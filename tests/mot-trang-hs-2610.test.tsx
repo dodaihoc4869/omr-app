@@ -207,6 +207,26 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
     expect(screen.getByRole('button', { name: 'Học tiếp · 6 câu' }).querySelector('.da-bong, .da-vong')).toBeNull()
   })
 
+  it('VÒNG NÚT KIỂM TRA ÔN TẬP (ảnh thầy 28/10: màn bài «3/5 chặng đã chốt» mà vòng trên Lộ trình xám hết): mỗi chặng một đoạn, tô đúng số chặng đã chốt; Tự sửa lỗi không vòng xám', () => {
+    const KT35: TomTatKiemTra = { ...KIEM, soChang: 5, daTra: 18, con: 10, changChot: 3 }
+    const { container, rerender } = render(<MotTrangHs {...goc({ kiem: KT35, onKiemTra: noop })} />)
+    const vong = nut()[0]!.querySelector('.da-vong')!
+    expect(vong).not.toBeNull()
+    const nen = vong.querySelector('circle.nen')!, CV = 2 * Math.PI * 54
+    expect(Number(nen.getAttribute('stroke-dasharray')!.split(' ')[0]) + 14).toBeCloseTo(CV / 5, 3) // 5 đoạn = 5 chặng
+    expect(Number(vong.querySelector('mask circle')!.getAttribute('stroke-dasharray')!.split(' ')[0])).toBeCloseTo((CV * 3) / 5, 3) // tô 3 đoạn
+    expect(vong.querySelector('circle.chay')).not.toBeNull()
+    // máy chủ cũ chưa gửi số chặng ⇒ theo câu đã trả lời (18/28), không xám nguyên
+    rerender(<MotTrangHs {...goc({ kiem: { ...KT35, changChot: undefined }, onKiemTra: noop })} />)
+    expect(Number(nut()[0]!.querySelector('.da-vong mask circle')!.getAttribute('stroke-dasharray')!.split(' ')[0])).toBeCloseTo((CV * 18) / 28, 3)
+    // không kiểm tra, đủ mức ⇒ Tự sửa lỗi là việc hiện tại: có bong bóng, KHÔNG vòng xám (không có số tổng để tô)
+    rerender(<MotTrangHs {...goc({ so: { daLam: 30, muc: 30, chang: 5, soChang: 5 } as PropsMotTrang['so'] })} />)
+    const sua = screen.getByRole('button', { name: 'Tự sửa lỗi: 5 câu' })
+    expect(sua.getAttribute('data-tt')).toBe('dang')
+    expect(sua.querySelector('.da-vong')).toBeNull()
+    expect(container.querySelectorAll('.da-vong')).toHaveLength(0)
+  })
+
   it('nộp xong ⇒ nút kiểm tra ✓ (đã xong), các chặng mở lại theo thứ tự cũ + vỡ khoá MỘT lần; quá hạn chưa làm ⇒ không khoá, ghi «Đã lỡ»', () => {
     // máy có chuyển động (jsdom mặc định coi là «giảm chuyển động»)
     vi.stubGlobal('matchMedia', (q: string) => ({ matches: false, media: q, addEventListener() {}, removeEventListener() {} }))

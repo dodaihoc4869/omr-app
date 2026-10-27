@@ -63,9 +63,12 @@ export const COT_META_KT = `k.id,k.sbd,k.lop,k.ngay,k.mo_luc,k.han_luc,k.trang_t
  json_object('tong',json_array_length(k.json,'$.cau'),'phienBan',json_extract(k.json,'$.phienBan'),'baiNgayToiThieu',COALESCE(json_extract(k.json,'$.baiNgayToiThieu'),0),'soChang',json_array_length(k.json,'$.chang'),'phut',json_extract(k.json,'$.phut'),'soBai',json_array_length(k.json,'$.bai'),'tongKienThuc',(SELECT COUNT(*) FROM json_each(k.json,'$.muc') m WHERE COALESCE(json_extract(m.value,'$.loai'),'')<>'bai'),'phuDe',COALESCE(json_extract(k.json,'$.phuKienThuc'),(SELECT COUNT(*) FROM json_each(k.json,'$.muc') m WHERE COALESCE(json_extract(m.value,'$.loai'),'')<>'bai' AND json_extract(m.value,'$.id') NOT IN(SELECT value FROM json_each(k.json,'$.thieu')))),'lyDo',json_extract(k.json,'$.lyDo'),'thieuNguon',json_array_length(k.json,'$.thieu'),'daTra',(SELECT COUNT(*) FROM json_each(k.json,'$.cau') c JOIN json_each(k.tra_json) a ON a.key=json_extract(c.value,'$.q.qid') WHERE a.type='text' AND CASE json_extract(c.value,'$.q.phan') WHEN 'I' THEN a.value IN('A','B','C','D') WHEN 'II' THEN length(a.value)=4 AND replace(replace(a.value,'D',''),'S','')='' ELSE length(trim(a.value,char(9,10,11,12,13,32,160,5760,8192,8193,8194,8195,8196,8197,8198,8199,8200,8201,8202,8232,8233,8239,8287,12288,65279)))>0 AND length(a.value)<=100 END))) meta_json`
 
 /** Chỉ đọc; bảng chỉ được tạo ở cron/migration, không ở trang của thầy/PH. */
+/** Số chặng ĐÃ CHỐT (em bấm chốt, hoặc hết giờ chặng) — CHỈ-THÊM 28/10 (thầy: «có 3 phần đã làm nhưng vòng xung quanh không tính vẫn màu xám»): nút Kiểm tra
+ *  ôn tập trên Lộ trình tô vòng theo đúng số này, cùng nguồn với màn bài («3/5 chặng đã chốt»). Dò khoá chính (bai_id, stt) trong CÙNG câu đọc, không thêm lượt D1. */
+const COT_CHANG_CHOT_KT = `(SELECT COUNT(*) FROM kiem_tra_ca_nhan_chang c WHERE c.bai_id=k.id AND (c.chot_luc IS NOT NULL OR c.han<=?3)) AS chang_chot`
 export async function docKtCn(env: Env, sbd: string, now: number, chiMeta=false): Promise<Row | null> {
   if (!await coKtCn(env)) return null
-  const r = await env.DB.prepare(`SELECT ${chiMeta?COT_META_KT:'k.*'} FROM kiem_tra_ca_nhan k JOIN hoc_sinh h ON h.sbd=k.sbd AND k.lop=${sqlTenLopHs('h')} WHERE k.sbd=? AND k.ngay>=? AND COALESCE(h.trang_thai,'')<>'khoa' ORDER BY (k.trang_thai='cho_nguon'),k.ngay LIMIT 1`).bind(sbd, ngayKt(now)).first<Row>()
+  const r = await env.DB.prepare(`SELECT ${chiMeta?`${COT_META_KT},${COT_CHANG_CHOT_KT}`:'k.*'} FROM kiem_tra_ca_nhan k JOIN hoc_sinh h ON h.sbd=k.sbd AND k.lop=${sqlTenLopHs('h')} WHERE k.sbd=?1 AND k.ngay>=?2 AND COALESCE(h.trang_thai,'')<>'khoa' ORDER BY (k.trang_thai='cho_nguon'),k.ngay LIMIT 1`).bind(...(chiMeta ? [sbd, ngayKt(now), now] : [sbd, ngayKt(now)])).first<Row>()
   if (!r) return null
   return r
 }
@@ -98,7 +101,9 @@ export function tomTatKt(r: Row, now: number) {
     homNay: laNgayKt(r, now),...(coHocNgayKt(r)?{baiNgayToiThieu:12}:{}),tong,daTra,con:tong-daTra,soChang:d?.chang.length??Number(meta!.soChang),phut:d?.phut??Number(meta!.phut),
     soBai:d?(d.bai?.length??new Set(d.muc.map(m=>m.bai)).size):Number(meta!.soBai),tongKienThuc,phuDe:d?(d.phuKienThuc??kn!.filter(m=>!d.thieu.includes(m.id)).length):Number(meta!.phuDe),
     nguonDayDu:thieu===0&&tongKienThuc>0,lyDo:d?.lyDo??String(meta!.lyDo),thieuNguon:thieu,
-    diem: r.diem === null || r.diem === undefined ? null : Number(r.diem), nopLuc: r.nop_luc ? Number(r.nop_luc) : null }
+    diem: r.diem === null || r.diem === undefined ? null : Number(r.diem), nopLuc: r.nop_luc ? Number(r.nop_luc) : null,
+    // số chặng đã chốt (chỉ có khi đọc bằng docKtCn chiMeta); đã nộp ⇒ mọi chặng coi như chốt
+    ...(r.chang_chot !== undefined && r.chang_chot !== null ? { changChot: r.nop_luc ? Number(d?.chang.length ?? meta!.soChang) : Math.min(Number(d?.chang.length ?? meta!.soChang), Number(r.chang_chot)) } : {}) }
 }
 
 /** Chuẩn bị trên cron, không bắt mỗi lượt mở app đọc lại toàn kho/lập đề. */

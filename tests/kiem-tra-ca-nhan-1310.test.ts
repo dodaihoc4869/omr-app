@@ -81,6 +81,8 @@ it('đồng hồ không khởi động lại; lưu/nộp chặng rồi nộp to�
   await ktCnAction(k.env,'S1','hoc-tap-ktcn-start',{id,chang:i},now+40000+i*1000)
   const tra=Object.fromEntries(d.cau.filter((c:{q:{qid:string}})=>d.chang[i].qids.includes(c.q.qid)).map((c:{q:{qid:string;correct:string}})=>[c.q.qid,c.q.correct]))
   await ktCnAction(k.env,'S1','hoc-tap-ktcn-chot-chang',{id,chang:i,tra,revision:Number(k.d.sql.prepare('SELECT revision FROM kiem_tra_ca_nhan WHERE id=?').get(id)!.revision)},now+41000+i*1000)
+  // 28/10 (ảnh thầy: màn bài «3/5 chặng đã chốt» mà vòng nút trên Lộ trình xám hết): bản tóm tắt nhẹ của Sảnh đếm ĐÚNG số chặng đã chốt sau mỗi lần chốt
+  expect(tomTatKt((await docKtCn(k.env,'S1',now+41500+i*1000,true))!,now+41500+i*1000)).toMatchObject({changChot:i+1,soChang:d.chang.length})
  }
  const result=await ktCnAction(k.env,'S1','hoc-tap-ktcn-nop',{id},now+60000)
  const count=k.d.sql.prepare("SELECT COUNT(*) n FROM su_kien_hoc WHERE ma_nguon=?").get(id)
@@ -246,7 +248,9 @@ it('đọc lịch nhẹ không mang đề/đáp án; số câu trả lời khớ
   const meta=(await docKtCn(k.env,'S1',NOW,true))!
   expect(meta).not.toHaveProperty('json');expect(meta).not.toHaveProperty('tra_json')
   expect(JSON.stringify(meta)).not.toContain('correct');expect(String(meta.meta_json)).not.toContain('"phan"')
-  expect(tomTatKt(meta,NOW)).toEqual(tomTatKt(full,NOW));expect(tomTatKt(meta,NOW).daTra).toBe(3)
+  // 28/10: đọc nhẹ kèm thêm số chặng đã chốt (vòng nút trên Lộ trình) — CHỈ-THÊM, còn lại khớp hệt bản đầy đủ
+  const {changChot,...nhe}=tomTatKt(meta,NOW);expect(changChot).toBe(0)
+  expect(nhe).toEqual(tomTatKt(full,NOW));expect(tomTatKt(meta,NOW).daTra).toBe(3)
  }
 })
 it('khẩn 13/10: lập đề ghi luôn số tính sẵn; đọc lịch nhẹ không bóc JSON đề trong SQL',async()=>{
@@ -261,7 +265,8 @@ it('khẩn 13/10: lập đề ghi luôn số tính sẵn; đọc lịch nhẹ kh
  vi.spyOn(k.env.DB,'prepare').mockImplementation(sql=>{sqls.push(sql);return prepare(sql)})
  const meta=(await docKtCn(k.env,'S1',NOW,true))!
  vi.restoreAllMocks()
- expect(tomTatKt(meta,NOW)).toEqual(tomTatKt(r,NOW))
+ const {changChot,...nhe}=tomTatKt(meta,NOW);expect(changChot).toBe(0) // 28/10 chỉ-thêm: số chặng đã chốt
+ expect(nhe).toEqual(tomTatKt(r,NOW))
  const doc=sqls.find(x=>x.includes('kiem_tra_ca_nhan_meta'))!
  const nhanhMoi=doc.slice(doc.indexOf('COALESCE((SELECT'),doc.indexOf("json_object('tong'"))
  expect(nhanhMoi).toContain('kiem_tra_ca_nhan_meta');expect(nhanhMoi).not.toMatch(/k\.json/)
