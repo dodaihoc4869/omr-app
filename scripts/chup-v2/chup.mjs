@@ -349,7 +349,29 @@ const DS_PH_DOC = [
   ,['62-ph-doc-tat-doc', 'ph&mot=1&trong=tat', 390, 844, 'light', true, /Hôm nay của Khôi/]
   ,['62-ph-doc-tat-may-tinh', 'ph&mot=1&trong=tat', 1440, 900, 'light', false, /Hôm nay của Khôi/]
 ]
+// ═══ DUO KIỂM TRA 27/10 (tiền tố "duo-kt-"): màn làm bài kiểm tra kiểu Duolingo — Kiểm tra ôn tập (`duo-kt&v=ktcn|ket`) + ca thi (`duo-kt&v=thi|kq&vai=hocsinh`),
+// khối DUO KIỂM TRA ở trang.tsx. 390×844 · 360×640 · 844×390 · 1440×900, sáng + tối. Thao tác `lam13:` (nút / phím) dùng chung khối LÀN MÀN LÀM BÀI.
+const DK_LUOI = 'nut:^Danh sách câu'
+const DUO_KT_CANH = [
+  ['ktcn-cau', 'duo-kt&v=ktcn', /Kiểm tra ôn tập/, 'lam13:nut:^Làm tiếp chặng 2'],
+  ['ktcn-ds', 'duo-kt&v=ktcn', /Kiểm tra ôn tập/, `lam13:nut:^Làm tiếp chặng 2 » ${DK_LUOI} » nut:^Câu 4`],
+  ['ktcn-tln', 'duo-kt&v=ktcn', /Kiểm tra ôn tập/, `lam13:nut:^Làm tiếp chặng 2 » ${DK_LUOI} » nut:^Câu 6 » phim:1,5`],
+  ['ktcn-luoi', 'duo-kt&v=ktcn', /Kiểm tra ôn tập/, `lam13:nut:^Làm tiếp chặng 2 » ${DK_LUOI}`],
+  ['ktcn-nop', 'duo-kt&v=ktcn', /Kiểm tra ôn tập/, `lam13:nut:^Làm tiếp chặng 2 » ${DK_LUOI} » nut:^Câu 6 » nut:^Nộp chặng 2`],
+  ['ktcn-ket', 'duo-kt&v=ket', /Làm tốt lắm/],
+  ['thi-cau', 'duo-kt&v=thi&vai=hocsinh', /Câu \d\/8/],
+  ['thi-chon', 'duo-kt&v=thi&vai=hocsinh', /Câu \d\/8/, 'lam13:nut:^B\\.'],
+  ['thi-ds', 'duo-kt&v=thi&vai=hocsinh', /Câu \d\/8/, `lam13:${DK_LUOI} » nut:^Câu 5 » nut:^Đúng$`],
+  ['thi-tln', 'duo-kt&v=thi&vai=hocsinh', /Câu \d\/8/, `lam13:${DK_LUOI} » nut:^Câu 7 » nut:^1$ » nut:^7$`],
+  ['thi-luoi', 'duo-kt&v=thi&vai=hocsinh', /Câu \d\/8/, `lam13:${DK_LUOI}`],
+  ['thi-nop', 'duo-kt&v=thi&vai=hocsinh', /Câu \d\/8/, `lam13:${DK_LUOI} » nut:^Nộp bài$`],
+  ['thi-kq', 'duo-kt&v=kq&vai=hocsinh', /Làm tốt lắm/],
+]
+const DS_DUO_KT = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  DUO_KT_CANH.map(([t, m, cho, viec]) => [`duo-kt-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
+// ═══ hết DUO KIỂM TRA 27/10
 const DS = [
+  ...DS_DUO_KT, // DUO KIỂM TRA 27/10
   ...DS_KGD, // KIỂM GD MỚI 26/10
   ...DS_NG_GV, // NGANG GV 26/10
   ...DS_PH_DOC, // PH CHỈ ĐỌC 26/10

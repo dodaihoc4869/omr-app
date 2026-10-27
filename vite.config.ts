@@ -284,6 +284,9 @@ export default defineConfig({
           '**/{HoiThayScreen,hoi-thay-goc}-*.{js,css}',
           // Kiểm tra riêng cần máy chủ để mở chặng/lưu giờ: chỉ tải khi đến lịch, cất ở kho chạy-lúc.
           '**/{ManKiemTraCaNhan,TheKiemTraCaNhan,TheKiemTraCon}-*.{js,css}',
+          // Kiểm tra kiểu Duolingo (27/10): khung chung + khung ca thi + Bi kết quả nạp lười khi <html data-trong="hs"> (tải hỏng ⇒ bố cục cũ) và Kết quả sau nộp
+          // (chỉ hiện khi bài đã gửi được, tức đang có mạng) ⇒ kho chạy-lúc, precache giữ ≤ 170.
+          '**/{KhungKiemTra,ThiDuo,BiNop,KetQuaSauNop}-*.{js,css}',
           '**/kiem-tra-ca-nhan-*.css',
           '**/LuyenDeChuan-*.{js,css}',
           // Giao diện «Trong» app học sinh (26/10): mảnh trình bày nạp lười (nap-trong-hs.ts) ⇒ kho chạy-lúc; tải hỏng (mất mạng lần đầu) ⇒ app vẽ bản cũ.

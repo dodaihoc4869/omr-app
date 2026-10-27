@@ -1,8 +1,9 @@
 // TIẾNG THƯỞNG PHẠT (HIEU-UNG.md «Âm thanh bổ sung», thầy 26/10) — cùng bộ tổng hợp với am-thanh.ts: Web Audio, KHÔNG tệp âm thanh. Mỗi tiếng = danh sách
 // «giọng» (chuông / ấm như am-thanh.ts) + thêm «ồn lọc» (tiếng ồn trắng qua bộ lọc thông dải, tần số lướt) cho lửa «phừng», ống nghiệm vỡ, xì hơi thăng hoa.
 // Chỉ kêu khi <html data-trong="hs">, em chưa tắt «Âm thanh» (localStorage 'ddh.am' ≠ 'tat') và tab đang hiện. AudioContext tạo lười, dùng lại. Lỗi im lặng.
-// Nằm trong mảnh nạp lười của các màn thưởng (không vào nhóm mở app). Không dùng ở màn thi thật.
+// Nằm trong mảnh nạp lười của các màn thưởng (không vào nhóm mở app). Màn kiểm tra đang mở (cờ che-do-thi.ts, thầy 27/10) ⇒ im lặng hẳn.
 import { duocPhanHoi } from './rung'
+import { dangCheDoThi } from './che-do-thi'
 
 export type KieuTiengThuong = 'combo' | 'tinhThe' | 'ruong' | 'lenHang' | 'roiHang' | 'chuoi' | 'vo' | 'thangHoa'
 type Giong = { t: number; f: number; f2?: number; d: number; a?: number; g: number; p?: [number, number][] }
@@ -53,7 +54,7 @@ function bufOn(c: AudioContext): AudioBuffer {
 }
 
 export function phatThuong(kieu: KieuTiengThuong, bac = 0): void {
-  if (!duocPhanHoi('ddh.am') || typeof document === 'undefined' || document.hidden) return
+  if (dangCheDoThi() || !duocPhanHoi('ddh.am') || typeof document === 'undefined' || document.hidden) return
   try {
     const c = layCtx()
     if (!c || !tong) return

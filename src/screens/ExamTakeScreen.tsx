@@ -65,7 +65,6 @@ import PhongChoGame from '../components/PhongChoGame'
 import { TheNoiDung, NutChinh, OThongBao, Nhan } from '../components/DesignSystem'
 import { TriangleAlert, X, ArrowLeft, LayoutGrid, Flag, Lock, Maximize } from 'lucide-react'
 import { classify, moTaBieuDiem, type SoCauBaPhan } from '../engine/score'
-import KetQuaSauNop from '../components/xem-diem/KetQuaSauNop'
 import { chuGioNop, luoiTungCau, phanTuDiem, soSanhLanTruoc, thoiGianLam, tongDungTong } from '../lib/ket-qua-sau-nop'
 import { docDuongVao } from '../lib/vai-tro'
 import { dungM3 } from '../components/m3'
@@ -104,6 +103,7 @@ import { soOHopLe } from '../lib/so-o-tra-loi-ngan'
 import type { BoDoTreoMayTrang } from '../lib/do-treo-may-thi'
 import type { CauPhieu } from './LamBaiNgang'
 import { thoatToanManHinh, thuVaoToanManHinh, useBoCuc } from '../lib/lam-bai-ngang'
+import type { ThiDuoProps } from '../components/kiem-tra-duo/ThiDuo'
 // «Trong» 26/10 (nhóm 2): tờ trình bày styles/trong-lam-bai.css nạp RIÊNG, chỉ khi <html data-trong> (main.tsx gắn trước khi nạp màn) — không cộng byte lượt mở app.
 if (typeof document !== 'undefined' && document.documentElement.dataset.trong) void import('../styles/trong-lam-bai.css').catch(() => {})
 // Mảnh bố cục NGANG (01/10, thầy: "xoay ngang không hoạt động"): trước đây nạp lười NGOÀI precache, nạp hỏng một lần (mạng yếu, hay máy còn
@@ -114,6 +114,20 @@ let LamBaiNgang = lazy(napNgang)
 function lamMoiManhNgang() {
   LamBaiNgang = lazy(napNgang)
 }
+// CA THI KIỂU DUOLINGO (thầy 27/10): khung một câu một màn, CHỈ khi <html data-trong="hs"> ở đường học sinh — mảnh NẠP LƯỜI (không cộng byte đường /t),
+// bắt đầu tải ngay lúc mô-đun màn thi chạy (em còn ở bước nhập mã / phòng chờ). Đã tải xong ⇒ dùng thẳng (không chớp bố cục cũ); chưa xong / tải hỏng
+// ⇒ bố cục dọc cũ (BoLuiDoc) — em vẫn làm bài bình thường.
+function laThiDuo(): boolean {
+  return dungM3() && typeof document !== 'undefined' && document.documentElement.dataset.trong === 'hs'
+}
+type ManhThiDuo = React.ComponentType<ThiDuoProps>
+let ThiDuoSan: ManhThiDuo | null = null
+const napThiDuo = () => import('../components/kiem-tra-duo/ThiDuo').then((m) => { ThiDuoSan = m.default })
+if (laThiDuo()) void napThiDuo().catch(() => {})
+// KẾT QUẢ SAU NỘP (27/10, bù byte khung Duo cho đường /t): chỉ hiện SAU khi bài đã gửi được (đang có mạng — nộp lúc mất mạng là thẻ «đang gửi» riêng)
+// ⇒ mảnh nạp lười, tải sẵn từ lúc vào đề; tải hỏng ⇒ một dòng «Em đã nộp bài» thay vì trắng màn.
+const napKetQua = () => import('../components/xem-diem/KetQuaSauNop')
+const KetQuaSauNop = lazy(() => napKetQua().catch(napKetQua))
 // BÁO CÁO CHI TIẾT CA bản mới (BaoCaoChiTiet chế độ em, 28/09) — mảnh lazy ngoài precache.
 const BaoCaoCaCuaEm = lazy(() => import('../components/ca-thi/BaoCaoCaCuaEm'))
 // Phiếu của em chỉ mở SAU khi nộp ⇒ nạp lười (22/10): trước đây nhập tĩnh làm đường vào thi /t tải thêm ~18 KB nén mà em đang thi không dùng.
@@ -484,6 +498,18 @@ export default function ExamTakeScreen({ tuCong, onVe }: { tuCong?: TuCongHocSin
   const [daGuiHoi, setDaGuiHoi] = useState<{ qids: string[]; ghiChu: string } | null>(null)
 
   // ---- Trạng thái riêng của màn làm bài ----
+  // KIỂU DUOLINGO (thầy 27/10): cố định suốt phiên như <html data-trong>. `cauDuo` = câu đang xem (khung Duo mở ra thì tự tới câu chưa làm đầu tiên).
+  // `thiDuoSan` đổi khi mảnh khung Duo tải xong ⇒ vẽ lại bằng khung ấy + bộ quan sát giây từng câu gắn lại các thẻ. Âm thanh: khung Duo bật cờ che-do-thi (chỉ rung).
+  const [thiDuo] = useState(laThiDuo)
+  const [cauDuo, setCauDuo] = useState(0)
+  const [thiDuoSan, setThiDuoSan] = useState(0)
+  const [thiDuoHong, setThiDuoHong] = useState(false)
+  useEffect(() => {
+    if (thiDuo) void napThiDuo().then(() => setThiDuoSan((n) => n + 1), () => {})
+  }, [thiDuo])
+  useEffect(() => {
+    if (phase === 'exam') void napKetQua().catch(() => {})
+  }, [phase])
   const [showGrid, setShowGrid] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [showBackDialog, setShowBackDialog] = useState(false)
@@ -1753,7 +1779,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       const el = document.getElementById(`cau-${stt}`)
       if (el) io.observe(el)
     }
-  }, [phase, soTheDung, flat.length])
+  }, [phase, soTheDung, flat.length, thiDuoSan])
 
   // CHỐNG GIAN LẬN THEO MỨC (QUANLYCATHI mục 6, thay quy định "1 lần là khoá"
   // ngày 2/9): rời màn (chuyển app, tắt màn hình, mất tiêu điểm — bắt được cả
@@ -3292,6 +3318,8 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
           </TheNoiDung>
           ) : (
             /* HS-1 (thầy chốt 21/09): kết quả sau nộp vẽ lại theo bản vẽ — ba trạng thái theo luật công bố; CHỈ đổi phần nhìn. */
+            <BoLuiDoc duPhong={<p className="text-center">Em đã nộp bài.</p>}>
+              <Suspense fallback={<p className="text-center">Em đã nộp bài.</p>}>
             <KetQuaSauNop
               kieu={graded ? 'da_cong_bo' : choCaLop ? 'ca_lop' : 'khong'}
               tenCa={attempt?.tenCa || ''}
@@ -3320,6 +3348,8 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
               lam2={thoiGianLam(attempt?.startedAt, attempt?.submittedAt)}
               expCa={graded ? expCa : null}
             />
+              </Suspense>
+            </BoLuiDoc>
           )}
 
           {phieuCuaEm && (
@@ -3612,12 +3642,14 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
   }
 
   const camNopSom = Boolean(attempt.chiNop3PhutCuoi && (mocGio === 'thuong' || mocGio === 'gap'))
+  const KhungDuo = thiDuo && !thiDuoHong ? ThiDuoSan : null
+  const vungDuo = !!KhungDuo
   const nhanNutNop = camNopSom ? <NhanNopCho kho={khoGio} /> : 'Nộp bài'
 
   const lopPhu = (
     <>
       {/* LƯỚI SỐ CÂU — tấm trượt từ dưới lên */}
-      {showGrid && (
+      {showGrid && !vungDuo && (
         <div className="fixed inset-0 z-40 flex items-end" style={{ background: 'var(--phu)' }} onClick={() => setShowGrid(false)}>
           <div
             className="w-full flex flex-col"
@@ -3679,7 +3711,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       )}
 
       {/* XÁC NHẬN NỘP BÀI */}
-      {showConfirm && (
+      {showConfirm && !vungDuo && (
         <HopThoai>
           <div style={{ fontSize: 'var(--cx-3)', lineHeight: 1.6 }}>
             Em đã làm{' '}
@@ -3773,10 +3805,44 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       </button>
     ) : null
 
+  // Dải cảnh báo rời màn + dòng báo thêm giờ — dùng chung cho ba bố cục (ngang, dọc, Duo).
+  const daiBao = (
+    <>
+      {/* DẢI CẢNH BÁO RỜI MÀN (mục 6) — dính dưới thanh trên, tự ẩn sau 15 giây */}
+      {canhBaoRoi &&
+        (dungM3() ? (
+          <div className="sticky z-30" style={{ top: 56 }} role="alert" data-canh-bao={canhBaoRoi.muc}>
+            <DaiCanhBaoRoiM3 muc={canhBaoRoi.muc} loi={canhBaoRoi.loi} />
+          </div>
+        ) : (
+          <div className="sticky z-30 px-3 sm:px-4" style={{ top: 56, paddingTop: 'var(--k2)', background: 'var(--nen)' }} role="alert" data-canh-bao={canhBaoRoi.muc}>
+            <OThongBao tone={canhBaoRoi.muc === 'dam' ? 'do' : 'cam'}>
+              <b>{canhBaoRoi.loi}</b>
+            </OThongBao>
+          </div>
+        ))}
+
+      {/* DÒNG BÁO "Thầy cho thêm N phút" — nhẹ, tự tắt; nhường chỗ cho cảnh báo rời màn (cùng vị trí dính) */}
+      {baoThemGio &&
+        !canhBaoRoi &&
+        (dungM3() ? (
+          <div className="sticky z-30" style={{ top: 56 }} role="status" data-bao-them-gio>
+            <DaiBaoNheM3 chu={baoThemGio} />
+          </div>
+        ) : (
+          <div className="sticky z-30 px-3 sm:px-4" style={{ top: 56, paddingTop: 'var(--k2)', background: 'var(--nen)' }} role="status" data-bao-them-gio>
+            <OThongBao tone="xanh">
+              <b>{baoThemGio}</b>
+            </OThongBao>
+          </div>
+        ))}
+    </>
+  )
+
   // BỐ CỤC NGANG (thầy chốt 28/09): đề | thanh kéo | phiếu + đồng hồ/nộp. Đề vẫn là CHÍNH các thẻ câu ở trên (chọn trong đề
   // hay trên phiếu đều gọi setPhanI/II/III), mọi lớp phủ (nộp, back, phóng ảnh, tấm che, giữ để đọc) dùng chung với bố cục dọc.
   let manNgang: React.ReactElement | null = null
-  if (boCuc !== 'doc') {
+  if (boCuc !== 'doc' && !KhungDuo) {
     const dsItem = (f: FlatRef) => (f.phan === 'I' ? assignment.phanI[f.i] : f.phan === 'II' ? assignment.phanII[f.i] : assignment.phanIII[f.i])
     const cauPhieu: CauPhieu[] = flat.map((f, i) => {
       const qid = qidCuaCau(f)
@@ -3847,39 +3913,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
           onCauDangXem={(n) => {
             cauDangXemRef.current = n
           }}
-          tren={
-            <>
-      {/* DẢI CẢNH BÁO RỜI MÀN (mục 6) — dính dưới thanh trên, tự ẩn sau 15 giây */}
-      {canhBaoRoi &&
-        (dungM3() ? (
-          <div className="sticky z-30" style={{ top: 56 }} role="alert" data-canh-bao={canhBaoRoi.muc}>
-            <DaiCanhBaoRoiM3 muc={canhBaoRoi.muc} loi={canhBaoRoi.loi} />
-          </div>
-        ) : (
-          <div className="sticky z-30 px-3 sm:px-4" style={{ top: 56, paddingTop: 'var(--k2)', background: 'var(--nen)' }} role="alert" data-canh-bao={canhBaoRoi.muc}>
-            <OThongBao tone={canhBaoRoi.muc === 'dam' ? 'do' : 'cam'}>
-              <b>{canhBaoRoi.loi}</b>
-            </OThongBao>
-          </div>
-        ))}
-
-      {/* DÒNG BÁO "Thầy cho thêm N phút" — nhẹ, tự tắt; nhường chỗ cho cảnh báo rời màn (cùng vị trí dính) */}
-      {baoThemGio &&
-        !canhBaoRoi &&
-        (dungM3() ? (
-          <div className="sticky z-30" style={{ top: 56 }} role="status" data-bao-them-gio>
-            <DaiBaoNheM3 chu={baoThemGio} />
-          </div>
-        ) : (
-          <div className="sticky z-30 px-3 sm:px-4" style={{ top: 56, paddingTop: 'var(--k2)', background: 'var(--nen)' }} role="status" data-bao-them-gio>
-            <OThongBao tone="xanh">
-              <b>{baoThemGio}</b>
-            </OThongBao>
-          </div>
-        ))}
-
-            </>
-          }
+          tren={daiBao}
           congCu={<NutDiuMat bat={diuMat} onDoi={doiDiuMat} chiBieuTuong={boCuc === 'ngang-gon'} />}
           phuDe={<ManGiuDeDoc trongKhung chu={coCamUng() ? undefined : 'Giữ phím cách để đọc tiếp'} />}
         >
@@ -3955,34 +3989,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       )}
 
 
-      {/* DẢI CẢNH BÁO RỜI MÀN (mục 6) — dính dưới thanh trên, tự ẩn sau 15 giây */}
-      {canhBaoRoi &&
-        (dungM3() ? (
-          <div className="sticky z-30" style={{ top: 56 }} role="alert" data-canh-bao={canhBaoRoi.muc}>
-            <DaiCanhBaoRoiM3 muc={canhBaoRoi.muc} loi={canhBaoRoi.loi} />
-          </div>
-        ) : (
-          <div className="sticky z-30 px-3 sm:px-4" style={{ top: 56, paddingTop: 'var(--k2)', background: 'var(--nen)' }} role="alert" data-canh-bao={canhBaoRoi.muc}>
-            <OThongBao tone={canhBaoRoi.muc === 'dam' ? 'do' : 'cam'}>
-              <b>{canhBaoRoi.loi}</b>
-            </OThongBao>
-          </div>
-        ))}
-
-      {/* DÒNG BÁO "Thầy cho thêm N phút" — nhẹ, tự tắt; nhường chỗ cho cảnh báo rời màn (cùng vị trí dính) */}
-      {baoThemGio &&
-        !canhBaoRoi &&
-        (dungM3() ? (
-          <div className="sticky z-30" style={{ top: 56 }} role="status" data-bao-them-gio>
-            <DaiBaoNheM3 chu={baoThemGio} />
-          </div>
-        ) : (
-          <div className="sticky z-30 px-3 sm:px-4" style={{ top: 56, paddingTop: 'var(--k2)', background: 'var(--nen)' }} role="status" data-bao-them-gio>
-            <OThongBao tone="xanh">
-              <b>{baoThemGio}</b>
-            </OThongBao>
-          </div>
-        ))}
+      {daiBao}
 
       {/* HAI CỘT TRÊN MÀN RỘNG. Cột trái KHÔNG phải menu của thầy: em đang thi
           mà bên cạnh có "Ngân hàng câu hỏi" thì một chạm là ra hết đáp án. Cột
@@ -4057,6 +4064,58 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       <ManGiuDeDoc />
     </Trang>
   )
+  // ═══ CA THI KIỂU DUOLINGO (thầy 27/10): một câu một màn trong khung ThiDuo (mảnh nạp lười). Vỏ (Trang + vân tay + lớp phủ: hộp thoát, phóng ảnh, tấm
+  // che, giữ để đọc, nút vào lại toàn màn hình) y như bố cục dọc; lưới số câu + hộp nộp là bản Duo trong khung. Khung chưa tải / hỏng ⇒ bố cục dọc cũ.
+  if (KhungDuo) {
+    stt = 0
+    const propsDuo: Omit<ThiDuoProps, 'children'> = {
+      tenCa: attempt.tenCa || '',
+      dongHo: laBaiTap ? (hanNopNgan ? `Hạn ${hanNopNgan}` : 'Bài tập') : <SoDongHo kho={khoGio} />,
+      nhanDongHo: laBaiTap ? 'Bài tập về nhà — không tính giờ' : 'Thời gian còn lại',
+      gap: !laBaiTap && gapNow,
+      daLam: daLamCount,
+      tong: total,
+      luu: { nhan: dotLabel, tt: loiKhoNen ? 'loi' : dangLuuNen || saveFlash ? 'dang' : !online ? 'mang' : 'da' },
+      cauHien: Math.min(Math.max(1, cauDuo), total),
+      onDenCau: (so) => {
+        if (so > soTheDung) setTheDaDung({ khoa: assignment, n: Infinity }) // câu chưa dựng (DỰNG ĐỀ DẦN) ⇒ dựng hết cùng lượt vẽ
+        setCauDuo(so)
+      },
+      phan: flat.map((f) => f.phan),
+      moTaPhan: (ph) => moTaBieuDiem(soCauCuaBai, ph),
+      moLuoi: showGrid,
+      onMoLuoi: setShowGrid,
+      moNop: showConfirm,
+      onMoNop: setShowConfirm,
+      chuaLam,
+      danhDau: sttDanhDau,
+      nhanNutNop,
+      camNopSom,
+      onNop: () => doSubmit(attemptRef.current ?? attempt),
+      onThoat: () => setShowBackDialog(true),
+      tren: daiBao,
+      congCu: <NutDiuMat bat={diuMat} onDoi={doiDiuMat} />,
+      tatPhim: showBackDialog || !!zoomSrc || !!lyDoChe,
+    }
+    const theDuo = (
+      <>
+        {renderPhan('I')}
+        {renderPhan('II')}
+        {renderPhan('III')}
+      </>
+    )
+    return (
+      <BoLuiDoc duPhong={manDoc} onLoi={() => setThiDuoHong(true)}>
+        <Trang className="man-lam-bai duo-kt-trang" diuMat={diuMat}>
+          <VanTay sbd={attempt.sbd} hoTen={hoTen.trim() || `SBD ${attempt.sbd}`} maCa={attempt.maCa} />
+          <KhungDuo {...propsDuo}>{theDuo}</KhungDuo>
+          {nutVaoLai}
+          {lopPhu}
+          <ManGiuDeDoc />
+        </Trang>
+      </BoLuiDoc>
+    )
+  }
   if (!manNgang) return manDoc
   // Mảnh ngang nạp lười (có trong precache). Đang nạp ⇒ tạm hiện bố cục dọc; nạp hỏng ⇒ ở lại bố cục dọc, xoay lại là thử nạp lại —
   // em vẫn làm bài bình thường, không bao giờ trắng màn.
