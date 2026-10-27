@@ -11,23 +11,12 @@
 //   ❷ chưa cho AI gán nhãn mức từng phương án — cờ hoá để thầy có số mà quyết;
 //   ❸ câu ôn lại CHỜ THẦY DUYỆT, không tự chèn vào ca.
 // Và một chốt nữa: hàng đợi ôn cất ở máy thầy, KHÔNG thêm cột vào `TienDoHS`.
+//
+// 27/10: bộ kê đơn `ke-don-chua` và lịch ôn `lich-on-lai` gỡ vì không màn nào dùng ⇒ các mục chỉ chạy hai tệp ấy bỏ theo.
 import { describe, expect, it } from 'vitest'
 import type { ChiTietCauRow } from '../src/lib/exam-api'
-import type { TeacherExamSource } from '../src/data/examContent'
 import { CAU_HINH_CHAN_DOAN_MAC_DINH as CH, TEN_BENH, mocOnKeTiep } from '../src/lib/chan-doan-cau-hinh'
 import { chanDoan, duocKe, thongKeTungCau, tiLeCoGiay, trungVi } from '../src/lib/chan-doan'
-import { keDon } from '../src/lib/ke-don-chua'
-import {
-  chuTienDo,
-  daKhacPhuc,
-  ghiDung,
-  ghiSai,
-  khoaMuc,
-  LICH_ON_LAI_RONG,
-  quaMotBuoi,
-  toiHan,
-  type LichOnLai,
-} from '../src/lib/lich-on-lai'
 
 // --------------------------------------------------------------- dựng dữ liệu
 
@@ -65,28 +54,6 @@ function lopLamCau(qid: string, n: number, soSai: number, soChum: number, pa = '
   }
   return ra
 }
-
-const KHO: TeacherExamSource[] = [
-  {
-    maDe: 'D1',
-    nhom: '12 · C1 - Ester – Lipid',
-    nguon: 'Bài 1',
-    phanI: Array.from({ length: 30 }, (_, i) => ({
-      id: `D1-I-${i + 1}`,
-      text: `câu ${i + 1}`,
-      choices: ['a', 'b', 'c', 'd'],
-      correct: 'A',
-      chuyenDe: 'Ester – lipid',
-      mucDo: i % 3 === 0 ? 'biet' : i % 3 === 1 ? 'hieu' : 'van_dung',
-      dang: { ma: 'ES-01', ten: 'Thuỷ phân ester' },
-      canChua: { sao: 1, ly_do: 'nên chữa' },
-    })),
-    phanII: [],
-    phanIII: [],
-  } as unknown as TeacherExamSource,
-]
-
-const NEN = { khoDe: KHO, nguonCauSai: KHO }
 
 // =========================================================================
 describe('CÔNG CỤ NỀN — sai ở đây thì mọi chẩn đoán sai theo', () => {
@@ -217,78 +184,6 @@ describe('CÙNG CÂU, KHÁC NGUYÊN NHÂN ⇒ KHÁC BỘ CHỮA — tiêu chí s
     expect(chanDoan(emB, tk.get('D1-I-5'), { caCoGiay: true, soCauCuoiPhan: 20 }).benh).toBe('bua_het_gio')
   })
 
-  it('HAI BỘ KHÁC NHAU, và em B có ĐÚNG 0 câu kiến thức + 1 cờ', () => {
-    const cdA = [chanDoan(emA, tk.get('D1-I-5'), { caCoGiay: true, soCauCuoiPhan: 20 })]
-    const cdB = [chanDoan(emB, tk.get('D1-I-5'), { caCoGiay: true, soCauCuoiPhan: 20 })]
-    const donA = keDon(cdA, [emA], NEN)
-    const donB = keDon(cdB, [emB], NEN)
-
-    expect(donA.tongCau).toBeGreaterThan(0)
-    expect(donB.tongCau).toBe(0)
-    expect(donB.cum.map((c) => c.benh)).toEqual(['bua_het_gio'])
-    expect(donB.co.filter((c) => c.chu.includes('hết giờ')).length).toBe(1)
-    // Và hai bộ thật sự khác nhau, không phải "khác vì một bên rỗng".
-    expect(donA.cum[0].cau.map((c) => c.id)).not.toEqual(donB.cum[0].cau.map((c) => c.id))
-  })
-
-  it('phiếu của em B vẫn có chữ giải thích, không im lặng bỏ trống', () => {
-    const cdB = [chanDoan(emB, tk.get('D1-I-5'), { caCoGiay: true, soCauCuoiPhan: 20 })]
-    const donB = keDon(cdB, [emB], NEN)
-    expect(donB.cum[0].chu).toContain('hết giờ')
-    expect(donB.cum[0].chu).toContain('chưa kê câu chữa')
-  })
-})
-
-describe('TRẦN SỐ CÂU — không thanh kéo nào vượt được', () => {
-  it('≤ 3 câu mỗi lỗi và ≤ 12 câu cả phiếu, trên 200 phiếu giả lập', () => {
-    let xauNhatMotLoi = 0
-    let xauNhatPhieu = 0
-    for (let s = 0; s < 200; s++) {
-      const rows: ChiTietCauRow[] = []
-      const cd = []
-      const soCauSai = 3 + (s % 18) // tới 20 câu sai một phiếu
-      for (let i = 0; i < soCauSai; i++) {
-        const qid = `D1-I-${(i % 30) + 1}`
-        const r = row({ qid, soCau: i + 1, dapAnChon: 'B' })
-        rows.push(r)
-        const benh = (['nham_khai_niem', 'chua_biet', 'loi_tinh'] as const)[i % 3]
-        cd.push({ qid, benh, lyDo: 'giả lập', canNhanPhuongAn: false })
-      }
-      const don = keDon(cd, rows, NEN)
-      for (const c of don.cum) xauNhatMotLoi = Math.max(xauNhatMotLoi, c.cau.length)
-      xauNhatPhieu = Math.max(xauNhatPhieu, don.tongCau)
-    }
-    // eslint-disable-next-line no-console
-    console.log(`[trần] xấu nhất: ${xauNhatMotLoi} câu/lỗi · ${xauNhatPhieu} câu/phiếu`)
-    expect(xauNhatMotLoi).toBeLessThanOrEqual(CH.TRAN_CAU_MOT_LOI)
-    expect(xauNhatPhieu).toBeLessThanOrEqual(CH.TRAN_CAU_MOT_PHIEU)
-  })
-
-  it('không câu nào bị kê HAI lần giữa các nhóm bệnh', () => {
-    const rows: ChiTietCauRow[] = []
-    const cd = []
-    for (let i = 0; i < 12; i++) {
-      const qid = `D1-I-${i + 1}`
-      rows.push(row({ qid, soCau: i + 1 }))
-      cd.push({ qid, benh: (['nham_khai_niem', 'chua_biet', 'loi_tinh'] as const)[i % 3], lyDo: '', canNhanPhuongAn: false })
-    }
-    const don = keDon(cd, rows, NEN)
-    const ids = don.cum.flatMap((c) => c.cau.map((x) => x.id))
-    expect(new Set(ids).size).toBe(ids.length)
-  })
-
-  it('chạm trần thì NÓI RA, không lặng lẽ cắt', () => {
-    const rows: ChiTietCauRow[] = []
-    const cd = []
-    for (let i = 0; i < 20; i++) {
-      const qid = `D1-I-${i + 1}`
-      rows.push(row({ qid, soCau: i + 1 }))
-      cd.push({ qid, benh: (['nham_khai_niem', 'chua_biet', 'loi_tinh', 'chua_ro'] as const)[i % 4], lyDo: '', canNhanPhuongAn: false })
-    }
-    const don = keDon(cd, rows, NEN)
-    expect(don.tongCau).toBeLessThanOrEqual(CH.TRAN_CAU_MOT_PHIEU)
-    expect(don.canhBao.length).toBeGreaterThan(0)
-  })
 })
 
 describe('❷ CỜ NHÃN PHƯƠNG ÁN — cho thầy SỐ mà quyết, không quyết hộ', () => {
@@ -298,53 +193,10 @@ describe('❷ CỜ NHÃN PHƯƠNG ÁN — cho thầy SỐ mà quyết, không qu
     const r = row({ qid: 'D1-I-3', dapAnChon: 'B', giay: 10 })
     const cd = [chanDoan(r, tk.get('D1-I-3'), { caCoGiay: true })]
     expect(cd[0].canNhanPhuongAn).toBe(true)
-    const don = keDon(cd, [r], NEN)
-    expect(don.co.some((c) => c.chu.includes('TỪNG PHƯƠNG ÁN'))).toBe(true)
   })
 })
 
 describe('❸ LỊCH ÔN GIÃN CÁCH — 1 / 3 / 7 buổi, sai lại thì về mốc 1', () => {
-  const LUC = '2026-09-10T00:00:00Z'
-
-  it('sai lần đầu ⇒ mốc 1 buổi, bậc hạ một nấc', () => {
-    const l = ghiSai(LICH_ON_LAI_RONG, 'S1', 'ES-01', 'nham_khai_niem', LUC)
-    const m = l[khoaMuc('S1', 'ES-01')]
-    expect(m.conMayBuoi).toBe(1)
-    expect(m.lanDung).toBe(0)
-    expect(m.lanSai).toBe(1)
-    expect(m.bac).toBe('biet') // từ mặc định 'hieu' hạ một nấc
-  })
-
-  it('mô phỏng 3 ca kế tiếp: dạng đã sai xuất hiện lại ĐÚNG mốc 1/3/7', () => {
-    let l: LichOnLai = ghiSai(LICH_ON_LAI_RONG, 'S1', 'ES-01', 'chua_biet', LUC)
-    const moc: number[] = []
-    for (let lan = 0; lan < 3; lan++) {
-      // đếm số buổi phải chờ tới khi tới hạn
-      let cho = 0
-      while (toiHan(l, 'S1').length === 0) {
-        l = quaMotBuoi(l)
-        cho++
-        if (cho > 20) break
-      }
-      moc.push(cho)
-      l = ghiDung(l, 'S1', 'ES-01', LUC)
-    }
-    expect(moc).toEqual(CH.MOC_ON) // [1, 3, 7]
-  })
-
-  it('sai lại ⇒ về mốc 1 VÀ hạ một bậc độ khó', () => {
-    let l = ghiSai(LICH_ON_LAI_RONG, 'S1', 'ES-01', 'chua_biet', LUC)
-    l = ghiDung(l, 'S1', 'ES-01', LUC)
-    l = ghiDung(l, 'S1', 'ES-01', LUC)
-    const truoc = l[khoaMuc('S1', 'ES-01')]
-    expect(truoc.bac).toBe('van_dung')
-    expect(truoc.conMayBuoi).toBe(7)
-    const sau = ghiSai(l, 'S1', 'ES-01', 'chua_biet', LUC)[khoaMuc('S1', 'ES-01')]
-    expect(sau.conMayBuoi).toBe(1)
-    expect(sau.bac).toBe('hieu') // van_dung hạ một nấc
-    expect(sau.lanDung).toBe(0)
-  })
-
   it('mốc kế tiếp không vượt bậc cuối', () => {
     expect(mocOnKeTiep(0)).toBe(1)
     expect(mocOnKeTiep(1)).toBe(3)
@@ -352,28 +204,9 @@ describe('❸ LỊCH ÔN GIÃN CÁCH — 1 / 3 / 7 buổi, sai lại thì về m
     expect(mocOnKeTiep(9)).toBe(7)
   })
 
-  it('ĐÃ KHẮC PHỤC = đúng đủ ba mốc, không sai lại ở giữa', () => {
-    let l = ghiSai(LICH_ON_LAI_RONG, 'S1', 'ES-01', 'chua_biet', LUC)
-    expect(daKhacPhuc(l[khoaMuc('S1', 'ES-01')])).toBe(false)
-    for (let i = 0; i < 3; i++) l = ghiDung(l, 'S1', 'ES-01', LUC)
-    const m = l[khoaMuc('S1', 'ES-01')]
-    expect(daKhacPhuc(m)).toBe(true)
-    expect(chuTienDo(m)).toBe('ES-01: đúng 3/3 mốc — đã khắc phục')
-  })
-
-  it('mục chưa tới hạn thì KHÔNG chen vào ca', () => {
-    const l = ghiSai(LICH_ON_LAI_RONG, 'S1', 'ES-01', 'chua_biet', LUC)
-    expect(toiHan(l, 'S1')).toEqual([])
-    expect(toiHan(quaMotBuoi(l), 'S1').length).toBe(1)
-  })
-
-  it('chữ tiến độ LUÔN kèm số, không nói chung chung', () => {
-    const l = ghiSai(LICH_ON_LAI_RONG, 'S1', 'ES-01', 'chua_biet', LUC)
-    expect(chuTienDo(l[khoaMuc('S1', 'ES-01')])).toBe('ES-01: sai 1 lần, đúng 0/3 mốc, còn 1 buổi')
-  })
 })
 
-describe('TỐC ĐỘ — chẩn đoán + kê đơn một phiếu 40 câu < 150 ms', () => {
+describe('TỐC ĐỘ — chẩn đoán một phiếu 40 câu < 150 ms (phần kê đơn `ke-don-chua` đã gỡ 27/10)', () => {
   it('đo bằng performance.now(), in số thật', () => {
     const rowsLop: ChiTietCauRow[] = []
     for (let i = 1; i <= 40; i++) rowsLop.push(...lopLamCau(`D1-I-${((i - 1) % 30) + 1}`, 30, 18, 12, 'B', 50))
@@ -382,12 +215,10 @@ describe('TỐC ĐỘ — chẩn đoán + kê đơn một phiếu 40 câu < 150 
 
     const t0 = performance.now()
     const cd = cuaEm.map((r) => chanDoan(r, tk.get(r.qid), { caCoGiay: true, soCauCuoiPhan: 40 }))
-    const don = keDon(cd, cuaEm, NEN)
     const ms = performance.now() - t0
     // eslint-disable-next-line no-console
-    console.log(`[tốc độ] chẩn đoán + kê đơn 40 câu: ${ms.toFixed(1)} ms · kê ${don.tongCau} câu`)
+    console.log(`[tốc độ] chẩn đoán 40 câu: ${ms.toFixed(1)} ms · ${cd.length} chẩn đoán`)
     expect(ms).toBeLessThan(150)
-    expect(don.tongCau).toBeLessThanOrEqual(CH.TRAN_CAU_MOT_PHIEU)
   })
 })
 
@@ -397,12 +228,6 @@ describe('CẤM — mấy chốt đặc tả ghi rõ', () => {
     const src = readSrc('src/lib/chan-doan.ts')
     expect(src).toContain("import { doChum } from './phan-cau-len-bang'")
     expect(src).not.toMatch(/function\s+doChum/)
-  })
-
-  it('KHÔNG viết bộ chọn câu thứ hai — kê đơn gọi lại `rutDeChua`', () => {
-    const src = readSrc('src/lib/ke-don-chua.ts')
-    expect(src).toContain("import { rutDeChua")
-    expect(src).toContain('rutDeChua({ ...nen, rows: ds, soCau: tran, qidTranh: [...tranh] })')
   })
 
   it('KHÔNG thêm cột nào vào `TienDoHS` — chốt của tôi thay cho đặc tả', () => {

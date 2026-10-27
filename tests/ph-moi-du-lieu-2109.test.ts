@@ -297,7 +297,8 @@ describe('khoá nguồn', () => {
     // MỌI tệp ts/tsx của app phụ huynh mới (bộ đọc, màn chính, bảng và các khối của bảng) — liệt kê từ đĩa để khối mới không lọt.
     const duyet = (d: string): string[] => fs.readdirSync(path.join(process.cwd(), d), { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? duyet(`${d}/${e.name}`) : /\.tsx?$/.test(e.name) ? [`${d}/${e.name}`] : []))
     const tep = [...duyet('src/lib/ph-moi'), ...duyet('src/components/ph-moi')]
-    expect(tep.length).toBeGreaterThan(25)
+    // 27/10 gọn mã: màn/bảng ph-moi cũ không màn nào dùng đã gỡ ⇒ còn 7 tệp (bộ đọc + phần cổng /ph đang dùng).
+    expect(tep.length).toBeGreaterThanOrEqual(7)
     for (const p of tep) {
       const s = doc(p).replace(/\/\/.*$/gm, '')
       expect(s, p).not.toMatch(/#[0-9a-fA-F]{3,8}\b|\(\?<[=!]|\.at\(|randomUUID/)

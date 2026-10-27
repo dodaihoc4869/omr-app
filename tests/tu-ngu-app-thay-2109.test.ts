@@ -10,16 +10,13 @@ const doc = (f: string) => fs.readFileSync(path.join(__dirname, '..', f), 'utf8'
 const chuHienRa = (f: string) => doc(f).split('\n').filter((l) => !/^\s*(\/\/|\/\*|\*)/.test(l)).join('\n')
 
 describe('CỤM 1 · Giao bài tập về nhà + Xem trước + theo dõi (hàng 2, 3, 5, 6, 7, 11, 12)', () => {
-  const TEP = ['src/screens/PhanCongScreen.tsx', 'src/components/KhoiBtvnLo.tsx', 'src/components/KhoiCaNhanHoa.tsx', 'src/components/XemTruocPhanBo.tsx', 'src/components/HocSinhNhanBai.tsx', 'src/lib/btvn-nang-do-thay.ts']
+  const TEP = ['src/screens/PhanCongScreen.tsx', 'src/components/KhoiCaNhanHoa.tsx', 'src/components/XemTruocPhanBo.tsx', 'src/components/HocSinhNhanBai.tsx', 'src/lib/btvn-nang-do-thay.ts']
 
   it('hàng 2 + 3: "chặng" thay "lô", "Bài tập về nhà đã giao" thay "Đợt bài đã giao"', () => {
     const pc = chuHienRa('src/screens/PhanCongScreen.tsx')
     expect(pc).toContain('Chia chặng theo hạn nộp')
     expect(pc).toContain('Bài tập về nhà đã giao')
     expect(pc).not.toMatch(/Chia lô theo hạn nộp|Đợt bài đã giao/)
-    const lo = chuHienRa('src/components/KhoiBtvnLo.tsx')
-    expect(lo).toContain('Chặng {b.loHienTai} trong {b.tongLo} chặng')
-    expect(lo).not.toMatch(/\blô \{|Lô \$\{/)
   })
 
   it('hàng 5 + 7: "câu cốt lõi" / "câu dành riêng cho em" — không còn "lõi"/"riêng" trơn ở chữ hiện ra; cột "CÂU CỐT LÕI / DÀNH RIÊNG"; tên màn "Xem trước phân bổ" GIỮ', () => {

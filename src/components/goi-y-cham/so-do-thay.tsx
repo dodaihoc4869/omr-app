@@ -12,8 +12,8 @@ import { BieuTuong } from './bieu-tuong'
 // `_` sau là TÊN chất («n_paracetamol», «n_p-nitrophenol») ⇒ cả tên là chỉ số dưới (thầy 27/10, ảnh: trước hiện «n_paracetamol» thô, «n_p» hạ mỗi chữ p).
 const CHI_SO = /_(\{[^}]*\}|[0-9]+|[\p{Ll}][\p{L}\p{N}()\-]+(?![_\p{L}\p{N}])|[A-Z][A-Za-z0-9()]*|[A-Za-z](?![a-z]))|\^(\{[^}]*\}|[-−+]?[0-9]*[+\-−]?)/gu
 const CS_DUOI: Record<string, string> = { '0': '₀', '1': '₁', '2': '₂', '3': '₃', '4': '₄', '5': '₅', '6': '₆', '7': '₇', '8': '₈', '9': '₉' }
-/** Công thức trong chỉ số dưới («H2SO4») ⇒ số sau chữ thành chỉ số Unicode («H₂SO₄») — n<sub>H₂SO₄</sub> gọn, không lồng <sub> (thầy 27/10). */
-const hoaChiSo = (v: string) => (/^[A-Z(]/.test(v) ? v.replace(/(?<=[A-Za-z)\]])\d+/g, (d) => [...d].map((c) => CS_DUOI[c] ?? c).join('')) : v)
+/** (Không dùng regex nhìn-lùi: Safari < 16.4 không chạy — tests/khong-cu-phap-may-cu-2109.) Công thức trong chỉ số dưới («H2SO4») ⇒ số sau chữ thành chỉ số Unicode («H₂SO₄») — n<sub>H₂SO₄</sub> gọn, không lồng <sub> (thầy 27/10). */
+const hoaChiSo = (v: string) => (/^[A-Z(]/.test(v) ? v.replace(/([A-Za-z)\]])(\d+)/g, (_m, a: string, d: string) => a + [...d].map((c) => CS_DUOI[c] ?? c).join('')) : v)
 const MU: Record<string, string> = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻', '−': '⁻', '+': '⁺' }
 /** Chữ có `_x` (chỉ số dưới) / `^x` (số mũ) → React; không có ⇒ trả nguyên chuỗi. */
 export function ChuCo({ chu }: { chu: string }): ReactNode {

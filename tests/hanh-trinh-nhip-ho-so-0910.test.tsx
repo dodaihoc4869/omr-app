@@ -25,7 +25,6 @@ import { useAppStore } from '../src/store/appStore'
 import { khopTim, xepNhomNhip } from '../src/components/chien-dich/nhip-hanh-trinh'
 import { chuGiay, doiGiay, GIOI_HAN_KHUNG_DAU, giayCacLanSai, gomTheoNgay, tenMucDo, xoaDemHoSoLamCau } from '../src/components/chien-dich/HoSoLamCauEm'
 const { default: HanhTrinhV2 } = await import('../src/components/chien-dich/HanhTrinhV2')
-const { default: TheNhipHoc } = await import('../src/components/chien-dich/TheNhipHoc')
 const { default: ChienDichScreen } = await import('../src/screens/ChienDichScreen')
 
 const cd = (id: string, khoi: string): ChienDichTom => ({
@@ -146,7 +145,7 @@ describe('phép thuần: nhóm ưu tiên + chữ số giây', () => {
 
 // SỬA CÓ CHỦ ĐÍCH 12/10 — thầy: "lịch sử học sinh làm bài tập hàng ngày, tính từ 12/10" ⇒ thẻ Bài hằng ngày ngay sau Nhịp học.
 // SỬA CÓ CHỦ ĐÍCH 12/10 (chiều) — thầy 12/10: Hành trình còn 2 mục ("thu gọn tối giản hết lại thành 2 mục": Dạy học & đầu giờ · Chữa bài). Nhịp học
-// chuyển sang màn Hôm nay (làn Hôm nay); thẻ `TheNhipHoc` giữ nguyên và vẫn kiểm ở các test dưới. Khoá cũ `{ the: 'nhip' }` ⇒ mục Dạy học & đầu giờ.
+// chuyển sang màn Hôm nay (làn Hôm nay); thẻ `TheNhipHoc` đã gỡ khỏi src/ 27/10 (không màn nào dùng) ⇒ các test vẽ thẻ + tấm qua thẻ ấy bỏ theo (tấm HoSoLamCauEm còn kiểm ở test ho-so-* khác). Khoá cũ `{ the: 'nhip' }` ⇒ mục Dạy học & đầu giờ.
 // SỬA CÓ CHỦ ĐÍCH 21/10 (thầy duyệt bản vẽ docs/ban-ve-hanh-trinh-2110): Hành trình thành MỘT trang 4 bước, không còn thẻ / mục.
 describe('Hành trình: thẻ Nhịp học', () => {
   it('Hành trình không còn thẻ; Hôm nay đặt khoá cũ { the: nhip, khoi: 12 } ⇒ ChienDichScreen mở trang 4 bước, không đọc nhịp, rồi xoá yêu cầu', async () => {
@@ -160,166 +159,9 @@ describe('Hành trình: thẻ Nhịp học', () => {
     expect(m.goi.mock.calls.some(([d]) => d === '/gv/chien-dich')).toBe(false)
   })
 
-  it('dòng tóm tắt + nhóm có tiêu đề và số, em chưa làm / chưa đủ đứng đầu; lọc khối; ô tìm; không dựng lại bốn ô số', async () => {
-    mayChu()
-    const { container } = render(<TheNhipHoc />)
-    await waitFor(() => expect(tenNhom(container).length).toBeGreaterThan(0))
-    const vung = screen.getByRole('region', { name: /^Nhịp học/ })
-    expect(vung.querySelector('.gvv2-cc-tom')?.textContent).toBe('2/6 em đủ mức hôm nay · 3 em chưa làm câu nào')
-    expect(tenNhom(container)).toEqual(['Chưa làm câu nào · 3 em', 'Chưa đủ mức · 2 em', 'Đủ mức · 2 em', 'Chưa có mức hôm nay · 1 em'])
-    expect(tenEm(container)).toEqual(['Đỗ Em', 'Trần Bình', 'Vũ Giang', 'Bùi Khoa', 'Lê Chi', 'Nguyễn Văn An', 'Phạm Dũng', 'Hồ Hạnh'])
-    expect(container.querySelector('.gvv2-kpi, .gvv2-the-so, .gvv2-chuong')).toBeNull()
-    // mỗi dòng là MỘT nút; số có nhãn ("Hôm nay", "Đã xếp")
-    const dong = [...container.querySelectorAll<HTMLButtonElement>('.gvv2-nh-dong')]
-    expect(dong).toHaveLength(8)
-    for (const d of dong) expect(d.tagName).toBe('BUTTON')
-    expect(dong[3]!.textContent).toContain('Hôm nay3/36 câu')
-    expect(dong[3]!.textContent).toContain('Thiếu 4 câu phù hợp')
-    expect(dong[3]!.textContent).toContain('Đã xếp 30 câu · 1 kiến thức cần bổ sung')
-    expect(dong[3]!.getAttribute('aria-label')).toBe('Bùi Khoa, SBD 8, Khối 12: hôm nay 3/36 câu · Thiếu 4 câu phù hợp — xem lịch sử làm câu')
-
-    // thanh phân đoạn khối: Tất cả 8 em · Khối 10: 3 em · Khối 12: 5 em
-    expect(screen.getAllByRole('radio').map((r) => r.textContent)).toEqual(['Tất cả8 em', 'Khối 103 em', 'Khối 125 em'])
-    fireEvent.click(screen.getByRole('radio', { name: /Khối 10/ }))
-    expect(tenNhom(container)).toEqual(['Chưa làm câu nào · 1 em', 'Chưa đủ mức · 1 em', 'Đủ mức · 1 em'])
-    expect(vung.querySelector('.gvv2-cc-tom')?.textContent).toBe('1/3 em đủ mức hôm nay · 1 em chưa làm câu nào')
-    fireEvent.click(screen.getByRole('radio', { name: /Tất cả/ }))
-
-    // ô tìm: gõ không dấu
-    fireEvent.change(screen.getByRole('searchbox', { name: 'Tìm học sinh theo tên hoặc số báo danh' }), { target: { value: 'do em' } })
-    expect(tenEm(container)).toEqual(['Đỗ Em'])
-    fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'không ai' } })
-    expect(screen.getByText('Không có em nào khớp ô tìm.')).toBeTruthy()
-  })
-
-  it('lỗi tải danh sách ⇒ câu dễ hiểu (không lỗi kỹ thuật thô) + Thử lại; một khối lỗi ⇒ khối khác vẫn hiện', async () => {
-    m.goi.mockResolvedValueOnce({ ok: false, loai: 'mang', chu: 'TypeError: Failed to fetch' })
-    render(<TheNhipHoc />)
-    const loi = await screen.findByRole('alert')
-    expect(loi.textContent).toContain('Chưa tải được nhịp học của các em. Mạng có thể đang chập chờn.')
-    expect(loi.textContent).not.toMatch(/TypeError|fetch/)
-    mayChu()
-    fireEvent.click(within(loi).getByRole('button', { name: 'Thử lại' }))
-    await waitFor(() => expect(screen.getAllByRole('radio')).toHaveLength(3))
-    cleanup()
-
-    m.goi.mockImplementation(async (duong: string, b: Record<string, unknown>) => {
-      if (b.action === 'danh-sach') return { ok: true, du: { homNay: '2026-10-09', chienDich: [HT10, HT12] } }
-      if (b.action === 'bang' && b.id === 'ht-10') return { ok: true, du: { chienDich: HT10, ...BANG['ht-10'] } }
-      return { ok: false, loai: 'mang', chu: 'Không nối được máy chủ.' }
-    })
-    const { container } = render(<TheNhipHoc />)
-    expect((await screen.findByRole('alert')).textContent).toContain('Chưa tải được nhịp học Khối 12. Không nối được máy chủ. Khối khác vẫn đúng.')
-    expect(tenEm(container)).toEqual(['Trần Bình', 'Lê Chi', 'Nguyễn Văn An'])
-  })
 })
 
 describe('bấm một em ⇒ tấm Lịch sử làm câu', () => {
-  it('gọi đúng lệnh; đầu tấm tên · SBD · lớp · hôm nay; bốn ô số có nhãn; Câu sai có số giây ("≈", "chưa đo giờ"); Esc đóng, focus về dòng', async () => {
-    mayChu()
-    render(<TheNhipHoc />)
-    const nut = await screen.findByRole('button', { name: /^Bùi Khoa, SBD 8/ })
-    nut.focus()
-    fireEvent.click(nut)
-    const tam = await screen.findByRole('dialog', { name: 'Bùi Khoa' })
-    expect(tam.getAttribute('aria-modal')).toBe('true')
-    expect(m.goi.mock.calls.filter(([d]) => d === '/gv/lich-su-lam-cau').map(([, b]) => b)).toEqual([{ sbd: '8', gioiHan: GIOI_HAN_KHUNG_DAU }])
-    // mở tấm ⇒ focus vào nút Đóng
-    expect(document.activeElement).toBe(within(tam).getByRole('button', { name: 'Đóng' }))
-    await within(tam).findByText('SBD 8 · Lớp 12A1')
-    expect(tam.querySelector('.gvv2-hs-hn')?.textContent).toContain('Hôm nay3/36 câu')
-    expect(tam.querySelector('.gvv2-hs-hn')?.textContent).toContain('Chưa đủ mức')
-    expect(tam.textContent).toContain('Kiến thức cần bổ sung')
-    await choTamXong(tam)
-    moGap(tam, /^Toàn bộ sổ/) // 6 mức: bốn ô số cả sổ nằm trong ngăn gập "Toàn bộ sổ của em"
-    expect([...tam.querySelectorAll('.gvv2-hs-o')].map((o) => o.textContent)).toEqual([
-      'Số lượt làm câu74 câu khác nhau',
-      'Tỉ lệ đúng43%3 đúng · 3 sai · 1 bỏ trống',
-      'Câu từng sai21 câu chưa sửa được',
-      'Trung bình mỗi câu52 giâylượt đo được, gồm ước tính',
-    ])
-    // khối "Câu từng sai" luôn hiện (không còn thẻ con)
-    expect(within(tam).getByRole('heading', { name: 'Câu từng sai' })).toBeTruthy()
-    const cau = [...tam.querySelectorAll('.gvv2-hs-cau')]
-    expect(cau).toHaveLength(2)
-    expect(cau[0]!.textContent).toContain('Câu 25 · Hiệu suất ester hoá')
-    expect(cau[0]!.textContent).toContain('Chưa sửa được')
-    expect(cau[0]!.textContent).toContain('Vận dụng · sai 2 lần · đúng 0 lần')
-    // SỬA CÓ CHỦ Ý — đợt 16 (thầy: "số giây hiển thị cho cả việc làm câu dễ khó"): hộp câu ghi số giây TỪNG lần (đúng, sai, bỏ trống), không đo được ⇒ "—".
-    expect(cau[0]!.querySelector('.gvv2-hs-cau-giay')?.textContent).toBe('Số giây từng lần (cũ → mới):Sai — chưa đo số giâySai ≈ 1 phút 5 giây')
-    expect(cau[1]!.textContent).toContain('Câu q12')
-    expect(cau[1]!.textContent).toContain('Đã sửa được')
-    // q12 không có lượt nào trong `lan` ⇒ lần sai lấy từ `giaySai` của máy chủ; 2 lần còn lại (theo soLan) ghi "+ 2 lần khác", không bịa số giây.
-    expect(cau[1]!.querySelector('.gvv2-hs-cau-giay')?.textContent).toBe('Số giây từng lần (cũ → mới):+ 2 lần khácSai 30 giây')
-    // thầy: hộp câu KHÔNG là đường vào Tự chữa
-    expect(cau[0]!.querySelector('button')).toBeNull()
-
-    // Tab ở phần tử cuối ⇒ vòng về đầu tấm (giữ focus trong tấm)
-    const nutTam = [...tam.querySelectorAll<HTMLElement>('button:not([disabled])')]
-    nutTam[nutTam.length - 1]!.focus()
-    fireEvent.keyDown(document, { key: 'Tab' })
-    expect(document.activeElement).toBe(nutTam[0])
-    fireEvent.keyDown(document, { key: 'Tab', shiftKey: true })
-    expect(document.activeElement).toBe(nutTam[nutTam.length - 1])
-
-    fireEvent.keyDown(document, { key: 'Escape' })
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
-    expect(document.activeElement).toBe(screen.getByRole('button', { name: /^Bùi Khoa, SBD 8/ }))
-  })
-
-  it('Toàn bộ lịch sử: gom theo ngày, mỗi lần giờ · nơi · câu · kết quả · đáp án chọn · số giây; "Chỉ lần sai"; Mở hồ sơ đầy đủ', async () => {
-    mayChu()
-    render(<TheNhipHoc />)
-    fireEvent.click(await screen.findByRole('button', { name: /^Bùi Khoa, SBD 8/ }))
-    const tam = await screen.findByRole('dialog')
-    await choTamXong(tam) // 6 mức: "Từng lượt" luôn hiện
-    expect([...tam.querySelectorAll('.gvv2-hs-ngay-tieu')].map((h) => h.textContent)).toEqual(['Thứ Sáu 09/10/2026 · 2 lượt', 'Thứ Năm 08/10/2026 · 2 lượt'])
-    const lan = [...tam.querySelectorAll('.gvv2-hs-lan')].map((l) => l.textContent!.replace(/\u00a0/g, ' ')) // SOÁT 26/10: dấu cách cứng trước «·»
-    // SỬA CÓ CHỦ Ý — đợt 16: số giây thành cột riêng bên phải (dưới kết quả) ở MỌI lượt; không đo được ⇒ "—" (+ chữ ẩn cho trình đọc màn hình).
-    expect(lan).toEqual([
-      '09:30Câu 25 · Hiệu suất ester hoáĐảo · Vận dụng · Chọn BSai≈ 1 phút 5 giây',
-      '08:00Câu 25 · Hiệu suất ester hoáCa Kiểm tra 15 phút 12A1 · Vận dụng · Chọn CSai— chưa đo số giây',
-      '10:00Câu q31Đoàn · Thông hiểu · Chọn AĐúng45 giây',
-      '09:00Câu 40 · Bảo toàn khối lượngLên bảng · có dùng gợi ýBỏ trống46 giây',
-    ])
-    const loc = within(tam).getByRole('tab', { name: /^Lượt sai/ })
-    fireEvent.click(loc)
-    expect(loc.getAttribute('aria-selected')).toBe('true')
-    expect(tam.querySelectorAll('.gvv2-hs-lan')).toHaveLength(2)
-    expect(tam.textContent).toContain('Đang hiện 2/2 lượt sai')
-
-    fireEvent.click(within(tam).getByRole('button', { name: 'Mở hồ sơ đầy đủ' }))
-    expect(useAppStore.getState()).toMatchObject({ screen: 'hocsinh', sbdDangXem: '8' })
-  })
-
-  it('danh sách dài: 100 lần đầu + "Xem thêm"; lỗi mạng ⇒ câu dễ hiểu + Thử lại gọi lại', async () => {
-    const nhieu = Array.from({ length: 150 }, (_, i) => lanGia({ luc: new Date(Date.UTC(2026, 9, 9, 3, 0, 0) - i * 60_000).toISOString(), qid: `q${i}` }))
-    mayChu({ lichSu: { ok: true, du: { ...LICH_SU, lan: nhieu, tong: { ...LICH_SU.tong, soLuot: 150 } } } })
-    render(<TheNhipHoc />)
-    fireEvent.click(await screen.findByRole('button', { name: /^Bùi Khoa, SBD 8/ }))
-    let tam = await screen.findByRole('dialog')
-    await choTamXong(tam)
-    expect(tam.querySelectorAll('.gvv2-hs-lan')).toHaveLength(100)
-    fireEvent.click(within(tam).getByRole('button', { name: 'Xem thêm 50 lượt (còn 50)' }))
-    expect(tam.querySelectorAll('.gvv2-hs-lan')).toHaveLength(150)
-    expect(within(tam).queryByRole('button', { name: /^Xem thêm/ })).toBeNull()
-    fireEvent.click(within(tam).getByRole('button', { name: 'Đóng' }))
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
-
-    let lan = 0
-    xoaDemHoSoLamCau() // lần mở trước đã cất bản trong bộ nhớ (mở lại là vẽ ngay); ở đây thử đúng đường lỗi mạng của lần mở ĐẦU
-    mayChu({ lichSu: () => (++lan === 1 ? { ok: false, loai: 'mang', chu: 'Failed to fetch' } : { ok: true, du: LICH_SU }) })
-    fireEvent.click(screen.getByRole('button', { name: /^Bùi Khoa, SBD 8/ }))
-    tam = await screen.findByRole('dialog')
-    const loi = await within(tam).findByRole('alert')
-    expect(loi.textContent).toBe('Chưa tải được hồ sơ làm bài của em. Mạng có thể đang chập chờn.Thử lại')
-    // vẫn mở được hồ sơ đầy đủ khi lệnh lỗi
-    expect(within(tam).getByRole('button', { name: 'Mở hồ sơ đầy đủ' })).toBeTruthy()
-    fireEvent.click(within(loi).getByRole('button', { name: 'Thử lại' }))
-    expect((await within(tam).findAllByText('Câu 25 · Hiệu suất ester hoá')).length).toBeGreaterThan(0)
-    expect(lan).toBe(2)
-  })
-
   // SỬA CÓ CHỦ ĐÍCH (thầy 12/10: Hành trình còn 2 mục) — không còn thẻ Nhịp học trong Hành trình; mục mặc định không đọc nhịp.
   it('HanhTrinhV2 là trang 4 bước và KHÔNG đọc nhịp (Nhịp học đã sang màn Hôm nay)', async () => {
     mayChu()

@@ -14,17 +14,31 @@ const E = { ...(env as unknown as Env), MA_BI_MAT: 'bi-mat-test-cuc-bo' } as Env
 let token = '',
   dotId = '',
   itemId = ''
+/** Cắt tệp SQL thành từng câu lệnh (kết thúc bằng `;` cuối dòng). Thân TRIGGER (BEGIN … END;) có nhiều `;` bên trong ⇒ chỉ kết thúc ở dòng `END;`
+ *  (migration-2610-giai-ban.sql — trước đây bị cắt đôi ⇒ «incomplete input»). */
+function catCauLenh(sql: string): string[] {
+  const ra: string[] = []
+  let cur = ''
+  for (const dong of sql.split('\n')) {
+    cur += dong + '\n'
+    const trigger = /^\s*CREATE\s+(?:TEMP\s+|TEMPORARY\s+)?TRIGGER\b/i.test(cur)
+    if (trigger ? /^\s*END\s*;\s*$/i.test(dong) : /;\s*$/.test(dong)) {
+      ra.push(cur.trim().replace(/;\s*$/, ''))
+      cur = ''
+    }
+  }
+  if (cur.trim()) ra.push(cur.trim())
+  return ra.filter(Boolean)
+}
 beforeAll(async () => {
   for (const sql of (env as unknown as { LUOC_DO_SQL: string[] }).LUOC_DO_SQL) {
-    const ds = sql
+    const sach = sql
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .split('\n')
       .filter((l) => !/^\s*--/.test(l))
       .map((l) => l.replace(/\s--.*$/, ''))
       .join('\n')
-      .split(/;\s*(?:\n|$)/)
-      .map((x) => x.trim())
-      .filter(Boolean)
+    const ds = catCauLenh(sach)
     for (let i = 0; i < ds.length; i += 50)
       await E.DB.batch(ds.slice(i, i + 50).map((x) => E.DB.prepare(x)))
   }

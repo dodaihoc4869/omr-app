@@ -9,6 +9,9 @@
 // Nguyên nhân gốc: cùng MỘT component báo cáo, nhưng bốn chỗ gọi tự tay nhặt
 // từng trường rồi truyền vào — mỗi chỗ nhặt thiếu một kiểu, có chỗ còn tự tính
 // `soCauSai = tongCau - soCauDung`.
+//
+// 27/10: hộp BaoCaoCaThiPhuHuynhModal, thẻ TheTienBo và lib/danh-gia-bai đã gỡ khỏi src/ vì không màn nào dùng ⇒
+// bỏ mọi vế soi ba tệp ấy; vế báo cáo em bản mới, màn thầy, máy chủ và khối dùng chung giữ nguyên.
 import { describe, expect, it } from 'vitest'
 import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
@@ -16,8 +19,6 @@ import { baoCaoCuaEm } from '../src/lib/bao-cao-cua-em'
 import { nguonBaoCaoEmMoi } from './_bao-cao-em-moi'
 import { demKetQua, type CauDeDem } from '../src/lib/dem-ket-qua'
 import { anhCuaCau, anhPhuongAn } from '../src/components/KhoiCauSai'
-import { danhGiaBai } from '../src/lib/danh-gia-bai'
-import { gomCaChoBieuDo } from '../src/components/TheTienBo'
 
 const doc = (p: string) => readFileSync(resolve(__dirname, '..', p), 'utf8')
 
@@ -124,18 +125,11 @@ describe('không chỗ gọi nào được tự nhặt trường nữa', () => {
 
 describe('khắc phục gộp cả bỏ trống lẫn phần II chưa trọn ý', () => {
   const HS = nguonBaoCaoEmMoi()
-  const PH = doc('src/components/BaoCaoCaThiPhuHuynhModal.tsx')
 
   it('nút "Làm lại … câu cần chữa" của em đếm MỌI câu không đúng trọn (sai · đúng một phần · bỏ trống)', () => {
     expect(HS).toContain('Làm lại {b.cauXemLai.length} câu cần chữa')
     expect(HS).toContain(".filter((r) => r.dungSai !== true)")
     expect(HS).not.toContain('${soSai} CÂU SAI')
-  })
-
-  it('cổng phụ huynh dùng ĐÚNG con số ấy, cùng một chữ', () => {
-    expect(PH).toContain('const soKhacPhuc = dem ? dem.soCanKhacPhuc : dsCauSai.length')
-    expect(PH).toContain('Câu sai cần chữa ({soKhacPhuc})')
-    expect(PH).toContain('Khắc phục {soKhacPhuc} câu sai này')
   })
 
   it('máy chủ trả sẵn con số ấy, khớp định nghĩa tổng trừ đúng', () => {
@@ -160,9 +154,7 @@ describe('ghi rõ tính điểm cho mấy ý', () => {
     const k = doc('src/components/KhoiCauSai.tsx')
     expect(k).toContain('chuDiemTheoY(')
     expect(k).toContain('soYDungPhanII(')
-    // Cổng phụ huynh vẽ danh sách câu sai bằng đúng khối ấy. (Báo cáo em bản mới 28/09 vẽ câu cần chữa bằng khuôn
-    // Câu đã làm `CauCanChua`/TheCau — kiểm ở tests/hs-lich-su-ca-2809.)
-    expect(doc('src/components/BaoCaoCaThiPhuHuynhModal.tsx')).toContain('<DongCauSai key=')
+    // (Báo cáo em bản mới 28/09 vẽ câu cần chữa bằng khuôn Câu đã làm `CauCanChua`/TheCau — kiểm ở tests/hs-lich-su-ca-2809.)
   })
 })
 
@@ -173,20 +165,11 @@ describe('THẺ MỨC TIẾN BỘ — đúng một thẻ, đúng một biểu đ
   // đồng bộ vào mọi báo cáo. Phép kiểm này khoá cả hai vế: có thẻ, và chỉ một.
   // 28/09: báo cáo em bản mới (bản vẽ thầy chốt) thay thẻ tiến bộ bằng dòng "± điểm so với ca trước" — phần thẻ chỉ còn ở cổng phụ huynh.
   const HS = nguonBaoCaoEmMoi()
-  const PH = doc('src/components/BaoCaoCaThiPhuHuynhModal.tsx')
   const MON = doc('src/screens/ExamMonitorScreen.tsx')
 
-  it('cổng phụ huynh có thẻ, vẽ bằng khối dùng chung; báo cáo em không tự vẽ biểu đồ/tự tính tiến bộ', () => {
+  it('báo cáo em không tự vẽ biểu đồ/tự tính tiến bộ', () => {
     expect(HS).not.toContain('BieuDoTienBoGoogle')
     expect(HS).not.toContain('phanTichTienBo')
-    for (const [t, ten] of [[PH, 'PH']] as const) {
-      expect(t, ten).toContain("'tien_bo'")
-      expect(t, ten).toContain('<span>Mức tiến bộ</span>')
-      expect(t, ten).toContain('<TheTienBo')
-      // Không cổng nào tự vẽ lại biểu đồ hay tự tính tiến bộ.
-      expect(t, ten).not.toContain('BieuDoTienBoGoogle')
-      expect(t, ten).not.toContain('phanTichTienBo')
-    }
   })
 
   it('màn Ca thi KHÔNG chèn thẻ nào nữa — báo cáo đúng BỐN thẻ ở mọi app', () => {
@@ -201,38 +184,6 @@ describe('THẺ MỨC TIẾN BỘ — đúng một thẻ, đúng một biểu đ
     expect(HS).not.toContain('ExtraTabItem')
   })
 
-  it('BỐN THẺ BÁO CÁO của cổng phụ huynh', () => {
-    for (const t of [PH]) {
-      expect(t).toContain('Câu sai cần chữa')
-      expect(t).toContain('Mức độ nhận thức')
-      expect(t).toContain('Mức tiến bộ')
-    }
-  })
-
-  it('ca ĐANG MỞ luôn có mặt trên biểu đồ, kể cả khi lịch sử chưa về', () => {
-    const t = doc('src/components/TheTienBo.tsx')
-    expect(t).toContain('if (!ds.some((c) => c.maCa === dangMo.maCa))')
-    // Và điểm vừa chấm tại chỗ đè lên bản máy chủ.
-    expect(t).toContain('diemDe')
-  })
-
-  it('gom lịch sử: đủ ca, đúng thứ tự dữ liệu, không mất ca đang mở', () => {
-    const ca = gomCaChoBieuDo(
-      [{ maCa: 'A', tenCa: 'Ca A', nopLuc: '2026-09-01T00:00:00Z', tong: 5 }],
-      { maCa: 'B', tenCa: 'Ca B', ngayThi: '2026-09-02T00:00:00Z', diem: 7 },
-    )
-    expect(ca).toHaveLength(2)
-    expect(ca.map((c) => c.maCa)).toEqual(['A', 'B'])
-    expect(ca[1].tong).toBe(7)
-  })
-
-  it('lịch sử đã có ca đang mở thì KHÔNG thêm lần hai', () => {
-    const ca = gomCaChoBieuDo(
-      [{ maCa: 'B', tenCa: 'Ca B', nopLuc: '2026-09-02T00:00:00Z', tong: 7 }],
-      { maCa: 'B', tenCa: 'Ca B', diem: 7 },
-    )
-    expect(ca).toHaveLength(1)
-  })
 })
 
 describe('ẢNH TRONG CÂU SAI vẽ đúng chuẩn của phiếu HTML', () => {
@@ -258,15 +209,12 @@ describe('ẢNH TRONG CÂU SAI vẽ đúng chuẩn của phiếu HTML', () => {
 
 describe('câu sai hiện đủ đề, ảnh, bốn ý phần II và lời giải chuẩn', () => {
   const HS = nguonBaoCaoEmMoi()
-  const PH = doc('src/components/BaoCaoCaThiPhuHuynhModal.tsx')
   const KHOI = doc('src/components/KhoiCauSai.tsx')
 
   it('mỗi cổng vẽ câu sai bằng khối DÙNG CHUNG, không tự dựng lời giải', () => {
-    expect(PH).toContain('<DongCauSai key={c.qid || i} c={c} stt={c.soCau || i + 1} />')
     // báo cáo em bản mới: khuôn Câu đã làm (CauCanChua → TheCau)
     expect(HS).toContain('<CauCanChua c={c.cau} stt={c.soCau} />')
     expect(HS).not.toContain('chuanHoaLoiGiaiCau')
-    expect(PH).not.toContain('chuanHoaLoiGiaiCau')
     expect(HS).not.toContain('cauSaiMoRong')
   })
 
@@ -297,34 +245,7 @@ describe('câu sai hiện đủ đề, ảnh, bốn ý phần II và lời giả
 })
 
 describe('nhận xét phải đúng với con số của chính bài đó', () => {
-  it('bài 10 điểm KHÔNG còn bị khen "thiếu một chút nữa là 10"', () => {
-    const d = danhGiaBai(10, 0, 12)
-    expect(d.xepLoai).toBe('Trọn điểm')
-    expect(d.thongDiep).toContain('làm đúng hết trên 12 câu')
-    expect(d.thongDiep).not.toContain('thiếu một chút')
-    expect(d.thongDiep).not.toContain('khắc phục')
-  })
-
-  it('còn câu phải chữa thì nhận xét nhắc ĐÚNG số câu ấy', () => {
-    expect(danhGiaBai(9.5, 2, 12).thongDiep).toContain('2 câu cần chữa')
-    expect(danhGiaBai(2, 12, 12).thongDiep).toContain('12 câu cần chữa')
-  })
-
-  it('không câu nào dùng dấu chấm than hay lời khen suông', () => {
-    for (const [d, c] of [[10, 0], [9.5, 1], [8.2, 3], [7, 5], [5.5, 8], [2, 12]] as const) {
-      const t = danhGiaBai(d, c, 12).thongDiep
-      expect(t, `${d}/${c}`).not.toContain('!')
-      expect(t, `${d}/${c}`).not.toContain('Đừng nản lòng')
-      expect(t, `${d}/${c}`).not.toContain('Phong độ đỉnh cao')
-    }
-  })
-
-  it('chưa biết tổng số câu thì KHÔNG bịa ra', () => {
-    expect(danhGiaBai(7, 3, null).thongDiep).not.toContain('trên')
-  })
-
-  it('cổng phụ huynh dùng hàm xếp loại chung; báo cáo em bản mới KHÔNG tự viết nhận xét/xếp loại riêng', () => {
-    expect(doc('src/components/BaoCaoCaThiPhuHuynhModal.tsx')).toContain('danhGiaBai(diem, soKhacPhuc, tongCau)')
+  it('báo cáo em bản mới KHÔNG tự viết nhận xét/xếp loại riêng', () => {
     expect(nguonBaoCaoEmMoi()).not.toMatch(/xepLoai|thongDiep|classify\(/)
   })
 })

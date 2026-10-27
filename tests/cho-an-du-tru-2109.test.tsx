@@ -1,11 +1,11 @@
 // THẦN THÚ MỖI NGÀY · ĐỢT 1 · MÀN HỌC SINH (Code 2; Boss 21/09; Code 3 làm rõ số): lời nhắc "Cho ăn" ở Bảng nhiệm vụ, "Dự trữ đủ N ngày ăn" ở ống nghiệm, thẻ cuối chặng nói ĐÚNG
 // ("EXP đã vào ống nghiệm · còn N EXP nữa lên cấp · ống nghiệm có M EXP · hôm nay thú còn ăn được K EXP"), câu báo trần EXP game 120/ngày, và lý do `tienBo.thieuDat` ("cần đúng thêm N câu").
 // Mọi số do máy chủ; thiếu MỘT số ⇒ ẩn hết (Pages đi trước Worker được); phụ huynh không thấy gì về thú.
+// 27/10: thẻ "Cho ăn" (`bang-nhiem-vu/TheChoAn`) đã gỡ khỏi src/ vì không màn nào dùng ⇒ các phép kiểm viewChoAn / TheChoAn bỏ theo.
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
-import TheChoAn, { viewChoAn } from '../src/components/bang-nhiem-vu/TheChoAn'
 import TheCuoiChang from '../src/components/bang-nhiem-vu/TheCuoiChang'
 import { docThieuDat, dongGoiBanNho, phucHoiBanNho, tuKeHoachNgay, type KeHoachNgayMayChu } from '../src/lib/nhiem-vu-adapter'
 import { docKetQuaChang, theChangView } from '../src/lib/btvn-ca-nhan-kieu'
@@ -89,37 +89,6 @@ describe('tienBo.thieuDat — "cần đúng thêm N câu" (Điều 7)', () => {
   })
 })
 
-describe('viewChoAn — khi nào thú "đói"', () => {
-  const v = (exp: object | null, thanThu: any = THU) => viewChoAn({ exp: dl(exp).exp, thanThu })
-  it('ống nghiệm > 0 và hôm nay còn ăn được ⇒ thẻ: tên thú thật, số ống nghiệm, dự trữ = ⌊ống ÷ 200⌋', () => {
-    expect(v(EXP())).toEqual({ ten: 'Hoả Long', ongNghiem: 480, duTruNgay: 2 })
-    expect(v(EXP({ ...EXP3, ongNghiem: 199 }))!.duTruNgay).toBeNull()
-    expect(v(EXP({ ...EXP3, ongNghiem: 200 }))!.duTruNgay).toBe(1)
-    expect(v(EXP({ ...EXP3, ongNghiem: 400 }))!.duTruNgay).toBe(2)
-    expect(v(EXP({ ...EXP3, ongNghiem: 399 }))!.duTruNgay).toBe(1)
-  })
-  it('KHÔNG thẻ: ống nghiệm 0 · hôm nay không ăn được nữa · cấp cao nhất (còn 0 EXP lên cấp) · thiếu số · chưa có thú', () => {
-    expect(v(EXP({ ...EXP3, ongNghiem: 0 }))).toBeNull()
-    expect(v(EXP({ ...EXP3, hapThuConLaiHomNay: 0 }))).toBeNull()
-    expect(v(EXP({ ...EXP3, expConThieu: 0 }))).toBeNull()
-    expect(v(EXP({ ongNghiem: 480, hapThuConLaiHomNay: 200 }))).toBeNull()
-    expect(v(null)).toBeNull()
-    expect(v(EXP(), { kieu: 'chua_chon' })).toBeNull()
-    expect(v(EXP(), { kieu: 'chua_biet' })).toBeNull()
-  })
-  it('thú không có biệt danh ⇒ tên loài; lạ ⇒ "Thần thú"', () => {
-    expect(v(EXP(), { kieu: 'co', pet: PETS[3]!.id, cap: 3 })!.ten).toBe(PETS[3]!.name)
-    expect(v(EXP(), { kieu: 'co', pet: 'khong_co', cap: 3 })!.ten).toBe('Thần thú')
-  })
-})
-
-describe('TheChoAn + Bảng nhiệm vụ', () => {
-  it('TheChoAn dựng thẳng: tên dài không vỡ, số ≥ 1000 có dấu chấm', () => {
-    render(<TheChoAn v={{ ten: 'Một Cái Tên Rất Dài Của Thần Thú', ongNghiem: 1200, duTruNgay: 6 }} onMo={() => {}} />)
-    expect(screen.getByRole('button').textContent).toContain('1.200 EXP · dự trữ đủ 6 ngày ăn')
-  })
-})
-
 describe('thẻ cuối chặng — EXP đã vào ống nghiệm', () => {
   const KQ = (exp: object) => ({ ok: true, loDaXong: 1, changDangMo: 1, chang: { chiSo: 0, soCau: 6, soDung: 5, xong: true }, ketQua: [], chuaLam: [], exp })
   it('docKetQuaChang: đủ 3 số ⇒ giữ; thiếu / âm ⇒ bỏ; số cũ (conLaiLenCap) vẫn đọc', () => {
@@ -149,13 +118,5 @@ describe('thẻ cuối chặng — EXP đã vào ống nghiệm', () => {
   it('hôm nay ăn được 0 vẫn nói 0 (thật), không ẩn', () => {
     const c = the({ homNay: 46, conLaiLenCap: null, expConThieu: 340, ongNghiem: 480, hapThuConLaiHomNay: 0 })
     expect(c.querySelector('[data-vung="exp-thu"]')!.textContent).toContain('hôm nay thú còn ăn được 0 EXP')
-  })
-})
-
-describe('khoá nguồn', () => {
-  it('không màu thô / emoji / lookbehind / .at( trong tệp mới; thẻ Cho ăn chỉ nhận prop, không gọi mạng', () => {
-    const s = doc('src/components/bang-nhiem-vu/TheChoAn.tsx')
-    expect(s).not.toMatch(/#[0-9a-fA-F]{3,8}\b|\(\?<[=!]|\.at\(|fetch\(|randomUUID/)
-    expect(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(s)).toBe(false)
   })
 })

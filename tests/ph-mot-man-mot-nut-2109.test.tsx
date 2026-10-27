@@ -1,11 +1,11 @@
 // APP PHỤ HUYNH — MỘT MÀN, MỘT NÚT (thầy lệnh 21/09; Nhật ký 97f3abe; Boss: "trên cây màn PH chỉ còn ĐÚNG MỘT nút hành động chính"): menu ba chấm, tab Xem điểm/Khắc phục/Bảng tin, giao nhanh, giao bài cũ (parent-news,
 // KhoiKhacPhuc, hộp khắc phục), Bộ não/thư tuần, Vinh danh, việc hôm nay dạng Bảng nhiệm vụ ĐÃ GỠ. Nay (app phụ huynh MỚI, thầy chốt mẫu 14:37): màn chính + bảng "Mọi thứ về con" (tests/ph-moi-*.test.*) — tệp này giữ CHỐT CHẶN.
+// 27/10: hộp `BaoCaoCaThiPhuHuynhModal` đã gỡ khỏi src/ vì không màn nào mở ⇒ bỏ khối «hộp báo cáo PH — chế độ khongGiaoBai».
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
 import ParentPortalScreen from '../src/screens/ParentPortalScreen'
-import BaoCaoCaThiPhuHuynhModal from '../src/components/BaoCaoCaThiPhuHuynhModal'
 import { chuBanApp } from '../src/lib/cap-nhat-app'
 import { PH_OK } from './_ph-moi/du-lieu-mau'
 import './_ph-nap-trang-cu' // trang cũ nạp lười (26/10): chờ mảnh về trước các test
@@ -114,20 +114,6 @@ describe('CHỈ XEM — cây màn phụ huynh thật (28/09)', () => {
     expect(goi.filter((g) => /parent-news|\/mom\/|hs\/lich-su|hs\/ke-hoach|hs\/btvn|hs\/cau-sai/.test(g))).toEqual([])
     expect(goi.filter((g) => g.startsWith('/ph/giao-them'))).toEqual([])
     expect(goi.filter((g) => g.startsWith('/ph/tat-ca-ve-con'))).toEqual(['/ph/tat-ca-ve-con {"sbd":"12121212"}'])
-  })
-})
-
-describe('hộp báo cáo PH — chế độ khongGiaoBai (còn dùng nếu nơi khác mở hộp này)', () => {
-  const baiThi = { maCa: 'CA-1', tenCa: 'Ca 1', ngayNop: '2026-09-15T10:00:00Z', diem: 6, tong: 6, tongSoCau: 28, soCauDung: 20, soCauSai: 8 }
-  const ve = (khong: boolean) => render(<BaoCaoCaThiPhuHuynhModal baiThi={baiThi as any} hoTenCon="Minh" sbd="12121212" scriptUrl="/test" onClose={() => {}} khongGiaoBai={khong} onGiaoBaiChoCon={() => {}} onNhanTinChoThay={() => {}} />)
-  it('bật ⇒ lời khuyên không chỉ tới nút đã gỡ; tắt (mặc định cũ) ⇒ nút "Tạo bài luyện khắc phục" vẫn có', async () => {
-    const a = ve(true)
-    await waitFor(() => expect(a.container.textContent).toMatch(/Điểm ca này/))
-    expect(a.container.textContent).not.toMatch(/Tạo bài luyện khắc phục|Tạo bài tập 10-15 câu/)
-    expect(a.container.textContent).toContain('Giao thêm bài cho con')
-    a.unmount()
-    const b = ve(false)
-    await waitFor(() => expect(b.container.textContent).toMatch(/Tạo bài (luyện khắc phục|tập 10-15 câu)/))
   })
 })
 

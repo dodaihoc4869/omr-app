@@ -2,6 +2,7 @@
 // KHÔNG VA CHẠM TÊN LỚP CSS (bài học hotfix P0 21/09: `.mt`/`.mt-tren` của mũi tên phản ứng hoá học ở src/index.css trùng tiền tố `mt-` của bản vẽ ⇒ app phụ huynh tràn ngang trên điện thoại thật).
 // Với MỌI thành phần giao diện làm trong ngày (Thi đua, Cho ăn, Đường về đích, thanh hấp thụ của Đảo, thẻ Giao thêm, app PH mới): mỗi lớp mà TSX của nó dùng và có tiền tố riêng CHỈ được định nghĩa trong tệp CSS SỞ HỮU của nó —
 // không tệp CSS nào khác trong src/ có bộ chọn `.lớp` trùng. Bản vẽ của phiên phụ dùng tiền tố ngắn (td-, vd-, mt-…): bê nguyên là rủi ro y hệt; chỉ chấp nhận tiền tố mang họ của app (bnv-, vd-, dao-, phm-…) và kiểm mỗi lần.
+// 27/10: Đường về đích (TheVeDich) và app phụ huynh kiểu Apple (ph-moi) đã gỡ khỏi src/ vì không màn nào dùng ⇒ bỏ khỏi bảng CA.
 import { describe, expect, it } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -31,9 +32,6 @@ const lopTsx = (src: string, tienTo: RegExp): string[] => {
 
 const tepTrong = (d: string, duoi: string): string[] => fs.readdirSync(path.join(goc, d)).filter((f) => f.endsWith(duoi)).map((f) => `${d}/${f}`)
 const CA = [
-  { ten: 'Đường về đích', tsx: ['src/components/bang-nhiem-vu/TheVeDich.tsx'], css: ['src/components/bang-nhiem-vu/ve-dich.css'], tienTo: /^vd(-|$)/ },
-  { ten: 'App phụ huynh mới (bảng "Mọi thứ về con" kiểu Apple)', tsx: tepTrong('src/components/ph-moi/bang', '.tsx'), css: ['src/components/ph-moi/ph-apple-bang.css', 'src/components/ph-moi/ph-apple.css', ...tepTrong('src/components/ph-moi/bang', '.css')], tienTo: /^phm(-|$)/ },
-  { ten: 'App phụ huynh mới (màn chính kiểu Apple)', tsx: ['src/components/ph-moi/ManChinh.tsx', 'src/components/ph-moi/ThanhDayAp.tsx', 'src/components/ph-moi/BieuTuongAp.tsx'], css: ['src/components/ph-moi/ph-apple.css'], tienTo: /^phm-ap(-|$)/ },
   { ten: 'Bảng tin kiểu sàn giao dịch (thầy)', tsx: ['src/components/bang-tin-san/BangTinSan.tsx', 'src/components/bang-tin-san/ThanhTren.tsx', 'src/components/bang-tin-san/BangChay.tsx', 'src/components/bang-tin-san/OSo.tsx', 'src/components/bang-tin-san/SoLan.tsx', 'src/components/bang-tin-san/NenHoc.tsx', 'src/components/bang-tin-san/BanDo3D.tsx', 'src/components/bang-tin-san/SoLenhBai.tsx', 'src/components/bang-tin-san/BanDoNhiet.tsx', 'src/components/bang-tin-san/DanDau.tsx', 'src/components/bang-tin-san/CotAI.tsx'], css: ['src/components/bang-tin-san/bang-tin-san.css'], tienTo: /^bts-/ },
   { ten: 'Mục Bài tập về nhà đã giao thiết kế lại (thầy)', tsx: tepTrong('src/components/btvn-da-giao', '.tsx'), css: ['src/components/btvn-da-giao/btg.css'], tienTo: /^btg-/ },
 ]
@@ -53,8 +51,8 @@ describe('không va chạm tên lớp CSS', () => {
         for (const t of lop) expect(d.has(t), `${p} có bộ chọn .${t} (của ${c.ten})`).toBe(false)
       }
     })
-  it('gốc `.mt` (mũi tên hoá học) vẫn ở index.css và KHÔNG thành gốc của app nào: không TSX phụ huynh/HS mới dùng className "m3 mt" / "mt"', () => {
+  // 27/10: bốn TSX từng soát className "mt" (ph-moi/ManChinh, ph-moi/BangMoiThu, TheVeDich, OThiDua) đã gỡ khỏi src/ vì không màn nào dùng ⇒ chỉ còn vế index.css.
+  it('gốc `.mt` (mũi tên hoá học) vẫn ở index.css', () => {
     expect(boChon(doc('src/index.css')).has('mt')).toBe(true)
-    for (const f of ['src/components/ph-moi/ManChinh.tsx', 'src/components/ph-moi/BangMoiThu.tsx', 'src/components/bang-nhiem-vu/TheVeDich.tsx', 'src/components/bang-nhiem-vu/OThiDua.tsx']) expect(doc(f)).not.toMatch(/className="(?:[\w-]+ )*mt(?: [\w-]+)*"/)
   })
 })

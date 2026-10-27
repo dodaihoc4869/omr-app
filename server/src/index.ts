@@ -3725,7 +3725,16 @@ const boXuLy = {
       if (p === '/hs/chua-cau-sai/mo-dot') {
         const kt = await import('./kiem-tra-ca-nhan'), sbd = await gameIdentity(env, b), khoa = kt.ktDangKhoaChang(await kt.docKtCn(env, sbd, Date.now(), true), Date.now())
         if (khoa) return ra({ ok: false, ma: kt.MA_KHOA_KT, error: kt.CHU_KHOA_KT, kiemTraCaNhan: khoa }, 409)
-        return raChua(await chuaMoDot(env, b))
+        // 27/10 tốc độ (thầy: «sửa lỗi chỗ mở câu phải tức thì»): `gon:true` (CHỈ-THÊM) ⇒ mở đợt XONG thì mở luôn bản làm lại (gon-mo) trong CÙNG lượt,
+        // trả ở trường `gon` (đúng thân lệnh gon-mo, kèm `status`) — máy em khỏi gọi gon-mo nối tiếp. Không có cờ ⇒ y như cũ.
+        const moRes = await chuaMoDot(env, b)
+        if (b.gon !== true) return raChua(moRes)
+        const mo = await moRes.json() as Record<string, unknown>
+        if (moRes.ok && mo.ok === true && typeof mo.dotId === 'string') {
+          const gRes = await chuaGonMo(env, { ...b, dotId: mo.dotId })
+          mo.gon = { ...(await gRes.json() as Record<string, unknown>), status: gRes.status }
+        }
+        return ra(mo, moRes.status)
       }
       if (p === '/hs/chua-cau-sai/phat-item') return raChua(await chuaPhatItem(env, b))
       if (p === '/hs/chua-cau-sai/nop-item') return raChua(await chuaNopItem(env, b))

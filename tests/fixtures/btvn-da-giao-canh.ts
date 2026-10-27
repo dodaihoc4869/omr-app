@@ -1,6 +1,8 @@
+// CHUYỂN TỪ src/components/xem-thu/btvn-da-giao-canh.ts (27/10): trang xem thử không còn điểm vào nào của app nên gỡ khỏi src/;
+// năm cảnh dữ liệu giả này chỉ còn là ĐỒ DỰNG cho test btvn-da-giao-khung-2109 (kiểm KhungBtvnDaGiao — màn sống).
 // DỮ LIỆU GIẢ cho trang xem thử "Bài tập về nhà đã giao" (Code 1, 21/09/2026) — năm cảnh của đề §6.1. CHỈ dùng ở trang xem thử và test; không vào gói sản phẩm.
-import type { DongTheoDoiBtvn } from '../../lib/btvn-may-chu-moi'
-import thatJson from './mau-btvn-theo-doi-that-2109.json' // THÂN THẬT của /btvn/theo-doi bản sống (Worker bae74f10, 21/09 19:3x), đã che họ tên em (Code 3)
+import type { DongTheoDoiBtvn } from '../../src/lib/btvn-may-chu-moi'
+import thatJson from '../../src/components/xem-thu/mau-btvn-theo-doi-that-2109.json' // THÂN THẬT của /btvn/theo-doi bản sống (Worker bae74f10, 21/09 19:3x), đã che họ tên em (Code 3)
 
 /** Thứ Hai 21/09/2026 19:00 giờ VN — mọi mốc trong cảnh tính quanh giờ này để ảnh chụp ổn định. */
 export const NOW_MAU = Date.parse('2026-09-21T19:00:00+07:00')

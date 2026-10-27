@@ -750,6 +750,14 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
   useEffect(() => {
     if (ktSanh && auth && tab === null && localStorage.getItem('ktcn:lam:' + auth.sbd)?.includes(ktSanh.id)) setTab('kiemtra')
   }, [ktSanh?.id]) // eslint-disable-line react-hooks/exhaustive-deps
+  // 27/10 tốc độ (thầy: «chỗ bấm kiểm tra phải tức thì»): Sảnh có bài kiểm tra ⇒ lúc rảnh nạp sẵn mảnh màn kiểm tra (từ precache/kho chạy-lúc),
+  // bấm là vẽ ngay thẻ tổng quan bằng số Sảnh (prop `ban`), không còn màn chờ nạp mảnh.
+  useEffect(() => {
+    if (!ktSanh?.id) return
+    const nap = () => { void import('../components/hoc-tap/ManKiemTraCaNhan').catch(() => {}) }
+    const ric = (globalThis as { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }).requestIdleCallback
+    if (ric) ric(nap, { timeout: 3000 }); else setTimeout(nap, 1200)
+  }, [ktSanh?.id])
   // PHIÊN CŨ KHÔNG CÒN DÙNG ĐƯỢC (07/10: mã bí mật máy chủ đổi ⇒ token cất trong máy bị từ chối "Phiên game không hợp lệ"; nút Thử lại gửi lại đúng token hỏng):
   // máy chủ nói token hỏng / hết hạn / mật khẩu đã đổi ⇒ đăng xuất, màn đăng nhập hiện một dòng giải thích.
   useTuDangXuatKhiPhienHong(!!auth?.token, hoa2.loi, dangXuat)
@@ -924,7 +932,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
       )}
       {moHoSoEm && auth.token && tab === null && !manThi && <Suspense fallback={null}><HoSoCuaEmHs token={auth.token} tenEm={auth.hoTen ?? ''} lop={auth.lop ?? undefined} onDong={() => setMoHoSoEm(false)} onChuaCau={(qid) => { setMoHoSoEm(false); setQidChua(qid); setTab('tuchua') }} onMoBaiTap={() => { setMoHoSoEm(false); setTab('hoctap') }} /></Suspense>}
       {tab === 'hoctap' && auth.token && !manThi && <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain"><Suspense fallback={<ChoNapGame />}><ManLamBaiTap token={auth.token} sbd={auth.sbd} onVe={() => setTab(null)} onCapNhat={hoa2.taiLai} onChua={(qid) => { setQidChua(qid); setTab('tuchua') }} homNay={soHomNay(hoa2.ketQua, duLieuBang.nguon === 'ke_hoach_ngay' ? duLieuBang.tienDo : undefined)} /></Suspense></div>}
-      {tab === 'kiemtra' && auth.token && !manThi && ktSanh && <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain"><Suspense fallback={<ChoNapGame />}><ManKiemTraCaNhan token={auth.token} sbd={auth.sbd} id={ktSanh.id} onVe={()=>setTab(null)} onCapNhat={hoa2.taiLai}/></Suspense></div>}
+      {tab === 'kiemtra' && auth.token && !manThi && ktSanh && <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain"><Suspense fallback={<ChoNapGame />}><ManKiemTraCaNhan token={auth.token} sbd={auth.sbd} id={ktSanh.id} ban={ktSanh} onVe={()=>setTab(null)} onCapNhat={hoa2.taiLai}/></Suspense></div>}
       {tab === 'tuchua' && auth.token && !manThi && <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain"><Suspense fallback={<ChoNapGame />}><ManTuChua token={auth.token} qid={qidChua} onVe={() => setTab(null)} onTuLuyen={() => setTab('tuluyen')} /></Suspense></div>}
 
       {/* FULLSCREEN CHỨC NĂNG: BẤM VÀO MỞ FULL MÀN HÌNH */}

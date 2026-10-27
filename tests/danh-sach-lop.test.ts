@@ -8,7 +8,6 @@
 import { describe, expect, it } from 'vitest'
 import gsCode from '../docs/apps-script-kiem-tra.gs?raw'
 import { autoMatchColumns, rowsToClassList } from '../src/lib/sheet-gviz'
-import { docNamSinh, hangToDanhSach, lopTuTenSheet } from '../src/lib/danh-sach-hs'
 
 describe('Đọc danh sách lớp từ Google Sheet', () => {
   const HEADER = ['SBD', 'Họ và tên', 'Ngày sinh', 'Lớp', 'SĐT phụ huynh']
@@ -37,98 +36,6 @@ describe('Đọc danh sách lớp từ Google Sheet', () => {
     const h = ['SBD', 'Họ tên', 'Lớp']
     const ds = rowsToClassList([h, ['110234', 'Lê Minh Đức', '11A1']], autoMatchColumns(h))
     expect(ds[0]).toMatchObject({ sbd: '110234', hoTen: 'Lê Minh Đức', lop: '11A1', namSinh: '' })
-  })
-})
-
-describe('Đọc FILE danh sách học sinh của thầy', () => {
-  const TIEU_DE = ['SBD', 'Họ và tên', 'Năm sinh']
-
-  it('đọc đủ ba cột từ file có hàng tiêu đề', () => {
-    const kq = hangToDanhSach([
-      TIEU_DE,
-      ['110234', 'Lê Minh Đức', 2009],
-      ['110235', 'Trần Bảo An', '12/05/2010'],
-    ])
-    expect(kq.items).toEqual([
-      { sbd: '110234', hoTen: 'Lê Minh Đức', namSinh: '2009', lop: '' },
-      { sbd: '110235', hoTen: 'Trần Bảo An', namSinh: '2010', lop: '' },
-    ])
-    expect(kq.boQua).toEqual([])
-  })
-
-  it('file KHÔNG có hàng tiêu đề vẫn đọc được — đoán theo hình dạng ô', () => {
-    const kq = hangToDanhSach([
-      ['110234', 'Lê Minh Đức', '2009'],
-      ['110235', 'Trần Bảo An', '2010'],
-    ])
-    expect(kq.items.map((e) => e.sbd)).toEqual(['110234', '110235'])
-    expect(kq.items[0].hoTen).toBe('Lê Minh Đức')
-  })
-
-  it('DÒNG THIẾU KHÔNG ĐƯỢC IM LẶNG — em không lên danh sách là em đứng ngoài phòng thi', () => {
-    const kq = hangToDanhSach([
-      TIEU_DE,
-      ['110234', 'Lê Minh Đức', '2009'],
-      ['110235', '', '2010'],
-      ['', 'Phạm Gia Huy', '2009'],
-      ['110237', 'Vũ Khánh Linh', ''],
-    ])
-    expect(kq.items).toHaveLength(1)
-    expect(kq.boQua.map((b) => b.dong)).toEqual([3, 4, 5])
-    expect(kq.boQua[0].vaoSao).toContain('họ tên')
-    expect(kq.boQua[1].vaoSao).toContain('số báo danh')
-    expect(kq.boQua[2].vaoSao).toContain('năm sinh')
-  })
-
-  it('số báo danh trùng: giữ dòng đầu và nêu ra', () => {
-    const kq = hangToDanhSach([TIEU_DE, ['110234', 'Lê Minh Đức', '2009'], ['110234', 'Lê Minh Đúc', '2009']])
-    expect(kq.items).toHaveLength(1)
-    expect(kq.items[0].hoTen).toBe('Lê Minh Đức')
-    expect(kq.trung).toEqual(['110234'])
-  })
-
-  it('thiếu hẳn một cột thì BÁO LỖI, không nạp nửa vời', () => {
-    expect(() => hangToDanhSach([['SBD', 'Họ và tên'], ['110234', 'Lê Minh Đức']])).toThrow(/3 cột/)
-  })
-
-  it('năm sinh đọc được từ số, chuỗi, ngày đầy đủ và ô Date của Excel', () => {
-    expect(docNamSinh(2009)).toBe('2009')
-    expect(docNamSinh('12/05/2010')).toBe('2010')
-    expect(docNamSinh(new Date(2008, 4, 12))).toBe('2008')
-    expect(docNamSinh('')).toBe('')
-    expect(docNamSinh('lớp 11')).toBe('')
-  })
-
-  it('gộp khoảng trắng thừa trong tên và bỏ khoảng trắng trong số báo danh', () => {
-    const kq = hangToDanhSach([TIEU_DE, [' 110 234 ', '  Lê   Minh  Đức ', '2009']])
-    expect(kq.items[0]).toEqual({ sbd: '110234', hoTen: 'Lê Minh Đức', namSinh: '2009', lop: '' })
-  })
-
-  // FILE THẦY GỬI CÓ BA SHEET: "lớp 10", "lớp 11", "lớp 12". Đọc mỗi sheet đầu
-  // là mất hơn 200 em mà tổng số nhìn vẫn "có vẻ đúng" — lỗi im lặng tệ nhất.
-  it('tên sheet thành tên lớp, bỏ chữ "lớp" thừa', () => {
-    expect(lopTuTenSheet('lớp 12')).toBe('12')
-    expect(lopTuTenSheet('Lop 11')).toBe('11')
-    expect(lopTuTenSheet('lớp10')).toBe('10')
-    // Sheet đặt kiểu tên lớp thật thì giữ nguyên.
-    expect(lopTuTenSheet('12A1')).toBe('12A1')
-  })
-
-  it('gán lớp cho mọi em trong một sheet', () => {
-    const kq = hangToDanhSach([TIEU_DE, ['12000', 'Hoàng Thị Kim Ngân', '2009']], '12', new Set(), [], 'lớp 12')
-    expect(kq.items[0].lop).toBe('12')
-    expect(kq.theoSheet).toEqual([{ ten: 'lớp 12', soEm: 1 }])
-    expect(kq.boQua).toEqual([])
-  })
-
-  it('một em chỉ nằm ở MỘT lớp — trùng số báo danh giữa hai sheet thì giữ sheet trước', () => {
-    const daCo = new Set<string>()
-    const trung: string[] = []
-    const a = hangToDanhSach([TIEU_DE, ['11010', 'Lê Minh Đức', '2010']], '11', daCo, trung, 'lớp 11')
-    const b = hangToDanhSach([TIEU_DE, ['11010', 'Lê Minh Đức', '2010']], '12', daCo, trung, 'lớp 12')
-    expect(a.items).toHaveLength(1)
-    expect(b.items).toHaveLength(0)
-    expect(trung).toEqual(['11010'])
   })
 })
 

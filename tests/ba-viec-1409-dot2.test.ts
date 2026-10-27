@@ -63,8 +63,6 @@ describe('1. Xem đề và lời giải — là TỜ ĐỀ, không phải phiế
 describe('2. Đếm câu — không app nào được tự trừ ngược nữa', () => {
   const nguon = [
     'src/screens/StudentPortalScreen.tsx',
-    // ParentPortalScreen: ĐÃ GỠ khỏi danh sách (app PH một màn một nút, 21/09 — màn không còn danh sách ca/đếm câu; báo cáo ca nằm ở BaoCaoCaThiPhuHuynhModal bên dưới).
-    'src/components/BaoCaoCaThiPhuHuynhModal.tsx',
   ]
   // 28/09: modal học sinh cũ ĐÃ XOÁ — báo cáo của em bản mới (BaoCaoCaCuaEm → BaoCaoChiTiet chế độ em) vẽ số theo bản vẽ thầy chốt,
   // không qua DongDemCau; luật "không tự trừ ngược" vẫn phủ cả ba tệp của nó.

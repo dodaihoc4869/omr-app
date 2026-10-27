@@ -2,7 +2,8 @@
 // CHỮA CÂU GỌN (thầy 25/10, server/src/chua-gon-lenh.ts): mở câu không lộ đáp án; máy chủ chấm; đúng lần 1 qua luật tự làm ⇒ Đã tự sửa NGAY;
 // sai ⇒ gợi ý ⇒ lần 2; trần 2 lần / ngày; bấm lặp trả kết quả cũ; không nộp được bản lạ.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { taoD1That } from './_d1-that'
+import { goiWorker, taoD1That } from './_d1-that'
+import worker from '../server/src/index'
 import { seedChua, Q } from './_chua-cau-sai-fixture'
 import { danhSach, moDot } from '../server/src/chua-cau-sai'
 import { gonMo, gonNop } from '../server/src/chua-gon-lenh'
@@ -28,6 +29,20 @@ const nop = async (d: D, traLoi: string, ban = Q, khoa = `k${++n}`) => {
 const tt = (d: D) => (d.sql.prepare('SELECT trang_thai_day FROM chua_loi_dot WHERE id=?').get(d.dotId) as { trang_thai_day: string }).trang_thai_day
 
 describe('Chữa câu gọn — mở câu và nộp', () => {
+  it('27/10 tốc độ: mo-dot `gon:true` ⇒ mở đợt + bản làm lại CÙNG một lượt (trường `gon` = đúng thân gon-mo); không cờ ⇒ không kèm', async () => {
+    const d = taoD1That()
+    const token = await seedChua(d.env)
+    const j = await goiWorker(worker, d.env, '/hs/chua-cau-sai/mo-dot', { token, qid: Q, gon: true }) as Record<string, any>
+    expect(j.ok).toBe(true)
+    expect(j.gon).toMatchObject({ ok: true, ban: Q, lan: 1, status: 200 })
+    expect(JSON.stringify(j.gon)).not.toMatch(/"correct"|"solution"|dapAn|loiGiai|bí mật lời giải/)
+    const rieng = await (await gonMo(d.env, { token, dotId: j.dotId })).json() as Record<string, any>
+    const { status: _s, ...gon } = j.gon
+    expect(gon).toEqual(rieng)
+    const khong = await goiWorker(worker, d.env, '/hs/chua-cau-sai/mo-dot', { token, qid: Q }) as Record<string, any>
+    expect(khong.ok).toBe(true)
+    expect(khong.gon).toBeUndefined()
+  })
   it('mở câu: đề công khai, KHÔNG đáp án / lời giải; đúng bây giờ sẽ tính Đã tự sửa (sai từ ngày trước)', async () => {
     const d = await dung()
     const j = await mo(d)

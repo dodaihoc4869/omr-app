@@ -1,12 +1,11 @@
 // BTVN "NÂNG ĐỠ" trên BẢNG NHIỆM VỤ (học sinh + phụ huynh dùng chung bộ chuyển): lô ≡ chặng, "N câu của em".
 // Hợp đồng docs/hop-dong-btvn-nang-do-2109.md mục 7: `chiTiet.caNhan:true`, `tongLo = soChang`, `chiSo` = chặng; chưa chốt: `chuaChot:true`.
+// 27/10: thẻ `TheLamNgay` (+ VachLo) và `DanhSachNhiemVu` (+ TheViec) đã gỡ khỏi src/ vì không màn nào dùng ⇒ các phép vẽ hai thẻ ấy bỏ theo.
 import fs from 'node:fs'
 import path from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup } from '@testing-library/react'
 import { tuKeHoachNgay, type KeHoachNgayMayChu } from '../src/lib/nhiem-vu-adapter'
-import TheLamNgay, { VachLo } from '../src/components/bang-nhiem-vu/TheLamNgay'
-import { TheViec } from '../src/components/bang-nhiem-vu/DanhSachNhiemVu'
 
 afterEach(() => cleanup())
 
@@ -66,16 +65,6 @@ describe('thẻ việc BTVN cá nhân hoá: chặng, không phải lô', () => {
     expect(t.moTa).toContain('6 câu')
     expect(t.moTa).not.toContain('của em')
     expect(t.tienDoLo).toEqual({ hienTai: 1, tong: 2 })
-  })
-})
-
-describe('VachLo (thanh tiến độ)', () => {
-  it('chuẩn từ ngữ: cả bài cá nhân hoá lẫn bài thường đọc "Chặng x trong y chặng" (không còn "Lô")', () => {
-    const { unmount } = render(<VachLo tienDo={{ hienTai: 2, tong: 7, laChang: true }} />)
-    expect(screen.getByRole('img', { name: 'Chặng 2 trong 7 chặng' })).toBeTruthy()
-    unmount()
-    render(<VachLo tienDo={{ hienTai: 1, tong: 3 }} />)
-    expect(screen.getByRole('img', { name: 'Chặng 1 trong 3 chặng' })).toBeTruthy()
   })
 })
 
@@ -142,27 +131,6 @@ describe('thẻ bài cá nhân hoá — tên "Bài tập về nhà · Chặng k"
     expect(t.tieuDe).toBe('BTVN Amin: Chặng 1 trong 2 chặng')
   })
 
-  it('thẻ "LÀM NGAY" của học sinh VÀ thẻ của phụ huynh đều vẽ đủ các dòng, tên truy cập không chứa mã tờ', () => {
-    const t = cn(0, HAN_CHANG, HAN_BAI)
-    for (const docChi of [false, true]) {
-      const { unmount } = render(<TheLamNgay viec={t} docChi={docChi} onLam={() => {}} />)
-      const sec = document.querySelector('[data-vung="lam-ngay"]')!
-      expect(sec.querySelector('h2')!.textContent).toBe('Bài tập về nhà · Chặng 1')
-      expect(sec.textContent).toContain('Chặng 1 trong 7 chặng')
-      expect(sec.textContent).toContain('Hạn chặng này: 23:59 · Thứ Hai 21/09/2026')
-      expect(sec.textContent).toContain('Hạn nộp cả bài: 23:59 · Thứ Năm 24/09/2026')
-      expect(sec.getAttribute('aria-label')).not.toContain('DH-12')
-      unmount()
-    }
-  })
-
-  it('thẻ trong DANH SÁCH cũng có dòng phụ', () => {
-    const t = cn(1, HAN_CHANG, HAN_BAI)
-    render(<TheViec viec={t} nhanBac="BẮT BUỘC" docChi={false} onChon={() => {}} />)
-    expect(document.body.textContent).toContain('Bài tập về nhà · Chặng 2')
-    expect(document.body.textContent).toContain('Chặng 2 trong 7 chặng')
-    expect(document.body.textContent).toContain('Hạn chặng này: 23:59 · Thứ Hai 21/09/2026')
-  })
 })
 
 // ───────── lỗi thầy thấy trên BÀI THẬT (21/09): thẻ ghi "Chặng 1/1" trong khi bài có 4 chặng ─────────

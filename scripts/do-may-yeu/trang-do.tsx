@@ -19,10 +19,6 @@ import '../../src/components/ph-v3/ph-v3.css'
 import { batCheDoMayYeu } from '../../src/lib/may-yeu'
 import HocTapHomNay from '../../src/components/hoc-tap/HocTapHomNay'
 import { docSanh, type KetQuaSanh } from '../../src/components/hoa2/api'
-import PH from '../../src/components/ph-moi/ManChinh'
-import BangPH from '../../src/components/ph-moi/BangMoiThu'
-import { docTatCaVeCon } from '../../src/lib/ph-moi/du-lieu'
-import { PH_APPLE } from '../../tests/_ph-moi/du-lieu-mau-apple'
 
 batCheDoMayYeu()
 const man = new URLSearchParams(location.search).get('man') ?? 'hoc-tap'
@@ -52,9 +48,7 @@ if (man === 'hoc-tap' || man === 'sanh' || man === 'hs')
     onHoc: noop, onXemLai: noop, onChua: noop, onThi: noop, onTuLuyen: noop, onLichSu: noop,
     onBaiTap: noop, onGiaDinh: noop, onDangXuat: noop, onTaiLai: noop,
   })
-else if (man === 'ph')
-  con = h(PH, { v: { trangThai: 'ok', pm: { serverNow: now, tongQuan: { soCau: 1234, soDung: 1200, phutHoc: 240, datNhiemVu: true, viecTong: 5, viecXong: 5 }, caGanNhat: null, nhipHoc: null }, thuLai: noop }, tenCon: 'Nguyễn Văn Thử', lop: '12A1', now, canhBao: [], onCanhBaoDaXem: noop, giaoThem: { trangThai: 'san_sang', conLai: 3, onGiao: noop }, onMoBang: noop, onDoiSbd: noop } as never)
-else con = h(BangPH, { pm: docTatCaVeCon(PH_APPLE), sbd: 'TEST', lop: '12A1', giaoThem: { san: true, dangTai: false, conLai: 3, goiGanNhat: null, the: null, dangGui: false, giao: noop }, onVe: noop } as never)
+// 27/10: màn phụ huynh ph-moi cũ (ManChinh / BangMoiThu) đã gỡ khỏi src/ — đo cổng phụ huynh trên app thật (/ph).
 
 createRoot(document.getElementById('root')!).render(h(StrictMode, null, con))
 requestAnimationFrame(() =>

@@ -15,7 +15,6 @@ import { resolve } from 'node:path'
 import { hopSao, demSao, soCauHopSao, LOC_SAO_MAC_DINH, MOI_LOC_SAO, TEN_LOC_SAO } from '../src/lib/loc-sao'
 import { soLieuThanhChua, cauGiaiThichThanh, cauCanhBaoHetHang, cauKhongRutDuoc } from '../src/lib/noi-dung-thanh-chua'
 import { rutDeChua } from '../src/lib/rut-de-chua'
-import { rutBaiTap } from '../src/lib/bai-tap'
 import { chonCauLuyen } from '../src/lib/bai-tap-pdf'
 import type { TeacherExamSource } from '../src/data/examContent'
 import type { ChiTietCauRow } from '../src/lib/exam-api'
@@ -101,12 +100,6 @@ describe('lọc sao — 2 sao (khó) và 1 sao (bản chất)', () => {
     const k = kho([cau('a1', 2), cau('b1', 1), cau('c1', 0)])
     const chiHai = chonCauLuyen(k, { chuyenDe: [], sao: 'sao_2', soCau: 10, ngauNhien: () => 0 })
     expect(chiHai.cau.map((c) => c.id)).toEqual(['a1'])
-  })
-
-  it('RÚT ĐỀ CHO CA cũng lọc theo sao', () => {
-    const k = kho([cau('a1', 2), cau('b1', 1), cau('c1', 0)])
-    const kq = rutBaiTap(k, { chuyenDe: [], mucDo: 'tron', sao: 'sao_1', soCau: 10, ngauNhien: () => 0 })
-    expect(kq.bank.phanI.map((c) => c.id)).toEqual(['b1'])
   })
 
   it('mọi màn rút câu đều có hàng nút Mức sao', () => {

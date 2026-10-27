@@ -62,12 +62,13 @@ function useHetGio(kho:KhoGio|null){
  const lay=()=>!!kho&&kho.conLai()<=0
  return useSyncExternalStore(kho?.dangKy??khongDangKy,lay,lay)
 }
-export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat}:{token:string;sbd:string;id:string;onVe:()=>void;onCapNhat:()=>void}) {
+export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,ban}:{token:string;sbd:string;id:string;onVe:()=>void;onCapNhat:()=>void;/** Tóm tắt bài từ Sảnh (27/10 tốc độ): vẽ ngay thẻ tổng quan khi bấm, số mới về thì thay. */ban?:TomTatKiemTra}) {
  // KIỂU DUOLINGO (thầy 27/10): <html data-trong="hs"> ⇒ màn làm chặng một câu một màn (KhungKiemTra.tsx) — cùng state, cùng lệnh lưu/chốt/đồng hồ.
  // Cả màn kiểm tra: TẮT ÂM THANH, chỉ rung (cờ batCheDoThi của am-thanh.ts, gỡ khi đóng).
  const [duo]=useState(laKiemTraDuo),[moLuoi,setMoLuoi]=useState(false),[hoiNop,setHoiNop]=useState<((ok:boolean)=>void)|null>(null)
  useEffect(()=>batCheDoThi(),[])
- const [tt,setTt]=useState<TomTatKiemTra>(),[chang,setChang]=useState<Chang[]>([]),[cs,setCs]=useState<Question[]>([]),[stt,setStt]=useState<number|null>(null),[viTri,setViTri]=useState(0),[tra,setTra]=useState<Record<string,string>>({}),[han,setHan]=useState(0),[offset,setOffset]=useState(0),[busy,setBusy]=useState(false),[loi,setLoi]=useState(''),[luu,setLuu]=useState(''),[ket,setKet]=useState<Ket>()
+ const banDau=ban?.id===id?ban:undefined
+ const [tt,setTt]=useState<TomTatKiemTra|undefined>(banDau),[chang,setChang]=useState<Chang[]>([]),[cs,setCs]=useState<Question[]>([]),[stt,setStt]=useState<number|null>(null),[viTri,setViTri]=useState(0),[tra,setTra]=useState<Record<string,string>>({}),[han,setHan]=useState(0),[offset,setOffset]=useState(0),[busy,setBusy]=useState(false),[loi,setLoi]=useState(''),[luu,setLuu]=useState(''),[ket,setKet]=useState<Ket>()
  const hanChay=stt!==null?han:!ket&&tt?.homNay&&tt.nopLuc===null?chang.find(c=>!c.daChot&&c.han!==null)?.han:undefined
  const khoChang=useMemo(()=>hanChay?taoKhoGio(hanChay,()=>Date.now()+offset):null,[hanChay,offset])
  const khoBai=useMemo(()=>tt?taoKhoGio(tt.hanLuc,()=>Date.now()+offset):null,[tt?.hanLuc,offset])
@@ -82,10 +83,10 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat}:{token:st
  const khung=useRef<HTMLDivElement>(null)
  useEffect(()=>{if(stt!==null)khung.current?.scrollIntoView?.({block:'start'})},[stt])
  const nhan=(r:Record<string,unknown>)=>{const t=docKiemTra(r.kiemTra);if(!t)throw new Error('Số liệu bài kiểm tra chưa đầy đủ. Em tải lại nhé.');setTt(t);setOffset(t.serverNow-Date.now());if(typeof r.revision==='number')revision.current=r.revision;return t}
- const tai=async()=>{const lan=lanPhien.current;setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-trang-thai',token,{id});if(!conPhien(lan))return;const t=nhan(r);setChang(r.chang as Chang[]);if(t.nopLuc!==null||t.trangThai==='het_han'){const k=await goiHoa2('hoc-tap-ktcn-ket-qua',token,{id});if(!conPhien(lan))return;nhan(k);setKet(k.ketQua as Ket)}}catch(e){if(conPhien(lan))setLoi(e instanceof Error?e.message:'Chưa tải được bài kiểm tra.')}finally{if(conPhien(lan))setBusy(false)}}
+ const tai=async()=>{const lan=lanPhien.current;setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-trang-thai',token,{id,kemKetQua:true});if(!conPhien(lan))return;const t=nhan(r);setChang(r.chang as Chang[]);if(r.ketQua&&t.nopLuc!==null){setKet(r.ketQua as Ket);return}if(t.nopLuc!==null||t.trangThai==='het_han'){const k=await goiHoa2('hoc-tap-ktcn-ket-qua',token,{id});if(!conPhien(lan))return;nhan(k);setKet(k.ketQua as Ket)}}catch(e){if(conPhien(lan))setLoi(e instanceof Error?e.message:'Chưa tải được bài kiểm tra.')}finally{if(conPhien(lan))setBusy(false)}}
  useEffect(()=>{
   mounted.current=true;tuTiep.current=true;lanPhien.current++;huyHenThuLai();lanThuLai.current=0;tuNop.current=false;revision.current=0;day.current=Promise.resolve();traRef.current={}
-  setTt(undefined);setChang([]);setCs([]);setStt(null);setHan(0);setOffset(0);setTra({});setKet(undefined);setNhapCuu(undefined);setLuu('')
+  setTt(banDau);setChang([]);setCs([]);setStt(null);setHan(0);setOffset(0);setTra({});setKet(undefined);setNhapCuu(undefined);setLuu('')
   void tai()
   return()=>{mounted.current=false;lanPhien.current++;huyHenThuLai();if(timer.current)clearTimeout(timer.current)}
  },[token,id])
@@ -225,13 +226,15 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat}:{token:st
     <div className="ktcn-dau"><span className="ktcn-hinh"><BieuTuongKiemTra hinh="lam"/></span><div className="ktcn-chu"><p className="ktcn-nhan">Bài dành riêng cho em</p><h2>Kiểm tra ôn tập</h2>{tt.lyDo&&<p className="ktcn-ly-do">{tt.lyDo}</p>}</div></div>
     <div className="ktcn-than">
      <VongDem phan={tt.tong?tt.daTra/tt.tong:0} nhan={`Đã trả lời ${tt.daTra} trên ${tt.tong} câu`}><b>{tt.daTra}/{tt.tong}</b><small>đã trả lời</small></VongDem>
-     <ul className="ktcn-dong-so"><li><Route size={20} aria-hidden="true"/><span><b>{soChot}/{chang.length||tt.soChang} chặng</b> đã chốt</span></li><li><Check size={20} aria-hidden="true"/><span>Từ <b>{tt.soBai} bài</b> em đã học</span></li></ul>
+     <ul className="ktcn-dong-so"><li><Route size={20} aria-hidden="true"/><span><b>{busy&&!chang.length?'…':soChot}/{chang.length||tt.soChang} chặng</b> đã chốt</span></li><li><Check size={20} aria-hidden="true"/><span>Từ <b>{tt.soBai} bài</b> em đã học</span></li></ul>
     </div>
     <div className="ktcn-hai-gio">
      <div><CalendarDays size={22} aria-hidden="true"/><b>Hạn nộp {gioHan(tt.hanLuc,tt.ngay)}</b><small>Cả bài · còn <GioConLai kho={khoBai} bai/></small></div>
      <div><Timer size={22} aria-hidden="true"/><b>Giờ riêng từng chặng</b><small>Chỉ chạy khi em bấm Làm chặng</small></div>
     </div>
    </section>
+   {/* Thẻ tổng quan vẽ ngay từ số Sảnh; chặng chưa về ⇒ khung chờ ngay dưới thẻ (27/10 tốc độ). */}
+   {busy&&!chang.length&&<div className="ktcn-xuong" aria-hidden="true"><span/><span/><span/></div>}
    <ol className="ktcn-chang" aria-label="Các chặng">{chang.map(c=>{
     const chay=dangChay?.stt===c.stt,khoa=!c.daChot&&!!dangChay&&!chay,chinh=chay||(!dangChay&&dau?.stt===c.stt)
     return <li key={c.stt} data-xong={c.daChot||undefined} data-dang={chay||undefined}>

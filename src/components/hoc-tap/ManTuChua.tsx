@@ -184,6 +184,13 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
   const [lanThem, setLanThem] = useState(0)
   const { viec, luu } = useMemo(() => (sbd ? dungViecHomNay(kq, Date.now(), sbd) : { viec: null, luu: null }), [kq, sbd, lanThem])
   useEffect(() => { luuViecHomNay(luu) }, [luu])
+  // 27/10 tốc độ (thầy: «sửa lỗi chỗ mở câu phải tức thì»): danh sách vừa mở ⇒ lúc rảnh nạp sẵn mảnh màn sửa câu, bấm câu là vào ngay, không màn chờ nạp mảnh.
+  useEffect(() => {
+    // Chỉ nạp mảnh màn sửa câu: khung Duo (ChuaGonDuo) do chính màn ấy nạp song song lệnh mở đợt — nạp thẳng từ đây làm Rolldown tách thêm mảnh dùng chung (+1 tệp precache).
+    const nap = () => { void import('../chua-cau-sai/ManChuaCauSai').catch(() => {}) }
+    const ric = (globalThis as { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }).requestIdleCallback
+    if (ric) ric(nap, { timeout: 2000 }); else setTimeout(nap, 600)
+  }, [])
 
   // Câu mở thẳng: danh sách về ⇒ mở đúng đợt (hoặc thử mở câu chưa có đợt); vòng chữa tắt ⇒ bỏ, hiện màn "chưa mở cho em".
   useEffect(() => {

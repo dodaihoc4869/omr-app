@@ -132,7 +132,6 @@ const boChuThich = (ma: string) => ma.replace(/^\s*\/\/.*$/gm, '').replace(/\/\*
 const API = boChuThich(doc('src/lib/exam-api.ts'))
 // 28/09: modal học sinh cũ ĐÃ XOÁ — báo cáo của em nay nạp qua `ca-thi/BaoCaoCaCuaEm` (bản mới).
 const BC_HS = boChuThich(doc('src/components/ca-thi/BaoCaoCaCuaEm.tsx'))
-const BC_PH = boChuThich(doc('src/components/BaoCaoCaThiPhuHuynhModal.tsx'))
 const CONG_PH = boChuThich(doc('src/screens/ParentPortalScreen.tsx'))
 const DB = boChuThich(doc('src/lib/exam-db.ts'))
 
@@ -173,12 +172,6 @@ describe('Màn báo cáo hết canh cửa bằng `scriptUrl`', () => {
     expect(BC_HS).not.toMatch(/fetch\(|layDiaChiMayChu|scriptUrl\.replace/)
   })
 
-  it('app phụ huynh: hai lượt nạp không còn cổng `!scriptUrl`', () => {
-    expect(BC_PH).not.toContain('if (!sbd || !scriptUrl) return')
-    expect(BC_PH).not.toContain('if (!baiThi.maCa || !scriptUrl) return')
-    expect(BC_PH).toContain('if (!baiThi.maCa) return')
-  })
-
   it('cổng phụ huynh: lượt lấy câu sai không còn bọc trong `if (scriptUrl)`', () => {
     expect(CONG_PH).not.toContain('if (scriptUrl) {')
   })
@@ -194,12 +187,7 @@ describe('Cấm nuốt lỗi im lặng', () => {
     expect(CT).toContain("p.loiEm || 'Ca này chưa có điểm đã công bố.'")
   })
 
-  it('app phụ huynh: gọi hỏng thì giữ lại lý do và hiện ra', () => {
-    expect(BC_PH).toContain('setLoiCauSai')
-    expect(BC_PH).toContain("loiCauSai || 'Ca này con không có câu nào cần khắc phục'")
-  })
-
-  // Cổng phụ huynh: luồng tạo bài khắc phục từ câu sai ĐÃ GỠ (app một màn một nút, 21/09) ⇒ không còn chỗ nào ở cổng để nuốt lỗi câu sai; phần "gọi hỏng" của hộp báo cáo giữ ở test phía trên.
+  // Cổng phụ huynh: luồng tạo bài khắc phục từ câu sai ĐÃ GỠ (app một màn một nút, 21/09) ⇒ không còn chỗ nào ở cổng để nuốt lỗi câu sai; hộp báo cáo phụ huynh cũ (BaoCaoCaThiPhuHuynhModal) đã gỡ 27/10 vì không màn nào mở.
   it('cổng phụ huynh: không còn luồng gọi câu sai để tạo bài khắc phục (đã gỡ, không còn chỗ nuốt lỗi)', () => {
     expect(CONG_PH).not.toContain('loiGoi')
     expect(CONG_PH).not.toContain('xuLyTaoBaiCuaMom')

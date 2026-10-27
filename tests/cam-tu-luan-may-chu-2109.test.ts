@@ -122,17 +122,6 @@ describe('A · game Đảo thần thú (game-v2.ts): chọn phiên, sổ tay, l�
     const r = await gameV2(d.env, 'recommendations', { token: await gameToken(d.env, 'S1') }) as { suggestions: { part: string; source: string }[] }
     expect(r.suggestions.length).toBeGreaterThan(0)
   })
-  it('so-tay: một dạng CHỈ có câu tự luận không hiện trong sổ tay', async () => {
-    const d = dungKho(); await saiBtvn(d, [`${MA}-I-1`])
-    const tl = { ...cauRieng(KHO_THO[5]!, 'DE-TL2', {}), qid: 'TL2-1', dang: 'TL.ONLY', tenDang: 'Chỉ tự luận', group: 'g-tl2' }
-    d.sql.prepare("INSERT INTO de_kho(ma_de,ten_de,lop,so_cau,r2_khoa,da_xoa,cap_nhat_luc) VALUES('DE-TL2','DE-TL2','12',1,'kho/DE-TL2.json',0,'v1')").run()
-    d.sql.prepare("INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE-TL2','v1','x')").run()
-    d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DE-TL2', tl.qid, 'v1', tl.group, tl.dang, JSON.stringify(tl))
-    await saiBtvn(d, ['TL2-1'], 'S1')
-    const r = await gameV2(d.env, 'so-tay', { token: await gameToken(d.env, 'S1') }) as { dang: { key: string }[] }
-    expect(r.dang.map((x) => x.key)).toContain('ES.A.X')
-    expect(r.dang.map((x) => x.key)).not.toContain('TL.ONLY')
-  })
   it('LƯỢT CŨ soạn trước lệnh cấm còn câu tự luận: resume chỉ trả câu rút được, answer câu tự luận bị đóng, complete chỉ đòi câu rút được', async () => {
     const d = dungKho()
     const id = 'LUOT-CU'

@@ -44,15 +44,13 @@ export interface DongSoTichHop {
 
 
 /**
- * SỔ KIỂM — 14 dòng, mỗi dòng đã đối chiếu mã thật của bản `aa08c74`.
+ * SỔ KIỂM — 12 dòng, mỗi dòng đã đối chiếu mã thật của bản `aa08c74` (27/10: bỏ /game-v2/invest và /game-v2/khien-ren cùng lệnh game đã gỡ).
  * Bất biến (test canh): mọi dòng có `tien !== 'khong'` PHẢI có `khoaIdempotency`; mọi dòng
  * `trangThai: 'de_xuat_patch'` phải nằm trong danh sách patch trình Boss (`deXuatPatch`).
  */
 export const SO_TICH_HOP: readonly DongSoTichHop[] = Object.freeze([
   { duong: '/game-v2/answer', xuLy: "gameV2 action==='answer'", vai: ['nop_bai'], tien: 'cong', khoaIdempotency: 'attempt (session|qid) — khoá LƯỢT LÀM, không phải khoá request', trangThai: 'de_xuat_patch', ghiChu: 'Trả lời một câu game; tiền chỉ trả ở bước chốt. Cần receipt P07 theo request trước khi bật quỹ mới.' },
   { duong: '/game-v2/complete', xuLy: "gameV2 action==='complete'", vai: ['quyet_toan_core'], tien: 'cong', khoaIdempotency: 'khoá khoản sổ `sbd|<mã chặng/lượt>` (exp_so)', trangThai: 'de_xuat_patch', ghiChu: 'Chốt lượt ⇒ ghi khoản EXP game. Nơi phải thay bằng `settle_core_entitlement` + receipt.' },
-  { duong: '/game-v2/invest', xuLy: "gameV2 action==='invest'", vai: ['chi_tieu'], tien: 'chi', khoaIdempotency: 'revision hồ sơ (CAS)', trangThai: 'de_xuat_patch', ghiChu: 'Hấp thụ ví ⇒ tiền GIẢM. Phải đi cùng một giao dịch với tài khoản P07 khi chuyển quyền ví.' },
-  { duong: '/game-v2/khien-ren', xuLy: "gameV2 action==='khien-ren'", vai: ['chi_tieu'], tien: 'chi', khoaIdempotency: 'revision hồ sơ (CAS)', trangThai: 'de_xuat_patch', ghiChu: 'Rèn khiên (mảnh + EXP dự trữ) ⇒ chi; giữ luật thưởng theo đặc tả, không tự cấp quà.' },
   { duong: '/btvn/nop', xuLy: 'nopBtvn → nopBtvnQuaPhieu', vai: ['nop_bai', 'quyet_toan_core'], tien: 'cong', khoaIdempotency: 'lan (khoá lượt làm theo bài|em)', trangThai: 'de_xuat_patch', ghiChu: 'Nộp phiếu BTVN ⇒ capNhatExp. Cần khoá request + receipt trước khi bật.' },
   { duong: '/btvn/xong-lo', xuLy: 'xongLoBtvn → capNhatExpSauNopLo', vai: ['quyet_toan_core'], tien: 'cong', khoaIdempotency: 'mã lô|chặng (btvn_lo)', trangThai: 'de_xuat_patch', ghiChu: 'Chốt lô ⇒ cập nhật EXP/kế hoạch; phải idempotent theo lô khi bật quỹ mới.' },
   { duong: '/hs/on-lai/nop', xuLy: 'hsOnLaiNop → chamVaGhiTraLoi', vai: ['nop_bai', 'quyet_toan_core'], tien: 'cong', khoaIdempotency: '`on_lai:<ngày>` + lan=1 (sổ su_kien_hoc)', trangThai: 'de_xuat_patch', ghiChu: 'ĐÃ chứng minh retry/cạnh tranh không cộng hai lần (ca của tôi). Vẫn phải đổi sang receipt P07 khi chuyển quyền ví.' },
@@ -120,8 +118,6 @@ export function kiemTichHopRoute(duong: string, c: CauHinhKichHoat): KetQuaCua &
 export const TEP_DE_XUAT_PATCH: Readonly<Record<string, string>> = Object.freeze({
   '/game-v2/answer': 'server/src/game-v2.ts (nhánh answer: khoá request + receipt)',
   '/game-v2/complete': 'server/src/game-v2.ts (nhánh complete: gọi quyết toán có receipt)',
-  '/game-v2/invest': 'server/src/game-v2.ts (nhánh invest: chi ví trong cùng giao dịch tài khoản)',
-  '/game-v2/khien-ren': 'server/src/game-v2.ts (nhánh khien-ren: chi ví cùng giao dịch)',
   '/btvn/nop': 'server/src/index.ts + server/src/btvn-nang-do-d1.ts (nopBtvnQuaPhieu)',
   '/btvn/xong-lo': 'server/src/index.ts + server/src/exp-d1.ts (capNhatExpSauNopLo)',
   '/hs/on-lai/nop': 'server/src/index.ts (route) + server/src/on-lai-nop.ts (chamVaGhiTraLoi)',

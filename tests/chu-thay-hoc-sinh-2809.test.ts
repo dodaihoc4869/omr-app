@@ -50,15 +50,11 @@ describe('khoá nguồn màn học sinh', () => {
   const TEP = [
     'src/screens/StudentPortalScreen.tsx', 'src/screens/ExamTakeScreen.tsx', 'src/screens/PhieuScreen.tsx',
     'src/components/KhoiBaiLuyen.tsx', 'src/components/xem-diem/KetQuaSauNop.tsx', // 06/10 gọn mã lần 2: bỏ KhungLoiGiaiGame.tsx (game Thần thú v1, đã xoá)
-    'src/components/InfographicHuongDan.tsx', // TheBoNao + TheThuThachRieng đã XOÁ cùng Bộ não A.I (28/09)
     'server/src/khien-mat.ts', 'server/src/game-v2-hap-thu.ts', 'server/src/ph-giao-them.ts',
   ]
   const game = (thu: string): string[] => readdirSync(thu, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? game(`${thu}/${e.name}`) : /\.tsx?$/.test(e.name) ? [`${thu}/${e.name}`] : [])
   it('không còn "A.I Đỗ Đại Học"/"Bộ não A.I" ngoài chú thích', () => {
     for (const t of [...TEP, ...game('src/game')]) expect(boChuThich(readFileSync(t, 'utf8')), t).not.toMatch(CU)
-  })
-  it('hướng dẫn ở cổng đăng nhập: không còn "Bài gia đình giao" (phụ huynh không giao bài nữa)', () => {
-    expect(readFileSync('src/components/InfographicHuongDan.tsx', 'utf8')).not.toContain('Bài gia đình giao')
   })
   it('thẻ Bộ não + Thử thách riêng đã GỠ HẲN (28/09): hai tệp thẻ không còn', () => {
     expect(existsSync('src/components/bang-nhiem-vu/TheBoNao.tsx')).toBe(false)

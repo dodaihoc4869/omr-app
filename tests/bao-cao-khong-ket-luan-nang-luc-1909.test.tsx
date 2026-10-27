@@ -1,12 +1,11 @@
 // SỬA LỖI (0.Planer 19/09, luật thầy chốt 18/09 áp cho MỌI màn phụ huynh): báo cáo ca thi chỉ NÓI SỐ LIỆU, không kết luận năng lực
 // của con từ một điểm số — "không coi số câu nộp là bằng chứng đã nắm chắc kiến thức". Tái hiện: bản cũ ghi "Nắm rất chắc nền tảng",
 // "Khả năng tư duy hóa học và phản xạ giải toán rất chắc chắn", "giữ vững phong độ đỉnh cao" chỉ từ điểm >= 8 / >= 9.
+// 27/10: hộp BaoCaoCaThiPhuHuynhModal và lib/danh-gia-bai đã gỡ khỏi src/ vì không màn nào dùng ⇒ chỉ còn soát báo cáo em bản mới.
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, render } from '@testing-library/react'
+import { cleanup } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
-import BaoCaoCaThiPhuHuynhModal from '../src/components/BaoCaoCaThiPhuHuynhModal'
-import { danhGiaBai } from '../src/lib/danh-gia-bai'
 import { CA_MAU, TEP_BAO_CAO_EM_MOI, veBaoCaoEmMoi } from './_bao-cao-em-moi'
 
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
@@ -26,9 +25,9 @@ afterEach(() => {
 })
 
 describe('báo cáo ca thi không kết luận năng lực từ điểm số', () => {
-  it('mã nguồn modal phụ huynh, báo cáo em bản mới và danh-gia-bai.ts không còn các cụm bị cấm', () => {
+  it('mã nguồn báo cáo em bản mới không còn các cụm bị cấm', () => {
     // 28/09: modal học sinh cũ ĐÃ XOÁ — báo cáo của em nay là BaoCaoCaCuaEm → BaoCaoChiTiet chế độ em (lib/bao-cao-cua-em)
-    for (const f of ['src/components/BaoCaoCaThiPhuHuynhModal.tsx', ...TEP_BAO_CAO_EM_MOI, 'src/lib/danh-gia-bai.ts']) {
+    for (const f of [...TEP_BAO_CAO_EM_MOI]) {
       expect(doc(f).match(CAM)?.[0] ?? null, f).toBeNull()
     }
   })
@@ -40,40 +39,6 @@ describe('báo cáo ca thi không kết luận năng lực từ điểm số', (
       expect(chu).toContain(String(diem).replace('.', ','))
       expect(chu.match(CAM)?.[0] ?? null).toBeNull()
       expect(chu.match(/năng lực|nền tảng|lỗ hổng/i)?.[0] ?? null).toBeNull()
-    })
-  }
-
-  for (const diem of [9.75, 8.5, 7, 5.25]) {
-    it(`modal phụ huynh ở điểm ${diem}: lời khuyên NÊU đúng con số ${diem.toFixed(2)}/10 và không có cụm bị cấm`, () => {
-      window.history.replaceState(null, '', '/?vai=phuhuynh')
-      vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, status: 200, json: async () => ({ ok: true, items: [] }), text: async () => '{}' })))
-      render(
-        <BaoCaoCaThiPhuHuynhModal
-          baiThi={{ maCa: 'CA-1', tenCa: 'Ca thử', diem, tongSoCau: 28, soCauDung: 20, soCauSai: 8 } as any}
-          hoTenCon="Minh" sbd="12001" scriptUrl="https://may.test" onClose={() => {}} onGiaoBaiChoCon={() => {}} onNhanTinChoThay={() => {}}
-        />,
-      )
-      const chu = document.body.textContent || ''
-      expect(chu).toContain(`${diem.toFixed(2)}/10`)
-      expect(chu.match(CAM)?.[0] ?? null).toBeNull()
-      expect(chu).toContain('Gợi ý hành động')
-    })
-  }
-})
-
-// nhận xét dùng chung (danhGiaBai) chỉ có điểm + số câu cần chữa + tổng câu → chỉ được nói những thứ đó
-const SUY_LUAN = /lỗ hổng|bẫy đề|bước tính|phần nhận biết|thông hiểu|vận dụng|năng lực|nền tảng/i
-describe('danhGiaBai: nhận xét chỉ nêu số liệu có trong tay', () => {
-  for (const [d, con] of [[10, 0], [9.6, 1], [8.4, 3], [7, 5], [5.5, 8], [3, 12]] as const) {
-    it(`điểm ${d}, còn ${con} câu: có con số của bài, không suy luận năng lực / mức độ`, () => {
-      const t = danhGiaBai(d, con, 28).thongDiep
-      if (con > 0) {
-        expect(t).toContain(`${d.toFixed(2)} điểm`)
-        expect(t).toContain(`${con} câu cần chữa`)
-      }
-      expect(t.match(CAM)?.[0] ?? null).toBeNull()
-      expect(t.match(SUY_LUAN)?.[0] ?? null).toBeNull()
-      expect(t).not.toContain('!')
     })
   }
 })

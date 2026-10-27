@@ -261,7 +261,8 @@ export default function ManChuaCauSai({
       setDaXongSo('')
       setGon(null)
       // Chữa câu gọn (thầy 25/10): mở đợt KHÔNG phát bước đầu (đường gọn không dùng phiên từng bước) rồi xin bản làm lại.
-      const r = await apiMoDot(token, qid, undefined, false)
+      // 27/10 (thầy: «sửa lỗi chỗ mở câu phải tức thì»): mở đợt + mở bản làm lại MỘT lượt đi-về (`gon`); máy chủ cũ ⇒ gọi gon-mo như trước.
+      const r = await apiMoDot(token, qid, undefined, false, true)
       const phat = docPhatKem(r.phat)
       if (huy || n !== goiRef.current) return
       // 24/10: sổ học đã đóng lỗi câu này (máy chủ trả «chưa có lỗi đang mở» kèm mã đợt) ⇒ tính xong phần hôm nay, không để chặng kẹt ở khung lỗi.
@@ -281,7 +282,7 @@ export default function ManChuaCauSai({
         setTai(false)
         return
       }
-      const g = await apiGonMo(token, r.dotId)
+      const g = r.gon ?? (await apiGonMo(token, r.dotId))
       if (huy || n !== goiRef.current) return
       if (g.ok || (g.ma && MA_GON.has(g.ma))) {
         setGon({ dotId: r.dotId, dau: g })

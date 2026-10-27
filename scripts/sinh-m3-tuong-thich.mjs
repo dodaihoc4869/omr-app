@@ -29,9 +29,7 @@ export const TEP = [
   'src/components/ModalKhacPhucCauSai.tsx',
   'src/components/KhoiCauSai.tsx',
   // nhóm C — báo cáo + tiến bộ (và các khối con nằm TRONG modal báo cáo phụ huynh; modal học sinh cũ đã xoá 28/09)
-  'src/components/BaoCaoCaThiPhuHuynhModal.tsx',
   'src/components/BieuDoTienBoGoogle.tsx',
-  'src/components/KhoiBaPhan.tsx',
   'src/components/DongDemCau.tsx',
   // nhóm A2 — vào thi (luồng thi thật)
   'src/components/PhongChoGame.tsx',

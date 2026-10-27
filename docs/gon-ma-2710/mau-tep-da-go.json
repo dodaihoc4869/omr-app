@@ -1,0 +1,403 @@
+{
+ "ghiChu": "27/10/2026 — thầy: «Siêu tối ưu code xóa bỏ code rác loại bỏ toàn bộ mọi thứ liên quan tới đảo đoàn game». files = tệp src/ KHÔNG điểm vào nào với tới (đồ thị nhập tĩnh + import() + new URL từ index.html · src/main.tsx · src/sw.ts · server/src/index.ts; bản build JS giống hệt từng byte trước/sau khi xoá), kèm sha256 nội dung đúng lúc xoá ⇒ chỉ miễn đúng bản đã soát. cu = khai báo màu của m3-tuong-thich.css (tệp SINH bởi scripts/sinh-m3-tuong-thich.mjs) biến mất khi bỏ hai tệp đã xoá (BaoCaoCaThiPhuHuynhModal, KhoiBaPhan) khỏi danh sách nguồn của bộ sinh.",
+ "base": "b44c5841",
+ "files": [
+  {
+   "path": "src/components/BaoCaoCaThiPhuHuynhModal.tsx",
+   "sha256": "cf172cdc351a0ed9243c9789132636f110937f9fca7b1be540765758a869bd84"
+  },
+  {
+   "path": "src/components/InfographicHuongDan.tsx",
+   "sha256": "6628e6574df163febda77935aec9abfb050876fc92cfcce297aed4b14020a0b8"
+  },
+  {
+   "path": "src/components/KhoiBaPhan.tsx",
+   "sha256": "3299cc6e831d30860e3ee654b6efa27652e9d8438ca8861e585a6ab1356dab42"
+  },
+  {
+   "path": "src/components/KhoiBtvnLo.tsx",
+   "sha256": "0fcef50a28a83fe2b8ff3974a8757058fd396bb20a4868284fbf5d2d9bf8d504"
+  },
+  {
+   "path": "src/components/KhoiLuyenKhacPhuc.tsx",
+   "sha256": "1535ca039fd414033c2b46527f2e93dcb39b7a85c9948104e1206ed3c820a260"
+  },
+  {
+   "path": "src/components/LogoApp.tsx",
+   "sha256": "5e256211d34716fda3099ed08bd5e6a9334c6a62e7c9c156026a5f7ab7835caa"
+  },
+  {
+   "path": "src/components/LogoDDH.tsx",
+   "sha256": "b3a008e3a031fa0882655d502ae5a4b73b1e6a6a463b35c61a5e9d5e38ace85d"
+  },
+  {
+   "path": "src/components/LogoPhuHuynh.tsx",
+   "sha256": "d8a442cb1a6f90e4463cfa27a153c248c2c22f6ba42736aec9aebabee7878990"
+  },
+  {
+   "path": "src/components/TheTienBo.tsx",
+   "sha256": "f49f56f996573ef98aeb8a67f17cc6f59d6a3b3cbdfd27a604e97c3e67e07fa9"
+  },
+  {
+   "path": "src/components/bang-nhiem-vu/DanhSachNhiemVu.tsx",
+   "sha256": "833cc7a24550a69fed49f3f3d452a778af56c126f7fc11c54983b2c3ec2416a2"
+  },
+  {
+   "path": "src/components/bang-nhiem-vu/GiaoThemChoCon.tsx",
+   "sha256": "9bd1310284722ba6e298e17bbf1b212d74a0170dbb0375c3240e6fe953069b7b"
+  },
+  {
+   "path": "src/components/bang-nhiem-vu/NutVaoThi.tsx",
+   "sha256": "1a21c57cc260d105eebc02ecd424e9dbaac9e971555d80a63543996439f03d9b"
+  },
+  {
+   "path": "src/components/bang-nhiem-vu/OThiDua.tsx",
+   "sha256": "fd9ccf9eea5a73bbeb17ed2cddd9e2e1b10d790d4bc0b4df5a7de0f87393f023"
+  },
+  {
+   "path": "src/components/bang-nhiem-vu/TheChoAn.tsx",
+   "sha256": "a998aab8fe9ac32fe6269e00525289920e3625c33b5495691aa20d766b9a02e3"
+  },
+  {
+   "path": "src/components/bang-nhiem-vu/TheLamNgay.tsx",
+   "sha256": "1f4fbec9a3553f25711d7316134f99588df3f24e5d4e615adfd65707c459fc5c"
+  },
+  {
+   "path": "src/components/bang-nhiem-vu/TheVeDich.tsx",
+   "sha256": "eb81269c90e7a696b4af0da57ae6d27c42f2a8fe08623448e1fd4bb5442c9dd6"
+  },
+  {
+   "path": "src/components/bang-nhiem-vu/ve-dich.css",
+   "sha256": "67cea825f00531027e08dbc8fbde1d9fbb169176dbc1a289b4eb95d60af3aef7"
+  },
+  {
+   "path": "src/components/chat-luong/TheChatLuongLoi.tsx",
+   "sha256": "6bd950310f38261d6b3cb6d9adfa38f96d4c0c8daa5a707145a6da2e569f721e"
+  },
+  {
+   "path": "src/components/chat-luong/api.ts",
+   "sha256": "73b7e204021ff54879f6c0aa1b217ba022fb33614905c540c9f9dd71acb89384"
+  },
+  {
+   "path": "src/components/chat-luong/the-chat-luong-loi.css",
+   "sha256": "39eb1a98a2c134c4306dac97c1491a04f8fdad9e15de74866f3c663d132fae53"
+  },
+  {
+   "path": "src/components/chien-dich/TheNhipHoc.tsx",
+   "sha256": "769be18494510b3168e87b887da21ec840d96bc9a8124d7a566fa6a5b24ac5b0"
+  },
+  {
+   "path": "src/components/chua-cau-sai/NutChuaTungBuoc.tsx",
+   "sha256": "22404c9c371c0af9de7d6fbc90109a4e0ea3b0c7a9c54153c6a2065bc66be696"
+  },
+  {
+   "path": "src/components/ph-moi/BangMoiThu.tsx",
+   "sha256": "ca9163a4da5efd625ced2c8c259b04200756d70b583d9b7a7976002ad1f620a6"
+  },
+  {
+   "path": "src/components/ph-moi/BieuTuongAp.tsx",
+   "sha256": "8b5874e987827729763f1e77c552d5da59b2809f0e1ad3a12325a3dff2798a3a"
+  },
+  {
+   "path": "src/components/ph-moi/ManChinh.tsx",
+   "sha256": "22cc146f6cab02f8c9e4032c8a0143691eb8bd8b464780b15b3a48676d905bb3"
+  },
+  {
+   "path": "src/components/ph-moi/ThanhDayAp.tsx",
+   "sha256": "38a002c35cbb02c3e6725fc97aaa8131436b22a85740a0e39e525b377e1a8d48"
+  },
+  {
+   "path": "src/components/ph-moi/bang/AiLam.tsx",
+   "sha256": "8e858894f2f33f9acb75c910ca058bd8bffb3fabf80aee06a6cbb4c8e3aaec9f"
+  },
+  {
+   "path": "src/components/ph-moi/bang/Btvn.tsx",
+   "sha256": "e9391618928448a6913a10cff9547324b566b0db5ad1da0095bdde7bab85b82b"
+  },
+  {
+   "path": "src/components/ph-moi/bang/Ca.tsx",
+   "sha256": "ef60ed2a889c29beede79d9cd52abcdcb4ac1e56e31245cdd870aa09fa92b4f0"
+  },
+  {
+   "path": "src/components/ph-moi/bang/Dang.tsx",
+   "sha256": "e6bba8a38d7cc8f9dd010de6c1f97f309c9ee41c4c58b65c8a1b35c7b74b08dd"
+  },
+  {
+   "path": "src/components/ph-moi/bang/DauTrang.tsx",
+   "sha256": "1d0e817a14d78cb9ddbecda08ba8c1604899eee98bfa70fa51e972f07f04ea7c"
+  },
+  {
+   "path": "src/components/ph-moi/bang/DieuMung.tsx",
+   "sha256": "9143e8341c3e2811a45d56b45663547d3ad0dcf771382145c1b1bb504962a508"
+  },
+  {
+   "path": "src/components/ph-moi/bang/DongThoiGian.css",
+   "sha256": "17f8b0b3c898aa310358b186a6f5acb6a171c83fb541a76e93454f45d65c0ced"
+  },
+  {
+   "path": "src/components/ph-moi/bang/DongThoiGian.tsx",
+   "sha256": "56173a0f128f7468e121f28e0a42da057be69143a6ae25e64d874084dc33d39e"
+  },
+  {
+   "path": "src/components/ph-moi/bang/LichOn.tsx",
+   "sha256": "824f480335a7da4169c63e51a3837f671072c9ca6107ea3e74be8473c66de595"
+  },
+  {
+   "path": "src/components/ph-moi/bang/LoiAi.tsx",
+   "sha256": "8bb5e2400cda05ca67bc72a56fef0becea8b5e9bdecf0c96471124d8ae9128f0"
+  },
+  {
+   "path": "src/components/ph-moi/bang/Nhip14.tsx",
+   "sha256": "cba7352a064d0a933e9639a48b8a120558c246ebaa2482c4a8ca5d5133a5a2fd"
+  },
+  {
+   "path": "src/components/ph-moi/bang/SapCo.tsx",
+   "sha256": "03d70f87bd62e1f9d1b214ce3275a0edf8180981b81ead7fd7e584c6304fe838"
+  },
+  {
+   "path": "src/components/ph-moi/bang/TongQuan.css",
+   "sha256": "14bd0522732392e5f23833496214f98317f25949acca2a1c686e2003a3d2b322"
+  },
+  {
+   "path": "src/components/ph-moi/bang/TongQuan.tsx",
+   "sha256": "33296fd1288ad65fc2707a0c937b2135896c142e5952290b2af4a042b19bb349"
+  },
+  {
+   "path": "src/components/ph-moi/bang/TungCau.css",
+   "sha256": "ce8d2dc65eb94b2db2289c3fb0577c43d5c7113ea83ed7ccc773ef2dc4db6245"
+  },
+  {
+   "path": "src/components/ph-moi/bang/TungCau.tsx",
+   "sha256": "b5750319a2eb2ad38cf0b528fc2289bf00e02236521272067dc1b3c7edc7b0b2"
+  },
+  {
+   "path": "src/components/ph-moi/bang/VoBang.tsx",
+   "sha256": "28e8a7474b078214ed67aa7d8491e63a6fc8e2121384b4c2df5f738c7fde0107"
+  },
+  {
+   "path": "src/components/ph-moi/bang/Vong3.tsx",
+   "sha256": "bf7761b98c26c96771a2bd845e0dc978e244de1028de9d930dcdf66d0bdfd0f1"
+  },
+  {
+   "path": "src/components/ph-moi/bang/bieu-tuong.tsx",
+   "sha256": "0163e2545e483285b05ae9d93f5617a1cb7b52e1f7a0ac6b87fae9b6d0cd085d"
+  },
+  {
+   "path": "src/components/ph-moi/bang/c-chung.ts",
+   "sha256": "f6cad6434259c76910f1afba1f1809b2cdfb9f3a206ce2ddf8023c8030949812"
+  },
+  {
+   "path": "src/components/ph-moi/bang/dung-chung.tsx",
+   "sha256": "369e601018c99ab966cc9e6ce975a414db79fedb3afec227e5267abc0bd6f864"
+  },
+  {
+   "path": "src/components/ph-moi/bang/khoi-c.css",
+   "sha256": "cd71e12bb59c5f44177db7e19d7ac22e0a8c97d5adefdebbf1ace7cced31acf4"
+  },
+  {
+   "path": "src/components/ph-moi/bang/nhom-cau.ts",
+   "sha256": "e2518afca4416ff4d39b80ff46f9676fe18581b1ea9c8d9a3dea261f09599645"
+  },
+  {
+   "path": "src/components/ph-moi/bang/so-dem.tsx",
+   "sha256": "621377545b73d11716eef70f38fb51e7987e4c0bf86ea0548b500a56ac44068b"
+  },
+  {
+   "path": "src/components/ph-moi/ph-apple-bang.css",
+   "sha256": "b8552881f158fbb35afbf4e1455566bdfefea883117b7783c45fb650f933f372"
+  },
+  {
+   "path": "src/components/ph-moi/ph-apple.css",
+   "sha256": "2c426e41ac65e8060c02d80e78ce6a06015be18b2161ab2fdb9c6deba4d2a9ab"
+  },
+  {
+   "path": "src/components/ph-v3/ManHomNay.tsx",
+   "sha256": "e158e4663240dc0aaf662b4eb0f0fb34b9014f5e56b1294dbb86cb7d95e7d185"
+  },
+  {
+   "path": "src/components/ph-v3/NhipHocCon.tsx",
+   "sha256": "a1847956e4da9f49fb11468f3f44267491f624327d5446b77e517b9802ac622c"
+  },
+  {
+   "path": "src/components/ph-v3/nhip-hoc-con.css",
+   "sha256": "44f4c67bb6d04e2300cc80cb66818732aeb3a0db66944f06d9f92ce27db38e05"
+  },
+  {
+   "path": "src/components/phong-cho-xem-truoc/ChuyenBay.tsx",
+   "sha256": "28eba5e195634f711c3c5595e73a4af2df60da10ec743b9f7e283eed9800e669"
+  },
+  {
+   "path": "src/components/phong-cho-xem-truoc/phong-cho.css",
+   "sha256": "b11fcb577fcc9cb28b35a5a6eb8001a2d714ceaf32e4618860f48ee63ece7b05"
+  },
+  {
+   "path": "src/components/phong-cho-xem-truoc/xem-truoc.html",
+   "sha256": "0216634b58e3ba5f9cbc789400ea8c2044f48cfde355be728918ee3483e906a6"
+  },
+  {
+   "path": "src/components/phong-cho-xem-truoc/xem-truoc.tsx",
+   "sha256": "f95d6295443bed6b348381eff9d9f422d11c383cc6c1664d0aa589afdc8adf9c"
+  },
+  {
+   "path": "src/components/phong-cho/ChuyenBay.tsx",
+   "sha256": "17c674e5d09fb63d8133dcfdbefb9b9b937093bd6d26c1b45f2e9c13121d91fb"
+  },
+  {
+   "path": "src/components/phong-cho/chuyen-bay.css",
+   "sha256": "42958eb2e414a3d25732e9e277ff2b9ad0ccd72e55ba8f749859e75dc3adec23"
+  },
+  {
+   "path": "src/components/phong-cho/xem-thu.html",
+   "sha256": "43428cef77eeaf1e86efa651cecc2c2268b54041c04ad52f8cc6678fda88d3e3"
+  },
+  {
+   "path": "src/components/phong-cho/xem-thu.tsx",
+   "sha256": "3fd3c0c3b3aadd2c66333b9db368538251980208747475d63ca0eee7777ddb79"
+  },
+  {
+   "path": "src/components/xem-thu/btvn-da-giao-canh.ts",
+   "sha256": "f4e050de3e7435f8dde5589c20cfaf6d460390795a137d0140ac68d7461519bc"
+  },
+  {
+   "path": "src/components/xem-thu/btvn-da-giao.html",
+   "sha256": "2a0510be408a52a33d78a6b9e7418d3b1db5141c11bae31bca8fbf0b51bcb96e"
+  },
+  {
+   "path": "src/components/xem-thu/btvn-da-giao.tsx",
+   "sha256": "024615f5660339a27ef7ecc0054640f30f867d747d90853d2a06db674d800ead"
+  },
+  {
+   "path": "src/components/xem-thu/the-cuoi-chang.html",
+   "sha256": "2afde22cf751dac3d7928f1bf88e58c24322a762948cc12367941f9e0e701f60"
+  },
+  {
+   "path": "src/components/xem-thu/the-cuoi-chang.tsx",
+   "sha256": "0c1c9fb15ab94c8668d621e56d9ad791686a55697735fc9a314334315c495ed1"
+  },
+  {
+   "path": "src/game/than-thu-v2/BieuCamThu.tsx",
+   "sha256": "8367bd88e1a69bd0ec65e65bf9ba54b568474cfa345191c1e1941305327099c4"
+  },
+  {
+   "path": "src/game/than-thu-v2/bieu-cam-thu.css",
+   "sha256": "a8eed05bd94834f5df3f58ff63a1d08e6869a4470c178ad56895baf9c422287e"
+  },
+  {
+   "path": "src/game/than-thu-v2/pet-name.ts",
+   "sha256": "c2163e4d8379da1cbc1e1afc687770e0a7d5168b4f2407591e2accc62702e611"
+  },
+  {
+   "path": "src/lib/bai-tap.ts",
+   "sha256": "35914485980f43cb87f31f18f06dd5d9bd12a933af80340b4b5a6018007bf632"
+  },
+  {
+   "path": "src/lib/bang-tin-san/mau-gia.ts",
+   "sha256": "051bc134c45f4156264d56a64014f64ebac81c4f3e9679f83d5b5e353b209246"
+  },
+  {
+   "path": "src/lib/danh-gia-bai.ts",
+   "sha256": "47a6d7844f9a7e91fe66389e8dd9d8851f98b00c582b699da139034efe50870b"
+  },
+  {
+   "path": "src/lib/danh-sach-hs.ts",
+   "sha256": "e251355e1a7ff44d6f85a449e1e6030507189af8b2fc9c525965cb4947302133"
+  },
+  {
+   "path": "src/lib/do-tai-loi.ts",
+   "sha256": "62f09be2274bd34089baeda3491bc322aa2d0b832fef742831dbce0f45e5810c"
+  },
+  {
+   "path": "src/lib/exam-answer-key.ts",
+   "sha256": "18878a5f92928c6883db76ec966da89aed96164f525293de323cb6fcaa844229"
+  },
+  {
+   "path": "src/lib/exam-auto-structure.ts",
+   "sha256": "a758ce1b0bdd4e8c26c35a236fcecb95921190c05badaa718a36b5846a8c4e98"
+  },
+  {
+   "path": "src/lib/exam-parse.ts",
+   "sha256": "7caf6ea68658a17e1a2cf7ec51baaa0b97813e804c1fd80ab4990726d12c6e59"
+  },
+  {
+   "path": "src/lib/giao-an-len-bang.ts",
+   "sha256": "9ef08340d5c6a74fb5d8aa4e132166ae3f0621f2a692c5a1745af458068b8496"
+  },
+  {
+   "path": "src/lib/giao-them-api.ts",
+   "sha256": "c641be4946298c6baaae729dc899ae281c8e0636ffcd101291f4bd48a3aa06d1"
+  },
+  {
+   "path": "src/lib/giao-them-hien-thi.ts",
+   "sha256": "dee07a51b6e705da5a188e7412ca2e15828c7e7e177fa8dfd9f509e9d85346f1"
+  },
+  {
+   "path": "src/lib/html-khoi-loi-giai-chuan.ts",
+   "sha256": "8fd520af8e70f7223c642f399fc8949f8bb6cc67f1dc59296b60b75ee1795ad5"
+  },
+  {
+   "path": "src/lib/ke-don-chua.ts",
+   "sha256": "caf66a7ad9acac3928bf58d3bd074a8db93795c0dfa70791355e461e511a0b42"
+  },
+  {
+   "path": "src/lib/lich-on-lai.ts",
+   "sha256": "ca7a5bc5cc502bf2a33a88f1e5146345e03537e73feb45e73374407d7f90bda0"
+  },
+  {
+   "path": "src/lib/ph-moi/nhip-ngay.ts",
+   "sha256": "aa5008ef9d6f1d0d26f009241c6a74d7757ec57f89c1fafe41cdf4ff878cd7c1"
+  },
+  {
+   "path": "src/lib/thi-dua-api.ts",
+   "sha256": "1b795ac149572918c3ee2a0937f45a725f6748b7403fa43ba2f1d5b120c616a4"
+  },
+  {
+   "path": "src/lib/thi-dua.ts",
+   "sha256": "f5f8fd3448e0929a68a888a9aa28849a81b12814e13fcf81ae4ba3bee98dfc9d"
+  },
+  {
+   "path": "src/lib/thu-thach-chon-cau.ts",
+   "sha256": "2f94f261dfd7227a6ad194a44ce6089857291b47694ed4fd75bc059773ad60a1"
+  },
+  {
+   "path": "src/lib/uoc-luong-thoi-gian.ts",
+   "sha256": "03b7f7484f1ed0d365fc3d5b904aa8d7261fc4de2a6a0d981346ee3c49592d72"
+  },
+  {
+   "path": "src/lib/use-giao-them.ts",
+   "sha256": "b165759047ddaf98b035ad454e00c647337a6fa6f722c42dab8f1ef03d4a1a5a"
+  },
+  {
+   "path": "src/lib/use-thi-dua.ts",
+   "sha256": "924cece9fbd2c7e1b8407c47fb95d625bc80aa9451365730bb5353896858239b"
+  },
+  {
+   "path": "src/lib/xep-gio-len-bang.ts",
+   "sha256": "977861914c6bb59a8edddc4c96ec3b9656658c47b6d068972bc79e2ba2d8341c"
+  },
+  {
+   "path": "src/lib/zip.ts",
+   "sha256": "15c317378bb674446a52dfa33a390737469879dee6e90510fa35a54474439f2a"
+  },
+  {
+   "path": "src/screens/AppDaChuyenScreen.tsx",
+   "sha256": "3c4465c554a55dcc003f5c8d80f3e8ce176e49bb49e8fa913d5a8e9ecd6b5ec6"
+  }
+ ],
+ "cu": {
+  "src/components/m3/m3-tuong-thich.css · background-color: var(--m3-primary-container)": 1,
+  "src/components/m3/m3-tuong-thich.css · background-color: var(--m3-tertiary-container)": 2,
+  "src/components/m3/m3-tuong-thich.css · background-color: var(--m3-error)": 1,
+  "src/components/m3/m3-tuong-thich.css · background-color: var(--m3-on-surface)": 1,
+  "src/components/m3/m3-tuong-thich.css · background-color: var(--m3-surface-container-lowest)": 3,
+  "src/components/m3/m3-tuong-thich.css · border-color: var(--m3-primary-container)": 2,
+  "src/components/m3/m3-tuong-thich.css · border-color: var(--m3-tertiary-container)": 1,
+  "src/components/m3/m3-tuong-thich.css · border-color: transparent": 1,
+  "src/components/m3/m3-tuong-thich.css · --tw-gradient-from: var(--m3-primary-container)": 1,
+  "src/components/m3/m3-tuong-thich.css · color: var(--m3-on-primary)": 1,
+  "src/components/m3/m3-tuong-thich.css · color: var(--m3-on-surface-variant)": 1,
+  "src/components/m3/m3-tuong-thich.css · color: var(--m3-on-surface)": 2,
+  "src/components/m3/m3-tuong-thich.css · --tw-gradient-to: var(--m3-primary-container)": 1,
+  "src/components/m3/m3-tuong-thich.css · color: var(--m3-on-error)": 1,
+  "src/components/m3/m3-tuong-thich.css · --tw-gradient-from: var(--m3-surface-container)": 1
+ }
+}

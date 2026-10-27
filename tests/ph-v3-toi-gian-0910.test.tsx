@@ -3,14 +3,12 @@
 // SỬA CÓ CHỦ Ý — TRUNG TU 09/10 (thầy duyệt bản vẽ trung-tu-canvas PH-HomNay · PH-TienBo · PH-CaKiemTra, "build luôn"): bộ "giao diện đầy đủ" đã đưa lại
 // bốn mục (Hôm nay · Tiến bộ · Lịch sử · Lời thầy) — nay CHỐT lại BA mục Hôm nay · Tiến bộ · Ca kiểm tra; "Nhận xét của thầy" là thẻ ở Hôm nay + màn con `#loi-thay`.
 // Thứ tự Hôm nay mới: khối chính → cảnh báo của thầy (nếu có) → Nhận xét của thầy → Tuần này học đều → danh sách cần chú ý → "Gia đình hỗ trợ" (một đoạn chữ nhỏ, cuối màn).
+// 27/10: `ph-v3/ManHomNay` (màn Hôm nay cũ) đã gỡ khỏi src/ vì không màn nào dùng ⇒ bỏ khối «hàm thuần của Hôm nay» (soCauHomNay, chuTinhTrang, tenDangHomNay).
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
 import ParentPortalScreen from '../src/screens/ParentPortalScreen'
-import { chuTinhTrang, soCauHomNay, tenDangHomNay } from '../src/components/ph-v3/ManHomNay'
-import { docTatCaVeCon } from '../src/lib/ph-moi/du-lieu'
-import { docHoc2 } from '../src/lib/ph-v3/du-lieu'
 import { PH_OK, PH_TRONG } from './_ph-moi/du-lieu-mau'
 import './_ph-nap-trang-cu' // trang cũ nạp lười (26/10): chờ mảnh về trước các test
 
@@ -246,29 +244,5 @@ describe('trung tu 09/10: đổi mục mịn, giữ chỗ cuộn từng mục, k
     await waitFor(() => expect(b.container.querySelector('[data-vung="hanh-trinh"]')).toBeTruthy())
     // SỬA CÓ CHỦ Ý — đợt 18 (thầy 13/10: "Bỏ hết các gợi ý hướng dẫn"): bỏ câu giải thích vì sao kế hoạch ít hơn mức.
     expect(b.container.querySelector('[data-vung="hanh-trinh"]')!.textContent).toBe('Hành trình của con: tầng Vận dụng · mức tối thiểu 45 câu.')
-  })
-})
-
-describe('hàm thuần của Hôm nay', () => {
-  const pm = docTatCaVeCon(PH_OK)!
-  it('soCauHomNay: kế hoạch đứng trên; không kế hoạch ⇒ tổng quan + mục tiêu (mục tiêu 0 ⇒ coi như không có)', () => {
-    expect(soCauHomNay(pm, docHoc2(HOC2))).toEqual({ daLam: 32, tong: 40, keHoach: true })
-    expect(soCauHomNay(pm, null)).toEqual({ daLam: 38, tong: null, keHoach: false })
-    expect(soCauHomNay({ ...pm, tongQuan: { ...pm.tongQuan!, mucTieu: { soCau: 0, phutHoc: null } } }, null)).toEqual({ daLam: 38, tong: null, keHoach: false })
-  })
-  it('chuTinhTrang: xong · chưa bắt đầu · đang làm (chỉ nói phần còn lại) · không mục tiêu', () => {
-    expect(chuTinhTrang({ daLam: 40, tong: 40, keHoach: true })).toBe('Con đã xong kế hoạch hôm nay.')
-    expect(chuTinhTrang({ daLam: 0, tong: 40, keHoach: true })).toBe('Con chưa bắt đầu kế hoạch hôm nay.')
-    expect(chuTinhTrang({ daLam: 12, tong: 30, keHoach: true })).toBe('Con đang làm, còn 18 câu nữa là xong kế hoạch hôm nay.')
-    expect(chuTinhTrang({ daLam: 41, tong: 40, keHoach: false })).toBe('Con đã đủ mục tiêu của ngày.')
-    expect(chuTinhTrang({ daLam: 9, tong: null, keHoach: false })).toBe('')
-    expect(chuTinhTrang({ daLam: 0, tong: null, keHoach: false })).toBe('') // đợt 18: bỏ câu hướng dẫn "Kết quả hiện ở đây…"
-  })
-  it('tenDangHomNay: dạng luyện thêm của máy chủ đứng trên; không có ⇒ "Dạng cần vững" của OMNI; không có gì ⇒ rỗng', () => {
-    expect(tenDangHomNay(pm, null)).toEqual({ tieuDe: 'Dạng con đang luyện thêm', ten: ['Xà phòng hoá chất béo', 'Bài toán hỗn hợp ester'] })
-    const tron = { ...pm, manhYeu: null, dangVap: null }
-    const omni = { chienDich: null, homNay: null, cauTungSai: null, omni: { khoangCach8: null, hieuChuan: { soCaChot: 0, du: false }, dangCanVung: ['Hiệu suất ester hoá'], sEm: null, chungChi: [], gioHoc: null, canThayChua: 0 } }
-    expect(tenDangHomNay(tron, omni)).toEqual({ tieuDe: 'Dạng cần vững', ten: ['Hiệu suất ester hoá'] })
-    expect(tenDangHomNay(tron, null).ten).toEqual([])
   })
 })

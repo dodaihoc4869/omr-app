@@ -4,11 +4,10 @@
 import {describe,it,expect,vi} from 'vitest'
 import {DatabaseSync} from 'node:sqlite'
 import {readFileSync} from 'node:fs'
-import {allowed,advance,THUONG_NAC,chooseSession,grade,newArena,arenaAction,PETS,DAY,targetLevel,publicQuestion} from '../src/game/than-thu-v2/core'
+import {allowed,advance,THUONG_NAC,chooseSession,grade,PETS,DAY,targetLevel,publicQuestion} from '../src/game/than-thu-v2/core'
 import type {PrivateQuestion,Attempt,Evidence} from '../src/game/than-thu-v2/core'
 import type {Env,D1PreparedStatement} from '../server/src/kieu'
 import {gameV2,loadProfile} from '../server/src/game-v2'
-import {normalizePetName,laTenTuc,LOI_TEN_TUC} from '../src/game/than-thu-v2/pet-name'
 import {xoaMoiDem} from '../server/src/dem-chung'
 import {gameToken,gameIdentity,parentPass,parentIdentity} from '../server/src/game-v2-auth'
 import {normalizeBank,readScope,syncIndex,protectedQuestions,xoaDemCaBaoVe} from '../server/src/game-v2-bank'
@@ -42,11 +41,6 @@ describe('Phạm vi và tiến bộ thật',()=>{
  it('4/5 câu khác nhau qua hai lượt mới nâng mức',()=>{const ds=Array.from({length:5},(_,i)=>({...attempt(i,`g${i}`),session:i<3?'a':'b',correct:i!==4}));expect(targetLevel('AA.BB.CC',[evidence()],ds)).toBe(1);expect(targetLevel('AA.BB.CC',[evidence()],ds.map(a=>({...a,session:'one'})))).toBe(0)})
  it('không thay kho thiếu bằng câu chung; loại bản sao và câu cần duyệt',()=>{expect(chooseSession([],[],[],[],'adventure',1)).toEqual([]);const q=question();const ds=chooseSession([q,{...q,qid:'copy'},{...question(2),reviewed:false}],[evidence()],[],[],'repair',1);expect(ds).toHaveLength(1)})
 })
-describe('Võ đài máy chủ',()=>{
- it('không thể tiêu âm vàng và ô không hợp lệ',()=>{const a=newArena(1);a.gold=0;expect(()=>arenaAction(a,{type:'buy',slot:0})).toThrow();a.units=[{id:'x',pet:0,star:1,pos:null}];expect(()=>arenaAction(a,{type:'place',id:'x',pos:9})).toThrow()})
- it('ba quân ghép lên sao, giữ vị trí và giới hạn đội',()=>{const a=newArena(1);a.units=[{id:'a',pet:0,star:1,pos:0},{id:'b',pet:0,star:1,pos:null}];a.shop[0]=0;const b=arenaAction(a,{type:'buy',slot:0});expect(b.units).toHaveLength(1);expect(b.units[0]).toMatchObject({star:2,pos:0});expect(a.units).toHaveLength(2)})
- it('trận tất định, không vượt vòng 10',()=>{let a=newArena(1);a.units=[{id:'x',pet:0,star:3,pos:0}];expect(arenaAction(a,{type:'fight'})).toEqual(arenaAction(a,{type:'fight'}));for(let i=0;i<10;i++){a.studied=1;a=arenaAction(a,{type:'fight'})}expect(a.finished).toBe(true);expect(()=>arenaAction(a,{type:'fight'})).toThrow()})
-})
 describe('D1 thực: tách dữ liệu, phân quyền, giao dịch',()=>{
  it('token giả / đổi SBD / đổi mật khẩu không được truy cập',async()=>{const {env,sql}=fixture();const token=await gameToken(env,'1');expect(await gameIdentity(env,{token,sbd:'2'})).toBe('1');await expect(gameIdentity(env,{sbd:'1'})).rejects.toThrow();await expect(gameIdentity(env,{token:token+'a'})).rejects.toThrow();sql.exec("UPDATE hoc_sinh SET mat_khau='changed' WHERE sbd='1'");expect(await gameIdentity(env,{token})).toBe('1') /* SỬA CÓ CHỦ Ý 21/09 (hạ tải D1): xác thực token được ĐỆM 60 giây ⇒ đổi mật khẩu có hiệu lực ≤ 60 giây */;vi.useFakeTimers({toFake:['Date']});vi.setSystemTime(Date.now()+61_000);try{await expect(gameIdentity(env,{token})).rejects.toThrow()}finally{vi.useRealTimers()}})
  it('mã phụ huynh không có quyền chấm bài',async()=>{const {env}=fixture();const pass=await parentPass(env,'1');expect(await parentIdentity(env,pass)).toBe('1');await expect(gameIdentity(env,{token:pass})).rejects.toThrow();const token=await gameToken(env,'1');await expect(parentIdentity(env,token)).rejects.toThrow()})
@@ -60,8 +54,6 @@ describe('D1 thực: tách dữ liệu, phân quyền, giao dịch',()=>{
  // test sửa bảng `ca` bằng SQL thô, không qua lệnh thật ⇒ tự gọi xoaDemCaBaoVe() sau mỗi lần sửa (production có móc bất hoạt ở mọi lệnh sửa ca thật).
  it('ca vẫn mang cờ mở nhưng đã hết hạn và công bố được phép ôn',async()=>{const f=fixture();f.seed();f.sql.exec("UPDATE ca SET trang_thai='mo',het_han_vao='2026-01-01T00:00:00Z',thoi_gian_phut=30,loai='thi',bank_r2='de/CA'");xoaDemCaBaoVe();f.objects.set('de/CA',f.bank('D'));expect((await protectedQuestions(f.env)).has('D-I-0')).toBe(false);f.sql.exec("UPDATE ca SET cong_bo='khong'");xoaDemCaBaoVe();expect((await protectedQuestions(f.env)).has('D-I-0')).toBe(true)})
  it('giáo viên khoá game riêng em (14/10: gỡ lệnh chết /game-v2-parent — bỏ phần phụ huynh)',async()=>{const f=fixture();f.seed();await syncIndex(f.env);const token=await gameToken(f.env,'1');await adminGame(f.env,{action:'scope',sbd:'1',enabled:false});await expect(gameV2(f.env,'start',{token})).rejects.toThrow('tạm dừng')})
- it('ống đầy và cấp 120 giữ phần EXP còn dư',async()=>{const f=fixture();/* Đợt 1 thần thú (21/09): hồ sơ ĐÃ ở luật cấp mới (luatCap 2), hôm nay em đạt nhiệm vụ ngày ⇒ trần 200; nạp qua cổng hấp thụ. Sửa CÓ CHỦ Ý. */const homNay=new Date(Date.now()+7*3600000).toISOString().slice(0,10);f.sql.prepare('INSERT INTO game_v2_profile(sbd,revision,json,created_at) VALUES(?,0,?,?)').run('1',JSON.stringify({pet:'dat_quy',choice:false,legacy:null,cap:119,exp:thanhExp(119)-5,wallet:50000,earned:0,tower:1,mastery:[],arena:null,cutover:'2026-09-21T00:00:00Z',luatCap:3}),'x');f.sql.exec('CREATE TABLE IF NOT EXISTS exp_so(khoa TEXT PRIMARY KEY,sbd TEXT,ngay_vn TEXT,loai TEXT,qid TEXT,ma_nguon TEXT,exp INTEGER,luc TEXT,ghi_chu TEXT)');f.sql.prepare("INSERT INTO exp_so(khoa,sbd,ngay_vn,loai,qid,ma_nguon,exp,luc,ghi_chu) VALUES(?,?,?,'dat_ngay',NULL,NULL,80,?,'x')").run(`1|dat|${homNay}`,'1',homNay,new Date().toISOString());const token=await gameToken(f.env,'1');const r=await gameV2(f.env,'invest',{token});const p=(await loadProfile(f.env,'1')).profile;/* Luật v4 (29/09): mở hồ sơ v3 ⇒ chuyển MỘT lần, ống nghiệm nạp hết vào thú (không trần); quá cấp 120 thì EXP chỉ ghi sổ; lệnh invest không còn gì để nạp. Sửa CÓ CHỦ Ý. */expect(p.cap).toBe(120);expect(p.wallet).toBe(0);expect(p.luatCap).toBe(5);/* SỬA CÓ CHỦ Ý 29/09 v5: chuỗi v3 → v4 → v5 */expect((p.truocSiet4 as {wallet:number}).wallet).toBe(50000);expect(r.daNap).toBe(0)})
- it('hoàn thành tầng gọi lại không nhảy thêm tầng',async()=>{const f=fixture();f.seed();await syncIndex(f.env);const token=await gameToken(f.env,'1');const r=await gameV2(f.env,'start',{token,mode:'tower'});await gameV2(f.env,'answer',{token,session:r.id,qid:'D-I-0',answer:'B'});await gameV2(f.env,'complete',{token,session:r.id});await gameV2(f.env,'complete',{token,session:r.id});expect((await loadProfile(f.env,'1')).profile.tower).toBe(2)})
  it('bỏ trống và nộp thiếu ý không được dùng để lấy lượt học',async()=>{const f=fixture();f.seed();await syncIndex(f.env);const token=await gameToken(f.env,'1');const r=await gameV2(f.env,'start',{token});await expect(gameV2(f.env,'answer',{token,session:r.id,qid:'D-I-0',answer:''})).rejects.toThrow('điền đủ');expect(f.sql.prepare('SELECT COUNT(*) n FROM game_v2_attempt').get()?.n).toBe(0)})
  it('giữ nguyên ảnh đúng vị trí trong nguồn thô',async()=>{const raw={ma_de:'D',cau:[{phan:'I',so:1,de:'Câu có ảnh',pa:{A:'a',B:'b',C:'c',D:'d'},dap_an:'A',hinh:[{tep:'i.png',vi_tri:'sau_pa_B',du_lieu:'data:image/png;base64,YQ=='}]}]};const qs=await normalizeBank(raw,'D');expect(qs[0]?.hinhAnh[0]?.viTri).toBe('sau_pa_B')})
 })
@@ -73,7 +65,7 @@ describe('teacher-authorized new game season',()=>{
   sql.prepare('INSERT INTO than_thu VALUES(?,?)').run('1',JSON.stringify(old));sql.prepare('INSERT INTO than_thu VALUES(?,?)').run('2',JSON.stringify(old))
   const original=await loadProfile(env,'1');expect(original.profile.cap).toBe(80)
   sql.prepare('INSERT INTO game_v2_settings VALUES(?,?)').run('season',JSON.stringify({id:'new-season'}))
-  for(const id of ['1','2']){const p=await loadProfile(env,id);expect(p.profile).toMatchObject({cap:1,exp:0,wallet:0,earned:0,tower:1,choice:true,mastery:[],arena:null,season:'new-season'});expect(JSON.parse(String(p.profile.legacy))).toEqual(old)}
+  for(const id of ['1','2']){const p=await loadProfile(env,id);expect(p.profile).toMatchObject({cap:1,exp:0,wallet:0,earned:0,tower:1,choice:true,mastery:[],season:'new-season'});expect(JSON.parse(String(p.profile.legacy))).toEqual(old)}
   const p=await loadProfile(env,'1');expect((await loadProfile(env,'1')).revision).toBe(p.revision)
   expect(sql.prepare('SELECT * FROM hoc_sinh').all()).toEqual(before);expect(sql.prepare('SELECT * FROM chi_tiet_cau').all()).toEqual(scores)
  })
@@ -96,28 +88,6 @@ it('classroom reads only chosen current-season V2 spirit without importing legac
 })
 
 describe('Khiên (thầy lệnh 21/09: khiên quà tiến hoá đầu chỉ mở khi đủ 21 ngày đạt nhiệm vụ ngày)',()=>{
- it('thưởng theo mốc, tiêu một lần, chặn dùng trùng và giữ qua thiết bị',async()=>{
-  const {env,sql}=fixture(),token=await gameToken(env,'1');await loadProfile(env,'1')
-  const put=(cap:number,extra={})=>sql.prepare('UPDATE game_v2_profile SET json=? WHERE sbd=?').run(JSON.stringify({pet:'dat_quy',choice:false,cap,exp:0,wallet:0,earned:0,tower:1,mastery:[],arena:null,cutover:'now',...extra}),'1')
-  put(9);await expect(gameV2(env,'shield-use',{token,useId:'test-shield-00001'})).rejects.toThrow('chưa có')
-  const du36={expMoi:{daCong:0,manhDaTinh:0,ngayDat:21}} // đủ 21 ngày đạt từ mốc ⇒ khiên quà đầu (cấp 10) mở
-  put(10);await expect(gameV2(env,'shield-use',{token,useId:'test-shield-00009'})).rejects.toThrow('Em chưa có khiên. Khiên đầu tiên mở khi em đạt nhiệm vụ ngày đủ 21 ngày (em đã có 0 ngày).')
-  put(10,{expMoi:{daCong:0,manhDaTinh:0,ngayDat:20}});await expect(gameV2(env,'shield-use',{token,useId:'test-shield-00009'})).rejects.toThrow('(em đã có 20 ngày)')
-  put(10,du36);const first=await gameV2(env,'shield-use',{token,useId:'test-shield-00001'});expect(first.profile).toMatchObject({shields:{used:1}})
-  expect((first.profile as any).shields.activeUntil-Date.now()).toBeGreaterThan(9000)
-  await gameV2(env,'shield-use',{token,useId:'test-shield-00001'});await gameV2(env,'shield-use',{token,useId:'test-shield-00002'})
-  expect((await loadProfile(env,'1')).profile.shields?.used).toBe(1)
-  put(10,{...du36,shields:{used:1,activeUntil:0,lastUse:'test-shield-00001'}})
-  await expect(gameV2(env,'shield-use',{token,useId:'test-shield-00002'})).rejects.toThrow('chưa có')
-  put(30,{...du36,shields:{used:1,activeUntil:0}})
-  expect((await gameV2(env,'shield-use',{token,useId:'test-shield-00003'})).profile).toMatchObject({cap:30,shields:{used:2}})
-  put(30,{expMoi:{daCong:0,manhDaTinh:0,ngayDat:20},shields:{used:2,activeUntil:0}}) // cấp 30 nhưng chưa đủ 21 ngày: quà 3 − 1 (khoá) = 2, đã dùng 2 ⇒ hết
-  await expect(gameV2(env,'shield-use',{token,useId:'test-shield-00004'})).rejects.toThrow('Khiên đầu tiên mở khi em đạt nhiệm vụ ngày đủ 21 ngày (em đã có 20 ngày)')
-  put(5,{khienRen:{manh:0,daRen:0}}) // cấp thường, không có gì: nói đúng luật mảnh
-  await expect(gameV2(env,'shield-use',{token,useId:'test-shield-00005'})).rejects.toThrow('đủ 36 mảnh rèn một khiên') // SỬA CÓ CHỦ Ý 29/09 v5: 21 ⇒ 36 mảnh
-  put(5,{khienRen:{manh:0,daRen:1}}) // có 1 khiên rèn ⇒ dùng được
-  expect((await gameV2(env,'shield-use',{token,useId:'test-shield-00006'})).profile).toMatchObject({cap:5,shields:{used:1}})
- })
  it('tổng quà các mốc 1,3,6,9,12, không phát quà ở cấp thường',async()=>{
   const {shieldEntitlement,shieldRemaining}=await import('../src/game/than-thu-v2/shields')
   expect([1,9,10,29,30,49,50,70,100,120].map(shieldEntitlement)).toEqual([0,0,1,1,3,3,6,9,12,12])
@@ -175,48 +145,7 @@ describe('adaptive variety',()=>{
  })
 })
 
-it('tên riêng lưu đúng hồ sơ, đồng bộ máy chiếu, không đổi điểm hay cấp',async()=>{
- const f=fixture(),token=await gameToken(f.env,'1');await gameV2(f.env,'choose',{token,pet:'nuoc_long'});const before=(await loadProfile(f.env,'1')).profile
- await gameV2(f.env,'rename',{token,name:'  Rồng   Lam  ',sbd:'2'});const after=(await loadProfile(f.env,'1')).profile
- expect(after.nickname).toBe('Rồng Lam');expect(after.cap).toBe(before.cap);expect(after.earned).toBe(before.earned)
- expect((await loadProfile(f.env,'2')).profile.nickname).toBeUndefined()
- expect((await adminGame(f.env,{sbd:'1',action:'spirit'})).spirit).toMatchObject({nickname:'Rồng Lam'})
- await expect(gameV2(f.env,'rename',{token,name:'<script>alert(1)</script>'})).rejects.toThrow()
-})
 
-describe('Đổi tên thần thú (luật tên + 3 lần/ngày)',()=>{
- it('độ dài 1–16 sau khi cắt khoảng trắng, chữ Việt + số + gạch; bỏ ký tự vô hình',()=>{
-  expect(normalizePetName('  Rồng   Lam  ')).toBe('Rồng Lam')
-  expect(normalizePetName('Ưng Đỏ-2_Nhỏ')).toBe('Ưng Đỏ-2_Nhỏ')
-  expect(normalizePetName('Thương Thương Ơi')).toBe('Thương Thương Ơi')
-  expect(normalizePetName('A'.repeat(16))).toBe('A'.repeat(16))
-  expect(()=>normalizePetName('A'.repeat(17))).toThrow(/1–16/)
-  expect(()=>normalizePetName('   ')).toThrow(/1–16/)
-  expect(()=>normalizePetName(42)).toThrow()
-  expect(normalizePetName('Mây\u200b Bông\u0007')).toBe('Mây Bông')
-  for(const x of ['<b>Rồng</b>','Rồng🐉','Rồng!','龍','Rồng.Lam',"O'Neil"])expect(()=>normalizePetName(x),x).toThrow(/1–16/)
- })
- it('lọc từ tục / xúc phạm không phân biệt dấu, hoa thường; không bắt nhầm tên hiền',()=>{
-  for(const x of ['Địt','DIT','Lồn Con','Đéo Sợ','Óc Chó','oc cho','Đ M','VCL','Dit Me','Thằng Ngu','Buồi','Cứt'])expect(()=>normalizePetName(x),x).toThrow(LOI_TEN_TUC)
-  for(const x of ['Lợn Con','Long','Bưởi','Đeo Nơ','Ngũ Hành','Con Cá Chép','Cầu Vồng','Đi Tới','Sóng Nhỏ','Lộc Non'])expect(normalizePetName(x),x).toBe(x)
- })
- it('máy chủ: báo lỗi thân thiện, tối đa 3 lần/ngày, chỉ đổi thần thú của chính em',async()=>{
-  const f=fixture(),token=await gameToken(f.env,'1'),token2=await gameToken(f.env,'2');await gameV2(f.env,'choose',{token,pet:'nuoc_long'});await gameV2(f.env,'choose',{token:token2,pet:'nuoc_long'})
-  await expect(gameV2(f.env,'rename',{token,name:'Óc Chó'})).rejects.toThrow('Tên này chưa phù hợp, em chọn tên khác nhé.')
-  await expect(gameV2(f.env,'rename',{token,name:'Tên Này Dài Quá Mười Sáu'})).rejects.toThrow(/1–16/)
-  const r1=await gameV2(f.env,'rename',{token,name:'Một',sbd:'2'});expect(r1.doiTenConLai).toBe(2)
-  expect((await gameV2(f.env,'rename',{token,name:'Một'})).doiTenConLai).toBe(2) // gửi lại đúng tên cũ: không tính lượt
-  await gameV2(f.env,'rename',{token,name:'Hai'});const r3=await gameV2(f.env,'rename',{token,name:'Ba'});expect(r3.doiTenConLai).toBe(0)
-  await expect(gameV2(f.env,'rename',{token,name:'Bốn'})).rejects.toThrow(/đã đổi tên 3 lần/)
-  expect((await loadProfile(f.env,'1')).profile.nickname).toBe('Ba')
-  expect((await loadProfile(f.env,'2')).profile.nickname).toBeUndefined()
-  expect((await gameV2(f.env,'rename',{token:token2,name:'Bạn Hai'})).doiTenConLai).toBe(2) // lượt đếm riêng từng em
-  // Sang ngày mới (VN) ⇒ đổi lại được.
-  const raw=JSON.parse(String(f.sql.prepare("SELECT json FROM game_v2_profile WHERE sbd='1'").get()?.json));raw.doiTen.ngay='2000-01-01'
-  f.sql.prepare("UPDATE game_v2_profile SET json=? WHERE sbd='1'").run(JSON.stringify(raw))
-  await gameV2(f.env,'rename',{token,name:'Bốn'});expect((await loadProfile(f.env,'1')).profile.nickname).toBe('Bốn')
- })
-})
 
 it('Võ đài Linh Tâm đã đóng: start kèm guardian và phiên guardian cũ đều bị từ chối, không ghi lượt',async()=>{
  const f=fixture();f.seed();await syncIndex(f.env);const token=await gameToken(f.env,'1');await gameV2(f.env,'choose',{token,pet:'nuoc_long'})

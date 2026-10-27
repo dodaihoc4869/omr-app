@@ -194,6 +194,10 @@ const DA_XOA_MA_CHET = new Set([
 // 14/10: các đường dẫn chính xác có đồ thị trước/sau, giữ lõi học. Hash buộc
 // bản bị gỡ đúng snapshot đã soát; không miễn tệp sửa một phần hoặc mã mới cùng tên.
 const GAME_DA_GO = new Map(JSON.parse(readFileSync(new URL('../docs/don-game-1410/mau-tep-da-go.json', import.meta.url), 'utf8')).files.map(x => [x.path, x.sha256]))
+// 27/10: đợt gọn mã thứ ba (thầy: «xóa bỏ code rác … đảo đoàn game») — cùng cách: tệp src/ không điểm vào nào với tới, khoá bằng sha256 (docs/gon-ma-2710/mau-tep-da-go.json);
+// `cu` = khai báo màu của tệp SINH m3-tuong-thich.css biến mất vì bộ sinh bỏ hai nguồn đã xoá (khoá → số lần, đúng lúc gỡ).
+const GON_MA_2710 = JSON.parse(readFileSync(new URL('../docs/gon-ma-2710/mau-tep-da-go.json', import.meta.url), 'utf8'))
+for (const x of GON_MA_2710.files) GAME_DA_GO.set(x.path, x.sha256)
 
 // MÀU THẦY RA LỆNH THÊM — ngoại lệ ĐÓNG (09/10/2026, thầy: "Quét bảng màu từ Bảng G (ngà voi #FFFEF6, xanh ngọc #10B981, xanh navy #0F3D3A,
 // vàng #F7A800) cập nhật vào tailwind…", rồi "Build rồi đẩy luôn"). Đúng BA khai báo gốc ở tokens.css (xanh ngọc trùng --xanh có sẵn nên không cần);
@@ -213,6 +217,7 @@ for (const k of ['background: var(--tr-mat)', 'color: var(--tr-chu)', 'box-shado
 for (const k of ['border: 2px solid var(--tr-vien-2)', 'border-bottom: 2px solid var(--tr-vien-2)', 'border-left: 2px solid var(--tr-vien-2)']) MAU_CU_THAY_RA_LENH[`src/components/giam-thi/giam-thi.css · ${k}`] = (MAU_CU_THAY_RA_LENH[`src/components/giam-thi/giam-thi.css · ${k}`] ?? 0) + 1
 // 27/10: đợt gỡ CSS chết thứ hai (tờ nạp chung index-*.css; luật tốc độ đỏ sau #430/#431) — danh sách đóng ở docs/css-chet-2710.json, cùng cách.
 for (const [k, n] of Object.entries(JSON.parse(readFileSync(new URL('../docs/css-chet-2710.json', import.meta.url), 'utf8')).cu)) MAU_CU_THAY_RA_LENH[k] = (MAU_CU_THAY_RA_LENH[k] ?? 0) + n
+for (const [k, n] of Object.entries(GON_MA_2710.cu)) MAU_CU_THAY_RA_LENH[k] = (MAU_CU_THAY_RA_LENH[k] ?? 0) + n
 // 27/10 thầy duyệt bộ màu riêng B «Chất chỉ thị»: «Chốt bảng màu chất chỉ thị, làm cho sáng bằng độ sáng của doligo nhé» ⇒ BỐN màu thân giám thị
 // đổi sang sắc bộ B (độ sáng / độ tươi ngang Duolingo, ve-moi/mau-rieng/de-xuat-build.md): bốn mã Duolingo cũ được phép biến mất đúng một lần.
 for (const k of ['--gt-mau-nb: #58cc02', '--gt-mau-th: #ce82ff', '--gt-mau-vd: #ff9600', '--gt-mau-vdc: #ff4b4b']) MAU_CU_THAY_RA_LENH[`src/components/giam-thi/giam-thi.css · ${k}`] = (MAU_CU_THAY_RA_LENH[`src/components/giam-thi/giam-thi.css · ${k}`] ?? 0) + 1
