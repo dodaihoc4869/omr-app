@@ -149,7 +149,7 @@ export function taoGoiGeminiLo(env: Env, hanMs = 60_000): GoiMoHinh {
       let r = await fetch(url, init)
       if (tram && r.status === 400 && RE_CHAN_VI_TRI.test(await r.clone().text().catch(() => ''))) r = await tram(url, init)
       const j = (await r.json().catch(() => null)) as Obj | null
-      if (!r.ok) return { ok: false, http: r.status, loi: `HTTP ${r.status} ${str((j?.error as Obj | undefined)?.message).slice(0, 160)}${nhanHanMuc(j)}` }
+      if (!r.ok) return { ok: false, http: r.status, loi: `HTTP ${r.status} ${str((j?.error as Obj | undefined)?.message).replace(/\s+/g, ' ').slice(0, 400)}${nhanHanMuc(j)}` }
       const ung = (j?.candidates as Obj[] | undefined)?.[0]
       const chu = (((ung?.content as Obj | undefined)?.parts as Obj[] | undefined) ?? []).filter((p) => p.thought !== true).map((p) => str(p.text)).join('').trim()
       const u = (j?.usageMetadata ?? {}) as Obj
@@ -169,6 +169,12 @@ export function taoGoiGeminiLo(env: Env, hanMs = 60_000): GoiMoHinh {
     for (const m of [model, ...MODEL_DU_PHONG.filter((x) => x !== model)]) {
       kq = await motLan(m, body)
       if (!kq.ok && (kq.http === 429 || kq.http === 503)) { await ngu(3000); kq = await motLan(m, body) }
+      // 27/10: model nhanh hết hạn mức (429) ⇒ thử một lần MODEL_MANH — hạn mức tính riêng từng model, và «Hỏi thầy» không dùng model này
+      // (kể cả danh sách dự phòng `DS_MODEL_DU_PHONG` của hoi-tro-ly.ts) ⇒ không ăn vào hạn mức của học sinh.
+      if (!kq.ok && kq.http === 429 && m !== MODEL_MANH) {
+        const manh = await motLan(MODEL_MANH, body)
+        if (manh.ok) return manh
+      }
       if (kq.ok || (kq.http !== 404 && kq.http !== 410)) return kq
     }
     return kq
