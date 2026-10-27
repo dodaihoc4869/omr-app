@@ -67,31 +67,52 @@
 .gt-loi {
   position: absolute; left: 0; bottom: calc(100% - var(--gt-loi-y, 0px)); z-index: 4; width: max-content; max-width: var(--gt-loi-max, 240px);
   padding: 6px 11px; border-radius: 14px; border: 2px solid var(--tr-vien-2); background: var(--tr-mat); color: var(--tr-chu);
-  font: 700 13px/1.35 inherit; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 3px 0 var(--tr-vien-2);
+  font-family: inherit; font-size: 13px; font-weight: 700; line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 3px 0 var(--tr-vien-2);
   pointer-events: none; transform-origin: var(--gt-loi-duoi, 40px) 100%;
 }
 .gt-loi::after { content: ''; position: absolute; left: var(--gt-loi-duoi, 40px); top: 100%; width: 10px; height: 10px; margin-top: -4px; background: inherit; border-right: 2px solid var(--tr-vien-2); border-bottom: 2px solid var(--tr-vien-2); border-bottom-right-radius: 3px; transform: rotate(45deg); }
 .gt-loi .an { visibility: hidden; }
 
-/* ── Bố cục màn làm chặng Duo (thầy chốt 27/10): hàng trên dành cho bong bóng càu nhàu · giám thị trái (bóng dưới chân) · đề trong bong bóng lời bên phải,
-   mũi nhọn chỉ vào giám thị. Đề dài / có hình ⇒ giám thị thu nhỏ góc trái trên, bong bóng chảy xuống. */
-[data-trong] .duo-gt-san { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 36px auto; align-items: center; min-width: 0; }
-[data-trong] .duo-gt-nv { grid-column: 1; grid-row: 2; width: 124px; margin-left: -8px; }
-[data-trong] .duo-gt-nv .gt-o { --gt-loi-y: 2px; }
-[data-trong] .duo-gt-bong { grid-column: 2; grid-row: 2; position: relative; min-width: 0; margin-left: 12px; padding: 12px 14px; border: 2px solid var(--tr-vien-2); border-radius: 18px; background: var(--tr-mat); }
-[data-trong] .duo-gt-bong::before { content: ''; position: absolute; left: -9px; top: var(--duoi, 50%); width: 14px; height: 14px; margin-top: -7px; background: var(--tr-mat); border-left: 2px solid var(--tr-vien-2); border-bottom: 2px solid var(--tr-vien-2); border-bottom-left-radius: 4px; transform: rotate(45deg); }
+/* ── Bố cục màn làm chặng Duo (thầy chốt 27/10, bổ sung tối 27/10 «khung bài tập tràn sang trái, chỉ chừa chỗ giám thị · giám thị to hơn · khung giống
+   Duolingo»). Hàng trên 36 px dành cho bong bóng càu nhàu. Giám thị TO (khung 120 px ở 390 — thân ~105–120 px; 100 px ở ≤ 380; 96 px xoay ngang; 136 px máy tính) ở mọi kiểu đề.
+   Viền kiểu bong bóng lời Duolingo: 2 px --tr-vien, bo 18 px, nền mặt, mũi nhọn nhỏ chĩa vào mặt giám thị, không bóng đổ.
+   · Đề ngắn: giám thị trái, bong bóng phải.
+   · Đề dài / có hình: bong bóng gần trọn bề ngang, viền chữ L khuyết góc trái trên ôm giám thị + khe 10 px (đường viền SVG do mảnh GiamThi vẽ theo cỡ
+     thật, bo mềm cả góc trong); chữ chạy bên phải giám thị rồi tràn sát mép trái từ dưới chân giám thị (phần tử float giữ chỗ). */
+[data-trong] .duo-gt-san { --gt-nvw: 120px; display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 36px auto; align-items: center; min-width: 0; }
+[data-trong] .duo-gt-nv { grid-column: 1; grid-row: 2; width: var(--gt-nvw); margin-left: -8px; }
+/* Bong bóng càu nhàu neo vào ĐẦU khối (hàng 36 px để trống), không theo giám thị: giám thị căn giữa / chữ L đều không bị bong bóng đè. */
+[data-trong] .duo-gt-san { position: relative; }
+[data-trong] .duo-gt-san .gt-o { position: static !important; }
+[data-trong] .duo-gt-san .gt-loi { top: 0; bottom: auto; left: -2px; }
+[data-trong] .duo-gt-bong { grid-column: 2; grid-row: 2; position: relative; min-width: 0; margin-left: 12px; padding: 12px 14px; border: 2px solid var(--tr-vien); border-radius: 18px; background: var(--tr-mat); }
+[data-trong] .duo-gt-bong::before { content: ''; position: absolute; left: -9px; top: var(--duoi, 50%); width: 14px; height: 14px; margin-top: -7px; background: var(--tr-mat); border-left: 2px solid var(--tr-vien); border-bottom: 2px solid var(--tr-vien); border-bottom-left-radius: 4px; transform: rotate(45deg); }
 [data-trong] .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 19px; }
-[data-trong] .duo-gt-san[data-nho] { align-items: start; }
-[data-trong] .duo-gt-san[data-nho] .duo-gt-nv { width: 92px; margin-left: -10px; }
-[data-trong] .duo-gt-san[data-nho] .duo-gt-bong { --duoi: 32px; margin-top: 2px; }
-[data-trong] .duo .duo-gt-san[data-nho] .duo-gt-bong .ht2-lam-de-chu { font-size: 18px; }
-@media (max-width: 380px) { [data-trong] .duo-gt-san:not([data-nho]) .duo-gt-nv { width: 108px; } [data-trong] .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 18px; } }
-@media (min-width: 900px) { [data-trong] .duo-gt-san:not([data-nho]) .duo-gt-nv { width: 150px; } [data-trong] .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 21px; } [data-trong] .duo .duo-gt-san[data-nho] .duo-gt-bong .ht2-lam-de-chu { font-size: 19px; } }
-/* Khung thấp xoay ngang: cột đề hẹp ⇒ luôn giám thị nhỏ. */
+.duo-gt-vien, .duo-gt-cho { display: none; }
+/* Đề dài: chữ L. Khuyết = giám thị (lệch trái 14 px, nhô trên 4 px; thân rộng ~83 %, chân ở ~96 % cao hình) + khe 10 px; --gt-kw / --gt-kh / --gt-kd (mũi nhọn) mảnh GiamThi đọc để vẽ viền. */
+[data-trong] .duo-gt-san[data-nho] {
+  display: block; position: relative; padding-top: 36px;
+  --gt-kw: calc(var(--gt-nvw) * .83 - 4px); --gt-kh: calc(var(--gt-nvw) * 1.15 + 6px); --gt-kd: calc(var(--gt-nvw) * .71 - 4px);
+}
+[data-trong] .duo-gt-san[data-nho] .duo-gt-nv { position: absolute; z-index: 1; left: -14px; top: var(--gt-nv-tren, 32px); margin: 0; }
+[data-trong] .duo-gt-san[data-nho] .gt-loi { top: calc(var(--gt-nv-tren, 32px) * -1); left: 12px; } /* giám thị định vị tuyệt đối ⇒ đưa bong bóng về đầu khối */
+[data-trong] .duo-gt-san[data-nho] .duo-gt-bong { display: flow-root; margin: 0; border: 0; background: none; isolation: isolate; min-height: calc(var(--gt-kh) + 12px); }
+[data-trong] .duo-gt-san[data-nho] .duo-gt-bong::before { content: none; }
+[data-trong] .duo-gt-san[data-nho] .duo-gt-vien { display: block; position: absolute; left: 0; top: 0; z-index: -1; overflow: visible; pointer-events: none; }
+[data-trong] .duo-gt-vien path { fill: var(--tr-mat); stroke: var(--tr-vien); stroke-width: 2; stroke-linejoin: round; }
+[data-trong] .duo-gt-san[data-nho] .duo-gt-cho { display: block; float: left; width: calc(var(--gt-kw) - 4px); height: calc(var(--gt-kh) - 2px); }
+[data-trong] .duo .duo-gt-san[data-nho] .ht2-lam-de { display: block; }
+[data-trong] .duo .duo-gt-san[data-nho] .ht2-lam-de > * + * { margin-top: 12px; }
+[data-trong] .duo .duo-gt-san[data-nho] .ht2-lam-de > :not(.ht2-lam-de-chu) { clear: left; } /* hình, bảng, thí nghiệm: xuống dưới chân giám thị, không đè */
+@media (max-width: 380px) { [data-trong] .duo-gt-san { --gt-nvw: 100px; } [data-trong] .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 18px; } }
+@media (min-width: 900px) { [data-trong] .duo-gt-san { --gt-nvw: 136px; } [data-trong] .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 21px; } }
+/* Khung thấp xoay ngang: cột đề hẹp, giám thị 96 px. */
 @media (orientation: landscape) and (max-height: 500px) {
-  [data-trong] .duo-gt-san { align-items: start; grid-template-rows: 34px auto; }
-  [data-trong] .duo-gt-san .duo-gt-nv { width: 84px; margin-left: -10px; }
-  [data-trong] .duo-gt-san .duo-gt-bong { --duoi: 30px; margin-top: 2px; padding: 10px 12px; }
+  [data-trong] .duo-gt-san { --gt-nvw: 96px; grid-template-rows: 34px auto; }
+  [data-trong] .duo-gt-san:not([data-nho]) { align-items: start; }
+  [data-trong] .duo-gt-san:not([data-nho]) .duo-gt-bong { --duoi: 40px; margin-top: 4px; padding: 10px 12px; }
+  [data-trong] .duo-gt-san[data-nho] { padding-top: 34px; }
+  [data-trong] .duo-gt-san[data-nho] { --gt-nv-tren: 30px; }
   [data-trong] .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 18px; }
 }
 /* Chữ trong bong bóng ≥ 18 px: chữ chạm được (VungChamDe, vùng chạm = cao chữ + 20 px) luôn ≥ 44 px. */

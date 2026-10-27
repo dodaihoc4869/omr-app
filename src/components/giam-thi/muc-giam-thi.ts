@@ -14,4 +14,4 @@ export function mucGiamThi(q: { mucDo?: unknown; sao?: unknown } | null | undefi
 
 /** Đề dài / có hình ⇒ giám thị thu nhỏ góc trái trên, bong bóng đề chảy xuống. Ngắn (≤ ~3 dòng ở 390 px) ⇒ giám thị to cạnh bong bóng. */
 export const deDaiGiamThi = (q: { text?: string; thanCauImg?: unknown; table?: unknown; hinhAnh?: { viTri: string }[] }) =>
-  (q.text?.length ?? 0) > 72 || !!q.thanCauImg || !!q.table || !!q.hinhAnh?.some((h) => h.viTri === 'sau_de')
+  (q.text?.length ?? 0) > 64 || !!q.thanCauImg || !!q.table || !!q.hinhAnh?.some((h) => h.viTri === 'sau_de')

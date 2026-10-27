@@ -23,7 +23,7 @@ import { suaDapAnKho } from './sua-dap-an-kho'
 import { quaTram } from './tram-gemini'
 import { docCauEmSai } from './hoc-lieu-may-soan'
 import { laCauTuLuan, laMotSoPhanIII } from '../../src/lib/cau-tu-luan'
-import { PHIEN_BAN_SO_DO, chuCauHoi, chuCauHoiMu, chuThuLai, chuThuLaiKhuon, chuThuLaiLo, chuThuLaiThieu, loiDanSoDo, type CauCanSoan } from './soan-so-do-loi-dan'
+import { PHIEN_BAN_SO_DO, chuCauHoi, chuCauHoiMu, chuThuLai, chuThuLaiAnDu, chuThuLaiKhuon, chuThuLaiLo, chuThuLaiThieu, loiDanSoDo, type CauCanSoan } from './soan-so-do-loi-dan'
 
 type Obj = Record<string, unknown>
 const str = (v: unknown) => (v === null || v === undefined ? '' : String(v)).trim()
@@ -115,8 +115,12 @@ const MODEL_DU_PHONG: readonly string[] = ['gemini-3.5-flash-lite', 'gemini-flas
 export const MODEL_MANH = 'gemini-pro-latest'
 /** Số lượt tối đa cho MỘT câu: lượt sau đọc lý do lệch / lộ / hỏng khuôn của lượt trước. */
 export const SO_LUOT_MOT_CAU = 4
+/** Ẩn dụ thầy đã bỏ (26/10): tiền / giàu / nghèo / đánh thuế / «nhà A», «nhà thằng…». «nhà máy», «tiền chất» không tính. */
+const RE_AN_DU = /tiền(?! chất)|giàu|nghèo|thuế|nhà (?:thằng|bạn|giàu|nghèo|[A-ZĐ](?![\p{L}\p{N}]))/iu
+export const LY_DO_AN_DU = 'Bản dùng ẩn dụ tiền / nhà / giàu / thuế (thầy đã bỏ).'
+export function coAnDuTienNha(ban: BanSoDo): boolean { return RE_AN_DU.test(JSON.stringify(ban)) }
 /** Câu vòng sửa soạn lại: lệch / lộ, và câu tính bị trả THIẾU sơ đồ / bước tính (27/10). Chuỗi hằng, không chèn dữ liệu ngoài. */
-export const SQL_CAN_SUA = `cong IN ('lech', 'lo_dap_an') OR (cong = 'khong_kiem_duoc' AND ly_do = '${LY_DO_THIEU_SO_DO}')`
+export const SQL_CAN_SUA = `cong IN ('lech', 'lo_dap_an') OR (cong = 'khong_kiem_duoc' AND (ly_do LIKE 'Bước % không đọc được.' OR ly_do = '${LY_DO_THIEU_SO_DO}'))`
 const RE_CHAN_VI_TRI = /location is not supported/i
 const ngu = (ms: number) => new Promise((ok) => setTimeout(ok, ms))
 
@@ -339,7 +343,7 @@ function docThamSo(t: unknown): ThamSoDayDu | string {
   if (model && !/^[a-z0-9][a-z0-9.\-]{2,60}$/i.test(model)) return 'model không hợp lệ'
   return {
     ...(qids ? { qids } : {}), gioiHan: kep(o.gioiHan, 10, 1, 50), chiCauSaiNhieu: o.chiCauSaiNhieu === true, thuKhong: o.thuKhong === true,
-    conTro: str(o.conTro), lamLai: o.lamLai === true, model: model || MODEL_MAC_DINH, songSong: kep(o.songSong, 4, 1, 24), // trần 8 ⇒ 24 (thầy 27/10 «24 câu luôn»)
+    conTro: str(o.conTro), lamLai: o.lamLai === true, model: model || MODEL_MAC_DINH, songSong: kep(o.songSong, 4, 1, 48), // trần 8 ⇒ 48 (27/10, cron máy soạn)
     nganSachGiay: kep(o.nganSachGiay, 40, 5, 110), soEmToiThieu: kep(o.soEmToiThieu, SO_EM_SAI_TOI_THIEU, 1, 1000), choChayGioCaoDiem: o.choChayGioCaoDiem === true,
     chiSuaLoi: o.chiSuaLoi === true, ...(o.chiPhan === 'I' || o.chiPhan === 'III' ? { chiPhan: o.chiPhan } : {}), ...(o.chiSuaLoi === true ? { lamLai: true } : {}), tuSuaDapAn: o.tuSuaDapAn !== false,
   }
@@ -471,6 +475,7 @@ async function soanMotCau(q: CauKho, ts: ThamSoDayDu, goi: GoiMoHinh, cong: Kiem
     luot.push({ vai: 'model', chu: kq.chu }, {
       vai: 'user',
       chu: thieuSoDo(ban) ? chuThuLaiThieu()
+        : ban.lyDo === LY_DO_AN_DU ? chuThuLaiAnDu()
         : c.ket === 'lo_dap_an' ? chuThuLaiLo(ban.lyDo ?? 'phần trước nộp chứa đáp án') : chuThuLai(ban.lyDo ?? 'tích các thừa số không ra đáp án kho', giaTri),
     })
   }
@@ -517,9 +522,14 @@ export async function soanSoDoLo(env: Env, thamSo: unknown, phu: PhuSoDo = {}): 
   const goi = phu.goiMoHinh ?? taoGoiGeminiLo(env)
   // Cổng làn C đọc phương án theo khoá A–D (`luaChon['B']`); câu kho mang mảng ⇒ đổi mảng thành {A,B,C,D}. Trước 26/10 truyền thẳng mảng ⇒ cổng không thấy
   // phương án đúng ⇒ MỌI câu Phần I ra `khong_kiem_duoc` («Phương án đúng không phải số»), không bao giờ `dat` / `lech`.
-  const cong: KiemCong = phu.kiemCong ?? ((ban, ctx) => kiemCong(ban, {
+  const congGoc: KiemCong = phu.kiemCong ?? ((ban, ctx) => kiemCong(ban, {
     phan: ctx.phan, dapAn: ctx.dapAn, luaChon: Object.fromEntries(ctx.luaChon.slice(0, 4).map((s, i) => ['ABCD'[i]!, String(s ?? '')])),
   }))
+  // Thầy 26/10 «Tạm thời bỏ tư duy tiền nhà»: bản ĐẠT số mà còn ẩn dụ tiền / nhà / giàu / thuế ⇒ coi như lệch, bắt viết lại nói thẳng.
+  const cong: KiemCong = async (ban, ctx) => {
+    const c = await congGoc(ban, ctx)
+    return c.ket === 'dat' && coAnDuTienNha(ban) ? { ket: 'lech', lyDo: LY_DO_AN_DU, ...(c.giaTri !== undefined ? { giaTri: c.giaTri } : {}) } : c
+  }
   const nganSach = (ts.nganSachGiay ?? 40) * 1000
   const het = () => bayGio() - batDau >= nganSach
 

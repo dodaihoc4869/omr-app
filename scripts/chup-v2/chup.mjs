@@ -324,6 +324,13 @@ const PT_CANH = [['mo', ''], ['nhan', PT_CHO], ['chon', `${PT_CHO} » tn:^D`]]
 const DS_PT = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   PT_CANH.map(([t, viec]) => [`duo-pt-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=duo-pt', w, hh, nen, false, /tính base của amine/, viec || undefined])))
 // ═══ hết PHƯƠNG TRÌNH 27/10
+// ═══ THÍ NGHIỆM GỌN 27/10 (thầy: «Thí nghiệm bỏ luôn khung bao, hiển thị nổi … thanh thu gọn cho đẹp mắt»): `lam13&lam=duo-tn` (gia/lam-bai-1210d.ts) —
+// câu methylamine + phenolphthalein + HCl. `mo` = khối thí nghiệm mở sẵn (cuộn tới giữa màn) · `dong` = bấm thanh thu gọn. Các bước cuộn ngang
+// (.ex-grid) là chủ đích — không tính tràn. 390×844 · 360×640 · 844×390 · 1440×900, sáng + tối. Tiền tố "duo-tn-".
+const TN_CANH = [['mo', 'lam13:cho:600 » xem:.ex-demo » cho:400'], ['dong', 'lam13:cho:600 » xem:.ex-demo » bam:.ex-demo > summary » cho:500']]
+const DS_TN = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  TN_CANH.map(([t, viec]) => [`duo-tn-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=duo-tn', w, hh, nen, false, /Tiến hành thí nghiệm/, viec])))
+// ═══ hết THÍ NGHIỆM GỌN 27/10
 // ═══ GIÁM THỊ 27/10 (tiền tố "duo-gt-"): giám thị theo mức câu cạnh đề, 4 mức × đề ngắn đã chọn (mắt dõi ô B) ở 390×844 / 360×640 / 844×390 / 1440×900;
 // ở 390×844 thêm đúng · sai · đề dài · đề có hình. Sáng + tối. `gtloi=1` ⇒ giám thị luôn càu nhàu (đo bong bóng không che nhãn / đề / phương án).
 const GT_NGAN = 'lam13&lam=duo&gtde=ngan&gtloi=1&gt='
@@ -332,6 +339,9 @@ const DS_GT = ['nb', 'th', 'vd', 'vdc'].flatMap((m) => ['light', 'dark'].flatMap
   return [
     ...[[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].map(([w, hh, k]) => [`duo-gt-${m}-ngan-${k}${toi}`, GT_NGAN + m, w, hh, nen, false, /quỳ tím/, 'lam13:tn:^B » cho:3200']),
     [`duo-gt-${m}-dung-doc${toi}`, GT_NGAN + m, 390, 844, nen, false, /quỳ tím/, 'lam13:tn:^B » nut:^Kiểm tra$'],
+    // đề DÀI như ảnh thầy (toluidine ~15 dòng): khung chữ L ôm giám thị — mọi khổ cho Cô Cốc / Kíp, 390 cho Tí / Chú Tam
+    ...(['th', 'vdc'].includes(m) ? [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']] : [[390, 844, 'doc']]).map(([w, hh, k]) =>
+      [`duo-gt-${m}-toluidine-${k}${toi}`, `lam13&lam=duo&gtde=dai&gtloi=1&gt=${m}`, w, hh, nen, false, /Toluidine là/, 'lam13:cho:3600 » dau']),
     [`duo-gt-${m}-sai-doc${toi}`, GT_NGAN + m, 390, 844, nen, false, /quỳ tím/, 'lam13:tn:^A » nut:^Kiểm tra$'],
     [`duo-gt-${m}-dai-doc${toi}`, `lam13&lam=duo&gtloi=1&gt=${m}`, 390, 844, nen, false, /Số đồng phân amine/, 'lam13:tn:^D » cho:3200'],
     [`duo-gt-${m}-hinh-doc${toi}`, `lam13&lam=duo&gt=${m}`, 390, 844, nen, false, /Số đồng phân amine/, `lam13:${D_Q1}`],
@@ -375,6 +385,10 @@ const NC_CANH = [
 const DS_NC = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   NC_CANH.map(([t, m, cho, viec]) => [`nc-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
 // ═══ hết NÂNG CẤP 27/10
+// ═══ LỘ TRÌNH GHIM 27/10 (tiền tố "lg-"): lần mở đầu (bong bóng lời Bi) · lần mở sau trong ngày (không bong bóng) · đã cuộn (thẻ bài dính, thu gọn)
+const LG_CANH = [['dau', 'hs-mot&tp=1', /Ester/], ['sau', 'hs-mot&tp=1', /Ester/, 'lam13:nap'], ['cuon', 'hs-mot&tp=1', /Ester/, 'lam13:nap » cuon:320 » cho']]
+const DS_LG = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  LG_CANH.map(([t, m, cho, viec]) => [`lg-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
 // ═══ BẢNG + TẤM CHƯA TÍNH 27/10 (tiền tố "nb-"): bảng 2 hàng × 4 cột tự xoay dọc ở khổ hẹp · tấm «Chưa được tính» gọn · bảng lớn cuộn ngang có bóng mép
 const NB_CANH = [
   ['1-bang', 'lam13&lam=duo-bang', /Chọn đáp án đúng/, ''], ['2-chua-tinh', 'lam13&lam=duo-bang', /Chọn đáp án đúng/, 'lam13:tn:^B » nut:^Kiểm tra$'],
@@ -514,9 +528,11 @@ const DS = [
   ...DS_GT, // GIÁM THỊ 27/10
   ...DS_CHAM, // THẺ CHẠM 27/10
   ...DS_PT, // PHƯƠNG TRÌNH 27/10
+  ...DS_TN, // THÍ NGHIỆM GỌN 27/10
   ...DS_TPC, // THƯỞNG PHẠT GỘP 26/10
   ...DS_TON, // VIỆC TỒN 27/10
   ...DS_NC, // NÂNG CẤP 27/10
+  ...DS_LG, // LỘ TRÌNH GHIM 27/10
   ...DS_NB, // BẢNG + TẤM CHƯA TÍNH 27/10
   ...DS_BD, // BI CHUYỂN ĐỘNG 27/10
   ...DS_HSE, // LÀN HỒ SƠ EM 12/10F
@@ -1000,6 +1016,12 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
         else if (loai === 'phim') for (const k of gt) await t.keyboard.press(k)
         else if (loai === 'cho') await t.waitForTimeout(Number(gt)) // GIÁM THỊ 27/10: chờ giám thị «đọc đề» xong rồi mới chụp
         else if (loai === 'dau') await t.evaluate(() => { const k = document.querySelector('.ht2-lam')?.parentElement; if (k) k.scrollTop = 0 })
+        // 27/10: `cuon:N` cuộn khung cuộn của trang N px (thẻ bài ghim) · `nap` tải lại trang (localStorage giữ ⇒ «lần mở sau»)
+        else if (loai === 'cuon') await t.evaluate((n) => { const k = [...document.querySelectorAll('body *')].find((e) => /(auto|scroll)/.test(getComputedStyle(e).overflowY) && e.scrollHeight > e.clientHeight + 4) ?? document.scrollingElement; k?.scrollBy(0, n) }, Number(gt))
+        // THÍ NGHIỆM GỌN 27/10: `xem:CSS` cuộn phần tử vào giữa màn · `bam:CSS` bấm phần tử (thanh <summary> không mang vai nút)
+        else if (loai === 'xem') await t.evaluate((q) => document.querySelector(q)?.scrollIntoView({ block: 'center' }), gt)
+        else if (loai === 'bam') await t.locator(gt).first().click({ timeout: 20000 })
+        else if (loai === 'nap') { await t.reload(); await t.getByText(cho).first().waitFor({ timeout: 20000 }); await t.waitForTimeout(600) }
         await t.waitForTimeout(250)
       }
       // GIÁM THỊ 27/10: bong bóng càu nhàu không được chồng lên nhãn, đề, phương án, thanh trên / đáy (đo hình chữ nhật thật) ⇒ ghi vào «Tràn ngang».
@@ -1009,7 +1031,7 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       // tràn ngang TRONG khung cuộn (documentElement không thấy được vì khung là `fixed`)
       // bảng lớn cuộn ngang TRONG khung riêng (.cau-bang, có bóng mép) là chủ đích — không tính tràn
       // SOÁT TỔNG 27/10: hình con TRONG một <svg> cắt mép (overflow hidden — mây bọt dải đúng .duo-may) không lòi ra ngoài ⇒ không tính; khung svg vẫn được đo
-      const tranTrong = await t.evaluate(() => Math.max(0, ...[...document.querySelectorAll('.ht2-lam *')].filter((e) => !e.closest('.cau-bang') && !(e.ownerSVGElement && getComputedStyle(e.ownerSVGElement).overflow !== 'visible')).map((e) => Math.round(e.getBoundingClientRect().right - innerWidth))))
+      const tranTrong = await t.evaluate(() => Math.max(0, ...[...document.querySelectorAll('.ht2-lam *')].filter((e) => !e.closest('.cau-bang, .ex-grid > *') && !(e.ownerSVGElement && getComputedStyle(e.ownerSVGElement).overflow !== 'visible')).map((e) => Math.round(e.getBoundingClientRect().right - innerWidth))))
       if (tranTrong > 0) tran.push(`${ten}: trong khung ${tranTrong}px`)
     } else if (viec?.startsWith('cham:')) {
       // THẺ CHẠM 27/10: chạm chữ tô tím (ruột nạp lười) ⇒ chờ thẻ kiểu Duolingo hiện hẳn (hết 120 ms phóng to)

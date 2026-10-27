@@ -704,7 +704,8 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
           {laLamLai && !k && viTri === soGoc && <p className="duo-mo-ghi">Câu cùng dạng với câu em vừa sai. Lượt này tính là có hỗ trợ.</p>}
           {mucGt ? <div className="duo-gt-san" data-nho={deDaiGiamThi(q) || undefined}>
               <div className="duo-gt-nv"><Suspense fallback={null}><GiamThiCau muc={mucGt} qid={q.qid} phien={phien} nop={nop} ket={ketGt} vung={() => gocRef.current} /></Suspense></div>
-              <div className="duo-gt-bong"><VungChamDe q={q} token={token} phien={phien} onHoTro={danhDauHoTro} nutBatDau={nutBatDau}><DeCau q={q} stt={stt} /></VungChamDe></div>
+              {/* đề dài: bong bóng gần trọn bề ngang, viền chữ L (khuyết góc trái trên ôm giám thị — mảnh GiamThi vẽ), chữ chảy vòng quanh chỗ giữ */}
+              <div className="duo-gt-bong">{deDaiGiamThi(q) && <><svg className="duo-gt-vien" aria-hidden="true"><path /></svg><span className="duo-gt-cho" aria-hidden="true" /></>}<VungChamDe q={q} token={token} phien={phien} onHoTro={danhDauHoTro} nutBatDau={nutBatDau}><DeCau q={q} stt={stt} /></VungChamDe></div>
             </div>
             : <VungChamDe q={q} token={token} phien={phien} onHoTro={danhDauHoTro} nutBatDau={nutBatDau}><DeCau q={q} stt={stt} /></VungChamDe>}
           {coDangCanh(q.text) && <MinhHoaDe text={q.text} />}

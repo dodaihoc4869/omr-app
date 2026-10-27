@@ -929,3 +929,42 @@
 [data-trong] .bang-de { --bang-mep: none; }
 [data-trong] .bang-de .cau-bang { box-shadow: var(--bang-mep); }
 [data-trong] .bang-de[data-doc] :is(th, td) { white-space: normal; }
+/* ── 22. THÍ NGHIỆM NỔI (thầy 27/10: «Thí nghiệm bỏ luôn khung bao, hiển thị nổi đẹp hơn tinh tế hơn, thanh thu gọn cho đẹp mắt hơn nữa»). Khối do
+   lib/experiments/scene.ts vẽ (chuỗi HTML, kiểu gốc nhúng sẵn — app thầy / máy chiếu giữ khung). App HS: không viền, không nền; thanh thu gọn một hàng
+   (bình · «Xem thí nghiệm» · mũi tên xoay); mỗi bước = hình đứng thoáng có bóng tròn mờ dưới đáy, chấm số màu nhấn, lời ngắn bên dưới; các bước xếp
+   NGANG nối bằng «→», cuộn ngang có nấc khi không đủ chỗ. Mở / đóng cao dần: ::details-content 0fr→1fr (kiểu gốc). ── */
+[data-trong='hs'] .ex-demo { margin: 2px 0 0; padding: 0; border: 0; border-radius: 0; background: none; overflow: visible; }
+[data-trong='hs'] .ex-demo > summary { width: fit-content; gap: 8px; padding: 0 4px; margin-left: -4px; border-radius: 12px; font-size: 15px; font-weight: 700; line-height: 1.3; color: var(--tr-tin-chu); -webkit-tap-highlight-color: transparent; }
+[data-trong='hs'] .ex-demo > summary:focus-visible { outline: 3px solid var(--tr-tin); outline-offset: 2px; }
+[data-trong='hs'] .ex-demo > summary .ex-chev { width: 18px; height: 18px; }
+[data-trong='hs'] .ex-demo .ex-ten { margin: 0 0 6px; font-size: 13px; font-weight: 700; line-height: 1.4; color: var(--tr-chu-3); }
+[data-trong='hs'] .ex-demo .ex-mo > svg { max-height: 170px; margin: 4px auto 10px; }
+[data-trong='hs'] .ex-demo .ex-grid {
+  display: flex; gap: 28px; margin: 0; padding: 4px 2px 6px; overflow-x: auto; overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory; scroll-padding-inline: 2px; scrollbar-width: none;
+}
+/* mép phải mờ CHỈ khi các bước không vừa khung (mỗi bước ≥ 124px + mũi tên 28px) ⇒ báo còn bước để cuộn */
+[data-trong='hs'] .ex-demo .ex-mo { container-type: inline-size; }
+@container (max-width: 275px) { [data-trong='hs'] .ex-demo .ex-grid:has(> :nth-child(2)) { mask-image: linear-gradient(to right, currentColor calc(100% - 20px), transparent); } }
+@container (max-width: 427px) { [data-trong='hs'] .ex-demo .ex-grid:has(> :nth-child(3)) { mask-image: linear-gradient(to right, currentColor calc(100% - 20px), transparent); } }
+@container (max-width: 579px) { [data-trong='hs'] .ex-demo .ex-grid:has(> :nth-child(4)) { mask-image: linear-gradient(to right, currentColor calc(100% - 20px), transparent); } }
+[data-trong='hs'] .ex-demo .ex-grid::-webkit-scrollbar { display: none; }
+[data-trong='hs'] .ex-demo .ex-phase {
+  position: relative; display: flex; flex-direction: column; align-items: center; flex: 1 0 clamp(124px, calc(50% - 14px), 240px); max-width: 260px;
+  padding: 0; border: 0; border-radius: 0; background: none; text-align: center; scroll-snap-align: start;
+}
+[data-trong='hs'] .ex-demo .ex-phase:first-child { margin-left: auto; }
+[data-trong='hs'] .ex-demo .ex-phase:last-child { margin-right: auto; }
+[data-trong='hs'] .ex-demo .ex-phase + .ex-phase::before { content: '→' / ''; position: absolute; top: 44px; left: -28px; width: 28px; font-size: 18px; line-height: 24px; text-align: center; color: var(--tr-chu-3); }
+[data-trong='hs'] .ex-demo .ex-vessels { order: 1; flex-wrap: nowrap; gap: 4px; }
+[data-trong='hs'] .ex-demo .ex-vessel { flex: 0 1 auto; max-width: none; }
+[data-trong='hs'] .ex-demo .ex-vessel svg {
+  width: auto; height: 108px; max-height: none; margin: 0 auto;
+  background: radial-gradient(closest-side, color-mix(in srgb, currentColor 18%, transparent), transparent) no-repeat 50% 91% / 62% 9px;
+}
+[data-trong='hs'] .ex-demo .ex-vessel > span { margin-top: 2px; font-size: 12px; font-weight: 700; line-height: 1.35; color: var(--tr-chu-3); }
+[data-trong='hs'] .ex-demo .ex-phase h4 { order: 2; margin: 8px 0 2px; font-size: 14px; font-weight: 800; line-height: 20px; color: var(--tr-chu); text-wrap: balance; overflow-wrap: anywhere; }
+[data-trong='hs'] .ex-demo .ex-so { display: inline-grid; place-items: center; width: 20px; height: 20px; margin: 0 6px 0 0; vertical-align: 1px; border-radius: 50%; background: var(--tr-tin); color: var(--tr-trang); font-size: 12px; font-weight: 800; line-height: 1; }
+[data-trong='hs'] .ex-demo .ex-so::after { content: none; }
+[data-trong='hs'] .ex-demo .ex-phase > p { order: 3; margin: 2px 0 0; text-wrap: pretty; font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--tr-chu-2); }
+[data-trong='hs'] .ex-demo .ex-ghi { margin: 6px 0 0; font-size: 12px; line-height: 1.45; color: var(--tr-chu-3); }
