@@ -203,6 +203,11 @@ describe('27/10 thầy «Bỏ thực tế lý thuyết đi» (ảnh nitrobenzene
     expect(lamSachChu('khối lượng benzene (kg per kmol)')).toBe('khối lượng benzene (kg/kmol)')
     expect(lamSachChu('Lượng thực tế: tính xuôi × H/100')).toBe('Lượng: tính xuôi × H/100')
     expect(lamSachChu('số mol aniline (chia M = 93)')).toBe('số mol aniline (chia M = 93)')
+    expect(lamSachChu('số mol of NaOH and HCl')).toBe('số mol của NaOH và HCl')
+    expect(lamSachChu('$\\frac{100}{80}$ · tính ngược')).toBe('100/80 · tính ngược')
+    expect(lamSachChu('n \\cdot M \\times 2')).toBe('n · M × 2')
+    expect(lamSachChu('the mass of glucose')).toBe('mass của glucose')
+    expect(lamSachChu('nhiệt độ ở thể khí')).toBe('nhiệt độ ở thể khí')
     expect(lamSachChu('gam quặng theo lí thuyết (quặng chỉ chứa 60% FeS₂)')).toBe('gam quặng (quặng chỉ chứa 60% FeS₂)')
   })
   it('làm sạch mọi chữ hiện, không đụng số / tên bước', () => {
