@@ -96,15 +96,15 @@ export function ManNhiemVu({ token, onVe, hieuUng }: { token?: string; onVe?: ()
           <h2>Tinh thể hôm nay</h2>
           <div className="tp-tong-nv"><span>Đã nhận</span><b>+{daNhan} <IcTinhThe /></b>{conLai > 0 && <><span>· còn có thể nhận</span><b>+{conLai} <IcTinhThe /></b></>}</div>
           {conLai > 0 && <p className="tp-phu" style={{ fontSize: 13.5 }}>Còn lại: {[nv.length - soXong > 0 && `${nv.length - soXong} nhiệm vụ (+${nv.filter((x) => !x.xong).reduce((s, x) => s + x.thuong, 0)})`,
-            mt && !datMt && `mục tiêu ngày ${mt.can} bài (+${MUC_TIEU_TT})`, !mo && r && `rương (+${r.thuong})`].filter(Boolean).join(', ')}.</p>}
+            mt && !datMt && `mục tiêu ngày ${mt.can} chặng (+${MUC_TIEU_TT})`, !mo && r && `rương (+${r.thuong})`].filter(Boolean).join(', ')}.</p>}
         </section>
         {mt && <section className="tp-the" aria-label="Mục tiêu ngày">
           <div className="tp-dong"><span className="tp-o" data-sac={datMt ? 'sao' : undefined}><Target aria-hidden="true" /></span>
-            <div className="giua"><b>Mục tiêu ngày · {mt.daXong}/{mt.can} bài</b><span>{datMt ? `Đã đạt · +${MUC_TIEU_TT} tinh thể` : `Thêm ${mt.can - mt.daXong} bài nữa là đạt, nhận +${MUC_TIEU_TT} tinh thể`}</span></div></div>
+            <div className="giua"><b>Mục tiêu ngày · {mt.daXong}/{mt.can} chặng</b><span>{datMt ? `Đã đạt · +${MUC_TIEU_TT} tinh thể` : `Thêm ${mt.can - mt.daXong} chặng nữa là đạt, nhận +${MUC_TIEU_TT} tinh thể`}</span></div></div>
         </section>}
         <section className="tp-the" aria-label="Các nhiệm vụ có thể ra">
           <h2>Mỗi ngày rút 3 trong 6 kiểu</h2>
-          <div className="tp-mau-nv">{['Xong N bài', 'Chuỗi đúng 5 câu', 'Đúng 2 câu khó', 'Sửa 2 lỗi cũ', 'Bài hoàn hảo', 'Học trước 20:00'].map((x) => <span key={x}>{x}</span>)}</div>
+          <div className="tp-mau-nv">{['Xong N chặng', 'Chuỗi đúng 5 câu', 'Đúng 2 câu khó', 'Sửa 2 lỗi cũ', 'Chặng hoàn hảo', 'Học trước 20:00'].map((x) => <span key={x}>{x}</span>)}</div>
         </section>
       </div>
     </div>
@@ -143,7 +143,7 @@ export function ManCuaHang({ token, onVe, onPhuKien }: { token?: string; onVe?: 
       <div className="c">
         {tq.bat.thangHoa && <section className="tp-the tp-thang-hoa" aria-label="Thăng hoa">
           <div className="hang-th"><span className="tp-o" data-sac="tin"><FlaskConical aria-hidden="true" /></span><div><h2>Thăng hoa là gì?</h2>
-            <p className="tp-phu" style={{ fontSize: 14 }}>Như iodine rắn hoá hơi khi đun: <b>2 ngày liền</b> em không xong bài nào và không có bình giữ chuỗi thì <b>10% tinh thể</b> bay hơi mất (ít nhất 5, nhiều nhất 50).</p></div></div>
+            <p className="tp-phu" style={{ fontSize: 14 }}>Như iodine rắn hoá hơi khi đun: <b>2 ngày liền</b> em không xong chặng nào và không có bình giữ chuỗi thì <b>10% tinh thể</b> bay hơi mất (ít nhất 5, nhiều nhất 50).</p></div></div>
           <p className="tp-phu" style={{ fontSize: 13.5 }}>Mang sẵn 1 bình giữ chuỗi là tinh thể không thăng hoa.</p>
         </section>}
         <section className="tp-the" aria-label="Cách kiếm tinh thể">
@@ -190,7 +190,7 @@ export function ManThangHoa({ tb, onHoc, onDong }: { tb: ThongBao; onHoc?: () =>
           <div ref={buon} style={{ gridArea: '1 / 1', zIndex: 2 }}><Bi cam="sai" size={130} /></div>
         </div>
         <h1>{mat} tinh thể đã thăng hoa</h1>
-        <p className="tp-phu">2 ngày liền em chưa xong bài nào, và không có bình giữ chuỗi.</p>
+        <p className="tp-phu">2 ngày liền em chưa xong chặng nào, và không có bình giữ chuỗi.</p>
         {truoc !== undefined && <div className="tp-doi" role="img" aria-label={`Số dư từ ${truoc} còn ${con} tinh thể`}>
           <div data-cu=""><span>Trước</span><b>{truoc}</b></div><ChevronRight aria-hidden="true" /><div data-moi=""><span>Còn lại</span><b><IcTinhThe />{con}</b></div>
         </div>}
@@ -199,7 +199,7 @@ export function ManThangHoa({ tb, onHoc, onDong }: { tb: ThongBao; onHoc?: () =>
         <section className="tp-the" aria-label="Vì sao">
           <div className="tp-dong"><span className="tp-o" data-sac="tin"><FlaskConical aria-hidden="true" /></span><div className="giua"><b>Thăng hoa = 10% số tinh thể</b><span>ít nhất 5, nhiều nhất 50{truoc !== undefined ? ` · 10% của ${truoc} là ${mat}` : ''}</span></div></div>
           <div className="tp-dong"><span className="tp-o" data-sac="bang"><Lock aria-hidden="true" /></span><div className="giua"><b>Lần sau mang sẵn bình giữ chuỗi</b><span>có bình thì tinh thể không thăng hoa · {GIA_BINH} tinh thể một bình</span></div></div>
-          <div className="tp-dong"><span className="tp-o" data-sac="sao"><Zap aria-hidden="true" /></span><div className="giua"><b>Học 1 bài hôm nay</b><span>ngọn lửa chuỗi bắt đầu cháy lại từ hôm nay</span></div></div>
+          <div className="tp-dong"><span className="tp-o" data-sac="sao"><Zap aria-hidden="true" /></span><div className="giua"><b>Học 1 chặng hôm nay</b><span>ngọn lửa chuỗi bắt đầu cháy lại từ hôm nay</span></div></div>
         </section>
       </div>
     </main>

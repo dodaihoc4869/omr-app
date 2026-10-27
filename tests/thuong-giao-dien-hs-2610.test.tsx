@@ -84,7 +84,7 @@ describe('phần hiện ngay', () => {
     expect(c.querySelector('[data-k="lua"] .tp-so')?.textContent).toBe('12')
     expect(c.querySelector('[data-k="nt"] .tp-so')?.textContent).toBe('147')
     expect(screen.getByRole('button', { name: 'Mục tiêu hôm nay: 4 chặng · đã xong 3' })).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: 'Tinh thể: 245' }))
+    fireEvent.click(screen.getByRole('button', { name: '245 tinh thể' }))
     expect(mo).toHaveBeenCalledWith('cua-hang')
   })
   it('vòng mục tiêu (lỗi 27/10 «1/16»): nói rõ «16 chặng (96 câu) · đã xong 1»; xong chặng ⇒ capNhatTongQuan ⇒ vòng đổi số NGAY, không cần mở lại app', async () => {
@@ -145,25 +145,25 @@ describe('phần hiện ngay', () => {
 describe('các màn (đúng số bản vẽ)', () => {
   it('kết bài (tp-3): +61 · 83% · 4:12, tách dòng đúng nhãn máy chủ, mục tiêu 3/4, lên hạng 4 ↑2', () => {
     const c = ve(<KetBaiThuong ketBai={docKetBai(M.KET_BAI)!} hang="bac" phu="Amine · chặng 3 · 6 câu" onTiep={() => {}} />)
-    expect(screen.getByRole('heading', { name: 'Xong bài!' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Xong chặng!' })).toBeTruthy()
     expect(screen.getByRole('group', { name: 'Nguyên tử: +61' })).toBeTruthy()
     expect(screen.getByRole('group', { name: 'Chính xác: 83%' })).toBeTruthy()
     expect(screen.getByRole('group', { name: 'Thời gian: 4:12' })).toBeTruthy()
     expect([...c.querySelectorAll('.hang-t')].map((r) => r.textContent)).toEqual(['Câu đúng · 5 câu × 10+50', 'Câu khó · câu 4+5', 'Chuỗi đúng · câu 3, 4+4', 'Câu sai làm kĩ · câu 5+2', 'Hoàn hảo · cần 6/6 câu đúng+0', 'Tổng+61 '])
-    expect(c.textContent).toMatch(/Mục tiêu ngày · 3\/4 bài/)
+    expect(c.textContent).toMatch(/Mục tiêu ngày · 3\/4 chặng/)
     expect(c.textContent).toMatch(/Lên hạng 4 trong nhóm Bạc ↑2/)
     expect(c.textContent).toMatch(/Top 5 cuối tuần được lên Giải Vàng/)
     cleanup()
     const h = ve(<KetBaiThuong ketBai={docKetBai(M.KET_BAI_HH)!} hang="bac" onTiep={() => {}} bat={{ giai: false, thangHoa: true, banBe: true, kimCuong: true }} />)
     expect(screen.getByRole('heading', { name: 'Hoàn hảo!' })).toBeTruthy()
-    expect(h.textContent).toMatch(/Đạt mục tiêu! · 4\/4 bài/)
+    expect(h.textContent).toMatch(/Đạt mục tiêu! · 4\/4 chặng/)
     expect(h.querySelector('[aria-label="Giải tuần"]')).toBeNull() // công tắc giải tắt ⇒ ẩn thẻ giải
   })
   it('chuỗi ngày (tp-5): 12 ngày liền, 3 câu luật đúng chữ, 1/2 bình, mốc 30 còn 18 ngày, cược ngày 3/7', () => {
     const c = ve(<ManChuoiNgay token={TK} />)
     expect(c.querySelector('#tp-so-chuoi')?.textContent).toBe('12')
     expect([...c.querySelectorAll('.tp-luat li span')].map((x) => x.textContent)).toEqual([
-      'Mỗi ngày học xong ít nhất 1 bài để ngọn lửa cháy tiếp.', 'Lỡ một ngày? Bình giữ chuỗi tự đỡ cho em. Em mang được tối đa 2 bình.', 'Hết bình? Học bù 2 bài trong 24 giờ là cứu được chuỗi.'])
+      'Mỗi ngày xong ít nhất 1 chặng để giữ chuỗi.', 'Lỡ một ngày? Bình giữ chuỗi tự đỡ cho em. Em mang được tối đa 2 bình.', 'Hết bình? Học bù 2 chặng trong 24 giờ là cứu được chuỗi.'])
     expect(c.textContent).toMatch(/đang mang 1\/2/)
     expect(c.textContent).toMatch(/Còn 18 ngày tới mốc 30/)
     expect(c.textContent).toMatch(/Đang cược · ngày 3\/7/)
@@ -174,7 +174,7 @@ describe('các màn (đúng số bản vẽ)', () => {
   it('cứu chuỗi (tp-6): vừa tắt 0/2 + đồng hồ; cứu xong 2/2 ⇒ sống lại', () => {
     ve(<ManCuuChuoi chuoi={docTongQuan(M.tongQuanGia({ chuoiNgay: M.CUU(0) }))!.chuoiNgay!} onDong={() => {}} />)
     expect(screen.getByRole('heading', { name: 'Chuỗi 12 ngày vừa tắt' })).toBeTruthy()
-    expect(screen.getByText('Bài bù · 0/2')).toBeTruthy()
+    expect(screen.getByText('Chặng bù · 0/2')).toBeTruthy()
     expect(screen.getByRole('timer').textContent).toMatch(/^23:1\d:\d\d$/)
     cleanup()
     ve(<ManCuuChuoi chuoi={docTongQuan(M.tongQuanGia({ chuoiNgay: M.CUU(2) }))!.chuoiNgay!} onDong={() => {}} />)
@@ -257,13 +257,13 @@ describe('các màn (đúng số bản vẽ)', () => {
   it('thành tích · huy hiệu (tp-13): nhóm theo mã, có/chưa có + tiến độ, «Mới»; công tắc tắt ⇒ nhóm ẩn', async () => {
     datMayChu(); ghiTam(khoaTam(DUONG.huyHieu, TK), (await import('../src/lib/thuong-api')).docDsHuyHieu(M.HUY_HIEU_GIA))
     let c = ve(<ManHuyHieu token={TK} moi="hoan_hao_10" />)
-    expect([...c.querySelectorAll('.tp-the > h2')].map((x) => x.textContent)).toEqual(['Chuỗi ngày', 'Giải tuần', 'Bài hoàn hảo', 'Thử thách Kim cương', 'Học cùng bạn', 'Đặc biệt'])
+    expect([...c.querySelectorAll('.tp-the > h2')].map((x) => x.textContent)).toEqual(['Chuỗi ngày', 'Giải tuần', 'Chặng hoàn hảo', 'Thử thách Kim cương', 'Học cùng bạn', 'Đặc biệt'])
     expect(c.textContent).toMatch(/12 ngàychuỗi hiện tại/); expect(c.textContent).toMatch(/Vànghạng cao nhất/); expect(c.textContent).toMatch(/9\/21huy hiệu đã có/)
     expect(c.querySelector('[data-hh-ma="hoan_hao_10"] .tp-moi')?.textContent).toBe('Mới')
     expect(c.querySelector('[data-hh-ma="chuoi_30"] small')?.textContent).toBe('12/30')
     cleanup(); datMayChu(M.tongQuanGia({ bat: { giai: false, thangHoa: true, banBe: false, kimCuong: false } })); ghiTam(khoaTam(DUONG.huyHieu, TK), (await import('../src/lib/thuong-api')).docDsHuyHieu(M.HUY_HIEU_GIA))
     c = ve(<ManHuyHieu token={TK} />)
-    expect([...c.querySelectorAll('.tp-the > h2')].map((x) => x.textContent)).toEqual(['Chuỗi ngày', 'Bài hoàn hảo', 'Đặc biệt'])
+    expect([...c.querySelectorAll('.tp-the > h2')].map((x) => x.textContent)).toEqual(['Chuỗi ngày', 'Chặng hoàn hảo', 'Đặc biệt'])
   })
   it('học cùng bạn (tp-16): 2 bạn, lửa đôi 9 · 3, gõ cửa, mốc kế tiếp; KHÔNG điểm / nguyên tử của bạn', () => {
     const c = ve(<ManHocCungBan token={TK} onMoi={() => {}} />)
@@ -299,11 +299,11 @@ describe('các màn (đúng số bản vẽ)', () => {
   })
   it('mốc chuỗi · huy hiệu mới · cược thua · gõ cửa; thẻ bên Lộ trình', () => {
     ve(<ManMocChuoi tb={tb(M.TB.mocChuoi)} tq={tq()} onDong={() => {}} />); expect(screen.getByRole('heading', { name: 'Chuỗi 7 ngày!' })).toBeTruthy(); cleanup()
-    ve(<ManHuyHieuMoi tb={tb(M.TB.huyHieu)} onDong={() => {}} />); expect(screen.getByRole('heading', { name: '10 bài hoàn hảo' })).toBeTruthy(); cleanup()
+    ve(<ManHuyHieuMoi tb={tb(M.TB.huyHieu)} onDong={() => {}} />); expect(screen.getByRole('heading', { name: '10 chặng hoàn hảo' })).toBeTruthy(); cleanup()
     ve(<ManCuocKetQua tb={tb(M.TB.cuocThua)} tq={tq()} onDong={() => {}} />); expect(screen.getByRole('heading', { name: 'Cược chuỗi chưa thành' })).toBeTruthy(); cleanup()
     ve(<BaoGoCua tb={tb(M.TB.goCua)} onDong={() => {}} />); expect(screen.getByText(/Bảo gõ cửa/)).toBeTruthy(); cleanup()
     const c = ve(<TheBenThuong token={TK} onMo={() => {}} />)
-    expect(c.textContent).toMatch(/Giải Bạc · hạng 4\/20/); expect(c.textContent).toMatch(/Xong 4 bài3\/4/)
+    expect(c.textContent).toMatch(/Giải Bạc · hạng 4\/20/); expect(c.textContent).toMatch(/Xong 4 chặng3\/4/)
   })
 })
 

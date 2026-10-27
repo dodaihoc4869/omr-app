@@ -121,6 +121,11 @@ interface NgayEm {
   mucTieu: { daXong: number; can: number; cau?: number }
 }
 
+/** «Xong 2 bài» ⇒ «Xong 2 chặng», «Bài hoàn hảo» ⇒ «Chặng hoàn hảo»; giữ «Bài tập…», «Bài 8…». */
+export function chuChangTen(s: string): string {
+  return s.replace(/(^|[^\p{L}])(b|B)ài(?![\p{L}])(?! tập| học| \d)/gu, (_m, d: string, b: string) => `${d}${b === 'B' ? 'C' : 'c'}hặng`)
+}
+
 function phanTichNgay(sbd: string, ngay: string, kq: readonly { results?: unknown[] }[]): NgayEm {
   const t = (kq[0]?.results?.[0] ?? {}) as Dong
   const bai = (kq[1]?.results ?? []) as Dong[]
@@ -133,7 +138,8 @@ function phanTichNgay(sbd: string, ngay: string, kq: readonly { results?: unknow
     hoanHao: bai.filter((r) => so(r.hoan_hao) === 1).length,
     baiTruoc20h: bai.filter((r) => gioVnCua(chu(r.luc)) < 20).length,
   }
-  const mau: MauNhiemVu[] = nv.map((r) => ({ ma: chu(r.ma) as MaNhiemVu, ten: chu(r.ten), can: so(r.can), thuong: so(r.thuong) }))
+  // Boss 27/10: đơn vị ~6 câu gọi «chặng» — tên nhiệm vụ đã LƯU trước khi đổi chữ («Xong 2 bài», «Bài hoàn hảo») đổi khi đọc ra
+  const mau: MauNhiemVu[] = nv.map((r) => ({ ma: chu(r.ma) as MaNhiemVu, ten: chuChangTen(chu(r.ten)), can: so(r.can), thuong: so(r.thuong) }))
   const nhiemVu = nhiemVuCuaNgay(sbd, ngay, soLieu, mau.length ? mau : undefined)
   const mucCau = t.muc === null || t.muc === undefined ? null : so(t.muc)
   return {

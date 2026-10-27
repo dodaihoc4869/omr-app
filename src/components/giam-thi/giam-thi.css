@@ -71,12 +71,17 @@
   position: absolute; left: 0; bottom: calc(100% + 10px); z-index: 4; width: max-content; min-width: calc(var(--gt-loi-duoi, 40px) + 34px); max-width: var(--gt-loi-max, 260px);
   padding: 10px 16px; border-radius: 14px; border-bottom: 3px solid var(--gt-loi-day); background: var(--gt-loi-nen); color: var(--gt-trang);
   font-family: inherit; font-size: 15px; font-weight: 700; line-height: 1.35; overflow-wrap: anywhere;
-  pointer-events: none; transform-origin: var(--gt-loi-duoi, 40px) 100%;
+  pointer-events: none; transform-origin: calc(var(--gt-loi-duoi, 40px) + 7px) calc(100% + 13px); /* bật / tan quanh đầu mũi nhọn */
 }
 .gt-loi[data-muc='th'] { --gt-loi-nen: color-mix(in srgb, var(--gt-mau-th) 64%, var(--gt-toi)); --gt-loi-day: color-mix(in srgb, var(--gt-mau-th) 50%, var(--gt-toi)); }
 .gt-loi[data-muc='vd'] { --gt-loi-nen: color-mix(in srgb, var(--gt-mau-vd) 59%, var(--gt-toi)); --gt-loi-day: color-mix(in srgb, var(--gt-mau-vd) 45%, var(--gt-toi)); }
 .gt-loi[data-muc='vdc'] { --gt-loi-nen: color-mix(in srgb, var(--gt-mau-vdc) 75%, var(--gt-toi)); --gt-loi-day: color-mix(in srgb, var(--gt-mau-vdc) 61%, var(--gt-toi)); }
-.gt-loi::after { content: ''; position: absolute; left: var(--gt-loi-duoi, 40px); top: calc(100% + 3px); width: 16px; height: 9px; background: var(--gt-loi-day); clip-path: polygon(0 0, 100% 0, 50% 100%); }
+/* Mũi nhọn LIỀN với bong bóng (thầy 27/10 tối, ảnh Kíp): 14 × 10 px, bo đầu, cùng màu thân; viền đáy 3D chạy liền xuống quanh mũi nhọn.
+   ::after = phần sáng (màu thân) đè đúng đoạn viền đáy nơi mũi nhọn mọc ra, chồng lên thân 1 px nên không khe / không đường nối;
+   ::before = cùng hình, tông đậm, lệch xuống 3 px ⇒ thành mép đậm dưới mũi nhọn như phần đáy. Vị trí theo đầu giám thị (--gt-loi-duoi). */
+.gt-loi::before, .gt-loi::after { content: ''; position: absolute; left: var(--gt-loi-duoi, 40px); width: 14px; height: 11px; clip-path: path('M0 0 H14 L8.4 9.2 Q7 11 5.6 9.2 Z'); }
+.gt-loi::after { top: calc(100% - 1px); background: var(--gt-loi-nen); }
+.gt-loi::before { top: calc(100% + 2px); background: var(--gt-loi-day); }
 .gt-loi .an { visibility: hidden; }
 
 /* ── Bố cục màn làm chặng Duo (thầy chốt 27/10, bổ sung tối 27/10 «khung bài tập tràn sang trái, chỉ chừa chỗ giám thị · giám thị to hơn · khung giống

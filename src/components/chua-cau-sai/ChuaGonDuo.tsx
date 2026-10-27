@@ -157,7 +157,7 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
           <p className="duo-xong-phu">Em đã sửa {tong} câu của chặng này.</p>
           <div className="duo-3">
             <div data-sac="dung" style={{ '--i': 0 } as CSSProperties}><p>Câu đã sửa</p><b>{tong}/{tong}</b></div>
-            {hn && hn.tong > 0 && <div data-sac="sao" style={{ '--i': 1 } as CSSProperties}><p>Hôm nay</p><b>{Math.min(hn.xong, hn.tong)}/{hn.tong}</b></div>}
+            {hn && hn.tong > 0 && <div data-sac="sao" style={{ '--i': 1 } as CSSProperties}><p>Hôm nay</p><b><span>{Math.min(hn.xong, hn.tong)}/{hn.tong}<small className="duo-so-dv">câu</small></span></b></div>}
           </div>
           <p className="duo-ghi">Câu chưa tự sửa được sẽ gặp lại ở ngày khác.</p>
         </section>
@@ -171,7 +171,7 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
   const nutTiep = (do_?: boolean) => <button ref={nutChinh} type="button" className="duo-nut" data-sac={do_ ? 'do' : undefined} onClick={tiepTuc}>Tiếp tục</button>
   const tam = (cam: 'vui' | 'sai' | 'nghi', tieu: ReactNode, than: ReactNode, them: ReactNode, nut: ReactNode, sac = tt) => (
     <section className="duo-day duo-ket" data-tt={sac ?? 'trung'} role="status" aria-live="polite"><div className="duo-giua">
-      {sac === 'dung' && <BungDung key={`${mo.lan ?? 1}${ket ?? ''}`} />}{/* thầy 27/10 (video Duolingo): mây bọt + hạt vuông xanh ở dải ĐÚNG */}
+      <BungDung key={`${mo.lan ?? 1}${ket ?? ''}`} loai={sac === 'dung' || sac === 'sai' ? sac : 'trung'} />{/* thầy 27/10 (video Duolingo): mây bọt ở cả dải đúng / sai / chưa tính */}
       <div className="duo-kq">
         <span className="duo-kq-bi" aria-hidden="true"><Bi key={`${mo.lan ?? 1}${ket ?? ''}`} cam={cam} size={64} /></span>
         <div className="duo-kq-chu"><div className="duo-ct-dau" data-dai={(typeof tieu === 'string' ? tieu.length > 12 : true) || undefined}><h2>{tieu}</h2>{them}</div>{than}</div>

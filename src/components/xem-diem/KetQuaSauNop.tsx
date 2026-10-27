@@ -59,6 +59,11 @@ export interface KetQuaSauNopProps {
 }
 
 export default function KetQuaSauNop(p: KetQuaSauNopProps) {
+  // Boss 27/10: giao diện Trong không còn «bảng nhiệm vụ» ⇒ nút về trang chính «Về Lộ trình» (đích: mục Lộ trình); giao diện cũ giữ chữ cũ
+  const trong = typeof document !== 'undefined' && !!document.documentElement.dataset.trong
+  const veTrangChinh = trong ? 'Về Lộ trình' : 'Về bảng nhiệm vụ'
+  // đúng đích: báo menu dọc (TrongHs) về mục Lộ trình rồi mới đóng phòng thi — em có thể đã vào thi từ mục khác
+  const onVeTrangChinh = p.onVe && (() => { if (trong) window.dispatchEvent(new Event('ddh:ve-lt')); p.onVe!() })
   const ten = p.tenCa.trim() || 'Ca kiểm tra'
   const coDiem = p.kieu === 'da_cong_bo' && typeof p.diem === 'number' && Array.isArray(p.phan) && typeof p.dung === 'number' && typeof p.tong === 'number'
   const chuNop = `Em đã nộp bài${p.gioNop ? ` lúc ${p.gioNop}` : ''}${p.lanThu && p.lanThu > 1 ? ` · lần ${p.lanThu}` : ''}`
@@ -138,8 +143,8 @@ export default function KetQuaSauNop(p: KetQuaSauNopProps) {
                   </NutXd>
                 )}
                 {p.onVe && (
-                  <NutXd kieu={p.onXemBaoCao ? 'chu' : 'chinh'} rong onClick={p.onVe}>
-                    Về bảng nhiệm vụ
+                  <NutXd kieu={p.onXemBaoCao ? 'chu' : 'chinh'} rong onClick={onVeTrangChinh}>
+                    {veTrangChinh}
                   </NutXd>
                 )}
               </div>
@@ -171,8 +176,8 @@ export default function KetQuaSauNop(p: KetQuaSauNopProps) {
             <TrangThaiChuaCoDiem kieu={p.kieu === 'ca_lop' ? 'ca_lop' : 'khong'} nop={p.daNop} si={p.daVao} luc={p.gioNop.split(' · ')[0]} />
             {p.onVe && (
               <div className="xd-nut-hang">
-                <NutXd rong onClick={p.onVe}>
-                  Về bảng nhiệm vụ
+                <NutXd rong onClick={onVeTrangChinh}>
+                  {veTrangChinh}
                 </NutXd>
               </div>
             )}

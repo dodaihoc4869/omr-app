@@ -10,6 +10,9 @@ import type { LichSuCuaEm } from '../ca-thi/BaoCaoCaCuaEm'
 import './cau-da-lam.css'
 import './lich-su-ca-em.css'
 
+// Tên trang chính trên nút «về» (Boss 27/10): giao diện Trong ⇒ «Lộ trình»; giao diện cũ ⇒ «Hôm nay». Viết tại chỗ: nhập mô-đun dùng chung sẽ đẻ mảnh tải riêng (+1 tệp mở app).
+const tenTrangChinh = (): string => (typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Lộ trình' : 'Hôm nay')
+
 const BaoCaoCaCuaEm = lazy(() => import('../ca-thi/BaoCaoCaCuaEm'))
 
 export interface LichSuCaEmProps {
@@ -70,7 +73,7 @@ export default function LichSuCaEm({ sbd, scriptUrl = '', banDau = null, onVe }:
     <div className="h2-cdl h2-lsc">
       <header className="h2-cdl-dau">
         <div className="h2-cdl-hang">
-          <button type="button" className="h2-cdl-ve" aria-label="Về Hôm nay" onClick={onVe}>
+          <button type="button" className="h2-cdl-ve" aria-label={`Về ${tenTrangChinh()}`} onClick={onVe}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
               <path d="M15 18l-6-6 6-6" />
             </svg>

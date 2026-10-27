@@ -211,6 +211,28 @@ export function RuotCham(p: RuotChamProps) {
   useEffect(() => (mo ? giuCotPhai() : undefined), [mo])
 
   const chuCua = (loai: LoaiCham) => [...new Set((boc?.vung ?? []).filter((v) => v.loai === loai).map((v) => v.chu.trim()).filter(Boolean))]
+
+  // ── CÓ GỢI Ý THẬT KHÔNG (thầy 27/10, ảnh câu lý thuyết «Phát biểu nào…»: «Câu nào không có Bắt đầu từ đâu thì ẩn đi nhé, có mới hiện»).
+  // Nút «Bắt đầu từ đâu?» chỉ dựng khi câu có ÍT NHẤT một tầng nội dung riêng của câu:
+  //  · tự sinh: số liệu đề cho (vùng «cho») hoặc cốt lõi / phương án loại thầy soạn (`q.goiY`) — chỉ có tên chất / chữ «đề hỏi» thì chỉ là nhắc lại
+  //    đề (đã tô màu sẵn) ⇒ không tính;
+  //  · bản sơ đồ thầy duyệt trên máy chủ: chỉ HỎI có bản không khi tự sinh không có gì — gọi KHÔNG kèm phiên (máy chủ chỉ đánh dấu «có trợ giúp»
+  //    khi có phiên) ⇒ lượt nộp không bị tính hỗ trợ vì lần hỏi này; em bấm mở thì `tai()` gọi lại như cũ (kèm phiên).
+  const coTuSinh = chuCua('cho').length > 0 || !!q.goiY?.cotLoi?.trim() || !!q.goiY?.gach?.length
+  const [coBan, setCoBan] = useState<boolean | null>(null)
+  const bocXong = !!boc
+  useEffect(() => {
+    if (coTuSinh || coBan !== null) return
+    const f = p.taiGoiY ?? (p.token ? (qid: string) => taiGoiYSoDo(p.token!, qid) : null)
+    if (!f) { setCoBan(false); return }
+    let huy = false
+    // chờ bọc chữ đề xong (biết có số liệu chưa) — từ điển chậm / hỏng thì sau 2 s vẫn hỏi
+    const t = window.setTimeout(() => {
+      f(q.qid).then((r) => { if (!huy) setCoBan(!!(r && r.co && docBanSoDo(r.ban, false))) }, () => { if (!huy) setCoBan(false) })
+    }, bocXong ? 300 : 2000)
+    return () => { huy = true; window.clearTimeout(t) }
+  }, [coTuSinh, coBan, bocXong, p.taiGoiY, p.token, q.qid])
+  const coGoiY = coTuSinh || coBan === true || gy?.tt === 'co'
   const tangDs = gy?.tt === 'co' && gy.ban ? tangTuBan(gy.ban) : tangTuSinh(chuCua('cho'), chuCua('hoi'), chuCua('chat'), q.goiY)
   const coPhepTinh = gy?.tt === 'co' ? !!gy.ban?.buoc.length : chuCua('cho').length > 0
 
@@ -235,8 +257,8 @@ export function RuotCham(p: RuotChamProps) {
   const theMo = mo1 && the[mo1.i]
   return (
     <>
-      {p.tren.current && createPortal(<>{!p.nutBatDau && <div className="gyc-hang-nut">{nut}</div>}{chuGiai}</>, p.tren.current)}
-      {p.nutBatDau?.(nut)}
+      {p.tren.current && createPortal(<>{!p.nutBatDau && coGoiY && <div className="gyc-hang-nut">{nut}</div>}{chuGiai}</>, p.tren.current)}
+      {coGoiY && p.nutBatDau?.(nut)}
       {p.duoi.current && mo && createPortal(
         <GoiY3Tang
           id={p.idGoiY} tangDs={tangDs} trangThai={gy?.tt ?? 'tai'} mo={tang} coPhepTinh={coPhepTinh}

@@ -28,6 +28,52 @@ const nut = () => within(duong()).getAllByRole('listitem').map((li) => (li.first
 const HS = { lop: '12A1', onXemLai: noop, onTuLuyen: noop, onLichSu: noop, onKetQua: noop }
 
 describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
+  it('nút Kiểm tra ôn tập / Tự sửa lỗi KHÔNG còn viên chữ cạnh nút (thầy 27/10: đè giám thị); nút đỏ có huy hiệu số, quá 99 ⇒ «99+»; tên đầy đủ vẫn ở aria-label', () => {
+    const { container, rerender } = render(<MotTrangHs {...goc({ soSua: 200, kiem: KIEM })} />)
+    const sua = within(duong()).getByRole('button', { name: 'Tự sửa lỗi: 200 câu' })
+    expect(sua.querySelector('.da-nhan')).toBeNull()
+    expect(sua.querySelector('.da-dem')!.textContent).toBe('99+')
+    for (const n of container.querySelectorAll('.da-nut[data-loai="kiem"], .da-nut[data-loai="sua"]')) expect(n.querySelector('.da-nhan')).toBeNull()
+    rerender(<MotTrangHs {...goc({ soSua: 7, kiem: KIEM })} />)
+    expect(within(duong()).getByRole('button', { name: 'Tự sửa lỗi: 7 câu' }).querySelector('.da-dem')!.textContent).toBe('7')
+  })
+  it('bấm nút Lộ trình KHÔNG vào thẳng: thẻ bật ra (role dialog) đúng màu nút, focus vào nút chính, Esc đóng + trả focus; một thẻ một lúc; chạm ngoài đóng (thầy 27/10)', () => {
+    const onHoc = vi.fn(), onChua = vi.fn()
+    render(<MotTrangHs {...goc({ onHoc, onChua, hs: HS })} />)
+    const hoc = screen.getByRole('button', { name: 'Học tiếp · 18 câu' })
+    expect(hoc.getAttribute('aria-expanded')).toBe('false')
+    fireEvent.click(hoc)
+    expect(onHoc).not.toHaveBeenCalled()
+    expect(hoc.getAttribute('aria-expanded')).toBe('true')
+    let the = screen.getByRole('dialog', { name: 'Ester – Lipid' })
+    expect(the.getAttribute('data-sac')).toBe('dung')
+    expect(the.textContent).toContain('Chặng 3 / 5 · 6 câu')
+    expect(document.activeElement).toBe(within(the).getByRole('button', { name: 'Bắt đầu' }))
+    fireEvent.keyDown(document, { key: 'Escape' })
+    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(document.activeElement).toBe(hoc)
+    // chặng khoá: thẻ xám, không có nút bắt đầu
+    fireEvent.click(screen.getByRole('button', { name: 'Chặng 4: chưa mở' }))
+    the = screen.getByRole('dialog')
+    expect(the.getAttribute('data-sac')).toBe('khoa')
+    expect(the.textContent).toContain('Hoàn thành các chặng trước để mở khoá')
+    expect(within(the).queryByRole('button')).toBeNull()
+    // bấm nút khác ⇒ chỉ thẻ mới mở; Tự sửa lỗi đỏ, «Sửa ngay» gọi đúng lệnh cũ
+    fireEvent.pointerDown(screen.getByRole('button', { name: 'Tự sửa lỗi: 5 câu' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Tự sửa lỗi: 5 câu' }))
+    expect(screen.getAllByRole('dialog')).toHaveLength(1)
+    the = screen.getByRole('dialog', { name: 'Tự sửa lỗi' })
+    expect(the.getAttribute('data-sac')).toBe('sai')
+    expect(the.textContent).toContain('5 câu cần sửa')
+    fireEvent.click(within(the).getByRole('button', { name: 'Sửa ngay' }))
+    expect(onChua).toHaveBeenCalledOnce()
+    expect(screen.queryByRole('dialog')).toBeNull()
+    // rương: nói điều kiện sáng; chạm ra ngoài ⇒ đóng
+    fireEvent.click(screen.getByRole('button', { name: 'Rương hôm nay' }))
+    expect(screen.getByRole('dialog', { name: 'Rương hôm nay' }).textContent).toContain('còn 3 chặng')
+    fireEvent.pointerDown(document.body)
+    expect(screen.queryByRole('dialog')).toBeNull()
+  })
   it('lời Bi NHẮC MỘT LẦN mỗi ngày (thầy 27/10): giữ ~4 s rồi thu gọn và gỡ; mở lại trong ngày ⇒ không hiện; nội dung đổi hẳn (đủ mức) ⇒ hiện lại một lần', () => {
     vi.useFakeTimers()
     try {
@@ -60,9 +106,10 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
     const onHoc = vi.fn()
     render(<MotTrangHs {...goc({ kiem: KIEM, onKiemTra: noop, onHoc, hs: HS })} />)
     const ds = nut()
-    expect(ds.map((n) => n.getAttribute('aria-label'))).toEqual(['Chặng 1: đã xong', 'Chặng 2: đã xong', 'Học tiếp · 18 câu', 'Chặng 4: chưa mở', 'Chặng 5: chưa mở',
+    expect(ds.map((n) => n.getAttribute('aria-label'))).toEqual(['Chặng 1: đã xong', 'Chặng 2: đã xong', 'Học tiếp · 18 câu', 'Rương hôm nay', 'Chặng 4: chưa mở', 'Chặng 5: chưa mở',
       'Kiểm tra ôn tập: 28 câu · khoảng 50 phút · hạn nộp 24:00', 'Tự sửa lỗi: 5 câu', 'Bài tập về nhà'])
     fireEvent.click(screen.getByRole('button', { name: 'Học tiếp · 18 câu' }))
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Bắt đầu' }))
     expect(onHoc).toHaveBeenCalledOnce()
     expect(screen.getByRole('button', { name: 'Học tiếp · 18 câu' }).textContent).toContain('Bắt đầu') // chặng 3 chưa làm câu nào
     expect(screen.getByLabelText('12/30 câu hôm nay')).toBeTruthy()
@@ -88,6 +135,7 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
     const sua = screen.getByRole('button', { name: 'Tự sửa lỗi: 5 câu' })
     expect(sua.getAttribute('data-tt')).toBe('dang')
     fireEvent.click(sua)
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Sửa ngay' }))
     fireEvent.click(screen.getByRole('button', { name: /Học thêm câu mới/ }))
     expect(onChua).toHaveBeenCalledOnce()
     expect(onHoc).toHaveBeenCalledOnce()
@@ -100,6 +148,7 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
     expect(kiem.getAttribute('data-tt')).toBe('dang')
     expect(screen.getByRole('region', { name: 'Đủ mức hôm nay' }).textContent).toContain('Tiếp theo: Kiểm tra ôn tập, rồi Tự sửa lỗi')
     fireEvent.click(kiem)
+    fireEvent.click(within(screen.getByRole('dialog', { name: 'Kiểm tra ôn tập' })).getByRole('button', { name: 'Bắt đầu' }))
     expect(onKiemTra).toHaveBeenCalledOnce()
     expect(screen.getByRole('button', { name: 'Tự sửa lỗi: 5 câu' }).getAttribute('data-tt')).toBe('mo')
   })

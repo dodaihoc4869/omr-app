@@ -459,6 +459,7 @@
 [data-trong] .duo-3 > div[data-sac=sao] { --sac: var(--tr-sao); --sac-chu: var(--tr-sao-chu); }
 [data-trong] .duo-3 p { margin: 0; padding: 6px 4px; background: var(--sac); color: var(--tr-trang); font-size: 12px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
 [data-trong] .duo-3 b { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 58px; background: var(--tr-mat); color: var(--sac-chu); font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
+[data-trong] .duo-3 .duo-so-dv { margin-left: 3px; font-size: .6em; font-weight: 800; white-space: nowrap; } /* đơn vị nhỏ sau số «11/24 câu» (Boss 27/10) */
 [data-trong] .duo-ghi { max-width: 420px; margin: 0; font-size: 14px; line-height: 1.5; color: var(--tr-chu-2); }
 @media (max-width: 600px) {
   [data-trong] .duo-tren { padding: 8px 12px 0 8px; gap: 10px; }
@@ -979,3 +980,12 @@
 [data-trong] .duo-ket .duo-ct-lg svg { width: 18px; height: 18px; flex: none; }
 [data-trong] .duo-ket .duo-ct-lg:focus-visible { outline: 3px solid currentColor; outline-offset: -2px; }
 @media (max-width: 380px) { [data-trong] .duo-ct-dau[data-dai] .duo-ct-lg > span { display: none; } }
+/* 23. MÂY BỌT DẢI SAI / CHƯA TÍNH (thầy 27/10 «Phần sai chưa có hiệu ứng bong bóng như trong video»): cùng mây bướu như dải đúng, nền bướu = đúng nền dải,
+   viền bướu đậm hơn nền. Sai: đỏ nhạt + 7 hạt tròn đỏ nhạt bay lên rồi tan (BungDung.tsx) · chưa tính: xám nhạt (tấm chưa tính ánh xanh), không hạt. */
+.duo-may[data-loai='sai'] .nen { fill: var(--tr-sai-nhat); }
+.duo-may[data-loai='sai'] .vien { fill: color-mix(in srgb, var(--tr-sai) 55%, var(--tr-sai-nhat)); }
+.duo-may[data-loai='trung'] .nen { fill: var(--tr-mat-2); }
+.duo-may[data-loai='trung'] .vien { fill: var(--tr-vien-2); }
+[data-trong='hs'] .duo-ket[data-tp-trung] .duo-may[data-loai='trung'] .nen { fill: color-mix(in srgb, var(--tr-tin) 7%, var(--tr-mat)); }
+[data-trong='hs'] .duo-ket[data-tp-trung] .duo-may[data-loai='trung'] .vien { fill: color-mix(in srgb, var(--tr-tin) 22%, var(--tr-vien)); }
+.duo-tron { position: fixed; left: 0; top: 0; z-index: 70; border-radius: 50%; background: color-mix(in srgb, var(--tr-sai) 45%, var(--tr-sai-nhat)); pointer-events: none; will-change: transform, opacity; }

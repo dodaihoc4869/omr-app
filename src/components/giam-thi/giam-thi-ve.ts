@@ -383,9 +383,9 @@ export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; 
       const el = document.createElement('div'); el.className = 'gt-loi'; el.setAttribute('role', 'status'); el.dataset.muc = muc
       const da = document.createElement('span'), con = document.createElement('span'); con.className = 'an'
       el.append(da, con)
-      // mũi nhọn chĩa xuống đầu giám thị (đầu ở ~45 % bề ngang khung vẽ)
+      // mũi nhọn chĩa xuống đầu giám thị (đầu ở giữa bề ngang khung vẽ)
       const lech = vao === khung ? 0 : khung.getBoundingClientRect().left - vao.getBoundingClientRect().left
-      el.style.setProperty('--gt-loi-duoi', Math.max(12, lech + khung.clientWidth * 0.45 - 6).toFixed(0) + 'px')
+      el.style.setProperty('--gt-loi-duoi', Math.max(14, lech + khung.clientWidth * 0.5 - 7).toFixed(1) + 'px') // tâm mũi nhọn (14 px) = giữa đầu
       vao.appendChild(el)
       if (tinh || giam || dung) { da.textContent = chu; if (tinh) return g } else con.textContent = chu
       if (typeof el.animate === 'function') el.animate([{ opacity: 0, transform: 'scale(.6)' }, { opacity: 1, transform: 'scale(1.05)', offset: 0.65 }, { opacity: 1, transform: 'scale(1)' }], { duration: 320, easing: NAY })
