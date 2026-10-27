@@ -115,6 +115,8 @@ import { NHIP_EM_CHAM, NHIP_EM_CHUA_DEU, NHIP_EM_LUOI } from './gia/nhip-hoc-em'
 
 const thamSo = new URLSearchParams(location.search)
 const man = thamSo.get('man') ?? 'sanh'
+// NHẮC SAMSUNG 27/10: `&ua=samsung` ⇒ giả chuỗi nhận diện Samsung Internet (thẻ nhắc một lần trên Lộ trình).
+if (thamSo.get('ua') === 'samsung') Object.defineProperty(navigator, 'userAgent', { get: () => 'Mozilla/5.0 (Linux; Android 14; SM-A546E) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/26.0 Chrome/122.0.0.0 Mobile Safari/537.36' })
 // Như main.tsx: giao diện «Trong» (26/10) — cảnh thầy `gv…` = 'gv', cảnh phụ huynh không bật, còn lại (học sinh, màn thi) = 'hs'. `&trong=tat` ⇒ giao diện cũ.
 if (man !== 'ph' && !man.startsWith('ph-') && thamSo.get('trong') !== 'tat') document.documentElement.dataset.trong = man.startsWith('gv') ? 'gv' : 'hs'
 // ═══ PH CHỈ ĐỌC 26/10 (thay khối MỘT TRANG PH): `?man=ph&mot=1` = app phụ huynh «Chỉ đọc» (DocPh.tsx; bật bằng <html data-trong="ph"> như main.tsx;
