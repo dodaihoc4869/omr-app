@@ -5,7 +5,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { taoD1That, type D1That } from './_d1-that'
 import { xoaDemCauHinh } from '../server/src/cau-hinh-dem'
-import { KHOA_MAY_SOAN, NGHI_KHI_LOI_MS, THOI_HAN_KHOA_MS, chayMaySoanCron, docCoMaySoan, type SoanLo } from '../server/src/may-soan-cron'
+import { GIOI_HAN_MOI_LUOT, lucCapLaiHanMucNgay, tomLoiHanMuc, KHOA_MAY_SOAN, NGHI_KHI_LOI_MS, THOI_HAN_KHOA_MS, chayMaySoanCron, docCoMaySoan, type SoanLo } from '../server/src/may-soan-cron'
 import type { Env } from '../server/src/kieu'
 
 const NGOAI_CAO_DIEM = Date.parse('2026-10-27T03:00:00Z') // 10:00 giờ VN
@@ -58,7 +58,7 @@ describe('cờ', () => {
     datCo({ bat: true })
     const s = soanGia(() => tra({ ok: true, xong: false, conTro: 'DE|q1', dem: { dat: 1 }, ketQua: ketDat(1) }))
     await chayMaySoanCron(env, NGOAI_CAO_DIEM, { soanLo: s.fn })
-    expect(s.goi[0]).toMatchObject({ tuSuaDapAn: false, choChayGioCaoDiem: true, gioiHan: 6, nganSachGiay: 25, songSong: 3, conTro: '' })
+    expect(s.goi[0]).toMatchObject({ tuSuaDapAn: false, choChayGioCaoDiem: true, gioiHan: 24, nganSachGiay: 25, songSong: 24, conTro: '' })
     expect(s.goi[0]!.chiSuaLoi).toBeUndefined()
   })
 })
@@ -102,7 +102,10 @@ describe('vòng và con trỏ', () => {
     datCo({ bat: true })
     const ghiLech = (qid: string, cong = 'lech') => d.sql.prepare(`INSERT INTO loi_giai_so_do (qid, ma_de, version, phien_ban, ban_json, cong, tao_luc, cap_nhat_luc)
       VALUES (?, 'DE', 'v', 1, '{}', ?, 'x', 'x') ON CONFLICT(qid) DO UPDATE SET cong = excluded.cong`).run(qid, cong)
-    for (const q of ['q01', 'q02', 'q03', 'q04', 'q05', 'q06', 'q07', 'q08']) ghiLech(q)
+    // G + 2 câu lệch (G = số câu mỗi lượt): lượt sửa đầu lấy G câu, lượt sau tiếp từ con trỏ
+    const G = GIOI_HAN_MOI_LUOT
+    const ds = Array.from({ length: G + 2 }, (_, i) => `q${String(i + 1).padStart(2, '0')}`)
+    for (const q of ds) ghiLech(q)
     ghiLech('q00', 'dat')
     const s = soanGia((t, lan) => {
       if (lan === 1) return tra({ ok: true, xong: false, conTro: 'DE|q3', dem: { dat: 3, bo_qua: 2 }, ketQua: ketDat(3) })
@@ -123,18 +126,18 @@ describe('vòng và con trỏ', () => {
     expect(s.goi[1]!.conTro).toBe('DE|q3')
     expect(trangThai()).toMatchObject({ vong: 'sua', con_tro: '' })
     await luot()
-    expect(s.goi[2]).toMatchObject({ chiSuaLoi: true, tuSuaDapAn: false, qids: ['q01', 'q02', 'q03', 'q04', 'q05', 'q06'] })
+    expect(s.goi[2]).toMatchObject({ chiSuaLoi: true, tuSuaDapAn: false, qids: ds.slice(0, G) })
     expect(trangThai()).toMatchObject({ vong: 'sua', con_tro: 'q03' })
     await luot()
-    expect(s.goi[3]!.qids).toEqual(['q04', 'q05', 'q06', 'q07', 'q08']) // q04 KHÔNG bị bỏ qua dù q01, q02 đã rời danh sách
-    expect(trangThai()).toMatchObject({ vong: 'sua', con_tro: 'q08' })
+    expect(s.goi[3]!.qids).toEqual(ds.slice(3)) // q04 KHÔNG bị bỏ qua dù q01, q02 đã rời danh sách
+    expect(trangThai()).toMatchObject({ vong: 'sua', con_tro: ds[ds.length - 1] })
     await luot()
-    expect(s.goi).toHaveLength(4) // hết câu lệch sau q08 ⇒ chuyển xong, không gọi
+    expect(s.goi).toHaveLength(4) // hết câu lệch sau câu cuối ⇒ chuyển xong, không gọi
     expect(trangThai().vong).toBe('xong')
     expect(await luot()).toMatchObject({ chay: false, lyDo: 'da_xong' })
     expect(s.goi).toHaveLength(4)
     const dem = JSON.parse(String(trangThai().dem_json)) as Record<string, number>
-    expect(dem).toMatchObject({ luot: 4, dat: 3 + 1 + 2 + 5, lech: 1, bo_qua: 2 })
+    expect(dem).toMatchObject({ luot: 4, dat: 3 + 1 + 2 + ds.slice(3).length, lech: 1, bo_qua: 2 })
     expect(trangThai().dang_chay_den).toBe(0)
   })
 })
@@ -183,6 +186,15 @@ describe('tự hãm', () => {
       ? tra({ ok: true, xong: false, conTro: '', dem: { loi_goi: 3 }, ketQua: [1, 2, 3].map((i) => ({ qid: `q${i}`, ket: 'loi_goi', lyDo: 'HTTP 429 Resource exhausted', lanThu: 2 })) })
       : tra({ ok: true, xong: false, conTro: 'DE|q9', dem: { dat: 1, loi_goi: 1 }, ketQua: [{ qid: 'a', ket: 'dat', lanThu: 1 }, { qid: 'b', ket: 'loi_goi', lyDo: 'HTTP 429', lanThu: 2 }] }))
     let t = NGOAI_CAO_DIEM
+    // 27/10 TỰ CO GIÃN: quá tải ⇒ chia đôi số câu song song, KHÔNG đếm lỗi, lượt sau chạy ngay (24 → 12 → 6 → 3 → 2)
+    for (const ss of [12, 6, 3, 2]) {
+      t += 60_000
+      await chayMaySoanCron(env, t, { soanLo: s.fn })
+      expect(trangThai()).toMatchObject({ so_loi_lien_tiep: 0, nghi_den: 0 })
+      expect(JSON.parse(String(trangThai().dem_json)).song_song_hien).toBe(ss)
+    }
+    expect(s.goi.map((g) => g.songSong)).toEqual([24, 12, 6, 3])
+    // ở mức thấp nhất mà vẫn quá tải ⇒ mới đếm lỗi như cũ
     for (let i = 1; i <= 2; i++) { t += 60_000; await chayMaySoanCron(env, t, { soanLo: s.fn }); expect(trangThai()).toMatchObject({ so_loi_lien_tiep: i, nghi_den: 0 }) }
     t += 60_000
     expect(await chayMaySoanCron(env, t, { soanLo: s.fn })).toMatchObject({ chay: true, nghi: true })
@@ -201,6 +213,39 @@ describe('tự hãm', () => {
     kieu = 'tot'
     await chayMaySoanCron(env, t, { soanLo: s.fn })
     expect(trangThai()).toMatchObject({ so_loi_lien_tiep: 0, ly_do: null, con_tro: 'DE|q9' })
+    // lượt êm (không 429) ⇒ tăng dần +4 tới trần 24
+    const em = soanGia(() => tra({ ok: true, xong: false, conTro: 'DE|q9', dem: { dat: 1 }, ketQua: [{ qid: 'a', ket: 'dat', lanThu: 1 }] }))
+    const ds: number[] = []
+    for (let i = 0; i < 7; i++) { t += 60_000; await chayMaySoanCron(env, t, { soanLo: em.fn }); ds.push(JSON.parse(String(trangThai().dem_json)).song_song_hien) }
+    expect(ds).toEqual([6, 10, 14, 18, 22, 24, 24])
+  })
+
+  it('27/10: hết hạn mức NGÀY ⇒ nghỉ tới nửa đêm giờ Thái Bình Dương, ghi mã hạn mức (không chữ câu)', async () => {
+    datCo({ bat: true })
+    const ly = 'HTTP 429 You exceeded your current quota [quota=GenerateRequestsPerDayPerProjectPerModel-FreeTier; retry=12s]'
+    const s = soanGia(() => tra({ ok: true, xong: false, conTro: '', dem: { loi_goi: 2 }, ketQua: [1, 2].map((i) => ({ qid: `q${i}`, ket: 'loi_goi', lyDo: ly, lanThu: 2 })) }))
+    const t = NGOAI_CAO_DIEM + 60_000
+    expect(await chayMaySoanCron(env, t, { soanLo: s.fn })).toMatchObject({ chay: true, nghi: true })
+    expect(trangThai().nghi_den).toBe(lucCapLaiHanMucNgay(t))
+    expect(String(trangThai().ly_do)).toMatch(/hết hạn mức ngày \(429 GenerateRequestsPerDayPerProjectPerModel-FreeTier ×2\)/)
+    expect(String(trangThai().ly_do)).not.toMatch(/exceeded/)
+  })
+  it('27/10: tóm lỗi hạn mức + giờ cấp lại', () => {
+    expect(tomLoiHanMuc([{ ket: 'loi_goi', lyDo: 'HTTP 503 overloaded' }, { ket: 'dat' }, { ket: 'loi_goi', lyDo: 'HTTP 429 x [quota=GenerateRequestsPerMinutePerProjectPerModel; retry=?s]' }]))
+      .toEqual({ chu: '503 ×1, 429 GenerateRequestsPerMinutePerProjectPerModel ×1', ngay: false })
+    // 27/10/2026 06:50 VN = 26/10 16:50 PDT (UTC−7) ⇒ cấp lại 27/10 00:00 PDT = 07:00Z (+5 phút)
+    expect(new Date(lucCapLaiHanMucNgay(Date.parse('2026-10-26T23:50:00Z'))).toISOString()).toBe('2026-10-27T07:05:00.000Z')
+  })
+  it('27/10: hết giờ nghỉ cũ (bộ đếm 3, chưa có song_song_hien) mà lượt đầu lại quá tải ⇒ hạ còn 12, KHÔNG nghỉ tiếp', async () => {
+    datCo({ bat: true })
+    await chayMaySoanCron(env, NGOAI_CAO_DIEM, { soanLo: soanGia(() => tra({ ok: true, xong: false, conTro: '', dem: {}, ketQua: [] })).fn })
+    d.sql.prepare("UPDATE may_soan_trang_thai SET so_loi_lien_tiep = 3, nghi_den = ?, dem_json = '{\"dat\":37}' WHERE id = 1").run(NGOAI_CAO_DIEM + 60_000)
+    const s = soanGia(() => tra({ ok: true, xong: false, conTro: '', dem: { loi_goi: 2 }, ketQua: [1, 2].map((i) => ({ qid: `q${i}`, ket: 'loi_goi', lyDo: 'HTTP 429', lanThu: 2 })) }))
+    const t = NGOAI_CAO_DIEM + 120_000
+    expect(await chayMaySoanCron(env, t, { soanLo: s.fn })).toMatchObject({ chay: true, nghi: false })
+    expect(s.goi[0]!.songSong).toBe(24)
+    expect(trangThai()).toMatchObject({ so_loi_lien_tiep: 0 })
+    expect(JSON.parse(String(trangThai().dem_json))).toMatchObject({ dat: 37, song_song_hien: 12 })
   })
 
   it('máy soạn trả 503 (vd chưa có khoá) hoặc ném lỗi ⇒ đếm lỗi, nhả khoá, không ném ra ngoài', async () => {

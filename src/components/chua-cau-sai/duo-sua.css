@@ -1,0 +1,27 @@
+/* ── SỬA CÂU KIỂU DUOLINGO (ChuaGonDuo.tsx, thầy 27/10). Nạp LƯỜI cùng mảnh màn sửa câu; phần lớn kiểu là lớp duo-* sẵn có ở styles/trong-lam-bai.css
+   (khung, thanh tiến độ, ô 3D, đáy ghim, tấm kết quả, màn xong). Tệp này chỉ thêm hai khối riêng của màn sửa câu. Chỉ biến --tr-* có sẵn. ── */
+
+/* Trạng thái không có câu để làm (đã tự sửa từ trước / không mở được câu): Bi + tiêu đề giữa thân, nút ở đáy ghim. */
+[data-trong='hs'] .duo-sua-bao { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 40px 0 8px; text-align: center; }
+[data-trong='hs'] .duo-sua-bao h1 { margin: 4px 0 0; font-size: 24px; font-weight: 800; line-height: 1.3; color: var(--tr-chu); }
+[data-trong='hs'] .duo-sua-bao[data-tt='dung'] h1 { color: var(--tr-dung-chu); }
+[data-trong='hs'] .duo-sua-bao p { max-width: 460px; margin: 0; font-size: 15px; line-height: 1.5; color: var(--tr-chu-2); overflow-wrap: anywhere; }
+@media (orientation: landscape) and (max-height: 500px) {
+  [data-trong='hs'] .duo-sua-bao { padding-top: 12px; gap: 8px; }
+  [data-trong='hs'] .duo-sua-bao .bi { width: 84px; height: auto; }
+}
+
+/* Gợi ý trong tấm đỏ «Chưa đúng · em thử thêm một lần»: một dòng có bóng đèn, chữ thường (không đậm cả câu). */
+[data-trong='hs'] .duo-kq-chu p.duo-sua-goi-y { display: flex; align-items: flex-start; gap: 6px; margin-top: 6px; }
+[data-trong='hs'] .duo-sua-goi-y svg { flex: none; margin-top: 3px; color: var(--tr-chu-y-chu); }
+[data-trong='hs'] .duo-sua-goi-y b { color: var(--tr-chu-y-chu); }
+
+/* Sai lần 1 (chưa có đáp án — máy chủ chỉ trả gợi ý): ô em đã chọn ở Phần I tô đỏ như Duolingo (không lộ ô đúng). */
+[data-trong='hs'] .duo-sua[data-tt='sai'] .ht2-lam-tn .ht2-lam-pa[aria-checked='true'] { border-color: var(--tr-sai); background: var(--tr-sai-nhat); color: var(--tr-sai-chu); opacity: 1; }
+[data-trong='hs'] .duo-sua[data-tt='sai'] .ht2-lam-tn .ht2-lam-pa[aria-checked='true'] .ht2-lam-pa-ma { border-color: var(--tr-sai); background: var(--tr-sai); color: var(--tr-trang); }
+
+/* Dấu tròn thay Bi ở trạng thái đang mở / báo lỗi của vỏ màn (ManChuaCauSai — vỏ không kéo Bi vào mảnh nạp đầu). */
+[data-trong='hs'] .duo-sua-dau { display: grid; place-items: center; width: 88px; height: 88px; border-radius: 50%; background: var(--tr-mat-2); }
+[data-trong='hs'] .duo-sua-dau svg { fill: none; stroke: var(--tr-chu-2); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+[data-trong='hs'] .duo-sua-bao[data-tt='dung'] .duo-sua-dau { background: var(--tr-dung-nhat); }
+[data-trong='hs'] .duo-sua-bao[data-tt='dung'] .duo-sua-dau svg { stroke: var(--tr-dung); }

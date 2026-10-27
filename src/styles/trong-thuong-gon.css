@@ -5,7 +5,7 @@
    «Trắng cố định» (hạt, ánh kim) = --tr-trang ở nền sáng, --tr-chu ở nền tối (cùng cách bi.css). Chữ trên nền màu = --tr-trang (quy ước «Trong»).
    Chuyển động: chỉ transform/opacity; giảm chuyển động / máy yếu ⇒ tắt. */
 [data-trong='hs'] {
-  --tp-f: 'Nunito Variable', 'Nunito', 'Be Vietnam Pro', system-ui, sans-serif;
+  --tp-f: 'M PLUS Rounded 1c', 'Be Vietnam Pro', system-ui, sans-serif; /* phông tròn của app học sinh (trong-hs.css, 27/10) */
   --tp-trang: var(--tr-trang); --tp-den: var(--tr-chu); --tp-tren: var(--tr-trang);
   --tp-tt: color-mix(in srgb, var(--tr-tin) 78%, var(--tr-sai));
   --tp-tt-dam: color-mix(in srgb, var(--tp-tt) 82%, var(--tp-den));

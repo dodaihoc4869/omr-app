@@ -13,6 +13,9 @@
 //   · TỰ HÃM (hạn mức Gemini dùng chung với Hỏi thầy): lượt mà mọi câu đều `loi_goi`, hoặc gặp 429 / 503, hoặc lỗi ném ra ⇒ so_loi_lien_tiep++;
 //     đạt 3 ⇒ nghỉ 30 phút. Lượt có câu soạn được ⇒ về 0. Hết giờ nghỉ mà lượt đầu lại lỗi ⇒ nghỉ tiếp 30 phút (bộ đếm không xoá khi bắt đầu nghỉ).
 //   · GIỜ CAO ĐIỂM 19–24h VN: chỉ chạy khi cờ `gioCaoDiem`, và `songSong` 1.
+//   · TỰ CO GIÃN (thầy 27/10 «Ko đc quá tải làm 24 câu liên tục tới lúc xong»): số câu song song hiện tại lưu ở `dem_json.song_song_hien`.
+//     Lượt gặp 429/503 ⇒ chia đôi (24 → 12 → 6 → 3 → 2), KHÔNG tính lỗi để nghỉ khi còn hạ được; lượt êm có câu soạn được ⇒ +4 (tới SONG_SONG).
+//     Chỉ khi đã ở mức thấp nhất mà vẫn 429 mới đếm lỗi ⇒ 3 lượt liền mới nghỉ 30 phút như cũ.
 //   · TỰ SỬA ĐÁP ÁN KHO: MẶC ĐỊNH TẮT (soanSoDoLo mặc định BẬT ⇒ luôn truyền boolean rõ ràng). Lý do: lời giải chữ trong gói R2 (`loi_giai.buoc` / `chot` /
 //     `noi_dung` / `tung_pa[X].vi_sao`) là CHỮ TỰ DO vẫn tính ra đáp án cũ — chỉ đổi `dap_an` thì lời giải cũ tự mâu thuẫn. Chỉ bật khi cờ `tuSuaDapAn:true`,
 //     và lượt đó KHÔNG có chặng kiểm tra cá nhân nào đang mở (đếm theo đúng điều kiện cổng phát hành; lỗi đếm ⇒ coi như có, đóng cửa).
@@ -32,14 +35,21 @@ export function docCoMaySoan(v: string | null | undefined): CoMaySoan {
   } catch { return { bat: false, gioCaoDiem: false, tuSuaDapAn: false } }
 }
 
-/** Khoá chạy: một lượt soạn (lô 6 câu, có câu thử 4 lượt + 2 lần giải mù, mỗi lần gọi tới 60 s) thường quá 90 s ⇒ 5 phút để lượt phút sau không gọi chồng
- *  (gấp đôi chi Gemini). Máy chết giữa chừng ⇒ tối đa 5 phút là lượt sau tự giành lại. */
-export const THOI_HAN_KHOA_MS = 300_000
+/** Khoá chạy: một lượt soạn (lô 24 câu song song, có câu thử 4 lượt + 2 lần giải mù, mỗi lần gọi tới 60 s) có thể tới vài phút ⇒ khoá 8 phút để lượt
+ *  phút sau không gọi chồng (gấp đôi chi Gemini). Máy chết giữa chừng ⇒ tối đa 8 phút là lượt sau tự giành lại. */
+export const THOI_HAN_KHOA_MS = 480_000
 export const NGHI_KHI_LOI_MS = 30 * 60_000
 export const SO_LOI_DE_NGHI = 3
-export const GIOI_HAN_MOI_LUOT = 6
+export const GIOI_HAN_MOI_LUOT = 24
 export const NGAN_SACH_GIAY = 25
-export const SONG_SONG = 3
+export const SONG_SONG = 24 // 27/10 thầy «24 câu luôn»: trần 24 câu song song ngoài giờ cao điểm (429 ⇒ tự co về SONG_SONG_THAP_NHAT)
+export const SONG_SONG_THAP_NHAT = 2
+export const SONG_SONG_TANG = 4
+/** Số câu song song lượt này theo `dem_json.song_song_hien` (vắng / hỏng ⇒ trần). */
+export function songSongHien(dem: Record<string, number>): number {
+  const v = Math.floor(Number(dem.song_song_hien))
+  return Number.isFinite(v) && v >= SONG_SONG_THAP_NHAT ? Math.min(v, SONG_SONG) : SONG_SONG
+}
 
 /** Câu vòng sửa: CHÉP NGUYÊN `SQL_CAN_SUA` của soan-so-do.ts (không nạp máy soạn khi cờ tắt); test may-soan-cron-2710 giữ hai bản bằng nhau. */
 export const SQL_CAN_SUA = `cong IN ('lech', 'lo_dap_an') OR (cong = 'khong_kiem_duoc' AND ly_do = 'Câu tính thiếu sơ đồ hoặc bước tính.')`
@@ -114,6 +124,28 @@ async function cauSuaTiep(env: Env, sau: string): Promise<string[]> {
 }
 
 const RE_HAN_MUC = /\bHTTP (429|503)\b/
+/** Tóm loại lỗi hạn mức của một lượt từ lý do `loi_goi` (chỉ mã HTTP + mã hạn mức — an toàn để ghi, không có chữ câu). */
+export function tomLoiHanMuc(ketQua: readonly Obj[]): { chu: string; ngay: boolean } {
+  const loai = new Map<string, number>()
+  for (const k of ketQua) {
+    if (k.ket !== 'loi_goi') continue
+    const ly = String(k.lyDo ?? '')
+    const h = /\bHTTP (\d{3})\b/.exec(ly)?.[1]
+    if (!h) continue
+    const q = /\[quota=([\w?-]+);/.exec(ly)?.[1]
+    const ten = `${h}${q && q !== '?' ? ` ${q}` : ''}`
+    loai.set(ten, (loai.get(ten) ?? 0) + 1)
+  }
+  const ds = [...loai.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3)
+  return { chu: ds.map(([t, n]) => `${t} ×${n}`).join(', '), ngay: ds.some(([t]) => /PerDay/i.test(t)) }
+}
+/** Giờ Google cấp lại hạn mức NGÀY: nửa đêm giờ Thái Bình Dương sắp tới (+5 phút cho chắc). */
+export function lucCapLaiHanMucNgay(nowMs: number): number {
+  const f = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Los_Angeles', hourCycle: 'h23', hour: '2-digit', minute: '2-digit', second: '2-digit' })
+  const p = Object.fromEntries(f.formatToParts(nowMs).map((x) => [x.type, x.value]))
+  const daQua = ((Number(p.hour) % 24) * 3600 + Number(p.minute) * 60 + Number(p.second)) * 1000 + (nowMs % 1000)
+  return nowMs - daQua + 86_400_000 + 5 * 60_000
+}
 /** Cùng mẫu `RE_QID` của soan-so-do.ts (`docThamSo`): một qid sai mẫu làm CẢ lô `qids` trả 400 ⇒ lọc trước, qid sai mẫu bị bước qua. */
 const RE_QID = /^[A-Za-z0-9][A-Za-z0-9._~:-]{0,120}$/
 const ngan = (s: string) => s.replace(/\s+/g, ' ').slice(0, 160)
@@ -155,9 +187,12 @@ export async function chayMaySoanCron(env: Env, nowMs: number, phu: PhuMaySoan =
     let soLoi = tt.soLoiLienTiep
     let lyDo: string | null = null
     let daXuLy = 0
+    let nghiNgay = 0
+    const ssTruoc = songSongHien(dem)
+    let ss = ssTruoc
 
     const thamChung = {
-      gioiHan: GIOI_HAN_MOI_LUOT, nganSachGiay: NGAN_SACH_GIAY, songSong: caoDiem ? 1 : SONG_SONG, choChayGioCaoDiem: true, tuSuaDapAn: tuSua,
+      gioiHan: GIOI_HAN_MOI_LUOT, nganSachGiay: NGAN_SACH_GIAY, songSong: caoDiem ? 1 : ssTruoc, choChayGioCaoDiem: true, tuSuaDapAn: tuSua,
     }
     let qidsSua: string[] | null = null
     let cuoiTrang = ''
@@ -188,7 +223,7 @@ export async function chayMaySoanCron(env: Env, nowMs: number, phu: PhuMaySoan =
         const hanMuc = r.status === 429 || r.status === 503 || ketQua.some((k) => k.ket === 'loi_goi' && RE_HAN_MUC.test(String(k.lyDo ?? '')))
         const tatCaLoiGoi = ketQua.length > 0 && ketQua.every((k) => k.ket === 'loi_goi')
         if (!r.ok || body?.ok !== true) {
-          if (r.status === 429 || r.status === 503) soLoi++
+          if (r.status === 429 || r.status === 503) soLoi++ // cả lô bị từ chối (vd chưa có khoá) — không phải Gemini quá tải từng câu
           // Vòng sửa: lô bị từ chối vì lý do khác hạn mức (vd 400) ⇒ bước qua lô, không kẹt mãi một chỗ.
           else if (vong === 'sua' && cuoiTrang) conTro = cuoiTrang
           lyDo = `máy soạn trả HTTP ${r.status}${typeof body?.ma === 'string' ? ` (${ngan(body.ma)})` : ''}`
@@ -196,8 +231,20 @@ export async function chayMaySoanCron(env: Env, nowMs: number, phu: PhuMaySoan =
           const d = (body.dem ?? {}) as Obj
           for (const [k, v] of Object.entries(d)) if (Number.isFinite(Number(v))) dem[k] = (dem[k] ?? 0) + Number(v)
           dem.luot = (dem.luot ?? 0) + 1
-          if (soDuoc > 0) { soLoi = 0; lyDo = null }
-          else if (tatCaLoiGoi || hanMuc) { soLoi++; lyDo = hanMuc ? 'Gemini báo hết hạn mức (429/503)' : 'mọi câu trong lượt đều lỗi gọi mô hình' }
+          const hm = tomLoiHanMuc(ketQua)
+          if (hm.ngay && soDuoc === 0) {
+            // Hết hạn mức NGÀY: co số câu không giúp gì ⇒ nghỉ tới giờ cấp lại, không đốt lượt.
+            nghiNgay = lucCapLaiHanMucNgay(nowMs)
+            lyDo = `Gemini hết hạn mức ngày (${hm.chu}) ⇒ nghỉ tới ${new Date(nghiNgay + 7 * 3_600_000).toISOString().slice(11, 16)} giờ VN`
+          } else if (hanMuc && !caoDiem && ss > SONG_SONG_THAP_NHAT) {
+            // Quá tải ⇒ co lại, lượt sau chạy tiếp ngay (không nghỉ 30 phút).
+            ss = Math.max(SONG_SONG_THAP_NHAT, Math.floor(ss / 2))
+            soLoi = 0 // còn hạ được ⇒ không phải lỗi; xoá cả bộ đếm cũ (vd 3 từ trước bản co giãn) để không nghỉ 30 phút oan
+            lyDo = `Gemini báo quá tải${hm.chu ? ` (${hm.chu})` : ''} ⇒ hạ còn ${ss} câu song song`
+          } else if (soDuoc > 0) {
+            soLoi = 0; lyDo = null
+            if (!hanMuc && !caoDiem) ss = Math.min(SONG_SONG, ss + SONG_SONG_TANG)
+          } else if (tatCaLoiGoi || hanMuc) { soLoi++; lyDo = hanMuc ? `Gemini báo hết hạn mức${hm.chu ? ` (${hm.chu})` : ' (429/503)'}` : 'mọi câu trong lượt đều lỗi gọi mô hình' }
           const xong = body.xong === true
           if (vong === 'chinh') {
             if (xong) { vong = 'sua'; conTro = ''; lyDo = lyDo ?? 'xong vòng chính, sang vòng sửa câu lệch' } else conTro = String(body.conTro ?? conTro)
@@ -211,8 +258,10 @@ export async function chayMaySoanCron(env: Env, nowMs: number, phu: PhuMaySoan =
       }
     }
 
+    dem.song_song_hien = ss
     let nghiDen = tt.nghiDen
-    if (soLoi >= SO_LOI_DE_NGHI) {
+    if (nghiNgay) nghiDen = nghiNgay
+    else if (soLoi >= SO_LOI_DE_NGHI) {
       nghiDen = nowMs + NGHI_KHI_LOI_MS
       lyDo = `nghỉ 30 phút sau ${soLoi} lượt lỗi liên tiếp${lyDo ? ` — ${lyDo}` : ''}`
     }

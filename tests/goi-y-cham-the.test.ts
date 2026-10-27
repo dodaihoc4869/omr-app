@@ -75,6 +75,19 @@ describe('thẻ Đề hỏi', () => {
     expect(chung.ten).toBe('Đề hỏi điều SAI')
     expect(JSON.stringify(chung)).not.toMatch(/ba phương án/)
   })
+  it('27/10: thẻ Đề hỏi không có câu chỉ nhắc lại chữ đề', () => {
+    const ds = [
+      cham('Chất nào sau đây là chất điện li mạnh?', 'Chất nào sau đây'),
+      cham('Cho các phát biểu sau về ester. Số phát biểu đúng là', 'Số phát biểu đúng là'),
+      cham('Cho 0,1 mol glucose lên men. Tính khối lượng ethanol thu được.', 'Tính khối lượng'),
+      cham(DE_ESTER, 'Giá trị của m là'),
+    ]
+    for (const t of ds) {
+      expect(t).not.toBeNull()
+      expect(t!.doan.length).toBeGreaterThan(0)
+      for (const c of t!.doan) expect(c).not.toMatch(/^«/)
+    }
+  })
   it('«nào sau đây», «Số … là», «Tính …»', () => {
     expect(cham('Chất nào sau đây là chất điện li mạnh?', 'Chất nào sau đây')?.ten).toBe('Đề hỏi chọn một phương án')
     expect(cham('Cho các phát biểu sau về ester. Số phát biểu đúng là', 'Số phát biểu đúng là')?.ten).toBe('Đề hỏi đếm')

@@ -9,6 +9,7 @@ type Giong = { t: number; f: number; f2?: number; d: number; a?: number; g: numb
 const CHUONG: [number, number][] = [[1, 1], [2, 0.32], [3, 0.12], [4.2, 0.05]] // chuông thuỷ tinh
 const MEM: [number, number][] = [[1, 1], [3, 0.08]] // tròn, ấm
 const BO = { C5: 523.25, E5: 659.25, G5: 783.99, A4: 440, F4: 349.23, C6: 1046.5, E6: 1318.51, G6: 1567.98, A6: 1760, C7: 2093 }
+const chuong = (...f: number[]): Giong[] => f.map((x, i) => ({ t: i * 0.08, f: x, d: i === f.length - 1 ? 0.6 : 0.3, a: 0.004, g: 0.22, p: CHUONG }))
 export const TIENG: Record<KieuPhanHoi, Giong[]> = {
   chon: [{ t: 0, f: 520, f2: 1150, d: 0.07, a: 0.004, g: 0.22, p: [[1, 1]] }],
   dung: [
@@ -37,22 +38,8 @@ export const TIENG: Record<KieuPhanHoi, Giong[]> = {
     { t: 0, f: BO.C6, d: 0.3, a: 0.004, g: 0.2, p: CHUONG },
     { t: 0.08, f: BO.G6, d: 0.5, a: 0.004, g: 0.22, p: CHUONG },
   ],
-  // Mốc combo 27/10: cùng chuông combo (lên một nốt mỗi bậc), mốc cao thêm tiếng chuông thứ ba.
-  combo3: [
-    { t: 0, f: BO.C6, d: 0.3, a: 0.004, g: 0.2, p: CHUONG },
-    { t: 0.08, f: BO.G6, d: 0.5, a: 0.004, g: 0.22, p: CHUONG },
-  ],
-  combo5: [
-    { t: 0, f: BO.C6, d: 0.3, a: 0.004, g: 0.2, p: CHUONG },
-    { t: 0.08, f: BO.E6, d: 0.3, a: 0.004, g: 0.2, p: CHUONG },
-    { t: 0.16, f: BO.G6, d: 0.55, a: 0.004, g: 0.22, p: CHUONG },
-  ],
-  combo10: [
-    { t: 0, f: BO.C6, d: 0.3, a: 0.004, g: 0.2, p: CHUONG },
-    { t: 0.08, f: BO.E6, d: 0.3, a: 0.004, g: 0.2, p: CHUONG },
-    { t: 0.16, f: BO.G6, d: 0.3, a: 0.004, g: 0.22, p: CHUONG },
-    { t: 0.24, f: BO.C7, d: 0.8, a: 0.004, g: 0.24, p: CHUONG },
-  ],
+  // Mốc combo 27/10: chuông nối nhau lên dần (mốc cao thêm nốt); cùng nâng một nốt mỗi bậc như 'combo'.
+  combo3: chuong(BO.C6, BO.G6), combo5: chuong(BO.C6, BO.E6, BO.G6), combo10: chuong(BO.C6, BO.E6, BO.G6, BO.C7),
 }
 /** Gam trưởng (nửa cung) cho bậc combo: 0 → C, 1 → D, 2 → E … quá 7 bậc thì giữ nốt cao nhất. */
 const GAM = [0, 2, 4, 5, 7, 9, 11, 12]

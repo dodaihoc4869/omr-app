@@ -198,7 +198,7 @@ function LoiBi({ cam, loi, coBi = true }: { cam: CamBi; loi: string; coBi?: bool
     t = window.setTimeout(go, 28)
     return () => window.clearTimeout(t)
   }, [loi])
-  return <div className="bi-loi" data-khong-bi={!coBi || undefined}>{coBi && <Bi cam={cam} size={84} />}<p className="bi-loi-bong"><span className="ht2-an">{loi}</span><span aria-hidden="true">{loi.slice(0, n)}<span className="bi-loi-con">{loi.slice(n)}</span></span></p></div>
+  return <div className="bi-loi" data-khong-bi={!coBi || undefined}>{coBi && <Bi cam={cam} size={84} noi={loi} />}<p className="bi-loi-bong"><span className="ht2-an">{loi}</span><span aria-hidden="true">{loi.slice(0, n)}<span className="bi-loi-con">{loi.slice(n)}</span></span></p></div>
 }
 
 const THU_NGAN = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
