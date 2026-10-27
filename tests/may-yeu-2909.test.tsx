@@ -2,7 +2,8 @@
 import { describe, it, expect, afterEach } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { render, waitFor } from '@testing-library/react'
-import { laMayYeu, docPhienBanIos, batCheDoMayYeu, docDauHieuMay, giamHieuUng, dangCheDoMayYeu, LOP_MAY_YEU } from '../src/lib/may-yeu'
+import { laMayYeu, docPhienBanIos, batCheDoMayYeu, docDauHieuMay, giamHieuUng, dangCheDoMayYeu, LOP_MAY_YEU, KHOA_NHO_MAY_YEU } from '../src/lib/may-yeu'
+import { nhipKhungCham } from '../src/lib/do-nhip-khung'
 import ExperimentDemo from '../src/components/ExperimentDemo'
 
 const doc = (p: string) => readFileSync(p, 'utf8')
@@ -100,5 +101,31 @@ describe('bớt mã nạp sớm ở /hs', () => {
     const text = 'Trong thí nghiệm bắn phá lá vàng của Rutherford, hầu hết các hạt alpha xuyên thẳng qua lá vàng mà không bị lệch hướng. Điều này chứng tỏ:'
     const { container } = render(<ExperimentDemo text={text} />)
     expect(container.innerHTML).toContain('ex-demo')
+  })
+})
+
+describe('27/10 (thầy: «Máy yếu bị lag») — 4 GB, đo nhịp khung thật, nhớ cho lần sau', () => {
+  it('Android 4 GB 8 lõi ⇒ máy yếu; 6 GB 8 lõi ⇒ không', () => {
+    expect(laMayYeu({ boNhoGb: 4, soLoi: 8 })).toBe(true)
+    expect(laMayYeu({ boNhoGb: 6, soLoi: 8 })).toBe(false)
+  })
+  it('nhipKhungCham: trung vị > 25 ms hoặc ≥ 6 khung > 50 ms; quá ít khung ⇒ không kết luận', () => {
+    expect(nhipKhungCham(Array(60).fill(16.7))).toBe(false)
+    expect(nhipKhungCham(Array(60).fill(33))).toBe(true)
+    expect(nhipKhungCham([...Array(54).fill(16.7), ...Array(6).fill(70)])).toBe(true)
+    expect(nhipKhungCham([...Array(55).fill(16.7), ...Array(5).fill(70)])).toBe(false)
+    expect(nhipKhungCham(Array(10).fill(100))).toBe(false)
+  })
+  it('nhớ: "1" ⇒ bật ngay dù thông số tốt; "0" ⇒ không bao giờ bật dù thông số yếu', () => {
+    const voi = (nho: string | null, nav: Record<string, unknown>) => ({ ...cuaSoGia(nav), localStorage: { getItem: (k: string) => (k === KHOA_NHO_MAY_YEU ? nho : null), setItem: () => {} } }) as unknown as Window
+    expect(batCheDoMayYeu(voi('1', { deviceMemory: 8, hardwareConcurrency: 8 }))).toBe(true)
+    expect(batCheDoMayYeu(voi('0', { deviceMemory: 2, hardwareConcurrency: 2 }))).toBe(false)
+  })
+  it('đo nhịp khung chạy từ mảnh NẠP LƯỜI của cổng học sinh (không vào mảnh mở app)', () => {
+    expect(doc('src/lib/may-yeu.ts')).not.toMatch(/do-nhip-khung'/)
+    expect(doc('src/components/cong-hs-nap-luoi.ts')).toMatch(/henDoNhipKhung\(window\)/)
+  })
+  it('giám thị: máy yếu dùng tư thế tĩnh (không vòng rAF lò xo), như giảm chuyển động', () => {
+    expect(doc('src/components/giam-thi/giam-thi-nguoi.ts')).toMatch(/const giam = !tinh && \(\(typeof matchMedia[^\n]*classList\.contains\('may-yeu'\)\)/)
   })
 })

@@ -141,7 +141,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   homNay?: SoHomNay | null
 }) {
   const [phien, setPhien] = useState(''), [cau, setCau] = useState<Cau[]>([]), [viTri, setViTri] = useState(0)
-  const [tra, setTra] = useState(''), [ket, setKet] = useState<Record<string, Ket>>({}), [tai, setTai] = useState(true), [nop, setNop] = useState(false), [loi, setLoi] = useState(''), [lan, setLan] = useState(0), [xong, setXong] = useState(false), [goiY, setGoiY] = useState(false)
+  const [tra, setTra] = useState(''), [ket, setKet] = useState<Record<string, Ket>>({}), [tai, setTai] = useState(true), [nop, setNop] = useState(false), [loi, setLoi] = useState(''), [hetCau, setHetCau] = useState(''), [lan, setLan] = useState(0), [xong, setXong] = useState(false), [goiY, setGoiY] = useState(false)
   const [tuLam, setTuLam] = useState(false), [moLoiGiai, setMoLoiGiai] = useState(false), [msCau, setMsCau] = useState<Record<string, number>>({})
   const [goi7, setGoi7] = useState<TomTatGoi7 | undefined>(), [chang, setChang] = useState<number | null>(null)
   // «Làm chặng kiểu Duolingo» (thầy chốt bản vẽ docs/ban-ve-duo-2610, 26/10): CHỈ khi <html data-trong> — cùng state, cùng lệnh, cùng luồng chấm/lưu/đo giây;
@@ -229,7 +229,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   const khoa = q ? `hoc-tap:nhap:${sbd}:${q.qid}:${q.version}` : ''
   useEffect(() => {
     let huy = false
-    setTai(true); setLoi(''); setCau([]); setPhien(''); setXong(false); setKet({}); setViTri(0); setMsCau({}); setChang(null); setDem(null); setSoGoc(0); setCombo(null); daXinLamLai.current = false; soLuotDem.current++
+    setTai(true); setLoi(''); setHetCau(''); setCau([]); setPhien(''); setXong(false); setKet({}); setViTri(0); setMsCau({}); setChang(null); setDem(null); setSoGoc(0); setCombo(null); daXinLamLai.current = false; soLuotDem.current++
     // Mở chặng trước (mo-chang-truoc.ts): Hôm nay / màn xong chặng đã gọi sẵn ⇒ dùng lại đúng lượt ấy, câu hiện ngay; không có ⇒ gọi như cũ.
     void (layChangMoTruoc(token) ?? goiHoa2('hoc-tap-start', token, {}, GIAY_CHO_MO_CHANG)).then(r => {
       if (huy) return
@@ -239,7 +239,9 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       const g7 = docTomTatGoi7(r.goi7)
       setCau(ds); setSoGoc(ds.length); setPhien(typeof r.id === 'string' ? r.id : ''); setGoi7(g7)
       if (g7) setDem({ daLam: g7.daLamHomNay, muc: g7.toiThieu })
-      if (!ds.length) setLoi(typeof r.message === 'string' && r.message.trim() ? r.message : `Chưa có câu mới cho chặng này. Em về ${tenTrangChinh()} xem tiến độ.`)
+      // 27/10 (ảnh thầy: khung đỏ «Em đã hoàn thành phần được xếp hôm nay…» + «Thử lại» ⇒ em kẹt, thử lại ra đúng câu ấy): chặng rỗng KHÔNG phải lỗi —
+      // thẻ trung tính + nút về trang chính (làm mới số ở đó), không «Thử lại».
+      if (!ds.length) setHetCau(typeof r.message === 'string' && r.message.trim() ? r.message : `Chưa có câu mới cho chặng này. Em về ${tenTrangChinh()} xem tiến độ.`)
     }).catch(e => { if (!huy) setLoi(e instanceof Error ? e.message : 'Chưa tải được bài học.') }).finally(() => { if (!huy) setTai(false) })
     return () => { huy = true }
   }, [token, lan])
@@ -735,6 +737,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
           </div>
         </> : null}
         {loi && !q && <div className="ht2-lam-loi" role="alert"><span>{loi}</span><button type="button" className="ht2-lam-nut ht2-lam-nut-phu" onClick={() => setLan(n => n + 1)}><RefreshCw size={17} aria-hidden="true" />Thử lại</button></div>}
+        {hetCau && !q && !loi && <div className="ht2-lam-loi" data-tt="xong" role="status"><span>{hetCau}</span><button type="button" className="ht2-lam-nut ht2-lam-nut-phu" onClick={() => { onCapNhat(); onVe() }}>Về {tenTrangChinh()}</button></div>}
       </main>
       {day}
       {/* Bi gom thưởng ở mốc combo — không còn nhãn chữ cạnh Bi (viên thưởng chỉ bật cạnh bộ đếm) */}
@@ -804,6 +807,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
           {!traLoiPhai && ghiTraLoi}
         </> : null}
         {loi && !q && <div className="ht2-lam-loi" role="alert"><span>{loi}</span><button type="button" className="ht2-lam-nut ht2-lam-nut-phu" onClick={() => setLan(n => n + 1)}><RefreshCw size={17} aria-hidden="true" />Thử lại</button></div>}
+        {hetCau && !q && !loi && <div className="ht2-lam-loi" data-tt="xong" role="status"><span>{hetCau}</span><button type="button" className="ht2-lam-nut ht2-lam-nut-phu" onClick={() => { onCapNhat(); onVe() }}>Về {tenTrangChinh()}</button></div>}
       </main>
       {thanhDay && <div className="ht2-lam-day" role="region" aria-label="Thao tác câu" data-tra-loi={traLoiPhai ? q.phan : undefined}>
         {traLoiPhai && <div className="ht2-lam-cot-tra-loi">{daiPhai && daiKet}{khoiTraLoi}{ghiTraLoi}</div>}
