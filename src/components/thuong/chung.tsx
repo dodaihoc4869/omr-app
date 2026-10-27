@@ -31,8 +31,8 @@ export const congNgay = (iso: string, n: number): string => new Date(Date.parse(
 /** Số phút tới 00:00 giờ Việt Nam hôm sau. */
 export const phutToiNuaDem = (ms: number = Date.now()): number => { const d = vn(ms); return (24 - d.getUTCHours()) * 60 - d.getUTCMinutes() }
 export const chuGioPhut = (phut: number): string => { const g = Math.floor(phut / 60), p = phut % 60; return g > 0 ? `${g} giờ ${pad(p)} phút` : `${Math.max(1, p)} phút` }
-/** «Lê Minh Khôi» ⇒ «MK» (hai chữ cuối). */
-export const chuCai = (ten: string): string => ten.trim().split(/\s+/).slice(-2).map((x) => x[0] ?? '').join('').toUpperCase()
+/** «Lê Minh Khôi» ⇒ «MK» (hai chữ cuối) — một nguồn ở ban-gon.ts (thẻ Lộ trình dùng chung, không kéo mảnh này). */
+export { chuCai } from './ban-gon'
 
 // ───────────────────────────── lịch hẹn hiệu ứng (gỡ sạch khi rời màn)
 export function henGio() {

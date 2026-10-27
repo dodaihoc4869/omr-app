@@ -12,7 +12,7 @@ import { IcLua, IcTinhThe, Tia } from './hinh'
 import { baoMoi, useTai, useTongQuan } from './dung-thuong'
 import { Cho, DemTT, Loi, ManToan, NutDay, chuCai, ngayNgan, oTinhThe, useHieuUng, useToast } from './chung'
 import { DauVe } from './ManChuoi'
-import { hieuUngGoCua, tenNgan } from './ban-gon'
+import { hieuUngGoCua, nhanLop, tenGoi } from './ban-gon'
 
 export const LUAT_BAN = [
   'Cả hai cùng xong ít nhất 1 chặng trong ngày thì lửa đôi tăng 1. Một bạn lỡ thì lửa đôi tắt.',
@@ -30,8 +30,9 @@ function LuaDoi({ so, id }: { so: number; id?: string }) {
 }
 const HOM_NAY_CHU = (b: BanHoc) => ({
   ca_hai: { Ic: CheckCircle2, chu: 'Hôm nay cả hai đã xong' },
-  ban_chua: { Ic: Clock, chu: `${tenNgan(b.ten)} chưa học hôm nay` },
-  em_chua: { Ic: Flame, chu: `${tenNgan(b.ten)} đã học · còn chờ em 1 chặng` },
+  // tên đủ đã đứng ngay trên (đầu thẻ) ⇒ dòng trạng thái gọi «Bạn», không lặp họ tên dài (27/10)
+  ban_chua: { Ic: Clock, chu: 'Bạn chưa học hôm nay' },
+  em_chua: { Ic: Flame, chu: 'Bạn đã học · còn chờ em 1 chặng' },
   ca_hai_chua: { Ic: Clock, chu: 'Hôm nay cả hai chưa học' },
 }[b.homNay])
 
@@ -49,20 +50,20 @@ function TheBan({ b, i, token, bao }: { b: BanHoc; i: number; token?: string; ba
     setDangGo(false)
     if (!r.ok) return bao(r.chu)
     setDaGo(true)
-    bao(`Đã gõ cửa ${tenNgan(b.ten)}.`)
+    bao(`Đã gõ cửa ${tenGoi(b.ten)}.`)
   }
   const thoi = async () => {
     if (!token) return
     const r = await thoiHocCung(token, b.ma)
     if (!r.ok) return bao(r.chu)
-    bao(`Đã thôi học cùng ${tenNgan(b.ten)}.`)
+    bao(`Đã thôi học cùng ${tenGoi(b.ten)}.`)
     void lamMoiBan(token)
   }
   const tt = HOM_NAY_CHU(b)
   const ke = MOC_DOI.find((m) => m.so > b.chuoiDoi)
   return <section className="tp-the tp-the-ban" aria-label={b.ten} data-ban={b.ma}>
     <div className="tp-ban-dau"><span className="tp-av" data-k={String((i % 4) + 1)} aria-hidden="true">{chuCai(b.ten)}</span>
-      <div className="giua"><b>{b.ten}</b><span>{[b.lop, b.tuNgay && `học cùng từ ${ngayNgan(b.tuNgay)}`].filter(Boolean).join(' · ')}</span></div>
+      <div className="giua"><b>{b.ten}</b><span>{[nhanLop(b.lop), b.tuNgay && `học cùng từ ${ngayNgan(b.tuNgay)}`].filter(Boolean).join(' · ')}</span></div>
       <LuaDoi so={b.chuoiDoi} id={`tp-doi-${b.ma}`} /></div>
     <div className="tp-tt-nay" data-k={b.homNay}><tt.Ic aria-hidden="true" /><span>{tt.chu}</span>
       {b.homNay === 'ban_chua' && token && <button ref={nut} type="button" className="tp-nut" data-sac={daGo ? 'tat' : 'tt'} disabled={daGo || dangGo} onClick={() => void go()}>{daGo ? 'Đã gõ cửa' : 'Gõ cửa'}</button>}</div>
@@ -72,7 +73,7 @@ function TheBan({ b, i, token, bao }: { b: BanHoc; i: number; token?: string; ba
       <span className="tp-mo" style={{ fontSize: 12.5 }}>còn {ke.so - b.chuoiDoi} ngày · cả hai nhận huy hiệu đôi</span>
     </div>}
     {token && <div className="tp-ban-chan">{hoiThoi
-      ? <><button type="button" className="tp-nut-chu" onClick={() => setHoiThoi(false)}>Giữ lại</button><button type="button" className="tp-nut" onClick={() => void thoi()}>Thôi học cùng {tenNgan(b.ten)}</button></>
+      ? <><button type="button" className="tp-nut-chu" onClick={() => setHoiThoi(false)}>Giữ lại</button><button type="button" className="tp-nut" onClick={() => void thoi()}>Thôi học cùng {tenGoi(b.ten)}</button></>
       : <button type="button" className="tp-nut-chu" onClick={() => setHoiThoi(true)}>Thôi học cùng</button>}</div>}
   </section>
 }
@@ -108,7 +109,7 @@ export function ManHocCungBan({ token, onVe, onMoi, onHoc }: { token?: string; o
     setDangTra('')
     if (!r.ok) return bao(r.chu)
     if (dongY) phanHoiThuong('chuoi')
-    bao(dongY ? `Em đã học cùng ${tenNgan(n.ten)}.` : 'Đã để lời mời lại sau.')
+    bao(dongY ? `Em đã học cùng ${tenGoi(n.ten)}.` : 'Đã để lời mời lại sau.')
     void lamMoiBan(token)
   }
   const con = Math.max(0, ds.toiDa - ds.ban.length - ds.daMoi.length)
@@ -119,7 +120,7 @@ export function ManHocCungBan({ token, onVe, onMoi, onHoc }: { token?: string; o
     <div><h1 className="tp-tieu">Học cùng bạn</h1><p className="tp-phu" style={{ marginTop: 4 }}>Lửa đôi chỉ tăng khi cả hai cùng xong ít nhất 1 chặng trong ngày.</p></div>
     {ds.loiMoi.map((n, i) => <section key={n.ma} className="tp-the" aria-label={`Lời mời của ${n.ten}`}>
       <div className="tp-ban-dau"><span className="tp-av" data-k={String((i % 4) + 1)} aria-hidden="true">{chuCai(n.ten)}</span>
-        <div className="giua"><b>{n.ten} mời em học cùng</b><span>{n.lop}</span></div></div>
+        <div className="giua"><b>{n.ten} mời em học cùng</b><span>{nhanLop(n.lop)}</span></div></div>
       {token && <div className="tp-ban-chan"><button type="button" className="tp-nut-chu" disabled={!!dangTra} onClick={() => void tra(n, false)}>Để sau</button>
         <button type="button" className="tp-nut" data-sac="chinh" disabled={!!dangTra} onClick={() => void tra(n, true)}>Đồng ý</button></div>}
     </section>)}
@@ -127,7 +128,7 @@ export function ManHocCungBan({ token, onVe, onMoi, onHoc }: { token?: string; o
       {ds.ban.map((b, i) => <TheBan key={b.ma} b={b} i={i} token={token} bao={bao} />)}
       {ds.daMoi.map((n, i) => <section key={n.ma} className="tp-the tp-the-ban" aria-label={`Đã mời ${n.ten}`}>
         <div className="tp-ban-dau"><span className="tp-av" data-k={String(((ds.ban.length + i) % 4) + 1)} aria-hidden="true">{chuCai(n.ten)}</span>
-          <div className="giua"><b>{n.ten}</b><span>{n.lop}</span></div></div>
+          <div className="giua"><b>{n.ten}</b><span>{nhanLop(n.lop)}</span></div></div>
         <div className="tp-tt-nay" data-k="ca_hai_chua"><Clock aria-hidden="true" /><span>Đã gửi lời mời · chờ bạn đồng ý</span></div>
       </section>)}
       {con > 0 && <div className="tp-trong-ban" role="group" aria-label="Mời thêm bạn">
@@ -170,7 +171,7 @@ export function ManMoiBan({ token, onDong, q: qDau = '' }: { token?: string; onD
     phanHoiThuong('gui')
     const rr = e.getBoundingClientRect(); bungHat([rr.left + rr.width / 2, rr.top], { n: 6, r: 40, mau: ['tt', 'trang'] })
     setKq((ds) => ds?.map((y) => (y.ma === x.ma ? { ...y, trangThai: x.trangThai === 'moi_em' ? 'ban' : 'da_moi' } : y)) ?? null)
-    bao(x.trangThai === 'moi_em' ? `Em đã học cùng ${tenNgan(x.ten)}.` : `Đã gửi lời mời tới ${tenNgan(x.ten)}.`)
+    bao(x.trangThai === 'moi_em' ? `Em đã học cùng ${tenGoi(x.ten)}.` : `Đã gửi lời mời tới ${tenGoi(x.ten)}.`)
     void lamMoiBan(token)
   }
   const day = con === 0
@@ -185,7 +186,7 @@ export function ManMoiBan({ token, onDong, q: qDau = '' }: { token?: string; onD
         {kq.length === 0 ? <p className="tp-phu">Chưa thấy bạn nào tên «{q.trim()}» trong trung tâm. Em thử gõ số báo danh nhé.</p>
           : <div className="tp-kq-tim">{kq.map((x, i) => <div key={x.ma} className="dong-b">
             <span className="tp-av" data-k={String((i % 4) + 1)} aria-hidden="true">{chuCai(x.ten)}</span>
-            <div className="giua"><b>{x.ten}</b><span>{[x.lop, x.sbd && `SBD ${x.sbd}`].filter(Boolean).join(' · ')}</span></div>
+            <div className="giua"><b>{x.ten}</b><span>{[nhanLop(x.lop), x.sbd && `SBD ${x.sbd}`].filter(Boolean).join(' · ')}</span></div>
             {x.trangThai === 'ban' ? <button type="button" className="tp-nut" data-sac="tat" disabled>Đang học cùng</button>
               : x.trangThai === 'da_moi' ? <button type="button" className="tp-nut" data-sac="tat" disabled>Đã gửi lời mời</button>
               : <button type="button" className="tp-nut" data-sac={day ? 'tat' : 'tt'} disabled={day || !!dang} onClick={(e) => void moi(x, e.currentTarget)}>{x.trangThai === 'moi_em' ? 'Đồng ý' : 'Mời'}</button>}
@@ -228,7 +229,7 @@ export function ManLoiMoi({ tb, token, onDong }: { tb: ThongBao; token?: string;
       <div className="cot-a">
         <div className="tp-hai-av"><span ref={a1} className="tp-av" data-k="1" aria-hidden="true">{chuCai(ten)}</span><span ref={lua} className="lua-g" aria-hidden="true"><IcLua /></span><span ref={a2} className="tp-av" data-k="0" aria-hidden="true">Em</span></div>
         <h1>{ten} mời em học cùng</h1>
-        <p className="tp-phu">{lop ? `${lop} · ` : ''}Mỗi ngày cả hai cùng xong ít nhất 1 chặng thì ngọn lửa đôi cháy thêm 1 ngày.</p>
+        <p className="tp-phu">{lop ? `${nhanLop(lop)} · ` : ''}Mỗi ngày cả hai cùng xong ít nhất 1 chặng thì ngọn lửa đôi cháy thêm 1 ngày.</p>
       </div>
       <div className="cot-b">
         <section className="tp-the" aria-label="Học cùng là gì">
@@ -287,7 +288,7 @@ export function BaoGoCua({ tb, onHoc, onDong }: { tb: ThongBao; onHoc?: () => vo
   useHieuUng(() => { phanHoiThuong('goCua'); hoatAnh(ref.current, [{ transform: 'translate(-50%, 40px)', opacity: 0 }, { transform: 'translate(-50%, 0)', opacity: 1 }], 300) }, [])
   if (!ten) return null
   return <div ref={ref} className="tp-goc tp-toast" role="status">
-    <span>{tenNgan(ten)} gõ cửa: bạn đã học xong, chờ em 1 chặng để giữ lửa đôi.</span>
+    <span>{tenGoi(ten)} gõ cửa: bạn đã học xong, chờ em 1 chặng để giữ lửa đôi.</span>
     {onHoc && <button type="button" className="tp-nut-chu" onClick={() => { onDong(); onHoc() }}>Học ngay</button>}
     <button type="button" className="tp-nut-chu" onClick={onDong}>Đóng</button>
   </div>

@@ -571,7 +571,7 @@ export default defineConfig({
             { name: 'bai-tap-pdf', test: /src[\\/](?:lib[\\/](?:bai-tap-pdf|dang-cau|goi-len-bang|loc-cau-rut|loc-sao)|data[\\/]examContent)\.ts$/, includeDependenciesRecursively: false },
             // Thưởng phạt 26/10: phần HIỆN NGAY (thanh trên, tấm thưởng câu, băng chuỗi đúng, lớp gọi lệnh + bản lưu máy, hình, hiệu ứng, tiếng) dùng chung bởi mảnh «Trong»
             // (Lộ trình) và màn làm bài ⇒ gom MỘT mảnh (+ một tờ CSS) thay vì Rolldown xẻ 4–5 tệp nhỏ.
-            { name: 'thuong-gon', test: /src[\\/](?:components[\\/]thuong[\\/](?:ThanhThuong|TamThuong|SoDem|hinh|dung-thuong|loc-thong-bao)\.tsx?|lib[\\/](?:thuong-api|hieu-ung-thuong|am-thanh-thuong)\.ts|styles[\\/]trong-thuong-gon\.css)$/, includeDependenciesRecursively: false },
+            { name: 'thuong-gon', test: /src[\\/](?:components[\\/]thuong[\\/](?:ThanhThuong|TamThuong|SoDem|hinh|dung-thuong|loc-thong-bao|ban-gon)\.tsx?|lib[\\/](?:thuong-api|hieu-ung-thuong|am-thanh-thuong)\.ts|styles[\\/]trong-thuong-gon\.css)$/, includeDependenciesRecursively: false },
             // …và phần dùng chung của các màn đầy đủ + màn kết bài (chung.tsx + tờ trong-thuong.css) — tên rõ để globIgnores bắt đúng (tên tự sinh `chung-*` quá chung).
             { name: 'thuong-chung', test: /src[\\/](?:components[\\/]thuong[\\/]chung\.tsx|styles[\\/]trong-thuong\.css)$/, includeDependenciesRecursively: false },
             { name: 'exam-grade', test: /src[\\/]lib[\\/](?:phan-tich-lam-bai|loai-cau-chua-dung|rut-de-chua|phan-cau-len-bang|chan-doan-cau-hinh|chan-doan|chan-doan-phieu|chong-gian-lan|phieu-du-lieu|phieu-link|exam-grade)\.ts$/, includeDependenciesRecursively: false },

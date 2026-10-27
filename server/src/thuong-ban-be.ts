@@ -6,7 +6,7 @@
 //     Giới hạn đã biết: cứu chuỗi (học bù hôm sau) cứu chuỗi CÁ NHÂN, không cứu chuỗi đôi (cron chốt ngày lỡ lúc 00:10 hôm sau, trước khi em học bù).
 //   · Mốc đôi 7/30/100 ⇒ cả hai +10/30/100 tinh thể, huy hiệu đôi, thông báo `moc_doi` (mỗi cặp mỗi mốc một lần: `moc_da`).
 //   · Gõ cửa: 1 lần/ngày/bạn (khoá chính go_cua) ⇒ thông báo `go_cua` cho bạn.
-//   · RIÊNG TƯ: chỉ trả tên rút gọn + lớp + «đã học hôm nay chưa» + số chuỗi đôi. KHÔNG điểm, KHÔNG nguyên tử, KHÔNG nhãn, KHÔNG số báo danh của bạn.
+//   · RIÊNG TƯ: chỉ trả họ tên (đủ, thầy 27/10) + lớp + «đã học hôm nay chưa» + số chuỗi đôi. KHÔNG điểm, KHÔNG nguyên tử, KHÔNG nhãn, KHÔNG số báo danh của bạn.
 //     Mã bạn = mã công khai (rowid hoc_sinh, `maCongKhai`).
 //   · Đọc: MỘT batch song song với bước kiểm mật khẩu. Ghi: khoá chống lặp ở mọi lệnh (PK / CAS trạng thái / INSERT OR IGNORE).
 import type { D1PreparedStatement, Env } from './kieu'
@@ -14,7 +14,8 @@ import { gameIdentityHaiBuoc } from './game-v2-auth'
 import { CAN_DANG_NHAP } from './on-lai-nop'
 import { ngayVn } from './su-kien-hoc'
 import { themNgay } from './ho-so-nam-kt'
-import { tenRutGon, SBD_THU_NGHIEM } from './thi-dua-hom-nay'
+import { SBD_THU_NGHIEM } from './thi-dua-hom-nay'
+import { tenDayDu } from './thuong-b-chung'
 import {
   SQL_TEN_LOP, cauHuyHieu, cauThongBao, cauTinhThe, docCongTacTuDong, ghiBangPhanA, maCongKhai, num, rowidTuMa, sqlCongTac, str, type Row,
 } from './thuong-b-chung'
@@ -98,7 +99,7 @@ export async function hsBan(env: Env, b: Row, nowMs: number = Date.now(), envDoc
     const daGo = new Set((rGo ?? []).map((x) => str(x.toi_em)))
     const ban: Row[] = [], loiMoi: Row[] = [], daMoi: Row[] = []
     for (const x of rCap ?? []) {
-      const ma = maCongKhai(x.rid), ten = tenRutGon(x.ho_ten), lop = str(x.lop), sbdBan = str(x.ban)
+      const ma = maCongKhai(x.rid), ten = tenDayDu(x.ho_ten), lop = str(x.lop), sbdBan = str(x.ban)
       if (str(x.tt) === 'dong_y') {
         const h = homNayDoi(xong(em), xong(sbdBan))
         ban.push({ ma, ten, lop, chuoiDoi: num(x.chuoi_doi) + (h === 'ca_hai' ? 1 : 0), homNay: h, daGoCua: daGo.has(sbdBan) })
@@ -139,7 +140,7 @@ export async function hsBanTim(env: Env, b: Row, envDoc: Env = env): Promise<Row
       .filter((x) => { const s = str(x.sbd); return s !== em && s !== SBD_THU_NGHIEM && (s === q || boDau(str(x.ho_ten)).includes(qd)) })
       .sort((a, c) => (str(a.sbd) === q ? -1 : 0) - (str(c.sbd) === q ? -1 : 0) || str(a.ho_ten).localeCompare(str(c.ho_ten), 'vi'))
       .slice(0, TIM_TOI_DA)
-      .map((x) => ({ ma: maCongKhai(x.rid), ten: tenRutGon(x.ho_ten), lop: str(x.lop), trangThai: trangThai.get(str(x.sbd)) ?? null }))
+      .map((x) => ({ ma: maCongKhai(x.rid), ten: tenDayDu(x.ho_ten), lop: str(x.lop), trangThai: trangThai.get(str(x.sbd)) ?? null }))
     return { ok: true, bat: true, ketQua }
   } catch (e) {
     console.error('[ban] tìm lỗi:', e instanceof Error ? e.message : e)
@@ -226,7 +227,7 @@ export async function hsBanMoi(env: Env, b: Row, nowMs: number = Date.now()): Pr
   ).bind(a, bb, em, luc).run()
   if (num(r.meta?.changes) > 0) {
     const toi = await env.DB.prepare(`SELECT rowid AS rid, ho_ten, ${SQL_TEN_LOP('hoc_sinh')} AS lop FROM hoc_sinh WHERE sbd = ?`).bind(em).first<Row>().catch(() => null)
-    await ghiBangPhanA(env, [cauThongBao(env, `moi_ban|${a}|${bb}|${luc}`, sbdBan, 'moi_ban', { ma: maCongKhai(toi?.rid), ten: tenRutGon(toi?.ho_ten), lop: str(toi?.lop) }, luc)], 'moi_ban')
+    await ghiBangPhanA(env, [cauThongBao(env, `moi_ban|${a}|${bb}|${luc}`, sbdBan, 'moi_ban', { ma: maCongKhai(toi?.rid), ten: tenDayDu(toi?.ho_ten), lop: str(toi?.lop) }, luc)], 'moi_ban')
   }
   return { ok: true, trangThai: 'da_moi' }
 }
@@ -244,7 +245,7 @@ export async function hsBanGoCua(env: Env, b: Row, nowMs: number = Date.now()): 
   const moi = num(r.meta?.changes) > 0
   if (moi) {
     const tu = await env.DB.prepare(`SELECT rowid AS rid, ho_ten, ${SQL_TEN_LOP('hoc_sinh')} AS lop FROM hoc_sinh WHERE sbd = ?`).bind(em).first<Row>().catch(() => null)
-    await ghiBangPhanA(env, [cauThongBao(env, `go_cua|${homNay}|${em}|${sbdBan}`, sbdBan, 'go_cua', { ma: maCongKhai(tu?.rid), ten: tenRutGon(tu?.ho_ten), lop: str(tu?.lop) }, luc)], 'go_cua')
+    await ghiBangPhanA(env, [cauThongBao(env, `go_cua|${homNay}|${em}|${sbdBan}`, sbdBan, 'go_cua', { ma: maCongKhai(tu?.rid), ten: tenDayDu(tu?.ho_ten), lop: str(tu?.lop) }, luc)], 'go_cua')
   }
   return { ok: true, daGoCua: true, moi }
 }
@@ -316,7 +317,7 @@ export async function cronChuoiDoi(env: Env, nowMs: number = Date.now()): Promis
       for (const [toi, tenKia] of [[v.a, v.tenB], [v.b, v.tenA]] as const) {
         cau.push(cauTinhThe(env, toi, 'moc_doi', m.tinhThe, `${v.a}|${v.b}|${m.moc}|${toi}`, luc))
         phanA.push(cauHuyHieu(env, toi, `doi_${m.moc}`, v.ngay, luc))
-        phanA.push(cauThongBao(env, `moc_doi|${v.a}|${v.b}|${m.moc}|${toi}`, toi, 'moc_doi', { moc: m.moc, tinhThe: m.tinhThe, ban: tenRutGon(tenKia) }, luc))
+        phanA.push(cauThongBao(env, `moc_doi|${v.a}|${v.b}|${m.moc}|${toi}`, toi, 'moc_doi', { moc: m.moc, tinhThe: m.tinhThe, ban: tenDayDu(tenKia) }, luc))
       }
     }
     donVi.push(cau)
