@@ -574,7 +574,7 @@ export default defineConfig({
             { name: 'bai-tap-pdf', test: /src[\\/](?:lib[\\/](?:bai-tap-pdf|dang-cau|goi-len-bang|loc-cau-rut|loc-sao|bo-cau-chuan|bo-cau-tu-bai-lam|chi-tiet-cau|exam-assign|exam-shuffle)|data[\\/]examContent)\.ts$/, includeDependenciesRecursively: false },
             // Thưởng phạt 26/10: phần HIỆN NGAY (thanh trên, tấm thưởng câu, băng chuỗi đúng, lớp gọi lệnh + bản lưu máy, hình, hiệu ứng, tiếng) dùng chung bởi mảnh «Trong»
             // (Lộ trình) và màn làm bài ⇒ gom MỘT mảnh (+ một tờ CSS) thay vì Rolldown xẻ 4–5 tệp nhỏ.
-            { name: 'thuong-gon', test: /src[\\/](?:components[\\/]thuong[\\/](?:ThanhThuong|TheVien|TamThuong|SoDem|hinh|dung-thuong|loc-thong-bao|ban-gon)\.tsx?|lib[\\/](?:thuong-api|hieu-ung-thuong|am-thanh-thuong|so-gon)\.ts|styles[\\/]trong-thuong-gon\.css)$/, includeDependenciesRecursively: false },
+            { name: 'thuong-gon', test: /src[\\/](?:components[\\/]thuong[\\/](?:ThanhThuong|TamThuong|SoDem|hinh|dung-thuong|loc-thong-bao|ban-gon)\.tsx?|lib[\\/](?:thuong-api|hieu-ung-thuong|am-thanh-thuong|so-gon)\.ts|styles[\\/]trong-thuong-gon\.css)$/, includeDependenciesRecursively: false },
             // …và phần dùng chung của các màn đầy đủ + màn kết bài (chung.tsx + tờ trong-thuong.css) — tên rõ để globIgnores bắt đúng (tên tự sinh `chung-*` quá chung).
             { name: 'thuong-chung', test: /src[\\/](?:components[\\/]thuong[\\/]chung\.tsx|styles[\\/]trong-thuong\.css)$/, includeDependenciesRecursively: false },
             // 27/10 (tốc độ cổng phụ huynh): bộ đọc lời giải một câu (`ph-moi/du-lieu-loi-giai`) nạp lười ⇒ gom vào mảnh màn chi tiết ca (nơi duy nhất dùng nó trong app)

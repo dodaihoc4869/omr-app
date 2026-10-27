@@ -42,67 +42,26 @@ function useCoBen(): boolean {
   return co
 }
 
-// ── VIÊN ĐẾM NỔI MÉP TRÁI (thầy chốt bản vẽ P2 27/10, ve-moi/thanh-doc): bỏ thanh đếm ngang trên cùng; 4 viên (vòng mục tiêu · lửa · nguyên tử · tinh thể)
-// nổi dọc mép trái, cách mép 8 px. Cuộn xuống (do EM cuộn) ⇒ thu còn biểu tượng; cuộn lên / về đầu trang ⇒ hiện lại số. Nội dung chừa lề trái 60 px
-// (8 + viên 44 + 8) ⇒ viên KHÔNG đè chữ / nút / ảnh đại diện ở màn nào. Máy tính (≥ 1024 × 600, menu là thanh trái — PR 490) ⇒ viên gộp vào thanh menu
-// (ô #tr-menu-dem). Vẽ bằng portal ra <body>: khung nội dung `.tt-vao-muc` giữ transform sau hoạt ảnh vào màn ⇒ position: fixed bên trong bị neo sai.
-const MQ_MAY_TINH = '(min-width: 1024px) and (min-height: 600px)'
-function useMayTinh(): boolean {
-  const [co, setCo] = useState(() => typeof window !== 'undefined' && !!window.matchMedia?.(MQ_MAY_TINH).matches)
-  useEffect(() => {
-    const m = window.matchMedia?.(MQ_MAY_TINH)
-    if (!m) return
-    const doi = () => setCo(m.matches)
-    doi()
-    m.addEventListener?.('change', doi)
-    return () => m.removeEventListener?.('change', doi)
-  }, [])
-  return co
-}
-/** Chỗ vẽ viên: máy tính ⇒ ô #tr-menu-dem trong thanh menu trái (chưa có ⇒ thử lại vài khung hình); còn lại ⇒ <body>. */
-function useChoVien(bat: boolean, mayTinh: boolean): HTMLElement | null {
+// ── SỐ CỦA EM TRONG HÀNG ĐẦU MENU (thầy 27/10 xem bản sống: «Ko làm hai ẩn, chuyển hết 4 biểu tượng bên trái vào menu ẩn bên phải… thiết kế tinh tế dễ nhìn
+// siêu đẹp» · «Chuyển hết vào menu này» · «Cho nó xếp dọc tinh tế bỏ nền thẳng hàng với cái chuông để ko phải thêm hàng vào menu»): bỏ viên mép trái (#501);
+// · «Ý tôi là để dọc xuống thẳng hàng cách đều dưới cái chuông»: 4 mục — vòng mục tiêu · lửa · nguyên tử · tinh thể — biểu tượng trên, số dưới, không nền,
+// thành CỘT DỌC bên phải 6 mục của MENU ĐANG CÓ, ngay dưới chuông, cùng trục (ô #tr-menu-dem của MenuDocTrong); không thêm hàng, menu rộng thêm đúng bề cột. Điện thoại / xoay ngang: menu ẩn mép phải; máy tính ≥ 1024 × 600: thanh menu trái.
+// Vẽ bằng portal vào ô ấy (menu là cây React khác); chạm ô ⇒ mở màn như cũ + menu thu (MenuDocTrong nghe click DOM của ô). Nội dung lấy lại TOÀN bộ bề ngang.
+/** Ô #tr-menu-dem trong menu (chưa vẽ xong ⇒ thử lại vài khung hình). Không có menu ⇒ không vẽ số (không chỗ nổi nào khác). */
+function useChoSo(bat: boolean): HTMLElement | null {
   const [cho, datCho] = useState<HTMLElement | null>(null)
   useLayoutEffect(() => {
     if (!bat || typeof document === 'undefined') { datCho(null); return }
-    if (!mayTinh) { datCho(document.body); return }
     let lan = 0, h = 0
     const tim = () => {
       const o = document.getElementById('tr-menu-dem')
-      if (o || lan++ > 20) datCho(o ?? document.body)
-      else h = requestAnimationFrame(tim)
+      if (o) datCho(o)
+      else if (lan++ < 30) h = requestAnimationFrame(tim)
     }
     tim()
     return () => cancelAnimationFrame(h)
-  }, [bat, mayTinh])
-  return cho
-}
-/** Thu viên khi EM cuộn xuống (chạm / con lăn / phím trong 0,8 s trước đó — Lộ trình tự cuộn tới chặng hiện tại lúc mở thì KHÔNG thu); cuộn lên ≥ 6 px
- *  hoặc về gần đầu trang (< 60 px) ⇒ hiện lại. Một thuộc tính đổi trong rAF, không đo bố cục. */
-function useThuKhiCuon(bat: boolean): boolean {
-  const [thu, datThu] = useState(false)
-  useEffect(() => {
-    if (!bat) { datThu(false); return }
-    let truoc = window.scrollY, h = 0, tay = -1e9
-    const cham = () => { tay = performance.now() }
-    const xet = () => {
-      h = 0
-      const y = window.scrollY, d = y - truoc
-      if (y < 60) { datThu(false); truoc = y; return }
-      if (Math.abs(d) < 6) return
-      if (performance.now() - tay < 800) datThu(d > 0)
-      truoc = y
-    }
-    const cuon = () => { if (!h) h = requestAnimationFrame(xet) }
-    const lop = { passive: true } as const
-    window.addEventListener('scroll', cuon, lop)
-    for (const s of ['touchmove', 'wheel', 'keydown', 'pointerdown'] as const) window.addEventListener(s, cham, lop)
-    return () => {
-      cancelAnimationFrame(h)
-      window.removeEventListener('scroll', cuon)
-      for (const s of ['touchmove', 'wheel', 'keydown', 'pointerdown'] as const) window.removeEventListener(s, cham)
-    }
   }, [bat])
-  return thu
+  return cho
 }
 
 export interface PropsMotTrang {
@@ -443,9 +402,7 @@ export function MotTrangHs(p: PropsMotTrang) {
   const chuLuatChuoi = giuHomNay ? 'hôm nay đã giữ chuỗi' : 'mỗi ngày xong ít nhất 1 chặng để giữ chuỗi'
   const [tp, setTp] = useState<{ man: TenManThuong; hieuUng?: 'chuoi' } | null>(null)
   const coBen = useCoBen()
-  const mayTinh = useMayTinh()
-  const choVien = useChoVien(coThuong, mayTinh)
-  const thuVien = useThuKhiCuon(coThuong && !mayTinh)
+  const choSo = useChoSo(coThuong)
   useEffect(() => { setTp(null) }, [p.muc])
   // Vừa nộp Kiểm tra ôn tập (lần mở trước còn khoá) ⇒ hiệu ứng vỡ khoá các chặng MỘT lần: nhớ id bài đang khoá trên máy, thấy đã nộp ⇒ chạy rồi xoá.
   const [moKt, setMoKt] = useState(false)
@@ -493,10 +450,10 @@ export function MotTrangHs(p: PropsMotTrang) {
   const pct = so && so.muc > 0 ? Math.min(100, Math.round((100 * so.daLam) / so.muc)) : 0
 
   // Thanh trên: ĐÚNG 3 bộ đếm thưởng phạt (chuỗi · nguyên tử hôm nay · tinh thể) + vòng Mục tiêu ngày (bản vẽ tp-4); thông báo thưởng chưa xem chỉ bật ở Lộ trình.
-  // Viên đếm nổi (thầy chốt P2 27/10) — xem useChoVien / useThuKhiCuon. Chưa có chỗ vẽ (lần vẽ đầu) ⇒ chưa hiện, không chớp.
-  const tren = coThuong ? choVien && createPortal(<header className="da-tren" data-vien="" data-thu={thuVien || undefined} aria-label="Số của em">
-    <ThanhThuong token={p.token} onMo={moTp} onHoc={p.onHoc} thongBao={!tp && (p.muc ?? 'hom-nay') === 'hom-nay'} vien={mayTinh && choVien !== document.body ? 'menu' : 'noi'} />
-  </header>, choVien) : <header className="da-tren" aria-label="Số của em">
+  // Khối trạng thái trong menu (thầy 27/10) — xem useChoSo. Chưa có chỗ vẽ (lần vẽ đầu) ⇒ chưa hiện, không chớp.
+  const tren = coThuong ? choSo && createPortal(<header className="da-tren" data-menu="" aria-label="Số của em">
+    <ThanhThuong token={p.token} onMo={moTp} onHoc={p.onHoc} thongBao={!tp && (p.muc ?? 'hom-nay') === 'hom-nay'} menu />
+  </header>, choSo) : <header className="da-tren" aria-label="Số của em">
     <>
     {lopSo(hs?.lop) && <span data-sac="tin" aria-label={`Khối ${lopSo(hs?.lop)}`}><GraduationCap size={22} aria-hidden="true" />{lopSo(hs?.lop)}</span>}
     <span data-sac="sao" aria-label={`Chuỗi ${chuoi} ngày đủ mức`}><Flame size={22} aria-hidden="true" />{chuoi}</span>
@@ -504,7 +461,7 @@ export function MotTrangHs(p: PropsMotTrang) {
     </>
   </header>
   // Một màn thưởng phạt đang mở (bấm bộ đếm / thẻ bên / ô Thành tích): thay nội dung mục, thanh trên + menu giữ nguyên; «Quay lại» về mục cũ.
-  if (tp && p.token) return <div className="dm-khung" data-muc="thuong" data-vien={coThuong || undefined}>{tren}<main className="tp-cam">
+  if (tp && p.token) return <div className="dm-khung" data-muc="thuong" data-so-menu={coThuong || undefined}>{tren}<main className="tp-cam">
     <Suspense fallback={<div className="tp-cam-cho" role="status" aria-busy="true" aria-label="Đang mở" />}>
       <ManThuong man={tp.man} token={p.token} hieuUng={tp.hieuUng} onVe={() => setTp(null)} onHoc={() => { setTp(null); p.onHoc() }} anPhuKien
         onMo={(m) => { if (m !== 'phu-kien' && m !== 'cuu') moTp(m) }} />
@@ -518,7 +475,7 @@ export function MotTrangHs(p: PropsMotTrang) {
   const theViec = nhip && <div className="dm-the da-viec"><h3>Chuỗi {chuoi} ngày</h3><span className="mo">Việc tiếp: {chuViecTiepHs(nhip)}</span></div>
 
   // ───── LUYỆN TẬP (mục «Ôn & sửa» cũ): mỗi việc một ô to; ô đỏ (Tự sửa lỗi còn câu) là việc nên làm trước.
-  if (p.muc === 'on-lai' && hs) return <div className="dm-khung" data-muc="luyen" data-vien={coThuong || undefined}>{tren}<main className="da-vo">
+  if (p.muc === 'on-lai' && hs) return <div className="dm-khung" data-muc="luyen" data-so-menu={coThuong || undefined}>{tren}<main className="da-vo">
     <h1 className="da-tieu">Luyện tập</h1>
     <OTo ten="Tự sửa lỗi" mo={p.soSua === 0 ? 'Không còn câu cần sửa' : 'Câu em làm sai'} sac="sai" Icon={Wrench} so={coSua ? <>{p.soSua}<small className="so-dv">câu</small></> : undefined} noi={coSua} onClick={p.onChua} />
     {kiem && <OTo ten="Kiểm tra ôn tập" mo={chuKiem(kiem)} sac="tin" Icon={Target} so={<>{kiem.daTra}/{kiem.tong}<small className="so-dv">câu</small></>} onClick={(kiemLam || kiemXong) && p.onKiemTra ? p.onKiemTra : undefined} tat={p.coCa} />}
@@ -537,7 +494,7 @@ export function MotTrangHs(p: PropsMotTrang) {
       { ten: '7 ngày liền', sac: 'sao', Icon: Flame, co: chuoi >= 7 },
       { ten: '30 ngày liền', sac: 'chu-y', Icon: Trophy, co: chuoi >= 30 },
     ]
-    return <div className="dm-khung" data-muc="thanh-tich" data-vien={coThuong || undefined}>{tren}<main className="da-vo">
+    return <div className="dm-khung" data-muc="thanh-tich" data-so-menu={coThuong || undefined}>{tren}<main className="da-vo">
       <h1 className="da-tieu">Thành tích</h1>
       <div className="da-cot">{/* ngang / máy tính: hai cột (chuỗi · tuần · việc tiếp | huy hiệu · điểm); dọc: display: contents */}
       <div className="da-lua"><Bi cam={chuoi > 0 ? 'lua' : so && so.daLam === 0 ? 'ngu' : 'chao'} size={72} /><div><b>{chuoi} ngày</b><span>{tq?.chuoiNgay ? `Chuỗi ngày · ${chuLuatChuoi}` : <>Chuỗi ngày đủ mức{so && !du ? ` · làm ${con} câu nữa để đủ mức hôm nay` : du ? ' · hôm nay đã đủ' : ''}</>}</span></div></div>
@@ -606,7 +563,7 @@ export function MotTrangHs(p: PropsMotTrang) {
 
   // Bi đứng cạnh đường (bản vẽ nâng cấp 27/10) khi đường có ≥ 2 chặng ⇒ lời Bi phía trên chỉ còn bong bóng (không hai Bi).
   const coBiBen = chang.length >= 2
-  return <div ref={khung} className="dm-khung" data-vien={coThuong || undefined} style={{ '--tren-cao': `${trenCao}px` } as CSSProperties}>{tren}
+  return <div ref={khung} className="dm-khung" data-so-menu={coThuong || undefined} style={{ '--tren-cao': `${trenCao}px` } as CSSProperties}>{tren}
     <main className="da-vo" aria-busy={!so && p.dangTai}>
       {chinh === 'ca' && <section className="da-bang" data-sac="tin" aria-label="Ca kiểm tra đang mở"><span className="h"><ClipboardCheck size={26} aria-hidden="true" /></span><div className="giua"><b>Ca kiểm tra đang mở</b><span className="mo">Nhập mã ca và mật khẩu thầy cung cấp để vào phòng kiểm tra.</span></div><button type="button" className="nut-to" onClick={p.onThi}>Vào ca kiểm tra</button></section>}
       {du && chinh !== 'ca' && so && <section className="da-bang" data-sac="dung" aria-label="Đủ mức hôm nay"><span className="h"><Check size={26} strokeWidth={3} aria-hidden="true" /></span><div className="giua"><b>Đủ {so.daLam}/{so.muc} câu hôm nay!</b><span className="mo">{tiepTheo.length ? `Tiếp theo: ${tiepTheo.join(', rồi ')}` : 'Em có thể nghỉ, hoặc học thêm câu mới.'}</span></div></section>}
@@ -754,6 +711,15 @@ export function MenuDocTrong(p: {
     return () => { window.removeEventListener('keydown', phim); window.removeEventListener('scroll', cuon) }
   }, [mo, oNhap])
   const chon = (fn: () => void) => () => { cham(); fn() }
+  // Chạm một ô số (cây React khác vẽ portal vào ô) ⇒ tiếng chạm + menu thu như mọi mục menu (nghe click DOM, không qua sự kiện React).
+  const oSo = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const o = oSo.current
+    if (!o) return
+    const bam = (e: Event) => { if ((e.target as Element | null)?.closest?.('button')) { cham(); setMo(false) } }
+    o.addEventListener('click', bam)
+    return () => o.removeEventListener('click', bam)
+  }, [])
   return <>
     {/* Khung thấp xoay ngang: menu thu thành DẢI BIỂU TƯỢNG mép phải (3 mục + A.I + nút mở menu đủ); dọc / máy tính: display: contents ⇒ chỉ vạch cũ. */}
     <div className="tr-menu-ray">
@@ -767,12 +733,14 @@ export function MenuDocTrong(p: {
     <nav ref={the} id="tr-menu" className="tr-menu" data-mo={mo || undefined} data-dd={coDd ? '' : undefined} aria-label="Điều hướng học sinh">
       <div className="tr-menu-dau">
         <a className="tr-menu-ten" href="/hs"><img src={`${import.meta.env.BASE_URL}logo-hs-nho-v3.svg`} width={28} height={28} alt="" draggable={false} />Đỗ Đại Học</a>
+
         {/* Chuông = ĐÚNG phần tử ThongBaoHocSinh (số chưa đọc, tấm thông báo); bấm ⇒ menu thu, tấm thông báo vẫn hiện (CSS giữ tấm hiện). */}
         {p.thongBao && <div className="tr-menu-tb" onClickCapture={(e) => { if ((e.target as Element).closest?.('.m3-tb-chuong')) { cham(); dong(false) } }}>{p.thongBao}</div>}
       </div>
-      {/* máy tính: chỗ VIÊN ĐẾM gộp vào thanh menu trái (MotTrangHs vẽ portal vào đây); điện thoại: rỗng ⇒ ẩn */}
-      <div id="tr-menu-dem" className="tr-menu-dem" />
       {coDd && <KhoiDiemDanh tt={tt} ma={ma} setMa={setMa} loi={loi} setLoi={setLoi} dangGui={dangGui} gui={gui} oNhap={oNhap} />}
+      {/* SỐ CỦA EM (thầy 27/10 «để dọc xuống thẳng hàng cách đều dưới cái chuông»): cột dọc bên phải 6 mục, cùng trục với chuông — MotTrangHs vẽ portal vào
+          đây (useChoSo); chưa có số ⇒ rỗng, menu giữ một cột như cũ */}
+      <div ref={oSo} id="tr-menu-dem" className="tr-menu-dem" />
       <div className="tr-menu-ds" hidden={cai}>
         {MENU_DUO.map(({ id, ten, icon: Icon, sac }) => <button key={id} type="button" className="tr-menu-muc" onClick={chon(() => { p.onMuc(id); dong(true) })} aria-current={p.muc === id ? 'page' : undefined}><span className="tr-menu-o" data-sac={sac} aria-hidden="true"><Icon size={20} /></span>{ten}</button>)}
         {!p.coCa && <button type="button" className="tr-menu-muc" onClick={chon(() => { dong(true); p.onThi() })}><span className="tr-menu-o" data-sac="tin" aria-hidden="true"><ClipboardCheck size={20} /></span>Ca kiểm tra</button>}
