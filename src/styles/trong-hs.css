@@ -1,3 +1,4 @@
+@import './trong-hs-mau.css'; /* bảng màu tươi app học sinh 27/10 — đi cùng mảnh lười này */
 /* GIAO DIỆN «TRONG» · APP HỌC SINH — khung (menu dọc mép phải) + các màn (bản vẽ ve-moi/hs-*.html, thầy chốt 26/10). Nạp LƯỜI cùng TrongHs.tsx
    (nap-trong-hs.ts) — chỉ khi <html data-trong>.
    Chỉ dưới [data-trong]; màu chỉ var(--tr-*) (styles/trong.css). Lùi ddh.trong = 'tat' ⇒ không luật nào ở đây chạy ⇒ y giao diện cũ.
@@ -1034,8 +1035,53 @@
 [data-trong] .da-ban .giua { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 [data-trong] .da-ban .giua b { font-size: 15.5px; font-weight: 800; line-height: 1.3; color: var(--tr-chu); }
 [data-trong] .da-ban .giua span { font-size: 13.5px; line-height: 1.4; color: var(--tr-chu-2); }
-[data-trong] .da-ban-go { flex: none; min-height: 44px; padding: 0 16px; border: 0; border-radius: 14px; background: var(--tr-tin); color: var(--tr-trang); font-size: 14px; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; cursor: pointer; touch-action: manipulation; box-shadow: inset 0 -4px 0 color-mix(in srgb, var(--tr-phu) 60%, transparent); }
+[data-trong] .da-ban-go { flex: none; min-height: 44px; padding: 0 16px; border: 0; border-radius: 14px; background: var(--tr-tin-day); color: var(--tr-trang); font-size: 14px; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; cursor: pointer; touch-action: manipulation; box-shadow: inset 0 -4px 0 var(--tr-tin-chu); }
 [data-trong] .da-ban-go:disabled { background: var(--tr-mat-2); color: var(--tr-chu-3); box-shadow: none; cursor: default; }
 [data-trong] .da-ban-dong { display: grid; place-items: center; flex: none; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 12px; background: none; color: var(--tr-chu-3); cursor: pointer; }
 [data-trong] :is(.da-ban-mo, .da-ban-go, .da-ban-dong):focus-visible { outline: 3px solid var(--tr-tin); outline-offset: 2px; border-radius: 12px; }
 [data-trong] .da-ban-loi { flex: 1 1 100%; margin: 0; font-size: 13px; color: var(--tr-sai-chu); }
+
+/* ── TƯƠI 27/10 — thầy cho phép: «Màu sắc của app làm siêu tươi như dolingo». CHỈ app học sinh. Khối màu nổi (ô biểu tượng, nút lục giác, băng bài,
+ * thẻ chuỗi): màu đặc + gờ đáy MỘT TÔNG ĐẬM HƠN cùng màu (--tr-*-day), bóng phẳng — bỏ gờ xám pha --tr-phu và bóng mờ nhoè. Chữ trắng trên nền
+ * màu ⇒ bản đạt 3:1 cho chữ đậm (--tr-dung-nut · --tr-tin-day · --tr-chu-y-nut). ── */
+:root[data-trong='hs'] :is(.da-bang .h, .da-o .h, .dm-dong .h, .da-huy i[data-sac]) { box-shadow: inset 0 -4px 0 var(--d, var(--tr-vien-2)); }
+:root[data-trong='hs'] :is(.da-bang[data-sac='tin'] .h, .da-o .h[data-sac='tin'], .dm-dong .h[data-sac='tin'], .da-huy i[data-sac='tin']) { --d: var(--tr-tin-day); }
+:root[data-trong='hs'] :is(.da-bang[data-sac='dung'] .h, .da-o .h[data-sac='dung'], .dm-dong .h[data-sac='dung'], .da-huy i[data-sac='dung']) { --d: var(--tr-dung-day); }
+:root[data-trong='hs'] :is(.da-o .h[data-sac='sai'], .dm-dong .h[data-sac='sai']) { --d: var(--tr-sai-day); }
+:root[data-trong='hs'] :is(.da-o .h[data-sac='sao'], .dm-dong .h[data-sac='sao'], .da-huy i[data-sac='sao']) { --d: var(--tr-sao-day); }
+:root[data-trong='hs'] :is(.da-o .h[data-sac='chu-y'], .dm-dong .h[data-sac='chu-y'], .da-huy i[data-sac='chu-y']) { --d: var(--tr-chu-y-day); }
+:root[data-trong='hs'] .da-bang .nut-to { background: var(--tr-tin-day); box-shadow: inset 0 -4px 0 var(--tr-tin-chu); }
+:root[data-trong='hs'] .da-bai { background: var(--tr-dung-nut); box-shadow: inset 0 -5px 0 var(--tr-dung-day); }
+:root[data-trong='hs'] .da-bang { box-shadow: none; border: 2px solid var(--tr-vien); }
+:root[data-trong='hs'] .da-bang[data-sac='tin'] { background: var(--tr-tin-nhat); border-color: color-mix(in srgb, var(--tr-tin) 35%, var(--tr-vien)); }
+:root[data-trong='hs'] .da-bang[data-sac='dung'] { background: var(--tr-dung-nhat); border-color: color-mix(in srgb, var(--tr-dung) 35%, var(--tr-vien)); }
+:root[data-trong='hs'] .da-lua { background: var(--tr-chu-y-nut); box-shadow: inset 0 -5px 0 var(--tr-chu-y-day); }
+:root[data-trong='hs'] .da-nut[data-tt='xong'], :root[data-trong='hs'] .da-nut[data-loai='hoc'][data-tt='dang'] { --n-d: var(--tr-dung-day); }
+:root[data-trong='hs'] .da-nut[data-tt='khoa'] { --n-d: initial; }
+:root[data-trong='hs'] .da-nut[data-loai='kiem'] { --n-d: var(--tr-tin-day); }
+:root[data-trong='hs'] .da-nut[data-loai='sua'] { --n-d: var(--tr-sai-day); }
+:root[data-trong='hs'] .da-nut[data-loai='bt'] { --n-d: var(--tr-chu-y-day); }
+:root[data-trong='hs'] .da-nut::before { background: var(--n-d, color-mix(in srgb, var(--n) 72%, var(--tr-phu))); }
+/* nút chính toàn app học sinh: nổi khối 3D như Duolingo (gờ trong, không đẩy bố cục) */
+:root[data-trong='hs'] :is(.m3-nut-chinh, .ht-nut-chinh, .h2-nut-chinh) { box-shadow: inset 0 -3px 0 var(--tr-chinh-day); }
+/* menu dọc 6 mục (PR 424) theo bảng tươi: ô biểu tượng màu ĐẶC + gờ đáy cùng tông (biểu tượng trắng), A.I tím Duolingo phẳng (bỏ gradient);
+   thẻ «Điểm danh» đầu menu về màu chính xanh lá + nút 3D. */
+:root[data-trong='hs'] .tr-menu-o { --d: var(--tr-dung-day); background: var(--tr-dung-nut); color: var(--tr-trang); box-shadow: inset 0 -3px 0 var(--d); }
+:root[data-trong='hs'] .tr-menu-o[data-sac='chu-y'] { --d: var(--tr-chu-y-day); background: var(--tr-chu-y); color: var(--tr-trang); }
+:root[data-trong='hs'] .tr-menu-o[data-sac='sao'] { --d: var(--tr-sao-day); background: var(--tr-sao); color: var(--tr-trang); }
+:root[data-trong='hs'] .tr-menu-o[data-sac='tin'] { --d: var(--tr-tin-day); background: var(--tr-tin); color: var(--tr-trang); }
+:root[data-trong='hs'] .tr-menu-o[data-sac='xam'] { --d: var(--tr-vien-2); background: var(--tr-mat-3); color: var(--tr-chu-2); }
+:root[data-trong='hs'] .tr-menu-o.tr-o-ai { --d: var(--tr-tim-day); background: var(--tr-tim); color: var(--tr-trang); }
+:root[data-trong='hs'] .tr-menu-muc[aria-current='page'] .tr-menu-o { background: var(--tr-dung-nut); }
+:root[data-trong='hs'] .tr-menu-muc[aria-current='page'] .tr-menu-o[data-sac='chu-y'] { background: var(--tr-chu-y); }
+:root[data-trong='hs'] .tr-menu-muc[aria-current='page'] .tr-menu-o[data-sac='sao'] { background: var(--tr-sao); }
+:root[data-trong='hs'] .tr-menu-muc[aria-current='page'] .tr-menu-o[data-sac='tin'] { background: var(--tr-tin); }
+:root[data-trong='hs'] .tr-dd { border-color: color-mix(in srgb, var(--tr-chinh) 45%, transparent); background: var(--tr-chinh-nhat); color: var(--tr-chinh-chu); }
+:root[data-trong='hs'] .tr-dd-h { background: var(--tr-chinh-nut); color: var(--tr-tren-chinh); box-shadow: inset 0 -3px 0 var(--tr-chinh-day); }
+:root[data-trong='hs'] .tr-dd-nut { background: var(--tr-chinh-nut); color: var(--tr-tren-chinh); box-shadow: 0 3px 0 var(--tr-chinh-day); }
+:root[data-trong='hs'] .tr-dd-nut:active:not(:disabled) { box-shadow: 0 1px 0 var(--tr-chinh-day); }
+:root[data-trong='hs'] .tr-dd-o:focus-within > span[data-dang] { border-color: var(--tr-chinh); box-shadow: 0 0 0 3px color-mix(in srgb, var(--tr-chinh) 22%, transparent); }
+:root[data-trong='hs'] .tr-dd .tr-dd-phu b { color: var(--tr-chinh-chu); }
+/* thanh bộ đếm trên đầu (PR 431): số đậm 16,5px cùng màu biểu tượng ⇒ bản đạt 3:1 cho chữ đậm, vẫn tươi (cam / xanh lá bản «nut») */
+:root[data-trong='hs'] .da-tren .tp-tr-o[data-k='lua'] { color: var(--tr-chu-y-nut); }
+:root[data-trong='hs'] .da-tren .tp-tr-o[data-k='nt'] { color: var(--tr-dung-nut); }

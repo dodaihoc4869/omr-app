@@ -46,6 +46,9 @@ import { DUONG, docKetBai, docThuongCau, khoaTam, layTam, ngayVn, type TongQuanT
 import { BangNhac, napSanGiuChan, TamGiuChanLuoi, useGiuChan } from './GiuChan'
 import { canGiuChan, chuoiHomNay, loiBangNhac, loiDongVien, loiGiuChan, type CauDaCham } from './giu-chan'
 const KetBaiThuong = lazy(() => import('../thuong/KetBaiThuong'))
+// Giám thị theo mức câu (thầy chốt 27/10): mảnh lười + tờ riêng; ở đây chỉ phần chọn mức (nhỏ).
+const GiamThiCau = lazy(() => import('../giam-thi/GiamThi'))
+import { deDaiGiamThi, mucGiamThi } from '../giam-thi/muc-giam-thi'
 /** Trùng tên với TrongHs.SU_KIEN_MO_CHUOI (không nhập TrongHs vào mảnh màn làm bài). */
 const SU_KIEN_MO_CHUOI = 'ddh-thuong-mo-chuoi'
 // «Trong» 26/10 (nhóm 2): tờ trình bày styles/trong-lam-bai.css nạp RIÊNG, chỉ khi <html data-trong> (main.tsx gắn trước khi nạp màn) — không cộng byte lượt mở app.
@@ -523,7 +526,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     else if (dangTraLoi && duocNop && !nop) { e.preventDefault(); phanHoi('chon'); void nopCau() }
   }
   // GIỮ CHÂN (màn Duo): đã chấm ≥ 1 câu, chặng chưa xong và còn câu phải làm ⇒ X / Esc / back mở tấm thay vì thoát thẳng.
-  useEffect(() => { if (duo) napSanGiuChan() }, [duo])
+  useEffect(() => { if (duo) { napSanGiuChan(); void import('../giam-thi/GiamThi').catch(() => {}) } }, [duo]) // nạp sẵn mảnh giám thị trong lúc chờ câu
   const conLai = cau.length - viTri - (k ? 1 : 0)
   const daChamGoc: CauDaCham[] = goc.flatMap((c) => {
     const r = ket[c.qid]
@@ -588,6 +591,9 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     })() : null
     const dongVien = q && k && tt === 'sai' && !khongTinh && !laLamLai ? loiDongVien(daChamGoc) : ''
     const bangNhac = q && !xong ? loiBangNhac({ viTri: viTri, soCau: goc.length, chang, lamLai: laLamLai, daCham: !!k }) : ''
+    // Giám thị: câu có mức độ ⇒ con của mức ấy đứng cạnh đề; tấm kết quả dùng dấu tròn ✓ / ✗ thay Bi (giám thị đã phản ứng). Không mức ⇒ y cũ.
+    const mucGt = q ? mucGiamThi(q) : null
+    const ketGt = !k ? null : khongTinh ? 'chua-tinh' as const : tt === 'trung' ? 'trung' as const : tt === 'sai' ? 'sai' as const : chuoi >= 3 && !laLamLai ? 'combo' as const : 'dung' as const
     const linkGiai = q && k && !k.choThay && <button type="button" className="duo-lien" onClick={() => setMoLoiGiai(true)}><BookOpen size={18} aria-hidden="true" />Lời giải từng bước</button>
 
     const day = tai ? null
@@ -681,7 +687,11 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
             : <p className="duo-nhan" data-nc=""><span className="duo-nhan-o" aria-hidden="true">{q.phan === 'III' || soPa ? <IcMayTinh /> : <IcLapLanh />}</span><span>{q.vaiGoi7 === 'moi' ? 'Câu mới' : loai}</span>{tenBai || q.tenDang ? <span className="duo-chip" data-cong-thuc={/[A-Z][a-z]?(\d|[A-Z(])/.test(tenBai || q.tenDang || '') || undefined}><ChemText text={chuDeNgan(tenBai || q.tenDang || '')} /></span> : null}{chang ? <span className="ht2-an">Chặng {chang}</span> : null}</p>}
           {!laLamLai && <div className="duo-lenh"><h2>{lenh}</h2>{nutDen}</div>}
           {laLamLai && !k && viTri === soGoc && <p className="duo-mo-ghi">Câu cùng dạng với câu em vừa sai. Lượt này tính là có hỗ trợ.</p>}
-          <VungChamDe q={q} token={token} phien={phien} onHoTro={danhDauHoTro} nutBatDau={nutBatDau}><DeCau q={q} stt={stt} /></VungChamDe>
+          {mucGt ? <div className="duo-gt-san" data-nho={deDaiGiamThi(q) || undefined}>
+              <div className="duo-gt-nv"><Suspense fallback={null}><GiamThiCau muc={mucGt} qid={q.qid} phien={phien} nop={nop} ket={ketGt} vung={() => gocRef.current} /></Suspense></div>
+              <div className="duo-gt-bong"><VungChamDe q={q} token={token} phien={phien} onHoTro={danhDauHoTro} nutBatDau={nutBatDau}><DeCau q={q} stt={stt} /></VungChamDe></div>
+            </div>
+            : <VungChamDe q={q} token={token} phien={phien} onHoTro={danhDauHoTro} nutBatDau={nutBatDau}><DeCau q={q} stt={stt} /></VungChamDe>}
           {coDangCanh(q.text) && <MinhHoaDe text={q.text} />}
           {q.goiY && goiY && dangTraLoi && <section id="ht2-lam-goi-y" className="ht2-lam-goi-y" aria-label="Gợi ý"><b><Lightbulb size={18} aria-hidden="true" />Gợi ý</b><p>{q.goiY.cotLoi || (q.goiY.gach?.length ? `Có thể loại phương án ${q.goiY.gach.join(', ')}.` : 'Đọc lại kiến thức cốt lõi của bài.')}</p></section>}
           </div>

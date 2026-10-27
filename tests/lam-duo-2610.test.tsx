@@ -120,6 +120,8 @@ describe('hiệu ứng đúng / sai kiểu Duolingo (thầy 26/10)', () => {
     expect(goc.querySelector('.ht2-lam-pa[data-ket="dung"]')!.textContent).toContain('4')
     expect(screen.getByRole('progressbar').getAttribute('aria-valuenow')).toBe('0') // sai: thanh không tăng
     expect(goc.querySelector('.duo-loe')).toBeNull()
+    // câu có mức độ ⇒ giám thị đứng cạnh đề (thầy 27/10); dải như Duolingo — dấu tròn ×, không Bi
+    expect(goc.querySelector('.duo-gt-san')).not.toBeNull()
     expect(goc.querySelector('.duo-kq-bi')).toBeNull() // 27/10: dải như Duolingo — dấu tròn ×, không Bi
     expect(goc.querySelector('.duo-ket .duo-tick[data-sai]')).not.toBeNull()
     vi.mocked(goiHoa2).mockResolvedValueOnce({ correct: true, answer: 'B', solution: {} })

@@ -531,6 +531,8 @@ function ManLam13() {
 }
 // ═══ DUO 26/10: `lam13&lam=duo` — phiên học sinh giả trên máy (nút Hỏi thầy / Lời giải từng bước chỉ hiện khi có phiên; lệnh hỏi thầy đi bộ giả chung).
 // ═══ KIỂM GD MỚI 26/10: `lam13&lam=duo-xau` (dữ liệu xấu, gia/lam-bai-1210d.ts) cũng có phiên học sinh giả như `duo`.
+// GIÁM THỊ 27/10: `&gtloi=1` ⇒ ngẫu nhiên luôn 0: giám thị chắc chắn càu nhàu (câu đầu kho) để chụp và đo bong bóng không chồng chữ.
+if (LA_LAM13 && thamSo.get('gtloi') === '1') Math.random = () => 0
 if (LA_LAM13 && thamSo.get('lam') === 'duo-xau') try { localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tk', sbd: '12121212' })) } catch { /* bỏ qua */ }
 // ═══ hết KIỂM GD MỚI 26/10
 if (LA_LAM13 && (thamSo.get('lam') === 'duo' || thamSo.get('lam') === 'duo-nc')) try { localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tk', sbd: '12121212' })) } catch { /* bỏ qua */ }

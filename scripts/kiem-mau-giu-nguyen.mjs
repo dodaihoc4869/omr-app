@@ -20,7 +20,8 @@ import ts from 'typescript'
 const MOC = process.argv[2] || 'origin/main'
 // BẢNG MÀU THẦY ĐÃ DUYỆT (ngoại lệ ĐÓNG, liệt kê đủ đường dẫn): giao diện «Trong» — thầy 26/10/2026 «Chốt BUILD LUÔN NHÉ», bản vẽ docs/ban-ve-trong-2610.
 // Tệp này là NƠI DUY NHẤT định nghĩa bảng màu mới (--tr-*) rồi đè lên biến sẵn có dưới [data-trong]; màu cũ ở mọi tệp khác giữ nguyên.
-const BANG_MAU_THAY_DUYET = new Set(['src/styles/trong.css'])
+// 27/10: thầy cho phép «Màu sắc của app làm siêu tươi như dolingo» — bảng màu tươi CHỈ app học sinh (:root[data-trong='hs']) ở trong-hs-mau.css (nạp lười).
+const BANG_MAU_THAY_DUYET = new Set(['src/styles/trong.css', 'src/styles/trong-hs-mau.css'])
 const git = (...a) => execFileSync('git', a, { encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 })
 
 const THUOC_TINH_MAU = /^(?:color|background(?:-color|-image)?|border(?:-(?:top|right|bottom|left|block|inline)(?:-(?:start|end))?)?(?:-color)?|outline(?:-color)?|fill|stroke|stop-color|box-shadow|text-shadow|caret-color|accent-color|column-rule(?:-color)?|text-decoration(?:-color)?|--[\w-]+)$/i
@@ -211,6 +212,12 @@ const MAU_THAY_RA_LENH = new Set([
   'src/styles/tokens.css · --v2-xanh-than: #0f3d3a',
   'src/styles/tokens.css · --v2-vang: #f7a800',
   ...LENH_2110.moi,
+  // 27/10 thầy: «màu sắc của linh vật cũng siêu tươi mịn mắt như dolingo» (Boss chuyển: Tí #58CC02, Cô Cốc #CE82FF, Chú Tam #FF9600, Giáo sư Kíp #FF4B4B) —
+  // đúng BỐN màu thân của 4 giám thị, khai một chỗ; mọi sắc dẫn xuất pha color-mix từ chúng.
+  'src/components/giam-thi/giam-thi.css · --gt-mau-nb: #58cc02',
+  'src/components/giam-thi/giam-thi.css · --gt-mau-th: #ce82ff',
+  'src/components/giam-thi/giam-thi.css · --gt-mau-vd: #ff9600',
+  'src/components/giam-thi/giam-thi.css · --gt-mau-vdc: #ff4b4b',
 ])
 
 const loi = []

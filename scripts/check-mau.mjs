@@ -17,6 +17,8 @@ const CHO_PHEP = new Set([
   'styles/tokens.css',
   // Bảng màu giao diện «Trong» thầy chốt 26/10/2026 (docs/ban-ve-trong-2610): mọi mã màu của giao diện mới chỉ nằm ở đây, nơi khác dùng biến --tr-*.
   'styles/trong.css',
+  // Bảng màu «tươi» app học sinh kiểu Duolingo — thầy cho phép 27/10 «Màu sắc của app làm siêu tươi như dolingo»; chỉ :root[data-trong='hs'], nạp lười.
+  'styles/trong-hs-mau.css',
   'lib/html-phieu.ts',
   'lib/html-may-chieu.ts',
   // Bảng màu của TỜ MÁY CHIẾU (M3, 19/09): tờ là HTML rời trong iframe, có thể lưu ra tệp / mở tab riêng / chiếu từ máy khác, và nền bảng luôn TỐI
@@ -38,6 +40,8 @@ const CHO_PHEP = new Set([
   'game/than-thu-v2/LinhTam.tsx',
   'game/than-thu-v2/ImmortalShield.tsx',
   'game/than-thu-v2/ProgressChart.tsx',
+  // BẢNG MÀU LINH VẬT 4 giám thị (thầy 27/10 «tươi mịn mắt như Duolingo»): đúng 4 màu thân + đen/trắng pha bóng, là TRANH không đổi theo nền; chỉ tệp này.
+  'components/giam-thi/giam-thi.css',
 ])
 const HEX = /#[0-9a-fA-F]{3,8}\b/g
 // bỏ qua: id URL fragment kiểu "#root", tham chiếu React key… — chỉ bắt chuỗi hex thuần
