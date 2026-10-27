@@ -12,6 +12,7 @@ import worker from '../server/src/index'
 import { taoKhoOmni, themChienDich } from './omni-3-ke-hoach-chung'
 import { dongBoGoi7 } from '../server/src/goi-bai-7'
 import { SQL_BANG_HANH_TRINH } from '../server/src/hanh-trinh-hop-nhat'
+import { SQL_SAN_SANG } from '../server/src/san-sang'
 import { damBaoBangBaiDaDay, xoaDemPhamVi } from '../server/src/bai-da-day'
 import { xoaDemChienDich, xoaDemMetaCau } from '../server/src/srs2-d1'
 import { xoaDemCaBaoVe } from '../server/src/game-v2-bank'
@@ -73,6 +74,8 @@ function boDemDot(goc: Env['DB']) {
 async function kho() {
   const k = taoKhoOmni({ 'DH-B8': 24 }, 3)
   for (const q of SQL_BANG_HANH_TRINH) k.d.sql.exec(q)
+  for (const q of SQL_SAN_SANG) k.d.sql.exec(q) // bảng bản sẵn (san-sang.ts) có sẵn như bản sống
+  k.d.sql.exec('CREATE TABLE IF NOT EXISTS chien_dich_em (chien_dich_id TEXT NOT NULL, sbd TEXT NOT NULL, them_luc TEXT, bot_luc TEXT, PRIMARY KEY (chien_dich_id, sbd))') // có ở bản sống
   await damBaoBangBaiDaDay(k.env)
   const b8 = k.qids('DH-B8')
   k.d.sql.exec(`UPDATE hoc_sinh SET lop='12', ten_lop=NULL, mat_khau='mk';

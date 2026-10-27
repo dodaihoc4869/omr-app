@@ -563,7 +563,9 @@ export function tomTatGoi7(lap: NonNullable<Awaited<ReturnType<typeof lapGoi7>>>
 }
 
 /** Một đợt tối đa 6 câu; giữ các câu/phiên bản và vai ở máy chủ, không phát đáp án. */
-export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Promise<{ results: Row[] }>): Promise<Record<string,unknown> | null> {
+/** `khongLuu` (SẴN SÀNG 27/10, san-sang.ts): lập đúng chặng như lượt thật nhưng KHÔNG lưu phiên — trả `chuanBi` {refs, questions, goi7, goiIds} để nơi gọi
+ *  cất sẵn; phiên chỉ được lưu lúc em thật sự mở chặng (`moChangSanSang`). Không có kế hoạch / chặng rỗng ⇒ null. */
+export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Promise<{ results: Row[] }>, opts?: { khongLuu?: boolean }): Promise<Record<string,unknown> | null> {
   // Đợt 17: khối em + đợt cũ (và câu đã trả lời của nó) đọc SONG SONG với lập kế hoạch — trước đây nối tiếp sau `lapGoi7`. Bảng gói chắc có trước (`damBaoGoi7`).
   const khoiSom = som(docKhoiEm(env,sbd))
   // Cờ «học kiểu Duolingo» (duolingo-bai-co.ts): đọc qua đệm, bắt đầu cùng đợt đầu — không thêm vòng chờ.
@@ -595,6 +597,7 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
   try {
   if (!lap) {
     await ghiDongCo
+    if (opts?.khongLuu) return null
     // Bớt em chỉ ngừng cấp câu mới. Phiên đã cấp vẫn tiếp tục đúng payload/thứ tự, qua các cổng nguồn/khối/ca hiện hành.
     const [khoi,{old,answered},baoVe,btvn,control]=await Promise.all([khoiSom,cuSom,protectedQuestions(env),docCauBtvnChuaNop(env,sbd),readGameScope(env,sbd)])
     if (!old || !control.enabled) return null
@@ -660,6 +663,8 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
   await ghiDongCo
   if (!refs.length) return {ok:true,questions:[],goi7:tomTatGoi7(lap,now),message:lap.plan.thieuPhu&&lap.daLamNgay<lap.toiThieu?'Còn câu cần thầy bổ sung học liệu hoặc đang được giữ cho ca kiểm tra.':'Em đã hoàn thành phần được xếp hôm nay. Lỗi chưa kiểm chứng vẫn được giữ để học tiếp.'}
   const id = viec.length && refs.length === viec.length && refs.every(r => viec.some(v => v.qid === r.qid)) ? str(old!.id) : crypto.randomUUID()
+  // Lập sẵn (không lưu): đợt cũ còn nguyên bộ câu ⇒ ghi lại mã đợt ấy (`phienCu`) để lượt mở thật trả ĐÚNG đợt đó như đường thường, không tạo đợt mới.
+  if (opts?.khongLuu) return {ok:true,chuanBi:{refs,questions,goi7:tomTatGoi7(lap,now),goiIds:lap.goi.map(g=>g.id),...(id === str(old?.id) ? {phienCu:id} : {})}}
   if (id !== str(old?.id)) {
     const rs=await env.DB.prepare(`INSERT INTO game_v2_session(id,sbd,json,created_at) SELECT ?,?,?,? WHERE ${sqlCacGoiConNhan7('?','?',sqlTenLopHs('h'))}`)
       .bind(id,sbd,JSON.stringify({mode:'adventure',created:now,hoa2:1,hocTap:1,goi7:1,questions:refs}),new Date(now).toISOString(),JSON.stringify(lap.goi.map(g=>g.id)),sbd).run()

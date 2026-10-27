@@ -1,0 +1,211 @@
+// SẴN SÀNG — SẢNH + CHẶNG KẾ TIẾP CHUẨN BỊ TRƯỚC (thầy 27/10: «tức thì mọi khung giờ, không sai sót»; Boss: sảnh ≤ 2–3 đợt D1, mở chặng ≤ 2).
+//
+// Vì sao: Sảnh / Mở chặng phải LẬP KẾ HOẠCH Gói 7 (gói → câu gói + sổ → hồ sơ → khối → ghi động cơ) — 5 đợt D1 nối tiếp mỗi lần (14 ở lượt đầu ngày); giờ cao
+// điểm mỗi đợt ~1,3 s. Nay kết quả lập kế hoạch (phần Sảnh + bộ câu chặng kế tiếp, CHƯA lưu phiên) được ghi sẵn vào `hoc_tap_san_sang` NGOÀI đường chờ của em:
+// sau câu cuối của chặng, sau lượt Sảnh chậm, cron đêm. Lượt sau đọc lại cùng đợt với mật khẩu, chỉ dùng khi DẤU còn khớp.
+//
+// DẤU (`dauSanSang`): MỘT câu đọc gom mọi đầu vào của kế hoạch có thể đổi giữa hai lượt — lượt trả lời / sổ học / học cách giải / xem lời giải / đợt Tự sửa lỗi
+// / lịch kiểm tra của em; gói của em; lớp, phạm vi thầy đặt; cấu hình; kho câu (lập chỉ mục); ca thi (mở, công bố); câu nghi đáp án; BTVN; chiến dịch. Dấu khác
+// ⇒ không dùng bản sẵn (đi đường cũ, lập lại). KHÔNG gồm bảng do chính việc lập kế hoạch ghi (quota ngày, mức ngày, động cơ) — nếu không sẽ không bao giờ khớp.
+// Ngày VN khác ⇒ không dùng. Lỗi đọc (bảng chưa có…) ⇒ không dùng. Mọi thứ phụ thuộc giờ (Kiểm tra ôn tập, chuỗi ngày) nơi dùng vẫn đọc TƯƠI.
+import type { Env } from './kieu'
+import { ngayVn7 } from './goi-bai-7-loi'
+
+type Row = Record<string, unknown>
+
+export const BANG_SAN_SANG = 'hoc_tap_san_sang'
+/** Bảng (CHỈ-THÊM). `sanh_json` = phần Sảnh không phụ thuộc giờ; `chang_json` = {refs, questions (đề công khai, KHÔNG đáp án), goi7} của chặng kế tiếp CHƯA lưu phiên. */
+export const SQL_SAN_SANG: readonly string[] = [
+  `CREATE TABLE IF NOT EXISTS ${BANG_SAN_SANG} (sbd TEXT PRIMARY KEY, ngay TEXT NOT NULL, luc INTEGER NOT NULL, dau TEXT NOT NULL, sanh_json TEXT, chang_json TEXT)`,
+]
+
+/** Mốc đầu ngày VN (ISO) của `now`. */
+const dauNgayVn = (now: number) => new Date(Date.parse(new Date(now + 7 * 3600000).toISOString().slice(0, 10) + 'T00:00:00+07:00')).toISOString()
+
+/**
+ * Câu đọc DẤU. Mỗi phần là một câu con theo chỉ mục của em (hoặc bảng nhỏ dùng chung) ⇒ một lượt D1 nhẹ; chạy CÙNG đợt với mật khẩu ở nơi gọi.
+ * ?1 = sbd, ?2 = mốc đầu ngày VN (ISO).
+ */
+const PHAN_DAU: readonly (readonly [string, string, string])[] = [
+  ['a', 'game_v2_attempt', "SELECT COUNT(*)||'|'||COALESCE(MAX(created_at),'') FROM game_v2_attempt WHERE sbd=?1 AND created_at>=?2"],
+  ['s', 'su_kien_hoc', "SELECT COUNT(*)||'|'||COALESCE(MAX(COALESCE(received_at,0)),0) FROM su_kien_hoc WHERE sbd=?1"],
+  ['g', 'goi_bai_7_gap', "SELECT COUNT(*)||'|'||COALESCE(MAX(luc),'') FROM goi_bai_7_gap WHERE sbd=?1"],
+  ['lg', 'loi_giai_hoi', "SELECT COUNT(*)||'|'||COALESCE(MAX(luc),'') FROM loi_giai_hoi WHERE sbd=?1"],
+  ['cl', 'chua_loi_dot', "SELECT COUNT(*)||'|'||COALESCE(MAX(cap_nhat_luc),0) FROM chua_loi_dot WHERE sbd=?1"],
+  ['kt', 'kiem_tra_ca_nhan', "SELECT group_concat(x,',') FROM (SELECT id||'~'||ngay||'~'||trang_thai||'~'||COALESCE(nop_luc,'') AS x FROM kiem_tra_ca_nhan WHERE sbd=?1 ORDER BY id)"],
+  ['goi', 'goi_bai_7_em', "SELECT group_concat(x,',') FROM (SELECT goi_id||'~'||bat_dau||'~'||han AS x FROM goi_bai_7_em WHERE sbd=?1 ORDER BY goi_id)"],
+  ['gg', 'goi_bai_7', "SELECT COUNT(*)||'|'||COALESCE(MAX(tao_luc),'') FROM goi_bai_7"],
+  ['hs', 'hoc_sinh', "SELECT COALESCE(lop,'')||'|'||COALESCE(ten_lop,'')||'|'||COALESCE(trang_thai,'') FROM hoc_sinh WHERE sbd=?1"],
+  ['pv', 'game_v2_scope', 'SELECT json FROM game_v2_scope WHERE sbd=?1'],
+  ['ch', 'cau_hinh', "SELECT COUNT(*)||'|'||COALESCE(MAX(cap_nhat_luc),'') FROM cau_hinh"],
+  ['kho', 'game_v2_index', "SELECT COUNT(*)||'|'||COALESCE(MAX(indexed_at),'') FROM game_v2_index"],
+  ['dk', 'de_kho', "SELECT COUNT(*)||'|'||COALESCE(MAX(cap_nhat_luc),'') FROM de_kho"],
+  ['ca', 'ca', "SELECT COUNT(*)||'|'||COALESCE(MAX(cap_nhat_luc),'')||'|'||COALESCE(SUM(trang_thai='mo'),0) FROM ca"],
+  ['ng', 'cau_nghi_dap_an', "SELECT COUNT(*) FROM cau_nghi_dap_an WHERE trang_thai='nghi'"],
+  ['bt', 'btvn_em', "SELECT COUNT(*)||'|'||COALESCE(MAX(nop_luc),'') FROM btvn_em WHERE sbd=?1"],
+  ['cd', 'chien_dich', "SELECT COUNT(*)||'|'||COALESCE(SUM(length(COALESCE(sbd_json,''))+length(COALESCE(qid_json,''))+length(COALESCE(ma_de_json,''))),0)||'|'||COALESCE(MAX(tao_luc),'')||'|'||COALESCE(group_concat(trang_thai||COALESCE(han_nop,''),''),'') FROM chien_dich"],
+  ['cde', 'chien_dich_em', "SELECT COUNT(*)||'|'||COALESCE(MAX(COALESCE(them_luc,'')),'')||'|'||COALESCE(MAX(COALESCE(bot_luc,'')),'') FROM chien_dich_em WHERE sbd=?1"],
+  ['bdd', 'bai_da_day', "SELECT COUNT(*)||'|'||COALESCE(MAX(tick_luc),'') FROM bai_da_day"],
+]
+/** Câu đọc DẤU (bỏ phần của bảng chưa có — `vang`). Mỗi phần là một câu con theo chỉ mục của em (hoặc bảng nhỏ dùng chung). ?1 = sbd, ?2 = mốc đầu ngày VN. */
+export function sqlDauSanSang(vang: ReadonlySet<string> = new Set()): string {
+  return 'SELECT ' + PHAN_DAU.map(([k, bang, q]) => (vang.has(bang) ? `'-' AS ${k}` : `(${q}) AS ${k}`)).join(',\n  ')
+}
+export const SQL_DAU_SAN_SANG = sqlDauSanSang()
+
+/** Chuỗi dấu từ một dòng đọc bằng `sqlDauSanSang`. */
+export function chuoiDau(r: Row | null | undefined): string | null {
+  if (!r) return null
+  return PHAN_DAU.map(([k]) => String(r[k] ?? '')).join('§')
+}
+/** Bảng isolate này đã thấy «chưa có» (bảng tạo lúc chạy: chiến dịch theo em, câu nghi…) — phần ấy coi là rỗng; bảng có lại thì dấu đổi ⇒ lập lại, an toàn. */
+const bangVang = new Set<string>()
+
+/** Đọc DẤU hiện tại của em; lỗi (bảng chưa có…) ⇒ null (nơi gọi đi đường cũ). Không bao giờ ném. */
+export async function dauSanSang(env: Env, sbd: string, now: number): Promise<string | null> {
+  for (let lan = 0; lan < 4; lan++) {
+    try { return chuoiDau(await env.DB.prepare(sqlDauSanSang(bangVang)).bind(sbd, dauNgayVn(now)).first<Row>()) } catch (e) {
+      const m = /no such table:\s*(?:main\.)?([A-Za-z_][A-Za-z0-9_]*)/i.exec(e instanceof Error ? e.message : String(e))
+      if (!m || !PHAN_DAU.some(([, b]) => b === m[1]) || bangVang.has(m[1]!)) return null
+      bangVang.add(m[1]!)
+    }
+  }
+  return null
+}
+/** Xoá đệm bảng vắng (test). */
+export const xoaBangVangSanSang = () => bangVang.clear()
+
+export interface BanSanSang { ngay: string; luc: number; dau: string; sanh: Row | null; chang: { refs: unknown[]; questions: unknown[]; goi7: unknown } | null
+  /** Giờ (ms) của đợt học MỚI NHẤT của em lúc đọc — có đợt mới hơn bản sẵn (mở chặng chạy song song / đường cũ) ⇒ không dùng phần chặng. */ phienMoi: number }
+
+/** Bản sẵn của em (hoặc null). Không bao giờ ném. */
+export async function docSanSang(env: Env, sbd: string): Promise<BanSanSang | null> {
+  try {
+    const r = await env.DB.prepare(`SELECT ngay, luc, dau, sanh_json, chang_json, (SELECT MAX(created_at) FROM game_v2_session g WHERE g.sbd=s.sbd) AS phien_moi FROM ${BANG_SAN_SANG} s WHERE sbd=?`).bind(sbd).first<Row>()
+    if (!r) return null
+    const doc = (v: unknown) => { try { return typeof v === 'string' && v ? JSON.parse(v) : null } catch { return null } }
+    return { ngay: String(r.ngay), luc: Number(r.luc) || 0, dau: String(r.dau), sanh: doc(r.sanh_json), chang: doc(r.chang_json), phienMoi: r.phien_moi ? Date.parse(String(r.phien_moi)) || 0 : 0 }
+  } catch { return null }
+}
+
+/** Cột bản sẵn đọc KÈM câu dấu (một lệnh D1 cho cả hai — lượt Sảnh / Mở chặng không thêm lệnh nào cho phần dấu). */
+const COT_BAN = `, (SELECT ngay FROM ${BANG_SAN_SANG} WHERE sbd=?1) AS ss_ngay, (SELECT luc FROM ${BANG_SAN_SANG} WHERE sbd=?1) AS ss_luc,
+  (SELECT dau FROM ${BANG_SAN_SANG} WHERE sbd=?1) AS ss_dau, (SELECT sanh_json FROM ${BANG_SAN_SANG} WHERE sbd=?1) AS ss_sanh,
+  (SELECT chang_json FROM ${BANG_SAN_SANG} WHERE sbd=?1) AS ss_chang, (SELECT MAX(created_at) FROM game_v2_session WHERE sbd=?1) AS ss_phien_moi`
+/** DẤU + BẢN SẴN trong MỘT lệnh D1 (đường Sảnh / Mở chặng). Bảng bản sẵn chưa có ⇒ chỉ dấu. Không bao giờ ném. */
+export async function docDauVaBan(env: Env, sbd: string, now: number): Promise<[string | null, BanSanSang | null]> {
+  let coBan = !bangVang.has(BANG_SAN_SANG)
+  for (let lan = 0; lan < 5; lan++) {
+    try {
+      const r = await env.DB.prepare(sqlDauSanSang(bangVang) + (coBan ? COT_BAN : '')).bind(sbd, dauNgayVn(now)).first<Row>()
+      const dau = chuoiDau(r)
+      if (!r || !coBan || r.ss_dau == null) return [dau, null]
+      const doc = (v: unknown) => { try { return typeof v === 'string' && v ? JSON.parse(v) : null } catch { return null } }
+      return [dau, { ngay: String(r.ss_ngay), luc: Number(r.ss_luc) || 0, dau: String(r.ss_dau), sanh: doc(r.ss_sanh), chang: doc(r.ss_chang), phienMoi: r.ss_phien_moi ? Date.parse(String(r.ss_phien_moi)) || 0 : 0 }]
+    } catch (e) {
+      const m = /no such table:\s*(?:main\.)?([A-Za-z_][A-Za-z0-9_]*)/i.exec(e instanceof Error ? e.message : String(e))
+      if (m && m[1] === BANG_SAN_SANG && coBan) { coBan = false; continue } // isolate mới, bảng đang được tạo (DDL gửi cùng lúc) ⇒ lượt này chỉ dấu
+      if (!m || !PHAN_DAU.some(([, b]) => b === m[1]) || bangVang.has(m[1]!)) return [null, null]
+      bangVang.add(m[1]!)
+    }
+  }
+  return [null, null]
+}
+
+/** Bản sẵn DÙNG ĐƯỢC: cùng ngày VN, dấu khớp (dấu đọc lỗi ⇒ không). */
+export function dungDuoc(ban: BanSanSang | null, dau: string | null, ngay: string): ban is BanSanSang {
+  return !!ban && !!dau && ban.dau === dau && ban.ngay === ngay
+}
+
+/** Ghi bản sẵn (thay cả dòng). `dau` PHẢI là dấu đọc TRƯỚC khi lập kế hoạch (đổi giữa chừng ⇒ lần sau lệch dấu ⇒ lập lại, an toàn). */
+export function lenhGhiSanSang(env: Env, sbd: string, b: { ngay: string; luc: number; dau: string; sanh: Row | null; chang: BanSanSang['chang'] }) {
+  return env.DB.prepare(`INSERT INTO ${BANG_SAN_SANG}(sbd, ngay, luc, dau, sanh_json, chang_json) VALUES(?,?,?,?,?,?)
+    ON CONFLICT(sbd) DO UPDATE SET ngay=excluded.ngay, luc=excluded.luc, dau=excluded.dau, sanh_json=excluded.sanh_json, chang_json=excluded.chang_json`)
+    .bind(sbd, b.ngay, b.luc, b.dau, b.sanh ? JSON.stringify(b.sanh) : null, b.chang ? JSON.stringify(b.chang) : null)
+}
+
+/** Bỏ phần chặng đã phát (một bản sẵn chỉ thành MỘT phiên). */
+export function lenhBoChangSanSang(env: Env, sbd: string, luc: number) {
+  return env.DB.prepare(`UPDATE ${BANG_SAN_SANG} SET chang_json=NULL WHERE sbd=? AND luc=?`).bind(sbd, luc)
+}
+
+/** Phần Sảnh KHÔNG phụ thuộc giờ (Kiểm tra ôn tập / chuỗi ngày nơi dùng đọc tươi). Cùng các trường như nhánh Sảnh Gói 7 của game-v2. */
+export function phanSanh(t7: { ngay: string } & Row, con: number, daLamNgay: number): Row {
+  return { ngay: t7.ngay, goi7: t7, theLuc: { con, tong: daLamNgay + con }, dao: { con } }
+}
+
+/**
+ * CHUẨN BỊ (chạy NỀN — waitUntil / cron, không ai chờ): đọc dấu TRƯỚC, lập kế hoạch Gói 7, lập chặng kế tiếp KHÔNG lưu phiên, cất cả hai.
+ * `lapSan` (tuỳ chọn): kế hoạch vừa lập ở lượt Sảnh chậm (cùng dấu `dauSan` đọc trước khi lập) ⇒ khỏi lập lại. Không bao giờ ném.
+ */
+export async function chuanBiSanSang(env: Env, sbd: string, now: number, san?: { dau: string | null; lap: unknown }): Promise<boolean> {
+  try {
+    const { chayDdlMotLan } = await import('./ddl-mot-lan')
+    await chayDdlMotLan(env, BANG_SAN_SANG, SQL_SAN_SANG)
+    const g7 = await import('./goi-bai-7')
+    if (!(await g7.coGoi7(env)).bat) return false
+    const dau = san ? san.dau : await dauSanSang(env, sbd, now)
+    if (!dau) return false
+    const lap = (san?.lap ?? await g7.lapGoi7(env, sbd, now)) as Awaited<ReturnType<typeof g7.lapGoi7>>
+    if (!lap) return false
+    if (!san) g7.nhoLapSanh7(env, sbd, now, lap) // chặng kế tiếp dưới dùng lại đúng kế hoạch này (như mở chặng ngay sau Sảnh)
+    const con = lap.plan.viec.length, t7 = g7.tomTatGoi7(lap, now)
+    const st = await g7.startGoi7(env, sbd, now, undefined, { khongLuu: true }).catch(() => null)
+    const chang = (st?.chuanBi ?? null) as BanSanSang['chang']
+    await lenhGhiSanSang(env, sbd, { ngay: ngayVn7(now), luc: now, dau, sanh: phanSanh(t7 as { ngay: string } & Row, con, lap.daLamNgay), chang }).run()
+    return true
+  } catch (e) { console.error('[san-sang] chuẩn bị lỗi:', e instanceof Error ? e.message : e); return false }
+}
+
+/**
+ * MỞ CHẶNG TỪ BẢN SẴN: lưu phiên với đúng bộ câu đã lập (cùng cổng «gói còn nhận em» như lượt thật) và bỏ phần chặng của bản sẵn — MỘT lô D1.
+ * Không lưu được (gói vừa đổi…) ⇒ null ⇒ nơi gọi đi đường cũ.
+ */
+export async function moChangSanSang(env: Env, sbd: string, now: number, ban: BanSanSang): Promise<Record<string, unknown> | null> {
+  const c = ban.chang as (BanSanSang['chang'] & { goiIds?: unknown; phienCu?: unknown }) | null
+  if (!c || !Array.isArray(c.refs) || !c.refs.length || !Array.isArray(c.questions) || !Array.isArray(c.goiIds)) return null
+  if (ban.phienMoi >= ban.luc) return null // đợt mới hơn bản sẵn (vd. mở chặng chạy song song với Sảnh) ⇒ đường thường tự dùng lại đúng đợt ấy
+  // Đợt cũ còn nguyên (lập sẵn trả đúng đợt ấy, như đường thường): dấu khớp ⇒ chưa câu nào được trả lời từ lúc lập ⇒ trả lại đợt đó (còn hạn 2 giờ), không tạo đợt mới.
+  if (typeof c.phienCu === 'string' && c.phienCu) {
+    const cu = await env.DB.prepare("SELECT json_extract(json,'$.created') AS t FROM game_v2_session WHERE id=? AND sbd=?").bind(c.phienCu, sbd).first<Row>()
+    if (!cu || now - Number(cu.t) > 100 * 60_000) return null
+    return { ok: true, id: c.phienCu, questions: c.questions, goi7: c.goi7 }
+  }
+  const { sqlCacGoiConNhan7 } = await import('./goi-bai-7-quyen')
+  const { sqlTenLopHs } = await import('./goi-bai-7')
+  const id = crypto.randomUUID()
+  const [ins] = await env.DB.batch([
+    env.DB.prepare(`INSERT INTO game_v2_session(id,sbd,json,created_at) SELECT ?,?,?,? WHERE ${sqlCacGoiConNhan7('?', '?', sqlTenLopHs('h'))}`)
+      .bind(id, sbd, JSON.stringify({ mode: 'adventure', created: now, hoa2: 1, hocTap: 1, goi7: 1, questions: c.refs }), new Date(now).toISOString(), JSON.stringify(c.goiIds), sbd),
+    lenhBoChangSanSang(env, sbd, ban.luc),
+  ])
+  if (!Number(ins?.meta.changes)) return null
+  return { ok: true, id, questions: c.questions, goi7: c.goi7 }
+}
+
+/** Phiên `id` của em đã trả lời HẾT câu (kể cả câu làm lại cuối chặng)? — sau câu cuối mới chuẩn bị chặng kế tiếp. Lỗi ⇒ false. */
+export async function phienDaXong(env: Env, sbd: string, id: string): Promise<boolean> {
+  try {
+    const r = await env.DB.prepare(`SELECT json_array_length(s.json,'$.questions') AS n,
+        (SELECT COUNT(DISTINCT a.qid) FROM game_v2_attempt a WHERE a.session=s.id AND a.sbd=s.sbd) AS d FROM game_v2_session s WHERE s.id=? AND s.sbd=?`).bind(id, sbd).first<Row>()
+    return !!r && Number(r.n) > 0 && Number(r.d) >= Number(r.n)
+  } catch { return false }
+}
+
+/** CRON ĐÊM 00:30–05:59 VN: chuẩn bị sẵn cho em có gói chưa có bản hôm nay — tối đa `toiDa` em mỗi phút (một lượt ~30 lệnh D1/em). */
+export async function cronSanSangDem(env: Env, now: number, toiDa = 6): Promise<number> {
+  const gio = new Date(now + 7 * 3600000).getUTCHours(), phut = new Date(now + 7 * 3600000).getUTCMinutes()
+  if (gio >= 6 || (gio === 0 && phut < 30)) return 0
+  try {
+    const { chayDdlMotLan } = await import('./ddl-mot-lan')
+    await chayDdlMotLan(env, BANG_SAN_SANG, SQL_SAN_SANG)
+    const g7 = await import('./goi-bai-7')
+    if (!(await g7.coGoi7(env)).bat) return 0
+    const ngay = ngayVn7(now)
+    const ds = await env.DB.prepare(`SELECT DISTINCT e.sbd FROM goi_bai_7_em e JOIN hoc_sinh h ON h.sbd=e.sbd WHERE e.han>=? AND COALESCE(h.trang_thai,'')<>'khoa'
+      AND NOT EXISTS (SELECT 1 FROM ${BANG_SAN_SANG} s WHERE s.sbd=e.sbd AND s.ngay=?) ORDER BY e.sbd LIMIT ?`).bind(ngay, ngay, toiDa).all<{ sbd: string }>()
+    let n = 0
+    for (const r of ds.results ?? []) if (await chuanBiSanSang(env, String(r.sbd), now)) n++
+    return n
+  } catch (e) { console.error('[san-sang] cron đêm lỗi:', e instanceof Error ? e.message : e); return 0 }
+}

@@ -53,6 +53,8 @@ import {TRAN_CAU_DAO_NGAY,demCauTrongNgay,tranCuaLoai,type LoaiTran,docCauBtvnCh
 import {ghiKhoanExpGame,docTongSoSom,docTruocKhoanGame,lenhKhoanExpGameGop,xongKhoanExpGameGop,type DocTruocKhoanGame,type KhoanGame,type KhoanGop} from './exp-d1'
 import {expMotCau,expMotCauGame} from './exp-hoc-tap'
 import {chonBanDat,docSoDoDat,luaChonTuChoices,qidTraSoDo,soDoBiTat} from './loi-giai-so-do'
+import {BANG_SAN_SANG,SQL_SAN_SANG,docDauVaBan,dungDuoc,chuanBiSanSang,moChangSanSang,phienDaXong} from './san-sang'
+import {ngayVn7} from './goi-bai-7-loi'
 export interface Profile {nickname?:string;/** Đếm lượt đổi tên trong ngày VN (rename). */doiTen?:{ngay:string;lan:number};academic?:Academic;shields?:ShieldState;expMoi?:{daCong:number;manhDaTinh:number;ngayDat?:number;ngayNghi?:number};khienRen?:KhienRen;expGame?:{ngay:string;da:number;days?:Record<string,number>};hapThu?:{ngay:string;da:number};luatCap?:number;truocSiet?:unknown;pet:string;choice:boolean;legacy:unknown;cap:number;exp:number;wallet:number;earned:number;tower:number;mastery:Mastery[];cutover:string;season?:string;/** Luật v4: EXP chờ mốc cấp 10 (chưa đủ 21 ngày đạt). */choMoc?:number;/** Luật v4: `earned` lúc chuyển sang v4 — vàng chỉ đúc trên EXP kiếm sau mốc. */mocVang?:number;/** Dấu vết trước khi sang v4 (để lùi). */truocSiet4?:TruocSiet4;/** Luật v5: EXP tràn hôm nay + luỹ kế. */tranV5?:TranV5;/** Dấu vết trước khi sang v5 (để lùi). */truocV5?:TruocV5}
 type Row={revision:number;json:string}
 type Session={doan?:number;guardian?:string;guardianRound?:number;mode:Mode;questions:({qid:string;maDe:string;version:string;group:string;novel:boolean;role?:string;hoiThayKiem?:true}&LamLaiRef)[];created:number;/** Game Hóa 2.0 / Bi-a / OMNI 3 (vé thử thách, Trạm hồi phục) — chỉ đọc ở `answer`. */hoa2?:number;bia?:number;ve?:number;tram?:number;/** Huỷ chiến dịch (thầy 06/10, thu-hoi-chien-dich.ts): ISO lúc huỷ SỚM NHẤT ảnh hưởng lượt này — chỉ có khi lượt chứa câu của chiến dịch bị huỷ. */thuHoiLuc?:string}
@@ -317,7 +319,7 @@ function batDauDocSom(env:Env,action:string,b:Record<string,unknown>,sbd:string)
   return {sbd,hoSoSom,truocAnswer,truocComplete,cheDo2Som,cauDaLamSom}
 }
 /** Nhóm bảng (tạo lúc chạy) mà Sảnh / Mở chặng học tập cần: Gói 7, động cơ Hành trình v4/v5/v6, OMNI 3 — tên nhóm + lệnh ĐÚNG như nơi tạo của từng nhóm. */
-const DDL_LUOT_HOC:readonly (readonly [string,readonly string[]])[]=[['goi_bai_7_v1',SQL_GOI7],['hanh_trinh_v4',SQL_DONG_CO_HANH_TRINH],['hanh_trinh_v5',SQL_HANH_TRINH_V5],['hanh_trinh_v6',SQL_HT6],['omni_3_0510',LENH_TAO_BANG_OMNI]]
+const DDL_LUOT_HOC:readonly (readonly [string,readonly string[]])[]=[[BANG_SAN_SANG,SQL_SAN_SANG],['goi_bai_7_v1',SQL_GOI7],['hanh_trinh_v4',SQL_DONG_CO_HANH_TRINH],['hanh_trinh_v5',SQL_HANH_TRINH_V5],['hanh_trinh_v6',SQL_HT6],['omni_3_0510',LENH_TAO_BANG_OMNI]]
 /**
  * ĐẦU LƯỢT của Sảnh / Mở chặng học tập (Gói R 15/10 — luật thầy 13/10 "sửa xong máy chủ phải nhanh hơn"), gọi khi token đã qua kiểm chữ ký/hạn (token giả bị chặn
  * trước mọi lượt D1 như cũ), CÙNG đợt với lượt đọc mật khẩu: (1) lệnh tạo bảng của cả lượt gửi ngay, song song, thẳng D1 gốc (`guiDdlSom` — isolate mới: trước
@@ -325,13 +327,17 @@ const DDL_LUOT_HOC:readonly (readonly [string,readonly string[]])[]=[['goi_bai_7
  * gói đã sẵn — `docDanhSachGoiSom7`), lớp của em (đệm 30 s dùng chung — `lapGoi7` dùng lại đúng lượt đọc đang bay). Không ghi dữ liệu, không trả gì trước khi
  * xác thực xong; mọi kết quả chỉ dùng sau `await` xác thực, lỗi nổi lên đúng chỗ `await` cũ.
  */
-function batDauHocTapSom(env:Env,sbd:string){
+function batDauHocTapSom(env:Env,sbd:string,action=''){
   guiDdlSom(env,DDL_LUOT_HOC)
   void lopCuaEm(env,sbd).catch(()=>null)
   const kiem=som(import('./kiem-tra-ca-nhan').then(kt=>kt.docKtCn(env,sbd,Date.now(),true)))
   // Bọc trong đối tượng: lời hứa đọc gói giữ NGUYÊN (không bị `then` mở ra) để nơi gọi truyền tiếp như `docDanhSachGoiSom7`.
   const dsGoi=som(import('./goi-bai-7').then(g7=>({p:g7.docDanhSachGoiSom7(env,sbd)})))
-  return {sbd,kiem,dsGoi}
+  // SẴN SÀNG (27/10, san-sang.ts): dấu + bản sẵn của em đọc CÙNG đợt này (chỉ đọc) — khớp ⇒ Sảnh / Mở chặng trả ngay, không lập kế hoạch trên đường chờ.
+  const sanSang=som(docDauVaBan(env,sbd,Date.now()))
+  // Chuỗi ngày theo bài của Sảnh (chỉ đọc; cờ tắt ⇒ null) cũng bắt đầu ngay — đường Sảnh dùng bản sẵn khỏi chờ thêm một đợt.
+  const chuoi=action==='hoc-tap-sanh'?som(import('./chuoi-ngay-bai-d1').then(m=>m.chuoiBaiNeuBat(env,sbd,Date.now()),()=>null)):null
+  return {sbd,kiem,dsGoi,sanSang,chuoi}
 }
 async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:ExecutionContext):Promise<Record<string,unknown>> {
   // Tối ưu 05/10: lượt kiểm mật khẩu (khi đệm 60 s trượt) chạy CÙNG đợt với các lượt ĐỌC đầu của lệnh (`batDauDocSom`, gọi khi token đã qua kiểm chữ ký/hạn —
@@ -342,7 +348,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
   // Kết quả / lỗi chỉ dùng ở đúng chỗ `await kiem` cũ bên dưới. Lệnh của chính Kiểm tra ôn tập (`hoc-tap-ktcn-*`) trả trước khi đọc ⇒ không đọc sớm.
   // Lệnh đếm nhẹ sau mỗi câu (`hoc-tap-dem`, 2 câu CHỈ ĐỌC): cũng bắt đầu cùng đợt ấy — chỉ dùng khi tới đúng nhánh trả số đếm như cũ (Gói 7 bật, không phải ngày
   // chỉ làm kiểm tra); nhánh khác bỏ kết quả.
-  const sbd=await gameIdentity(env,b,s=>{if(action==='hoc-tap-sanh'||action==='hoc-tap-start')giu.hocTap=batDauHocTapSom(env,s);else{if(action!=='sync'&&!action.startsWith('hoc-tap-'))giu.ds=batDauDocSom(env,action,b,s);if(action!=='sync'&&!action.startsWith('hoc-tap-ktcn-'))giu.kiem={sbd:s,p:som(import('./kiem-tra-ca-nhan').then(kt=>kt.docKtCn(env,s,Date.now(),true)))};if(action==='hoc-tap-dem')giu.dem={sbd:s,p:som(import('./goi-bai-7').then(g7=>g7.demHomNay7(env,s,Date.now())))}}})
+  const sbd=await gameIdentity(env,b,s=>{if(action==='hoc-tap-sanh'||action==='hoc-tap-start')giu.hocTap=batDauHocTapSom(env,s,action);else{if(action!=='sync'&&!action.startsWith('hoc-tap-'))giu.ds=batDauDocSom(env,action,b,s);if(action!=='sync'&&!action.startsWith('hoc-tap-ktcn-'))giu.kiem={sbd:s,p:som(import('./kiem-tra-ca-nhan').then(kt=>kt.docKtCn(env,s,Date.now(),true)))};if(action==='hoc-tap-dem')giu.dem={sbd:s,p:som(import('./goi-bai-7').then(g7=>g7.demHomNay7(env,s,Date.now())))}}})
   // Kế hoạch sảnh vừa nhớ (goi-bai-7-nho.ts) chỉ dành cho lượt mở chặng NGAY sau đó: mọi lệnh khác của em (nộp câu, học cách giải, kiểm…) xoá bản nhớ.
   if(action!=='hoc-tap-sanh'&&action!=='hoc-tap-start')boKeHoach7(env.DB,sbd)
   // Kiểm tra theo lịch RIÊNG từng em sở hữu cả ngày, kể cả khi em đã nộp sớm.
@@ -385,9 +391,15 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
       if(action==='hoc-tap-dem')return giu.dem&&giu.dem.sbd===sbd?giu.dem.p:g7.demHomNay7(env,sbd,Date.now())
       // Làm lại cuối chặng kiểu Duolingo (26/10, goi-bai-7-lam-lai.ts): câu anh em cho câu em vừa sai, có hỗ trợ, không EXP.
       if(action==='hoc-tap-lam-lai')return import('./goi-bai-7-lam-lai').then(m=>m.lamLaiCuoiChang7(env,sbd,b,Date.now()))
-      if(action==='hoc-tap-start'){const r7=await g7.startGoi7(env,sbd,Date.now(),gsSom7);if(r7)return r7}
+      // SẴN SÀNG (27/10): bản sẵn khớp dấu, cùng ngày ⇒ chặng đã lập sẵn thành phiên ngay (MỘT lô ghi) — không lập kế hoạch trên đường chờ. Không được ⇒ đường cũ.
+      if(action==='hoc-tap-start'){const ss=hocTapSom?await hocTapSom.sanSang.catch(()=>null):null,nowSs=Date.now();if(ss&&dungDuoc(ss[1],ss[0],ngayVn7(nowSs))&&ss[1].chang){const rs=await moChangSanSang(env,sbd,nowSs,ss[1]).catch(()=>null);if(rs)return rs}
+        const r7=await g7.startGoi7(env,sbd,Date.now(),gsSom7);if(r7)return r7}
       // B3 chuỗi ngày theo bài (26/10, chuoi-ngay-bai-d1.ts): cờ duolingo_bai bật ⇒ `chuoiNgay` {so, giuChuoi, sucChua, lich7, cuu?, binhVuaDo?}; đọc song song lập kế hoạch.
-      if(action==='hoc-tap-sanh'){const chuoiSom=import('./chuoi-ngay-bai-d1').then(m=>m.chuoiBaiNeuBat(env,sbd,Date.now()),()=>null);const lap7=await g7.lapGoi7(env,sbd,Date.now(),gsSom7);if(lap7){g7.nhoLapSanh7(env,sbd,Date.now(),lap7);const con7=lap7.plan.viec.length,t7=g7.tomTatGoi7(lap7,Date.now()),chuoi7=await chuoiSom;return {ok:true,cheDo2:true,ngay:t7.ngay,goi7:t7,...(chuoi7?{chuoiNgay:chuoi7}:{}),...(kiem?{kiemTraCaNhan:kt.tomTatKt(kiem,Date.now())}:{}),theLuc:{con:con7,tong:lap7.daLamNgay+con7},chienDich:null,doan:{con:0},dao:{con:con7}}}}
+      // SẴN SÀNG (27/10): bản sẵn khớp dấu, cùng ngày ⇒ phần Sảnh lấy từ bản sẵn; Kiểm tra ôn tập + chuỗi ngày đọc TƯƠI (cùng đợt). Bản cũ hơn 10 phút ⇒ lập lại NỀN.
+      // Lượt chậm (không khớp) ⇒ như cũ, rồi cất bản sẵn NỀN với dấu đọc TRƯỚC khi lập (kèm chặng kế tiếp chưa lưu phiên).
+      if(action==='hoc-tap-sanh'){const chuoiSom=hocTapSom?.chuoi??import('./chuoi-ngay-bai-d1').then(m=>m.chuoiBaiNeuBat(env,sbd,Date.now()),()=>null);const ss=hocTapSom?await hocTapSom.sanSang.catch(()=>null):null,nowSs=Date.now()
+        if(ss&&dungDuoc(ss[1],ss[0],ngayVn7(nowSs))&&ss[1].sanh){const ban=ss[1],chuoi7=await chuoiSom;if(ctx&&nowSs-ban.luc>10*60_000)ctx.waitUntil(chuanBiSanSang(envGhiRieng(env),sbd,nowSs));return {ok:true,cheDo2:true,...ban.sanh,...(chuoi7?{chuoiNgay:chuoi7}:{}),...(kiem?{kiemTraCaNhan:kt.tomTatKt(kiem,nowSs)}:{}),chienDich:null,doan:{con:0}}}
+        const lap7=await g7.lapGoi7(env,sbd,Date.now(),gsSom7);if(lap7){g7.nhoLapSanh7(env,sbd,Date.now(),lap7);const con7=lap7.plan.viec.length,t7=g7.tomTatGoi7(lap7,Date.now()),chuoi7=await chuoiSom;if(ctx&&ss?.[0])ctx.waitUntil(chuanBiSanSang(envGhiRieng(env),sbd,Date.now(),{dau:ss[0],lap:lap7}));return {ok:true,cheDo2:true,ngay:t7.ngay,goi7:t7,...(chuoi7?{chuoiNgay:chuoi7}:{}),...(kiem?{kiemTraCaNhan:kt.tomTatKt(kiem,Date.now())}:{}),theLuc:{con:con7,tong:lap7.daLamNgay+con7},chienDich:null,doan:{con:0},dao:{con:con7}}}}
       if(action==='hoc-tap-kiem-start'||action==='hoc-tap-kiem-nop')return import('./goi-bai-7-kiem').then(m=>m.kiemGoi7(env,sbd,action,b,Date.now()))
     }
 
@@ -592,7 +604,9 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
       // ghi trước nên lô EXP phải chờ thêm một đợt. Hai việc không đọc bảng của nhau (sổ ⇄ exp_so/hồ sơ) ⇒ kết quả y hệt.
       // `eSan`: phần EXP nơi gọi đã chạy (khoản đã ghi CÙNG lô chấm).
       const e=eSan??ghiExpCau(attempt,hoSo,expSom)
-      const [,kq]=await Promise.all([viecPhu(ctx,()=>e.then(()=>undefined,()=>undefined).then(()=>ghiSoHoc(attempt,chon,so))),e]);return kq
+      // SẴN SÀNG (27/10): sổ ghi xong mà phiên Gói 7 đã trả lời HẾT câu ⇒ chuẩn bị NỀN Sảnh + chặng kế tiếp (em đọc kết quả câu cuối trong lúc ấy). Chỉ khi có `ctx`.
+      const sauCauCuoi=async()=>{if(ctx&&(session as {goi7?:number}).goi7===1&&await phienDaXong(envSo,sbd,id))await chuanBiSanSang(envSo,sbd,Date.now())}
+      const [,kq]=await Promise.all([viecPhu(ctx,()=>e.then(()=>undefined,()=>undefined).then(()=>ghiSoHoc(attempt,chon,so)).then(sauCauCuoi)),e]);return kq
     }
     /** `expCau` = EXP THẬT đã vào thú nhờ câu này (thưởng nấc + khoản câu game + thử thách của CHÍNH lượt này) — đọc lại từ sổ nên gọi lại vẫn ra đúng số, không cộng đôi. */
     const expCauCuaCau=async(reward:number)=>{
