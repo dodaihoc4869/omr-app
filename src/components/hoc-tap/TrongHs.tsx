@@ -512,7 +512,7 @@ export function MenuDocTrong(p: {
   // Kết quả ca thi «Về Lộ trình» (Boss 27/10): đóng phòng thi ⇒ về đúng mục Lộ trình dù em vào thi từ mục khác (sự kiện do cổng phát khi đóng phòng thi)
   const onMuc = useRef(p.onMuc)
   onMuc.current = p.onMuc
-  useEffect(() => { const ve = () => onMuc.current('hom-nay'); window.addEventListener('ddh:ve-trang-chinh', ve); return () => window.removeEventListener('ddh:ve-trang-chinh', ve) }, [])
+  useEffect(() => { const ve = () => onMuc.current('hom-nay'); window.addEventListener('ddh:ve-lt', ve); return () => window.removeEventListener('ddh:ve-lt', ve) }, [])
   const caiRef = useRef(false)
   caiRef.current = cai
   const nut = useRef<HTMLButtonElement>(null)
