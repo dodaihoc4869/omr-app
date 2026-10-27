@@ -48,9 +48,13 @@ export const SQL_DONG_DA_DUNG_LAI = `UPDATE chua_loi_dot SET trang_thai_day='da_
  *  trên mỗi isolate (Hôm nay và Tự sửa lỗi cùng gọi danh sách). Câu em sửa ngay trong app đã được đóng lúc nộp (gon-nop), không chờ câu này. */
 export const PHUT_GIAN_CACH_DONG = 10
 const lanDong = new Map<string, number>()
+/** Khung học 18:00–23:59 VN: giãn 60 phút (Analytics 27/10 19–23h: câu đóng tự động chiếm 8,4 % thời gian D1 — ~190 ms GHI mỗi lần, giữ khoá ghi, em khác
+ *  chờ). Câu em sửa trong app vẫn đóng ngay lúc nộp (gon-nop); câu đúng lại ở chỗ khác đóng chậm hơn, không mất. */
+export const PHUT_GIAN_CACH_DONG_KHUNG_HOC = 60
 export function denLuotDong(sbd: string, nowMs: number): boolean {
   const truoc = lanDong.get(sbd)
-  if (truoc !== undefined && nowMs - truoc < PHUT_GIAN_CACH_DONG * 60_000) return false
+  const phut = new Date(nowMs + 7 * 3_600_000).getUTCHours() >= 18 ? PHUT_GIAN_CACH_DONG_KHUNG_HOC : PHUT_GIAN_CACH_DONG
+  if (truoc !== undefined && nowMs - truoc < phut * 60_000) return false
   lanDong.set(sbd, nowMs)
   if (lanDong.size > 4000) for (const k of lanDong.keys()) { lanDong.delete(k); if (lanDong.size <= 3000) break }
   return true
