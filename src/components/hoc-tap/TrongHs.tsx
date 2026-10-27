@@ -44,7 +44,7 @@ function useCoBen(): boolean {
 
 // ── VIÊN ĐẾM NỔI MÉP TRÁI (thầy chốt bản vẽ P2 27/10, ve-moi/thanh-doc): bỏ thanh đếm ngang trên cùng; 4 viên (vòng mục tiêu · lửa · nguyên tử · tinh thể)
 // nổi dọc mép trái, cách mép 8 px. Cuộn xuống (do EM cuộn) ⇒ thu còn biểu tượng; cuộn lên / về đầu trang ⇒ hiện lại số. Nội dung chừa lề trái 60 px
-// (8 + viên 44 + 8) ⇒ viên KHÔNG đè chữ / nút / ảnh đại diện ở màn nào. Máy tính (≥ 1024 × 600, menu là thanh trái — PR #490) ⇒ viên gộp vào thanh menu
+// (8 + viên 44 + 8) ⇒ viên KHÔNG đè chữ / nút / ảnh đại diện ở màn nào. Máy tính (≥ 1024 × 600, menu là thanh trái — PR 490) ⇒ viên gộp vào thanh menu
 // (ô #tr-menu-dem). Vẽ bằng portal ra <body>: khung nội dung `.tt-vao-muc` giữ transform sau hoạt ảnh vào màn ⇒ position: fixed bên trong bị neo sai.
 const MQ_MAY_TINH = '(min-width: 1024px) and (min-height: 600px)'
 function useMayTinh(): boolean {
