@@ -135,6 +135,8 @@
 [data-trong='hs'] .duo-kt-thi .duo-day { position: sticky; bottom: 0; }
 /* «Vào lại toàn màn hình» (nút nhỏ cố định góc trái dưới của màn thi): đứng TRÊN đáy dính, không đè nút «câu trước» */
 [data-trong='hs'] .duo-kt-trang .thi-nut-vao-lai { bottom: calc(100px + env(safe-area-inset-bottom)) !important; }
+/* soát tổng 27/10: nút ấy nổi trên đáy ⇒ chừa thêm đáy cuộn cho thân câu, phương án cuối cuộn lên được, không bị nút che (360×640) */
+@media not all and (orientation: landscape) and (max-height: 500px) { [data-trong='hs'] .duo-kt-trang:has(.thi-nut-vao-lai) .duo-kt-than { padding-bottom: 80px; } }
 /* thẻ câu: bỏ khung thẻ + dải «Câu N» (nhãn câu đã nói), đề chữ to đậm */
 [data-trong='hs'] .m3.duo-kt-trang .duo-kt-thi .the-cau { background: transparent !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; overflow: visible !important; }
 [data-trong='hs'] .m3.duo-kt-trang .duo-kt-thi .the-cau > div:first-child { display: none !important; }

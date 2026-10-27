@@ -166,16 +166,16 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
   }
 
   const linkHoi = (dangHoi: boolean) => <NutHoiThay gon chi="hoi" dangLam={dangHoi} qid={qid} nguon="tu_chua" dapAnEm={dangHoi ? undefined : tra || undefined} />
-  const linkGiai = ct ? <button type="button" className="duo-lien" onClick={() => setMoGiai(true)}><BookOpen size={18} aria-hidden="true" />Lời giải</button> : null
+  // thầy 27/10: «Lời giải» nút nhỏ BÊN PHẢI hàng tiêu đề dải (như màn làm chặng Duo), không còn viên riêng một hàng
+  const linkGiai = ct ? <button type="button" className="duo-ct-lg" aria-label="Lời giải" onClick={() => setMoGiai(true)}><BookOpen size={18} aria-hidden="true" /><span>Lời giải</span></button> : null
   const nutTiep = (do_?: boolean) => <button ref={nutChinh} type="button" className="duo-nut" data-sac={do_ ? 'do' : undefined} onClick={tiepTuc}>Tiếp tục</button>
   const tam = (cam: 'vui' | 'sai' | 'nghi', tieu: ReactNode, than: ReactNode, them: ReactNode, nut: ReactNode, sac = tt) => (
     <section className="duo-day duo-ket" data-tt={sac ?? 'trung'} role="status" aria-live="polite"><div className="duo-giua">
       {sac === 'dung' && <BungDung key={`${mo.lan ?? 1}${ket ?? ''}`} />}{/* thầy 27/10 (video Duolingo): mây bọt + hạt vuông xanh ở dải ĐÚNG */}
       <div className="duo-kq">
         <span className="duo-kq-bi" aria-hidden="true"><Bi key={`${mo.lan ?? 1}${ket ?? ''}`} cam={cam} size={64} /></span>
-        <div className="duo-kq-chu"><h2>{tieu}</h2>{than}</div>
+        <div className="duo-kq-chu"><div className="duo-ct-dau" data-dai={(typeof tieu === 'string' ? tieu.length > 12 : true) || undefined}><h2>{tieu}</h2>{them}</div>{than}</div>
       </div>
-      {them && <div className="duo-them">{them}</div>}
       {loi && <p className="duo-loi" role="alert">{loi}</p>}
       {/* thầy 27/10 «Chỗ hỏi thầy lấy 1/3 hoặc 1/4 cái nút làm lại câu này»: Hỏi thầy (nút 3D phụ, trái) + nút chính CÙNG MỘT HÀNG */}
       <div className="duo-hang-nut">{linkHoi(false)}{nut}</div>

@@ -21,7 +21,11 @@ export function bungDung(tam: HTMLElement, o: Element | null): () => void {
   svg.setAttribute('viewBox', `0 0 ${w} ${H}`); svg.setAttribute('width', String(w)); svg.setAttribute('height', String(H))
   const so = Math.max(5, Math.round(w / 64))
   const buou: { x: number; r: number }[] = []
-  for (let i = 0; i < so; i++) buou.push({ x: (w / (so - 1)) * i + (ngau(i) - 0.5) * 30, r: 30 + ngau(i + 9) * 24 })
+  for (let i = 0; i < so; i++) {
+    const r = 30 + ngau(i + 9) * 24
+    // bướu nằm trọn trong bề ngang dải (không thò ra ngoài màn — máy đo tràn đo cả hình bị cắt)
+    buou.push({ x: Math.min(w - r - 3, Math.max(r + 3, (w / (so - 1)) * i + (ngau(i) - 0.5) * 30)), r })
+  }
   for (const lop of ['vien', 'nen'] as const) {
     buou.forEach(({ x, r }, i) => {
       const g = document.createElementNS(NS, 'g')

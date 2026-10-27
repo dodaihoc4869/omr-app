@@ -163,7 +163,7 @@ export function ManKimCuong({ token, chuyenDe, tenChuyenDe, onDong, onOnLai, bat
       <div className="cot-a">
         <div className="tp-hinh tp-hinh-to"><Tia className="quay kc" /><div ref={hh} className="hh-to"><HuyHieuKimLoai hang="kimcuong" /></div><div className="bi-o"><Bi cam="chao" size={100} /></div></div>
         <h1>Thử thách Kim cương</h1>
-        <p className="tp-phu">{tenChuyenDe} · em đã thành thạo chuyên đề này. Thử sức với 10 câu khó nhất nhé?</p>
+        <p className="tp-phu">{tenChuyenDe} · em đã vững chuyên đề này. Thử sức với 10 câu khó nhất nhé?</p>
         {loi && <Loi chu={loi} />}
       </div>
       <div className="cot-b">

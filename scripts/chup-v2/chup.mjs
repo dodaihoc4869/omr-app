@@ -409,7 +409,7 @@ const DS_BD = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [14
 // ═══ NGANG HS 26/10: màn con học sinh mở đè Hôm nay (`?man=hs-ng&v=tu-sua|kiem|ai`, khối cùng tên ở trang.tsx) ở điện thoại dọc thấp / ngang / máy tính
 // bảng / máy tính, sáng + tối (ảnh khung nhìn; đo tràn ngang + vùng chạm như mọi cảnh). Tiền tố "ng-hs-".
 const DS_NG_HS = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [740, 360, 'ngang740'], [1024, 768, 'bang'], [1440, 900, 'may-tinh'], [1920, 1080, 'may-tinh-1920']].flatMap(([w, hh, k]) =>
-  ['light', 'dark'].flatMap((nen) => [['tu-sua', 'hs-ng&v=tu-sua', /Em tự làm lại câu này/], ['kiem', 'hs-ng&v=kiem', /Kiểm tra ôn tập/], ['ai', 'hs-ng&v=ai', /Chào Minh Anh|chặng/i]]
+  ['light', 'dark'].flatMap((nen) => [['tu-sua', 'hs-ng&v=tu-sua', /Em tự làm lại câu này/], ['kiem', 'hs-ng&v=kiem', /Kiểm tra ôn tập/], ['ai', 'hs-ng&v=ai', /Cho 5,6 gam Fe/]]
     .map(([ten, m, cho]) => [`ng-hs-${ten}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho])))
 // ═══ hết NGANG HS 26/10
 
@@ -1045,7 +1045,8 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       if (khe) tran.push(`${ten}: bong bóng càu nhàu sát (${khe})`)
       // tràn ngang TRONG khung cuộn (documentElement không thấy được vì khung là `fixed`)
       // bảng lớn cuộn ngang TRONG khung riêng (.cau-bang, có bóng mép) là chủ đích — không tính tràn
-      const tranTrong = await t.evaluate(() => Math.max(0, ...[...document.querySelectorAll('.ht2-lam *')].filter((e) => !e.closest('.cau-bang, .ex-grid > *')).map((e) => Math.round(e.getBoundingClientRect().right - innerWidth))))
+      // SOÁT TỔNG 27/10: hình con TRONG một <svg> cắt mép (overflow hidden — mây bọt dải đúng .duo-may) không lòi ra ngoài ⇒ không tính; khung svg vẫn được đo
+      const tranTrong = await t.evaluate(() => Math.max(0, ...[...document.querySelectorAll('.ht2-lam *')].filter((e) => !e.closest('.cau-bang, .ex-grid > *') && !(e.ownerSVGElement && getComputedStyle(e.ownerSVGElement).overflow !== 'visible')).map((e) => Math.round(e.getBoundingClientRect().right - innerWidth))))
       if (tranTrong > 0) tran.push(`${ten}: trong khung ${tranTrong}px`)
     } else if (viec?.startsWith('cham:')) {
       // THẺ CHẠM 27/10: chạm chữ tô tím (ruột nạp lười) ⇒ chờ thẻ kiểu Duolingo hiện hẳn (hết 120 ms phóng to)
