@@ -43,15 +43,16 @@ function hienDuChuGiai(qid: string): boolean {
 
 /** Gợi ý tầng 1 nói về chất + từ then chốt; tầng 2–3 thêm số liệu đề cho. «Đề hỏi» không cần soi (đã nổi sẵn). */
 /**
- * Lọc vùng theo luật màn (bước trước «chỉ bọc vùng có thẻ»):
- *  - câu lý thuyết (đề không có số liệu nào) chỉ tô «Đề hỏi» + cụm bẫy (bản vẽ màn 5): thẻ chất / từ then chốt dễ LỘ ĐÁP ÁN
- *    («Công thức của glucose là», «Ethylamine là amine bậc mấy?»);
- *  - đề hỏi tên gọi / công thức ⇒ không tô chất (thẻ chất in sẵn tên và công thức);
+ * Lọc vùng theo luật màn (bước trước «chỉ bọc vùng có thẻ»). `chuDe` = chữ toàn đề.
+ *  - câu lý thuyết (đề không có số liệu nào): chỉ tô bẫy phủ định / đề hỏi có thẻ + TÊN CHẤT (thầy 27/10: thẻ chất chỉ còn tên, công thức, M);
+ *    không tô từ then chốt;
+ *  - đề hỏi chính tên / công thức / phân tử khối ⇒ KHÔNG tô chất (thẻ chất in sẵn đúng thứ ấy ⇒ lộ đáp án);
  *  - đã có thẻ «90% · hiệu suất» thì bỏ thẻ chữ «hiệu suất» đứng ngay đó (hai thẻ nói cùng một điều).
  */
-export const locLyThuyet = (ds: VungCham[]): VungCham[] => {
-  let ra = ds.some((v) => v.loai === 'cho') ? ds : ds.filter((v) => v.loai === 'hoi')
-  if (ra.some((v) => v.loai === 'hoi' && /công thức|tên gọi|danh pháp/i.test(v.chu))) ra = ra.filter((v) => v.loai !== 'chat')
+const DE_HOI_TEN_CT = /công thức|tên gọi|gọi tên|danh pháp|tên (thay thế|thông thường|IUPAC|gốc)|phân tử khối|khối lượng (phân tử|mol)/i
+export const locLyThuyet = (ds: VungCham[], chuDe = ''): VungCham[] => {
+  let ra = ds.some((v) => v.loai === 'cho') ? ds : ds.filter((v) => v.loai === 'hoi' || v.loai === 'chat')
+  if (DE_HOI_TEN_CT.test(chuDe) || ra.some((v) => v.loai === 'hoi' && DE_HOI_TEN_CT.test(v.chu))) ra = ra.filter((v) => v.loai !== 'chat')
   if (ra.some((v) => v.loai === 'cho' && v.khoa === '%H')) ra = ra.filter((v) => !(v.loai === 'khoa' && v.khoa === 'hieu-suat'))
   return ra
 }
@@ -91,7 +92,7 @@ export function RuotCham(p: RuotChamProps) {
     setBoc(kq)
     return () => kq.go()
   }, [td, goc])
-  const the = useMemo<((TheGiaiNghia & { tenPhu?: string }) | null)[]>(() => (boc && td ? boc.vung.map((v) => { try { return td.theCho(v, boc.chuDe) } catch { return null } }) : []), [boc, td])
+  const the = useMemo<(TheGiaiNghia | null)[]>(() => (boc && td ? boc.vung.map((v) => { try { return td.theCho(v, boc.chuDe) } catch { return null } }) : []), [boc, td])
 
   // ── thẻ giải nghĩa đang mở: {i, ghim}; rê chuột (máy tính) = chưa ghim
   const [mo1, setMo1] = useState<{ i: number; ghim: boolean; phim?: boolean } | null>(null)

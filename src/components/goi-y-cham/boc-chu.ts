@@ -70,7 +70,7 @@ export type KetQuaBoc = { vung: VungCham[]; /** chữ TOÀN đề (mọi khối 
  * `loc(ds)`: bỏ bớt vùng theo luật của màn (vd câu lý thuyết chỉ giữ «Đề hỏi»). `chamDuoc(v, chuDe)` = vùng có thẻ giải nghĩa — vùng không có thẻ thì KHÔNG bọc.
  * Lỗi bất kỳ ⇒ trả DOM nguyên trạng, không vùng nào (đề vẫn hiện trơn).
  */
-export function bocVung(goc: HTMLElement, phatHien: (chu: string) => VungCham[], chamDuoc: (v: VungCham, chu: string) => boolean, loc: (ds: VungCham[]) => VungCham[] = (x) => x): KetQuaBoc {
+export function bocVung(goc: HTMLElement, phatHien: (chu: string) => VungCham[], chamDuoc: (v: VungCham, chu: string) => boolean, loc: (ds: VungCham[], chuDe: string) => VungCham[] = (x) => x): KetQuaBoc {
   const tach: { goc: Text; moi: Text }[] = []
   const boc: HTMLElement[] = []
   const go = () => {
@@ -94,8 +94,8 @@ export function bocVung(goc: HTMLElement, phatHien: (chu: string) => VungCham[],
       try { ds = lamSachVung(catKhoangTrang(phatHien(kh.chu), kh.chu), kh.chu.length) } catch { ds = [] }
       for (const v of ds) tim.push({ v, k })
     })
-    const giu = new Set(loc(tim.map((x) => x.v)))
     const chuDe = khoi.map((x) => x.chu).join('\n')
+    const giu = new Set(loc(tim.map((x) => x.v), chuDe))
     // Thầy 27/10 («Soát kĩ quá vô nghĩa»): vùng KHÔNG có thẻ giải nghĩa thì không bọc, không tô — chữ đề để nguyên.
     const chon = tim.filter((x) => giu.has(x.v) && chamDuoc(x.v, chuDe))
     const vung = chon.map((x) => x.v)

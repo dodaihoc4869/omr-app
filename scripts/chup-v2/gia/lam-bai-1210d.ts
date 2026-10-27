@@ -98,6 +98,17 @@ const CAU_XAU: CauGia[] = [
     choices: ['2-phenylethan-1-amine', 'N-methylbenzylamine', 'benzylamine', '1-phenylethan-1-amine'], ideas: [], dapAn: 'A',
     loiGiai: { chot: 'Nhóm NH2 gắn ở C1 của mạch ethan, vòng benzene ở C2.' } },
 ]
+// ═══ NÂNG CẤP 27/10: `lam13&lam=duo-nc` (bản vẽ ve-moi/nang-cap) — câu chọn chất (4 phân tử), câu tính có cảnh phản ứng + 4 phương án số, câu aniline
+// (câu cuối trả `thuong.tinh = false` ⇒ tấm «Câu này chưa được tính»). Số liệu tự giải: 4,5 g C2H5NH2 = 0,1 mol ⇒ 0,1 × 81,5 = 8,15 g C2H5NH3Cl;
+// 0,1 mol C6H5NH2 ⇒ 0,1 × 129,5 = 12,95 g C6H5NH3Cl.
+const CAU_NC: CauGia[] = [
+  { ...nen, qid: 'N1', maDe: 'BAI8', phan: 'I', tenDang: 'Amine — khái niệm, phân loại', text: 'Chất nào sau đây là amine?', choices: ['ethanol', 'methylamine', 'acetic acid', 'methyl formate'], ideas: [], dapAn: 'B',
+    loiGiai: { chot: 'Amine có nhóm –NH2 (hoặc –NH–, –N<) gắn vào gốc hydrocarbon: CH3NH2 là methylamine.' } },
+  { ...nen, qid: 'N2', maDe: 'BAI8', phan: 'I', tenDang: 'Amine — tính base — tính khối lượng', text: 'Cho 4,5 gam ethylamine tác dụng với dung dịch HCl vừa đủ, thu được m gam muối. Giá trị của m là', choices: ['7,65', '8,15', '8,10', '9,15'], ideas: [], dapAn: 'B',
+    loiGiai: { chot: 'C2H5NH2 + HCl → C2H5NH3Cl; n = 4,5 : 45 = 0,1 mol ⇒ m = 0,1 × 81,5 = 8,15 gam.' } },
+  { ...nen, qid: 'N3', maDe: 'BAI8', phan: 'I', tenDang: 'Amine — tính base — tính khối lượng', text: 'Cho 0,1 mol aniline tác dụng vừa đủ với HCl. Khối lượng muối phenylammonium chloride thu được là', choices: ['25,900 gam.', '6,475 gam.', '19,425 gam.', '12,950 gam.'], ideas: [], dapAn: 'D',
+    loiGiai: { chot: 'C6H5NH2 + HCl → C6H5NH3Cl; m = 0,1 × 129,5 = 12,95 gam.' } },
+]
 const SO_LON = thamSo.get('so') === 'lon'
 // ═══ hết KIỂM GD MỚI 26/10
 // ═══ THẺ CHẠM 27/10: `lam13&lam=duo&cham=chat|don-vi|phu-dinh|vd` — câu đầu chặng có chữ chạm để chụp thẻ kiểu Duolingo (tiền tố ảnh «duo-cham-»):
@@ -118,7 +129,7 @@ const CAU_DUO_CHAM = CAU_CHAM[CHAM] ? [CAU_CHAM[CHAM]!, ...CAU_DUO] : CAU_DUO
 // ═══ GIÁM THỊ 27/10: `&gt=nb|th|vd|vdc` ⇒ mọi câu mang mức ấy (giám thị tương ứng); `&gtde=ngan` ⇒ thêm câu đề NGẮN (L2, đáp án B) lên đầu chặng Duo.
 const MUC_GT = ({ nb: 'biet', th: 'hieu', vd: 'van_dung', vdc: 'van_dung_cao', khong: '' } as Record<string, string>)[thamSo.get('gt') ?? ''] // khong ⇒ câu không mức (đo nền)
 const CAU_DUO_GT = thamSo.get('gtde') === 'ngan' ? [{ ...CAU[1]!, qid: 'GT1' }, ...CAU_DUO_CHAM] : CAU_DUO_CHAM
-const ds0 = kieu === 'duo-xau' ? CAU_XAU : kieu === 'duo' ? CAU_DUO_GT : kieu === 'g7' ? CAU_G7 : kieu === 'ds-dau' ? [CAU[3]!, CAU[4]!, CAU[5]!] : kieu === 'so-o' ? CAU_SO_O : CAU
+const ds0 = kieu === 'duo-nc' ? CAU_NC : kieu === 'duo-xau' ? CAU_XAU : kieu === 'duo' ? CAU_DUO_GT : kieu === 'g7' ? CAU_G7 : kieu === 'ds-dau' ? [CAU[3]!, CAU[4]!, CAU[5]!] : kieu === 'so-o' ? CAU_SO_O : CAU
 const ds = MUC_GT !== undefined ? ds0.map((c) => ({ ...c, mucDo: MUC_GT || null })) : ds0
 const GOI7 = { bat: true, ngay: '2026-10-12', toiThieu: 24, daLamHomNay: 12, tuLamCon: 9, tiepCanCon: 3, thieuPhu: 0, thieuNgay: 0, canHoTro: false, kienThucCu: { tong: 0, dat: 0, tyLe: null },
   goi: [{ id: 'g8', ten: 'Bài 8. Amine', batDau: '2026-10-10', han: '2026-10-16', tong: 40, daGap: 10, con: 30, quota: 6, gapHomNay: 2, quaHan: false, canBoSung: 0, to: ['BAI8-AMINE'] }], diemDaDo: [] }
@@ -132,8 +143,8 @@ export const soHomNayLam13 = () => SO_LON ? { daLam: 1234 + daNop, muc: 2400, ch
 const congKhai = ({ dapAn: _d, loiGiai: _l, ...q }: CauGia) => { const n = q.phan === 'III' ? soOPhanIII(_d) : null; return n === null ? q : { ...q, soO: n } }
 const so = (v: string) => Number(String(v).replace(',', '.'))
 // THƯỞNG PHẠT (gộp 26/10): `&tp=1` ⇒ lệnh answer trả `thuong` (Đúng +10, chuỗi ≥ 3: +2; sai làm kĩ +2) như máy chủ phần A, câu cuối của chặng thêm `ketBai`.
-const TP = thamSo.get('tp') === '1'
-let chuoiTp = 0
+const TP = thamSo.get('tp') === '1' || kieu === 'duo-nc'
+let chuoiTp = Number(thamSo.get('chuoi') ?? 0) // `&chuoi=2` (27/10): bắt đầu giữa chuỗi đúng ⇒ câu đúng đầu chạm mốc 3 (cảnh hiệu ứng mốc combo)
 const daTraTp = new Set<string>()
 const thuongTp = (dung: boolean) => {
   chuoiTp = dung ? chuoiTp + 1 : 0
@@ -152,7 +163,7 @@ export function traLoiLam13(duong: string, b: Record<string, unknown>): Record<s
     daNop++
     const dung = q.phan === 'III' ? so(tra) === so(q.dapAn) : tra === q.dapAn
     daTraTp.add(q.qid)
-    const tp = TP ? { thuong: thuongTp(dung), ...(ds.every((c) => daTraTp.has(c.qid)) ? { ketBai: KET_BAI } : {}) } : {}
+    const tp = TP ? { thuong: q.qid === 'N3' ? { tinh: false, nguyenTu: 0, dong: [], chuoiDung: 0, cauKho: false } : thuongTp(dung), ...(ds.every((c) => daTraTp.has(c.qid)) ? { ketBai: KET_BAI } : {}) } : {}
     return { ok: true, correct: dung, answer: q.dapAn, solution: q.loiGiai, solutionImages: [], ...(q.vaiGoi7 === 'lam_lai' ? { attempt: { assisted: true } } : {}), ...tp }
   }
   if (duong.endsWith('/game-v2/hoc-tap-gap')) { daNop++; return { ok: true, correct: false, hocCoHoTro: true, answer: q.dapAn, solution: q.loiGiai, solutionImages: [] } }

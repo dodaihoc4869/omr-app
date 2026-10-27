@@ -8,6 +8,8 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import ManLamBaiTap from '../src/components/hoc-tap/ManLamBaiTap'
 import { goiHoa2 } from '../src/components/hoa2/api'
 import type { SoHomNay } from '../src/components/hoc-tap/lam-bai'
+// thầy 27/10: dải ĐÚNG xoay vòng câu khen như Duolingo (câu đầu «Chính xác!»)
+const KHEN = /^(Chính xác|Làm tốt lắm|Tuyệt vời|Xuất sắc)!$/
 vi.mock('../src/components/hoa2/api', async (goc) => ({ ...await goc<typeof import('../src/components/hoa2/api')>(), goiHoa2: vi.fn() }))
 beforeEach(() => { document.documentElement.dataset.trong = 'hs' })
 afterEach(() => { cleanup(); vi.mocked(goiHoa2).mockReset(); localStorage.clear(); delete document.documentElement.dataset.trong })
@@ -35,7 +37,7 @@ describe('làm chặng kiểu Duolingo («Trong»)', () => {
     expect(screen.getByRole('radio', { name: /^D/ }).getAttribute('aria-checked')).toBe('true')
     vi.mocked(goiHoa2).mockResolvedValueOnce({ correct: true, answer: 'D', solution: LG1 })
     fireEvent.keyDown(window, { key: 'Enter' })
-    await screen.findByRole('heading', { name: 'Chính xác!' })
+    await screen.findByRole('heading', { name: KHEN })
     expect(vi.mocked(goiHoa2).mock.calls.find((c) => c[0] === 'answer')![2]).toMatchObject({ qid: 'q1', answer: 'D' })
     fireEvent.keyDown(document.body, { key: 'Enter' })
     await screen.findByText(C2.text)
@@ -66,7 +68,7 @@ describe('làm chặng kiểu Duolingo («Trong»)', () => {
     expect(goi[2]).toMatchObject({ session: 'p1', qid: 'q1', answer: 'B' })
     const tam = document.querySelector('.duo-ket')!
     expect(tam.getAttribute('data-tt')).toBe('sai')
-    expect(tam.textContent).toContain('Đáp án: D. 4')
+    expect(tam.textContent).toContain('Đáp án đúng: D. 4')
     expect(tam.textContent).toContain('8 là tổng số đồng phân amine.')
     expect(tam.textContent).toContain('lịch ôn 1 · 3 · 7 ngày')
     expect(tam.textContent).not.toContain('Sửa câu này') // thầy 26/10 «Bỏ câu sai từng bước»: chỉ Lời giải từng bước + Hỏi thầy
@@ -82,7 +84,7 @@ describe('làm chặng kiểu Duolingo («Trong»)', () => {
     vi.mocked(goiHoa2).mockResolvedValueOnce({ correct: true, answer: 'D', solution: LG1 })
     fireEvent.click(screen.getByRole('radio', { name: /^D/ }))
     fireEvent.click(kiemTra())
-    await screen.findByRole('heading', { name: 'Chính xác!' })
+    await screen.findByRole('heading', { name: KHEN })
     expect(document.querySelector('.duo-ket')!.textContent).toContain('Chỉ amine bậc một cho alcohol.')
     expect(screen.getByLabelText('Chuỗi 1 câu đúng liền')).toBeTruthy()
     expect(screen.getByRole('progressbar').getAttribute('aria-valuenow')).toBe('1')
@@ -118,17 +120,17 @@ describe('hiệu ứng đúng / sai kiểu Duolingo (thầy 26/10)', () => {
     expect(goc.querySelector('.ht2-lam-pa[data-ket="dung"]')!.textContent).toContain('4')
     expect(screen.getByRole('progressbar').getAttribute('aria-valuenow')).toBe('0') // sai: thanh không tăng
     expect(goc.querySelector('.duo-loe')).toBeNull()
-    // câu có mức độ ⇒ giám thị đứng cạnh đề, tấm kết quả dùng dấu tròn ✓/✗ thay Bi (thầy 27/10); câu không mức vẫn khe Bi
+    // câu có mức độ ⇒ giám thị đứng cạnh đề (thầy 27/10); dải như Duolingo — dấu tròn ×, không Bi
     expect(goc.querySelector('.duo-gt-san')).not.toBeNull()
-    expect(goc.querySelector('.duo-kq-o')).not.toBeNull()
-    expect(goc.querySelector('.duo-kq-bi')).toBeNull()
+    expect(goc.querySelector('.duo-kq-bi')).toBeNull() // 27/10: dải như Duolingo — dấu tròn ×, không Bi
+    expect(goc.querySelector('.duo-ket .duo-tick[data-sai]')).not.toBeNull()
     vi.mocked(goiHoa2).mockResolvedValueOnce({ correct: true, answer: 'B', solution: {} })
     fireEvent.click(screen.getByRole('button', { name: 'Tiếp tục' }))
     await screen.findByText(C2.text)
     expect(screen.getByRole('progressbar').getAttribute('aria-valuenow')).toBe('1') // sang câu sau mới nhích
     fireEvent.click(screen.getByRole('radio', { name: /^B/ }))
     fireEvent.click(kiemTra())
-    await screen.findByRole('heading', { name: 'Chính xác!' })
+    await screen.findByRole('heading', { name: KHEN })
     expect(goc.getAttribute('data-tt')).toBe('dung')
     expect(goc.querySelector('.duo-loe')).not.toBeNull()
     expect(screen.getByRole('progressbar').getAttribute('aria-valuenow')).toBe('2')

@@ -535,11 +535,11 @@ function ManLam13() {
 if (LA_LAM13 && thamSo.get('gtloi') === '1') Math.random = () => 0
 if (LA_LAM13 && thamSo.get('lam') === 'duo-xau') try { localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tk', sbd: '12121212' })) } catch { /* bỏ qua */ }
 // ═══ hết KIỂM GD MỚI 26/10
-if (LA_LAM13 && thamSo.get('lam') === 'duo') try { localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tk', sbd: '12121212' })) } catch { /* bỏ qua */ }
+if (LA_LAM13 && (thamSo.get('lam') === 'duo' || thamSo.get('lam') === 'duo-nc')) try { localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tk', sbd: '12121212' })) } catch { /* bỏ qua */ }
 // ═══ DUO APP 26/10: app thật nạp TrongHs (kèm phông tròn M PLUS Rounded 1c + hiệu ứng Lộ trình, styles/trong-hs.css) ngay lúc mở cổng ⇒ màn làm chặng luôn có phông ấy;
 // trang chụp mở thẳng màn làm chặng nên nạp tờ đó tại đây cho giống app thật.
 // Phông tròn chỉ bật khi cổng đã vẽ (:has(.ht2) — app thật luôn gắn Hôm nay dưới màn con) ⇒ trang chụp gắn một .ht2 rỗng ẩn.
-if (LA_LAM13 && thamSo.get('lam') === 'duo' && document.documentElement.dataset.trong === 'hs') { void import('../../src/styles/trong-hs.css'); document.body.insertAdjacentHTML('beforeend', '<div class="ht2" hidden></div>') }
+if (LA_LAM13 && (thamSo.get('lam') === 'duo' || thamSo.get('lam') === 'duo-nc') && document.documentElement.dataset.trong === 'hs') { void import('../../src/styles/trong-hs.css'); document.body.insertAdjacentHTML('beforeend', '<div class="ht2" hidden></div>') }
 // ═══ hết DUO APP 26/10
 // ═══ GIỮ CHÂN 27/10: `lam13&lam=duo&tp=1&giu=1` — bản tổng quan thưởng ở máy như app thật đã nạp lúc mở (chuỗi 12 ngày, hôm nay chưa đạt, mục tiêu 3/4).
 import { DUONG as DUONG_TP, docTongQuan as docTqGiu, ghiTam as ghiTamGiu, khoaTam as khoaTamGiu } from '../../src/lib/thuong-api'
@@ -877,6 +877,89 @@ if (SOAT === 'dai' && MOT_PH) {
 if (man === 'soat-ktcn' && document.documentElement.dataset.trong === 'hs') void import('../../src/styles/trong-lam-bai.css')
 const manSoatKtcn = () => h(ManKiemTraCaNhan, { token: 'tk', sbd: '12121212', id: 'kt-soat', onVe: noop, onCapNhat: noop })
 // ═══ hết SOÁT 26/10
+// ═══ DUO KIỂM TRA 27/10 (tiền tố ảnh "duo-kt-"): màn làm bài kiểm tra kiểu Duolingo — component THẬT, máy chủ GIẢ trong khối.
+//   `?man=duo-kt&v=ktcn`  Kiểm tra ôn tập (ManKiemTraCaNhan): chặng 2 đang chạy, 6 câu đủ ba loại (2 câu đã trả lời); bấm «Làm tiếp chặng 2» ⇒ màn Duo.
+//   `?man=duo-kt&v=ket`   Kiểm tra ôn tập đã nộp (Bi + kết quả lọc câu).
+//   `?man=duo-kt&v=thi&vai=hocsinh`  Ca thi (ExamTakeScreen) — vào lại lượt dở cất trong IndexedDB (máy chủ không trả lời ⇒ đường rớt mạng), 8 câu.
+//   `?man=duo-kt&v=kq&vai=hocsinh`   Kết quả sau nộp ca thi (KetQuaSauNop, đã công bố) có Bi.
+import ManKiemTraCaNhanDk from '../../src/components/hoc-tap/ManKiemTraCaNhan'
+import ExamTakeScreenDk from '../../src/screens/ExamTakeScreen'
+import KetQuaSauNopDk from '../../src/components/xem-diem/KetQuaSauNop'
+import { cacheSession as cacheSessionDk, emptyAnswerRecord as emptyAnswerRecordDk, emptyIntegrityLog as emptyIntegrityLogDk, saveAttempt as saveAttemptDk, type ExamAttempt as ExamAttemptDk } from '../../src/lib/exam-db'
+import type { PublicExamBank as PublicExamBankDk } from '../../src/data/examContent'
+import { useEffect as useEffectDk, useState as useStateDk } from 'react'
+const DK_V = thamSo.get('v') ?? 'ktcn'
+if (man === 'duo-kt' && document.documentElement.dataset.trong === 'hs') void import('../../src/styles/trong-lam-bai.css')
+const dkNgay = new Date(now + 7 * 3600_000).toISOString().slice(0, 10), dkMo = Date.parse(`${dkNgay}T00:00:00+07:00`)
+const DK_KT = { id: 'kt-dk', ngay: dkNgay, moLuc: dkMo, hanLuc: dkMo + 86400_000, serverNow: now, trangThai: DK_V === 'ket' ? 'da_nop' : 'can_lam', homNay: true,
+  baiNgayToiThieu: 12, tong: 24, daTra: DK_V === 'ket' ? 24 : 8, con: DK_V === 'ket' ? 0 : 16, soChang: 4, phut: 50, soBai: 6, tongKienThuc: 10, phuDe: 10, nguonDayDu: true,
+  lyDo: 'Kiểm chứng những phần em đang luyện thêm', thieuNguon: 0, diem: DK_V === 'ket' ? 8.25 : null, nopLuc: DK_V === 'ket' ? now - 3600_000 : null }
+const DK_CHANG = [{ stt: 0, soCau: 6, giay: 720, han: now - 1_200_000, daChot: true, daTra: 6 }, { stt: 1, soCau: 6, giay: 720, han: now + 462_000, daChot: false, daTra: 2 },
+  { stt: 2, soCau: 6, giay: 720, han: null, daChot: false, daTra: 0 }, { stt: 3, soCau: 6, giay: 720, han: null, daChot: false, daTra: 0 }]
+const DK_CAU = [
+  { ...CAU_HOC[0]!, qid: 'K1' },
+  { ...CAU_HOC[0]!, qid: 'K2', tenDang: 'Amine', text: 'Dung dịch chất nào sau đây làm quỳ tím chuyển màu xanh?', choices: ['Aniline.', 'Methylamine.', 'Glycine.', 'Ethanol.'] },
+  { ...CAU_HOC[0]!, qid: 'K3', tenDang: 'Carbohydrate', text: 'Chất nào sau đây thuộc loại disaccharide và có phản ứng tráng bạc khi đun nóng với dung dịch AgNO₃ trong NH₃?', choices: ['Saccharose.', 'Maltose.', 'Tinh bột.', 'Cellulose.'] },
+  { ...CAU_HOC[1]!, qid: 'K4' },
+  { ...CAU_HOC[0]!, qid: 'K5', tenDang: 'Ester', text: 'Số đồng phân ester ứng với công thức phân tử C₃H₆O₂ là', choices: ['1.', '2.', '3.', '4.'] },
+  { ...CAU_HOC[2]!, qid: 'K6', soO: 4 },
+]
+const DK_KET = { chu: 'Em vững phần Ester – Lipid; phần Amine cần luyện thêm bậc amine và tính base.',
+  bai: [{ ten: 'Bài 6. Ester – Lipid', tong: 8, daKiem: 8, dungLanNay: 7 }, { ten: 'Bài 8. Amine', tong: 6, daKiem: 6, dungLanNay: 4 }],
+  cau: Array.from({ length: 12 }, (_, i) => ({ de: DK_CAU[i % 3]!, tra: i === 5 ? '' : 'A', dung: ![2, 5, 9].includes(i), dapAn: 'A', loiGiai: null })) }
+if (man === 'duo-kt' && (DK_V === 'ktcn' || DK_V === 'ket')) {
+  const fetchDk = window.fetch
+  window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+    const tra = (o: unknown) => new Response(JSON.stringify(o), { status: 200, headers: { 'content-type': 'application/json' } })
+    const kt = { ...DK_KT, serverNow: Date.now() }
+    if (url.includes('hoc-tap-ktcn-trang-thai')) return tra({ ok: true, kiemTra: kt, chang: DK_CHANG })
+    if (url.includes('hoc-tap-ktcn-start')) return tra({ ok: true, kiemTra: kt, revision: 3, hanChang: now + 462_000, daChot: false, questions: DK_CAU, tra: { K1: 'B', K4: 'DS--' } })
+    if (url.includes('hoc-tap-ktcn-ket-qua')) return tra({ ok: true, kiemTra: kt, ketQua: DK_KET })
+    if (url.includes('hoc-tap-ktcn-')) return tra({ ok: true, kiemTra: kt, revision: 4, daLuu: true })
+    return fetchDk(input, init)
+  }
+}
+const DK_BANK: PublicExamBankDk = {
+  phanI: [
+    { id: 'q1', text: 'Thuỷ phân hoàn toàn 8,8 gam ethyl acetate (CH₃COOC₂H₅) bằng dung dịch NaOH vừa đủ. Khối lượng muối thu được là', choices: ['8,2 gam.', '6,8 gam.', '9,6 gam.', '4,1 gam.'] },
+    { id: 'q2', text: 'Dung dịch chất nào sau đây làm quỳ tím chuyển màu xanh?', choices: ['Aniline.', 'Methylamine.', 'Glycine.', 'Ethanol.'] },
+    { id: 'q3', text: 'Chất nào sau đây thuộc loại disaccharide?', choices: ['Glucose.', 'Saccharose.', 'Tinh bột.', 'Cellulose.'] },
+    { id: 'q4', text: 'Số đồng phân ester ứng với công thức phân tử C₃H₆O₂ là', choices: ['1.', '2.', '3.', '4.'] },
+  ],
+  phanII: [
+    { id: 'q5', text: 'Xét dãy hydroxide ứng với hoá trị cao nhất của các nguyên tố chu kì 2: LiOH, Be(OH)₂, H₃BO₃, H₂CO₃, HNO₃.',
+      ideas: ['Theo chiều tăng điện tích hạt nhân, tính base của các hydroxide trong dãy giảm dần.', 'Theo chiều tăng điện tích hạt nhân, tính acid của các hydroxide trong dãy tăng dần.', 'Trong dãy trên, HNO₃ là acid mạnh nhất.', 'H₃BO₃ có tính acid mạnh hơn H₂CO₃.'] },
+    { id: 'q6', text: 'Cho các phát biểu về chất béo:', ideas: ['Chất béo là triester của glycerol với acid béo.', 'Tristearin ở thể lỏng ở nhiệt độ thường.', 'Chất béo không tan trong nước.', 'Thuỷ phân chất béo trong môi trường kiềm gọi là phản ứng xà phòng hoá.'] },
+  ],
+  phanIII: [
+    { id: 'q7', text: 'Lên men 45 gam glucose với hiệu suất 80%. Thể tích khí CO₂ (đkc, lít) thu được là bao nhiêu? (Làm tròn đến hàng phần mười.)', soO: 4 },
+    { id: 'q8', text: 'Đốt cháy hoàn toàn 0,1 mol ethylamine (C₂H₅NH₂) thu được V lít khí N₂ (đkc). Giá trị của V là bao nhiêu? (Làm tròn đến hàng phần mười.)', soO: 4 },
+  ],
+  soCau: { I: 4, II: 2, III: 2 },
+} as PublicExamBankDk
+async function datLuotDk() {
+  const maCa = '246810'
+  await cacheSessionDk({ maCa, lop: '12A1', thoiGianPhut: 50, bank: DK_BANK })
+  const a: ExamAttemptDk = {
+    key: `${maCa}:12121212`, maCa, sbd: '12121212', maDe: 'ngân hàng', startedAt: new Date(now - 12 * 60_000).toISOString(), durationMinutes: 50,
+    hetGioLuc: new Date(now + 38 * 60_000).toISOString(), lanThu: 1, idThietBi: 'may-gia', nguong: { lan: 99, giay: 999 }, loai: 'thi', tenCa: 'Ca kiểm tra Hoá 12 · Ester – Carbohydrate',
+    answers: { ...emptyAnswerRecordDk(), phanI: { q1: 'A' }, phanII: {}, phanIII: {} } as ExamAttemptDk['answers'], integrity: emptyIntegrityLogDk(), submitted: false, submittedAt: null, pendingSubmit: false,
+  }
+  await saveAttemptDk(a)
+}
+function ManThiDk() {
+  const [san, datSan] = useStateDk(false)
+  useEffectDk(() => { void datLuotDk().then(() => datSan(true)) }, [])
+  return san ? h('div', { className: 'fixed inset-0 z-[60] overflow-y-auto overscroll-contain man-thi-phu' },
+    h(ExamTakeScreenDk, { tuCong: { maCa: '246810', sbd: '12121212', hoTen: 'Nguyễn Minh Anh', namSinh: '2008', lop: '12A1', scriptUrl: 'https://may-chu-gia.invalid' } })) : null
+}
+const manDuoKt = () => DK_V === 'thi' ? h(ManThiDk)
+  : DK_V === 'kq' ? h(KetQuaSauNopDk, { kieu: 'da_cong_bo', tenCa: 'Kiểm tra 50 phút · 12A1', gioNop: '20:41 · Thứ Bảy 24/10/2026', lanThu: 1, diem: 8.25, dung: 23, tong: 28, lam: '41 phút', de: '50 phút', ss: 0.5, truoc: 7.75,
+      phan: [{ ma: 'I', ten: 'Phần I · Trắc nghiệm', dung: 16, tong: 18, motPhan: 0, diem: 4, toiDa: 4.5 }, { ma: 'II', ten: 'Phần II · Đúng–sai', dung: 2, tong: 4, motPhan: 2, diem: 2.75, toiDa: 4 }, { ma: 'III', ten: 'Phần III · Trả lời ngắn', dung: 5, tong: 6, motPhan: 0, diem: 1.5, toiDa: 1.5 }],
+      cau: Array.from({ length: 28 }, (_, i) => ({ phan: i < 18 ? 'I' : i < 22 ? 'II' : 'III', so: i + 1, kq: [4, 13].includes(i) ? 'sai' : i === 20 ? 'mot_phan' : 'dung' })), expCa: 40, onXemBaoCao: noop, onVe: noop } as never)
+  : h('div', { className: 'fixed inset-0 z-50 overflow-y-auto overscroll-contain' }, h(ManKiemTraCaNhanDk, { token: 'tk', sbd: '12121212', id: 'kt-dk', onVe: noop, onCapNhat: noop }))
+// ═══ hết DUO KIỂM TRA 27/10
 // ═══ THƯỞNG PHẠT 26/10: `?man=tp&v=…` = giao diện học sinh hệ thưởng phạt (khối riêng gia/thuong.tsx — component THẬT, máy chủ GIẢ tests/_thuong-mau.ts).
 import { canhThuong, capFetchThuong } from './gia/thuong'
 if (man === 'tp' || thamSo.get('tp') === '1') capFetchThuong() // gộp 26/10: `&tp=1` ⇒ Lộ trình / làm chặng THẬT có cắm thưởng phạt
@@ -921,6 +1004,7 @@ const con =
   man === 'hs-ng' ? manNgang() : // NGANG HS 26/10
   man === 'duo-sua' ? manDuoSua() : // DUO SỬA 27/10
   man === 'soat-ktcn' ? manSoatKtcn() : // ═══ SOÁT 26/10
+  man === 'duo-kt' ? manDuoKt() : // DUO KIỂM TRA 27/10
   man === 'tp' ? canhThuong() : // THƯỞNG PHẠT 26/10
   man === 'gv-hom-nay' ? h(GvHomNayScreen) : man === 'gv-kho' ? h(NganHangDeScreen) : man === 'gv-cai-dat' ? h(CaiDatScreen) : man === 'gv-hoc-sinh' ? h(HocSinhScreen) : man === 'gv-mo-ca' ? h(ExamSetupScreen) : man === 'gv-go-nut' ? h(BanGoNutThatScreen) : man === 'gv-duyet' ? h(DuyetLoiGiaiScreen) :
   PH_VAO ? h(BatLinhShell, { vai: 'ph' }, h(ParentPortalScreen)) : // NGANG PH 26/10

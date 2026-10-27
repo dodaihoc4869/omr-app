@@ -36,6 +36,10 @@
     --tr-phu: rgba(0, 0, 0, 0.6);
     --tr-bong-1: 0 1px 2px rgba(0, 0, 0, 0.35); --tr-bong-2: 0 4px 12px rgba(0, 0, 0, 0.35); --tr-bong-3: 0 16px 40px rgba(0, 0, 0, 0.5);
   }
+  /* NÂNG CẤP THẨM MỸ APP HỌC SINH (bản vẽ ve-moi/nang-cap; thầy 27/10 «Bạn tự chốt sao cho tốt nhất build luôn đi»): tối RIÊNG app học sinh kiểu Duolingo —
+     nền xanh xám đậm, thẻ #202f36, viền #37464f, chữ trắng ngà; màu nhấn giữ bảng tối ở trên (đã rực). CHỈ THÊM (đè theo độ ưu tiên), ít biến nhất có thể
+     vì tờ này nằm trong lượt mở cả ba app (luật tốc độ: +≤ 64 byte nén mỗi đường). */
+  :root[data-trong='hs'] { --tr-nen: #131f24; --tr-mat: #202f36; --tr-mat-2: #2a3a42; --tr-mat-3: #37464f; --tr-vien: #37464f; --tr-vien-2: #4a5b64; --tr-chu: #f2f1ea; }
 }
 
 /* ── 1. Màu chính theo vai ─────────────────────────────────────────────────────────────────────────────────────── */
@@ -125,3 +129,4 @@ html.may-yeu[data-trong] .ht-thanh { background: var(--tr-nen); backdrop-filter:
 /* ── 9. 12 bậc từ Lười đến Chăm: công thức màu gốc (bac-cham-chi.css) đọc --do/--cam/--xanh/--tim đã ánh xạ ở trên ⇒ tự theo bảng «Trong»;
    riêng bậc 12 dùng --vang-diu (nay là chữ hổ phách) ⇒ đặt thẳng vàng sao cho đúng nghĩa «thành tích». */
 [data-trong] .bcc[data-bac='12'] { --bac: var(--tr-sao); }
+

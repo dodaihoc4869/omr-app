@@ -54,6 +54,7 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
         run: |
-          npx -y wrangler@4 d1 execute omr --remote --json --file /tmp/lenh.sql > /tmp/ghi.json
-          python3 -c "import json;d=json.load(open('/tmp/ghi.json'));print('ghi:', [x.get('success') for x in d])"
+          # 26/10: `--file` của wrangler@4 không in JSON ra stdout (run 40410230082) ⇒ ghi bằng `--command`, như bước đọc lại.
+          npx -y wrangler@4 d1 execute omr --remote --json --command "$(cat /tmp/lenh.sql)" > /tmp/ghi.json
+          python3 -c "import json;d=json.load(open('/tmp/ghi.json'));print('ghi:', [x.get('success') for x in d]);assert all(x.get('success') for x in d)"
           npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT khoa, gia_tri, cap_nhat_luc FROM cau_hinh WHERE khoa = 'duolingo_bai'"

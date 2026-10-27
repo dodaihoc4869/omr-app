@@ -96,7 +96,26 @@ function changVuaXong(xong: number, tong: number): number | null {
 /** CON ĐƯỜNG CHẶNG (bản vẽ dm-1/2/3, thầy chốt 26/10): nút lục giác nổi khối, nối bằng đường chấm mềm (vẽ theo vị trí thật của nút).
  *  Hiệu ứng (HIEU-UNG.md F): F1 nút hiện tại phồng thở + bong bóng nhún (CSS) · F2 chặng vừa xong: vòng lan + sao bay · F3 chặng mới mở: khoá tinh thể vỡ
  *  · F4 tự cuộn mượt tới nút hiện tại khi nút nằm ngoài khung nhìn. */
-function DuongChang({ ds, moDi }: { ds: Nut[]; moDi: boolean }) {
+/** Rương tinh thể giữa đường (bản vẽ nâng cấp 27/10) — tranh trang trí; sáng màu khi xong hết chặng hôm nay, trước đó mờ. */
+function Ruong() {
+  return <svg className="da-ruong-hinh" viewBox="0 0 96 84" width="88" height="77" aria-hidden="true">
+    <ellipse className="rg-bong" cx="48" cy="80" rx="40" ry="4" />
+    <rect className="rg-day" x="8" y="34" width="80" height="44" rx="8" /><rect className="rg-than" x="8" y="34" width="80" height="38" rx="8" />
+    <path className="rg-nap" d="M12 34a14 14 0 0 1 14-16h44a14 14 0 0 1 14 16z" /><path className="rg-day" d="M12 34h72v8H12z" />
+    <rect className="rg-dai" x="20" y="18" width="10" height="56" rx="3" /><rect className="rg-dai" x="66" y="18" width="10" height="56" rx="3" />
+    <path className="rg-ngoc" d="M48 30l12 10-12 18-12-18z" /><path className="rg-ngoc-sang" d="M48 30l12 10H36z" /><path className="rg-ngoc-dam" d="M48 58l-12-18h12z" />
+  </svg>
+}
+/** Vòng tiến độ quanh nút HIỆN TẠI (thầy 27/10, ảnh Duolingo): bốn đoạn có khe, nền xám tối, phần đã làm tô màu chính từ đỉnh theo chiều kim đồng hồ,
+ *  tô dần 0 → tỉ lệ thật lúc mở (stroke-dashoffset, 600 ms); vòng thở co 0,94 ↔ 1. Không có số ⇒ vòng xám nguyên. */
+const CV = 2 * Math.PI * 54
+function VongChang({ pt }: { pt?: number }) {
+  const L = Math.max(0, Math.min(100, pt ?? 0)) / 100 * CV
+  return <svg className="da-vong" viewBox="0 0 116 116" aria-hidden="true"><circle className="nen" cx="58" cy="58" r="54" />
+    {L > 0 && <circle className="chay" cx="58" cy="58" r="54" strokeDasharray={`${L} ${CV}`} style={{ '--L': `${L}` } as CSSProperties} />}</svg>
+}
+
+function DuongChang({ ds, moDi, cam }: { ds: Nut[]; moDi: boolean; cam?: CamBi }) {
   const goc = useRef<HTMLDivElement>(null)
   const [duong, setDuong] = useState('')
   const [vua, setVua] = useState<number | null>(null)
@@ -110,6 +129,7 @@ function DuongChang({ ds, moDi }: { ds: Nut[]; moDi: boolean }) {
     const het = window.setTimeout(() => setVua(null), 2100)
     return () => { window.clearTimeout(mo); window.clearTimeout(t); window.clearTimeout(het) }
   }, [soXong, soChang])
+  const giua = soChang >= 2 ? ds.findIndex((n) => n.k === `c${Math.floor((soChang - 1) / 2)}`) : -1
   const daCuon = useRef(false)
   useEffect(() => {
     const nut = goc.current?.querySelector<HTMLElement>('.da-nut[data-tt="dang"]')
@@ -136,38 +156,51 @@ function DuongChang({ ds, moDi }: { ds: Nut[]; moDi: boolean }) {
     {duong && <svg className="da-noi" aria-hidden="true"><path d={duong} /></svg>}
     <ol className="da-ds" aria-label="Lộ trình hôm nay">
     {ds.map((n, i) => {
+      const sao = n.tt === 'dang' && n.loai === 'hoc'
       const Icon = n.tt === 'xong' ? Check : n.tt === 'khoa' ? Lock : HINH_NUT[n.loai]
       const x = LECH[i % LECH.length]!
       const than = <>
-        {n.vong !== undefined && <svg className="da-vong" viewBox="0 0 116 116" aria-hidden="true"><circle className="nen" cx="58" cy="58" r="54" /><circle className="chay" cx="58" cy="58" r="54" strokeDasharray={`${(n.vong / 100) * 339.3} 340`} /></svg>}
+        {(n.vong !== undefined || n.tt === 'dang') && <VongChang pt={n.vong} />}
         {n.bong && <span className="da-bong" aria-hidden="true">{n.bong}</span>}
-        <Icon size={30} strokeWidth={2.6} aria-hidden="true" />
+        {sao && <i className="da-sao-bong" aria-hidden="true" />}
+        {/* ngôi sao đặc tự vẽ (không thêm biểu tượng thư viện vào mảnh dùng chung lúc mở app) */}
+        {sao ? <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth={1.6} strokeLinejoin="round" aria-hidden="true"><path d="M12 2.8l2.8 5.8 6.3.8-4.6 4.4 1.2 6.3L12 17l-5.7 3.1 1.2-6.3-4.6-4.4 6.3-.8z" /></svg>
+          : <Icon size={30} strokeWidth={2.6} aria-hidden="true" />}
         {n.nhan && <span className="da-nhan" data-ben={x > 0 ? 'trai' : undefined} aria-hidden="true">{n.nhan}</span>}
       </>
       const hu = vua === null ? undefined : i === vua ? 'xong' : i === vua + 1 && n.tt === 'dang' ? 'mo' : undefined
-      return <li key={n.k} className="da-o-nut" data-hu={hu} style={{ '--x': `${x}px` } as CSSProperties}>
+      const o = <li key={n.k} className="da-o-nut" data-hu={hu} style={{ '--x': `${x}px` } as CSSProperties}>
         {n.onClick ? <button type="button" className="da-nut" data-loai={n.loai} data-tt={n.tt} onClick={n.onClick} disabled={n.tat} aria-label={n.ten}>{than}</button>
           : <span className="da-nut" data-loai={n.loai} data-tt={n.tt} role="img" aria-label={n.ten}>{than}</span>}
         {hu === 'xong' && <span className="da-lan" aria-hidden="true" />}
         {hu === 'mo' && <span className="da-vo-khoa" aria-hidden="true"><i /><i /><i /><i /><Lock size={22} strokeWidth={2.6} /></span>}
+        {/* LINH VẬT MỜ CẠNH ĐƯỜNG (thầy 27/10, như cú Duo xám): cứ 3 nút một con, xen kẽ trái / phải, đứng phía đối diện chỗ đường lượn; chặng chưa tới ⇒
+            xám mờ, đã tới ⇒ hiện màu + thở. Hiện dùng Bi; chỗ cắm sẵn `data-lv` cho 4 giám thị (Tí · Cô Cốc · Chú Tam · Giáo sư Kíp) khi vào main. */}
+        {i % 3 === 1 && cam && <span className="da-linh-vat" aria-hidden="true" data-lv="bi" data-toi={n.tt === 'khoa' || undefined}
+          style={{ '--lv': `${(x > 0 || (x === 0 && (i / 3 | 0) % 2 === 0) ? -1 : 1) * 104 - x}px` } as CSSProperties}><Bi cam={n.tt === 'khoa' ? 'ngu' : cam} size={104} /></span>}
       </li>
+      // Rương tinh thể + Bi đứng cạnh đường (bản vẽ nâng cấp): sau chặng giữa (đủ ≥ 2 chặng); rương lệch phía đối diện Bi.
+      return i === giua ? [o, <li key="ruong" className="da-ruong" aria-hidden="true" data-mo={soXong === soChang || undefined} style={{ '--x': `${LECH[(i + 1) % LECH.length]! <= 0 ? -56 : 56}px` } as CSSProperties}>
+        <Ruong /></li>] : o
     })}
   </ol></div>
 }
 
 /** G — Bi NÓI: bong bóng lời hiện chữ gõ dần (~28 ms/chữ); giảm chuyển động / máy yếu ⇒ hiện đủ ngay. Trình đọc màn hình đọc cả câu một lần. */
-function LoiBi({ cam, loi }: { cam: CamBi; loi: string }) {
+function LoiBi({ cam, loi, coBi = true }: { cam: CamBi; loi: string; coBi?: boolean }) {
   const [n, setN] = useState(loi.length)
   useEffect(() => {
     const yen = document.documentElement.classList.contains('may-yeu') || !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
     if (yen) { setN(loi.length); return }
     setN(0)
     let t = 0, i = 0
-    const go = () => { i++; setN(i); if (i < loi.length) t = window.setTimeout(go, 28) }
-    t = window.setTimeout(go, 28)
+    // 27/10 (soát ảnh: bong bóng trông «cụt câu» khi đang gõ): gõ xong câu trong ≤ 0,7 s (câu dài ⇒ mỗi chữ nhanh hơn, tối thiểu 8 ms).
+    const nhip = Math.max(8, Math.min(28, Math.floor(700 / Math.max(1, loi.length))))
+    const go = () => { i++; setN(i); if (i < loi.length) t = window.setTimeout(go, nhip) }
+    t = window.setTimeout(go, nhip)
     return () => window.clearTimeout(t)
   }, [loi])
-  return <div className="bi-loi"><Bi cam={cam} size={84} noi={loi} /><p className="bi-loi-bong"><span className="ht2-an">{loi}</span><span aria-hidden="true">{loi.slice(0, n)}<span className="bi-loi-con">{loi.slice(n)}</span></span></p></div>
+  return <div className="bi-loi" data-khong-bi={!coBi || undefined}>{coBi && <Bi cam={cam} size={84} noi={loi} />}<p className="bi-loi-bong"><span className="ht2-an">{loi}</span><span aria-hidden="true">{loi.slice(0, n)}<span className="bi-loi-con">{loi.slice(n)}</span></span></p></div>
 }
 
 const THU_NGAN = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
@@ -303,6 +336,8 @@ export function MotTrangHs(p: PropsMotTrang) {
     : du ? (tiepTheo.length ? ['vui', `Đủ mức rồi! Giờ đến ${tiepTheo[0]} nhé.`] : ['mung', 'Xong hết việc hôm nay! Em giỏi lắm.'])
     : so.daLam === 0 ? ['chao', 'Chào em! Hôm nay bắt đầu từ chặng Học nhé.'] : ['chao', `Học tiếp nhé! Còn ${con} câu nữa là đủ mức hôm nay.`]
 
+  // Bi đứng cạnh đường (bản vẽ nâng cấp 27/10) khi đường có ≥ 2 chặng ⇒ lời Bi phía trên chỉ còn bong bóng (không hai Bi).
+  const coBiBen = chang.length >= 2
   return <div className="dm-khung">{tren}
     <main className="da-vo" aria-busy={!so && p.dangTai}>
       {chinh === 'ca' && <section className="da-bang" data-sac="tin" aria-label="Ca kiểm tra đang mở"><span className="h"><ClipboardCheck size={26} aria-hidden="true" /></span><div className="giua"><b>Ca kiểm tra đang mở</b><span className="mo">Nhập mã ca và mật khẩu thầy cung cấp để vào phòng kiểm tra.</span></div><button type="button" className="nut-to" onClick={p.onThi}>Vào ca kiểm tra</button></section>}
@@ -310,9 +345,9 @@ export function MotTrangHs(p: PropsMotTrang) {
       {!p.ngayKiem && <section className="da-bai" aria-label="Bài học hôm nay"><div className="giua">{p.viec && <small>{p.viec}</small>}<b>{p.tenBai || 'Bài học hôm nay'}</b></div>
         {chang.length > 0 && <div className="da-bai-tien" role="progressbar" aria-label="Chặng hôm nay" aria-valuemin={0} aria-valuemax={chang.length} aria-valuenow={xongChang}><i><s style={{ width: `${Math.round((100 * xongChang) / chang.length)}%` }} /></i>{xongChang}/{chang.length} chặng</div>}
         {!so && p.dangTai && <span className="mot-xuong" aria-hidden="true" />}</section>}
-      {loiBi && <LoiBi cam={loiBi[0]} loi={loiBi[1]} />}
+      {loiBi && <LoiBi cam={loiBi[0]} loi={loiBi[1]} coBi={!coBiBen} />}
       {p.ghi.map((g) => <p key={g} className="da-ghi">{g}</p>)}
-      {nut.length > 0 && <DuongChang ds={nut} moDi={chinh === 'ca'} />}
+      {nut.length > 0 && <DuongChang ds={nut} moDi={chinh === 'ca'} cam={coBiBen ? loiBi?.[0] ?? 'chao' : undefined} />}
       {hocThem && <button type="button" className="mot-lien-ket" onClick={p.onHoc}>Học thêm câu mới<ChevronRight size={18} aria-hidden="true" /></button>}
     </main>
     <aside className="dm-ben" aria-label="Tóm tắt">

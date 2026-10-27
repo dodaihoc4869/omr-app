@@ -286,6 +286,9 @@ export default defineConfig({
           '**/{HoiThayScreen,hoi-thay-goc}-*.{js,css}',
           // Kiểm tra riêng cần máy chủ để mở chặng/lưu giờ: chỉ tải khi đến lịch, cất ở kho chạy-lúc.
           '**/{ManKiemTraCaNhan,TheKiemTraCaNhan,TheKiemTraCon}-*.{js,css}',
+          // Kiểm tra kiểu Duolingo (27/10): khung chung + khung ca thi + Bi kết quả nạp lười khi <html data-trong="hs"> (tải hỏng ⇒ bố cục cũ) và Kết quả sau nộp
+          // (chỉ hiện khi bài đã gửi được, tức đang có mạng) ⇒ kho chạy-lúc, precache giữ ≤ 170.
+          '**/{KhungKiemTra,ThiDuo,BiNop,KetQuaSauNop}-*.{js,css}',
           // Tấm giữ chân khi thoát giữa chặng (27/10): màn làm chặng Duo nạp sẵn ngay khi mở (GiuChan.tsx) ⇒ vào kho chạy-lúc, không cất sẵn.
           '**/TamGiuChan-*.{js,css}',
           // Giám thị theo mức câu (27/10): mảnh lười của màn làm chặng Duo (nạp sẵn lúc mở màn) ⇒ kho chạy-lúc, không cất sẵn.

@@ -283,11 +283,13 @@ const DS_DUO = [[390, 844, 'doc'], [390, 700, 'doc700'], [360, 640, 'doc640'], [
 // ═══ hết DUO 26/10
 // ═══ THẺ CHẠM 27/10 (thầy: «làm lại khung hiển thị cho tinh tế popup đẹp mắt dolingo»): thẻ nhỏ neo dưới chữ tô tím trên màn làm chặng THẬT
 // (`lam13&lam=duo&cham=…`, gia/lam-bai-1210d.ts) — mở trên chất / đơn vị / phủ định; 390×844 · 360×640 · 844×390 · 1440×900, sáng + tối.
-// `vd` = câu ethylamine trong ảnh thầy (không còn ô tô «dịch chất nào sau đây»). Thao tác `cham:<chữ>` = chạm chữ đó rồi chờ thẻ. Tiền tố "duo-cham-".
+// `vd` = câu ethylamine trong ảnh thầy (không còn tô «dịch chất nào sau đây»; chạm «Ethylamine» ⇒ tên · công thức · M). Thao tác `cham:<chữ>` = chạm chữ đó rồi chờ thẻ. Tiền tố "duo-cham-".
 const CHAM_CANH = [['chat', /aniline/, 'cham:aniline'], ['don-vi', /ethyl acetate/, 'cham:1,5 M'], ['phu-dinh', /không đúng/, 'cham:không đúng']]
 const DS_CHAM = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   CHAM_CANH.map(([t, cho, viec]) => [`duo-cham-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, `lam13&lam=duo&cham=${t}`, w, hh, nen, false, cho, viec])))
-DS_CHAM.push(['duo-cham-vd-doc', 'lam13&lam=duo&cham=vd', 390, 844, 'light', false, /Ethylamine thể hiện/, 'cham-khong:'])
+// thầy 27/10 («Hiện tên, công thức, M thôi»): câu lý thuyết cũng chạm được tên chất ⇒ ảnh câu ví dụ mở thẻ «Ethylamine»
+DS_CHAM.push(...[[390, 844, 'doc'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].map((nen) =>
+  [`duo-cham-vd-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=duo&cham=vd', w, hh, nen, false, /Ethylamine thể hiện/, 'cham:Ethylamine'])))
 // ═══ hết THẺ CHẠM 27/10
 // ═══ GIỮ CHÂN 27/10 (ảnh Duolingo «Đừng đi mà…»): tấm giữ chân khi bấm X giữa chặng + băng nhắc + lời động viên. `&giu=1` ⇒ bản tổng quan thưởng ở máy
 // (chuỗi 12 ngày, hôm nay chưa đạt, mục tiêu 3/4) và hôm nay mới làm 2 câu (trang.tsx / gia/lam-bai-1210d.ts). Tiền tố "duo-giu-".
@@ -325,6 +327,22 @@ const TPC_CANH = [
 const DS_TPC = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   TPC_CANH.map(([t, m, cho, viec]) => [`tpc-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
 // ═══ hết THƯỞNG PHẠT GỘP 26/10
+// ═══ NÂNG CẤP 27/10 (tiền tố "nc-", bản vẽ ve-moi/nang-cap): Lộ trình (nút tròn, vòng bốn đoạn, sao nảy, rương + Bi cạnh đường) và màn làm chặng
+// `lam13&lam=duo-nc` (câu chọn chất có tranh phân tử · câu tính có cảnh phản ứng + 4 phương án số · tấm Đúng · tấm Chưa đúng · tấm Chưa được tính).
+const NC_DEN_TINH = 'lam13:tn:^B » nut:^Kiểm tra$ » nut:^Tiếp tục'
+const NC_CANH = [
+  ['lo-trinh', 'hs-mot&tp=1', /Ester/], ['1-chon-chat', 'lam13&lam=duo-nc', /Chất nào sau đây là amine/, 'lam13:tn:^B'],
+  ['2-dung', 'lam13&lam=duo-nc', /Chất nào sau đây là amine/, 'lam13:tn:^B » nut:^Kiểm tra$'],
+  ['3-tinh', 'lam13&lam=duo-nc', /Chất nào sau đây là amine/, `${NC_DEN_TINH} » tn:^A`],
+  ['4-sai', 'lam13&lam=duo-nc', /Chất nào sau đây là amine/, `${NC_DEN_TINH} » tn:^A » nut:^Kiểm tra$`],
+  ['5-chua-tinh', 'lam13&lam=duo-nc', /Chất nào sau đây là amine/, `${NC_DEN_TINH} » tn:^A » nut:^Kiểm tra$ » nut:^Tiếp tục » tn:^B » nut:^Kiểm tra$`],
+  // mốc combo 3 giữa hiệu ứng (~750 ms sau Kiểm tra: Bi đã bay vào, hạt đang gom) và lúc xong (~1,6 s: số đã cộng đủ)
+  ['6-combo-giua', 'lam13&lam=duo-nc&chuoi=2', /Chất nào sau đây là amine/, 'lam13:tn:^B » nut:^Kiểm tra$ » cho » cho'],
+  ['7-combo-xong', 'lam13&lam=duo-nc&chuoi=2', /Chất nào sau đây là amine/, 'lam13:tn:^B » nut:^Kiểm tra$ » cho » cho » cho » cho » cho'],
+]
+const DS_NC = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  NC_CANH.map(([t, m, cho, viec]) => [`nc-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
+// ═══ hết NÂNG CẤP 27/10
 // ═══ BI CHUYỂN ĐỘNG 27/10 (tiền tố "bd-"): mọi chỗ có Bi trong app học sinh — Lộ trình (Bi nói), câu đúng (mừng nhảy), câu sai (buồn), kết chặng
 // (nhảy múa), Thành tích, chuỗi ngày (lửa). 390×844 · 360×640 · 844×390 · 1440×900, sáng + tối. Bi chuyển động nạp lười ⇒ chờ thêm cho mảnh bi-dong.
 const DS_BD = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
@@ -412,6 +430,27 @@ const DS_PH_DOC = [
   ,['62-ph-doc-tat-doc', 'ph&mot=1&trong=tat', 390, 844, 'light', true, /Hôm nay của Khôi/]
   ,['62-ph-doc-tat-may-tinh', 'ph&mot=1&trong=tat', 1440, 900, 'light', false, /Hôm nay của Khôi/]
 ]
+// ═══ DUO KIỂM TRA 27/10 (tiền tố "duo-kt-"): màn làm bài kiểm tra kiểu Duolingo — Kiểm tra ôn tập (`duo-kt&v=ktcn|ket`) + ca thi (`duo-kt&v=thi|kq&vai=hocsinh`),
+// khối DUO KIỂM TRA ở trang.tsx. 390×844 · 360×640 · 844×390 · 1440×900, sáng + tối. Thao tác `lam13:` (nút / phím) dùng chung khối LÀN MÀN LÀM BÀI.
+const DK_LUOI = 'nut:^Danh sách câu'
+const DUO_KT_CANH = [
+  ['ktcn-cau', 'duo-kt&v=ktcn', /Kiểm tra ôn tập/, 'lam13:nut:^Làm tiếp chặng 2'],
+  ['ktcn-ds', 'duo-kt&v=ktcn', /Kiểm tra ôn tập/, `lam13:nut:^Làm tiếp chặng 2 » ${DK_LUOI} » nut:^Câu 4`],
+  ['ktcn-tln', 'duo-kt&v=ktcn', /Kiểm tra ôn tập/, `lam13:nut:^Làm tiếp chặng 2 » ${DK_LUOI} » nut:^Câu 6 » phim:1,5`],
+  ['ktcn-luoi', 'duo-kt&v=ktcn', /Kiểm tra ôn tập/, `lam13:nut:^Làm tiếp chặng 2 » ${DK_LUOI}`],
+  ['ktcn-nop', 'duo-kt&v=ktcn', /Kiểm tra ôn tập/, `lam13:nut:^Làm tiếp chặng 2 » ${DK_LUOI} » nut:^Câu 6 » nut:^Nộp chặng 2`],
+  ['ktcn-ket', 'duo-kt&v=ket', /Làm tốt lắm/],
+  ['thi-cau', 'duo-kt&v=thi&vai=hocsinh', /Câu \d\/8/],
+  ['thi-chon', 'duo-kt&v=thi&vai=hocsinh', /Câu \d\/8/, 'lam13:nut:^B\\.'],
+  ['thi-ds', 'duo-kt&v=thi&vai=hocsinh', /Câu \d\/8/, `lam13:${DK_LUOI} » nut:^Câu 5 » nut:^Đúng$`],
+  ['thi-tln', 'duo-kt&v=thi&vai=hocsinh', /Câu \d\/8/, `lam13:${DK_LUOI} » nut:^Câu 7 » nut:^1$ » nut:^7$`],
+  ['thi-luoi', 'duo-kt&v=thi&vai=hocsinh', /Câu \d\/8/, `lam13:${DK_LUOI}`],
+  ['thi-nop', 'duo-kt&v=thi&vai=hocsinh', /Câu \d\/8/, `lam13:${DK_LUOI} » nut:^Nộp bài$`],
+  ['thi-kq', 'duo-kt&v=kq&vai=hocsinh', /Làm tốt lắm/],
+]
+const DS_DUO_KT = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  DUO_KT_CANH.map(([t, m, cho, viec]) => [`duo-kt-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
+// ═══ hết DUO KIỂM TRA 27/10
 // ═══ MENU 6 MỤC 27/10 (tiền tố "menu6-"): menu dọc app học sinh gọn 6 mục — mở (không buổi điểm danh) · mở khi có buổi đang mở (thẻ Điểm danh đầu menu)
 // · tấm Cài đặt. Hôm nay «Một trang» THẬT (`?man=hs-mot&dd=khong|mo`), chuông thật 2 tin chưa đọc. 390×844 · 360×640 · 844×390 · 1440×900, sáng + tối.
 const MENU6_CANH = [['mo', 'hs-mot&dd=khong', 'menu6:'], ['dd', 'hs-mot&dd=mo', 'menu6:'], ['cai', 'hs-mot&dd=khong', 'menu6:Cài đặt']]
@@ -419,6 +458,7 @@ const DS_MENU6 = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], 
   MENU6_CANH.map(([t, m, viec]) => [`menu6-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, /Ester/, viec])))
 // ═══ hết MENU 6 MỤC 27/10
 const DS = [
+  ...DS_DUO_KT, // DUO KIỂM TRA 27/10
   ...DS_MENU6, // MENU 6 MỤC 27/10
   ...DS_KGD, // KIỂM GD MỚI 26/10
   ...DS_NG_GV, // NGANG GV 26/10
@@ -432,6 +472,7 @@ const DS = [
   ...DS_GT, // GIÁM THỊ 27/10
   ...DS_CHAM, // THẺ CHẠM 27/10
   ...DS_TPC, // THƯỞNG PHẠT GỘP 26/10
+  ...DS_NC, // NÂNG CẤP 27/10
   ...DS_BD, // BI CHUYỂN ĐỘNG 27/10
   ...DS_HSE, // LÀN HỒ SƠ EM 12/10F
   ...DS_THE1210E, // LÀN THẺ HÔM NAY 12/10E
@@ -588,6 +629,8 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
     if (m.startsWith('gv-')) {
       await t.getByRole('heading', { name:m === 'gv-kho' ? /Kho đề|Ngân hàng câu hỏi/ : cho }).first().waitFor({ timeout:20000 })
     } else await t.getByText(cho).first().waitFor({ timeout: 20000 })
+    // 27/10 (soát ảnh): Bi đang gõ lời ⇒ chờ gõ xong (≤ 0,7 s) rồi mới chụp, tránh ảnh «cụt câu» giữa chừng.
+    await t.waitForFunction(() => [...document.querySelectorAll('.bi-loi-con')].every((e) => !e.textContent), null, { timeout: 3000 }).catch(() => {})
   } catch {
     loiTrang.push(`${ten}: không thấy chữ ${cho}`)
   }

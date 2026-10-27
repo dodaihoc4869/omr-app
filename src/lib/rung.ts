@@ -2,9 +2,11 @@
 // sinh «Trong» (làm chặng, Kiểm tra ôn tập, Tự sửa lỗi, Tu luyện); KHÔNG gắn ở màn thi thật. Nằm trong mảnh nạp lười của các màn ấy (không vào nhóm mở app).
 // Android: navigator.vibrate(mẫu). iPhone (không có vibrate): mẹo iOS 18+ — bấm nhãn của một `<input type="checkbox" switch>` ẩn (dựng một lần) cho một
 // nhịp rung nhẹ. Mọi lỗi im lặng. Tắt khi không có <html data-trong="hs"> hoặc em tắt trong menu (localStorage 'ddh.rung' = 'tat').
-export type KieuPhanHoi = 'chon' | 'dung' | 'sai' | 'xong' | 'combo'
+export type KieuPhanHoi = 'chon' | 'dung' | 'sai' | 'xong' | 'combo' | 'combo3' | 'combo5' | 'combo10'
 // 27/10 (thầy: «chưa thấy rung»): nhịp 10–18 ms quá ngắn — mô-tơ nhiều máy Android (Samsung) không kịp quay ⇒ mọi nhịp bật ≥ 35 ms.
-export const MAU_RUNG: Record<KieuPhanHoi, number[]> = { chon: [35], dung: [60], sai: [80, 70, 80], xong: [60, 50, 60, 50, 140], combo: [40, 40, 40] }
+// 27/10 (thầy: «rung siêu xịn như dolingo»): mốc chuỗi đúng liền 3 · 5 · 10 (rồi mỗi 5 câu) rung mạnh dần — nhịp ≥ 35 ms, cú cuối dài nhất.
+export const MAU_RUNG: Record<KieuPhanHoi, number[]> = { chon: [35], dung: [60], sai: [80, 70, 80], xong: [60, 50, 60, 50, 140], combo: [40, 40, 40],
+  combo3: [40, 40, 40, 40, 90], combo5: [50, 40, 50, 40, 50, 40, 160], combo10: [60, 40, 60, 40, 60, 40, 60, 60, 240] }
 
 /** Được phản hồi (rung / tiếng) không: chỉ app học sinh «Trong», và em chưa tắt công tắc `khoa` trong menu. */
 export function duocPhanHoi(khoa: 'ddh.rung' | 'ddh.am'): boolean {
