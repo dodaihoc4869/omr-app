@@ -271,7 +271,11 @@ export async function hsThuong(env: Env, b: Dong, ctx?: ExecutionContext, nowMs:
     nhiemVu: d.nhiemVu,
     ruong: { mo: d.ruongMo, thuong: TT_RUONG },
     // CHỈ-THÊM 27/10 (luật bình mới): giá + hạn mua 1 bình / tuần — giao diện xám nút và nói lý do khi `daMuaTuan`.
-    binh: { gia: TT_BINH_GIU_CHUOI, toiDaTuan: BINH_MUA_TOI_DA_TUAN, daMuaTuan: Math.max(d.binhTuan, chuoiNgay?.binhTuanNay ?? 0) >= BINH_MUA_TOI_DA_TUAN, muaTiepTu: tuanMuaBinh(ngay).muaTiepTu },
+    // `nguon` (CHỈ-THÊM 28/10): bình của tuần đến từ «mua» hay «qua» (quà mốc 30 ngày) — giao diện nói đúng nguồn; nút vẫn xám vì trần 1 bình/tuần.
+    binh: (() => {
+      const daMuaTuan = Math.max(d.binhTuan, chuoiNgay?.binhTuanNay ?? 0) >= BINH_MUA_TOI_DA_TUAN
+      return { gia: TT_BINH_GIU_CHUOI, toiDaTuan: BINH_MUA_TOI_DA_TUAN, daMuaTuan, ...(daMuaTuan ? { nguon: d.binhTuan >= BINH_MUA_TOI_DA_TUAN ? 'mua' : 'qua' } : {}), muaTiepTu: tuanMuaBinh(ngay).muaTiepTu }
+    })(),
     // Khối `giai` (phần B, tomTatGiaiEm): {hang, thuHang, soNguoi, hetHanGiay} | null (công tắc tắt / em chưa vào bảng tuần này) ⇒ giao diện ẩn thẻ.
     giai,
     thongBao: ((kq[4]?.results ?? []) as Dong[]).map((r) => ({ ma: chu(r.ma), loai: chu(r.loai), duLieu: docJson<unknown>(r.du_lieu, {}) })),
@@ -306,7 +310,7 @@ export async function hsMoRuong(env: Env, b: Dong, nowMs: number = Date.now()): 
 
 export const LOI_DA_MUA_TUAN = 'Tuần này em đã mua · mua tiếp từ thứ Hai'
 /** Tuần này em đã nhận bình (mua hoặc quà mốc 30 ngày) — trần chung 1 bình/tuần. */
-export const LOI_DA_NHAN_TUAN = 'Tuần này em đã có 1 bình · mua tiếp từ thứ Hai'
+export const LOI_DA_NHAN_TUAN = 'Tuần này em đã nhận 1 bình (quà mốc 30 ngày) · mua tiếp từ thứ Hai'
 
 export async function hsMuaBinh(env: Env, b: Dong, nowMs: number = Date.now()): Promise<Dong> {
   const { sbd: sbdKy, xong } = await gameIdentityHaiBuoc(env, b)
