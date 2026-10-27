@@ -5,7 +5,7 @@
 //    Không nhận ra ⇒ không vẽ gì (không đoán).
 //  - <TranhPa choices i>: CẢ BỐN phương án là chất có trong từ điển phân tử ⇒ vẽ phân tử bi–que (có chữ nguyên tố) trong ô phương án thứ i.
 //    Thiếu một ⇒ không vẽ ô nào (bốn ô phải cùng kiểu).
-import type { ReactNode } from 'react'
+import { memo, type ReactNode } from 'react'
 
 type NguyenTu = [x: number, y: number, e: 'C' | 'N' | 'O' | 'H']
 type Lien = [a: number, b: number, kep?: 1]
@@ -74,11 +74,12 @@ function PhanTu({ chat }: { chat: Chat }) {
   </svg>
 }
 
-export function TranhPa({ choices, i }: { choices: readonly string[]; i: number }) {
+// 28/10 MƯỢT: ghi nhớ — màn làm bài vẽ lại mỗi lần chạm (chọn, Kiểm tra) không phải vẽ lại tranh phân tử của bốn ô (hàm thuần của phương án)
+export const TranhPa = memo(function TranhPa({ choices, i }: { choices: readonly string[]; i: number }) {
   const ds = choices.map(chatCua)
   if (ds.length !== 4 || ds.some((c) => !c?.pt)) return null
   return <span className="mh-pa" aria-hidden="true"><PhanTu chat={ds[i]!} /></span>
-}
+})
 
 /** Đọc đề: chất chính (có lượng gam / mol đứng gần), chất phản ứng, đại lượng cần tìm. Không đủ ⇒ null. */
 export function docCanh(text: string): { ct: string; luong: string; thuoc: string; tim: string; dd: 1 | 2 | 3 } | null {

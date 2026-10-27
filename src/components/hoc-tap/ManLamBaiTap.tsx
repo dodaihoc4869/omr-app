@@ -419,6 +419,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       // 28/10 MƯỢT (thầy: «tách việc dài SAU lần vẽ phản hồi đầu»): lượt chạm chỉ đổi phần nhỏ (nút, tấm kết quả) ⇒ khung kế vẽ ngay; việc nặng (bản sao
       // trượt ra, dựng câu kế) chạy SAU lần vẽ đó (rAF + setTimeout 0). `dangSang` chặn chạm đúp tới khi câu kế hiện.
       dangSang.current = viTri
+      nutTiepRef.current?.setAttribute('data-lun', '') // 28/10 MƯỢT: nút giữ dáng lún tới khi câu kế hiện (trong-lam-bai.css) — phản hồi chạm vẽ ngay khung kế
       // 28/10 MƯỢT: bỏ tiêu điểm khỏi nút «Tiếp tục» TRƯỚC khi tấm kết quả rời cây — gỡ phần tử đang giữ tiêu điểm bắt trình duyệt tính kiểu + bố cục
       // ngay giữa lượt React gỡ nút (vết ×4: ~30 ms). Sau khi đổi câu tiêu điểm vẫn về trang như cũ.
       const sauKhiVe = (f: () => void) => { const g = () => { (document.activeElement as HTMLElement | null)?.blur?.(); f() }; if (document.hidden) window.setTimeout(g, 0); else requestAnimationFrame(() => { window.setTimeout(g, 0) }) }

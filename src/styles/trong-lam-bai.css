@@ -490,11 +490,15 @@
 [data-trong='hs'] :is(.ktcn-man, .ccs, .tlu) .pa-hang { transition: transform .08s ease; }
 [data-trong='hs'] .duo :is(.ht2-lam-pa, .ht2-lam-phim button):active:not(:disabled) { transform: translateY(2px); border-bottom-width: 2px; margin-bottom: 2px; }
 [data-trong='hs'] .duo .duo-nut:active:not(:disabled) { transform: translateY(3px); box-shadow: none; }
+/* 28/10 MƯỢT: «Tiếp tục» GIỮ dáng lún (y hệt :active) từ lúc chạm tới khi câu kế hiện — máy yếu (giám thị / Lửa đứng yên) khung kế vẫn vẽ ngay phản hồi
+   chạm thay vì chờ dựng xong câu kế (ManLamBaiTap `tiep`, `data-lun`). */
+[data-trong='hs'] .duo .duo-nut[data-lun]:not(:disabled) { transform: translateY(3px); box-shadow: none; }
 [data-trong='hs'] .duo .ht2-lam-y-nut button:active:not(:disabled),
 [data-trong='hs'] :is(.ktcn-man, .ccs, .tlu) .pa-hang:active:not(:disabled) { transform: translateY(2px); }
 @media (prefers-reduced-motion: reduce) {
   [data-trong='hs'] .duo :is(.ht2-lam-pa, .ht2-lam-phim button, .duo-nut, .ht2-lam-y-nut button):active:not(:disabled),
   [data-trong='hs'] :is(.ktcn-man, .ccs, .tlu) .pa-hang:active:not(:disabled) { transform: none; transition: none; }
+  [data-trong='hs'] .duo .duo-nut[data-lun]:not(:disabled) { transform: none; transition: none; }
 }
 
 /* ── 11. HIỆU ỨNG ĐÚNG / SAI kiểu Duolingo (thầy 26/10: «Làm đúng có hiệu ứng và làm sai cũng vậy, hiệu ứng đơn giản nhẹ như dolingo»), đi cùng rung/tiếng
