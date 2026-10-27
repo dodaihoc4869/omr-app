@@ -6,7 +6,8 @@ export type KieuPhanHoi = 'chon' | 'dung' | 'sai' | 'xong' | 'combo' | 'combo3' 
 // 27/10 (thầy: «chưa thấy rung»): nhịp 10–18 ms quá ngắn — mô-tơ nhiều máy Android (Samsung) không kịp quay ⇒ mọi nhịp bật ≥ 35 ms.
 // 27/10 (thầy: «rung siêu xịn như dolingo»): mốc chuỗi đúng liền 3 · 5 · 10 (rồi mỗi 5 câu) rung mạnh dần — nhịp ≥ 35 ms, cú cuối dài nhất.
 export const MAU_RUNG: Record<KieuPhanHoi, number[]> = { chon: [35], dung: [60], sai: [80, 70, 80], xong: [60, 50, 60, 50, 140], combo: [40, 40, 40],
-  combo3: [40, 40, 40, 40, 90], combo5: [50, 40, 50, 40, 50, 40, 160], combo10: [60, 40, 60, 40, 60, 40, 60, 60, 240] }
+  // 27/10 (sét đánh): mỗi mốc mở bằng MỘT nhịp mạnh 120 ms đúng lúc sét đánh
+  combo3: [120, 60, 40, 40, 90], combo5: [120, 60, 50, 40, 50, 40, 160], combo10: [120, 60, 60, 40, 60, 40, 60, 60, 240] }
 
 /** Được phản hồi (rung / tiếng) không: chỉ app học sinh «Trong», và em chưa tắt công tắc `khoa` trong menu. */
 export function duocPhanHoi(khoa: 'ddh.rung' | 'ddh.am'): boolean {

@@ -146,7 +146,7 @@ describe('các màn (đúng số bản vẽ)', () => {
   it('kết bài (tp-3): +61 · 83% · 4:12, tách dòng đúng nhãn máy chủ, mục tiêu 3/4, lên hạng 4 ↑2', () => {
     const c = ve(<KetBaiThuong ketBai={docKetBai(M.KET_BAI)!} hang="bac" phu="Amine · chặng 3 · 6 câu" onTiep={() => {}} />)
     expect(screen.getByRole('heading', { name: 'Xong chặng!' })).toBeTruthy()
-    expect(screen.getByRole('group', { name: 'Nguyên tử: +61' })).toBeTruthy()
+    expect(screen.getByRole('group', { name: 'Tổng nguyên tử: +61' })).toBeTruthy()
     expect(screen.getByRole('group', { name: 'Chính xác: 83%' })).toBeTruthy()
     expect(screen.getByRole('group', { name: 'Thời gian: 4:12' })).toBeTruthy()
     expect([...c.querySelectorAll('.hang-t')].map((r) => r.textContent)).toEqual(['Câu đúng · 5 câu × 10+50', 'Câu khó · câu 4+5', 'Chuỗi đúng · câu 3, 4+4', 'Câu sai làm kĩ · câu 5+2', 'Hoàn hảo · cần 6/6 câu đúng+0', 'Tổng+61 '])

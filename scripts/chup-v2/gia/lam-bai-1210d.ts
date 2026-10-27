@@ -125,6 +125,12 @@ const CAU_BANG: CauGia[] = [
     table: [['Chất', 'Methylamine', 'Ethylamine', 'Propylamine', 'Aniline'], ['Nhiệt độ sôi (°C)', '−6,4', '16,6', '47,8', '184,1'], ['Độ tan (g/100 g nước)', 'rất lớn', 'rất lớn', 'lớn', '3,6']],
     choices: ['Methylamine.', 'Aniline.', 'Propylamine.', 'Benzene.'], ideas: [], dapAn: 'A', loiGiai: { chot: 'Amine mạch ngắn tan rất tốt nhờ liên kết hydrogen với nước.' } },
 ]
+// ═══ COMBO + CÂU DÀI 27/10: `lam13&lam=duo-combo&chuoi=2|4|9` — câu đầu DÀI (bảng + đề nhiều dòng, phải cuộn mới tới phương án) để quay mốc 3 · 5 · 10
+// (thanh trên dính, sét, lắc, Bi gom, viên «+N» cạnh bộ đếm); các câu sau là câu ngắn của duo-nc. Mọi câu đều được tính.
+const CAU_COMBO: CauGia[] = [
+  { ...CAU_BANG[0]!, qid: 'L1', text: `${CAU_BANG[0]!.text}\nBiết rằng cả ba chất đều tạo được liên kết hydrogen giữa các phân tử, nhưng số liên kết N–H trong mỗi phân tử giảm dần từ ammonia đến ethylamine. Khi phân tử khối tăng, diện tích tiếp xúc giữa các phân tử tăng nên tương tác van der Waals mạnh dần.\nHãy chọn yếu tố giải thích đúng xu hướng nhiệt độ sôi trong bảng.` },
+  { ...CAU_NC[0]!, qid: 'C2' }, { ...CAU_NC[1]!, qid: 'C3' }, { ...CAU_BANG[1]!, qid: 'C4' },
+]
 const SO_LON = thamSo.get('so') === 'lon'
 // ═══ hết KIỂM GD MỚI 26/10
 // ═══ THẺ CHẠM 27/10: `lam13&lam=duo&cham=chat|don-vi|phu-dinh|vd` — câu đầu chặng có chữ chạm để chụp thẻ kiểu Duolingo (tiền tố ảnh «duo-cham-»):
@@ -175,7 +181,7 @@ const CAU_6DONG: CauGia = { ...nen, qid: 'GT4', maDe: 'BAI8', phan: 'I', tenDang
   choices: ['7,65', '8,10', '8,15', '0,85'], ideas: [], dapAn: 'C', loiGiai: { chot: 'n = 4,5 : 45 = 0,1 mol ⇒ m = 0,1 × 81,5 = 8,15 gam.' } }
 const DAU_GT: Record<string, CauGia> = { ngan: { ...CAU[1]!, qid: 'GT1' }, '4dong': CAU_4DONG, '6dong': CAU_6DONG, dai: CAU_TOLUIDINE }
 const CAU_DUO_GT = DAU_GT[thamSo.get('gtde') ?? ''] ? [DAU_GT[thamSo.get('gtde')!]!, ...CAU_DUO_CHAM] : CAU_DUO_CHAM
-const ds0 = kieu === 'duo-tn' ? CAU_TN : kieu === 'duo-bang' ? CAU_BANG : kieu === 'duo-pt' ? CAU_PT : kieu === 'duo-nc' ? CAU_NC : kieu === 'duo-xau' ? CAU_XAU : kieu === 'duo' ? CAU_DUO_GT : kieu === 'g7' ? CAU_G7 : kieu === 'ds-dau' ? [CAU[3]!, CAU[4]!, CAU[5]!] : kieu === 'so-o' ? CAU_SO_O : CAU
+const ds0 = kieu === 'duo-tn' ? CAU_TN : kieu === 'duo-bang' ? CAU_BANG : kieu === 'duo-pt' ? CAU_PT : kieu === 'duo-nc' ? CAU_NC : kieu === 'duo-combo' ? CAU_COMBO : kieu === 'duo-xau' ? CAU_XAU : kieu === 'duo' ? CAU_DUO_GT : kieu === 'g7' ? CAU_G7 : kieu === 'ds-dau' ? [CAU[3]!, CAU[4]!, CAU[5]!] : kieu === 'so-o' ? CAU_SO_O : CAU
 const ds = MUC_GT !== undefined ? ds0.map((c) => ({ ...c, mucDo: MUC_GT || null })) : ds0
 const GOI7 = { bat: true, ngay: '2026-10-12', toiThieu: 24, daLamHomNay: 12, tuLamCon: 9, tiepCanCon: 3, thieuPhu: 0, thieuNgay: 0, canHoTro: false, kienThucCu: { tong: 0, dat: 0, tyLe: null },
   goi: [{ id: 'g8', ten: 'Bài 8. Amine', batDau: '2026-10-10', han: '2026-10-16', tong: 40, daGap: 10, con: 30, quota: 6, gapHomNay: 2, quaHan: false, canBoSung: 0, to: ['BAI8-AMINE'] }], diemDaDo: [] }
@@ -189,7 +195,7 @@ export const soHomNayLam13 = () => SO_LON ? { daLam: 1234 + daNop, muc: 2400, ch
 const congKhai = ({ dapAn: _d, loiGiai: _l, ...q }: CauGia) => { const n = q.phan === 'III' ? soOPhanIII(_d) : null; return n === null ? q : { ...q, soO: n } }
 const so = (v: string) => Number(String(v).replace(',', '.'))
 // THƯỞNG PHẠT (gộp 26/10): `&tp=1` ⇒ lệnh answer trả `thuong` (Đúng +10, chuỗi ≥ 3: +2; sai làm kĩ +2) như máy chủ phần A, câu cuối của chặng thêm `ketBai`.
-const TP = thamSo.get('tp') === '1' || kieu === 'duo-nc' || kieu === 'duo-bang'
+const TP = thamSo.get('tp') === '1' || kieu === 'duo-nc' || kieu === 'duo-bang' || kieu === 'duo-combo'
 let chuoiTp = Number(thamSo.get('chuoi') ?? 0) // `&chuoi=2` (27/10): bắt đầu giữa chuỗi đúng ⇒ câu đúng đầu chạm mốc 3 (cảnh hiệu ứng mốc combo)
 const daTraTp = new Set<string>()
 const thuongTp = (dung: boolean) => {

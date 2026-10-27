@@ -585,3 +585,7 @@
 
 /* TƯƠI 27/10 (thầy cho phép: «Màu sắc của app làm siêu tươi như dolingo»): chữ trắng trên dải xanh lá ⇒ --tr-dung-nut (đạt 3:1 cho chữ đậm). */
 :root[data-trong='hs'] .tp-bxh .vach { background: var(--tr-dung-nut); }
+/* 27/10 thẻ số kết chặng kiểu Duolingo: tiêu đề «TỔNG NGUYÊN TỬ» xuống hai dòng ở khổ hẹp ⇒ ba thẻ dùng chung hàng (subgrid) để tiêu đề và số thẳng hàng */
+[data-trong='hs'] .tp-3o { grid-template-rows: auto auto; }
+[data-trong='hs'] .tp-3o > div { display: grid; grid-row: span 2; grid-template-rows: subgrid; }
+[data-trong='hs'] .tp-3o p { display: grid; place-items: center; line-height: 1.25; }

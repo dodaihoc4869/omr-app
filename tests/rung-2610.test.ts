@@ -14,7 +14,7 @@ describe('rung.ts', () => {
   it('gọi vibrate đúng mẫu cho từng kiểu', () => {
     for (const k of ['chon', 'dung', 'sai', 'xong', 'combo', 'combo3', 'combo5', 'combo10'] as const) { rung(k); expect(vibrate).toHaveBeenLastCalledWith(MAU_RUNG[k]) }
     expect(MAU_RUNG).toEqual({ chon: [35], dung: [60], sai: [80, 70, 80], xong: [60, 50, 60, 50, 140], combo: [40, 40, 40],
-      combo3: [40, 40, 40, 40, 90], combo5: [50, 40, 50, 40, 50, 40, 160], combo10: [60, 40, 60, 40, 60, 40, 60, 60, 240] })
+      combo3: [120, 60, 40, 40, 90], combo5: [120, 60, 50, 40, 50, 40, 160], combo10: [120, 60, 60, 40, 60, 40, 60, 60, 240] })
     // thầy 27/10: mốc combo mạnh dần, mọi nhịp ≥ 35 ms (Android)
     for (const m of Object.values(MAU_RUNG)) for (const n of m) expect(n).toBeGreaterThanOrEqual(35)
     expect(MAU_RUNG.combo10.reduce((a, b) => a + b)).toBeGreaterThan(MAU_RUNG.combo5.reduce((a, b) => a + b))
