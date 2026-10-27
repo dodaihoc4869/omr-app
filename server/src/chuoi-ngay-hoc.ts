@@ -6,6 +6,7 @@
 //   Hôm nay đã làm ⇒ tính cả hôm nay; hôm nay CHƯA làm ⇒ giữ chuỗi tới hôm qua (không về 0 lúc sáng sớm).
 // Một truy vấn, chạy trên chỉ mục `idx_skh_em_ngay_qid (sbd, ngay_vn, qid, ket_qua)`. Không đổi schema.
 import type { Env } from './kieu'
+import { laNgayBaoTri } from './ngay-bao-tri'
 
 const GIO_VN_MS = 7 * 3_600_000
 /** Số ngày tối đa đọc lùi (đủ cho mọi chuỗi thực tế, chặn truy vấn). */
@@ -22,7 +23,12 @@ export function demChuoiNgayHoc(cacNgay: Iterable<string>, homNay: string): numb
   const co = new Set(cacNgay)
   let d = co.has(homNay) ? homNay : lui(homNay, 1)
   let k = 0
-  while (co.has(d) && k < SO_NGAY_DOC_CHUOI) { k++; d = lui(d, 1) }
+  // Ngày bảo trì (ngay-bao-tri.ts) không học ⇒ bỏ qua (không cộng, không cắt chuỗi).
+  for (let buoc = 0; buoc < SO_NGAY_DOC_CHUOI; buoc++) {
+    if (co.has(d)) k++
+    else if (!laNgayBaoTri(d)) break
+    d = lui(d, 1)
+  }
   return k
 }
 

@@ -14,6 +14,8 @@
 //   · ĐẶT LẠI BÌNH (thầy duyệt 27/10, lặp lại 28/10 00:01): dòng `chuoi_binh_mua` nguồn bắt đầu TIEN_TO_DAT_LAI_BINH ⇒ ngày đó số bình về 0 (bình mua SAU
 //     lúc đặt lại vẫn cộng — nơi đọc lọc). Nhiều lần đặt lại ⇒ vòng lặp ngày gặp từng lần theo thứ tự, lần sau cùng (luc lớn nhất) quyết định.
 
+import { laNgayBaoTri } from './ngay-bao-tri'
+
 export const CAU_MOT_BAI = 6
 export const BAI_CUU = 2
 export const SUC_CHUA_GOC = 2
@@ -100,6 +102,8 @@ export function chuoiNgayCuaEm(nk: NhatKyChuoi, homNay: string, thang = false): 
     }
     if (d === homNay) { lich.set(d, 'cho'); continue } // hôm nay chưa xong ⇒ chuỗi giữ tới hôm qua
     if (nk.phep.has(d) && phepConGiuChuoi(d)) { lich.set(d, 'phep'); continue }
+    // Ngày bảo trì (ngay-bao-tri.ts): không làm vẫn giữ chuỗi, không tốn bình (vẽ như ngày được đỡ). Đã làm đủ thì đã tính ở trên (lửa +1).
+    if (laNgayBaoTri(d)) { lich.set(d, 'phep'); continue }
     if (so === 0) { lich.set(d, 'tat'); continue }
     if (binh > 0) { binh--; binhVuaDo = d; lich.set(d, 'binh'); continue }
     // Hết bình: cứu bằng 2 bài bù ngay hôm sau (một lần mỗi tuần).

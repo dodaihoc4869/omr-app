@@ -14,6 +14,7 @@
 //     bởi cron đêm, trigger trên sổ xoá ngày bị ghi muộn; chỉ hôm nay tính trực tiếp), MỘT câu mỗi lô, cùng số.
 //   · ĐỘ TIN CẬY CỦA NHÓM mỗi em (13/10 đợt 18, CHỈ THÊM `doTinCay` / `canThem`): phép thuần `tinCayNhomNhip` (dưới) trên đúng dãy ngày đã đọc —
 //     cùng phép `/hs/nhip-hoc` · `/ph/nhip-hoc` (nhip-hoc-em.ts) ⇒ thầy và em thấy cùng một số. KHÔNG truy vấn D1 nào thêm; nhóm vẫn do app tính.
+import { laNgayBaoTri } from './ngay-bao-tri'
 import type { Env } from './kieu'
 import type { LopBaiHangNgay, NgayBaiEm } from './bai-hang-ngay-kieu'
 import { NGUONG_THAI_DO as NG } from './bai-hang-ngay-kieu'
@@ -96,7 +97,8 @@ export { NHAN_CUA_NHOM, tinCayNhomNhip } from './thai-do-tin-cay'
 
 /** Dãy ngày ĐƯỢC TÍNH của một em: từ ngày vào (gồm hôm nay), đúng `mucToiThieu` / `daLam` — cách dựng dải ô của bảng em và của dòng thầy. */
 export const ngayDuocTinh = (ngay: readonly NgayBaiEm[], vao: string): NgayNhipEm[] =>
-  ngay.filter((n) => n.ngay >= vao).map((n) => ({ ngay: n.ngay, muc: n.mucToiThieu, lam: n.daLam }))
+  // Ngày bảo trì (ngay-bao-tri.ts) em chưa đủ mức ⇒ bỏ khỏi dải (không tính là ngày thiếu / ngày không làm, không cắt chuỗi đủ mức); đủ mức thì giữ.
+  ngay.filter((n) => n.ngay >= vao && !(laNgayBaoTri(n.ngay) && n.daLam < n.mucToiThieu)).map((n) => ({ ngay: n.ngay, muc: n.mucToiThieu, lam: n.daLam }))
 
 
 // ------------------------------------------------------------------ CỜ ĐỐI PHÓ (phép thuần — test gọi thẳng)

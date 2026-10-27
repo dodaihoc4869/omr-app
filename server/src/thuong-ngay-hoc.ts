@@ -9,6 +9,7 @@ import type { D1PreparedStatement, Env } from './kieu'
 import { themNgay } from './ho-so-nam-kt'
 import { CAU_MOT_BAI, chuoiNgayCuaEm, ngayVn as ngayVnMs, phepConGiuChuoi, SO_NGAY_DOC, SQL_COT_BINH_MUA, type ChuoiNgay, type KieuNgay, type NhatKyChuoi } from './chuoi-ngay-bai'
 import { str, num, type Row } from './thuong-b-chung'
+import { laNgayBaoTri } from './ngay-bao-tri'
 
 export { CAU_MOT_BAI, type KieuNgay }
 /** Cửa sổ đọc khi đọc CẢ LỚP / cron (ngày). Một em (phụ huynh) đọc đủ SO_NGAY_DOC như B3. */
@@ -80,7 +81,7 @@ export function kieuNgayCua(nk: NhatKyChuoi | undefined, ngay: string, homNay: s
   const l = (chuoi ?? chuoiCuaEm(nk, homNay)).lich7.find((x) => x.ngay === ngay)
   if (l) return l.kieu
   if (datNgay(nk, ngay)) return 'hoc'
-  return nk?.phep.has(ngay) && phepConGiuChuoi(ngay) ? 'phep' : 'tat'
+  return (nk?.phep.has(ngay) && phepConGiuChuoi(ngay)) || laNgayBaoTri(ngay) ? 'phep' : 'tat'
 }
 
 /** Bulk: sbd → NhatKyChuoi trong [tu, den]. Một batch. */

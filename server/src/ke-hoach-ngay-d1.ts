@@ -28,6 +28,7 @@ import { tuLucHomNay } from './cau-da-lam'
 import { docMocHienThi } from './moc-no'
 import { docLichDaLuu, moLucChang } from './btvn-nang-do-chang'
 import { ketQuaChotNgay } from '../../src/lib/dat-nhiem-vu-ngay'
+import { NGAY_BAO_TRI, laNgayBaoTri } from './ngay-bao-tri'
 
 export const TOI_DA_EM_MOI_LO = 50
 const MOT_NGAY_MS = 86_400_000
@@ -63,7 +64,9 @@ function docQid(v: unknown): string[] | undefined {
 /** Ngày nghỉ thầy đặt: `cau_hinh.ngay_nghi` = mảng JSON hoặc chuỗi cách nhau bởi dấu phẩy/xuống dòng. */
 export async function docNgayNghi(env: Env): Promise<Set<string>> {
   const r = await tat(() => env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa = 'ngay_nghi'").first<{ gia_tri: string }>(), null)
-  return phanTichNgayNghi(String(r?.gia_tri ?? ''))
+  // + ngày bảo trì (ngay-bao-tri.ts): khiên không mất, chuỗi ngày đạt (EXP) không đứt. KHÔNG thêm vào `phanTichNgayNghi` (EXP cấp tính ngày nghỉ chung là
+  // ngày đạt — bảo trì không cho thêm ngày).
+  return new Set([...phanTichNgayNghi(String(r?.gia_tri ?? '')), ...NGAY_BAO_TRI])
 }
 
 /**
@@ -80,7 +83,7 @@ export async function docCauHinhKeHoach(env: Env): Promise<{ ngayNghi: Set<strin
     if (String(x.khoa) === 'ngay_nghi') nghi = String(x.gia_tri ?? '')
     else if (String(x.khoa) === 'ngan_sach_luot') chung = String(x.gia_tri ?? '').trim() === 'bat'
   }
-  return { ngayNghi: phanTichNgayNghi(nghi), nganSachChung: chung }
+  return { ngayNghi: new Set([...phanTichNgayNghi(nghi), ...NGAY_BAO_TRI]), nganSachChung: chung }
 }
 
 /** Phần thuần của `docNgayNghi`: đọc giá trị `cau_hinh.ngay_nghi` (mảng JSON hoặc chuỗi cách nhau bởi dấu phẩy/chấm phẩy/khoảng trắng) thành tập ngày YYYY-MM-DD. */
@@ -676,6 +679,8 @@ export async function chotNgayCu(env: Env, dsSbd: string[], homNay: string, nowI
     for (const x of r.results ?? []) tienBo.set(`${x.sbd}|${ngay}`, { da: Number(x.da_lam) || 0, len: Number(x.len_bac) || 0, tut: Number(x.tut_bac) || 0, dung: Number(x.dung) || 0 })
   }
   const dong = []
+  /** Ngày bảo trì mà em chưa đạt ⇒ chốt như NGÀY NGHỈ (la_ngay_nghi = 1, không ghi «khong / mot_phan»). Em đã đạt vẫn chốt «dat» như thường. */
+  const nghiBaoTri: string[] = []
   for (const r of rows) {
     const tb = tienBo.get(`${r.sbd}|${r.ngay}`) ?? { da: 0, len: 0, tut: 0, dung: 0 }
     let toiThieu = 4, coToiHan = 0, treNhip = false
@@ -686,9 +691,11 @@ export async function chotNgayCu(env: Env, dsSbd: string[], homNay: string, nowI
       treNhip = v?.treNhip === true
     } catch { /* kế hoạch hỏng: chốt theo số câu thô */ }
     // P05 (02 §6): chốt ngày theo MỤC TIÊU CORE đã đóng băng (nếu ngày đó có) — `null` ⇒ kế hoạch cũ, không bịa.
+    const kq = ketQuaChotNgay({ daLam: tb.da, lenBac: tb.len, toiThieu, treNhip, soCauToiHan: coToiHan, ngayVn: String(r.ngay), soCauDungHomNay: tb.dung })
+    if (laNgayBaoTri(String(r.ngay)) && kq !== 'dat') { nghiBaoTri.push(String(r.khoa)); continue }
     const core = await danhGiaMucTieuNgay(env, String(r.sbd), String(r.ngay), r.muc_tieu_json, r.viec_json)
     dong.push({
-      k: String(r.khoa), r: ketQuaChotNgay({ daLam: tb.da, lenBac: tb.len, toiThieu, treNhip, soCauToiHan: coToiHan, ngayVn: String(r.ngay), soCauDungHomNay: tb.dung }),
+      k: String(r.khoa), r: kq,
       l: tb.da, u: tb.len, t: tb.tut, m: core ? json({ ...core, luc: nowIso }) : '',
     })
   }
@@ -701,7 +708,11 @@ export async function chotNgayCu(env: Env, dsSbd: string[], homNay: string, nowI
         WHERE ke_hoach_ngay.khoa = j.k AND ke_hoach_ngay.ket_qua IS NULL`,
     ).bind(nowIso, json(d)).run()
   }
-  return dong.length
+  for (const d of chunk(nghiBaoTri, 200)) {
+    await env.DB.prepare('UPDATE ke_hoach_ngay SET la_ngay_nghi = 1, cap_nhat_luc = ? WHERE khoa IN (SELECT value FROM json_each(?)) AND ket_qua IS NULL')
+      .bind(nowIso, json(d)).run()
+  }
+  return dong.length + nghiBaoTri.length
 }
 
 /**
