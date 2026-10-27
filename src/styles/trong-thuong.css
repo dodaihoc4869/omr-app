@@ -388,10 +388,13 @@
 [data-trong='hs'] .tp-nv .thuong .tp-dv { width: 18px; height: 18px; }
 [data-trong='hs'] .tp-ruong-the { display: flex; align-items: center; gap: 16px; }
 [data-trong='hs'] .tp-ruong-the .tp-ruong { width: 112px; }
+/* 27/10 (ảnh thầy): thẻ hẹp ⇒ ô rương co từ 112 xuống 72 px, cột chữ bên phải không bẻ 5 dòng */
+[data-trong='hs'] .tp-ruong-the > span:first-child { flex: 0 1 112px; min-width: 72px; }
+[data-trong='hs'] .tp-ruong-the > span:first-child .tp-ruong { width: 100%; }
 [data-trong='hs'] .tp-ruong-the .giua { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
 [data-trong='hs'] .tp-ruong-the b { font-size: 17px; }
-[data-trong='hs'] .tp-ba-cham { display: flex; gap: 6px; }
-[data-trong='hs'] .tp-ba-cham i { width: 28px; height: 10px; border-radius: 999px; background: var(--tr-mat-3); }
+[data-trong='hs'] .tp-ba-cham { display: flex; gap: 6px; width: 100%; max-width: 96px; } /* 27/10 (ảnh thầy): 3 vạch co theo cột chữ, không tràn mép thẻ */
+[data-trong='hs'] .tp-ba-cham i { flex: 1 1 28px; min-width: 0; height: 10px; border-radius: 999px; background: var(--tr-mat-3); }
 [data-trong='hs'] .tp-ba-cham i[data-x] { background: var(--tr-dung); }
 [data-trong='hs'] .tp-tong-nv { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14px; color: var(--tr-chu-2); }
 [data-trong='hs'] .tp-tong-nv b { display: inline-flex; align-items: center; gap: 3px; color: var(--tp-tt-chu); }
