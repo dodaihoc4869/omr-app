@@ -421,6 +421,11 @@ const LG_CANH = [['dau', 'hs-mot&tp=1', /Ester/], ['sau', 'hs-mot&tp=1', /Ester/
     .map(([k, ten]) => [`pop-${k}`, 'hs-mot&tp=1', /Ester/, `lam13:nap » nut:${ten} » cho:300`])]
 const DS_LG = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   LG_CANH.map(([t, m, cho, viec]) => [`lg-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
+// ═══ KIỂM TRA ÔN TẬP KHOÁ CHẶNG 27/10 (tiền tố "kt-"): bài kiểm tra hôm nay chưa nộp ⇒ nút kiểm tra đầu đường, chặng khoá; thẻ chặng khoá; thẻ kiểm tra; đã nộp.
+const KT_CANH = [['khoa', 'hs-mot&tp=1&kt=khoa', /Ester/, 'lam13:nap'], ['the-khoa', 'hs-mot&tp=1&kt=khoa', /Ester/, 'lam13:nap » nut:^Chặng 3: khoá » cho:300'],
+  ['the-kiem', 'hs-mot&tp=1&kt=khoa', /Ester/, 'lam13:nap » nut:^Kiểm tra ôn tập » cho:300'], ['xong', 'hs-mot&tp=1&kt=xong', /Ester/, 'lam13:nap']]
+const DS_KT = [[390, 844, 'doc'], [360, 640, 'doc640']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  KT_CANH.map(([t, m, cho, viec]) => [`kt-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
 // ═══ BẢNG + TẤM CHƯA TÍNH 27/10 (tiền tố "nb-"): bảng 2 hàng × 4 cột tự xoay dọc ở khổ hẹp · tấm «Chưa được tính» gọn · bảng lớn cuộn ngang có bóng mép
 const NB_CANH = [
   ['1-bang', 'lam13&lam=duo-bang', /Chọn đáp án đúng/, ''], ['2-chua-tinh', 'lam13&lam=duo-bang', /Chọn đáp án đúng/, 'lam13:tn:^B » nut:^Kiểm tra$'],
@@ -571,6 +576,7 @@ const DS = [
   ...DS_BINH, // LUẬT BÌNH 27/10
   ...DS_NC, // NÂNG CẤP 27/10
   ...DS_LG, // LỘ TRÌNH GHIM 27/10
+  ...DS_KT, // KIỂM TRA ÔN TẬP KHOÁ CHẶNG 27/10
   ...DS_NB, // BẢNG + TẤM CHƯA TÍNH 27/10
   ...DS_BD, // BI CHUYỂN ĐỘNG 27/10
   ...DS_MTC, // MỤC TIÊU NGÀY THEO CÂU 27/10
