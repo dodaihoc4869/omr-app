@@ -25,7 +25,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
         run: |
           q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c ".[0].results[]" || echo "(lỗi)"; }
-          q "bảng có mặt" "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('chien_dich_bat_dau','chien_dich_tuy_chon','chien_dich_em','hanh_trinh_v5_phan_nhom','omni_xac_nhan','hanh_trinh_v6_fit','hanh_trinh_v6_chon','v2_tham_so_em','srs2_day_lai','omni_beta_cau','cau_nghi_dap_an','goi_bai_7_muc_ngay','loi_giai_so_do','omni_p_vkn','goi_bai_7_kiem','goi_bai_7_chua','btvn_em_cau')"
-          q "cột chien_dich_em" "SELECT name FROM pragma_table_info('chien_dich_em')"
-          q "số dòng bảng lớn" "SELECT (SELECT COUNT(*) FROM su_kien_hoc) skh,(SELECT COUNT(*) FROM game_v2_question) q,(SELECT COUNT(*) FROM cau_meta) meta,(SELECT COUNT(*) FROM game_v2_attempt) att,(SELECT COUNT(*) FROM game_v2_session) ses,(SELECT COUNT(*) FROM loi_giai_hoi) lgh,(SELECT COUNT(*) FROM chua_loi_dot) cld,(SELECT COUNT(*) FROM hoc_sinh) hs"
-          q "chỉ mục game_v2_session" "SELECT name,sql FROM sqlite_master WHERE type='index' AND tbl_name IN ('game_v2_session','game_v2_attempt','loi_giai_hoi','goi_bai_7_gap')"
+          q "chỉ mục bảng nóng" "SELECT tbl_name,name,sql FROM sqlite_master WHERE type='index' AND tbl_name IN ('su_kien_hoc','chua_loi_dot','hanh_trinh_v4_canh','exp_so','loi_giai_hoi','kiem_tra_ca_nhan','game_v2_question','cau_meta','omni_q','chua_gon_lan') ORDER BY tbl_name"
+          q "kế hoạch truy vấn sổ theo em + luc" "EXPLAIN QUERY PLAN SELECT qid, ngay_vn, luc FROM su_kien_hoc WHERE sbd = 'x' AND luc >= '2026-10-01'"
+          q "kế hoạch truy vấn đóng đợt" "EXPLAIN QUERY PLAN SELECT id FROM chua_loi_dot WHERE sbd='x' AND dong_luc IS NULL AND trang_thai_day<>'da_tu_sua' AND COALESCE(sai_cuoi_luc,mo_luc)>=0"
+          q "số dòng bảng phụ" "SELECT (SELECT COUNT(*) FROM hanh_trinh_v4_canh) canh,(SELECT COUNT(*) FROM exp_so) exp,(SELECT COUNT(*) FROM omni_q) oq,(SELECT COUNT(*) FROM chua_gon_lan) cgl"
