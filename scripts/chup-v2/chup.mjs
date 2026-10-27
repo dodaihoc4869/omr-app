@@ -555,7 +555,7 @@ const DS_MENU6 = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], 
 // ═══ NGANG DUO 27/10 (tiền tố "ngd-", thầy 27/10 «Tối ưu tất cả các màn app hs xoay ngang và máy tính chưa»): MỌI màn app học sinh giao diện Duolingo ở
 // điện thoại ngang 844×390 · 932×430, máy tính bảng 1024×768, máy tính 1440×900 (sáng + tối) + điện thoại dọc 390×844 · 360×640 (chứng minh không vỡ).
 // Ngoài tràn ngang / vùng chạm, cảnh "ngd-" đo thêm (ghi `<ra>/do-ngd.jsonl`, in «Bố cục»): dòng chữ > 75 kí tự, nút / ô phương án / ô nhập bị phần tử khác
-// che (thanh đáy dính, giám thị, bàn phím), dải kết quả > 45% chiều cao (khổ thấp), tấm nổi (bóng đèn, thẻ chạm, thẻ Lộ trình) vượt mép màn.
+// che (thanh đáy dính, giám thị, bàn phím), dải kết quả cao bao nhiêu % khung (khổ thấp: dải gọn ≤ 30%), tấm nổi (bóng đèn, thẻ chạm, thẻ Lộ trình) vượt mép màn.
 const NGD_CANH = [
   ['lo-trinh', 'hs-mot&tp=1', /Ester/, 'lam13:nap'], ['lo-trinh-pop', 'hs-mot&tp=1', /Ester/, 'lam13:nap » nut:^(Học tiếp|Bắt đầu học) » cho:300'],
   ['cau-chon', 'lam13&lam=duo-nc', /Chất nào sau đây là amine/, 'lam13:tn:^B'], ['cau-dung', 'lam13&lam=duo-nc', /Chất nào sau đây là amine/, 'lam13:tn:^B » nut:^Kiểm tra$'],

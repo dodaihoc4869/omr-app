@@ -294,19 +294,22 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   useEffect(() => {
     if (!k) return
     const ngangThap = duo && !!window.matchMedia?.('(orientation: landscape) and (max-height: 500px)').matches
-    if (ngangThap) nutTiepRef.current?.scrollIntoView?.({ block: 'nearest' })
+    // NGANG 27/10: khung thấp xoay ngang — dải kết quả GHIM ĐÁY trải bề ngang (position: fixed, trong-lam-ngang.css) ⇒ như bản dọc: cuộn cho phương án ĐÚNG
+    // nằm trọn trên mép dải (không cuộn về đầu: đề cột trái ghim sẵn). Dải chưa ghim (tờ cũ) ⇒ đưa nút «Tiếp tục» vào khung như trước.
+    const ghimNgang = ngangThap && getComputedStyle(nutTiepRef.current?.closest('.duo-day') ?? document.body).position === 'fixed'
+    if (ngangThap && !ghimNgang) nutTiepRef.current?.scrollIntoView?.({ block: 'nearest' })
     else {
-      veDau()
+      if (!ngangThap) veDau()
       // thầy 27/10 (ảnh: tấm kết quả che nửa phương án D): tấm dính đáy ⇒ cuộn thêm cho phương án ĐÚNG nằm trọn trên mép tấm.
       if (duo) requestAnimationFrame(() => {
         const pa = gocRef.current?.querySelector<HTMLElement>('.ht2-lam-pa[data-ket=dung]'), tam = nutTiepRef.current?.closest<HTMLElement>('.duo-day')
-        if (!pa || !tam || getComputedStyle(tam).position !== 'sticky') return
+        if (!pa || !tam || !['sticky', 'fixed'].includes(getComputedStyle(tam).position)) return
         // 27/10 (nâng cấp): đo thẳng thay vì scrollIntoView «nearest» + scroll-margin (Chrome bỏ qua khi phương án còn trong khung cuộn dù đã nằm dưới tấm
         // dính) ⇒ cuộn đúng khoảng phương án bị che, không đẩy đỉnh phương án lên dưới thanh trên (64 px).
         // Mép trên tấm tính từ offsetHeight (tấm đang trượt lên ⇒ getBoundingClientRect còn lệch theo transform).
         const khung = khungCuonCua(pa)
         const r = pa.getBoundingClientRect(), mepTam = (khung ? khung.getBoundingClientRect().bottom : window.innerHeight) - tam.offsetHeight
-        const can = Math.min(r.bottom + 12 - mepTam, r.top - 72)
+        const can = Math.min(r.bottom + 12 - mepTam, r.top - (ngangThap ? 56 : 72))
         if (can <= 0) return
         if (khung) khung.scrollBy({ top: can }); else window.scrollBy({ top: can })
       })

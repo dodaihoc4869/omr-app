@@ -84,10 +84,11 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
     if (!kq) return
     // Như màn làm chặng: khung thấp xoay ngang ⇒ đưa tấm (nút chính) vào khung nhìn; dọc / máy tính ⇒ ô đúng nằm trọn trên mép tấm dính đáy.
     const tam = nutChinh.current?.closest<HTMLElement>('.duo-day')
-    if (window.matchMedia?.('(orientation: landscape) and (max-height: 500px)').matches) nutChinh.current?.scrollIntoView?.({ block: 'nearest' })
+    // NGANG 27/10: khung thấp xoay ngang có dải GHIM ĐÁY (position: fixed, trong-lam-ngang.css) ⇒ như bản dọc: phương án đúng / đã chọn nằm trọn trên mép dải.
+    if (window.matchMedia?.('(orientation: landscape) and (max-height: 500px)').matches && (!tam || getComputedStyle(tam).position !== 'fixed')) nutChinh.current?.scrollIntoView?.({ block: 'nearest' })
     else requestAnimationFrame(() => {
       const o = goc.current?.querySelector<HTMLElement>('.ht2-lam-pa[data-ket=dung], .ht2-lam-tn .ht2-lam-pa[aria-checked=true]')
-      if (!o || !tam || getComputedStyle(tam).position !== 'sticky') return
+      if (!o || !tam || !['sticky', 'fixed'].includes(getComputedStyle(tam).position)) return
       o.style.scrollMarginBottom = `${tam.offsetHeight + 12}px`
       o.scrollIntoView?.({ block: 'nearest' })
     })

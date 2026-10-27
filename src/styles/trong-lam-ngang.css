@@ -2,7 +2,7 @@
  * Nạp qua @import đầu trong-lam-bai.css ⇒ đứng TRƯỚC luật tờ ấy; tiền tố `:root[data-trong='hs']` cho đủ nặng để thắng. Điện thoại dọc không đổi. ──
  *
  * ĐIỆN THOẠI NGANG (cao ≤ 500): khung 844×390 phải thấy trọn phương án + «Kiểm tra» (trước: phương án ô 62–125px xếp một cột ⇒ «Kiểm tra» khuất
- * dưới mép, ô nhập số bị bàn phím đẩy lên dưới thanh trên). Dải kết quả: DẢI ĐÁY TRẢI HẾT BỀ NGANG kiểu Duolingo (chữ trái · nút phải), ≤ 45% chiều cao —
+ * dưới mép, ô nhập số bị bàn phím đẩy lên dưới thanh trên). Dải kết quả: DẢI ĐÁY GỌN MỘT HÀNG trải hết bề ngang kiểu Duolingo (tiêu đề trái · nút phải), ≤ 30% chiều cao —
  * trước đây tấm nằm trong cột phải cao 190–235px (48–60% khung). Hai cột chừa đáy cuộn bằng dải ⇒ không gì bị dải che vĩnh viễn. */
 @media (orientation: landscape) and (max-height: 500px) {
   /* thanh trên + cột: bớt khoảng đầu */
@@ -29,21 +29,30 @@
 
   /* DẢI KẾT QUẢ: ghim đáy, trải hết bề ngang; trong dải: chữ (cuộn riêng nếu dài) | hàng nút theo bề rộng chữ nút (không bẻ dòng) */
   :root[data-trong='hs'] .duo:not([data-xong]) .duo-day.duo-ket {
-    position: fixed; left: 0; right: 0; bottom: 0; z-index: 8; max-height: 45dvh; margin: 0; border-radius: 0;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 8; max-height: 30dvh; margin: 0; border-radius: 0;
     padding: 8px max(20px, env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
   }
   :root[data-trong='hs'] .duo:not([data-xong]) .duo-ket > .duo-giua {
     display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 20px; row-gap: 4px; width: 100%; max-width: 1080px; height: 100%; margin-inline: auto;
   }
   :root[data-trong='hs'] .duo:not([data-xong]) .duo-ket > .duo-giua > * { grid-column: 1 / -1; }
-  :root[data-trong='hs'] .duo:not([data-xong]) .duo-ket > .duo-giua > .duo-kq { grid-column: 1; grid-row: 1 / span 2; align-self: stretch; max-height: calc(45dvh - 16px); }
+  :root[data-trong='hs'] .duo:not([data-xong]) .duo-ket > .duo-giua > .duo-kq { grid-column: 1; grid-row: 1 / span 2; align-self: center; max-height: calc(30dvh - 16px); }
   :root[data-trong='hs'] .duo:not([data-xong]) .duo-ket > .duo-giua > .duo-hang-nut { grid-column: 2; grid-row: 1; }
   :root[data-trong='hs'] .duo:not([data-xong]) .duo-ket > .duo-giua > .duo-loi { grid-column: 2; grid-row: 2; }
   :root[data-trong='hs'] .duo:not([data-xong]) .duo-ket .duo-kq-chu h2 { font-size: 20px; }
   :root[data-trong='hs'] .duo:not([data-xong]) .duo-ket > .duo-giua > .duo-hang-nut { min-width: 280px; }
   :root[data-trong='hs'] .duo:not([data-xong]) .duo-ket .duo-nut { min-height: 46px; padding-inline: 18px; white-space: nowrap; }
-  /* dải đang hiện: hai cột chừa đáy cuộn bằng dải tối đa ⇒ phương án / cuối đề cuộn lên trên dải được */
-  :root[data-trong='hs'] .duo:not([data-xong]):has(.duo-ket) :is(.duo-cot-de, .duo-cot-tra) { padding-bottom: calc(45dvh + 8px); }
+  /* DẢI GỌN MỘT HÀNG (Boss 27/10 «dải che nửa dưới đề»): trái = tiêu đề + nút «Lời giải» (hàng .duo-ct-dau) · phải = Hỏi thầy + nút chính; ≤ 30% chiều cao.
+     Phần chữ còn lại (thưởng, đáp án đúng, lời nhắn lịch ôn) ẩn KHỎI MẮT nhưng vẫn đọc được bằng trình đọc màn hình (dải là role=status); đáp án đúng đã tô
+     xanh trên phương án, đủ lời giải ở nút «Lời giải». Màn sửa câu: dòng «Gợi ý» là nội dung chính ⇒ giữ, tối đa 2 dòng; Bi trong dải ẩn (khung thấp). */
+  :root[data-trong='hs'] .duo:not([data-xong]) .duo-ket .duo-kq-chu { position: relative; gap: 2px; }
+  :root[data-trong='hs'] .duo:not([data-xong]) .duo-ket .duo-kq-chu > :not(.duo-ct-dau, .duo-sua-goi-y) {
+    position: absolute; top: 0; left: 0; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); border: 0;
+  }
+  :root[data-trong='hs'] .duo:not([data-xong]) .duo-ket .duo-sua-goi-y > span { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+  :root[data-trong='hs'] .duo:not([data-xong]) .duo-ket .duo-kq-bi { display: none; }
+  /* dải đang hiện: hai cột chừa đáy cuộn bằng chiều cao tối đa của dải ⇒ cuối đề / phương án cuối cuộn lên trên dải được */
+  :root[data-trong='hs'] .duo:not([data-xong]):has(.duo-ket) :is(.duo-cot-de, .duo-cot-tra) { padding-bottom: calc(30dvh + 8px); }
 }
 
 /* MÁY TÍNH BẢNG / MÁY TÍNH (≥ 1000 rộng, > 500 cao): đề dài / có hình / có bảng (data-de-dai) — trước chỉ từ 1100px — và câu TRẢ LỜI NGẮN (bàn phím số) chia
