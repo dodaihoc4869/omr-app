@@ -35,7 +35,7 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
   useEffect(() => {
     const el = host.current
     if (!el) return
-    const g = taoGiamThi(el, { muc })
+    const g = taoGiamThi(el, { muc, loiVao: el.closest('.duo-gt-san')?.querySelector<HTMLElement>(':scope > .duo-gt-loi-o') })
     gt.current = g
     if (nhip.phien !== phien) nhip = taoNhip(phien)
     cauMoi(nhip, qid)
@@ -52,21 +52,37 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
     return () => { window.removeEventListener('resize', doRong); huyHen(); g.huy(); gt.current = null }
   }, [muc, qid]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Đề dài: vẽ viền chữ L theo cỡ thật của bong bóng (đổi cỡ ⇒ vẽ lại). Khuyết lấy từ --gt-nvw, cùng công thức với CSS.
+  // KHUNG CHỮ L — CHỈ khi chữ thật sự tràn xuống dưới chân giám thị (thầy 27/10: câu 4 dòng bị đáy rỗng). Đo trước khi vẽ (layout effect /
+  // ResizeObserver chạy trước khi sơn): bật thử chữ L, xem đáy chữ đề có xuống quá khuyết ≥ 12 px không; không ⇒ trả về bong bóng thường bên phải
+  // giám thị, cao vừa nội dung. Đo lại khi khối đổi bề ngang hoặc chữ đề đổi cao (ảnh nạp xong, phông về); bong bóng đổi cỡ (thẻ giải nghĩa) ⇒ vẽ lại viền.
   useLayoutEffect(() => {
     const san = host.current?.closest<HTMLElement>('.duo-gt-san'), bong = san?.querySelector<HTMLElement>('.duo-gt-bong')
     const svg = bong?.querySelector<SVGSVGElement>(':scope > .duo-gt-vien'), path = svg?.querySelector('path')
-    if (!san || !bong || !svg || !path || typeof ResizeObserver === 'undefined') return
+    const de = bong?.querySelector<HTMLElement>('.ht2-lam-de') ?? bong?.querySelector<HTMLElement>('.gyc-de')
+    if (!san || !bong || !svg || !path || !de || typeof ResizeObserver === 'undefined') return
+    const khuyet = () => khuyetL(parseFloat(getComputedStyle(san).getPropertyValue('--gt-nvw')) || 120)
     const ve = () => {
-      const w = bong.offsetWidth, h = bong.offsetHeight, nvw = parseFloat(getComputedStyle(san).getPropertyValue('--gt-nvw')) || 120
+      if (!san.hasAttribute('data-l')) return
+      const w = bong.offsetWidth, h = bong.offsetHeight, { kw, kh, kd } = khuyet()
       if (!w || !h) return
-      const { kw, kh, kd } = khuyetL(nvw)
       svg.setAttribute('width', String(w)); svg.setAttribute('height', String(h))
       path.setAttribute('d', duongL(w, h, kw, kh, kd))
     }
-    ve()
-    const ro = new ResizeObserver(ve); ro.observe(bong)
-    return () => ro.disconnect()
+    let rong = -1, cao = -1, bongCao = -1
+    const quyet = () => {
+      san.setAttribute('data-l', '')
+      const day = de.getBoundingClientRect().bottom - bong.getBoundingClientRect().top
+      if (!(day > khuyet().kh + 12)) san.removeAttribute('data-l')
+      ve()
+      rong = san.clientWidth; cao = de.offsetHeight; bongCao = bong.offsetHeight
+    }
+    quyet()
+    const ro = new ResizeObserver(() => {
+      if (san.clientWidth !== rong || de.offsetHeight !== cao) quyet()
+      else if (bong.offsetHeight !== bongCao) { bongCao = bong.offsetHeight; ve() }
+    })
+    ro.observe(san); ro.observe(de); ro.observe(bong)
+    return () => { ro.disconnect(); san.removeAttribute('data-l') }
   }, [qid])
 
   // Mắt dõi phương án + nhịp chờ / soi theo thao tác của em.
