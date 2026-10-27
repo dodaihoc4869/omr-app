@@ -339,6 +339,9 @@ const DS_GT = ['nb', 'th', 'vd', 'vdc'].flatMap((m) => ['light', 'dark'].flatMap
   return [
     ...[[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].map(([w, hh, k]) => [`duo-gt-${m}-ngan-${k}${toi}`, GT_NGAN + m, w, hh, nen, false, /quỳ tím/, 'lam13:tn:^B » cho:3200']),
     [`duo-gt-${m}-dung-doc${toi}`, GT_NGAN + m, 390, 844, nen, false, /quỳ tím/, 'lam13:tn:^B » nut:^Kiểm tra$'],
+    // đề 2 / 4 / 6 / 15 dòng ở 390 · 360 · ngang (đo: không khung rỗng > 24 px; chữ L chỉ khi chữ tràn dưới chân giám thị)
+    ...(['th', 'vdc'].includes(m) ? ['ngan', '4dong', '6dong', 'dai'].flatMap((de) => [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang']].map(([w, hh, k]) =>
+      [`duo-gt-${m}-dong-${de}-${k}${toi}`, `lam13&lam=duo&gtde=${de}&gt=${m}`, w, hh, nen, false, /Dung dịch chất nào|Phần trăm khối lượng|Cho 4,5 gam|Toluidine là/, 'lam13:cho:2200 » dau'])) : []),
     // đề DÀI như ảnh thầy (toluidine ~15 dòng): khung chữ L ôm giám thị — mọi khổ cho Cô Cốc / Kíp, 390 cho Tí / Chú Tam
     ...(['th', 'vdc'].includes(m) ? [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']] : [[390, 844, 'doc']]).map(([w, hh, k]) =>
       [`duo-gt-${m}-toluidine-${k}${toi}`, `lam13&lam=duo&gtde=dai&gtloi=1&gt=${m}`, w, hh, nen, false, /Toluidine là/, 'lam13:cho:3600 » dau']),
@@ -1031,6 +1034,18 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       const chong = await t.evaluate(() => { const l = document.querySelector('.gt-loi'); if (!l) return ''; const a = l.getBoundingClientRect()
         return [...document.querySelectorAll('.duo-nhan, .duo-gt-bong, .duo-tra, .duo-day, .duo-tren')].filter((e) => { const b = e.getBoundingClientRect(); return b.width > 0 && !(a.right <= b.left || a.left >= b.right || a.bottom <= b.top || a.top >= b.bottom) }).map((e) => e.className.split(' ')[0]).join(', ') })
       if (chong) tran.push(`${ten}: bong bóng càu nhàu chồng lên ${chong}`)
+      // GIÁM THỊ 27/10 tối: khung đề không được có vùng rỗng ở đáy > 24 px (khung chữ L chỉ khi chữ thật sự tràn xuống dưới chân giám thị).
+      const rong = await t.evaluate(() => { const b = document.querySelector('.duo-gt-bong'), d = b?.querySelector('.ht2-lam-de'); if (!b || !d) return 0
+        return Math.round(b.getBoundingClientRect().bottom - d.getBoundingClientRect().bottom - 14) })
+      if (rong > 24) tran.push(`${ten}: khung đề rỗng ${rong}px ở đáy`)
+      // bong bóng càu nhàu thoáng: cách khối phía trên và khung đề phía dưới ≥ 10 px, cách mép trái màn ≥ 16 px
+      const khe = await t.evaluate(() => { const l = document.querySelector('.gt-loi'), san = l?.closest('.duo-gt-san'); if (!l || !san) return ''
+        const a = l.getBoundingClientRect(), tren = san.previousElementSibling?.getBoundingClientRect(), duoi = san.querySelector('.duo-gt-bong')?.getBoundingClientRect(), loi = []
+        if (tren && a.top - tren.bottom < 9.5) loi.push(`trên ${Math.round(a.top - tren.bottom)}px`)
+        if (duoi && duoi.top - a.bottom < 9.5) loi.push(`dưới ${Math.round(duoi.top - a.bottom)}px`)
+        if (a.left < 15.5) loi.push(`lề trái ${Math.round(a.left)}px`)
+        return loi.join(', ') })
+      if (khe) tran.push(`${ten}: bong bóng càu nhàu sát (${khe})`)
       // tràn ngang TRONG khung cuộn (documentElement không thấy được vì khung là `fixed`)
       // bảng lớn cuộn ngang TRONG khung riêng (.cau-bang, có bóng mép) là chủ đích — không tính tràn
       // SOÁT TỔNG 27/10: hình con TRONG một <svg> cắt mép (overflow hidden — mây bọt dải đúng .duo-may) không lòi ra ngoài ⇒ không tính; khung svg vẫn được đo

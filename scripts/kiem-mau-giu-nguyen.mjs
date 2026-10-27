@@ -207,6 +207,9 @@ const MAU_CU_THAY_RA_LENH = LENH_2110.cu // khoá → số lần khai báo đư�
 for (const [k, n] of Object.entries(JSON.parse(readFileSync(new URL('../docs/css-chet-2610.json', import.meta.url), 'utf8')).cu)) MAU_CU_THAY_RA_LENH[k] = (MAU_CU_THAY_RA_LENH[k] ?? 0) + n
 // 27/10 tối thầy: «Giám thị cho to hơn, cho khung bao tối đa bao xung quanh giám thị, đẹp, khung giống Duolingo» (Boss chuyển: viền 2 px màu viền NHẠT
 // --tr-vien) ⇒ bong bóng đề của giám thị đổi --tr-vien-2 → --tr-vien (đúng 3 khai báo, mỗi khai báo một lần).
+// 27/10 tối thầy (ảnh Giáo sư Kíp): «Phần chữ “Làm nên trò trống gì không” hơi khít, tôi muốn nền con giám thị nhắn đúng màu với nó» ⇒ bong bóng càu nhàu
+// bỏ nền mặt / chữ / bóng / viền xám cũ (đúng 5 khai báo), thay bằng màu thân giám thị pha từ --gt-mau-* (giam-thi.css).
+for (const k of ['background: var(--tr-mat)', 'color: var(--tr-chu)', 'box-shadow: 0 3px 0 var(--tr-vien-2)', 'background: inherit', 'border-right: 2px solid var(--tr-vien-2)']) MAU_CU_THAY_RA_LENH[`src/components/giam-thi/giam-thi.css · ${k}`] = (MAU_CU_THAY_RA_LENH[`src/components/giam-thi/giam-thi.css · ${k}`] ?? 0) + 1
 for (const k of ['border: 2px solid var(--tr-vien-2)', 'border-bottom: 2px solid var(--tr-vien-2)', 'border-left: 2px solid var(--tr-vien-2)']) MAU_CU_THAY_RA_LENH[`src/components/giam-thi/giam-thi.css · ${k}`] = (MAU_CU_THAY_RA_LENH[`src/components/giam-thi/giam-thi.css · ${k}`] ?? 0) + 1
 // 27/10: đợt gỡ CSS chết thứ hai (tờ nạp chung index-*.css; luật tốc độ đỏ sau #430/#431) — danh sách đóng ở docs/css-chet-2710.json, cùng cách.
 for (const [k, n] of Object.entries(JSON.parse(readFileSync(new URL('../docs/css-chet-2710.json', import.meta.url), 'utf8')).cu)) MAU_CU_THAY_RA_LENH[k] = (MAU_CU_THAY_RA_LENH[k] ?? 0) + n

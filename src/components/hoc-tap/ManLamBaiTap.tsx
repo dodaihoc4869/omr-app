@@ -51,7 +51,7 @@ import { canGiuChan, chuoiHomNay, loiBangNhac, loiDongVien, loiGiuChan, type Cau
 const KetBaiThuong = lazy(() => import('../thuong/KetBaiThuong'))
 // Giám thị theo mức câu (thầy chốt 27/10): mảnh lười + tờ riêng; ở đây chỉ phần chọn mức (nhỏ).
 const GiamThiCau = lazy(() => import('../giam-thi/GiamThi'))
-import { deDaiGiamThi, mucGiamThi } from '../giam-thi/muc-giam-thi'
+import { mucGiamThi } from '../giam-thi/muc-giam-thi'
 /** Trùng tên với TrongHs.SU_KIEN_MO_CHUOI (không nhập TrongHs vào mảnh màn làm bài). */
 const SU_KIEN_MO_CHUOI = 'ddh-thuong-mo-chuoi'
 // «Trong» 26/10 (nhóm 2): tờ trình bày styles/trong-lam-bai.css nạp RIÊNG, chỉ khi <html data-trong> (main.tsx gắn trước khi nạp màn) — không cộng byte lượt mở app.
@@ -701,10 +701,11 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
             : <p className="duo-nhan" data-nc="" data-nhac={bangNhac ? '' : undefined}>{bangNhac && <span className="duo-nhan-nhac" role="status">{bangNhac}</span>}<span className="duo-nhan-o" aria-hidden="true">{q.phan === 'III' || soPa ? <IcMayTinh /> : <IcLapLanh />}</span><span>{q.vaiGoi7 === 'moi' ? 'Câu mới' : loai}</span>{tenBai || q.tenDang ? <span className="duo-chip" data-cong-thuc={/[A-Z][a-z]?(\d|[A-Z(])/.test(tenBai || q.tenDang || '') || undefined}><ChemText text={chuDeNgan(tenBai || q.tenDang || '')} /></span> : null}{chang ? <span className="ht2-an">Chặng {chang}</span> : null}</p>}
           {(!laLamLai || nutDen) && <div className="duo-lenh">{!laLamLai && <h2>{lenh}</h2>}{nutDen}</div>}
           {laLamLai && !k && viTri === soGoc && <p className="duo-mo-ghi">Câu cùng dạng với câu em vừa sai. Lượt này tính là có hỗ trợ.</p>}
-          {mucGt ? <div className="duo-gt-san" data-nho={deDaiGiamThi(q) || undefined}>
+          {mucGt ? <div className="duo-gt-san">
+              <div className="duo-gt-loi-o" />{/* hàng riêng của bong bóng càu nhàu: không đè nhãn, đề, phương án */}
               <div className="duo-gt-nv"><Suspense fallback={null}><GiamThiCau muc={mucGt} qid={q.qid} phien={phien} nop={nop} ket={ketGt} vung={() => gocRef.current} /></Suspense></div>
-              {/* đề dài: bong bóng gần trọn bề ngang, viền chữ L (khuyết góc trái trên ôm giám thị — mảnh GiamThi vẽ), chữ chảy vòng quanh chỗ giữ */}
-              <div className="duo-gt-bong">{deDaiGiamThi(q) && <><svg className="duo-gt-vien" aria-hidden="true"><path /></svg><span className="duo-gt-cho" aria-hidden="true" /></>}<VungChamDe q={q} token={token} phien={phien} onHoTro={danhDauHoTro} nutBatDau={nutBatDau}><DeCau q={q} stt={stt} /></VungChamDe></div>
+              {/* chữ L (bong bóng gần trọn bề ngang, khuyết góc trái trên ôm giám thị) CHỈ khi chữ thật sự tràn xuống dưới chân giám thị — mảnh GiamThi đo rồi bật `data-l` */}
+              <div className="duo-gt-bong"><svg className="duo-gt-vien" aria-hidden="true"><path /></svg><span className="duo-gt-cho" aria-hidden="true" /><VungChamDe q={q} token={token} phien={phien} onHoTro={danhDauHoTro} nutBatDau={nutBatDau}><DeCau q={q} stt={stt} /></VungChamDe></div>
             </div>
             : <VungChamDe q={q} token={token} phien={phien} onHoTro={danhDauHoTro} nutBatDau={nutBatDau}><DeCau q={q} stt={stt} /></VungChamDe>}
           {coDangCanh(q.text) && <MinhHoaDe text={q.text} />}
