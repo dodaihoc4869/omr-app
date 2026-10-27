@@ -15,7 +15,7 @@
 // và `answer` không đọc bảng, không kèm `soDo`. `solution` cũ của kho luôn giữ nguyên.
 import type { Env, D1Database } from './kieu'
 import type { BanSoDo, GoiYTraVe } from '../../src/lib/goi-y-cham/kieu'
-import { catTruocNop, kiemCong, type CauKiemCong } from './so-do-cong'
+import { catTruocNop, kiemCong, lamSachChuHien, type CauKiemCong } from './so-do-cong'
 import { gameIdentityHaiBuoc } from './game-v2-auth'
 import { protectedQuestions } from './game-v2-bank'
 import { trangThaiHoiThay } from './hoi-thay-ca-nhan'
@@ -75,7 +75,7 @@ export function chonBanDat(rows: Row[], qids: string[], cauCua: (qid: string) =>
     try { ban = JSON.parse(str(r.ban_json)) as BanSoDo } catch { continue }
     const cau = cauCua(q)
     if (!cau || !ban || typeof ban !== 'object') continue
-    if (kiemCong(ban, cau).ket === 'dat') return ban
+    if (kiemCong(ban, cau).ket === 'dat') return lamSachChuHien(ban) // thầy 27/10: bỏ «thực tế / lý thuyết» cả ở bản đã soạn
   }
   return null
 }

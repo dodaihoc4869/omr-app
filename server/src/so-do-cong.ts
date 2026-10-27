@@ -293,6 +293,27 @@ function khopDapAnSo(v: number, dapAn: string, d: SoDoc): boolean {
   return Math.abs(v) < 1e15 && khopPhanIII(v.toFixed(soChu), dapAn)
 }
 
+/** Chữ hiện cho em (thầy 27/10 «Bỏ thực tế lý thuyết đi», ảnh): bỏ «thực tế» / «lý thuyết» / «theo lý thuyết»; «per» (tiếng Anh) ⇒ «/». Không đụng `so`, `ten`. */
+export function lamSachChu(chu: string): string {
+  return chu
+    .replace(/\s*\b(?:theo\s+)?(?:lý thuyết|thực tế)(?![\p{L}\p{N}])/giu, '')
+    .replace(/(?<=[\p{L}\p{N}])\s+per\s+(?=[\p{L}\p{N}])/gu, '/')
+    .replace(/\(\s+/g, '(').replace(/\s+([,.;:)])/g, '$1').replace(/:\s*:/g, ':').replace(/\s{2,}/g, ' ').trim()
+}
+/** Làm sạch mọi chữ hiện cho em của một bản (đề nói gì, sơ đồ, nghĩa thừa số, tới đây, hiện tượng, chìa khoá). Không sửa bản gốc. */
+export function lamSachChuHien(ban: BanSoDo): BanSoDo {
+  const c = (v: unknown) => (typeof v === 'string' ? lamSachChu(v) : v)
+  return {
+    ...ban,
+    deNoiGi: c(ban.deNoiGi) as string,
+    ...(ban.chiaKhoa !== undefined ? { chiaKhoa: c(ban.chiaKhoa) as string } : {}),
+    ...(ban.cauTuHoi !== undefined ? { cauTuHoi: c(ban.cauTuHoi) as string } : {}),
+    ...(ban.soDo ? { soDo: { ...ban.soDo, nut: (ban.soDo.nut ?? []).map((n) => ({ ...n, ...(n.tong !== undefined ? { tong: c(n.tong) as string } : {}), soLieu: (n.soLieu ?? []).map((x) => c(x) as string) })) } } : {}),
+    buoc: (ban.buoc ?? []).map((b) => ({ ...b, thuaSo: (b.thuaSo ?? []).map((t) => ({ ...t, nghia: c(t.nghia) as string, ...(t.denDay !== undefined ? { denDay: c(t.denDay) as string } : {}) })) })),
+    ...(ban.hienTuong ? { hienTuong: { ...ban.hienTuong, giaiThich: (ban.hienTuong.giaiThich ?? []).map((x) => c(x) as string) } } : {}),
+  }
+}
+
 /** Bản để hiện TRƯỚC khi em nộp: bỏ mọi `ketQua` (cả trong từng bước). Không sửa bản gốc. */
 export function catTruocNop(ban: BanSoDo): BanSoDo {
   const { ketQua: _k, ...con } = ban
