@@ -293,6 +293,17 @@ const BP_CANH = [
   ['duo-5-tln-tg-ds-mo', 'lam13&lam=duo', /Số đồng phân amine/, `lam13:${D_Q3} » ds:a=Đúng » nut:^Trợ giúp`],
   ['duo-5-tln-tg-sua-mo', 'duo-sua&de=4', /Câu em đã sai/, 'lam13:nut:^8$ » nut:^Trợ giúp'],
 ]
+// ═══ HỎI THẦY THEO TÔNG 27/10 (tiền tố "duo-ht-"): hộp Hỏi Thầy mở từ dải kết quả mang màu dải — đúng (xanh lá) · sai (đỏ) · chưa tính (học cách giải,
+// tông trung tính) · đang làm (tông chính). 390×844, 360×640, 844×390, 1440×900, sáng + tối.
+const HT_CANH = [
+  ['duo-ht-dung', 'lam13&lam=duo&ht=1', /Số đồng phân amine/, 'lam13:tn:^D » nut:^Kiểm tra$ » nut:^Hỏi thầy'],
+  ['duo-ht-sai', 'lam13&lam=duo&ht=1', /Số đồng phân amine/, 'lam13:tn:^B » nut:^Kiểm tra$ » nut:^Hỏi thầy'],
+  ['duo-ht-chua-tinh', 'lam13&lam=duo&ba=1&ht=1', /Số đồng phân amine/, `lam13:${D_Q4} » nut:^Học cách giải » nut:^Hỏi thầy`],
+  ['duo-ht-dang-lam', 'lam13&lam=duo&ht=1', /Số đồng phân amine/, 'lam13:tn:^D » nut:^Trợ giúp » nut:^Hỏi thầy'],
+]
+const DS_HT = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  HT_CANH.map(([t, m, cho, viec]) => [`${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
+// ═══ hết HỎI THẦY THEO TÔNG 27/10
 const DS_BP = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   BP_CANH.map(([t, m, cho, viec]) => [`${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
 // ═══ hết BÀN PHÍM DUO 27/10
@@ -538,6 +549,7 @@ const DS = [
   ...DS_DUO_SUA, // DUO SỬA 27/10
   ...DS_DUO, // DUO 26/10
   ...DS_BP, // BÀN PHÍM DUO 27/10
+  ...DS_HT, // HỎI THẦY THEO TÔNG 27/10
   ...DS_GIU, // GIỮ CHÂN 27/10
   ...DS_GT, // GIÁM THỊ 27/10
   ...DS_GIAN, // ĐỀ GIÃN Ý 27/10
@@ -1041,8 +1053,9 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
         await t.waitForTimeout(250)
       }
       // GIÁM THỊ 27/10: bong bóng càu nhàu không được chồng lên nhãn, đề, phương án, thanh trên / đáy (đo hình chữ nhật thật) ⇒ ghi vào «Tràn ngang».
+      // 27/10 thanh trên DÍNH: trang đã cuộn ⇒ bong bóng (thuộc phần đề) trượt khuất DƯỚI thanh trên như mọi nội dung khác — không tính là chồng lên thanh trên
       const chong = await t.evaluate(() => { const l = document.querySelector('.gt-loi'); if (!l) return ''; const a = l.getBoundingClientRect()
-        return [...document.querySelectorAll('.duo-nhan, .duo-gt-bong, .duo-tra, .duo-day, .duo-tren')].filter((e) => { const b = e.getBoundingClientRect(); return b.width > 0 && !(a.right <= b.left || a.left >= b.right || a.bottom <= b.top || a.top >= b.bottom) }).map((e) => e.className.split(' ')[0]).join(', ') })
+        return [...document.querySelectorAll('.duo-nhan, .duo-gt-bong, .duo-tra, .duo-day, .duo-tren')].filter((e) => !(e.matches('.duo-tren') && getComputedStyle(e).position === 'sticky' && a.top < e.getBoundingClientRect().bottom)).filter((e) => { const b = e.getBoundingClientRect(); return b.width > 0 && !(a.right <= b.left || a.left >= b.right || a.bottom <= b.top || a.top >= b.bottom) }).map((e) => e.className.split(' ')[0]).join(', ') })
       if (chong) tran.push(`${ten}: bong bóng càu nhàu chồng lên ${chong}`)
       // GIÁM THỊ 27/10 tối: khung đề không được có vùng rỗng ở đáy > 24 px (khung chữ L chỉ khi chữ thật sự tràn xuống dưới chân giám thị).
       const rong = await t.evaluate(() => { const b = document.querySelector('.duo-gt-bong'), d = b?.querySelector('.ht2-lam-de'); if (!b || !d) return 0

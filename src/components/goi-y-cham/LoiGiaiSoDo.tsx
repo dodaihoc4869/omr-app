@@ -61,7 +61,7 @@ function ThanSoDo({ ban }: { ban: NonNullable<ReturnType<typeof docBanSoDo>> }) 
       </>}
       {ban.chiaKhoa && <><h3 className="gyc-lgsd-muc">Chìa khoá của bài</h3><p><ChemText text={ban.chiaKhoa} /></p></>}
       {n > 0 && <>
-        <h3 className="gyc-lgsd-muc">{n > 1 ? `Tính ${n} bước` : 'Một phép tính'} · chạm từng số để xem đến đó là gì</h3>
+        <h3 className="gyc-lgsd-muc">{n > 1 ? `Tính ${n} bước` : 'Một phép tính'}</h3>
         {n > 1 ? <div className="gyc-buoc-tinh">{ban.buoc.map((b, i) => <ChuoiTinh key={i} buoc={b} stt={i + 1} nhieu hienKetQua />)}</div>
           : <ChuoiTinh buoc={ban.buoc[0]} stt={1} nhieu={false} hienKetQua />}
       </>}
