@@ -12,7 +12,7 @@
 import { describe, expect, it } from 'vitest'
 import katex from 'katex'
 import 'katex/contrib/mhchem'
-import { beRongUocTinh, chuanHoaNhanMuiTen } from '../src/lib/chem-format'
+import { beRongUocTinh, chuanHoaNhanMuiTen } from '../src/lib/chem-latex' // 27/10: chuyển sang mảnh nạp lười cùng KaTeX
 
 /** Chữ mắt nhìn thấy + số lần có chỉ số dưới, đọc từ MathML của KaTeX. */
 function ve(latex: string): { chu: string; soChiSo: number; soNhan: number } {

@@ -111,7 +111,7 @@ describe('tấm giữ chân trên màn làm chặng Duo', () => {
   it('đang ở câu cuối chưa chấm ⇒ «chỉ 1 câu nữa thôi»; băng «Còn 1 câu»; 2 câu sai liền ⇒ Bi động viên', async () => {
     mo(3)
     await screen.findByText('Đề câu số 1')
-    expect(document.querySelector('.giu-bang')?.textContent).toBe('Chặng 2 · 3 câu · bắt đầu nào!')
+    expect(document.querySelector('.duo-nhan-nhac')?.textContent).toBe('Chặng 2 · 3 câu · bắt đầu nào!')
     await lamCau(false)
     expect(document.querySelector('.giu-dong-vien')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Tiếp tục' }))
@@ -120,7 +120,7 @@ describe('tấm giữ chân trên màn làm chặng Duo', () => {
     expect(document.querySelector('.giu-dong-vien')?.textContent).toBe('Không sao, sai để nhớ lâu. Câu sau đọc kĩ dữ kiện nhé.')
     fireEvent.click(screen.getByRole('button', { name: 'Tiếp tục' }))
     await screen.findByText('Đề câu số 3')
-    expect(document.querySelector('.giu-bang')?.textContent).toBe('Còn 1 câu là xong chặng!')
+    expect(document.querySelector('.duo-nhan-nhac')?.textContent).toBe('Còn 1 câu là xong chặng!')
     fireEvent.click(X())
     await screen.findByRole('dialog', { name: 'Đừng đi mà, chỉ 1 câu nữa thôi là xong chặng rồi!' })
   })
