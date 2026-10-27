@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 // MÀN KIỂM TRA KIỂU DUOLINGO (thầy 27/10: «Màn làm bài kiểm tra của hs đổi sang dolingo … tự động tắt âm thanh chỉ để rung»):
-//  1. Cờ che-do-thi: màn kiểm tra mở ⇒ phanHoi('chon') CHỈ rung, không tiếng nào (kể cả tiếng thưởng), dù công tắc «Âm thanh» bật; gỡ cờ ⇒ tiếng trở lại;
+//  1. Cờ «đang kiểm tra» (batCheDoThi): màn kiểm tra mở ⇒ phanHoi('chon') CHỈ rung, không tiếng nào (kể cả tiếng thưởng), dù công tắc «Âm thanh» bật; gỡ cờ ⇒ tiếng trở lại;
 //     hai màn lồng nhau / gỡ hai lần vẫn đúng.
 //  2. Khung ca thi (ThiDuo): một câu một màn — «Câu tiếp» đi câu sau, câu cuối là nút nộp (mở tấm xác nhận, KHÔNG nộp thẳng), ← → đổi câu, tấm lưới
 //     chỉ có «đã làm / chưa làm» (không đúng/sai), tấm nộp có Bi + câu chưa làm bấm được, chạm nút ⇒ rung. Chỉ nộp phút cuối ⇒ nút nộp khoá.
@@ -36,7 +36,7 @@ afterEach(() => { cleanup(); vi.unstubAllGlobals(); localStorage.clear(); delete
 
 describe('cờ «đang kiểm tra» — chỉ rung, không tiếng', () => {
   it('bật cờ ⇒ phanHoi rung nhưng không tạo oscillator; gỡ cờ ⇒ có tiếng lại', async () => {
-    const { batCheDoThi, dangCheDoThi } = await import('../src/lib/che-do-thi')
+    const { batCheDoThi, dangCheDoThi } = await import('../src/lib/am-thanh')
     const { phanHoi } = await import('../src/lib/phan-hoi')
     const { phat } = await import('../src/lib/am-thanh')
     localStorage.setItem('ddh.am', 'bat') // công tắc «Âm thanh» đang bật
@@ -51,7 +51,7 @@ describe('cờ «đang kiểm tra» — chỉ rung, không tiếng', () => {
     expect(soOsc).toBeGreaterThan(0)
   })
   it('tiếng thưởng (am-thanh-thuong) cũng im khi cờ bật', async () => {
-    const { batCheDoThi } = await import('../src/lib/che-do-thi')
+    const { batCheDoThi } = await import('../src/lib/am-thanh')
     const { phatThuong } = await import('../src/lib/am-thanh-thuong')
     const go = batCheDoThi()
     phatThuong('tinhThe')
@@ -59,7 +59,7 @@ describe('cờ «đang kiểm tra» — chỉ rung, không tiếng', () => {
     go()
   })
   it('hai màn lồng nhau: gỡ một vẫn im; gỡ hai lần một hàm không làm âm bộ đếm', async () => {
-    const { batCheDoThi, dangCheDoThi } = await import('../src/lib/che-do-thi')
+    const { batCheDoThi, dangCheDoThi } = await import('../src/lib/am-thanh')
     const a = batCheDoThi(), b = batCheDoThi()
     a(); a()
     expect(dangCheDoThi()).toBe(true)

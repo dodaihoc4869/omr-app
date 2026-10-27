@@ -14,7 +14,7 @@ import { docKtcnDangLam, ghiKtcnDangLam, xoaKtcnDangLam } from '../../lib/ktcn-d
 import './hoc-tap.css'
 import './kiem-tra-ca-nhan.css'
 import { phanHoi } from '../../lib/phan-hoi'
-import { batCheDoThi } from '../../lib/che-do-thi'
+import { batCheDoThi } from '../../lib/am-thanh'
 import { ChonDungSai, ChonTracNghiem, DeCau, HinhCuoiCau, OTraLoiNgan, BanPhimSo } from './LamCau'
 import { nhanPhim, phimTuBanPhim, type PhimSo } from './lam-bai'
 import { soOCuaCau } from '../../lib/so-o-tra-loi-ngan'
@@ -61,7 +61,7 @@ function useHetGio(kho:KhoGio|null){
 }
 export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat}:{token:string;sbd:string;id:string;onVe:()=>void;onCapNhat:()=>void}) {
  // KIỂU DUOLINGO (thầy 27/10): <html data-trong="hs"> ⇒ màn làm chặng một câu một màn (KhungKiemTra.tsx) — cùng state, cùng lệnh lưu/chốt/đồng hồ.
- // Cả màn kiểm tra: TẮT ÂM THANH, chỉ rung (cờ che-do-thi.ts, gỡ khi đóng).
+ // Cả màn kiểm tra: TẮT ÂM THANH, chỉ rung (cờ batCheDoThi của am-thanh.ts, gỡ khi đóng).
  const [duo]=useState(laKiemTraDuo),[moLuoi,setMoLuoi]=useState(false),[hoiNop,setHoiNop]=useState<((ok:boolean)=>void)|null>(null)
  useEffect(()=>batCheDoThi(),[])
  const [tt,setTt]=useState<TomTatKiemTra>(),[chang,setChang]=useState<Chang[]>([]),[cs,setCs]=useState<Question[]>([]),[stt,setStt]=useState<number|null>(null),[viTri,setViTri]=useState(0),[tra,setTra]=useState<Record<string,string>>({}),[han,setHan]=useState(0),[offset,setOffset]=useState(0),[busy,setBusy]=useState(false),[loi,setLoi]=useState(''),[luu,setLuu]=useState(''),[ket,setKet]=useState<Ket>()

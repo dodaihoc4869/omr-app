@@ -3,9 +3,19 @@
 // p: [[bội, biên]] hoạ âm }. Mỗi hoạ âm = một OscillatorNode sine qua GainNode; hoạ âm cao tắt nhanh hơn (như bản WAV: exp(−t·(bội−1)·2,2)).
 // Chỉ kêu khi <html data-trong="hs">, em chưa tắt («Âm thanh» trong menu ⇒ localStorage 'ddh.am' = 'tat') và tab đang hiện. AudioContext tạo lười ở lần
 // chạm đầu (luật trình duyệt) rồi dùng lại; 'suspended' ⇒ resume(). Mọi lỗi im lặng.
-// Màn KIỂM TRA (ca thi, Kiểm tra ôn tập — thầy 27/10 «tự động tắt âm thanh chỉ để rung») bật cờ che-do-thi.ts ⇒ im lặng hẳn, dù 'ddh.am' đang bật.
+// Màn KIỂM TRA (ca thi, Kiểm tra ôn tập — thầy 27/10 «tự động tắt âm thanh chỉ để rung») bật cờ «đang kiểm tra» (batCheDoThi dưới) ⇒ im lặng hẳn,
+// dù 'ddh.am' đang bật; rung không đổi.
 import { duocPhanHoi, type KieuPhanHoi } from './rung'
-import { dangCheDoThi } from './che-do-thi'
+
+// CỜ «ĐANG KIỂM TRA»: màn kiểm tra gọi `useEffect(() => batCheDoThi(), [])` — bật khi MỞ, hàm trả về gỡ khi ĐÓNG. Đếm số màn đang mở (hai màn lồng
+// nhau vẫn đúng); mỗi hàm gỡ chỉ trừ một lần. Tiếng thưởng (am-thanh-thuong.ts) cũng kiểm cờ này.
+let soManThi = 0
+export function batCheDoThi(): () => void {
+  let con = 1
+  soManThi++
+  return () => { soManThi -= con; con = 0 }
+}
+export const dangCheDoThi = (): boolean => soManThi > 0
 
 type Giong = { t: number; f: number; f2?: number; d: number; a?: number; g: number; p?: [number, number][] }
 const CHUONG: [number, number][] = [[1, 1], [2, 0.32], [3, 0.12], [4.2, 0.05]] // chuông thuỷ tinh

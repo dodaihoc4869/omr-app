@@ -2,10 +2,10 @@
 // thẻ câu (TheCau, đủ mọi câu, câu không xem thì `hidden` — bộ đếm giây từng câu, gom đáp án lúc nộp, lá chắn `.thi-noi-dung` vẫn chạy y cũ), đồng
 // hồ, lưu, nộp, chống rời màn, giữ để đọc, vân tay… đều do ExamTakeScreen dựng và truyền vào. Ở đây: thanh trên (thoát ⇒ hộp «không thoát được» cũ ·
 // thanh tiến độ «đã làm» · đồng hồ · lưới câu), một câu một màn, đáy dính «Câu tiếp» / «Nộp bài», tấm lưới số câu, tấm xác nhận nộp có Bi.
-// LUẬT THI: không hiện đúng/sai, không tấm xanh/đỏ, không đáp án — mảnh này không nhận đáp án nào. Âm thanh: màn thi bật cờ che-do-thi ⇒ chỉ rung.
+// LUẬT THI: không hiện đúng/sai, không tấm xanh/đỏ, không đáp án — mảnh này không nhận đáp án nào. Âm thanh: màn thi bật cờ «đang kiểm tra» (batCheDoThi, am-thanh.ts) ⇒ chỉ rung.
 import { useEffect, useLayoutEffect, useRef, type MouseEvent, type ReactNode } from 'react'
 import { phanHoi } from '../../lib/phan-hoi'
-import { batCheDoThi } from '../../lib/che-do-thi'
+import { batCheDoThi } from '../../lib/am-thanh'
 import { DayKt, NhanCauKt, TamLuoiKt, TamNopKt, ThanhTrenKt } from './KhungKiemTra'
 
 type PhanThi = 'I' | 'II' | 'III'
@@ -82,7 +82,7 @@ export default function ThiDuo(p: ThiDuoProps) {
     window.addEventListener('keydown', f)
     return () => window.removeEventListener('keydown', f)
   }, [])
-  // Chạm phương án / ý Đúng–Sai / nút ⇒ rung nhẹ (CHỈ rung — cờ che-do-thi chặn tiếng). Nghe ở pha bắt: không đụng hàm chọn đáp án của thẻ câu.
+  // Chạm phương án / ý Đúng–Sai / nút ⇒ rung nhẹ (CHỈ rung — cờ «đang kiểm tra» (batCheDoThi, am-thanh.ts) chặn tiếng). Nghe ở pha bắt: không đụng hàm chọn đáp án của thẻ câu.
   const rungKhiBam = (e: MouseEvent) => {
     const el = e.target instanceof Element ? e.target.closest('button, [role=radio]') : null
     if (el && !(el as HTMLButtonElement).disabled) phanHoi('chon')
