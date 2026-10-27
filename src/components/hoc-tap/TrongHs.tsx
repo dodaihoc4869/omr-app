@@ -194,8 +194,10 @@ function LoiBi({ cam, loi, coBi = true }: { cam: CamBi; loi: string; coBi?: bool
     if (yen) { setN(loi.length); return }
     setN(0)
     let t = 0, i = 0
-    const go = () => { i++; setN(i); if (i < loi.length) t = window.setTimeout(go, 28) }
-    t = window.setTimeout(go, 28)
+    // 27/10 (soát ảnh: bong bóng trông «cụt câu» khi đang gõ): gõ xong câu trong ≤ 0,7 s (câu dài ⇒ mỗi chữ nhanh hơn, tối thiểu 8 ms).
+    const nhip = Math.max(8, Math.min(28, Math.floor(700 / Math.max(1, loi.length))))
+    const go = () => { i++; setN(i); if (i < loi.length) t = window.setTimeout(go, nhip) }
+    t = window.setTimeout(go, nhip)
     return () => window.clearTimeout(t)
   }, [loi])
   return <div className="bi-loi" data-khong-bi={!coBi || undefined}>{coBi && <Bi cam={cam} size={84} noi={loi} />}<p className="bi-loi-bong"><span className="ht2-an">{loi}</span><span aria-hidden="true">{loi.slice(0, n)}<span className="bi-loi-con">{loi.slice(n)}</span></span></p></div>
