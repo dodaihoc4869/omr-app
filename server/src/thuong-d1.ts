@@ -17,7 +17,7 @@ import type { D1PreparedStatement, Env, ExecutionContext } from './kieu'
 import { gameIdentityHaiBuoc } from './game-v2-auth'
 import { viecPhu } from './viec-phu'
 import {
-  BINH_MUA_TOI_DA_TUAN, CUOC_SO_NGAY, GIO_CU_DEM, HAU_TO_KHOA_BINH_TUAN, HUY_HIEU, KHOA_CONG_TAC, KHOA_TAM_DONG_CHO_PHEP, KHOA_TAM_DONG_HS, MA_TT, SO_LIEU_RONG, THANG_HOA_SO_NGAY, TT_CUOC_DAT, TT_CUOC_THANG,
+  BINH_MUA_TOI_DA_TUAN, CAU_MOI_BAI, NGAY_CHANG_DU, changDu, CUOC_SO_NGAY, GIO_CU_DEM, HAU_TO_KHOA_BINH_TUAN, HUY_HIEU, KHOA_CONG_TAC, KHOA_TAM_DONG_CHO_PHEP, KHOA_TAM_DONG_HS, MA_TT, SO_LIEU_RONG, THANG_HOA_SO_NGAY, TT_CUOC_DAT, TT_CUOC_THANG,
   TT_BINH_GIU_CHUOI, TT_MOC_CHUOI, TT_MUC_TIEU_NGAY, TT_RUONG, chonNhiemVu, congNgayTt, congTacTuDong, datHuyHieu, gioVnCua, mucTieuBai, ngayVnTt, nhiemVuCuaNgay,
   soThangHoa, tamDongChoEm, tamDongTuDong, tuanMuaBinh,
   type CongTac, type MauNhiemVu, type MaNhiemVu, type NhiemVuEm, type SoLieuNgay,
@@ -171,12 +171,14 @@ export function chuChangTen(s: string): string {
 
 function phanTichNgay(sbd: string, ngay: string, kq: readonly { results?: unknown[] }[], cauDaLam: number | null = null): NgayEm {
   const t = (kq[0]?.results?.[0] ?? {}) as Dong
-  const bai = (kq[1]?.results ?? []) as Dong[]
+  // Chặng < 6 câu (từ 28/10) không tính chặng xong / hoàn hảo (changDu, thuong-luat.ts); chuỗi đúng / câu khó vẫn tính từ mọi chặng.
+  const tatCaBai = (kq[1]?.results ?? []) as Dong[]
+  const bai = tatCaBai.filter((r) => changDu(ngay, so(r.so_cau)))
   const nv = (kq[2]?.results ?? []) as Dong[]
   const soLieu: SoLieuNgay = {
     baiXong: bai.length,
-    chuoiMax: bai.reduce((m, r) => Math.max(m, so(r.chuoi_max)), 0),
-    khoDung: bai.reduce((s, r) => s + so(r.kho_dung), 0),
+    chuoiMax: tatCaBai.reduce((m, r) => Math.max(m, so(r.chuoi_max)), 0),
+    khoDung: tatCaBai.reduce((s, r) => s + so(r.kho_dung), 0),
     suaLoi: so(t.sua_loi),
     hoanHao: bai.filter((r) => so(r.hoan_hao) === 1).length,
     baiTruoc20h: bai.filter((r) => gioVnCua(chu(r.luc)) < 20).length,
@@ -384,7 +386,7 @@ export async function hsHuyHieu(env: Env, b: Dong, ctx?: ExecutionContext, nowMs
   const chuoiSom = cauNoiChuoi().docChuoiNgay(env, sbdKy, nowMs).catch(() => null)
   const lo = env.DB.batch([
     env.DB.prepare('SELECT ma, ngay, du_lieu FROM huy_hieu_em WHERE em = ?').bind(sbdKy),
-    env.DB.prepare(`SELECT COALESCE(SUM(hoan_hao), 0) AS hh, COALESCE(MAX(chuoi_max), 0) AS cm,
+    env.DB.prepare(`SELECT COALESCE(SUM(CASE WHEN ngay < '${NGAY_CHANG_DU}' OR so_cau >= ${CAU_MOI_BAI} THEN hoan_hao ELSE 0 END), 0) AS hh, COALESCE(MAX(chuoi_max), 0) AS cm,
         COALESCE(MAX(CASE WHEN CAST(strftime('%H', luc, '+7 hours') AS INTEGER) >= ? THEN 1 ELSE 0 END), 0) AS dem FROM thuong_bai_xong WHERE em = ?`).bind(GIO_CU_DEM, sbdKy),
   ])
   lo.catch(() => {})
