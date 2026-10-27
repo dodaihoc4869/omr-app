@@ -296,6 +296,15 @@ function khopDapAnSo(v: number, dapAn: string, d: SoDoc): boolean {
 /** Chữ hiện cho em (thầy 27/10 «Bỏ thực tế lý thuyết đi», ảnh): bỏ «thực tế» / «lý thuyết» / «theo lý thuyết»; «per» (tiếng Anh) ⇒ «/». Không đụng `so`, `ten`. */
 export function lamSachChu(chu: string): string {
   return chu
+    // LaTeX / $ lẫn trong chữ (27/10 soát: 1/1705 câu) ⇒ chữ thường
+    .replace(/\$/g, '')
+    .replace(/\\frac\s*\{([^{}]*)\}\s*\{([^{}]*)\}/g, '$1/$2')
+    .replace(/\\(?:text|mathrm|ce)\s*\{([^{}]*)\}/g, '$1')
+    .replace(/\\cdot/g, '·').replace(/\\times/g, '×').replace(/\\(?:approx)/g, '≈').replace(/\\(?:rightarrow|to)\b/g, '→')
+    // tiếng Anh lẫn trong lời Việt (27/10 soát: ~45/1705 câu)
+    .replace(/(?<=[\p{L}\p{N})])\s+of\s+(?=[\p{L}\p{N}(])/gu, ' của ')
+    .replace(/(?<=[\p{L}\p{N})])\s+and\s+(?=[\p{L}\p{N}(])/gu, ' và ')
+    .replace(/(?<![\p{L}])the\s+(?=[\p{L}])/giu, '')
     .replace(/\s*\b(?:theo\s+)?(?:l[ýí] thuyết|thực tế)(?![\p{L}\p{N}])/giu, '')
     .replace(/(?<=[\p{L}\p{N}])\s+per\s+(?=[\p{L}\p{N}])/gu, '/')
     .replace(/\(\s+/g, '(').replace(/\s+([,.;:)])/g, '$1').replace(/:\s*:/g, ':').replace(/\s{2,}/g, ' ').trim()

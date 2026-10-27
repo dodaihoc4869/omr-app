@@ -358,6 +358,32 @@ describe('soạn lô', () => {
     expect(String(JSON.parse(String(dongSoDo(Q.III)!.ban_json)).deNoiGi)).not.toMatch(/tiền/)
   })
 
+  it('27/10 trình bày: thiếu «?» / H không đứng riêng / thiếu nghĩa ⇒ bắt soạn lại; bản mẫu đạt', async () => {
+    const mau = VI_DU_MAU[0]!.ban as BanSoDo
+    expect(M.loiTrinhBay(mau)).toBeNull()
+    const khongHoi = { ...mau, soDo: { ...mau.soDo!, nut: mau.soDo!.nut.map((n) => ({ ...n, soLieu: n.soLieu.filter((x) => !x.includes('?')), tong: n.tong?.replace('?', '') })) } }
+    expect(M.loiTrinhBay(khongHoi)).toMatch(/đề hỏi/)
+    const khongH = { ...mau, buoc: mau.buoc.map((b) => ({ ...b, thuaSo: b.thuaSo.filter((t) => !/\/100$|^100\//.test(t.so)) })) }
+    expect(M.loiTrinhBay(khongH)).toMatch(/hiệu suất/)
+    const thieuNghia = { ...mau, buoc: mau.buoc.map((b) => ({ ...b, thuaSo: b.thuaSo.map((t, i) => (i ? t : { ...t, nghia: '' })) })) }
+    expect(M.loiTrinhBay(thieuNghia)).toMatch(/thiếu nghĩa/)
+    const mh = moHinhGia((h, lan) => (lan === 1 ? JSON.stringify(khongHoi) : chuMau(h)))
+    const { j } = await goiLo({ qids: [Q.III] }, { goiMoHinh: mh.fn, kiemCong: congGia(() => 'dat') })
+    expect(mh.fn).toHaveBeenCalledTimes(2)
+    expect(mh.goi[1]!.luot[2]!.chu).toContain('TRÌNH BÀY')
+    expect(j.dem.dat).toBe(1)
+  })
+  it('27/10: dòng đạt đánh dấu «trinh_bay_lai» ⇒ vòng sửa soạn lại; bản mới đạt thay, bản mới lệch KHÔNG hạ bản đạt cũ', async () => {
+    const mh = moHinhGia((h) => chuMau(h))
+    await goiLo({ qids: [Q.III, Q.III2] }, { goiMoHinh: mh.fn, kiemCong: congGia(() => 'dat') })
+    d.sql.prepare("UPDATE loi_giai_so_do SET ly_do = 'trinh_bay_lai'").run()
+    const mh2 = moHinhGia((h) => chuMau(h))
+    const { j } = await goiLo({ chiSuaLoi: true }, { goiMoHinh: mh2.fn, kiemCong: vi.fn((ban: BanSoDo) => (ban.qid === Q.III ? { ket: 'dat' as const } : { ket: 'lech' as const, lyDo: 'x', giaTri: 1 })) })
+    expect(j.ketQua.map((k) => k.qid).sort()).toEqual([Q.III, Q.III2].sort())
+    expect(dongSoDo(Q.III)).toMatchObject({ cong: 'dat', ly_do: null })
+    expect(dongSoDo(Q.III2)).toMatchObject({ cong: 'dat', ly_do: 'trinh_bay_lai' })
+  })
+
   it('thuKhong ⇒ không ghi gì (không tạo bảng), trả bản soạn để xem', async () => {
     const mh = moHinhGia((h) => chuMau(h))
     const { j } = await goiLo({ qids: [Q.III, Q.I], thuKhong: true }, { goiMoHinh: mh.fn, kiemCong: congGia(() => 'dat') })

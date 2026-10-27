@@ -23,7 +23,7 @@ import { suaDapAnKho } from './sua-dap-an-kho'
 import { quaTram } from './tram-gemini'
 import { docCauEmSai } from './hoc-lieu-may-soan'
 import { laCauTuLuan, laMotSoPhanIII } from '../../src/lib/cau-tu-luan'
-import { PHIEN_BAN_SO_DO, chuCauHoi, chuCauHoiMu, chuThuLai, chuThuLaiAnDu, chuThuLaiKhuon, chuThuLaiLo, chuThuLaiThieu, loiDanSoDo, type CauCanSoan } from './soan-so-do-loi-dan'
+import { PHIEN_BAN_SO_DO, chuCauHoi, chuCauHoiMu, chuThuLai, chuThuLaiAnDu, chuThuLaiKhuon, chuThuLaiTrinhBay, chuThuLaiLo, chuThuLaiThieu, loiDanSoDo, type CauCanSoan } from './soan-so-do-loi-dan'
 
 type Obj = Record<string, unknown>
 const str = (v: unknown) => (v === null || v === undefined ? '' : String(v)).trim()
@@ -119,8 +119,29 @@ export const SO_LUOT_MOT_CAU = 4
 const RE_AN_DU = /tiền(?! chất)|giàu|nghèo|thuế|nhà (?:thằng|bạn|giàu|nghèo|[A-ZĐ](?![\p{L}\p{N}]))/iu
 export const LY_DO_AN_DU = 'Bản dùng ẩn dụ tiền / nhà / giàu / thuế (thầy đã bỏ).'
 export function coAnDuTienNha(ban: BanSoDo): boolean { return RE_AN_DU.test(JSON.stringify(ban)) }
+/** Đánh dấu trên dòng ĐẠT cần trình bày lại (workflow đặt; vòng sửa soạn lại, bản đạt cũ vẫn hiện tới khi có bản đạt mới). */
+export const LY_DO_TRINH_BAY_LAI = 'trinh_bay_lai'
+const TIEN_TO_TRINH_BAY = 'Trình bày: '
+/**
+ * Lỗi TRÌNH BÀY của bản đạt số (thầy 27/10 «Kiểm kĩ vào»; soát 1705 câu: 149 thiếu «?», 45 có H mà không nhân H/100, 8 thiếu nghĩa) ⇒ lý do, hoặc null.
+ */
+export function loiTrinhBay(ban: BanSoDo): string | null {
+  const sd = ban.soDo
+  if (sd && Array.isArray(sd.nut) && sd.nut.length) {
+    const coHoi = sd.nut.some((n) => str(n?.tong).includes('?') || (n?.soLieu ?? []).some((x) => str(x).includes('?')))
+    if (!coHoi) return 'Sơ đồ chưa đánh dấu đại lượng đề hỏi (ghi «m kg = ?» … dưới chất cần tìm).'
+    const H = (sd.muiTen ?? []).map((m) => Number(m?.H)).filter((h) => Number.isFinite(h) && h > 0 && h !== 100)
+    if (H.length) {
+      const thua = (ban.buoc ?? []).flatMap((b) => (b?.thuaSo ?? []).map((t) => str(t?.so).replace(/\s+/g, '')))
+      const dung = H.every((h) => { const x = String(h).replace('.', ','); return thua.some((t) => t === `${x}/100` || t === `100/${x}` || t === `${String(h)}/100` || t === `100/${String(h)}`) })
+      if (!dung) return 'Có hiệu suất trên mũi tên nhưng phép tính chưa có thừa số H/100 (tính xuôi) hoặc 100/H (tính ngược) đứng riêng.'
+    }
+  }
+  if ((ban.buoc ?? []).some((b) => (b?.thuaSo ?? []).some((t) => str(t?.nghia).length < 3))) return 'Có thừa số thiếu nghĩa.'
+  return null
+}
 /** Câu vòng sửa soạn lại: lệch / lộ, và câu tính bị trả THIẾU sơ đồ / bước tính (27/10). Chuỗi hằng, không chèn dữ liệu ngoài. */
-export const SQL_CAN_SUA = `cong IN ('lech', 'lo_dap_an') OR (cong = 'khong_kiem_duoc' AND (ly_do LIKE 'Bước % không đọc được.' OR ly_do = '${LY_DO_THIEU_SO_DO}'))`
+export const SQL_CAN_SUA = `cong IN ('lech', 'lo_dap_an') OR (cong = 'khong_kiem_duoc' AND (ly_do LIKE 'Bước % không đọc được.' OR ly_do = '${LY_DO_THIEU_SO_DO}')) OR (cong = 'dat' AND ly_do = 'trinh_bay_lai')`
 const RE_CHAN_VI_TRI = /location is not supported/i
 const ngu = (ms: number) => new Promise((ok) => setTimeout(ok, ms))
 
@@ -476,6 +497,7 @@ async function soanMotCau(q: CauKho, ts: ThamSoDayDu, goi: GoiMoHinh, cong: Kiem
       vai: 'user',
       chu: thieuSoDo(ban) ? chuThuLaiThieu()
         : ban.lyDo === LY_DO_AN_DU ? chuThuLaiAnDu()
+        : str(ban.lyDo).startsWith(TIEN_TO_TRINH_BAY) ? chuThuLaiTrinhBay(str(ban.lyDo).slice(TIEN_TO_TRINH_BAY.length))
         : c.ket === 'lo_dap_an' ? chuThuLaiLo(ban.lyDo ?? 'phần trước nộp chứa đáp án') : chuThuLai(ban.lyDo ?? 'tích các thừa số không ra đáp án kho', giaTri),
     })
   }
@@ -528,7 +550,11 @@ export async function soanSoDoLo(env: Env, thamSo: unknown, phu: PhuSoDo = {}): 
   // Thầy 26/10 «Tạm thời bỏ tư duy tiền nhà»: bản ĐẠT số mà còn ẩn dụ tiền / nhà / giàu / thuế ⇒ coi như lệch, bắt viết lại nói thẳng.
   const cong: KiemCong = async (ban, ctx) => {
     const c = await congGoc(ban, ctx)
-    return c.ket === 'dat' && coAnDuTienNha(ban) ? { ket: 'lech', lyDo: LY_DO_AN_DU, ...(c.giaTri !== undefined ? { giaTri: c.giaTri } : {}) } : c
+    if (c.ket !== 'dat') return c
+    const kem = c.giaTri !== undefined ? { giaTri: c.giaTri } : {}
+    if (coAnDuTienNha(ban)) return { ket: 'lech', lyDo: LY_DO_AN_DU, ...kem }
+    const tb = loiTrinhBay(ban)
+    return tb ? { ket: 'lech', lyDo: `${TIEN_TO_TRINH_BAY}${tb}`, ...kem } : c
   }
   const nganSach = (ts.nganSachGiay ?? 40) * 1000
   const het = () => bayGio() - batDau >= nganSach
