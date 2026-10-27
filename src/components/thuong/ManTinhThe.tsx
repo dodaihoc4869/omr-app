@@ -167,6 +167,29 @@ export function ManCuaHang({ token, onVe, onPhuKien }: { token?: string; onVe?: 
 }
 
 /** Màn phủ Thăng hoa (tp-11) — thông báo `thang_hoa` {mat, conLai}. Không chặn học. */
+/** Thông báo MỘT lần (27/10, thầy duyệt): tinh thể của mọi em đặt lại về cùng mức (`duLieu.conLai`, vd 50) theo luật bình mới; lượt cược đang chạy
+ *  dừng (`duLieu.cuocHuy`). Trung tính, không nói số cũ, không so với bạn. */
+export function ManDatLaiTinhThe({ tb, onHoc, onDong }: { tb: ThongBao; onHoc?: () => void; onDong: () => void }) {
+  const con = typeof tb.duLieu.conLai === 'number' ? Math.max(0, Math.round(tb.duLieu.conLai)) : undefined
+  const cuocHuy = tb.duLieu.cuocHuy === true
+  if (con === undefined) return null
+  return <ManToan nhan="Tinh thể đặt lại theo luật mới" onDong={onDong} demTT={<DemTT gt={con} />}
+    day={<><NutDay chu="Học chặng hôm nay" onClick={onHoc ?? onDong} /><NutDay chu="Đã hiểu" phu onClick={onDong} /></>}>
+    <main className="tp-man" data-hai="">
+      <div className="cot-a">
+        <div className="tp-hinh"><span className="tp-xu" style={{ width: 96, height: 96 }} aria-hidden="true"><IcTinhThe /></span>
+          <div className="bi-o"><Bi cam="vui" size={90} /></div></div>
+        <h1>Tinh thể đã đặt lại theo luật mới</h1>
+        <p className="tp-phu">Từ 27/10, mọi bạn bắt đầu lại với <b>{con} tinh thể</b>. Học chặng, xong nhiệm vụ ngày để kiếm thêm nhé.</p>
+      </div>
+      <div className="cot-b"><section className="tp-the" aria-label="Luật mới">
+        <div className="tp-dong"><span className="tp-o" data-sac="bang"><FlaskConical aria-hidden="true" /></span><div className="giua"><b>Bình giữ chuỗi</b><span>{chuGiaBinh(giaBinh())}</span></div></div>
+        {cuocHuy && <div className="tp-dong"><span className="tp-o" data-sac="sao"><Lock aria-hidden="true" /></span><div className="giua"><b>Lượt cược chuỗi đã dừng</b><span>em cược lại khi sẵn sàng</span></div></div>}
+      </section></div>
+    </main>
+  </ManToan>
+}
+
 export function ManThangHoa({ tb, onHoc, onDong }: { tb: ThongBao; onHoc?: () => void; onDong: () => void }) {
   const mat = typeof tb.duLieu.mat === 'number' ? Math.max(0, Math.round(tb.duLieu.mat)) : undefined
   const con = typeof tb.duLieu.conLai === 'number' ? Math.max(0, Math.round(tb.duLieu.conLai)) : undefined

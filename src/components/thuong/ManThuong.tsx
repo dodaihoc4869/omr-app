@@ -11,7 +11,7 @@ import { useTongQuan } from './dung-thuong'
 import { ghiDaXem, locThongBao } from './loc-thong-bao'
 import { ManBinhDaDo, ManChuoiNgay, ManCuuChuoi, ManMocChuoi } from './ManChuoi'
 import { ManCuoiTuan, ManGiaiTuan, docCuoiTuan } from './ManGiai'
-import { ManCuaHang, ManCuocKetQua, ManNhiemVu, ManThangHoa } from './ManTinhThe'
+import { ManCuaHang, ManCuocKetQua, ManDatLaiTinhThe, ManNhiemVu, ManThangHoa } from './ManTinhThe'
 import { ManHuyHieu, ManHuyHieuMoi } from './ManHuyHieu'
 import { BaoGoCua, ManHocCungBan, ManLoiMoi, ManMocDoi, ManMoiBan } from './ManBan'
 import { ManKimCuong, ManKimCuongDs } from './ManKimCuong'
@@ -72,6 +72,7 @@ export function veDuoc(tb: ThongBao, tq: TongQuanThuong): boolean {
     case 'moc_doi': return so(d.moc)
     case 'go_cua': return chu(d.ten)
     case 'moi_ban': return chu(d.ma) && chu(d.ten)
+    case 'dat_lai_tt': return so(d.conLai)
   }
 }
 const KHO_CUU = 'ddh.thuong.cuu-da-xem'
@@ -101,6 +102,7 @@ export function ThongBaoThuong({ token, tongQuan: tq, onHoc, onMo }: { token: st
     case 'moc_doi': return <ManMocDoi key={tb.ma} tb={tb} tq={tq} onDong={xong} />
     case 'go_cua': return <BaoGoCua key={tb.ma} tb={tb} onHoc={onHoc} onDong={xong} />
     case 'moi_ban': return <ManLoiMoi key={tb.ma} tb={tb} token={token} onDong={xong} />
+    case 'dat_lai_tt': return <ManDatLaiTinhThe key={tb.ma} tb={tb} onHoc={hoc} onDong={xong} />
   }
 }
 
