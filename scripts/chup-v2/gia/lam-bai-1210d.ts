@@ -5,6 +5,9 @@
 //   ?man=lam13&lam=ds-dau đúng–sai đứng đầu (kịch bản vuốt: ý d + nút cuối phải tới được bằng vuốt)
 //   ?man=lam13&lam=so-o   15/10: số ô = đúng số kí tự đáp số (thầy 15/10 ~10:25): câu amine "24" (2 ô) · "6,48" (4 ô) · "10000" (5 ô)
 import { soOPhanIII } from '../../../src/lib/so-o-tra-loi-ngan'
+import { EXPANDED } from '../../../src/lib/experiments/expanded' // THÍ NGHIỆM GỌN 27/10
+import { experimentKey } from '../../../src/lib/experiments/nhe'
+import { tachDongTheoY } from '../../../src/lib/tach-dong-cau'
 import { KET_BAI } from '../../../tests/_thuong-mau'
 
 const thamSo = new URLSearchParams(location.search)
@@ -148,10 +151,22 @@ const CAU_PT: CauGia[] = [
   ...CAU_NC,
 ]
 // ═══ hết PHƯƠNG TRÌNH 27/10
+// ═══ THÍ NGHIỆM GỌN 27/10: `lam13&lam=duo-tn` — câu đúng–sai kiểu ảnh thầy (methylamine + phenolphthalein + HCl) có khối «Xem thí nghiệm».
+// Kho thật gắn cảnh theo dấu vân tay đề (scripts/experiment-reviewed-map.json, câu DH-12-C3-B8-II-11); trang chụp không có đề gốc nguyên văn
+// ⇒ gắn dấu vân tay của đề giả vào bảng tra cảnh (chỉ bản build chụp).
+const TN_DE = 'Tiến hành thí nghiệm theo các bước sau:\nBước 1: Cho 2 mL dung dịch methylamine 0,1 M vào ống nghiệm, thêm tiếp 1 giọt phenolphthalein.\nBước 2: Nhỏ từ từ 2 mL dung dịch HCl 0,1 M vào ống nghiệm.'
+const CAU_TN: CauGia[] = [
+  { ...nen, qid: 'TN1', maDe: 'BAI8', phan: 'II', tenDang: 'Amine — tính base', text: TN_DE, choices: [],
+    ideas: ['Sau bước 1, dung dịch trong ống nghiệm có màu hồng.', 'Sau bước 2, màu hồng của dung dịch nhạt dần rồi mất.', 'Methylamine có tính base mạnh hơn ammonia.', 'Sau bước 2, dung dịch thu được chỉ chứa một chất tan.'],
+    dapAn: 'DDDS', loiGiai: { chot: 'CH3NH2 làm phenolphthalein hoá hồng; HCl vừa đủ trung hoà ⇒ mất màu; dung dịch còn CH3NH3Cl (và phenolphthalein).' } },
+  ...CAU_NC,
+]
+if (kieu === 'duo-tn') (EXPANDED as Record<string, string[]>)[experimentKey(tachDongTheoY(TN_DE))] = ['amine-acid']
+// ═══ hết THÍ NGHIỆM GỌN 27/10
 // ═══ GIÁM THỊ 27/10: `&gt=nb|th|vd|vdc` ⇒ mọi câu mang mức ấy (giám thị tương ứng); `&gtde=ngan` ⇒ thêm câu đề NGẮN (L2, đáp án B) lên đầu chặng Duo.
 const MUC_GT = ({ nb: 'biet', th: 'hieu', vd: 'van_dung', vdc: 'van_dung_cao', khong: '' } as Record<string, string>)[thamSo.get('gt') ?? ''] // khong ⇒ câu không mức (đo nền)
 const CAU_DUO_GT = thamSo.get('gtde') === 'ngan' ? [{ ...CAU[1]!, qid: 'GT1' }, ...CAU_DUO_CHAM] : CAU_DUO_CHAM
-const ds0 = kieu === 'duo-bang' ? CAU_BANG : kieu === 'duo-pt' ? CAU_PT : kieu === 'duo-nc' ? CAU_NC : kieu === 'duo-xau' ? CAU_XAU : kieu === 'duo' ? CAU_DUO_GT : kieu === 'g7' ? CAU_G7 : kieu === 'ds-dau' ? [CAU[3]!, CAU[4]!, CAU[5]!] : kieu === 'so-o' ? CAU_SO_O : CAU
+const ds0 = kieu === 'duo-tn' ? CAU_TN : kieu === 'duo-bang' ? CAU_BANG : kieu === 'duo-pt' ? CAU_PT : kieu === 'duo-nc' ? CAU_NC : kieu === 'duo-xau' ? CAU_XAU : kieu === 'duo' ? CAU_DUO_GT : kieu === 'g7' ? CAU_G7 : kieu === 'ds-dau' ? [CAU[3]!, CAU[4]!, CAU[5]!] : kieu === 'so-o' ? CAU_SO_O : CAU
 const ds = MUC_GT !== undefined ? ds0.map((c) => ({ ...c, mucDo: MUC_GT || null })) : ds0
 const GOI7 = { bat: true, ngay: '2026-10-12', toiThieu: 24, daLamHomNay: 12, tuLamCon: 9, tiepCanCon: 3, thieuPhu: 0, thieuNgay: 0, canHoTro: false, kienThucCu: { tong: 0, dat: 0, tyLe: null },
   goi: [{ id: 'g8', ten: 'Bài 8. Amine', batDau: '2026-10-10', han: '2026-10-16', tong: 40, daGap: 10, con: 30, quota: 6, gapHomNay: 2, quaHan: false, canBoSung: 0, to: ['BAI8-AMINE'] }], diemDaDo: [] }

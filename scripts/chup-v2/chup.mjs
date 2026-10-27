@@ -324,6 +324,13 @@ const PT_CANH = [['mo', ''], ['nhan', PT_CHO], ['chon', `${PT_CHO} » tn:^D`]]
 const DS_PT = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   PT_CANH.map(([t, viec]) => [`duo-pt-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=duo-pt', w, hh, nen, false, /tính base của amine/, viec || undefined])))
 // ═══ hết PHƯƠNG TRÌNH 27/10
+// ═══ THÍ NGHIỆM GỌN 27/10 (thầy: «Thí nghiệm bỏ luôn khung bao, hiển thị nổi … thanh thu gọn cho đẹp mắt»): `lam13&lam=duo-tn` (gia/lam-bai-1210d.ts) —
+// câu methylamine + phenolphthalein + HCl. `mo` = khối thí nghiệm mở sẵn (cuộn tới giữa màn) · `dong` = bấm thanh thu gọn. Các bước cuộn ngang
+// (.ex-grid) là chủ đích — không tính tràn. 390×844 · 360×640 · 844×390 · 1440×900, sáng + tối. Tiền tố "duo-tn-".
+const TN_CANH = [['mo', 'lam13:cho:600 » xem:.ex-demo » cho:400'], ['dong', 'lam13:cho:600 » xem:.ex-demo » bam:.ex-demo > summary » cho:500']]
+const DS_TN = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  TN_CANH.map(([t, viec]) => [`duo-tn-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=duo-tn', w, hh, nen, false, /Tiến hành thí nghiệm/, viec])))
+// ═══ hết THÍ NGHIỆM GỌN 27/10
 // ═══ GIÁM THỊ 27/10 (tiền tố "duo-gt-"): giám thị theo mức câu cạnh đề, 4 mức × đề ngắn đã chọn (mắt dõi ô B) ở 390×844 / 360×640 / 844×390 / 1440×900;
 // ở 390×844 thêm đúng · sai · đề dài · đề có hình. Sáng + tối. `gtloi=1` ⇒ giám thị luôn càu nhàu (đo bong bóng không che nhãn / đề / phương án).
 const GT_NGAN = 'lam13&lam=duo&gtde=ngan&gtloi=1&gt='
@@ -518,6 +525,7 @@ const DS = [
   ...DS_GT, // GIÁM THỊ 27/10
   ...DS_CHAM, // THẺ CHẠM 27/10
   ...DS_PT, // PHƯƠNG TRÌNH 27/10
+  ...DS_TN, // THÍ NGHIỆM GỌN 27/10
   ...DS_TPC, // THƯỞNG PHẠT GỘP 26/10
   ...DS_TON, // VIỆC TỒN 27/10
   ...DS_NC, // NÂNG CẤP 27/10
@@ -1007,6 +1015,9 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
         else if (loai === 'dau') await t.evaluate(() => { const k = document.querySelector('.ht2-lam')?.parentElement; if (k) k.scrollTop = 0 })
         // 27/10: `cuon:N` cuộn khung cuộn của trang N px (thẻ bài ghim) · `nap` tải lại trang (localStorage giữ ⇒ «lần mở sau»)
         else if (loai === 'cuon') await t.evaluate((n) => { const k = [...document.querySelectorAll('body *')].find((e) => /(auto|scroll)/.test(getComputedStyle(e).overflowY) && e.scrollHeight > e.clientHeight + 4) ?? document.scrollingElement; k?.scrollBy(0, n) }, Number(gt))
+        // THÍ NGHIỆM GỌN 27/10: `xem:CSS` cuộn phần tử vào giữa màn · `bam:CSS` bấm phần tử (thanh <summary> không mang vai nút)
+        else if (loai === 'xem') await t.evaluate((q) => document.querySelector(q)?.scrollIntoView({ block: 'center' }), gt)
+        else if (loai === 'bam') await t.locator(gt).first().click({ timeout: 20000 })
         else if (loai === 'nap') { await t.reload(); await t.getByText(cho).first().waitFor({ timeout: 20000 }); await t.waitForTimeout(600) }
         await t.waitForTimeout(250)
       }
@@ -1016,7 +1027,7 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       if (chong) tran.push(`${ten}: bong bóng càu nhàu chồng lên ${chong}`)
       // tràn ngang TRONG khung cuộn (documentElement không thấy được vì khung là `fixed`)
       // bảng lớn cuộn ngang TRONG khung riêng (.cau-bang, có bóng mép) là chủ đích — không tính tràn
-      const tranTrong = await t.evaluate(() => Math.max(0, ...[...document.querySelectorAll('.ht2-lam *')].filter((e) => !e.closest('.cau-bang')).map((e) => Math.round(e.getBoundingClientRect().right - innerWidth))))
+      const tranTrong = await t.evaluate(() => Math.max(0, ...[...document.querySelectorAll('.ht2-lam *')].filter((e) => !e.closest('.cau-bang, .ex-grid > *')).map((e) => Math.round(e.getBoundingClientRect().right - innerWidth))))
       if (tranTrong > 0) tran.push(`${ten}: trong khung ${tranTrong}px`)
     } else if (viec?.startsWith('cham:')) {
       // THẺ CHẠM 27/10: chạm chữ tô tím (ruột nạp lười) ⇒ chờ thẻ kiểu Duolingo hiện hẳn (hết 120 ms phóng to)
