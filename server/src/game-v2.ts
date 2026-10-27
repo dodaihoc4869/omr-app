@@ -47,7 +47,7 @@ import {SQL_HANH_TRINH_V5} from './hanh-trinh-v5-schema'
 import {SQL_HT6} from './hanh-trinh-v6-schema'
 import {lopCuaEm} from './bai-da-day'
 import {boSungKichThuocDe,docDoGiayMot,phanSoCuaDo} from './do-giay-luot'
-import {chuoiTruocTuHoSo,khongTinhTuDo,kimCuongDaXong,laPhienNguyenTu,lenhThuongTraLoi,tinhThuongTraLoi,type PhienNt,type RaThuongTraLoi} from './thuong-tra-loi' // THƯỞNG PHẠT 26/10: nguyên tử từng câu + kết bài (cùng lô chấm, 0 lệnh D1 thêm)
+import {chuoiTruocTuHoSo,ntNgaySau,ntNgayTuHoSo,khongTinhTuDo,kimCuongDaXong,laPhienNguyenTu,lenhThuongTraLoi,tinhThuongTraLoi,type PhienNt,type RaThuongTraLoi} from './thuong-tra-loi' // THƯỞNG PHẠT 26/10: nguyên tử từng câu + kết bài (cùng lô chấm, 0 lệnh D1 thêm)
 import {docSomOmniTraLoi,docTruocOmni,phienXetOmni,soOmniTuKetQuaCu,themVaoKetQua,xetOmniTraLoi,type SoOmni} from './omni-game'
 import {TRAN_CAU_DAO_NGAY,demCauTrongNgay,tranCuaLoai,type LoaiTran,docCauBtvnChuaNop,docDauVaoLuot,docLuotDangCho,luotMoiBat,maiCho,tomTatLuot,moPhienLuotMoi} from './game-v2-luot'
 import {ghiKhoanExpGame,docTongSoSom,docTruocKhoanGame,lenhKhoanExpGameGop,xongKhoanExpGameGop,type DocTruocKhoanGame,type KhoanGame,type KhoanGop} from './exp-d1'
@@ -620,10 +620,13 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     if(laPhienNguyenTu(phienNt)&&!laCD){
       if(kimCuongDaXong(phienNt))throw new Error('Thử thách này đã kết thúc. Em xem kết quả nhé.')
       const doNt=boSungKichThuocDe(docDoGiayMot(b,{ms:b.msLam}),q.phan,q)
+      // 28/10 lặp câu trong ngày (thuong-tra-loi.ts NGAY_LAP_CAU): tập câu gốc đúng / sai hôm nay nằm trong hồ sơ (`ntNgay`) — đọc sẵn, ghi CAS cùng lô.
+      const daLamNgay=ntNgayTuHoSo((p as {ntNgay?:unknown}).ntNgay,ngayNt)
       tt=tinhThuongTraLoi({session:phienNt,qid,dung:attempt.correct,hoTro:attempt.assisted,khongTinh:!!omni?.luot||khongTinhTuDo(doNt,attempt.correct),cau:q,
-        chuoiTruoc:chuoiTruocTuHoSo((p as {ntChuoi?:unknown}).ntChuoi,ngayNt),giay:doNt?.giay??null,nowMs:attempt.at})
+        chuoiTruoc:chuoiTruocTuHoSo((p as {ntChuoi?:unknown}).ntChuoi,ngayNt),giay:doNt?.giay??null,nowMs:attempt.at,daLamNgay})
       ttCau=tt
       ;(p as {ntChuoi?:unknown}).ntChuoi={n:ngayNt,c:tt.thuong.chuoiDung}
+      ;(p as {ntNgay?:unknown}).ntNgay=ntNgaySau(daLamNgay,ngayNt,qid,attempt.correct,tt.thuong.tinh)
     }
     // Lướt (sai quá nhanh, ≤ 3 lượt/ngày): KHÔNG đổi mastery của hồ sơ game (bỏ `advance`), không thưởng nấc.
     // 06/10: câu CHẨN ĐOÁN cũng không đổi mastery theo dạng (câu nền không thuộc dạng nào của kho — không sinh khoá dạng lạ trong báo cáo tiến bộ game).
