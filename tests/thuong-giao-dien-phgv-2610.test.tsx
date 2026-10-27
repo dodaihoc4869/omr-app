@@ -9,7 +9,7 @@ import { resolve } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import AppPhuHuynh from '../src/components/ph-v3/AppPhuHuynh'
-import { cauGiai } from '../src/components/ph-v3/DocPh'
+import { cauGiai, cauHocThat } from '../src/components/ph-v3/DocPh'
 import { docBaoCaoTuanCon, docTuanCon } from '../src/lib/bao-cao-tuan-ph-api'
 import { docCongTac, docEm, docThiDua, nhoGhi } from '../src/lib/thi-dua-tuan-api'
 import ThiDuaTuanScreen, { capHocCung, khoangTuan, sapXep } from '../src/screens/ThiDuaTuanScreen'
@@ -86,11 +86,18 @@ describe('đọc số — chặt, không bịa', () => {
     expect(docBaoCaoTuanCon({ ok: true, soLieu: 'x', duLieu: DU_LIEU })?.tuan).toBeNull()
   })
   it('câu giải cho phụ huynh: top 5 lên hạng, 4 hạng cuối xuống, Sắt không xuống, thiếu thứ hạng ⇒ chỉ nói giải', () => {
-    expect(cauGiai({ kl: 'bac', thuHang: 4, soNguoi: 30 })).toBe('Đang ở Giải Bạc, hạng 4/30. Cuối tuần trong top 5 thì lên Giải Vàng.')
-    expect(cauGiai({ kl: 'bac', thuHang: 28, soNguoi: 30 })).toBe('Đang ở Giải Bạc, hạng 28/30. Cuối tuần còn trong 4 hạng cuối thì xuống Giải Đồng.')
-    expect(cauGiai({ kl: 'sat', thuHang: 29, soNguoi: 30 })).toBe('Đang ở Giải Sắt, hạng 29/30. Cuối tuần trong top 5 thì lên Giải Đồng.')
-    expect(cauGiai({ kl: 'kimcuong', thuHang: 2, soNguoi: 30 })).toBe('Đang ở Giải Kim cương, hạng 2/30. Đang ở giải cao nhất.')
-    expect(cauGiai({ kl: 'vang', thuHang: null, soNguoi: null })).toBe('Đang ở Giải Vàng.')
+    // 27/10 (thầy: «100% nguyên tử là gì, tuần này giải Sắt rất khó hiểu»): câu nói rõ Giải tuần là gì, bậc mấy/6, hạng trong nhóm.
+    expect(cauGiai({ kl: 'bac', thuHang: 4, soNguoi: 30 })).toBe('Giải tuần là bảng thi đua mỗi tuần, 6 bậc từ Sắt lên Kim cương. Con đang ở bậc Bạc (bậc 3/6), hạng 4/30 trong nhóm. Cuối tuần vào top 5 thì lên bậc Vàng.')
+    expect(cauGiai({ kl: 'bac', thuHang: 28, soNguoi: 30 })).toBe('Giải tuần là bảng thi đua mỗi tuần, 6 bậc từ Sắt lên Kim cương. Con đang ở bậc Bạc (bậc 3/6), hạng 28/30 trong nhóm. Cuối tuần còn trong 4 hạng cuối thì xuống bậc Đồng.')
+    expect(cauGiai({ kl: 'sat', thuHang: 29, soNguoi: 30 })).toBe('Giải tuần là bảng thi đua mỗi tuần, 6 bậc từ Sắt lên Kim cương. Con đang ở bậc Sắt (bậc 1/6), hạng 29/30 trong nhóm. Cuối tuần vào top 5 thì lên bậc Đồng.')
+    expect(cauGiai({ kl: 'kimcuong', thuHang: 2, soNguoi: 30 })).toBe('Giải tuần là bảng thi đua mỗi tuần, 6 bậc từ Sắt lên Kim cương. Con đang ở bậc Kim cương (bậc cao nhất), hạng 2/30 trong nhóm.')
+    expect(cauGiai({ kl: 'vang', thuHang: null, soNguoi: null })).toBe('Giải tuần là bảng thi đua mỗi tuần, 6 bậc từ Sắt lên Kim cương. Con đang ở bậc Vàng (bậc 4/6).')
+    expect(cauGiai({ kl: 'sat', thuHang: null, soNguoi: null })).toBe('Giải tuần là bảng thi đua mỗi tuần, 6 bậc từ Sắt lên Kim cương. Con đang ở bậc Sắt (bậc 1/6).')
+  })
+  it('dòng giải nghĩa nguyên tử: 100% ⇒ nói nguyên tử là gì và câu nào được tính; dưới 100% ⇒ phần còn lại là câu đúng nhờ gợi ý / hỏi thầy; 0% ⇒ kể cả Đối phó', () => {
+    expect(cauHocThat(1)).toBe('Mỗi câu làm đúng được nguyên tử. Chỉ câu con tự làm (không xem gợi ý, không hỏi thầy) mới tính vào Giải tuần.')
+    expect(cauHocThat(0.9)).toBe('Phần còn lại là câu con làm đúng nhờ xem gợi ý hoặc hỏi thầy, không tính vào Giải tuần.')
+    expect(cauHocThat(0)).toContain('Đối phó')
   })
   it('GV: em thiếu tên bị bỏ; hang hai dạng; hocCung chuỗi hoặc đối tượng; bậc ngoài 1…5 ⇒ null; công tắc chỉ nhận bat/tat', () => {
     const d = docThiDua(BANG, '12A1')!
@@ -131,7 +138,8 @@ describe('PH — thẻ «Tuần này của con» (tp-14)', () => {
     expect([...t.querySelectorAll('.pd-ba-so > div > span')].map((x) => x.textContent)).toEqual(['Chuỗi ngày', 'Số bài', 'Giải tuần'])
     expect(t.querySelector('.pd-ba-so')!.textContent).toContain('12ngày')
     expect(t.querySelector('.hhg[data-kl="bac"]')?.getAttribute('aria-label')).toBe('Giải Bạc')
-    expect(t.querySelector('[data-vung="cau-giai"]')!.textContent).toBe('Đang ở Giải Bạc, hạng 4/30. Cuối tuần trong top 5 thì lên Giải Vàng.')
+    expect(t.querySelector('[data-vung="cau-giai"]')!.textContent).toBe('Giải tuần là bảng thi đua mỗi tuần, 6 bậc từ Sắt lên Kim cương. Con đang ở bậc Bạc (bậc 3/6), hạng 4/30 trong nhóm. Cuối tuần vào top 5 thì lên bậc Vàng.')
+    expect(t.querySelector('[data-vung="ti-le-hoc-that"]')!.textContent).toContain('nguyên tử (điểm thưởng) tuần này là từ câu con tự làm đúng')
     expect(t.querySelector('[data-vung="ti-le-hoc-that"] b')!.textContent).toBe('90%')
     expect(t.querySelector('[data-vung="hoc-cung"]')!.textContent).toContain('Trần Gia Bảo')
     expect(c.querySelector('.pd-luoi')!.hasAttribute('data-tuan')).toBe(true)
