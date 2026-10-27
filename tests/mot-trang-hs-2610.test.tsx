@@ -1,7 +1,7 @@
 // HÔM NAY «MỘT TRANG» + MENU DỌC (Điểm danh, A.I Đỗ Đại Học) của app học sinh — bản vẽ ve-moi/hs-mot-trang*.html, thầy chốt 26/10.
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { NHIP_EM_LUOI } from '../scripts/chup-v2/gia/nhip-hoc-em'
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { createRef } from 'react'
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu' }))
 const phanHoi = vi.hoisted(() => vi.fn())
@@ -28,6 +28,17 @@ const nut = () => within(duong()).getAllByRole('listitem').map((li) => (li.first
 const HS = { lop: '12A1', onXemLai: noop, onTuLuyen: noop, onLichSu: noop, onKetQua: noop }
 
 describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
+  it('lời Bi trọn câu (soát 27/10: ảnh chụp lúc đang gõ trông «cụt» ở chữ «là»): câu đủ ý và gõ xong trong ≤ 0,7 s', () => {
+    vi.useFakeTimers()
+    try {
+      const { container } = render(<MotTrangHs {...goc()} />)
+      const bong = container.querySelector('.bi-loi-bong')!
+      expect(bong.querySelector('.ht2-an')!.textContent).toBe('Học tiếp nhé! Còn 18 câu nữa là đủ mức hôm nay.')
+      act(() => { vi.advanceTimersByTime(750) })
+      expect(bong.querySelector('.bi-loi-con')!.textContent).toBe('')
+      expect(bong.querySelector('[aria-hidden="true"]')!.textContent).toBe('Học tiếp nhé! Còn 18 câu nữa là đủ mức hôm nay.')
+    } finally { vi.useRealTimers() }
+  })
   it('đang học: chặng hiện tại là nút «Học tiếp · 18 câu» có bong bóng; sau các chặng là Kiểm tra ôn tập → Tự sửa lỗi → Bài tập về nhà; thanh số trên', () => {
     const onHoc = vi.fn()
     render(<MotTrangHs {...goc({ kiem: KIEM, onKiemTra: noop, onHoc, hs: HS })} />)

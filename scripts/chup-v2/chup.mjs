@@ -629,6 +629,8 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
     if (m.startsWith('gv-')) {
       await t.getByRole('heading', { name:m === 'gv-kho' ? /Kho đề|Ngân hàng câu hỏi/ : cho }).first().waitFor({ timeout:20000 })
     } else await t.getByText(cho).first().waitFor({ timeout: 20000 })
+    // 27/10 (soát ảnh): Bi đang gõ lời ⇒ chờ gõ xong (≤ 0,7 s) rồi mới chụp, tránh ảnh «cụt câu» giữa chừng.
+    await t.waitForFunction(() => [...document.querySelectorAll('.bi-loi-con')].every((e) => !e.textContent), null, { timeout: 3000 }).catch(() => {})
   } catch {
     loiTrang.push(`${ten}: không thấy chữ ${cho}`)
   }
