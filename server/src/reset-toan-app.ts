@@ -178,6 +178,9 @@ export const BANG_GIU: readonly string[] = [
   'thay_da_chua',
   // THƯỞNG PHẠT KIỂU DUOLINGO (migration-2610-thuong-phat.sql, 26/10) — sinh SAU lần 21/09 (job đã xong): GIỮ = không đụng. Phân loại thật cho lần 2 ở reset-hoa2.ts.
   'nhiem_vu_ngay', 'ruong_ngay', 'huy_hieu_em', 'cuoc_chuoi', 'kim_cuong_phien', 'thong_bao_thuong', 'thuong_bai_xong',
+  // THƯỞNG PHẠT PHẦN B (migration-2610-giai-ban.sql) + bảng xếp tuần — cũng sinh SAU lần 21/09: GIỮ = không đụng. Phân loại thật ở reset-hoa2.ts
+  // (giai_tuan · ban_hoc · go_cua · chuoi_binh_mua XOÁ; danh_gia_em_tuan GIỮ).
+  'giai_tuan', 'ban_hoc', 'go_cua', 'chuoi_binh_mua', 'danh_gia_em_tuan',
   // LỜI GIẢI TỪNG BƯỚC (loi-giai.ts, 29/09): hồ sơ lời giải thầy duyệt + chỉ mục câu + hàng soạn — HỌC LIỆU, không phải tiến độ game ⇒ GIỮ.
   'loi_giai', 'loi_giai_cau', 'loi_giai_viec',
   // Em đọc lời giải thế nào (migration-0210-doc-loi-giai.sql, GĐ1 v2 02/10) — hồ sơ học tập của em ⇒ GIỮ (như sổ su_kien_hoc).
