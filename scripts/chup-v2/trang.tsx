@@ -523,6 +523,8 @@ if (LA_LAM13) {
     const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
     let b: Record<string, unknown> = {}
     try { b = init?.body ? JSON.parse(String(init.body)) : {} } catch { /* bỏ qua */ }
+    // NỘP TỨC THÌ 27/10: `&cho=1` ⇒ lệnh answer không trả lời (máy chấm đang bận) — chụp nút «Kiểm tra» ở trạng thái chờ.
+    if (thamSo.get('cho') === '1' && new URL(url, location.href).pathname.endsWith('/game-v2/answer')) return new Promise<Response>(() => {})
     const r = traLoiLam13(new URL(url, location.href).pathname, b)
     return r ? new Response(JSON.stringify(r), { status: 200, headers: { 'content-type': 'application/json' } }) : fetchChung(input, init)
   }

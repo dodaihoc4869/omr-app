@@ -336,8 +336,13 @@ function batDauHocTapSom(env:Env,sbd:string){
 async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:ExecutionContext):Promise<Record<string,unknown>> {
   // Tối ưu 05/10: lượt kiểm mật khẩu (khi đệm 60 s trượt) chạy CÙNG đợt với các lượt ĐỌC đầu của lệnh (`batDauDocSom`, gọi khi token đã qua kiểm chữ ký/hạn —
   // token giả bị chặn trước mọi lượt D1 như cũ). Không ghi gì, không trả gì trước khi xác thực xong. `gameIdentity` bị thay (test) ⇒ đọc sau xác thực như cũ.
-  const giu:{ds:ReturnType<typeof batDauDocSom>|null;hocTap?:ReturnType<typeof batDauHocTapSom>}={ds:null}
-  const sbd=await gameIdentity(env,b,s=>{if(action==='hoc-tap-sanh'||action==='hoc-tap-start')giu.hocTap=batDauHocTapSom(env,s);else if(action!=='sync'&&!action.startsWith('hoc-tap-'))giu.ds=batDauDocSom(env,action,b,s)})
+  const giu:{ds:ReturnType<typeof batDauDocSom>|null;hocTap?:ReturnType<typeof batDauHocTapSom>;kiem?:{sbd:string;p:ReturnType<typeof import('./kiem-tra-ca-nhan')['docKtCn']>};dem?:{sbd:string;p:Promise<Record<string,unknown>>}}={ds:null}
+  // NỘP TỨC THÌ (thầy 27/10 «bấm nút nộp load chậm lag»): lịch Kiểm tra ôn tập (`docKtCn`, CHỈ ĐỌC) mọi lệnh khác cũng cần ⇒ bắt đầu CÙNG đợt lượt đọc mật khẩu
+  // + các lượt đọc đầu — trước: một đợt D1 nối tiếp riêng SAU xác thực ở mỗi lần nộp câu (`answer`), đếm sau câu (`hoc-tap-dem`), học cách giải, làm lại.
+  // Kết quả / lỗi chỉ dùng ở đúng chỗ `await kiem` cũ bên dưới. Lệnh của chính Kiểm tra ôn tập (`hoc-tap-ktcn-*`) trả trước khi đọc ⇒ không đọc sớm.
+  // Lệnh đếm nhẹ sau mỗi câu (`hoc-tap-dem`, 2 câu CHỈ ĐỌC): cũng bắt đầu cùng đợt ấy — chỉ dùng khi tới đúng nhánh trả số đếm như cũ (Gói 7 bật, không phải ngày
+  // chỉ làm kiểm tra); nhánh khác bỏ kết quả.
+  const sbd=await gameIdentity(env,b,s=>{if(action==='hoc-tap-sanh'||action==='hoc-tap-start')giu.hocTap=batDauHocTapSom(env,s);else{if(action!=='sync'&&!action.startsWith('hoc-tap-'))giu.ds=batDauDocSom(env,action,b,s);if(action!=='sync'&&!action.startsWith('hoc-tap-ktcn-'))giu.kiem={sbd:s,p:som(import('./kiem-tra-ca-nhan').then(kt=>kt.docKtCn(env,s,Date.now(),true)))};if(action==='hoc-tap-dem')giu.dem={sbd:s,p:som(import('./goi-bai-7').then(g7=>g7.demHomNay7(env,s,Date.now())))}}})
   // Kế hoạch sảnh vừa nhớ (goi-bai-7-nho.ts) chỉ dành cho lượt mở chặng NGAY sau đó: mọi lệnh khác của em (nộp câu, học cách giải, kiểm…) xoá bản nhớ.
   if(action!=='hoc-tap-sanh'&&action!=='hoc-tap-start')boKeHoach7(env.DB,sbd)
   // Kiểm tra theo lịch RIÊNG từng em sở hữu cả ngày, kể cả khi em đã nộp sớm.
@@ -349,7 +354,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
   // Gói R: lượt đọc đầu đã bắt đầu cùng đợt mật khẩu (`batDauHocTapSom`) ⇒ dùng lại; danh sách gói chưa đọc được lúc ấy (bảng gói chưa sẵn) ⇒ đọc như cũ.
   const hocTapSom=giu.hocTap&&giu.hocTap.sbd===sbd?giu.hocTap:undefined
   const dsGoiSom=(hocTapSom?(await hocTapSom.dsGoi).p:undefined)??g7Som?.docDanhSachGoiSom7(env,sbd)
-  const kiem=await (hocTapSom?hocTapSom.kiem:kt.docKtCn(env,sbd,Date.now(),true))
+  const kiem=await (hocTapSom?hocTapSom.kiem:giu.kiem&&giu.kiem.sbd===sbd?giu.kiem.p:kt.docKtCn(env,sbd,Date.now(),true))
   if(kt.laNgayKt(kiem,Date.now())&&!kt.coHocNgayKt(kiem)){
     const tt=kt.tomTatKt(kiem!,Date.now())
     if(action==='hoc-tap-sanh'||action==='hoa2-sanh')return {ok:true,cheDo2:true,ngay:tt.ngay,kiemTraCaNhan:tt,theLuc:{tong:tt.tong,con:tt.con},chienDich:null,doan:{con:0},dao:{con:0}}
@@ -377,7 +382,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
       // + trang thầy Bài mới 7 ngày (`gvGoi7`) + bước phát hành `ap-goi7-song`. Em mới mở app chậm nhất ~1 phút sau khi thầy tick là thấy bài.
       if(action==='hoc-tap-gap')return g7.gapHuongDan7(env,sbd,b,Date.now())
       // Ô "đã làm/M câu hôm nay" sau mỗi câu: lệnh nhẹ 3 truy vấn chỉ đọc (khẩn 12/10 22h30) — thay lượt nạp lại cả sảnh (`lapGoi7`) sau mỗi câu.
-      if(action==='hoc-tap-dem')return g7.demHomNay7(env,sbd,Date.now())
+      if(action==='hoc-tap-dem')return giu.dem&&giu.dem.sbd===sbd?giu.dem.p:g7.demHomNay7(env,sbd,Date.now())
       // Làm lại cuối chặng kiểu Duolingo (26/10, goi-bai-7-lam-lai.ts): câu anh em cho câu em vừa sai, có hỗ trợ, không EXP.
       if(action==='hoc-tap-lam-lai')return import('./goi-bai-7-lam-lai').then(m=>m.lamLaiCuoiChang7(env,sbd,b,Date.now()))
       if(action==='hoc-tap-start'){const r7=await g7.startGoi7(env,sbd,Date.now(),gsSom7);if(r7)return r7}
