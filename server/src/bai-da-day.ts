@@ -20,6 +20,7 @@ import { nhoTheoLuot } from './doc-d1-theo-luot'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import { laCauTuLuan } from './cam-tu-luan'
 import { cauGonTuDong, SQL_CAU_GON } from './cau-gon'
+import { DemTheoKho } from './dau-kho-cau'
 import { laMaDeTuLuan } from '../../src/lib/cau-tu-luan'
 import { tenLopCuaEm } from './ten-lop'
 import { cauCuaToChiTiet, gvChienDich, tachMaTo, THE_LUC_TOI_DA, trangThaiLop } from './srs2-gv'
@@ -379,7 +380,13 @@ async function tinhHan(env: Env, dv: DauVaoBai, nowMs: number): Promise<{ hanNop
 }
 
 /** Đếm câu TỰ LUẬN đã bị bỏ (câu đã duyệt) + nhãn kiến thức của các câu dùng được, theo đúng phần của tờ đã tách. */
+/** 28/10: đệm theo kho trong isolate (như `cauCuaToChiTiet`) — khoá = danh sách tờ; trả bản sao. */
+const demCauBai = new DemTheoKho<{ soTuLuan: number; kienThuc: string[] }>(30 * 60_000, 5 * 60_000, 64, 200_000)
 async function docCauBai(env: Env, maDe: readonly string[]): Promise<{ soTuLuan: number; kienThuc: string[] }> {
+  const v = await demCauBai.lay(env, JSON.stringify(maDe), Date.now(), () => docCauBaiD1(env, maDe), (x) => x.kienThuc.length + 1)
+  return { soTuLuan: v.soTuLuan, kienThuc: [...v.kienThuc] }
+}
+async function docCauBaiD1(env: Env, maDe: readonly string[]): Promise<{ soTuLuan: number; kienThuc: string[] }> {
   const goc = [...new Set(maDe.map((m) => tachMaTo(m).goc))]
   // 14/10: câu RÚT GỌN (cau-gon.ts) + nhãn kiến thức riêng — không nạp ảnh/lời giải của cả tờ (~6× nhẹ hơn JSON đầy đủ). Dòng JSON hỏng bị bỏ như cũ.
   const r = await env.DB.prepare(`SELECT ma_de, qid, ${SQL_CAU_GON}, CASE WHEN json_type(json,'$.kienThuc')='array' THEN json_extract(json,'$.kienThuc') END AS kien_thuc FROM game_v2_question WHERE ma_de IN (SELECT value FROM json_each(?)) AND json_valid(json) ORDER BY rowid`).bind(JSON.stringify(goc)).all<Row>()
