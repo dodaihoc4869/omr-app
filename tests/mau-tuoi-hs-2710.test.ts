@@ -18,7 +18,7 @@ describe('màu tươi app học sinh 27/10', () => {
   // 27/10 thầy duyệt bộ màu riêng B «Chất chỉ thị» (sáng bằng Duolingo) — khoá đầy đủ ở tests/mau-chat-chi-thi-hs-2710.test.ts
   it('bảng học sinh là bộ B «Chất chỉ thị» (chàm + lục ngọc), nền tối đêm chàm', () => {
     expect(bang.sang).toMatchObject({ '--tr-hs-nut': '#767eff', '--tr-dung': '#00d396', '--tr-nen': '#f6f6fc', '--tr-mat': '#ffffff' })
-    expect(bang.toi).toMatchObject({ '--tr-nen': '#121129', '--tr-mat': '#1c1b3a', '--tr-chu': '#f1f0ff' })
+    expect(bang.toi).toMatchObject({ '--tr-nen': '#1a1a29', '--tr-mat': '#262738', '--tr-chu': '#f1f0ff' })
   })
 
   it.each(['sang', 'toi'] as const)('mọi cặp chữ/nền đạt ngưỡng tương phản (%s)', (che) => {

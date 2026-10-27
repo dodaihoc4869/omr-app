@@ -222,10 +222,14 @@ for (const [k, n] of Object.entries(JSON.parse(readFileSync(new URL('../docs/css
 for (const [k, n] of Object.entries(GON_MA_2710.cu)) MAU_CU_THAY_RA_LENH[k] = (MAU_CU_THAY_RA_LENH[k] ?? 0) + n
 // 27/10 thầy duyệt bộ màu riêng B «Chất chỉ thị»: «Chốt bảng màu chất chỉ thị, làm cho sáng bằng độ sáng của doligo nhé» ⇒ BỐN màu thân giám thị
 // đổi sang sắc bộ B (độ sáng / độ tươi ngang Duolingo, ve-moi/mau-rieng/de-xuat-build.md): bốn mã Duolingo cũ được phép biến mất đúng một lần.
+// 28/10 thầy: «đo chế độ tối của Duolingo tinh chỉnh thông số» ⇒ nền tối HS sáng lên (#1a1a29) ⇒ bốn mã giám thị hạ L ≤ 0,03 để bong bóng càu nhàu giữ ≥ 4,5
+// (bốn mã 27/10 được phép biến mất đúng một lần).
+for (const k of ['--gt-mau-nb: #00c3d7', '--gt-mau-th: #9990ff', '--gt-mau-vd: #ff8f48', '--gt-mau-vdc: #f2499c']) MAU_CU_THAY_RA_LENH[`src/components/giam-thi/giam-thi.css · ${k}`] = (MAU_CU_THAY_RA_LENH[`src/components/giam-thi/giam-thi.css · ${k}`] ?? 0) + 1
 for (const k of ['--gt-mau-nb: #58cc02', '--gt-mau-th: #ce82ff', '--gt-mau-vd: #ff9600', '--gt-mau-vdc: #ff4b4b']) MAU_CU_THAY_RA_LENH[`src/components/giam-thi/giam-thi.css · ${k}`] = (MAU_CU_THAY_RA_LENH[`src/components/giam-thi/giam-thi.css · ${k}`] ?? 0) + 1
 // Cùng lệnh: trong-hs-mau.css là bảng màu RIÊNG app học sinh (chỉ :root[data-trong='hs'], nạp lười) ⇒ khai báo màu trong tệp này được đổi giá trị
 // (ngoại lệ ĐÓNG, đúng một tệp); trong.css chỉ được đổi đúng 7 biến của dòng tối riêng học sinh (:root[data-trong='hs'] trong @media dark).
 const BANG_HS_DOI_DUOC = new Set(['src/styles/trong-hs-mau.css'])
+for (const k of ['--tr-nen: #121129', '--tr-mat: #1c1b3a', '--tr-mat-2: #24234a', '--tr-mat-3: #312f5e', '--tr-vien: #2f2d59', '--tr-vien-2: #403e72', '--tr-chu: #f1f0ff']) MAU_CU_THAY_RA_LENH[`src/styles/trong.css · ${k}`] = (MAU_CU_THAY_RA_LENH[`src/styles/trong.css · ${k}`] ?? 0) + 1 // 28/10 tối đo theo Duolingo
 for (const k of ['--tr-nen: #131f24', '--tr-mat: #202f36', '--tr-mat-2: #2a3a42', '--tr-mat-3: #37464f', '--tr-vien: #37464f', '--tr-vien-2: #4a5b64', '--tr-chu: #f2f1ea']) MAU_CU_THAY_RA_LENH[`src/styles/trong.css · ${k}`] = (MAU_CU_THAY_RA_LENH[`src/styles/trong.css · ${k}`] ?? 0) + 1
 const MAU_THAY_RA_LENH = new Set([
   'src/styles/tokens.css · --v2-nga-voi: #fffef6',
@@ -239,10 +243,10 @@ const MAU_THAY_RA_LENH = new Set([
   'src/components/giam-thi/giam-thi.css · --gt-mau-vd: #ff9600',
   'src/components/giam-thi/giam-thi.css · --gt-mau-vdc: #ff4b4b',
   // 27/10 bộ B «Chất chỉ thị» (lệnh thầy ở trên): Tí lam ngọc · Cô Cốc chàm tím · Chú Tam da cam metyl · Giáo sư Kíp hồng phenolphtalein.
-  'src/components/giam-thi/giam-thi.css · --gt-mau-nb: #00c3d7',
-  'src/components/giam-thi/giam-thi.css · --gt-mau-th: #9990ff',
-  'src/components/giam-thi/giam-thi.css · --gt-mau-vd: #ff8f48',
-  'src/components/giam-thi/giam-thi.css · --gt-mau-vdc: #f2499c',
+  'src/components/giam-thi/giam-thi.css · --gt-mau-nb: #00bfd2',
+  'src/components/giam-thi/giam-thi.css · --gt-mau-th: #988eff',
+  'src/components/giam-thi/giam-thi.css · --gt-mau-vd: #ff8a3c',
+  'src/components/giam-thi/giam-thi.css · --gt-mau-vdc: #f1489b',
 ])
 
 const loi = []

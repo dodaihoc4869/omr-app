@@ -53,8 +53,10 @@ type Che = 'sang' | 'toi'
 const DUO: Record<Che, Record<string, string>> = {
   sang: { hs: '#58cc02', 'hs-nut': '#58a700', 'hs-day': '#478500', dung: '#58cc02', 'dung-nut': '#58a700', 'dung-day': '#478500', sai: '#ff4b4b', 'sai-day': '#ea2b2b',
     'chu-y': '#ff9600', 'chu-y-nut': '#ed6f00', 'chu-y-day': '#c47200', tin: '#1cb0f6', 'tin-day': '#1899d6', sao: '#ffc800', 'sao-day': '#e0a800', tim: '#ce82ff', 'tim-day': '#a560d6', 'nguyen-tu': '#1cb0f6' },
-  toi: { hs: '#56b30f', 'hs-nut': '#56b30f', 'hs-day': '#3f830b', dung: '#56b30f', 'dung-nut': '#56b30f', 'dung-day': '#3f830b', sai: '#f45b5b', 'sai-day': '#c23a3a',
-    'chu-y': '#f29200', 'chu-y-nut': '#f29200', 'chu-y-day': '#b86c00', tin: '#1ca8ea', 'tin-day': '#137fb0', sao: '#f2be00', 'sao-day': '#b38c00', tim: '#b77ae6', 'tim-day': '#8a52b3', 'nguyen-tu': '#1ca8ea' },
+  // TỐI 28/10: số đo Duolingo tối trên ảnh máy thầy (ve-moi/mau-rieng/do-duo-toi.md): mặt xanh lá #78c93e (L 0,757); đỏ / cam / lam / vàng / tím giữ mã sáng.
+  // Đáy 3D tối không so mã: kiểm quan hệ L(đáy) = L(mặt) − 0,116 (Duo tối #78c93e → #5ea12e) ở test riêng.
+  toi: { hs: '#78c93e', 'hs-nut': '#78c93e', dung: '#78c93e', 'dung-nut': '#78c93e', sai: '#ff4b4b', 'chu-y': '#ff9600', 'chu-y-nut': '#ff9600', tin: '#1cb0f6',
+    sao: '#ffc800', tim: '#ce82ff', 'nguyen-tu': '#1cb0f6' },
 }
 const SAC_B: Record<Che, Record<string, string>> = {
   sang: { hs: '#6366f1', 'hs-nut': '#4f46e5', 'hs-day': '#3730a3', dung: '#0fa877', 'dung-nut': '#0b7d5b', 'dung-day': '#086146', sai: '#c9304f', 'sai-day': '#9c213b',
@@ -82,9 +84,24 @@ describe('bộ màu B «Chất chỉ thị» sáng bằng Duolingo (thầy 27/10
     for (const k of ['hs', 'hs-nut', 'dung', 'dung-nut', 'sai']) expect(de2000(bang[che][`--tr-${k}`]!, DUO[che][k]!), k).toBeGreaterThanOrEqual(15)
   })
 
+  it('tối đo theo Duolingo: nền / thẻ / viền đúng bậc L; đáy 3D = mặt − 0,116 cùng sắc; mặt tô sáng như bản sáng', () => {
+    const t = bang.toi, L = (k: string) => oklch(t[`--tr-${k}`]!).L
+    expect(Math.abs(L('nen') - 0.225)).toBeLessThanOrEqual(0.01)
+    expect(Math.abs(L('mat') - 0.28)).toBeLessThanOrEqual(0.01)
+    expect(Math.abs(L('vien') - 0.385)).toBeLessThanOrEqual(0.01)
+    for (const [mat, day] of [['hs', 'hs-day'], ['dung', 'dung-day'], ['sai', 'sai-day'], ['chu-y', 'chu-y-day'], ['tin', 'tin-day'], ['sao', 'sao-day'], ['tim', 'tim-day']]) {
+      expect(Math.abs(L(mat!) - L(day!) - 0.116), `${mat}/${day}`).toBeLessThanOrEqual(0.012)
+      expect(Math.abs(lechSac(oklch(t[`--tr-${mat}`]!).h, oklch(t[`--tr-${day}`]!).h)), `${mat}/${day} cùng họ`).toBeLessThanOrEqual(6)
+      expect(L(mat!), `${mat} sáng như bản sáng`).toBeGreaterThanOrEqual(0.64)
+    }
+    for (const k of ['dung', 'sai', 'chu-y', 'tin', 'sao', 'hs']) expect(Math.abs(L(`${k}-nhat`) - 0.311), `${k}-nhat`).toBeLessThanOrEqual(0.01)
+    expect(t['--tr-hs-nut']).toBe(t['--tr-hs'])
+  })
+
   it.each(['sang', 'toi'] as const)('chữ trên nút không kém cặp Duolingo cũ; chữ màu ≥ 4,5 trên thẻ và nền nhạt — %s', (che) => {
     const t = bang[che], tren = t['--tr-hs-tren']!, trenDuo = che === 'sang' ? '#ffffff' : '#131f24'
-    for (const k of ['hs-nut', 'dung-nut', 'sai', 'sai-day', 'chu-y-nut', 'tin-day', 'tim']) expect(tuongPhan(tren, t[`--tr-${k}`]!), k).toBeGreaterThanOrEqual(tuongPhan(trenDuo, DUO[che][k]!) - 1e-9)
+    const ks = che === 'sang' ? ['hs-nut', 'dung-nut', 'sai', 'sai-day', 'chu-y-nut', 'tin-day', 'tim'] : ['hs-nut', 'dung-nut', 'sai', 'chu-y-nut', 'tin', 'sao', 'tim']
+    for (const k of ks) expect(tuongPhan(tren, t[`--tr-${k}`]!), k).toBeGreaterThanOrEqual(tuongPhan(trenDuo, DUO[che][k]!) - 1e-9)
     for (const k of ['hs', 'dung', 'sai', 'chu-y', 'tin', 'sao']) {
       expect(tuongPhan(t[`--tr-${k}-chu`]!, t['--tr-mat']!), `${k}-chu/mat`).toBeGreaterThanOrEqual(4.5)
       expect(tuongPhan(t[`--tr-${k}-chu`]!, t[`--tr-${k}-nhat`]!), `${k}-chu/nhat`).toBeGreaterThanOrEqual(4.5)
@@ -96,14 +113,14 @@ describe('bộ màu B «Chất chỉ thị» sáng bằng Duolingo (thầy 27/10
   it('nền tối không dùng #131f24 (cả bảng lười lẫn dòng tối học sinh trong trong.css)', () => {
     expect(mau.toLowerCase()).not.toMatch(/--tr-[\w-]+:\s*#131f24/)
     const tr = doc('src/styles/trong.css'), dong = tr.match(/^\s*:root\[data-trong='hs'\] \{ --tr-nen: (#[0-9a-f]{6})/m)
-    expect(dong?.[1]).toBe('#121129')
-    expect(bang.toi['--tr-nen']).toBe('#121129')
+    expect(dong?.[1]).toBe('#1a1a29')
+    expect(bang.toi['--tr-nen']).toBe('#1a1a29')
   })
 
   it('màu chính TÁCH khỏi màu đúng: Lộ trình, menu, rương, Bi đọc --tr-hs; «Tiếp tục» ở dải đúng đọc --tr-dung-nut', () => {
     for (const dong of [
       "html:root[data-trong='hs'] .da-bai { background: var(--tr-hs-nut); box-shadow: inset 0 -5px 0 var(--tr-hs-day); }",
-      "html:root[data-trong='hs'] .da-nut[data-tt='xong'], html:root[data-trong='hs'] .da-nut[data-loai='hoc'][data-tt='dang'] { --n: var(--tr-hs); --n-d: var(--tr-hs-day); }",
+      "html:root[data-trong='hs'] :is(.da-nut[data-loai][data-tt='xong'], .da-nut[data-tt='xong'], .da-nut[data-loai='hoc'][data-tt='dang']) { --n: var(--tr-hs); --n-d: var(--tr-hs-day); }",
       "html:root[data-trong='hs'] :is(.da-vong .chay, .da-vong .mo) { stroke: var(--tr-hs); }",
       "html:root[data-trong='hs'] .tr-vong[data-du] { background: conic-gradient(var(--tr-hs) calc(var(--p, 0) * 1%), var(--tr-mat-3) 0); }",
       "html:root[data-trong='hs'] .tr-menu-o { --d: var(--tr-hs-day); background: var(--tr-hs-nut); }",
@@ -113,6 +130,38 @@ describe('bộ màu B «Chất chỉ thị» sáng bằng Duolingo (thầy 27/10
     ]) expect(mau).toContain(dong)
     expect(de2000(bang.sang['--tr-hs']!, bang.sang['--tr-dung']!)).toBeGreaterThanOrEqual(30)
     expect(de2000(bang.toi['--tr-hs']!, bang.toi['--tr-dung']!)).toBeGreaterThanOrEqual(30)
+  })
+
+  // 28/10 ảnh thầy: nút chặng chàm mà đáy 3D LỤC — #485 thêm luật nút chặng ưu tiên cao hơn luật tách màu ⇒ khoá: mọi luật nút chặng xong / đang học
+  // trong trong-hs.css đọc màu ĐÚNG phải thua (độ ưu tiên) luật màu chính trong trong-hs-mau.css.
+  it('nút chặng đã xong / đang học: mặt và đáy 3D cùng họ màu chính — luật tách màu thắng mọi luật nút chặng của trong-hs.css', () => {
+    const uuTien = (sel: string): [number, number, number] => {
+      let a = 0, b = 0, c = 0
+      sel = sel.replace(/::?(before|after)\b/g, '')
+      sel = sel.replace(/:(is|where|not)\(((?:[^()]|\([^()]*\))*)\)/g, (_m, ten: string, ds: string) => {
+        if (ten === 'where') return ''
+        const best = ds.split(',').map((x) => uuTien(x.trim())).sort((x, y) => y[0] - x[0] || y[1] - x[1] || y[2] - x[2])[0]!
+        a += best[0]; b += best[1]; c += best[2]; return ''
+      })
+      sel = sel.replace(/\[[^\]]*\]/g, () => { b++; return '' })
+      sel = sel.replace(/#[\w-]+/g, () => { a++; return '' }).replace(/\.[\w-]+/g, () => { b++; return '' }).replace(/:[\w-]+/g, () => { b++; return '' })
+      c += (sel.match(/(^|[\s>+~])[a-z][\w-]*/gi) ?? []).length
+      return [a, b, c]
+    }
+    const so = (x: [number, number, number], y: [number, number, number]) => x[0] - y[0] || x[1] - y[1] || x[2] - y[2]
+    const luatMau = mau.match(/^(html:root\[data-trong='hs'\] :is\(\.da-nut[^{]*)\{ --n: var\(--tr-hs\); --n-d: var\(--tr-hs-day\); \}/m)
+    expect(luatMau).not.toBeNull()
+    const ta = uuTien(luatMau![1]!.trim())
+    const hs = doc('src/styles/trong-hs.css').replace(/\/\*[\s\S]*?\*\//g, '')
+    let dem = 0
+    for (const m of hs.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+      if (!/--n(-d)?:\s*var\(--tr-dung/.test(m[2]!) || !/\.da-nut/.test(m[1]!)) continue
+      for (const sel of m[1]!.split(',').map((x) => x.trim()).filter((x) => /data-tt='(xong|dang)'/.test(x))) {
+        dem++
+        expect(so(uuTien(sel), ta), `${sel} phải thua ${luatMau![1]}`).toBeLessThan(0)
+      }
+    }
+    expect(dem).toBeGreaterThanOrEqual(3)
   })
 
   it('4 giám thị: sắc B, L ±0,03 Duolingo cùng vai, cách nhau ΔE00 ≥ 25', () => {

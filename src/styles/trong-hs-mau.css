@@ -24,20 +24,23 @@
   --tr-bong-1: 0 2px 0 #e2e2f0; --tr-bong-2: 0 4px 0 #e2e2f0; --tr-bong-3: 0 8px 0 rgba(0, 0, 0, 0.1);
   --tp-tt: var(--tr-tim); --tp-tt-chu: var(--tr-tim-chu);
 }
+/* TỐI 28/10 (thầy: «đo chế độ tối của Duolingo tinh chỉnh thông số»): quan hệ L đo trên ảnh Duolingo tối cùng máy thầy (ve-moi/mau-rieng/do-duo-toi.md) —
+   nền 0,225 · thẻ 0,280 · viền 0,385 · mặt nút / thẻ / nút chặng giữ ĐỘ TƯƠI bản sáng (xanh lá 0,757) · đáy 3D = mặt − 0,116 · dải kết quả 0,311;
+   chữ nền tối trên mặt tô không kém cặp Duolingo tối cùng vai. Sắc giữ bộ B. */
 @media (prefers-color-scheme: dark) {
   :root[data-trong='hs'] {
-    --tr-nen: #121129; --tr-mat: #1c1b3a; --tr-mat-2: #24234a; --tr-mat-3: #312f5e; --tr-vien: #2f2d59; --tr-vien-2: #403e72;
-    --tr-chu: #f1f0ff; --tr-chu-2: #c6c4e8; --tr-chu-3: #a4a2cd; --tr-trang: #121129;
-    --tr-dung: #00ba84; --tr-dung-nhat: #003d32; --tr-dung-chu: #00e7b0; --tr-dung-nut: #00ba84; --tr-dung-day: #008c60;
-    --tr-sai: #ed5990; --tr-sai-nhat: #38262e; --tr-sai-chu: #f889b3; --tr-sai-day: #bc386f;
-    --tr-chu-y: #fb8a33; --tr-chu-y-nhat: #412e23; --tr-chu-y-chu: #ffb075; --tr-chu-y-nut: #fb8a33; --tr-chu-y-day: #bf6528;
-    --tr-tin: #00b6cb; --tr-tin-nhat: #163547; --tr-tin-chu: #43cee0; --tr-tin-day: #008a9d;
-    --tr-sao: #f6bc02; --tr-sao-nhat: #40371c; --tr-sao-chu: #ffd462; --tr-sao-day: #b88903;
-    --tr-tim: #ca73d3; --tr-tim-day: #984ca5; --tr-tim-chu: #e17beb;
-    --tr-hs: #898bff; --tr-hs-nut: #898bff; --tr-hs-day: #5f60c9; --tr-hs-nhat: #2c2f51; --tr-hs-chu: #bdbfff; --tr-hs-tren: #121129;
-    --tr-nguyen-tu: #00b6cb; --tr-nguyen-tu-so: #00b6cb;
+    --tr-nen: #1a1a29; --tr-mat: #262738; --tr-mat-2: #2c2d40; --tr-mat-3: #414157; --tr-vien: #414157; --tr-vien-2: #52536a;
+    --tr-chu: #f1f0ff; --tr-chu-2: #cdceeb; --tr-chu-3: #acaece; --tr-trang: #1a1a29;
+    --tr-dung: #00d497; --tr-dung-nhat: #18382a; --tr-dung-chu: #00df9f; --tr-dung-nut: #00d497; --tr-dung-day: #00aa76;
+    --tr-sai: #f7498f; --tr-sai-nhat: #43272f; --tr-sai-chu: #ff9bba; --tr-sai-day: #cc146f;
+    --tr-chu-y: #ff9447; --tr-chu-y-nhat: #422a1a; --tr-chu-y-chu: #ffa569; --tr-chu-y-nut: #ff9447; --tr-chu-y-day: #de6a00;
+    --tr-tin: #00bfd4; --tr-tin-nhat: #0e373d; --tr-tin-chu: #00d5ed; --tr-tin-day: #0097ab;
+    --tr-sao: #ffc735; --tr-sao-nhat: #3b2f14; --tr-sao-chu: #ecb400; --tr-sao-day: #d8a100;
+    --tr-tim: #e17beb; --tr-tim-day: #b857c8; --tr-tim-chu: #f592ff;
+    --tr-hs: #a8adff; --tr-hs-nut: #a8adff; --tr-hs-day: #7e80ff; --tr-hs-nhat: #2c2e47; --tr-hs-chu: #b1b6ff; --tr-hs-tren: #1a1a29;
+    --tr-nguyen-tu: #00bfd4; --tr-nguyen-tu-so: #00bfd4;
     --tr-phu: rgba(0, 0, 0, 0.6);
-    --tr-bong-1: 0 2px 0 #0b0a1c; --tr-bong-2: 0 4px 0 #0b0a1c; --tr-bong-3: 0 8px 0 rgba(0, 0, 0, 0.35);
+    --tr-bong-1: 0 2px 0 #0e0e1a; --tr-bong-2: 0 4px 0 #0e0e1a; --tr-bong-3: 0 8px 0 rgba(0, 0, 0, 0.35);
   }
 }
 [data-trong='hs'] { --tr-chinh-day: var(--tr-hs-day); }
@@ -47,7 +50,9 @@
    Độ ưu tiên html:root[data-trong='hs'] … cao hơn luật gốc nên thắng dù tệp này nạp TRƯỚC (@import đầu tệp). */
 html:root[data-trong='hs'] .da-bai { background: var(--tr-hs-nut); box-shadow: inset 0 -5px 0 var(--tr-hs-day); }
 html:root[data-trong='hs'] .da-dai { background: var(--tr-hs-nut); box-shadow: inset 0 -5px 0 var(--tr-hs-day), 0 10px 18px -12px var(--tr-phu); }
-html:root[data-trong='hs'] .da-nut[data-tt='xong'], html:root[data-trong='hs'] .da-nut[data-loai='hoc'][data-tt='dang'] { --n: var(--tr-hs); --n-d: var(--tr-hs-day); }
+/* nút chặng đã xong / đang học: mặt chàm + đáy 3D CÙNG HỌ chàm. 28/10: #485 thêm luật «.da-nut[data-loai][data-tt='xong'] { --n-d: var(--tr-dung-day) }»
+   (độ ưu tiên 0,5,0) thắng luật cũ ở đây ⇒ mặt chàm, đáy LỤC (ảnh thầy). Luật dưới ưu tiên 0,5,1 — thắng mọi luật nút chặng của trong-hs.css. */
+html:root[data-trong='hs'] :is(.da-nut[data-loai][data-tt='xong'], .da-nut[data-tt='xong'], .da-nut[data-loai='hoc'][data-tt='dang']) { --n: var(--tr-hs); --n-d: var(--tr-hs-day); }
 html:root[data-trong='hs'] :is(.da-vong .chay, .da-vong .mo) { stroke: var(--tr-hs); }
 html:root[data-trong='hs'] .da-lan { border-color: var(--tr-hs); }
 html:root[data-trong='hs'] .tr-vong[data-du] { background: conic-gradient(var(--tr-hs) calc(var(--p, 0) * 1%), var(--tr-mat-3) 0); }
