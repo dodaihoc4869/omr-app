@@ -779,6 +779,8 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       await t.waitForTimeout(1200)
       for (let lan = 0; lan < 4; lan++) {
         if (await t.locator('#tr-menu[data-mo]').count()) break
+        // NGANG DUO 27/10: máy tính ≥ 1024 × 600 — menu là THANH BÊN TRÁI luôn hiện (không có nút «Mở menu») ⇒ bấm mục ngay
+        if (await t.evaluate(() => getComputedStyle(document.querySelector('.tr-menu-cham') ?? document.body).display === 'none' && getComputedStyle(document.querySelector('#tr-menu') ?? document.body).visibility === 'visible')) break
         await t.getByRole('button', { name: /^Mở menu/ }).locator('visible=true').first().click()
         await t.waitForTimeout(500)
       }
