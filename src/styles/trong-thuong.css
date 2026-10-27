@@ -573,3 +573,6 @@
   [data-trong='hs'] .tp-goc *, [data-trong='hs'] .tp-goc *::before, [data-trong='hs'] .tp-goc *::after { animation: none !important; transition: none !important; }
 }
 [data-trong='hs'].may-yeu .tp-goc *, [data-trong='hs'].may-yeu .tp-goc *::before, [data-trong='hs'].may-yeu .tp-goc *::after { animation: none !important; }
+
+/* TƯƠI 27/10 (thầy cho phép: «Màu sắc của app làm siêu tươi như dolingo»): chữ trắng trên dải xanh lá ⇒ --tr-dung-nut (đạt 3:1 cho chữ đậm). */
+:root[data-trong='hs'] .tp-bxh .vach { background: var(--tr-dung-nut); }

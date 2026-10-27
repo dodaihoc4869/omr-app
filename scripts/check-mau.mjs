@@ -17,6 +17,8 @@ const CHO_PHEP = new Set([
   'styles/tokens.css',
   // Bảng màu giao diện «Trong» thầy chốt 26/10/2026 (docs/ban-ve-trong-2610): mọi mã màu của giao diện mới chỉ nằm ở đây, nơi khác dùng biến --tr-*.
   'styles/trong.css',
+  // Bảng màu «tươi» app học sinh kiểu Duolingo — thầy cho phép 27/10 «Màu sắc của app làm siêu tươi như dolingo»; chỉ :root[data-trong='hs'], nạp lười.
+  'styles/trong-hs-mau.css',
   'lib/html-phieu.ts',
   'lib/html-may-chieu.ts',
   // Bảng màu của TỜ MÁY CHIẾU (M3, 19/09): tờ là HTML rời trong iframe, có thể lưu ra tệp / mở tab riêng / chiếu từ máy khác, và nền bảng luôn TỐI
