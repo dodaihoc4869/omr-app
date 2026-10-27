@@ -3352,13 +3352,15 @@ const boXuLy = {
       // B2 (15/10): dựng lại bảng siêu dữ liệu câu tính sẵn cho tờ vừa lập chỉ mục (cau-meta.ts). Thường ngày không tờ nào lệch ⇒ một câu đọc nhẹ.
       await import('./cau-meta').then(m=>m.dongBoCauMeta(env,laGioCaoDiemVn(Date.now())?5:40)).catch(e=>console.error('[cau-meta] đồng bộ',e))
       // ĐO LẠI LƯỢT CŨ (21/10): lấp dần bảng kích thước đề từng câu (`cau_doc_giay`) — cao điểm chỉ 20 câu/phút, ngoài cao điểm 120; xong hết thì một câu đọc nhẹ.
-      await import('./cau-doc-giay').then(m=>m.dongBoCauDocGiay(env,laGioCaoDiemVn(Date.now())?10:120)).catch(e=>console.error('[cau-doc-giay] đồng bộ',e))
+      // KHUNG HỌC 18:00–23:59 VN (thầy 27/10 «tức thì mọi khung giờ»; đo Analytics 19–23h: D1 bận 20 % thời gian, lệnh em chờ ~1,3 s/đợt): việc LẤP DẦN này
+      // không ai chờ ⇒ nghỉ cả khung, chạy bù ngoài giờ (120 câu/phút).
+      if(!laKhungHocVn(Date.now()))await import('./cau-doc-giay').then(m=>m.dongBoCauDocGiay(env,120)).catch(e=>console.error('[cau-doc-giay] đồng bộ',e))
       const ht=await import('./hanh-trinh-hop-nhat').then(m => m.dongBoBaHanhTrinh(env, Date.now()))
         .catch(async e => { console.error('[hanh-trinh] đồng bộ lỗi:',e); await ghiLoiMay(env,'hanh_trinh_dong_bo'); return null })
       if(ht?.trangThai==='vua_hop_nhat')console.log('[hanh-trinh] đã gộp',ht.soChienDich)
       // Ngoài cao điểm, chuẩn bị nguồn cho từng ít em trước khi các em mở app.
       const gioVn=new Date(Date.now()+7*3600000).getUTCHours()
-      if(gioVn<20)await import('./hanh-trinh-nguon-cau').then(m=>m.chuanBiNguonCau(env,Date.now())).catch(async()=>{await ghiLoiMay(env,'hanh_trinh_nguon_cau')})
+      if(gioVn<18)await import('./hanh-trinh-nguon-cau').then(m=>m.chuanBiNguonCau(env,Date.now())).catch(async()=>{await ghiLoiMay(env,'hanh_trinh_nguon_cau')})
       // MÁY SOẠN LỜI GIẢI SƠ ĐỒ (27/10, may-soan-cron.ts): cờ `cau_hinh.may_soan_so_do` tắt ⇒ một câu đọc có đệm rồi về. Bật ⇒ một lô nhỏ có khoá chạy,
       // chạy NỀN (waitUntil) để không giữ chân các việc cron phía sau (thông báo, nhắc bài). Phải đứng TRƯỚC dòng `return` dưới. Lỗi chỉ ghi log.
       {const p=import('./may-soan-cron').then(m=>m.chayMaySoanCron(env,Date.now())).then(r=>{if(r.chay)console.log('[may-soan] cron',JSON.stringify(r))}).catch(e=>console.error('[may-soan] cron lỗi:',e))
@@ -4062,6 +4064,10 @@ const boXuLy = {
 }
 
 /** Khung CAO ĐIỂM học sinh làm bài: 20:00–23:59 giờ VN (= 13:00–16:59 UTC). */
+/** KHUNG HỌC 18:00–23:59 giờ VN (thầy 27/10 «App phải tức thì ở mọi khung giờ»): việc nền không ai chờ (lấp dần, soạn trước, chuẩn bị nguồn) nghỉ cả khung. */
+export function laKhungHocVn(nowMs: number): boolean {
+  return new Date(nowMs + 7 * 3_600_000).getUTCHours() >= 18
+}
 export function laGioCaoDiemVn(nowMs: number): boolean {
   const gio = new Date(nowMs + 7 * 3_600_000).getUTCHours()
   return gio >= 20 && gio <= 23
