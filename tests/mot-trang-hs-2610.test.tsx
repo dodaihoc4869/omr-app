@@ -4,6 +4,8 @@ import { NHIP_EM_LUOI } from '../scripts/chup-v2/gia/nhip-hoc-em'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { createRef } from 'react'
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu' }))
+const phanHoi = vi.hoisted(() => vi.fn())
+vi.mock('../src/lib/phan-hoi', () => ({ phanHoi }))
 import { MenuDocTrong, MotTrangHs, type PropsMotTrang } from '../src/components/hoc-tap/TrongHs'
 import type { TomTatKiemTra } from '../src/lib/kiem-tra-ca-nhan'
 
@@ -115,9 +117,12 @@ describe('Hệ lười chỉ thầy / phụ huynh xem (thầy 26/10)', () => {
   })
 })
 
-describe('Menu dọc «Một trang»: Điểm danh đầu menu, A.I Đỗ Đại Học', () => {
-  const menu = (them: { moDiemDanh?: boolean } = {}) => render(<MenuDocTrong muc="hom-nay" ds={[]} onMuc={noop} coCa={false} onThi={noop} dangTai={false} onTaiLai={noop}
-    chuDau="MA" moCuaEm={false} onCuaEm={noop} nutCuaEm={createRef()} token="tk" moDiemDanh={them.moDiemDanh ?? true} />)
+describe('Menu dọc «Một trang» — MENU 6 MỤC (thầy 27/10): Điểm danh chỉ khi có buổi mở, chuông ở đầu menu, Cài đặt là tấm con', () => {
+  const chuong = <div className="m3-tb"><button type="button" className="m3-tb-chuong" aria-label="Thông báo, 2 chưa đọc"><span className="m3-tb-dem">2</span></button></div>
+  const menu = (them: { moDiemDanh?: boolean; coCa?: boolean; onThi?: () => void; onMuc?: (id: string) => void; onTaiLai?: () => void; onCuaEm?: () => void } = {}) => render(<MenuDocTrong muc="hom-nay" ds={[]}
+    onMuc={them.onMuc ?? noop} coCa={them.coCa ?? false} onThi={them.onThi ?? noop} dangTai={false} onTaiLai={them.onTaiLai ?? noop} thongBao={chuong}
+    chuDau="MA" moCuaEm={false} onCuaEm={them.onCuaEm ?? noop} nutCuaEm={createRef()} token="tk" moDiemDanh={them.moDiemDanh ?? true} />)
+  const nav = () => screen.getByRole('navigation', { name: 'Điều hướng học sinh' })
 
   it('buổi đang mở ⇒ vạch thò «Điểm danh», khối chàm gửi mã bằng ĐÚNG lệnh /hs/diem-danh ⇒ «Đã điểm danh» kèm giờ', async () => {
     const f = vi.fn(async (url: string, init?: RequestInit) => {
@@ -137,7 +142,7 @@ describe('Menu dọc «Một trang»: Điểm danh đầu menu, A.I Đỗ Đại
     expect(screen.getByRole('button', { name: 'Mở menu' })).toBeTruthy()
   })
 
-  it('không có buổi ⇒ khối xám; QR ?diem-danh= vẫn tự gửi một lần và mở menu', async () => {
+  it('không có buổi ⇒ KHÔNG có khối Điểm danh; QR ?diem-danh= vẫn tự gửi một lần và mở menu', async () => {
     window.history.replaceState(null, '', '/hs?diem-danh=482915')
     const f = vi.fn(async (url: string) => (url.endsWith('/hs/diem-danh') ? traLoi({ ok: true, buoi: { id: 'B1', ten: 'Buổi học 26/10/2026', lop: '12A1', daDiemDanh: true } }) : traLoi({ ok: true, buoi: null })))
     vi.stubGlobal('fetch', f)
@@ -148,29 +153,87 @@ describe('Menu dọc «Một trang»: Điểm danh đầu menu, A.I Đỗ Đại
     await waitFor(() => expect(screen.getByRole('navigation', { name: 'Điều hướng học sinh' }).hasAttribute('data-mo')).toBe(true))
     cleanup()
     menu()
-    expect(await screen.findByText('Chưa có buổi học nào đang mở')).toBeTruthy()
+    await waitFor(() => expect(f.mock.calls.filter(([u]) => String(u).endsWith('/hs/buoi-hoc')).length).toBeGreaterThan(1))
+    await new Promise((r) => setTimeout(r, 0))
+    expect(screen.queryByLabelText('Điểm danh buổi học')).toBeNull()
+    expect(screen.queryByText(/Chưa có buổi học/)).toBeNull()
+    expect(nav().hasAttribute('data-dd')).toBe(false)
+    expect(screen.getByRole('button', { name: 'Mở menu' })).toBeTruthy()
   })
 
-  it('menu 3 mục Lộ trình · Luyện tập · Thành tích; công tắc «Âm thanh» / «Rung» ghi localStorage ddh.am / ddh.rung (mặc định Bật)', () => {
+  it('đúng 6 mục theo thứ tự, mỗi mục một ô biểu tượng; chuông ở đầu menu; Ca kiểm tra gọi onThi (ẩn khi ca đang mở); chạm mục ⇒ phanHoi(chon)', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => traLoi({ ok: true, buoi: null })))
-    menu({ moDiemDanh: false })
-    const nav = screen.getByRole('navigation', { name: 'Điều hướng học sinh' })
-    expect(['Lộ trình', 'Luyện tập', 'Thành tích'].every((t) => within(nav).getByRole('button', { name: t }))).toBe(true)
-    const am = screen.getByRole('switch', { name: /Âm thanh/ }), ru = screen.getByRole('switch', { name: /Rung/ })
+    phanHoi.mockClear()
+    const onThi = vi.fn(), onMuc = vi.fn()
+    const { unmount } = menu({ moDiemDanh: false, onThi, onMuc })
+    const muc = () => within(nav()).getAllByRole('button').filter((b) => b.classList.contains('tr-menu-muc'))
+    expect(muc().map((b) => b.textContent)).toEqual(['Lộ trình', 'Luyện tập', 'Thành tích', 'Ca kiểm tra', 'Hỏi A.I Đỗ Đại Học', 'Cài đặt'])
+    expect(muc().every((b) => b.querySelector('.tr-menu-o'))).toBe(true)
+    expect(within(nav()).getByRole('button', { name: 'Lộ trình' }).getAttribute('aria-current')).toBe('page')
+    expect(nav().querySelector('.tr-menu-ds hr')).toBeNull() // không vạch ngăn giữa 6 mục
+    // chuông THẬT nằm ở hàng đầu menu, cạnh «Đỗ Đại Học»
+    expect(nav().querySelector('.tr-menu-dau .tr-menu-tb .m3-tb-chuong')).not.toBeNull()
+    expect(nav().querySelector('.tr-menu-dau')!.textContent).toContain('Đỗ Đại Học')
+    fireEvent.click(within(nav()).getByRole('button', { name: 'Ca kiểm tra' }))
+    expect(onThi).toHaveBeenCalledOnce()
+    fireEvent.click(within(nav()).getByRole('button', { name: 'Thành tích' }))
+    expect(onMuc).toHaveBeenCalledWith('ket-qua')
+    await waitFor(() => expect(phanHoi).toHaveBeenCalled())
+    expect(phanHoi).toHaveBeenCalledWith('chon')
+    unmount()
+    menu({ moDiemDanh: false, coCa: true })
+    expect(within(nav()).queryByRole('button', { name: 'Ca kiểm tra' })).toBeNull()
+  })
+
+  it('Cài đặt mở tấm con (Âm thanh · Rung · Cập nhật bài học · Của em), Quay lại / Esc về 6 mục; công tắc ghi localStorage ddh.am / ddh.rung (mặc định Bật)', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => traLoi({ ok: true, buoi: null })))
+    const onTaiLai = vi.fn(), onCuaEm = vi.fn()
+    menu({ moDiemDanh: false, onTaiLai, onCuaEm })
+    fireEvent.click(screen.getByRole('button', { name: 'Mở menu' }))
+    expect(screen.queryByRole('switch', { name: /Âm thanh/ })).toBeNull() // tấm con chưa mở ⇒ công tắc ẩn
+    const cai = within(nav()).getByRole('button', { name: 'Cài đặt' })
+    expect(cai.getAttribute('aria-expanded')).toBe('false')
+    fireEvent.click(cai)
+    const tam = screen.getByRole('group', { name: 'Cài đặt' })
+    expect(within(nav()).queryByRole('button', { name: 'Lộ trình' })).toBeNull()
+    await waitFor(() => expect(document.activeElement).toBe(within(tam).getByRole('button', { name: 'Quay lại menu' })))
+    expect(within(tam).getByRole('button', { name: 'Cập nhật bài học' })).toBeTruthy()
+    expect(within(tam).getByRole('button', { name: 'Của em' }).getAttribute('aria-haspopup')).toBe('dialog')
+    const am = within(tam).getByRole('switch', { name: /Âm thanh/ }), ru = within(tam).getByRole('switch', { name: /Rung/ })
     expect(am.getAttribute('aria-checked')).toBe('true')
     fireEvent.click(am); fireEvent.click(ru)
     expect(localStorage.getItem('ddh.am')).toBe('tat'); expect(localStorage.getItem('ddh.rung')).toBe('tat')
     fireEvent.click(am)
     expect(localStorage.getItem('ddh.am')).toBeNull()
     localStorage.clear()
+    // Esc ở tấm con ⇒ về 6 mục (menu vẫn mở), tiêu điểm về «Cài đặt»; Esc lần nữa ⇒ menu thu
+    fireEvent.keyDown(window, { key: 'Escape' })
+    expect(screen.queryByRole('group', { name: 'Cài đặt' })).toBeNull()
+    expect(nav().hasAttribute('data-mo')).toBe(true)
+    await waitFor(() => expect(document.activeElement).toBe(within(nav()).getByRole('button', { name: 'Cài đặt' })))
+    fireEvent.click(within(nav()).getByRole('button', { name: 'Cài đặt' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Quay lại menu' }))
+    expect(within(nav()).getByRole('button', { name: 'Lộ trình' })).toBeTruthy()
+    fireEvent.keyDown(window, { key: 'Escape' })
+    expect(nav().hasAttribute('data-mo')).toBe(false)
+    // Cập nhật bài học / Của em giữ nguyên hành vi
+    fireEvent.click(screen.getByRole('button', { name: 'Mở menu' }))
+    expect(within(nav()).getByRole('button', { name: 'Lộ trình' })).toBeTruthy() // mở lại ⇒ luôn về 6 mục
+    fireEvent.click(within(nav()).getByRole('button', { name: 'Cài đặt' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Cập nhật bài học' }))
+    expect(onTaiLai).toHaveBeenCalledOnce()
+    fireEvent.click(screen.getByRole('button', { name: 'Mở menu' }))
+    fireEvent.click(within(nav()).getByRole('button', { name: 'Cài đặt' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Của em' }))
+    expect(onCuaEm).toHaveBeenCalledOnce()
   })
 
-  it('mục A.I Đỗ Đại Học bắn sự kiện mở ĐÚNG tấm chat của BongBongAiDdh', () => {
+  it('mục Hỏi A.I Đỗ Đại Học bắn sự kiện mở ĐÚNG tấm chat của BongBongAiDdh', () => {
     vi.stubGlobal('fetch', vi.fn(async () => traLoi({ ok: true, buoi: null })))
     const nghe = vi.fn()
     window.addEventListener('ddh:mo-ai', nghe)
     menu({ moDiemDanh: false })
-    fireEvent.click(within(document.getElementById('tr-menu')!).getByRole('button', { name: 'A.I Đỗ Đại Học' }))
+    fireEvent.click(within(document.getElementById('tr-menu')!).getByRole('button', { name: 'Hỏi A.I Đỗ Đại Học' }))
     expect(nghe).toHaveBeenCalledOnce()
     // khung thấp xoay ngang: dải biểu tượng có cùng lối A.I + 3 mục chính (dọc: dải bị CSS ẩn)
     fireEvent.click(document.querySelector('.tr-menu-ray .tr-ray-ai')!)
