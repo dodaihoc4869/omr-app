@@ -50,6 +50,14 @@
   [data-trong] .giu-keo { display: none; }
 }
 
+/* ── Băng nhắc nhỏ (mở chặng / còn 1 câu): trượt xuống dưới thanh trên, nằm đè, tự ẩn; cùng vị trí băng combo ── */
+[data-trong] .giu-bang {
+  position: absolute; top: calc(100% + 6px); left: 50%; z-index: 7; max-width: calc(100% - 24px); padding: 7px 16px; border-radius: 999px;
+  background: var(--tr-tin-nhat); color: var(--tr-tin-chu); box-shadow: var(--tr-bong-2); font-size: 15px; font-weight: 800; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; pointer-events: none; transform: translateX(-50%);
+  animation: giu-xuong 500ms cubic-bezier(.2, 1.3, .4, 1) both, giu-hien 300ms ease-in 2.2s reverse forwards;
+}
+@media (orientation: landscape) and (max-height: 500px) { [data-trong] .giu-bang { position: fixed; top: 8px; } }
 
 /* ── Lời Bi động viên sau hai câu sai liền (trong tấm kết quả sai) ── */
 [data-trong] .giu-dong-vien {
@@ -60,9 +68,10 @@
 @keyframes giu-hien { from { opacity: 0; } }
 @keyframes giu-truot { from { transform: translateY(100%); } }
 @keyframes giu-noi { from { opacity: 0; transform: translateY(24px) scale(.97); } }
+@keyframes giu-xuong { from { opacity: 0; transform: translate(-50%, -12px) scale(.96); } }
 @keyframes giu-le { 0% { opacity: 0; transform: translateY(0) scale(.5); } 15% { opacity: .95; transform: translateY(0) scale(1); } 70% { opacity: .9; transform: translateY(14px) scale(1); } 100% { opacity: 0; transform: translateY(22px) scale(.8); } }
 @media (prefers-reduced-motion: reduce) {
-  [data-trong] :is(.giu-nen, .giu-tam) { animation: none !important; }
+  [data-trong] :is(.giu-nen, .giu-tam, .giu-bang) { animation: none !important; }
   [data-trong='hs'] .giu-bi > i { animation: none; opacity: .9; }
 }
 [data-trong].may-yeu :is(.giu-nen, .giu-tam) { animation: none; }
