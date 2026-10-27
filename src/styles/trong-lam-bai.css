@@ -1,6 +1,9 @@
 /* «TRONG» NHÓM 2 — HỌC SINH LÀM BÀI (thầy chốt 26/10; bản vẽ hs-man-thi, hs-man-thi-ds, hs-ket-qua-sau-nop …). CHỈ trình bày: mọi luật dưới
  * [data-trong] (không có ⇒ giao diện cũ y nguyên), chỉ biến --tr-* / biến sẵn có. Kiểu nội tuyến của TheCau/Hang/NutChinh thắng CSS thường ⇒
  * đúng các thuộc tính ấy dùng !important (như the-cau.css). Màn thi: đồng hồ ≤ 5 phút giữ nền cảnh báo cũ (data-gap / data-muc). */
+/* Bàn phím số kiểu Duolingo + nút «Trợ giúp» của thanh đáy Duo (27/10): tờ riêng, gộp vào tờ này khi build (không thêm tệp, cùng nạp lười). */
+@import '../components/hoc-tap/ban-phim-duo.css';
+@import '../components/hoc-tap/tro-giup-duo.css';
 
 /* ── 1. MÀN THI DỌC · thanh trên: đồng hồ chữ to không nền · Đã làm · Danh sách câu · Nộp bài; vạch tiến độ mảnh ── */
 [data-trong] .m3 .thi-tren { background: color-mix(in srgb, var(--tr-nen) 90%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: inset 0 -1px 0 var(--tr-vien); }

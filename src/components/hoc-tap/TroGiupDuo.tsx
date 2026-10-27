@@ -2,11 +2,10 @@
 // thiết kế ẩn đi, bấm vào mới hiện cho tinh tế»). Thanh đáy chỉ còn MỘT hàng: nút tròn nhỏ (bên trái) + KIỂM TRA. Bấm nút tròn ⇒ tấm nhỏ bật lên ngay
 // phía trên liệt kê các trợ giúp đang có của câu; chạm ra ngoài / Esc / chọn một mục ⇒ đóng. Câu không có trợ giúp nào ⇒ ẩn nút tròn.
 // Các mục là CHÍNH các nút cũ (màn cha đưa vào `children`, kể cả ô portal của «Bắt đầu từ đâu?») ⇒ hành vi, đánh dấu «có hỗ trợ», aria giữ nguyên.
-// Tấm luôn nằm trong DOM (ẩn bằng `hidden`) để ô portal và nút «Hỏi thầy» không bị dựng lại khi đóng / mở.
+// Tờ trình bày: tro-giup-duo.css, nạp qua @import trong styles/trong-lam-bai.css (chỉ giao diện «Trong»). Tấm luôn nằm trong DOM (ẩn bằng `hidden`) để ô portal và nút «Hỏi thầy» không bị dựng lại khi đóng / mở.
 import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { CircleHelp } from 'lucide-react'
 import { phanHoi } from '../../lib/phan-hoi'
-import './tro-giup-duo.css'
 
 export function TroGiupDuo({ children, nut }: { children: ReactNode; nut: ReactNode }) {
   const [mo, setMo] = useState(false)

@@ -16,7 +16,6 @@ import { TOI_DA_KY_TU, chuDS, kyTuHien, phimCoTacDung, phimTuBanPhim, soSanhDung
 import { LUN_TOI_THIEU_MS, cuonThayBanPhim, doiO } from './ban-phim-hieu-ung'
 import { phanHoi } from '../../lib/phan-hoi'
 import '../m3/the-cau.css'
-import './ban-phim-duo.css'
 
 // ── BỐ CỤC THEO KHỔ MÀN (làn B đợt 16, thầy 12/10: "Tối ưu cho dọc ngang máy tính tất cả các màn làm bài của học sinh phải siêu đẹp và
 // thân thiện"). CÙNG điểm ngắt với hoc-tap.css: 'rong' = màn ≥ 900 px và cao > 560 px (máy tính, máy tính bảng ngang) · 'thap' = điện
@@ -195,9 +194,9 @@ export function OPhieu({ value, ket, soO = TOI_DA_KY_TU, hu }: { value: string; 
         return (
           <span key={i} className="ht2-lam-o" data-tt={i < value.length ? 'co' : i === value.length && !ket ? 'dang' : 'trong'} data-nay={moi ? (hu!.nhip % 2 ? 'a' : 'b') : undefined}>
             {/* chữ số vừa bấm: phần tử MỚI (key theo nhịp) ⇒ hiệu ứng bật vào ô chạy đúng một lần cho đúng ô ấy */}
-            {i < value.length ? (hu ? <b key={moi ? `m${hu.nhip}` : 'c'} className="ht2-lam-so" data-moi={moi || undefined}>{kyTuHien(value[i]!)}</b> : kyTuHien(value[i]!))
+            {i < value.length ? (hu ? <span key={moi ? `m${hu.nhip}` : 'c'} className="ht2-lam-so" data-moi={moi || undefined}>{kyTuHien(value[i]!)}</span> : kyTuHien(value[i]!))
               : i === value.length && !ket ? <i className="ht2-lam-con-tro" /> : ''}
-            {hu?.bong && hu.bong.i === i && i >= value.length && <b key={`x${hu.bong.id}`} className="ht2-lam-bong">{kyTuHien(hu.bong.ch)}</b>}
+            {hu?.bong && hu.bong.i === i && i >= value.length && <span key={`x${hu.bong.id}`} className="ht2-lam-bong">{kyTuHien(hu.bong.ch)}</span>}
           </span>
         )
       })}
@@ -217,6 +216,8 @@ function useHieuUngO(value: string): HieuUngO {
     truoc.current = value
     if (cu === value) return
     const d = doiO(cu, value)
+    // bóng kí tự xoá chỉ có tờ trình bày ở giao diện «Trong» (styles/trong-lam-bai.css) ⇒ giao diện cũ không vẽ bóng
+    if (!document.documentElement.dataset.trong) d.bong = null
     setHu((h) => ({ moi: d.moi, nhip: d.moi >= 0 ? h.nhip + 1 : h.nhip, bong: d.bong ? { ...d.bong, id: h.nhip + Date.now() } : null }))
   }, [value])
   useEffect(() => {

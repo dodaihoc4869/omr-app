@@ -629,7 +629,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
           {/* thầy 27/10 «rối quá, ẩn đi, bấm vào mới hiện»: các trợ giúp gom vào nút tròn «Trợ giúp» bên trái KIỂM TRA (TroGiupDuo) — cùng các nút cũ */}
           <TroGiupDuo nut={<button type="button" className="duo-nut" onClick={() => { phanHoi('chon'); void nopCau() }} disabled={nop || !duocNop}>{nop ? 'Đang kiểm tra…' : q.phan === 'II' && soYChua ? `Còn ${soYChua} ý chưa chọn` : 'Kiểm tra'}</button>}>
             <span ref={setONutCham} className="duo-o-nut-cham" />
-            {/* «Gợi ý» / «Học cách giải» đã gộp vào nút bóng đèn cạnh dòng lệnh (#431) ⇒ tấm Trợ giúp còn «Bắt đầu từ đâu?» + «Hỏi thầy» */}
+            {/* «Gợi ý» / «Học cách giải» đã gộp vào nút bóng đèn cạnh dòng lệnh (PR 431) ⇒ tấm Trợ giúp còn «Bắt đầu từ đâu?» + «Hỏi thầy» */}
             {linkHoi}
           </TroGiupDuo>
         </div></div>

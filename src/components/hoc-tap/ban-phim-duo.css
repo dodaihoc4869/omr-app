@@ -1,11 +1,11 @@
 /* BÀN PHÍM SỐ + Ô ĐÁP ÁN KIỂU DUOLINGO (thầy 27/10, ảnh bản sống: «Bấm chọn điền đáp án phải có hiệu ứng như dolingo nhé»; hàng phím 7–8–9 bị thanh
- * đáy che). Thanh đáy gọn (nút «Trợ giúp» + KIỂM TRA): TroGiupDuo.tsx. Nạp cùng LamCau.tsx (mảnh nạp lười của màn làm chặng / sửa câu). Mọi luật hiệu ứng dưới
+ * đáy che). Thanh đáy gọn (nút «Trợ giúp» + KIỂM TRA): TroGiupDuo.tsx. Nạp qua @import trong styles/trong-lam-bai.css (tờ nạp lười chỉ khi «Trong» —
+ * không thêm tệp, không cộng byte lượt mở app). Mọi luật hiệu ứng dưới
  * [data-trong='hs'] .ht-app.duo (màn làm chặng Duo, Tự sửa lỗi Duo) — màn cũ giữ nguyên. Chỉ biến màu «Trong» có sẵn; chỉ animate transform / opacity
  * (riêng nút KIỂM TRA đổi màu nền mượt). Giảm chuyển động / máy yếu ⇒ không chuyển động (rung vẫn giữ, phím lún đổi bằng màu nền). */
 
-/* chữ số trong ô: phần tử riêng để bật vào ô (mọi màn giữ nguyên chữ) */
-.ht2-lam-so { display: inline-block; font: inherit; }
-.ht2-lam-bong { display: none; }
+/* chữ số trong ô: phần tử riêng để bật vào ô (transform cần inline-block) */
+[data-trong] .ht2-lam-so { display: inline-block; }
 
 /* ── 1. PHÍM 3D: nút = gờ đáy 4 px (màu viền), mặt phím nằm trên; ấn ⇒ mặt lún 4 px che gờ (chỉ transform), nhả ⇒ bật lại ── */
 [data-trong='hs'] .ht-app.duo .ht2-lam-phim { gap: 8px; }

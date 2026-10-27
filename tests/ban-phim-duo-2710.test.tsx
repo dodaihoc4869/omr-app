@@ -14,8 +14,8 @@ import { nhanPhim, type PhimSo } from '../src/components/hoc-tap/lam-bai'
 import { phanHoi } from '../src/lib/phan-hoi'
 
 vi.mock('../src/lib/phan-hoi', () => ({ phanHoi: vi.fn() }))
-beforeEach(() => { vi.useFakeTimers() })
-afterEach(() => { cleanup(); vi.useRealTimers(); vi.mocked(phanHoi).mockClear() })
+beforeEach(() => { vi.useFakeTimers(); document.documentElement.dataset.trong = 'hs' })
+afterEach(() => { cleanup(); vi.useRealTimers(); vi.mocked(phanHoi).mockClear(); delete document.documentElement.dataset.trong })
 
 /** Màn cha tối giản như nhánh Duo của ManLamBaiTap: bàn phím màn hình + phím máy tính cùng nhập bằng `nhanPhim`. */
 function Man({ soO = 3, onDoi }: { soO?: number; onDoi?: (v: string) => void }) {
