@@ -1,3 +1,4 @@
+@import './trong-hs-mau.css'; /* bảng màu tươi app học sinh 27/10 — đi cùng mảnh lười này */
 /* «TRONG» NHÓM 2 — HỌC SINH LÀM BÀI (thầy chốt 26/10; bản vẽ hs-man-thi, hs-man-thi-ds, hs-ket-qua-sau-nop …). CHỈ trình bày: mọi luật dưới
  * [data-trong] (không có ⇒ giao diện cũ y nguyên), chỉ biến --tr-* / biến sẵn có. Kiểu nội tuyến của TheCau/Hang/NutChinh thắng CSS thường ⇒
  * đúng các thuộc tính ấy dùng !important (như the-cau.css). Màn thi: đồng hồ ≤ 5 phút giữ nền cảnh báo cũ (data-gap / data-muc). */

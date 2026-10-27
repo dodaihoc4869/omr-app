@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // ĐO TƯƠNG PHẢN BẢNG MÀU «TƯƠI» APP HỌC SINH (thầy cho phép 27/10: «Màu sắc của app làm siêu tươi như dolingo»).
 //   node scripts/do-tuong-phan-hs.mjs        → in bảng sáng + tối, thoát mã 1 nếu cặp nào dưới ngưỡng
-// Đọc khối `:root[data-trong='hs'] { … }` (sáng) và khối cùng tên trong `@media (prefers-color-scheme: dark)` (tối) ở src/styles/trong.css,
+// Đọc khối `:root[data-trong='hs'] { … }` (sáng) và khối cùng tên trong `@media (prefers-color-scheme: dark)` (tối) ở src/styles/trong-hs-mau.css,
 // tính tỉ lệ tương phản WCAG 2.x cho các cặp chữ/nền thật sự dùng trong app học sinh. Ngưỡng: chữ thường ≥ 4,5 · chữ to/đậm (nút, huy hiệu) ≥ 3.
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -19,7 +19,7 @@ function bien(khoi) {
 export function docBang(css) {
   const sangM = css.match(/^:root\[data-trong='hs'\]\s*\{([^}]*)\}/m)
   const toiM = css.match(/@media \(prefers-color-scheme: dark\)\s*\{\s*:root\[data-trong='hs'\]\s*\{([^}]*)\}/m)
-  if (!sangM || !toiM) throw new Error('không thấy khối :root[data-trong=hs] sáng/tối trong trong.css')
+  if (!sangM || !toiM) throw new Error('không thấy khối :root[data-trong=hs] sáng/tối trong trong-hs-mau.css')
   return { sang: bien(sangM[1]), toi: bien(toiM[1]) }
 }
 
@@ -50,7 +50,7 @@ export function doBang(bang) {
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
-  const bang = docBang(readFileSync(new URL('../src/styles/trong.css', import.meta.url), 'utf8'))
+  const bang = docBang(readFileSync(new URL('../src/styles/trong-hs-mau.css', import.meta.url), 'utf8'))
   let truot = 0
   for (const [ten, b] of [['SÁNG', bang.sang], ['TỐI', bang.toi]]) {
     console.log(`\n${ten}  | chữ | nền | tỉ lệ | ngưỡng | chỗ dùng`)

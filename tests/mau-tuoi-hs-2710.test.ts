@@ -10,9 +10,10 @@ import { docBang, doBang } from '../scripts/do-tuong-phan-hs.mjs'
 type Dong = { c: string; n: string; tp: number; nguong: number; dat: boolean }
 const doc = (p: string) => readFileSync(resolve(__dirname, '../src/styles', p), 'utf8')
 const trong = doc('trong.css')
+const mau = doc('trong-hs-mau.css')
 
 describe('màu tươi app học sinh 27/10', () => {
-  const bang = docBang(trong) as { sang: Record<string, string>; toi: Record<string, string> }
+  const bang = docBang(mau) as { sang: Record<string, string>; toi: Record<string, string> }
 
   it('màu nhấn đúng bảng Duolingo ở nền sáng, nền trắng tinh', () => {
     expect(bang.sang).toMatchObject({
@@ -36,7 +37,11 @@ describe('màu tươi app học sinh 27/10', () => {
     expect(goc).toContain('--tr-gv: #2563eb')
     expect(goc).toContain('--tr-hs-nut: #15803d')
     expect(goc).not.toContain('#58cc02')
-    expect(trong).not.toMatch(/\[data-trong='gv'\][^{]*\{[^}]*#58cc02/)
+    expect(trong).not.toContain('#58cc02')
+    expect(mau.replace(/\/\*[\s\S]*?\*\//g, '')).not.toMatch(/(^|\})\s*:root\s*\{|data-trong='gv'/)
+    // nạp lười: đi cùng mảnh học sinh, không vào trong.css (gói mở cả ba app)
+    expect(doc('trong-hs.css').startsWith("@import './trong-hs-mau.css';")).toBe(true)
+    expect(doc('trong-lam-bai.css').startsWith("@import './trong-hs-mau.css';")).toBe(true)
   })
 
   it('nút 3D và khối màu dùng gờ đáy cùng tông, không gờ xám pha --tr-phu', () => {
@@ -44,7 +49,7 @@ describe('màu tươi app học sinh 27/10', () => {
     expect(lam).toContain(":root[data-trong='hs'] .duo-nut { box-shadow: inset 0 -4px 0 var(--tr-chinh-day); }")
     expect(lam).toContain(":root[data-trong='hs'] .duo-nut[data-sac=do] { box-shadow: inset 0 -4px 0 var(--tr-sai-day); }")
     expect(hs).toMatch(/:root\[data-trong='hs'\] \.da-nut::before \{ background: var\(--n-d/)
-    expect(trong).toContain("[data-trong='hs'] { --tr-chinh-day: var(--tr-hs-day); }")
+    expect(mau).toContain("[data-trong='hs'] { --tr-chinh-day: var(--tr-hs-day); }")
   })
 
   it('linh vật Bi: viền cùng tông (không đen), dung dịch phẳng, Bi chuyển động khai lại tông ở svg', () => {
