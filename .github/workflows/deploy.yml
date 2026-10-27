@@ -21,7 +21,9 @@ permissions:
 
 concurrency:
   group: phat-hanh
-  cancel-in-progress: true
+  # 27/10: nhiều PR gộp liền nhau (~5–10 phút/lần) mà mỗi lượt phát hành ~15 phút ⇒ cancel-in-progress: true làm MỌI lượt bị huỷ giữa chừng,
+  # bản sống đứng yên cả đêm. Không huỷ lượt đang chạy; GitHub chỉ giữ 1 lượt chờ (lượt mới nhất thay lượt chờ cũ) ⇒ main mới nhất vẫn lên ngay sau.
+  cancel-in-progress: false
 
 jobs:
   phat-hanh:
