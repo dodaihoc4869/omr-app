@@ -18,6 +18,7 @@ export const SQL_GOI7: readonly string[] = [
   // Chỉ mục cho cổng câu mới theo em/QID/bản hiện tại; EXISTS không quét toàn bộ sổ hay JSON đề.
   `CREATE INDEX IF NOT EXISTS goi_bai_7_cau_qid ON goi_bai_7_cau(qid,version,goi_id)`,
   `CREATE INDEX IF NOT EXISTS goi_bai_7_gap_sbd_qid ON goi_bai_7_gap(sbd,qid,version)`,
+  `CREATE INDEX IF NOT EXISTS goi_bai_7_gap_sbd_luc ON goi_bai_7_gap(sbd,luc)`, // dấu Sảnh (san-sang.ts): dòng cuối của em — 28/10
   `CREATE INDEX IF NOT EXISTS game_v2_attempt_sbd_qid ON game_v2_attempt(sbd,qid,session)`,
   // Quyết định nhận bài và biên nhận CHỈ THÊM. Không xóa membership/sổ gặp khi thầy bớt em.
   `CREATE TABLE IF NOT EXISTS goi_bai_7_tick_em (tick_id TEXT PRIMARY KEY,sbd_json TEXT NOT NULL,luc TEXT NOT NULL)`,

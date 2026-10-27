@@ -41,6 +41,9 @@ export const CHI_MUC_CRON_DEM: readonly string[] = [
   'CREATE INDEX IF NOT EXISTS idx_skh_em_luc ON su_kien_hoc(sbd, luc)',
   //  · Lượt xem lời giải theo em + mốc giờ (`loi_giai_hoi WHERE sbd=? AND … AND luc>=?`, 24 nghìn lần khung học): chỉ mục cũ (sbd, qid, luc) ⇒ quét mọi câu.
   'CREATE INDEX IF NOT EXISTS idx_lg_hoi_em_luc ON loi_giai_hoi(sbd, luc)',
+  // 28/10 (nghiệm thu: câu DẤU của Sảnh đếm cả sổ của em mỗi lượt): dấu nay chỉ đọc DÒNG CUỐI theo (sbd, mốc giờ). Đã chạy --remote 28/10 (chỉ-thêm);
+  // bản sao server/migration-2810-chi-muc-dau-san-sang.sql. Chỉ mục cùng loại của goi_bai_7_gap (bảng tạo lúc chạy) ở SQL_GOI7 (goi-bai-7-schema.ts).
+  'CREATE INDEX IF NOT EXISTS idx_cld_em_cap_nhat ON chua_loi_dot(sbd, cap_nhat_luc)',
 ]
 /** Chạy từng câu riêng (một câu lỗi không chặn câu khác). Trả số câu lỗi; nơi gọi ghi nhật ký máy. */
 export async function dungChiMucCronDem(env: Env): Promise<number> {
