@@ -445,6 +445,10 @@ const DS_NB = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [14
 // ═══ MỤC TIÊU NGÀY THEO CÂU 27/10 (tiền tố "mtc-"): vòng Bi trên Lộ trình đo bằng câu như thẻ «Đủ x/y câu» — đủ mức («Đủ mức») · chưa đủ («12/30 câu»)
 const DS_MTC = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   [['du', 'hs-mot&tp=1&tt=du&mt=du'], ['chua', 'hs-mot&tp=1&mt=chua']].map(([t, m]) => [`mtc-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, /Ester/])))
+// ═══ GIẢI TUẦN — DÒNG EM LÀM ĐỐI PHÓ 27/10 (tiền tố "gdp-"): chữ phụ dưới tên em + thẻ lý do / cách gỡ sau khi chạm. 390×844 · 360×640 · 844×390 · 1440×900, sáng + tối.
+const DS_GDP = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  [['dong', 'ton:menu:Thành tích » nut:Giải tuần » xem:.tp-bxh .r[data-em]'], ['mo', 'ton:menu:Thành tích » nut:Giải tuần » nut:Tuần này làm đối phó']]
+    .map(([t, viec]) => [`gdp-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, 'hs-mot&tp=1&giai=doipho', w, hh, nen, false, /Ester/, viec])))
 // ═══ BI CHUYỂN ĐỘNG 27/10 (tiền tố "bd-"): mọi chỗ có Bi trong app học sinh — Lộ trình (Bi nói), câu đúng (mừng nhảy), câu sai (buồn), kết chặng
 // (nhảy múa), Thành tích, chuỗi ngày (lửa). 390×844 · 360×640 · 844×390 · 1440×900, sáng + tối. Bi chuyển động nạp lười ⇒ chờ thêm cho mảnh bi-dong.
 const DS_BD = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
@@ -638,6 +642,7 @@ const DS = [
   ...DS_KT, // KIỂM TRA ÔN TẬP KHOÁ CHẶNG 27/10
   ...DS_NB, // BẢNG + TẤM CHƯA TÍNH 27/10
   ...DS_BD, // BI CHUYỂN ĐỘNG 27/10
+  ...DS_GDP, // GIẢI TUẦN DÒNG EM ĐỐI PHÓ 27/10
   ...DS_MTC, // MỤC TIÊU NGÀY THEO CÂU 27/10
   ...DS_HSE, // LÀN HỒ SƠ EM 12/10F
   ...DS_THE1210E, // LÀN THẺ HÔM NAY 12/10E
@@ -841,6 +846,7 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       for (const buoc of viec.slice(4).split(' » ')) {
         if (buoc.startsWith('menu:')) await t.evaluate((ten) => [...document.querySelectorAll('button.tr-menu-muc')].find((b) => b.textContent?.trim().startsWith(ten))?.click(), buoc.slice(5))
         else if (buoc.startsWith('go:')) await t.getByRole('searchbox').first().fill(buoc.slice(3)) // 27/10: gõ vào ô tìm (Mời bạn)
+        else if (buoc.startsWith('xem:')) await t.evaluate((q) => document.querySelector(q)?.scrollIntoView({ block: 'center' }), buoc.slice(4)) // 27/10: cuộn phần tử vào giữa
         else await t.getByRole('button', { name: new RegExp('^' + buoc.slice(4)) }).first().click()
         await t.waitForTimeout(700)
       }

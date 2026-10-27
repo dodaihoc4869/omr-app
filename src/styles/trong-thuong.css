@@ -66,7 +66,6 @@
 [data-trong='hs'] .tp-luat { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
 [data-trong='hs'] .tp-luat li { display: flex; gap: 10px; align-items: flex-start; font-size: 14.5px; line-height: 1.45; }
 [data-trong='hs'] .tp-luat li > b:first-child { display: grid; place-items: center; width: 26px; height: 26px; flex: none; border-radius: 50%; background: var(--tr-sao-nhat); color: var(--tr-sao-chu); font-size: 13px; }
-[data-trong='hs'] .tp-gia { display: inline-flex; align-items: center; gap: 4px; font-weight: 900; color: var(--tp-tt-chu); white-space: nowrap; }
 [data-trong='hs'] .tp-loi { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 14px; border-radius: 14px; background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); font-size: 14px; font-weight: 700; }
 [data-trong='hs'] .tp-loi > span { flex: 1; min-width: 0; }
 [data-trong='hs'] .tp-cho { display: flex; flex-direction: column; gap: 12px; }
@@ -299,6 +298,17 @@
 [data-trong='hs'] .tp-bxh .r[data-vung='roi'] .h { color: var(--tr-sai-chu); }
 [data-trong='hs'] .tp-bxh .r[data-em] { z-index: 2; background: var(--tp-tt-nhat); box-shadow: inset 4px 0 0 var(--tp-tt); }
 [data-trong='hs'] .tp-bxh .r[data-em] .ten b { color: var(--tp-tt-chu); }
+/* Thầy 27/10: dòng của CHÍNH em khi tuần này làm đối phó (bảng tính 0) — chữ phụ chạm được (≥ 44px) mở thẻ lý do + cách gỡ ngay dưới dòng. Chỉ biến --tr-* (sáng/tối tự đổi). */
+[data-trong='hs'] .tp-bxh .g-chua-nut { display: flex; align-items: center; gap: 6px; min-height: 44px; margin: 2px 0 -6px; padding: 0; border: 0; background: none; color: var(--tr-chu-y-chu); font: inherit; font-size: 13px; font-weight: 800; line-height: 1.3; text-align: left; cursor: pointer; }
+[data-trong='hs'] .tp-bxh .g-chua-nut svg { width: 16px; height: 16px; flex: none; }
+[data-trong='hs'] .tp-bxh .g-chua-nut:focus-visible { outline: 3px solid var(--tr-tin); outline-offset: 2px; border-radius: 8px; }
+[data-trong='hs'] .tp-bxh .g-chua-tinh { padding: 12px 16px 14px 54px; border-top: 1px solid var(--tr-vien); background: var(--tr-chu-y-nhat); color: var(--tr-chu); font-size: 14px; line-height: 1.45; }
+[data-trong='hs'] .tp-bxh .g-chua-tinh b { display: block; margin-bottom: 6px; color: var(--tr-chu-y-chu); font-weight: 900; }
+[data-trong='hs'] .tp-bxh .g-chua-tinh p { margin: 8px 0 2px; font-weight: 800; color: var(--tr-chu-2); }
+[data-trong='hs'] .tp-bxh .g-chua-tinh ul { margin: 0; padding-left: 18px; }
+[data-trong='hs'] .tp-bxh .g-chua-tinh li { margin: 2px 0; }
+[data-trong='hs'] .tp-bxh .g-chua-tinh p:last-child { font-weight: 600; color: var(--tr-chu-2); }
+@media (max-width: 400px) { [data-trong='hs'] .tp-bxh .g-chua-tinh { padding-left: 16px; } }
 [data-trong='hs'] .tp-bxh .vach { display: flex; align-items: center; gap: 8px; min-height: 36px; padding: 6px 14px; font-size: 12.5px; font-weight: 900; letter-spacing: .05em; text-transform: uppercase; background: var(--tr-dung); color: var(--tr-trang); }
 [data-trong='hs'] .tp-bxh .vach[data-vung='roi'] { background: var(--tr-sai); }
 [data-trong='hs'] .tp-bxh .vach svg { width: 16px; height: 16px; }
@@ -359,7 +369,6 @@
 [data-trong='hs'] .tp-kq-kc { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 14px; font-weight: 900; }
 [data-trong='hs'] .tp-kq-kc[data-kq='dung'] { background: var(--tr-dung-nhat); color: var(--tr-dung-chu); }
 [data-trong='hs'] .tp-kq-kc[data-kq='sai'] { background: var(--tr-sai-nhat); color: var(--tr-sai-chu); }
-[data-trong='hs'] .tp-p-to { position: absolute; left: 30px; top: 20px; width: 120px; height: 120px; display: grid; place-items: center; border-radius: 50%; background: var(--tp-bang-nhat); color: var(--tp-bang-chu); font-size: 64px; font-weight: 900; box-shadow: inset 0 0 0 6px var(--tp-bang); z-index: 1; }
 [data-trong='hs'] .tp-binh-to { position: absolute; left: 24px; top: 4px; width: 120px; z-index: 1; }
 [data-trong='hs'] .tp-binh-con { display: flex; align-items: center; gap: 12px; }
 [data-trong='hs'] .tp-binh-con .tp-binh { width: 40px; }
@@ -544,7 +553,6 @@
   [data-trong='hs'] .tp-hai-bi > .bi-o { bottom: 22px; }
   [data-trong='hs'] .tp-hai-bi > .bi-o .bi { width: 88px; height: auto; }
   [data-trong='hs'] .tp-binh-to { width: 86px; }
-  [data-trong='hs'] .tp-p-to { width: 86px; height: 86px; font-size: 46px; left: 20px; top: 10px; }
   [data-trong='hs'] .tp-hai-bi { width: 220px; height: 170px; }
   [data-trong='hs'] .tp-hai-bi > .bi { width: 88px; height: auto; bottom: 22px; }
   [data-trong='hs'] .tp-hai-bi .lua-g { width: 56px; height: 64px; margin-left: -28px; }

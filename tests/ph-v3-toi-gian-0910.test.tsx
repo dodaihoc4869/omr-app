@@ -175,7 +175,7 @@ describe('ba mục · một nút chính mỗi màn · thẻ bo 24 px', () => {
 
   it('CSS: thanh mục 3 cột; thẻ (.ph3-the) và khối chính (.ph3-ah) bo 24 px; khối mới chỉ dùng biến --ph3-*', () => {
     const css = doc('src/components/ph-v3/ph-v3.css')
-    expect(css).toMatch(/\.ph3-dieu-huong \{[^}]*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\)/)
+    // 27/10: thanh mục `.ph3-dieu-huong` không còn ở màn nào (lớp không có trong src/) ⇒ luật CSS chết đã gỡ (docs/css-chet-2710b.json); bỏ khẳng định này.
     expect(css).toMatch(/\.ph3-the \{[^}]*border-radius: 24px/)
     expect(css).toMatch(/\.ph3-ah \{[^}]*border-radius: 24px/)
     const moi = css.slice(css.indexOf('/* bản vẽ tối giản 09/10: số bên phải'), css.indexOf('.ph3-thanh {'))

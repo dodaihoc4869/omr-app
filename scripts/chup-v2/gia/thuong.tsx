@@ -43,7 +43,10 @@ export function capFetchThuong(): void {
   void import('../../../src/styles/trong-hs.css'); void import('../../../src/styles/trong-lam-bai.css')
   const goc = window.fetch
   const BANG: Record<string, () => unknown> = {
-    '/hs/thuong': tqGoc, '/hs/giai': () => M.GIAI_GIA, '/hs/huy-hieu': () => M.HUY_HIEU_GIA,
+    '/hs/thuong': tqGoc, // 27/10 (cảnh giai-doi-pho): `&giai=doipho` ⇒ dòng CHÍNH em cuối bảng, 0 nguyên tử, có `chuaTinh` (lý do + cách gỡ); bạn khác chỉ số
+    '/hs/giai': () => (ts.get('giai') === 'doipho' ? { ...M.GIAI_GIA, nhom: M.GIAI_GIA.nhom.map((r) => (r.laEm
+      ? { ...r, thuHang: 20, nguyenTu: 0, chuaTinh: { nguyenTu: 623, lyDo: [{ ma: 'nhanMaSai', chu: '12/40 lượt trả lời trước khi đọc xong đề mà sai' }, { ma: 'khongLam', chu: '3 ngày liền không làm câu nào' }] } }
+      : { ...r, thuHang: r.thuHang > 4 ? r.thuHang - 1 : r.thuHang })) } : M.GIAI_GIA), '/hs/huy-hieu': () => M.HUY_HIEU_GIA,
     // 27/10 (cảnh ton-*): `&ban=0` ⇒ chưa có bạn học cùng; `&kc=0` ⇒ chưa vững chuyên đề nào
     '/hs/ban': () => (ts.get('ban') === '0' ? { ...M.BAN_GIA, ban: [] } : ts.get('ten') === 'dai' ? { ...M.BAN_GIA, ban: [...M.BAN_GIA.ban, { ma: 'b3', ten: 'Tôn Nữ Hoàng Phương Uyên Khánh Linh', lop: '11', chuoiDoi: 1, homNay: 'ban_chua', daGoCua: false }] } : M.BAN_GIA),
     '/hs/ban/tim': () => (ts.get('ten') === 'tim' ? { ok: true, bat: true, ketQua: [{ ma: 't1', ten: 'Lê Minh Đức', lop: '11', trangThai: null }, { ma: 't2', ten: 'Nguyễn Thị Minh Khai', lop: '12A1', trangThai: 'da_moi' }, { ma: 't3', ten: 'Tôn Nữ Hoàng Phương Uyên Khánh Linh', lop: '11', trangThai: null }] } : M.TIM_GIA),

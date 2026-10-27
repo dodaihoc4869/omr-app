@@ -1,10 +1,12 @@
 // CHẾ ĐỘ MÁY YẾU (thầy 29/09: "máy cấu hình yếu có vào mượt được không").
 //
 // Tự bật, em KHÔNG phải chọn:
-//   · Chrome/Android (CÓ navigator.deviceMemory): RAM ≤ 3 GB hoặc ≤ 4 luồng CPU;
+//   · Chrome/Android (CÓ navigator.deviceMemory): RAM ≤ 4 GB hoặc ≤ 4 luồng CPU (27/10: 4 GB — máy Android rẻ 4 GB vẫn giật ở giao diện Duolingo);
 //   · Safari/iOS (KHÔNG có deviceMemory): iOS/iPadOS < 16 (đọc "OS 15_…" trong userAgent) hoặc ≤ 2 luồng —
 //     Boss soát 29/09: không dùng "≤ 4 luồng" ở đây vì iPhone đời mới cũng báo ≤ 4 ⇒ mất kính mờ vô lý;
 //   · mọi máy: xin giảm chuyển động (prefers-reduced-motion) hoặc bật tiết kiệm dữ liệu (connection.saveData)
+//   · (27/10, thầy: «Máy yếu bị lag») ĐO THẬT: thông số tốt mà khung hình thật vẫn chậm (đo 2 s lúc app đứng yên, sau khi tải xong) ⇒ bật luôn và NHỚ
+//     cho lần mở sau (localStorage `ddh.mayYeu` = '1'; đặt '0' ⇒ không bao giờ bật — lùi tay một máy).
 // ⇒ gắn lớp `may-yeu` lên <html>. `src/styles/may-yeu.css` đọc lớp này để tắt kính mờ (backdrop-filter),
 // giảm bóng đổ lớn, cho hoạt ảnh trang trí chạy một lượt rồi đứng; các công tắc hiệu ứng nặng sẵn có
 // (hạt sáng / thị sai / pháo của Sảnh và Đảo, bản giản lược của chương trận đấu) hỏi `giamHieuUng()`.
@@ -41,8 +43,8 @@ export function docPhienBanIos(ua: string | undefined | null): number | undefine
 /** Máy có dấu hiệu yếu? Số không có / không hợp lệ ⇒ bỏ qua vế đó (không đoán). */
 export function laMayYeu(d: DauHieuMay): boolean {
   if (d.giamChuyenDong || d.tietKiemDuLieu) return true
-  // Trình duyệt CÓ deviceMemory (Chrome/Android): RAM ≤ 3 GB hoặc ≤ 4 luồng.
-  if (soHopLe(d.boNhoGb)) return d.boNhoGb <= 3 || (soHopLe(d.soLoi) && d.soLoi <= 4)
+  // Trình duyệt CÓ deviceMemory (Chrome/Android): RAM ≤ 4 GB hoặc ≤ 4 luồng.
+  if (soHopLe(d.boNhoGb)) return d.boNhoGb <= 4 || (soHopLe(d.soLoi) && d.soLoi <= 4)
   // KHÔNG có deviceMemory (Safari/iOS, Firefox): iOS < 16 hoặc ≤ 2 luồng.
   if (soHopLe(d.phienBanIos) && d.phienBanIos < 16) return true
   return soHopLe(d.soLoi) && d.soLoi <= 2
@@ -74,10 +76,15 @@ export function docDauHieuMay(w: Window = window): DauHieuMay {
   return d
 }
 
-/** Gắn lớp `may-yeu` lên <html> nếu máy yếu. Trả về true nếu đã bật. Lỗi bất kỳ ⇒ không bật (app chạy như cũ). */
+/** Khoá nhớ kết quả đo nhịp khung: '1' = máy này yếu (bật ngay lần mở sau), '0' = không bao giờ bật (lùi tay). */
+export const KHOA_NHO_MAY_YEU = 'ddh.mayYeu'
+
+/** Gắn lớp `may-yeu` lên <html> nếu máy yếu (thông số, hoặc lần đo trước đã thấy chậm — nhớ '1'; nhớ '0' ⇒ không bao giờ bật).
+ *  Trả về true nếu đã bật. Lỗi bất kỳ ⇒ không bật (app chạy như cũ). Đo nhịp khung thật: src/lib/do-nhip-khung.ts (mảnh nạp lười cổng HS). */
 export function batCheDoMayYeu(w: Window = window): boolean {
   try {
-    if (!laMayYeu(docDauHieuMay(w))) return false
+    const nho = w.localStorage?.getItem(KHOA_NHO_MAY_YEU)
+    if (nho === '0' || (nho !== '1' && !laMayYeu(docDauHieuMay(w)))) return false
     w.document.documentElement.classList.add(LOP_MAY_YEU)
     return true
   } catch {
