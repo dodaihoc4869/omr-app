@@ -118,3 +118,21 @@ describe('khung chữ L ôm giám thị (đề dài, thầy 27/10 tối)', () =>
     }
   })
 })
+
+describe('bong bóng càu nhàu: nền màu thân giám thị, chữ trắng đạt tương phản', () => {
+  const lum = (h: string) => { const v = [0, 2, 4].map((i) => parseInt(h.slice(1 + i, 3 + i), 16) / 255).map((c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4)); return 0.2126 * v[0]! + 0.7152 * v[1]! + 0.0722 * v[2]! }
+  const tron = (a: string, b: string, p: number) => '#' + [0, 2, 4].map((i) => Math.round(parseInt(a.slice(1 + i, 3 + i), 16) * p / 100 + parseInt(b.slice(1 + i, 3 + i), 16) * (1 - p / 100)).toString(16).padStart(2, '0')).join('')
+  const tuongPhan = (a: string, b: string) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05) }
+  it('cả 4 giám thị × sáng / tối ≥ 4,5 : 1 (đọc đúng tỉ lệ pha trong giam-thi.css và mã màu trong trong.css)', () => {
+    const css = readFileSync('src/components/giam-thi/giam-thi.css', 'utf8'), tr = readFileSync('src/styles/trong.css', 'utf8')
+    const mau = (m: string) => css.match(new RegExp(`--gt-mau-${m}: (#[0-9a-f]{6})`))![1]!
+    const tiLe = (m: string) => Number(css.match(new RegExp(`--gt-loi-nen: color-mix\\(in srgb, var\\(--gt-mau-${m}\\) (\\d+)%, var\\(--gt-toi\\)\\)`))![1])
+    const sangChu = tr.match(/--tr-chu: (#[0-9a-f]{6})/)![1]!, sangTrang = tr.match(/--tr-trang: (#[0-9a-f]{6})/)![1]!
+    const toi = tr.slice(tr.indexOf('prefers-color-scheme: dark')), toiChu = toi.match(/--tr-chu: (#[0-9a-f]{6})/)![1]!, toiTrang = toi.match(/--tr-trang: (#[0-9a-f]{6})/)![1]!
+    // .gt-loi: --gt-toi = --tr-chu (sáng) / --tr-trang (tối); chữ --gt-trang = --tr-trang (sáng) / --tr-chu (tối)
+    for (const m of THU_TU_GT) for (const [nenToi, chu] of [[sangChu, sangTrang], [toiTrang, toiChu]] as const) {
+      const nen = tron(mau(m), nenToi, tiLe(m))
+      expect(tuongPhan(nen, chu), `${m} ${nen}/${chu}`).toBeGreaterThanOrEqual(4.5)
+    }
+  })
+})

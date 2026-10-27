@@ -1035,6 +1035,14 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       const rong = await t.evaluate(() => { const b = document.querySelector('.duo-gt-bong'), d = b?.querySelector('.ht2-lam-de'); if (!b || !d) return 0
         return Math.round(b.getBoundingClientRect().bottom - d.getBoundingClientRect().bottom - 14) })
       if (rong > 24) tran.push(`${ten}: khung đề rỗng ${rong}px ở đáy`)
+      // bong bóng càu nhàu thoáng: cách khối phía trên và khung đề phía dưới ≥ 10 px, cách mép trái màn ≥ 16 px
+      const khe = await t.evaluate(() => { const l = document.querySelector('.gt-loi'), san = l?.closest('.duo-gt-san'); if (!l || !san) return ''
+        const a = l.getBoundingClientRect(), tren = san.previousElementSibling?.getBoundingClientRect(), duoi = san.querySelector('.duo-gt-bong')?.getBoundingClientRect(), loi = []
+        if (tren && a.top - tren.bottom < 9.5) loi.push(`trên ${Math.round(a.top - tren.bottom)}px`)
+        if (duoi && duoi.top - a.bottom < 9.5) loi.push(`dưới ${Math.round(duoi.top - a.bottom)}px`)
+        if (a.left < 15.5) loi.push(`lề trái ${Math.round(a.left)}px`)
+        return loi.join(', ') })
+      if (khe) tran.push(`${ten}: bong bóng càu nhàu sát (${khe})`)
       // tràn ngang TRONG khung cuộn (documentElement không thấy được vì khung là `fixed`)
       // bảng lớn cuộn ngang TRONG khung riêng (.cau-bang, có bóng mép) là chủ đích — không tính tràn
       const tranTrong = await t.evaluate(() => Math.max(0, ...[...document.querySelectorAll('.ht2-lam *')].filter((e) => !e.closest('.cau-bang, .ex-grid > *')).map((e) => Math.round(e.getBoundingClientRect().right - innerWidth))))

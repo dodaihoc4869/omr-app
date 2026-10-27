@@ -35,7 +35,7 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
   useEffect(() => {
     const el = host.current
     if (!el) return
-    const g = taoGiamThi(el, { muc })
+    const g = taoGiamThi(el, { muc, loiVao: el.closest('.duo-gt-san')?.querySelector<HTMLElement>(':scope > .duo-gt-loi-o') })
     gt.current = g
     if (nhip.phien !== phien) nhip = taoNhip(phien)
     cauMoi(nhip, qid)
