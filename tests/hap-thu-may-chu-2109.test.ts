@@ -35,36 +35,6 @@ const lamCau = (d: D1That, n: number, ngay = NGAY, o: { nguon?: string; ketQua?:
     .run(`${o.tienTo ?? 'k'}${ngay}-${i}`, `${o.tienTo ?? 'Q'}-${ngay}-${i}`, o.nguon ?? 'btvn', o.ketQua === undefined ? 1 : o.ketQua, `${ngay}T03:0${i % 10}:00.000Z`, ngay)
 }
 
-// SỬA CÓ CHỦ Ý 29/09 v5 (THẦY ĐÃ CHỐT, docs/DE-XUAT-EXP-V5-2909.md): hồ sơ nay chuyển tiếp v4 → v5 (luatCap 5, giữ cấp, tiến độ trong thanh theo tỉ lệ thanh v4 → v5), tin một lần mã `luat-cap-v5`,
-// bỏ trần 120 EXP game/ngày (nấc dạng nhận đủ, không còn `thuongGoc`), `expGameHomNay.tran` = null.
-// SỬA CÓ CHỦ Ý 29/09 (luật v4, docs/DE-XUAT-EXP-2909.md): BỎ cổng hấp thụ 200/120/0 và ống nghiệm. Bảy test cũ của cổng `invest` (trần 200/120/0, "no", "het_ong",
-// siết "có học", sang ngày mới…) khoá luật đã bỏ ⇒ thay bằng hành vi mới: mở hồ sơ v3 chuyển MỘT lần (ống nạp hết vào thú), `invest` không còn gì để nạp.
-describe('lệnh `invest` — luật v4 nạp tự do', () => {
-  it('hồ sơ v3 ống 500: mở ⇒ chuyển MỘT lần, 500 EXP vào thú (90 + 270 ⇒ cấp 3 dư 140), ống 0, ghi truocSiet4; invest trả daNap 0, KHÔNG ghi thêm; không còn hapThuHomNay', async () => {
-    gio(`${NGAY}T10:00:00`)
-    const d = taoD1That(); themHoSo(d)
-    const r = await invest(d) as any
-    expect(r).toMatchObject({ ok: true, daNap: 0, lyDo: null })
-    // v3 → v4: 500 vào thú (90 + 270 ⇒ cấp 3 dư 140 trên thanh v4 510) → v5: giữ cấp 3, tỉ lệ ⌊140/510 × 1 010⌋ = 277
-    expect(docHoSo(d)).toMatchObject({ cap: 3, exp: 277, wallet: 0, luatCap: 5, mocVang: 0, truocSiet4: { cap: 1, exp: 0, wallet: 500, earned: 0 }, truocV5: { cap: 3, exp: 140, choMoc: 0 } })
-    expect(revision(d)).toBe(1)
-    expect(r.profile).not.toHaveProperty('hapThuHomNay')
-    expect(r.profile).toMatchObject({ ongNghiem: 0, choMoc: 0 })
-    await invest(d); expect(revision(d)).toBe(1)
-  })
-
-  it('hồ sơ CHƯA chuyển được (thua CAS mãi) ⇒ invest bị chặn bằng lời, KHÔNG nạp theo luật cũ', async () => {
-    gio(`${NGAY}T10:00:00`)
-    const e = taoD1That(); themHoSo(e); themExp(e, 'dat_ngay')
-    const goc = e.env.DB.prepare.bind(e.env.DB)
-    e.env.DB.prepare = ((q: string) => {
-      if (/UPDATE game_v2_profile SET json = \?, revision = revision \+ 1 WHERE sbd = \? AND revision = \?/.test(q)) e.sql.prepare('UPDATE game_v2_profile SET revision = revision + 1').run()
-      return goc(q)
-    }) as never
-    await expect(invest(e)).rejects.toThrow('đang được cập nhật')
-    expect(docHoSo(e)).toMatchObject({ cap: 1, exp: 0, wallet: 500, luatCap: 3 })
-  })
-})
 
 describe('EXP học tập vào ỐNG NGHIỆM (không nạp thẳng vào cấp)', () => {
   it('congTongSoVaoHoSo: phần chênh cộng vào `wallet` và `earned`; cap/exp KHÔNG đổi; gọi lại không cộng đôi', () => {

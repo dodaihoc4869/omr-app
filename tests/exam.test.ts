@@ -1,36 +1,34 @@
 import { describe, expect, it } from 'vitest'
-import { validateTeacherSource, mergeAndStrip } from '../src/data/examContent'
-import { parseExamText } from '../src/lib/exam-parse'
+import { validateTeacherSource, mergeAndStrip, type TeacherExamSource } from '../src/data/examContent'
 import { assignStudentQuestions } from '../src/lib/exam-assign'
 import { gradeSubmissionFull, gradeFromKeyBank } from '../src/lib/exam-grade'
 import { hashSeed, seededPermutation } from '../src/lib/exam-shuffle'
 import { emptyAnswerRecord } from '../src/lib/exam-db'
 
-function makeSampleText(maDe: string, n1: number, n2: number, n3: number): string {
-  const p1 = Array.from({ length: n1 }, (_, i) => {
-    const correctIdx = i % 4
-    const letters = ['A', 'B', 'C', 'D']
-    return [
-      `${i + 1}) Câu hỏi phần I số ${i + 1} của ${maDe}`,
-      ...letters.map((l) => `${l === letters[correctIdx] ? '*' : ''}${l}. Lựa chọn ${l} câu ${i + 1}`),
-    ].join('\n')
-  }).join('\n')
-
-  const p2 = Array.from({ length: n2 }, (_, i) => {
-    return [
-      `${i + 1}) Câu hỏi phần II số ${i + 1} của ${maDe}`,
-      `a) Ý a (Đ)`,
-      `b) Ý b (S)`,
-      `c) Ý c (Đ)`,
-      `d) Ý d (S)`,
-    ].join('\n')
-  }).join('\n')
-
-  const p3 = Array.from({ length: n3 }, (_, i) => {
-    return [`${i + 1}) Câu hỏi phần III số ${i + 1} của ${maDe}`, `=> ${i + 1},00`].join('\n')
-  }).join('\n')
-
-  return `MÃ ĐỀ: ${maDe}\nPHẦN I\n${p1}\nPHẦN II\n${p2}\nPHẦN III\n${p3}\n`
+// Dựng đề mẫu thẳng thành đối tượng (bộ đọc văn bản đề exam-parse đã gỡ 27/10 vì không màn nào dùng).
+// Cùng dạng bộ đọc cũ trả ra: id `${maDe}-pN-i`, Phần I đáp án xoay vòng A→D, Phần II Đ-S-Đ-S, Phần III "i+1,00".
+function makeSampleSource(maDe: string, n1: number, n2: number, n3: number): TeacherExamSource {
+  const letters = ['A', 'B', 'C', 'D'] as const
+  return {
+    maDe,
+    phanI: Array.from({ length: n1 }, (_, i) => ({
+      id: `${maDe}-p1-${i}`,
+      text: `Câu hỏi phần I số ${i + 1} của ${maDe}`,
+      choices: letters.map((l) => `Lựa chọn ${l} câu ${i + 1}`) as [string, string, string, string],
+      correct: letters[i % 4],
+    })),
+    phanII: Array.from({ length: n2 }, (_, i) => ({
+      id: `${maDe}-p2-${i}`,
+      text: `Câu hỏi phần II số ${i + 1} của ${maDe}`,
+      ideas: ['Ý a', 'Ý b', 'Ý c', 'Ý d'] as [string, string, string, string],
+      correct: ['D', 'S', 'D', 'S'] as ['D', 'S', 'D', 'S'],
+    })),
+    phanIII: Array.from({ length: n3 }, (_, i) => ({
+      id: `${maDe}-p3-${i}`,
+      text: `Câu hỏi phần III số ${i + 1} của ${maDe}`,
+      correct: `${i + 1},00`,
+    })),
+  }
 }
 
 describe('exam-shuffle', () => {
@@ -52,142 +50,16 @@ describe('exam-shuffle', () => {
   })
 })
 
-describe('exam-parse', () => {
-  it('đọc đúng số câu + đáp án đúng đã đánh dấu bằng *', () => {
-    const text = makeSampleText('de-a', 20, 5, 8)
-    const result = parseExamText(text)
-    expect(result.errors).toEqual([])
-    expect(result.source).not.toBeNull()
-    expect(result.source!.phanI).toHaveLength(20)
-    expect(result.source!.phanII).toHaveLength(5)
-    expect(result.source!.phanIII).toHaveLength(8)
-    // câu 1 đánh dấu đúng ở lựa chọn A (correctIdx = 0 % 4 = 0)
-    expect(result.source!.phanI[0].correct).toBe('A')
-    // câu 2 đánh dấu đúng ở lựa chọn B (correctIdx = 1 % 4 = 1)
-    expect(result.source!.phanI[1].correct).toBe('B')
-    expect(result.source!.phanII[0].correct).toEqual(['D', 'S', 'D', 'S'])
-    expect(result.source!.phanIII[0].correct).toBe('1,00')
-  })
-
+describe('validateTeacherSource', () => {
   it('không bắt buộc đúng 18/4/6 câu — validateTeacherSource chỉ đòi >=1 mỗi phần', () => {
-    const text = makeSampleText('de-nho', 3, 2, 2)
-    const result = parseExamText(text)
-    expect(result.source).not.toBeNull()
-    expect(validateTeacherSource(result.source!)).toEqual([])
-  })
-
-  it('báo lỗi khi thiếu tiêu đề Phần', () => {
-    const result = parseExamText('MÃ ĐỀ: x\nPHẦN I\n1) a\nA. x\n*B. y\nC. z\nD. w\n')
-    expect(result.errors.length).toBeGreaterThan(0)
-  })
-
-  it('đọc đúng bảng số liệu [BANG]...[/BANG] — tái tạo y nguyên từng ô, không suy đoán', () => {
-    const text = [
-      'MÃ ĐỀ: co-bang',
-      'PHẦN I',
-      '1) Cho bảng số liệu sau:',
-      '[BANG]',
-      'Thời gian (phút) | Nồng độ (M)',
-      '0 | 1,0',
-      '5 | 0,5',
-      '[/BANG]',
-      'Nồng độ ở phút thứ 5 là bao nhiêu?',
-      'A. 1,0',
-      '*B. 0,5',
-      'C. 0,25',
-      'D. 2,0',
-      '2) câu 2',
-      'A. x',
-      '*B. y',
-      'C. z',
-      'D. w',
-      'PHẦN II',
-      '1) c',
-      'a) a (Đ)',
-      'b) b (S)',
-      'c) c (Đ)',
-      'd) d (S)',
-      'PHẦN III',
-      '1) c',
-      '=> 1',
-    ].join('\n')
-    const result = parseExamText(text)
-    expect(result.errors).toEqual([])
-    const q = result.source!.phanI[0]
-    expect(q.table).toEqual([
-      ['Thời gian (phút)', 'Nồng độ (M)'],
-      ['0', '1,0'],
-      ['5', '0,5'],
-    ])
-    // Dòng bảng KHÔNG bị lẫn vào text câu hỏi
-    expect(q.text).not.toMatch(/\|/)
-    expect(q.text).toContain('Cho bảng số liệu sau')
-    expect(q.text).toContain('Nồng độ ở phút thứ 5 là bao nhiêu')
-  })
-
-  it('gắn đúng ảnh theo mã [ANH:token] và xoá marker khỏi text câu hỏi', () => {
-    const text = [
-      'MÃ ĐỀ: co-anh',
-      'PHẦN I',
-      '1) Quan sát đồ thị sau [ANH:img_test1] và cho biết X là gì?',
-      'A. a',
-      '*B. b',
-      'C. c',
-      'D. d',
-      '2) câu 2',
-      'A. x',
-      '*B. y',
-      'C. z',
-      'D. w',
-      'PHẦN II',
-      '1) c',
-      'a) a (Đ)',
-      'b) b (S)',
-      'c) c (Đ)',
-      'd) d (S)',
-      'PHẦN III',
-      '1) c',
-      '=> 1',
-    ].join('\n')
-    const imageMap = { img_test1: 'data:image/png;base64,AAA' }
-    const result = parseExamText(text, imageMap)
-    expect(result.errors).toEqual([])
-    const q = result.source!.phanI[0]
-    expect(q.imageDataUrl).toBe('data:image/png;base64,AAA')
-    expect(q.text).not.toContain('[ANH:')
-    expect(q.text).toContain('Quan sát đồ thị sau')
-  })
-
-  it('mergeAndStrip giữ nguyên bảng/ảnh khi gộp sang bản public (không phải bí mật cần xoá)', () => {
-    const text = [
-      'MÃ ĐỀ: giu-bang',
-      'PHẦN I',
-      '1) câu 1 [ANH:img_x]',
-      'A. a',
-      '*B. b',
-      'C. c',
-      'D. d',
-      'PHẦN II',
-      '1) c',
-      'a) a (Đ)',
-      'b) b (S)',
-      'c) c (Đ)',
-      'd) d (S)',
-      'PHẦN III',
-      '1) c',
-      '=> 1',
-    ].join('\n')
-    const source = parseExamText(text, { img_x: 'data:image/png;base64,BBB' }).source!
-    const bank = mergeAndStrip([source])
-    expect(bank.phanI[0].imageDataUrl).toBe('data:image/png;base64,BBB')
-    expect((bank.phanI[0] as unknown as { correct?: string }).correct).toBeUndefined()
+    expect(validateTeacherSource(makeSampleSource('de-nho', 3, 2, 2))).toEqual([])
   })
 })
 
 describe('mergeAndStrip', () => {
   it('gộp nhiều đề và xoá sạch đáp án đúng khỏi bản public', () => {
-    const s1 = parseExamText(makeSampleText('a', 10, 3, 4)).source!
-    const s2 = parseExamText(makeSampleText('b', 10, 3, 4)).source!
+    const s1 = makeSampleSource('a', 10, 3, 4)
+    const s2 = makeSampleSource('b', 10, 3, 4)
     const bank = mergeAndStrip([s1, s2])
     expect(bank.phanI).toHaveLength(20)
     expect(bank.phanII).toHaveLength(6)
@@ -198,10 +70,18 @@ describe('mergeAndStrip', () => {
     const ids = bank.phanI.map((q) => q.id)
     expect(new Set(ids).size).toBe(ids.length)
   })
+
+  it('mergeAndStrip giữ nguyên bảng/ảnh khi gộp sang bản public (không phải bí mật cần xoá)', () => {
+    const source = makeSampleSource('giu-bang', 1, 1, 1)
+    source.phanI[0] = { ...source.phanI[0], correct: 'B', imageDataUrl: 'data:image/png;base64,BBB' }
+    const bank = mergeAndStrip([source])
+    expect(bank.phanI[0].imageDataUrl).toBe('data:image/png;base64,BBB')
+    expect((bank.phanI[0] as unknown as { correct?: string }).correct).toBeUndefined()
+  })
 })
 
 describe('exam-assign — random chọn câu theo học sinh', () => {
-  const s1 = parseExamText(makeSampleText('nganhang', 40, 10, 12)).source!
+  const s1 = makeSampleSource('nganhang', 40, 10, 12)
   const bank = mergeAndStrip([s1])
 
   it('cùng 1 học sinh trong cùng 1 ca luôn nhận đúng 1 bộ câu cố định', () => {
@@ -225,7 +105,7 @@ describe('exam-assign — random chọn câu theo học sinh', () => {
   })
 
   it('ngân hàng nhỏ hơn mức cần thì lấy hết, không lỗi', () => {
-    const smallSource = parseExamText(makeSampleText('nho', 5, 2, 3)).source!
+    const smallSource = makeSampleSource('nho', 5, 2, 3)
     const smallBank = mergeAndStrip([smallSource])
     const a = assignStudentQuestions(smallBank, 'ca02', 'hs001')
     expect(a.phanI).toHaveLength(5)
@@ -236,7 +116,7 @@ describe('exam-assign — random chọn câu theo học sinh', () => {
 
 describe('exam-grade — chấm bài từ ngân hàng câu hỏi khớp với engine chấm chuẩn', () => {
   it('học sinh trả lời đúng hết toàn bộ câu được gán thì được 10 điểm', () => {
-    const s1 = parseExamText(makeSampleText('grade-test', 40, 10, 12)).source!
+    const s1 = makeSampleSource('grade-test', 40, 10, 12)
     const maCa = 'ca-grade'
     const sbd = 'hs042'
     const assignment = assignStudentQuestions(mergeAndStrip([s1]), maCa, sbd)
@@ -263,13 +143,13 @@ describe('exam-grade — chấm bài từ ngân hàng câu hỏi khớp với en
   })
 
   it('không trả lời gì thì được 0 điểm, không throw lỗi', () => {
-    const s1 = parseExamText(makeSampleText('grade-empty', 20, 5, 8)).source!
+    const s1 = makeSampleSource('grade-empty', 20, 5, 8)
     const graded = gradeSubmissionFull([s1], 'ca-empty', 'hs001', emptyAnswerRecord())
     expect(graded.score.total).toBe(0)
   })
 
   it('chấm lại (regrade) từ submission độc lập ra đúng kết quả y hệt lần đầu — vì assignment deterministic', () => {
-    const s1 = parseExamText(makeSampleText('regrade', 40, 10, 12)).source!
+    const s1 = makeSampleSource('regrade', 40, 10, 12)
     const maCa = 'ca-regrade'
     const sbd = 'hs777'
     const assignment = assignStudentQuestions(mergeAndStrip([s1]), maCa, sbd)
@@ -293,7 +173,7 @@ describe('exam-grade — chấm bài từ ngân hàng câu hỏi khớp với en
   })
 
   it('gradeFromKeyBank (dùng trực tiếp keyBank server trả về lúc nộp bài) liệt kê đúng câu sai theo thứ tự hiển thị', () => {
-    const s1 = parseExamText(makeSampleText('keybank-test', 8, 4, 4)).source!
+    const s1 = makeSampleSource('keybank-test', 8, 4, 4)
     const maCa = 'ca-keybank'
     const sbd = 'hs099'
     const keyBank = { phanI: s1.phanI, phanII: s1.phanII, phanIII: s1.phanIII }
@@ -331,7 +211,7 @@ describe('exam-grade — chấm bài từ ngân hàng câu hỏi khớp với en
   })
 
   it('gradeFromKeyBank: đáp án Phần III lệch dấu phẩy/chấm hoặc có khoảng trắng vẫn được coi là đúng', () => {
-    const s1 = parseExamText(makeSampleText('keybank-norm', 2, 2, 4)).source!
+    const s1 = makeSampleSource('keybank-norm', 2, 2, 4)
     const maCa = 'ca-keybank-norm'
     const sbd = 'hs100'
     const keyBank = { phanI: s1.phanI, phanII: s1.phanII, phanIII: s1.phanIII }
@@ -353,7 +233,7 @@ describe('exam-grade — chấm bài từ ngân hàng câu hỏi khớp với en
 // bản công khai là em mở công cụ nhà phát triển đọc được đáp án, mà app vẫn
 // chạy đúng nên không test nào khác báo. Khoá cứng ở đây.
 describe('Bản đề gửi máy em KHÔNG chứa đáp án', () => {
-  const nguon = parseExamText(makeSampleText('bi-mat', 4, 2, 2)).source!
+  const nguon = makeSampleSource('bi-mat', 4, 2, 2)
 
   it('bản gốc của thầy CÓ đáp án — nếu không thì test dưới vô nghĩa', () => {
     expect(nguon.phanI[0]).toHaveProperty('correct')

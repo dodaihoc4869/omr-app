@@ -6,7 +6,7 @@ import { act, cleanup, fireEvent, render, waitFor } from '@testing-library/react
 import { datKhungGia } from './_khung-gia-2109'
 import fs from 'node:fs'
 import path from 'node:path'
-import { taoDuLieuGia } from '../src/lib/bang-tin-san/mau-gia'
+import { taoDuLieuGia } from './fixtures/bang-tin-san-du-lieu-gia'
 import { chotSo } from '../src/lib/bang-tin-san/trang-thai'
 import type { DanDauSan, EmNhiet, LopSan } from '../src/lib/bang-tin-san/kieu'
 import type { BangTin, BaiTapBangTin, EmCanDeY } from '../src/lib/bang-tin-thay'

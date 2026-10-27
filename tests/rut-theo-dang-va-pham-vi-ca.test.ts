@@ -13,7 +13,6 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { chonCauLuyen } from '../src/lib/bai-tap-pdf'
-import { khopLoc, rutBaiTap } from '../src/lib/bai-tap'
 import { dungUngVien, locTheoYeuCau, demDangUngVien } from '../src/lib/rut-de'
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion } from '../src/data/examContent'
 
@@ -137,20 +136,6 @@ describe('ba lựa chọn dạng câu ở mọi chỗ rút', () => {
     const kq = chonCauLuyen(kho(), { chuyenDe: [], chuyenDeCa: ['Trong ca'], dang: 'bai_tap', soCau: 10, ngauNhien: () => 0 })
     expect(kq.cau.length).toBeGreaterThan(0)
     for (const c of kq.cau) expect(c.dang).toBe('bai_tap')
-  })
-
-  it('7. giao bài tập: bộ lọc dạng ăn vào cả ba phần', () => {
-    const chiLt = rutBaiTap(kho(), { chuyenDe: [], mucDo: 'tron', dang: 'ly_thuyet', soCau: 10, ngauNhien: () => 0 })
-    expect(chiLt.keyBank.phanIII.length).toBe(0) // Phần III luôn là bài tập
-    expect(chiLt.keyBank.phanI.length).toBeGreaterThan(0)
-    const chiBt = rutBaiTap(kho(), { chuyenDe: [], mucDo: 'tron', dang: 'bai_tap', soCau: 10, ngauNhien: () => 0 })
-    expect(chiBt.keyBank.phanI.length).toBe(0)
-    expect(chiBt.keyBank.phanIII.length).toBeGreaterThan(0)
-  })
-
-  it('8. khopLoc mặc định KHÔNG lọc dạng — chỗ gọi cũ không đổi hành vi', () => {
-    expect(khopLoc(lyThuyet('x', 'A'), [], 'tron')).toBe(true)
-    expect(khopLoc(baiTapIII('y', 'A'), [], 'tron')).toBe(true)
   })
 
   it('9. rút đề: ứng viên mang dạng, và bộ lọc cắt đúng', () => {

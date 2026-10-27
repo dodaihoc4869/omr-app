@@ -517,17 +517,6 @@ describe('mảnh khiên → khiên rèn (nối vào hồ sơ game)', () => {
     expect(khienConLai(q)).toBe(1)
     expect(khienRenChuaDung(q)).toBe(1)
   })
-  it('lệnh `shield-use` của game v2 dùng được khiên rèn (còn lại = quà + rèn − đã dùng)', async () => {
-    const d = await dung()
-    d.sql.prepare('UPDATE game_v2_profile SET json=? WHERE sbd=?').run(JSON.stringify(hoSoGame({ cap: 5, khienRen: { manh: 0, daRen: 1 } })), 'S1')
-    const r = await gameV2(d.env, 'shield-use', { token: 'token-S1', useId: 'khien-ren-0000001' })
-    expect((r.profile as any).khienRen).toMatchObject({ daRen: 1, conLai: 0 })
-    // Hết 10 giây bật khiên: còn lại = 0 (quà 0 + rèn 1 − đã dùng 1) → từ chối.
-    const p = docHoSoGame(d)
-    p.shields.activeUntil = 0
-    d.sql.prepare('UPDATE game_v2_profile SET json=? WHERE sbd=?').run(JSON.stringify(p), 'S1')
-    await expect(gameV2(d.env, 'shield-use', { token: 'token-S1', useId: 'khien-ren-0000002' })).rejects.toThrow('chưa có')
-  })
 })
 
 describe('chuyển tiếp: không trả đôi trong NGÀY phát hành', () => {

@@ -7,7 +7,7 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
 import { chenhLech, chotSo, chuMoc, gioGiayVN, kiemTraKhop } from '../src/lib/bang-tin-san/trang-thai'
-import { chiaNguyen, taoDuLieuGia } from '../src/lib/bang-tin-san/mau-gia'
+import { taoDuLieuGia } from './fixtures/bang-tin-san-du-lieu-gia'
 import type { DuLieuSan, TinSan } from '../src/lib/bang-tin-san/kieu'
 import BangTinSan from '../src/components/bang-tin-san/BangTinSan'
 import { SoLan } from '../src/components/bang-tin-san/SoLan'
@@ -28,10 +28,6 @@ beforeEach(() => { khung = datKhungGia() })
 afterEach(() => { cleanup(); vi.unstubAllGlobals() })
 
 describe('dữ liệu giả có hạt giống — đúng hợp đồng và KHỚP nhau', () => {
-  it('cùng hạt giống ⇒ cùng dữ liệu; hạt giống khác ⇒ khác', () => {
-    expect(JSON.stringify(taoDuLieuGia(NAY))).toBe(JSON.stringify(taoDuLieuGia(NAY)))
-    expect(JSON.stringify(taoDuLieuGia(NAY, 7))).not.toBe(JSON.stringify(taoDuLieuGia(NAY, 8)))
-  })
   it('tổng lớp = câu đã làm; ô nhiệt = em đã học; số câu các nến cộng đúng bằng tổng; chuỗi tia đủ 60 điểm kết thúc ĐÚNG số hiện tại', () => {
     const d = goc()
     expect(kiemTraKhop(d)).toEqual([])
@@ -44,11 +40,6 @@ describe('dữ liệu giả có hạt giống — đúng hợp đồng và KHỚ
     expect(d.tia!.cau[59]).toBe(d.soCau)
     expect(d.tia!.nhip![59]).toBe(d.dungNhip!.soEm)
     expect(d.moPhong).toBe(true)
-  })
-  it('chiaNguyen: tổng khớp tuyệt đối theo trọng số', () => {
-    expect(chiaNguyen(100, [1, 1, 1])).toEqual([34, 33, 33])
-    expect(chiaNguyen(10, [0, 0, 0]).reduce((a, b) => a + b, 0)).toBe(10)
-    expect(chiaNguyen(7, [3, 1])).toEqual([5, 2])
   })
 })
 

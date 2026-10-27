@@ -6,7 +6,7 @@ import { datKhungGia } from './_khung-gia-2109'
 import fs from 'node:fs'
 import path from 'node:path'
 import { kiemTraKhop, phay, conLai, gioPhutMs } from '../src/lib/bang-tin-san/trang-thai'
-import { phatSuKienGia, taoDuLieuGia } from '../src/lib/bang-tin-san/mau-gia'
+import { phatSuKienGia, taoDuLieuGia } from './fixtures/bang-tin-san-du-lieu-gia'
 import type { NenSan } from '../src/lib/bang-tin-san/kieu'
 import BangTinSan from '../src/components/bang-tin-san/BangTinSan'
 import { NEN_MS, NenHoc, veNen } from '../src/components/bang-tin-san/NenHoc'
@@ -267,24 +267,6 @@ describe('BangTinSan — nến trong khung', () => {
     for (let i = 0; i < 60; i++) d = phatSuKienGia(d, NAY + i * 700, 100 + i)
     expect(kiemTraKhop(d)).toEqual([])
     expect(d.nen!.reduce((t, n) => t + n.soCau, 0)).toBe(d.soCau)
-  })
-})
-
-describe('phatSuKienGia — mô phỏng THUẦN và khớp', () => {
-  it('không sửa bản cũ; +1 câu ở đúng một em / một lớp / tổng / nến cuối; sang khung 5 phút thì thêm nến mới', () => {
-    const d0 = taoDuLieuGia(NAY)
-    const snap = JSON.stringify(d0)
-    const d1 = phatSuKienGia(d0, NAY + 1000, 5)
-    expect(JSON.stringify(d0)).toBe(snap)
-    expect(d1.soCau).toBe(d0.soCau + 1)
-    expect(d1.nhiet!.reduce((t, e) => t + e.soCau, 0)).toBe(d0.nhiet!.reduce((t, e) => t + e.soCau, 0) + 1)
-    expect(d1.nen!).toHaveLength(d0.nen!.length)
-    expect(d1.nen![d1.nen!.length - 1]!.soCau).toBe(d0.nen![d0.nen!.length - 1]!.soCau + 1)
-    const d2 = phatSuKienGia(d1, NAY + 6 * 60_000, 6)
-    expect(d2.nen!).toHaveLength(d1.nen!.length + 1)
-    expect(d2.nen![d2.nen!.length - 1]!.soCau).toBe(1)
-    expect(d2.nen![d2.nen!.length - 1]!.mo).toBe(d1.nen![d1.nen!.length - 1]!.dong)
-    expect(kiemTraKhop(d2)).toEqual([])
   })
 })
 

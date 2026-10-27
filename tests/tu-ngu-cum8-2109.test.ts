@@ -12,7 +12,6 @@ const CAP: [string, string, string][] = [
   ['src/screens/PhieuScreen.tsx', 'Đúng bộ câu Thầy Đỗ Đại Học đã gán riêng cho', 'Đúng bộ câu máy đã gán riêng cho'],
   ['src/screens/StudentPortalScreen.tsx', 'để A.I Đỗ Đại Học chấm điểm ngay', 'để máy chấm điểm ngay'],
   ['src/components/KhoiBaiLuyen.tsx', 'Thầy Đỗ Đại Học rút đúng chuyên đề em vừa mất điểm', 'Máy rút đúng chuyên đề em vừa mất điểm'],
-  ['src/components/KhoiLuyenKhacPhuc.tsx', 'bấm nộp và app chấm', 'bấm nộp và máy chấm'],
   // 06/10 gọn mã lần 2 (docs/gon-ma-0610-lan-2.md): bỏ dòng của KhungLoiGiaiGame.tsx (game Thần thú v1, đã xoá).
 ]
 describe('cụm 8 · "Máy" làm chủ ngữ tự động ⇒ "A.I Đỗ Đại Học"', () => {

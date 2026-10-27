@@ -13,10 +13,10 @@ const dongChu = (p: string) =>
     .filter((l) => !/^\s*(\/\/|\*|\/\*|\{\/\*)/.test(l) && !/\*\/\}?\s*$/.test(l)) // bỏ dòng chú thích (kể cả dòng kết thúc khối chú thích)
     .map((l) => l.replace(/\s\/\/\s.*$/, ''))
 
+// 27/10: bỏ NutVaoThi.tsx, BaoCaoCaThiPhuHuynhModal.tsx, InfographicHuongDan.tsx (gỡ khỏi src/ vì không màn nào dùng).
 const TEP_HS_PH = [
   'src/components/bang-nhiem-vu/LichSuCaM3.tsx',
   'src/components/bang-nhiem-vu/VaoThiForm.tsx',
-  'src/components/bang-nhiem-vu/NutVaoThi.tsx',
   'src/lib/nhiem-vu-adapter.ts',
   'src/lib/tro-ly-ca-nhan.ts',
   'src/screens/StudentPortalScreen.tsx',
@@ -24,13 +24,11 @@ const TEP_HS_PH = [
   'src/components/KhoiKhacPhuc3CheDo.tsx',
   'src/components/ModalKhacPhucCauSai.tsx',
   'src/components/BangTinPhuHuynh.tsx',
-  'src/components/BaoCaoCaThiPhuHuynhModal.tsx',
   // 28/09: modal học sinh cũ ĐÃ XOÁ — báo cáo của em bản mới (nạp + vẽ + số liệu):
   'src/components/ca-thi/BaoCaoCaCuaEm.tsx',
   'src/components/ca-thi/BaoCaoChiTiet.tsx',
   'src/components/ca-thi/CauCanChua.tsx',
   'src/lib/bao-cao-cua-em.ts',
-  'src/components/InfographicHuongDan.tsx',
   // 06/10 gọn mã lần 2 (docs/gon-ma-0610-lan-2.md): bỏ TheCaGanNhat.tsx (thẻ PH cũ, "lô dọn" ở docs/ph-toi-gian-2109.md, đã xoá).
   'src/components/BieuDoTienBoGoogle.tsx',
   // 06/10 gọn mã lần 2 (docs/gon-ma-0610-lan-2.md): bỏ ThanThuHoaHocGame.tsx (game Thần thú v1, đã xoá).
@@ -68,9 +66,6 @@ describe('chữ mới đúng chuẩn', () => {
     const cong = doc('src/screens/StudentPortalScreen.tsx')
     expect(cong).toContain('Mã ca kiểm tra (thường 6 chữ số)')
     expect(cong).toContain('Vui lòng nhập mã ca kiểm tra hợp lệ (từ 4 đến 8 chữ số)') // luật 4–8 chữ số không đổi (chỉ đổi chữ)
-  })
-  it('nút nổi khi ca đang mở: "Vào ca kiểm tra (đang mở)"; không ca: vẫn "Vào thi"', () => {
-    expect(doc('src/components/bang-nhiem-vu/NutVaoThi.tsx')).toContain("caDangMo ? 'Vào ca kiểm tra (đang mở)' : 'Vào thi'")
   })
   it('trợ lý: "Ôn trước ca kiểm tra"', () => {
     expect(doc('src/lib/nhiem-vu-adapter.ts')).toContain("on_thi: 'Ôn trước ca kiểm tra'")

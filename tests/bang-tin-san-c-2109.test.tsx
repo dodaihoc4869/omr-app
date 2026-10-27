@@ -6,7 +6,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { boTriLop, datNhanChongLap, docRgb, mauTheoTiLe, tiLeLop, tyLeCao, type ViTriNhan } from '../src/lib/bang-tin-san/ban-do-chung'
 import { veIso, type MauIso } from '../src/lib/bang-tin-san/ban-do-iso'
-import { taoDuLieuGia } from '../src/lib/bang-tin-san/mau-gia'
+import { taoDuLieuGia } from './fixtures/bang-tin-san-du-lieu-gia'
 import type { LopSan } from '../src/lib/bang-tin-san/kieu'
 import type { MauSan } from '../src/components/bang-tin-san/hooks'
 
@@ -395,7 +395,7 @@ describe('nguồn (c)', () => {
     const tep = ['BangTinSan', 'BanDo3D', 'NenHoc', 'OSo', 'ThanhTren', 'BangChay', 'SoLan', 'TiaCanvas'].map((f) => doc(`src/components/bang-tin-san/${f}.tsx`))
     for (const t of tep) expect(t).not.toMatch(/from 'three'|require\('three'\)/)
     expect(doc('src/components/bang-tin-san/hooks.ts')).not.toMatch(/'three'/)
-    for (const f of ['ban-do-chung', 'ban-do-iso', 'kieu', 'trang-thai', 'mau-gia']) expect(doc(`src/lib/bang-tin-san/${f}.ts`)).not.toMatch(/'three'/)
+    for (const f of ['ban-do-chung', 'ban-do-iso', 'kieu', 'trang-thai']) expect(doc(`src/lib/bang-tin-san/${f}.ts`)).not.toMatch(/'three'/)
     expect(doc('src/components/bang-tin-san/ban-do-3d-three.ts')).toMatch(/import \* as T from 'three'/)
     expect(doc('src/components/bang-tin-san/BanDo3D.tsx')).toMatch(/import\('\.\/ban-do-3d-three'\)/)
     expect(doc('src/components/bang-tin-san/BanDo3D.tsx')).not.toMatch(/^import (?!type)[^\n]*from '\.\/ban-do-3d-three'/m) // chỉ được import KIỂU (bị xoá lúc dựng), không import giá trị

@@ -19,7 +19,6 @@ const KHONG_GOI_MAY_CHU: Record<string, number> = {
   'src/components/luyen-de/dung-luyen-de.ts': 1, // lõi luyện đề chuẩn cấu trúc (tách từ LuyenDeChuan 30/09): 1 s thử tự nộp lại khi hết giờ
   'src/components/NutNopBtvn.tsx': 1,
   'src/components/PhongChoGame.tsx': 0, // 01/10: Chuyến bay dùng RAF, bỏ đồng hồ cao độ 100 ms
-  'src/components/bang-nhiem-vu/DanhSachNhiemVu.tsx': 1,
   'src/components/bang-nhiem-vu/LamCauOn.tsx': 1, // 20/10 đo giây (thầy: mọi câu đều đo được): 1 s cộng giây câu em đang làm, CHỈ cục bộ (không gọi máy chủ); dừng khi tab ẩn / 180 giây không chạm
   'src/components/hoc-tap/ManLamBaiTap.tsx': 1, // 20/10 đo giây: 1 s cộng giây câu đang hiện, CHỈ cục bộ (không gọi máy chủ); dừng khi tab ẩn / 180 giây không chạm
   'src/components/bang-tin-san/hooks.ts': 1, // 1 s đồng hồ câu Bi-a (chấm qua `answer` một lần khi em chốt, không có vòng hỏi)
@@ -93,7 +92,6 @@ describe('mọi vòng GỌI MÁY CHỦ của app HS/PH/game đi qua nhip-ben-vun
     'src/components/BangVinhDanh.tsx',
     'src/components/bang-nhiem-vu/may-chu.ts',
     'src/lib/app-presence.ts',
-    'src/lib/use-thi-dua.ts',
     'src/lib/ph-moi/use-tat-ca-ve-con.ts',
   ]
   for (const f of NEN)
@@ -106,8 +104,7 @@ describe('mọi vòng GỌI MÁY CHỦ của app HS/PH/game đi qua nhip-ben-vun
     it(`${f}: vòng hỏi trực tiếp dùng batVongTrucTiep (nối tiếp, thưa dần khi lỗi)`, () => {
       expect(doc(f)).toMatch(/batVongTrucTiep\(/)
     })
-  it('nhịp nền của thi đua / phụ huynh là 180 giây (không tụt về 60)', () => {
-    expect(doc('src/lib/use-thi-dua.ts')).toMatch(/NHIP_THI_DUA_MS = 180_000/)
+  it('nhịp nền của phụ huynh là 180 giây (không tụt về 60) — use-thi-dua đã gỡ 27/10', () => {
     expect(doc('src/lib/ph-moi/use-tat-ca-ve-con.ts')).toMatch(/NHIP_PH_MOI_MS = 180_000/)
     expect(doc('src/lib/nhip-ben-vung.ts')).toMatch(/NHIP_NEN_MS = 180_000/)
   })

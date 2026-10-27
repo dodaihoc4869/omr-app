@@ -12,7 +12,6 @@ import { EXP_MOI_VANG, VANG_REN_KHIEN, vangDangDuc } from '../src/lib/kinh-te-ga
 import { LUAT_CAP_MOI, LUAT_CAP_V3, LUAT_CAP_V4, NGAY_DAT_MO_CAP_10_V4 as NGAY_DAT_MO_CAP_10, chuyenDoiLuatCap, chuyenV3SangV4, dangKhoaMoc, nhanTuDo } from '../src/lib/hap-thu-ngay'
 import { tinhExp, type SuKienExp, type VaoTinhExp } from '../server/src/exp-hoc-tap'
 import { congTongSoVaoHoSo, renKhienBangVang, type HoSoGameExp } from '../server/src/exp-ho-so-game'
-import { ducVang, renKhienVang } from '../server/src/vang-duc'
 import { gameV2 } from '../server/src/game-v2'
 import { gameToken } from '../server/src/game-v2-auth'
 import { taoD1That, type D1That } from './_d1-that'
@@ -170,39 +169,3 @@ describe('(7) SỬA CÓ CHỦ Ý 29/09 v5 — khiên rèn: 36 mảnh + 2 600 và
 
 // ── (8) D1 thật (node:sqlite, lược đồ thật) ─────────────────────────────────────────────────────────
 const T0 = Date.parse('2026-09-30T12:00:00+07:00')
-describe('(8) D1: đúc vàng lười, rèn khiên bằng vàng, vang-doi đã bỏ', () => {
-  beforeEach(() => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(T0) })
-  afterEach(() => vi.useRealTimers())
-  const dung = (p: Record<string, unknown>): D1That => {
-    const d = taoD1That()
-    d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES('S1','Em','12','mk','x')").run()
-    d.sql.prepare('INSERT INTO game_v2_profile(sbd,json,created_at) VALUES(?,?,?)').run('S1', JSON.stringify({ pet: 'lua_phuong', choice: false, legacy: null, cap: 5, exp: 40, wallet: 0, earned: 0, tower: 1, mastery: [], arena: null, cutover: '2026-09-01T00:00:00.000Z', luatCap: 4, mocVang: 0, ...p }), 'x')
-    return d
-  }
-  const vangSo = (d: D1That): number => (d.sql.prepare("SELECT COALESCE(SUM(so_vang),0) v FROM vang_so WHERE sbd='S1'").get() as { v: number }).v
-  it('đúc: thêm MỘT dòng phần chênh; gọi lại cùng hồ sơ không đúc đôi; EXP kiếm thêm ⇒ dòng mới đúng phần chênh; vàng cũ giữ nguyên', async () => {
-    const d = dung({ earned: 1003 })
-    d.sql.prepare("INSERT INTO vang_so(sbd,loai,so_vang,exp_tru,ma_mon,khoa_yeu_cau,luc) VALUES('S1','doi',300,300,NULL,'cu-abcdefgh','x')").run()
-    expect(await ducVang(d.env, 'S1', { earned: 1003, mocVang: 0 })).toBe(200)
-    expect(await ducVang(d.env, 'S1', { earned: 1003, mocVang: 0 })).toBe(0)
-    await Promise.all([ducVang(d.env, 'S1', { earned: 1500, mocVang: 0 }), ducVang(d.env, 'S1', { earned: 1500, mocVang: 0 })])
-    expect(vangSo(d)).toBe(300 + 300)
-    const dong = d.sql.prepare("SELECT so_vang, exp_tru FROM vang_so WHERE sbd='S1' AND khoa_yeu_cau LIKE 'duc|%' ORDER BY id").all() as { so_vang: number; exp_tru: number }[]
-    expect(dong).toEqual([{ so_vang: 200, exp_tru: 0 }, { so_vang: 100, exp_tru: 0 }])
-  })
-  it('SỬA CÓ CHỦ Ý 29/09 v5 — rèn khiên: trừ đúng 2 600 vàng MỘT lần (gửi lại cùng số đã rèn không trừ nữa); thiếu vàng ⇒ lỗi, không trừ', async () => {
-    const d = dung({ earned: 13_500, cap: 3, expMoi: { daCong: 0, manhDaTinh: 36, ngayDat: 36 }, khienRen: { manh: 36, daRen: 0 } })
-    const tk = await gameToken(d.env, 'S1')
-    const r = await gameV2(d.env, 'khien-ren', { token: tk, soDaRen: 0 }) as Record<string, any>
-    expect(r).toMatchObject({ ok: true, daRen: true })
-    expect(vangSo(d)).toBe(2700 - 2600)
-    const lai = await gameV2(d.env, 'khien-ren', { token: tk, soDaRen: 0 }) as Record<string, any>
-    expect(lai.daRen).toBe(false)
-    expect(vangSo(d)).toBe(100)
-    const p = JSON.parse((d.sql.prepare("SELECT json FROM game_v2_profile WHERE sbd='S1'").get() as { json: string }).json)
-    expect(p.khienRen).toEqual({ manh: 0, daRen: 1 })
-    const d2 = dung({ earned: 5000, expMoi: { daCong: 0, manhDaTinh: 36, ngayDat: 36 }, khienRen: { manh: 36, daRen: 0 } })
-    await expect(renKhienVang(d2.env, 'S1', JSON.parse((d2.sql.prepare("SELECT json FROM game_v2_profile WHERE sbd='S1'").get() as { json: string }).json), 0, 0)).rejects.toThrow(/2\.600 vàng/)
-    expect(vangSo(d2)).toBe(1000)
-  })
-})

@@ -5,7 +5,6 @@ import { cleanup, fireEvent, render } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
 import BieuDoTienBoGoogle from '../src/components/BieuDoTienBoGoogle'
-import TheTienBo from '../src/components/TheTienBo'
 import { classify } from '../src/engine/score'
 import type { HoSoEm } from '../src/lib/exam-api'
 import { CA_MAU, nguonBaoCaoEmMoi, veBaoCaoEmMoi } from './_bao-cao-em-moi'
@@ -47,15 +46,10 @@ describe('BieuDoTienBoGoogle — nhãn xếp loại + hạng', () => {
   })
 })
 
-describe('TheTienBo truyền cờ xuống; chỉ màn HS/PH bật', () => {
-  it('TheTienBo có prop anNhanNangLuc và chuyển cho biểu đồ', () => {
-    const t = doc('src/components/TheTienBo.tsx')
-    expect(t).toContain('anNhanNangLuc = false')
-    expect(t).toContain('anNhanNangLuc={anNhanNangLuc}')
-  })
+describe('chỉ màn HS/PH bật cờ', () => {
   // GỌN MÃ 06/10 (lần 2, docs/gon-ma-0610-lan-2.md): đã gỡ dòng soi `xem-diem-gv/BaoCaoMotEm.tsx` (bị báo cáo chi tiết mới `ca-thi/BaoCaoChiTiet.tsx` thay và xoá); hai dòng còn lại giữ NGUYÊN.
-  it('modal báo cáo PHỤ HUYNH bật cờ; màn thầy (ExamMonitor) KHÔNG bật', () => {
-    expect(doc('src/components/BaoCaoCaThiPhuHuynhModal.tsx')).toMatch(/<TheTienBo[\s\S]*?anNhanNangLuc\s*\/>/)
+  // 27/10: TheTienBo và hộp BaoCaoCaThiPhuHuynhModal đã gỡ khỏi src/ vì không màn nào dùng ⇒ bỏ vế soi hai tệp ấy.
+  it('màn thầy (ExamMonitor) KHÔNG bật cờ', () => {
     expect(doc('src/screens/ExamMonitorScreen.tsx')).not.toContain('anNhanNangLuc')
   })
   it('báo cáo HỌC SINH bản mới (28/09, thay modal cũ đã xoá): không dùng thẻ có nhãn, màn KHÔNG in nhãn xếp loại hay hạng', () => {
@@ -69,14 +63,5 @@ describe('TheTienBo truyền cờ xuống; chỉ màn HS/PH bật', () => {
       expect(chu, `điểm ${diem}`).not.toMatch(/Hạng \d+|hạng trong lớp/i)
       unmount()
     }
-  })
-  it('dùng thẻ thật: TheTienBo với cờ ⇒ không nhãn xếp loại', () => {
-    const lichSu = [{ maCa: 'A', tenCa: 'Ca A', nopLuc: '2026-09-10T02:00:00Z', tong: 2.5, tongCau: 28 }, { maCa: 'B', tenCa: 'Ca B', nopLuc: '2026-09-17T02:00:00Z', tong: 6.5, tongCau: 28 }]
-    const dangMo = { maCa: 'B', tenCa: 'Ca B', diem: 6.5 } as never
-    const co = render(<TheTienBo lichSu={lichSu} dangMo={dangMo} anNhanNangLuc />)
-    expect(co.container.textContent).not.toContain(classify(6.5))
-    co.unmount()
-    const khong = render(<TheTienBo lichSu={lichSu} dangMo={dangMo} />)
-    expect(khong.container.textContent).toContain(classify(6.5))
   })
 })

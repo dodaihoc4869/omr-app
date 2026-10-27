@@ -11,7 +11,7 @@ import BottomNav from '../../src/components/BottomNav'
 import ThanhBenTrai from '../../src/components/ThanhBenTrai'
 import { useAppStore } from '../../src/store/appStore'
 import BangTinSan from '../../src/components/bang-tin-san/BangTinSan'
-import { taoDuLieuGia } from '../../src/lib/bang-tin-san/mau-gia'
+import { taoDuLieuGia } from '../fixtures/bang-tin-san-du-lieu-gia'
 
 const q = new URLSearchParams(location.search)
 history.replaceState(null, '', '/gv')

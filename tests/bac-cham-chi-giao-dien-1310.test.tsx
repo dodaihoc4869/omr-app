@@ -35,7 +35,6 @@ import { bacTheoSanh } from '../src/components/bac-cham-chi/bac'
 import ChipBac from '../src/components/bac-cham-chi/ChipBac'
 import ThangBac from '../src/components/bac-cham-chi/ThangBac'
 import BangNhipHoc from '../src/components/hoc-tap/BangNhipHoc'
-import NhipHocCon from '../src/components/ph-v3/NhipHocCon'
 import NhipHocThay from '../src/components/hom-nay-thay/NhipHocThay'
 import BanChieuDiemDanh from '../src/components/day-hoc/BanChieuDiemDanh'
 import { NHIP_EM_CHUA_DEU, NHIP_EM_LUOI } from '../scripts/chup-v2/gia/nhip-hoc-em'
@@ -228,29 +227,6 @@ describe('bảng em / phụ huynh', () => {
     expect(em.container.textContent).not.toMatch(/bậc|lười|chăm/i)
   })
 
-  it('phụ huynh: chip "Bậc N/12 · Tên" cạnh chip nhóm + thang; máy chủ cũ ⇒ thẻ y như trước', async () => {
-    const b = bacTheoSanh({ ...NHIP_EM_LUOI, bacCham: { bac: 1, diem: 0, diemLenBac: 8 } })!
-    ph.nhip.mockResolvedValue({ ok: true, du: { ...NHIP_EM_LUOI, bacCham: b } })
-    const { container, unmount } = render(<NhipHocCon sbd="12121212" tenCon="Minh Anh" />)
-    const chip = await waitFor(() => {
-      const c = container.querySelector('.ph3-the__dau .bcc-chip')
-      if (!c) throw new Error('chưa có chip')
-      return c
-    })
-    expect(chip.getAttribute('data-bac')).toBe(String(b.bac))
-    expect(chip.tagName).toBe('BUTTON')
-    expect(chip.textContent).toBe(`Bậc ${b.bac}/12 · ${BAC_CHAM_CHI[b.bac - 1]!.ten}, xem đủ 12 bậc`)
-    expect(chip.querySelector('svg.bcc-hh')!.getAttribute('data-bac')).toBe(String(b.bac))
-    expect(chip.parentElement!.querySelector('.ph3-nhip__nhom')!.textContent).toBe('Lười')
-    expect(container.querySelector('.ph3-nhip')!.classList.contains('ph3-nhip--bac')).toBe(true)
-    await screen.findByRole('img', { name: /^Thang 12 bậc/ })
-    unmount()
-    ph.nhip.mockResolvedValue({ ok: true, du: NHIP_EM_LUOI })
-    const cu = render(<NhipHocCon sbd="12121212" tenCon="Minh Anh" />)
-    await waitFor(() => expect(cu.container.querySelector('.ph3-nhip__nhom')).toBeTruthy())
-    expect(cu.container.querySelector('.bcc-chip, .bcc-thang, .bcc-hang')).toBeNull()
-    expect(cu.container.querySelector('.ph3-nhip')!.classList.contains('ph3-nhip--bac')).toBe(false)
-  })
 })
 
 describe('thầy · Nhịp học cả lớp', () => {

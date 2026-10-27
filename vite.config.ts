@@ -463,17 +463,12 @@ export default defineConfig({
           '**/baloo-2-*.woff2',
           // Phông riêng ĐĐH Rounded của app học sinh «Trong» (thầy 27/10, styles/trong-hs.css): máy đã đăng nhập nạp trước (phongHs) rồi cất ở kho chạy-lúc /assets/*.woff2.
           '**/ddh-rounded-*.woff2',
-          // Bi-a Phản Ứng (28/09): gói lười BiaGame + mảnh dùng chung với Đảo 2.0 (thẻ câu `TrongAi`, `useNgang`) — Rollup tách riêng vì cả hai game
-          // cùng nhập; trước đó chúng nằm trong mảnh Dao2 (đã ngoài precache). `chu-het-luot` (1 KB) bị tách theo, chỉ DaoThanThu/DoanHoTong/Game
-          // (đều ngoài precache) nhập. Chỉ máy mở game mới tải, cất ở kho chạy-lúc.
-          '**/{BiaGame,TrongAi,ngang,chu-het-luot}-*.{js,css}',
           // BẢN DUYỆT V2 (thầy 09/10): màn Hôm nay V2 của em (SanhV2) + bảng màu dẫn xuất V2 nạp LƯỜI — lỗi nạp ⇒ SanhHomNay rơi về Sảnh cũ
           // (đã trong precache), nên em mất mạng lần đầu vẫn có màn chính. Tải một lần rồi cất ở kho chạy-lúc; vỏ app không nặng thêm.
           '**/{SanhV2,ban-duyet-v2}-*.{js,css}',
-          // Mảnh mới tách ra khi các màn V2 dùng chung mã (đồ thị nhập đã soát, 09/10): màn "Thần thú của em" + lớp da trận + lệnh cửa hàng (CHỈ game nạp — game
-          // đã ngoài precache); cây Dạy học `day-hoc-len-bang` (CHỈ màn thầy: Dạy học lên bảng, Bài hôm nay, Hành trình V2). Bù chỗ: mô tả ca của tấm Chiếu mã
-          // `mo-ta-ca-chieu-ma` (CHỈ màn thầy: Mở ca, Theo dõi ca, phòng chờ của thầy, điểm danh — đều đã ngoài precache) ⇒ kho chạy-lúc.
-          '**/{ThanThuV2,tran-v2,may-chu-that,day-hoc-len-bang,mo-ta-ca-chieu-ma}-*.{js,css}',
+          // Cây Dạy học `day-hoc-len-bang` (CHỈ màn thầy: Dạy học lên bảng, Bài hôm nay, Hành trình V2) + mô tả ca của tấm Chiếu mã `mo-ta-ca-chieu-ma`
+          // (CHỈ màn thầy: Mở ca, Theo dõi ca, phòng chờ của thầy, điểm danh — đều đã ngoài precache) ⇒ kho chạy-lúc. (27/10: bỏ mẫu mảnh game đã gỡ.)
+          '**/{day-hoc-len-bang,mo-ta-ca-chieu-ma}-*.{js,css}',
           // Gói C 15/10 (app mở nhanh hơn — React riêng, bảng tra cảnh thí nghiệm + cửa nạp kho đề nạp lười, ba khối cổng học sinh vào mảnh nạp lười:
           // Rolldown tách thêm 7 tệp precache: react, expanded, exam-kho-de-import, bai-tap-pdf, cau-hinh-chua, luyen-khac-phuc .js/.css) — bù đủ 7, giữ 169 tệp
           // (mảnh vỏ `cau-on-api` 76 byte bỏ ở màn cổng học sinh — nhập tĩnh; sáu tệp ở (2) ra kho chạy-lúc; (1) giữ fflate không thành tệp precache mới):

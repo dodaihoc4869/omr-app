@@ -4,7 +4,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import KhungBtvnDaGiao, { type KhungBtvnDaGiaoProps } from '../src/components/btvn-da-giao/KhungBtvnDaGiao'
-import { canh, NOW_MAU, type TenCanh } from '../src/components/xem-thu/btvn-da-giao-canh'
+import { canh, NOW_MAU, type TenCanh } from './fixtures/btvn-da-giao-canh'
 import { nhomBtvn } from '../src/lib/nhom-btvn'
 
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); window.sessionStorage.clear() })

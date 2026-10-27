@@ -1,5 +1,5 @@
 /* TỆP SINH TỰ ĐỘNG — sửa scripts/sinh-m3-tuong-thich.mjs, KHÔNG sửa tay tệp này.
- * Phạm vi quét: LuyenDeChuan.tsx, KhoiKhacPhuc3CheDo.tsx, ModalKhacPhucCauSai.tsx, KhoiCauSai.tsx, BaoCaoCaThiPhuHuynhModal.tsx, BieuDoTienBoGoogle.tsx, KhoiBaPhan.tsx, DongDemCau.tsx, PhongChoGame.tsx, BangTinPhuHuynh.tsx, src/screens/ParentPortalScreen.tsx, src/screens/ExamHubScreen.tsx, src/screens/ExamSetupScreen.tsx, src/screens/PhanCongScreen.tsx, src/screens/HocSinhScreen.tsx, src/screens/LichSuCaScreen.tsx, src/screens/ExamMonitorScreen.tsx, src/screens/NganHangDeScreen.tsx, src/screens/CauHoiScreen.tsx, src/screens/ClassListScreen.tsx, src/screens/GoiLenBangScreen.tsx, src/screens/CaiDatScreen.tsx, HopChonDe.tsx, KhoiMayChuMoi.tsx, KhoiMatKhauApp.tsx, NutQuayLai.tsx.
+ * Phạm vi quét: LuyenDeChuan.tsx, KhoiKhacPhuc3CheDo.tsx, ModalKhacPhucCauSai.tsx, KhoiCauSai.tsx, BieuDoTienBoGoogle.tsx, DongDemCau.tsx, PhongChoGame.tsx, BangTinPhuHuynh.tsx, src/screens/ParentPortalScreen.tsx, src/screens/ExamHubScreen.tsx, src/screens/ExamSetupScreen.tsx, src/screens/PhanCongScreen.tsx, src/screens/HocSinhScreen.tsx, src/screens/LichSuCaScreen.tsx, src/screens/ExamMonitorScreen.tsx, src/screens/NganHangDeScreen.tsx, src/screens/CauHoiScreen.tsx, src/screens/ClassListScreen.tsx, src/screens/GoiLenBangScreen.tsx, src/screens/CaiDatScreen.tsx, HopChonDe.tsx, KhoiMayChuMoi.tsx, KhoiMatKhauApp.tsx, NutQuayLai.tsx.
  * Mọi bộ chọn đều mang tiền tố `.m3 ` (không có luật trần): app giáo viên, game thần thú và Bảng nhiệm vụ (.bnv)
  * không bị chạm. Không phân lớp (@layer) nên thắng lớp tiện ích Tailwind. Màu chỉ là biến --m3-*. */
 
@@ -26,7 +26,6 @@
 .m3 .bg-blue-600 { background-color: var(--m3-primary); }
 .m3 .bg-emerald-100 { background-color: var(--m3-tertiary-container); }
 .m3 .bg-emerald-50 { background-color: var(--m3-tertiary-container); }
-.m3 .bg-emerald-50\/50 { background-color: var(--m3-tertiary-container); }
 .m3 .bg-emerald-500 { background-color: var(--m3-tertiary); }
 .m3 .bg-green-50 { background-color: var(--m3-tertiary-container); }
 .m3 .bg-green-600 { background-color: var(--m3-tertiary); }
@@ -47,7 +46,6 @@
 .m3 .bg-rose-50\/40 { background-color: var(--m3-error-container); }
 .m3 .bg-rose-50\/50 { background-color: var(--m3-error-container); }
 .m3 .bg-rose-50\/90 { background-color: var(--m3-error-container); }
-.m3 .bg-rose-500 { background-color: var(--m3-error); }
 .m3 .bg-rose-600 { background-color: var(--m3-error); }
 .m3 .bg-slate-100 { background-color: var(--m3-surface-container); }
 .m3 .bg-slate-100\/90 { background-color: var(--m3-surface-container); }
@@ -59,11 +57,9 @@
 .m3 .bg-slate-50\/70 { background-color: var(--m3-surface-container-low); }
 .m3 .bg-slate-50\/90 { background-color: var(--m3-surface-container-low); }
 .m3 .bg-slate-900\/60 { background-color: var(--m3-man-che); }
-.m3 .bg-slate-900\/70 { background-color: var(--m3-on-surface); }
 .m3 .bg-white { background-color: var(--m3-surface-container-lowest); }
 .m3 .bg-white\/80 { background-color: var(--m3-surface-container-lowest); }
 .m3 .bg-white\/90 { background-color: var(--m3-surface-container-lowest); }
-.m3 .bg-white\/95 { background-color: var(--m3-surface-container-lowest); }
 .m3 .border-amber-100 { border-color: var(--m3-canh-bao); }
 .m3 .border-amber-200 { border-color: var(--m3-canh-bao); }
 .m3 .border-amber-200\/60 { border-color: var(--m3-canh-bao); }
@@ -81,7 +77,6 @@
 .m3 .border-blue-400 { border-color: var(--m3-primary); }
 .m3 .border-blue-500 { border-color: var(--m3-primary); }
 .m3 .border-blue-600 { border-color: var(--m3-primary); }
-.m3 .border-emerald-100 { border-color: var(--m3-tertiary-container); }
 .m3 .border-emerald-200 { border-color: var(--m3-tertiary-container); }
 .m3 .border-emerald-300 { border-color: var(--m3-tertiary-container); }
 .m3 .border-emerald-600 { border-color: var(--m3-tertiary); }
@@ -90,7 +85,6 @@
 .m3 .border-indigo-200\/90 { border-color: var(--m3-primary-container); }
 .m3 .border-orange-600 { border-color: var(--m3-tren-canh-bao); }
 .m3 .border-purple-100 { border-color: var(--m3-primary-container); }
-.m3 .border-purple-200 { border-color: var(--m3-primary-container); }
 .m3 .border-purple-200\/90 { border-color: var(--m3-primary-container); }
 .m3 .border-purple-600 { border-color: var(--m3-primary); }
 .m3 .border-red-200 { border-color: var(--m3-error-container); }
@@ -111,13 +105,11 @@
 .m3 .border-slate-200\/80 { border-color: var(--m3-surface-container-high); }
 .m3 .border-slate-200\/90 { border-color: var(--m3-surface-container-high); }
 .m3 .border-slate-300 { border-color: var(--m3-outline); }
-.m3 .border-transparent { border-color: transparent; }
 .m3 .border-white\/30 { border-color: transparent; }
 .m3 .divide-slate-100 > :not(:last-child) { border-color: var(--m3-surface-container-high); }
 .m3 .from-amber-50\/50 { --tw-gradient-from: var(--m3-canh-bao); }
 .m3 .from-blue-50\/40 { --tw-gradient-from: var(--m3-primary-container); }
 .m3 .from-blue-50\/70 { --tw-gradient-from: var(--m3-primary-container); }
-.m3 .from-blue-50\/80 { --tw-gradient-from: var(--m3-primary-container); }
 .m3 .from-blue-50\/90 { --tw-gradient-from: var(--m3-primary-container); }
 .m3 .from-blue-600 { --tw-gradient-from: var(--m3-primary); }
 .m3 .from-blue-600\/20 { --tw-gradient-from: var(--m3-primary); }
@@ -173,7 +165,6 @@
 .m3 .text-rose-700 { color: var(--m3-error); }
 .m3 .text-rose-800 { color: var(--m3-on-error-container); }
 .m3 .text-rose-900 { color: var(--m3-on-error-container); }
-.m3 .text-slate-100 { color: var(--m3-on-primary); }
 .m3 .text-slate-300 { color: var(--m3-on-surface-variant); }
 .m3 .text-slate-400 { color: var(--m3-on-surface-variant); }
 .m3 .text-slate-500 { color: var(--m3-on-surface-variant); }
@@ -197,10 +188,9 @@
 .m3 .bg-blue-500.text-white { color: var(--m3-on-primary); }
 .m3 .bg-blue-600.text-white { color: var(--m3-on-primary); }
 .m3 .bg-rose-600.text-white { color: var(--m3-on-error); }
-.m3 .bg-emerald-500.text-white { color: var(--m3-on-primary); }
-.m3 .bg-amber-500.text-white { color: var(--m3-canh-bao); }
-.m3 .bg-rose-500.text-white { color: var(--m3-on-error); }
 .m3 .bg-red-500.text-white { color: var(--m3-on-error); }
+.m3 .bg-amber-500.text-white { color: var(--m3-canh-bao); }
+.m3 .bg-emerald-500.text-white { color: var(--m3-on-primary); }
 .m3 .bg-green-600.text-white { color: var(--m3-on-primary); }
 .m3 .bg-red-600.text-white { color: var(--m3-on-error); }
 .m3 .bg-purple-600.text-white { color: var(--m3-on-primary); }
@@ -236,7 +226,6 @@
 .m3 .hover\:bg-slate-100\/80:hover { background-color: var(--m3-surface-container); }
 .m3 .hover\:bg-slate-200:hover { background-color: var(--m3-surface-container-high); }
 .m3 .hover\:bg-slate-50:hover { background-color: var(--m3-surface-container-low); }
-.m3 .hover\:bg-white:hover { background-color: var(--m3-surface-container-lowest); }
 .m3 .hover\:border-amber-300:hover { border-color: var(--m3-canh-bao); }
 .m3 .hover\:border-blue-300:hover { border-color: var(--m3-primary-container); }
 .m3 .hover\:border-emerald-300:hover { border-color: var(--m3-tertiary-container); }
@@ -248,8 +237,6 @@
 .m3 .hover\:text-blue-600:hover { color: var(--m3-primary); }
 .m3 .hover\:text-rose-500:hover { color: var(--m3-error); }
 .m3 .hover\:text-slate-600:hover { color: var(--m3-on-surface); }
-.m3 .hover\:text-slate-700:hover { color: var(--m3-on-surface); }
-.m3 .hover\:text-slate-800:hover { color: var(--m3-on-surface); }
 .m3 .hover\:text-slate-900:hover { color: var(--m3-on-surface); }
 
 @media (prefers-color-scheme: dark) {
@@ -280,7 +267,6 @@
   .m3 .dark\:bg-emerald-900\/40 { background-color: var(--m3-tertiary-container); }
   .m3 .dark\:bg-emerald-900\/80 { background-color: var(--m3-tertiary-container); }
   .m3 .dark\:bg-emerald-950 { background-color: var(--m3-tertiary-container); }
-  .m3 .dark\:bg-emerald-950\/20 { background-color: var(--m3-tertiary-container); }
   .m3 .dark\:bg-emerald-950\/30 { background-color: var(--m3-tertiary-container); }
   .m3 .dark\:bg-emerald-950\/50 { background-color: var(--m3-tertiary-container); }
   .m3 .dark\:bg-emerald-950\/60 { background-color: var(--m3-tertiary-container); }
@@ -293,7 +279,6 @@
   .m3 .dark\:bg-purple-900\/60 { background-color: var(--m3-primary-container); }
   .m3 .dark\:bg-purple-900\/70 { background-color: var(--m3-primary-container); }
   .m3 .dark\:bg-purple-900\/80 { background-color: var(--m3-primary-container); }
-  .m3 .dark\:bg-purple-950 { background-color: var(--m3-primary-container); }
   .m3 .dark\:bg-purple-950\/20 { background-color: var(--m3-primary-container); }
   .m3 .dark\:bg-purple-950\/60 { background-color: var(--m3-primary-container); }
   .m3 .dark\:bg-purple-950\/80 { background-color: var(--m3-primary-container); }
@@ -323,7 +308,6 @@
   .m3 .dark\:bg-slate-900\/50 { background-color: var(--m3-man-che); }
   .m3 .dark\:bg-slate-900\/80 { background-color: var(--m3-surface-container-lowest); }
   .m3 .dark\:bg-slate-900\/90 { background-color: var(--m3-surface-container-lowest); }
-  .m3 .dark\:bg-slate-900\/95 { background-color: var(--m3-surface-container-lowest); }
   .m3 .dark\:bg-slate-950 { background-color: var(--m3-surface); }
   .m3 .dark\:border-amber-800 { border-color: var(--m3-canh-bao); }
   .m3 .dark\:border-amber-800\/60 { border-color: var(--m3-canh-bao); }
@@ -346,7 +330,6 @@
   .m3 .dark\:border-emerald-800 { border-color: var(--m3-tertiary-container); }
   .m3 .dark\:border-emerald-800\/60 { border-color: var(--m3-tertiary-container); }
   .m3 .dark\:border-indigo-800\/80 { border-color: var(--m3-primary-container); }
-  .m3 .dark\:border-purple-800 { border-color: var(--m3-primary-container); }
   .m3 .dark\:border-purple-900\/50 { border-color: var(--m3-primary-container); }
   .m3 .dark\:border-purple-900\/60 { border-color: var(--m3-primary-container); }
   .m3 .dark\:border-red-800 { border-color: var(--m3-error-container); }
@@ -366,7 +349,6 @@
   .m3 .dark\:divide-slate-800 > :not(:last-child) { border-color: var(--m3-surface-container-high); }
   .m3 .dark\:from-blue-950\/80 { --tw-gradient-from: var(--m3-primary-container); }
   .m3 .dark\:from-indigo-950\/70 { --tw-gradient-from: var(--m3-primary-container); }
-  .m3 .dark\:from-slate-800\/80 { --tw-gradient-from: var(--m3-surface-container); }
   .m3 .dark\:from-slate-900 { --tw-gradient-from: var(--m3-surface-container-lowest); }
   .m3 .dark\:ring-white\/10 { --tw-ring-color: var(--m3-primary); }
   .m3 .dark\:text-amber-200 { color: var(--m3-tren-canh-bao); }
@@ -401,12 +383,10 @@
   .m3 .dark\:text-slate-400 { color: var(--m3-on-surface-variant); }
   .m3 .dark\:text-slate-500 { color: var(--m3-on-surface-variant); }
   .m3 .dark\:text-slate-600 { color: var(--m3-on-surface-variant); }
-  .m3 .dark\:text-slate-800 { color: var(--m3-on-surface-variant); }
   .m3 .dark\:text-white { color: var(--m3-on-surface); }
   .m3 .dark\:to-amber-950\/30 { --tw-gradient-to: var(--m3-canh-bao); }
   .m3 .dark\:to-blue-950\/30 { --tw-gradient-to: var(--m3-primary-container); }
   .m3 .dark\:to-blue-950\/60 { --tw-gradient-to: var(--m3-primary-container); }
-  .m3 .dark\:to-indigo-950\/40 { --tw-gradient-to: var(--m3-primary-container); }
   .m3 .dark\:to-indigo-950\/60 { --tw-gradient-to: var(--m3-primary-container); }
   .m3 .dark\:via-slate-900 { --tw-gradient-via: var(--m3-surface-container-lowest); }
   .m3 .group:hover .dark\:group-hover\:text-blue-300 { color: var(--m3-primary); }

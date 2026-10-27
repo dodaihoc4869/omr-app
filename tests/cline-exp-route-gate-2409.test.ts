@@ -21,8 +21,6 @@ const CUA_OK: CauHinhKichHoat = { phienBanChinhSach: PHIEN_BAN_CHINH_SACH, bangD
 const DOI_CHIEU: readonly (readonly [string, string, string])[] = [
   ['/game-v2/answer', 'server/src/game-v2.ts', "action==='answer'"],
   ['/game-v2/complete', 'server/src/game-v2.ts', "action==='complete'"],
-  ['/game-v2/invest', 'server/src/game-v2.ts', "action==='invest'"],
-  ['/game-v2/khien-ren', 'server/src/game-v2.ts', "action==='khien-ren'"],
   ['/btvn/nop', 'server/src/index.ts', "p === '/btvn/nop'"],
   ['/btvn/xong-lo', 'server/src/index.ts', "p === '/btvn/xong-lo'"],
   ['/hs/on-lai/nop', 'server/src/index.ts', "p === '/hs/on-lai/nop'"],
@@ -64,9 +62,9 @@ describe('SỔ KIỂM route → P07: đủ dòng, không trùng, và KHỚP mã 
     expect(doc('server/src/index.ts')).toContain("p.startsWith('/mom/')")
   })
 
-  it('deXuatPatch đủ 12 dòng và mỗi dòng nói rõ việc phải làm', () => {
+  it('deXuatPatch đủ 10 dòng (27/10: bỏ invest + khien-ren cùng lệnh game đã gỡ) và mỗi dòng nói rõ việc phải làm', () => {
     const patch = deXuatPatch()
-    expect(patch.length).toBe(12)
+    expect(patch.length).toBe(10)
     for (const p of patch) expect(p.viec.length, p.duong).toBeGreaterThan(20)
   })
 })

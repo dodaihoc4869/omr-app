@@ -1,6 +1,5 @@
-import { afterEach, expect, it, vi } from 'vitest'
+import { afterEach, expect, it } from 'vitest'
 import { cleanup, render, screen } from '@testing-library/react'
-vi.mock('../src/components/chua-cau-sai/NutChuaTungBuoc', () => ({ default: ({ qid }: { qid: string }) => <output aria-label="Mã câu chữa">{qid}</output> }))
 import NutHoiThay from '../src/components/loi-giai/NutHoiThay'
 afterEach(() => { cleanup(); localStorage.clear() })
 

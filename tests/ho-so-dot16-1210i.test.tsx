@@ -1,6 +1,7 @@
 // ĐỢT 16 — TẤM "HỒ SƠ LÀM BÀI" MỘT CHO BA APP + BẢNG LƯỜI/CHĂM Ở APP PHỤ HUYNH (thầy 12/10):
 //   "App ph cũng phải hiển thị lười chăm đầy đủ như app hs" · "đo kĩ hơn nữa thái độ … chính xác hơn 90%" · "số giây hiển thị cho cả việc làm câu dễ khó,
 //   chỗ các câu học sinh chưa chữa đc bấm vào phải nảy vào đúng chỗ tự sửa … cho vào box" · "Đồng bộ cho cả app hs gv và ph".
+// 27/10: thẻ `ph-v3/NhipHocCon` (Nhịp học của con, app phụ huynh) đã gỡ khỏi src/ vì không màn nào dùng ⇒ bỏ khối test vẽ thẻ ấy.
 // Kiểm:
 //   · số giây ở MỌI lượt — lượt ĐÚNG của câu dễ (Nhận biết) cũng có "12 giây" (dòng lịch sử + hộp câu + khối theo mức độ); không đo được ⇒ "—" có chú thích;
 //   · hộp "Chưa sửa được": chế độ học sinh là NÚT gọi onChuaCau(khoá câu); chế độ thầy KHÔNG là nút;
@@ -24,7 +25,6 @@ import { banHocSinhHoSoThaiDo, banHocSinhLichSu } from '../server/src/ho-so-em-h
 import { KHOA_PH_PASS } from '../src/lib/ph-token'
 const { default: HoSoLamCauEm, giayCacLan, giayTheoMucDo, chuDoTinCay, soTinHieu } = await import('../src/components/chien-dich/HoSoLamCauEm')
 const { default: HoSoCuaEmHs } = await import('../src/components/hoc-tap/HoSoCuaEmHs')
-const { default: NhipHocCon } = await import('../src/components/ph-v3/NhipHocCon')
 const { doiNgoiCon } = await import('../src/components/hoc-tap/BangNhipHoc')
 
 const SBD = '11010'
@@ -162,81 +162,6 @@ describe('hộp "Chưa sửa được"', () => {
     expect(hop.querySelector('button')).toBeNull()
     expect(hop.querySelector('.hslc-o-than')).toBeTruthy()
     expect(within(tam).queryByRole('button', { name: /^(Tự chữa|Sửa) câu này/ })).toBeNull()
-  })
-})
-
-describe('app phụ huynh — thẻ "Nhịp học của con" + CÙNG tấm hồ sơ', () => {
-  it('vẽ từ /ph/nhip-hoc (SBD trong thân lệnh), ngôi "con"; bấm ⇒ tấm chế độ phụ huynh gọi /ph/ho-so-thai-do + /ph/lich-su-lam-cau', async () => {
-    traFetch = (d) =>
-      d === '/ph/nhip-hoc'
-        ? { status: 200, du: NHIP_EM_LUOI }
-        : d === '/ph/ho-so-thai-do'
-          ? { status: 200, du: banHocSinhHoSoThaiDo(TD) }
-          : d === '/ph/lich-su-lam-cau'
-            ? { status: 200, du: banHocSinhLichSu(LS) }
-            : { status: 404, du: {} }
-    const { container } = render(<NhipHocCon sbd="12121212" tenCon="Nguyễn Minh Anh" lop="12A1" />)
-    const the = await waitFor(() => {
-      const x = container.querySelector('[data-vung="nhip-hoc-con"]')
-      expect(x).toBeTruthy()
-      return x as HTMLElement
-    })
-    expect(within(the).getByRole('heading', { name: 'Nhịp học của con' })).toBeTruthy()
-    expect(the.querySelector('.ph3-nhip__nhom')!.textContent).toBe('Lười')
-    expect(the.textContent).toContain('Ra khỏi nhóm Lười:')
-    expect(the.textContent).toMatch(/con đang có \d\/6 ngày/)
-    expect(the.textContent).not.toMatch(/\bem\b/)
-    expect(the.textContent).toContain('Con và thầy cùng thấy bảng này.')
-    expect(goiFetch.find((g) => g.duong === '/ph/nhip-hoc')!.body).toEqual({ sbd: '12121212' })
-    fireEvent.click(within(the).getByRole('button', { name: 'Xem hồ sơ làm bài của con' }))
-    const tam = await screen.findByRole('dialog')
-    await choTamXong(tam)
-    await choVaMoGap(tam)
-    expect(within(tam).getByRole('heading', { level: 2 }).textContent).toBe('Hồ sơ làm bài của con')
-    expect(within(tam).getByText(/^Nhịp học của con ·/)).toBeTruthy()
-    expect([...tam.querySelectorAll('.hsv-gap summary')].map((x) => x.firstChild?.textContent)).toContain('Toàn bộ sổ của con')
-    expect(within(tam).getByRole('heading', { name: /^Lượt sai gần đây/ })).toBeTruthy()
-    expect(within(tam).getByRole('button', { name: 'Xem mọi lượt của con' })).toBeTruthy()
-    expect(within(tam).queryByRole('button', { name: /Mở hồ sơ đầy đủ|^Tự chữa/ })).toBeNull()
-    expect(tam.textContent).not.toMatch(/SBD|Kho thiếu|Kiến thức cần bổ sung/)
-    expect(goiFetch.map((g) => g.duong).filter((d) => d !== '/ph/nhip-hoc').sort()).toEqual(['/ph/ho-so-thai-do', '/ph/lich-su-lam-cau'])
-  })
-
-  it('máy lưu liên kết riêng ⇒ thân lệnh {pass}, không SBD', async () => {
-    localStorage.setItem(KHOA_PH_PASS, 'ma-lien-ket-gia')
-    traFetch = () => ({ status: 200, du: NHIP_EM_LUOI })
-    const { container } = render(<NhipHocCon sbd="12121212" tenCon="Nguyễn Minh Anh" />)
-    await waitFor(() => expect(container.querySelector('[data-vung="nhip-hoc-con"]')).toBeTruthy())
-    expect(goiFetch[0]!.body).toEqual({ pass: 'ma-lien-ket-gia' })
-  })
-
-  it('lỗi (máy chủ chưa có lệnh 404) ⇒ "Chưa tải được nhịp học của con." + lý do thật + "Tải lại nhịp học"; tải lại được thì hiện bảng', async () => {
-    const { container } = render(<NhipHocCon sbd="12121212" tenCon="Nguyễn Minh Anh" />)
-    const loi = await waitFor(() => {
-      const x = container.querySelector('[data-vung="nhip-con-loi"]')
-      expect(x).toBeTruthy()
-      return x as HTMLElement
-    })
-    expect(loi.textContent).toContain('Chưa tải được nhịp học của con. Máy chủ chưa có hồ sơ làm bài cho phụ huynh')
-    expect(container.querySelector('.ht2-hn-dai')).toBeNull() // không số giả
-    traFetch = () => ({ status: 200, du: NHIP_EM_LUOI })
-    fireEvent.click(within(loi).getByRole('button', { name: 'Tải lại nhịp học' }))
-    await waitFor(() => expect(container.querySelector('[data-vung="nhip-hoc-con"]')).toBeTruthy())
-    // lỗi máy chủ (500, { ok:false, error }) ⇒ giữ lời máy chủ
-    cleanup()
-    traFetch = () => ({ status: 500, du: { ok: false, error: 'Máy chủ đang bận.' } })
-    const b = render(<NhipHocCon sbd="12121212" tenCon="Nguyễn Minh Anh" />)
-    await waitFor(() => expect(b.container.querySelector('[data-vung="nhip-con-loi"]')?.textContent).toContain('Chưa tải được nhịp học của con. Máy chủ đang bận.'))
-  })
-
-  it('bảng có độ tin cậy (trường tuỳ chọn) dưới 90% ⇒ "Kết luận tạm, đang theo dõi" + câu cần thêm, ngôi "con"', async () => {
-    traFetch = () => ({ status: 200, du: { ...NHIP_EM_LUOI, doTinCay: 72, canThem: 'cần thêm 3 ngày em làm bài để chắc.' } })
-    const { container } = render(<NhipHocCon sbd="12121212" tenCon="Nguyễn Minh Anh" />)
-    await waitFor(() => expect(container.querySelector('.ht2-hn-tin')).toBeTruthy())
-    const tin = container.querySelector('.ht2-hn-tin')!
-    expect(tin.getAttribute('data-du')).toBe('false')
-    // câu máy chủ đã mở đầu "cần …" ⇒ không lặp "Cần thêm: cần thêm"
-    expect(tin.textContent).toBe('Độ tin cậy 72%Kết luận tạm, đang theo dõi. Cần thêm 3 ngày con làm bài để chắc.')
   })
 })
 

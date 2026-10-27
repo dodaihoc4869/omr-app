@@ -80,12 +80,6 @@ describe('4. Học sinh bấm vào làm bài của Mom không bị lỗi undefin
 })
 
 describe('5. Modal báo cáo học tập ca thi của con cho phụ huynh chuẩn Google', () => {
-  it('BaoCaoCaThiPhuHuynhModal tồn tại và không chứa mã màu hex', () => {
-    const file = fs.readFileSync(path.join(__dirname, '../src/components/BaoCaoCaThiPhuHuynhModal.tsx'), 'utf-8')
-    expect(file).toContain('export default function BaoCaoCaThiPhuHuynhModal')
-    expect(file).not.toMatch(/#[0-9a-fA-F]{3,8}/)
-  })
-
   // App PH mới (21/09): màn PH KHÔNG còn mở hộp báo cáo cũ (bảng "Mọi thứ về con" thay) ⇒ khoá đổi: hộp còn tồn tại nhưng không được nối vào màn PH.
   it('ParentPortalScreen KHÔNG còn tích hợp BaoCaoCaThiPhuHuynhModal (28/09: app phụ huynh mới — báo cáo ca ở màn Chi tiết ca của ph-v3)', () => {
     const file = fs.readFileSync(path.join(__dirname, '../src/screens/ParentPortalScreen.tsx'), 'utf-8')

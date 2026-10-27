@@ -17,7 +17,7 @@ export const PETS = [
 export const ALIASES: Record<string,string> = {hoa_long:'lua_phuong',thuy_quai:'nuoc_long',thiet_giap:'dat_quy',loi_dieu:'khi_lang',loi_kim:'ductin_lan',moc_tinh:'tinhyeu_ho',khi_bang:'khi_lang',ductin_su:'ductin_lan',sangy_ma:'sangy_cu'}
 export const OLD_SIX = new Set(['hoa_long','thuy_quai','thiet_giap','loi_dieu','loi_kim','moc_tinh'])
 export const DAY = 86400000
-export type Mode = 'adventure'|'repair'|'tower'|'arena'
+export type Mode = 'adventure'|'repair'
 export interface Question {
   qid:string; maDe:string; version:string; group:string; phan:'I'|'II'|'III'; text:string
   choices:string[]; ideas:string[]; table?:string[][]; thanCauImg?:string; imageDataUrl?:string
@@ -343,42 +343,4 @@ export function luotHomNay(v:DauVaoLuot):KetQuaLuot {
   if(moTrum)danhSach.push({so:danhSach.length+1,loai:'trum',thuong:true})
   const tongLuotMo=Math.min(TRAN_LUOT_NGAY,danhSach.length)
   return {tongLuotMo,conLai:Math.max(0,tongLuotMo-daLam),tran:TRAN_LUOT_NGAY,danhSach:danhSach.slice(0,TRAN_LUOT_NGAY),luotTiepTheo:daLam<tongLuotMo?danhSach[daLam]!:null,khoa,tongCauToiDa:TRAN_LUOT_NGAY*SO_CAU_MOI_LUOT}
-}
-
-export interface Unit { id:string; pet:number; star:number; pos:number|null }
-export interface Arena { round:number; hp:number; gold:number; level:number; xp:number; shop:(number|null)[]; units:Unit[]; seed:number; learned:number; studied?:number; learnedGroups?:string[]; log:string[]; finished:boolean }
-export type ArenaAction={type:'buy';slot:number}|{type:'sell';id:string}|{type:'place';id:string;pos:number|null}|{type:'refresh'}|{type:'xp'}|{type:'fight'}
-function random(a:Arena):number {a.seed=(Math.imul(a.seed,1664525)+1013904223)>>>0;return a.seed/4294967296}
-function shop(a:Arena){a.shop=Array.from({length:5},()=>Math.floor(random(a)*8))}
-export function newArena(seed:number):Arena {const a:Arena={round:1,hp:100,gold:8,level:2,xp:0,shop:[],units:[],seed,learned:0,log:[],finished:false};shop(a);return a}
-export function arenaAction(state:Arena,action:ArenaAction):Arena {
-  const a: Arena=JSON.parse(JSON.stringify(state))
-  if(a.finished)throw new Error('Ván đã kết thúc.')
-  if(action.type==='buy'){
-    const pet=a.shop[action.slot];if(pet==null||a.gold<2||a.units.length>=12)throw new Error('Cần 2 vàng và một chỗ trống.')
-    a.gold-=2;a.shop[action.slot]=null;a.units.push({id:`u${a.seed}-${a.round}-${a.units.length}-${action.slot}`,pet,star:1,pos:null})
-    for(let star=1;star<3;star++){
-      const same=a.units.filter(u=>u.pet===pet&&u.star===star)
-      if(same.length>=3){const ids=new Set(same.slice(0,3).map(u=>u.id));a.units=a.units.filter(u=>!ids.has(u.id));a.units.push({...same[0]!,star:star+1,pos:same.find(u=>u.pos!==null)?.pos??null})}
-    }
-  }else if(action.type==='sell') {const u=a.units.find(u=>u.id===action.id);if(!u)throw new Error('Không có quân này.');a.gold+=Math.pow(3,u.star-1);a.units=a.units.filter(q=>q.id!==u.id)}
-  else if(action.type==='place') {const u=a.units.find(u=>u.id===action.id);if(!u)throw new Error('Không có quân này.');if(action.pos!==null&&(!Number.isInteger(action.pos)||action.pos<0||action.pos>=8))throw new Error('Ô bàn không hợp lệ.');if(action.pos!==null&&u.pos===null&&a.units.filter(x=>x.pos!==null).length>=a.level)throw new Error('Đội đã đủ quân.');const other=a.units.find(x=>x.pos===action.pos&&x.id!==u.id);if(other&&action.pos!==null)other.pos=u.pos;u.pos=action.pos}
-  else if(action.type==='refresh'){if(a.gold<2)throw new Error('Cần 2 vàng.');a.gold-=2;shop(a)}
-  else if(action.type==='xp'){if(a.gold<4||a.level>=6)throw new Error('Cần 4 vàng hoặc đội đã đạt cấp 6.');a.gold-=4;a.xp+=4;while(a.level<6&&a.xp>=a.level*3){a.xp-=a.level*3;a.level++}}
-  else {
-    if(a.round>1&&!a.studied)throw new Error('Em làm một câu Hoá của vòng này trước khi giao chiến.')
-    const team=a.units.filter(u=>u.pos!==null);if(!team.length)throw new Error('Đặt ít nhất một thần thú lên bàn.')
-    const power=arenaPower(a)
-    const enemy=75+a.round*31+random(a)*35
-    const win=power>=enemy;a.hp=Math.max(0,a.hp-(win?0:Math.min(25,8+a.round)))
-    a.log=[`Vòng ${a.round}: ${win?'thắng':'cần đổi đội hình'} (${Math.round(power)} / ${Math.round(enemy)} sức đội).`,...a.log].slice(0,10)
-    a.gold+=5+Math.min(5,Math.floor(a.gold/10));a.round++;a.learned=0;a.studied=0;a.learnedGroups=[];shop(a);a.finished=a.hp===0||a.round>10
-  }
-  return a
-}
-
-export function arenaPower(a:Arena):number {
- const team=a.units.filter(u=>u.pos!==null)
- const harmony=new Set(team.map(u=>u.pet)).size>=4?1.2:1
- return team.reduce((sum,u)=>sum+(35+u.star*25)*Math.pow(1.8,u.star-1)*((u.pet===0||u.pet===4)?(u.pos!<4?1.2:1):(u.pos!>=4?1.15:1)),0)*harmony
 }

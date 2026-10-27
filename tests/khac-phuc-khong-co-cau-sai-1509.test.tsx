@@ -38,7 +38,6 @@ const boChuThich = (ma: string) => ma.replace(/^\s*\/\/.*$/gm, '').replace(/\/\*
 const MODAL_DAY_DU = doc('src/components/ModalKhacPhucCauSai.tsx')
 const MODAL = boChuThich(MODAL_DAY_DU)
 const BC_HS = nguonBaoCaoEmMoi() // 28/09: báo cáo em bản mới (modal cũ đã xoá)
-const BC_PH = boChuThich(doc('src/components/BaoCaoCaThiPhuHuynhModal.tsx'))
 
 // ---------------------------------------------------------------------------
 
@@ -147,9 +146,4 @@ describe('Báo cáo ca thi — nút khắc phục đi theo DANH SÁCH THẬT', (
     d.unmount()
   })
 
-  it('app phụ huynh: nút "Tạo bài luyện khắc phục" không còn hiện vô điều kiện', () => {
-    // Thêm chế độ `khongGiaoBai` (app PH một màn một nút, 21/09): không giao bài ⇒ không nút; còn lại vẫn đi theo DANH SÁCH THẬT.
-    expect(BC_PH).toContain('{khongGiaoBai ? null : dsCauSai.length > 0 ? (')
-    expect(BC_PH).toContain('Ca này con không có câu nào cần khắc phục')
-  })
 })

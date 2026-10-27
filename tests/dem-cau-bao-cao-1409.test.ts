@@ -17,7 +17,6 @@ const SRV = doc('server/src/goi-cu.ts')
 // 28/09: báo cáo cũ `BaoCaoCaThiHocSinhModal` ĐÃ XOÁ — luật "số câu chỉ số thật" nay khoá ở BẢN MỚI phía em
 // (BaoCaoCaCuaEm → BaoCaoChiTiet chế độ em, số dựng bằng lib/bao-cao-cua-em).
 const HS_MOI = nguonBaoCaoEmMoi()
-const PH_MODAL = doc('src/components/BaoCaoCaThiPhuHuynhModal.tsx')
 
 /** Mọi công thức suy số câu từ điểm đã từng tồn tại trong mã. */
 const CONG_THUC_BIA = [
@@ -82,16 +81,10 @@ describe('BA APP — không màn nào tự dựng số câu', () => {
     expect(baoCaoCuaEm({ maCa: 'X', tong: 1.56, tongCau: 0, soCauDung: 0 }, []).tongCau).toBeNull()
   })
 
-  it('báo cáo cổng PHỤ HUYNH bỏ hết công thức suy từ điểm', () => {
-    for (const ct of CONG_THUC_BIA) expect(PH_MODAL, ct).not.toContain(ct)
-    expect(PH_MODAL).toContain("const tongCau = baiThi.tongSoCau && baiThi.tongSoCau > 0 ? baiThi.tongSoCau : null")
-    expect(PH_MODAL).toContain('const coDemCau = tongCau !== null && soDung !== null')
-  })
-
   it('không màn nào còn số câu gõ cứng 28 hay 40', () => {
     expect(doc('src/screens/HocSinhScreen.tsx')).not.toContain('tongCau: 40')
     expect(doc('src/screens/ExamMonitorScreen.tsx')).not.toContain('.items.length) : 40)')
-    for (const f of [HS_MOI, PH_MODAL]) {
+    for (const f of [HS_MOI]) {
       expect(f).not.toContain('Math.max(28, dsCauSai.length)')
     }
     expect(HS_MOI).not.toMatch(/tongCau\s*[:=]\s*(28|40)\b/)
@@ -100,11 +93,9 @@ describe('BA APP — không màn nào tự dựng số câu', () => {
   it('chưa chấm thì GIẤU dòng đếm, không hiện "Đúng 0/0 câu"', () => {
     const SP = doc('src/screens/StudentPortalScreen.tsx')
     expect(SP).toContain("{typeof item.tongCau === 'number' && item.tongCau > 0 && (")
-    expect(PH_MODAL).toContain("{coDemCau ? <DongDemCau so={demPH} /> : 'Ca chưa chấm xong'}")
   })
 
   it('danh sách câu sai THẬT vẫn được dùng khi máy chủ chưa trả số', () => {
-    expect(PH_MODAL).toContain("dsCauSai.length > 0 ? dsCauSai.length : null")
     // bản mới phía em: lịch sử thiếu số ⇒ đếm từ bảng chấm thật của ca (/hs/cau-da-thi)
     const bc = baoCaoCuaEm({ maCa: 'X', tong: 5 }, [
       { maCa: 'X', phan: 'I', soCau: 1, dungSai: true, dapAnChon: 'A', dapAnDung: 'A' },

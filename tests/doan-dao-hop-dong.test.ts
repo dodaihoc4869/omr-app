@@ -38,20 +38,3 @@ describe('Đảo thần thú · lý do thưởng (chữ sẵn in, khớp mốc 2
   })
 })
 
-describe('Đảo thần thú · lệnh đọc-chỉ so-tay + role/lyDoThuong qua máy chủ thật (SQLite)', () => {
-  it('so-tay chỉ liệt kê dạng em ĐƯỢC PHÉP làm (có bằng chứng), kèm tên + mã chương; start trả role, answer trả lyDoThuong; không ghi gì', async () => {
-    const d = taoD1That()
-    d.sql.prepare("INSERT INTO de_kho(ma_de,ten_de,lop,so_cau,r2_khoa,da_xoa,cap_nhat_luc) VALUES('DE1','DE1','12',9,'k',0,'v1')").run(); d.sql.prepare("INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE1','v1','x')").run()
-    for (let i = 0; i < 9; i++) { const es = i < 6, x = q(i, { maDe: 'DE1', lop: '12', version: 'v1', dang: es ? 'ES.A.X' : 'AN.B.Y', tenDang: es ? 'Ester' : 'Ancol' }); d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DE1', x.qid, 'v1', x.group, x.dang, JSON.stringify(x)) }
-    d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES('S1','x','12','mk','x')").run()
-    d.sql.prepare('INSERT INTO game_v2_profile(sbd,json,created_at) VALUES(?,?,?)').run('S1', JSON.stringify({ pet: 'dat_quy', choice: false, legacy: null, cap: 1, exp: 0, wallet: 0, earned: 0, tower: 1, mastery: [], arena: null, cutover: '2020-01-01T00:00:00.000Z' }), 'x')
-    await ghiSuKien(d.env, [{ nguon: 'btvn', maNguon: 'B', sbd: 'S1', qid: 'Q0', lan: 1, ketQua: 0, luc: new Date(Date.now() - 72 * 3_600_000).toISOString(), maDang: 'ES.A.X' }]); await dungLaiHoSo(d.env, ['S1'], new Date().toISOString())
-    const token = await gameToken(d.env, 'S1'), truoc = (d.sql.prepare('SELECT COUNT(*) n FROM game_v2_session').get() as any).n
-    expect(await gameV2(d.env, 'so-tay', { token })).toEqual({ ok: true, dang: [{ key: 'ES.A.X', ten: 'Ester', chuong: 'ES' }] }) // Ancol chưa có bằng chứng → không lộ
-    expect((d.sql.prepare('SELECT COUNT(*) n FROM game_v2_session').get() as any).n).toBe(truoc)
-    const st = await gameV2(d.env, 'start', { token, mode: 'adventure' }) as any
-    expect(st.questions.length).toBeGreaterThan(0); for (const x of st.questions) { expect(['yeu', 'toi_han', 'lap', 'thu_thach']).toContain(x.role) /* máy em cũ chỉ biết 4 vai: `role` giữ tập cũ; Đợt 2 thêm `roleV2` (vai thật: + moi, trum) */; expect(['yeu', 'toi_han', 'lap', 'thu_thach', 'moi', 'trum']).toContain(x.roleV2); expect(x.correct).toBeUndefined() }
-    const dau = st.questions[0], tl = await gameV2(d.env, 'answer', { token, session: st.id, qid: dau.qid, answer: 'A' }) as any
-    expect(tl.lyDoThuong).toEqual({ moc: 1, exp: 10, chu: '+10 EXP · lần đầu em tự làm đúng dạng này — sao thứ 1' }) // sửa có chủ ý 21/09: nấc 1 thưởng 20 → 10
-  })
-})

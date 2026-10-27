@@ -1,7 +1,9 @@
+// CHUYỂN TỪ src/lib/bang-tin-san/mau-gia.ts (27/10): màn thật không dùng (chỉ nhận `/gv/bang-tin-song`), nên gỡ khỏi src/;
+// bộ sinh dữ liệu giả này chỉ còn là ĐỒ DỰNG cho các test bang-tin-san-*-2109 kiểm các khối màn sống.
 // DỮ LIỆU GIẢ có hạt giống cố định cho bản vẽ, kiểm thử và chụp ảnh (KHÔNG dùng ở màn thật: màn thật chỉ nhận `/gv/bang-tin-song`).
 // Sinh ra ĐÚNG hợp đồng `DuLieuSan` và các số KHỚP nhau (tổng lớp = câu đã làm; ô nhiệt = em đã học) — cùng luật với `chotSo`.
-import type { BangTin } from '../bang-tin-thay'
-import type { DanDauSan, DuLieuSan, EmNhiet, LopSan, NenSan, TinSan } from './kieu'
+import type { BangTin } from '../../src/lib/bang-tin-thay'
+import type { DanDauSan, DuLieuSan, EmNhiet, LopSan, NenSan, TinSan } from '../../src/lib/bang-tin-san/kieu'
 
 const PHUT = 60_000
 const NEN_MS = 5 * PHUT

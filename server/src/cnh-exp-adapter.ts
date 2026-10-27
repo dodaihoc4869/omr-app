@@ -13,14 +13,7 @@
 import type { Env } from './kieu'
 import { docCauHinhDem } from './cau-hinh-dem'
 import {
-  dungKhienCore,
   ghiManhNgayDat,
-  hapThuCore,
-  renKhienCore,
-  type ChungLenhP08,
-  type PhanHoiDungKhien,
-  type PhanHoiHapThu,
-  type PhanHoiKhien,
   type PhanHoiManhNgayDat,
   type PhuThuocLenhP08,
   type YeuCauManhNgayDat,
@@ -161,41 +154,6 @@ export async function cuaP08Mo(env: Env): Promise<{ choPhep: boolean; ma: string
   const c = await docCauHinhKichHoat(env)
   return kiemCuaKichHoat(c)
 }
-export async function hapThuQuaP08(
-  env: Env,
-  duong: string,
-  yeuCau: ChungLenhP08,
-  phuThuoc: PhuThuocLenhP08 = {},
-): Promise<PhanHoiHapThu> {
-  const cua = await moCuaRoute(env, duong)
-  if (!cua.choPhep) throw new LoiCuaExp(cua.ma, cua.lyDo)
-  return hapThuCore(env, yeuCau, phuThuoc)
-}
-
-export async function renKhienQuaP08(
-  env: Env,
-  duong: string,
-  yeuCau: ChungLenhP08,
-  phuThuoc: PhuThuocLenhP08 = {},
-): Promise<PhanHoiKhien> {
-  const cua = await moCuaRoute(env, duong)
-  if (!cua.choPhep) throw new LoiCuaExp(cua.ma, cua.lyDo)
-  return renKhienCore(env, yeuCau, phuThuoc)
-}
-
-
-export async function dungKhienQuaP08(
-  env: Env,
-  duong: string,
-  yeuCau: ChungLenhP08,
-  phuThuoc: PhuThuocLenhP08 = {},
-): Promise<PhanHoiDungKhien> {
-  void duong // hành vi NỘI BỘ (action `shield-use`) — không phải route trong sổ kiểm
-  const cua = await cuaP08Mo(env)
-  if (!cua.choPhep) throw new LoiCuaExp(cua.ma, cua.lyDo)
-  return dungKhienCore(env, yeuCau, phuThuoc)
-}
-
 export async function ghiManhQuaP08(
   env: Env,
   duong: string,

@@ -1,16 +1,13 @@
 // MỘT định nghĩa "câu đã làm hôm nay" — PHẦN MÀN (Code 2; Boss 21/09, đề bài prompt-mot-dinh-nghia-cau-da-lam-2109.md: thầy thấy thẻ Hôm nay "93 câu" cạnh ô Thi đua "78 câu" của cùng một em).
 // Máy chủ (Code 3/4) gửi: học sinh `/hs/ke-hoach-ngay` + `/hs/on-lai/nop` → `tienBo.soCauHienThi`; phụ huynh `/ph/tat-ca-ve-con` → `tongQuan.soCau` (GỒM câu che) + `soDung` + `soCauCoKetQua` (mẫu số, chỉ câu không che).
 // Màn: CHỈ hiện các số ấy; máy chủ cũ chưa có trường ⇒ rơi về số cũ (không vỡ); KHÔNG đổi luật đạt/chưa đạt.
+// 27/10: màn `ph-moi/ManChinh`, khối `ph-moi/bang/TongQuan` + `Vong3` và lớp đọc `lib/thi-dua` đã gỡ khỏi src/ vì không màn nào dùng ⇒ các phép kiểm vẽ vòng / chữ giải vòng / so hôm qua bỏ theo.
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, render } from '@testing-library/react'
+import { cleanup } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
-import ManChinh from '../src/components/ph-moi/ManChinh'
-import { TongQuan, chuGiaiVong, soSanhHomQua } from '../src/components/ph-moi/bang/TongQuan'
-import { cacVongVe } from '../src/components/ph-moi/bang/Vong3'
 import { tuKeHoachNgay, type KeHoachNgayMayChu } from '../src/lib/nhiem-vu-adapter'
 import { soCauDaLamHienThi } from '../src/lib/so-cau-hien-thi'
-import { docThiDua } from '../src/lib/thi-dua'
 import { docTatCaVeCon, mauSoTiLeDung } from '../src/lib/ph-moi/du-lieu'
 import { PH_OK, NAY } from './_ph-moi/du-lieu-mau'
 import { PH_APPLE } from './_ph-moi/du-lieu-mau-apple'
@@ -106,21 +103,6 @@ describe('bộ chuyển kế hoạch ngày (thẻ Hôm nay, thẻ "xong việc h
   })
 })
 
-const RAW_THI_DUA = (soCauEm: number) => ({
-  ok: true,
-  lop: '12A1',
-  siSo: 42,
-  daHoc: 27,
-  top: [
-    { ten: 'Khánh Linh', soCau: 91, chuoi: 12, thu: 'lua_phuong' },
-    { ten: 'Minh Quân', soCau: 85, chuoi: 7, thu: 'lua_phuong' },
-    { ten: 'Bảo Ngọc', soCau: 80, chuoi: 5, thu: 'lua_phuong' },
-  ],
-  cuaEm: { hang: 4, soCau: soCauEm, themDeVuot: null, nhomCuoi: false },
-  capNhatLuc: '2026-09-21T11:00:00Z',
-})
-
-
 describe('khoá nguồn phía học sinh', () => {
   it('bộ chuyển và màn ôn câu đọc số hiển thị qua MỘT hàm; không còn đọc thẳng tienBo.daLamCau để nói "đã làm"', () => {
     const ad = doc('src/lib/nhiem-vu-adapter.ts')
@@ -192,43 +174,6 @@ describe('mauSoTiLeDung — mẫu số của tỉ lệ đúng', () => {
   })
 })
 
-const MUC = { soCau: 16, phutHoc: 45 }
-describe('bảng phụ huynh — vòng 2 / chữ giải vòng: "đúng 30 trong 35 câu đã có kết quả"', () => {
-  it('máy chủ gửi mẫu số 35 (3 câu che): số câu đã làm vẫn 38; tỉ lệ đúng 30/35 = 86 %; chữ "đã có kết quả"', () => {
-    const dong = chuGiaiVong({ soCau: 38, soDung: 30, soCauCoKetQua: 35, phutHoc: 52, mucTieu: MUC })
-    expect(dong[0]).toMatchObject({ mau: '1', so: '38', nhan: 'đã làm · vượt mục tiêu' })
-    expect(dong[1]).toEqual({ mau: '2', so: '86', don: '%', nhan: 'đúng 30 trong 35 câu đã có kết quả' })
-  })
-  it('máy chủ cũ chưa gửi mẫu số ⇒ chữ và số như trước: 30/38 = 79 %', () => {
-    const dong = chuGiaiVong({ soCau: 38, soDung: 30, phutHoc: 52, mucTieu: MUC })
-    expect(dong[1]).toEqual({ mau: '2', so: '79', don: '%', nhan: 'đúng 30 trong 38 câu' })
-    expect(chuGiaiVong({ soCau: 38, soDung: 30, soCauCoKetQua: null, phutHoc: 52, mucTieu: MUC })[1]!.nhan).toBe('đúng 30 trong 38 câu')
-  })
-  it('không có câu che (mẫu số = soCau): vẫn nói "đã có kết quả" vì máy chủ ĐÃ nói mẫu số', () => {
-    expect(chuGiaiVong({ soCau: 38, soDung: 30, soCauCoKetQua: 38, phutHoc: 52, mucTieu: MUC })[1]!.nhan).toBe('đúng 30 trong 38 câu đã có kết quả')
-  })
-  it('cả ngày chỉ có câu che (mẫu số 0): số câu đã làm hiện, tỉ lệ đúng KHÔNG hiện số giả — "chưa có câu nào có kết quả"', () => {
-    const dong = chuGiaiVong({ soCau: 6, soDung: null, soCauCoKetQua: 0, phutHoc: 20, mucTieu: MUC })
-    expect(dong[0]).toMatchObject({ mau: '1', so: '6' })
-    expect(dong[1]).toEqual({ mau: '2', so: '—', don: '', nhan: 'câu đúng · chưa có câu nào có kết quả' })
-  })
-  it('chưa làm câu nào (soCau 0) ⇒ giữ câu cũ "chưa có câu nào"; đúng > mẫu số (dữ liệu lệch) ⇒ chặn 100 %', () => {
-    expect(chuGiaiVong({ soCau: 0, soDung: null, soCauCoKetQua: null, phutHoc: 0, mucTieu: MUC })[1]!.nhan).toBe('câu đúng · chưa có câu nào')
-    const lech = chuGiaiVong({ soCau: 38, soDung: 40, soCauCoKetQua: 35, phutHoc: 52, mucTieu: MUC })
-    expect(lech[1]).toMatchObject({ so: '100', nhan: 'đúng 35 trong 35 câu đã có kết quả' })
-  })
-  it('vòng vẽ: vòng 2 lấp theo mẫu số (30/35), toàn câu che ⇒ vòng 2 trống', () => {
-    const v = cacVongVe({ soCau: 38, soDung: 30, soCauCoKetQua: 35, phutHoc: 52, mucTieu: MUC })
-    const v2 = v.find((x) => x.mau === 2)!
-    expect(v2.kq.ti).toBeCloseTo(30 / 35, 5)
-    const cu = cacVongVe({ soCau: 38, soDung: 30, phutHoc: 52, mucTieu: MUC }).find((x) => x.mau === 2)!
-    expect(cu.kq.ti).toBeCloseTo(30 / 38, 5)
-    const che = cacVongVe({ soCau: 6, soDung: null, soCauCoKetQua: 0, phutHoc: 20, mucTieu: MUC }).find((x) => x.mau === 2)
-    expect(che?.kq.ti).toBe(0)
-  })
-})
-
-
 describe('THÂN THẬT của Worker 5bb39dd4 (SBD thử 12121212, 21/09 18:3x, chỉ đọc): 21 câu đã làm, 7 câu có kết quả, đúng 1', () => {
   // Chép nguyên khối tongQuan + ngày nhịp học máy chủ thật trả (câu che chiếm 14 trong 21): soDung/soCauCoKetQua chỉ trên câu KHÔNG che.
   const THAT = { soCau: 21, soDung: 1, soCauCoKetQua: 7, datNhiemVu: true, mucTieu: { cau: 8, phut: 6 }, soLanHoc: 7, lanDaiNhatPhut: 1, viecXong: 3, viecTong: 3, chuoiNgayHoc: 1 }
@@ -242,27 +187,5 @@ describe('THÂN THẬT của Worker 5bb39dd4 (SBD thử 12121212, 21/09 18:3x, c
     const t = pmThat().tongQuan!
     expect([t.soCau, t.soDung, t.soCauCoKetQua]).toEqual([21, 1, 7])
     expect(pmThat().nhipHoc!.ngay).toEqual([{ ngay: '2026-09-21', soCau: 21, soCauDung: 1 }])
-  })
-  it('bảng: vòng 1 "21/8 câu · đã làm · vượt mục tiêu"; vòng 2 "14 %" và "đúng 1 trong 7 câu đã có kết quả" (không 5 % của 1/21)', () => {
-    const dong = chuGiaiVong(pmThat().tongQuan!)
-    expect(dong[0]).toMatchObject({ so: '21', don: '/8 câu', nhan: 'đã làm · vượt mục tiêu' })
-    expect(dong[1]).toEqual({ mau: '2', so: '14', don: '%', nhan: 'đúng 1 trong 7 câu đã có kết quả' })
-  })
-})
-
-describe('bảng phụ huynh — so với hôm qua theo mẫu số', () => {
-  const t = { soCau: 38, soDung: 30, soCauCoKetQua: 35, phutHoc: 52 }
-  it('tỉ lệ hôm nay 30/35 = 86 % so với hôm qua 76 % ⇒ "đúng hơn 10 %"', () => {
-    const chip = soSanhHomQua({ ...t, soVoiHomQua: { soCau: 33, soCauCoKetQua: 33, tiLeDung: 0.76, phutHoc: 44 } }).map((c) => c.chu)
-    expect(chip).toContain('nhiều hơn 5 câu')
-    expect(chip).toContain('đúng hơn 10 %')
-  })
-  it('hôm qua toàn câu che (không tỉ lệ): chip số câu vẫn có, KHÔNG chip tỉ lệ', () => {
-    const chip = soSanhHomQua({ ...t, soVoiHomQua: { soCau: 9, soCauCoKetQua: null, tiLeDung: null, phutHoc: null } }).map((c) => c.chu)
-    expect(chip).toEqual(['nhiều hơn 29 câu'])
-  })
-  it('hôm nay toàn câu che (soDung null) ⇒ không chip tỉ lệ dù hôm qua có', () => {
-    const chip = soSanhHomQua({ soCau: 6, soDung: null, soCauCoKetQua: 0, phutHoc: 20, soVoiHomQua: { soCau: 33, soCauCoKetQua: 33, tiLeDung: 0.76, phutHoc: 44 } }).map((c) => c.chu)
-    expect(chip.some((c) => /đúng/.test(c))).toBe(false)
   })
 })

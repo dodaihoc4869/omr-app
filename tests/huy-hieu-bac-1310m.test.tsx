@@ -32,7 +32,6 @@ import ThangBac from '../src/components/bac-cham-chi/ThangBac'
 import DaiDemBac from '../src/components/bac-cham-chi/DaiDemBac'
 import { NutBac } from '../src/components/bac-cham-chi/ChipBac'
 import { CHU_CACH_TINH } from '../src/components/bac-cham-chi/TamMuoiHaiBac'
-import NhipHocCon from '../src/components/ph-v3/NhipHocCon'
 import NhipHocThay from '../src/components/hom-nay-thay/NhipHocThay'
 import BanChieuDiemDanh from '../src/components/day-hoc/BanChieuDiemDanh'
 import { NHIP_EM_LUOI } from '../scripts/chup-v2/gia/nhip-hoc-em'
@@ -264,28 +263,6 @@ describe('chip bậc bấm được ⇒ tấm đủ 12 bậc', () => {
     fireEvent.click(tam2.parentElement!.querySelector('.bcc-tam-che')!)
     expect(screen.queryByRole('dialog')).toBeNull()
     expect(document.activeElement).toBe(nut)
-  })
-  it('phụ huynh: chip của thẻ Nhịp học là nút mở tấm (xưng "Con"); vắng bacCham ⇒ không có nút', async () => {
-    const b = bacTheoSanh({ ...NHIP_EM_LUOI, bacCham: { bac: 1, diem: 0, diemLenBac: 8 } })!
-    ph.nhip.mockResolvedValue({ ok: true, du: { ...NHIP_EM_LUOI, bacCham: b } })
-    const { container, unmount } = render(<NhipHocCon sbd="12121212" tenCon="Minh Anh" />)
-    const nut = await waitFor(() => {
-      const c = container.querySelector<HTMLButtonElement>('button.bcc-nut')
-      if (!c) throw new Error('chưa có nút')
-      return c
-    })
-    fireEvent.click(nut)
-    const tam = await screen.findByRole('dialog', { name: '12 bậc từ Lười đến Chăm' })
-    expect(tam.querySelector('[aria-current="true"]')!.textContent).toContain('Con đang ở đây')
-    fireEvent.keyDown(tam, { key: 'Escape' })
-    unmount()
-    ph.nhip.mockResolvedValue({ ok: true, du: NHIP_EM_LUOI })
-    const cu = render(<NhipHocCon sbd="12121212" tenCon="Minh Anh" />)
-    await waitFor(() => expect(cu.container.querySelector('.ph3-nhip__nhom')).toBeTruthy())
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 30))
-    })
-    expect(cu.container.querySelector('.bcc-nut, button.bcc-chip')).toBeNull()
   })
 })
 
