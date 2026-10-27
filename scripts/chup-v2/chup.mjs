@@ -331,6 +331,12 @@ const TN_CANH = [['mo', 'lam13:cho:600 » xem:.ex-demo » cho:400'], ['dong', 'l
 const DS_TN = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   TN_CANH.map(([t, viec]) => [`duo-tn-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=duo-tn', w, hh, nen, false, /Tiến hành thí nghiệm/, viec])))
 // ═══ hết THÍ NGHIỆM GỌN 27/10
+// ═══ ĐỀ GIÃN Ý 27/10 (tiền tố "duo-gian-"): đề dài nhiều ý như ảnh thầy (aniline: Bước 1 kèm phương trình, Bước 2, Giả sử…, câu hỏi) trong khung chữ L
+// của giám thị — 390×844 / 360×640 / 844×390 / 1440×900, sáng + tối; thêm cuộn xuống phần câu hỏi ở 390.
+const DS_GIAN = ['light', 'dark'].flatMap((nen) => { const toi = nen === 'dark' ? '-toi' : ''; return [
+  ...[[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].map(([w, hh, k]) => [`duo-gian-${k}${toi}`, 'lam13&lam=duo&gtde=aniline&gt=th', w, hh, nen, false, /Aniline/, 'lam13:cho:3600 » dau']),
+  [`duo-gian-cuon-doc${toi}`, 'lam13&lam=duo&gtde=aniline&gt=th', 390, 844, nen, false, /Aniline/, 'lam13:cho:3600 » xem:.de-doan[data-loai=hoi]'],
+] })
 // ═══ GIÁM THỊ 27/10 (tiền tố "duo-gt-"): giám thị theo mức câu cạnh đề, 4 mức × đề ngắn đã chọn (mắt dõi ô B) ở 390×844 / 360×640 / 844×390 / 1440×900;
 // ở 390×844 thêm đúng · sai · đề dài · đề có hình. Sáng + tối. `gtloi=1` ⇒ giám thị luôn càu nhàu (đo bong bóng không che nhãn / đề / phương án).
 const GT_NGAN = 'lam13&lam=duo&gtde=ngan&gtloi=1&gt='
@@ -534,6 +540,7 @@ const DS = [
   ...DS_BP, // BÀN PHÍM DUO 27/10
   ...DS_GIU, // GIỮ CHÂN 27/10
   ...DS_GT, // GIÁM THỊ 27/10
+  ...DS_GIAN, // ĐỀ GIÃN Ý 27/10
   ...DS_CHAM, // THẺ CHẠM 27/10
   ...DS_PT, // PHƯƠNG TRÌNH 27/10
   ...DS_TN, // THÍ NGHIỆM GỌN 27/10

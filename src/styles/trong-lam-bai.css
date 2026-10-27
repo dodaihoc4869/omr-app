@@ -989,3 +989,14 @@
 [data-trong='hs'] .duo-ket[data-tp-trung] .duo-may[data-loai='trung'] .nen { fill: color-mix(in srgb, var(--tr-tin) 7%, var(--tr-mat)); }
 [data-trong='hs'] .duo-ket[data-tp-trung] .duo-may[data-loai='trung'] .vien { fill: color-mix(in srgb, var(--tr-tin) 22%, var(--tr-vien)); }
 .duo-tron { position: fixed; left: 0; top: 0; z-index: 70; border-radius: 50%; background: color-mix(in srgb, var(--tr-sai) 45%, var(--tr-sai-nhat)); pointer-events: none; will-change: transform, opacity; }
+/* ── ĐỀ GIÃN Ý (thầy 27/10: «Đề hiển thị phải có giãn cách ý cho phù hợp, đọc không bị rối»). Đoạn do `tachDoanDe` (src/lib/gian-y-de.ts) tách:
+   mỗi dòng gốc một đoạn cách nhau .6em · nhãn «Bước 1:» đậm vừa cùng màu chữ, cách trên rõ hơn · phương trình là khối riêng thụt 10 px, viền trái 3 px
+   màu nhạt, không khung (flow-root: né chỗ giám thị trong khung chữ L) · câu hỏi cuối cách trên .9em. Không đổi phông / cỡ / độ đậm thân đề. */
+[data-trong] .ht2-lam-de-chu.de-gian { line-height: 1.5; }
+[data-trong] .de-gian > .de-doan + .de-doan { margin-top: .6em; }
+[data-trong] .de-gian > .de-doan[data-loai='nhan']:not(:first-of-type) { margin-top: .85em; }
+[data-trong] .de-gian > .de-doan[data-loai='hoi']:not(:first-of-type) { margin-top: .9em; }
+[data-trong] .de-gian .de-nhan { font-weight: 650; color: inherit; }
+[data-trong] .de-gian > .de-doan[data-loai='pt'] { display: flow-root !important; margin-left: 2px; padding: 2px 0 2px 10px; border-left: 3px solid var(--tr-vien-2); overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scrollbar-width: thin; }
+[data-trong] .de-gian > .de-doan[data-loai='nhan'] + .de-doan[data-loai='pt'] { margin-top: .45em; }
+[data-trong] .de-gian > .de-doan[data-loai='pt'] .de-nhan { margin-right: .15em; }
