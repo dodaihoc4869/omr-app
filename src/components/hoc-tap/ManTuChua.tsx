@@ -85,7 +85,8 @@ export function dungDong(m: MucChua, i: number, cdl: ReadonlyMap<string, CauDaLa
   const nhom: Nhom = nhomMucChua(m, nayMs)
   // Đợt cũ còn ở nhóm chờ lần gặp lại (vòng từng bước trước 25/10) ⇒ nói đúng mốc hẹn như nhóm của nó; mọi câu khác: Cần sửa / Đã tự sửa.
   const hen = nhom === 'cho' ? henGapLai(m.denHan, nayMs) : null
-  const trangThai = hen ? `Lần gặp lại 2 mở lúc ${hen.luc}` : CHU_TRANG_THAI_CHUA[m.trangThai] ?? 'Cần sửa'
+  // «·» dính chữ đứng trước (khoảng trắng không ngắt) ⇒ dòng không mở đầu bằng «·» ở 360 px (phông ĐĐH Rounded, 27/10)
+  const trangThai = hen ? `Lần gặp lại 2 mở lúc ${hen.luc.replace(/ ·/g, '\u00a0·')}` : CHU_TRANG_THAI_CHUA[m.trangThai] ?? 'Cần sửa'
   const lam = nhom === 'xong' ? 'Xem lại' : m.kiemHoiThay && m.trangThai !== 'can_thay' ? 'Kiểm lại' : 'Sửa'
   return { m, ten: c?.tenDang || `Câu sai số ${i + 1}`, phu, trangThai, nhom, lam }
 }
@@ -298,7 +299,7 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
           <p className="ht2-phu">Các câu kiểm lại được xếp riêng theo lịch ôn của em.</p>
           {kiemRieng.map((m) => {
             const hen = m.denHan ? henGapLai(m.denHan, Date.now()) : null
-            const chu = m.trangThai === 'dang_lam' ? 'Đang tự làm' : m.trangThai === 'den_han' ? 'Đến lịch kiểm lại' : hen ? `Chờ kiểm lại · ${hen.luc}` : 'Đang chờ lịch kiểm lại'
+            const chu = m.trangThai === 'dang_lam' ? 'Đang tự làm' : m.trangThai === 'den_han' ? 'Đến lịch kiểm lại' : hen ? `Chờ kiểm lại\u00a0· ${hen.luc.replace(/ ·/g, '\u00a0·')}` : 'Đang chờ lịch kiểm lại'
             return <button type="button" className="tcl-the" data-khoa={`kiem-hoi-${m.qid}`} key={m.qid} onClick={() => moKiemLai(m)}>
               <span className="ht2-dong-bt" data-sac="cham" aria-hidden="true"><CheckCircle2 size={20} /></span>
               <span className="tcl-the-chu"><strong className="tcl-the-ten">{m.ten || 'Câu em đang luyện'}</strong><small className="tcl-the-phu">{TEN_PHAN[m.phan] || 'Câu kiểm lại'}</small><small className="tcl-the-tt">{chu}</small></span>
