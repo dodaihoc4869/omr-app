@@ -112,7 +112,8 @@ describe('KetQuaSauNop · HAI trạng thái chưa có điểm KHÔNG lộ điể
 describe('rào của màn thi thật (ExamTakeScreen): CHỈ đổi phần nhìn khối kết quả sau nộp', () => {
   const src = doc('src/screens/ExamTakeScreen.tsx')
   it('dùng KetQuaSauNop; hết dòng cũ "Điểm của em:" + xếp loại + hai nút cũ; đường "đang gửi" (Gửi lại ngay) còn nguyên', () => {
-    expect(src).toContain("from '../components/xem-diem/KetQuaSauNop'")
+    // 27/10: nạp lười (bù byte đường /t cho khung thi kiểu Duolingo) — vẫn đúng một nguồn KetQuaSauNop
+    expect(src).toContain("import('../components/xem-diem/KetQuaSauNop')")
     expect(src).not.toContain('Điểm của em: <b')
     expect(src).not.toContain('Xem điểm (Chờ cả lớp nộp xong')
     expect(src).toContain('Gửi lại ngay'); expect(src).toContain('pendingSubmit')
