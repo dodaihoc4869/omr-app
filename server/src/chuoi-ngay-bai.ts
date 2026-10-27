@@ -11,7 +11,8 @@
 // LUẬT MỚI 27/10 (thầy: «1 tuần kiếm được 1 bình thôi», «Bỏ phần thầy duyệt đi») — áp TỪ ngày NGAY_LUAT_BINH_MOI, ngày đã qua tính như cũ (không sửa chuỗi cũ):
 //   · BỎ tặng bình thứ Hai (thứ Hai trước mốc vẫn tặng như cũ, để số bình / ngày bình đỡ trong quá khứ không đổi);
 //   · BỎ «vắng có phép giữ chuỗi»: từ mốc, ngày vắng có phép tính như ngày thường (không học ⇒ dùng bình / tắt / cứu). Dữ liệu điểm danh giữ nguyên.
-//   · ĐẶT LẠI BÌNH (thầy duyệt 27/10): dòng `chuoi_binh_mua` nguồn NGUON_DAT_LAI_BINH ⇒ ngày đó số bình về 0 (bình mua SAU lúc đặt lại vẫn cộng — nơi đọc lọc).
+//   · ĐẶT LẠI BÌNH (thầy duyệt 27/10, lặp lại 28/10 00:01): dòng `chuoi_binh_mua` nguồn bắt đầu TIEN_TO_DAT_LAI_BINH ⇒ ngày đó số bình về 0 (bình mua SAU
+//     lúc đặt lại vẫn cộng — nơi đọc lọc). Nhiều lần đặt lại ⇒ vòng lặp ngày gặp từng lần theo thứ tự, lần sau cùng (luc lớn nhất) quyết định.
 
 export const CAU_MOT_BAI = 6
 export const BAI_CUU = 2
@@ -23,17 +24,22 @@ export const MOC_SUC_CHUA = 100
 export const SO_NGAY_DOC = 400
 /** Ngày VN bắt đầu luật bình mới 27/10 (bỏ tặng thứ Hai + bỏ giữ chuỗi vì vắng có phép). Ngày TRƯỚC mốc giữ luật cũ. */
 export const NGAY_LUAT_BINH_MOI = '2026-10-27'
-/** Nguồn của dòng đặt lại bình (bảng `chuoi_binh_mua`, `so` = −số bình em có lúc đặt lại, chỉ để truy vết). */
+/** Nguồn của dòng đặt lại bình (bảng `chuoi_binh_mua`, `so` = −số bình em có lúc đặt lại, chỉ để truy vết) — lần 27/10. */
 export const NGUON_DAT_LAI_BINH = 'tt-binh-reset-2710'
+/** Tiền tố MỌI lần đặt lại bình (thầy 27/10: «00h01 đêm nay reset bình về 0 hết» ⇒ `tt-binh-reset-2810`, …). Mỗi lần một nguồn có hậu tố ngày ⇒ id
+ *  `<sbd>|<nguồn>` không trùng lần trước. Nhiều lần: mỗi ngày có dòng đặt lại bình về 0 (lần SAU cùng thắng — luc lớn nhất), bình mua sau mốc vẫn cộng. */
+export const TIEN_TO_DAT_LAI_BINH = 'tt-binh-reset'
+/** Nguồn đặt lại theo ngày VN (`2026-10-28` ⇒ `tt-binh-reset-2810`). */
+export const nguonDatLaiBinh = (ngayVn: string): string => `${TIEN_TO_DAT_LAI_BINH}-${ngayVn.slice(8, 10)}${ngayVn.slice(5, 7)}`
 /**
  * Hai cột đọc bình theo ngày VN từ `chuoi_binh_mua` bí danh `m` (nơi gọi thêm FROM/WHERE/GROUP BY theo `n`): `s` = số bình mua (ngày có đặt lại: chỉ bình mua
  * SAU lúc đặt lại), `r` = 1 khi ngày đó có dòng đặt lại. Một nguồn cho cả đọc một em (B3) lẫn đọc nhiều em (phần B).
  */
 export const SQL_COT_BINH_MUA = `date(m.luc, '+7 hours') AS n,
-    SUM(CASE WHEN m.nguon = '${NGUON_DAT_LAI_BINH}' THEN 0
-      WHEN EXISTS (SELECT 1 FROM chuoi_binh_mua r WHERE r.sbd = m.sbd AND r.nguon = '${NGUON_DAT_LAI_BINH}' AND r.luc >= m.luc AND date(r.luc, '+7 hours') = date(m.luc, '+7 hours')) THEN 0
+    SUM(CASE WHEN m.nguon LIKE '${TIEN_TO_DAT_LAI_BINH}%' THEN 0
+      WHEN EXISTS (SELECT 1 FROM chuoi_binh_mua r WHERE r.sbd = m.sbd AND r.nguon LIKE '${TIEN_TO_DAT_LAI_BINH}%' AND r.luc >= m.luc AND date(r.luc, '+7 hours') = date(m.luc, '+7 hours')) THEN 0
       ELSE m.so END) AS s,
-    MAX(m.nguon = '${NGUON_DAT_LAI_BINH}') AS r`
+    MAX(m.nguon LIKE '${TIEN_TO_DAT_LAI_BINH}%') AS r`
 /** Ngày `ngay` còn được tặng bình thứ Hai? (chỉ thứ Hai TRƯỚC mốc luật mới) */
 export const conTangThuHai = (ngay: string): boolean => ngay < NGAY_LUAT_BINH_MOI && new Date(Date.parse(`${ngay}T00:00:00Z`)).getUTCDay() === 1
 /** Vắng có phép ngày `ngay` còn giữ chuỗi? (chỉ ngày TRƯỚC mốc luật mới) */

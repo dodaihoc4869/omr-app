@@ -1,7 +1,7 @@
 // @vitest-environment node
 // B3 CHUỖI NGÀY THEO BÀI + BÌNH GIỮ CHUỖI (thầy chốt 26/10; docs/hop-dong-duolingo-2610.md mục 4–5) — hàm thuần chuoiNgayCuaEm.
 import { describe, expect, it } from 'vitest'
-import { chuoiNgayCuaEm, conTangThuHai, thuHaiCua, CAU_MOT_BAI, NGAY_LUAT_BINH_MOI, type NhatKyChuoi } from '../server/src/chuoi-ngay-bai'
+import { chuoiNgayCuaEm, conTangThuHai, nguonDatLaiBinh, thuHaiCua, CAU_MOT_BAI, NGAY_LUAT_BINH_MOI, type NhatKyChuoi } from '../server/src/chuoi-ngay-bai'
 
 const nk = (o: { hoc?: Record<string, number>; tuSua?: string[]; phep?: string[]; mua?: Record<string, number> } = {}): NhatKyChuoi =>
   ({ soCau: new Map(Object.entries(o.hoc ?? {})), tuSua: new Set(o.tuSua ?? []), phep: new Set(o.phep ?? []), mua: new Map(Object.entries(o.mua ?? {})) })
@@ -60,6 +60,14 @@ describe('chuoiNgayCuaEm', () => {
     expect(r.giuChuoi).toBe(0); expect(r.so).toBe(16)
     const sau = chuoiNgayCuaEm({ ...nk({ hoc, mua: { '2026-10-28': 1 } }), datLai: new Set(['2026-10-27']) }, '2026-10-28')
     expect(sau.giuChuoi).toBe(1)
+  })
+  it('hai lần đặt lại (27/10 rồi 28/10): bình mua giữa hai lần về 0, mua sau lần hai giữ; nguồn theo ngày', () => {
+    expect(nguonDatLaiBinh('2026-10-28')).toBe('tt-binh-reset-2810')
+    const hoc = hocCacNgay(ngay('2026-10-12', 20))
+    const r = chuoiNgayCuaEm({ ...nk({ hoc, mua: { '2026-10-27': 1, '2026-10-29': 1 } }), datLai: new Set(['2026-10-27', '2026-10-28']) }, '2026-10-29')
+    expect(r.giuChuoi).toBe(1) // mua 27/10 (sau lần 1) bị lần 2 xoá; mua 29/10 giữ
+    const ba = chuoiNgayCuaEm({ ...nk({ hoc, mua: { '2026-10-27': 1 } }), datLai: new Set(['2026-10-27', '2026-10-28']) }, '2026-10-28')
+    expect(ba.giuChuoi).toBe(0)
   })
   it('mốc 30 ngày tặng 1 bình; mốc 100 ngày nâng sức chứa lên 3', () => {
     const r30 = chuoiNgayCuaEm(nk({ hoc: hocCacNgay(ngay('2026-11-03', 30)) }), '2026-12-02') // sau luật mới: không bình thứ Hai, chỉ bình mốc 30

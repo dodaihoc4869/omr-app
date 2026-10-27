@@ -11,14 +11,25 @@
 // các dòng có trước mốc (rowid ≤ max lúc đầu) không đổi. Chạy lại: dòng đặt lại đã có (INSERT OR IGNORE) ⇒ không ghi thêm.
 import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
-import { chuoiNgayCuaEm, ngayVn, NGUON_DAT_LAI_BINH, SO_NGAY_DOC, SQL_COT_BINH_MUA, type NhatKyChuoi } from '../server/src/chuoi-ngay-bai'
+import { chuoiNgayCuaEm, ngayVn, nguonDatLaiBinh, SO_NGAY_DOC, SQL_COT_BINH_MUA, type NhatKyChuoi } from '../server/src/chuoi-ngay-bai'
 
 const token = process.env.CLOUDFLARE_API_TOKEN
 const account = process.env.CLOUDFLARE_ACCOUNT_ID
 const MOC_LUAT = process.env.MOC_LUAT ?? ''
 const GHI = process.env.GHI === 'ghi'
 if (!token || !account) throw new Error('Thiếu cấu hình Cloudflare.')
-if (!/^[a-f0-9]{7,40}$/.test(MOC_LUAT)) throw new Error('Thiếu commit luật mới (MOC_LUAT).')
+if (MOC_LUAT && !/^[a-f0-9]{7,40}$/.test(MOC_LUAT)) throw new Error('MOC_LUAT không phải mã commit.')
+// 28/10 (thầy: «00h01 đêm nay reset bình về 0 hết»): nhiều lần đặt lại ⇒ mỗi lần một NGUỒN (mặc định theo ngày VN của mốc) + MỐC `LUC` cố định (chạy trễ
+// vẫn ghi đúng mốc). `CHI_NGAY` (lượt hẹn giờ) ⇒ chỉ chạy đúng ngày VN đó. `CHO_CA_TOI` ⇒ có ca thi mở thì thử lại mỗi 10 phút tới giờ này rồi DỪNG.
+const MOC_MS = process.env.LUC ? Date.parse(process.env.LUC) : Date.now()
+if (!Number.isFinite(MOC_MS)) throw new Error('LUC không phải mốc ISO.')
+if (MOC_MS > Date.now() + 60_000) throw new Error(`Chưa tới mốc ${new Date(MOC_MS).toISOString()} — không ghi trước giờ.`)
+const NGUON = process.env.NGUON || nguonDatLaiBinh(ngayVn(MOC_MS))
+if (!/^tt-binh-reset-[0-9]{4}$/.test(NGUON)) throw new Error('NGUON phải dạng tt-binh-reset-DDMM.')
+const CHI_NGAY = process.env.CHI_NGAY ?? ''
+const CHO_CA_TOI = process.env.CHO_CA_TOI ? Date.parse(process.env.CHO_CA_TOI) : 0
+/** Dấu mã bắt buộc có trong mã Worker sống (luật đặt lại nhiều lần). */
+const DAU_MA = 'TIEN_TO_DAT_LAI_BINH'
 const DB = 'd2e6d322-374a-45d7-83a3-9fac486b23f1'
 type Row = Record<string, unknown>
 
@@ -38,10 +49,17 @@ async function cf(path: string): Promise<Record<string, unknown>> {
 }
 const log = (o: Record<string, unknown>) => console.log(JSON.stringify(o))
 
-// (1) Ca thi mở ⇒ dừng.
-const ca = (await query(readFileSync('scripts/kiem-ca-mo.sql', 'utf8').replace(/--[^\n]*/g, ' ')))[0] ?? {}
-log({ buoc: 'ca_thi', soCaMo: ca.so_ca_mo, soLuotDangLam: ca.so_luot_dang_lam })
-if (ca.so_ca_mo !== 0 || ca.so_luot_dang_lam !== 0) throw new Error('Có ca thi mở: DỪNG, chưa đặt lại bình.')
+// (0) Lượt hẹn giờ chỉ chạy đúng ngày VN đã định (cron năm sau trùng ngày ⇒ bỏ qua).
+if (CHI_NGAY && ngayVn(Date.now()) !== CHI_NGAY) { log({ buoc: 'bo_qua', ly_do: 'khac_ngay', chiNgay: CHI_NGAY, homNay: ngayVn(Date.now()) }); process.exit(0) }
+
+// (1) Ca thi mở ⇒ chờ (thử lại mỗi 10 phút tới CHO_CA_TOI) rồi DỪNG.
+for (;;) {
+  const ca = (await query(readFileSync('scripts/kiem-ca-mo.sql', 'utf8').replace(/--[^\n]*/g, ' ')))[0] ?? {}
+  log({ buoc: 'ca_thi', soCaMo: ca.so_ca_mo, soLuotDangLam: ca.so_luot_dang_lam, luc: new Date().toISOString() })
+  if (ca.so_ca_mo === 0 && ca.so_luot_dang_lam === 0) break
+  if (!CHO_CA_TOI || Date.now() + 10 * 60_000 > CHO_CA_TOI) throw new Error('DỪNG — CHƯA ĐẶT LẠI BÌNH: có ca thi mở (quá giờ chờ). Chạy tay lại khi ca đóng.')
+  await new Promise((r) => setTimeout(r, 10 * 60_000))
+}
 
 // (2) Bản sống đã có luật mới.
 const dep = await cf('workers/scripts/omr/deployments')
@@ -50,16 +68,18 @@ if (!ban?.length || ban.length !== 1 || ban[0]!.percentage !== 100) throw new Er
 const ver = await cf(`workers/scripts/omr/versions/${ban[0]!.version_id}`)
 const the = ((ver.annotations ?? (ver.metadata as Row | undefined)?.annotations) as Row | undefined)?.['workers/tag']
 if (typeof the !== 'string' || !/^[a-f0-9]{40}$/.test(the)) throw new Error('Bản Worker sống không có thẻ commit.')
-try { execFileSync('git', ['merge-base', '--is-ancestor', MOC_LUAT, the]) } catch { throw new Error('Worker sống CHƯA có luật bình mới — dừng (chạy lại sau khi deploy xanh).') }
+if (MOC_LUAT) { try { execFileSync('git', ['merge-base', '--is-ancestor', MOC_LUAT, the]) } catch { throw new Error('Worker sống CHƯA có luật bình mới — dừng (chạy lại sau khi deploy xanh).') } }
+let maSong = ''
+try { maSong = execFileSync('git', ['show', `${the}:server/src/chuoi-ngay-bai.ts`]).toString() } catch { maSong = '' }
+if (!maSong.includes(DAU_MA)) throw new Error('Worker sống CHƯA có luật đặt lại nhiều lần — dừng (chạy lại sau khi deploy xanh).')
 log({ buoc: 'ban_song', coLuatMoi: true })
 
 // (3) Bảng bình (chỉ-thêm, cùng DDL của B3) — có sẵn thì không đổi gì.
 await query('CREATE TABLE IF NOT EXISTS chuoi_binh_mua (id TEXT PRIMARY KEY, sbd TEXT NOT NULL, so INTEGER NOT NULL, nguon TEXT NOT NULL, luc TEXT NOT NULL)')
 await query('CREATE INDEX IF NOT EXISTS idx_chuoi_binh_mua_sbd ON chuoi_binh_mua (sbd, luc)')
 
-const MOC_MS = Date.now()
 const MOC_ISO = new Date(MOC_MS).toISOString()
-const homNay = ngayVn(MOC_MS)
+const homNay = ngayVn(Math.max(MOC_MS, Date.now()))
 const tu = new Date(Date.parse(`${homNay}T00:00:00Z`) - SO_NGAY_DOC * 86_400_000).toISOString().slice(0, 10)
 const tuIso = `${new Date(Date.parse(`${tu}T00:00:00Z`) - 86_400_000).toISOString().slice(0, 10)}T00:00:00Z`
 
@@ -85,13 +105,14 @@ const dem = (m: Map<string, number>) => { let soEm = 0, tong = 0; for (const v o
 async function tongSo() {
   const v = (await query('SELECT COUNT(*) AS n, COALESCE(SUM(so_vang), 0) AS s, COALESCE(MAX(rowid), 0) AS m FROM vang_so'))[0]!
   const e = (await query('SELECT COUNT(*) AS n, COALESCE(SUM(exp), 0) AS s, COALESCE(MAX(rowid), 0) AS m FROM exp_so'))[0]!
-  return { v, e }
+  const k = (await query("SELECT (SELECT COUNT(*) FROM kim_cuong_phien) AS phien, (SELECT COUNT(*) FROM huy_hieu_em WHERE ma LIKE 'kc|%') AS hh").catch(() => [{ phien: 0, hh: 0 }]))[0]!
+  return { v, e, k }
 }
 
 const truoc = await binhMoiEm(MOC_ISO)
-const daDatLai = Number((await query('SELECT COUNT(*) AS n FROM chuoi_binh_mua WHERE nguon = ?', [NGUON_DAT_LAI_BINH]))[0]?.n ?? 0)
+const daDatLai = Number((await query('SELECT COUNT(*) AS n FROM chuoi_binh_mua WHERE nguon = ?', [NGUON]))[0]?.n ?? 0)
 const t0 = await tongSo()
-log({ buoc: 'truoc', moc: MOC_ISO, ngayVn: homNay, soEmDaTinh: truoc.size, ...dem(truoc), dongDatLaiDaCo: daDatLai })
+log({ buoc: 'truoc', moc: MOC_ISO, nguon: NGUON, ngayVn: homNay, soEmDaTinh: truoc.size, ...dem(truoc), dongDatLaiDaCo: daDatLai })
 
 if (!GHI) { log({ buoc: 'chi_dem', ghi: false }); process.exit(0) }
 
@@ -105,7 +126,7 @@ for (let i = 0; i < can.length; i += 200) {
     body: JSON.stringify({
       sql: `INSERT OR IGNORE INTO chuoi_binh_mua (id, sbd, so, nguon, luc)
         SELECT json_extract(j.value, '$.s') || '|' || ?1, json_extract(j.value, '$.s'), -json_extract(j.value, '$.v'), ?1, ?2 FROM json_each(?3) j`,
-      params: [NGUON_DAT_LAI_BINH, MOC_ISO, JSON.stringify(phan)],
+      params: [NGUON, MOC_ISO, JSON.stringify(phan)],
     }),
   })
   const j = (await r.json()) as { success?: boolean; result?: { meta?: { changes?: number } }[] }
@@ -120,10 +141,12 @@ const v1 = (await query('SELECT COUNT(*) AS n, COALESCE(SUM(so_vang), 0) AS s FR
 const e1 = (await query('SELECT COUNT(*) AS n, COALESCE(SUM(exp), 0) AS s FROM exp_so WHERE rowid <= ?', [t0.e.m]))[0]!
 const tinhTheGiu = Number(v1.n) === Number(t0.v.n) && Number(v1.s) === Number(t0.v.s)
 const nguyenTuGiu = Number(e1.n) === Number(t0.e.n) && Number(e1.s) === Number(t0.e.s)
+const kimCuongGiu = Number(t1.k.phien) === Number(t0.k.phien) && Number(t1.k.hh) === Number(t0.k.hh)
 log({
   buoc: 'sau', dongVuaGhi: daGhi, ...dem(sau), coBinhDoMuaSauMoc: dem(sauTatCa).soEm,
   tinhThe: { truoc: Number(t0.v.s), sauCungDong: Number(v1.s), giuNguyen: tinhTheGiu, dongMoiSauMoc: Number(t1.v.n) - Number(t0.v.n) },
   nguyenTu: { truoc: Number(t0.e.s), sauCungDong: Number(e1.s), giuNguyen: nguyenTuGiu, dongMoiSauMoc: Number(t1.e.n) - Number(t0.e.n) },
+  kimCuong: { phien: Number(t1.k.phien), huyHieu: Number(t1.k.hh), giuNguyen: kimCuongGiu },
 })
 if (dem(sau).soEm !== 0) throw new Error('Còn em có bình sau khi đặt lại (không tính bình mua sau mốc) — kiểm lại.')
 if (!tinhTheGiu || !nguyenTuGiu) throw new Error('Tổng tinh thể / nguyên tử của các dòng cũ bị đổi — kiểm lại ngay.')

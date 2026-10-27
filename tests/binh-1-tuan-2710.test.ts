@@ -125,6 +125,20 @@ describe('bình giữ chuỗi từ sổ (B3 thật, D1 thật)', () => {
     expect((await docChuoiNgayBai(k.env, 'S1', t))?.so).toBe(16)
   })
 
+  it('hai lần đặt lại trên D1 (2710 rồi 2810, 00:01 VN): mua giữa hai lần về 0, mua cùng ngày trước mốc 2 về 0, mua sau mốc 2 giữ; một em = nhiều em', async () => {
+    const k = kho()
+    k.hoc('S1', '2026-10-12', 18); k.hoc('S2', '2026-10-12', 18)
+    const datLai = (sbd: string, nguon: string, luc: string) => k.d.sql.prepare('INSERT INTO chuoi_binh_mua(id,sbd,so,nguon,luc) VALUES(?,?,?,?,?)').run(`${sbd}|${nguon}`, sbd, -1, nguon, luc)
+    for (const s of ['S1', 'S2']) { datLai(s, 'tt-binh-reset-2710', '2026-10-27T09:14:02.876Z'); datLai(s, 'tt-binh-reset-2810', '2026-10-27T17:01:00.000Z') }
+    await congBinh(k.env, 'S1', 1, 'tinh_the', 'S1|giua', VN('2026-10-27T18:00:00'))   // giữa hai lần
+    await congBinh(k.env, 'S2', 1, 'tinh_the', 'S2|sau', VN('2026-10-28T08:00:00'))    // sau lần 2
+    const t = VN('2026-10-28T20:00:00')
+    expect((await docChuoiNgayBai(k.env, 'S1', t))?.giuChuoi).toBe(0)
+    expect((await docChuoiNgayBai(k.env, 'S2', t))?.giuChuoi).toBe(1)
+    expect((await nhieuEm(k.env, 'S1', '2026-10-28')).giuChuoi).toBe(0)
+    expect((await nhieuEm(k.env, 'S2', '2026-10-28')).giuChuoi).toBe(1)
+  })
+
   it('vắng có phép (dữ liệu điểm danh giữ nguyên): trước 27/10 vẫn giữ chuỗi; từ 27/10 không học + không bình ⇒ tắt, có bình ⇒ dùng bình; cược/thăng hoa không còn coi là ngày đỡ', async () => {
     const k = kho()
     const phep = (sbd: string, ngay: string) => {
