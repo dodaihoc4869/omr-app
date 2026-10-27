@@ -533,7 +533,9 @@ export async function soanSoDoLo(env: Env, thamSo: unknown, phu: PhuSoDo = {}): 
     }
     // 27/10: câu LỖI GỌI (Gemini 429 / quá tải…) không được bỏ qua — con trỏ dừng ngay TRƯỚC câu lỗi đầu tiên, lượt sau soạn lại từ đó
     // (câu cùng đợt đã soạn xong thì lượt sau tự bỏ qua vì đã có dòng). Trước đây con trỏ vẫn đi tiếp ⇒ câu lỗi rơi khỏi lượt quét.
-    const kLoi = xong.findIndex((r) => r.dong.ket === 'loi_goi')
+    // CHỈ lỗi hạn mức / quá tải (HTTP 429 / 503) mới giữ con trỏ; lỗi cố định của riêng câu (rỗng SAFETY, quá giờ, HTTP 400…) vẫn bước qua như cũ
+    // để một câu hỏng không ghim con trỏ mãi.
+    const kLoi = xong.findIndex((r) => r.dong.ket === 'loi_goi' && /\bHTTP (429|503)\b/.test(str(r.dong.lyDo)))
     if (kLoi >= 0) {
       const h = viTri[kLoi]!
       if (h > i) conTro = hang[h - 1]!.vt
