@@ -6,7 +6,7 @@ import { useRef, useState, type CSSProperties } from 'react'
 import { BookOpen, Check, ChevronRight, Clock, FlaskConical, Lock, Sparkles, Target, Wrench, Zap } from 'lucide-react'
 import { Bi } from '../linh-vat/Bi'
 import { bayToi, bungHat, demSo, hoatAnh, phanHoiThuong } from '../../lib/hieu-ung-thuong'
-import { GIA_BINH, moRuong, type NhiemVu, type ThongBao, type TongQuanThuong } from '../../lib/thuong-api'
+import { CHU_DA_MUA_TUAN, chuGiaBinh, giaBinh, moRuong, type NhiemVu, type ThongBao, type TongQuanThuong } from '../../lib/thuong-api'
 import { Binh, IcTinhThe, Ruong } from './hinh'
 import { SoDem } from './SoDem'
 import { capNhatTongQuan, useTongQuan } from './dung-thuong'
@@ -119,7 +119,8 @@ export function ManCuaHang({ token, onVe, onPhuKien }: { token?: string; onVe?: 
   if (!tq) return <div className="tp-goc tp-vo"><DauVe onVe={onVe} />{tai ? <Cho /> : <Loi chu={loi || 'Chưa xem được tinh thể.'} onThuLai={thuLai} />}</div>
   const c = tq.chuoiNgay
   const day = !!c && c.giuChuoi >= c.sucChua
-  const du = tq.tinhThe === undefined || tq.tinhThe >= GIA_BINH
+  const gia = giaBinh(tq), daMuaTuan = tq.binh?.daMuaTuan === true
+  const du = tq.tinhThe === undefined || tq.tinhThe >= gia
   return <div className="tp-goc tp-vo" data-man="cua-hang">
     <DauVe onVe={onVe} />
     {loi && <Loi chu={loi} onThuLai={thuLai} />}
@@ -128,10 +129,11 @@ export function ManCuaHang({ token, onVe, onPhuKien }: { token?: string; onVe?: 
         {tq.tinhThe !== undefined && <div className="tp-so-du tp-tren-mau" role="img" aria-label={`Em có ${tq.tinhThe} tinh thể`}><IcTinhThe /><div><b><SoDem gt={tq.tinhThe} /></b><span>tinh thể của em</span></div></div>}
         {c && <section className="tp-the" aria-label="Bình giữ chuỗi">
           <div className="tp-mon"><span className="hinh" id="tp-binh-mua"><Binh kieu={c.giuChuoi > 0 ? 'day' : 'trong'} /></span>
-            <div className="giua"><b>Bình giữ chuỗi</b><span>Lỡ một ngày, bình tự đỡ để chuỗi không tắt. Em đang mang {c.giuChuoi}/{c.sucChua} bình.</span>
-              {!day && !du && <span className="tp-mo">Cần {GIA_BINH} tinh thể — em đang có {tq.tinhThe}.</span>}</div></div>
-          {token && <button type="button" className="tp-nut-lon" data-sac="tt" disabled={day || !du || m.dang !== ''} onClick={() => void m.mua('tp-binh-mua')}>
-            {day ? `Đã mang đủ ${c.sucChua} bình` : `Mua 1 bình · ${GIA_BINH} tinh thể`}</button>}
+            <div className="giua"><b>Bình giữ chuỗi</b><span className="tp-chip-tt">{chuGiaBinh(gia)}</span>
+              <span>Lỡ một ngày, bình tự đỡ để chuỗi không tắt. Em đang mang {c.giuChuoi}/{c.sucChua} bình.</span>
+              {!day && !daMuaTuan && !du && <span className="tp-mo">Cần {gia} tinh thể — em đang có {tq.tinhThe}.</span>}</div></div>
+          {token && <button type="button" className="tp-nut-lon" data-sac={daMuaTuan && !day ? 'tat' : 'tt'} disabled={day || daMuaTuan || !du || m.dang !== ''} onClick={() => void m.mua('tp-binh-mua')}>
+            {day ? `Đã mang đủ ${c.sucChua} bình` : daMuaTuan ? CHU_DA_MUA_TUAN : `Mua 1 bình · ${gia} tinh thể`}</button>}
         </section>}
         <TheCuoc tq={tq} dangGui={m.dang === 'cuoc'} onCuoc={token ? () => void m.cuoc() : undefined} />
         {onPhuKien && <section className="tp-the" aria-label="Phụ kiện cho thú">
@@ -198,7 +200,7 @@ export function ManThangHoa({ tb, onHoc, onDong }: { tb: ThongBao; onHoc?: () =>
       <div className="cot-b">
         <section className="tp-the" aria-label="Vì sao">
           <div className="tp-dong"><span className="tp-o" data-sac="tin"><FlaskConical aria-hidden="true" /></span><div className="giua"><b>Thăng hoa = 10% số tinh thể</b><span>ít nhất 5, nhiều nhất 50{truoc !== undefined ? ` · 10% của ${truoc} là ${mat}` : ''}</span></div></div>
-          <div className="tp-dong"><span className="tp-o" data-sac="bang"><Lock aria-hidden="true" /></span><div className="giua"><b>Lần sau mang sẵn bình giữ chuỗi</b><span>có bình thì tinh thể không thăng hoa · {GIA_BINH} tinh thể một bình</span></div></div>
+          <div className="tp-dong"><span className="tp-o" data-sac="bang"><Lock aria-hidden="true" /></span><div className="giua"><b>Lần sau mang sẵn bình giữ chuỗi</b><span>có bình thì tinh thể không thăng hoa · {chuGiaBinh(giaBinh())}</span></div></div>
           <div className="tp-dong"><span className="tp-o" data-sac="sao"><Zap aria-hidden="true" /></span><div className="giua"><b>Học 1 chặng hôm nay</b><span>ngọn lửa chuỗi bắt đầu cháy lại từ hôm nay</span></div></div>
         </section>
       </div>

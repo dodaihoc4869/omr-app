@@ -16,7 +16,7 @@ import { hieuUngGoCua, nhanLop, tenGoi } from './ban-gon'
 
 export const LUAT_BAN = [
   'Cả hai cùng xong ít nhất 1 chặng trong ngày thì lửa đôi tăng 1. Một bạn lỡ thì lửa đôi tắt.',
-  'Bình giữ chuỗi hay ngày vắng có phép của bạn nào thì đỡ cho bạn ấy.',
+  'Bình giữ chuỗi của bạn nào thì đỡ cho bạn ấy.',
   'Em xong chặng mà bạn chưa? Bấm «Gõ cửa», mỗi ngày 1 lần cho mỗi bạn.',
   'Bạn bè chỉ thấy em đã học hôm nay chưa và số lửa đôi, không thấy điểm.',
 ] as const

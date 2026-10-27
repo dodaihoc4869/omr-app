@@ -1,0 +1,48 @@
+# ĐẶT LẠI BÌNH GIỮ CHUỖI VỀ 0 CHO MỌI HỌC SINH (thầy DUYỆT 27/10: chọn «Chỉ bình giữ chuỗi»). Bấm tay (workflow_dispatch), KHÔNG chạy từ máy local.
+# Chỉ THÊM dòng `chuoi_binh_mua` nguồn 'tt-binh-reset-2710' (một dòng mỗi em đang có bình, so = −số bình để truy vết) — không xoá / sửa dòng nào,
+# không đụng tinh thể (vang_so), nguyên tử (exp_so), chuỗi ngày, giải, nhiệm vụ. Máy chủ (luật 27/10) gặp dòng này ⇒ bình về 0; bình mua sau mốc vẫn cộng.
+# Cổng: có ca thi mở ⇒ DỪNG; Worker sống chưa có commit luật mới (`moc`) ⇒ DỪNG. In SỐ ĐẾM trước / sau (không sbd, không tên); đối chiếu tổng tinh thể
+# / nguyên tử của các dòng cũ không đổi. Chạy lại an toàn (INSERT OR IGNORE theo id). `che_do: dem` ⇒ chỉ đếm, không ghi.
+name: Đặt lại bình giữ chuỗi về 0 (27/10)
+on:
+  workflow_dispatch:
+    inputs:
+      moc:
+        description: 'Commit đã gộp luật bình mới (Worker sống phải chạy commit này hoặc mới hơn)'
+        required: true
+      che_do:
+        description: 'dem = chỉ đếm · ghi = đặt lại'
+        required: true
+        default: 'dem'
+        type: choice
+        options: [dem, ghi]
+permissions:
+  contents: read
+concurrency:
+  group: dat-lai-binh-2710
+  cancel-in-progress: false
+jobs:
+  dat-lai:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đóng gói lệnh (dùng đúng hàm thuần chuỗi ngày của máy chủ)
+        run: npx -y esbuild@0.24.0 scripts/dat-lai-binh-2710.ts --bundle --platform=node --format=esm --outfile=/tmp/dat-lai-binh.mjs --log-level=warning
+      - name: Đếm / đặt lại bình
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+          MOC_LUAT: ${{ inputs.moc }}
+          GHI: ${{ inputs.che_do }}
+        run: node /tmp/dat-lai-binh.mjs
