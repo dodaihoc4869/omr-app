@@ -204,7 +204,7 @@ describe('GV — màn «Thi đua tuần» (tp-15)', () => {
     expect(xacNhan).toHaveBeenCalledTimes(2)
     expect(xacNhan.mock.calls[1]![0]).toMatchObject({ tieuDe: 'Tắt Thăng hoa?', nguyHiem: true })
     expect(goi.filter((g) => g.body)).toEqual([{ duong: '/gv/thuong/cong-tac', body: { khoa: 'thuong_thang_hoa', giaTri: 'tat' } }])
-    expect(screen.getAllByRole('switch')).toHaveLength(4)
+    expect(screen.getAllByRole('switch')).toHaveLength(5) // + «Tạm đóng app học sinh» (27/10)
   })
 })
 

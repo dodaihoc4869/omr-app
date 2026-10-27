@@ -40,6 +40,8 @@ export interface TongQuanThuong {
   cuoc?: CuocDang | null
   /** Luật bình 27/10: giá + đã mua bình tuần này chưa (mỗi tuần mua 1 bình). Máy chủ cũ không gửi ⇒ vắng (giá mặc định GIA_BINH). */
   binh?: { gia: number; daMuaTuan: boolean; muaTiepTu?: string }
+  /** Thầy tạm đóng app học sinh (27/10, `cau_hinh.hs_tam_dong`). Chỉ có khi đang đóng; máy chủ cũ / đang mở ⇒ vắng. */
+  tamDong?: true
 }
 /** Chỉ có ở dòng của CHÍNH em khi tuần này bản xếp ghi làm đối phó (bảng tính 0): nguyên tử đã kiếm mà chưa tính hạng + lý do (mã, chữ). */
 export interface ChuaTinhHang { nguyenTu: number; lyDo: { ma: string; chu: string }[] }
@@ -134,6 +136,7 @@ export function docTongQuan(x: unknown): TongQuanThuong | null {
   const o = dt(x)
   if (!o || o.ok === false) return null
   const kq: TongQuanThuong = { bat: docCongTac(o.bat), thongBao: mang(o.thongBao, docThongBao) ?? [] }
+  if (o.tamDong === true) kq.tamDong = true
   const nt = soNg(o.nguyenTuHomNay); if (nt !== undefined) kq.nguyenTuHomNay = nt
   const tt = soNg(o.tinhThe); if (tt !== undefined) kq.tinhThe = tt
   const mt = dt(o.mucTieu), dx = soNg(mt?.daXong), can = soNg(mt?.can), mc = soNg(mt?.cau), cd = soNg(mt?.cauDaLam)

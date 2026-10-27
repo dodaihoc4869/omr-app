@@ -20,11 +20,15 @@ import '../styles/trong-gv-ngang.css' // NGANG GV 26/10: dải biểu tượng �
 
 if (typeof document !== 'undefined') document.head.append(Object.assign(document.createElement('style'), { textContent: cssThiDua + cssTrongThiDua }))
 
-export const CONG_TAC: readonly { khoa: KhoaCongTac; ten: string; mo: string; tat: string }[] = [
+export const CONG_TAC: readonly { khoa: KhoaCongTac; ten: string; mo: string; tat: string; hoiBat?: string; hoiTat?: string }[] = [
   { khoa: 'thuong_giai_tuan', ten: 'Giải tuần', mo: 'Các em vào giải tuần, xếp theo nguyên tử học thật', tat: 'Màn học sinh ẩn giải tuần và bảng xếp hạng; không chốt lên / xuống hạng cuối tuần.' },
   { khoa: 'thuong_thang_hoa', ten: 'Thăng hoa', mo: '2 ngày không học, không có bình ⇒ mất 10% tinh thể (5–50)', tat: 'Không em nào bị trừ tinh thể vì nghỉ học.' },
   { khoa: 'thuong_ban_be', ten: 'Học cùng bạn', mo: 'Mời tối đa 3 bạn, giữ chuỗi đôi, gõ cửa nhắc bạn', tat: 'Màn học sinh ẩn mục Học cùng bạn; chuỗi đôi đang có dừng lại.' },
   { khoa: 'thuong_kim_cuong', ten: 'Kim cương', mo: 'Thử thách 10 câu, 3 ống; trượt thì chờ 24 giờ', tat: 'Màn học sinh ẩn thử thách Kim cương.' },
+  // NGƯỢC chiều (27/10): bật = ĐÓNG app học sinh ⇒ bật mới là việc cần cân nhắc.
+  { khoa: 'hs_tam_dong', ten: 'Tạm đóng app học sinh', mo: 'Bật ⇒ học sinh thấy màn «App đang bảo trì», chưa vào học được; bài kiểm tra và ca thi đang làm vẫn nộp được', tat: '',
+    hoiBat: 'Trong vòng 1 phút, máy các em đang mở app hiện màn «App đang bảo trì». Em đang làm dở bài kiểm tra hoặc ca thi vẫn nộp được.',
+    hoiTat: 'Các em vào học lại được ngay; máy đang mở tự vào lại trong vòng 1 phút.' },
 ]
 const MAU_BAC: Readonly<Record<Bac, string>> = { 1: 'dung', 2: 'chu-y', 3: 'tin', 4: 'sai', 5: 'sai' }
 const HIEN_DAU = 10
@@ -127,9 +131,9 @@ export default function ThiDuaTuanScreen() {
     const bat = !dang
     const dongY = await hoiXacNhan({
       tieuDe: `${bat ? 'Bật' : 'Tắt'} ${k.ten}?`,
-      noiDung: bat ? `${k.mo}. Áp dụng cho mọi lớp ngay khi các em mở app.` : `${k.tat} Áp dụng cho mọi lớp; số đã có giữ nguyên, bật lại là hiện tiếp.`,
+      noiDung: bat ? k.hoiBat ?? `${k.mo}. Áp dụng cho mọi lớp ngay khi các em mở app.` : k.hoiTat ?? `${k.tat} Áp dụng cho mọi lớp; số đã có giữ nguyên, bật lại là hiện tiếp.`,
       nhanDongY: `${bat ? 'Bật' : 'Tắt'} ${k.ten}`,
-      nguyHiem: !bat,
+      nguyHiem: k.hoiBat ? bat : !bat,
     })
     if (!dongY) return
     setCtDang(k.khoa)

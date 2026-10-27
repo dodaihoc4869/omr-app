@@ -377,6 +377,7 @@ const DS_GT = ['nb', 'th', 'vd', 'vdc'].flatMap((m) => ['light', 'dark'].flatMap
 const TPC_CANH = [
   ['lo-trinh', 'hs-mot&tp=1', /Ester/], ['thanh-tich', 'hs-mot&tp=1', /Ester/, 'menu:Thành tích'], ['menu', 'hs-mot&tp=1', /Ester/, 'mo-menu'], ['chuoi', 'hs-mot&tp=1', /Ester/, 'nut:Chuỗi 12 ngày'],
   ['nhiem-vu', 'hs-mot&tp=1', /Ester/, 'nut:147 nguyên tử hôm nay'], ['cua-hang', 'hs-mot&tp=1', /Ester/, 'nut:245 tinh thể'],
+  ['tam-dong', 'hs-mot&tp=1&v=tam-dong', /App đang bảo trì/], // 27/10: thầy tạm đóng app học sinh (màn phủ)
   ['lam-dung', 'lam13&lam=duo&tp=1', /Số đồng phân amine/, 'lam13:tn:^D » nut:^Kiểm tra$'], ['lam-sai', 'lam13&lam=duo&tp=1', /Số đồng phân amine/, 'lam13:tn:^B » nut:^Kiểm tra$'],
   ['ket', 'lam13&lam=duo&tp=1', /Số đồng phân amine/, `lam13:${D_Q4} » phim:8,2 » nut:^Kiểm tra$ » nut:^Tiếp tục » tn:^B » nut:^Kiểm tra$ » nut:^Tiếp tục`],
 ]
