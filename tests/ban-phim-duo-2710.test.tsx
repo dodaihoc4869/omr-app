@@ -126,26 +126,26 @@ describe('phép thuần', () => {
   })
 })
 
-// ── THANH ĐÁY DUO GỌN (thầy 27/10: ba viên trợ giúp «rối quá, ẩn đi, bấm vào mới hiện»): nút tròn «Trợ giúp» + KIỂM TRA, tấm bật lên.
+// ── BÓNG ĐÈN «TRỢ GIÚP» (thầy 27/10: ba viên dưới KIỂM TRA «rối quá, ẩn đi, bấm vào mới hiện» ⇒ «cho vào cái bóng đèn»): tấm bật xuống dưới bóng đèn.
 import { TroGiupDuo } from '../src/components/hoc-tap/TroGiupDuo'
-const Kt = <button type="button" className="duo-nut">Kiểm tra</button>
-describe('nút Trợ giúp của thanh đáy Duo', () => {
-  it('không có trợ giúp nào ⇒ ẩn nút tròn, KIỂM TRA vẫn ở đó', () => {
-    render(<div className="ht-app duo"><TroGiupDuo nut={Kt}>{null}<span className="duo-o-nut-cham" /></TroGiupDuo></div>)
-    expect(screen.queryByRole('button', { name: 'Trợ giúp' })).toBeNull()
-    expect(screen.getByRole('button', { name: 'Kiểm tra' })).toBeTruthy()
+const den = () => screen.getByRole('button', { name: /^Trợ giúp/ })
+describe('bóng đèn Trợ giúp của màn Duo', () => {
+  it('không có trợ giúp nào ⇒ ẩn bóng đèn (ô portal vẫn có sẵn)', () => {
+    render(<div className="ht-app duo"><TroGiupDuo>{null}<span className="duo-o-nut-cham" /></TroGiupDuo></div>)
+    expect(screen.queryByRole('button', { name: /^Trợ giúp/ })).toBeNull()
+    expect(document.querySelector('.duo-tg-tam .duo-o-nut-cham')).toBeTruthy()
   })
-  it('bấm ⇒ tấm mở (rung chon), chọn mục ⇒ mục chạy việc của nó rồi tấm đóng; mục nằm sẵn trong DOM khi đóng', () => {
+  it('chấm «chưa xem» tới khi mở; bấm ⇒ tấm mở (rung chon); chọn mục ⇒ mục chạy việc của nó rồi tấm đóng', () => {
     const hoc = vi.fn()
-    render(<div className="ht-app duo"><TroGiupDuo nut={Kt}><span className="duo-o-nut-cham" /><button type="button" className="duo-lien" onClick={hoc}>Học cách giải</button></TroGiupDuo></div>)
-    const nut = screen.getByRole('button', { name: 'Trợ giúp' })
-    expect(nut.getAttribute('aria-expanded')).toBe('false')
-    const tam = document.getElementById(nut.getAttribute('aria-controls')!)!
+    render(<div className="ht-app duo"><TroGiupDuo><span className="duo-o-nut-cham" /><button type="button" className="duo-lien" onClick={hoc}>Học cách giải</button></TroGiupDuo></div>)
+    expect(den().hasAttribute('data-moi')).toBe(true)
+    expect(den().getAttribute('aria-expanded')).toBe('false')
+    const tam = document.getElementById(den().getAttribute('aria-controls')!)!
     expect(tam.hidden).toBe(true)
-    expect(tam.querySelector('.duo-o-nut-cham')).toBeTruthy() // ô portal «Bắt đầu từ đâu?» luôn có
-    fireEvent.click(nut)
+    fireEvent.click(den())
     expect(phanHoi).toHaveBeenCalledWith('chon')
-    expect(nut.getAttribute('aria-expanded')).toBe('true')
+    expect(den().getAttribute('aria-expanded')).toBe('true')
+    expect(den().hasAttribute('data-moi')).toBe(false)
     expect(tam.hidden).toBe(false)
     fireEvent.click(screen.getByRole('button', { name: 'Học cách giải' }))
     expect(hoc).toHaveBeenCalledTimes(1)
@@ -153,16 +153,15 @@ describe('nút Trợ giúp của thanh đáy Duo', () => {
   })
   it('chạm ra ngoài ⇒ đóng; Esc ⇒ đóng và KHÔNG đi tiếp tới màn (không thoát / không mở tấm giữ chân)', () => {
     const thoat = vi.fn()
-    window.addEventListener('keydown', thoat)
-    render(<div className="ht-app duo"><p>đề</p><TroGiupDuo nut={Kt}><button type="button" className="duo-lien">Gợi ý</button></TroGiupDuo></div>)
-    const nut = screen.getByRole('button', { name: 'Trợ giúp' })
-    fireEvent.click(nut)
+    document.addEventListener('keydown', thoat)
+    render(<div className="ht-app duo"><p>đề</p><TroGiupDuo><button type="button" className="duo-lien">Gợi ý</button></TroGiupDuo></div>)
+    fireEvent.click(den())
     fireEvent.pointerDown(screen.getByText('đề'))
-    expect(nut.getAttribute('aria-expanded')).toBe('false')
-    fireEvent.click(nut)
-    fireEvent.keyDown(window, { key: 'Escape' })
-    expect(nut.getAttribute('aria-expanded')).toBe('false')
+    expect(den().getAttribute('aria-expanded')).toBe('false')
+    fireEvent.click(den())
+    fireEvent.keyDown(screen.getByRole('button', { name: 'Gợi ý' }), { key: 'Escape' })
+    expect(den().getAttribute('aria-expanded')).toBe('false')
     expect(thoat).not.toHaveBeenCalled()
-    window.removeEventListener('keydown', thoat)
+    document.removeEventListener('keydown', thoat)
   })
 })

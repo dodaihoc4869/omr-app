@@ -205,8 +205,7 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
     const soYChua = phan === 'II' ? [0, 1, 2, 3].filter((i) => tra[i] !== 'D' && tra[i] !== 'S').length : 0
     day = <div className="duo-day"><div className="duo-giua">
       {loi && <p className="duo-loi" role="alert">{loi}</p>}
-      {/* thầy 27/10: trợ giúp gom vào nút tròn «Trợ giúp» bên trái KIỂM TRA (như màn làm chặng) */}
-      <TroGiupDuo nut={<button type="button" className="duo-nut" onClick={kiem} disabled={ban || !daTraLoiDu(phan, tra)}>{ban ? 'Đang kiểm tra…' : phan === 'II' && soYChua ? `Còn ${soYChua} ý chưa chọn` : 'Kiểm tra'}</button>}>{linkHoi(true)}</TroGiupDuo>
+      <button type="button" className="duo-nut" onClick={kiem} disabled={ban || !daTraLoiDu(phan, tra)}>{ban ? 'Đang kiểm tra…' : phan === 'II' && soYChua ? `Còn ${soYChua} ý chưa chọn` : 'Kiểm tra'}</button>
     </div></div>
   }
 
@@ -234,6 +233,8 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
         <div key={`d${q.qid}${lan}`} className="duo-cot-de">
           <p className="duo-nhan" data-sua=""><span>{mo.banKhac ? 'Bản mới của câu em đã sai' : 'Câu em đã sai'}{lan > 1 ? ' · lần 2' : ''}</span>{tienDo ? <span className="duo-chip">Chặng sửa {tienDo.so}</span> : null}</p>
           <h1 className="ht2-an">Em tự làm lại câu này</h1>
+          {/* thầy 27/10: trợ giúp gom vào bóng đèn góc phải (như màn làm chặng) — thanh đáy chỉ còn KIỂM TRA */}
+          {dangLam && <div className="duo-lenh" data-chi-den=""><TroGiupDuo key={`${q.qid}${lan}`}>{linkHoi(true)}</TroGiupDuo></div>}
           {lan === 1 && dangLam && <p className="duo-mo-ghi">{mo.tuSuaNeuDung ? LUAT_BAN_MOI : 'Em vừa sai câu này hôm nay: làm đúng bây giờ tính xong phần hôm nay. Ngày khác tự làm đúng mới tính là đã tự sửa.'}</p>}
           <DeCau q={q} stt={1} />
         </div>

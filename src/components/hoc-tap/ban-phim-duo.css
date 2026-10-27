@@ -46,7 +46,7 @@
 
 /* ── 3. NÚT KIỂM TRA: xám ⇒ xanh mượt khi đã có đáp án hợp lệ ── */
 [data-trong='hs'] .ht-app.duo .duo-day:not(.duo-ket) .duo-nut { transition: background-color 200ms ease, color 200ms ease, box-shadow 200ms ease, transform .08s ease; }
-[data-trong='hs'] .ht-app.duo .duo-day:not(.duo-ket):not([data-xong]) .duo-hang-kt > .duo-nut:not(:disabled) { animation: bp-sang 240ms ease-out; }
+[data-trong='hs'] .ht-app.duo .duo-day:not(.duo-ket):not([data-xong]) > .duo-giua > .duo-nut:not(:disabled) { animation: bp-sang 240ms ease-out; }
 @keyframes bp-sang { 0% { transform: scale(.98); } 60% { transform: scale(1.015); } 100% { transform: none; } }
 
 /* ── 4. MÀN THẤP: phím 52 px, ô đáp án 64 px (khung ≤ 700 px cao); điện thoại ngang: ô 60 px để trọn bàn phím trong cột phải ── */

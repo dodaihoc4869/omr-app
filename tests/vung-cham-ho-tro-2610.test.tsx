@@ -39,7 +39,7 @@ describe('khe chạm-giải-thích: onHoTro + nút bật', () => {
   it('gọi onHoTro ⇒ lượt nộp assisted: true; câu sau không dùng ⇒ assisted: false', async () => {
     const { container } = mo()
     await screen.findByText(C1.text)
-    expect(container.querySelector('.duo-day .duo-tg-tam .nut-cham')).not.toBeNull() // tấm «Trợ giúp» của thanh đáy (thầy 27/10), cạnh Gợi ý
+    expect(container.querySelector('.duo-lenh .duo-tg-tam .nut-cham')).not.toBeNull() // tấm bóng đèn «Trợ giúp» cạnh dòng lệnh (thầy 27/10), cạnh Gợi ý
     const xem = screen.getByRole('button', { name: 'Xem giải thích chạm' })
     expect([xem.dataset.token, xem.dataset.phien]).toEqual(['tk', 'p1'])
     fireEvent.click(screen.getByRole('button', { name: 'Xem giải thích chạm' }))
