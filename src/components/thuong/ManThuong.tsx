@@ -14,10 +14,10 @@ import { ManCuoiTuan, ManGiaiTuan, docCuoiTuan } from './ManGiai'
 import { ManCuaHang, ManCuocKetQua, ManNhiemVu, ManThangHoa } from './ManTinhThe'
 import { ManHuyHieu, ManHuyHieuMoi } from './ManHuyHieu'
 import { BaoGoCua, ManHocCungBan, ManLoiMoi, ManMocDoi, ManMoiBan } from './ManBan'
-import { ManKimCuong } from './ManKimCuong'
+import { ManKimCuong, ManKimCuongDs } from './ManKimCuong'
 
 export { ManBinhDaDo, ManChuoiNgay, ManCuuChuoi, ManMocChuoi, ManCuoiTuan, ManGiaiTuan, ManCuaHang, ManCuocKetQua, ManNhiemVu, ManThangHoa, ManHuyHieu, ManHuyHieuMoi,
-  BaoGoCua, ManHocCungBan, ManLoiMoi, ManMocDoi, ManMoiBan, ManKimCuong }
+  BaoGoCua, ManHocCungBan, ManLoiMoi, ManMocDoi, ManMoiBan, ManKimCuong, ManKimCuongDs }
 
 export type TenManThuong = 'chuoi' | 'giai' | 'nhiem-vu' | 'cua-hang' | 'huy-hieu' | 'ban' | 'moi-ban' | 'kim-cuong'
 export interface PropsManThuong {
@@ -41,7 +41,7 @@ export default function ManThuong({ man, token, onVe, onHoc, onMo, chuyenDe, hie
   const tq = useTongQuan(token).du
   const [cuu, setCuu] = useState(false)
   if (man === 'chuoi') return <>
-    <ManChuoiNgay token={token} onVe={onVe} onHoc={onHoc} onCuu={() => setCuu(true)} hieuUng={hieuUng === 'ruong' ? undefined : hieuUng} />
+    <ManChuoiNgay token={token} onVe={onVe} onHoc={onHoc} onCuu={() => setCuu(true)} onBan={onMo ? () => onMo('ban') : undefined} hieuUng={hieuUng === 'ruong' ? undefined : hieuUng} />
     {cuu && tq?.chuoiNgay?.cuu && <ManCuuChuoi chuoi={tq.chuoiNgay} onHoc={onHoc} onDong={() => setCuu(false)} />}
   </>
   if (man === 'giai') return <ManGiaiTuan token={token} onVe={onVe} />
@@ -51,6 +51,8 @@ export default function ManThuong({ man, token, onVe, onHoc, onMo, chuyenDe, hie
   if (man === 'ban') return <ManHocCungBan token={token} onVe={onVe} onHoc={onHoc} onMoi={onMo ? () => onMo('moi-ban') : undefined} />
   if (man === 'moi-ban') return <ManMoiBan token={token} onDong={onVe ?? (() => {})} />
   if (man === 'kim-cuong' && chuyenDe) return <ManKimCuong token={token} chuyenDe={chuyenDe.ma} tenChuyenDe={chuyenDe.ten} onDong={onVe ?? (() => {})} />
+  // Không kèm chuyên đề (ô «Thử thách Kim cương» ở Thành tích, 27/10) ⇒ danh sách chuyên đề em đã vững.
+  if (man === 'kim-cuong') return <ManKimCuongDs token={token} onVe={onVe} />
   return null
 }
 

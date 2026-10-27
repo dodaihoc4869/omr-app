@@ -3653,6 +3653,8 @@ const boXuLy = {
       if (p === '/hs/thuong/da-xem') return ra(await import('./thuong-d1').then((m) => m.hsDaXemThongBao(env, b)))
       if (p === '/hs/huy-hieu') return ra(await import('./thuong-d1').then((m) => m.hsHuyHieu(env, b, ctx)))
       if (p === '/hs/kim-cuong/bat-dau') return ra(await import('./thuong-kim-cuong').then((m) => m.hsKimCuongBatDau(env, b)))
+      // Lối vào Thử thách Kim cương (27/10): danh sách chuyên đề em đã vững + lượt dở / khoá / đã đạt — CHỈ ĐỌC, một lô (bản sao gần nhất).
+      if (p === '/hs/kim-cuong/ds') return ra(await import('./thuong-kim-cuong').then((m) => m.hsKimCuongDs(env, b, Date.now(), envDoc)))
       // BONG BÓNG A.I ĐỖ ĐẠI HỌC (thầy 24/10, server/src/ai-ddh.ts): em hỏi bài → hàng chờ văn phòng; token của em, máy chủ không tự giải.
       if (p === '/hs/ai-ddh/mo') return ra(await import('./ai-ddh').then((m) => m.hsMoAiDdh(env, b)))
       if (p === '/hs/ai-ddh/tin') return ra(await import('./ai-ddh').then((m) => m.hsTinAiDdh(env, b)))
