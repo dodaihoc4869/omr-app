@@ -22,6 +22,23 @@
 :root[data-trong='hs']:has(.ht2) { --sans: 'M PLUS Rounded 1c', 'Noto Sans', -apple-system, 'Segoe UI', Roboto, sans-serif; --serif: 'M PLUS Rounded 1c', 'Noto Sans', -apple-system, 'Segoe UI', Roboto, sans-serif; }
 :root[data-trong='hs']:has(.ht2) body { font-weight: 700; }
 :root[data-trong='hs']:has(.ht2) :where(h1, h2, h3, button, b, strong, th, dd) { font-weight: 800; }
+/* PHÔNG 27/10 · DẤU CHỒNG: M PLUS Rounded 1c có dấu chồng chữ hoa cao (Ổ đỉnh 1,06 em) và chân chữ sâu (g, ặ −0,23 em) ⇒ tiêu đề CÓ THỂ xuống hàng mà giãn
+   dòng < 1,3 thì dấu dòng dưới chạm chân chữ dòng trên (đo mực hai dòng, phông 700 và 800: 1,25 còn chạm «gậy ặ ợ / Ỗ Ổ Ở Ữ», 1,3 hết chạm).
+   Nâng các tiêu đề xuống hàng được lên 1,3; số / chữ một dòng (nowrap, chỉ chữ số, nút chữ in hoa) giữ nguyên. */
+:root[data-trong='hs']:has(.ht2) :is(.ht2-mo-dau h1, .da-bai b, .duo-xong h1, .tp-man h1, .tp-tieu, .tp-combo, .tp-khe b, .tp-o-hh b) { line-height: 1.3; }
+/* PHÔNG 27/10 · 360 px: phông rộng hơn Nunito ⇒ nhãn ngắn bẻ dòng xấu («2/4 chặng đã | chốt», «Đúng 2 câu | khó», «Tinh thể và | bình giữ | chuỗi»).
+   Bớt khoảng / cỡ biểu tượng ở điện thoại hẹp và cân dòng (text-wrap: balance) — không cắt chữ. */
+:root[data-trong='hs']:has(.ht2) :is(.tp-nv .giua > b, .da-o b, .da-o .mo, .ktcn-dong-so li > span) { text-wrap: balance; }
+@media (max-width: 380px) {
+  :root[data-trong='hs']:has(.ht2) .ktcn-dong-so li { gap: 6px; font-size: 14px; }
+  :root[data-trong='hs']:has(.ht2) .ktcn-dong-so li > svg { width: 18px; height: 18px; flex: none; }
+  :root[data-trong='hs']:has(.ht2) .tp-nv { gap: 10px; padding: 12px; }
+  :root[data-trong='hs']:has(.ht2) .tp-nv .giua > b { font-size: 15px; }
+  :root[data-trong='hs']:has(.ht2) .tp-nv .thuong { min-width: 0; }
+  :root[data-trong='hs']:has(.ht2) .da-o { gap: 12px; padding: 14px 12px; }
+  :root[data-trong='hs']:has(.ht2) .da-o .h { width: 48px; height: 48px; }
+  :root[data-trong='hs']:has(.ht2) .da-o .so { font-size: 20px; }
+}
 /* Số đồng hồ / điểm / bộ đếm không nhảy bề ngang khi đổi. */
 :root[data-trong='hs'] :where(.duo-chuoi, .duo-3 b, .tr-so, .ht2-lam-hom-nay, [role='timer'], time) { font-variant-numeric: tabular-nums; }
 

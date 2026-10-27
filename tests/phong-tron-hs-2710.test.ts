@@ -41,6 +41,21 @@ describe('phông tròn app học sinh 27/10', () => {
     expect(doc('src/styles/trong-thuong-gon.css')).toMatch(/--tp-f: 'M PLUS Rounded 1c'/)
   })
 
+  it('dấu chồng: tiêu đề xuống hàng được giãn dòng ≥ 1,3 (đo mực: 1,25 còn chạm «gậy / Ỗ Ổ»)', () => {
+    const m = /:root\[data-trong='hs'\]:has\(\.ht2\) :is\(([^)]*)\) \{ line-height: ([\d.]+); \}/.exec(HS)
+    expect(m).not.toBeNull()
+    expect(Number(m![2])).toBeGreaterThanOrEqual(1.3)
+    for (const chon of ['.duo-xong h1', '.tp-man h1', '.tp-tieu', '.da-bai b', '.ht2-mo-dau h1', '.tp-combo']) expect(m![1]).toContain(chon)
+  })
+
+  it('360 px: nhãn ngắn không bẻ dòng xấu — cân dòng + bớt khoảng ở điện thoại hẹp', () => {
+    expect(HS).toMatch(/:is\(\.tp-nv \.giua > b, \.da-o b, \.da-o \.mo, \.ktcn-dong-so li > span\) \{ text-wrap: balance; \}/)
+    const hep = HS.slice(HS.indexOf('@media (max-width: 380px) {\n  :root[data-trong=\'hs\']:has(.ht2) .ktcn-dong-so li'))
+    expect(hep).toContain('.ktcn-dong-so li { gap: 6px; font-size: 14px; }')
+    expect(hep).toContain('.tp-nv { gap: 10px; padding: 12px; }')
+    expect(hep).toContain('.da-o .h { width: 48px; height: 48px; }')
+  })
+
   it('vite: nạp trước (phongHs) và bỏ khỏi precache đúng tên tệp mới', () => {
     const vite = doc('vite.config.ts')
     const m = /phongHs = [\s\S]*?\.test\(f\)/.exec(vite)
