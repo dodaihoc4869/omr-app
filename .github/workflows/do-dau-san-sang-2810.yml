@@ -27,14 +27,14 @@ jobs:
         run: |
           W="npx -y wrangler@4 d1 execute omr --remote --json"
           q() { echo "== $1"; $W --command "$2" > /tmp/o.json 2>/tmp/e.txt && jq -c ".[0].results[]" /tmp/o.json || { echo "(lỗi)"; tail -3 /tmp/e.txt; }; }
-          m() { echo "== $1"; $W --file "$2" > /tmp/o.json 2>/tmp/e.txt && jq -c ".[0].meta | {rows_read, duration}" /tmp/o.json || { echo "(lỗi)"; tail -3 /tmp/e.txt; }; }
+          m() { echo "== $1"; $W --command "$(cat "$2")" > /tmp/o.json 2>/tmp/e.txt && jq -c ".[0].meta | {rows_read, duration}" /tmp/o.json || { echo "(lỗi)"; tail -3 /tmp/e.txt; }; }
           q "ca thi mở" "SELECT COUNT(*) mo FROM ca WHERE trang_thai='mo'"
           q "cỡ bảng" "SELECT (SELECT COUNT(*) FROM goi_bai_7_gap) gap, (SELECT COUNT(*) FROM chua_loi_dot) cld, (SELECT COUNT(*) FROM su_kien_hoc) skh, (SELECT COUNT(*) FROM game_v2_attempt) att"
           q "dòng tối đa / em (bảng đọc vài dòng)" "SELECT (SELECT MAX(n) FROM (SELECT COUNT(*) n FROM btvn_em GROUP BY sbd)) bt, (SELECT MAX(n) FROM (SELECT COUNT(*) n FROM kiem_tra_ca_nhan GROUP BY sbd)) kt, (SELECT MAX(n) FROM (SELECT COUNT(*) n FROM goi_bai_7_em GROUP BY sbd)) goi, (SELECT MAX(n) FROM (SELECT COUNT(*) n FROM chien_dich_em GROUP BY sbd)) cde, (SELECT MAX(n) FROM (SELECT COUNT(*) n FROM chua_loi_dot GROUP BY sbd)) cld, (SELECT MAX(n) FROM (SELECT COUNT(*) n FROM goi_bai_7_gap GROUP BY sbd)) gap, (SELECT MAX(n) FROM (SELECT COUNT(*) n FROM su_kien_hoc GROUP BY sbd)) skh"
           q "chỉ mục hiện có" "SELECT tbl_name, name FROM sqlite_master WHERE type='index' AND tbl_name IN ('game_v2_attempt','su_kien_hoc','goi_bai_7_gap','loi_giai_hoi','chua_loi_dot','kiem_tra_ca_nhan','goi_bai_7_em','btvn_em','chien_dich_em','game_v2_session','hoc_tap_san_sang') ORDER BY 1,2"
           MO=$($W --command "SELECT COUNT(*) n FROM ca WHERE trang_thai='mo'" | jq -r '.[0].results[0].n')
           if [ "$MO" = "0" ]; then
-            echo "== dựng chỉ mục chỉ-thêm"; $W --file migration-2810-chi-muc-dau-san-sang.sql | jq -c '.[] | .meta | {duration, rows_written}' || echo "(lỗi dựng)"
+            echo "== dựng chỉ mục chỉ-thêm"; $W --command "$(grep -v '^--' migration-2810-chi-muc-dau-san-sang.sql)" | jq -c '.[] | .meta | {duration, rows_written}' || echo "(lỗi dựng)"
           else echo "== CÓ CA THI MỞ ($MO) ⇒ KHÔNG dựng chỉ mục"; fi
           # em nặng nhất (theo sổ học) — giữ trong biến, KHÔNG in
           SBD=$($W --command "SELECT sbd FROM su_kien_hoc GROUP BY sbd ORDER BY COUNT(*) DESC LIMIT 1" | jq -r '.[0].results[0].sbd' | tr -cd 'A-Za-z0-9_.-')
@@ -42,5 +42,5 @@ jobs:
             sed -e "s/?1/'$SBD'/g" -e "s/?2/'2026-10-27T17:00:00.000Z'/g" ../.github/do-dau/$f.sql > /tmp/$f.sql
             { echo -n "EXPLAIN QUERY PLAN "; cat /tmp/$f.sql; } > /tmp/x-$f.sql
           done
-          for f in cu moi-day moi-em; do echo "== EXPLAIN $f"; $W --file /tmp/x-$f.sql | jq -r '.[0].results[] | .detail'; done
+          for f in cu moi-day moi-em; do echo "== EXPLAIN $f"; $W --command "$(cat /tmp/x-$f.sql)" | jq -r '.[0].results[] | .detail'; done
           for n in 1 2; do for f in cu moi-day moi-em; do m "đọc $f (em nặng nhất, lần $n)" /tmp/$f.sql; done; done
