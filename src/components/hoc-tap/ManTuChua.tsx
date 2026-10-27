@@ -22,6 +22,8 @@ import type { KetQuaDanhSachChua, LichKiemLaiHoiThay, MucChua } from '../../lib/
 import { nhomMucChua, taiTuSuaLoi, type NhomMucChua } from '../../lib/tu-sua-loi'
 import { dungViecHomNay, docSbdHs, luuViecHomNay, themMotChang } from '../../lib/tu-sua-viec-hom-nay'
 import ViecHomNay from './ViecHomNay'
+import type { ViecHomNay as KieuViecHomNay, ViecMuc } from '../../lib/tu-sua-viec-hom-nay'
+import type { TienDoSua } from '../chua-cau-sai/KhungDuoSua'
 import { taiCauDaLam, NHAN_NGUON_LAN, type CauDaLamMuc } from '../hoa2/api'
 import { henGapLai } from '../../lib/chua-truc-tiep'
 import { khoaMoChua } from '../../../server/src/ho-so-em-hs-loc'
@@ -113,6 +115,22 @@ function BieuTuong({ d }: { d: DongChua }) {
 }
 
 const TEN_NHOM: Record<Nhom, string> = { can: 'Cần sửa', cho: 'Đang chờ lần gặp lại', xong: 'Đã tự sửa' }
+
+/** Chỗ của câu đang sửa trong chặng của Việc hôm nay ⇒ thanh tiến độ + màn xong chặng của màn sửa câu kiểu Duolingo («Trong» HS, 27/10). Câu ngoài việc hôm nay ⇒ vắng. */
+export function tienDoSua(viec: KieuViecHomNay | null | undefined, qid: string): TienDoSua | undefined {
+  if (!viec) return undefined
+  const g = goc(qid), la = (x: ViecMuc) => goc(x.m.qid) === g
+  const ci = viec.chang.findIndex((c) => c.some(la))
+  if (ci < 0) return undefined
+  const c = viec.chang[ci]!, khac = c.filter((x) => !la(x)), nay = c.find(la)!
+  const tiep = viec.muc.find((x) => !x.xong && !la(x) && !c.includes(x))
+  return {
+    so: ci + 1, xong: khac.filter((x) => x.xong).length, tong: c.length, cuoi: khac.every((x) => x.xong),
+    // Câu kế = câu chưa xong đầu tiên theo thứ tự ngày (đúng câu `onTiep` mở).
+    conSau: !!tiep, changTiep: tiep ? viec.chang.findIndex((k) => k.includes(tiep)) + 1 || undefined : undefined,
+    homNay: { xong: Math.min(viec.tong, viec.xong + (nay.xong ? 0 : 1)), tong: viec.tong },
+  }
+}
 
 type Chon = { qid: string; ten?: string; kiemHoiThay?: boolean; /** câu mở thẳng KHÔNG có trong danh sách: mở không được thì về danh sách kèm lời báo */ thu?: boolean }
 
@@ -241,6 +259,7 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
             qid={chon.qid}
             tenCau={ten}
             onVe={veDanhSach}
+            tienDo={tienDoSua(viec, chon.qid)}
             onTiep={viec ? () => {
               // Chữa câu gọn (25/10): câu vừa khép đã ghi "xong phần" trên máy ⇒ dựng lại việc hôm nay và mở THẲNG câu kế; hết câu ⇒ về danh sách.
               const v = dungViecHomNay(kq, Date.now(), sbd).viec

@@ -534,9 +534,9 @@ function ManLam13() {
 if (LA_LAM13 && thamSo.get('lam') === 'duo-xau') try { localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tk', sbd: '12121212' })) } catch { /* bỏ qua */ }
 // ═══ hết KIỂM GD MỚI 26/10
 if (LA_LAM13 && thamSo.get('lam') === 'duo') try { localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tk', sbd: '12121212' })) } catch { /* bỏ qua */ }
-// ═══ DUO APP 26/10: app thật nạp TrongHs (kèm phông Nunito + hiệu ứng Lộ trình, styles/trong-hs.css) ngay lúc mở cổng ⇒ màn làm chặng luôn có phông ấy;
+// ═══ DUO APP 26/10: app thật nạp TrongHs (kèm phông tròn M PLUS Rounded 1c + hiệu ứng Lộ trình, styles/trong-hs.css) ngay lúc mở cổng ⇒ màn làm chặng luôn có phông ấy;
 // trang chụp mở thẳng màn làm chặng nên nạp tờ đó tại đây cho giống app thật.
-// Phông Nunito chỉ bật khi cổng đã vẽ (:has(.ht2) — app thật luôn gắn Hôm nay dưới màn con) ⇒ trang chụp gắn một .ht2 rỗng ẩn.
+// Phông tròn chỉ bật khi cổng đã vẽ (:has(.ht2) — app thật luôn gắn Hôm nay dưới màn con) ⇒ trang chụp gắn một .ht2 rỗng ẩn.
 if (LA_LAM13 && thamSo.get('lam') === 'duo' && document.documentElement.dataset.trong === 'hs') { void import('../../src/styles/trong-hs.css'); document.body.insertAdjacentHTML('beforeend', '<div class="ht2" hidden></div>') }
 // ═══ hết DUO APP 26/10
 // ═══ GIỮ CHÂN 27/10: `lam13&lam=duo&tp=1&giu=1` — bản tổng quan thưởng ở máy như app thật đã nạp lúc mở (chuỗi 12 ngày, hôm nay chưa đạt, mục tiêu 3/4).
@@ -705,7 +705,7 @@ import ManKiemTraCaNhanNg from '../../src/components/hoc-tap/ManKiemTraCaNhan'
 const NG_V = thamSo.get('v') ?? 'tu-sua'
 // Màn làm bài / tự sửa / Tu luyện / kiểm tra nạp tờ «Trong» riêng lúc mảnh mã chạy MÀ data-trong đã gắn (main.tsx gắn trước); trang chụp gắn data-trong
 // SAU khi nạp ⇒ nạp thẳng tờ ấy cho các cảnh học sinh này (như app thật sau khi mở màn).
-if (document.documentElement.dataset.trong === 'hs' && (man === 'hs-ng' || man.startsWith('hs12-') || man === 'lam13')) void import('../../src/styles/trong-lam-bai.css')
+if (document.documentElement.dataset.trong === 'hs' && (man === 'hs-ng' || man === 'duo-sua' || man.startsWith('hs12-') || man === 'lam13')) void import('../../src/styles/trong-lam-bai.css')
 const hinhCauTao = (chu: string) => 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="320" height="150" viewBox="0 0 320 150"><rect width="320" height="150" fill="white"/><g stroke="black" stroke-width="2" fill="none"><polygon points="60,40 95,20 130,40 130,80 95,100 60,80"/><line x1="130" y1="40" x2="175" y2="20"/><line x1="175" y1="20" x2="215" y2="40"/><line x1="215" y1="40" x2="215" y2="80"/></g><text x="222" y="92" font-family="sans-serif" font-size="20">OH</text><text x="20" y="135" font-family="sans-serif" font-size="18">${chu}</text></svg>`)
 if (man === 'hs-ng') {
   try { localStorage.setItem('omr-ai-ddh-co', JSON.stringify({ sbd: '12121212', bat: true, luc: Date.now() })) } catch { /* bỏ qua */ }
@@ -750,6 +750,68 @@ const manNgang = () => h(FragmentHse, null,
     NG_V === 'kiem' ? h(ManKiemTraCaNhanNg, { token: 'tk', sbd: '12121212', id: 'kt1', onVe: noop, onCapNhat: noop } as never)
     : h(ManChuaCauSai, { token: 'tk', qid: 'DH-12-C1-B4-9', tenCau: 'Đồng phân alcohol', onVe: noop })))
 // ═══ hết NGANG HS 26/10
+// ═══ DUO SỬA 27/10 (thầy «Phần sửa câu tôi chưa thấy giao diện của doligo»): `?man=duo-sua&de=1|2|3|4[&mo=da-sua|loi][&trong=tat]` = màn sửa câu
+// (ManChuaCauSai đường gọn → ChuaGonDuo) mở đè Hôm nay như cổng học sinh. Máy chủ GIẢ gon-mo / gon-nop chấm theo đáp án của câu: lần 1 đúng ⇒ tu_sua ·
+// lần 1 sai ⇒ goi_y · lần 2 đúng ⇒ xong_phan (co_goi_y) · lần 2 sai ⇒ loi_giai (đáp án + lời giải chỉ về SAU khi nộp, như máy chủ thật).
+// Câu là câu cuối của chặng sửa 2 (đã sửa 3/4 câu) ⇒ «Tiếp tục» sau khi khép mở màn xong chặng có Bi mừng.
+// de: 1 = 4 hình công thức cấu tạo (đề dài) · 2 = trắc nghiệm ngắn (lưới 2×2) · 3 = Đúng–sai · 4 = trả lời ngắn. mo=da-sua: câu đã tự sửa; mo=loi: không mở được.
+const DUO_SUA = man === 'duo-sua'
+const DS_CAU: Record<string, { de: Record<string, unknown>; dapAn: string; loiGiai: unknown }> = {
+  '1': { de: { qid: 'DH-12-C1-B4-9', phan: 'I', tenDang: 'Đồng phân alcohol', text: 'Cho bốn chất hữu cơ có công thức cấu tạo như hình dưới. Số chất thuộc loại alcohol bậc một là',
+    choices: ['1.', '2.', '3.', '4.'], hinhAnh: ['(1)', '(2)', '(3)', '(4)'].map((c) => ({ src: hinhCauTao(`Chất ${c}`), viTri: 'sau_de', alt: `Chất ${c}` })) }, dapAn: 'B',
+    loiGiai: { chot: 'Alcohol bậc một: nhóm OH gắn với carbon chỉ liên kết với một nguyên tử carbon khác. Chất (1) và (3) thoả mãn.' } },
+  '2': { de: { qid: 'DH-12-C1-B2-17', phan: 'I', tenDang: 'Thuỷ phân ester', text: 'Thuỷ phân hoàn toàn 8,8 gam ethyl acetate (CH₃COOC₂H₅) bằng dung dịch NaOH vừa đủ. Khối lượng muối thu được là',
+    choices: ['8,2 gam.', '6,8 gam.', '9,6 gam.', '4,1 gam.'], hinhAnh: [] }, dapAn: 'A',
+    loiGiai: { chot: 'n(ester) = 8,8 : 88 = 0,1 mol ⇒ n(CH₃COONa) = 0,1 mol ⇒ m = 0,1 × 82 = 8,2 gam.' } },
+  '3': { de: { qid: 'DH-12-C2-B6-4', phan: 'II', tenDang: 'Glucose và fructose', text: 'Cho các phát biểu về glucose và fructose:', ideas: ['Glucose và fructose là đồng phân của nhau.', 'Fructose không tham gia phản ứng tráng bạc.',
+    'Glucose có phản ứng với Cu(OH)₂ ở nhiệt độ thường tạo dung dịch xanh lam.', 'Fructose làm mất màu nước bromine.'], hinhAnh: [] }, dapAn: 'DSDS',
+    loiGiai: { chot: 'Glucose và fructose cùng công thức C₆H₁₂O₆; fructose vẫn tráng bạc trong môi trường base; chỉ glucose làm mất màu nước bromine.' } },
+  '4': { de: { qid: 'DH-12-C1-B2-21', phan: 'III', tenDang: 'Xà phòng hoá ester', soO: 3, text: 'Xà phòng hoá hoàn toàn 8,8 gam ethyl acetate bằng dung dịch NaOH vừa đủ, cô cạn thu được m gam muối. Giá trị của m là bao nhiêu?', hinhAnh: [] },
+    dapAn: '8,2', loiGiai: { chot: 'n(muối) = n(ester) = 0,1 mol ⇒ m = 0,1 × 82 = 8,2.' } },
+}
+if (DUO_SUA) {
+  try { localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tk', sbd: '12121212' })) } catch { /* bỏ qua */ } // nút Hỏi thầy cần phiên em
+  const cau = DS_CAU[thamSo.get('de') ?? '2'] ?? DS_CAU['2']!
+  const MO = thamSo.get('mo') ?? ''
+  let lanSua = 1
+  const fetchSua = window.fetch
+  window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+    const duong = new URL(url, location.href).pathname
+    const tra = (o: unknown) => new Response(JSON.stringify(o), { status: 200, headers: { 'content-type': 'application/json' } })
+    let b: Record<string, unknown> = {}
+    try { b = init?.body ? JSON.parse(String(init.body)) : {} } catch { /* bỏ qua */ }
+    if (duong.endsWith('/hs/buoi-hoc')) return tra({ ok: true, buoi: null })
+    if (duong.endsWith('/hs/chua-cau-sai/co')) return tra({ ok: true })
+    if (duong.endsWith('/hs/chua-cau-sai/danh-sach')) return tra({ ok: true, ds: [], dem: { tong: 5, can: 5, cho: 0, xong: 0 } })
+    if (duong.endsWith('/hs/chua-cau-sai/mo-dot')) return tra({ ok: true, dotId: 'd-sua', trangThai: 'dang_chua_buoc', coHocLieu: false })
+    if (duong.endsWith('/hs/chua-cau-sai/gon-mo')) {
+      if (MO === 'loi') return tra({ ok: false, ma: 'KHONG_MO_DUOC_CAU', mo: 'Câu này đang được thầy cập nhật nội dung. Em sang câu khác, lát nữa quay lại nhé.' })
+      if (MO === 'da-sua') return tra({ ok: true, dotId: 'd-sua', trangThai: 'da_tu_sua', de: cau.de })
+      return tra({ ok: true, dotId: 'd-sua', lan: lanSua, ban: `ban-${lanSua}`, tuSuaNeuDung: lanSua === 1, de: cau.de })
+    }
+    if (duong.endsWith('/hs/chua-cau-sai/gon-nop')) {
+      const em = String(b.traLoi ?? '').trim().toUpperCase().replace(/Đ/g, 'D')
+      const dung = em === cau.dapAn.toUpperCase()
+      const chiTiet = { de: { ...cau.de, maDe: 'DH-12', mucDo: 'hieu', sao: 0 }, dapAn: cau.dapAn, loiGiai: cau.loiGiai }
+      const lan = lanSua
+      if (!dung && lan === 1) { lanSua = 2; return tra({ ok: true, dotId: 'd-sua', lan, ban: `ban-${lan}`, dung: false, ket: 'goi_y', goiY: 'Em đọc lại đề, gạch chân điều đề hỏi rồi loại dần từng phương án.' }) }
+      if (dung) return tra({ ok: true, dotId: 'd-sua', lan, ban: `ban-${lan}`, dung: true, ...(lan === 1 ? { ket: 'tu_sua', trangThai: 'da_tu_sua' } : { ket: 'xong_phan', lyDo: 'co_goi_y' }), chiTiet })
+      return tra({ ok: true, dotId: 'd-sua', lan, ban: `ban-${lan}`, dung: false, ket: 'loi_giai', chiTiet })
+    }
+    if (duong.endsWith('/hs/nhip-hoc')) return tra(nhipEmGia('cham'))
+    if (duong.endsWith('/notifications/list')) return tra({ ok: true, publicKey: '', items: [] })
+    return fetchSua(input, init)
+  }
+}
+const manDuoSua = () => h(FragmentHse, null,
+  h('div', { inert: true, 'aria-hidden': true } as never, h(HocTapHomNay, { ten: 'Minh Anh', lop: '12A1', ketQua: { cheDo2: true, sanh: SANH_MT } as never, dangTai: false, loi: '', coCa: false, token: 'tk',
+    moDiemDanh: false, onMoHoSo: noop, soBaiTap: 1, coBaiTap: true, onKiemTra: noop,
+    onHoc: noop, onXemLai: noop, onChua: noop, onThi: noop, onTuLuyen: noop, onLichSu: noop, onBaiTap: noop, onGiaDinh: noop, onTaiLai: noop, onDangXuat: noop, onKetQua: noop, onBangTin: noop, onLuyenLai: noop })),
+  h('div', { className: 'fixed inset-0 z-50 overflow-y-auto overscroll-contain' },
+    h(ManChuaCauSai, { token: 'tk', qid: String(DS_CAU[thamSo.get('de') ?? '2']?.de.qid ?? 'DH-12-C1-B2-17'), tenCau: 'Thuỷ phân ester', onVe: noop, onTiep: noop,
+      tienDo: { so: 2, xong: 3, tong: 4, cuoi: true, conSau: true, changTiep: 3, homNay: { xong: 8, tong: 12 } } })))
+// ═══ hết DUO SỬA 27/10
 // ═══ SOÁT 26/10: cảnh cho bộ soát chữ chèn (scripts/soat-chu-chen) — các màn thầy chụp ảnh điện thoại 26/10 tối mà bộ chụp chưa có:
 //   `?man=soat-ktcn[&kt=ket]` = màn «Kiểm tra ôn tập của em» THẬT (ManKiemTraCaNhan): 28 câu, đã trả lời 10 (vòng «10/28»), 4 chặng, chặng 2 đang chạy;
 //     `&kt=ket` = đã nộp (kết quả lọc câu). Bấm «Làm tiếp chặng 2» (thao tác `nut:`) ⇒ màn làm chặng.
@@ -855,6 +917,7 @@ const con =
   man === 'hs-sheet' ? manTamTrong() : // LÀN «TRONG» HS 26/10
   man === 'hs-mot' ? manMotTrang() : // MỘT TRANG HS 26/10
   man === 'hs-ng' ? manNgang() : // NGANG HS 26/10
+  man === 'duo-sua' ? manDuoSua() : // DUO SỬA 27/10
   man === 'soat-ktcn' ? manSoatKtcn() : // ═══ SOÁT 26/10
   man === 'tp' ? canhThuong() : // THƯỞNG PHẠT 26/10
   man === 'gv-hom-nay' ? h(GvHomNayScreen) : man === 'gv-kho' ? h(NganHangDeScreen) : man === 'gv-cai-dat' ? h(CaiDatScreen) : man === 'gv-hoc-sinh' ? h(HocSinhScreen) : man === 'gv-mo-ca' ? h(ExamSetupScreen) : man === 'gv-go-nut' ? h(BanGoNutThatScreen) : man === 'gv-duyet' ? h(DuyetLoiGiaiScreen) :

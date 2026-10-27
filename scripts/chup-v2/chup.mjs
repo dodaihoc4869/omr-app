@@ -316,6 +316,30 @@ const DS_NG_HS = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], 
     .map(([ten, m, cho]) => [`ng-hs-${ten}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho])))
 // ═══ hết NGANG HS 26/10
 
+// ═══ DUO SỬA 27/10: màn sửa câu (Tự sửa lỗi · «Em tự làm lại câu này») kiểu Duolingo (`?man=duo-sua&de=…`, khối cùng tên ở trang.tsx; máy chủ giả
+// chấm theo đáp án). Thao tác `lam13:` (tn / nut / ds). 390×844 · 360×640 · 844×390 · 1440×900, sáng + tối; thêm `&trong=tat` (màn cũ giữ nguyên). Tiền tố "duo-sua-".
+const DS_SUA_SAI = 'tn:^C » nut:^Kiểm tra$'
+const DUO_SUA_CANH = [
+  ['01-cau-hinh', 'de=1', /Câu em đã sai/], ['02-cau', 'de=2', /Câu em đã sai/], ['03-chon', 'de=2', /Câu em đã sai/, 'lam13:tn:^B'],
+  ['04-dung', 'de=2', /Câu em đã sai/, 'lam13:tn:^A » nut:^Kiểm tra$'], ['05-sai-goi-y', 'de=2', /Câu em đã sai/, `lam13:${DS_SUA_SAI}`],
+  ['06-lan-2', 'de=2', /Câu em đã sai/, `lam13:${DS_SUA_SAI} » nut:^Làm lại câu này$`],
+  ['07-sai-lan-2', 'de=2', /Câu em đã sai/, `lam13:${DS_SUA_SAI} » nut:^Làm lại câu này$ » tn:^D » nut:^Kiểm tra$`],
+  ['08-loi-giai', 'de=2', /Câu em đã sai/, `lam13:${DS_SUA_SAI} » nut:^Làm lại câu này$ » tn:^D » nut:^Kiểm tra$ » nut:^Lời giải$`],
+  ['09-dung-lan-2', 'de=2', /Câu em đã sai/, `lam13:${DS_SUA_SAI} » nut:^Làm lại câu này$ » tn:^A » nut:^Kiểm tra$`],
+  ['10-dung-sai', 'de=3', /Câu em đã sai/, 'lam13:ds:a=Đúng,b=Sai,c=Đúng'], ['11-dung-sai-ket', 'de=3', /Câu em đã sai/, 'lam13:ds:a=Đúng,b=Sai,c=Đúng,d=Đúng » nut:^Kiểm tra$ » nut:^Làm lại câu này$ » ds:a=Đúng,b=Sai,c=Sai,d=Sai » nut:^Kiểm tra$'],
+  ['12-tra-loi-ngan', 'de=4', /Câu em đã sai/, 'lam13:nut:^8$ » nut:^Dấu phẩy$ » nut:^2$'], ['13-tra-loi-ngan-dung', 'de=4', /Câu em đã sai/, 'lam13:nut:^8$ » nut:^Dấu phẩy$ » nut:^2$ » nut:^Kiểm tra$'],
+  ['14-xong-chang', 'de=2', /Câu em đã sai/, 'lam13:tn:^A » nut:^Kiểm tra$ » nut:^Tiếp tục$'],
+  ['15-da-tu-sua', 'de=2&mo=da-sua', /Em đã tự sửa xong/], ['16-khong-mo', 'de=2&mo=loi', /Chưa mở được/],
+  ['17-giu-chan', 'de=2', /Câu em đã sai/, 'lam13:nut:^Quay lại$'], // giữa chặng sửa (đã sửa 3/4) ⇒ X mở tấm «Đừng đi mà…»
+]
+const DS_DUO_SUA = [
+  ...[[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+    DUO_SUA_CANH.map(([t, q, cho, viec]) => [`duo-sua-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, `duo-sua&${q}`, w, hh, nen, false, cho, viec]))),
+  ['duo-sua-00-tat-doc', 'duo-sua&de=2&trong=tat', 390, 844, 'light', false, /Em tự làm lại câu này/],
+  ['duo-sua-00-tat-may-tinh', 'duo-sua&de=2&trong=tat', 1440, 900, 'light', false, /Em tự làm lại câu này/],
+]
+// ═══ hết DUO SỬA 27/10
+
 // ═══ KIỂM GD MỚI 26/10: dữ liệu XẤU cho màn làm chặng kiểu Duolingo (`lam13&lam=duo-xau`, gia/lam-bai-1210d.ts: đề 6 dòng, phương án 3–4 dòng, công thức
 // dài, lưới 2×2 công thức sát ngưỡng, ý Đúng/Sai dài, trả lời ngắn 6 ô, hình rộng 960px, lý do dài; `&so=lon` số hôm nay lớn; `&loi=1` máy chủ lỗi) + Gói 7
 // «Chọn cách làm» ở giao diện mới + phụ huynh «Chỉ đọc» rỗng / nhiều dữ liệu. Bộ soát scripts/soat-chu-chen + scripts/kiem-gd-moi đọc DS này. Tiền tố "kgd-".
@@ -379,6 +403,7 @@ const DS = [
   ...DS_T3, // «TRONG» NHÓM 3
   ...DS_MG, // MỘT TRANG GV 26/10
   ...DS_NG_HS, // NGANG HS 26/10
+  ...DS_DUO_SUA, // DUO SỬA 27/10
   ...DS_DUO, // DUO 26/10
   ...DS_GIU, // GIỮ CHÂN 27/10
   ...DS_TPC, // THƯỞNG PHẠT GỘP 26/10

@@ -240,6 +240,43 @@ describe('soạn lô', () => {
     expect(mh2.fn).toHaveBeenCalledTimes(1)
   })
 
+  it('27/10: nhãn hạn mức Gemini chỉ lấy mã hạn mức + giây chờ', () => {
+    const j = { error: { message: 'x', details: [{ '@type': 'QuotaFailure', violations: [{ quotaId: 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', quotaMetric: 'm' }] }, { '@type': 'RetryInfo', retryDelay: '12.5s' }] } }
+    expect(M.nhanHanMuc(j)).toBe(' [quota=GenerateRequestsPerDayPerProjectPerModel-FreeTier; retry=12s]')
+    expect(M.nhanHanMuc({ error: { message: 'x' } })).toBe('')
+    expect(M.nhanHanMuc(null)).toBe('')
+  })
+
+  it('27/10: câu lỗi gọi (Gemini 429) KHÔNG bị con trỏ bỏ qua — lượt sau soạn lại đúng câu ấy', async () => {
+    let loi = true
+    const fn = vi.fn(async (h: Hoi) => {
+      const laIII = h.luot[0]!.chu.includes(String(CAU[Q.III]!.text).slice(0, 40))
+      if (loi && laIII) return { ok: false as const, loi: 'HTTP 429 quota', http: 429 }
+      const cau = Object.keys(CAU).find((q) => h.luot[0]!.chu.includes(String(CAU[q]!.text).slice(0, 40))) ?? ''
+      return { ok: true as const, chu: JSON_MAU[cau] ?? '{}', model: 'gia', vao: 1, ra: 1 }
+    })
+    const { j } = await goiLo({}, { goiMoHinh: fn, kiemCong: congGia(() => 'dat') })
+    expect(j.dem.loi_goi).toBe(1)
+    expect(j.xong).toBe(false)
+    expect(dongSoDo(Q.III)).toBeUndefined()
+    loi = false
+    const { j: j2 } = await goiLo({ conTro: j.conTro }, { goiMoHinh: fn, kiemCong: congGia(() => 'dat') })
+    expect(j2.ketQua.map((k) => k.qid)).toContain(Q.III)
+    expect(dongSoDo(Q.III)).toMatchObject({ cong: 'dat' })
+  })
+
+  it('27/10: lỗi cố định của riêng câu (rỗng SAFETY) KHÔNG ghim con trỏ — bước qua như cũ', async () => {
+    const fn = vi.fn(async (h: Hoi) => {
+      if (h.luot[0]!.chu.includes(String(CAU[Q.III]!.text).slice(0, 40))) return { ok: false as const, loi: 'rỗng finishReason=SAFETY' }
+      const cau = Object.keys(CAU).find((q) => h.luot[0]!.chu.includes(String(CAU[q]!.text).slice(0, 40))) ?? ''
+      return { ok: true as const, chu: JSON_MAU[cau] ?? '{}', model: 'gia', vao: 1, ra: 1 }
+    })
+    const { j } = await goiLo({}, { goiMoHinh: fn, kiemCong: congGia(() => 'dat') })
+    expect(j.dem.loi_goi).toBe(1)
+    expect(j.xong).toBe(true)
+    expect(dongSoDo(Q.III2)).toMatchObject({ cong: 'dat' })
+  })
+
   it('thuKhong ⇒ không ghi gì (không tạo bảng), trả bản soạn để xem', async () => {
     const mh = moHinhGia((h) => chuMau(h))
     const { j } = await goiLo({ qids: [Q.III, Q.I], thuKhong: true }, { goiMoHinh: mh.fn, kiemCong: congGia(() => 'dat') })
