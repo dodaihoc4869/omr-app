@@ -1087,3 +1087,28 @@
 /* thanh bộ đếm trên đầu (PR 431): số đậm 16,5px cùng màu biểu tượng ⇒ bản đạt 3:1 cho chữ đậm, vẫn tươi (cam / xanh lá bản «nut») */
 :root[data-trong='hs'] .da-tren .tp-tr-o[data-k='lua'] { color: var(--tr-chu-y-nut); }
 :root[data-trong='hs'] .da-tren .tp-tr-o[data-k='nt'] { color: var(--tr-dung-nut); }
+/* ── LỘ TRÌNH 27/10 (thầy: «Chỗ học tiếp nhé nhắc 1 lần xong ẩn đi, ghim phần bài 8 amine lại»):
+   (1) lời Bi nhắc một lần: giữ ~4 s rồi thu gọn mượt (mờ + co chiều cao bằng lưới 1fr → 0fr), đường đi trượt lên lấp chỗ;
+   (2) thẻ bài DÍNH ngay dưới hàng bộ đếm (--tren-cao đo thật); khi dính: bỏ dòng nhãn nhỏ, tên bài nhỏ lại, bóng đáy; ngang thấp: gọn MỘT dòng;
+   (3) nhãn «17 câu tự làm · 46 câu học có hỗ trợ»: chữ thường cỡ nhỏ đậm vừa (thôi IN HOA dài khó đọc). ── */
+[data-trong] .bi-loi-boc { display: grid; grid-template-rows: 1fr; opacity: 1; transition: grid-template-rows 380ms ease, opacity 300ms ease, margin 380ms ease; }
+[data-trong] .bi-loi-boc > .bi-loi { min-height: 0; overflow: hidden; }
+[data-trong] .bi-loi-boc[data-thu] { grid-template-rows: 0fr; opacity: 0; margin-top: -14px; }
+[data-trong='hs'] .da-bai { position: sticky; top: var(--tren-cao, 52px); z-index: 4; transition: padding 200ms ease, box-shadow 200ms ease; }
+[data-trong='hs'] .da-bai small { max-height: 2.6em; text-transform: none; letter-spacing: 0; font-size: 13.5px; font-weight: 600; opacity: .95; transition: max-height 200ms ease, opacity 200ms ease, margin 200ms ease; overflow: hidden; }
+[data-trong='hs'] .da-bai b { transition: font-size 200ms ease; }
+[data-trong='hs'] .da-bai[data-dinh] { padding-top: 10px; padding-bottom: 10px; }
+:root[data-trong='hs'] .da-bai[data-dinh] { box-shadow: inset 0 -5px 0 var(--tr-dung-day), 0 10px 18px -12px var(--tr-phu); }
+[data-trong='hs'] .da-bai[data-dinh] small { max-height: 0; opacity: 0; }
+[data-trong='hs'] .da-bai[data-dinh] b { font-size: 18px; }
+[data-trong] .da-bai-moc { display: block; height: 1px; margin-bottom: -19px; }
+@media (max-height: 520px) and (min-width: 600px) { [data-trong] .da-bai-moc { margin-bottom: -13px; } }
+@media (max-height: 520px) and (min-width: 600px) {
+  [data-trong='hs'] .da-bai[data-dinh] { flex-wrap: nowrap; padding: 6px 14px; }
+  [data-trong='hs'] .da-bai[data-dinh] .giua { flex: 0 1 auto; }
+  [data-trong='hs'] .da-bai[data-dinh] b { font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  [data-trong='hs'] .da-bai[data-dinh] .da-bai-tien { flex: 1 1 auto; }
+}
+@media (prefers-reduced-motion: reduce) { [data-trong] .bi-loi-boc, [data-trong='hs'] .da-bai, [data-trong='hs'] .da-bai :is(small, b) { transition: none; } }
+/* đường chặng là MỘT lớp xếp chồng ở mức 0 ⇒ linh vật / nút (có transform) luôn trượt DƯỚI thẻ bài đang dính (z 4), không vẽ đè lên thẻ */
+[data-trong='hs'] .da-duong { position: relative; z-index: 0; }
