@@ -2,7 +2,7 @@
 // hướng Duolingo + chất Hoá), NẠP LƯỜI qua nap-trong-hs.ts (chỉ khi `<html data-trong>`): Lộ trình · Luyện tập · Thành tích + menu dọc mép phải (Điểm danh đầu menu, A.I Đỗ Đại Học dưới 3 mục). Cùng số, cùng
 // chữ nút, cùng lệnh với bản cũ — chỉ đổi trình bày. Kiểu ở styles/trong-hs.css (nạp cùng mảnh này ⇒ vẽ là đã có kiểu).
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
-import { Check, CheckCircle2, ChevronRight, ClipboardCheck, FlaskConical, Flame, Gem, GraduationCap, History, Layers, LineChart, Lock, PenLine, Play, QrCode, RefreshCw, Route, Sparkles, Target, Trophy, Wrench, type LucideIcon } from 'lucide-react'
+import { Award, Check, CheckCircle2, ChevronRight, ClipboardCheck, FlaskConical, Flame, GraduationCap, History, Layers, LineChart, Lock, PenLine, Play, QrCode, RefreshCw, Route, Sparkles, Target, Trophy, Wrench, type LucideIcon } from 'lucide-react'
 import { soChangXong, type SoHomNay } from './lam-bai'
 import { chiaChang, chuNutHoc, useNhipHocEm } from './nhip-hom-nay'
 import { chuViecTiepHs, nhipTheoSanh } from '../../lib/nhip-hoc-em'
@@ -307,7 +307,7 @@ export function MotTrangHs(p: PropsMotTrang) {
         {tq?.chuoiNgay && <OTo ten="Chuỗi ngày" mo="Lịch chuỗi, bình giữ chuỗi, mốc" sac="chu-y" Icon={Flame} onClick={() => moTp('chuoi')} />}
         {tq?.bat.giai !== false && <OTo ten="Giải tuần" mo="Bảng nhóm tuần này" sac="tin" Icon={Route} onClick={() => moTp('giai')} />}
         {tq?.bat.banBe !== false && <OTo ten="Học cùng bạn" mo="Chuỗi đôi với bạn học cùng" sac="dung" Icon={GraduationCap} onClick={() => moTp('ban')} />}
-        {tq?.bat.kimCuong && <OTo ten="Thử thách Kim cương" mo="10 câu khó của chuyên đề em đã vững" sac="tin" Icon={Gem} onClick={() => moTp('kim-cuong')} />}
+        {tq?.bat.kimCuong && <OTo ten="Thử thách Kim cương" mo="10 câu khó của chuyên đề em đã vững" sac="tin" Icon={Award} onClick={() => moTp('kim-cuong')} />}
         <OTo ten="Cửa hàng" mo="Tinh thể và bình giữ chuỗi" sac="sao" Icon={Sparkles} so={tq?.tinhThe} onClick={() => moTp('cua-hang')} />
       </> : <div className="da-huy">{huy.map(({ ten, sac, Icon, co }) => <div key={ten}><i data-sac={co ? sac : undefined}>{co ? <Icon size={28} aria-hidden="true" /> : <Lock size={26} aria-hidden="true" />}</i>{ten}</div>)}</div>}
       <h2 className="da-tieu-nho">Điểm thầy đã công bố</h2>
