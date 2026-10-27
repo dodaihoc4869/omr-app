@@ -26,7 +26,13 @@ describe('phông tròn app học sinh 27/10', () => {
   })
 
   it('tệp phông tự host, tổng byte ≤ Nunito cũ, không còn Nunito', () => {
-    const tep = readdirSync(THU_MUC).filter((t) => t.endsWith('.woff2')).sort()
+    const moi = readdirSync(THU_MUC).filter((t) => t.endsWith('.woff2')).sort()
+    // #439 (27/10, «l» như «I»): thêm phông con MỘT chữ «l» (chu-l-duoi-700/800, U+006C) — chỉ tờ nạp lười trong-lam-bai.css dùng, Vite nhúng thẳng
+    // (< 1 KB mỗi tệp) ⇒ không thuộc bộ phông nạp trước; bộ M PLUS vẫn đúng 4 tệp và vẫn ≤ byte Nunito cũ.
+    const tep = moi.filter((t) => t.startsWith('m-plus-rounded-1c-'))
+    expect(moi.filter((t) => !tep.includes(t))).toEqual(['chu-l-duoi-700.woff2', 'chu-l-duoi-800.woff2'])
+    for (const t of ['chu-l-duoi-700.woff2', 'chu-l-duoi-800.woff2']) expect(statSync(resolve(THU_MUC, t)).size).toBeLessThanOrEqual(1024)
+    expect(HS).not.toContain('chu-l-duoi')
     expect(tep).toEqual(['latin-700', 'latin-800', 'vietnamese-700', 'vietnamese-800'].map((x) => `m-plus-rounded-1c-${x}-normal.woff2`))
     const tong = tep.reduce((s, t) => s + statSync(resolve(THU_MUC, t)).size, 0)
     expect(tong).toBeLessThanOrEqual(52224)

@@ -127,7 +127,7 @@ describe('Thử thách Kim cương · danh sách chuyên đề', () => {
     expect(screen.getByText(/^Làm lại từ \d\d:\d\d /)).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Làm tiếp Ester – lipid' })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Thử thách Cấu tạo nguyên tử' }))
-    expect(await screen.findByText(/Cấu tạo nguyên tử · em đã thành thạo chuyên đề này/)).toBeTruthy()
+    expect(await screen.findByText(/Cấu tạo nguyên tử · em đã vững chuyên đề này/)).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Bắt đầu thử thách' }))
     await waitFor(() => expect(daGoi.find((g) => g.duong === DUONG.kimCuong)?.than.chuyenDe).toBe('NGUYEN_TU'))
   })

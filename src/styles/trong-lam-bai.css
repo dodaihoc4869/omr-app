@@ -166,6 +166,8 @@
 [data-trong] .kq-kinh [aria-labelledby='kq-h-ai'] .kq-ai :is(div, i) { display: inline; }
 [data-trong] .kq-kinh [aria-labelledby='kq-h-ai'] .kq-ai i { display: none; }
 [data-trong] .kq-kinh .xd-khung:has(> .xd-kq) > [aria-labelledby='xd-h-3p'], [data-trong] .kq-kinh .xd-khung:has(> .xd-kq) > [aria-labelledby='kq-h-cau'] { grid-row: 5; margin-top: 20px; }
+/* soát tổng 27/10: khổ một cột ⇒ «Từng câu» xuống hàng 6 (cùng hàng 5 thì đè kín «Ba phần của bài»); máy rộng hai cột lại về hàng 5 */
+[data-trong] .kq-kinh .xd-khung:has(> .xd-kq) > [aria-labelledby='kq-h-cau'] { grid-row: 6; }
 [data-trong] .kq-kinh [aria-labelledby='xd-h-3p'] { padding: 20px; border: 1px solid var(--tr-vien); border-radius: 20px; background: var(--tr-mat); box-shadow: var(--tr-bong-1); }
 [data-trong] .kq-kinh [aria-labelledby='xd-h-3p'] .xd-muc__dau h2 { font-size: 16px; font-weight: 600; }
 [data-trong] .kq-kinh [aria-labelledby='xd-h-3p'] .xd-phan { border-radius: 0; background: none; box-shadow: none; }
@@ -175,7 +177,7 @@
 @media (min-width: 900px) {
   [data-trong] .kq-kinh[data-trang-thai='da_cong_bo'] .xd-khung:has(> .xd-kq) { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   [data-trong] .kq-kinh .xd-khung:has(> .xd-kq) > [aria-labelledby='xd-h-3p'] { grid-column: 1; }
-  [data-trong] .kq-kinh .xd-khung:has(> .xd-kq) > [aria-labelledby='kq-h-cau'] { grid-column: 2; }
+  [data-trong] .kq-kinh .xd-khung:has(> .xd-kq) > [aria-labelledby='kq-h-cau'] { grid-column: 2; grid-row: 5; }
   [data-trong] .kq-kinh .xd-khung > .xd-kq { grid-template-columns: auto 1fr; justify-items: start; text-align: left; }
   [data-trong] .kq-kinh .xd-khung > .xd-kq .xd-kq__chi-tiet { align-items: flex-start; }
   [data-trong] .kq-kinh .xd-khung:has(> .xd-kq) > .xd-nut-hang { padding-left: 236px; }

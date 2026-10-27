@@ -52,6 +52,7 @@
 [data-trong] .ht2:has(.tr-menu .m3-tb-dem) .tr-menu-cham s { display: block; }
 [data-trong] .tr-menu-cham[aria-expanded='true'] { opacity: 0; }
 [data-trong] body:has(.aid-tam) .tr-menu-cham { visibility: hidden; } /* tấm A.I đang mở: vạch không thò cạnh tấm */
+[data-trong] body:has(.tp-toan) .tr-menu-cham { visibility: hidden; } /* màn thưởng toàn khung (hộp thoại, vd mời Thử thách Kim cương): vạch / thẻ Điểm danh không đè lên */
 /* Màn con / tấm toàn màn đang mở (cổng gắn `inert` lên Hôm nay) ⇒ vạch menu + thẻ «Điểm danh» thò ra không hiện, không bao giờ chồng lên nút của màn con. */
 [data-trong] [inert] :is(.tr-menu-cham, .tr-menu, .tr-menu-phu) { visibility: hidden; }
 [data-trong] .tr-menu-cham:focus-visible { outline: 0; }
