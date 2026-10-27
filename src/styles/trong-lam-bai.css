@@ -1017,3 +1017,11 @@
   .so-lan-dai { transition: none; }
   [data-trong] .duo-tren > .duo-moc { animation: none; transform: translate(-50%, -50%); }
 }
+
+/* ── NỘP TỨC THÌ (thầy 27/10: «bấm nút nộp load chậm lag»). Bấm «Kiểm tra» ⇒ nút GIỮ màu chính, lún xuống (như đang được giữ) và có vệt sáng chạy qua trong
+ * lúc chờ máy chấm — không đổi sang xám «bị khoá» (trông như app đơ). Vẫn `disabled` (khoá bấm đúp), chưa hiện đúng/sai. Chỉ transform/opacity. ── */
+@keyframes duo-cho-quet { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+[data-trong] .ht-app .duo-nut[data-cho]:disabled { position: relative; overflow: hidden; background: var(--tr-chinh-nut); color: var(--tr-tren-chinh); box-shadow: none; transform: translateY(3px); cursor: progress; }
+[data-trong] .ht-app .duo-nut[data-cho]:disabled::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--tr-tren-chinh) 26%, transparent), transparent); animation: duo-cho-quet 900ms linear infinite; }
+@media (prefers-reduced-motion: reduce) { [data-trong] .ht-app .duo-nut[data-cho]:disabled { transform: none; } [data-trong] .ht-app .duo-nut[data-cho]:disabled::after { animation: none; opacity: .5; transform: none; } }
+[data-trong].may-yeu .ht-app .duo-nut[data-cho]:disabled::after { animation: none; opacity: .5; transform: none; }

@@ -281,6 +281,10 @@ const DUO_CANH = [
 const DS_DUO = [[390, 844, 'doc'], [390, 700, 'doc700'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   DUO_CANH.map(([t, viec]) => [`duo-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=duo', w, hh, nen, false, /Số đồng phân amine/, viec || undefined])))
 // ═══ hết DUO 26/10
+// ═══ NỘP TỨC THÌ 27/10 (tiền tố "duo-9-cho-"): bấm «Kiểm tra» khi máy chấm còn bận (`&cho=1`: lệnh answer chưa trả lời) ⇒ nút giữ màu chính, lún, vệt sáng chạy,
+// chữ «Đang kiểm tra…»; chưa có tấm đúng/sai. 390×844 · 360×640 · 844×390 · 1440×900, sáng + tối.
+const DS_NOP_CHO = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].map((nen) =>
+  [`duo-9-cho-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=duo&cho=1', w, hh, nen, false, /Số đồng phân amine/, 'lam13:tn:^D » nut:^Kiểm tra$']))
 // ═══ BÀN PHÍM DUO 27/10 (tiền tố "duo-5-tln-"): câu trả lời ngắn có đủ trợ giúp (`&ba=1`: Bắt đầu từ đâu? · Học cách giải · Hỏi thầy) — mở câu (tự cuộn
 // để trọn bàn phím trên thanh đáy) · gõ 8,2 · vừa bấm xoá · tấm bóng đèn «Trợ giúp» mở; thêm tấm ấy ở câu trắc nghiệm, đúng–sai và màn sửa câu Duo.
 // 390×844, 360×640, 844×390, 1440×900, sáng + tối.
@@ -627,6 +631,7 @@ const DS = [
   ...DS_MG, // MỘT TRANG GV 26/10
   ...DS_NG_HS, // NGANG HS 26/10
   ...DS_DUO_SUA, // DUO SỬA 27/10
+  ...DS_NOP_CHO, // NỘP TỨC THÌ 27/10
   ...DS_DUO, // DUO 26/10
   ...DS_BP, // BÀN PHÍM DUO 27/10
   ...DS_HT, // HỎI THẦY THEO TÔNG 27/10

@@ -321,9 +321,19 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   // Rung phản hồi kiểu Duolingo (thầy 26/10) — chỉ app học sinh «Trong» (phan-hoi.ts tự kiểm): tấm kết quả đúng / sai, hết chặng.
   useEffect(() => { if (k && !k.choThay && !k.hocCoHoTro && !k.omni?.luot) phanHoi(k.correct ? 'dung' : 'sai') }, [!!k]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (xong) phanHoi('xong') }, [xong])
+  // NỘP TỨC THÌ (thầy 27/10): em đang đọc kết quả câu này ⇒ tải sẵn ảnh đề / phương án của câu KẾ (không gồm ảnh lời giải) — bấm «Tiếp tục» là câu hiện đủ ngay.
+  useEffect(() => {
+    const sau = k ? cau[viTri + 1] : undefined
+    if (!sau) return
+    const ds = [...sau.hinhAnh.filter(h => h.viTri !== 'sau_loi_giai').map(h => h.src), sau.thanCauImg, ...(sau.choiceImgs ?? []), ...(sau.ideaImgs ?? [])]
+    for (const src of ds) if (src && !src.startsWith('data:')) { const im = new Image(); im.decoding = 'async'; im.src = src }
+  }, [!!k, viTri, cau]) // eslint-disable-line react-hooks/exhaustive-deps
   const nopCau = async () => {
     if (!q || !phien || !duTraLoi(q.phan, tra) || gui.current || k) return
     gui.current = true; setNop(true); setLoi('')
+    // NỘP TỨC THÌ (thầy 27/10): trong lúc chờ máy chấm, nạp sẵn mảnh lời giải từng bước (+ màn kết bài khi là câu cuối) — bấm «Lời giải» / hết chặng là có ngay.
+    // Chỉ mã giao diện (không có đáp án); đáp án vẫn chỉ về cùng phản hồi chấm.
+    if (duo) { void import('../goi-y-cham/LoiGiaiCauCoSoDo').catch(() => {}); if (viTri + 1 >= cau.length) void import('../thuong/KetBaiThuong').catch(() => {}) }
     const msLam = Math.max(0, Date.now() - batDau.current)
     const assisted = !!q.goiY || daHoiThay.current === q.qid || hoTroCham.current === q.qid
     try {
@@ -662,7 +672,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
         </div></div>
       : <div className="duo-day"><div className="duo-giua">
           {loi && <p className="duo-loi" role="alert">{loi}</p>}
-          <button type="button" className="duo-nut" onClick={() => { phanHoi('chon'); void nopCau() }} disabled={nop || !duocNop}>{nop ? 'Đang kiểm tra…' : q.phan === 'II' && soYChua ? `Còn ${soYChua} ý chưa chọn` : 'Kiểm tra'}</button>
+          <button type="button" className="duo-nut" data-cho={nop || undefined} aria-busy={nop || undefined} onClick={() => { phanHoi('chon'); void nopCau() }} disabled={nop || !duocNop}>{nop ? 'Đang kiểm tra…' : q.phan === 'II' && soYChua ? `Còn ${soYChua} ý chưa chọn` : 'Kiểm tra'}</button>
         </div></div>
 
     // MÀN KẾT BÀI thưởng phạt (bản vẽ tp-3): một màn đủ «được bao nhiêu nguyên tử, vì sao · hôm nay còn mấy bài · hạng giải». «Tiếp tục» ⇒ về Lộ trình;
