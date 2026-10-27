@@ -49,7 +49,7 @@ describe('phông tròn app học sinh 27/10', () => {
   })
 
   it('360 px: nhãn ngắn không bẻ dòng xấu — cân dòng + bớt khoảng ở điện thoại hẹp', () => {
-    expect(HS).toMatch(/:is\(\.tp-nv \.giua > b, \.da-o b, \.da-o \.mo, \.ktcn-dong-so li > span\) \{ text-wrap: balance; \}/)
+    expect(HS).toMatch(/:is\(\.tp-nv \.giua > b, \.da-o b, \.da-o \.mo, \.ktcn-dong-so li > span, \.tp-lua-lon \.giua p, \.tp-nut, \.tp-nut-lon\) \{ text-wrap: balance; \}/)
     const hep = HS.slice(HS.indexOf('@media (max-width: 380px) {\n  :root[data-trong=\'hs\']:has(.ht2) .ktcn-dong-so li'))
     expect(hep).toContain('.ktcn-dong-so li { gap: 6px; font-size: 14px; }')
     expect(hep).toContain('.tp-nv { gap: 10px; padding: 12px; }')
