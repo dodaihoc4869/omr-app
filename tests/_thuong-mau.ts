@@ -55,6 +55,13 @@ export const BAN_GIA = { ok: true, bat: true, toiDa: 3, loiMoi: [], daMoi: [], b
   { ma: 'b1', ten: 'Minh Châu', lop: '12A2', chuoiDoi: 9, homNay: 'ca_hai', daGoCua: false, tuNgay: '2026-10-17' },
   { ma: 'b2', ten: 'Gia Bảo', lop: '12A2', chuoiDoi: 3, homNay: 'ban_chua', daGoCua: false, tuNgay: '2026-10-23' },
 ] }
+/** /hs/kim-cuong/ds (lối vào Thử thách Kim cương, 27/10): một chuyên đề mở, một lượt dở, một đang khoá, một đã đạt. */
+export const DS_KC_GIA = { ok: true, bat: true, ds: [
+  { ma: 'ESTER', ten: 'Ester – lipid', tt: 'dang', daDat: false },
+  { ma: 'NGUYEN_TU', ten: 'Cấu tạo nguyên tử', tt: 'mo', daDat: false },
+  { ma: 'POLYMER', ten: 'Polymer', tt: 'mo', daDat: true },
+  { ma: 'HALOGEN', ten: 'Nguyên tố nhóm halogen', tt: 'khoa', daDat: false, moLaiLuc: '2026-10-28T02:30:00.000Z' },
+] }
 export const TIM_GIA = { ok: true, bat: true, ketQua: [
   { ma: 't1', ten: 'Nguyễn Thu Hà', lop: '12A1', trangThai: null }, { ma: 't2', ten: 'Chu Khánh Hà', lop: '12A1', trangThai: 'da_moi' },
   { ma: 't3', ten: 'Trịnh Hải Đăng', lop: '11B2', trangThai: null },

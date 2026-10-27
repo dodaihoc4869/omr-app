@@ -8,11 +8,12 @@ import { ChemText } from '../../lib/chem-format'
 import { Bi } from '../linh-vat/Bi'
 import { goiHoa2, guiLaiKhiKetMang } from '../hoa2/api'
 import { bayToi, bungHat, hoaGiay, hoatAnh, phanHoiThuong } from '../../lib/hieu-ung-thuong'
-import { batDauKimCuong, docKimCuongCau, docThuongCau, type CauKimCuong, type PhienKimCuong, type ThuongCau } from '../../lib/thuong-api'
+import { DUONG, batDauKimCuong, docKimCuongCau, docThuongCau, layDsKimCuong, type CauKimCuong, type MucKimCuong, type PhienKimCuong, type ThuongCau } from '../../lib/thuong-api'
 import { HuyHieuKimLoai, IcTinhThe, OngMang, Tia } from './hinh'
 import { OngNghiem, TamThuong } from './TamThuong'
-import { capNhatTongQuan, useTongQuan } from './dung-thuong'
-import { Loi, ManToan, NutDay, gioVn, oTinhThe, thuNgayVn, useHieuUng } from './chung'
+import { capNhatTongQuan, useTai, useTongQuan } from './dung-thuong'
+import { Cho, Loi, ManToan, NutDay, gioVn, oTinhThe, thuNgayVn, useHieuUng } from './chung'
+import { DauVe } from './ManChuoi'
 
 type Buoc = 'moi' | 'lam' | 'truot' | 'dat'
 export interface PropsKimCuong {
@@ -180,4 +181,34 @@ export function ManKimCuong({ token, chuyenDe, tenChuyenDe, onDong, onOnLai, bat
       </div>
     </main>
   </ManToan>
+}
+
+/** LỐI VÀO Thử thách Kim cương (27/10 — ô «Thử thách Kim cương» ở Thành tích): danh sách chuyên đề em ĐÃ VỮNG (máy chủ /hs/kim-cuong/ds, cùng luật mở của
+ *  lệnh bắt đầu) + lượt đang dở / đang khoá 24 giờ / đã đạt. Bấm «Thử thách» / «Làm tiếp» ⇒ màn mời của chuyên đề đó; đóng ⇒ về danh sách (đọc lại).
+ *  Chưa vững chuyên đề nào ⇒ nói thật cách mở. Công tắc Kim cương tắt ⇒ ẩn hẳn. */
+export function ManKimCuongDs({ token, onVe }: { token?: string; onVe?: () => void }) {
+  const tq = useTongQuan(token).du
+  const tat = tq?.bat.kimCuong === false
+  const { du, tai, loi, thuLai } = useTai(token, DUONG.kimCuongDs, layDsKimCuong, !tat)
+  const [chon, setChon] = useState<MucKimCuong | null>(null)
+  if (tat || du?.tat) return null
+  if (chon) return <ManKimCuong token={token} chuyenDe={chon.ma} tenChuyenDe={chon.ten} onDong={() => { setChon(null); thuLai() }} />
+  if (!du) return <div className="tp-goc tp-vo"><DauVe onVe={onVe} />{tai ? <Cho /> : <Loi chu={loi || 'Chưa xem được Thử thách Kim cương.'} onThuLai={thuLai} />}</div>
+  const chuTt = (m: MucKimCuong) => m.tt === 'dang' ? 'Em đang làm dở lượt này'
+    : m.tt === 'khoa' ? (m.moLaiLuc ? `Làm lại từ ${gioVn(Date.parse(m.moLaiLuc))} ${thuNgayVn(Date.parse(m.moLaiLuc))}` : 'Làm lại sau 24 giờ')
+    : m.tt === 'chua_vung' ? 'Vững lại chuyên đề để thử lần nữa' : m.daDat ? 'Đã đạt · thử lại được' : '10 câu khó · 3 ống nghiệm'
+  return <div className="tp-goc tp-vo" data-man="kim-cuong-ds">
+    <DauVe onVe={onVe} />
+    {loi && <Loi chu={loi} onThuLai={thuLai} />}
+    <div><h1 className="tp-tieu">Thử thách Kim cương</h1>
+      <p className="tp-phu" style={{ marginTop: 4 }}>Mở khi em vững một chuyên đề trên Lộ trình. Đạt lần đầu: +40 tinh thể và huy hiệu Kim cương.</p></div>
+    {du.ds.length === 0 ? <div className="tp-trong"><Bi cam="chao" size={72} /><b>Chưa có chuyên đề nào mở thử thách</b>
+      <span>Học đều trên Lộ trình. Khi em vững một chuyên đề, thử thách của chuyên đề đó sẽ hiện ở đây.</span></div>
+      : <section className="tp-the" aria-label="Chuyên đề">{du.ds.map((m) => <div key={m.ma} className="tp-dong tp-kc-muc" data-tt={m.tt}>
+        <span className="tp-kc-hh" aria-hidden="true"><HuyHieuKimLoai hang="kimcuong" khoa={!m.daDat} an /></span>
+        <div className="giua"><b>{m.ten}</b><span>{chuTt(m)}</span></div>
+        {(m.tt === 'mo' || m.tt === 'dang') && token ? <button type="button" className="tp-nut" data-sac={m.tt === 'dang' ? 'chinh' : 'kc'} onClick={() => setChon(m)} aria-label={`${m.tt === 'dang' ? 'Làm tiếp' : 'Thử thách'} ${m.ten}`}>{m.tt === 'dang' ? 'Làm tiếp' : 'Thử thách'}</button>
+          : m.daDat ? <span className="tp-chip">Đã đạt</span> : <span className="tp-mo-lai"><Clock aria-hidden="true" />Đang khoá</span>}
+      </div>)}</section>}
+  </div>
 }

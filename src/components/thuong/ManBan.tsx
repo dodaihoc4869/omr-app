@@ -12,6 +12,7 @@ import { IcLua, IcTinhThe, Tia } from './hinh'
 import { baoMoi, useTai, useTongQuan } from './dung-thuong'
 import { Cho, DemTT, Loi, ManToan, NutDay, chuCai, ngayNgan, oTinhThe, useHieuUng, useToast } from './chung'
 import { DauVe } from './ManChuoi'
+import { hieuUngGoCua, tenNgan } from './ban-gon'
 
 export const LUAT_BAN = [
   'Cả hai cùng xong ít nhất 1 bài trong ngày thì lửa đôi tăng 1. Một bạn lỡ thì lửa đôi tắt.',
@@ -22,7 +23,6 @@ export const LUAT_BAN = [
 const KHO_DOI = 'ddh.thuong.lua-doi'
 const docDoiCu = (): Record<string, number> => { try { const v = JSON.parse(localStorage.getItem(KHO_DOI) || '{}'); return v && typeof v === 'object' ? v : {} } catch { return {} } }
 const ghiDoi = (v: Record<string, number>) => { try { localStorage.setItem(KHO_DOI, JSON.stringify(v)) } catch { /* bỏ qua */ } }
-const tenNgan = (ten: string) => ten.trim().split(/\s+/).slice(-1)[0] ?? ten
 const lamMoiBan = async (token: string) => { const r = await layDsBan(token); if (r.ok) baoMoi(DUONG.ban, token) }
 
 function LuaDoi({ so, id }: { so: number; id?: string }) {
@@ -44,11 +44,7 @@ function TheBan({ b, i, token, bao }: { b: BanHoc; i: number; token?: string; ba
   const go = async () => {
     if (!token || dangGo || daGo) return
     setDangGo(true)
-    phanHoiThuong('goCua')
-    for (let k = 0; k < 2; k++) {
-      hoatAnh(nut.current, [{ transform: 'none' }, { transform: 'translateX(-3px) rotate(-3deg)' }, { transform: 'translateX(3px) rotate(3deg)' }, { transform: 'none' }], 220, { tre: k * 320 })
-      setTimeout(() => bungHat(nut.current, { n: 6, r: 36, co: 6, tron: true, mau: ['tt', 'trang'] }), k * 320 + 60)
-    }
+    hieuUngGoCua(nut.current)
     const r = await goCua(token, b.ma)
     setDangGo(false)
     if (!r.ok) return bao(r.chu)

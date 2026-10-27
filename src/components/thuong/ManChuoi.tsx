@@ -7,10 +7,11 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { ArrowLeft, Check, Flame } from 'lucide-react'
 import { Bi } from '../linh-vat/Bi'
 import { bayToi, bungHat, hoatAnh, latSo, phanHoiThuong } from '../../lib/hieu-ung-thuong'
-import { DAT_CUOC, GIA_BINH, MOC_CHUOI, datCuoc, muaBinh, ngayVn, type ChuoiNgay, type ThongBao, type TongQuanThuong } from '../../lib/thuong-api'
+import { DAT_CUOC, DUONG, GIA_BINH, MOC_CHUOI, datCuoc, layDsBan, muaBinh, ngayVn, type ChuoiNgay, type ThongBao, type TongQuanThuong } from '../../lib/thuong-api'
 import { Binh, HuyHieuMau, IcLua, IcTinhThe, Tia } from './hinh'
-import { capNhatTongQuan, useTongQuan } from './dung-thuong'
-import { ChuGiaiTuan, Cho, DemTT, Loi, ManToan, NutDay, ThangLich, TuanBay, dongHo, gioVn, ngayNgan, oTinhThe, thuNgayVn, useHieuUng, useToast } from './chung'
+import { capNhatTongQuan, useTai, useTongQuan } from './dung-thuong'
+import { tenNgan } from './ban-gon'
+import { ChuGiaiTuan, Cho, chuCai, DemTT, Loi, ManToan, NutDay, ThangLich, TuanBay, dongHo, gioVn, ngayNgan, oTinhThe, thuNgayVn, useHieuUng, useToast } from './chung'
 
 export const LUAT_CHUOI = [
   'Mỗi ngày học xong ít nhất 1 bài để ngọn lửa cháy tiếp.',
@@ -112,7 +113,25 @@ export function useMuaThuong(token: string | undefined) {
   return { dang, toast, mua, cuoc, bao }
 }
 
-export interface PropsManChuoi { token?: string; onVe?: () => void; onHoc?: () => void; onCuu?: () => void; hieuUng?: 'chuoi' | 'binh' | 'moc' }
+export interface PropsManChuoi { token?: string; onVe?: () => void; onHoc?: () => void; onCuu?: () => void; hieuUng?: 'chuoi' | 'binh' | 'moc'
+  /** Mở màn Học cùng bạn (khối «Lửa đôi»). Không truyền ⇒ khối chỉ để xem. */
+  onBan?: () => void }
+
+const CHU_DOI = { ca_hai: 'hôm nay cả hai đã xong', ban_chua: 'bạn chưa học hôm nay', em_chua: 'bạn đã học · chờ em 1 bài', ca_hai_chua: 'cả hai chưa học hôm nay' } as const
+/** Khối «Lửa đôi» (27/10): bạn học cùng + số lửa đôi — cùng dữ liệu, cùng cách gọi tên của màn Học cùng bạn (/hs/ban, bản gần nhất ở máy trước). Bấm ⇒ mở
+ *  Học cùng bạn. Chưa có bạn ⇒ một dòng mời. Công tắc «bạn bè» tắt ⇒ ẩn hẳn. Không điểm / nguyên tử của bạn. */
+function KhoiLuaDoi({ token, bat, onBan }: { token?: string; bat?: boolean; onBan?: () => void }) {
+  const { du: ds } = useTai(token, DUONG.ban, layDsBan, !!token && bat !== false)
+  if (bat !== true || !ds || ds.tat) return null
+  const nhan = ds.ban.length ? `Lửa đôi với ${ds.ban.length} bạn` : 'Chưa có bạn học cùng'
+  const ruot = ds.ban.length ? ds.ban.map((b, i) => <div key={b.ma} className="tp-dong"><span className="tp-av" data-k={String((i % 4) + 1)} aria-hidden="true">{chuCai(b.ten)}</span>
+    <div className="giua"><b>{b.ten}</b><span>Lửa đôi {b.chuoiDoi} ngày · {CHU_DOI[b.homNay].replace('bạn', tenNgan(b.ten))}</span></div></div>)
+    : <div className="tp-dong"><span className="tp-av" data-k="2" aria-hidden="true">+</span><div className="giua"><b>Học cùng bạn để giữ lửa đôi</b><span>Cả hai cùng xong 1 bài mỗi ngày thì lửa đôi tăng</span></div></div>
+  return <section className="tp-the" aria-label="Lửa đôi">
+    <h2>Lửa đôi</h2>
+    {onBan ? <button type="button" className="tp-the-nut" aria-label={`${nhan} — mở Học cùng bạn`} onClick={onBan}>{ruot}</button> : ruot}
+  </section>
+}
 
 function TheCuuNho({ c, onCuu }: { c: ChuoiNgay; onCuu?: () => void }) {
   const cu = c.cuu!
@@ -140,7 +159,7 @@ function TheLich({ c, homNay }: { c: ChuoiNgay; homNay: string }) {
 }
 
 /** Màn Chuỗi ngày (tp-5). */
-export function ManChuoiNgay({ token, onVe, onHoc, onCuu, hieuUng }: PropsManChuoi) {
+export function ManChuoiNgay({ token, onVe, onHoc, onCuu, hieuUng, onBan }: PropsManChuoi) {
   const { du: tq, tai, loi, thuLai } = useTongQuan(token)
   const m = useMuaThuong(token)
   const lua = useRef<HTMLSpanElement>(null), the = useRef<HTMLDivElement>(null), bi = useRef<HTMLDivElement>(null)
@@ -201,6 +220,7 @@ export function ManChuoiNgay({ token, onVe, onHoc, onCuu, hieuUng }: PropsManChu
         </section>
         <TheMoc so={c.so} />
         <TheCuoc tq={tq} dangGui={m.dang === 'cuoc'} onCuoc={token ? () => void m.cuoc() : undefined} nutChinh={daHoc || !onHoc} />
+        <KhoiLuaDoi token={token} bat={tq.bat.banBe} onBan={onBan} />
       </div>
     </div>
     {m.toast}

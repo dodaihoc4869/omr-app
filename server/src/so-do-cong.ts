@@ -91,10 +91,11 @@ export function giaTriThuaSo(so: string, ten: Map<string, number> = new Map()): 
     const c = xem()
     if (c === '(') { i++; const v = tong(); if (xem() !== ')') throw loi; i++; return v }
     for (const t of tenDai) if (s.startsWith(t, i)) { i += t.length; return ten.get(t)! }
-    const m = /^\d+(?:[.,]\d+)?/.exec(s.slice(i))
+    // 27/10: số có dấu cách ngăn hàng nghìn kiểu VN («1 000 000», «10 000,5») — chỉ nhóm đúng 3 chữ số.
+    const m = /^\d{1,3}(?: \d{3})+(?:,\d+)?(?![\d.])|^\d+(?:[.,]\d+)?/.exec(s.slice(i))
     if (!m) throw loi
     i += m[0].length
-    let v = Number(m[0].replace(',', '.'))
+    let v = Number(m[0].replace(/ /g, '').replace(',', '.'))
     if (xem() === '%') { i++; v /= 100 }
     return v
   }

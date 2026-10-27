@@ -14,6 +14,7 @@ import { chuyenDeTuDang, TIEN_QUYET_CHUYEN_DE } from './hanh-trinh-chuyen-de'
 import { publicQuestion, type PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { congTacTuDong, KC_KHOA_MS, KC_ONG, KC_SO_CAU, laCauKho, ngayVnTt, trangThaiKimCuong } from './thuong-luat'
 import { lenhDocCongTac } from './thuong-d1'
+import { TEN_CHUONG } from '../../src/lib/tu-vung-dang'
 
 type Dong = Record<string, unknown>
 /** Hạn một lượt game (game-v2.ts `answer`: quá 2 giờ ⇒ «Lượt học đã hết hạn»). */
@@ -112,4 +113,57 @@ export async function hsKimCuongBatDau(env: Env, b: Dong, nowMs: number = Date.n
     env.DB.prepare('INSERT INTO kim_cuong_phien(id, em, chuyen_de, tao_luc, ong_con) VALUES (?, ?, ?, ?, ?)').bind(phien, sbd, cd, nowMs, KC_ONG),
   ])
   return { ok: true, phien, cau: chon.map(publicQuestion), ong: KC_ONG }
+}
+
+/** Một chuyên đề trên danh sách Thử thách Kim cương của em. `tt`: mo = vào được · dang = lượt đang dở (còn hạn) · khoa = vừa trượt, chờ 24 giờ ·
+ *  chua_vung = đã đạt trước đây nhưng nay chưa vững lại (chỉ hiện huy hiệu). */
+export interface MucKimCuong { ma: string; ten: string; tt: 'mo' | 'dang' | 'khoa' | 'chua_vung'; daDat: boolean; moLaiLuc?: string }
+
+/** Trạng thái một chuyên đề từ lượt GẦN NHẤT — đúng luật của `hsKimCuongBatDau` (lượt dở còn hạn · trượt / bỏ dở quá hạn ⇒ khoá 24 giờ). Hàm thuần. */
+export function trangThaiMucKimCuong(cu: Dong | undefined, nowMs: number): { tt: 'mo' | 'dang' | 'khoa'; moLaiLuc?: string } {
+  if (!cu) return { tt: 'mo' }
+  const tao = Number(cu.tao_luc) || 0
+  const dangDo = cu.ket_qua === null || cu.ket_qua === undefined
+  if (dangDo && nowMs - tao < KC_HAN_LUOT_MS) return { tt: 'dang' }
+  const ketThuc = cu.ket_qua === 'truot' ? Number(cu.xong_luc) || tao : dangDo ? tao + KC_HAN_LUOT_MS : 0
+  if ((cu.ket_qua === 'truot' || dangDo) && nowMs < ketThuc + KC_KHOA_MS) return { tt: 'khoa', moLaiLuc: new Date(ketThuc + KC_KHOA_MS).toISOString() }
+  return { tt: 'mo' }
+}
+
+/**
+ * POST /hs/kim-cuong/ds {token} → {ok, bat, ds: MucKimCuong[]} — LỐI VÀO thử thách (27/10): chuyên đề em ĐÃ VỮNG (luật `chuyenDeThanhThao`) + chuyên đề có lượt
+ * đang dở / đang khoá / đã đạt. CHỈ ĐỌC, MỘT lô (công tắc · mức kỹ năng mới nhất · các lượt của em), chạy cùng đợt với lượt kiểm mật khẩu. Không câu, không đáp án.
+ */
+export async function hsKimCuongDs(env: Env, b: Dong, nowMs: number = Date.now(), envDoc: Env = env): Promise<Dong> {
+  let id: { sbd: string; xong: Promise<string> }
+  try { id = await gameIdentityHaiBuoc(env, b) } catch (e) { return { ok: false, error: e instanceof Error ? e.message : 'Em đăng nhập lại nhé.' } }
+  id.xong.catch(() => {})
+  const lo = envDoc.DB.batch([
+    lenhDocCongTac(envDoc),
+    envDoc.DB.prepare('SELECT muc_json FROM hanh_trinh_v5_muc WHERE sbd = ? ORDER BY cap_nhat_luc DESC LIMIT 1').bind(id.sbd),
+    envDoc.DB.prepare('SELECT chuyen_de, tao_luc, xong_luc, ket_qua FROM kim_cuong_phien WHERE em = ? ORDER BY tao_luc DESC LIMIT 300').bind(id.sbd),
+  ])
+  lo.catch(() => {})
+  try { await id.xong } catch (e) { return { ok: false, error: e instanceof Error ? e.message : 'Em đăng nhập lại nhé.' } }
+  const kq = await lo
+  if (congTacTuDong((kq[0]?.results ?? []) as { khoa: unknown; gia_tri: unknown }[]).thuong_kim_cuong === 'tat') return { ok: true, bat: false, ds: [] }
+  const muc = (kq[1]?.results?.[0] as Dong | undefined)?.muc_json
+  const ganNhat = new Map<string, Dong>(), daDat = new Set<string>()
+  for (const r of (kq[2]?.results ?? []) as Dong[]) {
+    const cd = String(r.chuyen_de ?? '')
+    if (!ganNhat.has(cd)) ganNhat.set(cd, r)
+    if (r.ket_qua === 'dat') daDat.add(cd)
+  }
+  const ds: MucKimCuong[] = []
+  for (const cd of Object.keys(TIEN_QUYET_CHUYEN_DE)) {
+    const vung = chuyenDeThanhThao(muc, cd)
+    const t = trangThaiMucKimCuong(ganNhat.get(cd), nowMs)
+    // Chưa vững mà cũng chưa từng làm / không dở / không khoá ⇒ chưa hiện (thử thách mở khi vững chuyên đề).
+    if (!vung && !daDat.has(cd) && t.tt === 'mo') continue
+    // Đã đạt nhưng nay chưa vững lại ⇒ chỉ hiện huy hiệu đã đạt (lệnh bắt đầu sẽ từ chối «chuaMo»).
+    ds.push({ ma: cd, ten: TEN_CHUONG[cd] ?? cd, ...(!vung && t.tt === 'mo' ? { tt: 'chua_vung' as const } : t), daDat: daDat.has(cd) })
+  }
+  const thu = { dang: 0, mo: 1, khoa: 2, chua_vung: 3 } as const
+  ds.sort((x, y) => thu[x.tt] - thu[y.tt] || Number(x.daDat) - Number(y.daDat))
+  return { ok: true, bat: true, ds }
 }
