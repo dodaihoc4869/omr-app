@@ -1121,3 +1121,8 @@
 [data-trong='hs'] .da-duong { margin-top: 24px; }
 @media (max-height: 520px) and (min-width: 600px) { [data-trong] .da-dai { height: 44px; } [data-trong] .da-dai-dinh::before { height: 66px; } [data-trong] .da-bai-moc { margin-bottom: -13px; } }
 @media (prefers-reduced-motion: reduce) { [data-trong] .da-dai, [data-trong] .da-dai-dinh::before { transition: none; animation: none !important; } }
+/* Hàng bộ đếm CHỨA trọn vòng Bi + nhãn «x/y bài» (nhãn đặt tuyệt đối dưới vòng) ⇒ nền đặc của hàng che hết nội dung cuộn phía sau; dải thẻ dính dưới
+   mép THỰC (--tren-cao đo cả nhãn + khe 8px, TrongHs.tsx) ⇒ không bao giờ đè nhãn (thầy 27/10 «Chữ 1/16 vẫn bị cắt, chuyển thẻ xuống dưới»). */
+[data-trong='hs'] .da-tren .tp-tr-muc { margin-bottom: 12px; }
+[data-trong] .da-dai-dinh::before { top: -10px; }
+[data-trong] .da-dai { top: 0; }
