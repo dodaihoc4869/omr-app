@@ -12,8 +12,6 @@ export { MomDanhSachM3, MomLamBaiM3 } from './bang-nhiem-vu/MomM3'
 export { default as LichSuCaM3 } from './bang-nhiem-vu/LichSuCaM3'
 // Bong bóng A.I Đỗ Đại Học (24/10): cửa nạp nằm Ở ĐÂY (không ở StudentPortalScreen) ⇒ danh sách mảnh kèm của import() không vào lượt mở /hs; bong bóng vẫn là mảnh riêng ngoài precache.
 export const napBong = () => import('./ai-ddh/BongBongAiDdh')
-// 27/10 MƯỢT: màn con che kín ⇒ trình duyệt bỏ qua Lộ trình phía sau (src/lib/an-khi-bi-che.ts) — ở mảnh lười này để lượt mở /hs không cộng byte.
-export { batAnKhiBiChe } from '../lib/an-khi-bi-che'
 
 // MÁY YẾU 27/10 (thầy: «Máy yếu bị lag»): mảnh này nạp lúc rảnh sau khi Lộ trình hiện ⇒ đo nhịp khung thật ở đây (src/lib/do-nhip-khung.ts):
 // thông số máy trông ổn mà khung hình chậm ⇒ bật chế độ máy yếu ngay + nhớ cho lần mở sau. Không thêm tệp, không cộng byte lượt mở.

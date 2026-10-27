@@ -27,6 +27,8 @@ const trinh = await chromium.launch({ executablePath: existsSync(exe) ? exe : un
 const [sa, sb] = await Promise.all([mayChu(A), mayChu(B)])
 const chup = async (s, canh, w, h, nen, tep) => {
   const ctx = await trinh.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 1, colorScheme: nen, reducedMotion: 'reduce', hasTouch: w < 900, isMobile: w < 500, timezoneId: 'Asia/Ho_Chi_Minh', locale: 'vi-VN' })
+  // ngẫu nhiên có hạt giống (lời càu nhàu của giám thị, lời khen…) ⇒ hai bên cùng chuỗi số, ảnh tất định
+  await ctx.addInitScript(() => { let h = 12345; Math.random = () => ((h = (h * 16807) % 2147483647) / 2147483647) })
   const p = await ctx.newPage()
   await p.clock.setFixedTime(new Date('2026-10-27T03:00:00Z'))
   await p.goto(`http://127.0.0.1:${s.address().port}/scripts/chup-v2/trang.html?man=${canh}`)

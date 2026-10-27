@@ -204,9 +204,6 @@
 [data-trong='hs'] .ht2-ca .ht-nut-chinh { min-height: 44px; padding: 0 18px; border-radius: 12px; border-color: var(--tr-tin-chu); background: var(--tr-tin-chu); color: var(--tr-trang); font-size: 15px; }
 
 /* Thẻ chung của màn: trắng, viền mảnh, bo 20px, bóng rất nhẹ. */
-[data-trong='hs'] .tr-hn-luoi :is(.ht2-hn, .ht2-nhom, .ht2-moi-sua, .ktcn-the, .ht-the) {
-  margin: 0; padding: 20px; border: 1px solid var(--tr-vien); border-radius: 20px; background: var(--tr-mat); box-shadow: var(--tr-bong-1); color: var(--tr-chu);
-}
 /* Bảng màu riêng của thẻ Hôm nay (biến khai ở hoc-tap.css) ⇒ màu app + màu nghĩa «Trong». */
 [data-trong='hs'] :is(.ht2-hn, .ht2-dong) {
   --lg-nhan: var(--tr-chinh-chu); --hn-du: var(--tr-dung); --hn-thieu-it: var(--tr-chu-y); --hn-khong: var(--tr-sai); --hn-o-cho: var(--tr-vien-2);
@@ -214,8 +211,6 @@
 }
 [data-trong] :is(.tr-the-dau, .ht2-nhom > h2) { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; }
 [data-trong] .ht2 :is(.tr-the-dau h2, .ht2-nhom > h2) { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.4; letter-spacing: 0; }
-[data-trong] .tr-nhip :is(.ht2-hn-tiep, .ht2-hn-luoi) { padding: 12px 14px; border-radius: 12px; font-size: 14px; background: var(--tr-dung-nhat); color: var(--tr-dung-chu); }
-[data-trong] .tr-hn-luoi :is(.ht2-moi-sua-nut, .ht2-moi-sua-chu-nut, .ht2-moi-sua > .vh-hang) { grid-column: 1 / -1; }
 
 /* ── Ôn và sửa / Kết quả: MỘT thẻ, dòng ngăn bằng đường mảnh ── */
 [data-trong='hs'] .ht2-noi-dung > .ht2-nhom, [data-trong='hs'] .tr-hn-luoi .ht2-nhom {
@@ -242,8 +237,6 @@
 [data-trong] .ht2[data-mot] .ht2-mo-dau h1 { margin: 0; font-size: 24px; }
 [data-trong] .ht2[data-mot] .ht-thong-bao { margin: 0; }
 [data-trong] .mot-xuong { display: block; width: 70%; height: 22px; border-radius: 8px; background: var(--tr-mat-2); }
-[data-trong] .mot-o > :is(svg, span, img) { max-width: 100%; max-height: 100%; }
-[data-trong] .mot-giua :is(strong, small) { overflow-wrap: anywhere; }
 [data-trong] .mot-lien-ket {
   display: inline-flex; align-items: center; align-self: flex-start; gap: 4px; min-height: 44px; padding: 0 4px; border: 0; background: transparent;
   color: var(--tr-chinh-chu); font-size: 15px; font-weight: 600;
@@ -474,7 +467,6 @@
   [data-trong] .ht2-mo-dau h1 { font-size: 24px; }
   [data-trong='hs'] .ht2 .ht-noi-dung { padding: 24px 28px 96px 16px; }
   [data-trong] .ht2-ca .ht-nut-chinh { width: 100%; }
-  [data-trong='hs'] .tr-hn-luoi :is(.ht2-hn, .ktcn-the, .ht-the, .ht2-moi-sua) { padding: 16px; border-radius: 18px; }
   [data-trong] .ht2 .ht2-nhom > h2 { padding: 14px 16px 4px; }
   [data-trong] .ht2-nhom > .ht2-dong { padding: 12px 16px; }
   [data-trong] .htn-lo { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'dau' 'nut' 'thang'; padding: 16px; }

@@ -23,6 +23,7 @@ import { phanHoi } from '../../lib/phan-hoi'
 import { Bi } from '../linh-vat/Bi'
 import { banHat, truotRa, useDemSo, yenLang } from '../../lib/hieu-ung'
 import { hamNongTuDien } from '../goi-y-cham/tu-dien'
+import { batAnKhiBiChe } from '../../lib/an-khi-bi-che'
 import { VungChamDe } from '../goi-y-cham/VungChamDe'
 // Lời giải kiểu sơ đồ (hợp đồng chạm để hiểu đề, chỗ 3): chỉ cần khi em mở «Lời giải từng bước» ⇒ nạp LƯỜI, lúc chờ vẽ lời giải cũ (không chớp trống).
 const LoiGiaiCauCoSoDo = lazy(() => import('../goi-y-cham/LoiGiaiCauCoSoDo'))
@@ -572,6 +573,8 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   }
   // GIỮ CHÂN (màn Duo): đã chấm ≥ 1 câu, chặng chưa xong và còn câu phải làm ⇒ X / Esc / back mở tấm thay vì thoát thẳng.
   useEffect(() => { if (duo) { napSanGiuChan(); void import('../giam-thi/GiamThi').catch(() => {}); hamNongTuDien() } }, [duo]) // nạp sẵn mảnh giám thị + hâm nóng bộ dò chạm-hiểu-đề trong lúc chờ câu
+  // 27/10 MƯỢT: màn làm chặng che kín Lộ trình (khung `inert` của cổng) ⇒ trình duyệt bỏ qua kiểu / bố cục / vẽ của Lộ trình suốt lúc làm (src/lib/an-khi-bi-che.ts)
+  useEffect(() => { const tr = document.querySelector('.ht2')?.closest<HTMLElement>('[inert]'); return tr ? batAnKhiBiChe(tr) : undefined }, [])
   const conLai = cau.length - viTri - (k ? 1 : 0)
   const daChamGoc: CauDaCham[] = goc.flatMap((c) => {
     const r = ket[c.qid]

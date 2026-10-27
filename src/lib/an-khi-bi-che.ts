@@ -25,8 +25,8 @@ export function diemBiChe(trang: Element, x: number, y: number): boolean {
   return false
 }
 
-/** Bắt đầu theo dõi: màn con đã che kín `el` ⇒ ẩn hiển thị (content-visibility). Trả hàm gỡ (gọi khi màn con đóng). Mảnh nạp lười
- *  (cong-hs-nap-luoi) — cổng chỉ giữ vài dòng gọi, lượt mở /hs không cộng byte. */
+/** Bắt đầu theo dõi: màn con đã che kín `el` ⇒ ẩn hiển thị (content-visibility). Trả hàm gỡ (gọi khi màn con đóng). Gọi từ chính màn con
+ *  (ManLamBaiTap — mảnh nạp lười) ⇒ lượt mở /hs không cộng byte. */
 export function batAnKhiBiChe(el: HTMLElement): () => void {
   if (typeof window === 'undefined' || typeof CSS === 'undefined' || !CSS.supports?.('content-visibility', 'hidden')) return () => {}
   let daAn = false, id = 0, lan = 0
