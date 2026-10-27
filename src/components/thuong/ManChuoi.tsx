@@ -7,7 +7,7 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { ArrowLeft, Check, Flame } from 'lucide-react'
 import { Bi } from '../linh-vat/Bi'
 import { bayToi, bungHat, hoatAnh, latSo, phanHoiThuong } from '../../lib/hieu-ung-thuong'
-import { CHU_DA_MUA_TUAN, DAT_CUOC, DUONG, MOC_CHUOI, chuGiaBinh, datCuoc, giaBinh, layDsBan, muaBinh, ngayVn, type ChuoiNgay, type ThongBao, type TongQuanThuong } from '../../lib/thuong-api'
+import { DAT_CUOC, chuDaCoBinhTuan, DUONG, MOC_CHUOI, chuGiaBinh, datCuoc, giaBinh, layDsBan, muaBinh, ngayVn, type ChuoiNgay, type ThongBao, type TongQuanThuong } from '../../lib/thuong-api'
 import { Binh, HuyHieuMau, IcLua, IcTinhThe, Tia } from './hinh'
 import { capNhatTongQuan, useTai, useTongQuan } from './dung-thuong'
 import { ChuGiaiTuan, Cho, chuCai, DemTT, Loi, ManToan, NutDay, ThangLich, TuanBay, dongHo, gioVn, oTinhThe, thuNgayVn, useHieuUng, useToast } from './chung'
@@ -23,7 +23,7 @@ export function DauVe({ onVe, chu = 'Quay lại' }: { onVe?: () => void; chu?: s
 }
 
 /** Ba khe bình (khe 3 mở ở mốc 100 ngày). Luật 27/10: mỗi tuần mua 1 bình ⇒ tuần này đã mua thì khe trống nói lý do thay cho nút. */
-function KheBinh({ c, tinhThe, gia, daMuaTuan, dangMua, onMua, idDay }: { c: ChuoiNgay; tinhThe?: number; gia: number; daMuaTuan: boolean; dangMua: boolean; onMua?: () => void; idDay?: string }) {
+function KheBinh({ c, tinhThe, gia, daMuaTuan, lyDo, dangMua, onMua, idDay }: { c: ChuoiNgay; tinhThe?: number; gia: number; daMuaTuan: boolean; lyDo: string; dangMua: boolean; onMua?: () => void; idDay?: string }) {
   const so = Math.max(3, c.sucChua)
   return <div className="tp-khe">
     {Array.from({ length: so }, (_, i) => {
@@ -31,7 +31,7 @@ function KheBinh({ c, tinhThe, gia, daMuaTuan, dangMua, onMua, idDay }: { c: Chu
       if (i < c.giuChuoi) return <div key={i} data-k="day" id={i === c.giuChuoi - 1 ? idDay : undefined}><Binh kieu="day" /><b>Sẵn sàng</b><small>tự đỡ khi em lỡ ngày</small></div>
       const du = tinhThe === undefined || tinhThe >= gia
       return <div key={i} data-k="trong"><Binh kieu="trong" /><b>Khe trống</b>
-        {daMuaTuan ? <small>{i === c.giuChuoi ? CHU_DA_MUA_TUAN : 'mỗi tuần mua 1 bình'}</small>
+        {daMuaTuan ? <small>{i === c.giuChuoi ? lyDo : 'mỗi tuần mua 1 bình'}</small>
           : onMua && i === c.giuChuoi ? <button type="button" className="tp-nut" data-sac={du ? undefined : 'tat'} disabled={!du || dangMua} onClick={onMua} aria-label={`Mua 1 bình giữ chuỗi, ${gia} tinh thể`}>
           <IcTinhThe />Mua {gia}</button> : <small>{du ? `mua ${gia} tinh thể` : `cần ${gia} tinh thể`}</small>}
       </div>
@@ -213,7 +213,7 @@ export function ManChuoiNgay({ token, onVe, onHoc, onCuu, hieuUng, onBan }: Prop
         <section className="tp-the" aria-label="Bình giữ chuỗi">
           <div className="tp-dau"><h2>Bình giữ chuỗi</h2><span className="day tp-mo">đang mang {c.giuChuoi}/{c.sucChua}</span></div>
           <p className="tp-phu">{chuGiaBinh(giaBinh(tq))}</p>
-          <KheBinh c={c} tinhThe={tq.tinhThe} gia={giaBinh(tq)} daMuaTuan={tq.binh?.daMuaTuan === true} dangMua={m.dang === 'binh'} onMua={token ? () => void m.mua('tp-khe-day') : undefined} idDay="tp-khe-day" />
+          <KheBinh c={c} tinhThe={tq.tinhThe} gia={giaBinh(tq)} daMuaTuan={tq.binh?.daMuaTuan === true} lyDo={chuDaCoBinhTuan(tq)} dangMua={m.dang === 'binh'} onMua={token ? () => void m.mua('tp-khe-day') : undefined} idDay="tp-khe-day" />
         </section>
         <section className="tp-the" aria-label="Luật chuỗi">
           <h2>Luật chuỗi</h2>
@@ -315,7 +315,7 @@ export function ManBinhDaDo({ tb, tq, token, onHoc, onDong }: { tb: ThongBao; tq
         {c && <section className="tp-the" aria-label="Bình giữ chuỗi">
           <div className="tp-binh-con" id="tp-binh-con"><Binh kieu={c.giuChuoi > 0 ? 'day' : 'trong'} />
             <div className="giua"><b>{`Còn ${c.giuChuoi}/${c.sucChua} bình`}</b>
-              <span>{c.giuChuoi >= c.sucChua ? 'đã đầy bình' : daMuaTuan ? CHU_DA_MUA_TUAN : chuGiaBinh(gia)}</span></div></div>
+              <span>{c.giuChuoi >= c.sucChua ? 'đã đầy bình' : daMuaTuan ? chuDaCoBinhTuan(tq) : chuGiaBinh(gia)}</span></div></div>
         </section>}
       </div>
     </main>

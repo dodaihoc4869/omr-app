@@ -64,7 +64,7 @@ describe('mua bình — tối đa 1 bình / tuần (D1 thật)', () => {
     const t0 = VN('2026-11-03T10:00:00')
     expect((await hsThuong(env, { token }, undefined, t0)).binh).toEqual({ gia: 150, toiDaTuan: 1, daMuaTuan: false, muaTiepTu: '2026-11-09' })
     expect((await hsMuaBinh(env, { token }, t0)).ok).toBe(true)
-    expect((await hsThuong(env, { token }, undefined, t0 + 3_600_000)).binh).toMatchObject({ daMuaTuan: true, muaTiepTu: '2026-11-09' })
+    expect((await hsThuong(env, { token }, undefined, t0 + 3_600_000)).binh).toMatchObject({ daMuaTuan: true, nguon: 'mua', muaTiepTu: '2026-11-09' })
     expect((await hsThuong(env, { token }, undefined, VN('2026-11-09T07:00:00'))).binh).toMatchObject({ daMuaTuan: false })
   })
 

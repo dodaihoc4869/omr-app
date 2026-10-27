@@ -282,6 +282,14 @@ describe('các màn (đúng số bản vẽ)', () => {
     const c2 = ve(<ManDatLaiTinhThe tb={tb({ ma: 'y', loai: 'dat_lai_tt', duLieu: { conLai: 50, cuocHuy: false } })} onDong={() => {}} />)
     expect(c2.textContent).not.toMatch(/cược/)
   })
+  it('cửa hàng: bình của tuần là QUÀ mốc 30 ngày ⇒ nói đúng nguồn, nút vẫn xám (trần 1 bình/tuần)', () => {
+    datMayChu(M.tongQuanGia({ binh: { gia: 150, toiDaTuan: 1, daMuaTuan: true, nguon: 'qua', muaTiepTu: '2026-11-02' } }))
+    const c = ve(<ManCuaHang token={TK} />)
+    const nut = screen.getByRole('button', { name: 'Tuần này em đã nhận bình' }) as HTMLButtonElement
+    expect(nut.disabled).toBe(true)
+    expect(c.textContent).toMatch(/Tuần này em đã nhận 1 bình \(quà mốc 30 ngày\) · mua tiếp từ thứ Hai/)
+    expect(c.textContent).not.toMatch(/em đã mua/)
+  })
   it('thăng hoa (tp-11): 12 tinh thể · trước 120 · còn 108', () => {
     const c = ve(<ManThangHoa tb={tb(M.TB.thangHoa)} onDong={() => {}} />)
     expect(screen.getByRole('heading', { name: '12 tinh thể đã thăng hoa' })).toBeTruthy()

@@ -78,6 +78,9 @@ describe('trần 1 bình/tuần cho mọi đường', () => {
     datCauNoiChuoi({ docChuoiNgay: async () => ({ so: 30, giuChuoi: 1, sucChua: 2, lich7: [], binhTuanNay: 1 }), congBinh: async () => true })
     expect(await hsMuaBinh(env, { token }, VN('2026-11-26T10:00:00'))).toMatchObject({ ok: false, ma: 'da_mua_tuan', error: LOI_DA_NHAN_TUAN, muaTiepTu: '2026-11-30' })
     expect((d.sql.prepare("SELECT SUM(so_vang) AS s FROM vang_so WHERE sbd='S1'").get() as { s: number }).s).toBe(400)
+    // Tổng quan nói đúng nguồn: bình của tuần là QUÀ mốc 30 ngày (không phải mua).
+    const { hsThuong } = await import('../server/src/thuong-d1')
+    expect((await hsThuong(env, { token }, undefined, VN('2026-11-26T10:00:00'))).binh).toMatchObject({ daMuaTuan: true, nguon: 'qua' })
   })
 })
 
