@@ -92,14 +92,16 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
     }
     let rong = -1, cao = -1, bongCao = -1, dau = true
     const ghiCo = () => { rong = san.clientWidth; cao = de.offsetHeight; bongCao = bong.offsetHeight }
+    // con trực tiếp của khối đề mang `data-l-con` khi chữ L bật (giam-thi.css: khoảng cách + xuống dưới chân giám thị) — chỉ các con này tính lại kiểu
+    const danhCon = (bat: boolean) => { for (const c of de.children) c.toggleAttribute('data-l-con', bat) }
     const quyet = () => {
       // 27/10 MƯỢT: đang là bong bóng thường ⇒ đo NGAY ở dáng này trước (lượt bố cục này lần sơn vốn đã cần, không tốn thêm). Chữ L cho chữ RỘNG hơn
       // ở phần dưới chân giám thị ⇒ khối chữ chỉ thấp đi: dáng thường đã không tràn quá khuyết thì dáng L chắc chắn không cần — khỏi bật thử chữ L
       // (mỗi lần bật thử = thêm một lượt tính kiểu + bố cục cả màn, ~30–60 ms ở CPU ×6). Câu dài thật sự tràn ⇒ bật thử như cũ.
       if (!san.hasAttribute('data-l') && !(de.getBoundingClientRect().bottom - bong.getBoundingClientRect().top > khuyet().kh + 12)) return
-      san.setAttribute('data-l', '')
+      san.setAttribute('data-l', ''); danhCon(true)
       const day = de.getBoundingClientRect().bottom - bong.getBoundingClientRect().top
-      if (!(day > khuyet().kh + 12)) san.removeAttribute('data-l')
+      if (!(day > khuyet().kh + 12)) { san.removeAttribute('data-l'); danhCon(false) }
       ve()
     }
     // 28/10 MƯỢT (vết Chrome, chuyển câu CPU ×6): quyết ở lượt báo ĐẦU của ResizeObserver — chạy SAU lượt tính kiểu + bố cục mà khung vẽ vốn phải làm,
@@ -111,7 +113,7 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
       else if (bong.offsetHeight !== bongCao) { bongCao = bong.offsetHeight; ve() }
     })
     ro.observe(san); ro.observe(de); ro.observe(bong)
-    return () => { ro.disconnect(); san.removeAttribute('data-l') }
+    return () => { ro.disconnect(); san.removeAttribute('data-l'); danhCon(false) }
   }, [qid])
 
   // Mắt dõi phương án + nhịp chờ / soi theo thao tác của em.

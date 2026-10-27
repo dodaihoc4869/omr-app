@@ -411,9 +411,8 @@ html[data-khoa-cuon] body {
  * trái — thầy vẫn thấy mình đang ở đâu và bấm sang màn khác được, không phải
  * đóng phiếu trước. Phiếu bên trong tự co theo bề rộng còn lại.
  *
- * `body:has(.ben-trai)` để màn LÀM BÀI của học sinh (không dựng thanh trái)
- * vẫn phủ kín — ở đó không có gì bên trái để chừa. Trình duyệt không hiểu
- * `:has` thì phủ kín như cũ, không vỡ. */
+ * Bề trái do KhungXemPhieu đo bằng JS (màn LÀM BÀI không dựng thanh trái ⇒ 0,
+ * phủ kín). */
 .lop-xem-phieu {
   box-sizing: border-box;
   padding-top: calc(48px + env(safe-area-inset-top));
@@ -440,15 +439,8 @@ html[data-khoa-cuon] body {
   backdrop-filter: blur(6px);
 }
 
-/* DÂY BẢO HIỂM. Vị trí thật do KhungXemPhieu ĐO BẰNG JS rồi đặt thẳng vào
- * style của thẻ (style nội tuyến thắng luật này), nên luật dưới chỉ để trang
- * không nhấp nháy phủ kín trong một khung hình đầu tiên trước khi đo xong. */
-@media (min-width: 880px) {
-  body:has(.ben-trai) .lop-xem-phieu {
-    left: 0;
-  }
-}
-
+/* 28/10 MƯỢT: gỡ luật `body:has(.ben-trai) .lop-xem-phieu { left: 0 }` — trùng `inset: 0` ở trên (không đổi gì), vị trí thật do KhungXemPhieu đo
+ * bằng JS; còn :has() trên body thì mỗi lần thêm / gỡ nút ở bất kì đâu Chrome kiểm lại cả trang. */
 
 /* ==========================================================================
    LÁ CHẮN ĐỀ — lớp CSS thuần (BAOMATCATHI.md mục 4.2).

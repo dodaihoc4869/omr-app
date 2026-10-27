@@ -135,11 +135,14 @@ function lap(now: number) {
   if (dangNhuongKhung(now)) { raf = requestAnimationFrame(lap); return } // em vừa chạm: nhường khung cho phản hồi nút
   const dtms = lan ? Math.min(100, now - lan) : 16
   lan = now; tichLuy += dtms
-  if (!mayYeu() || tichLuy >= 30) {
+  // 28/10 MƯỢT: ~30 khung/s trên mọi máy (như giám thị — nửa số khung rảnh hẳn cho chạm); máy yếu: vẽ MỘT khung rồi ngủ (Lửa đứng yên, điều phối
+  // vòng 4: «Lửa dừng rAF ở chế độ yếu»), IO / lớp che / tab hiện lại gọi `chay` thì vẽ lại một khung.
+  if (tichLuy >= 30 || mayYeu()) {
     let con = tichLuy; tichLuy = 0
     while (con > 0) { const dt = Math.min(con, 8); for (const s of ds) s.tich(dt / 1000); con -= dt }
     for (const s of ds) s.ve()
   }
+  if (mayYeu()) { lan = 0; return }
   raf = requestAnimationFrame(lap)
 }
 const chay = () => { if (!raf && !document.hidden && dangSong.size) { lan = 0; raf = requestAnimationFrame(lap) } }

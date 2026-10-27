@@ -763,6 +763,7 @@ function CongTac({ khoa, ten, Icon, sac }: { khoa: 'ddh.am' | 'ddh.rung'; ten: s
 /** Ba mục menu kiểu Duolingo (bản vẽ dm-4, thầy chốt 26/10) — cùng id mục của cổng: Lộ trình = Hôm nay (+ Hành trình) · Luyện tập = Ôn & sửa · Thành tích = Kết quả.
  *  `sac` = màu ô biểu tượng (menu 6 mục 27/10): chính · chú ý · sao. */
 const MENU_DUO = [{ id: 'hom-nay', ten: 'Lộ trình', icon: Route, sac: 'chinh' }, { id: 'on-lai', ten: 'Luyện tập', icon: Wrench, sac: 'chu-y' }, { id: 'ket-qua', ten: 'Thành tích', icon: Trophy, sac: 'sao' }] as const
+let soMenuCham = 0
 export function MenuDocTrong(p: {
   muc: string; ds: readonly { id: string; ten: string; icon: LucideIcon }[]; onMuc: (id: string) => void
   coCa: boolean; onThi: () => void; thongBao?: ReactNode; dangTai: boolean; onTaiLai: () => void
@@ -782,6 +783,13 @@ export function MenuDocTrong(p: {
   const caiRef = useRef(false)
   caiRef.current = cai
   const nut = useRef<HTMLButtonElement>(null)
+  // 28/10 MƯỢT: `<html data-menu-cham>` thay `body:has(.tr-menu-cham)` (trong-hs.css) — :has() trên body khiến MỖI lần thêm / gỡ nút ở bất kì đâu
+  // (vd đổi câu) Chrome lên lịch kiểm lại cả trang theo tập luật :has() chung (tính lại kiểu mọi <span>…). Đếm tham chiếu: nhiều menu cùng lúc vẫn đúng.
+  useLayoutEffect(() => {
+    const g = document.documentElement
+    if (soMenuCham++ === 0) g.setAttribute('data-menu-cham', '')
+    return () => { if (--soMenuCham <= 0) { soMenuCham = 0; g.removeAttribute('data-menu-cham') } }
+  }, [])
   const the = useRef<HTMLElement>(null)
   const nutCai = useRef<HTMLButtonElement>(null)
   const nutLui = useRef<HTMLButtonElement>(null)

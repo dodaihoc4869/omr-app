@@ -116,8 +116,10 @@
 [data-trong] .duo-gt-vien path { fill: var(--tr-mat); stroke: var(--tr-vien); stroke-width: 2; stroke-linejoin: round; }
 [data-trong] .duo-gt-san[data-l] .duo-gt-cho { --gt-kw: calc(var(--gt-nvw) * .66 - 2px); --gt-kh: calc(var(--gt-nvw) * 1.1 + 4px); --gt-kd: calc(var(--gt-nvw) * .38 + 0px); display: block; float: left; width: calc(var(--gt-kw) - 4px); height: calc(var(--gt-kh) - 2px); }
 [data-trong] .duo .duo-gt-san[data-l] .ht2-lam-de { display: block; }
-[data-trong] .duo .duo-gt-san[data-l] .ht2-lam-de > * + * { margin-top: 12px; }
-[data-trong] .duo .duo-gt-san[data-l] .ht2-lam-de > :not(.ht2-lam-de-chu) { clear: left; } /* hình, bảng, thí nghiệm: xuống dưới chân giám thị, không đè */
+/* 28/10 MƯỢT: hai luật dưới đọc `data-l-con` mà mảnh GiamThi gắn lên từng CON TRỰC TIẾP của khối đề khi bật chữ L — luật «… > *» đọc thuộc tính ở khối
+   cha thì mỗi lần bật / gỡ chữ L trình duyệt phải tính lại kiểu MỌI con cháu (cả ~160 hình giám thị, ~200 chữ chạm-hiểu-đề; ~30 ms ở CPU ×6). */
+[data-trong] .duo .duo-gt-san .ht2-lam-de > [data-l-con] + [data-l-con] { margin-top: 12px; }
+[data-trong] .duo .duo-gt-san .ht2-lam-de > [data-l-con]:not(.ht2-lam-de-chu) { clear: left; } /* hình, bảng, thí nghiệm: xuống dưới chân giám thị, không đè */
 @media (max-width: 380px) { [data-trong] .duo-gt-san { --gt-nvw: 100px; } [data-trong] .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 18px; } }
 @media (min-width: 900px) { [data-trong] .duo-gt-san { --gt-nvw: 136px; } [data-trong] .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 21px; } }
 /* Khung thấp xoay ngang: cột đề hẹp, giám thị 96 px. */

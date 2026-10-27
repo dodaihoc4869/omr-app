@@ -2,7 +2,7 @@
 // (thẻ câu dùng chung cho màn thi, màn thầy, phiếu…); chỉ dùng lại các mảnh hiển thị đề/hình/công thức mà `TheCau` cũng dùng
 // (ChemText · tachDongTheoY · ExperimentDemo · BangSoLieu · CauHinh · HinhTaiViTri · KhoiLoiGiaiChuan) để chữ và hình ra y hệt.
 // Màu: chỉ biến của app học sinh (hoc-tap.css, khối `.ht2-lam*`). Đáp án chỉ có ở các khối PHẢN HỒI — nhận từ máy chủ SAU khi nộp.
-import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type KeyboardEvent as KE, type ReactNode } from 'react'
+import { memo, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type KeyboardEvent as KE, type ReactNode } from 'react'
 import { Check, Delete, X as XIcon } from 'lucide-react'
 import ExperimentDemo, { ExperimentOriginal } from '../ExperimentDemo'
 import { BangSoLieu, CauHinh, HinhTaiViTri } from '../QuestionMedia'
@@ -60,7 +60,9 @@ const CHU_Y = ['a', 'b', 'c', 'd'] as const
 const CHU_PA = ['A', 'B', 'C', 'D'] as const
 
 /** Đề câu: "Câu 4." + đề (công thức hoá học, xuống dòng theo ý) + minh hoạ thí nghiệm + bảng số liệu + hình sau đề — cùng thứ tự `TheCau`. */
-export function DeCau({ q, stt }: { q: Question; stt: number }) {
+// 28/10 MƯỢT: ghi nhớ theo (câu, số thứ tự) — mỗi lần màn làm bài vẽ lại (chọn phương án, Kiểm tra, đổi câu) không phải dựng lại chữ đề (tách dòng +
+// công thức hoá). Đề là hàm thuần của `q` + `stt`.
+export const DeCau = memo(function DeCau({ q, stt }: { q: Question; stt: number }) {
   const de = tachDongTheoY(q.text)
   return (
     <section className="ht2-lam-de" aria-label={`Đề câu ${stt}`}>
@@ -80,7 +82,7 @@ export function DeCau({ q, stt }: { q: Question; stt: number }) {
       </ExperimentOriginal>
     </section>
   )
-}
+})
 
 /** Chữ đề GIÃN Ý (thầy 27/10): mỗi dòng gốc / nhãn «Bước 1:» / phương trình / câu hỏi cuối là một đoạn riêng (`tachDoanDe`).
  *  Đoạn = <span> khối (cùng nằm trong <p> cũ ⇒ khung chữ L của giám thị, «Câu N.» ẩn ở Duo giữ nguyên); `data-gyc-khoi` ⇒ chạm-hiểu-đề dò từng đoạn.
