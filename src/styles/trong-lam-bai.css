@@ -822,3 +822,18 @@
 }
 [data-trong='hs'].may-yeu :is(.duo-ket, .duo-ket .duo-tick, .duo-ket .duo-kq-chu h2) { animation: none; }
 [data-trong='hs'].may-yeu .duo-ket .duo-nut::after { display: none; }
+/* ── 17. ĐÁY TẤM KẾT QUẢ (thầy 27/10 «Chỗ hỏi thầy lấy 1/3 hoặc 1/4 cái nút làm lại câu này»): «Hỏi thầy» = nút 3D phụ bên trái (~1/4 hàng, tối thiểu đủ
+ * icon + chữ, không xuống dòng) · nút chính phần còn lại — CÙNG MỘT HÀNG. Màn làm chặng Duo + màn sửa câu Duo. Viền / chữ theo tông tấm. ── */
+[data-trong] .duo-hang-nut { display: grid; grid-template-columns: minmax(max-content, 1fr) 3fr; gap: 10px; align-items: stretch; --hang-vien: var(--tr-vien-2); --hang-chu: var(--tr-chu-2); }
+[data-trong] .duo-hang-nut:not(:has(.lg-nut-hoi-thay)) { grid-template-columns: minmax(0, 1fr); }
+[data-trong] .duo-ket[data-tt=dung] .duo-hang-nut { --hang-vien: color-mix(in srgb, var(--tr-dung) 55%, var(--tr-mat)); --hang-chu: var(--tr-dung-chu); }
+[data-trong] .duo-ket[data-tt=sai] .duo-hang-nut { --hang-vien: color-mix(in srgb, var(--tr-sai) 55%, var(--tr-mat)); --hang-chu: var(--tr-sai-chu); }
+[data-trong] .duo-hang-nut .lg-nut-hang { display: contents; }
+[data-trong] .duo-hang-nut .lg-loi { grid-column: 1 / -1; order: 3; font-size: 13.5px; color: var(--tr-chu-2); text-align: center; }
+[data-trong] .duo .duo-hang-nut .lg-nut-hoi-thay {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; width: 100%; min-height: 54px; margin: 0; padding: 0 12px;
+  border: 2px solid var(--hang-vien); border-bottom-width: 4px; border-radius: 16px; background: var(--tr-mat) !important; box-shadow: none !important;
+  color: var(--hang-chu); font-size: 15px; font-weight: 800; letter-spacing: 0; text-transform: none; white-space: nowrap;
+}
+[data-trong] .duo .duo-hang-nut .lg-nut-hoi-thay svg { flex: none; width: 18px; height: 18px; }
+[data-trong='hs'] .duo .duo-hang-nut .lg-nut-hoi-thay:active:not(:disabled) { transform: translateY(2px); border-bottom-width: 2px; margin-bottom: 2px; }

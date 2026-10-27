@@ -34,6 +34,10 @@ preview_urls = false
 [placement]
 mode = "smart"
 
+# Workers AI (27/10, thầy: «soạn luôn bằng mọi cách ko chờ gemini»): máy soạn lời giải sơ đồ dùng khi Gemini hết hạn mức (server/src/soan-so-do.ts).
+[ai]
+binding = "AI"
+
 [[d1_databases]]
 binding = "DB"
 database_name = "omr"
