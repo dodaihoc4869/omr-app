@@ -217,3 +217,18 @@ html.may-yeu[data-trong] .lg-hh-nen { backdrop-filter: none; -webkit-backdrop-fi
   [data-trong] .lg-hh, [data-trong] .lg-hh-nen { animation: none; }
   [data-trong] .lg-nh-khung::before { transition: none; }
 }
+
+/* ── TÔNG THEO KẾT QUẢ CÂU (thầy 27/10: «Nếu trả lời đúng bấm Hỏi thầy thì màu xanh theo màu trả lời đúng; sai thì Hỏi thầy thành màu đỏ cho đồng bộ»).
+ * HopHoiThay gắn `data-tong` (đúng / sai / chưa tính) lúc mở từ dải kết quả ⇒ đổi BỘ BIẾN màu chính ngay trên nền hộp: ô biểu tượng đầu hộp, viền + vòng
+ * sáng ô nhập, nút gửi, chữ «Câu n.», các nút / thẻ chính trong hộp đều theo. Nền hộp giữ sáng / tối như cũ. Nút đặc dùng sắc «-chu» + chữ «--tr-trang»
+ * (sáng: nền đậm chữ trắng; tối: nền sáng chữ tối) ⇒ tương phản ≥ 4,5:1 ở cả hai chế độ. Đang làm (chưa nộp) ⇒ không gắn ⇒ tông chính như cũ. */
+[data-trong] .lg-hh-nen[data-tong=dung] { --tr-chinh: var(--tr-dung); --tr-chinh-nhat: var(--tr-dung-nhat); --tr-chinh-chu: var(--tr-dung-chu); --tr-chinh-nut: var(--tr-dung-chu); --tr-tren-chinh: var(--tr-trang); }
+[data-trong] .lg-hh-nen[data-tong=sai] { --tr-chinh: var(--tr-sai); --tr-chinh-nhat: var(--tr-sai-nhat); --tr-chinh-chu: var(--tr-sai-chu); --tr-chinh-nut: var(--tr-sai-chu); --tr-tren-chinh: var(--tr-trang); }
+[data-trong] .lg-hh-nen[data-tong=trung] { --tr-chinh: var(--tr-tin); --tr-chinh-nhat: var(--tr-tin-nhat); --tr-chinh-chu: var(--tr-tin-chu); --tr-chinh-nut: var(--tr-tin-chu); --tr-tren-chinh: var(--tr-trang); }
+/* nút gửi: đáy 3D cùng sắc */
+[data-trong] .lg-hh-nen[data-tong] .lg-nh-gui:not(:disabled) { box-shadow: inset 0 -3px 0 color-mix(in srgb, var(--tr-chinh-nut) 72%, var(--tr-chu)); }
+/* bong bóng câu hỏi CỦA EM giữ màu chính của app (không nhuộm đỏ chữ của em) */
+[data-trong] .lg-hh-nen[data-tong] .lg-ht-em { background: var(--tr-hs-nut); color: var(--tr-hs-tren); }
+/* nhãn «Tự làm đúng x/y lần» cùng tông khi câu vừa đúng / sai */
+[data-trong] .lg-hh-nen[data-tong=dung] .lg-ev-tom { background: var(--tr-dung-nhat); color: var(--tr-dung-chu); }
+[data-trong] .lg-hh-nen[data-tong=sai] .lg-ev-tom { background: var(--tr-sai-nhat); color: var(--tr-sai-chu); }

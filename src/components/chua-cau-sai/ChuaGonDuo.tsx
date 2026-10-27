@@ -165,7 +165,8 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
     )
   }
 
-  const linkHoi = (dangHoi: boolean) => <NutHoiThay gon chi="hoi" dangLam={dangHoi} qid={qid} nguon="tu_chua" dapAnEm={dangHoi ? undefined : tra || undefined} />
+  // tong (thầy 27/10): hộp Hỏi Thầy mở từ dải kết quả mang màu của dải (đúng xanh · sai đỏ · chưa tính trung tính)
+  const linkHoi = (dangHoi: boolean, tong?: 'dung' | 'sai' | 'trung') => <NutHoiThay gon chi="hoi" dangLam={dangHoi} qid={qid} nguon="tu_chua" dapAnEm={dangHoi ? undefined : tra || undefined} tong={tong} />
   // thầy 27/10: «Lời giải» nút nhỏ BÊN PHẢI hàng tiêu đề dải (như màn làm chặng Duo), không còn viên riêng một hàng
   const linkGiai = ct ? <button type="button" className="duo-ct-lg" aria-label="Lời giải" onClick={() => setMoGiai(true)}><BookOpen size={18} aria-hidden="true" /><span>Lời giải</span></button> : null
   const nutTiep = (do_?: boolean) => <button ref={nutChinh} type="button" className="duo-nut" data-sac={do_ ? 'do' : undefined} onClick={tiepTuc}>Tiếp tục</button>
@@ -178,7 +179,7 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
       </div>
       {loi && <p className="duo-loi" role="alert">{loi}</p>}
       {/* thầy 27/10 «Chỗ hỏi thầy lấy 1/3 hoặc 1/4 cái nút làm lại câu này»: Hỏi thầy (nút 3D phụ, trái) + nút chính CÙNG MỘT HÀNG */}
-      <div className="duo-hang-nut">{linkHoi(false)}{nut}</div>
+      <div className="duo-hang-nut">{linkHoi(false, sac === 'dung' || sac === 'sai' ? sac : 'trung')}{nut}</div>
     </div></section>
   )
   const tick = <svg className="duo-tick" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M5 12.5 10 17.5 19 7" /></svg>

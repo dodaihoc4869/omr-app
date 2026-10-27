@@ -202,6 +202,15 @@ export function traLoiLam13(duong: string, b: Record<string, unknown>): Record<s
   if (duong.endsWith('/game-v2/hoc-tap-start') && thamSo.get('loi') === '1') return { ok: false, error: 'Máy chủ đang bận, chưa mở được chặng học của em lúc này. Em kiểm tra kết nối mạng rồi bấm Thử lại sau ít phút nhé.' } // KIỂM GD MỚI 26/10
   if (duong.endsWith('/game-v2/hoc-tap-start')) return { ok: true, id: `phien-${kieu || 'chung'}`, questions: ds.map(congKhai), ...(kieu === 'g7' || LAM_LAI ? { goi7: GOI7 } : {}) }
   if (duong.endsWith('/game-v2/hoc-tap-lam-lai')) return { ok: true, questions: LAM_LAI ? CAU_LAM_LAI.map(congKhai) : [] }
+  // HỎI THẦY THEO TÔNG 27/10: `&ht=1` ⇒ lệnh /hs/hoi-thay trả hộp hỏi thêm (đề câu + thẻ «Em và câu này» «Tự làm đúng 1/2 lần») như máy chủ thật.
+  if (duong.endsWith('/hs/hoi-thay') && thamSo.get('ht') === '1') {
+    const c = ds.find((x) => x.qid === b.qid)
+    if (!c) return null
+    const y = Object.fromEntries(((c.choices as string[] | undefined) ?? []).map((t, i) => ['ABCD'[i]!, t]))
+    const cau = { qid: c.qid, so: `Câu ${ds.indexOf(c) + 1}`, chuong: String(c.tenDang ?? ''), de: `<p>${String(c.text ?? '')}</p>`, y }
+    const em = { cauNay: { tuLam: 2, tuLamDung: 1, coTroGiup: 0, lan: [{ ketQua: 0, troGiup: false, luc: '2026-10-25T08:00:00Z' }, { ketQua: 1, troGiup: false, luc: '2026-10-26T08:00:00Z' }] }, kienThuc: [], hoiNhanh: ['Vì sao chỉ amine bậc một tạo alcohol?'] }
+    return b.chiHoi ? { ok: true, chiHoi: true, hoiThem: true, cau, emVaCau: em } : { ok: true, hoiThem: true, cau, loiGiaiChu: { chu: '' }, emVaCau: em }
+  }
   const q = [...ds, ...CAU_LAM_LAI].find((c) => c.qid === b.qid)
   if (!q) return null
   if (duong.endsWith('/game-v2/answer')) {
