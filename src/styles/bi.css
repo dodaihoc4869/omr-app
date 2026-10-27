@@ -90,3 +90,23 @@
 [data-trong='hs'] .bi-canh { display: flex; align-items: center; gap: 12px; }
 [data-trong='hs'] .bi-trong { display: grid; justify-items: center; gap: 8px; padding: 16px 8px; text-align: center; color: var(--tr-chu-2); font-weight: 600; }
 [data-trong='hs'] .bi-loi-con { visibility: hidden; }
+
+/* ── TƯƠI 27/10 — thầy cho phép: «màu sắc của linh vật cũng vậy siêu tươi mịn mắt». Bi kiểu Duolingo: dung dịch màu ĐẶC tươi (bỏ gradient sáng→tối),
+   viền = MỘT TÔNG ĐẬM HƠN của chính màu dung dịch (không viền đen dày), chân/bóng sàn phẳng cùng tông, bình kính trong phẳng, má hồng tươi.
+   Trộn trong oklab ⇒ giữ sắc, không ngả xám. Tròng mắt giữ màu mực (--bi-vien) cho rõ ánh nhìn. Bi chuyển động khai lại ở svg (bi-dong.css). ── */
+[data-trong='hs'] .bi {
+  --bi-net-mau: color-mix(in oklab, var(--bi-c) 42%, var(--bi-vien));
+  --bi-dam: color-mix(in oklab, var(--bi-c) 80%, var(--bi-vien));
+  --bi-sang: color-mix(in oklab, var(--bi-c) 45%, var(--bi-trang));
+}
+[data-trong='hs'] .bi .bi-net { stroke: var(--bi-net-mau); }
+[data-trong='hs'] .bi :is(.bi-g-sang, .bi-g-chinh, .bi-g-dam) { stop-color: var(--bi-c); }
+[data-trong='hs'] .bi .bi-g-kinh-2 { stop-color: var(--bi-trang); }
+[data-trong='hs'] .bi .bi-bong { fill: var(--bi-net-mau); }
+[data-trong='hs'] .bi .bi-ma { fill: color-mix(in oklab, var(--tr-sai) 45%, var(--bi-trang)); }
+/* nền tối: dung dịch sáng lên một chút (pha trắng ngà 12%) + viền đậm ít hơn ⇒ Bi vẫn tươi, không chìm vào nền tối */
+@media (prefers-color-scheme: dark) {
+  [data-trong='hs'] .bi { --bi-tuoi: color-mix(in oklab, var(--bi-c) 88%, var(--bi-trang)); --bi-net-mau: color-mix(in oklab, var(--bi-c) 72%, var(--bi-vien)); --bi-dam: color-mix(in oklab, var(--bi-c) 88%, var(--bi-vien)); }
+  [data-trong='hs'] .bi :is(.bi-g-sang, .bi-g-chinh, .bi-g-dam) { stop-color: var(--bi-tuoi); }
+  [data-trong='hs'] .bi .bi-net-c { stroke: var(--bi-tuoi); }
+}

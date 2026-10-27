@@ -57,6 +57,9 @@ export interface KetBai {
 export interface CauKimCuong { qid: string; phan: 'I' | 'II' | 'III'; text: string; choices: string[]; ideas: string[]; tenDang?: string }
 export interface PhienKimCuong { phien: string; cau: CauKimCuong[]; ong: number }
 export interface KimCuongCau { ongCon: number; xong?: boolean; dat?: boolean }
+/** Một chuyên đề trên danh sách Thử thách Kim cương (/hs/kim-cuong/ds): mo = vào được · dang = lượt đang dở · khoa = chờ 24 giờ (moLaiLuc) · chua_vung = đã đạt, nay chưa vững lại. */
+export interface MucKimCuong { ma: string; ten: string; tt: 'mo' | 'dang' | 'khoa' | 'chua_vung'; daDat: boolean; moLaiLuc?: string }
+export interface DsKimCuong { ds: MucKimCuong[]; tat?: true }
 
 // ───────────────────────────────────────────── ĐỌC CHẶT (thuần — test gọi thẳng)
 type O = Record<string, unknown>
@@ -214,6 +217,16 @@ export function docKimCuongCau(x: unknown): KimCuongCau | null {
   const o = dt(x); const con = soNg(o?.ongCon)
   return con === undefined ? null : { ongCon: con, ...(o!.xong === true ? { xong: true } : {}), ...(typeof o!.dat === 'boolean' ? { dat: o!.dat } : {}) }
 }
+export function docDsKimCuong(x: unknown): DsKimCuong | null {
+  const o = dt(x)
+  if (o?.bat === false) return { ds: [], tat: true }
+  const ds = mang(o?.ds, (v): MucKimCuong | undefined => {
+    const d = dt(v); const ma = chu(d?.ma), ten = chu(d?.ten), tt = d?.tt
+    if (!ma || !ten || !(tt === 'mo' || tt === 'dang' || tt === 'khoa' || tt === 'chua_vung')) return undefined
+    return { ma, ten, tt, daDat: d!.daDat === true, ...(chu(d!.moLaiLuc) ? { moLaiLuc: chu(d!.moLaiLuc) } : {}) }
+  })
+  return ds ? { ds } : null
+}
 
 // ───────────────────────────────────────────── GỌI LỆNH
 export type KetQua<T> = { ok: true; du: T } | { ok: false; chu: string; loai: 'mang' | 'cham' | 'chua_co_lenh' | 'tu_choi' | 'la' }
@@ -278,7 +291,7 @@ export function _quenTam(): void { khoRam = null }
 export const DUONG = {
   tongQuan: '/hs/thuong', daXem: '/hs/thuong/da-xem', moRuong: '/hs/thuong/mo-ruong', muaBinh: '/hs/thuong/mua-binh', cuoc: '/hs/thuong/cuoc',
   giai: '/hs/giai', huyHieu: '/hs/huy-hieu', ban: '/hs/ban', timBan: '/hs/ban/tim', moiBan: '/hs/ban/moi', traLoi: '/hs/ban/tra-loi', goCua: '/hs/ban/go-cua', thoi: '/hs/ban/thoi',
-  kimCuong: '/hs/kim-cuong/bat-dau',
+  kimCuong: '/hs/kim-cuong/bat-dau', kimCuongDs: '/hs/kim-cuong/ds',
 } as const
 
 async function docCo<T>(duong: string, token: string, doc: (x: unknown) => T | null, them: O = {}): Promise<KetQua<T>> {
@@ -310,6 +323,7 @@ export const moiBan = (token: string, ma: string) => ghi(DUONG.moiBan, token, { 
 export const traLoiMoi = (token: string, ma: string, dongY: boolean) => ghi(DUONG.traLoi, token, { ma, dongY })
 export const goCua = (token: string, ma: string) => ghi(DUONG.goCua, token, { ma })
 export const thoiHocCung = (token: string, ma: string) => ghi(DUONG.thoi, token, { ma })
+export const layDsKimCuong = (token: string) => docCo(DUONG.kimCuongDs, token, docDsKimCuong)
 export const batDauKimCuong = (token: string, chuyenDe: string) => docCo(DUONG.kimCuong, token, docPhienKimCuong, { chuyenDe })
 
 // ───────────────────────────────────────────── PHÉP THUẦN dùng chung các màn

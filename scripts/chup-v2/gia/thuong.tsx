@@ -36,7 +36,10 @@ export function capFetchThuong(): void {
   void import('../../../src/styles/trong-hs.css'); void import('../../../src/styles/trong-lam-bai.css')
   const goc = window.fetch
   const BANG: Record<string, () => unknown> = {
-    '/hs/thuong': tqGoc, '/hs/giai': () => M.GIAI_GIA, '/hs/huy-hieu': () => M.HUY_HIEU_GIA, '/hs/ban': () => M.BAN_GIA, '/hs/ban/tim': () => M.TIM_GIA,
+    '/hs/thuong': tqGoc, '/hs/giai': () => M.GIAI_GIA, '/hs/huy-hieu': () => M.HUY_HIEU_GIA,
+    // 27/10 (cảnh ton-*): `&ban=0` ⇒ chưa có bạn học cùng; `&kc=0` ⇒ chưa vững chuyên đề nào
+    '/hs/ban': () => (ts.get('ban') === '0' ? { ...M.BAN_GIA, ban: [] } : M.BAN_GIA),
+    '/hs/kim-cuong/ds': () => (ts.get('kc') === '0' ? { ok: true, bat: true, ds: [] } : M.DS_KC_GIA), '/hs/ban/tim': () => M.TIM_GIA,
     '/hs/kim-cuong/bat-dau': () => M.PHIEN_KC, '/hs/thuong/mo-ruong': () => ({ ok: true }), '/hs/thuong/mua-binh': () => ({ ok: true }), '/hs/thuong/cuoc': () => ({ ok: true }),
     '/hs/thuong/da-xem': () => ({ ok: true }), '/hs/ban/go-cua': () => ({ ok: true }), '/hs/ban/moi': () => ({ ok: true }),
   }

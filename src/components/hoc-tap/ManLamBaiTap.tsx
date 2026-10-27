@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, Clock, Flame, Info, Lightbulb, PenLine, RefreshCw, Target, X as XIcon } from 'lucide-react'
 import { ChemText } from '../../lib/chem-format'
+import '../../lib/chem-trinh-bay' // thầy 27/10: phương trình rõ ràng (khoảng hẹp quanh toán tử, ⇌ cỡ chữ, «l» có đuôi) — chỉ app học sinh
 import type { TheCauProps } from '../TheCau'
 import { loiGiaiChuanTuKho } from '../loi-giai/KhoiLoiGiaiChuan'
 import { goiHoa2, guiLaiKhiKetMang } from '../hoa2/api'
@@ -12,6 +13,7 @@ import type { Question } from '../../game/than-thu-v2/core'
 import { docTomTatGoi7, type TomTatGoi7 } from '../../lib/goi-bai-7'
 import { soOCuaCau } from '../../lib/so-o-tra-loi-ngan'
 import { BanDoY, BanPhimSo, ChonDungSai, ChonTracNghiem, DeCau, HinhCuoiCau, LoiGiaiCau, OTraLoiNgan, PhanHoiDungSai, PhanHoiTraLoiNgan, PhanHoiTracNghiem, traLoiCotPhai, useBoCucLam } from './LamCau'
+import { TroGiupDuo } from './TroGiupDuo'
 import { chuDanhSachCau, chuDS, chuThoiGian, coChuSo, cuonDeThayO, kyTuHien, nhanPhim, phimTuBanPhim, soChangXong, soHomNayGoi7, soSanhDungSai, type PhimSo, type SoHomNay } from './lam-bai'
 import NutHoiThay from '../loi-giai/NutHoiThay'
 import { phanHoi } from '../../lib/phan-hoi'
@@ -24,12 +26,13 @@ const LoiGiaiCauCoSoDo = lazy(() => import('../goi-y-cham/LoiGiaiCauCoSoDo'))
 // nạp lười, ngoài lượt mở app) — không tách mảnh riêng để precache không thêm tệp; chỉ vẽ khi chữ đề / phương án có dáng chất (lọc rẻ ngay đây).
 import { IcLapLanh, IcMayTinh, MinhHoaDe, TranhPa } from './minh-hoa-hoa'
 import { chayThuong, chuMoc, mocCombo } from './hieu-ung-duo'
+import { BungDung } from './BungDung'
 /** Đề có «<số> gam|mol <tên chất>» ⇒ đáng thử vẽ cảnh. */
 const coDangCanh = (text: string) => /\d\s*(?:gam|g|mol)\s+[A-Za-z(]/.test(text)
 /** Bốn phương án đều là tên / công thức chất ngắn (không phải số, không phải câu) ⇒ đáng thử vẽ phân tử. */
 const coDangChat = (pa: readonly string[]) => pa.length === 4 && pa.every((c) => /^[A-Za-z(][A-Za-z0-9() ]{1,24}\.?$/.test((c ?? '').trim()) && /[a-z]{4}|[A-Z][a-z]?\d/.test(c ?? ''))
 /** Câu khen xoay vòng ở dải ĐÚNG (thầy 27/10, như Duolingo) — theo thứ tự câu, câu đầu luôn «Chính xác!». */
-const LOI_KHEN = ['Chính xác!', 'Làm tốt lắm!', 'Tuyệt vời!', 'Xuất sắc!']
+const LOI_KHEN = ['Chính xác!', 'Giỏi quá!', 'Làm tốt lắm!', 'Tuyệt vời!', 'Xuất sắc!']
 /** Chủ đề ngắn cho nhãn câu: đoạn đầu trước « — » (thầy 27/10 bản vẽ: «CÂU MỚI · Amine» thay «AMINE — TÍNH BASE — TÍNH KHỐI LƯỢNG»); «Ester – Lipid» giữ nguyên. */
 export const chuDeNgan = (ten: string) => ten.split(/\s—\s/)[0]!.trim()
 import { createPortal } from 'react-dom'
@@ -43,7 +46,7 @@ import { IcNguyenTu } from '../thuong/hinh'
 import { capNhatTongQuan } from '../thuong/dung-thuong'
 import { DUONG, docKetBai, docThuongCau, khoaTam, layTam, ngayVn, type TongQuanThuong } from '../../lib/thuong-api'
 // GIỮ CHÂN KHI THOÁT + băng nhắc + lời động viên (thầy 27/10, ảnh Duolingo): móc nhỏ ở đây, tấm + CSS là mảnh nạp lười (GiuChan.tsx).
-import { BangNhac, napSanGiuChan, TamGiuChanLuoi, useGiuChan } from './GiuChan'
+import { napSanGiuChan, TamGiuChanLuoi, useGiuChan } from './GiuChan'
 import { canGiuChan, chuoiHomNay, loiBangNhac, loiDongVien, loiGiuChan, type CauDaCham } from './giu-chan'
 const KetBaiThuong = lazy(() => import('../thuong/KetBaiThuong'))
 // Giám thị theo mức câu (thầy chốt 27/10): mảnh lười + tờ riêng; ở đây chỉ phần chọn mức (nhỏ).
@@ -577,14 +580,18 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     // DÒNG LỆNH to đậm kiểu Duolingo («Chọn hình ảnh đúng») + nút bóng đèn nhỏ cạnh (gộp «Gợi ý» / «Học cách giải» — bỏ nút lẻ dưới đáy).
     const soPa = q?.phan === 'I' && pa.every((c) => /^\s*[-−]?\d+(?:[.,]\d+)?\s*(?:gam|g|mol|lít|ml|%|kJ)?\.?\s*$/i.test(c ?? ''))
     const lenh = q?.phan === 'II' ? 'Chọn Đúng hoặc Sai cho từng ý' : q?.phan === 'III' ? 'Tính rồi nhập đáp án' : soPa ? 'Tính rồi chọn đáp án' : 'Chọn đáp án đúng'
-    const nutDen = !q || !dangTraLoi ? null
-      : q.goiY ? <button type="button" className="duo-den" aria-label={goiY ? 'Thu gợi ý' : 'Gợi ý'} aria-expanded={goiY} aria-controls="ht2-lam-goi-y" onClick={() => setGoiY(v => !v)}><Lightbulb size={22} aria-hidden="true" /></button>
-      : coHuongDan ? <button type="button" className="duo-den" aria-label="Học cách giải" onClick={() => void hocHuongDan()} disabled={nop}><Lightbulb size={22} aria-hidden="true" /></button>
-      : null
     const danhDauHoTro = () => { if (q && !k) hoTroCham.current = q.qid }
-    // nutBatDau (hợp đồng chạm để hiểu đề): nút «Bắt đầu từ đâu?» của ruột đưa vào ô ở hàng nút đáy cạnh «Gợi ý» (khung thấp xoay ngang: cột phải).
+    // nutBatDau (hợp đồng chạm để hiểu đề): nút «Bắt đầu từ đâu?» của ruột đưa vào ô trong tấm bóng đèn «Trợ giúp» (TroGiupDuo), cạnh «Gợi ý».
     const nutBatDau = (nut: ReactNode) => oNutCham && !k ? createPortal(nut, oNutCham) : null
     const linkHoi = q && <NutHoiThay gon dangLam={!k} chi="hoi" qid={q.qid} nguon="bai_hang_ngay" dapAnEm={k ? traHien : undefined} onHoi={k ? undefined : () => { daHoiThay.current = q.qid }} />
+    // Thầy 27/10 («rối quá, ẩn đi, bấm vào mới hiện» ⇒ «Cho chỗ khoanh vào cái bóng đèn luôn nhé»): MỌI trợ giúp của câu (Bắt đầu từ đâu? · Gợi ý ·
+    // Học cách giải · Hỏi thầy) gom vào bóng đèn này — bấm ⇒ tấm nhỏ bật xuống (TroGiupDuo); thanh đáy chỉ còn KIỂM TRA. Cùng các nút cũ, cùng hành vi.
+    const nutDen = !q || !dangTraLoi ? null : <TroGiupDuo key={q.qid}>
+      <span ref={setONutCham} className="duo-o-nut-cham" />
+      {q.goiY && <button type="button" className="duo-lien" aria-expanded={goiY} aria-controls="ht2-lam-goi-y" onClick={() => setGoiY(v => !v)}><Lightbulb size={18} aria-hidden="true" />{goiY ? 'Thu gợi ý' : 'Gợi ý'}</button>}
+      {coHuongDan && <button type="button" className="duo-lien" onClick={() => void hocHuongDan()} disabled={nop}><BookOpen size={18} aria-hidden="true" />Học cách giải</button>}
+      {linkHoi}
+    </TroGiupDuo>
     const loiGiu = giu.mo ? (() => {
       const tq = layTam<TongQuanThuong>(khoaTam(DUONG.tongQuan, token))
       return loiGiuChan({ conLai, lamLai: laLamLai, soCau: goc.length, daCham: daChamGoc, coThuong: coNt, chuoi: chuoiHomNay(tq?.chuoiNgay, ngayVn()), cauHomNay: homNayHien?.daLam, mucTieu: tq?.mucTieu })
@@ -603,6 +610,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
         </div></div>
       : !q ? null
       : k ? <section className="duo-day duo-ket" data-tt={khongTinh ? 'trung' : tt} data-tp-trung={khongTinh || undefined} role="status" aria-live="polite"><div className="duo-giua">
+          {tt === 'dung' && !khongTinh && <BungDung key={q.qid} />}{/* thầy 27/10 (video Duolingo): mây bọt + hạt vuông xanh ở dải ĐÚNG */}
           <div className="duo-kq">
             {/* 27/10 (thầy: «dải … như dolingo»; phối hợp giám thị đứng trái đề): dải đúng / sai chỉ có dấu tròn tick / × ở tiêu đề — không đặt Bi */}
             {tt === 'trung' && !khongTinh ? <span className="duo-kq-o" aria-hidden="true"><BookOpen size={26} /></span> : null}
@@ -641,10 +649,6 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       : <div className="duo-day"><div className="duo-giua">
           {loi && <p className="duo-loi" role="alert">{loi}</p>}
           <button type="button" className="duo-nut" onClick={() => { phanHoi('chon'); void nopCau() }} disabled={nop || !duocNop}>{nop ? 'Đang kiểm tra…' : q.phan === 'II' && soYChua ? `Còn ${soYChua} ý chưa chọn` : 'Kiểm tra'}</button>
-          <div className="duo-bo">
-            {linkHoi}
-            <span ref={setONutCham} className="duo-o-nut-cham" />
-          </div>
         </div></div>
 
     // MÀN KẾT BÀI thưởng phạt (bản vẽ tp-3): một màn đủ «được bao nhiêu nguyên tử, vì sao · hôm nay còn mấy bài · hạng giải». «Tiếp tục» ⇒ về Lộ trình;
@@ -664,13 +668,14 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     }
     return <div ref={gocRef} className="ht-app ht2-lam duo" data-duo="" data-xong={xong || undefined} data-tt={k ? tt : undefined}>
       {!xong && <header className="duo-tren">
+        {/* thầy 27/10 (video Duolingo): đúng liền ≥ 2 câu ⇒ nhãn nhỏ «COMBO ×N» ngay TRÊN thanh tiến độ, số theo chuỗi */}
+        {chuoi >= 2 && !laLamLai && <span key={chuoi} className="duo-combo-nhan" aria-hidden="true">COMBO ×{chuoi}</span>}
         <button type="button" className="duo-dong" onClick={giu.xinThoat} disabled={nop} aria-label="Lưu và về Hôm nay"><XIcon size={26} aria-hidden="true" /></button>
         {/* A7 — ỐNG NGHIỆM: chất lỏng dâng theo câu, bọt nổi; chuỗi ≥ 3 ⇒ chất lỏng cam phát sáng + vệt sáng lướt. */}
         <div className="duo-thanh" data-combo={chuoi >= 3 || undefined} role="progressbar" aria-label={laLamLai ? `Làm lại · câu ${stt}/${lamLai.length}` : q ? `Câu ${stt}/${goc.length}${chang ? ` của chặng ${chang}` : ''}` : 'Chặng học của em'} aria-valuemin={0} aria-valuemax={goc.length || 1} aria-valuenow={Math.min(daCham, goc.length)}><i style={{ width: `${pct}%` }}><b /><b /><b />{k?.correct && <span key={q?.qid} className="duo-loe" />}</i></div>
         {coNt ? <span ref={demRef} className="duo-chuoi" data-co={ntBai > 0 || undefined} aria-label={`Nguyên tử của bài này: ${ntBai}`}><IcNguyenTu />{ntTre ?? ntBai}</span>
           : <span className="duo-chuoi" data-co={chuoi > 0 || undefined} aria-label={`Chuỗi ${chuoi} câu đúng liền`}><Flame size={22} aria-hidden="true" />{chuoi}</span>}
         {combo && <BangCombo key={combo.id} n={combo.n} />}
-        {!combo && !giu.mo && bangNhac && q && <BangNhac chu={bangNhac} khoa={q.qid} />}
       </header>}
       <main className="duo-than" data-de-dai={deDai || undefined} aria-live={xong ? 'polite' : undefined}>
         {tai ? <div className="ht2-lam-the ht2-lam-cho" role="status"><span className="chu-cho-tre">Đang chuẩn bị những câu phù hợp với em…</span></div>
@@ -693,8 +698,9 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
           {th && k && !laLamLai && !luot?.moc && <BangComboTp chuoi={khongTinh ? 0 : th.chuoiDung} tat={khongTinh && chuoiTruocTp >= 3} truoc={chuoiTruocTp} />}
           <div key={`d${q.qid}`} className="duo-cot-de">{/* khung thấp xoay ngang: cột trái = đề, cột phải = phương án + Kiểm tra / tấm kết quả; dọc / máy tính: display: contents (y bố cục cũ) */}
           {laLamLai ? <p className="duo-nhan" data-lam-lai=""><span>Làm lại · câu {stt}/{lamLai.length}</span><span className="duo-chip">Cùng dạng câu {goc.findIndex(c => c.qid === q.lamLaiCua) + 1 || '?'}</span></p>
-            : <p className="duo-nhan" data-nc=""><span className="duo-nhan-o" aria-hidden="true">{q.phan === 'III' || soPa ? <IcMayTinh /> : <IcLapLanh />}</span><span>{q.vaiGoi7 === 'moi' ? 'Câu mới' : loai}</span>{tenBai || q.tenDang ? <span className="duo-chip" data-cong-thuc={/[A-Z][a-z]?(\d|[A-Z(])/.test(tenBai || q.tenDang || '') || undefined}><ChemText text={chuDeNgan(tenBai || q.tenDang || '')} /></span> : null}{chang ? <span className="ht2-an">Chặng {chang}</span> : null}</p>}
-          {!laLamLai && <div className="duo-lenh"><h2>{lenh}</h2>{nutDen}</div>}
+            // thầy 27/10: lời nhắc chặng nằm TRONG dòng nhãn (không lớp nổi đè), mờ về nhãn thường sau 1,8 s — CSS «NHÃN CÂU NHẮC CHẶNG»
+            : <p className="duo-nhan" data-nc="" data-nhac={bangNhac ? '' : undefined}>{bangNhac && <span className="duo-nhan-nhac" role="status">{bangNhac}</span>}<span className="duo-nhan-o" aria-hidden="true">{q.phan === 'III' || soPa ? <IcMayTinh /> : <IcLapLanh />}</span><span>{q.vaiGoi7 === 'moi' ? 'Câu mới' : loai}</span>{tenBai || q.tenDang ? <span className="duo-chip" data-cong-thuc={/[A-Z][a-z]?(\d|[A-Z(])/.test(tenBai || q.tenDang || '') || undefined}><ChemText text={chuDeNgan(tenBai || q.tenDang || '')} /></span> : null}{chang ? <span className="ht2-an">Chặng {chang}</span> : null}</p>}
+          {(!laLamLai || nutDen) && <div className="duo-lenh">{!laLamLai && <h2>{lenh}</h2>}{nutDen}</div>}
           {laLamLai && !k && viTri === soGoc && <p className="duo-mo-ghi">Câu cùng dạng với câu em vừa sai. Lượt này tính là có hỗ trợ.</p>}
           {mucGt ? <div className="duo-gt-san" data-nho={deDaiGiamThi(q) || undefined}>
               <div className="duo-gt-nv"><Suspense fallback={null}><GiamThiCau muc={mucGt} qid={q.qid} phien={phien} nop={nop} ket={ketGt} vung={() => gocRef.current} /></Suspense></div>

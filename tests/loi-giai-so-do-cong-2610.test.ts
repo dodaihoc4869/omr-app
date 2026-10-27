@@ -86,6 +86,13 @@ describe('cổng kiểm số', () => {
       ],
     }
     expect(giaTriThuaSo('1/22,4')).toBeCloseTo(1 / 22.4, 12)
+    // 27/10: dấu cách ngăn hàng nghìn kiểu VN
+    expect(giaTriThuaSo('1 000 000')).toBe(1_000_000)
+    expect(giaTriThuaSo('10 000')).toBe(10_000)
+    expect(giaTriThuaSo('10 000,5')).toBe(10_000.5)
+    expect(giaTriThuaSo('1 000 000/120')).toBeCloseTo(1e6 / 120, 9)
+    expect(giaTriThuaSo('2 * 64')).toBe(128)
+    expect(giaTriThuaSo('12 34')).toBeNull() // nhóm không đủ 3 chữ số ⇒ không đoán
     expect(giaTriThuaSo('1/n', new Map([['n', 4]]))).toBe(0.25)
     expect(kiemCong(b, { phan: 'III', dapAn: '2,479' })).toMatchObject({ ket: 'dat' })
     expect(kiemCong(b, { phan: 'III', dapAn: '2,48' })).toMatchObject({ ket: 'dat' })

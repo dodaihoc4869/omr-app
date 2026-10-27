@@ -281,6 +281,21 @@ const DUO_CANH = [
 const DS_DUO = [[390, 844, 'doc'], [390, 700, 'doc700'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   DUO_CANH.map(([t, viec]) => [`duo-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=duo', w, hh, nen, false, /Số đồng phân amine/, viec || undefined])))
 // ═══ hết DUO 26/10
+// ═══ BÀN PHÍM DUO 27/10 (tiền tố "duo-5-tln-"): câu trả lời ngắn có đủ trợ giúp (`&ba=1`: Bắt đầu từ đâu? · Học cách giải · Hỏi thầy) — mở câu (tự cuộn
+// để trọn bàn phím trên thanh đáy) · gõ 8,2 · vừa bấm xoá · tấm bóng đèn «Trợ giúp» mở; thêm tấm ấy ở câu trắc nghiệm, đúng–sai và màn sửa câu Duo.
+// 390×844, 360×640, 844×390, 1440×900, sáng + tối.
+const BP_TLN = `lam13:${D_Q4} » nut:^Tự làm câu này`
+const BP_CANH = [
+  ['duo-5-tln-ba-dau', 'lam13&lam=duo&ba=1', /Số đồng phân amine/, BP_TLN], ['duo-5-tln-ba-go', 'lam13&lam=duo&ba=1', /Số đồng phân amine/, `${BP_TLN} » phim:8,2`],
+  ['duo-5-tln-ba-xoa', 'lam13&lam=duo&ba=1', /Số đồng phân amine/, `${BP_TLN} » phim:8,2 » nut:^Xoá một kí tự$`],
+  ['duo-5-tln-ba-tg-mo', 'lam13&lam=duo&ba=1', /Số đồng phân amine/, `${BP_TLN} » phim:8,2 » nut:^Trợ giúp`],
+  ['duo-5-tln-tg-tn-mo', 'lam13&lam=duo', /Số đồng phân amine/, 'lam13:tn:^D » nut:^Trợ giúp'],
+  ['duo-5-tln-tg-ds-mo', 'lam13&lam=duo', /Số đồng phân amine/, `lam13:${D_Q3} » ds:a=Đúng » nut:^Trợ giúp`],
+  ['duo-5-tln-tg-sua-mo', 'duo-sua&de=4', /Câu em đã sai/, 'lam13:nut:^8$ » nut:^Trợ giúp'],
+]
+const DS_BP = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  BP_CANH.map(([t, m, cho, viec]) => [`${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
+// ═══ hết BÀN PHÍM DUO 27/10
 // ═══ THẺ CHẠM 27/10 (thầy: «làm lại khung hiển thị cho tinh tế popup đẹp mắt dolingo»): thẻ nhỏ neo dưới chữ tô tím trên màn làm chặng THẬT
 // (`lam13&lam=duo&cham=…`, gia/lam-bai-1210d.ts) — mở trên chất / đơn vị / phủ định; 390×844 · 360×640 · 844×390 · 1440×900, sáng + tối.
 // `vd` = câu ethylamine trong ảnh thầy (không còn tô «dịch chất nào sau đây»; chạm «Ethylamine» ⇒ tên · công thức · M). Thao tác `cham:<chữ>` = chạm chữ đó rồi chờ thẻ. Tiền tố "duo-cham-".
@@ -301,6 +316,14 @@ const GIU_CANH = [
 const DS_GIU = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   GIU_CANH.map(([t, viec]) => [`duo-giu-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=duo&tp=1&giu=1', w, hh, nen, false, /Số đồng phân amine/, viec || undefined])))
 // ═══ hết GIỮ CHÂN 27/10
+// ═══ PHƯƠNG TRÌNH 27/10 (thầy gửi ảnh câu «tính base của amine»: viên «Chặng 3 · 4 câu» đè nhãn, ROH⁺N₂, phương trình dính liền, ⇌ nhỏ, «l» như «I»):
+// `lam13&lam=duo-pt` (gia/lam-bai-1210d.ts). `mo` = ngay khi mở (nhãn đang hiện lời nhắc chặng) · `nhan` = sau 3 s (nhãn thường đã về) · `chon` = chọn D.
+// 390×844 · 360×640 · 844×390 · 1440×900, sáng + tối. Tiền tố "duo-pt-".
+const PT_CHO = 'lam13:' + Array(9).fill('cho').join(' » ')
+const PT_CANH = [['mo', ''], ['nhan', PT_CHO], ['chon', `${PT_CHO} » tn:^D`]]
+const DS_PT = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  PT_CANH.map(([t, viec]) => [`duo-pt-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=duo-pt', w, hh, nen, false, /tính base của amine/, viec || undefined])))
+// ═══ hết PHƯƠNG TRÌNH 27/10
 // ═══ GIÁM THỊ 27/10 (tiền tố "duo-gt-"): giám thị theo mức câu cạnh đề, 4 mức × đề ngắn đã chọn (mắt dõi ô B) ở 390×844 / 360×640 / 844×390 / 1440×900;
 // ở 390×844 thêm đúng · sai · đề dài · đề có hình. Sáng + tối. `gtloi=1` ⇒ giám thị luôn càu nhàu (đo bong bóng không che nhãn / đề / phương án).
 const GT_NGAN = 'lam13&lam=duo&gtde=ngan&gtloi=1&gt='
@@ -324,6 +347,15 @@ const TPC_CANH = [
   ['ket', 'lam13&lam=duo&tp=1', /Số đồng phân amine/, `lam13:${D_Q4} » phim:8,2 » nut:^Kiểm tra$ » nut:^Tiếp tục » tn:^B » nut:^Kiểm tra$ » nut:^Tiếp tục`],
 ]
 // PHÔNG 27/10: thêm khổ 360×640 (`doc640`) — soát nhãn ngắn bẻ dòng khi phông rộng hơn; cảnh `menu` = menu dọc đang mở.
+// ═══ VIỆC TỒN 27/10 (tiền tố "ton-"): lối vào Học cùng bạn (thẻ trên Lộ trình · khối «Lửa đôi» ở Chuỗi ngày) + lối vào Thử thách Kim cương (ô ở Thành tích
+// ⇒ danh sách chuyên đề đã vững). App THẬT `hs-mot&tp=1` + máy chủ giả gia/thuong.tsx. 390×844 · 360×640, sáng + tối; Chuỗi ngày chụp cả trang.
+const TON_CANH = [
+  ['lo-trinh', 'hs-mot&tp=1', false], ['lo-trinh-moi', 'hs-mot&tp=1&ban=0', false], ['chuoi', 'hs-mot&tp=1', true, 'nut:Chuỗi 12 ngày'],
+  ['thanh-tich', 'hs-mot&tp=1', true, 'menu:Thành tích'], ['kc-ds', 'hs-mot&tp=1', false, 'ton:menu:Thành tích » nut:Thử thách Kim cương'],
+  ['kc-trong', 'hs-mot&tp=1&kc=0', false, 'ton:menu:Thành tích » nut:Thử thách Kim cương'], ['kc-moi', 'hs-mot&tp=1', false, 'ton:menu:Thành tích » nut:Thử thách Kim cương » nut:Thử thách Cấu tạo'],
+]
+const DS_TON = [[390, 844, 'doc'], [360, 640, 'doc640']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  TON_CANH.map(([t, m, ca, viec]) => [`ton-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, ca, /Ester/, viec])))
 const DS_TPC = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   TPC_CANH.map(([t, m, cho, viec]) => [`tpc-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
 // ═══ hết THƯỞNG PHẠT GỘP 26/10
@@ -475,10 +507,13 @@ const DS = [
   ...DS_NG_HS, // NGANG HS 26/10
   ...DS_DUO_SUA, // DUO SỬA 27/10
   ...DS_DUO, // DUO 26/10
+  ...DS_BP, // BÀN PHÍM DUO 27/10
   ...DS_GIU, // GIỮ CHÂN 27/10
   ...DS_GT, // GIÁM THỊ 27/10
   ...DS_CHAM, // THẺ CHẠM 27/10
+  ...DS_PT, // PHƯƠNG TRÌNH 27/10
   ...DS_TPC, // THƯỞNG PHẠT GỘP 26/10
+  ...DS_TON, // VIỆC TỒN 27/10
   ...DS_NC, // NÂNG CẤP 27/10
   ...DS_NB, // BẢNG + TẤM CHƯA TÍNH 27/10
   ...DS_BD, // BI CHUYỂN ĐỘNG 27/10
@@ -676,6 +711,13 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       await t.waitForTimeout(1500)
       await t.evaluate(() => document.querySelector('.tr-menu-cham')?.click())
       await t.waitForTimeout(400)
+    } else if (viec?.startsWith('ton:')) {
+      // VIỆC TỒN 27/10: chuỗi bước ngăn " » " — `menu:<mục>` (chọn mục menu dọc như dưới) · `nut:<tên đầu>` (bấm nút có tên bắt đầu bằng chữ ấy).
+      for (const buoc of viec.slice(4).split(' » ')) {
+        if (buoc.startsWith('menu:')) await t.evaluate((ten) => [...document.querySelectorAll('button.tr-menu-muc')].find((b) => b.textContent?.trim().startsWith(ten))?.click(), buoc.slice(5))
+        else await t.getByRole('button', { name: new RegExp('^' + buoc.slice(4)) }).first().click()
+        await t.waitForTimeout(700)
+      }
     } else if (viec?.startsWith('menu:')) {
       // THƯỞNG PHẠT GỘP 26/10: chọn một mục menu dọc «Trong» (menu luôn gắn trong DOM, ẩn bằng CSS ⇒ bấm bằng DOM, rồi chờ màn mục vẽ).
       await t.evaluate((ten) => [...document.querySelectorAll('button.tr-menu-muc')].find((b) => b.textContent?.trim().startsWith(ten))?.click(), viec.slice(5))
@@ -963,7 +1005,8 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
         return [...document.querySelectorAll('.duo-nhan, .duo-gt-bong, .duo-tra, .duo-day, .duo-tren')].filter((e) => { const b = e.getBoundingClientRect(); return b.width > 0 && !(a.right <= b.left || a.left >= b.right || a.bottom <= b.top || a.top >= b.bottom) }).map((e) => e.className.split(' ')[0]).join(', ') })
       if (chong) tran.push(`${ten}: bong bóng càu nhàu chồng lên ${chong}`)
       // tràn ngang TRONG khung cuộn (documentElement không thấy được vì khung là `fixed`)
-      const tranTrong = await t.evaluate(() => Math.max(0, ...[...document.querySelectorAll('.ht2-lam *')].map((e) => Math.round(e.getBoundingClientRect().right - innerWidth))))
+      // bảng lớn cuộn ngang TRONG khung riêng (.cau-bang, có bóng mép) là chủ đích — không tính tràn
+      const tranTrong = await t.evaluate(() => Math.max(0, ...[...document.querySelectorAll('.ht2-lam *')].filter((e) => !e.closest('.cau-bang')).map((e) => Math.round(e.getBoundingClientRect().right - innerWidth))))
       if (tranTrong > 0) tran.push(`${ten}: trong khung ${tranTrong}px`)
     } else if (viec?.startsWith('cham:')) {
       // THẺ CHẠM 27/10: chạm chữ tô tím (ruột nạp lười) ⇒ chờ thẻ kiểu Duolingo hiện hẳn (hết 120 ms phóng to)
