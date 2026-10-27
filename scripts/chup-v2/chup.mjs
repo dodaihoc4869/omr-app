@@ -29,7 +29,7 @@ const exe = process.env.PW_CHROMIUM || '/opt/pw-browsers/chromium-1194/chrome-li
 const trinh = await chromium.launch({ executablePath: existsSync(exe) ? exe : undefined, args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] })
 // LÀN THẺ HÔM NAY 12/10E: trình duyệt ÉP TỐI trang web (như "tối cho trang web" của Samsung Internet / Chrome trên điện thoại) — chỉ mở khi có cảnh 'ep-toi'.
 let epToi = null
-const trinhEpToi = async () => (epToi ??= await chromium.launch({ executablePath: existsSync(exe) ? exe : undefined, args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--blink-settings=forceDarkModeEnabled=true'] }))
+const trinhEpToi = async () => (epToi ??= await chromium.launch({ executablePath: existsSync(exe) ? exe : undefined, args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', process.env.EP_TOI_CO || '--blink-settings=forceDarkModeEnabled=true'] }))
 
 // ═══════════ LÀN HỌC SINH 12/10: Tu luyện trùng tu · Chữa trực tiếp câu gốc (thiếu bài luyện từng bước) · danh sách Tự chữa lỗi ═══════════
 // 3 khổ (390×844, 844×390, 1440×900) × sáng/tối; cảnh `?man=hs12-*` ở trang.tsx (khối cùng tên). Chạy riêng: tiền tố "4" (40-, 41-, 42-).
@@ -398,6 +398,12 @@ const DS_BINH = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [
 // ═══ ĐẶT LẠI TINH THỂ 27/10 (tiền tố "dat-lai-tt-"): thông báo một lần trên Lộ trình — mọi bạn bắt đầu lại với 50 tinh thể.
 const DS_DAT_LAI_TT = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].map((nen) =>
   [`dat-lai-tt-${k}${nen === 'dark' ? '-toi' : ''}`, 'hs-mot&tp=1&v=dat-lai', w, hh, nen, false, /Tinh thể đã đặt lại/]))
+// ═══ TỐI HS 28/10 (tiền tố "toi-"): thầy chụp tối trên máy thật — Lộ trình đã xong hết chặng (`tt=du`) + nút Tự sửa lỗi, 390×844 · 844×390 ×
+// sáng · tối · ép tối (máy tối + trình duyệt ép tối) · ép sáng (máy sáng + trình duyệt ép tối).
+const DS_TOI2810 = [[390, 844, 'doc'], [844, 390, 'ngang']].flatMap(([w, hh, k]) => [['light', ''], ['dark', '-toi']].flatMap(([nen, hau]) => [
+  [`toi-lo-trinh-xong-${k}${hau}`, 'hs-mot&tp=1&tt=du', w, hh, nen, false, /Ester/],
+  [`toi-giai-${k}${hau}`, 'hs-mot&tp=1', w, hh, nen, false, /Ester/, 'ton:menu:Thành tích » nut:Giải tuần'],
+])).concat([['ep-toi', '-ep-toi'], ['ep-sang', '-ep-sang']].map(([nen, hau]) => [`toi-lo-trinh-xong-doc${hau}`, 'hs-mot&tp=1&tt=du', 390, 844, nen, false, /Ester/]))
 const DS_TPC = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   TPC_CANH.map(([t, m, cho, viec]) => [`tpc-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
 // ═══ hết THƯỞNG PHẠT GỘP 26/10
@@ -604,6 +610,7 @@ const DS = [
   ...DS_CHAM, // THẺ CHẠM 27/10
   ...DS_PT, // PHƯƠNG TRÌNH 27/10
   ...DS_TN, // THÍ NGHIỆM GỌN 27/10
+  ...DS_TOI2810, // TỐI HS 28/10
   ...DS_TPC, // THƯỞNG PHẠT GỘP 26/10
   ...DS_TON, // VIỆC TỒN 27/10
   ...DS_BINH, // LUẬT BÌNH 27/10
@@ -758,7 +765,8 @@ if (khongCon.length) {
 for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
   if (CHON.length && !CHON.some((c) => ten.startsWith(c))) continue
   // LÀN THẺ HÔM NAY 12/10E: nền 'ep-toi' = máy tối + trình duyệt ép tối trang web (một trình duyệt riêng có cờ, mở khi cần)
-  const ctx = await (nen === 'ep-toi' ? await trinhEpToi() : trinh).newContext({ viewport: { width: w, height: hgt }, deviceScaleFactor: 1, colorScheme: nen === 'ep-toi' ? 'dark' : nen, hasTouch: w < 900, isMobile: w < 500 })
+  // 28/10: 'ep-sang' = máy SÁNG + trình duyệt ép tối trang web (Samsung Internet «Chế độ tối» bật riêng trong trình duyệt — ảnh thầy 28/10)
+  const ctx = await (nen === 'ep-toi' || nen === 'ep-sang' ? await trinhEpToi() : trinh).newContext({ viewport: { width: w, height: hgt }, deviceScaleFactor: 1, colorScheme: nen === 'ep-toi' ? 'dark' : nen === 'ep-sang' ? 'light' : nen, hasTouch: w < 900, isMobile: w < 500 })
   await ctx.route((u) => !u.href.startsWith(goc), (r) => r.abort())
   const t = await ctx.newPage()
   t.setDefaultTimeout(8000)
