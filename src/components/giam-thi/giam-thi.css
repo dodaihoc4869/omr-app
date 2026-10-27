@@ -102,20 +102,19 @@
 .duo-gt-vien, .duo-gt-cho { display: none; }
 /* Giám thị NGƯỜI (v3): mặt ở ~38 % bề ngang khung tính từ đỉnh ⇒ đề ngắn: bong bóng canh từ trên, mũi nhọn (30 px từ đỉnh bong bóng) chĩa vào mặt. */
 [data-trong] .duo-gt-san:not([data-l]) { align-items: start; }
-[data-trong] .duo-gt-san:not([data-l]) .duo-gt-bong { --duoi: 30px; margin-top: max(0px, calc(var(--gt-nvw) * .38 - 30px)); }
+[data-trong] .duo-gt-san:not([data-l]) .duo-gt-bong { margin-top: max(0px, calc(var(--gt-nvw) * .38 - 30px)); }
+[data-trong] .duo-gt-san:not([data-l]) .duo-gt-bong::before { --duoi: 30px; } /* 28/10 MƯỢT: biến mũi nhọn đặt trên chính mũi (không lan xuống chữ đề khi bật / gỡ `data-l`) */
 /* Đề dài: chữ L. Khuyết = giám thị (lệch trái 14 px, nhô trên 4 px; thân rộng ~83 %, chân ở ~96 % cao hình) + khe 10 px; --gt-kw / --gt-kh / --gt-kd (mũi nhọn) mảnh GiamThi đọc để vẽ viền. */
-[data-trong] .duo-gt-san[data-l] {
-  grid-template-columns: minmax(0, 1fr); align-items: start;
-  --gt-kw: calc(var(--gt-nvw) * .83 - 4px); --gt-kh: calc(var(--gt-nvw) * 1.15 + 6px); --gt-kd: calc(var(--gt-nvw) * .71 - 4px);
-}
-/* Giám thị NGƯỜI (v3, 27/10): người cao ≈ bề ngang khung, thân hẹp hơn dụng cụ cũ ⇒ khuyết chữ L đo lại (cùng công thức khuyetL trong giam-thi-ve.ts). */
-[data-trong] .duo-gt-san[data-l] { --gt-kw: calc(var(--gt-nvw) * .66 - 2px); --gt-kh: calc(var(--gt-nvw) * 1.1 + 4px); --gt-kd: calc(var(--gt-nvw) * .38 + 0px); }
+[data-trong] .duo-gt-san[data-l] { grid-template-columns: minmax(0, 1fr); align-items: start; }
+/* Giám thị NGƯỜI (v3, 27/10): người cao ≈ bề ngang khung, thân hẹp hơn dụng cụ cũ ⇒ khuyết chữ L đo lại (cùng công thức khuyetL trong giam-thi-ve.ts).
+   28/10 MƯỢT: biến khuyết đặt NGAY trên ô chờ (chỗ duy nhất dùng) thay vì cả khối — biến tự đặt được kế thừa xuống mọi con ⇒ bật / gỡ `data-l` làm
+   tính lại kiểu ~200 phần tử (cả ~160 hình giám thị), ~60–110 ms ở CPU ×6. */
 [data-trong] .duo-gt-san[data-l] .duo-gt-nv { position: relative; z-index: 1; grid-column: 1; grid-row: 2; align-self: start; justify-self: start; margin: -4px 0 0 -14px; }
 [data-trong] .duo-gt-san[data-l] .duo-gt-bong { grid-column: 1; grid-row: 2; display: flow-root; margin: 0; border: 0; background: none; isolation: isolate; }
 [data-trong] .duo-gt-san[data-l] .duo-gt-bong::before { content: none; }
 [data-trong] .duo-gt-san[data-l] .duo-gt-vien { display: block; position: absolute; left: 0; top: 0; z-index: -1; overflow: visible; pointer-events: none; }
 [data-trong] .duo-gt-vien path { fill: var(--tr-mat); stroke: var(--tr-vien); stroke-width: 2; stroke-linejoin: round; }
-[data-trong] .duo-gt-san[data-l] .duo-gt-cho { display: block; float: left; width: calc(var(--gt-kw) - 4px); height: calc(var(--gt-kh) - 2px); }
+[data-trong] .duo-gt-san[data-l] .duo-gt-cho { --gt-kw: calc(var(--gt-nvw) * .66 - 2px); --gt-kh: calc(var(--gt-nvw) * 1.1 + 4px); --gt-kd: calc(var(--gt-nvw) * .38 + 0px); display: block; float: left; width: calc(var(--gt-kw) - 4px); height: calc(var(--gt-kh) - 2px); }
 [data-trong] .duo .duo-gt-san[data-l] .ht2-lam-de { display: block; }
 [data-trong] .duo .duo-gt-san[data-l] .ht2-lam-de > * + * { margin-top: 12px; }
 [data-trong] .duo .duo-gt-san[data-l] .ht2-lam-de > :not(.ht2-lam-de-chu) { clear: left; } /* hình, bảng, thí nghiệm: xuống dưới chân giám thị, không đè */
@@ -125,7 +124,8 @@
 @media (orientation: landscape) and (max-height: 500px) {
   [data-trong] .duo-gt-san { --gt-nvw: 96px; }
   [data-trong] .duo-gt-san:not([data-l]) { align-items: start; }
-  [data-trong] .duo-gt-san:not([data-l]) .duo-gt-bong { --duoi: 40px; margin-top: 4px; padding: 10px 12px; }
+  [data-trong] .duo-gt-san:not([data-l]) .duo-gt-bong { margin-top: 4px; padding: 10px 12px; }
+  [data-trong] .duo-gt-san:not([data-l]) .duo-gt-bong::before { --duoi: 40px; }
   [data-trong] .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 18px; }
 }
 /* Chữ trong bong bóng ≥ 18 px: chữ chạm được (VungChamDe, vùng chạm = cao chữ + 20 px) luôn ≥ 44 px. */

@@ -21,5 +21,6 @@ if (typeof window !== 'undefined') henDoNhipKhung(window)
 // 27/10 MƯỢT: hâm nóng bộ dò «Chạm để hiểu đề» lúc rảnh trên Lộ trình (src/components/goi-y-cham/tu-dien.ts) ⇒ mở câu đầu / sang câu không còn khựng
 // 200–400 ms ở máy yếu. Chỉ giao diện «Trong» của học sinh (nơi màn làm chặng có chạm để hiểu đề).
 import { hamNongTuDien } from './goi-y-cham/tu-dien'
-// Bắt đầu sau 4 s (sau khung đo nhịp của henDoNhipKhung ở trên — việc hâm nóng không được làm khung đo chậm đi, kẻo bật nhầm chế độ máy yếu).
-if (typeof document !== 'undefined' && document.documentElement.dataset.trong === 'hs') window.setTimeout(hamNongTuDien, 4000)
+// Bắt đầu sau 8 s: sau khung đo nhịp của henDoNhipKhung ở trên (không làm khung đo chậm đi, kẻo bật nhầm chế độ máy yếu) và sau lúc Lộ trình vừa mở
+// xong (không chen tác vụ vào lúc em vừa mở app). Em bấm học sớm hơn ⇒ màn làm chặng tự hâm nóng lúc rảnh.
+if (typeof document !== 'undefined' && document.documentElement.dataset.trong === 'hs') window.setTimeout(hamNongTuDien, 8000)

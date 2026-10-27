@@ -7,6 +7,9 @@
   "src/components/hoc-tap/hoc-tap.css · --nhe-xanh: color-mix(in srgb,var(--xanh) 50%,var(--muc))": 1,
   "src/components/hoc-tap/hoc-tap.css · --nhe-do: color-mix(in srgb,var(--do) 68%,var(--muc))": 1,
   "src/components/hoc-tap/hoc-tap.css · --nhe-cam: color-mix(in srgb,var(--cam) 38%,var(--muc))": 1,
-  "src/components/hoc-tap/hoc-tap.css · --nhe-m: var(--muc)": 1
+  "src/components/hoc-tap/hoc-tap.css · --nhe-m: var(--muc)": 1,
+  "src/components/giam-thi/giam-thi.css · --gt-kw: calc(var(--gt-nvw) * .83 - 4px)": 1,
+  "src/components/giam-thi/giam-thi.css · --gt-kh: calc(var(--gt-nvw) * 1.15 + 6px)": 1,
+  "src/components/giam-thi/giam-thi.css · --gt-kd: calc(var(--gt-nvw) * .71 - 4px)": 1
  }
 }

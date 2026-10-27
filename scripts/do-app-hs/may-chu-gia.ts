@@ -18,6 +18,8 @@ const DANG = ['Chất béo', 'Danh pháp ester', 'Thuỷ phân ester', 'Đốt c
 /** `gio`: giờ máy chủ cố định (ms) cho ảnh giao diện tất định (do-app-hs --kich=anh) — null ⇒ giờ thật. */
 export const kichBan: { lanSanh: number; omni: boolean; gio: number | null } = { lanSanh: 0, omni: false, gio: null }
 const bayGio = () => kichBan.gio ?? Date.now()
+/** Ngày Việt Nam của giờ máy chủ giả — Sảnh lưu trên máy em chỉ dùng lại khi CÙNG NGÀY (như bản thật) ⇒ «mở lại» đo đúng đường hiện bản lưu. */
+const ngayVn = () => new Date(bayGio() + 7 * 3_600_000).toISOString().slice(0, 10)
 
 /** Sảnh khi lớp BẬT OMNI (hình dữ liệu như scripts/chup-omni-3/trang.tsx `SANH_OMNI`) — chỉ gửi khi `kichBan.omni` (do-app-hs --omni=1). */
 const SANH_OMNI = {
@@ -29,7 +31,7 @@ const SANH_OMNI = {
 }
 
 const sanh = (): Obj => ({
-  ok: true, cheDo2: true, ngay: '2026-09-30',
+  ok: true, cheDo2: true, ngay: ngayVn(),
   chienDich: { id: 'cd1', ten: 'Ester – Lipid', hanNop: '2026-10-04', D: 5, tong: 120, coXat: 67, thanhThao: 12, canDayLai: 3, thanhThaoTangTu: null },
   theLuc: { con: 28, tong: 40 }, huyetChien: false, doan: { con: 4 }, dao: { con: 28 }, khoaDao: false, loiKhoaDao: '',
   ruong: { daLam: 12, tong: 40, moDuoc: false, daMo: false },
@@ -103,7 +105,7 @@ export async function traLoi(duong: string, body: Obj): Promise<Obj> {
     case '/presence':
       return { ok: true }
     case '/hs/ke-hoach-ngay':
-      return { ok: true, ngay: '2026-09-30', viec: [], nganSach: { mucTieuCau: 20 }, tienBo: { daLamCau: 12, soCauHienThi: 12, dat: false, toiThieuCau: 20, conThieu: 8 }, thanThu: { pet: 'lua_phuong', cap: 7, nickname: 'Lửa Nhỏ', shopBat: true }, exp: { homNay: 40, expConThieu: 120, ongNghiem: 620 }, doanMo: true, capNhatLuc: new Date().toISOString() }
+      return { ok: true, ngay: ngayVn(), viec: [], nganSach: { mucTieuCau: 20 }, tienBo: { daLamCau: 12, soCauHienThi: 12, dat: false, toiThieuCau: 20, conThieu: 8 }, thanThu: { pet: 'lua_phuong', cap: 7, nickname: 'Lửa Nhỏ', shopBat: true }, exp: { homNay: 40, expConThieu: 120, ongNghiem: 620 }, doanMo: true, capNhatLuc: new Date().toISOString() }
     case '/luyen-de/dieu-kien':
       return { ok: true, trangThai: 'mo', lyDo: '', items: [] }
     case '/hs/tu-luyen/nguon':
@@ -131,7 +133,7 @@ export async function traLoi(duong: string, body: Obj): Promise<Obj> {
     case 'so-tay':
       return { ok: true, dang: DANG.map((t, i) => ({ key: 'D' + i, ten: t })) }
     case 'hoc-tap-start':
-      return { ok: true, id: 'phien-gia', questions: CAU_CHANG, goi7: { bat: true, ngay: '2026-09-30', toiThieu: 40, daLamHomNay: 12 + lamChang.daNop, tuLamCon: 20, tiepCanCon: 8, thieuPhu: 0, thieuNgay: 0, canHoTro: false,
+      return { ok: true, id: 'phien-gia', questions: CAU_CHANG, goi7: { bat: true, ngay: ngayVn(), toiThieu: 40, daLamHomNay: 12 + lamChang.daNop, tuLamCon: 20, tiepCanCon: 8, thieuPhu: 0, thieuNgay: 0, canHoTro: false,
         kienThucCu: { tong: 0, dat: 0, tyLe: null }, goi: [{ id: 'g1', ten: 'Ester – Lipid', batDau: '2026-09-28', han: '2026-10-04', tong: 40, daGap: 12, con: 28, quota: 8, gapHomNay: 2, quaHan: false, canBoSung: 0, to: ['BAI1'] }], diemDaDo: [] } }
     case 'hoc-tap-dem':
       return { ok: true, daLamHomNay: 12 + lamChang.daNop, toiThieu: 40 }

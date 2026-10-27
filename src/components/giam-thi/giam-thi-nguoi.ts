@@ -18,6 +18,8 @@ export interface GiamThi {
   nhinVao(el: Element | null | undefined): GiamThi
   noi(chu: string | null | undefined, o?: { giu?: number }): GiamThi
   tamDung(dung: boolean): void
+  /** Chuyển giám thị (giữ nguyên hình đã dựng + tư thế đang có) sang khung chứa mới — câu mới dùng lại, không dựng lại ~150 hình SVG. */
+  doiCho(khung: HTMLElement, loiVao?: HTMLElement | null): void
   huy(): void
 }
 
@@ -634,7 +636,9 @@ export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; 
     const dtms = lan ? Math.min(100, now - lan) : 16
     lan = now
     tichLuy += dtms
-    if (!mayYeu() || tichLuy >= 30) { let con = tichLuy; tichLuy = 0; while (con > 0) { const dt = Math.min(con, 8); tichPhan(dt / 1000); con -= dt } ve() }
+    // 28/10 MƯỢT: vẽ ~30 khung/s (mọi máy) — mỗi khung giám thị = JS + tính kiểu + sơn ~80 hình; 60 khung/s giữ luồng chính bận gần trọn mỗi khung ở
+    // CPU ×4 ⇒ chạm phải chờ (đo: chờ vào 30–70 ms). 30 khung/s: nửa số khung rảnh hẳn; chuyển động vẫn tích phân bước 8 ms như cũ.
+    if (tichLuy >= 30) { let con = tichLuy; tichLuy = 0; while (con > 0) { const dt = Math.min(con, 8); tichPhan(dt / 1000); con -= dt } ve() }
     raf = requestAnimationFrame(lap)
   }
   const chay = () => { if (!raf && !tinh && !giam && !dung && !khuat) { lan = 0; raf = requestAnimationFrame(lap) } }
@@ -699,6 +703,18 @@ export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; 
       dung = d
       khung.classList.toggle('gt-dung', d)
       if (d) { if (raf) cancelAnimationFrame(raf); raf = 0 } else chay()
+    },
+    doiCho(moi, loiVao) {
+      // 27/10 MƯỢT (đo scripts/do-muot-hs.mjs): sang câu mới, khối đề dựng lại ⇒ trước đây giám thị bị huỷ rồi dựng lại từ đầu (~150 hình SVG phải tạo + tính
+      // kiểu mỗi câu). Nay chuyển nguyên hình sang khung mới; tư thế đang có nối mượt sang tư thế của câu mới (lò xo).
+      loiHen.forEach((x) => { clearTimeout(x); clearInterval(x) }); loiHen = []; noiDen = 0
+      ;(o.loiVao ?? khung).querySelectorAll(':scope > .gt-loi').forEach((e) => e.remove())
+      if (moi === khung) { o.loiVao = loiVao ?? undefined; return }
+      moi.innerHTML = ''
+      moi.appendChild(svg)
+      if (dung) moi.classList.add('gt-dung')
+      khung.classList.remove('gt-dung')
+      khung = moi; o.loiVao = loiVao ?? undefined
     },
     huy() {
       if (raf) cancelAnimationFrame(raf); raf = 0; dung = true

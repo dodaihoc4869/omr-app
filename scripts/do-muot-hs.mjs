@@ -7,10 +7,10 @@
 //   2. Mở LẠI (đã đăng nhập, bộ nhớ đệm HTTP ấm): tới nội dung đầu, tới chạm được, byte qua mạng.
 //   3. Lộ trình đứng yên: số nút DOM, rAF chạy nền (lượt/giây), hoạt ảnh CSS vô hạn đang chạy, khung khi đứng yên; vuốt cuộn 4 s: khung p50/p95, khung > 50 ms.
 //   4. Bấm «Học tiếp» → câu đầu hiện (chuyển màn).
-//   5. Làm 4 câu: bấm phương án (phản hồi = Event Timing: từ chạm tới khung vẽ kế), «Kiểm tra» → dải kết quả, «Tiếp tục» → câu kế (chuyển câu);
+//   5. Làm 7 câu (--so-cau): bấm phương án (phản hồi = Event Timing: từ chạm tới khung vẽ kế), «Kiểm tra» → dải kết quả, «Tiếp tục» → câu kế (chuyển câu);
 //      khung trong 1,5 s hiệu ứng thưởng; tác vụ dài > 100 ms khi bấm.
 //   node scripts/do-muot-hs.mjs --dist=dist [--cpu=6] [--mang=fast3g|slow3g] [--may-chu-ms=60] [--yeu=1|0] [--ra=kq.json]
-// Chẩn đoán: --ho-so=bamPa|kiem|tiep (CPU profile câu 2: hàm tốn nhất + ai gọi getBoundingClientRect/removeChild/setAttribute) · --vet-tl=1 (vết Chrome:
+// Chẩn đoán: --ho-so=bamPa|kiem|tiep (CPU profile câu 2: hàm tốn nhất + ai gọi getBoundingClientRect/removeChild/setAttribute) · --vet-tl=1|2|3 (3 = kèm ngăn xếp lời gọi ép tính kiểu; vết Chrome:
 //   tính kiểu / bố cục lớn + lý do mất hiệu lực kiểu) · --ghi-vet=<tệp.json> · --chon-loc=1 (thống kê bộ chọn CSS) · --thu-css=1 (một lượt tính kiểu
 //   cả trang tốn bao nhiêu, bỏ từng tờ CSS / ẩn giám thị / ẩn Lộ trình) · --kham=1 (ai gọi rAF) · --vet=1 (in từng yêu cầu) · --chup-loi=<ảnh.jpg>.
 // Trang tĩnh phục vụ qua HTTP thường (bộ nhớ đệm HTTP chạy như máy thật); máy chủ app giả qua HTTPS, Chromium ánh xạ MỌI tên miền về máy này
@@ -176,7 +176,7 @@ const doKhung = (p, ms) => p.evaluate((ms) => new Promise((xong) => {
 const KHAM = arg('kham', '') === '1'
 const HO_SO = arg('ho-so', '')
 async function batHoSo(cdp, ten) { if (HO_SO !== ten) return
-  if (arg('vet-tl', '')) { const sk = []; cdp.on('Tracing.dataCollected', (e) => sk.push(...e.value)); cdp.__sk = sk; await cdp.send('Tracing.start', { categories: 'devtools.timeline,disabled-by-default-devtools.timeline' + (arg('vet-tl') === '2' ? '' : ',disabled-by-default-devtools.timeline.invalidationTracking,blink') + (arg('chon-loc', '') ? ',disabled-by-default-blink.debug' : ''), transferMode: 'ReportEvents' }) }
+  if (arg('vet-tl', '')) { const sk = []; cdp.on('Tracing.dataCollected', (e) => sk.push(...e.value)); cdp.__sk = sk; await cdp.send('Tracing.start', { categories: 'devtools.timeline,disabled-by-default-devtools.timeline' + (arg('vet-tl') === '3' ? ',disabled-by-default-devtools.timeline.stack' : '') + (arg('vet-tl') !== '1' ? '' : ',disabled-by-default-devtools.timeline.invalidationTracking,blink') + (arg('chon-loc', '') ? ',disabled-by-default-blink.debug' : ''), transferMode: 'ReportEvents' }) }
   await cdp.send('Profiler.enable'); await cdp.send('Profiler.setSamplingInterval', { interval: 100 }); await cdp.send('Profiler.start') }
 async function inHoSo(cdp, ten) {
   if (HO_SO !== ten) return
@@ -316,9 +316,11 @@ try {
   // 2. Mở lại (đã đăng nhập, đệm HTTP ấm)
   const { p, cdp } = await trangMoi(ctx, loi)
   {
+    await batHoSo(cdp, 'molai')
     await p.goto(goc + '/hs', { waitUntil: 'commit' })
     const tLt = await choThay(p, LO_TRINH)
     await p.waitForTimeout(5000)
+    await inHoSo(cdp, 'molai')
     const d = await layDo(p)
     kq.moLai = { fcp: d.fcp, noiDung: Math.round(tLt), chamDuoc: tti(d.dai, tLt), taskMax: daiNhat(d.dai), quaMang: await taiTheoLoai(p), dai: d.dai.filter(([t]) => t >= tLt - 500).map(([t, du]) => `${t}+${du}`) }
   }
@@ -374,12 +376,22 @@ try {
         sh.disabled = false
       }
       out.boTung = ket.sort((a, b) => a[2] - b[2]).slice(0, 12)
+      out.trongTrang = to.filter((s) => !s.href).map((s) => { try { return [...s.cssRules].map((r) => r.cssText.slice(0, 160)) } catch { return [] } })
       // gỡ một bản sao khối câu: tốn bao nhiêu (gồm cả kiểu/bố cục sau đó)
       const goBanSao = () => { const g = document.querySelector('.duo-than'); const b = g.cloneNode(true); g.parentElement.appendChild(b); void document.body.offsetHeight; const t = performance.now(); b.remove(); const t1 = performance.now(); void document.body.offsetHeight; return [Math.round(t1 - t), Math.round(performance.now() - t1)] }
       out.goBanSao = [goBanSao(), goBanSao(), goBanSao()]
       for (const sh of to) sh.disabled = true
       out.goBanSaoKhongCss = [goBanSao(), goBanSao()]
       for (const sh of to) sh.disabled = false
+      // gắn một bản sao khối câu: tính kiểu + bố cục bao nhiêu (≈ chi phí dựng câu mới); rồi thử bỏ mọi luật :has() / bỏ hoạt ảnh
+      const themBanSao = () => { const g = document.querySelector('.duo-than'); const b = g.cloneNode(true); void document.body.offsetHeight; const t = performance.now(); g.parentElement.appendChild(b); void document.body.offsetHeight; const ms = performance.now() - t; b.remove(); void document.body.offsetHeight; return Math.round(ms) }
+      out.themBanSao = [themBanSao(), themBanSao(), themBanSao()]
+      const boCo = []
+      for (const sh of to) { try { for (let i = sh.cssRules.length - 1; i >= 0; i--) { const r = sh.cssRules[i]; if (/:has\(/.test(r.cssText)) { boCo.push(r.cssText.slice(0, 90)); sh.deleteRule(i) } } } catch {} }
+      void document.body.offsetHeight
+      out.luatHas = boCo
+      out.themBanSaoKhongHas = [themBanSao(), themBanSao(), themBanSao()]
+      out.gocKhongHas = lap()
       const soPt = document.querySelector('.duo-than').getElementsByTagName('*').length
       out.soPtKhoiCau = soPt
       // bỏ hết trừ một tờ: không cần. Đo riêng: chỉ giám thị (ẩn), chỉ Lộ trình (ẩn)
@@ -390,7 +402,7 @@ try {
     console.error('THỬ CSS', JSON.stringify(r))
   }
   const cau = []
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < Number(arg("so-cau", "7")); i++) {
     const m = {}
     if (i === 1) await batHoSo(cdp, 'bamPa')
     let t0 = await bayGio(p)

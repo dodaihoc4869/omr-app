@@ -1,4 +1,4 @@
-import { lazy, startTransition, Suspense, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { lazy, startTransition, Suspense, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, Clock, Flame, Info, Lightbulb, PenLine, RefreshCw, Target, X as XIcon } from 'lucide-react'
 import { ChemText } from '../../lib/chem-format'
 import '../../lib/chem-trinh-bay' // thầy 27/10: phương trình rõ ràng (khoảng hẹp quanh toán tử, ⇌ cỡ chữ, «l» có đuôi) — chỉ app học sinh
@@ -371,6 +371,17 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   // 27/10 MƯỢT (đo scripts/do-muot-hs.mjs): sang câu mới ⇒ đo khối câu cũ + cuộn khung về đầu NGAY TRONG lượt bấm, lúc bố cục còn sạch (rẻ), rồi mới dựng
   // câu mới. Trước: `scrollIntoView` chạy SAU khi câu mới dựng ⇒ ép trình duyệt tính lại kiểu + bố cục cả màn thêm một lượt (~35–60 ms ở CPU ×6).
   const daVeDau = useRef(false)
+  // 27/10 MƯỢT (đo chuyển câu CPU ×6): khối giám thị + đề (`.duo-gt-san`) KHÔNG dựng lại mỗi câu — giám thị (~160 / ~220 phần tử của cột đề) đứng yên
+  // trong cây, chỉ phần chữ đề / nhãn / lệnh đổi theo câu (gắn key theo câu). Hiệu ứng «trượt vào» của khối (CSS duo-vao, chạy khi phần tử mới gắn) được
+  // chạy lại bằng Web Animations cùng thông số — nhìn y như cũ; máy yếu / giảm chuyển động: không chạy (như CSS).
+  const sanRef = useRef<HTMLDivElement>(null), sanQid = useRef('')
+  useLayoutEffect(() => { gocRef.current?.querySelector<HTMLElement>('.duo-than')?.style.removeProperty('opacity') }, [q?.qid, xong])
+  useLayoutEffect(() => {
+    const san = sanRef.current, id = q?.qid ?? ''
+    if (!san) { sanQid.current = ''; return }
+    if (sanQid.current && sanQid.current !== id && !yenLang() && typeof san.animate === 'function') san.animate([{ opacity: 0, transform: 'translateX(40px)' }, { opacity: 1, transform: 'none' }], { duration: 180, easing: 'ease-out', fill: 'backwards' })
+    sanQid.current = id
+  })
   const truotCauCu = () => {
     const goc = gocRef.current, than = goc?.querySelector('.duo-than')
     const r = duo && than ? than.getBoundingClientRect() : undefined
@@ -398,15 +409,32 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   const cauSai = goc.flatMap((c, i) => ttCau(c, i) === 'sai' ? [i + 1] : [])
   const lamLaiDung = lamLai.filter(c => ket[c.qid]?.correct === true).length
   // 27/10 MƯỢT (máy yếu, đo CPU ×6): dựng câu kế trong lượt «chuyển tiếp» của React — chia nhỏ, không giữ luồng chính một mạch 250–350 ms ⇒ nút vừa
-  // bấm lún ngay, câu mới hiện ngay sau đó. Máy thường giữ dựng ngay (cùng khung với hiệu ứng trượt câu cũ). `dangSang` chặn chạm đúp khi câu kế chưa hiện.
+  // bấm lún ngay, câu mới hiện ngay sau đó (28/10: máy thường cũng vậy, xem dưới).
   const dangSang = useRef(-1)
   const tiep = () => {
     if (gui.current || dangSang.current === viTri) return
     setLoi('')
     setCombo(null) // băng combo chỉ sống ở câu vừa đúng — sang câu mới thì tắt, không che đề
     if (viTri + 1 < cau.length) {
-      // máy yếu không có hiệu ứng trượt; cuộn về đầu để sau khi câu mới dựng (không kéo câu cũ lên đầu trong lúc chờ)
-      if (yenLang()) { dangSang.current = viTri; startTransition(() => setViTri(i => i + 1)) } else { truotCauCu(); setViTri(i => i + 1) }
+      // 28/10 MƯỢT (thầy: «tách việc dài SAU lần vẽ phản hồi đầu»): lượt chạm chỉ đổi phần nhỏ (nút, tấm kết quả) ⇒ khung kế vẽ ngay; việc nặng (bản sao
+      // trượt ra, dựng câu kế) chạy SAU lần vẽ đó (rAF + setTimeout 0). `dangSang` chặn chạm đúp tới khi câu kế hiện.
+      dangSang.current = viTri
+      const sauKhiVe = (f: () => void) => { if (document.hidden) window.setTimeout(f, 0); else requestAnimationFrame(() => { window.setTimeout(f, 0) }) }
+      // máy yếu: không có hiệu ứng trượt; cuộn về đầu để sau khi câu mới dựng (không kéo câu cũ lên đầu trong lúc chờ)
+      if (yenLang()) sauKhiVe(() => {
+        // khung đang ở đầu (đọc lúc bố cục còn sạch — rẻ) ⇒ câu mới khỏi `scrollIntoView` sau khi dựng (mỗi lần là một lượt ép bố cục cả màn)
+        const goc = gocRef.current, kh = goc ? khungCuonCua(goc) : null
+        if (goc && (kh ? kh.scrollTop === 0 : goc.getBoundingClientRect().top === 0)) daVeDau.current = true
+        startTransition(() => setViTri(i => i + 1))
+      })
+      else if (duo) sauKhiVe(() => {
+        // máy thường: bản sao câu cũ trượt ra phủ trên ⇒ câu thật ẩn bằng opacity (một phần tử, không lan xuống con) và câu kế dựng trong lượt chuyển
+        // tiếp (chia nhỏ) — không giữ luồng chính một mạch ~200 ms. Câu kế gắn thì hiện lại (layout effect theo qid).
+        truotCauCu()
+        gocRef.current?.querySelector<HTMLElement>('.duo-than')?.style.setProperty('opacity', '0')
+        startTransition(() => setViTri(i => i + 1))
+      })
+      else { dangSang.current = -1; truotCauCu(); setViTri(i => i + 1) }
     }
     else if (goi7 && !daXinLamLai.current && !laLamLai && cauSai.length > 0) void xinLamLai()
     else ketThuc()
@@ -744,21 +772,21 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
           </section>
         : q ? <>
           {th && k && !laLamLai && !luot?.moc && <BangComboTp chuoi={khongTinh ? 0 : th.chuoiDung} tat={khongTinh && chuoiTruocTp >= 3} truoc={chuoiTruocTp} />}
-          <div key={`d${q.qid}`} className="duo-cot-de">{/* khung thấp xoay ngang: cột trái = đề, cột phải = phương án + Kiểm tra / tấm kết quả; dọc / máy tính: display: contents (y bố cục cũ) */}
-          {laLamLai ? <p className="duo-nhan" data-lam-lai=""><span>Làm lại · câu {stt}/{lamLai.length}</span><span className="duo-chip">Cùng dạng câu {goc.findIndex(c => c.qid === q.lamLaiCua) + 1 || '?'}</span></p>
+          <div key="d" className="duo-cot-de">{/* khung thấp xoay ngang: cột trái = đề, cột phải = phương án + Kiểm tra / tấm kết quả; dọc / máy tính: display: contents (y bố cục cũ) */}
+          {laLamLai ? <p key={`n${q.qid}`} className="duo-nhan" data-lam-lai=""><span>Làm lại · câu {stt}/{lamLai.length}</span><span className="duo-chip">Cùng dạng câu {goc.findIndex(c => c.qid === q.lamLaiCua) + 1 || '?'}</span></p>
             // thầy 27/10: lời nhắc chặng nằm TRONG dòng nhãn (không lớp nổi đè), mờ về nhãn thường sau 1,8 s — CSS «NHÃN CÂU NHẮC CHẶNG»
-            : <p className="duo-nhan" data-nc="" data-nhac={bangNhac ? '' : undefined}>{bangNhac && <span className="duo-nhan-nhac" role="status">{bangNhac}</span>}<span className="duo-nhan-o" aria-hidden="true">{q.phan === 'III' || soPa ? <IcMayTinh /> : <IcLapLanh />}</span><span>{q.vaiGoi7 === 'moi' ? 'Câu mới' : loai}</span>{tenBai || q.tenDang ? <span className="duo-chip" data-cong-thuc={/[A-Z][a-z]?(\d|[A-Z(])/.test(tenBai || q.tenDang || '') || undefined}><ChemText text={chuDeNgan(tenBai || q.tenDang || '')} /></span> : null}{chang ? <span className="ht2-an">Chặng {chang}</span> : null}</p>}
-          {(!laLamLai || nutDen) && <div className="duo-lenh">{!laLamLai && <h2>{lenh}</h2>}{nutDen}</div>}
-          {laLamLai && !k && viTri === soGoc && <p className="duo-mo-ghi">Câu cùng dạng với câu em vừa sai. Lượt này tính là có hỗ trợ.</p>}
-          {mucGt ? <div className="duo-gt-san">
+            : <p key={`n${q.qid}`} className="duo-nhan" data-nc="" data-nhac={bangNhac ? '' : undefined}>{bangNhac && <span className="duo-nhan-nhac" role="status">{bangNhac}</span>}<span className="duo-nhan-o" aria-hidden="true">{q.phan === 'III' || soPa ? <IcMayTinh /> : <IcLapLanh />}</span><span>{q.vaiGoi7 === 'moi' ? 'Câu mới' : loai}</span>{tenBai || q.tenDang ? <span className="duo-chip" data-cong-thuc={/[A-Z][a-z]?(\d|[A-Z(])/.test(tenBai || q.tenDang || '') || undefined}><ChemText text={chuDeNgan(tenBai || q.tenDang || '')} /></span> : null}{chang ? <span className="ht2-an">Chặng {chang}</span> : null}</p>}
+          {(!laLamLai || nutDen) && <div key={`l${q.qid}`} className="duo-lenh">{!laLamLai && <h2>{lenh}</h2>}{nutDen}</div>}
+          {laLamLai && !k && viTri === soGoc && <p key={`g${q.qid}`} className="duo-mo-ghi">Câu cùng dạng với câu em vừa sai. Lượt này tính là có hỗ trợ.</p>}
+          {mucGt ? <div ref={sanRef} className="duo-gt-san">
               <div className="duo-gt-loi-o" />{/* hàng riêng của bong bóng càu nhàu: không đè nhãn, đề, phương án */}
               <div className="duo-gt-nv"><Suspense fallback={null}><GiamThiCau muc={mucGt} qid={q.qid} phien={phien} nop={nop} ket={ketGt} vung={() => gocRef.current} /></Suspense></div>
               {/* chữ L (bong bóng gần trọn bề ngang, khuyết góc trái trên ôm giám thị) CHỈ khi chữ thật sự tràn xuống dưới chân giám thị — mảnh GiamThi đo rồi bật `data-l` */}
-              <div className="duo-gt-bong"><svg className="duo-gt-vien" aria-hidden="true"><path /></svg><span className="duo-gt-cho" aria-hidden="true" /><VungChamDe q={q} token={token} phien={phien} onHoTro={danhDauHoTro} nutBatDau={nutBatDau}><DeCau q={q} stt={stt} /></VungChamDe></div>
+              <div key={`b${q.qid}`} className="duo-gt-bong"><svg className="duo-gt-vien" aria-hidden="true"><path /></svg><span className="duo-gt-cho" aria-hidden="true" /><VungChamDe q={q} token={token} phien={phien} onHoTro={danhDauHoTro} nutBatDau={nutBatDau}><DeCau q={q} stt={stt} /></VungChamDe></div>
             </div>
-            : <VungChamDe q={q} token={token} phien={phien} onHoTro={danhDauHoTro} nutBatDau={nutBatDau}><DeCau q={q} stt={stt} /></VungChamDe>}
-          {coDangCanh(q.text) && <MinhHoaDe text={q.text} />}
-          {q.goiY && goiY && dangTraLoi && <section id="ht2-lam-goi-y" className="ht2-lam-goi-y" aria-label="Gợi ý"><b><Lightbulb size={18} aria-hidden="true" />Gợi ý</b><p>{q.goiY.cotLoi || (q.goiY.gach?.length ? `Có thể loại phương án ${q.goiY.gach.join(', ')}.` : 'Đọc lại kiến thức cốt lõi của bài.')}</p></section>}
+            : <VungChamDe key={`v${q.qid}`} q={q} token={token} phien={phien} onHoTro={danhDauHoTro} nutBatDau={nutBatDau}><DeCau q={q} stt={stt} /></VungChamDe>}
+          {coDangCanh(q.text) && <MinhHoaDe key={`m${q.qid}`} text={q.text} />}
+          {q.goiY && goiY && dangTraLoi && <section key={`y${q.qid}`} id="ht2-lam-goi-y" className="ht2-lam-goi-y" aria-label="Gợi ý"><b><Lightbulb size={18} aria-hidden="true" />Gợi ý</b><p>{q.goiY.cotLoi || (q.goiY.gach?.length ? `Có thể loại phương án ${q.goiY.gach.join(', ')}.` : 'Đọc lại kiến thức cốt lõi của bài.')}</p></section>}
           </div>
           <div key={`t${q.qid}`} className="duo-cot-tra">
           {/* Thầy 27/10 (ảnh): ẩn khung «Câu này em chọn làm thế nào?» ở màn Duo — hai nút đáy «Học cách giải» / «Tự làm câu này» đã nói đủ. */}
