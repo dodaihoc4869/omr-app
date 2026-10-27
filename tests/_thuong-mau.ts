@@ -9,12 +9,12 @@ export const lich7 = (k: Kieu[]) => k.map((kieu, i) => ({ ngay: ngayTruoc(k.leng
 
 export const BAT = { giai: true, thangHoa: true, banBe: true, kimCuong: true }
 export const NHIEM_VU = [
-  { ma: 'xong_bai', ten: 'Xong 4 bài', tien: 3, can: 4, thuong: 10, xong: false },
+  { ma: 'xong_bai', ten: 'Xong 4 chặng', tien: 3, can: 4, thuong: 10, xong: false },
   { ma: 'chuoi_dung_5', ten: 'Chuỗi đúng 5 câu', tien: 5, can: 5, thuong: 5, xong: true },
   { ma: 'dung_kho_2', ten: 'Đúng 2 câu khó', tien: 1, can: 2, thuong: 10, xong: false },
 ]
 export const NHIEM_VU_XONG = [
-  { ma: 'xong_bai', ten: 'Xong 4 bài', tien: 4, can: 4, thuong: 10, xong: true },
+  { ma: 'xong_bai', ten: 'Xong 4 chặng', tien: 4, can: 4, thuong: 10, xong: true },
   { ma: 'chuoi_dung_5', ten: 'Chuỗi đúng 5 câu', tien: 5, can: 5, thuong: 5, xong: true },
   { ma: 'dung_kho_2', ten: 'Đúng 2 câu khó', tien: 2, can: 2, thuong: 10, xong: true },
 ]
@@ -44,7 +44,7 @@ export const HUY_HIEU_GIA = { ok: true, huyHieu: [
   { ma: 'hang_dong', ten: 'Giải Đồng', co: true, ngay: '2026-09-28' }, { ma: 'hang_bac', ten: 'Giải Bạc', co: true, ngay: '2026-10-05' },
   { ma: 'hang_vang', ten: 'Giải Vàng', co: true, ngay: '2026-10-19' }, { ma: 'hang_bachkim', ten: 'Bạch kim', co: false }, { ma: 'hang_kimcuong', ten: 'Kim cương', co: false },
   { ma: 'quan_quan', ten: 'Quán quân', co: false },
-  { ma: 'hoan_hao_10', ten: '10 bài', co: true, ngay: HOM_NAY }, { ma: 'hoan_hao_50', ten: '50 bài', co: false, tienDo: { da: 14, can: 50 } },
+  { ma: 'hoan_hao_10', ten: '10 chặng', co: true, ngay: HOM_NAY }, { ma: 'hoan_hao_50', ten: '50 chặng', co: false, tienDo: { da: 14, can: 50 } },
   { ma: 'kim_cuong_ester', ten: 'Ester – Lipid', co: true, ngay: '2026-10-24' }, { ma: 'kim_cuong_amine', ten: 'Amine', co: false }, { ma: 'kim_cuong_carbo', ten: 'Carbohydrate', co: false },
   { ma: 'doi_7', ten: 'Chuỗi đôi 7', co: true, ngay: '2026-10-25' }, { ma: 'doi_30', ten: 'Chuỗi đôi 30', co: false, tienDo: { da: 9, can: 30 } },
   { ma: 'doi_100', ten: 'Chuỗi đôi 100', co: false, tienDo: { da: 9, can: 100 } },
@@ -86,7 +86,7 @@ export const TB = {
   cuoiTuanRoi: { ma: 'cuoi_tuan|3', loai: 'cuoi_tuan', duLieu: { tuan: '2026-10-19', ket: 'roi', hangCu: 'bac', hangMoi: 'dong', thuHang: 18, soNguoi: 20, tinhThe: 0, nguyenTu: 52, soNgay: 2 } },
   mocChuoi: { ma: 'moc_chuoi|7', loai: 'moc_chuoi', duLieu: { moc: 7, tinhThe: 10 } },
   cuocThua: { ma: 'cuoc|1', loai: 'cuoc', duLieu: { ketQua: 'thua', tinhThe: -50 } },
-  huyHieu: { ma: 'huy_hieu|hoan_hao_10', loai: 'huy_hieu', duLieu: { ma: 'hoan_hao_10', ten: '10 bài hoàn hảo' } },
+  huyHieu: { ma: 'huy_hieu|hoan_hao_10', loai: 'huy_hieu', duLieu: { ma: 'hoan_hao_10', ten: '10 chặng hoàn hảo' } },
   mocDoi: { ma: 'moc_doi|7', loai: 'moc_doi', duLieu: { moc: 7, tinhThe: 10, ban: 'Minh Châu' } },
   moiBan: { ma: 'moi_ban|1', loai: 'moi_ban', duLieu: { ma: 'b9', ten: 'Minh Châu', lop: '12A2' } },
   goCua: { ma: 'go_cua|1', loai: 'go_cua', duLieu: { ma: 'b2', ten: 'Gia Bảo', lop: '12A2' } },

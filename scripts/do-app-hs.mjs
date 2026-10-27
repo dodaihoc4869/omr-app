@@ -496,12 +496,12 @@ async function cacMan() {
       m.cdlLoc = await b('cdlLoc', 'text=Sai lần gần nhất', null, 2000)
       m.cdlLocTatCa = await b('cdlLocTatCa', 'text=Tất cả', null, 2000)
       m.cdlCuon = await kc('cdlCuon', 4000)
-      m.veSanhTuCdl = await b('veSanhTuCdl', '[aria-label="Về Hôm nay"]', SANH, 1500)
+      m.veSanhTuCdl = await b('veSanhTuCdl', '[aria-label="Về Hôm nay"], [aria-label="Về Lộ trình"]', SANH, 1500)
       // Tu luyện: mở, từng thẻ chế độ, thẻ Tổng hợp.
       await cham(p, 'text=Ôn & sửa')
       m.vaoTuLuyen = await b('vaoTuLuyen', 'text=Tu luyện', 'text=Sửa câu sai', 2500)
       for (const [k, t] of [['tlSuaCauSai', 'Sửa câu sai'], ['tlDangCauSai', 'Dạng câu sai'], ['tlDangBai', 'Dạng bài'], ['tlTuDo', 'Tự do'], ['tlTongHop', 'Tổng hợp'], ['tlLuyenDe', 'Luyện đề cấu trúc'], ['tlLuyen', 'Luyện']]) m[k] = await b(k, 'text=' + t, null, 1500)
-      m.veSanhTuTl = await b('veSanhTuTl', '[aria-label="Về Hôm nay"]', SANH, 1500)
+      m.veSanhTuTl = await b('veSanhTuTl', '[aria-label="Về Hôm nay"], [aria-label="Về Lộ trình"]', SANH, 1500)
       kq.lan.push(m)
     }
     kq.heapMB = await heapMb(cdp)
@@ -559,7 +559,7 @@ async function heapDai(phut) {
     let vong = 0
     const ghi = async () => kq.mau.push({ vong, giay: Math.round((Date.now() - dau) / 1000), heapMB: await heapMb(cdp), ...(await domCounters(cdp)) })
     const ve = async () => {
-      await cham(p, '[aria-label="Về Hôm nay"]')
+      await cham(p, '[aria-label="Về Hôm nay"], [aria-label="Về Lộ trình"]')
       await choThay(p, SANH)
     }
     await ghi()

@@ -75,7 +75,7 @@ const lamCau = async (dung: boolean) => {
   fireEvent.click(screen.getByRole('button', { name: 'Kiểm tra' }))
   await screen.findByRole('heading', { name: dung ? 'Chính xác!' : 'Chưa đúng' })
 }
-const X = () => screen.getByRole('button', { name: 'Lưu và về Hôm nay' })
+const X = () => screen.getByRole('button', { name: 'Lưu và về Lộ trình' })
 
 describe('tấm giữ chân trên màn làm chặng Duo', () => {
   it('chưa làm câu nào ⇒ X thoát thẳng, không tấm', async () => {

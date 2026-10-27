@@ -17,6 +17,9 @@ Người giữ: Boss. Mọi phiên làm giao diện ĐỌC tệp này trước k
 |---|---|---|
 | Bài thầy giao về nhà | **Bài tập về nhà** (viết tắt BTVN) | bài tập, homework, mã tờ đề làm tên |
 | Một phần bài làm trong một buổi | **Chặng** ("Chặng 2 trong 7 chặng") | lô, đợt, phần, vòng |
+| Đơn vị ~6 câu của hệ thưởng kiểu Duolingo (kết chặng, nhiệm vụ, mục tiêu ngày, vòng Bi trên thanh trên, chuỗi, học cùng bạn) — Boss chốt 27/10 | **Chặng** ("Xong chặng!", "Mục tiêu ngày · 3/4 chặng", "Xong 2 chặng", "Chặng hoàn hảo"). «Bài» CHỈ dùng cho bài trong chương trình ("Bài 8. Amine") và Bài tập về nhà. Tên trường dữ liệu giữ nguyên (`baiXong`, `xong_bai`…) | bài (cho đơn vị này), lesson |
+| Trang chính app học sinh giao diện «Trong» (mục đầu menu dọc) — Boss chốt 27/10 | **Lộ trình**: nút về "Về Lộ trình" · "Lưu và về Lộ trình" · "← Lộ trình" (`tenTrangChinh()` ở `src/lib/trong-hs.ts`; giao diện cũ vẫn "Hôm nay") | Về Hôm nay, Về bảng nhiệm vụ (ở giao diện Trong) |
+| Luật giữ chuỗi khi có chuỗi theo chặng (`chuoiNgay`) — Boss chốt 27/10 | "Mỗi ngày xong ít nhất 1 chặng để giữ chuỗi" · "hôm nay đã giữ chuỗi". "Đủ mức hôm nay" là **Mục tiêu hôm nay** ("Mục tiêu hôm nay · 12/30 câu · còn 18 câu"), ghi tách riêng, không gắn với chuỗi | "làm N câu nữa để đủ mức" trên dòng chuỗi |
 | Thời điểm cuối được nộp | **Hạn nộp** | deadline, mốc, hạn chót |
 | Buổi kiểm tra trên app | **Ca kiểm tra** ở CẢ BA APP (cập nhật 21/09: màn Mở ca + Theo dõi ca của thầy cũng đã đổi, vì app thầy vốn dùng "ca kiểm tra" nhiều hơn "ca thi" — một khái niệm một từ). GIỮ NGUYÊN các chữ thầy đã chốt ở luồng thi: "Bắt đầu thi", "Cho thi lại", "Vào thi", và mọi câu cảnh báo của màn thi thật (test khoá) | ca thi (chữ hiển thị), đợt thi, bài thi |
 | Câu cả lớp cùng làm | **Câu cốt lõi** | lõi, core |

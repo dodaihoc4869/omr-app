@@ -459,6 +459,7 @@
 [data-trong] .duo-3 > div[data-sac=sao] { --sac: var(--tr-sao); --sac-chu: var(--tr-sao-chu); }
 [data-trong] .duo-3 p { margin: 0; padding: 6px 4px; background: var(--sac); color: var(--tr-trang); font-size: 12px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
 [data-trong] .duo-3 b { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 58px; background: var(--tr-mat); color: var(--sac-chu); font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
+[data-trong] .duo-3 .duo-so-dv { margin-left: 3px; font-size: .6em; font-weight: 800; white-space: nowrap; } /* đơn vị nhỏ sau số «11/24 câu» (Boss 27/10) */
 [data-trong] .duo-ghi { max-width: 420px; margin: 0; font-size: 14px; line-height: 1.5; color: var(--tr-chu-2); }
 @media (max-width: 600px) {
   [data-trong] .duo-tren { padding: 8px 12px 0 8px; gap: 10px; }

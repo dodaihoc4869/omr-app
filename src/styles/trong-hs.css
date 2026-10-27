@@ -815,6 +815,7 @@
 [data-trong] .dm-dong .giua { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 [data-trong] .dm-dong b { font-weight: 800; }
 [data-trong] .dm-dong .so { font-size: 17px; font-weight: 800; font-variant-numeric: tabular-nums; }
+[data-trong] :is(.da-o, .dm-dong) .so-dv { margin-left: 3px; font-size: .6em; font-weight: 700; } /* «5 câu», «0/28 câu»: số nào cũng có đơn vị (Boss 27/10) */
 [data-trong] .dm-thanh { height: 14px; overflow: hidden; border-radius: 999px; background: var(--tr-mat-3); }
 [data-trong] .dm-thanh i { display: block; height: 100%; border-radius: inherit; background: var(--tr-sao); }
 [data-trong] .da-huy { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }

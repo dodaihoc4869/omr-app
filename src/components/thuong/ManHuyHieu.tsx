@@ -12,7 +12,7 @@ import { DauVe } from './ManChuoi'
 import { Bi } from '../linh-vat/Bi'
 
 type Nhom = 'chuoi' | 'giai' | 'hoan-hao' | 'kim-cuong' | 'doi' | 'dac-biet'
-const TEN_NHOM: Record<Nhom, string> = { chuoi: 'Chuỗi ngày', giai: 'Giải tuần', 'hoan-hao': 'Bài hoàn hảo', 'kim-cuong': 'Thử thách Kim cương', doi: 'Học cùng bạn', 'dac-biet': 'Đặc biệt' }
+const TEN_NHOM: Record<Nhom, string> = { chuoi: 'Chuỗi ngày', giai: 'Giải tuần', 'hoan-hao': 'Chặng hoàn hảo', 'kim-cuong': 'Thử thách Kim cương', doi: 'Học cùng bạn', 'dac-biet': 'Đặc biệt' }
 const RE_HANG = /^(?:hang|giai)[_-](sat|dong|bac|vang|bachkim|kimcuong)$/
 /** Phân nhóm + hình của một huy hiệu theo mã (mã máy chủ: chuoi_7, hang_bac / giai_bac, quan_quan, hoan_hao_10, kim_cuong_<chuyên đề>, doi_7 / chuoi_doi_7…). */
 export function hinhHuyHieu(h: Pick<HuyHieu, 'ma' | 'ten'>): { nhom: Nhom; hinh: (khoa: boolean) => ReactNode } {

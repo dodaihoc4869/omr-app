@@ -46,7 +46,7 @@ describe('làm chặng kiểu Duolingo («Trong»)', () => {
   it('đầu màn: nút thoát lưu-và-về, MỘT thanh tiến độ, chuỗi 0; «Kiểm tra» xám tới khi chọn; không có «Bỏ qua»; lưới 2×2 khi phương án ngắn', async () => {
     const { container } = mo([C1, C2])
     await screen.findByText(C1.text)
-    expect(screen.getByRole('button', { name: 'Lưu và về Hôm nay' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Lưu và về Lộ trình' })).toBeTruthy()
     expect(screen.getByRole('progressbar', { name: 'Câu 1/2 của chặng 2' }).getAttribute('aria-valuenow')).toBe('0')
     expect(screen.getByLabelText('Chuỗi 0 câu đúng liền')).toBeTruthy()
     expect(container.querySelector('.ht2-lam-vach')).toBeNull() // vạch rời cũ không còn
@@ -94,7 +94,7 @@ describe('làm chặng kiểu Duolingo («Trong»)', () => {
     expect(ket.textContent).toContain('Tự làm đúng'); expect(ket.textContent).toContain('1/1')
     expect(ket.textContent).toContain('Thời gian'); expect(ket.textContent).toContain('Hôm nay'); expect(ket.textContent).toContain('6/24')
     expect(screen.getByRole('button', { name: 'Học tiếp chặng 3' })).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Về Hôm nay' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Về Lộ trình' })).toBeTruthy()
   })
 
   it('tắt «Trong» ⇒ màn cũ (thanh «Chặng · Câu x/y», nút «Nộp câu»)', async () => {

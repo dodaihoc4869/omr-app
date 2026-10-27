@@ -77,7 +77,7 @@ function khungCau(k: 'dung' | 'day' | 'kho' | 'khong-tinh') {
   return h('div', { className: 'ht-app ht2-lam duo' },
     h('div', { className: 'duo-tren' }, h('button', { type: 'button', className: 'duo-dong', 'aria-label': 'Thoát, lưu bài' }, h(X, { size: 26 })),
       h(OngNghiem, { phanTram: (cau / 6) * 100, combo: chuoi >= 3, nhan: `Câu ${cau}/6 của bài` }),
-      h('span', { className: 'duo-chuoi', 'data-co': '', 'aria-label': 'Nguyên tử của bài này' }, h(IcNguyenTu), String(k === 'day' ? 59 : k === 'kho' ? 49 : trung ? 32 : 32))),
+      h('span', { className: 'duo-chuoi', 'data-co': '', 'aria-label': 'Nguyên tử của chặng này' }, h(IcNguyenTu), String(k === 'day' ? 59 : k === 'kho' ? 49 : trung ? 32 : 32))),
     h('main', { className: 'duo-than' },
       h(BangCombo, { chuoi: trung ? 0 : chuoi, tat: trung, truoc: 3 }),
       h('p', { className: 'duo-nhan' }, k === 'day' || k === 'kho' ? 'Câu mới · Amine' : trung ? 'Câu mới · Amino acid' : 'Câu mới · Ester – Lipid', h('span', { className: 'duo-chip' }, `Câu ${cau}/6`)),

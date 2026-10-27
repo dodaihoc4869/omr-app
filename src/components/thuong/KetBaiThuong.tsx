@@ -54,13 +54,13 @@ export default function KetBaiThuong({ ketBai: k, phu, hang, bat, onTiep, chuNut
       })
     }
   }, [])
-  const dong = k.dong.length ? k.dong : [{ nhan: 'Nguyên tử của bài', so: k.tong }]
+  const dong = k.dong.length ? k.dong : [{ nhan: 'Nguyên tử của chặng', so: k.tong }]
   return <div className="tp-goc tp-ket" data-hh={hh || undefined}>
     <main className="tp-man" data-hai="">
       <div className="cot-a">
         {hh ? <div className="tp-ket-hinh"><Tia className="quay" /><div ref={kt} className="kt-o"><HuyHieuKimLoai hang="kimcuong" an /></div><div ref={bi} className="bi-o"><Bi cam="mung" size={80} /></div></div>
           : <div className="tp-hinh"><div ref={bi}><Bi cam="vui" size={120} /></div></div>}
-        <h1 style={hh ? { color: 'var(--tr-sao-chu)' } : undefined}>{hh ? 'Hoàn hảo!' : 'Xong bài!'}</h1>
+        <h1 style={hh ? { color: 'var(--tr-sao-chu)' } : undefined}>{hh ? 'Hoàn hảo!' : 'Xong chặng!'}</h1>
         {(phu || hh) && <p className="tp-phu">{hh ? `${k.soCau}/${k.soCau} câu đúng, tự làm${phu ? ` · ${phu}` : ''}` : phu}</p>}
         <div ref={ba} className="tp-3o">
           <div role="group" aria-label={`Nguyên tử: +${k.tong}`}><p>Nguyên tử</p><b aria-hidden="true"><IcNguyenTu /><span data-dem={k.tong} data-dau="+">+{k.tong}</span></b></div>
@@ -69,18 +69,18 @@ export default function KetBaiThuong({ ketBai: k, phu, hang, bat, onTiep, chuNut
         </div>
       </div>
       <div className="cot-b">
-        <section className="tp-the tp-tach" aria-label="Nguyên tử của bài">
-          <h2>Nguyên tử của bài</h2>
+        <section className="tp-the tp-tach" aria-label="Nguyên tử của chặng">
+          <h2>Nguyên tử của chặng</h2>
           {dong.map((d, i) => <div key={i} className="hang-t" data-khong={d.so === 0 || undefined} data-hh={/hoàn hảo/i.test(d.nhan) && d.so > 0 || undefined}><span>{d.nhan}</span><b>{d.so >= 0 ? '+' : ''}{d.so}</b></div>)}
           <div className="hang-t" data-tong=""><span>Tổng</span><b>+{k.tong} <IcNguyenTu /></b></div>
         </section>
         {(mt || g) && <div className="tp-hai">
           {mt && <section className="tp-the" aria-label="Mục tiêu ngày">
             <div className="tp-dong">
-              <div ref={vong} className="tp-vong" data-dat={dat || undefined} role="img" aria-label={`Mục tiêu ngày ${mt.daXong}/${mt.can} bài`}>
+              <div ref={vong} className="tp-vong" data-dat={dat || undefined} role="img" aria-label={`Mục tiêu ngày ${mt.daXong}/${mt.can} chặng`}>
                 <svg viewBox="0 0 64 64" aria-hidden="true"><circle className="nen" cx="32" cy="32" r="28" /><circle className="chay" cx="32" cy="32" r="28" strokeDasharray={`${Math.min(1, mt.daXong / mt.can) * CHU_VI} 200`} /></svg><b aria-hidden="true">{mt.daXong}/{mt.can}</b></div>
-              <div className="giua">{dat ? <><b>Đạt mục tiêu! · {mt.daXong}/{mt.can} bài</b><span ref={chip} className="tp-dat">+5 <IcTinhThe /> tinh thể</span></>
-                : <><b>Mục tiêu ngày · {mt.daXong}/{mt.can} bài</b><span>Thêm {mt.can - mt.daXong} bài nữa là đạt, nhận +5 <IcTinhThe /></span></>}</div>
+              <div className="giua">{dat ? <><b>Đạt mục tiêu! · {mt.daXong}/{mt.can} chặng</b><span ref={chip} className="tp-dat">+5 <IcTinhThe /> tinh thể</span></>
+                : <><b>Mục tiêu ngày · {mt.daXong}/{mt.can} chặng</b><span>Thêm {mt.can - mt.daXong} chặng nữa là đạt, nhận +5 <IcTinhThe /></span></>}</div>
             </div>
           </section>}
           {g && <section className="tp-the" aria-label="Giải tuần">
