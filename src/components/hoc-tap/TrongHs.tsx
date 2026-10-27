@@ -428,22 +428,34 @@ export function MotTrangHs(p: PropsMotTrang) {
   // dải gọn chỉ dựng từ lần dính đầu (chưa cuộn ⇒ không có bản sao tên bài trong cây); đã dựng thì giữ để thu / hiện mượt
   const daDinh = useRef(false)
   if (dinh) daDinh.current = true
+  // 27/10 MƯỢT (đo scripts/do-muot-hs.mjs): trước đây hiệu ứng này chạy lại SAU MỌI lượt vẽ của Lộ trình và đọc toạ độ ngay ⇒ mỗi lần cổng vẽ lại (mở
+  // màn làm chặng, số cập nhật…) là ép tính bố cục cả trang (~190 ms ở CPU ×6, đúng lúc em bấm «Bắt đầu»). Nay: chỉ đo ngay khi hàng bộ đếm MỚI xuất
+  // hiện; còn lại do ResizeObserver báo (sau khi trình duyệt tự tính bố cục) — theo dõi cả hàng lẫn từng ô / nhãn bên trong (nhãn đặt tuyệt đối đổi cỡ
+  // khi số đổi mà hàng không đổi cỡ). Mỗi lượt vẽ chỉ còn querySelectorAll (không đọc bố cục).
+  const doTren = useRef<{ tr: HTMLElement | null; ro: ResizeObserver | null }>({ tr: null, ro: null })
   useLayoutEffect(() => {
-    const tr = khung.current?.querySelector<HTMLElement>('.da-tren')
+    const tr = khung.current?.querySelector<HTMLElement>('.da-tren') ?? null
+    const d = doTren.current
     // viên đếm nổi (portal ra ngoài khung) ⇒ không còn hàng bộ đếm trên cùng: dải bài ghim sát mép trên (8 px)
-    if (!tr) { datTrenCao(8); return }
+    if (!tr) { d.ro?.disconnect(); d.ro = null; d.tr = null; datTrenCao(8); return }
     // mép dưới THỰC của hàng bộ đếm: tính cả vòng Bi + nhãn «x/y bài» (nhãn đặt tuyệt đối, có thể thò khỏi hàng) + khe 8px (thầy 27/10 «chữ 1/16 vẫn bị cắt»)
+    const CHON = '.tp-tr, .tp-tr-o, .tp-tr-muc, .tp-tr-muc > :not(svg)'
     const do_ = () => {
       const r = tr.getBoundingClientRect()
       let day = r.bottom
-      tr.querySelectorAll('.tp-tr, .tp-tr-o, .tp-tr-muc, .tp-tr-muc > :not(svg)').forEach((e) => { day = Math.max(day, e.getBoundingClientRect().bottom) })
+      tr.querySelectorAll(CHON).forEach((e) => { day = Math.max(day, e.getBoundingClientRect().bottom) })
       datTrenCao(Math.round(day - r.top) + 8)
     }
-    do_()
-    const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(do_) : null
-    ro?.observe(tr)
-    return () => ro?.disconnect()
+    if (d.tr !== tr) {
+      d.ro?.disconnect()
+      d.tr = tr
+      d.ro = typeof ResizeObserver === 'function' ? new ResizeObserver(do_) : null
+      do_()
+    }
+    if (d.ro) { d.ro.observe(tr); tr.querySelectorAll(CHON).forEach((e) => d.ro!.observe(e)) } // quan sát lại là không đổi gì; phần tử mới được theo dõi thêm
+    else do_()
   })
+  useEffect(() => () => { doTren.current.ro?.disconnect() }, [])
   useEffect(() => {
     const m = mocBai.current
     if (!m || typeof IntersectionObserver !== 'function') return

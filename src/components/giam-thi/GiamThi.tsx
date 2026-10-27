@@ -75,6 +75,10 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
     let rong = -1, cao = -1, bongCao = -1, dau = true
     const ghiCo = () => { rong = san.clientWidth; cao = de.offsetHeight; bongCao = bong.offsetHeight }
     const quyet = () => {
+      // 27/10 MƯỢT: đang là bong bóng thường ⇒ đo NGAY ở dáng này trước (lượt bố cục này lần sơn vốn đã cần, không tốn thêm). Chữ L cho chữ RỘNG hơn
+      // ở phần dưới chân giám thị ⇒ khối chữ chỉ thấp đi: dáng thường đã không tràn quá khuyết thì dáng L chắc chắn không cần — khỏi bật thử chữ L
+      // (mỗi lần bật thử = thêm một lượt tính kiểu + bố cục cả màn, ~30–60 ms ở CPU ×6). Câu dài thật sự tràn ⇒ bật thử như cũ.
+      if (!san.hasAttribute('data-l') && !(de.getBoundingClientRect().bottom - bong.getBoundingClientRect().top > khuyet().kh + 12)) return
       san.setAttribute('data-l', '')
       const day = de.getBoundingClientRect().bottom - bong.getBoundingClientRect().top
       if (!(day > khuyet().kh + 12)) san.removeAttribute('data-l')

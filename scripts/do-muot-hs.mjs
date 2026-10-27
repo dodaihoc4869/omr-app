@@ -111,7 +111,7 @@ const DO_TRONG_TRANG = () => {
   window.requestAnimationFrame = (f) => { d.raf++; return goc(f) }
   try { new PerformanceObserver((l) => l.getEntries().forEach((e) => d.dai.push([Math.round(e.startTime), Math.round(e.duration)]))).observe({ type: 'longtask', buffered: true }) } catch {}
   try { new PerformanceObserver((l) => l.getEntries().forEach((e) => e.name === 'first-contentful-paint' && (d.fcp = Math.round(e.startTime)))).observe({ type: 'paint', buffered: true }) } catch {}
-  try { new PerformanceObserver((l) => l.getEntries().forEach((e) => e.interactionId && d.sk.push([e.name, Math.round(e.startTime), Math.round(e.duration), e.interactionId, Math.round(e.processingEnd - e.startTime)]))).observe({ type: 'event', buffered: true, durationThreshold: 16 }) } catch {}
+  try { new PerformanceObserver((l) => l.getEntries().forEach((e) => e.interactionId && d.sk.push([e.name, Math.round(e.startTime), Math.round(e.duration), e.interactionId, Math.round(e.processingEnd - e.startTime), Math.round(e.processingStart - e.startTime), Math.round(e.processingEnd - e.processingStart)]))).observe({ type: 'event', buffered: true, durationThreshold: 16 }) } catch {}
 }
 
 const TIM = (chon) => {
@@ -148,6 +148,8 @@ function tti(dai, tu) {
   return Math.round(moc)
 }
 const inpTu = (sk, tu) => { const m = new Map(); for (const [, t, d, id] of sk) if (t >= tu - 5) m.set(id, Math.max(m.get(id) || 0, d)); return Math.max(0, ...m.values()) }
+/** Chia ba phần của lượt chạm chậm nhất sau `tu`: chờ vào (luồng chính đang bận) · xử lý sự kiện · vẽ khung (kiểu/bố cục/sơn tới khung kế). */
+const chiaBaTu = (sk, tu) => { let b = null; for (const x of sk) if (x[1] >= tu - 5 && (!b || x[2] > b[2])) b = x; return b ? { cho: b[5], xuLy: b[6], ve: Math.max(0, b[2] - b[4]) } : null }
 /** Phần CPU của lượt chạm (chờ vào + xử lý sự kiện, không gồm vẽ khung): processingEnd − startTime. */
 const xuLyTu = (sk, tu) => { let m = 0; for (const [, t, , , x] of sk) if (t >= tu - 5) m = Math.max(m, x || 0); return m }
 const taiTheoLoai = (p, den = Infinity) => p.evaluate((den) => {
@@ -174,7 +176,7 @@ const doKhung = (p, ms) => p.evaluate((ms) => new Promise((xong) => {
 const KHAM = arg('kham', '') === '1'
 const HO_SO = arg('ho-so', '')
 async function batHoSo(cdp, ten) { if (HO_SO !== ten) return
-  if (arg('vet-tl', '') === '1') { const sk = []; cdp.on('Tracing.dataCollected', (e) => sk.push(...e.value)); cdp.__sk = sk; await cdp.send('Tracing.start', { categories: 'devtools.timeline,disabled-by-default-devtools.timeline,disabled-by-default-devtools.timeline.invalidationTracking,blink' + (arg('chon-loc', '') ? ',disabled-by-default-blink.debug' : ''), transferMode: 'ReportEvents' }) }
+  if (arg('vet-tl', '')) { const sk = []; cdp.on('Tracing.dataCollected', (e) => sk.push(...e.value)); cdp.__sk = sk; await cdp.send('Tracing.start', { categories: 'devtools.timeline,disabled-by-default-devtools.timeline' + (arg('vet-tl') === '2' ? '' : ',disabled-by-default-devtools.timeline.invalidationTracking,blink') + (arg('chon-loc', '') ? ',disabled-by-default-blink.debug' : ''), transferMode: 'ReportEvents' }) }
   await cdp.send('Profiler.enable'); await cdp.send('Profiler.setSamplingInterval', { interval: 100 }); await cdp.send('Profiler.start') }
 async function inHoSo(cdp, ten) {
   if (HO_SO !== ten) return
@@ -318,7 +320,7 @@ try {
     const tLt = await choThay(p, LO_TRINH)
     await p.waitForTimeout(5000)
     const d = await layDo(p)
-    kq.moLai = { fcp: d.fcp, noiDung: Math.round(tLt), chamDuoc: tti(d.dai, tLt), taskMax: daiNhat(d.dai), quaMang: await taiTheoLoai(p) }
+    kq.moLai = { fcp: d.fcp, noiDung: Math.round(tLt), chamDuoc: tti(d.dai, tLt), taskMax: daiNhat(d.dai), quaMang: await taiTheoLoai(p), dai: d.dai.filter(([t]) => t >= tLt - 500).map(([t, du]) => `${t}+${du}`) }
   }
   buoc('lo-trinh')
   // 3. Lộ trình đứng yên + cuộn
@@ -337,12 +339,17 @@ try {
     if (!(await p.evaluate(() => !!document.querySelector('[role="radio"]')))) {
       theMs = Math.round(tThe - t0)
       await p.waitForTimeout(500)
+      await batHoSo(cdp, 'vao')
       tBam = await bayGio(p)
       await cham(p, 're=^(Bắt đầu|Tiếp tục|BẮT ĐẦU|TIẾP TỤC)$')
     }
     const t1 = await choThay(p, PHUONG_AN)
     await p.waitForTimeout(1500)
+    await inHoSo(cdp, 'vao')
     const d = await layDo(p)
+    // tệp / lệnh tải trong lúc chuyển màn (mốc tính từ lúc bấm), tác vụ dài trong khoảng ấy
+    kq.vaoChangTai = await p.evaluate(([a, b]) => performance.getEntriesByType('resource').filter((e) => e.startTime >= a - 5 && e.startTime <= b).map((e) => `${e.name.split('/').pop().replace(/-[\w-]{8}\.(js|css)$/, '.$1').slice(0, 40)} ${Math.round(e.startTime - a)}→${Math.round(e.responseEnd - a)}${e.transferSize ? '' : ' (đệm)'}`), [tBam, t1])
+    kq.vaoChangDai = d.dai.filter(([t]) => t >= tBam - 5 && t <= t1).map(([t, du]) => `${Math.round(t - tBam)}+${du}`)
     kq.vaoChang = { theChangMs: theMs, chuyenMs: Math.round(t1 - tBam), inp: inpTu(d.sk, t0), taskMax: daiNhat(d.dai, t0) }
   }
   // 5. Làm câu
@@ -391,7 +398,7 @@ try {
     await p.waitForTimeout(600)
     if (i === 1) await inHoSo(cdp, 'bamPa')
     let d = await layDo(p)
-    m.bamPa = { inp: inpTu(d.sk, t0), xuLy: xuLyTu(d.sk, t0), taskMax: daiNhat(d.dai, t0) }
+    m.bamPa = { inp: inpTu(d.sk, t0), xuLy: xuLyTu(d.sk, t0), ba: chiaBaTu(d.sk, t0), taskMax: daiNhat(d.dai, t0) }
     t0 = await bayGio(p)
     if (i === 1) await batHoSo(cdp, 'kiem')
     await cham(p, NUT_KIEM)
@@ -412,7 +419,7 @@ try {
     await p.waitForTimeout(800)
     d = await layDo(p)
     if (i === 1) await inHoSo(cdp, 'tiep')
-    m.tiep = { inp: inpTu(d.sk, t0), xuLy: xuLyTu(d.sk, t0), chuyenCau: Math.round(t2 - t0), taskMax: daiNhat(d.dai, t0) }
+    m.tiep = { inp: inpTu(d.sk, t0), xuLy: xuLyTu(d.sk, t0), ba: chiaBaTu(d.sk, t0), chuyenCau: Math.round(t2 - t0), taskMax: daiNhat(d.dai, t0) }
     cau.push(m)
   }
   kq.cau = cau

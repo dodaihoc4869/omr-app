@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { lazy, startTransition, Suspense, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, Clock, Flame, Info, Lightbulb, PenLine, RefreshCw, Target, X as XIcon } from 'lucide-react'
 import { ChemText } from '../../lib/chem-format'
 import '../../lib/chem-trinh-bay' // thầy 27/10: phương trình rõ ràng (khoảng hẹp quanh toán tử, ⇌ cỡ chữ, «l» có đuôi) — chỉ app học sinh
@@ -376,7 +376,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     const kh = goc ? khungCuonCua(goc) : null
     if (goc && kh) { const lech = goc.getBoundingClientRect().top - kh.getBoundingClientRect().top; if (lech) kh.scrollTop += lech; daVeDau.current = true }
     else if (goc && !kh && goc.getBoundingClientRect().top === 0) daVeDau.current = true // không khung nào cuộn được, màn đã ở đầu ⇒ khỏi cuộn
-    if (duo) truotRa(than, 180, r)
+    if (duo) truotRa(than, 180, r, 'svg.gtv')
   }
   // Hết câu của chặng mà có câu TỰ LÀM SAI ⇒ xin vòng làm lại MỘT lần. Rỗng / lỗi mạng ⇒ vào màn kết chặng như cũ. Đang xin ⇒ chạm lặp không kết chặng giữa chừng.
   const xinLamLai = async () => {
@@ -396,11 +396,17 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   const soDung = goc.filter((c, i) => ttCau(c, i) === 'dung').length
   const cauSai = goc.flatMap((c, i) => ttCau(c, i) === 'sai' ? [i + 1] : [])
   const lamLaiDung = lamLai.filter(c => ket[c.qid]?.correct === true).length
+  // 27/10 MƯỢT (máy yếu, đo CPU ×6): dựng câu kế trong lượt «chuyển tiếp» của React — chia nhỏ, không giữ luồng chính một mạch 250–350 ms ⇒ nút vừa
+  // bấm lún ngay, câu mới hiện ngay sau đó. Máy thường giữ dựng ngay (cùng khung với hiệu ứng trượt câu cũ). `dangSang` chặn chạm đúp khi câu kế chưa hiện.
+  const dangSang = useRef(-1)
   const tiep = () => {
-    if (gui.current) return
+    if (gui.current || dangSang.current === viTri) return
     setLoi('')
     setCombo(null) // băng combo chỉ sống ở câu vừa đúng — sang câu mới thì tắt, không che đề
-    if (viTri + 1 < cau.length) { truotCauCu(); setViTri(i => i + 1) }
+    if (viTri + 1 < cau.length) {
+      // máy yếu không có hiệu ứng trượt; cuộn về đầu để sau khi câu mới dựng (không kéo câu cũ lên đầu trong lúc chờ)
+      if (yenLang()) { dangSang.current = viTri; startTransition(() => setViTri(i => i + 1)) } else { truotCauCu(); setViTri(i => i + 1) }
+    }
     else if (goi7 && !daXinLamLai.current && !laLamLai && cauSai.length > 0) void xinLamLai()
     else ketThuc()
   }
