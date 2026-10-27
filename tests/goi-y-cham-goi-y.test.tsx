@@ -53,13 +53,14 @@ describe('mở dần 3 tầng + soi sáng', () => {
     expect(onHoTro).toHaveBeenCalledTimes(1)
   })
 
-  it('chạm thừa số «2» ⇒ ba số trước sáng (✓), «2» đặc, các số sau mờ; bóng nói nghĩa', async () => {
+  it('chạm thừa số «2» ⇒ ba số trước sáng (✓), «2» đặc, các số sau mờ; nghĩa + «tới đây» hiện thẳng ở danh sách', async () => {
     render(<VungChamDe q={{ qid: 'q-pyrite' }} tuDien={TU_DIEN_GIA} taiGoiY={async () => BAN_LO}><De text={DE_PYRITE} /></VungChamDe>)
     fireEvent.click((await screen.findByRole('button', { name: /Bắt đầu từ đâu/ })))
     await screen.findByText(/Theo dấu nguyên tố S/)
     fireEvent.click(screen.getByRole('button', { name: /Gợi ý tiếp/ }))
     fireEvent.click(screen.getByRole('button', { name: /Gợi ý tiếp/ }))
-    expect(document.querySelector('.gyc-bong-so')!.textContent).toContain('Chạm từng số')
+    // thầy 27/10: bỏ ô «Em đang chạm…» / «Chạm từng số…» — giải thích hiện thẳng ở danh sách
+    expect(document.querySelector('.gyc-bong-so')).toBeNull()
     const so2 = screen.getByRole('button', { name: 'Thừa số 4: 2' })
     fireEvent.click(so2)
     const thua = [...document.querySelectorAll('.gyc-thua')]
@@ -67,13 +68,13 @@ describe('mở dần 3 tầng + soi sáng', () => {
     expect(so2.classList).toContain('gyc-dang')
     expect(so2.getAttribute('aria-pressed')).toBe('true')
     expect(thua.slice(4).every((t) => t.classList.contains('gyc-sau'))).toBe(true)
-    const bong = document.querySelector('.gyc-bong-so')!.textContent!
-    expect(bong).toContain('bảo toàn S')
-    expect(bong).toContain('tới đây là: số mol SO')
+    const dong = document.querySelectorAll('.gyc-dong-yn')[3]!.textContent!
+    expect(dong).toContain('bảo toàn S')
+    expect(dong).toContain('tới đây là: số mol SO')
     expect(document.querySelectorAll('.gyc-dong-yn.gyc-qua svg').length).toBe(3)
     // phân số vẽ chồng (tử / mẫu)
     expect(screen.getByRole('button', { name: 'Thừa số 2: 8/100' }).querySelector('b')!.textContent).toBe('8')
-    expect(screen.getByRole('button', { name: 'Thừa số 1: 10^6' }).querySelector('sup')!.textContent).toBe('6')
+    expect(screen.getByRole('button', { name: 'Thừa số 1: 10^6' }).textContent).toBe('10⁶') // 27/10: ký tự mũ Unicode (thầy «mũ 6»)
   })
 })
 

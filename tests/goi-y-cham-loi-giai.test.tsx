@@ -19,8 +19,8 @@ describe('KhoiLoiGiaiCoSoDo (soDo)', () => {
     expect(screen.queryByText(/80000\/120/)).toBeNull()
     expect(screen.queryByText('Kiến thức cốt lõi')).toBeNull()
     expect(screen.getByText('LỜI GIẢI')).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: 'Thừa số 6: 90/100' }))
-    expect(document.querySelector('.gyc-bong-so')!.textContent).toContain('tính xuôi')
+    expect(document.querySelector('.gyc-bong-so')).toBeNull()
+    expect([...document.querySelectorAll('.gyc-dong-yn')].map((d) => d.textContent).join(' ')).toContain('tính xuôi')
   })
 
   it('không có soDo ⇒ lời giải cũ y như trước (cùng DOM với KhoiLoiGiaiChuan)', () => {
@@ -44,5 +44,29 @@ describe('KhoiLoiGiaiCoSoDo (soDo)', () => {
     await screen.findByText('Tóm tắt của thầy Đỗ Đại Học')
     expect(screen.getByText('Thiếu hiệu suất.')).toBeTruthy()
     expect(document.querySelector('.lg-y[data-dung="1"] .lg-ma')!.textContent).toBe('B.')
+  })
+})
+
+describe('27/10 thầy (ảnh paracetamol): mũ, tên chất làm chỉ số, không đè chữ', () => {
+  it('ChuCo: số mũ ⇒ ký tự mũ Unicode; tên chất sau «_» ⇒ cả tên hạ chỉ số; công thức giữ như cũ', async () => {
+    const { ChuCo } = await import('../src/components/goi-y-cham/so-do-thay')
+    const h = (chu: string) => { const r = render(<ChuCo chu={chu} />); const v = r.container.innerHTML; r.unmount(); return v }
+    expect(h('1,5·10^6 viên thuốc')).toBe('1,5·10⁶ viên thuốc')
+    expect(h('10^-6')).toBe('10⁻⁶')
+    expect(h('n_paracetamol')).toBe('n<sub>paracetamol</sub>')
+    expect(h('n_p-nitrophenol')).toBe('n<sub>p-nitrophenol</sub>')
+    expect(h('FeS_2')).toBe('FeS<sub>2</sub>')
+    expect(h('H_2SO_4')).toBe('H<sub>2</sub>SO<sub>4</sub>')
+    expect(h('C_nH_{2n}')).toBe('C<sub>n</sub>H<sub>2n</sub>')
+    expect(h('n_CO2')).toBe('n<sub>CO2</sub>')
+  })
+})
+
+describe('27/10 thầy: V_mL, n_H2SO4, sơ đồ luôn ngang', () => {
+  it('ChuCo đọc đúng chỉ số đơn vị / công thức', async () => {
+    const { ChuCo } = await import('../src/components/goi-y-cham/so-do-thay')
+    const h = (chu: string) => { const r = render(<ChuCo chu={chu} />); const v = r.container.innerHTML; r.unmount(); return v }
+    expect(h('V_mL')).toBe('V<sub>mL</sub>')
+    expect(h('n_H2SO4')).toBe('n<sub>H2SO4</sub>')
   })
 })

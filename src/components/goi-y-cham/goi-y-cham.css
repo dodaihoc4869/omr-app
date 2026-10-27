@@ -162,7 +162,7 @@
 .gyc-gy-tai{padding:14px;border-radius:16px;background:var(--tr-mat);border:1px solid var(--tr-vien);color:var(--tr-chu-3);font-size:14.5px}
 
 /* TÓM TẮT CỦA THẦY ĐỖ ĐẠI HỌC — chép đúng nét vở: tổng lượng TRÁI vạch dọc; chất, dưới nó số liệu xếp CỘT DỌC; mũi tên, H ghi TRÊN mũi tên */
-.gyc-sd{display:flex;align-items:flex-start;gap:12px;max-width:600px;margin-top:10px;padding:18px 16px;border-radius:14px;background:var(--tr-mat-2)}
+.gyc-sd{display:flex;align-items:flex-start;gap:12px;max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;margin-top:10px;padding:18px 16px;border-radius:14px;background:var(--tr-mat-2)} /* 27/10: luôn ngang, dài thì cuộn */
 .gyc-tang .gyc-sd{background:var(--tr-mat-2)}
 .gyc-sd-cot{display:flex;align-items:stretch;flex:none}
 .gyc-sd-goc{display:flex;align-items:flex-start;padding:4px 12px 4px 0;border-right:2px solid var(--tr-chu-2);font-weight:600;color:var(--tr-tin-chu);font-size:14.5px;line-height:22px;white-space:nowrap}
@@ -172,7 +172,7 @@
 .gyc-sd-ct{font-weight:700;color:var(--tr-chu);font-size:17px;line-height:30px;white-space:nowrap}
 .gyc-sd-sl{color:var(--tr-tin-chu);font-weight:600;font-size:14.5px;line-height:1.3;white-space:nowrap}
 .gyc-sd-sl.gyc-hoi-sd{color:var(--tr-chu-y-chu);background:var(--tr-chu-y-nhat);border-radius:8px;padding:1px 8px;font-weight:700}
-.gyc-sd-mui{flex:1;min-width:90px;position:relative;height:3px;margin-top:15px;border-radius:3px;background:var(--tr-hs)}
+.gyc-sd-mui{flex:1 0 90px;min-width:90px;position:relative;height:3px;margin-top:15px;border-radius:3px;background:var(--tr-hs)}
 .gyc-sd-mui::after{content:"";position:absolute;right:-3px;top:-6px;border:7.5px solid transparent;border-left:11px solid var(--tr-hs);border-right:0}
 .gyc-sd-H{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);white-space:nowrap;font-size:14px;font-weight:700;color:var(--tr-hs-chu)}
 .gyc-quy-uoc{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
@@ -193,10 +193,10 @@
 .gyc-bong-so{margin-top:12px;padding:12px 14px;border-radius:14px;background:var(--tr-hs-nut);color:var(--tr-hs-tren);font-size:15px;line-height:1.55}
 .gyc-bong-so.gyc-cho-cham{background:var(--tr-hs-nhat);color:var(--tr-hs-chu)}
 .gyc-y-nghia{margin-top:14px;display:grid;gap:6px}
-.gyc-dong-yn{display:grid;grid-template-columns:28px 92px minmax(0,1fr);gap:10px;align-items:center;padding:8px 10px;border-radius:12px;font-size:14.5px;color:var(--tr-chu-2)}
+.gyc-dong-yn{display:grid;grid-template-columns:28px var(--gyc-cot-so,92px) minmax(0,1fr);gap:10px;align-items:center;padding:8px 10px;border-radius:12px;font-size:14.5px;color:var(--tr-chu-2)}
 .gyc-dong-yn .gyc-tt{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--tr-mat-3);font-size:12px;font-weight:600;color:var(--tr-chu-3)}
 .gyc-dong-yn .gyc-tt svg{width:14px;height:14px}
-.gyc-dong-yn .gyc-ps-chu{font-weight:600;color:var(--tr-chu);font-variant-numeric:tabular-nums}
+.gyc-dong-yn .gyc-ps-chu{font-weight:600;color:var(--tr-chu);font-variant-numeric:tabular-nums;min-width:0;white-space:nowrap} /* 27/10: cột số rộng theo thừa số dài nhất (--gyc-cot-so), «· 1/0,035» không gãy dòng */
 .gyc-dong-yn.gyc-qua .gyc-tt{background:var(--tr-hs-nhat);color:var(--tr-hs-chu)}
 .gyc-dong-yn.gyc-dang{background:var(--tr-hs-nhat);color:var(--tr-hs-chu)}
 .gyc-dong-yn.gyc-dang .gyc-tt{background:var(--tr-hs);color:var(--tr-hs-tren)}
@@ -232,7 +232,7 @@ html[data-gyc-cot-phai]{--gyc-cot-phai:320px}
   .gyc-goi-y.gyc-o-cot .gyc-tang>.gyc-o-icon{float:left;width:30px;height:30px;margin:0 10px 4px 0}
   .gyc-goi-y.gyc-o-cot .gyc-tang .gyc-t-ten{min-height:30px}
   .gyc-goi-y.gyc-o-cot .gyc-tang>div>:not(.gyc-t-ten){clear:both}
-  .gyc-goi-y.gyc-o-cot .gyc-dong-yn{grid-template-columns:24px 64px minmax(0,1fr);gap:8px;padding:8px 6px;font-size:14px}
+  .gyc-goi-y.gyc-o-cot .gyc-dong-yn{grid-template-columns:24px var(--gyc-cot-so,64px) minmax(0,1fr);gap:8px;padding:8px 6px;font-size:14px}
   .gyc-goi-y.gyc-o-cot .gyc-tna-khung{grid-template-columns:1fr}
   .gyc-goi-y.gyc-o-cot .gyc-tna-buoc{grid-template-columns:64px minmax(0,1fr);justify-items:start;text-align:left;align-items:center}
   .gyc-goi-y.gyc-o-cot .gyc-tna-buoc svg{width:56px;height:64px;grid-row:span 3}
@@ -240,7 +240,7 @@ html[data-gyc-cot-phai]{--gyc-cot-phai:320px}
   .gyc-goi-y.gyc-o-cot .gyc-gy-cuoi .gyc-nut{flex:1 1 100%}
   .gyc-goi-y.gyc-o-cot .gyc-gy-cuoi .gyc-nut.gyc-chinh{margin-left:0}
 }
-/* Tóm tắt trong cột hẹp (cột phải 320px) và điện thoại dọc: xếp DỌC, mũi tên chỉ xuống, H bên phải mũi tên */
+/* Điện thoại dọc: khung gọn (tóm tắt vẫn NGANG, cuộn ngang — thầy 27/10) */
 @media (max-width:639px){
   .gyc-goi-y{padding:14px 12px 14px;margin:16px -6px 0}
   .gyc-tang{display:block;padding:12px}
@@ -248,7 +248,7 @@ html[data-gyc-cot-phai]{--gyc-cot-phai:320px}
   .gyc-tang .gyc-t-ten{min-height:30px}
   .gyc-tang .gyc-t-ten small{flex-basis:100%}
   .gyc-tang>div>:not(.gyc-t-ten){clear:both}
-  .gyc-dong-yn{grid-template-columns:24px 62px minmax(0,1fr);gap:8px;padding:8px 6px;font-size:14px}
+  .gyc-dong-yn{grid-template-columns:24px var(--gyc-cot-so,62px) minmax(0,1fr);gap:8px;padding:8px 6px;font-size:14px}
   .gyc-chuoi{font-size:16px}
   .gyc-gy-cuoi .gyc-nut{flex:1 1 100%}
   .gyc-gy-cuoi .gyc-nut.gyc-chinh{margin-left:0}
@@ -257,17 +257,15 @@ html[data-gyc-cot-phai]{--gyc-cot-phai:320px}
   .gyc-tna-buoc svg{width:64px;height:76px;grid-row:span 3}
   .gyc-tna-buoc>:not(svg){grid-column:2}
 }
-@media (max-width:639px){
-  .gyc-sd{flex-direction:column;align-items:center;gap:6px}
-  .gyc-sd-mui{flex:none;min-width:0;width:3px;height:56px;margin:4px 0 8px}
-  .gyc-sd-mui::after{right:auto;left:-6px;top:auto;bottom:-3px;border:7.5px solid transparent;border-top:11px solid var(--tr-hs);border-bottom:0}
-  .gyc-sd-H{left:14px;bottom:auto;top:50%;transform:translateY(-50%)}
-}
-/* Không đủ bề ngang cho bản ngang (cột phải hẹp, khung lời giải hẹp) ⇒ SoDoThay tự đo và gắn .gyc-sd-doc: xếp DỌC y như bản điện thoại */
+
+/* Bản DỌC của tóm tắt — thầy 27/10 bỏ tự xếp dọc (luôn ngang, cuộn ngang); giữ lớp .gyc-sd-doc (không còn gắn) để giữ nguyên màu mũi tên dọc nếu cần bật lại */
 .gyc-sd.gyc-sd-doc{flex-direction:column;align-items:center;gap:6px}
 .gyc-sd.gyc-sd-doc .gyc-sd-mui{flex:none;min-width:0;width:3px;height:56px;margin:4px 0 8px}
 .gyc-sd.gyc-sd-doc .gyc-sd-mui::after{right:auto;left:-6px;top:auto;bottom:-3px;border:7.5px solid transparent;border-top:11px solid var(--tr-hs);border-bottom:0}
 .gyc-sd.gyc-sd-doc .gyc-sd-H{left:14px;bottom:auto;top:50%;transform:translateY(-50%)}
+@media (max-width:639px){
+  .gyc-sd.gyc-sd-doc .gyc-sd-mui::after{right:auto;left:-6px;top:auto;bottom:-3px;border:7.5px solid transparent;border-top:11px solid var(--tr-hs);border-bottom:0}
+}
 
 /* ── 6. Lời giải kiểu sơ đồ (sau khi nộp) ────────────────────────────────────────────────────────────────── */
 .gyc-lgsd{display:grid;gap:12px;color:var(--tr-chu-2);font-size:15px;line-height:1.6;text-align:left}
