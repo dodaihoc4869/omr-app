@@ -1,0 +1,37 @@
+# TẢI D1 GIỜ CAO ĐIỂM (CHỈ ĐỌC — GraphQL Analytics d1QueriesAdaptiveGroups, số gộp, SQL có tham số `?`, không dữ liệu em). Khung 19:00–23:00 VN
+# (12:00–16:00 UTC) ngày 26/10 và 27/10: xếp hạng câu SQL theo tổng thời gian chạy; tổng cả khung để tính phần trăm.
+name: Đo tải D1 giờ cao điểm (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/do-nop-2710]
+    paths: [.github/workflows/do-tai-cao-diem-2710.yml]
+permissions:
+  contents: read
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Truy vấn Analytics
+        env:
+          TK: ${{ env.CF_TOKEN_SACH }}
+          AC: ${{ env.CF_ACC_SACH }}
+        run: |
+          DB=d2e6d322-374a-45d7-83a3-9fac486b23f1
+          hoi() { # $1 nhãn, $2 từ, $3 đến
+            Q=$(jq -n --arg a "$AC" --arg db "$DB" --arg t1 "$2" --arg t2 "$3" '{query:"query($a:String!,$db:String!,$t1:Time!,$t2:Time!){viewer{accounts(filter:{accountTag:$a}){tong:d1QueriesAdaptiveGroups(limit:1,filter:{databaseId:$db,datetime_geq:$t1,datetime_leq:$t2}){count sum{queryDurationMs rowsRead rowsWritten}} top:d1QueriesAdaptiveGroups(limit:40,filter:{databaseId:$db,datetime_geq:$t1,datetime_leq:$t2},orderBy:[sum_queryDurationMs_DESC]){count sum{queryDurationMs rowsRead rowsWritten} dimensions{query}}}}}",variables:{a:$a,db:$db,t1:$t1,t2:$t2}}')
+            curl -sS https://api.cloudflare.com/client/v4/graphql -H "Authorization: Bearer $TK" -H 'content-type: application/json' --data "$Q" > /tmp/g.json
+            echo "===== $1 ($2 → $3)"
+            jq -r '.errors // empty' /tmp/g.json | head -c 800
+            jq -r '.data.viewer.accounts[0].tong[0] | "TỔNG: lần \(.count) · ms \(.sum.queryDurationMs|floor) · đọc \(.sum.rowsRead) · ghi \(.sum.rowsWritten)"' /tmp/g.json
+            jq -r '(.data.viewer.accounts[0].tong[0].sum.queryDurationMs) as $T | .data.viewer.accounts[0].top[] | "\((100*.sum.queryDurationMs/$T*10|floor)/10)% | \(.count) | \(.sum.queryDurationMs|floor) ms | đọc \(.sum.rowsRead) | ghi \(.sum.rowsWritten) | \(.dimensions.query|gsub("\\s+";" ")|.[0:170])"' /tmp/g.json
+          }
+          hoi "26/10 19–23h VN" 2026-10-26T12:00:00Z 2026-10-26T16:00:00Z
+          hoi "27/10 19–23h VN" 2026-10-27T12:00:00Z 2026-10-27T16:00:00Z
