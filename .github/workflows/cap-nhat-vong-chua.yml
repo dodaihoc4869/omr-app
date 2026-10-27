@@ -2,6 +2,11 @@ name: Cập nhật siêu vòng lặp theo chiến dịch
 
 on:
   workflow_dispatch:
+    inputs:
+      ep:
+        description: 'Chạy cả trong giờ cao điểm 18:00–23:59 VN (mặc định: hoãn)'
+        type: boolean
+        default: false
   schedule:
     - cron: '17 */2 * * *'
   workflow_run:
@@ -24,30 +29,45 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
+      # GIỜ CAO ĐIỂM (thầy 27/10: «App phải tức thì ở mọi khung giờ»). Đo D1 thật (wrangler d1 insights 24h + tail 20:40 VN): mỗi lượt cập nhật quét toàn
+      # bảng sổ (~443 nghìn dòng / 1,5 s) rồi gọi giaoDotCuaEm cho từng cặp em–câu (~6 câu D1 mỗi cặp, ~200 nghìn lần/ngày, ~1 300 giây D1/ngày); tối 27/10
+      # chạy nối nhau 19:56–21:25 VN (mỗi lần phát hành một lượt) đúng lúc em học ⇒ D1 xếp hàng, nộp câu p50 3,9 s. Câu sai mới vào đợt NGAY bằng trigger
+      # `chua_giao_sai_sau_ghi`; lượt này chỉ bù ⇒ 18:00–23:59 VN HOÃN (lượt hẹn giờ / phát hành kế tiếp ngoài giờ ấy tự chạy bù). Bấm tay với ep=true để ép chạy.
+      - name: Hoãn trong giờ cao điểm
+        id: gio
+        run: |
+          H=$(TZ=Asia/Ho_Chi_Minh date +%H)
+          if [ "${{ inputs.ep }}" != "true" ] && [ "$H" -ge 18 ]; then echo "hoan=1" >> "$GITHUB_OUTPUT"; echo "Giờ VN $H: hoãn cập nhật vòng chữa (giờ cao điểm), lượt sau tự chạy bù."; fi
       - uses: actions/checkout@v4
+        if: steps.gio.outputs.hoan != '1'
         with:
           ref: main
       - uses: actions/setup-node@v4
+        if: steps.gio.outputs.hoan != '1'
         with:
           node-version: 24
           cache: npm
       - run: npm ci
+        if: steps.gio.outputs.hoan != '1'
       - name: Làm sạch khóa Cloudflare
+        if: steps.gio.outputs.hoan != '1'
         env:
           T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: bash scripts/lam-sach-khoa-cf.sh
       - name: Kiểm công cụ cập nhật trước khi dùng dữ liệu thật
+        if: steps.gio.outputs.hoan != '1'
         run: |
           npx vitest run tests/chua-d1-van-hanh.test.ts tests/chua-giao-van-hanh.test.ts --reporter=dot
           npx esbuild scripts/cap-nhat-vong-chua.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/chua-cap-nhat.mjs --log-level=warning
       - name: Bù câu sai mới và mở vòng đã đủ học liệu
+        if: steps.gio.outputs.hoan != '1'
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
         run: node /tmp/chua-cap-nhat.mjs
       - name: Dọn Worker giao tạm kể cả khi job dừng
-        if: ${{ always() && env.CF_TOKEN_SACH != '' }}
+        if: ${{ always() && steps.gio.outputs.hoan != '1' && env.CF_TOKEN_SACH != '' }}
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
