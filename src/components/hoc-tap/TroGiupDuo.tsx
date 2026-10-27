@@ -4,7 +4,7 @@
 // Các mục là CHÍNH các nút cũ (màn cha đưa vào `children`, kể cả ô portal của «Bắt đầu từ đâu?») ⇒ hành vi, đánh dấu «có hỗ trợ», aria giữ nguyên.
 // Tấm luôn nằm trong DOM (ẩn bằng `hidden`) để ô portal và nút «Hỏi thầy» không bị dựng lại khi đóng / mở.
 import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
-import { Lightbulb } from 'lucide-react'
+import { CircleHelp } from 'lucide-react'
 import { phanHoi } from '../../lib/phan-hoi'
 import './tro-giup-duo.css'
 
@@ -53,7 +53,7 @@ export function TroGiupDuo({ children, nut }: { children: ReactNode; nut: ReactN
       <div ref={goc} className="duo-tg" hidden={!co}>
         <button ref={nutTg} type="button" className="duo-tg-nut" aria-label="Trợ giúp" aria-expanded={mo} aria-controls={id} data-mo={mo || undefined}
           onClick={() => { phanHoi('chon'); setMo((v) => !v) }}>
-          <Lightbulb size={24} strokeWidth={2.2} aria-hidden="true" />
+          <CircleHelp size={24} strokeWidth={2.2} aria-hidden="true" />
         </button>
         {/* chọn một mục ⇒ mục chạy việc của nó (cùng lượt sự kiện) rồi tấm đóng */}
         <div ref={tam} id={id} className="duo-tg-tam" role="group" aria-label="Trợ giúp của câu này" hidden={!mo}
