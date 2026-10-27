@@ -150,7 +150,10 @@ const CAU_PT: CauGia[] = [
 // ═══ hết PHƯƠNG TRÌNH 27/10
 // ═══ GIÁM THỊ 27/10: `&gt=nb|th|vd|vdc` ⇒ mọi câu mang mức ấy (giám thị tương ứng); `&gtde=ngan` ⇒ thêm câu đề NGẮN (L2, đáp án B) lên đầu chặng Duo.
 const MUC_GT = ({ nb: 'biet', th: 'hieu', vd: 'van_dung', vdc: 'van_dung_cao', khong: '' } as Record<string, string>)[thamSo.get('gt') ?? ''] // khong ⇒ câu không mức (đo nền)
-const CAU_DUO_GT = thamSo.get('gtde') === 'ngan' ? [{ ...CAU[1]!, qid: 'GT1' }, ...CAU_DUO_CHAM] : CAU_DUO_CHAM
+// `&gtde=dai` ⇒ câu đề DÀI ~15 dòng (ảnh thầy gửi 27/10, câu toluidine) lên đầu chặng: khung chữ L ôm giám thị.
+const CAU_TOLUIDINE: CauGia = { ...nen, qid: 'GT2', maDe: 'BAI8', phan: 'I', tenDang: 'Tính base của amine', text: 'Toluidine là một nhóm chất amine thơm bậc I, trong đó đồng phân ortho được dùng để sản xuất thuốc trừ sâu metolachlor và acetochlor. Các đồng phân toluidine khác được sử dụng trong sản xuất thuốc nhuộm. Phổ khối lượng (MS) cho biết toluidine có phân tử khối 107. Kết quả phân tích nguyên tố cho biết phần trăm khối lượng các nguyên tố carbon, hydrogen và nitrogen trong phân tử toluidine lần lượt bằng 78,50; 8,42 và 13,08.\n\nCông thức cấu tạo nào sau đây không đúng với toluidine?',
+  choices: ['o-CH3-C6H4-NH2.', 'm-CH3-C6H4-NH2.', 'p-CH3-C6H4-NH2.', 'C6H5-CH2-NH2.'], ideas: [], dapAn: 'D', loiGiai: { chot: 'C6H5-CH2-NH2 là benzylamine (amine bậc I nhưng N không gắn vào vòng), không phải toluidine.' } }
+const CAU_DUO_GT = thamSo.get('gtde') === 'ngan' ? [{ ...CAU[1]!, qid: 'GT1' }, ...CAU_DUO_CHAM] : thamSo.get('gtde') === 'dai' ? [CAU_TOLUIDINE, ...CAU_DUO_CHAM] : CAU_DUO_CHAM
 const ds0 = kieu === 'duo-bang' ? CAU_BANG : kieu === 'duo-pt' ? CAU_PT : kieu === 'duo-nc' ? CAU_NC : kieu === 'duo-xau' ? CAU_XAU : kieu === 'duo' ? CAU_DUO_GT : kieu === 'g7' ? CAU_G7 : kieu === 'ds-dau' ? [CAU[3]!, CAU[4]!, CAU[5]!] : kieu === 'so-o' ? CAU_SO_O : CAU
 const ds = MUC_GT !== undefined ? ds0.map((c) => ({ ...c, mucDo: MUC_GT || null })) : ds0
 const GOI7 = { bat: true, ngay: '2026-10-12', toiThieu: 24, daLamHomNay: 12, tuLamCon: 9, tiepCanCon: 3, thieuPhu: 0, thieuNgay: 0, canHoTro: false, kienThucCu: { tong: 0, dat: 0, tyLe: null },

@@ -4,8 +4,8 @@
 //   20 giây không thao tác ⇒ chờ (gõ tay / chân) · quá giờ theo mức ⇒ xem đồng hồ · bấm Kiểm tra trong 4 giây đầu ⇒ liếc nghi ngờ, còn lại ⇒ cúi nhìn ·
 //   đúng ⇒ mừng theo tính cách (đúng liền ≥ 3 ⇒ combo) · sai ⇒ xị mặt · câu chưa tính ⇒ lắc ngón tay · học có hỗ trợ / chờ thầy ⇒ đứng coi.
 // Lời càu nhàu (loi-giam-thi.ts) theo nhịp chung cả phiên, tối đa 1 lần mỗi 2–3 câu. Tab ẩn ⇒ dừng hết (hoạt ảnh + hẹn giờ).
-import { useEffect, useRef, type CSSProperties } from 'react'
-import { taoGiamThi, type GiamThi, type MucGT, type TrangThaiGT } from './giam-thi-ve'
+import { useEffect, useLayoutEffect, useRef, type CSSProperties } from 'react'
+import { duongL, khuyetL, taoGiamThi, type GiamThi, type MucGT, type TrangThaiGT } from './giam-thi-ve'
 import { cauMoi, suLoi, taoNhip, type NguCanhLoi, type NhipLoi } from './loi-giam-thi'
 import './giam-thi.css'
 
@@ -51,6 +51,23 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
     }
     return () => { window.removeEventListener('resize', doRong); huyHen(); g.huy(); gt.current = null }
   }, [muc, qid]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Đề dài: vẽ viền chữ L theo cỡ thật của bong bóng (đổi cỡ ⇒ vẽ lại). Khuyết lấy từ --gt-nvw, cùng công thức với CSS.
+  useLayoutEffect(() => {
+    const san = host.current?.closest<HTMLElement>('.duo-gt-san'), bong = san?.querySelector<HTMLElement>('.duo-gt-bong')
+    const svg = bong?.querySelector<SVGSVGElement>(':scope > .duo-gt-vien'), path = svg?.querySelector('path')
+    if (!san || !bong || !svg || !path || typeof ResizeObserver === 'undefined') return
+    const ve = () => {
+      const w = bong.offsetWidth, h = bong.offsetHeight, nvw = parseFloat(getComputedStyle(san).getPropertyValue('--gt-nvw')) || 120
+      if (!w || !h) return
+      const { kw, kh, kd } = khuyetL(nvw)
+      svg.setAttribute('width', String(w)); svg.setAttribute('height', String(h))
+      path.setAttribute('d', duongL(w, h, kw, kh, kd))
+    }
+    ve()
+    const ro = new ResizeObserver(ve); ro.observe(bong)
+    return () => ro.disconnect()
+  }, [qid])
 
   // Mắt dõi phương án + nhịp chờ / soi theo thao tác của em.
   useEffect(() => {

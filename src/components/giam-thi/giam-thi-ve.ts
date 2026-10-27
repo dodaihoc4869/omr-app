@@ -417,3 +417,16 @@ export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; 
   g.datTrangThai(o.trangThai ?? 'yen', tinh ? { buoc: o.buoc ?? 0 } : {})
   return g
 }
+
+// ─────────────────────────────── VIỀN BONG BÓNG CHỮ L (đề dài) ───────────────────────────────
+/** Khuyết góc trái trên theo cỡ giám thị — CÙNG công thức với giam-thi.css (`--gt-kw / --gt-kh / --gt-kd`). */
+export const khuyetL = (nvw: number) => ({ kw: nvw * 0.83 - 4, kh: nvw * 1.15 + 6, kd: nvw * 0.71 - 4 })
+/** Đường viền bong bóng chữ L: hộp w×h, khuyết kw×kh ở góc trái trên; bo R ở góc ngoài, r ở góc trong; mũi nhọn ở cạnh khuyết, cao kd, chĩa trái. */
+export function duongL(w: number, h: number, kw: number, kh: number, kd: number, R = 18, r = 16): string {
+  const b = 1, n = (x: number) => Math.round(x * 10) / 10
+  R = Math.max(4, Math.min(R, (w - kw) / 2, (h - kh) / 2, kh / 2)); r = Math.min(r, kw / 2, kh / 2)
+  const dy = Math.max(R + 9, Math.min(kd, kh - r - 9))
+  return [`M${n(kw + R)} ${b}`, `H${n(w - R)}`, `A${R} ${R} 0 0 1 ${n(w - b)} ${n(R)}`, `V${n(h - R)}`, `A${R} ${R} 0 0 1 ${n(w - R)} ${n(h - b)}`,
+    `H${n(R)}`, `A${R} ${R} 0 0 1 ${b} ${n(h - R)}`, `V${n(kh + R)}`, `A${R} ${R} 0 0 1 ${n(R)} ${n(kh)}`, `H${n(kw - r)}`, `A${r} ${r} 0 0 0 ${n(kw)} ${n(kh - r)}`,
+    `V${n(dy + 7)}`, `L${n(kw - 8)} ${n(dy)}`, `L${n(kw)} ${n(dy - 7)}`, `V${n(R)}`, `A${R} ${R} 0 0 1 ${n(kw + R)} ${b}`, 'Z'].join(' ')
+}

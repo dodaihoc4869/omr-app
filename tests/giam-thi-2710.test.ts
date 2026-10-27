@@ -3,7 +3,8 @@ import { describe, expect, it } from 'vitest'
 import { deDaiGiamThi, mucGiamThi } from '../src/components/giam-thi/muc-giam-thi'
 import { khoaMucDo } from '../src/lib/muc-do-nhan-thuc'
 import { LOI_GIAM_THI, cauMoi, suLoi, taoNhip, type NguCanhLoi } from '../src/components/giam-thi/loi-giam-thi'
-import { THU_TU_GT, gocTay, kichBan, veGiamThi, type TrangThaiGT } from '../src/components/giam-thi/giam-thi-ve'
+import { THU_TU_GT, duongL, gocTay, khuyetL, kichBan, veGiamThi, type TrangThaiGT } from '../src/components/giam-thi/giam-thi-ve'
+import { readFileSync } from 'node:fs'
 
 const TT: TrangThaiGT[] = ['yen', 'doc', 'cho', 'soi', 'dong-ho', 'nghi-ngo', 'nop', 'dung', 'sai', 'chua-tinh', 'combo', 'xong']
 
@@ -98,6 +99,27 @@ describe('hình và kịch bản', () => {
       const id = (s: string) => s.match(/id="([^"]+)"/)?.[1]
       expect(id(a)).not.toBe(id(b))
       expect(a).toContain(`data-muc="${m}"`)
+    }
+  })
+})
+
+describe('khung chữ L ôm giám thị (đề dài, thầy 27/10 tối)', () => {
+  it('khuyết cùng công thức với giam-thi.css', () => {
+    const css = readFileSync('src/components/giam-thi/giam-thi.css', 'utf8')
+    const heSo = (k: string) => { const m = css.match(new RegExp(`--gt-${k}: calc\\(var\\(--gt-nvw\\) \\* ([\\d.]+) ([-+]) (\\d+)px\\)`)); expect(m, k).not.toBeNull(); return (nvw: number) => nvw * Number(m![1]) + (m![2] === '-' ? -1 : 1) * Number(m![3]) }
+    for (const nvw of [96, 100, 120, 136]) {
+      const k = khuyetL(nvw)
+      expect(k.kw).toBeCloseTo(heSo('kw')(nvw)); expect(k.kh).toBeCloseTo(heSo('kh')(nvw)); expect(k.kd).toBeCloseTo(heSo('kd')(nvw))
+      expect(k.kd).toBeLessThan(k.kh)
+    }
+  })
+  it('đường viền khép kín, có góc trong bo mềm và mũi nhọn, không NaN; bong bóng thấp vẫn vẽ được', () => {
+    for (const [w, h] of [[358, 600], [328, 140], [400, 132]] as const) {
+      const { kw, kh, kd } = khuyetL(120), d = duongL(w, h, kw, kh, kd)
+      expect(d.startsWith('M')).toBe(true); expect(d.endsWith('Z')).toBe(true)
+      expect(d).not.toMatch(/NaN|Infinity/)
+      expect(d).toMatch(/ 0 0 0 /) // góc trong (lõm) bo mềm
+      expect(d.match(/ L/g)?.length).toBe(2) // mũi nhọn
     }
   })
 })

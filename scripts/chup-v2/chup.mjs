@@ -332,6 +332,9 @@ const DS_GT = ['nb', 'th', 'vd', 'vdc'].flatMap((m) => ['light', 'dark'].flatMap
   return [
     ...[[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].map(([w, hh, k]) => [`duo-gt-${m}-ngan-${k}${toi}`, GT_NGAN + m, w, hh, nen, false, /quỳ tím/, 'lam13:tn:^B » cho:3200']),
     [`duo-gt-${m}-dung-doc${toi}`, GT_NGAN + m, 390, 844, nen, false, /quỳ tím/, 'lam13:tn:^B » nut:^Kiểm tra$'],
+    // đề DÀI như ảnh thầy (toluidine ~15 dòng): khung chữ L ôm giám thị — mọi khổ cho Cô Cốc / Kíp, 390 cho Tí / Chú Tam
+    ...(['th', 'vdc'].includes(m) ? [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']] : [[390, 844, 'doc']]).map(([w, hh, k]) =>
+      [`duo-gt-${m}-toluidine-${k}${toi}`, `lam13&lam=duo&gtde=dai&gtloi=1&gt=${m}`, w, hh, nen, false, /Toluidine là/, 'lam13:cho:3600 » dau']),
     [`duo-gt-${m}-sai-doc${toi}`, GT_NGAN + m, 390, 844, nen, false, /quỳ tím/, 'lam13:tn:^A » nut:^Kiểm tra$'],
     [`duo-gt-${m}-dai-doc${toi}`, `lam13&lam=duo&gtloi=1&gt=${m}`, 390, 844, nen, false, /Số đồng phân amine/, 'lam13:tn:^D » cho:3200'],
     [`duo-gt-${m}-hinh-doc${toi}`, `lam13&lam=duo&gt=${m}`, 390, 844, nen, false, /Số đồng phân amine/, `lam13:${D_Q1}`],
