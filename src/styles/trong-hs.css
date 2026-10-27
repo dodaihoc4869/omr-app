@@ -1070,6 +1070,6 @@
 :root[data-trong='hs'] .tr-dd-nut:active:not(:disabled) { box-shadow: 0 1px 0 var(--tr-chinh-day); }
 :root[data-trong='hs'] .tr-dd-o:focus-within > span[data-dang] { border-color: var(--tr-chinh); box-shadow: 0 0 0 3px color-mix(in srgb, var(--tr-chinh) 22%, transparent); }
 :root[data-trong='hs'] .tr-dd .tr-dd-phu b { color: var(--tr-chinh-chu); }
-/* thanh bộ đếm trên đầu (#431): số đậm 16,5px cùng màu biểu tượng ⇒ bản đạt 3:1 cho chữ đậm, vẫn tươi (cam #ED6F00 · xanh lá #58A700) */
+/* thanh bộ đếm trên đầu (PR 431): số đậm 16,5px cùng màu biểu tượng ⇒ bản đạt 3:1 cho chữ đậm, vẫn tươi (cam / xanh lá bản «nut») */
 :root[data-trong='hs'] .da-tren .tp-tr-o[data-k='lua'] { color: var(--tr-chu-y-nut); }
 :root[data-trong='hs'] .da-tren .tp-tr-o[data-k='nt'] { color: var(--tr-dung-nut); }
