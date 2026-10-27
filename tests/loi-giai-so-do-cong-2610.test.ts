@@ -2,7 +2,7 @@
 // CỔNG KIỂM «LỜI GIẢI KIỂU SƠ ĐỒ» (26/10, server/src/so-do-cong.ts) — hàm thuần: tính chuỗi thừa số, so đáp án kho, chặn lộ, cắt trước nộp.
 import { describe, expect, it } from 'vitest'
 import type { BanSoDo } from '../src/lib/goi-y-cham/kieu'
-import { catTruocNop, giaTriThuaSo, kiemCong } from '../server/src/so-do-cong'
+import { catTruocNop, giaTriThuaSo, kiemCong, lamSachChu, lamSachChuHien } from '../server/src/so-do-cong'
 import { qidTraSoDo } from '../server/src/loi-giai-so-do'
 
 /** Mẫu XUÔI của thầy: 1 tấn quặng 8% FeS₂ ⇒ m kg H₂SO₄? (theo S, H = 90%) — m = 10^6 · 8/100 · 1/120 · 2 · 64 · 90/100 · 1/1000 = 76,8. */
@@ -193,5 +193,24 @@ describe('cắt trước nộp và chọn qid', () => {
     expect(qidTraSoDo('DH-1-III-2~ss0')).toEqual(['DH-1-III-2~ss0'])
     expect(qidTraSoDo('DH-1-III-2~bt1#2')).toEqual(['DH-1-III-2~bt1#2'])
     expect(qidTraSoDo('DH-1-III-2~yd0')).toEqual(['DH-1-III-2~yd0'])
+  })
+})
+
+describe('27/10 thầy «Bỏ thực tế lý thuyết đi» (ảnh nitrobenzene)', () => {
+  it('bỏ «thực tế» / «lý thuyết»; «per» ⇒ «/»', () => {
+    expect(lamSachChu('số mol nitrobenzene thực tế (tính ngược ×100/H)')).toBe('số mol nitrobenzene (tính ngược ×100/H)')
+    expect(lamSachChu('gam SO₂ theo lý thuyết (nhân M = 64)')).toBe('gam SO₂ (nhân M = 64)')
+    expect(lamSachChu('khối lượng benzene (kg per kmol)')).toBe('khối lượng benzene (kg/kmol)')
+    expect(lamSachChu('Lượng thực tế: tính xuôi × H/100')).toBe('Lượng: tính xuôi × H/100')
+    expect(lamSachChu('số mol aniline (chia M = 93)')).toBe('số mol aniline (chia M = 93)')
+  })
+  it('làm sạch mọi chữ hiện, không đụng số / tên bước', () => {
+    const ban = { qid: 'q', phienBan: 1, deNoiGi: 'Tính lượng thực tế', soDo: { nut: [{ chat: 'C_6H_6', soLieu: ['m thực tế = ?'] }], muiTen: [], chieu: 'nguoc' as const },
+      buoc: [{ ten: 'm thực tế', thuaSo: [{ so: '100/60', nghia: 'số mol thực tế (tính ngược ×100/H)', denDay: 'tới đây là: số mol lý thuyết' }] }] }
+    const r = lamSachChuHien(ban)
+    expect(JSON.stringify([r.deNoiGi, r.soDo, r.buoc[0]!.thuaSo])).not.toMatch(/thực tế|lý thuyết/)
+    expect(r.buoc[0]!.ten).toBe('m thực tế')
+    expect(r.buoc[0]!.thuaSo[0]!.so).toBe('100/60')
+    expect(ban.deNoiGi).toBe('Tính lượng thực tế')
   })
 })

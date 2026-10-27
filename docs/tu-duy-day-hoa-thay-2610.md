@@ -15,8 +15,8 @@ Thầy 26/10: «Tạm thời bỏ tư duy tiền nhà nhé» ⇒ KHÔNG dùng �
 | nhân/chia tỉ lệ hệ số (vd · 2, · 1/2) | **bảo toàn nguyên tố**: 1 FeS₂ có 2 S ⇒ ra 2 SO₂ ⇒ số mol × 2 |
 | nhân M (vd · 64) | ra **khối lượng** (nhân M = 64) |
 | nhân 24,79 / chia V | ra **thể tích khí** ở đkc / ra nồng độ |
-| × H/100 (xuôi) | tính xuôi: chỉ H% lượng lý thuyết thành sản phẩm |
-| × 100/H (ngược) | tính ngược: phải lấy nhiều nguyên liệu hơn lý thuyết |
+| × H/100 (xuôi) | tính xuôi × H/100 |
+| × 100/H (ngược) | tính ngược × 100/H |
 
 ## Ví dụ mẫu
 1 tấn quặng chứa 8% FeS₂, H = 90%, hỏi m kg SO₂:

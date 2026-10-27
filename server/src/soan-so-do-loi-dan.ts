@@ -26,8 +26,8 @@ Thầy 26/10: «Tạm thời bỏ tư duy tiền nhà nhé» ⇒ KHÔNG dùng �
 | nhân/chia tỉ lệ hệ số (vd · 2, · 1/2) | **bảo toàn nguyên tố**: 1 FeS₂ có 2 S ⇒ ra 2 SO₂ ⇒ số mol × 2 |
 | nhân M (vd · 64) | ra **khối lượng** (nhân M = 64) |
 | nhân 24,79 / chia V | ra **thể tích khí** ở đkc / ra nồng độ |
-| × H/100 (xuôi) | tính xuôi: chỉ H% lượng lý thuyết thành sản phẩm |
-| × 100/H (ngược) | tính ngược: phải lấy nhiều nguyên liệu hơn lý thuyết |
+| × H/100 (xuôi) | tính xuôi × H/100 |
+| × 100/H (ngược) | tính ngược × 100/H |
 
 ## Ví dụ mẫu
 1 tấn quặng chứa 8% FeS₂, H = 90%, hỏi m kg SO₂:
@@ -41,7 +41,7 @@ export const LUAT_SO_DO = `LUẬT SƠ ĐỒ CỦA THẦY (bắt buộc, không n
 3. Thường 2 nút. Có chất trung gian quan trọng (đề cho số liệu ở chất đó, hoặc em dễ lạc) thì thêm MỘT nhịp: 3 nút. Không bao giờ quá 3 nút.
 4. Bảo toàn nguyên tố ⇒ MỘT phép tính duy nhất (1 bước). Khó hiểu thì tách 2, TỐI ĐA 3 bước.
 5. Tính XUÔI (nguyên liệu → sản phẩm, \`chieu: "xuoi"\`): thừa số «H/100». Tính NGƯỢC (sản phẩm → nguyên liệu, \`chieu: "nguoc"\`): thừa số «100/H».
-6. Mỗi thừa số có \`nghia\` nói THẲNG bằng thuật ngữ (thầy 26/10: tạm bỏ ẩn dụ tiền / nhà / giàu / đánh thuế / mua — TUYỆT ĐỐI không dùng các chữ đó): chia M = ra số mol chất đó; tỉ lệ hệ số = bảo toàn nguyên tố (vd 1 FeS₂ có 2 S ⇒ 2 SO₂); nhân M = ra khối lượng; nhân 24,79 = ra thể tích khí (đkc); hiệu suất: tính xuôi × H/100 (chỉ H% thành sản phẩm), tính ngược × 100/H (phải lấy nhiều nguyên liệu hơn). Đổi đơn vị (10^6, 1/1000, 10^-6) ghi rõ đổi ra gì.
+6. Mỗi thừa số có \`nghia\` nói THẲNG bằng thuật ngữ (thầy 26/10: tạm bỏ ẩn dụ tiền / nhà / giàu / đánh thuế / mua — TUYỆT ĐỐI không dùng các chữ đó): chia M = ra số mol chất đó; tỉ lệ hệ số = bảo toàn nguyên tố (vd 1 FeS₂ có 2 S ⇒ 2 SO₂); nhân M = ra khối lượng; nhân 24,79 = ra thể tích khí (đkc); hiệu suất: tính xuôi × H/100, tính ngược × 100/H. KHÔNG dùng chữ «thực tế», «lý thuyết» (thầy 27/10); không chữ tiếng Anh («per», «of»…). Đổi đơn vị (10^6, 1/1000, 10^-6) ghi rõ đổi ra gì.
 7. Bài khó / dài (nhỏ từ từ, nhiều giai đoạn, chất dư, phản ứng theo thứ tự) có \`hienTuong.giaiThich\`: 2–4 câu ngắn nói hiện tượng – bản chất.
 8. Câu lý thuyết hoặc bài không xích được thành phép nhân (so chất dư, hỗn hợp nhiều ẩn): KHÔNG vẽ sơ đồ; dùng \`chiaKhoa\` (chìa khoá của bài) + \`cauTuHoi\` (câu em tự hỏi để bắt đầu), \`buoc\` chỉ ghi bước đầu tiên.
 9. Thể tích mol khí lấy đúng theo chữ của đề («đkc» ⇒ 24,79; «đktc» ⇒ 22,4). Đề cho nguyên tử khối thì dùng đúng số của đề.`
@@ -83,8 +83,8 @@ export const VI_DU_MAU: readonly { de: string; dapAn: string; ban: Omit<BanSoDo,
           { so: '8/100', nghia: 'gam FeS₂ (quặng chứa 8%)' },
           { so: '1/120', nghia: 'số mol FeS₂ (chia M = 120)', denDay: 'tới đây là: số mol FeS₂' },
           { so: '2', nghia: 'bảo toàn S: 1 FeS₂ có 2 S ⇒ ra 2 SO₂', denDay: 'tới đây là: số mol SO₂' },
-          { so: '64', nghia: 'gam SO₂ theo lý thuyết (nhân M = 64)' },
-          { so: '90/100', nghia: 'gam SO₂ thực tế: tính xuôi × H/100' },
+          { so: '64', nghia: 'khối lượng SO₂ (nhân M = 64)' },
+          { so: '90/100', nghia: 'tính xuôi × H/100' },
           { so: '1/1000', nghia: 'kg SO₂ (đề hỏi theo kg)' },
         ],
         ketQua: '76,8', donVi: 'kg',
@@ -107,7 +107,7 @@ export const VI_DU_MAU: readonly { de: string; dapAn: string; ban: Omit<BanSoDo,
           { so: '1/2', nghia: 'bảo toàn S: 2 H₂SO₄ cần 1 FeS₂', denDay: 'tới đây là: số mol FeS₂' },
           { so: '120', nghia: 'gam FeS₂ (nhân M = 120)' },
           { so: '100/60', nghia: 'gam quặng theo lí thuyết (quặng chỉ chứa 60% FeS₂)' },
-          { so: '100/80', nghia: 'gam quặng thực tế cần: tính ngược × 100/H' },
+          { so: '100/80', nghia: 'tính ngược × 100/H' },
           { so: '10^-6', nghia: 'tấn quặng (đề hỏi theo tấn)' },
         ],
         ketQua: '1,25', donVi: 'tấn',
