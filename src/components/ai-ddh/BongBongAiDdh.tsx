@@ -108,6 +108,13 @@ export default function BongBongAiDdh({ auth, anBong = false }: { auth: { token?
   const co = docCoBat(sbd)
   const [bat, setBat] = useState<boolean>(co?.bat === true)
   const [mo, setMo] = useState(false)
+  // 28/10 MƯỢT: `<html data-aid-tam>` khi tấm A.I mở — thay `body:has(.aid-tam)` (trong-hs.css; :has() trên body = kiểm lại cả trang mỗi lần đổi nút).
+  useLayoutEffect(() => {
+    if (!mo) return
+    const g = document.documentElement
+    g.setAttribute('data-aid-tam', '')
+    return () => g.removeAttribute('data-aid-tam')
+  }, [mo])
   const [du, setDu] = useState<MoAiDdh | null>(null)
   const [loi, setLoi] = useState('')
   const [tin, setTin] = useState<TinAiDdh[]>([])

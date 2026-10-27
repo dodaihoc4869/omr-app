@@ -71,6 +71,17 @@ describe('độ mượt 27/10: luật :has() không bắt tính lại kiểu c�
     })
     expect(sai.map((x) => `${x.tep}:${x.dong} ${x.chon}`)).toEqual([])
   })
+  it('28/10: không còn :has() trên <body> — body bị gắn cờ ⇒ mọi lần thêm / gỡ nút Chrome kiểm lại cả trang theo tập :has() chung', () => {
+    const sai = TAT_CA.filter(({ chon }) => /(^|[\s>+~(,])(?:\[[^\]]*\]\s*)?body(?:\[[^\]]*\])*:has\(/.test(chon))
+    expect(sai.map((x) => `${x.tep}:${x.dong} ${x.chon}`)).toEqual([])
+    const hs = khongChuThich(readFileSync(join(GOC, 'src/styles/trong-hs.css'), 'utf8'))
+    expect(hs).toContain('[data-trong][data-aid-tam] .tr-menu-cham { visibility: hidden; }')
+    expect(hs).toContain('[data-trong][data-tp-toan] .tr-menu-cham { visibility: hidden; }')
+    expect(hs).toContain("[data-trong='hs'][data-menu-cham] .aid-bong {")
+    expect(readFileSync(join(GOC, 'src/components/ai-ddh/BongBongAiDdh.tsx'), 'utf8')).toContain("g.setAttribute('data-aid-tam', '')")
+    expect(readFileSync(join(GOC, 'src/components/thuong/chung.tsx'), 'utf8')).toContain("g.setAttribute('data-tp-toan', '')")
+    expect(readFileSync(join(GOC, 'src/components/hoc-tap/TrongHs.tsx'), 'utf8')).toContain("g.setAttribute('data-menu-cham', '')")
+  })
   it('in đề: luật @media print đọc html[data-co-de], không dùng body:has(.thi-noi-dung)', () => {
     const css = khongChuThich(readFileSync(join(GOC, 'src/index.css'), 'utf8'))
     expect(css).not.toContain('body:has(.thi-noi-dung)')

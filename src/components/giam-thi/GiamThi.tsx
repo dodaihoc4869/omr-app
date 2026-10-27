@@ -97,9 +97,9 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
       // ở phần dưới chân giám thị ⇒ khối chữ chỉ thấp đi: dáng thường đã không tràn quá khuyết thì dáng L chắc chắn không cần — khỏi bật thử chữ L
       // (mỗi lần bật thử = thêm một lượt tính kiểu + bố cục cả màn, ~30–60 ms ở CPU ×6). Câu dài thật sự tràn ⇒ bật thử như cũ.
       if (!san.hasAttribute('data-l') && !(de.getBoundingClientRect().bottom - bong.getBoundingClientRect().top > khuyet().kh + 12)) return
-      san.setAttribute('data-l', '')
+      san.setAttribute('data-l', ''); de.setAttribute('data-l', '')
       const day = de.getBoundingClientRect().bottom - bong.getBoundingClientRect().top
-      if (!(day > khuyet().kh + 12)) san.removeAttribute('data-l')
+      if (!(day > khuyet().kh + 12)) { san.removeAttribute('data-l'); de.removeAttribute('data-l') }
       ve()
     }
     // 28/10 MƯỢT (vết Chrome, chuyển câu CPU ×6): quyết ở lượt báo ĐẦU của ResizeObserver — chạy SAU lượt tính kiểu + bố cục mà khung vẽ vốn phải làm,
@@ -111,7 +111,7 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
       else if (bong.offsetHeight !== bongCao) { bongCao = bong.offsetHeight; ve() }
     })
     ro.observe(san); ro.observe(de); ro.observe(bong)
-    return () => { ro.disconnect(); san.removeAttribute('data-l') }
+    return () => { ro.disconnect(); san.removeAttribute('data-l'); de.removeAttribute('data-l') }
   }, [qid])
 
   // Mắt dõi phương án + nhịp chờ / soi theo thao tác của em.

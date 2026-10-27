@@ -65,8 +65,8 @@
 [data-trong] .tr-menu-cham s { display: none; position: absolute; top: 10px; right: 12px; width: 8px; height: 8px; border-radius: 50%; background: var(--tr-sai); box-shadow: 0 0 0 2px var(--tr-nen); }
 [data-trong] .ht2:has(.tr-menu .m3-tb-dem) .tr-menu-cham s { display: block; }
 [data-trong] .tr-menu-cham[aria-expanded='true'] { opacity: 0; }
-[data-trong] body:has(.aid-tam) .tr-menu-cham { visibility: hidden; } /* tấm A.I đang mở: vạch không thò cạnh tấm */
-[data-trong] body:has(.tp-toan) .tr-menu-cham { visibility: hidden; } /* màn thưởng toàn khung (hộp thoại, vd mời Thử thách Kim cương): vạch / thẻ Điểm danh không đè lên */
+[data-trong][data-aid-tam] .tr-menu-cham { visibility: hidden; } /* tấm A.I đang mở: vạch không thò cạnh tấm */
+[data-trong][data-tp-toan] .tr-menu-cham { visibility: hidden; } /* màn thưởng toàn khung (hộp thoại, vd mời Thử thách Kim cương): vạch / thẻ Điểm danh không đè lên */
 /* Màn con / tấm toàn màn đang mở (cổng gắn `inert` lên Hôm nay) ⇒ vạch menu + thẻ «Điểm danh» thò ra không hiện, không bao giờ chồng lên nút của màn con. */
 [data-trong] [inert] :is(.tr-menu-cham, .tr-menu, .tr-menu-phu) { visibility: hidden; }
 [data-trong] .tr-menu-cham:focus-visible { outline: 0; }
@@ -137,7 +137,7 @@
 [data-trong].may-yeu :is(.tr-menu, .tr-menu[data-mo], .tr-menu-ds, .tr-menu-cai) { animation: none; transition: none; }
 [data-trong].may-yeu .tr-menu-phu { backdrop-filter: none; -webkit-backdrop-filter: none; }
 /* Không còn thanh đáy ⇒ nút A.I nổi về sát góc dưới phải (vạch menu ở giữa mép, không đè). */
-[data-trong='hs'] body:has(.tr-menu-cham) .aid-bong { bottom: calc(24px + env(safe-area-inset-bottom)); }
+[data-trong='hs'][data-menu-cham] .aid-bong { bottom: calc(24px + env(safe-area-inset-bottom)); }
 
 /* ĐIỂM DANH đầu menu — CHỈ khi có buổi học đang mở (thầy 27/10): chưa điểm danh ⇒ thẻ nổi chàm (giữ màu điểm danh đang có) (ô mã + nút) · đã điểm danh ⇒ khối xanh gọn.
    Buổi đang mở mà em chưa điểm danh ⇒ vạch thu gọn thò thẻ dọc «Điểm danh» cùng màu chàm. */

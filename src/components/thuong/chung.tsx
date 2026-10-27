@@ -3,7 +3,7 @@
 //    thanh nút đáy dính. Esc đóng; mở ra thì con trỏ về nút chính. Bấm nút giữa hiệu ứng ⇒ xongHieuUng() nhảy tới trạng thái cuối (không chặn bấm).
 //  - Cho (khung xương, chữ chờ trễ 800 ms) · Loi (lý do thật + «Thử lại») · useToast (báo kết quả lệnh ghi) · TuanBay (lịch 7 ngày chuỗi) · DemTT.
 //  - Hàm thuần ngày giờ giờ Việt Nam (24 giờ, «Thứ Bảy 31/10»), chữ cái ảnh đại diện, lịch hẹn hiệu ứng (giảm chuyển động ⇒ chạy ngay, hiệu ứng tự bỏ).
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { Check, FlaskConical, RefreshCw, X } from 'lucide-react'
 import { coChuyenDong, xongHieuUng } from '../../lib/hieu-ung-thuong'
 import { ngayVn, type NgayChuoi } from '../../lib/thuong-api'
@@ -62,8 +62,15 @@ export function DemTT({ gt, tu, id }: { gt: number; tu?: number; id?: string }) 
 }
 
 export interface PropsManToan { nhan: string; onDong?: () => void; demTT?: ReactNode; children: ReactNode; day?: ReactNode; kieu?: string; tren?: ReactNode }
+let soManToan = 0
 export function ManToan({ nhan, onDong, demTT, children, day, kieu, tren }: PropsManToan) {
   const ref = useRef<HTMLDivElement>(null)
+  // 28/10 MƯỢT: `<html data-tp-toan>` thay `body:has(.tp-toan)` (trong-hs.css) — :has() trên body = kiểm lại cả trang mỗi lần thêm / gỡ nút.
+  useLayoutEffect(() => {
+    const g = document.documentElement
+    if (soManToan++ === 0) g.setAttribute('data-tp-toan', '')
+    return () => { if (--soManToan <= 0) { soManToan = 0; g.removeAttribute('data-tp-toan') } }
+  }, [])
   const dong = useRef(onDong)
   dong.current = onDong
   useEffect(() => {
