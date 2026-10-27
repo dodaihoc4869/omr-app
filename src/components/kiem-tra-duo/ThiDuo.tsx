@@ -6,7 +6,7 @@
 import { useEffect, useLayoutEffect, useRef, type MouseEvent, type ReactNode } from 'react'
 import { phanHoi } from '../../lib/phan-hoi'
 import { batCheDoThi } from '../../lib/am-thanh'
-import { DayKt, NhanCauKt, TamLuoiKt, TamNopKt, ThanhTrenKt } from './KhungKiemTra'
+import { DayKt, NhanCauKt, TamLuoiKt, TamNopKt, ThanhTrenKt, useBangKt } from './KhungKiemTra'
 
 type PhanThi = 'I' | 'II' | 'III'
 const TEN_PHAN: Record<PhanThi, string> = { I: 'Trắc nghiệm', II: 'Đúng / Sai', III: 'Trả lời ngắn' }
@@ -49,6 +49,7 @@ export interface ThiDuoProps {
 
 export default function ThiDuo(p: ThiDuoProps) {
   const goc = useRef<HTMLDivElement>(null)
+  useBangKt(goc) // bảng trong đề: hai hàng quá rộng ⇒ xoay dọc; bảng lớn ⇒ cuộn có bóng mép (thầy 27/10)
   // Màn thi đang mở ⇒ TẮT ÂM THANH, chỉ rung (gỡ khi khung đóng: nộp xong, rời màn).
   useEffect(() => batCheDoThi(), [])
   const chuaSet = new Set(p.chuaLam), dauSet = new Set(p.danhDau)

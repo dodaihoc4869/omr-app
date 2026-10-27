@@ -3,7 +3,7 @@
 // lưới câu), thanh đáy dính (câu trước · nút lớn), tấm lưới số câu trượt từ đáy, tấm xác nhận nộp có Bi. Mọi việc (lưu, chấm, nộp, đồng hồ, chống rời
 // màn) nằm ở màn cha — ở đây chỉ gọi lại hàm cha đưa. LUẬT THI: không có khái niệm đúng/sai — ô số câu chỉ «đã làm / chưa làm / đang xem / xem lại sau».
 // Chỉ dùng khi <html data-trong="hs">; tờ kiểu styles/trong-kiem-tra.css đi cùng mảnh này (không vào nhóm mở app).
-import { useEffect, useRef, type ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode, type RefObject } from 'react'
 import { ChevronLeft, Clock, Flag, LayoutGrid, X as XIcon } from 'lucide-react'
 import { Bi, type CamBi } from '../linh-vat/Bi'
 import '../../styles/trong-kiem-tra.css'
@@ -180,4 +180,37 @@ export function BiKetQua({ cam, tieuDe, phu, lop }: { cam: CamBi; tieuDe: string
 export function camTheoDiem(diem: number | null | undefined): CamBi {
   if (typeof diem !== 'number' || !Number.isFinite(diem)) return 'vui'
   return diem >= 8 ? 'mung' : diem >= 5 ? 'vui' : 'nghi'
+}
+
+/** BẢNG TRONG ĐỀ Ở MÀN THI / KIỂM TRA kiểu Duo (thầy 27/10: «Thi là chỗ quan trọng nhất»). Thẻ câu của màn thi do ExamTakeScreen dựng (BangSoLieu dùng
+ *  chung, nằm trong lượt mở app) ⇒ KHÔNG sửa thẻ: khung (mảnh nạp lười) chỉ ĐO và gắn thuộc tính trình bày lên bảng sẵn có — không đổi chữ, thứ tự, logic thi:
+ *  - bảng HAI hàng rộng hơn khung ⇒ `table[data-doc]` + `--n` (CSS trong-kiem-tra.css xếp lại thành lưới dọc: mỗi cột cũ thành một hàng); đủ chỗ ⇒ gỡ;
+ *  - bảng lớn ⇒ `.cau-bang[data-mep]` = trai | phai | hai (bóng mờ ở mép còn nội dung khi cuộn ngang).
+ *  Bảng của màn luyện (LamCau.BangDe, `.bang-de`) đã tự lo ⇒ bỏ qua. */
+export function useBangKt(goc: RefObject<HTMLElement | null>) {
+  useEffect(() => {
+    const g = goc.current
+    if (!g) return
+    const rong = new WeakMap<HTMLElement, number>()
+    const do_ = (k: HTMLElement) => {
+      const t = k.querySelector('table')
+      if (!t || k.closest('.bang-de') || !k.offsetParent) return
+      const hang = t.rows, hai = hang.length === 2 && hang[0]!.cells.length > 2
+      if (t.hasAttribute('data-doc')) { if (k.clientWidth >= (rong.get(k) ?? Infinity)) t.removeAttribute('data-doc'); else return }
+      const w = k.scrollWidth, c = k.clientWidth, l = k.scrollLeft
+      if (w > c + 1 && hai) { rong.set(k, w); t.style.setProperty('--n', String(hang[0]!.cells.length)); t.setAttribute('data-doc', ''); k.removeAttribute('data-mep'); return }
+      const trai = l > 1, phai = l + c < w - 1
+      if (trai || phai) k.setAttribute('data-mep', trai && phai ? 'hai' : trai ? 'trai' : 'phai'); else k.removeAttribute('data-mep')
+    }
+    const tatCa = () => g.querySelectorAll<HTMLElement>('.cau-bang').forEach(do_)
+    const cuon = (e: Event) => { const k = (e.target as HTMLElement).closest?.('.cau-bang'); if (k) do_(k as HTMLElement) }
+    tatCa()
+    g.addEventListener('scroll', cuon, true)
+    const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(tatCa) : null
+    ro?.observe(g)
+    // câu mới hiện (khung câu bỏ `hidden`) / đề dựng dần ⇒ đo lại
+    const mo = typeof MutationObserver === 'function' ? new MutationObserver(tatCa) : null
+    mo?.observe(g, { subtree: true, childList: true, attributes: true, attributeFilter: ['hidden'] })
+    return () => { g.removeEventListener('scroll', cuon, true); ro?.disconnect(); mo?.disconnect() }
+  }, [goc])
 }
