@@ -1,16 +1,18 @@
 /* GIÁM THỊ THEO MỨC CÂU (src/components/giam-thi) — tờ riêng, nạp cùng mảnh lười GiamThi. Màu = biến --tr-* (không màu thô):
-   mức Nhận biết → --tr-dung, Thông hiểu → --tr-tin, Vận dụng → --tr-chu-y, Vận dụng cao → --tr-sai; sáng/tối tự đổi (con ngươi, lông mày luôn tối, lòng mắt luôn sáng).
+   thân 4 con theo bảng màu linh vật ngay dưới; đạo cụ / mắt / miệng lấy biến --tr-* (con ngươi, lông mày luôn tối, lòng mắt luôn sáng ở cả hai nền).
    Chuyển động chỉ transform / opacity. Thân thở trên lớp HTML riêng (GPU, không vẽ lại SVG). Giảm chuyển động / máy yếu ⇒ đứng yên. */
+/* BẢNG MÀU LINH VẬT (thầy 27/10: «tươi mịn mắt như Duolingo») — CHỈNH MỘT CHỖ Ở ĐÂY. Là màu TRANH (như bảng màu game): không đổi theo nền sáng/tối;
+   bóng đổ phẳng = một tông đậm hơn, highlight nhẹ, không gradient, viền cùng sắc (không viền đen). check-mau.mjs cho phép mã màu riêng tệp này. */
 .gtv {
-  --gt-c: var(--tr-dung); --gt-toi: var(--tr-chu); --gt-trang: var(--tr-trang);
-  --gt-sang: color-mix(in srgb, var(--gt-c) 58%, var(--gt-trang)); --gt-dam: color-mix(in srgb, var(--gt-c) 70%, var(--gt-toi)); --gt-kinh: color-mix(in srgb, var(--gt-c) 14%, var(--gt-trang));
-  --nx: 0; --ny: 0; --mi: .1; --duoi: 0; --may: 0deg; --mayY: 0px; --may2: 0px; --lean: 0deg;
+  --gt-mau-nb: #58cc02; --gt-mau-th: #ce82ff; --gt-mau-vd: #ff9600; --gt-mau-vdc: #ff4b4b;
+  --gt-c: var(--gt-mau-nb); --gt-toi: var(--tr-chu); --gt-trang: var(--tr-trang);
+  --gt-sang: color-mix(in srgb, var(--gt-c) 55%, #fff); --gt-dam: color-mix(in srgb, var(--gt-c) 80%, #000); --gt-kinh: color-mix(in srgb, var(--gt-c) 15%, #fff);
   display: block; width: 100%; height: auto; overflow: visible;
 }
 @media (prefers-color-scheme: dark) { .gtv { --gt-toi: var(--tr-trang); --gt-trang: var(--tr-chu); } }
-.gtv[data-muc='th'] { --gt-c: var(--tr-tin); }
-.gtv[data-muc='vd'] { --gt-c: var(--tr-chu-y); }
-.gtv[data-muc='vdc'] { --gt-c: var(--tr-sai); }
+.gtv[data-muc='th'] { --gt-c: var(--gt-mau-th); }
+.gtv[data-muc='vd'] { --gt-c: var(--gt-mau-vd); }
+.gtv[data-muc='vdc'] { --gt-c: var(--gt-mau-vdc); }
 .gtv .gt-fc { fill: var(--gt-c); } .gtv .gt-fd { fill: var(--gt-dam); } .gtv .gt-fk { fill: var(--gt-kinh); } .gtv .gt-ft { fill: var(--gt-trang); } .gtv .gt-f-toi { fill: var(--gt-toi); }
 .gtv .gt-sc { stroke: var(--gt-c); } .gtv .gt-sd { stroke: var(--gt-dam); } .gtv .gt-ss { stroke: var(--gt-sang); } .gtv .gt-st { stroke: var(--gt-trang); } .gtv .gt-s-toi { stroke: var(--gt-toi); }
 .gtv .gt-f-ma { fill: color-mix(in srgb, var(--tr-sai) 30%, var(--gt-trang)); opacity: .85; }
@@ -28,28 +30,26 @@
 .gtv .gt-bong { fill: color-mix(in srgb, var(--tr-chu) 12%, transparent); }
 @media (prefers-color-scheme: dark) { .gtv .gt-bong { fill: var(--tr-mat-3); } }
 
-/* Lớp chuyển động: tư thế / nét mặt nội suy bằng transition (từ giá trị đang có), mắt do rAF đặt --nx/--ny, động tác một lần do WAAPI. */
+/* Lớp chuyển động: tư thế / nét mặt nội suy bằng transition (từ giá trị đang có) với biến đặt THẲNG trên phần tử ấy; mắt / nghiêng người do rAF đặt
+   transform nội tuyến; động tác một lần do WAAPI. Không biến / thuộc tính nào đổi ở gốc SVG ⇒ không tính lại kiểu cả cây. */
 .gtv .gt-nhay, .gtv .gt-lac { transform-origin: 100px 224px; }
-.gtv .gt-nghieng { transform-origin: 100px 224px; transform: rotate(var(--lean)); }
-.gtv .gt-mat { transform: translate(calc(var(--nx) * 2.6px), calc(var(--ny) * 2px)); }
-.gtv .gt-con { transform: translate(calc(var(--nx) * 4.6px), calc(var(--ny) * 4.2px)); }
+.gtv .gt-nghieng { transform-origin: 100px 224px; }
 .gtv .gt-gat { transform-origin: 100px 150px; }
-.gtv .gt-mi { transform: translateY(calc(var(--mi) * var(--h))); transition: transform .24s ease-in-out; }
-.gtv .gt-mi2 { transform: translateY(calc(var(--duoi) * var(--h) * -1)); transition: transform .24s ease-in-out; }
-.gtv .gt-may-t { transform: translateY(var(--mayY)) rotate(var(--may)); transition: transform .3s cubic-bezier(.34, 1.56, .64, 1); }
-.gtv .gt-may-p { transform: translateY(calc(var(--mayY) + var(--may2))) rotate(calc(var(--may) * -1)); transition: transform .3s cubic-bezier(.34, 1.56, .64, 1); }
+.gtv .gt-mi { transform: translateY(calc(var(--mi, 0) * var(--h))); transition: transform .24s ease-in-out; }
+.gtv .gt-mi2 { transform: translateY(calc(var(--duoi, 0) * var(--h) * -1)); transition: transform .24s ease-in-out; }
+.gtv .gt-may-t { transform: translateY(var(--mayY, 0px)) rotate(var(--may, 0deg)); transition: transform .3s cubic-bezier(.34, 1.56, .64, 1); }
+.gtv .gt-may-p { transform: translateY(calc(var(--mayY, 0px) + var(--may2, 0px))) rotate(calc(var(--may, 0deg) * -1)); transition: transform .3s cubic-bezier(.34, 1.56, .64, 1); }
 .gtv .gt-tay > .x { transform: rotate(var(--g, 0deg)); transition: transform .42s cubic-bezier(.34, 1.56, .64, 1); }
 .gtv .gt-nguoc { transform: rotate(calc(var(--g, 0deg) * -1)); transition: transform .42s cubic-bezier(.34, 1.56, .64, 1); }
-.gtv .gt-dongho > g { transition: transform .3s cubic-bezier(.34, 1.56, .64, 1); } .gtv[data-tay='dong-ho'] .gt-dongho > g { transform: scale(1.45); }
-.gtv .gt-so { transform: scale(0); transition: transform .3s cubic-bezier(.34, 1.56, .64, 1); } .gtv[data-tay='ghi'] .gt-so { transform: scale(1); }
-.gtv .gt-but { opacity: 0; transition: opacity .2s; } .gtv[data-tay='ghi'] .gt-but { opacity: 1; }
+.gtv .gt-dongho > g { transition: transform .3s cubic-bezier(.34, 1.56, .64, 1); } .gtv .gt-dongho.on > g { transform: scale(1.45); }
+.gtv .gt-so { transform: scale(0); transition: transform .3s cubic-bezier(.34, 1.56, .64, 1); } .gtv .gt-so.on { transform: scale(1); }
+.gtv .gt-but { opacity: 0; transition: opacity .2s; } .gtv .gt-but.on { opacity: 1; }
 .gtv [data-m], .gtv .gt-cuoi, .gtv .gt-nham { opacity: 0; transition: opacity .12s; }
-.gtv[data-mieng='thang'] [data-m='thang'], .gtv[data-mieng='mim'] [data-m='mim'], .gtv[data-mieng='cuoi-nhe'] [data-m='cuoi-nhe'], .gtv[data-mieng='cuoi'] [data-m='cuoi'],
-.gtv[data-mieng='nhech'] [data-m='nhech'], .gtv[data-mieng='xi'] [data-m='xi'], .gtv[data-mieng='o'] [data-m='o'], .gtv[data-mieng='noi'] [data-m='thang'] { opacity: 1; }
-.gtv[data-mieng='noi'] [data-m='o'] { animation: gt-noi .34s steps(1) infinite; }
+.gtv [data-m].on { opacity: 1; }
+.gtv [data-m].noi { animation: gt-noi .34s steps(1) infinite; }
 @keyframes gt-noi { 0% { opacity: 1; } 50% { opacity: 0; } }
-.gtv .gt-mo { transition: opacity .12s; } .gtv:is([data-mat='cuoi'], [data-mat='nham']) .gt-mo { opacity: 0; }
-.gtv[data-mat='cuoi'] .gt-cuoi, .gtv[data-mat='nham'] .gt-nham { opacity: 1; }
+.gtv .gt-mo { transition: opacity .12s; } .gtv .gt-mo.tat { opacity: 0; }
+.gtv :is(.gt-cuoi, .gt-nham).on { opacity: 1; }
 .gtv .gt-hieu > *, .gtv :is(.gt-tick, .gt-cheo) { opacity: 0; }
 
 /* Khung chứa: thân thở trên lớp HTML (transform, lớp GPU riêng). */
@@ -93,3 +93,5 @@
   [data-trong] .duo-gt-san .duo-gt-bong { --duoi: 30px; margin-top: 2px; padding: 10px 12px; }
   [data-trong] .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 16px; }
 }
+/* Chữ chạm được (VungChamDe) trong bong bóng: nới vùng chạm lên ≥ 44 px theo chiều dọc mà không đổi dòng chữ (padding trên phần tử nội dòng không đẩy dòng). */
+[data-trong] .duo-gt-bong [role='button'] { padding-block: 11px; }

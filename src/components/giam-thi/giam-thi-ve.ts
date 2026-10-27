@@ -295,8 +295,22 @@ export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; 
 
   // ── mắt dõi theo: lerp trên rAF (tự dừng khi tới đích) ──
   let nhinXY: [number, number] = [0, 0], dangNhin: [number, number] = [0, 0], raf = 0, tLan = 0
-  const datBien = (k: string, v: string) => svg.style.setProperty(k, v)
-  const apNhin = (x: number, y: number, lean: number) => { datBien('--nx', x.toFixed(3)); datBien('--ny', y.toFixed(3)); datBien('--lean', lean.toFixed(2) + 'deg') }
+  // Đặt giá trị THẲNG lên đúng phần tử cần (không đặt biến/thuộc tính ở gốc SVG: đổi ở gốc ⇒ tính lại kiểu cả cây vài trăm phần tử mỗi khung).
+  type El = SVGElement | null
+  const E = {
+    con: qa('.gt-con'), mat: q('.gt-mat') as El, nghieng: q('.gt-nghieng') as El, mi: qa('.gt-mi'), mi2: qa('.gt-mi2'), may: qa('.gt-may-t, .gt-may-p'),
+    mo: qa('.gt-mo'), cuoi: qa('.gt-cuoi'), nham: qa('.gt-nham'), mieng: qa('[data-m]'), dongho: q('.gt-dongho') as El, so: q('.gt-so') as El, but: q('.gt-but') as El,
+    tayT: q('.gt-tay-t') as El, tayP: q('.gt-tay-p') as El,
+  }
+  const daDat = new WeakMap<Element, Record<string, string>>()
+  const datBien = (els: El | El[], k: string, v: string) => { for (const e of ([] as El[]).concat(els)) { if (!e) continue; const m = daDat.get(e) ?? {}; if (m[k] === v) continue; m[k] = v; daDat.set(e, m); e.style.setProperty(k, v) } }
+  const lop = (e: El, ten: string, bat: boolean) => e?.classList.toggle(ten, bat)
+  const apNhin = (x: number, y: number, lean: number) => {
+    const t = `translate(${(x * 4.6).toFixed(2)}px,${(y * 4.2).toFixed(2)}px)`
+    for (const e of E.con) e.style.transform = t
+    if (E.mat) E.mat.style.transform = `translate(${(x * 2.6).toFixed(2)}px,${(y * 2).toFixed(2)}px)`
+    if (E.nghieng) E.nghieng.style.transform = `rotate(${lean.toFixed(2)}deg)`
+  }
   const dichNhin = (): [number, number, number] => { const s = buocNay ?? {}; const x = s.nx ?? nhinXY[0], y = s.ny ?? nhinXY[1]; return [x, y, s.nx == null ? x * 2.5 : 0] }
   const buocNhin = (t: number) => {
     raf = 0
@@ -316,13 +330,18 @@ export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; 
 
   const ap = (s: Buoc) => {
     buocNay = s
-    svg.setAttribute('data-mat', (mat = s.mat ?? 'mo'))
-    svg.setAttribute('data-mieng', s.mieng ?? 'thang')
-    svg.setAttribute('data-tay', s.tay ?? 'tha')
-    datBien('--mi', String(s.mi ?? 0)); datBien('--duoi', String(s.duoi ?? 0))
-    datBien('--may', (s.may ?? 0) + 'deg'); datBien('--mayY', (s.mayY ?? 0) + 'px'); datBien('--may2', (s.may2 ?? 0) + 'px')
-    const [t, p] = gocTay(muc, s.tay ?? 'tha')
-    q<SVGGElement>('.gt-tay-t')?.style.setProperty('--g', t + 'deg'); q<SVGGElement>('.gt-tay-p')?.style.setProperty('--g', p + 'deg')
+    mat = s.mat ?? 'mo'
+    for (const e of E.mo) lop(e, 'tat', mat !== 'mo')
+    for (const e of E.cuoi) lop(e, 'on', mat === 'cuoi')
+    for (const e of E.nham) lop(e, 'on', mat === 'nham')
+    const mieng = s.mieng ?? 'thang'
+    for (const e of E.mieng) { const k = e.getAttribute('data-m'); lop(e, 'on', k === mieng || (mieng === 'noi' && k === 'thang')); lop(e, 'noi', mieng === 'noi' && k === 'o') }
+    const tay = s.tay ?? 'tha'
+    lop(E.dongho, 'on', tay === 'dong-ho'); lop(E.so, 'on', tay === 'ghi'); lop(E.but, 'on', tay === 'ghi')
+    datBien(E.mi, '--mi', String(s.mi ?? 0)); datBien(E.mi2, '--duoi', String(s.duoi ?? 0))
+    datBien(E.may, '--may', (s.may ?? 0) + 'deg'); datBien(E.may, '--mayY', (s.mayY ?? 0) + 'px'); datBien(E.may, '--may2', (s.may2 ?? 0) + 'px')
+    const [t, p] = gocTay(muc, tay)
+    datBien(E.tayT, '--g', t + 'deg'); datBien(E.tayP, '--g', p + 'deg')
     nhinAp()
     vong.forEach((x) => x.cancel()); vong = []
     for (const v of s.vong ?? []) { const an = VONG[v]?.(); if (an) { mot = mot.filter((x) => x !== an); vong.push(an); if (tinh) an.currentTime = 140 } }
@@ -366,9 +385,9 @@ export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; 
       el.style.setProperty('--gt-loi-duoi', Math.max(10, khung.clientWidth * 0.45 - 6).toFixed(0) + 'px')
       khung.appendChild(el)
       if (tinh || giam || dung) { da.textContent = chu; if (tinh) return g } else con.textContent = chu
-      el.animate([{ opacity: 0, transform: 'scale(.6)' }, { opacity: 1, transform: 'scale(1.05)', offset: 0.65 }, { opacity: 1, transform: 'scale(1)' }], { duration: 320, easing: NAY })
+      if (typeof el.animate === 'function') el.animate([{ opacity: 0, transform: 'scale(.6)' }, { opacity: 1, transform: 'scale(1.05)', offset: 0.65 }, { opacity: 1, transform: 'scale(1)' }], { duration: 320, easing: NAY })
       if (!giam && !dung) { let i = 0; const go = window.setInterval(() => { i++; da.textContent = chu.slice(0, i); con.textContent = chu.slice(i); if (i >= chu.length) clearInterval(go) }, 34); loiHen.push(go) }
-      loiHen.push(window.setTimeout(() => { const an = el.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(-6px) scale(.96)' }], { duration: 300, easing: 'ease-in', fill: 'forwards' }); an.onfinish = () => el.remove() }, chu.length * 34 + (oo.giu ?? 1900)))
+      loiHen.push(window.setTimeout(() => { if (typeof el.animate !== 'function') { el.remove(); return } const an = el.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(-6px) scale(.96)' }], { duration: 300, easing: 'ease-in', fill: 'forwards' }); an.onfinish = () => el.remove() }, chu.length * 34 + (oo.giu ?? 1900)))
       return g
     },
     tamDung(d) {
@@ -387,7 +406,7 @@ export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; 
     chop = window.setTimeout(() => {
       if (mat === 'mo' && !document.hidden) {
         const kep = Math.random() < 0.18
-        qa('.gt-chop').forEach((e) => e.animate(kep
+        qa('.gt-chop').forEach((e) => e.animate?.(kep
           ? [{ transform: 'none' }, { transform: `translateY(${c.r[1] * 2}px)`, offset: 0.22 }, { transform: 'none', offset: 0.45 }, { transform: `translateY(${c.r[1] * 2}px)`, offset: 0.67 }, { transform: 'none' }]
           : [{ transform: 'none' }, { transform: `translateY(${c.r[1] * 2}px)`, offset: 0.45 }, { transform: 'none' }], { duration: kep ? 360 : 180, easing: 'ease-in-out' }))
       }

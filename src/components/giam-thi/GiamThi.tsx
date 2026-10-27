@@ -41,7 +41,7 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
     cauMoi(nhip, qid)
     batDau.current = bay(); daNop.current = false
     // Bong bóng càu nhàu không rộng hơn khối giám thị + đề (không tràn sang cột phương án ở khung ngang).
-    const doRong = () => { const san = el.parentElement; if (san) el.style.setProperty('--gt-loi-max', `${Math.max(140, san.clientWidth - 4)}px`) }
+    const doRong = () => { const san = el.closest('.duo-gt-san') ?? el.parentElement; if (san) el.style.setProperty('--gt-loi-max', `${Math.max(140, san.clientWidth - 4)}px`) }
     doRong()
     window.addEventListener('resize', doRong)
     if (!ket) {
