@@ -271,7 +271,7 @@ describe('bấm em ⇒ tấm Hồ sơ làm bài (trùng tu)', () => {
     fireEvent.click(within(tam).getByRole('tab', { name: /Câu đã ôn/ }))
     const on = tam.querySelector('.gvv2-hs-o-the .gvv2-hs-cau')!
     expect(on.textContent).toContain('Chưa sửa được')
-    expect(on.textContent).toContain('Vận dụng · ôn 1 lần · làm 2 lần · đúng 0 · sai 2')
+    expect(on.textContent!.replace(/\u00a0/g, ' ')).toContain('Vận dụng · ôn 1 lần · làm 2 lần · đúng 0 · sai 2') // «·» dính chữ trước bằng khoảng trắng không ngắt (27/10)
     // vẫn giữ Mở hồ sơ đầy đủ
     expect(within(tam).getByRole('button', { name: 'Mở hồ sơ đầy đủ' })).toBeTruthy()
     fireEvent.keyDown(document, { key: 'Escape' })
