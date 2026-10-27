@@ -499,7 +499,7 @@ export default function ExamTakeScreen({ tuCong, onVe }: { tuCong?: TuCongHocSin
 
   // ---- Trạng thái riêng của màn làm bài ----
   // KIỂU DUOLINGO (thầy 27/10): cố định suốt phiên như <html data-trong>. `cauDuo` = câu đang xem (khung Duo mở ra thì tự tới câu chưa làm đầu tiên).
-  // `thiDuoSan` đổi khi mảnh khung Duo tải xong ⇒ vẽ lại bằng khung ấy + bộ quan sát giây từng câu gắn lại các thẻ. Âm thanh: khung Duo bật cờ «đang kiểm tra» (batCheDoThi, am-thanh.ts) (chỉ rung).
+  // `thiDuoSan` đổi khi mảnh khung Duo tải xong ⇒ vẽ lại bằng khung ấy + bộ quan sát giây từng câu gắn lại các thẻ. Âm thanh: khung Duo bật cờ «đang kiểm tra» (batCheDoThi) ⇒ chỉ rung.
   const [thiDuo] = useState(laThiDuo)
   const [cauDuo, setCauDuo] = useState(0)
   const [thiDuoSan, setThiDuoSan] = useState(0)
