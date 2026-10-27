@@ -204,6 +204,8 @@ const MAU_CU_THAY_RA_LENH = LENH_2110.cu // khoá → số lần khai báo đư�
 // 26/10: gỡ CSS CHẾT (luật mà mọi bộ chọn trỏ tới lớp không còn mã nào dùng) để giao diện «Trong» không làm app nặng hơn — danh sách đóng ở
 // docs/css-chet-2610.json (khoá → số lần, đúng lúc gỡ). Cộng vào MAU_CU_THAY_RA_LENH; giảm thêm ngoài danh sách vẫn là vi phạm.
 for (const [k, n] of Object.entries(JSON.parse(readFileSync(new URL('../docs/css-chet-2610.json', import.meta.url), 'utf8')).cu)) MAU_CU_THAY_RA_LENH[k] = (MAU_CU_THAY_RA_LENH[k] ?? 0) + n
+// 27/10: đợt gỡ CSS chết thứ hai (tờ nạp chung index-*.css; luật tốc độ đỏ sau #430/#431) — danh sách đóng ở docs/css-chet-2710.json, cùng cách.
+for (const [k, n] of Object.entries(JSON.parse(readFileSync(new URL('../docs/css-chet-2710.json', import.meta.url), 'utf8')).cu)) MAU_CU_THAY_RA_LENH[k] = (MAU_CU_THAY_RA_LENH[k] ?? 0) + n
 const MAU_THAY_RA_LENH = new Set([
   'src/styles/tokens.css · --v2-nga-voi: #fffef6',
   'src/styles/tokens.css · --v2-xanh-than: #0f3d3a',
