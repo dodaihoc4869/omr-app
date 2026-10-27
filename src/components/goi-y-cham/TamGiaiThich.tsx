@@ -1,40 +1,31 @@
-// TẤM GIẢI THÍCH khi chạm một chữ tô màu (bản vẽ docs/ban-ve-doc-de-2610 màn 2, 3, 3b, 3c và tấm xoay ngang).
-//   ≤ 639px  ('day') : tấm trượt từ đáy, có thanh kéo + lớp phủ, nút «Đã hiểu» rộng hết.
-//   640–900px ('cot'): CỘT PHẢI 320px, không phủ đề (thầy 26/10: «tối ưu cho giao diện xoay ngang»).
-//   ≥ 901px  ('noi') : thẻ nổi neo ngay dưới chữ, có mũi nhọn; rê chuột hiện, bấm ghim (nơi gọi quyết định), Esc đóng.
-// Gắn vào <body> (không bị khung cuộn của màn cắt); phông lấy đúng phông của chữ neo (không đặt phông riêng).
-import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react'
+// THẺ GIẢI NGHĨA khi chạm một chữ tô tím — kiểu DUOLINGO (thầy 27/10: «làm lại khung hiển thị cho tinh tế popup đẹp mắt dolingo»).
+// Mọi khổ (điện thoại dọc, xoay ngang, máy tính) cùng MỘT kiểu: thẻ nhỏ neo ngay dưới chữ (hết chỗ dưới ⇒ lật lên trên), mũi nhọn chỉ vào chữ,
+// rộng tối đa 300px, không vượt mép màn (lề 12px). Không tấm đáy, không nền xám che màn, không cột phải, không nút «Đã hiểu».
+// Dòng đầu đậm (tên / ý chính) · 1–2 dòng chi tiết (chất: công thức · M).
+// Đóng: chạm ra ngoài, chạm chữ khác, cuộn làm chữ trôi đi, Esc (nơi gọi lo), Tab ra khỏi thẻ. Gắn vào <body> (không bị khung cuộn của màn cắt);
+// phông lấy đúng phông của chữ neo.
+import { useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
 import { ChemText } from '../../lib/chem-format'
 import type { TheGiaiNghia } from '../../lib/goi-y-cham/kieu'
-import { BieuTuong, type TenBieuTuong } from './bieu-tuong'
 import { CongThuc } from './so-do-thay'
 
-export type KieuTam = 'day' | 'cot' | 'noi'
-const MQ_DAY = '(max-width: 639px)', MQ_COT = '(max-width: 900px)'
-function docKieu(): KieuTam {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return 'day'
-  return window.matchMedia(MQ_DAY).matches ? 'day' : window.matchMedia(MQ_COT).matches ? 'cot' : 'noi'
+const MQ_RE = '(hover: hover) and (pointer: fine)'
+function docCoRe(): boolean {
+  return typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia(MQ_RE).matches
 }
-function ngheKieu(bao: () => void) {
+function ngheCoRe(bao: () => void) {
   if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return () => {}
-  const ds = [MQ_DAY, MQ_COT].map((q) => window.matchMedia(q))
-  for (const m of ds) m.addEventListener?.('change', bao)
-  return () => { for (const m of ds) m.removeEventListener?.('change', bao) }
+  const m = window.matchMedia(MQ_RE)
+  m.addEventListener?.('change', bao)
+  return () => m.removeEventListener?.('change', bao)
 }
-/** Khổ hiện tại — đổi ngay khi xoay máy / kéo cửa sổ. */
-export function useKieuTam(): KieuTam {
-  return useSyncExternalStore(ngheKieu, docKieu, () => 'day')
+/** Máy có chuột (rê để xem trước): rê chữ là hiện thẻ, bấm thì ghim. Màn cảm ứng: chỉ chạm. */
+export function useCoRe(): boolean {
+  return useSyncExternalStore(ngheCoRe, docCoRe, () => false)
 }
 
-const ICON: Record<TheGiaiNghia['nhan'], { ten: TenBieuTuong; mau: string; chip: string }> = {
-  'Đơn vị': { ten: 'info', mau: 'gyc-tin', chip: 'gyc-tin' },
-  'Chất': { ten: 'book', mau: 'gyc-dung', chip: 'gyc-dung' },
-  'Công thức': { ten: 'book', mau: 'gyc-dung', chip: 'gyc-dung' },
-  'Từ then chốt': { ten: 'flag', mau: 'gyc-chu-y', chip: '' },
-  'Đề hỏi': { ten: 'alert', mau: 'gyc-chu-y', chip: 'gyc-chu-y' },
-}
-// Cột phải dùng chung cho thẻ giải nghĩa (640–900px) và gợi ý (≥ 640px): đếm số chỗ đang giữ, hết người giữ mới gỡ `data-gyc-cot-phai`.
+// Cột phải của «Gợi ý 3 tầng» (≥ 640px): đếm số chỗ đang giữ, hết người giữ mới gỡ `data-gyc-cot-phai`.
 let soGiu = 0
 /** Báo khung màn chừa cột phải (`--gyc-cot-phai`) — trả hàm nhả. */
 export function giuCotPhai(): () => void {
@@ -44,70 +35,78 @@ export function giuCotPhai(): () => void {
   return () => { if (da) return; da = true; if (--soGiu <= 0) { soGiu = 0; document.documentElement.removeAttribute('data-gyc-cot-phai') } }
 }
 
-const so = (x: number) => String(Math.round(x * 100) / 100).replace('.', ',')
+const LE = 12, KHE = 10, RONG = 300, TROI = 24
 
-export default function TamGiaiThich({ the, neo, kieu, id, onDong, onVao, onRoi }: {
+/** Khung chữ neo: dòng đầu của mảnh đầu, nối thêm các mảnh cùng dòng (FeS<sub>2</sub> = 2 mảnh). */
+function khungNeo(manh: HTMLElement[]): DOMRect | null {
+  const dau = manh[0]
+  if (!dau?.isConnected) return null
+  const r0 = dau.getClientRects()[0] ?? dau.getBoundingClientRect()
+  let trai = r0.left, phai = r0.right, tren = r0.top, duoi = r0.bottom
+  for (const m of manh.slice(1)) {
+    const r = m.getClientRects()[0]
+    if (!r || Math.abs(r.top - r0.top) > r0.height / 2) break
+    trai = Math.min(trai, r.left); phai = Math.max(phai, r.right); tren = Math.min(tren, r.top); duoi = Math.max(duoi, r.bottom)
+  }
+  return new DOMRect(trai, tren, phai - trai, duoi - tren)
+}
+
+type ViTri = { top: number; left: number; mui: number; tren: boolean }
+
+export default function TamGiaiThich({ the, neo, id, onDong, onVao, onRoi }: {
   the: TheGiaiNghia
-  neo: HTMLElement | null
-  kieu: KieuTam
+  /** các mảnh chữ của vùng đang mở (mảnh đầu là chữ nhận Tab) */
+  neo: HTMLElement[]
   id: string
-  onDong: () => void
+  /** `traTieuDiem`: đưa con trỏ bàn phím về lại chữ */
+  onDong: (traTieuDiem: boolean) => void
   /** chuột vào / rời thẻ (máy tính: rê từ chữ sang thẻ không làm thẻ tắt) */
   onVao?: () => void
   onRoi?: () => void
 }) {
-  const the_ = useRef<HTMLDivElement>(null)
-  const [vt, setVt] = useState<{ top: number; left: number; mui: number; tren: boolean } | null>(null)
-  const font = neo ? getComputedStyle(neo).fontFamily : undefined
-  // Máy tính: đặt thẻ ngay dưới chữ (thiếu chỗ dưới ⇒ lật lên trên), không tràn mép; cuộn / đổi khổ ⇒ đặt lại.
+  const ref = useRef<HTMLDivElement>(null)
+  const [vt, setVt] = useState<ViTri | null>(null)
+  const font = neo[0] ? getComputedStyle(neo[0]).fontFamily : undefined
+  // Đặt thẻ dưới chữ (thiếu chỗ ⇒ lật lên trên), kẹp trong lề 12px; mũi nhọn chỉ đúng giữa chữ. Cuộn làm chữ trôi > 24px ⇒ đóng.
   useLayoutEffect(() => {
-    if (kieu !== 'noi' || !neo) { setVt(null); return }
+    const goc = khungNeo(neo)
+    if (!goc) return
     const dat = () => {
-      const r = neo.getBoundingClientRect(), w = the_.current?.offsetWidth ?? 340, h = the_.current?.offsetHeight ?? 220
-      const left = Math.max(12, Math.min(r.left - 8, window.innerWidth - w - 12))
-      const tren = r.bottom + 14 + h > window.innerHeight - 12 && r.top - 14 - h > 12
-      setVt({ top: tren ? r.top - 14 - h : r.bottom + 14, left, mui: Math.max(14, Math.min(r.left + Math.min(r.width / 2, 22) - left - 7, w - 28)), tren })
+      const r = khungNeo(neo)
+      if (!r) return
+      const vw = document.documentElement.clientWidth || window.innerWidth, vh = window.innerHeight
+      const w = ref.current?.offsetWidth || Math.min(RONG, vw - 2 * LE), h = ref.current?.offsetHeight || 96
+      const tam = r.left + r.width / 2
+      const left = Math.round(Math.max(LE, Math.min(tam - w / 2, vw - w - LE)))
+      const tren = r.bottom + KHE + h > vh - LE && r.top - KHE - h >= LE
+      setVt({ top: Math.round(tren ? r.top - KHE - h : r.bottom + KHE), left, mui: Math.round(Math.max(18, Math.min(tam - left, w - 18))), tren })
     }
     dat()
-    window.addEventListener('scroll', dat, true)
+    const cuon = () => {
+      const r = khungNeo(neo)
+      if (!r || Math.abs(r.top - goc.top) > TROI || Math.abs(r.left - goc.left) > TROI) onDong(false)
+      else dat()
+    }
+    window.addEventListener('scroll', cuon, true)
     window.addEventListener('resize', dat)
-    return () => { window.removeEventListener('scroll', dat, true); window.removeEventListener('resize', dat) }
-  }, [kieu, neo, the])
-  // 640–900px: thẻ là CỘT PHẢI ⇒ đề co lại bên trái, không bị che (thầy 26/10: «tối ưu cho giao diện xoay ngang»)
-  useEffect(() => (kieu === 'cot' ? giuCotPhai() : undefined), [kieu])
-  const ic = ICON[the.nhan] ?? ICON['Từ then chốt']
-  // Thẻ của làn A (the-cham.ts `TheGiaiNghiaDu`) có thêm: loai (viên thuốc «Base mạnh», «Ester»), cachTinhM, congThucChat, tenIupac.
-  // Bố cục theo bản vẽ màn 3/3b: tên to · [tên IUPAC đậm · tên cũ] · hộp «công thức · M = … g/mol» · dòng nhỏ «M tính từ nguyên tử khối …».
-  const du = the as TheGiaiNghia & { loai?: string; cachTinhM?: string; congThucChat?: string; tenIupac?: string }
-  const laHop = (d: string) => / · (?:M|M một mắt xích) = /.test(d)
-  const laNho = (d: string) => !!du.cachTinhM && d.endsWith(du.cachTinhM)
-  const doan = the.doan.filter((d) => !laHop(d) && !laNho(d) && d !== du.tenIupac)
-  const hop = the.doan.find(laHop) ?? (the.congThuc ? `${the.congThuc}${the.M ? ` · M = ${so(the.M)} g/mol` : ''}` : the.M ? `M = ${so(the.M)} g/mol` : '')
-  const nho = the.doan.find(laNho)
+    return () => { window.removeEventListener('scroll', cuon, true); window.removeEventListener('resize', dat) }
+  }, [neo, the]) // eslint-disable-line react-hooks/exhaustive-deps
+  const idTen = `${id}-ten`
   return createPortal(
-    <>
-      {kieu === 'day' && <div className="gyc-phu" aria-hidden="true" onClick={onDong} />}
-      <div
-        ref={the_} id={id} className="gyc-bong" data-kieu={kieu} data-tren={vt?.tren || undefined} role="dialog" aria-label={`Giải nghĩa: ${the.ten}`}
-        style={{ fontFamily: font, ...(kieu === 'noi' ? (vt ? { top: vt.top, left: vt.left } : { visibility: 'hidden', top: 0, left: 0 }) : {}) }}
-        onMouseEnter={onVao} onMouseLeave={onRoi}
-        onKeyDown={(e) => { if (e.key === 'Escape') { e.stopPropagation(); onDong() } }}
-      >
-        {kieu === 'noi' && vt && <span className="gyc-bong-mui" style={{ left: vt.mui }} aria-hidden="true" />}
-        <span className="gyc-keo" aria-hidden="true" />
-        <div className="gyc-b-dau">
-          <span className={`gyc-o-icon ${ic.mau}`}><BieuTuong ten={ic.ten} /></span>
-          <span className="gyc-b-ten"><ChemText text={the.ten} /></span>
-          <span className={`gyc-chip gyc-b-loai ${ic.chip}`}>{du.loai || the.nhan}</span>
-        </div>
-        {(du.tenIupac || the.tenCu) && <p className="gyc-b-doan">{du.tenIupac && <b><ChemText text={du.tenIupac} /></b>}{du.tenIupac && the.tenCu ? ' · ' : ''}{the.tenCu && <>tên cũ: <ChemText text={the.tenCu} /></>}</p>}
-        {doan.map((d, i) => <p key={i} className="gyc-b-doan"><ChemText text={d} /></p>)}
-        {hop && <div className="gyc-b-ct"><CongThuc chu={hop} /></div>}
-        {nho && <p className="gyc-b-nho">{nho}</p>}
-        {the.nhoDoi && <p className="gyc-b-nho">Nhớ đổi: {the.nhoDoi}</p>}
-        <div className="gyc-b-cuoi"><button type="button" className="gyc-nut gyc-nhe" data-gyc-da-hieu="" onClick={onDong}>Đã hiểu</button></div>
-      </div>
-    </>,
+    <div
+      ref={ref} id={id} className="gyc-bong" data-tren={vt?.tren || undefined} role="dialog" aria-modal="false" aria-labelledby={idTen} tabIndex={-1}
+      style={{ fontFamily: font, ...(vt ? { top: vt.top, left: vt.left, ['--gyc-mui' as string]: `${vt.mui}px` } : { visibility: 'hidden', top: 0, left: 0 }) }}
+      onMouseEnter={onVao} onMouseLeave={onRoi}
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') { e.stopPropagation(); e.preventDefault(); onDong(true) }
+        // Tab ra khỏi thẻ ⇒ đóng, con trỏ về chữ rồi đi tiếp như thường (không chặn phím)
+        else if (e.key === 'Tab') onDong(true)
+      }}
+    >
+      <span className="gyc-bong-mui" aria-hidden="true" />
+      <p className="gyc-b-ten" id={idTen}><ChemText text={the.ten} /></p>
+      {the.doan.slice(0, 2).map((d, i) => <p key={i} className="gyc-b-doan"><CongThuc chu={d} /></p>)}
+    </div>,
     document.body,
   )
 }

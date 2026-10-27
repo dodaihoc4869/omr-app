@@ -4,6 +4,18 @@ Kênh: Code app 1 nhắn Code app 3 bằng send_message. Chiều ngược lại 
 
 ## Phản hồi
 
+### 27/10 đêm (2) · Claude — thẻ chất chỉ còn tên · công thức · M
+Lời thầy: «Hiện tên, công thức, M thôi, bỏ tính chất» + «Bỏ cái dòng tên cũ anilin đi».
+- Mọi thẻ chất: đúng 3 dòng (tên theo GDPT 2018 · công thức · M). Bỏ loại, bậc, tính chất, tên cũ / tên khác (từ điển vẫn nhận tên cũ để dò chất trong đề).
+- Câu lý thuyết nay tô cả tên chất. Đề hỏi chính tên / công thức / phân tử khối ⇒ không tô chất (tránh lộ đáp án). `locLyThuyet(ds, chuDe)` nhận thêm chữ đề.
+
+### 27/10 đêm · Claude (giúp Boss, làn goi-y-cham) — thẻ kiểu Duolingo + rà nội dung
+Lời thầy: «Soát kĩ quá vô nghĩa, làm lại khung hiển thị cho tinh tế popup đẹp mắt dolingo» (ảnh câu ethylamine: tô «dịch chất nào sau đây», tấm đáy che nửa màn «Đề hỏi chọn một phương án… Đã hiểu»).
+- **Khung:** `TamGiaiThich` bỏ tấm đáy / nền xám / cột phải / nút «Đã hiểu». Mọi khổ: thẻ nhỏ neo dưới chữ (hết chỗ ⇒ trên), mũi nhọn, rộng ≤ 300px, lề 12px, phóng .9→1 trong 120ms, rung `chon`. Đóng: chạm ngoài / chữ khác / cuộn / Esc (bắt ở pha capture, không lọt xuống màn) / Tab. Giữ export `giuCotPhai` (cột phải chỉ còn cho «Gợi ý 3 tầng»); `useKieuTam` ⇒ `useCoRe`.
+- **Nội dung:** vùng KHÔNG có thẻ thì không bọc, không tô (`boc-chu.ts`). Bỏ: thẻ «chất nào sau đây», «… là» chung chung, từ ai cũng hiểu (đun nóng, thu được, tối đa, lọc, nhiệt độ thường), «%» không rõ của gì, mọi câu «tự hỏi …». Còn: chất (tên IUPAC · công thức · M · loại · bậc + tính chất amine · tên cũ), đơn vị (công thức đổi, đkc/đktc theo đề), biến cần tìm (gắn chất), bẫy phủ định, đếm. Bảng trước/sau trong mô tả PR.
+- **Cắt cụm:** `phat-hien.ts` không cắt giữa từ ghép («dung dịch», «phản ứng», «nhiệt độ», «khối lượng»…).
+- Không đụng `ManLamBaiTap.tsx`, `trong-lam-bai.css`.
+
 ### 27/10 khuya · Code app 3 — đã đọc #409, rà thêm thẻ
 - Đã kéo main (#409). Không khôi phục khung / nền / chú giải.
 - Rà `the-cham.ts` `theDeHoi`: bỏ mọi câu chỉ nhắc lại chữ đề («X»: đó là thứ em cần tìm · «X»: chỉ một phương án hợp…). Thẻ chỉ còn câu giúp em làm. Test mới: không câu nào mở bằng «chữ đề».

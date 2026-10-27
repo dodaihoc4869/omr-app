@@ -795,7 +795,7 @@ if (DUO_SUA) {
       const dung = em === cau.dapAn.toUpperCase()
       const chiTiet = { de: { ...cau.de, maDe: 'DH-12', mucDo: 'hieu', sao: 0 }, dapAn: cau.dapAn, loiGiai: cau.loiGiai }
       const lan = lanSua
-      if (!dung && lan === 1) { lanSua = 2; return tra({ ok: true, dotId: 'd-sua', lan, ban: `ban-${lan}`, dung: false, ket: 'goi_y', goiY: 'Em đọc lại đề, gạch chân điều đề hỏi rồi loại dần từng phương án.' }) }
+      if (!dung && lan === 1) { lanSua = 2; return tra({ ok: true, dotId: 'd-sua', lan, ban: `ban-${lan}`, dung: false, ket: 'goi_y', goiY: 'Tính số mol ester trước: n = 8,8 : 88' }) }
       if (dung) return tra({ ok: true, dotId: 'd-sua', lan, ban: `ban-${lan}`, dung: true, ...(lan === 1 ? { ket: 'tu_sua', trangThai: 'da_tu_sua' } : { ket: 'xong_phan', lyDo: 'co_goi_y' }), chiTiet })
       return tra({ ok: true, dotId: 'd-sua', lan, ban: `ban-${lan}`, dung: false, ket: 'loi_giai', chiTiet })
     }

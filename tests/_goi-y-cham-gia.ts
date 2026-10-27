@@ -16,9 +16,9 @@ export function phatHienGia(chu: string): VungCham[] {
 }
 export function theChoGia(v: VungCham): TheGiaiNghia | null {
   if (v.loai === 'hoi') return null
-  if (v.loai === 'cho' && /M$/.test(v.chu)) return { ten: 'M · nồng độ mol', nhan: 'Đơn vị', doan: ['1,5 M đọc là «1,5 mol trên lít».'], congThuc: 'n = C_M × V (V tính bằng lít)', nhoDoi: '1000 mL = 1 L' }
+  if (v.loai === 'cho' && /M$/.test(v.chu)) return { ten: 'M · nồng độ mol', nhan: 'Đơn vị', doan: ['1,5 M: cứ 1 lít dung dịch có 1,5 mol chất tan', 'n = C_M × V (V: lít; 1000 mL = 1 L)'], congThuc: 'n = C_M × V (V tính bằng lít)', nhoDoi: '1000 mL = 1 L' }
   if (v.loai === 'cho') return { ten: v.chu, nhan: 'Đơn vị', doan: ['Số liệu đề cho.'] }
-  if (v.loai === 'chat') return { ten: v.chu === 'NaOH' ? 'sodium hydroxide' : v.chu, nhan: 'Chất', doan: ['Chất trong đề.'], tenCu: 'natri hiđroxit', M: 40 }
+  if (v.loai === 'chat') return { ten: v.chu === 'NaOH' ? 'sodium hydroxide' : v.chu, nhan: 'Chất', doan: v.chu === 'NaOH' ? ['NaOH', 'M = 40 g/mol'] : ['Chất trong đề.'], tenCu: 'natri hiđroxit', M: 40 }
   return { ten: v.chu, nhan: 'Từ then chốt', doan: ['Từ quyết định cách làm.'] }
 }
 export const TU_DIEN_GIA: TuDien = { phatHien: phatHienGia, theCho: theChoGia }
