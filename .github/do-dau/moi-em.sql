@@ -1,0 +1,13 @@
+SELECT (SELECT created_at FROM game_v2_attempt WHERE sbd=?1 ORDER BY created_at DESC LIMIT 1) AS a,
+  (SELECT received_at FROM su_kien_hoc WHERE sbd=?1 ORDER BY received_at DESC LIMIT 1) AS s,
+  (SELECT luc FROM goi_bai_7_gap WHERE sbd=?1 ORDER BY luc DESC LIMIT 1) AS g,
+  (SELECT luc FROM loi_giai_hoi WHERE sbd=?1 ORDER BY luc DESC LIMIT 1) AS lg,
+  (SELECT cap_nhat_luc FROM chua_loi_dot WHERE sbd=?1 ORDER BY cap_nhat_luc DESC LIMIT 1) AS cl,
+  (SELECT group_concat(x,',') FROM (SELECT id||'~'||ngay||'~'||trang_thai||'~'||COALESCE(nop_luc,'') AS x FROM kiem_tra_ca_nhan WHERE sbd=?1 ORDER BY id)) AS kt,
+  (SELECT group_concat(x,',') FROM (SELECT goi_id||'~'||bat_dau||'~'||han AS x FROM goi_bai_7_em WHERE sbd=?1 ORDER BY goi_id)) AS goi,
+  (SELECT COALESCE(lop,'')||'|'||COALESCE(ten_lop,'')||'|'||COALESCE(trang_thai,'') FROM hoc_sinh WHERE sbd=?1) AS hs,
+  (SELECT json FROM game_v2_scope WHERE sbd=?1) AS pv,
+  (SELECT COUNT(*)||'|'||COALESCE(MAX(nop_luc),'') FROM btvn_em WHERE sbd=?1) AS bt,
+  (SELECT COUNT(*)||'|'||COALESCE(MAX(COALESCE(them_luc,'')),'')||'|'||COALESCE(MAX(COALESCE(bot_luc,'')),'') FROM chien_dich_em WHERE sbd=?1) AS cde, (SELECT ngay FROM hoc_tap_san_sang WHERE sbd=?1) AS ss_ngay, (SELECT luc FROM hoc_tap_san_sang WHERE sbd=?1) AS ss_luc,
+  (SELECT dau FROM hoc_tap_san_sang WHERE sbd=?1) AS ss_dau, (SELECT sanh_json FROM hoc_tap_san_sang WHERE sbd=?1) AS ss_sanh,
+  (SELECT chang_json FROM hoc_tap_san_sang WHERE sbd=?1) AS ss_chang, (SELECT created_at FROM game_v2_session WHERE sbd=?1 ORDER BY created_at DESC LIMIT 1) AS ss_phien_moi
