@@ -19,52 +19,84 @@ export const SQL_SAN_SANG: readonly string[] = [
   `CREATE TABLE IF NOT EXISTS ${BANG_SAN_SANG} (sbd TEXT PRIMARY KEY, ngay TEXT NOT NULL, luc INTEGER NOT NULL, dau TEXT NOT NULL, sanh_json TEXT, chang_json TEXT)`,
 ]
 
-/** Mốc đầu ngày VN (ISO) của `now`. */
-const dauNgayVn = (now: number) => new Date(Date.parse(new Date(now + 7 * 3600000).toISOString().slice(0, 10) + 'T00:00:00+07:00')).toISOString()
-
 /**
- * Câu đọc DẤU. Mỗi phần là một câu con theo chỉ mục của em (hoặc bảng nhỏ dùng chung) ⇒ một lượt D1 nhẹ; chạy CÙNG đợt với mật khẩu ở nơi gọi.
- * ?1 = sbd, ?2 = mốc đầu ngày VN (ISO).
+ * Câu đọc DẤU — chạy CÙNG đợt với mật khẩu ở nơi gọi. ?1 = sbd.
+ * Phần CỦA EM (`em`): chỉ đọc theo chỉ mục của riêng em — DÒNG CUỐI theo (sbd, mốc giờ) (`ORDER BY … DESC LIMIT 1`, một lần dò chỉ mục, không đếm),
+ * hoặc vài dòng của em qua chỉ mục sbd (bảng nhỏ theo em: kiểm tra cá nhân, gói, BTVN, chiến dịch theo em). EXPLAIN QUERY PLAN: tests/dau-san-sang-chi-muc-2810.
+ * Phần CHUNG (cấu hình thầy, kho, ca, chiến dịch…): đếm / quét bảng dùng chung ⇒ KHÔNG đọc mỗi lượt Sảnh mà lấy từ ĐỆM ISOLATE 5 phút (như #531);
+ * hết hạn ⇒ ghép vào CHÍNH câu dấu của lượt ấy (không thêm lệnh / đợt D1), lượt đồng thời dùng bản cũ trong lúc làm mới.
  */
-const PHAN_DAU: readonly (readonly [string, string, string])[] = [
-  ['a', 'game_v2_attempt', "SELECT COUNT(*)||'|'||COALESCE(MAX(created_at),'') FROM game_v2_attempt WHERE sbd=?1 AND created_at>=?2"],
-  ['s', 'su_kien_hoc', "SELECT COUNT(*)||'|'||COALESCE(MAX(COALESCE(received_at,0)),0) FROM su_kien_hoc WHERE sbd=?1"],
-  ['g', 'goi_bai_7_gap', "SELECT COUNT(*)||'|'||COALESCE(MAX(luc),'') FROM goi_bai_7_gap WHERE sbd=?1"],
-  ['lg', 'loi_giai_hoi', "SELECT COUNT(*)||'|'||COALESCE(MAX(luc),'') FROM loi_giai_hoi WHERE sbd=?1"],
-  ['cl', 'chua_loi_dot', "SELECT COUNT(*)||'|'||COALESCE(MAX(cap_nhat_luc),0) FROM chua_loi_dot WHERE sbd=?1"],
-  ['kt', 'kiem_tra_ca_nhan', "SELECT group_concat(x,',') FROM (SELECT id||'~'||ngay||'~'||trang_thai||'~'||COALESCE(nop_luc,'') AS x FROM kiem_tra_ca_nhan WHERE sbd=?1 ORDER BY id)"],
-  ['goi', 'goi_bai_7_em', "SELECT group_concat(x,',') FROM (SELECT goi_id||'~'||bat_dau||'~'||han AS x FROM goi_bai_7_em WHERE sbd=?1 ORDER BY goi_id)"],
-  ['gg', 'goi_bai_7', "SELECT COUNT(*)||'|'||COALESCE(MAX(tao_luc),'') FROM goi_bai_7"],
+type Phan = readonly [khoa: string, bang: string, sql: string, chung?: 1]
+const PHAN_DAU: readonly Phan[] = [
+  ['a', 'game_v2_attempt', 'SELECT created_at FROM game_v2_attempt WHERE sbd=?1 ORDER BY created_at DESC LIMIT 1'], // game_v2_attempt_student(sbd,created_at)
+  ['s', 'su_kien_hoc', 'SELECT received_at FROM su_kien_hoc WHERE sbd=?1 ORDER BY received_at DESC LIMIT 1'], // idx_skh_tiep_nhan(sbd,received_at,khoa)
+  ['g', 'goi_bai_7_gap', 'SELECT luc FROM goi_bai_7_gap WHERE sbd=?1 ORDER BY luc DESC LIMIT 1'], // goi_bai_7_gap_sbd_luc (mới, chỉ-thêm)
+  ['lg', 'loi_giai_hoi', 'SELECT luc FROM loi_giai_hoi WHERE sbd=?1 ORDER BY luc DESC LIMIT 1'], // idx_lg_hoi_em_luc(sbd,luc)
+  ['cl', 'chua_loi_dot', 'SELECT cap_nhat_luc FROM chua_loi_dot WHERE sbd=?1 ORDER BY cap_nhat_luc DESC LIMIT 1'], // idx_cld_em_cap_nhat (mới, chỉ-thêm)
+  ['kt', 'kiem_tra_ca_nhan', "SELECT group_concat(x,',') FROM (SELECT id||'~'||ngay||'~'||trang_thai||'~'||COALESCE(nop_luc,'') AS x FROM kiem_tra_ca_nhan WHERE sbd=?1 ORDER BY ngay)"], // ktcn_em_ngay(sbd,ngay) — UNIQUE(sbd,ngay), thứ tự chỉ mục,
+  ['goi', 'goi_bai_7_em', "SELECT group_concat(x,',') FROM (SELECT goi_id||'~'||bat_dau||'~'||han AS x FROM goi_bai_7_em WHERE sbd=?1 ORDER BY han, goi_id)"], // goi_bai_7_em_sbd(sbd,han),
+  ['gg', 'goi_bai_7', "SELECT COUNT(*)||'|'||COALESCE(MAX(tao_luc),'') FROM goi_bai_7", 1],
   ['hs', 'hoc_sinh', "SELECT COALESCE(lop,'')||'|'||COALESCE(ten_lop,'')||'|'||COALESCE(trang_thai,'') FROM hoc_sinh WHERE sbd=?1"],
   ['pv', 'game_v2_scope', 'SELECT json FROM game_v2_scope WHERE sbd=?1'],
-  ['ch', 'cau_hinh', "SELECT COUNT(*)||'|'||COALESCE(MAX(cap_nhat_luc),'') FROM cau_hinh"],
-  ['kho', 'game_v2_index', "SELECT COUNT(*)||'|'||COALESCE(MAX(indexed_at),'') FROM game_v2_index"],
-  ['dk', 'de_kho', "SELECT COUNT(*)||'|'||COALESCE(MAX(cap_nhat_luc),'') FROM de_kho"],
-  ['ca', 'ca', "SELECT COUNT(*)||'|'||COALESCE(MAX(cap_nhat_luc),'')||'|'||COALESCE(SUM(trang_thai='mo'),0) FROM ca"],
-  ['ng', 'cau_nghi_dap_an', "SELECT COUNT(*) FROM cau_nghi_dap_an WHERE trang_thai='nghi'"],
-  ['bt', 'btvn_em', "SELECT COUNT(*)||'|'||COALESCE(MAX(nop_luc),'') FROM btvn_em WHERE sbd=?1"],
-  ['cd', 'chien_dich', "SELECT COUNT(*)||'|'||COALESCE(SUM(length(COALESCE(sbd_json,''))+length(COALESCE(qid_json,''))+length(COALESCE(ma_de_json,''))),0)||'|'||COALESCE(MAX(tao_luc),'')||'|'||COALESCE(group_concat(trang_thai||COALESCE(han_nop,''),''),'') FROM chien_dich"],
+  ['ch', 'cau_hinh', "SELECT COUNT(*)||'|'||COALESCE(MAX(cap_nhat_luc),'') FROM cau_hinh", 1],
+  ['kho', 'game_v2_index', "SELECT COUNT(*)||'|'||COALESCE(MAX(indexed_at),'') FROM game_v2_index", 1],
+  ['dk', 'de_kho', "SELECT COUNT(*)||'|'||COALESCE(MAX(cap_nhat_luc),'') FROM de_kho", 1],
+  ['ca', 'ca', "SELECT COUNT(*)||'|'||COALESCE(MAX(cap_nhat_luc),'')||'|'||COALESCE(SUM(trang_thai='mo'),0) FROM ca", 1],
+  ['ng', 'cau_nghi_dap_an', "SELECT COUNT(*) FROM cau_nghi_dap_an WHERE trang_thai='nghi'", 1],
+  ['bt', 'btvn_em', "SELECT COUNT(*)||'|'||COALESCE(MAX(nop_luc),'') FROM btvn_em WHERE sbd=?1"], // idx_btvn_em(sbd): vài chục dòng / em
+  ['cd', 'chien_dich', "SELECT COUNT(*)||'|'||COALESCE(SUM(length(COALESCE(sbd_json,''))+length(COALESCE(qid_json,''))+length(COALESCE(ma_de_json,''))),0)||'|'||COALESCE(MAX(tao_luc),'')||'|'||COALESCE(group_concat(trang_thai||COALESCE(han_nop,''),''),'') FROM chien_dich", 1],
   ['cde', 'chien_dich_em', "SELECT COUNT(*)||'|'||COALESCE(MAX(COALESCE(them_luc,'')),'')||'|'||COALESCE(MAX(COALESCE(bot_luc,'')),'') FROM chien_dich_em WHERE sbd=?1"],
-  ['bdd', 'bai_da_day', "SELECT COUNT(*)||'|'||COALESCE(MAX(tick_luc),'') FROM bai_da_day"],
+  ['bdd', 'bai_da_day', "SELECT COUNT(*)||'|'||COALESCE(MAX(tick_luc),'') FROM bai_da_day", 1],
 ]
-/** Câu đọc DẤU (bỏ phần của bảng chưa có — `vang`). Mỗi phần là một câu con theo chỉ mục của em (hoặc bảng nhỏ dùng chung). ?1 = sbd, ?2 = mốc đầu ngày VN. */
-export function sqlDauSanSang(vang: ReadonlySet<string> = new Set()): string {
-  return 'SELECT ' + PHAN_DAU.map(([k, bang, q]) => (vang.has(bang) ? `'-' AS ${k}` : `(${q}) AS ${k}`)).join(',\n  ')
+/** Phiên bản cách tính dấu (đầu chuỗi): đổi cách tính ⇒ bản sẵn cũ không khớp, cron đêm lập lại (xem `cronSanSangDem`). */
+export const BAN_DAU = 'v2'
+/** Câu đọc DẤU (bỏ phần của bảng chưa có — `vang`; `coChung` = có kèm phần chung). ?1 = sbd. */
+export function sqlDauSanSang(vang: ReadonlySet<string> = new Set(), coChung = true): string {
+  return 'SELECT ' + PHAN_DAU.filter((p) => coChung || !p[3]).map(([k, bang, q]) => (vang.has(bang) ? `'-' AS ${k}` : `(${q}) AS ${k}`)).join(',\n  ')
 }
 export const SQL_DAU_SAN_SANG = sqlDauSanSang()
+/** Câu dấu khi phần chung lấy từ đệm (đường nóng của lượt Sảnh / Mở chặng). */
+export const SQL_DAU_SAN_SANG_EM = sqlDauSanSang(new Set(), false)
 
-/** Chuỗi dấu từ một dòng đọc bằng `sqlDauSanSang`. */
-export function chuoiDau(r: Row | null | undefined): string | null {
+/** Chuỗi dấu từ một dòng đọc bằng `sqlDauSanSang`; `chung` (đệm) thay cho phần chung khi câu không kèm phần ấy. */
+export function chuoiDau(r: Row | null | undefined, chung?: Row | null): string | null {
   if (!r) return null
-  return PHAN_DAU.map(([k]) => String(r[k] ?? '')).join('§')
+  return BAN_DAU + '§' + PHAN_DAU.map(([k, , , c]) => String((c && chung ? chung[k] : r[k]) ?? '')).join('§')
 }
 /** Bảng isolate này đã thấy «chưa có» (bảng tạo lúc chạy: chiến dịch theo em, câu nghi…) — phần ấy coi là rỗng; bảng có lại thì dấu đổi ⇒ lập lại, an toàn. */
 const bangVang = new Set<string>()
 
+// ĐỆM PHẦN CHUNG (isolate). Tắt dưới vitest (test đổi cấu hình / kho rồi đọc dấu ngay); test riêng bật bằng `batDemDauChung`.
+const HAN_CHUNG_MS = 5 * 60_000, CHO_LAM_MOI_MS = 15_000
+let demChungBat = !(globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.VITEST
+let demChung: { v: Row; luc: number } | null = null, dangLamMoi = 0
+export function batDemDauChung(b: boolean): void { demChungBat = b; demChung = null; dangLamMoi = 0 }
+/** Phần chung dùng được cho lượt này (null ⇒ câu dấu phải kèm phần chung). Hết hạn: lượt đầu làm mới, lượt đồng thời (≤ 15 s) dùng bản cũ. */
+function layChung(now: number): Row | null {
+  if (!demChungBat || !demChung) return null
+  if (now - demChung.luc < HAN_CHUNG_MS) return demChung.v
+  if (dangLamMoi && now - dangLamMoi < CHO_LAM_MOI_MS) return demChung.v
+  dangLamMoi = now
+  return null
+}
+function ghiChung(r: Row | null | undefined, now: number): void {
+  dangLamMoi = 0
+  if (!demChungBat || !r) return
+  const v: Row = {}
+  for (const [k, , , c] of PHAN_DAU) if (c) v[k] = r[k]
+  demChung = { v, luc: now }
+}
+
 /** Đọc DẤU hiện tại của em; lỗi (bảng chưa có…) ⇒ null (nơi gọi đi đường cũ). Không bao giờ ném. */
 export async function dauSanSang(env: Env, sbd: string, now: number): Promise<string | null> {
   for (let lan = 0; lan < 4; lan++) {
-    try { return chuoiDau(await env.DB.prepare(sqlDauSanSang(bangVang)).bind(sbd, dauNgayVn(now)).first<Row>()) } catch (e) {
+    const chung = layChung(now)
+    try {
+      const r = await env.DB.prepare(sqlDauSanSang(bangVang, !chung)).bind(sbd).first<Row>()
+      if (!chung) ghiChung(r, now)
+      return chuoiDau(r, chung)
+    } catch (e) {
+      if (!chung) dangLamMoi = 0
       const m = /no such table:\s*(?:main\.)?([A-Za-z_][A-Za-z0-9_]*)/i.exec(e instanceof Error ? e.message : String(e))
       if (!m || !PHAN_DAU.some(([, b]) => b === m[1]) || bangVang.has(m[1]!)) return null
       bangVang.add(m[1]!)
@@ -81,7 +113,7 @@ export interface BanSanSang { ngay: string; luc: number; dau: string; sanh: Row 
 /** Bản sẵn của em (hoặc null). Không bao giờ ném. */
 export async function docSanSang(env: Env, sbd: string): Promise<BanSanSang | null> {
   try {
-    const r = await env.DB.prepare(`SELECT ngay, luc, dau, sanh_json, chang_json, (SELECT MAX(created_at) FROM game_v2_session g WHERE g.sbd=s.sbd) AS phien_moi FROM ${BANG_SAN_SANG} s WHERE sbd=?`).bind(sbd).first<Row>()
+    const r = await env.DB.prepare(`SELECT ngay, luc, dau, sanh_json, chang_json, (SELECT g.created_at FROM game_v2_session g WHERE g.sbd=s.sbd ORDER BY g.created_at DESC LIMIT 1) AS phien_moi FROM ${BANG_SAN_SANG} s WHERE sbd=?`).bind(sbd).first<Row>()
     if (!r) return null
     const doc = (v: unknown) => { try { return typeof v === 'string' && v ? JSON.parse(v) : null } catch { return null } }
     return { ngay: String(r.ngay), luc: Number(r.luc) || 0, dau: String(r.dau), sanh: doc(r.sanh_json), chang: doc(r.chang_json), phienMoi: r.phien_moi ? Date.parse(String(r.phien_moi)) || 0 : 0 }
@@ -89,20 +121,23 @@ export async function docSanSang(env: Env, sbd: string): Promise<BanSanSang | nu
 }
 
 /** Cột bản sẵn đọc KÈM câu dấu (một lệnh D1 cho cả hai — lượt Sảnh / Mở chặng không thêm lệnh nào cho phần dấu). */
-const COT_BAN = `, (SELECT ngay FROM ${BANG_SAN_SANG} WHERE sbd=?1) AS ss_ngay, (SELECT luc FROM ${BANG_SAN_SANG} WHERE sbd=?1) AS ss_luc,
+export const COT_BAN = `, (SELECT ngay FROM ${BANG_SAN_SANG} WHERE sbd=?1) AS ss_ngay, (SELECT luc FROM ${BANG_SAN_SANG} WHERE sbd=?1) AS ss_luc,
   (SELECT dau FROM ${BANG_SAN_SANG} WHERE sbd=?1) AS ss_dau, (SELECT sanh_json FROM ${BANG_SAN_SANG} WHERE sbd=?1) AS ss_sanh,
-  (SELECT chang_json FROM ${BANG_SAN_SANG} WHERE sbd=?1) AS ss_chang, (SELECT MAX(created_at) FROM game_v2_session WHERE sbd=?1) AS ss_phien_moi`
+  (SELECT chang_json FROM ${BANG_SAN_SANG} WHERE sbd=?1) AS ss_chang, (SELECT created_at FROM game_v2_session WHERE sbd=?1 ORDER BY created_at DESC LIMIT 1) AS ss_phien_moi`
 /** DẤU + BẢN SẴN trong MỘT lệnh D1 (đường Sảnh / Mở chặng). Bảng bản sẵn chưa có ⇒ chỉ dấu. Không bao giờ ném. */
 export async function docDauVaBan(env: Env, sbd: string, now: number): Promise<[string | null, BanSanSang | null]> {
   let coBan = !bangVang.has(BANG_SAN_SANG)
   for (let lan = 0; lan < 5; lan++) {
+    const chung = layChung(now)
     try {
-      const r = await env.DB.prepare(sqlDauSanSang(bangVang) + (coBan ? COT_BAN : '')).bind(sbd, dauNgayVn(now)).first<Row>()
-      const dau = chuoiDau(r)
+      const r = await env.DB.prepare(sqlDauSanSang(bangVang, !chung) + (coBan ? COT_BAN : '')).bind(sbd).first<Row>()
+      if (!chung) ghiChung(r, now)
+      const dau = chuoiDau(r, chung)
       if (!r || !coBan || r.ss_dau == null) return [dau, null]
       const doc = (v: unknown) => { try { return typeof v === 'string' && v ? JSON.parse(v) : null } catch { return null } }
       return [dau, { ngay: String(r.ss_ngay), luc: Number(r.ss_luc) || 0, dau: String(r.ss_dau), sanh: doc(r.ss_sanh), chang: doc(r.ss_chang), phienMoi: r.ss_phien_moi ? Date.parse(String(r.ss_phien_moi)) || 0 : 0 }]
     } catch (e) {
+      if (!chung) dangLamMoi = 0
       const m = /no such table:\s*(?:main\.)?([A-Za-z_][A-Za-z0-9_]*)/i.exec(e instanceof Error ? e.message : String(e))
       if (m && m[1] === BANG_SAN_SANG && coBan) { coBan = false; continue } // isolate mới, bảng đang được tạo (DDL gửi cùng lúc) ⇒ lượt này chỉ dấu
       if (!m || !PHAN_DAU.some(([, b]) => b === m[1]) || bangVang.has(m[1]!)) return [null, null]
@@ -192,7 +227,7 @@ export async function phienDaXong(env: Env, sbd: string, id: string): Promise<bo
   } catch { return false }
 }
 
-/** CRON ĐÊM 00:30–05:59 VN: chuẩn bị sẵn cho em có gói chưa có bản hôm nay — tối đa `toiDa` em mỗi phút (một lượt ~30 lệnh D1/em). */
+/** CRON ĐÊM 00:30–05:59 VN: chuẩn bị sẵn cho em có gói chưa có bản hôm nay (hoặc bản theo cách tính dấu cũ — khác `BAN_DAU`) — tối đa `toiDa` em mỗi phút (một lượt ~30 lệnh D1/em). */
 export async function cronSanSangDem(env: Env, now: number, toiDa = 6): Promise<number> {
   const gio = new Date(now + 7 * 3600000).getUTCHours(), phut = new Date(now + 7 * 3600000).getUTCMinutes()
   if (gio >= 6 || (gio === 0 && phut < 30)) return 0
@@ -203,7 +238,7 @@ export async function cronSanSangDem(env: Env, now: number, toiDa = 6): Promise<
     if (!(await g7.coGoi7(env)).bat) return 0
     const ngay = ngayVn7(now)
     const ds = await env.DB.prepare(`SELECT DISTINCT e.sbd FROM goi_bai_7_em e JOIN hoc_sinh h ON h.sbd=e.sbd WHERE e.han>=? AND COALESCE(h.trang_thai,'')<>'khoa'
-      AND NOT EXISTS (SELECT 1 FROM ${BANG_SAN_SANG} s WHERE s.sbd=e.sbd AND s.ngay=?) ORDER BY e.sbd LIMIT ?`).bind(ngay, ngay, toiDa).all<{ sbd: string }>()
+      AND NOT EXISTS (SELECT 1 FROM ${BANG_SAN_SANG} s WHERE s.sbd=e.sbd AND s.ngay=? AND s.dau LIKE ?) ORDER BY e.sbd LIMIT ?`).bind(ngay, ngay, BAN_DAU + '§%', toiDa).all<{ sbd: string }>()
     let n = 0
     for (const r of ds.results ?? []) if (await chuanBiSanSang(env, String(r.sbd), now)) n++
     return n
