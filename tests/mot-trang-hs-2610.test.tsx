@@ -1,5 +1,5 @@
 // HÔM NAY «MỘT TRANG» + MENU DỌC (Điểm danh, A.I Đỗ Đại Học) của app học sinh — bản vẽ ve-moi/hs-mot-trang*.html, thầy chốt 26/10.
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest'
 import { NHIP_EM_LUOI } from '../scripts/chup-v2/gia/nhip-hoc-em'
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { createRef } from 'react'
@@ -18,6 +18,8 @@ const goc = (them: Partial<PropsMotTrang> = {}): PropsMotTrang => ({
 const mo = Date.parse('2026-10-26T00:00:00+07:00')
 const KIEM: TomTatKiemTra = { id: 'k', ngay: '2026-10-26', moLuc: mo, hanLuc: mo + 86400_000, serverNow: mo + 3600_000, trangThai: 'can_lam', homNay: true, baiNgayToiThieu: 12,
   tong: 28, daTra: 0, con: 28, soChang: 4, phut: 50, soBai: 6, tongKienThuc: 10, phuDe: 10, nguonDayDu: true, lyDo: '', thieuNguon: 0, diem: null, nopLuc: null }
+/** Kiểm tra ôn tập của NGÀY KHÁC (chưa tới) ⇒ không khoá chặng, nút kiểm tra đứng sau các chặng như cũ. */
+const KIEM_SAU: TomTatKiemTra = { ...KIEM, ngay: '2026-10-28', homNay: false, trangThai: 'sap_den' as TomTatKiemTra['trangThai'] }
 
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); window.history.replaceState(null, '', '/'); try { localStorage.clear() } catch { /* bỏ qua */ } })
 
@@ -29,12 +31,12 @@ const HS = { lop: '12A1', onXemLai: noop, onTuLuyen: noop, onLichSu: noop, onKet
 
 describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
   it('nút Kiểm tra ôn tập / Tự sửa lỗi KHÔNG còn viên chữ cạnh nút (thầy 27/10: đè giám thị); nút đỏ có huy hiệu số, quá 99 ⇒ «99+»; tên đầy đủ vẫn ở aria-label', () => {
-    const { container, rerender } = render(<MotTrangHs {...goc({ soSua: 200, kiem: KIEM })} />)
+    const { container, rerender } = render(<MotTrangHs {...goc({ soSua: 200, kiem: KIEM_SAU })} />)
     const sua = within(duong()).getByRole('button', { name: 'Tự sửa lỗi: 200 câu' })
     expect(sua.querySelector('.da-nhan')).toBeNull()
     expect(sua.querySelector('.da-dem')!.textContent).toBe('99+')
     for (const n of container.querySelectorAll('.da-nut[data-loai="kiem"], .da-nut[data-loai="sua"]')) expect(n.querySelector('.da-nhan')).toBeNull()
-    rerender(<MotTrangHs {...goc({ soSua: 7, kiem: KIEM })} />)
+    rerender(<MotTrangHs {...goc({ soSua: 7, kiem: KIEM_SAU })} />)
     expect(within(duong()).getByRole('button', { name: 'Tự sửa lỗi: 7 câu' }).querySelector('.da-dem')!.textContent).toBe('7')
   })
   it('bấm nút Lộ trình KHÔNG vào thẳng: thẻ bật ra (role dialog) đúng màu nút, focus vào nút chính, Esc đóng + trả focus; một thẻ một lúc; chạm ngoài đóng (thầy 27/10)', () => {
@@ -104,10 +106,11 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
   })
   it('đang học: chặng hiện tại là nút «Học tiếp · 18 câu» có bong bóng; sau các chặng là Kiểm tra ôn tập → Tự sửa lỗi → Bài tập về nhà; thanh số trên', () => {
     const onHoc = vi.fn()
-    render(<MotTrangHs {...goc({ kiem: KIEM, onKiemTra: noop, onHoc, hs: HS })} />)
+    render(<MotTrangHs {...goc({ kiem: KIEM_SAU, onKiemTra: noop, onHoc, hs: HS })} />)
     const ds = nut()
-    expect(ds.map((n) => n.getAttribute('aria-label'))).toEqual(['Chặng 1: đã xong', 'Chặng 2: đã xong', 'Học tiếp · 18 câu', 'Rương hôm nay', 'Chặng 4: chưa mở', 'Chặng 5: chưa mở',
-      'Kiểm tra ôn tập: 28 câu · khoảng 50 phút · hạn nộp 24:00', 'Tự sửa lỗi: 5 câu', 'Bài tập về nhà'])
+    // thầy 27/10: Kiểm tra ôn tập LUÔN đầu đường; Tự sửa lỗi chèn GIỮA hành trình (sau chặng mới thứ 2 kể từ chỗ đang học)
+    expect(ds.map((n) => n.getAttribute('aria-label'))).toEqual(['Kiểm tra ôn tập: Thứ Tư 28/10 · còn 2 ngày', 'Chặng 1: đã xong', 'Chặng 2: đã xong', 'Học tiếp · 18 câu', 'Rương hôm nay',
+      'Chặng 4: chưa mở', 'Tự sửa lỗi: 5 câu', 'Chặng 5: chưa mở', 'Bài tập về nhà'])
     fireEvent.click(screen.getByRole('button', { name: 'Học tiếp · 18 câu' }))
     fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Bắt đầu' }))
     expect(onHoc).toHaveBeenCalledOnce()
@@ -150,7 +153,78 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
     fireEvent.click(kiem)
     fireEvent.click(within(screen.getByRole('dialog', { name: 'Kiểm tra ôn tập' })).getByRole('button', { name: 'Bắt đầu' }))
     expect(onKiemTra).toHaveBeenCalledOnce()
+    // thầy 27/10: kiểm tra chưa nộp ⇒ Tự sửa lỗi khoá tới khi nộp
+    expect(screen.getByRole('button', { name: 'Tự sửa lỗi: khoá đến khi làm xong Kiểm tra ôn tập' }).getAttribute('data-tt')).toBe('khoa')
+  })
+
+  it('KIỂM TRA ÔN TẬP HÔM NAY chưa nộp (thầy 27/10 «đẩy lên đầu hành trình, làm xong mới mở khoá»): nút kiểm tra ĐẦU đường, đang hiện tại + bong bóng; chặng chưa xong + Tự sửa lỗi khoá', () => {
+    const onHoc = vi.fn(), onKiemTra = vi.fn(), onChua = vi.fn()
+    render(<MotTrangHs {...goc({ kiem: KIEM, onKiemTra, onHoc, onChua, hs: HS })} />)
+    expect(nut().map((n) => n.getAttribute('aria-label'))).toEqual(['Kiểm tra ôn tập: 28 câu · khoảng 50 phút · hạn nộp 24:00', 'Chặng 1: đã xong', 'Chặng 2: đã xong',
+      'Chặng 3: khoá đến khi làm xong Kiểm tra ôn tập', 'Rương hôm nay', 'Chặng 4: khoá đến khi làm xong Kiểm tra ôn tập', 'Tự sửa lỗi: khoá đến khi làm xong Kiểm tra ôn tập',
+      'Chặng 5: khoá đến khi làm xong Kiểm tra ôn tập', 'Bài tập về nhà'])
+    const kiem = nut()[0]!
+    expect(kiem.getAttribute('data-tt')).toBe('dang')
+    expect(kiem.querySelector('.da-bong')!.textContent).toBe('Kiểm tra ôn tập')
+    expect(kiem.querySelector('.da-vong')).not.toBeNull()
+    // chặng khoá: thẻ xám «Làm Kiểm tra ôn tập trước để mở khoá», không có nút bắt đầu
+    fireEvent.click(screen.getByRole('button', { name: 'Chặng 3: khoá đến khi làm xong Kiểm tra ôn tập' }))
+    const the = screen.getByRole('dialog')
+    expect(the.getAttribute('data-sac')).toBe('khoa')
+    expect(the.textContent).toContain('Làm Kiểm tra ôn tập trước để mở khoá')
+    expect(within(the).queryByRole('button')).toBeNull()
+    // nút kiểm tra: thẻ xanh dương, số câu + thời gian, «Bắt đầu»
+    fireEvent.pointerDown(kiem); fireEvent.click(kiem)
+    const tk = screen.getByRole('dialog', { name: 'Kiểm tra ôn tập' })
+    expect(tk.getAttribute('data-sac')).toBe('tin')
+    expect(tk.textContent).toContain('28 câu · khoảng 50 phút')
+    fireEvent.click(within(tk).getByRole('button', { name: 'Bắt đầu' }))
+    expect(onKiemTra).toHaveBeenCalledOnce()
+    expect(onHoc).not.toHaveBeenCalled()
+    expect(screen.queryByRole('button', { name: /Học thêm câu mới/ })).toBeNull()
+  })
+
+  it('THỨ TỰ NÚT (thầy 27/10 «kiểm tra lên đầu, sửa lỗi chèn giữa hành trình mới»): không kiểm tra · chỉ có tự sửa · còn ≤ 2 chặng · mốc đã qua ⇒ Tự sửa lỗi là việc hiện tại', () => {
+    const nhan = () => nut().map((n) => n.getAttribute('aria-label'))
+    // không có kiểm tra: chặng 3 đang học ⇒ Tự sửa lỗi sau chặng 4 (chặng mới thứ 2), trước chặng 5
+    let r = render(<MotTrangHs {...goc()} />)
+    expect(nhan()).toEqual(['Chặng 1: đã xong', 'Chặng 2: đã xong', 'Học tiếp · 18 câu', 'Rương hôm nay', 'Chặng 4: chưa mở', 'Tự sửa lỗi: 5 câu', 'Chặng 5: chưa mở', 'Bài tập về nhà'])
+    r.unmount(); localStorage.clear()
+    // chỉ có tự sửa (không kiểm tra, không bài tập)
+    r = render(<MotTrangHs {...goc({ soBaiTap: 0, coBaiTap: false })} />)
+    expect(nhan()).toEqual(['Chặng 1: đã xong', 'Chặng 2: đã xong', 'Học tiếp · 18 câu', 'Rương hôm nay', 'Chặng 4: chưa mở', 'Tự sửa lỗi: 5 câu', 'Chặng 5: chưa mở'])
+    r.unmount(); localStorage.clear()
+    // còn 2 chặng mới ⇒ sau chặng mới đầu tiên
+    r = render(<MotTrangHs {...goc({ so: { daLam: 18, muc: 30, chang: 4, soChang: 5 } as PropsMotTrang['so'], soBaiTap: 0, coBaiTap: false })} />)
+    expect(nhan().slice(-3)).toEqual(['Học tiếp · 12 câu', 'Tự sửa lỗi: 5 câu', 'Chặng 5: chưa mở'])
+    r.unmount()
+    // cùng ngày, em học qua mốc đã nhớ (sau chặng 4) ⇒ nút không trôi; Tự sửa lỗi thành việc hiện tại (bong bóng), chặng 5 không còn bong bóng / vòng
+    render(<MotTrangHs {...goc({ so: { daLam: 24, muc: 30, chang: 5, soChang: 5 } as PropsMotTrang['so'], soBaiTap: 0, coBaiTap: false })} />)
+    expect(nhan()).toEqual(['Chặng 1: đã xong', 'Chặng 2: đã xong', 'Chặng 3: đã xong', 'Rương hôm nay', 'Chặng 4: đã xong', 'Tự sửa lỗi: 5 câu', 'Học tiếp · 6 câu'])
+    const sua = screen.getByRole('button', { name: 'Tự sửa lỗi: 5 câu' })
+    expect(sua.getAttribute('data-tt')).toBe('dang')
+    expect(sua.querySelector('.da-bong')!.textContent).toBe('Sửa lỗi')
+    expect(screen.getByRole('button', { name: 'Học tiếp · 6 câu' }).querySelector('.da-bong, .da-vong')).toBeNull()
+  })
+
+  it('nộp xong ⇒ nút kiểm tra ✓ (đã xong), các chặng mở lại theo thứ tự cũ + vỡ khoá MỘT lần; quá hạn chưa làm ⇒ không khoá, ghi «Đã lỡ»', () => {
+    // máy có chuyển động (jsdom mặc định coi là «giảm chuyển động»)
+    vi.stubGlobal('matchMedia', (q: string) => ({ matches: false, media: q, addEventListener() {}, removeEventListener() {} }))
+    const animCu = Element.prototype.animate
+    Element.prototype.animate = vi.fn(() => ({ cancel() {}, finished: Promise.resolve() })) as unknown as typeof Element.prototype.animate
+    onTestFinished(() => { Element.prototype.animate = animCu })
+    const { rerender, container, unmount } = render(<MotTrangHs {...goc({ kiem: KIEM, onKiemTra: noop })} />)
+    expect(localStorage.getItem('ddh.kt-khoa')).toBe('k')
+    rerender(<MotTrangHs {...goc({ kiem: { ...KIEM, nopLuc: mo + 7200_000, diem: 8.5, trangThai: 'da_nop' as TomTatKiemTra['trangThai'] }, onKiemTra: noop })} />)
+    expect(nut()[0]!.getAttribute('data-tt')).toBe('xong')
+    expect(screen.getByRole('button', { name: 'Học tiếp · 18 câu' }).getAttribute('data-tt')).toBe('dang')
     expect(screen.getByRole('button', { name: 'Tự sửa lỗi: 5 câu' }).getAttribute('data-tt')).toBe('mo')
+    expect(container.querySelectorAll('.da-vo-khoa').length).toBe(2) // chặng hiện tại + Tự sửa lỗi
+    expect(localStorage.getItem('ddh.kt-khoa')).toBeNull()
+    unmount()
+    render(<MotTrangHs {...goc({ kiem: { ...KIEM, homNay: false, trangThai: 'het_han' as TomTatKiemTra['trangThai'] } })} />)
+    expect(screen.getByRole('button', { name: 'Học tiếp · 18 câu' }).getAttribute('data-tt')).toBe('dang')
+    expect(screen.getByRole('button', { name: /^Kiểm tra ôn tập: Đã lỡ/ })).toBeTruthy()
   })
 
   it('ngày chỉ có Kiểm tra ôn tập ⇒ đường chỉ một nút kiểm tra, không băng bài', () => {

@@ -3721,7 +3721,12 @@ const boXuLy = {
       // VÒNG CHỮA CÂU SAI (07/10, server/src/chua-cau-sai.ts): đặc tả §10; SBD từ token.
       if (p === '/hs/chua-cau-sai/co') { const sbd=await gameIdentity(env,b); return ra({ok:await tinhNangChuaBat(env,{sbd})}) }
       if (p === '/hs/chua-cau-sai/danh-sach') return raChua(await chuaDanhSach(env,b))
-      if (p === '/hs/chua-cau-sai/mo-dot') return raChua(await chuaMoDot(env, b))
+      // 27/10 khoá theo Kiểm tra ôn tập: đang có bài kiểm tra hôm nay chưa nộp ⇒ chưa mở đợt Tự sửa lỗi (giao diện cũng khoá nút).
+      if (p === '/hs/chua-cau-sai/mo-dot') {
+        const kt = await import('./kiem-tra-ca-nhan'), sbd = await gameIdentity(env, b), khoa = kt.ktDangKhoaChang(await kt.docKtCn(env, sbd, Date.now(), true), Date.now())
+        if (khoa) return ra({ ok: false, ma: kt.MA_KHOA_KT, error: kt.CHU_KHOA_KT, kiemTraCaNhan: khoa }, 409)
+        return raChua(await chuaMoDot(env, b))
+      }
       if (p === '/hs/chua-cau-sai/phat-item') return raChua(await chuaPhatItem(env, b))
       if (p === '/hs/chua-cau-sai/nop-item') return raChua(await chuaNopItem(env, b))
       if (p === '/hs/chua-cau-sai/xin-goi-y') return raChua(await chuaXinGoiY(env, b))
