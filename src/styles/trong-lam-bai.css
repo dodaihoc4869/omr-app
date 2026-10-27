@@ -997,7 +997,7 @@
 [data-trong] .de-gian > .de-doan[data-loai='nhan']:not(:first-of-type) { margin-top: .85em; }
 [data-trong] .de-gian > .de-doan[data-loai='hoi']:not(:first-of-type) { margin-top: .9em; }
 [data-trong] .de-gian .de-nhan { font-weight: 650; color: inherit; }
-[data-trong] .de-gian > .de-doan[data-loai='pt'] { display: flow-root !important; margin-left: 2px; padding: 2px 0 2px 10px; border-left: 3px solid var(--tr-vien-2); overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scrollbar-width: thin; }
+[data-trong] .de-gian > .de-doan[data-loai='pt'] { display: flow-root !important; line-height: 1.7; margin-left: 2px; padding: 2px 0 2px 10px; border-left: 3px solid var(--tr-vien-2); overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scrollbar-width: thin; }
 [data-trong] .de-gian > .de-doan[data-loai='nhan'] + .de-doan[data-loai='pt'] { margin-top: .45em; }
 [data-trong] .de-gian > .de-doan[data-loai='pt'] .de-nhan { margin-right: .15em; }
 /* 24. LÀM LẠI HIỆU ỨNG NGUYÊN TỬ + COMBO (thầy 27/10 «chưa đẹp mắt và tinh tế, làm lại cho ngon như Duolingo» · «sét đánh dọc màn hình rung lắc siêu xịn»;
