@@ -483,10 +483,11 @@ export async function soanSoDoLo(env: Env, thamSo: unknown, phu: PhuSoDo = {}): 
   while (i < hang.length) {
     if (i > 0 && het()) break
     const dot: CauKho[] = []
+    const viTri: number[] = [] // chỉ số trong `hang` của từng câu trong đợt
     let j = i
     for (; j < hang.length && dot.length < (ts.songSong ?? 4); j++) {
       const m = hang[j]!
-      if (m.q) dot.push(m.q); else dem.bo_qua++
+      if (m.q) { dot.push(m.q); viTri.push(j) } else dem.bo_qua++
     }
     const xong = await Promise.all(dot.map((q) => soanMotCau(q, ts, goi, cong, heThong)))
     // TỰ SỬA ĐÁP ÁN KHO — TUẦN TỰ (các câu cùng tờ ghi chung một gói R2): nghi ⇒ chọn đáp án mới ⇒ suaDapAnKho ⇒ soạn lại câu theo đáp án mới (version mới).
@@ -529,6 +530,15 @@ export async function soanSoDoLo(env: Env, thamSo: unknown, phu: PhuSoDo = {}): 
     if (ghi.length) {
       if (!daTaoBang) { await env.DB.batch(SQL_BANG_SO_DO.map((s) => env.DB.prepare(s))); daTaoBang = true }
       await env.DB.batch(ghi)
+    }
+    // 27/10: câu LỖI GỌI (Gemini 429 / quá tải…) không được bỏ qua — con trỏ dừng ngay TRƯỚC câu lỗi đầu tiên, lượt sau soạn lại từ đó
+    // (câu cùng đợt đã soạn xong thì lượt sau tự bỏ qua vì đã có dòng). Trước đây con trỏ vẫn đi tiếp ⇒ câu lỗi rơi khỏi lượt quét.
+    const kLoi = xong.findIndex((r) => r.dong.ket === 'loi_goi')
+    if (kLoi >= 0) {
+      const h = viTri[kLoi]!
+      if (h > i) conTro = hang[h - 1]!.vt
+      i = h
+      break
     }
     conTro = hang[j - 1]!.vt
     i = j
