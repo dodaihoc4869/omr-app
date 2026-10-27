@@ -165,8 +165,9 @@ describe('bình giữ chuỗi từ sổ (B3 thật, D1 thật)', () => {
     expect(co?.lich7.find((x) => x.ngay === '2026-11-05')?.kieu).toBe('binh'); expect(co?.so).toBe(3); expect(co?.giuChuoi).toBe(0)
     expect(await ngayCoHoc(k.env, 'S2', '2026-11-05', t)).toBe('binh')
     const { cauNoiChuoi } = await import('../server/src/thuong-cau-noi-chuoi')
-    expect((await cauNoiChuoi().docNgayCoPhep(k.env, ['S1', 'S2'], '2026-10-01', '2026-11-30')).get('S2')).toBeUndefined()
-    expect([...(await cauNoiChuoi().docNgayCoPhep(k.env, ['S1', 'S2'], '2026-10-01', '2026-11-30')).get('S1') ?? []]).toEqual(['2026-10-14'])
+    // Phép 5/11 của S2 không còn được đỡ; chỉ còn ngày bảo trì 27/10 (ngay-bao-tri.ts, mọi em).
+    expect([...(await cauNoiChuoi().docNgayCoPhep(k.env, ['S1', 'S2'], '2026-10-01', '2026-11-30')).get('S2') ?? []]).toEqual(['2026-10-27'])
+    expect([...(await cauNoiChuoi().docNgayCoPhep(k.env, ['S1', 'S2'], '2026-10-01', '2026-11-30')).get('S1') ?? []].sort()).toEqual(['2026-10-14', '2026-10-27'])
     // Dữ liệu điểm danh không bị đụng.
     expect((k.d.sql.prepare("SELECT COUNT(*) AS n FROM buoi_hoc_diem_danh WHERE trang_thai='co_phep'").get() as { n: number }).n).toBe(2)
   })

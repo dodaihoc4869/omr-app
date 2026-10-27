@@ -8,6 +8,7 @@
 import type { Env } from './kieu'
 import { CAU_MOT_BAI, chuoiNgayCuaEm, ngayVn, phepConGiuChuoi, type ChuoiNgay as ChuoiNgayB3 } from './chuoi-ngay-bai'
 import { chuoiBaiNeuBat, congBinh, docNhatKyChuoi } from './chuoi-ngay-bai-d1'
+import { ngayBaoTriTrong } from './ngay-bao-tri'
 
 /** Trường dùng chung §4.3 (B3 trả; thêm 'cuu' | 'cho' theo hợp đồng docs/hop-dong-duolingo-2610.md mục 4). */
 export type ChuoiNgay = ChuoiNgayB3
@@ -42,7 +43,9 @@ const cuoiNgayIso = (ngay: string) => new Date(Date.parse(`${ngay}T00:00:00+07:0
 
 /** Vắng có phép theo ngày VN của buổi (đúng câu B3, chạy cho cả lô em). Luật 27/10: chỉ ngày TRƯỚC mốc còn giữ chuỗi ⇒ ngày từ mốc bỏ. */
 function docPhep(env: Env, ds: readonly string[], tu: string, den: string): Promise<Dong[]> {
-  return docPhepTho(env, ds, tu, den).then((r) => r.filter((x) => phepConGiuChuoi(String(x.ngay))))
+  // + ngày bảo trì (ngay-bao-tri.ts): mọi em được đỡ ngày đó (thăng hoa không phạt, cược không thua).
+  const baoTri = ngayBaoTriTrong(tu, den).flatMap((ngay) => ds.map((sbd) => ({ sbd, ngay })))
+  return docPhepTho(env, ds, tu, den).then((r) => [...r.filter((x) => phepConGiuChuoi(String(x.ngay))), ...baoTri])
 }
 function docPhepTho(env: Env, ds: readonly string[], tu: string, den: string): Promise<Dong[]> {
   return rongNeuLoi(env.DB.prepare(`SELECT DISTINCT d.sbd AS sbd, date(b.mo_luc, '+7 hours') AS ngay FROM buoi_hoc_diem_danh d JOIN buoi_hoc b ON b.id = d.buoi_id
