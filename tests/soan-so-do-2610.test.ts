@@ -277,6 +277,26 @@ describe('soạn lô', () => {
     expect(dongSoDo(Q.III2)).toMatchObject({ cong: 'dat' })
   })
 
+  it('27/10: model nhanh 429 ⇒ thử MODEL_MANH một lần (ngoài danh sách model của Hỏi thầy)', async () => {
+    const { DS_MODEL_DU_PHONG, MAC_DINH_HOI_THEM } = await import('../server/src/hoi-tro-ly')
+    expect([MAC_DINH_HOI_THEM.model, ...DS_MODEL_DU_PHONG]).not.toContain(M.MODEL_MANH)
+    const goc = globalThis.fetch
+    const goi: string[] = []
+    globalThis.fetch = vi.fn(async (url: string | URL | Request) => {
+      const u = String(url); goi.push(u)
+      if (u.includes(encodeURIComponent(M.MODEL_MAC_DINH))) return new Response(JSON.stringify({ error: { message: 'quota' } }), { status: 429 })
+      return new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: '{"a":1}' }] } }], usageMetadata: {} }), { status: 200 })
+    }) as typeof fetch
+    vi.useFakeTimers({ toFake: ['setTimeout'] })
+    try {
+      const p = M.taoGoiGeminiLo({ GEMINI_API_KEY: 'k' } as never)({ heThong: 'h', luot: [{ vai: 'user', chu: 'x' }], model: M.MODEL_MAC_DINH })
+      await vi.runAllTimersAsync()
+      const kq = await p
+      expect(kq).toMatchObject({ ok: true, model: M.MODEL_MANH })
+      expect(goi.filter((u) => u.includes(encodeURIComponent(M.MODEL_MANH)))).toHaveLength(1)
+    } finally { globalThis.fetch = goc; vi.useRealTimers() }
+  })
+
   it('thuKhong ⇒ không ghi gì (không tạo bảng), trả bản soạn để xem', async () => {
     const mh = moHinhGia((h) => chuMau(h))
     const { j } = await goiLo({ qids: [Q.III, Q.I], thuKhong: true }, { goiMoHinh: mh.fn, kiemCong: congGia(() => 'dat') })
