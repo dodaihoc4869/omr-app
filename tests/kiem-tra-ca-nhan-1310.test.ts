@@ -91,6 +91,17 @@ it('đồng hồ không khởi động lại; lưu/nộp chặng rồi nộp to�
  expect(k.d.sql.prepare("SELECT COUNT(*) n FROM su_kien_hoc WHERE ma_nguon=?").get(id)).toEqual(count)
  r=(await docKtCn(k.env,'S1',now+90000))!;expect(tomTatKt(r,now+90000).homNay).toBe(true)
 })
+it('27/10 tốc độ: trạng thái `kemKetQua` trả phần chữa CÙNG lượt khi đã nộp (giống hệt lệnh ket-qua); chưa nộp / không cờ ⇒ không kèm',async()=>{
+ const k=await kho();await lapKtCn(k.env,'S1',NOW);const r=(await docKtCn(k.env,'S1',NOW))!
+ const now=Number(r.mo_luc)+1000,id=String(r.id)
+ expect((await ktCnAction(k.env,'S1','hoc-tap-ktcn-trang-thai',{id,kemKetQua:true},now)).ketQua).toBeUndefined()
+ await ktCnAction(k.env,'S1','hoc-tap-ktcn-nop',{id},now+1000)
+ const kem=await ktCnAction(k.env,'S1','hoc-tap-ktcn-trang-thai',{id,kemKetQua:true},now+2000)
+ const rieng=await ktCnAction(k.env,'S1','hoc-tap-ktcn-ket-qua',{id},now+2000)
+ expect(kem.ketQua).toEqual(rieng.ketQua)
+ expect(Array.isArray(kem.chang)).toBe(true)
+ expect((await ktCnAction(k.env,'S1','hoc-tap-ktcn-trang-thai',{id},now+2000)).ketQua).toBeUndefined()
+})
 it('đợt 20: trạng thái trả số câu đã trả lời TỪNG chặng (chỉ-thêm), đếm chặt như tomTatKt, không thêm lượt D1',async()=>{
  const k=await kho();await lapKtCn(k.env,'S1',NOW);const r=(await docKtCn(k.env,'S1',NOW))!
  const now=Number(r.mo_luc)+1000,id=String(r.id),d=JSON.parse(String(r.json))

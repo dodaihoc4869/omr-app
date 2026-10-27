@@ -161,15 +161,19 @@ export async function apiMoDot(
   qid: string,
   nguonSai?: string,
   phat = nguonSai === undefined,
-): Promise<KetQuaDot & { phat?: unknown }> {
+  /** 27/10 tốc độ: máy chủ mở luôn bản làm lại (gon-mo) trong CÙNG lượt, trả ở `gon`. Máy chủ cũ bỏ qua cờ ⇒ `gon` vắng, nơi gọi gọi gon-mo như trước. */
+  gon = false,
+): Promise<KetQuaDot & { phat?: unknown; gon?: KetQuaGon }> {
   const j = await goi('mo-dot', token, {
     qid,
     ...(nguonSai ? { nguonSai } : {}),
     ...(phat ? { phat: true } : {}),
+    ...(gon ? { gon: true } : {}),
   })
   // 24/10: «chưa có lỗi đang mở» kèm mã đợt = sổ học đã đóng lỗi (máy chủ đã đóng đợt) ⇒ màn chữa tính xong phần thay vì dừng ở lỗi.
   if (!j?.ok) return { ok: false, loi: loiCua(j), ma: chu(j?.ma), ...(j?.dotId ? { dotId: chu(j.dotId), daDong: j.daDong === true } : {}) }
-  return j as unknown as KetQuaDot & { phat?: unknown }
+  const g = j.gon && typeof j.gon === 'object' ? docGon(j.gon as Obj) : undefined
+  return { ...(j as unknown as KetQuaDot & { phat?: unknown }), ...(g ? { gon: g } : {}) }
 }
 
 /** Lấy item hiện tại (hoặc tạo mới) cho đợt. */

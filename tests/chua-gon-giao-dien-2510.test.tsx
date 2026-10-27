@@ -38,7 +38,7 @@ describe('Chữa câu gọn — màn em', () => {
     expect(await screen.findByRole('heading', { name: 'Em tự làm lại câu này' })).toBeTruthy()
     expect(screen.getByText(LUAT_BAN_MOI)).toBeTruthy()
     expect(screen.queryByText('Đáp án đúng')).toBeNull()
-    expect(api.apiMoDot).toHaveBeenCalledWith('t', 'Q', undefined, false)
+    expect(api.apiMoDot).toHaveBeenCalledWith('t', 'Q', undefined, false, true)
     expect(api.apiPhatItem).not.toHaveBeenCalled()
     const kiem = screen.getByRole('button', { name: 'Kiểm tra' }) as HTMLButtonElement
     expect(kiem.disabled).toBe(true)
