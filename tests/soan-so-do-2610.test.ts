@@ -333,6 +333,17 @@ describe('soạn lô', () => {
     } finally { globalThis.fetch = goc; vi.useRealTimers() }
   })
 
+  it('27/10: vòng sửa lấy lại câu «thừa số … không đọc được» (cổng đã đọc thêm cách viết mới); lý do khác thì không', async () => {
+    const mh = moHinhGia((h) => chuMau(h))
+    await goiLo({ qids: [Q.III, Q.III2] }, { goiMoHinh: mh.fn, kiemCong: vi.fn((ban: BanSoDo) => ({ ket: 'khong_kiem_duoc' as const,
+      lyDo: ban.qid === Q.III ? 'Bước 1: thừa số «10 000» không đọc được.' : 'Phần II chưa kiểm số (v1).' })) })
+    const mh2 = moHinhGia((h) => chuMau(h))
+    const { j } = await goiLo({ chiSuaLoi: true }, { goiMoHinh: mh2.fn, kiemCong: congGia(() => 'dat') })
+    expect(j.ketQua.map((k) => k.qid)).toEqual([Q.III])
+    expect(dongSoDo(Q.III)).toMatchObject({ cong: 'dat' })
+    expect(dongSoDo(Q.III2)).toMatchObject({ cong: 'khong_kiem_duoc' })
+  })
+
   it('thuKhong ⇒ không ghi gì (không tạo bảng), trả bản soạn để xem', async () => {
     const mh = moHinhGia((h) => chuMau(h))
     const { j } = await goiLo({ qids: [Q.III, Q.I], thuKhong: true }, { goiMoHinh: mh.fn, kiemCong: congGia(() => 'dat') })
