@@ -7,9 +7,10 @@ import type { BanSoDo, GoiYTraVe, LoaiCham, TheGiaiNghia, VungCham } from '../..
 import { docBanSoDo, taiGoiYSoDo } from '../../lib/goi-y-cham/api'
 import { bocVung, type KetQuaBoc } from './boc-chu'
 import { napTuDien, type TuDien } from './tu-dien'
-import TamGiaiThich, { giuCotPhai, useKieuTam } from './TamGiaiThich'
+import TamGiaiThich, { giuCotPhai, useCoRe } from './TamGiaiThich'
 import GoiY3Tang, { tangTuBan, tangTuSinh, type TrangThaiGoiY } from './GoiY3Tang'
 import { BieuTuong } from './bieu-tuong'
+import { rung } from '../../lib/rung'
 import './goi-y-cham.css'
 
 export type CauCham = { qid: string; phan?: string; goiY?: { gach?: string[]; cotLoi?: string } }
@@ -41,8 +42,19 @@ function hienDuChuGiai(qid: string): boolean {
 }
 
 /** Gợi ý tầng 1 nói về chất + từ then chốt; tầng 2–3 thêm số liệu đề cho. «Đề hỏi» không cần soi (đã nổi sẵn). */
-/** Câu lý thuyết (đề không có số liệu nào) chỉ tô «Đề hỏi» + cụm bẫy (bản vẽ màn 5): bỏ tô chất, từ then chốt. */
-export const locLyThuyet = (ds: VungCham[]): VungCham[] => (ds.some((v) => v.loai === 'cho') ? ds : ds.filter((v) => v.loai === 'hoi'))
+/**
+ * Lọc vùng theo luật màn (bước trước «chỉ bọc vùng có thẻ»):
+ *  - câu lý thuyết (đề không có số liệu nào) chỉ tô «Đề hỏi» + cụm bẫy (bản vẽ màn 5): thẻ chất / từ then chốt dễ LỘ ĐÁP ÁN
+ *    («Công thức của glucose là», «Ethylamine là amine bậc mấy?»);
+ *  - đề hỏi tên gọi / công thức ⇒ không tô chất (thẻ chất in sẵn tên và công thức);
+ *  - đã có thẻ «90% · hiệu suất» thì bỏ thẻ chữ «hiệu suất» đứng ngay đó (hai thẻ nói cùng một điều).
+ */
+export const locLyThuyet = (ds: VungCham[]): VungCham[] => {
+  let ra = ds.some((v) => v.loai === 'cho') ? ds : ds.filter((v) => v.loai === 'hoi')
+  if (ra.some((v) => v.loai === 'hoi' && /công thức|tên gọi|danh pháp/i.test(v.chu))) ra = ra.filter((v) => v.loai !== 'chat')
+  if (ra.some((v) => v.loai === 'cho' && v.khoa === '%H')) ra = ra.filter((v) => !(v.loai === 'khoa' && v.khoa === 'hieu-suat'))
+  return ra
+}
 
 const sangO = (loai: LoaiCham, tang: number) => loai === 'chat' || loai === 'khoa' || (loai === 'cho' && tang >= 2)
 
@@ -61,7 +73,7 @@ export function RuotCham(p: RuotChamProps) {
       <BieuTuong ten="bulb" />{mo ? 'Đang xem gợi ý' : 'Bắt đầu từ đâu?'}
     </button>
   )
-  const kieu = useKieuTam()
+  const coRe = useCoRe()
   const [td, setTd] = useState<TuDien | null>(p.tuDien ?? null)
   useEffect(() => {
     if (p.tuDien) return
@@ -79,7 +91,7 @@ export function RuotCham(p: RuotChamProps) {
     setBoc(kq)
     return () => kq.go()
   }, [td, goc])
-  const the = useMemo<(TheGiaiNghia | null)[]>(() => (boc && td ? boc.vung.map((v) => { try { return td.theCho(v, boc.chuDe) } catch { return null } }) : []), [boc, td])
+  const the = useMemo<((TheGiaiNghia & { tenPhu?: string }) | null)[]>(() => (boc && td ? boc.vung.map((v) => { try { return td.theCho(v, boc.chuDe) } catch { return null } }) : []), [boc, td])
 
   // ── thẻ giải nghĩa đang mở: {i, ghim}; rê chuột (máy tính) = chưa ghim
   const [mo1, setMo1] = useState<{ i: number; ghim: boolean; phim?: boolean } | null>(null)
@@ -108,6 +120,7 @@ export function RuotCham(p: RuotChamProps) {
       const i = vungCua(e.target)
       if (i < 0) return
       huyHen(); nay(i)
+      if (!(moRef.current?.i === i && moRef.current.ghim)) rung('chon')
       setMo1((c) => (c && c.i === i && c.ghim ? null : { i, ghim: true }))
     }
     const onKey = (e: KeyboardEvent) => {
@@ -115,18 +128,19 @@ export function RuotCham(p: RuotChamProps) {
       if (i < 0) return
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault(); e.stopPropagation(); huyHen(); nay(i)
+        if (!(moRef.current?.i === i && moRef.current.ghim)) rung('chon')
         setMo1((c) => (c && c.i === i && c.ghim ? null : { i, ghim: true, phim: true }))
       } else if (e.key === 'Escape' && moRef.current) { e.stopPropagation(); setMo1(null) }
     }
     const onVao = (e: MouseEvent | FocusEvent) => {
-      if (kieu !== 'noi') return
+      if (!coRe) return
       const i = vungCua(e.target)
       if (i < 0) return
       huyHen()
       setMo1((c) => (c?.ghim ? c : { i, ghim: false }))
     }
     const onRa = (e: MouseEvent | FocusEvent) => {
-      if (kieu !== 'noi' || vungCua(e.target) < 0) return
+      if (!coRe || vungCua(e.target) < 0) return
       if (vungCua(e.relatedTarget) === vungCua(e.target)) return
       henTat()
     }
@@ -142,20 +156,22 @@ export function RuotCham(p: RuotChamProps) {
       g.removeEventListener('mouseover', onVao); g.removeEventListener('mouseout', onRa)
       g.removeEventListener('focusin', onVao); g.removeEventListener('focusout', onRa)
     }
-  }, [boc, goc, kieu])
-  // chạm ra ngoài (không phải chữ chạm, không phải thẻ) ⇒ đóng; Esc ở bất kỳ đâu ⇒ đóng
+  }, [boc, goc, coRe])
+  // chạm ra ngoài (không phải chữ chạm, không phải thẻ) ⇒ đóng; Esc ở bất kỳ đâu ⇒ đóng thẻ (bắt sớm ở pha capture: Esc KHÔNG lọt xuống
+  // màn — không mở tấm «giữ chân» khi em chỉ muốn tắt thẻ)
+  const dangMo = !!mo1
   useEffect(() => {
-    if (!mo1) return
+    if (!dangMo) return
     const ngoai = (e: PointerEvent) => {
       const t = e.target as Element | null
       if (t?.closest?.('.gyc-bong') || (t?.closest?.('.gyc-cham') && goc.current?.contains(t))) return
       setMo1(null)
     }
-    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') dongThe(true) }
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') { e.stopPropagation(); e.preventDefault(); dongThe(true) } }
     document.addEventListener('pointerdown', ngoai, true)
-    document.addEventListener('keydown', esc)
-    return () => { document.removeEventListener('pointerdown', ngoai, true); document.removeEventListener('keydown', esc) }
-  }, [mo1, goc, dongThe])
+    window.addEventListener('keydown', esc, true)
+    return () => { document.removeEventListener('pointerdown', ngoai, true); window.removeEventListener('keydown', esc, true) }
+  }, [dangMo, goc, dongThe])
   // trạng thái trên chữ: đang chạm, aria-expanded
   useEffect(() => {
     if (!boc) return
@@ -165,8 +181,8 @@ export function RuotCham(p: RuotChamProps) {
       if (ds[0]?.tabIndex === 0) { ds[0].setAttribute('aria-expanded', String(dang)); if (dang) ds[0].setAttribute('aria-controls', idThe); else ds[0].removeAttribute('aria-controls') }
     })
   }, [boc, mo1, idThe])
-  // mở bằng phím ⇒ đưa con trỏ vào nút «Đã hiểu» của thẻ (Esc / Đã hiểu ⇒ con trỏ về lại chữ)
-  useEffect(() => { if (mo1?.phim) document.getElementById(idThe)?.querySelector<HTMLElement>('[data-gyc-da-hieu]')?.focus({ preventScroll: true }) }, [mo1, idThe])
+  // mở bằng phím ⇒ đưa con trỏ vào thẻ (role=dialog, tabIndex -1) để trình đọc màn hình đọc ngay; Esc / Tab ⇒ con trỏ về lại chữ
+  useEffect(() => { if (mo1?.phim) document.getElementById(idThe)?.focus({ preventScroll: true }) }, [mo1, idThe])
 
   // ── gợi ý 3 tầng
   const [gy, setGy] = useState<{ tt: TrangThaiGoiY; ban?: BanSoDo } | null>(null)
@@ -227,8 +243,8 @@ export function RuotCham(p: RuotChamProps) {
         />, p.duoi.current)}
       {theMo && boc && (
         <TamGiaiThich
-          the={theMo} neo={boc.manh[mo1.i]?.[0] ?? null} kieu={kieu} id={idThe}
-          onDong={() => dongThe(true)}
+          key={mo1.i} the={theMo} neo={boc.manh[mo1.i] ?? []} id={idThe}
+          onDong={dongThe}
           onVao={() => window.clearTimeout(hen.current)}
           onRoi={() => { if (!moRef.current?.ghim) { window.clearTimeout(hen.current); hen.current = window.setTimeout(() => { if (moRef.current && !moRef.current.ghim) setMo1(null) }, 220) } }}
         />

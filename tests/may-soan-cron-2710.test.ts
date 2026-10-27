@@ -204,7 +204,7 @@ describe('tự hãm', () => {
     expect(await chayMaySoanCron(env, t, { soanLo: s.fn })).toMatchObject({ chay: true, nghi: true })
     expect(trangThai()).toMatchObject({ so_loi_lien_tiep: 3, nghi_den: t + NGHI_KHI_LOI_MS })
     expect(String(trangThai().ly_do)).toMatch(/nghỉ 30 phút/)
-    expect(String(trangThai().ly_do)).not.toMatch(/Resource exhausted/)
+    expect(String(trangThai().ly_do)).toMatch(/\(429 Resource exhausted ×3\)/) // 27/10: chỉ chữ lỗi của Google (≤ 50 ký tự), không có chữ câu
     const truocNghi = s.goi.length
     expect(await chayMaySoanCron(env, t + 60_000, { soanLo: s.fn })).toMatchObject({ chay: false, lyDo: 'dang_nghi' })
     expect(await chayMaySoanCron(env, t + NGHI_KHI_LOI_MS - 1, { soanLo: s.fn })).toMatchObject({ chay: false, lyDo: 'dang_nghi' })
@@ -236,7 +236,11 @@ describe('tự hãm', () => {
   })
   it('27/10: tóm lỗi hạn mức + giờ cấp lại', () => {
     expect(tomLoiHanMuc([{ ket: 'loi_goi', lyDo: 'HTTP 503 overloaded' }, { ket: 'dat' }, { ket: 'loi_goi', lyDo: 'HTTP 429 x [quota=GenerateRequestsPerMinutePerProjectPerModel; retry=?s]' }]))
-      .toEqual({ chu: '503 ×1, 429 GenerateRequestsPerMinutePerProjectPerModel ×1', ngay: false })
+      .toEqual({ chu: '503 overloaded ×1, 429 GenerateRequestsPerMinutePerProjectPerModel ×1', ngay: false })
+    // không có mã hạn mức ⇒ đọc số đo / giới hạn / model trong chữ của Google; lỗi khác 429/503 không chép chữ
+    const msg = 'HTTP 429 You exceeded your current quota. * Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 250, model: gemini-2.5-flash Please retry in 39s.'
+    expect(tomLoiHanMuc([{ ket: 'loi_goi', lyDo: msg }, { ket: 'loi_goi', lyDo: 'HTTP 400 Invalid argument: đề câu…' }]).chu)
+      .toBe('429 generate_content_free_tier_requests limit 250 gemini-2.5-flash ×1, 400 ×1')
     // 27/10/2026 06:50 VN = 26/10 16:50 PDT (UTC−7) ⇒ cấp lại 27/10 00:00 PDT = 07:00Z (+5 phút)
     expect(new Date(lucCapLaiHanMucNgay(Date.parse('2026-10-26T23:50:00Z'))).toISOString()).toBe('2026-10-27T07:05:00.000Z')
   })

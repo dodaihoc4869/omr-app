@@ -174,7 +174,8 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
       </div>
       {them && <div className="duo-them">{them}</div>}
       {loi && <p className="duo-loi" role="alert">{loi}</p>}
-      {nut}
+      {/* thầy 27/10 «Chỗ hỏi thầy lấy 1/3 hoặc 1/4 cái nút làm lại câu này»: Hỏi thầy (nút 3D phụ, trái) + nút chính CÙNG MỘT HÀNG */}
+      <div className="duo-hang-nut">{linkHoi(false)}{nut}</div>
     </div></section>
   )
   const tick = <svg className="duo-tick" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M5 12.5 10 17.5 19 7" /></svg>
@@ -189,15 +190,15 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
   if (!mo.ok || (p.daTuSua && !kq)) {
     day = dayTron
   } else if (ket === 'tu_sua') {
-    day = tam('vui', <>{tick}Em đã tự sửa xong câu này</>, <p className="duo-mo">Đúng ngay lần đầu, không cần gợi ý.</p>, <>{linkGiai}{linkHoi(false)}</>, nutTiep())
+    day = tam('vui', <>{tick}Em đã tự sửa xong câu này</>, <p className="duo-mo">Đúng ngay lần đầu, không cần gợi ý.</p>, linkGiai, nutTiep())
   } else if (ket === 'xong_phan') {
-    day = tam('vui', <>{tick}Đúng rồi · xong phần hôm nay</>, kq?.lyDo ? <p className="duo-mo">{p.chuXongPhan}</p> : null, <>{linkGiai}{linkHoi(false)}</>, nutTiep())
+    day = tam('vui', <>{tick}Đúng rồi · xong phần hôm nay</>, kq?.lyDo ? <p className="duo-mo">{p.chuXongPhan}</p> : null, linkGiai, nutTiep())
   } else if (ket === 'loi_giai') {
-    day = tam('sai', 'Chưa đúng · xem đáp án và lời giải', <>{tomDS ? <p><b>{tomDS}</b></p> : dapAnChu && <p><b>Đáp án: <ChemText text={dapAnChu} /></b></p>}<p className="duo-mo">Câu này sẽ gặp lại ở ngày khác. Chỗ nào chưa hiểu, em bấm Hỏi thầy.</p></>, <>{linkGiai}{linkHoi(false)}</>, nutTiep(true))
+    day = tam('sai', 'Chưa đúng · xem đáp án và lời giải', <>{tomDS ? <p><b>{tomDS}</b></p> : dapAnChu && <p><b>Đáp án: <ChemText text={dapAnChu} /></b></p>}<p className="duo-mo">Câu này sẽ gặp lại ở ngày khác. Chỗ nào chưa hiểu, em bấm Hỏi thầy.</p></>, linkGiai, nutTiep(true))
   } else if (ket === 'goi_y') {
     day = tam('sai', 'Chưa đúng · em thử thêm một lần',
       kq?.goiY ? <p className="duo-sua-goi-y"><Lightbulb size={16} aria-hidden="true" /><span><b>Gợi ý: </b><ChemText text={kq.goiY} /></span></p> : null,
-      linkHoi(false),
+      null,
       <button ref={nutChinh} type="button" className="duo-nut" data-sac="do" onClick={() => { phanHoi('chon'); p.onLamLai() }} disabled={ban}>{ban ? 'Đang mở lại…' : 'Làm lại câu này'}</button>)
   } else if (de) {
     const soYChua = phan === 'II' ? [0, 1, 2, 3].filter((i) => tra[i] !== 'D' && tra[i] !== 'S').length : 0

@@ -37,17 +37,14 @@ export function tangTuBan(ban: BanSoDo): TangGoiY[] {
 /** Gợi ý TỰ SINH khi câu chưa có bản soạn (hoặc mất mạng): chỉ dùng chữ của đề (vùng tô màu) + gợi ý cũ của câu nếu có. */
 export function tangTuSinh(cho: string[], hoi: string[], chat: string[], cu?: { cotLoi?: string; gach?: string[] }): TangGoiY[] {
   const chips = (ds: string[], mau: string) => <div className="gyc-chips">{ds.map((s, i) => <span key={i} className={`gyc-chip ${mau}`}><ChemText text={s} /></span>)}</div>
+  // Thầy 27/10 («Soát kĩ quá vô nghĩa»): chỉ giữ tầng có nội dung CỤ THỂ của câu này (số liệu, chất, đề hỏi có thẻ, cốt lõi thầy soạn);
+  // bỏ lời khuyên chung («Đọc chậm từng câu…», «Tìm câu hỏi ở cuối đề…», «Đọc từng phương án và tự hỏi…»).
   const ra: TangGoiY[] = []
-  ra.push(cho.length || chat.length
-    ? { icon: 'book', mau: 'tin', ten: 'Đề cho', than: <>{chips(cho, 'gyc-tin')}{chat.length > 0 && chips(chat, 'gyc-dung')}</> }
-    : { icon: 'book', mau: 'tin', ten: 'Đề đang nói gì', than: doan('Đọc chậm từng câu của đề, chạm vào chữ tô màu để hiểu từng chữ.') })
-  ra.push({
-    icon: 'target', mau: 'chu-y', ten: 'Đề hỏi',
-    than: <>{hoi.length > 0 && chips(hoi, 'gyc-chu-y')}{cu?.cotLoi ? doan(cu.cotLoi) : cu?.gach?.length ? doan(`Có thể loại phương án ${cu.gach.join(', ')}.`) : !hoi.length && doan('Tìm câu hỏi ở cuối đề: đề muốn em tính gì, hay chọn ý nào?')}</>,
-  })
-  ra.push(cho.length
-    ? { icon: 'pen', mau: 'dung', ten: 'Bước đầu tiên', than: doan('Đổi các số liệu đề cho ra số mol, rồi tự làm tiếp.') }
-    : { icon: 'ask', mau: 'dung', ten: 'Tự hỏi để kiểm', than: doan('Đọc từng phương án và tự hỏi: đúng hay sai, vì sao?') })
+  if (cho.length || chat.length) ra.push({ icon: 'book', mau: 'tin', ten: 'Đề cho', than: <>{cho.length > 0 && chips(cho, 'gyc-tin')}{chat.length > 0 && chips(chat, 'gyc-dung')}</> })
+  const cotLoi = cu?.cotLoi ? doan(cu.cotLoi) : cu?.gach?.length ? doan(`Có thể loại phương án ${cu.gach.join(', ')}.`) : null
+  if (hoi.length || cotLoi) ra.push({ icon: 'target', mau: 'chu-y', ten: 'Đề hỏi', than: <>{hoi.length > 0 && chips(hoi, 'gyc-chu-y')}{cotLoi}</> })
+  if (cho.length) ra.push({ icon: 'pen', mau: 'dung', ten: 'Bước đầu tiên', than: doan('Đổi các số liệu đề cho ra số mol, rồi tự làm tiếp.') })
+  if (!ra.length) ra.push({ icon: 'info', mau: 'tin', ten: 'Chưa có gợi ý soạn sẵn', than: doan('Thầy chưa soạn gợi ý cho câu này. Em tự làm; làm xong sẽ có lời giải từng bước.') })
   return ra
 }
 

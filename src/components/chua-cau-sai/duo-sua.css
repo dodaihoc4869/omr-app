@@ -25,3 +25,7 @@
 [data-trong='hs'] .duo-sua-dau svg { fill: none; stroke: var(--tr-chu-2); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
 [data-trong='hs'] .duo-sua-bao[data-tt='dung'] .duo-sua-dau { background: var(--tr-dung-nhat); }
 [data-trong='hs'] .duo-sua-bao[data-tt='dung'] .duo-sua-dau svg { stroke: var(--tr-dung); }
+
+/* Vệt sáng thanh tiến độ của màn sửa câu: lướt TRONG thanh rồi mờ đi (KhungDuoSua gỡ vệt khi lướt xong) — không trượt ra ngoài mép phải khung nhìn. */
+@keyframes duo-sua-loe { from { transform: translateX(-100%); opacity: 1; } 75% { opacity: 1; } to { transform: translateX(150%); opacity: 0; } }
+[data-trong='hs'] .duo-sua .duo-loe { animation: duo-sua-loe 520ms ease-out 120ms both; }
