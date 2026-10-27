@@ -2,13 +2,15 @@
 // `POST /gv/bai-hang-ngay {tu?, den?, khoi?, lop?}` và `POST /gv/ho-so-thai-do {sbd, tu?, den?}`; hình dạng trả về là hợp đồng dùng chung
 // `server/src/bai-hang-ngay-kieu.ts` (app CHỈ ĐỌC kiểu). Không ném lỗi: trả `KetQuaLenh` với MỘT câu nói thật. Trường thiếu / sai kiểu ⇒ bỏ dòng ấy
 // (không bịa số); thiếu cả khung ⇒ "không đọc được".
-import { goiLenh, type KetQuaLenh } from './goi-lenh-thay'
+import type { KetQuaLenh } from './goi-lenh-thay'
 import type {
   CauTomTat, CheDoNgay, EmBaiHangNgay, KetLuanThaiDo, KetQuaBaiHangNgay, KetQuaHoSoThaiDo, LopBaiHangNgay, MaTinHieu, MucTinHieu, NgayBaiEm,
   NgayHoatDong, NguonMuc, NhanThaiDo, NhomGiay, TinHieuThaiDo,
 } from '../../server/src/bai-hang-ngay-kieu'
 import { MUC_THEO_TANG, NGAY_BAT_DAU_BAI_HANG_NGAY, NGUONG_THAI_DO, TEN_NHAN_THAI_DO } from '../../server/src/bai-hang-ngay-kieu'
 import { docBacCham } from './bac-cham-chi'
+// 27/10 tốc độ: cổng phụ huynh nhập tệp này chỉ để dùng hàm đọc thuần ⇒ `goiLenh` (mảnh DesignSystem ~27 KB nén) nạp LƯỜI lúc gọi lệnh thầy, không cõng vào /ph.
+const goiLenh: typeof import('./goi-lenh-thay').goiLenh = (...a) => import('./goi-lenh-thay').then((m) => m.goiLenh(...a))
 
 export type {
   CauTomTat, EmBaiHangNgay, KetLuanThaiDo, KetQuaBaiHangNgay, KetQuaHoSoThaiDo, LopBaiHangNgay, MaTinHieu, MucTinHieu, NgayBaiEm, NgayHoatDong,
