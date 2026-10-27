@@ -88,6 +88,19 @@ const HINH_NUT: Record<Nut['loai'], LucideIcon> = { hoc: Play, kiem: FlaskConica
 /** F2/F3 — nhớ trên máy số chặng đã xong hôm nay (giờ VN): lần mở Lộ trình kế tiếp thấy THÊM đúng một chặng ⇒ chặng đó «vừa xong». Không bao giờ ghi lùi
  *  (bản Sảnh đệm cũ vẽ trước bản mới không làm chạy lại hiệu ứng). Trả chỉ số chặng vừa xong hoặc null. */
 const KHOA_LO_TRINH = 'ddh.lo-trinh'
+/** MỐC CHÈN Tự sửa lỗi = số chặng đứng TRƯỚC nút (thầy 27/10 «sửa lỗi chèn vào giữa hành trình mới»). Giả định: một nút Tự sửa lỗi / ngày; tính MỘT lần mỗi
+ *  ngày từ chỗ em đang học (d = số chặng đã xong) rồi nhớ trên máy để nút không trôi theo em: còn ≥ 3 chặng mới ⇒ sau chặng mới thứ 2 (d + 2); còn 1–2 ⇒ sau
+ *  chặng mới đầu tiên (d + 1); hết chặng ⇒ cuối đường. Số chặng hôm nay đổi ⇒ tính lại. Không đọc / ghi được bộ nhớ máy ⇒ tính theo chỗ hiện tại. */
+const KHOA_MOC_SUA = 'ddh.moc-sua'
+export function mocSuaHomNay(tong: number, xong: number): number {
+  const ngay = ngayVn(Date.now()), con = tong - xong, moi = con <= 0 ? tong : con <= 2 ? xong + 1 : xong + 2
+  try {
+    const cu = JSON.parse(localStorage.getItem(KHOA_MOC_SUA) || 'null') as { ngay?: string; tong?: number; sau?: number } | null
+    if (cu && cu.ngay === ngay && cu.tong === tong && typeof cu.sau === 'number') return Math.min(tong, cu.sau)
+    localStorage.setItem(KHOA_MOC_SUA, JSON.stringify({ ngay, tong, sau: moi }))
+  } catch { /* bộ nhớ máy không dùng được: tính theo chỗ hiện tại */ }
+  return moi
+}
 /** id Kiểm tra ôn tập đang khoá chặng (để biết lúc quay về sau khi nộp mà chạy hiệu ứng mở khoá một lần). */
 const KHOA_KT_MO = 'ddh.kt-khoa'
 function changVuaXong(xong: number, tong: number): number | null {
@@ -223,11 +236,12 @@ function DuongChang({ ds, moDi, cam, moKt }: { ds: Nut[]; moDi: boolean; cam?: C
     {duong && <svg className="da-noi" aria-hidden="true"><path d={duong} /></svg>}
     <ol className="da-ds" aria-label="Lộ trình hôm nay">
     {ds.map((n, i) => {
-      const sao = n.tt === 'dang' && n.loai === 'hoc'
+      // chặng đang học mà việc hiện tại là Tự sửa lỗi (đứng trước trên đường) ⇒ không vòng / không sao nảy — chỉ MỘT nút hiện tại
+      const sao = n.tt === 'dang' && n.loai === 'hoc' && n.vong !== undefined
       const Icon = n.tt === 'xong' ? Check : n.tt === 'khoa' ? Lock : HINH_NUT[n.loai]
       const x = LECH[i % LECH.length]!
       const than = <>
-        {(n.vong !== undefined || n.tt === 'dang') && <VongChang pt={n.vong} />}
+        {(n.vong !== undefined || (n.tt === 'dang' && n.loai !== 'hoc')) && <VongChang pt={n.vong} />}
         {n.bong && <span className="da-bong" aria-hidden="true">{n.bong}</span>}
         {sao && <i className="da-sao-bong" aria-hidden="true" />}
         {/* ngôi sao đặc tự vẽ (không thêm biểu tượng thư viện vào mảnh dùng chung lúc mở app) */}
@@ -400,10 +414,14 @@ export function MotTrangHs(p: PropsMotTrang) {
   // cũng từ chối mở chặng — game-v2 `KIEM_TRA_ON_TAP_TRUOC`). Nộp xong ⇒ nút thành ✓, các chặng vỡ khoá lần lượt (F3). Quá hạn ⇒ không khoá, ghi «Đã lỡ».
   const ktDau = !!kiem && kiem.homNay && !p.ngayKiem
   const khoaKt = ktDau && kiemLam
-  const chinh = p.coCa ? 'ca' : p.ngayKiem || khoaKt ? 'kiem' : du && kiemLam ? 'kiem' : du && coSua ? 'sua' : du && p.soBaiTap ? 'bt' : 'hoc'
-  const pct = so && so.muc > 0 ? Math.min(100, Math.round((100 * so.daLam) / so.muc)) : 0
   const chang = so && !p.ngayKiem ? chiaChang(so) : []
   const xongChang = so ? soChangXong(so) : 0
+  // TỰ SỬA LỖI CHÈN GIỮA HÀNH TRÌNH (thầy 27/10 «Ưu tiên bài kiểm tra lên đầu hành trình sau đó sửa lỗi chèn vào giữa hành trình mới»): nút Tự sửa lỗi đứng SAU
+  // `mocSua` chặng (xem mocSuaHomNay). Đường đi theo thứ tự: các chặng trước mốc xong rồi ⇒ Tự sửa lỗi là việc hiện tại (dù chưa đủ mức).
+  const mocSua = coSua && !p.ngayKiem && chang.length ? mocSuaHomNay(chang.length, xongChang) : chang.length
+  const toiSua = coSua && !p.ngayKiem && xongChang >= mocSua
+  const chinh = p.coCa ? 'ca' : p.ngayKiem || khoaKt ? 'kiem' : toiSua ? 'sua' : du && kiemLam ? 'kiem' : du && coSua ? 'sua' : du && p.soBaiTap ? 'bt' : 'hoc'
+  const pct = so && so.muc > 0 ? Math.min(100, Math.round((100 * so.daLam) / so.muc)) : 0
 
   // Thanh trên: ĐÚNG 3 bộ đếm thưởng phạt (chuỗi · nguyên tử hôm nay · tinh thể) + vòng Mục tiêu ngày (bản vẽ tp-4); thông báo thưởng chưa xem chỉ bật ở Lộ trình.
   const tren = <header className="da-tren" aria-label="Số của em">
@@ -482,32 +500,35 @@ export function MotTrangHs(p: PropsMotTrang) {
     bong: chinh === 'kiem' && kiemLam ? (khoaKt && kiem.daTra === 0 ? 'Kiểm tra ôn tập' : kiem.daTra > 0 ? 'Làm tiếp' : 'Bắt đầu') : undefined,
     ten: `Kiểm tra ôn tập: ${chuKiem(kiem)}`, pop: { tieu: 'Kiểm tra ôn tập', phu: chuKiem(kiem),
       nut: (kiemLam || kiemXong) && p.onKiemTra ? { chu: kiemXong ? 'Xem kết quả' : kiem.daTra > 0 ? 'Làm tiếp' : 'Bắt đầu', onClick: p.onKiemTra, tat: p.coCa } : undefined } }
-  if (nutKiem && ktDau) nut.push(nutKiem)
+  if (nutKiem) nut.push(nutKiem) // Kiểm tra ôn tập LUÔN đứng đầu hành trình (thầy 27/10)
+  let nutSua: Nut | null = null
+  if (coSua && !p.ngayKiem && khoaKt) nutSua = { k: 'sua', loai: 'sua', tt: 'khoa', ten: 'Tự sửa lỗi: khoá đến khi làm xong Kiểm tra ôn tập', pop: { tieu: 'Tự sửa lỗi', phu: CHU_KHOA_KT } }
+  else if (coSua && !p.ngayKiem) nutSua = { k: 'sua', loai: 'sua', tt: chinh === 'sua' ? 'dang' : 'mo', dem: p.soSua ?? undefined, bong: chinh === 'sua' ? 'Sửa lỗi' : undefined, ten: `Tự sửa lỗi: ${p.soSua} câu`,
+    pop: { tieu: 'Tự sửa lỗi', phu: `${p.soSua} câu cần sửa`, nut: { chu: 'Sửa ngay', onClick: p.onChua } } }
   if (!p.ngayKiem) chang.forEach((c, i) => {
+    if (nutSua && i === mocSua) nut.push(nutSua)
     const dang = c.tt === 'dang' && chinh === 'hoc' || c.tt === 'dang' && chinh === 'ca'
     const thu = `Chặng ${i + 1} / ${chang.length}`, conChang = so ? Math.max(0, Math.min(c.co, dauChang + c.co - so.daLam)) : c.co
     dauChang += c.co
     if (khoaKt && c.tt !== 'xong') { nut.push({ k: `c${i}`, loai: 'hoc', tt: 'khoa', ten: `Chặng ${i + 1}: khoá đến khi làm xong Kiểm tra ôn tập`, pop: { tieu: tenBaiThe, phu: `${thu} · ${CHU_KHOA_KT}` } }); return }
     nut.push(c.tt === 'xong' ? { k: `c${i}`, loai: 'hoc', tt: 'xong', ten: `Chặng ${i + 1}: đã xong`,
       pop: { tieu: tenBaiThe, phu: `${thu} · đã xong`, nut: hs ? { chu: 'Xem lại', onClick: hs.onXemLai } : undefined } }
-      : c.tt === 'dang' ? { k: `c${i}`, loai: 'hoc', tt: 'dang', ten: nutHoc, bong: dang && chinh === 'hoc' ? (c.phan > 0 ? 'Học tiếp' : 'Bắt đầu') : undefined, vong: c.phan,
+      : c.tt === 'dang' ? { k: `c${i}`, loai: 'hoc', tt: 'dang', ten: nutHoc, bong: dang && chinh === 'hoc' ? (c.phan > 0 ? 'Học tiếp' : 'Bắt đầu') : undefined, vong: chinh === 'sua' ? undefined : c.phan,
         pop: { tieu: tenBaiThe, phu: p.khoaHoc || p.hetCau ? nutHoc : `${thu} · ${conChang} câu`, nut: { chu: c.phan > 0 ? 'Tiếp tục' : 'Bắt đầu', onClick: p.onHoc, tat: p.khoaHoc } } }
       : { k: `c${i}`, loai: 'hoc', tt: 'khoa', ten: `Chặng ${i + 1}: chưa mở`, pop: { tieu: tenBaiThe, phu: `${thu} · Hoàn thành các chặng trước để mở khoá` } })
   })
-  if (nutKiem && !ktDau) nut.push(nutKiem)
-  if (coSua && !p.ngayKiem && khoaKt) nut.push({ k: 'sua', loai: 'sua', tt: 'khoa', ten: 'Tự sửa lỗi: khoá đến khi làm xong Kiểm tra ôn tập', pop: { tieu: 'Tự sửa lỗi', phu: CHU_KHOA_KT } })
-  else if (coSua && !p.ngayKiem) nut.push({ k: 'sua', loai: 'sua', tt: chinh === 'sua' ? 'dang' : 'mo', dem: p.soSua ?? undefined, bong: chinh === 'sua' ? 'Sửa lỗi' : undefined, ten: `Tự sửa lỗi: ${p.soSua} câu`,
-    pop: { tieu: 'Tự sửa lỗi', phu: `${p.soSua} câu cần sửa`, nut: { chu: 'Sửa ngay', onClick: p.onChua } } })
+  if (nutSua && mocSua >= chang.length) nut.push(nutSua) // hết chặng mới (hoặc ngày không có chặng) ⇒ sau chặng cuối
   if (coBt && !p.ngayKiem) nut.push({ k: 'bt', loai: 'bt', tt: chinh === 'bt' ? 'dang' : 'mo', dem: p.soBaiTap || undefined, bong: chinh === 'bt' ? 'Làm bài' : undefined, ten: 'Bài tập về nhà',
     pop: { tieu: 'Bài tập về nhà', phu: p.soBaiTap ? `${p.soBaiTap} bài thầy đang giao` : 'Xem lại bài đã nộp', nut: { chu: p.soBaiTap ? 'Làm bài' : 'Xem bài', onClick: p.onBaiTap } } })
   const tiepTheo = [kiemLam && 'Kiểm tra ôn tập', coSua && 'Tự sửa lỗi', !!p.soBaiTap && 'Bài tập về nhà'].filter(Boolean) as string[]
-  const hocThem = (chinh === 'sua' || chinh === 'bt' || (chinh === 'kiem' && !p.ngayKiem)) && !p.khoaHoc && !khoaKt
+  const hocThem = ((chinh === 'sua' && du) || chinh === 'bt' || (chinh === 'kiem' && !p.ngayKiem)) && !p.khoaHoc && !khoaKt
   // Bi nói việc chính của hôm nay (cùng thứ tự `chinh`); xong hết ⇒ Bi mừng. Chưa có số (đang tải) ⇒ chưa hiện, không đoán.
   // [cảm xúc, lời, loại]: loại làm khoá «nhắc một lần» (số câu còn lại đổi theo từng câu KHÔNG tính là nội dung mới); 'ca' = lời quan trọng, luôn hiện.
   const loiBi: [CamBi, string, string] | null = chinh === 'ca' ? ['chao', 'Có ca kiểm tra đang mở. Em vào ca trước nhé.', 'ca']
     : p.ngayKiem ? ['chao', 'Hôm nay là ngày Kiểm tra ôn tập. Em làm bài nhé.', 'ngay-kiem']
     : khoaKt ? ['chao', 'Hôm nay có Kiểm tra ôn tập. Em làm xong là mở khoá các chặng nhé.', 'kt-khoa']
     : !so ? null
+    : toiSua && !du ? ['chao', `Tới chặng Tự sửa lỗi rồi! Em sửa ${p.soSua} câu sai rồi học tiếp nhé.`, 'toi-sua']
     : du ? (tiepTheo.length ? ['vui', `Đủ mức rồi! Giờ đến ${tiepTheo[0]} nhé.`, `du-${tiepTheo[0]}`] : ['mung', 'Xong hết việc hôm nay! Em giỏi lắm.', 'xong'])
     : so.daLam === 0 ? ['chao', 'Chào em! Hôm nay bắt đầu từ chặng Học nhé.', 'bat-dau'] : ['chao', `Học tiếp nhé! Còn ${con} câu nữa là đủ mức hôm nay.`, 'hoc-tiep']
 
