@@ -17,6 +17,21 @@ export const DONG_HO_GT: Record<MucGT, number> = { nb: 60_000, th: 90_000, vd: 1
 let nhip: NhipLoi = taoNhip()
 const bay = () => performance.now()
 const CHON = '[aria-checked="true"], [aria-pressed="true"]'
+// 27/10 MƯỢT (đo scripts/do-muot-hs.mjs, chuyển câu CPU ×6): khối đề dựng lại mỗi câu ⇒ trước đây giám thị bị huỷ rồi dựng ~150 hình SVG mới. Nay câu cũ
+// rời đi thì giám thị được GỬI lại (không huỷ); câu mới cùng mức lấy về, chuyển sang khung mới (`doiCho`). Không ai lấy trong lượt này ⇒ huỷ thật.
+let guiLai: { g: GiamThi; hen: number } | null = null
+function gui(g: GiamThi): void {
+  if (guiLai) { clearTimeout(guiLai.hen); guiLai.g.huy() }
+  const muc = { g, hen: window.setTimeout(() => { if (guiLai?.g === g) { guiLai = null; g.huy() } }, 0) }
+  guiLai = muc
+}
+function layLai(muc: MucGT, el: HTMLElement, loiVao: HTMLElement | null | undefined): GiamThi | null {
+  if (!guiLai || guiLai.g.muc !== muc) return null
+  const g = guiLai.g
+  clearTimeout(guiLai.hen); guiLai = null
+  g.doiCho(el, loiVao)
+  return g
+}
 
 export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
   muc: MucGT; qid: string; phien: string; nop: boolean; ket: KetGT | null
@@ -36,7 +51,10 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
   useEffect(() => {
     const el = host.current
     if (!el) return
-    const g = taoGiamThi(el, { muc, loiVao: el.closest('.duo-gt-san')?.querySelector<HTMLElement>(':scope > .duo-gt-loi-o') })
+    const loiVao = el.closest('.duo-gt-san')?.querySelector<HTMLElement>(':scope > .duo-gt-loi-o')
+    const cu = layLai(muc, el, loiVao)
+    const g = cu ?? taoGiamThi(el, { muc, loiVao })
+    if (cu && ket) g.datTrangThai('yen') // như giám thị mới dựng: câu đã có kết quả ⇒ đứng yên
     gt.current = g
     if (nhip.phien !== phien) nhip = taoNhip(phien)
     cauMoi(nhip, qid)
@@ -53,7 +71,7 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
       henCho()
       datHen('dh', DONG_HO_GT[muc], () => { if (!coKet.current && !document.hidden) { datTT('dong-ho'); noi('dongHo') } })
     }
-    return () => { quanRong?.disconnect(); huyHen(); g.huy(); gt.current = null }
+    return () => { quanRong?.disconnect(); huyHen(); gui(g); gt.current = null }
   }, [muc, qid]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // KHUNG CHỮ L — CHỈ khi chữ thật sự tràn xuống dưới chân giám thị (thầy 27/10: câu 4 dòng bị đáy rỗng). Đo trước khi vẽ (layout effect /

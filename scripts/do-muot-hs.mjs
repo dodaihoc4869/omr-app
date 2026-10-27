@@ -7,7 +7,7 @@
 //   2. Mở LẠI (đã đăng nhập, bộ nhớ đệm HTTP ấm): tới nội dung đầu, tới chạm được, byte qua mạng.
 //   3. Lộ trình đứng yên: số nút DOM, rAF chạy nền (lượt/giây), hoạt ảnh CSS vô hạn đang chạy, khung khi đứng yên; vuốt cuộn 4 s: khung p50/p95, khung > 50 ms.
 //   4. Bấm «Học tiếp» → câu đầu hiện (chuyển màn).
-//   5. Làm 4 câu: bấm phương án (phản hồi = Event Timing: từ chạm tới khung vẽ kế), «Kiểm tra» → dải kết quả, «Tiếp tục» → câu kế (chuyển câu);
+//   5. Làm 7 câu (--so-cau): bấm phương án (phản hồi = Event Timing: từ chạm tới khung vẽ kế), «Kiểm tra» → dải kết quả, «Tiếp tục» → câu kế (chuyển câu);
 //      khung trong 1,5 s hiệu ứng thưởng; tác vụ dài > 100 ms khi bấm.
 //   node scripts/do-muot-hs.mjs --dist=dist [--cpu=6] [--mang=fast3g|slow3g] [--may-chu-ms=60] [--yeu=1|0] [--ra=kq.json]
 // Chẩn đoán: --ho-so=bamPa|kiem|tiep (CPU profile câu 2: hàm tốn nhất + ai gọi getBoundingClientRect/removeChild/setAttribute) · --vet-tl=1 (vết Chrome:
@@ -316,9 +316,11 @@ try {
   // 2. Mở lại (đã đăng nhập, đệm HTTP ấm)
   const { p, cdp } = await trangMoi(ctx, loi)
   {
+    await batHoSo(cdp, 'molai')
     await p.goto(goc + '/hs', { waitUntil: 'commit' })
     const tLt = await choThay(p, LO_TRINH)
     await p.waitForTimeout(5000)
+    await inHoSo(cdp, 'molai')
     const d = await layDo(p)
     kq.moLai = { fcp: d.fcp, noiDung: Math.round(tLt), chamDuoc: tti(d.dai, tLt), taskMax: daiNhat(d.dai), quaMang: await taiTheoLoai(p), dai: d.dai.filter(([t]) => t >= tLt - 500).map(([t, du]) => `${t}+${du}`) }
   }
@@ -390,7 +392,7 @@ try {
     console.error('THỬ CSS', JSON.stringify(r))
   }
   const cau = []
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < Number(arg("so-cau", "7")); i++) {
     const m = {}
     if (i === 1) await batHoSo(cdp, 'bamPa')
     let t0 = await bayGio(p)

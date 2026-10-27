@@ -88,9 +88,13 @@ export function RuotCham(p: RuotChamProps) {
   useLayoutEffect(() => {
     const g = goc.current
     if (!g || !td) return
-    const kq = bocVung(g, td.phatHien, (v, chu) => { try { return !!td.theCho(v, chu) } catch { return false } }, locLyThuyet)
-    setBoc(kq)
-    return () => kq.go()
+    let kq: KetQuaBoc | null = null, r = 0, h = 0
+    const boc = () => { kq = bocVung(g, td.phatHien, (v, chu) => { try { return !!td.theCho(v, chu) } catch { return false } }, locLyThuyet); setBoc(kq) }
+    // 27/10 MƯỢT (máy yếu, đo scripts/do-muot-hs.mjs): dò + bọc chữ đề (20–40 ms ở CPU ×6) chạy SAU lần vẽ đầu của câu — câu hiện ngay, chữ tô tím
+    // hiện ngay sau đó; máy thường bọc trước lần vẽ như cũ.
+    if (document.documentElement.classList.contains('may-yeu')) r = requestAnimationFrame(() => { h = window.setTimeout(boc, 0) })
+    else boc()
+    return () => { cancelAnimationFrame(r); clearTimeout(h); kq?.go() }
   }, [td, goc])
   const the = useMemo<(TheGiaiNghia | null)[]>(() => (boc && td ? boc.vung.map((v) => { try { return td.theCho(v, boc.chuDe) } catch { return null } }) : []), [boc, td])
 

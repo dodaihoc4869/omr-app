@@ -18,6 +18,8 @@ export interface GiamThi {
   nhinVao(el: Element | null | undefined): GiamThi
   noi(chu: string | null | undefined, o?: { giu?: number }): GiamThi
   tamDung(dung: boolean): void
+  /** Chuyển giám thị (giữ nguyên hình đã dựng + tư thế đang có) sang khung chứa mới — câu mới dùng lại, không dựng lại ~150 hình SVG. */
+  doiCho(khung: HTMLElement, loiVao?: HTMLElement | null): void
   huy(): void
 }
 
@@ -699,6 +701,18 @@ export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; 
       dung = d
       khung.classList.toggle('gt-dung', d)
       if (d) { if (raf) cancelAnimationFrame(raf); raf = 0 } else chay()
+    },
+    doiCho(moi, loiVao) {
+      // 27/10 MƯỢT (đo scripts/do-muot-hs.mjs): sang câu mới, khối đề dựng lại ⇒ trước đây giám thị bị huỷ rồi dựng lại từ đầu (~150 hình SVG phải tạo + tính
+      // kiểu mỗi câu). Nay chuyển nguyên hình sang khung mới; tư thế đang có nối mượt sang tư thế của câu mới (lò xo).
+      loiHen.forEach((x) => { clearTimeout(x); clearInterval(x) }); loiHen = []; noiDen = 0
+      ;(o.loiVao ?? khung).querySelectorAll(':scope > .gt-loi').forEach((e) => e.remove())
+      if (moi === khung) { o.loiVao = loiVao ?? undefined; return }
+      moi.innerHTML = ''
+      moi.appendChild(svg)
+      if (dung) moi.classList.add('gt-dung')
+      khung.classList.remove('gt-dung')
+      khung = moi; o.loiVao = loiVao ?? undefined
     },
     huy() {
       if (raf) cancelAnimationFrame(raf); raf = 0; dung = true

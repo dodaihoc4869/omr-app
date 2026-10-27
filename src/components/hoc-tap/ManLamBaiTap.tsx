@@ -406,7 +406,12 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     setCombo(null) // băng combo chỉ sống ở câu vừa đúng — sang câu mới thì tắt, không che đề
     if (viTri + 1 < cau.length) {
       // máy yếu không có hiệu ứng trượt; cuộn về đầu để sau khi câu mới dựng (không kéo câu cũ lên đầu trong lúc chờ)
-      if (yenLang()) { dangSang.current = viTri; startTransition(() => setViTri(i => i + 1)) } else { truotCauCu(); setViTri(i => i + 1) }
+      if (yenLang()) {
+        // khung đang ở đầu (đọc lúc bố cục còn sạch — rẻ) ⇒ câu mới khỏi `scrollIntoView` sau khi dựng (mỗi lần là một lượt ép bố cục cả màn)
+        const goc = gocRef.current, kh = goc ? khungCuonCua(goc) : null
+        if (goc && (kh ? kh.scrollTop === 0 : goc.getBoundingClientRect().top === 0)) daVeDau.current = true
+        dangSang.current = viTri; startTransition(() => setViTri(i => i + 1))
+      } else { truotCauCu(); setViTri(i => i + 1) }
     }
     else if (goi7 && !daXinLamLai.current && !laLamLai && cauSai.length > 0) void xinLamLai()
     else ketThuc()
