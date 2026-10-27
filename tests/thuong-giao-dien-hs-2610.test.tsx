@@ -237,7 +237,8 @@ describe('các màn (đúng số bản vẽ)', () => {
   it('cửa hàng + chuỗi ngày: tuần này đã mua bình ⇒ nút xám + lý do «Tuần này em đã mua · mua tiếp từ thứ Hai» (luật 27/10)', () => {
     datMayChu(M.tongQuanGia({ binh: { gia: 150, toiDaTuan: 1, daMuaTuan: true, muaTiepTu: '2026-11-02' } }))
     let c = ve(<ManCuaHang token={TK} />)
-    const nut = screen.getByRole('button', { name: 'Tuần này em đã mua · mua tiếp từ thứ Hai' }) as HTMLButtonElement
+    const nut = screen.getByRole('button', { name: 'Tuần này em đã mua' }) as HTMLButtonElement
+    expect(c.textContent).toMatch(/Tuần này em đã mua · mua tiếp từ thứ Hai/)
     expect(nut.disabled).toBe(true); expect(nut.getAttribute('data-sac')).toBe('tat')
     expect(screen.queryByRole('button', { name: /Mua 1 bình/ })).toBeNull()
     cleanup()

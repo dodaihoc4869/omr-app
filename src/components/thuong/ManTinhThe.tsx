@@ -129,11 +129,12 @@ export function ManCuaHang({ token, onVe, onPhuKien }: { token?: string; onVe?: 
         {tq.tinhThe !== undefined && <div className="tp-so-du tp-tren-mau" role="img" aria-label={`Em có ${tq.tinhThe} tinh thể`}><IcTinhThe /><div><b><SoDem gt={tq.tinhThe} /></b><span>tinh thể của em</span></div></div>}
         {c && <section className="tp-the" aria-label="Bình giữ chuỗi">
           <div className="tp-mon"><span className="hinh" id="tp-binh-mua"><Binh kieu={c.giuChuoi > 0 ? 'day' : 'trong'} /></span>
-            <div className="giua"><b>Bình giữ chuỗi</b><span className="tp-chip-tt">{chuGiaBinh(gia)}</span>
+            <div className="giua"><b>Bình giữ chuỗi</b><span><b>{chuGiaBinh(gia)}</b></span>
               <span>Lỡ một ngày, bình tự đỡ để chuỗi không tắt. Em đang mang {c.giuChuoi}/{c.sucChua} bình.</span>
+              {!day && daMuaTuan && <span className="tp-mo">{CHU_DA_MUA_TUAN}</span>}
               {!day && !daMuaTuan && !du && <span className="tp-mo">Cần {gia} tinh thể — em đang có {tq.tinhThe}.</span>}</div></div>
           {token && <button type="button" className="tp-nut-lon" data-sac={daMuaTuan && !day ? 'tat' : 'tt'} disabled={day || daMuaTuan || !du || m.dang !== ''} onClick={() => void m.mua('tp-binh-mua')}>
-            {day ? `Đã mang đủ ${c.sucChua} bình` : daMuaTuan ? CHU_DA_MUA_TUAN : `Mua 1 bình · ${gia} tinh thể`}</button>}
+            {day ? `Đã mang đủ ${c.sucChua} bình` : daMuaTuan ? 'Tuần này em đã mua' : `Mua 1 bình · ${gia} tinh thể`}</button>}
         </section>}
         <TheCuoc tq={tq} dangGui={m.dang === 'cuoc'} onCuoc={token ? () => void m.cuoc() : undefined} />
         {onPhuKien && <section className="tp-the" aria-label="Phụ kiện cho thú">
