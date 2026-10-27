@@ -11,8 +11,9 @@ vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'htt
 
 import { KHOA_TAM_DONG_HS, dsChoPhepTamDong, tamDongChoEm, tamDongTuDong, congTacTuDong } from '../server/src/thuong-luat'
 import { _quenTam, docTongQuan } from '../src/lib/thuong-api'
-import GacTamDong, { PhuTamDong, TAM_DONG_KIEM_MS } from '../src/components/hoc-tap/TrongHs'
+import GacTamDong, { NGAY_BAO_TRI_HS, PhuTamDong, TAM_DONG_KIEM_MS, chuTamDong } from '../src/components/hoc-tap/TrongHs'
 import { KHOA_CONG_TAC } from '../src/lib/thi-dua-tuan-api'
+import { NGAY_BAO_TRI } from '../server/src/ngay-bao-tri'
 
 afterEach(() => { cleanup(); vi.useRealTimers(); vi.unstubAllGlobals() })
 
@@ -63,19 +64,49 @@ describe('app học sinh: đọc tamDong', () => {
 })
 
 describe('màn phủ «App đang bảo trì»', () => {
-  it('tamDong ⇒ phủ đúng chữ thầy chốt, không nút «Thử lại»; tự đọc lại mỗi 60 giây', () => {
-    vi.useFakeTimers()
-    const kiemLai = vi.fn()
-    render(<PhuTamDong onKiemLai={kiemLai} />)
+  it('ngày bảo trì 27/10 ⇒ nguyên văn thầy chốt; không nút «Thử lại»', () => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date('2026-10-27T14:00:00Z')) // 21:00 giờ VN
+    render(<PhuTamDong onKiemLai={() => {}} />)
     expect(screen.getByRole('dialog', { name: 'App đang bảo trì.' })).toBeTruthy()
     expect(document.body.textContent).toContain('Tối nay các em không phải làm.')
     expect(document.body.textContent).toContain('Ngày mai vào làm bình thường.')
     expect(screen.queryByRole('button')).toBeNull()
+  })
+  it('từ 28/10 (ngày không bảo trì) ⇒ chữ mới, KHÔNG hứa «không mất chuỗi», không hứa giờ', () => {
+    expect(chuTamDong(Date.parse('2026-10-27T16:59:00Z'))[0]).toBe('Tối nay các em không phải làm.') // 23:59 VN 27/10
+    const [d1, d2] = chuTamDong(Date.parse('2026-10-27T17:00:00Z')) // 00:00 VN 28/10
+    expect([d1, d2]).toEqual(['Các em chưa phải làm bài lúc này.', 'App mở lại các em vào làm tiếp bình thường.'])
+    expect(`${d1} ${d2}`).not.toMatch(/chuỗi|\d+ ?(giờ|phút|h)\b/)
+  })
+  it('ngày bảo trì của màn phủ KHỚP danh sách máy chủ (lời hứa chỉ đúng ngày máy chủ miễn thiệt)', () => {
+    expect([...NGAY_BAO_TRI_HS]).toEqual([...NGAY_BAO_TRI])
+  })
+  it('tự đọc lại theo vòng chuẩn batNhipBenVung (≈ 60 giây), không setInterval trần; lỗi ⇒ lùi dần; tab ẩn ⇒ không gọi', async () => {
     expect(TAM_DONG_KIEM_MS).toBe(60_000)
-    act(() => { vi.advanceTimersByTime(60_000) })
-    expect(kiemLai).toHaveBeenCalledTimes(1)
-    act(() => { vi.advanceTimersByTime(120_000) })
-    expect(kiemLai).toHaveBeenCalledTimes(3)
+    const src = readFileSync('src/components/hoc-tap/TrongHs.tsx', 'utf8')
+    expect(src).not.toMatch(/setInterval\(/)
+    expect(src).toMatch(/batNhipBenVung\(/)
+    vi.useFakeTimers()
+    vi.spyOn(Math, 'random').mockReturnValue(0.5) // lệch 0 ⇒ nhịp đúng 60 s (thật: 50–70 s)
+    let ok = true
+    const kiemLai = vi.fn(async () => ok)
+    render(<PhuTamDong onKiemLai={kiemLai} />)
+    const toi = async (ms: number) => { await act(async () => { await vi.advanceTimersByTimeAsync(ms) }) }
+    await toi(59_000); expect(kiemLai).toHaveBeenCalledTimes(0)
+    await toi(1_000); expect(kiemLai).toHaveBeenCalledTimes(1) // 60 s — tốt
+    ok = false
+    await toi(60_000); expect(kiemLai).toHaveBeenCalledTimes(2) // 120 s — lỗi 1
+    await toi(60_000); expect(kiemLai).toHaveBeenCalledTimes(3) // 180 s — lỗi 2 (max(60, 30))
+    await toi(60_000); expect(kiemLai).toHaveBeenCalledTimes(4) // 240 s — lỗi 3 (max(60, 60))
+    await toi(119_000); expect(kiemLai).toHaveBeenCalledTimes(4) // lỗi 3 lần liên tiếp ⇒ LÙI 120 s
+    await toi(1_000); expect(kiemLai).toHaveBeenCalledTimes(5)
+    const an = vi.spyOn(document, 'hidden', 'get').mockReturnValue(true)
+    const truoc = kiemLai.mock.calls.length
+    await act(async () => { await vi.advanceTimersByTimeAsync(600_000) })
+    expect(kiemLai.mock.calls.length).toBe(truoc) // tab ẩn: không gọi
+    an.mockRestore()
+    vi.restoreAllMocks()
   })
   it('đang làm kiểm tra / ca thi (Lộ trình bị `inert` dưới tấm) ⇒ KHÔNG phủ', () => {
     render(<div inert><PhuTamDong onKiemLai={() => {}} /></div>)
