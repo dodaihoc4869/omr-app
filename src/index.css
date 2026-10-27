@@ -13,7 +13,6 @@
   /* TẦNG CHỒNG — một thang duy nhất, để thanh dưới, nút nổi và hộp thoại không
    * đè nhau bằng số tự chế rải rác trong từng màn. */
   --z-noi-dung: 1;
-  --z-thanh: 50;
   --z-noi: 80;
   --z-hop: 100;
   /* Vân tay nằm TRÊN nội dung đề nhưng DƯỚI mọi thanh — nó phải lọt vào ảnh
@@ -26,11 +25,6 @@
   --z-giu-de: 55;
 }
 
-/* Vùng cuộn phải chừa chỗ cho thanh dưới + vùng an toàn, nếu không câu cuối
- * bị thanh che mất. */
-.thanh-duoi {
-  z-index: var(--z-thanh);
-}
 /* Cuộn tới câu từ lưới số câu: chừa chiều cao thanh trên, không dính mép. */
 .the-cau {
   scroll-margin-top: 72px;
@@ -615,20 +609,6 @@ html[data-giu-de-an] [data-giu-de-phu] {
   }
 }
 
-@keyframes google-pop {
-  0% {
-    transform: scale(0.94);
-    opacity: 0;
-  }
-  70% {
-    transform: scale(1.02);
-  }
-  100% {
-    transform: none;
-    opacity: 1;
-  }
-}
-
 /* `backwards`, KHÔNG `forwards` (P0 thầy báo 21/09: thanh đáy game Đảo "cố định che mất nội dung"): `forwards` giữ giá trị cuối của animation MÃI MÃI, Chromium giữ nó thành ma trận đơn vị (computed
  * `transform: matrix(1,0,0,1,0,0)`, KHÔNG phải `none`) ⇒ vỏ sheet thành khung chứa của mọi con `position: fixed`, mà vỏ lại là hộp cuộn ⇒ phần tử fixed trôi theo nội dung thay vì bám màn.
  * Trạng thái cuối của cả hai animation đúng bằng trạng thái tự nhiên (opacity 1, không transform) nên bỏ `forwards` không đổi hình; `backwards` chỉ giữ khung đầu trong lúc chờ. */
@@ -745,12 +725,9 @@ html[data-giu-de-an] [data-giu-de-phu] {
 
 @media (prefers-reduced-motion: reduce) {
   .animate-google-fade,
-  .animate-google-pop,
   .btn-google-primary,
   .btn-google-tonal,
-  .btn-google-outlined,
-  .btn-google-icon,
-  .btn-google-chip {
+  .btn-google-outlined {
     animation: none;
     transition: none;
     transform: none;
