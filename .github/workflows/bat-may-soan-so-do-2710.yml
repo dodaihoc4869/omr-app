@@ -23,6 +23,11 @@ on:
         required: true
         default: false
         type: boolean
+      vongSuaLai:
+        description: 'Máy đã «xong» ⇒ chạy THÊM một vòng sửa các câu còn lộ / lệch / thiếu sơ đồ / thừa số không đọc được (chỉ đổi trạng thái máy soạn)'
+        required: false
+        default: false
+        type: boolean
       anDuSoanLai:
         description: 'Câu ĐẠT còn dính ẩn dụ tiền / nhà (thầy 26/10 đã bỏ) ⇒ ẩn khỏi học sinh và để vòng sửa soạn lại'
         required: false
@@ -75,6 +80,10 @@ jobs:
           npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT cong, substr(COALESCE(ly_do, ''), 1, 40) AS ly_do, COUNT(*) AS so_cau FROM loi_giai_so_do WHERE cong = 'khong_kiem_duoc' GROUP BY 1, 2 ORDER BY 3 DESC LIMIT 15" 2>/dev/null | jq -c '.[0].results[] | .ly_do |= gsub("[0-9]"; "#")' || echo 'chưa đọc được lý do'
           # Theo model (27/10: có Workers AI khi Gemini hết hạn mức) — để thầy chê chữ của model nào thì lọc được đúng các dòng ấy.
           npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT model, cong, COUNT(*) AS so_cau FROM loi_giai_so_do GROUP BY 1, 2 ORDER BY 1, 2" 2>/dev/null | jq -c '.[0].results' || echo 'chưa đọc được theo model'
+          # vongSuaLai: chỉ đặt lại trạng thái máy soạn (vòng 'sua', con trỏ đầu) — không đụng bảng lời giải.
+          if [ "${{ inputs.vongSuaLai }}" = "true" ]; then
+            npx -y wrangler@4 d1 execute omr --remote --json --command "UPDATE may_soan_trang_thai SET vong = 'sua', con_tro = '', ly_do = 'thêm một vòng sửa' WHERE id = 1 AND vong = 'xong'" | jq -c '[.[] | .meta.changes]' | sed 's/^/mở thêm vòng sửa: /'
+          fi
           # anDuSoanLai: chỉ đổi cong 'dat' ⇒ 'lech' (bảng lời giải máy tự sinh, chỉ-thêm) để vòng sửa soạn lại; không xoá dòng nào.
           if [ "${{ inputs.anDuSoanLai }}" = "true" ]; then
             npx -y wrangler@4 d1 execute omr --remote --json --command "UPDATE loi_giai_so_do SET cong = 'lech', ly_do = 'Bản dùng ẩn dụ tiền / nhà / giàu / thuế (thầy đã bỏ).' WHERE cong = 'dat' AND (ban_json LIKE '%tiền%' OR ban_json LIKE '%giàu%' OR ban_json LIKE '%nghèo%' OR ban_json LIKE '%thuế%')" | jq -c '[.[] | .meta.changes]' | sed 's/^/đưa về soạn lại: /'
