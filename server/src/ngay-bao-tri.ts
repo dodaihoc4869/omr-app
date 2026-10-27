@@ -8,3 +8,8 @@ const TAP = new Set(NGAY_BAO_TRI)
 export const laNgayBaoTri = (ngay: string): boolean => TAP.has(String(ngay).slice(0, 10))
 /** Ngày bảo trì trong [tu, den] (gồm hai đầu). */
 export const ngayBaoTriTrong = (tu: string, den: string): string[] => NGAY_BAO_TRI.filter((d) => d >= tu && d <= den)
+/** Danh sách cho SQL `IN(…)` (chỉ ngày đúng mẫu YYYY-MM-DD, hằng trong mã). */
+export const SQL_DS_BAO_TRI: string = NGAY_BAO_TRI.filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d)).map((d) => `'${d}'`).join(',') || "''"
+/** Kiểm tra cá nhân (Boss 27/10): loại bài ngày bảo trì đã quá hạn mà em chưa nộp (bí danh bảng `a`) — không hiện «Đã lỡ», không giữ câu, không tính. */
+export const sqlKhongBaoTriBo = (a: string, now: number): string =>
+  `NOT(${a}.ngay IN(${SQL_DS_BAO_TRI}) AND ${a}.nop_luc IS NULL AND ${a}.han_luc<=${Math.floor(Number(now) || 0)})`

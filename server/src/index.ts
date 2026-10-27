@@ -3361,6 +3361,9 @@ const boXuLy = {
       // Ngoài cao điểm, chuẩn bị nguồn cho từng ít em trước khi các em mở app.
       const gioVn=new Date(Date.now()+7*3600000).getUTCHours()
       if(gioVn<18)await import('./hanh-trinh-nguon-cau').then(m=>m.chuanBiNguonCau(env,Date.now())).catch(async()=>{await ghiLoiMay(env,'hanh_trinh_nguon_cau')})
+      // SẴN SÀNG ĐÊM (27/10, san-sang.ts): 00:30–05:59 VN chuẩn bị Sảnh + chặng đầu cho em có gói (6 em/phút) ⇒ lượt mở app đầu ngày khỏi lập kế hoạch.
+      {const p=import('./san-sang').then(m=>m.cronSanSangDem(env,Date.now())).then(n=>{if(n)console.log('[san-sang] đêm',n)}).catch(e=>console.error('[san-sang] cron lỗi:',e))
+      if(ctx?.waitUntil)ctx.waitUntil(p);else await p}
       // MÁY SOẠN LỜI GIẢI SƠ ĐỒ (27/10, may-soan-cron.ts): cờ `cau_hinh.may_soan_so_do` tắt ⇒ một câu đọc có đệm rồi về. Bật ⇒ một lô nhỏ có khoá chạy,
       // chạy NỀN (waitUntil) để không giữ chân các việc cron phía sau (thông báo, nhắc bài). Phải đứng TRƯỚC dòng `return` dưới. Lỗi chỉ ghi log.
       {const p=import('./may-soan-cron').then(m=>m.chayMaySoanCron(env,Date.now())).then(r=>{if(r.chay)console.log('[may-soan] cron',JSON.stringify(r))}).catch(e=>console.error('[may-soan] cron lỗi:',e))
