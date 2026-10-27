@@ -433,9 +433,9 @@ const NB_CANH = [
 ]
 const DS_NB = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   NB_CANH.map(([t, m, cho, viec]) => [`nb-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec || undefined])))
-// ═══ MỤC TIÊU NGÀY THEO CÂU 27/10 (tiền tố "mtc-"): vòng Bi trên Lộ trình đo bằng câu như thẻ «Đủ x/y câu» — đủ mức («Đủ mức») · chưa đủ («40/92 câu»)
+// ═══ MỤC TIÊU NGÀY THEO CÂU 27/10 (tiền tố "mtc-"): vòng Bi trên Lộ trình đo bằng câu như thẻ «Đủ x/y câu» — đủ mức («Đủ mức») · chưa đủ («12/30 câu»)
 const DS_MTC = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
-  [['du', 'hs-mot&tp=1&mt=du'], ['chua', 'hs-mot&tp=1&mt=chua']].map(([t, m]) => [`mtc-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, /Ester/])))
+  [['du', 'hs-mot&tp=1&tt=du&mt=du'], ['chua', 'hs-mot&tp=1&mt=chua']].map(([t, m]) => [`mtc-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, /Ester/])))
 // ═══ BI CHUYỂN ĐỘNG 27/10 (tiền tố "bd-"): mọi chỗ có Bi trong app học sinh — Lộ trình (Bi nói), câu đúng (mừng nhảy), câu sai (buồn), kết chặng
 // (nhảy múa), Thành tích, chuỗi ngày (lửa). 390×844 · 360×640 · 844×390 · 1440×900, sáng + tối. Bi chuyển động nạp lười ⇒ chờ thêm cho mảnh bi-dong.
 const DS_BD = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
