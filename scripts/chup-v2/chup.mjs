@@ -316,6 +316,20 @@ const GIU_CANH = [
 const DS_GIU = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   GIU_CANH.map(([t, viec]) => [`duo-giu-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=duo&tp=1&giu=1', w, hh, nen, false, /Số đồng phân amine/, viec || undefined])))
 // ═══ hết GIỮ CHÂN 27/10
+// ═══ GIÁM THỊ 27/10 (tiền tố "duo-gt-"): giám thị theo mức câu cạnh đề, 4 mức × đề ngắn đã chọn (mắt dõi ô B) ở 390×844 / 360×640 / 844×390 / 1440×900;
+// ở 390×844 thêm đúng · sai · đề dài · đề có hình. Sáng + tối. `gtloi=1` ⇒ giám thị luôn càu nhàu (đo bong bóng không che nhãn / đề / phương án).
+const GT_NGAN = 'lam13&lam=duo&gtde=ngan&gtloi=1&gt='
+const DS_GT = ['nb', 'th', 'vd', 'vdc'].flatMap((m) => ['light', 'dark'].flatMap((nen) => {
+  const toi = nen === 'dark' ? '-toi' : ''
+  return [
+    ...[[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].map(([w, hh, k]) => [`duo-gt-${m}-ngan-${k}${toi}`, GT_NGAN + m, w, hh, nen, false, /quỳ tím/, 'lam13:tn:^B » cho:3200']),
+    [`duo-gt-${m}-dung-doc${toi}`, GT_NGAN + m, 390, 844, nen, false, /quỳ tím/, 'lam13:tn:^B » nut:^Kiểm tra$'],
+    [`duo-gt-${m}-sai-doc${toi}`, GT_NGAN + m, 390, 844, nen, false, /quỳ tím/, 'lam13:tn:^A » nut:^Kiểm tra$'],
+    [`duo-gt-${m}-dai-doc${toi}`, `lam13&lam=duo&gtloi=1&gt=${m}`, 390, 844, nen, false, /Số đồng phân amine/, 'lam13:tn:^D » cho:3200'],
+    [`duo-gt-${m}-hinh-doc${toi}`, `lam13&lam=duo&gt=${m}`, 390, 844, nen, false, /Số đồng phân amine/, `lam13:${D_Q1}`],
+  ]
+}))
+// ═══ hết GIÁM THỊ 27/10
 // ═══ THƯỞNG PHẠT GỘP 26/10 (tiền tố "tpc-"): Lộ trình / Thành tích / màn mở từ thanh trên / làm chặng / kết chặng THẬT có cắm thưởng phạt (`&tp=1`:
 // máy chủ giả gia/thuong.tsx + answer trả `thuong`, câu cuối `ketBai`). 390×844 · 844×390 · 1440×900, sáng + tối. Thao tác `menu:<mục>` = chọn mục menu dọc.
 const TPC_CANH = [
@@ -471,6 +485,7 @@ const DS = [
   ...DS_DUO, // DUO 26/10
   ...DS_BP, // BÀN PHÍM DUO 27/10
   ...DS_GIU, // GIỮ CHÂN 27/10
+  ...DS_GT, // GIÁM THỊ 27/10
   ...DS_CHAM, // THẺ CHẠM 27/10
   ...DS_TPC, // THƯỞNG PHẠT GỘP 26/10
   ...DS_NC, // NÂNG CẤP 27/10
@@ -947,9 +962,14 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
         else if (loai === 'nut') await t.getByRole('button', { name: new RegExp(gt) }).first().click({ timeout: 20000 })
         else if (loai === 'ds') for (const cap of gt.split(',')) { const [y, v] = cap.split('='); await t.getByRole('group', { name: `Chọn cho ý ${y}` }).getByRole('button', { name: v, exact: true }).click({ timeout: 20000 }) }
         else if (loai === 'phim') for (const k of gt) await t.keyboard.press(k)
+        else if (loai === 'cho') await t.waitForTimeout(Number(gt)) // GIÁM THỊ 27/10: chờ giám thị «đọc đề» xong rồi mới chụp
         else if (loai === 'dau') await t.evaluate(() => { const k = document.querySelector('.ht2-lam')?.parentElement; if (k) k.scrollTop = 0 })
         await t.waitForTimeout(250)
       }
+      // GIÁM THỊ 27/10: bong bóng càu nhàu không được chồng lên nhãn, đề, phương án, thanh trên / đáy (đo hình chữ nhật thật) ⇒ ghi vào «Tràn ngang».
+      const chong = await t.evaluate(() => { const l = document.querySelector('.gt-loi'); if (!l) return ''; const a = l.getBoundingClientRect()
+        return [...document.querySelectorAll('.duo-nhan, .duo-gt-bong, .duo-tra, .duo-day, .duo-tren')].filter((e) => { const b = e.getBoundingClientRect(); return b.width > 0 && !(a.right <= b.left || a.left >= b.right || a.bottom <= b.top || a.top >= b.bottom) }).map((e) => e.className.split(' ')[0]).join(', ') })
+      if (chong) tran.push(`${ten}: bong bóng càu nhàu chồng lên ${chong}`)
       // tràn ngang TRONG khung cuộn (documentElement không thấy được vì khung là `fixed`)
       const tranTrong = await t.evaluate(() => Math.max(0, ...[...document.querySelectorAll('.ht2-lam *')].map((e) => Math.round(e.getBoundingClientRect().right - innerWidth))))
       if (tranTrong > 0) tran.push(`${ten}: trong khung ${tranTrong}px`)

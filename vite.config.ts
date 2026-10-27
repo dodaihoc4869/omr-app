@@ -2,7 +2,7 @@ import { execSync } from 'node:child_process'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import react from '@vitejs/plugin-react'
-import { defineConfig, type Plugin } from 'vite'
+import { defineConfig, minifySync, type Plugin } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import { taoMaNapTruoc } from './src/lib/nap-truoc-man-em.ts'
 
@@ -112,7 +112,16 @@ function napTruocManEm(): Plugin {
         // (đo: mất ~1,5 s trên 3G) — đặt trước thì chạy ngay khi trình duyệt vừa đọc tới.
         const moc = html.indexOf('<script type="module"')
         if (moc < 0) return html
-        return html.slice(0, moc) + `<script>${taoMaNapTruoc(bang)}</script>\n` + html.slice(moc)
+        // Nén mã HAI HÀM chèn nguyên văn (toString của mã nguồn, còn khoảng trắng + tên dài) — đoạn này nằm trong index.html của MỌI đường vào (27/10:
+        // −0,5 KB nén mỗi đường). Cùng đích build (safari14). Nén hỏng (lỗi cú pháp) ⇒ giữ bản gốc, không bao giờ làm hỏng trang.
+        const gon = (ham: string): string => {
+          try {
+            const r = minifySync('nap-truoc.js', `var __h=${ham}`, { compress: { target: ['es2020', 'safari14'] }, mangle: true })
+            const m = /^var __h=([\s\S]*?);?\s*$/.exec(r.code)
+            return !r.errors.length && m ? m[1]! : ham
+          } catch { return ham }
+        }
+        return html.slice(0, moc) + `<script>${taoMaNapTruoc(bang, gon)}</script>\n` + html.slice(moc)
       },
     },
   }
@@ -291,6 +300,8 @@ export default defineConfig({
           '**/{KhungKiemTra,ThiDuo,BiNop,KetQuaSauNop}-*.{js,css}',
           // Tấm giữ chân khi thoát giữa chặng (27/10): màn làm chặng Duo nạp sẵn ngay khi mở (GiuChan.tsx) ⇒ vào kho chạy-lúc, không cất sẵn.
           '**/TamGiuChan-*.{js,css}',
+          // Giám thị theo mức câu (27/10): mảnh lười của màn làm chặng Duo (nạp sẵn lúc mở màn) ⇒ kho chạy-lúc, không cất sẵn.
+          '**/{GiamThi,giam-thi}-*.{js,css}',
           '**/kiem-tra-ca-nhan-*.css',
           '**/LuyenDeChuan-*.{js,css}',
           // Giao diện «Trong» app học sinh (26/10): mảnh trình bày nạp lười (nap-trong-hs.ts) ⇒ kho chạy-lúc; tải hỏng (mất mạng lần đầu) ⇒ app vẽ bản cũ.

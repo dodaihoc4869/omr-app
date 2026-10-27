@@ -52,3 +52,14 @@
 @media (prefers-reduced-motion: reduce) {
   [data-trong='hs'] .bi-dong, [data-trong='hs'] .bi-dong * { animation: none !important; transition: none !important; }
 }
+
+/* TƯƠI 27/10 (thầy cho phép: «màu sắc của linh vật cũng vậy siêu tươi mịn mắt»): --bi-c đổi ở svg ⇒ khai lại các tông dẫn xuất ở đây (cùng công thức bi.css). */
+[data-trong='hs'] .bi-dong svg {
+  --bi-net-mau: color-mix(in oklab, var(--bi-c) 42%, var(--bi-vien));
+  --bi-dam: color-mix(in oklab, var(--bi-c) 80%, var(--bi-vien));
+  --bi-sang: color-mix(in oklab, var(--bi-c) 45%, var(--bi-trang));
+}
+@media (prefers-color-scheme: dark) {
+  [data-trong='hs'] .bi-dong svg { --bi-tuoi: color-mix(in oklab, var(--bi-c) 88%, var(--bi-trang)); --bi-net-mau: color-mix(in oklab, var(--bi-c) 72%, var(--bi-vien)); --bi-dam: color-mix(in oklab, var(--bi-c) 88%, var(--bi-vien)); }
+  [data-trong='hs'] .bi-dong .bd-mi-f { fill: var(--bi-tuoi); }
+}
