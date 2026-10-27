@@ -4,7 +4,7 @@
 import { execFileSync } from 'node:child_process'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { taoKhoOmni } from './omni-3-ke-hoach-chung'
-import { SQL_CHUOI_BINH, docChuoiNgayBai } from '../server/src/chuoi-ngay-bai-d1'
+import { SQL_CHUOI_BINH, congBinh, docChuoiNgayBai } from '../server/src/chuoi-ngay-bai-d1'
 import { xoaDemPhamVi } from '../server/src/bai-da-day'
 
 const HEAD = execFileSync('git', ['rev-parse', 'HEAD']).toString().trim()
@@ -71,6 +71,40 @@ describe('dat-lai-binh-2710', () => {
     const lai = await chay({ GHI: 'ghi' })
     expect(lai.find((x) => x.buoc === 'truoc')).toMatchObject({ soEm: 0, dongDatLaiDaCo: 2 })
     expect(lai.find((x) => x.buoc === 'sau')).toMatchObject({ dongVuaGhi: 0 })
+  })
+  it('28/10: lần đặt lại THỨ HAI (nguồn tt-binh-reset-2810, mốc cố định 00:01 VN) — bình mua giữa hai lần về 0, mua sau mốc giữ; lần 27/10 không đổi', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(Date.parse('2026-10-27T09:00:00Z'))
+    const k = kho()
+    gia(k, HEAD)
+    await chay({ GHI: 'ghi' }) // lần 1 (27/10)
+    vi.resetModules()
+    // S1 mua 1 bình sau lần 1 (27/10 18:00 VN); S2 mua 1 bình SAU mốc lần 2 (28/10 00:20 VN).
+    await congBinh(k.env, 'S1', 1, 'tinh_the', 'S1|giua', Date.parse('2026-10-27T11:00:00Z'))
+    await congBinh(k.env, 'S2', 1, 'tinh_the', 'S2|sau', Date.parse('2026-10-27T17:20:00Z'))
+    vi.setSystemTime(Date.parse('2026-10-27T17:30:00Z')) // cron chạy trễ 29 phút
+    // Mốc chưa tới ⇒ từ chối ghi trước giờ.
+    await expect(chay({ GHI: 'ghi', LUC: '2026-10-27T18:30:00Z' })).rejects.toThrow(/Chưa tới mốc/)
+    vi.resetModules()
+    // Lượt hẹn giờ sai ngày ⇒ bỏ qua, không ghi.
+    const lech = await chay({ GHI: 'ghi', LUC: '2026-10-27T17:01:00Z', CHI_NGAY: '2027-10-28' })
+    expect(lech.find((x) => x.buoc === 'bo_qua')).toBeTruthy()
+    vi.resetModules()
+    const r = await chay({ GHI: 'ghi', LUC: '2026-10-27T17:01:00Z', CHI_NGAY: '2026-10-28', MOC_LUAT: '' })
+    expect(r.find((x) => x.buoc === 'truoc')).toMatchObject({ nguon: 'tt-binh-reset-2810', moc: '2026-10-27T17:01:00.000Z', soEm: 1, tongBinh: 1 })
+    expect(r.find((x) => x.buoc === 'sau')).toMatchObject({ dongVuaGhi: 1, soEm: 0, coBinhDoMuaSauMoc: 1 })
+    expect((r.find((x) => x.buoc === 'sau')!.kimCuong as Record<string, unknown>).giuNguyen).toBe(true)
+    expect(k.d.sql.prepare("SELECT id, so, luc FROM chuoi_binh_mua WHERE nguon = 'tt-binh-reset-2810'").all()).toEqual([{ id: 'S1|tt-binh-reset-2810', so: -1, luc: '2026-10-27T17:01:00.000Z' }])
+    expect((k.d.sql.prepare("SELECT COUNT(*) AS n FROM chuoi_binh_mua WHERE nguon = 'tt-binh-reset-2710'").get() as { n: number }).n).toBe(2)
+    const t = Date.parse('2026-10-27T18:00:00Z')
+    expect((await docChuoiNgayBai(k.env, 'S1', t))?.giuChuoi).toBe(0)
+    expect((await docChuoiNgayBai(k.env, 'S2', t))?.giuChuoi).toBe(1)
+  })
+  it('lượt hẹn giờ: có ca thi mở tới quá giờ chờ ⇒ DỪNG có dấu rõ, không ghi', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(Date.parse('2026-10-27T18:25:00Z'))
+    const k = kho()
+    gia(k, HEAD, 1)
+    await expect(chay({ GHI: 'ghi', LUC: '2026-10-27T17:01:00Z', CHI_NGAY: '2026-10-28', CHO_CA_TOI: '2026-10-27T18:30:00Z' })).rejects.toThrow(/DỪNG — CHƯA ĐẶT LẠI BÌNH/)
+    expect((k.d.sql.prepare('SELECT COUNT(*) AS n FROM chuoi_binh_mua').get() as { n: number }).n).toBe(0)
   })
   it('có ca thi mở ⇒ DỪNG, không ghi', async () => {
     const k = kho()
