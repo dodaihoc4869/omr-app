@@ -453,7 +453,7 @@ describe('sổ "thay cho" (tc) đọc theo chỉ mục — không quét mọi d�
     const d = taoD1That()
     const ke = (sql: string, ...b: string[]) => (d.sql.prepare(`EXPLAIN QUERY PLAN ${sql}`).all(...b) as { detail: string }[]).map((x) => x.detail)
     for (const ds of [
-      ke(sqlQidHoacTc('qid, ngay_vn, luc, ket_qua, assistance, visibility, nguon', 'sbd = ?1', `luc >= ?4 AND ${SQL_LA_LAN_LAM}`), 'S1', '["Q"]', '["Q"]', ''),
+      ke(sqlQidHoacTc('qid, ngay_vn, luc, ket_qua, assistance, visibility, nguon', 'sbd = ?1', `+luc >= ?4 AND ${SQL_LA_LAN_LAM}`), 'S1', '["Q"]', '["Q"]', ''),
       ke(sqlQidHoacTc('sbd, qid, ngay_vn, luc, ket_qua, assistance, visibility, nguon', 'sbd IN (SELECT value FROM json_each(?1))'), '["S1"]', '["Q"]', '["Q"]'),
     ]) {
       const tim = ds.filter((x) => /su_kien_hoc/.test(x))

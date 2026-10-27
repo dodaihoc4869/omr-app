@@ -375,8 +375,8 @@ const DS_GT = ['nb', 'th', 'vd', 'vdc'].flatMap((m) => ['light', 'dark'].flatMap
 // ═══ THƯỞNG PHẠT GỘP 26/10 (tiền tố "tpc-"): Lộ trình / Thành tích / màn mở từ thanh trên / làm chặng / kết chặng THẬT có cắm thưởng phạt (`&tp=1`:
 // máy chủ giả gia/thuong.tsx + answer trả `thuong`, câu cuối `ketBai`). 390×844 · 844×390 · 1440×900, sáng + tối. Thao tác `menu:<mục>` = chọn mục menu dọc.
 const TPC_CANH = [
-  ['lo-trinh', 'hs-mot&tp=1', /Ester/], ['thanh-tich', 'hs-mot&tp=1', /Ester/, 'menu:Thành tích'], ['menu', 'hs-mot&tp=1', /Ester/, 'mo-menu'], ['chuoi', 'hs-mot&tp=1', /Ester/, 'nut:Chuỗi 12 ngày'],
-  ['nhiem-vu', 'hs-mot&tp=1', /Ester/, 'nut:147 nguyên tử hôm nay'], ['cua-hang', 'hs-mot&tp=1', /Ester/, 'nut:245 tinh thể'],
+  ['lo-trinh', 'hs-mot&tp=1', /Ester/], ['thanh-tich', 'hs-mot&tp=1', /Ester/, 'menu:Thành tích'], ['menu', 'hs-mot&tp=1', /Ester/, 'mo-menu'], ['chuoi', 'hs-mot&tp=1', /Ester/, 'muc:Chuỗi 12 ngày'],
+  ['nhiem-vu', 'hs-mot&tp=1', /Ester/, 'muc:147 nguyên tử hôm nay'], ['cua-hang', 'hs-mot&tp=1', /Ester/, 'muc:245 tinh thể'],
   ['tam-dong', 'hs-mot&tp=1&v=tam-dong', /App đang bảo trì/], // 27/10: thầy tạm đóng app học sinh (màn phủ)
   ['lam-dung', 'lam13&lam=duo&tp=1', /Số đồng phân amine/, 'lam13:tn:^D » nut:^Kiểm tra$'], ['lam-sai', 'lam13&lam=duo&tp=1', /Số đồng phân amine/, 'lam13:tn:^B » nut:^Kiểm tra$'],
   ['ket', 'lam13&lam=duo&tp=1', /Số đồng phân amine/, `lam13:${D_Q4} » phim:8,2 » nut:^Kiểm tra$ » nut:^Tiếp tục » tn:^B » nut:^Kiểm tra$ » nut:^Tiếp tục`],
@@ -385,7 +385,7 @@ const TPC_CANH = [
 // ═══ VIỆC TỒN 27/10 (tiền tố "ton-"): lối vào Học cùng bạn (thẻ trên Lộ trình · khối «Lửa đôi» ở Chuỗi ngày) + lối vào Thử thách Kim cương (ô ở Thành tích
 // ⇒ danh sách chuyên đề đã vững). App THẬT `hs-mot&tp=1` + máy chủ giả gia/thuong.tsx. 390×844 · 360×640, sáng + tối; Chuỗi ngày chụp cả trang.
 const TON_CANH = [
-  ['lo-trinh', 'hs-mot&tp=1', false], ['lo-trinh-moi', 'hs-mot&tp=1&ban=0', false], ['chuoi', 'hs-mot&tp=1', true, 'nut:Chuỗi 12 ngày'],
+  ['lo-trinh', 'hs-mot&tp=1', false], ['lo-trinh-moi', 'hs-mot&tp=1&ban=0', false], ['chuoi', 'hs-mot&tp=1', true, 'muc:Chuỗi 12 ngày'],
   ['thanh-tich', 'hs-mot&tp=1', true, 'menu:Thành tích'], ['kc-ds', 'hs-mot&tp=1', false, 'ton:menu:Thành tích » nut:Thử thách Kim cương'],
   ['kc-trong', 'hs-mot&tp=1&kc=0', false, 'ton:menu:Thành tích » nut:Thử thách Kim cương'],
   // TÊN ĐỦ 27/10 (thầy: «Cho hiện đủ tên nhé, chuẩn tên nhé»): Học cùng bạn + Mời bạn tìm «11010» (`&ten=dai`: tên 4 chữ, tên rất dài, lớp «11»)
@@ -395,8 +395,8 @@ const DS_TON = [[390, 844, 'doc'], [360, 640, 'doc640']].flatMap(([w, hh, k]) =>
   TON_CANH.map(([t, m, ca, viec]) => [`ton-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, ca, /Ester/, viec])))
 // ═══ LUẬT BÌNH 27/10 (tiền tố "binh-"): Cửa hàng + Chuỗi ngày — giá 150 · mỗi tuần mua 1 bình; `&binh=da` ⇒ tuần này đã mua (nút xám + lý do). Không dấu «P».
 const BINH_CANH = [
-  ['cua-hang', 'hs-mot&tp=1', false, 'nut:245 tinh thể'], ['cua-hang-da', 'hs-mot&tp=1&binh=da', false, 'nut:245 tinh thể'],
-  ['chuoi', 'hs-mot&tp=1', true, 'nut:Chuỗi 12 ngày'], ['chuoi-da', 'hs-mot&tp=1&binh=da', true, 'nut:Chuỗi 12 ngày'],
+  ['cua-hang', 'hs-mot&tp=1', false, 'muc:245 tinh thể'], ['cua-hang-da', 'hs-mot&tp=1&binh=da', false, 'muc:245 tinh thể'],
+  ['chuoi', 'hs-mot&tp=1', true, 'muc:Chuỗi 12 ngày'], ['chuoi-da', 'hs-mot&tp=1&binh=da', true, 'muc:Chuỗi 12 ngày'],
 ]
 const DS_BINH = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   BINH_CANH.map(([t, m, ca, viec]) => [`binh-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, ca, /Ester/, viec])))
@@ -592,7 +592,7 @@ const NGD_CANH = [
   ['ban-phim', 'lam13&lam=duo&ba=1', /Số đồng phân amine/, `${BP_TLN} » phim:8,2`], ['bong-den', 'lam13&lam=duo', /Số đồng phân amine/, 'lam13:tn:^D » nut:^Trợ giúp'],
   ['hoi-thay', 'lam13&lam=duo&ht=1', /Số đồng phân amine/, 'lam13:tn:^B » nut:^Kiểm tra$ » nut:^Hỏi thầy'],
   ['giu', 'lam13&lam=duo&tp=1&giu=1', /Số đồng phân amine/, `lam13:${D_Q1} » ${X_GIU}`], ['cham', 'lam13&lam=duo&cham=chat', /aniline/, 'cham:aniline'],
-  ['menu', 'hs-mot&dd=khong', /Ester/, 'menu6:'], ['thanh-tich', 'hs-mot&tp=1', /Ester/, 'menu:Thành tích'], ['chuoi', 'hs-mot&tp=1', /Ester/, 'nut:Chuỗi 12 ngày'],
+  ['menu', 'hs-mot&dd=khong', /Ester/, 'menu6:'], ['thanh-tich', 'hs-mot&tp=1', /Ester/, 'menu:Thành tích'], ['chuoi', 'hs-mot&tp=1', /Ester/, 'muc:Chuỗi 12 ngày'],
   ['ban', 'hs-mot&tp=1&ten=dai', /Ester/, 'ton:menu:Thành tích » nut:Học cùng bạn'], ['kim-cuong', 'hs-mot&tp=1', /Ester/, 'ton:menu:Thành tích » nut:Thử thách Kim cương'],
   ['giai', 'hs-mot&tp=1', /Ester/, 'ton:menu:Thành tích » nut:Giải tuần'], ['luyen', 'hs-mot&tp=1', /Ester/, 'menu:Luyện tập'],
   ['ho-so', 'hs-ho-so&nhe=luoi', /Hồ sơ làm bài của em/, 'hse:dau'],
