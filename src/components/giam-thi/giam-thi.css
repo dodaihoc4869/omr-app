@@ -5,7 +5,7 @@
    bóng đổ phẳng = một tông đậm hơn, highlight nhẹ, không gradient, viền cùng sắc (không viền đen). Chỉ 4 mã gốc này là màu thô (check-mau.mjs +
    kiem-mau-giu-nguyen.mjs ghi lệnh thầy); mọi sắc khác pha từ chúng với --gt-trang / --gt-toi (trắng / tối cố định ở cả hai nền). */
 .gtv, .gt-loi {
-  --gt-mau-nb: #58cc02; --gt-mau-th: #ce82ff; --gt-mau-vd: #ff9600; --gt-mau-vdc: #ff4b4b;
+  --gt-mau-nb: #00c3d7; --gt-mau-th: #9990ff; --gt-mau-vd: #ff8f48; --gt-mau-vdc: #f2499c;
   --gt-c: var(--gt-mau-nb); --gt-toi: var(--tr-chu); --gt-trang: var(--tr-trang);
   --gt-sang: color-mix(in srgb, var(--gt-c) 55%, var(--gt-trang)); --gt-dam: color-mix(in srgb, var(--gt-c) 80%, var(--gt-toi)); --gt-kinh: color-mix(in srgb, var(--gt-c) 15%, var(--gt-trang));
   display: block; width: 100%; height: auto; overflow: visible;
