@@ -9,6 +9,9 @@ import './viec-hom-nay.css'
 // Em chỉ thấy MỘT chặng 4 câu tại một lúc (chặng sau gọn một dòng), tiến độ theo chặng, MỘT nút chính tới câu kế tiếp, và dòng nói thật số câu còn cho các ngày sau.
 // Logic ở src/lib/tu-sua-viec-hom-nay.ts (thuần, có test). Màn này nạp lười cùng ManTuChua.
 
+// Tên trang chính trên nút «về» (Boss 27/10): giao diện Trong ⇒ «Lộ trình»; giao diện cũ ⇒ «Hôm nay». Viết tại chỗ: nhập mô-đun dùng chung sẽ đẻ mảnh tải riêng (+1 tệp mở app).
+const tenTrangChinh = (): string => (typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Lộ trình' : 'Hôm nay')
+
 export interface ThongTinDong { ten: string; phu: string; trangThai: string }
 interface Props {
   viec: ViecHomNay
@@ -105,7 +108,7 @@ export default function ViecHomNay({ viec, thongTin, soXong, tong, xongHomNay = 
         </>}
         {xongCa
           ? <div className="vh-hang-nut">
-              <button type="button" className="ht-nut-chinh ht2-nut-lon tcl-nut-chinh" onClick={onVe}><span>Về Hôm nay</span><ArrowRight size={20} aria-hidden="true" /></button>
+              <button type="button" className="ht-nut-chinh ht2-nut-lon tcl-nut-chinh" onClick={onVe}><span>Về {tenTrangChinh()}</span><ArrowRight size={20} aria-hidden="true" /></button>
               <button type="button" className="ht-nut-phu" onClick={onThem}>Sửa thêm 1 chặng</button>
             </div>
           : <button type="button" className="ht-nut-chinh ht2-nut-lon tcl-nut-chinh" onClick={() => onChon(viec.tiep!.m, chiSo.get(viec.tiep!.khoa) ?? 0)}>

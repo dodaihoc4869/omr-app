@@ -69,7 +69,7 @@ export function ManGiaiTuan({ token, onVe, tuHang }: { token?: string; onVe?: ()
         <p className="tp-phu">{[sau && g.len > 0 && `Top ${g.len} lên Giải ${TEN_HANG[sau]}`, truoc && g.roi > 0 && `${g.roi} bạn cuối xuống Giải ${TEN_HANG[truoc]}`].filter(Boolean).join(' · ') || 'Giữ vững hạng của em nhé'}</p>
       </section>
       {n === 0
-        ? <div className="tp-trong g-bxh"><Bi cam="chao" size={88} /><b>Tuần này em chưa vào bảng</b><span>Học 1 bài để có nguyên tử đầu tiên — em sẽ vào nhóm cùng hạng.</span></div>
+        ? <div className="tp-trong g-bxh"><Bi cam="chao" size={88} /><b>Tuần này em chưa vào bảng</b><span>Học 1 chặng để có nguyên tử đầu tiên — em sẽ vào nhóm cùng hạng.</span></div>
         : <div ref={bxh} className="tp-bxh g-bxh" role="list" aria-label={`Bảng xếp hạng nhóm ${TEN_HANG[g.hang]}`}>
           {g.nhom.map((r, i) => {
             const v = vung(r.thuHang)

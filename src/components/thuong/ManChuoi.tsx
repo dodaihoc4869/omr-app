@@ -14,9 +14,9 @@ import { tenNgan } from './ban-gon'
 import { ChuGiaiTuan, Cho, chuCai, DemTT, Loi, ManToan, NutDay, ThangLich, TuanBay, dongHo, gioVn, ngayNgan, oTinhThe, thuNgayVn, useHieuUng, useToast } from './chung'
 
 export const LUAT_CHUOI = [
-  'Mỗi ngày học xong ít nhất 1 bài để ngọn lửa cháy tiếp.',
+  'Mỗi ngày xong ít nhất 1 chặng để giữ chuỗi.',
   'Lỡ một ngày? Bình giữ chuỗi tự đỡ cho em. Em mang được tối đa 2 bình.',
-  'Hết bình? Học bù 2 bài trong 24 giờ là cứu được chuỗi.',
+  'Hết bình? Học bù 2 chặng trong 24 giờ là cứu được chuỗi.',
 ] as const
 
 export function DauVe({ onVe, chu = 'Quay lại' }: { onVe?: () => void; chu?: string }) {
@@ -117,7 +117,7 @@ export interface PropsManChuoi { token?: string; onVe?: () => void; onHoc?: () =
   /** Mở màn Học cùng bạn (khối «Lửa đôi»). Không truyền ⇒ khối chỉ để xem. */
   onBan?: () => void }
 
-const CHU_DOI = { ca_hai: 'hôm nay cả hai đã xong', ban_chua: 'bạn chưa học hôm nay', em_chua: 'bạn đã học · chờ em 1 bài', ca_hai_chua: 'cả hai chưa học hôm nay' } as const
+const CHU_DOI = { ca_hai: 'hôm nay cả hai đã xong', ban_chua: 'bạn chưa học hôm nay', em_chua: 'bạn đã học · chờ em 1 chặng', ca_hai_chua: 'cả hai chưa học hôm nay' } as const
 /** Khối «Lửa đôi» (27/10): bạn học cùng + số lửa đôi — cùng dữ liệu, cùng cách gọi tên của màn Học cùng bạn (/hs/ban, bản gần nhất ở máy trước). Bấm ⇒ mở
  *  Học cùng bạn. Chưa có bạn ⇒ một dòng mời. Công tắc «bạn bè» tắt ⇒ ẩn hẳn. Không điểm / nguyên tử của bạn. */
 function KhoiLuaDoi({ token, bat, onBan }: { token?: string; bat?: boolean; onBan?: () => void }) {
@@ -126,7 +126,7 @@ function KhoiLuaDoi({ token, bat, onBan }: { token?: string; bat?: boolean; onBa
   const nhan = ds.ban.length ? `Lửa đôi với ${ds.ban.length} bạn` : 'Chưa có bạn học cùng'
   const ruot = ds.ban.length ? ds.ban.map((b, i) => <div key={b.ma} className="tp-dong"><span className="tp-av" data-k={String((i % 4) + 1)} aria-hidden="true">{chuCai(b.ten)}</span>
     <div className="giua"><b>{b.ten}</b><span>Lửa đôi {b.chuoiDoi} ngày · {CHU_DOI[b.homNay].replace('bạn', tenNgan(b.ten))}</span></div></div>)
-    : <div className="tp-dong"><span className="tp-av" data-k="2" aria-hidden="true">+</span><div className="giua"><b>Học cùng bạn để giữ lửa đôi</b><span>Cả hai cùng xong 1 bài mỗi ngày thì lửa đôi tăng</span></div></div>
+    : <div className="tp-dong"><span className="tp-av" data-k="2" aria-hidden="true">+</span><div className="giua"><b>Học cùng bạn để giữ lửa đôi</b><span>Cả hai cùng xong 1 chặng mỗi ngày thì lửa đôi tăng</span></div></div>
   return <section className="tp-the" aria-label="Lửa đôi">
     <h2>Lửa đôi</h2>
     {onBan ? <button type="button" className="tp-the-nut" aria-label={`${nhan} — mở Học cùng bạn`} onClick={onBan}>{ruot}</button> : ruot}
@@ -137,7 +137,7 @@ function TheCuuNho({ c, onCuu }: { c: ChuoiNgay; onCuu?: () => void }) {
   const cu = c.cuu!
   return <section className="tp-the" aria-label="Cứu chuỗi">
     <div className="tp-dau"><span className="tp-o" data-sac="sao"><Flame size={22} aria-hidden="true" /></span><h2>{cu.so ? `Cứu chuỗi ${cu.so} ngày` : 'Cứu chuỗi'}</h2></div>
-    <p className="tp-phu">Học bù {cu.can} bài trước {gioVn(cu.hetHan)} {thuNgayVn(cu.hetHan)} · đã xong {cu.daLam}/{cu.can}.</p>
+    <p className="tp-phu">Học bù {cu.can} chặng trước {gioVn(cu.hetHan)} {thuNgayVn(cu.hetHan)} · đã xong {cu.daLam}/{cu.can}.</p>
     {onCuu && <div><button type="button" className="tp-nut" data-sac="chinh" onClick={onCuu}>Xem cách cứu chuỗi</button></div>}
   </section>
 }
@@ -202,12 +202,12 @@ export function ManChuoiNgay({ token, onVe, onHoc, onCuu, hieuUng, onBan }: Prop
         <div ref={the} className="tp-lua-lon" role="img" aria-label={`Chuỗi ${c.so} ngày`}>
           <span ref={lua} className="lua-to" aria-hidden="true"><IcLua /></span>
           <div className="giua"><div className="so"><b className="tp-lat" id="tp-so-chuoi">{c.so}</b><span>ngày liền</span></div>
-            <p>{daHoc ? 'Hôm nay đã giữ chuỗi' : c.so > 0 ? 'Học xong 1 bài hôm nay để giữ chuỗi' : 'Học xong 1 bài để nhóm lửa chuỗi'}</p></div>
+            <p>{daHoc ? 'Hôm nay đã giữ chuỗi' : c.so > 0 ? 'Học xong 1 chặng hôm nay để giữ chuỗi' : 'Học xong 1 chặng để nhóm lửa chuỗi'}</p></div>
           <div ref={bi}><Bi cam={c.so > 0 ? 'lua' : 'ngu'} size={92} /></div>
         </div>
         {c.cuu && c.cuu.daLam < c.cuu.can && <TheCuuNho c={c} onCuu={onCuu} />}
         <TheLich c={c} homNay={homNay} />
-        {!daHoc && onHoc && <button type="button" className="tp-nut-lon" onClick={onHoc}>Học 1 bài để giữ chuỗi</button>}
+        {!daHoc && onHoc && <button type="button" className="tp-nut-lon" onClick={onHoc}>Học 1 chặng để giữ chuỗi</button>}
       </div>
       <div className="c">
         <section className="tp-the" aria-label="Bình giữ chuỗi">
@@ -256,16 +256,16 @@ export function ManCuuChuoi({ chuoi, onHoc, onDong }: { chuoi: ChuoiNgay; onHoc?
           <span ref={lua} className="tp-lua-nho" data-leo={xong ? undefined : ''} data-to={xong ? '' : undefined} aria-hidden="true"><IcLua /></span>
         </div>
         <h1 style={xong ? { color: 'var(--tr-sao-chu)' } : undefined}>{so ? (xong ? `Chuỗi ${so} ngày đã sống lại!` : `Chuỗi ${so} ngày vừa tắt`) : xong ? 'Chuỗi đã sống lại!' : 'Chuỗi ngày vừa tắt'}</h1>
-        <p className="tp-phu">{xong ? `Em học bù đủ ${cu.can} bài. Chuỗi giữ nguyên${so ? ` ${so} ngày` : ''}, không mất tinh thể.` : 'Hôm qua em chưa xong bài nào, và đã hết bình giữ chuỗi.'}</p>
+        <p className="tp-phu">{xong ? `Em học bù đủ ${cu.can} chặng. Chuỗi giữ nguyên${so ? ` ${so} ngày` : ''}, không mất tinh thể.` : 'Hôm qua em chưa xong chặng nào, và đã hết bình giữ chuỗi.'}</p>
       </div>
       <div className="cot-b">
         <section className="tp-the" aria-label="Cứu chuỗi">
           <div className="tp-dau"><span className="tp-o" data-sac="sao"><Flame size={22} aria-hidden="true" /></span><h2>{so ? `Cứu chuỗi ${so} ngày` : 'Cứu chuỗi'}</h2></div>
-          {!xong && <p className="tp-phu" style={{ color: 'var(--tr-chu)', fontWeight: 800 }}>Học bù {cu.can} bài trước {gioVn(cu.hetHan)} {thuNgayVn(cu.hetHan)}</p>}
+          {!xong && <p className="tp-phu" style={{ color: 'var(--tr-chu)', fontWeight: 800 }}>Học bù {cu.can} chặng trước {gioVn(cu.hetHan)} {thuNgayVn(cu.hetHan)}</p>}
           {!xong && <div className="tp-dh"><b role="timer" aria-label={`Còn ${dongHo(cu.hetHan - bay)}`}>{dongHo(cu.hetHan - bay)}</b><span>còn lại</span></div>}
           <div className="tp-bu">
             {Array.from({ length: cu.can }, (_, i) => <span key={i} className="o" data-x={i < cu.daLam || undefined} id={i === cu.can - 1 ? 'tp-bu-cuoi' : undefined} aria-hidden="true">{i < cu.daLam ? <Check size={22} strokeWidth={3} /> : i + 1}</span>)}
-            <div className="giua"><b>Bài bù · {Math.min(cu.daLam, cu.can)}/{cu.can}</b><span>tính ngoài bài của hôm đó</span></div>
+            <div className="giua"><b>Chặng bù · {Math.min(cu.daLam, cu.can)}/{cu.can}</b><span>tính ngoài chặng của hôm đó</span></div>
           </div>
           <p className="tp-ghi">Không mất tinh thể. Mỗi tuần cứu được <b>1 lần</b>.</p>
         </section>
@@ -302,7 +302,7 @@ export function ManBinhDaDo({ tb, tq, token, onHoc, onDong }: { tb: ThongBao; tq
   }, [])
   const chuSo = so !== undefined ? <b style={{ color: 'var(--tr-sao-chu)' }}>{so} ngày</b> : null
   const day = <>
-    <NutDay chu="Học bài hôm nay" onClick={onHoc ?? onDong} />
+    <NutDay chu="Học chặng hôm nay" onClick={onHoc ?? onDong} />
     {!phep && c && c.giuChuoi < c.sucChua && token && <NutDay chu={`Mua bình · ${GIA_BINH} tinh thể`} phu tat={m.dang !== '' || (tq.tinhThe !== undefined && tq.tinhThe < GIA_BINH)} onClick={() => void m.mua('tp-binh-con')} />}
   </>
   return <ManToan nhan={phep ? 'Ngày vắng có phép' : 'Bình giữ chuỗi đã đỡ'} onDong={onDong} day={day}>
@@ -315,7 +315,7 @@ export function ManBinhDaDo({ tb, tq, token, onHoc, onDong }: { tb: ThongBao; tq
         <h1>{phep ? 'Ngày vắng có phép — chuỗi vẫn giữ' : 'Hôm qua bình giữ chuỗi đã đỡ cho em'}</h1>
         <p className="tp-phu">{phep
           ? <>{ngay ? `Hôm ${ngayNgan(ngay)} em vắng có phép.` : 'Em vắng có phép.'}{chuSo && <> Chuỗi vẫn {chuSo}</>}, không tốn bình.</>
-          : <>{chuSo ? <>Chuỗi vẫn {chuSo}. </> : null}Hôm nay học 1 bài để lửa cháy tiếp nhé.</>}</p>
+          : <>{chuSo ? <>Chuỗi vẫn {chuSo}. </> : null}Hôm nay học 1 chặng để lửa cháy tiếp nhé.</>}</p>
       </div>
       <div className="cot-b">
         {c && <section className="tp-the" aria-label="Tuần này"><h2>Tuần này</h2><TuanBay lich7={c.lich7} idO={(x) => `tp-o-${x}`} /></section>}

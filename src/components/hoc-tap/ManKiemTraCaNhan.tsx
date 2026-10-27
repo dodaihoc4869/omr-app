@@ -21,6 +21,9 @@ import { soOCuaCau } from '../../lib/so-o-tra-loi-ngan'
 import { BiKetQua, camTheoDiem, DayKt, laKiemTraDuo, NhanCauKt, OGioKt, TamLuoiKt, TamNopKt, ThanhTrenKt } from '../kiem-tra-duo/KhungKiemTra'
 // «Trong» 26/10 (nhóm 2): tờ trình bày styles/trong-lam-bai.css nạp RIÊNG, chỉ khi <html data-trong> (main.tsx gắn trước khi nạp màn) — không cộng byte lượt mở app.
 if (typeof document !== 'undefined' && document.documentElement.dataset.trong) void import('../../styles/trong-lam-bai.css').catch(() => {})
+// Tên trang chính trên nút «về» (Boss 27/10): giao diện Trong ⇒ «Lộ trình»; giao diện cũ ⇒ «Hôm nay». Viết tại chỗ: nhập mô-đun dùng chung sẽ đẻ mảnh tải riêng (+1 tệp mở app).
+const tenTrangChinh = (): string => (typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Lộ trình' : 'Hôm nay')
+
 // ĐỢT 20 · MÀN KIỂM TRA ÔN TẬP theo bản vẽ docs/ban-ve-dot20 (thầy duyệt 13/10). Logic lưu/đồng hồ/chốt/khôi phục nháp GIỮ NGUYÊN (hợp đồng Codex
 // docs/hop-dong-kiem-tra-ca-nhan-1310.md); chỉ đổi trình bày: trang bài = lộ trình chặng + tách "hạn nộp cả bài" với "giờ riêng từng chặng";
 // làm chặng = đồng hồ vòng (đỏ --gap khi còn dưới 1 phút), dấu câu đã trả lời, thanh đáy cố định; máy tính có cột phải; kết quả có lọc câu.
@@ -175,7 +178,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat}:{token:st
   const chuaLam=cs.flatMap((c,i)=>daTraDu(c,tra[c.qid])?[]:[i+1])
   const nhanLuu=luu==='Đã lưu trên máy chủ'?<><CloudCheck size={16} aria-hidden="true"/>Đã lưu</>:luu
   return <div className="ht-app ht2-lam duo duo-kt" ref={khung} data-duo="">
-   <ThanhTrenKt onDong={()=>void ve()} nhanDong="Lưu và về Hôm nay" khoaDong={busy} daLam={daTraChang} tong={cs.length}
+   <ThanhTrenKt onDong={()=>void ve()} nhanDong={`Lưu và về ${tenTrangChinh()}`} khoaDong={busy} daLam={daTraChang} tong={cs.length}
     gio={<GioChangDuo kho={khoChang} nhan={`Thời gian chặng ${stt+1} còn lại`}/>} nhanGio="" onMoLuoi={()=>{phanHoi('chon');setMoLuoi(true)}}/>
    <main className="duo-than" data-de-dai={deDai||undefined}>
     {baoLoi}
@@ -209,7 +212,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat}:{token:st
  }
  return <div className="ht-app ktcn-man" ref={khung} data-dang-lam={stt!==null||undefined}>
   <header className="ktcn-thanh">
-   <button type="button" className="ktcn-ve" onClick={()=>void ve()} disabled={busy&&stt!==null}><ArrowLeft size={20} aria-hidden="true"/>{stt!==null?'Lưu và về':'Hôm nay'}</button>
+   <button type="button" className="ktcn-ve" onClick={()=>void ve()} disabled={busy&&stt!==null}><ArrowLeft size={20} aria-hidden="true"/>{stt!==null?'Lưu và về':tenTrangChinh()}</button>
    <p className="ktcn-thanh-giua">{tieuDe}</p>
    {stt!==null?<DongHoChang kho={khoChang} giay={giayChang}/>:<span className="ktcn-thanh-trong" aria-hidden="true"/>}
   </header>
@@ -288,7 +291,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat}:{token:st
     </div>
     <div className="ktcn-ds-cau">{cauLoc.map(({c,i})=><details className="ktcn-cau-kq" key={c.de.qid}><summary><span className="ktcn-chip" data-sac={c.dung?'xanh':c.tra?'vang':'xam'}>Câu {i+1}</span><span>{c.tra?c.dung?'Đúng':'Cần ôn lại':'Chưa trả lời'}</span></summary><TheCau {...propsCauHoc(c.de,i+1,c.tra,()=>{},{correct:c.dung,answer:c.dapAn,solution:c.loiGiai},true)} hoiThay={{qid:c.de.qid,nguon:'kiem_tra_ca_nhan'}}/></details>)}</div>
     <p className="ktcn-ch-ghi">Bấm từng câu để xem đáp án và lời giải.</p>
-    <button type="button" className="ktcn-nut-chinh" onClick={()=>void ve()}>Về Hôm nay</button>
+    <button type="button" className="ktcn-nut-chinh" onClick={()=>void ve()}>Về {tenTrangChinh()}</button>
    </div>
   </main>}
  </div>

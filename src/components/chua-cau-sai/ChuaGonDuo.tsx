@@ -157,7 +157,7 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
           <p className="duo-xong-phu">Em đã sửa {tong} câu của chặng này.</p>
           <div className="duo-3">
             <div data-sac="dung" style={{ '--i': 0 } as CSSProperties}><p>Câu đã sửa</p><b>{tong}/{tong}</b></div>
-            {hn && hn.tong > 0 && <div data-sac="sao" style={{ '--i': 1 } as CSSProperties}><p>Hôm nay</p><b>{Math.min(hn.xong, hn.tong)}/{hn.tong}</b></div>}
+            {hn && hn.tong > 0 && <div data-sac="sao" style={{ '--i': 1 } as CSSProperties}><p>Hôm nay</p><b><span>{Math.min(hn.xong, hn.tong)}/{hn.tong}<small className="duo-so-dv">câu</small></span></b></div>}
           </div>
           <p className="duo-ghi">Câu chưa tự sửa được sẽ gặp lại ở ngày khác.</p>
         </section>

@@ -119,11 +119,11 @@ export type MaNhiemVu = 'xong_bai' | 'chuoi_dung_5' | 'dung_kho_2' | 'sua_loi_2'
 export interface MauNhiemVu { ma: MaNhiemVu; ten: string; can: number; thuong: number }
 /** Bộ mẫu (LUAT mục «Nhiệm vụ ngày»). Mỗi ô 5–10 tinh thể. */
 export const MAU_NHIEM_VU: readonly MauNhiemVu[] = [
-  { ma: 'xong_bai', ten: 'Xong 2 bài', can: 2, thuong: 10 },
+  { ma: 'xong_bai', ten: 'Xong 2 chặng', can: 2, thuong: 10 },
   { ma: 'chuoi_dung_5', ten: 'Chuỗi đúng 5 câu', can: 5, thuong: 10 },
   { ma: 'dung_kho_2', ten: 'Đúng 2 câu khó', can: 2, thuong: 10 },
   { ma: 'sua_loi_2', ten: 'Sửa 2 lỗi cũ', can: 2, thuong: 5 },
-  { ma: 'hoan_hao', ten: 'Bài hoàn hảo', can: 1, thuong: 10 },
+  { ma: 'hoan_hao', ten: 'Chặng hoàn hảo', can: 1, thuong: 10 },
   { ma: 'hoc_truoc_20h', ten: 'Học trước 20:00', can: 1, thuong: 5 },
 ]
 export const SO_NHIEM_VU = 3
@@ -203,8 +203,8 @@ export const HUY_HIEU: readonly DinhNghiaHuyHieu[] = [
   { ma: 'hang_bachkim', ten: 'Hạng Bạch kim' },
   { ma: 'hang_kimcuong', ten: 'Hạng Kim cương' },
   { ma: 'quan_quan', ten: 'Quán quân' },
-  { ma: 'hoan_hao_10', ten: '10 bài hoàn hảo', can: 10 },
-  { ma: 'hoan_hao_50', ten: '50 bài hoàn hảo', can: 50 },
+  { ma: 'hoan_hao_10', ten: '10 chặng hoàn hảo', can: 10 },
+  { ma: 'hoan_hao_50', ten: '50 chặng hoàn hảo', can: 50 },
   { ma: 'phan_ung_day_chuyen', ten: 'Phản ứng dây chuyền', can: 10 },
   { ma: 'cu_dem', ten: 'Cú đêm' },
   // Chuỗi đôi «Học cùng bạn» — tác tử B trao (ghi `huy_hieu_em`), tầng này chỉ liệt kê.

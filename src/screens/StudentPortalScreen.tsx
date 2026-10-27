@@ -983,7 +983,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
             <ThanhTren
               tieuDe={tieuSheet}
               onQuayLai={() => setTab(null)}
-              nhanQuayLai="Về Hôm nay"
+              nhanQuayLai={trongHs ? 'Về Lộ trình' : 'Về Hôm nay'} /* Boss 27/10: trang chính giao diện Trong là Lộ trình */
               phai={
                 <button type="button" onClick={() => setTab(null)} className="m3-nut-chu" title="Đóng toàn màn hình">
                   <X size={18} aria-hidden="true" />
@@ -1876,6 +1876,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
               onVe={() => {
                 setManThi(false)
                 setBoVaoThi(null)
+                window.dispatchEvent(new Event('ddh:ve-trang-chinh'))
               }}
             />
           </Suspense>

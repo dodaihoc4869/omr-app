@@ -308,7 +308,7 @@ DS_CHAM.push(...[[390, 844, 'doc'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]
 // ═══ hết THẺ CHẠM 27/10
 // ═══ GIỮ CHÂN 27/10 (ảnh Duolingo «Đừng đi mà…»): tấm giữ chân khi bấm X giữa chặng + băng nhắc + lời động viên. `&giu=1` ⇒ bản tổng quan thưởng ở máy
 // (chuỗi 12 ngày, hôm nay chưa đạt, mục tiêu 3/4) và hôm nay mới làm 2 câu (trang.tsx / gia/lam-bai-1210d.ts). Tiền tố "duo-giu-".
-const X_GIU = 'nut:^Lưu và về Hôm nay'
+const X_GIU = 'nut:^Lưu và về Lộ trình'
 const GIU_CANH = [
   ['tam', `lam13:${D_Q1} » ${X_GIU}`], ['cuoi', `lam13:${D_Q4} » phim:8,2 » nut:^Kiểm tra$ » nut:^Tiếp tục » ${X_GIU}`],
   ['dong-vien', 'lam13:tn:^B » nut:^Kiểm tra$ » nut:^Tiếp tục » tn:^A » nut:^Kiểm tra$'], ['con-1', `lam13:${D_Q4} » phim:8,2 » nut:^Kiểm tra$ » nut:^Tiếp tục`], ['mo', ''],
@@ -352,7 +352,7 @@ const DS_GT = ['nb', 'th', 'vd', 'vdc'].flatMap((m) => ['light', 'dark'].flatMap
 // máy chủ giả gia/thuong.tsx + answer trả `thuong`, câu cuối `ketBai`). 390×844 · 844×390 · 1440×900, sáng + tối. Thao tác `menu:<mục>` = chọn mục menu dọc.
 const TPC_CANH = [
   ['lo-trinh', 'hs-mot&tp=1', /Ester/], ['thanh-tich', 'hs-mot&tp=1', /Ester/, 'menu:Thành tích'], ['menu', 'hs-mot&tp=1', /Ester/, 'mo-menu'], ['chuoi', 'hs-mot&tp=1', /Ester/, 'nut:Chuỗi 12 ngày'],
-  ['nhiem-vu', 'hs-mot&tp=1', /Ester/, 'nut:Nguyên tử hôm nay: 147'], ['cua-hang', 'hs-mot&tp=1', /Ester/, 'nut:Tinh thể: 245'],
+  ['nhiem-vu', 'hs-mot&tp=1', /Ester/, 'nut:147 nguyên tử hôm nay'], ['cua-hang', 'hs-mot&tp=1', /Ester/, 'nut:245 tinh thể'],
   ['lam-dung', 'lam13&lam=duo&tp=1', /Số đồng phân amine/, 'lam13:tn:^D » nut:^Kiểm tra$'], ['lam-sai', 'lam13&lam=duo&tp=1', /Số đồng phân amine/, 'lam13:tn:^B » nut:^Kiểm tra$'],
   ['ket', 'lam13&lam=duo&tp=1', /Số đồng phân amine/, `lam13:${D_Q4} » phim:8,2 » nut:^Kiểm tra$ » nut:^Tiếp tục » tn:^B » nut:^Kiểm tra$ » nut:^Tiếp tục`],
 ]

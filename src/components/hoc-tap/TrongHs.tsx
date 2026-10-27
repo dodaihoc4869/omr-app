@@ -280,6 +280,9 @@ export function MotTrangHs(p: PropsMotTrang) {
   const tq = tqTai.du
   const coThuong = !!p.token && (!!tq || tqTai.tai)
   const chuoi = tq?.chuoiNgay?.so ?? nhip?.chuoiDuGanNhat ?? 0
+  // Boss 27/10 (Q2): có chuỗi theo luật mới (≥ 1 chặng/ngày) ⇒ mọi dòng chuỗi nói ĐÚNG luật đó; «đủ mức» là MỤC TIÊU NGÀY, ghi tách riêng.
+  const giuHomNay = !!tq?.chuoiNgay && tq.chuoiNgay.lich7.some((x) => x.ngay.slice(0, 10) === ngayVn(Date.now()) && x.kieu === 'hoc')
+  const chuLuatChuoi = giuHomNay ? 'hôm nay đã giữ chuỗi' : 'mỗi ngày xong ít nhất 1 chặng để giữ chuỗi'
   const [tp, setTp] = useState<{ man: TenManThuong; hieuUng?: 'chuoi' } | null>(null)
   const coBen = useCoBen()
   useEffect(() => { setTp(null) }, [p.muc])
@@ -320,19 +323,19 @@ export function MotTrangHs(p: PropsMotTrang) {
     </Suspense>
   </main></div>
   const dongHomNay = so && <div className="dm-the"><h3>Hôm nay</h3>
-    <div className="dm-dong"><span className="h" data-sac="sao"><Flame size={22} aria-hidden="true" /></span><div className="giua"><b>Chuỗi {chuoi} ngày</b><span className="mo">{du ? 'hôm nay đã đủ mức' : `làm ${con} câu nữa để đủ mức`}</span></div></div>
+    <div className="dm-dong"><span className="h" data-sac="sao"><Flame size={22} aria-hidden="true" /></span><div className="giua"><b>Chuỗi {chuoi} ngày</b><span className="mo">{tq?.chuoiNgay ? chuLuatChuoi : du ? 'hôm nay đã đủ mức' : `làm ${con} câu nữa để đủ mức`}</span></div></div>
     <div className="dm-thanh" role="progressbar" aria-label="Câu hôm nay" aria-valuemin={0} aria-valuemax={so.muc} aria-valuenow={Math.min(so.daLam, so.muc)}><i style={{ width: `${pct}%` }} /></div>
-    <span className="mo">{so.daLam}/{so.muc} câu hôm nay{du ? ' · đủ mức' : ''}</span></div>
+    <span className="mo">{tq?.chuoiNgay ? <>Mục tiêu hôm nay · {so.daLam}/{so.muc} câu{du ? ' · đã đủ' : ` · còn ${con} câu`}</> : <>{so.daLam}/{so.muc} câu hôm nay{du ? ' · đủ mức' : ''}</>}</span></div>
   // Thầy 26/10: hệ lười (nhóm, bậc chăm, Học thật / Đối phó, mức làm) CHỈ thầy và phụ huynh xem ⇒ em chỉ thấy chuỗi ngày + việc tiếp trung tính.
   const theViec = nhip && <div className="dm-the da-viec"><h3>Chuỗi {chuoi} ngày</h3><span className="mo">Việc tiếp: {chuViecTiepHs(nhip)}</span></div>
 
   // ───── LUYỆN TẬP (mục «Ôn & sửa» cũ): mỗi việc một ô to; ô đỏ (Tự sửa lỗi còn câu) là việc nên làm trước.
   if (p.muc === 'on-lai' && hs) return <div className="dm-khung" data-muc="luyen">{tren}<main className="da-vo">
     <h1 className="da-tieu">Luyện tập</h1>
-    <OTo ten="Tự sửa lỗi" mo={p.soSua === 0 ? 'Không còn câu cần sửa' : 'Câu em làm sai'} sac="sai" Icon={Wrench} so={coSua ? p.soSua! : undefined} noi={coSua} onClick={p.onChua} />
-    {kiem && <OTo ten="Kiểm tra ôn tập" mo={chuKiem(kiem)} sac="tin" Icon={Target} so={`${kiem.daTra}/${kiem.tong}`} onClick={(kiemLam || kiemXong) && p.onKiemTra ? p.onKiemTra : undefined} tat={p.coCa} />}
+    <OTo ten="Tự sửa lỗi" mo={p.soSua === 0 ? 'Không còn câu cần sửa' : 'Câu em làm sai'} sac="sai" Icon={Wrench} so={coSua ? <>{p.soSua}<small className="so-dv">câu</small></> : undefined} noi={coSua} onClick={p.onChua} />
+    {kiem && <OTo ten="Kiểm tra ôn tập" mo={chuKiem(kiem)} sac="tin" Icon={Target} so={<>{kiem.daTra}/{kiem.tong}<small className="so-dv">câu</small></>} onClick={(kiemLam || kiemXong) && p.onKiemTra ? p.onKiemTra : undefined} tat={p.coCa} />}
     <OTo ten="Câu đã làm" mo="Lời giải và lịch ôn từng câu" sac="dung" Icon={History} onClick={hs.onXemLai} />
-    {coBt && <OTo ten="Bài tập về nhà" mo={p.soBaiTap ? 'Thầy đang giao' : 'Xem lại bài đã nộp'} sac="chu-y" Icon={PenLine} so={p.soBaiTap || undefined} onClick={p.onBaiTap} />}
+    {coBt && <OTo ten="Bài tập về nhà" mo={p.soBaiTap ? 'Thầy đang giao' : 'Xem lại bài đã nộp'} sac="chu-y" Icon={PenLine} so={p.soBaiTap ? <>{p.soBaiTap}<small className="so-dv">bài</small></> : undefined} onClick={p.onBaiTap} />}
     <OTo ten="Tu luyện" mo="Luyện thêm theo chương, dạng, mức" sac="sao" Icon={Layers} onClick={hs.onTuLuyen} />
     {hs.onLuyenLai && <OTo ten="Luyện lại từ bài kiểm tra" mo="Câu sai trong các bài kiểm tra" sac="sai" Icon={RefreshCw} onClick={hs.onLuyenLai} />}
   </main></div>
@@ -349,7 +352,7 @@ export function MotTrangHs(p: PropsMotTrang) {
     return <div className="dm-khung" data-muc="thanh-tich">{tren}<main className="da-vo">
       <h1 className="da-tieu">Thành tích</h1>
       <div className="da-cot">{/* ngang / máy tính: hai cột (chuỗi · tuần · việc tiếp | huy hiệu · điểm); dọc: display: contents */}
-      <div className="da-lua"><Bi cam={chuoi > 0 ? 'lua' : so && so.daLam === 0 ? 'ngu' : 'chao'} size={72} /><div><b>{chuoi} ngày</b><span>{tq?.chuoiNgay ? 'Chuỗi ngày' : 'Chuỗi ngày đủ mức'}{so && !du ? ` · làm ${con} câu nữa để đủ mức hôm nay` : du ? ' · hôm nay đã đủ' : ''}</span></div></div>
+      <div className="da-lua"><Bi cam={chuoi > 0 ? 'lua' : so && so.daLam === 0 ? 'ngu' : 'chao'} size={72} /><div><b>{chuoi} ngày</b><span>{tq?.chuoiNgay ? `Chuỗi ngày · ${chuLuatChuoi}` : <>Chuỗi ngày đủ mức{so && !du ? ` · làm ${con} câu nữa để đủ mức hôm nay` : du ? ' · hôm nay đã đủ' : ''}</>}</span></div></div>
       {/* có chuỗi ngày theo bài (thưởng phạt) ⇒ lịch / việc tiếp theo chuỗi «đủ mức» cũ ẩn (hai cách đếm khác nhau không đứng cạnh nhau); lịch ở ô «Chuỗi ngày» */}
       {!tq?.chuoiNgay && tuan.length > 0 && <ol className="da-tuan" aria-label="7 ngày gần nhất">{tuan.map((x) => { const nay = x.ngay === nhip!.homNay, d = x.muc > 0 && x.lam >= x.muc
         return <li key={x.ngay} aria-label={`${nay ? 'Hôm nay' : thuNgan(x.ngay)}: ${d ? 'đủ mức' : `${x.lam}/${x.muc} câu`}`}><i data-d={d || undefined} data-nay={nay || undefined}>{d && <Check size={18} strokeWidth={3} aria-hidden="true" />}</i>{nay ? 'Nay' : thuNgan(x.ngay)}</li> })}</ol>}
@@ -362,7 +365,7 @@ export function MotTrangHs(p: PropsMotTrang) {
         {tq?.bat.giai !== false && <OTo ten="Giải tuần" mo="Bảng nhóm tuần này" sac="tin" Icon={Route} onClick={() => moTp('giai')} />}
         {tq?.bat.banBe !== false && <OTo ten="Học cùng bạn" mo="Chuỗi đôi với bạn học cùng" sac="dung" Icon={GraduationCap} onClick={() => moTp('ban')} />}
         {tq?.bat.kimCuong && <OTo ten="Thử thách Kim cương" mo="10 câu khó của chuyên đề em đã vững" sac="tin" Icon={Award} onClick={() => moTp('kim-cuong')} />}
-        <OTo ten="Cửa hàng" mo="Tinh thể và bình giữ chuỗi" sac="sao" Icon={Sparkles} so={tq?.tinhThe} onClick={() => moTp('cua-hang')} />
+        <OTo ten="Cửa hàng" mo="Tinh thể và bình giữ chuỗi" sac="sao" Icon={Sparkles} so={tq?.tinhThe !== undefined ? <>{tq.tinhThe}<span className="sr-only"> tinh thể</span></> : undefined} onClick={() => moTp('cua-hang')} />
       </> : <div className="da-huy">{huy.map(({ ten, sac, Icon, co }) => <div key={ten}><i data-sac={co ? sac : undefined}>{co ? <Icon size={28} aria-hidden="true" /> : <Lock size={26} aria-hidden="true" />}</i>{ten}</div>)}</div>}
       <h2 className="da-tieu-nho">Điểm thầy đã công bố</h2>
       <OTo ten="Ca kiểm tra" mo="Điểm và lời giải ca đã công bố" sac="tin" Icon={LineChart} onClick={hs.onLichSu} />
@@ -421,8 +424,8 @@ export function MotTrangHs(p: PropsMotTrang) {
       {/* thưởng phạt (tp-4): Giải tuần + Nhiệm vụ ngày thay thẻ «việc tiếp» cũ */}
       {coThuong && coBen && <Suspense fallback={null}><TheBenThuong token={p.token} onMo={moTp} /></Suspense>}
       <div className="dm-the"><h3>Luyện tập</h3>
-        <button type="button" className="dm-dong" onClick={p.onChua}><span className="h" data-sac="sai"><Wrench size={20} aria-hidden="true" /></span><span className="giua"><b>Tự sửa lỗi</b></span>{coSua && <span className="so">{p.soSua}</span>}</button>
-        {kiem && <button type="button" className="dm-dong" onClick={(kiemLam || kiemXong) && p.onKiemTra ? p.onKiemTra : undefined} disabled={p.coCa || !((kiemLam || kiemXong) && p.onKiemTra)}><span className="h" data-sac="tin"><Target size={20} aria-hidden="true" /></span><span className="giua"><b>Kiểm tra ôn tập</b></span><span className="so">{kiem.daTra}/{kiem.tong}</span></button>}
+        <button type="button" className="dm-dong" onClick={p.onChua}><span className="h" data-sac="sai"><Wrench size={20} aria-hidden="true" /></span><span className="giua"><b>Tự sửa lỗi</b></span>{coSua && <span className="so">{p.soSua}<small className="so-dv">câu</small></span>}</button>
+        {kiem && <button type="button" className="dm-dong" onClick={(kiemLam || kiemXong) && p.onKiemTra ? p.onKiemTra : undefined} disabled={p.coCa || !((kiemLam || kiemXong) && p.onKiemTra)}><span className="h" data-sac="tin"><Target size={20} aria-hidden="true" /></span><span className="giua"><b>Kiểm tra ôn tập</b></span><span className="so">{kiem.daTra}/{kiem.tong}<small className="so-dv">câu</small></span></button>}
         {hs && <button type="button" className="dm-dong" onClick={hs.onXemLai}><span className="h" data-sac="dung"><History size={20} aria-hidden="true" /></span><span className="giua"><b>Câu đã làm</b></span></button>}
       </div>
       {!coThuong && theViec}
@@ -506,6 +509,10 @@ export function MenuDocTrong(p: {
 }) {
   const [mo, setMo] = useState(false)
   const [cai, setCai] = useState(false) // tấm con «Cài đặt» đang mở (thay chỗ 6 mục)
+  // Kết quả ca thi «Về Lộ trình» (Boss 27/10): đóng phòng thi ⇒ về đúng mục Lộ trình dù em vào thi từ mục khác (sự kiện do cổng phát khi đóng phòng thi)
+  const onMuc = useRef(p.onMuc)
+  onMuc.current = p.onMuc
+  useEffect(() => { const ve = () => onMuc.current('hom-nay'); window.addEventListener('ddh:ve-trang-chinh', ve); return () => window.removeEventListener('ddh:ve-trang-chinh', ve) }, [])
   const caiRef = useRef(false)
   caiRef.current = cai
   const nut = useRef<HTMLButtonElement>(null)

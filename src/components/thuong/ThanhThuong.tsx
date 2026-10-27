@@ -37,14 +37,14 @@ export function ThanhThuong({ token, onMo, onHoc, thongBao = true }: PropsThanhT
   const tb = thongBao && token ? locThongBao(du) : []
   return <div className="tp-tr">
     {c && o('lua', `Chuỗi ${c.so} ngày`, 'chuoi', <><IcLua tat={c.so === 0} /><SoDem gt={c.so} lat className="tp-tr-so" /></>)}
-    {du.nguyenTuHomNay !== undefined && o('nt', `Nguyên tử hôm nay: ${du.nguyenTuHomNay}`, 'nhiem-vu', <><IcNguyenTu /><SoDem gt={du.nguyenTuHomNay} className="tp-tr-so" /></>)}
-    {du.tinhThe !== undefined && o('tt', `Tinh thể: ${du.tinhThe}`, 'cua-hang', <><IcTinhThe /><SoDem gt={du.tinhThe} className="tp-tr-so" /></>)}
+    {du.nguyenTuHomNay !== undefined && o('nt', `${du.nguyenTuHomNay} nguyên tử hôm nay`, 'nhiem-vu', <><IcNguyenTu /><SoDem gt={du.nguyenTuHomNay} className="tp-tr-so" /></>)}
+    {du.tinhThe !== undefined && o('tt', `${du.tinhThe} tinh thể`, 'cua-hang', <><IcTinhThe /><SoDem gt={du.tinhThe} className="tp-tr-so" /></>)}
     {mt && (() => {
-      const nhan = `Mục tiêu ngày ${mt.daXong}/${mt.can} bài${dat ? ', đã đạt' : ''}`
+      const nhan = `Mục tiêu ngày ${mt.daXong}/${mt.can} chặng${dat ? ', đã đạt' : ''}`
       const ruot = <>
         <svg className="vm" viewBox="0 0 52 52" aria-hidden="true"><circle className="nen" cx="26" cy="26" r="22" /><circle className="chay" cx="26" cy="26" r="22" strokeDasharray={`${p * CHU_VI} 200`} /></svg>
         <Bi cam={dat ? 'mung' : 'chao'} size={34} nhip="yen" />
-        <em aria-hidden="true">{mt.daXong}/{mt.can} bài</em>
+        <em aria-hidden="true">{mt.daXong}/{mt.can} chặng</em>
       </>
       return onMo ? <button type="button" className="tp-tr-muc" data-dat={dat || undefined} aria-label={nhan} onClick={() => onMo('nhiem-vu')}>{ruot}</button>
         : <span className="tp-tr-muc" data-dat={dat || undefined} role="img" aria-label={nhan}>{ruot}</span>

@@ -20,6 +20,9 @@ import { useBoCucNgang } from './bo-cuc-ngang'
 import { nhanCauDaLamSom, xoaCauDaLamSom } from './man-sanh-luoi'
 import './cau-da-lam.css'
 
+// Tên trang chính trên nút «về» (Boss 27/10): giao diện Trong ⇒ «Lộ trình»; giao diện cũ ⇒ «Hôm nay». Viết tại chỗ: nhập mô-đun dùng chung sẽ đẻ mảnh tải riêng (+1 tệp mở app).
+const tenTrangChinh = (): string => (typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Lộ trình' : 'Hôm nay')
+
 export type BoLoc = 'tat_ca' | 'sai_gan' | 'dang_on' | 'thanh_thao' | 'can_day_lai'
 export const BO_LOC: { id: BoLoc; nhan: string; hop: (c: CauDaLamMuc) => boolean }[] = [
   { id: 'tat_ca', nhan: 'Tất cả', hop: () => true },
@@ -592,11 +595,11 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
     return (
       <div className="h2-cdl h2-cdl-ngang" data-bo-cuc="ngang" data-thap={bc.thap ? 'true' : 'false'} data-trang-thai={trangThaiDs} style={bc.thap ? ({ '--h2-ti-le': String(bc.tiLe) } as CSSProperties) : undefined}>
         <header className="h2-cdl-ng-dau">
-          <button type="button" className="h2-cdl-ve h2-cdl-ve-chu" aria-label="Về Hôm nay" onClick={onVe}>
+          <button type="button" className="h2-cdl-ve h2-cdl-ve-chu" aria-label={`Về ${tenTrangChinh()}`} onClick={onVe}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
               <path d="M15 18l-6-6 6-6" />
             </svg>
-            <span aria-hidden="true">Về Hôm nay</span>
+            <span aria-hidden="true">Về {tenTrangChinh()}</span>
           </button>
           <div className="h2-cdl-ng-tieu">
             <h1 className="h2-cdl-tieu">Câu đã làm</h1>
@@ -656,7 +659,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
     <div className="h2-cdl" data-trang-thai={trangThaiDs}>
       <header className="h2-cdl-dau">
         <div className="h2-cdl-hang">
-          <button type="button" className="h2-cdl-ve" aria-label="Về Hôm nay" onClick={onVe}>
+          <button type="button" className="h2-cdl-ve" aria-label={`Về ${tenTrangChinh()}`} onClick={onVe}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
               <path d="M15 18l-6-6 6-6" />
             </svg>

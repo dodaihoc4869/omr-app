@@ -59,6 +59,8 @@ export interface KetQuaSauNopProps {
 }
 
 export default function KetQuaSauNop(p: KetQuaSauNopProps) {
+  // Boss 27/10: giao diện Trong không còn «bảng nhiệm vụ» ⇒ nút về trang chính «Về Lộ trình» (đích: mục Lộ trình); giao diện cũ giữ chữ cũ
+  const veTrangChinh = typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Về Lộ trình' : 'Về bảng nhiệm vụ'
   const ten = p.tenCa.trim() || 'Ca kiểm tra'
   const coDiem = p.kieu === 'da_cong_bo' && typeof p.diem === 'number' && Array.isArray(p.phan) && typeof p.dung === 'number' && typeof p.tong === 'number'
   const chuNop = `Em đã nộp bài${p.gioNop ? ` lúc ${p.gioNop}` : ''}${p.lanThu && p.lanThu > 1 ? ` · lần ${p.lanThu}` : ''}`
@@ -139,7 +141,7 @@ export default function KetQuaSauNop(p: KetQuaSauNopProps) {
                 )}
                 {p.onVe && (
                   <NutXd kieu={p.onXemBaoCao ? 'chu' : 'chinh'} rong onClick={p.onVe}>
-                    Về bảng nhiệm vụ
+                    {veTrangChinh}
                   </NutXd>
                 )}
               </div>
@@ -172,7 +174,7 @@ export default function KetQuaSauNop(p: KetQuaSauNopProps) {
             {p.onVe && (
               <div className="xd-nut-hang">
                 <NutXd rong onClick={p.onVe}>
-                  Về bảng nhiệm vụ
+                  {veTrangChinh}
                 </NutXd>
               </div>
             )}

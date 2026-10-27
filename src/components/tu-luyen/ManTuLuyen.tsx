@@ -6,6 +6,9 @@
 // v3 (30/09): không thẻ nào "Đang khoá" vì kho câu sai trống (máy chủ tự dự phòng); bộ đếm "Đã khắc phục X/Y câu sai"; công tắc
 // "Chấm từng câu" (nhớ theo máy) ⇒ mỗi câu bấm Kiểm tra, máy chủ chấm + khoá câu, hiện đúng/sai + lời giải + nút Câu tiếp.
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+// Tên trang chính trên nút «về» (Boss 27/10): giao diện Trong ⇒ «Lộ trình»; giao diện cũ ⇒ «Hôm nay». Viết tại chỗ: nhập mô-đun dùng chung sẽ đẻ mảnh tải riêng (+1 tệp mở app).
+const tenTrangChinh = (): string => (typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Lộ trình' : 'Hôm nay')
+
 const ManChuaCauSai = lazy(() => import('../chua-cau-sai/ManChuaCauSai'))
 import { apiCoChua } from '../../lib/chua-cau-sai-api'
 import TheCau from '../TheCau'
@@ -836,7 +839,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
     <div className={rong ? 'tlu tlu-rong' : 'tlu'} data-chang="chon" data-bo-cuc={boCuc}>
       <header className="tlu-dau">
         <div className="tlu-hang">
-          <button type="button" className="tlu-ve" aria-label="Về Hôm nay" onClick={onVe}><IconVe /></button>
+          <button type="button" className="tlu-ve" aria-label={`Về ${tenTrangChinh()}`} onClick={onVe}><IconVe /></button>
           <div className="tlu-tieu-khoi">
             <h1 className="tlu-tieu">Tu luyện</h1>
             <p className="tlu-phu">Luyện tự do · luyện theo nhu cầu</p>
@@ -1105,7 +1108,7 @@ function ManKetQua({ boCuc, kq, cau, token, onVe, onLuyenTiep, onTongHop }: { bo
   const dau = (
     <header className={rong ? 'tlu-dau tlu-dau-rong' : 'tlu-dau'}>
       <div className="tlu-hang">
-        <button type="button" className="tlu-ve" aria-label="Về Hôm nay" onClick={onVe}><IconVe /></button>
+        <button type="button" className="tlu-ve" aria-label={`Về ${tenTrangChinh()}`} onClick={onVe}><IconVe /></button>
         <div className="tlu-tieu-khoi">
           <h1 className="tlu-tieu tlu-tieu-nho">Kết quả tu luyện</h1>
           <p className="tlu-phu">{kq.tieuDe}</p>

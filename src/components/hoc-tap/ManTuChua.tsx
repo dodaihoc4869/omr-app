@@ -32,6 +32,9 @@ import './hoc-tap.css'
 import './tu-chua.css'
 // «Trong» 26/10 (nhóm 2): tờ trình bày styles/trong-lam-bai.css nạp RIÊNG, chỉ khi <html data-trong> (main.tsx gắn trước khi nạp màn) — không cộng byte lượt mở app.
 if (typeof document !== 'undefined' && document.documentElement.dataset.trong) void import('../../styles/trong-lam-bai.css').catch(() => {})
+// Tên trang chính trên nút «về» (Boss 27/10): giao diện Trong ⇒ «Lộ trình»; giao diện cũ ⇒ «Hôm nay». Viết tại chỗ: nhập mô-đun dùng chung sẽ đẻ mảnh tải riêng (+1 tệp mở app).
+const tenTrangChinh = (): string => (typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Lộ trình' : 'Hôm nay')
+
 const ManChua = lazy(() => import('../chua-cau-sai/ManChuaCauSai'))
 const KiemHoiThay = lazy(() => import('../loi-giai/HoiThayKiemChung'))
 // Thẻ mời ở Hôm nay đi CÙNG khối mã với màn này (một khối nạp lười, không thêm tệp precache — trần 170 tệp của kiem-sw).
@@ -286,7 +289,7 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
   return (
     <div ref={gocRef} className="ht-app ht2 tcl-man">
       <header className="ht-thanh tcl-dau-trang">
-        <button type="button" className="ht-nut-phu" onClick={onVe}><ArrowLeft size={18} aria-hidden="true" />Hôm nay</button>
+        <button type="button" className="ht-nut-phu" onClick={onVe}><ArrowLeft size={18} aria-hidden="true" />{tenTrangChinh()}</button>
         <strong className="tcl-dau-trang-ten">Tự sửa lỗi</strong>
       </header>
       <main className="ht-noi-dung ht2-noi-dung tcl-noi-dung">
@@ -339,7 +342,7 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
             <h1 id="tcl-tat-tieu">Tự sửa lỗi chưa mở cho em</h1>
             <p className="ht2-phu">Lời giải câu đã làm có ở Ôn &amp; sửa › Câu đã làm.</p>
             <div className="ht2-hang-nut">
-              <button type="button" className="ht-nut-chinh ht2-nut-lon" onClick={onVe}>Về Hôm nay</button>
+              <button type="button" className="ht-nut-chinh ht2-nut-lon" onClick={onVe}>Về {tenTrangChinh()}</button>
             </div>
           </section>
         ) : !tong || (!soCan && !soCho) ? (
@@ -350,7 +353,7 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
               {soXong > 0 && <p className="tcl-trong-so">Đã tự sửa: <b>{soXong} câu</b></p>}
               <p className="ht2-phu">Câu em làm sai sẽ tự vào đây.</p>
               <div className="ht2-hang-nut">
-                <button type="button" className="ht-nut-chinh ht2-nut-lon" onClick={onVe}>Về Hôm nay</button>
+                <button type="button" className="ht-nut-chinh ht2-nut-lon" onClick={onVe}>Về {tenTrangChinh()}</button>
                 {onTuLuyen && <button type="button" className="ht-nut-phu" onClick={onTuLuyen}>Luyện thêm ở Tu luyện</button>}
               </div>
             </section>
@@ -433,7 +436,7 @@ function TheTong({ can, soCan, soCho, soXong, tong, onChon, onVe, onTaiThem, dan
         <button type="button" className="ht-nut-chinh ht2-nut-lon tcl-nut-chinh" onClick={onTaiThem} disabled={dangThem}>{dangThem ? 'Đang tải thêm…' : 'Tải thêm câu cần sửa'}</button>
       ) : (
         <button type="button" className="ht-nut-chinh ht2-nut-lon tcl-nut-chinh" onClick={onVe}>
-          <span>Về Hôm nay</span><ArrowRight size={20} aria-hidden="true" />
+          <span>Về {tenTrangChinh()}</span><ArrowRight size={20} aria-hidden="true" />
         </button>
       )}
     </section>

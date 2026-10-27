@@ -6,6 +6,9 @@ import type { TheCauProps } from '../TheCau'
 import { loiGiaiChuanTuKho } from '../loi-giai/KhoiLoiGiaiChuan'
 import { goiHoa2, guiLaiKhiKetMang } from '../hoa2/api'
 import { GIAY_CHO_MO_CHANG, layChangMoTruoc, moChangTruoc } from './mo-chang-truoc'
+// Tên trang chính trên nút «về» (Boss 27/10): giao diện Trong ⇒ «Lộ trình»; giao diện cũ ⇒ «Hôm nay». Viết tại chỗ: nhập mô-đun dùng chung sẽ đẻ mảnh tải riêng (+1 tệp mở app).
+const tenTrangChinh = (): string => (typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Lộ trình' : 'Hôm nay')
+
 // Hôm nay nạp ĐỘNG đúng mảnh này để mở chặng trước (không sinh thêm tệp nạp / precache; mảnh màn làm bài được nạp sẵn luôn).
 export { moChangTruoc } from './mo-chang-truoc'
 import type { HinhAnh } from '../../data/examContent'
@@ -97,9 +100,10 @@ function BangCombo({ n }: { n: number }) {
 }
 
 /** B1 — một thẻ số kết chặng: bật lên (trễ theo `i` × 120 ms), số đếm tăng từ 0. `dinh` đổi số đếm ra chữ (vd. giây ⇒ «m:ss»). */
-function TheSo({ i, sac, ten, Icon, den, dinh }: { i: number; sac: string; ten: string; Icon: typeof Target; den: number; dinh: (v: number) => string }) {
+function TheSo({ i, sac, ten, Icon, den, dinh, dv }: { i: number; sac: string; ten: string; Icon: typeof Target; den: number; dinh: (v: number) => string; dv?: string }) {
   const v = useDemSo(den, 800, 200 + i * 120)
-  return <div data-sac={sac} style={{ '--i': i } as CSSProperties}><p>{ten}</p><b><Icon size={20} aria-hidden="true" /><span aria-hidden="true">{dinh(v)}</span><span className="ht2-an">{dinh(den)}</span></b></div>
+  // dv: đơn vị chữ nhỏ sau số (Boss 27/10 «số nào cũng có nhãn»: «11/24 câu»)
+  return <div data-sac={sac} style={{ '--i': i } as CSSProperties}><p>{ten}</p><b><Icon size={20} aria-hidden="true" /><span aria-hidden="true">{dinh(v)}{dv && <small className="duo-so-dv">{dv}</small>}</span><span className="ht2-an">{dinh(den)}{dv ? ` ${dv}` : ''}</span></b></div>
 }
 
 /** B4 — VÒNG MỤC TIÊU NGÀY: số chặng đã xong / số chặng kế hoạch hôm nay; tô dần từ trước chặng này tới bây giờ (600 ms). Đầy ⇒ nổ hạt + «Đạt mục tiêu!». */
@@ -232,7 +236,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       const g7 = docTomTatGoi7(r.goi7)
       setCau(ds); setSoGoc(ds.length); setPhien(typeof r.id === 'string' ? r.id : ''); setGoi7(g7)
       if (g7) setDem({ daLam: g7.daLamHomNay, muc: g7.toiThieu })
-      if (!ds.length) setLoi(typeof r.message === 'string' && r.message.trim() ? r.message : 'Chưa có câu mới cho chặng này. Em về Hôm nay xem tiến độ.')
+      if (!ds.length) setLoi(typeof r.message === 'string' && r.message.trim() ? r.message : `Chưa có câu mới cho chặng này. Em về ${tenTrangChinh()} xem tiến độ.`)
     }).catch(e => { if (!huy) setLoi(e instanceof Error ? e.message : 'Chưa tải được bài học.') }).finally(() => { if (!huy) setTai(false) })
     return () => { huy = true }
   }, [token, lan])
@@ -442,7 +446,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   const thanhDay = tai ? null
     : xong ? <div className="ht2-lam-cot-nut">
         <button type="button" className="ht2-lam-nut ht2-lam-nut-chinh" onClick={() => setLan(n => n + 1)}>{chuHocTiep}<ArrowRight size={18} aria-hidden="true" /></button>
-        <button type="button" className="ht2-lam-nut ht2-lam-nut-phu" onClick={onVe}>Nghỉ và về Hôm nay</button>
+        <button type="button" className="ht2-lam-nut ht2-lam-nut-phu" onClick={onVe}>Nghỉ và về {tenTrangChinh()}</button>
       </div>
     : !q ? null
     : k ? <div className="ht2-lam-hang-nut" data-mot={!coTuChua || undefined}>
@@ -609,7 +613,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     const day = tai ? null
       : xong ? <div className="duo-day" data-xong=""><div className="duo-giua">
           <button type="button" className="duo-nut" onClick={() => { phanHoi('chon'); setLan(n => n + 1) }}>{chuHocTiep}</button>
-          <div className="duo-bo"><button type="button" className="duo-lien" onClick={onVe}>Về Hôm nay</button></div>
+          <div className="duo-bo"><button type="button" className="duo-lien" onClick={onVe}>Về {tenTrangChinh()}</button></div>
         </div></div>
       : !q ? null
       : k ? <section className="duo-day duo-ket" data-tt={khongTinh ? 'trung' : tt} data-tp-trung={khongTinh || undefined} role="status" aria-live="polite"><div className="duo-giua">
@@ -669,7 +673,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       {!xong && <header className="duo-tren">
         {/* thầy 27/10 (video Duolingo): đúng liền ≥ 2 câu ⇒ nhãn nhỏ «COMBO ×N» ngay TRÊN thanh tiến độ, số theo chuỗi */}
         {chuoi >= 2 && !laLamLai && <span key={chuoi} className="duo-combo-nhan" aria-hidden="true">COMBO ×{chuoi}</span>}
-        <button type="button" className="duo-dong" onClick={giu.xinThoat} disabled={nop} aria-label="Lưu và về Hôm nay"><XIcon size={26} aria-hidden="true" /></button>
+        <button type="button" className="duo-dong" onClick={giu.xinThoat} disabled={nop} aria-label={`Lưu và về ${tenTrangChinh()}`}><XIcon size={26} aria-hidden="true" /></button>
         {/* A7 — ỐNG NGHIỆM: chất lỏng dâng theo câu, bọt nổi; chuỗi ≥ 3 ⇒ chất lỏng cam phát sáng + vệt sáng lướt. */}
         <div className="duo-thanh" data-combo={chuoi >= 3 || undefined} role="progressbar" aria-label={laLamLai ? `Làm lại · câu ${stt}/${lamLai.length}` : q ? `Câu ${stt}/${goc.length}${chang ? ` của chặng ${chang}` : ''}` : 'Chặng học của em'} aria-valuemin={0} aria-valuemax={goc.length || 1} aria-valuenow={Math.min(daCham, goc.length)}><i style={{ width: `${pct}%` }}><b /><b /><b />{k?.correct && <span key={q?.qid} className="duo-loe" />}</i></div>
         {coNt ? <span ref={demRef} className="duo-chuoi" data-co={ntBai > 0 || undefined} aria-label={`Nguyên tử của bài này: ${ntBai}`}><IcNguyenTu />{ntTre ?? ntBai}</span>
@@ -688,7 +692,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
             <div className="duo-3">
               <TheSo i={0} sac="dung" ten="Tự làm đúng" Icon={Target} den={soDung} dinh={(v) => `${v}/${goc.length}`} />
               <TheSo i={1} sac="tin" ten="Thời gian" Icon={Clock} den={Math.round(tongMs / 1000)} dinh={(v) => tongMs > 0 ? `${Math.floor(v / 60)}:${String(v % 60).padStart(2, '0')}` : '—'} />
-              {homNayHien && <TheSo i={2} sac="sao" ten="Hôm nay" Icon={Flame} den={homNayHien.daLam} dinh={(v) => `${v}/${homNayHien.muc}`} />}
+              {homNayHien && <TheSo i={2} sac="sao" ten="Hôm nay" Icon={Flame} den={homNayHien.daLam} dinh={(v) => `${v}/${homNayHien.muc}`} dv="câu" />}
             </div>
             {homNayHien && homNayHien.soChang > 0 && <VongMucTieu xong={soChangXong(homNayHien)} tong={homNayHien.soChang} />}
             <p className="duo-ghi">{[lamLai.length ? `Đã làm lại ${lamLai.length} câu.` : '', cauSai.length ? `${chuDanhSachCau(cauSai)} sai đã vào lịch ôn 1 · 3 · 7 ngày.` : '', conDu === null ? '' : conDu > 0 ? `Còn ${conDu} câu nữa là đủ mức hôm nay.` : 'Em đã đủ mức hôm nay.'].filter(Boolean).join(' ')}</p>
@@ -738,7 +742,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
 
   return <div ref={gocRef} className="ht-app ht2-lam" data-xong={xong || undefined}>
     <header className="ht2-lam-tren">
-      <button type="button" className="ht2-lam-nut-ve" onClick={onVe} disabled={nop} aria-label={xong ? 'Về Hôm nay' : 'Lưu và về Hôm nay'}><ArrowLeft size={20} aria-hidden="true" /></button>
+      <button type="button" className="ht2-lam-nut-ve" onClick={onVe} disabled={nop} aria-label={xong ? `Về ${tenTrangChinh()}` : `Lưu và về ${tenTrangChinh()}`}><ArrowLeft size={20} aria-hidden="true" /></button>
       <div className="ht2-lam-giua">
         <h1 className="ht2-lam-tieu" aria-live="polite">{tieuDe}</h1>
         {vach.length > 0 && !xong && <div className="ht2-lam-vach" role="img" aria-label={vachChu} style={{ gridTemplateColumns: `repeat(${vach.length}, minmax(0, 1fr))` }}>{vach.map((c, j) => <i key={c.qid} data-tt={ttCau(c, dauVach + j)} />)}</div>}
