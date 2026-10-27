@@ -13,6 +13,7 @@ import type { Question } from '../../game/than-thu-v2/core'
 import { docTomTatGoi7, type TomTatGoi7 } from '../../lib/goi-bai-7'
 import { soOCuaCau } from '../../lib/so-o-tra-loi-ngan'
 import { BanDoY, BanPhimSo, ChonDungSai, ChonTracNghiem, DeCau, HinhCuoiCau, LoiGiaiCau, OTraLoiNgan, PhanHoiDungSai, PhanHoiTraLoiNgan, PhanHoiTracNghiem, traLoiCotPhai, useBoCucLam } from './LamCau'
+import { TroGiupDuo } from './TroGiupDuo'
 import { chuDanhSachCau, chuDS, chuThoiGian, coChuSo, cuonDeThayO, kyTuHien, nhanPhim, phimTuBanPhim, soChangXong, soHomNayGoi7, soSanhDungSai, type PhimSo, type SoHomNay } from './lam-bai'
 import NutHoiThay from '../loi-giai/NutHoiThay'
 import { phanHoi } from '../../lib/phan-hoi'
@@ -578,14 +579,18 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     // DÒNG LỆNH to đậm kiểu Duolingo («Chọn hình ảnh đúng») + nút bóng đèn nhỏ cạnh (gộp «Gợi ý» / «Học cách giải» — bỏ nút lẻ dưới đáy).
     const soPa = q?.phan === 'I' && pa.every((c) => /^\s*[-−]?\d+(?:[.,]\d+)?\s*(?:gam|g|mol|lít|ml|%|kJ)?\.?\s*$/i.test(c ?? ''))
     const lenh = q?.phan === 'II' ? 'Chọn Đúng hoặc Sai cho từng ý' : q?.phan === 'III' ? 'Tính rồi nhập đáp án' : soPa ? 'Tính rồi chọn đáp án' : 'Chọn đáp án đúng'
-    const nutDen = !q || !dangTraLoi ? null
-      : q.goiY ? <button type="button" className="duo-den" aria-label={goiY ? 'Thu gợi ý' : 'Gợi ý'} aria-expanded={goiY} aria-controls="ht2-lam-goi-y" onClick={() => setGoiY(v => !v)}><Lightbulb size={22} aria-hidden="true" /></button>
-      : coHuongDan ? <button type="button" className="duo-den" aria-label="Học cách giải" onClick={() => void hocHuongDan()} disabled={nop}><Lightbulb size={22} aria-hidden="true" /></button>
-      : null
     const danhDauHoTro = () => { if (q && !k) hoTroCham.current = q.qid }
-    // nutBatDau (hợp đồng chạm để hiểu đề): nút «Bắt đầu từ đâu?» của ruột đưa vào ô ở hàng nút đáy cạnh «Gợi ý» (khung thấp xoay ngang: cột phải).
+    // nutBatDau (hợp đồng chạm để hiểu đề): nút «Bắt đầu từ đâu?» của ruột đưa vào ô trong tấm bóng đèn «Trợ giúp» (TroGiupDuo), cạnh «Gợi ý».
     const nutBatDau = (nut: ReactNode) => oNutCham && !k ? createPortal(nut, oNutCham) : null
     const linkHoi = q && <NutHoiThay gon dangLam={!k} chi="hoi" qid={q.qid} nguon="bai_hang_ngay" dapAnEm={k ? traHien : undefined} onHoi={k ? undefined : () => { daHoiThay.current = q.qid }} />
+    // Thầy 27/10 («rối quá, ẩn đi, bấm vào mới hiện» ⇒ «Cho chỗ khoanh vào cái bóng đèn luôn nhé»): MỌI trợ giúp của câu (Bắt đầu từ đâu? · Gợi ý ·
+    // Học cách giải · Hỏi thầy) gom vào bóng đèn này — bấm ⇒ tấm nhỏ bật xuống (TroGiupDuo); thanh đáy chỉ còn KIỂM TRA. Cùng các nút cũ, cùng hành vi.
+    const nutDen = !q || !dangTraLoi ? null : <TroGiupDuo key={q.qid}>
+      <span ref={setONutCham} className="duo-o-nut-cham" />
+      {q.goiY && <button type="button" className="duo-lien" aria-expanded={goiY} aria-controls="ht2-lam-goi-y" onClick={() => setGoiY(v => !v)}><Lightbulb size={18} aria-hidden="true" />{goiY ? 'Thu gợi ý' : 'Gợi ý'}</button>}
+      {coHuongDan && <button type="button" className="duo-lien" onClick={() => void hocHuongDan()} disabled={nop}><BookOpen size={18} aria-hidden="true" />Học cách giải</button>}
+      {linkHoi}
+    </TroGiupDuo>
     const loiGiu = giu.mo ? (() => {
       const tq = layTam<TongQuanThuong>(khoaTam(DUONG.tongQuan, token))
       return loiGiuChan({ conLai, lamLai: laLamLai, soCau: goc.length, daCham: daChamGoc, coThuong: coNt, chuoi: chuoiHomNay(tq?.chuoiNgay, ngayVn()), cauHomNay: homNayHien?.daLam, mucTieu: tq?.mucTieu })
@@ -633,10 +638,6 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       : <div className="duo-day"><div className="duo-giua">
           {loi && <p className="duo-loi" role="alert">{loi}</p>}
           <button type="button" className="duo-nut" onClick={() => { phanHoi('chon'); void nopCau() }} disabled={nop || !duocNop}>{nop ? 'Đang kiểm tra…' : q.phan === 'II' && soYChua ? `Còn ${soYChua} ý chưa chọn` : 'Kiểm tra'}</button>
-          <div className="duo-bo">
-            {linkHoi}
-            <span ref={setONutCham} className="duo-o-nut-cham" />
-          </div>
         </div></div>
 
     // MÀN KẾT BÀI thưởng phạt (bản vẽ tp-3): một màn đủ «được bao nhiêu nguyên tử, vì sao · hôm nay còn mấy bài · hạng giải». «Tiếp tục» ⇒ về Lộ trình;
@@ -686,7 +687,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
           {laLamLai ? <p className="duo-nhan" data-lam-lai=""><span>Làm lại · câu {stt}/{lamLai.length}</span><span className="duo-chip">Cùng dạng câu {goc.findIndex(c => c.qid === q.lamLaiCua) + 1 || '?'}</span></p>
             // thầy 27/10: lời nhắc chặng nằm TRONG dòng nhãn (không lớp nổi đè), mờ về nhãn thường sau 1,8 s — CSS «NHÃN CÂU NHẮC CHẶNG»
             : <p className="duo-nhan" data-nc="" data-nhac={bangNhac ? '' : undefined}>{bangNhac && <span className="duo-nhan-nhac" role="status">{bangNhac}</span>}<span className="duo-nhan-o" aria-hidden="true">{q.phan === 'III' || soPa ? <IcMayTinh /> : <IcLapLanh />}</span><span>{q.vaiGoi7 === 'moi' ? 'Câu mới' : loai}</span>{tenBai || q.tenDang ? <span className="duo-chip" data-cong-thuc={/[A-Z][a-z]?(\d|[A-Z(])/.test(tenBai || q.tenDang || '') || undefined}><ChemText text={chuDeNgan(tenBai || q.tenDang || '')} /></span> : null}{chang ? <span className="ht2-an">Chặng {chang}</span> : null}</p>}
-          {!laLamLai && <div className="duo-lenh"><h2>{lenh}</h2>{nutDen}</div>}
+          {(!laLamLai || nutDen) && <div className="duo-lenh">{!laLamLai && <h2>{lenh}</h2>}{nutDen}</div>}
           {laLamLai && !k && viTri === soGoc && <p className="duo-mo-ghi">Câu cùng dạng với câu em vừa sai. Lượt này tính là có hỗ trợ.</p>}
           {mucGt ? <div className="duo-gt-san" data-nho={deDaiGiamThi(q) || undefined}>
               <div className="duo-gt-nv"><Suspense fallback={null}><GiamThiCau muc={mucGt} qid={q.qid} phien={phien} nop={nop} ket={ketGt} vung={() => gocRef.current} /></Suspense></div>
