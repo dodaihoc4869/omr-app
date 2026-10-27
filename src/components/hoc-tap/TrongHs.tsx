@@ -108,7 +108,7 @@ function chuKiem(k: TomTatKiemTra): string {
 /** Phần của cổng HocTapHomNay mà Luyện tập / Thành tích cần (truyền nguyên props cổng — không thêm lệnh, không thêm số). */
 export interface HsTrong { lop?: string; onXemLai: () => void; onTuLuyen: () => void; onLichSu: () => void; onKetQua?: () => void; onLuyenLai?: () => void }
 /** Một nút trên con đường chặng (Lộ trình). `x` = độ lệch ngang (px) để đường uốn như bản vẽ. */
-type Nut = { k: string; loai: 'hoc' | 'kiem' | 'sua' | 'bt'; tt: 'xong' | 'dang' | 'khoa' | 'mo'; dem?: number; bong?: string; vong?: number; ten: string; pop: Pop }
+type Nut = { k: string; loai: 'hoc' | 'kiem' | 'sua' | 'bt'; tt: 'xong' | 'dang' | 'khoa' | 'mo'; dem?: number; bong?: string; vong?: number; soDoan?: number; ten: string; pop: Pop }
 /** Thẻ bật ra khi bấm một nút Lộ trình (thầy 27/10, ảnh Duolingo «bấm vào hiện như thế này»): tiêu đề · dòng phụ · nút việc chính (không có ⇒ chỉ thông tin). */
 type Pop = { tieu: string; phu: string; nut?: { chu: string; onClick?: () => void; tat?: boolean } }
 const LECH = [0, -52, -80, -52, 0, 52, 80, 52]
@@ -158,9 +158,10 @@ function Ruong() {
 }
 /** Vòng tiến độ quanh nút HIỆN TẠI (thầy 27/10, ảnh Duolingo; «làm sát lại, tinh tế hơn»): bốn đoạn đầu tròn, khe nhỏ, ôm sát nút (khe ~5–7 px), nền xám
  *  rất nhạt; phần đã làm cùng màu nút, tô dần 0 → tỉ lệ thật lúc mở (mặt nạ stroke-dashoffset, 500 ms ease-out). Không có số ⇒ vòng xám nguyên. */
-const CV = 2 * Math.PI * 54, DOAN = CV / 4, KHE = 14 // khe theo đơn vị khung 116 (nét 8 đầu tròn ⇒ khe nhìn thấy ~5 px)
-function VongChang({ pt }: { pt?: number }) {
-  const L = Math.max(0, Math.min(100, pt ?? 0)) / 100 * CV
+const CV = 2 * Math.PI * 54, KHE = 14 // khe theo đơn vị khung 116 (nét 8 đầu tròn ⇒ khe nhìn thấy ~5 px)
+/** `so` = số đoạn (mặc định 4). Nút Kiểm tra ôn tập (28/10): MỖI CHẶNG MỘT ĐOẠN, `pt` = chặng đã chốt / tổng ⇒ tô trọn đúng số đoạn (mặt nạ dừng giữa khe). */
+function VongChang({ pt, so = 4 }: { pt?: number; so?: number }) {
+  const L = Math.max(0, Math.min(100, pt ?? 0)) / 100 * CV, DOAN = CV / Math.max(2, Math.min(8, so))
   const id = `da-vm${useId().replace(/[^a-zA-Z0-9]/g, '')}`
   const doan = { cx: 58, cy: 58, r: 54, strokeDasharray: `${DOAN - KHE} ${KHE}`, strokeDashoffset: DOAN - KHE / 2 }
   return <svg className="da-vong" viewBox="0 0 116 116" aria-hidden="true">
@@ -270,7 +271,9 @@ function DuongChang({ ds, moDi, cam, moKt }: { ds: Nut[]; moDi: boolean; cam?: C
       const Icon = n.tt === 'xong' ? Check : n.tt === 'khoa' ? Lock : HINH_NUT[n.loai]
       const x = LECH[i % LECH.length]!
       const than = <>
-        {(n.vong !== undefined || (n.tt === 'dang' && n.loai !== 'hoc')) && <VongChang pt={n.vong} />}
+        {/* 28/10 (thầy: «có 3 phần đã làm nhưng vòng xung quanh không tính vẫn màu xám»): vòng CHỈ vẽ khi có số tiến độ thật — chặng (phần đã làm), Kiểm tra
+            ôn tập (chặng đã chốt / tổng). Tự sửa lỗi / Bài tập về nhà không có số tổng ⇒ không vòng (vòng xám nguyên trông như «chưa làm gì»), giữ bong bóng. */}
+        {n.vong !== undefined && <VongChang pt={n.vong} so={n.soDoan} />}
         {n.bong && <span className="da-bong" aria-hidden="true">{n.bong}</span>}
         {sao && <i className="da-sao-bong" aria-hidden="true" />}
         {/* ngôi sao đặc tự vẽ (không thêm biểu tượng thư viện vào mảnh dùng chung lúc mở app) */}
@@ -623,6 +626,8 @@ export function MotTrangHs(p: PropsMotTrang) {
   const CHU_KHOA_KT = 'Làm Kiểm tra ôn tập trước để mở khoá'
   const nutKiem: Nut | null = !kiem ? null : { k: 'kiem', loai: 'kiem', tt: ktDau && kiemXong && kiem.nopLuc !== null ? 'xong' : chinh === 'kiem' ? 'dang' : 'mo',
     bong: chinh === 'kiem' && kiemLam ? (khoaKt && kiem.daTra === 0 ? 'Kiểm tra ôn tập' : kiem.daTra > 0 ? 'Làm tiếp' : 'Bắt đầu') : undefined,
+    // vòng = chặng ĐÃ CHỐT / tổng chặng (cùng nguồn với màn bài «3/5 chặng đã chốt»); máy chủ cũ chưa gửi số chặng ⇒ theo số câu đã trả lời
+    ...(kiemLam && kiem.soChang > 0 ? { soDoan: kiem.soChang, vong: kiem.changChot !== undefined ? (100 * kiem.changChot) / kiem.soChang : kiem.tong > 0 ? (100 * kiem.daTra) / kiem.tong : 0 } : {}),
     ten: `Kiểm tra ôn tập: ${chuKiem(kiem)}`, pop: { tieu: 'Kiểm tra ôn tập', phu: chuKiem(kiem),
       nut: (kiemLam || kiemXong) && p.onKiemTra ? { chu: kiemXong ? 'Xem kết quả' : kiem.daTra > 0 ? 'Làm tiếp' : 'Bắt đầu', onClick: p.onKiemTra, tat: p.coCa } : undefined } }
   if (nutKiem) nut.push(nutKiem) // Kiểm tra ôn tập LUÔN đứng đầu hành trình (thầy 27/10)

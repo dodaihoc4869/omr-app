@@ -32,7 +32,7 @@ it('mặc định lập đúng 18/4/6, 50 phút, năm chặng; metadata nhẹ v�
  expect(d).toMatchObject({phienBan:3,phut:50,soLanTuan:1});expect(d.cau).toHaveLength(28)
  expect(['I','II','III'].map(p=>d.cau.filter((c:{q:{phan:string}})=>c.q.phan===p).length)).toEqual([18,4,6])
  expect(d.chang.map((c:{qids:string[]})=>c.qids.length)).toEqual([6,6,6,4,6]);expect(d.chang.reduce((n:number,c:{giay:number})=>n+c.giay,0)).toBe(3000)
- expect(tt).toMatchObject({tong:28,phut:50,tongKienThuc:1,phuDe:1,nguonDayDu:true});expect(tomTatKt(meta,NOW)).toEqual(tt)
+ expect(tt).toMatchObject({tong:28,phut:50,tongKienThuc:1,phuDe:1,nguonDayDu:true});expect(tomTatKt(meta,NOW)).toEqual({...tt,changChot:0}) // 28/10 chỉ-thêm: số chặng đã chốt ở bản đọc nhẹ
 })
 it('hai đề phủ đủ kiến thức, cách nhau ba ngày; không tạo đề thứ ba khi đề đầu đã mở, chu kỳ kế tiếp cách đúng một tuần',async()=>{
  const k=await kho(60);await lapKtCn(k.env,'S1',NOW)

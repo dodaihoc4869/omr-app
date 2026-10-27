@@ -680,7 +680,8 @@ const mtNgay = new Date(now + 7 * 3600_000).toISOString().slice(0, 10), mtMo = D
 const MT_KT = thamSo.get('kt')
 const MT_KIEM = { id: 'kt1', ngay: mtNgay, moLuc: mtMo, hanLuc: mtMo + 86400_000, serverNow: now, trangThai: 'can_lam', homNay: true, baiNgayToiThieu: 12, tong: 28, daTra: 0, con: 28,
   soChang: 4, phut: 50, soBai: 6, tongKienThuc: 10, phuDe: 10, nguonDayDu: true, lyDo: '', thieuNguon: 0, diem: null as number | null, nopLuc: null as number | null,
-  ...(MT_KT === 'xong' ? { trangThai: 'da_nop', daTra: 28, con: 0, diem: 8.5, nopLuc: now - 60_000 } : MT_KT === 'khoa' ? {}
+  // `&kt=lam` (28/10, ảnh thầy): đang làm dở — 3/5 chặng đã chốt, 18/28 câu đã trả lời ⇒ vòng nút kiểm tra tô 3/5 đoạn
+  ...(MT_KT === 'xong' ? { trangThai: 'da_nop', daTra: 28, con: 0, diem: 8.5, nopLuc: now - 60_000 } : MT_KT === 'lam' ? { soChang: 5, daTra: 18, con: 10, changChot: 3 } : MT_KT === 'khoa' ? {}
     : { ngay: new Date(mtMo + 86400_000 + 7 * 3600_000).toISOString().slice(0, 10), moLuc: mtMo + 86400_000, hanLuc: mtMo + 2 * 86400_000, trangThai: 'sap_den', homNay: false }) }
 const mtLam = MT_TT === 'du' ? 30 : 12
 const SANH_MT = { ...SANH_MOI, chienDich: { id: 'cd1', ten: 'Ester – Lipid' }, hanhTrinh: { ...SANH_MOI.hanhTrinh, tang: 2, toiThieu: 30, daLam: mtLam, daXep: 30, soChang: 5, changHienTai: MT_TT === 'du' ? 5 : 3 },
