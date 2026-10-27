@@ -2,7 +2,7 @@
 // Không bao giờ đọc đáp án / lời giải; không tính hộ số của đề (chỉ đọc lại số đề cho, và M do máy tính từ công thức).
 // THẦY 27/10 («Soát kĩ quá vô nghĩa», trước đó «giải thích ngu»): thẻ nào không cho em thêm kiến thức CỤ THỂ so với chính câu đề thì BỎ
 // (trả null ⇒ chữ không tô, không chạm được). Không còn lời khuyên chung «đọc kĩ», «tự hỏi có đúng ý đề không», «gạch phương án», «đó là điều đề hỏi».
-// Thẻ hiện kiểu Duolingo: dòng đầu đậm = `ten`, dưới là `doan` (1–2 dòng), `tenPhu` (nếu có) là một dòng nhỏ mờ.
+// Thẻ hiện kiểu Duolingo: dòng đầu đậm = `ten`, dưới là `doan` (1–2 dòng).
 import type { TheGiaiNghia, VungCham } from './kieu'
 import { cachTinhM, chuanCongThuc, dangDep, soViet, tachDienTich, tinhM, traCongThuc, traTen, type BangNtk, type Chat } from './tu-dien-chat'
 import { theDonVi } from './tu-dien-don-vi'
@@ -15,7 +15,6 @@ export type TheGiaiNghiaDu = TheGiaiNghia & {
   congThucChat?: string // công thức đẹp (chỉ số dưới Unicode)
   tenIupac?: string // tên IUPAC theo SGK 2018
   ungVien?: string[] // công thức ứng với nhiều chất (C6H12O6: glucose, fructose)
-  tenPhu?: string // dòng nhỏ: «tên khác: ethanamine · tên cũ: etylamin»
 }
 
 /** «natri hiđroxit (xút ăn da)»: bỏ tên ngắn đã nằm trong tên dài hơn («xút» trong «xút ăn da»). */
@@ -30,80 +29,47 @@ function dongM(ct: string, ntk?: BangNtk): { M?: number; cach?: string } {
   return M === null ? {} : { M, cach: cach ?? undefined }
 }
 
-// Bậc + tính chất then chốt của các amine trong từ điển (SGK Hoá 12, GDPT 2018).
-const BAC_AMIN: Record<string, string> = { CH3NH2: 'I', C2H5NH2: 'I', '(CH3)2NH': 'II', '(CH3)3N': 'III', C3H7NH2: 'I', C6H5NH2: 'I' }
-const TINH_AMIN: Record<string, string> = { C6H5NH2: 'tính base rất yếu, không làm quỳ tím đổi màu' }
-const TINH_AMIN_BEO = 'dung dịch làm quỳ tím hoá xanh'
-
-/**
- * Dòng «loại · bậc · tính chất». KHÔNG LỘ ĐÁP ÁN: đề đang hỏi chính điều đó (bậc mấy, thuộc loại nào, quỳ tím / lực base) thì bỏ phần ấy.
- */
-function dongLoai(c: Chat, chuDe: string): string {
-  const lc = chuDe.toLowerCase()
-  const anLoai = /thuộc loại|loại (hợp )?chất|thuộc (dãy|nhóm)/.test(lc)
-  const anBac = /bậc/.test(lc)
-  const anTinh = /quỳ|base|bazơ|màu|lực/.test(lc)
-  const ct = c.congThuc ? chuanCongThuc(c.congThuc) : ''
-  const bac = BAC_AMIN[ct]
-  const phan: string[] = []
-  if (!anLoai) phan.push(bac && !anBac ? `${c.loai} bậc ${bac}` : c.loai)
-  if (bac && !anTinh) phan.push(TINH_AMIN[ct] ?? TINH_AMIN_BEO)
-  return phan.join(' · ')
-}
-
-function tenPhuCua(c: Chat, boQua: string): string | undefined {
-  const khac = c.tenKhac.filter((t) => t.toLowerCase() !== boQua.toLowerCase() && t.length > 3)
-  const cu = noiTenCu(c.tenCu.filter((t) => t.toLowerCase() !== c.ten.toLowerCase()))
-  const phan = [khac.length ? `tên khác: ${khac.join(', ')}` : '', cu ? `tên cũ: ${cu}` : ''].filter(Boolean)
-  return phan.length ? phan.join(' · ') : undefined
-}
-
-/** Dòng «công thức · M = … g/mol» (polymer: M một mắt xích). */
-function dongCongThuc(c: Chat, ntk: BangNtk | undefined, the: TheGiaiNghiaDu): string {
-  const dep = dangDep(c.congThuc)
-  the.congThucChat = dep
-  const { M, cach } = dongM(c.congThuc, ntk)
-  if (M === undefined) return dep
+/** Dòng «M = … g/mol» (polymer: M một mắt xích); ghi M + cách tính vào thẻ. */
+function dongM2(ct: string, ntk: BangNtk | undefined, the: TheGiaiNghiaDu): string | null {
+  const { M, cach } = dongM(ct, ntk)
+  if (M === undefined) return null
   the.M = M
   if (cach) the.cachTinhM = cach
-  return `${dep} · ${/\)n$/.test(c.congThuc) ? 'M một mắt xích' : 'M'} = ${soViet(M)} g/mol`
+  return `${/\)n$/.test(chuanCongThuc(ct)) ? 'M một mắt xích' : 'M'} = ${soViet(M)} g/mol`
 }
 
-/** Thẻ của MỘT chất (mở từ tên hoặc từ công thức): tên IUPAC · [công thức · M] · [loại · bậc · tính chất] · tên khác / tên cũ. */
-function theChat(c: Chat, ntk: BangNtk | undefined, chuDe: string, nhan: TheGiaiNghia['nhan']): TheGiaiNghiaDu {
+/**
+ * Thẻ của MỘT chất (mở từ tên hoặc từ công thức). Thầy 27/10: «Hiện tên, công thức, M thôi, bỏ tính chất» + «Bỏ cái dòng tên cũ anilin đi»
+ * ⇒ đúng 3 dòng: tên theo chương trình GDPT 2018 · công thức · M. Không loại, bậc, tính chất, tên cũ (từ điển vẫn nhận tên cũ để DÒ chất trong đề).
+ */
+function theChat(c: Chat, ntk: BangNtk | undefined, nhan: TheGiaiNghia['nhan']): TheGiaiNghiaDu {
   const the: TheGiaiNghiaDu = { ten: c.ten, nhan, doan: [], loai: c.loai, tenIupac: c.ten }
   const cu = noiTenCu(c.tenCu.filter((t) => t.toLowerCase() !== c.ten.toLowerCase()))
-  if (cu) the.tenCu = cu
-  const phu = tenPhuCua(c, c.ten)
-  if (phu) the.tenPhu = phu
-  the.doan.push(c.congThuc ? dongCongThuc(c, ntk, the) : `${c.loai} mạch rất dài, không có công thức ngắn`)
-  const loai = dongLoai(c, chuDe)
-  if (loai && c.congThuc) the.doan.push(loai)
+  if (cu) the.tenCu = cu // chỉ là dữ liệu, KHÔNG hiện
+  if (!c.congThuc) { the.doan.push('Mạch rất dài, không có công thức ngắn'); return the }
+  the.congThucChat = dangDep(c.congThuc)
+  the.doan.push(the.congThucChat)
+  const m = dongM2(c.congThuc, ntk, the)
+  if (m) the.doan.push(m)
   return the
 }
 
 /** Thẻ khi chạm CÔNG THỨC (NaOH, SO₄²⁻, C₆H₁₂O₆…). */
-function theTheoCongThuc(khoa: string, ntk: BangNtk | undefined, chuDe: string): TheGiaiNghiaDu | null {
+function theTheoCongThuc(khoa: string, ntk: BangNtk | undefined): TheGiaiNghiaDu | null {
   const k = chuanCongThuc(khoa)
   const ds = traCongThuc(k)
-  if (ds.length === 1) return theChat(ds[0], ntk, chuDe, 'Công thức')
+  if (ds.length === 1) return theChat(ds[0], ntk, 'Công thức')
   const { goc, dienTich } = tachDienTich(k)
   const dep = dangDep(dienTich ? `${goc} ${dienTich}` : goc)
-  const { M, cach } = dongM(k, ntk)
-  if (M === undefined && !ds.length) return null
   const the: TheGiaiNghiaDu = { ten: dep, nhan: 'Công thức', doan: [], congThucChat: dep }
-  if (M !== undefined) {
-    the.M = M
-    if (cach) the.cachTinhM = cach
-    the.doan.push(`${/\)n$/.test(goc) ? 'M một mắt xích' : 'M'} = ${soViet(M)} g/mol`)
-  }
   if (ds.length > 1) {
     the.ungVien = ds.map((c) => c.ten)
-    const cung = ds.every((c) => c.loai === ds[0].loai)
-    if (cung) the.loai = ds[0].loai
-    the.doan.push(`Có thể là ${the.ungVien.join(' hoặc ')}${cung ? ` (${ds[0].loai})` : ''}`)
-  } else if (cach) the.doan.push(cach) // công thức hợp lệ, chưa có tên trong từ điển: chỉ M + cách tính
-  return the
+    if (ds.every((c) => c.loai === ds[0].loai)) the.loai = ds[0].loai
+    the.doan.push(`Có thể là ${the.ungVien.join(' hoặc ')}`)
+  }
+  const m = dongM2(k, ntk, the)
+  if (m) the.doan.push(m)
+  return the.doan.length ? the : null
 }
 
 // ───────────── Đề hỏi ─────────────
@@ -208,7 +174,7 @@ function theDeHoi(v: VungCham, chuDe: string): TheGiaiNghiaDu | null {
 /**
  * Thẻ giải nghĩa cho một vùng chạm. Không có thẻ có giá trị ⇒ null (giao diện không tô, không mở thẻ).
  * `ntk`: nguyên tử khối đề cho (từ `docNguyenTuKhoiTrongDe(chuDe).bang`), có thì M tính theo số của đề.
- * `chuDe`: cả chữ đề — biến «m» gắn với chất nào, khí đo ở đkc hay đktc, và để không lộ đáp án (đề hỏi bậc / loại / quỳ tím).
+ * `chuDe`: cả chữ đề — biến «m» gắn với chất nào, khí đo ở đkc hay đktc.
  */
 export function theCho(vung: VungCham, ntk?: BangNtk, chuDe = ''): TheGiaiNghiaDu | null {
   switch (vung.loai) {
@@ -217,8 +183,8 @@ export function theCho(vung: VungCham, ntk?: BangNtk, chuDe = ''): TheGiaiNghiaD
     case 'hoi': return theDeHoi(vung, chuDe)
     case 'chat': {
       const theoTen = traTen(vung.chu)
-      if (theoTen) return theChat(theoTen, ntk, chuDe, 'Chất')
-      return theTheoCongThuc(vung.khoa ?? vung.chu, ntk, chuDe)
+      if (theoTen) return theChat(theoTen, ntk, 'Chất')
+      return theTheoCongThuc(vung.khoa ?? vung.chu, ntk)
     }
   }
 }

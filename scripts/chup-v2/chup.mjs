@@ -283,11 +283,13 @@ const DS_DUO = [[390, 844, 'doc'], [390, 700, 'doc700'], [360, 640, 'doc640'], [
 // ═══ hết DUO 26/10
 // ═══ THẺ CHẠM 27/10 (thầy: «làm lại khung hiển thị cho tinh tế popup đẹp mắt dolingo»): thẻ nhỏ neo dưới chữ tô tím trên màn làm chặng THẬT
 // (`lam13&lam=duo&cham=…`, gia/lam-bai-1210d.ts) — mở trên chất / đơn vị / phủ định; 390×844 · 360×640 · 844×390 · 1440×900, sáng + tối.
-// `vd` = câu ethylamine trong ảnh thầy (không còn ô tô «dịch chất nào sau đây»). Thao tác `cham:<chữ>` = chạm chữ đó rồi chờ thẻ. Tiền tố "duo-cham-".
+// `vd` = câu ethylamine trong ảnh thầy (không còn tô «dịch chất nào sau đây»; chạm «Ethylamine» ⇒ tên · công thức · M). Thao tác `cham:<chữ>` = chạm chữ đó rồi chờ thẻ. Tiền tố "duo-cham-".
 const CHAM_CANH = [['chat', /aniline/, 'cham:aniline'], ['don-vi', /ethyl acetate/, 'cham:1,5 M'], ['phu-dinh', /không đúng/, 'cham:không đúng']]
 const DS_CHAM = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   CHAM_CANH.map(([t, cho, viec]) => [`duo-cham-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, `lam13&lam=duo&cham=${t}`, w, hh, nen, false, cho, viec])))
-DS_CHAM.push(['duo-cham-vd-doc', 'lam13&lam=duo&cham=vd', 390, 844, 'light', false, /Ethylamine thể hiện/, 'cham-khong:'])
+// thầy 27/10 («Hiện tên, công thức, M thôi»): câu lý thuyết cũng chạm được tên chất ⇒ ảnh câu ví dụ mở thẻ «Ethylamine»
+DS_CHAM.push(...[[390, 844, 'doc'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].map((nen) =>
+  [`duo-cham-vd-${k}${nen === 'dark' ? '-toi' : ''}`, 'lam13&lam=duo&cham=vd', w, hh, nen, false, /Ethylamine thể hiện/, 'cham:Ethylamine'])))
 // ═══ hết THẺ CHẠM 27/10
 // ═══ GIỮ CHÂN 27/10 (ảnh Duolingo «Đừng đi mà…»): tấm giữ chân khi bấm X giữa chặng + băng nhắc + lời động viên. `&giu=1` ⇒ bản tổng quan thưởng ở máy
 // (chuỗi 12 ngày, hôm nay chưa đạt, mục tiêu 3/4) và hôm nay mới làm 2 câu (trang.tsx / gia/lam-bai-1210d.ts). Tiền tố "duo-giu-".

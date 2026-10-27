@@ -1,7 +1,7 @@
 // THẺ GIẢI NGHĨA khi chạm một chữ tô tím — kiểu DUOLINGO (thầy 27/10: «làm lại khung hiển thị cho tinh tế popup đẹp mắt dolingo»).
 // Mọi khổ (điện thoại dọc, xoay ngang, máy tính) cùng MỘT kiểu: thẻ nhỏ neo ngay dưới chữ (hết chỗ dưới ⇒ lật lên trên), mũi nhọn chỉ vào chữ,
 // rộng tối đa 300px, không vượt mép màn (lề 12px). Không tấm đáy, không nền xám che màn, không cột phải, không nút «Đã hiểu».
-// Dòng đầu đậm (tên / ý chính) · 1–2 dòng chi tiết · (chất) một dòng nhỏ tên khác / tên cũ.
+// Dòng đầu đậm (tên / ý chính) · 1–2 dòng chi tiết (chất: công thức · M).
 // Đóng: chạm ra ngoài, chạm chữ khác, cuộn làm chữ trôi đi, Esc (nơi gọi lo), Tab ra khỏi thẻ. Gắn vào <body> (không bị khung cuộn của màn cắt);
 // phông lấy đúng phông của chữ neo.
 import { useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react'
@@ -54,7 +54,7 @@ function khungNeo(manh: HTMLElement[]): DOMRect | null {
 type ViTri = { top: number; left: number; mui: number; tren: boolean }
 
 export default function TamGiaiThich({ the, neo, id, onDong, onVao, onRoi }: {
-  the: TheGiaiNghia & { tenPhu?: string }
+  the: TheGiaiNghia
   /** các mảnh chữ của vùng đang mở (mảnh đầu là chữ nhận Tab) */
   neo: HTMLElement[]
   id: string
@@ -106,7 +106,6 @@ export default function TamGiaiThich({ the, neo, id, onDong, onVao, onRoi }: {
       <span className="gyc-bong-mui" aria-hidden="true" />
       <p className="gyc-b-ten" id={idTen}><ChemText text={the.ten} /></p>
       {the.doan.slice(0, 2).map((d, i) => <p key={i} className="gyc-b-doan"><CongThuc chu={d} /></p>)}
-      {the.tenPhu && <p className="gyc-b-nho">{the.tenPhu}</p>}
     </div>,
     document.body,
   )

@@ -4,6 +4,11 @@ Kênh: Code app 1 nhắn Code app 3 bằng send_message. Chiều ngược lại 
 
 ## Phản hồi
 
+### 27/10 đêm (2) · Claude — thẻ chất chỉ còn tên · công thức · M
+Lời thầy: «Hiện tên, công thức, M thôi, bỏ tính chất» + «Bỏ cái dòng tên cũ anilin đi».
+- Mọi thẻ chất: đúng 3 dòng (tên theo GDPT 2018 · công thức · M). Bỏ loại, bậc, tính chất, tên cũ / tên khác (từ điển vẫn nhận tên cũ để dò chất trong đề).
+- Câu lý thuyết nay tô cả tên chất. Đề hỏi chính tên / công thức / phân tử khối ⇒ không tô chất (tránh lộ đáp án). `locLyThuyet(ds, chuDe)` nhận thêm chữ đề.
+
 ### 27/10 đêm · Claude (giúp Boss, làn goi-y-cham) — thẻ kiểu Duolingo + rà nội dung
 Lời thầy: «Soát kĩ quá vô nghĩa, làm lại khung hiển thị cho tinh tế popup đẹp mắt dolingo» (ảnh câu ethylamine: tô «dịch chất nào sau đây», tấm đáy che nửa màn «Đề hỏi chọn một phương án… Đã hiểu»).
 - **Khung:** `TamGiaiThich` bỏ tấm đáy / nền xám / cột phải / nút «Đã hiểu». Mọi khổ: thẻ nhỏ neo dưới chữ (hết chỗ ⇒ trên), mũi nhọn, rộng ≤ 300px, lề 12px, phóng .9→1 trong 120ms, rung `chon`. Đóng: chạm ngoài / chữ khác / cuộn / Esc (bắt ở pha capture, không lọt xuống màn) / Tab. Giữ export `giuCotPhai` (cột phải chỉ còn cho «Gợi ý 3 tầng»); `useKieuTam` ⇒ `useCoRe`.
