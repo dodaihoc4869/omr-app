@@ -4126,6 +4126,16 @@ export default {
     // THỬ TẢI (chỉ Worker sao có VET=1): vết D1 từng yêu cầu ⇒ đầu `x-vet`.
     const vet = (env as unknown as { VET?: string }).VET === '1' && req.headers.get('x-vet') ? (await import('./vet-d1')).taoVet(env) : null
     if (vet) env = vet.env
+    // THỬ TẢI (chỉ Worker sao VET=1): chụp hồ sơ OMNI như cron đêm cho một lô em (D1 sao giống bản thật sau đêm chụp) — cần mã bí mật sao.
+    if ((env as unknown as { VET?: string }).VET === '1' && new URL(req.url).pathname === '/thu-tai/chup' && req.method === 'POST' && req.headers.get('x-ma-bi-mat') === env.MA_BI_MAT) {
+      const b = await req.json().catch(() => ({})) as { sau?: string; n?: number }
+      const r = await env.DB.prepare('SELECT sbd FROM hoc_sinh WHERE sbd > ? ORDER BY sbd LIMIT ?').bind(String(b.sau ?? ''), Math.min(40, Number(b.n) || 15)).all<{ sbd: string }>()
+      const ds = (r.results ?? []).map((x) => String(x.sbd))
+      const om = await import('./omni-d1'), sr = await import('./srs2-d1')
+      await om.damBaoBangOmni(env)
+      const so = ds.length ? await om.chupHoSoTho(env, ds, sr.ngayVnCua(Date.now()), await om.docThamSoOmni(env)) : 0
+      return new Response(JSON.stringify({ ok: true, so, cuoi: ds[ds.length - 1] ?? null }), { headers: { 'content-type': 'application/json' } })
+    }
     // ỔN ĐỊNH (28/09): ~40 nhánh định tuyến `return handler(...)` KHÔNG await ⇒ Promise bị từ chối thoát khỏi try/catch của định tuyến (và các nhánh GET
     // nằm ngoài try) ⇒ Cloudflare trả 1101 thiếu CORS, máy em tưởng mất mạng. `await` + `catch` Ở ĐÂY bắt MỌI lỗi (đồng bộ lẫn bất đồng bộ) một chỗ duy nhất.
     try { res = await boXuLy.fetch(req, env, ctx) } catch (e) { console.error('[may-chu] lỗi chưa bắt:', tenLenh(new URL(req.url).pathname), e); res = raLoi(e) } finally { if (req.method !== 'OPTIONS') ghiDoLenh(tenLenh(new URL(req.url).pathname), Date.now() - t0) }

@@ -26,6 +26,20 @@ const token = (sbd) => { const p = Buffer.from(JSON.stringify({ sbd, exp: Date.n
 const ngu = (ms) => new Promise((r) => setTimeout(r, ms))
 const ng = (a, b) => a + Math.random() * (b - a)
 
+// DỰNG SẴN (lệnh `dung-san` trong lenh.txt, chỉ lượt đo chính): D1 sao về trạng thái như bản thật trước giờ học — chụp hồ sơ OMNI đêm cho mọi em
+// (route sao `/thu-tai/chup`), rồi mỗi em mở Sảnh một lần (6 em song song) ⇒ bản sẵn, điểm gọn, prior lớp, bản chụp kho có đủ. Không tính vào số đo.
+if (SO_EM > 10 && /^dung-san\b/m.test(fs.readFileSync(new URL('./lenh.txt', import.meta.url), 'utf8'))) {
+  const t0 = Date.now()
+  let sau = '', so = 0
+  for (let i = 0; i < 60; i++) {
+    try { const r = await fetch(GOC + '/thu-tai/chup', { method: 'POST', headers: { 'content-type': 'application/json', 'x-ma-bi-mat': SEED }, body: JSON.stringify({ sau, n: 12 }) }); const j = await r.json(); if (!j.ok || !j.cuoi) break; so += j.so; sau = j.cuoi } catch (e) { console.log('  chụp lỗi:', String(e?.message).slice(0, 80)); break }
+  }
+  console.log(`Dựng sẵn: chụp hồ sơ ${so} em · ${Math.round((Date.now() - t0) / 1000)} s`)
+  const hang = [...dsEm]
+  await Promise.all(Array.from({ length: 6 }, async () => { for (let sbd = hang.shift(); sbd; sbd = hang.shift()) { try { const r = await fetch(GOC + '/game-v2/hoc-tap-sanh', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token: token(sbd) }) }); await r.text() } catch { /* bỏ */ } } }))
+  console.log(`Dựng sẵn: Sảnh ${dsEm.length} em · ${Math.round((Date.now() - t0) / 1000)} s`)
+  await ngu(45_000)
+}
 // HÂM MÁY (Smart Placement): Worker mới chạy ở trạm gần runner (Mỹ), D1 ở APAC ⇒ mỗi truy vấn ~200 ms. Bản thật đã được Cloudflare dời về sát D1.
 // Bắn nhẹ (30 em, Sảnh 3 s/lần) tới khi ≥ 90% phản hồi 60 s gần nhất có `cf-placement: remote-*`, tối đa AM_PHUT phút. Không tính vào số đo.
 {
