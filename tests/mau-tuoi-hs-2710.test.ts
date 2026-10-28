@@ -46,10 +46,10 @@ describe('màu tươi app học sinh 27/10', () => {
     expect(mau).toContain("[data-trong='hs'] { --tr-chinh-day: var(--tr-hs-day); }")
   })
 
-  it('linh vật Bi: viền cùng tông (không đen), dung dịch phẳng, Bi chuyển động khai lại tông ở svg', () => {
+  it('linh vật Bi chuyển động (mảnh cũ) khai tông ở svg; 28/10: CSS vẽ hình Bi bình cầu trong bi.css đã gỡ (Cú Ngọc thay hình)', () => {
     const bi = doc('bi.css'), bd = doc('bi-dong.css')
-    expect(bi).toContain("[data-trong='hs'] .bi .bi-net { stroke: var(--bi-net-mau); }")
-    expect(bi).toContain("[data-trong='hs'] .bi :is(.bi-g-sang, .bi-g-chinh, .bi-g-dam) { stop-color: var(--bi-c); }")
+    expect(bi).not.toContain('.bi .bi-net {')
+    expect(bi).toContain("[data-trong='hs'] .bi-loi {")
     expect(bd).toMatch(/\.bi-dong svg \{\s*--bi-net-mau: color-mix\(in oklab, var\(--bi-c\)/)
   })
 })
