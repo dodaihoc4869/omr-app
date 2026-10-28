@@ -3,7 +3,7 @@
 // trạng thái chờ (data-cho + aria-busy, chữ «Đang kiểm tra…», khoá bấm đúp — chỉ MỘT lệnh `answer`), CHƯA hiện đúng/sai tới khi máy chủ chấm; có kết quả ⇒ tải
 // sẵn ảnh đề / phương án của câu kế (không gồm ảnh lời giải).
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import ManLamBaiTap from '../src/components/hoc-tap/ManLamBaiTap'
 import { goiHoa2 } from '../src/components/hoa2/api'
 
@@ -29,13 +29,16 @@ it('bấm «Kiểm tra» ⇒ nút chờ ngay (data-cho, aria-busy, khoá bấm �
   vi.mocked(goiHoa2).mockImplementation((lenh) => lenh === 'answer' ? new Promise((ok) => { tra = ok }) : Promise.resolve({ ok: true }))
   fireEvent.click(screen.getByRole('radio', { name: /^D/ }))
   fireEvent.click(screen.getByRole('button', { name: 'Kiểm tra' }))
-  const nut = await screen.findByRole('button', { name: 'Đang kiểm tra…' }) as HTMLButtonElement
+  // SỬA CÓ CHỦ Ý 28/10 (thầy «Ẩn cái chữ đang chấm»): nút chờ giữ chữ «Kiểm tra» (data-cho + aria-busy), không còn «Đang kiểm tra…».
+  const nut = await waitFor(() => { const b = document.querySelector<HTMLButtonElement>('.duo-ket .duo-nut[data-cho]'); expect(b).toBeTruthy(); return b! })
+  expect(nut.textContent).toBe('Kiểm tra')
+  expect(nut.getAttribute('aria-busy')).toBe('true')
   expect(nut.disabled).toBe(true)
-  // CHẤM NHANH 28/10: chạm ⇒ dải kết quả trượt lên NGAY ở trạng thái trung tính «Đang chấm…» (chưa đúng/sai)
+  // CHẤM NHANH 28/10: chạm ⇒ dải kết quả trượt lên NGAY ở trạng thái trung tính (chưa đúng/sai); chữ «Đang chấm» chỉ cho trình đọc màn hình
   const dai = document.querySelector('.duo-ket')!
   expect(dai.getAttribute('data-tt')).toBe('cho')
   expect(dai.getAttribute('aria-busy')).toBe('true')
-  expect(dai.textContent).toContain('Đang chấm…')
+  expect(dai.querySelector('h2')?.className).toBe('sr-only')
   fireEvent.click(nut); fireEvent.keyDown(window, { key: 'Enter' })
   const goiNop = vi.mocked(goiHoa2).mock.calls.filter((c) => c[0] === 'answer')
   expect(goiNop).toHaveLength(1)

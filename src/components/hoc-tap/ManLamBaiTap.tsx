@@ -744,8 +744,9 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
         </div></section>
       // CHẤM NHANH (28/10): chạm «Kiểm tra» ⇒ dải kết quả trượt lên NGAY ở trạng thái trung tính «Đang chấm…»; kết quả về ⇒ CÙNG dải đổi màu đúng / sai tại chỗ.
       : cham ? <section className="duo-day duo-ket" data-tt="cho" role="status" aria-live="polite" aria-busy="true"><div className="duo-giua">
-          <div className="duo-kq"><div className="duo-kq-chu"><div className="duo-ct-dau"><h2>Đang chấm…</h2></div></div></div>
-          <div className="duo-hang-nut"><button ref={nutTiepRef} type="button" className="duo-nut" data-cho="" aria-busy="true" disabled>Đang kiểm tra…</button></div>
+          {/* thầy 28/10 «Ẩn cái chữ đang chấm»: dải vẫn trượt lên ngay (phản hồi chạm), không hiện chữ chờ — trình đọc màn hình vẫn đọc «Đang chấm» */}
+          <div className="duo-kq"><div className="duo-kq-chu"><div className="duo-ct-dau"><h2 className="sr-only">Đang chấm</h2></div></div></div>
+          <div className="duo-hang-nut"><button ref={nutTiepRef} type="button" className="duo-nut" data-cho="" aria-busy="true" disabled>Kiểm tra</button></div>
         </div></section>
       : choChonCach ? <div className="duo-day"><div className="duo-giua">
           <div className="duo-hai">

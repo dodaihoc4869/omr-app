@@ -29,7 +29,8 @@ async function mo(luu: (p: Record<string, unknown>) => Promise<unknown>, traMayC
 const tick = async (ms: number) => { await act(async () => { await vi.advanceTimersByTimeAsync(ms) }) }
 const ok = () => Promise.resolve({ ok: true, kiemTra: tomTat(), revision: 4, daLuu: true, daChot: false })
 
-it('máy chủ bận 2 lần: câu nhẹ, không hộp lỗi, tự gửi lại sau 1 rồi 2 giây; xong ⇒ «Đã lưu», nháp trên máy được dọn', async () => {
+// SỬA CÓ CHỦ Ý 28/10 (thầy «Ẩn cái chữ … đã lưu»): chữ trạng thái lưu thường (Đang lưu… / Đã lưu) không hiện nữa — chỉ lời báo cần em biết.
+it('máy chủ bận 2 lần: câu nhẹ, không hộp lỗi, tự gửi lại sau 1 rồi 2 giây; xong ⇒ lưu được (không chữ «Đã lưu»), nháp trên máy được dọn', async () => {
   let n = 0
   await mo(() => (n++ < 2 ? Promise.reject(new LoiHoa2(CHU_MAY_CHU_BAN_EM, 'MAY_CHU_BAN')) : ok()))
   fireEvent.click(screen.getByText('B.').closest('.pa-hang')!)
@@ -37,7 +38,7 @@ it('máy chủ bận 2 lần: câu nhẹ, không hộp lỗi, tự gửi lại s
   expect(soLuu()).toHaveLength(1)
   expect(screen.queryByRole('alert')).toBeNull()
   expect(screen.getByText(CHU_MAY_CHU_BAN_EM)).toBeTruthy()
-  expect(screen.getByText('Đang lưu…')).toBeTruthy()
+  expect(screen.queryByText('Đang lưu…')).toBeNull()
   expect(JSON.parse(localStorage.getItem('ktcn:nhap:S1:kt1:0')!).tra).toMatchObject({ q1: 'B' })
   await tick(999); expect(soLuu()).toHaveLength(1)
   await tick(1); expect(soLuu()).toHaveLength(2)
@@ -45,7 +46,7 @@ it('máy chủ bận 2 lần: câu nhẹ, không hộp lỗi, tự gửi lại s
   // Cùng một bản vá mỗi lượt (máy chủ vá json_patch, gửi lại không ghi đôi) + mốc em trả lời.
   for (const c of soLuu()) expect(c[2]).toMatchObject({ id: 'kt1', chang: 0, tra: { q1: 'B', q2: '' }, lucTra: { q1: now } })
   expect(screen.queryByText(CHU_MAY_CHU_BAN_EM)).toBeNull()
-  expect(screen.getByText('Đã lưu')).toBeTruthy()
+  expect(screen.queryByText('Đã lưu')).toBeNull()
   expect(localStorage.getItem('ktcn:nhap:S1:kt1:0')).toBeNull()
   await tick(60_000); expect(soLuu()).toHaveLength(3)
   expect(document.body.textContent).not.toMatch(/D1_|ERROR|export/)
@@ -60,7 +61,7 @@ it('mất mạng: có mạng lại (online) ⇒ gửi ngay, không đợi hẹn 
   await act(async () => { window.dispatchEvent(new Event('online')) })
   await tick(0)
   expect(soLuu()).toHaveLength(2)
-  expect(screen.getByText('Đã lưu')).toBeTruthy()
+  expect(screen.queryByText('Đã lưu')).toBeNull()
   await tick(5_000); expect(soLuu()).toHaveLength(2)
 })
 
