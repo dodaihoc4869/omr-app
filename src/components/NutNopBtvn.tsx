@@ -7,6 +7,7 @@
 // CHẶN QUÁ HẠN Ở MÁY CHỦ. Đồng hồ ở đây chỉ để em nhìn; giờ trên máy em chỉnh
 // được nên nó không bao giờ là cái chặn. Máy chủ từ chối thì hiện đúng câu thầy
 // chốt: "Bạn đã quá hạn nộp BTVN".
+import { chuCuaLoi } from '../lib/loi-may-chu'
 import { useEffect, useState } from 'react'
 import { NutChinh, OThongBao } from './DesignSystem'
 import KhungXemPhieu from './KhungXemPhieu'
@@ -65,7 +66,7 @@ export default function NutNopBtvn({ maCa, sbd }: { maCa: string; sbd: string })
       const { dungPhieuBtvn } = await import('../lib/btvn-cho-em')
       setHtmlPhieu(await dungPhieuBtvn(r, maCa, sbd))
     } catch (e) {
-      setLoi(e instanceof Error ? e.message : 'Không mở được bài tập')
+      setLoi(chuCuaLoi(e, 'Không mở được bài tập'))
     } finally {
       setDang(false)
     }

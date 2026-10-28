@@ -1,6 +1,7 @@
 /** THÊM PHÚT CHO CẢ PHÒNG — lệnh THẦY `POST /ca/them-phut {maCa, phut}` (mã bí mật; hợp đồng docs/hop-dong-them-phut-2109.md, Code 3).
  *  Máy chủ cộng `phut` vào `thoi_gian_phut` của ca và vào hạn `het_gio_luc` của mọi lượt CHƯA nộp (chỉ cộng, trần 30 phút mỗi ca).
  *  Hàm này KHÔNG giả thành công: máy chủ chưa có lệnh (404), mất mạng, hay từ chối đều NÉM lỗi với câu nói thật — màn thầy hiện đúng câu đó. */
+import { chuLoiAnToan } from './loi-may-chu'
 import { layCauHinhMayChu } from './may-chu-moi'
 import { loadTeacherSecret } from './exam-db'
 
@@ -49,7 +50,7 @@ export async function themPhutCa(maCa: string, phut: number = PHUT_MOI_LAN): Pro
     throw new Error('Máy chủ trả lời không đọc được — chưa chắc đã cộng giờ, hãy bấm Làm mới để xem giờ hiện tại.')
   }
   if (!res.ok || j.ok !== true) {
-    const goc = String(j.error || j.loi || 'Máy chủ không cho thêm phút.')
+    const goc = chuLoiAnToan(j.error || j.loi, 'Máy chủ không cho thêm phút.')
     // `thuLai`: có lệnh khác chen vào giữa lúc đọc và ghi — máy chủ KHÔNG đổi gì; nói rõ để thầy bấm lại được mà không lo cộng đôi.
     throw new Error(j.thuLai === true && !/bấm lại|thử lại/i.test(goc) ? `${goc} Chưa cộng gì — bấm Thêm ${phut} phút lần nữa.` : goc)
   }

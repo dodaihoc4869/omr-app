@@ -2,6 +2,7 @@
 // Danh sách: tên ca, giờ nộp, điểm/10, số câu đúng, xu hướng so với ca đã công bố liền trước; mới nhất trên cùng.
 // Ca chưa công bố: "Chờ thầy công bố", không điểm/không số câu. Bấm một ca đã công bố ⇒ BÁO CÁO CHI TIẾT bản mới
 // (`BaoCaoChiTiet` chế độ em, nạp qua `BaoCaoCaCuaEm`). Khung + bảng màu theo "Câu đã làm" (cau-da-lam.css).
+import { chuCuaLoi } from '../../lib/loi-may-chu'
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react'
 import { hsLichSuCaApi } from '../../lib/exam-api'
 import { dungLichSuCa, type DongLichSuCa } from '../../lib/lich-su-ca-hs'
@@ -51,7 +52,7 @@ export default function LichSuCaEm({ sbd, scriptUrl = '', banDau = null, onVe }:
       if (r.ok) setLs({ items: (r.items ?? []) as LichSuCuaEm['items'], chuaCongBo: r.chuaCongBo ?? [] })
       else setLoi(r.error || 'Chưa lấy được lịch sử ca kiểm tra.')
     } catch (e) {
-      setLoi(e instanceof Error ? e.message : 'Không kết nối được máy chủ.')
+      setLoi(chuCuaLoi(e, 'Không kết nối được máy chủ.'))
     } finally {
       setDangTai(false)
     }

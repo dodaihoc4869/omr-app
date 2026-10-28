@@ -9,6 +9,7 @@
 //   HỌC SINH (token của em):
 //     POST /hs/buoi-hoc {token}        → { buoi: {id, ten, lop, daDiemDanh} | null }  (KHÔNG có mã)
 //     POST /hs/diem-danh {token, ma}   → { buoi } | { ok:false, lyDo, error }
+import { chuLoiAnToan } from './loi-may-chu'
 import { goiLenh, type KetQuaLenh } from './goi-lenh-thay'
 import { layDiaChiMayChu } from './dia-chi-may-chu'
 import { layHoiSom } from './hoi-som'
@@ -190,7 +191,7 @@ export async function emDiemDanh(token: string, ma: string): Promise<{ ok: true;
   const j = await goiHs('/hs/diem-danh', { token, ma: ma.replace(/\D/g, '') })
   const b = docBuoiEm(j.buoi)
   if (j.ok === true && b) return { ok: true, buoi: b }
-  return { ok: false, chu: chu(j.error) || 'Chưa điểm danh được. Em thử lại.' }
+  return { ok: false, chu: chuLoiAnToan(chu(j.error), 'Chưa điểm danh được. Em thử lại.') }
 }
 
 

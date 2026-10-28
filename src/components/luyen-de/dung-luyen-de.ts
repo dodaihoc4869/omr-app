@@ -1,6 +1,7 @@
 // LÕI LUYỆN ĐỀ CHUẨN CẤU TRÚC (tách 30/09 từ LuyenDeChuan.tsx — KHÔNG đổi luật): gọi `/luyen-de/*`, giữ bài, lưu nháp (máy + máy chủ),
 // đồng hồ theo mốc máy chủ, tự nộp khi hết giờ. Hai giao diện dùng chung: LuyenDeChuan (tab Khắc phục cũ) và thẻ "Luyện đề cấu trúc"
 // trong Tu luyện (tu-luyen/LuyenDeCauTruc.tsx). Đáp án/lời giải CHỈ có sau nộp (máy chủ `server/src/luyen-de.ts` mới gửi `solutions`).
+import { chuLoiAnToan, chuCuaLoi } from '../../lib/loi-may-chu'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { taoKhoGio, useMocGio, type KhoGio } from '../../lib/dong-ho-thi'
 import { layCauHinhMayChu, xongNapDiaChi } from '../../lib/may-chu-moi'
@@ -36,7 +37,7 @@ export async function goiLuyenDe(action: string, token: string | undefined, data
       signal: controller.signal,
     })
     const json = await r.json()
-    if (!r.ok || !json.ok) throw new Error(json.error || 'Không kết nối được máy chủ luyện đề.')
+    if (!r.ok || !json.ok) throw new Error(chuLoiAnToan(json.error, 'Không kết nối được máy chủ luyện đề.'))
     return json
   } finally {
     clearTimeout(timeout)
@@ -95,7 +96,7 @@ export function useLuyenDe(sbd: string, token: string | undefined) {
       const r = await api('history')
       if (alive.current) setHistory((r.items || []) as LuotLuyenDe[])
     } catch (e) {
-      if (alive.current) setError(e instanceof Error ? e.message : 'Không tải được lịch sử.')
+      if (alive.current) setError(chuCuaLoi(e, 'Không tải được lịch sử.'))
     }
   }
 
@@ -126,7 +127,7 @@ export function useLuyenDe(sbd: string, token: string | undefined) {
       accept(await api(id ? 'open' : 'start', id ? { id } : { daHocXong: ready }))
       await refresh()
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Không mở được đề.')
+      setError(chuCuaLoi(e, 'Không mở được đề.'))
     } finally {
       setBusy(false)
     }
@@ -143,7 +144,7 @@ export function useLuyenDe(sbd: string, token: string | undefined) {
       setSaved('Đã nộp bài')
       await refresh()
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Chưa nộp được bài. Em thử lại.')
+      setError(chuCuaLoi(e, 'Chưa nộp được bài. Em thử lại.'))
     } finally {
       submitting.current = false
       setBusy(false)

@@ -3,6 +3,7 @@
 // (server/src/ho-so-em-hs.ts). Hình dạng trả về là ĐÚNG hợp đồng hai lệnh thầy ⇒ đọc bằng CÙNG hàm đọc (`docHoSoThaiDo`, `docLichSuLamCau`) và vẽ
 // bằng CÙNG tấm `HoSoLamCauEm` (chế độ học sinh). Không ném lỗi: trả `KetQuaLenh` với MỘT câu nói thật (như lệnh thầy).
 // Token đi trong thân lệnh (như `/hs/nhip-hoc`); không mã bí mật của thầy, không SBD (máy chủ lấy SBD từ token).
+import { chuLoiAnToan } from './loi-may-chu'
 import { layDiaChiMayChu } from './dia-chi-may-chu'
 import type { KetQuaLenh } from './goi-lenh-thay'
 import { docHoSoThaiDo, type KetQuaHoSoThaiDo } from './bai-hang-ngay-api'
@@ -44,7 +45,7 @@ export async function goiLenhEm(duong: string, body: Record<string, unknown>): P
   } catch {
     return thoat('khong_doc_duoc', 'Máy chủ trả lời không đọc được.')
   }
-  if (!res.ok || j.ok !== true) return thoat('tu_choi', String(j.error || 'Máy chủ chưa trả hồ sơ — em thử lại sau ít phút.'))
+  if (!res.ok || j.ok !== true) return thoat('tu_choi', chuLoiAnToan(j.error, 'Máy chủ chưa trả hồ sơ — em thử lại sau ít phút.'))
   return { ok: true, du: j }
 }
 

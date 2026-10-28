@@ -7,6 +7,7 @@
 // TỆP .pdf thật đúng bản vẽ HS-PDF → tải về `cau-da-lam-<bộ-lọc>-<ngày>.pdf`. Máy yếu không dựng được thì còn nút "Mở bản in" (đường cũ).
 // Bản NGANG (docs/ban-ve-ngang-2809/Ngang-CauDaLam): cột trái bộ lọc + danh sách gọn, cột phải chi tiết câu đang chọn (cùng khối
 // TheCau xem_lai), Tải PDF lên hàng trên. Điểm ngắt: bo-cuc-ngang.ts. Điện thoại dọc giữ nguyên.
+import { chuCuaLoi } from '../../lib/loi-may-chu'
 import ChuTheLoc, { tenTheLoc } from '../ChuTheLoc'
 import { startTransition, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import TheCau from '../TheCau'
@@ -154,7 +155,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
         setCapNhat(Date.now())
       })
       .catch((e: unknown) => {
-        if (!huy) setLoi(e instanceof Error ? e.message : 'Chưa tải được danh sách câu.')
+        if (!huy) setLoi(chuCuaLoi(e, 'Chưa tải được danh sách câu.'))
       })
       .finally(() => {
         if (!huy) setDangTai(false)
@@ -213,7 +214,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
           })))
         })
         .catch((e: unknown) => {
-          const loiChu = e instanceof Error ? e.message : 'Chưa tải được lời giải.'
+          const loiChu = chuCuaLoi(e, 'Chưa tải được lời giải.')
           qids.forEach((q) => daXin.current.delete(q))
           setChiTiet((x) => ({ ...x, ...Object.fromEntries(qids.map((q) => [q, { loi: loiChu } as TrangThaiChiTiet])) }))
         })
@@ -277,7 +278,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
       const thieu = ds.length - cauIn.length
       setPdf({ ...PDF_TRONG, xong: `Đã tải tệp ${ten} (${cauIn.length} câu).${thieu > 0 ? ` Có ${thieu} câu máy chủ chưa trả được nên chưa có trong tệp.` : ''}` })
     } catch (e) {
-      const chu = e instanceof Error ? e.message : ''
+      const chu = chuCuaLoi(e, '')
       setPdf({
         ...PDF_TRONG,
         loi: buoc === 'dung' ? `Máy chưa dựng được tệp PDF${chu ? ` (${chu})` : ''}. Em bấm "Mở bản in" để lưu PDF bằng hộp In.` : chu || 'Chưa lấy được câu. Em thử lại.',
@@ -322,7 +323,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
       setPhieu(themInTuDong(html))
       setPdf(PDF_TRONG)
     } catch (e) {
-      setPdf({ ...PDF_TRONG, loi: e instanceof Error ? e.message : 'Chưa dựng được bản in. Em thử lại.', duPhong: true })
+      setPdf({ ...PDF_TRONG, loi: chuCuaLoi(e, 'Chưa dựng được bản in. Em thử lại.'), duPhong: true })
     }
   }
 

@@ -10,6 +10,7 @@
 // mã câu (mục 2.1). Chưa có bản đề CÓ đáp án trên máy này thì KHÔNG dựng được
 // trang tổng hợp — nói thẳng thế, không dựng trang thiếu lời giải rồi để thầy
 // tưởng kho đề hỏng.
+import { chuCuaLoi } from '../lib/loi-may-chu'
 import { useEffect, useMemo, useState } from 'react'
 import { Check, Loader2, MessageCircleQuestion } from 'lucide-react'
 import type { TeacherExamSource } from '../data/examContent'
@@ -58,7 +59,7 @@ export default function KhoiCauHoiEm({ scriptUrl, secret, maCa, tenCa, lop, bank
     try {
       setDong(await danhSachCauHoi(scriptUrl, secret, maCa))
     } catch (e) {
-      setLoi(e instanceof Error ? e.message : 'Không lấy được câu hỏi')
+      setLoi(chuCuaLoi(e, 'Không lấy được câu hỏi'))
     } finally {
       setDangTai(false)
     }
@@ -87,7 +88,7 @@ export default function KhoiCauHoiEm({ scriptUrl, secret, maCa, tenCa, lop, bank
       setDong((cu) => (cu ? cu.map((d) => (!sbd || d.sbd === sbd ? { ...d, daChua: true } : d)) : cu))
       showToast(sbd ? 'Đã đánh dấu chữa xong cho em này' : 'Đã đánh dấu chữa xong cả ca', 'success')
     } catch (e) {
-      showToast(e instanceof Error ? e.message : 'Không đánh dấu được', 'error')
+      showToast(chuCuaLoi(e, 'Không đánh dấu được'), 'error')
     } finally {
       setDangChua('')
     }

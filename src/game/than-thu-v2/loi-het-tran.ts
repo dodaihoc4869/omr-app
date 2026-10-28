@@ -1,3 +1,4 @@
+import { chuLoiAnToan } from '../../lib/loi-may-chu'
 // Máy chủ từ chối `answer` GIỮA lượt vì em đã chạm TRẦN CÂU game trong ngày (Đảo 36 / Đoàn 60 — tách riêng, thầy lệnh 19:30): lời "Em đã hoàn thành 36 câu hôm nay".
 // Thầy 20:28: em chơi Đảo "không nộp được bài" — lời lỗi chỉ hiện ở ĐẦU màn, em đang ở cuối màn bấm nộp không thấy gì. Màn nay hiện lỗi NGAY TRÊN nút nộp và, khi đúng là hết trần,
 // thay nút nộp bằng thẻ rõ ràng + "Về đảo" (nút nộp bấm mãi cũng vô ích). Code 3 sẽ thêm mã `het_tran`; trước đó nhận theo LỜI ("N câu … hôm nay"). THUẦN.
@@ -21,7 +22,8 @@ export function maCuaLoi(e: unknown): string {
 /** Lời lỗi máy chủ trong phản hồi `ok:false`: đọc `error` (lệnh game-v2 cũ) rồi `loi` (lệnh Game Hóa 2.0, ví dụ `hoa2-ruong-mo` chưa đủ); không có ⇒ ''. THUẦN. */
 export function loiCuaKetQua(r: unknown): string {
   const o = (r ?? {}) as { error?: unknown; loi?: unknown }
-  for (const v of [o.error, o.loi]) if (typeof v === 'string' && v.trim()) return v
+  // 28/10: chữ kỹ thuật (D1/JS tiếng Anh) không tới màn em ⇒ câu Việt chung.
+  for (const v of [o.error, o.loi]) if (typeof v === 'string' && v.trim()) return chuLoiAnToan(v)
   return ''
 }
 

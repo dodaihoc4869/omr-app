@@ -1,4 +1,5 @@
 // Chỉ nạp khi em hỏi thêm; giữ nguyên yêu cầu đang làm và câu trả lời có cấu trúc.
+import { chuLoiAnToan } from './loi-may-chu'
 import { layDiaChiMayChu } from './dia-chi-may-chu'
 import { docTokenHs, goiHs, type CauNen, type KetQuaCauKiem, type ThangGo, type SuKienKhung, type KetQuaNopNen, type MucCong, type CauChoKhung, type HoSoLoiGiai, type KiemKhung, type LoiGiaiChu, type KetQuaHoiThay, type KetQuaHoiThem } from './loi-giai-api'
 
@@ -7,7 +8,7 @@ export async function hoiThay(qid: string, nguon: string, chiHoi = false, luotId
   if (!token) return { ok: false, loi: 'Em đăng nhập lại để hỏi thầy.' }
   const j = await goiHs('/hs/hoi-thay', { token, qid, nguon, ...(chiHoi ? { chiHoi: true } : {}), ...(luotId ? { luotId } : {}), ...(emVaCau ? { emVaCau: true } : {}) })
   if (!j) return { ok: false, loi: 'Chưa nối được máy chủ. Em thử lại sau.' }
-  if (j.ok !== true) return { ok: false, loi: String(j.error ?? 'Chưa mở được lời giải.'), khoa: j.khoa as 'dang_kiem_tra' | 'ca_chua_cong_bo' | undefined }
+  if (j.ok !== true) return { ok: false, loi: chuLoiAnToan(j.error, 'Chưa mở được lời giải.'), khoa: j.khoa as 'dang_kiem_tra' | 'ca_chua_cong_bo' | undefined }
   const hoiThem = j.hoiThem === true
   // Thô: chỉ hộp Hỏi Thầy (TheEmVaCau ⇒ docEmVaCau) đọc khuôn ⇒ em-va-cau.ts nằm trọn trong mảnh của hộp, không tách thêm tệp precache.
   const em = emVaCau ? { emVaCau: j.emVaCau ?? null } : {}
@@ -28,7 +29,7 @@ export async function hoiThemThay(qid: string, nguon: string, cauHoi: string, da
     const j = (await r.json()) as Record<string, unknown>
     const conLai = typeof j.conLai === 'number' ? j.conLai : undefined
     if (j.ok === true) return { ok: true, traLoi: String(j.traLoi ?? ''), cauTruc: j.cauTruc, conLai: conLai ?? 0, ngoaiPhamVi: j.ngoaiPhamVi === true }
-    return { ok: false, ma: String(j.ma ?? 'loi'), loi: String(j.error ?? 'Thầy chưa trả lời được. Em thử lại sau.'), ...(conLai !== undefined ? { conLai } : {}) }
+    return { ok: false, ma: String(j.ma ?? 'loi'), loi: chuLoiAnToan(j.error, 'Thầy chưa trả lời được. Em thử lại sau.'), ...(conLai !== undefined ? { conLai } : {}) }
   } catch {
     return { ok: false, ma: dk.signal.aborted ? 'cham' : 'mang', loi: dk.signal.aborted ? 'Thầy trả lời chưa kịp. Em gửi lại câu hỏi nhé.' : 'Chưa nối được máy chủ. Em thử lại sau.' }
   } finally {
@@ -42,7 +43,7 @@ export async function guiCauKiem(qid: string, buoc: number, traLoi: string, giay
   if (!token) return { ok: false, loi: 'Em đăng nhập lại để trả lời.' }
   const j = await goiHs('/hs/cau-kiem', { token, qid, buoc, traLoi, giay })
   if (!j) return { ok: false, loi: 'Chưa nối được máy chủ. Em thử lại sau.' }
-  if (j.ok !== true) return { ok: false, loi: String(j.error ?? 'Chưa kiểm được câu trả lời.') }
+  if (j.ok !== true) return { ok: false, loi: chuLoiAnToan(j.error, 'Chưa kiểm được câu trả lời.') }
   return { ok: true, dung: j.dung === true, ...(typeof j.dapAn === 'string' ? { dapAn: j.dapAn } : {}), ...(typeof j.nhanNen === 'string' ? { nhanNen: j.nhanNen, tenNen: String(j.tenNen ?? '') } : {}) }
 }
 
@@ -59,7 +60,7 @@ export async function luyenNen(nhan: string): Promise<{ ok: true; ten: string; c
   if (!token) return { ok: false, loi: 'Em đăng nhập lại để luyện.' }
   const j = await goiHs('/hs/luyen-nen', { token, nhan })
   if (!j) return { ok: false, loi: 'Chưa nối được máy chủ. Em thử lại sau.' }
-  if (j.ok !== true) return { ok: false, loi: String(j.error ?? 'Chưa mở được bài luyện.') }
+  if (j.ok !== true) return { ok: false, loi: chuLoiAnToan(j.error, 'Chưa mở được bài luyện.') }
   return { ok: true, ten: String(j.ten ?? ''), cau: Array.isArray(j.cau) ? (j.cau as CauNen[]) : [] }
 }
 

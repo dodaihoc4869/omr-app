@@ -20,6 +20,7 @@
 // Gói máy chủ trả về đi qua ĐÚNG cửa nạp của kho đề (`parseKhoDeJson` →
 // `buildTeacherSourceFromKhoDe`) — không nới một luật nào: câu thiếu phương án
 // hay thiếu đáp án thì bỏ, không dựng phiếu với ô trống rồi để em ngồi đoán.
+import { chuCuaLoi } from './loi-may-chu'
 import type { TeacherExamSource } from '../data/examContent'
 import { cauKhacPhuc } from './exam-api'
 import { parseKhoDeJson, buildTeacherSourceFromKhoDe } from './exam-kho-de-import'
@@ -91,6 +92,6 @@ export async function napKhoChoMayEm(
     return { nguon, chuyenDe, loi: '' }
   } catch (e) {
     // Nói ĐÚNG câu lỗi của máy chủ, đừng nuốt rồi báo chung chung.
-    return { nguon: [], chuyenDe, loi: e instanceof Error ? e.message : 'Không xin được kho từ máy chủ.' }
+    return { nguon: [], chuyenDe, loi: chuCuaLoi(e, 'Không xin được kho từ máy chủ.') }
   }
 }

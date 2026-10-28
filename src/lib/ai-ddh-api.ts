@@ -1,5 +1,6 @@
 // BONG BÓNG A.I ĐỖ ĐẠI HỌC — lớp nối app học sinh (thầy 24/10; server/src/ai-ddh.ts). Ba lệnh token của em: mở tấm · tin mới · gửi tin.
 // Không ném lỗi: trả { ok:false, chu } với MỘT câu nói thật. Chỉ mảnh nạp lười BongBongAiDdh nhập tệp này (ngoài precache).
+import { chuLoiAnToan } from './loi-may-chu'
 import { layDiaChiMayChu } from './dia-chi-may-chu'
 
 export interface TinAiDdh {
@@ -30,7 +31,7 @@ async function goi(duong: string, than: Record<string, unknown>, hanMs = HAN_MS)
     const r = await fetch(url + duong, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(than), signal: dk.signal })
     if (r.status === 404) return { ok: false, chu: 'Máy chủ chưa có A.I Đỗ Đại Học — thầy cần cập nhật máy chủ.' }
     const j = (await r.json()) as Record<string, unknown>
-    if (j.ok !== true) return { ok: false, chu: String(j.error || 'Máy chủ không nhận tin.'), ...(typeof j.khoa === 'string' ? { khoa: j.khoa } : {}) }
+    if (j.ok !== true) return { ok: false, chu: chuLoiAnToan(j.error, 'Máy chủ không nhận tin.'), ...(typeof j.khoa === 'string' ? { khoa: j.khoa } : {}) }
     return { ok: true, du: j }
   } catch (e) {
     return { ok: false, chu: (e as { name?: string })?.name === 'AbortError' ? 'Mạng chậm, bạn thử lại nhé.' : 'Mất mạng.' }

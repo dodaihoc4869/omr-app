@@ -1,3 +1,4 @@
+import { chuCuaLoi } from '../../lib/loi-may-chu'
 import { lazy, startTransition, Suspense, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, Clock, Flame, Info, Lightbulb, PenLine, RefreshCw, Target, X as XIcon } from 'lucide-react'
 import { ChemText } from '../../lib/chem-format'
@@ -244,7 +245,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       // 27/10 (ảnh thầy: khung đỏ «Em đã hoàn thành phần được xếp hôm nay…» + «Thử lại» ⇒ em kẹt, thử lại ra đúng câu ấy): chặng rỗng KHÔNG phải lỗi —
       // thẻ trung tính + nút về trang chính (làm mới số ở đó), không «Thử lại».
       if (!ds.length) setHetCau(typeof r.message === 'string' && r.message.trim() ? r.message : `Chưa có câu mới cho chặng này. Em về ${tenTrangChinh()} xem tiến độ.`)
-    }).catch(e => { if (!huy) setLoi(e instanceof Error ? e.message : 'Chưa tải được bài học.') }).finally(() => { if (!huy) setTai(false) })
+    }).catch(e => { if (!huy) setLoi(chuCuaLoi(e, 'Chưa tải được bài học.')) }).finally(() => { if (!huy) setTai(false) })
     return () => { huy = true }
   }, [token, lan])
   useEffect(() => {
@@ -353,7 +354,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       // Lượt đã chấm quyết định tự làm hay có hỗ trợ, kể cả nộp lại trên máy khác. Máy chủ cũ thiếu cờ thì dùng cờ đã gửi.
       const hoTro = (r.attempt as { assisted?: unknown } | undefined)?.assisted
       setKet(v => ({ ...v, [q.qid]: { ...(r as unknown as Ket), assisted: typeof hoTro === 'boolean' ? hoTro : assisted, ...(r.replayed === true && daCham !== tra ? { chamLanTruoc: true } : {}) } })); try { localStorage.removeItem(khoa) } catch { /* Không cản nhận kết quả. */ } capNhatSo()
-    } catch (e) { setLoi(e instanceof Error ? e.message : 'Chưa nộp được câu. Đáp án nháp vẫn được giữ.') }
+    } catch (e) { setLoi(chuCuaLoi(e, 'Chưa nộp được câu. Đáp án nháp vẫn được giữ.')) }
     finally { gui.current = false; setNop(false) }
   }
   const hocHuongDan = async () => {
@@ -363,7 +364,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       const r=await guiLaiKhiKetMang(()=>goiHoa2('hoc-tap-gap',token,{session:phien,qid:q.qid,chuaTuLam:true},15))
       if(r.ok!==true || !(r.choThay===true || r.hocCoHoTro===true&&typeof r.answer==='string'))throw new Error(typeof r.error==='string'?r.error:'Chưa mở được phần chữa.')
       setKet(v=>({...v,[q.qid]:r as unknown as Ket}));capNhatSo()
-    } catch(e){setLoi(e instanceof Error?e.message:'Chưa tải được phần chữa.')}finally{gui.current=false;setNop(false)}
+    } catch(e){setLoi(chuCuaLoi(e, 'Chưa tải được phần chữa.'))}finally{gui.current=false;setNop(false)}
   }
   // Xong chặng: câu cuối đã nộp ⇒ mở trước chặng sau (em bấm "Học tiếp chặng N" là có câu ngay).
   const ketThuc = () => { setXong(true); canTaiSanh.current = false; onCapNhat(); boChangMoTruoc(); moChangTruoc(token); /* LẶP CÂU 27/10: luôn mở trước lượt MỚI sau câu cuối, không giữ lượt cũ */ gocRef.current?.scrollIntoView?.({ block: 'start' }) }

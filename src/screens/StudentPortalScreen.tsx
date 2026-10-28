@@ -1,4 +1,5 @@
 // App học sinh tập trung làm bài; giữ máy chủ giao câu, chấm và tiến độ hiện hành.
+import { chuCuaLoi } from '../lib/loi-may-chu'
 import HocTapHomNay from '../components/hoc-tap/HocTapHomNay'
 import { soHomNay } from '../components/hoc-tap/lam-bai' // màn làm bài 12/10D: thanh trên "đã làm/M câu hôm nay" cùng nguồn vòng tròn Hôm nay
 import TheDiemDanhHs from '../components/diem-danh/TheDiemDanhHs'
@@ -371,7 +372,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
       if (kq.html) setXemDeHtml(kq.html)
       else void bao(kq.loi || 'Không mở được đề của em', 'Chưa mở được đề')
     } catch (e) {
-      void bao(e instanceof Error ? e.message : 'Không mở được đề của em', 'Chưa mở được đề')
+      void bao(chuCuaLoi(e, 'Không mở được đề của em'), 'Chưa mở được đề')
     } finally {
       setDangMoDe(false)
     }
@@ -428,7 +429,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
       setDaTaiMom(true)
       setLoiMom('')
       return true
-    } catch (e) { setLoiMom(e instanceof Error ? e.message : 'Chưa tải được bài. Em thử lại.'); return false }
+    } catch (e) { setLoiMom(chuCuaLoi(e, 'Chưa tải được bài. Em thử lại.')); return false }
   }, [auth])
 
   useEffect(() => {
@@ -524,13 +525,13 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
           const rev = await momApi('review', { token: auth.token, id: bai.id })
           if (rev?.item) setPhieuHtml(await momReviewHtml(chuanHoaBaiMom(rev.item)))
           else setLoiMom('Chưa tải được kết quả. Em thử lại.')
-        } catch (e) { setLoiMom(e instanceof Error ? e.message : 'Chưa tải được kết quả. Em thử lại.') }
+        } catch (e) { setLoiMom(chuCuaLoi(e, 'Chưa tải được kết quả. Em thử lại.')) }
         return
       }
       setDangLamMom(capNhat)
       setThongBaoNopMom(null)
       setLoiMom('')
-    } catch (e) { setLoiMom(e instanceof Error ? e.message : 'Chưa mở được bài. Em thử lại.') }
+    } catch (e) { setLoiMom(chuCuaLoi(e, 'Chưa mở được bài. Em thử lại.')) }
   }
 
   async function nopBaiCuaMom() {
@@ -551,7 +552,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
     setDangLamMom(null)
     setThongBaoNopMom(`Đã nộp bài thành công. Điểm: ${saved.item.diem}/10. Phụ huynh đã có thể xem kết quả trên app.`)
     setLoiMom('')
-    } catch (e) { setLoiMom(`Chưa nộp được bài. Đáp án vẫn được giữ trên máy, em bấm nộp lại khi có mạng. ${e instanceof Error ? e.message : ''}`) }
+    } catch (e) { setLoiMom(`Chưa nộp được bài. Đáp án vẫn được giữ trên máy, em bấm nộp lại khi có mạng. ${chuCuaLoi(e, '')}`) }
     finally { submittingMom.current = false }
   }
 
@@ -671,7 +672,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
       maCaPhieuRef.current = bt.maCa || 'Riêng'
       setPhieuHtml(html)
     } catch (e) {
-      void bao(e instanceof Error ? e.message : 'Không mở được bài tập', 'Chưa mở được bài')
+      void bao(chuCuaLoi(e, 'Không mở được bài tập'), 'Chưa mở được bài')
     } finally {
       setDangMoBai(null)
     }
@@ -1465,7 +1466,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
                 onXemKetQua={async (bai: any) => {
                   // Phiếu cũ trong máy có thể từng tự đoán đáp án; chỉ mở phần chữa máy chủ xác nhận sau nộp.
                   try { const data = await momApi('review', { token: auth?.token, id: bai.id }); setPhieuHtml(await momReviewHtml(chuanHoaBaiMom(data.item))) }
-                  catch (e) { setLoiMom(e instanceof Error ? e.message : 'Chưa tải được kết quả.') }
+                  catch (e) { setLoiMom(chuCuaLoi(e, 'Chưa tải được kết quả.')) }
                 }}
               />
             )}
@@ -1726,7 +1727,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
                                 onClick={async () => {
                                   // Phiếu cũ trong máy có thể từng tự đoán đáp án; chỉ mở phần chữa máy chủ xác nhận sau nộp.
                                   try { const data = await momApi('review', {token:auth?.token,id:bai.id}); setPhieuHtml(await momReviewHtml(chuanHoaBaiMom(data.item))) }
-                                  catch (e) { setLoiMom(e instanceof Error ? e.message : 'Chưa tải được kết quả.') }
+                                  catch (e) { setLoiMom(chuCuaLoi(e, 'Chưa tải được kết quả.')) }
                                 }}
                                 className="btn-google-outlined text-xs py-2 px-3.5 rounded-full font-semibold flex items-center gap-1.5 cursor-pointer"
                               >

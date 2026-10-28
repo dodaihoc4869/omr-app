@@ -1,3 +1,4 @@
+import { chuCuaLoi } from '../lib/loi-may-chu'
 import { LoiChao } from '../components/bat-linh/LoiChao'
 // APP PHỤ HUYNH — TRÙNG TU 28/09 (thầy: "Trùng tu toàn bộ app phụ huynh, app phụ huynh không có giao bài cho con nữa chỉ xem được báo cáo mọi thứ về con";
 // bản vẽ đã chốt https://claude.ai/artifact/2HShm51xEiuVKcTAUpfeFT). Lệnh mới này THAY quyết định 27/09 "bỏ hẳn app phụ huynh" (màn "đã ngừng" theo công tắc Game Hoá 2.0 đã gỡ):
@@ -115,7 +116,7 @@ export default function ParentPortalScreen() {
       setLopCon(lop)
       try { localStorage.setItem(SBD_STORAGE_KEY, sbdSach) } catch { /* vẫn xem báo cáo trong phiên này */ }
     } catch (e) {
-      if (luot === luotDangNhap.current) setThongBaoLoi(e instanceof Error ? e.message : 'Không đăng nhập được')
+      if (luot === luotDangNhap.current) setThongBaoLoi(chuCuaLoi(e, 'Không đăng nhập được'))
     } finally {
       if (luot === luotDangNhap.current) setDangTai(false)
     }

@@ -4,6 +4,7 @@
 // ĐỌC CHẶT: thiếu trường / sai kiểu ⇒ trường đó vắng (undefined) ⇒ khối tương ứng ẩn — KHÔNG bịa số. Không có nhãn lười nào ở đây (máy chủ cũng không gửi).
 // BẢN GẦN NHẤT: mỗi lệnh đọc lưu ở localStorage (try/catch) ⇒ thanh trên / màn vẽ ngay từ bản ấy rồi cập nhật khi máy chủ trả (không chờ mạng, không chớp số);
 // mất mạng ⇒ giữ bản gần nhất + nút «Thử lại». CHỐNG BẤM LẶP: cùng lệnh + cùng thân đang bay ⇒ dùng lại đúng lời hứa ấy (máy chủ còn khoá theo ngày/tuần).
+import { chuLoiAnToan } from './loi-may-chu'
 import { layDiaChiMayChu } from './dia-chi-may-chu'
 
 // ───────────────────────────────────────────── KIỂU (đúng hợp đồng)
@@ -272,7 +273,7 @@ async function guiThat(duong: string, than: O): Promise<KetQua<O>> {
     try { j = await res.json() } catch { /* thân lạ */ }
     const o = dt(j)
     if (!o) return { ok: false, loai: 'la', chu: 'Máy chủ trả lời chưa đọc được — em thử lại sau ít phút.' }
-    if (!res.ok || o.ok === false) return { ok: false, loai: 'tu_choi', chu: chu(o.error) ?? chu(o.loi) ?? 'Chưa làm được lúc này — em thử lại nhé.' }
+    if (!res.ok || o.ok === false) return { ok: false, loai: 'tu_choi', chu: chuLoiAnToan(chu(o.error) ?? chu(o.loi), 'Chưa làm được lúc này — em thử lại nhé.') }
     return { ok: true, du: o }
   } catch (e) {
     return (e as { name?: string })?.name === 'AbortError' ? { ok: false, loai: 'cham', chu: 'Máy chủ trả lời chậm — em thử lại sau ít phút.' } : { ok: false, loai: 'mang', chu: 'Mất mạng — đang hiện bản gần nhất.' }

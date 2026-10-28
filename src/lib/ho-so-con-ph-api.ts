@@ -6,6 +6,7 @@
 // DANH TÍNH: y hệt lệnh `/ph/con-tong-quan` (src/lib/ph-v3/api.ts) — mã liên kết riêng `{ pass }` (docPass) nếu máy đang lưu, không thì SBD trần `{ sbd }`.
 // Không ném lỗi: trả `KetQuaLenh` với MỘT câu nói thật cho phụ huynh (404 = máy chủ chưa có lệnh ⇒ "thầy cần cập nhật máy chủ"); màn hiện "Chưa tải
 // được …" + nút tải lại, KHÔNG số bịa. Nguồn `taoNguonHoSoCon` cắm thẳng vào tấm `HoSoLamCauEm` (prop `nguon`, chế độ 'phu-huynh').
+import { laChuLoiHienDuoc } from './loi-may-chu'
 import { layDiaChiMayChu } from './dia-chi-may-chu'
 import { docPass } from './ph-token'
 import type { KetQuaLenh } from './goi-lenh-thay'
@@ -61,7 +62,7 @@ export async function goiLenhCon(duong: string, sbd: string, them: Record<string
     }
     if (!j || typeof j !== 'object') return thoat('khong_doc_duoc', 'Máy chủ trả lời không đọc được.')
     if (!res.ok || j.ok !== true) {
-      const e = typeof j.error === 'string' ? j.error.replace(/\s+/g, ' ').trim() : ''
+      const e = typeof j.error === 'string' && laChuLoiHienDuoc(j.error) ? j.error.replace(/\s+/g, ' ').trim() : ''
       return thoat('tu_choi', e && e.length <= 240 ? e : 'Máy chủ chưa trả số liệu — anh/chị thử lại sau ít phút.')
     }
     return { ok: true, du: j }

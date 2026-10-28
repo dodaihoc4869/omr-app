@@ -1,6 +1,7 @@
 /** ĐỔI TÊN MỘT HỌC SINH — lệnh THẦY `POST /hoc-sinh/doi-ten {sbd, hoTen}` (mã bí mật; hợp đồng docs/hop-dong-doi-ten-hoc-sinh-2109.md, Code 3).
  *  Máy chủ đổi CHỈ cột tên ở danh_sach · hoc_sinh · luot · btvn_em · phong_cho theo đúng SBD (không đụng phiếu/nhật ký đã phát, điểm, lớp, năm sinh, mật khẩu).
  *  Máy chủ chưa có lệnh / mất mạng / từ chối ⇒ NÉM lỗi với câu nói thật; màn KHÔNG tự đổi riêng ở máy thầy (tránh hai nơi lệch tên). */
+import { chuLoiAnToan } from './loi-may-chu'
 import { layCauHinhMayChu } from './may-chu-moi'
 import { loadTeacherSecret } from './exam-db'
 
@@ -57,7 +58,7 @@ export async function doiTenHocSinh(sbd: string, hoTen: string): Promise<KetQuaD
   }
   // Trùng tên cũ: máy chủ trả {ok:false, khongDoi:true, error} và KHÔNG ghi — không phải lỗi, để màn nói "không có gì để đổi".
   if (j.khongDoi === true) return { sbd: String(j.sbd ?? sbd), tenCu: String(j.tenCu ?? ''), tenMoi: String(j.tenMoi ?? hoTen), khongDoi: true, soDong: {} }
-  if (!res.ok || j.ok !== true) throw new Error(String(j.error || j.loi || 'Máy chủ không cho đổi tên.'))
+  if (!res.ok || j.ok !== true) throw new Error(chuLoiAnToan(j.error || j.loi, 'Máy chủ không cho đổi tên.'))
   const soDong: Record<string, number> = {}
   for (const [k, v] of Object.entries((j.soDong ?? {}) as Record<string, unknown>)) soDong[k] = Number(v) || 0
   return { sbd: String(j.sbd ?? sbd), tenCu: String(j.tenCu ?? ''), tenMoi: String(j.tenMoi ?? hoTen), khongDoi: j.khongDoi === true, soDong }

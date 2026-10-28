@@ -2,6 +2,7 @@
 // Dùng Content-Type: text/plain cho POST để tránh trình duyệt gửi preflight
 // OPTIONS — Apps Script Web App không xử lý OPTIONS, preflight sẽ lỗi CORS
 // nếu dùng application/json.
+import { CHU_LOI_CHUNG, laChuLoiHienDuoc } from './loi-may-chu'
 import type { PublicExamBank, QuestionMedia, SoCauMoiPhan, TeacherExamSource } from '../data/examContent'
 import type { AnswerRecord, IntegrityLog } from './exam-db'
 import type { CauHoiCuaEm, GoiCauHoi } from './hoi-bai'
@@ -159,9 +160,13 @@ async function postJson(_scriptUrl: string, body: unknown, giay: number = HAN_GI
     // Lệnh công khai của em (không `secret`) giữ nguyên câu cũ — 403 ở đó là lý do khác, không được gán cho mã bí mật.
     const coMa = typeof (body as { secret?: unknown } | null)?.secret === 'string' && (body as { secret: string }).secret !== ''
     if (res.status === 403 && coMa) throw new Error(`Máy chủ trả lỗi HTTP 403 — mã bí mật trên máy này chưa đúng. Vào Cài đặt (mục Kết nối máy chủ), nhập lại mã rồi bấm Lưu.`)
+    // 28/10: 503 = máy chủ bận tạm thời (D1 export / quá tải) ⇒ câu nhẹ có chữ "đang bận" (loiNenThuLai thử lại), không mã kỹ thuật.
+    if (res.status === 503) throw new Error('Máy chủ đang bận. Bài vẫn được lưu trên máy và tự gửi lại khi máy chủ sẵn sàng.')
     throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
   }
   const r = await res.json()
+  // 28/10: chữ lỗi kỹ thuật (máy chủ cũ, D1/JS tiếng Anh) không tới màn em — đổi một chỗ cho cả 60 chỗ gọi `r.error`.
+  if (r && r.ok === false && typeof r.error === 'string' && !laChuLoiHienDuoc(r.error)) r.error = CHU_LOI_CHUNG
   // Mọi phản hồi có serverNow → hiệu chỉnh đồng hồ theo máy chủ ngay tại đây,
   // màn hình không phải nhớ gọi.
   if (r && typeof r.serverNow === 'number') dongBoGioMayChu(r.serverNow)

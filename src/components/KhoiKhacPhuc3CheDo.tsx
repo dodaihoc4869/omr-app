@@ -1,3 +1,4 @@
+import { chuCuaLoi } from '../lib/loi-may-chu'
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import {
@@ -299,7 +300,7 @@ export default function KhoiKhacPhuc3CheDo({
           }
         }
       } catch (e) {
-        if (alive) setLoiKho2(e instanceof Error ? e.message : 'Lỗi tải kho câu sai.')
+        if (alive) setLoiKho2(chuCuaLoi(e, 'Lỗi tải kho câu sai.'))
       } finally {
         if (alive) setDangTaiKho2(false)
       }
@@ -731,7 +732,7 @@ export default function KhoiKhacPhuc3CheDo({
         setSeconds(0)
       }
     } catch (e) {
-      setLoi(e instanceof Error ? e.message : 'Có lỗi xảy ra khi tạo đề.')
+      setLoi(chuCuaLoi(e, 'Có lỗi xảy ra khi tạo đề.'))
     } finally {
       setDangXuLy(false)
     }
