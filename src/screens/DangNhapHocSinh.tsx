@@ -58,6 +58,8 @@ export default function DangNhapHocSinh({ api, onDangNhap, logo }: { api: ApiDan
   const diaChiSom = useRef<Promise<string> | null>(null)
   useEffect(() => {
     diaChiSom.current = hoiDiaChi()
+    // Khung tĩnh Lộ trình (khung-tinh-hs.ts) còn phủ ⇒ gỡ: màn đầu là đăng nhập (phiên hỏng / hết hạn).
+    ;(window as { __ddhGoKhungTinh?: (() => void) | null }).__ddhGoKhungTinh?.()
   }, [])
   const layDiaChi = async () => (diaChiSom.current && (await diaChiSom.current)) || hoiDiaChi()
 

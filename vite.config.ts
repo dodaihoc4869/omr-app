@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react'
 import { defineConfig, minifySync, type Plugin } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import { taoMaNapTruoc } from './src/lib/nap-truoc-man-em.ts'
+import { KHOA_KHUNG_TINH, moKhungTinh, taoKhungXuong } from './src/lib/khung-tinh-noi-tuyen.ts'
 
 // Repo name dùng làm base path khi deploy GitHub Pages (project page, không phải user page).
 // Đổi giá trị này đúng bằng tên repo GitHub của thầy trước khi deploy.
@@ -46,6 +47,7 @@ ghiSwVersion()
 // tự nạp, rồi chèn đoạn mã chọn-theo-đường-dẫn lên TRƯỚC các thẻ Vite chèn. Chỉ thêm gợi ý tải sớm — không đổi mảnh nào, không đổi precache.
 function napTruocManEm(): Plugin {
   let goc = '/'
+  let khungCss: string[] = []
   return {
     name: 'nap-truoc-man-em',
     apply: 'build',
@@ -93,12 +95,37 @@ function napTruocManEm(): Plugin {
           .filter((f) => /^assets\/(?:ddh-rounded-(?:de|dam)-(?:latin|vietnamese)|baloo-2-(?:latin|vietnamese)-(?:700|800)-normal)-[\w-]+\.woff2$/.test(f))
           .sort()
           .map((f) => goc + f)
+        // 28/10 («vẫn chưa tức thì»): mảnh trình bày «Trong» của Lộ trình (TrongHs + CSS) — trước đây chỉ tải SAU khi mảnh cổng chạy (nạp nối đuôi).
+        // Máy đã đăng nhập nạp trước cùng lúc với mảnh cổng. Cùng các tệp lượt mở vốn tải ⇒ không thêm byte.
+        const hsCong = ngoai(dsCua('/src/screens/StudentPortalScreen.tsx'), hsVo)
+        const hsTrong = ngoai(dsCua('/src/components/hoc-tap/TrongHs.tsx'), [...hsVo, ...hsCong])
+        // Tờ kiểu của Lộ trình cho KHUNG TĨNH (src/lib/khung-tinh-noi-tuyen.ts): ĐÚNG THỨ TỰ trình nạp mảnh của Vite chèn khi app tự chạy (vỏ HS →
+        // cổng → «Trong»; trong mỗi mảnh: CSS của mảnh con trước, CSS của chính mảnh sau — đo 28/10 trên bản chạy thật: trong · TheCau · StudentPortalScreen ·
+        // hoc-tap · Bi · thuong-gon · TrongHs). Đoạn mã nội tuyến chèn đúng các thẻ ấy (cùng href) ⇒ Vite thấy đã có, không chèn lại ⇒ thứ tự tầng kiểu y như cũ.
+        const cssSauThuTu = (...duoi: string[]): string[] => {
+          const ra: string[] = [], da = new Set<string>()
+          const di = (ten: string) => {
+            if (da.has(ten)) return
+            da.add(ten)
+            const m = theoTen.get(ten)
+            if (!m) return
+            for (const con of m.imports) di(con)
+            for (const c of m.viteMetadata?.importedCss ?? []) if (!ra.includes(c)) ra.push(c)
+          }
+          for (const d of duoi) {
+            const dau = manh.find((m) => m.isDynamicEntry && (m.facadeModuleId || '').split('\\').join('/').endsWith(d))
+            if (dau) di(dau.fileName)
+          }
+          return ra.filter((t) => !html.includes(t)).map((t) => goc + t)
+        }
+        khungCss = cssSauThuTu('/src/AppHocSinh.tsx', '/src/screens/StudentPortalScreen.tsx', '/src/components/hoc-tap/TrongHs.tsx')
         const bang = {
           katex: dsCua('/src/lib/katex-goi.ts'),
           // Ảnh lớn nhất của màn đăng nhập học sinh (LoiChao: `anhThu(1, 50)`) — nạp trước khi máy chưa đăng nhập (tests/may-yeu-mo-app-1310 khoá đúng đường).
           anhDangNhapHs: '/than-thu-v2/nho/thu-1-3.webp',
           thi: thiVo.length ? [...new Set([...thiVo, ...dsCua('/src/screens/ExamTakeScreen.tsx')])] : ngoai(dsCua('/src/screens/ExamTakeScreen.tsx'), app),
-          hs: ngoai(dsCua('/src/screens/StudentPortalScreen.tsx'), hsVo),
+          hs: hsCong,
+          ...(hsTrong.length ? { hsTrong } : {}),
           ph: ngoai(dsCua('/src/screens/ParentPortalScreen.tsx'), phVo.length ? phVo : app),
           phieu: ngoai(dsCua('/src/screens/PhieuScreen.tsx'), app),
           app,
@@ -121,7 +148,12 @@ function napTruocManEm(): Plugin {
             return !r.errors.length && m ? m[1]! : ham
           } catch { return ham }
         }
-        return html.slice(0, moc) + `<script>${taoMaNapTruoc(bang, gon)}</script>\n` + html.slice(moc)
+        let ra = html.slice(0, moc) + `<script>${taoMaNapTruoc(bang, gon)}</script>\n` + html.slice(moc)
+        // KHUNG TĨNH LỘ TRÌNH (28/10): đoạn mã ngay SAU #root (body đã có) — dựng ảnh Lộ trình lần mở trước trước khi mã chính chạy.
+        const gocRoot = '<main id="root"></main>'
+        if (khungCss.length && ra.includes(gocRoot))
+          ra = ra.replace(gocRoot, `${gocRoot}<script>(${gon(moKhungTinh.toString())})(window,document,${JSON.stringify(khungCss)},${JSON.stringify(taoKhungXuong())},${JSON.stringify(KHOA_KHUNG_TINH)},"omr_student_portal_auth")</script>`)
+        return ra
       },
     },
   }

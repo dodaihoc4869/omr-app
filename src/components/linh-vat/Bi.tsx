@@ -4,7 +4,7 @@
 // Hình + chuyển động ở mảnh NẠP LƯỜI ./lua-dong (không vào nhóm mở app); trong lúc chờ mảnh về: khung giữ chỗ đúng tỉ lệ 200 : 230 (không xô bố cục).
 // Lửa giữ MÀU LÔNG CHÀM riêng ở mọi cảm xúc (không mang màu đúng / sai như Bi): cảm xúc đọc bằng dáng, tai, mắt, miệng.
 // Giảm chuyển động / máy yếu / không có rAF ⇒ Lửa đứng TĨNH ở tư thế của cảm xúc. Chỉ dùng trong app học sinh «Trong». aria-hidden: chữ đi kèm đã đủ nghĩa.
-import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import type { GocLua, Lua, TrangThaiLua, TuyChonLua } from './lua-dong'
 import '../../styles/bi.css' // khung bong bóng «Học tiếp nhé» (.bi-loi) vẫn ở tệp này
 import '../../styles/lua.css'
@@ -31,6 +31,16 @@ export function biDungYen(): boolean {
 }
 let moDong: typeof import('./lua-dong') | null = null
 
+/** (28/10 «vẫn chưa tức thì») Ảnh TĨNH của linh vật ở Lộ trình lần mở trước (src/lib/khung-tinh-hs.ts chụp): `{ "<cỡ>|<cảm xúc>|<hướng>": { src, st } }`. */
+export const KHOA_BI_TINH = 'ddh.bi-tinh'
+let biTinh: Record<string, { src?: string; st?: string }> | null = null
+/** Ảnh tĩnh khớp đúng cỡ + cảm xúc + hướng (không khớp ⇒ không có, giữ khung trống như trước). */
+function anhBiTinh(size: number, cam: string, goc?: string): { src?: string; st?: string } | null {
+  if (!biTinh) { try { biTinh = JSON.parse(localStorage.getItem(KHOA_BI_TINH) || '{}') || {} } catch { biTinh = {} } }
+  const a = biTinh![`${size}px|${cam}|${goc ?? ''}`]
+  return a && typeof a.src === 'string' && /^data:image\/(?:svg\+xml|webp|png)/.test(a.src) ? a : null
+}
+
 export interface PropsBi {
   cam?: CamBi
   /** Cạnh rộng (px); cao tự theo tỉ lệ 200 : 230. */
@@ -47,6 +57,20 @@ export interface PropsBi {
 export function Bi({ cam = 'chao', size = 96, className, nhip, noi, goc }: PropsBi) {
   const o = useRef<HTMLSpanElement>(null), lua = useRef<Lua | null>(null), dau = useRef(true)
   const [co, setCo] = useState(() => !!moDong)
+  // Mảnh hoạt ảnh chưa về: đặt ẢNH TĨNH lần trước vào khung giữ chỗ (đúng cỡ, đúng tư thế) ⇒ linh vật hiện ngay từ khung đầu (khung tĩnh Lộ trình gỡ ra
+  // là thấy đúng hình ấy), mảnh về thì thay bằng hình động (cùng lượt, không chớp).
+  useLayoutEffect(() => {
+    const el = o.current
+    if (co || !el || el.firstChild) return
+    const a = anhBiTinh(size, cam, goc)
+    if (!a) return
+    const img = document.createElement('img')
+    img.className = 'lua-svg bi-tinh'
+    img.alt = ''
+    img.src = a.src!
+    if (a.st) img.setAttribute('style', a.st)
+    el.appendChild(img)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps -- chỉ lượt gắn đầu
   useEffect(() => {
     if (co) return
     let con = true
@@ -56,6 +80,7 @@ export function Bi({ cam = 'chao', size = 96, className, nhip, noi, goc }: Props
   useEffect(() => {
     if (!co || !moDong || !o.current) return
     const [trangThai, tuyChon] = ttTheoCam(cam, nhip)
+    o.current.querySelector(':scope > .bi-tinh')?.remove()
     const l = moDong.taoLua(o.current, { trangThai, tuyChon, tinh: biDungYen(), goc })
     if (noi) l.noi(noi, 40)
     lua.current = l
@@ -67,7 +92,7 @@ export function Bi({ cam = 'chao', size = 96, className, nhip, noi, goc }: Props
     lua.current?.datTrangThai(t, tc)
     if (noi) lua.current?.noi(noi, 40)
   }, [cam, nhip, noi])
-  return <span ref={o} className={`bi lua${className ? ` ${className}` : ''}`} data-cam={cam} aria-hidden="true" style={{ '--lv-w': `${size}px` } as CSSProperties} />
+  return <span ref={o} className={`bi lua${className ? ` ${className}` : ''}`} data-cam={cam} data-goc={goc} aria-hidden="true" style={{ '--lv-w': `${size}px` } as CSSProperties} />
 }
 
 export default Bi

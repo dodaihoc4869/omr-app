@@ -30,6 +30,7 @@ import { useTongQuan } from '../thuong/dung-thuong'
 import { napSanThanhTich } from '../../lib/thuong-api'
 import { laSamsungInternet } from '../../lib/nhac-samsung'
 import { giuToanManHs } from '../../lib/toan-man-hs'
+import { baoLoTrinh, goKhungTinh, henChupKhungTinhHs, sbdPhien } from '../../lib/khung-tinh-hs'
 import type { TenManThuong } from '../thuong/ManThuong'
 const ManThuong = lazy(() => import('../thuong/ManThuong'))
 const GiamThiTinh = lazy(() => import('../giam-thi/GiamThi').then((m) => ({ default: m.GiamThiTinh })))
@@ -465,6 +466,12 @@ export function MotTrangHs(p: PropsMotTrang) {
     else do_()
   })
   useEffect(() => () => { doTren.current.ro?.disconnect() }, [])
+  // KHUNG TĨNH (28/10, thầy «vẫn chưa tức thì»): Lộ trình thật đã gắn ⇒ gỡ ảnh tĩnh của lần mở trước TRONG CÙNG khung hình (không nháy); đang ở Lộ
+  // trình + đủ số ⇒ hẹn chụp ảnh mới lúc máy rảnh (src/lib/khung-tinh-hs.ts).
+  useLayoutEffect(() => { goKhungTinh() }, [])
+  const laLoTrinh = (p.muc ?? 'hom-nay') === 'hom-nay'
+  useEffect(() => { baoLoTrinh(laLoTrinh); if (laLoTrinh && so) henChupKhungTinhHs(sbdPhien()) }, [laLoTrinh, so])
+  useEffect(() => () => baoLoTrinh(false), [])
   useEffect(() => {
     const m = mocBai.current
     if (!m || typeof IntersectionObserver !== 'function') return

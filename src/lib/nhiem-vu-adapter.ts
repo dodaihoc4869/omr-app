@@ -479,10 +479,12 @@ export interface NguonPhuKeHoach {
   dsMomGiao?: any[]
 }
 
+// "HH:mm" giờ Việt Nam (UTC+7, không đổi giờ mùa hè) bằng phép cộng — 28/10, đo mở app HS CPU ×4: dựng `Intl.DateTimeFormat` có múi giờ ở đây tốn ~60 ms
+// (nạp dữ liệu múi giờ ICU) ngay trước khi Lộ trình hiện. Cùng chữ với `Intl.DateTimeFormat('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false })`.
 function gioVietNam(iso: string): string {
   const t = Date.parse(iso)
   if (!Number.isFinite(t)) return ''
-  return new Intl.DateTimeFormat('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(t))
+  return new Date(t + 7 * 3_600_000).toISOString().slice(11, 16)
 }
 
 function bacMayChu(v: ViecMayChu): BacNhiemVu {

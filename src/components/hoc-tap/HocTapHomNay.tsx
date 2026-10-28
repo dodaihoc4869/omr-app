@@ -98,6 +98,10 @@ export function useDanhDauHt2(): void {
 export default function HocTapHomNay(p: Props) {
   useDanhDauHt2()
   const [muc, setMuc] = useState<Muc>('hom-nay')
+  // Mờ dần khi ĐỔI mục (thang.css `tt-vao-muc`) — KHÔNG ở lần vẽ đầu (28/10 «vẫn chưa tức thì»: Lộ trình mở app hiện từ trong suốt thêm 200 ms; khung tĩnh
+  // của lần mở trước gỡ ra là thấy ngay Lộ trình, không chớp nền).
+  const daDoiMuc = useRef(false)
+  if (muc !== 'hom-nay') daDoiMuc.current = true
   const [moCuaEm, setMoCuaEm] = useState(false)
   const nutCuaEm = useRef<HTMLButtonElement>(null)
   const tamCuaEm = useRef<HTMLDivElement>(null)
@@ -185,7 +189,7 @@ export default function HocTapHomNay(p: Props) {
     </header>}
     <div className="ht-khung">
       {!trong && <nav className="ht-menu" aria-label="Điều hướng học sinh">{MENU.map(({ id, ten, icon: Icon }) => <button key={id} onClick={() => setMuc(id)} aria-current={muc === id ? 'page' : undefined}><Icon size={21} aria-hidden="true" /><span>{ten}</span></button>)}</nav>}
-      <main className="ht-noi-dung ht2-noi-dung tt-vao-muc" key={muc}>
+      <main className={daDoiMuc.current ? 'ht-noi-dung ht2-noi-dung tt-vao-muc' : 'ht-noi-dung ht2-noi-dung'} key={muc}>
         <div className="ht2-mo-dau"><p>{homNayChu()}{p.lop ? ` · ${p.lop}` : ''}{muc === 'hanh-trinh' && sanh?.chienDich?.ten ? ` · ${sanh.chienDich.ten}` : ''}</p><h1>{muc === 'hom-nay' ? `Chào ${p.ten || 'em'}` : MENU.find(x => x.id === muc)?.ten}</h1></div>
         {p.canhBao}
         {p.dangLamMoi && <p className="ht-thong-bao" data-vung="dang-lam-moi" role="status">App đang làm mới, khoảng 1–5 phút. Em cứ để app mở, app tự vào lại.</p>}
