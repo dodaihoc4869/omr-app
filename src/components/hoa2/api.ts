@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from 'react'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { danhDauDaNhan, layHoiSom, xemHoiSomDaVe } from '../../lib/hoi-som'
 import { loiCuaKetQua } from '../../game/than-thu-v2/loi-het-tran'
-import { CHU_MAY_CHU_BAN_EM, MA_MAY_CHU_BAN, choLuiDanMs, chuLoiAnToan, laLoiMayChuBan } from '../../lib/loi-may-chu'
 import { laCauTuLuan } from '../../lib/cau-tu-luan'
 import { NHAN_NGUON_LAN, type NguonLanLam } from '../../lib/nhan-nguon-lan'
 import { chanCauTuLuan, choPhepCauChoEm } from '../../lib/cau-tu-luan-may-hs'
@@ -197,10 +196,8 @@ export async function goiHoa2(lenh: string, token: string, du: Record<string, un
     }
     if (!j || typeof j !== 'object') throw new LoiHoa2('Máy chủ chưa trả lời được. Em thử lại sau ít phút.')
     const o = j as Record<string, unknown>
-    // 28/10: máy chủ bận (503 / MAY_CHU_BAN — D1 đang export, quá tải) ⇒ câu nhẹ + mã để màn tự thử lại, không hiện chữ gốc.
-    if (o.ok !== true && laLoiMayChuBan(o, r.status)) throw new LoiHoa2(CHU_MAY_CHU_BAN_EM, MA_MAY_CHU_BAN)
-    // Lời máy chủ: `error` hoặc `loi` (vd. `hoa2-ruong-mo` chưa đủ: ma `chua_du`). Chữ kỹ thuật (máy chủ cũ) ⇒ câu Việt chung.
-    if (o.ok !== true) throw new LoiHoa2(chuLoiAnToan(loiCuaKetQua(o), 'Máy chủ chưa trả lời được. Em thử lại sau ít phút.'), chu(o.ma))
+    // Lời máy chủ: `error` hoặc `loi` (vd. `hoa2-ruong-mo` chưa đủ: ma `chua_du`).
+    if (o.ok !== true) throw new LoiHoa2(loiCuaKetQua(o) || 'Máy chủ chưa trả lời được. Em thử lại sau ít phút.', chu(o.ma))
     return o
     })()])
   } catch (e) {
@@ -219,13 +216,11 @@ export async function goiHoa2(lenh: string, token: string, du: Record<string, un
  * (hết giờ chờ / mất kết nối) ⇒ tự gọi lại tối đa `lan` lần rồi mới báo em. Lỗi máy chủ trả lời (`ok:false`) báo ngay như cũ. (Thầy 19/10, ảnh 18/10 21:56
  * "Máy chủ phản hồi chậm hoặc mạng gián đoạn": cả cao điểm 18/10 máy chủ 0 lỗi, 99% lượt < 0,73 giây — lượt ấy kẹt đường truyền, em chờ đủ 40 giây rồi tự bấm lại.)
  */
-export async function guiLaiKhiKetMang<T>(goi: () => Promise<T>, lan = 2, cho: (ms: number) => Promise<void> = (ms) => new Promise((x) => setTimeout(x, ms))): Promise<T> {
-  // 28/10: máy chủ BẬN (MAY_CHU_BAN) ⇒ chờ lùi dần 1, 2, 4, 8, 15 giây (≈ 30 giây) rồi gửi lại — lệnh chống trùng nên không ghi đôi.
-  for (let i = 0, ban = 0; ; i++) {
+export async function guiLaiKhiKetMang<T>(goi: () => Promise<T>, lan = 2): Promise<T> {
+  for (let i = 0; ; i++) {
     try {
       return await goi()
     } catch (e) {
-      if (e instanceof LoiHoa2 && e.ma === MA_MAY_CHU_BAN && ban < 5) { await cho(choLuiDanMs(ban++)); continue }
       if (i >= lan || !(e instanceof LoiHoa2) || (e.ma !== 'het_gio' && e.ma !== 'mat_mang')) throw e
     }
   }

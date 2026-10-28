@@ -4,7 +4,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import worker from '../server/src/index'
 import { gameToken } from '../server/src/game-v2-auth'
-import { lamSachThanLoi, phanLoaiLoi, thanTuLoiNem, CHU_LOI_CHUNG, CHU_MAY_CHU_BAN } from '../server/src/loi-may-chu'
+import { lamSachThanLoi, phanLoaiLoi, thanTuLoiNem, CHU_LOI_CHUNG, CHU_MAY_CHU_BAN, CHU_MAY_CHU_BAN_PH, CHU_MAY_CHU_BAN_THAY, loiBanTheoDuong } from '../server/src/loi-may-chu'
 import { taoD1That } from './_d1-that'
 
 afterEach(() => vi.restoreAllMocks())
@@ -31,7 +31,7 @@ describe('làm sạch thân lỗi', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {})
     const { data, status } = lamSachThanLoi({ ok: false, error: 'D1_ERROR: Currently processing a long-running export.' }, 200)
     expect(status).toBe(503)
-    expect(data).toEqual({ ok: false, error: CHU_MAY_CHU_BAN, maLoi: 'MAY_CHU_BAN', thuLaiSau: 2 })
+    expect(data).toEqual({ ok: false, error: CHU_MAY_CHU_BAN, ma: 'MAY_CHU_BAN', maLoi: 'MAY_CHU_BAN', thuLaiSau: 2 })
   })
   it('thân ok:true / lỗi Việt đi nguyên (cùng tham chiếu)', () => {
     const a = { ok: true, error: 'D1_ERROR x' }, b = { ok: false, error: 'Thiếu mã ca.', ma: 'x' }
@@ -64,7 +64,26 @@ describe('Worker thật: D1 đang export ⇒ máy em nhận 503 câu Việt', ()
     const j = JSON.parse(than)
     expect(j.ok).toBe(false)
     expect(res.status).toBe(503)
-    expect(j).toMatchObject({ maLoi: 'MAY_CHU_BAN', thuLaiSau: 2, error: CHU_MAY_CHU_BAN })
+    expect(j).toMatchObject({ ma: 'MAY_CHU_BAN', maLoi: 'MAY_CHU_BAN', thuLaiSau: 2, error: CHU_MAY_CHU_BAN })
     expect(loiLog.mock.calls.flat().map(String).join(' ')).toMatch(/long-running export/)
+  })
+})
+
+describe('xưng hô theo app khi máy chủ bận', () => {
+  it('/gv ⇒ «Thầy thử lại», /ph ⇒ «Anh/chị thử lại», còn lại giữ câu cho em', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    const d = taoD1That()
+    d.env.DB.prepare = () => { throw new Error('D1_ERROR: D1 DB is overloaded. Requests queued for too long.') }
+    const goi = async (duong: string) => {
+      const res = await worker.fetch(new Request(`https://local${duong}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ secret: 'bi-mat-thu', token: 'x' }) }), d.env)
+      return { status: res.status, j: await res.json() as Record<string, unknown> }
+    }
+    expect(loiBanTheoDuong('/ph/ke-hoach')).toBe(CHU_MAY_CHU_BAN_PH)
+    expect(loiBanTheoDuong('/game-v2/answer')).toBeNull()
+    for (const [duong, chu] of [['/gv/bang-tin-song', CHU_MAY_CHU_BAN_THAY]] as const) {
+      const { status, j } = await goi(duong)
+      expect(status).toBe(503); expect(j.error).toBe(chu)
+      expect(JSON.stringify(j)).not.toMatch(/D1_|overloaded/)
+    }
   })
 })

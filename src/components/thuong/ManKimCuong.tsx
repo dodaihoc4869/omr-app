@@ -2,7 +2,6 @@
 // Hợp đồng 4.4: POST /hs/kim-cuong/bat-dau {chuyenDe} → {phien, cau[10] KHÔNG đáp án, ong: 3}; nộp qua lệnh `answer` sẵn có kèm `phien`; phản hồi thêm
 // `kimCuong: {ongCon, xong?, dat?}` (+ `thuong` nguyên tử như mọi câu). Đáp án không xuống máy trước khi nộp. Công tắc «Kim cương» tắt ⇒ màn ẩn.
 // Hiệu ứng: mời — huy hiệu bật lên · H2 ống nghiệm vỡ: nứt, mảnh rơi, chất lỏng tràn · trượt — Bi buồn, ống rung · D3 đạt — huy hiệu lật 3D, hoa giấy.
-import { chuCuaLoi } from '../../lib/loi-may-chu'
 import { useRef, useState } from 'react'
 import { Check, Clock, RefreshCw, Target, Trophy } from 'lucide-react'
 import { ChemText } from '../../lib/chem-format'
@@ -85,7 +84,7 @@ export function ManKimCuong({ token, chuyenDe, tenChuyenDe, onDong, onOnLai, bat
       setKq({ dung, thuong: docThuongCau(r.thuong), xong: kc?.xong, dat: kc?.dat })
       if (dung) { setSoDung((n) => n + 1); phanHoiThuong('combo', 1) }
       if (kc) { if (kc.ongCon < ongCon) { setOngCon(kc.ongCon); requestAnimationFrame(vo) } } else if (!dung) { setOngCon((n) => Math.max(0, n - 1)); requestAnimationFrame(vo) }
-    } catch (e) { setLoi(chuCuaLoi(e, 'Chưa nộp được câu. Em thử lại nhé.')) }
+    } catch (e) { setLoi(e instanceof Error ? e.message : 'Chưa nộp được câu. Em thử lại nhé.') }
     finally { setGui(false) }
   }
   const tiep = () => {

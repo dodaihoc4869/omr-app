@@ -1,4 +1,3 @@
-import { chuCuaLoi } from '../lib/loi-may-chu'
 import { useEffect, useState, useRef } from 'react'
 import { Bell, BellOff, X, BookOpen, Sparkles, CheckCheck, ChevronRight, Check } from 'lucide-react'
 import { layDiaChiMayChu } from '../lib/dia-chi-may-chu'
@@ -187,7 +186,7 @@ export default function ThongBaoHocSinh({
       setEnabled(true)
       setMessage('Đã bật thông báo đẩy thành công.')
     } catch (e) {
-      setMessage(chuCuaLoi(e, 'Chưa cập nhật được thông báo đẩy.'))
+      setMessage(e instanceof Error ? e.message : 'Chưa cập nhật được thông báo đẩy.')
     } finally {
       setBusy(false)
     }

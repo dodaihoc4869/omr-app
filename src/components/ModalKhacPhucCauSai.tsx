@@ -1,4 +1,3 @@
-import { chuCuaLoi } from '../lib/loi-may-chu'
 import NhomCaThuGon from './NhomCaThuGon'
 // MODAL KHẮC PHỤC CÂU SAI — CHUẨN HOÁ CHO CẢ 3 APP
 // 1. Làm lại các câu sai
@@ -260,7 +259,7 @@ export default function ModalKhacPhucCauSai({
         setDmDangBai(kq.lops)
         setLoiDm(kq.lops.length === 0 ? kq.loi || 'Kho trên máy chủ chưa có dạng bài nào.' : '')
       } catch (e) {
-        if (!huy) setLoiDm(chuCuaLoi(e, 'Không tải được danh mục dạng bài.'))
+        if (!huy) setLoiDm(e instanceof Error ? e.message : 'Không tải được danh mục dạng bài.')
       } finally {
         if (!huy) setDangTaiDm(false)
       }
@@ -304,7 +303,7 @@ export default function ModalKhacPhucCauSai({
         }
         setKhoDangBai([dung.source])
       } catch (e) {
-        if (!huy) setLoiDang(chuCuaLoi(e, 'Không kết nối được máy chủ.'))
+        if (!huy) setLoiDang(e instanceof Error ? e.message : 'Không kết nối được máy chủ.')
       } finally {
         if (!huy) setDangTaiDang(false)
       }

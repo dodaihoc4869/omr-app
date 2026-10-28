@@ -111,7 +111,6 @@
 /* ── 3. KIỂM TRA ÔN TẬP (.duo.duo-kt): bố cục Duo của màn làm chặng; chỉ bổ sung ── */
 [data-trong='hs'] .duo.duo-kt .duo-than { gap: 14px; }
 [data-trong='hs'] .duo.duo-kt .duo-than > .ktcn-bao { margin: 0; }
-[data-trong='hs'] .duo.duo-kt .duo-than > .ktcn-ban { margin: 0; }
 [data-trong='hs'] .duo.duo-kt .duo-cot-de .duo-kt-nhan { margin-bottom: -4px; }
 /* Đúng | Sai đã chọn: màu tin cho cả hai (màn kiểm tra không có xanh lá / đỏ — chỉ nghĩa «đang chọn») */
 [data-trong='hs'] .duo.duo-kt .ht2-lam-y-nut button[aria-pressed=true] { background: var(--tr-tin-nhat); color: var(--tr-tin-chu); box-shadow: inset 0 0 0 2px var(--tr-tin); font-weight: 800; }

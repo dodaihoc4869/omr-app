@@ -4,7 +4,6 @@
 //   (4) gọi lại /hs/ke-hoach-ngay (màn cổng tự gọi khi sheet đóng: useLamMoiKhiDong)
 // Mọi lỗi mạng → null, KHÔNG ném (màn phải sống được khi mất mạng). Khác `goiPost` của may-chu.ts: ở đây cần cả chữ báo lỗi của
 // máy chủ (`ok:false, error`) nên trả kèm mã HTTP và thân JSON.
-import { laChuLoiHienDuoc } from '../../lib/loi-may-chu'
 import { docAnhThu, type AnhThuNhan, type KhoanExpNhan } from '../../lib/hieu-ung-exp-cau'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { chanCauTuLuan } from '../../lib/cau-tu-luan-may-hs'
@@ -131,7 +130,7 @@ export async function nopOnLai(token: string, traLoi: MucTraLoi[], duong = '/hs/
   if (!r) return { ok: false, ban: true, error: 'Chưa gửi được lên máy chủ. Bài làm của em vẫn được giữ, em bấm nộp lại khi có mạng.' }
   const d = r.du
   if (!d || typeof d !== 'object') return { ok: false, ...(r.trangThai >= 500 ? { ban: true } : {}), error: 'Máy chủ trả lời không đọc được. Em thử nộp lại.' }
-  if (d.ok !== true) return { ok: false, ...(r.trangThai >= 500 ? { ban: true } : {}), error: typeof d.error === 'string' && laChuLoiHienDuoc(d.error) ? d.error : 'Máy chủ chưa nhận bài. Em thử nộp lại.' }
+  if (d.ok !== true) return { ok: false, ...(r.trangThai >= 500 ? { ban: true } : {}), error: typeof d.error === 'string' && d.error.trim() ? d.error : 'Máy chủ chưa nhận bài. Em thử nộp lại.' }
   return {
     ok: true,
     ketQua: Array.isArray(d.ketQua) ? d.ketQua : [],

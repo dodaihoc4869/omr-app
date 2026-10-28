@@ -6,7 +6,6 @@
 //      Chạm tên em thì vào Báo cáo.
 // Cùng hồ sơ này sẽ dùng lại cho lối vào từ mục Phụ huynh — không dựng hai màn.
 // Chỉ dùng token + 6 thành phần thiết kế; số liệu dùng --sans.
-import { chuCuaLoi } from '../lib/loi-may-chu'
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { ArrowLeft, ChevronRight, FileText, History, KeyRound, RefreshCw, Search, Trash2, Sparkles, TrendingUp, Users, Wallet } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
@@ -131,10 +130,10 @@ export default function HocSinhScreen() {
       if (!mat.trim()) throw new Error('Chưa nhập mã bí mật — vào Cài đặt → Kết nối máy chủ')
       setCauHinh({ url: url.trim(), mat: mat.trim() })
       // Học phí tải SONG SONG, lỗi riêng (không chặn danh sách).
-      void taiHocPhi().then((m) => { setHocPhi(m); setLoiHocPhi('') }).catch((e) => setLoiHocPhi(`Chưa tải được học phí: ${chuCuaLoi(e, 'lỗi không rõ')}`))
+      void taiHocPhi().then((m) => { setHocPhi(m); setLoiHocPhi('') }).catch((e) => setLoiHocPhi(`Chưa tải được học phí: ${e instanceof Error ? e.message : 'lỗi không rõ'}`))
       setDs(await danhSachEm(url.trim(), mat.trim()))
     } catch (e) {
-      setLoi(chuCuaLoi(e, 'Lỗi không rõ'))
+      setLoi(e instanceof Error ? e.message : 'Lỗi không rõ')
       if (ds === null) setDs([])
     } finally {
       setDangTai(false)
@@ -156,7 +155,7 @@ export default function HocSinhScreen() {
     setLoi('')
     hoSoEm(cauHinh.url, { secret: cauHinh.mat, sbd: sbdDangXem })
       .then(setHoSo)
-      .catch((e) => setLoi(chuCuaLoi(e, 'Không mở được hồ sơ')))
+      .catch((e) => setLoi(e instanceof Error ? e.message : 'Không mở được hồ sơ'))
       .finally(() => setDangTaiHoSo(false))
   }, [sbdDangXem, cauHinh, lanTaiHoSo])
 
@@ -206,7 +205,7 @@ export default function HocSinhScreen() {
         showToast(res.error || 'Không cập nhật được trạng thái', 'error')
       }
     } catch (e) {
-      showToast(chuCuaLoi(e, 'Lỗi kết nối máy chủ'), 'error')
+      showToast(e instanceof Error ? e.message : 'Lỗi kết nối máy chủ', 'error')
     } finally {
       setDangDoiNghiHoc(false)
       setCanXacNhan(null)
@@ -225,7 +224,7 @@ export default function HocSinhScreen() {
       moHoSoEm('')
       showToast(`Đã xoá ${hoTen || `SBD ${sbd}`} khỏi danh sách`, 'success')
     } catch (e) {
-      showToast(chuCuaLoi(e, 'Không xoá được'), 'error')
+      showToast(e instanceof Error ? e.message : 'Không xoá được', 'error')
     } finally {
       setDangXoaEm(false)
       setCanXacNhan(null)
@@ -248,7 +247,7 @@ export default function HocSinhScreen() {
         showToast(res.error || 'Không đặt lại được mật khẩu', 'error')
       }
     } catch (e) {
-      showToast(chuCuaLoi(e, 'Lỗi kết nối máy chủ'), 'error')
+      showToast(e instanceof Error ? e.message : 'Lỗi kết nối máy chủ', 'error')
     } finally {
       setDangResetMk(false)
       setCanXacNhan(null)

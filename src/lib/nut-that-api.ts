@@ -1,6 +1,5 @@
 // BÀN GỠ NÚT THẮT — máy khách của thầy (máy chủ: server/src/ban-go-nut-that.ts). Lệnh thầy: mã bí mật `x-ma-bi-mat` như mọi lệnh thầy
 // (cùng cách `goiThay` của loi-giai-api.ts). Học sinh đọc lời gỡ qua `/hs/loi-go` (token cổng học sinh).
-import { chuLoiAnToan } from './loi-may-chu'
 import { layCauHinhMayChu } from './may-chu-moi'
 import { loadTeacherSecret } from './exam-db'
 import { docTokenHs } from './loi-giai-api'
@@ -71,7 +70,7 @@ export async function hsLoiGo(qid: string): Promise<{ ok: boolean; loiGo: LoiGoE
     if (!url) return { ok: false, loiGo: [], error: 'Chưa nối được máy chủ.' }
     const r = await fetch(`${url}/hs/loi-go`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token, qid }) })
     const j = (await r.json()) as Obj
-    return { ok: j.ok === true, loiGo: Array.isArray(j.loiGo) ? (j.loiGo as LoiGoEm[]) : [], ...(j.ok === true ? {} : { error: chuLoiAnToan(j.error, 'Chưa mở được lời thầy gỡ.') }) }
+    return { ok: j.ok === true, loiGo: Array.isArray(j.loiGo) ? (j.loiGo as LoiGoEm[]) : [], ...(j.ok === true ? {} : { error: String(j.error ?? 'Chưa mở được lời thầy gỡ.') }) }
   } catch {
     return { ok: false, loiGo: [], error: 'Chưa nối được máy chủ.' }
   }

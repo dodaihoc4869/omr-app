@@ -1,6 +1,5 @@
 // TU LUYỆN — lớp gọi máy chủ của màn học sinh (hợp đồng docs/hop-dong-tu-luyen-2909.md). Mọi lệnh `POST /hs/tu-luyen/<lệnh>` kèm token.
 // Đọc CHẶT: trường thiếu/sai kiểu thì bỏ, không bịa số. Không bao giờ nhận đáp án trước khi nộp (máy chủ không gửi).
-import { chuLoiAnToan } from '../../lib/loi-may-chu'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import type {
   CauCongKhai,
@@ -36,7 +35,7 @@ async function goi(lenh: string, token: string, du: Obj = {}, giay = 60): Promis
   }
 }
 const LOI_MANG = 'Chưa nối được máy chủ. Em kiểm tra mạng rồi thử lại.'
-const loiCua = (j: Obj | null): string => (j ? chuLoiAnToan(j.error, 'Máy chủ chưa trả lời được. Em thử lại.') : LOI_MANG)
+const loiCua = (j: Obj | null): string => (j ? String(j.error ?? 'Máy chủ chưa trả lời được. Em thử lại.') : LOI_MANG)
 const so = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : Number(v) || 0)
 const chu = (v: unknown) => (typeof v === 'string' ? v : v === null || v === undefined ? '' : String(v))
 

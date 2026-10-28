@@ -1,7 +1,6 @@
 // CLIENT API — vòng chữa câu sai (đặc tả §10, 07/10/2026).
 // Pattern: POST với token trong body (y hệt tu-luyen/api.ts).
 // BẢO MẬT: không nhận/trả đáp án, không nhận sbd từ client.
-import { chuLoiAnToan } from './loi-may-chu'
 import { layDiaChiMayChu } from './dia-chi-may-chu'
 import type { HinhAnh } from '../data/examContent'
 
@@ -147,7 +146,7 @@ async function goi(
 
 const loiCua = (j: Obj | null): string =>
   j
-    ? chuLoiAnToan(chu(j.mo ?? j.error ?? ''), 'Máy chủ chưa trả lời được. Em thử lại.')
+    ? chu(j.mo ?? j.error ?? 'Máy chủ chưa trả lời được. Em thử lại.')
     : LOI_MANG
 
 // ---------------------------------------------------------------------------

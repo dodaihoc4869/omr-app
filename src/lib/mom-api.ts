@@ -1,4 +1,3 @@
-import { chuLoiAnToan } from './loi-may-chu'
 import {layDiaChiMayChu} from './dia-chi-may-chu'
 // Phiếu HTML nạp lười (≈ 52 KB gzip): chỉ tải khi em mở kết quả bài, không kéo vào lượt tải đầu.
 import type {ThongTinPhieu} from './html-phieu'
@@ -33,7 +32,7 @@ async function requestMom(action:string,body:Record<string,unknown>,prefix='/mom
   try{
     const r=await fetch(`${url}${prefix}/${action}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body),signal:controller.signal})
     const data=await r.json()
-    if(!r.ok||!data.ok)throw new Error(chuLoiAnToan(data.error||data.loi,'Chưa đồng bộ được bài. Vui lòng thử lại.'))
+    if(!r.ok||!data.ok)throw new Error(data.error||data.loi||'Chưa đồng bộ được bài. Vui lòng thử lại.')
     return data
   }finally{clearTimeout(timer)}
 }

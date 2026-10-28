@@ -563,6 +563,8 @@ const DUO_KT_CANH = [
   ['ktcn-luoi', 'duo-kt&v=ktcn', /Kiểm tra ôn tập/, `lam13:nut:^Làm tiếp chặng 2 » ${DK_LUOI}`],
   ['ktcn-nop', 'duo-kt&v=ktcn', /Kiểm tra ôn tập/, `lam13:nut:^Làm tiếp chặng 2 » ${DK_LUOI} » nut:^Câu 6 » nut:^Nộp chặng 2`],
   ['ktcn-ket', 'duo-kt&v=ket', /Làm tốt lắm/],
+  // 28/10: máy chủ bận khi em đang làm ⇒ câu nhẹ «Máy chủ đang bận…», đáy «Đang lưu…», không hộp lỗi tiếng Anh.
+  ['ktcn-ban', 'duo-kt&v=ktcn&ban=1', /Kiểm tra ôn tập/, 'lam13:nut:^Làm tiếp chặng 2 » tn:^C » cho:900'],
   ['thi-cau', 'duo-kt&v=thi&vai=hocsinh', /Câu \d\/8/],
   // 27/10: bảng trong đề ở màn thi — 2 hàng × 4 cột tự xoay dọc (câu 1) · bảng lớn cuộn ngang có bóng mép (câu 2)
   ['thi-bang', 'duo-kt&v=thi&vai=hocsinh&bang=1', /Câu \d\/8/, `lam13:${DK_LUOI} » nut:^Câu 1`], ['thi-bang-lon', 'duo-kt&v=thi&vai=hocsinh&bang=1', /Câu \d\/8/, `lam13:${DK_LUOI} » nut:^Câu 2`],

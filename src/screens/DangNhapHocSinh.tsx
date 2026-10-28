@@ -4,7 +4,6 @@
 // GIỮ NGUYÊN như bản trong StudentPortalScreen (cây JSX chép nguyên văn); cổng vẫn dùng chính màn này khi em đăng xuất.
 // Lệnh máy chủ được TRAO VÀO (`api`): cổng truyền đúng hàm nó nhập từ exam-api (phép kiểm giả lập ở đó), vỏ nhẹ truyền thẳng từ
 // hs-dang-nhap-api.ts — cùng một hàm (exam-api xuất lại), không phải tải exam-api trước khi hiện màn.
-import { chuCuaLoi } from '../lib/loi-may-chu'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { AlertCircle, Eye, EyeOff, Lock, LogIn, RefreshCw, Sparkles } from 'lucide-react'
 import { LoiChao } from '../components/bat-linh/LoiChao'
@@ -94,7 +93,7 @@ export default function DangNhapHocSinh({ api, onDangNhap, logo }: { api: ApiDan
         kemCuaDangNhap(res),
       )
     } catch (err) {
-      setLoiDangNhap(chuCuaLoi(err, 'Lỗi kết nối máy chủ'))
+      setLoiDangNhap(err instanceof Error ? err.message : 'Lỗi kết nối máy chủ')
     } finally {
       setDangXuLyDangNhap(false)
     }
@@ -139,7 +138,7 @@ export default function DangNhapHocSinh({ api, onDangNhap, logo }: { api: ApiDan
         setLoiDangNhap('Đã đặt mật khẩu. Em đăng nhập lại.')
       }
     } catch (err) {
-      setLoiDatMatKhau(chuCuaLoi(err, 'Lỗi kết nối máy chủ'))
+      setLoiDatMatKhau(err instanceof Error ? err.message : 'Lỗi kết nối máy chủ')
     } finally {
       setDangDatMatKhau(false)
     }

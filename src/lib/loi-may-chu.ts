@@ -1,6 +1,9 @@
-// LỜI LỖI MÁY CHỦ TRÊN MÀN HỌC SINH / PHỤ HUYNH (thầy chụp 28/10: «D1_ERROR: Currently processing a long-running export.» trên màn Kiểm tra ôn tập).
-// Máy chủ mới đã tự làm sạch (server/src/loi-may-chu.ts); đây là lớp chặn thứ hai cho máy chủ cũ / đường khác: chữ kỹ thuật tiếng Anh, mã D1/SQLite,
-// lỗi JS ⇒ câu Việt chung. Câu Việt máy chủ cố ý viết cho em và mã có tên (vd het_tran) ⇒ giữ. THUẦN.
+// LỜI LỖI MÁY CHỦ TRÊN MÀN HỌC SINH (thầy chụp 28/10: «D1_ERROR: Currently processing a long-running export.» trên màn Kiểm tra ôn tập).
+// Bảng dịch CHÍNH ở máy chủ (server/src/loi-may-chu.ts: mọi thân ok:false đã là câu Việt, máy chủ bận ⇒ 503 + ma/maLoi MAY_CHU_BAN). Tệp này là lớp chặn
+// thứ hai, CHỈ dùng ở màn nạp khi bấm (Kiểm tra ôn tập, chặng Duo, Kim cương, Câu đã làm…) — không nằm trên đường mở app (LUẬT TỐC ĐỘ, dung sai 64 byte):
+// chữ kỹ thuật tiếng Anh / lỗi JS ⇒ câu Việt; mất mạng ⇒ câu mạng; máy chủ bận ⇒ câu nhẹ + tự gửi lại lùi dần. THUẦN.
+
+import { guiLaiKhiKetMang } from '../components/hoa2/api'
 
 export const MA_MAY_CHU_BAN = 'MAY_CHU_BAN'
 /** Câu cho em khi máy chủ bận (503 / MAY_CHU_BAN): bài không mất, máy tự gửi lại. */
@@ -49,4 +52,24 @@ export function laLoiTamThoi(e: unknown): boolean {
 /** Lùi dần khi thử lại: 1, 2, 4, 8, 15, 30 giây (trần 30 giây). */
 export function choLuiDanMs(lan: number): number {
   return [1000, 2000, 4000, 8000, 15000, 30000][Math.max(0, Math.min(5, Math.floor(lan)))]
+}
+
+/**
+ * Gửi lệnh CHỐNG TRÙNG (vd `answer` có khoá biên nhận): máy chủ bận (MAY_CHU_BAN) ⇒ chờ lùi dần 1, 2, 4, 8, 15 giây (≈ 30 giây) rồi gửi lại —
+ * máy chủ khoá theo biên nhận nên gửi lại không ghi đôi, không cộng thưởng đôi. Lỗi khác ném ngay. `cho` thay được trong test.
+ */
+export async function guiLaiKhiBan<T>(goi: () => Promise<T>, cho: (ms: number) => Promise<void> = (ms) => new Promise((x) => setTimeout(x, ms))): Promise<T> {
+  for (let lan = 0; ; lan++) {
+    try {
+      return await goi()
+    } catch (e) {
+      if (lan >= 5 || !laLoiMayChuBan(e)) throw e
+      await cho(choLuiDanMs(lan))
+    }
+  }
+}
+
+/** Lệnh chống trùng của màn làm câu: lỗi đường truyền ⇒ gửi lại ngay (guiLaiKhiKetMang); máy chủ bận ⇒ lùi dần rồi gửi lại. */
+export function guiLaiBenVung<T>(goi: () => Promise<T>): Promise<T> {
+  return guiLaiKhiBan(() => guiLaiKhiKetMang(goi))
 }

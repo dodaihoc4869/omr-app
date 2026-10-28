@@ -1,7 +1,6 @@
 // ĐĂNG NHẬP + ĐẶT MẬT KHẨU LẦN ĐẦU của cổng học sinh — tách khỏi exam-api.ts (05/10, tối ưu mở app học sinh): màn đăng nhập là màn
 // ĐẦU TIÊN em thấy và chỉ cần hai lệnh này; để nó nhập exam-api là bắt máy em tải cả bộ gọi máy chủ của app thầy (≈ 16 KB gzip + bộ
 // chấm) trước khi hiện ô SBD. exam-api.ts XUẤT LẠI hai hàm ⇒ mọi chỗ gọi cũ (và phép kiểm giả lập exam-api) giữ nguyên. Nội dung như cũ.
-import { chuCuaLoi } from './loi-may-chu'
 import { layDiaChiMayChu } from './dia-chi-may-chu'
 import { HAN_GIAY, fetchCoHan } from './fetch-co-han'
 
@@ -96,7 +95,7 @@ async function dangNhapGoi(scriptUrl: string, sbd: string, matKhau: string | und
     if (kemSanh && /ndjson/i.test(res.headers.get('content-type') ?? '') && res.body) return await docLuongDangNhap(res)
     return (await res.json()) as any
   } catch (e) {
-    return { ok: false, error: chuCuaLoi(e, 'Không kết nối được máy chủ') }
+    return { ok: false, error: e instanceof Error ? e.message : 'Không kết nối được máy chủ' }
   }
 }
 
@@ -128,6 +127,6 @@ export async function hsDatMatKhauApi(scriptUrl: string, sbd: string, matKhauMoi
     }, HAN_GIAY)
     return (await res.json()) as any
   } catch (e) {
-    return { ok: false, error: chuCuaLoi(e, 'Không kết nối được máy chủ') }
+    return { ok: false, error: e instanceof Error ? e.message : 'Không kết nối được máy chủ' }
   }
 }

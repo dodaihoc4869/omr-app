@@ -1,4 +1,3 @@
-import { chuCuaLoi } from '../lib/loi-may-chu'
 import {useEffect,useRef,useState} from 'react'
 import {createPortal} from 'react-dom'
 import {layCauHinhMayChu} from '../lib/may-chu-moi'
@@ -18,7 +17,7 @@ export default function BaiNopBtvn({maBtvn,sbd,onClose}:{maBtvn:string;sbd:strin
  const parsed=parseKhoDeJson(j.de);if(!parsed.ok||!parsed.json)throw new Error('Nội dung đề chưa đầy đủ: '+parsed.errors.join('; '))
  const built=buildTeacherSourceFromKhoDe(parsed.json);if(built.errors.length)throw new Error(built.errors.join('; '))
  if(alive)setData({...j,source:built.source})
- }catch(e){if(alive)setError(chuCuaLoi(e, 'Chưa tải được bài.'))}finally{clearTimeout(timer)}})()
+ }catch(e){if(alive)setError(e instanceof Error?e.message:'Chưa tải được bài.')}finally{clearTimeout(timer)}})()
  return()=>{alive=false;clearTimeout(timer);abort.abort()}
  },[maBtvn,sbd])
  return createPortal(<dialog ref={ref} onCancel={onClose} style={{width:'min(960px,96vw)',maxHeight:'92dvh',padding:0,border:'1px solid var(--vien)',borderRadius:20,background:'var(--nen)',color:'var(--muc)'}}>

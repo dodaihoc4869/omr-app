@@ -5,7 +5,6 @@
 //   GET  /gv/thuong/cong-tac              → { ok, congTac: { thuong_giai_tuan: 'bat'|'tat', … } }   (khoá phẳng ở gốc cũng đọc được)
 //   POST /gv/thuong/cong-tac {khoa, giaTri} → { ok, congTac? }
 // Đọc chặt: trường sai kiểu ⇒ null / bỏ, không bịa số. Bản gần nhất lưu trên máy (localStorage) để màn vẽ ngay rồi mới cập nhật.
-import { chuLoiAnToan } from './loi-may-chu'
 import { layDiaChiMayChu } from './dia-chi-may-chu'
 import { loadTeacherSecret } from './exam-db'
 import type { KetQuaLenh } from './goi-lenh-thay'
@@ -103,7 +102,7 @@ async function goi(duong: string, body?: O): Promise<KetQuaLenh<O>> {
     if (res.status === 404) return thoat('chua_co_lenh', 'Máy chủ chưa có lệnh thưởng phạt — cần đẩy bản máy chủ mới.')
     const j = dt(await res.json().catch(() => null))
     if (!j) return thoat('khong_doc_duoc', 'Máy chủ trả lời không đọc được.')
-    if (!res.ok || j.ok !== true) return thoat('tu_choi', chuLoiAnToan(chu(j.error ?? j.loi), 'Máy chủ không đồng ý lệnh này.'))
+    if (!res.ok || j.ok !== true) return thoat('tu_choi', chu(j.error ?? j.loi) || 'Máy chủ không đồng ý lệnh này.')
     return { ok: true, du: j }
   } catch {
     return dk.signal.aborted ? thoat('cham', 'Máy chủ trả lời chậm — thử lại sau ít phút.') : thoat('mang', 'Không nối được máy chủ.')

@@ -6,7 +6,10 @@
 
 export const MA_MAY_CHU_BAN = 'MAY_CHU_BAN'
 export const THU_LAI_SAU_GIAY = 2
-export const CHU_MAY_CHU_BAN = 'Máy chủ đang bận. Thử lại sau ít giây.'
+/** Câu cho HỌC SINH (đa số lệnh); app thầy / phụ huynh được đổi lời ở `doiLoiBanTheoApp` (chỉ khi 503, không tốn gì lúc bình thường). */
+export const CHU_MAY_CHU_BAN = 'Máy chủ đang bận. Em cứ làm tiếp, bài vẫn được lưu trên máy và tự gửi khi máy chủ sẵn sàng.'
+export const CHU_MAY_CHU_BAN_THAY = 'Máy chủ đang bận. Thầy thử lại sau ít giây.'
+export const CHU_MAY_CHU_BAN_PH = 'Máy chủ đang bận. Anh/chị thử lại sau ít giây.'
 export const CHU_LOI_CHUNG = 'Máy chủ gặp trục trặc. Thử lại sau ít phút.'
 
 /** D1 tạm từ chối truy vấn — thử lại là qua. */
@@ -55,7 +58,8 @@ export function lamSachThanLoi<T>(data: T, status: number): { data: T; status: n
   const moi: Record<string, unknown> = { ...o }
   for (const k of ['error', 'loi'] as const) if (typeof moi[k] === 'string' && phanLoaiLoi(moi[k] as string) !== 'giu') moi[k] = chu
   if (typeof moi.error !== 'string') moi.error = chu
-  if (ban) { moi.maLoi = MA_MAY_CHU_BAN; moi.thuLaiSau = THU_LAI_SAU_GIAY }
+  // `ma` cũng mang MAY_CHU_BAN (khi lệnh chưa có mã riêng): máy em cũ đọc `ma` sẵn (LoiHoa2.ma) ⇒ nhận ra máy chủ bận mà không phải tải thêm byte nào.
+  if (ban) { moi.maLoi = MA_MAY_CHU_BAN; moi.thuLaiSau = THU_LAI_SAU_GIAY; if (typeof moi.ma !== 'string') moi.ma = MA_MAY_CHU_BAN }
   return { data: moi as T, status: ban ? 503 : status }
 }
 
@@ -66,6 +70,13 @@ export function thanTuLoiNem(e: unknown): { data: Record<string, unknown>; statu
   const kieu = phanLoaiLoi(chu)
   if (kieu !== 'giu' || !chu) console.error('[loi-may-chu] lỗi chưa bắt (không gửi máy em):', e)
   const base = { ok: false, ...(typeof ma === 'string' ? { ma } : {}) }
-  if (kieu === 'ban') return { data: { ...base, error: CHU_MAY_CHU_BAN, maLoi: MA_MAY_CHU_BAN, thuLaiSau: THU_LAI_SAU_GIAY }, status: 503 }
+  if (kieu === 'ban') return { data: { ma: MA_MAY_CHU_BAN, ...base, error: CHU_MAY_CHU_BAN, maLoi: MA_MAY_CHU_BAN, thuLaiSau: THU_LAI_SAU_GIAY }, status: 503 }
   return { data: { ...base, error: kieu === 'giu' && chu ? chu : CHU_LOI_CHUNG }, status: 500 }
+}
+
+/** Lời "máy chủ bận" theo app của đường dẫn: /gv… (thầy) và /ph… (phụ huynh) đổi xưng hô; còn lại (học sinh, màn thi) giữ câu cho em. */
+export function loiBanTheoDuong(duong: string): string | null {
+  if (duong.startsWith('/gv')) return CHU_MAY_CHU_BAN_THAY
+  if (duong.startsWith('/ph')) return CHU_MAY_CHU_BAN_PH
+  return null
 }

@@ -10,7 +10,6 @@
 // Nay dựng HTML tại chỗ, đúng khuôn phiếu đã thiết kế (`dungPhieu`), giống hệt
 // phiếu bài tập và phiếu khắc phục. Không đụng tới điều hướng, nên chạy cả khi
 // mất mạng và không bao giờ phụ thuộc cấu hình máy chủ.
-import { chuCuaLoi } from './loi-may-chu'
 import { cauLuyenTuNguon, type CauLuyen } from './bai-tap-pdf'
 import { taoChiTietCau } from './chi-tiet-cau'
 // Phiếu HTML nạp lười (≈ 52 KB gzip) — chỉ tải khi em mở đề & lời giải.
@@ -104,7 +103,7 @@ export async function deVaLoiGiaiCuaEm(
   try {
     b = await phieuCuaEm(url, maCa, sbd)
   } catch (e) {
-    return { html: '', loi: chuCuaLoi(e, 'Không lấy được bài của em') }
+    return { html: '', loi: e instanceof Error ? e.message : 'Không lấy được bài của em' }
   }
   if (!b?.bank) return { html: '', loi: 'Ca này chưa có đáp án trên máy chủ — báo Thầy.' }
   const dapAn = b.luot?.dapAn ?? { phanI: {}, phanII: {}, phanIII: {} }

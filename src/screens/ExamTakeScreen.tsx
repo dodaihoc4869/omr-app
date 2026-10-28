@@ -1,4 +1,3 @@
-import { chuCuaLoi } from '../lib/loi-may-chu'
 import { Component, lazy, memo, startTransition, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { choBaoLau, gianNopTuDong, gianVaoSauBatDau, gianVaoThi, laLoiDongNguoi } from '../lib/nhip-gui-lai'
 import type { PublicExamBank, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
@@ -831,7 +830,7 @@ export default function ExamTakeScreen({ tuCong, onVe }: { tuCong?: TuCongHocSin
     } catch (e) {
       // GIỮ NGUYÊN lựa chọn của em: tấm trượt không đóng, em bấm Gửi lại được
       // ngay khi có mạng, không phải tick lại từ đầu.
-      setLoiHoiBai(chuCuaLoi(e, 'Chưa gửi được, em thử lại giúp Thầy'))
+      setLoiHoiBai(e instanceof Error ? e.message : 'Chưa gửi được, em thử lại giúp Thầy')
     } finally {
       setDangGuiHoi(false)
     }
@@ -1392,7 +1391,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       }
       setPhase('submitted')
     } catch (e) {
-      setErrorMsg(chuCuaLoi(e, 'Không mở được bài của em.'))
+      setErrorMsg(e instanceof Error ? e.message : 'Không mở được bài của em.')
       setPhase('error')
     }
   }
@@ -1415,7 +1414,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       // không chặn — hiện thẳng để em và thầy biết.
       setXacNhan({ sbd: kq.sbd, hoTen: kq.hoTen, lop: kq.lop })
     } catch (e) {
-      showToast(chuCuaLoi(e, 'Không tra được số báo danh'), 'error')
+      showToast(e instanceof Error ? e.message : 'Không tra được số báo danh', 'error')
     } finally {
       setDangTraTen(false)
     }
@@ -1627,7 +1626,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       if (kq.cach === 'duyet_lai') showToast(`Thầy đã duyệt cho thi lại — lần ${kq.lanThu}`, 'success')
       setPhase('exam')
     } catch (e) {
-      loiVaoThiRef.current = chuCuaLoi(e, 'Lỗi không rõ nguyên nhân')
+      loiVaoThiRef.current = e instanceof Error ? e.message : 'Lỗi không rõ nguyên nhân'
       setErrorMsg(loiVaoThiRef.current)
       setPhase('error')
     }
@@ -2374,7 +2373,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     if (dangLuuNopRef.current) return
     dangLuuNopRef.current = true; setDangLuuNop(true); nopTuDongRef.current = tuDongNop
     try { await saveAttempt(snapshot) } catch (e) {
-      setErrorMsg(chuCuaLoi(e, 'Chưa lưu được bài trên máy. Em giữ màn này rồi thử lại.'))
+      setErrorMsg(e instanceof Error ? e.message : 'Chưa lưu được bài trên máy. Em giữ màn này rồi thử lại.')
       setPhase('loi-luu-nop')
       return
     } finally { dangLuuNopRef.current = false; setDangLuuNop(false) }
@@ -2730,7 +2729,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         if (tt.batDau) void vaoSauBatDau()
       } catch (e) {
         // Ca bị thầy huỷ giữa lúc chờ: nói thẳng, đừng để em đứng mãi.
-        if (con) setLoiCho(chuCuaLoi(e, 'Mất kết nối — em cứ chờ, máy tự hỏi lại.'))
+        if (con) setLoiCho(e instanceof Error ? e.message : 'Mất kết nối — em cứ chờ, máy tự hỏi lại.')
       } finally {
         dangHoi = false
       }
