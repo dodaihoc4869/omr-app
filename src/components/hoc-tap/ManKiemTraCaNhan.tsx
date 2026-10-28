@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
-import { ArrowLeft, ArrowRight, CalendarDays, Check, CloudCheck, Lock, RefreshCw, Route, Timer } from 'lucide-react'
+import { ArrowLeft, ArrowRight, CalendarDays, Check, Lock, RefreshCw, Route, Timer } from 'lucide-react'
 import { goiHoa2 } from '../hoa2/api'
 import { docKiemTra, type TomTatKiemTra } from '../../lib/kiem-tra-ca-nhan'
 import type { Question } from '../../game/than-thu-v2/core'
@@ -65,6 +65,8 @@ function useHetGio(kho:KhoGio|null){
  const lay=()=>!!kho&&kho.conLai()<=0
  return useSyncExternalStore(kho?.dangKy??khongDangKy,lay,lay)
 }
+/** Chữ trạng thái lưu THƯỜNG — không hiện (thầy 28/10). */
+const LUU_AN=new Set(['Đang lưu…','Đã lưu trên máy chủ','Đã tải câu trả lời đã lưu'])
 export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,ban}:{token:string;sbd:string;id:string;onVe:()=>void;onCapNhat:()=>void;/** Tóm tắt bài từ Sảnh (27/10 tốc độ): vẽ ngay thẻ tổng quan khi bấm, số mới về thì thay. */ban?:TomTatKiemTra}) {
  // KIỂU DUOLINGO (thầy 27/10): <html data-trong="hs"> ⇒ màn làm chặng một câu một màn (KhungKiemTra.tsx) — cùng state, cùng lệnh lưu/chốt/đồng hồ.
  // Cả màn kiểm tra: TẮT ÂM THANH, chỉ rung (cờ batCheDoThi của am-thanh.ts, gỡ khi đóng).
@@ -221,7 +223,8 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,ban}:{toke
   const deDai=q.text.length>160||!!q.thanCauImg||!!q.table||q.hinhAnh.some(h=>h.viTri==='sau_de')
   const toi=(i:number)=>{phanHoi('chon');setMoLuoi(false);setViTri(Math.max(0,Math.min(cs.length-1,i)))}
   const chuaLam=cs.flatMap((c,i)=>daTraDu(c,tra[c.qid])?[]:[i+1])
-  const nhanLuu=luu==='Đã lưu trên máy chủ'?<><CloudCheck size={16} aria-hidden="true"/>Đã lưu</>:luu
+  // thầy 28/10 «Ẩn cái chữ … đã lưu»: không hiện chữ trạng thái lưu thường (Đang lưu / Đã lưu / Đã tải) — chỉ còn lời báo cần em biết (hết giờ, chưa lưu được)
+  const nhanLuu=LUU_AN.has(luu)?'':luu
   return <div className="ht-app ht2-lam duo duo-kt" ref={khung} data-duo="" data-hai-cot={deDai||undefined}>
    <ThanhTrenKt onDong={()=>void ve()} nhanDong={`Lưu và về ${tenTrangChinh()}`} khoaDong={busy} daLam={daTraChang} tong={cs.length}
     gio={<GioChangDuo kho={khoChang} nhan={`Thời gian chặng ${stt+1} còn lại`}/>} nhanGio="" onMoLuoi={()=>{phanHoi('chon');setMoLuoi(true)}}/>
@@ -307,7 +310,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,ban}:{toke
    <main className="ktcn-noi">
     {dsCau(true)}
     {mayBan&&!loi&&<p className="ktcn-ban" role="status">{CHU_MAY_CHU_BAN_EM}</p>}
-    <div className="ktcn-luu-dong"><p className="ktcn-luu" role="status">{luu==='Đã lưu trên máy chủ'?<><CloudCheck size={18} aria-hidden="true"/>Đã lưu</>:luu}</p><span>Đã trả lời {daTraChang}/{cs.length}</span></div>
+    <div className="ktcn-luu-dong"><p className="ktcn-luu" role="status">{LUU_AN.has(luu)?'':luu}</p><span>Đã trả lời {daTraChang}/{cs.length}</span></div>
     <TheCau {...propsCauHoc(q,viTri+1,tra[q.qid]??'',v=>doi(q.qid,v),undefined,busy||hetGio)}/>
     <div className="ktcn-day">
      <button className="ktcn-nut-phu" type="button" onClick={()=>setViTri(Math.max(0,viTri-1))} disabled={viTri===0||busy}>Câu trước</button>
