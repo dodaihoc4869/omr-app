@@ -11,7 +11,8 @@ vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'htt
 
 import { KHOA_TAM_DONG_HS, dsChoPhepTamDong, tamDongChoEm, tamDongTuDong, congTacTuDong } from '../server/src/thuong-luat'
 import { _quenTam, docTongQuan } from '../src/lib/thuong-api'
-import GacTamDong, { NGAY_BAO_TRI_HS, PhuTamDong, TAM_DONG_KIEM_MS, chuTamDong } from '../src/components/hoc-tap/TrongHs'
+import GacTamDong from '../src/components/hoc-tap/TrongHs'
+import { NGAY_BAO_TRI_HS, PhuTamDong, TAM_DONG_KIEM_MS, chuTamDong } from '../src/components/hoc-tap/PhuTamDong'
 import { KHOA_CONG_TAC } from '../src/lib/thi-dua-tuan-api'
 import { NGAY_BAO_TRI } from '../server/src/ngay-bao-tri'
 
@@ -84,7 +85,7 @@ describe('màn phủ «App đang bảo trì»', () => {
   })
   it('tự đọc lại theo vòng chuẩn batNhipBenVung (≈ 60 giây), không setInterval trần; lỗi ⇒ lùi dần; tab ẩn ⇒ không gọi', async () => {
     expect(TAM_DONG_KIEM_MS).toBe(60_000)
-    const src = readFileSync('src/components/hoc-tap/TrongHs.tsx', 'utf8')
+    const src = readFileSync('src/components/hoc-tap/PhuTamDong.tsx', 'utf8') // 28/10: màn phủ tách khỏi TrongHs (mảnh nạp lười riêng)
     expect(src).not.toMatch(/setInterval\(/)
     expect(src).toMatch(/batNhipBenVung\(/)
     vi.useFakeTimers()
@@ -107,7 +108,7 @@ describe('màn phủ «App đang bảo trì»', () => {
     expect(kiemLai.mock.calls.length).toBe(truoc) // tab ẩn: không gọi
     an.mockRestore()
     vi.restoreAllMocks()
-  })
+  }, 20_000) // máy chạy test bận (nhiều tệp song song): Bi nạp lười dưới đồng hồ giả có khi > 5 s
   it('đang làm kiểm tra / ca thi (Lộ trình bị `inert` dưới tấm) ⇒ KHÔNG phủ', () => {
     render(<div inert><PhuTamDong onKiemLai={() => {}} /></div>)
     expect(screen.queryByRole('dialog')).toBeNull()
@@ -129,11 +130,12 @@ describe('giao diện cũ (ddh.trong = tat) cũng đóng', () => {
     _quenTam(); localStorage.clear(); delete document.documentElement.dataset.trong
     mayChu(true)
     const r = render(<GacTamDong p={{ token: 'tk-cu', coCa: false } as never} />)
-    await waitFor(() => expect(screen.getByRole('dialog', { name: 'App đang bảo trì.' })).toBeTruthy())
+    // màn phủ là mảnh nạp lười ⇒ chờ lâu hơn mặc định 1 s khi chạy test
+    await waitFor(() => expect(screen.getByRole('dialog', { name: 'App đang bảo trì.' })).toBeTruthy(), { timeout: 15_000 })
     expect(document.documentElement.dataset.trong).toBe('hs')
     r.unmount()
     expect(document.documentElement.dataset.trong).toBeUndefined()
-  })
+  }, 20_000)
   it('không đóng (hoặc SBD được vào) ⇒ không phủ, không đổi giao diện', async () => {
     _quenTam(); localStorage.clear(); delete document.documentElement.dataset.trong
     mayChu(false)
@@ -145,6 +147,12 @@ describe('giao diện cũ (ddh.trong = tat) cũng đóng', () => {
   })
   it('Hôm nay cũ gắn cổng tạm đóng', () => {
     expect(readFileSync('src/components/hoc-tap/HocTapHomNay.tsx', 'utf8')).toContain('if (!huaTrong) return <>{ve(false)}<Suspense><GacTamDong p={p} kiem={kiem} /></Suspense></>')
+  })
+  it('tốc độ (28/10): màn phủ đi cùng mảnh nạp lười ManThuong — Lộ trình (mảnh «Trong») không cõng mã của nó', () => {
+    const trong = readFileSync('src/components/hoc-tap/TrongHs.tsx', 'utf8')
+    expect(trong).toContain("lazy(() => import('../thuong/ManThuong').then((m) => ({ default: m.PhuTamDong })))")
+    expect(trong).not.toMatch(/^import [^\n]*from '\.\/PhuTamDong'/m)
+    expect(readFileSync('src/components/thuong/ManThuong.tsx', 'utf8')).toContain("export { PhuTamDong } from '../hoc-tap/PhuTamDong'")
   })
 })
 

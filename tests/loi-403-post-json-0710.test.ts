@@ -30,9 +30,13 @@ describe('postJson — 403', () => {
     expect((loi as Error).message).toBe('Máy chủ trả lỗi HTTP 403')
   })
 
-  it('lỗi khác giữ nguyên: 503 ⇒ "Máy chủ trả lỗi HTTP 503"', async () => {
+  // SỬA CÓ CHỦ ĐÍCH 28/10 (thầy chụp lỗi D1 export trên màn thi): 5xx ⇒ câu Việt, không mã số; vẫn có «đang bận» để tự thử lại. 4xx giữ câu cũ.
+  it('5xx ⇒ "Máy chủ đang bận…" (không mã số); 404 vẫn giữ câu cũ', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => ({ ok: false, status: 503, json: async () => ({}) })))
     const loi = await lichSuLenBang('https://x', 'MAT', 1).catch((e: Error) => e)
-    expect((loi as Error).message).toBe('Máy chủ trả lỗi HTTP 503')
+    expect((loi as Error).message).toBe('Máy chủ đang bận. Bài vẫn lưu trên máy, tự gửi lại.')
+    expect((loi as Error).message).not.toMatch(/HTTP|\d/)
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: false, status: 404, json: async () => ({}) })))
+    expect(((await lichSuLenBang('https://x', 'MAT', 1).catch((e: Error) => e)) as Error).message).toBe('Máy chủ trả lỗi HTTP 404')
   })
 })

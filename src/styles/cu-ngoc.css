@@ -1,0 +1,35 @@
+/* LINH VẬT «Lửa» hình CÚ NGỌC (src/components/linh-vat/lua-dong.ts; thầy chốt 28/10 «Chốt build thay») — nạp LƯỜI cùng mảnh lua-dong, chỉ app học sinh.
+   BẢNG MÀU: không mã thô; mọi sắc pha color-mix từ token «Chất chỉ thị» --tr-hs* (lông chàm tím), --tr-tin (ngọc lam), --tr-tim (chỏm lửa / ống nghiệm hồng),
+   --tr-sai (má, miệng), --tr-sao (kem, lấp lánh) với đen / trắng CỐ ĐỊNH (--btg-chu-doan / --btg-chu-doan-dam). Nền tối: token --tr-* tự sáng lên
+   ⇒ lông + viền sáng hơn một chút, vẫn tách khỏi nền chàm đậm. Bảng --lv-* cũ (lua.css) giữ nguyên, không dùng nữa. */
+[data-trong='hs'] .lua {
+  --cn-long: color-mix(in srgb, var(--tr-hs) 50%, var(--tr-hs-nut));
+  --cn-longT: color-mix(in srgb, var(--tr-hs-nut) 55%, var(--tr-hs-day));
+  --cn-longS: color-mix(in srgb, var(--tr-hs) 72%, var(--btg-chu-doan-dam));
+  --cn-vien: color-mix(in oklab, var(--tr-hs-day) 70%, var(--btg-chu-doan));
+  --cn-lucGiac: color-mix(in oklab, var(--tr-hs-day) 82%, var(--btg-chu-doan));
+  --cn-den: color-mix(in oklab, var(--tr-hs-day) 34%, var(--btg-chu-doan));
+  --cn-kem: color-mix(in srgb, var(--tr-sao) 9%, var(--btg-chu-doan-dam));
+  --cn-trang: var(--btg-chu-doan-dam);
+  --cn-aoT: color-mix(in srgb, var(--tr-hs) 14%, var(--btg-chu-doan-dam));
+  --cn-thuyTinh: color-mix(in srgb, var(--tr-tin) 8%, var(--btg-chu-doan-dam));
+  --cn-ngoc: var(--tr-tin);
+  --cn-ngocS: color-mix(in srgb, var(--tr-tin) 45%, var(--btg-chu-doan-dam));
+  --cn-hong: var(--tr-tim);
+  --cn-hongS: color-mix(in srgb, var(--tr-tim) 45%, var(--btg-chu-doan-dam));
+  --cn-khoi: color-mix(in srgb, var(--tr-tim) 65%, var(--btg-chu-doan-dam));
+  --cn-ma: color-mix(in srgb, var(--tr-sai) 30%, var(--btg-chu-doan-dam));
+  --cn-mieng: color-mix(in srgb, var(--tr-sai) 88%, var(--btg-chu-doan));
+  --cn-luoi: color-mix(in srgb, var(--tr-sai) 55%, var(--btg-chu-doan-dam));
+  --cn-giot: color-mix(in srgb, var(--tr-tin) 50%, var(--btg-chu-doan-dam));
+  --cn-sao: var(--tr-sao);
+  --cn-bong: color-mix(in srgb, var(--tr-hs-day) 18%, transparent);
+}
+[data-trong='hs'] .lua .lua-svg text { font-family: inherit; }
+/* Vòng mục tiêu trên thanh (ThanhThuong): chỉ ĐẦU Cú Ngọc trong ô tròn nền kem — như biểu tượng nhận diện app (đầu to, chỏm lửa + kính rõ ở cỡ 40 px) */
+[data-trong='hs'] .tp-tr-vong > .bi.lua { aspect-ratio: 1; border-radius: 50%; overflow: hidden; background: var(--cn-kem); }
+[data-trong='hs'] .tp-tr-vong > .bi.lua > .lua-svg { transform: translateY(17%) scale(1.75); }
+@media (prefers-color-scheme: dark) {
+  [data-trong='hs'] .lua { --cn-bong: color-mix(in srgb, var(--btg-chu-doan) 45%, transparent); }
+  [data-trong='hs'] .tp-tr-vong > .bi.lua { background: var(--cn-lucGiac); }
+}

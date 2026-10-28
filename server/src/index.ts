@@ -1,4 +1,5 @@
 import { docPhongChoDongThoi, xoaDemPhongCho } from './phong-cho-dong-thoi'
+import { lamSachThanLoi, loiBanTheoDuong, thanTuLoiNem } from './loi-may-chu'
 import { khoiPhucChienDich0810 } from './khoi-phuc-chien-dich-0810'
 import { nhipCa } from './nhip-ca'
 import { anhCo, anhDay, layAnh } from './kho-anh'
@@ -170,13 +171,16 @@ async function sauGhi<T>(env: Env, b: Record<string, unknown>, viec: Promise<T>)
   try { return await viec } finally { try { emCoGhi(await gameIdentity(env, b)) } catch { /* token sai / hết hạn */ } }
 }
 
-/** Lỗi máy chủ ⇒ JSON {ok:false,error[,ma]} 500 KÈM CORS (máy em đọc được lời, không tưởng mất mạng). `ma`: mã lỗi có tên (vd het_tran của game) để màn hiện đúng lời. */
+/** Lỗi máy chủ ⇒ JSON {ok:false,error[,ma]} 500 KÈM CORS (máy em đọc được lời, không tưởng mất mạng). `ma`: mã lỗi có tên (vd het_tran của game) để màn hiện đúng lời.
+ *  28/10: chữ lỗi gốc (D1/JS) chỉ ghi log; máy em nhận câu Việt chung, D1 tạm thời ⇒ 503 + maLoi MAY_CHU_BAN (loi-may-chu.ts). */
 function raLoi(e: unknown): Response {
-  const ma = (e as { ma?: unknown } | null)?.ma
-  return ra({ ok: false, error: e instanceof Error ? e.message : 'Lỗi máy chủ', ...(typeof ma === 'string' ? { ma } : {}) }, 500)
+  const { data, status } = thanTuLoiNem(e)
+  return ra(data, status)
 }
 
-function ra(data: unknown, status = 200,giuServerNow=false): Response {
+function ra(data0: unknown, status0 = 200,giuServerNow=false): Response {
+  // 28/10: mọi thân ok:false đi qua đây được làm sạch chữ lỗi kỹ thuật (một phép so thuộc tính, không tốn truy vấn).
+  const { data, status } = lamSachThanLoi(data0, status0)
   return new Response(JSON.stringify({ ...(data as object), serverNow: giuServerNow&&Number.isFinite((data as {serverNow?:unknown}).serverNow)?(data as {serverNow:number}).serverNow:Date.now(), nhipDeNghi: nhipDeNghi() }), { status, headers: JSON_HEADERS }) // nhipDeNghi: hệ số nhịp hỏi nền cho máy khách (suc-khoe-may.ts)
 }
 
@@ -4123,6 +4127,8 @@ export default {
     // nằm ngoài try) ⇒ Cloudflare trả 1101 thiếu CORS, máy em tưởng mất mạng. `await` + `catch` Ở ĐÂY bắt MỌI lỗi (đồng bộ lẫn bất đồng bộ) một chỗ duy nhất.
     try { res = await boXuLy.fetch(req, env, ctx) } catch (e) { console.error('[may-chu] lỗi chưa bắt:', tenLenh(new URL(req.url).pathname), e); res = raLoi(e) } finally { if (req.method !== 'OPTIONS') ghiDoLenh(tenLenh(new URL(req.url).pathname), Date.now() - t0) }
     // HEADER song song với trường JSON `nhipDeNghi` (Code 2: máy em yếu, khỏi phải clone + parse thân phản hồi 20–100 KB): `x-nhip-de-nghi: 1|2|4` + cho trình duyệt đọc qua CORS. Thân phản hồi đi nguyên (stream).
+    // 28/10: máy chủ bận (503 MAY_CHU_BAN) trên app thầy / phụ huynh ⇒ đổi xưng hô của câu (chỉ chạy khi 503 — lúc thường không đọc thân).
+    if (res.status === 503) { const loi = loiBanTheoDuong(new URL(req.url).pathname); if (loi) { const j = await res.clone().json().catch(() => null) as Record<string, unknown> | null; if (j && j.maLoi === 'MAY_CHU_BAN') res = new Response(JSON.stringify({ ...j, error: loi }), { status: 503, headers: res.headers }) } }
     const h = new Headers(res.headers)
     h.set('x-nhip-de-nghi', String(heSoGoiNen(new URL(req.url).pathname)))
     const ex = h.get('access-control-expose-headers'); h.set('access-control-expose-headers', ex ? `${ex}, x-nhip-de-nghi` : 'x-nhip-de-nghi')

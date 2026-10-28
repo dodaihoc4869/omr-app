@@ -31,7 +31,10 @@ interface CauDe { q: PrivateQuestion; muc: string[]; y: Record<string, string[]>
 interface DeKt { phienBan: 1|2|3; phuKienThuc?:number; phuChuKy?:number; chuKyNgay?:string; lanTrongChuKy?:number; soLanTuan?:number; baiNgayToiThieu?:number; lyDo: string; bai: {khoa:string;ten:string}[]; muc: MucKt[]; cau: CauDe[]; soPhu: number; phut: number; thieu: string[]; chang: { qids: string[]; giay: number }[] }
 const de = (r: Row): DeKt => JSON.parse(s(r.json)) as DeKt
 const tra = (r: Row): Record<string, string> => JSON.parse(s(r.tra_json)) as Record<string, string>
+/** Cửa nhận bản nháp gửi muộn vì máy chủ bận / mất mạng (thầy 28/10): tối đa 10 phút sau hạn, chỉ phần em trả lời trước hạn. */
+export const GUI_TRE_MS=10*60_000
 /** Số tĩnh của một đề (không đổi sau khi lập) + phần của từng câu để đếm "đã trả lời" từ tra_json. Cùng phép tính với nhánh đọc đề của tomTatKt. */
+
 export interface MetaKt { phienBan:number; baiNgayToiThieu:number; tong: number; soChang: number; phut: number; soBai: number; tongKienThuc: number; phuDe: number; lyDo: string; thieuNguon: number; phan: Record<string, string> }
 export function metaKt(d: DeKt): MetaKt {
   const thieu = new Set(d.thieu), kn=d.muc.filter(m=>m.loai!=='bai')
@@ -275,7 +278,11 @@ export async function ktCnAction(env: Env, sbd: string, action: string, b: Row, 
   }
   if (now<Number(r.mo_luc)) throw new Error('Chưa đến lịch kiểm tra của em.')
   if (laKtBaoTriBo(r,now)) throw new Error(CHU_BAO_TRI_KT)
-  if (!r.nop_luc && now>=Number(r.han_luc)) r=await chotKtCn(env,r,now,true)
+  // GỬI MUỘN VÌ MÁY CHỦ BẬN (thầy 28/10): bản nháp mang mốc em trả lời (`lucTra`, giờ máy chủ đã hiệu chỉnh ở máy em) tới trong 10 phút sau hạn ⇒ nhận phần
+  // trả lời TRƯỚC hạn rồi mới chốt bài. Giả định: mốc ≤ hạn chặng/chốt chặng, ≤ hạn bài, ≥ lúc mở chặng, ≤ giờ máy chủ nhận + 5 giây lệch đồng hồ.
+  const coTre=(action==='hoc-tap-ktcn-luu'||action==='hoc-tap-ktcn-chot-chang')&&!!b.lucTra&&typeof b.lucTra==='object'&&!Array.isArray(b.lucTra)
+  const hoanChotBai=coTre&&!r.nop_luc&&now>=Number(r.han_luc)&&now<=Number(r.han_luc)+GUI_TRE_MS
+  if (!r.nop_luc && now>=Number(r.han_luc) && !hoanChotBai) r=await chotKtCn(env,r,now,true)
   if (action==='hoc-tap-ktcn-nop') {
     // Không nhận đáp án ở lệnh nộp; chỉ chốt bản nháp đã lưu đúng giờ ở máy chủ.
     if (!r.nop_luc) {
@@ -322,9 +329,19 @@ export async function ktCnAction(env: Env, sbd: string, action: string, b: Row, 
     const saved=await env.DB.prepare(`UPDATE kiem_tra_ca_nhan SET tra_json=json_patch(tra_json,?),revision=revision+1,cap_nhat_luc=? WHERE id=? AND sbd=? AND revision=? AND nop_luc IS NULL AND han_luc>? AND EXISTS(SELECT 1 FROM kiem_tra_ca_nhan_chang WHERE bai_id=? AND stt=? AND chot_luc IS NULL AND han>?)`).bind(patch,now,r.id,sbd,b.revision,now,r.id,stt,now).run()
     if(!saved.meta.changes){const fresh=await docBai(env,sbd,s(r.id));if(entries.some(([id,a])=>tra(fresh)[id]!==a))throw new Error('Bản nháp đã thay đổi ở một lượt khác. Em tải lại chặng trước khi lưu tiếp.')}
     daLuu=true
+  } else if (coTre && !r.nop_luc && now<=Number(row.han)+GUI_TRE_MS) {
+    const lucTra=b.lucTra as Record<string,unknown>, input=(b.tra&&typeof b.tra==='object'&&!Array.isArray(b.tra)?b.tra:{}) as Record<string,unknown>
+    const tran=Math.min(Number(row.chot_luc)||Number(row.han),Number(row.han),Number(r.han_luc)),tu=Number(row.bat_dau)||0
+    const entries=Object.entries(input).filter(([id,a])=>{const l=Number(lucTra[id]);return ch.qids.includes(id)&&typeof a==='string'&&a.length<=100&&Number.isFinite(l)&&l>=tu&&l<=tran&&l<=now+5000})
+    if (entries.length) {
+      // Không so revision: chặng đã đóng nên không còn lượt ghi trong hạn nào chen vào; chỉ vá các câu có mốc trước hạn. Gửi lại y hệt ⇒ vá lại cùng giá trị (không cộng gì).
+      const saved=await env.DB.prepare('UPDATE kiem_tra_ca_nhan SET tra_json=json_patch(tra_json,?),revision=revision+1,cap_nhat_luc=? WHERE id=? AND sbd=? AND nop_luc IS NULL').bind(JSON.stringify(Object.fromEntries(entries)),now,r.id,sbd).run()
+      daLuu=saved.meta.changes>0
+    }
   }
   if (action==='hoc-tap-ktcn-chot-chang'||now>=Number(row.han)) await env.DB.prepare('UPDATE kiem_tra_ca_nhan_chang SET chot_luc=? WHERE bai_id=? AND stt=? AND chot_luc IS NULL').bind(Math.min(now,Number(row.han)),r.id,stt).run()
   r=await docBai(env,sbd,s(r.id)); d=de(r)
+  if (hoanChotBai && !r.nop_luc) r=await chotKtCn(env,r,now,true)
   return {ok:true,kiemTra:tomTatKt(r,now),revision:Number(r.revision),daLuu,daChot:action==='hoc-tap-ktcn-chot-chang'||!!row.chot_luc||now>=Number(row.han)}
 }
 

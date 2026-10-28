@@ -547,7 +547,8 @@ function ManLam13() {
 // GIÁM THỊ 27/10: `&gtloi=1` ⇒ ngẫu nhiên luôn 0: giám thị chắc chắn càu nhàu (câu đầu kho) để chụp và đo bong bóng không chồng chữ.
 if (LA_LAM13 && thamSo.get('gtloi') === '1') Math.random = () => 0
 // LỬA 27/10: `&luadien=1` ⇒ lộ các Lửa đang sống ra window.__lua để máy quay điều khiển cảm xúc (video quay từ bản build thật).
-if (thamSo.get('luadien') === '1') void import('../../src/components/linh-vat/lua-dong').then((m) => { (window as unknown as { __lua: unknown }).__lua = m.LUA_DANG_SONG })
+// 28/10 Cú Ngọc: thêm window.__taoLua ⇒ máy quay dựng Lửa cỡ lớn trên sân khấu (mọi biểu cảm, đứng nghiêng) từ bản build thật.
+if (thamSo.get('luadien') === '1') void import('../../src/components/linh-vat/lua-dong').then((m) => { Object.assign(window, { __lua: m.LUA_DANG_SONG, __taoLua: m.taoLua }) })
 // GIÁM THỊ NGƯỜI 27/10: `&gtdien=1` ⇒ lộ các giám thị đang sống ra window.__gt để máy quay điều khiển trạng thái (video quay từ bản build thật).
 if (LA_LAM13 && thamSo.get('gtdien') === '1') void import('../../src/components/giam-thi/giam-thi-nguoi').then((m) => { (window as unknown as { __gt: unknown }).__gt = m.GT_DANG_SONG })
 if (LA_LAM13 && thamSo.get('lam') === 'duo-xau') try { localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tk', sbd: '12121212' })) } catch { /* bỏ qua */ }
@@ -940,6 +941,8 @@ if (man === 'duo-kt' && (DK_V === 'ktcn' || DK_V === 'ket')) {
     if (url.includes('hoc-tap-ktcn-trang-thai')) return tra({ ok: true, kiemTra: kt, chang: DK_CHANG })
     if (url.includes('hoc-tap-ktcn-start')) return tra({ ok: true, kiemTra: kt, revision: 3, hanChang: now + 462_000, daChot: false, questions: DK_CAU, tra: { K1: 'B', K4: 'DS--' } })
     if (url.includes('hoc-tap-ktcn-ket-qua')) return tra({ ok: true, kiemTra: kt, ketQua: DK_KET })
+    // 28/10 `&ban=1`: máy chủ bận (D1 đang export) ⇒ lệnh lưu trả 503 MAY_CHU_BAN như máy chủ thật — màn hiện câu nhẹ, không hộp lỗi.
+    if (thamSo.get('ban') === '1' && url.includes('hoc-tap-ktcn-luu')) return new Response(JSON.stringify({ ok: false, error: 'Máy chủ đang bận. Em cứ làm tiếp, bài vẫn được lưu trên máy và tự gửi khi máy chủ sẵn sàng.', ma: 'MAY_CHU_BAN', maLoi: 'MAY_CHU_BAN', thuLaiSau: 2 }), { status: 503, headers: { 'content-type': 'application/json' } })
     if (url.includes('hoc-tap-ktcn-')) return tra({ ok: true, kiemTra: kt, revision: 4, daLuu: true })
     return fetchDk(input, init)
   }
