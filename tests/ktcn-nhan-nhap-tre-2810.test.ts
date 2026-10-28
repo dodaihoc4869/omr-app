@@ -50,10 +50,18 @@ it('quá 10 phút sau hạn, mốc trước lúc mở chặng, mốc vượt gi�
  expect((await tra())[q0]??'').toBe('')
 })
 
-it('bài đã nộp ⇒ không nhận nháp muộn',async()=>{
+it('bài đã nộp (lượt nộp THÀNH CÔNG thật) ⇒ nháp muộn, kể cả mốc trước hạn, không được nhận',async()=>{
  const {k,id,han,q0,tra}=await kho()
- await ktCnAction(k.env,'S1','hoc-tap-ktcn-chot-chang',{id,chang:0,revision:0,tra:{}},han-500)
- await ktCnAction(k.env,'S1','hoc-tap-ktcn-nop',{id},han+1000).catch(()=>null)
+ const chot=await ktCnAction(k.env,'S1','hoc-tap-ktcn-chot-chang',{id,chang:0,revision:0,tra:{}},han-500)
+ expect(chot).toMatchObject({ok:true,daChot:true})
+ const nop=await ktCnAction(k.env,'S1','hoc-tap-ktcn-nop',{id},han+1000)
+ expect(nop.ok).toBe(true)
+ expect(Number((nop.kiemTra as {nopLuc:unknown}).nopLuc)).toBeGreaterThan(0)
+ expect((await docKtCn(k.env,'S1',han))!.nop_luc).toBeTruthy()
+ const truoc=JSON.stringify(await tra())
  const kq=await ktCnAction(k.env,'S1','hoc-tap-ktcn-luu',{id,chang:0,revision:0,tra:{[q0]:'D'},lucTra:{[q0]:han-1000}},han+2000)
- if((await docKtCn(k.env,'S1',han))!.nop_luc){expect(kq).toMatchObject({daNop:true});expect((await tra())[q0]??'').toBe('')}
+ expect(kq).toMatchObject({ok:true,daNop:true})
+ expect(kq.daLuu).toBeUndefined()
+ expect(JSON.stringify(await tra())).toBe(truoc)
+ expect((await tra())[q0]??'').toBe('')
 })
