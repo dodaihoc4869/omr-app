@@ -41,7 +41,7 @@ const KiemHoiThay = lazy(() => import('../loi-giai/HoiThayKiemChung'))
 // Thẻ mời ở Hôm nay đi CÙNG khối mã với màn này (một khối nạp lười, không thêm tệp precache — trần 170 tệp của kiem-sw).
 export { default as TheMoiTuSua } from './TheMoiTuSua'
 // Lộ trình «Trong» (TrongHs: số trên nút «Sửa lỗi») đọc việc hôm nay QUA mảnh này (đã là điểm nạp lười) — nạp động thẳng tu-sua-viec-hom-nay sẽ tách thêm mảnh precache.
-export { conSuaHomNay, docSbdHs, dungViecHomNay, luuViecHomNay } from '../../lib/tu-sua-viec-hom-nay'
+export { baoKhoaSua, conSuaHomNay, conSuaPhanNgay, docSbdHs, dungViecHomNay, luuViecHomNay } from '../../lib/tu-sua-viec-hom-nay'
 
 /** Trạng thái đợt chữa ⇒ chữ em đọc được (bảng từ chuẩn: không mã nội bộ). */
 export const CHU_TRANG_THAI_CHUA: Record<string, string> = {

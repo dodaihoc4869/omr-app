@@ -20,7 +20,8 @@ export function tachCau(sql) {
 
 const CHI_THEM = /^(CREATE (UNIQUE )?INDEX IF NOT EXISTS|CREATE TABLE IF NOT EXISTS|CREATE TRIGGER IF NOT EXISTS|INSERT OR IGNORE INTO)\s/i
 // 28/10: + bảng việc hôm nay của Tự sửa lỗi (tu-sua-viec-ngay.ts) — cùng đường áp chỉ-thêm từng câu, trước bước đẩy Worker.
-const ds = ['server/migration-2610-thuong-phat.sql', 'server/migration-2610-giai-ban.sql', 'server/migration-2810-tu-sua-viec-ngay.sql'].flatMap((t) => tachCau(readFileSync(t, 'utf8')))
+// 28/10: + bảng khoá chặng sau Tự sửa lỗi (tu_sua_khoa_ngay) — «sửa phải xong mới hiện chặng sau».
+const ds = ['server/migration-2610-thuong-phat.sql', 'server/migration-2610-giai-ban.sql', 'server/migration-2810-tu-sua-viec-ngay.sql', 'server/migration-2810-tu-sua-khoa.sql'].flatMap((t) => tachCau(readFileSync(t, 'utf8')))
 const sai = ds.find((s) => !CHI_THEM.test(s))
 if (sai) throw new Error(`Migration thưởng phạt phải chỉ-thêm, gặp: ${sai.slice(0, 80)}`)
 for (const sql of ds) await query(sql)

@@ -63,6 +63,9 @@ export async function hsGhiViecNgay(env: Env, b: Obj, nowMs: number = Date.now()
   const x = [...new Set((Array.isArray(b.x) ? b.x : []).filter((k): k is string => typeof k === 'string' && !!k && k.length <= 160))].slice(0, TOI_DA_MUC_NGAY * 2)
   const them = Math.min(12, Math.max(0, Math.floor(Number(b.them) || 0)))
   if (!m.length && !x.length) return loi('THIEU_THAM_SO', 'Thiếu việc hôm nay.')
+  // 28/10 «sửa phải xong mới hiện chặng sau»: máy em báo Lộ trình đang KHOÁ các chặng sau nút Tự sửa lỗi ⇒ ghi một dòng / ngày (giữ lần đầu). Ghi riêng,
+  // lỗi (bảng chưa áp) bỏ qua — không làm hỏng bản lưu việc hôm nay.
+  if (b.khoa === true) await env.DB.prepare('INSERT OR IGNORE INTO tu_sua_khoa_ngay(sbd,ngay_vn,luc) VALUES(?1,?2,?3)').bind(sbd, ngay, nowMs).run().catch(() => null)
   await env.DB.prepare(`INSERT INTO tu_sua_viec_ngay(sbd,ngay_vn,muc_json,xong_json,them,cap_nhat_luc) VALUES(?1,?2,?3,?4,?5,?6)
     ON CONFLICT(sbd,ngay_vn) DO UPDATE SET
       muc_json=CASE WHEN json_array_length(excluded.muc_json)>json_array_length(tu_sua_viec_ngay.muc_json) THEN excluded.muc_json ELSE tu_sua_viec_ngay.muc_json END,
@@ -70,4 +73,28 @@ export async function hsGhiViecNgay(env: Env, b: Obj, nowMs: number = Date.now()
       them=MAX(tu_sua_viec_ngay.them,excluded.them),cap_nhat_luc=excluded.cap_nhat_luc`)
     .bind(sbd, ngay, JSON.stringify(m), JSON.stringify(x), them, nowMs).run()
   return Response.json({ ok: true, ngay })
+}
+
+// ─────────────────────────── KHOÁ CHẶNG SAU TỰ SỬA LỖI (thầy 28/10 «Tôi muốn sửa phải xong mới hiện chặng sau») ───────────────────────────
+// Giả định (ghi trong PR): «xong» = 12 câu ĐẦU của việc hôm nay (phần ngày; «Sửa thêm 1 chặng» nối thêm câu ở CUỐI nên không làm khoá lại) đều đã xong phần
+// (khoá đợt / mã câu nằm trong xong_json, hoặc đợt đã khép hôm nay ở chua_gon_lan: đúng, hoặc đã hết 2 lần) — KHÔNG đòi đúng hết.
+// Máy chủ chỉ chặn khi máy em đã báo khoá hôm nay (tu_sua_khoa_ngay) ⇒ không bao giờ chặt hơn Lộ trình em đang thấy; thiếu bảng / thiếu dòng ⇒ không chặn.
+export const MA_TU_SUA_TRUOC = 'TU_SUA_TRUOC'
+export const CHU_TU_SUA_TRUOC = 'Em sửa xong lỗi hôm nay rồi mới mở chặng tiếp nhé.'
+export const SO_CAU_PHAN_NGAY = 12
+/** Một câu đọc (chạy CÙNG đợt với mật khẩu ở nơi gọi — không thêm đợt chờ D1). ?1 = sbd, ?2 = ngày VN. */
+export const lenhDocKhoaSua = (env: Env, sbd: string, ngay: string): D1PreparedStatement => env.DB.prepare(
+  `SELECT k.luc AS khoa, v.muc_json AS m, v.xong_json AS x,
+     (SELECT json_group_array(dot_id) FROM (SELECT DISTINCT dot_id FROM chua_gon_lan WHERE sbd=?1 AND ngay_vn=?2 AND (dung=1 OR lan>=2))) AS xg
+   FROM tu_sua_khoa_ngay k LEFT JOIN tu_sua_viec_ngay v ON v.sbd=k.sbd AND v.ngay_vn=k.ngay_vn WHERE k.sbd=?1 AND k.ngay_vn=?2`).bind(sbd, ngay)
+/** Số câu của phần ngày (12 câu đầu) CHƯA xong phần; không có dòng khoá / không có việc hôm nay ⇒ 0 (không chặn). */
+export function conPhanNgay(d: Obj | null | undefined): number {
+  if (!d || d.khoa === null || d.khoa === undefined) return 0
+  const m = chuanMuc(docMang(d.m)).slice(0, SO_CAU_PHAN_NGAY)
+  const x = new Set([...docMang(d.x), ...docMang(d.xg)].filter((k): k is string => typeof k === 'string'))
+  return m.filter((v) => !x.has(v.d || v.q) && !x.has(v.q)).length
+}
+/** Đọc + tính (không bao giờ ném: bảng chưa áp ⇒ 0). */
+export async function docConPhanKhoa(env: Env, sbd: string, nowMs: number = Date.now()): Promise<number> {
+  try { return conPhanNgay(await lenhDocKhoaSua(env, sbd, ngayVn(nowMs)).first<Obj>()) } catch { return 0 }
 }

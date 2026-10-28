@@ -698,6 +698,8 @@ const SANH_MT = { ...SANH_MOI, chienDich: { id: 'cd1', ten: 'Ester – Lipid' },
   theLuc: MT_TT === 'du' ? { con: 6, tong: 36 } : { con: 18, tong: 30 }, ruong: { ...SANH_MOI.ruong, daLam: mtLam, tong: 30 }, tamGiuCa: 0, kiemTraCaNhan: MT_KIEM }
 if (man === 'hs-mot') {
   try { localStorage.setItem('omr-ai-ddh-co', JSON.stringify({ sbd: '12121212', bat: true, luc: Date.now() })) } catch { /* bỏ qua */ }
+  // 28/10 `&moc=N`: nút Tự sửa lỗi đứng sau chặng N (mốc trong ngày đã nhớ) — cảnh «em tới nút Sửa lỗi»: chặng hiện tại nằm SAU nút ⇒ khoá tới khi sửa xong
+  if (thamSo.get('moc')) try { localStorage.setItem('ddh.moc-sua', JSON.stringify({ ngay: new Date(Date.now() + 7 * 3600_000).toISOString().slice(0, 10), tong: 5, sau: Number(thamSo.get('moc')) })) } catch { /* bỏ qua */ }
   const fetchMt = window.fetch
   const buoi = { id: 'b1', ten: 'Buổi học 26/10/2026', lop: '12A1' }
   window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
