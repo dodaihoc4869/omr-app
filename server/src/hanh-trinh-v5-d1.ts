@@ -1,3 +1,4 @@
+import {layKhoChung} from './kho-chung'
 import type { Env, D1PreparedStatement } from './kieu'
 import type { HoSo2 } from './srs2-d1'
 import { KHOP } from './cau-meta'
@@ -80,9 +81,21 @@ export async function danhMuc(env:Env,hs:Pick<HoSo2,'chienDich'|'phamVi'> & {cau
   congDung.set(khoaDb,p.catch(()=>undefined))
   return p
 }
+/** 28/10 (thử tải 270 em: câu đọc danh mục 3.080 lần × ~24.700 dòng): kho khớp chỉ mục ⇒ lọc từ KHO CHUNG (kho-chung.ts, bản chụp dùng chung) — CÙNG dòng, CÙNG
+ *  thứ tự (qid, ma_de) như nhánh cau_meta của câu SQL dưới; `q_kn` = vkn_json của dòng omni_q (y = −1, đã duyệt). Kho chưa khớp ⇒ null ⇒ câu SQL như cũ. */
+async function dongDanhMucChung(env:Env,ids:readonly string[],mas:readonly string[]):Promise<Record<string,unknown>[]|null>{
+  const kc=await layKhoChung(env).catch(()=>null);if(!kc||!kc.cau.length)return null
+  const maSet=new Set(mas),ra:Record<string,unknown>[]=[]
+  for(const qid of [...new Set(ids)].sort()){const ds=kc.theoQid.get(qid);if(!ds)continue
+    const qkn=(kc.qTheoQid.get(qid)??[]).find(x=>Number(x.y)===-1&&x.duyet===1)?.vkn_json??null
+    for(const g of ds){if(!maSet.has(String(g.ma_de))||Number(g.reviewed)!==1)continue
+      ra.push({qid:g.qid,ma_de:g.ma_de,dang:g.dang,content_group:g.content_group,phan:g.phan,muc:g.muc_do,sao:g.sao,cd:g.chuyen_de,duyet:g.reviewed,nhan:g.nhan_ht,kn:g.kien_thuc,q_kn:qkn})}}
+  return ra
+}
 async function dungDanhMuc(env:Env,ids:readonly string[],mas:readonly string[]):Promise<CauDanhMuc[]>{
+  const chung=await dongDanhMucChung(env,ids,mas)
   // B2 (15/10): bảng tính sẵn `cau_meta` khớp kho ⇒ đọc bảng ấy (không tách JSON ~23.000 câu); lệch ⇒ CÙNG câu đọc thẳng `game_v2_question` như cũ.
-  const r=await env.DB.prepare(`SELECT g.qid,g.ma_de,g.dang,g.content_group,g.phan,g.muc_do muc,g.sao,g.chuyen_de cd,g.reviewed duyet,g.nhan_ht nhan,g.kien_thuc kn,(SELECT oq.vkn_json FROM omni_q oq WHERE oq.qid=g.qid AND oq.y=-1 AND oq.duyet_luc IS NOT NULL) q_kn FROM cau_meta g WHERE ${KHOP} AND g.qid IN(SELECT value FROM json_each(?1)) AND g.ma_de IN(SELECT value FROM json_each(?2)) AND g.reviewed=1
+  const r=chung?{results:chung}:await env.DB.prepare(`SELECT g.qid,g.ma_de,g.dang,g.content_group,g.phan,g.muc_do muc,g.sao,g.chuyen_de cd,g.reviewed duyet,g.nhan_ht nhan,g.kien_thuc kn,(SELECT oq.vkn_json FROM omni_q oq WHERE oq.qid=g.qid AND oq.y=-1 AND oq.duyet_luc IS NOT NULL) q_kn FROM cau_meta g WHERE ${KHOP} AND g.qid IN(SELECT value FROM json_each(?1)) AND g.ma_de IN(SELECT value FROM json_each(?2)) AND g.reviewed=1
     UNION ALL SELECT g.qid,g.ma_de,g.dang,g.content_group,json_extract(g.json,'$.phan') phan,json_extract(g.json,'$.mucDo') muc,json_extract(g.json,'$.sao') sao,json_extract(g.json,'$.chuyenDe') cd,json_extract(g.json,'$.reviewed') duyet,json_extract(g.json,'$.hanhTrinh') nhan,json_extract(g.json,'$.kienThuc') kn,(SELECT oq.vkn_json FROM omni_q oq WHERE oq.qid=g.qid AND oq.y=-1 AND oq.duyet_luc IS NOT NULL) q_kn FROM game_v2_question g WHERE NOT ${KHOP} AND g.qid IN(SELECT value FROM json_each(?1)) AND g.ma_de IN(SELECT value FROM json_each(?2)) AND json_valid(g.json) AND json_extract(g.json,'$.reviewed')=1 ORDER BY qid,ma_de`).bind(JSON.stringify(ids),JSON.stringify(mas)).all<Row>()
   const fullQ=await qCuaCau(env,[...new Set(r.results.map(x=>String(x.qid)))])
   const ds:CauDanhMuc[]=[],da=new Set<string>()

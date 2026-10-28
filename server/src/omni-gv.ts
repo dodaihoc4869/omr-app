@@ -10,6 +10,7 @@
 //   gan-ca-chot {chienDichId, maCa}    ⇒ { ok }
 // Thầy 05/10: A.I Đỗ Đại Học TỰ GẮN vi kỹ năng (mỗi câu = `dang:<ma>` ∪ `nen:<nhãn>`) — `q-lo`/`q-duyet` để thầy XEM/sửa khi muốn, không bắt buộc duyệt.
 // Bảng bài: cột = dạng; ô P của dạng = P vi kỹ năng `dang:<ma>` (khái niệm dạng); vi kỹ năng `nen:*` yếu nhất hiện trong "Cần thầy chữa" (nút thắt / sơ ý).
+import { boKhoChup } from './kho-chung'
 import type { Env } from './kieu'
 import { laHanhTrinh } from './hanh-trinh-hop-nhat'
 import { xoaDemCauHinh } from './cau-hinh-dem'
@@ -411,6 +412,7 @@ async function qDuyet(env: Env, b: Row, nowMs: number) {
   }
   for (let i = 0; i < lenh.length; i += 90) await env.DB.batch(lenh.slice(i, i + 90))
   xoaDemOmni()
+  await boKhoChup(env) // Q đổi ⇒ bỏ bản chụp kho dùng chung (kho-chung.ts)
   return { ok: true, daDuyet: ds.length, vknMoi: vknMoi.length }
 }
 

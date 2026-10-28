@@ -1,3 +1,4 @@
+import { LENH_BANG_DIEM_GON, lenhDiemGon } from './diem-gon'
 import type { Env, D1PreparedStatement } from './kieu'
 import { chayDdlMotLan, ddlDaXong } from './ddl-mot-lan'
 import { SQL_GOI7 } from './goi-bai-7-schema'
@@ -364,7 +365,31 @@ const demKnTinh = new WeakMap<object, Map<string, { luc: number; kiem: number; d
  * dấu kho (một dòng) CÙNG đợt với lượt đọc điểm của em. Điểm của em LUÔN đọc mới, rồi tính
  * ĐÚNG phép SQL cũ: DISTINCT (nhãn, trạng thái) và MIN(COALESCE(p, 0,3)) theo câu đã duyệt, xếp (độ yếu, mã câu), lấy 96. Số đợt D1 không tăng.
  */
-const docDiemKyNang7 = (env: Env, sbd: string) => som(env.DB.prepare('SELECT vkn_id,p,trang_thai FROM omni_p_vkn WHERE sbd=?').bind(sbd).all<Row>())
+// 28/10 (thử tải 270 em: câu này 6.102 lần × ~2.770 dòng): điểm kỹ năng của em chỉ đổi ở ẢNH CHỤP ĐÊM (`chupHoSoTho` là nơi DUY NHẤT ghi omni_p_vkn) ⇒ bản GỌN
+// một dòng `omni_p_gon` (ghi cùng lô chụp; thiếu ⇒ cất nền ở lượt đầu), hợp lệ khi cùng mốc với `omni_em`. MỘT câu SQL: bản gọn hợp lệ ⇒ một dòng; không ⇒ CÙNG các
+// dòng như câu cũ. Bảng gọn chưa có ⇒ câu cũ. Kết quả trả nơi gọi y hệt (vkn_id, p, trang_thai; thứ tự vkn_id).
+const SQL_DIEM_GON = `SELECT NULL AS vkn_id, NULL AS p, NULL AS trang_thai, g.json AS j, NULL AS m FROM omni_p_gon g JOIN omni_em e ON e.sbd = g.sbd AND e.cap_nhat_luc = g.moc WHERE g.sbd = ?1
+  UNION ALL SELECT vkn_id, p, trang_thai, NULL, (SELECT cap_nhat_luc FROM omni_em WHERE sbd = ?1) FROM omni_p_vkn WHERE sbd = ?1
+    AND NOT EXISTS (SELECT 1 FROM omni_p_gon g JOIN omni_em e ON e.sbd = g.sbd AND e.cap_nhat_luc = g.moc WHERE g.sbd = ?1)`
+async function docDiemKyNangGon(env: Env, sbd: string): Promise<{ results: Row[] }> {
+  let r: { results?: Row[] }
+  // Bảng gọn chưa có (D1 mới, trước đêm chụp đầu tiên) ⇒ câu cũ KÈM mốc ảnh chụp ⇒ tạo bảng + cất nền như dưới.
+  try { r = await env.DB.prepare(SQL_DIEM_GON).bind(sbd).all<Row>() } catch { r = await env.DB.prepare('SELECT vkn_id, p, trang_thai, NULL AS j, (SELECT cap_nhat_luc FROM omni_em WHERE sbd = ?1) AS m FROM omni_p_vkn WHERE sbd = ?1').bind(sbd).all<Row>() }
+  const ds = r.results ?? []
+  const gon = ds.find((x) => x.j != null)
+  if (gon) {
+    try { return { results: (JSON.parse(String(gon.j)) as [string, number, string][]).map(([vkn_id, p, trang_thai]) => ({ vkn_id, p, trang_thai })) } } catch { /* hỏng ⇒ câu cũ */ }
+    return env.DB.prepare('SELECT vkn_id,p,trang_thai FROM omni_p_vkn WHERE sbd=?').bind(sbd).all<Row>()
+  }
+  const ra = ds.map((x) => ({ vkn_id: x.vkn_id, p: x.p, trang_thai: x.trang_thai }))
+  const moc = ds[0]?.m
+  if (ra.length && typeof moc === 'string' && moc) {
+    const e = envGhiRieng(env)
+    void chayDdlMotLan(e, 'omni_p_gon_2810', LENH_BANG_DIEM_GON).then(() => lenhDiemGon(e, sbd, moc, ra.map((x) => [String(x.vkn_id), Number(x.p), String(x.trang_thai)] as const)).run()).catch(() => {})
+  }
+  return { results: ra }
+}
+const docDiemKyNang7 = (env: Env, sbd: string) => som(docDiemKyNangGon(env, sbd))
 /** `diemSom` (Gói R 15/10) = lượt đọc điểm kỹ năng của em (`omni_p_vkn`, chỉ theo SBD) nơi gọi đã bắt đầu sớm — cùng câu SQL; vắng ⇒ đọc như cũ. */
 export async function docMaTranCu7(env: Env, sbd: string, maCu: readonly string[], now: number, diemSom?: Promise<{ results: Row[] }>): Promise<[{ results: Row[] }, { results: Row[] }]> {
   const thamSo = JSON.stringify(maCu), khoa = [...maCu].sort().join('|'), goc = dbGoc(env.DB as unknown as object)
