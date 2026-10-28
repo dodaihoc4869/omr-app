@@ -33,7 +33,7 @@ jobs:
             const x = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ query, variables }), signal: AbortSignal.timeout(30000) })
             const j = await x.json(); if (j.errors?.length) console.log('LỖI GraphQL:', JSON.stringify(j.errors).slice(0, 400)); return j.data
           }
-          const den = new Date(Date.now() - 2 * 60000), tu = new Date(den.getTime() - 10 * 60000)
+          const den = new Date('2026-10-28T14:00:00Z'), tu = new Date(den.getTime() - 10 * 60000)
           const q = `query($acc:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
             d1QueriesAdaptiveGroups(limit:10000,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[sum_queryDurationMs_DESC]){
               count sum{queryDurationMs rowsRead rowsWritten} dimensions{query}}}}}`
