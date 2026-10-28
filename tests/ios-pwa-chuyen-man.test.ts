@@ -19,13 +19,14 @@ describe('Sửa triệt để lỗi iOS thêm vào màn hình chính bị nhảy
     // gọn cắt mất như phần sau dấu `?`. Xem `src/lib/khoa-vai.ts`.
     expect(manifestHs.start_url).toBe('./hs')
     expect(manifestHs.name).toContain('Học Sinh')
-    expect(manifestHs.display).toBe('standalone')
+    // 28/10: app học sinh tràn toàn màn (thầy «full hẳn») — xem tests/toan-man-hs-2810.test.ts.
+    expect(manifestHs.display).toBe('fullscreen')
   })
 
   it('manifest phụ huynh có start_url trỏ tới cổng phụ huynh', () => {
     expect(manifestPh.start_url).toBe('./ph')
     expect(manifestPh.name).toContain('Phụ Huynh')
-    expect(manifestPh.display).toBe('standalone')
+    expect(manifestPh.display).toBe('fullscreen') // manifest PH đã toàn màn từ trước (phép kiểm cũ chưa đổi theo)
   })
 
   it('đường /hoc-sinh và /phu-huynh nhận đúng vai', () => {

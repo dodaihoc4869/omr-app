@@ -29,6 +29,7 @@ import { TheBanLoTrinh } from '../thuong/TheBanLoTrinh' // lối vào Học cùn
 import { useTongQuan } from '../thuong/dung-thuong'
 import { napSanThanhTich } from '../../lib/thuong-api'
 import { laSamsungInternet } from '../../lib/nhac-samsung'
+import { giuToanManHs } from '../../lib/toan-man-hs'
 import type { TenManThuong } from '../thuong/ManThuong'
 const ManThuong = lazy(() => import('../thuong/ManThuong'))
 const GiamThiTinh = lazy(() => import('../giam-thi/GiamThi').then((m) => ({ default: m.GiamThiTinh })))
@@ -39,6 +40,8 @@ const NhacSamsung = lazy(() => import('./NhacSamsung').catch(() => ({ default: (
 // Màn phủ tạm đóng (27/10): đi cùng mảnh nạp lười ManThuong, chỉ tải khi thầy đang đóng app (28/10 tác tử tốc độ: trước nằm trong mảnh này ⇒ mọi lần mở
 // Lộ trình cõng ~0,6 KB nén mã chỉ dùng lúc đóng). Không thêm mảnh / tệp precache mới (precache đang ở trần 170 tệp).
 const PhuTamDong = lazy(() => import('../thuong/ManThuong').then((m) => ({ default: m.PhuTamDong })))
+// LUÔN TRÀN TOÀN MÀN (thầy 28/10 «full hẳn, không dải đen»): gắn một lần lúc mảnh này nạp (song song Sảnh, ngoài đường mở app ⇒ không cộng byte lượt mở).
+giuToanManHs()
 /** Sự kiện màn làm chặng phát khi xong bài ĐẦU TIÊN trong ngày ⇒ Lộ trình mở «Chuỗi ngày» với hiệu ứng lửa bùng (C1). */
 export const SU_KIEN_MO_CHUOI = 'ddh-thuong-mo-chuoi'
 /** Cột bên (thẻ Giải tuần + Nhiệm vụ) chỉ hiện ở máy tính / điện thoại ngang (cùng điều kiện CSS `.dm-ben`) ⇒ điện thoại dọc không nạp mảnh màn thưởng. */
