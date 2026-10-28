@@ -4,7 +4,7 @@
 import fs from 'node:fs'
 const { CF_TOKEN_SACH: TOKEN, CF_ACC_SACH: ACC, DB_THAT, RA } = process.env
 const url = `https://api.cloudflare.com/client/v4/accounts/${ACC}/d1/database/${DB_THAT}/query`
-const CHO_PHEP = /^SELECT (name FROM sqlite_master WHERE type='table'|max\(rowid\) AS n FROM "[\w]+"|COUNT\(\*\) AS n FROM "[\w]+"|\w+ AS k, COUNT\(\*\) AS n FROM "[\w]+" GROUP BY \w+|COUNT\(DISTINCT \w+\) AS n FROM "[\w]+"|khoa AS k, length\(gia_tri\) AS dai, json_extract\(CASE WHEN json_valid\(gia_tri\) THEN gia_tri END, '\$\.bat'\) AS bat, json_array_length\(CASE WHEN json_valid\(gia_tri\) THEN gia_tri END, '\$\.lop'\) AS so_lop, json_array_length\(CASE WHEN json_valid\(gia_tri\) THEN gia_tri END, '\$\.sbd'\) AS so_sbd, CASE WHEN length\(gia_tri\) <= 8 THEN gia_tri END AS ngan FROM cau_hinh)$/
+const CHO_PHEP = /^SELECT (name FROM sqlite_master WHERE type='table'|max\(rowid\) AS n FROM "[\w]+"|COUNT\(\*\) AS n FROM "[\w]+"|\w+ AS k, COUNT\(\*\) AS n FROM "[\w]+" GROUP BY \w+|COUNT\(DISTINCT \w+\) AS n FROM "[\w]+"|khoa AS k, length\(gia_tri\) AS dai, json_extract\(CASE WHEN json_valid\(gia_tri\) THEN gia_tri END, '\$\.bat'\) AS bat, json_array_length\(CASE WHEN json_valid\(gia_tri\) THEN gia_tri END, '\$\.lop'\) AS so_lop, json_array_length\(CASE WHEN json_valid\(gia_tri\) THEN gia_tri END, '\$\.sbd'\) AS so_sbd FROM cau_hinh)$/
 const ngu = (ms) => new Promise((r) => setTimeout(r, ms))
 async function hoi(sql) {
   if (!CHO_PHEP.test(sql)) throw new Error('Câu không nằm trong danh sách chỉ-đọc: ' + sql)
@@ -45,11 +45,11 @@ for (const [t, cot] of [['su_kien_hoc', 'sbd'], ['su_kien_hoc', 'qid']]) {
   tongD1 += r.d1ms || 0
   nhom[`${t}.distinct_${cot}`] = r.loi ? { loi: r.loi } : r.rows[0]?.n
 }
-// Công tắc cấu hình: CHỈ tên khoá + độ dài + cờ `bat` + SỐ lớp/SBD trong danh sách + giá trị ≤ 8 ký tự ('bat'/'tat') — không đọc danh sách SBD.
+// Công tắc cấu hình: CHỈ tên khoá + độ dài + cờ `bat` + SỐ lớp/SBD trong danh sách — KHÔNG đọc giá trị (lượt 40611180218 in nhầm một SBD qua cột giá trị ngắn; log đã xoá).
 {
-  const r = await hoi("SELECT khoa AS k, length(gia_tri) AS dai, json_extract(CASE WHEN json_valid(gia_tri) THEN gia_tri END, '$.bat') AS bat, json_array_length(CASE WHEN json_valid(gia_tri) THEN gia_tri END, '$.lop') AS so_lop, json_array_length(CASE WHEN json_valid(gia_tri) THEN gia_tri END, '$.sbd') AS so_sbd, CASE WHEN length(gia_tri) <= 8 THEN gia_tri END AS ngan FROM cau_hinh")
+  const r = await hoi("SELECT khoa AS k, length(gia_tri) AS dai, json_extract(CASE WHEN json_valid(gia_tri) THEN gia_tri END, '$.bat') AS bat, json_array_length(CASE WHEN json_valid(gia_tri) THEN gia_tri END, '$.lop') AS so_lop, json_array_length(CASE WHEN json_valid(gia_tri) THEN gia_tri END, '$.sbd') AS so_sbd FROM cau_hinh")
   tongD1 += r.d1ms || 0
-  nhom.cau_hinh = r.loi ? { loi: r.loi } : r.rows.map((x) => [String(x.k).slice(0, 60), x.dai, x.bat, x.so_lop, x.so_sbd, x.ngan])
+  nhom.cau_hinh = r.loi ? { loi: r.loi } : r.rows.map((x) => [String(x.k).slice(0, 60), x.dai, x.bat, x.so_lop, x.so_sbd])
 }
 const kq = { luc: new Date().toISOString(), dem, nhom, tongD1ms: Math.round(tongD1) }
 fs.writeFileSync(RA, JSON.stringify(kq))

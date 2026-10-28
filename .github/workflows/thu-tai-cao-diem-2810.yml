@@ -95,9 +95,10 @@ jobs:
           python3 -I ../scripts/thu-tai/chia-nap.py "$TT/gia.sqlite" "$N" "$TT/tam.sqlite"
           for P in "$N"-*.sql; do
             T0=$(date +%s); OK=0
-            for LAN in 1 2; do
+            # Lượt 40613523556: phần 150 MB ⇒ «D1_RESET_DO» (một lượt nạp quá lớn) ⇒ phần ~25 MB, lỗi thì nghỉ 30 s rồi thử lại.
+            for LAN in 1 2 3; do
               if npx wrangler d1 execute omr-thu-tai --remote -c wrangler-thu-tai.toml --file "$P" -y > "$TT/nap.log" 2>&1; then OK=1; break; fi
-              echo "Phần $(basename "$P") lỗi lần $LAN:"; grep -E "ERROR|✘" "$TT/nap.log" | cut -c1-200 | head -n 3
+              echo "Phần $(basename "$P") lỗi lần $LAN:"; grep -E "ERROR|✘" "$TT/nap.log" | cut -c1-200 | head -n 3; sleep 30
             done
             [ "$OK" = 1 ] || exit 1
             echo "Nạp $(basename "$P") ($(du -m "$P" | cut -f1) MB) xong sau $(( $(date +%s) - T0 )) s"

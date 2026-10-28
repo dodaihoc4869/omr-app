@@ -58,7 +58,7 @@ class Ghi:
         s.f = open(f'{ra}-{s.so:03d}.sql', 'w', encoding='utf-8', newline='\n'); s.write('PRAGMA defer_foreign_keys = true;\n')
     def write(s, x): s.f.write(x); s.co += len(x)
     def ranh(s):
-        if s.co > 150_000_000: s.moi()
+        if s.co > 25_000_000: s.moi()
 o = Ghi()
 if True:
     for _, sql in bang: o.write(sql.strip().rstrip(';') + ';\n'); dem['bang'] += 1
