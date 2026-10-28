@@ -686,7 +686,8 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
     refs.push(ref); questions.push({...publicQuestion(q),...(ref.goiY?{goiY:ref.goiY}:{}),vaiGoi7:v.vai,huongDan7:v.huongDan,coGoi7:lap.goi.some(g=>g.cau.some(c=>c.qid===q.qid&&c.version===q.version))})
   } } }
   await ghiDongCo
-  if (!refs.length) return {ok:true,questions:[],goi7:tomTatGoi7(lap,now),message:lap.plan.thieuPhu&&lap.daLamNgay<lap.toiThieu?'Còn câu cần thầy bổ sung học liệu hoặc đang được giữ cho ca kiểm tra.':'Em đã hoàn thành phần được xếp hôm nay. Lỗi chưa kiểm chứng vẫn được giữ để học tiếp.'}
+  // Chặng RỖNG (em đã xong phần hôm nay) cũng lập sẵn được (28/10 chiều, thử tải): phản hồi y hệt, nơi dùng trả ngay không lập lại.
+  if (!refs.length) { const rong: Record<string,unknown> = {ok:true,questions:[],goi7:tomTatGoi7(lap,now),message:lap.plan.thieuPhu&&lap.daLamNgay<lap.toiThieu?'Còn câu cần thầy bổ sung học liệu hoặc đang được giữ cho ca kiểm tra.':'Em đã hoàn thành phần được xếp hôm nay. Lỗi chưa kiểm chứng vẫn được giữ để học tiếp.'}; return opts?.khongLuu ? {ok:true,chuanBi:{rong}} : rong }
   const id = viec.length && refs.length === viec.length && refs.every(r => viec.some(v => v.qid === r.qid)) ? str(old!.id) : crypto.randomUUID()
   // Lập sẵn (không lưu): đợt cũ còn nguyên bộ câu ⇒ ghi lại mã đợt ấy (`phienCu`) để lượt mở thật trả ĐÚNG đợt đó như đường thường, không tạo đợt mới.
   if (opts?.khongLuu) return {ok:true,chuanBi:{refs,questions,goi7:tomTatGoi7(lap,now),goiIds:lap.goi.map(g=>g.id),...(id === str(old?.id) ? {phienCu:id} : {})}}

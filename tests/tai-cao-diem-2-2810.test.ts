@@ -4,7 +4,7 @@
 //  · bản chụp kho dùng chung nén gzip ⇒ giải nén ra đúng chuỗi.
 import { afterEach, expect, it } from 'vitest'
 import { taoD1That } from './_d1-that'
-import { dauSanSang, batDemDauChung, SQL_SAN_SANG, KHOA_CH_KHONG_DAU } from '../server/src/san-sang'
+import { dauSanSang, batDemDauChung, SQL_SAN_SANG, KHOA_CH_KHONG_DAU, moChangSanSang } from '../server/src/san-sang'
 import { nen, giaiNen } from '../server/src/kho-chung'
 import { chupHoSoTho, dungSanOmni, hoSoOmniEm, xoaDemOmni } from '../server/src/omni-d1'
 import { taoKhoOmni } from './omni-3-ke-hoach-chung'
@@ -60,4 +60,14 @@ it('dựng sẵn trước giờ học: điểm gọn thiếu ⇒ dựng đúng c
   expect(await dungSanOmni(env, now)).toEqual({ gon: 0, lop: 0 }) // đã đủ ⇒ không làm lại
   xoaDemOmni()
   expect(JSON.stringify(await hoSoOmniEm(env, 'S3', now))).toBe(JSON.stringify(cu))
+})
+
+it('chặng RỖNG lập sẵn (em đã xong phần hôm nay) ⇒ mở chặng trả đúng phản hồi đã lập, không chạm D1', async () => {
+  const rong = { ok: true, questions: [], goi7: { ngay: '2026-10-28' }, message: 'Em đã hoàn thành phần được xếp hôm nay. Lỗi chưa kiểm chứng vẫn được giữ để học tiếp.' }
+  let cham = 0
+  const env = { DB: { prepare: () => { cham++; throw new Error('không được chạm D1') }, batch: () => { cham++; throw new Error('không được chạm D1') } } } as unknown as Env
+  const ban = { ngay: '2026-10-28', luc: 1000, dau: 'v3§x', sanh: null, chang: { rong } as never, phienMoi: 0 }
+  expect(await moChangSanSang(env, 'S1', 2000, ban)).toEqual(rong)
+  expect(cham).toBe(0)
+  expect(await moChangSanSang(env, 'S1', 2000, { ...ban, phienMoi: 1500 })).toBeNull() // có đợt mới hơn bản sẵn ⇒ đường thường
 })
