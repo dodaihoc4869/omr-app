@@ -5,6 +5,7 @@
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { loiCuaKetQua } from '../../game/than-thu-v2/loi-het-tran'
 import { LoiHoa2 } from './api'
+import { dauMocD1 } from '../../lib/moc-d1'
 
 type Obj = Record<string, unknown>
 
@@ -43,6 +44,7 @@ export async function nopCauLuong(token: string, du: Obj, giay: number, tam: (o:
     return await Promise.race([hetHan, (async () => {
       const goc = (await layDiaChiMayChu('')) || 'https://omr.ttadodaihoc.workers.dev'
       if (c.signal.aborted) throw new DOMException('Đã hết giờ', 'AbortError')
+      dauMocD1('answer') // 28/10: lần ghi ⇒ lượt đọc bản sao kế tiếp lấy mốc tươi (moc-d1.ts)
       const r = await fetch(`${goc}/game-v2/answer`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...du, luong: 1, token }), signal: c.signal })
       let j: Obj | null = null
       if (r.body && /ndjson/i.test(r.headers.get('content-type') ?? '')) {
