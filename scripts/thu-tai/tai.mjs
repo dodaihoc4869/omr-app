@@ -185,6 +185,7 @@ for (const [ph, v] of Object.entries(theoPhut)) console.log(`  phút ${ph}: ` + 
     for (const v of ds) for (const x of v.d || []) { const k = String(x[2]).slice(0, 70); const o = cau.get(k) ?? { t: 0, n: 0, d: 0, r: 0 }; o.t += x[1] - x[0]; o.n++; o.d += x[4] || 0; o.r += x[3] || 0; cau.set(k, o) }
     for (const [k, o] of [...cau].sort((a, b) => b[1].t - a[1].t).slice(0, 8)) console.log(`   ${String(Math.round(o.t / ds.length)).padStart(5)} ms/yc · ${(o.n / ds.length).toFixed(1)} lượt/yc · tb ${Math.round(o.t / o.n)} ms · D1 ${(o.d / o.n).toFixed(1)} ms · ${Math.round(o.r / o.n)} dòng | ${k}`)
   }
+  { const sv = {}; for (const ds of Object.values(VET)) for (const v of ds) for (const x of v.sv || []) sv[x] = (sv[x] || 0) + 1; console.log('D1 phục vụ bởi:', JSON.stringify(sv)) }
   // một vết mẫu Sảnh (trung vị) để nhìn thứ tự
   const s = (VET.sanh || []).slice().sort((a, b) => a.w - b.w)
   const m = s[Math.floor(s.length / 2)]

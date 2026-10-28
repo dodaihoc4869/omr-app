@@ -10,10 +10,15 @@ const cauCua = new WeakMap<object, string>()
 export function taoVet(env: Env): { env: Env; tom: () => string } {
   const t0 = Date.now()
   const ds: Ban[] = []
+  const sv = new Set<string>()
   const ghi = (s: string, a: number, r: unknown) => {
     const arr = Array.isArray(r) ? r : [r]
     let n = 0, d = 0
-    for (const x of arr as { results?: unknown[]; meta?: { duration?: number } }[]) { n += Array.isArray(x?.results) ? x.results.length : 0; d += Number(x?.meta?.duration ?? 0) }
+    for (const x of arr as { results?: unknown[]; meta?: { duration?: number } & Record<string, unknown> }[]) {
+      n += Array.isArray(x?.results) ? x.results.length : 0; d += Number(x?.meta?.duration ?? 0)
+      const m = x?.meta
+      if (m && sv.size < 6) { const t = ['served_by_region', 'served_by_colo', 'served_by_primary', 'served_by'].map((k) => (m[k] != null ? `${k.replace('served_by', 'sb')}=${String(m[k])}` : '')).filter(Boolean).join(','); if (t) sv.add(t) }
+    }
     ds.push([a - t0, Date.now() - t0, s, n, Math.round(d * 10) / 10])
   }
   const vaSt = <T extends object>(st: T, q: string): T => {
@@ -41,6 +46,6 @@ export function taoVet(env: Env): { env: Env; tom: () => string } {
   }) as Env['DB']
   return {
     env: { ...env, DB: vaDb(env.DB) },
-    tom: () => { let s = JSON.stringify({ w: Date.now() - t0, d: ds }); if (s.length > 7000) s = JSON.stringify({ w: Date.now() - t0, cat: ds.length, d: ds.slice(0, 60) }); return encodeURIComponent(s) },
+    tom: () => { let s = JSON.stringify({ w: Date.now() - t0, sv: [...sv], d: ds }); if (s.length > 7000) s = JSON.stringify({ w: Date.now() - t0, sv: [...sv], cat: ds.length, d: ds.slice(0, 60) }); return encodeURIComponent(s) },
   }
 }
