@@ -133,6 +133,8 @@ jobs:
           node scripts/toc-do-sau-gop.mjs --gop=kq/kq-trinh-duyet.json,kq/kq-may-chu.json --ra=kq.json --tom=tom.md --tieu-de="Tốc độ ${SAU:0:8} so bản trước ${TRUOC:0:8}" > /dev/null
           { cat tom.md; echo; echo "Job đo trình duyệt: $TD · job đo máy chủ: $MC"; } >> "$GITHUB_STEP_SUMMARY"
           node -e 'const k=require("./kq.json");const c=k.cham||[];console.log("so-cham="+c.length);console.log("dau="+(c[0]||""))' >> "$GITHUB_OUTPUT"
+          # Chú thích trên lượt chạy (đọc được qua API check-runs/<id>/annotations — phiên Claude không tải được log/artifact): kết luận + số lượt đo được.
+          node -e 'const k=require("./kq.json");const c=k.cham||[];const m=(k.muot||[]).map((x)=>`${x.ten} ${x.truoc}→${x.sau}`).join("; ");const b=(k.byte||[]).filter((x)=>x.ten.startsWith("app ")).map((x)=>`${x.ten} ${x.sau-x.truoc>=0?"+":""}${x.sau-x.truoc} B`).join("; ");const d=(k.d1||[]).filter((x)=>x.cham).map((x)=>x.ten).join("; ");console.log(`::${c.length?"error":"notice"} title=Tốc độ sau gộp: ${c.length?c.length+" chỉ số chậm hơn":"không chậm hơn"}::lượt trước/sau ${k.soLuot?.truoc??0}/${k.soLuot?.sau??0}; lỗi đo ${(k.loiMuot||[]).length}; D1 ${(k.d1||[]).length} lệnh${d?" (chậm: "+d+")":""}; ${c.length?"CHẬM: "+c.join(" · ")+"; ":""}${b}; ${m}`)'
       - name: Mở issue «Chậm hơn bản trước»
         if: steps.kl.outputs.so-cham != '0'
         env:
