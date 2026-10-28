@@ -104,18 +104,28 @@ jobs:
             echo "Nạp $(basename "$P") ($(du -m "$P" | cut -f1) MB) xong sau $(( $(date +%s) - T0 )) s"
           done
           npx wrangler d1 execute omr-thu-tai --remote -c wrangler-thu-tai.toml --json --command "SELECT (SELECT COUNT(*) FROM thu_tai_em) em, (SELECT COUNT(*) FROM game_v2_attempt) luot, (SELECT COUNT(*) FROM su_kien_hoc) so_hoc, (SELECT COUNT(*) FROM omni_p_vkn) vkn" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log("D1 sao:",JSON.stringify(JSON.parse(s)[0].results[0])))'
-      - name: "Sinh 4 · thùng R2 sao + kho câu giả"
-        if: contains(env.LENH, 'sinh')
+      - name: "Sinh 4 · thùng R2 sao + kho câu giả (khoá không có quyền R2 ⇒ Worker sao chạy không R2)"
+        if: contains(env.LENH, 'sinh') || contains(env.LENH, 'worker')
         working-directory: server
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
         run: |
           set -euo pipefail
-          npx wrangler r2 bucket create omr-thu-tai-de > "$TT/r2.log" 2>&1 || { grep -qi "already" "$TT/r2.log" && echo "Thùng sao đã có." || { tail -n 5 "$TT/r2.log"; exit 1; }; }
-          node ../scripts/thu-tai/chep-r2.mjs tai "$TT/kho"
+          npx wrangler d1 list --json > "$TT/list.json"
+          ID=$(node -e 'const l=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));const x=l.find(d=>d.name==="omr-thu-tai");if(!x)process.exit(1);console.log(x.uuid)' "$TT/list.json")
+          [ "$ID" != "$DB_THAT" ] || exit 1
+          echo "DB_SAO=$ID" >> "$GITHUB_ENV"
+          MA=$(curl -s -o "$TT/r2.json" -w '%{http_code}' -X POST -H "Authorization: Bearer $CF_TOKEN_SACH" -H 'content-type: application/json' "https://api.cloudflare.com/client/v4/accounts/$CF_ACC_SACH/r2/buckets" -d '{"name":"omr-thu-tai-de"}' || true)
+          if [ "$MA" = 200 ] || grep -q '10004\|already' "$TT/r2.json"; then
+            node ../scripts/thu-tai/tao-cau-hinh.mjs "$ID" wrangler-thu-tai.toml
+            if [ -d "$TT/kho" ]; then node ../scripts/thu-tai/chep-r2.mjs tai "$TT/kho"; fi
+          else
+            echo "Không tạo được thùng R2 sao (HTTP $MA) ⇒ Worker sao chạy KHÔNG có R2 (4 lệnh nóng không đọc R2)."
+            node ../scripts/thu-tai/tao-cau-hinh.mjs "$ID" wrangler-thu-tai.toml khong-r2
+          fi
       - name: "Sinh 5 · đẩy Worker SAO omr-thu-tai (mã main hiện tại) + mã bí mật sao + thử khói"
-        if: contains(env.LENH, 'sinh')
+        if: contains(env.LENH, 'sinh') || contains(env.LENH, 'worker')
         working-directory: server
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
@@ -147,7 +157,7 @@ jobs:
           ID=$(node -e 'const l=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));const x=l.find(d=>d.name==="omr-thu-tai");if(!x)process.exit(1);console.log(x.uuid)' "$TT/list.json")
           [ "$ID" != "$DB_THAT" ] || exit 1
           echo "DB_SAO=$ID" >> "$GITHUB_ENV"
-          node ../scripts/thu-tai/tao-cau-hinh.mjs "$ID" wrangler-thu-tai.toml
+          [ -f wrangler-thu-tai.toml ] || node ../scripts/thu-tai/tao-cau-hinh.mjs "$ID" wrangler-thu-tai.toml khong-r2
           npx wrangler d1 execute omr-thu-tai --remote -c wrangler-thu-tai.toml --json --command "SELECT sbd FROM thu_tai_em" > "$TT/em.json"
           SO=$(grep -m1 -oE '^so_em=[0-9]+' ../scripts/thu-tai/lenh.txt | cut -d= -f2 || true)
           PH=$(grep -m1 -oE '^phut=[0-9]+' ../scripts/thu-tai/lenh.txt | cut -d= -f2 || true)

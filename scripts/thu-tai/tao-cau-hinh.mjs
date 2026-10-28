@@ -2,7 +2,7 @@
 // Đổi: tên Worker, D1 (sang bản sao), R2 (sang thùng riêng), cron chỉ giữ «mỗi phút» (tải nền giống bản thật). Không route, không tên miền riêng.
 // Chặn cứng: tệp ra mà còn tên / mã D1 / thùng R2 của bản thật ⇒ dừng.
 import fs from 'node:fs'
-const [, , dbId, ra] = process.argv
+const [, , dbId, ra, tuy] = process.argv
 if (!/^[0-9a-f-]{36}$/.test(dbId || '')) { console.error('Thiếu mã D1 sao'); process.exit(1) }
 const goc = fs.readFileSync(new URL('../../server/wrangler.toml', import.meta.url), 'utf8')
 const MA_THAT = 'd2e6d322-374a-45d7-83a3-9fac486b23f1'
@@ -12,7 +12,11 @@ let t = goc
   .replace(`database_id = "${MA_THAT}"`, `database_id = "${dbId}"`)
   .replace(/^bucket_name = "omr-de"$/m, 'bucket_name = "omr-thu-tai-de"')
   .replace(/^crons = \[.*\]$/m, 'crons = ["* * * * *"]')
+// Khoá Cloudflare không có quyền R2 (lượt 40615721475: tạo thùng sao bị từ chối) ⇒ `khong-r2`: bỏ hẳn khối R2. Bốn lệnh nóng không đọc R2
+// (đo bằng test đường nóng có bọc R2: 0 lượt), các lệnh khác đọc R2 sẽ báo lỗi trên bản sao — không ảnh hưởng số đo.
+if (tuy === 'khong-r2') t = t.replace(/\[\[r2_buckets\]\]\nbinding = "DE"\nbucket_name = "omr-thu-tai-de"\n/, '')
 const loi = []
+if (tuy === 'khong-r2' && /^\[\[r2_buckets\]\]/m.test(t)) loi.push('chưa bỏ được khối R2')
 if (!/^name = "omr-thu-tai"$/m.test(t)) loi.push('tên')
 if (t.includes(MA_THAT)) loi.push('mã D1 thật')
 if (/^database_name = "omr"$/m.test(t)) loi.push('tên D1 thật')

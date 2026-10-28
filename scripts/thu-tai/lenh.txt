@@ -1,5 +1,4 @@
-sinh chay
-so_ngay=14
+worker chay
 so_em=270
 phut=12
 am=20
