@@ -22,7 +22,7 @@
    "lenh": 1
   }
  },
- "mayChuNop": {"nop-cau-sai": {"dot": 2, "lenh": 3}, "dem-sau-cau": {"dot": 1, "lenh": 2}, "nop-cau-dung": {"dot": 2, "lenh": 3}, "nop-cau-dung-xac-thuc": {"dot": 2, "lenh": 3}, "dem-sau-cau-xac-thuc": {"dot": 1, "lenh": 2}, "dong-bo-exp-lai": {"dot": 3, "lenh": 4}, "ke-hoach-ngay": {"dot": 8, "lenh": 33}, "nop-cau-luong": {"dot": 0, "lenh": 0}},
+ "mayChuNop": {"nop-cau-sai": {"dot": 2, "lenh": 3}, "dem-sau-cau": {"dot": 1, "lenh": 2}, "nop-cau-dung": {"dot": 2, "lenh": 3}, "nop-cau-dung-xac-thuc": {"dot": 2, "lenh": 3}, "dem-sau-cau-xac-thuc": {"dot": 1, "lenh": 2}, "dong-bo-exp-lai": {"dot": 3, "lenh": 4}, "ke-hoach-ngay": {"dot": 7, "lenh": 33}, "nop-cau-luong": {"dot": 0, "lenh": 0}},
  "mayChuSanSang": {"sanh-lan-sau": {"dot": 1, "lenh": 3}, "mo-chang": {"dot": 2, "lenh": 4}, "sanh-sau-chang": {"dot": 1, "lenh": 3}, "mo-chang-sau-chang": {"dot": 2, "lenh": 4}, "sanh-dau-ngay": {"dot": 1, "lenh": 3}, "mo-chang-dau-ngay": {"dot": 2, "lenh": 4}},
  "taiApp": {
   "giao-vien": {

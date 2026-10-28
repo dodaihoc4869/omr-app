@@ -1124,11 +1124,14 @@ export async function hsKeHoachNgayCoExp(env: Env, b: Record<string, unknown>, s
   // Tối ưu 05/10: cờ EXP mới (`cau_hinh.exp_moi`) đọc CÙNG đợt đầu của kế hoạch (trước: một đợt riêng sau khi lập kế hoạch). Kế hoạch không ghi `cau_hinh`.
   const cauHinhSom = docCauHinhExp(env)
   cauHinhSom.catch(() => {})
-  const r = await hsKeHoachNgay(env, b)
+  // 28/10 GIỜ CAO ĐIỂM: `sauKeHoach` (vd. "về đích" đọc hồ sơ nắm kiến thức) chạy NGAY khi hồ sơ đã cập nhật — song song phần đọc đầu vào + ghi kế hoạch
+  // (trước: chờ ghi kế hoạch xong ⇒ thêm một đợt D1 nối tiếp). Đường không báo (lỗi giữa chừng) ⇒ gọi như cũ sau kế hoạch. Chỉ MỘT lần.
+  let daBao = false
+  const bao = (s: string) => { if (!daBao && s && sauKeHoach) { daBao = true; sauKeHoach(s) } }
+  const r = await hsKeHoachNgay(env, b, sauKeHoach ? bao : undefined)
   if (r.ok !== true) return r
   const sbd = typeof r.sbd === 'string' ? r.sbd : b.token ? await gameIdentity(env, b).catch(() => '') : String(b.sbd ?? '').trim()
-  // `sauKeHoach` (chỉ-thêm): nơi gọi bắt đầu phần đọc cần kế hoạch VỪA ghi (vd. "về đích" đọc hồ sơ nắm kiến thức) song song với phần EXP bên dưới.
-  if (sbd && sauKeHoach) sauKeHoach(sbd)
+  if (sbd) bao(sbd)
   if (!sbd) return r
   const now = Date.now()
   const k = await capNhatExp(env, sbd, now, {

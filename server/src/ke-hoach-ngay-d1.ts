@@ -615,7 +615,7 @@ export function batDauDocKeHoach(env: Env, dsSbd: string[], now: number): DocDau
     ).bind(arr).all<Record<string, unknown>>(), trong()),
   }
 }
-export async function lapVaLuuKeHoach(env: Env, dsSbd: string[], now: number, tuyChon: { luu?: boolean } = {}, docSom?: DocDauKeHoach): Promise<Map<string, KeHoachDaLap>> {
+export async function lapVaLuuKeHoach(env: Env, dsSbd: string[], now: number, tuyChon: { luu?: boolean; /** (28/10) hồ sơ năm KT đã cập nhật (dựng xong / không cần dựng) — nơi gọi bắt đầu phần chỉ đọc hồ sơ. */ khiHoSo?: () => void } = {}, docSom?: DocDauKeHoach): Promise<Map<string, KeHoachDaLap>> {
   const em = [...new Set(dsSbd.map((x) => x.trim()).filter(Boolean))]
   const ra = new Map<string, KeHoachDaLap>()
   if (em.length === 0) return ra
@@ -634,6 +634,8 @@ export async function lapVaLuuKeHoach(env: Env, dsSbd: string[], now: number, tu
   // 28/10 GIỜ CAO ĐIỂM (vết đợt D1 /hs/ke-hoach-ngay: dựng hồ sơ 4 đợt nối tiếp RỒI mới bắt đầu đọc đầu vào): dựng hồ sơ và đọc đầu vào chạy SONG SONG —
   // `docDauVao` chỉ chờ hồ sơ ở chỗ cần (các lượt đọc khác không phụ thuộc hồ sơ, không đọc nam_kt_* của em đang dựng).
   const pDung = cuHo.length > 0 ? tat(() => dungLaiHoSo(env, cuHo, nowIso), null) : null
+  // 28/10 GIỜ CAO ĐIỂM: báo «hồ sơ đã sẵn» NGAY khi dựng xong (không chờ đọc đầu vào + ghi kế hoạch) — khối «về đích» chỉ đọc hồ sơ, không đọc kế hoạch.
+  if (tuyChon.khiHoSo) { if (pDung) void pDung.then(tuyChon.khiHoSo, tuyChon.khiHoSo); else tuyChon.khiHoSo() }
   const dauVao = await docDauVao(env, em, now, { ...(pDung ? { hoSoCho: { em: cuHo, hua: pDung.then((k) => k?.hoSo ?? null) } } : {}), tongHop })
   const dungKq = pDung ? await pDung : null
 
@@ -851,7 +853,7 @@ export async function docThanThu(env: Env, sbd: string): Promise<ThanThu | null>
 }
 
 /** `POST /hs/ke-hoach-ngay {sbd | token}` — công khai như `/btvn/cua-em`; có `token` thì lấy SBD từ chữ ký. */
-export async function hsKeHoachNgay(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
+export async function hsKeHoachNgay(env: Env, b: Record<string, unknown>, khiHoSo?: (sbd: string) => void): Promise<Record<string, unknown>> {
   const sbd = b.token ? await gameIdentity(env, b) : String(b.sbd ?? '').trim()
   if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
   // Đường này công khai (như `/hs/btvn`), nên SBD bịa KHÔNG được phép sinh ra dòng nào trong `ke_hoach_ngay`.
@@ -863,7 +865,7 @@ export async function hsKeHoachNgay(env: Env, b: Record<string, unknown>): Promi
   const docSom = batDauDocKeHoach(env, [sbd], now)
   const thanThuSom = docThanThu(env, sbd)
   if (!(await laHocSinhThat(env, sbd))) return { ok: false, error: 'Không tìm thấy học sinh' }
-  const kh = (await lapVaLuuKeHoach(env, [sbd], now, {}, docSom)).get(sbd)!
+  const kh = (await lapVaLuuKeHoach(env, [sbd], now, khiHoSo ? { khiHoSo: () => khiHoSo(sbd) } : {}, docSom)).get(sbd)!
   // `thanThu` đọc tươi mỗi lần gọi, KHÔNG nằm trong bản ghi `ke_hoach_ngay`.
   return { ok: true, ...kh, thanThu: await thanThuSom }
 }
