@@ -8,7 +8,8 @@
 //   2. Độ mượt app học sinh (scripts/do-muot-hs.mjs, CPU ×N, Fast 3G): chạm được, bấm phương án, Kiểm tra, Tiếp tục, chuyển câu, vào chặng,
 //      khung cuộn p95, rAF nền. Chạy XEN KẼ trước/sau `--lan` lượt (mặc định 3), lấy TRUNG VỊ từng chỉ số ⇒ bớt nhiễu máy.
 //   3. Đợt chờ D1 + số lệnh D1 của lệnh nóng (`--d1-truoc` / `--d1-sau`: thư mục chứa JSON do các test tốc độ máy chủ ghi qua GHI_MOC_TOC_DO) — tất định.
-// Chậm hơn khi: byte > +64 B (nhiễu mã băm tên tệp ≤ ~35 B) · D1: hơn 1 đợt / 1 lệnh · thời gian: trung vị vượt CẢ +10 ms lẫn +5 % VÀ khác biệt có ý nghĩa
+// Chậm hơn khi: byte > +64 B (nhiễu mã băm tên tệp ≤ ~35 B) · D1: min các lượt bản mới > max các lượt bản trước (đợt hoặc lệnh; bộ đếm có lệnh nhảy ±1 theo
+// nhịp máy) · thời gian: trung vị vượt CẢ +10 ms lẫn +5 % VÀ khác biệt có ý nghĩa
 // (Mann–Whitney một phía trên số từng lượt, p ≤ 0,05 ⇒ với 3 lượt: cả 3 lượt sau đều chậm hơn cả 3 lượt trước). Đo 28/10 trên 15 bản liên tiếp: hai bản chỉ
 // khác chữ (bdff8d51 → 7915b8b4) vẫn lệch trung vị 3 lượt tới +150 ms (vào chặng), +16 ms (bấm phương án) ⇒ chỉ ngưỡng phần trăm sẽ mở issue giả. Chỉ số theo
 // câu (bấm phương án / Kiểm tra / Tiếp tục / chuyển câu / hiệu ứng) còn phải chậm hơn trên mọi câu gộp (7 × 3 = 21 mẫu mỗi bên, p ≤ 0,01).
@@ -95,15 +96,18 @@ function doMuot(dist, i) {
   return kq.tom ? { kq } : { loi: String(kq.loiChay || 'không có số đo').slice(0, 300) }
 }
 
-/** JSON của 4 test tốc độ máy chủ (GHI_MOC_TOC_DO) trong một thư mục ⇒ { 'tệp › lệnh': {dot, lenh} }. */
+/** JSON của các test tốc độ máy chủ (GHI_MOC_TOC_DO, mỗi lượt một tệp `<test>~<lượt>.json`) ⇒ { 'test › lệnh': [{dot, lenh}, …] } (mọi lượt). */
 function docD1(thu) {
   const o = {}
   if (!thu || !existsSync(thu)) return o
   for (const t of readdirSync(thu).filter((x) => x.endsWith('.json'))) {
-    try { for (const [k, v] of Object.entries(JSON.parse(readFileSync(join(thu, t), 'utf8')))) o[`${t.replace(/\.json$/, '')} › ${k}`] = v } catch {}
+    try { for (const [k, v] of Object.entries(JSON.parse(readFileSync(join(thu, t), 'utf8')))) (o[`${t.replace(/(~\d+)?\.json$/, '')} › ${k}`] ??= []).push(v) } catch {}
   }
   return o
 }
+const khoang = (ds, k) => (ds?.length ? [Math.min(...ds.map((x) => x[k])), Math.max(...ds.map((x) => x[k]))] : null)
+/** D1 chậm hơn: MỌI lượt bản mới hơn MỌI lượt bản trước (min sau > max trước) ở số đợt hoặc số lệnh. Lệnh tất định (min = max) ⇒ +1 là bắt được. */
+export const d1ChamHon = (t, s) => !!(t?.length && s?.length && ['dot', 'lenh'].some((k) => khoang(s, k)[0] > khoang(t, k)[1]))
 
 /** So các lượt đo độ mượt hai bản (mỗi lượt = kết quả đầy đủ của do-muot-hs.mjs). */
 function soMuot(kq, luot) {
@@ -141,7 +145,8 @@ function soSanhTrinhDuyet() {
   kq.d1 = []
   for (const k of new Set([...Object.keys(d1t), ...Object.keys(d1s)])) {
     const t = d1t[k], s = d1s[k]
-    kq.d1.push({ ten: k, truoc: t ?? null, sau: s ?? null, cham: !!(t && s && (chamHon(t.dot, s.dot, 'd1') || chamHon(t.lenh, s.lenh, 'd1'))) })
+    const tom = (ds) => (ds ? { dot: khoang(ds, 'dot'), lenh: khoang(ds, 'lenh'), luot: ds.length } : null)
+    kq.d1.push({ ten: k, truoc: tom(t), sau: tom(s), cham: d1ChamHon(t, s) })
   }
   return kq
 }
@@ -167,7 +172,7 @@ function bangMarkdown(kq, tieuDe) {
   kq.cham = cham
   const d = [`## ${cham.length ? '🔴' : '🟢'} ${tieuDe}`, '']
   d.push(cham.length ? `**Chậm hơn bản trước ở ${cham.length} chỉ số:** ${cham.join(' · ')}` : '**Không chỉ số nào chậm hơn bản trước quá ngưỡng nhiễu.**', '')
-  d.push(`Ngưỡng nhiễu: byte +${NGUONG.byte} B · thời gian: trung vị vượt cả +${NGUONG.ms} ms lẫn +${NGUONG.phanTram} % và Mann–Whitney trên số từng lượt p ≤ ${NGUONG.p} (chỉ số theo câu: thêm mọi câu gộp p ≤ ${NGUONG.pCau}) · D1 hơn 1 đợt / 1 lệnh. Dữ liệu GIẢ (máy chủ app giả), không dữ liệu thật.`, '')
+  d.push(`Ngưỡng nhiễu: byte +${NGUONG.byte} B · thời gian: trung vị vượt cả +${NGUONG.ms} ms lẫn +${NGUONG.phanTram} % và Mann–Whitney trên số từng lượt p ≤ ${NGUONG.p} (chỉ số theo câu: thêm mọi câu gộp p ≤ ${NGUONG.pCau}) · D1: mọi lượt bản mới hơn mọi lượt bản trước (đợt hoặc lệnh). Dữ liệu GIẢ (máy chủ app giả), không dữ liệu thật.`, '')
   if (kq.muot.length) {
     d.push(`### Độ mượt app học sinh — CPU ×${kq.cpu}, ${kq.mang === 'slow3g' ? 'Slow 3G' : 'Fast 3G'}, trung vị, ${kq.soLuot?.truoc ?? 0}/${kq.soLuot?.sau ?? 0} lượt (trước/sau)`, '', '| Chỉ số | Trước | Sau | Lượt | p lượt | p câu | |', '|---|---:|---:|---:|---:|---:|:-:|')
     for (const x of kq.muot) d.push(`| ${x.ten} | ${so(x.truoc, x.dv)} | ${so(x.sau, x.dv)} | ${x.soMau?.join('/') ?? ''} | ${x.p ?? ''} | ${x.pCau ?? ''} | ${x.cham ? '🔴' : x.sau != null && x.truoc != null && x.sau < x.truoc ? '↓' : ''} |`)
@@ -180,8 +185,9 @@ function bangMarkdown(kq, tieuDe) {
     d.push('')
   }
   if (kq.d1.length) {
-    d.push('### Máy chủ: đợt chờ D1 nối tiếp / số lệnh D1 (lệnh nóng)', '', '| Lệnh | Trước | Sau | |', '|---|---:|---:|:-:|')
-    const o = (v) => (v ? `${v.dot} / ${v.lenh}` : '—')
+    d.push('### Máy chủ: đợt chờ D1 nối tiếp / số lệnh D1 (lệnh nóng; khoảng của 3 lượt)', '', '| Lệnh | Trước | Sau | |', '|---|---:|---:|:-:|')
+    const r = ([a, b]) => (a === b ? `${a}` : `${a}–${b}`)
+    const o = (v) => (v ? `${r(v.dot)} / ${r(v.lenh)}` : '—')
     for (const x of kq.d1) d.push(`| ${x.ten} | ${o(x.truoc)} | ${o(x.sau)} | ${x.cham ? '🔴' : ''} |`)
     d.push('')
   }

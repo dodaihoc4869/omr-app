@@ -98,10 +98,11 @@ jobs:
           git worktree add --detach "$RUNNER_TEMP/wt-truoc" "$TRUOC"
           ln -s "$PWD/node_modules" "$RUNNER_TEMP/wt-truoc/node_modules"
           mkdir -p "$RUNNER_TEMP/d1-sau" "$RUNNER_TEMP/d1-truoc"
-          for t in toc-do-may-chu-lenh-nong-1310 toc-do-may-chu-ph-2110 toc-do-may-chu-nop-2710 san-sang-2710; do
-            [[ -f "tests/$t.test.ts" ]] && GHI_MOC_TOC_DO="$RUNNER_TEMP/d1-sau/$t.json" timeout 4m npx vitest run "tests/$t.test.ts" --reporter=dot > /dev/null 2>&1 || true
-            [[ -f "$RUNNER_TEMP/wt-truoc/tests/$t.test.ts" ]] && (cd "$RUNNER_TEMP/wt-truoc" && GHI_MOC_TOC_DO="$RUNNER_TEMP/d1-truoc/$t.json" timeout 4m npx vitest run "tests/$t.test.ts" --reporter=dot > /dev/null 2>&1) || true
-          done
+          # 3 lượt mỗi bản: bộ đếm đợt có lệnh nhảy theo nhịp máy (28/10: nộp câu 7/9 ↔ 6/10 cùng một mã) ⇒ so KHOẢNG min–max, không so một lần đo.
+          for t in toc-do-may-chu-lenh-nong-1310 toc-do-may-chu-ph-2110 toc-do-may-chu-nop-2710 san-sang-2710; do for l in 1 2 3; do
+            [[ -f "tests/$t.test.ts" ]] && GHI_MOC_TOC_DO="$RUNNER_TEMP/d1-sau/$t~$l.json" timeout 4m npx vitest run "tests/$t.test.ts" --reporter=dot > /dev/null 2>&1 || true
+            [[ -f "$RUNNER_TEMP/wt-truoc/tests/$t.test.ts" ]] && (cd "$RUNNER_TEMP/wt-truoc" && GHI_MOC_TOC_DO="$RUNNER_TEMP/d1-truoc/$t~$l.json" timeout 4m npx vitest run "tests/$t.test.ts" --reporter=dot > /dev/null 2>&1) || true
+          done; done
           node scripts/toc-do-sau-gop.mjs --d1-truoc="$RUNNER_TEMP/d1-truoc" --d1-sau="$RUNNER_TEMP/d1-sau" --ra=kq-may-chu.json > /dev/null
       - uses: actions/upload-artifact@v4
         if: always()
