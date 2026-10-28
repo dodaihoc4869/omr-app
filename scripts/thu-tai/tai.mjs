@@ -74,7 +74,14 @@ async function goi(ten, duong, than, { giay = 30, get = false, dau = {} } = {}) 
   const c = new AbortController(), hen = setTimeout(() => c.abort(), giay * 1000)
   try {
     const r = await fetch(GOC + duong, get ? { signal: c.signal, headers: { ...dau, 'x-vet': '1' } } : { method: 'POST', headers: { 'content-type': 'application/json', 'x-vet': '1', ...dau }, body: JSON.stringify(than), signal: c.signal })
-    const chu = await r.text()
+    // Nộp theo luồng (`luong: 1`, như máy em thật — doc-luong-nop.ts): dòng đầu (đúng / sai tạm) tới lúc nào ⇒ `nop_tam` (em thấy kết quả); cả thân ⇒ như cũ.
+    let chu = ''
+    if (than && than.luong && r.body && /ndjson/i.test(r.headers.get('content-type') || '')) {
+      const doc = r.body.getReader(), gm = new TextDecoder()
+      let daTam = false
+      for (;;) { const { value, done } = await doc.read(); if (value) chu += gm.decode(value, { stream: true }); if (!daTam && chu.includes('\n')) { daTam = true; if (trongDo) dem('nop_tam').ms.push(performance.now() - t0) } if (done) break }
+      chu = chu.trim().split('\n').filter(Boolean).pop() || ''
+    } else { chu = await r.text(); if (than && than.luong && trongDo) dem('nop_tam').ms.push(performance.now() - t0) } // máy chủ không chấm nhanh được ⇒ em chờ cả thân
     const ms = performance.now() - t0
     const xv = r.headers.get('x-vet')
     if (xv && trongDo) { const k = [].concat(ten)[0]; const a = (VET[k] ??= []); if (a.length < 600) { try { a.push({ ms, ...JSON.parse(decodeURIComponent(xv)) }) } catch { /* */ } } }
@@ -124,7 +131,7 @@ async function em(sbd) {
       const nghi = ng(3_000, 15_000)
       await ngu(nghi)
       const tra = q.phan === 'I' ? 'ABCD'[Math.floor(Math.random() * 4)] : q.phan === 'II' ? Array.from({ length: 4 }, () => (Math.random() < 0.5 ? 'D' : 'S')).join('') : String(Math.floor(Math.random() * 10 ** Math.max(1, Math.min(4, Number(q.soO) || 4))))
-      const r = await goi('nop_cau', '/game-v2/answer', { token: tk, session: s.id, qid: q.qid, answer: tra, assisted: false, msLam: Math.round(nghi) }, { giay: 15 })
+      const r = await goi('nop_cau', '/game-v2/answer', { token: tk, session: s.id, qid: q.qid, answer: tra, assisted: false, msLam: Math.round(nghi), luong: 1 }, { giay: 15 })
       if (typeof r.correct === 'boolean') soChang.cau++
       void goi('dem_sau_cau', '/game-v2/hoc-tap-dem', { token: tk }, { giay: 20 })
       await ngu(ng(1_500, 4_000)) // đọc kết quả câu

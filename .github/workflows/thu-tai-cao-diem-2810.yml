@@ -65,6 +65,17 @@ jobs:
           if [ "$GIO" -ge 18 ]; then echo "::error::Khung học 18–24 giờ VN — không đếm D1 thật."; exit 1; fi
           RA="$TT/dem.json" node scripts/thu-tai/dem-bang.mjs
 
+      - name: "Vị trí · D1 thật và D1 sao chạy ở đâu (CHỈ ĐỌC: SELECT 1, ngoài khung học)"
+        if: contains(env.LENH, 'vitri')
+        run: |
+          set -euo pipefail
+          npx wrangler d1 list --json > "$TT/list-vt.json" 2>/dev/null || true
+          export DB_SAO=$(node -e 'try{const l=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));const x=l.find(d=>d.name==="omr-thu-tai");console.log(x?x.uuid:"")}catch{console.log("")}' "$TT/list-vt.json")
+          CLOUDFLARE_API_TOKEN="$CF_TOKEN_SACH" CLOUDFLARE_ACCOUNT_ID="$CF_ACC_SACH" node scripts/thu-tai/vi-tri-d1.mjs
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+
       - name: "Mốc · giờ cao điểm thật 5 tối gần nhất (CHỈ ĐỌC Analytics, không gọi D1)"
         if: contains(env.LENH, 'moc')
         run: node scripts/thu-tai/phan-tich-that.mjs
