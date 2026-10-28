@@ -75,6 +75,9 @@ function daXong(m: MucChua, loai: LoaiViec, ghi: ReadonlySet<string>, nayMs: num
   // không bao giờ khớp ⇒ "Sửa tiếp" mở lại đúng câu ấy mãi. Màn chữa ghi thêm mã câu (đúng `qid` của mục) ⇒ khép được.
   if (ghi.has(khoaMuc(m)) || ghi.has(m.qid)) return true
   if (m.trangThai === 'da_tu_sua') return true
+  // 28/10 (video thầy 20:09: «Câu sai số 9 · Cần sửa» mở ra «Đang chờ kiểm lại · lịch 20:02 29-10» ⇒ kẹt 11/12, chặng sau khoá mãi): câu kiểm lại sau Hỏi thầy
+  // chỉ chờ lịch ôn chung — hôm nay em không còn gì để làm ở đây ⇒ coi như xong phần.
+  if (m.kiemHoiThay) return true
   if (loai === 'goc') return false
   if (m.trangThai === 'can_thay') return true
   return m.trangThai === 'cho_gap_lai_2' && nhomMucChua(m, nayMs) === 'cho'
@@ -198,7 +201,7 @@ export function dungViecHomNay(
     const truoc = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0)
     const ung = ds
       .map((m, i) => ({ m, i, l: loaiViec(m, nayMs) }))
-      .filter((x): x is { m: MucChua; i: number; l: LoaiViec } => x.l !== null && !co.has(khoaMuc(x.m)))
+      .filter((x): x is { m: MucChua; i: number; l: LoaiViec } => x.l !== null && !x.m.kiemHoiThay && !co.has(khoaMuc(x.m)))
       .sort((a, b) => THU_TU[a.l] - THU_TU[b.l] || hangSai(a.m, nayMs) - hangSai(b.m, nayMs)
         || (a.l === 'goc' ? truoc(lanCuoi[khoaMuc(a.m)] ?? '', lanCuoi[khoaMuc(b.m)] ?? '') : 0) || (b.m.saiLuc ?? 0) - (a.m.saiLuc ?? 0) || a.i - b.i)
       .slice(0, soMuc - nk.m.length)
@@ -211,6 +214,8 @@ export function dungViecHomNay(
     const m = hienTai.get(khoa) ?? { qid: x.q, ...(x.d ? { dotId: x.d } : {}), trangThai: x.t, ...(x.h ? { denHan: x.h } : {}) } as MucChua
     return { m, khoa, loai: x.l, xong: daXong(m, x.l, ghi, nayMs) }
   })
+  // Câu chờ kiểm lại đã nằm trong việc hôm nay ⇒ ghi vào «đã xong» (máy chủ đếm cùng tập này khi khoá chặng sau Sửa lỗi — TU_SUA_TRUOC).
+  const tuXong = muc.filter((x) => x.m.kiemHoiThay && !ghi.has(x.khoa)).map((x) => x.khoa)
   const chang = chiaChang(muc)
   const xong = muc.filter((x) => x.xong).length
   const tiep = muc.find((x) => !x.xong) ?? null
@@ -222,8 +227,8 @@ export function dungViecHomNay(
     conNgaySau: Math.max(0, soCan - trongCan),
     ...(kq.dem?.xongHomNay ? { xongHomNay: kq.dem.xongHomNay } : {}),
   }
-  const doi = them_.length > 0 || (them > (nk.them ?? 0))
-  const cuoi: NhatKy = doi ? { n: nk.n, m: luuMuc, x: nk.x, them: Math.max(them, nk.them ?? 0) } : nk
+  const doi = them_.length > 0 || (them > (nk.them ?? 0)) || tuXong.length > 0
+  const cuoi: NhatKy = doi ? { n: nk.n, m: luuMuc, x: [...nk.x, ...tuXong], them: Math.max(them, nk.them ?? 0) } : nk
   // Ghi bản đệm khi bản cuối khác bản đang nằm trên máy (thêm câu, hoặc vừa nhận bản máy chủ); gửi máy chủ khi máy chủ còn thiếu.
   return { viec, luu: doi || !giongNhatKy(cuoi, nkMay) ? cuoi : null, day: canDay(cuoi, kq.viecNgay) ? cuoi : null }
 }

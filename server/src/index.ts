@@ -13,7 +13,7 @@ import {ghiSuKien,ghiSuKienThi,chuanBiSuKienLoBtvn,ghiSuKienLoBtvn,ngayVn,type L
 import {docDoGiayNhieu} from './do-giay-luot'
 import {napLaiSuKien,kiemCheoSuKien,type NguonNapLai} from './su-kien-nap-lai'
 import {dungLaiHoSo,docHoSoEm,docDoPhuDang} from './ho-so-nam-kt'
-import {chayCaLop,docThanThu} from './ke-hoach-ngay-d1'
+import {chayCaLop,docThanThu,type KeHoachTruoc} from './ke-hoach-ngay-d1'
 import {chayResetNeuDenGio,chayTiepTay,dangLamMoi,dangLamMoiTuDem,docMocReset,doGioiHanTruyVan,maDaDung,maDaDungTrong,resetDryRun,LOI_DANG_LAM_MOI} from './reset-toan-app'
 import {cronResetHoa2,lenhGhiResetHoa2,xuLyLenhResetHoa2} from './reset-hoa2'
 import {hsKeHoachNgayCoExp,expNhanSauNop,chotExpNgayQuaDayDu} from './exp-d1'
@@ -141,7 +141,7 @@ const JSON_HEADERS = { 'content-type': 'application/json;charset=utf-8', ...CORS
 /** Bộ não A.I đã gỡ (thầy lệnh 28/09/2026): lời trả cho mọi lệnh cũ của chức năng này. */
 const DA_GO_BO_NAO = 'Chức năng đã gỡ'
 
-async function dungKeHoachEm(env: Env, b: Record<string, unknown>, sbdBiet = ''): Promise<Record<string, unknown>> {
+async function dungKeHoachEm(env: Env, b: Record<string, unknown>, sbdBiet = '', truoc?: KeHoachTruoc): Promise<Record<string, unknown>> {
   // TỐI ƯU 05/10: `sbdBiet` (SBD nơi gọi đã xác định từ token/sbd — đúng SBD kế hoạch sẽ dùng) ⇒ khối phụ KHÔNG phụ thuộc kế hoạch (cảnh báo
   // của thầy — chỉ đọc bảng kế hoạch/EXP không ghi) bắt đầu CÙNG đợt đầu của kế hoạch; "về đích" đọc hồ sơ nắm kiến thức mà kế hoạch vừa dựng lại ⇒ bắt đầu
   // NGAY SAU khi kế hoạch ghi xong, song song phần EXP (EXP không ghi bảng nào "về đích" đọc). Trước: cả ba chờ hết kế hoạch + EXP. Phản hồi y hệt.
@@ -150,7 +150,7 @@ async function dungKeHoachEm(env: Env, b: Record<string, unknown>, sbdBiet = '')
   // DỒN VỀ ĐÍCH (thầy chốt 21/09 14:13; ve-dich-d1.ts, đọc-chỉ): `no` + `veDich`. Chỉ-thêm; lỗi ⇒ vắng khoá (màn ẩn thẻ).
   const docVeDich = (sbd: string) => docVeDichCuaEm(env, sbd).then((v) => v, (e) => { console.error('[ve-dich] không dựng được (bỏ khối):', e instanceof Error ? e.message : e); return null })
   let veDichSom: { sbd: string; p: ReturnType<typeof docVeDich> } | null = null
-  const kh = await hsKeHoachNgayCoExp(env, b, (sbd) => { veDichSom = { sbd, p: docVeDich(sbd) } })
+  const kh = await hsKeHoachNgayCoExp(env, b, (sbd) => { veDichSom = { sbd, p: docVeDich(sbd) } }, truoc)
   if (kh.ok === true && typeof kh.sbd === 'string') {
     const sbd = kh.sbd
     const vdSom = veDichSom as { sbd: string; p: ReturnType<typeof docVeDich> } | null
@@ -3716,17 +3716,26 @@ const boXuLy = {
         // nối tiếp riêng sau xác thực. Kết quả/lỗi chỉ dùng ở đúng chỗ `await` cũ.
         const ktMod = import('./kiem-tra-ca-nhan')
         let ktSom: { sbd: string; p: Promise<Awaited<ReturnType<Awaited<typeof ktMod>['docKtCn']>>> } | null = null
-        try { sbdKhoa = b.token ? await gameIdentity(env, b, (s) => { const p = ktMod.then((m) => m.docKtCn(env, s, Date.now(), true)); p.catch(() => {}); ktSom = { sbd: s, p } }) : String(b.sbd ?? '').trim() } catch { /* để đường thật trả lỗi đúng lời */ }
+        // 28/10 tối GIỜ CAO ĐIỂM: kế hoạch (đệm 20 s / dồn lượt như cũ) cũng bắt đầu NGAY khi token qua kiểm chữ ký — mọi lượt ĐỌC cùng đợt lượt đọc mật khẩu +
+        // lịch KTCN; mọi lệnh GHI chờ `cong` (mật khẩu khớp VÀ không phải ngày kiểm tra). Cổng đóng ⇒ lượt sớm trả ok:false (không đệm), không ghi gì.
+        let laLuotThat = false
+        let khSom: { sbd: string; p: Promise<Record<string, unknown>>; mo: (v: boolean) => void } | null = null
+        const batDauKh = (s: string) => { let mo!: (v: boolean) => void; const cong = new Promise<boolean>((r) => { mo = r }); const p = keHoachCoDem(s, () => { laLuotThat = true; return dungKeHoachEm(env, b, s, { sbd: s, cong }) }); p.catch(() => {}); khSom = { sbd: s, p, mo } }
+        try { sbdKhoa = b.token ? await gameIdentity(env, b, (s) => { const p = ktMod.then((m) => m.docKtCn(env, s, Date.now(), true)); p.catch(() => {}); ktSom = { sbd: s, p }; if (s.length <= 40) batDauKh(s) }) : String(b.sbd ?? '').trim() } catch { /* để đường thật trả lỗi đúng lời */ }
+        const kSom = khSom as { sbd: string; p: Promise<Record<string, unknown>>; mo: (v: boolean) => void } | null
+        if (kSom && kSom.sbd !== sbdKhoa) kSom.mo(false)
         if (!sbdKhoa || sbdKhoa.length > 40) return themMocReset(env, ra(await dungKeHoachEm(env, b)))
         const som = ktSom as { sbd: string; p: Promise<Awaited<ReturnType<Awaited<typeof ktMod>['docKtCn']>>> } | null
-        const kt=await ktMod, baiKt=await (som && som.sbd === sbdKhoa ? som.p : kt.docKtCn(env,sbdKhoa,Date.now(),true))
-        if(kt.laNgayKt(baiKt,Date.now())){
+        let kt: Awaited<typeof ktMod>, baiKt: Awaited<ReturnType<Awaited<typeof ktMod>['docKtCn']>>
+        try { kt=await ktMod; baiKt=await (som && som.sbd === sbdKhoa ? som.p : kt.docKtCn(env,sbdKhoa,Date.now(),true)) } catch (e) { kSom?.mo(false); throw e }
+        const ngayKt = kt.laNgayKt(baiKt,Date.now())
+        kSom?.mo(!ngayKt)
+        if(ngayKt){
           const tt=kt.tomTatKt(baiKt!,Date.now())
           if(kt.coHocNgayKt(baiKt)){const g=await import('./goi-bai-7'),dem=await g.demHomNay7(env,sbdKhoa,Date.now()),lam=Number(dem.daLamHomNay);return themMocReset(env,ra({ok:true,cheDoNgay:'goi7',kiemTraCaNhan:tt,viec:[],ngay:tt.ngay,sbd:sbdKhoa,nganSach:{mucTieuCau:12,toiThieuCau:12},tienBo:{daLamCau:lam,toiThieuCau:12,conThieu:Math.max(0,12-lam),dat:lam>=12}}))}
           return themMocReset(env,ra({ok:true,cheDoNgay:'kiem-tra',kiemTraCaNhan:tt,viec:[],ngay:tt.ngay,sbd:sbdKhoa,nganSach:{mucTieuCau:tt.tong,toiThieuCau:tt.tong},tienBo:{daLamCau:tt.daTra,toiThieuCau:tt.tong,conThieu:tt.con,dat:tt.nopLuc!==null&&tt.con===0}}))
         }
-        let laLuotThat = false
-        const kh = await keHoachCoDem(sbdKhoa, () => { laLuotThat = true; return dungKeHoachEm(env, b, sbdKhoa) })
+        const kh = await (kSom && kSom.sbd === sbdKhoa ? kSom.p : keHoachCoDem(sbdKhoa, () => { laLuotThat = true; return dungKeHoachEm(env, b, sbdKhoa) }))
         if (!laLuotThat && kh.ok === true) {
           kh.thanThu = await docThanThu(env, sbdKhoa)
           // Thông báo MỘT LẦN (EXP / mảnh khiên vừa nhận) đã đi ra ở lượt thật: lượt đệm KHÔNG lặp lại (em không thấy thưởng hai lần).

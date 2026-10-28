@@ -6,6 +6,7 @@ import '../../lib/chem-trinh-bay' // thầy 27/10: phương trình rõ ràng (kh
 import type { TheCauProps } from '../TheCau'
 import { loiGiaiChuanTuKho } from '../loi-giai/KhoiLoiGiaiChuan'
 import { goiHoa2 } from '../hoa2/api'
+import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { nopCauLuong } from '../hoa2/doc-luong-nop'
 import { boChangMoTruoc, GIAY_CHO_MO_CHANG, layChangMoTruoc, moChangTruoc } from './mo-chang-truoc'
 // Tên trang chính trên nút «về» (Boss 27/10): giao diện Trong ⇒ «Lộ trình»; giao diện cũ ⇒ «Hôm nay». Viết tại chỗ: nhập mô-đun dùng chung sẽ đẻ mảnh tải riêng (+1 tệp mở app).
@@ -139,6 +140,23 @@ function VongMucTieu({ xong, tong }: { xong: number; tong: number }) {
  * không chặn chạm. Kiểm bằng vuốt thật: `scripts/kiem-vuot-lam-bai.mjs`.
  * Giữ nguyên: luồng máy chủ (`hoc-tap-start` → `answer` / `hoc-tap-gap`; đáp án chỉ về SAU khi nộp), lưu nháp localStorage, `msLam`, `assisted`, Tự chữa, Thử lại.
  */
+/** Mở chặng bị chặn TU_SUA_TRUOC: gửi NGAY việc Sửa lỗi hôm nay đã lưu trên máy (`omr_tu_sua_hom_nay_<sbd>`, lib/tu-sua-viec-hom-nay.ts — cùng lệnh
+ *  `viec-ngay` như lượt gửi nền) — câu đã xong trên máy có thể chưa lên máy chủ vì mạng chậm. Viết tại chỗ (không nhập mảnh Tự sửa: thêm mảnh làm phình precache).
+ *  true = máy chủ đã ghi. */
+async function daySuaNgay(token: string, sbd: string): Promise<boolean> {
+  try {
+    const nk = JSON.parse(localStorage.getItem(`omr_tu_sua_hom_nay_${sbd}`) || 'null') as { n?: unknown; m?: unknown; x?: unknown; them?: unknown } | null
+    if (!nk || typeof nk.n !== 'string' || !Array.isArray(nk.m) || !Array.isArray(nk.x) || !nk.x.length) return false
+    const goc = await layDiaChiMayChu()
+    if (!goc) return false // như lệnh Tự sửa khác (chua-cau-sai-api `goi`)
+    const c = new AbortController(), h = setTimeout(() => c.abort(), 10_000) // iPhone cũ (iOS 14–15) chưa có AbortSignal.timeout
+    try {
+      const r = await fetch(`${goc}/hs/chua-cau-sai/viec-ngay`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ngay: nk.n, m: nk.m, x: nk.x, them: nk.them ?? 0, token }), signal: c.signal })
+      return ((await r.json()) as { ok?: unknown } | null)?.ok === true
+    } finally { clearTimeout(h) }
+  } catch { return false }
+}
+
 export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homNay }: {
   token: string; sbd: string; onVe: () => void; onCapNhat: () => void; onChua: (qid: string) => void
   /** Số "đã làm/M câu hôm nay" + chặng — cùng nguồn vòng tròn Hôm nay (`soHomNay` trong lam-bai.ts). Thiếu ⇒ ẩn ô số, tiêu đề không ghi chặng. */
@@ -153,7 +171,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   const [duo] = useState(() => typeof document !== 'undefined' && !!document.documentElement.dataset.trong)
   // LÀM LẠI CUỐI CHẶNG kiểu Duolingo (hợp đồng docs/hop-dong-duolingo-2610.md mục 3; máy chủ goi-bai-7-lam-lai.ts): `soGoc` = số câu của chặng; câu làm lại
   // (≤ 3, chỉ đề) nối sau, mỗi chặng xin MỘT lần (`hoc-tap-lam-lai`), nộp qua `answer` cùng phiên (máy chủ tự ép có hỗ trợ). Không đếm vào số câu của chặng.
-  const [soGoc, setSoGoc] = useState(0), daXinLamLai = useRef(false)
+  const [soGoc, setSoGoc] = useState(0), daXinLamLai = useRef(false), daDaySua = useRef(false)
   // A6 — băng combo «N câu đúng liền!» / «Phản ứng dây chuyền!» (n = số câu đúng liền lúc hiện, id = câu vừa đúng ⇒ hoạt ảnh chạy lại mỗi câu).
   const [combo, setCombo] = useState<{ n: number; id: string } | null>(null)
   // THƯỞNG BAY + MỐC COMBO (thầy 27/10, hieu-ung-duo.ts): `luot` = một lượt hiệu ứng của câu vừa chấm; `ntTre` = số nguyên tử ĐANG HIỆN trên bộ đếm khi
@@ -240,7 +258,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     // Mở chặng trước (mo-chang-truoc.ts): Hôm nay / màn xong chặng đã gọi sẵn ⇒ dùng lại đúng lượt ấy, câu hiện ngay; không có ⇒ gọi như cũ.
     void (layChangMoTruoc(token) ?? goiHoa2('hoc-tap-start', token, {}, GIAY_CHO_MO_CHANG)).then(r => {
       if (huy) return
-      if (!r.ok) throw new Error(typeof r.error === 'string' ? r.error : 'Chưa mở được chặng học.')
+      if (!r.ok) throw Object.assign(new Error(typeof r.error === 'string' ? r.error : 'Chưa mở được chặng học.'), { ma: r.ma })
       const ds = Array.isArray(r.questions) ? r.questions as Cau[] : []
       if (ds.some(cauHong)) throw new Error('Nội dung câu chưa đầy đủ. Em cập nhật lại bài học nhé.')
       const g7 = docTomTatGoi7(r.goi7)
@@ -249,7 +267,20 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       // 27/10 (ảnh thầy: khung đỏ «Em đã hoàn thành phần được xếp hôm nay…» + «Thử lại» ⇒ em kẹt, thử lại ra đúng câu ấy): chặng rỗng KHÔNG phải lỗi —
       // thẻ trung tính + nút về trang chính (làm mới số ở đó), không «Thử lại».
       if (!ds.length) setHetCau(typeof r.message === 'string' && r.message.trim() ? r.message : `Chưa có câu mới cho chặng này. Em về ${tenTrangChinh()} xem tiến độ.`)
-    }).catch(e => { if (!huy) setLoi(chuCuaLoi(e, 'Chưa tải được bài học.')) }).finally(() => { if (!huy) setTai(false) })
+    }).catch(async e => {
+      if (huy) return
+      // KHOÁ SAU SỬA LỖI (ảnh thầy 28/10 19:55: khung đỏ «Em sửa xong lỗi hôm nay rồi mới mở chặng tiếp nhé.» + «Thử lại» ⇒ em kẹt): gửi ngay câu Sửa lỗi đã xong
+      // trên máy (có thể chưa lên máy chủ vì mạng chậm) rồi mở lại MỘT lần; vẫn chặn ⇒ thẻ trung tính + nút về Lộ trình (nút Sửa lỗi ở đó), không «Thử lại».
+      if ((e as { ma?: unknown })?.ma === 'TU_SUA_TRUOC') {
+        if (!daDaySua.current) {
+          daDaySua.current = true
+          if (await daySuaNgay(token, sbd)) { if (!huy) setLan(n => n + 1); return }
+        }
+        if (!huy) setHetCau(chuCuaLoi(e, 'Em sửa xong lỗi hôm nay rồi mới mở chặng tiếp nhé.'))
+        return
+      }
+      setLoi(chuCuaLoi(e, 'Chưa tải được bài học.'))
+    }).finally(() => { if (!huy) setTai(false) })
     return () => { huy = true }
   }, [token, lan])
   useEffect(() => {
