@@ -19,7 +19,7 @@ jobs:
     timeout-minutes: 12
     env:
       DB_ID: d2e6d322-374a-45d7-83a3-9fac486b23f1
-      PHUT: '1'
+      PHUT: '3'
     steps:
       - uses: actions/checkout@v4
       - name: Làm sạch khoá Cloudflare
