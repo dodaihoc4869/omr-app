@@ -38,6 +38,8 @@ export interface BangNapTruoc {
   phVo?: string[]
   /** (25/10) Màn thi có gốc riêng `AppThi` (main.tsx không dựng App.tsx): `thi` đã gồm vỏ ⇒ đường màn thi chỉ nạp `thi`, KHÔNG nạp `app`. */
   thiRieng?: 1
+  /** (28/10) Mảnh trình bày «Trong» của Lộ trình (TrongHs + CSS) — máy đã đăng nhập nạp cùng mảnh cổng (trước: nạp nối sau khi mảnh cổng chạy). */
+  hsTrong?: string[]
   /** Phông Sảnh (chỉ nạp khi trang đã do service worker phục vụ). */
   phongHs?: string[]
   /** Mảnh KaTeX (`katex-goi` + CSS). 13/10: KHÔNG nạp trước ở cổng học sinh nữa (main.tsx tải lúc rảnh sau khi trang tải xong — máy yếu). */
@@ -145,8 +147,12 @@ const HOI_SOM_MO_CHANG =
 export function taoMaNapTruoc(bang: BangNapTruoc, gon: (hamNguon: string) => string = (x) => x): string {
   return `(function(){try{var c=(${gon(chonMangNapTruoc.toString())})(location.pathname,location.search);var b=${JSON.stringify(bang)};` +
     `var nap=function(ds,thap){if(!ds)return;for(var i=0;i<ds.length;i++){var l=document.createElement('link');if(/\\.css$/.test(ds[i])){l.rel='preload';l.as='style'}else if(/\\.woff2$/.test(ds[i])){l.rel='preload';l.as='font';l.type='font/woff2'}else{l.rel='modulepreload'}if(thap)l.fetchPriority='low';l.crossOrigin='';l.href=ds[i];document.head.appendChild(l)}};` +
-    `if(c==='hs'&&b.hsVo){var p=null;try{p=JSON.parse(localStorage.getItem(${JSON.stringify(KHOA_PHIEN_HS)})||'null')}catch(e){}nap(b.hsVo);` +
-    `if(p){nap(b.hs);var g='';try{g=localStorage.getItem(${JSON.stringify(KHOA_DIA_CHI_HS)})||''}catch(e){}` +
+    `if(c==='hs'&&b.hsVo){var p=null;try{p=JSON.parse(localStorage.getItem(${JSON.stringify(KHOA_PHIEN_HS)})||'null')}catch(e){}` +
+    // 28/10 («vẫn chưa tức thì»): máy đã đăng nhập + service worker phục vụ (mảnh mã lấy từ máy, không chờ mạng) ⇒ chèn ~40 thẻ nạp trước của mảnh cổng +
+    // «Trong» SAU khung hình đầu (rAF → setTimeout): mỗi thẻ là một lượt xin tài nguyên đồng bộ trên luồng chính (đo CPU ×4: ~90 ms) — trước đây chặn khung đầu
+    // (khung tĩnh Lộ trình). Vỏ HS (`hsVo`, mã chính cần ngay) + lệnh hỏi sớm máy chủ vẫn đi NGAY.
+    `var N=p&&navigator.serviceWorker&&navigator.serviceWorker.controller&&window.requestAnimationFrame?function(ds){requestAnimationFrame(function(){setTimeout(function(){nap(ds)},0)})}:nap;nap(b.hsVo);` +
+    `if(p){N(b.hs);try{if(localStorage.getItem('ddh.trong')!=='tat')N(b.hsTrong)}catch(e){}var g='';try{g=localStorage.getItem(${JSON.stringify(KHOA_DIA_CHI_HS)})||''}catch(e){}` +
     `if(/^https:\\/\\/[^\\/]+$/.test(g)&&typeof fetch==='function'){try{var H=(${gon(hoiSomSanh.toString())});H(window,g,p,${JSON.stringify(LENH_HOI_SOM)},true);${HOI_SOM_MO_CHANG}}catch(e){}}` +
     `if(navigator.serviceWorker&&navigator.serviceWorker.controller)nap(b.phongHs)}else{if(b.anhDangNhapHs){var a=document.createElement('link');a.rel='preload';a.as='image';a.href=b.anhDangNhapHs;document.head.appendChild(a)}` +
     `document.addEventListener('DOMContentLoaded',function(){nap(b.hs,1)})}return}` +
