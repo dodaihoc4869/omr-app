@@ -1503,7 +1503,7 @@ async function lopKeTiepCoOmni(env: Env, sau: string): Promise<string | null> {
  *  (3) prior lớp cất sẵn (`omni_prior_em`) của lớp còn em thiếu dòng hôm nay — tối đa `soLop` lớp.
  * Chỉ ghi bảng tính sẵn (chỉ-thêm), không đổi dữ liệu học. Công tắc OMNI tắt ⇒ không làm gì. Không ném.
  */
-export async function dungSanOmni(env: Env, nowMs: number, soEm = 30, soLop = 2): Promise<{ gon: number; lop: number }> {
+export async function dungSanOmni(env: Env, nowMs: number, soEm = 30, soLop = 1): Promise<{ gon: number; lop: number }> {
   const ra = { gon: 0, lop: 0 }
   try {
     if (!(await docCoOmni(env)).bat) return ra

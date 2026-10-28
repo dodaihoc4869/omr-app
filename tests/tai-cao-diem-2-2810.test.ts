@@ -55,7 +55,7 @@ it('dựng sẵn trước giờ học: điểm gọn thiếu ⇒ dựng đúng c
   xoaDemOmni()
   const r = await dungSanOmni(env, now)
   expect(r.gon).toBe(8)
-  expect(r.lop).toBe(1)
+  expect(r.lop).toBe(1) // một lớp mỗi lượt (mặc định)
   const dong = k.d.sql.prepare('SELECT vkn_id,p,trang_thai FROM omni_p_vkn WHERE sbd=? ORDER BY vkn_id').all('S5') as Record<string, unknown>[]
   expect(JSON.parse((k.d.sql.prepare('SELECT json FROM omni_p_gon WHERE sbd=?').get('S5') as { json: string }).json)).toEqual(dong.map((x) => [x.vkn_id, x.p, x.trang_thai]))
   expect(k.d.dem('omni_prior_em')).toBeGreaterThanOrEqual(8)
