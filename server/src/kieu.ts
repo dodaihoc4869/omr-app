@@ -21,6 +21,8 @@ export interface D1PreparedStatement {
 export interface D1DatabaseSession {
   prepare(query: string): D1PreparedStatement
   batch<T = unknown>(statements: D1PreparedStatement[]): Promise<D1Result<T>[]>
+  /** Dấu mốc (bookmark) mới nhất của phiên — lượt sau `withSession(dấu)` đọc ít nhất mới bằng mốc ấy (ban-sao-doc.ts). D1 giả có thể vắng. */
+  getBookmark?(): string | null
 }
 export interface D1Database {
   prepare(query: string): D1PreparedStatement
