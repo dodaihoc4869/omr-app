@@ -46,8 +46,9 @@ export async function docCauHinhDem(env: Env, khoa: string, nowMs: number = Date
   if (!env.DB) return null
   const m = bangDem(env.DB as unknown as object)
   let o = m.get(khoa)
-  // Workerd gắn I/O với request: chỉ chờ bằng timer của chính lượt gọi này, tối đa 240 ms.
-  for (let n = 0; o?.dangDoc && m.get(khoa) === o && n < 15; n++) await new Promise<void>(xong => setTimeout(xong, 16))
+  // Workerd gắn I/O với request: chỉ chờ bằng timer của chính lượt gọi này. 28/10 (thử tải 270 em): trước tối đa 240 ms — D1 chậm hơn thế ⇒ MỌI lượt đồng thời
+  // tự đọc lại (đàn đọc dồn, D1 càng chậm) ⇒ nay chờ tới 3 s (lượt đang đọc luôn tự gỡ cờ ở `finally`).
+  for (let n = 0; o?.dangDoc && m.get(khoa) === o && n < 190; n++) await new Promise<void>(xong => setTimeout(xong, 16))
   o = m.get(khoa)
   if (o && !o.dangDoc && o.het > nowMs) return o.v
   const moi: O = { het: nowMs + DEM_CO_MS, v: null, dangDoc: true }

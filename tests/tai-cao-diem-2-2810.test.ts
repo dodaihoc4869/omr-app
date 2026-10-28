@@ -8,6 +8,8 @@ import { dauSanSang, batDemDauChung, SQL_SAN_SANG, KHOA_CH_KHONG_DAU, moChangSan
 import { nen, giaiNen } from '../server/src/kho-chung'
 import { chupHoSoTho, dungSanOmni, hoSoOmniEm, xoaDemOmni } from '../server/src/omni-d1'
 import { taoKhoOmni } from './omni-3-ke-hoach-chung'
+import { docChienDichCuaEm, xoaDemChienDich } from '../server/src/srs2-d1'
+import { docCauHinhDem, xoaDemCauHinh } from '../server/src/cau-hinh-dem'
 import type { Env } from '../server/src/kieu'
 
 afterEach(() => { batDemDauChung(false) })
@@ -70,4 +72,24 @@ it('chặng RỖNG lập sẵn (em đã xong phần hôm nay) ⇒ mở chặng t
   expect(await moChangSanSang(env, 'S1', 2000, ban)).toEqual(rong)
   expect(cham).toBe(0)
   expect(await moChangSanSang(env, 'S1', 2000, { ...ban, phienMoi: 1500 })).toBeNull() // có đợt mới hơn bản sẵn ⇒ đường thường
+})
+
+it('đàn đọc dồn: D1 chậm hơn 240 ms ⇒ lượt đồng thời CHỜ lượt đang đọc (chiến dịch, cờ cấu hình) — một lượt D1 thay vì mỗi lượt một', async () => {
+  const d = taoD1That()
+  const goc = d.env as unknown as Env
+  let lan = 0
+  const cham = (q: string) => /FROM chien_dich WHERE trang_thai <> 'da_huy' OR|FROM cau_hinh WHERE khoa/.test(q)
+  const env = { ...goc, DB: { ...goc.DB, prepare: (q: string) => {
+    const st = (goc.DB as unknown as { prepare(x: string): Record<string, (...a: unknown[]) => unknown> }).prepare(q)
+    if (!cham(q)) return st
+    const boc = (x: Record<string, (...a: unknown[]) => unknown>): Record<string, unknown> => ({ bind: (...a: unknown[]) => boc(x.bind!(...a) as never), all: async () => { lan++; await new Promise((r) => setTimeout(r, 400)); return x.all!() }, first: async () => { lan++; await new Promise((r) => setTimeout(r, 400)); return x.first!() } })
+    return boc(st)
+  } } } as unknown as Env
+  xoaDemChienDich()
+  await Promise.all([docChienDichCuaEm(env, 'S1'), docChienDichCuaEm(env, 'S2'), docChienDichCuaEm(env, 'S3')])
+  expect(lan).toBe(1)
+  lan = 0
+  xoaDemCauHinh(env)
+  await Promise.all([docCauHinhDem(env, 'omni'), docCauHinhDem(env, 'omni'), docCauHinhDem(env, 'omni')])
+  expect(lan).toBe(1)
 })
