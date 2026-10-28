@@ -19,6 +19,8 @@ import { ManKimCuong, ManKimCuongDs } from './ManKimCuong'
 export { ManBinhDaDo, ManChuoiNgay, ManCuuChuoi, ManMocChuoi, ManCuoiTuan, ManGiaiTuan, ManCuaHang, ManCuocKetQua, ManNhiemVu, ManThangHoa, ManHuyHieu, ManHuyHieuMoi,
   BaoGoCua, ManHocCungBan, ManLoiMoi, ManMocDoi, ManMoiBan, ManKimCuong, ManKimCuongDs }
 
+// Màn phủ tạm đóng app (hoc-tap/PhuTamDong.tsx) đi CÙNG mảnh nạp lười này (28/10, tác tử tốc độ): Lộ trình không cõng nó, không thêm tệp precache / mảnh mới.
+export { PhuTamDong } from '../hoc-tap/PhuTamDong'
 export type TenManThuong = 'chuoi' | 'giai' | 'nhiem-vu' | 'cua-hang' | 'huy-hieu' | 'ban' | 'moi-ban' | 'kim-cuong'
 export interface PropsManThuong {
   man: TenManThuong

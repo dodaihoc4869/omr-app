@@ -1,0 +1,149 @@
+# TỐC ĐỘ SAU GỘP — MÁY TỰ ÉP LUẬT «NHANH HƠN BẢN TRƯỚC» (thầy 27/10: «bất kể thay đổi gì đều phải tự tối ưu tốc độ tức thì hơn bản trước»).
+#
+# Chạy sau MỖI push lên main, SONG SONG với deploy.yml (không chặn phát hành). So bản mới với bản ngay trước (github.event.before; chạy tay: tự chọn):
+#   - trinh-duyet: build hai bản, đo bằng Playwright ở CPU ×4 (scripts/toc-do-sau-gop.mjs → scripts/do-muot-hs.mjs, xen kẽ 3 lượt, trung vị):
+#     byte tải mở từng app/đường, chạm được, bấm phương án, Kiểm tra, Tiếp tục, chuyển câu, vào chặng, khung cuộn p95, rAF nền.
+#   - may-chu: số đợt chờ D1 nối tiếp + số lệnh D1 của lệnh nóng (4 test tốc độ máy chủ, GHI_MOC_TOC_DO) ở cả hai bản.
+#   - ket-luan: bảng vào Job Summary; chỉ số nào chậm hơn quá ngưỡng nhiễu ⇒ Summary đỏ + mở issue «Chậm hơn bản trước: <chỉ số> @<commit>»
+#     nhãn `toc-do`. CLAUDE.md: issue nhãn `toc-do` mở ⇒ việc ưu tiên số 1 của phiên kế tiếp.
+# Máy chủ app GIẢ + kho test trong bộ nhớ: không chạm máy chủ thật, không đọc / in dữ liệu thật, không cần secret Cloudflare.
+name: Tốc độ sau gộp (so bản trước)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      sau: {description: 'Commit mới (bỏ trống = main hiện tại)', required: false, default: ''}
+      truoc: {description: 'Commit trước (bỏ trống = commit cha)', required: false, default: ''}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: toc-do-sau-gop-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  pham-vi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    outputs:
+      sau: ${{ steps.c.outputs.sau }}
+      truoc: ${{ steps.c.outputs.truoc }}
+      app: ${{ steps.c.outputs.app }}
+      may-chu: ${{ steps.c.outputs.may-chu }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - id: c
+        env:
+          VAO_SAU: ${{ inputs.sau }}
+          VAO_TRUOC: ${{ inputs.truoc }}
+          MOC_TRUOC: ${{ github.event.before }}
+        run: |
+          SAU=$(git rev-parse "${VAO_SAU:-HEAD}^{commit}")
+          if [[ -n "$VAO_TRUOC" ]]; then TRUOC=$(git rev-parse "$VAO_TRUOC^{commit}")
+          elif [[ -z "$VAO_SAU" && "$MOC_TRUOC" =~ ^[a-f0-9]{40}$ && "$MOC_TRUOC" != 0000000000000000000000000000000000000000 ]] && git cat-file -e "$MOC_TRUOC^{commit}" 2>/dev/null; then TRUOC=$MOC_TRUOC
+          else TRUOC=$(git rev-parse "$SAU^"); fi
+          # Chỉ đo phần đổi: app (src/public/build) ⇒ trình duyệt; server ⇒ D1. Chỉ docs/nhật ký ⇒ không đo. Hai bản đo bằng CÙNG bộ đo của bản mới.
+          APP=false; MAY=false
+          git diff --name-only "$TRUOC" "$SAU" -- src public index.html vite.config.ts package.json package-lock.json | grep -q . && APP=true
+          git diff --name-only "$TRUOC" "$SAU" -- server package.json package-lock.json | grep -q . && MAY=true
+          [[ "${{ github.event_name }}" == workflow_dispatch ]] && { APP=true; MAY=true; }
+          { echo "sau=$SAU"; echo "truoc=$TRUOC"; echo "app=$APP"; echo "may-chu=$MAY"; } >> "$GITHUB_OUTPUT"
+          echo "So ${SAU:0:8} với ${TRUOC:0:8} — app: $APP · máy chủ: $MAY"
+
+  trinh-duyet:
+    needs: pham-vi
+    if: needs.pham-vi.outputs.app == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: '${{ needs.pham-vi.outputs.sau }}', fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: 24, cache: npm}
+      - run: npm ci --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Build bản mới và bản trước
+        env: {TRUOC: '${{ needs.pham-vi.outputs.truoc }}'}
+        run: |
+          npx vite build --outDir "$RUNNER_TEMP/dist-sau" --emptyOutDir --logLevel error
+          git checkout -- public/sw-version.json 2>/dev/null || true
+          git worktree add --detach "$RUNNER_TEMP/wt-truoc" "$TRUOC"
+          ln -s "$PWD/node_modules" "$RUNNER_TEMP/wt-truoc/node_modules"
+          (cd "$RUNNER_TEMP/wt-truoc" && npx vite build --outDir "$RUNNER_TEMP/dist-truoc" --emptyOutDir --logLevel error)
+      - name: Đo CPU ×4 (xen kẽ 3 lượt, trung vị)
+        timeout-minutes: 10
+        run: node scripts/toc-do-sau-gop.mjs --truoc="$RUNNER_TEMP/dist-truoc" --sau="$RUNNER_TEMP/dist-sau" --lan=3 --cpu=4 --ra=kq-trinh-duyet.json > /dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: kq-trinh-duyet, path: kq-trinh-duyet.json, if-no-files-found: ignore, retention-days: 14}
+
+  may-chu:
+    needs: pham-vi
+    if: needs.pham-vi.outputs.may-chu == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: '${{ needs.pham-vi.outputs.sau }}', fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: 24, cache: npm}
+      - run: npm ci --no-audit --no-fund
+      - name: Đo đợt chờ D1 hai bản
+        env: {TRUOC: '${{ needs.pham-vi.outputs.truoc }}'}
+        run: |
+          git worktree add --detach "$RUNNER_TEMP/wt-truoc" "$TRUOC"
+          ln -s "$PWD/node_modules" "$RUNNER_TEMP/wt-truoc/node_modules"
+          mkdir -p "$RUNNER_TEMP/d1-sau" "$RUNNER_TEMP/d1-truoc"
+          for t in toc-do-may-chu-lenh-nong-1310 toc-do-may-chu-ph-2110 toc-do-may-chu-nop-2710 san-sang-2710; do
+            [[ -f "tests/$t.test.ts" ]] && GHI_MOC_TOC_DO="$RUNNER_TEMP/d1-sau/$t.json" timeout 4m npx vitest run "tests/$t.test.ts" --reporter=dot > /dev/null 2>&1 || true
+            [[ -f "$RUNNER_TEMP/wt-truoc/tests/$t.test.ts" ]] && (cd "$RUNNER_TEMP/wt-truoc" && GHI_MOC_TOC_DO="$RUNNER_TEMP/d1-truoc/$t.json" timeout 4m npx vitest run "tests/$t.test.ts" --reporter=dot > /dev/null 2>&1) || true
+          done
+          node scripts/toc-do-sau-gop.mjs --d1-truoc="$RUNNER_TEMP/d1-truoc" --d1-sau="$RUNNER_TEMP/d1-sau" --ra=kq-may-chu.json > /dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: kq-may-chu, path: kq-may-chu.json, if-no-files-found: ignore, retention-days: 14}
+
+  ket-luan:
+    needs: [pham-vi, trinh-duyet, may-chu]
+    if: always() && needs.pham-vi.result == 'success' && (needs.pham-vi.outputs.app == 'true' || needs.pham-vi.outputs.may-chu == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: '${{ needs.pham-vi.outputs.sau }}', sparse-checkout: scripts, fetch-depth: 1}
+      - uses: actions/download-artifact@v4
+        with: {path: kq, merge-multiple: true}
+        continue-on-error: true
+      - name: Kết luận + Job Summary
+        id: kl
+        env:
+          SAU: ${{ needs.pham-vi.outputs.sau }}
+          TRUOC: ${{ needs.pham-vi.outputs.truoc }}
+          TD: ${{ needs.trinh-duyet.result }}
+          MC: ${{ needs.may-chu.result }}
+        run: |
+          node scripts/toc-do-sau-gop.mjs --gop=kq/kq-trinh-duyet.json,kq/kq-may-chu.json --ra=kq.json --tom=tom.md --tieu-de="Tốc độ ${SAU:0:8} so bản trước ${TRUOC:0:8}" > /dev/null
+          { cat tom.md; echo; echo "Job đo trình duyệt: $TD · job đo máy chủ: $MC"; } >> "$GITHUB_STEP_SUMMARY"
+          node -e 'const k=require("./kq.json");const c=k.cham||[];console.log("so-cham="+c.length);console.log("dau="+(c[0]||""))' >> "$GITHUB_OUTPUT"
+      - name: Mở issue «Chậm hơn bản trước»
+        if: steps.kl.outputs.so-cham != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SAU: ${{ needs.pham-vi.outputs.sau }}
+          DAU: ${{ steps.kl.outputs.dau }}
+          SO: ${{ steps.kl.outputs.so-cham }}
+          LUOT: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh label create toc-do --color B60205 --description "Chậm hơn bản trước — ưu tiên số 1 của phiên kế tiếp" -R "$GITHUB_REPOSITORY" 2>/dev/null || true
+          THEM=""; [[ "$SO" -gt 1 ]] && THEM=" (+$((SO-1)) chỉ số)"
+          TEN="Chậm hơn bản trước: ${DAU}${THEM} @${SAU:0:8}"
+          if gh issue list -R "$GITHUB_REPOSITORY" --label toc-do --state open --search "@${SAU:0:8} in:title" --json number --jq '.[].number' | grep -q .; then echo "Đã có issue cho ${SAU:0:8}"; exit 0; fi
+          { echo "Workflow \`toc-do-sau-gop\` (lượt $LUOT) đo bản \`${SAU:0:8}\` chậm hơn bản trước. Luật CLAUDE.md: issue nhãn \`toc-do\` mở ⇒ việc ưu tiên số 1 của phiên kế tiếp — sửa cho nhanh bằng/hơn rồi đóng issue."; echo; cat tom.md; } > than.md
+          gh issue create -R "$GITHUB_REPOSITORY" --title "$TEN" --label toc-do --body-file than.md
