@@ -328,10 +328,10 @@ function DuongChang({ ds, moDi, cam, moKt }: { ds: Nut[]; moDi: boolean; cam?: C
             xám mờ, đã tới ⇒ hiện màu + thở. Xen kẽ Bi rồi 4 giám thị (Tí · Cô Cốc · Chú Tam · Giáo sư Kíp — GiamThiTinh, mảnh giám thị nạp lười);
             Lộ trình chưa biết mức câu của cụm chặng ⇒ xoay vòng nb → th → vd → vdc. */}
         {i % 3 === 1 && cam && (() => {
-          const thu = (i / 3) | 0, gt = thu === 0 ? null : MUC_LV[(thu - 1) % MUC_LV.length]!, toi = n.tt === 'khoa'
+          const thu = (i / 3) | 0, gt = thu === 0 ? null : MUC_LV[(thu - 1) % MUC_LV.length]!, toi = n.tt === 'khoa', ben = x > 0 || (x === 0 && thu % 2 === 0) ? -1 : 1
           return <span className="da-linh-vat" aria-hidden="true" data-lv={gt ?? 'bi'} data-toi={toi || undefined}
-            style={{ '--lv': `${(x > 0 || (x === 0 && thu % 2 === 0) ? -1 : 1) * 104 - x}px` } as CSSProperties}>
-            {gt ? <Suspense fallback={null}><GiamThiTinh muc={gt} xam={toi} mo={toi} className="da-lv-gt" /></Suspense> : <Bi cam={toi ? 'ngu' : cam} size={104} />}
+            style={{ '--lv': `${ben * 104 - x}px` } as CSSProperties}>
+            {gt ? <Suspense fallback={null}><GiamThiTinh muc={gt} xam={toi} mo={toi} className="da-lv-gt" /></Suspense> : <Bi cam={toi ? 'ngu' : cam} size={104} goc={ben < 0 ? 'phai' : 'trai'} />}
           </span>
         })()}
       </li>

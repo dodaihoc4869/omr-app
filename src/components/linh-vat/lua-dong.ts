@@ -1,11 +1,15 @@
-// LINH VẬT «LỬA» CHUYỂN ĐỘNG (thầy chốt 27/10 «Chọn Lửa build luôn nhé»): chó shiba khoác blouse trắng viền chàm, kính bảo hộ trên trán,
-// ống nghiệm hồng trong túi, thẻ ĐĐH. Bản vẽ duyệt: ve-moi/linh-vat-moi/v3 (cùng họ phong cách 4 giám thị người). Mảnh NẠP LƯỜI: chỉ Bi.tsx gọi import('./lua-dong').
-// Khung xương LÒ XO như giám thị: mọi tham số (dáng, tay, tai, mặt, miệng) nội suy từ giá trị đang có ⇒ đổi cảm xúc không nhảy cóc, có lấy đà và quá đà;
-// tai + đuôi trễ một nhịp theo đà thân. Thân đầu liền khối, chân tay mập ngắn theo tỉ lệ cú Duo; mắt to hai điểm sáng; bóng hai tầng phẳng.
-// MỘT vòng rAF chung cho mọi Lửa trên màn; Lửa ra khỏi khung nhìn / tab ẩn ⇒ không tính, không vẽ. Máy yếu ⇒ 30 khung/s, bỏ lấp lánh.
-// Không màu thô: mọi màu là biến --lv-* (styles/lua.css) pha từ token bảng «Chất chỉ thị». Lông cam đất riêng, tách khỏi cam «chú ý / lửa chuỗi».
-export type TrangThaiLua = 'yen' | 'cuoi' | 'chao' | 'vui' | 'combo' | 'buon' | 'ngac' | 'nghi' | 'covu' | 'ngu' | 'choc'
-export const TRANG_THAI_LUA: readonly TrangThaiLua[] = ['yen', 'cuoi', 'chao', 'vui', 'combo', 'buon', 'ngac', 'nghi', 'covu', 'ngu', 'choc']
+// LINH VẬT «LỬA» CHUYỂN ĐỘNG — hình «CÚ NGỌC» (thầy chốt 28/10 «Chốt build thay»: concept cú × Lửa màu chàm ngọc, bản vẽ duyệt
+// ve-moi/linh-vat-moi/v4-cu-ngoc). Tên trên màn VẪN là «Lửa» (Cú Ngọc là tên concept) ⇒ không đổi chữ khắp app. Mảnh NẠP LƯỜI: chỉ Bi.tsx gọi import('./lua-dong').
+// Hình: đầu to lông chàm viền chàm đậm, mặt kem, má hồng, mắt tròn hai điểm sáng; chỏm lửa hồng; kính bảo hộ ngọc lam ôm trán + viên lục giác chàm;
+// tai nhọn lòng kem; blouse trắng viền chàm, ống nghiệm hồng túi trái, huy hiệu lục giác ngọn lửa ngực phải; đuôi xoăn to vệt ngọc; tay «cánh cú» xù.
+// Khung xương LÒ XO: mọi tham số nội suy từ giá trị đang có ⇒ đổi cảm xúc không nhảy cóc, có lấy đà và quá đà; tai + đuôi + chỏm lửa trễ một nhịp.
+// Góc nghiêng (tham số q) xoay đầu / mặt / kính / thân / đuôi; `goc` = 'phai' | 'trai' đứng nghiêng hẳn (trái = lật gương).
+// MỘT vòng rAF chung cho mọi Lửa trên màn; ra khỏi khung nhìn / tab ẩn / bị màn con che ⇒ không tính, không vẽ. Máy yếu ⇒ vẽ một khung rồi đứng.
+// Không màu thô: mọi màu là biến --cn-* (styles/cu-ngoc.css, nạp cùng mảnh này) pha từ token bảng «Chất chỉ thị» --tr-*.
+import '../../styles/cu-ngoc.css'
+export type TrangThaiLua = 'yen' | 'cuoi' | 'chao' | 'vui' | 'combo' | 'buon' | 'ngac' | 'nghi' | 'covu' | 'ngu' | 'choc' | 'doi' | 'gian' | 'caunhau'
+export const TRANG_THAI_LUA: readonly TrangThaiLua[] = ['yen', 'cuoi', 'chao', 'vui', 'combo', 'buon', 'ngac', 'nghi', 'covu', 'ngu', 'choc', 'doi', 'gian', 'caunhau']
+export type GocLua = 'truoc' | 'phai' | 'trai'
 export interface TuyChonLua {
   /** Sau bao nhiêu ms thì tự chuyển sang `ve`. */
   sau?: number
@@ -33,7 +37,7 @@ type TrangThaiVe = { base?: TT; seq?: Khung[]; loop?: Khung[] }
 type Diem = [number, number] | [number, number, number]
 const f1 = (v: number) => Math.round(v * 10) / 10
 const rad = (d: number) => (d * Math.PI) / 180
-const M = (k: string) => `var(--lv-${k})`
+const M = (k: string) => `var(--cn-${k})`
 function tao(tag: string, tt: Record<string, string | number> | null, cha?: Element | null): SVGElement {
   const e = document.createElementNS(NS, tag) as SVGElement
   if (tt) for (const k in tt) e.setAttribute(k, String(tt[k]))
@@ -41,7 +45,8 @@ function tao(tag: string, tt: Record<string, string | number> | null, cha?: Elem
   return e
 }
 const to = (e: SVGElement, mau: string) => { e.style.fill = M(mau); return e }
-const vien = (e: SVGElement, mau: string, w: number) => { e.style.stroke = M(mau); e.setAttribute('stroke-width', String(w)); e.style.paintOrder = 'stroke'; e.setAttribute('stroke-linejoin', 'round'); return e }
+const OUT = 5.5 // nét viền chàm đậm
+const vien = (e: SVGElement, w = OUT, mau = 'vien') => { e.style.stroke = M(mau); e.setAttribute('stroke-width', String(w)); e.style.paintOrder = 'stroke'; e.setAttribute('stroke-linejoin', 'round'); return e }
 const net = (e: SVGElement, mau: string, w: number) => { e.style.stroke = M(mau); e.setAttribute('stroke-width', String(w)); e.setAttribute('fill', 'none'); e.setAttribute('stroke-linecap', 'round'); e.setAttribute('stroke-linejoin', 'round'); return e }
 function dg(pts: Diem[]): string {
   let d = ''
@@ -57,58 +62,73 @@ const H = (c: Element, d: Diem[] | string, mau: string, tt?: Record<string, stri
 const E = (c: Element, cx: number, cy: number, rx: number, ry: number, mau: string, tt?: Record<string, string | number>) => to(tao('ellipse', { cx, cy, rx, ry, ...tt }, c), mau)
 const R = (c: Element, x: number, y: number, w: number, h: number, r: number, mau: string, tt?: Record<string, string | number>) => to(tao('rect', { x, y, width: w, height: h, rx: r, ...tt }, c), mau)
 
-// Hình: gốc = mặt đất giữa hai chân, y hướng xuống. Thân liền đầu (tỉ lệ cú Duo: cao/rộng ≈ 1,05 cho thân shiba tròn), mắt 0,25 bề ngang.
-const W = 176, HH = 184, EY = -104, EX = 38, ERX = 22.5, ERY = 26.5, PR = 11.5, MY = -64
-export const VIEWBOX = '-120 -238 240 276' // tỉ lệ 240 : 276 = 200 : 230 như Bi cũ ⇒ mọi khung chứa giữ nguyên
+// Gốc = mặt đất giữa hai chân, y hướng xuống. Đầu tâm (0, -196), rộng 224; thân 172 × 116; hình cao ≈ 352 / khung 391 (0,9).
+export const VIEWBOX = '-170 -372 340 391' // 340 : 391 = 200 : 230 như Bi / Lửa cũ ⇒ mọi khung chứa giữ nguyên
+const DAU_Y = -196
 
 // ─────────── TƯ THẾ / CẢM XÚC ───────────
-const CHUAN: So = { x: 0, y: 0, rot: 0, sq: 1, hr: 0, fx: 0, fy: 0, tai: 0, aT: 24, bT: 14, aP: 24, bP: 14, dT: 1, dP: 1, px: 0.1, py: 0.1, lt: 0, ltP: 0, lb: 0, la: 0, es: 1, by: 0, ba: 0, mw: 0, mc: 4, mt: 2.5, mb: 2.5, mk: 0, ma: 0.55, tho: 1 }
+const CHUAN: So = { x: 0, y: 0, rot: 0, sq: 1, hr: 0, hy: 0, q: 0, tai: 0, aT: 22, bT: 10, dT: 1, aP: 22, bP: 10, dP: 1, px: 0, py: 0, lt: 0, ltP: 0, la: 0, es: 1, may: 0, ba: 0, mw: 2, mc: 5, mt: -1, mb: 11, mk: 0, ma: 0.9, lua: 1, tho: 1 }
 const ROI: Record<string, string | number> = { mat: 'mo', hT: 'nam', hP: 'nam', zT: 0, zP: 0, hieu: '' }
-const MK = new Set(['px', 'py', 'lt', 'ltP', 'lb', 'la', 'es', 'by', 'ba', 'mw', 'mc', 'mt', 'mb', 'mk', 'ma'])
+const MK = new Set(['px', 'py', 'lt', 'ltP', 'la', 'es', 'may', 'ba', 'mw', 'mc', 'mt', 'mb', 'mk', 'ma'])
 const A = (...d: TT[]): TT => Object.assign({}, ...d)
 export const CAM_XUC_LUA: Record<TrangThaiLua, TrangThaiVe> = {
-  yen: { base: {}, loop: [{ d: 1700, k: 22, p: { rot: -1.5, fx: -0.1 } }, { d: 1700, k: 22, p: { rot: 1.5, fx: 0.15 } }] },
-  cuoi: { base: { mw: 3, mc: 6, mt: 1, mb: 5, ma: 0.9, tai: -4 }, loop: [{ d: 1700, k: 22, p: { rot: -1.5 } }, { d: 1700, k: 22, p: { rot: 1.5 } }] },
-  chao: { base: { aP: 128, bP: 160, hP: 'xoe', zP: 1, mw: 3, mc: 6, mt: 1, mb: 6, ma: 0.9, rot: -3, fx: 0.15, px: 0.15, py: 0.15, tai: -4 }, loop: [{ d: 300, k: 260, p: { bP: 128 } }, { d: 300, k: 260, p: { bP: 168 } }] },
-  vui: {
-    base: { mat: 'cong', mw: 7, mc: 6, mt: -1, mb: 13, ma: 1, aP: 120, bP: 150, hP: 'xoe', zP: 1, tai: -6 },
-    seq: [{ d: 80, k: 520, p: { y: 6, sq: 0.84, aP: 30, bP: 20 } }, { d: 260, k: 260, p: { y: -24, sq: 1.1, hieu: 'sao' } }, { d: 160, k: 320, p: { sq: 0.92 } }],
-    loop: [{ d: 260, k: 300, p: { y: -10, sq: 1.05, bP: 120 } }, { d: 260, k: 300, p: { y: 0, sq: 0.95, bP: 165 } }],
+  yen: { base: {}, loop: [{ d: 1700, k: 22, p: { rot: -1.5, hr: 2 } }, { d: 1700, k: 22, p: { rot: 1.5, hr: -1 } }] },
+  cuoi: { base: { mat: 'cong', mw: 4, mc: 6, mt: -1, mb: 13, tai: -4 }, loop: [{ d: 1700, k: 22, p: { rot: -1.5, hr: 2 } }, { d: 1700, k: 22, p: { rot: 1.5, hr: -1 } }] },
+  chao: { // vẫy tay DÀI: cánh tay vươn ra ngoài rồi lên (như dáng chính ảnh thầy), mắt híp cười, vạch «!» hồng
+    base: { aP: 118, bP: 150, dP: 1.15, hP: 'xoe', zP: 1, mat: 'cong', mw: 5, mc: 6, mt: -1, mb: 15, hr: -5, rot: -2, tai: -4, hieu: 'nhay' },
+    loop: [{ d: 300, k: 260, p: { bP: 128 } }, { d: 300, k: 260, p: { bP: 172 } }],
   },
-  combo: {
-    base: { mat: 'cong', mw: 9, mc: 6, mt: -2, mb: 17, ma: 1.2, aT: 125, bT: 150, aP: 125, bP: 150, hT: 'xoe', hP: 'xoe', zT: 1, zP: 1, tai: -12 },
+  vui: { // đúng: lấy đà 80 ms rồi nảy, cười híp, lấp lánh
+    base: { mat: 'cong', mw: 5, mc: 6, mt: -1, mb: 14, aP: 120, bP: 150, hP: 'xoe', zP: 1, tai: -6 },
+    seq: [{ d: 80, k: 520, p: { y: 6, sq: 0.84, aP: 30, bP: 20 } }, { d: 260, k: 260, p: { y: -22, sq: 1.1, hieu: 'sao' } }, { d: 160, k: 320, p: { sq: 0.92 } }],
+    loop: [{ d: 260, k: 300, p: { y: -9, sq: 1.05, bP: 125 } }, { d: 260, k: 300, p: { y: 0, sq: 0.95, bP: 165 } }],
+  },
+  combo: { // nhảy cao, hai tay giơ, chỏm lửa bùng
+    base: { mat: 'cong', mw: 7, mc: 6, mt: -2, mb: 17, aT: 130, bT: 155, aP: 130, bP: 155, hT: 'xoe', hP: 'xoe', zT: 1, zP: 1, tai: -12, lua: 1.5 },
     seq: [{ d: 80, k: 560, p: { y: 8, sq: 0.8, aT: 30, bT: 20, aP: 30, bP: 20, mat: 'mo', es: 1.12, mt: -3, mb: 8 } }, { d: 300, k: 240, p: { y: -40, sq: 1.14, hieu: 'sao' } }, { d: 170, k: 320, p: { sq: 0.86 } }, { d: 300, k: 240, p: { y: -28, sq: 1.1, rot: 8 } }, { d: 170, k: 320, p: { sq: 0.88 } }],
-    loop: [{ d: 280, k: 260, p: { y: -16, sq: 1.08, rot: -6, aT: 110, aP: 140 } }, { d: 280, k: 260, p: { y: 0, sq: 0.92, rot: 6, aT: 140, aP: 110 } }],
+    loop: [{ d: 280, k: 260, p: { y: -14, sq: 1.08, rot: -6, aT: 115, aP: 145 } }, { d: 280, k: 260, p: { y: 0, sq: 0.92, rot: 6, aT: 145, aP: 115 } }],
   },
-  buon: {
-    base: { lt: 0.42, la: -14, ba: -14, by: -2, mw: -1, mc: -6, mt: -3, mb: 1.5, py: 0.6, px: 0, ma: 0.3, sq: 0.9, tai: 34, aT: 4, bT: 0, aP: 4, bP: 0, hr: 3, fy: 4 },
-    seq: [{ d: 110, k: 440, p: { y: -6, sq: 1.08, es: 1.15, by: -8, mt: -3, mb: 7, mc: 0, tai: -8, hieu: 'giot' } }],
-    loop: [{ d: 1200, k: 50, p: {} }, { d: 1000, k: 40, p: { sq: 0.87, hr: 5, fy: 5 } }],
+  buon: { // sai: giật mình, tai cụp, xị, giọt mồ hôi
+    base: { lt: 0.38, ltP: 0.38, la: -16, may: 1, ba: -16, mw: -3, mc: -6, mt: -2, mb: 2, py: 0.6, ma: 0.5, sq: 0.92, tai: 30, aT: 4, bT: 0, aP: 4, bP: 0, hr: 4, hy: 4, lua: 0.75 },
+    seq: [{ d: 110, k: 440, p: { y: -6, sq: 1.08, es: 1.12, mt: -3, mb: 8, mc: 0, tai: -8, lua: 1.1, ma: 0.9, may: 0, hieu: 'giot' } }],
+    loop: [{ d: 1200, k: 50, p: {} }, { d: 1000, k: 40, p: { sq: 0.89, hr: 6, hy: 5 } }],
   },
-  ngac: {
-    base: { es: 1.16, by: -9, mw: -4, mc: 0, mt: -4, mb: 10, aT: 20, iT: [-34, -78], aP: 20, iP: [34, -78], hT: 'xoe', hP: 'xoe', zT: 1, zP: 1, tai: -14, ma: 0.9, y: -4 },
+  ngac: { // ngạc nhiên: mắt to, mày nhướng, miệng chữ O, hai cánh áp má
+    base: { es: 1.14, may: 1, ba: -10, mw: -5, mc: 0, mt: -4, mb: 10, aT: 150, iT: [-66, -150], aP: 150, iP: [66, -150], hT: 'xoe', hP: 'xoe', zT: 1, zP: 1, tai: -14, y: -4 },
     seq: [{ d: 90, k: 520, p: { y: 4, sq: 0.86 } }, { d: 200, k: 300, p: { y: -14, sq: 1.1 } }],
     loop: [{ d: 600, k: 200, p: {} }, { d: 600, k: 200, p: { y: -2 } }],
   },
-  nghi: {
-    base: { aP: 30, iP: [14, -56], hP: 'nam', zP: 1, px: -0.6, py: -0.8, lt: 0.18, ba: 4, by: -2, mw: -3, mc: 1, mt: 0.6, mb: 0.6, mk: 2.4, rot: -4, hr: -6, fx: -0.25, hieu: 'hoi', tai: 6 },
-    loop: [{ d: 800, k: 120, p: {} }, { d: 300, k: 300, p: { iP: [14, -60] } }, { d: 300, k: 300, p: {} }],
+  nghi: { // suy nghĩ: cánh chống cằm, mắt liếc lên, miệng mím, dấu ?
+    base: { aP: 150, iP: [26, -120], hP: 'nam', zP: 1, px: -0.5, py: -0.7, lt: 0.12, may: 1, ba: -4, mw: -5, mc: 0, mt: 1, mb: 1, mk: 2, hr: 7, tai: 4, hieu: 'hoi' },
+    loop: [{ d: 900, k: 120, p: {} }, { d: 280, k: 320, p: { iP: [26, -125] } }, { d: 280, k: 320, p: {} }],
   },
-  covu: {
-    base: { lt: 1, ltP: 0, mw: 5, mc: 6, mt: 1, mb: 9, ma: 1, aP: 110, bP: 168, hP: 'nam', zP: 1, aT: 20, iT: [-14, -40], hT: 'nam', rot: 5, fx: 0.3, tai: -6 },
+  covu: { // cổ vũ (chuỗi ngày): nháy mắt, đấm tay lên
+    base: { lt: 1, mw: 5, mc: 6, mt: -1, mb: 12, aP: 112, bP: 168, hP: 'nam', zP: 1, aT: 20, iT: [-30, -60], hT: 'nam', zT: 1, rot: 4, q: 0.2, tai: -6 },
     seq: [{ d: 90, k: 500, p: { y: 4, sq: 0.88, aP: 40, bP: 40 } }],
-    loop: [{ d: 220, k: 420, p: { bP: 150, aP: 96, y: -4 } }, { d: 220, k: 420, p: { y: 0 } }, { d: 1200, k: 200, p: {} }],
+    loop: [{ d: 220, k: 420, p: { bP: 150, aP: 98, y: -4 } }, { d: 220, k: 420, p: { y: 0 } }, { d: 1200, k: 200, p: {} }],
   },
-  ngu: { base: { mat: 'nham', mw: -3, mc: 1, mt: 1.5, mb: 3.5, hr: 9, rot: 4, fy: 3, tai: 22, sq: 0.95, hieu: 'zzz', aT: 8, bT: -40, aP: 8, bP: -40, ma: 0.7 }, loop: [{ d: 1500, k: 30, p: { sq: 0.93 } }, { d: 1500, k: 30, p: { sq: 0.97 } }] },
+  ngu: { base: { mat: 'nham', mw: -4, mc: 1, mt: 2, mb: 4, hr: 10, rot: 4, hy: 3, tai: 20, sq: 0.95, lua: 0.6, aT: 8, bT: -30, aP: 8, bP: -30, ma: 0.7, hieu: 'zzz' }, loop: [{ d: 1500, k: 30, p: { sq: 0.93 } }, { d: 1500, k: 30, p: { sq: 0.97 } }] },
   choc: { // bị chạm: nảy lên, mắt nhắm tịt, cười khúc khích
-    seq: [{ d: 90, k: 520, p: { y: 5, sq: 0.82 } }, { d: 340, k: 300, p: { y: -16, sq: 1.12, aT: 120, bT: 150, aP: 120, bP: 150, zT: 1, zP: 1, hT: 'xoe', hP: 'xoe', mat: 'xoan', mw: 3, mc: 2, mt: -2, mb: 10, mk: 3, hr: -8, ma: 1.4, tai: -14 } },
-      { d: 520, k: 240, p: { hr: 6, mat: 'cong', mw: 4, mc: 6, mt: 0, mb: 8, ma: 1.2 } }],
+    seq: [{ d: 90, k: 520, p: { y: 5, sq: 0.82 } }, { d: 340, k: 300, p: { y: -16, sq: 1.12, aT: 120, bT: 150, aP: 120, bP: 150, zT: 1, zP: 1, hT: 'xoe', hP: 'xoe', mat: 'xoan', mw: 3, mc: 2, mt: -2, mb: 10, mk: 3, hr: -8, ma: 1.3, tai: -14, lua: 1.3 } },
+      { d: 520, k: 240, p: { hr: 6, mat: 'cong', mw: 4, mc: 6, mt: 0, mb: 10, ma: 1.1 } }],
+  },
+  doi: { // dỗi: khoanh tay, nghiêng đầu, liếc ngang, môi chu
+    base: { aT: -6, iT: [34, -58], aP: -6, iP: [-34, -66], zT: 1, zP: 1, q: -0.45, hr: -8, px: 0.7, py: 0.1, lt: 0.35, ltP: 0.35, la: 10, may: 1, ba: 14, mw: -6, mc: -2, mt: 1, mb: 3, mk: 1.5, ma: 1.2, tai: 10 },
+    seq: [{ d: 110, k: 420, p: { y: 3, sq: 0.94 } }],
+    loop: [{ d: 1400, k: 60, p: {} }, { d: 260, k: 300, p: { hr: -12 } }, { d: 260, k: 300, p: {} }],
+  },
+  gian: { // tức giận: mày xếch, mắt dữ, nắm tay trước bụng, khói hồng
+    base: { aT: 14, iT: [-36, -46], aP: 14, iP: [36, -46], zT: 1, zP: 1, lt: 0.3, ltP: 0.3, la: 22, may: 1, ba: 24, mw: -2, mc: -5, mt: -2, mb: 4, ma: 1.3, sq: 0.95, tai: -6, hieu: 'khoi' },
+    seq: [{ d: 100, k: 480, p: { y: -6, sq: 1.08 } }],
+    loop: [{ d: 120, k: 600, p: { x: -2 } }, { d: 120, k: 600, p: { x: 2 } }, { d: 120, k: 600, p: { x: -2 } }, { d: 900, k: 200, p: {} }],
+  },
+  caunhau: { // càu nhàu: nhắm một mắt, miệng méo lẩm bẩm, cánh giơ, vạch tiếng hồng
+    base: { aP: 100, bP: 150, hP: 'xoe', zP: 1, lt: 1, ltP: 0.4, la: 6, may: 1, ba: 8, mw: -3, mc: -2, mt: 0, mb: 4, mk: 2.5, hr: 6, tai: 4, hieu: 'lam' },
+    loop: [{ d: 200, k: 400, p: { bP: 135, mb: 6 } }, { d: 200, k: 400, p: { mb: 2 } }, { d: 200, k: 400, p: { bP: 135, mb: 6 } }, { d: 700, k: 200, p: {} }],
   },
 }
 
-// NHƯỜNG KHUNG CHO LƯỢT CHẠM (27/10 MƯỢT, đo scripts/do-muot-hs.mjs): một khung linh vật vẽ lại vài chục hình SVG (~6–10 ms ở CPU ×4) — chen đúng giữa
-// lượt chạm và lần vẽ phản hồi (nút lún, ô được chọn) là phản hồi chậm thêm một khung. Có pointerdown / keydown ⇒ linh vật nghỉ 140 ms (đồng hồ lò xo
-// vẫn tính, chạy tiếp mượt). Viết tại chỗ (không tệp chung) để không sinh thêm mảnh precache.
+// NHƯỜNG KHUNG CHO LƯỢT CHẠM (27/10 MƯỢT, đo scripts/do-muot-hs.mjs): có pointerdown / keydown ⇒ linh vật nghỉ 140 ms (đồng hồ lò xo vẫn tính).
 let nhuongDen = 0
 if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
   const chamNhuong = () => { nhuongDen = performance.now() + 140 }
@@ -117,26 +137,21 @@ if (typeof window !== 'undefined' && typeof window.addEventListener === 'functio
 }
 const dangNhuongKhung = (now: number): boolean => now < nhuongDen
 // ─────────── MỘT VÒNG rAF CHUNG ───────────
-// 27/10 MƯỢT (scripts/do-muot-hs.mjs): vòng chỉ chạy khi CÓ Lửa đang được nhìn thấy — Lửa ngoài khung nhìn (IntersectionObserver) hoặc nằm dưới
-// màn con che kín (Lộ trình `inert` khi đang làm chặng, <html class="sanh-bi-che">) ⇒ không tính, không vẽ, và KHÔNG xin khung nữa (trước: vòng
-// rAF 60 lượt/giây chạy suốt, kể cả khi mọi Lửa đều khuất). Lửa hiện lại (IO / lớp che gỡ) ⇒ chạy tiếp đúng tư thế cũ.
+// Vòng chỉ chạy khi CÓ Lửa đang được nhìn thấy (IntersectionObserver; Lộ trình `inert` dưới màn con ⇒ <html class="sanh-bi-che">). ~30 khung/s.
 type Song = { tich(dt: number): void; ve(): void; hien: boolean; svg: SVGSVGElement }
 const dangSong = new Set<Song>()
 let raf = 0, lan = 0, tichLuy = 0
 const mayYeu = () => document.documentElement.classList.contains('may-yeu')
-/** Lửa này đang nằm dưới một màn con che kín (Lộ trình bị `inert` khi màn làm chặng / màn con mở đè). */
 const biChe = (s: Song) => document.documentElement.classList.contains('sanh-bi-che') && !!s.svg.closest('[inert]')
 const dangThay = () => [...dangSong].filter((s) => s.hien && !biChe(s))
 function lap(now: number) {
   raf = 0
   if (document.hidden || !dangSong.size) { lan = 0; return }
   const ds = dangThay()
-  if (!ds.length) { lan = 0; return } // không Lửa nào đang thấy ⇒ ngủ; IO / lớp che đổi sẽ gọi `chay`
-  if (dangNhuongKhung(now)) { raf = requestAnimationFrame(lap); return } // em vừa chạm: nhường khung cho phản hồi nút
+  if (!ds.length) { lan = 0; return }
+  if (dangNhuongKhung(now)) { raf = requestAnimationFrame(lap); return }
   const dtms = lan ? Math.min(100, now - lan) : 16
   lan = now; tichLuy += dtms
-  // 28/10 MƯỢT: ~30 khung/s trên mọi máy (như giám thị — nửa số khung rảnh hẳn cho chạm); máy yếu: vẽ MỘT khung rồi ngủ (Lửa đứng yên, điều phối
-  // vòng 4: «Lửa dừng rAF ở chế độ yếu»), IO / lớp che / tab hiện lại gọi `chay` thì vẽ lại một khung.
   if (tichLuy >= 30 || mayYeu()) {
     let con = tichLuy; tichLuy = 0
     while (con > 0) { const dt = Math.min(con, 8); for (const s of ds) s.tich(dt / 1000); con -= dt }
@@ -148,132 +163,155 @@ function lap(now: number) {
 const chay = () => { if (!raf && !document.hidden && dangSong.size) { lan = 0; raf = requestAnimationFrame(lap) } }
 if (typeof document !== 'undefined') {
   document.addEventListener('visibilitychange', chay)
-  // Màn con đóng (gỡ lớp `sanh-bi-che` trên <html>) ⇒ Lửa của Lộ trình chạy lại. Chỉ theo dõi thuộc tính class của <html> (rẻ).
   if (typeof MutationObserver !== 'undefined') new MutationObserver(chay).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
 }
 
 /** Các Lửa đang sống (bộ chụp / máy quay video bản build điều khiển trạng thái qua đây). */
 export const LUA_DANG_SONG = new Set<Lua>()
 let soId = 0
-export function taoLua(noiGan: HTMLElement, tc: { trangThai?: TrangThaiLua; tuyChon?: TuyChonLua; tinh?: boolean; tay?: boolean } = {}): Lua {
-  const id = 'lua' + ++soId, tinh = !!tc.tinh
+export function taoLua(noiGan: HTMLElement, tc: { trangThai?: TrangThaiLua; tuyChon?: TuyChonLua; tinh?: boolean; tay?: boolean; goc?: GocLua } = {}): Lua {
+  const id = 'lua' + ++soId, tinh = !!tc.tinh, qGoc = tc.goc && tc.goc !== 'truoc' ? 0.8 : 0
   const svg = tao('svg', { viewBox: VIEWBOX, class: 'lua-svg', 'aria-hidden': 'true', focusable: 'false' }, null) as SVGSVGElement
   const defs = tao('defs', null, svg)
   const P: Record<string, SVGElement> = {}
   const g = (k: string, c: Element) => (P[k] = tao('g', null, c))
-  const bong = E(svg, 0, 4, W * 0.46, 9, 'bong')
-  g('goc', svg); g('duoi', P.goc!)
-  const chan = [-1, 1].map((s) => { const c = tao('g', null, P.goc!); vien(E(c, 0, 0, W * 0.085, 9, 'kem'), 'tayV', 2.2); return { c, s } })
-  g('than', P.goc!); g('tai', P.than!)
-  // tai tam giác dựng, lòng kem
-  const taiGoc: [number, number, number][] = [[-W * 0.27, -HH + 8, -16], [W * 0.27, -HH + 8, 16]]
-  const tai = [-1, 1].map(() => { const t = tao('g', null, P.tai!); H(t, [[-22, 6, 8], [22, 6, 8], [6, -40, 7]], 'long'); H(t, [[-12, 2, 5], [12, 2, 5], [4, -26, 5]], 'tai'); return t })
-  // đuôi xoăn sau lưng
-  const du = tao('g', { transform: `translate(${W * 0.4},-62)` }, P.duoi!)
-  to(tao('circle', { cx: 18, cy: -22, r: 24 }, du), 'long'); to(tao('circle', { cx: 16, cy: -24, r: 13 }, du), 'kem'); to(tao('circle', { cx: 20, cy: -20, r: 6 }, du), 'long')
-  // thân + bóng 2 tầng (mảng tối phải-dưới, mảng sáng trên-trái), cắt theo thân
-  const thanD = dg([[-W * 0.32, -HH, 50], [W * 0.32, -HH, 50], [W * 0.5, -HH * 0.55, 60], [W * 0.45, -4, 42], [-W * 0.45, -4, 42], [-W * 0.5, -HH * 0.55, 60]])
-  vien(H(P.than!, thanD, 'long'), 'longT', 3.4) // viền tông đậm mảnh: tách thân khỏi nền cam (thẻ chuỗi ngày)
+  const lat = tao('g', tc.goc === 'trai' ? { transform: 'scale(-1,1)' } : null, svg) // nghiêng trái = gương của nghiêng phải
+  const bong = E(lat, 0, 6, 92, 12, 'bong')
+  g('goc', lat); g('duoi', P.goc!)
+  // ĐUÔI xoăn to: khối chàm + mảng tối + vệt ngọc lưỡi liềm + lõi xoáy
+  const du = tao('g', { transform: 'translate(-100,-62)' }, P.duoi!)
+  vien(E(du, 0, 0, 50, 46, 'long'))
+  H(du, 'M44,-14C54,18 30,46 -2,46C-28,46 -46,30 -50,8C-38,30 -8,40 14,30C34,22 44,4 44,-14Z', 'longT')
+  H(du, 'M-4,-34C-30,-30 -40,-4 -30,16C-26,24 -18,28 -12,30C-24,14 -24,-12 -4,-34Z', 'ngoc')
+  H(du, 'M-10,-26C-22,-18 -26,-6 -24,4C-20,-8 -16,-16 -10,-26Z', 'ngocS')
+  E(du, 8, 4, 13, 12, 'longT')
+  // CHÂN
+  const chan = [-1, 1].map((s) => { const c = tao('g', null, P.goc!); vien(E(c, 0, -4, 27, 14, 'longS')); return { c, s } })
+  g('lopSau', P.goc!)
+  // THÂN + ÁO BLOUSE
+  g('than', P.goc!)
+  const thanD = dg([[-64, -118, 40], [64, -118, 40], [86, -50, 46], [70, -2, 26], [-70, -2, 26], [-86, -50, 46]])
+  H(P.than!, thanD, 'long')
   H(tao('clipPath', { id: id + 't' }, defs), thanD, 'long')
   const cat = tao('g', { 'clip-path': `url(#${id}t)` }, P.than!)
-  H(cat, `M${W * 0.5},${-HH * 1.1}Q${W * 0.3},${-HH * 0.5} ${W * 0.22},0H${W}V${-HH * 1.1}Z`, 'longT')
-  E(cat, -W * 0.28, -HH * 0.86, W * 0.16, HH * 0.07, 'longS', { transform: `rotate(-18 ${-W * 0.28} ${-HH * 0.86})` })
-  // má trắng (urajiro) + mõm kem
-  H(cat, 'M-74,-96Q-60,-110 -42,-100Q-20,-88 0,-86Q20,-88 42,-100Q60,-110 74,-96Q80,-52 40,-42Q20,-38 0,-40Q-20,-38 -40,-42Q-80,-52 -74,-96Z', 'kem')
-  // ÁO BLOUSE: cổ chữ V, viền chàm, khuy, túi + ống nghiệm hồng, thẻ ĐĐH
-  const ao = tao('g', null, cat), yc = MY + 14, yv = yc + 34
-  const coAo = `M${-W},${yc - 10}Q${-W * 0.3},${yc - 8} ${-W * 0.15},${yc}L0,${yv}L${W * 0.15},${yc}Q${W * 0.3},${yc - 8} ${W},${yc - 10}`
-  H(ao, coAo + `V40H${-W}Z`, 'trang')
-  H(ao, `M${W * 0.5},${-HH * 0.6}Q${W * 0.3},${-HH * 0.3} ${W * 0.24},0H${W}Z`, 'aoT')
-  net(tao('path', { d: coAo }, ao), 'cham', 4.5)
-  net(tao('path', { d: `M0,${yv}V2`, opacity: 0.5 }, ao), 'cham', 2.5)
-  E(ao, -7, yv + 16, 3.4, 3.4, 'cham'); E(ao, -7, yv + 36, 3.4, 3.4, 'cham')
-  const tui = tao('g', { transform: `translate(${-W * 0.28},${yc + 24})` }, ao), ong = tao('g', { transform: 'rotate(-8)' }, tui)
-  vien(R(ong, -7, -30, 14, 38, 7, 'thuyTinh'), 'thuyTinhV', 2.2)
-  H(ong, 'M-5.5,-14H5.5V1A5.5,5.5 0 0 1 -5.5,1Z', 'hong'); R(ong, -3.5, -26, 2.6, 10, 1.3, 'trang')
-  vien(R(tui, -16, -4, 32, 18, 6, 'trang'), 'cham', 3).style.paintOrder = 'normal'
-  const the = tao('g', { transform: `translate(${W * 0.27},${yc + 20})` }, ao)
-  R(the, -17, -9, 34, 18, 5, 'cham')
-  const chu = to(tao('text', { x: 0, y: 4.6, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 900, 'letter-spacing': '0.3' }, the), 'trang'); chu.textContent = 'ĐĐH'
-  // dây kính cắt theo đầu
-  const ky = -HH + 26
-  R(cat, -W, ky - 3.5, 2 * W, 7, 3.5, 'chamS')
-  // mặt
-  g('mat', P.than!)
-  const ma = [-1, 1].map((s) => E(P.mat!, s * (EX + 12), EY + 34, 13, 8, 'ma'))
+  H(cat, 'M-120,-112L-30,-112L0,-64L30,-112L120,-112V20H-120Z', 'trang')
+  H(cat, 'M40,-112L120,-112V20H52Q66,-40 40,-112Z', 'aoT')
+  const ao = g('ao', P.than!)
+  net(tao('path', { d: 'M-46,-112L0,-58L46,-112' }, ao), 'vien', 4.5)
+  vien(H(ao, 'M-46,-113L-30,-113L0,-64L-6,-56Z', 'trang'), 3.6)
+  vien(H(ao, 'M46,-113L30,-113L0,-64L6,-56Z', 'trang'), 3.6)
+  net(tao('path', { d: 'M0,-58V-4' }, ao), 'vien', 3.6)
+  const tui = tao('g', { transform: 'translate(-40,-46)' }, ao), ong = tao('g', { transform: 'rotate(-6)' }, tui)
+  vien(R(ong, -8, -34, 16, 42, 8, 'thuyTinh'), 3.2)
+  H(ong, 'M-6.4,-14H6.4V0A6.4,6.4 0 0 1 -6.4,0Z', 'hong'); R(ong, -3.6, -28, 3, 11, 1.5, 'trang')
+  vien(R(tui, -20, -4, 40, 26, 6, 'trang'), 4).style.paintOrder = 'normal'
+  const hh = tao('g', { transform: 'translate(40,-58)' }, ao)
+  vien(H(hh, 'M0,-21L18.2,-10.5V10.5L0,21L-18.2,10.5V-10.5Z', 'lucGiac'), 3.4)
+  H(hh, 'M0,-12C6,-6 9,-1 8,5C7,10 3,13 0,13C-4,13 -8,10 -8,5C-8,1 -6,-2 -3,-5C-3,-1 -1,1 1,1C2,-3 1,-7 0,-12Z', 'trang')
+  vien(tao('path', { d: thanD, fill: 'none' }, P.than!)) // nét viền thân phủ trên áo
+  // TAY: tay áo trắng hai đốt (khuỷu bo) + bàn tay «cánh cú» xù chàm
+  const tay = [-1, 1].map((s) => {
+    const tg = tao('g', null, P.lopSau!)
+    const ongT = vien(H(tg, '', 'trang'), 4.5)
+    const ban = tao('g', null, tg), kieu: Record<string, SVGElement> = {}
+    const k1 = (t: string) => (kieu[t] = tao('g', null, ban))
+    let h = k1('nam'); vien(H(h, 'M-15,-4C-20,8 -18,24 -6,30Q0,34 6,30C18,24 20,8 15,-4Z', 'long')); net(tao('path', { d: 'M-4,22L-2,28M4,22L4,29' }, h), 'vien', 2.6)
+    h = k1('xoe'); vien(H(h, 'M-15,-4C-21,12 -18,30 -11,40Q-6,47 -2,40Q2,50 7,41Q13,47 15,35C21,20 19,6 15,-4Z', 'long')); H(h, 'M2,8C8,14 10,24 8,32C5,24 2,18 2,8Z', 'longS')
+    return { tg, ongT, ban, kieu, s, z: 0, kh: '' }
+  })
+  // ĐẦU (gốc nhóm = tâm đầu)
+  g('dau', P.goc!); g('tai', P.dau!)
+  const tai = [-1, 1].map(() => { const t = tao('g', null, P.tai!); vien(H(t, [[-34, 34, 10], [30, 18, 10], [-4, -46, 8]], 'long')); H(t, [[-20, 22, 6], [16, 12, 6], [-4, -26, 5]], 'kem'); return t })
+  g('lua', P.dau!)
+  vien(H(P.lua!, 'M0,0C-18,-2 -26,-18 -18,-34C-14,-24 -8,-22 -6,-26C-10,-38 -4,-52 8,-58C4,-44 12,-40 16,-34C22,-26 24,-10 14,-2C10,0 4,1 0,0Z', 'hong'), 4.5)
+  H(P.lua!, 'M2,-6C-6,-8 -10,-16 -6,-24C-2,-18 4,-20 4,-26C10,-20 12,-12 8,-7C6,-6 4,-6 2,-6Z', 'hongS')
+  const dauD = dg([[-70, -90, 52], [70, -90, 52], [110, -10, 56], [112, 30, 10], [100, 42, 4], [108, 52, 14], [70, 88, 40], [-70, 88, 40], [-108, 52, 14], [-100, 42, 4], [-112, 30, 10], [-110, -10, 56]])
+  H(P.dau!, dauD, 'long')
+  H(tao('clipPath', { id: id + 'd' }, defs), dauD, 'long')
+  const catD = tao('g', { 'clip-path': `url(#${id}d)` }, P.dau!)
+  H(catD, 'M60,-120Q120,-40 96,100H140V-120Z', 'longT')
+  E(catD, -50, -66, 34, 14, 'longS', { transform: 'rotate(-20 -50 -66)', opacity: 0.8 })
+  g('mat', P.dau!); g('mask', P.mat!)
+  H(P.mask!, 'M-104,26C-106,-20 -78,-30 -50,-28C-28,-26 -12,-18 0,-2C12,-18 28,-26 50,-28C78,-30 106,-20 104,26C102,64 64,86 0,86C-64,86 -102,64 -104,26Z', 'kem')
+  E(P.mask!, -44, -40, 9, 6, 'kem'); E(P.mask!, 44, -40, 9, 6, 'kem') // chấm lông mày kem
+  vien(tao('path', { d: dauD, fill: 'none' }, P.dau!))
+  const ma = [-1, 1].map((s) => E(P.mat!, s * 72, 40, 17, 10.5, 'ma'))
   const mats = [-1, 1].map((s) => {
     const mg = tao('g', null, P.mat!), ci = `${id}e${s + 1}`
-    E(tao('clipPath', { id: ci }, defs), 0, 0, ERX, ERY, 'trang')
+    tao('circle', { r: 27 }, tao('clipPath', { id: ci }, defs))
     const tron = tao('g', null, mg)
-    E(tron, 0, 0, ERX, ERY, 'trang')
+    to(tao('circle', { r: 27 }, tron), 'den')
     const tr = tao('g', { 'clip-path': `url(#${ci})` }, tron), ng = tao('g', null, tr)
-    E(ng, 0, 2, PR, PR * 1.22, 'den'); E(ng, -PR * 0.32, -PR * 0.38, PR * 0.42, PR * 0.46, 'trang'); E(ng, PR * 0.42, PR * 0.62, PR * 0.18, PR * 0.18, 'trang')
-    const miT = R(tr, -ERX - 4, 0, 2 * ERX + 8, 3 * ERY, 0, 'long'), miD = E(tr, 0, 0, ERX * 1.7, ERY, 'long')
-    const nham = net(tao('path', { d: `M${-ERX + 2},2Q0,${ERY * 0.55} ${ERX - 2},2` }, mg), 'den', 4)
-    const cong = net(tao('path', { d: `M${-ERX + 2},6Q0,${-ERY * 0.8} ${ERX - 2},6` }, mg), 'den', 4.5)
-    const xoan = net(tao('path', { d: s < 0 ? `M${-ERX + 4},-8L${ERX - 4},0L${-ERX + 4},8` : `M${ERX - 4},-8L${-ERX + 4},0L${ERX - 4},8` }, mg), 'den', 4.5)
-    const may = E(P.mat!, 0, 0, 9, 5.5, 'kem') // hai chấm lông mày trắng đặc trưng shiba
-    return { mg, tron, ng, miT, miD, nham, cong, xoan, may, s }
+    to(tao('circle', { cx: 8, cy: -9, r: 9.5 }, ng), 'trang'); to(tao('circle', { cx: -10, cy: 9, r: 4 }, ng), 'trang')
+    const miT = R(tr, -32, 0, 64, 80, 0, 'kem')
+    const nham = net(tao('path', { d: 'M-18,0Q0,14 18,0' }, mg), 'den', 5)
+    const cong = net(tao('path', { d: 'M-18,6Q0,-16 18,6' }, mg), 'den', 5.5)
+    const xoan = net(tao('path', { d: s < 0 ? 'M-14,-10L14,0L-14,10' : 'M14,-10L-14,0L14,10' }, mg), 'den', 5.5)
+    const may = net(tao('path', { d: 'M-14,0H14' }, P.mat!), 'vien', 6)
+    return { mg, tron, ng, miT, nham, cong, xoan, may, s }
   })
-  const mui = tao('g', null, P.mat!); E(mui, 0, -78, 9, 6.5, 'mui'); E(mui, -3, -80, 3, 1.8, 'trang', { opacity: 0.55 })
-  const mq = tao('g', null, P.mat!)
+  H(P.mat!, 'M-11,19Q0,14 11,19Q8,29 0,31Q-8,29 -11,19Z', 'den') // mũi
+  const mq = tao('g', { transform: 'translate(0,44)' }, P.mat!)
   const mcp = tao('path', null, tao('clipPath', { id: id + 'm' }, defs))
-  const mh = H(mq, '', 'mieng', { 'stroke-width': 3.6, 'stroke-linejoin': 'round' }); mh.style.stroke = M('mieng')
-  const luoi = E(tao('g', { 'clip-path': `url(#${id}m)` }, mq), 0, 0, 8, 6, 'luoi')
-  // kính bảo hộ trên trán (nhỏ hơn mắt, sát đỉnh — không thành «bốn mắt»)
-  g('kinh', P.than!)
-  for (const s of [-1, 1]) { R(P.kinh!, s * 20 - 16, ky - 11, 32, 22, 10, 'kinhV'); R(P.kinh!, s * 20 - 12, ky - 7.5, 24, 15, 7, 'kinh'); R(P.kinh!, s * 20 - 8, ky - 5, 5, 9, 2.5, 'trang') }
-  // tay: tay áo trắng thuôn có khuỷu bo + cổ tay chàm + bàn tay tròn có viền
-  const tay = [-1, 1].map((s) => {
-    const tg = tao('g', null, null)
-    const ongT = vien(H(tg, '', 'trang'), 'tayAoV', 2.4)
-    const co = net(tao('path', null, tg), 'cham', 18); co.setAttribute('stroke-linecap', 'butt')
-    const ban = tao('g', null, tg), kieu: Record<string, SVGElement> = {}
-    const k1 = (t: string) => { const h = tao('g', { 'stroke-width': 2.4 }, ban); h.style.stroke = M('tayV'); h.style.paintOrder = 'stroke'; kieu[t] = h; return h }
-    let h = k1('nam'); E(h, 0, 8, 10, 10, 'long'); E(h, -7.5, 4, 4, 5.5, 'long', { transform: 'rotate(28 -7.5 4)' })
-    h = k1('xoe'); H(h, [[-9, 0, 7], [9, 0, 7], [10, 21, 9], [-9, 21, 9]], 'long'); E(h, -11, 6, 4, 7, 'long', { transform: 'rotate(55 -11 6)' })
-    P.goc!.insertBefore(tg, P.than!)
-    return { tg, ongT, co, ban, kieu, s, z: 0, kh: '' }
+  const mh = vien(H(mq, '', 'mieng'), 3.6)
+  const luoi = E(tao('g', { 'clip-path': `url(#${id}m)` }, mq), 0, 0, 9, 6, 'luoi')
+  // KÍNH BẢO HỘ: dải ngọc cong ôm trán (cắt theo đầu) + hai tròng + viên lục giác chàm
+  g('kinh', P.dau!)
+  const daiK = tao('g', null, tao('g', { 'clip-path': `url(#${id}d)` }, P.kinh!))
+  vien(H(daiK, 'M-130,-34Q0,-118 130,-34V-14Q0,-98 -130,-14Z', 'ngoc'), 4)
+  const trong = [-1, 1].map(() => {
+    const k = tao('g', null, P.kinh!)
+    vien(R(k, -31, -20, 62, 40, 16, 'ngoc'), 4.5)
+    R(k, -23, -13, 46, 26, 11, 'ngocS'); H(k, 'M-16,-9H-4L-12,7H-20Z', 'trang', { opacity: 0.9 }); to(tao('circle', { cx: 10, cy: -7, r: 3, opacity: 0.8 }, k), 'trang')
+    return k
   })
-  // hiệu ứng: lấp lánh, giọt mồ hôi, dấu hỏi, zzz
+  vien(H(P.kinh!, 'M0,-80L10,-74V-62L0,-56L-10,-62V-74Z', 'lucGiac'), 3)
+  g('lopTruoc', P.goc!)
+  // HIỆU ỨNG (ngoài nhóm lật ⇒ chữ «?» / «z» không bị gương)
   g('hieu', svg)
-  const sao = ([[-96, -200, 1], [92, -230, 0.8], [-70, -268, 0.7], [104, -150, 0.75]] as const).map(([x, y, s]) => { const e = H(P.hieu!, 'M0,-10Q1.6,-1.6 10,0Q1.6,1.6 0,10Q-1.6,1.6 -10,0Q-1.6,-1.6 0,-10Z', 'sao'); e.style.display = 'none'; return { e, x, y, s } })
-  const giot = H(P.hieu!, 'M70,-170Q80,-152 70,-144Q60,-152 70,-170Z', 'giot'); giot.style.display = 'none'
+  const sao = ([[-150, -250, 1.2], [140, -280, 0.9], [-120, -320, 0.8], [152, -190, 0.8]] as const).map(([x, y, s]) => { const e = H(P.hieu!, 'M0,-12Q2,-2 12,0Q2,2 0,12Q-2,2 -12,0Q-2,-2 0,-12Z', 'sao'); e.style.display = 'none'; return { e, x, y, s } })
+  const nhay = tao('g', null, P.hieu!); nhay.style.display = 'none'
+  net(tao('path', { d: 'M120,-276L134,-300M138,-262L162,-276' }, nhay), 'hong', 6)
   const hoi = tao('g', null, P.hieu!); hoi.style.display = 'none'
-  vien(to(tao('circle', { cx: 86, cy: -214, r: 17 }, hoi), 'trang'), 'cham', 3.5).style.paintOrder = 'normal'
-  net(tao('path', { d: 'M80,-219Q80,-225 86,-225Q92,-225 92,-220Q92,-216 86.5,-213V-210' }, hoi), 'cham', 3.6); E(hoi, 86.5, -204, 2.2, 2.2, 'cham')
+  net(tao('path', { d: 'M104,-296Q104,-312 120,-312Q136,-312 136,-298Q136,-288 121,-282V-272' }, hoi), 'lucGiac', 7); to(tao('circle', { cx: 121, cy: -258, r: 4.6 }, hoi), 'lucGiac')
+  const khoi = tao('g', null, P.hieu!); khoi.style.display = 'none'
+  for (const s of [-1, 1]) { const k = tao('g', { transform: `translate(${s * 120},-300)` }, khoi); for (const [x, y, r] of [[0, 0, 16], [14, -8, 12], [-12, -8, 11], [4, -18, 11]] as const) to(tao('circle', { cx: x, cy: y, r }, k), 'khoi') }
+  const lam = tao('g', null, P.hieu!); lam.style.display = 'none'
+  net(tao('path', { d: 'M140,-240Q156,-226 146,-208M154,-252Q176,-228 162,-200' }, lam), 'hong', 5)
+  const giot = vien(H(P.hieu!, 'M108,-250Q120,-228 108,-218Q96,-228 108,-250Z', 'giot'), 3); giot.style.display = 'none'
   const zzz = tao('g', null, P.hieu!); zzz.style.display = 'none'
-  const zs = ([[70, -190, 13], [92, -218, 17], [118, -250, 21]] as const).map(([x, y, s]) => { const t = to(tao('text', { x, y, 'font-size': s, 'font-weight': 900 }, zzz), 'chamS'); t.textContent = 'z'; return t })
+  const zs = ([[96, -250, 18], [120, -280, 24], [148, -316, 30]] as const).map(([x, y, s]) => { const t = to(tao('text', { x, y, 'font-size': s, 'font-weight': 900 }, zzz), 'longT'); t.textContent = 'z'; return t })
   noiGan.appendChild(svg)
 
   // ── khung xương lò xo ──
   const v: So = { ...CHUAN }, van: So = {}, dich: So = { ...CHUAN }
   for (const k in v) van[k] = 0
   let roi: Record<string, string | number> = { ...ROI }, cx: TrangThaiVe = CAM_XUC_LUA.yen, iK = 0, tK = 0, kK = 170, gd: 'seq' | 'loop' | 'xong' = 'loop'
-  let t = 0, nhay = 0, hen = 2000 + Math.random() * 2000, tSao = -1e9, tGiot = -1e9, noiDen = 0, ten: TrangThaiLua = 'yen', truocChoc: TrangThaiLua = 'yen', henVe = 0, ve2: TrangThaiLua | null = null
+  let t = 0, nhayMat = 0, hen = 2000 + Math.random() * 2000, tSao = -1e9, tGiot = -1e9, noiDen = 0, ten: TrangThaiLua = 'yen', truocChoc: TrangThaiLua = 'yen', henVe = 0, ve2: TrangThaiLua | null = null
   const phu = { x: 0, v: 0 }
-  let truoc = { rot: 0, y: 0 }
-  const SHO = (s: number): [number, number] => [s * W * 0.44, -HH * 0.5]
+  let truoc = { rot: 0, y: 0, hr: 0 }
+  const SHO = (s: number): [number, number] => [s * 74, -98]
   function ap(f: Khung) {
     const tt = A(cx.base ?? {}, f.p ?? {})
     for (const k in CHUAN) { const x = tt[k]; dich[k] = typeof x === 'number' ? x : CHUAN[k]! }
+    dich.q! += qGoc
     for (const [s, T] of [[-1, 'T'], [1, 'P']] as const) {
       const di = tt['i' + T] as number[] | null | undefined
       if (!di) continue
-      const [Sx, Sy] = SHO(s), X = s * (di[0]! - Sx), Y = di[1]! - Sy, a = rad(dich['a' + T]!), Ex = 22 * Math.sin(a), Ey = 22 * Math.cos(a)
+      const [Sx, Sy] = SHO(s), X = s * (di[0]! - Sx), Y = di[1]! - Sy, a = rad(dich['a' + T]!), Ex = 24 * Math.sin(a), Ey = 24 * Math.cos(a)
       dich['b' + T] = (Math.atan2(X - Ex, Y - Ey) * 180) / Math.PI
-      dich['d' + T] = Math.max(0.6, Math.min(2.2, Math.hypot(X - Ex, Y - Ey) / 20))
+      dich['d' + T] = Math.max(0.5, Math.min(2.2, Math.hypot(X - Ex, Y - Ey) / 22))
     }
     const r: Record<string, string | number> = {}
     for (const k in ROI) { const x = tt[k]; r[k] = x == null ? ROI[k]! : (x as string | number) }
     if (r.hieu === 'sao' && !mayYeu()) tSao = t
     if (r.hieu === 'giot' && !mayYeu()) tGiot = t
-    for (const [i, kk] of [[0, 'zT'], [1, 'zP']] as const) { const ty = tay[i]!; if (r[kk] && !ty.z) { P.goc!.appendChild(ty.tg); ty.z = 1 } else if (!r[kk] && ty.z) { P.goc!.insertBefore(ty.tg, P.than!); ty.z = 0 } }
+    for (const [i, kk] of [[0, 'zT'], [1, 'zP']] as const) { const ty = tay[i]!; if (r[kk] && !ty.z) { P.lopTruoc!.appendChild(ty.tg); ty.z = 1 } else if (!r[kk] && ty.z) { P.lopSau!.appendChild(ty.tg); ty.z = 0 } }
     roi = r; kK = f.k ?? 170
   }
   function batDau(tm: TrangThaiLua, o: TuyChonLua = {}) {
     ten = CAM_XUC_LUA[tm] ? tm : 'yen'; cx = CAM_XUC_LUA[ten]; iK = 0; tK = 0
-    if (!['vui', 'combo', 'covu', 'choc'].includes(ten)) tSao = -1e9
+    if (!['vui', 'combo', 'choc'].includes(ten)) tSao = -1e9
     if (ten !== 'buon') tGiot = -1e9
     let seq = cx.seq
     if (o.em && seq) seq = seq.filter((k) => !(k.p && (k.p.y as number) > 0)) // êm: bỏ nhịp nén lấy đà
@@ -303,57 +341,63 @@ export function taoLua(noiGan: HTMLElement, tc: { trangThai?: TrangThaiLua; tuyC
     }
     if (henVe && t >= henVe && ve2) { const x = ve2; henVe = 0; ve2 = null; batDau(x, { em: true }) }
     for (const k in v) { const mk = MK.has(k), K = mk ? Math.max(kK, 380) : kK, z = mk ? 0.85 : 0.6; van[k]! += (K * (dich[k]! - v[k]!) - 2 * Math.sqrt(K) * z * van[k]!) * dt; v[k]! += van[k]! * dt }
-    const dv = ((v.rot! - truoc.rot) * 0.06 + (v.y! - truoc.y) * 0.05) / dt
-    truoc = { rot: v.rot!, y: v.y! }
+    const dv = ((v.rot! - truoc.rot) * 0.06 + (v.hr! - truoc.hr) * 0.06 + (v.y! - truoc.y) * 0.05) / dt
+    truoc = { rot: v.rot!, y: v.y!, hr: v.hr! }
     const dp = Math.max(-18, Math.min(18, -dv * 0.9))
     phu.v += (70 * (dp - phu.x) - 2 * Math.sqrt(70) * 0.25 * phu.v) * dt; phu.x += phu.v * dt
     hen -= dt * 1000
-    if (hen <= 0) { nhay = 1; hen = 2400 + Math.random() * 2600 }
-    if (nhay > 0) nhay = Math.max(0, nhay - (dt * 1000) / 150)
+    if (hen <= 0) { nhayMat = 1; hen = 2400 + Math.random() * 2600 }
+    if (nhayMat > 0) nhayMat = Math.max(0, nhayMat - (dt * 1000) / 150)
   }
   const cu = new WeakMap<Element, Record<string, string>>()
   const dat = (e: Element, k: string, val: string) => { let m = cu.get(e); if (!m) cu.set(e, (m = {})); if (m[k] !== val) { m[k] = val; if (k === 'display') (e as SVGElement).style.display = val; else e.setAttribute(k, val) } }
   const tf = (e: Element, s: string) => dat(e, 'transform', s)
   function ve() {
-    const th = tinh ? 0 : Math.sin((t / 2400) * Math.PI * 2) * v.tho! * 0.02
-    const sq = v.sq! * (1 + th * 0.5), sx = 1 + (1 - sq) * 0.6
+    const th = tinh ? 0 : Math.sin((t / 2400) * Math.PI * 2) * v.tho! * 0.018
+    const sq = v.sq! * (1 + th * 0.5), sx = 1 + (1 - sq) * 0.6, q = v.q!, aq = Math.abs(q)
     tf(P.goc!, `translate(${f1(v.x!)},${f1(v.y!)}) rotate(${f1(v.rot!)}) scale(${f1(sx * 1000) / 1000},${f1(sq * 1000) / 1000})`)
-    dat(bong, 'rx', String(f1(W * 0.46 * (1 + Math.min(0, v.y!) / 120)))); dat(bong, 'opacity', String(f1(1 + Math.min(0, v.y!) / 90)))
-    for (const { c, s } of chan) tf(c, `translate(${f1(s * W * 0.22)},-2)`)
-    tf(P.than!, `rotate(${f1(v.hr!)})`)
-    tf(P.mat!, `translate(${f1(v.fx! * 9)},${f1(v.fy!)})`)
-    tf(P.kinh!, `translate(${f1(v.fx! * 6)},${f1(v.fy! * 0.5)})`)
-    tf(P.duoi!, `rotate(${f1(phu.x * 0.6 + v.rot! * 0.5)} ${W * 0.4} -40)`)
-    tai.forEach((e, i) => { const [x, y, r] = taiGoc[i]!, s = i ? 1 : -1; tf(e, `translate(${x},${y}) rotate(${f1(r + s * v.tai! + phu.x * (i ? 1 : 0.8))})${i ? '' : ' scale(-1,1)'}`) })
-    const ns = Math.sin(nhay * Math.PI)
+    dat(bong, 'rx', String(f1(92 * (1 + Math.min(0, v.y!) / 120)))); dat(bong, 'opacity', String(f1(1 + Math.min(0, v.y!) / 90)))
+    for (const { c, s } of chan) tf(c, `translate(${f1(s * 40 + q * 10)},0)`)
+    tf(P.duoi!, `translate(${f1(-q * 36)},0) rotate(${f1(phu.x * 0.7 + v.rot! * 0.5)} -60 -40)`)
+    tf(P.than!, `translate(${f1(q * 8)},0) scale(${f1(1 - 0.08 * aq)},1)`)
+    tf(P.ao!, `translate(${f1(q * 18)},0)`)
+    tf(P.dau!, `translate(${f1(q * 12)},${f1(DAU_Y + v.hy! - th * 120)}) rotate(${f1(v.hr!)})`)
+    tai.forEach((e, i) => {
+      const s = i ? 1 : -1, xa = Math.max(0, s * q)
+      tf(e, `translate(${f1(s * 62 - q * 18 - s * xa * 22)},-92) rotate(${f1(s * 20 + s * v.tai! + phu.x * (i ? 1 : 0.8))}) scale(${f1(s * 1.12 * (1 - 0.35 * xa))},1.12)`)
+    })
+    tf(P.lua!, `translate(${f1(q * 20)},-88) rotate(${f1(phu.x * 1.2)}) scale(${f1(0.9 + 0.1 * v.lua!)},${f1(v.lua!)})`)
+    tf(P.mat!, `translate(${f1(q * 32)},0)`)
+    tf(P.mask!, `scale(${f1(1 - 0.15 * aq)},1)`)
+    tf(P.kinh!, `translate(${f1(q * 26)},0)`); tf(daiK, `translate(${f1(q * 4)},0)`)
+    trong.forEach((k, i) => { const s = i ? 1 : -1, xa = Math.max(0, s * q); tf(k, `translate(${f1(s * 44 * (1 - 0.3 * xa))},-62) rotate(${s * 13}) scale(${f1(0.9 * (1 - 0.35 * xa))},0.9)`) })
+    const ns = Math.sin(nhayMat * Math.PI)
     for (const e of mats) {
-      const s = e.s, md = roi.mat
-      tf(e.mg, `translate(${s * EX},${EY}) scale(${f1(v.es! * 100) / 100})`)
+      const s = e.s, md = roi.mat, xa = Math.max(0, s * q), x0 = s * 46 * (1 - 0.25 * xa)
+      tf(e.mg, `translate(${f1(x0)},8) scale(${f1(v.es! * (1 - 0.3 * xa) * 100) / 100},${f1(v.es! * 100) / 100})`)
       const lt = Math.min(1, Math.max(s < 0 ? v.lt! : v.ltP!, tinh ? 0 : ns)), thuong = md === 'mo'
-      dat(e.tron, 'display', thuong && lt <= 0.9 ? '' : 'none')
+      dat(e.tron, 'display', thuong && lt <= 0.92 ? '' : 'none')
       dat(e.cong, 'display', md === 'cong' ? '' : 'none')
       dat(e.xoan, 'display', md === 'xoan' ? '' : 'none')
-      dat(e.nham, 'display', md === 'nham' || (thuong && lt > 0.9) ? '' : 'none')
-      tf(e.ng, `translate(${f1(v.px! * ERX * 0.4)},${f1(v.py! * ERY * 0.36)})`)
-      const yb = -ERY + lt * 2 * ERY
-      dat(e.miT, 'y', String(f1(yb - 3 * ERY))); tf(e.miT, `rotate(${f1(-s * v.la!)} 0 ${f1(yb)})`)
-      dat(e.miD, 'cy', String(f1(2 * ERY - v.lb! * 2 * ERY + 2)))
-      tf(e.may, `translate(${s * 36},${f1(EY - ERY - 12 + v.by! - (md === 'cong' ? 3 : 0))}) rotate(${f1(-s * v.ba!)})`)
+      dat(e.nham, 'display', md === 'nham' || (thuong && lt > 0.92) ? '' : 'none')
+      tf(e.ng, `translate(${f1(v.px! * 6)},${f1(v.py! * 5)})`)
+      const yb = -27 + lt * 54
+      dat(e.miT, 'y', String(f1(yb - 80))); tf(e.miT, `rotate(${f1(-s * v.la!)} 0 ${f1(yb)})`)
+      dat(e.may, 'display', v.may! > 0.3 ? '' : 'none')
+      tf(e.may, `translate(${f1(x0)},${f1(-28 + (1 - v.may!) * 6)}) rotate(${f1(-s * v.ba!)})`)
     }
     for (const m of ma) dat(m, 'opacity', String(f1(Math.min(1, v.ma!))))
     // miệng — mấp máy khi đang nói
     const dangNoi = t < noiDen, nhip = dangNoi ? Math.floor(t / 90) % 3 : 0
-    const w = 9 + v.mw! - (dangNoi ? 1.5 : 0), yl = -v.mc! + v.mk!, yr = -v.mc! - v.mk!, ym = (yl + yr) / 2
-    const mt = ym + v.mt! - (dangNoi ? 1 : 0), mb = Math.max(mt, ym + v.mb! + (dangNoi ? [6, 2, 4][nhip]! : 0))
+    const w = 13 + v.mw! - (dangNoi ? 2 : 0), yl = -v.mc! + v.mk!, yr = -v.mc! - v.mk!, ym = (yl + yr) / 2
+    const mt = ym + v.mt! - (dangNoi ? 1 : 0), mb = Math.max(mt, ym + v.mb! + (dangNoi ? [6, 1, 4][nhip]! - 4 : 0))
     const d = `M${f1(-w)},${f1(yl)}Q0,${f1(mt * 2 - ym)} ${f1(w)},${f1(yr)}Q0,${f1(mb * 2 - ym)} ${f1(-w)},${f1(yl)}Z`
-    dat(mh, 'd', d); dat(mcp, 'd', d); tf(mq, `translate(0,${MY})`)
-    dat(luoi, 'cy', String(f1(mb + 3))); dat(luoi, 'rx', String(f1(Math.max(3, w * 0.6))))
+    dat(mh, 'd', d); dat(mcp, 'd', d)
+    dat(luoi, 'cy', String(f1(mb + 3))); dat(luoi, 'rx', String(f1(Math.max(4, w * 0.6))))
     for (const ty of tay) {
-      const s = ty.s, T = s < 0 ? 'T' : 'P', [Sx, Sy] = SHO(s), a = rad(v['a' + T]!), b = rad(v['b' + T]!), dd = v['d' + T]!
-      const Ex = Sx + s * 22 * Math.sin(a), Ey = Sy + 22 * Math.cos(a), Hx = Ex + s * 20 * dd * Math.sin(b), Hy = Ey + 20 * dd * Math.cos(b)
-      dat(ty.ongT, 'd', ongTay(Sx, Sy, Ex, Ey, Hx, Hy, 22, 19, 16))
-      const ux = s * Math.sin(b), uy = Math.cos(b)
-      dat(ty.co, 'd', `M${f1(Hx - ux * 5)},${f1(Hy - uy * 5)}L${f1(Hx)},${f1(Hy)}`)
+      const s = ty.s, T = s < 0 ? 'T' : 'P', [Sx0, Sy] = SHO(s), Sx = Sx0 + q * 8 - (s * q > 0 ? s * q * 16 : 0), a = rad(v['a' + T]!), b = rad(v['b' + T]!), dd = v['d' + T]!
+      const Ex = Sx + s * 24 * Math.sin(a), Ey = Sy + 24 * Math.cos(a), Hx = Ex + s * 22 * dd * Math.sin(b), Hy = Ey + 22 * dd * Math.cos(b)
+      dat(ty.ongT, 'd', ongTay(Sx, Sy, Ex, Ey, Hx, Hy, 30, 27, 25))
       tf(ty.ban, `translate(${f1(Hx)},${f1(Hy)}) scale(${s},1) rotate(${f1(-v['b' + T]!)})`)
       const kh = String(roi['h' + T])
       if (ty.kh !== kh) { for (const n in ty.kieu) ty.kieu[n]!.style.display = n === kh ? '' : 'none'; ty.kh = kh }
@@ -364,11 +408,15 @@ export function taoLua(noiGan: HTMLElement, tc: { trangThai?: TrangThaiLua; tuyC
       const sc = (k < 0.4 ? (k / 0.4) * 1.3 : 1.3 * (1 - (k - 0.4) / 0.6)) * sv.s
       dat(sv.e, 'display', ''); tf(sv.e, `translate(${sv.x},${sv.y}) rotate(${f1(k * 90)}) scale(${f1(sc * 100) / 100})`)
     }
+    const hien = (e: SVGElement, ok: boolean, s?: string) => { dat(e, 'display', ok ? '' : 'none'); if (ok && s) tf(e, tinh ? '' : s) }
+    const nh = (t % 600) / 600, kk = (t / 900) % 1
+    hien(nhay, roi.hieu === 'nhay', `translate(${f1(Math.sin(nh * Math.PI) * 4)},${f1(-Math.sin(nh * Math.PI) * 4)})`)
+    hien(hoi, roi.hieu === 'hoi', `translate(0,${f1(Math.sin(t / 300) * 4)})`)
+    hien(khoi, roi.hieu === 'khoi', `translate(0,${f1(-kk * 14)}) scale(${f1(0.85 + kk * 0.3)})`)
+    hien(lam, roi.hieu === 'lam', `translate(${f1(Math.sin(t / 120) * 3)},0)`)
     const kg = t - tGiot - 120
     dat(giot, 'display', kg < 0 || kg > 1600 ? 'none' : '')
     if (kg >= 0 && kg <= 1600) { tf(giot, `translate(0,${f1(kg / 100)})`); dat(giot, 'opacity', String(f1(kg < 200 ? kg / 200 : kg > 1200 ? (1600 - kg) / 400 : 1))) }
-    dat(hoi, 'display', roi.hieu === 'hoi' ? '' : 'none')
-    if (roi.hieu === 'hoi') tf(hoi, `translate(0,${f1(Math.sin(t / 300) * 3)}) rotate(${f1(Math.sin(t / 400) * 6)} 86 -214)`)
     dat(zzz, 'display', roi.hieu === 'zzz' ? '' : 'none')
     if (roi.hieu === 'zzz') zs.forEach((z, i) => { const k = (t / 1800 + i / 3) % 1; dat(z, 'opacity', String(f1(tinh ? 1 : k < 0.2 ? k / 0.2 : 1 - (k - 0.2) / 0.8))); tf(z, `translate(${f1(tinh ? 0 : k * 10)},${f1(tinh ? 0 : -k * 16)})`) })
   }
@@ -378,8 +426,8 @@ export function taoLua(noiGan: HTMLElement, tc: { trangThai?: TrangThaiLua; tuyC
     const r = Math.min(7, L1 * 0.45, L2 * 0.45), mi = 1 / Math.max(0.45, 1 + n1[0] * n2[0] + n1[1] * n2[1])
     const ben = (k: number) => ({ a: [Sx + k * n1[0] * w1 / 2, Sy + k * n1[1] * w1 / 2], p1: [Ex + k * n1[0] * w2 / 2 - u1[0] * r, Ey + k * n1[1] * w2 / 2 - u1[1] * r], c: [Ex + k * (n1[0] + n2[0]) * mi * w2 / 2, Ey + k * (n1[1] + n2[1]) * mi * w2 / 2], p2: [Ex + k * n2[0] * w2 / 2 + u2[0] * r, Ey + k * n2[1] * w2 / 2 + u2[1] * r], b: [Hx + k * n2[0] * w3 / 2, Hy + k * n2[1] * w3 / 2] })
     const A1 = ben(1), B1 = ben(-1), Q = (p: number[]) => `${f1(p[0]!)},${f1(p[1]!)}`
-    const tip = [Hx + u2[0] * w3 / 2, Hy + u2[1] * w3 / 2], goc = [Sx - u1[0] * w1 / 2, Sy - u1[1] * w1 / 2]
-    return `M${Q(A1.a)}L${Q(A1.p1)}Q${Q(A1.c)} ${Q(A1.p2)}L${Q(A1.b)}Q${Q([A1.b[0]! + u2[0] * w3 / 2, A1.b[1]! + u2[1] * w3 / 2])} ${Q(tip)}Q${Q([B1.b[0]! + u2[0] * w3 / 2, B1.b[1]! + u2[1] * w3 / 2])} ${Q(B1.b)}L${Q(B1.p2)}Q${Q(B1.c)} ${Q(B1.p1)}L${Q(B1.a)}Q${Q([B1.a[0]! - u1[0] * w1 / 2, B1.a[1]! - u1[1] * w1 / 2])} ${Q(goc)}Q${Q([A1.a[0]! - u1[0] * w1 / 2, A1.a[1]! - u1[1] * w1 / 2])} ${Q(A1.a)}Z`
+    const goc = [Sx - u1[0] * w1 / 2, Sy - u1[1] * w1 / 2]
+    return `M${Q(A1.a)}L${Q(A1.p1)}Q${Q(A1.c)} ${Q(A1.p2)}L${Q(A1.b)}L${Q(B1.b)}L${Q(B1.p2)}Q${Q(B1.c)} ${Q(B1.p1)}L${Q(B1.a)}Q${Q([B1.a[0]! - u1[0] * w1 / 2, B1.a[1]! - u1[1] * w1 / 2])} ${Q(goc)}Q${Q([A1.a[0]! - u1[0] * w1 / 2, A1.a[1]! - u1[1] * w1 / 2])} ${Q(A1.a)}Z`
   }
 
   const song: Song = { tich, ve, hien: true, svg }

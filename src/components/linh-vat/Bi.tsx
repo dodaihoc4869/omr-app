@@ -1,10 +1,11 @@
-// LINH VẬT CHÍNH «Lửa» (thầy chốt 27/10 «Chọn Lửa build luôn nhé»): chó shiba khoác blouse trắng viền chàm, kính bảo hộ trên trán, ống nghiệm hồng
-// trong túi, thẻ ĐĐH — THAY «Bi» (bình cầu) ở mọi chỗ của app học sinh. GIỮ NGUYÊN API <Bi cam size className nhip noi> nên người gọi không đổi.
+// LINH VẬT CHÍNH «Lửa» — hình «CÚ NGỌC» (thầy chốt 28/10 «Chốt build thay»; trước đó 27/10 là chó shiba cam): lông chàm tím, chỏm lửa hồng, kính bảo hộ
+// ngọc lam, blouse trắng, ống nghiệm hồng, huy hiệu lục giác — ở mọi chỗ của app học sinh. Tên trên màn VẪN là «Lửa» (Cú Ngọc là tên concept).
+// GIỮ NGUYÊN API <Bi cam size className nhip noi> nên người gọi không đổi; thêm `goc` (tuỳ chọn) để đứng nghiêng.
 // Hình + chuyển động ở mảnh NẠP LƯỜI ./lua-dong (không vào nhóm mở app); trong lúc chờ mảnh về: khung giữ chỗ đúng tỉ lệ 200 : 230 (không xô bố cục).
-// Lửa giữ MÀU LÔNG CAM ĐẤT riêng ở mọi cảm xúc (không mang màu đúng / sai như Bi): cảm xúc đọc bằng dáng, tai, mắt, miệng.
+// Lửa giữ MÀU LÔNG CHÀM riêng ở mọi cảm xúc (không mang màu đúng / sai như Bi): cảm xúc đọc bằng dáng, tai, mắt, miệng.
 // Giảm chuyển động / máy yếu / không có rAF ⇒ Lửa đứng TĨNH ở tư thế của cảm xúc. Chỉ dùng trong app học sinh «Trong». aria-hidden: chữ đi kèm đã đủ nghĩa.
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
-import type { Lua, TrangThaiLua, TuyChonLua } from './lua-dong'
+import type { GocLua, Lua, TrangThaiLua, TuyChonLua } from './lua-dong'
 import '../../styles/bi.css' // khung bong bóng «Học tiếp nhé» (.bi-loi) vẫn ở tệp này
 import '../../styles/lua.css'
 
@@ -39,9 +40,11 @@ export interface PropsBi {
   nhip?: 'nay' | 'lac' | 'nhay' | 'yen'
   /** Câu Lửa đang nói: miệng mấp máy khớp nhịp chữ (bong bóng lời do màn tự vẽ). */
   noi?: string
+  /** Đứng nghiêng: 'phai' = quay mặt sang phải, 'trai' = sang trái (Lộ trình: nhìn về phía đường). */
+  goc?: GocLua
 }
 
-export function Bi({ cam = 'chao', size = 96, className, nhip, noi }: PropsBi) {
+export function Bi({ cam = 'chao', size = 96, className, nhip, noi, goc }: PropsBi) {
   const o = useRef<HTMLSpanElement>(null), lua = useRef<Lua | null>(null), dau = useRef(true)
   const [co, setCo] = useState(() => !!moDong)
   useEffect(() => {
@@ -53,7 +56,7 @@ export function Bi({ cam = 'chao', size = 96, className, nhip, noi }: PropsBi) {
   useEffect(() => {
     if (!co || !moDong || !o.current) return
     const [trangThai, tuyChon] = ttTheoCam(cam, nhip)
-    const l = moDong.taoLua(o.current, { trangThai, tuyChon, tinh: biDungYen() })
+    const l = moDong.taoLua(o.current, { trangThai, tuyChon, tinh: biDungYen(), goc })
     if (noi) l.noi(noi, 40)
     lua.current = l
     return () => { l.huy(); lua.current = null }

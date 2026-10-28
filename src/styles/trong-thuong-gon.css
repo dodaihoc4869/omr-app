@@ -55,20 +55,20 @@
 [data-trong='hs'] .tp-tr-o:focus-visible, [data-trong='hs'] .tp-tr-muc:focus-visible { outline: 3px solid var(--tr-tin); outline-offset: 2px; }
 [data-trong='hs'] .tp-tr-so { display: inline-block; min-width: 1.2ch; transform-origin: 50% 60%; }
 [data-trong='hs'] .tp-tr-cho { display: inline-block; width: 2.2ch; height: 14px; border-radius: 6px; background: var(--tr-mat-3); }
-[data-trong='hs'] .tp-tr-muc { position: relative; display: grid; place-items: center; width: 52px; height: 52px; flex: none; margin-left: auto; padding: 0; border: 0; border-radius: 50%; background: none; cursor: pointer; touch-action: manipulation; }
-[data-trong='hs'] .tp-tr-muc svg.vm { position: absolute; inset: 0; width: 52px; height: 52px; transform: rotate(-90deg); }
+[data-trong='hs'] .tp-tr-muc { position: relative; display: grid; place-items: center; width: 54px; height: 54px; flex: none; margin-left: auto; padding: 0; border: 0; border-radius: 50%; background: none; cursor: pointer; touch-action: manipulation; }
+[data-trong='hs'] .tp-tr-muc svg.vm { position: absolute; inset: 0; width: 54px; height: 54px; transform: rotate(-90deg); }
 [data-trong='hs'] .tp-tr-muc .vm circle { fill: none; stroke-width: 4.5; }
 [data-trong='hs'] .tp-tr-muc .vm .nen { stroke: var(--tr-mat-3); }
 [data-trong='hs'] .tp-tr-muc .vm .chay { stroke: var(--tr-dung); stroke-linecap: round; }
 [data-trong='hs'] .tp-tr-muc[data-dat] .vm .chay { stroke: var(--tr-sao); }
-[data-trong='hs'] .tp-tr-muc .bi { margin-top: -4px; }
+[data-trong='hs'] .tp-tr-muc .bi { width: 40px; margin-top: -2px; }
 [data-trong='hs'] .tp-tr-muc em { position: absolute; bottom: -3px; left: 50%; transform: translateX(-50%); padding: 2px 5px; border-radius: 999px; background: var(--tr-chinh-nut); color: var(--tr-tren-chinh); font: 900 11px/1 var(--tp-f); font-style: normal; white-space: nowrap; }
 /* đặt trong header.da-tren của Lộ trình: bỏ viên thuốc chung của thanh, giữ của ô mình */
 [data-trong='hs'] .da-tren > .tp-tr { flex: 1 1 auto; }
 @media (min-width: 1000px) { [data-trong='hs'] .tp-tr-muc { margin-left: 8px; } [data-trong='hs'] .da-tren > .tp-tr { flex: 0 1 auto; } }
 @media (max-height: 520px) and (min-width: 600px) {
-  [data-trong='hs'] .tp-tr-muc, [data-trong='hs'] .tp-tr-muc svg.vm { width: 44px; height: 44px; }
-  [data-trong='hs'] .tp-tr-muc .bi { width: 24px; height: auto; margin-top: -12px; }
+  [data-trong='hs'] .tp-tr-muc, [data-trong='hs'] .tp-tr-muc svg.vm { width: 46px; height: 46px; }
+  [data-trong='hs'] .tp-tr-muc .bi { width: 33px; height: auto; margin-top: -8px; }
 }
 @media (max-width: 359px) { [data-trong='hs'] .tp-tr-o { padding: 4px 8px 4px 6px; font-size: 14px; gap: 4px; } }
 
