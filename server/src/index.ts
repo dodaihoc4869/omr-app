@@ -1,4 +1,5 @@
 import { docPhongChoDongThoi, xoaDemPhongCho } from './phong-cho-dong-thoi'
+import { lamSachThanLoi, loiBanTheoDuong, thanTuLoiNem } from './loi-may-chu'
 import { khoiPhucChienDich0810 } from './khoi-phuc-chien-dich-0810'
 import { nhipCa } from './nhip-ca'
 import { anhCo, anhDay, layAnh } from './kho-anh'
@@ -168,13 +169,16 @@ async function sauGhi<T>(env: Env, b: Record<string, unknown>, viec: Promise<T>)
   try { return await viec } finally { try { emCoGhi(await gameIdentity(env, b)) } catch { /* token sai / hết hạn */ } }
 }
 
-/** Lỗi máy chủ ⇒ JSON {ok:false,error[,ma]} 500 KÈM CORS (máy em đọc được lời, không tưởng mất mạng). `ma`: mã lỗi có tên (vd het_tran của game) để màn hiện đúng lời. */
+/** Lỗi máy chủ ⇒ JSON {ok:false,error[,ma]} 500 KÈM CORS (máy em đọc được lời, không tưởng mất mạng). `ma`: mã lỗi có tên (vd het_tran của game) để màn hiện đúng lời.
+ *  28/10: chữ lỗi gốc (D1/JS) chỉ ghi log; máy em nhận câu Việt chung, D1 tạm thời ⇒ 503 + maLoi MAY_CHU_BAN (loi-may-chu.ts). */
 function raLoi(e: unknown): Response {
-  const ma = (e as { ma?: unknown } | null)?.ma
-  return ra({ ok: false, error: e instanceof Error ? e.message : 'Lỗi máy chủ', ...(typeof ma === 'string' ? { ma } : {}) }, 500)
+  const { data, status } = thanTuLoiNem(e)
+  return ra(data, status)
 }
 
-function ra(data: unknown, status = 200,giuServerNow=false): Response {
+function ra(data0: unknown, status0 = 200,giuServerNow=false): Response {
+  // 28/10: mọi thân ok:false đi qua đây được làm sạch chữ lỗi kỹ thuật (một phép so thuộc tính, không tốn truy vấn).
+  const { data, status } = lamSachThanLoi(data0, status0)
   return new Response(JSON.stringify({ ...(data as object), serverNow: giuServerNow&&Number.isFinite((data as {serverNow?:unknown}).serverNow)?(data as {serverNow:number}).serverNow:Date.now(), nhipDeNghi: nhipDeNghi() }), { status, headers: JSON_HEADERS }) // nhipDeNghi: hệ số nhịp hỏi nền cho máy khách (suc-khoe-may.ts)
 }
 
@@ -3364,6 +3368,9 @@ const boXuLy = {
       // SẴN SÀNG ĐÊM (27/10, san-sang.ts): 00:30–05:59 VN chuẩn bị Sảnh + chặng đầu cho em có gói (6 em/phút) ⇒ lượt mở app đầu ngày khỏi lập kế hoạch.
       {const p=import('./san-sang').then(m=>m.cronSanSangDem(env,Date.now())).then(n=>{if(n)console.log('[san-sang] đêm',n)}).catch(e=>console.error('[san-sang] cron lỗi:',e))
       if(ctx?.waitUntil)ctx.waitUntil(p);else await p}
+      // TỰ SỬA LỖI — ĐỢT CŨ HƠN 14 NGÀY (28/10, chua-gon-dem.ts): 00:30–05:59 VN đóng dần theo luật tự làm, một lô 60 đợt/phút; ngoài khung không truy vấn.
+      {const p=import('./chua-gon-dem').then(m=>m.cronDongDotCu(env,Date.now())).then(r=>{if(r.dong)console.log('[tu-sua-dem] đóng',JSON.stringify(r))}).catch(e=>console.error('[tu-sua-dem] cron lỗi:',e))
+      if(ctx?.waitUntil)ctx.waitUntil(p);else await p}
       // MÁY SOẠN LỜI GIẢI SƠ ĐỒ (27/10, may-soan-cron.ts): cờ `cau_hinh.may_soan_so_do` tắt ⇒ một câu đọc có đệm rồi về. Bật ⇒ một lô nhỏ có khoá chạy,
       // chạy NỀN (waitUntil) để không giữ chân các việc cron phía sau (thông báo, nhắc bài). Phải đứng TRƯỚC dòng `return` dưới. Lỗi chỉ ghi log.
       {const p=import('./may-soan-cron').then(m=>m.chayMaySoanCron(env,Date.now())).then(r=>{if(r.chay)console.log('[may-soan] cron',JSON.stringify(r))}).catch(e=>console.error('[may-soan] cron lỗi:',e))
@@ -3757,6 +3764,8 @@ const boXuLy = {
       // CHỮA CÂU GỌN (thầy 25/10, server/src/chua-gon-lenh.ts): mở bản làm lại (không đáp án) · nộp (máy chủ chấm, đúng lần 1 qua luật tự làm ⇒ Đã tự sửa ngay).
       if (p === '/hs/chua-cau-sai/gon-mo') return raChua(await chuaGonMo(env, b))
       if (p === '/hs/chua-cau-sai/gon-nop') return raChua(await chuaGonNop(env, b))
+      // VIỆC HÔM NAY của Tự sửa lỗi trên máy chủ (28/10, tu-sua-viec-ngay.ts): máy em gửi nền bản 12 câu đã chọn ⇒ đổi máy vẫn cùng 12 câu.
+      if (p === '/hs/chua-cau-sai/viec-ngay') return raChua(await import('./tu-sua-viec-ngay').then((m) => m.hsGhiViecNgay(env, b)))
       if (p === '/hs/on-lai/nop') { const r = await sauGhi(env, b, hsOnLaiNop(env, b, ctx)); return ra(r, trangThaiNop(r)) }
       // THỬ THÁCH RIÊNG HÔM NAY (Bộ não A.I Nấc 1, docs/hop-dong-thu-thach-rieng-2109.md): máy chủ chọn + chốt câu; nộp đi đường chấm của ôn lại.
       // ĐÃ GỠ cùng Bộ não A.I (28/09/2026): thử thách do Bộ não chọn ⇒ không còn nguồn. Máy em cũ gọi ⇒ `co:false` (app tự ẩn thẻ); nộp ⇒ báo đã gỡ.
@@ -4088,6 +4097,8 @@ export default {
     // nằm ngoài try) ⇒ Cloudflare trả 1101 thiếu CORS, máy em tưởng mất mạng. `await` + `catch` Ở ĐÂY bắt MỌI lỗi (đồng bộ lẫn bất đồng bộ) một chỗ duy nhất.
     try { res = await boXuLy.fetch(req, env, ctx) } catch (e) { console.error('[may-chu] lỗi chưa bắt:', tenLenh(new URL(req.url).pathname), e); res = raLoi(e) } finally { if (req.method !== 'OPTIONS') ghiDoLenh(tenLenh(new URL(req.url).pathname), Date.now() - t0) }
     // HEADER song song với trường JSON `nhipDeNghi` (Code 2: máy em yếu, khỏi phải clone + parse thân phản hồi 20–100 KB): `x-nhip-de-nghi: 1|2|4` + cho trình duyệt đọc qua CORS. Thân phản hồi đi nguyên (stream).
+    // 28/10: máy chủ bận (503 MAY_CHU_BAN) trên app thầy / phụ huynh ⇒ đổi xưng hô của câu (chỉ chạy khi 503 — lúc thường không đọc thân).
+    if (res.status === 503) { const loi = loiBanTheoDuong(new URL(req.url).pathname); if (loi) { const j = await res.clone().json().catch(() => null) as Record<string, unknown> | null; if (j && j.maLoi === 'MAY_CHU_BAN') res = new Response(JSON.stringify({ ...j, error: loi }), { status: 503, headers: res.headers }) } }
     const h = new Headers(res.headers)
     h.set('x-nhip-de-nghi', String(heSoGoiNen(new URL(req.url).pathname)))
     const ex = h.get('access-control-expose-headers'); h.set('access-control-expose-headers', ex ? `${ex}, x-nhip-de-nghi` : 'x-nhip-de-nghi')

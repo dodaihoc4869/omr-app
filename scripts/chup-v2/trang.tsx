@@ -393,6 +393,14 @@ const HS12_DS_CHUA = [
   { dotId: 'd4', qid: 'H12-4', trangThai: 'cho_gap_lai_2', denHan: new Date(now + 20 * 3600_000).toISOString() },
   { dotId: 'd5', qid: 'H12-5', trangThai: 'da_tu_sua' },
 ]
+// TỰ SỬA LỖI THEO ĐỀ XUẤT 28/10: `&sua=nay` (12 câu hôm nay, đã xong 3 ⇒ nút Lộ trình «9») · `&sua=xong` (xong cả 12 ⇒ nút ✓) — danh sách 20 câu cần sửa,
+// tổng nợ 40 (màn Tự sửa lỗi «Còn 40 lỗi cần sửa»), việc hôm nay do MÁY CHỦ giữ (`viecNgay`, như đổi máy). Cần phiên em (sbd) ⇒ gắn sẵn.
+const SUA_GIA = thamSo.get('sua')
+const DS_SUA_GIA = Array.from({ length: 20 }, (_, i) => ({ dotId: `s${i}`, qid: i < 4 ? `H12-${i + 1}` : `S${i}`, trangThai: 'can_chan_doan', saiLuc: now - (i + 2) * 86_400_000 }))
+const danhSachSuaGia = () => ({ ok: true, ds: DS_SUA_GIA, dem: { tong: 44, can: 40, cho: 0, xong: 4, xongHomNay: SUA_GIA === 'xong' ? 12 : 3 }, kiemLaiHoiThay: [],
+  viecNgay: { n: new Date(now + 7 * 3600_000).toISOString().slice(0, 10), m: DS_SUA_GIA.slice(0, 12).map((m) => ({ q: m.qid, d: m.dotId, t: m.trangThai, l: 'goc' })),
+    x: DS_SUA_GIA.slice(0, SUA_GIA === 'xong' ? 12 : 3).map((m) => m.dotId), them: 0 } })
+if (SUA_GIA) try { localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tk', sbd: '12121212' })); localStorage.removeItem('omr_tu_sua_hom_nay_12121212') } catch { /* bỏ qua */ }
 // hs12-tu-luyen-lam: bài Tu luyện đang làm dở (máy em giữ trong localStorage — chỉ câu công khai, không đáp án) ⇒ màn làm bài mở thẳng.
 if (man === 'hs12-tu-luyen-lam') {
   const cau = [
@@ -414,7 +422,8 @@ if (man.startsWith('hs12-')) {
     if (p.endsWith('/hs/tu-luyen/xem-truoc')) return tra({ ok: true, tongToiDa: 40, loi: '', thongKe: [{ tenDang: 'Thuỷ phân ester', soCauSai: 4, soUngVien: 36 }], nguonDang: { kieu: 'cau_sai', nhan: 'Theo câu sai của em', loi: '' } })
     if (p.endsWith('/luyen-de/dieu-kien')) return tra({ ok: true, trangThai: 'mo', lyDo: '', items: [] })
     if (p.endsWith('/hs/chua-cau-sai/co')) return tra({ ok: true })
-    if (p.endsWith('/hs/chua-cau-sai/danh-sach')) return tra({ ok: true, ds: HS12_DS_CHUA })
+    if (p.endsWith('/hs/chua-cau-sai/danh-sach')) return tra(SUA_GIA ? danhSachSuaGia() : { ok: true, ds: HS12_DS_CHUA })
+    if (p.endsWith('/hs/chua-cau-sai/viec-ngay')) return tra({ ok: true })
     if (p.endsWith('/hs/chua-cau-sai/mo-dot')) return tra({ ok: true, dotId: 'd1', trangThai: 'thieu_hoc_lieu', coHocLieu: false })
     if (p.endsWith('/hs/chua-cau-sai/phat-item')) return tra({ ok: true, dotId: 'd1', revision: 1, tienDo: { soBuocDaQua: 0, soBuocCanKiem: 0 }, tienDoChiTiet: [], cauGoc: null, item: null,
       ...(man === 'hs12-chua-gap-lai' ? { trangThai: 'cho_gap_lai_2', denHan: new Date(now + 20 * 3600_000).toISOString() } : { trangThai: 'thieu_hoc_lieu' }) })
@@ -697,7 +706,8 @@ if (man === 'hs-mot') {
     if (duong.endsWith('/hs/buoi-hoc')) return tra(MT_DD === 'khong' ? { ok: true, buoi: null } : { ok: true, buoi: { ...buoi, daDiemDanh: MT_DD === 'xong' } })
     if (duong.endsWith('/hs/diem-danh')) return tra({ ok: true, buoi: { ...buoi, daDiemDanh: true } })
     if (duong.endsWith('/hs/chua-cau-sai/co')) return tra({ ok: true })
-    if (duong.endsWith('/hs/chua-cau-sai/danh-sach')) return tra({ ok: true, ds: [], dem: { tong: 5, can: 5, cho: 0, xong: 0 } })
+    if (duong.endsWith('/hs/chua-cau-sai/danh-sach')) return tra(SUA_GIA ? danhSachSuaGia() : { ok: true, ds: [], dem: { tong: 5, can: 5, cho: 0, xong: 0 } })
+    if (duong.endsWith('/hs/chua-cau-sai/viec-ngay')) return tra({ ok: true })
     if (duong.endsWith('/hs/nhip-hoc')) return tra(nhipEmGia('cham'))
     if (duong.endsWith('/notifications/list')) return tra({ ok: true, publicKey: '', items: [
       { id: 'n1', kind: 'btvn', title: 'Bài tập về nhà mới', body: 'Thầy giao 1 bài, hạn 28/10.', created_at: new Date(now - 3600_000).toISOString(), read_at: null },
@@ -930,6 +940,8 @@ if (man === 'duo-kt' && (DK_V === 'ktcn' || DK_V === 'ket')) {
     if (url.includes('hoc-tap-ktcn-trang-thai')) return tra({ ok: true, kiemTra: kt, chang: DK_CHANG })
     if (url.includes('hoc-tap-ktcn-start')) return tra({ ok: true, kiemTra: kt, revision: 3, hanChang: now + 462_000, daChot: false, questions: DK_CAU, tra: { K1: 'B', K4: 'DS--' } })
     if (url.includes('hoc-tap-ktcn-ket-qua')) return tra({ ok: true, kiemTra: kt, ketQua: DK_KET })
+    // 28/10 `&ban=1`: máy chủ bận (D1 đang export) ⇒ lệnh lưu trả 503 MAY_CHU_BAN như máy chủ thật — màn hiện câu nhẹ, không hộp lỗi.
+    if (thamSo.get('ban') === '1' && url.includes('hoc-tap-ktcn-luu')) return new Response(JSON.stringify({ ok: false, error: 'Máy chủ đang bận. Em cứ làm tiếp, bài vẫn được lưu trên máy và tự gửi khi máy chủ sẵn sàng.', ma: 'MAY_CHU_BAN', maLoi: 'MAY_CHU_BAN', thuLaiSau: 2 }), { status: 503, headers: { 'content-type': 'application/json' } })
     if (url.includes('hoc-tap-ktcn-')) return tra({ ok: true, kiemTra: kt, revision: 4, daLuu: true })
     return fetchDk(input, init)
   }

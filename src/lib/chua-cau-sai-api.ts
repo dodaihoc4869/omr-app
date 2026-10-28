@@ -257,8 +257,11 @@ export interface MucChua {
 export interface DemDanhSachChua { tong: number; can: number; cho: number; xong: number; xongHomNay?: number }
 export interface MocDanhSachChua { hang: number; giaoLuc: number; dotId: string; nay: string }
 export interface LichKiemLaiHoiThay { qid: string; ten: string; phan: string; trangThai: 'dang_lam' | 'den_han' | 'cho_kiem_lai'; denHan?: string }
+/** Việc hôm nay của Tự sửa lỗi máy chủ đang giữ (28/10, server/src/tu-sua-viec-ngay.ts): ngày VN · mục đã chọn · khoá câu đã xong phần · số chặng thêm. */
+export interface MucViecNgay { q: string; d?: string; t: string; h?: string; l: 'gan' | 'dang' | 'moi' | 'goc' }
+export interface ViecNgayMayChu { n: string; m: MucViecNgay[]; x: string[]; them: number }
 export type KetQuaDanhSachChua =
-  | { trangThai: 'bat'; ds: MucChua[]; dem?: DemDanhSachChua; sau?: MocDanhSachChua; kiemLaiHoiThay?: LichKiemLaiHoiThay[] }
+  | { trangThai: 'bat'; ds: MucChua[]; dem?: DemDanhSachChua; sau?: MocDanhSachChua; kiemLaiHoiThay?: LichKiemLaiHoiThay[]; viecNgay?: ViecNgayMayChu }
   | { trangThai: 'tat' }
   | { trangThai: 'loi'; loi: string }
 export async function apiDanhSachTuChua(token: string, sau?: MocDanhSachChua): Promise<KetQuaDanhSachChua> {
@@ -293,13 +296,32 @@ export async function apiDanhSachTuChua(token: string, sau?: MocDanhSachChua): P
       ...(typeof x.denHan === 'string' ? { denHan: x.denHan } : {}),
     })
   }
+  const vn = docViecNgay(j.viecNgay)
   return { trangThai: 'bat', ds,
+    ...(vn ? { viecNgay: vn } : {}),
     ...(Array.isArray(j.kiemLaiHoiThay) ? { kiemLaiHoiThay: [...lich.values()] } : {}),
     ...(demDung ? { dem: { tong: Number(dem.tong), can: Number(dem.can), cho: Number(dem.cho), xong: Number(dem.xong),
       ...(Number.isSafeInteger(dem.xongHomNay) && Number(dem.xongHomNay) >= 0 ? { xongHomNay: Number(dem.xongHomNay) } : {}) } } : {}),
     ...(moc && [0, 1, 2].includes(Number(moc.hang)) && Number.isSafeInteger(moc.giaoLuc) && typeof moc.dotId === 'string' && typeof moc.nay === 'string'
       ? { sau: { hang: Number(moc.hang), giaoLuc: Number(moc.giaoLuc), dotId: moc.dotId, nay: moc.nay } } : {}),
   }
+}
+
+const LOAI_VIEC = new Set(['gan', 'dang', 'moi', 'goc'])
+/** Đọc `viecNgay` của máy chủ; hỏng / vắng ⇒ null (máy em dùng bản đệm trên máy). */
+export function docViecNgay(v: unknown): ViecNgayMayChu | null {
+  if (!v || typeof v !== 'object') return null
+  const o = v as Obj
+  if (typeof o.n !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(o.n)) return null
+  const m = (Array.isArray(o.m) ? o.m as Obj[] : []).filter((x) => !!x && typeof x.q === 'string' && !!x.q && typeof x.t === 'string' && LOAI_VIEC.has(chu(x.l)))
+    .map((x): MucViecNgay => ({ q: chu(x.q), ...(typeof x.d === 'string' && x.d ? { d: x.d } : {}), t: chu(x.t), ...(typeof x.h === 'string' && x.h ? { h: x.h } : {}), l: chu(x.l) as MucViecNgay['l'] }))
+  const x = (Array.isArray(o.x) ? o.x : []).filter((k): k is string => typeof k === 'string' && !!k)
+  return { n: o.n, m, x, them: Math.max(0, Math.floor(Number(o.them) || 0)) }
+}
+/** Gửi NỀN việc hôm nay lên máy chủ (đổi máy vẫn cùng 12 câu). Lỗi ⇒ bỏ qua (bản đệm trên máy vẫn đúng). */
+export async function apiGhiViecNgay(token: string, v: ViecNgayMayChu): Promise<boolean> {
+  const j = await goi('viec-ngay', token, { ngay: v.n, m: v.m, x: v.x, them: v.them })
+  return j?.ok === true
 }
 
 // ---------------------------------------------------------------------------
@@ -331,6 +353,8 @@ export interface KetQuaGon {
   /** Đề đầy đủ + đáp án + lời giải — chỉ có sau khi nộp (đúng, hoặc đã hết lần thử). Đọc bằng `docChiTiet`. */
   chiTiet?: unknown
   daKhepHomNay?: boolean
+  /** (28/10) nguyên tử vừa cộng vì câu ra khỏi hàng (+2; vắng khi không cộng — trần ngày, câu đã đúng hôm nay, EXP chưa bật). */
+  nguyenTu?: number
 }
 const docGon = (j: Obj | null): KetQuaGon => (j?.ok ? (j as unknown as KetQuaGon) : { ok: false, loi: loiCua(j), ...(j?.ma ? { ma: chu(j.ma) } : {}) })
 export async function apiGonMo(token: string, dotId: string): Promise<KetQuaGon> {
