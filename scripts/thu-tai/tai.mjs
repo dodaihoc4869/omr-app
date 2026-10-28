@@ -76,7 +76,7 @@ async function goi(ten, duong, than, { giay = 30, get = false, dau = {} } = {}) 
   } finally { clearTimeout(hen) }
 }
 
-const soChang = { mo: 0, rong: 0, cau: 0 }
+const soChang = { mo: 0, rong: 0, cau: 0, lyDo: {} } // hết việc ⇒ em nghỉ 3–6 phút (như rời app) rồi mới mở lại — không dồn Sảnh liên tục
 async function em(sbd) {
   const tk = token(sbd)
   await ngu(ng(0, PHUT_LEN * 60_000))
@@ -101,7 +101,7 @@ async function em(sbd) {
     const s = await goi('mo_chang', '/game-v2/hoc-tap-start', { token: tk }, { giay: 40 })
     const cau = Array.isArray(s.questions) ? s.questions : []
     soChang.mo++
-    if (!s.id || !cau.length) { soChang.rong++; await cho(ng(20_000, 40_000)); if (Date.now() >= HET) break; await goi(['sanh', 'sanh_ve'], '/game-v2/hoc-tap-sanh', { token: tk }); continue }
+    if (!s.id || !cau.length) { soChang.rong++; const ly = anLoi(s.error ?? s.message ?? '').slice(0, 50); soChang.lyDo[ly] = (soChang.lyDo[ly] || 0) + 1; await cho(ng(180_000, 360_000)); if (Date.now() >= HET) break; await goi(['sanh', 'sanh_ve'], '/game-v2/hoc-tap-sanh', { token: tk }); continue }
     for (const q of cau.slice(0, 6)) {
       if (Date.now() >= HET) break
       const nghi = ng(3_000, 15_000)

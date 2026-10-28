@@ -42,6 +42,8 @@ jobs:
           echo "SEED=$SEED" >> "$GITHUB_ENV"
           LENH=$(head -n1 scripts/thu-tai/lenh.txt | tr -d '\r')
           echo "LENH=$LENH" >> "$GITHUB_ENV"
+          NOI=$(grep -m1 -oE '^noi=[a-z0-9:-]+' scripts/thu-tai/lenh.txt | cut -d= -f2 || true)
+          [ -z "$NOI" ] || { echo "NOI_DAT=$NOI" >> "$GITHUB_ENV"; echo "Ghim nơi chạy Worker sao: $NOI"; }
           echo "Bước: $LENH · giờ VN: $(TZ=Asia/Ho_Chi_Minh date '+%H:%M %d/%m')"
           SUB=$(curl -fsS -H "Authorization: Bearer $CF_TOKEN_SACH" "https://api.cloudflare.com/client/v4/accounts/$CF_ACC_SACH/workers/subdomain" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).result.subdomain))')
           echo "GOC=https://omr-thu-tai.$SUB.workers.dev" >> "$GITHUB_ENV"
@@ -54,6 +56,10 @@ jobs:
           GIO=$(TZ=Asia/Ho_Chi_Minh date +%-H)
           if [ "$GIO" -ge 18 ]; then echo "::error::Khung học 18–24 giờ VN — không đếm D1 thật."; exit 1; fi
           RA="$TT/dem.json" node scripts/thu-tai/dem-bang.mjs
+
+      - name: "Mốc · giờ cao điểm thật 5 tối gần nhất (CHỈ ĐỌC Analytics, không gọi D1)"
+        if: contains(env.LENH, 'moc')
+        run: node scripts/thu-tai/phan-tich-that.mjs
 
       # ───────────── SINH DỮ LIỆU GIẢ + DỰNG BẢN SAO ─────────────
       - name: "Sinh 1 · tạo lại D1 sao omr-thu-tai (APAC như bản thật)"
@@ -124,6 +130,11 @@ jobs:
             echo "Không tạo được thùng R2 sao (HTTP $MA) ⇒ Worker sao chạy KHÔNG có R2 (4 lệnh nóng không đọc R2)."
             node ../scripts/thu-tai/tao-cau-hinh.mjs "$ID" wrangler-thu-tai.toml khong-r2
           fi
+          if grep -q '^ktcn-tat' ../scripts/thu-tai/lenh.txt; then
+            # Bộ tải chưa làm luồng Kiểm tra ôn tập ⇒ tắt KTCN TRONG D1 SAO để em vào thẳng chặng (lượt 40617819248: 71% lượt mở chặng bị chặn «làm Kiểm tra ôn tập trước»).
+            npx wrangler d1 execute omr-thu-tai --remote -c wrangler-thu-tai.toml --json --command "UPDATE cau_hinh SET gia_tri='{\"bat\":false}' WHERE khoa='kiem_tra_ca_nhan_v1'" > /dev/null
+            echo "D1 sao: đã tắt Kiểm tra ôn tập."
+          fi
       - name: "Sinh 5 · đẩy Worker SAO omr-thu-tai (mã main hiện tại) + mã bí mật sao + thử khói"
         if: contains(env.LENH, 'sinh') || contains(env.LENH, 'worker')
         working-directory: server
@@ -134,7 +145,14 @@ jobs:
           set -euo pipefail
           grep -q '^name = "omr-thu-tai"$' wrangler-thu-tai.toml
           ! grep -q "$DB_THAT" wrangler-thu-tai.toml
-          npx wrangler deploy -c wrangler-thu-tai.toml > "$TT/deploy.log" 2>&1 || { tail -n 25 "$TT/deploy.log"; exit 1; }
+          if ! npx wrangler deploy -c wrangler-thu-tai.toml > "$TT/deploy.log" 2>&1; then
+            grep -E "ERROR|✘" "$TT/deploy.log" | grep -v -i "account" | cut -c1-200 | head -n 5
+            if grep -q 'mode = "targeted"' wrangler-thu-tai.toml; then
+              echo "Ghim nơi chạy bị từ chối ⇒ quay về smart."; sed -i -E '/^mode = "targeted"$/{N;s/mode = "targeted"\nregion = "[^"]*"/mode = "smart"/}' wrangler-thu-tai.toml
+              npx wrangler deploy -c wrangler-thu-tai.toml > "$TT/deploy.log" 2>&1 || { grep -E "ERROR|✘" "$TT/deploy.log" | cut -c1-200 | head -n 5; exit 1; }
+            else exit 1; fi
+          fi
+          grep -A2 '^\[placement\]' wrangler-thu-tai.toml
           grep -q "omr-thu-tai" "$TT/deploy.log" || { echo "::error::không thấy tên Worker sao"; exit 1; }
           grep -E "workers.dev|Current Version|schedule" "$TT/deploy.log" | head -n 6 || true
           printf '%s' "$SEED" | npx wrangler secret put MA_BI_MAT -c wrangler-thu-tai.toml > /dev/null 2>&1

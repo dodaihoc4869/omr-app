@@ -15,7 +15,11 @@ let t = goc
 // Khoá Cloudflare không có quyền R2 (lượt 40615721475: tạo thùng sao bị từ chối) ⇒ `khong-r2`: bỏ hẳn khối R2. Bốn lệnh nóng không đọc R2
 // (đo bằng test đường nóng có bọc R2: 0 lượt), các lệnh khác đọc R2 sẽ báo lỗi trên bản sao — không ảnh hưởng số đo.
 if (tuy === 'khong-r2') t = t.replace(/\[\[r2_buckets\]\]\nbinding = "DE"\nbucket_name = "omr-thu-tai-de"\n/, '')
+// NƠI CHẠY: Worker mới với «smart» KHÔNG được dời về sát D1 sau 20 phút (lượt 40617819248: 100% `local-PDX/SEA`, D1 ở APAC ⇒ mỗi lượt D1 đi
+// Mỹ–châu Á). Bản thật đã được dời sát D1 (Hồng Kông). NOI_DAT=aws:ap-east-1 ⇒ ghim Worker sao ở Hồng Kông (placement «targeted») cho giống bản thật.
+if (process.env.NOI_DAT) t = t.replace(/^\[placement\]\nmode = "smart"$/m, `[placement]\nmode = "targeted"\nregion = "${process.env.NOI_DAT}"`)
 const loi = []
+if (process.env.NOI_DAT && !/mode = "targeted"/.test(t)) loi.push('chưa đổi được nơi chạy')
 if (tuy === 'khong-r2' && /^\[\[r2_buckets\]\]/m.test(t)) loi.push('chưa bỏ được khối R2')
 if (!/^name = "omr-thu-tai"$/m.test(t)) loi.push('tên')
 if (t.includes(MA_THAT)) loi.push('mã D1 thật')

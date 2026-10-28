@@ -1,4 +1,6 @@
-worker chay
+moc worker chay
+noi=aws:ap-east-1
+ktcn-tat
 so_em=270
 phut=12
-am=20
+am=4
