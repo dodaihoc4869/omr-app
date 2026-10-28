@@ -247,6 +247,17 @@ export function luuViecHomNay(luu: NhatKy | null, day: NhatKy | null = null): vo
 /** Số câu CÒN PHẢI SỬA HÔM NAY cho nút «Sửa lỗi» trên Lộ trình (thầy duyệt 28/10): việc hôm nay − đã xong phần; 0 ⇒ xong hôm nay (nút ✓).
  *  Chưa dựng được việc hôm nay (chưa có danh sách / vòng chữa tắt) ⇒ null (nơi gọi dùng tối đa 12 trên số cần sửa). */
 export const conSuaHomNay = (v: ViecHomNay | null): number | null => (v ? Math.max(0, v.tong - v.xong) : null)
+/** Số câu PHẦN NGÀY (12 câu đầu) chưa xong — khoá chặng sau nút Tự sửa lỗi (thầy 28/10 «sửa phải xong mới hiện chặng sau»). «Sửa thêm 1 chặng» nối câu ở CUỐI
+ *  ⇒ không làm khoá lại. Cùng phép đếm với máy chủ (`conPhanNgay`, server/src/tu-sua-viec-ngay.ts). */
+export const conSuaPhanNgay = (v: ViecHomNay | null): number | null => (v ? v.muc.slice(0, SO_CAU_MOI_NGAY).filter((x) => !x.xong).length : null)
+/** Báo máy chủ (nền, một lần / ngày / máy): Lộ trình đang khoá chặng sau nút Tự sửa lỗi ⇒ máy chủ chặn mở chặng bằng lối khác. Lỗi mạng ⇒ lần mở sau báo lại. */
+export function baoKhoaSua(nayMs = Date.now()): void {
+  const sbd = docSbdHs(), token = docTokenHs(), nk = docNhatKy(sbd, nayMs), khoa = `omr_tu_sua_khoa_${sbd}`
+  if (!sbd || !token || !nk.m.length) return
+  try { if (localStorage.getItem(khoa) === nk.n) return } catch { /* không đọc được: vẫn báo */ }
+  void import('./chua-cau-sai-api').then((m) => m.apiGhiViecNgay(token, { n: nk.n, m: nk.m, x: nk.x, them: nk.them ?? 0 }, true))
+    .then((ok) => { if (ok) try { localStorage.setItem(khoa, nk.n) } catch { /* bỏ qua */ } }, () => {})
+}
 
 /** Chữ nhóm chặng cho dòng phụ: "2 câu chỉ còn làm bản mới · 2 câu đang sửa dở". Rỗng khi không có gì đáng nói. */
 export function moTaChang(c: readonly ViecMuc[]): string {

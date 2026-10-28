@@ -107,6 +107,23 @@ async function goi(k: Awaited<ReturnType<typeof kho>>, lenh: string, than: Recor
   }, viecPhu)
 }
 
+/** NỘP THEO LUỒNG (28/10, nop-luong.ts): đo tới DÒNG 1 (đúng / sai) — phần còn lại của luồng đọc NỀN (dòng 2 = phản hồi đầy đủ, ghi trong `ctx.waitUntil`). */
+async function goiLuong(k: Awaited<ReturnType<typeof kho>>, than: Record<string, unknown>) {
+  const viecPhu: Promise<unknown>[] = []
+  const ctx = { waitUntil: (p: Promise<unknown>) => { viecPhu.push(p) }, passThroughOnException() {} }
+  let conLai: Promise<string> = Promise.resolve('')
+  const r = await k.bo.chay(async () => {
+    const res = await worker.fetch(new Request('https://test/game-v2/answer', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...than, luong: 1, token: k.token }) }), k.env, ctx as never)
+    if (!/ndjson/.test(res.headers.get('content-type') ?? '')) return { ...(await res.json()) as Record<string, unknown>, __khongLuong: true }
+    const doc = res.body!.getReader(), gm = new TextDecoder()
+    let dem = ''
+    for (;;) { const { value, done } = await doc.read(); if (value) dem += gm.decode(value, { stream: true }); const i = dem.indexOf('\n'); if (i >= 0 || done) { const d1 = dem.slice(0, i >= 0 ? i : undefined); dem = dem.slice(i + 1)
+      conLai = (async () => { for (;;) { const x = await doc.read(); if (x.value) dem += gm.decode(x.value, { stream: true }); if (x.done) return dem } })(); return JSON.parse(d1) as Record<string, unknown> } }
+  }, viecPhu)
+  const du = (await conLai).trim()
+  return { ...r, du: du ? JSON.parse(du.split('\n').pop()!) as Record<string, unknown> : null }
+}
+
 const MOC = path.resolve(__dirname, '../docs/moc-toc-do.json')
 const traLoi = (phan: string, dung: boolean) => phan === 'I' ? (dung ? 'B' : 'A') : phan === 'II' ? (dung ? 'DSDS' : 'DSDD') : dung ? '4' : '5'
 
@@ -134,6 +151,16 @@ it('nút «Kiểm tra» (answer) và lệnh đếm sau câu: số đợt chờ D
   vi.setSystemTime(NOW + 190_000); await amCo(); const lau = await nop(3, true)
   expect(lau.kq.correct).toBe(true); ghi('nop-cau-dung-xac-thuc', lau)
   vi.setSystemTime(NOW + 191_000); ghi('dem-sau-cau-xac-thuc', await goi(k, 'hoc-tap-dem', {}))
+  // CHẤM NHANH (thầy 28/10 «bấm kiểm tra vẫn bị chậm, chưa tức thì ngay»): máy em xin `luong: 1` ⇒ đúng / sai về TRƯỚC mọi đợt D1 (phiên, câu, phạm vi, câu bảo vệ
+  // từ đệm isolate do các lượt trên nạp); phản hồi đầy đủ (dòng 2) y như `answer` thường. Đo tới dòng 1: 0 đợt. Sau hơn 60 s (đệm xác thực trượt) cũng vậy.
+  if (ds[4]) {
+    vi.setSystemTime(NOW + 260_000); await amCo()
+    const luong = await goiLuong(k, { session: s.kq.id, qid: ds[4].qid, answer: traLoi(ds[4].phan, true), assisted: false, msLam: 30_000 })
+    expect(luong.kq.__khongLuong, JSON.stringify(luong.kq).slice(0, 200)).toBeUndefined()
+    expect(luong.kq.tam).toBe(true); expect(luong.kq.correct).toBe(true)
+    expect(luong.du?.ok, JSON.stringify(luong.du).slice(0, 200)).toBe(true); expect(luong.du?.correct).toBe(true); expect(luong.du?.tam).toBeUndefined()
+    ghi('nop-cau-luong', luong)
+  }
   // NHANH 27/10 (thầy «nhanh hơn app cũ mọi chỗ»): đồng bộ EXP học tập nền (~3 phút/lần + mỗi lần quay lại tab) — lượt không có gì mới KHÔNG ghi lại hồ sơ;
   // kế hoạch ngày (/hs/ke-hoach-ngay, Sảnh hỏi sớm + làm mới) — lịch Kiểm tra ôn tập đọc cùng đợt mật khẩu.
   vi.setSystemTime(NOW + 300_000); await amCo(); await goi(k, 'academic-sync', {})

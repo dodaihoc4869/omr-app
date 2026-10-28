@@ -35,7 +35,7 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
     // chưa có việc hôm nay (chưa tải danh sách) ⇒ tối đa 12 câu của ngày; huy hiệu vẽ khi mảnh việc hôm nay đã nạp (không nháy số)
     const sua = within(duong()).getByRole('button', { name: 'Tự sửa lỗi: hôm nay còn 12 câu' })
     expect(sua.querySelector('.da-nhan')).toBeNull()
-    await waitFor(() => expect(sua.querySelector('.da-dem')?.textContent).toBe('12'))
+    await waitFor(() => expect(sua.querySelector('.da-dem')?.textContent).toBe('12'), { timeout: 5000 }) // mảnh việc hôm nay nạp lười: máy bận (chạy song song nhiều tệp) có thể quá 1 s
     for (const n of container.querySelectorAll('.da-nut[data-loai="kiem"], .da-nut[data-loai="sua"]')) expect(n.querySelector('.da-nhan')).toBeNull()
     rerender(<MotTrangHs {...goc({ soSua: 7, kiem: KIEM_SAU })} />)
     expect(within(duong()).getByRole('button', { name: 'Tự sửa lỗi: hôm nay còn 7 câu' }).querySelector('.da-dem')!.textContent).toBe('7')
