@@ -19,7 +19,7 @@ jobs:
     timeout-minutes: 12
     env:
       DB_ID: d2e6d322-374a-45d7-83a3-9fac486b23f1
-      PHUT: '2'
+      PHUT: '1'
     steps:
       - uses: actions/checkout@v4
       - name: Làm sạch khoá Cloudflare
@@ -82,13 +82,13 @@ jobs:
             workersInvocationsAdaptive(limit:20,filter:{scriptName:"omr",datetime_geq:$tu,datetime_leq:$den}){dimensions{status} sum{requests}}}}}`, { acc: ACC, tu: tu.toISOString(), den: den.toISOString() })
           console.log('=== Trạng thái lượt gọi 60 phút ===')
           for (const x of st?.viewer?.accounts?.[0]?.workersInvocationsAdaptive ?? []) console.log(`${x.dimensions.status}: ${x.sum.requests}`)
-          const tu40 = new Date(den.getTime() - 40 * 60000)
+          const tu40 = new Date(den.getTime() - 8 * 60000)
           const d1 = await hoi(`query($acc:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
             d1QueriesAdaptiveGroups(limit:25,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[sum_queryDurationMs_DESC]){
               count sum{queryDurationMs rowsRead rowsWritten} quantiles{queryDurationMsP50 queryDurationMsP95} dimensions{query}}}}}`, { acc: ACC, db: DB_ID, tu: tu40.toISOString(), den: den.toISOString() })
           const ds = d1?.viewer?.accounts?.[0]?.d1QueriesAdaptiveGroups ?? []
           console.log(`=== D1 40 phút: ${ds.length} nhóm nặng nhất · tổng ${Math.round(ds.reduce((n, x) => n + x.sum.queryDurationMs, 0) / 1000)} s ===`)
-          for (const x of ds.slice(0, 20)) console.log([`lan=${x.count}`, `tongS=${(x.sum.queryDurationMs / 1000).toFixed(1)}`, `tbMs=${(x.sum.queryDurationMs / Math.max(1, x.count)).toFixed(1)}`, `p95=${Math.round(x.quantiles?.queryDurationMsP95 ?? 0)}`, `docTB=${Math.round(x.sum.rowsRead / Math.max(1, x.count))}`, `ghi=${x.sum.rowsWritten}`, '|', String(x.dimensions.query).replace(/\s+/g, ' ').slice(0, 260)].join(' '))
+          for (const x of ds.slice(0, 25)) console.log([`lan=${x.count}`, `tongS=${(x.sum.queryDurationMs / 1000).toFixed(1)}`, `tbMs=${(x.sum.queryDurationMs / Math.max(1, x.count)).toFixed(1)}`, `p95=${Math.round(x.quantiles?.queryDurationMsP95 ?? 0)}`, `docTB=${Math.round(x.sum.rowsRead / Math.max(1, x.count))}`, `ghi=${x.sum.rowsWritten}`, '|', String(x.dimensions.query).replace(/\s+/g, ' ').slice(0, 200)].join(' '))
           const d5 = await hoi(`query($acc:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
             d1AnalyticsAdaptiveGroups(limit:20,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[datetimeFiveMinutes_ASC]){
               dimensions{datetimeFiveMinutes} sum{readQueries writeQueries rowsRead rowsWritten} quantiles{queryBatchTimeMsP50 queryBatchTimeMsP90}}}}}`, { acc: ACC, db: DB_ID, tu: tu.toISOString(), den: den.toISOString() })
