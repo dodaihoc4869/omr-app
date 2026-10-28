@@ -74,13 +74,16 @@ describe('Lửa thay Bi', () => {
     expect(tsx).not.toMatch(/^import (?!type)[^\n]*from '\.\/lua-dong'/m)
   })
   it('Cú Ngọc: đủ biểu cảm bản vẽ (dỗi, tức giận, càu nhàu); đứng nghiêng (trái = gương); màu nạp cùng mảnh lười; cỡ mới trên màn', () => {
-    for (const t of ['doi', 'gian', 'caunhau', 'nghi', 'ngac', 'covu'] as const) expect(TRANG_THAI_LUA).toContain(t)
+    for (const t of ['doi', 'gian', 'caunhau', 'nghi', 'covu'] as const) expect(TRANG_THAI_LUA).toContain(t)
     expect(readFileSync('src/components/linh-vat/lua-dong.ts', 'utf8')).toMatch(/^import '\.\.\/\.\.\/styles\/cu-ngoc\.css'/m)
     const o = document.createElement('span'); document.body.appendChild(o)
     const p = taoLua(o, { tay: true, goc: 'phai' }), t = taoLua(o, { tay: true, goc: 'trai' })
     expect(t.svg.querySelector(':scope > g')!.getAttribute('transform')).toBe('scale(-1,1)')
     expect(p.svg.querySelector(':scope > g')!.getAttribute('transform')).toBeNull()
     p.huy(); t.huy()
+    // 28/10 luật tốc độ: Lửa đứng yên / chào trên Lộ trình ≤ 130 nút SVG (bằng hình shiba cũ) — hiệu ứng, kiểu bàn tay, mắt xoắn dựng LẦN ĐẦU cần
+    for (const tt of ['yen', 'chao'] as const) { const l = taoLua(o, { tay: true, trangThai: tt }); expect(l.svg.querySelectorAll('*').length + 1, tt).toBeLessThanOrEqual(130); l.huy() }
+    const lc = taoLua(o, { tay: true, trangThai: 'ngu' }); lc.buoc(300); expect(lc.svg.querySelectorAll('text').length).toBe(3); lc.datTrangThai('gian'); lc.buoc(300); expect(lc.svg.querySelectorAll('text').length).toBe(3); lc.huy()
     const hs = readFileSync('src/styles/trong-hs.css', 'utf8'), gon = readFileSync('src/styles/trong-thuong-gon.css', 'utf8')
     expect(hs).toMatch(/\.da-linh-vat \.bi \{ display: block; width: 83px;/) // Lộ trình: hình cao ≈ 86 px
     expect(gon).toMatch(/\.tp-tr-muc \{[^}]*width: 54px; height: 54px;/) // vòng mục tiêu 54 px

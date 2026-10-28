@@ -7,8 +7,7 @@
 // MỘT vòng rAF chung cho mọi Lửa trên màn; ra khỏi khung nhìn / tab ẩn / bị màn con che ⇒ không tính, không vẽ. Máy yếu ⇒ vẽ một khung rồi đứng.
 // Không màu thô: mọi màu là biến --cn-* (styles/cu-ngoc.css, nạp cùng mảnh này) pha từ token bảng «Chất chỉ thị» --tr-*.
 import '../../styles/cu-ngoc.css'
-export type TrangThaiLua = 'yen' | 'cuoi' | 'chao' | 'vui' | 'combo' | 'buon' | 'ngac' | 'nghi' | 'covu' | 'ngu' | 'choc' | 'doi' | 'gian' | 'caunhau'
-export const TRANG_THAI_LUA: readonly TrangThaiLua[] = ['yen', 'cuoi', 'chao', 'vui', 'combo', 'buon', 'ngac', 'nghi', 'covu', 'ngu', 'choc', 'doi', 'gian', 'caunhau']
+export type TrangThaiLua = 'yen' | 'cuoi' | 'chao' | 'vui' | 'combo' | 'buon' | 'nghi' | 'covu' | 'ngu' | 'choc' | 'doi' | 'gian' | 'caunhau'
 export type GocLua = 'truoc' | 'phai' | 'trai'
 export interface TuyChonLua {
   /** Sau bao nhiêu ms thì tự chuyển sang `ve`. */
@@ -93,11 +92,6 @@ export const CAM_XUC_LUA: Record<TrangThaiLua, TrangThaiVe> = {
     seq: [{ d: 110, k: 440, p: { y: -6, sq: 1.08, es: 1.12, mt: -3, mb: 8, mc: 0, tai: -8, lua: 1.1, ma: 0.9, may: 0, hieu: 'giot' } }],
     loop: [{ d: 1200, k: 50, p: {} }, { d: 1000, k: 40, p: { sq: 0.89, hr: 6, hy: 5 } }],
   },
-  ngac: { // ngạc nhiên: mắt to, mày nhướng, miệng chữ O, hai cánh áp má
-    base: { es: 1.14, may: 1, ba: -10, mw: -5, mc: 0, mt: -4, mb: 10, aT: 150, iT: [-66, -150], aP: 150, iP: [66, -150], hT: 'xoe', hP: 'xoe', zT: 1, zP: 1, tai: -14, y: -4 },
-    seq: [{ d: 90, k: 520, p: { y: 4, sq: 0.86 } }, { d: 200, k: 300, p: { y: -14, sq: 1.1 } }],
-    loop: [{ d: 600, k: 200, p: {} }, { d: 600, k: 200, p: { y: -2 } }],
-  },
   nghi: { // suy nghĩ: cánh chống cằm, mắt liếc lên, miệng mím, dấu ?
     base: { aP: 150, iP: [26, -120], hP: 'nam', zP: 1, px: -0.5, py: -0.7, lt: 0.12, may: 1, ba: -4, mw: -5, mc: 0, mt: 1, mb: 1, mk: 2, hr: 7, tai: 4, hieu: 'hoi' },
     loop: [{ d: 900, k: 120, p: {} }, { d: 280, k: 320, p: { iP: [26, -125] } }, { d: 280, k: 320, p: {} }],
@@ -109,7 +103,7 @@ export const CAM_XUC_LUA: Record<TrangThaiLua, TrangThaiVe> = {
   },
   ngu: { base: { mat: 'nham', mw: -4, mc: 1, mt: 2, mb: 4, hr: 10, rot: 4, hy: 3, tai: 20, sq: 0.95, lua: 0.6, aT: 8, bT: -30, aP: 8, bP: -30, ma: 0.7, hieu: 'zzz' }, loop: [{ d: 1500, k: 30, p: { sq: 0.93 } }, { d: 1500, k: 30, p: { sq: 0.97 } }] },
   choc: { // bị chạm: nảy lên, mắt nhắm tịt, cười khúc khích
-    seq: [{ d: 90, k: 520, p: { y: 5, sq: 0.82 } }, { d: 340, k: 300, p: { y: -16, sq: 1.12, aT: 120, bT: 150, aP: 120, bP: 150, zT: 1, zP: 1, hT: 'xoe', hP: 'xoe', mat: 'xoan', mw: 3, mc: 2, mt: -2, mb: 10, mk: 3, hr: -8, ma: 1.3, tai: -14, lua: 1.3 } },
+    seq: [{ d: 90, k: 520, p: { y: 5, sq: 0.82 } }, { d: 340, k: 300, p: { y: -16, sq: 1.12, aT: 120, bT: 150, aP: 120, bP: 150, zT: 1, zP: 1, hT: 'xoe', hP: 'xoe', mat: 'nham', mw: 3, mc: 2, mt: -2, mb: 10, mk: 3, hr: -8, ma: 1.3, tai: -14, lua: 1.3 } },
       { d: 520, k: 240, p: { hr: 6, mat: 'cong', mw: 4, mc: 6, mt: 0, mb: 10, ma: 1.1 } }],
   },
   doi: { // dỗi: khoanh tay, nghiêng đầu, liếc ngang, môi chu
@@ -128,6 +122,7 @@ export const CAM_XUC_LUA: Record<TrangThaiLua, TrangThaiVe> = {
   },
 }
 
+export const TRANG_THAI_LUA = Object.keys(CAM_XUC_LUA) as readonly TrangThaiLua[]
 // NHƯỜNG KHUNG CHO LƯỢT CHẠM (27/10 MƯỢT, đo scripts/do-muot-hs.mjs): có pointerdown / keydown ⇒ linh vật nghỉ 140 ms (đồng hồ lò xo vẫn tính).
 let nhuongDen = 0
 if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
@@ -186,7 +181,7 @@ export function taoLua(noiGan: HTMLElement, tc: { trangThai?: TrangThaiLua; tuyC
   H(du, 'M-10,-26C-22,-18 -26,-6 -24,4C-20,-8 -16,-16 -10,-26Z', 'ngocS')
   E(du, 8, 4, 13, 12, 'longT')
   // CHÂN
-  const chan = [-1, 1].map((s) => { const c = tao('g', null, P.goc!); vien(E(c, 0, -4, 27, 14, 'longS')); return { c, s } })
+  const chan = [-1, 1].map((s) => ({ c: vien(E(P.goc!, 0, -4, 27, 14, 'longS')), s }))
   g('lopSau', P.goc!)
   // THÂN + ÁO BLOUSE
   g('than', P.goc!)
@@ -197,10 +192,8 @@ export function taoLua(noiGan: HTMLElement, tc: { trangThai?: TrangThaiLua; tuyC
   H(cat, 'M-120,-112L-30,-112L0,-64L30,-112L120,-112V20H-120Z', 'trang')
   H(cat, 'M40,-112L120,-112V20H52Q66,-40 40,-112Z', 'aoT')
   const ao = g('ao', P.than!)
-  net(tao('path', { d: 'M-46,-112L0,-58L46,-112' }, ao), 'vien', 4.5)
-  vien(H(ao, 'M-46,-113L-30,-113L0,-64L-6,-56Z', 'trang'), 3.6)
-  vien(H(ao, 'M46,-113L30,-113L0,-64L6,-56Z', 'trang'), 3.6)
-  net(tao('path', { d: 'M0,-58V-4' }, ao), 'vien', 3.6)
+  net(tao('path', { d: 'M-46,-112L0,-58L46,-112M0,-58V-4' }, ao), 'vien', 4)
+  vien(H(ao, 'M-46,-113L-30,-113L0,-64L-6,-56ZM46,-113L30,-113L0,-64L6,-56Z', 'trang'), 3.6)
   const tui = tao('g', { transform: 'translate(-40,-46)' }, ao), ong = tao('g', { transform: 'rotate(-6)' }, tui)
   vien(R(ong, -8, -34, 16, 42, 8, 'thuyTinh'), 3.2)
   H(ong, 'M-6.4,-14H6.4V0A6.4,6.4 0 0 1 -6.4,0Z', 'hong'); R(ong, -3.6, -28, 3, 11, 1.5, 'trang')
@@ -213,12 +206,13 @@ export function taoLua(noiGan: HTMLElement, tc: { trangThai?: TrangThaiLua; tuyC
   const tay = [-1, 1].map((s) => {
     const tg = tao('g', null, P.lopSau!)
     const ongT = vien(H(tg, '', 'trang'), 4.5)
-    const ban = tao('g', null, tg), kieu: Record<string, SVGElement> = {}
-    const k1 = (t: string) => (kieu[t] = tao('g', null, ban))
-    let h = k1('nam'); vien(H(h, 'M-15,-4C-20,8 -18,24 -6,30Q0,34 6,30C18,24 20,8 15,-4Z', 'long')); net(tao('path', { d: 'M-4,22L-2,28M4,22L4,29' }, h), 'vien', 2.6)
-    h = k1('xoe'); vien(H(h, 'M-15,-4C-21,12 -18,30 -11,40Q-6,47 -2,40Q2,50 7,41Q13,47 15,35C21,20 19,6 15,-4Z', 'long')); H(h, 'M2,8C8,14 10,24 8,32C5,24 2,18 2,8Z', 'longS')
+    const ban = tao('g', null, tg), kieu: Record<string, SVGElement> = {} // kiểu bàn tay dựng LẦN ĐẦU cần (bớt nút DOM khi đứng yên)
     return { tg, ongT, ban, kieu, s, z: 0, kh: '' }
   })
+  const BAN_TAY: Record<string, (h: SVGElement) => void> = {
+    nam: (h) => { vien(H(h, 'M-15,-4C-20,8 -18,24 -6,30Q0,34 6,30C18,24 20,8 15,-4Z', 'long')); net(tao('path', { d: 'M-4,22L-2,28M4,22L4,29' }, h), 'vien', 2.6) },
+    xoe: (h) => { vien(H(h, 'M-15,-4C-21,12 -18,30 -11,40Q-6,47 -2,40Q2,50 7,41Q13,47 15,35C21,20 19,6 15,-4Z', 'long')); H(h, 'M2,8C8,14 10,24 8,32C5,24 2,18 2,8Z', 'longS') },
+  }
   // ĐẦU (gốc nhóm = tâm đầu)
   g('dau', P.goc!); g('tai', P.dau!)
   const tai = [-1, 1].map(() => { const t = tao('g', null, P.tai!); vien(H(t, [[-34, 34, 10], [30, 18, 10], [-4, -46, 8]], 'long')); H(t, [[-20, 22, 6], [16, 12, 6], [-4, -26, 5]], 'kem'); return t })
@@ -232,23 +226,21 @@ export function taoLua(noiGan: HTMLElement, tc: { trangThai?: TrangThaiLua; tuyC
   H(catD, 'M60,-120Q120,-40 96,100H140V-120Z', 'longT')
   E(catD, -50, -66, 34, 14, 'longS', { transform: 'rotate(-20 -50 -66)', opacity: 0.8 })
   g('mat', P.dau!); g('mask', P.mat!)
-  H(P.mask!, 'M-104,26C-106,-20 -78,-30 -50,-28C-28,-26 -12,-18 0,-2C12,-18 28,-26 50,-28C78,-30 106,-20 104,26C102,64 64,86 0,86C-64,86 -102,64 -104,26Z', 'kem')
-  E(P.mask!, -44, -40, 9, 6, 'kem'); E(P.mask!, 44, -40, 9, 6, 'kem') // chấm lông mày kem
+  H(P.mask!, 'M-104,26C-106,-20 -78,-30 -50,-28C-28,-26 -12,-18 0,-2C12,-18 28,-26 50,-28C78,-30 106,-20 104,26C102,64 64,86 0,86C-64,86 -102,64 -104,26ZM-53,-40a9,6 0 1,0 18,0a9,6 0 1,0 -18,0M35,-40a9,6 0 1,0 18,0a9,6 0 1,0 -18,0', 'kem') // + hai chấm lông mày kem
   vien(tao('path', { d: dauD, fill: 'none' }, P.dau!))
-  const ma = [-1, 1].map((s) => E(P.mat!, s * 72, 40, 17, 10.5, 'ma'))
+  const ma = H(P.mat!, 'M-89,40a17,10.5 0 1,0 34,0a17,10.5 0 1,0 -34,0M55,40a17,10.5 0 1,0 34,0a17,10.5 0 1,0 -34,0', 'ma')
   const mats = [-1, 1].map((s) => {
     const mg = tao('g', null, P.mat!), ci = `${id}e${s + 1}`
     tao('circle', { r: 27 }, tao('clipPath', { id: ci }, defs))
     const tron = tao('g', null, mg)
     to(tao('circle', { r: 27 }, tron), 'den')
     const tr = tao('g', { 'clip-path': `url(#${ci})` }, tron), ng = tao('g', null, tr)
-    to(tao('circle', { cx: 8, cy: -9, r: 9.5 }, ng), 'trang'); to(tao('circle', { cx: -10, cy: 9, r: 4 }, ng), 'trang')
+    H(ng, 'M-1.5,-9a9.5,9.5 0 1,0 19,0a9.5,9.5 0 1,0 -19,0M-14,9a4,4 0 1,0 8,0a4,4 0 1,0 -8,0', 'trang')
     const miT = R(tr, -32, 0, 64, 80, 0, 'kem')
     const nham = net(tao('path', { d: 'M-18,0Q0,14 18,0' }, mg), 'den', 5)
     const cong = net(tao('path', { d: 'M-18,6Q0,-16 18,6' }, mg), 'den', 5.5)
-    const xoan = net(tao('path', { d: s < 0 ? 'M-14,-10L14,0L-14,10' : 'M14,-10L-14,0L14,10' }, mg), 'den', 5.5)
     const may = net(tao('path', { d: 'M-14,0H14' }, P.mat!), 'vien', 6)
-    return { mg, tron, ng, miT, nham, cong, xoan, may, s }
+    return { mg, tron, ng, miT, nham, cong, may, s }
   })
   H(P.mat!, 'M-11,19Q0,14 11,19Q8,29 0,31Q-8,29 -11,19Z', 'den') // mũi
   const mq = tao('g', { transform: 'translate(0,44)' }, P.mat!)
@@ -263,25 +255,26 @@ export function taoLua(noiGan: HTMLElement, tc: { trangThai?: TrangThaiLua; tuyC
   const trong = [-1, 1].map(() => {
     const k = tao('g', null, P.kinh!)
     vien(R(k, -31, -20, 62, 40, 16, 'ngoc'), 4.5)
-    R(k, -23, -13, 46, 26, 11, 'ngocS'); H(k, 'M-16,-9H-4L-12,7H-20Z', 'trang', { opacity: 0.9 }); to(tao('circle', { cx: 10, cy: -7, r: 3, opacity: 0.8 }, k), 'trang')
+    R(k, -23, -13, 46, 26, 11, 'ngocS'); H(k, 'M-16,-9H-4L-12,7H-20ZM7,-7a3,3 0 1,0 6,0a3,3 0 1,0 -6,0', 'trang', { opacity: 0.85 })
     return k
   })
   vien(H(P.kinh!, 'M0,-80L10,-74V-62L0,-56L-10,-62V-74Z', 'lucGiac'), 3)
   g('lopTruoc', P.goc!)
   // HIỆU ỨNG (ngoài nhóm lật ⇒ chữ «?» / «z» không bị gương)
   g('hieu', svg)
-  const sao = ([[-150, -250, 1.2], [140, -280, 0.9], [-120, -320, 0.8], [152, -190, 0.8]] as const).map(([x, y, s]) => { const e = H(P.hieu!, 'M0,-12Q2,-2 12,0Q2,2 0,12Q-2,2 -12,0Q-2,-2 0,-12Z', 'sao'); e.style.display = 'none'; return { e, x, y, s } })
-  const nhay = tao('g', null, P.hieu!); nhay.style.display = 'none'
-  net(tao('path', { d: 'M120,-276L134,-300M138,-262L162,-276' }, nhay), 'hong', 6)
-  const hoi = tao('g', null, P.hieu!); hoi.style.display = 'none'
-  net(tao('path', { d: 'M104,-296Q104,-312 120,-312Q136,-312 136,-298Q136,-288 121,-282V-272' }, hoi), 'lucGiac', 7); to(tao('circle', { cx: 121, cy: -258, r: 4.6 }, hoi), 'lucGiac')
-  const khoi = tao('g', null, P.hieu!); khoi.style.display = 'none'
-  for (const s of [-1, 1]) { const k = tao('g', { transform: `translate(${s * 120},-300)` }, khoi); for (const [x, y, r] of [[0, 0, 16], [14, -8, 12], [-12, -8, 11], [4, -18, 11]] as const) to(tao('circle', { cx: x, cy: y, r }, k), 'khoi') }
-  const lam = tao('g', null, P.hieu!); lam.style.display = 'none'
-  net(tao('path', { d: 'M140,-240Q156,-226 146,-208M154,-252Q176,-228 162,-200' }, lam), 'hong', 5)
-  const giot = vien(H(P.hieu!, 'M108,-250Q120,-228 108,-218Q96,-228 108,-250Z', 'giot'), 3); giot.style.display = 'none'
-  const zzz = tao('g', null, P.hieu!); zzz.style.display = 'none'
-  const zs = ([[96, -250, 18], [120, -280, 24], [148, -316, 30]] as const).map(([x, y, s]) => { const t = to(tao('text', { x, y, 'font-size': s, 'font-weight': 900 }, zzz), 'longT'); t.textContent = 'z'; return t })
+  // Dựng LẦN ĐẦU cần (28/10 tốc độ: Lửa đứng yên trên Lộ trình không mang ~25 nút hiệu ứng ẩn)
+  const SAO = [[-150, -250, 1.2], [140, -280, 0.9], [-120, -320, 0.8], [152, -190, 0.8]] as const
+  let sao: { e: SVGElement; x: number; y: number; s: number }[] | null = null
+  const DUNG_HU: Record<string, (c: SVGElement) => void> = {
+    nhay: (c) => { net(tao('path', { d: 'M120,-276L134,-300M138,-262L162,-276' }, c), 'hong', 6) },
+    hoi: (c) => { net(tao('path', { d: 'M104,-296Q104,-312 120,-312Q136,-312 136,-298Q136,-288 121,-282V-272' }, c), 'lucGiac', 7); to(tao('circle', { cx: 121, cy: -258, r: 4.6 }, c), 'lucGiac') },
+    khoi: (c) => { H(c, [-120, 120].map((x) => `M${x - 16},-300a16,16 0 1,0 32,0a16,16 0 1,0 -32,0M${x + 2},-308a12,12 0 1,0 24,0a12,12 0 1,0 -24,0M${x - 23},-308a11,11 0 1,0 22,0a11,11 0 1,0 -22,0M${x - 7},-318a11,11 0 1,0 22,0a11,11 0 1,0 -22,0`).join(''), 'khoi') },
+    lam: (c) => { net(tao('path', { d: 'M140,-240Q156,-226 146,-208M154,-252Q176,-228 162,-200' }, c), 'hong', 5) },
+    giot: (c) => { vien(H(c, 'M108,-250Q120,-228 108,-218Q96,-228 108,-250Z', 'giot'), 3) },
+    zzz: (c) => { for (const [x, y, s] of [[96, -250, 18], [120, -280, 24], [148, -316, 30]] as const) to(tao('text', { x, y, 'font-size': s, 'font-weight': 900 }, c), 'longT').textContent = 'z' },
+  }
+  const hu: Record<string, SVGElement> = {}
+  const lay = (k: string) => { if (!hu[k]) DUNG_HU[k]!((hu[k] = tao('g', null, P.hieu!))); return hu[k]! }
   noiGan.appendChild(svg)
 
   // ── khung xương lò xo ──
@@ -379,7 +372,6 @@ export function taoLua(noiGan: HTMLElement, tc: { trangThai?: TrangThaiLua; tuyC
       const lt = Math.min(1, Math.max(s < 0 ? v.lt! : v.ltP!, tinh ? 0 : ns)), thuong = md === 'mo'
       dat(e.tron, 'display', thuong && lt <= 0.92 ? '' : 'none')
       dat(e.cong, 'display', md === 'cong' ? '' : 'none')
-      dat(e.xoan, 'display', md === 'xoan' ? '' : 'none')
       dat(e.nham, 'display', md === 'nham' || (thuong && lt > 0.92) ? '' : 'none')
       tf(e.ng, `translate(${f1(v.px! * 6)},${f1(v.py! * 5)})`)
       const yb = -27 + lt * 54
@@ -387,7 +379,7 @@ export function taoLua(noiGan: HTMLElement, tc: { trangThai?: TrangThaiLua; tuyC
       dat(e.may, 'display', v.may! > 0.3 ? '' : 'none')
       tf(e.may, `translate(${f1(x0)},${f1(-28 + (1 - v.may!) * 6)}) rotate(${f1(-s * v.ba!)})`)
     }
-    for (const m of ma) dat(m, 'opacity', String(f1(Math.min(1, v.ma!))))
+    dat(ma, 'opacity', String(f1(Math.min(1, v.ma!))))
     // miệng — mấp máy khi đang nói
     const dangNoi = t < noiDen, nhip = dangNoi ? Math.floor(t / 90) % 3 : 0
     const w = 13 + v.mw! - (dangNoi ? 2 : 0), yl = -v.mc! + v.mk!, yr = -v.mc! - v.mk!, ym = (yl + yr) / 2
@@ -401,25 +393,26 @@ export function taoLua(noiGan: HTMLElement, tc: { trangThai?: TrangThaiLua; tuyC
       dat(ty.ongT, 'd', ongTay(Sx, Sy, Ex, Ey, Hx, Hy, 30, 27, 25))
       tf(ty.ban, `translate(${f1(Hx)},${f1(Hy)}) scale(${s},1) rotate(${f1(-v['b' + T]!)})`)
       const kh = String(roi['h' + T])
-      if (ty.kh !== kh) { for (const n in ty.kieu) ty.kieu[n]!.style.display = n === kh ? '' : 'none'; ty.kh = kh }
+      if (ty.kh !== kh) { if (!ty.kieu[kh]) BAN_TAY[kh]!((ty.kieu[kh] = tao('g', null, ty.ban))); for (const n in ty.kieu) ty.kieu[n]!.style.display = n === kh ? '' : 'none'; ty.kh = kh }
     }
-    for (const [i, sv] of sao.entries()) {
+    if (!sao && t - tSao >= 0 && t - tSao <= 1900) sao = SAO.map(([x, y, s]) => ({ e: H(P.hieu!, 'M0,-12Q2,-2 12,0Q2,2 0,12Q-2,2 -12,0Q-2,-2 0,-12Z', 'sao'), x, y, s }))
+    for (const [i, sv] of (sao ?? []).entries()) {
       const e = t - tSao - i * 110, k = e < 0 || e > 1500 ? -1 : (e % 750) / 750
       if (k < 0) { dat(sv.e, 'display', 'none'); continue }
       const sc = (k < 0.4 ? (k / 0.4) * 1.3 : 1.3 * (1 - (k - 0.4) / 0.6)) * sv.s
       dat(sv.e, 'display', ''); tf(sv.e, `translate(${sv.x},${sv.y}) rotate(${f1(k * 90)}) scale(${f1(sc * 100) / 100})`)
     }
-    const hien = (e: SVGElement, ok: boolean, s?: string) => { dat(e, 'display', ok ? '' : 'none'); if (ok && s) tf(e, tinh ? '' : s) }
+    const hien = (k: string, ok: boolean, s?: string) => { const e = ok ? lay(k) : hu[k]; if (!e) return; dat(e, 'display', ok ? '' : 'none'); if (ok && s) tf(e, tinh ? '' : s) }
     const nh = (t % 600) / 600, kk = (t / 900) % 1
-    hien(nhay, roi.hieu === 'nhay', `translate(${f1(Math.sin(nh * Math.PI) * 4)},${f1(-Math.sin(nh * Math.PI) * 4)})`)
-    hien(hoi, roi.hieu === 'hoi', `translate(0,${f1(Math.sin(t / 300) * 4)})`)
-    hien(khoi, roi.hieu === 'khoi', `translate(0,${f1(-kk * 14)}) scale(${f1(0.85 + kk * 0.3)})`)
-    hien(lam, roi.hieu === 'lam', `translate(${f1(Math.sin(t / 120) * 3)},0)`)
-    const kg = t - tGiot - 120
-    dat(giot, 'display', kg < 0 || kg > 1600 ? 'none' : '')
-    if (kg >= 0 && kg <= 1600) { tf(giot, `translate(0,${f1(kg / 100)})`); dat(giot, 'opacity', String(f1(kg < 200 ? kg / 200 : kg > 1200 ? (1600 - kg) / 400 : 1))) }
-    dat(zzz, 'display', roi.hieu === 'zzz' ? '' : 'none')
-    if (roi.hieu === 'zzz') zs.forEach((z, i) => { const k = (t / 1800 + i / 3) % 1; dat(z, 'opacity', String(f1(tinh ? 1 : k < 0.2 ? k / 0.2 : 1 - (k - 0.2) / 0.8))); tf(z, `translate(${f1(tinh ? 0 : k * 10)},${f1(tinh ? 0 : -k * 16)})`) })
+    hien('nhay', roi.hieu === 'nhay', `translate(${f1(Math.sin(nh * Math.PI) * 4)},${f1(-Math.sin(nh * Math.PI) * 4)})`)
+    hien('hoi', roi.hieu === 'hoi', `translate(0,${f1(Math.sin(t / 300) * 4)})`)
+    hien('khoi', roi.hieu === 'khoi', `translate(0,${f1(-kk * 14)}) scale(${f1(0.85 + kk * 0.3)})`)
+    hien('lam', roi.hieu === 'lam', `translate(${f1(Math.sin(t / 120) * 3)},0)`)
+    const kg = t - tGiot - 120, coGiot = kg >= 0 && kg <= 1600
+    hien('giot', coGiot, `translate(0,${f1(kg / 100)})`)
+    if (coGiot) dat(hu.giot!, 'opacity', String(f1(kg < 200 ? kg / 200 : kg > 1200 ? (1600 - kg) / 400 : 1)))
+    hien('zzz', roi.hieu === 'zzz')
+    if (roi.hieu === 'zzz') [...hu.zzz!.children].forEach((z, i) => { const k = (t / 1800 + i / 3) % 1; dat(z, 'opacity', String(f1(tinh ? 1 : k < 0.2 ? k / 0.2 : 1 - (k - 0.2) / 0.8))); tf(z, `translate(${f1(tinh ? 0 : k * 10)},${f1(tinh ? 0 : -k * 16)})`) })
   }
   function ongTay(Sx: number, Sy: number, Ex: number, Ey: number, Hx: number, Hy: number, w1: number, w2: number, w3: number): string {
     const L1 = Math.hypot(Ex - Sx, Ey - Sy) || 1, L2 = Math.hypot(Hx - Ex, Hy - Ey) || 1
