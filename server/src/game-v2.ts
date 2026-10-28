@@ -10,6 +10,7 @@ import {readGameScope} from './game-v2-reports'
 import {boKeHoach7} from './goi-bai-7-nho'
 import type {D1PreparedStatement,D1Result,Env,ExecutionContext} from './kieu'
 import {viecPhu} from './viec-phu'
+import {dapAnDaLo,napPhienNhanh,nhoBaoVe,nhoBienNhan,nhoCau,nhoEm,nhoPhien,phienDuCau} from './cham-nhanh' // CHẤM NHANH «Kiểm tra» 28/10: đệm isolate cho dòng 1 của answer theo luồng
 import {gameIdentity,parentPass} from './game-v2-auth'
 import {readScope,syncIndex,protectedQuestions,docKhoiEm,doDayDu,laTuLuanPool,docCauTheoRef,loiCauDoi,type CauPool} from './game-v2-bank'
 import {cauHopKhoi,type Khoi} from '../../src/lib/khoi-cau'
@@ -521,6 +522,9 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
   }
   if(action==='answer'){
     const id=String(b.session??'');const qid=String(b.qid??'');const receipt=`${id}|${qid}`
+    // CHẤM NHANH (28/10, cham-nhanh.ts): đáp án của câu này đã xuống máy em qua dòng 1 ⇒ chấm theo ĐÚNG đáp án đã nộp lần ấy; biên nhận đã vào đường thường ⇒ không chấm nhanh nữa.
+    const daLo=dapAnDaLo(receipt);if(daLo!==undefined)b.answer=daLo
+    nhoBienNhan(receipt)
     const truoc=truocAnswer??docTruocAnswer(env,sbd,b)
     const row=await truoc.session
     if(!row)throw new Error('Không tìm thấy lượt học của em.')
@@ -537,10 +541,15 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     // 05/10 bậc 3 (cau-anh-em.ts): ref phiên có hoán vị `xt` ⇒ chấm trên BẢN XÁO đúng như đã phát (`q`); `qGoc` giữ cho OMNI từng ý / sổ (đáp án quy về khung gốc).
     // Tối ưu 05/10: dòng câu đọc sẵn cùng đợt với phiên (`truoc.cau`, cùng điều kiện tra) — bản xáo áp lên đúng câu gốc ấy như cũ.
     const qGoc=await currentQuestion(env,ref,truoc.cau),q=apXaoTheoRef(qGoc,ref)
+    // CHẤM NHANH: nhớ phiên + câu đúng như vừa đọc (không thêm lượt D1); phiên chưa đủ câu trong đệm ⇒ nạp NỀN cả phiên (chỉ đọc, sau phản hồi).
+    nhoPhien(id,sbd,session);nhoCau(ref,qGoc);if(ctx&&!phienDuCau(id))ctx.waitUntil(napPhienNhanh(envGhiRieng(env),id,sbd))
     // Đọc OMNI (thời gian kỳ vọng, số lượt lướt hôm nay, hồ sơ, ma trận Q, lượt của chuyến) bắt đầu ngay khi biết câu — song song phần kiểm phạm vi / bản chấm cũ.
     const omniDoc=omniSom?som(omniSom.then(bat=>bat?docTruocOmni(env,sbd,id,session,q,Date.now()):null)):null
     const blocked=await truoc.blocked
+    nhoBaoVe(blocked) // CHẤM NHANH: tập câu bảo vệ ca thi (bản sao, TRƯỚC khi thêm câu chặn riêng của em)
     const control=await truoc.control;if(!control.enabled)throw new Error('Thầy đang tạm dừng game cho hồ sơ này.')
+    // CHẤM NHANH: phạm vi thầy đặt + em có đang được xét OMNI (chưa biết ⇒ coi như có: đường thường lo «chưa tính»). Đã qua cổng lịch Kiểm tra ôn tập ở đầu lệnh.
+    void (omniSom??Promise.resolve(true)).then(o=>nhoEm(sbd,control,o!==false),()=>{})
     for(const key of control.blocked)blocked.add(key)
     // 06/10: câu CHẨN ĐOÁN bước sai (chan-doan-buoc-sai.ts) đứng thay chỗ một câu lỗi ĐÃ qua phạm vi lúc phát — không xét lại dạng (câu nền không mang dạng của kho).
     const laCD=laQidChanDoan(qid)

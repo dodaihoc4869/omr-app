@@ -68,9 +68,11 @@ import { luyenDe } from './luyen-de'
 import {adminGame} from './game-v2-reports'
 import { gameV2, laLenhCongSongSong } from './game-v2'
 import { kemSanhBiTat, luongDangNhapKemSanh, sanhKemDangNhap } from './dang-nhap-kem-sanh'
-import { RAO_GHI } from './doc-d1-theo-luot'
+import { envGhiRieng, RAO_GHI } from './doc-d1-theo-luot'
+import { traLoiNopLuong } from './nop-luong'
+import { napPhienNhanh } from './cham-nhanh'
 import { xoaDemCaBaoVe, xoaDemSync } from './game-v2-bank'
-import { gameToken, gameIdentity } from './game-v2-auth'
+import { gameToken, gameIdentity, gameSbdDaKy } from './game-v2-auth'
 import { phanTichGianLanBtvn, type ThiThatBaseline, type ThongTinHocSinhBtvn } from './gian-lan-btvn'
 // MÁY CHỦ MỚI — bốn lệnh nóng lúc thi (MAY-CHU-MOI.md).
 //
@@ -180,6 +182,14 @@ function ra(data0: unknown, status0 = 200,giuServerNow=false): Response {
   // 28/10: mọi thân ok:false đi qua đây được làm sạch chữ lỗi kỹ thuật (một phép so thuộc tính, không tốn truy vấn).
   const { data, status } = lamSachThanLoi(data0, status0)
   return new Response(JSON.stringify({ ...(data as object), serverNow: giuServerNow&&Number.isFinite((data as {serverNow?:unknown}).serverNow)?(data as {serverNow:number}).serverNow:Date.now(), nhipDeNghi: nhipDeNghi() }), { status, headers: JSON_HEADERS }) // nhipDeNghi: hệ số nhịp hỏi nền cho máy khách (suc-khoe-may.ts)
+}
+
+/** Sau lệnh game (việc NỀN, chỉ đọc): mở chặng xong ⇒ nạp sẵn phiên + câu (bản riêng có đáp án) vào đệm chấm nhanh của isolate (cham-nhanh.ts) — câu ĐẦU của chặng
+ *  cũng chấm được từ bộ nhớ. Không bao giờ ném, không chạm đường trả lời. */
+function sauLenhGame(env: Env, lenh: string, b: Record<string, unknown>, kq: Record<string, unknown>, ctx?: ExecutionContext): void {
+  if (lenh !== 'hoc-tap-start' || !ctx || kq?.ok !== true || typeof kq.id !== 'string' || !kq.id) return
+  const id = kq.id
+  try { ctx.waitUntil(gameSbdDaKy(env, b).then((sbd) => napPhienNhanh(envGhiRieng(env), id, sbd)).catch(() => {})) } catch { /* không có ctx thật */ }
 }
 
 async function traLoiNopBtvn(nop:()=>Promise<Response>):Promise<Response> {
@@ -3615,7 +3625,25 @@ const boXuLy = {
       if (p === '/ph/lich-su-lam-cau') return ra(await import('./ph-ho-so-con').then((m) => m.phLichSuLamCau(env, b, envDoc, ctx)))
       if (p.startsWith('/luyen-de/')) return ra(await luyenDe(env, p.slice('/luyen-de/'.length), b))
       if (p.startsWith('/game-v2/')) {
-        if (!congGame) return ra(await gameV2(env, p.slice('/game-v2/'.length), b, ctx))
+        const lenhGame = p.slice('/game-v2/'.length)
+        // CHẤM NHANH «Kiểm tra» (thầy 28/10, nop-luong.ts / cham-nhanh.ts): máy em xin `luong: 1` + chấm được từ bộ nhớ isolate ⇒ NDJSON (dòng 1 đúng / sai ngay,
+        // 0 đợt D1; dòng 2 phản hồi đầy đủ như cũ). Cổng đóng băng đang đọc (đệm 30 s vừa hết hạn): dòng 1 không ghi gì nên vẫn đi; lệnh đầy đủ chạy với RÀO GHI như
+        // nhánh dưới — cổng báo đóng băng ⇒ dòng 2 là đúng lời cũ, không ghi gì.
+        if (lenhGame === 'answer' && b.luong === 1) {
+          const congL = congGame
+          const chayDu = async (): Promise<Record<string, unknown>> => {
+            if (!congL) return gameV2(env, 'answer', b, ctx)
+            const rao = congL.then((dong) => { if (dong) throw new Error(LOI_DANG_LAM_MOI.error) })
+            rao.catch(() => {})
+            const kq = gameV2({ ...env, [RAO_GHI]: rao } as Env, 'answer', b, ctx)
+            kq.catch(() => {})
+            if (await congL) return LOI_DANG_LAM_MOI as unknown as Record<string, unknown>
+            return kq
+          }
+          const luong = await traLoiNopLuong(env, b, JSON_HEADERS, chayDu, (r) => ({ ...r, serverNow: Date.now(), nhipDeNghi: nhipDeNghi() }), ctx)
+          if (luong) return luong
+        }
+        if (!congGame) { const kq = await gameV2(env, lenhGame, b, ctx); sauLenhGame(env, lenhGame, b, kq, ctx); return ra(kq) }
         // Cổng đang đọc (đệm vừa hết hạn): lệnh chạy ngay với RÀO GHI; cổng báo đóng băng ⇒ trả lời cũ, bỏ kết quả lệnh (mọi lệnh ghi của nó bị rào chặn).
         const cong = congGame
         const rao = cong.then((dong) => { if (dong) throw new Error(LOI_DANG_LAM_MOI.error) })
@@ -3623,7 +3651,9 @@ const boXuLy = {
         const kq = gameV2({ ...env, [RAO_GHI]: rao } as Env, p.slice('/game-v2/'.length), b, ctx)
         kq.catch(() => {})
         if (await cong) return ra(LOI_DANG_LAM_MOI)
-        return ra(await kq)
+        const kqXong = await kq
+        sauLenhGame(env, lenhGame, b, kqXong, ctx)
+        return ra(kqXong)
       }
       if (p === '/hs/dat-mat-khau') return ra(await G.hsDatMatKhau(env, b))
       if (p === '/hs/lich-su') return ra(await G.hsLichSuCa(env, b))
