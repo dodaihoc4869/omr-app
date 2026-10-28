@@ -1,1 +1,5 @@
-dem
+sinh chay
+so_ngay=14
+so_em=270
+phut=12
+am=20

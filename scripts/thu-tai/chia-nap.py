@@ -4,31 +4,36 @@
 # (2) viết lại: bảng ⇒ dữ liệu ⇒ chỉ mục ⇒ trigger ⇒ view; dòng nào câu INSERT > 90 KB thì chèn chuỗi lớn rỗng rồi nối dần bằng
 # `UPDATE … SET c = c || '<khúc>' WHERE <khoá chính>` (mỗi câu < 90 KB). Chỉ in số đếm — không in nội dung dòng.
 # Ghi thành nhiều phần ≤ ~250 MB (<tiền tố ra>-000.sql …): phần 0 = bảng, các phần dữ liệu (một dòng + các câu nối của nó không bị cắt ngang), phần cuối = chỉ mục/trigger/view.
-# python3 -I chia-nap.py <tệp export> <tiền tố ra> <tệp sqlite tạm>
+# python3 -I chia-nap.py <tệp export | dữ-liệu-giả.sqlite> <tiền tố ra> <tệp sqlite tạm>
 import sqlite3, sys, os
 
 vao, ra, tam = sys.argv[1], sys.argv[2], sys.argv[3]
 GIOI = 90_000
-if os.path.exists(tam): os.remove(tam)
-db = sqlite3.connect(tam, isolation_level=None)
-db.execute('PRAGMA foreign_keys=OFF'); db.execute('PRAGMA journal_mode=OFF'); db.execute('PRAGMA synchronous=OFF')
-db.execute('BEGIN')
-buf, sau, n = [], [], 0
-with open(vao, encoding='utf-8', newline='') as f:
-    for dong in f:
-        buf.append(dong)
-        if not dong.rstrip().endswith(';'): continue
-        cau = ''.join(buf)
-        if not sqlite3.complete_statement(cau): continue
-        buf = []
-        dau = cau.lstrip()[:40].upper()
-        if dau.startswith('PRAGMA') or dau.startswith('BEGIN') or dau.startswith('COMMIT'): continue
-        if dau.startswith('CREATE TRIGGER'): sau.append(cau); continue
-        db.execute(cau); n += 1
-if ''.join(buf).strip(): raise SystemExit('Tệp export kết thúc giữa chừng một câu')
-for c in sau: db.execute(c)
-db.execute('COMMIT')
-print(f'Đọc vào SQLite tạm: {n} câu · {len(sau)} trigger')
+if vao.endswith('.sqlite'):
+    # Đầu vào là SQLite dữ liệu giả (tests/zz-thu-tai-sinh-gia-2810.test.ts) ⇒ đọc thẳng.
+    db = sqlite3.connect(f'file:{vao}?mode=ro', uri=True)
+    print('Đọc SQLite dữ liệu giả:', os.path.getsize(vao) // 1048576, 'MB')
+else:
+    if os.path.exists(tam): os.remove(tam)
+    db = sqlite3.connect(tam, isolation_level=None)
+    db.execute('PRAGMA foreign_keys=OFF'); db.execute('PRAGMA journal_mode=OFF'); db.execute('PRAGMA synchronous=OFF')
+    db.execute('BEGIN')
+    buf, sau, n = [], [], 0
+    with open(vao, encoding='utf-8', newline='') as f:
+        for dong in f:
+            buf.append(dong)
+            if not dong.rstrip().endswith(';'): continue
+            cau = ''.join(buf)
+            if not sqlite3.complete_statement(cau): continue
+            buf = []
+            dau = cau.lstrip()[:40].upper()
+            if dau.startswith('PRAGMA') or dau.startswith('BEGIN') or dau.startswith('COMMIT'): continue
+            if dau.startswith('CREATE TRIGGER'): sau.append(cau); continue
+            db.execute(cau); n += 1
+    if ''.join(buf).strip(): raise SystemExit('Tệp export kết thúc giữa chừng một câu')
+    for c in sau: db.execute(c)
+    db.execute('COMMIT')
+    print(f'Đọc vào SQLite tạm: {n} câu · {len(sau)} trigger')
 
 def lit(v):
     if v is None: return 'NULL'

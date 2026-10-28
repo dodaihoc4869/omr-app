@@ -17,7 +17,7 @@ concurrency:
 jobs:
   thu:
     runs-on: ubuntu-latest
-    timeout-minutes: 75
+    timeout-minutes: 150
     env:
       DB_THAT: d2e6d322-374a-45d7-83a3-9fac486b23f1
       TT: ${{ github.workspace }}/../tt-rieng
@@ -56,6 +56,83 @@ jobs:
           RA="$TT/dem.json" node scripts/thu-tai/dem-bang.mjs
 
       # ───────────── SINH DỮ LIỆU GIẢ + DỰNG BẢN SAO ─────────────
+      - name: "Sinh 1 · tạo lại D1 sao omr-thu-tai (APAC như bản thật)"
+        if: contains(env.LENH, 'sinh')
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          set -euo pipefail
+          npx wrangler d1 list --json > "$TT/list.json"
+          CU=$(node -e 'const l=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));const x=l.find(d=>d.name==="omr-thu-tai");console.log(x?x.uuid:"")' "$TT/list.json")
+          if [ -n "$CU" ]; then
+            [ "$CU" != "$DB_THAT" ] || { echo "::error::nhầm D1 thật"; exit 1; }
+            npx wrangler d1 delete omr-thu-tai -y > /dev/null; echo "Đã xoá D1 sao cũ."
+          fi
+          npx wrangler d1 create omr-thu-tai --location apac > /dev/null
+          npx wrangler d1 list --json > "$TT/list.json"
+          ID=$(node -e 'const l=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));console.log(l.find(d=>d.name==="omr-thu-tai").uuid)' "$TT/list.json")
+          [ "$ID" != "$DB_THAT" ] || exit 1
+          echo "DB_SAO=$ID" >> "$GITHUB_ENV"
+          node ../scripts/thu-tai/tao-cau-hinh.mjs "$ID" wrangler-thu-tai.toml
+      - name: "Sinh 2 · dữ liệu giả: chạy mã máy chủ thật qua các ngày giả (không dữ liệu thật)"
+        if: contains(env.LENH, 'sinh')
+        run: |
+          set -euo pipefail
+          SN=$(grep -m1 -oE '^so_ngay=[0-9]+' scripts/thu-tai/lenh.txt | cut -d= -f2 || true)
+          SINH_GIA=1 SO_NGAY="${SN:-14}" SINH_RA="$TT/gia.sqlite" SINH_KHO="$TT/kho" npx vitest run tests/zz-thu-tai-sinh-gia-2810.test.ts --reporter=verbose > "$TT/sinh.log" 2>&1 || { tail -n 40 "$TT/sinh.log"; exit 1; }
+          grep -E "Hạt giống|Ngày |Nhân bản|Lỗi gặp|Xong sau|^  [a-z0-9_]+: [0-9-]+ / [0-9]+|✓|✗|FAIL" "$TT/sinh.log" | head -n 90
+      - name: "Sinh 3 · nạp dữ liệu giả vào D1 sao theo phần (mỗi câu < 90 KB)"
+        if: contains(env.LENH, 'sinh')
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          set -euo pipefail
+          N="$TT/nap"
+          python3 -I ../scripts/thu-tai/chia-nap.py "$TT/gia.sqlite" "$N" "$TT/tam.sqlite"
+          for P in "$N"-*.sql; do
+            T0=$(date +%s); OK=0
+            for LAN in 1 2; do
+              if npx wrangler d1 execute omr-thu-tai --remote -c wrangler-thu-tai.toml --file "$P" -y > "$TT/nap.log" 2>&1; then OK=1; break; fi
+              echo "Phần $(basename "$P") lỗi lần $LAN:"; grep -E "ERROR|✘" "$TT/nap.log" | cut -c1-200 | head -n 3
+            done
+            [ "$OK" = 1 ] || exit 1
+            echo "Nạp $(basename "$P") ($(du -m "$P" | cut -f1) MB) xong sau $(( $(date +%s) - T0 )) s"
+          done
+          npx wrangler d1 execute omr-thu-tai --remote -c wrangler-thu-tai.toml --json --command "SELECT (SELECT COUNT(*) FROM thu_tai_em) em, (SELECT COUNT(*) FROM game_v2_attempt) luot, (SELECT COUNT(*) FROM su_kien_hoc) so_hoc, (SELECT COUNT(*) FROM omni_p_vkn) vkn" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log("D1 sao:",JSON.stringify(JSON.parse(s)[0].results[0])))'
+      - name: "Sinh 4 · thùng R2 sao + kho câu giả"
+        if: contains(env.LENH, 'sinh')
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          set -euo pipefail
+          npx wrangler r2 bucket create omr-thu-tai-de > "$TT/r2.log" 2>&1 || { grep -qi "already" "$TT/r2.log" && echo "Thùng sao đã có." || { tail -n 5 "$TT/r2.log"; exit 1; }; }
+          node ../scripts/thu-tai/chep-r2.mjs tai "$TT/kho"
+      - name: "Sinh 5 · đẩy Worker SAO omr-thu-tai (mã main hiện tại) + mã bí mật sao + thử khói"
+        if: contains(env.LENH, 'sinh')
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          set -euo pipefail
+          grep -q '^name = "omr-thu-tai"$' wrangler-thu-tai.toml
+          ! grep -q "$DB_THAT" wrangler-thu-tai.toml
+          npx wrangler deploy -c wrangler-thu-tai.toml > "$TT/deploy.log" 2>&1 || { tail -n 25 "$TT/deploy.log"; exit 1; }
+          grep -q "omr-thu-tai" "$TT/deploy.log" || { echo "::error::không thấy tên Worker sao"; exit 1; }
+          grep -E "workers.dev|Current Version|schedule" "$TT/deploy.log" | head -n 6 || true
+          printf '%s' "$SEED" | npx wrangler secret put MA_BI_MAT -c wrangler-thu-tai.toml > /dev/null 2>&1
+          echo "Đã đặt MA_BI_MAT cho bản sao (dẫn xuất, không phải mã thật)."
+          sleep 20
+          curl -fsS "$GOC/khoe"; echo
+          npx wrangler d1 execute omr-thu-tai --remote -c wrangler-thu-tai.toml --json --command "SELECT sbd FROM thu_tai_em" > "$TT/em.json"
+          DS_EM="$TT/em.json" SO_EM=10 PHUT=1 PHUT_LEN=0 RA="$TT/khoi.json" node ../scripts/thu-tai/tai.mjs
+
       # ───────────── ĐO ─────────────
       - name: "Đo · 270 em, hâm máy tới khi Worker chạy sát D1, rồi 12 phút"
         if: contains(env.LENH, 'chay')
