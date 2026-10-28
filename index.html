@@ -44,6 +44,13 @@
           var ten2 = vai === 'hs' ? 'ĐĐH Học Sinh' : vai === 'ph' ? 'ĐĐH Phụ Huynh' : 'ĐỖ ĐẠI HỌC'
           document.write('<link rel="manifest" href="/' + ten + '">')
           document.write('<meta name="apple-mobile-web-app-title" content="' + ten2 + '">')
+          // App học sinh (thầy 28/10 «full hẳn, không dải đen»): thanh trạng thái CÙNG MÀU NỀN app học sinh (--tr-nen sáng / tối ở
+          // src/styles/trong-hs-mau.css). Viết TRƯỚC ba thẻ theme-color chung bên dưới ⇒ trình duyệt lấy thẻ khớp đầu tiên là thẻ này.
+          // Sau khi app chạy, src/lib/toan-man-hs.ts còn tự đặt lại theo nền đang vẽ.
+          if (vai === 'hs') {
+            document.write('<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f6fc">')
+            document.write('<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1a1a29">')
+          }
         } catch (e) {
           document.write('<link rel="manifest" href="/manifest.json">')
         }

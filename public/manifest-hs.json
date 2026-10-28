@@ -9,8 +9,8 @@
   "orientation": "any",
   "start_url": "./hs",
   "scope": "./",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "background_color": "#f6f6fc",
+  "theme_color": "#f6f6fc",
   "icons": [
     {
       "src": "logo-hs-192-v3.png",
