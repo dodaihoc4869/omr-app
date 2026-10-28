@@ -52,15 +52,18 @@ const BAT_DAU = Date.now(), HET = BAT_DAU + (PHUT_LEN + PHUT) * 60_000, DO_TU = 
 const so = {} // ten -> {ms:[], trang:{}, loi:{}}
 const dem = (ten) => (so[ten] ??= { ms: [], msDu: [], trang: {}, loi: {}, tre: 0 })
 const noiDat = {}
+const VET = {} // ten -> [{ms, w, d:[[a,b,sql,n,dur]]}]
 const anLoi = (s) => String(s ?? '').replace(/\d{3,}/g, '#').replace(/"[^"]*"/g, '"…"').slice(0, 90)
 
 async function goi(ten, duong, than, { giay = 30, get = false, dau = {} } = {}) {
   const t0 = performance.now(), ms_ = [].concat(ten).map(dem), m = ms_[0], trongDo = Date.now() >= DO_TU
   const c = new AbortController(), hen = setTimeout(() => c.abort(), giay * 1000)
   try {
-    const r = await fetch(GOC + duong, get ? { signal: c.signal, headers: dau } : { method: 'POST', headers: { 'content-type': 'application/json', ...dau }, body: JSON.stringify(than), signal: c.signal })
+    const r = await fetch(GOC + duong, get ? { signal: c.signal, headers: { ...dau, 'x-vet': '1' } } : { method: 'POST', headers: { 'content-type': 'application/json', 'x-vet': '1', ...dau }, body: JSON.stringify(than), signal: c.signal })
     const chu = await r.text()
     const ms = performance.now() - t0
+    const xv = r.headers.get('x-vet')
+    if (xv && trongDo) { const k = [].concat(ten)[0]; const a = (VET[k] ??= []); if (a.length < 600) { try { a.push({ ms, ...JSON.parse(decodeURIComponent(xv)) }) } catch { /* */ } } }
     const pl = r.headers.get('cf-placement') || 'khong'
     noiDat[pl] = (noiDat[pl] || 0) + 1
     let j = null; try { j = JSON.parse(chu) } catch { /* không phải JSON */ }
@@ -148,3 +151,32 @@ console.log('Nơi chạy Worker (cf-placement):', JSON.stringify(noiDat))
 console.log('Chặng:', JSON.stringify(soChang))
 console.log('Theo phút (sanh/mo_chang/nop_cau p50·p95):')
 for (const [ph, v] of Object.entries(theoPhut)) console.log(`  phút ${ph}: ` + ['sanh', 'mo_chang', 'nop_cau'].map((k) => v[k] ? `${k} ${v[k].n}× ${v[k].p50}·${v[k].p95}` : `${k} -`).join(' | '))
+
+// ── VẾT D1 (Worker sao VET=1): mỗi lệnh — wall Worker, số lượt D1, số đợt (gộp khoảng chồng), thời gian chờ D1 trên đường (phủ), D1 tự báo; câu tốn nhất.
+{
+  const p = (a, q) => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y); return Math.round(s[Math.min(s.length - 1, Math.floor(q * s.length))]) }
+  console.log('=== VẾT D1 theo lệnh (p50 · p95) ===')
+  for (const [ten, ds] of Object.entries(VET)) {
+    const hang = ds.map((v) => {
+      const kh = (v.d || []).filter((x) => x[0] <= v.w).map((x) => [x[0], x[1]]).sort((a, b) => a[0] - b[0])
+      let dot = 0, cuoi = -1, phu = 0
+      for (const [a, b] of kh) { if (a > cuoi) { dot++; phu += b - a; cuoi = b } else if (b > cuoi) { phu += b - cuoi; cuoi = b } }
+      const d1 = (v.d || []).reduce((n, x) => n + (x[4] || 0), 0)
+      return { ms: v.ms, w: v.w, n: (v.d || []).length, dot, phu, ngoai: v.w - phu, d1, dau: kh.length ? kh[0][0] : v.w }
+    })
+    const f = (k) => `${p(hang.map((h) => h[k]), 0.5)}·${p(hang.map((h) => h[k]), 0.95)}`
+    console.log(`${ten.padEnd(16)} n=${hang.length} runner=${f('ms')} worker=${f('w')} lượt=${f('n')} đợt=${f('dot')} chờD1=${f('phu')} ngoàiD1=${f('ngoai')} D1báo=${f('d1')} lượtĐầuLúc=${f('dau')}`)
+    // câu tốn: tổng (b-a) / số yêu cầu, và trung bình mỗi lượt
+    const cau = new Map()
+    for (const v of ds) for (const x of v.d || []) { const k = String(x[2]).slice(0, 70); const o = cau.get(k) ?? { t: 0, n: 0, d: 0, r: 0 }; o.t += x[1] - x[0]; o.n++; o.d += x[4] || 0; o.r += x[3] || 0; cau.set(k, o) }
+    for (const [k, o] of [...cau].sort((a, b) => b[1].t - a[1].t).slice(0, 8)) console.log(`   ${String(Math.round(o.t / ds.length)).padStart(5)} ms/yc · ${(o.n / ds.length).toFixed(1)} lượt/yc · tb ${Math.round(o.t / o.n)} ms · D1 ${(o.d / o.n).toFixed(1)} ms · ${Math.round(o.r / o.n)} dòng | ${k}`)
+  }
+  // một vết mẫu Sảnh (trung vị) để nhìn thứ tự
+  const s = (VET.sanh || []).slice().sort((a, b) => a.w - b.w)
+  const m = s[Math.floor(s.length / 2)]
+  if (m) { console.log(`Vết Sảnh trung vị (worker ${m.w} ms, runner ${Math.round(m.ms)} ms):`); for (const x of (m.d || []).slice().sort((a, b) => a[0] - b[0]).slice(0, 45)) console.log(`   +${String(x[0]).padStart(5)}…${String(x[1]).padStart(5)} n=${String(x[3]).padStart(5)} D1=${x[4]} ${String(x[2]).slice(0, 110)}`) }
+  const mc = (VET.mo_chang || []).slice().sort((a, b) => a.w - b.w); const m2 = mc[Math.floor(mc.length * 0.9)]
+  if (m2) { console.log(`Vết mở chặng p90 (worker ${m2.w} ms):`); for (const x of (m2.d || []).slice().sort((a, b) => a[0] - b[0]).slice(0, 30)) console.log(`   +${String(x[0]).padStart(5)}…${String(x[1]).padStart(5)} n=${String(x[3]).padStart(5)} D1=${x[4]} ${String(x[2]).slice(0, 110)}`) }
+  const nc = (VET.nop_cau || []).slice().sort((a, b) => a.w - b.w); const m3 = nc[Math.floor(nc.length / 2)]
+  if (m3) { console.log(`Vết nộp trung vị (worker ${m3.w} ms):`); for (const x of (m3.d || []).slice().sort((a, b) => a[0] - b[0]).slice(0, 30)) console.log(`   +${String(x[0]).padStart(5)}…${String(x[1]).padStart(5)} n=${String(x[3]).padStart(5)} D1=${x[4]} ${String(x[2]).slice(0, 110)}`) }
+}

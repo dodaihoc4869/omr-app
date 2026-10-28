@@ -1,8 +1,7 @@
 worker chay
 noi=aws:ap-east-1
 ktcn-tat
-so_em=270
-phut=12
+so_em=135
+phut=8
 am=3
-# 28/10 trưa (lần 3): đo lại 270 em — bản sẽ phát hành (kho chung, điểm gọn có tạo bảng, prior cất sẵn) + main mới.
-# (D1 sao giữ dữ liệu giả cũ + phần các lượt đo trước ghi thêm ⇒ nặng hơn lượt trước một chút). Không chờ 20h ⇒ cron nhánh ngoài cao điểm như lượt 2.
+# 28/10 trưa (lần 4): đo VẾT D1 từng lệnh (Worker sao VET=1) ở 135 em — tìm vì sao Sảnh p50 7 s.

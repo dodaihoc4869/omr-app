@@ -4123,6 +4123,9 @@ export default {
   async fetch(req: Request, env: Env, ctx?: ExecutionContext): Promise<Response> {
     const t0 = Date.now()
     let res: Response
+    // THỬ TẢI (chỉ Worker sao có VET=1): vết D1 từng yêu cầu ⇒ đầu `x-vet`.
+    const vet = (env as unknown as { VET?: string }).VET === '1' && req.headers.get('x-vet') ? (await import('./vet-d1')).taoVet(env) : null
+    if (vet) env = vet.env
     // ỔN ĐỊNH (28/09): ~40 nhánh định tuyến `return handler(...)` KHÔNG await ⇒ Promise bị từ chối thoát khỏi try/catch của định tuyến (và các nhánh GET
     // nằm ngoài try) ⇒ Cloudflare trả 1101 thiếu CORS, máy em tưởng mất mạng. `await` + `catch` Ở ĐÂY bắt MỌI lỗi (đồng bộ lẫn bất đồng bộ) một chỗ duy nhất.
     try { res = await boXuLy.fetch(req, env, ctx) } catch (e) { console.error('[may-chu] lỗi chưa bắt:', tenLenh(new URL(req.url).pathname), e); res = raLoi(e) } finally { if (req.method !== 'OPTIONS') ghiDoLenh(tenLenh(new URL(req.url).pathname), Date.now() - t0) }
@@ -4131,6 +4134,7 @@ export default {
     if (res.status === 503) { const loi = loiBanTheoDuong(new URL(req.url).pathname); if (loi) { const j = await res.clone().json().catch(() => null) as Record<string, unknown> | null; if (j && j.maLoi === 'MAY_CHU_BAN') res = new Response(JSON.stringify({ ...j, error: loi }), { status: 503, headers: res.headers }) } }
     const h = new Headers(res.headers)
     h.set('x-nhip-de-nghi', String(heSoGoiNen(new URL(req.url).pathname)))
+    if (vet) h.set('x-vet', vet.tom())
     const ex = h.get('access-control-expose-headers'); h.set('access-control-expose-headers', ex ? `${ex}, x-nhip-de-nghi` : 'x-nhip-de-nghi')
     return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h })
   },

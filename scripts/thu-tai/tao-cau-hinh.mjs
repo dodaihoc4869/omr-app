@@ -18,6 +18,8 @@ if (tuy === 'khong-r2') t = t.replace(/\[\[r2_buckets\]\]\nbinding = "DE"\nbucke
 // NƠI CHẠY: Worker mới với «smart» KHÔNG được dời về sát D1 sau 20 phút (lượt 40617819248: 100% `local-PDX/SEA`, D1 ở APAC ⇒ mỗi lượt D1 đi
 // Mỹ–châu Á). Bản thật đã được dời sát D1 (Hồng Kông). NOI_DAT=aws:ap-east-1 ⇒ ghim Worker sao ở Hồng Kông (placement «targeted») cho giống bản thật.
 if (process.env.NOI_DAT) t = t.replace(/^\[placement\]\nmode = "smart"$/m, `[placement]\nmode = "targeted"\nregion = "${process.env.NOI_DAT}"`)
+// VẾT D1 (vet-d1.ts): chỉ Worker sao.
+t = t.replace(/^\[placement\]$/m, '[vars]\nVET = "1"\n\n[placement]')
 const loi = []
 if (process.env.NOI_DAT && !/mode = "targeted"/.test(t)) loi.push('chưa đổi được nơi chạy')
 if (tuy === 'khong-r2' && /^\[\[r2_buckets\]\]/m.test(t)) loi.push('chưa bỏ được khối R2')
