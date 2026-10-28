@@ -81,3 +81,14 @@ describe('Lộ trình: khoá chặng sau nút Tự sửa lỗi', () => {
     expect(SO.bao).not.toHaveBeenCalled()
   })
 })
+
+describe('Sảnh chưa về (ảnh thầy 28/10 giờ cao điểm: Lộ trình chỉ có nút Sửa lỗi)', () => {
+  it('đang tải, chưa có số ⇒ báo «Đang tải bài học hôm nay…», CHƯA vẽ đường (không chỉ còn nút Sửa lỗi); có số ⇒ đường như cũ', async () => {
+    const { rerender } = render(<MotTrangHs {...goc({ so: null, dangTai: true })} />)
+    expect(screen.getByRole('status').textContent).toBe('Đang tải bài học hôm nay…')
+    expect(screen.queryByRole('list', { name: 'Lộ trình hôm nay' })).toBeNull()
+    rerender(<MotTrangHs {...goc()} />)
+    await waitFor(() => expect(nhan()).toContain('Tự sửa lỗi: hôm nay còn 8 câu'))
+    expect(screen.queryByText('Đang tải bài học hôm nay…')).toBeNull()
+  })
+})

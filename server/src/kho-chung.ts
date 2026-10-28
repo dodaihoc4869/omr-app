@@ -28,8 +28,11 @@ export interface KhoChung {
   qTheoQid: Map<string, DongQ[]>
 }
 
-const HAN_ISOLATE_MS = 5 * 60_000
-const HAN_CHUP_MS = 10 * 60_000
+// 28/10 tối GIỜ CAO ĐIỂM (đo: Worker «exceededMemory» 81 lần / 60 phút từ 19:15 VN, hôm qua 0 — ảnh thầy «Máy chủ phản hồi chậm…» khi bấm Kiểm tra): mỗi lần nạp lại
+// kho giữ HAI bản (cũ còn trong lượt đang chạy + mới: chuỗi giải nén vài MB + ~15 nghìn đối tượng), và bản chụp quá 10 phút ⇒ MỌI isolate đọc lại toàn bảng
+// (~21 nghìn dòng) rồi nén. Nay: giữ trong isolate 30 phút; bản chụp DÙNG LẠI tới 60 phút khi DẤU KHO khớp (ghi omni_q đã xoá bản chụp ngay — `boKhoChup`).
+const HAN_ISOLATE_MS = 30 * 60_000
+const HAN_CHUP_MS = 60 * 60_000
 const CO_PHAN = 900_000
 // v2 (28/10 chiều): JSON nén gzip ⇒ base64 (một dòng ~1/5 cỡ cũ: lượt đo 270 em, đọc bản chụp v1 = 980 lần × 36 ms ≈ 3,6 MB mỗi isolate mới).
 const KHOA_CHUP = 'kho_omni_v2'
