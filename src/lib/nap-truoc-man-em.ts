@@ -103,14 +103,11 @@ export function hoiSomSanh(w: any, goc: string, phien: any, ds: [string, string]
       else o.token = phien.token
       if (!o[kieu]) return
       var than = JSON.stringify(o)
-      // 28/10: lệnh game đọc bản sao D1 (moc-d1.ts); vừa ghi trong 60 giây (ddh.d1ghi) ⇒ đọc tươi tại D1 chính.
-      var h: any = { 'content-type': 'application/json' }
-      if (duong.indexOf('/game-v2/') === 0) { h['x-d1-ban'] = '1'; try { if (Date.now() - (Number(w.localStorage.getItem('ddh.d1ghi')) || 0) < 6e4) h['x-d1-tuoi'] = '1' } catch (e) { /* bỏ */ } }
       var cu = kho[duong]
       if (cu && !cu.daDung && cu.goc === goc && cu.than === than) return
       var muc: any = { goc: goc, than: than, tuHtml: tuHtml, xong: undefined }
       muc.hua = w
-        .fetch(goc + duong, { method: 'POST', headers: h, body: than })
+        .fetch(goc + duong, { method: 'POST', headers: { 'content-type': 'application/json' }, body: than })
         .then(function (r: any) {
           return r.text().then(function (t: string) {
             return { ok: r.ok, status: r.status, text: t, nhip: r.headers.get('x-nhip-de-nghi') }

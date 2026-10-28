@@ -120,7 +120,6 @@ import { gvOmni } from './omni-gv'
 import { chayOmniDem, docCoOmni, hieuChinhOmniTuan } from './omni-d1'
 import { viecPhu } from './viec-phu'
 import { gan } from './cau-hinh-dem'
-import { DAU_MOC, DAU_YEU_CAU, chayBanSao, ganMoc, phienBanSao } from './ban-sao-doc'
 import { gvKhoDeGiao } from './gv-kho-de-giao'
 import { damBaoChiMuc, dungChiMucCronDem } from './chi-muc-luc-chay'
 import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
@@ -135,7 +134,7 @@ import { docGoiDeDem, docKeyBankDem, ghiKeyBank, doanCongBoNgay, layDemHetGioLuo
 const CORS = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, POST, OPTIONS',
-  'access-control-allow-headers': 'content-type, x-ma-bi-mat, ' + DAU_YEU_CAU, // 28/10: x-d1-* — mốc đọc bản sao (ban-sao-doc.ts)
+  'access-control-allow-headers': 'content-type, x-ma-bi-mat',
   'access-control-max-age': '86400',
 }
 const JSON_HEADERS = { 'content-type': 'application/json;charset=utf-8', ...CORS }
@@ -3647,19 +3646,17 @@ const boXuLy = {
           const luong = await traLoiNopLuong(env, b, JSON_HEADERS, chayDu, (r) => ({ ...r, serverNow: Date.now(), nhipDeNghi: nhipDeNghi() }), ctx)
           if (luong) return luong
         }
-        // BẢN SAO ĐỌC (28/10, ban-sao-doc.ts): Sảnh / đếm sau câu / mở chặng của máy em mới (`x-d1-ban: 1`) đọc bản sao D1 theo mốc em gửi; ghi vẫn về D1 chính.
-        const bs = phienBanSao(env, req.headers, lenhGame)
-        if (!congGame) { const { kq, moc } = await chayBanSao(env, bs, (e) => gameV2(e, lenhGame, b, ctx)); sauLenhGame(env, lenhGame, b, kq, ctx); return ganMoc(ra(kq), moc) }
+        if (!congGame) { const kq = await gameV2(env, lenhGame, b, ctx); sauLenhGame(env, lenhGame, b, kq, ctx); return ra(kq) }
         // Cổng đang đọc (đệm vừa hết hạn): lệnh chạy ngay với RÀO GHI; cổng báo đóng băng ⇒ trả lời cũ, bỏ kết quả lệnh (mọi lệnh ghi của nó bị rào chặn).
         const cong = congGame
         const rao = cong.then((dong) => { if (dong) throw new Error(LOI_DANG_LAM_MOI.error) })
         rao.catch(() => {})
-        const kq = chayBanSao({ ...env, [RAO_GHI]: rao } as Env, bs && { ...bs, env: { ...bs.env, [RAO_GHI]: rao } as Env }, (e) => gameV2(e, p.slice('/game-v2/'.length), b, ctx))
+        const kq = gameV2({ ...env, [RAO_GHI]: rao } as Env, p.slice('/game-v2/'.length), b, ctx)
         kq.catch(() => {})
         if (await cong) return ra(LOI_DANG_LAM_MOI)
         const kqXong = await kq
-        sauLenhGame(env, lenhGame, b, kqXong.kq, ctx)
-        return ganMoc(ra(kqXong.kq), kqXong.moc)
+        sauLenhGame(env, lenhGame, b, kqXong, ctx)
+        return ra(kqXong)
       }
       if (p === '/hs/dat-mat-khau') return ra(await G.hsDatMatKhau(env, b))
       if (p === '/hs/lich-su') return ra(await G.hsLichSuCa(env, b))
@@ -4151,7 +4148,7 @@ export default {
     const h = new Headers(res.headers)
     h.set('x-nhip-de-nghi', String(heSoGoiNen(new URL(req.url).pathname)))
     if (vet) h.set('x-vet', vet.tom())
-    const ex = h.get('access-control-expose-headers'); h.set('access-control-expose-headers', ex ? `${ex}, x-nhip-de-nghi, ${DAU_MOC}` : `x-nhip-de-nghi, ${DAU_MOC}`)
+    const ex = h.get('access-control-expose-headers'); h.set('access-control-expose-headers', ex ? `${ex}, x-nhip-de-nghi` : 'x-nhip-de-nghi')
     return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h })
   },
 }

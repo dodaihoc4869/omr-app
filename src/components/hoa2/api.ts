@@ -4,7 +4,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { danhDauDaNhan, layHoiSom, xemHoiSomDaVe } from '../../lib/hoi-som'
-import { dauMocD1 } from '../../lib/moc-d1'
 import { loiCuaKetQua } from '../../game/than-thu-v2/loi-het-tran'
 import { laCauTuLuan } from '../../lib/cau-tu-luan'
 import { NHAN_NGUON_LAN, type NguonLanLam } from '../../lib/nhan-nguon-lan'
@@ -180,17 +179,15 @@ export async function goiHoa2(lenh: string, token: string, du: Record<string, un
     if (c.signal.aborted) throw new DOMException('Đã hết giờ', 'AbortError')
     const url = `${goc}/game-v2/${lenh}`
     const than = JSON.stringify({ ...du, token })
-    const md = dauMocD1(lenh) // 28/10: mốc đọc bản sao D1 (moc-d1.ts)
     // Lệnh đã HỎI SỚM (lúc mở app / vừa đăng nhập, src/lib/hoi-som.ts) ⇒ nhận phản hồi ấy, không gửi lại; không có / hỏng ⇒ gửi như cũ.
     const r =
       (await layHoiSom(url, than, c.signal)) ??
       (await fetch(url, {
         method: 'POST',
-        headers: { 'content-type': 'application/json', ...md.dau },
+        headers: { 'content-type': 'application/json' },
         body: than,
         signal: c.signal,
       }))
-    md.nhan(r)
     let j: unknown = null
     try {
       j = await r.json()
