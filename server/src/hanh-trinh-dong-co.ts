@@ -59,7 +59,9 @@ const SQL_CANH_LOP=`SELECT tu,den,SUM(n_co) nCo,SUM(dung_co) dungCo,SUM(n_chua) 
  */
 const demCanh=new WeakMap<object,{luc:number;moc:number;theoDen:Map<string,CanhHoc[]>}>()
 async function docCanhLop(env:Env,targets:readonly string[],now:number):Promise<CanhHoc[]>{
-  const han=new Date(now+7*3_600_000).getUTCHours()>=20?600_000:180_000
+  // 28/10 tối GIỜ CAO ĐIỂM (đo D1 8 phút: câu này đứng ĐẦU — 322 lần × 55 ms ≈ 18 s, ~21.000 dòng/lần, chiếm ~1/5 thời gian D1): số liệu CẢ LỚP 7 ngày đổi chậm,
+  // lệch vài chục phút không đổi thứ tự ưu tiên bài ⇒ nhớ 30 phút lúc cao điểm, 10 phút ngoài cao điểm (trước 10 / 3 phút; isolate sống ngắn nên hạn càng dài càng trúng).
+  const han=new Date(now+7*3_600_000).getUTCHours()>=20?1_800_000:600_000
   const goc=dbGoc(env.DB as unknown as object)
   let d=demCanh.get(goc)
   if(!d||now-d.luc>=han||now<d.luc){d={luc:now,moc:now-7*86400000,theoDen:new Map()};demCanh.set(goc,d)}
