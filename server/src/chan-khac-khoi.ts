@@ -141,7 +141,10 @@ export async function docNguonKhoiD1(env: Env, qids: readonly string[]): Promise
     const thieu = ds.filter((q) => !daNho(env.DB, khoaNguonKhoi(q)))
     if (thieu.length) {
       const lo = docNguonKhoiTho(env, thieu)
-      for (const q of thieu) gieoNho(env.DB, khoaNguonKhoi(q), lo.then((rs) => rs.filter((r) => str(r.qid) === q)), BANG_NGUON_KHOI)
+      // 29/10 (đo CPU thật: Sảnh sau khi nộp câu 300–420 ms CPU, câu này một mình ~76 ms — trước: MỖI câu lọc lại CẢ lô kết quả ⇒ O(câu × dòng), kho 3.000 câu ứng viên
+      // ≈ 9× — chính là 10% lượt Sảnh / Mở chặng giờ cao điểm ngốn 600–1.700 ms CPU làm đứng cả máy chủ): gom theo câu MỘT lần, mỗi câu tra Map.
+      const theoQ = lo.then((rs) => { const m = new Map<string, Row[]>(); for (const r of rs) { const k = str(r.qid); const a = m.get(k); if (a) a.push(r); else m.set(k, [r]) } return m })
+      for (const q of thieu) gieoNho(env.DB, khoaNguonKhoi(q), theoQ.then((m) => (m.get(q) ?? []).slice()), BANG_NGUON_KHOI)
     }
     const theo = await Promise.all(ds.map((q) => nhoTheoLuot(env.DB, khoaNguonKhoi(q), () => docNguonKhoiTho(env, [q]), BANG_NGUON_KHOI).catch(() => [] as Row[])))
     rows = theo.flat()
