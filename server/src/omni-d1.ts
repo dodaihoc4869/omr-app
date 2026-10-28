@@ -13,6 +13,8 @@
 import type { Env } from './kieu'
 import { KHOP } from './cau-meta'
 import { dauKhoCau, dauTruocLucDoc } from './dau-kho-cau'
+import { layKhoChung, xoaKhoChung, type KhoChung } from './kho-chung'
+import { LENH_BANG_DIEM_GON, lenhDiemGon } from './diem-gon'
 import {
   CAC_KHUNG_GIO, KHOA_CO_OMNI, KHOA_THAM_SO_OMNI, MUC_DICH_LUOT, PHIEN_BAN_OMNI, THAM_SO_OMNI,
   coOmniApCho, docCoOmniTu, khungGioCua,
@@ -121,7 +123,7 @@ const demNhatKy = new DemTTL<string[]>(60_000, 400)
 let phienBanDem = 0
 /** Bỏ mọi đệm OMNI của isolate (sau khi thầy duyệt Q, xác nhận dạng, đổi tham số). */
 export function xoaDemOmni(): void {
-  demHoSo.xoa(); demTho.xoa(); demPriorEm.xoa(); demQ.xoa(); demKho.xoa(); demTenDang.xoa(); demHieuChuan.xoa(); demSo.xoa(); demNhatKy.xoa(); demQChienDich.xoa(); khoToan = null; qToan = null
+  demHoSo.xoa(); demTho.xoa(); demPriorEm.xoa(); demQ.xoa(); demKho.xoa(); demTenDang.xoa(); demHieuChuan.xoa(); demSo.xoa(); demNhatKy.xoa(); demQChienDich.xoa(); xoaKhoChung()
   phienBanDem++
 }
 
@@ -240,66 +242,25 @@ const cauKhoTuDong = (x: Row): CauKho => {
     kienThuc: mangChuoi(x.kien_thuc), kienThucY: mangMang(x.kien_thuc_y), tuLuan: Number(x.tu_luan) === 1 || x.tu_luan === true, reviewed: Number(x.reviewed) === 1 || x.reviewed === true,
   }
 }
-// 28/10 (thử tải 270 em: `cau_meta` theo lô qid 13.782 lần × ~4.800 dòng, `omni_q` theo lô 7.564 lần × ~5.300 dòng — mỗi em một bộ qid nên đệm theo câu ít trúng):
-// nạp TOÀN KHO một lần mỗi isolate (cau_meta ~15 nghìn dòng / 30 phút, kiểm dấu kho 5 phút; omni_q ~6 nghìn dòng / 10 phút như đệm Q cũ), một lượt đọc bay chung
-// cho mọi lệnh đồng thời. Kho chưa khớp chỉ mục (`KHOP` sai) ⇒ 0 dòng ⇒ đường cũ theo lô. Bộ test: tắt (như đệm dấu kho) — test riêng bật bằng `batNapToanKho`.
-let napToanKho = BAT_DAU_KHO
-export function batNapToanKho(b: boolean): void { napToanKho = b; khoToan = null; qToan = null }
-let khoToan: { m: Map<string, CauKho>; luc: number; dau: string; p?: Promise<void> } | null = null
-let qToan: { m: Map<string, { thay: Map<number, string[]>; goiY: Map<number, string[]> }>; luc: number; p?: Promise<void> } | null = null
-const SQL_CAU_KHO_TOAN = `SELECT ma_de, qid, content_group, dang, phan, muc_do, ten_dang, chuyen_de, kien_thuc, kien_thuc_y, tu_luan, reviewed FROM cau_meta WHERE ${KHOP} ORDER BY qid, ma_de`
-/** Bản toàn kho dùng được ngay (null ⇒ chưa nạp / đang nạp lần đầu / kho chưa khớp ⇒ nơi gọi đi đường cũ). Hết hạn / dấu đổi ⇒ nạp lại (lượt này chờ). */
-async function layKhoToan(env: Env, now: number): Promise<Map<string, CauKho> | null> {
-  if (!napToanKho) return null
-  const k = khoToan
-  if (k && k.m.size && now - k.luc < 30 * 60_000) {
-    if (now - kiemDauKho < 5 * 60_000 && now >= kiemDauKho) return k.m
-    const d = await dauKhoCau(env)
-    kiemDauKho = now
-    if (d && d === k.dau) return k.m
-  }
-  if (khoToan?.p) { await khoToan.p.catch(() => {}); return khoToan?.m.size ? khoToan.m : null }
-  // Dấu kho đọc SONG SONG với lượt nạp (một đợt): kho đổi đúng lúc nạp ⇒ lần kiểm dấu sau (≤ 5 phút) bắt được.
-  const pDau = dauKhoCau(env)
-  const moi: { m: Map<string, CauKho>; luc: number; dau: string; p?: Promise<void> } = { m: new Map(), luc: now, dau: '' }
-  moi.p = (async () => {
-    const r = await env.DB.prepare(SQL_CAU_KHO_TOAN).all<Row>()
-    for (const x of r.results ?? []) {
-      const q = str(x.qid), cu = moi.m.get(q)
-      if (cu) { if (!cu.maDeDs.includes(str(x.ma_de))) cu.maDeDs.push(str(x.ma_de)); continue }
-      moi.m.set(q, cauKhoTuDong(x))
-    }
-  })()
-  khoToan = moi
-  try { await moi.p } catch { if (khoToan === moi) khoToan = null; return null }
-  delete moi.p
-  const dauTruoc = await pDau
-  moi.dau = dauTruoc ?? ''
-  if (!dauTruoc) { if (khoToan === moi) khoToan = null; return moi.m.size ? moi.m : null } // không đọc được dấu ⇒ dùng lượt này, không giữ
-  kiemDauKho = now; dauKhoDem = dauTruoc
-  return moi.m.size ? moi.m : null
-}
-/** Dòng `omni_q` toàn bảng (đệm 10 phút như đệm Q; `xoaDemOmni` bỏ). null ⇒ đường cũ theo lô. */
-async function layQToan(env: Env, now: number): Promise<NonNullable<typeof qToan>['m'] | null> {
-  if (!napToanKho) return null
-  if (qToan && !qToan.p && now - qToan.luc < 10 * 60_000) return qToan.m
-  if (qToan?.p) { await qToan.p.catch(() => {}); return qToan && !qToan.p ? qToan.m : null }
-  const moi: NonNullable<typeof qToan> = { m: new Map(), luc: now }
-  moi.p = (async () => {
-    const r = await env.DB.prepare('SELECT qid, y, vkn_json, nguon FROM omni_q').all<Row>()
-    themDongQ(moi.m, r.results ?? [])
-  })()
-  qToan = moi
-  try { await moi.p } catch { if (qToan === moi) qToan = null; return null }
-  delete moi.p
-  return moi.m
+// 28/10 (thử tải 270 em): siêu dữ liệu câu + Q lấy từ KHO CHUNG (kho-chung.ts: bản chụp dùng chung trong D1, vài dòng / isolate) thay cho đọc theo lô qid.
+const khoTuChung = new WeakMap<KhoChung, Map<string, CauKho | null>>()
+function cauKhoTuChung(kc: KhoChung, q: string): CauKho | null {
+  let m = khoTuChung.get(kc)
+  if (!m) { m = new Map(); khoTuChung.set(kc, m) }
+  const co = m.get(q)
+  if (co !== undefined) return co
+  const ds = kc.theoQid.get(q)
+  let c: CauKho | null = null
+  for (const x of ds ?? []) { if (!c) c = cauKhoTuDong(x as Row); else if (!c.maDeDs.includes(str(x.ma_de))) c.maDeDs.push(str(x.ma_de)) }
+  m.set(q, c)
+  return c
 }
 /** Siêu dữ liệu rút gọn của các câu (đệm 10 phút theo qid; câu không có trong kho ⇒ vắng). */
 export async function docCauKho(env: Env, qids: readonly string[]): Promise<Map<string, CauKho>> {
   const ra = new Map<string, CauKho>()
   const now = Date.now()
-  const toan = await layKhoToan(env, now).catch(() => null)
-  if (toan) { for (const q of new Set(qids.filter(Boolean))) { const c = toan.get(q); if (c) ra.set(q, c) } return ra }
+  const kc = await layKhoChung(env).catch(() => null)
+  if (kc && kc.cau.length) { for (const q of new Set(qids.filter(Boolean))) { const c = cauKhoTuChung(kc, q); if (c) ra.set(q, c) } return ra }
   const can: string[] = []
   for (const q of new Set(qids.filter(Boolean))) {
     const c = demKho.doc(q, now)
@@ -353,8 +314,8 @@ function themDongQ(ra: Map<string, { thay: Map<number, string[]>; goiY: Map<numb
 async function docDongQ(env: Env, qids: readonly string[]): Promise<Map<string, { thay: Map<number, string[]>; goiY: Map<number, string[]> }>> {
   const ra = new Map<string, { thay: Map<number, string[]>; goiY: Map<number, string[]> }>()
   if (!qids.length) return ra
-  const toan = await layQToan(env, Date.now()).catch(() => null)
-  if (toan) { for (const q of qids) { const o = toan.get(q); if (o) ra.set(q, o) } return ra }
+  const kc = await layKhoChung(env).catch(() => null)
+  if (kc) { for (const q of qids) themDongQ(ra, (kc.qTheoQid.get(q) ?? []) as unknown as Row[]); return ra }
   const r = await env.DB.prepare('SELECT qid, y, vkn_json, nguon FROM omni_q WHERE qid IN (SELECT value FROM json_each(?))').bind(dsJson(qids)).all<Row>().catch(() => ({ results: [] as Row[] }))
   themDongQ(ra, r.results ?? [])
   return ra
@@ -1552,6 +1513,12 @@ export async function chupHoSoTho(env: Env, sbds: readonly string[], homNay: str
       lenh.push(env.DB.prepare(`INSERT OR REPLACE INTO omni_p_vkn (sbd, vkn_id, p, n_tu_lam, n_cau, n_ngay, n_troi_chay, n_cau_la_dung, diem_sprt, trang_thai, day_lai, phien_ban, cap_nhat_luc)
           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(s, k, v.p, v.nTuLam, v.nCau, v.nNgay, v.nTroiChay, v.nCauLaDung, v.diemSprt, v.trangThai, v.dayLai ? 1 : 0, hs.phienBan || PHIEN_BAN_OMNI, moc))
     }
+  }
+  // 28/10: bản gọn điểm kỹ năng (diem-gon.ts) ghi CÙNG lượt chụp — nơi đọc thấy cùng mốc với omni_em ⇒ một dòng.
+  await chayDdlMotLan(env, 'omni_p_gon_2810', LENH_BANG_DIEM_GON)
+  for (const s of sbds) {
+    const hs = m.get(s)?.hs ?? hoSoRong(s, homNay, ts)
+    lenh.push(lenhDiemGon(env, s, moc, Object.keys(hs.vkn).sort().map((k) => [k, hs.vkn[k]!.p, hs.vkn[k]!.trangThai] as const)))
   }
   for (let i = 0; i < lenh.length; i += LENH_MOI_GOI) await env.DB.batch(lenh.slice(i, i + LENH_MOI_GOI))
   return sbds.length
