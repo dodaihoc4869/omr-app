@@ -57,10 +57,6 @@ jobs:
           SUB=$(curl -fsS -H "Authorization: Bearer $CF_TOKEN_SACH" "https://api.cloudflare.com/client/v4/accounts/$CF_ACC_SACH/workers/subdomain" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).result.subdomain))')
           echo "GOC=https://omr-thu-tai.$SUB.workers.dev" >> "$GITHUB_ENV"
 
-      - name: "Cấu hình · bản sao đọc D1 + KV (chỉ cấu hình, không đọc dữ liệu)"
-        if: contains(env.LENH, 'hoi') || contains(env.LENH, 'kv-tao') || contains(env.LENH, 'bat-')  || contains(env.LENH, 'tat-')
-        run: node scripts/thu-tai/sao-chep-d1.mjs
-
       # ───────────── ĐẾM (CHỈ ĐỌC D1 thật; luật #543: CẤM export) ─────────────
       - name: "Đếm · số dòng từng bảng D1 thật (max(rowid) / COUNT từng câu, ngoài cao điểm)"
         if: contains(env.LENH, 'dem')

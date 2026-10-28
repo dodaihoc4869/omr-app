@@ -1,0 +1,32 @@
+# 28/10 (claude/kv-san-sang-2810): CẤU HÌNH bản sao đọc D1 (read replication) + KV Sảnh lập sẵn — chỉ gọi API cấu hình Cloudflare, không đọc/ghi dòng dữ liệu.
+# Lệnh: dòng đầu scripts/thu-tai/cau-hinh-kv.txt (xem scripts/thu-tai/sao-chep-d1.mjs).
+name: Cấu hình KV + bản sao đọc D1 (28/10)
+on:
+  push:
+    branches: [claude/thu-tai-kv-2810]
+    paths: ['.github/workflows/cau-hinh-kv-2810.yml', 'scripts/thu-tai/cau-hinh-kv.txt']
+permissions:
+  contents: read
+concurrency:
+  group: cau-hinh-kv-2810
+  cancel-in-progress: false
+jobs:
+  cau-hinh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DB_THAT: d2e6d322-374a-45d7-83a3-9fac486b23f1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Bản sao đọc D1 + KV
+        run: |
+          curl -s -H "Authorization: Bearer $CF_TOKEN_SACH" https://api.cloudflare.com/client/v4/user | grep -oE '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}' | sort -u | while read -r E; do echo "::add-mask::$E"; done || true
+          LENH="$(head -n1 scripts/thu-tai/cau-hinh-kv.txt | tr -d '\r')" node scripts/thu-tai/sao-chep-d1.mjs
