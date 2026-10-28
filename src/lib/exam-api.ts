@@ -159,7 +159,9 @@ async function postJson(_scriptUrl: string, body: unknown, giay: number = HAN_GI
     // Lệnh công khai của em (không `secret`) giữ nguyên câu cũ — 403 ở đó là lý do khác, không được gán cho mã bí mật.
     const coMa = typeof (body as { secret?: unknown } | null)?.secret === 'string' && (body as { secret: string }).secret !== ''
     if (res.status === 403 && coMa) throw new Error(`Máy chủ trả lỗi HTTP 403 — mã bí mật trên máy này chưa đúng. Vào Cài đặt (mục Kết nối máy chủ), nhập lại mã rồi bấm Lưu.`)
-    throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
+    // 28/10 (thầy chụp lỗi D1 export): 5xx = máy chủ bận / trục trặc tạm ⇒ câu Việt, không mã số. Có chữ «đang bận» nên `loiNenThuLai` vẫn tự thử lại
+    // như khi còn «HTTP 5». 4xx giữ câu cũ (máy chủ từ chối thật, thử lại vô ích).
+    throw new Error(res.status > 499 ? 'Máy chủ đang bận. Bài vẫn lưu trên máy, tự gửi lại.' : `Máy chủ trả lỗi HTTP ${res.status}`)
   }
   const r = await res.json()
   // Mọi phản hồi có serverNow → hiệu chỉnh đồng hồ theo máy chủ ngay tại đây,
