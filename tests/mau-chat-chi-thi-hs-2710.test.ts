@@ -120,7 +120,8 @@ describe('bộ màu B «Chất chỉ thị» sáng bằng Duolingo (thầy 27/10
   it('màu chính TÁCH khỏi màu đúng: Lộ trình, menu, rương, Bi đọc --tr-hs; «Tiếp tục» ở dải đúng đọc --tr-dung-nut', () => {
     for (const dong of [
       "html:root[data-trong='hs'] .da-bai { background: var(--tr-hs-nut); box-shadow: inset 0 -5px 0 var(--tr-hs-day); }",
-      "html:root[data-trong='hs'] :is(.da-nut[data-loai][data-tt='xong'], .da-nut[data-tt='xong'], .da-nut[data-loai='hoc'][data-tt='dang']) { --n: var(--tr-hs); --n-d: var(--tr-hs-day); }",
+      // 28/10 (thầy): CHỈ nút chặng học mặc chàm; Kiểm tra ôn tập / Tự sửa lỗi đã xong giữ màu riêng của loại
+      "html:root[data-trong='hs'] .da-nut[data-loai='hoc']:is([data-tt='xong'], [data-tt='dang']) { --n: var(--tr-hs); --n-d: var(--tr-hs-day); }",
       "html:root[data-trong='hs'] :is(.da-vong .chay, .da-vong .mo) { stroke: var(--tr-hs); }",
       "html:root[data-trong='hs'] .tr-vong[data-du] { background: conic-gradient(var(--tr-hs) calc(var(--p, 0) * 1%), var(--tr-mat-3) 0); }",
       "html:root[data-trong='hs'] .tr-menu-o { --d: var(--tr-hs-day); background: var(--tr-hs-nut); }",
@@ -128,6 +129,10 @@ describe('bộ màu B «Chất chỉ thị» sáng bằng Duolingo (thầy 27/10
       "html[data-trong='hs'] .bi { --bi-c: var(--tr-hs); }",
       "html:root[data-trong='hs'] .duo-ket[data-tt=dung] .duo-nut:not([data-sac]) { background: var(--tr-dung-nut); color: var(--tr-trang); box-shadow: inset 0 -4px 0 var(--tr-dung-day); }",
     ]) expect(mau).toContain(dong)
+    // Kiểm tra ôn tập / Tự sửa lỗi đã xong không bị luật nào ép sang chàm hay màu đúng (thầy 28/10: «hiển thị đúng màu riêng … để học sinh phân biệt»)
+    const hsCss = doc('src/styles/trong-hs.css').replace(/\/\*[\s\S]*?\*\//g, '')
+    expect(hsCss).not.toMatch(/\.da-nut\[data-loai\]\[data-tt='xong'\]/)
+    expect(mau.replace(/\/\*[\s\S]*?\*\//g, '')).not.toMatch(/\.da-nut(\[data-loai\])?\[data-tt='xong'\]/)
     expect(de2000(bang.sang['--tr-hs']!, bang.sang['--tr-dung']!)).toBeGreaterThanOrEqual(30)
     expect(de2000(bang.toi['--tr-hs']!, bang.toi['--tr-dung']!)).toBeGreaterThanOrEqual(30)
   })
@@ -149,7 +154,7 @@ describe('bộ màu B «Chất chỉ thị» sáng bằng Duolingo (thầy 27/10
       return [a, b, c]
     }
     const so = (x: [number, number, number], y: [number, number, number]) => x[0] - y[0] || x[1] - y[1] || x[2] - y[2]
-    const luatMau = mau.match(/^(html:root\[data-trong='hs'\] :is\(\.da-nut[^{]*)\{ --n: var\(--tr-hs\); --n-d: var\(--tr-hs-day\); \}/m)
+    const luatMau = mau.match(/^(html:root\[data-trong='hs'\] \.da-nut[^{]*)\{ --n: var\(--tr-hs\); --n-d: var\(--tr-hs-day\); \}/m)
     expect(luatMau).not.toBeNull()
     const ta = uuTien(luatMau![1]!.trim())
     const hs = doc('src/styles/trong-hs.css').replace(/\/\*[\s\S]*?\*\//g, '')

@@ -52,7 +52,9 @@ html:root[data-trong='hs'] .da-bai { background: var(--tr-hs-nut); box-shadow: i
 html:root[data-trong='hs'] .da-dai { background: var(--tr-hs-nut); box-shadow: inset 0 -5px 0 var(--tr-hs-day), 0 10px 18px -12px var(--tr-phu); }
 /* nút chặng đã xong / đang học: mặt chàm + đáy 3D CÙNG HỌ chàm. 28/10: #485 thêm luật «.da-nut[data-loai][data-tt='xong'] { --n-d: var(--tr-dung-day) }»
    (độ ưu tiên 0,5,0) thắng luật cũ ở đây ⇒ mặt chàm, đáy LỤC (ảnh thầy). Luật dưới ưu tiên 0,5,1 — thắng mọi luật nút chặng của trong-hs.css. */
-html:root[data-trong='hs'] :is(.da-nut[data-loai][data-tt='xong'], .da-nut[data-tt='xong'], .da-nut[data-loai='hoc'][data-tt='dang']) { --n: var(--tr-hs); --n-d: var(--tr-hs-day); }
+/* 28/10 (thầy, ảnh Kiểm tra ôn tập «Đã nộp · điểm 4/10» mà nút ✓ màu chàm như chặng): CHỈ nút CHẶNG HỌC mặc chàm khi xong; Kiểm tra ôn tập / Tự sửa lỗi
+   đã xong giữ màu riêng của loại (luật `.da-nut[data-loai='kiem' | 'sua']` của trong-hs.css) để em phân biệt với chặng. */
+html:root[data-trong='hs'] .da-nut[data-loai='hoc']:is([data-tt='xong'], [data-tt='dang']) { --n: var(--tr-hs); --n-d: var(--tr-hs-day); }
 html:root[data-trong='hs'] :is(.da-vong .chay, .da-vong .mo) { stroke: var(--tr-hs); }
 html:root[data-trong='hs'] .da-lan { border-color: var(--tr-hs); }
 html:root[data-trong='hs'] .tr-vong[data-du] { background: conic-gradient(var(--tr-hs) calc(var(--p, 0) * 1%), var(--tr-mat-3) 0); }
