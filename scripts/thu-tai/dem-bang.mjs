@@ -54,4 +54,7 @@ for (const [t, cot] of [['su_kien_hoc', 'sbd'], ['su_kien_hoc', 'qid']]) {
 const kq = { luc: new Date().toISOString(), dem, nhom, tongD1ms: Math.round(tongD1) }
 fs.writeFileSync(RA, JSON.stringify(kq))
 console.log(`Tổng thời gian D1 của mọi câu: ${Math.round(tongD1)} ms`)
-console.log('DEM_JSON ' + JSON.stringify(kq))
+// Lưới an toàn: chuỗi nào trông như SBD (≥ 6 chữ số liền) hoặc email ⇒ che trước khi in ra log công khai.
+const che = (v) => (typeof v === 'string' ? v.replace(/\d{6,}/g, '#').replace(/[\w.%+-]+@[\w.-]+/g, '<…>') : v)
+const sach = JSON.parse(JSON.stringify(kq), (_, v) => che(v))
+console.log('DEM_JSON ' + JSON.stringify(sach))

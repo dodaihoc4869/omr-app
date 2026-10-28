@@ -1,2 +1,3 @@
-don
-# lần 2: xoá Worker sao bằng API
+nghi
+# Đo lại (sau khi phiên máy chủ sửa xong), cùng điều kiện, cron nhánh cao điểm:
+# sinh worker chay / noi=aws:ap-east-1 / ktcn-tat / so_em=270 (rồi 135) / phut=12 / am=3 / gio_vn=20
