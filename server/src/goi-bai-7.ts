@@ -373,7 +373,8 @@ const SQL_DIEM_GON = `SELECT NULL AS vkn_id, NULL AS p, NULL AS trang_thai, g.js
     AND NOT EXISTS (SELECT 1 FROM omni_p_gon g JOIN omni_em e ON e.sbd = g.sbd AND e.cap_nhat_luc = g.moc WHERE g.sbd = ?1)`
 async function docDiemKyNangGon(env: Env, sbd: string): Promise<{ results: Row[] }> {
   let r: { results?: Row[] }
-  try { r = await env.DB.prepare(SQL_DIEM_GON).bind(sbd).all<Row>() } catch { return env.DB.prepare('SELECT vkn_id,p,trang_thai FROM omni_p_vkn WHERE sbd=?').bind(sbd).all<Row>() }
+  // Bảng gọn chưa có (D1 mới, trước đêm chụp đầu tiên) ⇒ câu cũ KÈM mốc ảnh chụp ⇒ tạo bảng + cất nền như dưới.
+  try { r = await env.DB.prepare(SQL_DIEM_GON).bind(sbd).all<Row>() } catch { r = await env.DB.prepare('SELECT vkn_id, p, trang_thai, NULL AS j, (SELECT cap_nhat_luc FROM omni_em WHERE sbd = ?1) AS m FROM omni_p_vkn WHERE sbd = ?1').bind(sbd).all<Row>() }
   const ds = r.results ?? []
   const gon = ds.find((x) => x.j != null)
   if (gon) {
