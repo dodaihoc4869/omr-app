@@ -148,8 +148,11 @@ async function daySuaNgay(token: string, sbd: string): Promise<boolean> {
     const nk = JSON.parse(localStorage.getItem(`omr_tu_sua_hom_nay_${sbd}`) || 'null') as { n?: unknown; m?: unknown; x?: unknown; them?: unknown } | null
     if (!nk || typeof nk.n !== 'string' || !Array.isArray(nk.m) || !Array.isArray(nk.x) || !nk.x.length) return false
     const goc = (await layDiaChiMayChu('')) || 'https://omr.ttadodaihoc.workers.dev'
-    const r = await fetch(`${goc}/hs/chua-cau-sai/viec-ngay`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ngay: nk.n, m: nk.m, x: nk.x, them: Number(nk.them) || 0, token }), signal: AbortSignal.timeout(10_000) })
-    return ((await r.json()) as { ok?: unknown } | null)?.ok === true
+    const c = new AbortController(), h = setTimeout(() => c.abort(), 10_000) // iPhone cũ (iOS 14–15) chưa có AbortSignal.timeout
+    try {
+      const r = await fetch(`${goc}/hs/chua-cau-sai/viec-ngay`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ngay: nk.n, m: nk.m, x: nk.x, them: Number(nk.them) || 0, token }), signal: c.signal })
+      return ((await r.json()) as { ok?: unknown } | null)?.ok === true
+    } finally { clearTimeout(h) }
   } catch { return false }
 }
 
