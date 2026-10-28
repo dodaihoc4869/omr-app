@@ -425,10 +425,8 @@
 [data-trong] .duo-ket[data-tt=sai] { background: var(--tr-sai-nhat); }
 [data-trong] .duo-ket[data-tt=trung] { background: var(--tr-mat-2); }
 /* CHẤM NHANH 28/10 (thầy «bấm kiểm tra … chưa tức thì ngay»): chạm «Kiểm tra» ⇒ dải trượt lên NGAY ở trạng thái trung tính «Đang chấm…» (màu mặt phụ như dải
-   «chưa tính»); kết quả về ⇒ CÙNG dải đổi nền đúng / sai tại chỗ (chuyển màu ngắn, không trượt lại). Giảm chuyển động / máy yếu ⇒ đổi ngay. */
+   «chưa tính», nút chờ giữ dáng `data-cho` cũ); kết quả về ⇒ CÙNG dải đổi nền đúng / sai tại chỗ, không trượt lại. */
 [data-trong] .duo-ket[data-tt=cho] { background: var(--tr-mat-2); }
-[data-trong] .duo-ket[data-tt=cho] h2 { color: var(--tr-chu-2); }
-[data-trong] .duo-ket { transition: background-color .16s ease-out; }
 @keyframes duo-truot { from { transform: translateY(100%); } }
 [data-trong] .duo-kq { display: flex; align-items: flex-start; gap: 14px; }
 [data-trong] .duo-kq-o { display: grid; place-items: center; flex: none; width: 52px; height: 52px; border-radius: 50%; background: var(--tr-mat); color: var(--tr-chu-2); }
@@ -482,9 +480,8 @@
   [data-trong] .duo .ht2-lam-pa, [data-trong] .duo .ht2-lam-pa[data-ket] { min-height: 52px; font-size: 17px; }
   [data-trong] .duo-xong { padding-top: 12px; gap: 10px; }
 }
-@media (prefers-reduced-motion: reduce) { [data-trong] :is(.duo-ket, .duo-lg-the) { animation: none; } [data-trong] .duo-ket { transition: none; } [data-trong] .duo-thanh > i { transition: none; } }
+@media (prefers-reduced-motion: reduce) { [data-trong] :is(.duo-ket, .duo-lg-the) { animation: none; } [data-trong] .duo-thanh > i { transition: none; } }
 [data-trong].may-yeu :is(.duo-ket, .duo-lg-the) { animation: none; }
-[data-trong].may-yeu .duo-ket { transition: none; }
 [data-trong].may-yeu .duo-thanh > i { transition: none; }
 [data-trong] .duo-hai .duo-nut { padding: 0 10px; font-size: 15px; letter-spacing: .02em; }
 /* Ô phương án KHÔNG chèn chữ «Em chọn · đáp án» ở mọi khổ (như bản vẽ: màu xanh/đỏ + tấm kết quả «Đáp án: …» đã nói) — chữ chỉ còn cho trình đọc màn hình. */

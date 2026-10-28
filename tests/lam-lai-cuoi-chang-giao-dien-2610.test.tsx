@@ -9,6 +9,8 @@ import ManLamBaiTap from '../src/components/hoc-tap/ManLamBaiTap'
 import { goiHoa2 } from '../src/components/hoa2/api'
 import type { TomTatGoi7 } from '../src/lib/goi-bai-7'
 vi.mock('../src/components/hoa2/api', async (goc) => ({ ...(await goc<typeof import('../src/components/hoa2/api')>()), goiHoa2: vi.fn() }))
+// «Kiểm tra» của màn Duo đi theo luồng (doc-luong-nop.ts) — ở test đi qua cùng `goiHoa2` giả như trước (không dòng tạm).
+vi.mock('../src/components/hoa2/doc-luong-nop', async () => { const api = await import('../src/components/hoa2/api'); return { nopCauLuong: (token: string, du: Record<string, unknown>, giay: number) => api.goiHoa2('answer', token, du, giay) } })
 afterEach(() => { cleanup(); vi.clearAllMocks(); vi.mocked(goiHoa2).mockReset(); localStorage.clear(); delete document.documentElement.dataset.trong })
 
 const nen = { maDe: 'DH-12-B1', version: 'v1', hinhAnh: [], dang: 'D0', tenDang: 'Amine', mucDo: 'NB', sao: 0, kienThuc: [], ideas: [] }

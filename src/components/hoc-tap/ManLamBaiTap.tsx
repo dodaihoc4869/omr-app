@@ -6,7 +6,7 @@ import '../../lib/chem-trinh-bay' // thầy 27/10: phương trình rõ ràng (kh
 import type { TheCauProps } from '../TheCau'
 import { loiGiaiChuanTuKho } from '../loi-giai/KhoiLoiGiaiChuan'
 import { goiHoa2 } from '../hoa2/api'
-import { docLuongNop } from '../hoa2/doc-luong-nop'
+import { nopCauLuong } from '../hoa2/doc-luong-nop'
 import { boChangMoTruoc, GIAY_CHO_MO_CHANG, layChangMoTruoc, moChangTruoc } from './mo-chang-truoc'
 // Tên trang chính trên nút «về» (Boss 27/10): giao diện Trong ⇒ «Lộ trình»; giao diện cũ ⇒ «Hôm nay». Viết tại chỗ: nhập mô-đun dùng chung sẽ đẻ mảnh tải riêng (+1 tệp mở app).
 const tenTrangChinh = (): string => (typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Lộ trình' : 'Hôm nay')
@@ -351,7 +351,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
         setKet(v => v[qidNop] ? v : { ...v, [qidNop]: { ...(o as unknown as Ket), tam: true, assisted, ...(o.khongTinh === true ? { thuong: { tinh: false, nguyenTu: 0, dong: [], chuoiDung: 0 } } : {}) } })
       }
       const than = { session: phien, qid: q.qid, answer: tra, assisted, msLam, doGiay: dhMs.current >= 1000 ? { g: Math.round(dhMs.current / 1000), v: dhT.current.v, a: dhT.current.a, l: Math.max(dhT.current.l, dhT.current.lang), n: dhT.current.n, w: dhW.current ? 1 : 0 } : undefined }
-      const r = await guiLaiBenVung(() => duo ? goiHoa2('answer', token, than, 15, { tam: khiTam, doc: docLuongNop }) : goiHoa2('answer', token, than, 15)) // chống trùng theo biên nhận ⇒ kẹt mạng tự gửi lại
+      const r = await guiLaiBenVung(() => duo ? nopCauLuong(token, than, 15, khiTam) : goiHoa2('answer', token, than, 15)) // chống trùng theo biên nhận ⇒ kẹt mạng tự gửi lại
       if (typeof r.correct !== 'boolean' || typeof r.answer !== 'string') throw new Error(typeof r.error === 'string' ? r.error : 'Chưa xác nhận được bài nộp. Em thử lại; kết quả không bị tính hai lần.')
       setMsCau(v => ({ ...v, [q.qid]: msLam }))
       // LẶP CÂU (27/10): lượt mở chặng trước (Hôm nay gọi sẵn) lập TRƯỚC câu này ⇒ có thể chứa đúng câu em vừa làm — bỏ, hết chặng sẽ mở trước lượt mới.
@@ -745,7 +745,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       // CHẤM NHANH (28/10): chạm «Kiểm tra» ⇒ dải kết quả trượt lên NGAY ở trạng thái trung tính «Đang chấm…»; kết quả về ⇒ CÙNG dải đổi màu đúng / sai tại chỗ.
       : cham ? <section className="duo-day duo-ket" data-tt="cho" role="status" aria-live="polite" aria-busy="true"><div className="duo-giua">
           <div className="duo-kq"><div className="duo-kq-chu"><div className="duo-ct-dau"><h2>Đang chấm…</h2></div></div></div>
-          <div className="duo-hang-nut"><button ref={nutTiepRef} type="button" className="duo-nut" disabled>Đang kiểm tra…</button></div>
+          <div className="duo-hang-nut"><button ref={nutTiepRef} type="button" className="duo-nut" data-cho="" aria-busy="true" disabled>Đang kiểm tra…</button></div>
         </div></section>
       : choChonCach ? <div className="duo-day"><div className="duo-giua">
           <div className="duo-hai">
@@ -756,7 +756,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
         </div></div>
       : <div className="duo-day"><div className="duo-giua">
           {loi && <p className="duo-loi" role="alert">{loi}</p>}
-          <button type="button" className="duo-nut" data-cho={nop || undefined} aria-busy={nop || undefined} onClick={(e) => { e.currentTarget.setAttribute('data-lun', ''); phanHoi('chon'); void nopCau() }} disabled={nop || !duocNop}>{nop ? 'Đang kiểm tra…' : q.phan === 'II' && soYChua ? `Còn ${soYChua} ý chưa chọn` : 'Kiểm tra'}</button>
+          <button type="button" className="duo-nut" onClick={(e) => { e.currentTarget.setAttribute('data-lun', ''); phanHoi('chon'); void nopCau() }} disabled={nop || !duocNop}>{q.phan === 'II' && soYChua ? `Còn ${soYChua} ý chưa chọn` : 'Kiểm tra'}</button>
         </div></div>
 
     // MÀN KẾT BÀI thưởng phạt (bản vẽ tp-3): một màn đủ «được bao nhiêu nguyên tử, vì sao · hôm nay còn mấy bài · hạng giải». «Tiếp tục» ⇒ về Lộ trình;
