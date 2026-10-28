@@ -93,16 +93,27 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
         run: |
           set -euo pipefail
-          F="$TT/omr-xuat.sql"
-          trap 'rm -f "$F"' EXIT
+          F="$TT/omr-xuat.sql"; N="$TT/omr-nap"; DBT="$TT/omr-tam.sqlite"
+          trap 'rm -f "$F" "$N"-*.sql "$DBT"' EXIT
           an() { sed -E "s/'[^']*'/'…'/g; s/[0-9]{4,}/#/g" | cut -c1-160; }
           T0=$(date +%s)
           npx wrangler d1 export omr --remote --output "$F" > "$TT/xuat.log" 2>&1 || { echo "Export lỗi:"; tail -n 15 "$TT/xuat.log" | an; exit 1; }
-          echo "Export xong sau $(( $(date +%s) - T0 )) s · $(du -m "$F" | cut -f1) MB · $(grep -c '^INSERT' "$F" || true) dòng INSERT"
+          echo "Export xong sau $(( $(date +%s) - T0 )) s · $(du -m "$F" | cut -f1) MB"
+          # D1 giới hạn mỗi câu 100 KB ⇒ tách dòng lớn (run 40608357630: SQLITE_TOOBIG); chia nhiều phần để mỗi lượt nạp nhỏ.
           T0=$(date +%s)
-          npx wrangler d1 execute omr-thu-tai --remote -c wrangler-thu-tai.toml --file "$F" -y > "$TT/nap.log" 2>&1 || { echo "Nạp lỗi:"; tail -n 20 "$TT/nap.log" | an; exit 1; }
-          echo "Nạp xong sau $(( $(date +%s) - T0 )) s"; tail -n 6 "$TT/nap.log" | an
-          rm -f "$F"; echo "Đã xoá tệp export."
+          python3 -I ../scripts/thu-tai/chia-nap.py "$F" "$N" "$DBT" 2>&1 | an
+          rm -f "$F" "$DBT"; echo "Đã xoá tệp export + SQLite tạm (tách xong sau $(( $(date +%s) - T0 )) s)."
+          for P in "$N"-*.sql; do
+            T0=$(date +%s); OK=0
+            for LAN in 1 2; do
+              if npx wrangler d1 execute omr-thu-tai --remote -c wrangler-thu-tai.toml --file "$P" -y > "$TT/nap.log" 2>&1; then OK=1; break; fi
+              echo "Phần $(basename "$P") lỗi lần $LAN:"; grep -E "ERROR|✘" "$TT/nap.log" | an | head -n 3
+            done
+            [ "$OK" = 1 ] || exit 1
+            echo "Nạp $(basename "$P") ($(du -m "$P" | cut -f1) MB) xong sau $(( $(date +%s) - T0 )) s"
+            rm -f "$P"
+          done
+          echo "Đã nạp hết và xoá mọi tệp nạp."
       - name: "Dựng 4 · trong D1 SAO: bỏ đăng ký đẩy tin, chọn 270 em, đặt mật khẩu thử"
         if: contains(env.LENH, 'dung')
         working-directory: server

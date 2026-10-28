@@ -81,7 +81,8 @@ async function em(sbd) {
   const tk = token(sbd)
   await ngu(ng(0, PHUT_LEN * 60_000))
   // Nền: thưởng (công tắc tạm đóng) 60 s, thông báo 180 s.
-  const nen = (ten, duong, coSo, lech) => (async () => { await ngu(ng(5_000, coSo)); while (Date.now() < HET) { await goi(ten, duong, { token: tk }); await ngu(coSo + ng(-lech, lech)) } })()
+  const cho = (ms) => ngu(Math.max(0, Math.min(ms, HET - Date.now())))
+  const nen = (ten, duong, coSo, lech) => (async () => { await cho(ng(5_000, coSo)); while (Date.now() < HET) { await goi(ten, duong, { token: tk }); await cho(coSo + ng(-lech, lech)) } })()
   const ds = [nen('nen_thuong', '/hs/thuong', 60_000, 10_000), nen('nen_thong_bao', '/notifications/list', 180_000, 30_000)]
   // Mở app: loạt hỏi sớm song song (nap-truoc-man-em.ts) — đo Sảnh riêng + cả loạt.
   const t0 = performance.now()
@@ -100,7 +101,7 @@ async function em(sbd) {
     const s = await goi('mo_chang', '/game-v2/hoc-tap-start', { token: tk }, { giay: 40 })
     const cau = Array.isArray(s.questions) ? s.questions : []
     soChang.mo++
-    if (!s.id || !cau.length) { soChang.rong++; await ngu(ng(20_000, 40_000)); await goi(['sanh', 'sanh_ve'], '/game-v2/hoc-tap-sanh', { token: tk }); continue }
+    if (!s.id || !cau.length) { soChang.rong++; await cho(ng(20_000, 40_000)); if (Date.now() >= HET) break; await goi(['sanh', 'sanh_ve'], '/game-v2/hoc-tap-sanh', { token: tk }); continue }
     for (const q of cau.slice(0, 6)) {
       if (Date.now() >= HET) break
       const nghi = ng(3_000, 15_000)
@@ -117,10 +118,10 @@ async function em(sbd) {
 }
 
 async function thay() {
-  while (Date.now() < HET) { await goi('thay_bang_tin', '/gv/bang-tin-song', {}, { dau: { 'x-ma-bi-mat': SEED } }); await ngu(30_000) }
+  while (Date.now() < HET) { await goi('thay_bang_tin', '/gv/bang-tin-song', {}, { dau: { 'x-ma-bi-mat': SEED } }); await ngu(Math.max(0, Math.min(30_000, HET - Date.now()))) }
 }
 async function doMang() {
-  while (Date.now() < HET) { await goi('khoe_mang', '/khoe', null, { get: true, giay: 10 }); await ngu(5_000) }
+  while (Date.now() < HET) { await goi('khoe_mang', '/khoe', null, { get: true, giay: 10 }); await ngu(Math.max(0, Math.min(5_000, HET - Date.now()))) }
 }
 
 const pv = (a, p) => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y); return Math.round(s[Math.min(s.length - 1, Math.floor(p * s.length))]) }
