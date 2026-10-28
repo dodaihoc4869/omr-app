@@ -139,6 +139,11 @@ export class LoiKhoThi extends Error {
   }
 }
 
+/** MỘT KẾT NỐI DÙNG CHUNG (28/10, tối ưu tốc độ): trước đây mỗi lần lưu câu / đọc kho đều `openDB` mới và không đóng ⇒ mỗi thao tác thêm một lượt mở
+ *  kho, kết nối dồn lại, máy yếu chậm dần (dễ chạm hạn 3 giây của kho). Nay mở một lần, dùng lại; mở lỗi / hết hạn / thao tác lỗi (kể cả kết nối bị
+ *  trình duyệt đóng) ⇒ bỏ kết nối, lần sau mở lại như cũ. */
+let ketNoi: Promise<IDBPDatabase> | null = null
+
 async function thaoTacKho<T, M extends 'readonly' | 'readwrite'>(db: IDBPDatabase, ten: string, cheDo: M, viec: (tx: IDBPTransaction<unknown, [string], M>) => Promise<T>): Promise<T> {
   const tx = db.transaction(ten, cheDo)
   // Đăng ký cả done trước khi chạy request; abort không sinh lời hứa lỗi không ai nhận.
@@ -149,11 +154,17 @@ async function thaoTacKho<T, M extends 'readonly' | 'readwrite'>(db: IDBPDatabas
     return (await voiHanCho(Promise.all([viec(tx), done]), HAN_KHO_THI_MS, 'Kho bài chưa phản hồi.', huy))[0]
   } catch {
     huy()
+    // kết nối dùng chung có thể đã hỏng (đang đóng, kho treo) ⇒ lần sau mở kết nối mới
+    ketNoi = null
     throw new LoiKhoThi(cheDo === 'readonly' ? 'doc' : 'ghi')
   }
 }
 
-async function getDb(): Promise<IDBPDatabase> {
+function getDb(): Promise<IDBPDatabase> {
+  return ketNoi ??= moDb().catch((e: unknown) => { ketNoi = null; throw e })
+}
+
+async function moDb(): Promise<IDBPDatabase> {
   let hetCho = false
   // Hết hạn phải rollback cả migration đã bắt đầu nhưng chưa commit.
   let nangCap: IDBPTransaction<unknown, string[], 'versionchange'> | undefined
@@ -175,8 +186,11 @@ async function getDb(): Promise<IDBPDatabase> {
       }
       // v1 dùng object store tên khác cho nội dung đề/bài làm — xoá sạch làm lại vì
       // đổi hẳn shape dữ liệu (đề cố định theo vị trí -> ngân hàng câu random theo id).
-      if (db.objectStoreNames.contains('examContents')) db.deleteObjectStore('examContents')
-      if (db.objectStoreNames.contains('attempts')) db.deleteObjectStore('attempts')
+      // CHỈ khi nâng từ v1: từ v2 `attempts` là bài làm thật (có bài chưa gửi) — nâng DB_VERSION sau này không được xoá.
+      if (oldVersion < 2) {
+        if (db.objectStoreNames.contains('examContents')) db.deleteObjectStore('examContents')
+        if (db.objectStoreNames.contains('attempts')) db.deleteObjectStore('attempts')
+      }
       if (!db.objectStoreNames.contains(STORE_SOURCES)) db.createObjectStore(STORE_SOURCES, { keyPath: 'maDe' })
       if (!db.objectStoreNames.contains(STORE_ATTEMPTS)) db.createObjectStore(STORE_ATTEMPTS, { keyPath: 'key' })
       if (!db.objectStoreNames.contains(STORE_SESSION_CACHE)) db.createObjectStore(STORE_SESSION_CACHE)
@@ -667,7 +681,7 @@ export async function deleteExamSource(maDe: string): Promise<void> {
   await db.delete(STORE_SOURCES, maDe)
 }
 
-export function attemptKey(maCa: string, sbd: string): string {
+function attemptKey(maCa: string, sbd: string): string {
   return `${maCa}:${sbd}`
 }
 

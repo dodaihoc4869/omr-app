@@ -1,11 +1,17 @@
 // Kho thi không được giữ màn chờ vô hạn hoặc trả "không có nháp" khi chưa đọc được nháp.
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
-import { loadAttempt, loadCachedSession, loadCauHinhMayChu, loadScriptUrlHoacMacDinh, saveAttempt } from '../src/lib/exam-db'
+// Kho thi giữ MỘT kết nối dùng chung (28/10) ⇒ mỗi ca test nạp lại mô-đun để kho giả của ca trước không bị dùng lại.
+let K: typeof import('../src/lib/exam-db')
+const loadAttempt: typeof K.loadAttempt = (...a) => K.loadAttempt(...a)
+const loadCachedSession: typeof K.loadCachedSession = (...a) => K.loadCachedSession(...a)
+const loadCauHinhMayChu: typeof K.loadCauHinhMayChu = (...a) => K.loadCauHinhMayChu(...a)
+const loadScriptUrlHoacMacDinh: typeof K.loadScriptUrlHoacMacDinh = (...a) => K.loadScriptUrlHoacMacDinh(...a)
+const saveAttempt: typeof K.saveAttempt = (...a) => K.saveAttempt(...a)
 const m = vi.hoisted(() => ({ mo: vi.fn() }))
 vi.mock('idb', () => ({ openDB: (...a: unknown[]) => m.mo(...a) }))
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://worker.test' }))
 const nhap = { key: 'ca1:S1', maCa: 'ca1', sbd: 'S1', answers: { phanI: { q1: 'B' }, phanII: {}, phanIII: {} }, submitted: true, pendingSubmit: true }
-beforeEach(() => vi.useFakeTimers())
+beforeEach(async () => { vi.resetModules(); K = await import('../src/lib/exam-db'); vi.useFakeTimers() })
 afterEach(() => { vi.useRealTimers(); m.mo.mockReset() })
 it('openDB treo quá 6 giây: đọc lượt/cached phải báo lỗi, cấu hình về dự phòng; không coi nháp là rỗng', async () => {
   m.mo.mockImplementation(() => new Promise(() => {}))
@@ -138,4 +144,34 @@ it('ghi transaction treo không báo ACK, abort ngăn ghi đè nháp khi request
   k.ghiVeMuon(); await Promise.resolve()
   expect(k.abort).toHaveBeenCalled()
   expect(k.data.get('ca1:S1')).toEqual(nhap)
+})
+
+// TỐC ĐỘ 28/10: MỘT kết nối dùng chung — lưu câu liên tiếp không mở kho lại; nâng phiên bản từ v2 trở lên KHÔNG xoá bài làm chưa gửi.
+it('nhiều lần lưu / đọc liên tiếp chỉ mở kho MỘT lần; thao tác lỗi thì lần sau mở lại', async () => {
+  vi.useRealTimers()
+  const data = new Map<string, unknown>([['ca1:S1', nhap]])
+  let loi = false
+  const db = {
+    close: vi.fn(),
+    transaction: () => ({ store: { get: (k: string) => (loi ? Promise.reject(new Error('hỏng')) : Promise.resolve(data.get(k))), put: (v: { key: string }) => Promise.resolve(data.set(v.key, v)) }, done: Promise.resolve(), abort: vi.fn() }),
+  }
+  m.mo.mockResolvedValue(db)
+  await saveAttempt(nhap as never)
+  await saveAttempt(nhap as never)
+  expect(await loadAttempt('ca1', 'S1')).toEqual(nhap)
+  expect(m.mo).toHaveBeenCalledOnce()
+  loi = true
+  await expect(loadAttempt('ca1', 'S1')).rejects.toMatchObject({ name: 'LoiKhoThi' })
+  loi = false
+  expect(await loadAttempt('ca1', 'S1')).toEqual(nhap)
+  expect(m.mo).toHaveBeenCalledTimes(2)
+})
+it('nâng kho từ v2 (sau này đổi DB_VERSION) không xoá kho bài làm', async () => {
+  vi.useRealTimers()
+  const db = { close: vi.fn(), objectStoreNames: { contains: () => true }, deleteObjectStore: vi.fn(), createObjectStore: vi.fn(),
+    transaction: () => ({ store: { get: () => Promise.resolve(nhap) }, done: Promise.resolve(), abort: vi.fn() }) }
+  const tx = { done: Promise.resolve(), abort: vi.fn() }
+  m.mo.mockImplementation((_ten, _v, opt) => { opt.upgrade(db, 2, 3, tx); return Promise.resolve(db) })
+  expect(await loadAttempt('ca1', 'S1')).toEqual(nhap)
+  expect(db.deleteObjectStore).not.toHaveBeenCalled()
 })
