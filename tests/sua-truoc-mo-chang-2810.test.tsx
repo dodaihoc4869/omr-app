@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 // KHOÁ SAU SỬA LỖI Ở MÀN LÀM CHẶNG (ảnh thầy 28/10 19:55: khung đỏ «Em sửa xong lỗi hôm nay rồi mới mở chặng tiếp nhé.» + «Thử lại» ⇒ em kẹt).
 // Khoá: máy chủ chặn TU_SUA_TRUOC ⇒ (1) gửi ngay việc Sửa lỗi đã xong trên máy rồi mở lại MỘT lần (giờ cao điểm lượt gửi nền có thể hết giờ);
-// (2) vẫn chặn ⇒ thẻ trung tính + nút về Lộ trình, KHÔNG «Thử lại»; lỗi khác vẫn khung lỗi + «Thử lại» như cũ.
+// (2) vẫn chặn ⇒ (29/10, video thầy: Lộ trình cho bấm chặng 1 mà máy chủ chặn) báo `khoa: false` để GỠ dòng khoá cũ rồi mở lại; (3) vẫn chặn ⇒ thẻ trung tính + nút về Lộ trình,
+// KHÔNG «Thử lại»; lỗi khác vẫn khung lỗi + «Thử lại» như cũ.
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import ManLamBaiTap from '../src/components/hoc-tap/ManLamBaiTap'
@@ -32,7 +33,17 @@ describe('màn làm chặng: máy chủ chặn vì chưa xong Sửa lỗi', () =
     expect(vi.mocked(goiHoa2).mock.calls.filter((c) => c[0] === 'hoc-tap-start')).toHaveLength(2)
     expect(screen.queryByText(CHU)).toBeNull()
   })
-  it('vẫn chặn sau khi gửi ⇒ thẻ trung tính + «Về …» (làm mới rồi về), không «Thử lại»; chỉ thử lại một lần', async () => {
+  it('video thầy 29/10: chặng 1 Lộ trình cho bấm mà máy chủ chặn, KHÔNG có việc Sửa lỗi trên máy ⇒ báo khoa:false (gỡ khoá) rồi mở lại, câu hiện', async () => {
+    vi.mocked(goiHoa2).mockRejectedValueOnce(chan()).mockResolvedValueOnce({ ok: true, id: 'p1', questions: [C] })
+    render(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} />)
+    await screen.findByText('Câu một')
+    expect(goiViec()).toHaveLength(1)
+    const than = JSON.parse(String((goiViec()[0]![1] as RequestInit).body)) as Record<string, unknown>
+    expect(than).toMatchObject({ token: 'tk', khoa: false })
+    expect(than.ngay).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+    expect(screen.queryByText(CHU)).toBeNull()
+  })
+  it('vẫn chặn sau khi gửi tiến độ VÀ gỡ khoá ⇒ thẻ trung tính + «Về …» (làm mới rồi về), không «Thử lại»; tối đa hai lần mở lại', async () => {
     vi.mocked(goiHoa2).mockRejectedValue(chan())
     coViecTrenMay()
     const onVe = vi.fn(), onCapNhat = vi.fn()
@@ -41,21 +52,19 @@ describe('màn làm chặng: máy chủ chặn vì chưa xong Sửa lỗi', () =
     expect(the.closest('[role="status"]')).toBeTruthy()
     expect(screen.queryByRole('alert')).toBeNull()
     expect(screen.queryByRole('button', { name: /Thử lại/ })).toBeNull()
-    await waitFor(() => expect(vi.mocked(goiHoa2).mock.calls.filter((c) => c[0] === 'hoc-tap-start')).toHaveLength(2))
+    await waitFor(() => expect(vi.mocked(goiHoa2).mock.calls.filter((c) => c[0] === 'hoc-tap-start')).toHaveLength(3))
+    expect(goiViec()).toHaveLength(2) // tiến độ + gỡ khoá
     fireEvent.click(screen.getByRole('button', { name: /^Về / }))
     expect(onCapNhat).toHaveBeenCalled()
     expect(onVe).toHaveBeenCalled()
   })
-  it('không có gì trên máy để gửi / máy chủ không ghi ⇒ không mở lại, thẻ trung tính ngay', async () => {
+  it('máy chủ không ghi được (cả tiến độ lẫn gỡ khoá) ⇒ không mở lại, thẻ trung tính', async () => {
     vi.mocked(goiHoa2).mockRejectedValue(chan())
+    viecOk = false; coViecTrenMay()
     render(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} />)
     await screen.findByText(CHU)
-    expect(goiViec()).toHaveLength(0)
-    cleanup(); coViecTrenMay(); viecOk = false
-    render(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} />)
-    await screen.findByText(CHU)
-    expect(goiViec()).toHaveLength(1)
-    expect(vi.mocked(goiHoa2).mock.calls.filter((c) => c[0] === 'hoc-tap-start')).toHaveLength(2) // một lượt mỗi lần mở màn, không mở lại
+    expect(goiViec()).toHaveLength(2)
+    expect(vi.mocked(goiHoa2).mock.calls.filter((c) => c[0] === 'hoc-tap-start')).toHaveLength(1) // máy chủ không ghi ⇒ không mở lại
   })
   it('lỗi khác (mạng) vẫn khung lỗi + «Thử lại» như cũ', async () => {
     vi.mocked(goiHoa2).mockRejectedValue(new LoiHoa2('Máy chủ phản hồi chậm hoặc mạng gián đoạn. Em thử lại nhé.', 'het_gio'))

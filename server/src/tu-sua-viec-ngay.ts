@@ -59,6 +59,9 @@ export async function hsGhiViecNgay(env: Env, b: Obj, nowMs: number = Date.now()
   const ngay = ngayVn(nowMs)
   // Máy em lưu theo ngày của máy em: lệch ngày (qua nửa đêm, đồng hồ sai) ⇒ bỏ, không ghi đè ngày khác.
   if (str(b.ngay) !== ngay) return Response.json({ ok: true, boQua: 'khac_ngay', ngay })
+  // 29/10 (video thầy 06:10: Lộ trình cho bấm BẮT ĐẦU chặng 1 — nút Sửa lỗi đứng sau chặng 2 — mà máy chủ chặn «Em sửa xong lỗi hôm nay rồi mới mở chặng tiếp nhé»):
+  // dòng khoá cũ còn lại trong ngày dù Lộ trình em đang thấy KHÔNG khoá chặng ấy. Màn chặng chỉ mở được chặng mà Lộ trình đã cho bấm ⇒ máy em báo `khoa: false` ⇒ gỡ dòng khoá.
+  if (b.khoa === false) { await env.DB.prepare('DELETE FROM tu_sua_khoa_ngay WHERE sbd=?1 AND ngay_vn=?2').bind(sbd, ngay).run().catch(() => null); return Response.json({ ok: true, ngay, moKhoa: true }) }
   const m = chuanMuc(Array.isArray(b.m) ? b.m : [])
   const x = [...new Set((Array.isArray(b.x) ? b.x : []).filter((k): k is string => typeof k === 'string' && !!k && k.length <= 160))].slice(0, TOI_DA_MUC_NGAY * 2)
   const them = Math.min(12, Math.max(0, Math.floor(Number(b.them) || 0)))

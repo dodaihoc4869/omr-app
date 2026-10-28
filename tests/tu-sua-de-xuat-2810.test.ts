@@ -167,6 +167,19 @@ describe('(4) Việc hôm nay trên máy chủ', () => {
     const sau = await gameV2(d.env, 'hoc-tap-start', { token: d.token }).catch((e: Error) => ({ loi: e.message }))
     expect((sau as Record<string, unknown>).ma).not.toBe('TU_SUA_TRUOC')
   })
+  it('29/10 (video thầy: Lộ trình cho bấm chặng 1 mà máy chủ chặn): máy em báo khoa:false ⇒ gỡ dòng khoá ⇒ mở chặng không còn bị TU_SUA_TRUOC; báo lại khoa:true thì khoá lại', async () => {
+    const d = await dung()
+    const { docConPhanKhoa } = await import('../server/src/tu-sua-viec-ngay')
+    const { gameV2 } = await import('../server/src/game-v2')
+    await ghi(d, { m: muc(12), x: [], them: 0, khoa: true })
+    const sbd = (await d.env.DB.prepare('SELECT sbd FROM tu_sua_viec_ngay').first<{ sbd: string }>())!.sbd
+    expect(await gameV2(d.env, 'hoc-tap-start', { token: d.token })).toMatchObject({ ok: false, ma: 'TU_SUA_TRUOC' })
+    expect(await ghi(d, { khoa: false })).toMatchObject({ ok: true, moKhoa: true })
+    expect(await docConPhanKhoa(d.env, sbd)).toBe(0)
+    expect(await gameV2(d.env, 'hoc-tap-start', { token: d.token }).catch(() => ({}))).not.toMatchObject({ ma: 'TU_SUA_TRUOC' })
+    await ghi(d, { m: muc(12), x: [], them: 0, khoa: true })
+    expect(await docConPhanKhoa(d.env, sbd)).toBe(12)
+  })
   it('đợt em đã khép hôm nay ở màn sửa câu ⇒ có trong «đã xong» dù máy em chưa gửi', async () => {
     const d = await dung()
     await nop(d, '24')
