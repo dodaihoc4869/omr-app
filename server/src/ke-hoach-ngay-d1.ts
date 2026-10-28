@@ -231,6 +231,9 @@ export async function docTongHop(env: Env, arr: string, homNay: string, tuLuc: s
 export interface DauVaoBoSung {
   /** Hồ sơ ĐẦY ĐỦ (không chỉ phần thay đổi) của các em vừa `dungLaiHoSo` trong lượt này. Em không có ở đây ⇒ đọc D1 như cũ. */
   hoSoSan?: Map<string, { cau: NamKtCau[]; dang: NamKtDang[] }>
+  /** (28/10 giờ cao điểm) Hồ sơ ĐANG dựng lại cho `em` (lời hứa `dungLaiHoSo`, null = dựng hỏng): mọi lượt đọc khác bắt đầu NGAY, chỉ phần hồ sơ chờ
+   *  — trước: chờ dựng xong (4 đợt D1 nối tiếp) rồi mới bắt đầu đọc đầu vào. Dựng hỏng ⇒ đọc D1 cho các em ấy như cũ. */
+  hoSoCho?: { em: string[]; hua: Promise<Map<string, { cau: NamKtCau[]; dang: NamKtDang[] }> | null | undefined> }
   /** Tổng hợp `su_kien_hoc` hôm nay (tiến bộ, số câu hiển thị, giây tốc độ) nơi gọi đã đọc. `null` = đã thử và lỗi (giữ mặc định, không đọc lại). */
   tongHop?: Map<string, TongHopEm> | null
 }
@@ -247,19 +250,25 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number, bo: DauV
   // Mỗi lời hứa dưới đây KHÔNG ném lỗi (đã bọc `tat`) trừ khi ghi chú khác; ai ném thì được chặn cảnh báo chưa xử lý và vẫn ném đúng chỗ `await` cũ.
   const chan = <T,>(p: Promise<T>): Promise<T> => { p.catch(() => undefined); return p }
   // HẠ TẢI (Boss 22/09 M3): em có hồ sơ vừa dựng lại (`hoSoSan`) thì KHÔNG đọc `nam_kt_cau`/`nam_kt_dang` từ D1 nữa — hồ sơ nguồn không đổi giữa lúc dựng và lúc đọc lại (cùng một lượt xử lý); chỉ đọc D1 cho phần em còn lại (lô cron trộn em cũ/mới).
-  const hoSoSan = bo.hoSoSan
-  const emCanDocHoSo = hoSoSan ? em.filter((s) => !hoSoSan.has(s)) : em
-  const arrCanDoc = json(emCanDocHoSo)
+  const hoSoSan0 = bo.hoSoSan
+  const choEm = new Set(bo.hoSoCho?.em ?? [])
+  const emCanDocHoSo = em.filter((s) => !hoSoSan0?.has(s) && !choEm.has(s))
   const pCauHinh = chan(docCauHinhKeHoach(env))
   // Tối ưu 05/10: cờ phạm vi học (đệm 30 s) đọc CÙNG đợt các lượt đọc độc lập bên dưới — trước: một đợt riêng sau khi lọc câu phục vụ được.
   const pPhamViBat = chan(phamViBat(env))
   const pKhoiLop = chan(docKhoiVaLopCacEm(env, em).catch(() => ({ khoi: new Map<string, Khoi | null>(), lop: new Map<string, string>() })))
-  const pRc = emCanDocHoSo.length === 0 ? Promise.resolve(trong<Record<string, unknown>>()) : chan(tat(() => env.DB.prepare(
-    `SELECT sbd, qid, ma_dang, moc_on_ke, lan_sai, luc_cuoi FROM nam_kt_cau
-      WHERE ${IN_EM} AND trang_thai IN ('moi_sai','dang_on','da_khac_phuc','chua_thay_sai') AND can_day_lai = 0 AND moc_on_ke IS NOT NULL AND moc_on_ke <= ?`,
-  ).bind(arrCanDoc, homNay).all<Record<string, unknown>>(), trong()))
-  const pRd = emCanDocHoSo.length === 0 ? Promise.resolve(trong<Record<string, unknown>>()) : chan(tat(() => env.DB.prepare(`SELECT * FROM nam_kt_dang WHERE ${IN_EM}`).bind(arrCanDoc).all<Record<string, unknown>>(), trong()))
-  const pRn = emCanDocHoSo.length === 0 ? Promise.resolve(trong<Record<string, unknown>>()) : chan(tat(() => env.DB.prepare(`SELECT sbd, COUNT(*) AS n FROM nam_kt_cau WHERE ${IN_EM} AND trang_thai IN ('moi_sai','dang_on') GROUP BY sbd`).bind(arrCanDoc).all<Record<string, unknown>>(), trong()))
+  const docHoSoD1 = (ds: string[]) => {
+    const rong = () => Promise.resolve(trong<Record<string, unknown>>()), a = json(ds)
+    return {
+      rc: ds.length === 0 ? rong() : chan(tat(() => env.DB.prepare(
+        `SELECT sbd, qid, ma_dang, moc_on_ke, lan_sai, luc_cuoi FROM nam_kt_cau
+          WHERE ${IN_EM} AND trang_thai IN ('moi_sai','dang_on','da_khac_phuc','chua_thay_sai') AND can_day_lai = 0 AND moc_on_ke IS NOT NULL AND moc_on_ke <= ?`,
+      ).bind(a, homNay).all<Record<string, unknown>>(), trong())),
+      rd: ds.length === 0 ? rong() : chan(tat(() => env.DB.prepare(`SELECT * FROM nam_kt_dang WHERE ${IN_EM}`).bind(a).all<Record<string, unknown>>(), trong())),
+      rn: ds.length === 0 ? rong() : chan(tat(() => env.DB.prepare(`SELECT sbd, COUNT(*) AS n FROM nam_kt_cau WHERE ${IN_EM} AND trang_thai IN ('moi_sai','dang_on') GROUP BY sbd`).bind(a).all<Record<string, unknown>>(), trong())),
+    }
+  }
+  const d1HoSo = docHoSoD1(emCanDocHoSo)
   // Phục vụ được: `game_v2_index` có chỉ mục chưa (1 dòng) + đề đang bảo vệ (`ca`) — MỘT LẦN cho cả lượt (dưới còn 1-2 chỗ khác cần dùng lại, xem `coChiMuc`/`baoVe`).
   const pCoChiMuc = chan(tat(() => env.DB.prepare('SELECT 1 AS x FROM game_v2_index LIMIT 1').first(), null).then(Boolean))
   const pBaoVe = chan(baoVeMotLuot(env))
@@ -362,6 +371,15 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number, bo: DauV
 
   // Hồ sơ: câu tới hạn ôn (cả câu chưa từng sai khi FSRS đã tới hạn), dạng, và số câu sai chưa khắc phục.
   // Em có `hoSoSan` (sổ vừa đổi, hồ sơ vừa dựng lại trong CHÍNH lượt này) ⇒ lọc TRONG BỘ NHỚ, không đọc lại D1; em khác vẫn đọc D1 (`rc`/`rd`/`rn`, đã thu hẹp còn `emCanDocHoSo` ở trên).
+  // (28/10) Hồ sơ đang dựng song song ⇒ chờ ĐÚNG lúc cần; dựng hỏng ⇒ đọc D1 cho các em ấy (như lúc chưa có `hoSoCho`).
+  const hoSoMoi = bo.hoSoCho ? await bo.hoSoCho.hua : null
+  const hoSoSan = hoSoMoi ? (hoSoSan0 ? new Map([...hoSoSan0, ...hoSoMoi]) : hoSoMoi) : hoSoSan0
+  const d1Bu = docHoSoD1([...choEm].filter((s) => !hoSoMoi?.has(s)))
+  const gop = async (a: Promise<D1Result<Record<string, unknown>>>, b: Promise<D1Result<Record<string, unknown>>>) => {
+    const [x, y] = await Promise.all([a, b])
+    return y.results?.length ? { ...x, results: [...(x.results ?? []), ...y.results] } : x
+  }
+  const pRc = gop(d1HoSo.rc, d1Bu.rc), pRd = gop(d1HoSo.rd, d1Bu.rd), pRn = gop(d1HoSo.rn, d1Bu.rn)
   const rc = await pRc
   const denHanTuBoNho: Record<string, unknown>[] = hoSoSan
     ? [...hoSoSan.entries()].flatMap(([sbd, h]) => h.cau
@@ -613,11 +631,14 @@ export async function lapVaLuuKeHoach(env: Env, dsSbd: string[], now: number, tu
   const daLap = new Map((rk.results ?? []).map((x) => [String(x.sbd), Number(x.so_su_kien)]))
   const phienCu = new Map((rk.results ?? []).map((x) => [String(x.sbd), Number(x.phien_ban)]))
   const cuHo = em.filter((s) => phienCu.get(s) !== PHIEN_BAN_KE_HOACH || !daLap.has(s) || daLap.get(s) !== (soSk.get(s) ?? 0))
-  const dungKq = cuHo.length > 0 ? await tat(() => dungLaiHoSo(env, cuHo, nowIso), null) : null
+  // 28/10 GIỜ CAO ĐIỂM (vết đợt D1 /hs/ke-hoach-ngay: dựng hồ sơ 4 đợt nối tiếp RỒI mới bắt đầu đọc đầu vào): dựng hồ sơ và đọc đầu vào chạy SONG SONG —
+  // `docDauVao` chỉ chờ hồ sơ ở chỗ cần (các lượt đọc khác không phụ thuộc hồ sơ, không đọc nam_kt_* của em đang dựng).
+  const pDung = cuHo.length > 0 ? tat(() => dungLaiHoSo(env, cuHo, nowIso), null) : null
+  const dauVao = await docDauVao(env, em, now, { ...(pDung ? { hoSoCho: { em: cuHo, hua: pDung.then((k) => k?.hoSo ?? null) } } : {}), tongHop })
+  const dungKq = pDung ? await pDung : null
 
   // Không đóng dấu version/số sự kiện mới nếu dựng hồ sơ thất bại: lượt sau phải thử lại.
   const dungLoi = new Set(dungKq ? [] : cuHo)
-  const dauVao = await docDauVao(env, em, now, { hoSoSan: dungKq?.hoSo, tongHop })
   const dong: Record<string, unknown>[] = []
   for (const sbd of em) {
     const kh = lapKeHoachNgay(dauVao.get(sbd)!)
