@@ -100,7 +100,7 @@ export const KHIEN_BAO_VANG_NGAY = 5
  *   · từng câu của BÀI học (lượt `hocTap` của game-v2: Hành trình / Gói 7) — hàm thuần `nguyenTuCau` (exp-hoc-tap.ts);
  *   · phần "sai nghiêm túc / có hỗ trợ / không được tính" của câu học tập khác trong `tinhExp`.
  * Câu KHÔNG được tính (Mức làm Bấm vội / treo máy / cố tình treo máy) = 0 và đứt chuỗi đúng. Tự sửa (nguồn `NGUON_TU_SUA`) = 0, kể cả các khoản
- * "câu đúng đầu ngày", "lên bậc", "khắc phục" (giữ quyết định 20/10 của thầy).
+ * "câu đúng đầu ngày", "lên bậc", "khắc phục" (giữ quyết định 20/10 của thầy) — riêng câu ra khỏi hàng có khoản `NT_TU_SUA_RA_HANG` (28/10, dưới).
  */
 export const NT_DUNG_TU_LAM = 10
 export const NT_DUNG_HO_TRO = 5
@@ -116,8 +116,18 @@ export const NT_HOAN_HAO = 20
 export const NT_HOAN_HAO_TOI_THIEU_CAU = 3
 /** Kiểm tra cá nhân / ca thi hoàn thành: cố định, KHÔNG phụ thuộc điểm. */
 export const NT_HOAN_THANH_KT = 30
-/** Nguồn sổ là TỰ SỬA lỗi (chữa câu gọn, vòng chữa câu sai, Hỏi thầy kiểm chứng): 0 nguyên tử mọi đường. */
+/** Nguồn sổ là TỰ SỬA lỗi (chữa câu gọn, vòng chữa câu sai, Hỏi thầy kiểm chứng): 0 nguyên tử ở mọi khoản TÍNH TỪ SỔ (câu đúng, đầu ngày, lên bậc, khắc phục). */
 export const NGUON_TU_SUA: readonly string[] = ['chua_loi']
+/**
+ * (28/10, thầy duyệt «sửa theo đề xuất») THƯỞNG SỬA ĐÚNG CÂU CŨ: câu RA KHỎI HÀNG ở màn sửa câu (gon-nop `ket = 'tu_sua'` — đúng lần đầu, không gợi ý,
+ * không đọc lời giải 12 giờ, bản khác hoặc ngày sau) ⇒ +NT_TU_SUA_RA_HANG, tối đa NT_TU_SUA_TRAN_NGAY câu / em / ngày VN. KHÔNG có khi «xong phần», khi
+ * mã gốc (kể cả song sinh / biến thể) đã ĐÚNG ở kênh khác cùng ngày (luật lặp câu #525), hay lần thứ hai cùng mã gốc cùng ngày (khoá sổ). Ghi thẳng vào
+ * `exp_so` (loai `LOAI_TU_SUA`) CÙNG lô ghi của gon-nop ⇒ bảng giải tuần (trigger) áp luật Đối phó như mọi khoản khác. Đợt đóng tự động (đúng lại ở kênh
+ * khác — kênh ấy đã có nguyên tử riêng) KHÔNG có khoản này.
+ */
+export const NT_TU_SUA_RA_HANG = 2
+export const NT_TU_SUA_TRAN_NGAY = 12
+export const LOAI_TU_SUA = 'tu_sua'
 /** Tiền tố `exp_so.ghi_chu` của khoản câu đúng CÓ HỖ TRỢ (cả câu làm lại) — bảng giải tuần (tác tử B) nhận ra bằng chuỗi này. GIỮ NGUYÊN chữ. */
 export const GHI_CHU_DUNG_HO_TRO = 'Câu đúng có hỗ trợ'
 

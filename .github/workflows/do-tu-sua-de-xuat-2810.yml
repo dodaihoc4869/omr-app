@@ -1,0 +1,38 @@
+# ĐO TRƯỚC / SAU «TỰ SỬA LỖI THEO ĐỀ XUẤT» (thầy duyệt 28/10) — CHỈ ĐỌC, chỉ in số đếm (không sbd / tên / mã câu).
+# A: mô phỏng +2 nguyên tử / câu ra khỏi hàng (trần 12 câu / ngày). B: đợt mở cũ hơn 14 ngày sẽ được cron đêm đóng theo luật tự làm.
+name: Đo Tự sửa lỗi theo đề xuất (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/tu-sua-de-xuat-2810]
+    paths: ['.github/workflows/do-tu-sua-de-xuat-2810.yml', 'scripts/do-tu-sua-de-xuat-2810.mjs']
+permissions:
+  contents: read
+concurrency:
+  group: do-tu-sua-de-xuat-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tệp đo chỉ có SELECT
+        run: |
+          if grep -v '^\s*//' scripts/do-tu-sua-de-xuat-2810.mjs | grep -E '`' | grep -iqE '\b(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|REPLACE)\b'; then echo "Có lệnh ghi — dừng."; exit 1; fi
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Dịch luật đóng tự động (server/src/chua-gon.ts, không import ngoài)
+        run: npx -y esbuild@0.25.0 server/src/chua-gon.ts --format=esm --platform=node --outfile=/tmp/chua-gon.mjs --log-level=warning
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đo
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+          CHUA_GON: /tmp/chua-gon.mjs
+        run: node scripts/do-tu-sua-de-xuat-2810.mjs

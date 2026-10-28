@@ -40,6 +40,8 @@ const ManChua = lazy(() => import('../chua-cau-sai/ManChuaCauSai'))
 const KiemHoiThay = lazy(() => import('../loi-giai/HoiThayKiemChung'))
 // Thẻ mời ở Hôm nay đi CÙNG khối mã với màn này (một khối nạp lười, không thêm tệp precache — trần 170 tệp của kiem-sw).
 export { default as TheMoiTuSua } from './TheMoiTuSua'
+// Lộ trình «Trong» (TrongHs: số trên nút «Sửa lỗi») đọc việc hôm nay QUA mảnh này (đã là điểm nạp lười) — nạp động thẳng tu-sua-viec-hom-nay sẽ tách thêm mảnh precache.
+export { conSuaHomNay, docSbdHs, dungViecHomNay, luuViecHomNay } from '../../lib/tu-sua-viec-hom-nay'
 
 /** Trạng thái đợt chữa ⇒ chữ em đọc được (bảng từ chuẩn: không mã nội bộ). */
 export const CHU_TRANG_THAI_CHUA: Record<string, string> = {
@@ -184,8 +186,8 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
   // VIỆC HÔM NAY (thầy 20/10): tối thiểu 12 câu/ngày chia chặng 4 câu; cần SBD để giữ ổn định trong ngày — thiếu ⇒ danh sách cũ.
   const sbd = useMemo(() => docSbdHs(), [])
   const [lanThem, setLanThem] = useState(0)
-  const { viec, luu } = useMemo(() => (sbd ? dungViecHomNay(kq, Date.now(), sbd) : { viec: null, luu: null }), [kq, sbd, lanThem])
-  useEffect(() => { luuViecHomNay(luu) }, [luu])
+  const { viec, luu, day } = useMemo(() => (sbd ? dungViecHomNay(kq, Date.now(), sbd) : { viec: null, luu: null, day: null }), [kq, sbd, lanThem])
+  useEffect(() => { luuViecHomNay(luu, day ?? null) }, [luu, day])
   // 27/10 tốc độ (thầy: «sửa lỗi chỗ mở câu phải tức thì»): danh sách vừa mở ⇒ lúc rảnh nạp sẵn mảnh màn sửa câu, bấm câu là vào ngay, không màn chờ nạp mảnh.
   useEffect(() => {
     // Chỉ nạp mảnh màn sửa câu: khung Duo (ChuaGonDuo) do chính màn ấy nạp song song lệnh mở đợt — nạp thẳng từ đây làm Rolldown tách thêm mảnh dùng chung (+1 tệp precache).
@@ -373,7 +375,7 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
           <div className="tcl-bo-cuc">
             {viec && viec.tong > 0
               ? <div className="vh-cot"><ViecHomNay
-                  viec={viec} soXong={soXong} tong={tong} xongHomNay={dem?.xongHomNay} nayMs={Date.now()}
+                  viec={viec} soXong={soXong} tong={tong} soCan={soCan} xongHomNay={dem?.xongHomNay} nayMs={Date.now()}
                   thongTin={(m, i) => { const d = dungDong(m, i, cdl, Date.now()); return { ten: d.ten, phu: d.phu, trangThai: d.trangThai } }}
                   onChon={(m, i) => moCau(dungDong(m, i, cdl, Date.now()))}
                   onThem={() => { themMotChang(kq); setLanThem((n) => n + 1) }}

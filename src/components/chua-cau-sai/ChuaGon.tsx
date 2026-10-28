@@ -146,7 +146,7 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep, 
       <>
         <section className="ccs-phan-hoi" data-dung="true" role="status" aria-live="polite">
           <h2 ref={tieuDe} tabIndex={-1}>Em đã tự sửa xong câu này</h2>
-          <p>Đúng ngay lần đầu, không cần gợi ý.</p>
+          <p>Đúng ngay lần đầu, không cần gợi ý.{kq.nguyenTu ? <> <b>+{kq.nguyenTu} nguyên tử</b></> : null}</p>
         </section>
         {xemGiai ? loiGiai : null}
       </>

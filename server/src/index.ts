@@ -3364,6 +3364,9 @@ const boXuLy = {
       // SẴN SÀNG ĐÊM (27/10, san-sang.ts): 00:30–05:59 VN chuẩn bị Sảnh + chặng đầu cho em có gói (6 em/phút) ⇒ lượt mở app đầu ngày khỏi lập kế hoạch.
       {const p=import('./san-sang').then(m=>m.cronSanSangDem(env,Date.now())).then(n=>{if(n)console.log('[san-sang] đêm',n)}).catch(e=>console.error('[san-sang] cron lỗi:',e))
       if(ctx?.waitUntil)ctx.waitUntil(p);else await p}
+      // TỰ SỬA LỖI — ĐỢT CŨ HƠN 14 NGÀY (28/10, chua-gon-dem.ts): 00:30–05:59 VN đóng dần theo luật tự làm, một lô 60 đợt/phút; ngoài khung không truy vấn.
+      {const p=import('./chua-gon-dem').then(m=>m.cronDongDotCu(env,Date.now())).then(r=>{if(r.dong)console.log('[tu-sua-dem] đóng',JSON.stringify(r))}).catch(e=>console.error('[tu-sua-dem] cron lỗi:',e))
+      if(ctx?.waitUntil)ctx.waitUntil(p);else await p}
       // MÁY SOẠN LỜI GIẢI SƠ ĐỒ (27/10, may-soan-cron.ts): cờ `cau_hinh.may_soan_so_do` tắt ⇒ một câu đọc có đệm rồi về. Bật ⇒ một lô nhỏ có khoá chạy,
       // chạy NỀN (waitUntil) để không giữ chân các việc cron phía sau (thông báo, nhắc bài). Phải đứng TRƯỚC dòng `return` dưới. Lỗi chỉ ghi log.
       {const p=import('./may-soan-cron').then(m=>m.chayMaySoanCron(env,Date.now())).then(r=>{if(r.chay)console.log('[may-soan] cron',JSON.stringify(r))}).catch(e=>console.error('[may-soan] cron lỗi:',e))
@@ -3757,6 +3760,8 @@ const boXuLy = {
       // CHỮA CÂU GỌN (thầy 25/10, server/src/chua-gon-lenh.ts): mở bản làm lại (không đáp án) · nộp (máy chủ chấm, đúng lần 1 qua luật tự làm ⇒ Đã tự sửa ngay).
       if (p === '/hs/chua-cau-sai/gon-mo') return raChua(await chuaGonMo(env, b))
       if (p === '/hs/chua-cau-sai/gon-nop') return raChua(await chuaGonNop(env, b))
+      // VIỆC HÔM NAY của Tự sửa lỗi trên máy chủ (28/10, tu-sua-viec-ngay.ts): máy em gửi nền bản 12 câu đã chọn ⇒ đổi máy vẫn cùng 12 câu.
+      if (p === '/hs/chua-cau-sai/viec-ngay') return raChua(await import('./tu-sua-viec-ngay').then((m) => m.hsGhiViecNgay(env, b)))
       if (p === '/hs/on-lai/nop') { const r = await sauGhi(env, b, hsOnLaiNop(env, b, ctx)); return ra(r, trangThaiNop(r)) }
       // THỬ THÁCH RIÊNG HÔM NAY (Bộ não A.I Nấc 1, docs/hop-dong-thu-thach-rieng-2109.md): máy chủ chọn + chốt câu; nộp đi đường chấm của ôn lại.
       // ĐÃ GỠ cùng Bộ não A.I (28/09/2026): thử thách do Bộ não chọn ⇒ không còn nguồn. Máy em cũ gọi ⇒ `co:false` (app tự ẩn thẻ); nộp ⇒ báo đã gỡ.
