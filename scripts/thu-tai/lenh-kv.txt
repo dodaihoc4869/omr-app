@@ -1,0 +1,9 @@
+worker chay
+ban-sao
+noi=aws:ap-northeast-3
+ktcn-tat
+dung-san
+so_em=270
+phut=10
+am=3
+# 28/10 claude/kv-san-sang-2810: Sảnh / đếm / mở chặng đọc bản sao D1 theo mốc (D1 sao đã bật bản sao đọc 13:30 VN). 270 em, cùng bộ #558.

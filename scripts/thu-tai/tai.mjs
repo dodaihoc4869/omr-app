@@ -69,7 +69,7 @@ const noiDat = {}
 const VET = {} // ten -> [{ms, w, d:[[a,b,sql,n,dur]]}]
 const anLoi = (s) => String(s ?? '').replace(/\d{3,}/g, '#').replace(/"[^"]*"/g, '"…"').slice(0, 90)
 
-async function goi(ten, duong, than, { giay = 30, get = false, dau = {} } = {}) {
+async function goi(ten, duong, than, { giay = 30, get = false, dau = {}, nhan = null } = {}) {
   const t0 = performance.now(), ms_ = [].concat(ten).map(dem), m = ms_[0], trongDo = Date.now() >= DO_TU
   const c = new AbortController(), hen = setTimeout(() => c.abort(), giay * 1000)
   try {
@@ -83,6 +83,7 @@ async function goi(ten, duong, than, { giay = 30, get = false, dau = {} } = {}) 
       chu = chu.trim().split('\n').filter(Boolean).pop() || ''
     } else { chu = await r.text(); if (than && than.luong && trongDo) dem('nop_tam').ms.push(performance.now() - t0) } // máy chủ không chấm nhanh được ⇒ em chờ cả thân
     const ms = performance.now() - t0
+    if (nhan) nhan(r)
     const xv = r.headers.get('x-vet')
     if (xv && trongDo) { const k = [].concat(ten)[0]; const a = (VET[k] ??= []); if (a.length < 600) { try { a.push({ ms, ...JSON.parse(decodeURIComponent(xv)) }) } catch { /* */ } } }
     const pl = r.headers.get('cf-placement') || 'khong'
@@ -101,8 +102,23 @@ async function goi(ten, duong, than, { giay = 30, get = false, dau = {} } = {}) 
 }
 
 const soChang = { mo: 0, rong: 0, cau: 0, lyDo: {} } // hết việc ⇒ em nghỉ 3–6 phút (như rời app) rồi mới mở lại — không dồn Sảnh liên tục
+// MỐC ĐỌC BẢN SAO (claude/kv-san-sang-2810, như src/lib/moc-d1.ts): mỗi em giữ mốc; lệnh ghi ⇒ lượt đọc kế tiếp `x-d1-tuoi`.
+const DOC_SAO = new Set(['hoc-tap-sanh', 'hoc-tap-dem', 'hoc-tap-start'])
+const coMoc = /^ban-sao\b/m.test(fs.readFileSync(new URL('./lenh.txt', import.meta.url), 'utf8'))
+const dongMoc = { tuoi: 0, moc: 0, tron: 0 }
+function taoMoc() {
+  const st = { moc: null, soGhi: 0, sau: 0 }
+  return (lenh) => {
+    if (!coMoc) return {}
+    if (!DOC_SAO.has(lenh)) { st.soGhi++; return {} }
+    const luc = st.soGhi, dau = { 'x-d1-ban': '1' }
+    if (st.soGhi > st.sau) { dau['x-d1-tuoi'] = '1'; dongMoc.tuoi++ } else if (st.moc) { dau['x-d1-bookmark'] = st.moc; dongMoc.moc++ } else dongMoc.tron++
+    return { dau, nhan: (r) => { const m = r.headers.get('x-d1-bookmark'); if (m && luc === st.soGhi) { st.moc = m; st.sau = luc } } }
+  }
+}
 async function em(sbd) {
   const tk = token(sbd)
+  const mocEm = taoMoc()
   await ngu(ng(0, PHUT_LEN * 60_000))
   // Nền: thưởng (công tắc tạm đóng) 60 s, thông báo 180 s.
   const cho = (ms) => ngu(Math.max(0, Math.min(ms, HET - Date.now())))
@@ -111,7 +127,7 @@ async function em(sbd) {
   // Mở app: loạt hỏi sớm song song (nap-truoc-man-em.ts) — đo Sảnh riêng + cả loạt.
   const t0 = performance.now()
   await Promise.all([
-    goi(['sanh', 'sanh_mo_app'], '/game-v2/hoc-tap-sanh', { token: tk }),
+    goi(['sanh', 'sanh_mo_app'], '/game-v2/hoc-tap-sanh', { token: tk }, mocEm('hoc-tap-sanh')),
     goi('mo_ke_hoach_ngay', '/hs/ke-hoach-ngay', { token: tk }),
     goi('mo_ca_dang_mo', '/hs/ca-dang-mo', { token: tk }),
     goi('mo_buoi_hoc', '/hs/buoi-hoc', { token: tk }),
@@ -122,21 +138,22 @@ async function em(sbd) {
   if (Date.now() >= DO_TU) dem('mo_app_ca_loat').ms.push(performance.now() - t0)
   while (Date.now() < HET) {
     await ngu(ng(2_000, 6_000))
-    const s = await goi('mo_chang', '/game-v2/hoc-tap-start', { token: tk }, { giay: 40 })
+    const s = await goi('mo_chang', '/game-v2/hoc-tap-start', { token: tk }, { giay: 40, ...mocEm('hoc-tap-start') })
     const cau = Array.isArray(s.questions) ? s.questions : []
     soChang.mo++
-    if (!s.id || !cau.length) { soChang.rong++; const ly = anLoi(s.error ?? s.message ?? '').slice(0, 50); soChang.lyDo[ly] = (soChang.lyDo[ly] || 0) + 1; await cho(ng(180_000, 360_000)); if (Date.now() >= HET) break; await goi(['sanh', 'sanh_ve'], '/game-v2/hoc-tap-sanh', { token: tk }); continue }
+    if (!s.id || !cau.length) { soChang.rong++; const ly = anLoi(s.error ?? s.message ?? '').slice(0, 50); soChang.lyDo[ly] = (soChang.lyDo[ly] || 0) + 1; await cho(ng(180_000, 360_000)); if (Date.now() >= HET) break; await goi(['sanh', 'sanh_ve'], '/game-v2/hoc-tap-sanh', { token: tk }, mocEm('hoc-tap-sanh')); continue }
     for (const q of cau.slice(0, 6)) {
       if (Date.now() >= HET) break
       const nghi = ng(3_000, 15_000)
       await ngu(nghi)
       const tra = q.phan === 'I' ? 'ABCD'[Math.floor(Math.random() * 4)] : q.phan === 'II' ? Array.from({ length: 4 }, () => (Math.random() < 0.5 ? 'D' : 'S')).join('') : String(Math.floor(Math.random() * 10 ** Math.max(1, Math.min(4, Number(q.soO) || 4))))
+      mocEm('answer')
       const r = await goi('nop_cau', '/game-v2/answer', { token: tk, session: s.id, qid: q.qid, answer: tra, assisted: false, msLam: Math.round(nghi), luong: 1 }, { giay: 15 })
       if (typeof r.correct === 'boolean') soChang.cau++
-      void goi('dem_sau_cau', '/game-v2/hoc-tap-dem', { token: tk }, { giay: 20 })
+      void goi('dem_sau_cau', '/game-v2/hoc-tap-dem', { token: tk }, { giay: 20, ...mocEm('hoc-tap-dem') })
       await ngu(ng(1_500, 4_000)) // đọc kết quả câu
     }
-    await goi(['sanh', 'sanh_ve'], '/game-v2/hoc-tap-sanh', { token: tk }) // về Sảnh
+    await goi(['sanh', 'sanh_ve'], '/game-v2/hoc-tap-sanh', { token: tk }, mocEm('hoc-tap-sanh')) // về Sảnh
   }
   await Promise.all(ds)
 }
@@ -170,6 +187,7 @@ console.log('=== KẾT QUẢ (ms, đo từ runner) ===')
 for (const [ten, b] of Object.entries(bang)) console.log(`${ten.padEnd(18)} n=${String(b.n).padStart(5)} p50=${b.p50} p95=${b.p95} p99=${b.p99} max=${b.max} 5xx=${b.loi5xx} quáGiờ=${b.quaGio} trạng=${JSON.stringify(b.trang)}${b.loiHay.length ? ' lỗi=' + JSON.stringify(b.loiHay) : ''}`)
 console.log('Nơi chạy Worker (cf-placement):', JSON.stringify(noiDat))
 console.log('Chặng:', JSON.stringify(soChang))
+console.log('Mốc bản sao (lượt đọc gửi tươi / mốc / không mốc):', coMoc ? JSON.stringify(dongMoc) : 'tắt')
 console.log('Theo phút (sanh/mo_chang/nop_cau p50·p95):')
 for (const [ph, v] of Object.entries(theoPhut)) console.log(`  phút ${ph}: ` + ['sanh', 'mo_chang', 'nop_cau'].map((k) => v[k] ? `${k} ${v[k].n}× ${v[k].p50}·${v[k].p95}` : `${k} -`).join(' | '))
 
