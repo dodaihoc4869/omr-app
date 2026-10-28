@@ -16,6 +16,7 @@
 //   Câu chỉ-dạng ⇒ doTin 1. nguon luôn 'goi_y' (A.I gắn tự động); dòng thầy duyệt ('thay') KHÔNG bao giờ bị đè.
 // Bảng chỉ-thêm của làn này (tự tạo lúc chạy; bản SQL: SQL_BANG_GAN_VKN): omni_q_gan (phiên bản gắn từng câu), omni_q_nhat_ky (nhật ký thay đổi Q
 // của kiểm định tuần), omni_q_nghi (câu nghi của kiểm định tuần — KHÔNG ghi cau_nghi_dap_an để rút đề ca kiểm tra không bị bỏ câu). Ghi omni_q / omni_vkn đúng lược đồ migration-0510-omni-3.sql.
+import { boKhoChup } from './kho-chung'
 import type { D1PreparedStatement, Env } from './kieu'
 import { SQL_LA_LAN_LAM, TEN_AI, type Phan, type QCau, type Vkn } from './omni-kieu'
 import { SO_NEN_TOI_DA, chuanHoaNhan, vknMacDinh, vknNen } from './omni-q'
@@ -693,6 +694,7 @@ async function ganVaGhi(env: Env, cau: readonly CauDoc[], nowMs: number): Promis
       .bind(vknNen(n), '', TEN_NEN[n] ?? n, TEN_LOI_NEN[n] ?? null, n, Math.max(0, thuTu.indexOf(n))))
   }
   const soGhi = await chayLo(env, lenhQ)
+  if (soGhi) await boKhoChup(env) // Q đổi ⇒ bỏ bản chụp kho dùng chung (kho-chung.ts)
   await chayLo(env, lenhPhu)
   return { soCau: cau.length, soGhi, theoNguon }
 }
@@ -947,6 +949,7 @@ export async function kiemDinhQTuan(env: Env, nowMs = Date.now()): Promise<Recor
       }
     }
     await chayLo(env, lenh)
+    await boKhoChup(env) // Q có thể đổi ⇒ bỏ bản chụp kho dùng chung (kho-chung.ts)
     // Câu nghi CHỈ vào bảng riêng omni_q_nghi (điều phối 05/10). KHÔNG ghi cau_nghi_dap_an: bảng đó làm khâu rút đề ca kiểm tra tạm bỏ câu, mà
     // "ma trận Q chưa giải thích được" KHÔNG có nghĩa đáp án sai — luật nghi đáp án đã có ở tu-hoan-thien.ts với ngưỡng riêng.
     for (const n of dsNghi) {
