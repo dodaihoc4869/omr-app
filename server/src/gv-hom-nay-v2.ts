@@ -264,7 +264,7 @@ export async function gvCanGiup(env: Env, b: Record<string, unknown>, nowMs: num
   if (dsMa.length > 0) {
     const d7 = themNgay(ngay, -6)
     const d14 = themNgay(ngay, -13)
-    const rTen = await Q.hoi("SELECT dang AS ma, MIN(json_extract(json, '$.tenDang')) AS ten FROM game_v2_question WHERE dang IN (SELECT value FROM json_each(?)) GROUP BY dang", json(dsMa))
+    const rTen = await import('./ten-dang-dem').then((m) => m.tenDangCoNho(dsMa, (j) => Q.hoi(m.SQL_TEN_DANG, j)))
     const ten = new Map((rTen ?? []).filter((x) => chuoi(x.ten)).map((x) => [chuoi(x.ma), chuoi(x.ten)]))
     const rXh = await Q.hoi(
       `SELECT sbd, ma_dang,
@@ -518,7 +518,7 @@ export async function gvEmToanCanh(env: Env, b: Record<string, unknown>, nowMs: 
   const dsMa = (rDang ?? []).map((x) => chuoi(x.ma_dang))
   const d7 = themNgay(homNay, -6)
   const d14 = themNgay(homNay, -13)
-  const rTen = dsMa.length ? await Q.hoi("SELECT dang AS ma, MIN(json_extract(json, '$.tenDang')) AS ten FROM game_v2_question WHERE dang IN (SELECT value FROM json_each(?)) GROUP BY dang", json(dsMa)) : []
+  const rTen = dsMa.length ? await import('./ten-dang-dem').then((m) => m.tenDangCoNho(dsMa, (j) => Q.hoi(m.SQL_TEN_DANG, j))) : []
   const rXh = dsMa.length
     ? await Q.hoi(
       `SELECT ma_dang, SUM(CASE WHEN ngay_vn >= ? THEN 1 ELSE 0 END) AS n_moi, SUM(CASE WHEN ngay_vn >= ? AND ket_qua = 1 THEN 1 ELSE 0 END) AS d_moi,

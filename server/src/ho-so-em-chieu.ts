@@ -177,7 +177,7 @@ export async function gvHoSoLenBang(env: Env, b: Record<string, unknown>, nowMs:
     phien.length ? hoi(env, "SELECT id, json_extract(json, '$.doan') IS NOT NULL AS doan, COALESCE(json_extract(json, '$.bia'), 0) AS bia FROM game_v2_session WHERE sbd = ? AND id IN (SELECT value FROM json_each(?))", sbd, JSON.stringify(phien)) : Promise.resolve([] as Row[] | null),
     caThi.length ? hoi(env, 'SELECT ma_ca, lan_thu, dap_an_chon FROM chi_tiet_cau WHERE sbd = ? AND qid = ? AND ma_ca IN (SELECT value FROM json_each(?))', sbd, qid, JSON.stringify(caThi)) : Promise.resolve([] as Row[] | null),
     bt.then((x) => x[0]),
-    maDang.length ? hoi(env, "SELECT dang AS ma, MIN(json_extract(json, '$.tenDang')) AS ten FROM game_v2_question WHERE dang IN (SELECT value FROM json_each(?)) GROUP BY dang", JSON.stringify(maDang)) : Promise.resolve([] as Row[] | null),
+    maDang.length ? import('./ten-dang-dem').then((m) => m.tenDangCoNho(maDang, (j) => hoi(env, m.SQL_TEN_DANG, j))).catch(() => null) : Promise.resolve([] as Row[] | null),
     gocCanKichThuoc.length ? docKichThuocCau(env, gocCanKichThuoc).catch(() => new Map<string, KichThuocCau>()) : Promise.resolve(new Map<string, KichThuocCau>()),
     gameThieu.length ? giayUocTinhGame(env, gameThieu.map((d) => ({ sbd, phien: d.maNguon }))).catch(() => new Map<string, number>()) : Promise.resolve(new Map<string, number>()),
     bt.then((x) => x[1]),
