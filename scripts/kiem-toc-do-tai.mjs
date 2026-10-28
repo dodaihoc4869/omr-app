@@ -5,13 +5,14 @@
 // (khối mã màn chính của app và mọi tệp khối ấy nạp tĩnh) + tệp kiểu (CSS) đi kèm. So với mốc `docs/moc-toc-do.json` (đo trên bản đang chạy thật):
 // lớn hơn mốc quá DUNG_SAI ⇒ thoát mã 1 (đỏ, không đẩy). Nhỏ hơn ⇒ in gợi ý HẠ mốc (mốc chỉ hạ, không nâng).
 // Cách dùng: `node scripts/kiem-toc-do-tai.mjs` (so mốc) · `node scripts/kiem-toc-do-tai.mjs --in` (chỉ in số đo, dạng JSON).
+// `--dist=<thư mục>`: đo một bản build khác (vd bản commit cha trong workflow toc-do-sau-gop) · `--in-tat-ca`: in JSON {app, duong} rồi thoát.
 import { readFileSync, readdirSync, existsSync } from 'node:fs'
 import { gzipSync } from 'node:zlib'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const GOC = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const DIST = resolve(GOC, 'dist')
+const DIST = resolve(GOC, process.argv.find((a) => a.startsWith('--dist='))?.slice(7) || 'dist')
 const ASSETS = resolve(DIST, 'assets')
 /** Dung sai 1 KB nén cho mỗi app (~1 ms trên mạng 4G) — chỗ cho một dòng chữ / một luật kiểu; hơn thế phải bù ở chỗ khác. */
 const DUNG_SAI = 1024
@@ -48,6 +49,15 @@ for (const [app, ds] of Object.entries(APP)) {
   so[app] = { tep: tat.size, gzip: [...tat].reduce((s, t) => s + kichCo(t), 0) }
 }
 if (process.argv.includes('--in')) { console.log(JSON.stringify(so)); process.exit(0) }
+const bangNap = (() => { const m = /var b=(\{.*?\});var (?:v|nap)=/s.exec(html); return m ? JSON.parse(m[1]) : null })()
+// 25/10: màn thi có gốc riêng `AppThi` ⇒ nhóm `thi` đã gồm vỏ (cờ `thiRieng`), không cộng nhóm `app`.
+const DUONG = { 'thay /gv': ['app'], 'phieu /p': ['app', 'phieu'], 'phu-huynh /ph': ['phVo', 'ph'], 'thi /t': bangNap?.thiRieng ? ['thi'] : ['app', 'thi'], 'dang-nhap-hs /hs': ['hsVo'], 'cong-hs /hs (đã đăng nhập)': ['hsVo', 'hs'] }
+if (process.argv.includes('--in-tat-ca')) {
+  const duong = {}
+  for (const [d, nhom] of Object.entries(DUONG)) duong[d] = bangNap ? [...dong([...vao, ...nhom.flatMap((n) => (bangNap[n] ?? []).map((u) => u.replace(/^\/assets\//, '')))])].reduce((s, t) => s + kichCo(t), 0) : null
+  console.log(JSON.stringify({ app: so, duong }))
+  process.exit(0)
+}
 const moc = JSON.parse(readFileSync(resolve(GOC, 'docs/moc-toc-do.json'), 'utf8')).taiApp ?? {}
 const kb = (n) => `${(n / 1024).toFixed(1)} KB`
 let do_ = 0
@@ -65,9 +75,6 @@ for (const [app, s] of Object.entries(so)) {
 // của tên tệp có mã băm (mỗi lần mã đổi, tên ~8 ký tự ngẫu nhiên nén chênh vài–vài chục byte; đo 22/10: main f7991856 tự dựng đã lệch +5…+35 byte so mốc
 // ghi tay) — 64 byte ≈ 0,02 ms trên 4G, không phải chậm thật. Mọi thay đổi thật (một hàm, một dòng chữ) đều vượt ngưỡng này.
 const DUNG_SAI_DUONG = 64
-const bangNap = (() => { const m = /var b=(\{.*?\});var (?:v|nap)=/s.exec(html); return m ? JSON.parse(m[1]) : null })()
-// 25/10: màn thi có gốc riêng `AppThi` ⇒ nhóm `thi` đã gồm vỏ (cờ `thiRieng`), không cộng nhóm `app`.
-const DUONG = { 'thay /gv': ['app'], 'phieu /p': ['app', 'phieu'], 'phu-huynh /ph': ['phVo', 'ph'], 'thi /t': bangNap?.thiRieng ? ['thi'] : ['app', 'thi'], 'dang-nhap-hs /hs': ['hsVo'], 'cong-hs /hs (đã đăng nhập)': ['hsVo', 'hs'] }
 const mocDuong = JSON.parse(readFileSync(resolve(GOC, 'docs/moc-toc-do.json'), 'utf8')).taiDuong ?? {}
 if (!bangNap) { console.error('✗ không đọc được bảng nạp trước theo đường trong dist/index.html'); do_++ }
 else for (const [duong, nhom] of Object.entries(DUONG)) {
