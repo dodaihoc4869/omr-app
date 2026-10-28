@@ -926,7 +926,13 @@ async function emBatOmniCuaLop(env: Env, lop: string): Promise<string[]> {
 }
 const hoSoThoTuHs = (hs: HoSoOmniEm): Map<string, { p: number; n: number }> =>
   new Map(Object.entries(hs.vkn).map(([k, v]) => [k, { p: v.p, n: v.nTuLam }]))
-async function thoCuaLop(env: Env, lop: string, homNay: string, ts: ThamSoOmni): Promise<ThoLop> {
+async function thoCuaLop(env: Env, lop: string, homNay: string, ts: ThamSoOmni): Promise<ThoLop>
+async function thoCuaLop(env: Env, lop: string, homNay: string, ts: ThamSoOmni, canPrior: readonly string[]): Promise<ThoLop | null>
+/**
+ * `canPrior` (28/10, thử tải 270 em): các em đang cần prior — lớp đủ đông thì đọc prior CẤT SẴN của các em ấy (`omni_prior_em`, một dòng / em) TRƯỚC: đủ ⇒ ghi vào
+ * đệm prior và trả `null` (KHÔNG đọc hồ sơ thô cả lớp ~144 nghìn dòng). Thiếu ⇒ như cũ, rồi cất NỀN prior cả lớp để lượt sau / isolate khác chỉ đọc một dòng.
+ */
+async function thoCuaLop(env: Env, lop: string, homNay: string, ts: ThamSoOmni, canPrior?: readonly string[]): Promise<ThoLop | null> {
   const khoa = `${lop}|${homNay}|${khoaTs(ts)}|${phienBanDem}`
   const co = demTho.doc(khoa, Date.now())
   if (co) return co
@@ -934,6 +940,23 @@ async function thoCuaLop(env: Env, lop: string, homNay: string, ts: ThamSoOmni):
   const ban = await emBatOmniCuaLop(env, lop)
   if (ban.length >= ts.PRIOR_LOP_TOI_THIEU) {
     const moc = dauNgayVn(homNay)
+    const khoaP = khoaPriorEm(ts, lop)
+    if (canPrior?.length) {
+      const r = await env.DB.prepare('SELECT sbd, khoa, json FROM omni_prior_em WHERE sbd IN (SELECT value FROM json_each(?)) AND moc = ?').bind(dsJson(canPrior), moc).all<Row>().catch(() => null)
+      const thay = new Map<string, Map<string, number>>()
+      for (const x of r?.results ?? []) {
+        if (str(x.khoa) !== khoaP) continue
+        try {
+          const a = JSON.parse(str(x.json)) as unknown
+          if (Array.isArray(a)) thay.set(str(x.sbd), new Map(a.filter((v): v is [string, number] => Array.isArray(v) && typeof v[0] === 'string' && typeof v[1] === 'number').map((v) => [v[0], v[1]] as [string, number])))
+        } catch { /* dòng hỏng ⇒ tính như cũ */ }
+      }
+      if (canPrior.every((s) => thay.has(s))) {
+        const nowP = Date.now()
+        for (const [s, m] of thay) demPriorEm.ghi(`${s}|${moc}|${khoaP}|${phienBanDem}`, nowP, m)
+        return null
+      }
+    }
     const [emAnh, pAnh] = await Promise.all([
       env.DB.prepare('SELECT sbd FROM omni_em WHERE sbd IN (SELECT value FROM json_each(?)) AND cap_nhat_luc = ? AND phien_ban = ?').bind(JSON.stringify(ban), moc, PHIEN_BAN_OMNI).all<Row>().catch(() => ({ results: [] as Row[] })),
       env.DB.prepare('SELECT sbd, vkn_id, p, n_tu_lam FROM omni_p_vkn WHERE sbd IN (SELECT value FROM json_each(?)) AND cap_nhat_luc = ? AND phien_ban = ?').bind(JSON.stringify(ban), moc, PHIEN_BAN_OMNI).all<Row>().catch(() => ({ results: [] as Row[] })),
@@ -948,6 +971,10 @@ async function thoCuaLop(env: Env, lop: string, homNay: string, ts: ThamSoOmni):
     }
   }
   demTho.ghi(khoa, Date.now(), ra)
+  if (canPrior?.length && ra.size) {
+    const caLop = [...new Set([...ra.keys(), ...canPrior])]
+    void catPrior(envGhiRieng(env), dauNgayVn(homNay), khoaPriorEm(ts, lop), gopPriorCaLop(ra, caLop, ts)).catch((e) => console.error('[omni] cất prior lớp lỗi:', e instanceof Error ? e.message : e))
+  }
   return ra
 }
 /** Prior đã có của em trong isolate (khoá em|mốc|lớp+tham số+phiên bản) — cùng ngày bất biến; mỗi mục ~1.000 cặp ⇒ trần 150 em. */
@@ -957,42 +984,19 @@ async function priorChoNhieuEm(env: Env, sbds: readonly string[], homNay: string
   const moc = dauNgayVn(homNay), now = Date.now()
   const khoaDem = (s: string, l: string) => `${s}|${moc}|${khoaPriorEm(ts, l)}|${phienBanDem}`
   const lop = await lopCuaNhieuEm(env, sbds)
-  const conThieu: string[] = []
+  const theoLop = new Map<string, string[]>()
   for (const s of sbds) {
     const l = lop.get(s)
     if (!l) continue
     const m = demPriorEm.doc(khoaDem(s, l), now)
     if (m) { ra.set(s, m); continue }
-    // Hồ sơ thô cả lớp còn trong đệm isolate ⇒ tính tại chỗ như cũ (không D1).
-    const tho = demTho.doc(`${l}|${homNay}|${khoaTs(ts)}|${phienBanDem}`, now)
-    if (tho) { const g = gopPrior(tho, s, ts); ra.set(s, g); demPriorEm.ghi(khoaDem(s, l), now, g); continue }
-    conThieu.push(s)
+    theoLop.set(l, [...(theoLop.get(l) ?? []), s])
   }
-  // Prior cất sẵn (một dòng / em) — chỉ khi đệm isolate không có. Bảng chưa có / lỗi ⇒ null ⇒ tính như cũ.
-  if (conThieu.length) {
-    const r = await env.DB.prepare('SELECT sbd, khoa, json FROM omni_prior_em WHERE sbd IN (SELECT value FROM json_each(?)) AND moc = ?').bind(dsJson(conThieu), moc).all<Row>().catch(() => null)
-    for (const x of r?.results ?? []) {
-      const s = str(x.sbd), l = lop.get(s)
-      if (!l || !conThieu.includes(s) || str(x.khoa) !== khoaPriorEm(ts, l)) continue
-      try {
-        const a = JSON.parse(str(x.json)) as unknown
-        if (!Array.isArray(a)) continue
-        const m = new Map(a.filter((v): v is [string, number] => Array.isArray(v) && typeof v[0] === 'string' && typeof v[1] === 'number').map((v) => [v[0], v[1]] as [string, number]))
-        ra.set(s, m); demPriorEm.ghi(khoaDem(s, l), now, m)
-      } catch { /* dòng hỏng ⇒ tính lại bên dưới */ }
-    }
-  }
-  // Còn thiếu ⇒ như cũ (hồ sơ thô cả lớp), rồi cất NỀN prior của CẢ LỚP (đường ghi riêng, không chờ) — isolate khác / lượt sau chỉ đọc một dòng.
-  const theoLop = new Map<string, string[]>()
-  for (const s of conThieu) { const l = lop.get(s)!; if (!ra.has(s)) theoLop.set(l, [...(theoLop.get(l) ?? []), s]) }
   for (const [l, ems] of theoLop) {
-    let tho: ThoLop
-    try { tho = await thoCuaLop(env, l, homNay, ts) } catch { for (const s of ems) ra.set(s, new Map()); continue }
+    let tho: ThoLop | null
+    try { tho = await thoCuaLop(env, l, homNay, ts, ems) } catch { for (const s of ems) ra.set(s, new Map()); continue }
+    if (!tho) { const t = Date.now(); for (const s of ems) { const m = demPriorEm.doc(khoaDem(s, l), t); ra.set(s, m ?? new Map()) } continue } // prior cất sẵn đã vào đệm (thoCuaLop)
     for (const s of ems) { const g = gopPrior(tho, s, ts); ra.set(s, g); demPriorEm.ghi(khoaDem(s, l), now, g) }
-    if (tho.size) {
-      const caLop = [...new Set([...tho.keys(), ...ems])]
-      void catPrior(envGhiRieng(env), moc, khoaPriorEm(ts, l), gopPriorCaLop(tho, caLop, ts)).catch((e) => console.error('[omni] cất prior lớp lỗi:', e instanceof Error ? e.message : e))
-    }
   }
   return ra
 }
