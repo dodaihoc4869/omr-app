@@ -24,7 +24,7 @@ import { docCaSapMo, docKhoiVaLopCacEm } from './game-v2-bank'
 import type { Khoi } from '../../src/lib/khoi-cau'
 import { chanKhacKhoiDong } from './chan-khac-khoi'
 import { ngayVn } from './su-kien-hoc'
-import { tuLucHomNay } from './cau-da-lam'
+import { tuLucHomNay, tuLucTuNgay } from './cau-da-lam'
 import { docMocHienThi } from './moc-no'
 import { docLichDaLuu, moLucChang } from './btvn-nang-do-chang'
 import { ketQuaChotNgay } from '../../src/lib/dat-nhiem-vu-ngay'
@@ -225,6 +225,22 @@ export async function docTongHop(env: Env, arr: string, homNay: string, tuLuc: s
   }
 }
 
+/**
+ * `docTongHop` của HÔM NAY (28/10 tối, giờ cao điểm): trước chờ đọc mốc hiển thị (`cau_hinh`, hết đệm 30 s) RỒI mới quét sổ ⇒ hai đợt D1 nối tiếp.
+ * Nay quét sổ NGAY với ngưỡng 00:00 hôm nay — đúng mọi ngày mốc nằm trước hôm nay (`tuLucTuNgay` lấy mốc muộn hơn). Mốc rơi vào hôm nay ⇒ quét lại đúng mốc.
+ */
+function docTongHopHomNay(env: Env, arr: string, now: number): Promise<Map<string, TongHopEm> | null> {
+  const homNay = ngayVn(now), ngay30 = themNgay(homNay, -SO_NGAY_DO_VAN_TOC), nowIso = new Date(now).toISOString()
+  const dau = tuLucTuNgay('', homNay)
+  const doan = docTongHop(env, arr, homNay, dau, ngay30, nowIso)
+  return (async () => {
+    try {
+      const tuLuc = tuLucHomNay(await docMocHienThi(env), now)
+      return tuLuc === dau ? await doan : await docTongHop(env, arr, homNay, tuLuc, ngay30, nowIso)
+    } catch { return null }
+  })()
+}
+
 // --- Gom đầu vào -------------------------------------------------------------------------
 
 /** Bổ sung TUỲ CHỌN cho `docDauVao` — dữ liệu nơi gọi (`lapVaLuuKeHoach`) ĐÃ có sẵn từ CÙNG một lượt xử lý, dùng thay vì đọc lại D1 (HẠ TẢI, Boss 22/09 M3). */
@@ -234,8 +250,11 @@ export interface DauVaoBoSung {
   /** (28/10 giờ cao điểm) Hồ sơ ĐANG dựng lại cho `em` (lời hứa `dungLaiHoSo`, null = dựng hỏng): mọi lượt đọc khác bắt đầu NGAY, chỉ phần hồ sơ chờ
    *  — trước: chờ dựng xong (4 đợt D1 nối tiếp) rồi mới bắt đầu đọc đầu vào. Dựng hỏng ⇒ đọc D1 cho các em ấy như cũ. */
   hoSoCho?: { em: string[]; hua: Promise<Map<string, { cau: NamKtCau[]; dang: NamKtDang[] }> | null | undefined> }
-  /** Tổng hợp `su_kien_hoc` hôm nay (tiến bộ, số câu hiển thị, giây tốc độ) nơi gọi đã đọc. `null` = đã thử và lỗi (giữ mặc định, không đọc lại). */
-  tongHop?: Map<string, TongHopEm> | null
+  /** (28/10 tối, giờ cao điểm) Như `hoSoCho` nhưng CHƯA biết em nào phải dựng: đọc hồ sơ D1 của CẢ lô ngay (cùng đợt các lượt đọc khác), lời hứa trả
+   *  hồ sơ vừa dựng của em sổ đổi (em có trong Map thì bỏ dòng D1 đọc trước của em ấy); null = dựng hỏng ⇒ dùng dòng D1 (hồ sơ cũ, như đọc lại sau lỗi). */
+  hoSoDoan?: Promise<Map<string, { cau: NamKtCau[]; dang: NamKtDang[] }> | null>
+  /** Tổng hợp `su_kien_hoc` hôm nay (tiến bộ, số câu hiển thị, giây tốc độ) nơi gọi đã đọc (hoặc đang đọc). `null` = đã thử và lỗi (giữ mặc định, không đọc lại). */
+  tongHop?: Map<string, TongHopEm> | null | Promise<Map<string, TongHopEm> | null>
 }
 
 export async function docDauVao(env: Env, dsSbd: string[], now: number, bo: DauVaoBoSung = {}): Promise<Map<string, DauVaoKeHoach>> {
@@ -244,7 +263,6 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number, bo: DauV
   const homNay = ngayVn(now)
   const nowIso = new Date(now).toISOString()
   const cat14 = new Date(now - NGAY_LIET_KE_QUA_HAN * MOT_NGAY_MS).toISOString()
-  const ngay30 = themNgay(homNay, -SO_NGAY_DO_VAN_TOC)
   const ngayLs = themNgay(homNay, -SO_NGAY_LICH_SU)
   // HẠ TẢI (Boss 21/09, D1 nghẽn): các truy vấn ĐỘC LẬP chỉ-đọc dưới đây chạy SONG SONG (trước đây tuần tự ~30 lượt chờ hàng đợi D1, mỗi lượt trả phí chờ; song song trả một lần). Kết quả dùng đúng chỗ cũ, đầu ra không đổi.
   // Mỗi lời hứa dưới đây KHÔNG ném lỗi (đã bọc `tat`) trừ khi ghi chú khác; ai ném thì được chặn cảnh báo chưa xử lý và vẫn ném đúng chỗ `await` cũ.
@@ -257,26 +275,29 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number, bo: DauV
   // Tối ưu 05/10: cờ phạm vi học (đệm 30 s) đọc CÙNG đợt các lượt đọc độc lập bên dưới — trước: một đợt riêng sau khi lọc câu phục vụ được.
   const pPhamViBat = chan(phamViBat(env))
   const pKhoiLop = chan(docKhoiVaLopCacEm(env, em).catch(() => ({ khoi: new Map<string, Khoi | null>(), lop: new Map<string, string>() })))
+  // 28/10 tối: BA lượt đọc hồ sơ (câu tới hạn · dạng · số câu chưa khắc phục) gộp MỘT lệnh UNION ALL (cột chung c1…c9, `k` phân loại) — cùng điều kiện, cùng dòng.
   const docHoSoD1 = (ds: string[]) => {
     const rong = () => Promise.resolve(trong<Record<string, unknown>>()), a = json(ds)
+    if (ds.length === 0) return { rc: rong(), rd: rong(), rn: rong() }
+    const goc = chan(tat(() => env.DB.prepare(
+      `SELECT 'c' AS k, sbd, qid AS c1, ma_dang AS c2, moc_on_ke AS c3, lan_sai AS c4, luc_cuoi AS c5, NULL AS c6, NULL AS c7, NULL AS c8, NULL AS c9 FROM nam_kt_cau
+        WHERE ${IN_EM} AND trang_thai IN ('moi_sai','dang_on','da_khac_phuc','chua_thay_sai') AND can_day_lai = 0 AND moc_on_ke IS NOT NULL AND moc_on_ke <= ?
+       UNION ALL SELECT 'n', sbd, COUNT(*), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL FROM nam_kt_cau WHERE ${IN_EM} AND trang_thai IN ('moi_sai','dang_on') GROUP BY sbd
+       UNION ALL SELECT 'd', sbd, ma_dang, so_gap, so_sai, so_da_khac_phuc, so_moi_sai, so_chua_thay_sai, bac, moc_on_ke, moc_moi_sai FROM nam_kt_dang WHERE ${IN_EM}`,
+    ).bind(a, homNay, a, a).all<Record<string, unknown>>(), trong()))
+    const tach = (k: string, cot: string[]) => goc.then((r) => ({ ...r, results: (r.results ?? []).filter((x) => x.k === k).map((x) => Object.fromEntries([['sbd', x.sbd], ...cot.map((c, i) => [c, x[`c${i + 1}`]])])) }))
     return {
-      rc: ds.length === 0 ? rong() : chan(tat(() => env.DB.prepare(
-        `SELECT sbd, qid, ma_dang, moc_on_ke, lan_sai, luc_cuoi FROM nam_kt_cau
-          WHERE ${IN_EM} AND trang_thai IN ('moi_sai','dang_on','da_khac_phuc','chua_thay_sai') AND can_day_lai = 0 AND moc_on_ke IS NOT NULL AND moc_on_ke <= ?`,
-      ).bind(a, homNay).all<Record<string, unknown>>(), trong())),
-      rd: ds.length === 0 ? rong() : chan(tat(() => env.DB.prepare(`SELECT * FROM nam_kt_dang WHERE ${IN_EM}`).bind(a).all<Record<string, unknown>>(), trong())),
-      rn: ds.length === 0 ? rong() : chan(tat(() => env.DB.prepare(`SELECT sbd, COUNT(*) AS n FROM nam_kt_cau WHERE ${IN_EM} AND trang_thai IN ('moi_sai','dang_on') GROUP BY sbd`).bind(a).all<Record<string, unknown>>(), trong())),
+      rc: tach('c', ['qid', 'ma_dang', 'moc_on_ke', 'lan_sai', 'luc_cuoi']),
+      rd: tach('d', ['ma_dang', 'so_gap', 'so_sai', 'so_da_khac_phuc', 'so_moi_sai', 'so_chua_thay_sai', 'bac', 'moc_on_ke', 'moc_moi_sai']),
+      rn: tach('n', ['n']),
     }
   }
   const d1HoSo = docHoSoD1(emCanDocHoSo)
   // Phục vụ được: `game_v2_index` có chỉ mục chưa (1 dòng) + đề đang bảo vệ (`ca`) — MỘT LẦN cho cả lượt (dưới còn 1-2 chỗ khác cần dùng lại, xem `coChiMuc`/`baoVe`).
   const pCoChiMuc = chan(tat(() => env.DB.prepare('SELECT 1 AS x FROM game_v2_index LIMIT 1').first(), null).then(Boolean))
   const pBaoVe = chan(baoVeMotLuot(env))
-  // Tối ưu 08/10: docMocHienThi khởi chạy SONG SONG với các lời hứa khác — tiết kiệm 1 round-trip D1 nối tiếp trước khi docTongHop bắt đầu.
-  const pMoc = bo.tongHop !== undefined ? null : chan(docMocHienThi(env))
-  const pTongHop = bo.tongHop !== undefined
-    ? Promise.resolve(bo.tongHop)
-    : chan((async () => { try { return await docTongHop(env, arr, homNay, tuLucHomNay(await pMoc!, now), ngay30, new Date(now).toISOString()) } catch { return null } })())
+  // Tối ưu 08/10 + 28/10: tổng hợp sổ không chờ đọc mốc hiển thị (`docTongHopHomNay`).
+  const pTongHop = bo.tongHop !== undefined ? Promise.resolve(bo.tongHop) : chan(docTongHopHomNay(env, arr, now))
   const pRh = chan(tat(() => env.DB.prepare(`SELECT sbd, ngay, ket_qua FROM ke_hoach_ngay WHERE ${IN_EM} AND ngay < ? AND ngay >= ? ORDER BY ngay DESC`).bind(arr, homNay, ngayLs).all<Record<string, unknown>>(), trong()))
   const pRp = chan(tat(() => env.DB.prepare(`SELECT sbd, minutes FROM study_preferences WHERE ${IN_EM}`).bind(arr).all<Record<string, unknown>>(), trong()))
   const pRk = chan(tat(() => env.DB.prepare(`SELECT sbd, id, dang FROM game_v2_task WHERE ${IN_EM} AND completed_at IS NULL`).bind(arr).all<Record<string, unknown>>(), trong()))
@@ -372,11 +393,13 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number, bo: DauV
   // Hồ sơ: câu tới hạn ôn (cả câu chưa từng sai khi FSRS đã tới hạn), dạng, và số câu sai chưa khắc phục.
   // Em có `hoSoSan` (sổ vừa đổi, hồ sơ vừa dựng lại trong CHÍNH lượt này) ⇒ lọc TRONG BỘ NHỚ, không đọc lại D1; em khác vẫn đọc D1 (`rc`/`rd`/`rn`, đã thu hẹp còn `emCanDocHoSo` ở trên).
   // (28/10) Hồ sơ đang dựng song song ⇒ chờ ĐÚNG lúc cần; dựng hỏng ⇒ đọc D1 cho các em ấy (như lúc chưa có `hoSoCho`).
-  const hoSoMoi = bo.hoSoCho ? await bo.hoSoCho.hua : null
+  const hoSoMoi = bo.hoSoCho ? await bo.hoSoCho.hua : bo.hoSoDoan ? await bo.hoSoDoan : null
   const hoSoSan = hoSoMoi ? (hoSoSan0 ? new Map([...hoSoSan0, ...hoSoMoi]) : hoSoMoi) : hoSoSan0
   const d1Bu = docHoSoD1([...choEm].filter((s) => !hoSoMoi?.has(s)))
   const gop = async (a: Promise<D1Result<Record<string, unknown>>>, b: Promise<D1Result<Record<string, unknown>>>) => {
-    const [x, y] = await Promise.all([a, b])
+    const [x0, y] = await Promise.all([a, b])
+    // `hoSoDoan`: dòng D1 đọc trước của em vừa dựng lại là hồ sơ CŨ ⇒ bỏ, dùng bản dựng trong bộ nhớ.
+    const x = bo.hoSoDoan && hoSoMoi?.size ? { ...x0, results: (x0.results ?? []).filter((r) => !hoSoMoi.has(String(r.sbd))) } : x0
     return y.results?.length ? { ...x, results: [...(x.results ?? []), ...y.results] } : x
   }
   const pRc = gop(d1HoSo.rc, d1Bu.rc), pRd = gop(d1HoSo.rd, d1Bu.rd), pRn = gop(d1HoSo.rn, d1Bu.rn)
@@ -604,18 +627,16 @@ export interface KeHoachDaLap extends KeHoachNgay {
 export interface DocDauKeHoach { tongHop: Promise<Map<string, TongHopEm> | null>; rk: Promise<D1Result<Record<string, unknown>>> }
 export function batDauDocKeHoach(env: Env, dsSbd: string[], now: number): DocDauKeHoach {
   const em = [...new Set(dsSbd.map((x) => x.trim()).filter(Boolean))]
-  const homNay = ngayVn(now)
   const arr = json(em)
-  const ngay30 = themNgay(homNay, -SO_NGAY_DO_VAN_TOC)
   return {
-    tongHop: (async () => { try { return await docTongHop(env, arr, homNay, tuLucHomNay(await docMocHienThi(env), now), ngay30, new Date(now).toISOString()) } catch { return null } })(),
+    tongHop: docTongHopHomNay(env, arr, now),
     rk: tat(() => env.DB.prepare(
       `SELECT k.sbd, k.ngay, k.so_su_kien, k.phien_ban, k.muc_tieu_json, k.deferred_count, k.over_budget_seconds FROM ke_hoach_ngay k
         WHERE k.sbd IN (SELECT value FROM json_each(?)) AND k.ngay = (SELECT MAX(z.ngay) FROM ke_hoach_ngay z WHERE z.sbd = k.sbd)`,
     ).bind(arr).all<Record<string, unknown>>(), trong()),
   }
 }
-export async function lapVaLuuKeHoach(env: Env, dsSbd: string[], now: number, tuyChon: { luu?: boolean; /** (28/10) hồ sơ năm KT đã cập nhật (dựng xong / không cần dựng) — nơi gọi bắt đầu phần chỉ đọc hồ sơ. */ khiHoSo?: () => void } = {}, docSom?: DocDauKeHoach): Promise<Map<string, KeHoachDaLap>> {
+export async function lapVaLuuKeHoach(env: Env, dsSbd: string[], now: number, tuyChon: { luu?: boolean; /** (28/10) hồ sơ năm KT đã cập nhật (dựng xong / không cần dựng) — nơi gọi bắt đầu phần chỉ đọc hồ sơ. */ khiHoSo?: () => void; /** (28/10 tối) Cổng trước mọi lệnh GHI (vd. em có thật): false ⇒ không ghi gì, trả Map rỗng; các lượt ĐỌC đã chạy song song cổng. */ cong?: Promise<boolean> } = {}, docSom?: DocDauKeHoach): Promise<Map<string, KeHoachDaLap>> {
   const em = [...new Set(dsSbd.map((x) => x.trim()).filter(Boolean))]
   const ra = new Map<string, KeHoachDaLap>()
   if (em.length === 0) return ra
@@ -626,7 +647,15 @@ export async function lapVaLuuKeHoach(env: Env, dsSbd: string[], now: number, tu
   // đếm này lẫn tiến bộ/hiển thị hôm nay mà `docDauVao` cần bên dưới, khỏi đọc lại) với `so_su_kien` của dòng kế hoạch
   // gần nhất. Hai lời hứa độc lập chạy SONG SONG (hạ tải D1: một lượt chờ hàng đợi thay vì hai). `docSom`: nơi gọi đã bắt đầu đúng hai lượt ấy.
   const dau = docSom ?? batDauDocKeHoach(env, em, now)
-  const [tongHop, rk] = await Promise.all([dau.tongHop, dau.rk])
+  // 28/10 tối GIỜ CAO ĐIỂM (vết đợt: tổng hợp sổ ⇒ RỒI mới đọc đầu vào ⇒ ghi): mọi lượt đọc đầu vào bắt đầu NGAY, cùng đợt tổng hợp sổ + dòng kế hoạch
+  // gần nhất; hồ sơ năm KT đọc trước cho cả lô, em nào sổ đổi thì thay bằng bản dựng lại (`hoSoDoan`). Bớt một đợt chờ D1 nối tiếp.
+  let baoHoSo!: (v: Map<string, { cau: NamKtCau[]; dang: NamKtDang[] }> | null | Promise<Map<string, { cau: NamKtCau[]; dang: NamKtDang[] }> | null>) => void
+  const hoSoDoan = new Promise<Map<string, { cau: NamKtCau[]; dang: NamKtDang[] }> | null>((r) => { baoHoSo = r })
+  const pDauVao = docDauVao(env, em, now, { hoSoDoan, tongHop: dau.tongHop })
+  pDauVao.catch(() => undefined)
+  let tongHop: Map<string, TongHopEm> | null, rk: D1Result<Record<string, unknown>>
+  try { [tongHop, rk] = await Promise.all([dau.tongHop, dau.rk]) } catch (e) { baoHoSo(null); throw e }
+  if (tuyChon.cong && !(await tuyChon.cong.catch((e) => { baoHoSo(null); throw e }))) { baoHoSo(null); return ra }
   const soSk = new Map(em.map((s) => [s, tongHop?.get(s)?.soSuKien ?? 0]))
   const daLap = new Map((rk.results ?? []).map((x) => [String(x.sbd), Number(x.so_su_kien)]))
   const phienCu = new Map((rk.results ?? []).map((x) => [String(x.sbd), Number(x.phien_ban)]))
@@ -636,7 +665,8 @@ export async function lapVaLuuKeHoach(env: Env, dsSbd: string[], now: number, tu
   const pDung = cuHo.length > 0 ? tat(() => dungLaiHoSo(env, cuHo, nowIso), null) : null
   // 28/10 GIỜ CAO ĐIỂM: báo «hồ sơ đã sẵn» NGAY khi dựng xong (không chờ đọc đầu vào + ghi kế hoạch) — khối «về đích» chỉ đọc hồ sơ, không đọc kế hoạch.
   if (tuyChon.khiHoSo) { if (pDung) void pDung.then(tuyChon.khiHoSo, tuyChon.khiHoSo); else tuyChon.khiHoSo() }
-  const dauVao = await docDauVao(env, em, now, { ...(pDung ? { hoSoCho: { em: cuHo, hua: pDung.then((k) => k?.hoSo ?? null) } } : {}), tongHop })
+  baoHoSo(pDung ? pDung.then((k) => k?.hoSo ?? null) : new Map())
+  const dauVao = await pDauVao
   const dungKq = pDung ? await pDung : null
 
   // Không đóng dấu version/số sự kiện mới nếu dựng hồ sơ thất bại: lượt sau phải thử lại.
@@ -853,8 +883,10 @@ export async function docThanThu(env: Env, sbd: string): Promise<ThanThu | null>
 }
 
 /** `POST /hs/ke-hoach-ngay {sbd | token}` — công khai như `/btvn/cua-em`; có `token` thì lấy SBD từ chữ ký. */
-export async function hsKeHoachNgay(env: Env, b: Record<string, unknown>, khiHoSo?: (sbd: string) => void): Promise<Record<string, unknown>> {
-  const sbd = b.token ? await gameIdentity(env, b) : String(b.sbd ?? '').trim()
+/** (28/10 tối) Nơi gọi đã biết SBD từ token ĐÃ KÝ (chưa chắc mật khẩu còn khớp): `cong` = true khi mọi kiểm của nơi gọi đã qua — trước đó chỉ chạy lượt ĐỌC. */
+export interface KeHoachTruoc { sbd: string; cong: Promise<boolean> }
+export async function hsKeHoachNgay(env: Env, b: Record<string, unknown>, khiHoSo?: (sbd: string) => void, truoc?: KeHoachTruoc): Promise<Record<string, unknown>> {
+  const sbd = truoc ? truoc.sbd : b.token ? await gameIdentity(env, b) : String(b.sbd ?? '').trim()
   if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
   // Đường này công khai (như `/hs/btvn`), nên SBD bịa KHÔNG được phép sinh ra dòng nào trong `ke_hoach_ngay`.
   // Em có thật = có trong hoc_sinh, danh sách lớp, hoặc đã có lượt thi. Kiểm TRƯỚC mọi thao tác ghi.
@@ -862,10 +894,14 @@ export async function hsKeHoachNgay(env: Env, b: Record<string, unknown>, khiHoS
   // Tối ưu 05/10: hai lượt ĐỌC đầu của kế hoạch + thần thú (đọc tươi, kế hoạch không ghi hồ sơ game) bắt đầu CÙNG đợt với lượt kiểm SBD có thật
   // (trước: ba đợt nối tiếp). Mọi lệnh GHI vẫn chỉ chạy SAU khi kiểm xong; SBD bịa ⇒ chỉ tốn vài lượt đọc theo SBD, không dòng nào được ghi.
   const now = Date.now()
-  const docSom = batDauDocKeHoach(env, [sbd], now)
+  // 28/10 tối GIỜ CAO ĐIỂM: lập kế hoạch bắt đầu NGAY (mọi lượt ĐỌC đầu vào cùng đợt lượt kiểm em có thật); `cong` chặn mọi lệnh GHI tới khi kiểm xong.
   const thanThuSom = docThanThu(env, sbd)
-  if (!(await laHocSinhThat(env, sbd))) return { ok: false, error: 'Không tìm thấy học sinh' }
-  const kh = (await lapVaLuuKeHoach(env, [sbd], now, khiHoSo ? { khiHoSo: () => khiHoSo(sbd) } : {}, docSom)).get(sbd)!
+  const pThat = laHocSinhThat(env, sbd)
+  const cong = truoc ? Promise.all([truoc.cong, pThat]).then(([a, c]) => a && c) : pThat
+  const pKh = lapVaLuuKeHoach(env, [sbd], now, { cong, ...(khiHoSo ? { khiHoSo: () => khiHoSo(sbd) } : {}) })
+  pKh.catch(() => undefined)
+  if (!(await cong)) return { ok: false, error: 'Không tìm thấy học sinh' }
+  const kh = (await pKh).get(sbd)!
   // `thanThu` đọc tươi mỗi lần gọi, KHÔNG nằm trong bản ghi `ke_hoach_ngay`.
   return { ok: true, ...kh, thanThu: await thanThuSom }
 }

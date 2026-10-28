@@ -172,6 +172,8 @@ it('nút «Kiểm tra» (answer) và lệnh đếm sau câu: số đợt chờ D
   const caMo = async () => { const viecPhu: Promise<unknown>[] = []; const ctx = { waitUntil: (x: Promise<unknown>) => { viecPhu.push(x) }, passThroughOnException() {} }
     return k.bo.chay(async () => (await (await worker.fetch(new Request('https://test/hs/ca-dang-mo', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token: k.token }) }), k.env, ctx as never)).json()) as Record<string, unknown>, viecPhu) }
   vi.setSystemTime(NOW + 480_000); await amCo(); ghi('ca-dang-mo', await caMo())
+  // 28/10 tối: mở lại Lộ trình khi sổ không đổi (em quay về Sảnh) — mọi lượt đọc đầu vào cùng đợt lượt kiểm em có thật, tổng hợp sổ không chờ mốc.
+  vi.setSystemTime(NOW + 540_000); await amCo(); ghi('ke-hoach-ngay-lai', await keHoach())
   const moc = JSON.parse(fs.readFileSync(MOC, 'utf8')) as { mayChuNop?: Record<string, { dot: number; lenh: number }> }
   if (process.env.GHI_MOC_TOC_DO) fs.writeFileSync(process.env.GHI_MOC_TOC_DO, JSON.stringify(do_, null, 1))
   const vuot: string[] = [], ha: string[] = [], thieuMoc: string[] = []

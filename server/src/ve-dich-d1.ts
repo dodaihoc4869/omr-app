@@ -32,7 +32,7 @@ import { NGAN_SACH_TRAN, NGAY_LIET_KE_QUA_HAN, SO_NGAY_DO_VAN_TOC } from './ho-s
 import { themNgay } from './ho-so-nam-kt'
 import { tinhVanToc } from './ke-hoach-ngay'
 import { ngayVn } from './su-kien-hoc'
-import { baiTuNgayMoc, giaiMocHienThi, KHOA_HIEN_THI_TU, KHOA_MOC_BANG_TIN_NO, KHOA_VE_DICH_TU } from './moc-no'
+import { baiTuNgayMoc, docMocHienThi } from './moc-no'
 
 type Row = Record<string, unknown>
 
@@ -360,13 +360,11 @@ export async function docVeDichCuaEm(env: Env, sbd: string, nowMs: number = Date
   const dauHomNay = dauNgayVnMs(homNay)
   const dauMai = dauHomNay + MS_NGAY
 
-  const [bai, emVaCa, onQuaLich, goiGiaDinh, soHoc, cfgMoc] = await Promise.all([
-    docBai(hoi, em, nowMs), docEmVaCa(hoi, em, nowMs), docOn(hoi, em, homNay), docGoi(hoi, em, nowMs), docSoHoc(hoi, em, homNay),
-    hoi('SELECT khoa, gia_tri FROM cau_hinh WHERE khoa IN (?, ?, ?)', KHOA_HIEN_THI_TU, KHOA_VE_DICH_TU, KHOA_MOC_BANG_TIN_NO),
+  // 28/10 tối (giờ cao điểm): mốc đọc qua `docMocHienThi` (đệm 30 s, Lộ trình vừa đọc cùng mốc ấy) — bớt một lệnh D1 mỗi lượt.
+  const [bai, emVaCa, onQuaLich, goiGiaDinh, soHoc, moc] = await Promise.all([
+    docBai(hoi, em, nowMs), docEmVaCa(hoi, em, nowMs), docOn(hoi, em, homNay), docGoi(hoi, em, nowMs), docSoHoc(hoi, em, homNay), docMocHienThi(env),
   ])
-  // MỐC TÍNH NỢ (thầy lệnh 21/09 15:52): món nợ có ngày < mốc KHÔNG phải nợ (xem moc-no.ts). Không đọc được cấu hình ⇒ hằng số mặc định.
-  const cauHinh = new Map((cfgMoc ?? []).map((x) => [chuoi(x.khoa), x.gia_tri]))
-  const moc = giaiMocHienThi(cauHinh.get(KHOA_HIEN_THI_TU), cauHinh.get(KHOA_VE_DICH_TU), cauHinh.get(KHOA_MOC_BANG_TIN_NO))
+  // MỐC TÍNH NỢ (thầy lệnh 21/09 15:52): món nợ có ngày < mốc KHÔNG phải nợ (xem moc-no.ts). Không đọc được cấu hình ⇒ hằng số mặc định (docMocHienThi không ném).
   const tuNgay = moc.ngayVn
   const tuLuc = moc.iso
   const giay = tinhVanToc(soHoc.mauGiay).giay

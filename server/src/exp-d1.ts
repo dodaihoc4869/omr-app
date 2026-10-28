@@ -23,7 +23,7 @@ import { congTongSoVaoHoSo, khienConLai, khienRenChuaDung, type DaCong, type HoS
 import { NGAN_SACH_SAN, TOI_THIEU_CAU_SAN } from './ho-so-cau-hinh'
 import type { SuKienDoc } from './ho-so-nam-kt'
 import { traCuuTheoQid } from './ho-so-nam-kt'
-import { docNgayNghi, hsKeHoachNgay, lapVaLuuKeHoach, phanTichNgayNghi } from './ke-hoach-ngay-d1'
+import { docNgayNghi, hsKeHoachNgay, lapVaLuuKeHoach, phanTichNgayNghi, type KeHoachTruoc } from './ke-hoach-ngay-d1'
 import { docHapThuChoEm, nhanExpGame } from './game-v2-hap-thu'
 import type { Profile } from './game-v2'
 import { tinhDatNhiemVuNgay } from '../../src/lib/dat-nhiem-vu-ngay'
@@ -1120,7 +1120,7 @@ export async function docExpHomNay(env: Env, sbd: string, nowMs: number): Promis
  * `POST /hs/ke-hoach-ngay` có EXP: lập kế hoạch như cũ, rồi (chỉ khi EXP mới bật cho em) tính EXP từ kế hoạch VỪA LẬP và đính `exp` + `expNhan` +
  * `manhNhan`. Tắt cờ → phản hồi y hệt bản cũ, từng chữ.
  */
-export async function hsKeHoachNgayCoExp(env: Env, b: Record<string, unknown>, sauKeHoach?: (sbd: string) => void): Promise<Record<string, unknown>> {
+export async function hsKeHoachNgayCoExp(env: Env, b: Record<string, unknown>, sauKeHoach?: (sbd: string) => void, truoc?: KeHoachTruoc): Promise<Record<string, unknown>> {
   // Tối ưu 05/10: cờ EXP mới (`cau_hinh.exp_moi`) đọc CÙNG đợt đầu của kế hoạch (trước: một đợt riêng sau khi lập kế hoạch). Kế hoạch không ghi `cau_hinh`.
   const cauHinhSom = docCauHinhExp(env)
   cauHinhSom.catch(() => {})
@@ -1128,7 +1128,7 @@ export async function hsKeHoachNgayCoExp(env: Env, b: Record<string, unknown>, s
   // (trước: chờ ghi kế hoạch xong ⇒ thêm một đợt D1 nối tiếp). Đường không báo (lỗi giữa chừng) ⇒ gọi như cũ sau kế hoạch. Chỉ MỘT lần.
   let daBao = false
   const bao = (s: string) => { if (!daBao && s && sauKeHoach) { daBao = true; sauKeHoach(s) } }
-  const r = await hsKeHoachNgay(env, b, sauKeHoach ? bao : undefined)
+  const r = await hsKeHoachNgay(env, b, sauKeHoach ? bao : undefined, truoc)
   if (r.ok !== true) return r
   const sbd = typeof r.sbd === 'string' ? r.sbd : b.token ? await gameIdentity(env, b).catch(() => '') : String(b.sbd ?? '').trim()
   if (sbd) bao(sbd)
