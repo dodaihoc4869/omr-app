@@ -107,3 +107,22 @@ it('lượt lướt / chẩn đoán đã vào sổ (không tính) không đượ
   expect((await demHomNay7(k.env, 'S1', NOW)).daLamHomNay).toBe(4)
   expect((await ngayBaiCuaMotEm(k.env, 'S1', '2026-10-13', '2026-10-13', '2026-10-13'))?.map((n) => n.daLam)).toEqual([4])
 })
+
+// LỖI 28/10 (ảnh thầy: «Đủ 14/12 câu hôm nay · 2/2 chặng» mà nút Sửa lỗi còn 2 câu — «phần sửa chưa làm xong nhưng lại tự xong chặng cuối mặc dù chưa làm»).
+// Nguyên nhân gốc: lượt Tự sửa lỗi (`nguon = 'chua_loi'`) cộng vào «đã làm hôm nay» ⇒ kế hoạch bớt câu học, Lộ trình vẽ chặng cuối «xong». Mức / chặng chỉ đếm câu học.
+it('câu Tự sửa lỗi không cộng vào đã làm hôm nay — sảnh, ô đếm, lịch ngày cùng số; kế hoạch vẫn phát đủ câu học', async () => {
+  const k = await kho()
+  const lap0 = (await lapGoi7(k.env, 'S1', NOW))!
+  const ke = lap0.plan.viec.map((v) => v.qid)
+  const luc = NOW - 60_000
+  const hoc = ke.slice(0, 6)
+  ghiLuotNgay(k, hoc, luc)
+  const sua = k.qids('DH-B8').filter((q) => !ke.includes(q)).slice(0, 8)
+  const dong = (nguon: string, q: string) => ({ nguon, maNguon: nguon === 'chua_loi' ? `dot-${q}` : 'phien-cuoi', sbd: 'S1', qid: q, lan: 1, ketQua: 1, luc: new Date(luc).toISOString(), maDang: '', chuyenDe: '', mucDo: '', attemptId: `${nguon}|${q}`, assistance: 'none', purpose: nguon === 'chua_loi' ? 'repair' : 'maintenance', receivedAt: luc })
+  await ghiSuKien(k.env, [...hoc.map((q) => dong('game', q)), ...sua.map((q) => dong('chua_loi', q))] as never)
+  const lap = (await lapGoi7(k.env, 'S1', NOW))!
+  expect(lap.daLamNgay).toBe(6) // trước: 14 ⇒ «Đủ 14/12», chặng cuối tự xong
+  expect((await demHomNay7(k.env, 'S1', NOW)).daLamHomNay).toBe(6)
+  expect((await ngayBaiCuaMotEm(k.env, 'S1', '2026-10-13', '2026-10-13', '2026-10-13'))?.map((n) => n.daLam)).toEqual([6])
+  expect(lap.daLamNgay + lap.plan.viec.length).toBeGreaterThanOrEqual(lap0.toiThieu) // phần học còn lại vẫn được xếp đủ mức
+})

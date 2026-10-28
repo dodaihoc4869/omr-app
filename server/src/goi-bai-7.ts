@@ -32,6 +32,7 @@ import { soSanhOnHoiThay } from './hoi-thay-lich-on'
 import { cungTap, layKeHoach7, nhoKeHoach7 } from './goi-bai-7-nho'
 import { lenhThuongTraLoi, tinhThuongHocCachGiai, type PhienNt } from './thuong-tra-loi'
 import { ngayVnTt } from './thuong-luat'
+import { SQL_KHONG_TU_SUA } from './chuoi-ngay-bai'
 
 type Row = Record<string, unknown>
 const str = (x: unknown) => String(x ?? '')
@@ -269,11 +270,13 @@ const VUA_LAM_MS = 15 * 60_000
  * tưởng đủ mức, ngừng phát câu; (2) chỉ thêm lượt CHƯA có dòng sổ — lượt đã ghi sổ thì sổ quyết định như lịch ngày (lướt / chẩn đoán không tính).
  * `vuaLam` (chặn phát lại) giữ cả mã đã phát lẫn mã gốc (`tachSongSinh`).
  * `now` vắng ⇒ như cũ (chỉ sổ). Lỗi đọc bảng lượt ⇒ bỏ phần thêm, như cũ.
+ * KHÔNG TÍNH CÂU TỰ SỬA LỖI (lỗi 28/10, ảnh thầy: «Đủ 14/12 câu · 2/2 chặng» mà nút Sửa lỗi còn 2): lượt `chua_loi` từng cộng vào mức ⇒ kế hoạch bớt câu
+ * học, chặng cuối tự «xong» dù em chưa học. Tự sửa lỗi là nút riêng trên Lộ trình (đếm riêng, thưởng riêng) ⇒ mức / chặng chỉ đếm câu học.
  */
 export async function docDaLamVaVuaLam7(env: Env, sbd: string, ngay: string, now?: number): Promise<{ daLam: Set<string>; vuaLam: Set<string>; soVua: number }> {
   const tu = now === undefined ? '' : new Date(Math.max(now - VUA_LAM_MS, Date.parse(`${ngay}T00:00:00+07:00`))).toISOString()
   const [done, guidedToday, vua] = await Promise.all([
-    env.DB.prepare(`SELECT DISTINCT qid FROM su_kien_hoc WHERE sbd=? AND ngay_vn=? AND ket_qua IS NOT NULL AND ma_nguon NOT LIKE 'ktcn:%' AND ${SQL_LUOT_GOI7}`).bind(sbd,ngay).all<{qid:string}>(),
+    env.DB.prepare(`SELECT DISTINCT qid FROM su_kien_hoc WHERE sbd=? AND ngay_vn=? AND ket_qua IS NOT NULL AND ma_nguon NOT LIKE 'ktcn:%' AND ${SQL_KHONG_TU_SUA} AND ${SQL_LUOT_GOI7}`).bind(sbd,ngay).all<{qid:string}>(),
     env.DB.prepare("SELECT DISTINCT qid FROM goi_bai_7_gap WHERE sbd=? AND date(luc,'+7 hours')=?").bind(sbd,ngay).all<{qid:string}>(),
     // `co_so`: lượt đã có dòng sổ (chỉ mục su_kien_hoc(sbd, qid, ngay_vn)) ⇒ sổ quyết định (lướt / chẩn đoán không tính); chưa có ⇒ đang chờ ghi, tính ngay.
     tu ? env.DB.prepare('SELECT a.qid,EXISTS(SELECT 1 FROM su_kien_hoc s WHERE s.sbd=a.sbd AND s.qid=a.qid AND s.ngay_vn=? AND s.attempt_id=a.id) co_so FROM game_v2_attempt a WHERE a.sbd=? AND a.created_at>=?').bind(ngay,sbd,tu).all<{qid:string;co_so:number}>().catch(() => ({ results: [] as {qid:string;co_so:number}[] })) : Promise.resolve({ results: [] as {qid:string;co_so:number}[] }),

@@ -19,8 +19,9 @@ import { SQL_LA_LAN_LAM } from './omni-kieu'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 
 /** (28/10) Điều kiện một dòng `su_kien_hoc` (KHÔNG bí danh) được tính vào MỨC HÔM NAY — đúng tập «đã làm hôm nay» của Gói 7 (`docDaLamNgay7`): bỏ KTCN,
- *  lướt / chẩn đoán / xem lời giải, câu đang giấu, câu ca thi chưa công bố. Viết lại ở đây (không nhập goi-bai-7 ⇒ không vòng nhập). */
-export const SQL_CAU_TINH_MUC = `ma_nguon NOT LIKE 'ktcn:%' AND ${SQL_LA_LAN_LAM} AND COALESCE(visibility,'')<>'embargoed' AND (nguon<>'thi' OR EXISTS(SELECT 1 FROM ca c WHERE c.ma_ca=su_kien_hoc.ma_nguon AND c.trang_thai<>'da_xoa' AND ${SQL_DA_CONG_BO('c')}))`
+ *  lướt / chẩn đoán / xem lời giải, câu Tự sửa lỗi, câu đang giấu, câu ca thi chưa công bố. Viết lại ở đây (không nhập goi-bai-7 ⇒ không vòng nhập). */
+export const SQL_KHONG_TU_SUA = "COALESCE(nguon,'')<>'chua_loi'"
+export const SQL_CAU_TINH_MUC = `ma_nguon NOT LIKE 'ktcn:%' AND ${SQL_KHONG_TU_SUA} AND ${SQL_LA_LAN_LAM} AND COALESCE(visibility,'')<>'embargoed' AND (nguon<>'thi' OR EXISTS(SELECT 1 FROM ca c WHERE c.ma_ca=su_kien_hoc.ma_nguon AND c.trang_thai<>'da_xoa' AND ${SQL_DA_CONG_BO('c')}))`
 
 export const CAU_MOT_BAI = 6
 export const BAI_CUU = 2
