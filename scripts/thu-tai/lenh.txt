@@ -1,1 +1,2 @@
 don
+# lần 2: xoá Worker sao bằng API

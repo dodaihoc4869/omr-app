@@ -203,10 +203,11 @@ jobs:
           ID=$(node -e 'const l=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));const x=l.find(d=>d.name==="omr-thu-tai");console.log(x?x.uuid:"")' "$TT/list.json")
           node ../scripts/thu-tai/tao-cau-hinh.mjs "${ID:-00000000-0000-0000-0000-000000000000}" wrangler-thu-tai.toml
           grep -q '^name = "omr-thu-tai"$' wrangler-thu-tai.toml || exit 1
-          # Xoá chạy trong thư mục KHÔNG có wrangler.toml thật, cấu hình sao + tên sao ghi rõ — không thể trúng Worker `omr`.
-          ( cd "$TT" && "$GITHUB_WORKSPACE/node_modules/.bin/wrangler" delete -c "$GITHUB_WORKSPACE/server/wrangler-thu-tai.toml" --name omr-thu-tai --force > "$TT/xoa.log" 2>&1 ) && echo "Đã xoá Worker omr-thu-tai." || tail -n 5 "$TT/xoa.log" | grep -v -i token
-          if [ -n "$ID" ] && [ "$ID" != "$DB_THAT" ]; then
-            npx wrangler d1 execute omr-thu-tai --remote -c wrangler-thu-tai.toml --json --command "SELECT DISTINCT COALESCE(NULLIF(r2_khoa,''), 'kho/' || ma_de || '.json') AS k FROM de_kho" > "$TT/khoa.json" && node ../scripts/thu-tai/chep-r2.mjs xoa "$TT/khoa.json"
-          fi
-          npx wrangler r2 bucket delete omr-thu-tai-de > "$TT/r2x.log" 2>&1 && echo "Đã xoá thùng R2 sao." || tail -n 5 "$TT/r2x.log"
+          # Xoá bằng API Cloudflare, TÊN SAO viết cứng (lượt 40626915563: `wrangler delete` báo lỗi quyền đọc thành viên, Worker sao còn nguyên).
+          TEN=omr-thu-tai; [ "$TEN" != "omr" ] || exit 1
+          MA=$(curl -s -o "$TT/xoa.json" -w '%{http_code}' -X DELETE -H "Authorization: Bearer $CF_TOKEN_SACH" "https://api.cloudflare.com/client/v4/accounts/$CF_ACC_SACH/workers/scripts/$TEN?force=true")
+          echo "Xoá Worker sao: HTTP $MA · $(node -e 'try{const j=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));console.log(j.success?"thành công":JSON.stringify(j.errors).slice(0,160))}catch{console.log("?")}' "$TT/xoa.json")"
+          CON=$(curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer $CF_TOKEN_SACH" "https://api.cloudflare.com/client/v4/accounts/$CF_ACC_SACH/workers/scripts/$TEN")
+          echo "Kiểm lại: GET Worker sao ⇒ HTTP $CON (404 = đã xoá)"
+          echo "Thùng R2 sao: không tạo được (khoá thiếu quyền R2) ⇒ không có gì để xoá."
           if grep -q 'xoa-d1' ../scripts/thu-tai/lenh.txt && [ -n "$ID" ] && [ "$ID" != "$DB_THAT" ]; then npx wrangler d1 delete omr-thu-tai -y > /dev/null && echo "Đã xoá D1 sao."; else echo "GIỮ D1 sao omr-thu-tai để đo lại."; fi
