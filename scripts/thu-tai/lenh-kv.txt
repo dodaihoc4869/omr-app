@@ -1,0 +1,2 @@
+hoi kv-tao bat-sao
+# 28/10 claude/kv-san-sang-2810: hỏi chế độ bản sao đọc D1, tạo KV, bật bản sao đọc cho D1 SAO.
