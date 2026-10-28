@@ -1,0 +1,104 @@
+# ĐO «KIỂM TRA» CHẬM GIỜ CAO ĐIỂM 28/10 (CHỈ ĐỌC) — thầy gửi ảnh em bấm «Kiểm tra» ra «Máy chủ phản hồi chậm hoặc mạng gián đoạn» (19:50 VN).
+# do-tail-lenh 19:51–19:57 VN: /game-v2/answer p50 1,4 s · p90 14,9 s · max 44,9 s · 14/70 khác ok; CPU max 1,2 s.
+# In: (1) Worker 60 phút gần nhất theo 5 phút + trạng thái lượt gọi; (2) D1 15 nhóm câu nặng nhất 40 phút gần nhất; (3) tail 4 phút: với answer / sanh /
+# ke-hoach — loại kết quả (outcome), tên + đầu lời ngoại lệ, đầu dòng nhật ký (số ≥ 3 chữ số thay bằng #), thời gian theo phút. Không in thân yêu cầu, không mã em.
+name: Đo Kiểm tra chậm giờ cao điểm (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/do-kiem-tra-cham-2810]
+    paths: ['.github/workflows/do-kiem-tra-cham-2810.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-kiem-tra-cham-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      DB_ID: d2e6d322-374a-45d7-83a3-9fac486b23f1
+      PHUT: '4'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Worker + D1 (GraphQL, chỉ đọc)
+        env:
+          TOKEN: ${{ env.CF_TOKEN_SACH }}
+          ACC: ${{ env.CF_ACC_SACH }}
+        run: |
+          node - <<'JS'
+          const { TOKEN, ACC, DB_ID } = process.env
+          const H = { authorization: `Bearer ${TOKEN}`, 'content-type': 'application/json' }
+          const hoi = async (query, variables) => {
+            const r = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ query, variables }), signal: AbortSignal.timeout(30000) })
+            const j = await r.json(); if (j.errors?.length) console.log('LỖI GraphQL:', JSON.stringify(j.errors).slice(0, 600)); return j.data
+          }
+          const den = new Date(), tu = new Date(den.getTime() - 60 * 60000)
+          console.log(`=== Worker omr theo 5 phút ${tu.toISOString()} → ${den.toISOString()} (UTC; VN = +7) ===`)
+          const w5 = await hoi(`query($acc:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+            workersInvocationsAdaptive(limit:20,filter:{scriptName:"omr",datetime_geq:$tu,datetime_leq:$den},orderBy:[datetimeFiveMinutes_ASC]){
+            dimensions{datetimeFiveMinutes} sum{requests errors subrequests} quantiles{durationP50 durationP90 durationP99 cpuTimeP50 cpuTimeP99}}}}}`, { acc: ACC, tu: tu.toISOString(), den: den.toISOString() })
+          for (const x of w5?.viewer?.accounts?.[0]?.workersInvocationsAdaptive ?? [])
+            console.log([x.dimensions.datetimeFiveMinutes.slice(11, 16), `yc=${x.sum.requests}`, `loi=${x.sum.errors}`, `p50=${Math.round(x.quantiles.durationP50)}`, `p90=${Math.round(x.quantiles.durationP90)}`, `p99=${Math.round(x.quantiles.durationP99)}`, `cpu50=${Math.round(x.quantiles.cpuTimeP50)}`, `cpu99=${Math.round(x.quantiles.cpuTimeP99)}`].join(' '))
+          const st = await hoi(`query($acc:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+            workersInvocationsAdaptive(limit:20,filter:{scriptName:"omr",datetime_geq:$tu,datetime_leq:$den}){dimensions{status} sum{requests}}}}}`, { acc: ACC, tu: tu.toISOString(), den: den.toISOString() })
+          console.log('=== Trạng thái lượt gọi 60 phút ===')
+          for (const x of st?.viewer?.accounts?.[0]?.workersInvocationsAdaptive ?? []) console.log(`${x.dimensions.status}: ${x.sum.requests}`)
+          const tu40 = new Date(den.getTime() - 40 * 60000)
+          const d1 = await hoi(`query($acc:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+            d1QueriesAdaptiveGroups(limit:25,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[sum_queryDurationMs_DESC]){
+              count sum{queryDurationMs rowsRead rowsWritten} quantiles{queryDurationMsP50 queryDurationMsP95} dimensions{query}}}}}`, { acc: ACC, db: DB_ID, tu: tu40.toISOString(), den: den.toISOString() })
+          const ds = d1?.viewer?.accounts?.[0]?.d1QueriesAdaptiveGroups ?? []
+          console.log(`=== D1 40 phút: ${ds.length} nhóm nặng nhất · tổng ${Math.round(ds.reduce((n, x) => n + x.sum.queryDurationMs, 0) / 1000)} s ===`)
+          for (const x of ds.slice(0, 20)) console.log([`lan=${x.count}`, `tongS=${(x.sum.queryDurationMs / 1000).toFixed(1)}`, `tbMs=${(x.sum.queryDurationMs / Math.max(1, x.count)).toFixed(1)}`, `p95=${Math.round(x.quantiles?.queryDurationMsP95 ?? 0)}`, `docTB=${Math.round(x.sum.rowsRead / Math.max(1, x.count))}`, `ghi=${x.sum.rowsWritten}`, '|', String(x.dimensions.query).replace(/\s+/g, ' ').slice(0, 260)].join(' '))
+          const d5 = await hoi(`query($acc:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+            d1AnalyticsAdaptiveGroups(limit:20,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[datetimeFiveMinutes_ASC]){
+              dimensions{datetimeFiveMinutes} sum{readQueries writeQueries rowsRead rowsWritten} quantiles{queryBatchTimeMsP50 queryBatchTimeMsP90}}}}}`, { acc: ACC, db: DB_ID, tu: tu.toISOString(), den: den.toISOString() })
+          console.log('=== D1 theo 5 phút (đọc / ghi / dòng đọc / lô p50-p90 ms) ===')
+          for (const x of d5?.viewer?.accounts?.[0]?.d1AnalyticsAdaptiveGroups ?? [])
+            console.log([x.dimensions.datetimeFiveMinutes.slice(11, 16), `doc=${x.sum.readQueries}`, `ghi=${x.sum.writeQueries}`, `dongDoc=${x.sum.rowsRead}`, `dongGhi=${x.sum.rowsWritten}`, `lo50=${Math.round(x.quantiles.queryBatchTimeMsP50)}`, `lo90=${Math.round(x.quantiles.queryBatchTimeMsP90)}`].join(' '))
+          JS
+      - name: Theo dõi Worker sống (tail) rồi gộp số
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          timeout $((PHUT*60)) npx -y wrangler@4 tail omr --format json > /tmp/tail.jsonl 2>/tmp/tail.err || true
+          node - <<'JS'
+          const fs = require('fs')
+          const raw = fs.readFileSync('/tmp/tail.jsonl', 'utf8')
+          const ev = []; let d = 0, s = -1, inStr = false, esc = false
+          for (let i = 0; i < raw.length; i++) { const c = raw[i]
+            if (inStr) { if (esc) esc = false; else if (c === '\\') esc = true; else if (c === '"') inStr = false; continue }
+            if (c === '"') { inStr = true; continue }
+            if (c === '{') { if (d++ === 0) s = i } else if (c === '}') { if (--d === 0 && s >= 0) { try { ev.push(JSON.parse(raw.slice(s, i + 1))) } catch {} s = -1 } } }
+          const sach = (x) => String(x ?? '').replace(/\d{3,}/g, '#').replace(/"[^"]{0,80}"/g, '"…"').replace(/\s+/g, ' ').slice(0, 160)
+          const pt = (a, q) => { if (!a.length) return '-'; const b = [...a].sort((x, y) => x - y); return b[Math.min(b.length - 1, Math.floor(q * b.length))] }
+          console.log('sự kiện:', ev.length)
+          const outcomeAll = new Map(); for (const e of ev) outcomeAll.set(e.outcome, (outcomeAll.get(e.outcome) ?? 0) + 1)
+          console.log('outcome mọi lệnh:', JSON.stringify([...outcomeAll]))
+          for (const duong of ['/game-v2/answer', '/game-v2/hoc-tap-sanh', '/hs/ke-hoach-ngay', '/game-v2/hoa2-cau-da-lam', '/game-v2/hoc-tap-start']) {
+            const cua = ev.filter((e) => { try { return new URL(e?.event?.request?.url).pathname === duong } catch { return false } })
+            if (!cua.length) continue
+            const oc = new Map(), ex = new Map(), lg = new Map(), phut = new Map()
+            for (const e of cua) {
+              oc.set(e.outcome, (oc.get(e.outcome) ?? 0) + 1)
+              for (const x of e.exceptions ?? []) { const k = sach(`${x.name}: ${x.message}`); ex.set(k, (ex.get(k) ?? 0) + 1) }
+              for (const l of e.logs ?? []) { const k = `${l.level} ${sach((l.message ?? []).join(' '))}`; lg.set(k, (lg.get(k) ?? 0) + 1) }
+              const m = new Date(e.eventTimestamp).toISOString().slice(11, 16); const g = phut.get(m) ?? []; g.push(e.wallTime); phut.set(m, g)
+            }
+            console.log(`\n=== ${duong}: ${cua.length} lượt · wall p50/p90/p99/max ${pt(cua.map((e) => e.wallTime), .5)}/${pt(cua.map((e) => e.wallTime), .9)}/${pt(cua.map((e) => e.wallTime), .99)}/${pt(cua.map((e) => e.wallTime), 1)} · cpu p50/p90/max ${pt(cua.map((e) => e.cpuTime), .5)}/${pt(cua.map((e) => e.cpuTime), .9)}/${pt(cua.map((e) => e.cpuTime), 1)}`)
+            console.log('outcome:', JSON.stringify([...oc]))
+            const kOk = cua.filter((e) => e.outcome !== 'ok'); console.log('lượt khác ok — wall / cpu:', kOk.map((e) => `${e.outcome}:${e.wallTime}/${e.cpuTime}`).join(' '))
+            console.log('ngoại lệ:'); for (const [k, n] of [...ex].sort((a, b) => b[1] - a[1]).slice(0, 10)) console.log(`  ${n}× ${k}`)
+            console.log('nhật ký:'); for (const [k, n] of [...lg].sort((a, b) => b[1] - a[1]).slice(0, 15)) console.log(`  ${n}× ${k}`)
+            console.log('theo phút (UTC) — lượt · p50/max:'); for (const [m, g] of [...phut].sort()) console.log(`  ${m} ${g.length} · ${pt(g, .5)}/${pt(g, 1)}`)
+          }
+          JS
