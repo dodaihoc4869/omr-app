@@ -19,7 +19,7 @@ jobs:
     timeout-minutes: 12
     env:
       DB_ID: d2e6d322-374a-45d7-83a3-9fac486b23f1
-      PHUT: '4'
+      PHUT: '1'
     steps:
       - uses: actions/checkout@v4
       - name: Làm sạch khoá Cloudflare
@@ -27,6 +27,21 @@ jobs:
           T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Lược đồ ke_hoach_ngay trên D1 sống (chỉ đọc)
+        env:
+          TOKEN: ${{ env.CF_TOKEN_SACH }}
+          ACC: ${{ env.CF_ACC_SACH }}
+        run: |
+          node - <<'JS'
+          const { TOKEN, ACC, DB_ID } = process.env
+          const q = async (sql) => {
+            const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${ACC}/d1/database/${DB_ID}/query`, { method: 'POST', headers: { authorization: `Bearer ${TOKEN}`, 'content-type': 'application/json' }, body: JSON.stringify({ sql }), signal: AbortSignal.timeout(30000) })
+            const j = await r.json(); return j.success ? j.result?.[0]?.results : `LỖI ${JSON.stringify(j.errors).slice(0, 300)}`
+          }
+          console.log('cột ke_hoach_ngay:', JSON.stringify((await q('PRAGMA table_info(ke_hoach_ngay)'))?.map?.((c) => c.name)))
+          console.log('dòng theo tháng / chưa chốt:', JSON.stringify(await q("SELECT substr(ngay,1,7) AS thang, COUNT(*) AS n, SUM(ket_qua IS NULL) AS chua_chot, MAX(cap_nhat_luc) AS moi_nhat FROM ke_hoach_ngay GROUP BY 1 ORDER BY 1")))
+          console.log('hôm nay:', JSON.stringify(await q("SELECT COUNT(*) AS n, MAX(cap_nhat_luc) AS moi_nhat FROM ke_hoach_ngay WHERE ngay = date('now','+7 hours')")))
+          JS
       - name: Worker + D1 (GraphQL, chỉ đọc)
         env:
           TOKEN: ${{ env.CF_TOKEN_SACH }}
