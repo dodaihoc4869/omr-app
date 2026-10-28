@@ -52,8 +52,9 @@ const PHAN_DAU: readonly Phan[] = [
   ['cde', 'chien_dich_em', "SELECT COUNT(*)||'|'||COALESCE(MAX(COALESCE(them_luc,'')),'')||'|'||COALESCE(MAX(COALESCE(bot_luc,'')),'') FROM chien_dich_em WHERE sbd=?1"],
   ['bdd', 'bai_da_day', "SELECT COUNT(*)||'|'||COALESCE(MAX(tick_luc),'') FROM bai_da_day", 1],
 ]
-/** Phiên bản cách tính dấu (đầu chuỗi): đổi cách tính ⇒ bản sẵn cũ không khớp, cron đêm lập lại (xem `cronSanSangDem`). */
-export const BAN_DAU = 'v3'
+/** Phiên bản cách tính dấu (đầu chuỗi): đổi cách tính ⇒ bản sẵn cũ không khớp, cron đêm lập lại (xem `cronSanSangDem`).
+ *  v4 (28/10): «đã làm hôm nay» không còn đếm câu Tự sửa lỗi ⇒ bỏ mọi bản sẵn lập theo cách đếm cũ (sảnh «Đủ 14/12 · 2/2 chặng» khi chưa học chặng cuối). */
+export const BAN_DAU = 'v4'
 /** Câu đọc DẤU (bỏ phần của bảng chưa có — `vang`; `coChung` = có kèm phần chung). ?1 = sbd. */
 export function sqlDauSanSang(vang: ReadonlySet<string> = new Set(), coChung = true): string {
   return 'SELECT ' + PHAN_DAU.filter((p) => coChung || !p[3]).map(([k, bang, q]) => (vang.has(bang) ? `'-' AS ${k}` : `(${q}) AS ${k}`)).join(',\n  ')
