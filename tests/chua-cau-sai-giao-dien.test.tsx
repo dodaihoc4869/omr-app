@@ -57,18 +57,22 @@ describe('Trải nghiệm sửa từng bước', () => {
       screen.queryByRole('button', { name: /Nhờ thầy|Gửi thầy/ }),
     ).toBeNull()
   })
-  it('mất mạng lúc mở đầu có thể tải lại và bắt đầu đúng phiên', async () => {
+  it('mất mạng lúc mở đầu: TỰ thử lại (không khung lỗi) và bắt đầu đúng phiên', async () => {
     api.apiMoDot
       .mockResolvedValueOnce({ ok: false, loi: 'Chưa kết nối được' })
       .mockResolvedValueOnce({ ok: true, dotId: 'D1' })
     render(<Man token="t" qid="Q" onVe={() => {}} />)
-    await screen.findByText('Chưa kết nối được')
-    // SỬA CÓ CHỦ Ý 12/10: lỗi lúc MỞ câu có khung riêng "Chưa mở được câu này" (nút chính "Thử lại" + "Sang câu khác") thay cho
-    // nút "Tải lại tiến độ" đứng một mình — vẫn tải lại đúng phiên như trước.
-    expect(screen.getByRole('button', { name: 'Sang câu khác' })).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: 'Thử lại' }))
-    expect(await screen.findByLabelText('Câu trả lời của em')).toBeTruthy()
+    // SỬA CÓ CHỦ Ý 28/10 (thầy «Bỏ màn chưa sửa được câu này đi»): không còn khung «Chưa mở được câu này» + «Thử lại» — màn tự thử lại.
+    expect(await screen.findByLabelText('Câu trả lời của em', undefined, { timeout: 3000 })).toBeTruthy()
+    expect(screen.queryByText('Chưa kết nối được')).toBeNull()
     expect(api.apiMoDot).toHaveBeenCalledTimes(2)
+  })
+  it('mất mạng mãi: thử lại 2 lần rồi sang câu kế, KHÔNG ghi xong phần (câu còn nợ)', async () => {
+    api.apiMoDot.mockResolvedValue({ ok: false, loi: 'Chưa kết nối được' })
+    const onTiep = vi.fn()
+    render(<Man token="t" qid="Q" onVe={() => {}} onTiep={onTiep} />)
+    await waitFor(() => expect(onTiep).toHaveBeenCalledTimes(1), { timeout: 4000 })
+    expect(api.apiMoDot).toHaveBeenCalledTimes(3)
   })
   it('phản hồi sai được giữ cho em đọc; khoá đáp án đầu và chỉ chuyển khi em bấm', async () => {
     api.apiNopItem.mockResolvedValue({

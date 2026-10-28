@@ -1,7 +1,7 @@
 // 24/10 (em SBD 10044 «Vẫn lỗi»): máy chủ trả «chưa có lỗi đang mở» KÈM mã đợt (sổ học đã đóng lỗi, đợt vừa được đóng) ⇒ màn chữa tính xong phần
 // hôm nay và báo «Câu này không cần sửa nữa» (không còn khung «Chưa mở được câu này» làm kẹt chặng). Không kèm mã đợt ⇒ khung lỗi cũ y nguyên.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, render, screen, waitFor } from '@testing-library/react'
 
 const api = vi.hoisted(() => ({
   apiMoDot: vi.fn(),
@@ -40,10 +40,14 @@ describe('Sổ học đã đóng lỗi, hàng đợt vừa đóng', () => {
     expect(ghi).toHaveBeenCalledWith('D9')
     expect(screen.getByRole('status').textContent).not.toMatch(/làm lại đúng|sửa xong rồi/)
   })
-  it('«chưa có lỗi đang mở» KHÔNG kèm mã đợt ⇒ khung lỗi cũ, không ghi xong phần', async () => {
+  // SỬA CÓ CHỦ Ý 28/10 (thầy «Bỏ màn chưa sửa được câu này đi»): không còn khung lỗi — câu tự khép phần hôm nay rồi sang câu kế / về.
+  it('«chưa có lỗi đang mở» KHÔNG kèm mã đợt ⇒ ghi xong phần theo mã câu, sang câu kế ngay — không khung lỗi', async () => {
     api.apiMoDot.mockResolvedValue({ ok: false, loi: 'Câu này chưa có lỗi đang mở đã công bố.', ma: 'CHUA_CO_LOI' })
-    render(<Man token="t" qid="Q" onVe={() => {}} />)
-    expect(await screen.findByRole('heading', { name: 'Chưa mở được câu này' })).toBeTruthy()
-    expect(ghi).not.toHaveBeenCalled()
+    const onVe = vi.fn(), onTiep = vi.fn()
+    render(<Man token="t" qid="Q" onVe={onVe} onTiep={onTiep} />)
+    await waitFor(() => expect(onTiep).toHaveBeenCalledTimes(1))
+    expect(ghi).toHaveBeenCalledWith('Q')
+    expect(onVe).not.toHaveBeenCalled()
+    expect(screen.queryByRole('heading', { name: 'Chưa mở được câu này' })).toBeNull()
   })
 })
