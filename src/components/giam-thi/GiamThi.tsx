@@ -66,12 +66,16 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
     const doRong = (w: number) => el.style.setProperty('--gt-loi-max', `${Math.max(140, w - 4)}px`)
     const quanRong = san && typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => doRong(san.clientWidth)) : null // đọc trong lượt báo: bố cục đã sạch, không ép tính lại
     if (san && quanRong) quanRong.observe(san); else if (san) doRong(san.clientWidth)
-    if (!ket) {
+    // 28/10 TỨC THÌ (hồ sơ «Tiếp tục» CPU ×6: setAttribute của giám thị ~110 ms nằm giữa cú chạm và khung câu mới): đổi câu do cú chạm ⇒ React chạy hiệu ứng
+    // này ĐỒNG BỘ trước lần sơn. Dáng «đọc đề» đặt SAU khung đầu của câu mới (rAF → setTimeout) ⇒ câu hiện trước, giám thị chuyển dáng ngay khung sau.
+    let raf = 0, sauVe = 0
+    if (!ket) raf = requestAnimationFrame(() => { sauVe = window.setTimeout(() => {
+      if (gt.current !== g || coKet.current) return
       g.datTrangThai('doc', { xong: () => { if (coKet.current) return; const chon = vung()?.querySelector(`.duo-tra ${CHON}`); chon ? g.nhinVao(chon) : g.nhin(0.5, 0.45); datHen('loi', 1200, () => { if (!coKet.current) noi('ngauNhien') }) } })
       henCho()
       datHen('dh', DONG_HO_GT[muc], () => { if (!coKet.current && !document.hidden) { datTT('dong-ho'); noi('dongHo') } })
-    }
-    return () => { quanRong?.disconnect(); huyHen(); gui(g); gt.current = null }
+    }, 0) })
+    return () => { cancelAnimationFrame(raf); clearTimeout(sauVe); quanRong?.disconnect(); huyHen(); gui(g); gt.current = null }
   }, [muc, qid]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // KHUNG CHỮ L — CHỈ khi chữ thật sự tràn xuống dưới chân giám thị (thầy 27/10: câu 4 dòng bị đáy rỗng). Đo trước khi vẽ (layout effect /
