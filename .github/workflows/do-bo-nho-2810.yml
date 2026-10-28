@@ -48,6 +48,6 @@ jobs:
           console.log('kho_chup:', await q("SELECT khoa, COUNT(*) phan, SUM(length(json)) co FROM kho_chup GROUP BY khoa"))
           console.log('cau_meta / omni_q dòng:', await q("SELECT (SELECT COUNT(*) FROM cau_meta) cm, (SELECT COUNT(*) FROM omni_q) oq, (SELECT SUM(length(vkn_json)) FROM omni_q) oq_vkn"))
           const nay = new Date()
-          await khung('2026-10-28T13:40:00Z', nay.toISOString(), 'HÔM NAY 28/10')
+          await khung('2026-10-28T14:00:00Z', nay.toISOString(), 'HÔM NAY 28/10')
           
           JS
