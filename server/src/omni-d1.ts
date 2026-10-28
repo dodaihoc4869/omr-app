@@ -622,8 +622,12 @@ export function dongSangSuKien(x: Row, meta?: Pick<CauKho, 'phan' | 'dang' | 'mu
   const kq = x.ket_qua == null || x.ket_qua === '' ? null : Number(x.ket_qua) === 1 ? 1 : 0
   const as = str(x.assistance)
   const phan: Phan = meta?.phan ?? (phanTuQid(t.goc, 'I') as Phan)
-  const raw = docRawOmni(x.raw_json)
-  let cauVersion:string|null=null;try{const r=JSON.parse(str(x.raw_json));if(typeof r?.ht_cau_version==='string')cauVersion=r.ht_cau_version}catch{/* Sổ cũ không có phiên bản đáng tin. */}
+  // 29/10 (hồ sơ CPU: mỗi dòng sổ bị JSON.parse HAI lần — một cho msLam/tuTin/nhanTocDo, một cho phiên bản câu; 3.000 dòng × mỗi lần lập kế hoạch): parse MỘT lần.
+  let po: unknown = x.raw_json
+  if (typeof po === 'string') { try { po = JSON.parse(po) } catch { po = null } }
+  const raw = docRawOmni(po)
+  let cauVersion:string|null=null
+  if (typeof x.raw_json === 'string' && po && typeof po === 'object') { const v = (po as Row).ht_cau_version; if (typeof v === 'string') cauVersion = v } /* Sổ cũ không có phiên bản đáng tin. */
   return {
     cauVersion,
     khoa: str(x.khoa), sbd: str(x.sbd), qid: t.goc, songSinh: t.songSinh !== null, nguon: str(x.nguon),
