@@ -3378,6 +3378,9 @@ const boXuLy = {
       // SẴN SÀNG ĐÊM (27/10, san-sang.ts): 00:30–05:59 VN chuẩn bị Sảnh + chặng đầu cho em có gói (6 em/phút) ⇒ lượt mở app đầu ngày khỏi lập kế hoạch.
       {const p=import('./san-sang').then(m=>m.cronSanSangDem(env,Date.now())).then(n=>{if(n)console.log('[san-sang] đêm',n)}).catch(e=>console.error('[san-sang] cron lỗi:',e))
       if(ctx?.waitUntil)ctx.waitUntil(p);else await p}
+      // DỰNG SẴN TRƯỚC GIỜ HỌC (28/10 chiều, omni-d1.ts `dungSanOmni`): 06:00–17:59 VN — bản chụp kho, điểm kỹ năng gọn, prior lớp cho mọi em (một phần nhỏ mỗi phút).
+      {const gioVn2=new Date(Date.now()+7*3600000).getUTCHours();if(gioVn2>=6&&gioVn2<18){const p=import('./omni-d1').then(m=>m.dungSanOmni(env,Date.now())).then(r=>{if(r.gon||r.lop)console.log('[omni] dựng sẵn',JSON.stringify(r))}).catch(e=>console.error('[omni] dựng sẵn lỗi:',e))
+      if(ctx?.waitUntil)ctx.waitUntil(p);else await p}}
       // TỰ SỬA LỖI — ĐỢT CŨ HƠN 14 NGÀY (28/10, chua-gon-dem.ts): 00:30–05:59 VN đóng dần theo luật tự làm, một lô 60 đợt/phút; ngoài khung không truy vấn.
       {const p=import('./chua-gon-dem').then(m=>m.cronDongDotCu(env,Date.now())).then(r=>{if(r.dong)console.log('[tu-sua-dem] đóng',JSON.stringify(r))}).catch(e=>console.error('[tu-sua-dem] cron lỗi:',e))
       if(ctx?.waitUntil)ctx.waitUntil(p);else await p}

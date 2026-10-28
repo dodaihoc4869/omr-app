@@ -27,6 +27,10 @@ export const SQL_SAN_SANG: readonly string[] = [
  * hết hạn ⇒ ghép vào CHÍNH câu dấu của lượt ấy (không thêm lệnh / đợt D1), lượt đồng thời dùng bản cũ trong lúc làm mới.
  */
 type Phan = readonly [khoa: string, bang: string, sql: string, chung?: 1]
+/** Khoá `cau_hinh` KHÔNG vào dấu (28/10 chiều): bản đệm / con trỏ / mốc giờ của việc nền — không phải công tắc, không đầu vào kế hoạch của em. Trước: Bảng tin của
+ *  thầy tính lại «sai nhanh» mỗi 10 phút (`sai_nhanh_gv`), nhắc tự động ghi mốc mỗi 30 phút… ⇒ dấu chung đổi ⇒ MỌI bản sẵn của mọi em hỏng cùng lúc. */
+export const KHOA_CH_KHONG_DAU: readonly string[] = ['sai_nhanh_gv', 'nhac_tu_dong_lan', 'may_soan_em_sai_luc', 'ai_ddh_vp_luc', 'omni_dem_con_tro', 'omni_gan_con_tro', 'omni_kiem_q_tuan',
+  'danh_gia_hoc_that_con_tro', 'tu_sua_dong_cu', 'chot_exp_ngay_qua', 'thuong_cron_ngay', 'khien_mat_ngay', 'giai_tuan_chot']
 const PHAN_DAU: readonly Phan[] = [
   ['a', 'game_v2_attempt', 'SELECT created_at FROM game_v2_attempt WHERE sbd=?1 ORDER BY created_at DESC LIMIT 1'], // game_v2_attempt_student(sbd,created_at)
   ['s', 'su_kien_hoc', 'SELECT received_at FROM su_kien_hoc WHERE sbd=?1 ORDER BY received_at DESC LIMIT 1'], // idx_skh_tiep_nhan(sbd,received_at,khoa)
@@ -38,7 +42,7 @@ const PHAN_DAU: readonly Phan[] = [
   ['gg', 'goi_bai_7', "SELECT COUNT(*)||'|'||COALESCE(MAX(tao_luc),'') FROM goi_bai_7", 1],
   ['hs', 'hoc_sinh', "SELECT COALESCE(lop,'')||'|'||COALESCE(ten_lop,'')||'|'||COALESCE(trang_thai,'') FROM hoc_sinh WHERE sbd=?1"],
   ['pv', 'game_v2_scope', 'SELECT json FROM game_v2_scope WHERE sbd=?1'],
-  ['ch', 'cau_hinh', "SELECT COUNT(*)||'|'||COALESCE(MAX(cap_nhat_luc),'') FROM cau_hinh", 1],
+  ['ch', 'cau_hinh', `SELECT COUNT(*)||'|'||COALESCE(MAX(cap_nhat_luc),'') FROM cau_hinh WHERE khoa NOT IN (${KHOA_CH_KHONG_DAU.map((k) => `'${k}'`).join(',')})`, 1],
   ['kho', 'game_v2_index', "SELECT COUNT(*)||'|'||COALESCE(MAX(indexed_at),'') FROM game_v2_index", 1],
   ['dk', 'de_kho', "SELECT COUNT(*)||'|'||COALESCE(MAX(cap_nhat_luc),'') FROM de_kho", 1],
   ['ca', 'ca', "SELECT COUNT(*)||'|'||COALESCE(MAX(cap_nhat_luc),'')||'|'||COALESCE(SUM(trang_thai='mo'),0) FROM ca", 1],
@@ -49,7 +53,7 @@ const PHAN_DAU: readonly Phan[] = [
   ['bdd', 'bai_da_day', "SELECT COUNT(*)||'|'||COALESCE(MAX(tick_luc),'') FROM bai_da_day", 1],
 ]
 /** Phiên bản cách tính dấu (đầu chuỗi): đổi cách tính ⇒ bản sẵn cũ không khớp, cron đêm lập lại (xem `cronSanSangDem`). */
-export const BAN_DAU = 'v2'
+export const BAN_DAU = 'v3'
 /** Câu đọc DẤU (bỏ phần của bảng chưa có — `vang`; `coChung` = có kèm phần chung). ?1 = sbd. */
 export function sqlDauSanSang(vang: ReadonlySet<string> = new Set(), coChung = true): string {
   return 'SELECT ' + PHAN_DAU.filter((p) => coChung || !p[3]).map(([k, bang, q]) => (vang.has(bang) ? `'-' AS ${k}` : `(${q}) AS ${k}`)).join(',\n  ')
@@ -107,7 +111,7 @@ export async function dauSanSang(env: Env, sbd: string, now: number): Promise<st
 /** Xoá đệm bảng vắng (test). */
 export const xoaBangVangSanSang = () => bangVang.clear()
 
-export interface BanSanSang { ngay: string; luc: number; dau: string; sanh: Row | null; chang: { refs: unknown[]; questions: unknown[]; goi7: unknown } | null
+export interface BanSanSang { ngay: string; luc: number; dau: string; sanh: Row | null; chang: { refs: unknown[]; questions: unknown[]; goi7: unknown; rong?: Row } | null
   /** Giờ (ms) của đợt học MỚI NHẤT của em lúc đọc — có đợt mới hơn bản sẵn (mở chặng chạy song song / đường cũ) ⇒ không dùng phần chặng. */ phienMoi: number }
 
 /** Bản sẵn của em (hoặc null). Không bao giờ ném. */
@@ -197,9 +201,11 @@ export async function chuanBiSanSang(env: Env, sbd: string, now: number, san?: {
  * Không lưu được (gói vừa đổi…) ⇒ null ⇒ nơi gọi đi đường cũ.
  */
 export async function moChangSanSang(env: Env, sbd: string, now: number, ban: BanSanSang): Promise<Record<string, unknown> | null> {
-  const c = ban.chang as (BanSanSang['chang'] & { goiIds?: unknown; phienCu?: unknown }) | null
-  if (!c || !Array.isArray(c.refs) || !c.refs.length || !Array.isArray(c.questions) || !Array.isArray(c.goiIds)) return null
+  const c = ban.chang as (BanSanSang['chang'] & { goiIds?: unknown; phienCu?: unknown; rong?: unknown }) | null
   if (ban.phienMoi >= ban.luc) return null // đợt mới hơn bản sẵn (vd. mở chặng chạy song song với Sảnh) ⇒ đường thường tự dùng lại đúng đợt ấy
+  // Chặng RỖNG lập sẵn (em đã xong phần hôm nay — goi-bai-7.ts `startGoi7` khongLuu): dấu khớp ⇒ cùng kết quả, không ghi gì (đường thường cũng không lưu phiên).
+  if (c && c.rong && typeof c.rong === 'object' && !Array.isArray(c.rong)) return c.rong as Record<string, unknown>
+  if (!c || !Array.isArray(c.refs) || !c.refs.length || !Array.isArray(c.questions) || !Array.isArray(c.goiIds)) return null
   // Đợt cũ còn nguyên (lập sẵn trả đúng đợt ấy, như đường thường): dấu khớp ⇒ chưa câu nào được trả lời từ lúc lập ⇒ trả lại đợt đó (còn hạn 2 giờ), không tạo đợt mới.
   if (typeof c.phienCu === 'string' && c.phienCu) {
     const cu = await env.DB.prepare("SELECT json_extract(json,'$.created') AS t FROM game_v2_session WHERE id=? AND sbd=?").bind(c.phienCu, sbd).first<Row>()
@@ -227,10 +233,12 @@ export async function phienDaXong(env: Env, sbd: string, id: string): Promise<bo
   } catch { return false }
 }
 
-/** CRON ĐÊM 00:30–05:59 VN: chuẩn bị sẵn cho em có gói chưa có bản hôm nay (hoặc bản theo cách tính dấu cũ — khác `BAN_DAU`) — tối đa `toiDa` em mỗi phút (một lượt ~30 lệnh D1/em). */
+/** CRON ĐÊM 00:30–05:59 VN (+ chiều 13:00–17:59): chuẩn bị sẵn cho em có gói chưa có bản hôm nay (hoặc bản theo cách tính dấu cũ — khác `BAN_DAU`) — tối đa `toiDa` em mỗi phút (một lượt ~30 lệnh D1/em). */
 export async function cronSanSangDem(env: Env, now: number, toiDa = 6): Promise<number> {
   const gio = new Date(now + 7 * 3600000).getUTCHours(), phut = new Date(now + 7 * 3600000).getUTCMinutes()
-  if (gio >= 6 || (gio === 0 && phut < 30)) return 0
+  // 28/10 chiều (thử tải 270 em): thêm khung 13:00–17:59 VN — bản sẵn có đủ trước giờ học (dấu khớp ⇒ lượt mở app đầu tiên của em khỏi lập kế hoạch).
+  const chieu = gio >= 13 && gio < 18
+  if (!chieu && (gio >= 6 || (gio === 0 && phut < 30))) return 0
   try {
     const { chayDdlMotLan } = await import('./ddl-mot-lan')
     await chayDdlMotLan(env, BANG_SAN_SANG, SQL_SAN_SANG)

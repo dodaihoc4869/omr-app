@@ -31,7 +31,9 @@ export interface KhoChung {
 const HAN_ISOLATE_MS = 5 * 60_000
 const HAN_CHUP_MS = 10 * 60_000
 const CO_PHAN = 900_000
-const KHOA_CHUP = 'kho_omni_v1'
+// v2 (28/10 chiều): JSON nén gzip ⇒ base64 (một dòng ~1/5 cỡ cũ: lượt đo 270 em, đọc bản chụp v1 = 980 lần × 36 ms ≈ 3,6 MB mỗi isolate mới).
+const KHOA_CHUP = 'kho_omni_v2'
+const KHOA_CHUP_CU = 'kho_omni_v1'
 const LENH_BANG_CHUP = ['CREATE TABLE IF NOT EXISTS kho_chup (khoa TEXT NOT NULL, phan INTEGER NOT NULL, dau TEXT NOT NULL, luc INTEGER NOT NULL, json TEXT NOT NULL, PRIMARY KEY (khoa, phan))']
 const SQL_CAU = `SELECT ${COT_CAU.join(', ')} FROM cau_meta WHERE ${KHOP} ORDER BY qid, ma_de`
 const SQL_Q = 'SELECT qid, y, vkn_json, nguon, CASE WHEN duyet_luc IS NOT NULL THEN 1 ELSE 0 END AS duyet FROM omni_q ORDER BY qid, y'
@@ -72,7 +74,7 @@ async function nap(env: Env, now: number): Promise<KhoChung | null> {
   } catch { dau = await dauKhoCau(env) }
   if (dau && dong.length && dong.every((x) => String(x.dau) === dau && Number(x.luc) === Number(dong[0]!.luc)) && now - Number(dong[0]!.luc) < HAN_CHUP_MS && now >= Number(dong[0]!.luc)) {
     try {
-      const o = JSON.parse(dong.map((x) => String(x.json)).join('')) as { cau: unknown[][]; q: unknown[][] }
+      const o = JSON.parse(await giaiNen(dong.map((x) => String(x.json)).join(''))) as { cau: unknown[][]; q: unknown[][] }
       if (Array.isArray(o.cau) && Array.isArray(o.q)) return dung(o.cau, o.q)
     } catch { /* bản chụp hỏng ⇒ đọc lại */ }
   }
@@ -84,9 +86,23 @@ async function nap(env: Env, now: number): Promise<KhoChung | null> {
   return dung(cauTho, qTho)
 }
 
-async function catChup(env: Env, dau: string, luc: number, json: string): Promise<void> {
+/** gzip ⇒ base64 (cột TEXT: D1 trả BLOB thành mảng số, nặng hơn). */
+export async function nen(chu: string): Promise<string> {
+  const buf = new Uint8Array(await new Response(new Blob([chu]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer())
+  let s = ''
+  for (let i = 0; i < buf.length; i += 0x8000) s += String.fromCharCode(...buf.subarray(i, i + 0x8000))
+  return btoa(s)
+}
+export async function giaiNen(b64: string): Promise<string> {
+  const bin = atob(b64)
+  const buf = new Uint8Array(bin.length)
+  for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i)
+  return new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream('gzip'))).text()
+}
+async function catChup(env: Env, dau: string, luc: number, thuan: string): Promise<void> {
+  const json = await nen(thuan)
   await chayDdlMotLan(env, 'kho_chup_2810', LENH_BANG_CHUP)
-  const lenh = [env.DB.prepare('DELETE FROM kho_chup WHERE khoa = ?').bind(KHOA_CHUP)]
+  const lenh = [env.DB.prepare('DELETE FROM kho_chup WHERE khoa IN (?, ?)').bind(KHOA_CHUP, KHOA_CHUP_CU)]
   for (let i = 0, phan = 0; i < json.length; i += CO_PHAN, phan++) lenh.push(env.DB.prepare('INSERT INTO kho_chup (khoa, phan, dau, luc, json) VALUES (?,?,?,?,?)').bind(KHOA_CHUP, phan, dau, luc, json.slice(i, i + CO_PHAN)))
   await env.DB.batch(lenh)
 }
