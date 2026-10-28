@@ -726,7 +726,8 @@ export function MotTrangHs(p: PropsMotTrang) {
       {p.ghi.map((g) => <p key={g} className="da-ghi">{g}</p>)}
       {p.token && chinh !== 'ca' && laSamsungInternet() && <Suspense fallback={null}><NhacSamsung /></Suspense>}
       {coThuong && <TheBanLoTrinh token={p.token} bat={tq?.bat.banBe} onMo={() => moTp('ban')} />}
-      {nut.length > 0 && <DuongChang ds={nut} moDi={chinh === 'ca'} cam={coBiBen ? loiBi?.[0] ?? 'chao' : undefined} moKhoa={moKt ? 'kt' : moSua ? 'sua' : undefined} />}
+      {/* 28/10 tối (ảnh thầy giờ cao điểm: Lộ trình chỉ có nút Sửa lỗi): Sảnh chưa về ⇒ chưa vẽ đường (nút Sửa lỗi về trước làm em tưởng hết bài), báo đang tải. */}
+      {!so && p.dangTai && !p.ngayKiem ? <p className="da-ghi" role="status">Đang tải bài học hôm nay…</p> : nut.length > 0 && <DuongChang ds={nut} moDi={chinh === 'ca'} cam={coBiBen ? loiBi?.[0] ?? 'chao' : undefined} moKhoa={moKt ? 'kt' : moSua ? 'sua' : undefined} />}
       {hocThem && <button type="button" className="mot-lien-ket" onClick={p.onHoc}>Học thêm câu mới<ChevronRight size={18} aria-hidden="true" /></button>}
     </main>
     <aside className="dm-ben" aria-label="Tóm tắt">
