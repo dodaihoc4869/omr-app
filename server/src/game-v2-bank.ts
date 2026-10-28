@@ -134,7 +134,10 @@ const demCaBaoVe=new DemTTL<Set<string>>(5_000,4)
 /** Ca sắp mở (kế hoạch ngày, "ca sắp tới") — cùng bảng `ca`, dùng CHUNG móc bất hoạt với đệm bảo vệ (Boss 22/09: không cần móc riêng). Đệm 30 giây theo (nowIso, hạn) làm tròn phút để không đổi khoá mỗi mili giây. */
 const demCaSapMo=new DemTTL<{maCa:string;tenCa:string;batDau:string;lop:string}[]>(30_000,200)
 /** Xoá đệm 5 giây của `protectedQuestions` + đệm 30 giây "ca sắp mở" — gọi ngay sau MỌI câu ghi bảng `ca` (production) hoặc sau khi test tự tay sửa bảng `ca` bằng SQL thô (bỏ qua đường ghi thật, nên không tự kích hoạt móc bất hoạt). */
-export function xoaDemCaBaoVe():void{demCaBaoVe.xoa();demCaSapMo.xoa();demQidDeBaoVe.clear()}
+/** Việc thêm khi xoá đệm ca bảo vệ (chấm nhanh — cham-nhanh.ts tự đăng ký; không nhập ngược để khỏi vòng nhập mô-đun). */
+const sauXoaCaBaoVe:(()=>void)[]=[]
+export function dangKySauXoaCaBaoVe(f:()=>void):void{sauXoaCaBaoVe.push(f)}
+export function xoaDemCaBaoVe():void{demCaBaoVe.xoa();demCaSapMo.xoa();demQidDeBaoVe.clear();for(const f of sauXoaCaBaoVe)try{f()}catch{/* bỏ qua */}}
 /** Ca `mo`, loại thi, mở trong khoảng (nowIso, denCaIso]. Đệm 30 giây theo khoá làm tròn phút (bind chính xác vẫn dùng nowIso/denCaIso thật khi đọc D1 tươi — chỉ khoá đệm làm tròn để cùng phút dùng chung). */
 export async function docCaSapMo(env:Env,nowIso:string,denCaIso:string):Promise<{maCa:string;tenCa:string;batDau:string;lop:string}[]> {
   const now=Date.now()

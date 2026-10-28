@@ -5,6 +5,7 @@ import '../../lib/chem-trinh-bay' // thầy 27/10: phương trình rõ ràng (kh
 import type { TheCauProps } from '../TheCau'
 import { loiGiaiChuanTuKho } from '../loi-giai/KhoiLoiGiaiChuan'
 import { goiHoa2, guiLaiKhiKetMang } from '../hoa2/api'
+import { docLuongNop } from '../hoa2/doc-luong-nop'
 import { boChangMoTruoc, GIAY_CHO_MO_CHANG, layChangMoTruoc, moChangTruoc } from './mo-chang-truoc'
 // Tên trang chính trên nút «về» (Boss 27/10): giao diện Trong ⇒ «Lộ trình»; giao diện cũ ⇒ «Hôm nay». Viết tại chỗ: nhập mô-đun dùng chung sẽ đẻ mảnh tải riêng (+1 tệp mở app).
 const tenTrangChinh = (): string => (typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Lộ trình' : 'Hôm nay')
@@ -66,7 +67,7 @@ if (typeof document !== 'undefined' && document.documentElement.dataset.trong) v
 type Cau = Question & { vaiGoi7?:string; huongDan7?:boolean; coGoi7?:boolean; goiY?: { gach?: string[]; cotLoi?: string }; lamLaiCua?: string }
 /** Câu không đủ nội dung để hiện (cùng luật lúc mở chặng và lúc nhận vòng làm lại). */
 const cauHong = (c: Cau) => !c.qid || !['I', 'II', 'III'].includes(c.phan) || typeof c.text !== 'string' || !Array.isArray(c.hinhAnh) || c.phan === 'I' && c.choices?.length !== 4 || c.phan === 'II' && c.ideas?.length !== 4
-type Ket = { soDo?: unknown; choThay?:boolean; hocCoHoTro?:boolean; assisted?:boolean; correct: boolean; answer: string; solution?: unknown; omni?: { luot?: boolean }; solutionImages?: Question['hinhAnh']; chamLanTruoc?: boolean; /** thưởng phạt 26/10 */ thuong?: unknown; ketBai?: unknown }
+type Ket = { /** CHẤM NHANH 28/10: kết quả TẠM (đúng / sai chấm từ bộ nhớ máy chủ, chưa có thưởng — server/src/nop-luong.ts); phản hồi đầy đủ thay ngay khi về */ tam?: boolean; soDo?: unknown; choThay?:boolean; hocCoHoTro?:boolean; assisted?:boolean; correct: boolean; answer: string; solution?: unknown; omni?: { luot?: boolean }; solutionImages?: Question['hinhAnh']; chamLanTruoc?: boolean; /** thưởng phạt 26/10 */ thuong?: unknown; ketBai?: unknown }
 export function duTraLoi(phan: string, value: string): boolean { return phan === 'II' ? /^[DS]{4}$/.test(value) : phan === 'I' ? /^[ABCD]$/.test(value) : value.trim().length > 0 }
 /** Props `TheCau` cho câu học (bảng Gói 7 của thầy vẫn dùng — `src/components/chien-dich/BangGoi7.tsx`). Màn làm bài của em từ 12/10 dựng phần trả lời riêng (LamCau.tsx). */
 export function propsCauHoc(q: Cau, stt: number, value: string, onChange: (v: string) => void, ket?: Ket, khoa = false): TheCauProps {
@@ -167,6 +168,9 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   const canTaiSanh = useRef(false), soLuotDem = useRef(0), capNhatRef = useRef(onCapNhat)
   capNhatRef.current = onCapNhat
   const batDau = useRef(0), gui = useRef(false), traRef = useRef('')
+  // CHẤM NHANH (thầy 28/10 «bấm kiểm tra … chưa tức thì ngay»): `cham` = đang chờ máy chủ chấm (dải «Đang chấm…» trượt lên ngay khi chạm); `tiepCho` = em bấm
+  // «Tiếp tục» khi kết quả còn TẠM ⇒ sang câu ngay khi bản đầy đủ (đã ghi) về — câu kế không bao giờ nộp chồng lên lượt ghi của câu trước.
+  const [cham, setCham] = useState(false), tiepCho = useRef(false), tiepMoi = useRef<() => void>(() => {})
   const gocRef = useRef<HTMLDivElement>(null), nutTiepRef = useRef<HTMLButtonElement>(null)
   const q = cau[viTri], k = q ? ket[q.qid] : undefined
   // 20/10 đo giây (thầy: mọi câu đều đo được): giây câu đang hiện, CHỈ cộng khi tab đang hiện và em còn chạm màn trong 180 giây; trần 900; gửi cùng lượt nộp
@@ -332,14 +336,21 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   }, [!!k, viTri, cau]) // eslint-disable-line react-hooks/exhaustive-deps
   const nopCau = async () => {
     if (!q || !phien || !duTraLoi(q.phan, tra) || gui.current || k) return
-    gui.current = true; setNop(true); setLoi('')
+    gui.current = true; setNop(true); setCham(true); setLoi('')
     // NỘP TỨC THÌ (thầy 27/10): trong lúc chờ máy chấm, nạp sẵn mảnh lời giải từng bước (+ màn kết bài khi là câu cuối) — bấm «Lời giải» / hết chặng là có ngay.
     // Chỉ mã giao diện (không có đáp án); đáp án vẫn chỉ về cùng phản hồi chấm.
     if (duo) { void import('../goi-y-cham/LoiGiaiCauCoSoDo').catch(() => {}); if (viTri + 1 >= cau.length) void import('../thuong/KetBaiThuong').catch(() => {}) }
     const msLam = Math.max(0, Date.now() - batDau.current)
     const assisted = !!q.goiY || daHoiThay.current === q.qid || hoTroCham.current === q.qid
     try {
-      const r = await guiLaiKhiKetMang(() => goiHoa2('answer', token, { session: phien, qid: q.qid, answer: tra, assisted, msLam, doGiay: dhMs.current >= 1000 ? { g: Math.round(dhMs.current / 1000), v: dhT.current.v, a: dhT.current.a, l: Math.max(dhT.current.l, dhT.current.lang), n: dhT.current.n, w: dhW.current ? 1 : 0 } : undefined }, 15)) // chống trùng theo biên nhận ⇒ kẹt mạng tự gửi lại
+      const qidNop = q.qid
+      // CHẤM NHANH: dòng TẠM (đúng / sai từ bộ nhớ máy chủ) ⇒ đổi màu đúng / sai NGAY tại dải; thưởng / EXP đến cùng phản hồi đầy đủ ngay sau. Bản nháp giữ tới bản đầy đủ.
+      const khiTam = (o: Record<string, unknown>) => {
+        if (typeof o.correct !== 'boolean' || typeof o.answer !== 'string') return
+        setKet(v => v[qidNop] ? v : { ...v, [qidNop]: { ...(o as unknown as Ket), tam: true, assisted, ...(o.khongTinh === true ? { thuong: { tinh: false, nguyenTu: 0, dong: [], chuoiDung: 0 } } : {}) } })
+      }
+      const than = { session: phien, qid: q.qid, answer: tra, assisted, msLam, doGiay: dhMs.current >= 1000 ? { g: Math.round(dhMs.current / 1000), v: dhT.current.v, a: dhT.current.a, l: Math.max(dhT.current.l, dhT.current.lang), n: dhT.current.n, w: dhW.current ? 1 : 0 } : undefined }
+      const r = await guiLaiKhiKetMang(() => duo ? goiHoa2('answer', token, than, 15, { tam: khiTam, doc: docLuongNop }) : goiHoa2('answer', token, than, 15)) // chống trùng theo biên nhận ⇒ kẹt mạng tự gửi lại
       if (typeof r.correct !== 'boolean' || typeof r.answer !== 'string') throw new Error(typeof r.error === 'string' ? r.error : 'Chưa xác nhận được bài nộp. Em thử lại; kết quả không bị tính hai lần.')
       setMsCau(v => ({ ...v, [q.qid]: msLam }))
       // LẶP CÂU (27/10): lượt mở chặng trước (Hôm nay gọi sẵn) lập TRƯỚC câu này ⇒ có thể chứa đúng câu em vừa làm — bỏ, hết chặng sẽ mở trước lượt mới.
@@ -353,8 +364,13 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       // Lượt đã chấm quyết định tự làm hay có hỗ trợ, kể cả nộp lại trên máy khác. Máy chủ cũ thiếu cờ thì dùng cờ đã gửi.
       const hoTro = (r.attempt as { assisted?: unknown } | undefined)?.assisted
       setKet(v => ({ ...v, [q.qid]: { ...(r as unknown as Ket), assisted: typeof hoTro === 'boolean' ? hoTro : assisted, ...(r.replayed === true && daCham !== tra ? { chamLanTruoc: true } : {}) } })); try { localStorage.removeItem(khoa) } catch { /* Không cản nhận kết quả. */ } capNhatSo()
-    } catch (e) { setLoi(e instanceof Error ? e.message : 'Chưa nộp được câu. Đáp án nháp vẫn được giữ.') }
-    finally { gui.current = false; setNop(false) }
+    } catch (e) {
+      // Bản đầy đủ không về được ⇒ bỏ kết quả TẠM (câu chưa chắc đã ghi), giữ nháp, em bấm lại (biên nhận chống trùng ⇒ không tính hai lần).
+      setKet(v => { const x = v[q.qid]; if (!x?.tam) return v; const { [q.qid]: _bo, ...con } = v; return con })
+      tiepCho.current = false; nutTiepRef.current?.removeAttribute('data-lun')
+      setLoi(e instanceof Error ? e.message : 'Chưa nộp được câu. Đáp án nháp vẫn được giữ.')
+    }
+    finally { gui.current = false; setNop(false); setCham(false); if (tiepCho.current) { tiepCho.current = false; window.setTimeout(() => tiepMoi.current(), 0) } }
   }
   const hocHuongDan = async () => {
     if(!q || !phien || gui.current || k)return
@@ -412,6 +428,8 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   // bấm lún ngay, câu mới hiện ngay sau đó (28/10: máy thường cũng vậy, xem dưới).
   const dangSang = useRef(-1)
   const tiep = () => {
+    // Kết quả còn TẠM (bản đầy đủ đang về): giữ dáng lún, sang câu ngay khi bản đầy đủ về (nopCau `finally`).
+    if (gui.current && k?.tam) { tiepCho.current = true; nutTiepRef.current?.setAttribute('data-lun', ''); return }
     if (gui.current || dangSang.current === viTri) return
     setLoi('')
     setCombo(null) // băng combo chỉ sống ở câu vừa đúng — sang câu mới thì tắt, không che đề
@@ -442,6 +460,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     else if (goi7 && !daXinLamLai.current && !laLamLai && cauSai.length > 0) void xinLamLai()
     else ketThuc()
   }
+  tiepMoi.current = tiep
   const loai = q ? (q.phan === 'I' ? 'Trắc nghiệm' : q.phan === 'II' ? 'Đúng – sai' : 'Trả lời ngắn') : ''
   // Câu Gói 7 có hướng dẫn: em CHỌN cách làm trước (Học cách giải / Tự làm câu này) — cùng điều kiện nút cũ "Chưa tự làm được · xem chữa".
   const coHuongDan = !!q && !k && (!!q.coGoi7 || q.vaiGoi7 === 'moi' || q.vaiGoi7 === 'tiep_can' || q.vaiGoi7 === 'chua')
@@ -562,15 +581,21 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     if (!duo || !q || !k || !k.correct || k.choThay || k.hocCoHoTro || k.omni?.luot) return
     const g = gocRef.current
     banHat(g?.querySelector('.ht2-lam-pa[data-ket=dung], .ht2-lam-o-hang[data-ket=dung]') ?? g?.querySelector('.duo-ket .duo-tick'), { so: 8, xa: 72 })
+  }, [!!k]) // eslint-disable-line react-hooks/exhaustive-deps
+  // Băng chuỗi đúng: cần biết máy chủ có gửi thưởng không ⇒ chờ bản ĐẦY ĐỦ (kết quả tạm của chấm nhanh chưa có `thuong`).
+  const kDu = !!k && !k.tam
+  useEffect(() => {
+    if (!duo || !q || !k || k.tam || !k.correct || k.choThay || k.hocCoHoTro || k.omni?.luot) return
     if (laLamLai || chuoi < 3 || k.thuong !== undefined || mocCombo(chuoi)) return // máy chủ gửi thưởng ⇒ băng chuỗi đúng của thưởng phạt (BangComboTp) thay băng cũ; mốc 3 · 5 · 10 ⇒ hiệu ứng mốc (dưới)
     setCombo({ n: chuoi, id: q.qid })
     const t = window.setTimeout(() => phanHoi('combo', chuoi - 3), 280)
     return () => window.clearTimeout(t)
-  }, [!!k]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [kDu]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (!combo) return; const t = window.setTimeout(() => setCombo(null), 2200); return () => window.clearTimeout(t) }, [combo])
   // Lượt thưởng / mốc combo (làm lại 27/10): câu được tính có nguyên tử (đúng, hoặc sai mà «Làm nghiêm túc») ⇒ viên «+N» bật cạnh bộ đếm; mốc chuỗi đúng
   // liền 3 · 5 · 10 chỉ ở câu ĐÚNG. N = `thuong.nguyenTu` của máy chủ; phần chuỗi / dây chuyền / nghiêm túc trong các dòng máy chủ ⇒ viên cam thứ hai.
   useEffect(() => {
+    if (k?.tam) return // kết quả tạm (chấm nhanh): viên «+N» / mốc chuỗi chờ thưởng của bản đầy đủ
     if (!duo || !q || !k || k.choThay || k.hocCoHoTro || k.omni?.luot || laLamLai) { setLuot(null); return }
     const t = docThuongCau(k.thuong)
     const N = t?.tinh && t.nguyenTu > 0 ? t.nguyenTu : 0
@@ -578,7 +603,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     const moc = !k.correct || (t && !t.tinh) ? 0 : mocCombo(n)
     const phu = (t?.dong ?? []).filter((d) => /chuỗi|dây chuyền|nghiêm túc|combo/i.test(d.nhan) && d.so > 0).reduce((a, d) => a + d.so, 0)
     setLuot(N || moc ? { id: q.qid, N, phu, moc, chuoi: n } : null)
-  }, [!!k]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [kDu]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!luot) return
     let tre = luot.N > 0 ? ntBaiNay() - luot.N : null
@@ -716,6 +741,11 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
           {/* thầy 27/10: Hỏi thầy (nút 3D phụ ~1/4, trái) + «Tiếp tục» CÙNG MỘT HÀNG */}
           <div className="duo-hang-nut">{linkHoi}<button ref={nutTiepRef} type="button" className="duo-nut" data-sac={tt === 'sai' && !khongTinh ? 'do' : khongTinh ? 'lam' : undefined} onClick={() => { phanHoi('chon'); tiep() }}>Tiếp tục</button></div>
         </div></section>
+      // CHẤM NHANH (28/10): chạm «Kiểm tra» ⇒ dải kết quả trượt lên NGAY ở trạng thái trung tính «Đang chấm…»; kết quả về ⇒ CÙNG dải đổi màu đúng / sai tại chỗ.
+      : cham ? <section className="duo-day duo-ket" data-tt="cho" role="status" aria-live="polite" aria-busy="true"><div className="duo-giua">
+          <div className="duo-kq"><div className="duo-kq-chu"><div className="duo-ct-dau"><h2>Đang chấm…</h2></div></div></div>
+          <div className="duo-hang-nut"><button ref={nutTiepRef} type="button" className="duo-nut" disabled>Đang kiểm tra…</button></div>
+        </div></section>
       : choChonCach ? <div className="duo-day"><div className="duo-giua">
           <div className="duo-hai">
             <button type="button" className="duo-nut" data-sac="vang" onClick={() => { phanHoi('chon'); void hocHuongDan() }} disabled={nop}>Học cách giải</button>
@@ -725,7 +755,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
         </div></div>
       : <div className="duo-day"><div className="duo-giua">
           {loi && <p className="duo-loi" role="alert">{loi}</p>}
-          <button type="button" className="duo-nut" data-cho={nop || undefined} aria-busy={nop || undefined} onClick={() => { phanHoi('chon'); void nopCau() }} disabled={nop || !duocNop}>{nop ? 'Đang kiểm tra…' : q.phan === 'II' && soYChua ? `Còn ${soYChua} ý chưa chọn` : 'Kiểm tra'}</button>
+          <button type="button" className="duo-nut" data-cho={nop || undefined} aria-busy={nop || undefined} onClick={(e) => { e.currentTarget.setAttribute('data-lun', ''); phanHoi('chon'); void nopCau() }} disabled={nop || !duocNop}>{nop ? 'Đang kiểm tra…' : q.phan === 'II' && soYChua ? `Còn ${soYChua} ý chưa chọn` : 'Kiểm tra'}</button>
         </div></div>
 
     // MÀN KẾT BÀI thưởng phạt (bản vẽ tp-3): một màn đủ «được bao nhiêu nguyên tử, vì sao · hôm nay còn mấy bài · hạng giải». «Tiếp tục» ⇒ về Lộ trình;

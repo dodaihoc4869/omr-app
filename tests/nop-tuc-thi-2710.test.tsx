@@ -29,12 +29,20 @@ it('bấm «Kiểm tra» ⇒ nút chờ ngay (data-cho, aria-busy, khoá bấm �
   fireEvent.click(screen.getByRole('button', { name: 'Kiểm tra' }))
   const nut = await screen.findByRole('button', { name: 'Đang kiểm tra…' }) as HTMLButtonElement
   expect(nut.disabled).toBe(true)
-  expect(nut.hasAttribute('data-cho')).toBe(true)
-  expect(nut.getAttribute('aria-busy')).toBe('true')
+  // CHẤM NHANH 28/10: chạm ⇒ dải kết quả trượt lên NGAY ở trạng thái trung tính «Đang chấm…» (chưa đúng/sai)
+  const dai = document.querySelector('.duo-ket')!
+  expect(dai.getAttribute('data-tt')).toBe('cho')
+  expect(dai.getAttribute('aria-busy')).toBe('true')
+  expect(dai.textContent).toContain('Đang chấm…')
   fireEvent.click(nut); fireEvent.keyDown(window, { key: 'Enter' })
-  expect(vi.mocked(goiHoa2).mock.calls.filter((c) => c[0] === 'answer')).toHaveLength(1)
-  expect(document.querySelector('.duo-ket')).toBeNull() // chưa chấm ⇒ chưa có tấm đúng/sai
+  const goiNop = vi.mocked(goiHoa2).mock.calls.filter((c) => c[0] === 'answer')
+  expect(goiNop).toHaveLength(1)
+  expect(typeof (goiNop[0]![4] as { tam?: unknown }).tam).toBe('function') // xin máy chủ trả theo luồng (dòng tạm đúng / sai)
   expect(nap).toEqual([])
+  // dòng TẠM (chấm từ bộ nhớ máy chủ) ⇒ CÙNG dải đổi màu đúng tại chỗ (không dựng lại phần tử), trước phản hồi đầy đủ
+  await act(async () => { (goiNop[0]![4] as { tam: (o: Record<string, unknown>) => void }).tam({ ok: true, tam: true, correct: true, answer: 'D', solution: {} }) })
+  expect(document.querySelector('.duo-ket')).toBe(dai)
+  expect(dai.getAttribute('data-tt')).toBe('dung')
   await act(async () => { tra({ correct: true, answer: 'D', solution: {} }) })
   expect(document.querySelector('.duo-ket')!.getAttribute('data-tt')).toBe('dung')
   expect(nap.sort()).toEqual(['https://anh.test/de-q2.png', 'https://anh.test/pa-q2.png'])

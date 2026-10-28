@@ -156,6 +156,9 @@ const chu = (x: unknown): string => (typeof x === 'string' ? x : x == null ? '' 
 const laNgay = (x: unknown): x is string => typeof x === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(x)
 const laPhan = (x: unknown): x is 'I' | 'II' | 'III' => x === 'I' || x === 'II' || x === 'III'
 
+/** Dòng tạm của «Kiểm tra» theo luồng: `tam` nhận dòng đúng / sai; `doc` đọc luồng (doc-luong-nop.ts), trả dòng đầy đủ hoặc null khi đứt. */
+export type KhiTam = { tam: (o: Record<string, unknown>) => void; doc: (than: ReadableStream<Uint8Array>, tam: (o: Record<string, unknown>) => void) => Promise<Record<string, unknown> | null> }
+
 /** Lỗi máy chủ trả về (`ok:false`) — mang câu tiếng Việt của máy chủ. */
 export class LoiHoa2 extends Error {
   ma: string
@@ -165,8 +168,13 @@ export class LoiHoa2 extends Error {
   }
 }
 
-/** Gọi `POST /game-v2/<lenh>` với token của em. Máy chủ báo `ok:false` ⇒ ném `LoiHoa2` kèm câu của máy chủ. */
-export async function goiHoa2(lenh: string, token: string, du: Record<string, unknown> = {}, giay = 20): Promise<Record<string, unknown>> {
+/**
+ * Gọi `POST /game-v2/<lenh>` với token của em. Máy chủ báo `ok:false` ⇒ ném `LoiHoa2` kèm câu của máy chủ.
+ * `khiTam` (chỉ «Kiểm tra» — `answer`; bộ đọc luồng ở doc-luong-nop.ts, nạp cùng màn làm chặng — không vào lượt mở app, thầy 28/10 «bấm kiểm tra … chưa tức thì ngay»): xin máy chủ trả THEO LUỒNG (`luong: 1`, server/src/nop-luong.ts). Dòng
+ * `tam: true` (đúng / sai chấm từ bộ nhớ máy chủ, chưa có thưởng) ⇒ gọi `khiTam` ngay; lời hứa vẫn chỉ xong ở phản hồi ĐẦY ĐỦ (đã ghi). Luồng đứt trước phản hồi đầy đủ
+ * ⇒ lỗi đường truyền (`mat_mang`) ⇒ `guiLaiKhiKetMang` gửi lại (biên nhận chống trùng). Máy chủ cũ / không chấm nhanh được ⇒ JSON thường như cũ.
+ */
+export async function goiHoa2(lenh: string, token: string, du: Record<string, unknown> = {}, giay = 20, khiTam?: KhiTam): Promise<Record<string, unknown>> {
   const c = new AbortController()
   let hen: ReturnType<typeof setTimeout>
   const hetHan = new Promise<never>((_, hong) => {
@@ -178,7 +186,7 @@ export async function goiHoa2(lenh: string, token: string, du: Record<string, un
     const goc = (await layDiaChiMayChu('')) || 'https://omr.ttadodaihoc.workers.dev'
     if (c.signal.aborted) throw new DOMException('Đã hết giờ', 'AbortError')
     const url = `${goc}/game-v2/${lenh}`
-    const than = JSON.stringify({ ...du, token })
+    const than = JSON.stringify({ ...du, ...(khiTam ? { luong: 1 } : {}), token })
     // Lệnh đã HỎI SỚM (lúc mở app / vừa đăng nhập, src/lib/hoi-som.ts) ⇒ nhận phản hồi ấy, không gửi lại; không có / hỏng ⇒ gửi như cũ.
     const r =
       (await layHoiSom(url, than, c.signal)) ??
@@ -189,10 +197,15 @@ export async function goiHoa2(lenh: string, token: string, du: Record<string, un
         signal: c.signal,
       }))
     let j: unknown = null
-    try {
-      j = await r.json()
-    } catch {
-      j = null
+    if (khiTam && r.body && /ndjson/i.test(r.headers.get('content-type') ?? '')) {
+      j = await khiTam.doc(r.body, khiTam.tam)
+      if (!j) throw new LoiHoa2('Chưa kết nối được máy chủ. Em kiểm tra mạng rồi thử lại.', 'mat_mang')
+    } else {
+      try {
+        j = await r.json()
+      } catch {
+        j = null
+      }
     }
     if (!j || typeof j !== 'object') throw new LoiHoa2('Máy chủ chưa trả lời được. Em thử lại sau ít phút.')
     const o = j as Record<string, unknown>
