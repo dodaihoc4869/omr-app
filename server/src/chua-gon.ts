@@ -25,18 +25,18 @@ const laLanTuLam = (a: string) =>
   `COALESCE(${a}.purpose,'') NOT IN ('xem_loi_giai','luot','chan_doan','chua_buoc') AND COALESCE(${a}.assistance,'none') IN ('none','') AND COALESCE(${a}.visibility,'released')<>'embargoed'`
 
 /**
- * Điều kiện SQL "đợt `d` đã có lượt đúng qua luật tự làm sau lần sai cuối" (d = alias bảng chua_loi_dot; ?2 = sbd).
- * Dùng chung cho câu đóng tự động (danh sách) và test.
+ * Điều kiện SQL "đợt `d` đã có lượt đúng qua luật tự làm sau lần sai cuối" (d = alias bảng chua_loi_dot; `sbd` = biểu thức sbd, mặc định tham số ?2).
+ * Dùng chung cho câu đóng tự động (danh sách), cron đêm đóng đợt cũ (`sbd` = cột `d.sbd`, chua-gon-dem.ts) và test.
  */
-export function sqlDaTuSuaDungLai(d: string): string {
+export function sqlDaTuSuaDungLai(d: string, sbd = '?2'): string {
   const Q = `${d}.qid_chuan`
   const saiCuoi = (cot: 'luc' | 'ngay_vn') =>
-    `(SELECT w.${cot} FROM su_kien_hoc w WHERE w.sbd=?2 AND ${sqlHoCau('w.qid', Q)} AND COALESCE(w.ket_qua,0)=0 AND ${laLanTuLam('w')} ORDER BY w.luc DESC LIMIT 1)`
-  return `EXISTS (SELECT 1 FROM su_kien_hoc c WHERE c.sbd=?2 AND ${sqlHoCau('c.qid', Q)} AND c.ket_qua=1 AND ${laLanTuLam('c')}
+    `(SELECT w.${cot} FROM su_kien_hoc w WHERE w.sbd=${sbd} AND ${sqlHoCau('w.qid', Q)} AND COALESCE(w.ket_qua,0)=0 AND ${laLanTuLam('w')} ORDER BY w.luc DESC LIMIT 1)`
+  return `EXISTS (SELECT 1 FROM su_kien_hoc c WHERE c.sbd=${sbd} AND ${sqlHoCau('c.qid', Q)} AND c.ket_qua=1 AND ${laLanTuLam('c')}
     AND c.luc > ${saiCuoi('luc')}
     AND (c.qid<>${Q} OR c.ngay_vn > ${saiCuoi('ngay_vn')})
-    AND NOT EXISTS (SELECT 1 FROM loi_giai_hoi g WHERE g.sbd=?2 AND ${sqlHoCau('g.qid', Q)} AND g.luc<=c.luc AND g.luc>=strftime('%Y-%m-%dT%H:%M:%fZ',c.luc,'-${GIO_LOI_GIAI_GAN} hours'))
-    AND NOT EXISTS (SELECT 1 FROM su_kien_hoc x WHERE x.sbd=?2 AND ${sqlHoCau('x.qid', Q)} AND x.purpose='xem_loi_giai' AND x.luc<=c.luc AND x.luc>=strftime('%Y-%m-%dT%H:%M:%fZ',c.luc,'-${GIO_LOI_GIAI_GAN} hours')))`
+    AND NOT EXISTS (SELECT 1 FROM loi_giai_hoi g WHERE g.sbd=${sbd} AND ${sqlHoCau('g.qid', Q)} AND g.luc<=c.luc AND g.luc>=strftime('%Y-%m-%dT%H:%M:%fZ',c.luc,'-${GIO_LOI_GIAI_GAN} hours'))
+    AND NOT EXISTS (SELECT 1 FROM su_kien_hoc x WHERE x.sbd=${sbd} AND ${sqlHoCau('x.qid', Q)} AND x.purpose='xem_loi_giai' AND x.luc<=c.luc AND x.luc>=strftime('%Y-%m-%dT%H:%M:%fZ',c.luc,'-${GIO_LOI_GIAI_GAN} hours')))`
 }
 
 /** Câu đóng tự động: ?1 = bây giờ (ms), ?2 = sbd, ?3 = mốc đầu cửa sổ (ms). */
