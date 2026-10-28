@@ -1,0 +1,57 @@
+# ÁP CỘT CHỈ-THÊM CHO ke_hoach_ngay (28/10 tối) — migration server/migration-2309-cnh1-ke-hoach-muc-tieu.sql CHƯA TỪNG chạy trên D1 thật:
+# đo 28/10 20:05 VN (do-kiem-tra-cham-2810, chỉ đọc) — bảng thiếu muc_tieu_json / deferred_count / over_budget_seconds / muc_tieu_ket_qua_json, 0 dòng;
+# nhật ký Worker «D1_ERROR: table ke_hoach_ngay has no column named muc_tieu_json» 23 lần / 4 phút ⇒ mỗi lượt Lộ trình dựng lại hồ sơ rồi ghi hỏng.
+# Chạy qua API truy vấn D1 (KHÔNG `--file`: lệnh nhập khoá D1 vài giây, giờ cao điểm em thấy «Máy chủ phản hồi chậm»). Chỉ ADD COLUMN có DEFAULT,
+# chỉ cột còn thiếu. Ca thi đang mở ⇒ DỪNG (luật CLAUDE.md). Không in dữ liệu em.
+name: Áp cột chỉ-thêm ke_hoach_ngay (28/10)
+on:
+  push:
+    branches: [claude/ap-cot-ke-hoach-2810]
+    paths: ['.github/workflows/ap-cot-ke-hoach-2810.yml']
+permissions:
+  contents: read
+concurrency:
+  group: phat-hanh-cot
+jobs:
+  ap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Áp cột còn thiếu
+        env:
+          TOKEN: ${{ env.CF_TOKEN_SACH }}
+          ACC: ${{ env.CF_ACC_SACH }}
+        run: |
+          node - <<'JS'
+          const { readFileSync } = require('fs')
+          const { TOKEN, ACC } = process.env
+          const q = async (sql) => {
+            const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${ACC}/d1/database/d2e6d322-374a-45d7-83a3-9fac486b23f1/query`, { method: 'POST', headers: { authorization: `Bearer ${TOKEN}`, 'content-type': 'application/json' }, body: JSON.stringify({ sql }), signal: AbortSignal.timeout(30000) })
+            const j = await r.json(); if (!r.ok || !j.success) throw new Error(`D1 lỗi ${r.status}: ${JSON.stringify(j.errors).slice(0, 300)}`)
+            return j.result.flatMap((x) => x.results ?? [])
+          }
+          ;(async () => {
+            const ca = (await q(readFileSync('scripts/kiem-ca-mo.sql', 'utf8')))[0]
+            console.log('ca thi:', JSON.stringify({ soCaMo: ca.so_ca_mo, soLuotDangLam: ca.so_luot_dang_lam }))
+            if (ca.so_ca_mo !== 0) throw new Error('Có ca thi mở: DỪNG, không áp.')
+            const cot = new Set((await q("SELECT name FROM pragma_table_info('ke_hoach_ngay')")).map((x) => x.name))
+            const can = [
+              ['muc_tieu_json', "TEXT NOT NULL DEFAULT ''"], ['deferred_count', 'INTEGER NOT NULL DEFAULT 0'],
+              ['over_budget_seconds', 'INTEGER NOT NULL DEFAULT 0'], ['muc_tieu_ket_qua_json', "TEXT NOT NULL DEFAULT ''"],
+            ]
+            for (const [ten, kieu] of can) {
+              if (cot.has(ten)) { console.log(`đã có: ${ten}`); continue }
+              await q(`ALTER TABLE ke_hoach_ngay ADD COLUMN ${ten} ${kieu}`)
+              console.log(`đã thêm: ${ten}`)
+            }
+            const sau = (await q("SELECT name FROM pragma_table_info('ke_hoach_ngay')")).map((x) => x.name)
+            console.log('cột sau:', JSON.stringify(sau))
+            if (!can.every(([t]) => sau.includes(t))) throw new Error('Chưa đủ cột.')
+          })().catch((e) => { console.error(e.message); process.exit(1) })
+          JS
