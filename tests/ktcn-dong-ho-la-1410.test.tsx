@@ -49,7 +49,7 @@ it('hết giờ đã hiệu chỉnh máy chủ chốt một lần, sau lượt l
   expect(screen.getByLabelText('Thời gian chặng còn lại').textContent).toBe('0:00')
   expect(doLuong.goi.mock.calls.filter(c => c[0] === 'hoc-tap-ktcn-chot-chang')).toHaveLength(0)
   await act(async () => { traLuu({ ok: true, kiemTra: tomTat(), revision: 1, daLuu: true }) })
-  expect(doLuong.goi.mock.calls.filter(c => c[0] === 'hoc-tap-ktcn-chot-chang')).toEqual([['hoc-tap-ktcn-chot-chang', 'token', { id: 'kt1', chang: 0, tra: { q1: 'A' }, revision: 1 }]])
+  expect(doLuong.goi.mock.calls.filter(c => c[0] === 'hoc-tap-ktcn-chot-chang')).toEqual([['hoc-tap-ktcn-chot-chang', 'token', { id: 'kt1', chang: 0, tra: { q1: 'A' }, revision: 1, lucTra: { q1: expect.any(Number) } }]]) // 28/10: kèm mốc em trả lời
   await act(async () => { await vi.advanceTimersByTimeAsync(5000) })
   expect(doLuong.goi.mock.calls.filter(c => c[0] === 'hoc-tap-ktcn-chot-chang')).toHaveLength(1)
 })
