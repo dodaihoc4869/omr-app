@@ -1495,6 +1495,41 @@ async function lopKeTiepCoOmni(env: Env, sau: string): Promise<string | null> {
   const lop = [...new Set((r.results ?? []).filter((x) => apDungOmniCho(coH, coO, str(x.sbd), str(x.lop).trim())).map((x) => str(x.lop).trim()))].filter((l) => l > sau).sort()
   return lop[0] ?? null
 }
+/**
+ * DỰNG SẴN TRƯỚC GIỜ HỌC (28/10 chiều, thử tải 270 em — Boss: «bảng tính sẵn phải DỰNG ĐỦ cho 274 em trước 18:30»). Gọi từ cron mỗi phút NGOÀI khung học
+ * (index.ts). Mỗi lượt làm một phần nhỏ, xong rồi thì chỉ vài câu đọc nhẹ:
+ *  (1) bản chụp kho câu dùng chung (`kho_chup`) — nạp một lần ⇒ isolate nào cũng chỉ đọc một dòng;
+ *  (2) điểm kỹ năng GỌN (`omni_p_gon`) của em có ảnh chụp đêm mà chưa có bản gọn cùng mốc — tối đa `soEm` em;
+ *  (3) prior lớp cất sẵn (`omni_prior_em`) của lớp còn em thiếu dòng hôm nay — tối đa `soLop` lớp.
+ * Chỉ ghi bảng tính sẵn (chỉ-thêm), không đổi dữ liệu học. Công tắc OMNI tắt ⇒ không làm gì. Không ném.
+ */
+export async function dungSanOmni(env: Env, nowMs: number, soEm = 30, soLop = 2): Promise<{ gon: number; lop: number }> {
+  const ra = { gon: 0, lop: 0 }
+  try {
+    if (!(await docCoOmni(env)).bat) return ra
+    await layKhoChung(env).catch(() => null)
+    await chayDdlMotLan(env, 'omni_p_gon_2810', LENH_BANG_DIEM_GON)
+    const thieu = await env.DB.prepare('SELECT e.sbd, e.cap_nhat_luc AS moc FROM omni_em e LEFT JOIN omni_p_gon g ON g.sbd = e.sbd WHERE g.sbd IS NULL OR g.moc <> e.cap_nhat_luc ORDER BY e.sbd LIMIT ?').bind(soEm).all<Row>()
+    for (const x of thieu.results ?? []) {
+      const s = str(x.sbd), moc = str(x.moc)
+      const r = await env.DB.prepare('SELECT vkn_id, p, trang_thai FROM omni_p_vkn WHERE sbd = ?').bind(s).all<Row>()
+      await lenhDiemGon(env, s, moc, (r.results ?? []).map((v) => [str(v.vkn_id), Number(v.p), str(v.trang_thai)] as const)).run()
+      ra.gon++
+    }
+    const homNay = ngayVnCua(nowMs), moc = dauNgayVn(homNay), ts = await docThamSoOmni(env)
+    await chayDdlMotLan(env, 'omni_prior_em_2810', LENH_BANG_PRIOR_EM)
+    for (let l = await lopKeTiepCoOmni(env, ''); l !== null && ra.lop < soLop; l = await lopKeTiepCoOmni(env, l)) {
+      const ban = await emBatOmniCuaLop(env, l)
+      if (ban.length < ts.PRIOR_LOP_TOI_THIEU) continue
+      const co = await env.DB.prepare('SELECT COUNT(*) AS n FROM omni_prior_em WHERE moc = ? AND khoa = ? AND sbd IN (SELECT value FROM json_each(?))').bind(moc, khoaPriorEm(ts, l), dsJson(ban)).first<Row>()
+      if (Number(co?.n) >= ban.length) continue
+      const tho = await thoCuaLop(env, l, homNay, ts)
+      if (tho.size) await catPrior(env, moc, khoaPriorEm(ts, l), gopPriorCaLop(tho, ban, ts))
+      ra.lop++
+    }
+  } catch (e) { console.error('[omni] dựng sẵn lỗi:', e instanceof Error ? e.message : e) }
+  return ra
+}
 /** Chụp hồ sơ THÔ (prior P0, sổ tiếp nhận trước 00:00 VN ngày `homNay`) của một lô em vào `omni_em`/`omni_p_vkn` (giá trị bind trực tiếp — không lệch số thực). */
 export async function chupHoSoTho(env: Env, sbds: readonly string[], homNay: string, ts: ThamSoOmni = THAM_SO_OMNI): Promise<number> {
   if (!sbds.length) return 0
