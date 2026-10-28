@@ -143,15 +143,16 @@ function VongMucTieu({ xong, tong }: { xong: number; tong: number }) {
 /** Mở chặng bị chặn TU_SUA_TRUOC: gửi NGAY việc Sửa lỗi hôm nay đã lưu trên máy (`omr_tu_sua_hom_nay_<sbd>`, lib/tu-sua-viec-hom-nay.ts — cùng lệnh
  *  `viec-ngay` như lượt gửi nền) — câu đã xong trên máy có thể chưa lên máy chủ vì mạng chậm. Viết tại chỗ (không nhập mảnh Tự sửa: thêm mảnh làm phình precache).
  *  true = máy chủ đã ghi. */
-async function daySuaNgay(token: string, sbd: string): Promise<boolean> {
+async function daySuaNgay(token: string, sbd: string, moKhoa = false): Promise<boolean> {
   try {
-    const nk = JSON.parse(localStorage.getItem(`omr_tu_sua_hom_nay_${sbd}`) || 'null') as { n?: unknown; m?: unknown; x?: unknown; them?: unknown } | null
-    if (!nk || typeof nk.n !== 'string' || !Array.isArray(nk.m) || !Array.isArray(nk.x) || !nk.x.length) return false
+    // `moKhoa`: Lộ trình cho bấm chặng này mà máy chủ vẫn chặn (dòng khoá cũ) ⇒ gỡ khoá của hôm nay (server/src/tu-sua-viec-ngay.ts `khoa: false`).
+    const nk = moKhoa ? { n: new Date(Date.now() + 7 * 3600_000).toISOString().slice(0, 10), m: [], x: [], them: 0 } : JSON.parse(localStorage.getItem(`omr_tu_sua_hom_nay_${sbd}`) || 'null') as { n?: unknown; m?: unknown; x?: unknown; them?: unknown } | null
+    if (!nk || typeof nk.n !== 'string' || !Array.isArray(nk.m) || !Array.isArray(nk.x) || (!moKhoa && !nk.x.length)) return false
     const goc = await layDiaChiMayChu()
     if (!goc) return false // như lệnh Tự sửa khác (chua-cau-sai-api `goi`)
     const c = new AbortController(), h = setTimeout(() => c.abort(), 10_000) // iPhone cũ (iOS 14–15) chưa có AbortSignal.timeout
     try {
-      const r = await fetch(`${goc}/hs/chua-cau-sai/viec-ngay`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ngay: nk.n, m: nk.m, x: nk.x, them: nk.them ?? 0, token }), signal: c.signal })
+      const r = await fetch(`${goc}/hs/chua-cau-sai/viec-ngay`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(moKhoa ? { ngay: nk.n, khoa: false, token } : { ngay: nk.n, m: nk.m, x: nk.x, them: nk.them ?? 0, token }), signal: c.signal })
       return ((await r.json()) as { ok?: unknown } | null)?.ok === true
     } finally { clearTimeout(h) }
   } catch { return false }
@@ -171,7 +172,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   const [duo] = useState(() => typeof document !== 'undefined' && !!document.documentElement.dataset.trong)
   // LÀM LẠI CUỐI CHẶNG kiểu Duolingo (hợp đồng docs/hop-dong-duolingo-2610.md mục 3; máy chủ goi-bai-7-lam-lai.ts): `soGoc` = số câu của chặng; câu làm lại
   // (≤ 3, chỉ đề) nối sau, mỗi chặng xin MỘT lần (`hoc-tap-lam-lai`), nộp qua `answer` cùng phiên (máy chủ tự ép có hỗ trợ). Không đếm vào số câu của chặng.
-  const [soGoc, setSoGoc] = useState(0), daXinLamLai = useRef(false), daDaySua = useRef(false)
+  const [soGoc, setSoGoc] = useState(0), daXinLamLai = useRef(false), daDaySua = useRef(0)
   // A6 — băng combo «N câu đúng liền!» / «Phản ứng dây chuyền!» (n = số câu đúng liền lúc hiện, id = câu vừa đúng ⇒ hoạt ảnh chạy lại mỗi câu).
   const [combo, setCombo] = useState<{ n: number; id: string } | null>(null)
   // THƯỞNG BAY + MỐC COMBO (thầy 27/10, hieu-ung-duo.ts): `luot` = một lượt hiệu ứng của câu vừa chấm; `ntTre` = số nguyên tử ĐANG HIỆN trên bộ đếm khi
@@ -272,9 +273,10 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       // KHOÁ SAU SỬA LỖI (ảnh thầy 28/10 19:55: khung đỏ «Em sửa xong lỗi hôm nay rồi mới mở chặng tiếp nhé.» + «Thử lại» ⇒ em kẹt): gửi ngay câu Sửa lỗi đã xong
       // trên máy (có thể chưa lên máy chủ vì mạng chậm) rồi mở lại MỘT lần; vẫn chặn ⇒ thẻ trung tính + nút về Lộ trình (nút Sửa lỗi ở đó), không «Thử lại».
       if ((e as { ma?: unknown })?.ma === 'TU_SUA_TRUOC') {
-        if (!daDaySua.current) {
-          daDaySua.current = true
-          if (await daySuaNgay(token, sbd)) { if (!huy) setLan(n => n + 1); return }
+        // Lần 1: gửi tiến độ Sửa lỗi trên máy rồi mở lại. Lần 2 (vẫn chặn): Lộ trình đã cho bấm chặng này ⇒ gỡ dòng khoá cũ trên máy chủ rồi mở lại.
+        while (daDaySua.current < 2) {
+          const moKhoa = daDaySua.current++ === 1
+          if (await daySuaNgay(token, sbd, moKhoa)) { if (!huy) setLan(n => n + 1); return }
         }
         if (!huy) setHetCau(chuCuaLoi(e, 'Em sửa xong lỗi hôm nay rồi mới mở chặng tiếp nhé.'))
         return
