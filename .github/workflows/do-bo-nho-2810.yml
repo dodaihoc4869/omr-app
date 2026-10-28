@@ -1,0 +1,44 @@
+# ĐO TRÀN BỘ NHỚ WORKER 28/10 tối (CHỈ ĐỌC): exceededMemory / exceededCpu theo 5 phút, hôm nay 11:00–nay UTC và hôm qua cùng khung (so sánh).
+name: Đo tràn bộ nhớ Worker (chỉ đọc)
+on:
+  push:
+    branches: [claude/do-kiem-tra-cham-2810]
+    paths: ['.github/workflows/do-bo-nho-2810.yml']
+permissions:
+  contents: read
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Trạng thái theo 5 phút
+        env:
+          TOKEN: ${{ env.CF_TOKEN_SACH }}
+          ACC: ${{ env.CF_ACC_SACH }}
+        run: |
+          node - <<'JS'
+          const { TOKEN, ACC } = process.env
+          const hoi = async (query, variables) => {
+            const r = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: { authorization: `Bearer ${TOKEN}`, 'content-type': 'application/json' }, body: JSON.stringify({ query, variables }), signal: AbortSignal.timeout(30000) })
+            const j = await r.json(); if (j.errors?.length) console.log('LỖI GraphQL:', JSON.stringify(j.errors).slice(0, 400)); return j.data
+          }
+          const khung = async (tu, den, nhan) => {
+            const x = await hoi(`query($acc:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+              workersInvocationsAdaptive(limit:500,filter:{scriptName:"omr",datetime_geq:$tu,datetime_leq:$den},orderBy:[datetimeFiveMinutes_ASC]){dimensions{datetimeFiveMinutes status} sum{requests}}}}}`, { acc: ACC, tu, den })
+            const m = new Map()
+            for (const r of x?.viewer?.accounts?.[0]?.workersInvocationsAdaptive ?? []) {
+              const k = r.dimensions.datetimeFiveMinutes.slice(11, 16); const o = m.get(k) ?? {}; o[r.dimensions.status] = (o[r.dimensions.status] ?? 0) + r.sum.requests; m.set(k, o)
+            }
+            console.log(`=== ${nhan} (UTC; VN = +7) — tổng · exceededMemory · exceededCpu · clientDisconnected ===`)
+            for (const [k, o] of [...m].sort()) { const t = Object.values(o).reduce((a, b) => a + b, 0); console.log(`${k} ${t} · mem=${o.exceededMemory ?? 0} · cpu=${o.exceededCpu ?? 0} · ngat=${o.clientDisconnected ?? 0}${Object.keys(o).filter((s) => !['success','exceededMemory','exceededCpu','clientDisconnected'].includes(s)).map((s) => ` · ${s}=${o[s]}`).join('')}`) }
+          }
+          const nay = new Date()
+          await khung('2026-10-28T11:00:00Z', nay.toISOString(), 'HÔM NAY 28/10')
+          await khung('2026-10-27T11:00:00Z', '2026-10-27T16:00:00Z', 'HÔM QUA 27/10')
+          JS
