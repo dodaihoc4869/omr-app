@@ -940,6 +940,8 @@ if (man === 'duo-kt' && (DK_V === 'ktcn' || DK_V === 'ket')) {
     if (url.includes('hoc-tap-ktcn-trang-thai')) return tra({ ok: true, kiemTra: kt, chang: DK_CHANG })
     if (url.includes('hoc-tap-ktcn-start')) return tra({ ok: true, kiemTra: kt, revision: 3, hanChang: now + 462_000, daChot: false, questions: DK_CAU, tra: { K1: 'B', K4: 'DS--' } })
     if (url.includes('hoc-tap-ktcn-ket-qua')) return tra({ ok: true, kiemTra: kt, ketQua: DK_KET })
+    // 28/10 `&ban=1`: máy chủ bận (D1 đang export) ⇒ lệnh lưu trả 503 MAY_CHU_BAN như máy chủ thật — màn hiện câu nhẹ, không hộp lỗi.
+    if (thamSo.get('ban') === '1' && url.includes('hoc-tap-ktcn-luu')) return new Response(JSON.stringify({ ok: false, error: 'Máy chủ đang bận. Em cứ làm tiếp, bài vẫn được lưu trên máy và tự gửi khi máy chủ sẵn sàng.', ma: 'MAY_CHU_BAN', maLoi: 'MAY_CHU_BAN', thuLaiSau: 2 }), { status: 503, headers: { 'content-type': 'application/json' } })
     if (url.includes('hoc-tap-ktcn-')) return tra({ ok: true, kiemTra: kt, revision: 4, daLuu: true })
     return fetchDk(input, init)
   }
