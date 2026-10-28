@@ -2,7 +2,7 @@ worker chay
 noi=aws:ap-east-1
 ktcn-tat
 dung-san
-so_em=135
-phut=8
+so_em=270
+phut=10
 am=2
-# 28/10 trưa (lần 5): mã nhánh tai-cao-diem-2 (dấu Sảnh bỏ khoá đệm việc nền, dựng sẵn, kho nén) + D1 sao DỰNG SẴN (chụp đêm + Sảnh mỗi em) — 135 em.
+# 28/10 trưa (lần 6): 270 em — mã tai-cao-diem-2 đủ (dấu Sảnh, dựng sẵn, kho nén, chặng rỗng lập sẵn, chống đàn đọc dồn) + D1 sao dựng sẵn.
