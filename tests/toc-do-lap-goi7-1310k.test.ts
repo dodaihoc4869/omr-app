@@ -99,6 +99,21 @@ describe('docNguonKhoiD1 — nhớ theo lượt từng câu', () => {
     await docNguonKhoiD1(env, ['q1', 'q3'])
     expect(k.lan()).toBe(2) // đủ cả ⇒ 0 truy vấn
   })
+  it('29/10 CPU giờ cao điểm: 6.000 câu ứng viên gom theo câu MỘT lần (tuyến tính) — trước lọc lại cả lô cho từng câu ⇒ O(câu × dòng), Sảnh sau nộp câu 2 giây CPU', async () => {
+    const d = taoD1That()
+    const N = 6000
+    const qs = Array.from({ length: N }, (_, i) => `q${i}`)
+    d.sql.exec("INSERT INTO de_kho(ma_de,ten_de,so_cau,da_xoa,cap_nhat_luc,lop) VALUES('T10','Tờ 10',1,0,'v1','10')")
+    const ins = d.sql.prepare("INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES('T10',?,'v1',?,'d1','{\"lop\":10}')")
+    for (const q of qs) ins.run(q, q)
+    const env = { DB: gopDocD1(d.env.DB as unknown as D1Database) } as Env
+    const t0 = performance.now()
+    const kq = await docNguonKhoiD1(env, qs)
+    const ms = performance.now() - t0
+    expect(kq.size).toBe(N)
+    expect(kq.get('q5999')).toHaveLength(1)
+    expect(ms, `gom nguồn khối 6.000 câu mất ${ms.toFixed(0)} ms`).toBeLessThan(1000)
+  })
   it('lệnh ghi cùng lượt đụng bảng nguồn ⇒ đọc lại; D1 thô (không gộp) ⇒ luôn đọc như cũ', async () => {
     const k = kho()
     const env = { DB: gopDocD1(k.boc) } as Env
