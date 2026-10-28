@@ -75,8 +75,8 @@ export const CAM_XUC_LUA: Record<TrangThaiLua, TrangThaiVe> = {
   yen: { base: {}, loop: [{ d: 1700, k: 22, p: { rot: -1.5, hr: 2 } }, { d: 1700, k: 22, p: { rot: 1.5, hr: -1 } }] },
   cuoi: { base: { mat: 'cong', mw: 4, mc: 6, mt: -1, mb: 13, tai: -4 }, loop: [{ d: 1700, k: 22, p: { rot: -1.5, hr: 2 } }, { d: 1700, k: 22, p: { rot: 1.5, hr: -1 } }] },
   chao: { // vẫy tay DÀI: cánh tay vươn ra ngoài rồi lên (như dáng chính ảnh thầy), mắt híp cười, vạch «!» hồng
-    base: { aP: 118, bP: 150, dP: 1.15, hP: 'xoe', zP: 1, mat: 'cong', mw: 5, mc: 6, mt: -1, mb: 15, hr: -5, rot: -2, tai: -4, hieu: 'nhay' },
-    loop: [{ d: 300, k: 260, p: { bP: 128 } }, { d: 300, k: 260, p: { bP: 172 } }],
+    base: { aP: 95, bP: 125, dP: 1.4, hP: 'xoe', zP: 1, mat: 'cong', mw: 5, mc: 6, mt: -1, mb: 15, hr: -5, rot: -2, tai: -4, hieu: 'nhay' },
+    loop: [{ d: 300, k: 260, p: { bP: 108 } }, { d: 300, k: 260, p: { bP: 142 } }],
   },
   vui: { // đúng: lấy đà 80 ms rồi nảy, cười híp, lấp lánh
     base: { mat: 'cong', mw: 5, mc: 6, mt: -1, mb: 14, aP: 120, bP: 150, hP: 'xoe', zP: 1, tai: -6 },
@@ -256,8 +256,9 @@ export function taoLua(noiGan: HTMLElement, tc: { trangThai?: TrangThaiLua; tuyC
   const mh = vien(H(mq, '', 'mieng'), 3.6)
   const luoi = E(tao('g', { 'clip-path': `url(#${id}m)` }, mq), 0, 0, 9, 6, 'luoi')
   // KÍNH BẢO HỘ: dải ngọc cong ôm trán (cắt theo đầu) + hai tròng + viên lục giác chàm
+  // dải cắt theo đầu nằm NGOÀI nhóm kính (nhóm kính trượt theo góc nghiêng — vùng cắt phải đứng yên với đầu, không thì dải lòi ra ngoài)
+  const daiK = tao('g', null, tao('g', { 'clip-path': `url(#${id}d)` }, P.dau!))
   g('kinh', P.dau!)
-  const daiK = tao('g', null, tao('g', { 'clip-path': `url(#${id}d)` }, P.kinh!))
   vien(H(daiK, 'M-130,-34Q0,-118 130,-34V-14Q0,-98 -130,-14Z', 'ngoc'), 4)
   const trong = [-1, 1].map(() => {
     const k = tao('g', null, P.kinh!)
@@ -369,7 +370,7 @@ export function taoLua(noiGan: HTMLElement, tc: { trangThai?: TrangThaiLua; tuyC
     tf(P.lua!, `translate(${f1(q * 20)},-88) rotate(${f1(phu.x * 1.2)}) scale(${f1(0.9 + 0.1 * v.lua!)},${f1(v.lua!)})`)
     tf(P.mat!, `translate(${f1(q * 32)},0)`)
     tf(P.mask!, `scale(${f1(1 - 0.15 * aq)},1)`)
-    tf(P.kinh!, `translate(${f1(q * 26)},0)`); tf(daiK, `translate(${f1(q * 4)},0)`)
+    tf(P.kinh!, `translate(${f1(q * 26)},0)`); tf(daiK, `translate(${f1(q * 22)},0)`)
     trong.forEach((k, i) => { const s = i ? 1 : -1, xa = Math.max(0, s * q); tf(k, `translate(${f1(s * 44 * (1 - 0.3 * xa))},-62) rotate(${s * 13}) scale(${f1(0.9 * (1 - 0.35 * xa))},0.9)`) })
     const ns = Math.sin(nhayMat * Math.PI)
     for (const e of mats) {
