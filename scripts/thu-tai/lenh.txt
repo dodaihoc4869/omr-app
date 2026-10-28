@@ -1,6 +1,1 @@
-worker chay
-noi=aws:ap-east-1
-ktcn-tat
-so_em=135
-phut=12
-am=3
+don
