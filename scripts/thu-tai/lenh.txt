@@ -1,8 +1,2 @@
-worker chay
-noi=aws:ap-east-1
-ktcn-tat
-dung-san
-so_em=270
-phut=10
-am=2
-# 28/10 trưa (lần 6): 270 em — mã tai-cao-diem-2 đủ (dấu Sảnh, dựng sẵn, kho nén, chặng rỗng lập sẵn, chống đàn đọc dồn) + D1 sao dựng sẵn.
+vitri
+# 28/10 trưa: hỏi D1 thật / D1 sao chạy ở đâu (SELECT 1, chỉ đọc) — lượt 6: D1 sao ở KIX (Osaka), Worker sao ghim HKG ⇒ mỗi đợt ~70–100 ms.
