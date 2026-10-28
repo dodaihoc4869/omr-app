@@ -202,11 +202,13 @@ type DsChienDich = { ds: { row: Row; sbd: Set<string> }[]; huy: DongDaHuy[]; bd:
 type OChienDich = { ds: DsChienDich | null; dangDoc: boolean }
 // 14/10 (số đo cao điểm 13/10: câu `SELECT * FROM chien_dich …` 3.238 lần/3 giờ × 9,4 ms — mỗi isolate đọc lại sau mỗi 15 giây): đệm 60 giây. Chiến dịch nay
 // do hệ thống quản (giao chiến dịch tay đã gỡ 14/10); ghi trong isolate vẫn xoá đệm ngay (`xoaDemChienDich`), isolate khác thấy sau ≤ 60 giây.
+// 28/10 (thử tải 270 em: câu này 13.870 lần / 13 phút — mỗi dòng mang sbd_json/qid_json lớn): lượt đồng thời chờ lượt đang đọc tới 3 s (trước 240 ms ⇒
+// D1 chậm hơn thế thì mọi lượt tự đọc lại, đàn đọc dồn).
 const demChienDich = new DemTTL<OChienDich>(60_000, 2)
 export function xoaDemChienDich(): void { demChienDich.xoa() }
 async function docMoiChienDich(env: Env): Promise<DsChienDich> {
   const co = demChienDich.doc('ds', Date.now())
-  for (let n = 0; co?.dangDoc && demChienDich.doc('ds', Date.now()) === co && n < 15; n++) await new Promise<void>(xong => setTimeout(xong, 16))
+  for (let n = 0; co?.dangDoc && demChienDich.doc('ds', Date.now()) === co && n < 190; n++) await new Promise<void>(xong => setTimeout(xong, 16))
   const daXong = demChienDich.doc('ds', Date.now())
   if (daXong?.ds) return daXong.ds
   const o: OChienDich = { ds: null, dangDoc: true }
