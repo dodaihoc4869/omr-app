@@ -459,6 +459,8 @@ export default defineConfig({
           // Biểu tượng cài app 512 px + logo của app thầy: hệ điều hành đọc lúc CÀI app (qua mạng), máy không cần chúng để chạy.
           '**/*-512*.png',
           '**/logo-gv-*',
+          // 28/10 biểu tượng app học sinh mới (đầu Cú Ngọc, bộ -cn): favicon / icon cài máy đọc qua mạng như bộ 512 — không thêm mục precache (trần 170).
+          '**/logo-hs-*-cn.{png,svg}',
           // Phiếu HTML: chỉ mở khi em bấm làm phiếu (đang có mạng), tải một lần rồi cất.
           '**/html-phieu-*.js',
           // Phông Inter (58 KB) chỉ cho app phụ huynh trên máy KHÔNG phải Apple: tải một lần khi phụ huynh mở app rồi cất ở kho chạy-lúc (đường /assets/*.woff2 của src/sw.ts); không ép vào precache vỏ.
