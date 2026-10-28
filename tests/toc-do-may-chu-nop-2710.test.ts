@@ -168,6 +168,10 @@ it('nút «Kiểm tra» (answer) và lệnh đếm sau câu: số đợt chờ D
   const keHoach = async () => { const viecPhu: Promise<unknown>[] = []; const ctx = { waitUntil: (x: Promise<unknown>) => { viecPhu.push(x) }, passThroughOnException() {} }
     return k.bo.chay(async () => (await (await worker.fetch(new Request('https://test/hs/ke-hoach-ngay', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token: k.token }) }), k.env, ctx as never)).json()) as Record<string, unknown>, viecPhu) }
   vi.setSystemTime(NOW + 470_000); await amCo(); ghi('ke-hoach-ngay', await keHoach())
+  // 28/10 GIỜ CAO ĐIỂM: /hs/ca-dang-mo (máy em hỏi sớm mỗi lần mở app; «mở chặng sớm» CHỜ nó) — một câu, cùng đợt lượt đọc mật khẩu.
+  const caMo = async () => { const viecPhu: Promise<unknown>[] = []; const ctx = { waitUntil: (x: Promise<unknown>) => { viecPhu.push(x) }, passThroughOnException() {} }
+    return k.bo.chay(async () => (await (await worker.fetch(new Request('https://test/hs/ca-dang-mo', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token: k.token }) }), k.env, ctx as never)).json()) as Record<string, unknown>, viecPhu) }
+  vi.setSystemTime(NOW + 480_000); await amCo(); ghi('ca-dang-mo', await caMo())
   const moc = JSON.parse(fs.readFileSync(MOC, 'utf8')) as { mayChuNop?: Record<string, { dot: number; lenh: number }> }
   if (process.env.GHI_MOC_TOC_DO) fs.writeFileSync(process.env.GHI_MOC_TOC_DO, JSON.stringify(do_, null, 1))
   const vuot: string[] = [], ha: string[] = [], thieuMoc: string[] = []

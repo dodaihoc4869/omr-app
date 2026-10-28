@@ -108,7 +108,8 @@ describe('/hs/ca-dang-mo', () => {
     expect((await hoi(d, { token: token + 'x' })).ok).toBe(false)
   })
 
-  it('HAI truy vấn cho một lượt hỏi (không nhân theo số ca)', async () => {
+  // 28/10 GIỜ CAO ĐIỂM: hai câu gộp làm MỘT (em + lớp + năm sinh LEFT JOIN ca mở của lớp em, kèm lượt của em) — chạy cùng đợt lượt đọc mật khẩu.
+  it('MỘT truy vấn cho một lượt hỏi (không nhân theo số ca)', async () => {
     const d = taoD1That()
     hs(d, 'E12', '12')
     for (let i = 0; i < 6; i++) ca(d, `C${i}`, { lop: '12' })
@@ -116,7 +117,7 @@ describe('/hs/ca-dang-mo', () => {
     await goiWorker(worker, d.env, '/khong-co-duong-nay', {})
     const truoc = d.soLenh.prepare
     await hoi(d, { sbd: 'E12' })
-    // 1 = em có thật + lớp + năm sinh · 2 = ca mở của lớp em (kèm lượt của em)
-    expect(d.soLenh.prepare - truoc).toBe(2)
+    // em có thật + lớp + năm sinh + ca mở của lớp em (kèm lượt của em) — một câu
+    expect(d.soLenh.prepare - truoc).toBe(1)
   })
 })
