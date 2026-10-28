@@ -41,6 +41,23 @@ jobs:
           console.log('cột ke_hoach_ngay:', JSON.stringify((await q('PRAGMA table_info(ke_hoach_ngay)'))?.map?.((c) => c.name)))
           console.log('dòng theo tháng / chưa chốt:', JSON.stringify(await q("SELECT substr(ngay,1,7) AS thang, COUNT(*) AS n, SUM(ket_qua IS NULL) AS chua_chot, MAX(cap_nhat_luc) AS moi_nhat FROM ke_hoach_ngay GROUP BY 1 ORDER BY 1")))
           console.log('hôm nay:', JSON.stringify(await q("SELECT COUNT(*) AS n, MAX(cap_nhat_luc) AS moi_nhat FROM ke_hoach_ngay WHERE ngay = date('now','+7 hours')")))
+          // Mọi ADD COLUMN / CREATE TABLE trong server/migration-*.sql: cái nào CHƯA có trên D1 thật (chỉ đọc sqlite_master + pragma).
+          const fs = require('fs')
+          const bang = new Set((await q("SELECT name FROM sqlite_master WHERE type='table'")).map((x) => x.name))
+          const cotCua = new Map()
+          const thieuCot = [], thieuBang = []
+          for (const f of fs.readdirSync('server').filter((f) => /^migration-.*\.sql$/.test(f)).sort()) {
+            const t = fs.readFileSync(`server/${f}`, 'utf8').replace(/--[^\n]*/g, '')
+            for (const m of t.matchAll(/ALTER\s+TABLE\s+([\w"]+)\s+ADD\s+COLUMN\s+([\w"]+)/gi)) {
+              const b0 = m[1].replace(/"/g, ''), c0 = m[2].replace(/"/g, '')
+              if (!bang.has(b0)) { thieuBang.push(`${f}: ${b0} (bảng chưa có, cột ${c0})`); continue }
+              if (!cotCua.has(b0)) cotCua.set(b0, new Set((await q(`SELECT name FROM pragma_table_info('${b0}')`)).map((x) => x.name)))
+              if (!cotCua.get(b0).has(c0)) thieuCot.push(`${f}: ${b0}.${c0}`)
+            }
+            for (const m of t.matchAll(/CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?([\w"]+)/gi)) { const b0 = m[1].replace(/"/g, ''); if (!bang.has(b0)) thieuBang.push(`${f}: ${b0}`) }
+          }
+          console.log(`THIẾU CỘT (${thieuCot.length}):`); for (const x of thieuCot) console.log('  ' + x)
+          console.log(`THIẾU BẢNG (${thieuBang.length}):`); for (const x of thieuBang) console.log('  ' + x)
           JS
       - name: Worker + D1 (GraphQL, chỉ đọc)
         env:
