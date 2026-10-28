@@ -1,3 +1,8 @@
-nghi
-# Đo lại (sau khi phiên máy chủ sửa xong), cùng điều kiện, cron nhánh cao điểm:
-# sinh worker chay / noi=aws:ap-east-1 / ktcn-tat / so_em=270 (rồi 135) / phut=12 / am=3 / gio_vn=20
+worker chay
+noi=aws:ap-east-1
+ktcn-tat
+so_em=270
+phut=12
+am=3
+# 28/10 trưa: đo lại 270 em sau sửa tải D1 (nhánh claude/tai-cao-diem-2810: prior lớp tính sẵn theo em, kho câu + Q nạp toàn bảng / isolate). Không sinh lại dữ liệu
+# (D1 sao giữ dữ liệu giả cũ + phần các lượt đo trước ghi thêm ⇒ nặng hơn lượt trước một chút). Không chờ 20h ⇒ cron nhánh ngoài cao điểm như lượt 2.
