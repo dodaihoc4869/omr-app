@@ -1,7 +1,8 @@
 worker chay
 noi=aws:ap-east-1
 ktcn-tat
+dung-san
 so_em=135
 phut=8
-am=3
-# 28/10 trưa (lần 4): đo VẾT D1 từng lệnh (Worker sao VET=1) ở 135 em — tìm vì sao Sảnh p50 7 s.
+am=2
+# 28/10 trưa (lần 5): mã nhánh tai-cao-diem-2 (dấu Sảnh bỏ khoá đệm việc nền, dựng sẵn, kho nén) + D1 sao DỰNG SẴN (chụp đêm + Sảnh mỗi em) — 135 em.
