@@ -150,8 +150,9 @@ describe('trang cài app (cai-app.html · cai-dat.html · cai-app/index.html): b
     expect(a).toContain('<link rel="icon" type="image/svg+xml" sizes="any" href="/logo-gv-nho-v3.svg">')
     expect(a).toContain('<link rel="apple-touch-icon" href="/logo-gv-180-v3.png">')
     expect(a).toContain('<img src="/logo-gv-180-v3.png" alt="Đỗ Đại Học Logo">')
-    expect(a.match(/<img src="\/logo-hs-192-v3\.png" alt="App Icon">/g)).toHaveLength(2)
-    expect(a).toContain("img.src = '/logo-' + (role === 'hs' ? 'hs' : 'ph') + '-192-v3.png';")
+    // 28/10: ô xem trước app học sinh = biểu tượng đầu Cú Ngọc (bộ -cn) như icon cài máy thật; phụ huynh giữ -v3
+    expect(a.match(/<img src="\/logo-hs-192-cn\.png" alt="App Icon">/g)).toHaveLength(2)
+    expect(a).toContain("img.src = '/logo-' + (role === 'hs' ? 'hs-192-cn' : 'ph-192-v3') + '.png';")
     expect(a).not.toMatch(/-v2|apple-touch-icon\.png/)
   })
 })
