@@ -38,7 +38,16 @@ jobs:
             console.log(`=== ${nhan} (UTC; VN = +7) — tổng · exceededMemory · exceededCpu · clientDisconnected ===`)
             for (const [k, o] of [...m].sort()) { const t = Object.values(o).reduce((a, b) => a + b, 0); console.log(`${k} ${t} · mem=${o.exceededMemory ?? 0} · cpu=${o.exceededCpu ?? 0} · ngat=${o.clientDisconnected ?? 0}${Object.keys(o).filter((s) => !['success','exceededMemory','exceededCpu','clientDisconnected'].includes(s)).map((s) => ` · ${s}=${o[s]}`).join('')}`) }
           }
+          const q = async (sql) => {
+            const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${ACC}/d1/database/d2e6d322-374a-45d7-83a3-9fac486b23f1/query`, { method: 'POST', headers: { authorization: `Bearer ${TOKEN}`, 'content-type': 'application/json' }, body: JSON.stringify({ sql }), signal: AbortSignal.timeout(30000) })
+            const j = await r.json(); return j.success ? JSON.stringify(j.result?.[0]?.results) : `LỖI ${JSON.stringify(j.errors).slice(0, 300)}`
+          }
+          console.log('CỠ game_v2_question.json:', await q("SELECT COUNT(*) n, CAST(AVG(length(json)) AS INT) tb, MAX(length(json)) lon_nhat, SUM(length(json)>100000) tren_100k, SUM(length(json)>20000) tren_20k FROM game_v2_question"))
+          console.log('CỠ câu trong phiên mở 2 giờ qua (đúng câu đệm chấm nhanh giữ):', await q("SELECT COUNT(*) n, CAST(AVG(length(q.json)) AS INT) tb, MAX(length(q.json)) lon FROM game_v2_question q WHERE q.qid IN (SELECT json_extract(j.value,'$.qid') FROM game_v2_session s, json_each(s.json,'$.questions') j WHERE s.created_at >= datetime('now','-2 hours'))"))
+          console.log('CỠ game_v2_session.json (2 giờ):', await q("SELECT COUNT(*) n, CAST(AVG(length(json)) AS INT) tb, MAX(length(json)) lon FROM game_v2_session WHERE created_at >= datetime('now','-2 hours')"))
+          console.log('kho_chup:', await q("SELECT khoa, COUNT(*) phan, SUM(length(json)) co FROM kho_chup GROUP BY khoa"))
+          console.log('cau_meta / omni_q dòng:', await q("SELECT (SELECT COUNT(*) FROM cau_meta) cm, (SELECT COUNT(*) FROM omni_q) oq, (SELECT SUM(length(vkn_json)) FROM omni_q) oq_vkn"))
           const nay = new Date()
-          await khung('2026-10-28T11:00:00Z', nay.toISOString(), 'HÔM NAY 28/10')
-          await khung('2026-10-27T11:00:00Z', '2026-10-27T16:00:00Z', 'HÔM QUA 27/10')
+          await khung('2026-10-28T13:30:00Z', nay.toISOString(), 'HÔM NAY 28/10')
+          
           JS
