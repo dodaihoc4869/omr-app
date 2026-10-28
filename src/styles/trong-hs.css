@@ -834,14 +834,14 @@
 [data-trong] .da-duong { overflow-x: clip; }
 [data-trong] .da-o-nut { position: relative; }
 [data-trong] .da-linh-vat { position: absolute; left: 50%; top: 50%; z-index: 0; width: 104px; transform: translate(calc(var(--lv) - 50%), -46%); pointer-events: none; }
-[data-trong] .da-linh-vat .bi { display: block; width: 74px; height: auto; margin: 0 auto; } /* Lửa cao ≈ 72 px như cú Duo cạnh đường */
+[data-trong] .da-linh-vat .bi { display: block; width: 83px; height: auto; margin: 0 auto; } /* Lửa (Cú Ngọc, 28/10) cao ≈ 86 px cạnh đường */
 [data-trong] .da-linh-vat .da-lv-gt { width: 104px; height: 120px; }
 [data-trong] .da-linh-vat .da-lv-gt svg { display: block; width: 100%; height: 100%; }
 [data-trong] .da-linh-vat::after { content: ''; display: block; width: 70px; height: 10px; margin: -8px auto 0; border-radius: 50%; background: var(--tr-day-khoi); opacity: .5; }
 [data-trong] .da-linh-vat[data-toi] { filter: grayscale(1); opacity: .32; }
 @keyframes da-lv-tho { 0%, 100% { transform: translate(calc(var(--lv) - 50%), -46%) scale(1); } 50% { transform: translate(calc(var(--lv) - 50%), -48%) scale(1.03); } }
 [data-trong='hs'] .da-linh-vat:not([data-toi]) { animation: da-lv-tho 2.6s ease-in-out infinite; }
-@media (max-width: 380px) { [data-trong] .da-linh-vat { width: 88px; } [data-trong] .da-linh-vat .bi { width: 64px; } }
+@media (max-width: 380px) { [data-trong] .da-linh-vat { width: 88px; } [data-trong] .da-linh-vat .bi { width: 72px; } }
 @media (prefers-reduced-motion: reduce) { [data-trong='hs'] .da-linh-vat { animation: none; } }
 [data-trong='hs'].may-yeu .da-linh-vat { animation: none; }
 /* THẺ «HỌC CÙNG BẠN» TRÊN LỘ TRÌNH (27/10, TheBanLoTrinh): một hàng gọn kiểu lời nhắc bạn bè Duolingo — chữ bấm được mở màn, nút «Gõ cửa» / nút đóng bên phải. */
@@ -1052,16 +1052,16 @@
   order: 0; flex-direction: column; justify-content: center; align-items: center; gap: 4px; width: 48px; min-width: 44px; height: 52px; min-height: 44px; margin: 0;
   padding: 0; border-radius: 14px; background: none; box-shadow: none; color: var(--tr-chu-2); font-size: 12.5px; font-weight: 800; line-height: 1;
 }
-:root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr-muc { order: -1; display: flex; }
+:root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr-muc { order: -1; display: flex; height: 62px; } /* 28/10: vòng mục tiêu to hơn (đầu Cú Ngọc rõ) */
 :root[data-trong='hs'] .tr-menu .da-tren[data-menu] :is(.tp-tr-o, .tp-tr-muc):hover { background: var(--tr-mat-2); box-shadow: inset 0 0 0 1px var(--tr-vien); }
 /* chạm bằng bàn phím: mục «nổi» lên như thẻ 3D của menu (cùng viền focus chung) */
 :root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr-o:focus-visible { background: var(--tr-mat); box-shadow: var(--tr-bong-2), 0 0 0 1px var(--tr-vien); }
 :root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr-muc:focus-visible { background: var(--tr-mat); box-shadow: var(--tr-bong-2), 0 0 0 1px var(--tr-vien); }
 :root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr-o .tp-dv { width: 22px; height: 22px; }
 :root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr-so { min-width: 0; color: var(--tr-chu-2); }
-:root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr-vong { position: relative; display: grid; place-items: center; width: 28px; height: 28px; }
-:root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr-vong svg.vm { position: absolute; inset: 0; width: 28px; height: 28px; transform: rotate(-90deg); }
-:root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr-vong > .bi { width: 18px; margin: 0; }
+:root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr-vong { position: relative; display: grid; place-items: center; width: 42px; height: 42px; }
+:root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr-vong svg.vm { position: absolute; inset: 0; width: 42px; height: 42px; transform: rotate(-90deg); }
+:root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr-vong > .bi { width: 32px; margin: 0; }
 [data-trong='hs'] .tp-tr-vong { display: contents; }
 /* xoay ngang thấp: menu lưới 2 cột mục ⇒ thêm cột số thứ ba */
 @media (orientation: landscape) and (max-height: 500px) and (min-width: 700px) {
@@ -1074,6 +1074,8 @@
 /* bỏ thanh trên ⇒ nội dung lên sát mép trên, cột tóm tắt ghim cao hơn */
 [data-trong='hs'] .dm-khung[data-so-menu] > .da-vo { padding-top: max(16px, env(safe-area-inset-top)); }
 @media (min-width: 1000px) { [data-trong='hs'] .dm-khung[data-so-menu] > .da-vo { padding-top: 26px; } [data-trong='hs'] .dm-khung[data-so-menu] .dm-ben { top: 16px; } }
+/* xoay ngang, tai thỏ / camera ở mép trái (thầy 28/10 «full hẳn»): nội dung lùi đúng bề vùng an toàn, không bị che; máy không tai thỏ giữ 16px */
+[data-trong='hs'] .dm-khung { padding-left: max(16px, env(safe-area-inset-left)); }
 /* gờ mở menu mép phải: rõ hơn, chàm (thầy 27/10 «tinh tế, dễ thấy») */
 :root[data-trong='hs'] .tr-menu-cham i { width: 6px; height: 44px; background: color-mix(in srgb, var(--tr-hs) 78%, transparent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--tr-hs) 16%, transparent), 0 4px 14px color-mix(in srgb, var(--tr-hs) 30%, transparent); }
 /* thanh tiến độ thẻ bài / dải ghim ở nền tối: phần đầy là MÀU ĐÚNG (trước là --tr-trang = gần đen ở nền tối ⇒ «vạch đen đặc» lúc 16/16) */

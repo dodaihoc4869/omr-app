@@ -6,6 +6,7 @@
 // Chưa có: câu anh em (cùng dạng, khác nội dung) và xáo phương án câu gốc — câu gốc chỉ tính "Đã tự sửa" khi làm ở NGÀY KHÁC ngày sai (luật b).
 // Đáp án / lời giải CHỈ ra sau khi em nộp, và chỉ khi đúng hoặc đã hết lần thử. Bấm lặp cùng `khoa` ⇒ đúng kết quả cũ. Trần 2 lần / đợt / ngày chốt trong câu INSERT.
 // Chi phí: gon-mo = 1 đợt đọc song song + nạp câu; gon-nop = 1 đợt đọc song song + nạp câu + 1 lô ghi. Không lệnh nóng nào đổi.
+// THƯỞNG (thầy duyệt 28/10): câu ra khỏi hàng ⇒ +2 nguyên tử (exp-cau-hinh.ts NT_TU_SUA_RA_HANG) — MỘT câu chèn exp_so CÙNG lô ghi, cấu hình EXP đọc CÙNG đợt đọc.
 import type { Env } from './kieu'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { cauCongKhai } from './cau-theo-qid'
@@ -21,6 +22,9 @@ import { qidBienThe, qidYDsMoi } from './loi-hoc-luat'
 import { GIO_LOI_GIAI_GAN, sqlHoCau } from './chua-gon'
 import { emCoGhi } from './dem-ke-hoach'
 import { goiYTuLoiGiai } from './goi-y-rieng'
+import { docCauHinhExp, mocExpCuaEm } from './exp-d1'
+import { LOAI_TU_SUA, NT_TU_SUA_RA_HANG, NT_TU_SUA_TRAN_NGAY } from './exp-cau-hinh'
+import { tachSongSinh } from './loi-hoc-luat'
 
 type Obj = Record<string, unknown>
 const str = (v: unknown) => (typeof v === 'string' ? v : '')
@@ -117,9 +121,10 @@ export async function gonNop(env: Env, b: Obj): Promise<Response> {
   if (!dotId || dotId.length > 160 || !banXin || banXin.length > 160 || !khoa || khoa.length > 80) return loi('THIEU_THAM_SO', 'Thiếu câu trả lời.')
   if (!traLoi) return loi('CHUA_TRA_LOI', 'Em trả lời rồi bấm Kiểm tra nhé.')
   const nowMs = Date.now()
-  const [c, cu] = await Promise.all([
+  const [c, cu, cfgExp] = await Promise.all([
     docChung(env, sbd, dotId, nowMs),
     env.DB.prepare('SELECT ket FROM chua_gon_lan WHERE khoa=? AND sbd=?').bind(khoa, sbd).first<{ ket: string }>(),
+    docCauHinhExp(env).catch(() => null),
   ])
   if (!c.dot) return loi('KHONG_CO_DOT', 'Không tìm thấy câu này trong danh sách của em.', 404)
   const Q = str(c.dot.qid_chuan)
@@ -164,14 +169,33 @@ export async function gonNop(env: Env, b: Obj): Promise<Response> {
     // Em đã thấy lời giải ⇒ dấu đọc lời giải (luật tự làm a của mọi kênh khác cũng thấy).
     ...(moLoiGiai ? [env.DB.prepare(`INSERT OR IGNORE INTO loi_giai_hoi(sbd,qid,luc,co_ho_so,nguon) SELECT ?,?,?,0,'chua_gon:sau_nop' WHERE ${cong.sql}`)
       .bind(sbd, Q, new Date(nowMs + 1).toISOString(), ...cong.params)] : []),
-    env.DB.prepare('SELECT ket,luc FROM chua_gon_lan WHERE khoa=? AND sbd=?').bind(khoa, sbd),
   ]
+  // Thưởng sửa đúng câu cũ (28/10): chỉ khi câu RA KHỎI HÀNG ở lượt này và EXP mới đang bật cho em; điều kiện trần / lặp ngày chốt TRONG câu chèn.
+  const thuong = tuSua && cfgExp && mocExpCuaEm(cfgExp, sbd, nowMs) ? ghi.push(lenhThuongTuSua(env, { sbd, Q, dotId, ngay: c.homNay, luc, cong })) - 1 : -1
+  ghi.push(env.DB.prepare('SELECT ket,luc FROM chua_gon_lan WHERE khoa=? AND sbd=?').bind(khoa, sbd))
   const r = await env.DB.batch(ghi)
   const dong = (r.at(-1)?.results?.[0] ?? null) as { ket: string; luc: number } | null
   if (!dong) return loi('HET_LUOT', 'Hôm nay em đã làm câu này đủ lần. Mai làm lại nhé.', 409)
   emCoGhi(sbd) // như nopItem: sổ vừa có dòng mới ⇒ bỏ bản đếm kế hoạch / hồ sơ đệm của em
   if (Number(dong.luc) !== nowMs) { try { return Response.json(await kemChiTiet(env, sbd, Q, JSON.parse(dong.ket) as Obj)) } catch { /* rơi xuống */ } }
-  return Response.json(await kemChiTiet(env, sbd, Q, kq, ban))
+  const nguyenTu = thuong >= 0 && Number(r[thuong]?.meta.changes) > 0 ? NT_TU_SUA_RA_HANG : 0
+  return Response.json(await kemChiTiet(env, sbd, Q, nguyenTu ? { ...kq, nguyenTu } : kq, ban))
+}
+
+/**
+ * Khoản «Sửa đúng câu cũ» vào sổ nguyên tử (exp_so — trigger bảng giải tuần cộng như mọi khoản, nhãn Đối phó tuần ⇒ 0 ở bảng giải). Khoá theo MÃ GỐC + ngày
+ * (bỏ hậu tố song sinh / biến thể ⇒ một câu gốc một lần mỗi ngày). Chỉ vào khi: dòng lần nộp của CHÍNH lượt này vừa chèn (`cong`), em chưa có đủ
+ * NT_TU_SUA_TRAN_NGAY khoản hôm nay, và mã gốc chưa ĐÚNG ở kênh khác hôm nay trước lúc này (luật lặp câu #525). Mọi điều kiện theo chỉ mục (sbd, ngay_vn) / (sbd, qid).
+ */
+export function lenhThuongTuSua(env: Env, x: { sbd: string; Q: string; dotId: string; ngay: string; luc: string; cong: { sql: string; params: unknown[] } }) {
+  const goc = tachSongSinh(x.Q).goc
+  return env.DB.prepare(`INSERT OR IGNORE INTO exp_so(khoa,sbd,ngay_vn,loai,qid,ma_nguon,exp,luc,ghi_chu)
+    SELECT ?1,?2,?3,'${LOAI_TU_SUA}',?4,?5,?6,?7,?8
+    WHERE EXISTS(SELECT 1 FROM chua_gon_lan WHERE khoa=?9 AND luc=?10)
+      AND (SELECT COUNT(*) FROM exp_so WHERE sbd=?2 AND ngay_vn=?3 AND loai='${LOAI_TU_SUA}') < ?11
+      AND NOT EXISTS(SELECT 1 FROM su_kien_hoc s WHERE s.sbd=?2 AND ${sqlHoCau('s.qid', '?4')} AND s.ngay_vn=?3 AND s.ket_qua=1 AND s.nguon<>'chua_loi' AND s.luc<?7)`)
+    .bind(`${x.sbd}|${LOAI_TU_SUA}|${goc}|${x.ngay}`, x.sbd, x.ngay, goc, x.dotId, NT_TU_SUA_RA_HANG, x.luc, `Sửa đúng câu cũ: +${NT_TU_SUA_RA_HANG}`,
+      ...x.cong.params, NT_TU_SUA_TRAN_NGAY)
 }
 
 /** Gợi ý sau lần sai đầu (thầy 27/10: lời khuyên chung chung «đọc lại đề, gạch chân…» là vô nghĩa ⇒ bỏ): bước 1 bài luyện từng bước thầy đã duyệt ·

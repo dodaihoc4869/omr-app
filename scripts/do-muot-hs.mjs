@@ -33,12 +33,16 @@ const MANG = arg('mang', 'fast3g')
 const YEU = arg('yeu', CPU >= 6 ? '1' : '0') === '1'
 const RA = arg('ra', '')
 const MAY_CHU_MS = Number(arg('may-chu-ms', '60'))
+// Luồng NDJSON (chấm nhanh «Kiểm tra» 28/10): dòng 1 đi sau DONG1_MS, dòng cuối sau MAY_CHU_MS (máy chủ giả: dòng 1 = chấm từ bộ nhớ, dòng cuối = sau các đợt D1).
+const DONG1_MS = Number(arg('dong1-ms', '10'))
 const MAN = { width: 360, height: 740 }
 const MANG_GIA = {
   // DevTools «Fast 3G» (= «Slow 4G» của Lighthouse): 562,5 ms RTT, 1,44 Mb/s xuống.
   fast3g: { offline: false, latency: 562.5, downloadThroughput: (1.6 * 1024 * 1024 * 0.9) / 8, uploadThroughput: (750 * 1024 * 0.9) / 8 },
   // DevTools «Slow 3G»: 2 000 ms RTT, 400 kb/s xuống.
   slow3g: { offline: false, latency: 2000, downloadThroughput: (500 * 1024 * 0.8) / 8, uploadThroughput: (500 * 1024 * 0.8) / 8 },
+  // Không giả mạng (đo phần MÁY CHỦ + MÁY: DevTools giả mạng giữ thân phản hồi theo luồng tới khi đủ khối ⇒ không đo được dòng 1 của NDJSON).
+  khong: { offline: false, latency: 0, downloadThroughput: -1, uploadThroughput: -1 },
 }[MANG]
 
 function timChromium() {
@@ -78,6 +82,13 @@ const may = createSecureServer({ ...chungChi(), allowHTTP1: true }, async (req, 
     try { body = JSON.parse(raw || '{}') } catch {}
     const tl = await GIA.traLoi(u.pathname, body)
     const laLuong = Array.isArray(tl.__ndjson)
+    if (laLuong && tl.__ndjson.length > 1) {
+      await new Promise((ok) => setTimeout(ok, DONG1_MS))
+      res.writeHead(200, { ...cors, 'content-type': 'application/x-ndjson' })
+      res.write(JSON.stringify(tl.__ndjson[0]) + '\n')
+      await new Promise((ok) => setTimeout(ok, Math.max(0, MAY_CHU_MS - DONG1_MS)))
+      return res.end(tl.__ndjson.slice(1).map((x) => JSON.stringify(x)).join('\n') + '\n')
+    }
     const than = laLuong ? tl.__ndjson.map((x) => JSON.stringify(x)).join('\n') + '\n' : JSON.stringify(tl)
     await new Promise((ok) => setTimeout(ok, MAY_CHU_MS))
     res.writeHead(200, { ...cors, 'content-type': laLuong ? 'application/x-ndjson' : 'application/json' })
@@ -413,6 +424,8 @@ try {
     m.bamPa = { inp: inpTu(d.sk, t0), xuLy: xuLyTu(d.sk, t0), ba: chiaBaTu(d.sk, t0), taskMax: daiNhat(d.dai, t0) }
     t0 = await bayGio(p)
     if (i === 1) await batHoSo(cdp, 'kiem')
+    // khung đầu có dải kết quả (kể cả «Đang chấm…») và khung đầu dải đã đúng / sai (rAF, mốc performance.now)
+    await p.evaluate(() => { const w = (window.__kiem = { dai: 0, mau: 0 }); const f = (t) => { const d = document.querySelector('.duo-ket'); if (d && !w.dai) w.dai = t; if (d && /^(dung|sai|trung)$/.test(d.getAttribute('data-tt') || '') && !w.mau) w.mau = t; if (!w.mau) requestAnimationFrame(f) }; requestAnimationFrame(f) })
     await cham(p, NUT_KIEM)
     await p.waitForTimeout(400)
     d = await layDo(p)
@@ -421,7 +434,8 @@ try {
     const kHieuUng = await doKhung(p, 1500)
     if (i === 1) await inHoSo(cdp, 'kiem')
     d = await layDo(p)
-    m.kiemTra = { inp: inpKiem, xuLy: xuLyKiem, toiKetQua: Math.round(t1 - t0), taskMax: daiNhat(d.dai, t0), khungHieuUng: kHieuUng }
+    const kk = await p.evaluate(() => window.__kiem)
+    m.kiemTra = { inp: inpKiem, xuLy: xuLyKiem, toiKetQua: Math.round(t1 - t0), toiDai: kk.dai ? Math.round(kk.dai - t0) : null, toiMau: kk.mau ? Math.round(kk.mau - t0) : null, taskMax: daiNhat(d.dai, t0), khungHieuUng: kHieuUng }
     await p.waitForTimeout(300)
     const truoc = await chuPa(p)
     if (i === 1) await batHoSo(cdp, 'tiep')

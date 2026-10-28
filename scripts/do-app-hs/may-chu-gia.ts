@@ -144,9 +144,12 @@ export async function traLoi(duong: string, body: Obj): Promise<Obj> {
       lamChang.daNop++; lamChang.daTra.add(String(body.qid))
       lamChang.chuoi = dung ? lamChang.chuoi + 1 : 0
       const c = lamChang.chuoi
-      return { ok: true, correct: dung, answer: 'A', solution: { chot: 'Chốt lời giải: phương án A đúng vì thoả mãn điều kiện đề bài.' }, solutionImages: [],
+      const du: Obj = { ok: true, correct: dung, answer: 'A', solution: { chot: 'Chốt lời giải: phương án A đúng vì thoả mãn điều kiện đề bài.' }, solutionImages: [],
         thuong: dung ? { tinh: true, nguyenTu: 10 + (c >= 3 ? 2 : 0), dong: [{ nhan: 'Đúng', so: 10 }, ...(c >= 3 ? [{ nhan: `Chuỗi đúng ${c}`, so: 2 }] : [])], chuoiDung: c, cauKho: false }
           : { tinh: true, nguyenTu: 2, dong: [{ nhan: 'Làm nghiêm túc', so: 2 }], chuoiDung: 0, cauKho: false } }
+      // Chấm nhanh 28/10 (server/src/nop-luong.ts): máy em xin luồng ⇒ dòng tạm (đúng / sai, chưa thưởng) + dòng đầy đủ.
+      if (body.luong === 1) return { __ndjson: [{ ok: true, tam: true, correct: dung, answer: 'A', traLoi: String(body.answer ?? ''), solution: du.solution, solutionImages: [] }, du] }
+      return du
     }
     case 'hoa2-cau-da-lam':
       return cauDaLam()

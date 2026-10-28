@@ -225,6 +225,8 @@ for (const [k, n] of Object.entries(JSON.parse(readFileSync(new URL('../docs/css
 // 27/10 khuya (độ mượt máy học sinh): CSS chết ở các tờ nạp chung — danh sách đóng docs/css-chet-2710c.json, cùng cách.
 for (const [k, n] of Object.entries(JSON.parse(readFileSync(new URL('../docs/css-chet-2710c.json', import.meta.url), 'utf8')).cu)) MAU_CU_THAY_RA_LENH[k] = (MAU_CU_THAY_RA_LENH[k] ?? 0) + n
 for (const [k, n] of Object.entries(GON_MA_2710.cu)) MAU_CU_THAY_RA_LENH[k] = (MAU_CU_THAY_RA_LENH[k] ?? 0) + n
+// 28/10 thầy «Chốt build thay» (Cú Ngọc): CSS vẽ hình Bi cũ (bi.css) + bảng --lv-* hình shiba (lua.css) thành chết — danh sách đóng docs/css-chet-2810.json.
+for (const [k, n] of Object.entries(JSON.parse(readFileSync(new URL('../docs/css-chet-2810.json', import.meta.url), 'utf8')).cu)) MAU_CU_THAY_RA_LENH[k] = (MAU_CU_THAY_RA_LENH[k] ?? 0) + n
 // 27/10 thầy duyệt bộ màu riêng B «Chất chỉ thị»: «Chốt bảng màu chất chỉ thị, làm cho sáng bằng độ sáng của doligo nhé» ⇒ BỐN màu thân giám thị
 // đổi sang sắc bộ B (độ sáng / độ tươi ngang Duolingo, ve-moi/mau-rieng/de-xuat-build.md): bốn mã Duolingo cũ được phép biến mất đúng một lần.
 // 28/10 thầy: «đo chế độ tối của Duolingo tinh chỉnh thông số» ⇒ nền tối HS sáng lên (#1a1a29) ⇒ bốn mã giám thị hạ L ≤ 0,03 để bong bóng càu nhàu giữ ≥ 4,5

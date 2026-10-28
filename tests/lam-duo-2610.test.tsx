@@ -11,6 +11,8 @@ import type { SoHomNay } from '../src/components/hoc-tap/lam-bai'
 // thầy 27/10: dải ĐÚNG xoay vòng câu khen như Duolingo (câu đầu «Chính xác!»)
 const KHEN = /^(Chính xác|Giỏi quá|Làm tốt lắm|Tuyệt vời|Xuất sắc)!$/
 vi.mock('../src/components/hoa2/api', async (goc) => ({ ...await goc<typeof import('../src/components/hoa2/api')>(), goiHoa2: vi.fn() }))
+// «Kiểm tra» của màn Duo đi theo luồng (doc-luong-nop.ts) — ở test đi qua cùng `goiHoa2` giả như trước (không dòng tạm).
+vi.mock('../src/components/hoa2/doc-luong-nop', async () => { const api = await import('../src/components/hoa2/api'); return { nopCauLuong: (token: string, du: Record<string, unknown>, giay: number) => api.goiHoa2('answer', token, du, giay) } })
 beforeEach(() => { document.documentElement.dataset.trong = 'hs' })
 afterEach(() => { cleanup(); vi.mocked(goiHoa2).mockReset(); localStorage.clear(); delete document.documentElement.dataset.trong })
 

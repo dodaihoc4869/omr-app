@@ -14,6 +14,7 @@ import { docKtcnDangLam, ghiKtcnDangLam, xoaKtcnDangLam } from '../../lib/ktcn-d
 import './hoc-tap.css'
 import './kiem-tra-ca-nhan.css'
 import { phanHoi } from '../../lib/phan-hoi'
+import { CHU_MAY_CHU_BAN_EM, choLuiDanMs, chuCuaLoi, laLoiMayChuBan, laLoiTamThoi } from '../../lib/loi-may-chu'
 import { batCheDoThi } from '../../lib/am-thanh'
 import { ChonDungSai, ChonTracNghiem, DeCau, HinhCuoiCau, OTraLoiNgan, BanPhimSo } from './LamCau'
 import { nhanPhim, phimTuBanPhim, type PhimSo } from './lam-bai'
@@ -58,6 +59,8 @@ function GioConLai({kho,bai=false}:{kho:KhoGio|null;bai?:boolean}){
 /** Dòng phụ của chặng ĐÃ CHỐT (thầy 26/10: «Đã chốt · đã trả lời 0/6» dễ hiểu nhầm): nói rõ bỏ trống bao nhiêu câu — cùng số daTra, chỉ đổi lời. */
 const chuChot=(so:number,da:number)=>da>=so?`${so} câu · trả lời đủ ${so}/${so}`:da<=0?`${so} câu · bỏ trống cả ${so} câu`:`${so} câu · trả lời ${da}/${so} · bỏ trống ${so-da}`
 const khongDangKy=()=>()=>{}
+/** Cửa máy chủ nhận bản nháp gửi muộn (khớp GUI_TRE_MS của server/src/kiem-tra-ca-nhan.ts): 10 phút sau hạn, chỉ phần em trả lời trước hạn. */
+const GUI_TRE_MS=10*60_000
 function useHetGio(kho:KhoGio|null){
  const lay=()=>!!kho&&kho.conLai()<=0
  return useSyncExternalStore(kho?.dangKy??khongDangKy,lay,lay)
@@ -76,19 +79,35 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,ban}:{toke
  const traRef=useRef(tra),revision=useRef(0),day=useRef<Promise<unknown>>(Promise.resolve()),tuNop=useRef(false),timer=useRef<ReturnType<typeof setTimeout>|undefined>(undefined),mounted=useRef(true)
  const tuTiep=useRef(true),lanPhien=useRef(0),henThuLai=useRef<ReturnType<typeof setTimeout>|undefined>(undefined),choThuLai=useRef(false),lanThuLai=useRef(0)
  const [nhipThuLai,setNhipThuLai]=useState(0)
+ // TỰ ĐỒNG BỘ BẢN NHÁP (thầy 28/10 «Tự động khôi phục bản nháp trên máy đi nhé»): còn câu chưa lên máy chủ (`chuaGui`) ⇒ tự gửi lại lùi dần 1→30 giây,
+ // khi có mạng lại, khi quay lại tab, khi mở lại chặng — em không phải bấm. Mỗi câu nhớ MỐC em trả lời (`lucRef`, giờ máy chủ đã hiệu chỉnh) để máy chủ
+ // nhận phần trả lời trước hạn kể cả khi gửi muộn vì máy chủ bận. `ban`: máy chủ báo bận ⇒ câu nhẹ, không hộp lỗi.
+ const lucRef=useRef<Record<string,number>>({}),chuaGui=useRef(false),lanDongBo=useRef(0),henDongBo=useRef<ReturnType<typeof setTimeout>|undefined>(undefined),dongBoRef=useRef<()=>void>(()=>{})
+ const [mayBan,setBan]=useState(false),[nhipDongBo,setNhipDongBo]=useState(0)
+ const huyDongBo=()=>{if(henDongBo.current)clearTimeout(henDongBo.current);henDongBo.current=undefined}
  const conPhien=(lan:number)=>mounted.current&&lanPhien.current===lan
  const huyHenThuLai=()=>{if(henThuLai.current)clearTimeout(henThuLai.current);henThuLai.current=undefined;choThuLai.current=false}
  const key=`ktcn:nhap:${sbd}:${id}:${stt}`
- const [nhapCuu,setNhapCuu]=useState<Record<string,string>>()
  const khung=useRef<HTMLDivElement>(null)
  useEffect(()=>{if(stt!==null)khung.current?.scrollIntoView?.({block:'start'})},[stt])
  const nhan=(r:Record<string,unknown>)=>{const t=docKiemTra(r.kiemTra);if(!t)throw new Error('Số liệu bài kiểm tra chưa đầy đủ. Em tải lại nhé.');setTt(t);setOffset(t.serverNow-Date.now());if(typeof r.revision==='number')revision.current=r.revision;return t}
- const tai=async()=>{const lan=lanPhien.current;setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-trang-thai',token,{id,kemKetQua:true});if(!conPhien(lan))return;const t=nhan(r);setChang(r.chang as Chang[]);if(r.ketQua&&t.nopLuc!==null){setKet(r.ketQua as Ket);return}if(t.nopLuc!==null||t.trangThai==='het_han'){const k=await goiHoa2('hoc-tap-ktcn-ket-qua',token,{id});if(!conPhien(lan))return;nhan(k);setKet(k.ketQua as Ket)}}catch(e){if(conPhien(lan))setLoi(e instanceof Error?e.message:'Chưa tải được bài kiểm tra.')}finally{if(conPhien(lan))setBusy(false)}}
+ /** Bản nháp trên máy của chặng i: câu trả lời + mốc trả lời từng câu + câu đang làm. Hỏng / không có ⇒ null. */
+ const docNhap=(i:number):{han:number;tra:Record<string,unknown>;luc:Record<string,number>;viTri?:number}|null=>{try{const o=JSON.parse(localStorage.getItem(`ktcn:nhap:${sbd}:${id}:${i}`)||'null');if(!o||typeof o!=='object'||!o.tra||typeof o.tra!=='object')return null;return {han:Number(o.han),tra:o.tra,luc:o.luc&&typeof o.luc==='object'?o.luc:{},viTri:typeof o.viTri==='number'?o.viTri:undefined}}catch{return null}}
+ /** Chặng đã chốt (hết giờ lúc máy chủ bận / máy tắt) mà máy còn nháp chưa lên: gửi phần em trả lời TRƯỚC hạn (máy chủ nhận trong 10 phút sau hạn). */
+ const guiNhapTre=async(i:number,hanC:number,bayGio:number):Promise<boolean>=>{
+  const n=docNhap(i);if(!n||n.han!==hanC||bayGio>hanC+GUI_TRE_MS)return false
+  const tra=Object.fromEntries(Object.entries(n.tra).filter(([q,v])=>typeof v==='string'&&Number(n.luc[q])<=hanC)),lucTra=Object.fromEntries(Object.keys(tra).map(q=>[q,n.luc[q]]))
+  if(!Object.keys(tra).length)return false
+  try{const r=await goiHoa2('hoc-tap-ktcn-luu',token,{id,chang:i,tra,lucTra,revision:revision.current});if(typeof r.revision==='number')revision.current=r.revision;try{localStorage.removeItem(`ktcn:nhap:${sbd}:${id}:${i}`)}catch{/* không cản */}return r.daLuu===true}catch{return false}
+ }
+ const guiNhapTreCacChang=async(ds:Chang[],bayGio:number)=>{let co=false;for(const c of ds)if(c.daChot&&c.han&&await guiNhapTre(c.stt,c.han,bayGio))co=true;return co}
+ const tai=async()=>{const lan=lanPhien.current;setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-trang-thai',token,{id,kemKetQua:true});if(!conPhien(lan))return;const t=nhan(r);setChang(r.chang as Chang[]);if(r.ketQua&&t.nopLuc!==null){setKet(r.ketQua as Ket);return}if(t.nopLuc===null&&await guiNhapTreCacChang(r.chang as Chang[],t.serverNow)&&conPhien(lan)){const r2=await goiHoa2('hoc-tap-ktcn-trang-thai',token,{id,kemKetQua:true});if(!conPhien(lan))return;nhan(r2);setChang(r2.chang as Chang[])}if(t.nopLuc!==null||t.trangThai==='het_han'){const k=await goiHoa2('hoc-tap-ktcn-ket-qua',token,{id});if(!conPhien(lan))return;nhan(k);setKet(k.ketQua as Ket)}}catch(e){if(conPhien(lan))setLoi(chuCuaLoi(e,'Chưa tải được bài kiểm tra.'))}finally{if(conPhien(lan))setBusy(false)}}
  useEffect(()=>{
   mounted.current=true;tuTiep.current=true;lanPhien.current++;huyHenThuLai();lanThuLai.current=0;tuNop.current=false;revision.current=0;day.current=Promise.resolve();traRef.current={}
-  setTt(banDau);setChang([]);setCs([]);setStt(null);setHan(0);setOffset(0);setTra({});setKet(undefined);setNhapCuu(undefined);setLuu('')
+  lucRef.current={};chuaGui.current=false;lanDongBo.current=0;huyDongBo();setBan(false)
+  setTt(banDau);setChang([]);setCs([]);setStt(null);setHan(0);setOffset(0);setTra({});setKet(undefined);setLuu('')
   void tai()
-  return()=>{mounted.current=false;lanPhien.current++;huyHenThuLai();if(timer.current)clearTimeout(timer.current)}
+  return()=>{mounted.current=false;lanPhien.current++;huyHenThuLai();huyDongBo();if(timer.current)clearTimeout(timer.current)}
  },[token,id])
  const save=(submit=false)=>{
   if(stt===null)return Promise.resolve()
@@ -96,15 +115,20 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,ban}:{toke
   const patch={...traRef.current},part=stt,lan=lanPhien.current
   const p=day.current.catch(()=>{}).then(async()=>{
    if(!conPhien(lan))return
-   const r=await goiHoa2(submit?'hoc-tap-ktcn-chot-chang':'hoc-tap-ktcn-luu',token,{id,chang:part,tra:patch,revision:revision.current})
-   if(conPhien(lan)){nhan(r);setLuu(r.daLuu?'Đã lưu trên máy chủ':'Chặng đã chốt; chỉ dùng bản nháp đã lưu đúng giờ');if(r.daLuu&&JSON.stringify(patch)===JSON.stringify(traRef.current)){try{localStorage.removeItem(`ktcn:nhap:${sbd}:${id}:${part}`)}catch{/* Không làm hỏng lưu máy chủ */}}}
+   const lucTra=Object.fromEntries(Object.keys(patch).flatMap(k=>lucRef.current[k]?[[k,lucRef.current[k]]]:[]))
+   const r=await goiHoa2(submit?'hoc-tap-ktcn-chot-chang':'hoc-tap-ktcn-luu',token,{id,chang:part,tra:patch,revision:revision.current,...(Object.keys(lucTra).length?{lucTra}:{})})
+   if(conPhien(lan)){nhan(r);setBan(false);const khop=JSON.stringify(patch)===JSON.stringify(traRef.current);if(khop||!r.daLuu)chuaGui.current=false;setLuu(r.daLuu?(khop?'Đã lưu trên máy chủ':'Đang lưu…'):'Chặng đã chốt; chỉ dùng bản nháp đã lưu đúng giờ');if(r.daLuu&&khop){try{localStorage.removeItem(`ktcn:nhap:${sbd}:${id}:${part}`)}catch{/* Không làm hỏng lưu máy chủ */}}}
    return r
   });day.current=p
   return p
  }
- const mo=async(i:number)=>{const lan=lanPhien.current;huyHenThuLai();setBusy(true);setLoi('');setNhapCuu(undefined);try{const r=await goiHoa2('hoc-tap-ktcn-start',token,{id,chang:i});if(!conPhien(lan))return;const t=nhan(r);if(r.daChot){xoaKtcnDangLam(sbd);setCs([]);setStt(null);await tai();return}const questions=r.questions as Question[];setCs(questions);setStt(i);setViTri(0);setHan(Number(r.hanChang));ghiKtcnDangLam(sbd,id,i,Number(r.hanChang));const a=r.tra as Record<string,string>;traRef.current=a;setTra(a);setLuu('Đã tải câu trả lời đã lưu');tuNop.current=false;lanThuLai.current=0
-  try{const raw=localStorage.getItem(`ktcn:nhap:${sbd}:${id}:${i}`),saved=raw?JSON.parse(raw):null;if(saved&&saved.han===Number(r.hanChang)&&t.serverNow<Number(r.hanChang)&&saved.tra&&typeof saved.tra==='object'){const ids=new Set(questions.map(q=>q.qid));const v=Object.fromEntries(Object.entries(saved.tra).filter(([qid,v])=>ids.has(qid)&&typeof v==='string'&&v.length<=100)) as Record<string,string>;if(Object.entries(v).some(([qid,v])=>a[qid]!==v))setNhapCuu(v)}}catch{/* Bản nháp máy hỏng: vẫn dùng bản chính đã lưu */}
- }catch(e){if(conPhien(lan))setLoi(e instanceof Error?e.message:'Chưa mở được chặng.')}finally{if(conPhien(lan))setBusy(false)}}
+ const mo=async(i:number)=>{const lan=lanPhien.current;huyHenThuLai();setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-start',token,{id,chang:i});if(!conPhien(lan))return;const t=nhan(r);if(r.daChot){xoaKtcnDangLam(sbd);setCs([]);setStt(null);await guiNhapTre(i,Number(r.hanChang),t.serverNow);await tai();return}const questions=r.questions as Question[];setCs(questions);setStt(i);setViTri(0);setHan(Number(r.hanChang));ghiKtcnDangLam(sbd,id,i,Number(r.hanChang));const a=r.tra as Record<string,string>;traRef.current=a;setTra(a);setLuu('Đã tải câu trả lời đã lưu');tuNop.current=false;lanThuLai.current=0
+  // Mở lại chặng (kể cả sau khi tắt app): TỰ nạp bản nháp trên máy vào đúng câu em đang làm rồi tự gửi — không còn nút «Khôi phục» (thầy 28/10).
+  try{const saved=docNhap(i);if(saved&&saved.han===Number(r.hanChang)){const ids=new Set(questions.map(q=>q.qid));const v=Object.fromEntries(Object.entries(saved.tra).filter(([qid,v])=>ids.has(qid)&&typeof v==='string'&&v.length<=100)) as Record<string,string>
+   lucRef.current=Object.fromEntries(Object.entries(saved.luc).filter(([qid,l])=>ids.has(qid)&&Number.isFinite(l))) as Record<string,number>
+   if(typeof saved.viTri==='number'&&saved.viTri>=0&&saved.viTri<questions.length)setViTri(saved.viTri)
+   if(t.serverNow<Number(r.hanChang)+GUI_TRE_MS&&Object.entries(v).some(([qid,v])=>a[qid]!==v)){traRef.current={...a,...v};setTra(traRef.current);chuaGui.current=true;setLuu('Đang lưu…');setNhipDongBo(n=>n+1)}}}catch{/* Bản nháp máy hỏng: vẫn dùng bản chính đã lưu */}
+ }catch(e){if(conPhien(lan))setLoi(chuCuaLoi(e,'Chưa mở được chặng.'))}finally{if(conPhien(lan))setBusy(false)}}
  const chot=async(auto=false)=>{if(stt===null||tuNop.current)return
   const lan=lanPhien.current
   // Nộp tay khi còn câu trống ⇒ hỏi lại bằng hộp app (đợt 20). Hết giờ tự chốt thì không hỏi; hộp đang mở mà hết giờ ⇒ lượt tự chốt đi trước.
@@ -115,7 +139,10 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,ban}:{toke
   try{await save(true);if(!conPhien(lan))return;xoaKtcnDangLam(sbd);setCs([]);setStt(null);await tai();if(conPhien(lan))onCapNhat()}
   catch(e){
    if(!conPhien(lan))return
-   tuNop.current=false;setLoi(e instanceof Error?e.message:'Chưa chốt được chặng.');if(auto)setLuu('Hết giờ; đang giữ bản nháp trên máy để đối chiếu.')
+   tuNop.current=false
+   // Máy chủ bận / mất mạng: không hộp lỗi; bài giữ trên máy và tự gửi lại (lùi dần bên dưới). Lỗi khác: câu Việt an toàn.
+   if(laLoiTamThoi(e)){setBan(laLoiMayChuBan(e));setLuu('Đang lưu…')}else setLoi(chuCuaLoi(e,'Chưa chốt được chặng.'))
+   if(auto&&!laLoiTamThoi(e))setLuu('Hết giờ; đang giữ bản nháp trên máy để đối chiếu.')
    if(auto||(khoChang&&khoChang.conLaiNgay()<=0)){
     // Lỗi mạng nhanh không gọi dồn: đợi 2/4/8/16 giây, tối đa 30 giây; bấm thử lại vẫn đi ngay.
     choThuLai.current=true;const doi=Math.min(30_000,2000*2**lanThuLai.current);lanThuLai.current=Math.min(4,lanThuLai.current+1)
@@ -136,10 +163,27 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,ban}:{toke
  },[chang,busy,tt,ket,stt])
  // Gốc màn chỉ nghe mốc giờ; hết hạn vẫn chốt một lần, đợi đúng hàng lưu/revision hiện hành.
  useEffect(()=>{if(stt!==null&&han&&hetGio&&!busy&&!choThuLai.current)void chot(true)},[hetGio,han,offset,stt,busy,nhipThuLai])
- const doi=(qid:string,a:string)=>{phanHoi('chon');const v={...traRef.current,[qid]:a};traRef.current=v;setTra(v);setLuu('Đang lưu…');setNhapCuu(undefined);try{localStorage.setItem(key,JSON.stringify({han,tra:v}))}catch{/* bản nháp máy chủ vẫn là nguồn chính */}if(timer.current)clearTimeout(timer.current);timer.current=setTimeout(()=>{void save().catch(e=>{setLoi(e instanceof Error?e.message:'Chưa lưu được bài.');setLuu('Chưa đồng bộ; bản nháp đang ở trên máy')})},400)}
- const phucHoi=()=>{if(!nhapCuu||!khoChang||khoChang.conLaiNgay()<=0)return;traRef.current={...traRef.current,...nhapCuu};setTra(traRef.current);setNhapCuu(undefined);void save().catch(e=>setLoi(e instanceof Error?e.message:'Chưa đồng bộ được bản nháp.'))}
- const ve=async()=>{xoaKtcnDangLam(sbd);if(stt!==null){setBusy(true);try{await save();onVe();onCapNhat()}catch(e){setLoi(e instanceof Error?e.message:'Chưa lưu được bài.')}finally{setBusy(false)}}else{onVe();onCapNhat()}}
- const nop=async()=>{if(tt&&tt.daTra<tt.tong&&!await hoiXacNhan({tieuDe:'Nộp bài kiểm tra?',noiDung:`Còn ${tt.con} câu chưa trả lời. Nộp bài sẽ chốt kết quả hiện tại.`,nhanDongY:'Nộp bài',nhanKhong:'Làm tiếp',vo:'m3'}))return;setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-nop',token,{id});nhan(r);setKet(r.ketQua as Ket);onCapNhat()}catch(e){setLoi(e instanceof Error?e.message:'Chưa nộp được bài.')}finally{setBusy(false)}}
+ const ghiNhap=()=>{try{localStorage.setItem(key,JSON.stringify({han,tra:traRef.current,luc:lucRef.current,viTri}))}catch{/* bản nháp máy chủ vẫn là nguồn chính */}}
+ const doi=(qid:string,a:string)=>{phanHoi('chon');const v={...traRef.current,[qid]:a};traRef.current=v;setTra(v);lucRef.current={...lucRef.current,[qid]:Date.now()+offset};chuaGui.current=true;setLuu('Đang lưu…');ghiNhap();if(timer.current)clearTimeout(timer.current);timer.current=setTimeout(()=>{lanDongBo.current=0;dongBoRef.current()},400)}
+ // Một lượt đồng bộ: lỗi tạm thời (máy chủ bận / mất mạng / hết giờ chờ) ⇒ hẹn lại lùi dần 1, 2, 4, 8, 15, 30 giây, giữ «Đang lưu…»; lỗi khác ⇒ hộp lỗi tiếng Việt.
+ dongBoRef.current=()=>{
+  huyDongBo()
+  if(stt===null||!chuaGui.current||tuNop.current)return
+  const lan=lanPhien.current
+  void save().then(()=>{if(conPhien(lan))lanDongBo.current=0}).catch(e=>{
+   if(!conPhien(lan))return
+   setLuu('Đang lưu…')
+   if(laLoiTamThoi(e)){setBan(laLoiMayChuBan(e));henDongBo.current=setTimeout(()=>dongBoRef.current(),choLuiDanMs(lanDongBo.current++))}
+   else setLoi(chuCuaLoi(e,'Chưa lưu được bài.'))
+  })
+ }
+ useEffect(()=>{if(nhipDongBo){lanDongBo.current=0;dongBoRef.current()}},[nhipDongBo])
+ // Có mạng lại / quay lại tab / mở lại app ⇒ gửi ngay phần còn trên máy.
+ useEffect(()=>{const f=()=>{if(document.visibilityState!=='hidden'&&chuaGui.current){lanDongBo.current=0;dongBoRef.current()}};window.addEventListener('online',f);document.addEventListener('visibilitychange',f);return()=>{window.removeEventListener('online',f);document.removeEventListener('visibilitychange',f)}},[])
+ // Câu đang làm cũng nhớ trên máy: mở lại chặng về đúng câu ấy.
+ useEffect(()=>{if(stt!==null&&han)try{const raw=localStorage.getItem(key);if(raw){const o=JSON.parse(raw);if(o&&o.han===han&&o.viTri!==viTri)localStorage.setItem(key,JSON.stringify({...o,viTri}))}}catch{/* không cản làm bài */}},[viTri,stt,han])
+ const ve=async()=>{xoaKtcnDangLam(sbd);if(stt!==null){setBusy(true);try{await save();onVe();onCapNhat()}catch(e){if(laLoiTamThoi(e)){onVe();onCapNhat()}else setLoi(chuCuaLoi(e,'Chưa lưu được bài.'))}finally{setBusy(false)}}else{onVe();onCapNhat()}}
+ const nop=async()=>{if(tt&&tt.daTra<tt.tong&&!await hoiXacNhan({tieuDe:'Nộp bài kiểm tra?',noiDung:`Còn ${tt.con} câu chưa trả lời. Nộp bài sẽ chốt kết quả hiện tại.`,nhanDongY:'Nộp bài',nhanKhong:'Làm tiếp',vo:'m3'}))return;setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-nop',token,{id});nhan(r);setKet(r.ketQua as Ket);onCapNhat()}catch(e){setLoi(chuCuaLoi(e,'Chưa nộp được bài.'))}finally{setBusy(false)}}
  const [loc,setLoc]=useState<Loc>('tat-ca')
  // Tấm hỏi nộp đang mở mà chặng đã đóng / hết giờ (lượt tự chốt đi trước) ⇒ trả «không» và đóng tấm.
  useEffect(()=>{if(hoiNop&&(stt===null||hetGio)){hoiNop(false);setHoiNop(null)}},[stt,hetGio,hoiNop])
@@ -183,7 +227,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,ban}:{toke
     gio={<GioChangDuo kho={khoChang} nhan={`Thời gian chặng ${stt+1} còn lại`}/>} nhanGio="" onMoLuoi={()=>{phanHoi('chon');setMoLuoi(true)}}/>
    <main className="duo-than" data-de-dai={deDai||undefined}>
     {baoLoi}
-    {nhapCuu&&<div className="ktcn-bao" role="status"><span>Có bản nháp trên máy chưa đồng bộ. Đồng hồ vẫn theo giờ đã mở.</span><button type="button" className="ktcn-nut-phu" onClick={phucHoi} disabled={busy||hetGio}>Khôi phục bản nháp trên máy</button></div>}
+    {mayBan&&!loi&&<p className="ktcn-ban" role="status">{CHU_MAY_CHU_BAN_EM}</p>}
     <div key={`d${q.qid}`} className="duo-cot-de">
      <NhanCauKt so={viTri+1} tong={cs.length} phu={`Chặng ${stt+1}/${chang.length||stt+1}`}/>
      <DeCau q={q} stt={viTri+1}/>
@@ -262,7 +306,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,ban}:{toke
    </aside>
    <main className="ktcn-noi">
     {dsCau(true)}
-    {nhapCuu&&<div className="ktcn-bao" role="status"><span>Có bản nháp trên máy chưa đồng bộ. Đồng hồ vẫn theo giờ đã mở.</span><button type="button" className="ktcn-nut-phu" onClick={phucHoi} disabled={busy||hetGio}>Khôi phục bản nháp trên máy</button></div>}
+    {mayBan&&!loi&&<p className="ktcn-ban" role="status">{CHU_MAY_CHU_BAN_EM}</p>}
     <div className="ktcn-luu-dong"><p className="ktcn-luu" role="status">{luu==='Đã lưu trên máy chủ'?<><CloudCheck size={18} aria-hidden="true"/>Đã lưu</>:luu}</p><span>Đã trả lời {daTraChang}/{cs.length}</span></div>
     <TheCau {...propsCauHoc(q,viTri+1,tra[q.qid]??'',v=>doi(q.qid,v),undefined,busy||hetGio)}/>
     <div className="ktcn-day">

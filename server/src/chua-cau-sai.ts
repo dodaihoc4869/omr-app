@@ -26,6 +26,7 @@ import { emCoGhi } from './dem-ke-hoach'
 import type { ItemCongKhai, ProbeRef } from './chua-cau-sai-kieu'
 import { khopPhanIII } from '../../src/lib/cham-so'
 import { denLuotDong, NGAY_CUA_SO_GON, SQL_DONG_DA_DUNG_LAI } from './chua-gon'
+import { lenhDocViecNgay, viecNgayTuDong } from './tu-sua-viec-ngay'
 type Obj = Record<string, unknown>
 const str = (v: unknown) => (typeof v === 'string' ? v : '')
 const num = (v: unknown) => Number(v) || 0
@@ -970,10 +971,14 @@ export async function danhSach(env: Env, b: Obj): Promise<Response> {
         (SELECT COUNT(DISTINCT dot_id) FROM chua_gon_lan WHERE sbd=? AND ngay_vn=? AND json_extract(ket,'$.ket')='tu_sua') AS xongHomNay FROM muc`)
       .bind(nay, sbd, sbd, ngayVn(nowMs)),
   ]
-  // Câu đóng tự động KHÔNG được làm hỏng danh sách: lỗi (D1 từ chối / quá giờ) ⇒ đọc lại không có nó (như layCauChoEm).
-  let soDong = dong.length
-  const r0 = await env.DB.batch([...dong, ...doc]).catch(() => { soDong = 0; return env.DB.batch(doc) })
+  // Việc hôm nay của Tự sửa lỗi lưu trên máy chủ (tu-sua-viec-ngay.ts, 28/10): trang đầu đọc CÙNG lô (không thêm đợt chờ D1).
+  const homNay = ngayVn(nowMs)
+  const viec = c ? [] : [lenhDocViecNgay(env, sbd, homNay)]
+  // Câu đóng tự động / việc hôm nay KHÔNG được làm hỏng danh sách: lỗi (D1 từ chối / quá giờ / bảng chưa áp) ⇒ đọc lại chỉ phần danh sách (như layCauChoEm).
+  let soDong = dong.length, coViec = viec.length > 0
+  const r0 = await env.DB.batch([...dong, ...doc, ...viec]).catch(() => { soDong = 0; coViec = false; return env.DB.batch(doc) })
   const r = r0.slice(soDong)
+  const viecNgay = coViec ? viecNgayTuDong(r[doc.length]?.results?.[0] as Obj | undefined, homNay) : null
   const rows = (r[0]?.results ?? []) as Obj[], ds = rows.slice(0, 100), cuoi = ds.at(-1)
   const d = r[1]?.results?.[0] as Obj | undefined
   return Response.json({ ok: true,
@@ -982,6 +987,7 @@ export async function danhSach(env: Env, b: Obj): Promise<Response> {
     dem: { tong: num(d?.tong), can: num(d?.can), cho: num(d?.cho), xong: num(d?.xong), xongHomNay: num(d?.xongHomNay) },
     // Thầy 21/10 "bỏ phần làm câu tương đương đi": không còn lịch tự làm lại câu tương đương sau Hỏi Thầy (giữ trường rỗng cho máy em bản cũ).
     kiemLaiHoiThay: [],
+    ...(viecNgay ? { viecNgay } : {}),
     ...(rows.length > 100 && cuoi ? { sau: { hang: num(cuoi.hang), giaoLuc: num(cuoi.giaoLuc), dotId: str(cuoi.dotId), nay } } : {}),
   })
 }

@@ -51,8 +51,8 @@ export default function TheMoiTuSua({ so, token, onChua }: Props) {
     return ngheTuSua((t, moi) => { if (t === token) setKq(moi) })
   }, [token])
   const sbd = useMemo(() => docSbdHs(), [])
-  const { viec, luu } = useMemo(() => (sbd ? dungViecHomNay(kq, Date.now(), sbd) : { viec: null, luu: null }), [kq, sbd])
-  useEffect(() => { luuViecHomNay(luu) }, [luu])
+  const { viec, luu, day } = useMemo(() => (sbd ? dungViecHomNay(kq, Date.now(), sbd) : { viec: null, luu: null, day: null }), [kq, sbd])
+  useEffect(() => { luuViecHomNay(luu, day ?? null) }, [luu, day])
   if (!so || so <= 0) return null
   if (!viec || viec.tong === 0) return <TheCu so={so} onChua={() => onChua()} />
 

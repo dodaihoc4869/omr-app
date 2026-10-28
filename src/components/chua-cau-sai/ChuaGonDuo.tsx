@@ -195,7 +195,7 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
   if (!mo.ok || (p.daTuSua && !kq)) {
     day = dayTron
   } else if (ket === 'tu_sua') {
-    day = tam('vui', <>{tick}Em đã tự sửa xong câu này</>, <p className="duo-mo">Đúng ngay lần đầu, không cần gợi ý.</p>, linkGiai, nutTiep())
+    day = tam('vui', <>{tick}Em đã tự sửa xong câu này</>, <p className="duo-mo">Đúng ngay lần đầu, không cần gợi ý.{kq?.nguyenTu ? <> <b>+{kq.nguyenTu} nguyên tử</b></> : null}</p>, linkGiai, nutTiep())
   } else if (ket === 'xong_phan') {
     day = tam('vui', <>{tick}Đúng rồi · xong phần hôm nay</>, kq?.lyDo ? <p className="duo-mo">{p.chuXongPhan}</p> : null, linkGiai, nutTiep())
   } else if (ket === 'loi_giai') {

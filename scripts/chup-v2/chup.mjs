@@ -400,6 +400,14 @@ const BINH_CANH = [
 ]
 const DS_BINH = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   BINH_CANH.map(([t, m, ca, viec]) => [`binh-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, ca, /Ester/, viec])))
+// ═══ TỰ SỬA LỖI THEO ĐỀ XUẤT 28/10 (tiền tố "tusua-"): nút «Sửa lỗi» trên Lộ trình = số câu CÒN PHẢI SỬA HÔM NAY (`&sua=nay` ⇒ 9) / xong ⇒ ✓ (`&sua=xong`), thẻ bật ra;
+// màn Tự sửa lỗi có «Còn 40 lỗi cần sửa» (tổng nợ chỉ ở đây). Khối `SUA_GIA` ở trang.tsx. 390×844 · 360×640 · 844×390 · 1440×900, sáng + tối.
+const TUSUA_CANH = [
+  ['lo-trinh', 'hs-mot&tp=1&tt=du&sua=nay', false, /Ester/], ['lo-trinh-the', 'hs-mot&tp=1&tt=du&sua=nay', false, /Ester/, 'nut:Tự sửa lỗi: hôm nay còn 9 câu'],
+  ['lo-trinh-xong', 'hs-mot&tp=1&tt=du&sua=xong', false, /Ester/], ['man', 'hs12-tu-chua&sua=nay', true, /Còn 40 lỗi cần sửa/],
+]
+const DS_TUSUA = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  TUSUA_CANH.map(([t, m, ca, cho, viec]) => [`tusua-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, ca, cho, viec])))
 // ═══ ĐẶT LẠI TINH THỂ 27/10 (tiền tố "dat-lai-tt-"): thông báo một lần trên Lộ trình — mọi bạn bắt đầu lại với 50 tinh thể.
 const DS_DAT_LAI_TT = [[390, 844, 'doc'], [360, 640, 'doc640'], [844, 390, 'ngang'], [1440, 900, 'may-tinh']].flatMap(([w, hh, k]) => ['light', 'dark'].map((nen) =>
   [`dat-lai-tt-${k}${nen === 'dark' ? '-toi' : ''}`, 'hs-mot&tp=1&v=dat-lai', w, hh, nen, false, /Tinh thể đã đặt lại/]))
@@ -444,6 +452,11 @@ const KT_CANH = [['khoa', 'hs-mot&tp=1&kt=khoa', /Ester/, 'lam13:nap'], ['the-kh
   ['the-kiem', 'hs-mot&tp=1&kt=khoa', /Ester/, 'lam13:nap » nut:^Kiểm tra ôn tập » cho:300'], ['xong', 'hs-mot&tp=1&kt=xong', /Ester/, 'lam13:nap'], ['lam-3-5', 'hs-mot&tp=1&kt=lam', /Ester/, 'lam13:nap']]
 const DS_KT = [[390, 844, 'doc'], [360, 640, 'doc640']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
   KT_CANH.map(([t, m, cho, viec]) => [`kt-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
+// ═══ SỬA XONG MỚI MỞ CHẶNG SAU 28/10 (tiền tố "st-"): `&sua=1` = phần ngày còn 9 câu ⇒ chặng sau nút Sửa lỗi khoá · thẻ chặng khoá · `&sua=xong` = đã xong ⇒ mở.
+const ST_CANH = [['khoa', 'hs-mot&tp=1&sua=1', /Ester/, 'lam13:nap'], ['the-khoa', 'hs-mot&tp=1&sua=1', /Ester/, 'lam13:nap » nut:khoá đến khi sửa xong » cho:300'],
+  ['mo', 'hs-mot&tp=1&sua=xong', /Ester/, 'lam13:nap'], ['toi-khoa', 'hs-mot&tp=1&sua=1&moc=2', /Ester/, 'lam13:nap'], ['toi-mo', 'hs-mot&tp=1&sua=xong&moc=2', /Ester/, 'lam13:nap']]
+const DS_ST = [[390, 844, 'doc'], [360, 640, 'doc640']].flatMap(([w, hh, k]) => ['light', 'dark'].flatMap((nen) =>
+  ST_CANH.map(([t, m, cho, viec]) => [`st-${t}-${k}${nen === 'dark' ? '-toi' : ''}`, m, w, hh, nen, false, cho, viec])))
 // ═══ BẢNG + TẤM CHƯA TÍNH 27/10 (tiền tố "nb-"): bảng 2 hàng × 4 cột tự xoay dọc ở khổ hẹp · tấm «Chưa được tính» gọn · bảng lớn cuộn ngang có bóng mép
 const NB_CANH = [
   ['1-bang', 'lam13&lam=duo-bang', /Chọn đáp án đúng/, ''], ['2-chua-tinh', 'lam13&lam=duo-bang', /Chọn đáp án đúng/, 'lam13:tn:^B » nut:^Kiểm tra$'],
@@ -555,6 +568,8 @@ const DUO_KT_CANH = [
   ['ktcn-luoi', 'duo-kt&v=ktcn', /Kiểm tra ôn tập/, `lam13:nut:^Làm tiếp chặng 2 » ${DK_LUOI}`],
   ['ktcn-nop', 'duo-kt&v=ktcn', /Kiểm tra ôn tập/, `lam13:nut:^Làm tiếp chặng 2 » ${DK_LUOI} » nut:^Câu 6 » nut:^Nộp chặng 2`],
   ['ktcn-ket', 'duo-kt&v=ket', /Làm tốt lắm/],
+  // 28/10: máy chủ bận khi em đang làm ⇒ câu nhẹ «Máy chủ đang bận…», đáy «Đang lưu…», không hộp lỗi tiếng Anh.
+  ['ktcn-ban', 'duo-kt&v=ktcn&ban=1', /Kiểm tra ôn tập/, 'lam13:nut:^Làm tiếp chặng 2 » tn:^C » cho:900'],
   ['thi-cau', 'duo-kt&v=thi&vai=hocsinh', /Câu \d\/8/],
   // 27/10: bảng trong đề ở màn thi — 2 hàng × 4 cột tự xoay dọc (câu 1) · bảng lớn cuộn ngang có bóng mép (câu 2)
   ['thi-bang', 'duo-kt&v=thi&vai=hocsinh&bang=1', /Câu \d\/8/, `lam13:${DK_LUOI} » nut:^Câu 1`], ['thi-bang-lon', 'duo-kt&v=thi&vai=hocsinh&bang=1', /Câu \d\/8/, `lam13:${DK_LUOI} » nut:^Câu 2`],
@@ -648,11 +663,13 @@ const DS = [
   ...DS_TPC, // THƯỞNG PHẠT GỘP 26/10
   ...DS_TON, // VIỆC TỒN 27/10
   ...DS_BINH, // LUẬT BÌNH 27/10
+  ...DS_TUSUA, // TỰ SỬA LỖI THEO ĐỀ XUẤT 28/10
   ...DS_DAT_LAI_TT, // ĐẶT LẠI TINH THỂ 27/10
   ...DS_SS, // NHẮC SAMSUNG 27/10
   ...DS_NC, // NÂNG CẤP 27/10
   ...DS_LG, // LỘ TRÌNH GHIM 27/10
   ...DS_KT, // KIỂM TRA ÔN TẬP KHOÁ CHẶNG 27/10
+  ...DS_ST, // SỬA XONG MỚI MỞ CHẶNG SAU 28/10
   ...DS_NB, // BẢNG + TẤM CHƯA TÍNH 27/10
   ...DS_BD, // BI CHUYỂN ĐỘNG 27/10
   ...DS_GDP, // GIẢI TUẦN DÒNG EM ĐỐI PHÓ 27/10

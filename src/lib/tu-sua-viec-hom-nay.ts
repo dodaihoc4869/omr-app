@@ -9,7 +9,10 @@
 //     câu CHƯA làm bao giờ / làm lâu nhất đứng trước ⇒ hôm sau ra câu khác, không lặp cùng tám câu. Không loại câu nào: chỉ còn câu làm gần đây thì vẫn lấp đủ ngày.
 //   · Danh sách chỉ trả tối đa 100 dòng (câu đã tự sửa đứng cuối, câu chờ có thể rớt trang 1) ⇒ "không còn trong danh sách" KHÔNG nghĩa là xong. Mỗi câu của ngày được
 //     lưu kèm bản chụp mục (qid, dotId, trạng thái lúc chọn) và danh sách "đã xong" ghi lúc nộp; khoá theo SBD + ngày VN (đăng nhập lại không mất).
-import type { MucChua } from './chua-cau-sai-api'
+//   · MÁY CHỦ GIỮ BẢN CHÍNH (thầy duyệt 28/10 «sửa theo đề xuất», server/src/tu-sua-viec-ngay.ts): danh sách Tự sửa lỗi kèm `viecNgay` (cùng lô đọc) ⇒ gộp với
+//     bản trên máy (danh sách DÀI hơn thắng, bằng nhau thì bản máy chủ — đổi máy vẫn cùng 12 câu; «đã xong» hợp lại); bản gộp mới hơn máy chủ ⇒ gửi NỀN
+//     (`dayViecNgay`, gom 400 ms, không chờ). localStorage giữ làm bản đệm (mất mạng / máy chủ cũ vẫn đúng như trước).
+import type { MucChua, ViecNgayMayChu } from './chua-cau-sai-api'
 import { nhomMucChua } from './tu-sua-loi'
 
 export const SO_CAU_MOI_NGAY = 12
@@ -84,6 +87,46 @@ export function docSbdHs(): string {
     return typeof o?.sbd === 'string' ? o.sbd.trim() : ''
   } catch { return '' }
 }
+function docTokenHs(): string {
+  try {
+    const o = JSON.parse(localStorage.getItem(KHOA_PHIEN) || 'null') as { token?: unknown } | null
+    return typeof o?.token === 'string' ? o.token : ''
+  } catch { return '' }
+}
+/** Gộp bản trên máy với bản máy chủ CÙNG ngày: mục — dài hơn thắng (bằng nhau ⇒ máy chủ); «đã xong» — hợp; chặng thêm — lớn nhất. */
+export function hopNhatKy(nk: NhatKy, may: ViecNgayMayChu | null | undefined): NhatKy {
+  if (!may || may.n !== nk.n) return nk
+  const m = may.m.length >= nk.m.length && may.m.length > 0 ? may.m.map((x): MucLuu => ({ q: x.q, ...(x.d ? { d: x.d } : {}), t: x.t, ...(x.h ? { h: x.h } : {}), l: x.l })) : nk.m
+  const x = [...new Set([...nk.x, ...may.x])]
+  const them = Math.max(nk.them ?? 0, may.them)
+  return { n: nk.n, m, x, ...(them > 0 ? { them } : {}) }
+}
+const giongNhatKy = (a: NhatKy, b: NhatKy) => a.n === b.n && (a.them ?? 0) === (b.them ?? 0) && a.x.length === b.x.length && a.x.every((k) => b.x.includes(k))
+  && a.m.length === b.m.length && a.m.every((x, i) => (x.d ?? x.q) === (b.m[i]!.d ?? b.m[i]!.q))
+/** Bản `nk` có gì máy chủ chưa có (mục dài hơn, câu xong mới, thêm chặng)? */
+function canDay(nk: NhatKy, may: ViecNgayMayChu | null | undefined): boolean {
+  if (!nk.m.length && !nk.x.length) return false
+  if (!may || may.n !== nk.n) return true
+  return nk.m.length > may.m.length || (nk.them ?? 0) > may.them || nk.x.some((k) => !may.x.includes(k))
+}
+let choDay: { nk: NhatKy; h: ReturnType<typeof setTimeout> } | null = null
+let daDay = ''
+/** Gửi NỀN bản việc hôm nay lên máy chủ (gom 400 ms; trùng bản vừa gửi ⇒ bỏ). Không phiên / lỗi mạng ⇒ bỏ qua — bản đệm trên máy vẫn đúng. */
+export function dayViecNgay(nk: NhatKy | null): void {
+  if (!nk) return
+  if (choDay) clearTimeout(choDay.h)
+  choDay = { nk, h: setTimeout(() => {
+    const v = choDay?.nk
+    choDay = null
+    const token = docTokenHs()
+    if (!v || !token) return
+    const ky = JSON.stringify([v.n, v.m.map((x) => x.d ?? x.q), [...v.x].sort(), v.them ?? 0])
+    if (ky === daDay) return
+    daDay = ky
+    void import('./chua-cau-sai-api').then((m) => m.apiGhiViecNgay(token, { n: v.n, m: v.m, x: v.x, them: v.them ?? 0 }))
+      .then((ok) => { if (!ok && daDay === ky) daDay = '' }, () => { if (daDay === ky) daDay = '' })
+  }, 400) }
+}
 function docNhatKy(sbd: string, nayMs: number): NhatKy {
   const rong: NhatKy = { n: ngayVnTuSua(nayMs), m: [], x: [] }
   if (!sbd) return rong
@@ -118,7 +161,9 @@ export function ghiXongHomNay(dotId: string, nayMs = Date.now()): void {
   const nk = docNhatKy(sbd, nayMs)
   ghiLanCuoi(sbd, dotId, nayMs)
   if (nk.x.includes(dotId)) return
-  luuNhatKy(sbd, { ...nk, x: [...nk.x, dotId] })
+  const moi = { ...nk, x: [...nk.x, dotId] }
+  luuNhatKy(sbd, moi)
+  dayViecNgay(moi)
 }
 
 // ---------------------------------------------------------------- dựng việc hôm nay ----------------------------------------------------------------
@@ -133,14 +178,15 @@ function chiaChang(muc: ViecMuc[]): ViecMuc[][] {
  * Không đủ 12 câu làm được ⇒ ngày nhỏ hơn, đúng số có. Danh sách lỗi / vòng chữa tắt ⇒ null.
  */
 export function dungViecHomNay(
-  kq: { trangThai: string; ds?: readonly MucChua[]; dem?: { can: number; xongHomNay?: number } } | null | undefined,
+  kq: { trangThai: string; ds?: readonly MucChua[]; dem?: { can: number; xongHomNay?: number }; viecNgay?: ViecNgayMayChu } | null | undefined,
   nayMs: number,
   sbd: string,
   them = 0,
-): { viec: ViecHomNay | null; luu: NhatKy | null } {
+): { viec: ViecHomNay | null; luu: NhatKy | null; day?: NhatKy | null } {
   if (!kq || kq.trangThai !== 'bat' || !kq.ds) return { viec: null, luu: null }
   const ds = kq.ds
-  const nk = docNhatKy(sbd, nayMs)
+  const nkMay = docNhatKy(sbd, nayMs)
+  const nk = hopNhatKy(nkMay, kq.viecNgay)
   const hienTai = new Map(ds.map((m) => [khoaMuc(m), m]))
   const ghi = new Set(nk.x)
   const co = new Set(nk.m.map((x) => x.d ?? x.q))
@@ -159,7 +205,7 @@ export function dungViecHomNay(
     for (const x of ung) them_.push({ q: x.m.qid, ...(x.m.dotId ? { d: x.m.dotId } : {}), t: x.m.trangThai, ...(x.m.denHan ? { h: x.m.denHan } : {}), l: x.l })
   }
   const luuMuc = [...nk.m, ...them_]
-  if (!luuMuc.length) return { viec: null, luu: null }
+  if (!luuMuc.length) return { viec: null, luu: null, day: null }
   const muc: ViecMuc[] = luuMuc.map((x) => {
     const khoa = x.d ?? x.q
     const m = hienTai.get(khoa) ?? { qid: x.q, ...(x.d ? { dotId: x.d } : {}), trangThai: x.t, ...(x.h ? { denHan: x.h } : {}) } as MucChua
@@ -177,21 +223,40 @@ export function dungViecHomNay(
     ...(kq.dem?.xongHomNay ? { xongHomNay: kq.dem.xongHomNay } : {}),
   }
   const doi = them_.length > 0 || (them > (nk.them ?? 0))
-  return { viec, luu: doi ? { n: nk.n, m: luuMuc, x: nk.x, them: Math.max(them, nk.them ?? 0) } : null }
+  const cuoi: NhatKy = doi ? { n: nk.n, m: luuMuc, x: nk.x, them: Math.max(them, nk.them ?? 0) } : nk
+  // Ghi bản đệm khi bản cuối khác bản đang nằm trên máy (thêm câu, hoặc vừa nhận bản máy chủ); gửi máy chủ khi máy chủ còn thiếu.
+  return { viec, luu: doi || !giongNhatKy(cuoi, nkMay) ? cuoi : null, day: canDay(cuoi, kq.viecNgay) ? cuoi : null }
 }
 
 /** Mở thêm một chặng cho hôm nay (em đã xong phần mà còn muốn sửa). Trả nhật ký mới đã lưu. */
 export function themMotChang(kq: Parameters<typeof dungViecHomNay>[0], nayMs = Date.now()): ViecHomNay | null {
   const sbd = docSbdHs()
   const nk = docNhatKy(sbd, nayMs)
-  const { viec, luu } = dungViecHomNay(kq, nayMs, sbd, (nk.them ?? 0) + 1)
+  const { viec, luu, day } = dungViecHomNay(kq, nayMs, sbd, (hopNhatKy(nk, kq?.viecNgay).them ?? 0) + 1)
   if (luu) luuNhatKy(sbd, luu)
+  dayViecNgay(day ?? null)
   return viec
 }
 
-/** Ghi nhật ký do `dungViecHomNay` trả (gọi trong effect). */
-export function luuViecHomNay(luu: NhatKy | null): void {
+/** Ghi nhật ký do `dungViecHomNay` trả (gọi trong effect); `day` ⇒ gửi nền lên máy chủ. */
+export function luuViecHomNay(luu: NhatKy | null, day: NhatKy | null = null): void {
   if (luu) luuNhatKy(docSbdHs(), luu)
+  dayViecNgay(day)
+}
+
+/** Số câu CÒN PHẢI SỬA HÔM NAY cho nút «Sửa lỗi» trên Lộ trình (thầy duyệt 28/10): việc hôm nay − đã xong phần; 0 ⇒ xong hôm nay (nút ✓).
+ *  Chưa dựng được việc hôm nay (chưa có danh sách / vòng chữa tắt) ⇒ null (nơi gọi dùng tối đa 12 trên số cần sửa). */
+export const conSuaHomNay = (v: ViecHomNay | null): number | null => (v ? Math.max(0, v.tong - v.xong) : null)
+/** Số câu PHẦN NGÀY (12 câu đầu) chưa xong — khoá chặng sau nút Tự sửa lỗi (thầy 28/10 «sửa phải xong mới hiện chặng sau»). «Sửa thêm 1 chặng» nối câu ở CUỐI
+ *  ⇒ không làm khoá lại. Cùng phép đếm với máy chủ (`conPhanNgay`, server/src/tu-sua-viec-ngay.ts). */
+export const conSuaPhanNgay = (v: ViecHomNay | null): number | null => (v ? v.muc.slice(0, SO_CAU_MOI_NGAY).filter((x) => !x.xong).length : null)
+/** Báo máy chủ (nền, một lần / ngày / máy): Lộ trình đang khoá chặng sau nút Tự sửa lỗi ⇒ máy chủ chặn mở chặng bằng lối khác. Lỗi mạng ⇒ lần mở sau báo lại. */
+export function baoKhoaSua(nayMs = Date.now()): void {
+  const sbd = docSbdHs(), token = docTokenHs(), nk = docNhatKy(sbd, nayMs), khoa = `omr_tu_sua_khoa_${sbd}`
+  if (!sbd || !token || !nk.m.length) return
+  try { if (localStorage.getItem(khoa) === nk.n) return } catch { /* không đọc được: vẫn báo */ }
+  void import('./chua-cau-sai-api').then((m) => m.apiGhiViecNgay(token, { n: nk.n, m: nk.m, x: nk.x, them: nk.them ?? 0 }, true))
+    .then((ok) => { if (ok) try { localStorage.setItem(khoa, nk.n) } catch { /* bỏ qua */ } }, () => {})
 }
 
 /** Chữ nhóm chặng cho dòng phụ: "2 câu chỉ còn làm bản mới · 2 câu đang sửa dở". Rỗng khi không có gì đáng nói. */

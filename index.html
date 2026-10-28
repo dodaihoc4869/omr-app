@@ -37,13 +37,21 @@
                 ? 'gv'
                 : localStorage.getItem('ddh.vaiDaDung') || ''
           var logoVai = vai === 'hs' ? 'hs' : vai === 'ph' ? 'ph' : 'gv'
-          document.write('<link rel="icon" type="image/svg+xml" sizes="any" href="/logo-' + logoVai + '-nho-v3.svg">')
-          document.write('<link rel="icon" type="image/png" sizes="64x64" href="/logo-' + logoVai + '-64-v3.png">')
-          document.write('<link rel="apple-touch-icon" href="/logo-' + logoVai + '-180-v3.png">')
+          var bo = logoVai === 'hs' ? 'cn' : 'v3'
+          document.write('<link rel="icon" type="image/svg+xml" sizes="any" href="/logo-' + logoVai + '-nho-' + bo + '.svg">')
+          document.write('<link rel="icon" type="image/png" sizes="64x64" href="/logo-' + logoVai + '-64-' + bo + '.png">')
+          document.write('<link rel="apple-touch-icon" href="/logo-' + logoVai + '-180-' + bo + '.png">')
           var ten = vai === 'hs' ? 'manifest-hs.json' : vai === 'ph' ? 'manifest-ph.json' : 'manifest.json'
           var ten2 = vai === 'hs' ? 'ĐĐH Học Sinh' : vai === 'ph' ? 'ĐĐH Phụ Huynh' : 'ĐỖ ĐẠI HỌC'
           document.write('<link rel="manifest" href="/' + ten + '">')
           document.write('<meta name="apple-mobile-web-app-title" content="' + ten2 + '">')
+          // App học sinh (thầy 28/10 «full hẳn, không dải đen»): thanh trạng thái CÙNG MÀU NỀN app học sinh (--tr-nen sáng / tối ở
+          // src/styles/trong-hs-mau.css). Viết TRƯỚC ba thẻ theme-color chung bên dưới ⇒ trình duyệt lấy thẻ khớp đầu tiên là thẻ này.
+          // Sau khi app chạy, src/lib/toan-man-hs.ts còn tự đặt lại theo nền đang vẽ.
+          if (vai === 'hs') {
+            document.write('<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f6fc">')
+            document.write('<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1a1a29">')
+          }
         } catch (e) {
           document.write('<link rel="manifest" href="/manifest.json">')
         }
