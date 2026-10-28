@@ -172,6 +172,37 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
     expect(onHoc).toHaveBeenCalledOnce()
   })
 
+  // 28/10 (thầy «Chúc mừng, em đã hoàn thành bài hôm nay — ghi rõ câu sửa, bài kiểm tra. Thay thẻ hoàn thành nhiệm vụ»)
+  it('xong HẾT việc hôm nay ⇒ thẻ «Chúc mừng, em đã hoàn thành bài hôm nay!» ghi số câu học · câu sửa · điểm Kiểm tra ôn tập (thay «Đủ x/y câu…»)', () => {
+    const ngay = new Date(Date.now() + 7 * 3600_000).toISOString().slice(0, 10)
+    localStorage.setItem('ddh.sua-nho', JSON.stringify({ t: 'tk', n: ngay, s: [0, 0, 0, 8] }))
+    render(<MotTrangHs {...goc({ token: 'tk', so: { daLam: 30, muc: 30, chang: 5, soChang: 5 } as PropsMotTrang['so'], soSua: 0, soBaiTap: 0, coBaiTap: false,
+      kiem: { ...KIEM, trangThai: 'da_nop' as TomTatKiemTra['trangThai'], nopLuc: mo + 7200_000, diem: 7.5 } })} />)
+    const bang = screen.getByRole('region', { name: 'Hoàn thành bài hôm nay' })
+    expect(bang.textContent).toContain('Chúc mừng, em đã hoàn thành bài hôm nay!')
+    expect(bang.textContent).toContain('30 câu học · 8 câu sửa · Kiểm tra ôn tập 7,5/10')
+    expect(screen.queryByRole('region', { name: 'Đủ mức hôm nay' })).toBeNull()
+    expect(document.body.textContent).not.toContain('Em có thể nghỉ')
+  })
+
+  // 28/10 (video thầy «hai thẻ dưới load bị khựng»): tải lại trang ⇒ bản nhớ phiên trống ⇒ trước đây nút Tự sửa lỗi vẽ thiếu / sai rồi mới chèn (đường nhảy).
+  it('tải lại trang: số nhớ trên máy của hôm nay ⇒ nút Tự sửa lỗi đúng chỗ, đúng ✓ NGAY lần vẽ đầu (không chờ danh sách)', () => {
+    const ngay = new Date(Date.now() + 7 * 3600_000).toISOString().slice(0, 10)
+    localStorage.setItem('ddh.sua-nho', JSON.stringify({ t: 'tk', n: ngay, s: [5, 0, 0, 12] }))
+    // số câu cần sửa CHƯA về (soSua null) ⇒ nút vẫn có, đúng ✓ ngay lần vẽ đầu
+    render(<MotTrangHs {...goc({ token: 'tk', soSua: null as never })} />)
+    expect(within(duong()).getByRole('button', { name: 'Tự sửa lỗi: hôm nay đã sửa xong' }).getAttribute('data-tt')).toBe('xong')
+  })
+  it('số nhớ của NGÀY KHÁC / PHIÊN KHÁC không dùng (chưa có số ⇒ không vẽ nút Tự sửa lỗi như cũ)', () => {
+    localStorage.setItem('ddh.sua-nho', JSON.stringify({ t: 'tk', n: '2020-01-01', s: [5, 0, 0, 12] }))
+    const { unmount } = render(<MotTrangHs {...goc({ token: 'tk', soSua: null as never })} />)
+    expect(within(duong()).queryByRole('button', { name: /^Tự sửa lỗi/ })).toBeNull()
+    unmount()
+    localStorage.setItem('ddh.sua-nho', JSON.stringify({ t: 'khac', n: new Date(Date.now() + 7 * 3600_000).toISOString().slice(0, 10), s: [5, 0, 0, 12] }))
+    render(<MotTrangHs {...goc({ token: 'tk', soSua: null as never })} />)
+    expect(within(duong()).queryByRole('button', { name: /^Tự sửa lỗi/ })).toBeNull()
+  })
+
   it('đủ mức + còn Kiểm tra ôn tập phải làm ⇒ kiểm tra là nút hiện tại, rồi mới tới Tự sửa lỗi (thầy 26/10)', () => {
     const onKiemTra = vi.fn()
     render(<MotTrangHs {...goc({ so: { daLam: 30, muc: 30, chang: 5, soChang: 5 } as PropsMotTrang['so'], kiem: { ...KIEM, homNay: true, trangThai: 'can_lam', nopLuc: null }, onKiemTra })} />)

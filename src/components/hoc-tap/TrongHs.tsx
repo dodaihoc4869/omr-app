@@ -120,7 +120,7 @@ function chuKiem(k: TomTatKiemTra): string {
 /** SỐ TRÊN NÚT «SỬA LỖI» (thầy duyệt 28/10 «sửa theo đề xuất»): số câu CÒN PHẢI SỬA HÔM NAY của việc hôm nay (12 câu, chặng 4 — tu-sua-viec-hom-nay.ts), không phải
  *  tổng nợ (tổng chỉ ở màn Tự sửa lỗi: «Còn N lỗi cần sửa»). Danh sách lấy từ bản nhớ `taiTuSuaLoi` mà Lộ trình đã tải cho số cần sửa (không thêm lượt gọi máy chủ);
  *  cùng hàm dựng ngày với màn Tự sửa lỗi ⇒ cùng con số. 0 ⇒ xong hôm nay (nút ✓). Chưa dựng được ⇒ null. */
-function useConSuaHomNay(token: string | undefined, bat: boolean): { con: number | null | undefined; phan: number | null | undefined; mod: ModViec | null } {
+function useConSuaHomNay(token: string | undefined, bat: boolean, nho: number[] | null): { con: number | null | undefined; phan: number | null | undefined; xong: number | null | undefined; mod: ModViec | null } {
   const [kq, setKq] = useState<KetQuaDanhSachChua | null>(() => (token ? docNhoTuSua(token) : null))
   const [mod, setMod] = useState<ModViec | null>(null)
   useEffect(() => {
@@ -137,9 +137,18 @@ function useConSuaHomNay(token: string | undefined, bat: boolean): { con: number
   const r = useMemo(() => { const sbd = mod?.docSbdHs(); return mod && bat && sbd ? mod.dungViecHomNay(kq, Date.now(), sbd) : null }, [kq, mod, bat])
   useEffect(() => { if (r && mod) mod.luuViecHomNay(r.luu, r.day ?? null) }, [r, mod])
   // undefined = mảnh chưa nạp (chưa vẽ số, khỏi nháy 12 → 9); null = không dựng được việc hôm nay
-  // phan = câu PHẦN NGÀY (12 câu đầu) chưa xong — khoá chặng sau nút Sửa lỗi (28/10); «Sửa thêm 1 chặng» không làm khoá lại
-  if (bat && !mod) return { con: undefined, phan: undefined, mod }
-  return mod ? { con: mod.conSuaHomNay(r?.viec ?? null), phan: mod.conSuaPhanNgay(r?.viec ?? null), mod } : { con: null, phan: null, mod }
+  // phan = câu PHẦN NGÀY (12 câu đầu) chưa xong — khoá chặng sau nút Sửa lỗi (28/10); «Sửa thêm 1 chặng» không làm khoá lại · xong = câu đã sửa xong hôm nay
+  const viec = r?.viec
+  if (mod && viec) return { con: mod.conSuaHomNay(viec), phan: mod.conSuaPhanNgay(viec), xong: viec.xong, mod }
+  // 28/10 (video thầy «hai thẻ dưới load bị khựng»): chưa có danh sách (tải lại trang) ⇒ số nhớ trên máy của hôm nay — nút ✓ / số đúng ngay lần vẽ đầu
+  if (nho) return { con: nho[1], phan: nho[2], xong: nho[3], mod }
+  return bat && !mod ? { con: undefined, phan: undefined, xong: undefined, mod } : { con: null, phan: null, xong: null, mod }
+}
+/** 28/10 (video thầy «hai thẻ dưới load bị khựng»): bản nhớ phiên mất khi tải lại ⇒ Lộ trình vẽ lần đầu THIẾU nút Tự sửa lỗi, số về mới chèn nút (đường nhảy,
+ *  trang giật). Nhớ trên máy số của HÔM NAY theo phiên: [câu cần sửa, còn phải sửa hôm nay, phần ngày chưa xong, đã sửa xong hôm nay]. */
+const KHOA_SUA_NHO = 'ddh.sua-nho'
+const docSuaNho = (tk?: string): number[] | null => {
+  try { const o = JSON.parse(localStorage.getItem(KHOA_SUA_NHO) || '0'); return tk && o.t === tk.slice(-16) && o.n === ngayVn(Date.now()) ? o.s : null } catch { return null }
 }
 
 /** Phần của cổng HocTapHomNay mà Luyện tập / Thành tích cần (truyền nguyên props cổng — không thêm lệnh, không thêm số). */
@@ -524,10 +533,15 @@ export function MotTrangHs(p: PropsMotTrang) {
   const nutHoc = chuNutHoc(so, p.hetCau, p.kho)
   const kiemXong = !!kiem && (kiem.nopLuc !== null || kiem.trangThai === 'het_han')
   const kiemLam = !!kiem && kiem.homNay && !kiemXong && kiem.trangThai === 'can_lam'
-  const coSua = !!p.soSua && p.soSua > 0
-  const { con: conSua, phan: conSuaPhan, mod: modSua } = useConSuaHomNay(p.token, coSua)
+  const nhoSua = useMemo(() => docSuaNho(p.token), [p.token])
+  const soSua = p.soSua ?? nhoSua?.[0]
+  const coSua = !!soSua && soSua > 0
+  const { con: conSua, phan: conSuaPhan, xong: daSuaNay, mod: modSua } = useConSuaHomNay(p.token, coSua, nhoSua)
+  useEffect(() => {
+    if (p.token && p.soSua != null && conSuaPhan != null) try { localStorage.setItem(KHOA_SUA_NHO, JSON.stringify({ t: p.token.slice(-16), n: ngayVn(Date.now()), s: [p.soSua, conSua, conSuaPhan, daSuaNay] })) } catch { /* máy chặn: như cũ */ }
+  }, [p.token, p.soSua, conSua, conSuaPhan, daSuaNay])
   /** Số trên nút: còn phải sửa HÔM NAY (chưa dựng được việc hôm nay ⇒ tối đa 12 trên số cần sửa). */
-  const suaNay = conSua ?? (coSua ? Math.min(SO_CAU_MOI_NGAY, p.soSua!) : 0)
+  const suaNay = conSua ?? (coSua ? Math.min(SO_CAU_MOI_NGAY, soSua!) : 0)
   const choSoSua = conSua === undefined // mảnh việc hôm nay đang nạp ⇒ chưa vẽ huy hiệu số
   const xongSuaNay = coSua && conSua === 0
   const coBt = !!p.soBaiTap || !!p.coBaiTap
@@ -692,7 +706,11 @@ export function MotTrangHs(p: PropsMotTrang) {
   return <div ref={khung} className="dm-khung" data-so-menu={coThuong || undefined} style={{ '--tren-cao': `${trenCao}px` } as CSSProperties}>{tren}
     <main className="da-vo" aria-busy={!so && p.dangTai}>
       {chinh === 'ca' && <section className="da-bang" data-sac="tin" aria-label="Ca kiểm tra đang mở"><span className="h"><ClipboardCheck size={26} aria-hidden="true" /></span><div className="giua"><b>Ca kiểm tra đang mở</b><span className="mo">Nhập mã ca và mật khẩu thầy cung cấp để vào phòng kiểm tra.</span></div><button type="button" className="nut-to" onClick={p.onThi}>Vào ca kiểm tra</button></section>}
-      {du && chinh !== 'ca' && so && <section className="da-bang" data-sac="dung" aria-label="Đủ mức hôm nay"><span className="h"><Check size={26} strokeWidth={3} aria-hidden="true" /></span><div className="giua"><b>Đủ {so.daLam}/{so.muc} câu hôm nay!</b><span className="mo">{tiepTheo.length ? `Tiếp theo: ${tiepTheo.join(', rồi ')}` : 'Em có thể nghỉ, hoặc học thêm câu mới.'}</span></div></section>}
+      {/* 28/10 (thầy «Chúc mừng, em đã hoàn thành bài hôm nay — ghi rõ câu sửa, bài kiểm tra. Thay thẻ hoàn thành nhiệm vụ»): xong HẾT việc hôm nay ⇒ thẻ chúc mừng
+          kèm số câu học · câu sửa · Kiểm tra ôn tập; còn việc ⇒ thẻ «Đủ x/y câu» + việc tiếp như cũ. */}
+      {du && chinh !== 'ca' && so && <section className="da-bang" data-sac="dung" aria-label={tiepTheo.length ? 'Đủ mức hôm nay' : 'Hoàn thành bài hôm nay'}><span className="h"><Check size={26} strokeWidth={3} aria-hidden="true" /></span><div className="giua">{tiepTheo.length
+        ? <><b>Đủ {so.daLam}/{so.muc} câu hôm nay!</b><span className="mo">Tiếp theo: {tiepTheo.join(', rồi ')}</span></>
+        : <><b>Chúc mừng, em đã hoàn thành bài hôm nay!</b><span className="mo">{so.daLam} câu học{daSuaNay ? ` · ${daSuaNay} câu sửa` : ''}{kiem?.homNay && kiem.nopLuc !== null ? ` · Kiểm tra ôn tập ${kiem.diem !== null ? `${diemChu(kiem.diem)}/10` : 'đã nộp'}` : ''}</span></>}</div></section>}
       {/* THẺ BÀI (thầy 27/10 «thu vào bị giật… cho thanh màu xanh xuống kẻo chèn vào ống nghiệm»): thẻ đầy đủ ĐỨNG YÊN trong luồng (giữ chỗ, không nhảy cuộn);
           cuộn qua ⇒ DẢI GỌN 54px (tên bài · thanh mảnh · chặng) dính dưới hàng bộ đếm, cross-fade opacity + translateY 200 ms; sau dải là nền trang đặc + mép mờ
           ⇒ nút chặng / linh vật trượt khuất gọn dưới dải. Dải nằm trong khối cao 0 ⇒ không chiếm chỗ. */}
