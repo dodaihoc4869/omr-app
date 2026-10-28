@@ -1,2 +1,8 @@
-vitri
-# 28/10 trưa: hỏi D1 thật / D1 sao chạy ở đâu (SELECT 1, chỉ đọc) — lượt 6: D1 sao ở KIX (Osaka), Worker sao ghim HKG ⇒ mỗi đợt ~70–100 ms.
+worker chay
+noi=aws:ap-northeast-3
+ktcn-tat
+dung-san
+so_em=270
+phut=10
+am=3
+# 28/10 trưa (lần 7): D1 THẬT ở HKG (Worker thật remote-HKG ⇒ mỗi đợt D1 ~vài ms); D1 SAO ở KIX ⇒ ghim Worker sao ở Osaka cho giống bản thật. 270 em, mã PR #558.
