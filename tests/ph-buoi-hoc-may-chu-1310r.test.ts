@@ -10,6 +10,7 @@ import { describe, expect, it } from 'vitest'
 import { parentPass } from '../server/src/game-v2-auth'
 import { phTatCaVeCon, SO_NGAY_BUOI_HOC, TOI_DA_BUOI_HOC } from '../server/src/ph-tat-ca-ve-con'
 import type { Env } from '../server/src/kieu'
+import { xoaDemMocHienThi } from '../server/src/moc-no'
 import { taoD1That, type D1That } from './_d1-that'
 
 const T = (s: string): number => Date.parse(`${s}+07:00`)
@@ -158,6 +159,7 @@ describe('tốc độ — không thêm đợt chờ D1 nối tiếp', () => {
     const co = boDemDot(d.env.DB)
     const r1 = await co.chay(() => chay(d, { pass }, { ...d.env, DB: co.db } as Env))
     expect(r1.kq.buoiHoc.ds[0].coMat).toBe(true)
+    xoaDemMocHienThi() // hai lượt đo cùng điều kiện: mốc hiển thị (đệm 30 s, ve-dich-d1 đọc qua docMocHienThi) không mang từ lượt trước sang
     const khong = boDemDot(d.env.DB, LA_CAU_BUOI)
     const r2 = await khong.chay(() => chay(d, { pass }, { ...d.env, DB: khong.db } as Env))
     expect('buoiHoc' in r2.kq).toBe(false)

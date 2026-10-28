@@ -276,25 +276,32 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number, bo: DauV
   const pPhamViBat = chan(phamViBat(env))
   const pKhoiLop = chan(docKhoiVaLopCacEm(env, em).catch(() => ({ khoi: new Map<string, Khoi | null>(), lop: new Map<string, string>() })))
   // 28/10 tối: BA lượt đọc hồ sơ (câu tới hạn · dạng · số câu chưa khắc phục) gộp MỘT lệnh UNION ALL (cột chung c1…c9, `k` phân loại) — cùng điều kiện, cùng dòng.
-  const docHoSoD1 = (ds: string[]) => {
+  const docHoSoD1 = (ds: string[], kemChiMuc = false) => {
     const rong = () => Promise.resolve(trong<Record<string, unknown>>()), a = json(ds)
-    if (ds.length === 0) return { rc: rong(), rd: rong(), rn: rong() }
-    const goc = chan(tat(() => env.DB.prepare(
+    if (ds.length === 0) return { rc: rong(), rd: rong(), rn: rong(), chiMuc: null }
+    const hoi = (kem: boolean) => tat(() => env.DB.prepare(
       `SELECT 'c' AS k, sbd, qid AS c1, ma_dang AS c2, moc_on_ke AS c3, lan_sai AS c4, luc_cuoi AS c5, NULL AS c6, NULL AS c7, NULL AS c8, NULL AS c9 FROM nam_kt_cau
         WHERE ${IN_EM} AND trang_thai IN ('moi_sai','dang_on','da_khac_phuc','chua_thay_sai') AND can_day_lai = 0 AND moc_on_ke IS NOT NULL AND moc_on_ke <= ?
        UNION ALL SELECT 'n', sbd, COUNT(*), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL FROM nam_kt_cau WHERE ${IN_EM} AND trang_thai IN ('moi_sai','dang_on') GROUP BY sbd
-       UNION ALL SELECT 'd', sbd, ma_dang, so_gap, so_sai, so_da_khac_phuc, so_moi_sai, so_chua_thay_sai, bac, moc_on_ke, moc_moi_sai FROM nam_kt_dang WHERE ${IN_EM}`,
-    ).bind(a, homNay, a, a).all<Record<string, unknown>>(), trong()))
+       UNION ALL SELECT 'd', sbd, ma_dang, so_gap, so_sai, so_da_khac_phuc, so_moi_sai, so_chua_thay_sai, bac, moc_on_ke, moc_moi_sai FROM nam_kt_dang WHERE ${IN_EM}${kem ? `
+       UNION ALL SELECT 'x', NULL, (SELECT 1 FROM game_v2_index LIMIT 1), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL` : ''}`,
+    ).bind(a, homNay, a, a).all<Record<string, unknown>>(), null)
+    // Lệnh kèm cờ lỗi (vd. kho thiếu bảng game_v2_index) ⇒ đọc lại hồ sơ KHÔNG kèm cờ, cờ hỏi riêng như cũ.
+    const goc0 = chan(hoi(kemChiMuc).then(async (r) => ({ r: r ?? (kemChiMuc ? await hoi(false) : null), coCo: !!r && kemChiMuc })))
+    const goc = chan(goc0.then((x) => x.r ?? trong<Record<string, unknown>>()))
     const tach = (k: string, cot: string[]) => goc.then((r) => ({ ...r, results: (r.results ?? []).filter((x) => x.k === k).map((x) => Object.fromEntries([['sbd', x.sbd], ...cot.map((c, i) => [c, x[`c${i + 1}`]])])) }))
     return {
       rc: tach('c', ['qid', 'ma_dang', 'moc_on_ke', 'lan_sai', 'luc_cuoi']),
       rd: tach('d', ['ma_dang', 'so_gap', 'so_sai', 'so_da_khac_phuc', 'so_moi_sai', 'so_chua_thay_sai', 'bac', 'moc_on_ke', 'moc_moi_sai']),
       rn: tach('n', ['n']),
+      // Cờ «đã có chỉ mục game_v2_index» đi kèm cùng lệnh (bớt một lệnh D1); lệnh lỗi ⇒ null, nơi gọi hỏi riêng như cũ.
+      chiMuc: kemChiMuc ? goc0.then((x) => x.coCo ? (x.r?.results ?? []).some((y) => y.k === 'x' && y.c1 != null) : null) : null,
     }
   }
-  const d1HoSo = docHoSoD1(emCanDocHoSo)
+  const d1HoSo = docHoSoD1(emCanDocHoSo, true)
   // Phục vụ được: `game_v2_index` có chỉ mục chưa (1 dòng) + đề đang bảo vệ (`ca`) — MỘT LẦN cho cả lượt (dưới còn 1-2 chỗ khác cần dùng lại, xem `coChiMuc`/`baoVe`).
-  const pCoChiMuc = chan(tat(() => env.DB.prepare('SELECT 1 AS x FROM game_v2_index LIMIT 1').first(), null).then(Boolean))
+  const hoiChiMuc = () => tat(() => env.DB.prepare('SELECT 1 AS x FROM game_v2_index LIMIT 1').first(), null).then(Boolean)
+  const pCoChiMuc = chan(d1HoSo.chiMuc ? d1HoSo.chiMuc.then((c) => c ?? hoiChiMuc()) : hoiChiMuc())
   const pBaoVe = chan(baoVeMotLuot(env))
   // Tối ưu 08/10 + 28/10: tổng hợp sổ không chờ đọc mốc hiển thị (`docTongHopHomNay`).
   const pTongHop = bo.tongHop !== undefined ? Promise.resolve(bo.tongHop) : chan(docTongHopHomNay(env, arr, now))
