@@ -20,6 +20,8 @@ interface Props {
   /** Đã tự sửa / tổng số đợt (`dem` của máy chủ). */
   soXong: number
   tong: number
+  /** Tổng số câu còn cần sửa (máy chủ đếm) — thầy duyệt 28/10: tổng nợ chỉ hiện ở màn này, dạng «Còn N lỗi cần sửa» (nút Lộ trình chỉ số câu hôm nay). */
+  soCan?: number
   /** Số câu ĐÃ TỰ SỬA hôm nay (máy chủ đếm; chữa câu gọn 25/10). */
   xongHomNay?: number
   nayMs: number
@@ -50,7 +52,7 @@ export function chuTrangThaiViec(x: ViecMuc, goc: string, nayMs: number): string
   return x.loai === 'gan' ? 'Chỉ còn làm bản mới là xong' : goc
 }
 
-export default function ViecHomNay({ viec, thongTin, soXong, tong, xongHomNay = 0, nayMs, onChon, onThem, onVe }: Props) {
+export default function ViecHomNay({ viec, thongTin, soXong, tong, soCan, xongHomNay = 0, nayMs, onChon, onThem, onVe }: Props) {
   const nChang = viec.chang.length
   const xongCa = !viec.tiep
   const k = Math.min(viec.changHienTai, nChang - 1)
@@ -116,7 +118,9 @@ export default function ViecHomNay({ viec, thongTin, soXong, tong, xongHomNay = 
             </button>}
       </section>
       <div className="vh-tien">
-        <p className="vh-ghi">{viec.conNgaySau > 0 ? `Còn ${viec.conNgaySau} câu cho các ngày sau. Em không cần sửa hết hôm nay.` : 'Em không còn câu nào cho các ngày sau.'}</p>
+        {soCan !== undefined
+          ? <p className="vh-ghi"><b>Còn {soCan} lỗi cần sửa</b>{viec.conNgaySau > 0 ? ` · ${viec.conNgaySau} câu để các ngày sau, em không cần sửa hết hôm nay.` : ''}</p>
+          : <p className="vh-ghi">{viec.conNgaySau > 0 ? `Còn ${viec.conNgaySau} câu cho các ngày sau. Em không cần sửa hết hôm nay.` : 'Em không còn câu nào cho các ngày sau.'}</p>}
         <div className="tcl-tien-do">
           <p className="tcl-tien-do-chu"><span>Đã tự sửa</span><b>{soXong}/{tong} câu</b></p>
           <div className="tcl-thanh" role="img" aria-label={`Đã tự sửa ${soXong} trong ${tong} câu`}>{soXong > 0 && <i data-tt="xong" style={{ width: phanTram }} />}</div>

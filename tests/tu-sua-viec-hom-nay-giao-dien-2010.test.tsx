@@ -121,7 +121,8 @@ describe('Màn Tự sửa lỗi: Việc hôm nay', () => {
     const gap = container.querySelector('details.vh-gap')!
     expect(gap.hasAttribute('open')).toBe(false)
     expect(gap.querySelector('summary')!.textContent).toContain('Tất cả câu cần sửa')
-    expect(container.textContent).toContain('Còn 6 câu cho các ngày sau. Em không cần sửa hết hôm nay.')
+    // thầy duyệt 28/10: tổng nợ CHỈ ở màn này, dạng «Còn N lỗi cần sửa» (nút Lộ trình chỉ số câu hôm nay)
+    expect(container.textContent).toContain('Còn 18 lỗi cần sửa · 6 câu để các ngày sau, em không cần sửa hết hôm nay.')
     fireEvent.click(screen.getByRole('button', { name: /Bắt đầu sửa/ }))
     expect(await screen.findByText('Đang chữa g0')).toBeTruthy()
   })
