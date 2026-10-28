@@ -87,6 +87,10 @@
 .ktcn-dh[data-gap]{background:color-mix(in srgb,var(--gap) 14%,var(--the));color:var(--gap)}.ktcn-dh[data-gap] .ktcn-dh-cung{stroke:var(--gap)}
 .ktcn-khung{width:100%;max-width:760px;margin:0 auto;padding:16px 16px 40px}
 .ktcn-bao{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;max-width:760px;margin:12px auto 0;padding:12px 14px;border-radius:16px;background:var(--cam-nen);color:var(--muc);font-size:15px}
+/* 28/10: máy chủ bận ⇒ câu nhẹ (không phải hộp lỗi, không nút): nền thẻ phụ, chữ mực thường. */
+.ktcn-ban{max-width:760px;margin:12px auto 0;padding:10px 14px;border-radius:16px;background:var(--the-2);color:var(--muc);font-size:15px;line-height:1.45}
+.duo-kt .duo-than>.ktcn-ban{margin:0}
+@media (orientation:landscape) and (max-height:500px){.duo-kt .duo-than>.ktcn-ban{margin:0 20px 12px}}
 .ktcn-man .an-chu{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .ktcn-xuong{display:grid;gap:14px}.ktcn-xuong span{display:block;height:120px;border-radius:24px;background:var(--the-2)}
 .ktcn-xuong span:first-child{height:220px}
