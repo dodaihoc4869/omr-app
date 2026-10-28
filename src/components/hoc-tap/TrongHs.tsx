@@ -30,6 +30,7 @@ import { baoMoi, useTongQuan } from '../thuong/dung-thuong'
 import { DUONG, layTongQuan, napSanThanhTich } from '../../lib/thuong-api'
 import { batNhipBenVung } from '../../lib/nhip-ben-vung'
 import { laSamsungInternet } from '../../lib/nhac-samsung'
+import { giuToanManHs } from '../../lib/toan-man-hs'
 import type { TenManThuong } from '../thuong/ManThuong'
 const ManThuong = lazy(() => import('../thuong/ManThuong'))
 const GiamThiTinh = lazy(() => import('../giam-thi/GiamThi').then((m) => ({ default: m.GiamThiTinh })))
@@ -37,6 +38,8 @@ const MUC_LV = ['nb', 'th', 'vd', 'vdc'] as const
 const TheBenThuong = lazy(() => import('../thuong/ManThuong').then((m) => ({ default: m.TheBenThuong })))
 // Thẻ nhắc Samsung Internet (27/10): mảnh riêng chỉ máy Samsung Internet tải; tải hỏng ⇒ không vẽ gì.
 const NhacSamsung = lazy(() => import('./NhacSamsung').catch(() => ({ default: () => null })))
+// LUÔN TRÀN TOÀN MÀN (thầy 28/10 «full hẳn, không dải đen»): gắn một lần lúc mảnh này nạp (song song Sảnh, ngoài đường mở app ⇒ không cộng byte lượt mở).
+giuToanManHs()
 /** Sự kiện màn làm chặng phát khi xong bài ĐẦU TIÊN trong ngày ⇒ Lộ trình mở «Chuỗi ngày» với hiệu ứng lửa bùng (C1). */
 export const SU_KIEN_MO_CHUOI = 'ddh-thuong-mo-chuoi'
 /** Cột bên (thẻ Giải tuần + Nhiệm vụ) chỉ hiện ở máy tính / điện thoại ngang (cùng điều kiện CSS `.dm-ben`) ⇒ điện thoại dọc không nạp mảnh màn thưởng. */

@@ -1074,6 +1074,8 @@
 /* bỏ thanh trên ⇒ nội dung lên sát mép trên, cột tóm tắt ghim cao hơn */
 [data-trong='hs'] .dm-khung[data-so-menu] > .da-vo { padding-top: max(16px, env(safe-area-inset-top)); }
 @media (min-width: 1000px) { [data-trong='hs'] .dm-khung[data-so-menu] > .da-vo { padding-top: 26px; } [data-trong='hs'] .dm-khung[data-so-menu] .dm-ben { top: 16px; } }
+/* xoay ngang, tai thỏ / camera ở mép trái (thầy 28/10 «full hẳn»): nội dung lùi đúng bề vùng an toàn, không bị che; máy không tai thỏ giữ 16px */
+[data-trong='hs'] .dm-khung { padding-left: max(16px, env(safe-area-inset-left)); }
 /* gờ mở menu mép phải: rõ hơn, chàm (thầy 27/10 «tinh tế, dễ thấy») */
 :root[data-trong='hs'] .tr-menu-cham i { width: 6px; height: 44px; background: color-mix(in srgb, var(--tr-hs) 78%, transparent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--tr-hs) 16%, transparent), 0 4px 14px color-mix(in srgb, var(--tr-hs) 30%, transparent); }
 /* thanh tiến độ thẻ bài / dải ghim ở nền tối: phần đầy là MÀU ĐÚNG (trước là --tr-trang = gần đen ở nền tối ⇒ «vạch đen đặc» lúc 16/16) */
