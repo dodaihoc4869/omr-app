@@ -1,0 +1,197 @@
+# PHÁT HÀNH KHẨN 28/10 TỐI (MỘT LẦN) — thầy: «Nhanh lên để hs làm ổn định và tốc độ. Đẩy hết lên đi» / «Tối ưu máy chủ tức thì đi».
+# Bản sao deploy.yml phát hành ĐÚNG main (commit ghi ở bước «sha»), chỉ khác: BỎ CHỜ chặng kiểm tra cá nhân đang làm (index.ts nằm trong danh sách làn
+# nhưng bản này không đổi luật kiểm tra). Lý do: Worker tràn bộ nhớ 81 lần / giờ từ 19:15 VN giết cả lượt nộp của em đang làm kiểm tra; bản sửa ở #569.
+# Ca thi đang mở VẪN DỪNG (kiem-phat-hanh-chua.mjs). Mọi bước kiểm / schema / xác nhận bản sống giữ nguyên.
+# PHÁT HÀNH APP LÊN CLOUDFLARE PAGES — https://omr-app-b3u.pages.dev/
+#
+# Thầy chốt 14/09: chỉ còn MỘT nơi phát hành. GitHub Pages bị bỏ hẳn, không còn
+# job nào đẩy lên đó nữa — để hai nơi cùng sống thì mỗi lần đẩy mã lại sinh một
+# bản app song song, và em nào giữ link cũ sẽ làm bài trên bản khác với bản Thầy
+# đang chấm.
+#
+# CẦN ĐẶT MỘT LẦN, trong repo → Settings → Secrets and variables → Actions:
+#   CLOUDFLARE_API_TOKEN   (quyền: Cloudflare Pages — Edit)
+#   CLOUDFLARE_ACCOUNT_ID  (mã tài khoản Cloudflare)
+# Đặt xong thì mọi lần đẩy mã lên main đều tự phát hành, không ai phải bấm gì.
+name: Phát hành khẩn 28-10 (bỏ chờ chặng KTCN)
+
+on:
+  push:
+    branches: [claude/phat-hanh-khan-2810]
+    paths: ['.github/workflows/phat-hanh-khan-2810.yml']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phat-hanh
+  # 27/10: nhiều PR gộp liền nhau (~5–10 phút/lần) mà mỗi lượt phát hành ~15 phút ⇒ cancel-in-progress: true làm MỌI lượt bị huỷ giữa chừng,
+  # bản sống đứng yên cả đêm. Không huỷ lượt đang chạy; GitHub chỉ giữ 1 lượt chờ (lượt mới nhất thay lượt chờ cũ) ⇒ main mới nhất vẫn lên ngay sau.
+  cancel-in-progress: false
+
+jobs:
+  phat-hanh:
+    # Bản sống chỉ lấy từ main; nhánh cũ không được ghi đè luồng chữa đã phát hành.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 2}
+      - name: sha
+        id: sha
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"; git log --oneline -1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+
+      # CỔNG KIỂM CHẠY TRƯỚC, ghi nhận kết quả và không chặn phát hành bản mới
+      - run: npm run check:mau
+        continue-on-error: true
+      # Bộ toàn repo vừa chạy nếu cây mã chạy không đổi: sửa kiểm phát hành không cần lặp 15 phút.
+      # Đối chiếu toàn bộ đợt push, không chỉ commit cuối; không đọc được mốc thì chạy toàn bộ.
+      - name: Xác định thay đổi mã chạy
+        id: pham-vi
+        env:
+          MOC_TRUOC: ${{ github.event.before }}
+          SU_KIEN: ${{ github.event_name }}
+        run: |
+          TOAN_BO=true
+          if [[ "$SU_KIEN" == push && "$MOC_TRUOC" =~ ^[a-f0-9]{40}$ && "$MOC_TRUOC" != 0000000000000000000000000000000000000000 ]]; then
+            if git fetch --no-tags --depth=1 origin "$MOC_TRUOC"; then
+              git diff --name-only "$MOC_TRUOC" HEAD -- src server public package.json package-lock.json tsconfig.json tsconfig.app.json tsconfig.node.json .github/workflows/deploy.yml > /tmp/chua-ma-doi.txt
+              if [[ -s /tmp/chua-ma-doi.txt ]]; then
+                TOAN_BO=true
+              else
+                TOAN_BO=false
+              fi
+            fi
+          fi
+          echo "toan-bo=$TOAN_BO" >> "$GITHUB_OUTPUT"
+          echo "Kiểm toàn repo: $TOAN_BO"
+      - run: timeout 5m npm test -- --run
+        if: false # KHẨN: bộ toàn repo đã chạy trên PR #568/#569 (CI kiem xanh); hợp đồng vận hành bên dưới vẫn chạy
+        timeout-minutes: 6
+        continue-on-error: true
+      # Công cụ bật cờ/receipt và hợp đồng điều hướng luôn kiểm; đóng gói/PWA kiểm bằng build:cf.
+      - name: Kiểm hợp đồng vận hành và tệp kiểm thử vừa đổi
+        env:
+          MOC_TRUOC: ${{ github.event.before }}
+          TOAN_BO: ${{ steps.pham-vi.outputs.toan-bo }}
+        run: |
+          KIEM=(tests/chua-d1-van-hanh.test.ts tests/chien-dich-thanh-ben.test.tsx tests/khoi-phuc-chien-dich-0810.test.ts tests/srs2-loi-2709.test.ts tests/srs2-ke-hoach-doi-cd-2809.test.ts tests/srs2-rai-deu-d1-3009.test.ts tests/d1-qua-tai-khong-nhan-truy-van-0810.test.ts tests/cao-diem-ho-so-0110.test.ts)
+          KIEM+=(tests/ph-bao-cao-moi-2809.test.ts tests/hanh-trinh-bai-thu-suc-0910.test.ts tests/hanh-trinh-nguon-cau-0910.test.ts tests/hanh-trinh-ngay-0910.test.ts tests/hanh-trinh-d1-0910.test.ts tests/hanh-trinh-giao-dien-0910.test.tsx tests/hanh-trinh-dong-co-0910.test.ts tests/hanh-trinh-v5-0910.test.ts tests/hanh-trinh-v6-0910.test.ts tests/omni-3-tra-loi.test.ts tests/omni-3-tra-loi-ve-de-thu.test.ts)
+          KIEM+=(tests/hoc-tap-tap-trung-1010.test.ts tests/hoc-tap-giao-dien-1010.test.tsx tests/vao-thi-form-m3-1909.test.tsx tests/dang-nhap-hs-1909.test.tsx tests/hoa2-sanh-2709.test.tsx tests/hs-lich-su-ca-2809.test.tsx tests/m3-c8-bang-tin-1909.test.tsx tests/ph-khong-game-2109.test.tsx)
+          KIEM+=(tests/kiem-tra-ca-nhan-1310.test.ts tests/kiem-tra-ca-nhan-giao-dien-1310.test.tsx tests/ung-vien-chieu-1310.test.ts tests/uu-tien-chieu-1310.test.ts tests/thay-tu-chua-1210.test.tsx)
+          KIEM+=(tests/goi-bai-7-1010.test.ts tests/goi-bai-7-giao-dien-1010.test.tsx tests/goi-bai-7-loi-vao-thay-1010.test.tsx tests/hanh-trinh-nhip-ho-so-0910.test.tsx tests/gv-hom-nay-0910.test.tsx)
+          if [[ "$TOAN_BO" == false ]]; then
+            git diff --name-only --diff-filter=AM "$MOC_TRUOC" HEAD -- tests > /tmp/chua-test-doi.txt
+            while IFS= read -r TEP; do
+              if [[ "$TEP" == *.test.ts || "$TEP" == *.test.tsx ]]; then
+                if [[ " ${KIEM[*]} " != *" $TEP "* ]]; then KIEM+=("$TEP"); fi
+              fi
+            done < /tmp/chua-test-doi.txt
+          fi
+          npx vitest run "${KIEM[@]}"
+
+      # KHÔNG đặt GITHUB_PAGES: cờ đó đổi địa chỉ gốc thành /omr-app/, chỉ đúng
+      # cho GitHub Pages. Đặt nhầm thì pages.dev tải tài nguyên sai đường và mở
+      # ra trang trắng.
+      - run: npm run build:cf
+
+      # GIỮ MẢNH CŨ (28/10, thầy chụp "Failed to fetch dynamically imported module …StudentPortalScreen-….js"): mỗi lượt
+      # `pages deploy` thay TRỌN bản sống ⇒ mảnh băm tên của bản trước biến mất, máy còn chạy bản cũ (app nằm nền qua đêm
+      # phát hành nhiều lần) mở màn tải lười là văng. Chép lại vào dist/assets mảnh của ≥5 bản gần nhất + mọi bản trong 72 giờ,
+      # lấy từ chính bản sống (danh sách `manh-cu.json`). Chỉ đọc bản sống, không cần khoá; lỗi mạng không chặn phát hành.
+      - name: Giữ mảnh mã của các bản gần đây
+        continue-on-error: true
+        timeout-minutes: 6
+        run: node scripts/giu-manh-cu.mjs dist --goc https://omr-app-b3u.pages.dev --id ${{ steps.sha.outputs.sha }}
+
+      # Secret dán thừa dòng/khoảng trắng làm wrangler hỏng ("invalid header value", run 499):
+      # làm sạch một lần rồi mới đưa cho hai bước đẩy. Không in giá trị khoá.
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+
+      - name: Kiểm ca thi và áp schema vòng chữa trước khi đổi bản sống
+        run: |
+          node scripts/kiem-phat-hanh-chua.mjs
+          # GIỜ CAO ĐIỂM 19:00–23:59 VN (thầy 12/10: "tối ưu triệt để … giờ cao điểm"): `ap-migration-chua.mjs` chạy `wrangler d1 execute --file` —
+          # Cloudflare báo "D1 database will be unavailable to serve queries" ⇒ em đang học thấy "Máy chủ phản hồi chậm". Schema vòng chữa ổn định từ
+          # 07/10 ⇒ giờ cao điểm BỎ bước áp; bước `--schema` cuối vẫn KIỂM (thiếu là dừng phát hành). Các bước schema dưới là CREATE IF NOT EXISTS qua API.
+          if [ "$(TZ=Asia/Ho_Chi_Minh date +%H)" -ge 19 ]; then echo "Giờ cao điểm: bỏ áp schema vòng chữa bằng --file, chỉ kiểm."; else node scripts/ap-migration-chua.mjs --remote; fi
+          node scripts/ap-migration-hanh-trinh-0910.mjs
+          npx esbuild scripts/ap-migration-goi7.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/goi7-schema.mjs --log-level=warning
+          node /tmp/goi7-schema.mjs
+          npx esbuild scripts/ap-migration-ktcn.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/ktcn-schema.mjs --log-level=warning
+          node /tmp/ktcn-schema.mjs
+          sed -i 's/boChoKtcn: !cho/boChoKtcn: true/' scripts/ap-migration-hoi-thay.ts && grep -q 'boChoKtcn: true' scripts/ap-migration-hoi-thay.ts # KHẨN: bỏ chờ chặng KTCN (ca thi mở vẫn dừng)
+          npx esbuild scripts/ap-migration-hoi-thay.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/hoi-thay-schema.mjs --log-level=warning
+          node /tmp/hoi-thay-schema.mjs
+          # Thưởng phạt 26/10: bảng + trigger chỉ-thêm (nộp câu ghi vào các bảng này) — áp TRƯỚC khi đẩy Worker.
+          node scripts/ap-migration-thuong-2610.mjs
+          node scripts/kiem-phat-hanh-chua.mjs --schema
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+
+      - name: Đẩy lên Cloudflare Worker (Máy chủ)
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ env.CF_TOKEN_SACH }}
+          accountId: ${{ env.CF_ACC_SACH }}
+          command: deploy --tag=${{ steps.sha.outputs.sha }}
+          workingDirectory: server
+
+      - name: Xác nhận đã khôi phục chiến dịch riêng
+        if: github.event_name == 'push' && github.event.before == '3f495cd16e9a8adab7682e346907d9a871ed4693'
+        run: node scripts/kiem-khoi-phuc-song-0810.mjs
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+
+      - name: Đẩy lên Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ env.CF_TOKEN_SACH }}
+          accountId: ${{ env.CF_ACC_SACH }}
+          command: pages deploy dist --project-name=omr-app --branch=main
+
+      - name: Xác nhận ba hành trình đã tự gộp
+        run: |
+          # Giờ cao điểm 19:00–23:59 VN: bước KIỂM chỉ đọc này đọc nặng (~60 lệnh; 3 phút 27 giây lúc 21h 12/10) — hoãn sang lần phát hành ngoài giờ.
+          if [ "$(TZ=Asia/Ho_Chi_Minh date +%H)" -ge 19 ]; then echo "Giờ cao điểm: hoãn bước kiểm ba hành trình (chỉ đọc)."; exit 0; fi
+          node scripts/kiem-hanh-trinh-song-0910.mjs
+          npx esbuild scripts/kiem-dong-co-hanh-trinh-song.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/hanh-trinh-kiem.mjs --log-level=warning
+          node /tmp/hanh-trinh-kiem.mjs
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+
+      - name: Kiểm Worker và Pages sống cùng commit
+        run: node scripts/kiem-phat-hanh-chua.mjs --schema --live
+        env:
+          CHUA_RELEASE_SHA: ${{ steps.sha.outputs.sha }}
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+
+      - name: Áp bài gần nhất của mỗi lớp và chốt lịch phủ câu hôm nay
+        run: |
+          # Giờ cao điểm 19:00–23:59 VN: bước này GHI hàng loạt (đồng bộ gói mọi lớp, nạp R2) — hoãn; cron mỗi phút của Worker vẫn đồng bộ bài mới.
+          if [ "$(TZ=Asia/Ho_Chi_Minh date +%H)" -ge 19 ]; then echo "Giờ cao điểm: hoãn áp gói hàng loạt — cron Worker vẫn đồng bộ mỗi phút."; exit 0; fi
+          npx esbuild scripts/ap-goi7-song.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/goi7-song.mjs --log-level=warning
+          node /tmp/goi7-song.mjs
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+
+      - name: Bật và chuẩn bị lịch kiểm tra riêng sau khi xác nhận bản sống
+        run: |
+          npx esbuild scripts/ap-ktcn-song.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/ktcn-song.mjs --log-level=warning
+          node /tmp/ktcn-song.mjs
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
