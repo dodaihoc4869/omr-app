@@ -1,9 +1,8 @@
-worker chay
-ban-sao
+khoiphuc worker chay
 noi=aws:ap-northeast-3
 ktcn-tat
 dung-san
 so_em=135
 phut=10
 am=3
-# 28/10 claude/kv-san-sang-2810: lượt 2 — 135 em, đọc bản sao theo mốc; kiểm lại bản sao đọc có phục vụ sau ~1 giờ bật.
+# 28/10 claude/kv-san-sang-2810: D1 sao về 01:52Z (time travel) ⇒ em ảo chưa làm hôm nay — đường nặng 19h. Mã = main (f11ea355) + công cụ vết. 135 em.

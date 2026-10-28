@@ -155,6 +155,28 @@ jobs:
             npx wrangler d1 execute omr-thu-tai --remote -c wrangler-thu-tai.toml --json --command "UPDATE cau_hinh SET gia_tri='{\"bat\":false}' WHERE khoa='kiem_tra_ca_nhan_v1'" > /dev/null 2>&1
             echo "D1 sao: đã tắt Kiểm tra ôn tập."
           fi
+      - name: "Khôi phục · D1 SAO về ngay sau lượt sinh dữ liệu giả (time travel, chỉ D1 sao) ⇒ 270 em ảo «chưa làm hôm nay»"
+        if: contains(env.LENH, 'khoiphuc')
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          set -euo pipefail
+          # Lượt sinh 40615721475: nạp xong 01:49:11Z, Worker sao chỉ dựng lại từ 01:55Z ⇒ 01:52Z là dữ liệu giả nguyên vẹn, chưa lượt đo nào chạm.
+          MOC=$(grep -m1 -oE '^moc_khoi_phuc=[0-9TZ:-]+' ../scripts/thu-tai/lenh.txt | cut -d= -f2 || true); MOC="${MOC:-2026-10-28T01:52:00Z}"
+          npx wrangler d1 list --json > "$TT/list-kp.json" 2>/dev/null
+          ID=$(node -e 'const l=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));const x=l.find(d=>d.name==="omr-thu-tai");if(!x)process.exit(1);console.log(x.uuid)' "$TT/list-kp.json")
+          [ -n "$ID" ] && [ "$ID" != "$DB_THAT" ] || { echo "::error::không phải D1 sao"; exit 1; }
+          grep -q "database_id = \"$ID\"" wrangler-thu-tai.toml || { echo "::error::cấu hình sao không trỏ D1 sao"; exit 1; }
+          ! grep -q "$DB_THAT" wrangler-thu-tai.toml
+          if npx wrangler d1 time-travel restore omr-thu-tai --timestamp="$MOC" -c wrangler-thu-tai.toml -y > "$TT/kp.log" 2>&1 || npx wrangler d1 time-travel restore omr-thu-tai --timestamp="$MOC" -c wrangler-thu-tai.toml > "$TT/kp.log" 2>&1 < /dev/null; then
+            echo "Đã khôi phục D1 sao về $MOC."
+          else
+            grep -E "ERROR|✘" "$TT/kp.log" | sed -E 's/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+/<…>/g; s/[0-9]{6,}/#/g' | cut -c1-200 | head -n 4; exit 1
+          fi
+          if grep -q '^ktcn-tat' ../scripts/thu-tai/lenh.txt; then npx wrangler d1 execute omr-thu-tai --remote -c wrangler-thu-tai.toml --json --command "UPDATE cau_hinh SET gia_tri='{\"bat\":false}' WHERE khoa='kiem_tra_ca_nhan_v1'" > /dev/null 2>&1; echo "D1 sao: đã tắt lại Kiểm tra ôn tập."; fi
+          npx wrangler d1 execute omr-thu-tai --remote -c wrangler-thu-tai.toml --json --command "SELECT (SELECT COUNT(*) FROM thu_tai_em) em, (SELECT COUNT(*) FROM game_v2_attempt WHERE created_at >= '2026-10-27T17:00:00Z') luot_hom_nay, (SELECT MAX(created_at) FROM game_v2_attempt) luot_cuoi" 2>/dev/null | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{console.log("D1 sao sau khôi phục:",JSON.stringify(JSON.parse(s)[0].results[0]))}catch{console.log("(không đọc được số đếm)")}})'
       - name: "Sinh 5 · đẩy Worker SAO omr-thu-tai (mã main hiện tại) + mã bí mật sao + thử khói"
         if: contains(env.LENH, 'sinh') || contains(env.LENH, 'worker')
         working-directory: server
