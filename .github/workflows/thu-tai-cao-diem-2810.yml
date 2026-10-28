@@ -93,6 +93,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
         run: |
           set -euo pipefail
+          echo "::error::CẤM export D1 thật (Boss 28/10: export khoá D1 thật, «Currently processing a long-running export»). Dùng dữ liệu giả."; exit 1
           F="$TT/omr-xuat.sql"; N="$TT/omr-nap"; DBT="$TT/omr-tam.sqlite"
           trap 'rm -f "$F" "$N"-*.sql "$DBT"' EXIT
           an() { sed -E "s/'[^']*'/'…'/g; s/[0-9]{4,}/#/g" | cut -c1-160; }
