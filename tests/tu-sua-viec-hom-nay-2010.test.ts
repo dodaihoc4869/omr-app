@@ -211,3 +211,21 @@ describe('mục mang mã đợt khác với đợt vừa mở', () => {
     expect(v.tiep?.m.qid).toBe('Q2')
   })
 })
+
+describe('câu chờ kiểm lại sau Hỏi thầy (video thầy 28/10 20:09: «Câu sai số 9 · Cần sửa» mở ra «Đang chờ kiểm lại» ⇒ kẹt 11/12)', () => {
+  it('không chọn vào việc hôm nay; đã nằm trong việc hôm nay ⇒ xong phần, ghi vào «đã xong» (máy chủ đếm cùng tập) — không kẹt', () => {
+    const d = dai(13, 'thieu_hoc_lieu')
+    // Ngày mới: câu kiểm lại không được chọn (đủ 12 câu khác).
+    const v0 = dungNgay(ds([{ ...d[0]!, kiemHoiThay: true }], d.slice(1)))!
+    expect(v0.muc.map((x) => x.khoa)).not.toContain(d[0]!.dotId)
+    expect(v0.tong).toBe(12)
+    // Câu đã nằm trong việc hôm nay từ trước, nay chuyển sang chờ kiểm lại ⇒ xong phần + ghi khoá vào x.
+    localStorage.clear()
+    dungNgay(d.slice(0, 12))
+    const r = dungViecHomNay(bat(ds([{ ...d[0]!, kiemHoiThay: true }], d.slice(1, 12))), NAY, '11010')
+    expect(r.viec!.muc[0]!.xong).toBe(true)
+    expect(r.viec!.xong).toBe(1)
+    expect(r.luu?.x).toContain(d[0]!.dotId)
+    expect(r.day?.x).toContain(d[0]!.dotId)
+  })
+})
