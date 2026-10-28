@@ -111,7 +111,7 @@ export async function dauSanSang(env: Env, sbd: string, now: number): Promise<st
 /** Xoá đệm bảng vắng (test). */
 export const xoaBangVangSanSang = () => bangVang.clear()
 
-export interface BanSanSang { ngay: string; luc: number; dau: string; sanh: Row | null; chang: { refs: unknown[]; questions: unknown[]; goi7: unknown } | null
+export interface BanSanSang { ngay: string; luc: number; dau: string; sanh: Row | null; chang: { refs: unknown[]; questions: unknown[]; goi7: unknown; rong?: Row } | null
   /** Giờ (ms) của đợt học MỚI NHẤT của em lúc đọc — có đợt mới hơn bản sẵn (mở chặng chạy song song / đường cũ) ⇒ không dùng phần chặng. */ phienMoi: number }
 
 /** Bản sẵn của em (hoặc null). Không bao giờ ném. */
@@ -201,9 +201,11 @@ export async function chuanBiSanSang(env: Env, sbd: string, now: number, san?: {
  * Không lưu được (gói vừa đổi…) ⇒ null ⇒ nơi gọi đi đường cũ.
  */
 export async function moChangSanSang(env: Env, sbd: string, now: number, ban: BanSanSang): Promise<Record<string, unknown> | null> {
-  const c = ban.chang as (BanSanSang['chang'] & { goiIds?: unknown; phienCu?: unknown }) | null
-  if (!c || !Array.isArray(c.refs) || !c.refs.length || !Array.isArray(c.questions) || !Array.isArray(c.goiIds)) return null
+  const c = ban.chang as (BanSanSang['chang'] & { goiIds?: unknown; phienCu?: unknown; rong?: unknown }) | null
   if (ban.phienMoi >= ban.luc) return null // đợt mới hơn bản sẵn (vd. mở chặng chạy song song với Sảnh) ⇒ đường thường tự dùng lại đúng đợt ấy
+  // Chặng RỖNG lập sẵn (em đã xong phần hôm nay — goi-bai-7.ts `startGoi7` khongLuu): dấu khớp ⇒ cùng kết quả, không ghi gì (đường thường cũng không lưu phiên).
+  if (c && c.rong && typeof c.rong === 'object' && !Array.isArray(c.rong)) return c.rong as Record<string, unknown>
+  if (!c || !Array.isArray(c.refs) || !c.refs.length || !Array.isArray(c.questions) || !Array.isArray(c.goiIds)) return null
   // Đợt cũ còn nguyên (lập sẵn trả đúng đợt ấy, như đường thường): dấu khớp ⇒ chưa câu nào được trả lời từ lúc lập ⇒ trả lại đợt đó (còn hạn 2 giờ), không tạo đợt mới.
   if (typeof c.phienCu === 'string' && c.phienCu) {
     const cu = await env.DB.prepare("SELECT json_extract(json,'$.created') AS t FROM game_v2_session WHERE id=? AND sbd=?").bind(c.phienCu, sbd).first<Row>()

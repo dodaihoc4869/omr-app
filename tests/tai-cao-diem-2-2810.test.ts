@@ -4,10 +4,12 @@
 //  · bản chụp kho dùng chung nén gzip ⇒ giải nén ra đúng chuỗi.
 import { afterEach, expect, it } from 'vitest'
 import { taoD1That } from './_d1-that'
-import { dauSanSang, batDemDauChung, SQL_SAN_SANG, KHOA_CH_KHONG_DAU } from '../server/src/san-sang'
+import { dauSanSang, batDemDauChung, SQL_SAN_SANG, KHOA_CH_KHONG_DAU, moChangSanSang } from '../server/src/san-sang'
 import { nen, giaiNen } from '../server/src/kho-chung'
 import { chupHoSoTho, dungSanOmni, hoSoOmniEm, xoaDemOmni } from '../server/src/omni-d1'
 import { taoKhoOmni } from './omni-3-ke-hoach-chung'
+import { docChienDichCuaEm, xoaDemChienDich } from '../server/src/srs2-d1'
+import { docCauHinhDem, xoaDemCauHinh } from '../server/src/cau-hinh-dem'
 import type { Env } from '../server/src/kieu'
 
 afterEach(() => { batDemDauChung(false) })
@@ -60,4 +62,34 @@ it('dựng sẵn trước giờ học: điểm gọn thiếu ⇒ dựng đúng c
   expect(await dungSanOmni(env, now)).toEqual({ gon: 0, lop: 0 }) // đã đủ ⇒ không làm lại
   xoaDemOmni()
   expect(JSON.stringify(await hoSoOmniEm(env, 'S3', now))).toBe(JSON.stringify(cu))
+})
+
+it('chặng RỖNG lập sẵn (em đã xong phần hôm nay) ⇒ mở chặng trả đúng phản hồi đã lập, không chạm D1', async () => {
+  const rong = { ok: true, questions: [], goi7: { ngay: '2026-10-28' }, message: 'Em đã hoàn thành phần được xếp hôm nay. Lỗi chưa kiểm chứng vẫn được giữ để học tiếp.' }
+  let cham = 0
+  const env = { DB: { prepare: () => { cham++; throw new Error('không được chạm D1') }, batch: () => { cham++; throw new Error('không được chạm D1') } } } as unknown as Env
+  const ban = { ngay: '2026-10-28', luc: 1000, dau: 'v3§x', sanh: null, chang: { rong } as never, phienMoi: 0 }
+  expect(await moChangSanSang(env, 'S1', 2000, ban)).toEqual(rong)
+  expect(cham).toBe(0)
+  expect(await moChangSanSang(env, 'S1', 2000, { ...ban, phienMoi: 1500 })).toBeNull() // có đợt mới hơn bản sẵn ⇒ đường thường
+})
+
+it('đàn đọc dồn: D1 chậm hơn 240 ms ⇒ lượt đồng thời CHỜ lượt đang đọc (chiến dịch, cờ cấu hình) — một lượt D1 thay vì mỗi lượt một', async () => {
+  const d = taoD1That()
+  const goc = d.env as unknown as Env
+  let lan = 0
+  const cham = (q: string) => /FROM chien_dich WHERE trang_thai <> 'da_huy' OR|FROM cau_hinh WHERE khoa/.test(q)
+  const env = { ...goc, DB: { ...goc.DB, prepare: (q: string) => {
+    const st = (goc.DB as unknown as { prepare(x: string): Record<string, (...a: unknown[]) => unknown> }).prepare(q)
+    if (!cham(q)) return st
+    const boc = (x: Record<string, (...a: unknown[]) => unknown>): Record<string, unknown> => ({ bind: (...a: unknown[]) => boc(x.bind!(...a) as never), all: async () => { lan++; await new Promise((r) => setTimeout(r, 400)); return x.all!() }, first: async () => { lan++; await new Promise((r) => setTimeout(r, 400)); return x.first!() } })
+    return boc(st)
+  } } } as unknown as Env
+  xoaDemChienDich()
+  await Promise.all([docChienDichCuaEm(env, 'S1'), docChienDichCuaEm(env, 'S2'), docChienDichCuaEm(env, 'S3')])
+  expect(lan).toBe(1)
+  lan = 0
+  xoaDemCauHinh(env)
+  await Promise.all([docCauHinhDem(env, 'omni'), docCauHinhDem(env, 'omni'), docCauHinhDem(env, 'omni')])
+  expect(lan).toBe(1)
 })
