@@ -32,7 +32,7 @@ describe('laLoiThieuManh', () => {
 
 describe('taiLaiMotLan', () => {
   // Chặn jsdom kêu "Not implemented: navigation" mỗi lần gọi reload thật.
-  beforeEach(() => vi.stubGlobal('location', { reload: () => {} }))
+  beforeEach(() => vi.stubGlobal('location', { href: 'https://x/hs', reload: () => {}, replace: () => {} }))
   afterEach(() => vi.unstubAllGlobals())
 
   it('lần đầu thì tải lại và ghi mốc thời gian', () => {
@@ -72,59 +72,70 @@ describe('napDong', () => {
   it('thiếu mảnh thì đổi thành câu tiếng Việt nói đúng việc phải làm', async () => {
     const noi = vi.fn()
     vi.stubGlobal('sessionStorage', khoGia())
-    vi.stubGlobal('location', { reload: noi })
+    vi.stubGlobal('location', { href: 'https://x/hs', replace: noi })
     await expect(napDong(() => Promise.reject(new TypeError('Failed to fetch dynamically imported module: /x.js')))).rejects.toThrow(/bản cũ/i)
     expect(noi).toHaveBeenCalledTimes(1)
     vi.unstubAllGlobals()
   })
 })
 
-describe('thiếu mảnh sau khi phát hành: chờ bản mới nhận quyền rồi mới tải lại (thầy 28/09 "bấm vào bị văng ra")', () => {
-  it('có service worker ⇒ xin kiểm bản mới, KHÔNG tải lại ngay; bản mới nhận quyền ⇒ tải lại đúng một lần', async () => {
-    const { taiLaiKhiCoBanMoi } = await import('../src/lib/nap-manh')
+describe('thiếu mảnh sau khi phát hành: tải lại NGAY (thầy 28/10: màn «Đang tải bản mới» đứng kèm chữ lỗi)', () => {
+  function datMoiTruong(dangKy: Record<string, unknown>) {
     const nghe: Record<string, () => void> = {}
-    const update = vi.fn(async () => {})
-    const sw = { addEventListener: (t: string, f: () => void) => { nghe[t] = f }, getRegistration: async () => ({ update }) }
+    const sw = { addEventListener: (t: string, f: () => void) => { nghe[t] = f }, getRegistration: async () => dangKy }
     const cuNav = Object.getOwnPropertyDescriptor(globalThis.navigator, 'serviceWorker')
     Object.defineProperty(globalThis.navigator, 'serviceWorker', { value: sw, configurable: true })
     const replace = vi.fn()
     const cuLoc = globalThis.location
     Object.defineProperty(globalThis, 'location', { value: { ...cuLoc, replace }, configurable: true })
-    vi.useFakeTimers()
-    try {
-      taiLaiKhiCoBanMoi('https://x/?_moi=1', 8000)
-      await Promise.resolve(); await Promise.resolve()
-      expect(update).toHaveBeenCalled()
-      expect(replace).not.toHaveBeenCalled()
-      nghe.controllerchange!()
-      expect(replace).toHaveBeenCalledTimes(1)
-      vi.advanceTimersByTime(9000)
-      expect(replace).toHaveBeenCalledTimes(1)
-    } finally {
-      vi.useRealTimers()
+    const tra = () => {
       Object.defineProperty(globalThis, 'location', { value: cuLoc, configurable: true })
       if (cuNav) Object.defineProperty(globalThis.navigator, 'serviceWorker', cuNav)
     }
-  })
-  it('bản mới không tới ⇒ hết 8 giây vẫn tải lại', async () => {
+    return { nghe, replace, tra }
+  }
+  it('không có bản SW nằm chờ ⇒ tải lại ngay (đường `_moi` đi thẳng ra mạng), vẫn xin kiểm bản mới', async () => {
     const { taiLaiKhiCoBanMoi } = await import('../src/lib/nap-manh')
-    const sw = { addEventListener: () => {}, getRegistration: async () => ({ update: async () => {} }) }
-    const cuNav = Object.getOwnPropertyDescriptor(globalThis.navigator, 'serviceWorker')
-    Object.defineProperty(globalThis.navigator, 'serviceWorker', { value: sw, configurable: true })
-    const replace = vi.fn()
-    const cuLoc = globalThis.location
-    Object.defineProperty(globalThis, 'location', { value: { ...cuLoc, replace }, configurable: true })
+    const update = vi.fn(async () => {})
+    const mt = datMoiTruong({ update, waiting: null })
     vi.useFakeTimers()
     try {
-      taiLaiKhiCoBanMoi('https://x/', 8000)
-      vi.advanceTimersByTime(7999)
-      expect(replace).not.toHaveBeenCalled()
+      taiLaiKhiCoBanMoi('https://x/?_moi=1')
+      await Promise.resolve(); await Promise.resolve(); await Promise.resolve()
+      expect(update).toHaveBeenCalled()
+      expect(mt.replace).toHaveBeenCalledTimes(1)
+      expect(mt.replace).toHaveBeenCalledWith('https://x/?_moi=1')
+      vi.advanceTimersByTime(9000)
+      expect(mt.replace).toHaveBeenCalledTimes(1)
+    } finally { vi.useRealTimers(); mt.tra() }
+  })
+  it('bản SW mới đang nằm chờ ⇒ nhắn SKIP_WAITING, nhận quyền thì tải lại đúng một lần', async () => {
+    const { taiLaiKhiCoBanMoi } = await import('../src/lib/nap-manh')
+    const postMessage = vi.fn()
+    const mt = datMoiTruong({ update: async () => {}, waiting: { postMessage } })
+    vi.useFakeTimers()
+    try {
+      taiLaiKhiCoBanMoi('https://x/')
+      await Promise.resolve(); await Promise.resolve(); await Promise.resolve()
+      expect(postMessage).toHaveBeenCalledWith({ type: 'SKIP_WAITING' })
+      expect(mt.replace).not.toHaveBeenCalled()
+      mt.nghe.controllerchange!()
+      expect(mt.replace).toHaveBeenCalledTimes(1)
+      vi.advanceTimersByTime(5000)
+      expect(mt.replace).toHaveBeenCalledTimes(1)
+    } finally { vi.useRealTimers(); mt.tra() }
+  })
+  it('bản nằm chờ không nhận quyền ⇒ tối đa 1,5 giây vẫn tải lại', async () => {
+    const { taiLaiKhiCoBanMoi } = await import('../src/lib/nap-manh')
+    const mt = datMoiTruong({ update: async () => {}, waiting: { postMessage: () => {} } })
+    vi.useFakeTimers()
+    try {
+      taiLaiKhiCoBanMoi('https://x/')
+      await Promise.resolve(); await Promise.resolve()
+      vi.advanceTimersByTime(1499)
+      expect(mt.replace).not.toHaveBeenCalled()
       vi.advanceTimersByTime(2)
-      expect(replace).toHaveBeenCalledTimes(1)
-    } finally {
-      vi.useRealTimers()
-      Object.defineProperty(globalThis, 'location', { value: cuLoc, configurable: true })
-      if (cuNav) Object.defineProperty(globalThis.navigator, 'serviceWorker', cuNav)
-    }
+      expect(mt.replace).toHaveBeenCalledTimes(1)
+    } finally { vi.useRealTimers(); mt.tra() }
   })
 })

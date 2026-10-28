@@ -157,6 +157,11 @@ registerRoute(
 // vào màn hình chính gần như không bao giờ nhận được bản sửa.
 self.skipWaiting()
 clientsClaim()
+// Dây bảo hiểm (28/10): trang thiếu mảnh mã gặp bản SW đang nằm chờ (trình duyệt hoãn skipWaiting lúc cài) thì nhắn
+// SKIP_WAITING (`nap-manh.ts`, `daySangBanMoi`) — nhận và chiếm quyền ngay để lượt tải lại là lượt cuối.
+self.addEventListener('message', (event: ExtendableMessageEvent) => {
+  if ((event.data as { type?: string } | null)?.type === 'SKIP_WAITING') void self.skipWaiting()
+})
 
 // ─── BẢN MỚI TRÊN MÁY CHỦ: GỌI BẢN MỚI VỀ, TUYỆT ĐỐI KHÔNG TỰ HUỶ ────────
 //

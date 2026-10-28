@@ -93,6 +93,15 @@ jobs:
       # ra trang trắng.
       - run: npm run build:cf
 
+      # GIỮ MẢNH CŨ (28/10, thầy chụp "Failed to fetch dynamically imported module …StudentPortalScreen-….js"): mỗi lượt
+      # `pages deploy` thay TRỌN bản sống ⇒ mảnh băm tên của bản trước biến mất, máy còn chạy bản cũ (app nằm nền qua đêm
+      # phát hành nhiều lần) mở màn tải lười là văng. Chép lại vào dist/assets mảnh của ≥5 bản gần nhất + mọi bản trong 72 giờ,
+      # lấy từ chính bản sống (danh sách `manh-cu.json`). Chỉ đọc bản sống, không cần khoá; lỗi mạng không chặn phát hành.
+      - name: Giữ mảnh mã của các bản gần đây
+        continue-on-error: true
+        timeout-minutes: 6
+        run: node scripts/giu-manh-cu.mjs dist --goc https://omr-app-b3u.pages.dev --id ${{ github.sha }}
+
       # Secret dán thừa dòng/khoảng trắng làm wrangler hỏng ("invalid header value", run 499):
       # làm sạch một lần rồi mới đưa cho hai bước đẩy. Không in giá trị khoá.
       - name: Làm sạch khoá Cloudflare

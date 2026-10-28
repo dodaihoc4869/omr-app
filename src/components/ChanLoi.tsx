@@ -67,9 +67,10 @@ export default class ChanLoi extends Component<Props, State> {
             {napManh ? 'Đang tải bản mới của app' : `Màn ${this.props.o ?? 'này'} gặp lỗi`}
           </div>
           <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--nhat)' }}>
-            {napManh ? 'Máy đang giữ bản cũ nên app tự tải lại. Bài đã lưu vẫn còn nguyên. Chờ vài giây; nếu màn này vẫn đứng yên thì bấm Tải lại app.' : 'Dữ liệu đã lưu vẫn còn nguyên. Thầy quay về màn chính rồi vào lại; còn lỗi thì chụp dòng dưới gửi lại.'}
+            {napManh ? 'App có bản mới, đang tự tải lại. Bài đã lưu vẫn còn nguyên. Màn này đứng yên thì bấm Tải lại app.' : 'Dữ liệu đã lưu vẫn còn nguyên. Thầy quay về màn chính rồi vào lại; còn lỗi thì chụp dòng dưới gửi lại.'}
           </div>
-          <pre
+          {/* Thiếu mảnh (28/10): KHÔNG in chữ lỗi tiếng Anh của trình duyệt cho em — chi tiết đã ghi ở console (componentDidCatch). */}
+          {!napManh && <pre
             style={{
               fontFamily: 'ui-monospace, monospace',
               fontSize: 'var(--cx-1)',
@@ -85,7 +86,7 @@ export default class ChanLoi extends Component<Props, State> {
             }}
           >
             {loi.message || String(loi)}
-          </pre>
+          </pre>}
           <div className="flex" style={{ gap: 'var(--k3)', flexWrap: 'wrap' }}>
             {this.props.veManChinh && (
               <button
