@@ -42,7 +42,7 @@ jobs:
           console.log('dòng theo tháng / chưa chốt:', JSON.stringify(await q("SELECT substr(ngay,1,7) AS thang, COUNT(*) AS n, SUM(ket_qua IS NULL) AS chua_chot, MAX(cap_nhat_luc) AS moi_nhat FROM ke_hoach_ngay GROUP BY 1 ORDER BY 1")))
           console.log('hôm nay:', JSON.stringify(await q("SELECT COUNT(*) AS n, MAX(cap_nhat_luc) AS moi_nhat FROM ke_hoach_ngay WHERE ngay = date('now','+7 hours')")))
           // Mọi ADD COLUMN / CREATE TABLE trong server/migration-*.sql: cái nào CHƯA có trên D1 thật (chỉ đọc sqlite_master + pragma).
-          const fs = require('fs')
+          const fs = await import('node:fs')
           const bang = new Set((await q("SELECT name FROM sqlite_master WHERE type='table'")).map((x) => x.name))
           const cotCua = new Map()
           const thieuCot = [], thieuBang = []
@@ -104,7 +104,7 @@ jobs:
         run: |
           timeout $((PHUT*60)) npx -y wrangler@4 tail omr --format json > /tmp/tail.jsonl 2>/tmp/tail.err || true
           node - <<'JS'
-          const fs = require('fs')
+          const fs = await import('node:fs')
           const raw = fs.readFileSync('/tmp/tail.jsonl', 'utf8')
           const ev = []; let d = 0, s = -1, inStr = false, esc = false
           for (let i = 0; i < raw.length; i++) { const c = raw[i]
