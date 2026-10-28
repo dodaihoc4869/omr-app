@@ -149,6 +149,24 @@ describe('(4) Việc hôm nay trên máy chủ', () => {
     expect(await hsGhiViecNgay(d.env, { token: d.token, ngay: '2026-10-06', m: muc(12) }).then((r) => r.json())).toMatchObject({ ok: true, boQua: 'khac_ngay' })
     expect(await doc(d)).toBeUndefined()
   })
+  it('28/10 «sửa phải xong mới hiện chặng sau»: máy em báo khoá + phần ngày còn câu ⇒ máy chủ từ chối mở chặng (TU_SUA_TRUOC); xong 12 câu ⇒ mở; «Sửa thêm» không khoá lại; chưa báo khoá ⇒ không chặn', async () => {
+    const d = await dung()
+    const { docConPhanKhoa } = await import('../server/src/tu-sua-viec-ngay')
+    const { gameV2 } = await import('../server/src/game-v2')
+    await ghi(d, { m: muc(12), x: ['D0'], them: 0 })
+    const sbd = (await d.env.DB.prepare('SELECT sbd FROM tu_sua_viec_ngay').first<{ sbd: string }>())!.sbd
+    expect(await docConPhanKhoa(d.env, sbd)).toBe(0) // chưa báo khoá ⇒ không chặn
+    expect(await gameV2(d.env, 'hoc-tap-start', { token: d.token }).catch(() => ({}))).not.toMatchObject({ ma: 'TU_SUA_TRUOC' })
+    await ghi(d, { m: muc(12), x: [], them: 0, khoa: true })
+    expect(await docConPhanKhoa(d.env, sbd)).toBe(11)
+    for (const lenh of ['hoc-tap-start', 'hoc-tap-lam-lai']) expect(await gameV2(d.env, lenh, { token: d.token })).toMatchObject({ ok: false, ma: 'TU_SUA_TRUOC', conSua: 11 })
+    await ghi(d, { m: muc(12), x: muc(12).map((x) => x.d), them: 0 })
+    expect(await docConPhanKhoa(d.env, sbd)).toBe(0)
+    await ghi(d, { m: muc(16), x: [], them: 1 }) // «Sửa thêm 1 chặng»: 4 câu nối ở cuối
+    expect(await docConPhanKhoa(d.env, sbd)).toBe(0)
+    const sau = await gameV2(d.env, 'hoc-tap-start', { token: d.token }).catch((e: Error) => ({ loi: e.message }))
+    expect((sau as Record<string, unknown>).ma).not.toBe('TU_SUA_TRUOC')
+  })
   it('đợt em đã khép hôm nay ở màn sửa câu ⇒ có trong «đã xong» dù máy em chưa gửi', async () => {
     const d = await dung()
     await nop(d, '24')

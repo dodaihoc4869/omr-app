@@ -319,8 +319,9 @@ export function docViecNgay(v: unknown): ViecNgayMayChu | null {
   return { n: o.n, m, x, them: Math.max(0, Math.floor(Number(o.them) || 0)) }
 }
 /** Gửi NỀN việc hôm nay lên máy chủ (đổi máy vẫn cùng 12 câu). Lỗi ⇒ bỏ qua (bản đệm trên máy vẫn đúng). */
-export async function apiGhiViecNgay(token: string, v: ViecNgayMayChu): Promise<boolean> {
-  const j = await goi('viec-ngay', token, { ngay: v.n, m: v.m, x: v.x, them: v.them })
+export async function apiGhiViecNgay(token: string, v: ViecNgayMayChu, khoa = false): Promise<boolean> {
+  // `khoa` (28/10): Lộ trình đang khoá các chặng sau nút Tự sửa lỗi ⇒ máy chủ ghi một dòng / ngày để chặn mở chặng bằng lối khác (TU_SUA_TRUOC)
+  const j = await goi('viec-ngay', token, { ngay: v.n, m: v.m, x: v.x, them: v.them, ...(khoa ? { khoa: true } : {}) })
   return j?.ok === true
 }
 
