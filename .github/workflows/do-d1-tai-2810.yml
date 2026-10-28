@@ -1,0 +1,46 @@
+# ĐO TẢI D1 CAO ĐIỂM 28/10 (CHỈ ĐỌC): tổng thời gian chạy câu / giây (D1 xử lý tuần tự trên một luồng SQLite ⇒ >50% là xếp hàng), vùng đặt D1, và 40 nhóm câu theo TỔNG thời gian.
+name: Đo tải D1 cao điểm (chỉ đọc)
+on:
+  push:
+    branches: [claude/do-kiem-tra-cham-2810]
+    paths: ['.github/workflows/do-d1-tai-2810.yml']
+permissions:
+  contents: read
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đo
+        env:
+          TOKEN: ${{ env.CF_TOKEN_SACH }}
+          ACC: ${{ env.CF_ACC_SACH }}
+        run: |
+          node - <<'JS'
+          const { TOKEN, ACC } = process.env
+          const DB = 'd2e6d322-374a-45d7-83a3-9fac486b23f1'
+          const H = { authorization: `Bearer ${TOKEN}`, 'content-type': 'application/json' }
+          const info = await (await fetch(`https://api.cloudflare.com/client/v4/accounts/${ACC}/d1/database/${DB}`, { headers: H, signal: AbortSignal.timeout(30000) })).json()
+          const r = info.result ?? {}
+          console.log('D1 info:', JSON.stringify({ vung: r.running_in_region, chinh: r.primary_location_hint, replica: r.read_replication, kichThuocMB: Math.round((r.file_size ?? 0) / 1e6), soBang: r.num_tables }))
+          const hoi = async (query, variables) => {
+            const x = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ query, variables }), signal: AbortSignal.timeout(30000) })
+            const j = await x.json(); if (j.errors?.length) console.log('LỖI GraphQL:', JSON.stringify(j.errors).slice(0, 400)); return j.data
+          }
+          const den = new Date(Date.now() - 2 * 60000), tu = new Date(den.getTime() - 10 * 60000)
+          const q = `query($acc:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+            d1QueriesAdaptiveGroups(limit:10000,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[sum_queryDurationMs_DESC]){
+              count sum{queryDurationMs rowsRead rowsWritten} dimensions{query}}}}}`
+          const d = (await hoi(q, { acc: ACC, db: DB, tu: tu.toISOString(), den: den.toISOString() }))?.viewer?.accounts?.[0]?.d1QueriesAdaptiveGroups ?? []
+          const tongMs = d.reduce((n, x) => n + x.sum.queryDurationMs, 0), tongLan = d.reduce((n, x) => n + x.count, 0), giay = (den - tu) / 1000
+          console.log(`CỬA SỔ ${tu.toISOString().slice(11, 19)}–${den.toISOString().slice(11, 19)} UTC · ${d.length} nhóm · ${tongLan} câu (${(tongLan / giay).toFixed(0)}/giây) · tổng ${(tongMs / 1000).toFixed(0)} s chạy / ${giay} s thực = TẢI ${(100 * tongMs / 1000 / giay).toFixed(0)}% một luồng · dòng đọc ${d.reduce((n, x) => n + x.sum.rowsRead, 0)}`)
+          let luy = 0
+          console.log('Top theo TỔNG thời gian (lan · tổng s · tb ms · %tải tích lũy · dòng đọc TB · câu):')
+          for (const x of d.slice(0, 40)) { luy += x.sum.queryDurationMs; console.log([x.count, (x.sum.queryDurationMs / 1000).toFixed(1), (x.sum.queryDurationMs / x.count).toFixed(1), (100 * luy / tongMs).toFixed(0) + '%', Math.round(x.sum.rowsRead / x.count), '|', String(x.dimensions.query).replace(/\s+/g, ' ').slice(0, 170)].join(' · ')) }
+          JS
