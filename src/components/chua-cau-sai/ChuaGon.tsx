@@ -64,6 +64,8 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep, 
   // Ghi theo cả mã đợt và mã câu: mục Việc hôm nay có thể mang mã đợt khác với đợt vừa mở (xem daXong) ⇒ thiếu mã câu là kẹt vòng.
   const ghiXong = () => { ghiXongHomNay(dotId); ghiXongHomNay(qid) }
   useEffect(() => { if (khep) ghiXong() }, [khep, dotId, qid]) // eslint-disable-line react-hooks/exhaustive-deps
+  // 28/10 (thầy «Bỏ màn chưa sửa được câu này đi»): không mở được câu ở đây ⇒ đã tính xong phần hôm nay (trên) ⇒ sang câu kế ngay, không dừng ở khung báo.
+  useEffect(() => { if (!mo.ok && onTiep) onTiep() }, [mo.ok]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (kq) tieuDe.current?.focus() }, [kq])
 
   const de = mo.de

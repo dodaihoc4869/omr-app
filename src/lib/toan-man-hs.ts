@@ -106,14 +106,17 @@ export function giuToanManHs(): void {
       })
     }
 
-    const moi = () => { datMauThanh(); kiemLai() }
+    // 28/10 MƯỢT (hồ sơ mở lại Lộ trình CPU ×6: đọc màu nền ~190 ms ép tính kiểu cả trang giữa lúc màn đang dựng): đọc SAU khung vẽ (rAF → setTimeout)
+    // — kiểu vừa tính xong cho khung ấy nên `getComputedStyle` gần như không tốn.
+    const sauVe = (f: () => void) => requestAnimationFrame(() => { window.setTimeout(f, 0) })
+    const moi = () => { sauVe(datMauThanh); kiemLai() }
     if (document.readyState === 'complete') requestAnimationFrame(moi)
     else window.addEventListener('load', moi, { once: true })
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') kiemLai() })
     window.addEventListener('orientationchange', kiemLai)
     toanMan?.addEventListener?.('change', kiemLai)
-    toi?.addEventListener?.('change', () => requestAnimationFrame(datMauThanh))
-    window.setTimeout(datMauThanh, 1500) // CSS màn em nạp lười xong
+    toi?.addEventListener?.('change', () => sauVe(datMauThanh))
+    window.setTimeout(() => sauVe(datMauThanh), 1500) // CSS màn em nạp lười xong
   } catch {
     /* máy chặn: giữ nguyên như cũ */
   }

@@ -47,6 +47,10 @@ export interface PropsChuaCauSai {
   /** Chỗ của câu trong chặng sửa hôm nay — màn kiểu Duolingo («Trong» HS, 27/10) vẽ thanh tiến độ + màn xong chặng. */
   tienDo?: TienDoSua
 }
+/** 28/10: câu KHÔNG mở được vì chính câu ấy (hỏng, không còn lỗi, thiếu học liệu, đổi bản, đang giữ cho ca…) ⇒ tính xong phần hôm nay, sang câu kế. */
+const MA_CAU_HONG = new Set(['KHONG_MO_DUOC_CAU', 'KHONG_TIM_THAY', 'CHUA_CO_LOI', 'KHONG_CO_DOT', 'THIEU_HOC_LIEU', 'CAU_THAY_DOI', 'CHUA_CONG_BO', 'CAU_BI_BAO_VE', 'CHUA_DEN_HAN'])
+/** Chặn CHUNG cả phần sửa (ca kiểm tra đang mở, Kiểm tra ôn tập chưa làm, tính năng tắt, phiên hết) ⇒ giữ khung báo lý do (sang câu kế cũng bị chặn y vậy). */
+const MA_CHAN_CHUNG = new Set(['DANG_KIEM_TRA', 'KIEM_TRA_ON_TAP_TRUOC', 'FEATURE_TAT', 'CAN_DANG_NHAP', 'CHO_KIEM_QUYEN'])
 /** Mã lỗi của lệnh gọn (máy chủ ĐÃ có đường gọn) ⇒ vẫn ở đường gọn để báo thật; mã khác / mất mạng ⇒ lối cũ. */
 const MA_GON = new Set(['KHONG_MO_DUOC_CAU', 'KHONG_CO_DOT'])
 function IconVe() {
@@ -225,6 +229,19 @@ export default function ManChuaCauSai({
   const song = useRef(true),
     buocRef = useRef<HTMLHeadingElement>(null),
     goiRef = useRef(0)
+  /** 28/10 (thầy «Bỏ màn chưa sửa được câu này đi»): câu không mở được KHÔNG dừng ở khung lỗi (xem `xuLyKhongMo`). */
+  const thuLai = useRef(0)
+  /** Trả true khi đã xử lý (thử lại / sang câu kế); false ⇒ chặn chung, giữ khung báo lý do. */
+  const xuLyKhongMoRef = useRef<(r: { ma?: string }) => boolean>(() => false)
+  xuLyKhongMoRef.current = (r) => {
+    const ma = r.ma ?? ''
+    if (MA_CHAN_CHUNG.has(ma)) return false
+    if (!MA_CAU_HONG.has(ma) && thuLai.current < 2) { thuLai.current++; window.setTimeout(() => { if (song.current) setLanTai((x) => x + 1) }, 800 * thuLai.current); return true }
+    if (MA_CAU_HONG.has(ma)) ghiXongHomNay(qid)
+    ;(onTiep ?? onVe)()
+    return true
+  }
+  useEffect(() => { thuLai.current = 0 }, [qid])
   useEffect(() => {
     song.current = true
     return () => {
@@ -278,6 +295,7 @@ export default function ManChuaCauSai({
           khongMoRef.current(r.loi ?? 'Chưa mở được câu chữa.')
           return
         }
+        if (xuLyKhongMoRef.current(r)) return
         setLoi(r.loi ?? 'Chưa mở được câu chữa.')
         setTai(false)
         return
@@ -292,6 +310,7 @@ export default function ManChuaCauSai({
       const sau = phat ?? (await apiPhatItem(token, r.dotId))
       if (huy || n !== goiRef.current) return
       if (sau.ok) ap(sau)
+      else if (xuLyKhongMoRef.current(sau)) return
       else setLoi(sau.loi ?? 'Chưa tải được câu chữa.')
       setTai(false)
     })()

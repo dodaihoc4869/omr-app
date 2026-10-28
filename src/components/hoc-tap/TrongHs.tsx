@@ -296,9 +296,10 @@ function DuongChang({ ds, moDi, cam, moKhoa }: { ds: Nut[]; moDi: boolean; cam?:
       const p = [...d.querySelectorAll<HTMLElement>('.da-nut')].map((n) => { const q = n.getBoundingClientRect(); return [q.left + q.width / 2 - r.left, q.top + q.height / 2 - r.top] as const })
       setDuong(p.length < 2 ? '' : p.slice(1).reduce((s, b, i) => { const a = p[i]!, m = (a[1] + b[1]) / 2; return `${s} C${a[0]} ${m} ${b[0]} ${m} ${b[0]} ${b[1]}` }, `M${p[0]![0]} ${p[0]![1]}`))
     }
-    ve()
+    // 28/10 MƯỢT (hồ sơ mở lại CPU ×6: đo vị trí nút ngay trong layout effect ép tính bố cục ~110 ms giữa lượt dựng, rồi ResizeObserver vẽ lại lần nữa):
+    // chỉ vẽ ở lượt báo của ResizeObserver — chạy SAU bố cục mà khung vẽ vốn phải tính, TRƯỚC lần sơn ⇒ đường hiện cùng khung, không đo thừa.
     const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(ve) : null
-    ro?.observe(d)
+    if (ro) ro.observe(d); else ve()
     return () => ro?.disconnect()
   }, [ds.length])
   return <div ref={goc} className="da-duong" data-mo-di={moDi || undefined}>
