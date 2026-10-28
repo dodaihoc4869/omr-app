@@ -1,6 +1,6 @@
-moc worker chay
+worker chay
 noi=aws:ap-east-1
 ktcn-tat
-so_em=270
+so_em=135
 phut=12
-am=4
+am=3
