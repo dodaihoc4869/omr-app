@@ -251,6 +251,15 @@ it('cron chuẩn bị MỌI em còn đang nhận gói — kể cả gói đã QU
   expect((k.d.sql.prepare('SELECT luc FROM hoc_tap_san_sang WHERE sbd=?').get('S3') as { luc: number }).luc).toBe(dem + 180_000)
   vi.setSystemTime(muon + 60_000)
   expect(await cronSanSangDem(k.rawEnv, muon + 60_000, 10)).toBe(0) // mọi bản đã khớp dấu
+  // Em có gói TẠO SAU lúc lập bản (thầy vừa giao thêm câu cho lớp của em) ⇒ lập lại TRƯỚC, dù hạn mức chỉ 1 em/lượt (S3 sau S1 theo thứ tự chữ nhưng được ưu tiên).
+  k.d.sql.exec("INSERT INTO goi_bai_7(id,tick_id,lop,khoa_bai,ten,bat_dau,han,tao_luc) VALUES('g7:moi','tick-gia','12 - Lớp Thường','B9','Bài 9','2026-10-13','2026-10-19','2099-01-01T00:00:00.000Z')")
+  k.d.sql.exec("INSERT INTO goi_bai_7_em(goi_id,sbd,bat_dau,han) VALUES('g7:moi','S3','2026-10-13','2026-10-19')")
+  const luotGoiMoi = muon + 5 * 60_000
+  vi.setSystemTime(luotGoiMoi)
+  expect(await cronSanSangDem(k.rawEnv, luotGoiMoi, 1)).toBe(1) // dấu chung đổi ⇒ mọi bản lệch; hạn mức 1 ⇒ chỉ S3 (có gói mới)
+  expect((k.d.sql.prepare('SELECT luc FROM hoc_tap_san_sang WHERE sbd=?').get('S3') as { luc: number }).luc).toBe(luotGoiMoi)
+  expect((k.d.sql.prepare('SELECT luc FROM hoc_tap_san_sang WHERE sbd=?').get('S1') as { luc: number }).luc).toBe(muon)
+  k.d.sql.exec("DELETE FROM goi_bai_7_em WHERE goi_id='g7:moi'; DELETE FROM goi_bai_7 WHERE id='g7:moi'")
 })
 
 it('hạn mức cron theo khung giờ: đêm 10 · sáng 6 · chiều 16 · tối 6 · 00:00–00:14 nghỉ', async () => {
