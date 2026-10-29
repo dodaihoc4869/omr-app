@@ -1,0 +1,40 @@
+# ĐẾM «ĐÃ TẢI SẴN CHO TỪNG EM CHƯA» (CHỈ ĐỌC) — thầy 29/10: «Đã tải sẵn hết lộ trình ngày hôm nay cho từng hs chưa?». Chỉ SELECT gộp: không mã em, không tên.
+name: Đếm bộ nạp sẵn Sảnh + chặng (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/do-san-sang-2910]
+    paths: ['.github/workflows/do-san-sang-2910.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-san-sang-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm (chỉ SELECT)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c ".[0].results" || echo "(lỗi)"; }
+          echo "Giờ VN: $(TZ=Asia/Ho_Chi_Minh date '+%d/%m %H:%M')"
+          HOM="date('now','+7 hours')"
+          q "tổng em có tài khoản / em có lớp" "SELECT COUNT(*) tong, SUM(COALESCE(lop,'')<>'') co_lop FROM hoc_sinh"
+          q "bộ nạp sẵn: tổng dòng · của hôm nay · có phần Sảnh · có phần chặng" "SELECT COUNT(*) tong, SUM(ngay=$HOM) hom_nay, SUM(ngay=$HOM AND sanh_json IS NOT NULL) co_sanh, SUM(ngay=$HOM AND chang_json IS NOT NULL) co_chang FROM hoc_tap_san_sang"
+          q "bộ nạp sẵn hôm nay theo giờ VN lúc ghi (giờ: số em)" "SELECT strftime('%H', luc/1000, 'unixepoch', '+7 hours') gio, COUNT(*) n FROM hoc_tap_san_sang WHERE ngay=$HOM GROUP BY 1 ORDER BY 1"
+          q "em có làm câu hôm nay: số em · số em có bộ nạp sẵn hôm nay GHI SAU lần làm cuối (còn mới) · ghi TRƯỚC lần làm cuối (cũ ⇒ Sảnh chậm)" \
+            "WITH a AS (SELECT sbd, MAX(CAST(strftime('%s', received_at) AS INTEGER)*1000) cuoi FROM su_kien_hoc WHERE ngay_vn=$HOM GROUP BY sbd) SELECT COUNT(*) em_lam, SUM(s.sbd IS NOT NULL AND s.luc>=a.cuoi) con_moi, SUM(s.sbd IS NOT NULL AND s.luc<a.cuoi) cu, SUM(s.sbd IS NULL OR s.ngay<>$HOM) chua_co FROM a LEFT JOIN hoc_tap_san_sang s ON s.sbd=a.sbd"
+          q "em đang học (có làm câu trong 7 ngày): số em · có bộ nạp sẵn HÔM NAY" \
+            "WITH a AS (SELECT DISTINCT sbd FROM su_kien_hoc WHERE ngay_vn>=date('now','+7 hours','-6 days')) SELECT COUNT(*) em_hoc, SUM(s.ngay=$HOM) co_hom_nay FROM a LEFT JOIN hoc_tap_san_sang s ON s.sbd=a.sbd"
+          q "cấu hình nạp đêm / bật Gói 7" "SELECT khoa, substr(gia_tri,1,80) v FROM cau_hinh WHERE khoa IN ('goi_bai_7_v1','san_sang_dem','tat_san_sang')"
