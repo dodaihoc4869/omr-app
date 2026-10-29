@@ -88,7 +88,8 @@ function tongHop(): void {
 const now = Date.now()
 const ngay = ngayVn7(now)
 ra(`BẮT ĐẦU · chế độ ${CHE_DO} · hôm nay (VN) ${ngay} · song song ${SONG_SONG}`)
-const dsEm = (await hoi('SELECT sbd FROM goi_bai_7_muc_ngay WHERE ngay=? ORDER BY sbd', [ngay])).map((r) => String(r.sbd))
+const LOP = process.env.OMR_LOP ?? '' // 29/10: chỉ lớp này (vd. '11') — thầy vừa giao bài mới cho lớp 11, em thấy «đã hoàn thành» khi chưa học gì
+const dsEm = (await hoi(LOP ? "SELECT m.sbd FROM goi_bai_7_muc_ngay m JOIN hoc_sinh h ON h.sbd=m.sbd WHERE m.ngay=? AND (h.lop=? OR h.ten_lop LIKE ?) ORDER BY m.sbd" : 'SELECT sbd FROM goi_bai_7_muc_ngay WHERE ngay=? ORDER BY sbd', LOP ? [ngay, LOP, LOP + '%'] : [ngay])).map((r) => String(r.sbd))
 ra(`em có mức Gói 7 đã chốt hôm nay: ${dsEm.length}`)
 
 async function xet(sbd: string, i: number): Promise<void> {

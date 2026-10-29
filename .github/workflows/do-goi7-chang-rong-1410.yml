@@ -38,7 +38,12 @@ jobs:
           cp scripts/do-goi7-chang-rong-1410.ts /tmp/main/scripts/ && ln -s "$PWD/node_modules" /tmp/main/node_modules
           (cd /tmp/main && npx esbuild scripts/do-goi7-chang-rong-1410.ts --bundle --platform=node --format=esm --target=node22 --external:node:sqlite --outfile=/tmp/do-g7-truoc.mjs --log-level=warning)
           npx esbuild scripts/do-goi7-chang-rong-1410.ts --bundle --platform=node --format=esm --target=node22 --external:node:sqlite --outfile=/tmp/do-g7-sau.mjs --log-level=warning
-          echo '=== TRƯỚC (main) ==='
-          OMR_SONG_SONG=3 OMR_GIOI_HAN_MS=700000 timeout 760 node --no-warnings /tmp/do-g7-truoc.mjs | grep -v '^\[chan-khac-khoi\]' || echo "(thoát mã $?)"
-          echo '=== SAU (nhánh sửa) ==='
-          OMR_SONG_SONG=3 OMR_GIOI_HAN_MS=700000 timeout 760 node --no-warnings /tmp/do-g7-sau.mjs | grep -v '^\[chan-khac-khoi\]' || echo "(thoát mã $?)"
+          echo '=== GÓI VÀ BÀI ĐÃ DẠY CỦA LỚP 11 (đếm) ==='
+          cd server
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c ".[0].results" || echo "(lỗi)"; }
+          q "gói lớp 11: tên · bài · hạn · số em · tạo lúc UTC" "SELECT g.lop, g.ten, g.bat_dau, g.han, COUNT(e.sbd) so_em, substr(g.tao_luc,1,16) tao FROM goi_bai_7 g LEFT JOIN goi_bai_7_em e ON e.goi_id=g.id WHERE g.lop LIKE '11%' GROUP BY g.id ORDER BY g.tao_luc DESC LIMIT 6"
+          q "bài đã dạy lớp 11 (tick)" "SELECT lop, ten_bai, substr(tick_luc,1,16) tick, substr(COALESCE(bo_tick_luc,''),1,16) bo FROM bai_da_day WHERE lop LIKE '11%' ORDER BY tick_luc DESC LIMIT 6"
+          q "lớp 11: bản sẵn hôm nay theo loại chặng (rỗng / có câu / không có phần chặng) và giờ ghi" "SELECT CASE WHEN s.chang_json IS NULL THEN 'khong_chang' WHEN json_extract(s.chang_json,'\$.rong') IS NOT NULL THEN 'RONG' ELSE 'co_cau' END loai, COUNT(*) n, MAX(strftime('%H:%M', s.luc/1000, 'unixepoch', '+7 hours')) ghi_muon_nhat FROM hoc_tap_san_sang s JOIN hoc_sinh h ON h.sbd=s.sbd WHERE s.ngay=date('now','+7 hours') AND (h.lop='11' OR h.ten_lop LIKE '11%') GROUP BY 1"
+          cd ..
+          echo '=== MỞ CHẶNG THẬT, LỚP 11, mã máy chủ main (chỉ đọc) ==='
+          OMR_LOP=11 OMR_SONG_SONG=3 OMR_GIOI_HAN_MS=700000 timeout 760 node --no-warnings /tmp/do-g7-sau.mjs | grep -v '^\[chan-khac-khoi\]' || echo "(thoát mã $?)"
