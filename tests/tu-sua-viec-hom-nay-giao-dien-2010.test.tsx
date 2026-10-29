@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 // VIỆC HÔM NAY của Tự sửa lỗi — GIAO DIỆN (thầy 20/10: "cho sửa ít nhất 12 câu mỗi ngày, chia làm các chặng cho thông minh và cảm hứng").
 // Khoá: thẻ ở Hôm nay (4 trạng thái, bấm mở THẲNG câu kế tiếp, không có phiên ⇒ thẻ cũ), khối đầu màn Tự sửa lỗi (một chặng 4 câu, chặng sau gọn một dòng,
-// danh sách đầy đủ gập lại, nút chính tới câu kế tiếp, xong cả ngày ⇒ Về Hôm nay + Sửa thêm 1 chặng), một dòng điều kiện ở bản mới, tiêu đề sau khi nộp.
+// danh sách đầy đủ gập lại, nút chính tới câu kế tiếp, xong cả ngày ⇒ Về Hôm nay, KHÔNG còn Sửa thêm — thầy 29/10), một dòng điều kiện ở bản mới, tiêu đề sau khi nộp.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 
@@ -66,7 +66,7 @@ describe('Thẻ ở Hôm nay', () => {
     expect(onChua).toHaveBeenCalledWith('m0')
   })
 
-  it('đã xong phần của vài câu ⇒ nói đúng việc đã làm và nút "Sửa tiếp · chặng k/n"; xong cả ngày ⇒ thẻ xanh + "Sửa thêm 1 chặng"', async () => {
+  it('đã xong phần của vài câu ⇒ nói đúng việc đã làm và nút "Sửa tiếp · chặng k/n"; xong cả ngày ⇒ thẻ xanh, KHÔNG còn nút sửa thêm (thầy 29/10: sửa hết câu của ngày thì không cho sửa thêm)', async () => {
     dangNhap()
     const ds = mot(30, 'can_chan_doan', 'm')
     const { onChua } = await ve(ds)
@@ -84,8 +84,9 @@ describe('Thẻ ở Hôm nay', () => {
     const xong = await screen.findByRole('region', { name: /xong phần của 12 câu/ })
     expect(xong.getAttribute('data-tt')).toBe('xong')
     expect(xong.textContent).toContain('Còn 18 câu cho các ngày sau.')
-    fireEvent.click(within(xong).getByRole('button', { name: 'Sửa thêm 1 chặng' }))
-    expect(onChua).toHaveBeenLastCalledWith('m12')
+    expect(within(xong).queryByRole('button')).toBeNull() // không nút «Sửa thêm 1 chặng», không nút nào mở thêm câu
+    expect(xong.textContent).not.toContain('Sửa thêm')
+    expect(onChua).toHaveBeenCalledTimes(1) // chỉ lần bấm «Sửa tiếp · chặng 2/3» ở trên
   })
 
   it('không có phiên đăng nhập ⇒ thẻ CŨ y nguyên (một con số, một nút)', async () => {
@@ -127,7 +128,7 @@ describe('Màn Tự sửa lỗi: Việc hôm nay', () => {
     expect(await screen.findByText('Đang chữa g0')).toBeTruthy()
   })
 
-  it('xong chặng 1 ⇒ "Đã xong chặng 1/3" và nút "Sửa tiếp · chặng 2/3"; xong cả ngày ⇒ Về Hôm nay + Sửa thêm 1 chặng', async () => {
+  it('xong chặng 1 ⇒ "Đã xong chặng 1/3" và nút "Sửa tiếp · chặng 2/3"; xong cả ngày ⇒ Về Hôm nay, không Sửa thêm (thầy 29/10)', async () => {
     dangNhap()
     api.apiDanhSachTuChua.mockResolvedValue(bat(DANH_SACH))
     // Dựng (và lưu) việc hôm nay TRƯỚC, rồi mới ghi xong 4 câu đầu — như em làm thật (ghi trước khi dựng thì câu vừa làm bị xoay xuống sau).
@@ -148,7 +149,9 @@ describe('Màn Tự sửa lỗi: Việc hôm nay', () => {
     expect(await screen.findByRole('heading', { name: 'Hôm nay em đã xong phần của 12 câu' })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Về Hôm nay' }))
     expect(onVe).toHaveBeenCalledOnce()
-    expect(screen.getByRole('button', { name: 'Sửa thêm 1 chặng' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Sửa thêm 1 chặng' })).toBeNull() // đã sửa đủ ⇒ không cho sửa thêm
+    expect(screen.getByText('Em đã sửa đủ phần hôm nay. Những câu còn lại để ngày mai nhé.')).toBeTruthy()
+    expect(screen.queryByText('Tất cả câu cần sửa')).toBeNull() // danh sách câu còn lại bị ẩn (chỉ còn nhóm đã xong để xem lại)
   })
 
   it('không có SBD ⇒ giao diện danh sách cũ (không việc hôm nay)', async () => {

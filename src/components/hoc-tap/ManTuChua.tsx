@@ -23,7 +23,7 @@ import { docNhoTuSua, nhomMucChua, taiTuSuaLoi, type NhomMucChua } from '../../l
 import { napTruocCauSua } from '../../lib/nap-truoc-sua'
 /** Bản nhớ danh sách còn mới (ms) để vẽ ngay khi mở màn Tự sửa lỗi; quá hạn ⇒ khung chờ như cũ. */
 const NHO_VE_NGAY_MS = 120_000
-import { dungViecHomNay, docSbdHs, luuViecHomNay, themMotChang } from '../../lib/tu-sua-viec-hom-nay'
+import { dungViecHomNay, docSbdHs, luuViecHomNay } from '../../lib/tu-sua-viec-hom-nay'
 import ViecHomNay from './ViecHomNay'
 import { useDanhDauHt2 } from './HocTapHomNay'
 import type { ViecHomNay as KieuViecHomNay, ViecMuc } from '../../lib/tu-sua-viec-hom-nay'
@@ -190,9 +190,13 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
   const dong = useMemo(() => (kq?.trangThai === 'bat' ? kq.ds.map((m, i) => dungDong(m, i, cdl, Date.now())) : []), [kq, cdl])
   // VIỆC HÔM NAY (thầy 20/10): tối thiểu 12 câu/ngày chia chặng 4 câu; cần SBD để giữ ổn định trong ngày — thiếu ⇒ danh sách cũ.
   const sbd = useMemo(() => docSbdHs(), [])
-  const [lanThem, setLanThem] = useState(0)
-  const { viec, luu, day } = useMemo(() => (sbd ? dungViecHomNay(kq, Date.now(), sbd) : { viec: null, luu: null, day: null }), [kq, sbd, lanThem])
+  const { viec, luu, day } = useMemo(() => (sbd ? dungViecHomNay(kq, Date.now(), sbd) : { viec: null, luu: null, day: null }), [kq, sbd])
   useEffect(() => { luuViecHomNay(luu, day ?? null) }, [luu, day])
+  // KHÔNG CHO SỬA THÊM (thầy 29/10 «Phần sửa lỗi sai sau khi làm hết câu cần sửa thì không cho sửa thêm nữa»): đã xong HẾT việc hôm nay ⇒ không còn «Sửa thêm 1 chặng», danh sách câu
+  // còn lại bị ẩn và không mở được (để các ngày sau); câu ĐÃ xong hôm nay vẫn «Xem lại» được, câu thầy yêu cầu kiểm lại (`kiemHoiThay`) vẫn mở.
+  const daDuHomNay = !!viec && viec.tong > 0 && !viec.tiep
+  const xongHomNayQ = useMemo(() => new Set((viec?.muc ?? []).filter((x) => x.xong).map((x) => x.m.qid)), [viec])
+  const [baoDu, setBaoDu] = useState(false)
   // 29/10 (thầy «Mở câu quá lâu»): câu CHƯA XONG kế tiếp của Việc hôm nay (khác câu đang mở) ⇒ mở sẵn ở máy chủ lúc em còn xem danh sách / làm câu trước; bấm vào là có ngay.
   // Trễ 1,2 giây để không tranh lượt với chính lần mở em vừa bấm.
   const tiepNap = viec?.muc.find((x) => !x.xong && !x.m.kiemHoiThay && x.m.qid !== chon?.qid)?.m.qid
@@ -217,11 +221,12 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
       const m = timMucChua(kq.ds, doi)
       const k = kq.kiemLaiHoiThay?.find((x) => laKhoaHoSo(doi) ? khoaMoChua(x.qid) === doi : goc(x.qid) === goc(doi))
       // Khoá từ Hồ sơ không có trong danh sách (đã sửa xong / chưa vào vòng chữa) ⇒ không "thử mở" bằng khoá băm: hiện danh sách kèm lời báo.
+      if (daDuHomNay && !k && !(m && (m.kiemHoiThay || m.trangThai === 'da_tu_sua' || xongHomNayQ.has(m.qid)))) { setBaoDu(true); setBao(null); setDoi(''); return } // đã sửa đủ hôm nay: không mở câu mới
       if (!m && !k && laKhoaHoSo(doi)) setBao({ qid: doi, loi: kq.sau ? 'Câu em chọn chưa nằm trong phần đã tải. Em xem tiếp danh sách nhé.' : 'Câu này chưa có trong Tự sửa lỗi của em.' })
       else setChon(m ? { qid: m.qid, kiemHoiThay: m.kiemHoiThay } : k ? { qid: k.qid, ten: k.ten, kiemHoiThay: true } : { qid: doi, thu: true })
       setDoi('')
     } else if (kq.trangThai === 'tat') setDoi('')
-  }, [kq, doi])
+  }, [kq, doi, daDuHomNay, xongHomNayQ])
   useEffect(() => {
     if (!bao || !laKhoaHoSo(bao.qid) || kq?.trangThai !== 'bat') return
     const m = timMucChua(kq.ds, bao.qid)
@@ -248,6 +253,8 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
   }, [chon, kq])
 
   const moCau = (d: DongChua) => {
+    if (daDuHomNay && d.nhom !== 'xong' && !d.m.kiemHoiThay && !xongHomNayQ.has(d.m.qid)) { setBaoDu(true); return } // đã sửa đủ hôm nay (thầy 29/10): câu còn lại để ngày mai
+    setBaoDu(false)
     viTri.current = { top: khungCuon(gocRef.current)?.scrollTop ?? 0, khoa: d.m.dotId ?? d.m.qid }
     setBao(null)
     setChon({ qid: d.m.qid, kiemHoiThay: d.m.kiemHoiThay })
@@ -392,13 +399,12 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
                   viec={viec} soXong={soXong} tong={tong} soCan={soCan} xongHomNay={dem?.xongHomNay} nayMs={Date.now()}
                   thongTin={(m, i) => { const d = dungDong(m, i, cdl, Date.now()); return { ten: d.ten, phu: d.phu, trangThai: d.trangThai } }}
                   onChon={(m, i) => moCau(dungDong(m, i, cdl, Date.now()))}
-                  onThem={() => { themMotChang(kq); setLanThem((n) => n + 1) }}
                   onVe={onVe} /></div>
               : <TheTong can={can} soCan={soCan} soCho={soCho} soXong={soXong} tong={tong} onChon={moCau} onVe={onVe} onTaiThem={kq.sau ? () => void taiThem() : undefined} dangThem={dangThem} />}
             <div className="tcl-ds">
               {(['can', 'cho', 'xong'] as Nhom[]).map((n) => {
                 const ds = dong.filter((d) => d.nhom === n)
-                if (!ds.length) return null
+                if (!ds.length || (daDuHomNay && n !== 'xong')) return null // đã sửa đủ hôm nay: ẩn các câu còn lại (không cho sửa thêm)
                 // Có việc hôm nay ⇒ danh sách đầy đủ gập lại (em không phải nhìn cả trăm câu một lúc).
                 return viec && viec.tong > 0
                   ? <details className="vh-gap" key={n}><summary><b>{n === 'can' ? 'Tất cả câu cần sửa' : TEN_NHOM[n]}</b><span>{dem?.[n] ?? ds.length} câu</span></summary><DanhSach nhom={n} ds={ds} tong={dem?.[n]} onChon={moCau} /></details>
@@ -407,7 +413,8 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
             </div>
           </div>
         )}
-        {kq?.trangThai === 'bat' && (kq.sau || loiThem) && <div className="tcl-nhom" style={{ marginTop: 'var(--k3)' }}>
+        {baoDu && daDuHomNay && <div className="tcl-bao" role="status"><span className="tcl-bao-chu"><b>Hôm nay em đã sửa đủ phần của mình rồi</b><small>Những câu còn lại để ngày mai nhé.</small></span></div>}
+        {kq?.trangThai === 'bat' && !daDuHomNay && (kq.sau || loiThem) && <div className="tcl-nhom" style={{ marginTop: 'var(--k3)' }}>
           <p className="ht2-phu">Đã tải {kq.ds.length}/{tong} câu trong danh sách.</p>
           {loiThem && <p className="ht2-loi" role="alert">{loiThem}</p>}
           {kq.sau && <button type="button" className="ht-nut-phu" disabled={dangThem} onClick={() => void taiThem()}>{dangThem ? 'Đang tải thêm…' : 'Xem tiếp các câu'}</button>}
