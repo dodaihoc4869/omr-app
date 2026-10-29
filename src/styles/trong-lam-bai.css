@@ -699,7 +699,8 @@
  * TRONG tấm (không cắt), «Lời giải từng bước» · «Hỏi thầy» · «Tiếp tục» luôn thấy. */
 [data-trong] .duo-ket { display: flex; flex-direction: column; max-height: 58dvh; }
 [data-trong] .duo-ket > .duo-giua { flex: 0 1 auto; min-height: 0; }
-[data-trong] .duo-ket .duo-kq { flex: 0 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+/* 29/10 (thầy: «bỏ cái thanh trượt màu xám ở phần này đi»): `overflow-y: auto` kéo theo `overflow-x: auto` ⇒ máy tính hiện thanh trượt NGANG xám dưới dòng giải thích. Chỉ cuộn dọc. */
+[data-trong] .duo-ket .duo-kq { flex: 0 1 auto; min-height: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; }
 @media (orientation: landscape) and (max-height: 500px) { [data-trong] .duo-ket { max-height: none; } }
 /* tên bài/dạng ở nhãn đầu câu có công thức (C5H13N, HCl, NaOH): viết HOA làm sai công thức («HCL», «NAOH») ⇒ giữ nguyên hoa/thường, chỉ số dưới đúng */
 [data-trong] .duo-nhan [data-cong-thuc] { text-transform: none; letter-spacing: 0; }
