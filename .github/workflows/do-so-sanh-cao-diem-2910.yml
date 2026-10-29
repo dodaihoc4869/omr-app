@@ -77,6 +77,7 @@ jobs:
             const theoTt = {}
             for (const r of ds) theoTt[r.dimensions.status] = (theoTt[r.dimensions.status] ?? 0) + r.sum.requests
             console.log(`${ten}: tổng khác success = ${ds.reduce((n, r) => n + r.sum.requests, 0)} · theo trạng thái: ${JSON.stringify(theoTt)}`)
+            { const cao = ds.filter((r) => { const h = +gioVn(r.dimensions.datetimeHour); return h >= 19 && h <= 22 }), t = {}; for (const r of cao) t[r.dimensions.status] = (t[r.dimensions.status] ?? 0) + r.sum.requests; console.log(`   >>> KHUNG 19–23h VN ${ten}: ${JSON.stringify(t)} · yêu cầu cả khung=${KQ[d].w.filter((x) => { const h = +gioVn(x.dimensions.datetimeHour); return h >= 19 && h <= 22 }).reduce((n, x) => n + x.sum.requests, 0)}`) }
             console.log('   ' + ds.map((r) => `${gioVn(r.dimensions.datetimeHour)}h:${r.dimensions.status}=${r.sum.requests}`).join(' '))
           }
           JS
