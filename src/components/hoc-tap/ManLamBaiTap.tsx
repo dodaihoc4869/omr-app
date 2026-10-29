@@ -178,14 +178,15 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   homNay?: SoHomNay | null
 }) {
   // 29/10 tối (thầy «làm cho app hs load tức thì kể cả giờ cao điểm»): lượt mở trước đã về sẵn ở Lộ trình / màn kết chặng ⇒ nạp ĐỒNG BỘ ngay từ khung vẽ đầu (0 ms, không chớp khung chờ).
-  const docMoNgay = (tk: string) => {
-    const r = layChangMoTruocNgay(tk)
+  const docMoNgay = (tk: string, chiXem = false) => {
+    const r = layChangMoTruocNgay(tk, Date.now(), chiXem)
     if (!r || !r.ok || !Array.isArray(r.questions)) return null
     const ds = r.questions as Cau[]
     if (!ds.length || ds.some(cauHong)) return null
     return { ds, id: typeof r.id === 'string' ? r.id : '', g7: docTomTatGoi7(r.goi7) }
   }
-  const [mo0] = useState(() => docMoNgay(token))
+  // Lượt dựng đầu chỉ XEM lượt mở trước (React có thể bỏ lượt dựng này rồi dựng lại); effect lúc màn đã hiện thật mới LẤY (mo-chang-truoc.ts `chiXem`).
+  const [mo0] = useState(() => docMoNgay(token, true))
   const daNapMo0 = useRef(!!mo0)
   // GÓI CẢ NGÀY (mo-chang-truoc.ts): không có lượt mở trước đã về ⇒ chặng kế trong gói trên máy hiện NGAY từ khung vẽ đầu (đề công khai, bỏ tem dài); phiên mở NỀN ở effect.
   // Số «đã làm» của gói (lúc lập) có thể cũ hơn Lộ trình ⇒ lấy số lớn hơn.
@@ -299,7 +300,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   if (!tai && chang === null && homNayHien?.chang) setChang(homNayHien.chang)
   const khoa = q ? `hoc-tap:nhap:${sbd}:${q.qid}:${q.version}` : ''
   useEffect(() => {
-    if (daNapMo0.current && lan === 0) { daNapMo0.current = false; return }
+    if (daNapMo0.current && lan === 0) { daNapMo0.current = false; layChangMoTruocNgay(token); return }
     let huy = false
     luotChang.current = 0; lamLaiSom.current = null; phienCho.current = null
     const san = docMoNgay(token)
