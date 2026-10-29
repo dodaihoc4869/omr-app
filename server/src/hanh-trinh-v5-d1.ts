@@ -132,6 +132,13 @@ export async function boChonV5(env:Env,sbd:string,now:number,hs:HoSo2,q:Readonly
   }
   const seen=new Set([...daGap,...qs.map(o=>o.nhom)])
   out.ungNgoai=ds.filter(c=>!hs.meta.has(c.qid)).flatMap(c=>{const access=quyenCau(c.q,c.tang,m,omni,c.nhan);return access.quyen==='sua_nen'?[]:[{qid:c.qid,nhom:c.q.contentGroup||c.qid,moi:!seen.has(c.q.contentGroup||c.qid),hoc:access.quyen==='hoc'}]}).sort((a,b)=>Number(b.hoc)-Number(a.hoc)||Number(b.moi)-Number(a.moi)||a.qid.localeCompare(b.qid))
+  // 29/10 (hồ sơ CPU: cùng một câu `qs.some(...)` trong vòng lặp từng câu ứng viên ⇒ O(câu × lượt làm) — 3.000 × 3.000 ≈ 520 ms CPU mỗi lần lập kế hoạch):
+  // dựng chỉ mục MỘT lần: kỹ năng → khoá bài → các nhóm câu đã ĐÚNG. «Cheo» = có lượt đúng cùng kỹ năng, khác nhóm câu, khác khoá bài (khoá bài của hai bên đều có).
+  const dungTheoKn=new Map<string,Map<string,Set<string>>>()
+  for(const o of qs){if(!o.dung)continue;const kb=q.get(o.qid)?.khoaBai;if(!kb)continue
+    for(const k of o.kn){let m=dungTheoKn.get(k);if(!m)dungTheoKn.set(k,m=new Map());let g=m.get(kb);if(!g)m.set(kb,g=new Set());g.add(o.nhom)}}
+  const coCheo=(kn:readonly string[],group:string,kb:string|null|undefined):boolean=>{if(!kb)return false
+    for(const k of kn){const m=dungTheoKn.get(k);if(!m)continue;for(const [b,g] of m)if(b!==kb&&(g.size>1||!g.has(group)))return true}return false}
   for(const c of hs.cau){const qc=q.get(c.qid);if(!qc)continue;const record=byId.get(tachSongSinh(c.qid).goc),t=tangViKyNang(qc.mucDo),kn=vknCaCau(qc),label=record?.nhan??null
     if(!t||(c.nguon==='chien_dich'&&hs.phamVi&&!record)){out.chan.add(c.qid);continue}
     const access=quyenCau(qc,t,m,omni,label),group=qc.contentGroup||c.qid
@@ -141,7 +148,7 @@ export async function boChonV5(env:Env,sbd:string,now:number,hs:HoSo2,q:Readonly
     if(diagnostic)out.chanDoan.add(c.qid)
     out.tang.set(c.qid,t as 1|2|3|4);if(t===4&&!diagnostic)out.soL4++
     const fresh=hs.tt.get(c.qid)?.laMoi===true&&!seen.has(group),unknown=kn.some(k=>!m.has(`${k}@L${k.startsWith('nen:')?1:t}`))
-    const cross=qs.some(o=>o.dung&&o.nhom!==group&&kn.some(k=>o.kn.includes(k))&&q.get(o.qid)?.khoaBai&&qc.khoaBai&&q.get(o.qid)?.khoaBai!==qc.khoaBai)
+    const cross=coCheo(kn,group,qc.khoaBai)
     if(diagnostic&&!fresh){out.chan.add(c.qid);continue}
     const role:VaiTroCau=diagnostic?'chan_doan':!fresh?'on_sua':t===4?vaiTroL4(qc,label,fresh,cross):unknown?'chan_doan':'hoc_moi'
     out.vai[c.qid]=role;if(role==='chan_doan')out.soChanDoan++

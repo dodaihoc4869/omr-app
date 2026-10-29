@@ -488,7 +488,8 @@ export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promis
   const kiemDenHan = new Set(hs.hoiThayDenHan ?? [])
   const uuTien=(a:{qid:string},b:{qid:string})=>soSanhOnHoiThay(a.qid,b.qid,kiemDenHan)||(engine.trongSo[b.qid]??0)-(engine.trongSo[a.qid]??0)||a.qid.localeCompare(b.qid)
   const sua = hs.cau.filter(c => !vuaXem.has(c.qid)&&['mo','cho_kiem'].includes(hs.loiV2?.get(c.qid)?.trangThai ?? '')).sort(uuTien).map(c => c.qid)
-  const on = hs.cau.filter(c => !vuaXem.has(c.qid)&&(!qids.includes(c.qid)||daGap.has(c.qid)) && (kiemDenHan.has(c.qid) || hs.tt.get(c.qid)?.laMoi || (engine.hen.get(c.qid) ?? hs.tt.get(c.qid)?.henOn ?? '9999') <= ngay)).sort(uuTien).map(c => c.qid)
+  const qidsGoi7 = new Set(qids) // 29/10: `qids.includes` trong vòng lặp từng câu ứng viên là O(câu × câu gói) — dùng Set
+  const on = hs.cau.filter(c => !vuaXem.has(c.qid)&&(!qidsGoi7.has(c.qid)||daGap.has(c.qid)) && (kiemDenHan.has(c.qid) || hs.tt.get(c.qid)?.laMoi || (engine.hen.get(c.qid) ?? hs.tt.get(c.qid)?.henOn ?? '9999') <= ngay)).sort(uuTien).map(c => c.qid)
   const chua=goi.flatMap(g=>g.cau.filter(c=>g.choThay.has(c.qid)&&teacherCorrections.results.some(r=>r.goi_id===g.id&&r.qid===c.qid&&r.version===c.version)).map(c=>c.qid))
   const cau = [...new Map(goi.flatMap(g => g.cau).map(c => [c.qid,c])).values()]
   const quotaCon = goi.reduce((n,g) => n+Math.max(0,g.quota-g.gapNgay.size),0)
