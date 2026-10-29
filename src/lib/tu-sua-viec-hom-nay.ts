@@ -157,6 +157,10 @@ function ghiLanCuoi(sbd: string, khoa: string, nayMs: number): void {
   const giu = cu.length > TOI_DA_LAN_CUOI ? cu.sort((a, b) => (a[1] < b[1] ? 1 : a[1] > b[1] ? -1 : 0)).slice(0, TOI_DA_LAN_CUOI) : cu
   try { localStorage.setItem(khoaLanCuoi(sbd), JSON.stringify(Object.fromEntries(giu))) } catch { /* không lưu được: bỏ qua */ }
 }
+// ĐỒNG BỘ NGAY (thầy 29/10 «làm xong thoát ra Lộ trình phải đồng bộ chính xác ngay lập tức»): em vừa sửa xong một câu ⇒ `ghiXongHomNay` ghi nhật ký trên máy và báo người nghe
+// (Lộ trình dựng lại số «Sửa lỗi» TỨC THÌ từ nhật ký — không chờ máy chủ). Nằm ở mảnh nạp lười của màn Tự sửa lỗi ⇒ không cộng byte lượt mở cổng.
+const NGHE_XONG_SUA = new Set<() => void>()
+export const ngheXongSua = (f: () => void): (() => void) => { NGHE_XONG_SUA.add(f); return () => { NGHE_XONG_SUA.delete(f) } }
 /** Ghi: hôm nay em đã xong phần của đợt `dotId` (gọi lúc nộp bước ghép bài / bản mới, hoặc lúc bấm "Kiểm tra lại" ở câu gốc). Lặp lại không đổi gì. */
 export function ghiXongHomNay(dotId: string, nayMs = Date.now()): void {
   const sbd = docSbdHs()
@@ -167,6 +171,7 @@ export function ghiXongHomNay(dotId: string, nayMs = Date.now()): void {
   const moi = { ...nk, x: [...nk.x, dotId] }
   luuNhatKy(sbd, moi)
   dayViecNgay(moi)
+  for (const f of NGHE_XONG_SUA) f()
 }
 
 // ---------------------------------------------------------------- dựng việc hôm nay ----------------------------------------------------------------

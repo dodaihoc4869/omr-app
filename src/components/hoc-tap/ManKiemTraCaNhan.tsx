@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { ArrowLeft, ArrowRight, CalendarDays, Check, Lock, RefreshCw, Route, Timer } from 'lucide-react'
-import { goiHoa2 } from '../hoa2/api'
+import { goiHoa2, type KetQuaSanh } from '../hoa2/api'
 import { docKiemTra, type TomTatKiemTra } from '../../lib/kiem-tra-ca-nhan'
 import type { Question } from '../../game/than-thu-v2/core'
 import TheCau from '../TheCau'
@@ -67,7 +67,14 @@ function useHetGio(kho:KhoGio|null){
 }
 /** Chữ trạng thái lưu THƯỜNG — không hiện (thầy 28/10). */
 const LUU_AN=new Set(['Đang lưu…','Đã lưu trên máy chủ','Đã tải câu trả lời đã lưu'])
-export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,ban}:{token:string;sbd:string;id:string;onVe:()=>void;onCapNhat:()=>void;/** Tóm tắt bài từ Sảnh (27/10 tốc độ): vẽ ngay thẻ tổng quan khi bấm, số mới về thì thay. */ban?:TomTatKiemTra}) {
+/** Vá Sảnh bằng tóm tắt bài kiểm tra MỚI NHẤT của màn này (cùng bài, em đã trả lời nhiều hơn / đã chốt thêm / đã nộp) — không bao giờ lùi. */
+const vaKt = (t: TomTatKiemTra) => (kq: KetQuaSanh): KetQuaSanh => {
+  if (!kq.cheDo2 || !('sanh' in kq)) return kq
+  const o = kq.sanh.kiemTraCaNhan
+  if (!o || o.id !== t.id || (o.daTra >= t.daTra && (o.changChot ?? 0) >= (t.changChot ?? 0) && (o.nopLuc !== null || t.nopLuc === null))) return kq
+  return { ...kq, sanh: { ...kq.sanh, kiemTraCaNhan: t } }
+}
+export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:{token:string;sbd:string;id:string;onVe:()=>void;onCapNhat:()=>void;/** Vá Sảnh ngay (hoa2.va): Lộ trình đúng lúc thoát, không chờ lượt nạp lại. */onVa?:(f:(k:KetQuaSanh)=>KetQuaSanh)=>void;/** Tóm tắt bài từ Sảnh (27/10 tốc độ): vẽ ngay thẻ tổng quan khi bấm, số mới về thì thay. */ban?:TomTatKiemTra}) {
  // KIỂU DUOLINGO (thầy 27/10): <html data-trong="hs"> ⇒ màn làm chặng một câu một màn (KhungKiemTra.tsx) — cùng state, cùng lệnh lưu/chốt/đồng hồ.
  // Cả màn kiểm tra: TẮT ÂM THANH, chỉ rung (cờ batCheDoThi của am-thanh.ts, gỡ khi đóng).
  const [duo]=useState(laKiemTraDuo),[moLuoi,setMoLuoi]=useState(false),[hoiNop,setHoiNop]=useState<((ok:boolean)=>void)|null>(null)
@@ -92,7 +99,8 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,ban}:{toke
  const key=`ktcn:nhap:${sbd}:${id}:${stt}`
  const khung=useRef<HTMLDivElement>(null)
  useEffect(()=>{if(stt!==null)khung.current?.scrollIntoView?.({block:'start'})},[stt])
- const nhan=(r:Record<string,unknown>)=>{const t=docKiemTra(r.kiemTra);if(!t)throw new Error('Số liệu bài kiểm tra chưa đầy đủ. Em tải lại nhé.');setTt(t);setOffset(t.serverNow-Date.now());if(typeof r.revision==='number')revision.current=r.revision;return t}
+ const ttRef=useRef(tt),ra=()=>{onCapNhat();const t=ttRef.current;if(t)onVa?.(vaKt(t))}
+ const nhan=(r:Record<string,unknown>)=>{const t=docKiemTra(r.kiemTra);if(!t)throw new Error('Số liệu bài kiểm tra chưa đầy đủ. Em tải lại nhé.');setTt(t);ttRef.current=t;setOffset(t.serverNow-Date.now());if(typeof r.revision==='number')revision.current=r.revision;return t}
  /** Bản nháp trên máy của chặng i: câu trả lời + mốc trả lời từng câu + câu đang làm. Hỏng / không có ⇒ null. */
  const docNhap=(i:number):{han:number;tra:Record<string,unknown>;luc:Record<string,number>;viTri?:number}|null=>{try{const o=JSON.parse(localStorage.getItem(`ktcn:nhap:${sbd}:${id}:${i}`)||'null');if(!o||typeof o!=='object'||!o.tra||typeof o.tra!=='object')return null;return {han:Number(o.han),tra:o.tra,luc:o.luc&&typeof o.luc==='object'?o.luc:{},viTri:typeof o.viTri==='number'?o.viTri:undefined}}catch{return null}}
  /** Chặng đã chốt (hết giờ lúc máy chủ bận / máy tắt) mà máy còn nháp chưa lên: gửi phần em trả lời TRƯỚC hạn (máy chủ nhận trong 10 phút sau hạn). */
@@ -138,7 +146,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,ban}:{toke
   else if(!auto){const trong=cs.flatMap((c,i)=>daTraDu(c,traRef.current[c.qid])?[]:[i+1]);if(trong.length&&!await hoiXacNhan({tieuDe:`Nộp chặng ${stt+1}?`,noiDung:`Chặng này còn ${trong.length} câu chưa trả lời (câu ${trong.join(', ')}). Nộp chặng sẽ chốt các câu đã lưu, không sửa lại được.`,nhanDongY:`Nộp chặng ${stt+1}`,nhanKhong:'Làm tiếp',vo:'m3'}))return;if(tuNop.current)return}
   if(!conPhien(lan))return
   huyHenThuLai();tuNop.current=true;setBusy(true);setLoi('')
-  try{await save(true);if(!conPhien(lan))return;xoaKtcnDangLam(sbd);setCs([]);setStt(null);await tai();if(conPhien(lan))onCapNhat()}
+  try{await save(true);if(!conPhien(lan))return;xoaKtcnDangLam(sbd);setCs([]);setStt(null);await tai();if(conPhien(lan))ra()}
   catch(e){
    if(!conPhien(lan))return
    tuNop.current=false
@@ -184,8 +192,8 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,ban}:{toke
  useEffect(()=>{const f=()=>{if(document.visibilityState!=='hidden'&&chuaGui.current){lanDongBo.current=0;dongBoRef.current()}};window.addEventListener('online',f);document.addEventListener('visibilitychange',f);return()=>{window.removeEventListener('online',f);document.removeEventListener('visibilitychange',f)}},[])
  // Câu đang làm cũng nhớ trên máy: mở lại chặng về đúng câu ấy.
  useEffect(()=>{if(stt!==null&&han)try{const raw=localStorage.getItem(key);if(raw){const o=JSON.parse(raw);if(o&&o.han===han&&o.viTri!==viTri)localStorage.setItem(key,JSON.stringify({...o,viTri}))}}catch{/* không cản làm bài */}},[viTri,stt,han])
- const ve=async()=>{xoaKtcnDangLam(sbd);if(stt!==null){setBusy(true);try{await save();onVe();onCapNhat()}catch(e){if(laLoiTamThoi(e)){onVe();onCapNhat()}else setLoi(chuCuaLoi(e,'Chưa lưu được bài.'))}finally{setBusy(false)}}else{onVe();onCapNhat()}}
- const nop=async()=>{if(tt&&tt.daTra<tt.tong&&!await hoiXacNhan({tieuDe:'Nộp bài kiểm tra?',noiDung:`Còn ${tt.con} câu chưa trả lời. Nộp bài sẽ chốt kết quả hiện tại.`,nhanDongY:'Nộp bài',nhanKhong:'Làm tiếp',vo:'m3'}))return;setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-nop',token,{id});nhan(r);setKet(r.ketQua as Ket);onCapNhat()}catch(e){setLoi(chuCuaLoi(e,'Chưa nộp được bài.'))}finally{setBusy(false)}}
+ const ve=async()=>{xoaKtcnDangLam(sbd);if(stt!==null){setBusy(true);try{await save();onVe();ra()}catch(e){if(laLoiTamThoi(e)){onVe();ra()}else setLoi(chuCuaLoi(e,'Chưa lưu được bài.'))}finally{setBusy(false)}}else{onVe();ra()}}
+ const nop=async()=>{if(tt&&tt.daTra<tt.tong&&!await hoiXacNhan({tieuDe:'Nộp bài kiểm tra?',noiDung:`Còn ${tt.con} câu chưa trả lời. Nộp bài sẽ chốt kết quả hiện tại.`,nhanDongY:'Nộp bài',nhanKhong:'Làm tiếp',vo:'m3'}))return;setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-nop',token,{id});nhan(r);setKet(r.ketQua as Ket);ra()}catch(e){setLoi(chuCuaLoi(e,'Chưa nộp được bài.'))}finally{setBusy(false)}}
  const [loc,setLoc]=useState<Loc>('tat-ca')
  // Tấm hỏi nộp đang mở mà chặng đã đóng / hết giờ (lượt tự chốt đi trước) ⇒ trả «không» và đóng tấm.
  useEffect(()=>{if(hoiNop&&(stt===null||hetGio)){hoiNop(false);setHoiNop(null)}},[stt,hetGio,hoiNop])

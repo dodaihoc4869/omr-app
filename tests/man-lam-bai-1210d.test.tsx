@@ -6,7 +6,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import ManLamBaiTap, { nopDuoc } from '../src/components/hoc-tap/ManLamBaiTap'
 import { docSanh, goiHoa2 } from '../src/components/hoa2/api'
-import { chuDanhSachCau, chuThoiGian, nhanPhim, phimCoTacDung, phimTuBanPhim, soChangXong, soHomNay, soSanhDungSai, type SoHomNay } from '../src/components/hoc-tap/lam-bai'
+import { chuThoiGian, nhanPhim, phimCoTacDung, phimTuBanPhim, soChangXong, soHomNay, soSanhDungSai, type SoHomNay } from '../src/components/hoc-tap/lam-bai'
+import { chuDanhSachCau } from '../src/components/hoc-tap/lam-bai-man'
 vi.mock('../src/components/hoa2/api', async (goc) => ({ ...await goc<typeof import('../src/components/hoa2/api')>(), goiHoa2: vi.fn() }))
 afterEach(() => { cleanup(); vi.clearAllMocks(); vi.mocked(goiHoa2).mockReset(); localStorage.clear() })
 
