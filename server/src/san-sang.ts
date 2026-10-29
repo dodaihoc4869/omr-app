@@ -235,6 +235,23 @@ export async function phienDaXong(env: Env, sbd: string, id: string): Promise<bo
   } catch { return false }
 }
 
+/**
+ * CHUẨN BỊ KHI EM RỜI APP GIỮA CHỪNG (thầy 29/10 «mở app tức thì mọi lúc»): bản lập sẵn hết hạn ngay khi em làm một câu (dấu đổi) — chỉ lượt sau câu CUỐI chặng mới lập lại. Em bỏ
+ * giữa chặng (khoá máy / đổi ứng dụng) rồi mở lại ⇒ Sảnh đi đường lập kế hoạch ~3 s. Máy em báo lúc app bị ẩn (`hoc-tap-chuan-bi`) ⇒ lập lại NỀN một lần, tối đa 1 lượt / 90 s mỗi em
+ * (đệm isolate; lượt trùng ở isolate khác chỉ tốn thêm một lần lập). Không đụng hồ sơ / kết quả của em — chỉ bảng lập sẵn.
+ */
+const daChuanBiKhiThoat = new Map<string, number>()
+export const HAN_CHUAN_BI_THOAT_MS = 90_000
+export function chuanBiKhiThoat(env: Env, sbd: string, ctx: { waitUntil(p: Promise<unknown>): void } | undefined, now: number = Date.now()): { ok: true; dang: boolean } {
+  const cu = daChuanBiKhiThoat.get(sbd)
+  if (!ctx || (cu !== undefined && now - cu < HAN_CHUAN_BI_THOAT_MS)) return { ok: true, dang: false }
+  daChuanBiKhiThoat.delete(sbd); daChuanBiKhiThoat.set(sbd, now)
+  while (daChuanBiKhiThoat.size > 500) daChuanBiKhiThoat.delete(daChuanBiKhiThoat.keys().next().value as string)
+  ctx.waitUntil(chuanBiSanSang(env, sbd, now).catch(() => false))
+  return { ok: true, dang: true }
+}
+export const xoaChuanBiKhiThoat = (): void => daChuanBiKhiThoat.clear()
+
 /** Khung cron ĐÊM của bản lập sẵn (giờ VN): từ 00:15 (sau việc 00:01 đổi ngày) tới HẾT 03:59 — thầy 29/10: «mỗi ngày load trước cho học sinh TRƯỚC 4h sáng». */
 export const DEM_BAT_DAU_PHUT = 15, DEM_KET_GIO = 4
 /** Số em mỗi phút: đêm 10 (2 250 em / khung; ~30 lệnh D1 mỗi em, đêm D1 vắng), chiều 6. */

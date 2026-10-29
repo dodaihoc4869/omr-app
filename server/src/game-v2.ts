@@ -344,6 +344,12 @@ function batDauHocTapSom(env:Env,sbd:string,action=''){
   return {sbd,kiem,dsGoi,sanSang,chuoi}
 }
 async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:ExecutionContext):Promise<Record<string,unknown>> {
+  // MÁY EM BÁO RỜI APP GIỮA CHỪNG ⇒ lập lại bản sẵn Sảnh + chặng NỀN (san-sang.ts `chuanBiKhiThoat`). Chỉ cần chữ ký + hạn của token (0 đợt D1 ở đường chờ), không đọc / ghi gì của em ngoài bảng lập sẵn.
+  if(action==='hoc-tap-chuan-bi'){
+    const {gameSbdDaKy}=await import('./game-v2-auth')
+    const sbd=await gameSbdDaKy(env,b)
+    return (await import('./san-sang')).chuanBiKhiThoat(envGhiRieng(env),sbd,ctx)
+  }
   // Tối ưu 05/10: lượt kiểm mật khẩu (khi đệm 60 s trượt) chạy CÙNG đợt với các lượt ĐỌC đầu của lệnh (`batDauDocSom`, gọi khi token đã qua kiểm chữ ký/hạn —
   // token giả bị chặn trước mọi lượt D1 như cũ). Không ghi gì, không trả gì trước khi xác thực xong. `gameIdentity` bị thay (test) ⇒ đọc sau xác thực như cũ.
   const giu:{ds:ReturnType<typeof batDauDocSom>|null;hocTap?:ReturnType<typeof batDauHocTapSom>;kiem?:{sbd:string;p:ReturnType<typeof import('./kiem-tra-ca-nhan')['docKtCn']>};dem?:{sbd:string;p:Promise<Record<string,unknown>>};khoaSua?:{sbd:string;p:Promise<number>}}={ds:null}
