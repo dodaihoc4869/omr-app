@@ -68,6 +68,14 @@ jobs:
           for (const [k2, n] of [...kcDuong].sort((a, b) => b[1] - a[1]).slice(0, 8)) console.log(`  không-ok ${k2}: ${n}`)
           console.log(`CHẤM NHANH (từ bộ nhớ isolate): ${nhom.nhanh.n} lượt (${tong ? Math.round(100 * nhom.nhanh.n / tong) : 0}%) · dòng 1 ms p50/p90/max ${pt(nhom.nhanh.d1, .5)}/${pt(nhom.nhanh.d1, .9)}/${pt(nhom.nhanh.d1, 1)} · cả lệnh wall p50/p90 ${pt(nhom.nhanh.w, .5)}/${pt(nhom.nhanh.w, .9)} · cpu p50/p90 ${pt(nhom.nhanh.c, .5)}/${pt(nhom.nhanh.c, .9)}`)
           console.log(`ĐƯỜNG CHẬM (D1): ${nhom.cham.n} lượt (${tong ? Math.round(100 * nhom.cham.n / tong) : 0}%) · wall p50/p90/max ${pt(nhom.cham.w, .5)}/${pt(nhom.cham.w, .9)}/${pt(nhom.cham.w, 1)} · cpu p50/p90 ${pt(nhom.cham.c, .5)}/${pt(nhom.cham.c, .9)}`)
+          // PHÂN BỐ Sảnh / Mở chặng / Làm lại (29/10 19:55: p90 sảnh 6 s, start 4 s, tối đa 26–40 s): bao nhiêu lượt «tức thì» (CPU < 40 ms = dùng bản lập sẵn) và bao nhiêu lượt đi đường lập kế hoạch nặng.
+          for (const ten of ['/game-v2/hoc-tap-sanh', '/game-v2/hoc-tap-start', '/game-v2/hoc-tap-lam-lai', '/hs/ke-hoach-ngay', '/game-v2/hoa2-cau-da-lam']) {
+            const ds = ev.filter((e) => { try { return new URL(e?.event?.request?.url).pathname === ten } catch { return false } })
+            if (!ds.length) continue
+            const cpu = ds.map((e) => e.cpuTime ?? 0), wall = ds.map((e) => e.wallTime ?? 0)
+            const dem = (a, lo, hi) => a.filter((x) => x >= lo && x < hi).length
+            console.log(`PHÂN BỐ ${ten} (${ds.length} lượt) · CPU <40ms ${dem(cpu, 0, 40)} · 40–150 ${dem(cpu, 40, 150)} · 150–400 ${dem(cpu, 150, 400)} · ≥400 ${dem(cpu, 400, 1e9)} · wall <1s ${dem(wall, 0, 1000)} · 1–3s ${dem(wall, 1000, 3000)} · 3–10s ${dem(wall, 3000, 10000)} · ≥10s ${dem(wall, 10000, 1e9)}`)
+          }
           // Mọi lệnh game-v2 khác (để so): số lượt + wall p50/p90
           const khac = new Map()
           for (const e of ev) { let p = ''; try { p = new URL(e?.event?.request?.url).pathname } catch { continue }
