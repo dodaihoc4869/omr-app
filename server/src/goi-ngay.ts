@@ -17,7 +17,8 @@ import { HAN_NIEM_CHUAN_BI_MS, lamMoiNiem, moMa, niemMa } from './niem-phong'
 import { ngayVn7 } from './goi-bai-7-loi'
 
 export type CheDoGoiNgay = 'tat' | 'thu' | 'bat'
-export const GOI_NGAY_CHE_DO: CheDoGoiNgay = 'thu'
+// 29/10 23h: BẬT cho mọi em (thầy «tới lúc nào app hs mọi chỗ, mọi lớp, load câu, nộp câu mọi thứ tức thì mới được dừng lại»). Lỗi / từ chối ở đâu ⇒ đường cũ.
+export const GOI_NGAY_CHE_DO: CheDoGoiNgay = 'bat'
 let cheDo: CheDoGoiNgay = GOI_NGAY_CHE_DO
 /** Chỉ cho test. */
 export const datCheDoGoiNgay = (m: CheDoGoiNgay = GOI_NGAY_CHE_DO): void => { cheDo = m }
@@ -37,6 +38,16 @@ interface NoiDungVe { v: number; e: number; r: Ref[]; g: string[] }
 /** Lập gói cả ngày cho em. Không có kế hoạch / thầy tạm dừng ⇒ gói rỗng. */
 export async function goiNgay7(env: Env, sbd: string, now: number): Promise<Record<string, unknown>> {
   if (!goiNgayBat(sbd)) return { ok: true, tat: true, sbd }
+  // BẢN SẴN (san-sang.ts — cron lập sẵn cho mọi em; dấu khớp, cùng ngày, chưa có đợt mới hơn): chặng kế đã lập ⇒ gói từ bản ấy, KHÔNG lập kế hoạch (một lệnh D1).
+  // Gói một chặng; hết chặng máy em lập lại gói (đường đủ dưới).
+  const ss = await import('./san-sang')
+  const [dauSs, ban] = await ss.docDauVaBan(env, sbd, now)
+  const c = ban?.chang as { refs?: unknown; questions?: unknown; goi7?: unknown; goiIds?: unknown; phienCu?: unknown } | null | undefined
+  if (ss.dungDuoc(ban, dauSs, ngayVn7(now)) && ban.phienMoi < ban.luc && c && !c.phienCu && Array.isArray(c.refs) && c.refs.length > 0 && Array.isArray(c.questions)
+    && c.questions.length === c.refs.length && Array.isArray(c.goiIds)) {
+    const ve = await niemMa(env, aadVe(sbd, ban.ngay), { r: c.refs, g: c.goiIds }, now, HAN_NIEM_CHUAN_BI_MS)
+    if (ve) return { ok: true, sbd, ngay: ban.ngay, luc: now, chang: [{ ve, questions: c.questions }], goi7: c.goi7, tuBanSan: true }
+  }
   const g7 = await import('./goi-bai-7')
   const x = await g7.xayGoiNgay7(env, sbd, now, SO_CAU_GOI_NGAY)
   if (!x) return { ok: true, sbd, ngay: ngayVn7(now), luc: now, chang: [] }
