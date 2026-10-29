@@ -1,4 +1,4 @@
-# ĐO ĐƯỜNG CHẤM NHANH «Kiểm tra» TRÊN BẢN SỐNG (CHỈ ĐỌC) — thầy 29/10 (video «Bấm kiểm tra vẫn chưa tức thì, phải tức thì luôn»).
+# ĐO ĐƯỜNG CHẤM NHANH «Kiểm tra» (chặng học + Sửa câu) TRÊN BẢN SỐNG (CHỈ ĐỌC) — thầy 29/10 (video «Bấm kiểm tra vẫn chưa tức thì, phải tức thì luôn»).
 # `wrangler tail` PHUT phút trên Worker sống, chỉ lấy yêu cầu `/game-v2/answer`: bao nhiêu lượt chấm được TỪ BỘ NHỚ isolate (có dòng nhật ký `[nop-luong]`) và bao nhiêu
 # phải đi đường D1 chậm; thời gian dòng 1 (đúng / sai) và thời gian cả lệnh, tách theo hai nhóm. CHỈ in số gộp — không in nhật ký, không thân yêu cầu, không mã em.
 name: Đo đường chấm nhanh Kiểm tra (chỉ đọc)
@@ -68,4 +68,18 @@ jobs:
             if (!p.startsWith('/game-v2/') || p === '/game-v2/answer') continue
             const g = khac.get(p) ?? []; if (typeof e.wallTime === 'number') g.push(e.wallTime); khac.set(p, g) }
           for (const [p, g] of [...khac].sort((a, b) => b[1].length - a[1].length).slice(0, 12)) console.log(`${p} | ${g.length} | wall p50/p90 ${pt(g, .5)}/${pt(g, .9)}`)
+          // 29/10 (tem niêm phong): nguồn dòng 1 — nho (đệm isolate) / niem (tem chặng) / chua-niem (tem Sửa câu) / som (đường thường sớm) — và các lệnh Sửa câu.
+          const theoNguon = new Map()
+          for (const e of ev) { let p = ''; try { p = new URL(e?.event?.request?.url).pathname } catch { continue }
+            if (p !== '/game-v2/answer' && p !== '/hs/chua-cau-sai/gon-nop') continue
+            const nl = (Array.isArray(e.logs) ? e.logs : []).map((l) => (Array.isArray(l.message) ? l.message.join(' ') : String(l.message))).find((m) => m.startsWith('[nop-luong]'))
+            let j = {}; if (nl) { try { j = JSON.parse(nl.slice('[nop-luong]'.length).trim()) } catch {} }
+            const k = `${p} · ${nl ? j.nguon : 'khong-luong'}`; const g = theoNguon.get(k) ?? { n: 0, d1: [], khongKhop: 0 }
+            g.n++; if (typeof j.dong1Ms === 'number') g.d1.push(j.dong1Ms); if (j.khop === false) g.khongKhop++; theoNguon.set(k, g) }
+          for (const [k, g] of [...theoNguon].sort()) console.log(`NGUỒN ${k} | ${g.n} lượt | dòng 1 ms p50/p90 ${pt(g.d1, .5)}/${pt(g.d1, .9)} | dòng 2 khác dòng 1: ${g.khongKhop}`)
+          const sua = new Map()
+          for (const e of ev) { let p = ''; try { p = new URL(e?.event?.request?.url).pathname } catch { continue }
+            if (!p.startsWith('/hs/chua-cau-sai/')) continue
+            const g = sua.get(p) ?? { w: [], c: [] }; if (typeof e.wallTime === 'number') g.w.push(e.wallTime); if (typeof e.cpuTime === 'number') g.c.push(e.cpuTime); sua.set(p, g) }
+          for (const [p, g] of [...sua].sort((a, b) => b[1].w.length - a[1].w.length).slice(0, 10)) console.log(`${p} | ${g.w.length} | wall p50/p90 ${pt(g.w, .5)}/${pt(g.w, .9)} | cpu p50/p90 ${pt(g.c, .5)}/${pt(g.c, .9)}`)
           JS

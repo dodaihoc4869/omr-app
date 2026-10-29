@@ -10,6 +10,7 @@ import {readGameScope} from './game-v2-reports'
 import {boKeHoach7} from './goi-bai-7-nho'
 import type {D1PreparedStatement,D1Result,Env,ExecutionContext} from './kieu'
 import {viecPhu} from './viec-phu'
+import {ganNiemChoCau} from './niem-cau'
 import {coTheLaLuotMs,dapAnDaLo,napPhienNhanh,nhoBaoVe,nhoBienNhan,nhoCau,nhoDaLo,nhoEm,nhoPhien,phatTamSom,phienDuCau} from './cham-nhanh' // CHẤM NHANH «Kiểm tra» 28/10: đệm isolate cho dòng 1 của answer theo luồng
 import {gameIdentity,parentPass} from './game-v2-auth'
 import {readScope,syncIndex,protectedQuestions,docKhoiEm,doDayDu,laTuLuanPool,docCauTheoRef,loiCauDoi,type CauPool} from './game-v2-bank'
@@ -520,13 +521,14 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
   if(action==='resume'){
     const row=await env.DB.prepare("SELECT id,json FROM game_v2_session WHERE sbd=? AND created_at>? AND json_extract(json,'$.doan') IS NULL AND COALESCE(json_extract(json,'$.bia'),0)=0 ORDER BY created_at DESC LIMIT 1").bind(sbd,new Date(Date.now()-2*3600000).toISOString()).first<{id:string;json:string}>()
     if(!row)return {ok:true,questions:[]}
-    const session=JSON.parse(row.json) as Session;const blocked=await protectedQuestions(env);const control=await readGameScope(env,sbd);if(!control.enabled)throw new Error('Thầy đang tạm dừng game.');for(const key of control.blocked)blocked.add(key);const qs=[]
+    const session=JSON.parse(row.json) as Session;const blocked=await protectedQuestions(env);const control=await readGameScope(env,sbd);if(!control.enabled)throw new Error('Thầy đang tạm dừng game.');for(const key of control.blocked)blocked.add(key);const qs=[],riengQ:PrivateQuestion[]=[]
     // CẤM RÚT TỰ LUẬN (21/09): lượt soạn trước lệnh cấm mà còn câu tự luận ⇒ BỎ câu ấy khỏi lượt trả về (em làm nốt các câu còn lại, `complete` cũng chỉ đòi các câu này).
     const tuLuan=await qidTuLuanTrongLuot(env,session.questions,await docKhoiEm(env,sbd))
     for(const q of await qidThuHoiTrongLuot(env,sbd,session))tuLuan.add(q) // THU HỒI KHI HUỶ (06/10): câu của chiến dịch đã huỷ không trả lại cho em làm nốt (lượt không cờ ⇒ rỗng, không truy vấn)
     // 29/09: câu THẬT SỰ đổi đề/đáp án (hoặc bị rút) giữa lượt ⇒ BỎ câu ấy khỏi lượt trả về như câu tự luận (em làm nốt các câu còn lại, `complete` cũng không đòi) — em không kẹt.
-    for(const ref of session.questions){if(tuLuan.has(ref.qid))continue;const q=await docCauTheoRef(env,ref);if(!q||laCauTuLuan(q))continue;if(blocked.has(q.qid)||blocked.has(q.group))throw new Error('Lượt cũ có câu đang bảo vệ. Em mở lượt mới.');qs.push(publicQuestion(apXaoTheoRef(q,ref)))} // 05/10: bản xáo phát lại y hệt lúc phát
+    for(const ref of session.questions){if(tuLuan.has(ref.qid))continue;const q=await docCauTheoRef(env,ref);if(!q||laCauTuLuan(q))continue;if(blocked.has(q.qid)||blocked.has(q.group))throw new Error('Lượt cũ có câu đang bảo vệ. Em mở lượt mới.');const qx=apXaoTheoRef(q,ref);riengQ.push(qx);qs.push(publicQuestion(qx))} // 05/10: bản xáo phát lại y hệt lúc phát
     if(!qs.length)return {ok:true,questions:[]}
+    if((session as {hocTap?:number}).hocTap===1)await ganNiemChoCau(env,sbd,qs as unknown as Record<string,unknown>[],riengQ,(session as {hoa2?:number}).hoa2===1) // TEM NIÊM PHONG (niem-cau.ts): phiên học tập mở lại vẫn có dòng 1 tức thì
     const rows=await env.DB.prepare('SELECT json FROM game_v2_attempt WHERE session=? AND sbd=? ORDER BY created_at').bind(row.id,sbd).all<{json:string}>()
     return {ok:true,id:row.id,questions:qs,mode:session.mode,answered:rows.results.map(x=>JSON.parse(x.json))}
   }

@@ -27,11 +27,12 @@ import { goiYTuLoiGiai } from './goi-y-rieng'
 import { docCauHinhExp, mocExpCuaEm } from './exp-d1'
 import { LOAI_TU_SUA, NT_TU_SUA_RA_HANG, NT_TU_SUA_TRAN_NGAY } from './exp-cau-hinh'
 import { tachSongSinh } from './loi-hoc-luat'
+import { niemSua, SO_LAN_MOI_NGAY } from './chua-gon-niem'
 
 type Obj = Record<string, unknown>
 const str = (v: unknown) => (typeof v === 'string' ? v : '')
 const loi = (ma: string, mo: string, status = 400) => Response.json({ ok: false, ma, mo }, { status })
-export const SO_LAN_MOI_NGAY = 2
+export { SO_LAN_MOI_NGAY }
 
 /** Dựng danh sách bản làm lại; `tot` = KHÔNG có lượt đọc nào lỗi (lỗi thoáng qua ⇒ danh sách rút gọn, KHÔNG được nhớ). */
 async function dungCacBan(env: Env, q: PrivateQuestion): Promise<{ ds: PrivateQuestion[]; tot: boolean }> {
@@ -121,7 +122,7 @@ async function quyenKemDocChung<T>(env: Env, b: Obj, sbdDaKiem: string | undefin
  * chỉ cho biết mã câu sau đợt đầu. Gợi ý sai / lỗi ⇒ bỏ qua (đường thường tự nạp sau). Chỉ ĐỌC, kết quả chỉ nằm trong bản nhớ — nơi gọi vẫn kiểm đợt thuộc về em và khớp mã câu.
  */
 const lamAm = (env: Env, sbd: string, qid: string): Promise<null> =>
-  (qid && qid.length <= 160 ? cauDuocNho(env, sbd, qid).then((q) => (q ? cacBan(env, q) : null)) : Promise.resolve(null)).then(() => null, () => null)
+  (qid && qid.length <= 160 ? Promise.all([cauDuocNho(env, sbd, qid).then((q) => (q ? cacBan(env, q) : null)), docHocLieuNho(env, qid).catch(() => null)]) : Promise.resolve(null)).then(() => null, () => null)
 
 export async function gonMo(env: Env, b: Obj, sbdDaKiem?: string): Promise<Response> {
   const dotId = str(b.dotId)
@@ -145,10 +146,15 @@ export async function gonMo(env: Env, b: Obj, sbdDaKiem?: string): Promise<Respo
   const ban = (truoc && ds.find((x) => x.qid === str(truoc.ban))) || ds[c.tongLan % ds.length]!
   const lan = c.lanHomNay.length + 1
   const ngaySai = str(c.dot.ngay_sai), docGan = Number(c.dot.doc_gan) === 1
+  const tuSuaNeuDung = tinhTuSua(ban, q.qid, lan, { ngaySai, docGan, homNay: c.homNay })
+  // TEM NIÊM PHONG (chua-gon-niem.ts): kết quả của cả hai đáp án cho LẦN này ⇒ «Kiểm tra» trả đúng / sai tức thì ở mọi isolate (gợi ý lần 1 đã được `lamAm` làm ấm).
+  const goiY = lan < SO_LAN_MOI_NGAY ? await goiYMot(env, str(c.dot.qid_chuan), ban).catch(() => undefined) : undefined
+  const sk = await niemSua(env, sbd, { dotId, ban, lan, tuSua: tuSuaNeuDung, docGan, goiY })
   return Response.json({
     ok: true, dotId, lan, ban: ban.qid, banKhac: ban.qid !== q.qid,
-    tuSuaNeuDung: tinhTuSua(ban, q.qid, lan, { ngaySai, docGan, homNay: c.homNay }),
+    tuSuaNeuDung,
     de: cauCongKhai(ban),
+    ...(sk ? { sk } : {}),
   })
 }
 

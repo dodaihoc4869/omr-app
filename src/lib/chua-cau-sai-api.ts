@@ -381,8 +381,16 @@ export interface KetQuaGon {
   daKhepHomNay?: boolean
   /** (28/10) nguyên tử vừa cộng vì câu ra khỏi hàng (+2; vắng khi không cộng — trần ngày, câu đã đúng hôm nay, EXP chưa bật). */
   nguyenTu?: number
+  /** TEM NIÊM PHONG (29/10, server/src/chua-gon-niem.ts): gon-mo cấp `sk` (chuỗi mờ — máy em không mở được); gửi lại cùng gon-nop ⇒ kết quả TỨC THÌ (dòng `tam`). */
+  sk?: string
+  /** Dòng `tam` của gon-nop: kết quả suy từ tem, CHƯA ghi — dòng đầy đủ đến ngay sau và thay thế. */
+  tam?: boolean
+  /** Tem của LẦN 2 (cùng bản) — chỉ có ở dòng `tam` khi sai lần 1: «Làm lại câu này» mở tại máy em. */
+  sk2?: string
+  /** Phần chi tiết của dòng `tam` (đáp án + lời giải + ảnh sau lời giải) — chỉ khi đúng / hết lần thử; máy em ghép với đề đã có thành `chiTiet`. */
+  ct?: { dapAn: string; loiGiai: unknown; hinhSau: { src: string; viTri: string; alt?: string }[] }
 }
-const docGon = (j: Obj | null): KetQuaGon => (j?.ok ? (j as unknown as KetQuaGon) : { ok: false, loi: loiCua(j), ...(j?.ma ? { ma: chu(j.ma) } : {}) })
+export const docGon = (j: Obj | null): KetQuaGon => (j?.ok ? (j as unknown as KetQuaGon) : { ok: false, loi: loiCua(j), ...(j?.ma ? { ma: chu(j.ma) } : {}) })
 /** `qid` (29/10): mã câu GỐC của đợt — gợi ý để máy chủ nạp sẵn câu song song với việc đọc đợt (câu nguội mất 4–6 đợt D1 nối tiếp). Máy chủ vẫn kiểm đợt thuộc về em và khớp mã câu. */
 export async function apiGonMo(token: string, dotId: string, qid?: string): Promise<KetQuaGon> {
   return docGon(await goi('gon-mo', token, { dotId, ...(qid ? { qid } : {}) }))

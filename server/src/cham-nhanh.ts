@@ -26,6 +26,7 @@ import { laCauTuLuan } from './cam-tu-luan'
 import type { Env } from './kieu'
 import { THAM_SO_OMNI } from './omni-kieu'
 import { dangKySauXoaCaBaoVe, protectedQuestions } from './game-v2-bank'
+import type { NoiDungNiem } from './niem-phong'
 
 type RefPhien = { qid: string; maDe: string; version: string; xt?: unknown } & Record<string, unknown>
 type PhienNho = { doan?: number; guardian?: string; created: number; questions: RefPhien[]; hoa2?: number; bia?: number; hocTap?: number; goi7?: number; kimCuong?: number; thuHoiLuc?: string } & Record<string, unknown>
@@ -146,6 +147,29 @@ export function chamNhanh(sbd: string, b: Record<string, unknown>, now = Date.no
   if (!correct && em.omni && s.hoa2 === 1 && coTheLaLuot(b.msLam)) return null
   const khongTinh = laPhienNguyenTu(s as unknown as PhienNt) && khongTinhTuDo(boSungKichThuocDe(docDoGiayMot(b, { ms: b.msLam }), q.phan, q), correct)
   return { ok: true, tam: true, correct, answer: q.correct, traLoi: tra, solution: q.solution, solutionImages: q.hinhAnh.filter((h) => h.viTri === 'sau_loi_giai'), ...(khongTinh ? { khongTinh: true as const } : {}) }
+}
+
+/**
+ * DÒNG 1 TỪ TEM NIÊM PHONG (niem-phong.ts, 29/10 «giờ cao điểm cũng phải tức thì 100%»): tem đã mở (`moNiem`) ⇒ chấm KHÔNG cần phiên / câu / phạm vi trong isolate này,
+ * 0 đợt D1 — isolate nào đón lệnh cũng có dòng 1 ngay. Điều kiện thêm so với chấm bằng đệm: biên nhận chưa vào đường thường ở isolate này; isolate đã có tập câu bảo vệ
+ * ca thi còn mới ⇒ câu thuộc ca thi bị chặn; phạm vi của em còn mới trong isolate (tạm dừng / câu chặn) ⇒ tôn trọng. Phần còn lại (phiên còn hạn, câu còn trong kho, ca thi…)
+ * do lệnh `answer` đầy đủ xét — dòng 2 là bản lưu chuẩn. `null` ⇒ đường thường.
+ */
+export function chamTuNiem(sbd: string, nd: NoiDungNiem, b: Record<string, unknown>, now = Date.now()): DongNhanh | null {
+  const id = String(b.session ?? ''), qid = String(b.qid ?? '')
+  if (!id || !qid || nd.q !== qid || laQidChanDoan(qid) || bienNhan.has(`${id}|${qid}`)) return null
+  if (baoVe && now - baoVe.luc <= HAN_BAO_VE_MS && (baoVe.tap.has(nd.q) || baoVe.tap.has(nd.g))) return null
+  const em = emNho.get(sbd)
+  if (em && now - em.luc <= HAN_EM_MS && (!em.enabled || em.blocked.has(nd.q) || em.blocked.has(nd.g))) return null
+  const tra = String(b.answer ?? '').trim()
+  if (nd.p === 'I' && !/^[ABCD]$/.test(tra) || nd.p === 'II' && !/^[DS]{4}$/.test(tra) || nd.p === 'III' && (!tra || tra.length > 40)) return null
+  const correct = nd.p === 'III' ? khopPhanIII(String(b.answer ?? ''), nd.c) : grade({ phan: nd.p, correct: nd.c }, String(b.answer ?? ''))
+  // OMNI: như `chamNhanh` — câu sai làm dưới 8 giây (hoặc không đo) của phiên Hoá 2.0 có thể là «lướt» (cần số đọc D1) ⇒ đường thường.
+  if (!correct && nd.o === 1 && coTheLaLuot(b.msLam)) return null
+  const d = docDoGiayMot(b, { ms: b.msLam })
+  const dKichThuoc = d && d.giay !== null && nd.t >= 0 ? { ...d, tu: nd.t, hinh: nd.h, phan: nd.p } : d // đúng như `boSungKichThuocDe`
+  const khongTinh = khongTinhTuDo(dKichThuoc, correct)
+  return { ok: true, tam: true, correct, answer: nd.c, traLoi: tra, solution: nd.l, solutionImages: Array.isArray(nd.m) ? nd.m : [], ...(khongTinh ? { khongTinh: true as const } : {}) }
 }
 
 /** Câu ĐẦY ĐỦ của mọi ref trong phiên (đúng điều kiện `SQL_CAU_THEO_PHIEN` của game-v2.ts: tờ chưa xoá, chỉ mục khớp bản nguồn). */

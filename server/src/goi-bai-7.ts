@@ -23,6 +23,8 @@ import { CAU_TOI_THIEU, tangCuaCau, tangCuaEm, type TangHanhTrinh } from './hanh
 import { chanKhacKhoiEm, docCauNghiDem } from './chan-khac-khoi'
 import { apLamLaiKhac } from './cau-anh-em'
 import { apXaoTheoRef, type LamLaiRef } from './lam-lai-so'
+import { ganNiemChoCau } from './niem-cau'
+import { HAN_NIEM_CHUAN_BI_MS } from './niem-phong'
 import { tachSongSinh } from './loi-hoc-luat'
 import { quotaHocKt, quotaCacGoiHocKt } from './kiem-tra-ca-nhan-loi'
 import { dbGoc, docCauHinhDem } from './cau-hinh-dem'
@@ -635,8 +637,10 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
     const done=new Set(answered.results.map(r=>r.qid)),refs=saved.questions.filter(r=>!done.has(r.qid)&&!r.lamLaiCuoi)
     const qs=(await Promise.all(refs.map(r=>currentQuestion(env,r).then(q=>({r,q}),()=>null)))).filter((v):v is NonNullable<typeof v>=>!!v)
     const quaKhoi=new Set(await chanKhacKhoiEm(env,'goi7',{sbd,khoiEm:khoi},qs.map(v=>v.q)))
-    const questions=qs.filter(({q})=>quaKhoi.has(q)&&q.reviewed&&!laCauTuLuan(q)&&!baoVe.has(q.qid)&&!baoVe.has(q.group)&&!btvn.has(q.qid)&&!control.blocked.includes(q.qid)&&(!control.types.length||!!q.dang&&control.types.includes(q.dang)))
-      .map(({r,q})=>({...publicQuestion(apXaoTheoRef(q,r)),...(r.goiY?{goiY:r.goiY}:{}),vaiGoi7:r.vai,huongDan7:r.huongDan,coGoi7:true}))
+    const questions0=qs.filter(({q})=>quaKhoi.has(q)&&q.reviewed&&!laCauTuLuan(q)&&!baoVe.has(q.qid)&&!baoVe.has(q.group)&&!btvn.has(q.qid)&&!control.blocked.includes(q.qid)&&(!control.types.length||!!q.dang&&control.types.includes(q.dang)))
+    const giao=questions0.map(({r,q})=>apXaoTheoRef(q,r))
+    const questions=giao.map((qx,i)=>({...publicQuestion(qx),...(questions0[i]!.r.goiY?{goiY:questions0[i]!.r.goiY}:{}),vaiGoi7:questions0[i]!.r.vai,huongDan7:questions0[i]!.r.huongDan,coGoi7:true} as Record<string,unknown>))
+    await ganNiemChoCau(env,sbd,questions,giao,true) // TEM NIÊM PHONG (niem-cau.ts): dòng 1 «Kiểm tra» không phụ thuộc isolate
     return questions.length?{ok:true,id:str(old.id),questions}:null
   }
   if (!lap.control.enabled) { await ghiDongCo; throw new Error('Thầy đang tạm dừng bài học cho em.') }
@@ -652,7 +656,7 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
   // câu song sinh (`~ss|bt|ydN`): em vừa làm câu gốc thì bản song sinh của nó cũng không phát ngay.
   const vuaLamGoc = (qid: string) => vuaLam.has(qid) || vuaLam.has(tachSongSinh(qid).goc)
   const viec = saved ? saved.questions.filter(r => !done.has(r.qid) && !r.lamLaiCuoi && !vuaLamGoc(r.qid) && !lap.daLamTap.has(r.qid)).map(r=>({...r,vai:r.vai??'on',huongDan:r.huongDan??false})) : []
-  const refs: RefGoi7[] = [], questions: Record<string,unknown>[] = []
+  const refs: RefGoi7[] = [], questions: Record<string,unknown>[] = [], riengQ: PrivateQuestion[] = []
   const kiemHoiThay = new Set(lap.hs.hoiThayDenHan ?? [])
   // Đợt cũ còn câu mà không câu nào phát được nữa ⇒ lấy theo kế hoạch hôm nay; kế hoạch đi tiếp qua câu không phát được cho đủ 6 câu (khẩn 12/10 23h).
   // Kế hoạch cũng không phát được câu nào mà em CÒN THIẾU mức ⇒ hàng chờ dự phòng (`lapGoi7` → `duPhong`, lỗi 14/10) — chặng chỉ rỗng khi thật hết câu.
@@ -687,19 +691,21 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
     const ref: RefGoi7 = {...oldRef,...lamLai,qid:q.qid,maDe:q.maDe,version:q.version,group:q.group,novel:lap.hs.tt.get(q.qid)?.laMoi ?? true,
       role:v.vai==='moi'?'cau_moi':v.vai==='sua'?'on_lai':'on_lai',vai:v.vai,huongDan:v.huongDan,
       ...(kiemHoiThay.has(q.qid)||kiemHoiThay.has(tachSongSinh(lamLai?.tc??oldRef?.tc??q.qid).goc)?{hoiThayKiem:true as const}:{})}
-    refs.push(ref); questions.push({...publicQuestion(q),...(ref.goiY?{goiY:ref.goiY}:{}),vaiGoi7:v.vai,huongDan7:v.huongDan,coGoi7:lap.goi.some(g=>g.cau.some(c=>c.qid===q.qid&&c.version===q.version))})
+    refs.push(ref); riengQ.push(q); questions.push({...publicQuestion(q),...(ref.goiY?{goiY:ref.goiY}:{}),vaiGoi7:v.vai,huongDan7:v.huongDan,coGoi7:lap.goi.some(g=>g.cau.some(c=>c.qid===q.qid&&c.version===q.version))})
   } } }
   await ghiDongCo
+  const niemSom = ganNiemChoCau(env, sbd, questions, riengQ, true, now, opts?.khongLuu ? HAN_NIEM_CHUAN_BI_MS : undefined) // TEM NIÊM PHONG (niem-cau.ts): song song phần còn lại; không bao giờ ném. Chặng LẬP SẴN: hạn dài, làm mới lúc mở (san-sang.ts)
   // Chặng RỖNG (em đã xong phần hôm nay) cũng lập sẵn được (28/10 chiều, thử tải): phản hồi y hệt, nơi dùng trả ngay không lập lại.
   if (!refs.length) { const rong: Record<string,unknown> = {ok:true,questions:[],goi7:tomTatGoi7(lap,now),message:lap.plan.thieuPhu&&lap.daLamNgay<lap.toiThieu?'Còn câu cần thầy bổ sung học liệu hoặc đang được giữ cho ca kiểm tra.':'Em đã hoàn thành phần được xếp hôm nay. Lỗi chưa kiểm chứng vẫn được giữ để học tiếp.'}; return opts?.khongLuu ? {ok:true,chuanBi:{rong}} : rong }
   const id = viec.length && refs.length === viec.length && refs.every(r => viec.some(v => v.qid === r.qid)) ? str(old!.id) : crypto.randomUUID()
   // Lập sẵn (không lưu): đợt cũ còn nguyên bộ câu ⇒ ghi lại mã đợt ấy (`phienCu`) để lượt mở thật trả ĐÚNG đợt đó như đường thường, không tạo đợt mới.
-  if (opts?.khongLuu) return {ok:true,chuanBi:{refs,questions,goi7:tomTatGoi7(lap,now),goiIds:lap.goi.map(g=>g.id),...(id === str(old?.id) ? {phienCu:id} : {})}}
+  if (opts?.khongLuu) { await niemSom; return {ok:true,chuanBi:{refs,questions,goi7:tomTatGoi7(lap,now),goiIds:lap.goi.map(g=>g.id),...(id === str(old?.id) ? {phienCu:id} : {})}} }
   if (id !== str(old?.id)) {
     const rs=await env.DB.prepare(`INSERT INTO game_v2_session(id,sbd,json,created_at) SELECT ?,?,?,? WHERE ${sqlCacGoiConNhan7('?','?',sqlTenLopHs('h'))}`)
       .bind(id,sbd,JSON.stringify({mode:'adventure',created:now,hoa2:1,hocTap:1,goi7:1,questions:refs}),new Date(now).toISOString(),JSON.stringify(lap.goi.map(g=>g.id)),sbd).run()
     if(!Number(rs.meta.changes))throw new Error('Danh sách bài vừa thay đổi. Em cập nhật lại trước khi học tiếp; bài đang làm vẫn được giữ.')
   }
+  await niemSom
   return {ok:true,id,questions,goi7:tomTatGoi7(lap,now)}
   } catch (e) { await ghiDongCo.catch(() => {}); throw e } // lối ra lỗi giữa chừng: lô ghi của động cơ vẫn xong trước (như thứ tự cũ: ghi trong lúc lập)
 }

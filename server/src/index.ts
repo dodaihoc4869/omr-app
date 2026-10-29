@@ -95,6 +95,7 @@ import { tinhNangBat as tinhNangChuaBat } from './chua-cau-sai-cau-hinh'
 import { hangChieu, daChuaTrenLop } from './chua-cau-sai-chieu'
 import { moDot as chuaMoDot, phatItem as chuaPhatItem, nopItem as chuaNopItem, xinGoiY as chuaXinGoiY, danhSach as chuaDanhSach } from './chua-cau-sai'
 import { gonMo as chuaGonMo, gonNop as chuaGonNop } from './chua-gon-lenh'
+import { gonNopLuong } from './chua-gon-niem'
 import {tinhBoSungTheoDoi} from './btvn-theo-doi-nhom'
 import * as ND from './btvn-nang-do-d1'
 import { btvnNopTreBat } from './btvn-nang-do-chang'
@@ -3806,7 +3807,14 @@ const boXuLy = {
       if (p === '/hs/chua-cau-sai/xin-goi-y') return raChua(await chuaXinGoiY(env, b))
       // CHỮA CÂU GỌN (thầy 25/10, server/src/chua-gon-lenh.ts): mở bản làm lại (không đáp án) · nộp (máy chủ chấm, đúng lần 1 qua luật tự làm ⇒ Đã tự sửa ngay).
       if (p === '/hs/chua-cau-sai/gon-mo') return raChua(await chuaGonMo(env, b))
-      if (p === '/hs/chua-cau-sai/gon-nop') return raChua(await chuaGonNop(env, b))
+      // TEM NIÊM PHONG (29/10, chua-gon-niem.ts; thầy «Bấm kiểm tra còn quá lâu. Phải tức thì luôn»): máy em xin `luong: 1` + gửi `sk` của gon-mo ⇒ NDJSON: dòng 1 (kết quả suy từ tem, 0 đợt D1)
+      // rồi dòng 2 = phản hồi gon-nop đầy đủ như cũ. Không xin luồng / tem hỏng / hết hạn ⇒ JSON thường như trước.
+      if (p === '/hs/chua-cau-sai/gon-nop') {
+        const luongSua = await gonNopLuong(env, b, JSON_HEADERS, async () => (await (await chuaGonNop(env, b)).json()) as Record<string, unknown>,
+          (r) => ({ ...(lamSachThanLoi(r, 200).data as object), serverNow: Date.now(), nhipDeNghi: nhipDeNghi() }), ctx)
+        if (luongSua) return luongSua
+        return raChua(await chuaGonNop(env, b))
+      }
       // VIỆC HÔM NAY của Tự sửa lỗi trên máy chủ (28/10, tu-sua-viec-ngay.ts): máy em gửi nền bản 12 câu đã chọn ⇒ đổi máy vẫn cùng 12 câu.
       if (p === '/hs/chua-cau-sai/viec-ngay') return raChua(await import('./tu-sua-viec-ngay').then((m) => m.hsGhiViecNgay(env, b)))
       if (p === '/hs/on-lai/nop') { const r = await sauGhi(env, b, hsOnLaiNop(env, b, ctx)); return ra(r, trangThaiNop(r)) }

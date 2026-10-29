@@ -24,6 +24,7 @@ import { damBaoKtCn } from '../server/src/kiem-tra-ca-nhan-schema'
 import { metaKt } from '../server/src/kiem-tra-ca-nhan'
 import type { Env } from '../server/src/kieu'
 import { cronSanSangDem, xoaBangVangSanSang } from '../server/src/san-sang'
+import { lamMoiNiem, moNiem } from '../server/src/niem-phong'
 
 const NOW = Date.parse('2026-10-12T13:30:00Z') // 20:30 giờ VN — giờ cao điểm
 beforeEach(() => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(NOW) })
@@ -193,6 +194,15 @@ it('câu cuối chặng ⇒ chuẩn bị nền: Sảnh ≤ 1 đợt, mở chặn
   const dem = Date.parse('2026-10-13T01:00:00+07:00')
   vi.setSystemTime(dem)
   expect(await cronSanSangDem(k.rawEnv, dem, 10)).toBeGreaterThanOrEqual(1)
+  // TEM NIÊM PHONG (29/10): chặng lập sẵn mang tem hạn DÀI trong D1 — máy em KHÔNG bao giờ nhận tem ấy trực tiếp (`moNiem` từ chối), lúc mở được làm MỚI (45 phút từ giờ).
+  const luuSan = JSON.parse(String((k.d.sql.prepare('SELECT chang_json FROM hoc_tap_san_sang WHERE sbd=?').get('S1') as { chang_json: string }).chang_json)) as { questions: { qid: string; sk?: string }[] }
+  expect(luuSan.questions.length).toBeGreaterThan(0)
+  const luc19 = Date.parse('2026-10-13T19:30:06+07:00')
+  for (const q of luuSan.questions) {
+    expect(typeof q.sk).toBe('string')
+    expect(await moNiem(k.rawEnv as Env, 'S1', q.qid, q.sk, luc19)).toBeNull() // hạn dài ⇒ chưa dùng được trực tiếp
+    expect(await lamMoiNiem(k.rawEnv as Env, 'S1', q.qid, q.sk, luc19)).toBeTypeOf('string')
+  }
   vi.setSystemTime(Date.parse('2026-10-13T19:30:00+07:00'))
   await goi(k, 'hoc-tap-dem', {}, k.tokenBan)
   const dauNgay = await goi(k, 'hoc-tap-sanh', {})
@@ -201,6 +211,10 @@ it('câu cuối chặng ⇒ chuẩn bị nền: Sảnh ≤ 1 đợt, mở chặn
   vi.setSystemTime(Date.parse('2026-10-13T19:30:05+07:00'))
   const moDauNgay = await goi(k, 'hoc-tap-start', {})
   expect(moDauNgay.kq.ok).toBe(true); expect(moDauNgay.dot).toBeLessThanOrEqual(2); ghiDo('mo-chang-dau-ngay', moDauNgay)
+  // Chặng mở từ bản sẵn: mỗi câu mang tem đã làm MỚI — dùng được ngay (dòng 1 «Kiểm tra» không cần D1) và đúng câu.
+  const moCau = moDauNgay.kq.questions as { qid: string; sk?: string }[]
+  expect(moCau.length).toBeGreaterThan(0)
+  for (const q of moCau) expect(await moNiem(k.rawEnv as Env, 'S1', q.qid, q.sk, Date.parse('2026-10-13T19:30:10+07:00'))).toMatchObject({ q: q.qid })
 })
 
 it('cổng tốc độ: số đợt chờ D1 của Sảnh / Mở chặng (bản sẵn) không vượt mốc `mayChuSanSang` (mốc chỉ hạ)', () => {

@@ -94,7 +94,7 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
     })
     nutChinh.current?.focus({ preventScroll: true })
     if (tt === 'dung') banHat(goc.current?.querySelector('.ht2-lam-pa[data-ket=dung], .ht2-lam-o-hang[data-ket=dung]') ?? goc.current?.querySelector('.duo-kq-bi'), { so: 8, xa: 72 })
-  }, [kq]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [!!kq, kq?.ket, kq?.lan]) // eslint-disable-line react-hooks/exhaustive-deps -- kết quả TẠM (dòng tam) rồi bản đầy đủ cùng kết quả ⇒ không bung hạt / cuộn lần hai
   useEffect(() => { if (xongChang) phanHoi('xong') }, [xongChang])
 
   const tiepTuc = () => {
