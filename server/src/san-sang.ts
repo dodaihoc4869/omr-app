@@ -254,23 +254,64 @@ export const xoaChuanBiKhiThoat = (): void => daChuanBiKhiThoat.clear()
 
 /** Khung cron ĐÊM của bản lập sẵn (giờ VN): từ 00:15 (sau việc 00:01 đổi ngày) tới HẾT 03:59 — thầy 29/10: «mỗi ngày load trước cho học sinh TRƯỚC 4h sáng». */
 export const DEM_BAT_DAU_PHUT = 15, DEM_KET_GIO = 4
-/** Số em mỗi phút: đêm 10 (2 250 em / khung; ~30 lệnh D1 mỗi em, đêm D1 vắng), chiều 12 (13:00–18:59 ⇒ 4 300 lượt — đủ phủ mọi em có gói TRƯỚC giờ cao điểm 19h, thầy 29/10 «nạp hết sẵn cho 100% học sinh»). */
-export const TOI_DA_DEM = 10, TOI_DA_CHIEU = 12, SONG_SONG_CRON = 4
-/** Khung chiều: 13:00–18:59 VN (giờ học bắt đầu 19h; D1 còn vắng). */
-export const trongKhungChieu = (now: number): boolean => { const g = new Date(now + 7 * 3600000).getUTCHours(); return g >= 13 && g < 19 }
+/** Số em lập sẵn mỗi phút theo khung giờ VN: đêm 00:15–03:59 → 10 (D1 vắng); 04:00–12:59 → 6; chiều 13:00–18:59 → 16 (trước giờ học — thầy 29/10 «nạp hết sẵn cho 100% học sinh»; ~30 lệnh D1/em,
+ *  trần ~1000 lệnh D1 mỗi lượt cron ⇒ không quá 16); tối 19:00–23:59 → 6 (chỉ để vá bản bị đổi dấu khi thầy giao bài giữa giờ — D1 bận nên ít); 00:00–00:14 → 0 (việc đổi ngày 00:01). */
+export const TOI_DA_DEM = 10, TOI_DA_SANG = 6, TOI_DA_CHIEU = 16, TOI_DA_TOI = 6, SONG_SONG_CRON = 4
+/** Em vừa trả lời trong vòng này ⇒ đang học: cron KHÔNG lập lại bản của em (lượt cuối chặng / lúc rời app đã lo, tránh lập đi lập lại khi em làm từng câu). */
+export const EM_DANG_HOC_MS = 10 * 60_000
 /** Giờ này (VN) có thuộc khung chuẩn bị đêm không? */
 export const trongKhungDem = (now: number): boolean => { const d = new Date(now + 7 * 3600000), g = d.getUTCHours(); return g >= 1 && g < DEM_KET_GIO || (g === 0 && d.getUTCMinutes() >= DEM_BAT_DAU_PHUT) }
+/** Khung chiều: 13:00–18:59 VN. */
+export const trongKhungChieu = (now: number): boolean => { const g = new Date(now + 7 * 3600000).getUTCHours(); return g >= 13 && g < 19 }
+/** Hạn mức số em lập sẵn cho phút này (0 = nghỉ). */
+export function toiDaCron(now: number): number {
+  const g = new Date(now + 7 * 3600000).getUTCHours()
+  if (g >= 19) return TOI_DA_TOI
+  if (g >= 13) return TOI_DA_CHIEU
+  if (g >= 4) return TOI_DA_SANG
+  return trongKhungDem(now) ? TOI_DA_DEM : 0
+}
 
 /**
- * CRON ĐÊM 00:15–03:59 VN (+ chiều 13:00–18:59): chuẩn bị sẵn cho MỌI em còn đang nhận gói chưa có bản hôm nay (hoặc bản theo cách tính dấu cũ — khác `BAN_DAU`), rồi (còn chỗ) làm mới bản đã CŨ
- * (em vừa học xong một đợt mới hơn bản sẵn) — tối đa `toiDa` em mỗi phút (một lượt ~30 lệnh D1/em).
- * 29/10 chiều: cũ chọn theo `goi_bai_7_em.han >= hôm nay` ⇒ bỏ sót ~233 em (hạn là HẠN NỘP, em vẫn «đang nhận» sau hạn — goi-bai-7-quyen.ts). Nay dùng ĐÚNG điều kiện của
+ * DẤU HIỆN TẠI của nhiều em (cron): em đầu đọc kèm phần CHUNG (tươi), các em còn lại chỉ phần của em, theo lô ≤ 50 lệnh — ghép bằng `chuoiDau` y như lượt Sảnh.
+ * Đồng thời làm tươi đệm phần chung của isolate để `chuanBiSanSang` ngay sau đó ghi dấu khớp. Trả `a` = mốc trả lời cuối của em. Lỗi ⇒ null (bỏ lượt làm mới này).
+ */
+async function dauNhieuEm(env: Env, sbds: readonly string[], now: number): Promise<Map<string, { dau: string; a: number }> | null> {
+  const ra = new Map<string, { dau: string; a: number }>()
+  if (!sbds.length) return ra
+  const mocA = (r: Row) => { const t = Date.parse(String(r.a ?? '')); return Number.isFinite(t) ? t : 0 }
+  for (let lan = 0; lan < 4; lan++) {
+    try {
+      const r0 = await env.DB.prepare(sqlDauSanSang(bangVang, true)).bind(sbds[0]).first<Row>()
+      if (!r0) return null
+      ghiChung(r0, now)
+      const d0 = chuoiDau(r0); if (d0) ra.set(sbds[0]!, { dau: d0, a: mocA(r0) })
+      const con = sbds.slice(1)
+      for (let i = 0; i < con.length; i += 50) {
+        const lo = con.slice(i, i + 50)
+        const rs = await env.DB.batch(lo.map((sbd) => env.DB.prepare(sqlDauSanSang(bangVang, false)).bind(sbd)))
+        lo.forEach((sbd, j) => { const r = rs[j]?.results?.[0] as Row | undefined; const d = chuoiDau(r, r0); if (r && d) ra.set(sbd, { dau: d, a: mocA(r) }) })
+      }
+      return ra
+    } catch (e) {
+      const m = /no such table:\s*(?:main\.)?([A-Za-z_][A-Za-z0-9_]*)/i.exec(e instanceof Error ? e.message : String(e))
+      if (!m || !PHAN_DAU.some(([, b]) => b === m[1]) || bangVang.has(m[1]!)) return null
+      bangVang.add(m[1]!); ra.clear()
+    }
+  }
+  return null
+}
+
+/**
+ * CRON LẬP SẴN (cả ngày, trừ 00:00–00:14): chuẩn bị Sảnh + chặng đầu cho MỌI em còn đang nhận gói — trước hết em CHƯA có bản hôm nay (hoặc bản theo cách tính dấu cũ), rồi (còn chỗ) em có bản
+ * nhưng DẤU ĐÃ ĐỔI (thầy giao bài / đổi cấu hình / gói mới… — dấu chung đổi là mọi bản của mọi em lệch cùng lúc ⇒ lượt mở app đầu của em phải lập lại ~3 s; thầy 29/10 «mở app phải tức thì 100%»).
+ * Tối đa `toiDaCron` em mỗi phút (~30 lệnh D1/em). Em vừa trả lời < `EM_DANG_HOC_MS` thì bỏ qua (đang học); em học gần đây nhất được lập lại trước.
+ * 29/10 chiều: bản cũ chọn theo `goi_bai_7_em.han >= hôm nay` ⇒ bỏ sót ~233 em (hạn là HẠN NỘP, em vẫn «đang nhận» sau hạn — goi-bai-7-quyen.ts). Nay dùng ĐÚNG điều kiện của
  * `docDanhSachGoi7` (lớp hiệu lực, tick còn hoạt động, quyền nhận), không điều kiện ngày.
  */
 export async function cronSanSangDem(env: Env, now: number, toiDa?: number): Promise<number> {
-  const chieu = trongKhungChieu(now)
-  if (!chieu && !trongKhungDem(now)) return 0
-  toiDa ??= chieu ? TOI_DA_CHIEU : TOI_DA_DEM
+  toiDa ??= toiDaCron(now)
+  if (toiDa <= 0) return 0
   try {
     const { chayDdlMotLan } = await import('./ddl-mot-lan')
     await chayDdlMotLan(env, BANG_SAN_SANG, SQL_SAN_SANG)
@@ -283,17 +324,22 @@ export async function cronSanSangDem(env: Env, now: number, toiDa?: number): Pro
       JOIN hoc_sinh h ON h.sbd=e.sbd AND ${g7.sqlTenLopHs('h')}=g.lop JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE ${sqlEmDangNhan7('e', 'g', 'h')}`
     const chua = await env.DB.prepare(`SELECT x.sbd FROM (${emNhan}) x WHERE NOT EXISTS (SELECT 1 FROM ${BANG_SAN_SANG} s WHERE s.sbd=x.sbd AND s.ngay=? AND s.dau LIKE ?) ORDER BY x.sbd LIMIT ?`)
       .bind(ngay, BAN_DAU + '§%', toiDa).all<{ sbd: string }>()
-    const ds = [...(chua.results ?? [])]
-    // Còn chỗ ⇒ làm mới bản cũ: đợt học MỚI NHẤT của em muộn hơn lúc lập bản sẵn (phiên mới ⇒ dấu đã đổi).
+    const ds = (chua.results ?? []).map((r) => String(r.sbd))
+    // Còn chỗ ⇒ vá bản đã LỆCH DẤU (so với dấu hiện tại), em học gần đây nhất trước, bỏ em đang học dở.
     if (ds.length < toiDa) {
-      const cu = await env.DB.prepare(`SELECT x.sbd FROM (${emNhan}) x JOIN ${BANG_SAN_SANG} s ON s.sbd=x.sbd AND s.ngay=? AND s.dau LIKE ?
-        WHERE (SELECT g.created_at FROM game_v2_session g WHERE g.sbd=s.sbd ORDER BY g.created_at DESC LIMIT 1) > strftime('%Y-%m-%dT%H:%M:%fZ', s.luc/1000.0, 'unixepoch')
-        ORDER BY s.luc LIMIT ?`).bind(ngay, BAN_DAU + '§%', toiDa - ds.length).all<{ sbd: string }>()
-      ds.push(...(cu.results ?? []))
+      const co = await env.DB.prepare(`SELECT x.sbd, s.dau, (SELECT g.created_at FROM game_v2_session g WHERE g.sbd=x.sbd ORDER BY g.created_at DESC LIMIT 1) AS gan FROM (${emNhan}) x
+        JOIN ${BANG_SAN_SANG} s ON s.sbd=x.sbd AND s.ngay=? AND s.dau LIKE ?`).bind(ngay, BAN_DAU + '§%').all<{ sbd: string; dau: string; gan: string | null }>()
+      const hang = co.results ?? []
+      const hienTai = await dauNhieuEm(env, hang.map((r) => String(r.sbd)), now)
+      if (hienTai) {
+        const lech = hang.filter((r) => { const h = hienTai.get(String(r.sbd)); return !!h && h.dau !== String(r.dau) && now - h.a >= EM_DANG_HOC_MS })
+          .sort((a, b) => String(b.gan ?? '').localeCompare(String(a.gan ?? '')))
+        ds.push(...lech.slice(0, toiDa - ds.length).map((r) => String(r.sbd)))
+      }
     }
-    // Từng nhóm 4 em chạy song song (mỗi em ~30 lệnh D1 nối tiếp ⇒ 12 em/phút nối tiếp có thể vượt một phút); chiều/đêm D1 vắng.
+    // Từng nhóm 4 em chạy song song (mỗi em ~30 lệnh D1 nối tiếp ⇒ 16 em/phút nối tiếp có thể vượt một phút); chiều/đêm D1 vắng.
     let n = 0
-    for (let i = 0; i < ds.length; i += SONG_SONG_CRON) n += (await Promise.all(ds.slice(i, i + SONG_SONG_CRON).map((r) => chuanBiSanSang(env, String(r.sbd), now)))).filter(Boolean).length
+    for (let i = 0; i < ds.length; i += SONG_SONG_CRON) n += (await Promise.all(ds.slice(i, i + SONG_SONG_CRON).map((sbd) => chuanBiSanSang(env, sbd, now)))).filter(Boolean).length
     return n
   } catch (e) { console.error('[san-sang] cron đêm lỗi:', e instanceof Error ? e.message : e); return 0 }
 }
