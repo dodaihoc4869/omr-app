@@ -45,3 +45,4 @@ jobs:
           q "BỘ NẠP SẴN của tài khoản thử: ngày · tuổi (giây) · có Sảnh · số câu chặng · số tem sk · cỡ KB" "SELECT ngay, (CAST(strftime('%s','now') AS INTEGER)*1000-luc)/1000 tuoi_giay, sanh_json IS NOT NULL co_sanh, json_array_length(json_extract(chang_json,'\$.questions')) so_cau, (length(chang_json)-length(replace(chang_json,'\"sk\"','')))/4 so_tem, length(chang_json)/1024 kb FROM hoc_tap_san_sang WHERE sbd=$S"
           q "đã làm hôm nay / mức chốt" "SELECT (SELECT COUNT(*) FROM su_kien_hoc WHERE sbd=$S AND ngay_vn=$HOM) so_dong_so, (SELECT muc FROM goi_bai_7_muc_ngay WHERE sbd=$S AND ngay=$HOM) muc"
           q "mức ngày đã chốt" "SELECT tang, toi_thieu_tang, quota, muc FROM goi_bai_7_muc_ngay WHERE sbd=$S AND ngay=$HOM"
+# lần 1 1793262473
