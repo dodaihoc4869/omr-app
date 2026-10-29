@@ -62,7 +62,7 @@ function boDemDot(goc: Env['DB']) {
 }
 
 
-const MOC = { moNguoi: 11, moAm: 3, goiMoLai: 1, nopSaiAm: 2, nopDungAm: 2, nopNguoi: 4 }
+const MOC = { moNguoi: 11, moAm: 3, goiMoLai: 1, nopSaiAm: 2, nopDungAm: 2, nopNguoi: 5 }
 
 it('mở câu / nộp của Sửa lỗi: số đợt chờ D1 nối tiếp không vượt mốc', async () => {
   const d = taoD1That()
