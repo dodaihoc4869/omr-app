@@ -3644,7 +3644,7 @@ const boXuLy = {
             if (await congL) return LOI_DANG_LAM_MOI as unknown as Record<string, unknown>
             return kq
           }
-          const luong = await traLoiNopLuong(env, b, JSON_HEADERS, chayDu, (r) => ({ ...r, serverNow: Date.now(), nhipDeNghi: nhipDeNghi() }), ctx)
+          const luong = await traLoiNopLuong(env, b, JSON_HEADERS, chayDu, (r) => ({ ...r, serverNow: Date.now(), nhipDeNghi: nhipDeNghi() }), ctx, (r) => ra(r))
           if (luong) return luong
         }
         if (!congGame) { const kq = await gameV2(env, lenhGame, b, ctx); sauLenhGame(env, lenhGame, b, kq, ctx); return ra(kq) }

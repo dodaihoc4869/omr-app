@@ -16,6 +16,7 @@ import { damBaoBangBaiDaDay, xoaDemPhamVi } from '../server/src/bai-da-day'
 import { xoaDemChienDich, xoaDemMetaCau } from '../server/src/srs2-d1'
 import { xoaDemCaBaoVe } from '../server/src/game-v2-bank'
 import { xoaDemChanKhoi } from '../server/src/chan-khac-khoi'
+import { xoaChamNhanh } from '../server/src/cham-nhanh'
 import { gameToken } from '../server/src/game-v2-auth'
 import { damBaoKtCn } from '../server/src/kiem-tra-ca-nhan-schema'
 import { metaKt } from '../server/src/kiem-tra-ca-nhan'
@@ -174,6 +175,16 @@ it('nút «Kiểm tra» (answer) và lệnh đếm sau câu: số đợt chờ D
   vi.setSystemTime(NOW + 480_000); await amCo(); ghi('ca-dang-mo', await caMo())
   // 28/10 tối: mở lại Lộ trình khi sổ không đổi (em quay về Sảnh) — mọi lượt đọc đầu vào cùng đợt lượt kiểm em có thật, tổng hợp sổ không chờ mốc.
   vi.setSystemTime(NOW + 540_000); await amCo(); ghi('ke-hoach-ngay-lai', await keHoach())
+  // DÒNG 1 SỚM TỪ ĐƯỜNG THƯỜNG (29/10, thầy «Bấm kiểm tra vẫn chưa tức thì»): đệm isolate TRƯỢT (isolate mới / nhiều isolate giờ cao điểm) ⇒ lệnh đầy đủ gửi dòng 1 ngay khi chấm xong
+  // sau đợt đọc đầu — không chờ OMNI + lô ghi. Đo tới dòng 1 (trước 29/10: không có dòng 1, em chờ cả lệnh).
+  if (ds[5]) {
+    vi.setSystemTime(NOW + 600_000); await amCo(); xoaChamNhanh()
+    const truot = await goiLuong(k, { session: s.kq.id, qid: ds[5].qid, answer: traLoi(ds[5].phan, true), assisted: false, msLam: 30_000 })
+    expect(truot.kq.__khongLuong, JSON.stringify(truot.kq).slice(0, 200)).toBeUndefined()
+    expect(truot.kq.tam).toBe(true); expect(truot.kq.correct).toBe(true)
+    expect(truot.du?.ok, JSON.stringify(truot.du).slice(0, 200)).toBe(true); expect(truot.du?.correct).toBe(true)
+    ghi('nop-cau-luong-truot', truot)
+  }
   const moc = JSON.parse(fs.readFileSync(MOC, 'utf8')) as { mayChuNop?: Record<string, { dot: number; lenh: number }> }
   if (process.env.GHI_MOC_TOC_DO) fs.writeFileSync(process.env.GHI_MOC_TOC_DO, JSON.stringify(do_, null, 1))
   const vuot: string[] = [], ha: string[] = [], thieuMoc: string[] = []

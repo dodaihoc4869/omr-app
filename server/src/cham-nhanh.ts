@@ -96,6 +96,20 @@ function coTheLaLuot(v: unknown): boolean {
   return Math.round(n) < THAM_SO_OMNI.LUOT_MS_MAX
 }
 
+// DÒNG 1 SỚM TỪ ĐƯỜNG THƯỜNG (29/10, thầy «Bấm kiểm tra vẫn chưa tức thì»): đệm isolate trượt (câu / phiên chưa nằm trong isolate này — gặp nhiều giờ cao điểm khi có nhiều isolate)
+// ⇒ trước đây em chờ cả lệnh `answer` (~3 đợt D1: đọc đầu → OMNI → lô ghi) mới thấy đúng / sai. Nay đường thường (game-v2.ts) gửi dòng 1 NGAY khi đã chấm xong sau đợt đọc đầu
+// (phiên, câu, phạm vi, đề bảo vệ đều ĐÃ kiểm ở đường thường), không chờ OMNI + lô ghi. Nơi gọi (nop-luong.ts) đăng ký hàm nhận theo đúng đối tượng thân yêu cầu `b`.
+const tamSomCua = new WeakMap<object, (d: DongNhanh) => void>()
+export function dangKyTamSom(b: object, f: (d: DongNhanh) => void): void { tamSomCua.set(b, f) }
+/** Gửi dòng 1 sớm nếu thân yêu cầu `b` có đăng ký (một lần). Trả true khi đã gửi — nơi gọi khi ấy PHẢI nhớ đáp án đã lộ (`nhoDaLo`). */
+export function phatTamSom(b: object, d: DongNhanh): boolean {
+  const f = tamSomCua.get(b)
+  if (!f) return false
+  tamSomCua.delete(b)
+  try { f(d); return true } catch { return false }
+}
+export { coTheLaLuot as coTheLaLuotMs }
+
 export type DongNhanh = { ok: true; tam: true; correct: boolean; answer: string; traLoi: string; solution: unknown; solutionImages: unknown[]; khongTinh?: true }
 
 /**
