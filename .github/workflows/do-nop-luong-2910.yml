@@ -60,6 +60,12 @@ jobs:
             }
           }
           console.log(`sự kiện: ${ev.length} · lệnh answer: ${tong}`)
+          // KẾT CỤC mọi yêu cầu (29/10: đo bộ nhớ — `exceededMemory` giết cả isolate kéo theo mọi lượt đang chạy): tổng theo kết cục + đường dẫn của lượt KHÔNG ok.
+          const kc = new Map(), kcDuong = new Map()
+          for (const e of ev) { const o = String(e?.outcome ?? '?'); kc.set(o, (kc.get(o) ?? 0) + 1)
+            if (o !== 'ok') { let p = '?'; try { p = new URL(e?.event?.request?.url).pathname } catch {} const k2 = o + ' ' + p; kcDuong.set(k2, (kcDuong.get(k2) ?? 0) + 1) } }
+          console.log('KẾT CỤC: ' + [...kc].sort((a, b) => b[1] - a[1]).map(([o, n]) => `${o}=${n}`).join(' · '))
+          for (const [k2, n] of [...kcDuong].sort((a, b) => b[1] - a[1]).slice(0, 8)) console.log(`  không-ok ${k2}: ${n}`)
           console.log(`CHẤM NHANH (từ bộ nhớ isolate): ${nhom.nhanh.n} lượt (${tong ? Math.round(100 * nhom.nhanh.n / tong) : 0}%) · dòng 1 ms p50/p90/max ${pt(nhom.nhanh.d1, .5)}/${pt(nhom.nhanh.d1, .9)}/${pt(nhom.nhanh.d1, 1)} · cả lệnh wall p50/p90 ${pt(nhom.nhanh.w, .5)}/${pt(nhom.nhanh.w, .9)} · cpu p50/p90 ${pt(nhom.nhanh.c, .5)}/${pt(nhom.nhanh.c, .9)}`)
           console.log(`ĐƯỜNG CHẬM (D1): ${nhom.cham.n} lượt (${tong ? Math.round(100 * nhom.cham.n / tong) : 0}%) · wall p50/p90/max ${pt(nhom.cham.w, .5)}/${pt(nhom.cham.w, .9)}/${pt(nhom.cham.w, 1)} · cpu p50/p90 ${pt(nhom.cham.c, .5)}/${pt(nhom.cham.c, .9)}`)
           // Mọi lệnh game-v2 khác (để so): số lượt + wall p50/p90
