@@ -101,11 +101,16 @@ describe('danh sách Tự sửa lỗi trả kế hoạch ngày', () => {
     expect(j.ke?.ung).toHaveLength(8)
     expect(j.ke!.ung.some((u) => cu.some((c) => c.d === u.d))).toBe(false)
   })
-  it('em đã làm xong câu nào (hoặc thêm chặng) ⇒ danh sách giữ nguyên giữa ngày, không bù', async () => {
+  it('29/10 áp dụng NGAY HÔM NAY: em đã làm xong vài câu của danh sách 12 câu cũ ⇒ vẫn bù cho đủ N; đã thêm chặng ⇒ không bù', async () => {
     const d = await dung({ moi: 300 })
     const ke = (await doc(d)).ke!
-    await ghi(d, { m: ke.ung.slice(0, 12), x: [ke.ung[0]!.d], them: 0 })
-    expect((await doc(d)).ke).toBeUndefined()
+    await ghi(d, { m: ke.ung.slice(0, 12), x: [ke.ung[0]!.d, ke.ung[1]!.d], them: 0 })
+    const bu = (await doc(d)).ke
+    expect(bu?.n).toBe(20)
+    expect(bu?.ung).toHaveLength(8)
+    expect(bu!.ung.some((u) => ke.ung.slice(0, 12).some((c) => c.d === u.d))).toBe(false)
+    await ghi(d, { m: [...ke.ung.slice(0, 12), ...bu!.ung], x: [ke.ung[0]!.d], them: 0, mt: 20 })
+    expect((await doc(d)).ke).toBeUndefined() // đã lập (mt = 20) ⇒ không bù lại
     const e = await dung({ moi: 300 })
     await ghi(e, { m: (await doc(e)).ke!.ung.slice(0, 16), x: [], them: 1 })
     expect((await doc(e)).ke).toBeUndefined()

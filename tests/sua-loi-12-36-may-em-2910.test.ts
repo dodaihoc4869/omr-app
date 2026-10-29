@@ -67,10 +67,18 @@ describe('danh sách 12 câu lập từ trước bản này', () => {
     expect(r.viec?.tong).toBe(20)
     expect(new Set(r.viec?.muc.map((x) => x.khoa)).size).toBe(20)
   })
-  it('em đã làm câu nào rồi mà bản trả về cũ (còn nhớ) vẫn mang kế hoạch ⇒ bỏ qua, danh sách không phình ra giữa ngày', () => {
-    const r = dungViecHomNay(kq({ viecNgay: mayChu(dai(0, 12), ['D0']), ke: ke(dai(12, 20)) }), NOW, SBD)
-    expect(r.viec?.tong).toBe(12)
-    expect(conSuaHomNay(r.viec ?? null)).toBe(11)
+  it('29/10 áp dụng NGAY HÔM NAY: em đã làm dở 12 câu cũ + máy chủ bù 8 câu ⇒ 20 câu, câu đã xong giữ nguyên, câu mới nối ở cuối, «còn» = 8 + chưa xong', () => {
+    const xong = dai(0, 12).map((i) => `D${i}`)
+    const r = dungViecHomNay(kq({ viecNgay: mayChu(dai(0, 12), xong), ke: ke(dai(12, 20)) }), NOW, SBD)
+    expect(r.viec?.muc.map((x) => x.khoa)).toEqual(dai(0, 20).map((i) => `D${i}`))
+    expect(r.viec?.xong).toBe(12)
+    expect(conSuaHomNay(r.viec ?? null)).toBe(8)
+    expect(conSuaPhanNgay(r.viec ?? null)).toBe(8) // khoá chặng sau đếm theo mục tiêu mới
+    expect(r.day?.mt).toBe(20)
+  })
+  it('đã thêm «Sửa thêm 1 chặng» (them > 0) ⇒ không bù thêm (tránh chèn giữa các chặng thêm)', () => {
+    const r = dungViecHomNay(kq({ viecNgay: mayChu(dai(0, 16), dai(0, 16).map((i) => `D${i}`), 1), ke: ke(dai(16, 24)) }), NOW, SBD)
+    expect(r.viec?.tong).toBe(16)
   })
   it('em đã làm giữa ngày: máy chủ không gửi kế hoạch ⇒ danh sách không đổi, số «còn» không nhảy lên', () => {
     const r = dungViecHomNay(kq({ viecNgay: mayChu(dai(0, 12), ['D0', 'D1']) }), NOW, SBD)
@@ -177,7 +185,10 @@ describe('máy em chỉ XIN kế hoạch khi cần (danh sách vẫn một lô D
   it('chưa có việc hôm nay ⇒ xin', async () => { auth(); expect(await goiDanhSach()).toMatchObject({ ke: 1 }) })
   it('có danh sách 12 câu cũ, chưa làm, chưa nhớ mt ⇒ xin (để bù cho đủ)', async () => { auth(); nhatKy({}); expect(await goiDanhSach()).toMatchObject({ ke: 1 }) })
   it('đã nhớ mt (kể cả 12) ⇒ không xin', async () => { auth(); nhatKy({ mt: 12 }); expect(await goiDanhSach()).not.toHaveProperty('ke') })
-  it('đã làm câu nào ⇒ không xin', async () => { auth(); nhatKy({ x: ['D0'] }); expect(await goiDanhSach()).not.toHaveProperty('ke') })
+  it('đã làm dở nhưng chưa nhớ mt ⇒ xin (áp dụng ngay hôm nay); đã thêm chặng ⇒ không xin', async () => {
+    auth(); nhatKy({ x: ['D0'] }); expect(await goiDanhSach()).toMatchObject({ ke: 1 })
+    nhatKy({ x: ['D0'], them: 1 }); expect(await goiDanhSach()).not.toHaveProperty('ke')
+  })
   it('nhật ký của NGÀY KHÁC ⇒ xin', async () => { auth(); nhatKy({ n: '2020-01-01', mt: 20 }); expect(await goiDanhSach()).toMatchObject({ ke: 1 }) })
   it('chưa đăng nhập (không SBD) ⇒ không xin', async () => { expect(await goiDanhSach()).not.toHaveProperty('ke') })
 })
