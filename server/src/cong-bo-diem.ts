@@ -23,6 +23,26 @@ export function laSanSangCongBo(congBo: string, trangThaiCa: string, daVao: numb
   return congBo === 'ngay' || (congBo === 'ca_lop_xong' && caDaXong(trangThaiCa, daVao, daNop))
 }
 
+/**
+ * LƯỢT CỦA EM ĐÃ NỘP: `da_nop` / `khoa` (thầy khoá bài) hoặc đã có giờ nộp — ĐÚNG định nghĩa `daNop` của `phieuCuaEm` (goi-cu.ts).
+ * Người gọi truyền LƯỢT MỚI NHẤT của em: thi lại đang làm dở (lượt 2 `dang_lam` / `duoc_duyet_lai`) là CHƯA nộp dù lượt 1 đã nộp.
+ */
+export function luotDaNop(trangThai: unknown, nopLuc: unknown): boolean {
+  const tt = trangThai === null || trangThai === undefined ? '' : String(trangThai)
+  const nop = nopLuc === null || nopLuc === undefined ? '' : String(nopLuc)
+  return tt === 'da_nop' || tt === 'khoa' || nop !== ''
+}
+
+/**
+ * ĐÁP ÁN + LỜI GIẢI (`keyBank`) có được xuống máy em này không. «Đáp án không xuống máy học sinh trước khi nộp» (CLAUDE.md):
+ * ca phải ĐÃ CÔNG BỐ (`laSanSangCongBo`) VÀ (lượt mới nhất của em đã nộp HOẶC ca đã ĐÓNG — hết cửa vào, không ai còn thi).
+ * Thiếu vế «em đã nộp» thì ca `ngay` (luôn công bố) hoặc ca `ca_lop_xong` mà những em đã vào đều nộp xong sẽ mở đáp án cho
+ * BẤT KỲ AI biết mã ca — kể cả em chưa vào thi / đang làm dở / đang thi lại. `sanSang` (đã công bố chưa) KHÔNG đổi, chỉ chặn đáp án.
+ */
+export function duocXemDapAn(sanSang: boolean, trangThaiCa: string, emDaNop: boolean): boolean {
+  return sanSang && (emDaNop || trangThaiCa === 'dong')
+}
+
 /** Chuẩn hoá `ca.cong_bo` (thiếu / lạ ⇒ `khong`). */
 export function cheDoCongBo(v: unknown): CheDoCongBo {
   const s = v === null || v === undefined ? '' : String(v).trim()

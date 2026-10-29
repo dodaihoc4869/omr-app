@@ -31,7 +31,7 @@ import { chuanNhanKienThuc, gomDiemNhan, thuongNhan, type BangChungCau, type Cau
 import type { D1PreparedStatement, Env } from './kieu'
 import { docDsQid, docNamKtChoLop, type NamKtCauMayChu } from './ho-so-len-bang'
 import { tenLopCuaEm } from './ten-lop'
-import { docTrangThaiCongBo, dongChuaCongBo, laSanSangCongBo } from './cong-bo-diem'
+import { docTrangThaiCongBo, dongChuaCongBo, duocXemDapAn, laSanSangCongBo, luotDaNop } from './cong-bo-diem'
 import { chamLuotTuNganHang } from './cham-lai-ca'
 import { docKeyBankDem, ghiKeyBank } from './dem-ca-thi'
 import { buSoCauChoKeyBank, hopNhatKeyBank } from './key-bank-hop-nhat'
@@ -2105,21 +2105,29 @@ export async function noiKhoCa(env: Env, b: Record<string, unknown>): Promise<Re
 
 /** HỎI LẠI SAU KHI NỘP (chế độ `ca_lop_xong`, hoặc mở lại app sau khi đã nộp).
  *
- * Trả về ĐÚNG dáng `KetQuaCongBo` của đường cũ: `sanSang` là "đã được phép xem
- * đáp án chưa", và chỉ khi ấy mới kèm `keyBank`. Đếm bằng MỘT câu — không lặp
- * theo em, vì lệnh này cả lớp bắn cùng lúc lúc tan ca. */
+ * Trả về ĐÚNG dáng `KetQuaCongBo` của đường cũ: `sanSang` là "ca đã công bố chưa";
+ * `keyBank` chỉ kèm khi ca đã công bố VÀ em (SBD trong thân yêu cầu) đã NỘP lượt mới nhất
+ * hoặc ca đã đóng (`duocXemDapAn`). Đếm bằng MỘT câu — không lặp theo em, vì lệnh này
+ * cả lớp bắn cùng lúc lúc tan ca. */
 export async function ketQuaCuaEm(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
   const maCa = chuoi(b.maCa).trim()
   if (!maCa) return { ok: false, error: 'Thiếu mã ca' }
-  const ca = await env.DB.prepare('SELECT cong_bo, trang_thai, so_cau_json FROM ca WHERE ma_ca = ?').bind(maCa).first<Record<string, unknown>>()
+  const sbd = chuoi(b.sbd).trim()
+  // HAI lượt đọc CHẠY SONG SONG (trước: nối tiếp ⇒ 2 đợt chờ D1; nay 1) — cả lớp hỏi lệnh này mỗi 4–15 giây sau khi nộp.
+  // Lượt MỚI NHẤT của em (SBD trong thân yêu cầu) đi cùng câu đếm bằng hai truy vấn con vô hướng ⇒ KHÔNG thêm câu, KHÔNG thêm đợt chờ.
+  const [ca, dem] = await Promise.all([
+    env.DB.prepare('SELECT cong_bo, trang_thai, so_cau_json FROM ca WHERE ma_ca = ?').bind(maCa).first<Record<string, unknown>>(),
+    env.DB.prepare(
+      `SELECT COUNT(*) AS da_vao, SUM(CASE WHEN trang_thai = 'da_nop' THEN 1 ELSE 0 END) AS da_nop,
+              (SELECT trang_thai FROM luot WHERE ma_ca = ? AND sbd = ? ORDER BY lan_thu DESC LIMIT 1) AS em_trang_thai,
+              (SELECT nop_luc FROM luot WHERE ma_ca = ? AND sbd = ? ORDER BY lan_thu DESC LIMIT 1) AS em_nop_luc
+         FROM luot WHERE ma_ca = ?`,
+    )
+      .bind(maCa, sbd, maCa, sbd, maCa)
+      .first<{ da_vao: number; da_nop: number; em_trang_thai: string | null; em_nop_luc: string | null }>(),
+  ])
   if (!ca) return { ok: false, error: 'Không tìm thấy ca kiểm tra' }
   const congBo = chuoi(ca.cong_bo) || 'khong'
-  const dem = await env.DB.prepare(
-    `SELECT COUNT(*) AS da_vao, SUM(CASE WHEN trang_thai = 'da_nop' THEN 1 ELSE 0 END) AS da_nop
-       FROM luot WHERE ma_ca = ?`,
-  )
-    .bind(maCa)
-    .first<{ da_vao: number; da_nop: number }>()
   const daVao = Number(dem?.da_vao) || 0
   const daNop = Number(dem?.da_nop) || 0
 
@@ -2127,8 +2135,11 @@ export async function ketQuaCuaEm(env: Env, b: Record<string, unknown>): Promise
   // ai vào thì KHÔNG tính là xong — nếu không, em mở link sớm là thấy đáp án.
   const sanSang = laSanSangCongBo(congBo, chuoi(ca.trang_thai), daVao, daNop) // MỘT nguồn luật công bố (cong-bo-diem.ts): ca đóng / cả lớp nộp / `ngay`
 
+  // ĐÁP ÁN CHỈ XUỐNG MÁY EM ĐÃ NỘP (29/10: trước đây chỉ hỏi «ca đã công bố chưa» ⇒ ca `ngay` lộ đáp án cho ai biết mã ca). `sanSang` giữ nguyên; xem `duocXemDapAn`.
+  const duocXem = duocXemDapAn(sanSang, chuoi(ca.trang_thai), luotDaNop(dem?.em_trang_thai, dem?.em_nop_luc))
+
   let keyBank: unknown = null
-  if (sanSang && env.DE) {
+  if (duocXem && env.DE) {
     const o = await env.DE.get(`key/${maCa}.json`)
     if (o?.body) {
       try {
@@ -2141,8 +2152,7 @@ export async function ketQuaCuaEm(env: Env, b: Record<string, unknown>): Promise
   // Tờ đáp án thiếu `soCau` (bị ghi đè trước đây) ⇒ bù từ D1: thiếu mẫu số thì máy em mở lại app chấm loãng điểm (xem key-bank-hop-nhat.ts).
   const buMau = buSoCauChoKeyBank(keyBank, null, ca.so_cau_json)
   if (buMau) keyBank = buMau.giaTri
-  // EXP em nhận từ ca (bản vẽ ca thi 28/09, màn e): CHỈ khi đã được xem điểm (cùng cổng với đáp án) và có SBD. Chỉ-đọc.
-  const sbd = chuoi(b.sbd).trim()
+  // EXP em nhận từ ca (bản vẽ ca thi 28/09, màn e): CHỈ khi đã được xem điểm (cùng cổng công bố với đáp án) và có SBD. Chỉ-đọc.
   const expCa = sanSang && sbd ? await expCuaEmTrongCa(env, maCa, sbd) : null
   return { ok: true, congBo, sanSang, daNop, daVao, keyBank, ...(expCa !== null ? { expCa } : {}) }
 }
