@@ -217,6 +217,38 @@ it('câu cuối chặng ⇒ chuẩn bị nền: Sảnh ≤ 1 đợt, mở chặn
   for (const q of moCau) expect(await moNiem(k.rawEnv as Env, 'S1', q.qid, q.sk, Date.parse('2026-10-13T19:30:10+07:00'))).toMatchObject({ q: q.qid })
 })
 
+it('cron chuẩn bị MỌI em còn đang nhận gói — kể cả gói đã QUÁ HẠN nộp (29/10: cũ lọc `han >= hôm nay` ⇒ bỏ sót 233 em); em khoá thì không; bản cũ (em vừa học phiên mới) được làm mới', async () => {
+  const k = await kho()
+  const dem = Date.parse('2026-10-13T01:00:00+07:00')
+  vi.setSystemTime(dem)
+  k.d.sql.exec("UPDATE goi_bai_7_em SET han='2026-10-01'") // hạn đã qua — em vẫn «đang nhận» (goi-bai-7-quyen.ts)
+  expect((k.d.sql.prepare("SELECT COUNT(*) n FROM goi_bai_7_em WHERE han<'2026-10-13'").get() as { n: number }).n).toBeGreaterThanOrEqual(2)
+  const soEm = (k.d.sql.prepare('SELECT COUNT(DISTINCT sbd) n FROM goi_bai_7_em').get() as { n: number }).n
+  expect(soEm).toBeGreaterThanOrEqual(2)
+  k.d.sql.exec("UPDATE hoc_sinh SET trang_thai='khoa' WHERE sbd='S2'")
+  expect(await cronSanSangDem(k.rawEnv, dem, 10)).toBe(2) // S1 + S3 (S2 bị khoá)
+  const ban = k.d.sql.prepare('SELECT sbd, ngay, luc FROM hoc_tap_san_sang').all() as { sbd: string; ngay: string; luc: number }[]
+  expect(ban.map((b) => b.sbd).sort()).toEqual(['S1', 'S3'])
+  expect(ban[0]!.ngay).toBe('2026-10-13')
+  // Đã có bản đủ mới ⇒ lượt sau không lập lại.
+  vi.setSystemTime(dem + 60_000)
+  expect(await cronSanSangDem(k.rawEnv, dem + 60_000, 10)).toBe(0)
+  // Em S1 học một phiên MỚI hơn bản sẵn ⇒ cron làm mới bản (còn chỗ trong lượt).
+  k.d.sql.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').run('phien-moi', 'S1', '{}', new Date(dem + 120_000).toISOString())
+  vi.setSystemTime(dem + 180_000)
+  expect(await cronSanSangDem(k.rawEnv, dem + 180_000, 10)).toBe(1) // chỉ S1 (S3 chưa có phiên mới)
+  expect((k.d.sql.prepare('SELECT luc FROM hoc_tap_san_sang WHERE sbd=?').get('S1') as { luc: number }).luc).toBe(dem + 180_000)
+})
+
+it('khung cron: chiều 13:00–18:59 và đêm 00:15–03:59 có chạy; 19:00–23:59 (giờ cao điểm) không chạy', async () => {
+  const { trongKhungChieu, trongKhungDem } = await import('../server/src/san-sang')
+  const vn = (h: number, m = 0) => Date.parse(`2026-10-13T${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00+07:00`)
+  expect(trongKhungChieu(vn(13))).toBe(true); expect(trongKhungChieu(vn(18, 59))).toBe(true); expect(trongKhungChieu(vn(19))).toBe(false); expect(trongKhungChieu(vn(12, 59))).toBe(false)
+  expect(trongKhungDem(vn(0, 14))).toBe(false); expect(trongKhungDem(vn(0, 15))).toBe(true); expect(trongKhungDem(vn(3, 59))).toBe(true); expect(trongKhungDem(vn(4))).toBe(false)
+  const k = await kho()
+  expect(await cronSanSangDem(k.rawEnv, vn(20, 30), 10)).toBe(0) // cao điểm: không lập
+})
+
 it('cổng tốc độ: số đợt chờ D1 của Sảnh / Mở chặng (bản sẵn) không vượt mốc `mayChuSanSang` (mốc chỉ hạ)', () => {
   const moc = JSON.parse(fs.readFileSync(MOC, 'utf8')) as { mayChuSanSang?: Record<string, { dot: number; lenh: number }> }
   if (process.env.GHI_MOC_TOC_DO) fs.writeFileSync(process.env.GHI_MOC_TOC_DO, JSON.stringify(DO, null, 1))
