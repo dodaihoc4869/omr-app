@@ -9,6 +9,7 @@ vi.mock('../server/src/game-v2-auth', () => ({ gameIdentity: async () => quyen.s
 vi.mock('../server/src/chua-cau-sai-cau-hinh', () => ({ tinhNangBat: async () => quyen.bat }))
 vi.mock('../server/src/ca-dang-mo', () => ({ coCaDangMo: async () => quyen.ca }))
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-thu' }))
+import { xoaMoiDem } from '../server/src/dem-chung'
 import { danhSach } from '../server/src/chua-cau-sai'
 import { apiDanhSachTuChua } from '../src/lib/chua-cau-sai-api'
 import { docNhoTuSua, ngheTuSua, nhomMucChua, soCauCanSua, taiTuSuaLoi, xoaNhoTuSua } from '../src/lib/tu-sua-loi'
@@ -73,8 +74,10 @@ describe('Tự sửa lỗi · tổng thật và phân trang', () => {
   })
   it('ca đang mở / chưa bật / không có phiên vẫn chặn trước khi đọc tổng hoặc danh sách', async () => {
     const d = dbThu(); d.them('D1')
+    xoaMoiDem() // bản nhớ «ca đang mở» 8 giây của quyen (29/10) không được lẫn từ ca thử trước
     quyen.ca = true
     expect(await (await danhSach(d.env, {})).json()).toMatchObject({ ok: false, ma: 'DANG_KIEM_TRA' })
+    xoaMoiDem()
     quyen.ca = false; quyen.bat = false
     expect(await (await danhSach(d.env, {})).json()).toMatchObject({ ok: false, ma: 'FEATURE_TAT' })
     quyen.sbd = ''

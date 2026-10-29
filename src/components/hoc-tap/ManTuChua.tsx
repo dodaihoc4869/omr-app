@@ -19,7 +19,10 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, ChevronRight, Clock3, Lock, PencilLine, RotateCcw } from 'lucide-react'
 import type { KetQuaDanhSachChua, LichKiemLaiHoiThay, MucChua } from '../../lib/chua-cau-sai-api'
-import { nhomMucChua, taiTuSuaLoi, type NhomMucChua } from '../../lib/tu-sua-loi'
+import { docNhoTuSua, nhomMucChua, taiTuSuaLoi, type NhomMucChua } from '../../lib/tu-sua-loi'
+import { napTruocCauSua } from '../../lib/nap-truoc-sua'
+/** Bản nhớ danh sách còn mới (ms) để vẽ ngay khi mở màn Tự sửa lỗi; quá hạn ⇒ khung chờ như cũ. */
+const NHO_VE_NGAY_MS = 120_000
 import { dungViecHomNay, docSbdHs, luuViecHomNay, themMotChang } from '../../lib/tu-sua-viec-hom-nay'
 import ViecHomNay from './ViecHomNay'
 import { useDanhDauHt2 } from './HocTapHomNay'
@@ -42,6 +45,7 @@ const KiemHoiThay = lazy(() => import('../loi-giai/HoiThayKiemChung'))
 export { default as TheMoiTuSua } from './TheMoiTuSua'
 // Lộ trình «Trong» (TrongHs: số trên nút «Sửa lỗi») đọc việc hôm nay QUA mảnh này (đã là điểm nạp lười) — nạp động thẳng tu-sua-viec-hom-nay sẽ tách thêm mảnh precache.
 export { baoKhoaSua, conSuaHomNay, conSuaPhanNgay, docSbdHs, dungViecHomNay, luuViecHomNay, ngheXongSua } from '../../lib/tu-sua-viec-hom-nay'
+export { napTruocCauSua } from '../../lib/nap-truoc-sua'
 
 /** Trạng thái đợt chữa ⇒ chữ em đọc được (bảng từ chuẩn: không mã nội bộ). */
 export const CHU_TRANG_THAI_CHUA: Record<string, string> = {
@@ -156,7 +160,8 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
     setChon(null)
     setBao(null)
   }
-  const [kq, setKq] = useState<KetQuaDanhSachChua | null>(null)
+  // 29/10 (thầy «tức thì mọi chỗ»): danh sách Lộ trình / Hôm nay vừa tải (≤ 2 phút) ⇒ vẽ NGAY từ bản nhớ rồi làm mới lặng — không còn khung chờ một vòng đi-về mỗi lần bấm «Sửa lỗi».
+  const [kq, setKq] = useState<KetQuaDanhSachChua | null>(() => docNhoTuSua(token, NHO_VE_NGAY_MS))
   const [cdl, setCdl] = useState<ReadonlyMap<string, CauDaLamMuc>>(new Map())
   const [lan, setLan] = useState(0)
   const [dangThem, setDangThem] = useState(false)
@@ -172,7 +177,7 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
     let huy = false
     const moc = ++lanDoc.current
     khoaThem.current = false; setDangThem(false); setLoiThem('')
-    if (!lang.current) setKq(null)
+    if (!lang.current) setKq(docNhoTuSua(token, NHO_VE_NGAY_MS))
     lang.current = false
     // Luôn tải MỚI (em vừa sửa xong một câu thì số đổi) — bản nhớ chung được ghi đè ⇒ thẻ mời ở Hôm nay cập nhật theo.
     void taiTuSuaLoi(token, { moi: true }).then((r) => { if (!huy && moc === lanDoc.current) { choDongBoViTri.current = false; setKq(r) } })
@@ -188,6 +193,14 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
   const [lanThem, setLanThem] = useState(0)
   const { viec, luu, day } = useMemo(() => (sbd ? dungViecHomNay(kq, Date.now(), sbd) : { viec: null, luu: null, day: null }), [kq, sbd, lanThem])
   useEffect(() => { luuViecHomNay(luu, day ?? null) }, [luu, day])
+  // 29/10 (thầy «Mở câu quá lâu»): câu CHƯA XONG kế tiếp của Việc hôm nay (khác câu đang mở) ⇒ mở sẵn ở máy chủ lúc em còn xem danh sách / làm câu trước; bấm vào là có ngay.
+  // Trễ 1,2 giây để không tranh lượt với chính lần mở em vừa bấm.
+  const tiepNap = viec?.muc.find((x) => !x.xong && !x.m.kiemHoiThay && x.m.qid !== chon?.qid)?.m.qid
+  useEffect(() => {
+    if (!tiepNap) return
+    const h = setTimeout(() => napTruocCauSua(token, tiepNap), 1200)
+    return () => clearTimeout(h)
+  }, [token, tiepNap])
   // 27/10 tốc độ (thầy: «sửa lỗi chỗ mở câu phải tức thì»): danh sách vừa mở ⇒ lúc rảnh nạp sẵn mảnh màn sửa câu, bấm câu là vào ngay, không màn chờ nạp mảnh.
   useEffect(() => {
     // Chỉ nạp mảnh màn sửa câu: khung Duo (ChuaGonDuo) do chính màn ấy nạp song song lệnh mở đợt — nạp thẳng từ đây làm Rolldown tách thêm mảnh dùng chung (+1 tệp precache).

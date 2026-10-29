@@ -24,6 +24,7 @@ import { boSungKichThuocDe, docDoGiayMot } from './do-giay-luot'
 import { khongTinhTuDo, laPhienNguyenTu, type PhienNt } from './thuong-tra-loi'
 import { laCauTuLuan } from './cam-tu-luan'
 import type { Env } from './kieu'
+import { THAM_SO_OMNI } from './omni-kieu'
 import { dangKySauXoaCaBaoVe, protectedQuestions } from './game-v2-bank'
 
 type RefPhien = { qid: string; maDe: string; version: string; xt?: unknown } & Record<string, unknown>
@@ -88,6 +89,13 @@ export function phienDuCau(id: string): boolean {
   return !!p && p.phien.questions.every((r) => laQidChanDoan(r.qid) || cauNho.has(khoaCau(r)))
 }
 
+/** Thời lượng em làm có thể rơi vào vùng «lướt» không? Cùng cách đọc `docMsLam` (omni-game.ts): số hữu hạn ≥ 0 ⇒ làm tròn; vắng / âm / không phải số ⇒ không đo (không bao giờ lướt). */
+function coTheLaLuot(v: unknown): boolean {
+  const n = typeof v === 'number' ? v : typeof v === 'string' && v.trim() ? Number(v) : NaN
+  if (!Number.isFinite(n) || n < 0) return false
+  return Math.round(n) < THAM_SO_OMNI.LUOT_MS_MAX
+}
+
 export type DongNhanh = { ok: true; tam: true; correct: boolean; answer: string; traLoi: string; solution: unknown; solutionImages: unknown[]; khongTinh?: true }
 
 /**
@@ -119,7 +127,9 @@ export function chamNhanh(sbd: string, b: Record<string, unknown>, now = Date.no
   if (q.phan === 'I' && !/^[ABCD]$/.test(tra) || q.phan === 'II' && !/^[DS]{4}$/.test(tra) || q.phan === 'III' && (!tra || tra.length > 40)) return null
   const correct = s.hocTap === 1 && q.phan === 'III' ? khopPhanIII(String(b.answer ?? ''), q.correct) : grade(q, String(b.answer ?? ''))
   // OMNI (omni-game.ts): LƯỚT chỉ xảy ra khi SAI (sai ∧ quá nhanh ∧ < 3 lượt/ngày) — cần số đọc D1 ⇒ câu sai của em đang được xét OMNI đi đường thường.
-  if (!correct && em.omni && s.hoa2 === 1) return null
+  // 29/10 (thầy «Bấm kiểm tra vẫn chưa tức thì»): NHƯNG ngưỡng lướt luôn nằm trong [LUOT_MS_MIN, LUOT_MS_MAX] = [3 s, 8 s] (omni-toc-do.ts `nguongLuotMs`) ⇒ câu sai làm TỪ 8 giây
+  // trở lên (hoặc máy không đo được thời lượng ⇒ `nhanTocDo` = null) KHÔNG BAO GIỜ là lướt ⇒ vẫn chấm nhanh được. Trước: mọi câu sai của em OMNI đều đi đường D1 chậm (~3 đợt).
+  if (!correct && em.omni && s.hoa2 === 1 && coTheLaLuot(b.msLam)) return null
   const khongTinh = laPhienNguyenTu(s as unknown as PhienNt) && khongTinhTuDo(boSungKichThuocDe(docDoGiayMot(b, { ms: b.msLam }), q.phan, q), correct)
   return { ok: true, tam: true, correct, answer: q.correct, traLoi: tra, solution: q.solution, solutionImages: q.hinhAnh.filter((h) => h.viTri === 'sau_loi_giai'), ...(khongTinh ? { khongTinh: true as const } : {}) }
 }

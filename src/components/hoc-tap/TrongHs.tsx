@@ -17,7 +17,7 @@ import { banHat, yenLang } from '../../lib/hieu-ung'
 import { docNhoTuSua, ngheTuSua } from '../../lib/tu-sua-loi'
 // Việc hôm nay NẠP ĐỘNG qua mảnh ManTuChua (đã là điểm nạp lười, có trong precache, Lộ trình nạp sẵn lúc rảnh): nhập tĩnh / nạp thẳng tu-sua-viec-hom-nay làm
 // Rolldown tách chua-truc-tiep thành tệp riêng (+1 tệp precache, trần 170).
-type ModViec = Pick<typeof import('./ManTuChua'), 'baoKhoaSua' | 'conSuaHomNay' | 'conSuaPhanNgay' | 'docSbdHs' | 'dungViecHomNay' | 'luuViecHomNay' | 'ngheXongSua'>
+type ModViec = Pick<typeof import('./ManTuChua'), 'baoKhoaSua' | 'conSuaHomNay' | 'conSuaPhanNgay' | 'docSbdHs' | 'dungViecHomNay' | 'luuViecHomNay' | 'ngheXongSua' | 'napTruocCauSua'>
 const SO_CAU_MOI_NGAY = 12 // = SO_CAU_MOI_NGAY của tu-sua-viec-hom-nay (chỉ dùng khi mảnh chưa nạp)
 import type { KetQuaDanhSachChua } from '../../lib/chua-cau-sai-api'
 import '../../styles/trong-hs.css'
@@ -138,6 +138,13 @@ function useConSuaHomNay(token: string | undefined, bat: boolean, nho: number[] 
   useEffect(() => mod?.ngheXongSua?.(() => setKq((k) => k && { ...k } as KetQuaDanhSachChua)), [mod])
   const r = useMemo(() => { const sbd = mod?.docSbdHs(); return mod && bat && sbd ? mod.dungViecHomNay(kq, Date.now(), sbd) : null }, [kq, mod, bat])
   useEffect(() => { if (r && mod) mod.luuViecHomNay(r.luu, r.day ?? null) }, [r, mod])
+  // 29/10 (thầy «Mở câu quá lâu»): câu chưa xong đầu tiên của Việc hôm nay ⇒ mở sẵn ở máy chủ khi Lộ trình đã yên; bấm «Sửa ngay» rồi chọn câu là vào ngay (nap-truoc-sua.ts).
+  const tiepNap = r?.viec?.tiep?.m.qid
+  useEffect(() => {
+    if (!mod || !token || !tiepNap) return
+    const h = setTimeout(() => mod.napTruocCauSua?.(token, tiepNap), 2500)
+    return () => clearTimeout(h)
+  }, [mod, token, tiepNap])
   // undefined = mảnh chưa nạp (chưa vẽ số, khỏi nháy 12 → 9); null = không dựng được việc hôm nay
   // phan = câu PHẦN NGÀY (12 câu đầu) chưa xong — khoá chặng sau nút Sửa lỗi (28/10); «Sửa thêm 1 chặng» không làm khoá lại · xong = câu đã sửa xong hôm nay
   const viec = r?.viec

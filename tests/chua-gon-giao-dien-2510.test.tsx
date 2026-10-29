@@ -46,7 +46,7 @@ describe('Chữa câu gọn — màn em', () => {
     fireEvent.click(screen.getByRole('button', { name: /8,2/ }))
     fireEvent.click(kiem)
     expect(await screen.findByRole('heading', { name: 'Em đã tự sửa xong câu này' })).toBeTruthy()
-    expect(api.apiGonNop).toHaveBeenCalledWith('t', 'D1', 'Q', 'A', expect.any(String))
+    expect(api.apiGonNop).toHaveBeenCalledWith('t', 'D1', 'Q', 'A', expect.any(String), 'Q')
     expect(xong()).toEqual(['D1', 'Q']) // mã đợt + mã câu (25/10: mục ngày có thể mang mã đợt khác)
     fireEvent.click(screen.getByRole('button', { name: 'Câu tiếp theo' }))
     expect(onTiep).toHaveBeenCalledOnce()

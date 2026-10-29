@@ -28,6 +28,7 @@ vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'htt
 vi.mock('../src/lib/may-chu-moi', () => ({ layCauHinhMayChu: async () => ({ URL: 'https://may.test' }), xongNapDiaChi: async () => {} }))
 
 import ManTuChua, { goc, timMucChua } from '../src/components/hoc-tap/ManTuChua'
+import { xoaNhoTuSua } from '../src/lib/tu-sua-loi'
 
 const CDL = {
   ok: true,
@@ -48,6 +49,7 @@ const DS = { trangThai: 'bat', ds: [
 beforeEach(() => {
   vi.clearAllMocks()
   localStorage.clear()
+  xoaNhoTuSua() // màn Tự sửa lỗi vẽ ngay từ bản nhớ ≤ 2 phút (29/10) — mỗi ca bắt đầu không có bản nhớ của ca trước
   api.apiPhatItem.mockResolvedValue(DOT)
   api.apiCoChua.mockResolvedValue(false)
   vi.stubGlobal('fetch', vi.fn(async (url: string) => {

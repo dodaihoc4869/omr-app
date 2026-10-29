@@ -201,6 +201,7 @@ describe('Vòng chữa — API, SQL thật, quyền và bằng chứng', () => {
         new Date(T - 60000).toISOString(),
         new Date(T + 3600000).toISOString(),
       )
+    xoaDemCaBaoVe() // thầy vừa mở ca (SQL thô, không qua đường ghi thật) ⇒ bỏ bản nhớ «ca đang mở» 8 giây của quyen (29/10)
     for (const fn of [phatItem, nopItem, xinGoiY])
       expect(
         (
@@ -450,6 +451,7 @@ describe('Ranh giới dữ liệu và phục hồi', () => {
   it('không đọc được lịch thi thì dừng cấp câu, không coi là không có ca', async () => {
     const d = await dung(),
       id = await mo(d)
+    xoaDemCaBaoVe() // bỏ bản nhớ «ca đang mở» 8 giây của quyen (29/10) để lần đọc kế tiếp thật sự chạm D1 lỗi
     const db = d.env.DB,
       prepare = db.prepare.bind(db)
     db.prepare = (sql: string) => {

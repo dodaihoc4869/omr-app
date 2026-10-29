@@ -3,9 +3,13 @@ import { docDoGiayMot, ghepDocVaoRaw } from './do-giay-luot'
 import type { D1PreparedStatement, Env } from './kieu'
 import { gameIdentity } from './game-v2-auth'
 import { coCaDangMo } from './ca-dang-mo'
-import { cauCongKhai, layCauChoEm } from './cau-theo-qid'
+import { cauCongKhai, khongBiBaoVe, layCauChoEm } from './cau-theo-qid'
+import { dangKySauXoaCaBaoVe, protectedQuestions } from './game-v2-bank'
+import { NhoCoLuot } from './chua-gon-nho'
+import { DemTTL } from './dem-chung'
+import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { chuanCauHinh, docCauHinh, tinhNangBat } from './chua-cau-sai-cau-hinh'
-import { docHocLieu } from './chua-cau-sai-hoc-lieu'
+import { docHocLieu, type KetQuaKiemHocLieu } from './chua-cau-sai-hoc-lieu'
 import {
   qidChuan,
   docTrangThaiLoiDau,
@@ -33,13 +37,19 @@ const str = (v: unknown) => (typeof v === 'string' ? v : '')
 const num = (v: unknown) => Number(v) || 0
 const loi = (ma: string, mo: string, status = 400) =>
   Response.json({ ok: false, ma, mo }, { status })
+// 29/10 (thầy «Mở câu quá lâu»): «em có ca thi đang mở không» đọc D1 MỖI lệnh (mo-dot, gon-mo, gon-nop… cùng một lần sửa câu gọi 3–4 lần) ⇒ nhớ 8 giây theo em.
+// Thầy mở ca ⇒ em bị chặn chậm nhất 8 giây sau (isolate vừa ghi bảng `ca` xoá ngay — `xoaDemCaBaoVe`). Chỉ nhớ kết quả ĐỌC ĐƯỢC (lỗi đọc không nhớ).
+const demCaMoQuyen = new DemTTL<boolean>(8_000, 3000)
+let daDangKyCaMo = false
+const dangKyXoaCaMo = () => { if (!daDangKyCaMo) { daDangKyCaMo = true; dangKySauXoaCaBaoVe(() => demCaMoQuyen.xoa()) } } // lúc ghi đầu, không lúc nạp mô-đun (vòng nhập với game-v2-bank)
 export async function quyen(env: Env, b: Obj): Promise<string | Response> {
   const sbd = await gameIdentity(env, b).catch(() => '')
   if (!sbd) return loi('CAN_DANG_NHAP', 'Em đăng nhập lại để tiếp tục.', 401)
   // 13/10 (thầy: "chỗ này mở câu quá lâu"): hai lượt ĐỌC độc lập (cờ tính năng, ca đang mở) chạy CÙNG đợt — trước: nối tiếp. Thứ tự xét + lời giữ nguyên.
+  const caNho = demCaMoQuyen.doc(sbd, Date.now())
   const [bat, ca] = await Promise.all([
     tinhNangBat(env, { sbd }),
-    coCaDangMo(env, sbd, Date.now(), true).then((v) => ({ v }), () => null),
+    caNho !== undefined ? Promise.resolve({ v: caNho }) : coCaDangMo(env, sbd, Date.now(), true).then((v) => { dangKyXoaCaMo(); demCaMoQuyen.ghi(sbd, Date.now(), v); return { v } }, () => null),
   ])
   if (!bat)
     return loi('FEATURE_TAT', 'Vòng chữa chưa mở cho tài khoản này.', 403)
@@ -94,12 +104,29 @@ function docAnh(ph: Obj): AnhPhien | null {
     return null
   }
 }
-export async function cauDuoc(env: Env, sbd: string, qid: string) {
+export async function cauDuoc(env: Env, sbd: string, qid: string): Promise<PrivateQuestion | null> {
   // Chỉ gọi sau bằng chứng lỗi đã công bố hoặc đợt máy chủ đã giao; alias cùng nhóm nội dung được phép phục vụ.
   const r = await layCauChoEm(env, sbd, [qid], new Set([qid]))
   if (r.loi || !r.cau[0] || r.nghi?.has(qid)) return null
   return r.cau[0]
 }
+// 29/10 (thầy «Mở câu quá lâu»): `layCauChoEm` tốn 3–4 đợt D1 nối tiếp và màn Sửa câu gọi nó 2–3 lần cho MỘT lần mở ⇒ nhớ kết quả trong isolate (chua-gon-nho.ts).
+const nhoCauDuoc = new NhoCoLuot<PrivateQuestion>()
+/** `cauDuoc` có bản nhớ ≤ 3 phút — CHỈ cho đường chữa câu gọn (mo-dot / gon-mo / gon-nop). Đường từng bước cũ (phat-item / nop-item) vẫn đọc tươi: nó thu hồi phiên khi câu đổi phiên bản.
+ *  Mỗi lần dùng bản nhớ vẫn qua cổng đề bảo vệ (đệm 5 giây, tươi như đường gốc). */
+export async function cauDuocNho(env: Env, sbd: string, qid: string): Promise<PrivateQuestion | null> {
+  const khoa = `${sbd}|${qid}`
+  const co = nhoCauDuoc.doc(khoa)
+  if (co) {
+    // Không kiểm được đề bảo vệ ⇒ đóng cửa như `layCauChoEm` (null), không phục vụ từ bản nhớ.
+    const baoVe = await protectedQuestions(env).catch(() => null)
+    return baoVe && khongBiBaoVe(co, baoVe) ? co : null
+  }
+  return nhoCauDuoc.lay(khoa, () => cauDuoc(env, sbd, qid))
+}
+const nhoHocLieu = new NhoCoLuot<KetQuaKiemHocLieu>()
+/** `docHocLieu` có đệm isolate 3 phút (học liệu thầy duyệt đổi rất hiếm; đợt đã giao tự mở lại khi học liệu được duyệt — xem giaoDotCuaEm). */
+export const docHocLieuNho = (env: Env, qid: string): Promise<KetQuaKiemHocLieu> => nhoHocLieu.lay(qid, () => docHocLieu(env, qid)) as Promise<KetQuaKiemHocLieu>
 async function kiemAnh(
   env: Env,
   sbd: string,
@@ -281,18 +308,19 @@ export async function giaoDotCuaEm(
   // 13/10: trạng thái lỗi, cấu hình, học liệu, câu là bốn lượt ĐỌC độc lập ⇒ chạy CÙNG lúc (trước: bốn chặng nối tiếp ≈ 8 đợt D1). Chưa có lỗi đã công
   // bố ⇒ trả lỗi như cũ, phần đọc thêm bỏ đi (chỉ đọc, không ghi, không trả gì cho em).
   const dauSom = docTrangThaiLoiDau(env, sbd, qid, ngayVn(Date.now()))
-  const cfgSom = docCauHinh(env), hSom = docHocLieu(env, qid), qSom = cauDuoc(env, sbd, qid)
-  for (const p of [cfgSom, hSom, qSom]) p.catch(() => {})
+  const cfgSom = docCauHinh(env), hSom = docHocLieuNho(env, qid), qSom = cauDuocNho(env, sbd, qid)
+  // 29/10 (thầy «Mở câu quá lâu»): đợt đang mở của em cho câu này (cần nhóm nội dung của câu) đọc NGAY khi có câu, CÙNG đợt với phần còn lại — trước: thêm một đợt nối tiếp sau cùng.
+  const cuSom = qSom.then((q0) => env.DB.prepare(
+    `SELECT * FROM chua_loi_dot WHERE sbd=? AND (qid_chuan=? OR (content_group<>'' AND content_group=?)) AND dong_luc IS NULL ORDER BY giao_luc ASC,id ASC LIMIT 1`,
+  )
+    .bind(sbd, qid, q0?.group ?? '')
+    .first<Obj>())
+  for (const p of [cfgSom, hSom, qSom, cuSom]) p.catch(() => {})
   const dau = await dauSom
   if (!dau || ['dong', 'khong_loi'].includes(dau.loiHoc.trangThai))
     return chuaCoLoi(env, sbd, qid, !!dau && choDongDotLech)
-  const [cfg, h, q] = await Promise.all([cfgSom, hSom, qSom]),
+  const [cfg, h, q, cu] = await Promise.all([cfgSom, hSom, qSom, cuSom]),
     now = Date.now()
-  const cu = await env.DB.prepare(
-    `SELECT * FROM chua_loi_dot WHERE sbd=? AND (qid_chuan=? OR (content_group<>'' AND content_group=?)) AND dong_luc IS NULL ORDER BY giao_luc ASC,id ASC LIMIT 1`,
-  )
-    .bind(sbd, qid, q?.group ?? '')
-    .first<Obj>()
   if (cu && cu.qid_chuan !== qid)
     return giaoDotCuaEm(env, sbd, str(cu.qid_chuan), choDongDotLech)
   const id = cu
