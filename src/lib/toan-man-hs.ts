@@ -100,6 +100,7 @@ export function giuToanManHs(): void {
 
     // Màu thanh trạng thái = nền app đang vẽ (đọc từ CSS, không ghi mã màu vào đây).
     const datMauThanh = () => {
+      if (typeof document === 'undefined' || typeof getComputedStyle !== 'function' || !document.body) return // hẹn giờ chạy sau khi môi trường test đã dỡ
       const nen = getComputedStyle(document.body).backgroundColor
       if (!nen || nen === 'transparent' || /rgba\(.*,\s*0\)$/.test(nen)) return
       document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]').forEach((m) => {
@@ -109,7 +110,7 @@ export function giuToanManHs(): void {
 
     // 28/10 MƯỢT (hồ sơ mở lại Lộ trình CPU ×6: đọc màu nền ~190 ms ép tính kiểu cả trang giữa lúc màn đang dựng): đọc SAU khung vẽ (rAF → setTimeout)
     // — kiểu vừa tính xong cho khung ấy nên `getComputedStyle` gần như không tốn.
-    const sauVe = (f: () => void) => requestAnimationFrame(() => { window.setTimeout(f, 0) })
+    const sauVe = (f: () => void) => { if (typeof requestAnimationFrame === 'function') requestAnimationFrame(() => { if (typeof window !== 'undefined') window.setTimeout(f, 0) }) }
     const moi = () => { sauVe(datMauThanh); kiemLai() }
     if (document.readyState === 'complete') requestAnimationFrame(moi)
     else window.addEventListener('load', moi, { once: true })
