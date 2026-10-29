@@ -6,11 +6,11 @@ import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { laCauTuLuan } from './cam-tu-luan'
 import { SO_TU_TOI_DA } from './do-giay-luot'
 import { HAN_NIEM_MS, lamMoiNiem, niemPhong } from './niem-phong'
-import { omniChoTem } from './omni-d1'
+import type { omniChoTem as OmniChoTem } from './omni-d1'
 import type { Env } from './kieu'
 
 /** Kết quả hỏi OMNI cho cả chặng (omni-d1.ts `omniChoTem`). */
-type OmniTem = NonNullable<Awaited<ReturnType<typeof omniChoTem>>>
+type OmniTem = NonNullable<Awaited<ReturnType<typeof OmniChoTem>>>
 /** Phần OMNI của tem: tắt ⇒ `o: 0` (không bao giờ lướt); áp + biết kỳ vọng ⇒ `o: 1, y, u`; chưa biết ⇒ `o: 1` (câu sai nhanh đi đường thường như cũ). */
 const dauOmni = (hoa2: boolean, om: OmniTem | null, qid: string): { o: 0 | 1; y?: number; u?: number } => {
   if (!hoa2) return { o: 0 }
@@ -34,7 +34,8 @@ export async function niemPhongCau(env: Env, sbd: string, q: PrivateQuestion, ho
 /** Gắn `sk` vào từng câu công khai `cong[i]` (tương ứng riêng `rieng[i]`) — song song. Câu không niêm phong được thì giữ nguyên. */
 export async function ganNiemChoCau(env: Env, sbd: string, cong: Record<string, unknown>[], rieng: readonly PrivateQuestion[], hoa2: boolean, nayMs = Date.now(), hanMs = HAN_NIEM_MS): Promise<void> {
   // Phiên Hoá 2.0: hỏi OMNI MỘT lần cho cả chặng (kỳ vọng từng câu + số lướt hôm nay) để tem quyết được câu SAI nhanh không cần D1. Lỗi ⇒ null ⇒ tem như cũ.
-  const om = hoa2 ? await omniChoTem(env, sbd, rieng.filter(Boolean).map((q) => ({ qid: q.qid, phan: q.phan as 'I' | 'II' | 'III', mucDo: q.mucDo ?? null })), nayMs).catch(() => null) : null
+  // Nạp LƯỜI omni-d1 (mô-đun lớn, nhiều phụ thuộc): tránh vòng nhập khi mở chặng và giữ tem nhẹ cho đường không Hoá 2.0.
+  const om = hoa2 ? await import('./omni-d1').then((m) => m.omniChoTem(env, sbd, rieng.filter(Boolean).map((q) => ({ qid: q.qid, phan: q.phan as 'I' | 'II' | 'III', mucDo: q.mucDo ?? null })), nayMs)).catch(() => null) : null
   await Promise.all(cong.map(async (c, i) => { const q = rieng[i]; if (!q) return; const sk = await niemPhongCau(env, sbd, q, hoa2, nayMs, hanMs, om); if (sk) c.sk = sk }))
 }
 
