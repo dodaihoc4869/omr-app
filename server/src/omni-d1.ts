@@ -103,23 +103,23 @@ export async function damBaoBangOmni(env: Env): Promise<void> {
 
 // ---------------------------------------------------------------- đệm trong isolate
 /** Hồ sơ trực tiếp: khoá (sbd, ngày, số dòng sổ + mốc tiếp nhận cuối, tham số, phiên bản đệm). */
-const demHoSo = new DemTTL<HoSoOmniEm>(60_000, 400)
+const demHoSo = new DemTTL<HoSoOmniEm>(60_000, 150) 
 /** Hồ sơ THÔ của bạn cùng lớp cho prior lớp: khoá (lớp, ngày, tham số). Giá trị của một ngày là bất biến theo mốc cắt ⇒ đệm dài. */
 // 28/10 (thử tải 270 em: 125 lượt exceededMemory — hồ sơ thô cả lớp ~144 nghìn mục/lớp, ~15–20 MB): prior đã tính sẵn theo em (`omni_prior_em`) ⇒ hồ sơ thô cả lớp
 // chỉ cần khi thiếu bản tính sẵn ⇒ đệm tối đa 2 lớp.
 const demTho = new DemTTL<Map<string, Map<string, { p: number; n: number }>>>(6 * 3_600_000, 2)
 /** Ma trận Q và siêu dữ liệu câu (đổi khi thầy duyệt Q / nạp kho) — 10 phút; isolate duyệt Q xoá ngay. */
-const demQ = new DemTTL<QCau>(10 * 60_000, 16_000)
+const demQ = new DemTTL<QCau>(10 * 60_000, 5_000) // 29/10 22:00 ăn kiêng bộ nhớ: 16 000 → 5 000 (kho ~15 000 câu ⇒ cả kho nằm trong đệm ~16 MB/isolate; câu đang dùng chỉ vài nghìn; LRU giữ câu nóng)
 // 28/10 (Analytics D1 27/10 19–23h: siêu dữ liệu câu ~6 % thời gian D1; kho gần như tĩnh): tuổi 10 → 30 phút, KÈM kiểm dấu kho mỗi 5 phút khi có câu đệm
 // được dùng lại (dau-kho-cau.ts) — thầy sửa kho ⇒ dấu đổi ⇒ bỏ cả đệm. Bộ test: như cũ (10 phút, không hỏi dấu).
 const BAT_DAU_KHO = !(globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.VITEST
-const demKho = new DemTTL<CauKho | null>(BAT_DAU_KHO ? 30 * 60_000 : 10 * 60_000, 16_000)
+const demKho = new DemTTL<CauKho | null>(BAT_DAU_KHO ? 30 * 60_000 : 10 * 60_000, 5_000) // 29/10 22:00 ăn kiêng bộ nhớ: 16 000 → 5 000
 let dauKhoDem = '', kiemDauKho = 0, lucDemDau = 0
 const demTenDang = new DemTTL<string>(10 * 60_000, 4_000)
 const demHieuChuan = new DemTTL<HieuChuan>(10 * 60_000, 4)
 const demQChienDich = new DemTTL<{ cau: QCau[]; dangCo: string[] }>(10 * 60_000, 20)
 /** Nhật ký hôm nay: Sảnh mở lại nhiều lần sau khi xong kế hoạch ⇒ đệm 60 s theo (em, ngày, số dòng sổ). */
-const demNhatKy = new DemTTL<string[]>(60_000, 400)
+const demNhatKy = new DemTTL<string[]>(60_000, 150)
 let phienBanDem = 0
 /** Bỏ mọi đệm OMNI của isolate (sau khi thầy duyệt Q, xác nhận dạng, đổi tham số). */
 export function xoaDemOmni(): void {

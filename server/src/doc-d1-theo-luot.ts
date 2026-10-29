@@ -12,7 +12,7 @@ const DA_GOP = Symbol('omr.docD1TheoLuot')
 export const BANG_DUNG_CHUNG: readonly string[] = ['game_v2_question', 'omni_q', 'danh_sach', 'game_v2_index', 'cau_meta', 'cau_meta_to']
 // Trần bộ nhớ (đo 13/10 21:20–22:05: 111 lỗi `exceededMemory`): trọng lượng = số ký tự JSON; chữ Việt ⇒ 2 byte/ký tự và đối tượng dòng còn tốn gấp vài lần
 // ⇒ trước 16 triệu ký tự (một mục tới 4 triệu) có thể chiếm hàng chục MB của 128 MB isolate. Nay 6 triệu tổng, 1,5 triệu mỗi mục (mục lớn hơn đọc thẳng D1).
-const demChung = new DemTTL<D1Result>(60_000, 300, 6_000_000)
+const demChung = new DemTTL<D1Result>(60_000, 300, 3_000_000) // 29/10 22:00 ăn kiêng bộ nhớ: trần trọng lượng 6 triệu → 3 triệu
 const TRAN_MOT_MUC_DEM_CHUNG = 1_500_000
 // Lượt đọc cũ đang bay không được hồi sinh đệm sau khi lượt khác sửa kho.
 let doiDemChung = 0
