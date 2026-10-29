@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { ArrowRight } from 'lucide-react'
 import { BieuTuongTuSua } from './BieuTuongTuSua'
 import { docNhoTuSua, ngheTuSua } from '../../lib/tu-sua-loi'
-import { dungViecHomNay, docSbdHs, luuViecHomNay, themMotChang, type ViecHomNay } from '../../lib/tu-sua-viec-hom-nay'
+import { dungViecHomNay, docSbdHs, luuViecHomNay, type ViecHomNay } from '../../lib/tu-sua-viec-hom-nay'
 import type { KetQuaDanhSachChua } from '../../lib/chua-cau-sai-api'
 import './viec-hom-nay.css'
 
@@ -34,7 +34,7 @@ export function noiDungThe(v: ViecHomNay): { kieu: KieuThe; tieuDe: string; so: 
   const ngaySau = v.conNgaySau > 0 ? `Còn ${v.conNgaySau} câu cho các ngày sau.` : ''
   // Chữa câu gọn (25/10): em thấy NGAY số câu đã tự sửa hôm nay (máy chủ đếm).
   const tuSua = (v.xongHomNay ?? 0) > 0 ? `Đã tự sửa hôm nay: ${v.xongHomNay} câu.` : ''
-  if (!v.tiep) return { kieu: 'xong', tieuDe: 'Hôm nay em đã xong phần của ', so: v.tong, phu: [tuSua, ngaySau].filter(Boolean).join(' '), nut: 'Sửa thêm 1 chặng' }
+  if (!v.tiep) return { kieu: 'xong', tieuDe: 'Hôm nay em đã xong phần của ', so: v.tong, phu: [tuSua, ngaySau].filter(Boolean).join(' '), nut: '' } // xong phần hôm nay ⇒ KHÔNG còn nút sửa thêm (thầy 29/10): câu còn lại để ngày mai
   if (v.xong > 0) {
     return { kieu: 'dang', tieuDe: 'Hôm nay em đã xong phần của ', so: v.xong, phu: [tuSua, `Tự sửa lỗi · Chặng ${k}/${nChang} · còn ${v.chang[v.changHienTai]!.filter((x) => !x.xong).length} câu`].filter(Boolean).join(' '), nut: `Sửa tiếp · chặng ${k}/${nChang}` }
   }
@@ -59,10 +59,6 @@ export default function TheMoiTuSua({ so, token, onChua }: Props) {
   const nd = noiDungThe(viec)
   const nChang = viec.chang.length
   const moTiep = () => onChua(viec.tiep?.m.qid)
-  const them = () => {
-    const v = themMotChang(kq)
-    onChua(v?.tiep?.m.qid)
-  }
   return <section className="ht2-moi-sua" data-viec="" data-tt={nd.kieu === 'xong' ? 'xong' : undefined} aria-labelledby="ht2-moi-sua-tieu">
     <span className="ht2-moi-sua-bt" aria-hidden="true"><BieuTuongTuSua hien /></span>
     <div className="ht2-moi-sua-chu">
@@ -79,7 +75,7 @@ export default function TheMoiTuSua({ so, token, onChua }: Props) {
       <b className="vh-so">{viec.xong}/{viec.tong} câu</b>
     </div>
     {nd.kieu === 'xong'
-      ? <button type="button" className="ht2-moi-sua-chu-nut" onClick={them}>{nd.nut}</button>
+      ? null
       : <button type="button" className="ht2-moi-sua-nut" onClick={moTiep}>{nd.nut}<ArrowRight size={20} aria-hidden="true" /></button>}
   </section>
 }

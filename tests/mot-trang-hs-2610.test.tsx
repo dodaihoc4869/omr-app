@@ -65,10 +65,12 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
     const xong = await waitFor(() => within(duong()).getByRole('button', { name: 'Tự sửa lỗi: hôm nay đã sửa xong' }))
     expect(xong.getAttribute('data-tt')).toBe('xong')
     expect(xong.querySelector('.da-dem')).toBeNull()
-    // Bài tập về nhà thành việc chính; thẻ của nút đã xong vẫn cho sửa thêm
+    // Bài tập về nhà thành việc chính; thẻ của nút đã xong KHÔNG còn nút sửa thêm (thầy 29/10: sửa hết câu của ngày thì không cho sửa thêm)
     expect(screen.getByRole('button', { name: 'Bài tập về nhà' }).getAttribute('data-tt')).toBe('dang')
     fireEvent.click(xong)
-    expect(within(screen.getByRole('dialog', { name: 'Tự sửa lỗi' })).getByRole('button', { name: 'Sửa thêm' })).toBeTruthy()
+    const thePop = within(screen.getByRole('dialog', { name: 'Tự sửa lỗi' }))
+    expect(thePop.queryByRole('button', { name: 'Sửa thêm' })).toBeNull()
+    expect(thePop.getByText('Hôm nay em đã sửa đủ phần của mình. Những câu còn lại để ngày mai nhé.')).toBeTruthy()
   })
   it('bấm nút Lộ trình KHÔNG vào thẳng: thẻ bật ra (role dialog) đúng màu nút, focus vào nút chính, Esc đóng + trả focus; một thẻ một lúc; chạm ngoài đóng (thầy 27/10)', () => {
     const onHoc = vi.fn(), onChua = vi.fn()

@@ -26,7 +26,6 @@ interface Props {
   xongHomNay?: number
   nayMs: number
   onChon: (m: MucChua, i: number) => void
-  onThem: () => void
   onVe: () => void
 }
 
@@ -52,14 +51,15 @@ export function chuTrangThaiViec(x: ViecMuc, goc: string, nayMs: number): string
   return x.loai === 'gan' ? 'Chỉ còn làm bản mới là xong' : goc
 }
 
-export default function ViecHomNay({ viec, thongTin, soXong, tong, soCan, xongHomNay = 0, nayMs, onChon, onThem, onVe }: Props) {
+export default function ViecHomNay({ viec, thongTin, soXong, tong, soCan, xongHomNay = 0, nayMs, onChon, onVe }: Props) {
   const nChang = viec.chang.length
   const xongCa = !viec.tiep
   const k = Math.min(viec.changHienTai, nChang - 1)
   const chang = viec.chang[k]!
   const chiSo = new Map(viec.muc.map((x, i) => [x.khoa, i]))
   const phanTram = `${Math.round((soXong / Math.max(1, tong)) * 1000) / 10}%`
-  const phu = xongCa ? 'Em nghỉ cũng được, sửa thêm cũng được.'
+  // 29/10 (thầy «Phần sửa lỗi sai sau khi làm hết câu cần sửa thì không cho sửa thêm nữa»): xong phần hôm nay ⇒ KHÔNG còn nút «Sửa thêm 1 chặng»; câu còn lại để ngày mai.
+  const phu = xongCa ? 'Em đã sửa đủ phần hôm nay. Những câu còn lại để ngày mai nhé.'
     : k > 0 ? `Đã xong chặng ${k}/${nChang}. Nghỉ một chút cũng được.`
     : nChang > 1 ? `Chia ${nChang} chặng nhỏ, mỗi chặng 4 câu.` : 'Làm xong phần này là đủ cho hôm nay.'
   return (
@@ -111,7 +111,6 @@ export default function ViecHomNay({ viec, thongTin, soXong, tong, soCan, xongHo
         {xongCa
           ? <div className="vh-hang-nut">
               <button type="button" className="ht-nut-chinh ht2-nut-lon tcl-nut-chinh" onClick={onVe}><span>Về {tenTrangChinh()}</span><ArrowRight size={20} aria-hidden="true" /></button>
-              <button type="button" className="ht-nut-phu" onClick={onThem}>Sửa thêm 1 chặng</button>
             </div>
           : <button type="button" className="ht-nut-chinh ht2-nut-lon tcl-nut-chinh" onClick={() => onChon(viec.tiep!.m, chiSo.get(viec.tiep!.khoa) ?? 0)}>
               <span>{viec.xong === 0 ? 'Bắt đầu sửa' : `Sửa tiếp · chặng ${k + 1}/${nChang}`}</span><ArrowRight size={20} aria-hidden="true" />

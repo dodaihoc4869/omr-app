@@ -679,7 +679,7 @@ export function MotTrangHs(p: PropsMotTrang) {
   let nutSua: Nut | null = null
   if (coSua && !p.ngayKiem && khoaKt) nutSua = { k: 'sua', loai: 'sua', tt: 'khoa', ten: 'Tự sửa lỗi: khoá đến khi làm xong Kiểm tra ôn tập', pop: { tieu: 'Tự sửa lỗi', phu: CHU_KHOA_KT } }
   else if (coSua && !p.ngayKiem && xongSuaNay) nutSua = { k: 'sua', loai: 'sua', tt: 'xong', ten: 'Tự sửa lỗi: hôm nay đã sửa xong',
-    pop: { tieu: 'Tự sửa lỗi', phu: 'Hôm nay em đã sửa xong. Sửa thêm nếu em muốn.', nut: { chu: 'Sửa thêm', onClick: p.onChua } } }
+    pop: { tieu: 'Tự sửa lỗi', phu: 'Hôm nay em đã sửa đủ phần của mình. Những câu còn lại để ngày mai nhé.' } } // thầy 29/10: xong phần hôm nay ⇒ không cho sửa thêm
   else if (coSua && !p.ngayKiem) nutSua = { k: 'sua', loai: 'sua', tt: chinh === 'sua' ? 'dang' : 'mo', dem: choSoSua ? undefined : suaNay || undefined, bong: chinh === 'sua' ? 'Sửa lỗi' : undefined, ten: `Tự sửa lỗi: hôm nay còn ${suaNay} câu`,
     pop: { tieu: 'Tự sửa lỗi', phu: `Hôm nay còn ${suaNay} câu cần sửa`, nut: { chu: 'Sửa ngay', onClick: p.onChua } } }
   if (!p.ngayKiem) chang.forEach((c, i) => {
