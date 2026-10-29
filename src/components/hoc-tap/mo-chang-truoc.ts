@@ -37,3 +37,22 @@ export function layChangMoTruoc(token: string, goi: typeof goiHoa2 = goiHoa2, no
 
 /** Bỏ lượt mở trước (đăng xuất / test). */
 export function boChangMoTruoc(): void { dangCo = null }
+
+// BÁO RỜI APP GIỮA CHỪNG (thầy 29/10 «mở app tức thì mọi lúc»): em làm dở chặng rồi khoá máy / đổi ứng dụng ⇒ bản lập sẵn Sảnh + chặng trên máy chủ đã hết hạn (dấu đổi vì em vừa
+// làm câu). Báo một lần cho máy chủ lập lại NỀN (server/src/san-sang.ts `chuanBiKhiThoat`) ⇒ lần mở app sau Sảnh có ngay, không lập kế hoạch ~3 s. Tối đa 1 lượt / 60 s; lỗi mạng bỏ qua.
+// Em bấm «thoát» về Hôm nay thì KHÔNG báo ở đây: Hôm nay tự hỏi lại Sảnh và máy chủ lập sẵn sau lượt ấy. (Cùng tệp này để khỏi thêm một mảnh vào precache.)
+const HAN_BAO_ROI_MS = 60_000
+let cuoiBaoRoi = 0
+export function baoRoiAppGiuaChung(token: string, now: number = Date.now(), goi: typeof goiHoa2 = goiHoa2): void {
+  if (!token || now - cuoiBaoRoi < HAN_BAO_ROI_MS) return
+  cuoiBaoRoi = now
+  goi('hoc-tap-chuan-bi', token, {}, 10).catch(() => {})
+}
+/** Gắn khi màn đang làm: app bị ẩn mà `coTienDo()` đúng ⇒ báo. Trả hàm gỡ. */
+export function nghePhanAnRoiApp(coTienDo: () => boolean, token: string): () => void {
+  const f = () => { if (document.visibilityState === 'hidden' && coTienDo()) baoRoiAppGiuaChung(token) }
+  document.addEventListener('visibilitychange', f)
+  return () => document.removeEventListener('visibilitychange', f)
+}
+/** Chỉ cho test. */
+export const datLaiBaoRoiApp = (): void => { cuoiBaoRoi = 0 }

@@ -8,7 +8,7 @@ import { loiGiaiChuanTuKho } from '../loi-giai/KhoiLoiGiaiChuan'
 import { goiHoa2, type KetQuaSanh } from '../hoa2/api'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { nopCauLuong } from '../hoa2/doc-luong-nop'
-import { boChangMoTruoc, GIAY_CHO_MO_CHANG, layChangMoTruoc, moChangTruoc } from './mo-chang-truoc'
+import { boChangMoTruoc, GIAY_CHO_MO_CHANG, layChangMoTruoc, moChangTruoc, nghePhanAnRoiApp } from './mo-chang-truoc'
 // Tên trang chính trên nút «về» (Boss 27/10): giao diện Trong ⇒ «Lộ trình»; giao diện cũ ⇒ «Hôm nay». Viết tại chỗ: nhập mô-đun dùng chung sẽ đẻ mảnh tải riêng (+1 tệp mở app).
 const tenTrangChinh = (): string => (typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Lộ trình' : 'Hôm nay')
 
@@ -214,6 +214,8 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   const ghiTruoc = useRef<Promise<void> | null>(null), tachRoi = useRef<Set<string>>(new Set())
   // «Kiểm tra» tức thì cả câu sai nhanh (29/10): số lượt LƯỚT máy chủ đã báo từ lúc mở chặng (tem mang số lướt lúc niêm phong) — gửi kèm `lm` để dòng 1 từ tem quyết lướt đúng.
   const luotChang = useRef(0)
+  // LÀM LẠI SỚM: lời hứa của lệnh `hoc-tap-lam-lai` đã xin NGAY khi câu cuối có bản đầy đủ (em đang đọc lời giải) — `xinLamLai` dùng lại; mỗi chặng một lần.
+  const lamLaiSom = useRef<Promise<Record<string, unknown>> | null>(null)
   const gocRef = useRef<HTMLDivElement>(null), nutTiepRef = useRef<HTMLButtonElement>(null)
   const q = cau[viTri], k = q ? ket[q.qid] : undefined
   // 20/10 đo giây (thầy: mọi câu đều đo được): giây câu đang hiện, CHỈ cộng khi tab đang hiện và em còn chạm màn trong 180 giây; trần 900; gửi cùng lượt nộp
@@ -278,7 +280,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   const khoa = q ? `hoc-tap:nhap:${sbd}:${q.qid}:${q.version}` : ''
   useEffect(() => {
     let huy = false
-    luotChang.current = 0
+    luotChang.current = 0; lamLaiSom.current = null
     setTai(true); setLoi(''); setHetCau(''); setCau([]); setPhien(''); setXong(false); setKet({}); setViTri(0); setMsCau({}); setChang(null); setDem(null); setSoGoc(0); setCombo(null); daXinLamLai.current = false; soLuotDem.current++
     // Mở chặng trước (mo-chang-truoc.ts): Hôm nay / màn xong chặng đã gọi sẵn ⇒ dùng lại đúng lượt ấy, câu hiện ngay; không có ⇒ gọi như cũ.
     void (layChangMoTruoc(token) ?? goiHoa2('hoc-tap-start', token, {}, GIAY_CHO_MO_CHANG)).then(r => {
@@ -428,6 +430,10 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
       boChangMoTruoc()
       if (r.thuong !== undefined) coThuongRef.current = true
       if ((r.omni as { luot?: unknown } | undefined)?.luot === true) luotChang.current++
+      // Câu CUỐI của chặng + có câu tự làm sai ⇒ xin vòng làm lại ngay (không chờ bấm «Tiếp tục»: trước ~1,2 s trắng giữa câu cuối và vòng làm lại).
+      if (goi7 && !daXinLamLai.current && !lamLaiSom.current && q.vaiGoi7 !== 'lam_lai' && viTri + 1 >= cau.length && (cauSai.length > 0 || (r.correct === false && (r.omni as { luot?: unknown } | undefined)?.luot !== true))) {
+        const p = goiHoa2('hoc-tap-lam-lai', token, { session: phien }, 15); p.catch(() => {}); lamLaiSom.current = p
+      }
       // CHẤM THEO ĐÚNG ĐÁP ÁN MÁY CHỦ ĐÃ CHẤM (khẩn 12/10 23h — thầy: "hs làm đúng cả 4 ý nhưng app lại báo sai"): mỗi câu của một đợt chỉ chấm MỘT lần
       // (khoá lượt|câu). Giờ cao điểm lần nộp đầu chậm / hết 40 giây ⇒ em sửa đáp án rồi nộp lại ⇒ máy chủ trả kết quả LẦN ĐẦU (`replayed`, kèm `traLoi`
       // đã chấm) — trước đây màn so từng ý bằng đáp án đang chọn ⇒ "Đúng 4/4 ý · sai ý". Nay hiện đúng đáp án đã chấm và ghi rõ là lần nộp trước.
@@ -468,6 +474,10 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   // chạy lại bằng Web Animations cùng thông số — nhìn y như cũ; máy yếu / giảm chuyển động: không chạy (như CSS).
   const sanRef = useRef<HTMLDivElement>(null), sanQid = useRef('')
   useLayoutEffect(() => { gocRef.current?.querySelector<HTMLElement>('.duo-than')?.style.removeProperty('opacity') }, [q?.qid, xong])
+  // Rời app GIỮA chặng (đã trả lời ≥ 1 câu, chưa kết chặng) ⇒ báo máy chủ lập lại bản sẵn Sảnh + chặng (mo-chang-truoc.ts); câu cuối chặng máy chủ vốn đã lập sẵn.
+  const dangDoRef = useRef(false)
+  dangDoRef.current = !xong && Object.keys(ket).length > 0
+  useEffect(() => nghePhanAnRoiApp(() => dangDoRef.current, token), [token])
   useLayoutEffect(() => {
     const san = sanRef.current, id = q?.qid ?? ''
     if (!san) { sanQid.current = ''; return }
@@ -486,7 +496,8 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   const xinLamLai = async () => {
     daXinLamLai.current = true; gui.current = true; setNop(true)
     try {
-      const r = await goiHoa2('hoc-tap-lam-lai', token, { session: phien }, 15)
+      const som = lamLaiSom.current; lamLaiSom.current = null
+      const r = await (som ?? goiHoa2('hoc-tap-lam-lai', token, { session: phien }, 15)).catch(() => goiHoa2('hoc-tap-lam-lai', token, { session: phien }, 15)) // lệnh xin sớm lỗi ⇒ xin lại MỘT lần (máy chủ trả đúng vòng đã cấp nếu đã cấp)
       const ds = (Array.isArray(r.questions) ? r.questions as Cau[] : []).filter(c => !cauHong(c) && !cau.some(x => x.qid === c.qid)).slice(0, 3)
       if (!ds.length) { ketThuc(); return }
       truotCauCu(); setCau(v => [...v, ...ds]); setViTri(i => i + 1)
