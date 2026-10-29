@@ -138,8 +138,11 @@ export function hoiSomSanh(w: any, goc: string, phien: any, ds: [string, string]
  * Máy chủ tự dùng lại phiên chưa làm xong (2 giờ) và không tính suất khi mở trước ⇒ kết quả như gọi lúc bấm. Mã ES5 tự chứa, chèn nguyên văn vào index.html.
  */
 const HOI_SOM_MO_CHANG =
-  `try{var q=String(p.sbd||''),h=JSON.parse(localStorage.getItem('omr_hoa2_sanh_dem:'+q)||localStorage.getItem('omr_hoa2_sanh_dem:'+q.trim())||'null'),s=h&&h.cheDo2&&h.sanh&&h.sanh.ngay===new Date(Date.now()+25200000).toISOString().slice(0,10)?h.sanh:null,k=s&&s.kiemTraCaNhan,c=window.__ddhHoiSom&&window.__ddhHoiSom['/hs/ca-dang-mo'];` +
-  `if(c&&c.hua&&s&&s.theLuc&&s.theLuc.con>0&&!(k&&k.homNay===true&&!k.baiNgayToiThieu))c.hua.then(function(x){try{if(x&&x.ok&&JSON.parse(x.text).coCaMo===false){H(window,g,p,[['/game-v2/hoc-tap-start','token']],true);var m=window.__ddhHoiSom['/game-v2/hoc-tap-start'];if(m)m.het=Date.now()+6e5}}catch(e){}})}catch(e){}`
+  `try{var q=String(p.sbd||''),nd=new Date(Date.now()+25200000).toISOString().slice(0,10),h=JSON.parse(localStorage.getItem('omr_hoa2_sanh_dem:'+q)||localStorage.getItem('omr_hoa2_sanh_dem:'+q.trim())||'null'),s=h&&h.cheDo2&&h.sanh&&h.sanh.ngay===nd?h.sanh:null,k=s&&s.kiemTraCaNhan,c=window.__ddhHoiSom&&window.__ddhHoiSom['/hs/ca-dang-mo'];` +
+  // GÓI CẢ NGÀY (mo-chang-truoc.ts, 29/10): máy em đã có gói hôm nay còn câu chưa làm ⇒ màn làm bài hiện câu từ gói, KHÔNG cần lượt mở chặng sớm (bớt một lệnh nặng mỗi lần mở app).
+  `var gk=JSON.parse(localStorage.getItem('omr_goi_ngay_'+q.trim())||'null'),xk=JSON.parse(localStorage.getItem('omr_goi_ngay_xong_'+q.trim())||'null'),cg=false,i,j;` +
+  `if(gk&&gk.ngay===nd&&gk.chang)for(i=0;i<gk.chang.length;i++)for(j=0;j<gk.chang[i].questions.length;j++)if(!(xk&&xk.n===nd&&xk.q&&xk.q.indexOf(gk.chang[i].questions[j].qid)>=0))cg=true;` +
+  `if(!cg&&c&&c.hua&&s&&s.theLuc&&s.theLuc.con>0&&!(k&&k.homNay===true&&!k.baiNgayToiThieu))c.hua.then(function(x){try{if(x&&x.ok&&JSON.parse(x.text).coCaMo===false){H(window,g,p,[['/game-v2/hoc-tap-start','token']],true);var m=window.__ddhHoiSom['/game-v2/hoc-tap-start'];if(m)m.het=Date.now()+6e5}}catch(e){}})}catch(e){}`
 
 /** Mã JS (ES5, tự gọi) chèn vào <head>: chọn mảng theo đường dẫn rồi thêm thẻ link tải sớm (+ hỏi Sảnh sớm khi máy em đã đăng nhập).
  *  `gon` (lúc build, vite.config.ts — 27/10 luật tốc độ): nén mã nguồn HAI HÀM chèn bằng `toString()` (bỏ khoảng trắng, đổi tên biến cục bộ) — chúng đứng
