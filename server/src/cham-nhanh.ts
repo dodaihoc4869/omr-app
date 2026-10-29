@@ -25,6 +25,7 @@ import { khongTinhTuDo, laPhienNguyenTu, type PhienNt } from './thuong-tra-loi'
 import { laCauTuLuan } from './cam-tu-luan'
 import type { Env } from './kieu'
 import { THAM_SO_OMNI } from './omni-kieu'
+import { nhanTocDo } from './omni-toc-do'
 import { dangKySauXoaCaBaoVe, protectedQuestions } from './game-v2-bank'
 import type { NoiDungNiem } from './niem-phong'
 
@@ -111,7 +112,7 @@ export function phatTamSom(b: object, d: DongNhanh): boolean {
 }
 export { coTheLaLuot as coTheLaLuotMs }
 
-export type DongNhanh = { ok: true; tam: true; correct: boolean; answer: string; traLoi: string; solution: unknown; solutionImages: unknown[]; khongTinh?: true }
+export type DongNhanh = { ok: true; tam: true; correct: boolean; answer: string; traLoi: string; solution: unknown; solutionImages: unknown[]; khongTinh?: true; omni?: { luot: true } }
 
 /**
  * Chấm từ bộ nhớ. KHÔNG chạm D1, không ghi gì. Trả `null` khi có BẤT KỲ điều gì chưa chắc (đường thường lo, lỗi / lời báo y như cũ).
@@ -164,12 +165,19 @@ export function chamTuNiem(sbd: string, nd: NoiDungNiem, b: Record<string, unkno
   const tra = String(b.answer ?? '').trim()
   if (nd.p === 'I' && !/^[ABCD]$/.test(tra) || nd.p === 'II' && !/^[DS]{4}$/.test(tra) || nd.p === 'III' && (!tra || tra.length > 40)) return null
   const correct = nd.p === 'III' ? khopPhanIII(String(b.answer ?? ''), nd.c) : grade({ phan: nd.p, correct: nd.c }, String(b.answer ?? ''))
-  // OMNI: như `chamNhanh` — câu sai làm dưới 8 giây (hoặc không đo) của phiên Hoá 2.0 có thể là «lướt» (cần số đọc D1) ⇒ đường thường.
-  if (!correct && nd.o === 1 && coTheLaLuot(b.msLam)) return null
+  // OMNI: câu sai làm dưới 8 giây của phiên Hoá 2.0 có thể là «lướt». Tem mang thời gian kỳ vọng `y` + số lướt hôm nay `u` ⇒ QUYẾT LƯỚT NGAY, không đợt D1 (29/10 thầy «bấm kiểm tra vẫn chậm»:
+  // trước đây mọi câu sai nhanh đều đi đường D1 ~2 s). Thiếu `y` (OMNI chưa biết) ⇒ đường thường. Công thức y như `xetOmniTraLoi`: sai ∧ nhãn 'luot' ∧ số lướt < LUOT_TOI_DA_NGAY;
+  // số lướt = `u` + `lm` (máy em đếm lướt đã thấy từ lúc tem được niêm phong). Dòng 2 vẫn là bản chuẩn.
+  let luot = false
+  if (!correct && nd.o === 1 && coTheLaLuot(b.msLam)) {
+    if (!(typeof nd.y === 'number' && nd.y > 0)) return null
+    const lm = Math.min(20, Math.max(0, Math.round(Number(b.lm)) || 0))
+    luot = nhanTocDo(Math.round(Number(b.msLam)), nd.y, false) === 'luot' && (Number(nd.u) || 0) + lm < THAM_SO_OMNI.LUOT_TOI_DA_NGAY
+  }
   const d = docDoGiayMot(b, { ms: b.msLam })
   const dKichThuoc = d && d.giay !== null && nd.t >= 0 ? { ...d, tu: nd.t, hinh: nd.h, phan: nd.p } : d // đúng như `boSungKichThuocDe`
-  const khongTinh = khongTinhTuDo(dKichThuoc, correct)
-  return { ok: true, tam: true, correct, answer: nd.c, traLoi: tra, solution: nd.l, solutionImages: Array.isArray(nd.m) ? nd.m : [], ...(khongTinh ? { khongTinh: true as const } : {}) }
+  const khongTinh = luot || khongTinhTuDo(dKichThuoc, correct)
+  return { ok: true, tam: true, correct, answer: nd.c, traLoi: tra, solution: nd.l, solutionImages: Array.isArray(nd.m) ? nd.m : [], ...(khongTinh ? { khongTinh: true as const } : {}), ...(luot ? { omni: { luot: true as const } } : {}) }
 }
 
 /** Câu ĐẦY ĐỦ của mọi ref trong phiên (đúng điều kiện `SQL_CAU_THEO_PHIEN` của game-v2.ts: tờ chưa xoá, chỉ mục khớp bản nguồn). */

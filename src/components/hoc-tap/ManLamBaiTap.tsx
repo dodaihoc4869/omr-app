@@ -212,6 +212,8 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   // GHI NỀN (29/10, thầy «tải sẵn gì tải luôn, tức thì cả giờ cao điểm»): kết quả đã hiện (dòng tạm) mà bản đầy đủ (đã ghi) chưa về ⇒ «Tiếp tục» sang câu kế NGAY (trừ câu cuối), lượt ghi chạy tiếp nền.
   // `ghiTruoc` = lượt nộp trước còn chạy: câu kế chỉ GỬI sau khi nó xong (hồ sơ game ghi bằng CAS — không chồng hai lượt ghi của một em); `tachRoi` = câu đã rời màn khi bản đầy đủ chưa về.
   const ghiTruoc = useRef<Promise<void> | null>(null), tachRoi = useRef<Set<string>>(new Set())
+  // «Kiểm tra» tức thì cả câu sai nhanh (29/10): số lượt LƯỚT máy chủ đã báo từ lúc mở chặng (tem mang số lướt lúc niêm phong) — gửi kèm `lm` để dòng 1 từ tem quyết lướt đúng.
+  const luotChang = useRef(0)
   const gocRef = useRef<HTMLDivElement>(null), nutTiepRef = useRef<HTMLButtonElement>(null)
   const q = cau[viTri], k = q ? ket[q.qid] : undefined
   // 20/10 đo giây (thầy: mọi câu đều đo được): giây câu đang hiện, CHỈ cộng khi tab đang hiện và em còn chạm màn trong 180 giây; trần 900; gửi cùng lượt nộp
@@ -276,6 +278,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   const khoa = q ? `hoc-tap:nhap:${sbd}:${q.qid}:${q.version}` : ''
   useEffect(() => {
     let huy = false
+    luotChang.current = 0
     setTai(true); setLoi(''); setHetCau(''); setCau([]); setPhien(''); setXong(false); setKet({}); setViTri(0); setMsCau({}); setChang(null); setDem(null); setSoGoc(0); setCombo(null); daXinLamLai.current = false; soLuotDem.current++
     // Mở chặng trước (mo-chang-truoc.ts): Hôm nay / màn xong chặng đã gọi sẵn ⇒ dùng lại đúng lượt ấy, câu hiện ngay; không có ⇒ gọi như cũ.
     void (layChangMoTruoc(token) ?? goiHoa2('hoc-tap-start', token, {}, GIAY_CHO_MO_CHANG)).then(r => {
@@ -417,13 +420,14 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
         if (typeof o.correct !== 'boolean' || typeof o.answer !== 'string') return
         setKet(v => v[qidNop] ? v : { ...v, [qidNop]: { ...(o as unknown as Ket), tam: true, assisted, ...(o.khongTinh === true ? { thuong: { tinh: false, nguyenTu: 0, dong: [], chuoiDung: 0 } } : {}) } })
       }
-      const than = { session: phien, qid: q.qid, answer: tra, assisted, msLam, ...(typeof q.sk === 'string' && q.sk ? { sk: q.sk } : {}), doGiay: dhMs.current >= 1000 ? { g: Math.round(dhMs.current / 1000), v: dhT.current.v, a: dhT.current.a, l: Math.max(dhT.current.l, dhT.current.lang), n: dhT.current.n, w: dhW.current ? 1 : 0 } : undefined }
+      const than = { session: phien, qid: q.qid, answer: tra, assisted, msLam, ...(typeof q.sk === 'string' && q.sk ? { sk: q.sk, ...(luotChang.current > 0 ? { lm: luotChang.current } : {}) } : {}), doGiay: dhMs.current >= 1000 ? { g: Math.round(dhMs.current / 1000), v: dhT.current.v, a: dhT.current.a, l: Math.max(dhT.current.l, dhT.current.lang), n: dhT.current.n, w: dhW.current ? 1 : 0 } : undefined }
       const r = await guiLaiBenVung(() => duo ? nopCauLuong(token, than, 15, khiTam) : goiHoa2('answer', token, than, 15)) // chống trùng theo biên nhận ⇒ kẹt mạng tự gửi lại
       if (typeof r.correct !== 'boolean' || typeof r.answer !== 'string') throw new Error(typeof r.error === 'string' ? r.error : 'Chưa xác nhận được bài nộp. Em thử lại; kết quả không bị tính hai lần.')
       setMsCau(v => ({ ...v, [q.qid]: msLam }))
       // LẶP CÂU (27/10): lượt mở chặng trước (Hôm nay gọi sẵn) lập TRƯỚC câu này ⇒ có thể chứa đúng câu em vừa làm — bỏ, hết chặng sẽ mở trước lượt mới.
       boChangMoTruoc()
       if (r.thuong !== undefined) coThuongRef.current = true
+      if ((r.omni as { luot?: unknown } | undefined)?.luot === true) luotChang.current++
       // CHẤM THEO ĐÚNG ĐÁP ÁN MÁY CHỦ ĐÃ CHẤM (khẩn 12/10 23h — thầy: "hs làm đúng cả 4 ý nhưng app lại báo sai"): mỗi câu của một đợt chỉ chấm MỘT lần
       // (khoá lượt|câu). Giờ cao điểm lần nộp đầu chậm / hết 40 giây ⇒ em sửa đáp án rồi nộp lại ⇒ máy chủ trả kết quả LẦN ĐẦU (`replayed`, kèm `traLoi`
       // đã chấm) — trước đây màn so từng ý bằng đáp án đang chọn ⇒ "Đúng 4/4 ý · sai ý". Nay hiện đúng đáp án đã chấm và ghi rõ là lần nộp trước.

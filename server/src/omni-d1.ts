@@ -1034,6 +1034,23 @@ export async function kyVongMsCau(env: Env, sbd: string, q: { qid: string; phan:
     return msKyVong(null, 0, q.phan, q.mucDo)
   }
 }
+/**
+ * TEM NIÊM PHONG (niem-cau.ts, thầy 29/10 «bấm kiểm tra vẫn chậm»): OMNI có xét «lướt» cho em không + thời gian kỳ vọng RIÊNG từng câu + số lượt lướt hôm nay — đủ để dòng 1 của câu SAI
+ * làm nhanh (< 8 s) quyết «lướt» NGAY, không đợt D1. Trước: mọi câu sai nhanh của phiên Hoá 2.0 đều đi đường D1 (~2 s). Cùng công thức với `kyVongMsCau` (β câu, τ em từ `omni_em`).
+ * Một lượt D1 (β + τ) + đếm lướt, song song. `{ bat: false }` = OMNI không áp cho em ⇒ không bao giờ lướt. Lỗi ⇒ null (tem giữ như cũ: câu sai nhanh đi đường thường).
+ */
+export async function omniChoTem(env: Env, sbd: string, cau: readonly { qid: string; phan: 'I' | 'II' | 'III'; mucDo: string | null }[], nowMs: number): Promise<{ bat: false } | { bat: true; ky: Map<string, number>; luot: number } | null> {
+  try {
+    if (!sbd) return null
+    if (!(await omniBat(env, sbd))) return { bat: false }
+    const goc = cau.map((c) => tachSongSinh(c.qid).goc)
+    const [[beta, tau], luot] = await Promise.all([docBetaVaTau(env, [...new Set(goc)], [sbd]), soLuotHomNay(env, sbd, nowMs)])
+    const t = tau.get(sbd) ?? 0
+    const ky = new Map<string, number>()
+    cau.forEach((c, i) => { const v = msKyVong(beta.get(goc[i]!) ?? null, t, c.phan, c.mucDo); if (Number.isFinite(v) && v > 0) ky.set(c.qid, v) })
+    return { bat: true, ky, luot }
+  } catch { return null }
+}
 /** Số lượt lướt hôm nay của em (dòng purpose 'luot' ngày VN hôm nay). Lỗi / D1 cũ ⇒ 0. */
 export async function soLuotHomNay(env: Env, sbd: string, nowMs: number): Promise<number> {
   const ngay = ngayVnCua(nowMs)

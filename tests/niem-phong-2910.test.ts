@@ -18,6 +18,7 @@ import { chamTuNiem, nhoBaoVe, nhoBienNhan, nhoEm, xoaChamNhanh } from '../serve
 import { HAN_NIEM_MS, moNiem, niemPhong, xoaKhoaNiem, type NoiDungNiem } from '../server/src/niem-phong'
 import { niemPhongCau } from '../server/src/niem-cau'
 import { boSungKichThuocDe, docDoGiayMot } from '../server/src/do-giay-luot'
+import { xoaDemCauHinh } from '../server/src/cau-hinh-dem'
 import { khongTinhTuDo } from '../server/src/thuong-tra-loi'
 import type { PrivateQuestion } from '../src/game/than-thu-v2/core'
 import type { Env } from '../server/src/kieu'
@@ -102,6 +103,30 @@ describe('chấm từ tem (chamTuNiem) khớp chấm thường', () => {
     expect(chamTuNiem('S1', nd(), b('C', { msLam: 1000 }), NOW)).toMatchObject({ correct: true })
     expect(chamTuNiem('S1', nd({ o: 0 }), b('A', { msLam: 1000 }), NOW)).toMatchObject({ correct: false })
     expect(chamTuNiem('S1', nd(), b('A', { msLam: undefined }), NOW)).toMatchObject({ correct: false }) // máy không đo ⇒ không bao giờ lướt (cùng luật cham-nhanh.ts)
+  })
+  it('OMNI + tem mang kỳ vọng `y` và số lướt `u` ⇒ câu SAI làm nhanh QUYẾT LƯỚT NGAY (không null, không D1): lướt ⇒ chưa tính; hết suất lướt / đủ lâu ⇒ sai thường', () => {
+    const om = (o: Partial<NoiDungNiem> = {}) => nd({ y: 30_000, u: 0, ...o }) // kỳ vọng 30 s ⇒ ngưỡng lướt = max(3 s, 10 % × 30 s) = 3 s
+    expect(chamTuNiem('S1', om(), b('A', { msLam: 2000 }), NOW)).toMatchObject({ correct: false, khongTinh: true, omni: { luot: true } })
+    expect(chamTuNiem('S1', om(), b('A', { msLam: 3000 }), NOW)).toMatchObject({ correct: false }) // = ngưỡng ⇒ không lướt (còn «làm vội» là luật khác, xét như cũ)
+    expect(chamTuNiem('S1', om(), b('A', { msLam: 3000 }), NOW)!.omni).toBeUndefined()
+    expect(chamTuNiem('S1', om({ u: 3 }), b('A', { msLam: 1000 }), NOW)!.omni).toBeUndefined() // đã đủ 3 lượt lướt hôm nay ⇒ sai thường
+    expect(chamTuNiem('S1', om({ u: 2 }), b('A', { msLam: 1000 }), NOW)).toMatchObject({ omni: { luot: true } }) // lượt lướt thứ 3 vẫn được
+    expect(chamTuNiem('S1', om({ u: 2 }), b('A', { msLam: 1000, lm: 1 }), NOW)!.omni).toBeUndefined() // máy em đã thấy thêm 1 lướt trong chặng ⇒ 2 + 1 = 3 ⇒ sai thường
+    expect(chamTuNiem('S1', om({ y: 90_000 }), b('A', { msLam: 7000 }), NOW)).toMatchObject({ khongTinh: true, omni: { luot: true } }) // kỳ vọng 90 s ⇒ ngưỡng 8 s (kẹp)
+    expect(chamTuNiem('S1', om(), b('C', { msLam: 1000 }), NOW)!.omni).toBeUndefined() // đúng thì không bao giờ lướt
+    expect(chamTuNiem('S1', nd({ o: 1 }), b('A', { msLam: 1000 }), NOW)).toBeNull() // OMNI chưa biết kỳ vọng ⇒ đường thường như cũ
+    expect(chamTuNiem('S1', om({ o: 0 }), b('A', { msLam: 1000 }), NOW)!.omni).toBeUndefined() // OMNI tắt cho em ⇒ không xét lướt
+  })
+  it('niêm phong cả chặng: OMNI áp ⇒ tem mang y + u; OMNI tắt ⇒ o = 0; chưa biết (lỗi) ⇒ o = 1 không y', async () => {
+    const env = envBiMat(), q = cauMau()
+    const mo = async (om: Parameters<typeof niemPhongCau>[6]) => (await moNiem(env, 'S1', 'Q1', (await niemPhongCau(env, 'S1', q, true, NOW, undefined, om))!))!
+    expect(await mo({ bat: true, ky: new Map([['Q1', 30_456.7]]), luot: 2 })).toMatchObject({ o: 1, y: 30_457, u: 2 })
+    expect(await mo({ bat: false })).toMatchObject({ o: 0 })
+    expect((await mo({ bat: false })).y).toBeUndefined()
+    const loi = await mo(null)
+    expect(loi).toMatchObject({ o: 1 }); expect(loi.y).toBeUndefined()
+    const thieu = await mo({ bat: true, ky: new Map(), luot: 0 })
+    expect(thieu).toMatchObject({ o: 1 }); expect(thieu.y).toBeUndefined() // câu không có kỳ vọng ⇒ như chưa biết
   })
   it('khongTinh (làm vội) khớp đúng hàm của đường thường với mọi thời lượng', async () => {
     const env = envBiMat()
@@ -231,6 +256,22 @@ describe('đường thật: mở chặng cấp tem, nộp kèm tem', () => {
     expect(sai).toMatchObject({ tam: true, correct: false, answer: expect.any(String) })
     xoaChamNhanh()
     expect(await dong1KhiD1Treo(x, { session: id, qid: ds[2]!.qid, answer: traLoi(ds[2]!.phan, true), assisted: false, msLam: 30_000 }, 600)).toBe('het')
+  })
+  it('OMNI áp cho em: tem mang kỳ vọng + số lướt; câu SAI làm nhanh ⇒ dòng 1 «lướt» (chưa tính) đi NGAY khi D1 treo hẳn', async () => {
+    const x = await kho()
+    x.k.d.sql.exec(`UPDATE cau_hinh SET gia_tri='{"bat":true,"lop":[],"sbd":["S1"]}' WHERE khoa='game_hoa_2'; INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('omni','{"bat":true,"lop":[],"sbd":["S1"]}','x')`)
+    xoaDemCauHinh(x.env)
+    const { id, ds } = await moChang(x)
+    const nd0 = (await moNiem(x.env, 'S1', ds[0]!.qid, ds[0]!.sk))!
+    expect(nd0.o).toBe(1); expect(nd0.y).toBeGreaterThan(0); expect(nd0.u).toBe(0)
+    xoaChamNhanh()
+    const sai = await dong1KhiD1Treo(x, { session: id, qid: ds[0]!.qid, answer: traLoi(ds[0]!.phan, false), assisted: false, msLam: 1500, sk: ds[0]!.sk })
+    expect(sai, 'câu sai nhanh phải có dòng 1 từ tem dù D1 treo').not.toBe('het')
+    expect(sai).toMatchObject({ tam: true, correct: false, khongTinh: true, omni: { luot: true } })
+    xoaChamNhanh()
+    const du = await dong1KhiD1Treo(x, { session: id, qid: ds[1]!.qid, answer: traLoi(ds[1]!.phan, false), assisted: false, msLam: 1500, lm: 3, sk: ds[1]!.sk })
+    expect(du).toMatchObject({ tam: true, correct: false }) // máy em đã thấy 3 lượt lướt ⇒ lần này sai thường, vẫn có dòng 1 ngay
+    expect((du as Record<string, unknown>).omni).toBeUndefined()
   })
   it('tem hỏng / của câu khác / hết hạn 45 phút / đã nộp rồi ở isolate này ⇒ KHÔNG dùng (D1 treo ⇒ không có dòng 1)', async () => {
     const x = await kho()
