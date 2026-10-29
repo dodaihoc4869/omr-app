@@ -26,9 +26,12 @@ function gui(g: GiamThi): void {
   guiLai = muc
 }
 function layLai(muc: MucGT, el: HTMLElement, loiVao: HTMLElement | null | undefined): GiamThi | null {
-  if (!guiLai || guiLai.g.muc !== muc) return null
+  if (!guiLai) return null
   const g = guiLai.g
   clearTimeout(guiLai.hen); guiLai = null
+  // 29/10 (ảnh thầy: «Có câu ko có giám thị»): câu liền trước KHÁC mức ⇒ giám thị cũ còn đang chờ huỷ (hẹn 0 ms) mà giám thị mới được dựng vào CHÍNH khung đó —
+  // hẹn chạy sau ⇒ `huy()` cũ xoá sạch khung (`khung.innerHTML = ''`) kéo theo giám thị mới ⇒ khung trống tới hết câu. Huỷ cái cũ NGAY, trước khi dựng cái mới.
+  if (g.muc !== muc) { g.huy(); return null }
   g.doiCho(el, loiVao)
   return g
 }
