@@ -224,8 +224,6 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
   const day=await doDayDu(env,chon.map(x=>x.q as CauPool)) // pool là bản NHẸ: chỉ các câu ĐƯỢC CHỌN mới nạp đầy đủ để đưa cho em
   return {ok:true,id,questions:chon.map((x,i)=>({...publicQuestion(day[i]!),...vaiChoMay(x.role)})),missing:scope.missing,sourceCases:[...new Set(scope.evidence.map(e=>e.ca))].slice(0,3),...(nganSachThieu?{nganSach:nganSachThieu}:{}),...(giuMat.length?{giuChoThua:giuMat}:{}),...(giuDangMo?{giuChoDangMo:giuDangMo}:{}),...(lyDoLuot?{chonLyDo:lyDoLuot}:{}),...(hoanLuot?{hoanLuot}:{}),luot:{...tomTatLuot({...info,conLai:Math.max(0,info.conLai-1)},dauVao.soLuotDaLam+1),luotDangMo:lt},maiCho:cho}
 }
-/** Lệnh mở chặng mới bị khoá khi phần Tự sửa lỗi hôm nay chưa xong (28/10). */
-const LENH_KHOA_SUA=['hoc-tap-start','hoc-tap-lam-lai']
 /** Promise bắt đầu sớm: đánh dấu "đã bắt" để lỗi không thành lỗi treo — nơi dùng vẫn `await` và nhận đúng lỗi. */
 const som=<T,>(p:Promise<T>)=>{p.catch(()=>{});return p}
 /** Lệnh game được chạy lượt đọc "cổng đóng băng" (reset) SONG SONG khi đệm cổng vừa hết hạn (index.ts, tối ưu 05/10): chỉ các lệnh CHỈ chạm D1 qua `env.DB`
@@ -352,14 +350,14 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
   }
   // Tối ưu 05/10: lượt kiểm mật khẩu (khi đệm 60 s trượt) chạy CÙNG đợt với các lượt ĐỌC đầu của lệnh (`batDauDocSom`, gọi khi token đã qua kiểm chữ ký/hạn —
   // token giả bị chặn trước mọi lượt D1 như cũ). Không ghi gì, không trả gì trước khi xác thực xong. `gameIdentity` bị thay (test) ⇒ đọc sau xác thực như cũ.
-  const giu:{ds:ReturnType<typeof batDauDocSom>|null;hocTap?:ReturnType<typeof batDauHocTapSom>;kiem?:{sbd:string;p:ReturnType<typeof import('./kiem-tra-ca-nhan')['docKtCn']>};dem?:{sbd:string;p:Promise<Record<string,unknown>>};khoaSua?:{sbd:string;p:Promise<number>}}={ds:null}
+  const giu:{ds:ReturnType<typeof batDauDocSom>|null;hocTap?:ReturnType<typeof batDauHocTapSom>;kiem?:{sbd:string;p:ReturnType<typeof import('./kiem-tra-ca-nhan')['docKtCn']>};dem?:{sbd:string;p:Promise<Record<string,unknown>>}}={ds:null}
   // NỘP TỨC THÌ (thầy 27/10 «bấm nút nộp load chậm lag»): lịch Kiểm tra ôn tập (`docKtCn`, CHỈ ĐỌC) mọi lệnh khác cũng cần ⇒ bắt đầu CÙNG đợt lượt đọc mật khẩu
   // + các lượt đọc đầu — trước: một đợt D1 nối tiếp riêng SAU xác thực ở mỗi lần nộp câu (`answer`), đếm sau câu (`hoc-tap-dem`), học cách giải, làm lại.
   // Kết quả / lỗi chỉ dùng ở đúng chỗ `await kiem` cũ bên dưới. Lệnh của chính Kiểm tra ôn tập (`hoc-tap-ktcn-*`) trả trước khi đọc ⇒ không đọc sớm.
   // Lệnh đếm nhẹ sau mỗi câu (`hoc-tap-dem`, 2 câu CHỈ ĐỌC): cũng bắt đầu cùng đợt ấy — chỉ dùng khi tới đúng nhánh trả số đếm như cũ (Gói 7 bật, không phải ngày
   // chỉ làm kiểm tra); nhánh khác bỏ kết quả.
   // 28/10 «sửa phải xong mới hiện chặng sau»: số câu phần ngày Tự sửa lỗi còn thiếu (chỉ khi máy em đã báo khoá) — đọc CÙNG đợt mật khẩu, không thêm đợt chờ.
-  const sbd=await gameIdentity(env,b,s=>{if(LENH_KHOA_SUA.includes(action))giu.khoaSua={sbd:s,p:som(import('./tu-sua-viec-ngay').then(m=>m.docConPhanKhoa(env,s)))};if(action==='hoc-tap-sanh'||action==='hoc-tap-start')giu.hocTap=batDauHocTapSom(env,s,action);else{if(action!=='sync'&&!action.startsWith('hoc-tap-'))giu.ds=batDauDocSom(env,action,b,s);if(action!=='sync'&&!action.startsWith('hoc-tap-ktcn-'))giu.kiem={sbd:s,p:som(import('./kiem-tra-ca-nhan').then(kt=>kt.docKtCn(env,s,Date.now(),true)))};if(action==='hoc-tap-dem')giu.dem={sbd:s,p:som(import('./goi-bai-7').then(g7=>g7.demHomNay7(env,s,Date.now())))}}})
+  const sbd=await gameIdentity(env,b,s=>{if(action==='hoc-tap-sanh'||action==='hoc-tap-start')giu.hocTap=batDauHocTapSom(env,s,action);else{if(action!=='sync'&&!action.startsWith('hoc-tap-'))giu.ds=batDauDocSom(env,action,b,s);if(action!=='sync'&&!action.startsWith('hoc-tap-ktcn-'))giu.kiem={sbd:s,p:som(import('./kiem-tra-ca-nhan').then(kt=>kt.docKtCn(env,s,Date.now(),true)))};if(action==='hoc-tap-dem')giu.dem={sbd:s,p:som(import('./goi-bai-7').then(g7=>g7.demHomNay7(env,s,Date.now())))}}})
   // Kế hoạch sảnh vừa nhớ (goi-bai-7-nho.ts) chỉ dành cho lượt mở chặng NGAY sau đó: mọi lệnh khác của em (nộp câu, học cách giải, kiểm…) xoá bản nhớ.
   if(action!=='hoc-tap-sanh'&&action!=='hoc-tap-start')boKeHoach7(env.DB,sbd)
   // Kiểm tra theo lịch RIÊNG từng em sở hữu cả ngày, kể cả khi em đã nộp sớm.
@@ -385,13 +383,10 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     const khoa=kt.ktDangKhoaChang(kiem,Date.now())
     if(khoa)return {ok:false,ma:kt.MA_KHOA_KT,error:kt.CHU_KHOA_KT,kiemTraCaNhan:khoa}
   }
-  // KHOÁ CHẶNG SAU TỰ SỬA LỖI (thầy 28/10 «Tôi muốn sửa phải xong mới hiện chặng sau»): Lộ trình của em đã khoá các chặng sau nút Sửa lỗi (máy em báo
-  // `tu_sua_khoa_ngay`) mà 12 câu phần ngày còn câu chưa xong ⇒ không mở chặng mới / làm lại (kể cả lối cũ). Thứ tự: Kiểm tra ôn tập (trên) ⇒ Sửa lỗi.
-  if(LENH_KHOA_SUA.includes(action)){
-    const tsv=await import('./tu-sua-viec-ngay')
-    const con=await (giu.khoaSua&&giu.khoaSua.sbd===sbd?giu.khoaSua.p:tsv.docConPhanKhoa(env,sbd))
-    if(con>0)return {ok:false,ma:tsv.MA_TU_SUA_TRUOC,error:tsv.CHU_TU_SUA_TRUOC,conSua:con}
-  }
+  // 29/10 20:15 (thầy: «sao vẫn có học sinh bị vậy … sửa luôn đi để học sinh còn làm, triệt để, không được phép có lỗi này nữa» — ảnh Lộ trình cho bấm BẮT ĐẦU chặng 1,
+  // «Tự sửa lỗi ✓ · Sửa 2 lỗi cũ 2/2», mà mở chặng báo «Em sửa xong lỗi hôm nay rồi mới mở chặng tiếp nhé»; lần thứ ba: 28/10 19:55, 29/10 06:10): MÁY CHỦ KHÔNG CÒN CHẶN mở chặng vì Tự sửa lỗi.
+  // Khoá «sửa xong mới tới chặng sau» thuộc Lộ trình (nút chặng khoá xám, màn chặng chỉ mở chặng Lộ trình đã cho bấm). Bản chặn ở máy chủ dựa vào danh sách «đã xong» do máy em
+  // gửi nền — lệch một nhịp (mạng chậm, đổi máy, mã câu khác khoá) là em kẹt giữa Lộ trình và màn chặng, không có đường ra. Không còn lệnh đọc khoá Sửa lỗi trong lượt mở chặng.
   // App học sinh tập trung làm bài (10/10): không bắt chọn thần thú, không mở phòng/game.
   // Cùng bộ kế hoạch, phiên, quyền và answer hiện có; chỉ bỏ ràng buộc cửa Đảo/Đoàn ở giao diện.
   if(action.startsWith('hoc-tap-')){
