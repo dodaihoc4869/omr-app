@@ -109,7 +109,7 @@ describe('Tự sửa lỗi · tổng thật và phân trang', () => {
     vi.useRealTimers(); d.sql.close()
   })
 
-  it('API mới đọc metadata/cursor; client đếm tương thích payload cũ, trang tiếp chỉ 1 lệnh không gọi lại co', async () => {
+  it('API mới đọc metadata/cursor; client đếm tương thích payload cũ; tải đầu chỉ MỘT lệnh danh-sach (29/10: bỏ lượt hỏi cờ co đi trước), trang tiếp cũng 1 lệnh', async () => {
     const sau = { hang: 1, giaoLuc: 100, dotId: 'D099', nay: new Date(NOW).toISOString() }
     const dem = { can: 135, cho: 4, xong: 6, tong: 145 }
     const urls: string[] = []
@@ -123,8 +123,15 @@ describe('Tự sửa lỗi · tổng thật và phân trang', () => {
     expect(a.trangThai === 'bat' ? a.kiemLaiHoiThay : []).toEqual([{ qid: 'Q-NO-DOT', ten: 'Mol', phan: 'III', trangThai: 'den_han' }])
     expect(soCauCanSua(a, NOW)).toBe(135)
     await apiDanhSachTuChua('token', sau)
-    expect(urls.map((u) => u.split('/').pop())).toEqual(['co', 'danh-sach', 'danh-sach'])
+    expect(urls.map((u) => u.split('/').pop())).toEqual(['danh-sach', 'danh-sach'])
     expect(soCauCanSua({ trangThai: 'bat', ds: [{ qid: 'Q1', trangThai: 'can_thay' }, { qid: 'Q2', trangThai: 'da_tu_sua' }] }, NOW)).toBe(1)
+  })
+
+  it('vòng chữa tắt: danh-sach trả FEATURE_TAT ⇒ «tắt» (không cần lượt hỏi cờ riêng); mạng hỏng ⇒ «lỗi»', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ ok: false, ma: 'FEATURE_TAT' }), { status: 403 })))
+    expect(await apiDanhSachTuChua('token')).toEqual({ trangThai: 'tat' })
+    vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('mạng') }))
+    expect(await apiDanhSachTuChua('token')).toMatchObject({ trangThai: 'loi' })
   })
 
   it('cache trang tiếp gộp dotId, giữ tổng full; người nghe không nhận riêng trang cuối; Hôm nay không tự tải hết', async () => {
@@ -140,7 +147,7 @@ describe('Tự sửa lỗi · tổng thật và phân trang', () => {
     }))
     const nghe = vi.fn(), bo = ngheTuSua(nghe)
     const a = await taiTuSuaLoi('token')
-    expect(urls).toHaveLength(2)
+    expect(urls).toHaveLength(1)
     expect(soCauCanSua(a, NOW)).toBe(135)
     const b = await taiTuSuaLoi('token', { sau })
     expect(b.trangThai === 'bat' ? b.ds.length : 0).toBe(2)
@@ -149,9 +156,9 @@ describe('Tự sửa lỗi · tổng thật và phân trang', () => {
     expect(docNhoTuSua('token')).toEqual(b)
     const thongBao = nghe.mock.calls.at(-1)?.[1] as KetQuaDanhSachChua
     expect(thongBao.trangThai === 'bat' ? thongBao.ds.length : 0).toBe(2)
-    expect(urls).toHaveLength(3)
+    expect(urls).toHaveLength(2)
     await taiTuSuaLoi('token')
-    expect(urls).toHaveLength(3)
+    expect(urls).toHaveLength(2)
     bo()
   })
 })

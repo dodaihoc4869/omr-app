@@ -280,13 +280,11 @@ function canXinKe(): boolean {
   } catch { return true }
 }
 export async function apiDanhSachTuChua(token: string, sau?: MocDanhSachChua): Promise<KetQuaDanhSachChua> {
-  if (!sau) {
-    const co = await goi('co', token)
-    if (!co) return { trangThai: 'loi', loi: LOI_MANG }
-    if (co.ok !== true) return { trangThai: 'tat' }
-  }
+  // 29/10: BỎ lượt hỏi cờ `co` đi TRƯỚC (một vòng đi-về + một lượt xác thực/đọc cờ máy chủ chỉ để biết vòng chữa bật hay tắt): chính `danh-sach` kiểm cờ ngay đầu lệnh
+  // (`quyen`) và trả FEATURE_TAT khi tắt — em tắt vẫn chỉ tốn một lượt nhẹ, em bật nhanh hơn một vòng đi-về (số «Sửa lỗi» trên Lộ trình, thẻ Hôm nay, màn Tự sửa lỗi).
   const j = await goi('danh-sach', token, sau ? { sau } : canXinKe() ? { ke: 1 } : {})
-  if (j?.ma === 'FEATURE_TAT') return { trangThai: 'tat' }
+  if (!j) return { trangThai: 'loi', loi: LOI_MANG }
+  if (j.ma === 'FEATURE_TAT') return { trangThai: 'tat' }
   if (!j?.ok || !Array.isArray(j.ds)) return { trangThai: 'loi', loi: loiCua(j) }
   const ds = (j.ds as Obj[])
     .filter((x) => !!x && typeof x.qid === 'string' && !!x.qid)
