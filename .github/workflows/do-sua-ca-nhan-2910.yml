@@ -1,0 +1,47 @@
+# ĐO «SỬA LỖI CÁ NHÂN HOÁ 12–36 CÂU/NGÀY» TRÊN BẢN SỐNG (CHỈ ĐỌC) — thầy 29/10: «Đã áp câu sửa theo luật mới chưa? Cho tôi con số xem đã cá nhân hoá chưa».
+# Chỉ SELECT gộp: KHÔNG in mã em, tên em, mã câu. Số em theo mục tiêu ngày (muc_tieu), so với tổng số câu sai của chính em (công thức server/src/sua-loi-phan-bo.ts), việc hôm nay đã lưu.
+name: Đo Sửa lỗi cá nhân hoá (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/do-sua-ca-nhan-2910]
+    paths: ['.github/workflows/do-sua-ca-nhan-2910.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-sua-ca-nhan-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm gộp (chỉ SELECT, ẩn danh)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c ".[0].results" || echo "(lỗi)"; }
+          echo "Giờ VN: $(TZ=Asia/Ho_Chi_Minh date '+%d/%m %H:%M')"
+          HOM="date('now','+7 hours')"
+          # «số câu» mỗi em, đúng cách máy chủ đếm (chua-cau-sai.ts danhSach): can / cho / đã tự sửa 11 ngày; N = kẹp(⌈4·tổng/60⌉, 12, 36)
+          CTE="WITH p AS (SELECT sbd, SUM(CASE WHEN trang_thai_day='da_tu_sua' THEN 0 WHEN trang_thai_day='cho_gap_lai_2' AND (julianday(den_han) IS NULL OR julianday(den_han)>julianday($HOM)) THEN 0 ELSE 1 END) can, SUM(CASE WHEN trang_thai_day='cho_gap_lai_2' AND (julianday(den_han) IS NULL OR julianday(den_han)>julianday($HOM)) THEN 1 ELSE 0 END) cho, SUM(CASE WHEN trang_thai_day='da_tu_sua' AND COALESCE(dong_luc,cap_nhat_luc)>=(CAST(strftime('%s','now') AS INTEGER)*1000-11*86400000) THEN 1 ELSE 0 END) da11 FROM chua_loi_dot GROUP BY sbd), q AS (SELECT p.sbd, p.can, p.cho, p.da11, (p.can+p.cho) AS no, MIN(36, MAX(12, (4*(p.can+p.cho+p.da11)+59)/60)) AS n_dung, m.muc_tieu AS mt FROM p LEFT JOIN tu_sua_muc_tieu_ngay m ON m.sbd=p.sbd AND m.ngay_vn=$HOM)"
+          q "tổng quan: em có đợt sửa · có câu cần / chờ sửa · ĐÃ có mục tiêu ngày hôm nay · mục tiêu > 12 · mục tiêu = công thức hôm nay · mục tiêu ≥ công thức · em còn nợ nhưng CHƯA có mục tiêu hôm nay" \
+            "$CTE SELECT COUNT(*) em_co_dot, SUM(no>0) em_con_no, SUM(mt IS NOT NULL) em_co_muc_tieu, SUM(mt>12) muc_tieu_tren_12, SUM(mt=n_dung) bang_cong_thuc, SUM(mt>=n_dung) khong_thap_hon_cong_thuc, SUM(no>0 AND mt IS NULL) con_no_chua_co_muc_tieu FROM q"
+          q "phân bố mục tiêu ngày hôm nay (muc_tieu: số em)" "SELECT muc_tieu, COUNT(*) em FROM tu_sua_muc_tieu_ngay WHERE ngay_vn=$HOM GROUP BY muc_tieu ORDER BY muc_tieu"
+          q "theo cỡ nợ (can+cho): số em · số em đã có mục tiêu · mục tiêu thấp / trung bình / cao · công thức trung bình" \
+            "$CTE SELECT CASE WHEN no<=12 THEN 'a:<=12' WHEN no<=60 THEN 'b:13-60' WHEN no<=120 THEN 'c:61-120' WHEN no<=240 THEN 'd:121-240' ELSE 'e:>240' END AS co_no, COUNT(*) em, SUM(mt IS NOT NULL) co_mt, MIN(mt) mt_thap, ROUND(AVG(mt),1) mt_tb, MAX(mt) mt_cao, ROUND(AVG(n_dung),1) cong_thuc_tb FROM q GROUP BY 1 ORDER BY 1"
+          q "việc hôm nay đã lưu trên máy chủ: số em · độ dài danh sách thấp / trung bình / cao · em có 'them' > 0" \
+            "SELECT COUNT(*) em, MIN(json_array_length(muc_json)) dai_thap, ROUND(AVG(json_array_length(muc_json)),1) dai_tb, MAX(json_array_length(muc_json)) dai_cao, SUM(them>0) em_sua_them FROM tu_sua_viec_ngay WHERE ngay_vn=$HOM"
+          q "danh sách đã lưu so với mục tiêu: em có danh sách ≥ mục tiêu · em có danh sách < mục tiêu (chưa đủ câu)" \
+            "SELECT SUM(json_array_length(v.muc_json)>=m.muc_tieu) du_cau, SUM(json_array_length(v.muc_json)<m.muc_tieu) thieu_cau, COUNT(*) em FROM tu_sua_viec_ngay v JOIN tu_sua_muc_tieu_ngay m ON m.sbd=v.sbd AND m.ngay_vn=v.ngay_vn WHERE v.ngay_vn=$HOM"
+          q "độ phủ trong danh sách hôm nay: số dạng khác nhau / mức độ khác nhau mỗi em (trung bình) — chỉ em có danh sách ≥ 12 câu" \
+            "WITH l AS (SELECT v.sbd, json_extract(j.value,'\$.q') qid FROM tu_sua_viec_ngay v, json_each(v.muc_json) j WHERE v.ngay_vn=$HOM), z AS (SELECT l.sbd, COUNT(*) so_cau, COUNT(DISTINCT c.dang) so_dang, COUNT(DISTINCT c.muc_do) so_muc FROM l LEFT JOIN cau_meta c ON c.qid=l.qid GROUP BY l.sbd HAVING COUNT(*)>=12) SELECT COUNT(*) em, ROUND(AVG(so_cau),1) cau_tb, ROUND(AVG(so_dang),1) dang_tb, MIN(so_dang) dang_thap, MAX(so_dang) dang_cao, ROUND(AVG(so_muc),2) muc_tb FROM z"
+          q "cột bảng tu_sua_muc_tieu_ngay (để biết bảng đã áp)" "SELECT name, type FROM pragma_table_info('tu_sua_muc_tieu_ngay')"
