@@ -829,6 +829,8 @@ async function startGoi7Thuc(env: Env, sbd: string, now: number, gsSom?: Promise
 export async function xayGoiNgay7(env: Env, sbd: string, now: number, soCau: number): Promise<{ refs: RefGoi7[]; questions: Record<string, unknown>[]; goi7: unknown; goiIds: string[]; ngay: string } | null> {
   const [lap, khoi, duo] = await Promise.all([lapDungLai7(env, sbd, now).then((x) => x ?? lapGoi7(env, sbd, now)), docKhoiEm(env, sbd), duolingoChoEm(env, sbd, now).catch(() => false)])
   if (!lap || !lap.control.enabled) return null
+  // Gói lập lúc em vừa xong chặng: máy em nạp lại Sảnh cùng lúc (0 s / 4 s) ⇒ Sảnh dùng lại đúng kế hoạch này (8 s, đối chiếu «đã làm» mới), không lập lần nữa.
+  nhoLapSanh7(env, sbd, now, lap)
   const vuaLamGoc = (qid: string) => lap.vuaLam.has(qid) || lap.vuaLam.has(tachSongSinh(qid).goc)
   const satHan = !duo || lap.goi.some(g => g.quota > g.gapNgay.size && soNgayCon7(ngayVn7(now), g.han) <= 1)
   const ds = [...xepBai6(lap.plan.viec, lap.pDung, { giuThuTu: satHan }), ...(lap.daLamNgay < lap.toiThieu ? lap.duPhong() : lap.hocThem())]

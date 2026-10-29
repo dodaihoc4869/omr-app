@@ -188,7 +188,8 @@ function ra(data0: unknown, status0 = 200,giuServerNow=false): Response {
 /** Sau lệnh game (việc NỀN, chỉ đọc): mở chặng xong ⇒ nạp sẵn phiên + câu (bản riêng có đáp án) vào đệm chấm nhanh của isolate (cham-nhanh.ts) — câu ĐẦU của chặng
  *  cũng chấm được từ bộ nhớ. Không bao giờ ném, không chạm đường trả lời. */
 function sauLenhGame(env: Env, lenh: string, b: Record<string, unknown>, kq: Record<string, unknown>, ctx?: ExecutionContext): void {
-  if (lenh !== 'hoc-tap-start' || !ctx || kq?.ok !== true || typeof kq.id !== 'string' || !kq.id) return
+  // `hoc-tap-mo-goi` (gói bài cả ngày, goi-ngay.ts): phiên mở từ gói cũng nạp sẵn vào bộ chấm nhanh như phiên mở chặng thường.
+  if ((lenh !== 'hoc-tap-start' && lenh !== 'hoc-tap-mo-goi') || !ctx || kq?.ok !== true || typeof kq.id !== 'string' || !kq.id) return
   const id = kq.id
   try { ctx.waitUntil(gameSbdDaKy(env, b).then((sbd) => napPhienNhanh(envGhiRieng(env), id, sbd)).catch(() => {})) } catch { /* không có ctx thật */ }
 }

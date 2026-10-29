@@ -131,3 +131,13 @@ it('máy em ghép câu của hai chặng trong gói (`ves` + `qids`) ⇒ phiên 
   expect(tat.qids).toHaveLength(6) // không chọn ⇒ vẫn tối đa một chặng
   expect(await moGoi7(k.env, 'S1', { ves: [c0.ve, 'x'.repeat(80)], qids: chon }, NOW)).toEqual({ ok: false, ma: 'GOI_CU' })
 })
+
+it('thầy sửa đề / đáp án (đổi phiên bản) sau lúc lập gói ⇒ câu ấy bị bỏ khi mở phiên; câu khác giữ nguyên', async () => {
+  const k = await kho()
+  const goi = await goiNgay7(k.env, 'S1', NOW) as unknown as Goi
+  const c0 = goi.chang[0]!, qs = c0.questions.map((q) => q.qid)
+  k.d.sql.prepare("UPDATE game_v2_question SET version='v2-thay-sua' WHERE ma_de='DH-B8' AND qid=?").run(qs[0]!)
+  const mo = await moGoi7(k.env, 'S1', { ve: c0.ve, sk: temCua(c0) }, NOW) as { ok: boolean; qids: string[] }
+  expect(mo.ok).toBe(true)
+  expect(mo.qids).toEqual(qs.slice(1))
+})
