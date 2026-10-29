@@ -1,0 +1,96 @@
+# ĐẶT LẠI «BÀI HÔM NAY» CỦA TÀI KHOẢN THỬ 12121212 (thầy 29/10: «Reset lại bài hôm nay của số báo danh test 12121212 để tôi test lại app»).
+# Bấm tay (workflow_dispatch), KHÔNG chạy từ máy local, KHÔNG export D1. CHỈ đụng đúng một tài khoản (hằng SBD bên dưới, không nhận từ ô nhập) và chỉ dòng của HÔM NAY (ngày VN):
+#   XOÁ: kế hoạch ngày · bộ nạp sẵn (hoc_tap_san_sang) · mức + hạn ngạch chặng học hôm nay · lượt «gặp» câu hôm nay · phiên + lượt trả lời game hôm nay · SỔ HỌC của hôm nay
+#        · việc / mục tiêu / khoá Sửa lỗi hôm nay · lượt Sửa gọn hôm nay · nhiệm vụ ngày · kế hoạch SRS 2.0 hôm nay · bài Mẹ giao daily_<hôm nay> · kiểm tra cá nhân hôm nay.
+#   MỞ LẠI (không xoá dòng): đợt chữa lỗi đã đóng / đang chờ gặp lại / đang kiểm chứng trong hôm nay ⇒ trạng thái can_chan_doan, đóng_luc rỗng.
+#   GIỮ NGUYÊN: tài khoản, mật khẩu, lớp, EXP / tinh thể / thú / rương, sổ + hồ sơ các ngày trước, ca thi và mọi dữ liệu của em khác.
+# `che_do: dem` ⇒ chỉ ĐẾM số dòng sẽ đụng · `ghi` ⇒ thực hiện, rồi đếm lại (phải về 0). Ca thi đang mở ⇒ DỪNG. Chạy lại an toàn.
+# Máy học sinh còn bản nhớ trong trình duyệt (việc Sửa lỗi hôm nay, xem lại): xoá dữ liệu trang hoặc dùng cửa sổ ẩn danh khi test lại.
+name: Đặt lại bài hôm nay của tài khoản thử 12121212
+on:
+  workflow_dispatch:
+    inputs:
+      che_do:
+        description: 'dem = chỉ đếm · ghi = đặt lại'
+        required: true
+        default: 'dem'
+        type: choice
+        options: [dem, ghi]
+permissions:
+  contents: read
+concurrency:
+  group: dat-lai-bai-thu
+  cancel-in-progress: false
+jobs:
+  chay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đặt lại
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+          CHE_DO: ${{ inputs.che_do }}
+        run: |
+          set -euo pipefail
+          S="'12121212'"
+          HOM=$(TZ=Asia/Ho_Chi_Minh date +%F)
+          BD_MS=$(( $(TZ=Asia/Ho_Chi_Minh date -d "$HOM 00:00:00" +%s) * 1000 ))
+          BD_ISO=$(date -u -d "@$((BD_MS/1000))" +%Y-%m-%dT%H:%M:%S.000Z)
+          NAY_MS=$(( $(date +%s) * 1000 ))
+          echo "Giờ VN: $(TZ=Asia/Ho_Chi_Minh date '+%d/%m %H:%M') · hôm nay $HOM · bắt đầu ngày (UTC) $BD_ISO · chế độ $CHE_DO"
+          d1() { npx -y wrangler@4 d1 execute omr --remote --json --command "$1"; }
+          # cổng: ca thi đang mở ⇒ dừng
+          MO=$(d1 "SELECT COUNT(*) n FROM ca WHERE trang_thai='mo'" | jq -r '.[0].results[0].n')
+          echo "Ca thi đang mở: $MO"
+          [ "$MO" = "0" ] || { echo "::error::Đang có ca thi mở — dừng."; exit 1; }
+          TON=$(d1 "SELECT COUNT(*) n FROM hoc_sinh WHERE sbd=$S" | jq -r '.[0].results[0].n')
+          [ "$TON" = "1" ] || { echo "::error::Không thấy tài khoản thử — dừng."; exit 1; }
+          # mô tả | bảng | điều kiện (luôn gắn với tài khoản thử + hôm nay)
+          MUC=(
+            "ke_hoach_ngay|sbd=$S AND ngay='$HOM'"
+            "hoc_tap_san_sang|sbd=$S"
+            "goi_bai_7_muc_ngay|sbd=$S AND ngay='$HOM'"
+            "goi_bai_7_ngay|sbd=$S AND ngay='$HOM'"
+            "goi_bai_7_gap|sbd=$S AND luc>='$BD_ISO'"
+            "game_v2_attempt|sbd=$S AND created_at>='$BD_ISO'"
+            "game_v2_session|sbd=$S AND created_at>='$BD_ISO'"
+            "su_kien_hoc|sbd=$S AND ngay_vn='$HOM'"
+            "tu_sua_viec_ngay|sbd=$S AND ngay_vn='$HOM'"
+            "tu_sua_muc_tieu_ngay|sbd=$S AND ngay_vn='$HOM'"
+            "tu_sua_khoa_ngay|sbd=$S AND ngay_vn='$HOM'"
+            "chua_gon_lan|sbd=$S AND ngay_vn='$HOM'"
+            "nhiem_vu_ngay|em=$S AND ngay='$HOM'"
+            "srs2_ke_hoach|sbd=$S AND ngay='$HOM'"
+            "mom_bai|sbd=$S AND id='daily_$HOM'"
+            "kiem_tra_ca_nhan|sbd=$S AND ngay='$HOM'"
+          )
+          MO_LAI="sbd=$S AND ((trang_thai_day='da_tu_sua' AND dong_luc>=$BD_MS) OR (trang_thai_day IN ('cho_gap_lai_2','dang_kiem_chung','dang_chua_buoc','dang_ghep_bai') AND cap_nhat_luc>=$BD_MS))"
+          dem() {
+            for m in "${MUC[@]}"; do
+              b="${m%%|*}"; c="${m#*|}"
+              n=$(d1 "SELECT COUNT(*) n FROM $b WHERE $c" | jq -r '.[0].results[0].n')
+              echo "  $b: $n dòng"
+            done
+            echo "  chua_loi_dot (đợt đóng / dở trong hôm nay): $(d1 "SELECT COUNT(*) n FROM chua_loi_dot WHERE $MO_LAI" | jq -r '.[0].results[0].n') dòng"
+          }
+          echo "== TRƯỚC"; dem
+          if [ "$CHE_DO" = "ghi" ]; then
+            echo "== GHI"
+            echo "Mốc khôi phục D1 (Time Travel) trước khi ghi:"; npx -y wrangler@4 d1 time-travel info omr 2>&1 | tail -n 3 || true
+            for m in "${MUC[@]}"; do
+              b="${m%%|*}"; c="${m#*|}"
+              r=$(d1 "DELETE FROM $b WHERE $c" | jq -r '.[0].meta.changes')
+              echo "  xoá $b: $r dòng"
+            done
+            r=$(d1 "UPDATE chua_loi_dot SET trang_thai_day='can_chan_doan',dong_luc=NULL,lan_gap_lai=0,buoc_dang_xu_ly=NULL,den_han='',revision=revision+1,cap_nhat_luc=$NAY_MS WHERE $MO_LAI" | jq -r '.[0].meta.changes')
+            echo "  mở lại chua_loi_dot: $r dòng"
+            echo "== SAU (phải về 0)"; dem
+          fi
