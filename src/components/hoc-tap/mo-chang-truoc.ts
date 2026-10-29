@@ -32,10 +32,12 @@ export function moChangTruoc(token: string, goi: typeof goiHoa2 = goiHoa2, now: 
 }
 
 /** Đọc ĐỒNG BỘ (và XOÁ) lượt mở trước ĐÃ VỀ thành công của `token` ⇒ mở câu đầu tức thì 0 ms (không chớp khung chờ). Chưa về / lỗi ⇒ null (nhường `layChangMoTruoc`). */
-export function layChangMoTruocNgay(token: string, now: number = Date.now()): KetQuaMo | null {
+// `chiXem` (29/10 khuya, đo máy yếu): lượt dựng ĐẦU của màn làm bài chỉ XEM (không xoá) — React có thể bỏ lượt dựng ấy rồi dựng lại (Suspense), nếu đã xoá thì lượt dựng
+// thật mất kết quả mở trước và phải gọi máy chủ lại từ đầu («Đang chuẩn bị…»). Màn đã hiện thật (effect) mới LẤY (xoá).
+export function layChangMoTruocNgay(token: string, now: number = Date.now(), chiXem = false): KetQuaMo | null {
   const c = dangCo
   if (c && c.token === token && now - c.luc < TUOI_MO_TRUOC_MS && c.kq) {
-    dangCo = null
+    if (!chiXem) dangCo = null
     return c.kq
   }
   if (!bat || !token) return null
@@ -45,8 +47,7 @@ export function layChangMoTruocNgay(token: string, now: number = Date.now()): Ke
     try {
       const r = JSON.parse(som.text) as KetQuaMo
       if (r && r.ok === true && Array.isArray(r.questions)) {
-        danhDauDaNhan('/game-v2/hoc-tap-start', than)
-        if (c && c.token === token) dangCo = null
+        if (!chiXem) { danhDauDaNhan('/game-v2/hoc-tap-start', than); if (c && c.token === token) dangCo = null }
         return r
       }
     } catch { /* bỏ qua */ }
