@@ -23,12 +23,14 @@ import { khopPhanIII } from '../../lib/cham-so'
 import TheCau from '../TheCau'
 import { BangSoLieu, ZoomableImage } from '../QuestionMedia'
 import ChuaTrucTiep, { propsCauLam } from './ChuaTrucTiep'
-import ChuaGon from './ChuaGon'
+import ChuaGon, { napKhungDuo as napKhungDuoGon } from './ChuaGon'
 import { KhungDuoSua, type TienDoSua } from './KhungDuoSua'
 import { TrongManChua } from './trong-man-chua'
 import { canChuaTrucTiep, henGapLai, LUAT_BAN_MOI } from '../../lib/chua-truc-tiep'
 import { ghiXongHomNay } from '../../lib/tu-sua-viec-hom-nay'
 import { layNapTruocCauSua, layNapTruocCauSuaNgay } from '../../lib/nap-truoc-sua'
+import { docXemLai } from '../../lib/xem-lai-sua'
+import { docSbdHs } from '../../lib/tu-sua-viec-hom-nay'
 import '../tu-luyen/tu-luyen.css'
 import './chua-cau-sai.css'
 // «Trong» 26/10 (nhóm 2): tờ trình bày styles/trong-lam-bai.css nạp RIÊNG, chỉ khi <html data-trong> (main.tsx gắn trước khi nạp màn) — không cộng byte lượt mở app.
@@ -197,8 +199,8 @@ function docPhatKem(v: unknown): KetQuaDot | null {
   return { ok: false, loi: String(o.mo ?? o.error ?? 'Máy chủ chưa trả lời được. Em thử lại.'), ma: String(o.ma ?? '') }
 }
 /** NẠP SẴN khung Duo của màn sửa câu (29/10, video 11:00 «Vẫn bị khựng chỗ mở câu»: 2–3 khung TRẮNG lúc bấm câu vì mảnh ChuaGonDuo mới bắt đầu nạp + chạy mã SAU khi bấm). Gọi từ danh sách Tự sửa lỗi lúc rảnh —
- *  nằm trong mảnh này nên KHÔNG tách thêm mảnh (bộ chặn số mảnh precache của kiem-sw). */
-export const napKhungDuo = (): Promise<unknown> => (typeof document !== 'undefined' && document.documentElement.dataset.trong === 'hs' ? import('./ChuaGonDuo').catch(() => null) : Promise.resolve(null))
+ *  nằm trong mảnh này nên KHÔNG tách thêm mảnh (bộ chặn số mảnh precache của kiem-sw). Mô-đun được nhớ (ChuaGon.tsx) ⇒ lần dựng sau không còn khung chờ `lazy`. */
+export const napKhungDuo = (): Promise<unknown> => (typeof document !== 'undefined' && document.documentElement.dataset.trong === 'hs' ? napKhungDuoGon() : Promise.resolve(null))
 
 export default function ManChuaCauSai({
   token,
@@ -213,11 +215,17 @@ export default function ManChuaCauSai({
   // «Trong» HS 27/10: đường gọn + lúc đang mở / báo lỗi vẽ khung Duo (ChuaGonDuo); lối cũ (từng bước, câu gốc) giữ như trước.
   const [duo] = useState(() => {
     const d = typeof document !== 'undefined' && document.documentElement.dataset.trong === 'hs'
-    if (d) void import('./ChuaGonDuo').catch(() => {}) // nạp trước, song song lệnh mở đợt
+    if (d) void napKhungDuoGon() // nạp trước (và nhớ mô-đun), song song lệnh mở đợt
     return d
   })
   // 29/10 (video 11:00 «Vẫn bị khựng chỗ mở câu»): lượt mở nạp trước ĐÃ VỀ ⇒ dựng thẳng màn câu ở lần vẽ ĐẦU (không khung «Đang mở câu…» một khung hình, không chờ vòng hiệu ứng).
-  const [pre] = useState(() => { const r = layNapTruocCauSuaNgay(token, qid); return r && r.ok && r.dotId && r.gon?.ok ? r : null })
+  // 29/10 (thầy «Bấm vào để xem lại chưa tức thì»): câu ĐÃ khép hôm nay ⇒ máy em còn nhớ kết quả đầy đủ (xem-lai-sua.ts) ⇒ dựng thẳng, KHÔNG gọi máy chủ.
+  const [pre] = useState<{ dotId: string; gon: KetQuaGon } | null>(() => {
+    const x = docXemLai(docSbdHs(), qid)
+    if (x && x.dotId) return { dotId: x.dotId, gon: x }
+    const r = layNapTruocCauSuaNgay(token, qid)
+    return r && r.ok && r.dotId && r.gon?.ok ? { dotId: r.dotId, gon: r.gon } : null
+  })
   const preRef = useRef(pre)
   const [ph, setPh] = useState<KetQuaDot | null>(null),
     [tai, setTai] = useState(!pre),
@@ -230,7 +238,7 @@ export default function ManChuaCauSai({
     [cho, setCho] = useState<LanNop | null>(null),
     [lanTai, setLanTai] = useState(0),
     /** Chữa câu gọn (25/10): đợt mở được ⇒ một đường cho mọi câu (ChuaGon); máy chủ chưa có lệnh gọn ⇒ lối cũ như trước. */
-    [gon, setGon] = useState<{ dotId: string; dau: KetQuaGon } | null>(() => (pre && pre.dotId && pre.gon ? { dotId: pre.dotId, dau: pre.gon } : null))
+    [gon, setGon] = useState<{ dotId: string; dau: KetQuaGon } | null>(() => (pre ? { dotId: pre.dotId, dau: pre.gon } : null))
   const mucGoi = useRef(0)
   const khongMoRef = useRef(onKhongMo)
   khongMoRef.current = onKhongMo

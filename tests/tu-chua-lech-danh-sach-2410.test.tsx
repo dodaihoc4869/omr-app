@@ -12,7 +12,7 @@ const api = vi.hoisted(() => ({
 }))
 const ghi = vi.hoisted(() => vi.fn())
 vi.mock('../src/lib/chua-cau-sai-api', () => api)
-vi.mock('../src/lib/tu-sua-viec-hom-nay', () => ({ ghiXongHomNay: ghi }))
+vi.mock('../src/lib/tu-sua-viec-hom-nay', () => ({ ghiXongHomNay: ghi, docSbdHs: () => '11010' }))
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
 vi.mock('../src/lib/may-chu-moi', () => ({ layCauHinhMayChu: async () => ({ URL: 'https://may.test' }), xongNapDiaChi: async () => {} }))
 

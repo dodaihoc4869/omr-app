@@ -87,7 +87,13 @@ export function BungDung({ loai = 'dung', chonO = '.ht2-lam-pa[data-ket=dung], .
     const tam = ref.current?.closest<HTMLElement>('.duo-ket')
     if (!tam || yenLang()) return
     const goc = tam.closest('.ht-app, .duo, main') ?? document
-    return bungDung(tam, loai === 'dung' ? goc.querySelector(chonO) : null, loai)
+    // Dựng SAU lần vẽ đầu của dải: «Kiểm tra» là sự kiện rời rạc ⇒ React chạy effect NGAY, trước khi trình duyệt vẽ; dựng ~30 mây / hạt + đo bố cục ở đây
+    // làm dải kết quả hiện chậm (đo CPU ×4: ~34 ms). Dải đã hiện rồi mới nổ bọt (độ trễ ≤ 1 khung, hiệu ứng vốn trễ 70–200 ms).
+    let huy = () => {}, huyHen = 0, dung = false
+    const khung = requestAnimationFrame(() => {
+      huyHen = window.setTimeout(() => { if (!dung) huy = bungDung(tam, loai === 'dung' ? goc.querySelector(chonO) : null, loai) }, 0)
+    })
+    return () => { dung = true; cancelAnimationFrame(khung); clearTimeout(huyHen); huy() }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
   return <span ref={ref} hidden />
 }
