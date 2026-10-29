@@ -102,7 +102,9 @@ it('BẤT BIẾN: MỌI câu kế hoạch lúc phát không đọc được (th�
   expect(r.questions.filter((q) => ke.has(q.qid))).toEqual([])
 })
 
-it('đủ mức rồi mà kế hoạch không phát được câu nào ⇒ KHÔNG mở thêm từ hàng chờ dự phòng (dự phòng chỉ dành cho em còn thiếu mức)', async () => {
+// 29/10 (thầy «Sửa ngay lỗi này cho mọi hs», nút «Học thêm câu mới» của Lộ trình): em đủ mức bấm học thêm ⇒ một chặng toàn câu MỚI (hocThem, tests/hoc-them-cau-moi-2910) — KHÔNG lấy sửa / ôn
+// từ hàng chờ dự phòng (dự phòng vẫn chỉ dành cho em còn thiếu mức).
+it('đủ mức rồi ⇒ KHÔNG mở thêm từ hàng chờ dự phòng (sửa / ôn); chỉ «học thêm» câu MỚI chưa làm hôm nay', async () => {
   const k = await kho()
   const lap0 = (await lapGoi7(k.env, 'S1', NOW))!
   let t = NOW - 3 * 3600_000
@@ -110,6 +112,8 @@ it('đủ mức rồi mà kế hoạch không phát được câu nào ⇒ KHÔN
   const lap = (await lapGoi7(k.env, 'S1', NOW))!
   expect(lap.daLamNgay).toBe(lap.toiThieu)
   expect(lap.plan.viec).toEqual([])
-  const r = (await startGoi7(k.env, 'S1', NOW)) as KetQua
-  expect(r.questions).toEqual([])
+  const r = (await startGoi7(k.env, 'S1', NOW)) as KetQua & { questions: { qid: string; vaiGoi7?: string }[] }
+  const daLam = new Set(lap0.plan.viec.map((v) => v.qid))
+  expect(r.questions.length).toBeGreaterThan(0)
+  for (const q of r.questions) { expect(daLam.has(q.qid)).toBe(false); expect(['moi', 'tiep_can']).toContain(q.vaiGoi7) }
 })
