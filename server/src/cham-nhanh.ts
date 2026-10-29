@@ -41,7 +41,8 @@ export const HAN_CAU_MS = 30 * 60_000
 /** Phiên `answer` chấp nhận tới 2 giờ sau khi mở (game-v2.ts) — chấm nhanh dừng sớm 1 phút để không bao giờ chấm phiên máy chủ sẽ từ chối. */
 const HAN_PHIEN_MS = 2 * 3_600_000 - 60_000
 // Trần bộ nhớ: câu riêng ~2–5 KB ⇒ 1.500 câu ≈ ≤ 7,5 MB (150 chặng đang mở / isolate); phiên, em, biên nhận nhỏ.
-const TOI_DA_PHIEN = 600, TOI_DA_CAU = 1500, TOI_DA_EM = 2000, TOI_DA_BIEN_NHAN = 20_000
+// 29/10 22:00 ăn kiêng bộ nhớ (`exceededMemory` giờ cao điểm): phiên 600 → 400, câu riêng 1 500 → 800 (~4 MB), em 2 000 → 1 000.
+const TOI_DA_PHIEN = 400, TOI_DA_CAU = 800, TOI_DA_EM = 1000, TOI_DA_BIEN_NHAN = 20_000
 
 const phienNho = new Map<string, { sbd: string; phien: PhienNho; luc: number }>()
 const cauNho = new Map<string, { q: PrivateQuestion; luc: number }>()

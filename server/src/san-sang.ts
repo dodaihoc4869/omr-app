@@ -257,7 +257,7 @@ export const xoaChuanBiKhiThoat = (): void => daChuanBiKhiThoat.clear()
 export const DEM_BAT_DAU_PHUT = 15, DEM_KET_GIO = 4
 /** Số em lập sẵn mỗi phút theo khung giờ VN: đêm 00:15–03:59 → 10 (D1 vắng); 04:00–12:59 → 6; chiều 13:00–18:59 → 20 (trước giờ học — thầy 29/10 «nạp hết sẵn cho 100% học sinh»; ~30 lệnh D1/em,
  *  trần ~1000 lệnh D1 mỗi lượt cron ⇒ không quá ~20); tối 19:00–23:59 → 12 (vá bản bị đổi dấu khi thầy giao bài giữa giờ — em có gói mới lập lại trước; 29/10 thầy giao thêm câu lúc 18:4x, cần nạp ngay cả khi đã vào giờ học); 00:00–00:14 → 0 (việc đổi ngày 00:01). */
-export const TOI_DA_DEM = 10, TOI_DA_SANG = 6, TOI_DA_CHIEU = 20, TOI_DA_TOI = 12, SONG_SONG_CRON = 4
+export const TOI_DA_DEM = 10, TOI_DA_SANG = 6, TOI_DA_CHIEU = 20, TOI_DA_TOI = 8, SONG_SONG_CRON = 2
 /** Em vừa trả lời trong vòng này ⇒ đang học: cron KHÔNG lập lại bản của em (lượt cuối chặng / lúc rời app đã lo, tránh lập đi lập lại khi em làm từng câu). */
 export const EM_DANG_HOC_MS = 10 * 60_000
 /** Giờ này (VN) có thuộc khung chuẩn bị đêm không? */
