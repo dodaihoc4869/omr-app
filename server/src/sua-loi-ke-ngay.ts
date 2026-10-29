@@ -1,7 +1,8 @@
 // KẾ HOẠCH SỬA LỖI CỦA NGÀY — phần đọc D1 (thầy 29/10; tính toán thuần ở sua-loi-phan-bo.ts). Gọi trong `danhSach` (chua-cau-sai.ts) khi việc hôm nay CHƯA lập / còn thiếu:
 //   · chưa có dòng việc hôm nay (đầu ngày) ⇒ lập N câu;
-//   · đã có nhưng em chưa làm câu nào, chưa thêm chặng, và mục tiêu đã lưu < N (danh sách cũ 12 câu từ trước bản này, hoặc có câu sai mới) ⇒ bù cho đủ N, GIỮ NGUYÊN các câu đang có.
-// Em đã làm câu nào / đã thêm chặng ⇒ KHÔNG đổi danh sách giữa chừng (số «Còn x câu» không nhảy lên). Câu sai mới trong ngày và câu chưa sửa xong dồn sang ngày sau, ngày sau tính lại.
+//   · đã có nhưng chưa thêm chặng và mục tiêu đã lưu < N (danh sách 12 câu lập từ trước bản này — áp dụng NGAY HÔM NAY theo lời thầy 29/10, kể cả em đã làm dở —, hoặc có câu sai mới) ⇒
+//     bù cho đủ N, GIỮ NGUYÊN các câu đang có (thứ tự, câu đã xong), câu mới nối ở cuối.
+// Đã lập (mục tiêu `mt` đã lưu) ⇒ KHÔNG đổi giữa ngày. Đã thêm chặng ⇒ không bù. Câu sai mới trong ngày và câu chưa sửa xong dồn sang ngày sau, ngày sau tính lại.
 // KHÔNG thêm đợt chờ D1: máy em chỉ xin (`ke: 1` trong lệnh danh sách) khi máy chưa có việc hôm nay / chưa nhớ mục tiêu ⇒ câu đọc ứng viên đi CÙNG lô với danh sách; các lần mở
 // sau máy em đã nhớ mục tiêu (`mt`) ⇒ không xin ⇒ danh sách vẫn đúng một lô như trước.
 import type { MucNgay, ViecNgay } from './tu-sua-viec-ngay'
@@ -36,7 +37,7 @@ export const SQL_UNG_VIEN_SUA = `SELECT d.id AS d, d.qid_chuan AS q, d.trang_tha
 /** Có cần lập / bù kế hoạch cho ngày này không (xem đầu tệp). `viec` = dòng việc hôm nay đọc cùng lô (null = chưa có). */
 export function canLapKe(viec: ViecNgay | null, n: number): boolean {
   if (!viec || viec.m.length === 0) return true
-  if (viec.x.length > 0 || viec.them > 0) return false
+  if (viec.them > 0) return false
   return (viec.mt ?? SUA_NGAY_TOI_THIEU) < n
 }
 

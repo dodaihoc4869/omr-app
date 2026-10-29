@@ -267,7 +267,7 @@ export type KetQuaDanhSachChua =
   | { trangThai: 'bat'; ds: MucChua[]; dem?: DemDanhSachChua; sau?: MocDanhSachChua; kiemLaiHoiThay?: LichKiemLaiHoiThay[]; viecNgay?: ViecNgayMayChu; ke?: KeSuaNgay }
   | { trangThai: 'tat' }
   | { trangThai: 'loi'; loi: string }
-/** Máy em có cần máy chủ lập kế hoạch ngày (Sửa lỗi 12–36 câu) không: chưa có việc hôm nay, hoặc có mà chưa nhớ mục tiêu `mt` và chưa làm câu nào / thêm chặng.
+/** Máy em có cần máy chủ lập kế hoạch ngày (Sửa lỗi 12–36 câu) không: chưa có việc hôm nay, hoặc có mà chưa nhớ mục tiêu `mt` (và chưa thêm chặng) — kể cả em đã làm dở (29/10: áp dụng ngay hôm nay).
  *  Đọc thẳng nhật ký trên máy (khoá viết thẳng như tu-sua-viec-hom-nay.ts — mảnh ấy nạp lười). Lỗi đọc ⇒ xin (không hại: máy chủ chỉ trả `ke` khi cần). */
 function canXinKe(): boolean {
   try {
@@ -276,7 +276,7 @@ function canXinKe(): boolean {
     const nk = JSON.parse(localStorage.getItem(`omr_tu_sua_hom_nay_${sbd.trim()}`) || 'null') as { n?: unknown; m?: unknown; x?: unknown; them?: unknown; mt?: unknown } | null
     const homNay = new Date(Date.now() + 7 * 3600_000).toISOString().slice(0, 10)
     if (!nk || nk.n !== homNay || !Array.isArray(nk.m) || nk.m.length === 0) return true
-    return !(Number(nk.mt) >= 12) && Array.isArray(nk.x) && nk.x.length === 0 && !(Number(nk.them) > 0)
+    return !(Number(nk.mt) >= 12) && !(Number(nk.them) > 0)
   } catch { return true }
 }
 export async function apiDanhSachTuChua(token: string, sau?: MocDanhSachChua): Promise<KetQuaDanhSachChua> {

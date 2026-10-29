@@ -20,13 +20,15 @@ const goc = (them: Partial<PropsMotTrang> = {}): PropsMotTrang => ({
 const ngay = new Date(Date.now() + 7 * 3600_000).toISOString().slice(0, 10)
 const nhan = () => within(screen.getByRole('list', { name: 'Lộ trình hôm nay' })).getAllByRole('listitem').map((li) => li.firstElementChild!.getAttribute('aria-label'))
 const KHOA = 'Chặng 5: khoá đến khi sửa xong lỗi hôm nay'
+/** Còn chặng phía trên chưa xong ⇒ Tự sửa lỗi khoá (thầy 29/10 «làm tuần tự từ trên xuống dưới»). */
+const KHOA_SUA_TREN = 'Tự sửa lỗi: làm xong các chặng phía trên để mở khoá'
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); SO.con = 8; SO.phan = 8; SO.bao.mockReset(); try { localStorage.clear() } catch { /* bỏ qua */ } })
 
 describe('Lộ trình: khoá chặng sau nút Tự sửa lỗi', () => {
   it('phần ngày còn 8 câu ⇒ chặng NẰM SAU nút Sửa lỗi khoá xám (thẻ «Sửa xong 8 lỗi hôm nay…»); chặng trước nút vẫn học được; chưa tới nút ⇒ chưa báo máy chủ', async () => {
     render(<MotTrangHs {...goc()} />)
     await waitFor(() => expect(nhan()).toContain(KHOA))
-    expect(nhan()).toEqual(['Chặng 1: đã xong', 'Chặng 2: đã xong', 'Học tiếp · 18 câu', 'Rương hôm nay', 'Chặng 4: chưa mở', 'Tự sửa lỗi: hôm nay còn 8 câu', KHOA])
+    expect(nhan()).toEqual(['Chặng 1: đã xong', 'Chặng 2: đã xong', 'Học tiếp · 18 câu', 'Rương hôm nay', 'Chặng 4: chưa mở', KHOA_SUA_TREN, KHOA])
     fireEvent.click(screen.getByRole('button', { name: KHOA }))
     const the = screen.getByRole('dialog')
     expect(the.getAttribute('data-sac')).toBe('khoa')
@@ -88,7 +90,7 @@ describe('Sảnh chưa về (ảnh thầy 28/10 giờ cao điểm: Lộ trình c
     expect(screen.getByRole('status').textContent).toBe('Đang tải bài học hôm nay…')
     expect(screen.queryByRole('list', { name: 'Lộ trình hôm nay' })).toBeNull()
     rerender(<MotTrangHs {...goc()} />)
-    await waitFor(() => expect(nhan()).toContain('Tự sửa lỗi: hôm nay còn 8 câu'))
+    await waitFor(() => expect(nhan()).toContain(KHOA_SUA_TREN))
     expect(screen.queryByText('Đang tải bài học hôm nay…')).toBeNull()
   })
 })

@@ -696,6 +696,11 @@ export function MotTrangHs(p: PropsMotTrang) {
       : { k: `c${i}`, loai: 'hoc', tt: 'khoa', ten: `Chặng ${i + 1}: chưa mở`, pop: { tieu: tenBaiThe, phu: `${thu} · Hoàn thành các chặng trước để mở khoá` } })
   })
   if (nutSua && mocSua >= chang.length) nut.push(nutSua) // hết chặng mới (hoặc ngày không có chặng) ⇒ sau chặng cuối
+  // TUẦN TỰ TỪ TRÊN XUỐNG (thầy 29/10 «Làm tuần tự từ trên xuống dưới, chặng trước làm xong thì mở khoá chặng sau»): nút Tự sửa lỗi đứng SAU các chặng trước mốc ⇒ còn chặng
+  // phía trên chưa xong thì nút khoá xám (trước đây vẫn bấm được ngay dù chặng 1 chưa làm). Chặng sau nút Sửa lỗi đã khoá cho tới khi sửa xong (khoaSua). Đủ mức rồi (du) thì
+  // việc chính đã nhảy sang Sửa lỗi ⇒ không khoá. Bài tập về nhà có hạn riêng ⇒ không khoá theo chặng.
+  if (nutSua && nutSua.tt !== 'xong' && nutSua.tt !== 'khoa' && !du && nut.slice(0, nut.indexOf(nutSua)).some((x) => x.loai === 'hoc' && x.tt !== 'xong'))
+    Object.assign(nutSua, { tt: 'khoa', dem: undefined, bong: undefined, ten: 'Tự sửa lỗi: làm xong các chặng phía trên để mở khoá', pop: { tieu: 'Tự sửa lỗi', phu: 'Em làm xong các chặng phía trên thì Tự sửa lỗi mở khoá nhé.' } })
   if (coBt && !p.ngayKiem) nut.push({ k: 'bt', loai: 'bt', tt: chinh === 'bt' ? 'dang' : 'mo', dem: p.soBaiTap || undefined, bong: chinh === 'bt' ? 'Làm bài' : undefined, ten: 'Bài tập về nhà',
     pop: { tieu: 'Bài tập về nhà', phu: p.soBaiTap ? `${p.soBaiTap} bài thầy đang giao` : 'Xem lại bài đã nộp', nut: { chu: p.soBaiTap ? 'Làm bài' : 'Xem bài', onClick: p.onBaiTap } } })
   const tiepTheo = [kiemLam && 'Kiểm tra ôn tập', coSua && !xongSuaNay && 'Tự sửa lỗi', !!p.soBaiTap && 'Bài tập về nhà'].filter(Boolean) as string[]

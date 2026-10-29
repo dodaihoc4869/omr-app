@@ -206,8 +206,8 @@ export function dungViecHomNay(
   const ghi = new Set(nk.x)
   const co = new Set(nk.m.map((x) => x.d ?? x.q))
   // Mục tiêu phần ngày: số máy chủ lập (12…36, chỉ tăng trong ngày); chưa lập ⇒ 12. `mt` được nhớ cả khi = 12 (dấu «đã lập» để lần mở sau khỏi xin lại).
-  // Kế hoạch chỉ dùng khi ngày chưa có việc, hoặc em chưa làm câu nào / thêm chặng (bản trả về cũ còn nhớ giữa ngày không được làm số «Còn x câu» nhảy lên).
-  const ke = kq.ke && (nk.m.length === 0 || (nk.x.length === 0 && !(nk.them ?? 0))) ? kq.ke : null
+  // Kế hoạch dùng khi ngày chưa có việc, hoặc chưa thêm chặng (29/10: áp dụng NGAY HÔM NAY cả cho em đã làm dở — câu mới nối ở cuối, câu đã xong giữ nguyên).
+  const ke = kq.ke && (nk.m.length === 0 || !(nk.them ?? 0)) ? kq.ke : null
   const mt = Math.min(MUC_TIEU_TOI_DA, Math.max(nk.mt ?? 0, ke?.n ?? 0))
   const mucTieu = Math.max(SO_CAU_MOI_NGAY, mt)
   const soMuc = mucTieu + SO_CAU_MOI_CHANG * Math.max(them, nk.them ?? 0)
