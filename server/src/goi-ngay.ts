@@ -15,6 +15,7 @@
 import type { Env } from './kieu'
 import { HAN_NIEM_CHUAN_BI_MS, lamMoiNiem, moMa, niemMa } from './niem-phong'
 import { ngayVn7 } from './goi-bai-7-loi'
+import { tachSongSinh } from './loi-hoc-luat'
 
 export type CheDoGoiNgay = 'tat' | 'thu' | 'bat'
 // 29/10 23h: BẬT cho mọi em (thầy «tới lúc nào app hs mọi chỗ, mọi lớp, load câu, nộp câu mọi thứ tức thì mới được dừng lại»). Lỗi / từ chối ở đâu ⇒ đường cũ.
@@ -32,7 +33,15 @@ export const SO_CAU_GOI_NGAY = SO_CHANG_GOI * CAU_MOI_CHANG
 export const goiNgayBat = (sbd: string): boolean => cheDo === 'bat' || (cheDo === 'thu' && SBD_THU.has(sbd))
 const aadVe = (sbd: string, ngay: string) => `goi-ngay|${sbd}|${ngay}`
 
-type Ref = { qid: string; group: string } & Record<string, unknown>
+type Ref = { qid: string; group: string; maDe?: unknown; version?: unknown } & Record<string, unknown>
+
+/** Phiên bản HIỆN TẠI trong kho của từng câu gốc (một lệnh D1): `maDe|qid` ⇒ version. Câu vắng trong kho (tờ đang đồng bộ…) ⇒ không có khoá — nơi gọi giữ nguyên. */
+async function phienBanHienTai(env: Env, refs: readonly Ref[]): Promise<Map<string, string>> {
+  const ds = [...new Map(refs.filter((r) => typeof r.maDe === 'string').map((r) => { const goc = tachSongSinh(r.qid).goc; return [`${r.maDe}|${goc}`, [r.maDe as string, goc]] as const })).values()]
+  if (!ds.length) return new Map()
+  const rs = await env.DB.prepare(`SELECT ma_de, qid, version FROM game_v2_question WHERE ${ds.map(() => '(ma_de=? AND qid=?)').join(' OR ')}`).bind(...ds.flat()).all<{ ma_de: string; qid: string; version: string }>()
+  return new Map(rs.results.map((x) => [`${x.ma_de}|${x.qid}`, String(x.version)]))
+}
 interface NoiDungVe { v: number; e: number; r: Ref[]; g: string[] }
 
 /** Lập gói cả ngày cho em. Không có kế hoạch / thầy tạm dừng ⇒ gói rỗng. */
@@ -79,10 +88,13 @@ export async function moGoi7(env: Env, sbd: string, b: Record<string, unknown>, 
   const nd = { r: cacNd.flatMap((x) => x!.r).filter((r) => r && typeof r.qid === 'string' && (!chon || chon.has(r.qid)) && !daCo.has(r.qid) && !!daCo.add(r.qid)), g: [...new Set(cacNd.flatMap((x) => x!.g))] }
   const [{ docCauBtvnChuaNop }, { protectedQuestions }, { readGameScope }, { sqlCacGoiConNhan7 }] = await Promise.all([
     import('./game-v2-luot'), import('./game-v2-bank'), import('./game-v2-reports'), import('./goi-bai-7-quyen')])
-  const [dl, baoVe, btvn, control] = await Promise.all([g7.docDaLamVaVuaLam7(env, sbd, ngay, now), protectedQuestions(env), docCauBtvnChuaNop(env, sbd), readGameScope(env, sbd)])
+  // Gói sống tới cả ngày ⇒ thầy có thể đã sửa đề / đáp án sau lúc lập: câu đổi phiên bản bị bỏ (tem cũ chấm theo đáp án cũ; lượt nộp sẽ báo «câu đã đổi»). Cùng đợt đọc.
+  const [dl, baoVe, btvn, control, ban] = await Promise.all([g7.docDaLamVaVuaLam7(env, sbd, ngay, now), protectedQuestions(env), docCauBtvnChuaNop(env, sbd), readGameScope(env, sbd),
+    phienBanHienTai(env, nd.r).catch(() => new Map<string, string>())])
   if (!control.enabled) throw new Error('Thầy đang tạm dừng bài học cho em.')
   const chan = new Set(control.blocked)
-  const refs = nd.r.filter((r) => !dl.daLam.has(r.qid) && !dl.vuaLam.has(r.qid) && !baoVe.has(r.qid) && !baoVe.has(r.group) && !btvn.has(r.qid) && !chan.has(r.qid)).slice(0, CAU_MOI_CHANG)
+  const doiBan = (r: Ref) => { const v = ban.get(`${r.maDe}|${tachSongSinh(r.qid).goc}`); return v !== undefined && v !== String(r.version) }
+  const refs = nd.r.filter((r) => !doiBan(r) && !dl.daLam.has(r.qid) && !dl.vuaLam.has(r.qid) && !baoVe.has(r.qid) && !baoVe.has(r.group) && !btvn.has(r.qid) && !chan.has(r.qid)).slice(0, CAU_MOI_CHANG)
   if (!refs.length) return { ok: false, ma: 'GOI_HET' }
   const tem = (b.sk && typeof b.sk === 'object' ? b.sk : {}) as Record<string, unknown>
   const sk: Record<string, string> = {}
