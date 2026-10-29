@@ -36,3 +36,6 @@ jobs:
             "SELECT SUM(json_extract(s.json,'\$.goiNgay')=1) tu_goi, SUM(COALESCE(json_extract(s.json,'\$.goiNgay'),0)<>1) duong_cu FROM game_v2_attempt a JOIN game_v2_session s ON s.id=a.session WHERE s.created_at >= strftime('%Y-%m-%dT%H:%M:%fZ','now','-3 hours') AND json_extract(s.json,'\$.hocTap')=1"
           q "phiên từ gói 3 giờ qua: số câu trong phiên (câu: số phiên)" \
             "SELECT json_array_length(json,'\$.questions') so_cau, COUNT(*) n FROM game_v2_session WHERE created_at >= strftime('%Y-%m-%dT%H:%M:%fZ','now','-3 hours') AND json_extract(json,'\$.goiNgay')=1 GROUP BY 1 ORDER BY 1"
+          q "hành trình đang chạy (bước kiểm phát hành «ba hành trình»): mã · trạng thái · tạo lúc" \
+            "SELECT id, trang_thai, substr(COALESCE(tao_luc,''),1,16) tao FROM chien_dich WHERE trang_thai='dang_chay' ORDER BY id"
+          q "kho theo khối + biên nhận gộp" "SELECT khoa, length(gia_tri) dai FROM cau_hinh WHERE khoa IN ('hanh_trinh_v3_kho_10','hanh_trinh_v3_kho_11','hanh_trinh_v3_kho_12','hanh_trinh_3_0910_v1')"
