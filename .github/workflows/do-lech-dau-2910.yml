@@ -1,0 +1,35 @@
+# ĐO «BẢN LẬP SẴN LỆCH DẤU VÌ PHẦN NÀO» (chỉ đọc, chỉ đếm) — xem scripts/do-lech-dau-2910.ts
+name: Đo bản lập sẵn lệch dấu (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/do-lech-dau-2910]
+    paths: ['.github/workflows/do-lech-dau-2910.yml', 'scripts/do-lech-dau-2910.ts']
+permissions:
+  contents: read
+concurrency:
+  group: do-lech-dau-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci --ignore-scripts
+      - name: Đo (chỉ SELECT)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          export OMR_D1_ID=$(grep -m1 '^database_id' server/wrangler.toml | sed -E 's/.*"([^"]+)".*/\1/')
+          npx esbuild scripts/do-lech-dau-2910.ts --bundle --platform=node --format=esm --target=node22 --external:node:sqlite --outfile=/tmp/do-lech.mjs --log-level=warning
+          timeout 600 node --no-warnings /tmp/do-lech.mjs | grep -v '^\[chan-khac-khoi\]'
