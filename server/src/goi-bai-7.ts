@@ -470,7 +470,36 @@ async function gioiHanLap7<T>(f: () => Promise<T>): Promise<T> {
 export const trangThaiLap7 = () => ({ chay: dangLap7, cho: hangLap7.length })
 dangKyKichThuoc('lap7', () => dangLap7 * 1000 + hangLap7.length)
 export function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promise<{ results: Row[] }>, hoan?: D1PreparedStatement[]) {
-  return gioiHanLap7(() => lapGoi7Tho(env, sbd, now, gsSom, hoan))
+  const p = gioiHanLap7(() => lapGoi7Tho(env, sbd, now, gsSom, hoan))
+  // Ghi danh lượt ĐANG LẬP của em (cùng isolate) để lượt đến sau trong vài giây dùng lại (`lapDungLai7`) thay vì lập lần nữa.
+  const m = bangDangLap7(env.DB), muc = { luc: now, p }
+  m.set(sbd, muc)
+  const bo = () => { if (m.get(sbd) === muc) m.delete(sbd) }
+  p.then(bo, bo)
+  return p
+}
+/**
+ * LẬP MỘT LẦN (29/10 22:05 — thầy «bắt buộc phải làm được 100%»): xong một chặng, app gọi CÙNG LÚC Sảnh (làm mới Lộ trình) + mở trước chặng sau, và máy chủ còn lập sẵn nền
+ * (`sauCauCuoi`) ⇒ BA lượt `lapGoi7` cho cùng một em chồng nhau (vài MB + ~0,4 s CPU + ~5 đợt D1 mỗi lượt) — gốc của phần lớn tải nặng giờ cao điểm (`exceededMemory`, «Đang chuẩn bị…»).
+ * Lượt đến sau, cùng isolate, khi một lượt lập của em ĐANG chạy (bắt đầu ≤ 5 s trước, cùng ngày) ⇒ chờ lượt ấy rồi ĐỐI CHIẾU «đã làm hôm nay / vừa làm» đọc MỚI (một lệnh D1, như bản nhớ
+ * Sảnh → Mở chặng `goi-bai-7-nho.ts`): khớp từng câu ⇒ dùng lại; lệch (em vừa trả lời thêm) / lỗi ⇒ null ⇒ nơi gọi tự lập như cũ.
+ */
+type LapGoi7Kq = Awaited<ReturnType<typeof lapGoi7Tho>>
+const DANG_LAP7 = new WeakMap<object, Map<string, { luc: number; p: Promise<LapGoi7Kq> }>>()
+function bangDangLap7(db: unknown): Map<string, { luc: number; p: Promise<LapGoi7Kq> }> {
+  const g = dbGoc(db as object)
+  let m = DANG_LAP7.get(g)
+  if (!m) { m = new Map(); DANG_LAP7.set(g, m) }
+  return m
+}
+export async function lapDungLai7(env: Env, sbd: string, now: number): Promise<LapGoi7Kq | null> {
+  const x = bangDangLap7(env.DB).get(sbd)
+  if (!x || now - x.luc < 0 || now - x.luc > 5_000 || ngayVn7(x.luc) !== ngayVn7(now)) return null
+  try {
+    const [lap, moi] = await Promise.all([x.p, docDaLamVaVuaLam7(env, sbd, ngayVn7(now), now)])
+    if (!lap || !moi) return null
+    return moi.soVua === lap.soVua && cungTap(moi.daLam, lap.daLamTap) && cungTap(moi.vuaLam, lap.vuaLam) ? lap : null
+  } catch { return null }
 }
 async function lapGoi7Tho(env: Env, sbd: string, now: number, gsSom?: Promise<{ results: Row[] }>, hoan?: D1PreparedStatement[]) {
   const ngay = ngayVn7(now)
@@ -668,7 +697,7 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
     const moi = await kiemNhoSom.catch(() => null)
     if (moi && moi.soVua === nho.soVua && cungTap(moi.daLam, nho.daLam) && cungTap(moi.vuaLam, nho.vuaLam)) lapNho = nho.lap
   }
-  const lap = lapNho ?? await lapGoi7(env,sbd,now,gsSom,hoan)
+  const lap = lapNho ?? (!nho ? await lapDungLai7(env, sbd, now) : null) ?? await lapGoi7(env,sbd,now,gsSom,hoan)
   const ghiDongCo = som((async () => { const db = envGhiRieng(env).DB; for (let i = 0; i < hoan.length; i += 30) await db.batch(hoan.slice(i, i + 30).map(st => lenhTrong(env.DB, st))) })())
   try {
   if (!lap) {
