@@ -54,3 +54,4 @@ jobs:
           q "cấu hình nạp đêm / bật Gói 7" "SELECT khoa, substr(gia_tri,1,80) v FROM cau_hinh WHERE khoa IN ('goi_bai_7_v1','san_sang_dem','tat_san_sang')"
 # đo lại 16:34
 # đo lại 16:40
+# đo lại 18:25
