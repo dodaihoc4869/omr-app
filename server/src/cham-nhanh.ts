@@ -27,6 +27,7 @@ import type { Env } from './kieu'
 import { THAM_SO_OMNI } from './omni-kieu'
 import { nhanTocDo } from './omni-toc-do'
 import { dangKySauXoaCaBaoVe, protectedQuestions } from './game-v2-bank'
+import { dangKyKichThuoc } from './dem-chung'
 import type { NoiDungNiem } from './niem-phong'
 
 type RefPhien = { qid: string; maDe: string; version: string; xt?: unknown } & Record<string, unknown>
@@ -50,6 +51,7 @@ const emNho = new Map<string, { enabled: boolean; blocked: Set<string>; types: s
 let baoVe: { tap: Set<string>; luc: number } | null = null
 const bienNhan = new Set<string>()
 
+dangKyKichThuoc('cham.phien', () => phienNho.size); dangKyKichThuoc('cham.cau', () => cauNho.size); dangKyKichThuoc('cham.em', () => emNho.size); dangKyKichThuoc('cham.bienNhan', () => bienNhan.size)
 const catBot = <K, V>(m: Map<K, V>, toiDa: number) => { while (m.size > toiDa) { const k = m.keys().next().value as K; m.delete(k) } }
 const khoaCau = (ref: { qid: string; maDe: string; version: string }) => `${ref.maDe}|${ref.qid}|${ref.version}`
 

@@ -32,6 +32,7 @@ import { envGhiRieng, lenhTrong } from './doc-d1-theo-luot'
 import { dauKhoCau, dauTruocLucDoc } from './dau-kho-cau'
 import { soSanhOnHoiThay } from './hoi-thay-lich-on'
 import { cungTap, layKeHoach7, nhoKeHoach7 } from './goi-bai-7-nho'
+import { dangKyKichThuoc } from './dem-chung'
 import { lenhThuongTraLoi, tinhThuongHocCachGiai, type PhienNt } from './thuong-tra-loi'
 import { ngayVnTt } from './thuong-luat'
 import { CAU_MOT_BAI, SQL_KHONG_TU_SUA, SQL_LA_LUOT_CHANG } from './chuoi-ngay-bai'
@@ -445,11 +446,20 @@ export async function docMaTranCu7(env: Env, sbd: string, maCu: readonly string[
  * hơn — xếp hàng: tối đa `TOI_DA_LAP_DONG_THOI` lượt cùng lúc mỗi isolate, lượt sau chờ lượt trước xong (bàn giao chỗ, không chen).
  */
 export const TOI_DA_LAP_DONG_THOI = 3
+/** Chờ chỗ tối đa (ms) — quá thì chạy luôn. */
+export const CHO_TOI_DA_MS = 6_000
 let dangLap7 = 0
 const hangLap7: (() => void)[] = []
 async function gioiHanLap7<T>(f: () => Promise<T>): Promise<T> {
-  if (dangLap7 >= TOI_DA_LAP_DONG_THOI) await new Promise<void>((ok) => { hangLap7.push(ok) }) // nhận chỗ do lượt trước bàn giao (không tăng dangLap7)
-  else dangLap7++
+  if (dangLap7 >= TOI_DA_LAP_DONG_THOI) {
+    // Chờ chỗ do lượt trước bàn giao (không tăng dangLap7). Chờ quá CHO_TOI_DA_MS ⇒ rời hàng, chạy luôn (vượt trần một lượt) — hàng đợi không bao giờ thành chờ lâu.
+    let nhan!: () => void
+    const coCho = new Promise<boolean>((ok) => { nhan = () => ok(true); hangLap7.push(nhan) })
+    let hen = 0
+    const duoc = await Promise.race([coCho, new Promise<boolean>((ok) => { hen = setTimeout(() => ok(false), CHO_TOI_DA_MS) as unknown as number })])
+    clearTimeout(hen)
+    if (!duoc) { const i = hangLap7.indexOf(nhan); if (i >= 0) hangLap7.splice(i, 1); else { /* vừa được bàn giao đúng lúc hết giờ ⇒ đã có chỗ */ } if (i >= 0) dangLap7++ }
+  } else dangLap7++
   // Nhả chỗ đúng MỘT lần: xong việc, hoặc quá 45 s (D1 treo) — không để một lượt kẹt chặn cả hàng.
   let nha = false
   const tha = () => { if (nha) return; nha = true; const ke = hangLap7.shift(); if (ke) ke(); else dangLap7-- }
@@ -458,6 +468,7 @@ async function gioiHanLap7<T>(f: () => Promise<T>): Promise<T> {
 }
 /** Số lượt lập đang chạy / đang chờ (test). */
 export const trangThaiLap7 = () => ({ chay: dangLap7, cho: hangLap7.length })
+dangKyKichThuoc('lap7', () => dangLap7 * 1000 + hangLap7.length)
 export function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promise<{ results: Row[] }>, hoan?: D1PreparedStatement[]) {
   return gioiHanLap7(() => lapGoi7Tho(env, sbd, now, gsSom, hoan))
 }

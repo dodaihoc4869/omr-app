@@ -7,11 +7,26 @@ export function xoaMoiDem(): void { for (const f of moiDem) f() }
 /** Đệm mức mô-đun KHÔNG phải `DemTTL` (vd. đệm "bảng chưa có" của doc-d1-theo-luot.ts) đăng ký cách xoá để `xoaMoiDem()` xoá cả nó (chỉ-thêm, 05/10). */
 export function dangKyXoaDem(f: () => void): void { moiDem.push(f) }
 
+/** ĐO BỘ NHỚ (29/10 22:00, `exceededMemory` giờ cao điểm): mọi `DemTTL` tự ghi danh để `thongKeDem()` báo số khoá / trọng lượng từng đệm (nhãn = hạn s / trần khoá / trần trọng lượng —
+ *  bản đóng gói một tệp nên không có tên tệp); đệm / bảng khác ghi danh bằng `dangKyKichThuoc`. Chỉ đọc số, không đổi hành vi. */
+const dsDem: DemTTL<unknown>[] = []
+const dsKichThuoc: [string, () => number][] = []
+export function dangKyKichThuoc(ten: string, f: () => number): void { dsKichThuoc.push([ten, f]) }
+export function thongKeDem(n = 8): { dem: string[]; khac: Record<string, number> } {
+  const dem = dsDem.filter((d) => d.soKhoa > 0).sort((a, b) => (b.tongCo === b.soKhoa ? b.soKhoa : b.tongCo) - (a.tongCo === a.soKhoa ? a.soKhoa : a.tongCo)).slice(0, n)
+    .map((d) => `${d.nhan}=${d.soKhoa}k/${Number.isFinite(d.tongCo) ? d.tongCo : 0}`)
+  const khac: Record<string, number> = {}
+  for (const [ten, f] of dsKichThuoc) { try { khac[ten] = f() } catch { /* bỏ */ } }
+  return { dem, khac }
+}
+
 export class DemTTL<T> {
   private kho = new Map<string, { at: number; v: T; co: number }>()
   private tong = 0
   /** `hanMs` = tuổi thọ tối đa; `toiDaKhoa` = số khoá tối đa; `toiDaCo` = tổng "trọng lượng" tối đa (vd số ký tự JSON). */
-  constructor(private readonly hanMs: number, private readonly toiDaKhoa: number, private readonly toiDaCo: number = Number.POSITIVE_INFINITY) { moiDem.push(() => this.xoa()) }
+  constructor(private readonly hanMs: number, private readonly toiDaKhoa: number, private readonly toiDaCo: number = Number.POSITIVE_INFINITY) { moiDem.push(() => this.xoa()); dsDem.push(this as DemTTL<unknown>) }
+  /** Nhãn cho số đo bộ nhớ: hạn (s) / trần khoá / trần trọng lượng. */
+  get nhan(): string { return `${Math.round(this.hanMs / 1000)}s/${this.toiDaKhoa}${Number.isFinite(this.toiDaCo) ? '/' + this.toiDaCo : ''}` }
   /** Còn hạn ⇒ trả giá trị (và đưa khoá lên "mới nhất"); hết hạn / đồng hồ lùi ⇒ bỏ khoá và trả undefined. */
   doc(khoa: string, nowMs: number): T | undefined {
     const x = this.kho.get(khoa)
