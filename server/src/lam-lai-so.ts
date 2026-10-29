@@ -250,6 +250,8 @@ export function rawLamLai(ref: LamLaiRef | null | undefined, phan: string, chon?
   if (laHoanVi(ref?.xt)) ra.xt = 1
   if (ref?.nv) ra.nv = 1
   if (ref?.cd) ra.cd = 1
+  // (29/10) câu LÀM LẠI CUỐI CHẶNG (goi-bai-7-lam-lai.ts): dấu `ll` ⇒ KHÔNG tính vào «đã làm hôm nay» / chặng (chuoi-ngay-bai.ts `SQL_KHONG_LAM_LAI`).
+  if ((ref as { lamLaiCuoi?: unknown } | null | undefined)?.lamLaiCuoi) ra.ll = 1
   return ra
 }
 /** Khối `raw` cho `ghiSuKien`: gộp phần làm lại với phần OMNI; rỗng ⇒ KHÔNG có khoá `raw` (dòng sổ y hệt hôm nay). */

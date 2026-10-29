@@ -70,7 +70,8 @@ it('ca thật 14/10: còn 1 câu, câu ấy (sửa/ôn) đang NGHI SAI ĐÁP ÁN
   expect(lap.plan.viec.length).toBe(1) // vẫn đủ phần còn lại của mức bằng câu khác
 })
 
-it('câu vừa trả lời ≤ 15 phút mà lượt LƯỚT (sổ không tính) không vào kế hoạch sửa/ôn — kế hoạch và lúc phát cùng luật, chặng không rỗng', async () => {
+// 29/10: lượt LƯỚT là câu em đã được phát + đã trả lời ⇒ tính vào mức hôm nay (Lộ trình / chặng khớp những gì em đã làm). Câu ấy KHÔNG quay lại kế hoạch; mức đủ ⇒ chặng rỗng đúng («đã hoàn thành»).
+it('câu vừa trả lời ≤ 15 phút mà lượt LƯỚT: không quay lại kế hoạch sửa/ôn, được tính vào mức — kế hoạch và lúc phát cùng luật', async () => {
   const k = await kho()
   const { x } = await con1CauSua(k)
   const luc = NOW - 60_000
@@ -79,8 +80,8 @@ it('câu vừa trả lời ≤ 15 phút mà lượt LƯỚT (sổ không tính) 
   const lap = (await lapGoi7(k.env, 'S1', NOW))!
   expect(lap.vuaLam.has(x)).toBe(true)
   expect(lap.plan.viec.map((v) => v.qid)).not.toContain(x)
+  expect(lap.daLamNgay, 'lướt tính vào mức: câu cuối vừa làm ⇒ đủ mức').toBe(lap.toiThieu)
   const r = (await startGoi7(k.env, 'S1', NOW)) as KetQua
-  expect(r.questions.length, r.message).toBeGreaterThan(0)
   expect(r.questions.map((q) => q.qid)).not.toContain(x)
 })
 

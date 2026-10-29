@@ -7,7 +7,7 @@
 // dựng `NhatKyChuoi` từng em và gọi đúng hàm thuần của B3 ⇒ số giống hệt màn học sinh (cửa sổ đọc ≤ SO_NGAY_DOC của B3).
 import type { D1PreparedStatement, Env } from './kieu'
 import { themNgay } from './ho-so-nam-kt'
-import { CAU_MOT_BAI, chuoiNgayCuaEm, ngayDatChuoi, ngayVn as ngayVnMs, NGAY_CHUOI_DU_MUC, phepConGiuChuoi, SO_NGAY_DOC, SQL_CAU_TINH_MUC, SQL_COT_BINH_MUA, type ChuoiNgay, type KieuNgay, type NhatKyChuoi } from './chuoi-ngay-bai'
+import { CAU_MOT_BAI, chuoiNgayCuaEm, ngayDatChuoi, ngayVn as ngayVnMs, NGAY_CHUOI_DU_MUC, phepConGiuChuoi, SO_NGAY_DOC, SQL_CAU_TINH_MUC, SQL_CO_KET_QUA_HOAC_LUOT, SQL_COT_BINH_MUA, type ChuoiNgay, type KieuNgay, type NhatKyChuoi } from './chuoi-ngay-bai'
 import { str, num, type Row } from './thuong-b-chung'
 import { laNgayBaoTri } from './ngay-bao-tri'
 
@@ -23,10 +23,10 @@ export const TAP_EM_JSON = '(SELECT value FROM json_each(?1))'
 /** Câu khác nhau có kết quả theo (em, ngày VN) — đúng câu đếm của B3. `?2..?3` = khoảng ngày. Chỉ mục idx_skh_em_ngay_qid(sbd, ngay_vn, qid, ket_qua). */
 export const sqlSoCau = (tapEm: string = TAP_EM_JSON): string =>
   // (28/10) + c7 = câu tính MỨC (đúng tập Gói 7) · m = mức câu đã chốt của ngày — luật chuỗi «đủ mức hôm nay» (chỉ ngày từ NGAY_CHUOI_DU_MUC).
-  `SELECT sbd, ngay_vn AS n, COUNT(DISTINCT qid) AS c,
+  `SELECT sbd, ngay_vn AS n, COUNT(DISTINCT CASE WHEN ket_qua IS NOT NULL THEN qid END) AS c,
       COUNT(DISTINCT CASE WHEN ngay_vn >= '${NGAY_CHUOI_DU_MUC}' AND ${SQL_CAU_TINH_MUC} THEN qid END) AS c7,
       CASE WHEN ngay_vn >= '${NGAY_CHUOI_DU_MUC}' THEN (SELECT g.muc FROM goi_bai_7_muc_ngay g WHERE g.sbd = su_kien_hoc.sbd AND g.ngay = su_kien_hoc.ngay_vn) END AS m
-    FROM su_kien_hoc WHERE sbd IN ${tapEm} AND ngay_vn BETWEEN ?2 AND ?3 AND ket_qua IS NOT NULL GROUP BY sbd, ngay_vn`
+    FROM su_kien_hoc WHERE sbd IN ${tapEm} AND ngay_vn BETWEEN ?2 AND ?3 AND ${SQL_CO_KET_QUA_HOAC_LUOT} GROUP BY sbd, ngay_vn`
 /** Ngày tự sửa xong (B3). `?2` = ngày đầu cửa sổ. Chỉ mục idx_cld_sbd_trang_thai(sbd, trang_thai_day, …). */
 export const sqlTuSua = (tapEm: string = TAP_EM_JSON): string =>
   `SELECT DISTINCT sbd, date(dong_luc, '+7 hours') AS n FROM chua_loi_dot WHERE sbd IN ${tapEm} AND trang_thai_day = 'da_tu_sua' AND dong_luc >= ?2`

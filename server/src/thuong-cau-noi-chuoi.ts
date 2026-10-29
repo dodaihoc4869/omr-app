@@ -6,7 +6,7 @@
 //   · «ngày có học» / «ngày được đỡ» (thăng hoa, cược) dùng ĐÚNG định nghĩa B3: ≥ CAU_MOT_BAI câu khác nhau có kết quả trong ngày VN hoặc tự sửa xong;
 //     được đỡ = vắng có phép (chỉ ngày trước 27/10), bình đã dùng, ngày đã cứu.
 import type { Env } from './kieu'
-import { CAU_MOT_BAI, chuoiNgayCuaEm, ngayVn, NGAY_CHUOI_DU_MUC, phepConGiuChuoi, SQL_CAU_TINH_MUC, type ChuoiNgay as ChuoiNgayB3 } from './chuoi-ngay-bai'
+import { CAU_MOT_BAI, chuoiNgayCuaEm, ngayVn, NGAY_CHUOI_DU_MUC, phepConGiuChuoi, SQL_CAU_TINH_MUC, SQL_CO_KET_QUA_HOAC_LUOT, type ChuoiNgay as ChuoiNgayB3 } from './chuoi-ngay-bai'
 import { chuoiBaiNeuBat, congBinh, docNhatKyChuoi } from './chuoi-ngay-bai-d1'
 import { ngayBaoTriTrong } from './ngay-bao-tri'
 
@@ -60,8 +60,8 @@ const B3: CauNoiChuoi = {
     if (!ds.length) return new Map()
     const [a, b] = await Promise.all([
       rongNeuLoi(env.DB.prepare(duMuc
-        ? `SELECT sbd, ngay_vn AS ngay FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay_vn >= ?2 AND ngay_vn <= ?3 AND ket_qua IS NOT NULL
-            GROUP BY sbd, ngay_vn HAVING (ngay_vn < '${NGAY_CHUOI_DU_MUC}' AND COUNT(DISTINCT qid) >= ?4)
+        ? `SELECT sbd, ngay_vn AS ngay FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay_vn >= ?2 AND ngay_vn <= ?3 AND ${SQL_CO_KET_QUA_HOAC_LUOT}
+            GROUP BY sbd, ngay_vn HAVING (ngay_vn < '${NGAY_CHUOI_DU_MUC}' AND COUNT(DISTINCT CASE WHEN ket_qua IS NOT NULL THEN qid END) >= ?4)
               OR (ngay_vn >= '${NGAY_CHUOI_DU_MUC}' AND COUNT(DISTINCT CASE WHEN ${SQL_CAU_TINH_MUC} THEN qid END)
                   >= COALESCE((SELECT g.muc FROM goi_bai_7_muc_ngay g WHERE g.sbd = su_kien_hoc.sbd AND g.ngay = su_kien_hoc.ngay_vn AND g.muc > 0), ?4))`
         : `SELECT sbd, ngay_vn AS ngay FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay_vn >= ?2 AND ngay_vn <= ?3 AND ket_qua IS NOT NULL
