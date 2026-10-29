@@ -4,7 +4,7 @@
 // Máy em KHÔNG có đáp án trước khi nộp (lệnh gon-mo chỉ trả đề công khai); đáp án + lời giải về cùng kết quả nộp. Không EXP (thầy 20/10).
 // "Xong phần hôm nay" (Việc hôm nay) ghi khi câu đã khép: đã tự sửa · đúng sau gợi ý / chưa qua luật tự làm · đã xem lời giải đầy đủ · không mở được câu.
 // Chỉ lớp kiểu `ccs-*` sẵn có (chua-cau-sai.css) — không màu mới.
-import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState, type ComponentProps, type ReactNode } from 'react'
 import TheCau, { type TheCauProps } from '../TheCau'
 import NutHoiThay from '../loi-giai/NutHoiThay'
 import { docChiTiet } from '../hoa2/api'
@@ -13,12 +13,17 @@ import { propsCauLam } from './ChuaTrucTiep'
 import { apiGonMo, apiGonNop, type KetQuaGon } from '../../lib/chua-cau-sai-api'
 import { apiGonNopLuong, ketTuTam } from '../../lib/chua-gon-luong'
 import { chuDapAn, daTraLoiDu, LUAT_BAN_MOI } from '../../lib/chua-truc-tiep'
-import { ghiXongHomNay } from '../../lib/tu-sua-viec-hom-nay'
+import { docSbdHs, ghiXongHomNay } from '../../lib/tu-sua-viec-hom-nay'
+import { luuXemLai } from '../../lib/xem-lai-sua'
 import { sinhMaNgauNhien } from '../../lib/thiet-bi'
 import { phanHoi } from '../../lib/phan-hoi'
 // «Trong» HS (thầy 27/10 «Phần sửa câu tôi chưa thấy giao diện của doligo»): cùng logic, cây trình bày kiểu Duolingo ở ChuaGonDuo.tsx.
 // Mảnh RIÊNG nạp lười (máy tắt «Trong» không tải; ManChuaCauSai nạp trước lúc mở đợt ⇒ không thêm vòng chờ).
-const ChuaGonDuo = lazy(() => import('./ChuaGonDuo'))
+// Khung Duo: nạp lười như cũ, NHƯNG nhớ mô-đun ngay khi đã về (`napKhungDuo`, gọi lúc rảnh từ danh sách Tự sửa lỗi) ⇒ lần dựng sau dùng THẲNG, không qua `lazy` — React.lazy luôn treo một lượt dựng
+// (một khung «Đang mở câu…») dù mảnh đã nằm trong bộ nhớ (thầy 29/10 «khựng chỗ mở câu», «xem lại chưa tức thì»).
+let khungDuoDaNap: ((p: ComponentProps<typeof import('./ChuaGonDuo').default>) => ReactNode) | null = null
+export const napKhungDuo = (): Promise<unknown> => import('./ChuaGonDuo').then((m) => { khungDuoDaNap = m.default as typeof khungDuoDaNap; return m }).catch(() => null)
+const ChuaGonDuoLuoi = lazy(() => napKhungDuo().then((m) => m as typeof import('./ChuaGonDuo')))
 import { KhungDuoSua, type TienDoSua } from './KhungDuoSua'
 
 export interface PropsChuaGon {
@@ -47,6 +52,8 @@ const KHEP = new Set(['tu_sua', 'xong_phan', 'loi_giai'])
 export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep, tienDo }: PropsChuaGon) {
   // Chỉ khi <html data-trong="hs"> lúc mở màn (đọc lúc vẽ — trang chụp gắn data-trong sau khi nạp mã); tắt «Trong» ⇒ màn y cũ.
   const [duo] = useState(() => typeof document !== 'undefined' && document.documentElement.dataset.trong === 'hs')
+  // Chốt kiểu khung ngay lần dựng ĐẦU (đã nạp ⇒ dùng thẳng; chưa ⇒ lazy): đổi kiểu giữa chừng sẽ dựng lại cả khung.
+  const [KhungDuo] = useState(() => khungDuoDaNap ?? ChuaGonDuoLuoi)
   const [mo, setMo] = useState<KetQuaGon>(dau)
   const [kq, setKq] = useState<KetQuaGon | null>(dau.daKhepHomNay ? dau : null)
   const [tra, setTra] = useState('')
@@ -70,6 +77,7 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep, 
   // 28/10 (thầy «Bỏ màn chưa sửa được câu này đi»): không mở được câu ở đây ⇒ đã tính xong phần hôm nay (trên) ⇒ sang câu kế ngay, không dừng ở khung báo.
   useEffect(() => { if (!mo.ok && onTiep) onTiep() }, [mo.ok]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (kq) tieuDe.current?.focus() }, [kq])
+  useEffect(() => { if (dau.daKhepHomNay && dau.ok) luuXemLai(docSbdHs(), qid, { ...dau, dotId }) }, []) // eslint-disable-line react-hooks/exhaustive-deps -- mở lại câu đã khép (lần đầu qua máy chủ) ⇒ nhớ cho lần sau
 
   const de = mo.de
   const phan = de?.phan ?? 'I'
@@ -106,7 +114,7 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep, 
         if (song.current && !daRung) break // còn trên màn mà chưa có kết quả tạm: để em thấy lỗi + bấm lại như cũ
         await new Promise((x) => setTimeout(x, 1500 * (lan + 1)))
       }
-      if (r.ok && r.ket && KHEP.has(r.ket)) ghiXong() // ghi NGAY khi có kết quả đầy đủ (kể cả máy em đã rời màn)
+      if (r.ok && r.ket && KHEP.has(r.ket)) { ghiXong(); luuXemLai(docSbdHs(), qid, { ...r, dotId }) } // ghi NGAY khi có kết quả đầy đủ (kể cả máy em đã rời màn); nhớ để «Xem lại» tức thì (xem-lai-sua.ts)
       if (!song.current) return
       setBan(false)
       if (!r.ok) {
@@ -159,7 +167,7 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep, 
 
   if (duo) return (
     <Suspense fallback={<KhungDuoSua onVe={onVe} pct={tienDo ? Math.round((100 * Math.min(tienDo.xong, tienDo.tong)) / Math.max(1, tienDo.tong)) : 0} nhanThanh="Sửa câu này"><div className="ht2-lam-the ht2-lam-cho" role="status"><span className="chu-cho-tre">Đang mở câu…</span></div></KhungDuoSua>}>
-    <ChuaGonDuo qid={qid} mo={mo} kq={kq} tra={tra} onTra={setTra} ban={ban} loi={loi} daTuSua={daTuSua} khep={khep} ct={ct}
+    <KhungDuo qid={qid} mo={mo} kq={kq} tra={tra} onTra={setTra} ban={ban} loi={loi} daTuSua={daTuSua} khep={khep} ct={ct}
       onNop={() => void nop()} onLamLai={() => void lamLai()} onVe={onVe} onTiep={veSauLuu} nhanTiep={nhanTiep} tienDo={tienDo}
       chuXongPhan={kq?.lyDo ? CHU_XONG_PHAN[kq.lyDo] : ''} />
     </Suspense>
