@@ -255,9 +255,9 @@ export const xoaChuanBiKhiThoat = (): void => daChuanBiKhiThoat.clear()
 
 /** Khung cron ĐÊM của bản lập sẵn (giờ VN): từ 00:15 (sau việc 00:01 đổi ngày) tới HẾT 03:59 — thầy 29/10: «mỗi ngày load trước cho học sinh TRƯỚC 4h sáng». */
 export const DEM_BAT_DAU_PHUT = 15, DEM_KET_GIO = 4
-/** Số em lập sẵn mỗi phút theo khung giờ VN: đêm 00:15–03:59 → 10 (D1 vắng); 04:00–12:59 → 6; chiều 13:00–18:59 → 16 (trước giờ học — thầy 29/10 «nạp hết sẵn cho 100% học sinh»; ~30 lệnh D1/em,
- *  trần ~1000 lệnh D1 mỗi lượt cron ⇒ không quá 16); tối 19:00–23:59 → 6 (chỉ để vá bản bị đổi dấu khi thầy giao bài giữa giờ — D1 bận nên ít); 00:00–00:14 → 0 (việc đổi ngày 00:01). */
-export const TOI_DA_DEM = 10, TOI_DA_SANG = 6, TOI_DA_CHIEU = 16, TOI_DA_TOI = 6, SONG_SONG_CRON = 4
+/** Số em lập sẵn mỗi phút theo khung giờ VN: đêm 00:15–03:59 → 10 (D1 vắng); 04:00–12:59 → 6; chiều 13:00–18:59 → 20 (trước giờ học — thầy 29/10 «nạp hết sẵn cho 100% học sinh»; ~30 lệnh D1/em,
+ *  trần ~1000 lệnh D1 mỗi lượt cron ⇒ không quá ~20); tối 19:00–23:59 → 12 (vá bản bị đổi dấu khi thầy giao bài giữa giờ — em có gói mới lập lại trước; 29/10 thầy giao thêm câu lúc 18:4x, cần nạp ngay cả khi đã vào giờ học); 00:00–00:14 → 0 (việc đổi ngày 00:01). */
+export const TOI_DA_DEM = 10, TOI_DA_SANG = 6, TOI_DA_CHIEU = 20, TOI_DA_TOI = 12, SONG_SONG_CRON = 4
 /** Em vừa trả lời trong vòng này ⇒ đang học: cron KHÔNG lập lại bản của em (lượt cuối chặng / lúc rời app đã lo, tránh lập đi lập lại khi em làm từng câu). */
 export const EM_DANG_HOC_MS = 10 * 60_000
 /** Giờ này (VN) có thuộc khung chuẩn bị đêm không? */
@@ -328,13 +328,15 @@ export async function cronSanSangDem(env: Env, now: number, toiDa?: number): Pro
     const ds = (chua.results ?? []).map((r) => String(r.sbd))
     // Còn chỗ ⇒ vá bản đã LỆCH DẤU (so với dấu hiện tại), em học gần đây nhất trước, bỏ em đang học dở.
     if (ds.length < toiDa) {
-      const co = await env.DB.prepare(`SELECT x.sbd, s.dau, (SELECT g.created_at FROM game_v2_session g WHERE g.sbd=x.sbd ORDER BY g.created_at DESC LIMIT 1) AS gan FROM (${emNhan}) x
-        JOIN ${BANG_SAN_SANG} s ON s.sbd=x.sbd AND s.ngay=? AND s.dau LIKE ?`).bind(ngay, BAN_DAU + '§%').all<{ sbd: string; dau: string; gan: string | null }>()
+      // `goi_moi` = em có gói TẠO SAU lúc lập bản (thầy vừa giao bài / thêm câu cho lớp) ⇒ kế hoạch CHẮC CHẮN đổi ⇒ lập lại TRƯỚC (thầy 29/10 «Lớp 12 đã được giao thêm câu mới, nạp luôn nhé»).
+      const co = await env.DB.prepare(`SELECT x.sbd, s.dau, (SELECT g.created_at FROM game_v2_session g WHERE g.sbd=x.sbd ORDER BY g.created_at DESC LIMIT 1) AS gan,
+        EXISTS(SELECT 1 FROM goi_bai_7_em e2 JOIN goi_bai_7 g2 ON g2.id=e2.goi_id WHERE e2.sbd=x.sbd AND g2.tao_luc > strftime('%Y-%m-%dT%H:%M:%fZ', s.luc/1000.0, 'unixepoch')) AS goi_moi
+        FROM (${emNhan}) x JOIN ${BANG_SAN_SANG} s ON s.sbd=x.sbd AND s.ngay=? AND s.dau LIKE ?`).bind(ngay, BAN_DAU + '§%').all<{ sbd: string; dau: string; gan: string | null; goi_moi: number }>()
       const hang = co.results ?? []
       const hienTai = await dauNhieuEm(env, hang.map((r) => String(r.sbd)), now)
       if (hienTai) {
         const lech = hang.filter((r) => { const h = hienTai.get(String(r.sbd)); return !!h && h.dau !== String(r.dau) && now - h.a >= EM_DANG_HOC_MS })
-          .sort((a, b) => String(b.gan ?? '').localeCompare(String(a.gan ?? '')))
+          .sort((a, b) => Number(b.goi_moi) - Number(a.goi_moi) || String(b.gan ?? '').localeCompare(String(a.gan ?? '')))
         ds.push(...lech.slice(0, toiDa - ds.length).map((r) => String(r.sbd)))
       }
     }
