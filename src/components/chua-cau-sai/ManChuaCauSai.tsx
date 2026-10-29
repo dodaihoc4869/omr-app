@@ -28,7 +28,7 @@ import { KhungDuoSua, type TienDoSua } from './KhungDuoSua'
 import { TrongManChua } from './trong-man-chua'
 import { canChuaTrucTiep, henGapLai, LUAT_BAN_MOI } from '../../lib/chua-truc-tiep'
 import { ghiXongHomNay } from '../../lib/tu-sua-viec-hom-nay'
-import { layNapTruocCauSua } from '../../lib/nap-truoc-sua'
+import { layNapTruocCauSua, layNapTruocCauSuaNgay } from '../../lib/nap-truoc-sua'
 import '../tu-luyen/tu-luyen.css'
 import './chua-cau-sai.css'
 // «Trong» 26/10 (nhóm 2): tờ trình bày styles/trong-lam-bai.css nạp RIÊNG, chỉ khi <html data-trong> (main.tsx gắn trước khi nạp màn) — không cộng byte lượt mở app.
@@ -196,6 +196,10 @@ function docPhatKem(v: unknown): KetQuaDot | null {
   if (o.ok) return o as unknown as KetQuaDot
   return { ok: false, loi: String(o.mo ?? o.error ?? 'Máy chủ chưa trả lời được. Em thử lại.'), ma: String(o.ma ?? '') }
 }
+/** NẠP SẴN khung Duo của màn sửa câu (29/10, video 11:00 «Vẫn bị khựng chỗ mở câu»: 2–3 khung TRẮNG lúc bấm câu vì mảnh ChuaGonDuo mới bắt đầu nạp + chạy mã SAU khi bấm). Gọi từ danh sách Tự sửa lỗi lúc rảnh —
+ *  nằm trong mảnh này nên KHÔNG tách thêm mảnh (bộ chặn số mảnh precache của kiem-sw). */
+export const napKhungDuo = (): Promise<unknown> => (typeof document !== 'undefined' && document.documentElement.dataset.trong === 'hs' ? import('./ChuaGonDuo').catch(() => null) : Promise.resolve(null))
+
 export default function ManChuaCauSai({
   token,
   qid,
@@ -212,8 +216,11 @@ export default function ManChuaCauSai({
     if (d) void import('./ChuaGonDuo').catch(() => {}) // nạp trước, song song lệnh mở đợt
     return d
   })
+  // 29/10 (video 11:00 «Vẫn bị khựng chỗ mở câu»): lượt mở nạp trước ĐÃ VỀ ⇒ dựng thẳng màn câu ở lần vẽ ĐẦU (không khung «Đang mở câu…» một khung hình, không chờ vòng hiệu ứng).
+  const [pre] = useState(() => { const r = layNapTruocCauSuaNgay(token, qid); return r && r.ok && r.dotId && r.gon?.ok ? r : null })
+  const preRef = useRef(pre)
   const [ph, setPh] = useState<KetQuaDot | null>(null),
-    [tai, setTai] = useState(true),
+    [tai, setTai] = useState(!pre),
     [daXongSo, setDaXongSo] = useState<'' | 'dong' | 'chua_thay'>(''),
     [loi, setLoi] = useState(''),
     [tra, setTra] = useState(''),
@@ -223,7 +230,7 @@ export default function ManChuaCauSai({
     [cho, setCho] = useState<LanNop | null>(null),
     [lanTai, setLanTai] = useState(0),
     /** Chữa câu gọn (25/10): đợt mở được ⇒ một đường cho mọi câu (ChuaGon); máy chủ chưa có lệnh gọn ⇒ lối cũ như trước. */
-    [gon, setGon] = useState<{ dotId: string; dau: KetQuaGon } | null>(null)
+    [gon, setGon] = useState<{ dotId: string; dau: KetQuaGon } | null>(() => (pre && pre.dotId && pre.gon ? { dotId: pre.dotId, dau: pre.gon } : null))
   const mucGoi = useRef(0)
   const khongMoRef = useRef(onKhongMo)
   khongMoRef.current = onKhongMo
@@ -272,6 +279,8 @@ export default function ManChuaCauSai({
     setTra(r.traLoiDaNop ?? c?.traLoi ?? '')
   }, [])
   useEffect(() => {
+    // Đã dựng từ lượt nạp trước ngay ở lần vẽ đầu (xem `pre`) ⇒ không làm lại; «Thử lại» (lanTai > 0) vẫn hỏi tươi.
+    if (lanTai === 0 && preRef.current) { preRef.current = null; return }
     let huy = false
     const n = ++goiRef.current
     ;(async () => {

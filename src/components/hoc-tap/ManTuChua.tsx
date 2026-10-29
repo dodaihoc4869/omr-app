@@ -198,13 +198,14 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
   const tiepNap = viec?.muc.find((x) => !x.xong && !x.m.kiemHoiThay && x.m.qid !== chon?.qid)?.m.qid
   useEffect(() => {
     if (!tiepNap) return
-    const h = setTimeout(() => napTruocCauSua(token, tiepNap), 1200)
+    const h = setTimeout(() => napTruocCauSua(token, tiepNap), 250) // 29/10 (video 11:00): 1200 → 250 ms — em chạm câu đầu sau ~1 s thì lượt mở đã bay sẵn
     return () => clearTimeout(h)
   }, [token, tiepNap])
   // 27/10 tốc độ (thầy: «sửa lỗi chỗ mở câu phải tức thì»): danh sách vừa mở ⇒ lúc rảnh nạp sẵn mảnh màn sửa câu, bấm câu là vào ngay, không màn chờ nạp mảnh.
   useEffect(() => {
     // Chỉ nạp mảnh màn sửa câu: khung Duo (ChuaGonDuo) do chính màn ấy nạp song song lệnh mở đợt — nạp thẳng từ đây làm Rolldown tách thêm mảnh dùng chung (+1 tệp precache).
-    const nap = () => { void import('../chua-cau-sai/ManChuaCauSai').catch(() => {}) }
+    // 29/10 (video 11:00 «khựng chỗ mở câu»): nạp luôn KHUNG DUO của màn sửa câu (`napKhungDuo`, nằm trong mảnh ManChuaCauSai ⇒ không thêm mảnh) — bấm câu là có khung ngay, không khung trắng.
+    const nap = () => { void import('../chua-cau-sai/ManChuaCauSai').then((m) => m.napKhungDuo?.()).catch(() => {}) }
     const ric = (globalThis as { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }).requestIdleCallback
     if (ric) ric(nap, { timeout: 2000 }); else setTimeout(nap, 600)
   }, [])
