@@ -47,3 +47,4 @@ jobs:
           cd ..
           echo '=== MỞ CHẶNG THẬT, LỚP 11, mã máy chủ main (chỉ đọc) ==='
           OMR_LOP=11 OMR_SONG_SONG=3 OMR_GIOI_HAN_MS=700000 timeout 760 node --no-warnings /tmp/do-g7-sau.mjs | grep -v '^\[chan-khac-khoi\]' || echo "(thoát mã $?)"
+# lần 2 18:26
