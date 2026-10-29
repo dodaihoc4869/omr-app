@@ -438,7 +438,30 @@ export async function docMaTranCu7(env: Env, sbd: string, maCu: readonly string[
 }
 /** `gsSom`: danh sách gói đã đọc đoán cùng đợt cờ Gói 7 (`docDanhSachGoiSom7`); vắng ⇒ đọc như cũ.
  *  `hoan` (Gói R 15/10): có ⇒ lô ghi cuối của động cơ (kèm quota ngày) KHÔNG gửi ở đây mà đẩy vào `hoan` để nơi gọi tự gửi (`startGoi7`: song song lượt đọc câu). */
-export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promise<{ results: Row[] }>, hoan?: D1PreparedStatement[]) {
+/**
+ * GIỚI HẠN LẬP KẾ HOẠCH NẶNG ĐỒNG THỜI (thầy 29/10 21:36 «học sinh đang kêu lag» — ảnh «Đang chuẩn bị những câu phù hợp với em…»; Analytics 19–23h: `exceededMemory` 1 070 lượt
+ * (230 / 700 / 143 lượt mỗi giờ 19–21h), hôm qua 1 367): mỗi lượt `lapGoi7` giữ hồ sơ + sổ học + câu của gói của MỘT em (vài MB). Giờ cao điểm một isolate chạy xen kẽ hàng chục lượt
+ * như vậy (Sảnh + Mở chặng + lập sẵn nền của cùng một em cũng chạy ba lần) ⇒ vượt 128 MB ⇒ isolate bị giết, KÉO THEO mọi lượt đang chạy. Việc này nặng CPU + D1 nên chạy xen quá 3 lượt không nhanh
+ * hơn — xếp hàng: tối đa `TOI_DA_LAP_DONG_THOI` lượt cùng lúc mỗi isolate, lượt sau chờ lượt trước xong (bàn giao chỗ, không chen).
+ */
+export const TOI_DA_LAP_DONG_THOI = 3
+let dangLap7 = 0
+const hangLap7: (() => void)[] = []
+async function gioiHanLap7<T>(f: () => Promise<T>): Promise<T> {
+  if (dangLap7 >= TOI_DA_LAP_DONG_THOI) await new Promise<void>((ok) => { hangLap7.push(ok) }) // nhận chỗ do lượt trước bàn giao (không tăng dangLap7)
+  else dangLap7++
+  // Nhả chỗ đúng MỘT lần: xong việc, hoặc quá 45 s (D1 treo) — không để một lượt kẹt chặn cả hàng.
+  let nha = false
+  const tha = () => { if (nha) return; nha = true; const ke = hangLap7.shift(); if (ke) ke(); else dangLap7-- }
+  const hen = setTimeout(tha, 45_000)
+  try { return await f() } finally { clearTimeout(hen); tha() }
+}
+/** Số lượt lập đang chạy / đang chờ (test). */
+export const trangThaiLap7 = () => ({ chay: dangLap7, cho: hangLap7.length })
+export function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promise<{ results: Row[] }>, hoan?: D1PreparedStatement[]) {
+  return gioiHanLap7(() => lapGoi7Tho(env, sbd, now, gsSom, hoan))
+}
+async function lapGoi7Tho(env: Env, sbd: string, now: number, gsSom?: Promise<{ results: Row[] }>, hoan?: D1PreparedStatement[]) {
   const ngay = ngayVn7(now)
   // Lớp của em (bảng lớp dùng chung cả trường, đệm 30 giây trong isolate — `lopCuaEm`) bắt đầu CÙNG đợt danh sách gói (đợt 18): đệm vừa hết hạn thì phạm vi
   // bài ⇒ ma trận cũ ⇒ hồ sơ không phải chờ thêm một đợt. Lỗi đọc ⇒ null như cũ (hàm tự bắt).
