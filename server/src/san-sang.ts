@@ -254,16 +254,21 @@ export const xoaChuanBiKhiThoat = (): void => daChuanBiKhiThoat.clear()
 
 /** Khung cron ĐÊM của bản lập sẵn (giờ VN): từ 00:15 (sau việc 00:01 đổi ngày) tới HẾT 03:59 — thầy 29/10: «mỗi ngày load trước cho học sinh TRƯỚC 4h sáng». */
 export const DEM_BAT_DAU_PHUT = 15, DEM_KET_GIO = 4
-/** Số em mỗi phút: đêm 10 (2 250 em / khung; ~30 lệnh D1 mỗi em, đêm D1 vắng), chiều 6. */
-export const TOI_DA_DEM = 10, TOI_DA_CHIEU = 6
+/** Số em mỗi phút: đêm 10 (2 250 em / khung; ~30 lệnh D1 mỗi em, đêm D1 vắng), chiều 12 (13:00–18:59 ⇒ 4 300 lượt — đủ phủ mọi em có gói TRƯỚC giờ cao điểm 19h, thầy 29/10 «nạp hết sẵn cho 100% học sinh»). */
+export const TOI_DA_DEM = 10, TOI_DA_CHIEU = 12, SONG_SONG_CRON = 4
+/** Khung chiều: 13:00–18:59 VN (giờ học bắt đầu 19h; D1 còn vắng). */
+export const trongKhungChieu = (now: number): boolean => { const g = new Date(now + 7 * 3600000).getUTCHours(); return g >= 13 && g < 19 }
 /** Giờ này (VN) có thuộc khung chuẩn bị đêm không? */
 export const trongKhungDem = (now: number): boolean => { const d = new Date(now + 7 * 3600000), g = d.getUTCHours(); return g >= 1 && g < DEM_KET_GIO || (g === 0 && d.getUTCMinutes() >= DEM_BAT_DAU_PHUT) }
 
-/** CRON ĐÊM 00:15–03:59 VN (+ chiều 13:00–17:59): chuẩn bị sẵn cho em có gói chưa có bản hôm nay (hoặc bản theo cách tính dấu cũ — khác `BAN_DAU`) — tối đa `toiDa` em mỗi phút (một lượt ~30 lệnh D1/em). */
+/**
+ * CRON ĐÊM 00:15–03:59 VN (+ chiều 13:00–18:59): chuẩn bị sẵn cho MỌI em còn đang nhận gói chưa có bản hôm nay (hoặc bản theo cách tính dấu cũ — khác `BAN_DAU`), rồi (còn chỗ) làm mới bản đã CŨ
+ * (em vừa học xong một đợt mới hơn bản sẵn) — tối đa `toiDa` em mỗi phút (một lượt ~30 lệnh D1/em).
+ * 29/10 chiều: cũ chọn theo `goi_bai_7_em.han >= hôm nay` ⇒ bỏ sót ~233 em (hạn là HẠN NỘP, em vẫn «đang nhận» sau hạn — goi-bai-7-quyen.ts). Nay dùng ĐÚNG điều kiện của
+ * `docDanhSachGoi7` (lớp hiệu lực, tick còn hoạt động, quyền nhận), không điều kiện ngày.
+ */
 export async function cronSanSangDem(env: Env, now: number, toiDa?: number): Promise<number> {
-  const gio = new Date(now + 7 * 3600000).getUTCHours()
-  // 28/10 chiều (thử tải 270 em): thêm khung 13:00–17:59 VN — bản sẵn có đủ trước giờ học (dấu khớp ⇒ lượt mở app đầu tiên của em khỏi lập kế hoạch).
-  const chieu = gio >= 13 && gio < 18
+  const chieu = trongKhungChieu(now)
   if (!chieu && !trongKhungDem(now)) return 0
   toiDa ??= chieu ? TOI_DA_CHIEU : TOI_DA_DEM
   try {
@@ -271,11 +276,24 @@ export async function cronSanSangDem(env: Env, now: number, toiDa?: number): Pro
     await chayDdlMotLan(env, BANG_SAN_SANG, SQL_SAN_SANG)
     const g7 = await import('./goi-bai-7')
     if (!(await g7.coGoi7(env)).bat) return 0
+    const { sqlEmDangNhan7 } = await import('./goi-bai-7-quyen')
     const ngay = ngayVn7(now)
-    const ds = await env.DB.prepare(`SELECT DISTINCT e.sbd FROM goi_bai_7_em e JOIN hoc_sinh h ON h.sbd=e.sbd WHERE e.han>=? AND COALESCE(h.trang_thai,'')<>'khoa'
-      AND NOT EXISTS (SELECT 1 FROM ${BANG_SAN_SANG} s WHERE s.sbd=e.sbd AND s.ngay=? AND s.dau LIKE ?) ORDER BY e.sbd LIMIT ?`).bind(ngay, ngay, BAN_DAU + '§%', toiDa).all<{ sbd: string }>()
+    // Em đang nhận ≥ 1 gói (cùng các điều kiện JOIN / quyền như danh sách gói của em), chưa bị khoá.
+    const emNhan = `SELECT DISTINCT e.sbd FROM goi_bai_7_em e JOIN goi_bai_7 g ON g.id=e.goi_id
+      JOIN hoc_sinh h ON h.sbd=e.sbd AND ${g7.sqlTenLopHs('h')}=g.lop JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE ${sqlEmDangNhan7('e', 'g', 'h')}`
+    const chua = await env.DB.prepare(`SELECT x.sbd FROM (${emNhan}) x WHERE NOT EXISTS (SELECT 1 FROM ${BANG_SAN_SANG} s WHERE s.sbd=x.sbd AND s.ngay=? AND s.dau LIKE ?) ORDER BY x.sbd LIMIT ?`)
+      .bind(ngay, BAN_DAU + '§%', toiDa).all<{ sbd: string }>()
+    const ds = [...(chua.results ?? [])]
+    // Còn chỗ ⇒ làm mới bản cũ: đợt học MỚI NHẤT của em muộn hơn lúc lập bản sẵn (phiên mới ⇒ dấu đã đổi).
+    if (ds.length < toiDa) {
+      const cu = await env.DB.prepare(`SELECT x.sbd FROM (${emNhan}) x JOIN ${BANG_SAN_SANG} s ON s.sbd=x.sbd AND s.ngay=? AND s.dau LIKE ?
+        WHERE (SELECT g.created_at FROM game_v2_session g WHERE g.sbd=s.sbd ORDER BY g.created_at DESC LIMIT 1) > strftime('%Y-%m-%dT%H:%M:%fZ', s.luc/1000.0, 'unixepoch')
+        ORDER BY s.luc LIMIT ?`).bind(ngay, BAN_DAU + '§%', toiDa - ds.length).all<{ sbd: string }>()
+      ds.push(...(cu.results ?? []))
+    }
+    // Từng nhóm 4 em chạy song song (mỗi em ~30 lệnh D1 nối tiếp ⇒ 12 em/phút nối tiếp có thể vượt một phút); chiều/đêm D1 vắng.
     let n = 0
-    for (const r of ds.results ?? []) if (await chuanBiSanSang(env, String(r.sbd), now)) n++
+    for (let i = 0; i < ds.length; i += SONG_SONG_CRON) n += (await Promise.all(ds.slice(i, i + SONG_SONG_CRON).map((r) => chuanBiSanSang(env, String(r.sbd), now)))).filter(Boolean).length
     return n
   } catch (e) { console.error('[san-sang] cron đêm lỗi:', e instanceof Error ? e.message : e); return 0 }
 }

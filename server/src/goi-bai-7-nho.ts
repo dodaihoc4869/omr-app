@@ -7,7 +7,9 @@
 import { dbGoc } from './cau-hinh-dem'
 
 /** Tuổi tối đa của bản nhớ. App mở chặng trước NGAY khi sảnh trả về ⇒ thường dùng trong < 1 giây; ngắn để kế hoạch không cũ. */
-export const NHO_KE_HOACH_MS = 15_000
+export const NHO_KE_HOACH_MS = 8_000
+/** Số bản nhớ tối đa mỗi isolate (bộ nhớ). */
+export const NHO_TOI_DA = 24
 
 export interface KeHoachNho<T> {
   luc: number
@@ -29,7 +31,10 @@ const bangCua = (db: unknown): Map<string, KeHoachNho<unknown>> => {
 export function nhoKeHoach7<T>(db: unknown, sbd: string, muc: KeHoachNho<T>): void {
   const m = bangCua(db)
   for (const [k, v] of m) if (!(muc.luc - v.luc >= 0 && muc.luc - v.luc < NHO_KE_HOACH_MS)) m.delete(k)
-  if (m.size >= 2000) m.clear()
+  m.delete(sbd) // ghi lại ⇒ lên «mới nhất»
+  // 29/10 (đo cao điểm 28/10: 1 367 lượt `exceededMemory`/133 581 — isolate 128 MB bị giết kéo theo mọi lượt đang chạy): mỗi bản giữ cả kế hoạch `lap` (nhiều MB) — trần 2000 em cũ là quá tay.
+  // Sảnh → Mở chặng cách nhau < 1 s nên chỉ cần vài chục bản; quá trần ⇒ bỏ bản CŨ NHẤT (không xoá cả bảng).
+  while (m.size >= NHO_TOI_DA) m.delete(m.keys().next().value as string)
   m.set(sbd, muc as KeHoachNho<unknown>)
 }
 
