@@ -100,3 +100,20 @@ it('`ve` của em khác / bị sửa / rác ⇒ GOI_CU; công tắc tắt ⇒ ta
   datCheDoGoiNgay('thu')
   expect(await goiNgay7(k.env, 'S1', NOW)).toMatchObject({ tat: true }) // chỉ tài khoản thử của thầy
 })
+
+it('em có bản sẵn (cron) còn dùng được ⇒ gói lấy đúng chặng bản sẵn, không lập kế hoạch; mở phiên được', async () => {
+  const k = await kho()
+  const { chuanBiSanSang, docSanSang } = await import('../server/src/san-sang')
+  expect(await chuanBiSanSang(k.env, 'S1', NOW - 60_000)).toBe(true)
+  const ban = await docSanSang(k.env, 'S1')
+  const qBan = (ban!.chang!.questions as { qid: string }[]).map((q) => q.qid)
+  const goi = await goiNgay7(k.env, 'S1', NOW) as unknown as Goi & { tuBanSan?: boolean }
+  expect(goi.tuBanSan).toBe(true)
+  expect(goi.chang).toHaveLength(1)
+  expect(goi.chang[0]!.questions.map((q) => q.qid)).toEqual(qBan)
+  expect(JSON.stringify(goi)).not.toContain('"correct"')
+  const mo = await moGoi7(k.env, 'S1', { ve: goi.chang[0]!.ve, sk: temCua(goi.chang[0]!) }, NOW) as { ok: boolean; qids: string[]; sk: Record<string, string> }
+  expect(mo.ok).toBe(true)
+  expect(mo.qids).toEqual(qBan)
+  expect(Object.keys(mo.sk).length).toBe(qBan.length)
+})
