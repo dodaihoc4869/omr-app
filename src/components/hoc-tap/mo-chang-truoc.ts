@@ -145,8 +145,24 @@ export function napGoiNgay(token: string, goi: typeof goiHoa2 = goiHoa2, now: nu
     nhoGoi.set(r.sbd.trim(), g)
     ghiJson(khoaGoi(r.sbd), g)
     ghiJson(KHOA_CUA, { sbd: r.sbd, t: duoiToken(token) })
+    napAnhSan(chang.flatMap((c) => c.questions).slice(0, CAU_MOI_CHANG_GOI))
   }).catch(() => {}).finally(() => { napDang = null })
   return napDang
+}
+
+/** Nạp sẵn ẢNH ĐỀ của chặng kế (hình đề, thân câu, hình phương án / ý — không hình lời giải) lúc máy rảnh: mở chặng là hình có ngay, mạng yếu không chờ tải. */
+function napAnhSan(qs: KetQuaMo[]): void {
+  if (typeof Image === 'undefined') return
+  const ds: string[] = []
+  for (const q of qs) {
+    const hinh = Array.isArray(q.hinhAnh) ? (q.hinhAnh as { src?: unknown; viTri?: unknown }[]).filter((h) => h && h.viTri !== 'sau_loi_giai').map((h) => h.src) : []
+    for (const src of [...hinh, q.thanCauImg, ...(Array.isArray(q.choiceImgs) ? q.choiceImgs : []), ...(Array.isArray(q.ideaImgs) ? q.ideaImgs : [])])
+      if (typeof src === 'string' && src && !src.startsWith('data:') && !ds.includes(src)) ds.push(src)
+  }
+  if (!ds.length) return
+  const chay = () => { for (const src of ds) { const im = new Image(); im.decoding = 'async'; im.src = src } }
+  const w = globalThis as { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }
+  if (w.requestIdleCallback) w.requestIdleCallback(chay, { timeout: 5000 }); else setTimeout(chay, 1500)
 }
 
 /** Chặng kế tiếp trong gói của em: `so` câu đầu (theo thứ tự gói) máy này CHƯA làm hôm nay — ghép qua ranh các chặng của gói (gói lập lại giữa chừng vẫn đủ một

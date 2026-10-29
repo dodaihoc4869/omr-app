@@ -336,7 +336,8 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
       setTai(false)
       const temDai: Record<string, unknown> = {}
       for (const c of goi.questions) if (typeof c.qid === 'string' && typeof c.sk === 'string') temDai[c.qid] = c.sk
-      return goiHoa2('hoc-tap-mo-goi', token, { ves: goi.ves, qids: dsGoi.map(c => c.qid), sk: temDai }, GIAY_CHO_MO_CHANG).then(r => {
+      // Lệnh nhẹ (một đợt đọc + một lệnh ghi): chờ tối đa 20 s rồi rơi về đường cũ — không để em đã bấm «Kiểm tra» chờ đủ 40 s + 40 s.
+      return goiHoa2('hoc-tap-mo-goi', token, { ves: goi.ves, qids: dsGoi.map(c => c.qid), sk: temDai }, 20).then(r => {
         if (r.ok !== true || typeof r.id !== 'string' || !Array.isArray(r.qids)) {
           if (typeof r.ma === 'string' && r.ma.startsWith('GOI_')) boGoiNgay(sbd) // gói không dùng được nữa ⇒ đường cũ tới khi gói mới về
           throw Object.assign(new Error('goi'), { roiVe: true })
