@@ -10,6 +10,7 @@
 // Ngày VN khác ⇒ không dùng. Lỗi đọc (bảng chưa có…) ⇒ không dùng. Mọi thứ phụ thuộc giờ (Kiểm tra ôn tập, chuỗi ngày) nơi dùng vẫn đọc TƯƠI.
 import type { Env } from './kieu'
 import { ngayVn7 } from './goi-bai-7-loi'
+import { lamMoiNiemChoCau } from './niem-cau'
 
 type Row = Record<string, unknown>
 
@@ -211,7 +212,7 @@ export async function moChangSanSang(env: Env, sbd: string, now: number, ban: Ba
   if (typeof c.phienCu === 'string' && c.phienCu) {
     const cu = await env.DB.prepare("SELECT json_extract(json,'$.created') AS t FROM game_v2_session WHERE id=? AND sbd=?").bind(c.phienCu, sbd).first<Row>()
     if (!cu || now - Number(cu.t) > 100 * 60_000) return null
-    return { ok: true, id: c.phienCu, questions: c.questions, goi7: c.goi7 }
+    return { ok: true, id: c.phienCu, questions: await lamMoiNiemChoCau(env, sbd, c.questions, now), goi7: c.goi7 }
   }
   const { sqlCacGoiConNhan7 } = await import('./goi-bai-7-quyen')
   const { sqlTenLopHs } = await import('./goi-bai-7')
@@ -222,7 +223,7 @@ export async function moChangSanSang(env: Env, sbd: string, now: number, ban: Ba
     lenhBoChangSanSang(env, sbd, ban.luc),
   ])
   if (!Number(ins?.meta.changes)) return null
-  return { ok: true, id, questions: c.questions, goi7: c.goi7 }
+  return { ok: true, id, questions: await lamMoiNiemChoCau(env, sbd, c.questions, now), goi7: c.goi7 } // tem niêm phong làm MỚI lúc mở (niem-cau.ts)
 }
 
 /** Phiên `id` của em đã trả lời HẾT câu (kể cả câu làm lại cuối chặng)? — sau câu cuối mới chuẩn bị chặng kế tiếp. Lỗi ⇒ false. */
@@ -234,12 +235,20 @@ export async function phienDaXong(env: Env, sbd: string, id: string): Promise<bo
   } catch { return false }
 }
 
-/** CRON ĐÊM 00:30–05:59 VN (+ chiều 13:00–17:59): chuẩn bị sẵn cho em có gói chưa có bản hôm nay (hoặc bản theo cách tính dấu cũ — khác `BAN_DAU`) — tối đa `toiDa` em mỗi phút (một lượt ~30 lệnh D1/em). */
-export async function cronSanSangDem(env: Env, now: number, toiDa = 6): Promise<number> {
-  const gio = new Date(now + 7 * 3600000).getUTCHours(), phut = new Date(now + 7 * 3600000).getUTCMinutes()
+/** Khung cron ĐÊM của bản lập sẵn (giờ VN): từ 00:15 (sau việc 00:01 đổi ngày) tới HẾT 03:59 — thầy 29/10: «mỗi ngày load trước cho học sinh TRƯỚC 4h sáng». */
+export const DEM_BAT_DAU_PHUT = 15, DEM_KET_GIO = 4
+/** Số em mỗi phút: đêm 10 (2 250 em / khung; ~30 lệnh D1 mỗi em, đêm D1 vắng), chiều 6. */
+export const TOI_DA_DEM = 10, TOI_DA_CHIEU = 6
+/** Giờ này (VN) có thuộc khung chuẩn bị đêm không? */
+export const trongKhungDem = (now: number): boolean => { const d = new Date(now + 7 * 3600000), g = d.getUTCHours(); return g >= 1 && g < DEM_KET_GIO || (g === 0 && d.getUTCMinutes() >= DEM_BAT_DAU_PHUT) }
+
+/** CRON ĐÊM 00:15–03:59 VN (+ chiều 13:00–17:59): chuẩn bị sẵn cho em có gói chưa có bản hôm nay (hoặc bản theo cách tính dấu cũ — khác `BAN_DAU`) — tối đa `toiDa` em mỗi phút (một lượt ~30 lệnh D1/em). */
+export async function cronSanSangDem(env: Env, now: number, toiDa?: number): Promise<number> {
+  const gio = new Date(now + 7 * 3600000).getUTCHours()
   // 28/10 chiều (thử tải 270 em): thêm khung 13:00–17:59 VN — bản sẵn có đủ trước giờ học (dấu khớp ⇒ lượt mở app đầu tiên của em khỏi lập kế hoạch).
   const chieu = gio >= 13 && gio < 18
-  if (!chieu && (gio >= 6 || (gio === 0 && phut < 30))) return 0
+  if (!chieu && !trongKhungDem(now)) return 0
+  toiDa ??= chieu ? TOI_DA_CHIEU : TOI_DA_DEM
   try {
     const { chayDdlMotLan } = await import('./ddl-mot-lan')
     await chayDdlMotLan(env, BANG_SAN_SANG, SQL_SAN_SANG)

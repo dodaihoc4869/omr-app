@@ -11,6 +11,7 @@ import { docChiTiet } from '../hoa2/api'
 import { propsTheCau } from '../hoa2/cau-chuyen'
 import { propsCauLam } from './ChuaTrucTiep'
 import { apiGonMo, apiGonNop, type KetQuaGon } from '../../lib/chua-cau-sai-api'
+import { apiGonNopLuong, ketTuTam } from '../../lib/chua-gon-luong'
 import { chuDapAn, daTraLoiDu, LUAT_BAN_MOI } from '../../lib/chua-truc-tiep'
 import { ghiXongHomNay } from '../../lib/tu-sua-viec-hom-nay'
 import { sinhMaNgauNhien } from '../../lib/thiet-bi'
@@ -63,7 +64,9 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep, 
   const khep = daTuSua || (!!kq?.ket && KHEP.has(kq.ket)) || !mo.ok
   // Ghi theo cả mã đợt và mã câu: mục Việc hôm nay có thể mang mã đợt khác với đợt vừa mở (xem daXong) ⇒ thiếu mã câu là kẹt vòng.
   const ghiXong = () => { ghiXongHomNay(dotId); ghiXongHomNay(qid) }
-  useEffect(() => { if (khep) ghiXong() }, [khep, dotId, qid]) // eslint-disable-line react-hooks/exhaustive-deps
+  // Chỉ ghi «xong phần» khi kết quả là bản ĐẦY ĐỦ (đã ghi ở máy chủ) — dòng TẠM của tem (`kq.tam`) chỉ để hiện ngay, chưa được tính (bản đầy đủ lỗi ⇒ bỏ dòng tạm).
+  const khepThat = khep && !kq?.tam
+  useEffect(() => { if (khepThat) ghiXong() }, [khepThat, dotId, qid]) // eslint-disable-line react-hooks/exhaustive-deps
   // 28/10 (thầy «Bỏ màn chưa sửa được câu này đi»): không mở được câu ở đây ⇒ đã tính xong phần hôm nay (trên) ⇒ sang câu kế ngay, không dừng ở khung báo.
   useEffect(() => { if (!mo.ok && onTiep) onTiep() }, [mo.ok]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (kq) tieuDe.current?.focus() }, [kq])
@@ -74,26 +77,66 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep, 
   const ve = onTiep ?? onVe
   const nhanTiep = onTiep ? 'Câu tiếp theo' : nhanVe
 
+  // KIỂM TRA TỨC THÌ (29/10, thầy «Bấm kiểm tra còn quá lâu. Phải tức thì luôn»; server/src/chua-gon-niem.ts): gon-mo cấp tem `sk` ⇒ gon-nop theo luồng: dòng `tam` (đúng / sai, gợi ý, đáp án + lời giải
+  // khi đúng / hết lần) hiện NGAY; bản đầy đủ (đã ghi lần nộp, đóng đợt, thưởng) đến sau và thay thế. Chưa có bản đầy đủ thì «Tiếp tục» / «Làm lại» chờ nó (không bỏ sót ghi nhận).
+  const luu = useRef<Promise<void> | null>(null)
+  const luuLoi = useRef(false)
+  const sk2 = useRef<{ tem: string; lan: number } | null>(null)
   const nop = async () => {
     if (!de || !mo.ban || ban || !daTraLoiDu(phan, tra)) return
     if (!khoa.current) khoa.current = sinhMaNgauNhien()
     setBan(true); setLoi('')
-    const r = await apiGonNop(token, dotId, mo.ban, tra.trim(), khoa.current, qid)
-    if (!song.current) return
-    setBan(false)
-    if (!r.ok) {
-      // Máy chủ đã từ chối hẳn (đổi bản / hết lần) ⇒ khoá mới cho lần sau; lỗi mạng ⇒ giữ khoá để gửi lại đúng lần này.
-      if (r.ma) khoa.current = ''
-      setLoi(r.loi ?? 'Chưa gửi được. Em bấm Kiểm tra lại nhé.')
-      return
+    let daRung = false
+    const khiTam = (t: KetQuaGon) => {
+      if (!song.current || !t.ket) return
+      sk2.current = t.ket === 'goi_y' && t.sk2 && t.lan ? { tem: t.sk2, lan: t.lan + 1 } : null
+      daRung = true; phanHoi(t.ket === 'tu_sua' || t.ket === 'xong_phan' ? 'dung' : 'sai') // rung phản hồi (chỉ «Trong»)
+      setKq(ketTuTam(t, mo.de)); setBan(false)
     }
-    khoa.current = ''
-    if (r.ket && KHEP.has(r.ket)) ghiXong() // ghi NGAY khi có kết quả (không chờ lượt vẽ sau)
-    if (r.ket) phanHoi(r.ket === 'tu_sua' || r.ket === 'xong_phan' ? 'dung' : 'sai') // rung phản hồi (chỉ «Trong»)
-    setKq(r)
+    const traLoi = tra.trim(), banNop = mo.ban
+    const chay = (async () => {
+      const r = mo.sk
+        ? await apiGonNopLuong(token, { dotId, ban: banNop, traLoi, khoa: khoa.current, qid, sk: mo.sk }, khiTam)
+        : await apiGonNop(token, dotId, banNop, traLoi, khoa.current, qid)
+      if (r.ok && r.ket && KHEP.has(r.ket)) ghiXong() // ghi NGAY khi có kết quả đầy đủ (kể cả máy em đã rời màn)
+      if (!song.current) return
+      setBan(false)
+      if (!r.ok) {
+        // Máy chủ đã từ chối hẳn (đổi bản / hết lần) ⇒ khoá mới cho lần sau; lỗi mạng ⇒ giữ khoá để gửi lại đúng lần này.
+        if (r.ma) khoa.current = ''
+        luuLoi.current = true; sk2.current = null
+        setKq(null) // bỏ kết quả TẠM (nếu đã hiện): câu chưa chắc đã ghi — em bấm Kiểm tra lại
+        setLoi(r.loi ?? 'Chưa gửi được. Em bấm Kiểm tra lại nhé.')
+        return
+      }
+      luuLoi.current = false
+      khoa.current = ''
+      if (!daRung && r.ket) phanHoi(r.ket === 'tu_sua' || r.ket === 'xong_phan' ? 'dung' : 'sai')
+      if (sk2.current && (r.ket !== 'goi_y' || sk2.current.lan !== (r.lan ?? 0) + 1)) sk2.current = null // bản đầy đủ khác dòng tạm ⇒ mở lại bằng gon-mo
+      setKq(r)
+    })()
+    luu.current = chay
+    await chay
+    if (luu.current === chay) luu.current = null
+  }
+  // «Tiếp tục» / «Về»: chờ bản đầy đủ của lần nộp vừa rồi (nếu còn) rồi mới đi — không để mất ghi nhận; lần nộp lỗi ⇒ ở lại màn, báo lỗi.
+  const veSauLuu = () => {
+    const p = luu.current
+    if (!p) { ve(); return }
+    void p.then(() => { if (song.current && !luuLoi.current) ve() })
   }
   const lamLai = async () => {
-    setBan(true); setLoi('')
+    setLoi('')
+    if (luu.current) { setBan(true); await luu.current; if (!song.current) return; if (luuLoi.current) { setBan(false); return } }
+    const s2 = sk2.current
+    if (s2) {
+      // Lần 2 cùng bản (tem do máy chủ cấp lúc chấm lần 1): mở NGAY tại máy em, khỏi gọi gon-mo.
+      sk2.current = null
+      setMo((m) => ({ ...m, lan: s2.lan, tuSuaNeuDung: false, sk: s2.tem })); setKq(null); setTra(''); setXemGiai(false); setBan(false)
+      requestAnimationFrame(() => tieuDe.current?.focus())
+      return
+    }
+    setBan(true)
     const r = await apiGonMo(token, dotId, qid)
     if (!song.current) return
     setBan(false)
@@ -105,7 +148,7 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep, 
   if (duo) return (
     <Suspense fallback={<KhungDuoSua onVe={onVe} pct={tienDo ? Math.round((100 * Math.min(tienDo.xong, tienDo.tong)) / Math.max(1, tienDo.tong)) : 0} nhanThanh="Sửa câu này"><div className="ht2-lam-the ht2-lam-cho" role="status"><span className="chu-cho-tre">Đang mở câu…</span></div></KhungDuoSua>}>
     <ChuaGonDuo qid={qid} mo={mo} kq={kq} tra={tra} onTra={setTra} ban={ban} loi={loi} daTuSua={daTuSua} khep={khep} ct={ct}
-      onNop={() => void nop()} onLamLai={() => void lamLai()} onVe={onVe} onTiep={ve} nhanTiep={nhanTiep} tienDo={tienDo}
+      onNop={() => void nop()} onLamLai={() => void lamLai()} onVe={onVe} onTiep={veSauLuu} nhanTiep={nhanTiep} tienDo={tienDo}
       chuXongPhan={kq?.lyDo ? CHU_XONG_PHAN[kq.lyDo] : ''} />
     </Suspense>
   )
@@ -133,7 +176,7 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep, 
         <NutHoiThay qid={qid} nguon="tu_chua" />
       </section>
     )
-    nutChinh = <button type="button" className="ccs-nut-chinh" onClick={ve}>{nhanTiep}</button>
+    nutChinh = <button type="button" className="ccs-nut-chinh" onClick={veSauLuu}>{nhanTiep}</button>
     nutPhu = null
   } else if (mo.trangThai === 'da_tu_sua' && !kq) {
     than = (
@@ -141,7 +184,7 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep, 
         <h2 ref={tieuDe} tabIndex={-1}>Em đã tự sửa xong câu này</h2>
       </section>
     )
-    nutChinh = <button type="button" className="ccs-nut-chinh" onClick={ve}>{nhanTiep}</button>
+    nutChinh = <button type="button" className="ccs-nut-chinh" onClick={veSauLuu}>{nhanTiep}</button>
     nutPhu = null
   } else if (kq?.ket === 'tu_sua') {
     than = (
@@ -153,7 +196,7 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep, 
         {xemGiai ? loiGiai : null}
       </>
     )
-    nutChinh = <button type="button" className="ccs-nut-chinh" onClick={ve}>{nhanTiep}</button>
+    nutChinh = <button type="button" className="ccs-nut-chinh" onClick={veSauLuu}>{nhanTiep}</button>
     nutPhu = xemGiai || !ct ? <button type="button" className="ccs-nut-phu" onClick={onVe}>{nhanVe}</button>
       : <button type="button" className="ccs-nut-phu" onClick={() => setXemGiai(true)}>Xem lời giải</button>
   } else if (kq?.ket === 'xong_phan') {
@@ -166,7 +209,7 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep, 
         {loiGiai}
       </>
     )
-    nutChinh = <button type="button" className="ccs-nut-chinh" onClick={ve}>{nhanTiep}</button>
+    nutChinh = <button type="button" className="ccs-nut-chinh" onClick={veSauLuu}>{nhanTiep}</button>
   } else if (kq?.ket === 'loi_giai') {
     than = (
       <>
@@ -177,7 +220,7 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep, 
         {loiGiai}
       </>
     )
-    nutChinh = <button type="button" className="ccs-nut-chinh" onClick={ve}>{nhanTiep}</button>
+    nutChinh = <button type="button" className="ccs-nut-chinh" onClick={veSauLuu}>{nhanTiep}</button>
   } else if (kq?.ket === 'goi_y') {
     than = (
       <>

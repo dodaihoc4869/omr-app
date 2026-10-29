@@ -1,0 +1,46 @@
+# KIỂM TRA «NẠP TRƯỚC TRƯỚC 4H SÁNG» (CHỈ ĐỌC) — thầy 29/10: «Mỗi ngày load trước luôn cho học sinh trước 4h sáng, để học sinh bấm vào là tức thì».
+# 04:10 giờ VN mỗi ngày (21:10 UTC): đếm em có gói hôm nay và bao nhiêu em ĐÃ có bản lập sẵn (Sảnh + chặng đầu, server/src/san-sang.ts) của đúng ngày + đúng cách tính dấu.
+# Chỉ SELECT, chỉ in số đếm gộp (không mã em, không tên). Dưới 90 % ⇒ job đỏ + mở issue nhãn `toc-do` (việc ưu tiên số 1 của phiên kế tiếp).
+name: Kiểm tra nạp trước trước 4h sáng (chỉ đọc)
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '10 21 * * *'
+permissions:
+  contents: read
+  issues: write
+concurrency:
+  group: kiem-san-sang-dem-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  kiem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm em đã có bản lập sẵn hôm nay (chỉ SELECT gộp)
+        id: dem
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          Q="SELECT (SELECT COUNT(DISTINCT e.sbd) FROM goi_bai_7_em e JOIN hoc_sinh h ON h.sbd=e.sbd WHERE e.han>=date('now','+7 hours') AND COALESCE(h.trang_thai,'')<>'khoa') AS co_goi, (SELECT COUNT(*) FROM hoc_tap_san_sang s WHERE s.ngay=date('now','+7 hours') AND s.dau LIKE 'v4%') AS san, (SELECT COUNT(*) FROM hoc_tap_san_sang s WHERE s.ngay=date('now','+7 hours') AND s.chang_json IS NOT NULL) AS co_chang, (SELECT MAX(luc) FROM hoc_tap_san_sang s WHERE s.ngay=date('now','+7 hours')) AS luc_cuoi"
+          R=$(npx -y wrangler@4 d1 execute omr --remote --json --command "$Q" | jq -c '.[0].results[0]')
+          echo "$R"
+          CO=$(echo "$R" | jq '.co_goi'); SAN=$(echo "$R" | jq '.san')
+          echo "co_goi=$CO" >> "$GITHUB_OUTPUT"; echo "san=$SAN" >> "$GITHUB_OUTPUT"
+          echo "Giờ VN lúc đếm: $(TZ=Asia/Ho_Chi_Minh date '+%H:%M')"
+          if [ "${CO:-0}" -gt 0 ] && [ $((SAN * 100)) -lt $((CO * 90)) ]; then echo "THIEU=1" >> "$GITHUB_OUTPUT"; echo "::error::Chỉ $SAN/$CO em có bản lập sẵn lúc 04:10 (cần ≥ 90 %)"; exit 1; fi
+      - name: Mở issue khi thiếu
+        if: failure() && steps.dem.outputs.THIEU == '1' && github.event_name == 'schedule' # chạy tay giữa ngày chỉ để xem số, không mở issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create --repo "${{ github.repository }}" --label toc-do --title "Nạp trước đêm: chỉ ${{ steps.dem.outputs.san }}/${{ steps.dem.outputs.co_goi }} em có bản lập sẵn lúc 04:10" \
+            --body "Kiểm tra tự động 04:10 giờ VN (kiem-san-sang-dem-2910.yml): cron đêm (server/src/san-sang.ts \`cronSanSangDem\`, 00:15–03:59, 10 em/phút) chưa kịp lập đủ bản sẵn. Kiểm: log \`[san-sang] đêm\`, dấu đổi giữa đêm, throughput." || true

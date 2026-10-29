@@ -7,7 +7,8 @@
 // Đáp án KHÔNG xuống máy: chỉ trả đề (`publicQuestion`); đáp án về sau khi nộp như mọi câu.
 // Chi phí: 1 lượt đọc phiên + lượt nộp của phiên (song song), meta câu sai, phần chung của bộ chọn câu anh em (một lần cho cả chặng), 1 lệnh ghi phiên.
 import type { Env } from './kieu'
-import { publicQuestion } from '../../src/game/than-thu-v2/core'
+import { publicQuestion, type PrivateQuestion } from '../../src/game/than-thu-v2/core'
+import { ganNiemChoCau } from './niem-cau'
 import { chonAnhEmChoCaDaDung } from './cau-anh-em'
 import { docMetaCau } from './srs2-d1'
 import { readGameScope } from './game-v2-reports'
@@ -53,7 +54,7 @@ export async function lamLaiCuoiChang7(env: Env, sbd: string, b: Row, now: numbe
   // Gọi lại (mất mạng, bấm lặp) ⇒ trả đúng các câu làm lại đã cấp mà em chưa làm, không cấp vòng thứ hai.
   if (s.lamLai === 1) {
     const cu = s.questions.filter(r => r.lamLaiCuoi && !daLam.has(r.qid))
-    return { ok: true, questions: await napCau(env, cu) }
+    return { ok: true, questions: await napCau(env, sbd, cu) }
   }
   if (!control.enabled) return { ok: true, questions: [] }
   const sai = cauSaiCuaPhien(s.questions, (luot.results ?? []).map(l => ({ qid: l.qid, json: String(l.json) }))).slice(0, TRAN_LAM_LAI)
@@ -63,25 +64,29 @@ export async function lamLaiCuoiChang7(env: Env, sbd: string, b: Row, now: numbe
   const cho = sai.map(r => meta.get(r.qid)).filter((m): m is NonNullable<typeof m> => !!m && !!m.dang && !m.tuLuan)
   const trongDe = s.questions.map(r => ({ qid: r.qid, group: r.group }))
   const ae = await chonAnhEmChoCaDaDung(env, sbd, now, cho, trongDe)
-  const moi: RefGoi7[] = [], questions: Record<string, unknown>[] = []
+  const moi: RefGoi7[] = [], questions: Record<string, unknown>[] = [], riengQ: PrivateQuestion[] = []
   for (const r of sai) {
     const x = ae.get(r.qid)
     if (!x || laCauTuLuan(x.q) || !x.q.reviewed || control.blocked.includes(x.q.qid) || control.types.length && (!x.q.dang || !control.types.includes(x.q.dang))) continue
     const ref: RefGoi7 = { qid: x.q.qid, maDe: x.q.maDe, version: x.q.version, group: x.q.group, novel: false, role: 'on_lai', vai: 'sua', huongDan: false,
       goiY: GOI_Y_LAM_LAI, tc: tachSongSinh(r.tc ?? r.qid).goc, lamLaiCuoi: true, lamLaiCua: r.qid }
     moi.push(ref)
-    questions.push({ ...publicQuestion(x.q), vaiGoi7: 'lam_lai', lamLaiCua: r.qid })
+    riengQ.push(x.q); questions.push({ ...publicQuestion(x.q), vaiGoi7: 'lam_lai', lamLaiCua: r.qid })
   }
   if (!moi.length) return { ok: true, questions: [] }
+  const niemSom = ganNiemChoCau(env, sbd, questions, riengQ, true) // TEM NIÊM PHONG (niem-cau.ts)
   // Ghi một lần, chỉ khi phiên chưa có vòng làm lại (hai máy / bấm lặp cùng lúc ⇒ một bên thắng; bên kia nhận danh sách trống, máy em về màn kết chặng).
   const rs = await env.DB.prepare("UPDATE game_v2_session SET json=json_set(json,'$.questions',json(?),'$.lamLai',1) WHERE id=? AND sbd=? AND json_extract(json,'$.lamLai') IS NULL")
     .bind(JSON.stringify([...s.questions, ...moi]), id, sbd).run()
   if (!Number(rs.meta.changes)) return { ok: true, questions: [] }
+  await niemSom
   return { ok: true, questions }
 }
 
 /** Nạp lại đề các câu làm lại đã cấp (gọi lại lệnh). Câu không còn trong kho ⇒ bỏ. */
-async function napCau(env: Env, refs: readonly RefGoi7[]): Promise<Record<string, unknown>[]> {
-  const ra = await Promise.all(refs.map(r => docCauTheoRef(env, r).then(q => q && !laCauTuLuan(q) ? { ...publicQuestion(q), vaiGoi7: 'lam_lai', lamLaiCua: r.lamLaiCua ?? '' } : null, () => null)))
-  return ra.filter((x): x is NonNullable<typeof x> => !!x)
+async function napCau(env: Env, sbd: string, refs: readonly RefGoi7[]): Promise<Record<string, unknown>[]> {
+  const ra = await Promise.all(refs.map(r => docCauTheoRef(env, r).then(q => q && !laCauTuLuan(q) ? { q, cong: { ...publicQuestion(q), vaiGoi7: 'lam_lai', lamLaiCua: r.lamLaiCua ?? '' } as Record<string, unknown> } : null, () => null)))
+  const co = ra.filter((x): x is NonNullable<typeof x> => !!x)
+  await ganNiemChoCau(env, sbd, co.map(x => x.cong), co.map(x => x.q), true)
+  return co.map(x => x.cong)
 }
