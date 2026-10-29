@@ -13,7 +13,7 @@ import { boChangMoTruoc, boGoiNgay, ghiCauXong, GIAY_CHO_MO_CHANG, layChangGoi, 
 const tenTrangChinh = (): string => (typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Lộ trình' : 'Hôm nay')
 
 // Hôm nay nạp ĐỘNG đúng mảnh này để mở chặng trước (không sinh thêm tệp nạp / precache; mảnh màn làm bài được nạp sẵn luôn).
-export { moChangTruoc, napGoiNgay } from './mo-chang-truoc'
+export { moChangTruoc } from './mo-chang-truoc'
 import type { HinhAnh } from '../../data/examContent'
 import type { Question } from '../../game/than-thu-v2/core'
 import { docTomTatGoi7, type TomTatGoi7 } from '../../lib/goi-bai-7'
@@ -191,7 +191,9 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   // Số «đã làm» của gói (lúc lập) có thể cũ hơn Lộ trình ⇒ lấy số lớn hơn.
   const g7Goi = (raw: unknown) => { const g = docTomTatGoi7(raw), d0 = Math.max(g?.daLamHomNay ?? -1, homNay?.daLam ?? -1); return g && d0 > g.daLamHomNay ? { ...g, daLamHomNay: d0 } : g }
   const dsTuGoi = (qs: Record<string, unknown>[]) => { const ds = qs.map(({ sk: _sk, ...c }) => c as unknown as Cau); return ds.length && !ds.some(cauHong) ? ds : null }
-  const [goi0] = useState(() => { if (mo0) return null; const g = layChangGoi(sbd), ds = g && dsTuGoi(g.questions); return g && ds ? { ds, g7: g7Goi(g.goi7) } : null })
+  // Số câu chặng từ gói: tới ranh chặng kế của Lộ trình (đã làm hôm nay chia 6) — không chặng lẻ khi em làm dở rồi thoát.
+  const soCauGoi = () => { const d = Math.max(homNay?.daLam ?? 0, 0); return 6 - (d % 6) }
+  const [goi0] = useState(() => { if (mo0) return null; const g = layChangGoi(sbd, Date.now(), soCauGoi()), ds = g && dsTuGoi(g.questions); return g && ds ? { ds, g7: g7Goi(g.goi7) } : null })
   const dau0 = mo0 ?? goi0
   const [phien, setPhien] = useState(mo0?.id ?? ''), [cau, setCau] = useState<Cau[]>(dau0?.ds ?? []), [viTri, setViTri] = useState(0)
   const [tra, setTra] = useState(''), [ket, setKet] = useState<Record<string, Ket>>({}), [tai, setTai] = useState(!dau0), [nop, setNop] = useState(false), [loi, setLoi] = useState(''), [hetCau, setHetCau] = useState(''), [lan, setLan] = useState(0), [xong, setXong] = useState(false), [goiY, setGoiY] = useState(false)
@@ -325,7 +327,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     const duongCu = () => layChangMoTruoc(token) ?? guiLaiBenVung(() => goiHoa2('hoc-tap-start', token, {}, GIAY_CHO_MO_CHANG))
     // GÓI CẢ NGÀY (thầy 29/10 «cách khác hoàn toàn … tức thì ở mọi thời điểm, kể cả giờ cao điểm»; mo-chang-truoc.ts): máy em có sẵn chặng ⇒ câu hiện NGAY (không chờ máy
     // chủ); phiên mở NỀN bằng lệnh nhẹ `hoc-tap-mo-goi` rồi nhận mã phiên + tem mới, bỏ câu máy chủ báo em đã làm (máy khác). Máy chủ từ chối / lỗi ⇒ đường cũ.
-    const goi = layChangGoi(sbd)
+    const goi = layChangGoi(sbd, Date.now(), soCauGoi())
     const dsGoi = goi && dsTuGoi(goi.questions)
     const mo: Promise<{ id: string; sk: Record<string, unknown>; qids: Set<string> }> = goi && dsGoi ? (() => {
       const g7 = g7Goi(goi.goi7)
@@ -334,7 +336,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
       setTai(false)
       const temDai: Record<string, unknown> = {}
       for (const c of goi.questions) if (typeof c.qid === 'string' && typeof c.sk === 'string') temDai[c.qid] = c.sk
-      return goiHoa2('hoc-tap-mo-goi', token, { ve: goi.ve, sk: temDai }, GIAY_CHO_MO_CHANG).then(r => {
+      return goiHoa2('hoc-tap-mo-goi', token, { ves: goi.ves, qids: dsGoi.map(c => c.qid), sk: temDai }, GIAY_CHO_MO_CHANG).then(r => {
         if (r.ok !== true || typeof r.id !== 'string' || !Array.isArray(r.qids)) {
           if (typeof r.ma === 'string' && r.ma.startsWith('GOI_')) boGoiNgay(sbd) // gói không dùng được nữa ⇒ đường cũ tới khi gói mới về
           throw Object.assign(new Error('goi'), { roiVe: true })

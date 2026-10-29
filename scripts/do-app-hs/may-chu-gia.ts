@@ -70,6 +70,10 @@ const cauTuLuyen = (n: number) => Array.from({ length: n }, (_, i) => ({ qid: `T
 const CAU_CHANG = Array.from({ length: 8 }, (_, i) => ({ qid: `K${i}`, version: '1', group: 'g', phan: 'I', maDe: 'BAI1', tenDang: DANG[i % 6], mucDo: 'hieu', sao: 0, kienThuc: [], hinhAnh: [], ideas: [],
   text: `Câu ${i + 1}: ${chu(i, 2)}. Chất nào sau đây thoả mãn?`, choices: [chu(i, 1), chu(i + 1, 1), chu(i + 2, 1), chu(i + 3, 1)] }))
 const lamChang = { daNop: 0, chuoi: 0, daTra: new Set<string>() }
+/** SBD của lượt đăng nhập gần nhất — gói cả ngày (`hoc-tap-goi-ngay`) trả kèm để máy em cất đúng chỗ. */
+let sbdGia = ''
+const goi7Gia = (): Obj => ({ bat: true, ngay: ngayVn(), toiThieu: 40, daLamHomNay: 12 + lamChang.daNop, tuLamCon: 20, tiepCanCon: 8, thieuPhu: 0, thieuNgay: 0, canHoTro: false,
+  kienThucCu: { tong: 0, dat: 0, tyLe: null }, goi: [{ id: 'g1', ten: 'Ester – Lipid', batDau: '2026-09-28', han: '2026-10-04', tong: 40, daGap: 12, con: 28, quota: 8, gapHomNay: 2, quaHan: false, canBoSung: 0, to: ['BAI1'] }], diemDaDo: [] })
 
 export function datLai() {
   lamChang.daNop = 0; lamChang.chuoi = 0; lamChang.daTra.clear()
@@ -83,6 +87,7 @@ export async function traLoi(duong: string, body: Obj): Promise<Obj> {
   switch (duong) {
     case '/hs/dang-nhap': {
       const dn = { ok: true, token: 'tk-gia', sbd: body.sbd, hoTen: 'Học Sinh Thử', lop: '12A0', namSinh: '2008' }
+      sbdGia = String(body.sbd ?? '')
       // Máy chủ mới (D1 06/10): máy em xin `kemSanh` ⇒ trả THEO LUỒNG (NDJSON): dòng 1 = đăng nhập, dòng 2 = `{sanh}` (phản hồi hoa2-sanh). Máy em cũ không xin ⇒ y như trước.
       // (Playwright không phát được thân theo từng nhịp: máy chủ giả trả cả hai dòng một lúc — trong máy chủ giả thời gian xử lý của mọi lệnh bằng nhau nên đo ra như nhau.)
       if (body.kemSanh === true) {
@@ -135,6 +140,11 @@ export async function traLoi(duong: string, body: Obj): Promise<Obj> {
     case 'hoc-tap-start':
       return { ok: true, id: 'phien-gia', questions: CAU_CHANG, goi7: { bat: true, ngay: ngayVn(), toiThieu: 40, daLamHomNay: 12 + lamChang.daNop, tuLamCon: 20, tiepCanCon: 8, thieuPhu: 0, thieuNgay: 0, canHoTro: false,
         kienThucCu: { tong: 0, dat: 0, tyLe: null }, goi: [{ id: 'g1', ten: 'Ester – Lipid', batDau: '2026-09-28', han: '2026-10-04', tong: 40, daGap: 12, con: 28, quota: 8, gapHomNay: 2, quaHan: false, canBoSung: 0, to: ['BAI1'] }], diemDaDo: [] } }
+    // Gói bài cả ngày (server/src/goi-ngay.ts); mở phiên từ gói nhận mọi câu.
+    case 'hoc-tap-goi-ngay':
+      return { ok: true, sbd: sbdGia, ngay: ngayVn(), luc: bayGio(), goi7: goi7Gia(), chang: [{ ve: 've-gia-1'.padEnd(64, '.'), questions: CAU_CHANG }] } // một chặng đủ câu như `hoc-tap-start` (đo so sánh cùng số câu)
+    case 'hoc-tap-mo-goi':
+      return { ok: true, id: 'phien-gia', qids: CAU_CHANG.map((c) => c.qid), sk: {}, daLam: 12 + lamChang.daNop }
     case 'hoc-tap-dem':
       return { ok: true, daLamHomNay: 12 + lamChang.daNop, toiThieu: 40 }
     case 'hoc-tap-lam-lai':

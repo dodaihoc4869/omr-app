@@ -76,6 +76,7 @@ export function giuToanManHs(): void {
 
     let lanThu = 0
     const kiem = () => {
+      if (typeof document === 'undefined') return // hẹn giờ chạy sau khi môi trường test đã dỡ (đỏ oan bước phát hành 29/10)
       if (document.visibilityState === 'hidden' || !viewport) return
       const s: SoDoMan = {
         toanMan: !!toanMan?.matches,
