@@ -21,6 +21,7 @@ function dbThu() {
     CREATE TABLE loi_giai_hoi(sbd TEXT,qid TEXT,luc TEXT);
     CREATE TABLE chua_gon_lan(khoa TEXT,dot_id TEXT,sbd TEXT,ngay_vn TEXT,ket TEXT,dung INTEGER,lan INTEGER);
     CREATE TABLE tu_sua_viec_ngay(sbd TEXT,ngay_vn TEXT,muc_json TEXT,xong_json TEXT,them INTEGER,cap_nhat_luc INTEGER,PRIMARY KEY(sbd,ngay_vn));
+    CREATE TABLE tu_sua_muc_tieu_ngay(sbd TEXT,ngay_vn TEXT,muc_tieu INTEGER,PRIMARY KEY(sbd,ngay_vn));
     CREATE INDEX idx_sbd ON chua_loi_dot(sbd,trang_thai_day,den_han);
     CREATE TABLE hoi_thay_kiem(id TEXT PRIMARY KEY,sbd TEXT,qid_goc TEXT,version_goc TEXT DEFAULT 'v1',nhom_goc TEXT DEFAULT 'G',trang_thai TEXT DEFAULT 'da_nop',het_han_luc INTEGER DEFAULT 0,phat_luc INTEGER DEFAULT 0,den_han INTEGER);
     CREATE INDEX htk_em_goc ON hoi_thay_kiem(sbd,qid_goc);

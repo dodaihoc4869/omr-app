@@ -259,18 +259,33 @@ export interface MocDanhSachChua { hang: number; giaoLuc: number; dotId: string;
 export interface LichKiemLaiHoiThay { qid: string; ten: string; phan: string; trangThai: 'dang_lam' | 'den_han' | 'cho_kiem_lai'; denHan?: string }
 /** Việc hôm nay của Tự sửa lỗi máy chủ đang giữ (28/10, server/src/tu-sua-viec-ngay.ts): ngày VN · mục đã chọn · khoá câu đã xong phần · số chặng thêm. */
 export interface MucViecNgay { q: string; d?: string; t: string; h?: string; l: 'gan' | 'dang' | 'moi' | 'goc' }
-export interface ViecNgayMayChu { n: string; m: MucViecNgay[]; x: string[]; them: number }
+/** `mt` = số câu mục tiêu của phần ngày khi máy chủ lập hơn 12 câu (Sửa lỗi 12–36 câu/ngày, 29/10); vắng = 12. */
+export interface ViecNgayMayChu { n: string; m: MucViecNgay[]; x: string[]; them: number; mt?: number }
+/** Kế hoạch ngày máy chủ lập (29/10): số câu mục tiêu `n` (12…36) + câu bổ sung theo thứ tự chọn (đủ dạng, đủ mức). Chỉ có khi việc hôm nay chưa lập / còn thiếu. */
+export interface KeSuaNgay { n: number; ung: MucViecNgay[] }
 export type KetQuaDanhSachChua =
-  | { trangThai: 'bat'; ds: MucChua[]; dem?: DemDanhSachChua; sau?: MocDanhSachChua; kiemLaiHoiThay?: LichKiemLaiHoiThay[]; viecNgay?: ViecNgayMayChu }
+  | { trangThai: 'bat'; ds: MucChua[]; dem?: DemDanhSachChua; sau?: MocDanhSachChua; kiemLaiHoiThay?: LichKiemLaiHoiThay[]; viecNgay?: ViecNgayMayChu; ke?: KeSuaNgay }
   | { trangThai: 'tat' }
   | { trangThai: 'loi'; loi: string }
+/** Máy em có cần máy chủ lập kế hoạch ngày (Sửa lỗi 12–36 câu) không: chưa có việc hôm nay, hoặc có mà chưa nhớ mục tiêu `mt` và chưa làm câu nào / thêm chặng.
+ *  Đọc thẳng nhật ký trên máy (khoá viết thẳng như tu-sua-viec-hom-nay.ts — mảnh ấy nạp lười). Lỗi đọc ⇒ xin (không hại: máy chủ chỉ trả `ke` khi cần). */
+function canXinKe(): boolean {
+  try {
+    const sbd = (JSON.parse(localStorage.getItem('omr_student_portal_auth') || 'null') as { sbd?: unknown } | null)?.sbd
+    if (typeof sbd !== 'string' || !sbd.trim()) return false
+    const nk = JSON.parse(localStorage.getItem(`omr_tu_sua_hom_nay_${sbd.trim()}`) || 'null') as { n?: unknown; m?: unknown; x?: unknown; them?: unknown; mt?: unknown } | null
+    const homNay = new Date(Date.now() + 7 * 3600_000).toISOString().slice(0, 10)
+    if (!nk || nk.n !== homNay || !Array.isArray(nk.m) || nk.m.length === 0) return true
+    return !(Number(nk.mt) >= 12) && Array.isArray(nk.x) && nk.x.length === 0 && !(Number(nk.them) > 0)
+  } catch { return true }
+}
 export async function apiDanhSachTuChua(token: string, sau?: MocDanhSachChua): Promise<KetQuaDanhSachChua> {
   if (!sau) {
     const co = await goi('co', token)
     if (!co) return { trangThai: 'loi', loi: LOI_MANG }
     if (co.ok !== true) return { trangThai: 'tat' }
   }
-  const j = await goi('danh-sach', token, sau ? { sau } : {})
+  const j = await goi('danh-sach', token, sau ? { sau } : canXinKe() ? { ke: 1 } : {})
   if (j?.ma === 'FEATURE_TAT') return { trangThai: 'tat' }
   if (!j?.ok || !Array.isArray(j.ds)) return { trangThai: 'loi', loi: loiCua(j) }
   const ds = (j.ds as Obj[])
@@ -297,8 +312,10 @@ export async function apiDanhSachTuChua(token: string, sau?: MocDanhSachChua): P
     })
   }
   const vn = docViecNgay(j.viecNgay)
+  const ke = docKeSuaNgay(j.ke)
   return { trangThai: 'bat', ds,
     ...(vn ? { viecNgay: vn } : {}),
+    ...(ke ? { ke } : {}),
     ...(Array.isArray(j.kiemLaiHoiThay) ? { kiemLaiHoiThay: [...lich.values()] } : {}),
     ...(demDung ? { dem: { tong: Number(dem.tong), can: Number(dem.can), cho: Number(dem.cho), xong: Number(dem.xong),
       ...(Number.isSafeInteger(dem.xongHomNay) && Number(dem.xongHomNay) >= 0 ? { xongHomNay: Number(dem.xongHomNay) } : {}) } } : {}),
@@ -308,20 +325,30 @@ export async function apiDanhSachTuChua(token: string, sau?: MocDanhSachChua): P
 }
 
 const LOAI_VIEC = new Set(['gan', 'dang', 'moi', 'goc'])
+const docMuc = (a: unknown): MucViecNgay[] => (Array.isArray(a) ? a as Obj[] : []).filter((x) => !!x && typeof x.q === 'string' && !!x.q && typeof x.t === 'string' && LOAI_VIEC.has(chu(x.l)))
+  .map((x): MucViecNgay => ({ q: chu(x.q), ...(typeof x.d === 'string' && x.d ? { d: x.d } : {}), t: chu(x.t), ...(typeof x.h === 'string' && x.h ? { h: x.h } : {}), l: chu(x.l) as MucViecNgay['l'] }))
+/** Số câu mục tiêu hợp lệ (12…36) hoặc 0. */
+const docMucTieu = (v: unknown): number => { const n = Math.floor(Number(v)); return Number.isFinite(n) && n >= 12 ? Math.min(36, n) : 0 }
 /** Đọc `viecNgay` của máy chủ; hỏng / vắng ⇒ null (máy em dùng bản đệm trên máy). */
 export function docViecNgay(v: unknown): ViecNgayMayChu | null {
   if (!v || typeof v !== 'object') return null
   const o = v as Obj
   if (typeof o.n !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(o.n)) return null
-  const m = (Array.isArray(o.m) ? o.m as Obj[] : []).filter((x) => !!x && typeof x.q === 'string' && !!x.q && typeof x.t === 'string' && LOAI_VIEC.has(chu(x.l)))
-    .map((x): MucViecNgay => ({ q: chu(x.q), ...(typeof x.d === 'string' && x.d ? { d: x.d } : {}), t: chu(x.t), ...(typeof x.h === 'string' && x.h ? { h: x.h } : {}), l: chu(x.l) as MucViecNgay['l'] }))
   const x = (Array.isArray(o.x) ? o.x : []).filter((k): k is string => typeof k === 'string' && !!k)
-  return { n: o.n, m, x, them: Math.max(0, Math.floor(Number(o.them) || 0)) }
+  const mt = docMucTieu(o.mt)
+  return { n: o.n, m: docMuc(o.m), x, them: Math.max(0, Math.floor(Number(o.them) || 0)), ...(mt ? { mt } : {}) }
+}
+/** Đọc `ke` (kế hoạch ngày) của máy chủ; hỏng / vắng ⇒ null (máy em chọn 12 câu như cũ). */
+export function docKeSuaNgay(v: unknown): KeSuaNgay | null {
+  if (!v || typeof v !== 'object') return null
+  const o = v as Obj
+  const n = Math.floor(Number(o.n))
+  return Number.isFinite(n) && n >= 12 ? { n: Math.min(36, n), ung: docMuc(o.ung).slice(0, 36) } : null
 }
 /** Gửi NỀN việc hôm nay lên máy chủ (đổi máy vẫn cùng 12 câu). Lỗi ⇒ bỏ qua (bản đệm trên máy vẫn đúng). */
 export async function apiGhiViecNgay(token: string, v: ViecNgayMayChu, khoa = false): Promise<boolean> {
   // `khoa` (28/10): Lộ trình đang khoá các chặng sau nút Tự sửa lỗi ⇒ máy chủ ghi một dòng / ngày để chặn mở chặng bằng lối khác (TU_SUA_TRUOC)
-  const j = await goi('viec-ngay', token, { ngay: v.n, m: v.m, x: v.x, them: v.them, ...(khoa ? { khoa: true } : {}) })
+  const j = await goi('viec-ngay', token, { ngay: v.n, m: v.m, x: v.x, them: v.them, ...(v.mt ? { mt: v.mt } : {}), ...(khoa ? { khoa: true } : {}) })
   return j?.ok === true
 }
 
