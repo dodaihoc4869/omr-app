@@ -76,7 +76,8 @@ export const datLaiBaoRoiApp = (): void => { cuoiBaoRoi = 0 }
 // Máy chủ tắt / em chưa được bật (`tat`) ⇒ nhớ 30 phút, mọi thứ y như cũ. Không có gói / gói hỏng / máy chủ từ chối ⇒ đường mở chặng cũ.
 type ChangGoi = { ve: string; questions: KetQuaMo[] }
 type GoiNgay = { ngay: string; luc: number; chang: ChangGoi[]; goi7?: unknown }
-const khoaGoi = (sbd: string) => `omr_goi_ngay_${sbd}`, khoaXong = (sbd: string) => `omr_goi_ngay_xong_${sbd}`
+// SBD bỏ khoảng trắng hai đầu: phiên lưu trên máy có thể mang khoảng trắng (mo-app-hs-nhanh-0510), máy chủ trả SBD sạch ⇒ cùng một khoá.
+const khoaGoi = (sbd: string) => `omr_goi_ngay_${sbd.trim()}`, khoaXong = (sbd: string) => `omr_goi_ngay_xong_${sbd.trim()}`
 const KHOA_CUA = 'omr_goi_ngay_cua', KHOA_TAT = 'omr_goi_ngay_tat'
 const ngayMay = (ms: number) => new Date(ms + 7 * 3600_000).toISOString().slice(0, 10)
 /** Lập lại gói tối đa một lần mỗi chừng này (trừ lượt sau chặng: luôn lập lại). */
@@ -93,6 +94,7 @@ const docJson = (k: string): unknown => { try { return JSON.parse(localStorage.g
 const ghiJson = (k: string, v: unknown) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch { /* đầy / bị chặn: vẫn dùng bản trong bộ nhớ */ } }
 
 function docGoi(sbd: string): GoiNgay | null {
+  sbd = sbd.trim()
   const m = nhoGoi.get(sbd)
   if (m) return m
   const g = docJson(khoaGoi(sbd)) as GoiNgay | null
@@ -101,6 +103,7 @@ function docGoi(sbd: string): GoiNgay | null {
   return g
 }
 function docXong(sbd: string, ngay: string): Set<string> {
+  sbd = sbd.trim()
   const m = nhoXong.get(sbd)
   if (m && m.n === ngay) return m.q
   const x = docJson(khoaXong(sbd)) as { n?: unknown; q?: unknown } | null
@@ -123,7 +126,7 @@ export function napGoiNgay(token: string, goi: typeof goiHoa2 = goiHoa2, now: nu
     if (typeof r.ngay !== 'string' || !Array.isArray(r.chang)) return
     const chang = (r.chang as ChangGoi[]).filter((c) => c && typeof c.ve === 'string' && Array.isArray(c.questions) && c.questions.length > 0)
     const g: GoiNgay = { ngay: r.ngay, luc: now, chang, goi7: r.goi7 }
-    nhoGoi.set(r.sbd, g)
+    nhoGoi.set(r.sbd.trim(), g)
     ghiJson(khoaGoi(r.sbd), g)
     ghiJson(KHOA_CUA, { sbd: r.sbd, t: duoiToken(token) })
   }).catch(() => {}).finally(() => { napDang = null })
@@ -163,7 +166,7 @@ export function ghiCauXong(sbd: string, qid: string, now: number = Date.now()): 
 
 /** Bỏ gói (máy chủ từ chối gói: hết hạn / bài đổi / em đã làm hết) — lần sau đi đường cũ tới khi gói mới về. */
 export function boGoiNgay(sbd: string): void {
-  nhoGoi.delete(sbd)
+  nhoGoi.delete(sbd.trim())
   try { localStorage.removeItem(khoaGoi(sbd)) } catch { /* bỏ qua */ }
 }
 /** Chỉ cho test. */
