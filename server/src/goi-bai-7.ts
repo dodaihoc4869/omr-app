@@ -641,7 +641,7 @@ export function tomTatGoi7(lap: NonNullable<Awaited<ReturnType<typeof lapGoi7>>>
 /** Một đợt tối đa 6 câu; giữ các câu/phiên bản và vai ở máy chủ, không phát đáp án. */
 /** `khongLuu` (SẴN SÀNG 27/10, san-sang.ts): lập đúng chặng như lượt thật nhưng KHÔNG lưu phiên — trả `chuanBi` {refs, questions, goi7, goiIds} để nơi gọi
  *  cất sẵn; phiên chỉ được lưu lúc em thật sự mở chặng (`moChangSanSang`). Không có kế hoạch / chặng rỗng ⇒ null. */
-export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Promise<{ results: Row[] }>, opts?: { khongLuu?: boolean }): Promise<Record<string,unknown> | null> {
+export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Promise<{ results: Row[] }>, opts?: { khongLuu?: boolean; lapSan?: LapGoi7 }): Promise<Record<string,unknown> | null> {
   // Đợt 17: khối em + đợt cũ (và câu đã trả lời của nó) đọc SONG SONG với lập kế hoạch — trước đây nối tiếp sau `lapGoi7`. Bảng gói chắc có trước (`damBaoGoi7`).
   const khoiSom = som(docKhoiEm(env,sbd))
   // Cờ «học kiểu Duolingo» (duolingo-bai-co.ts): đọc qua đệm, bắt đầu cùng đợt đầu — không thêm vòng chờ.
@@ -661,9 +661,10 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
   const hoan: D1PreparedStatement[] = []
   // DÙNG LẠI KẾ HOẠCH SẢNH VỪA LẬP (19/10, goi-bai-7-nho.ts): có bản nhớ ⇒ đọc lại "đã làm hôm nay / vừa làm" CÙNG đợt D1 đầu (song song khối em, đợt cũ);
   // khớp từng câu với lúc sảnh lập ⇒ dùng đúng kế hoạch ấy (bỏ cả lượt lập ~25 lệnh D1 + ~0,2 s CPU; lô ghi động cơ sảnh đã gửi). Lệch ⇒ lập lại như cũ.
-  const nho = layKeHoach7<LapGoi7>(env.DB, sbd, now)
+  // 29/10 tối: khi `chuanBiSanSang` truyền sẵn `opts.lapSan`, dùng thẳng kế hoạch đó — KHÔNG gọi `layKeHoach7` để không xoá mất bản nhớ `nhoLapSanh7` của lượt `hoc-tap-start` thật của em!
+  const nho = opts?.lapSan ? null : layKeHoach7<LapGoi7>(env.DB, sbd, now)
   const kiemNhoSom = nho && ngayVn7(nho.luc) === ngayVn7(now) ? som(docDaLamVaVuaLam7(env, sbd, ngayVn7(now), now)) : null
-  let lapNho: LapGoi7 | null = null
+  let lapNho: LapGoi7 | null = opts?.lapSan ?? null
   if (nho && kiemNhoSom) {
     const moi = await kiemNhoSom.catch(() => null)
     if (moi && moi.soVua === nho.soVua && cungTap(moi.daLam, nho.daLam) && cungTap(moi.vuaLam, nho.vuaLam)) lapNho = nho.lap

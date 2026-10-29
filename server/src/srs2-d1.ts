@@ -771,7 +771,8 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
   if (ht) {
     // `ungMoRong` (nơi gọi tự lập ứng viên — Gói 7, kho v6) ⇒ KHÔNG đọc vòng xoay `ungVienHanhTrinh`: kết quả của nó chỉ là đầu vào của `ungVienV6`
     // (đợt 18 — trước: vẫn đọc rồi bỏ, hai đợt D1 nối tiếp trên đường Sảnh / Mở chặng). Kết quả hồ sơ y hệt.
-    const ung:readonly string[] = ungMoRong ? await ungMoRong : await ungVienHanhTrinh(env, ht.id, sbd, homNay, ht.qids).then((rotated) => import('./hanh-trinh-v6-kho').then(m=>m.ungVienV6(env,ht,sbd,homNay,phamVi,rotated)))
+    const v6P = ungMoRong ? null : import('./hanh-trinh-v6-kho')
+    const ung:readonly string[] = ungMoRong ? await ungMoRong : await ungVienHanhTrinh(env, ht.id, sbd, homNay, ht.qids).then(async (rotated) => (await v6P!).ungVienV6(env,ht,sbd,homNay,phamVi,rotated))
     const can = new Set([...ung, ...qidSaiCa.keys(), ...qidSaiLop.keys(), ...qidSaiMoiKenh.keys(), ...hoiThayDenHan])
     // Không nạp lại toàn bộ kho của các chiến dịch nguồn đã đóng.
     for (let i = 0; i < ds.length; i++) ds[i] = { ...ds[i]!, qids: ds[i]!.qids.filter(q => can.has(q)) }

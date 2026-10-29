@@ -21,8 +21,8 @@ import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, ChevronRight, Clock3,
 import type { KetQuaDanhSachChua, LichKiemLaiHoiThay, MucChua } from '../../lib/chua-cau-sai-api'
 import { docNhoTuSua, nhomMucChua, taiTuSuaLoi, type NhomMucChua } from '../../lib/tu-sua-loi'
 import { napTruocCauSua } from '../../lib/nap-truoc-sua'
-/** Bản nhớ danh sách còn mới (ms) để vẽ ngay khi mở màn Tự sửa lỗi; quá hạn ⇒ khung chờ như cũ. */
-const NHO_VE_NGAY_MS = 120_000
+/** Bản nhớ danh sách còn mới (ms) để vẽ ngay khi mở màn Tự sửa lỗi; quá hạn ⇒ khung chờ như cũ. (29/10 tối: nâng lên 10 phút = NHO_TU_SUA_MS để bấm từ Lộ trình luôn hiện ngay 0 ms.) */
+const NHO_VE_NGAY_MS = 600_000
 import { dungViecHomNay, docSbdHs, luuViecHomNay } from '../../lib/tu-sua-viec-hom-nay'
 import ViecHomNay from './ViecHomNay'
 import { useDanhDauHt2 } from './HocTapHomNay'

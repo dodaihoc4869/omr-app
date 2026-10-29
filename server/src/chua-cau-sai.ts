@@ -32,6 +32,7 @@ import { khopPhanIII } from '../../src/lib/cham-so'
 import { denLuotDong, NGAY_CUA_SO_GON, SQL_DONG_DA_DUNG_LAI } from './chua-gon'
 import { lenhDocViecNgay, viecNgayTuDong } from './tu-sua-viec-ngay'
 import { lapKeSuaNgay, MOC_DA_SUA_MS, SQL_UNG_VIEN_SUA } from './sua-loi-ke-ngay'
+import { phanLoaiLoi, thanTuLoiNem } from './loi-may-chu'
 type Obj = Record<string, unknown>
 const str = (v: unknown) => (typeof v === 'string' ? v : '')
 const num = (v: unknown) => Number(v) || 0
@@ -43,7 +44,16 @@ const demCaMoQuyen = new DemTTL<boolean>(8_000, 3000)
 let daDangKyCaMo = false
 const dangKyXoaCaMo = () => { if (!daDangKyCaMo) { daDangKyCaMo = true; dangKySauXoaCaBaoVe(() => demCaMoQuyen.xoa()) } } // lúc ghi đầu, không lúc nạp mô-đun (vòng nhập với game-v2-bank)
 export async function quyen(env: Env, b: Obj): Promise<string | Response> {
-  const sbd = await gameIdentity(env, b).catch(() => '')
+  let sbd = ''
+  try {
+    sbd = await gameIdentity(env, b)
+  } catch (e) {
+    // 29/10 tối (ảnh HS «Chưa tải được câu cần sửa — Em đăng nhập lại để tiếp tục»): khi D1 bận / quá tải lúc xác thực, KHÔNG biến thành 401 CAN_DANG_NHAP.
+    if (phanLoaiLoi(e instanceof Error ? e.message : String(e ?? '')) !== 'giu') {
+      const r = thanTuLoiNem(e)
+      return Response.json({ ...r.data, mo: r.data.error }, { status: r.status })
+    }
+  }
   if (!sbd) return loi('CAN_DANG_NHAP', 'Em đăng nhập lại để tiếp tục.', 401)
   // 13/10 (thầy: "chỗ này mở câu quá lâu"): hai lượt ĐỌC độc lập (cờ tính năng, ca đang mở) chạy CÙNG đợt — trước: nối tiếp. Thứ tự xét + lời giữ nguyên.
   const caNho = demCaMoQuyen.doc(sbd, Date.now())

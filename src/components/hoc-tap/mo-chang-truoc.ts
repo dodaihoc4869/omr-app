@@ -13,7 +13,7 @@ export const TUOI_MO_TRUOC_MS = 10 * 60_000
 /** Thời hạn chờ máy chủ của lệnh mở chặng — đúng số giây màn làm bài vẫn dùng. */
 export const GIAY_CHO_MO_CHANG = 40
 
-let dangCo: { token: string; luc: number; p: Promise<KetQuaMo> } | null = null
+let dangCo: { token: string; luc: number; p: Promise<KetQuaMo>; kq?: KetQuaMo } | null = null
 /** Bộ test mặc định TẮT (lượt mở trước sống theo mô-đun ⇒ test sau dùng nhầm máy chủ giả của test trước); test của tính năng bật bằng `batMoChangTruoc(true)`. */
 let bat = !(globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.VITEST
 export function batMoChangTruoc(b: boolean): void { bat = b; dangCo = null }
@@ -23,8 +23,17 @@ export function moChangTruoc(token: string, goi: typeof goiHoa2 = goiHoa2, now: 
   if (!bat || !token) return
   if (dangCo && dangCo.token === token && now - dangCo.luc < TUOI_MO_TRUOC_MS) return
   const p = goi('hoc-tap-start', token, {}, GIAY_CHO_MO_CHANG)
-  p.catch(() => {}) // lỗi để lượt dùng xử lý (gọi lại)
-  dangCo = { token, luc: now, p }
+  const muc: { token: string; luc: number; p: Promise<KetQuaMo>; kq?: KetQuaMo } = { token, luc: now, p }
+  p.then((r) => { if (r && r.ok === true && Array.isArray(r.questions)) muc.kq = r }, () => {}) // lỗi để lượt dùng xử lý (gọi lại)
+  dangCo = muc
+}
+
+/** Đọc ĐỒNG BỘ (và XOÁ) lượt mở trước ĐÃ VỀ thành công của `token` ⇒ mở câu đầu tức thì 0 ms (không chớp khung chờ). Chưa về / lỗi ⇒ null (nhường `layChangMoTruoc`). */
+export function layChangMoTruocNgay(token: string, now: number = Date.now()): KetQuaMo | null {
+  const c = dangCo
+  if (!c || c.token !== token || now - c.luc >= TUOI_MO_TRUOC_MS || !c.kq) return null
+  dangCo = null
+  return c.kq
 }
 
 /** Lấy (và XOÁ) lượt mở trước còn hạn của `token`; không có ⇒ null. Lượt lỗi mạng ⇒ lời hứa trả về tự gọi lại MỘT lần như cũ. */

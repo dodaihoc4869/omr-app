@@ -8,7 +8,7 @@ import { loiGiaiChuanTuKho } from '../loi-giai/KhoiLoiGiaiChuan'
 import { goiHoa2, type KetQuaSanh } from '../hoa2/api'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { nopCauLuong } from '../hoa2/doc-luong-nop'
-import { boChangMoTruoc, GIAY_CHO_MO_CHANG, layChangMoTruoc, moChangTruoc, nghePhanAnRoiApp } from './mo-chang-truoc'
+import { boChangMoTruoc, GIAY_CHO_MO_CHANG, layChangMoTruoc, layChangMoTruocNgay, moChangTruoc, nghePhanAnRoiApp } from './mo-chang-truoc'
 // Tên trang chính trên nút «về» (Boss 27/10): giao diện Trong ⇒ «Lộ trình»; giao diện cũ ⇒ «Hôm nay». Viết tại chỗ: nhập mô-đun dùng chung sẽ đẻ mảnh tải riêng (+1 tệp mở app).
 const tenTrangChinh = (): string => (typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Lộ trình' : 'Hôm nay')
 
@@ -177,16 +177,26 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   /** Số "đã làm/M câu hôm nay" + chặng — cùng nguồn vòng tròn Hôm nay (`soHomNay` trong lam-bai.ts). Thiếu ⇒ ẩn ô số, tiêu đề không ghi chặng. */
   homNay?: SoHomNay | null
 }) {
-  const [phien, setPhien] = useState(''), [cau, setCau] = useState<Cau[]>([]), [viTri, setViTri] = useState(0)
-  const [tra, setTra] = useState(''), [ket, setKet] = useState<Record<string, Ket>>({}), [tai, setTai] = useState(true), [nop, setNop] = useState(false), [loi, setLoi] = useState(''), [hetCau, setHetCau] = useState(''), [lan, setLan] = useState(0), [xong, setXong] = useState(false), [goiY, setGoiY] = useState(false)
+  // 29/10 tối (thầy «làm cho app hs load tức thì kể cả giờ cao điểm»): lượt mở trước đã về sẵn ở Lộ trình / màn kết chặng ⇒ nạp ĐỒNG BỘ ngay từ khung vẽ đầu (0 ms, không chớp khung chờ).
+  const docMoNgay = (tk: string) => {
+    const r = layChangMoTruocNgay(tk)
+    if (!r || !r.ok || !Array.isArray(r.questions)) return null
+    const ds = r.questions as Cau[]
+    if (!ds.length || ds.some(cauHong)) return null
+    return { ds, id: typeof r.id === 'string' ? r.id : '', g7: docTomTatGoi7(r.goi7) }
+  }
+  const [mo0] = useState(() => docMoNgay(token))
+  const daNapMo0 = useRef(!!mo0)
+  const [phien, setPhien] = useState(mo0?.id ?? ''), [cau, setCau] = useState<Cau[]>(mo0?.ds ?? []), [viTri, setViTri] = useState(0)
+  const [tra, setTra] = useState(''), [ket, setKet] = useState<Record<string, Ket>>({}), [tai, setTai] = useState(!mo0), [nop, setNop] = useState(false), [loi, setLoi] = useState(''), [hetCau, setHetCau] = useState(''), [lan, setLan] = useState(0), [xong, setXong] = useState(false), [goiY, setGoiY] = useState(false)
   const [tuLam, setTuLam] = useState(false), [moLoiGiai, setMoLoiGiai] = useState(false), [msCau, setMsCau] = useState<Record<string, number>>({})
-  const [goi7, setGoi7] = useState<TomTatGoi7 | undefined>(), [chang, setChang] = useState<number | null>(null)
+  const [goi7, setGoi7] = useState<TomTatGoi7 | undefined>(mo0?.g7), [chang, setChang] = useState<number | null>(null)
   // «Làm chặng kiểu Duolingo» (thầy chốt bản vẽ docs/ban-ve-duo-2610, 26/10): CHỈ khi <html data-trong> — cùng state, cùng lệnh, cùng luồng chấm/lưu/đo giây;
   // chỉ dựng cây trình bày khác (nhánh `if (duo)` cuối hàm). Tắt «Trong» ⇒ màn y cũ.
   const [duo] = useState(() => typeof document !== 'undefined' && !!document.documentElement.dataset.trong)
   // LÀM LẠI CUỐI CHẶNG kiểu Duolingo (hợp đồng docs/hop-dong-duolingo-2610.md mục 3; máy chủ goi-bai-7-lam-lai.ts): `soGoc` = số câu của chặng; câu làm lại
   // (≤ 3, chỉ đề) nối sau, mỗi chặng xin MỘT lần (`hoc-tap-lam-lai`), nộp qua `answer` cùng phiên (máy chủ tự ép có hỗ trợ). Không đếm vào số câu của chặng.
-  const [soGoc, setSoGoc] = useState(0), daXinLamLai = useRef(false), daDaySua = useRef(0)
+  const [soGoc, setSoGoc] = useState(mo0?.ds.length ?? 0), daXinLamLai = useRef(false), daDaySua = useRef(0)
   // A6 — băng combo «N câu đúng liền!» / «Phản ứng dây chuyền!» (n = số câu đúng liền lúc hiện, id = câu vừa đúng ⇒ hoạt ảnh chạy lại mỗi câu).
   const [combo, setCombo] = useState<{ n: number; id: string } | null>(null)
   // THƯỞNG BAY + MỐC COMBO (thầy 27/10, hieu-ung-duo.ts): `luot` = một lượt hiệu ứng của câu vừa chấm; `ntTre` = số nguyên tử ĐANG HIỆN trên bộ đếm khi
@@ -198,11 +208,11 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   const demRef = useRef<HTMLSpanElement>(null), biGomRef = useRef<HTMLSpanElement>(null)
   // SỐ HÔM NAY TRONG CHẶNG (khẩn 12/10 22h30 — giờ cao điểm máy chủ chậm): nhánh Gói 7 lấy (đã làm, M) từ `hoc-tap-start` lúc mở chặng rồi lệnh nhẹ
   // `hoc-tap-dem` sau mỗi câu — KHÔNG gọi lại cả sảnh (`lapGoi7` ~25 truy vấn) sau mỗi câu. Sảnh nạp lại MỘT lần khi xong chặng / rời màn.
-  const [dem, setDem] = useState<{ daLam: number; muc: number } | null>(null)
+  const [dem, setDem] = useState<{ daLam: number; muc: number } | null>(() => (mo0?.g7 ? { daLam: mo0.g7.daLamHomNay, muc: mo0.g7.toiThieu } : null))
   const canTaiSanh = useRef(false), soLuotDem = useRef(0), capNhatRef = useRef(onCapNhat)
   capNhatRef.current = onCapNhat
   // Câu MỚI em làm trong lượt này (không tính làm lại) + số «đã làm» lúc mở chặng ⇒ số thật ngay sau mỗi câu, không chờ máy chủ.
-  const moi = useRef<{ qids: Set<string>; tiep: number; d0: number; ngay: string }>({ qids: new Set(), tiep: 0, d0: -1, ngay: '' }), onVaRef = useRef(onVa)
+  const moi = useRef<{ qids: Set<string>; tiep: number; d0: number; ngay: string }>({ qids: new Set(), tiep: 0, d0: mo0?.g7 ? mo0.g7.daLamHomNay : -1, ngay: mo0?.g7?.ngay ?? '' }), onVaRef = useRef(onVa)
   onVaRef.current = onVa
   const vaSo = (d: number) => onVaRef.current?.(vaDaLamSanh(d, moi.current.tiep, moi.current.ngay))
   const batDau = useRef(0), gui = useRef(false), traRef = useRef('')
@@ -279,11 +289,19 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   if (!tai && chang === null && homNayHien?.chang) setChang(homNayHien.chang)
   const khoa = q ? `hoc-tap:nhap:${sbd}:${q.qid}:${q.version}` : ''
   useEffect(() => {
+    if (daNapMo0.current && lan === 0) { daNapMo0.current = false; return }
     let huy = false
     luotChang.current = 0; lamLaiSom.current = null
+    const san = docMoNgay(token)
+    if (san) {
+      setTai(false); setLoi(''); setHetCau(''); setCau(san.ds); setSoGoc(san.ds.length); setPhien(san.id); setGoi7(san.g7); setXong(false); setKet({}); setViTri(0); setMsCau({}); setChang(null); setCombo(null); daXinLamLai.current = false; soLuotDem.current++
+      moi.current = { qids: new Set(), tiep: 0, d0: san.g7 ? san.g7.daLamHomNay : -1, ngay: san.g7?.ngay ?? '' }
+      setDem(san.g7 ? { daLam: san.g7.daLamHomNay, muc: san.g7.toiThieu } : null)
+      return
+    }
     setTai(true); setLoi(''); setHetCau(''); setCau([]); setPhien(''); setXong(false); setKet({}); setViTri(0); setMsCau({}); setChang(null); setDem(null); setSoGoc(0); setCombo(null); daXinLamLai.current = false; soLuotDem.current++
-    // Mở chặng trước (mo-chang-truoc.ts): Hôm nay / màn xong chặng đã gọi sẵn ⇒ dùng lại đúng lượt ấy, câu hiện ngay; không có ⇒ gọi như cũ.
-    void (layChangMoTruoc(token) ?? goiHoa2('hoc-tap-start', token, {}, GIAY_CHO_MO_CHANG)).then(r => {
+    // Mở chặng trước (mo-chang-truoc.ts): Hôm nay / màn xong chặng đã gọi sẵn ⇒ dùng lại đúng lượt ấy, câu hiện ngay; không có ⇒ gọi qua guiLaiBenVung (tự thử lại khi 503 MAY_CHU_BAN / rớt mạng).
+    void (layChangMoTruoc(token) ?? guiLaiBenVung(() => goiHoa2('hoc-tap-start', token, {}, GIAY_CHO_MO_CHANG))).then(r => {
       if (huy) return
       if (!r.ok) throw Object.assign(new Error(typeof r.error === 'string' ? r.error : 'Chưa mở được chặng học.'), { ma: r.ma })
       const ds = Array.isArray(r.questions) ? r.questions as Cau[] : []

@@ -43,7 +43,7 @@ export function lamSachThanLoi<T>(data: T, status: number): { data: T; status: n
   if (!o || typeof o !== 'object' || o.ok !== false) return { data, status }
   let kieu: KieuLoi = 'giu'
   let goc = ''
-  for (const k of ['error', 'loi'] as const) {
+  for (const k of ['error', 'loi', 'mo'] as const) {
     const v = o[k]
     if (typeof v !== 'string') continue
     const kk = phanLoaiLoi(v)
@@ -56,7 +56,7 @@ export function lamSachThanLoi<T>(data: T, status: number): { data: T; status: n
   const ban = kieu === 'ban' || o.maLoi === MA_MAY_CHU_BAN
   const chu = ban ? CHU_MAY_CHU_BAN : CHU_LOI_CHUNG
   const moi: Record<string, unknown> = { ...o }
-  for (const k of ['error', 'loi'] as const) if (typeof moi[k] === 'string' && phanLoaiLoi(moi[k] as string) !== 'giu') moi[k] = chu
+  for (const k of ['error', 'loi', 'mo'] as const) if (typeof moi[k] === 'string' && phanLoaiLoi(moi[k] as string) !== 'giu') moi[k] = chu
   if (typeof moi.error !== 'string') moi.error = chu
   // `ma` cũng mang MAY_CHU_BAN (khi lệnh chưa có mã riêng): máy em cũ đọc `ma` sẵn (LoiHoa2.ma) ⇒ nhận ra máy chủ bận mà không phải tải thêm byte nào.
   if (ban) { moi.maLoi = MA_MAY_CHU_BAN; moi.thuLaiSau = THU_LAI_SAU_GIAY; if (typeof moi.ma !== 'string') moi.ma = MA_MAY_CHU_BAN }

@@ -1,11 +1,13 @@
 // Cờ pilot: đóng khi cấu hình hỏng, chỉ mở cho danh sách do thầy quản lý.
 import type { Env } from './kieu'
+import { dbGoc } from './cau-hinh-dem'
+import { phanLoaiLoi } from './loi-may-chu'
 import {
   CAU_HINH_MAC_DINH,
   KHOA_CHUA_CAU_SAI,
   type CauHinhChuaCauSai,
 } from './chua-cau-sai-kieu'
-const cache = new WeakMap<Env['DB'], { den: number; cfg: CauHinhChuaCauSai }>()
+const cache = new WeakMap<object, { den: number; cfg: CauHinhChuaCauSai }>()
 const ds = (v: unknown): string[] =>
   Array.isArray(v)
     ? [
@@ -46,7 +48,8 @@ export function chuanCauHinh(v: unknown): CauHinhChuaCauSai {
 }
 export async function docCauHinh(env: Env): Promise<CauHinhChuaCauSai> {
   const now = Date.now(),
-    hit = cache.get(env.DB)
+    k = dbGoc(env.DB as unknown as object),
+    hit = cache.get(k)
   if (hit && hit.den > now) return hit.cfg
   let cfg = chuanCauHinh(null)
   try {
@@ -56,14 +59,15 @@ export async function docCauHinh(env: Env): Promise<CauHinhChuaCauSai> {
       .bind(KHOA_CHUA_CAU_SAI)
       .first<{ gia_tri: string }>()
     if (row?.gia_tri) cfg = chuanCauHinh(JSON.parse(row.gia_tri))
-  } catch {
+  } catch (e) {
+    if (phanLoaiLoi(e instanceof Error ? e.message : String(e ?? '')) === 'ban') throw e
     /* Không có cấu hình hợp lệ thì đóng pilot. */
   }
-  cache.set(env.DB, { den: now + 15_000, cfg })
+  cache.set(k, { den: now + 15_000, cfg })
   return cfg
 }
 export function xoaDemChua(env: Env): void {
-  cache.delete(env.DB)
+  cache.delete(dbGoc(env.DB as unknown as object))
 }
 export async function tinhNangBat(
   env: Env,

@@ -67,6 +67,21 @@ describe('Worker thật: D1 đang export ⇒ máy em nhận 503 câu Việt', ()
     expect(j).toMatchObject({ ma: 'MAY_CHU_BAN', maLoi: 'MAY_CHU_BAN', thuLaiSau: 2, error: CHU_MAY_CHU_BAN })
     expect(loiLog.mock.calls.flat().map(String).join(' ')).toMatch(/long-running export/)
   })
+  it('/hs/chua-cau-sai/* khi D1 quá tải lúc xác thực ⇒ 503 MAY_CHU_BAN (không báo nhầm 401 Em đăng nhập lại)', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    const d = taoD1That()
+    d.sql.exec("INSERT INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES('S1','Em','12','mk','x')")
+    const token = await gameToken(d.env, 'S1')
+    d.env.DB.prepare = () => { throw new Error('D1_ERROR: D1 DB is overloaded. Requests queued for too long.') }
+    const res = await worker.fetch(new Request('https://local/hs/chua-cau-sai/danh-sach', {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ token }),
+    }), d.env)
+    expect(res.status).toBe(503)
+    const j = await res.json() as Record<string, unknown>
+    expect(j.ma).toBe('MAY_CHU_BAN')
+    expect(j.mo).toBe(CHU_MAY_CHU_BAN)
+  })
 })
 
 describe('xưng hô theo app khi máy chủ bận', () => {

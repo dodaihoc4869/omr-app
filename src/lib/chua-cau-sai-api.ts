@@ -120,28 +120,46 @@ type Obj = Record<string, unknown>
 const LOI_MANG = 'Chưa nối được máy chủ. Em kiểm tra mạng rồi thử lại.'
 const chu = (v: unknown) => (typeof v === 'string' ? v : String(v ?? ''))
 
+const laTest = !!(globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.VITEST
+const laBan = (status: number, j: Obj | null): boolean =>
+  status === 503 || j?.ma === 'MAY_CHU_BAN' || j?.maLoi === 'MAY_CHU_BAN' || j?.ma === 'CHO_KIEM_QUYEN'
+
 async function goi(
   lenh: string,
   token: string,
   du: Obj = {},
 ): Promise<Obj | null> {
-  const dk = new AbortController()
-  const t = setTimeout(() => dk.abort(), 20_000)
-  try {
-    const goc = await layDiaChiMayChu()
-    if (!goc) return null
-    const r = await fetch(`${goc}/hs/chua-cau-sai/${lenh}`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ ...du, token }),
-      signal: dk.signal,
-    })
-    return (await r.json()) as Obj
-  } catch {
-    return null
-  } finally {
-    clearTimeout(t)
+  const goc = await layDiaChiMayChu()
+  if (!goc) return null
+  const url = `${goc}/hs/chua-cau-sai/${lenh}`
+  const body = JSON.stringify({ ...du, token })
+  for (let lan = 0; lan < 3; lan++) {
+    const dk = new AbortController()
+    const t = setTimeout(() => dk.abort(), 20_000)
+    try {
+      const r = await fetch(url, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body,
+        signal: dk.signal,
+      })
+      const j = (await r.json()) as Obj
+      if (lan < 2 && laBan(r.status, j)) {
+        await new Promise((x) => setTimeout(x, laTest ? 0 : (lan + 1) * 800))
+        continue
+      }
+      return j
+    } catch {
+      if (lan < 1 && !laTest) {
+        await new Promise((x) => setTimeout(x, 600))
+        continue
+      }
+      return null
+    } finally {
+      clearTimeout(t)
+    }
   }
+  return null
 }
 
 const loiCua = (j: Obj | null): string =>

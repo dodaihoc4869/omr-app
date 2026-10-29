@@ -190,9 +190,9 @@ export async function chuanBiSanSang(env: Env, sbd: string, now: number, san?: {
     if (!dau) return false
     const lap = (san?.lap ?? await g7.lapGoi7(env, sbd, now)) as Awaited<ReturnType<typeof g7.lapGoi7>>
     if (!lap) return false
-    if (!san) g7.nhoLapSanh7(env, sbd, now, lap) // chặng kế tiếp dưới dùng lại đúng kế hoạch này (như mở chặng ngay sau Sảnh)
+    if (!san) g7.nhoLapSanh7(env, sbd, now, lap) // chặng kế tiếp dưới + lượt mở chặng thật của em dùng lại đúng kế hoạch này
     const con = lap.plan.viec.length, t7 = g7.tomTatGoi7(lap, now)
-    const st = await g7.startGoi7(env, sbd, now, undefined, { khongLuu: true }).catch(() => null)
+    const st = await g7.startGoi7(env, sbd, now, undefined, { khongLuu: true, lapSan: lap }).catch(() => null)
     const chang = (st?.chuanBi ?? null) as BanSanSang['chang']
     await lenhGhiSanSang(env, sbd, { ngay: ngayVn7(now), luc: now, dau, sanh: phanSanh(t7 as { ngay: string } & Row, con, lap.daLamNgay), chang }).run()
     return true
@@ -332,12 +332,28 @@ export async function cronSanSangDem(env: Env, now: number, toiDa?: number): Pro
       const co = await env.DB.prepare(`SELECT x.sbd, s.dau, (SELECT g.created_at FROM game_v2_session g WHERE g.sbd=x.sbd ORDER BY g.created_at DESC LIMIT 1) AS gan,
         EXISTS(SELECT 1 FROM goi_bai_7_em e2 JOIN goi_bai_7 g2 ON g2.id=e2.goi_id WHERE e2.sbd=x.sbd AND g2.tao_luc > strftime('%Y-%m-%dT%H:%M:%fZ', s.luc/1000.0, 'unixepoch')) AS goi_moi
         FROM (${emNhan}) x JOIN ${BANG_SAN_SANG} s ON s.sbd=x.sbd AND s.ngay=? AND s.dau LIKE ?`).bind(ngay, BAN_DAU + '§%').all<{ sbd: string; dau: string; gan: string | null; goi_moi: number }>()
-      const hang = co.results ?? []
-      const hienTai = await dauNhieuEm(env, hang.map((r) => String(r.sbd)), now)
+      const hang = (co.results ?? []).sort((a, b) => Number(b.goi_moi) - Number(a.goi_moi) || String(b.gan ?? '').localeCompare(String(a.gan ?? '')))
+      const canTim = toiDa - ds.length
+      const caoDiem = new Date(now + 7 * 3600000).getUTCHours() >= 19
+      // Giờ cao điểm (19h–23h59): xếp thứ tự ưu tiên trước rồi quét từng lô 50 em, đủ `canTim` em lệch dấu là dừng ngay (không quét cả 600 em × 11 subquery mỗi phút).
+      const sbds = hang.map((r) => String(r.sbd))
+      const hienTai = caoDiem && sbds.length > 50 ? new Map<string, { dau: string; a: number }>() : await dauNhieuEm(env, sbds, now)
+      if (caoDiem && sbds.length > 50 && hienTai) {
+        for (let i = 0; i < sbds.length; i += 50) {
+          const lo = await dauNhieuEm(env, sbds.slice(i, i + 50), now)
+          if (!lo) break
+          for (const [k, v] of lo) hienTai.set(k, v)
+          let du = 0
+          for (let j = 0; j < Math.min(hang.length, i + 50); j++) {
+            const r = hang[j]!, h = hienTai.get(String(r.sbd))
+            if (h && h.dau !== String(r.dau) && now - h.a >= EM_DANG_HOC_MS && ++du >= canTim) break
+          }
+          if (du >= canTim) break
+        }
+      }
       if (hienTai) {
         const lech = hang.filter((r) => { const h = hienTai.get(String(r.sbd)); return !!h && h.dau !== String(r.dau) && now - h.a >= EM_DANG_HOC_MS })
-          .sort((a, b) => Number(b.goi_moi) - Number(a.goi_moi) || String(b.gan ?? '').localeCompare(String(a.gan ?? '')))
-        ds.push(...lech.slice(0, toiDa - ds.length).map((r) => String(r.sbd)))
+        ds.push(...lech.slice(0, canTim).map((r) => String(r.sbd)))
       }
     }
     // Từng nhóm 4 em chạy song song (mỗi em ~30 lệnh D1 nối tiếp ⇒ 16 em/phút nối tiếp có thể vượt một phút); chiều/đêm D1 vắng.
