@@ -233,20 +233,36 @@ it('cron chuẩn bị MỌI em còn đang nhận gói — kể cả gói đã QU
   // Đã có bản đủ mới ⇒ lượt sau không lập lại.
   vi.setSystemTime(dem + 60_000)
   expect(await cronSanSangDem(k.rawEnv, dem + 60_000, 10)).toBe(0)
-  // Em S1 học một phiên MỚI hơn bản sẵn ⇒ cron làm mới bản (còn chỗ trong lượt).
-  k.d.sql.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').run('phien-moi', 'S1', '{}', new Date(dem + 120_000).toISOString())
+  // Thầy giao bài / đổi cấu hình ⇒ DẤU CHUNG đổi ⇒ mọi bản lệch cùng lúc: cron vá lại (em vừa trả lời < 10 phút là đang học ⇒ bỏ qua).
+  k.d.sql.exec("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('thay_giao_bai_moi','{}','z')")
+  k.d.sql.prepare('INSERT INTO game_v2_attempt(id,sbd,session,qid,content_group,json,created_at) VALUES(?,?,?,?,?,?,?)')
+    .run('p|a', 'S1', 'p', 'q-x', 'g-x', JSON.stringify({ attempt: { assisted: false } }), new Date(dem + 150_000).toISOString())
   vi.setSystemTime(dem + 180_000)
-  expect(await cronSanSangDem(k.rawEnv, dem + 180_000, 10)).toBe(1) // chỉ S1 (S3 chưa có phiên mới)
-  expect((k.d.sql.prepare('SELECT luc FROM hoc_tap_san_sang WHERE sbd=?').get('S1') as { luc: number }).luc).toBe(dem + 180_000)
+  const truoc = k.d.sql.prepare('SELECT sbd, luc FROM hoc_tap_san_sang ORDER BY sbd').all() as { sbd: string; luc: number }[]
+  expect(await cronSanSangDem(k.rawEnv, dem + 180_000, 10)).toBe(1) // chỉ S3 (S1 đang học)
+  const sau = k.d.sql.prepare('SELECT sbd, luc FROM hoc_tap_san_sang ORDER BY sbd').all() as { sbd: string; luc: number }[]
+  expect(sau.find((x) => x.sbd === 'S3')!.luc).toBe(dem + 180_000)
+  expect(sau.find((x) => x.sbd === 'S1')!.luc).toBe(truoc.find((x) => x.sbd === 'S1')!.luc)
+  // Nghỉ đủ 10 phút ⇒ S1 được vá; S3 đã khớp dấu ⇒ không lập lại.
+  const muon = dem + 180_000 + 11 * 60_000
+  vi.setSystemTime(muon)
+  expect(await cronSanSangDem(k.rawEnv, muon, 10)).toBe(1)
+  expect((k.d.sql.prepare('SELECT luc FROM hoc_tap_san_sang WHERE sbd=?').get('S1') as { luc: number }).luc).toBe(muon)
+  expect((k.d.sql.prepare('SELECT luc FROM hoc_tap_san_sang WHERE sbd=?').get('S3') as { luc: number }).luc).toBe(dem + 180_000)
+  vi.setSystemTime(muon + 60_000)
+  expect(await cronSanSangDem(k.rawEnv, muon + 60_000, 10)).toBe(0) // mọi bản đã khớp dấu
 })
 
-it('khung cron: chiều 13:00–18:59 và đêm 00:15–03:59 có chạy; 19:00–23:59 (giờ cao điểm) không chạy', async () => {
-  const { trongKhungChieu, trongKhungDem } = await import('../server/src/san-sang')
+it('hạn mức cron theo khung giờ: đêm 10 · sáng 6 · chiều 16 · tối 6 · 00:00–00:14 nghỉ', async () => {
+  const { toiDaCron, TOI_DA_DEM, TOI_DA_SANG, TOI_DA_CHIEU, TOI_DA_TOI } = await import('../server/src/san-sang')
   const vn = (h: number, m = 0) => Date.parse(`2026-10-13T${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00+07:00`)
-  expect(trongKhungChieu(vn(13))).toBe(true); expect(trongKhungChieu(vn(18, 59))).toBe(true); expect(trongKhungChieu(vn(19))).toBe(false); expect(trongKhungChieu(vn(12, 59))).toBe(false)
-  expect(trongKhungDem(vn(0, 14))).toBe(false); expect(trongKhungDem(vn(0, 15))).toBe(true); expect(trongKhungDem(vn(3, 59))).toBe(true); expect(trongKhungDem(vn(4))).toBe(false)
+  expect(toiDaCron(vn(0, 5))).toBe(0); expect(toiDaCron(vn(0, 15))).toBe(TOI_DA_DEM); expect(toiDaCron(vn(3, 59))).toBe(TOI_DA_DEM)
+  expect(toiDaCron(vn(4))).toBe(TOI_DA_SANG); expect(toiDaCron(vn(12, 59))).toBe(TOI_DA_SANG)
+  expect(toiDaCron(vn(13))).toBe(TOI_DA_CHIEU); expect(toiDaCron(vn(18, 59))).toBe(TOI_DA_CHIEU)
+  expect(toiDaCron(vn(19))).toBe(TOI_DA_TOI); expect(toiDaCron(vn(23, 59))).toBe(TOI_DA_TOI)
   const k = await kho()
-  expect(await cronSanSangDem(k.rawEnv, vn(20, 30), 10)).toBe(0) // cao điểm: không lập
+  vi.setSystemTime(vn(0, 5))
+  expect(await cronSanSangDem(k.rawEnv, vn(0, 5))).toBe(0) // 00:05 nghỉ (việc đổi ngày 00:01)
 })
 
 it('cổng tốc độ: số đợt chờ D1 của Sảnh / Mở chặng (bản sẵn) không vượt mốc `mayChuSanSang` (mốc chỉ hạ)', () => {
