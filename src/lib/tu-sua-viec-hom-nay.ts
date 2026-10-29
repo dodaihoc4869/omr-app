@@ -12,11 +12,15 @@
 //   · MÁY CHỦ GIỮ BẢN CHÍNH (thầy duyệt 28/10 «sửa theo đề xuất», server/src/tu-sua-viec-ngay.ts): danh sách Tự sửa lỗi kèm `viecNgay` (cùng lô đọc) ⇒ gộp với
 //     bản trên máy (danh sách DÀI hơn thắng, bằng nhau thì bản máy chủ — đổi máy vẫn cùng 12 câu; «đã xong» hợp lại); bản gộp mới hơn máy chủ ⇒ gửi NỀN
 //     (`dayViecNgay`, gom 400 ms, không chờ). localStorage giữ làm bản đệm (mất mạng / máy chủ cũ vẫn đúng như trước).
-import type { MucChua, ViecNgayMayChu } from './chua-cau-sai-api'
+//   · 12–36 CÂU/NGÀY (thầy 29/10): máy chủ tính số câu của ngày theo tổng số câu sai + chọn câu đủ dạng, đủ mức (`ke` trong danh sách, chỉ khi việc hôm nay chưa lập / còn thiếu);
+//     máy em điền danh sách ngày từ `ke.ung` rồi gửi lên kèm `mt` (mục tiêu). Máy chủ cũ / không có `ke` ⇒ 12 câu như trước.
+import type { KeSuaNgay, MucChua, ViecNgayMayChu } from './chua-cau-sai-api'
 import { nhomMucChua } from './tu-sua-loi'
 
 export const SO_CAU_MOI_NGAY = 12
 export const SO_CAU_MOI_CHANG = 4
+/** Trần số câu mục tiêu của ngày (thầy 29/10: 12–36 câu/ngày; máy chủ tính, sua-loi-phan-bo.ts). */
+const MUC_TIEU_TOI_DA = 36
 /** Khoá phiên cổng học sinh (viết thẳng, như hoi-thay-nhung.ts — không nhập phien-hoc-sinh.ts để khỏi tách khối tải). */
 const KHOA_PHIEN = 'omr_student_portal_auth'
 const khoaNhatKy = (sbd: string) => `omr_tu_sua_hom_nay_${sbd}`
@@ -35,6 +39,8 @@ export interface ViecMuc {
   xong: boolean
 }
 export interface ViecHomNay {
+  /** Số câu PHẦN NGÀY (mục tiêu 12…36; chặng «sửa thêm» nối sau, không tính). Vắng ⇒ 12. */
+  phan?: number
   muc: ViecMuc[]
   /** Chặng 4 câu (chặng cuối có thể ít hơn). */
   chang: ViecMuc[][]
@@ -50,7 +56,7 @@ export interface ViecHomNay {
   xongHomNay?: number
 }
 export interface MucLuu { q: string; d?: string; t: string; h?: string; l: LoaiViec }
-export interface NhatKy { n: string; m: MucLuu[]; x: string[]; them?: number }
+export interface NhatKy { n: string; m: MucLuu[]; x: string[]; them?: number; mt?: number }
 
 export const khoaMuc = (m: Pick<MucChua, 'dotId' | 'qid'>) => m.dotId ?? m.qid
 export const ngayVnTuSua = (ms: number) => new Date(ms + 7 * 3600_000).toISOString().slice(0, 10)
@@ -102,15 +108,16 @@ export function hopNhatKy(nk: NhatKy, may: ViecNgayMayChu | null | undefined): N
   const m = may.m.length >= nk.m.length && may.m.length > 0 ? may.m.map((x): MucLuu => ({ q: x.q, ...(x.d ? { d: x.d } : {}), t: x.t, ...(x.h ? { h: x.h } : {}), l: x.l })) : nk.m
   const x = [...new Set([...nk.x, ...may.x])]
   const them = Math.max(nk.them ?? 0, may.them)
-  return { n: nk.n, m, x, ...(them > 0 ? { them } : {}) }
+  const mt = Math.max(nk.mt ?? 0, may.mt ?? 0)
+  return { n: nk.n, m, x, ...(them > 0 ? { them } : {}), ...(mt > 0 ? { mt } : {}) }
 }
-const giongNhatKy = (a: NhatKy, b: NhatKy) => a.n === b.n && (a.them ?? 0) === (b.them ?? 0) && a.x.length === b.x.length && a.x.every((k) => b.x.includes(k))
+const giongNhatKy = (a: NhatKy, b: NhatKy) => a.n === b.n && (a.them ?? 0) === (b.them ?? 0) && (a.mt ?? 0) === (b.mt ?? 0) && a.x.length === b.x.length && a.x.every((k) => b.x.includes(k))
   && a.m.length === b.m.length && a.m.every((x, i) => (x.d ?? x.q) === (b.m[i]!.d ?? b.m[i]!.q))
 /** Bản `nk` có gì máy chủ chưa có (mục dài hơn, câu xong mới, thêm chặng)? */
 function canDay(nk: NhatKy, may: ViecNgayMayChu | null | undefined): boolean {
   if (!nk.m.length && !nk.x.length) return false
   if (!may || may.n !== nk.n) return true
-  return nk.m.length > may.m.length || (nk.them ?? 0) > may.them || nk.x.some((k) => !may.x.includes(k))
+  return nk.m.length > may.m.length || (nk.them ?? 0) > may.them || (nk.mt ?? 0) > (may.mt ?? 0) || nk.x.some((k) => !may.x.includes(k))
 }
 let choDay: { nk: NhatKy; h: ReturnType<typeof setTimeout> } | null = null
 let daDay = ''
@@ -123,10 +130,10 @@ export function dayViecNgay(nk: NhatKy | null): void {
     choDay = null
     const token = docTokenHs()
     if (!v || !token) return
-    const ky = JSON.stringify([v.n, v.m.map((x) => x.d ?? x.q), [...v.x].sort(), v.them ?? 0])
+    const ky = JSON.stringify([v.n, v.m.map((x) => x.d ?? x.q), [...v.x].sort(), v.them ?? 0, v.mt ?? 0])
     if (ky === daDay) return
     daDay = ky
-    void import('./chua-cau-sai-api').then((m) => m.apiGhiViecNgay(token, { n: v.n, m: v.m, x: v.x, them: v.them ?? 0 }))
+    void import('./chua-cau-sai-api').then((m) => m.apiGhiViecNgay(token, { n: v.n, m: v.m, x: v.x, them: v.them ?? 0, ...(v.mt ? { mt: v.mt } : {}) }))
       .then((ok) => { if (!ok && daDay === ky) daDay = '' }, () => { if (daDay === ky) daDay = '' })
   }, 400) }
 }
@@ -186,7 +193,7 @@ function chiaChang(muc: ViecMuc[]): ViecMuc[][] {
  * Không đủ 12 câu làm được ⇒ ngày nhỏ hơn, đúng số có. Danh sách lỗi / vòng chữa tắt ⇒ null.
  */
 export function dungViecHomNay(
-  kq: { trangThai: string; ds?: readonly MucChua[]; dem?: { can: number; xongHomNay?: number }; viecNgay?: ViecNgayMayChu } | null | undefined,
+  kq: { trangThai: string; ds?: readonly MucChua[]; dem?: { can: number; xongHomNay?: number }; viecNgay?: ViecNgayMayChu; ke?: KeSuaNgay } | null | undefined,
   nayMs: number,
   sbd: string,
   them = 0,
@@ -198,10 +205,22 @@ export function dungViecHomNay(
   const hienTai = new Map(ds.map((m) => [khoaMuc(m), m]))
   const ghi = new Set(nk.x)
   const co = new Set(nk.m.map((x) => x.d ?? x.q))
-  const soMuc = SO_CAU_MOI_NGAY + SO_CAU_MOI_CHANG * Math.max(them, nk.them ?? 0)
-  // Bổ sung từ danh sách hiện tại (theo thứ tự máy chủ, ổn định theo loại) khi ngày chưa đủ số câu.
+  // Mục tiêu phần ngày: số máy chủ lập (12…36, chỉ tăng trong ngày); chưa lập ⇒ 12. `mt` được nhớ cả khi = 12 (dấu «đã lập» để lần mở sau khỏi xin lại).
+  // Kế hoạch chỉ dùng khi ngày chưa có việc, hoặc em chưa làm câu nào / thêm chặng (bản trả về cũ còn nhớ giữa ngày không được làm số «Còn x câu» nhảy lên).
+  const ke = kq.ke && (nk.m.length === 0 || (nk.x.length === 0 && !(nk.them ?? 0))) ? kq.ke : null
+  const mt = Math.min(MUC_TIEU_TOI_DA, Math.max(nk.mt ?? 0, ke?.n ?? 0))
+  const mucTieu = Math.max(SO_CAU_MOI_NGAY, mt)
+  const soMuc = mucTieu + SO_CAU_MOI_CHANG * Math.max(them, nk.them ?? 0)
+  // Bổ sung khi ngày chưa đủ số câu: có kế hoạch của máy chủ (đủ dạng, đủ mức) ⇒ lấy đúng thứ tự ấy; không ⇒ từ danh sách hiện tại (theo thứ tự máy chủ, ổn định theo loại).
   const them_: MucLuu[] = []
-  if (nk.m.length < soMuc) {
+  if (nk.m.length < soMuc && ke) {
+    for (const x of ke.ung) {
+      if (nk.m.length + them_.length >= soMuc) break
+      if (co.has(x.d ?? x.q) || (x.d && co.has(x.q))) continue
+      co.add(x.d ?? x.q)
+      them_.push({ q: x.q, ...(x.d ? { d: x.d } : {}), t: x.t, ...(x.h ? { h: x.h } : {}), l: x.l })
+    }
+  } else if (nk.m.length < soMuc) {
     const lanCuoi = docLanCuoi(sbd)
     const truoc = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0)
     const ung = ds
@@ -227,13 +246,14 @@ export function dungViecHomNay(
   const soCan = kq.dem?.can ?? ds.filter((m) => nhomMucChua(m, nayMs) === 'can').length
   const trongCan = muc.filter((x) => nhomMucChua(x.m, nayMs) === 'can').length
   const viec: ViecHomNay = {
+    phan: Math.min(muc.length, mucTieu),
     muc, chang, xong, tong: muc.length, tiep,
     changHienTai: tiep ? chang.findIndex((c) => c.some((x) => x.khoa === tiep.khoa)) : chang.length,
     conNgaySau: Math.max(0, soCan - trongCan),
     ...(kq.dem?.xongHomNay ? { xongHomNay: kq.dem.xongHomNay } : {}),
   }
-  const doi = them_.length > 0 || (them > (nk.them ?? 0)) || tuXong.length > 0
-  const cuoi: NhatKy = doi ? { n: nk.n, m: luuMuc, x: [...nk.x, ...tuXong], them: Math.max(them, nk.them ?? 0) } : nk
+  const doi = them_.length > 0 || (them > (nk.them ?? 0)) || tuXong.length > 0 || mt > (nk.mt ?? 0)
+  const cuoi: NhatKy = doi ? { n: nk.n, m: luuMuc, x: [...nk.x, ...tuXong], them: Math.max(them, nk.them ?? 0), ...(mt ? { mt } : {}) } : nk
   // Ghi bản đệm khi bản cuối khác bản đang nằm trên máy (thêm câu, hoặc vừa nhận bản máy chủ); gửi máy chủ khi máy chủ còn thiếu.
   return { viec, luu: doi || !giongNhatKy(cuoi, nkMay) ? cuoi : null, day: canDay(cuoi, kq.viecNgay) ? cuoi : null }
 }
@@ -257,15 +277,15 @@ export function luuViecHomNay(luu: NhatKy | null, day: NhatKy | null = null): vo
 /** Số câu CÒN PHẢI SỬA HÔM NAY cho nút «Sửa lỗi» trên Lộ trình (thầy duyệt 28/10): việc hôm nay − đã xong phần; 0 ⇒ xong hôm nay (nút ✓).
  *  Chưa dựng được việc hôm nay (chưa có danh sách / vòng chữa tắt) ⇒ null (nơi gọi dùng tối đa 12 trên số cần sửa). */
 export const conSuaHomNay = (v: ViecHomNay | null): number | null => (v ? Math.max(0, v.tong - v.xong) : null)
-/** Số câu PHẦN NGÀY (12 câu đầu) chưa xong — khoá chặng sau nút Tự sửa lỗi (thầy 28/10 «sửa phải xong mới hiện chặng sau»). «Sửa thêm 1 chặng» nối câu ở CUỐI
+/** Số câu PHẦN NGÀY (12 câu đầu, hoặc mục tiêu 13…36 câu máy chủ lập) chưa xong — khoá chặng sau nút Tự sửa lỗi (thầy 28/10 «sửa phải xong mới hiện chặng sau»). «Sửa thêm 1 chặng» nối câu ở CUỐI
  *  ⇒ không làm khoá lại. Cùng phép đếm với máy chủ (`conPhanNgay`, server/src/tu-sua-viec-ngay.ts). */
-export const conSuaPhanNgay = (v: ViecHomNay | null): number | null => (v ? v.muc.slice(0, SO_CAU_MOI_NGAY).filter((x) => !x.xong).length : null)
+export const conSuaPhanNgay = (v: ViecHomNay | null): number | null => (v ? v.muc.slice(0, v.phan ?? SO_CAU_MOI_NGAY).filter((x) => !x.xong).length : null)
 /** Báo máy chủ (nền, một lần / ngày / máy): Lộ trình đang khoá chặng sau nút Tự sửa lỗi ⇒ máy chủ chặn mở chặng bằng lối khác. Lỗi mạng ⇒ lần mở sau báo lại. */
 export function baoKhoaSua(nayMs = Date.now()): void {
   const sbd = docSbdHs(), token = docTokenHs(), nk = docNhatKy(sbd, nayMs), khoa = `omr_tu_sua_khoa_${sbd}`
   if (!sbd || !token || !nk.m.length) return
   try { if (localStorage.getItem(khoa) === nk.n) return } catch { /* không đọc được: vẫn báo */ }
-  void import('./chua-cau-sai-api').then((m) => m.apiGhiViecNgay(token, { n: nk.n, m: nk.m, x: nk.x, them: nk.them ?? 0 }, true))
+  void import('./chua-cau-sai-api').then((m) => m.apiGhiViecNgay(token, { n: nk.n, m: nk.m, x: nk.x, them: nk.them ?? 0, ...(nk.mt ? { mt: nk.mt } : {}) }, true))
     .then((ok) => { if (ok) try { localStorage.setItem(khoa, nk.n) } catch { /* bỏ qua */ } }, () => {})
 }
 

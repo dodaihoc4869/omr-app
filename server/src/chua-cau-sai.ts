@@ -27,6 +27,7 @@ import type { ItemCongKhai, ProbeRef } from './chua-cau-sai-kieu'
 import { khopPhanIII } from '../../src/lib/cham-so'
 import { denLuotDong, NGAY_CUA_SO_GON, SQL_DONG_DA_DUNG_LAI } from './chua-gon'
 import { lenhDocViecNgay, viecNgayTuDong } from './tu-sua-viec-ngay'
+import { lapKeSuaNgay, MOC_DA_SUA_MS, SQL_UNG_VIEN_SUA } from './sua-loi-ke-ngay'
 type Obj = Record<string, unknown>
 const str = (v: unknown) => (typeof v === 'string' ? v : '')
 const num = (v: unknown) => Number(v) || 0
@@ -966,21 +967,29 @@ export async function danhSach(env: Env, b: Obj): Promise<Response> {
       .bind(nay, sbd, sbd, c ? 1 : 0, c ? num(c.hang) : 0, c ? num(c.hang) : 0,
         c ? num(c.giaoLuc) : 0, c ? num(c.giaoLuc) : 0, c ? str(c.dotId) : ''),
     // «Đã tự sửa hôm nay» = câu em TỰ SỬA XONG hôm nay ở màn sửa câu (chua_gon_lan), KHÔNG đếm theo dong_luc: câu đóng tự động hôm nay có thể là câu sửa từ hôm trước.
-    env.DB.prepare(`WITH muc AS (SELECT ${nhom} AS nhom FROM chua_loi_dot WHERE sbd=?)
-      SELECT COUNT(*) AS tong,SUM(nhom='can') AS can,SUM(nhom='cho') AS cho,SUM(nhom='xong') AS xong,
+    // `daSua11` (29/10, Sửa lỗi 12–36 câu/ngày): câu đã tự sửa trong 11 ngày qua — cùng cửa sổ 12 ngày với số câu mỗi ngày (sua-loi-phan-bo.ts).
+    env.DB.prepare(`WITH muc AS (SELECT ${nhom} AS nhom,COALESCE(dong_luc,cap_nhat_luc) AS dl FROM chua_loi_dot WHERE sbd=?)
+      SELECT COUNT(*) AS tong,SUM(nhom='can') AS can,SUM(nhom='cho') AS cho,SUM(nhom='xong') AS xong,SUM(nhom='xong' AND dl>=?) AS daSua11,
         (SELECT COUNT(DISTINCT dot_id) FROM chua_gon_lan WHERE sbd=? AND ngay_vn=? AND json_extract(ket,'$.ket')='tu_sua') AS xongHomNay FROM muc`)
-      .bind(nay, sbd, sbd, ngayVn(nowMs)),
+      .bind(nay, sbd, nowMs - MOC_DA_SUA_MS, sbd, ngayVn(nowMs)),
   ]
   // Việc hôm nay của Tự sửa lỗi lưu trên máy chủ (tu-sua-viec-ngay.ts, 28/10): trang đầu đọc CÙNG lô (không thêm đợt chờ D1).
   const homNay = ngayVn(nowMs)
   const viec = c ? [] : [lenhDocViecNgay(env, sbd, homNay)]
   // Câu đóng tự động / việc hôm nay KHÔNG được làm hỏng danh sách: lỗi (D1 từ chối / quá giờ / bảng chưa áp) ⇒ đọc lại chỉ phần danh sách (như layCauChoEm).
-  let soDong = dong.length, coViec = viec.length > 0
-  const r0 = await env.DB.batch([...dong, ...doc, ...viec]).catch(() => { soDong = 0; coViec = false; return env.DB.batch(doc) })
+  // Sửa lỗi 12–36 câu/ngày (29/10): máy em chưa có việc hôm nay / chưa nhớ mục tiêu ⇒ xin kế hoạch (`ke: 1`) ⇒ câu đọc ứng viên đi CÙNG lô (không thêm đợt chờ D1);
+  // lô lỗi (bảng siêu dữ liệu câu…) ⇒ đọc lại không kèm ứng viên rồi mới bỏ việc hôm nay.
+  const ung = !c && (b.ke === 1 || b.ke === true) && viec.length > 0 ? [env.DB.prepare(SQL_UNG_VIEN_SUA).bind(sbd, nay)] : []
+  let soDong = dong.length, coViec = viec.length > 0, coUng = ung.length > 0
+  let r0 = await env.DB.batch([...dong, ...doc, ...viec, ...ung]).catch(() => null)
+  if (!r0 && coUng) { coUng = false; r0 = await env.DB.batch([...dong, ...doc, ...viec]).catch(() => null) }
+  if (!r0) { soDong = 0; coViec = false; coUng = false; r0 = await env.DB.batch(doc) }
   const r = r0.slice(soDong)
   const viecNgay = coViec ? viecNgayTuDong(r[doc.length]?.results?.[0] as Obj | undefined, homNay) : null
   const rows = (r[0]?.results ?? []) as Obj[], ds = rows.slice(0, 100), cuoi = ds.at(-1)
   const d = r[1]?.results?.[0] as Obj | undefined
+  // KẾ HOẠCH SỬA LỖI 12–36 câu/ngày (29/10): máy em xin + việc hôm nay chưa lập / còn thiếu ⇒ lập từ câu đọc cùng lô. Lỗi ⇒ bỏ (máy em chọn 12 câu như cũ).
+  const ke = coUng ? lapKeSuaNgay((r[doc.length + (coViec ? 1 : 0)]?.results ?? []) as Obj[], { can: num(d?.can), cho: num(d?.cho), daSua: num(d?.daSua11) }, viecNgay, nowMs) : null
   return Response.json({ ok: true,
     ds: ds.map(({ hang: _hang, giaoLuc: _giao, saiLuc, dongLuc, ...m }) => ({ ...m, kiemHoiThay: num(m.kiemHoiThay) === 1,
       ...(num(saiLuc) > 0 ? { saiLuc: num(saiLuc) } : {}), ...(num(dongLuc) > 0 ? { dongLuc: num(dongLuc) } : {}) })),
@@ -988,6 +997,7 @@ export async function danhSach(env: Env, b: Obj): Promise<Response> {
     // Thầy 21/10 "bỏ phần làm câu tương đương đi": không còn lịch tự làm lại câu tương đương sau Hỏi Thầy (giữ trường rỗng cho máy em bản cũ).
     kiemLaiHoiThay: [],
     ...(viecNgay ? { viecNgay } : {}),
+    ...(ke ? { ke } : {}),
     ...(rows.length > 100 && cuoi ? { sau: { hang: num(cuoi.hang), giaoLuc: num(cuoi.giaoLuc), dotId: str(cuoi.dotId), nay } } : {}),
   })
 }

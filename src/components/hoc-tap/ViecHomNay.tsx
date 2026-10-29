@@ -74,7 +74,7 @@ export default function ViecHomNay({ viec, thongTin, soXong, tong, soCan, xongHo
           </div>
         </div>
         <div className="vh-hang">
-          <div className="vh-cac" role="img" aria-label={`Hôm nay đã xong phần của ${viec.xong} trong ${viec.tong} câu, chia ${nChang} chặng`}>
+          <div className="vh-cac" data-nhieu={nChang > 5 ? '' : undefined} role="img" aria-label={`Hôm nay đã xong phần của ${viec.xong} trong ${viec.tong} câu, chia ${nChang} chặng`}>
             {viec.chang.map((c, i) => <span className="vh-nhom" key={i}>{c.map((x) => <i key={x.khoa} data-tt={x.xong ? 'xong' : x.khoa === viec.tiep?.khoa ? 'nay' : undefined} />)}</span>)}
           </div>
           <b className="vh-so">{viec.xong}/{viec.tong} câu</b>

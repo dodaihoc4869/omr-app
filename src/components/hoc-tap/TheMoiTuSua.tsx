@@ -71,7 +71,7 @@ export default function TheMoiTuSua({ so, token, onChua }: Props) {
       {nd.phu && <p className="ht2-moi-sua-phu">{nd.phu}</p>}
     </div>
     <div className="vh-hang">
-      <div className="vh-cac" role="img" aria-label={`Hôm nay đã xong phần của ${viec.xong} trong ${viec.tong} câu, chia ${nChang} chặng`}>
+      <div className="vh-cac" data-nhieu={nChang > 5 ? '' : undefined} role="img" aria-label={`Hôm nay đã xong phần của ${viec.xong} trong ${viec.tong} câu, chia ${nChang} chặng`}>
         {viec.chang.map((c, i) => (
           <span className="vh-nhom" key={i}>{c.map((x) => <i key={x.khoa} data-tt={x.xong ? 'xong' : x.khoa === viec.tiep?.khoa ? 'nay' : undefined} />)}</span>
         ))}

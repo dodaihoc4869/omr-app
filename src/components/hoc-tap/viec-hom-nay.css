@@ -7,6 +7,9 @@
 .vh-hang { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .vh-cac { display: flex; flex: 1; gap: 10px; min-width: 0; }
 .vh-nhom { display: grid; flex: 1 1 0; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 4px; min-width: 0; }
+/* Ngày 20–36 câu (Sửa lỗi 12–36 câu/ngày, 29/10): hơn 5 chặng ⇒ thu khoảng cách để mỗi chấm vẫn thấy rõ trên máy nhỏ. */
+.vh-cac[data-nhieu] { gap: 4px; }
+.vh-cac[data-nhieu] .vh-nhom { gap: 2px; }
 .vh-nhom i { display: block; height: 10px; border-radius: 99px; background: var(--the-2); border: 1.5px solid var(--vien-dam); }
 .vh-nhom i[data-tt='xong'] { background: var(--xanh); border-color: var(--xanh); }
 .vh-nhom i[data-tt='nay'] { background: var(--vang-diu-nen); border-color: var(--vang-diu); }
