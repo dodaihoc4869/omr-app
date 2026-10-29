@@ -784,6 +784,50 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
   return {ok:true,id,questions,goi7:tomTatGoi7(lap,now)}
   } catch (e) { await ghiDongCo.catch(() => {}); throw e } // lối ra lỗi giữa chừng: lô ghi của động cơ vẫn xong trước (như thứ tự cũ: ghi trong lúc lập)
 }
+/**
+ * GÓI BÀI CẢ NGÀY (thầy 29/10 22:05 «tìm mọi cách, cách khác hoàn toàn để app hs load tức thì ở mọi thời điểm»; goi-ngay.ts): lập MỘT lần các chặng còn lại của hôm nay —
+ * cùng kế hoạch, cùng thứ tự (`xepBai6`), cùng mọi cổng phát câu của `startGoi7` (câu chặn / nghi / vừa làm / khối / tự luận / chưa duyệt / dạng thầy giới hạn, bản làm lại
+ * của câu sửa) — tối đa `soCau` câu, KHÔNG lưu phiên. Em đủ mức ⇒ phần «học thêm câu mới». Trả ref RIÊNG (máy chủ niêm phong trước khi gửi) + đề công khai (có tem hạn dài).
+ */
+export async function xayGoiNgay7(env: Env, sbd: string, now: number, soCau: number): Promise<{ refs: RefGoi7[]; questions: Record<string, unknown>[]; goi7: unknown; goiIds: string[]; ngay: string } | null> {
+  const [lap, khoi, duo] = await Promise.all([lapDungLai7(env, sbd, now).then((x) => x ?? lapGoi7(env, sbd, now)), docKhoiEm(env, sbd), duolingoChoEm(env, sbd, now).catch(() => false)])
+  if (!lap || !lap.control.enabled) return null
+  const vuaLamGoc = (qid: string) => lap.vuaLam.has(qid) || lap.vuaLam.has(tachSongSinh(qid).goc)
+  const satHan = !duo || lap.goi.some(g => g.quota > g.gapNgay.size && soNgayCon7(ngayVn7(now), g.han) <= 1)
+  const ds = [...xepBai6(lap.plan.viec, lap.pDung, { giuThuTu: satHan }), ...(lap.daLamNgay < lap.toiThieu ? lap.duPhong() : lap.hocThem())]
+  const cauGoi = new Map(lap.goi.flatMap(g=>g.cau).map(c=>[c.qid,c] as const).reverse())
+  const kiemHoiThay = new Set(lap.hs.hoiThayDenHan ?? [])
+  const refs: RefGoi7[] = [], questions: Record<string,unknown>[] = [], riengQ: PrivateQuestion[] = [], da = new Set<string>()
+  const ung = ds.filter((v, i) => ds.findIndex((w) => w.qid === v.qid) === i).map(v => ({ v, meta: lap.hs.meta.get(v.qid) ?? cauGoi.get(v.qid) }))
+    .filter(x => x.meta && !lap.chan.has(x.v.qid) && !lap.chan.has(x.meta.group) && !vuaLamGoc(x.v.qid) && !lap.daLamTap.has(x.v.qid))
+  for (let i = 0; i < ung.length && refs.length < soCau;) {
+    const lo = ung.slice(i, i + soCau - refs.length + 4); i += lo.length
+    const daDoc = (await Promise.all(lo.map(x => currentQuestion(env, x.meta!).then(q => ({ ...x, q }), () => null)))).filter((x): x is NonNullable<typeof x> => !!x)
+    const quaKhoi = new Set(await chanKhacKhoiEm(env,'goi7',{sbd,khoiEm:khoi},daDoc.map(x => x.q),{nghiSan:lap.nghi}))
+    for (const x of daDoc) {
+      if (refs.length >= soCau) break
+      const v = x.v
+      let q: PrivateQuestion = x.q
+      if (!quaKhoi.has(q) || laCauTuLuan(q) || !q.reviewed || lap.control.types.length && (!q.dang || !lap.control.types.includes(q.dang))) continue
+      let lamLai: LamLaiRef | undefined
+      if (v.vai === 'sua') {
+        const m = lap.hs.meta.get(q.qid)
+        if (m) { const y = (await apLamLaiKhac(env, lap.hs, [{ q, m }], { sbd, nowMs: now, keHoach: lap.plan.viec.map(w => w.qid) }, new Set([...lap.chan, ...refs.map(r => r.qid)])))[0]; if (y) { q = y.q; lamLai = y.lamLai; const ss = tachSongSinh(q.qid); if (ss.songSinh !== null) lamLai = { ...lamLai, tc: ss.goc } } }
+      }
+      if (q.qid !== v.qid && vuaLamGoc(q.qid)) continue
+      if (da.has(q.qid)) continue
+      da.add(q.qid)
+      const ref: RefGoi7 = { ...lamLai, qid: q.qid, maDe: q.maDe, version: q.version, group: q.group, novel: lap.hs.tt.get(q.qid)?.laMoi ?? true,
+        role: v.vai === 'moi' ? 'cau_moi' : 'on_lai', vai: v.vai, huongDan: v.huongDan,
+        ...(kiemHoiThay.has(q.qid) || kiemHoiThay.has(tachSongSinh(lamLai?.tc ?? q.qid).goc) ? { hoiThayKiem: true as const } : {}) }
+      refs.push(ref); riengQ.push(q)
+      questions.push({ ...publicQuestion(q), vaiGoi7: v.vai, huongDan7: v.huongDan, coGoi7: lap.goi.some(g => g.cau.some(c => c.qid === q.qid && c.version === q.version)) })
+    }
+  }
+  await ganNiemChoCau(env, sbd, questions, riengQ, true, now, HAN_NIEM_CHUAN_BI_MS) // tem hạn DÀI — máy em không dùng trực tiếp; làm mới lúc mở phiên (goi-ngay.ts)
+  return { refs, questions, goi7: tomTatGoi7(lap, now), goiIds: lap.goi.map(g => g.id), ngay: ngayVn7(now) }
+}
+
 export interface RefGoi7 extends LamLaiRef { qid:string; maDe:string; version:string; group:string; novel:boolean; role:string; vai:ViecGoi7['vai']; huongDan:boolean; goiY?:unknown; hoiThayKiem?:true
   /** 26/10: câu làm lại cuối chặng (câu anh em của câu em vừa sai) — luôn có hỗ trợ, không tính đóng lỗi, không mở thành chặng mới. */
   lamLaiCuoi?:true; lamLaiCua?:string }

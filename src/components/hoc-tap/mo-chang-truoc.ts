@@ -18,9 +18,11 @@ let dangCo: { token: string; luc: number; p: Promise<KetQuaMo>; kq?: KetQuaMo } 
 let bat = !(globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.VITEST
 export function batMoChangTruoc(b: boolean): void { bat = b; dangCo = null }
 
-/** Bắt đầu mở chặng trước cho `token` (đã có lượt còn hạn cho token này ⇒ không gọi thêm). Không bao giờ ném. */
+/** Bắt đầu mở chặng trước cho `token` (đã có lượt còn hạn cho token này ⇒ không gọi thêm). Không bao giờ ném.
+ *  Gói cả ngày (dưới): máy em đã có chặng trong gói ⇒ KHÔNG mở trước bằng `hoc-tap-start` (màn làm bài hiện câu từ gói, không cần lượt ấy). */
 export function moChangTruoc(token: string, goi: typeof goiHoa2 = goiHoa2, now: number = Date.now()): void {
   if (!bat || !token) return
+  if (coChangGoiCua(token, now)) return
   if (dangCo && dangCo.token === token && now - dangCo.luc < TUOI_MO_TRUOC_MS) return
   const p = goi('hoc-tap-start', token, {}, GIAY_CHO_MO_CHANG)
   const muc: { token: string; luc: number; p: Promise<KetQuaMo>; kq?: KetQuaMo } = { token, luc: now, p }
@@ -65,3 +67,97 @@ export function nghePhanAnRoiApp(coTienDo: () => boolean, token: string): () => 
 }
 /** Chỉ cho test. */
 export const datLaiBaoRoiApp = (): void => { cuoiBaoRoi = 0 }
+
+// GÓI BÀI CẢ NGÀY TRÊN MÁY EM (thầy 29/10 22:05 «tìm mọi cách, cách khác hoàn toàn để app hs load tức thì ở mọi thời điểm, kể cả giờ cao điểm» · «bắt buộc, tới lúc
+// nào load được tức thì tại mọi thời điểm mới được dừng lại»; máy chủ server/src/goi-ngay.ts). Máy em giữ SẴN các chặng còn lại của hôm nay (đề công khai + bộ ref
+// niêm phong `ve` — máy em không đọc / sửa được; đáp án KHÔNG có trong gói). Mở chặng ⇒ câu hiện NGAY từ máy; phiên mở NỀN (`hoc-tap-mo-goi`, nhẹ: không lập kế
+// hoạch); «Kiểm tra» trước khi phiên về thì tự đợi phiên. Gói lập lại NỀN khi Lộ trình hiện (mỗi lượt mở app) và sau mỗi chặng (câu sửa lỗi mới, bài thầy vừa giao).
+// Máy chủ tắt / em chưa được bật (`tat`) ⇒ nhớ 30 phút, mọi thứ y như cũ. Không có gói / gói hỏng / máy chủ từ chối ⇒ đường mở chặng cũ.
+type ChangGoi = { ve: string; questions: KetQuaMo[] }
+type GoiNgay = { ngay: string; luc: number; chang: ChangGoi[]; goi7?: unknown }
+const khoaGoi = (sbd: string) => `omr_goi_ngay_${sbd}`, khoaXong = (sbd: string) => `omr_goi_ngay_xong_${sbd}`
+const KHOA_CUA = 'omr_goi_ngay_cua', KHOA_TAT = 'omr_goi_ngay_tat'
+const ngayMay = (ms: number) => new Date(ms + 7 * 3600_000).toISOString().slice(0, 10)
+/** Lộ trình lập lại gói tối đa một lần mỗi chừng này (trừ lượt sau chặng: luôn lập lại). */
+export const TUOI_GOI_MS = 10 * 60_000
+const HAN_TAT_MS = 30 * 60_000
+const nhoGoi = new Map<string, GoiNgay>(), nhoXong = new Map<string, { n: string; q: Set<string> }>()
+let napDang: Promise<void> | null = null, napCuoi = { token: '', luc: 0 }
+/** Bộ test mặc định TẮT (như `bat` ở trên: các test cũ đếm đúng số lệnh gửi máy chủ); test của gói bật bằng `batGoiNgay(true)`. */
+let batGoi = !(globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.VITEST
+const duoiToken = (t: string) => t.slice(-16)
+const docJson = (k: string): unknown => { try { return JSON.parse(localStorage.getItem(k) || 'null') } catch { return null } }
+const ghiJson = (k: string, v: unknown) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch { /* đầy / bị chặn: vẫn dùng bản trong bộ nhớ */ } }
+
+function docGoi(sbd: string): GoiNgay | null {
+  const m = nhoGoi.get(sbd)
+  if (m) return m
+  const g = docJson(khoaGoi(sbd)) as GoiNgay | null
+  if (!g || typeof g.ngay !== 'string' || !Array.isArray(g.chang)) return null
+  nhoGoi.set(sbd, g)
+  return g
+}
+function docXong(sbd: string, ngay: string): Set<string> {
+  const m = nhoXong.get(sbd)
+  if (m && m.n === ngay) return m.q
+  const x = docJson(khoaXong(sbd)) as { n?: unknown; q?: unknown } | null
+  const q = new Set(x && x.n === ngay && Array.isArray(x.q) ? x.q.filter((v): v is string => typeof v === 'string') : [])
+  nhoXong.set(sbd, { n: ngay, q })
+  return q
+}
+
+/** Lập lại gói NỀN (không bao giờ ném). `luon` = sau chặng: bỏ qua nhịp 10 phút. */
+export function napGoiNgay(token: string, goi: typeof goiHoa2 = goiHoa2, now: number = Date.now(), luon = false): Promise<void> {
+  if (!batGoi || !token) return Promise.resolve()
+  if (napDang) return napDang
+  const tat = Number(docJson(KHOA_TAT)) || 0
+  if (now < tat) return Promise.resolve()
+  if (!luon && napCuoi.token === token && now - napCuoi.luc < TUOI_GOI_MS) return Promise.resolve()
+  napCuoi = { token, luc: now }
+  napDang = Promise.resolve().then(() => goi('hoc-tap-goi-ngay', token, {}, 60)).then((r) => {
+    if (r.ok !== true || typeof r.sbd !== 'string' || !r.sbd) return
+    if (r.tat === true) { ghiJson(KHOA_TAT, now + HAN_TAT_MS); boGoiNgay(r.sbd); return }
+    if (typeof r.ngay !== 'string' || !Array.isArray(r.chang)) return
+    const chang = (r.chang as ChangGoi[]).filter((c) => c && typeof c.ve === 'string' && Array.isArray(c.questions) && c.questions.length > 0)
+    const g: GoiNgay = { ngay: r.ngay, luc: now, chang, goi7: r.goi7 }
+    nhoGoi.set(r.sbd, g)
+    ghiJson(khoaGoi(r.sbd), g)
+    ghiJson(KHOA_CUA, { sbd: r.sbd, t: duoiToken(token) })
+  }).catch(() => {}).finally(() => { napDang = null })
+  return napDang
+}
+
+/** Chặng kế tiếp trong gói của em (bỏ câu máy này đã làm hôm nay); không có / khác ngày ⇒ null. */
+export function layChangGoi(sbd: string, now: number = Date.now()): { ve: string; questions: KetQuaMo[]; goi7: unknown } | null {
+  if (!batGoi || !sbd) return null
+  const g = docGoi(sbd)
+  if (!g || g.ngay !== ngayMay(now)) return null
+  const xong = docXong(sbd, g.ngay)
+  for (const c of g.chang) {
+    const questions = c.questions.filter((q) => typeof q.qid === 'string' && !xong.has(q.qid))
+    if (questions.length) return { ve: c.ve, questions, goi7: g.goi7 }
+  }
+  return null
+}
+function coChangGoiCua(token: string, now: number): boolean {
+  const c = docJson(KHOA_CUA) as { sbd?: unknown; t?: unknown } | null
+  return !!c && typeof c.sbd === 'string' && c.t === duoiToken(token) && !!layChangGoi(c.sbd, now)
+}
+
+/** Câu em vừa làm xong (đã chấm) — chặng kế trong gói bỏ câu này. */
+export function ghiCauXong(sbd: string, qid: string, now: number = Date.now()): void {
+  if (!batGoi || !sbd || !qid) return
+  const n = ngayMay(now), q = docXong(sbd, n)
+  if (q.has(qid)) return
+  q.add(qid)
+  ghiJson(khoaXong(sbd), { n, q: [...q] })
+}
+
+/** Bỏ gói (máy chủ từ chối gói: hết hạn / bài đổi / em đã làm hết) — lần sau đi đường cũ tới khi gói mới về. */
+export function boGoiNgay(sbd: string): void {
+  nhoGoi.delete(sbd)
+  try { localStorage.removeItem(khoaGoi(sbd)) } catch { /* bỏ qua */ }
+}
+/** Chỉ cho test. */
+export const datLaiGoiNgay = (): void => { nhoGoi.clear(); nhoXong.clear(); napDang = null; napCuoi = { token: '', luc: 0 } }
+export function batGoiNgay(b: boolean): void { batGoi = b; datLaiGoiNgay() }
