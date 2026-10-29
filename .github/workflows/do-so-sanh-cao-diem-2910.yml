@@ -1,0 +1,71 @@
+# SO SÁNH GIỜ CAO ĐIỂM HÔM QUA / HÔM NAY (CHỈ ĐỌC) — thầy 29/10: «tối ưu giờ cao điểm hôm nay so với hôm qua như thế nào rồi».
+# Worker omr + D1 theo GIỜ VN (yêu cầu / lỗi / thời gian p50–p90–p99 / CPU p99; D1: số truy vấn, thời gian TB, dòng đọc / ghi) cho 27/10, 28/10 (hôm qua), 29/10 (hôm nay, tới giờ chạy).
+# Chỉ số đếm — không tham số, không tên / SBD.
+name: So sánh giờ cao điểm hôm qua / hôm nay (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/so-sanh-cao-diem-2910]
+    paths: ['.github/workflows/do-so-sanh-cao-diem-2910.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-so-sanh-cao-diem-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DB_ID: d2e6d322-374a-45d7-83a3-9fac486b23f1
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đo (chỉ đọc)
+        env:
+          TOKEN: ${{ env.CF_TOKEN_SACH }}
+          ACC: ${{ env.CF_ACC_SACH }}
+        run: |
+          node - <<'JS'
+          const { TOKEN, ACC, DB_ID } = process.env
+          const H = { authorization: `Bearer ${TOKEN}`, 'content-type': 'application/json' }
+          const hoi = async (query, variables) => {
+            const r = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ query, variables }) })
+            const j = await r.json(); if (j.errors?.length) console.log('LỖI GraphQL:', JSON.stringify(j.errors).slice(0, 500)); return j.data
+          }
+          const gioVn = (iso) => String((new Date(iso).getUTCHours() + 7) % 24).padStart(2, '0')
+          const nay = new Date()
+          console.log('Giờ chạy (VN):', new Date(nay.getTime() + 7 * 3600e3).toISOString().slice(0, 16).replace('T', ' '))
+          const ngay = [[27, '27/10 (hôm kia)'], [28, '28/10 (HÔM QUA)'], [29, '29/10 (HÔM NAY)']]
+          const KQ = {}
+          for (const [d, ten] of ngay) {
+            const tu = new Date(Date.UTC(2026, 9, d - 1, 17)).toISOString()
+            const den = new Date(Math.min(Date.UTC(2026, 9, d, 17), nay.getTime())).toISOString()
+            const w = await hoi(`query($acc:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+              workersInvocationsAdaptive(limit:30,filter:{scriptName:"omr",datetime_geq:$tu,datetime_leq:$den},orderBy:[datetimeHour_ASC]){
+              dimensions{datetimeHour} sum{requests errors} quantiles{durationP50 durationP90 durationP99 cpuTimeP50 cpuTimeP99}}}}}`, { acc: ACC, tu, den })
+            const d1 = await hoi(`query($acc:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+              d1AnalyticsAdaptiveGroups(limit:30,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[datetimeHour_ASC]){
+              dimensions{datetimeHour} sum{readQueries writeQueries rowsRead rowsWritten} quantiles{queryBatchTimeMsP50 queryBatchTimeMsP90 queryBatchTimeMsP99}}}}}`, { acc: ACC, db: DB_ID, tu, den })
+            KQ[d] = { w: w?.viewer?.accounts?.[0]?.workersInvocationsAdaptive ?? [], d1: d1?.viewer?.accounts?.[0]?.d1AnalyticsAdaptiveGroups ?? [] }
+            console.log(`\n=== ${ten} · Worker omr theo GIỜ VN: yêu cầu · lỗi · thời gian xử lý ms p50/p90/p99 · CPU ms p50/p99 ===`)
+            for (const x of KQ[d].w) console.log(`${gioVn(x.dimensions.datetimeHour)}h  yc=${String(x.sum.requests).padStart(6)}  loi=${String(x.sum.errors).padStart(4)}  p50=${String(Math.round(x.quantiles.durationP50)).padStart(5)}  p90=${String(Math.round(x.quantiles.durationP90)).padStart(5)}  p99=${String(Math.round(x.quantiles.durationP99)).padStart(6)}  cpu50=${String(Math.round(x.quantiles.cpuTimeP50)).padStart(4)}  cpu99=${String(Math.round(x.quantiles.cpuTimeP99)).padStart(5)}`)
+            console.log(`--- ${ten} · D1 theo GIỜ VN: truy vấn đọc / ghi · thời gian lô ms p50/p90/p99 · dòng đọc / ghi ---`)
+            for (const x of KQ[d].d1) console.log(`${gioVn(x.dimensions.datetimeHour)}h  doc=${String(x.sum.readQueries).padStart(6)}  ghi=${String(x.sum.writeQueries).padStart(5)}  p50=${String(Math.round(x.quantiles.queryBatchTimeMsP50)).padStart(5)}  p90=${String(Math.round(x.quantiles.queryBatchTimeMsP90)).padStart(5)}  p99=${String(Math.round(x.quantiles.queryBatchTimeMsP99)).padStart(6)}  dongDoc=${x.sum.rowsRead}  dongGhi=${x.sum.rowsWritten}`)
+          }
+          // Khung cao điểm 19–23h VN: gộp theo ngày (trung bình theo yêu cầu cho p50; p99 lớn nhất)
+          console.log('\n=== TÓM TẮT KHUNG CAO ĐIỂM 19h–23h VN ===')
+          for (const [d, ten] of ngay) {
+            const g = KQ[d].w.filter((x) => { const h = +gioVn(x.dimensions.datetimeHour); return h >= 19 && h <= 22 })
+            const yc = g.reduce((n, x) => n + x.sum.requests, 0), loi = g.reduce((n, x) => n + x.sum.errors, 0)
+            const tb = (k) => g.length ? Math.round(g.reduce((n, x) => n + x.quantiles[k] * x.sum.requests, 0) / Math.max(1, yc)) : '-'
+            const p99 = g.length ? Math.round(Math.max(...g.map((x) => x.quantiles.durationP99))) : '-'
+            const dd = KQ[d].d1.filter((x) => { const h = +gioVn(x.dimensions.datetimeHour); return h >= 19 && h <= 22 })
+            const dp = (k) => dd.length ? Math.round(Math.max(...dd.map((x) => x.quantiles[k]))) : '-'
+            console.log(`${ten}: yc=${yc} loi=${loi} | thời gian TB theo yêu cầu: p50=${tb('durationP50')} p90=${tb('durationP90')} ms, p99 lớn nhất=${p99} ms | D1 lô lớn nhất theo giờ: p50=${dp('queryBatchTimeMsP50')} p90=${dp('queryBatchTimeMsP90')} p99=${dp('queryBatchTimeMsP99')} ms`)
+          }
+          JS
