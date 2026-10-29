@@ -54,8 +54,9 @@ const PHAN_DAU: readonly Phan[] = [
   ['bdd', 'bai_da_day', "SELECT COUNT(*)||'|'||COALESCE(MAX(tick_luc),'') FROM bai_da_day", 1],
 ]
 /** Phiên bản cách tính dấu (đầu chuỗi): đổi cách tính ⇒ bản sẵn cũ không khớp, cron đêm lập lại (xem `cronSanSangDem`).
- *  v4 (28/10): «đã làm hôm nay» không còn đếm câu Tự sửa lỗi ⇒ bỏ mọi bản sẵn lập theo cách đếm cũ (sảnh «Đủ 14/12 · 2/2 chặng» khi chưa học chặng cuối). */
-export const BAN_DAU = 'v4'
+ *  v4 (28/10): «đã làm hôm nay» không còn đếm câu Tự sửa lỗi ⇒ bỏ mọi bản sẵn lập theo cách đếm cũ (sảnh «Đủ 14/12 · 2/2 chặng» khi chưa học chặng cuối).
+ *  v5 (29/10): em ĐÃ đủ mức nay có chặng «học thêm câu mới» (goi-bai-7.ts `hocThem`) thay cho chặng RỖNG ⇒ bỏ mọi bản cũ mang chặng rỗng. */
+export const BAN_DAU = 'v5'
 /** Câu đọc DẤU (bỏ phần của bảng chưa có — `vang`; `coChung` = có kèm phần chung). ?1 = sbd. */
 export function sqlDauSanSang(vang: ReadonlySet<string> = new Set(), coChung = true): string {
   return 'SELECT ' + PHAN_DAU.filter((p) => coChung || !p[3]).map(([k, bang, q]) => (vang.has(bang) ? `'-' AS ${k}` : `(${q}) AS ${k}`)).join(',\n  ')

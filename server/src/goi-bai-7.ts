@@ -34,7 +34,7 @@ import { soSanhOnHoiThay } from './hoi-thay-lich-on'
 import { cungTap, layKeHoach7, nhoKeHoach7 } from './goi-bai-7-nho'
 import { lenhThuongTraLoi, tinhThuongHocCachGiai, type PhienNt } from './thuong-tra-loi'
 import { ngayVnTt } from './thuong-luat'
-import { SQL_KHONG_TU_SUA, SQL_LA_LUOT_CHANG } from './chuoi-ngay-bai'
+import { CAU_MOT_BAI, SQL_KHONG_TU_SUA, SQL_LA_LUOT_CHANG } from './chuoi-ngay-bai'
 
 type Row = Record<string, unknown>
 const str = (x: unknown) => String(x ?? '')
@@ -550,6 +550,9 @@ export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promis
   // được (thầy vừa sửa / rút câu, đọc lại câu lỗi, cổng khối …) là đủ để chặng rỗng. `startGoi7` khi đó đi tiếp TOÀN BỘ hàng chờ theo CÙNG luật xếp (mới theo lịch
   // → chữa → sửa → ôn → mới → tiếp cận), bỏ câu đã có trong kế hoạch. Chỉ tính khi cần — CPU, không đọc D1.
   const duPhong = (): ViecGoi7[] => { const co = new Set(plan.viec.map(v => v.qid)); return chonGoi7({ ...vaoPlan, mucTieuNgay: cau.length + hs.cau.length }).viec.filter(v => !co.has(v.qid)) }
+  // HỌC THÊM CÂU MỚI (thầy 29/10 17:36, ảnh «Em đã hoàn thành phần được xếp hôm nay…»: nút «Học thêm câu mới» của Lộ trình mở chặng RỖNG ⇒ em kẹt): em ĐÃ đủ mức hôm nay muốn học thêm ⇒ một
+  // chặng (6 câu) toàn câu MỚI của các gói (theo lịch trước, rồi câu chưa gặp), không câu sửa / ôn. Không đổi mức đã chốt, chuỗi, số «đã làm» — câu học thêm chỉ cộng vào số đã làm. CPU thuần, chỉ tính khi gọi.
+  const hocThem = (): ViecGoi7[] => chonGoi7({ ...vaoPlan, sua: [], on: [], chua: [], onSom: undefined, giuOn: 0, mucTieuNgay: CAU_MOT_BAI }).viec
   const kiem=await kiemSom
   const diemDaDo=kiem.results.filter(r=>diemConDungNguon7(json<Row>(r.json).cau,goi.find(g=>g.id===r.goi_id)?.cau.filter(c=>(c.maTo??c.maDe)===r.ma_de)??[])).map(r=>({goiId:str(r.goi_id),maDe:str(r.ma_de),diem:Number(r.diem),luc:str(r.nop_luc),cauMoi:Number(json<Row>(r.json).cauMoi??0),tong:Number(json<Row>(r.json).tong??0)}))
   const skills = new Map(old.results.map(r => [str(r.kn),r.trang_thai === 'vung']))
@@ -562,7 +565,7 @@ export async function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promis
     const q = new Set(g.cau.map(c => c.qid)), ds = hs.cau.filter(c => q.has(c.qid))
     if (ds.some(c => tangCuaCau(c) !== null)) tangGoi.set(g.id, tangCuaEm(ds, hs.tt, nhom7))
   }
-  return { goi, plan, hs, chan, control, kienThucCu, diemDaDo, toiThieu, daLamNgay:soDaLam, tang, tangGoi, vuaLam, nghi, duPhong, daLamTap: daLamNgay as ReadonlySet<string>, soVua, pDung: engine.pDung ?? {} }
+  return { goi, plan, hs, chan, control, kienThucCu, diemDaDo, toiThieu, daLamNgay:soDaLam, tang, tangGoi, vuaLam, nghi, duPhong, hocThem, daLamTap: daLamNgay as ReadonlySet<string>, soVua, pDung: engine.pDung ?? {} }
 }
 
 type LapGoi7 = NonNullable<Awaited<ReturnType<typeof lapGoi7>>>
@@ -671,7 +674,7 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
   // BÀI 6 CÂU KIỂU DUOLINGO (26/10, bai-6-cau.ts): kế hoạch ngày trộn đều thành chặng 6 câu (câu mới · sửa · ôn), dễ → khó → vừa, quanh ~80% đúng — CÙNG tập câu,
   // chỉ đổi thứ tự. Ngày sát hạn của một gói còn quota (≤ 1 ngày) ⇒ giữ thứ tự cũ (câu mới trước) để em làm dở ngày vẫn phủ tối đa câu mới.
   const satHan = !(await duoSom) || lap.goi.some(g => g.quota > g.gapNgay.size && soNgayCon7(ngayVn7(now), g.han) <= 1) // cờ tắt ⇒ giữ thứ tự cũ
-  const lanThu: (() => readonly (ViecGoi7 | RefGoi7)[])[] = [...(viec.length ? [() => viec] : []), () => xepBai6(lap.plan.viec, lap.pDung, { giuThuTu: satHan }), ...(lap.daLamNgay < lap.toiThieu ? [lap.duPhong] : [])]
+  const lanThu: (() => readonly (ViecGoi7 | RefGoi7)[])[] = [...(viec.length ? [() => viec] : []), () => xepBai6(lap.plan.viec, lap.pDung, { giuThuTu: satHan }), ...(lap.daLamNgay < lap.toiThieu ? [lap.duPhong] : [lap.hocThem])]
   const cauGoi = new Map(lap.goi.flatMap(g=>g.cau).map(c=>[c.qid,c] as const).reverse())
   // ĐỌC SONG SONG THEO LÔ (đợt 17): trước đây TỪNG câu đọc nối tiếp (đọc câu theo ref ⇒ cổng khối) — 6 câu ≈ 12 lượt D1 chờ nhau ("Đang chuẩn bị những
   // câu…" lâu giờ cao điểm). Nay mỗi lô (đủ chỗ còn thiếu + 2 dự phòng) đọc các câu CÙNG LÚC, cổng khối MỘT lần cho cả lô (từng câu xét độc lập); vẫn

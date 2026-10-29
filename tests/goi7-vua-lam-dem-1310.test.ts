@@ -46,8 +46,9 @@ it('em vừa nộp hết câu của kế hoạch, sổ chưa kịp ghi: bộ đ�
   expect(lap.plan.viec.filter((v) => ke.includes(v.qid))).toEqual([])
   const dem = await demHomNay7(k.env, 'S1', NOW)
   expect(dem.daLamHomNay).toBe(lap0.toiThieu) // ô "đã làm/M câu hôm nay" cũng đủ ngay
-  const r = (await startGoi7(k.env, 'S1', NOW)) as { questions: unknown[]; goi7: { daLamHomNay: number; toiThieu: number } }
-  expect(r.questions).toEqual([])
+  const r = (await startGoi7(k.env, 'S1', NOW)) as { questions: { qid: string }[]; goi7: { daLamHomNay: number; toiThieu: number } }
+  // 29/10: đủ mức ⇒ chỉ «học thêm» câu MỚI (không phát lại câu em vừa làm, kể cả khi sổ chưa kịp ghi)
+  for (const q of r.questions) expect(ke).not.toContain(q.qid)
   expect(r.goi7.daLamHomNay).toBe(r.goi7.toiThieu) // "M/M" — hết mâu thuẫn "còn 1 câu mà báo hoàn thành"
 })
 
