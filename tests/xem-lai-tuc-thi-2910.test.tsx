@@ -12,7 +12,7 @@ vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'htt
 vi.mock('../src/lib/may-chu-moi', () => ({ layCauHinhMayChu: async () => ({ URL: 'https://may.test' }), xongNapDiaChi: async () => {} }))
 import Man, { napKhungDuo } from '../src/components/chua-cau-sai/ManChuaCauSai'
 import { docXemLai, luuXemLai } from '../src/lib/xem-lai-sua'
-import { taiChiTiet, xoaNhoChiTiet } from '../src/components/hoa2/api'
+import { taiChiTiet, xoaNhoChiTiet } from '../src/components/hoa2/tai-chi-tiet'
 
 const DE = { qid: 'Q', phan: 'I', text: 'Thuỷ phân hoàn toàn 8,8 gam etyl axetat bằng dung dịch NaOH vừa đủ. Khối lượng muối thu được là', choices: ['8,2 gam.', '6,8 gam.', '9,6 gam.', '4,1 gam.'], ideas: [], hinhAnh: [], tenDang: 'Thuỷ phân ester' }
 const CHI_TIET = { de: { ...DE, maDe: 'DH-12', mucDo: 'hieu', sao: 0 }, dapAn: 'A', loiGiai: { chot: 'Muối CH₃COONa là 8,2 gam.' } }
