@@ -3796,7 +3796,7 @@ const boXuLy = {
         if (b.gon !== true) return raChua(moRes)
         const mo = await moRes.json() as Record<string, unknown>
         if (moRes.ok && mo.ok === true && typeof mo.dotId === 'string') {
-          const gRes = await chuaGonMo(env, { ...b, dotId: mo.dotId })
+          const gRes = await chuaGonMo(env, { ...b, dotId: mo.dotId }, sbd)
           mo.gon = { ...(await gRes.json() as Record<string, unknown>), status: gRes.status }
         }
         return ra(mo, moRes.status)

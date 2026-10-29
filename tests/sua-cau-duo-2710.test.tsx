@@ -50,7 +50,7 @@ describe('Sửa câu kiểu Duolingo («Trong» HS)', () => {
     expect(kiem.disabled).toBe(false)
     fireEvent.click(kiem)
     expect(await screen.findByRole('heading', { name: 'Em đã tự sửa xong câu này' })).toBeTruthy()
-    expect(api.apiGonNop).toHaveBeenCalledWith('t', 'D1', 'Q', 'A', expect.any(String))
+    expect(api.apiGonNop).toHaveBeenCalledWith('t', 'D1', 'Q', 'A', expect.any(String), 'Q')
     expect(container.querySelector('.duo-ket[data-tt=dung]')).toBeTruthy()
     expect(xong()).toEqual(['D1', 'Q'])
     fireEvent.click(screen.getByRole('button', { name: 'Tiếp tục' }))

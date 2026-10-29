@@ -14,6 +14,7 @@ import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { docThamSo } from './tu-hoan-thien'
 import { docThamSoEm } from './ca-nhan-hoa-v2'
 import type { TrangThaiDay } from './chua-cau-sai-kieu'
+import { NhoCoLuot } from './chua-gon-nho'
 export interface TrangThaiLoiDau {
   qidChuan: string
   loiHoc: KetQuaLoi
@@ -29,8 +30,11 @@ const str = (v: unknown) => (v == null ? '' : String(v))
 import { SQL_DAU_HO_TRO_CHUA } from './dau-ho-tro-chua'
 export { SQL_DAU_HO_TRO_CHUA }
 export async function docLuatChua(env: Env, sbd: string): Promise<ThamSoLuat> {
-  return (await docThamSoEm(env, sbd)) ?? (await docThamSo(env))
+  // 29/10 (thầy «Mở câu quá lâu»): hai lượt đọc độc lập chạy CÙNG đợt (trước: nối tiếp — tham số riêng của em rồi mới tham số chung). Kết quả y như cũ: riêng em nếu có, không thì chung.
+  const [em, chung] = await Promise.all([docThamSoEm(env, sbd), docThamSo(env)])
+  return em ?? chung
 }
+const nhoAlias = new NhoCoLuot<{ qid: string; goc: string }[]>()
 export async function docNhieuTrangThaiLoiDau(
   env: Env,
   sbd: string,
@@ -42,11 +46,15 @@ export async function docNhieuTrangThaiLoiDau(
     ra = new Map<string, TrangThaiLoiDau>()
   if (!goc.length) return ra
   const ds = JSON.stringify(goc)
-  const aliasRows = await env.DB.prepare(
+  // 29/10: nhóm câu cùng nội dung của MỘT vài câu là dữ liệu ít đổi ⇒ nhớ 3 phút trong isolate (chỉ lượt tra ≤ 5 câu: mở / nộp một câu sửa; danh sách lớn không nhớ).
+  const khoaAlias = goc.length <= 5 ? ds : ''
+  const nho = khoaAlias ? nhoAlias.doc(khoaAlias) : undefined
+  const aliasRows = nho ? { results: nho } : await env.DB.prepare(
     `SELECT a.qid AS qid,b.qid AS goc FROM game_v2_question b JOIN game_v2_question a ON a.content_group=b.content_group AND a.content_group<>'' WHERE b.qid IN (SELECT value FROM json_each(?))`,
   )
     .bind(ds)
     .all<{ qid: string; goc: string }>()
+  if (khoaAlias && !nho) nhoAlias.ghi(khoaAlias, aliasRows.results ?? [])
   const alias = new Map<string, Set<string>>()
   for (const q of goc) alias.set(q, new Set([q]))
   for (const x of aliasRows.results ?? []) alias.get(x.goc)?.add(x.qid)

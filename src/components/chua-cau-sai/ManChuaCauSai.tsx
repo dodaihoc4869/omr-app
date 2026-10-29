@@ -28,6 +28,7 @@ import { KhungDuoSua, type TienDoSua } from './KhungDuoSua'
 import { TrongManChua } from './trong-man-chua'
 import { canChuaTrucTiep, henGapLai, LUAT_BAN_MOI } from '../../lib/chua-truc-tiep'
 import { ghiXongHomNay } from '../../lib/tu-sua-viec-hom-nay'
+import { layNapTruocCauSua } from '../../lib/nap-truoc-sua'
 import '../tu-luyen/tu-luyen.css'
 import './chua-cau-sai.css'
 // «Trong» 26/10 (nhóm 2): tờ trình bày styles/trong-lam-bai.css nạp RIÊNG, chỉ khi <html data-trong> (main.tsx gắn trước khi nạp màn) — không cộng byte lượt mở app.
@@ -279,7 +280,10 @@ export default function ManChuaCauSai({
       setGon(null)
       // Chữa câu gọn (thầy 25/10): mở đợt KHÔNG phát bước đầu (đường gọn không dùng phiên từng bước) rồi xin bản làm lại.
       // 27/10 (thầy: «sửa lỗi chỗ mở câu phải tức thì»): mở đợt + mở bản làm lại MỘT lượt đi-về (`gon`); máy chủ cũ ⇒ gọi gon-mo như trước.
-      const r = await apiMoDot(token, qid, undefined, false, true)
+      // 29/10 (thầy «Mở câu quá lâu»): câu kế của Việc hôm nay đã được mở sẵn lúc em còn xem danh sách / làm câu trước (nap-truoc-sua.ts) ⇒ dùng ngay; lần «Thử lại» hỏi tươi.
+      const sanNap = lanTai === 0 ? layNapTruocCauSua(token, qid) : null
+      let r = sanNap ? await sanNap : null
+      if (!r || !r.ok) r = await apiMoDot(token, qid, undefined, false, true)
       const phat = docPhatKem(r.phat)
       if (huy || n !== goiRef.current) return
       // 24/10: sổ học đã đóng lỗi câu này (máy chủ trả «chưa có lỗi đang mở» kèm mã đợt) ⇒ tính xong phần hôm nay, không để chặng kẹt ở khung lỗi.

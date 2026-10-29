@@ -383,9 +383,10 @@ export interface KetQuaGon {
   nguyenTu?: number
 }
 const docGon = (j: Obj | null): KetQuaGon => (j?.ok ? (j as unknown as KetQuaGon) : { ok: false, loi: loiCua(j), ...(j?.ma ? { ma: chu(j.ma) } : {}) })
-export async function apiGonMo(token: string, dotId: string): Promise<KetQuaGon> {
-  return docGon(await goi('gon-mo', token, { dotId }))
+/** `qid` (29/10): mã câu GỐC của đợt — gợi ý để máy chủ nạp sẵn câu song song với việc đọc đợt (câu nguội mất 4–6 đợt D1 nối tiếp). Máy chủ vẫn kiểm đợt thuộc về em và khớp mã câu. */
+export async function apiGonMo(token: string, dotId: string, qid?: string): Promise<KetQuaGon> {
+  return docGon(await goi('gon-mo', token, { dotId, ...(qid ? { qid } : {}) }))
 }
-export async function apiGonNop(token: string, dotId: string, ban: string, traLoi: string, khoa: string): Promise<KetQuaGon> {
-  return docGon(await goi('gon-nop', token, { dotId, ban, traLoi, khoa }))
+export async function apiGonNop(token: string, dotId: string, ban: string, traLoi: string, khoa: string, qid?: string): Promise<KetQuaGon> {
+  return docGon(await goi('gon-nop', token, { dotId, ban, traLoi, khoa, ...(qid ? { qid } : {}) }))
 }

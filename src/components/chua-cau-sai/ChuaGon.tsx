@@ -78,7 +78,7 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep, 
     if (!de || !mo.ban || ban || !daTraLoiDu(phan, tra)) return
     if (!khoa.current) khoa.current = sinhMaNgauNhien()
     setBan(true); setLoi('')
-    const r = await apiGonNop(token, dotId, mo.ban, tra.trim(), khoa.current)
+    const r = await apiGonNop(token, dotId, mo.ban, tra.trim(), khoa.current, qid)
     if (!song.current) return
     setBan(false)
     if (!r.ok) {
@@ -94,7 +94,7 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep, 
   }
   const lamLai = async () => {
     setBan(true); setLoi('')
-    const r = await apiGonMo(token, dotId)
+    const r = await apiGonMo(token, dotId, qid)
     if (!song.current) return
     setBan(false)
     if (!r.ok) { setLoi(r.loi ?? 'Chưa mở lại được câu. Em thử lại nhé.'); return }

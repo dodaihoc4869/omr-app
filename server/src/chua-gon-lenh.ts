@@ -10,12 +10,14 @@
 import type { Env } from './kieu'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { cauCongKhai } from './cau-theo-qid'
-import { cauDuoc, quyen } from './chua-cau-sai'
-import { docHocLieu } from './chua-cau-sai-hoc-lieu'
+import { cauDuocNho, docHocLieuNho, quyen } from './chua-cau-sai'
+import { NhoCoLuot } from './chua-gon-nho'
+import { boTroTheoQid } from './song-sinh-game'
+import type { BoTro } from './cau-bo-tro'
+import { gameSbdDaKy } from './game-v2-auth'
 import { chamCauTuLuyen } from '../../src/lib/tu-luyen'
 import { laCauTuLuan } from '../../src/lib/cau-tu-luan'
 import { lenhGhiSuKienNguyenTu, ngayVn } from './su-kien-hoc'
-import { docBoTroLoi } from './hang-chua-loi'
 import { apSongSinh, qidSongSinh } from './song-sinh-game'
 import { phuQidAoMoi, SO_THU_BIEN_THE } from './ban-khac-ao'
 import { qidBienThe, qidYDsMoi } from './loi-hoc-luat'
@@ -31,21 +33,34 @@ const str = (v: unknown) => (typeof v === 'string' ? v : '')
 const loi = (ma: string, mo: string, status = 400) => Response.json({ ok: false, ma, mo }, { status })
 export const SO_LAN_MOI_NGAY = 2
 
-/** Mọi bản làm lại dùng được của câu gốc, theo thứ tự ưu tiên (song sinh → biến thể → gốc). */
-export async function cacBan(env: Env, q: PrivateQuestion): Promise<PrivateQuestion[]> {
+/** Dựng danh sách bản làm lại; `tot` = KHÔNG có lượt đọc nào lỗi (lỗi thoáng qua ⇒ danh sách rút gọn, KHÔNG được nhớ). */
+async function dungCacBan(env: Env, q: PrivateQuestion): Promise<{ ds: PrivateQuestion[]; tot: boolean }> {
+  let tot = true
   const ra: PrivateQuestion[] = []
-  const boTro = await docBoTroLoi(env, [q.qid])
+  const boTro = await boTroTheoQid(env, [q.qid]).catch(() => { tot = false; return new Map<string, BoTro>() })
   const ss = boTro.get(q.qid)?.songSinh ?? []
   ss.forEach((s, i) => { const b = apSongSinh(q, s, i); if (b && b.qid === qidSongSinh(q.qid, i)) ra.push(b) })
   if (!ra.length) {
     const ao = q.phan === 'II' ? [qidYDsMoi(q.qid, 0)] : Array.from({ length: SO_THU_BIEN_THE }, (_, k) => qidBienThe(q.qid, k))
     for (const qid of ao) {
-      const b = await phuQidAoMoi(env, q, qid).catch(() => null)
+      const b = await phuQidAoMoi(env, q, qid).catch(() => { tot = false; return null })
       if (b && b.qid === qid) { ra.push(b); break }
     }
   }
   ra.push(q)
-  return ra.filter((b) => !laCauTuLuan(b) && !!String(b.correct ?? '').trim())
+  return { ds: ra.filter((b) => !laCauTuLuan(b) && !!String(b.correct ?? '').trim()), tot }
+}
+// 29/10 (thầy «Mở câu quá lâu»): danh sách bản làm lại là hàm THUẦN của câu gốc + học liệu bổ trợ (song sinh) ⇒ nhớ trong isolate 3 phút (chua-gon-nho.ts); dùng chung cho
+// mọi em cùng câu (giờ cao điểm cả lớp sai cùng vài câu). Không nhớ khi một lượt đọc lỗi.
+const nhoBan = new NhoCoLuot<PrivateQuestion[]>()
+/** Mọi bản làm lại dùng được của câu gốc, theo thứ tự ưu tiên (song sinh → biến thể → gốc). Mảng dùng chung — nơi gọi KHÔNG sửa. */
+export async function cacBan(env: Env, q: PrivateQuestion): Promise<PrivateQuestion[]> {
+  const khoa = `${q.qid}|${q.version ?? ''}`
+  const co = nhoBan.doc(khoa)
+  if (co) return co
+  const r = await dungCacBan(env, q)
+  if (r.tot) nhoBan.ghi(khoa, r.ds)
+  return r.ds
 }
 
 /** Bản đề để XEM LẠI sau khi nộp (như `publicQuestionDayDu` của srs2-game): giữ cả hình sau lời giải. */
@@ -71,7 +86,7 @@ async function docChung(env: Env, sbd: string, dotId: string, nowMs: number) {
 /** Kết quả lưu KHÔNG kèm đề + lời giải (câu có thể mang ảnh lớn); trả ra thì dựng lại từ bản đã chấm. */
 async function kemChiTiet(env: Env, sbd: string, Q: string, kq: Obj, ban?: PrivateQuestion): Promise<Obj> {
   if (!kq.ket || kq.ket === 'goi_y') return kq
-  const b = ban ?? await (async () => { const q = await cauDuoc(env, sbd, Q); return q ? (await cacBan(env, q)).find((x) => x.qid === str(kq.ban)) : undefined })()
+  const b = ban ?? await (async () => { const q = await cauDuocNho(env, sbd, Q); return q ? (await cacBan(env, q)).find((x) => x.qid === str(kq.ban)) : undefined })()
   return b ? { ...kq, chiTiet: { de: deDayDu(b), dapAn: b.correct, loiGiai: b.solution } } : kq
 }
 
@@ -87,18 +102,41 @@ function ketDaKhep(ds: Obj[]): Obj | null {
 const tinhTuSua = (ban: PrivateQuestion, goc: string, lan: number, c: { ngaySai: string; docGan: boolean; homNay: string }) =>
   lan === 1 && !c.docGan && (ban.qid !== goc || (!!c.ngaySai && c.homNay > c.ngaySai))
 
-export async function gonMo(env: Env, b: Obj): Promise<Response> {
+/**
+ * Xác thực rồi đọc phần chung SONG SONG (29/10, thầy «Mở câu quá lâu»): chữ ký token kiểm KHÔNG chạm D1 (`gameSbdDaKy`) ⇒ các lượt ĐỌC theo SBD ấy chạy CÙNG đợt với `quyen`
+ * (mật khẩu, cờ, ca thi đang mở). Chỉ ĐỌC, chỉ dùng sau khi `quyen` qua và SBD khớp — như `gameIdentityHaiBuoc`. `sbdDaKiem`: nơi gọi vừa chạy `quyen` rồi (mo-dot kèm gon-mo).
+ */
+async function quyenKemDocChung<T>(env: Env, b: Obj, sbdDaKiem: string | undefined, doc: (sbd: string) => Promise<T>): Promise<{ sbd: string; kq: Promise<T> } | Response> {
+  if (sbdDaKiem) return { sbd: sbdDaKiem, kq: doc(sbdDaKiem) }
+  const sbdSom = await gameSbdDaKy(env, b).catch(() => '')
+  const som = sbdSom ? doc(sbdSom) : null
+  som?.catch(() => {}) // lỗi tới đúng chỗ khi `await kq`; chặn cảnh báo khi `quyen` từ chối trước
   const sbd = await quyen(env, b)
   if (sbd instanceof Response) return sbd
+  return { sbd, kq: som && sbdSom === sbd ? som : doc(sbd) }
+}
+
+/**
+ * Làm ẤM bản nhớ câu + bản làm lại của câu `qid` (máy em gợi ý — đúng câu gốc của đợt) CÙNG đợt với phần đọc đầu: câu nguội mất 4–6 đợt D1 nối tiếp để nạp, đợt của em
+ * chỉ cho biết mã câu sau đợt đầu. Gợi ý sai / lỗi ⇒ bỏ qua (đường thường tự nạp sau). Chỉ ĐỌC, kết quả chỉ nằm trong bản nhớ — nơi gọi vẫn kiểm đợt thuộc về em và khớp mã câu.
+ */
+const lamAm = (env: Env, sbd: string, qid: string): Promise<null> =>
+  (qid && qid.length <= 160 ? cauDuocNho(env, sbd, qid).then((q) => (q ? cacBan(env, q) : null)) : Promise.resolve(null)).then(() => null, () => null)
+
+export async function gonMo(env: Env, b: Obj, sbdDaKiem?: string): Promise<Response> {
   const dotId = str(b.dotId)
-  if (!dotId || dotId.length > 160) return loi('THIEU_THAM_SO', 'Thiếu câu cần sửa.')
   const nowMs = Date.now()
-  const c = await docChung(env, sbd, dotId, nowMs)
+  const qHint = str(b.qid)
+  const qk = await quyenKemDocChung(env, b, sbdDaKiem, (s) => (dotId && dotId.length <= 160 ? Promise.all([docChung(env, s, dotId, nowMs), lamAm(env, s, qHint)]).then(([c]) => c) : Promise.resolve(null)))
+  if (qk instanceof Response) return qk
+  const sbd = qk.sbd
+  if (!dotId || dotId.length > 160) return loi('THIEU_THAM_SO', 'Thiếu câu cần sửa.')
+  const c = (await qk.kq)!
   if (!c.dot) return loi('KHONG_CO_DOT', 'Không tìm thấy câu này trong danh sách của em.', 404)
   if (str(c.dot.trang_thai_day) === 'da_tu_sua') return Response.json({ ok: true, dotId, trangThai: 'da_tu_sua' })
   const khep = ketDaKhep(c.lanHomNay)
   if (khep) return Response.json(await kemChiTiet(env, sbd, str(c.dot.qid_chuan), { ...khep, ok: true, dotId, daKhepHomNay: true }))
-  const q = await cauDuoc(env, sbd, str(c.dot.qid_chuan))
+  const q = await cauDuocNho(env, sbd, str(c.dot.qid_chuan))
   if (!q) return loi('KHONG_MO_DUOC_CAU', 'Chưa mở được câu này ở đây. Em bấm Hỏi thầy nhé.', 404)
   const ds = await cacBan(env, q)
   if (!ds.length) return loi('KHONG_MO_DUOC_CAU', 'Câu này chưa chấm tự động được. Em bấm Hỏi thầy nhé.', 404)
@@ -115,23 +153,28 @@ export async function gonMo(env: Env, b: Obj): Promise<Response> {
 }
 
 export async function gonNop(env: Env, b: Obj): Promise<Response> {
-  const sbd = await quyen(env, b)
-  if (sbd instanceof Response) return sbd
   const dotId = str(b.dotId), banXin = str(b.ban), traLoi = str(b.traLoi).trim().slice(0, 200), khoa = str(b.khoa)
-  if (!dotId || dotId.length > 160 || !banXin || banXin.length > 160 || !khoa || khoa.length > 80) return loi('THIEU_THAM_SO', 'Thiếu câu trả lời.')
-  if (!traLoi) return loi('CHUA_TRA_LOI', 'Em trả lời rồi bấm Kiểm tra nhé.')
+  const hopLe = !!dotId && dotId.length <= 160 && !!banXin && banXin.length <= 160 && !!khoa && khoa.length <= 80
   const nowMs = Date.now()
-  const [c, cu, cfgExp] = await Promise.all([
-    docChung(env, sbd, dotId, nowMs),
-    env.DB.prepare('SELECT ket FROM chua_gon_lan WHERE khoa=? AND sbd=?').bind(khoa, sbd).first<{ ket: string }>(),
+  // 29/10 (thầy «Kiểm tra chưa tức thì»): `quyen` + ba lượt đọc (đợt / lần hôm nay, lần đã nộp theo khoá, cấu hình EXP) CÙNG một đợt D1 — trước: nối tiếp.
+  const qHint = str(b.qid)
+  const qk = await quyenKemDocChung(env, b, undefined, (s) => (hopLe && traLoi ? Promise.all([
+    docChung(env, s, dotId, nowMs),
+    env.DB.prepare('SELECT ket FROM chua_gon_lan WHERE khoa=? AND sbd=?').bind(khoa, s).first<{ ket: string }>(),
     docCauHinhExp(env).catch(() => null),
-  ])
+    lamAm(env, s, qHint),
+  ]).then(([c0, cu0, cfg0]) => [c0, cu0, cfg0] as const) : Promise.resolve(null)))
+  if (qk instanceof Response) return qk
+  const sbd = qk.sbd
+  if (!hopLe) return loi('THIEU_THAM_SO', 'Thiếu câu trả lời.')
+  if (!traLoi) return loi('CHUA_TRA_LOI', 'Em trả lời rồi bấm Kiểm tra nhé.')
+  const [c, cu, cfgExp] = (await qk.kq)!
   if (!c.dot) return loi('KHONG_CO_DOT', 'Không tìm thấy câu này trong danh sách của em.', 404)
   const Q = str(c.dot.qid_chuan)
   if (cu) { try { return Response.json(await kemChiTiet(env, sbd, Q, JSON.parse(cu.ket) as Obj)) } catch { /* hỏng ⇒ chấm như mới */ } }
   const khep = ketDaKhep(c.lanHomNay)
   if (khep) return Response.json(await kemChiTiet(env, sbd, Q, { ...khep, ok: true, dotId, daKhepHomNay: true }))
-  const q = await cauDuoc(env, sbd, Q)
+  const q = await cauDuocNho(env, sbd, Q)
   if (!q) return loi('KHONG_MO_DUOC_CAU', 'Chưa mở được câu này ở đây. Em bấm Hỏi thầy nhé.', 404)
   // CHỈ nhận bản máy chủ dựng lại được từ chính câu gốc của đợt (không nộp được câu lạ để lấy "Đã tự sửa").
   const ban = (await cacBan(env, q)).find((x) => x.qid === banXin)
@@ -201,7 +244,7 @@ export function lenhThuongTuSua(env: Env, x: { sbd: string; Q: string; dotId: st
 /** Gợi ý sau lần sai đầu (thầy 27/10: lời khuyên chung chung «đọc lại đề, gạch chân…» là vô nghĩa ⇒ bỏ): bước 1 bài luyện từng bước thầy đã duyệt ·
  *  không có ⇒ vế đầu bước 1 / kiến thức cốt lõi của lời giải kho nếu KHÔNG lộ đáp án (goi-y-rieng.ts) · không có ⇒ undefined (máy em không hiện dòng Gợi ý). */
 async function goiYMot(env: Env, Q: string, ban: PrivateQuestion): Promise<string | undefined> {
-  const h = await docHocLieu(env, Q).catch(() => null)
+  const h = await docHocLieuNho(env, Q).catch(() => null)
   const buoc = h?.duDung ? h.hocLieu?.buoc?.[0] : undefined
   const m1 = buoc?.hoTro?.find((x) => x.muc === 1)?.noiDung?.trim()
   if (m1) return m1
