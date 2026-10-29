@@ -71,16 +71,19 @@ export const datLaiBaoRoiApp = (): void => { cuoiBaoRoi = 0 }
 // GÓI BÀI CẢ NGÀY TRÊN MÁY EM (thầy 29/10 22:05 «tìm mọi cách, cách khác hoàn toàn để app hs load tức thì ở mọi thời điểm, kể cả giờ cao điểm» · «bắt buộc, tới lúc
 // nào load được tức thì tại mọi thời điểm mới được dừng lại»; máy chủ server/src/goi-ngay.ts). Máy em giữ SẴN các chặng còn lại của hôm nay (đề công khai + bộ ref
 // niêm phong `ve` — máy em không đọc / sửa được; đáp án KHÔNG có trong gói). Mở chặng ⇒ câu hiện NGAY từ máy; phiên mở NỀN (`hoc-tap-mo-goi`, nhẹ: không lập kế
-// hoạch); «Kiểm tra» trước khi phiên về thì tự đợi phiên. Gói lập lại NỀN khi Lộ trình hiện (mỗi lượt mở app) và sau mỗi chặng (câu sửa lỗi mới, bài thầy vừa giao).
+// hoạch); «Kiểm tra» trước khi phiên về thì tự đợi phiên. Gói lập lại NỀN sau mỗi chặng (câu sửa lỗi mới, bài thầy vừa giao) — KHÔNG lập lúc mở app: chặng đầu khi chưa có
+// gói đi lượt mở trước (đã có bản sẵn cron, nhẹ) ⇒ mở app không thêm lệnh nặng nào giờ cao điểm; có gói ⇒ không lệnh nào ngoài lệnh nhẹ mở phiên.
 // Máy chủ tắt / em chưa được bật (`tat`) ⇒ nhớ 30 phút, mọi thứ y như cũ. Không có gói / gói hỏng / máy chủ từ chối ⇒ đường mở chặng cũ.
 type ChangGoi = { ve: string; questions: KetQuaMo[] }
 type GoiNgay = { ngay: string; luc: number; chang: ChangGoi[]; goi7?: unknown }
 const khoaGoi = (sbd: string) => `omr_goi_ngay_${sbd}`, khoaXong = (sbd: string) => `omr_goi_ngay_xong_${sbd}`
 const KHOA_CUA = 'omr_goi_ngay_cua', KHOA_TAT = 'omr_goi_ngay_tat'
 const ngayMay = (ms: number) => new Date(ms + 7 * 3600_000).toISOString().slice(0, 10)
-/** Lộ trình lập lại gói tối đa một lần mỗi chừng này (trừ lượt sau chặng: luôn lập lại). */
+/** Lập lại gói tối đa một lần mỗi chừng này (trừ lượt sau chặng: luôn lập lại). */
 export const TUOI_GOI_MS = 10 * 60_000
 const HAN_TAT_MS = 30 * 60_000
+/** Số câu một chặng (máy chủ goi-ngay.ts `CAU_MOI_CHANG`). */
+export const CAU_MOI_CHANG_GOI = 6
 const nhoGoi = new Map<string, GoiNgay>(), nhoXong = new Map<string, { n: string; q: Set<string> }>()
 let napDang: Promise<void> | null = null, napCuoi = { token: '', luc: 0 }
 /** Bộ test mặc định TẮT (như `bat` ở trên: các test cũ đếm đúng số lệnh gửi máy chủ); test của gói bật bằng `batGoiNgay(true)`. */
@@ -127,17 +130,22 @@ export function napGoiNgay(token: string, goi: typeof goiHoa2 = goiHoa2, now: nu
   return napDang
 }
 
-/** Chặng kế tiếp trong gói của em (bỏ câu máy này đã làm hôm nay); không có / khác ngày ⇒ null. */
-export function layChangGoi(sbd: string, now: number = Date.now()): { ve: string; questions: KetQuaMo[]; goi7: unknown } | null {
+/** Chặng kế tiếp trong gói của em: `so` câu đầu (theo thứ tự gói) máy này CHƯA làm hôm nay — ghép qua ranh các chặng của gói (gói lập lại giữa chừng vẫn đủ một
+ *  chặng); `ves` = bộ ref niêm phong của các chặng góp câu. Không có / khác ngày ⇒ null. */
+export function layChangGoi(sbd: string, now: number = Date.now(), so = CAU_MOI_CHANG_GOI): { ves: string[]; questions: KetQuaMo[]; goi7: unknown } | null {
   if (!batGoi || !sbd) return null
   const g = docGoi(sbd)
   if (!g || g.ngay !== ngayMay(now)) return null
-  const xong = docXong(sbd, g.ngay)
+  const xong = docXong(sbd, g.ngay), questions: KetQuaMo[] = [], ves: string[] = []
   for (const c of g.chang) {
-    const questions = c.questions.filter((q) => typeof q.qid === 'string' && !xong.has(q.qid))
-    if (questions.length) return { ve: c.ve, questions, goi7: g.goi7 }
+    for (const q of c.questions) {
+      if (questions.length >= so) break
+      if (typeof q.qid !== 'string' || xong.has(q.qid) || questions.some((x) => x.qid === q.qid)) continue
+      questions.push(q)
+      if (!ves.includes(c.ve)) ves.push(c.ve)
+    }
   }
-  return null
+  return questions.length ? { ves, questions, goi7: g.goi7 } : null
 }
 function coChangGoiCua(token: string, now: number): boolean {
   const c = docJson(KHOA_CUA) as { sbd?: unknown; t?: unknown } | null

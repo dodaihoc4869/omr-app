@@ -127,8 +127,9 @@ export default function HocTapHomNay(p: Props) {
   // ngay (mo-chang-truoc.ts — kết quả y hệt gọi lúc bấm; mỗi token tối đa một lượt mỗi 10 phút). Nạp ĐỘNG mảnh màn làm bài (cùng mảnh nút Học tiếp mở): không
   // thêm tệp vào lượt mở app / precache, và màn làm bài được nạp sẵn luôn.
   const coTheHoc = !!sanh && !ngayKiem && !khoaHoc && !!con && con > 0 && !p.coCa
-  // Gói cả ngày (mo-chang-truoc.ts `napGoiNgay`, thầy 29/10): cùng lúc lập lại NỀN gói các chặng còn lại của hôm nay ⇒ bấm chặng là câu hiện từ máy, không chờ máy chủ.
-  useEffect(() => { if (coTheHoc && p.token) { const token = p.token; void import('./ManLamBaiTap').then((m) => { void m.napGoiNgay(token); m.moChangTruoc(token) }).catch(() => {}) } }, [coTheHoc, p.token])
+  // Gói cả ngày (mo-chang-truoc.ts, thầy 29/10): máy em đã có chặng trong gói ⇒ `moChangTruoc` không gọi máy chủ (câu hiện từ gói). Gói chỉ lập lại sau mỗi chặng (màn làm bài)
+  // — mở app KHÔNG thêm lệnh nặng nào giờ cao điểm.
+  useEffect(() => { if (coTheHoc && p.token) { const token = p.token; void import('./ManLamBaiTap').then((m) => m.moChangTruoc(token)).catch(() => {}) } }, [coTheHoc, p.token])
 
   // Tấm "Của em": Esc đóng, focus vào tấm khi mở và trả về ảnh đại diện khi đóng.
   useEffect(() => {

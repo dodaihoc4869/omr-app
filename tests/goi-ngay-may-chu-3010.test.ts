@@ -117,3 +117,17 @@ it('em có bản sẵn (cron) còn dùng được ⇒ gói lấy đúng chặng 
   expect(mo.qids).toEqual(qBan)
   expect(Object.keys(mo.sk).length).toBe(qBan.length)
 })
+
+it('máy em ghép câu của hai chặng trong gói (`ves` + `qids`) ⇒ phiên đúng các câu ấy, tối đa 6; một `ve` hỏng ⇒ GOI_CU', async () => {
+  const k = await kho()
+  const goi = await goiNgay7(k.env, 'S1', NOW) as unknown as Goi
+  const [c0, c1] = [goi.chang[0]!, goi.chang[1]!]
+  const chon = [...c0.questions.slice(3).map((q) => q.qid), ...c1.questions.slice(0, 3).map((q) => q.qid)]
+  const sk = { ...temCua(c0), ...temCua(c1) }
+  const mo = await moGoi7(k.env, 'S1', { ves: [c0.ve, c1.ve], qids: chon, sk }, NOW) as { ok: boolean; id: string; qids: string[] }
+  expect(mo.ok).toBe(true)
+  expect(mo.qids).toEqual(chon)
+  const tat = await moGoi7(k.env, 'S1', { ves: [c0.ve, c1.ve], sk }, NOW) as { qids: string[] }
+  expect(tat.qids).toHaveLength(6) // không chọn ⇒ vẫn tối đa một chặng
+  expect(await moGoi7(k.env, 'S1', { ves: [c0.ve, 'x'.repeat(80)], qids: chon }, NOW)).toEqual({ ok: false, ma: 'GOI_CU' })
+})

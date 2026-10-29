@@ -65,19 +65,24 @@ export async function goiNgay7(env: Env, sbd: string, now: number): Promise<Reco
   return { ok: true, sbd, ngay: x.ngay, luc: now, chang, goi7: x.goi7 }
 }
 
-/** Mở phiên từ một chặng của gói. `b.ve` = bộ ref niêm phong; `b.sk` = {qid: tem hạn dài} của gói. */
+/** Mở phiên từ gói. `b.ves` (hoặc `b.ve` của máy em cũ) = các bộ ref niêm phong (≤ 4 chặng của gói — máy em ghép câu còn lại cho đủ một chặng); `b.qids` (tuỳ chọn) =
+ *  đúng các câu máy em đang hiện (chỉ giữ ref trong số này); `b.sk` = {qid: tem hạn dài} của gói. */
 export async function moGoi7(env: Env, sbd: string, b: Record<string, unknown>, now: number): Promise<Record<string, unknown>> {
   if (!goiNgayBat(sbd)) return { ok: false, ma: 'GOI_TAT' }
   const g7 = await import('./goi-bai-7')
   const ngay = ngayVn7(now)
-  const nd = await moMa<NoiDungVe>(env, aadVe(sbd, ngay), b.ve, now, HAN_NIEM_CHUAN_BI_MS)
-  if (!nd || !Array.isArray(nd.r) || !Array.isArray(nd.g)) return { ok: false, ma: 'GOI_CU' }
+  const ves = Array.isArray(b.ves) ? b.ves.slice(0, 4) : [b.ve]
+  const cacNd = await Promise.all(ves.map((ve) => moMa<NoiDungVe>(env, aadVe(sbd, ngay), ve, now, HAN_NIEM_CHUAN_BI_MS)))
+  if (!cacNd.length || cacNd.some((x) => !x || !Array.isArray(x.r) || !Array.isArray(x.g))) return { ok: false, ma: 'GOI_CU' }
+  const chon = Array.isArray(b.qids) ? new Set(b.qids.filter((x): x is string => typeof x === 'string')) : null
+  const daCo = new Set<string>()
+  const nd = { r: cacNd.flatMap((x) => x!.r).filter((r) => r && typeof r.qid === 'string' && (!chon || chon.has(r.qid)) && !daCo.has(r.qid) && !!daCo.add(r.qid)), g: [...new Set(cacNd.flatMap((x) => x!.g))] }
   const [{ docCauBtvnChuaNop }, { protectedQuestions }, { readGameScope }, { sqlCacGoiConNhan7 }] = await Promise.all([
     import('./game-v2-luot'), import('./game-v2-bank'), import('./game-v2-reports'), import('./goi-bai-7-quyen')])
   const [dl, baoVe, btvn, control] = await Promise.all([g7.docDaLamVaVuaLam7(env, sbd, ngay, now), protectedQuestions(env), docCauBtvnChuaNop(env, sbd), readGameScope(env, sbd)])
   if (!control.enabled) throw new Error('Thầy đang tạm dừng bài học cho em.')
   const chan = new Set(control.blocked)
-  const refs = nd.r.filter((r) => r && typeof r.qid === 'string' && !dl.daLam.has(r.qid) && !dl.vuaLam.has(r.qid) && !baoVe.has(r.qid) && !baoVe.has(r.group) && !btvn.has(r.qid) && !chan.has(r.qid))
+  const refs = nd.r.filter((r) => !dl.daLam.has(r.qid) && !dl.vuaLam.has(r.qid) && !baoVe.has(r.qid) && !baoVe.has(r.group) && !btvn.has(r.qid) && !chan.has(r.qid)).slice(0, CAU_MOI_CHANG)
   if (!refs.length) return { ok: false, ma: 'GOI_HET' }
   const tem = (b.sk && typeof b.sk === 'object' ? b.sk : {}) as Record<string, unknown>
   const sk: Record<string, string> = {}

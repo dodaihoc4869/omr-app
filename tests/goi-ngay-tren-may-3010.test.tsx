@@ -23,16 +23,17 @@ const goiMau = () => ({ ok: true, sbd: 's1', ngay: homNayVn(), luc: Date.now(), 
 const lenh = (ten: string) => vi.mocked(goiHoa2).mock.calls.filter((c) => c[0] === ten)
 
 describe('kho gói cả ngày', () => {
-  it('lưu gói; chặng kế bỏ câu đã làm; hết câu chặng 1 ⇒ chặng 2; khác ngày ⇒ không dùng', async () => {
+  it('lưu gói; chặng kế bỏ câu đã làm, ghép qua ranh chặng của gói cho đủ số câu; khác ngày ⇒ không dùng', async () => {
     const goi = vi.fn(async () => goiMau())
     await napGoiNgay('tk', goi)
     expect(goi).toHaveBeenCalledWith('hoc-tap-goi-ngay', 'tk', {}, 60)
-    expect(layChangGoi('s1')?.ve).toBe('ve-1')
+    expect(layChangGoi('s1')).toMatchObject({ ves: ['ve-1', 've-2'] })
+    expect(layChangGoi('s1', Date.now(), 2)).toMatchObject({ ves: ['ve-1'] }) // chặng 2 câu: chỉ chặng đầu của gói góp câu
     expect(layChangGoi('khac')).toBeNull() // gói gắn em
     ghiCauXong('s1', 'tn1')
-    expect(layChangGoi('s1')?.questions.map((q) => q.qid)).toEqual(['tn2'])
+    expect(layChangGoi('s1', Date.now(), 2)?.questions.map((q) => q.qid)).toEqual(['tn2', 'tn3'])
     ghiCauXong('s1', 'tn2')
-    expect(layChangGoi('s1')?.ve).toBe('ve-2')
+    expect(layChangGoi('s1')).toMatchObject({ ves: ['ve-2'] })
     expect(layChangGoi('s1', Date.now() + 86_400_000)).toBeNull() // sang ngày khác
   })
   it('đã có chặng trong gói ⇒ Lộ trình KHÔNG mở trước bằng hoc-tap-start', async () => {
@@ -68,15 +69,15 @@ describe('màn làm bài mở chặng từ gói', () => {
     expect(lenh('hoc-tap-start')).toHaveLength(0)
     const mo = lenh('hoc-tap-mo-goi')
     expect(mo).toHaveLength(1)
-    expect(mo[0]![2]).toEqual({ ve: 've-1', sk: { tn1: 'tem-dai-1', tn2: 'tem-dai-2' } })
+    expect(mo[0]![2]).toEqual({ ves: ['ve-1', 've-2'], qids: ['tn1', 'tn2', 'tn3'], sk: { tn1: 'tem-dai-1', tn2: 'tem-dai-2', tn3: 'tem-dai-3' } })
     fireEvent.click(screen.getByRole('radio', { name: /\(CH3\)2NH/ }))
     fireEvent.click(screen.getByRole('button', { name: 'Nộp câu · đã chọn B' }))
     await new Promise((r) => setTimeout(r, 20))
     expect(lenh('answer')).toHaveLength(0) // chưa có phiên ⇒ đợi
-    moXong({ ok: true, id: 'phien-goi', qids: ['tn1', 'tn2'], sk: { tn1: 'tem-moi-1', tn2: 'tem-moi-2' }, daLam: 0 })
+    moXong({ ok: true, id: 'phien-goi', qids: ['tn1', 'tn2', 'tn3'], sk: { tn1: 'tem-moi-1', tn2: 'tem-moi-2' }, daLam: 0 })
     await waitFor(() => expect(lenh('answer')).toHaveLength(1))
     expect(lenh('answer')[0]![2]).toMatchObject({ session: 'phien-goi', qid: 'tn1', answer: 'B', sk: 'tem-moi-1' })
-    await waitFor(() => expect(layChangGoi('s1')?.questions.map((q) => q.qid)).toEqual(['tn2'])) // câu vừa làm không vào chặng kế
+    await waitFor(() => expect(layChangGoi('s1')?.questions.map((q) => q.qid)).toEqual(['tn2', 'tn3'])) // câu vừa làm không vào chặng kế
   })
   it('máy chủ bỏ câu em đã làm (máy khác) ⇒ màn bỏ câu ấy', async () => {
     await napGoiNgay('tk', vi.fn(async () => goiMau()))
