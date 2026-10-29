@@ -1,0 +1,42 @@
+# ĐỌC «ĐÃ LÀM HÔM NAY» CỦA TÀI KHOẢN THỬ 12121212 để đối chiếu với vạch chặng ở Lộ trình (CHỈ ĐỌC) — thầy 29/10: «Phần học tiếp ở dưới chưa làm câu nào thanh đã báo rồi».
+# Chỉ SELECT; tài khoản thử là hằng công khai (SBD_THU_NGHIEM). Không in nội dung câu / lời giải.
+name: Đọc đã-làm hôm nay của tài khoản thử (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/do-san-sang-2910]
+    paths: ['.github/workflows/do-dem-thu-2910.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-dem-thu-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đọc (chỉ SELECT)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c ".[0].results[]" || echo "(lỗi)"; }
+          echo "Giờ VN: $(TZ=Asia/Ho_Chi_Minh date '+%d/%m %H:%M')"
+          HOM="date('now','+7 hours')"; S="'12121212'"
+          q "sổ học hôm nay: nguồn · mục đích · kết quả · hỗ trợ · số dòng · số câu khác nhau" "SELECT COALESCE(nguon,'') nguon, COALESCE(purpose,'') purpose, ket_qua, assistance, COUNT(*) dong, COUNT(DISTINCT qid) cau FROM su_kien_hoc WHERE sbd=$S AND ngay_vn=$HOM GROUP BY 1,2,3,4 ORDER BY 1,2,3,4"
+          q "ĐÃ LÀM HÔM NAY theo đúng câu truy vấn của máy chủ (sổ, không lướt / chẩn đoán / tự sửa)" "SELECT COUNT(DISTINCT qid) so FROM su_kien_hoc WHERE sbd=$S AND ngay_vn=$HOM AND ket_qua IS NOT NULL AND ma_nguon NOT LIKE 'ktcn:%' AND COALESCE(nguon,'')<>'chua_loi' AND COALESCE(purpose,'') NOT IN ('xem_loi_giai','luot','chan_doan','chua_buoc')"
+          q "câu học có hướng dẫn hôm nay (goi_bai_7_gap): kiểu · số dòng · số câu" "SELECT kieu, COUNT(*) dong, COUNT(DISTINCT qid) cau FROM goi_bai_7_gap WHERE sbd=$S AND date(luc,'+7 hours')=$HOM GROUP BY 1"
+          q "giao nhau: câu có hướng dẫn mà KHÔNG nằm trong sổ có kết quả" "SELECT COUNT(DISTINCT g.qid) so FROM goi_bai_7_gap g WHERE g.sbd=$S AND date(g.luc,'+7 hours')=$HOM AND g.qid NOT IN (SELECT qid FROM su_kien_hoc WHERE sbd=$S AND ngay_vn=$HOM AND ket_qua IS NOT NULL)"
+          q "phiên học hôm nay: tạo lúc (giờ VN) · số câu · cờ làm lại · số câu làm lại · số lượt đã trả lời" \
+            "SELECT strftime('%H:%M', s.created_at,'+7 hours') luc, json_array_length(json_extract(s.json,'\$.questions')) so_cau, json_extract(s.json,'\$.lamLai') lam_lai, (SELECT COUNT(*) FROM json_each(s.json,'\$.questions') j WHERE json_extract(j.value,'\$.lamLaiCuoi')=1) so_lam_lai, (SELECT COUNT(*) FROM game_v2_attempt a WHERE a.session=s.id) tra_loi FROM game_v2_session s WHERE s.sbd=$S AND substr(datetime(s.created_at,'+7 hours'),1,10)=$HOM ORDER BY s.created_at"
+          q "lượt trả lời hôm nay theo phiên: số lượt · lướt (omni.luot) · có hỗ trợ" \
+            "SELECT substr(a.session,1,6) phien, COUNT(*) luot, SUM(json_extract(a.json,'\$.omni.luot')=1) luot_luot, SUM(json_extract(a.json,'\$.attempt.assisted')=1) ho_tro FROM game_v2_attempt a WHERE a.sbd=$S AND substr(datetime(a.created_at,'+7 hours'),1,10)=$HOM GROUP BY a.session ORDER BY MIN(a.created_at)"
+          q "mức ngày đã chốt" "SELECT tang, toi_thieu_tang, quota, muc FROM goi_bai_7_muc_ngay WHERE sbd=$S AND ngay=$HOM"
