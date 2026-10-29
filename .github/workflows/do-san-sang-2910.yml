@@ -50,3 +50,4 @@ jobs:
           q "bài đã dạy (tick) gần nhất: lớp · bài · tick lúc · bỏ tick" "SELECT lop, ten_bai, khoa_bai, substr(tick_luc,1,16) tick, substr(COALESCE(bo_tick_luc,''),1,16) bo_tick FROM bai_da_day ORDER BY tick_luc DESC LIMIT 20"
           q "số em theo lớp hiệu lực (ten_lop hoặc lop) và có gói còn hạn hôm nay" "SELECT COALESCE(NULLIF(h.ten_lop,''),h.lop) lop_hl, COUNT(*) so_em, SUM(EXISTS(SELECT 1 FROM goi_bai_7_em e WHERE e.sbd=h.sbd AND e.han>=$HOM)) co_goi_hom_nay FROM hoc_sinh h WHERE COALESCE(h.trang_thai,'')<>'khoa' GROUP BY 1 ORDER BY 2 DESC LIMIT 20"
           q "cấu hình nạp đêm / bật Gói 7" "SELECT khoa, substr(gia_tri,1,80) v FROM cau_hinh WHERE khoa IN ('goi_bai_7_v1','san_sang_dem','tat_san_sang')"
+# đo lại 16:34
