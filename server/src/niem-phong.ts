@@ -32,7 +32,9 @@ export interface NoiDungNiem {
   /** Ảnh lời giải. */ m: unknown[]
   /** Số từ của đề (đo kích thước đề cho luật «làm vội»). */ t: number
   /** Đề có hình (0 / 1). */ h: 0 | 1
-  /** Phiên Hoá 2.0 (OMNI có thể xét lướt) 0 / 1. */ o: 0 | 1
+  /** Phiên Hoá 2.0 mà OMNI CÓ THỂ xét lướt 0 / 1 (OMNI tắt cho em ⇒ 0). */ o: 0 | 1
+  /** OMNI áp ⇒ thời gian kỳ vọng riêng của em cho câu (ms, nguyên); vắng ⇒ chưa biết (câu sai nhanh đi đường thường). */ y?: number
+  /** Số lượt lướt hôm nay của em lúc niêm phong (cộng thêm `lm` máy em gửi: lướt đã thấy trong chặng). */ u?: number
 }
 
 const b64 = (u: Uint8Array): string => { let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode(...u.subarray(i, i + 0x8000)); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '') }
