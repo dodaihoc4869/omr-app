@@ -1,0 +1,38 @@
+# ĐO GÓI BÀI CẢ NGÀY TRÊN BẢN SỐNG (CHỈ ĐỌC) — thầy 29/10 «app hs … tốc độ tức thì ở mọi khung giờ». Chỉ SELECT gộp: không mã em, không tên.
+# Phiên mở từ gói (`goiNgay: 1`, lệnh hoc-tap-mo-goi) so với phiên đường cũ (hoc-tap-start / bản sẵn), theo giờ VN; câu đã nộp trong từng loại phiên.
+name: Đo gói bài cả ngày (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/do-goi-ngay-3010]
+    paths: ['.github/workflows/do-goi-ngay-3010.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-goi-ngay-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm (chỉ SELECT)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c ".[0].results" || echo "(lỗi)"; }
+          echo "Giờ VN: $(TZ=Asia/Ho_Chi_Minh date '+%d/%m %H:%M')"
+          q "phiên học 3 giờ qua theo giờ VN: tổng · từ gói · đường cũ · số em dùng gói" \
+            "SELECT strftime('%H', created_at, '+7 hours') gio, COUNT(*) tong, SUM(json_extract(json,'\$.goiNgay')=1) tu_goi, SUM(COALESCE(json_extract(json,'\$.goiNgay'),0)<>1) duong_cu, COUNT(DISTINCT CASE WHEN json_extract(json,'\$.goiNgay')=1 THEN sbd END) em_goi FROM game_v2_session WHERE created_at >= strftime('%Y-%m-%dT%H:%M:%fZ','now','-3 hours') AND json_extract(json,'\$.hocTap')=1 GROUP BY 1 ORDER BY 1"
+          q "câu đã nộp 3 giờ qua: trong phiên từ gói · phiên đường cũ" \
+            "SELECT SUM(json_extract(s.json,'\$.goiNgay')=1) tu_goi, SUM(COALESCE(json_extract(s.json,'\$.goiNgay'),0)<>1) duong_cu FROM game_v2_attempt a JOIN game_v2_session s ON s.id=a.session WHERE s.created_at >= strftime('%Y-%m-%dT%H:%M:%fZ','now','-3 hours') AND json_extract(s.json,'\$.hocTap')=1"
+          q "phiên từ gói 3 giờ qua: số câu trong phiên (câu: số phiên)" \
+            "SELECT json_array_length(json,'\$.questions') so_cau, COUNT(*) n FROM game_v2_session WHERE created_at >= strftime('%Y-%m-%dT%H:%M:%fZ','now','-3 hours') AND json_extract(json,'\$.goiNgay')=1 GROUP BY 1 ORDER BY 1"
