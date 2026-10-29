@@ -470,7 +470,36 @@ async function gioiHanLap7<T>(f: () => Promise<T>): Promise<T> {
 export const trangThaiLap7 = () => ({ chay: dangLap7, cho: hangLap7.length })
 dangKyKichThuoc('lap7', () => dangLap7 * 1000 + hangLap7.length)
 export function lapGoi7(env: Env, sbd: string, now: number, gsSom?: Promise<{ results: Row[] }>, hoan?: D1PreparedStatement[]) {
-  return gioiHanLap7(() => lapGoi7Tho(env, sbd, now, gsSom, hoan))
+  const p = gioiHanLap7(() => lapGoi7Tho(env, sbd, now, gsSom, hoan))
+  // Ghi danh lượt ĐANG LẬP của em (cùng isolate) để lượt đến sau trong vài giây dùng lại (`lapDungLai7`) thay vì lập lần nữa.
+  const m = bangDangLap7(env.DB), muc = { luc: now, p }
+  m.set(sbd, muc)
+  const bo = () => { if (m.get(sbd) === muc) m.delete(sbd) }
+  p.then(bo, bo)
+  return p
+}
+/**
+ * LẬP MỘT LẦN (29/10 22:05 — thầy «bắt buộc phải làm được 100%»): xong một chặng, app gọi CÙNG LÚC Sảnh (làm mới Lộ trình) + mở trước chặng sau, và máy chủ còn lập sẵn nền
+ * (`sauCauCuoi`) ⇒ BA lượt `lapGoi7` cho cùng một em chồng nhau (vài MB + ~0,4 s CPU + ~5 đợt D1 mỗi lượt) — gốc của phần lớn tải nặng giờ cao điểm (`exceededMemory`, «Đang chuẩn bị…»).
+ * Lượt đến sau, cùng isolate, khi một lượt lập của em ĐANG chạy (bắt đầu ≤ 5 s trước, cùng ngày) ⇒ chờ lượt ấy rồi ĐỐI CHIẾU «đã làm hôm nay / vừa làm» đọc MỚI (một lệnh D1, như bản nhớ
+ * Sảnh → Mở chặng `goi-bai-7-nho.ts`): khớp từng câu ⇒ dùng lại; lệch (em vừa trả lời thêm) / lỗi ⇒ null ⇒ nơi gọi tự lập như cũ.
+ */
+type LapGoi7Kq = Awaited<ReturnType<typeof lapGoi7Tho>>
+const DANG_LAP7 = new WeakMap<object, Map<string, { luc: number; p: Promise<LapGoi7Kq> }>>()
+function bangDangLap7(db: unknown): Map<string, { luc: number; p: Promise<LapGoi7Kq> }> {
+  const g = dbGoc(db as object)
+  let m = DANG_LAP7.get(g)
+  if (!m) { m = new Map(); DANG_LAP7.set(g, m) }
+  return m
+}
+export async function lapDungLai7(env: Env, sbd: string, now: number): Promise<LapGoi7Kq | null> {
+  const x = bangDangLap7(env.DB).get(sbd)
+  if (!x || now - x.luc < 0 || now - x.luc > 5_000 || ngayVn7(x.luc) !== ngayVn7(now)) return null
+  try {
+    const [lap, moi] = await Promise.all([x.p, docDaLamVaVuaLam7(env, sbd, ngayVn7(now), now)])
+    if (!lap || !moi) return null
+    return moi.soVua === lap.soVua && cungTap(moi.daLam, lap.daLamTap) && cungTap(moi.vuaLam, lap.vuaLam) ? lap : null
+  } catch { return null }
 }
 async function lapGoi7Tho(env: Env, sbd: string, now: number, gsSom?: Promise<{ results: Row[] }>, hoan?: D1PreparedStatement[]) {
   const ngay = ngayVn7(now)
@@ -669,7 +698,7 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
     const moi = await kiemNhoSom.catch(() => null)
     if (moi && moi.soVua === nho.soVua && cungTap(moi.daLam, nho.daLam) && cungTap(moi.vuaLam, nho.vuaLam)) lapNho = nho.lap
   }
-  const lap = lapNho ?? await lapGoi7(env,sbd,now,gsSom,hoan)
+  const lap = lapNho ?? (!nho ? await lapDungLai7(env, sbd, now) : null) ?? await lapGoi7(env,sbd,now,gsSom,hoan)
   const ghiDongCo = som((async () => { const db = envGhiRieng(env).DB; for (let i = 0; i < hoan.length; i += 30) await db.batch(hoan.slice(i, i + 30).map(st => lenhTrong(env.DB, st))) })())
   try {
   if (!lap) {
@@ -755,6 +784,50 @@ export async function startGoi7(env: Env, sbd: string, now: number, gsSom?: Prom
   return {ok:true,id,questions,goi7:tomTatGoi7(lap,now)}
   } catch (e) { await ghiDongCo.catch(() => {}); throw e } // lối ra lỗi giữa chừng: lô ghi của động cơ vẫn xong trước (như thứ tự cũ: ghi trong lúc lập)
 }
+/**
+ * GÓI BÀI CẢ NGÀY (thầy 29/10 22:05 «tìm mọi cách, cách khác hoàn toàn để app hs load tức thì ở mọi thời điểm»; goi-ngay.ts): lập MỘT lần các chặng còn lại của hôm nay —
+ * cùng kế hoạch, cùng thứ tự (`xepBai6`), cùng mọi cổng phát câu của `startGoi7` (câu chặn / nghi / vừa làm / khối / tự luận / chưa duyệt / dạng thầy giới hạn, bản làm lại
+ * của câu sửa) — tối đa `soCau` câu, KHÔNG lưu phiên. Em đủ mức ⇒ phần «học thêm câu mới». Trả ref RIÊNG (máy chủ niêm phong trước khi gửi) + đề công khai (có tem hạn dài).
+ */
+export async function xayGoiNgay7(env: Env, sbd: string, now: number, soCau: number): Promise<{ refs: RefGoi7[]; questions: Record<string, unknown>[]; goi7: unknown; goiIds: string[]; ngay: string } | null> {
+  const [lap, khoi, duo] = await Promise.all([lapDungLai7(env, sbd, now).then((x) => x ?? lapGoi7(env, sbd, now)), docKhoiEm(env, sbd), duolingoChoEm(env, sbd, now).catch(() => false)])
+  if (!lap || !lap.control.enabled) return null
+  const vuaLamGoc = (qid: string) => lap.vuaLam.has(qid) || lap.vuaLam.has(tachSongSinh(qid).goc)
+  const satHan = !duo || lap.goi.some(g => g.quota > g.gapNgay.size && soNgayCon7(ngayVn7(now), g.han) <= 1)
+  const ds = [...xepBai6(lap.plan.viec, lap.pDung, { giuThuTu: satHan }), ...(lap.daLamNgay < lap.toiThieu ? lap.duPhong() : lap.hocThem())]
+  const cauGoi = new Map(lap.goi.flatMap(g=>g.cau).map(c=>[c.qid,c] as const).reverse())
+  const kiemHoiThay = new Set(lap.hs.hoiThayDenHan ?? [])
+  const refs: RefGoi7[] = [], questions: Record<string,unknown>[] = [], riengQ: PrivateQuestion[] = [], da = new Set<string>()
+  const ung = ds.filter((v, i) => ds.findIndex((w) => w.qid === v.qid) === i).map(v => ({ v, meta: lap.hs.meta.get(v.qid) ?? cauGoi.get(v.qid) }))
+    .filter(x => x.meta && !lap.chan.has(x.v.qid) && !lap.chan.has(x.meta.group) && !vuaLamGoc(x.v.qid) && !lap.daLamTap.has(x.v.qid))
+  for (let i = 0; i < ung.length && refs.length < soCau;) {
+    const lo = ung.slice(i, i + soCau - refs.length + 4); i += lo.length
+    const daDoc = (await Promise.all(lo.map(x => currentQuestion(env, x.meta!).then(q => ({ ...x, q }), () => null)))).filter((x): x is NonNullable<typeof x> => !!x)
+    const quaKhoi = new Set(await chanKhacKhoiEm(env,'goi7',{sbd,khoiEm:khoi},daDoc.map(x => x.q),{nghiSan:lap.nghi}))
+    for (const x of daDoc) {
+      if (refs.length >= soCau) break
+      const v = x.v
+      let q: PrivateQuestion = x.q
+      if (!quaKhoi.has(q) || laCauTuLuan(q) || !q.reviewed || lap.control.types.length && (!q.dang || !lap.control.types.includes(q.dang))) continue
+      let lamLai: LamLaiRef | undefined
+      if (v.vai === 'sua') {
+        const m = lap.hs.meta.get(q.qid)
+        if (m) { const y = (await apLamLaiKhac(env, lap.hs, [{ q, m }], { sbd, nowMs: now, keHoach: lap.plan.viec.map(w => w.qid) }, new Set([...lap.chan, ...refs.map(r => r.qid)])))[0]; if (y) { q = y.q; lamLai = y.lamLai; const ss = tachSongSinh(q.qid); if (ss.songSinh !== null) lamLai = { ...lamLai, tc: ss.goc } } }
+      }
+      if (q.qid !== v.qid && vuaLamGoc(q.qid)) continue
+      if (da.has(q.qid)) continue
+      da.add(q.qid)
+      const ref: RefGoi7 = { ...lamLai, qid: q.qid, maDe: q.maDe, version: q.version, group: q.group, novel: lap.hs.tt.get(q.qid)?.laMoi ?? true,
+        role: v.vai === 'moi' ? 'cau_moi' : 'on_lai', vai: v.vai, huongDan: v.huongDan,
+        ...(kiemHoiThay.has(q.qid) || kiemHoiThay.has(tachSongSinh(lamLai?.tc ?? q.qid).goc) ? { hoiThayKiem: true as const } : {}) }
+      refs.push(ref); riengQ.push(q)
+      questions.push({ ...publicQuestion(q), vaiGoi7: v.vai, huongDan7: v.huongDan, coGoi7: lap.goi.some(g => g.cau.some(c => c.qid === q.qid && c.version === q.version)) })
+    }
+  }
+  await ganNiemChoCau(env, sbd, questions, riengQ, true, now, HAN_NIEM_CHUAN_BI_MS) // tem hạn DÀI — máy em không dùng trực tiếp; làm mới lúc mở phiên (goi-ngay.ts)
+  return { refs, questions, goi7: tomTatGoi7(lap, now), goiIds: lap.goi.map(g => g.id), ngay: ngayVn7(now) }
+}
+
 export interface RefGoi7 extends LamLaiRef { qid:string; maDe:string; version:string; group:string; novel:boolean; role:string; vai:ViecGoi7['vai']; huongDan:boolean; goiY?:unknown; hoiThayKiem?:true
   /** 26/10: câu làm lại cuối chặng (câu anh em của câu em vừa sai) — luôn có hỗ trợ, không tính đóng lỗi, không mở thành chặng mới. */
   lamLaiCuoi?:true; lamLaiCua?:string }

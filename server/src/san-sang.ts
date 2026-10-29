@@ -188,7 +188,7 @@ export async function chuanBiSanSang(env: Env, sbd: string, now: number, san?: {
     if (!(await g7.coGoi7(env)).bat) return false
     const dau = san ? san.dau : await dauSanSang(env, sbd, now)
     if (!dau) return false
-    const lap = (san?.lap ?? await g7.lapGoi7(env, sbd, now)) as Awaited<ReturnType<typeof g7.lapGoi7>>
+    const lap = (san?.lap ?? await g7.lapDungLai7(env, sbd, now) ?? await g7.lapGoi7(env, sbd, now)) as Awaited<ReturnType<typeof g7.lapGoi7>> // lượt lập của em đang chạy (Sảnh / mở chặng) ⇒ dùng lại
     if (!lap) return false
     if (!san) g7.nhoLapSanh7(env, sbd, now, lap) // chặng kế tiếp dưới + lượt mở chặng thật của em dùng lại đúng kế hoạch này
     const con = lap.plan.viec.length, t7 = g7.tomTatGoi7(lap, now)

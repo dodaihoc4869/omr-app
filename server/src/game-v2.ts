@@ -228,7 +228,7 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
 const som=<T,>(p:Promise<T>)=>{p.catch(()=>{});return p}
 /** Lệnh game được chạy lượt đọc "cổng đóng băng" (reset) SONG SONG khi đệm cổng vừa hết hạn (index.ts, tối ưu 05/10): chỉ các lệnh CHỈ chạm D1 qua `env.DB`
  *  (rào ghi chặn được mọi lệnh ghi). */
-export const laLenhCongSongSong=(action:string):boolean=>['hoc-tap-gap','hoc-tap-dem','hoc-tap-lam-lai','hoc-tap-kiem-start','hoc-tap-kiem-nop','hoc-tap-sanh','hoc-tap-start','hoc-tap-cau-da-lam','hoc-tap-cau-chi-tiet','sync','resume','start','answer','complete','profile','recommendations','academic-sync','so-tay','progress-history'].includes(action)||LENH_HOA2.has(action)
+export const laLenhCongSongSong=(action:string):boolean=>['hoc-tap-gap','hoc-tap-dem','hoc-tap-lam-lai','hoc-tap-kiem-start','hoc-tap-kiem-nop','hoc-tap-sanh','hoc-tap-start','hoc-tap-goi-ngay','hoc-tap-mo-goi','hoc-tap-cau-da-lam','hoc-tap-cau-chi-tiet','sync','resume','start','answer','complete','profile','recommendations','academic-sync','so-tay','progress-history'].includes(action)||LENH_HOA2.has(action)
 export async function gameV2(env:Env,action:string,b:Record<string,unknown>,ctx?:ExecutionContext):Promise<Record<string,unknown>> {
   // Rào ghi (index.ts, tối ưu 05/10): đệm cổng đóng băng vừa hết hạn ⇒ lượt đọc cổng chạy song song, mọi lệnh GHI của lệnh này chờ cổng. Lệnh nội bộ
   // (Đoàn gọi `answer`) dùng lại đúng bản gộp đọc của lượt ngoài (đã có rào) ⇒ không bọc lần nữa.
@@ -359,7 +359,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
   // 28/10 «sửa phải xong mới hiện chặng sau»: số câu phần ngày Tự sửa lỗi còn thiếu (chỉ khi máy em đã báo khoá) — đọc CÙNG đợt mật khẩu, không thêm đợt chờ.
   const sbd=await gameIdentity(env,b,s=>{if(action==='hoc-tap-sanh'||action==='hoc-tap-start')giu.hocTap=batDauHocTapSom(env,s,action);else{if(action!=='sync'&&!action.startsWith('hoc-tap-'))giu.ds=batDauDocSom(env,action,b,s);if(action!=='sync'&&!action.startsWith('hoc-tap-ktcn-'))giu.kiem={sbd:s,p:som(import('./kiem-tra-ca-nhan').then(kt=>kt.docKtCn(env,s,Date.now(),true)))};if(action==='hoc-tap-dem')giu.dem={sbd:s,p:som(import('./goi-bai-7').then(g7=>g7.demHomNay7(env,s,Date.now())))}}})
   // Kế hoạch sảnh vừa nhớ (goi-bai-7-nho.ts) chỉ dành cho lượt mở chặng NGAY sau đó: mọi lệnh khác của em (nộp câu, học cách giải, kiểm…) xoá bản nhớ.
-  if(action!=='hoc-tap-sanh'&&action!=='hoc-tap-start')boKeHoach7(env.DB,sbd)
+  if(action!=='hoc-tap-sanh'&&action!=='hoc-tap-start'&&action!=='hoc-tap-goi-ngay')boKeHoach7(env.DB,sbd)
   // Kiểm tra theo lịch RIÊNG từng em sở hữu cả ngày, kể cả khi em đã nộp sớm.
   // Cổng ở trước lập Gói 7/Hành trình: API cũ và phiên cũ không phát bài thường song song.
   const kt=await import('./kiem-tra-ca-nhan')
@@ -374,12 +374,12 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     const tt=kt.tomTatKt(kiem!,Date.now())
     if(action==='hoc-tap-sanh'||action==='hoa2-sanh')return {ok:true,cheDo2:true,ngay:tt.ngay,kiemTraCaNhan:tt,theLuc:{tong:tt.tong,con:tt.con},chienDich:null,doan:{con:0},dao:{con:0}}
     if(action==='hoc-tap-dem')return {ok:true,daLamHomNay:tt.daTra,toiThieu:tt.tong,kiemTraCaNhan:tt}
-    if(['hoc-tap-start','hoc-tap-gap','hoc-tap-lam-lai','hoc-tap-kiem-start','hoc-tap-kiem-nop','start','answer','resume','complete','hoa2-dao-start','hoa2-thu-suc','hoa2-thu-suc-them','hoa2-de-thu-start','hoa2-de-thu-nop'].includes(action))throw new Error('Hôm nay em chỉ làm bài kiểm tra theo lịch riêng. Bài tập tiếp tục vào ngày học kế tiếp.')
+    if(['hoc-tap-start','hoc-tap-gap','hoc-tap-lam-lai','hoc-tap-goi-ngay','hoc-tap-mo-goi','hoc-tap-kiem-start','hoc-tap-kiem-nop','start','answer','resume','complete','hoa2-dao-start','hoa2-thu-suc','hoa2-thu-suc-them','hoa2-de-thu-start','hoa2-de-thu-nop'].includes(action))throw new Error('Hôm nay em chỉ làm bài kiểm tra theo lịch riêng. Bài tập tiếp tục vào ngày học kế tiếp.')
   }
   // KHOÁ CHẶNG SAU KIỂM TRA ÔN TẬP (thầy 27/10): ngày có Kiểm tra ôn tập + vẫn có bài học ⇒ bài kiểm tra đang mở mà chưa nộp thì KHÔNG mở chặng / làm lại /
   // học cách giải / phiên cũ (start · resume · answer · complete) — kể cả lối cũ. Sảnh, đếm, xem câu đã làm vẫn chạy. Dùng lại lượt đọc `kiem` ở trên (không thêm
   // vòng D1). Quá hạn / đã nộp / công tắc thầy tắt ⇒ không khoá.
-  if(['hoc-tap-start','hoc-tap-gap','hoc-tap-lam-lai','hoc-tap-kiem-start','hoc-tap-kiem-nop','start','answer','resume','complete'].includes(action)){
+  if(['hoc-tap-start','hoc-tap-gap','hoc-tap-lam-lai','hoc-tap-goi-ngay','hoc-tap-mo-goi','hoc-tap-kiem-start','hoc-tap-kiem-nop','start','answer','resume','complete'].includes(action)){
     const khoa=kt.ktDangKhoaChang(kiem,Date.now())
     if(khoa)return {ok:false,ma:kt.MA_KHOA_KT,error:kt.CHU_KHOA_KT,kiemTraCaNhan:khoa}
   }
@@ -404,6 +404,10 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
       if(action==='hoc-tap-dem')return giu.dem&&giu.dem.sbd===sbd?giu.dem.p:g7.demHomNay7(env,sbd,Date.now())
       // Làm lại cuối chặng kiểu Duolingo (26/10, goi-bai-7-lam-lai.ts): câu anh em cho câu em vừa sai, có hỗ trợ, không EXP.
       if(action==='hoc-tap-lam-lai')return import('./goi-bai-7-lam-lai').then(m=>m.lamLaiCuoiChang7(env,sbd,b,Date.now()))
+      // GÓI BÀI CẢ NGÀY TRÊN MÁY EM (thầy 29/10 22:05 «cách khác hoàn toàn để app hs load tức thì ở mọi thời điểm», goi-ngay.ts): lập gói NỀN (không ai chờ) · mở phiên từ
+      // một chặng của gói (máy em đã hiện câu; một đợt đọc + một lệnh ghi, không lập kế hoạch). Công tắc tắt / không phải em thử ⇒ `tat` / `GOI_TAT` (máy em đi đường cũ).
+      if(action==='hoc-tap-goi-ngay')return import('./goi-ngay').then(m=>m.goiNgay7(env,sbd,Date.now()))
+      if(action==='hoc-tap-mo-goi')return import('./goi-ngay').then(m=>m.moGoi7(env,sbd,b,Date.now()))
       // SẴN SÀNG (27/10): bản sẵn khớp dấu, cùng ngày ⇒ chặng đã lập sẵn thành phiên ngay (MỘT lô ghi) — không lập kế hoạch trên đường chờ. Không được ⇒ đường cũ.
       if(action==='hoc-tap-start'){const ss=hocTapSom?await hocTapSom.sanSang.catch(()=>null):null,nowSs=Date.now();if(ss&&dungDuoc(ss[1],ss[0],ngayVn7(nowSs))&&ss[1].chang){const rs=await moChangSanSang(env,sbd,nowSs,ss[1]).catch(()=>null);if(rs)return rs}
         const r7=await g7.startGoi7(env,sbd,Date.now(),gsSom7);if(r7)return r7}
@@ -412,7 +416,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
       // Lượt chậm (không khớp) ⇒ như cũ, rồi cất bản sẵn NỀN với dấu đọc TRƯỚC khi lập (kèm chặng kế tiếp chưa lưu phiên).
       if(action==='hoc-tap-sanh'){const chuoiSom=hocTapSom?.chuoi??import('./chuoi-ngay-bai-d1').then(m=>m.chuoiBaiNeuBat(env,sbd,Date.now()),()=>null);const ss=hocTapSom?await hocTapSom.sanSang.catch(()=>null):null,nowSs=Date.now()
         if(ss&&dungDuoc(ss[1],ss[0],ngayVn7(nowSs))&&ss[1].sanh){const ban=ss[1],chuoi7=await chuoiSom;if(ctx&&nowSs-ban.luc>10*60_000)ctx.waitUntil(chuanBiSanSang(envGhiRieng(env),sbd,nowSs));return {ok:true,cheDo2:true,...ban.sanh,...(chuoi7?{chuoiNgay:chuoi7}:{}),...(kiem?{kiemTraCaNhan:kt.tomTatKt(kiem,nowSs)}:{}),chienDich:null,doan:{con:0}}}
-        const lap7=await g7.lapGoi7(env,sbd,Date.now(),gsSom7);if(lap7){g7.nhoLapSanh7(env,sbd,Date.now(),lap7);const con7=lap7.plan.viec.length,t7=g7.tomTatGoi7(lap7,Date.now()),chuoi7=await chuoiSom;if(ctx&&ss?.[0])ctx.waitUntil(chuanBiSanSang(envGhiRieng(env),sbd,Date.now(),{dau:ss[0],lap:lap7}));return {ok:true,cheDo2:true,ngay:t7.ngay,goi7:t7,...(chuoi7?{chuoiNgay:chuoi7}:{}),...(kiem?{kiemTraCaNhan:kt.tomTatKt(kiem,Date.now())}:{}),theLuc:{con:con7,tong:lap7.daLamNgay+con7},chienDich:null,doan:{con:0},dao:{con:con7}}}}
+        const lap7=(await g7.lapDungLai7(env,sbd,Date.now()))??await g7.lapGoi7(env,sbd,Date.now(),gsSom7);if(lap7){g7.nhoLapSanh7(env,sbd,Date.now(),lap7);const con7=lap7.plan.viec.length,t7=g7.tomTatGoi7(lap7,Date.now()),chuoi7=await chuoiSom;if(ctx&&ss?.[0])ctx.waitUntil(chuanBiSanSang(envGhiRieng(env),sbd,Date.now(),{dau:ss[0],lap:lap7}));return {ok:true,cheDo2:true,ngay:t7.ngay,goi7:t7,...(chuoi7?{chuoiNgay:chuoi7}:{}),...(kiem?{kiemTraCaNhan:kt.tomTatKt(kiem,Date.now())}:{}),theLuc:{con:con7,tong:lap7.daLamNgay+con7},chienDich:null,doan:{con:0},dao:{con:con7}}}}
       if(action==='hoc-tap-kiem-start'||action==='hoc-tap-kiem-nop')return import('./goi-bai-7-kiem').then(m=>m.kiemGoi7(env,sbd,action,b,Date.now()))
     }
 
