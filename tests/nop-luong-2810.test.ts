@@ -95,6 +95,7 @@ it('nộp lại câu đã chấm (đáp án khác) ⇒ không chấm nhanh, tr�
 
 it('sai phiên (token em khác) / phiên hết hạn / đệm hỏng / câu đang bảo vệ ca thi ⇒ không chấm nhanh, lời báo như cũ', async () => {
   const x = await kho()
+  ;(x.env as unknown as Record<string, unknown>).TAT_TAM_SOM = '1' // khoá nguồn «dòng 1 sớm từ đường thường» (29/10): ca này khoá đường ĐỆM; đường sớm có ca riêng bên dưới
   const { id, ds } = await moChang(x)
   vi.setSystemTime(NOW + 30_000); await nop(x, id, ds[0]!, true)
   // em khác cầm mã phiên của S1
@@ -120,4 +121,44 @@ it('token giả / hết hạn ⇒ không chấm nhanh, không chạm đệm', as
   vi.setSystemTime(NOW + 30_000); await nop(x, id, ds[0]!, true)
   vi.setSystemTime(NOW + 40_000); const gia = await nop(x, id, ds[1]!, true, {}, x.token.slice(0, -2) + 'xx')
   expect(gia.luong).toBe(false); expect(gia.cuoi.ok).toBe(false)
+})
+
+// DÒNG 1 SỚM TỪ ĐƯỜNG THƯỜNG (29/10, thầy «Bấm kiểm tra vẫn chưa tức thì»): đệm isolate trượt ⇒ lệnh đầy đủ gửi dòng 1 ngay khi chấm xong sau đợt đọc đầu.
+it('đệm trượt (isolate mới) ⇒ vẫn theo luồng: dòng 1 (đúng / sai) TRƯỚC, dòng 2 đầy đủ; dòng 1 khớp dòng 2; ghi đúng một lần', async () => {
+  const x = await kho()
+  const { id, ds } = await moChang(x)
+  for (const [i, dung] of [[0, true], [1, false], [2, true], [3, false]] as const) {
+    xoaChamNhanh() // isolate không có gì trong đệm
+    vi.setSystemTime(NOW + 60_000 * (i + 1))
+    const r = await nop(x, id, ds[i]!, dung)
+    expect(r.luong, `câu ${i}: ${JSON.stringify(r.cuoi).slice(0, 160)}`).toBe(true)
+    expect(r.dong.length).toBe(2)
+    const [d1, d2] = r.dong as [Record<string, unknown>, Record<string, unknown>]
+    expect(d1.tam).toBe(true); expect(d1.correct).toBe(dung); expect(d2.ok).toBe(true); expect(d2.correct).toBe(dung)
+    expect(d1.answer).toBe(d2.answer); expect(d1.traLoi).toBe(d2.traLoi)
+    expect(JSON.stringify(d1.solution)).toBe(JSON.stringify(d2.solution))
+    expect(x.k.d.dem('game_v2_attempt', `id='${id}|${ds[i]!.qid}'`)).toBe(1)
+  }
+})
+it('đường sớm: lỗi trước khi chấm (phiên hết hạn / sai phiên / token giả) ⇒ JSON thường với lời báo + mã trạng thái như cũ, không dòng 1', async () => {
+  const x = await kho()
+  const { id, ds } = await moChang(x)
+  xoaChamNhanh()
+  await goi(x, 'hoc-tap-start', {}, x.token2)
+  vi.setSystemTime(NOW + 40_000); const la = await nop(x, id, ds[1]!, true, {}, x.token2)
+  expect(la.luong).toBe(false); expect(la.cuoi.ok).toBe(false)
+  vi.setSystemTime(NOW + 2 * 3_600_000 + 1000); const het = await nop(x, id, ds[3]!, true)
+  expect(het.luong).toBe(false); expect(het.cuoi.ok).toBe(false)
+})
+it('công tắc TAT_TAM_SOM ⇒ đệm trượt đi JSON thường như trước; TAT_NOP_LUONG ⇒ tắt cả hai nguồn', async () => {
+  const x = await kho()
+  const { id, ds } = await moChang(x)
+  xoaChamNhanh()
+  ;(x.env as unknown as Record<string, unknown>).TAT_TAM_SOM = '1'
+  vi.setSystemTime(NOW + 60_000); const a = await nop(x, id, ds[0]!, true)
+  expect(a.luong).toBe(false); expect(a.cuoi.ok).toBe(true); expect(a.cuoi.correct).toBe(true)
+  ;(x.env as unknown as Record<string, unknown>).TAT_TAM_SOM = ''
+  ;(x.env as unknown as Record<string, unknown>).TAT_NOP_LUONG = '1'
+  vi.setSystemTime(NOW + 120_000); const b = await nop(x, id, ds[1]!, false)
+  expect(b.luong).toBe(false); expect(b.cuoi.ok).toBe(true); expect(b.cuoi.correct).toBe(false)
 })

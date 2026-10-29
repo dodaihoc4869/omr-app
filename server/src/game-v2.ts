@@ -10,7 +10,7 @@ import {readGameScope} from './game-v2-reports'
 import {boKeHoach7} from './goi-bai-7-nho'
 import type {D1PreparedStatement,D1Result,Env,ExecutionContext} from './kieu'
 import {viecPhu} from './viec-phu'
-import {dapAnDaLo,napPhienNhanh,nhoBaoVe,nhoBienNhan,nhoCau,nhoEm,nhoPhien,phienDuCau} from './cham-nhanh' // CHẤM NHANH «Kiểm tra» 28/10: đệm isolate cho dòng 1 của answer theo luồng
+import {coTheLaLuotMs,dapAnDaLo,napPhienNhanh,nhoBaoVe,nhoBienNhan,nhoCau,nhoDaLo,nhoEm,nhoPhien,phatTamSom,phienDuCau} from './cham-nhanh' // CHẤM NHANH «Kiểm tra» 28/10: đệm isolate cho dòng 1 của answer theo luồng
 import {gameIdentity,parentPass} from './game-v2-auth'
 import {readScope,syncIndex,protectedQuestions,docKhoiEm,doDayDu,laTuLuanPool,docCauTheoRef,loiCauDoi,type CauPool} from './game-v2-bank'
 import {cauHopKhoi,type Khoi} from '../../src/lib/khoi-cau'
@@ -645,6 +645,15 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     if(q.phan==='I'&&!/^[ABCD]$/.test(submitted)||q.phan==='II'&&!/^[DS]{4}$/.test(submitted)||q.phan==='III'&&(!submitted||submitted.length>40))throw new Error('Em điền đủ đáp án trước khi chấm.')
     // 06/10: câu CHẨN ĐOÁN Phần III (câu nền) chấm như câu nền — khớp đáp án hoặc lệch ≤ 0,5 % giá trị đúng (chan-doan-buoc-sai.ts `chamCauChanDoan`); câu khác y hệt cũ.
     const attempt:Attempt={id:receipt,session:id,qid,group:q.group,dang:q.dang,mucDo:q.mucDo,correct:laCD?chamCauChanDoan(q,String(b.answer??'')):(session as {hocTap?:number}).hocTap===1&&q.phan==='III'?khopPhanIII(String(b.answer??''),q.correct):grade(q,String(b.answer??'')),assisted:b.assisted===true||!!(ref as {goiY?:unknown}).goiY,at:Date.now(),novel:ref.novel}
+    // DÒNG 1 SỚM (29/10, cham-nhanh.ts `phatTamSom`): đã chấm xong sau đợt đọc đầu ⇒ gửi đúng / sai NGAY cho lượt xin theo luồng, không chờ OMNI + lô ghi (~2 đợt D1). Cùng điều kiện an toàn
+    // với chấm nhanh từ đệm (phiên học tập, không chẩn đoán / tự luận / kênh số / được hỗ trợ); câu sai CÓ THỂ là lướt (làm < 8 giây, phiên xét OMNI) chờ bản đầy đủ. Không đăng ký ⇒ không làm gì.
+    {
+      const ss=session as {hocTap?:number;goi7?:number;bia?:number;kimCuong?:number;thuHoiLuc?:unknown;guardian?:unknown}
+      if(!laCD&&!attempt.assisted&&(ss.hocTap===1||ss.goi7===1)&&!ss.bia&&ss.kimCuong!==1&&!ss.thuHoiLuc&&!ss.guardian&&!laCauTuLuan(qGoc)&&!ngoaiKenhSo(qGoc)&&!(omniSom&&!attempt.correct&&coTheLaLuotMs(b.msLam))){
+        const khongTinh=laPhienNguyenTu(session as unknown as PhienNt)&&khongTinhTuDo(boSungKichThuocDe(docDoGiayMot(b,{ms:b.msLam}),q.phan,q),attempt.correct)
+        if(phatTamSom(b,{ok:true,tam:true,correct:attempt.correct,answer:q.correct,traLoi:submitted,solution:q.solution,solutionImages:q.hinhAnh.filter(h=>h.viTri==='sau_loi_giai'),...(khongTinh?{khongTinh:true as const}:{})}))nhoDaLo(receipt,String(b.answer??''))
+      }
+    }
     // OMNI 3: xét lướt / chắc-mà-sai / P dạng / Trạm hồi phục (omni-game.ts). Lỗi đọc ⇒ null ⇒ lượt chấm như cờ tắt.
     const docOmni=omniDoc?await omniDoc:null
     const omni=docOmni?await xetOmniTraLoi(env,{sbd,phien:session,qidPhien:qid,cau:qGoc,chon:chonVeGoc(ref,q.phan,submitted),dung:attempt.correct,hoTro:attempt.assisted,b,nowMs:attempt.at,doc:docOmni}):null
