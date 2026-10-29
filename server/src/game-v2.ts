@@ -399,7 +399,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
       // MỌI gói đang mở của lớp (đọc R2 từng tờ, upsert ~164 dòng/gói) ⇒ dồn tải ghi D1 vào đúng lệnh sảnh / bắt đầu chặng. Trước 18:53 lượt này lọc
       // theo KHỐI nên với em khối 12 là no-op; sửa theo tên lớp làm nó chạy thật ⇒ quá tải. Bài mới vẫn vào gói: cron mỗi phút của Worker (index.ts)
       // + trang thầy Bài mới 7 ngày (`gvGoi7`) + bước phát hành `ap-goi7-song`. Em mới mở app chậm nhất ~1 phút sau khi thầy tick là thấy bài.
-      if(action==='hoc-tap-gap')return g7.gapHuongDan7(env,sbd,b,Date.now())
+      if(action==='hoc-tap-gap'){const kq=await g7.gapHuongDan7(env,sbd,b,Date.now());if(ctx)ctx.waitUntil((async()=>{if(await phienDaXong(envGhiRieng(env),sbd,String(b.session??'')))await chuanBiSanSang(envGhiRieng(env),sbd,Date.now())})());return kq}
       // Ô "đã làm/M câu hôm nay" sau mỗi câu: lệnh nhẹ 3 truy vấn chỉ đọc (khẩn 12/10 22h30) — thay lượt nạp lại cả sảnh (`lapGoi7`) sau mỗi câu.
       if(action==='hoc-tap-dem')return giu.dem&&giu.dem.sbd===sbd?giu.dem.p:g7.demHomNay7(env,sbd,Date.now())
       // Làm lại cuối chặng kiểu Duolingo (26/10, goi-bai-7-lam-lai.ts): câu anh em cho câu em vừa sai, có hỗ trợ, không EXP.
@@ -410,13 +410,13 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
       if(action==='hoc-tap-mo-goi')return import('./goi-ngay').then(m=>m.moGoi7(env,sbd,b,Date.now()))
       // SẴN SÀNG (27/10): bản sẵn khớp dấu, cùng ngày ⇒ chặng đã lập sẵn thành phiên ngay (MỘT lô ghi) — không lập kế hoạch trên đường chờ. Không được ⇒ đường cũ.
       if(action==='hoc-tap-start'){const ss=hocTapSom?await hocTapSom.sanSang.catch(()=>null):null,nowSs=Date.now();if(ss&&dungDuoc(ss[1],ss[0],ngayVn7(nowSs))&&ss[1].chang){const rs=await moChangSanSang(env,sbd,nowSs,ss[1]).catch(()=>null);if(rs)return rs}
-        const r7=await g7.startGoi7(env,sbd,Date.now(),gsSom7);if(r7)return r7}
+        const r7=await g7.startGoi7(env,sbd,Date.now(),gsSom7,{coPhienMoi:Boolean(ss?.[1]?.phienMoi&&nowSs-ss[1].phienMoi<2*3600_000)});if(r7)return r7}
       // B3 chuỗi ngày theo bài (26/10, chuoi-ngay-bai-d1.ts): cờ duolingo_bai bật ⇒ `chuoiNgay` {so, giuChuoi, sucChua, lich7, cuu?, binhVuaDo?}; đọc song song lập kế hoạch.
       // SẴN SÀNG (27/10): bản sẵn khớp dấu, cùng ngày ⇒ phần Sảnh lấy từ bản sẵn; Kiểm tra ôn tập + chuỗi ngày đọc TƯƠI (cùng đợt). Bản cũ hơn 10 phút ⇒ lập lại NỀN.
       // Lượt chậm (không khớp) ⇒ như cũ, rồi cất bản sẵn NỀN với dấu đọc TRƯỚC khi lập (kèm chặng kế tiếp chưa lưu phiên).
       if(action==='hoc-tap-sanh'){const chuoiSom=hocTapSom?.chuoi??import('./chuoi-ngay-bai-d1').then(m=>m.chuoiBaiNeuBat(env,sbd,Date.now()),()=>null);const ss=hocTapSom?await hocTapSom.sanSang.catch(()=>null):null,nowSs=Date.now()
         if(ss&&dungDuoc(ss[1],ss[0],ngayVn7(nowSs))&&ss[1].sanh){const ban=ss[1],chuoi7=await chuoiSom;if(ctx&&nowSs-ban.luc>10*60_000)ctx.waitUntil(chuanBiSanSang(envGhiRieng(env),sbd,nowSs));return {ok:true,cheDo2:true,...ban.sanh,...(chuoi7?{chuoiNgay:chuoi7}:{}),...(kiem?{kiemTraCaNhan:kt.tomTatKt(kiem,nowSs)}:{}),chienDich:null,doan:{con:0}}}
-        const lap7=(await g7.lapDungLai7(env,sbd,Date.now()))??await g7.lapGoi7(env,sbd,Date.now(),gsSom7);if(lap7){g7.nhoLapSanh7(env,sbd,Date.now(),lap7);const con7=lap7.plan.viec.length,t7=g7.tomTatGoi7(lap7,Date.now()),chuoi7=await chuoiSom;if(ctx&&ss?.[0])ctx.waitUntil(chuanBiSanSang(envGhiRieng(env),sbd,Date.now(),{dau:ss[0],lap:lap7}));return {ok:true,cheDo2:true,ngay:t7.ngay,goi7:t7,...(chuoi7?{chuoiNgay:chuoi7}:{}),...(kiem?{kiemTraCaNhan:kt.tomTatKt(kiem,Date.now())}:{}),theLuc:{con:con7,tong:lap7.daLamNgay+con7},chienDich:null,doan:{con:0},dao:{con:con7}}}}
+        const nho7=g7.layLapSanhNho7(env,sbd,Date.now());const lapNho7=nho7?await nho7:null;const lap7=lapNho7??(await g7.lapDungLai7(env,sbd,Date.now()))??await g7.lapGoi7(env,sbd,Date.now(),gsSom7);if(lap7){if(!lapNho7)g7.nhoLapSanh7(env,sbd,Date.now(),lap7);const con7=lap7.plan.viec.length,t7=g7.tomTatGoi7(lap7,Date.now()),chuoi7=await chuoiSom;if(ctx&&ss?.[0])ctx.waitUntil(chuanBiSanSang(envGhiRieng(env),sbd,Date.now(),{dau:ss[0],lap:lap7}));return {ok:true,cheDo2:true,ngay:t7.ngay,goi7:t7,...(chuoi7?{chuoiNgay:chuoi7}:{}),...(kiem?{kiemTraCaNhan:kt.tomTatKt(kiem,Date.now())}:{}),theLuc:{con:con7,tong:lap7.daLamNgay+con7},chienDich:null,doan:{con:0},dao:{con:con7}}}}
       if(action==='hoc-tap-kiem-start'||action==='hoc-tap-kiem-nop')return import('./goi-bai-7-kiem').then(m=>m.kiemGoi7(env,sbd,action,b,Date.now()))
     }
 

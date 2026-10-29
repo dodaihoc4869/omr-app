@@ -6,6 +6,7 @@
 // (cùng mã phiên, trong 2 giờ — goi-bai-7.ts `startGoi7`), trần câu/ngày đếm theo câu đã TRẢ LỜI chứ không theo phiên ⇒ mở trước không tốn suất của em.
 // Mỗi lời hứa dùng MỘT lần; quá TUOI_MO_TRUOC_MS, khác token hoặc lời hứa lỗi mạng ⇒ màn làm bài gọi lại như cũ.
 import { goiHoa2 } from '../hoa2/api'
+import { danhDauDaNhan, xemHoiSomDaVe } from '../../lib/hoi-som'
 
 type KetQuaMo = Record<string, unknown>
 /** Tuổi tối đa của một lượt mở trước (máy chủ giữ phiên 2 giờ; 10 phút để kế hoạch không cũ khi em rời đi lâu). */
@@ -33,9 +34,24 @@ export function moChangTruoc(token: string, goi: typeof goiHoa2 = goiHoa2, now: 
 /** Đọc ĐỒNG BỘ (và XOÁ) lượt mở trước ĐÃ VỀ thành công của `token` ⇒ mở câu đầu tức thì 0 ms (không chớp khung chờ). Chưa về / lỗi ⇒ null (nhường `layChangMoTruoc`). */
 export function layChangMoTruocNgay(token: string, now: number = Date.now()): KetQuaMo | null {
   const c = dangCo
-  if (!c || c.token !== token || now - c.luc >= TUOI_MO_TRUOC_MS || !c.kq) return null
-  dangCo = null
-  return c.kq
+  if (c && c.token === token && now - c.luc < TUOI_MO_TRUOC_MS && c.kq) {
+    dangCo = null
+    return c.kq
+  }
+  if (!bat || !token) return null
+  const than = JSON.stringify({ token })
+  const som = xemHoiSomDaVe('/game-v2/hoc-tap-start', than)
+  if (som && som.ok && som.text) {
+    try {
+      const r = JSON.parse(som.text) as KetQuaMo
+      if (r && r.ok === true && Array.isArray(r.questions)) {
+        danhDauDaNhan('/game-v2/hoc-tap-start', than)
+        if (c && c.token === token) dangCo = null
+        return r
+      }
+    } catch { /* bỏ qua */ }
+  }
+  return null
 }
 
 /** Lấy (và XOÁ) lượt mở trước còn hạn của `token`; không có ⇒ null. Lượt lỗi mạng ⇒ lời hứa trả về tự gọi lại MỘT lần như cũ. */

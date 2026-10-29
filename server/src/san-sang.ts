@@ -166,8 +166,11 @@ export function lenhGhiSanSang(env: Env, sbd: string, b: { ngay: string; luc: nu
     .bind(sbd, b.ngay, b.luc, b.dau, b.sanh ? JSON.stringify(b.sanh) : null, b.chang ? JSON.stringify(b.chang) : null)
 }
 
-/** Bỏ phần chặng đã phát (một bản sẵn chỉ thành MỘT phiên). */
-export function lenhBoChangSanSang(env: Env, sbd: string, luc: number) {
+/** Đánh dấu phần chặng đã phát thành phiên `phienId` (một bản sẵn chỉ tạo MỘT phiên; mở lại khi chưa trả lời câu nào trả về ngay phiên đó trong ≤ 2 đợt D1). */
+export function lenhBoChangSanSang(env: Env, sbd: string, luc: number, phienId?: string, now?: number) {
+  if (phienId && now) {
+    return env.DB.prepare(`UPDATE ${BANG_SAN_SANG} SET luc=?, chang_json=json_set(chang_json,'$.phienCu',?) WHERE sbd=? AND luc=?`).bind(now, phienId, sbd, luc)
+  }
   return env.DB.prepare(`UPDATE ${BANG_SAN_SANG} SET chang_json=NULL WHERE sbd=? AND luc=?`).bind(sbd, luc)
 }
 
@@ -205,33 +208,36 @@ export async function chuanBiSanSang(env: Env, sbd: string, now: number, san?: {
  */
 export async function moChangSanSang(env: Env, sbd: string, now: number, ban: BanSanSang): Promise<Record<string, unknown> | null> {
   const c = ban.chang as (BanSanSang['chang'] & { goiIds?: unknown; phienCu?: unknown; rong?: unknown }) | null
+  // Đợt cũ còn nguyên (lập sẵn hoặc vừa mở trước mà chưa trả lời câu nào): dấu khớp ⇒ chưa câu nào được trả lời từ lúc lập ⇒ trả lại đợt đó (còn hạn 2 giờ), không tạo đợt mới và không chạy lại lapGoi7.
+  if (c && typeof c.phienCu === 'string' && c.phienCu && Array.isArray(c.questions)) {
+    const cu = await env.DB.prepare("SELECT json_extract(json,'$.created') AS t FROM game_v2_session WHERE id=? AND sbd=?").bind(c.phienCu, sbd).first<Row>()
+    const t = cu ? Number(cu.t) : 0
+    if (!t || now - t > 100 * 60_000 || ban.phienMoi > t + 1000) return null
+    return { ok: true, id: c.phienCu, questions: await lamMoiNiemChoCau(env, sbd, c.questions, now), goi7: c.goi7 }
+  }
   if (ban.phienMoi >= ban.luc) return null // đợt mới hơn bản sẵn (vd. mở chặng chạy song song với Sảnh) ⇒ đường thường tự dùng lại đúng đợt ấy
   // Chặng RỖNG lập sẵn (em đã xong phần hôm nay — goi-bai-7.ts `startGoi7` khongLuu): dấu khớp ⇒ cùng kết quả, không ghi gì (đường thường cũng không lưu phiên).
   if (c && c.rong && typeof c.rong === 'object' && !Array.isArray(c.rong)) return c.rong as Record<string, unknown>
   if (!c || !Array.isArray(c.refs) || !c.refs.length || !Array.isArray(c.questions) || !Array.isArray(c.goiIds)) return null
-  // Đợt cũ còn nguyên (lập sẵn trả đúng đợt ấy, như đường thường): dấu khớp ⇒ chưa câu nào được trả lời từ lúc lập ⇒ trả lại đợt đó (còn hạn 2 giờ), không tạo đợt mới.
-  if (typeof c.phienCu === 'string' && c.phienCu) {
-    const cu = await env.DB.prepare("SELECT json_extract(json,'$.created') AS t FROM game_v2_session WHERE id=? AND sbd=?").bind(c.phienCu, sbd).first<Row>()
-    if (!cu || now - Number(cu.t) > 100 * 60_000) return null
-    return { ok: true, id: c.phienCu, questions: await lamMoiNiemChoCau(env, sbd, c.questions, now), goi7: c.goi7 }
-  }
   const { sqlCacGoiConNhan7 } = await import('./goi-bai-7-quyen')
   const { sqlTenLopHs } = await import('./goi-bai-7')
   const id = crypto.randomUUID()
   const [ins] = await env.DB.batch([
     env.DB.prepare(`INSERT INTO game_v2_session(id,sbd,json,created_at) SELECT ?,?,?,? WHERE ${sqlCacGoiConNhan7('?', '?', sqlTenLopHs('h'))}`)
-      .bind(id, sbd, JSON.stringify({ mode: 'adventure', created: now, hoa2: 1, hocTap: 1, goi7: 1, questions: c.refs }), new Date(now).toISOString(), JSON.stringify(c.goiIds), sbd),
-    lenhBoChangSanSang(env, sbd, ban.luc),
+      .bind(id, sbd, JSON.stringify({ mode: 'adventure', created: now, hoa2: 1, hocTap: 1, goi7: 1, questions: c.refs, tomTat7: c.goi7, goiIds: c.goiIds }), new Date(now).toISOString(), JSON.stringify(c.goiIds), sbd),
+    lenhBoChangSanSang(env, sbd, ban.luc, id, now),
   ])
   if (!Number(ins?.meta.changes)) return null
   return { ok: true, id, questions: await lamMoiNiemChoCau(env, sbd, c.questions, now), goi7: c.goi7 } // tem niêm phong làm MỚI lúc mở (niem-cau.ts)
 }
 
-/** Phiên `id` của em đã trả lời HẾT câu (kể cả câu làm lại cuối chặng)? — sau câu cuối mới chuẩn bị chặng kế tiếp. Lỗi ⇒ false. */
+/** Phiên `id` của em đã trả lời HẾT câu (kể cả câu học cách giải `goi_bai_7_gap` và câu làm lại cuối chặng)? — sau câu cuối mới chuẩn bị chặng kế tiếp. Lỗi ⇒ false. */
 export async function phienDaXong(env: Env, sbd: string, id: string): Promise<boolean> {
   try {
     const r = await env.DB.prepare(`SELECT json_array_length(s.json,'$.questions') AS n,
-        (SELECT COUNT(DISTINCT a.qid) FROM game_v2_attempt a WHERE a.session=s.id AND a.sbd=s.sbd) AS d FROM game_v2_session s WHERE s.id=? AND s.sbd=?`).bind(id, sbd).first<Row>()
+        (SELECT COUNT(DISTINCT a.qid) FROM game_v2_attempt a WHERE a.session=s.id AND a.sbd=s.sbd) +
+        (SELECT COUNT(DISTINCT g.qid) FROM goi_bai_7_gap g WHERE g.sbd=s.sbd AND g.receipt LIKE s.id||'|%') AS d
+        FROM game_v2_session s WHERE s.id=? AND s.sbd=?`).bind(id, sbd).first<Row>()
     return !!r && Number(r.n) > 0 && Number(r.d) >= Number(r.n)
   } catch { return false }
 }

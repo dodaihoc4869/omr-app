@@ -45,6 +45,12 @@ export function layKeHoach7<T>(db: unknown, sbd: string, now: number): KeHoachNh
   return v && now - v.luc >= 0 && now - v.luc < NHO_KE_HOACH_MS ? (v as KeHoachNho<T>) : null
 }
 
+/** Xem bản nhớ còn hạn của em (KHÔNG xoá — cho phép Sảnh và Mở chặng ngay sau câu cuối cùng dùng lại kế hoạch vừa lập trong 8 giây nếu dấu đã làm khớp). */
+export function xemKeHoach7<T>(db: unknown, sbd: string, now: number): KeHoachNho<T> | null {
+  const m = bangCua(db), v = m.get(sbd)
+  return v && now - v.luc >= 0 && now - v.luc < NHO_KE_HOACH_MS ? (v as KeHoachNho<T>) : null
+}
+
 export function boKeHoach7(db: unknown, sbd: string): void {
   BANG.get(dbGoc(db as object))?.delete(sbd)
 }
