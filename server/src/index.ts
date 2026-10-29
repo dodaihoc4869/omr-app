@@ -4137,6 +4137,7 @@ export function laGioCaoDiemVn(nowMs: number): boolean {
 }
 
 /** Bọc `boXuLy.fetch`: đo thời gian trả lời từng lệnh (trừ OPTIONS) vào bộ nhớ ⇒ p50/p95 ⇒ `nhipDeNghi` + `/gv/suc-khoe-may-chu` (suc-khoe-may.ts). Không tốn truy vấn nào. */
+import { batDauYeuCau, ghiBoNhoDinhKy } from './do-bo-nho'
 export { BanBiA } from './ban-bi-a-dong'
 export { TramGemini } from './tram-gemini'
 export default {
@@ -4144,6 +4145,9 @@ export default {
   async fetch(req: Request, env: Env, ctx?: ExecutionContext): Promise<Response> {
     const t0 = Date.now()
     let res: Response
+    // ĐO BỘ NHỚ / ĐỒNG THỜI (29/10 22:00, do-bo-nho.ts): đếm lượt đang chạy; mỗi isolate tối đa một dòng `[bo-nho]` / phút.
+    const xongDo = batDauYeuCau(); ghiBoNhoDinhKy(t0)
+    try {
     // ỔN ĐỊNH (28/09): ~40 nhánh định tuyến `return handler(...)` KHÔNG await ⇒ Promise bị từ chối thoát khỏi try/catch của định tuyến (và các nhánh GET
     // nằm ngoài try) ⇒ Cloudflare trả 1101 thiếu CORS, máy em tưởng mất mạng. `await` + `catch` Ở ĐÂY bắt MỌI lỗi (đồng bộ lẫn bất đồng bộ) một chỗ duy nhất.
     try { res = await boXuLy.fetch(req, env, ctx) } catch (e) { console.error('[may-chu] lỗi chưa bắt:', tenLenh(new URL(req.url).pathname), e); res = raLoi(e) } finally { if (req.method !== 'OPTIONS') ghiDoLenh(tenLenh(new URL(req.url).pathname), Date.now() - t0) }
@@ -4154,5 +4158,6 @@ export default {
     h.set('x-nhip-de-nghi', String(heSoGoiNen(new URL(req.url).pathname)))
     const ex = h.get('access-control-expose-headers'); h.set('access-control-expose-headers', ex ? `${ex}, x-nhip-de-nghi` : 'x-nhip-de-nghi')
     return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h })
+    } finally { xongDo() }
   },
 }
