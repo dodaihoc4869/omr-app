@@ -7,7 +7,7 @@ vi.mock('../src/lib/phan-hoi', () => ({ phanHoi: vi.fn() }))
 const SO = vi.hoisted(() => ({ con: 8 as number | null, phan: 8 as number | null, bao: vi.fn() }))
 vi.mock('../src/components/hoc-tap/ManTuChua', () => ({
   dungViecHomNay: () => ({ viec: {}, luu: null }), luuViecHomNay: () => {}, docSbdHs: () => 'S1',
-  conSuaHomNay: () => SO.con, conSuaPhanNgay: () => SO.phan, baoKhoaSua: SO.bao,
+  conSuaHomNay: () => SO.con, conSuaPhanNgay: () => SO.phan, baoKhoaSua: SO.bao, ngheXongSua: () => () => {},
 }))
 import { MotTrangHs, type PropsMotTrang } from '../src/components/hoc-tap/TrongHs'
 import type { TomTatKiemTra } from '../src/lib/kiem-tra-ca-nhan'

@@ -635,12 +635,13 @@ function sanhHoiSom(token: string | undefined, tapTrung: boolean): { than: strin
   }
 }
 
+let bu: ((k: KetQuaSanh) => KetQuaSanh) | null = null // bản vá hiện hành của Sảnh (xem `va` trong useSanhHoa2)
 /**
  * Hỏi `hoa2-sanh` khi đăng nhập, mỗi lần `lamMoi` đổi (vừa đóng game / màn con), và khi quay lại tab (dội ≥ 20 giây).
  * SWR (09/10): nếu máy đã có bản đệm từ trước ⇒ hiện Sảnh NGAY 0ms (dangTai: true); ngầm gọi máy chủ làm tươi.
  * Lỗi mạng / timeout: GIỮ nguyên bản đệm/bản cuối đang hiện để học sinh không kẹt ở khung xương hay bị màn lỗi chặn.
  */
-export function useSanhHoa2(token: string | undefined, sbd: string | undefined, lamMoi: number, tapTrung = false): TrangThaiSanh & { taiLai: () => void } {
+export function useSanhHoa2(token: string | undefined, sbd: string | undefined, lamMoi: number, tapTrung = false): TrangThaiSanh & { taiLai: () => void; va: (f: (k: KetQuaSanh) => KetQuaSanh) => void } {
   const som = useRef<{ than: string; kq: KetQuaSanh } | null | undefined>(undefined)
   // 13/10: Hôm nay (`tapTrung`) cũng nhận phản hồi hỏi sớm — đoạn mã nội tuyến / đăng nhập nay hỏi sớm đúng `hoc-tap-sanh`.
   if (som.current === undefined) som.current = sbd ? sanhHoiSom(token, tapTrung) : null
@@ -668,6 +669,10 @@ export function useSanhHoa2(token: string | undefined, sbd: string | undefined, 
     if (dangBay.current) { canThem.current = true; return }
     setLuot((n) => n + 1)
   }
+  // ĐỒNG BỘ NGAY (thầy 29/10 «làm xong thoát ra Lộ trình phải đồng bộ chính xác ngay lập tức, tải lại mới đúng»): số «đã làm» của Sảnh tính từ sổ học mà máy chủ ghi
+  // SAU khi trả lời (việc nền) ⇒ Sảnh nạp ngay lúc em thoát có thể mang số CŨ. Màn làm bài biết số thật ⇒ `va(f)` VÁ ngay bản đang hiện và bản máy chủ trả về
+  // từ đó (f chỉ nâng số CỦA ĐÚNG NGÀY, không bao giờ hạ) — máy chủ theo kịp thì f không đổi gì.
+  const va = (f: (k: KetQuaSanh) => KetQuaSanh) => { bu = f; setT((x) => ({ ...x, ketQua: x.ketQua && f(x.ketQua) })) }
   const khoaDung = useRef(`${token ?? ''}|${sbd ?? ''}`)
   useEffect(() => {
     // Đổi em (đăng xuất / đăng nhập SBD khác) ⇒ kiểm tra đệm của em mới hoặc về "chờ".
@@ -704,8 +709,9 @@ export function useSanhHoa2(token: string | undefined, sbd: string | undefined, 
     }
     setT((x) => ({ ...x, dangTai: true }))
     taiSanh(token, tapTrung)
-      .then((kq) => {
+      .then((kq0) => {
         if (huy) return
+        const kq = bu ? bu(kq0) : kq0
         ghiNhoCheDo2(sbd, kq.cheDo2)
         ghiNhoKetQuaSanh(sbd, kq)
         setT({ pha: 'xong', cheDo2: kq.cheDo2, ketQua: kq, loi: '', dangTai: false })
@@ -742,5 +748,5 @@ export function useSanhHoa2(token: string | undefined, sbd: string | undefined, 
       document.removeEventListener('visibilitychange', kich)
     }
   }, [token])
-  return { ...t, taiLai: xinNapLai }
+  return { ...t, taiLai: xinNapLai, va }
 }

@@ -17,7 +17,7 @@ import { banHat, yenLang } from '../../lib/hieu-ung'
 import { docNhoTuSua, ngheTuSua } from '../../lib/tu-sua-loi'
 // Việc hôm nay NẠP ĐỘNG qua mảnh ManTuChua (đã là điểm nạp lười, có trong precache, Lộ trình nạp sẵn lúc rảnh): nhập tĩnh / nạp thẳng tu-sua-viec-hom-nay làm
 // Rolldown tách chua-truc-tiep thành tệp riêng (+1 tệp precache, trần 170).
-type ModViec = Pick<typeof import('./ManTuChua'), 'baoKhoaSua' | 'conSuaHomNay' | 'conSuaPhanNgay' | 'docSbdHs' | 'dungViecHomNay' | 'luuViecHomNay'>
+type ModViec = Pick<typeof import('./ManTuChua'), 'baoKhoaSua' | 'conSuaHomNay' | 'conSuaPhanNgay' | 'docSbdHs' | 'dungViecHomNay' | 'luuViecHomNay' | 'ngheXongSua'>
 const SO_CAU_MOI_NGAY = 12 // = SO_CAU_MOI_NGAY của tu-sua-viec-hom-nay (chỉ dùng khi mảnh chưa nạp)
 import type { KetQuaDanhSachChua } from '../../lib/chua-cau-sai-api'
 import '../../styles/trong-hs.css'
@@ -134,6 +134,8 @@ function useConSuaHomNay(token: string | undefined, bat: boolean, nho: number[] 
     setKq(docNhoTuSua(token))
     return ngheTuSua((t, moi) => { if (t === token) setKq(moi) })
   }, [token])
+  // 29/10 (thầy «làm xong thoát ra Lộ trình phải đồng bộ chính xác ngay lập tức»): em vừa sửa xong một câu ⇒ dựng lại việc hôm nay NGAY từ nhật ký trên máy (bản sao danh sách ⇒ vẽ lại)
+  useEffect(() => mod?.ngheXongSua?.(() => setKq((k) => k && { ...k } as KetQuaDanhSachChua)), [mod])
   const r = useMemo(() => { const sbd = mod?.docSbdHs(); return mod && bat && sbd ? mod.dungViecHomNay(kq, Date.now(), sbd) : null }, [kq, mod, bat])
   useEffect(() => { if (r && mod) mod.luuViecHomNay(r.luu, r.day ?? null) }, [r, mod])
   // undefined = mảnh chưa nạp (chưa vẽ số, khỏi nháy 12 → 9); null = không dựng được việc hôm nay

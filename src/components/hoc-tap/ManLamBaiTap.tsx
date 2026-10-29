@@ -5,7 +5,7 @@ import { ChemText } from '../../lib/chem-format'
 import '../../lib/chem-trinh-bay' // thầy 27/10: phương trình rõ ràng (khoảng hẹp quanh toán tử, ⇌ cỡ chữ, «l» có đuôi) — chỉ app học sinh
 import type { TheCauProps } from '../TheCau'
 import { loiGiaiChuanTuKho } from '../loi-giai/KhoiLoiGiaiChuan'
-import { goiHoa2 } from '../hoa2/api'
+import { goiHoa2, type KetQuaSanh } from '../hoa2/api'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { nopCauLuong } from '../hoa2/doc-luong-nop'
 import { boChangMoTruoc, GIAY_CHO_MO_CHANG, layChangMoTruoc, moChangTruoc } from './mo-chang-truoc'
@@ -20,7 +20,8 @@ import { docTomTatGoi7, type TomTatGoi7 } from '../../lib/goi-bai-7'
 import { soOCuaCau } from '../../lib/so-o-tra-loi-ngan'
 import { BanDoY, BanPhimSo, ChonDungSai, ChonTracNghiem, DeCau, HinhCuoiCau, LoiGiaiCau, OTraLoiNgan, PhanHoiDungSai, PhanHoiTraLoiNgan, PhanHoiTracNghiem, traLoiCotPhai, useBoCucLam } from './LamCau'
 import { TroGiupDuo } from './TroGiupDuo'
-import { chuDanhSachCau, chuDS, chuThoiGian, coChuSo, cuonDeThayO, kyTuHien, nhanPhim, phimTuBanPhim, soChangXong, soHomNayGoi7, soSanhDungSai, type PhimSo, type SoHomNay } from './lam-bai'
+import { chuDS, chuThoiGian, kyTuHien, nhanPhim, phimTuBanPhim, soChangXong, soSanhDungSai, type PhimSo, type SoHomNay } from './lam-bai'
+import { chuDanhSachCau, coChuSo, cuonDeThayO, soHomNayGoi7 } from './lam-bai-man'
 import NutHoiThay from '../loi-giai/NutHoiThay'
 import { phanHoi } from '../../lib/phan-hoi'
 import { Bi } from '../linh-vat/Bi'
@@ -158,8 +159,21 @@ async function daySuaNgay(token: string, sbd: string, moKhoa = false): Promise<b
   } catch { return false }
 }
 
-export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homNay }: {
+/** Vá Sảnh NGAY (thầy 29/10 «làm xong thoát ra Lộ trình phải đồng bộ chính xác ngay lập tức»): nâng «đã làm hôm nay» lên `d` — KHÔNG bao giờ hạ; số câu còn lại
+ *  trừ đúng phần nâng (câu tiếp cận trừ ở `tiepCanCon`). Máy chủ ghi sổ học SAU khi trả lời nên Sảnh nạp ngay lúc thoát có thể mang số cũ; máy chủ theo kịp ⇒ không đổi gì. */
+export const vaDaLamSanh = (d: number, tiep: number, ngay: string) => (kq: KetQuaSanh): KetQuaSanh => {
+  if (!kq.cheDo2 || !('sanh' in kq)) return kq
+  const s = kq.sanh, g = s.goi7
+  if (!g || g.ngay !== ngay || g.daLamHomNay >= d) return kq // chỉ vá đúng NGÀY của chặng này (sang ngày mới bản vá hết tác dụng)
+  const them = d - g.daLamHomNay, tc = Math.min(g.tiepCanCon, tiep)
+  return { ...kq, sanh: { ...s, goi7: { ...g, daLamHomNay: d, tiepCanCon: g.tiepCanCon - tc, tuLamCon: Math.max(0, g.tuLamCon - (them - tc)) }, theLuc: { ...s.theLuc, con: Math.max(0, s.theLuc.con - them) } } }
+}
+/** Nạp lại Sảnh thêm hai lần sau khi thoát (4 s, 12 s): lần nạp ngay lúc thoát có thể đọc trước khi sổ học kịp ghi. */
+const henNapLai = (f: () => void) => { for (const ms of [4000, 12000]) window.setTimeout(f, ms) }
+export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa, homNay }: {
   token: string; sbd: string; onVe: () => void; onCapNhat: () => void; onChua: (qid: string) => void
+  /** Vá bản Sảnh đang hiện (hoa2.va) — số «đã làm» đúng ngay lúc thoát ra Lộ trình. */
+  onVa?: (f: (k: KetQuaSanh) => KetQuaSanh) => void
   /** Số "đã làm/M câu hôm nay" + chặng — cùng nguồn vòng tròn Hôm nay (`soHomNay` trong lam-bai.ts). Thiếu ⇒ ẩn ô số, tiêu đề không ghi chặng. */
   homNay?: SoHomNay | null
 }) {
@@ -187,6 +201,10 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
   const [dem, setDem] = useState<{ daLam: number; muc: number } | null>(null)
   const canTaiSanh = useRef(false), soLuotDem = useRef(0), capNhatRef = useRef(onCapNhat)
   capNhatRef.current = onCapNhat
+  // Câu MỚI em làm trong lượt này (không tính làm lại) + số «đã làm» lúc mở chặng ⇒ số thật ngay sau mỗi câu, không chờ máy chủ.
+  const moi = useRef<{ qids: Set<string>; tiep: number; d0: number; ngay: string }>({ qids: new Set(), tiep: 0, d0: -1, ngay: '' }), onVaRef = useRef(onVa)
+  onVaRef.current = onVa
+  const vaSo = (d: number) => onVaRef.current?.(vaDaLamSanh(d, moi.current.tiep, moi.current.ngay))
   const batDau = useRef(0), gui = useRef(false), traRef = useRef('')
   // CHẤM NHANH (thầy 28/10 «bấm kiểm tra … chưa tức thì ngay»): `cham` = đang chờ máy chủ chấm (dải «Đang chấm…» trượt lên ngay khi chạm); `tiepCho` = em bấm
   // «Tiếp tục» khi kết quả còn TẠM ⇒ sang câu ngay khi bản đầy đủ (đã ghi) về — câu kế không bao giờ nộp chồng lên lượt ghi của câu trước.
@@ -263,7 +281,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       const ds = Array.isArray(r.questions) ? r.questions as Cau[] : []
       if (ds.some(cauHong)) throw new Error('Nội dung câu chưa đầy đủ. Em cập nhật lại bài học nhé.')
       const g7 = docTomTatGoi7(r.goi7)
-      setCau(ds); setSoGoc(ds.length); setPhien(typeof r.id === 'string' ? r.id : ''); setGoi7(g7)
+      setCau(ds); setSoGoc(ds.length); setPhien(typeof r.id === 'string' ? r.id : ''); setGoi7(g7); moi.current = { qids: new Set(), tiep: 0, d0: g7 ? g7.daLamHomNay : -1, ngay: g7?.ngay ?? '' }
       if (g7) setDem({ daLam: g7.daLamHomNay, muc: g7.toiThieu })
       // 27/10 (ảnh thầy: khung đỏ «Em đã hoàn thành phần được xếp hôm nay…» + «Thử lại» ⇒ em kẹt, thử lại ra đúng câu ấy): chặng rỗng KHÔNG phải lỗi —
       // thẻ trung tính + nút về trang chính (làm mới số ở đó), không «Thử lại».
@@ -291,7 +309,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     setTra(nhap); traRef.current = nhap; setGoiY(false); setMoLoiGiai(false); setTuLam(!!nhap); batDau.current = Date.now()
   }, [khoa])
   // Rời màn (Về, Tự chữa…) khi đã nộp câu mà sảnh chưa nạp lại ⇒ nạp MỘT lần để Hôm nay đúng số.
-  useEffect(() => () => { if (canTaiSanh.current) { canTaiSanh.current = false; capNhatRef.current() } }, [])
+  useEffect(() => () => { if (canTaiSanh.current) { canTaiSanh.current = false; capNhatRef.current(); henNapLai(() => capNhatRef.current()) } }, [])
   // Thưởng phạt: rời màn sau khi đã có câu được thưởng ⇒ đọc lại tổng quan MỘT lần (thanh trên Lộ trình: nguyên tử hôm nay, mục tiêu ngày).
   const coThuongRef = useRef(false)
   useEffect(() => () => { if (coThuongRef.current) void capNhatTongQuan(token) }, [token])
@@ -304,8 +322,16 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       if (luot !== soLuotDem.current) return
       const daLam = Number(r.daLamHomNay), muc = r.toiThieu == null ? NaN : Number(r.toiThieu)
       if (r.daLamHomNay == null || !Number.isFinite(daLam) || daLam < 0) return
-      setDem(v => { const m = Number.isFinite(muc) && muc > 0 ? muc : v?.muc ?? 0; return m > 0 ? { daLam, muc: m } : v })
+      setDem(v => { const m = Number.isFinite(muc) && muc > 0 ? muc : v?.muc ?? 0; return m > 0 ? { daLam: Math.max(daLam, v?.daLam ?? 0), muc: m } : v })
+      vaSo(Math.max(daLam, moi.current.d0 + moi.current.qids.size)) // số máy chủ có thể CŨ (sổ học chưa kịp ghi): không bao giờ thấp hơn số đã đếm ở máy
     }).catch(() => { /* Giữ số cũ; xong chặng / rời màn sẽ nạp lại sảnh. */ })
+  }
+  /** Câu MỚI (không phải làm lại, chưa tính trong lượt này) ⇒ cộng vào «đã làm hôm nay» NGAY và vá Sảnh — không chờ `hoc-tap-dem` / sổ học của máy chủ. */
+  const tinhCauMoi = (c: Cau) => {
+    const m = moi.current
+    if (!goi7 || m.d0 < 0 || c.vaiGoi7 === 'lam_lai' || m.qids.has(c.qid)) return
+    m.qids.add(c.qid); if (c.vaiGoi7 === 'tiep_can') m.tiep++
+    setDem(v => (v ? { ...v, daLam: Math.max(v.daLam, m.d0 + m.qids.size) } : v)); vaSo(m.d0 + m.qids.size)
   }
   const doiTra = (v: string) => { phanHoi('chon'); setTra(v); traRef.current = v; try { localStorage.setItem(khoa, v) } catch { /* Em vẫn làm và nộp được. */ } }
   // Sang câu mới / vừa có kết quả ⇒ đưa màn về đầu (dải kết quả, đề) — em không phải tự vuốt ngược. Trình đọc màn hình: tiêu đề "Câu x/y" và dải
@@ -397,7 +423,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
       if (daCham !== tra) { setTra(daCham); traRef.current = daCham }
       // Lượt đã chấm quyết định tự làm hay có hỗ trợ, kể cả nộp lại trên máy khác. Máy chủ cũ thiếu cờ thì dùng cờ đã gửi.
       const hoTro = (r.attempt as { assisted?: unknown } | undefined)?.assisted
-      setKet(v => ({ ...v, [q.qid]: { ...(r as unknown as Ket), assisted: typeof hoTro === 'boolean' ? hoTro : assisted, ...(r.replayed === true && daCham !== tra ? { chamLanTruoc: true } : {}) } })); try { localStorage.removeItem(khoa) } catch { /* Không cản nhận kết quả. */ } capNhatSo()
+      setKet(v => ({ ...v, [q.qid]: { ...(r as unknown as Ket), assisted: typeof hoTro === 'boolean' ? hoTro : assisted, ...(r.replayed === true && daCham !== tra ? { chamLanTruoc: true } : {}) } })); try { localStorage.removeItem(khoa) } catch { /* Không cản nhận kết quả. */ } tinhCauMoi(q); capNhatSo()
     } catch (e) {
       // Bản đầy đủ không về được ⇒ bỏ kết quả TẠM (câu chưa chắc đã ghi), giữ nháp, em bấm lại (biên nhận chống trùng ⇒ không tính hai lần).
       setKet(v => { const x = v[q.qid]; if (!x?.tam) return v; const { [q.qid]: _bo, ...con } = v; return con })
@@ -412,11 +438,11 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, homN
     try {
       const r=await guiLaiBenVung(()=>goiHoa2('hoc-tap-gap',token,{session:phien,qid:q.qid,chuaTuLam:true},15))
       if(r.ok!==true || !(r.choThay===true || r.hocCoHoTro===true&&typeof r.answer==='string'))throw new Error(typeof r.error==='string'?r.error:'Chưa mở được phần chữa.')
-      setKet(v=>({...v,[q.qid]:r as unknown as Ket}));capNhatSo()
+      setKet(v=>({...v,[q.qid]:r as unknown as Ket}));tinhCauMoi(q);capNhatSo()
     } catch(e){setLoi(chuCuaLoi(e, 'Chưa tải được phần chữa.'))}finally{gui.current=false;setNop(false)}
   }
   // Xong chặng: câu cuối đã nộp ⇒ mở trước chặng sau (em bấm "Học tiếp chặng N" là có câu ngay).
-  const ketThuc = () => { setXong(true); canTaiSanh.current = false; onCapNhat(); boChangMoTruoc(); moChangTruoc(token); /* LẶP CÂU 27/10: luôn mở trước lượt MỚI sau câu cuối, không giữ lượt cũ */ gocRef.current?.scrollIntoView?.({ block: 'start' }) }
+  const ketThuc = () => { setXong(true); canTaiSanh.current = false; onCapNhat(); henNapLai(() => capNhatRef.current()); boChangMoTruoc(); moChangTruoc(token); /* LẶP CÂU 27/10: luôn mở trước lượt MỚI sau câu cuối, không giữ lượt cũ */ gocRef.current?.scrollIntoView?.({ block: 'start' }) }
   // A3 — câu cũ trượt trái mờ dần (bản sao, không trễ bước sang câu mới; chỉ màn Duo).
   // 27/10 MƯỢT (đo scripts/do-muot-hs.mjs): sang câu mới ⇒ đo khối câu cũ + cuộn khung về đầu NGAY TRONG lượt bấm, lúc bố cục còn sạch (rẻ), rồi mới dựng
   // câu mới. Trước: `scrollIntoView` chạy SAU khi câu mới dựng ⇒ ép trình duyệt tính lại kiểu + bố cục cả màn thêm một lượt (~35–60 ms ở CPU ×6).

@@ -8,7 +8,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import ManLamBaiTap from '../src/components/hoc-tap/ManLamBaiTap'
 import { goiHoa2 } from '../src/components/hoa2/api'
-import { cuonDeThayO } from '../src/components/hoc-tap/lam-bai'
+import { cuonDeThayO } from '../src/components/hoc-tap/lam-bai-man'
 import { MQ_LAM_RONG } from '../src/components/hoc-tap/LamCau'
 import { publicQuestion, type PrivateQuestion } from '../src/game/than-thu-v2/core'
 vi.mock('../src/components/hoa2/api', async (goc) => ({ ...await goc<typeof import('../src/components/hoa2/api')>(), goiHoa2: vi.fn() }))

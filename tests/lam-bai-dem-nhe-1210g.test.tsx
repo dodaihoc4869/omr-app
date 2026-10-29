@@ -11,7 +11,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react'
 import ManLamBaiTap from '../src/components/hoc-tap/ManLamBaiTap'
 import { goiHoa2, useSanhHoa2 } from '../src/components/hoa2/api'
-import { soHomNay, soHomNayGoi7, type SoHomNay } from '../src/components/hoc-tap/lam-bai'
+import { soHomNay, type SoHomNay } from '../src/components/hoc-tap/lam-bai'
+import { soHomNayGoi7 } from '../src/components/hoc-tap/lam-bai-man'
 import { docSanh } from '../src/components/hoa2/api'
 vi.mock('../src/components/hoa2/api', async (goc) => ({ ...await goc<typeof import('../src/components/hoa2/api')>(), goiHoa2: vi.fn() }))
 afterEach(() => { cleanup(); vi.clearAllMocks(); vi.mocked(goiHoa2).mockReset(); vi.unstubAllGlobals(); localStorage.clear() })
@@ -95,7 +96,8 @@ describe('màn làm bài nhánh Gói 7', () => {
     vi.mocked(goiHoa2).mockRejectedValueOnce(new Error('Máy chủ phản hồi chậm'))
     await nopB()
     await waitFor(() => expect(lenh()).toContain('hoc-tap-dem'))
-    expect(screen.getByText('12/24')).toBeTruthy()
+    // 29/10 (thầy «làm xong thoát ra Lộ trình phải đồng bộ chính xác ngay lập tức»): hoc-tap-dem lỗi vẫn KHÔNG làm mất câu em vừa làm — số đếm ở máy (12 lúc mở chặng + 1 câu vừa làm).
+    expect(screen.getByText('13/24')).toBeTruthy()
     fireEvent.click(await screen.findByRole('button', { name: /Câu tiếp theo/ }))
     await screen.findByText(/Câu b:/)
     vi.mocked(goiHoa2).mockResolvedValueOnce({ ok: true, correct: true, answer: 'B', solution: '' })
