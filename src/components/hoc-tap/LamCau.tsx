@@ -272,7 +272,6 @@ function khungCuon(el: HTMLElement): HTMLElement {
   }
   return (document.scrollingElement as HTMLElement | null) ?? document.documentElement
 }
-const giamChuyenDong = () => typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 /** Bàn phím số riêng trong thanh đáy: 1–9, 0, dấu phẩy, dấu trừ, xoá một kí tự, xoá hết. Phím hết tác dụng thì mờ (đủ `soO` kí tự, đã có dấu phẩy…).
  *  KIỂU DUOLINGO (thầy 27/10): mỗi phím là mặt phím trên gờ đáy 4 px — chạm ⇒ mặt lún xuống (≥ 80 ms, chỉ transform) rồi bật lại; mỗi lần bấm
@@ -323,12 +322,14 @@ export function BanPhimSo({ value, onPhim, khoa, soO = TOI_DA_KY_TU }: { value: 
     const ds = hen.current
     return () => { window.removeEventListener('keydown', f); for (const t of ds.values()) window.clearTimeout(t) }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
-  // Bắt đầu câu (bàn phím dựng lại theo câu): đo sau khi bố cục xong rồi cuộn vừa đủ.
-  useEffect(() => {
+  // Bắt đầu câu (bàn phím dựng lại theo câu): đo rồi cuộn vừa đủ để thấy ô đáp án + bàn phím + «Kiểm tra».
+  // 29/10 (thầy, video 11:00 «Vẫn bị khựng chỗ mở câu»): trước đây đo SAU hai khung vẽ rồi cuộn MƯỢT ~0,35 s ⇒ câu vừa hiện đã trượt lên ngay trước mắt em. Nay đo + cuộn TỨC THÌ
+  // trong lượt layout (trước lần vẽ đầu) ⇒ khung đầu tiên đã ở đúng vị trí, không trượt. Bố cục chưa có (cao 0) ⇒ đo lại sau khung vẽ, vẫn cuộn tức thì (không trượt).
+  useLayoutEffect(() => {
     const el = goc.current
     if (!el || !el.closest('.duo')) return
-    let r2 = 0
-    const r1 = requestAnimationFrame(() => { r2 = requestAnimationFrame(() => {
+    const cuon = (): boolean => {
+      if (el.getBoundingClientRect().height <= 0) return false
       const khung = khungCuon(el)
       const laTrang = khung === document.scrollingElement || khung === document.documentElement
       const thanh = el.closest('.duo')?.querySelector<HTMLElement>('.duo-day')
@@ -344,8 +345,11 @@ export function BanPhimSo({ value, onPhim, khoa, soO = TOI_DA_KY_TU }: { value: 
         oTren: (o ?? el).getBoundingClientRect().top,
         khungTren: kTren,
       })
-      if (d > 0) khung.scrollBy({ top: d, behavior: giamChuyenDong() ? 'auto' : 'smooth' })
-    }) })
+      if (d > 0) khung.scrollBy({ top: d, behavior: 'auto' })
+      return true
+    }
+    let r1 = 0, r2 = 0
+    if (!cuon()) r1 = requestAnimationFrame(() => { r2 = requestAnimationFrame(() => { cuon() }) })
     return () => { cancelAnimationFrame(r1); cancelAnimationFrame(r2) }
   }, [])
   return (

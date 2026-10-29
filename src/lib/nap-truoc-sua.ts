@@ -11,7 +11,7 @@ type KetQuaMo = Awaited<ReturnType<typeof apiMoDot>>
 export const HAN_NAP_TRUOC_MS = 3 * 60_000
 /** Số câu nạp trước giữ cùng lúc. */
 const TOI_DA = 3
-const KHO = new Map<string, { p: Promise<KetQuaMo>; luc: number }>()
+const KHO = new Map<string, { p: Promise<KetQuaMo>; luc: number; kq?: KetQuaMo }>()
 const khoa = (token: string, qid: string) => `${token}|${qid}`
 
 /** Bắt đầu mở sẵn câu `qid` (không chờ). Đã có bản còn mới ⇒ không làm gì. */
@@ -24,8 +24,17 @@ export function napTruocCauSua(token: string, qid: string, nayMs = Date.now()): 
   KHO.delete(k)
   KHO.set(k, { p, luc: nayMs })
   while (KHO.size > TOI_DA) KHO.delete(KHO.keys().next().value as string)
-  // Kết quả lỗi không nằm lại: lần bấm thật sẽ hỏi tươi.
-  void p.then((r) => { if (!r.ok && KHO.get(k)?.p === p) KHO.delete(k) })
+  // Kết quả lỗi không nằm lại: lần bấm thật sẽ hỏi tươi. Kết quả tốt được giữ kèm bản ĐÃ VỀ (`kq`) để màn sửa câu dựng thẳng ở lần vẽ đầu (xem `layNapTruocCauSuaNgay`).
+  void p.then((r) => { const e = KHO.get(k); if (e?.p !== p) return; if (r.ok) e.kq = r; else KHO.delete(k) })
+}
+
+/** Kết quả nạp trước ĐÃ VỀ và còn mới ⇒ trả ĐỒNG BỘ (và bỏ); chưa về / hết hạn ⇒ null (nơi gọi dùng `layNapTruocCauSua`). Màn sửa câu dựng ngay ở lần vẽ đầu — không khung chờ (29/10, video 11:00 «khựng chỗ mở câu»). */
+export function layNapTruocCauSuaNgay(token: string, qid: string, nayMs = Date.now()): KetQuaMo | null {
+  const k = khoa(token, qid)
+  const co = KHO.get(k)
+  if (!co?.kq || nayMs - co.luc >= HAN_NAP_TRUOC_MS) return null
+  KHO.delete(k)
+  return co.kq
 }
 
 /** Lấy (và bỏ) kết quả nạp trước của câu `qid` còn mới; không có ⇒ null (nơi gọi hỏi tươi). Có thể còn đang về — chờ `await`. */
