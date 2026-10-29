@@ -1,0 +1,55 @@
+# ĐẾM «BÀI HÔM NAY» CỦA TÀI KHOẢN THỬ 12121212 (CHỈ ĐỌC) — thầy 29/10: «Reset lại bài hôm nay của số báo danh test 12121212 để tôi test lại app».
+# Chỉ SELECT đếm dòng theo bảng (tài khoản thử là hằng công khai trong mã: SBD_THU_NGHIEM). KHÔNG ghi, KHÔNG export.
+name: Đếm bài hôm nay của tài khoản thử (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/reset-test-2910]
+    paths: ['.github/workflows/do-bai-hom-nay-thu-2910.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-bai-hom-nay-thu-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm (chỉ SELECT)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c ".[0].results" || echo "(lỗi)"; }
+          echo "Giờ VN: $(TZ=Asia/Ho_Chi_Minh date '+%d/%m %H:%M')"
+          HOM="date('now','+7 hours')"
+          S="'12121212'"
+          q "ngày VN" "SELECT $HOM AS hom_nay"
+          q "tài khoản thử có tồn tại" "SELECT COUNT(*) n FROM hoc_sinh WHERE sbd=$S"
+          q "ke_hoach_ngay (mọi ngày / hôm nay)" "SELECT COUNT(*) tong, SUM(ngay=$HOM) hom_nay FROM ke_hoach_ngay WHERE sbd=$S"
+          q "hoc_tap_san_sang" "SELECT ngay, luc, dau, sanh_json IS NOT NULL co_sanh, chang_json IS NOT NULL co_chang FROM hoc_tap_san_sang WHERE sbd=$S"
+          q "goi_bai_7_muc_ngay" "SELECT COUNT(*) tong, SUM(ngay=$HOM) hom_nay FROM goi_bai_7_muc_ngay WHERE sbd=$S"
+          q "goi_bai_7_ngay" "SELECT COUNT(*) tong, SUM(ngay=$HOM) hom_nay FROM goi_bai_7_ngay WHERE sbd=$S"
+          q "goi_bai_7_em" "SELECT COUNT(*) tong FROM goi_bai_7_em WHERE sbd=$S"
+          q "cột goi_bai_7_gap" "SELECT group_concat(name) cot FROM pragma_table_info('goi_bai_7_gap')"
+          q "cột goi_bai_7_kiem" "SELECT group_concat(name) cot FROM pragma_table_info('goi_bai_7_kiem')"
+          q "cột su_kien_hoc" "SELECT group_concat(name) cot FROM pragma_table_info('su_kien_hoc')"
+          q "game_v2_session (hôm nay theo created_at)" "SELECT COUNT(*) tong, SUM(substr(datetime(created_at,'+7 hours'),1,10)=$HOM) hom_nay, MAX(created_at) moi_nhat FROM game_v2_session WHERE sbd=$S"
+          q "game_v2_attempt (hôm nay)" "SELECT COUNT(*) tong, SUM(substr(datetime(created_at,'+7 hours'),1,10)=$HOM) hom_nay FROM game_v2_attempt WHERE sbd=$S"
+          q "tu_sua_viec_ngay / muc_tieu / khoa (hôm nay)" "SELECT (SELECT COUNT(*) FROM tu_sua_viec_ngay WHERE sbd=$S AND ngay_vn=$HOM) viec, (SELECT COUNT(*) FROM tu_sua_muc_tieu_ngay WHERE sbd=$S AND ngay_vn=$HOM) muc_tieu, (SELECT COUNT(*) FROM tu_sua_khoa_ngay WHERE sbd=$S AND ngay_vn=$HOM) khoa"
+          q "chua_gon_lan (hôm nay / tổng)" "SELECT COUNT(*) tong, SUM(ngay_vn=$HOM) hom_nay FROM chua_gon_lan WHERE sbd=$S"
+          q "chua_loi_dot theo trạng thái" "SELECT trang_thai_day, COUNT(*) n FROM chua_loi_dot WHERE sbd=$S GROUP BY 1"
+          q "nhiem_vu_ngay (hôm nay)" "SELECT COUNT(*) tong, SUM(ngay=$HOM) hom_nay, SUM(ngay=$HOM AND xong_luc IS NOT NULL) hom_nay_xong FROM nhiem_vu_ngay WHERE em=$S"
+          q "ruong_ngay (hôm nay)" "SELECT COUNT(*) tong, SUM(ngay=$HOM) hom_nay FROM ruong_ngay WHERE em=$S"
+          q "srs2_ke_hoach (hôm nay)" "SELECT COUNT(*) tong, SUM(ngay=$HOM) hom_nay FROM srs2_ke_hoach WHERE sbd=$S"
+          q "cnh_exp_day (hôm nay)" "SELECT COUNT(*) tong, SUM(learning_day=$HOM) hom_nay FROM cnh_exp_day WHERE student_id=$S"
+          q "kiem_tra_ca_nhan (hôm nay)" "SELECT COUNT(*) tong, SUM(ngay=$HOM) hom_nay FROM kiem_tra_ca_nhan WHERE sbd=$S"
+          q "ca thi đang mở" "SELECT COUNT(*) n FROM ca WHERE trang_thai='mo'"
