@@ -93,11 +93,19 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep, 
       daRung = true; phanHoi(t.ket === 'tu_sua' || t.ket === 'xong_phan' ? 'dung' : 'sai') // rung phản hồi (chỉ «Trong»)
       setKq(ketTuTam(t, mo.de)); setBan(false)
     }
-    const traLoi = tra.trim(), banNop = mo.ban
+    const traLoi = tra.trim(), banNop = mo.ban, truoc = luu.current, khoaNop = khoa.current
     const chay = (async () => {
-      const r = mo.sk
-        ? await apiGonNopLuong(token, { dotId, ban: banNop, traLoi, khoa: khoa.current, qid, sk: mo.sk }, khiTam)
-        : await apiGonNop(token, dotId, banNop, traLoi, khoa.current, qid)
+      if (truoc) await truoc // lần nộp trước của đợt này còn ghi nền (em vừa «Làm lại» ngay) ⇒ gửi SAU nó: máy chủ đếm lần theo các dòng đã ghi
+      // Lỗi đường truyền (không có mã lỗi của máy chủ) ⇒ thử lại cùng khoá (máy chủ chống trùng theo khoá) — em có thể đã sang câu khác, không ai bấm lại được.
+      let r: KetQuaGon = { ok: false }
+      for (let lan = 0; lan < 3; lan++) {
+        r = mo.sk
+          ? await apiGonNopLuong(token, { dotId, ban: banNop, traLoi, khoa: khoaNop, qid, sk: mo.sk }, khiTam)
+          : await apiGonNop(token, dotId, banNop, traLoi, khoaNop, qid)
+        if (r.ok || r.ma || lan >= 2) break
+        if (song.current && !daRung) break // còn trên màn mà chưa có kết quả tạm: để em thấy lỗi + bấm lại như cũ
+        await new Promise((x) => setTimeout(x, 1500 * (lan + 1)))
+      }
       if (r.ok && r.ket && KHEP.has(r.ket)) ghiXong() // ghi NGAY khi có kết quả đầy đủ (kể cả máy em đã rời màn)
       if (!song.current) return
       setBan(false)
@@ -123,12 +131,16 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep, 
   const veSauLuu = () => {
     const p = luu.current
     if (!p) { ve(); return }
+    // GHI NỀN (29/10): kết quả đã hiện từ dòng tạm ⇒ đánh dấu «xong phần» ngay (câu kế của Việc hôm nay khỏi chọn lại câu này) và sang câu kế; lượt ghi chạy tiếp nền
+    // (thử lại cùng khoá khi đứt mạng; máy chủ chống trùng). Chưa có dòng tạm (đang chờ) ⇒ chờ như cũ.
+    if (kq?.tam && kq.ket && KHEP.has(kq.ket)) { ghiXong(); ve(); return }
     void p.then(() => { if (song.current && !luuLoi.current) ve() })
   }
   const lamLai = async () => {
     setLoi('')
-    if (luu.current) { setBan(true); await luu.current; if (!song.current) return; if (luuLoi.current) { setBan(false); return } }
     const s2 = sk2.current
+    // Có tem lần 2 ⇒ mở NGAY (lần nộp kế tự đợi lượt ghi lần 1 trong `nop`); không thì gon-mo đọc số lần đã ghi ⇒ chờ lượt ghi trước.
+    if (!s2 && luu.current) { setBan(true); await luu.current; if (!song.current) return; if (luuLoi.current) { setBan(false); return } }
     if (s2) {
       // Lần 2 cùng bản (tem do máy chủ cấp lúc chấm lần 1): mở NGAY tại máy em, khỏi gọi gon-mo.
       sk2.current = null

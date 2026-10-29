@@ -209,6 +209,9 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   // CHẤM NHANH (thầy 28/10 «bấm kiểm tra … chưa tức thì ngay»): `cham` = đang chờ máy chủ chấm (dải «Đang chấm…» trượt lên ngay khi chạm); `tiepCho` = em bấm
   // «Tiếp tục» khi kết quả còn TẠM ⇒ sang câu ngay khi bản đầy đủ (đã ghi) về — câu kế không bao giờ nộp chồng lên lượt ghi của câu trước.
   const [cham, setCham] = useState(false), tiepCho = useRef(false), tiepMoi = useRef<() => void>(() => {})
+  // GHI NỀN (29/10, thầy «tải sẵn gì tải luôn, tức thì cả giờ cao điểm»): kết quả đã hiện (dòng tạm) mà bản đầy đủ (đã ghi) chưa về ⇒ «Tiếp tục» sang câu kế NGAY (trừ câu cuối), lượt ghi chạy tiếp nền.
+  // `ghiTruoc` = lượt nộp trước còn chạy: câu kế chỉ GỬI sau khi nó xong (hồ sơ game ghi bằng CAS — không chồng hai lượt ghi của một em); `tachRoi` = câu đã rời màn khi bản đầy đủ chưa về.
+  const ghiTruoc = useRef<Promise<void> | null>(null), tachRoi = useRef<Set<string>>(new Set())
   const gocRef = useRef<HTMLDivElement>(null), nutTiepRef = useRef<HTMLButtonElement>(null)
   const q = cau[viTri], k = q ? ket[q.qid] : undefined
   // 20/10 đo giây (thầy: mọi câu đều đo được): giây câu đang hiện, CHỈ cộng khi tab đang hiện và em còn chạm màn trong 180 giây; trần 900; gửi cùng lượt nộp
@@ -397,13 +400,18 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   const nopCau = async () => {
     if (!q || !phien || !duTraLoi(q.phan, tra) || gui.current || k) return
     gui.current = true; setNop(true); setCham(true); setLoi('')
+    const truoc = ghiTruoc.current
+    let xongLuot!: () => void
+    const luotNay = new Promise<void>((r) => { xongLuot = r })
+    ghiTruoc.current = luotNay
+    const qidNop = q.qid
     // NỘP TỨC THÌ (thầy 27/10): trong lúc chờ máy chấm, nạp sẵn mảnh lời giải từng bước (+ màn kết bài khi là câu cuối) — bấm «Lời giải» / hết chặng là có ngay.
     // Chỉ mã giao diện (không có đáp án); đáp án vẫn chỉ về cùng phản hồi chấm.
     if (duo) { void import('../goi-y-cham/LoiGiaiCauCoSoDo').catch(() => {}); if (viTri + 1 >= cau.length) void import('../thuong/KetBaiThuong').catch(() => {}) }
     const msLam = Math.max(0, Date.now() - batDau.current)
     const assisted = !!q.goiY || daHoiThay.current === q.qid || hoTroCham.current === q.qid
     try {
-      const qidNop = q.qid
+      if (truoc) await truoc // lượt ghi của câu trước (đã bấm «Tiếp tục» khi còn tạm) xong rồi mới gửi câu này
       // CHẤM NHANH: dòng TẠM (đúng / sai từ bộ nhớ máy chủ) ⇒ đổi màu đúng / sai NGAY tại dải; thưởng / EXP đến cùng phản hồi đầy đủ ngay sau. Bản nháp giữ tới bản đầy đủ.
       const khiTam = (o: Record<string, unknown>) => {
         if (typeof o.correct !== 'boolean' || typeof o.answer !== 'string') return
@@ -426,11 +434,15 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
       setKet(v => ({ ...v, [q.qid]: { ...(r as unknown as Ket), assisted: typeof hoTro === 'boolean' ? hoTro : assisted, ...(r.replayed === true && daCham !== tra ? { chamLanTruoc: true } : {}) } })); try { localStorage.removeItem(khoa) } catch { /* Không cản nhận kết quả. */ } tinhCauMoi(q); capNhatSo()
     } catch (e) {
       // Bản đầy đủ không về được ⇒ bỏ kết quả TẠM (câu chưa chắc đã ghi), giữ nháp, em bấm lại (biên nhận chống trùng ⇒ không tính hai lần).
-      setKet(v => { const x = v[q.qid]; if (!x?.tam) return v; const { [q.qid]: _bo, ...con } = v; return con })
-      tiepCho.current = false; nutTiepRef.current?.removeAttribute('data-lun')
-      setLoi(chuCuaLoi(e, 'Chưa nộp được câu. Đáp án nháp vẫn được giữ.'))
+      setKet(v => { const x = v[qidNop]; if (!x?.tam) return v; const { [qidNop]: _bo, ...con } = v; return con })
+      if (tachRoi.current.has(qidNop)) setLoi(`Câu ${cau.findIndex(c => c.qid === qidNop) + 1} chưa được lưu: ${chuCuaLoi(e, 'mất kết nối máy chủ')}. Em làm lại câu đó ở cuối chặng nhé.`) // đã sang câu khác: báo ở câu đang làm
+      else { tiepCho.current = false; nutTiepRef.current?.removeAttribute('data-lun'); setLoi(chuCuaLoi(e, 'Chưa nộp được câu. Đáp án nháp vẫn được giữ.')) }
     }
-    finally { gui.current = false; setNop(false); setCham(false); if (tiepCho.current) { tiepCho.current = false; window.setTimeout(() => tiepMoi.current(), 0) } }
+    finally {
+      xongLuot(); if (ghiTruoc.current === luotNay) ghiTruoc.current = null
+      // em đã sang câu khác lúc bản đầy đủ chưa về ⇒ cờ gửi / chờ thuộc câu đang làm, không đụng
+      if (!tachRoi.current.delete(qidNop)) { gui.current = false; setNop(false); setCham(false); if (tiepCho.current) { tiepCho.current = false; window.setTimeout(() => tiepMoi.current(), 0) } }
+    }
   }
   const hocHuongDan = async () => {
     if(!q || !phien || gui.current || k)return
@@ -489,7 +501,9 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   const dangSang = useRef(-1)
   const tiep = () => {
     // Kết quả còn TẠM (bản đầy đủ đang về): giữ dáng lún, sang câu ngay khi bản đầy đủ về (nopCau `finally`).
-    if (gui.current && k?.tam) { tiepCho.current = true; nutTiepRef.current?.setAttribute('data-lun', ''); return }
+    // GHI NỀN: không phải câu cuối ⇒ sang câu kế ngay, lượt ghi chạy tiếp nền (câu kế đợi nó trước khi gửi). Câu cuối: chờ bản đầy đủ (kết chặng / làm lại cuối chặng đọc sổ đã ghi).
+    if (gui.current && k?.tam && viTri + 1 < cau.length && q) { tachRoi.current.add(q.qid); gui.current = false; setNop(false); setCham(false) }
+    else if (gui.current && k?.tam) { tiepCho.current = true; nutTiepRef.current?.setAttribute('data-lun', ''); return }
     if (gui.current || dangSang.current === viTri) return
     setLoi('')
     setCombo(null) // băng combo chỉ sống ở câu vừa đúng — sang câu mới thì tắt, không che đề
