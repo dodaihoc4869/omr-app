@@ -21,7 +21,16 @@ import { SQL_DA_CONG_BO } from './cong-bo-diem'
 /** (28/10) Điều kiện một dòng `su_kien_hoc` (KHÔNG bí danh) được tính vào MỨC HÔM NAY — đúng tập «đã làm hôm nay» của Gói 7 (`docDaLamNgay7`): bỏ KTCN,
  *  lướt / chẩn đoán / xem lời giải, câu Tự sửa lỗi, câu đang giấu, câu ca thi chưa công bố. Viết lại ở đây (không nhập goi-bai-7 ⇒ không vòng nhập). */
 export const SQL_KHONG_TU_SUA = "COALESCE(nguon,'')<>'chua_loi'"
-export const SQL_CAU_TINH_MUC = `ma_nguon NOT LIKE 'ktcn:%' AND ${SQL_KHONG_TU_SUA} AND ${SQL_LA_LAN_LAM} AND COALESCE(visibility,'')<>'embargoed' AND (nguon<>'thi' OR EXISTS(SELECT 1 FROM ca c WHERE c.ma_ca=su_kien_hoc.ma_nguon AND c.trang_thai<>'da_xoa' AND ${SQL_DA_CONG_BO('c')}))`
+// (29/10, thầy: «Phần học tiếp ở dưới chưa làm câu nào thanh đã báo rồi» — Lộ trình báo chặng sau đã làm dở dù em chưa động tới) MỘT chặng = 6 câu em ĐÃ TRẢ LỜI trong chặng:
+//  · câu LÀM LẠI CUỐI CHẶNG (game-v2.ts ghi sổ `raw.ll = 1`) là phần thêm của chặng ấy — KHÔNG tính vào mức hôm nay (trước đây cộng ⇒ ranh chặng lệch, chặng sau «đã làm dở»);
+//  · câu LƯỚT OMNI (`purpose 'luot'`, kết quả rỗng) em ĐÃ được phát và đã trả lời, chỉ không tính đúng / sai ⇒ vẫn là một câu của chặng (trước đây không cộng ⇒ chặng đủ 6 câu mà vạch báo 4/6).
+// Đúng MỘT định nghĩa cho Lộ trình (`docDaLamVaVuaLam7`), lịch ngày (`bai-hang-ngay.ts`) và chuỗi «đủ mức hôm nay» (SQL_CAU_TINH_MUC) — ba nơi phải ra cùng một số.
+export const SQL_KHONG_LAM_LAI = "COALESCE(json_extract(raw_json,'$.ll'),0)=0"
+/** Dòng sổ là LƯỢT LƯỚT của chặng học (câu đã phát + đã trả lời, chưa tính đúng / sai). */
+export const SQL_LA_LUOT_CHANG = "(nguon='game' AND purpose='luot')"
+/** Dòng sổ có kết quả HOẶC là lượt lướt của chặng — thay cho `ket_qua IS NOT NULL` ở các nơi đếm «câu của chặng hôm nay». */
+export const SQL_CO_KET_QUA_HOAC_LUOT = `(ket_qua IS NOT NULL OR ${SQL_LA_LUOT_CHANG})`
+export const SQL_CAU_TINH_MUC = `ma_nguon NOT LIKE 'ktcn:%' AND ${SQL_KHONG_TU_SUA} AND ${SQL_KHONG_LAM_LAI} AND (${SQL_LA_LUOT_CHANG} OR (${SQL_LA_LAN_LAM} AND COALESCE(visibility,'')<>'embargoed' AND (nguon<>'thi' OR EXISTS(SELECT 1 FROM ca c WHERE c.ma_ca=su_kien_hoc.ma_nguon AND c.trang_thai<>'da_xoa' AND ${SQL_DA_CONG_BO('c')}))))`
 
 export const CAU_MOT_BAI = 6
 export const BAI_CUU = 2

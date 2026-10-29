@@ -94,7 +94,8 @@ it('câu bản ảo vừa làm (sổ đã ghi) không bị đếm hai lần — 
   expect(lap.plan.viec.filter((v) => ke.slice(0, 19).includes(v.qid))).toEqual([]) // câu vừa làm (cả gốc của bản ảo) không quay lại
 })
 
-it('lượt lướt / chẩn đoán đã vào sổ (không tính) không được phần "vừa làm" cộng lại — sảnh và lịch ngày vẫn cùng số', async () => {
+// 29/10 (thầy: «Phần học tiếp ở dưới chưa làm câu nào thanh đã báo rồi»): lượt LƯỚT là câu em đã được phát + đã trả lời ⇒ TÍNH vào chặng (chỉ không tính đúng / sai); chẩn đoán vẫn không.
+it('lượt lướt tính vào chặng, chẩn đoán đã vào sổ thì không — phần "vừa làm" không cộng lại hai lần; sảnh và lịch ngày vẫn cùng số', async () => {
   const k = await kho()
   const ke = (await lapGoi7(k.env, 'S1', NOW))!.plan.viec.map((v) => v.qid)
   const luc = NOW - 60_000
@@ -103,9 +104,9 @@ it('lượt lướt / chẩn đoán đã vào sổ (không tính) không đượ
   const dong = (q: string, i: number) => ({ nguon: 'game', maNguon: 'phien-cuoi', sbd: 'S1', qid: q, lan: 1, ketQua: i === 0 ? null : 1, luc: new Date(luc).toISOString(), maDang: '', chuyenDe: '', mucDo: '', attemptId: `phien-cuoi|${q}`, assistance: 'none', purpose: i === 0 ? 'luot' : i === 1 ? 'chan_doan' : 'maintenance', receivedAt: luc })
   await ghiSuKien(k.env, lam.map(dong) as never)
   const lap = (await lapGoi7(k.env, 'S1', NOW))!
-  expect(lap.daLamNgay).toBe(4)
-  expect((await demHomNay7(k.env, 'S1', NOW)).daLamHomNay).toBe(4)
-  expect((await ngayBaiCuaMotEm(k.env, 'S1', '2026-10-13', '2026-10-13', '2026-10-13'))?.map((n) => n.daLam)).toEqual([4])
+  expect(lap.daLamNgay).toBe(5) // 6 lượt − 1 chẩn đoán (lướt có tính)
+  expect((await demHomNay7(k.env, 'S1', NOW)).daLamHomNay).toBe(5)
+  expect((await ngayBaiCuaMotEm(k.env, 'S1', '2026-10-13', '2026-10-13', '2026-10-13'))?.map((n) => n.daLam)).toEqual([5])
 })
 
 // LỖI 28/10 (ảnh thầy: «Đủ 14/12 câu hôm nay · 2/2 chặng» mà nút Sửa lỗi còn 2 câu — «phần sửa chưa làm xong nhưng lại tự xong chặng cuối mặc dù chưa làm»).

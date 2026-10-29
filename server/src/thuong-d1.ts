@@ -161,7 +161,7 @@ export interface MucTieuNgay { daXong: number; can: number; cau?: number; cauDaL
 
 /** Số câu «đã làm hôm nay» của Gói 7 (một nguồn với thẻ «Đủ x/y câu»). Nạp lười module Gói 7; lỗi / chưa có bảng ⇒ null (lùi về chặng). */
 export function docCauDaLamNgay(env: Env, sbd: string, ngay: string, nowMs?: number): Promise<number | null> {
-  return import('./goi-bai-7').then((m) => m.docDaLamNgay7(env, sbd, ngay, nowMs)).then((x) => x.size, () => null)
+  return import('./goi-bai-7').then((m) => m.docSoDaLamNgay7(env, sbd, ngay, nowMs)).then((x) => x, () => null)
 }
 
 /** «Xong 2 bài» ⇒ «Xong 2 chặng», «Bài hoàn hảo» ⇒ «Chặng hoàn hảo»; giữ «Bài tập…», «Bài 8…». */
