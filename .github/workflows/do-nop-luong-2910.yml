@@ -1,0 +1,71 @@
+# ĐO ĐƯỜNG CHẤM NHANH «Kiểm tra» TRÊN BẢN SỐNG (CHỈ ĐỌC) — thầy 29/10 (video «Bấm kiểm tra vẫn chưa tức thì, phải tức thì luôn»).
+# `wrangler tail` PHUT phút trên Worker sống, chỉ lấy yêu cầu `/game-v2/answer`: bao nhiêu lượt chấm được TỪ BỘ NHỚ isolate (có dòng nhật ký `[nop-luong]`) và bao nhiêu
+# phải đi đường D1 chậm; thời gian dòng 1 (đúng / sai) và thời gian cả lệnh, tách theo hai nhóm. CHỈ in số gộp — không in nhật ký, không thân yêu cầu, không mã em.
+name: Đo đường chấm nhanh Kiểm tra (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/do-nop-luong-2910]
+    paths: ['.github/workflows/do-nop-luong-2910.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-nop-luong-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PHUT: '6'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Theo dõi Worker sống rồi gộp số
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          timeout $((PHUT*60)) npx -y wrangler@4 tail omr --format json > /tmp/tail.jsonl 2>/tmp/tail.err || true
+          echo "dòng nhận: $(wc -l < /tmp/tail.jsonl)"
+          node - <<'JS'
+          const fs = require('fs')
+          const raw = fs.readFileSync('/tmp/tail.jsonl', 'utf8')
+          const ev = []; let d = 0, s = -1, inStr = false, esc = false
+          for (let i = 0; i < raw.length; i++) { const c = raw[i]
+            if (inStr) { if (esc) esc = false; else if (c === '\\') esc = true; else if (c === '"') inStr = false; continue }
+            if (c === '"') { inStr = true; continue }
+            if (c === '{') { if (d++ === 0) s = i } else if (c === '}') { if (--d === 0 && s >= 0) { try { ev.push(JSON.parse(raw.slice(s, i + 1))) } catch {} s = -1 } } }
+          const pt = (a, q) => { if (!a.length) return '-'; const b = [...a].sort((x, y) => x - y); return b[Math.min(b.length - 1, Math.floor(q * b.length))] }
+          const nhom = { nhanh: { w: [], d1: [], c: [], n: 0 }, cham: { w: [], c: [], n: 0 }, luongNhungKhongNhanh: 0 }
+          let tong = 0
+          for (const e of ev) {
+            let p = ''; try { p = new URL(e?.event?.request?.url).pathname } catch { continue }
+            if (p !== '/game-v2/answer') continue
+            tong++
+            const logs = Array.isArray(e.logs) ? e.logs : []
+            const nl = logs.map((l) => (Array.isArray(l.message) ? l.message.join(' ') : String(l.message))).find((m) => m.startsWith('[nop-luong]'))
+            if (nl) {
+              let j = {}; try { j = JSON.parse(nl.slice('[nop-luong]'.length).trim()) } catch {}
+              nhom.nhanh.n++; if (typeof j.dong1Ms === 'number') nhom.nhanh.d1.push(j.dong1Ms)
+              if (typeof e.wallTime === 'number') nhom.nhanh.w.push(e.wallTime); if (typeof e.cpuTime === 'number') nhom.nhanh.c.push(e.cpuTime)
+            } else {
+              nhom.cham.n++
+              if (typeof e.wallTime === 'number') nhom.cham.w.push(e.wallTime); if (typeof e.cpuTime === 'number') nhom.cham.c.push(e.cpuTime)
+            }
+          }
+          console.log(`sự kiện: ${ev.length} · lệnh answer: ${tong}`)
+          console.log(`CHẤM NHANH (từ bộ nhớ isolate): ${nhom.nhanh.n} lượt (${tong ? Math.round(100 * nhom.nhanh.n / tong) : 0}%) · dòng 1 ms p50/p90/max ${pt(nhom.nhanh.d1, .5)}/${pt(nhom.nhanh.d1, .9)}/${pt(nhom.nhanh.d1, 1)} · cả lệnh wall p50/p90 ${pt(nhom.nhanh.w, .5)}/${pt(nhom.nhanh.w, .9)} · cpu p50/p90 ${pt(nhom.nhanh.c, .5)}/${pt(nhom.nhanh.c, .9)}`)
+          console.log(`ĐƯỜNG CHẬM (D1): ${nhom.cham.n} lượt (${tong ? Math.round(100 * nhom.cham.n / tong) : 0}%) · wall p50/p90/max ${pt(nhom.cham.w, .5)}/${pt(nhom.cham.w, .9)}/${pt(nhom.cham.w, 1)} · cpu p50/p90 ${pt(nhom.cham.c, .5)}/${pt(nhom.cham.c, .9)}`)
+          // Mọi lệnh game-v2 khác (để so): số lượt + wall p50/p90
+          const khac = new Map()
+          for (const e of ev) { let p = ''; try { p = new URL(e?.event?.request?.url).pathname } catch { continue }
+            if (!p.startsWith('/game-v2/') || p === '/game-v2/answer') continue
+            const g = khac.get(p) ?? []; if (typeof e.wallTime === 'number') g.push(e.wallTime); khac.set(p, g) }
+          for (const [p, g] of [...khac].sort((a, b) => b[1].length - a[1].length).slice(0, 12)) console.log(`${p} | ${g.length} | wall p50/p90 ${pt(g, .5)}/${pt(g, .9)}`)
+          JS
