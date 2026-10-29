@@ -44,4 +44,8 @@ jobs:
             "SELECT SUM(json_array_length(v.muc_json)>=m.muc_tieu) du_cau, SUM(json_array_length(v.muc_json)<m.muc_tieu) thieu_cau, COUNT(*) em FROM tu_sua_viec_ngay v JOIN tu_sua_muc_tieu_ngay m ON m.sbd=v.sbd AND m.ngay_vn=v.ngay_vn WHERE v.ngay_vn=$HOM"
           q "độ phủ trong danh sách hôm nay: số dạng khác nhau / mức độ khác nhau mỗi em (trung bình) — chỉ em có danh sách ≥ 12 câu" \
             "WITH l AS (SELECT v.sbd, json_extract(j.value,'\$.q') qid FROM tu_sua_viec_ngay v, json_each(v.muc_json) j WHERE v.ngay_vn=$HOM), z AS (SELECT l.sbd, COUNT(*) so_cau, COUNT(DISTINCT c.dang) so_dang, COUNT(DISTINCT c.muc_do) so_muc FROM l LEFT JOIN cau_meta c ON c.qid=l.qid GROUP BY l.sbd HAVING COUNT(*)>=12) SELECT COUNT(*) em, ROUND(AVG(so_cau),1) cau_tb, ROUND(AVG(so_dang),1) dang_tb, MIN(so_dang) dang_thap, MAX(so_dang) dang_cao, ROUND(AVG(so_muc),2) muc_tb FROM z"
+          q "TOÀN BỘ em (mọi em còn nợ): phân bố số câu/ngày theo công thức (n_dung: số em)" \
+            "$CTE SELECT n_dung, COUNT(*) em FROM q GROUP BY n_dung ORDER BY n_dung"
+          q "danh sách đã lưu hôm nay mà CHƯA có mục tiêu (lập bằng luật cũ trước khi bản mới chạy): số em · độ dài thấp / trung bình / cao" \
+            "SELECT COUNT(*) em, MIN(json_array_length(v.muc_json)) thap, ROUND(AVG(json_array_length(v.muc_json)),1) tb, MAX(json_array_length(v.muc_json)) cao FROM tu_sua_viec_ngay v LEFT JOIN tu_sua_muc_tieu_ngay m ON m.sbd=v.sbd AND m.ngay_vn=v.ngay_vn WHERE v.ngay_vn=$HOM AND m.sbd IS NULL"
           q "cột bảng tu_sua_muc_tieu_ngay (để biết bảng đã áp)" "SELECT name, type FROM pragma_table_info('tu_sua_muc_tieu_ngay')"
