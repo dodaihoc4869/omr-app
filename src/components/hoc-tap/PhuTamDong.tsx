@@ -11,7 +11,7 @@ import { batNhipBenVung } from '../../lib/nhip-ben-vung'
 /** Nhịp tự kiểm lại công tắc tạm đóng (thầy mở lại ⇒ máy em tự vào trong khoảng 1 phút). Vòng chuẩn `batNhipBenVung`: lệch ±10 giây, tab ẩn không gọi, lỗi lùi dần. */
 export const TAM_DONG_KIEM_MS = 60_000
 /** Ngày bảo trì — CÙNG danh sách với server/src/ngay-bao-tri.ts (test giữ hai bên khớp): chỉ ngày này em không làm mà không bị thiệt (chuỗi, bình…). */
-export const NGAY_BAO_TRI_HS: readonly string[] = ['2026-10-27', '2026-10-28', '2026-10-29']
+export const NGAY_BAO_TRI_HS: readonly string[] = ['2026-10-27', '2026-10-28', '2026-10-29', '2026-10-30']
 const ngayVn = (ms: number) => new Date(ms + 7 * 3_600_000).toISOString().slice(0, 10)
 /**
  * Chữ màn phủ theo NGÀY VN. Ngày bảo trì: nguyên văn thầy chốt 27/10. Ngày khác: không hứa «không mất chuỗi» (máy chủ chỉ miễn thiệt cho ngày trong

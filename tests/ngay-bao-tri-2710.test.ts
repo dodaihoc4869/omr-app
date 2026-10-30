@@ -18,8 +18,8 @@ const nk = (hoc: string[], mua: Record<string, number> = {}, cau = CAU_MOT_BAI):
 
 describe('ngày bảo trì 27/10', () => {
   it('danh sách', () => {
-    // 30/10: thêm 28/10 + 29/10 (thầy «khôi phục chuỗi cho học sinh bị mất hôm qua và hôm kia» — giờ cao điểm app lag).
-    expect(NGAY_BAO_TRI).toEqual(['2026-10-27', '2026-10-28', '2026-10-29']); expect(laNgayBaoTri('2026-10-27')).toBe(true); expect(laNgayBaoTri('2026-10-29')).toBe(true); expect(laNgayBaoTri('2026-10-30')).toBe(false)
+    // 30/10 22:20: thêm 30/10 (thầy «báo app bảo trì luôn đi»). 30/10: thêm 28/10 + 29/10 (thầy «khôi phục chuỗi cho học sinh bị mất hôm qua và hôm kia» — giờ cao điểm app lag).
+    expect(NGAY_BAO_TRI).toEqual(['2026-10-27', '2026-10-28', '2026-10-29', '2026-10-30']); expect(laNgayBaoTri('2026-10-27')).toBe(true); expect(laNgayBaoTri('2026-10-29')).toBe(true); expect(laNgayBaoTri('2026-10-30')).toBe(true); expect(laNgayBaoTri('2026-10-31')).toBe(false)
   })
   it('chuỗi B3: không làm 27/10 ⇒ giữ chuỗi, KHÔNG tiêu bình; làm đủ 27/10 ⇒ lửa +1 như thường', () => {
     const khong = chuoiNgayCuaEm(nk(['2026-10-24', '2026-10-25', '2026-10-26', '2026-10-28'], { '2026-10-24': 1 }), '2026-10-28')
@@ -43,7 +43,7 @@ describe('ngày bảo trì 27/10', () => {
   it('ngày nghỉ (khiên, chuỗi ngày đạt EXP, kế hoạch) có 27/10; cấu hình thô (EXP cấp) KHÔNG thêm; khiên không tính 27/10 là vắng', async () => {
     const d = taoD1That()
     const env = d.env as unknown as Env
-    expect(await docNgayNghi(env)).toEqual(new Set(['2026-10-27', '2026-10-28', '2026-10-29']))
+    expect(await docNgayNghi(env)).toEqual(new Set(['2026-10-27', '2026-10-28', '2026-10-29', '2026-10-30']))
     expect(phanTichNgayNghi('2026-09-02')).toEqual(new Set(['2026-09-02']))
     expect(soNgayVang('2026-10-27', '2026-10-20', new Set(['2026-10-26']), await docNgayNghi(env))).toBe(0)
     expect((await docCauHinhKeHoach(env)).ngayNghi.has('2026-10-27')).toBe(true)
