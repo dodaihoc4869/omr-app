@@ -4,7 +4,7 @@
 //   · không còn tặng bình thứ Hai (thứ Hai trước 27/10 vẫn tính ⇒ bình / ngày đỡ đã qua không đổi);
 //   · ngày vắng có phép từ 27/10 tính như ngày thường (ngày trước 27/10 giữ như cũ);
 //   · đặt lại bình (dòng `chuoi_binh_mua` nguồn tt-binh-reset-2710): bình về 0, bình mua sau lúc đặt lại vẫn cộng; hai cách đọc (một em / nhiều em) cùng số.
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { taoD1That } from './_d1-that'
 import { taoKhoOmni } from './omni-3-ke-hoach-chung'
 import { gameToken } from '../server/src/game-v2-auth'
@@ -17,6 +17,10 @@ import { NGUON_DAT_LAI_BINH } from '../server/src/chuoi-ngay-bai'
 import { chuoiCuaEm, docNhatKyNhieuEm, kieuNgayCua, ngayCoHoc } from '../server/src/thuong-ngay-hoc'
 import { buocChuoiDoi } from '../server/src/thuong-ban-be'
 import { xoaDemPhamVi } from '../server/src/bai-da-day'
+import { datNgayBaoTriChoTest } from '../server/src/ngay-bao-tri'
+// Luật chuỗi dùng ngày mẫu cuối tháng 10: ghim lịch bảo trì như lúc viết test (chỉ 27/10) — 28/10 + 29/10 thêm vào lịch vận hành 30/10 (tests/ngay-bao-tri-2710.test.ts).
+beforeAll(() => datNgayBaoTriChoTest(['2026-10-27']))
+afterAll(() => datNgayBaoTriChoTest())
 
 const VN = (s: string) => Date.parse(`${s}+07:00`)
 afterEach(() => { vi.useRealTimers(); datCauNoiChuoi(null); xoaDemPhamVi() })

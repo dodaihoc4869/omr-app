@@ -28,12 +28,12 @@ describe('Boss 27/10 («Tối nay các em không phải làm»): bài kiểm tra
     them.run('do-27', '2026-10-27', han27, null)
     them.run('nop-27', '2026-10-27', han27, han27 - 10)
     them.run('lo-26', '2026-10-26', dauNgayKt('2026-10-27'), null)
-    them.run('mai-28', '2026-10-28', dauNgayKt('2026-10-29'), null)
+    them.run('mai-30', '2026-10-30', dauNgayKt('2026-10-31'), null) // 28/10 + 29/10 nay cũng là ngày bảo trì (30/10) ⇒ «ngày khác» lấy 30/10
     const ids = (now: number) => (db.prepare(`SELECT id FROM kiem_tra_ca_nhan k WHERE ${sqlKhongBaoTriBo('k', now)} ORDER BY id`).all() as { id: string }[]).map((r) => r.id)
-    expect(ids(sau00)).toEqual(['lo-26', 'mai-28', 'nop-27'])
-    expect(ids(truoc00)).toEqual(['do-27', 'lo-26', 'mai-28', 'nop-27'])
+    expect(ids(sau00)).toEqual(['lo-26', 'mai-30', 'nop-27'])
+    expect(ids(truoc00)).toEqual(['do-27', 'lo-26', 'mai-30', 'nop-27'])
     expect(db.prepare('SELECT COUNT(*) n FROM kiem_tra_ca_nhan').get()).toEqual({ n: 4 })
-    expect(SQL_DS_BAO_TRI).toBe("'2026-10-27'")
+    expect(SQL_DS_BAO_TRI).toBe("'2026-10-27','2026-10-28','2026-10-29'")
   })
   it('máy chủ: cron không chốt «hết hạn» bài ngày bảo trì; lệnh em sau hạn báo không phải làm; lịch thầy, bài hằng ngày, câu bảo vệ đều loại bài này', () => {
     const kt = readFileSync('server/src/kiem-tra-ca-nhan.ts', 'utf8')

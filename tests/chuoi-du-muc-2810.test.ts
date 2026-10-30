@@ -3,7 +3,7 @@
 //   · từ 28/10 ngày giữ chuỗi = ĐỦ MỨC HÔM NAY (câu Gói 7 ≥ mức đã chốt; chưa chốt mức ⇒ 1 chặng); tự sửa riêng không giữ; cứu = đủ mức + 2 chặng bù;
 //   · trần 1 bình/tuần chung cho mua + quà mốc 30 ngày; /hs/thuong/mua-binh từ chối khi tuần đã nhận bình (kể cả quà);
 //   · cược chuỗi chốt theo ngày giữ chuỗi mới; lửa đôi theo cùng định nghĩa. D1 thật.
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { taoD1That } from './_d1-that'
 import { taoKhoOmni } from './omni-3-ke-hoach-chung'
 import { gameToken } from '../server/src/game-v2-auth'
@@ -14,6 +14,10 @@ import { chuoiCuaEm, datNgay, docNhatKyNhieuEm } from '../server/src/thuong-ngay
 import { cauNoiChuoi, datCauNoiChuoi } from '../server/src/thuong-cau-noi-chuoi'
 import { hsMuaBinh, LOI_DA_NHAN_TUAN } from '../server/src/thuong-d1'
 import { xoaDemPhamVi } from '../server/src/bai-da-day'
+import { datNgayBaoTriChoTest } from '../server/src/ngay-bao-tri'
+// Luật chuỗi dùng ngày mẫu cuối tháng 10: ghim lịch bảo trì như lúc viết test (chỉ 27/10) — 28/10 + 29/10 thêm vào lịch vận hành 30/10 (tests/ngay-bao-tri-2710.test.ts).
+beforeAll(() => datNgayBaoTriChoTest(['2026-10-27']))
+afterAll(() => datNgayBaoTriChoTest())
 
 afterEach(() => { datCauNoiChuoi(null); xoaDemPhamVi(); vi.useRealTimers() })
 const VN = (s: string) => Date.parse(`${s}+07:00`)
