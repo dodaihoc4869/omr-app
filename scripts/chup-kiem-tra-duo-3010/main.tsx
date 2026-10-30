@@ -65,7 +65,7 @@ function App() {
   const soCau = [3, 7, 20, 25, 28]
   return (
     <div className="min-h-screen m3 man-lam-bai duo-kt-trang" style={{ background: 'var(--nen)', color: 'var(--muc)', fontFamily: 'var(--serif)' }}>
-      <VanTay sbd="12018" hoTen="Nguyễn Minh Anh" maCa="KT-AMINE-3010" gio="20:41" />
+      <VanTay sbd="00000" hoTen="Học sinh Mẫu" maCa="KT-AMINE-3010" gio="20:41" />
       <ThiDuo tenCa="Kiểm tra Amine · 30/10" dongHo="38:12" nhanDongHo="Thời gian còn lại" gap={false} daLam={daLam} tong={TONG}
         luu={{ nhan: 'đã lưu', tt: 'da' }} cauHien={cau} onDenCau={(n) => setCau(soCau.includes(n) ? n : hien)} phan={PHAN}
         moTaPhan={(ph) => (ph === 'I' ? '18 câu · mỗi câu 0,25 điểm' : ph === 'II' ? '4 câu · mỗi câu tối đa 1 điểm' : '6 câu · mỗi câu 0,25 điểm')}

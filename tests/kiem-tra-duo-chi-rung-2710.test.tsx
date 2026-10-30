@@ -169,7 +169,7 @@ describe('Kiểm tra ôn tập kiểu Duo (ManKiemTraCaNhan, data-trong="hs")', 
     await screen.findByText('Câu 2/2')
     fireEvent.click(screen.getByRole('button', { name: 'Nộp chặng 1' }))
     const tam = await screen.findByRole('dialog', { name: 'Nộp chặng 1?' })
-    expect(tam.querySelector('svg.bi')).toBeTruthy()
+    expect(tam.querySelector('.bi, .duo-kt-nop-bi[data-gt] .kt-gt-nop')).toBeTruthy() // 30/10: tấm nộp có nhân vật (Bi hoặc giám thị)
     expect(goi).not.toContain('hoc-tap-ktcn-chot-chang')
     await act(async () => { fireEvent.click(screen.getAllByRole('button', { name: 'Nộp chặng 1' }).at(-1)!) })
     await waitFor(() => expect(goi).toContain('hoc-tap-ktcn-chot-chang'))
