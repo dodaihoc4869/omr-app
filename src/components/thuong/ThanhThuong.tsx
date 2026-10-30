@@ -17,7 +17,6 @@ import '../../styles/trong-thuong-gon.css'
 const ThongBaoThuong = lazy(() => import('./ManThuong').then((m) => ({ default: m.ThongBaoThuong })))
 // Tấm hướng dẫn lửa / nguyên tử / tinh thể (thầy 30/10) đi trong mảnh nạp lười ManThuong (đã được SW cất sẵn) ⇒ chạm là nạp, không thêm byte mở app.
 const TamHuongDan = lazy(() => import('./ManThuong').then((m) => ({ default: m.TamHuongDan })))
-const napTruocHuongDan = () => { void import('./ManThuong').catch(() => {}) }
 const CHU_VI = 138.2 // 2π·22
 
 export interface PropsThanhThuong {
@@ -47,7 +46,7 @@ export function ThanhThuong({ token, onMo, onHoc, thongBao = true, menu }: Props
   // Một khuôn cho 3 bộ đếm + vòng mục tiêu (`lop` = 'tp-tr-muc'). Lửa / nguyên tử / tinh thể (thầy 30/10) ⇒ LUÔN là nút mở tấm hướng dẫn (nút chính
   // trong tấm mới sang màn chi tiết); vòng mục tiêu: có onMo ⇒ nút mở màn, không ⇒ ô chỉ để xem.
   const o = (k: LoaiBieuTuong | undefined, nhan: string, man: 'chuoi' | 'nhiem-vu' | 'cua-hang', con: ReactNode, lop = 'tp-tr-o', d?: true) => k
-    ? <button type="button" className={lop} data-k={k} data-dat={d} aria-label={`${nhan} · xem hướng dẫn`} aria-haspopup="dialog" onPointerDown={napTruocHuongDan} onClick={() => setHd(k)}>{con}</button>
+    ? <button type="button" className={lop} data-k={k} data-dat={d} aria-label={nhan} aria-haspopup="dialog" onClick={() => setHd(k)}>{con}</button>
     : onMo
     ? <button type="button" className={lop} data-k={k} data-dat={d} aria-label={nhan} onClick={() => onMo(man)}>{con}</button>
     : <span className={lop} data-k={k} data-dat={d} role="img" aria-label={nhan}>{con}</span>

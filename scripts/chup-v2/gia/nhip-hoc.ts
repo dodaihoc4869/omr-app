@@ -165,3 +165,14 @@ export function hoSoTuNhip(sbd: string): KetQuaHoSoThaiDo {
     ),
   }
 }
+
+/** `/gv/danh-gia/lop` giả (XẾP HẠNG 30/10 — cột «Học thật nhất»): Điểm Thật TẤT ĐỊNH theo bậc chăm của em, trừ nặng em có dấu hiệu đối phó. */
+export function danhGiaLopGia(): { ok: true; du: Record<string, unknown> } {
+  const em = EM.filter((e) => e.bacCham).map((e, i) => {
+    const diem = Math.max(5, Math.min(99, Math.round(e.bacCham!.bac * 7.6 + 6 + 10 * gia(i, 53) - (e.doiPho ? 45 : 0))))
+    const bac = diem >= 80 ? 1 : diem >= 62 ? 2 : diem >= 40 ? 3 : diem >= 22 ? 4 : 5
+    const lyDo = bac === 1 ? [`đọc kỹ đề, ${70 + Math.floor(25 * gia(i, 59))}% câu đúng tự làm`] : bac === 2 ? ['đôi lúc làm nhanh hơn thời gian đọc đề'] : ['nhiều câu trả lời quá nhanh mà sai']
+    return { sbd: e.sbd, ten: e.hoTen, lop: e.lop, tuan: '2026-10-05', diem, bac, duDuLieu: true, coDo: false, phat: [], soLieu: null, tienBo: null, lyDo, viec: null }
+  })
+  return { ok: true, du: { cheDo: 'ngam', em } }
+}
