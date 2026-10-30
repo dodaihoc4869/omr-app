@@ -1,4 +1,5 @@
 # ĐO GÓI BÀI CẢ NGÀY TRÊN BẢN SỐNG (CHỈ ĐỌC) — thầy 29/10 «app hs … tốc độ tức thì ở mọi khung giờ». Chỉ SELECT gộp: không mã em, không tên.
+# Chạy lại 30/10 17:55 VN (kiểm trước giờ cao điểm, sau #627–#629).
 # Phiên mở từ gói (`goiNgay: 1`, lệnh hoc-tap-mo-goi) so với phiên đường cũ (hoc-tap-start / bản sẵn), theo giờ VN; câu đã nộp trong từng loại phiên.
 name: Đo gói bài cả ngày (chỉ đọc)
 on:
@@ -36,6 +37,10 @@ jobs:
             "SELECT SUM(json_extract(s.json,'\$.goiNgay')=1) tu_goi, SUM(COALESCE(json_extract(s.json,'\$.goiNgay'),0)<>1) duong_cu FROM game_v2_attempt a JOIN game_v2_session s ON s.id=a.session WHERE s.created_at >= strftime('%Y-%m-%dT%H:%M:%fZ','now','-3 hours') AND json_extract(s.json,'\$.hocTap')=1"
           q "phiên từ gói 3 giờ qua: số câu trong phiên (câu: số phiên)" \
             "SELECT json_array_length(json,'\$.questions') so_cau, COUNT(*) n FROM game_v2_session WHERE created_at >= strftime('%Y-%m-%dT%H:%M:%fZ','now','-3 hours') AND json_extract(json,'\$.goiNgay')=1 GROUP BY 1 ORDER BY 1"
+          q "phiên học hôm nay KHÔNG có câu nào (phiên rỗng): từ gói · đường cũ" \
+            "SELECT SUM(json_extract(json,'\$.goiNgay')=1) tu_goi, SUM(COALESCE(json_extract(json,'\$.goiNgay'),0)<>1) duong_cu FROM game_v2_session WHERE created_at >= strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 hours') AND json_extract(json,'\$.hocTap')=1 AND COALESCE(json_array_length(json,'\$.questions'),0)=0"
+          q "sổ học hôm nay theo nguồn (số dòng · số em): kiểm #629 câu Tự luyện" \
+            "SELECT nguon, COUNT(*) dong, COUNT(DISTINCT sbd) em FROM su_kien_hoc WHERE ngay_vn=strftime('%Y-%m-%d','now','+7 hours') GROUP BY nguon ORDER BY dong DESC"
           q "hành trình đang chạy (bước kiểm phát hành «ba hành trình»): mã · trạng thái · tạo lúc" \
             "SELECT id, trang_thai, substr(COALESCE(tao_luc,''),1,16) tao FROM chien_dich WHERE trang_thai='dang_chay' ORDER BY id"
           q "kho theo khối + biên nhận gộp" "SELECT khoa, length(gia_tri) dai FROM cau_hinh WHERE khoa IN ('hanh_trinh_v3_kho_10','hanh_trinh_v3_kho_11','hanh_trinh_v3_kho_12','hanh_trinh_3_0910_v1')"
