@@ -55,8 +55,8 @@ const homNayChu = () => { const d = new Date(); return `${THU[d.getDay()]} ${Str
 const chuCaiDau = (ten: string) => { const p = ten.trim().split(/\s+/).filter(Boolean); return ((p.length > 1 ? p[p.length - 2]![0] : '') + (p[p.length - 1]?.[0] ?? 'E')).toUpperCase() }
 
 /** Tiêu đề việc còn lại của ngày Gói 7: tự làm + có hỗ trợ (+ câu chờ bổ sung khi kho thiếu) = mức − đã làm, không số nào mâu thuẫn vòng tròn. */
-export function chuViecGoi7(g: Pick<TomTatGoi7, 'tuLamCon' | 'tiepCanCon' | 'thieuNgay'>): string {
-  return `${g.tuLamCon} câu tự làm · ${g.tiepCanCon} câu học có hỗ trợ${g.thieuNgay > 0 ? ` · ${g.thieuNgay} câu chờ thầy bổ sung` : ''}`
+export function chuViecGoi7(g: Pick<TomTatGoi7, 'tuLamCon' | 'tiepCanCon' | 'thieuNgay' | 'khoaCaThi'>): string {
+  return `${g.tuLamCon} câu tự làm · ${g.tiepCanCon} câu học có hỗ trợ${g.thieuNgay > 0 ? ` · ${g.thieuNgay} câu ${g.khoaCaThi ? 'chờ ca kiểm tra đóng' : 'chờ thầy bổ sung'}` : ''}`
 }
 
 /** Dòng việc: biểu tượng · tên · chữ phụ ngắn (nếu có) · số (nếu có) · mũi tên. */
@@ -119,7 +119,7 @@ export default function HocTapHomNay(p: Props) {
   const con = sanh?.theLuc.con ?? null
   const khoaHoc = p.dangLamMoi || p.dangTai && !sanh || con === 0
   const conMuc = so ? Math.max(0, so.muc - so.daLam) : 0
-  const kho = goi7 ? { choBoSung: con === 0 ? conMuc : 0, sanSang: con ?? undefined } : undefined
+  const kho = goi7 ? { choBoSung: con === 0 ? conMuc : 0, sanSang: con ?? undefined, caThi: con === 0 && (goi7.khoaCaThi ?? 0) > 0 } : undefined
   // Thẻ mời Tự sửa lỗi: tải lười khi Hôm nay đã có số (không tranh lượt với Sảnh); em làm thêm câu ⇒ xem lại bản nhớ (hết hạn mới hỏi máy chủ).
   const soSua = useSoCauCanSua(p.token, !!sanh || !p.dangTai, so?.daLam)
   const coMoiSua = !!soSua && soSua > 0
@@ -170,7 +170,7 @@ export default function HocTapHomNay(p: Props) {
     // Các khối của màn Hôm nay giao diện cũ (một cột). «Trong» vẽ MotTrangHs với CÙNG điều kiện hiện từng việc.
     const eKiem = kiem && kiemHomNay && <Suspense fallback={<p role="status"><span className="chu-cho-tre">Đang mở lịch kiểm tra…</span></p>}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa} /></Suspense>
     const eHomNay = <TheHomNayEm so={so} dangTai={p.dangTai && !sanh} ngayChu={homNayChu()} tenBai={tenBai} viec={viec}
-      onHoc={p.onHoc} khoaHoc={khoaHoc} hetCau={con === 0} choBoSung={kho?.choBoSung} sanSang={kho?.sanSang} nutPhu={p.coCa} token={p.token} onMoHoSo={p.onMoHoSo} />
+      onHoc={p.onHoc} khoaHoc={khoaHoc} hetCau={con === 0} choBoSung={kho?.choBoSung} sanSang={kho?.sanSang} caThi={kho?.caThi} nutPhu={p.coCa} token={p.token} onMoHoSo={p.onMoHoSo} />
     const eKiemSau = kiem && !kiemHomNay && <Suspense fallback={null}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa} /></Suspense>
     const eMoiSua = <TheMoiTuSua so={soSua} token={p.token} onChua={p.onChua} />
     const eGoi7 = goi7 && <TheGoi7 du={goi7} />

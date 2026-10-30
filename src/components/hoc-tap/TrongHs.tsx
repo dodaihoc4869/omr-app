@@ -83,7 +83,7 @@ function useChoSo(bat: boolean): HTMLElement | null {
 
 export interface PropsMotTrang {
   so: SoHomNay | null; dangTai: boolean; tenBai?: string; viec?: string
-  onHoc: () => void; khoaHoc: boolean; hetCau: boolean; kho?: { choBoSung?: number; sanSang?: number }
+  onHoc: () => void; khoaHoc: boolean; hetCau: boolean; kho?: { choBoSung?: number; sanSang?: number; caThi?: boolean }
   coCa: boolean; onThi: () => void; token?: string
   soSua: number | null; onChua: () => void; hinhSua?: ReactNode
   kiem?: TomTatKiemTra; ngayKiem: boolean; onKiemTra?: () => void
@@ -740,9 +740,9 @@ export function MotTrangHs(p: PropsMotTrang) {
     if (khoaSua && i >= mocSua && c.tt !== 'xong') { nut.push({ k: `c${i}`, loai: 'hoc', tt: 'khoa', ten: `Chặng ${i + 1}: khoá đến khi sửa xong lỗi hôm nay`, pop: { tieu: tenBaiThe, phu: `${thu} · Sửa xong ${conPhan} lỗi hôm nay để mở chặng tiếp` } }); return }
     nut.push(c.tt === 'xong' ? { k: `c${i}`, loai: 'hoc', tt: 'xong', ten: `Chặng ${i + 1}: đã xong`,
       pop: { tieu: tenBaiThe, phu: `${thu} · đã xong`, nut: hs ? { chu: 'Xem lại', onClick: hs.onXemLai } : undefined } }
-      : c.tt === 'dang' ? { k: `c${i}`, loai: 'hoc', tt: 'dang', ten: nutHoc, bong: dang && chinh === 'hoc' ? (c.phan > 0 ? 'Học tiếp' : 'Bắt đầu') : undefined, vong: chinh === 'sua' ? undefined : c.phan,
+      : c.tt === 'dang' ? { k: `c${i}`, loai: 'hoc', tt: 'dang', ten: nutHoc, bong: dang && chinh === 'hoc' && !(p.hetCau && !dangDoNay) ? (c.phan > 0 ? 'Học tiếp' : 'Bắt đầu') : undefined, vong: chinh === 'sua' ? undefined : c.phan,
         soDoan, daDoan, khoaVong: `ddh.vong-chang.${ngayVn(Date.now())}.${sbdPhien() ?? ''}.${i}`,
-        pop: { tieu: tenBaiThe, phu: (p.khoaHoc || p.hetCau) && !dangDoNay ? nutHoc : `${thu} · ${conChang} câu`, nut: { chu: c.phan > 0 ? 'Tiếp tục' : 'Bắt đầu', onClick: p.onHoc, tat: p.khoaHoc && !dangDoNay } } }
+        pop: { tieu: tenBaiThe, phu: (p.khoaHoc || p.hetCau) && !dangDoNay ? nutHoc : `${thu} · ${conChang} câu`, nut: { chu: p.hetCau && p.kho?.caThi && !dangDoNay ? 'Chờ ca kiểm tra đóng' : c.phan > 0 ? 'Tiếp tục' : 'Bắt đầu', onClick: p.onHoc, tat: p.khoaHoc && !dangDoNay } } }
       : { k: `c${i}`, loai: 'hoc', tt: 'khoa', ten: `Chặng ${i + 1}: chưa mở`, pop: { tieu: tenBaiThe, phu: `${thu} · Hoàn thành các chặng trước để mở khoá` } })
   })
   if (nutSua && mocSua >= chang.length) nut.push(nutSua) // hết chặng mới (hoặc ngày không có chặng) ⇒ sau chặng cuối

@@ -134,6 +134,15 @@ describe('kho thiếu câu sẵn sàng: số theo M, nút vẫn bấm được p
     expect(nutChinh().disabled).toBe(true)
   })
 
+  // 30/10 (ảnh thầy: nút «BẮT ĐẦU» không bấm được, «36 câu chờ thầy bổ sung» trong lúc ca kiểm tra 269333 mở): câu bài đang khoá cho ca thi ⇒ nói đúng lý do.
+  it('hết việc vì câu của bài đang khoá cho ca kiểm tra mở ⇒ nút khoá + dòng bài nói rõ «ca kiểm tra», không «chờ thầy bổ sung»', () => {
+    ve(docSanh({ cheDo2: true, theLuc: { con: 0, tong: 7 }, goi7: goiTho({ tuLamCon: 0, tiepCanCon: 0, thieuNgay: 25, canHoTro: true, khoaCaThi: 40 }) }))
+    expect(nutChinh().textContent).toBe('Đang có ca kiểm tra · câu bài này mở lại khi ca đóng')
+    expect(nutChinh().disabled).toBe(true)
+    expect(the().querySelector('.ht2-hn-bai')!.textContent).toBe('Bài 8. Amine · 0 câu tự làm · 0 câu học có hỗ trợ · 25 câu chờ ca kiểm tra đóng')
+    expect(screen.getByRole('region', { name: 'Bài học trong 7 ngày' }).textContent).toContain('Đang có ca kiểm tra: 25 câu của mức ngày mở lại khi ca đóng.')
+  })
+
   it('đủ mức và hết việc ⇒ chữ cũ "Đã làm hết câu được giao"', () => {
     ve(docSanh({ cheDo2: true, theLuc: { con: 0, tong: 32 }, goi7: goiTho({ daLamHomNay: 32, tuLamCon: 0 }) }))
     expect(nutChinh().textContent).toBe('Đã làm hết câu được giao')

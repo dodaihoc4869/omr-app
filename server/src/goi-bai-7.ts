@@ -528,6 +528,9 @@ async function lapGoi7Tho(env: Env, sbd: string, now: number, gsSom?: Promise<{ 
   const dongCo = som7.dongCo ?? docTruocDongCo(env, sbd, now)
   docTruocDongCoTheoHoSo(env, dongCo, hs)
   const chan = new Set([...baoVe,...btvn,...control.blocked,...goi.flatMap(g=>g.cau.filter(c=>c.hopLe===false).map(c=>c.qid))])
+  // (30/10, thầy: «Làm luôn thông báo rõ khi đang có ca thi») câu gói em CHƯA gặp đang khoá vì ca kiểm tra mở (bảo vệ đề) ⇒ Lộ trình nói rõ lý do thay vì «chờ thầy bổ sung».
+  const daGapCa = new Set(goi.flatMap(g => [...g.daGap]))
+  const khoaCaThi = [...new Map(goi.flatMap(g => g.cau).map(c => [c.qid, c])).values()].filter(c => !daGapCa.has(c.qid) && (baoVe.has(c.qid) || baoVe.has(c.group))).length
   if (control.types.length) for (const c of hs.cau) if (!c.dang || !control.types.includes(c.dang)) chan.add(c.qid)
   // CÂU NGHI SAI ĐÁP ÁN (lỗi 14/10 — thầy: "học sinh còn 1 câu nhưng app ko cho làm, sửa triệt để nhé"; đo D1 thật 21:40: 3 em 23/24, kế hoạch còn ĐÚNG 1 câu
   // ôn/sửa là câu nghi). Cổng phát câu (`chanKhacKhoiEm`) loại câu nghi, còn kế hoạch chỉ xét câu nghi cho câu gói CHƯA gặp ⇒ câu ôn / sửa / chữa đang nghi vẫn
@@ -629,7 +632,7 @@ async function lapGoi7Tho(env: Env, sbd: string, now: number, gsSom?: Promise<{ 
     const q = new Set(g.cau.map(c => c.qid)), ds = hs.cau.filter(c => q.has(c.qid))
     if (ds.some(c => tangCuaCau(c) !== null)) tangGoi.set(g.id, tangCuaEm(ds, hs.tt, nhom7))
   }
-  return { goi, plan, hs, chan, control, kienThucCu, diemDaDo, toiThieu, daLamNgay:soDaLam, tang, tangGoi, vuaLam, nghi, duPhong, hocThem, daLamTap: daLamNgay as ReadonlySet<string>, soVua, pDung: engine.pDung ?? {} }
+  return { goi, plan, hs, chan, control, kienThucCu, diemDaDo, toiThieu, daLamNgay:soDaLam, tang, tangGoi, vuaLam, nghi, duPhong, hocThem, daLamTap: daLamNgay as ReadonlySet<string>, soVua, pDung: engine.pDung ?? {}, khoaCaThi }
 }
 
 type LapGoi7 = NonNullable<Awaited<ReturnType<typeof lapGoi7>>>
@@ -674,7 +677,7 @@ export function tomTatGoi7(lap: NonNullable<Awaited<ReturnType<typeof lapGoi7>>>
   }),
     tuLamCon:dem7(lap.plan.tuLam),tiepCanCon:dem7(lap.plan.tiepCan),thieuPhu:dem7(lap.plan.thieuPhu),thieuNgay:Math.max(0,lap.toiThieu-lap.daLamNgay-lap.plan.viec.length),kienThucCu:lap.kienThucCu,
     canHoTro:lap.plan.tuLam*2+lap.plan.tiepCan*3>60 || lap.plan.thieuPhu>0 || lap.daLamNgay+lap.plan.viec.length<lap.toiThieu,
-    mucTieuDiem:7,diemDaDo:lap.diemDaDo.filter(laDiemDaDo7),toiThieu:lap.toiThieu,daLamHomNay:lap.daLamNgay }
+    mucTieuDiem:7,diemDaDo:lap.diemDaDo.filter(laDiemDaDo7),toiThieu:lap.toiThieu,daLamHomNay:lap.daLamNgay,...(lap.khoaCaThi ? { khoaCaThi: lap.khoaCaThi } : {}) }
 }
 
 const dangMoChang7 = new WeakMap<object, Map<string, Promise<Record<string, unknown> | null>>>()
