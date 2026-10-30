@@ -69,7 +69,12 @@ export class NganHocSinh {
     const ctx = { waitUntil: (p: Promise<unknown>) => state.waitUntil(p), passThroughOnException() {} } as unknown as ExecutionContext
     const sbd = req.headers.get(DAU_SBD_NGAN) ?? ''
     if (sbd && state.storage?.sql && (!this.kho || this.kho.sbd !== sbd)) this.kho = taoKhoEm(state.storage.sql, sbd)
-    return xuLy(req, this.kho ? { ...this.env, KHO_EM: this.kho } : this.env, ctx)
+    const res = await xuLy(req, this.kho ? { ...this.env, KHO_EM: this.kho } : this.env, ctx)
+    // Dấu «đã qua ngăn» (đo được trên máy thật, không lộ gì): 1 = ngăn có kho sổ.
+    const h = new Headers(res.headers)
+    h.set('x-ngan', this.kho ? '1' : '0')
+    const ex = h.get('access-control-expose-headers'); h.set('access-control-expose-headers', ex ? `${ex}, x-ngan` : 'x-ngan')
+    return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h })
   }
 }
 
