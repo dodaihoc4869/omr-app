@@ -20,7 +20,9 @@ import { SQL_DA_CONG_BO } from './cong-bo-diem'
 
 /** (28/10) Điều kiện một dòng `su_kien_hoc` (KHÔNG bí danh) được tính vào MỨC HÔM NAY — đúng tập «đã làm hôm nay» của Gói 7 (`docDaLamNgay7`): bỏ KTCN,
  *  lướt / chẩn đoán / xem lời giải, câu Tự sửa lỗi, câu đang giấu, câu ca thi chưa công bố. Viết lại ở đây (không nhập goi-bai-7 ⇒ không vòng nhập). */
-export const SQL_KHONG_TU_SUA = "COALESCE(nguon,'')<>'chua_loi'"
+// (30/10, thầy: «Phần chặng tính số câu riêng nha, hs làm trong tu luyện là phần chặng tự nhiên xong») câu TỰ LUYỆN (`nguon 'tu_luyen'`, tu-luyen.ts ghi sổ
+//  qua chua-cau-sai-tu-luyen.ts) cũng là phần riêng như Tự sửa lỗi ⇒ không tính vào mức hôm nay / chặng (trước đây cộng ⇒ chặng trên Lộ trình tự «xong»).
+export const SQL_KHONG_TU_SUA = "COALESCE(nguon,'') NOT IN ('chua_loi','tu_luyen')"
 // (29/10, thầy: «Phần học tiếp ở dưới chưa làm câu nào thanh đã báo rồi» — Lộ trình báo chặng sau đã làm dở dù em chưa động tới) MỘT chặng = 6 câu em ĐÃ TRẢ LỜI trong chặng:
 //  · câu LÀM LẠI CUỐI CHẶNG (game-v2.ts ghi sổ `raw.ll = 1`) là phần thêm của chặng ấy — KHÔNG tính vào mức hôm nay (trước đây cộng ⇒ ranh chặng lệch, chặng sau «đã làm dở»);
 //  · câu LƯỚT OMNI (`purpose 'luot'`, kết quả rỗng) em ĐÃ được phát và đã trả lời, chỉ không tính đúng / sai ⇒ vẫn là một câu của chặng (trước đây không cộng ⇒ chặng đủ 6 câu mà vạch báo 4/6).
