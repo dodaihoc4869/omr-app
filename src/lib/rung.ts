@@ -9,10 +9,27 @@ export const MAU_RUNG: Record<KieuPhanHoi, number[]> = { chon: [35], dung: [60],
   // 27/10 (sét đánh): mỗi mốc mở bằng MỘT nhịp mạnh 120 ms đúng lúc sét đánh
   combo3: [120, 60, 40, 40, 90], combo5: [120, 60, 50, 40, 50, 40, 160], combo10: [120, 60, 60, 40, 60, 40, 60, 60, 240] }
 
+let cacheRung: boolean | null = null
+let cacheAm: boolean | null = null
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('storage', (e) => {
+    if (!e.key || e.key === 'ddh.rung') cacheRung = null
+    if (!e.key || e.key === 'ddh.am') cacheAm = null
+  })
+}
+
 /** Được phản hồi (rung / tiếng) không: chỉ app học sinh «Trong», và em chưa tắt công tắc `khoa` trong menu. */
 export function duocPhanHoi(khoa: 'ddh.rung' | 'ddh.am'): boolean {
   if (typeof document === 'undefined' || document.documentElement.dataset.trong !== 'hs') return false
-  try { return localStorage.getItem(khoa) !== 'tat' } catch { return true }
+  if (khoa === 'ddh.rung' && cacheRung !== null) return cacheRung
+  if (khoa === 'ddh.am' && cacheAm !== null) return cacheAm
+  try {
+    const bat = localStorage.getItem(khoa) !== 'tat'
+    if (khoa === 'ddh.rung') cacheRung = bat
+    else cacheAm = bat
+    return bat
+  } catch { return true }
 }
 
 let nhanIos: HTMLLabelElement | null = null

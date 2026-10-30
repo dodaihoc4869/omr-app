@@ -25,7 +25,7 @@ import { chuDanhSachCau, coChuSo, cuonDeThayO, soHomNayGoi7 } from './lam-bai-ma
 import NutHoiThay from '../loi-giai/NutHoiThay'
 import { phanHoi } from '../../lib/phan-hoi'
 import { Bi } from '../linh-vat/Bi'
-import { banHat, truotRa, useDemSo, yenLang } from '../../lib/hieu-ung'
+import { banHat, useDemSo, yenLang } from '../../lib/hieu-ung'
 import { hamNongTuDien } from '../goi-y-cham/tu-dien'
 import { batAnKhiBiChe } from '../../lib/an-khi-bi-che'
 import { VungChamDe } from '../goi-y-cham/VungChamDe'
@@ -622,6 +622,16 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     const ds = [...sau.hinhAnh.filter(h => h.viTri !== 'sau_loi_giai').map(h => h.src), sau.thanCauImg, ...(sau.choiceImgs ?? []), ...(sau.ideaImgs ?? [])]
     for (const src of ds) if (src && !src.startsWith('data:')) { const im = new Image(); im.decoding = 'async'; im.src = src; im.decode?.().catch(() => {}) }
   }, [!!k, viTri, cau]) // eslint-disable-line react-hooks/exhaustive-deps
+  // Prefetch lời giải và màn kết bài lúc rảnh (không chạy trong nopCau để tránh nghẽn luồng click)
+  useEffect(() => {
+    if (duo) {
+      const t = window.setTimeout(() => {
+        void import('../goi-y-cham/LoiGiaiCauCoSoDo').catch(() => {})
+        if (viTri + 1 >= cau.length) void import('../thuong/KetBaiThuong').catch(() => {})
+      }, 800)
+      return () => window.clearTimeout(t)
+    }
+  }, [duo, viTri, cau.length])
   const nopCau = async () => {
     if (!q || !phien && !phienCho.current || !duTraLoi(q.phan, tra) || gui.current || k) return
     gui.current = true; setNop(true); setCham(true); setLoi('')
@@ -630,9 +640,6 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     const luotNay = new Promise<void>((r) => { xongLuot = r })
     ghiTruoc.current = luotNay
     const qidNop = q.qid
-    // NỘP TỨC THÌ (thầy 27/10): trong lúc chờ máy chấm, nạp sẵn mảnh lời giải từng bước (+ màn kết bài khi là câu cuối) — bấm «Lời giải» / hết chặng là có ngay.
-    // Chỉ mã giao diện (không có đáp án); đáp án vẫn chỉ về cùng phản hồi chấm.
-    if (duo) { void import('../goi-y-cham/LoiGiaiCauCoSoDo').catch(() => {}); if (viTri + 1 >= cau.length) void import('../thuong/KetBaiThuong').catch(() => {}) }
     const msLam = Math.max(0, Date.now() - batDau.current)
     const assisted = !!q.goiY || daHoiThay.current === q.qid || hoTroCham.current === q.qid
     try {
@@ -758,18 +765,16 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     return () => { luuDangRef.current(); document.removeEventListener('visibilitychange', f); window.removeEventListener('pagehide', g) }
   }, [])
   useLayoutEffect(() => {
+    dangSang.current = -1
     const san = sanRef.current, id = q?.qid ?? ''
     if (!san) { sanQid.current = ''; return }
-    if (sanQid.current && sanQid.current !== id && !yenLang() && typeof san.animate === 'function') san.animate([{ opacity: 0, transform: 'translateX(40px)' }, { opacity: 1, transform: 'none' }], { duration: 180, easing: 'ease-out', fill: 'backwards' })
+    if (sanQid.current && sanQid.current !== id && !yenLang() && typeof san.animate === 'function') san.animate([{ opacity: 0, transform: 'translateX(28px)' }, { opacity: 1, transform: 'none' }], { duration: 160, easing: 'ease-out', fill: 'backwards' })
     sanQid.current = id
   })
   const truotCauCu = () => {
-    const goc = gocRef.current, than = goc?.querySelector('.duo-than')
-    const r = duo && than ? than.getBoundingClientRect() : undefined
-    const kh = goc ? khungCuonCua(goc) : null
+    const goc = gocRef.current, kh = goc ? khungCuonCua(goc) : null
     if (goc && kh) { const lech = goc.getBoundingClientRect().top - kh.getBoundingClientRect().top; if (lech) kh.scrollTop += lech; daVeDau.current = true }
-    else if (goc && !kh && goc.getBoundingClientRect().top === 0) daVeDau.current = true // không khung nào cuộn được, màn đã ở đầu ⇒ khỏi cuộn
-    if (duo) truotRa(than, 180, r, 'svg.gtv')
+    else if (goc && !kh && goc.getBoundingClientRect().top === 0) daVeDau.current = true
   }
   // Hết câu của chặng mà có câu TỰ LÀM SAI ⇒ xin vòng làm lại MỘT lần. Rỗng / lỗi mạng ⇒ vào màn kết chặng như cũ. Đang xin ⇒ chạm lặp không kết chặng giữa chừng.
   const xinLamLai = async () => {
@@ -802,28 +807,14 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     setLoi('')
     setCombo(null) // băng combo chỉ sống ở câu vừa đúng — sang câu mới thì tắt, không che đề
     if (viTri + 1 < cau.length) {
-      // 28/10 MƯỢT (thầy: «tách việc dài SAU lần vẽ phản hồi đầu»): lượt chạm chỉ đổi phần nhỏ (nút, tấm kết quả) ⇒ khung kế vẽ ngay; việc nặng (bản sao
-      // trượt ra, dựng câu kế) chạy SAU lần vẽ đó (rAF + setTimeout 0). `dangSang` chặn chạm đúp tới khi câu kế hiện.
+      // TỨC THÌ 100%: chạm «Tiếp tục» ⇒ phản hồi tức thì 0ms, không delay frame, không clone DOM nặng nề
       dangSang.current = viTri
-      nutTiepRef.current?.setAttribute('data-lun', '') // 28/10 MƯỢT: nút giữ dáng lún tới khi câu kế hiện (trong-lam-bai.css) — phản hồi chạm vẽ ngay khung kế
-      // 28/10 MƯỢT: bỏ tiêu điểm khỏi nút «Tiếp tục» TRƯỚC khi tấm kết quả rời cây — gỡ phần tử đang giữ tiêu điểm bắt trình duyệt tính kiểu + bố cục
-      // ngay giữa lượt React gỡ nút (vết ×4: ~30 ms). Sau khi đổi câu tiêu điểm vẫn về trang như cũ.
-      const sauKhiVe = (f: () => void) => { const g = () => { (document.activeElement as HTMLElement | null)?.blur?.(); f() }; if (document.hidden) window.setTimeout(g, 0); else requestAnimationFrame(() => { window.setTimeout(g, 0) }) }
-      // máy yếu: không có hiệu ứng trượt; cuộn về đầu để sau khi câu mới dựng (không kéo câu cũ lên đầu trong lúc chờ)
-      if (yenLang()) sauKhiVe(() => {
-        // khung đang ở đầu (đọc lúc bố cục còn sạch — rẻ) ⇒ câu mới khỏi `scrollIntoView` sau khi dựng (mỗi lần là một lượt ép bố cục cả màn)
-        const goc = gocRef.current, kh = goc ? khungCuonCua(goc) : null
-        if (goc && (kh ? kh.scrollTop === 0 : goc.getBoundingClientRect().top === 0)) daVeDau.current = true
-        startTransition(() => setViTri(i => i + 1))
-      })
-      else if (duo) sauKhiVe(() => {
-        // máy thường: bản sao câu cũ trượt ra phủ trên ⇒ câu thật ẩn bằng opacity (một phần tử, không lan xuống con) và câu kế dựng trong lượt chuyển
-        // tiếp (chia nhỏ) — không giữ luồng chính một mạch ~200 ms. Câu kế gắn thì hiện lại (layout effect theo qid).
-        truotCauCu()
-        gocRef.current?.querySelector<HTMLElement>('.duo-than')?.style.setProperty('opacity', '0')
-        startTransition(() => setViTri(i => i + 1))
-      })
-      else { dangSang.current = -1; truotCauCu(); setViTri(i => i + 1) }
+      nutTiepRef.current?.setAttribute('data-lun', '')
+      ;(document.activeElement as HTMLElement | null)?.blur?.()
+      const goc = gocRef.current, kh = goc ? khungCuonCua(goc) : null
+      if (kh && kh.scrollTop > 0) { kh.scrollTop = 0; daVeDau.current = true }
+      else if (goc && !kh && goc.getBoundingClientRect().top === 0) daVeDau.current = true
+      startTransition(() => setViTri(i => i + 1))
     }
     else if (goi7 && !daXinLamLai.current && !laLamLai && cauSai.length > 0) void xinLamLai()
     else ketThuc()
@@ -1083,37 +1074,37 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
           <div className="duo-bo"><button type="button" className="duo-lien" onClick={onVe}>Về {tenTrangChinh()}</button></div>
         </div></div>
       : !q ? null
-      : k ? <section className="duo-day duo-ket" data-tt={khongTinh ? 'trung' : tt} data-tp-trung={khongTinh || undefined} role="status" aria-live="polite"><div className="duo-giua">
-          <BungDung key={q.qid} loai={khongTinh ? 'trung' : tt === 'dung' || tt === 'sai' ? tt : 'trung'} />{/* thầy 27/10 (video Duolingo): mây bọt — đúng: xanh + hạt vuông · sai: đỏ nhạt + hạt tròn · chưa tính: xám, không hạt */}
-          <div className="duo-kq">
-            {/* 27/10 (thầy: «dải … như dolingo»; phối hợp giám thị đứng trái đề): dải đúng / sai chỉ có dấu tròn tick / × ở tiêu đề — không đặt Bi */}
-            {tt === 'trung' && !khongTinh ? <span className="duo-kq-o" aria-hidden="true"><BookOpen size={26} /></span> : null}
-            <div className="duo-kq-chu">
-              {/* 27/10 (thầy: «phần màu xám … làm cho tinh tế lại»): tấm CHƯA ĐƯỢC TÍNH gọn kiểu Duolingo — dấu (i) tròn nhỏ cùng dòng tiêu đề ngắn, một dòng
-                  phụ (không nhãn lười: máy chủ chỉ báo `tinh: false`, không nói vì sao), «Lời giải từng bước» là liên kết nhỏ ở góc phải hàng tiêu đề.
-                  TamThuong vẫn gắn (ẩn) để giữ tiếng / rung «không tính» như cũ. */}
-              {khongTinh ? <>
-                {dauDai(<h2><span className="duo-ct-i" aria-hidden="true"><Info size={20} strokeWidth={2.6} /></span>Chưa được tính</h2>, 'Chưa được tính')}
-                <p className="duo-mo">Đọc kĩ đề rồi làm nhé.</p>
-                <span hidden><TamThuong thuong={th} /></span>
-              </>
-              : tt === 'dung' ? <>{dauDai(<h2><svg className="duo-tick" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M5 12.5 10 17.5 19 7" /></svg>{laLamLai ? 'Làm lại đúng' : LOI_KHEN[viTri % LOI_KHEN.length]}</h2>, laLamLai ? 'Làm lại đúng' : LOI_KHEN[viTri % LOI_KHEN.length]!)}<TamThuong thuong={th} demLen />{cotLoi && <p><ChemText text={cotLoi} /></p>}</>
-              : tt === 'sai' ? <>{dauDai(<h2><svg className="duo-tick" data-sai="" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M7 7 17 17M17 7 7 17" /></svg>Chưa đúng</h2>, 'Chưa đúng')}<TamThuong thuong={th} demLen />{dongVien && <p className="giu-dong-vien">{dongVien}</p>}
-                  <p><b>{q.phan === 'II' && ketDai ? ketDai.tieu : <>Đáp án đúng: <ChemText text={chuDapAnDuo} /></>}</b></p>
-                  <p className="duo-mo">{(lyDoEm || cotLoi) && <><ChemText text={lyDoEm || cotLoi} />{' '}</>}{laLamLai ? 'Câu gốc vẫn' : 'Câu này đã'} vào lịch ôn <span className="duo-lien-chu">1 · 3 · 7 ngày</span>.</p></>
-              : <>{dauDai(<h2>{ketDai?.tieu}</h2>, ketDai?.tieu ?? '')}<TamThuong thuong={th} demLen />{ketDai?.phu && <p className="duo-mo">{ketDai.phu}</p>}</>}
-              {lanTruoc && !khongTinh && <p className="duo-mo">Chấm theo đáp án em nộp lần trước.</p>}
+      : (k || cham) ? <section className="duo-day duo-ket" data-tt={k ? (khongTinh ? 'trung' : tt) : 'cho'} data-tp-trung={k && khongTinh ? true : undefined} role="status" aria-live="polite" aria-busy={!k || undefined}><div className="duo-giua">
+          {k ? <>
+            <BungDung key={q.qid} loai={khongTinh ? 'trung' : tt === 'dung' || tt === 'sai' ? tt : 'trung'} />{/* thầy 27/10 (video Duolingo): mây bọt — đúng: xanh + hạt vuông · sai: đỏ nhạt + hạt tròn · chưa tính: xám, không hạt */}
+            <div className="duo-kq">
+              {/* 27/10 (thầy: «dải … như dolingo»; phối hợp giám thị đứng trái đề): dải đúng / sai chỉ có dấu tròn tick / × ở tiêu đề — không đặt Bi */}
+              {tt === 'trung' && !khongTinh ? <span className="duo-kq-o" aria-hidden="true"><BookOpen size={26} /></span> : null}
+              <div className="duo-kq-chu">
+                {/* 27/10 (thầy: «phần màu xám … làm cho tinh tế lại»): tấm CHƯA ĐƯỢC TÍNH gọn kiểu Duolingo — dấu (i) tròn nhỏ cùng dòng tiêu đề ngắn, một dòng
+                    phụ (không nhãn lười: máy chủ chỉ báo `tinh: false`, không nói vì sao), «Lời giải từng bước» là liên kết nhỏ ở góc phải hàng tiêu đề.
+                    TamThuong vẫn gắn (ẩn) để giữ tiếng / rung «không tính» như cũ. */}
+                {khongTinh ? <>
+                  {dauDai(<h2><span className="duo-ct-i" aria-hidden="true"><Info size={20} strokeWidth={2.6} /></span>Chưa được tính</h2>, 'Chưa được tính')}
+                  <p className="duo-mo">Đọc kĩ đề rồi làm nhé.</p>
+                  <span hidden><TamThuong thuong={th} /></span>
+                </>
+                : tt === 'dung' ? <>{dauDai(<h2><svg className="duo-tick" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M5 12.5 10 17.5 19 7" /></svg>{laLamLai ? 'Làm lại đúng' : LOI_KHEN[viTri % LOI_KHEN.length]}</h2>, laLamLai ? 'Làm lại đúng' : LOI_KHEN[viTri % LOI_KHEN.length]!)}<TamThuong thuong={th} demLen />{cotLoi && <p><ChemText text={cotLoi} /></p>}</>
+                : tt === 'sai' ? <>{dauDai(<h2><svg className="duo-tick" data-sai="" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M7 7 17 17M17 7 7 17" /></svg>Chưa đúng</h2>, 'Chưa đúng')}<TamThuong thuong={th} demLen />{dongVien && <p className="giu-dong-vien">{dongVien}</p>}
+                    <p><b>{q.phan === 'II' && ketDai ? ketDai.tieu : <>Đáp án đúng: <ChemText text={chuDapAnDuo} /></>}</b></p>
+                    <p className="duo-mo">{(lyDoEm || cotLoi) && <><ChemText text={lyDoEm || cotLoi} />{' '}</>}{laLamLai ? 'Câu gốc vẫn' : 'Câu này đã'} vào lịch ôn <span className="duo-lien-chu">1 · 3 · 7 ngày</span>.</p></>
+                : <>{dauDai(<h2>{ketDai?.tieu}</h2>, ketDai?.tieu ?? '')}<TamThuong thuong={th} demLen />{ketDai?.phu && <p className="duo-mo">{ketDai.phu}</p>}</>}
+                {lanTruoc && !khongTinh && <p className="duo-mo">Chấm theo đáp án em nộp lần trước.</p>}
+              </div>
             </div>
-          </div>
-          {loi && <p className="duo-loi" role="alert">{loi}</p>}
-          {/* thầy 27/10: Hỏi thầy (nút 3D phụ ~1/4, trái) + «Tiếp tục» CÙNG MỘT HÀNG */}
-          <div className="duo-hang-nut">{linkHoi}<button ref={nutTiepRef} type="button" className="duo-nut" data-sac={tt === 'sai' && !khongTinh ? 'do' : khongTinh ? 'lam' : undefined} onClick={() => { phanHoi('chon'); tiep() }}>Tiếp tục</button></div>
-        </div></section>
-      // CHẤM NHANH (28/10): chạm «Kiểm tra» ⇒ dải kết quả trượt lên NGAY ở trạng thái trung tính «Đang chấm…»; kết quả về ⇒ CÙNG dải đổi màu đúng / sai tại chỗ.
-      : cham ? <section className="duo-day duo-ket" data-tt="cho" role="status" aria-live="polite" aria-busy="true"><div className="duo-giua">
-          {/* thầy 28/10 «Ẩn cái chữ đang chấm»: dải vẫn trượt lên ngay (phản hồi chạm), không hiện chữ chờ — trình đọc màn hình vẫn đọc «Đang chấm» */}
-          <div className="duo-kq"><div className="duo-kq-chu"><div className="duo-ct-dau"><h2 className="sr-only">Đang chấm</h2></div></div></div>
-          <div className="duo-hang-nut"><button ref={nutTiepRef} type="button" className="duo-nut" data-cho="" aria-busy="true" disabled>Kiểm tra</button></div>
+            {loi && <p className="duo-loi" role="alert">{loi}</p>}
+            {/* thầy 27/10: Hỏi thầy (nút 3D phụ ~1/4, trái) + «Tiếp tục» CÙNG MỘT HÀNG */}
+            <div className="duo-hang-nut">{linkHoi}<button ref={nutTiepRef} type="button" className="duo-nut" data-sac={tt === 'sai' && !khongTinh ? 'do' : khongTinh ? 'lam' : undefined} onClick={() => { phanHoi('chon'); tiep() }}>Tiếp tục</button></div>
+          </> : <>
+            {/* Chấm nhanh tức thì: dải xuất hiện ngay trong frame bấm, giữ nguyên phần tử DOM khi kết quả về để không giật nảy */}
+            <div className="duo-kq"><div className="duo-kq-chu"><div className="duo-ct-dau"><h2 className="sr-only">Đang chấm</h2></div></div></div>
+            <div className="duo-hang-nut"><button ref={nutTiepRef} type="button" className="duo-nut" data-cho="" aria-busy="true" disabled>Kiểm tra</button></div>
+          </>}
         </div></section>
       : choChonCach ? <div className="duo-day"><div className="duo-giua">
           <div className="duo-hai">

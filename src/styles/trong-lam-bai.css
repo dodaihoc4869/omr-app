@@ -404,6 +404,8 @@
   box-shadow: inset 0 -4px 0 color-mix(in srgb, var(--tr-chu) 18%, transparent);
 }
 [data-trong] .ht-app .duo-nut:disabled { opacity: 1; background: var(--tr-mat-3); color: var(--tr-chu-3); box-shadow: none; }
+[data-trong] .duo .duo-nut[data-lun] { transform: translateY(3px) !important; box-shadow: none !important; }
+[data-trong] .ht-app .duo-nut[data-lun]:disabled { background: var(--tr-chinh-nut) !important; color: var(--tr-tren-chinh) !important; opacity: 1 !important; box-shadow: none !important; transform: translateY(3px) !important; }
 [data-trong] .duo-nut[data-sac=do] { background: var(--tr-sai); color: var(--tr-trang); }
 [data-trong] .duo-nut[data-sac=vang] { background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); }
 [data-trong] .duo-hai { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
@@ -420,13 +422,15 @@
 [data-trong] .duo :is(.duo-bo, .duo-them) .lg-loi { flex-basis: 100%; font-size: 13.5px; color: var(--tr-chu-2); text-align: center; }
 [data-trong] .duo-loi { margin: 0; font-size: 14px; font-weight: 600; color: var(--tr-sai-chu); }
 /* tấm kết quả */
-[data-trong] .duo-ket { border-top-color: transparent; animation: duo-truot 200ms ease-out; }
+[data-trong] .duo-ket { border-top-color: transparent; animation: duo-truot 180ms ease-out; will-change: transform; transition: background 160ms ease; }
 [data-trong] .duo-ket[data-tt=dung] { background: var(--tr-dung-nhat); }
 [data-trong] .duo-ket[data-tt=sai] { background: var(--tr-sai-nhat); }
 [data-trong] .duo-ket[data-tt=trung] { background: var(--tr-mat-2); }
 /* CHẤM NHANH 28/10 (thầy «bấm kiểm tra … chưa tức thì ngay»): chạm «Kiểm tra» ⇒ dải trượt lên NGAY ở trạng thái trung tính «Đang chấm…» (màu mặt phụ như dải
    «chưa tính», nút chờ giữ dáng `data-cho` cũ); kết quả về ⇒ CÙNG dải đổi nền đúng / sai tại chỗ, không trượt lại. */
 [data-trong] .duo-ket[data-tt=cho] { background: var(--tr-mat-2); }
+@media (prefers-reduced-motion: reduce) { [data-trong] .duo-ket { animation: none !important; transition: none !important; } }
+[data-trong].may-yeu .duo-ket { animation: none !important; transition: none !important; }
 @keyframes duo-truot { from { transform: translateY(100%); } }
 [data-trong] .duo-kq { display: flex; align-items: flex-start; gap: 14px; }
 [data-trong] .duo-kq-o { display: grid; place-items: center; flex: none; width: 52px; height: 52px; border-radius: 50%; background: var(--tr-mat); color: var(--tr-chu-2); }
