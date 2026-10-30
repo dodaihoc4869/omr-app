@@ -15,10 +15,48 @@ function ThoatLuon({ onThoat }: { onThoat: () => void }) {
 /** Nạp sẵn mảnh tấm + CSS (màn Duo vừa mở). Lỗi im lặng — lúc bấm X sẽ thử lại / thoát như cũ. */
 export const napSanGiuChan = () => { void napTam().catch(() => {}) }
 
+// MỤC CANH LỊCH SỬ DÙNG CHUNG (thầy 30/10, ảnh «Bấm vào tiếp tục lại hiện thoát»): màn sửa câu dựng lại cả khung mỗi câu (key = đợt) ⇒ trước đây màn cũ
+// gỡ mục canh bằng history.back() (bất đồng bộ) còn màn mới đẩy mục canh của nó ngay ⇒ popstate của lượt lùi đến SAU, màn mới tưởng em bấm back ⇒ bật tấm.
+// Nay: một mục canh cho mọi móc đang bật; móc nhả ⇒ HẸN gỡ (0 ms), móc kế bật kịp ⇒ huỷ hẹn, dùng lại mục cũ; popstate do chính ta lùi ⇒ bỏ qua.
+type Canh = { onBack: () => void }
+const dsCanh: Canh[] = []
+let henGo: ReturnType<typeof setTimeout> | null = null
+let tuLui = false
+let daNghe = false
+const laMucCanh = () => { try { return !!(history.state as { giuChan?: number } | null)?.giuChan } catch { return false } }
+const dayMucCanh = () => { try { history.pushState({ giuChan: Date.now() }, '') } catch { /* vẫn chạy, chỉ mất canh back */ } }
+function ngheLui() {
+  if (daNghe) return
+  daNghe = true
+  window.addEventListener('popstate', () => {
+    if (tuLui) { tuLui = false; if (dsCanh.length && !laMucCanh()) dayMucCanh(); return }
+    const c = dsCanh[dsCanh.length - 1]
+    if (!c || laMucCanh()) return
+    dayMucCanh(); c.onBack()
+  })
+}
+function batCanh(c: Canh): () => void {
+  ngheLui()
+  if (henGo !== null) { clearTimeout(henGo); henGo = null }
+  if (!dsCanh.length && !laMucCanh()) dayMucCanh()
+  dsCanh.push(c)
+  return () => {
+    const i = dsCanh.lastIndexOf(c)
+    if (i >= 0) dsCanh.splice(i, 1)
+    if (dsCanh.length || henGo !== null) return
+    henGo = setTimeout(() => {
+      henGo = null
+      if (dsCanh.length || !laMucCanh()) return
+      tuLui = true
+      try { history.back() } catch { tuLui = false }
+    }, 0)
+  }
+}
+
 /**
  * `bat` = đang có điều để giữ (đã chấm ≥ 1 câu, chặng chưa xong — `canGiuChan`). Trả `xinThoat` cho nút X: `bat` ⇒ mở tấm (rung 'chon'), không ⇒ `onThoat`.
- * Esc: mở tấm (đang mở ⇒ đóng = học tiếp); bỏ qua khi một hộp thoại khác đang mở (lời giải, hỏi thầy). Back Android / trình duyệt: khi `bat`, đẩy MỘT mục
- * lịch sử canh; back ⇒ đẩy lại + mở tấm (đang mở ⇒ đóng). Hết `bat` / rời màn ⇒ gỡ mục canh nếu nó còn trên đỉnh. Hàm gọi lại giữ trong ref (không chạy
+ * Esc: mở tấm (đang mở ⇒ đóng = học tiếp); bỏ qua khi một hộp thoại khác đang mở (lời giải, hỏi thầy). Back Android / trình duyệt: khi `bat`, giữ MỘT mục
+ * lịch sử canh (dùng chung — `batCanh`); back ⇒ đẩy lại + mở tấm (đang mở ⇒ đóng). Hết `bat` / rời màn ⇒ hẹn gỡ mục canh nếu không móc nào bật lại. Hàm gọi lại giữ trong ref (không chạy
  * lại hiệu ứng lịch sử mỗi lần vẽ — bài học KhungXemPhieu 06/09).
  */
 export function useGiuChan({ bat, onThoat }: { bat: boolean; onThoat: () => void }) {
@@ -39,18 +77,7 @@ export function useGiuChan({ bat, onThoat }: { bat: boolean; onThoat: () => void
   }, [moTam])
   useEffect(() => {
     if (!bat) { setMo(false); return }
-    const dau = { giuChan: Date.now() }
-    try { history.pushState(dau, '') } catch { return }
-    const f = () => {
-      if ((history.state as { giuChan?: number } | null)?.giuChan === dau.giuChan) return
-      try { history.pushState(dau, '') } catch { /* vẫn mở tấm */ }
-      if (moRef.current) setMo(false); else moTam()
-    }
-    window.addEventListener('popstate', f)
-    return () => {
-      window.removeEventListener('popstate', f)
-      try { if ((history.state as { giuChan?: number } | null)?.giuChan === dau.giuChan) history.back() } catch { /* bỏ qua */ }
-    }
+    return batCanh({ onBack: () => { if (moRef.current) setMo(false); else moTam() } })
   }, [bat, moTam])
   const tiepTuc = useCallback(() => setMo(false), [])
   const thoat = useCallback(() => { setMo(false); thoatRef.current() }, [])
