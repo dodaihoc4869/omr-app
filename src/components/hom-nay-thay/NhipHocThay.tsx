@@ -31,6 +31,7 @@ import DaiDemBac from '../bac-cham-chi/DaiDemBac'
 import { chuBacSo } from '../bac-cham-chi/bac'
 import type { EmHoSo } from '../chien-dich/HoSoLamCauEm'
 import XepHangEm, { DsHocThatDu, useHocThatLop, xepHocThat, type CotXep } from './XepHangEm'
+import BangChungEm, { type HangEm } from './BangChungEm'
 import '../chien-dich/bai-hang-ngay.css'
 import './hom-nay-thay.css'
 
@@ -294,7 +295,7 @@ export default function NhipHocThay({ du, dangTai, onThuLai, viec }: { du: DuNhi
   // «Một trang»: khối đang mở đủ trong tấm (Nhịp học theo lớp · Em cần thầy để ý · 12 bậc + Đối phó)
   const [tam, setTam] = useState<TamMotTrang | null>(null)
   // Xếp hạng (thầy 30/10): bảng Học thật hằng tuần — chỉ bản «Một trang» cần, nạp lúc rảnh sau khi màn đã vẽ.
-  const hocThat = useHocThatLop(trong)
+  const hocThat = useHocThatLop(trong || !!mo)
 
   const kq = du?.ok ? du.kq : null
   const tatCa = useMemo(() => kq?.em ?? [], [kq])
@@ -311,6 +312,17 @@ export default function NhipHocThay({ du, dangTai, onThuLai, viec }: { du: DuNhi
   const theoBac = useMemo(() => (t ? t.dong.filter((d) => d.bacCham).sort(xepTheoBac) : []), [t])
   const demBac = useMemo(() => (t ? demTheoBac(t.dong) : []), [t])
   const hocThatDs = useMemo(() => (hocThat.tt === 'co' ? xepHocThat(hocThat.em, tatCa, { khoi: khoiChon, lop: lopChon }) : []), [hocThat, tatCa, khoiChon, lopChon])
+  // Bằng chứng của em đang mở hồ sơ (thầy 30/10 «bấm vào từng hs phải ra đủ thông tin … chứng minh hs đó như vậy»): số Nhịp học + bảng Học thật + hạng.
+  const bangChung = useMemo(() => {
+    if (!mo) return null
+    const d = t?.dong.find((x) => x.sbd === mo.sbd)
+    const ht = hocThat.tt === 'co' ? hocThat.em.find((x) => x.sbd === mo.sbd) : undefined
+    const hang: HangEm[] = []
+    const them = (cot: CotXep, ds: readonly { sbd: string }[]) => { const i = ds.findIndex((x) => x.sbd === mo.sbd); if (i >= 0) hang.push({ cot, so: i + 1, tong: ds.length }) }
+    them('luoi', luoi); them('cham', cham); them('hoc-that', hocThatDs); them('doi-pho', doiPho)
+    const htTai = hocThat.tt === 'co' && hocThat.cheDo === 'tat' ? 'tat' : hocThat.tt
+    return <BangChungEm d={d} ht={ht} htTai={htTai} hang={hang} />
+  }, [mo, t, hocThat, luoi, cham, hocThatDs, doiPho])
 
   const onMo = useCallback((d: DongNhipHoc, nut: HTMLButtonElement) => {
     nutVua.current = nut
@@ -732,7 +744,7 @@ export default function NhipHocThay({ du, dangTai, onThuLai, viec }: { du: DuNhi
                 </>
               }
             >
-              <HoSoLamCauEm em={mo} onDong={onDong} />
+              <HoSoLamCauEm em={mo} onDong={onDong} dauThan={bangChung} />
             </Suspense>
           </div>,
           document.body,

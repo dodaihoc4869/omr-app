@@ -97,11 +97,11 @@ describe('hàm thuần', () => {
 })
 
 describe('chỗ đặt trên Hôm nay «Một trang»', () => {
-  it('dải xếp hạng ngay dưới dải số; ô «Em cần thầy để ý» 3 em đã gộp vào dải; bảng Học thật chỉ nạp ở bản «Một trang»', () => {
+  it('dải xếp hạng ngay dưới dải số; ô «Em cần thầy để ý» 3 em đã gộp vào dải; bảng Học thật nạp ở bản «Một trang» (bản cũ: khi mở hồ sơ)', () => {
     const src = readFileSync('src/components/hom-nay-thay/NhipHocThay.tsx', 'utf8')
     expect(src.indexOf('<XepHangEm')).toBeGreaterThan(src.indexOf('{nhtODs}\n        </div>'))
     expect(src).not.toContain('mt-de-y')
-    expect(src).toContain('useHocThatLop(trong)')
+    expect(src).toContain('useHocThatLop(trong || !!mo)') // bản cũ (tắt «Trong»): chỉ nạp khi thầy mở hồ sơ một em
     const css = readFileSync('src/styles/trong-gv-hom-nay.css', 'utf8')
     expect(css).toContain("grid-template-areas: 'so so so' 'xep xep xep' 'viec lop cot3'")
   })
