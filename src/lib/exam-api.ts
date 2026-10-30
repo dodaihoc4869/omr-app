@@ -424,6 +424,9 @@ export async function hoSoOnCa(
   return em as Record<string, unknown>
 }
 
+/** Hạn chờ MỘT lượt `noiKhoCa` (giây) — lượt nối cả trăm câu lúc D1 nghẽn mất hơn 25 giây. */
+export const HAN_NOI_KHO_CA_GIAY = 60
+
 /** NỐI THÊM CÂU VÀO KHO CỦA MỘT CA — chỉ dùng cho đề riêng từng em.
  *
  * Câu em từng sai có thể nằm ngoài kho thầy vừa rút cho ca. Muốn hỏi lại đúng
@@ -439,7 +442,10 @@ export async function noiKhoCa(
   bank: PublicExamBank,
   keyBank: { phanI: TeacherExamSource['phanI']; phanII: TeacherExamSource['phanII']; phanIII: TeacherExamSource['phanIII'] },
 ): Promise<{ themBank: number; themKey: number }> {
-  const r = await postJson(scriptUrl, { action: 'noiKhoCa', secret, maCa, bank, keyBank })
+  // HẠN 60 GIÂY + THỬ LẠI 1 LẦN (30/10, ca 269333): nối 344 câu lúc bấm Bắt đầu quá hạn 25 giây chung khi D1 nghẽn ⇒ máy thầy bỏ HẾT câu sai cũ khỏi
+  // đề «rút câu sai». Gửi lại AN TOÀN: máy chủ ghi `kho_ca_them` theo khoá `maCa|qid` (ghi đè đúng dòng ấy bằng cùng nội dung) và chỉ THÊM câu chưa
+  // có vào `de/` + `key/` (so theo id) ⇒ lần hai không nhân đôi gì.
+  const r = await postCoThuLai(scriptUrl, { action: 'noiKhoCa', secret, maCa, bank, keyBank }, HAN_NOI_KHO_CA_GIAY, 2)
   if (!r.ok) throw new Error(r.error || 'Không nối được kho ca')
   return { themBank: Number(r.themBank) || 0, themKey: Number(r.themKey) || 0 }
 }

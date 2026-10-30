@@ -1,0 +1,181 @@
+# ĐO BÀI CHƯA CHẤM ĐƯỢC CA 30/10 (CHỈ ĐỌC) — thầy 30/10 tối «nay có 5 bạn không chấm được bài» + «ca rút câu sai bấm bắt đầu rất lâu».
+# CHỈ SELECT trên D1 + ĐỌC tờ đáp án R2 (`key/<ca>.json`). KHÔNG ghi gì, KHÔNG export.
+# Repo CÔNG KHAI ⇒ KHÔNG in SBD / tên / bài làm: mỗi em chỉ hiện bằng 6 ký tự đầu sha256(SBD); bài làm chỉ xử lý trong bộ nhớ máy chạy.
+# Chấm thử (chỉ đọc) bằng ĐÚNG lõi chấm máy chủ (`chamLaiMotCa` — server/src/cham-lai-ca.ts) để biết lý do từng bài không chấm được.
+name: Đo bài chưa chấm được 30/10 (chỉ đọc)
+on:
+  push:
+    branches: [claude/cham-bai-3010]
+    paths: ['.github/workflows/do-cham-bai-3010.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-cham-bai-3010
+  cancel-in-progress: false
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      TU: '2026-10-29T17:00:00'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Gói lõi chấm (chỉ để chấm thử trong bộ nhớ)
+        run: npx -y esbuild@0.24.0 server/src/cham-lai-ca.ts --bundle --platform=node --format=esm --outfile=/tmp/cham.mjs --log-level=warning
+      - name: Đọc (chỉ SELECT) + tờ đáp án R2
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          set -u
+          mkdir -p /tmp/d
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" 2>/tmp/d/err | jq -c '.[0].results[]' || { echo "(lỗi)"; tail -n 3 /tmp/d/err | cut -c1-300; }; }
+          # Đọc ra TỆP (không in) — có SBD / bài làm.
+          tep() { npx -y wrangler@4 d1 execute omr --remote --json --command "$2" > "$1" 2>/tmp/d/err || { echo "(lỗi đọc $1)"; tail -n 3 /tmp/d/err | cut -c1-300; echo '[]' > "$1"; }; }
+          echo "Giờ VN: $(TZ=Asia/Ho_Chi_Minh date '+%d/%m %H:%M')"
+          q "ca động tới từ 00:00 VN 30/10" "SELECT ma_ca, substr(COALESCE(ten_ca,''),1,40) ten, trang_thai, loai, cong_bo, de_rieng, len_bang, pham_vi_hoi_lai, phong_cho, so_cau_json, mo_luc, bat_dau_thi_luc, cap_nhat_luc, thoi_gian_phut, length(bo_theo_em_json) bo_len, (SELECT COUNT(*) FROM luot l WHERE l.ma_ca = ca.ma_ca) so_luot FROM ca WHERE cap_nhat_luc >= '$TU' OR mo_luc >= '$TU' OR bat_dau_thi_luc >= '$TU' ORDER BY cap_nhat_luc LIMIT 30"
+          tep /tmp/d/ca.json "SELECT ma_ca, ten_ca, trang_thai, cong_bo, de_rieng, len_bang, pham_vi_hoi_lai, phong_cho, so_cau_json, mo_luc, bat_dau_thi_luc, cap_nhat_luc, thoi_gian_phut, bo_theo_em_json FROM ca WHERE (cap_nhat_luc >= '$TU' OR mo_luc >= '$TU' OR bat_dau_thi_luc >= '$TU') AND EXISTS (SELECT 1 FROM luot l WHERE l.ma_ca = ca.ma_ca) LIMIT 10"
+          for MA in $(jq -r '.[0].results[].ma_ca' /tmp/d/ca.json); do
+            echo "################ CA $MA"
+            q "lượt theo trạng thái: số · chưa điểm (tong NULL) · không bài · có chi tiết câu" "SELECT trang_thai, COUNT(*) n, SUM(tong IS NULL) chua_diem, SUM(dap_an_json IS NULL OR dap_an_json IN ('','{}')) khong_bai, SUM(EXISTS (SELECT 1 FROM chi_tiet_cau c WHERE c.ma_ca = l.ma_ca AND c.sbd = l.sbd AND c.lan_thu = l.lan_thu)) co_ctc, MIN(vao_luc) vao_dau, MAX(vao_luc) vao_cuoi, MIN(nop_luc) nop_dau, MAX(nop_luc) nop_cuoi FROM luot l WHERE ma_ca = '$MA' GROUP BY trang_thai"
+            q "chặn vào theo lý do" "SELECT ly_do, COUNT(*) n, MIN(luc) dau, MAX(luc) cuoi FROM chan_vao WHERE ma_ca = '$MA' GROUP BY ly_do"
+            q "phòng chờ: số em · ghi đầu · ghi cuối" "SELECT COUNT(*) n, MIN(ghi_luc) dau, MAX(ghi_luc) cuoi FROM phong_cho WHERE ma_ca = '$MA'"
+            q "bài bổ sung theo trạng thái" "SELECT trang_thai, COUNT(*) n FROM bai_bo_sung WHERE ma_ca = '$MA' GROUP BY trang_thai"
+            q "nhận xét (sendFeedback) ghi từ máy chủ: số · tuMayChu" "SELECT json_extract(noi_dung,'\$.tuMayChu') tu_may_chu, COUNT(*) n, MIN(luc) dau, MAX(luc) cuoi FROM nhan_xet WHERE ma_ca = '$MA' AND luc >= '$TU' GROUP BY 1"
+            tep /tmp/d/luot_$MA.json "SELECT l.sbd, l.lan_thu, l.trang_thai, l.vao_luc, l.nop_luc, l.het_gio_luc, l.cap_nhat_luc, l.tong, l.diem_i, l.dap_an_json, l.giay_cau_json, l.ghi_chu, l.so_lan_roi_man, l.integrity_json, (SELECT COUNT(*) FROM chi_tiet_cau c WHERE c.ma_ca = l.ma_ca AND c.sbd = l.sbd AND c.lan_thu = l.lan_thu) n_ctc, (SELECT COUNT(*) FROM nhan_xet x WHERE x.sbd = l.sbd AND x.ma_ca = l.ma_ca) n_nx, (SELECT json_extract(x.noi_dung,'\$.tuMayChu') FROM nhan_xet x WHERE x.sbd = l.sbd AND x.ma_ca = l.ma_ca ORDER BY x.luc DESC LIMIT 1) nx_may_chu, (SELECT COUNT(*) FROM bai_bo_sung b WHERE b.ma_ca = l.ma_ca AND b.sbd = l.sbd) n_bs, (SELECT ghi_luc FROM phong_cho p WHERE p.khoa = l.ma_ca || '|' || l.sbd) cho_luc FROM luot l WHERE l.ma_ca = '$MA'"
+            tep /tmp/d/ctc_$MA.json "SELECT sbd, lan_thu, phan, so_cau, qid, dap_an_dung, cap_nhat_luc FROM chi_tiet_cau WHERE ma_ca = '$MA'"
+            tep /tmp/d/chan_$MA.json "SELECT sbd, ly_do, luc FROM chan_vao WHERE ma_ca = '$MA' ORDER BY luc LIMIT 500"
+            for K in key de; do
+              npx -y wrangler@4 r2 object get "omr-de/$K/$MA.json" --remote --file "/tmp/d/${K}_$MA.json" >/tmp/d/out 2>/tmp/d/err || { echo "(không đọc được $K/$MA.json)"; cat /tmp/d/out /tmp/d/err | grep -v "Logs were written" | grep -v '^\s*$' | tail -n 6 | cut -c1-240; }
+              [ -s "/tmp/d/${K}_$MA.json" ] && echo "$K/$MA.json: $(wc -c < /tmp/d/${K}_$MA.json) byte"
+            done
+          done
+          q "nhật ký lỗi máy từ 00:00 VN" "SELECT nguon, COUNT(*) n, MIN(luc) dau, MAX(luc) cuoi FROM nhat_ky_may WHERE luc >= '$TU' GROUP BY nguon"
+      - name: Chấm thử trong bộ nhớ + in số (không in SBD / bài làm)
+        run: |
+          node --input-type=module - <<'JS'
+          import fs from 'node:fs'
+          import crypto from 'node:crypto'
+          const { chamLaiMotCa } = await import('/tmp/cham.mjs')
+          const h = (s) => crypto.createHash('sha256').update(String(s)).digest('hex').slice(0, 6)
+          const doc = (p) => { try { return JSON.parse(fs.readFileSync(p, 'utf8')) } catch { return null } }
+          const kq = (p) => (doc(p)?.[0]?.results ?? [])
+          const j = (v) => { try { return v ? JSON.parse(String(v)) : null } catch { return null } }
+          const vn = (iso) => { const t = Date.parse(String(iso ?? '')); return Number.isFinite(t) ? new Date(t + 7 * 3600e3).toISOString().slice(11, 19) : '-' }
+          const giay = (a, b) => (a && b ? Math.round((Date.parse(a) - Date.parse(b)) / 1000) : null)
+          const pt = (a, q) => { if (!a.length) return '-'; const s = [...a].sort((x, y) => x - y); return s[Math.min(s.length - 1, Math.floor(q * s.length))] }
+          // LƯỚI CHE SBD: gom mọi SBD đã biết (lượt, chặn vào, bản đồ) rồi thay MỌI chỗ xuất hiện trong dòng in bằng mã băm — kể cả trong chữ biên bản.
+          const sbdBiet = new Set()
+          for (const ca of kq('/tmp/d/ca.json')) {
+            const g = j(ca.bo_theo_em_json) ?? {}
+            for (const k of [g.bo, g.lap, g.dem, g.bac, g.daLam, g.daDung, g.bb?.v2?.thieu, g.bb?.canCua, g.bb?.soLapCua]) for (const x of Object.keys(k ?? {})) sbdBiet.add(x)
+            for (const l of kq(`/tmp/d/luot_${ca.ma_ca}.json`)) sbdBiet.add(String(l.sbd))
+            for (const c of kq(`/tmp/d/chan_${ca.ma_ca}.json`)) sbdBiet.add(String(c.sbd))
+          }
+          const sbdDs = [...sbdBiet].filter((x) => x.length >= 3).sort((a, b) => b.length - a.length)
+          const re = sbdDs.length ? new RegExp(sbdDs.map((x) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'g') : null
+          const goc = console.log.bind(console)
+          console.log = (...a) => goc(...a.map((x) => (re ? String(x).replace(re, (m) => '#' + h(m)) : x)))
+          for (const ca of kq('/tmp/d/ca.json')) {
+            const ma = ca.ma_ca
+            console.log(`\n######## CA ${ma} · trạng thái ${ca.trang_thai} · công bố ${ca.cong_bo} · đề riêng ${ca.de_rieng} · lên bảng ${ca.len_bang} · phạm vi hỏi lại ${ca.pham_vi_hoi_lai || '(gan_nhat)'} · số câu ${ca.so_cau_json}`)
+            console.log(`mở ${vn(ca.mo_luc)} · bắt đầu ${vn(ca.bat_dau_thi_luc)} · cập nhật ${vn(ca.cap_nhat_luc)} (giờ VN)`)
+            const goi = j(ca.bo_theo_em_json) ?? {}
+            const boD1 = goi && typeof goi.bo === 'object' ? goi.bo : goi
+            const soEmBo = Object.keys(boD1 || {}).filter((k) => Array.isArray(boD1[k])).length
+            const bb = goi.bb ?? null
+            console.log(`bản đồ D1: ${soEmBo} em · khoá gói: ${Object.keys(goi).join(',')}`)
+            if (bb) {
+              const thieuV2 = bb.v2?.thieu ?? {}
+              // `thieu` có khoá theo SBD ⇒ CHỈ in số (repo công khai).
+              console.log(`biên bản: lucRut ${vn(bb.lucRut)} · cheDo ${bb.v2?.cheDo ?? '-'} · mucTieu ${bb.v2?.mucTieu ? JSON.stringify(Object.fromEntries(Object.entries(bb.v2.mucTieu).map(([k, v]) => [k, Array.isArray(v) ? v.length : v]))) : '-'} · thiếu: ${Object.keys(thieuV2).length} em / ${Object.values(thieuV2).reduce((a, x) => a + (Array.isArray(x) ? x.length : 0), 0)} ô`)
+              for (const g of bb.ghiChu ?? []) console.log(`  ghiChu[${g.loai}] ${String(g.loi).slice(0, 220)}`)
+              const bac = goi.bac ?? {}
+              const demBac = {}
+              for (const m of Object.values(bac)) for (const b of Object.values(m ?? {})) demBac[b] = (demBac[b] ?? 0) + 1
+              console.log(`  bậc lấp (cả lớp): ${JSON.stringify(demBac)}`)
+            }
+            // Token CI không có quyền đọc R2 ⇒ DỰNG TỜ ĐÁP ÁN THAY THẾ từ `chi_tiet_cau` của chính ca (đáp án đúng từng câu đã ghi lúc chấm) — chỉ để chấm thử.
+            const ctc = kq(`/tmp/d/ctc_${ma}.json`)
+            let key = doc(`/tmp/d/key_${ma}.json`)
+            let keyThay = false
+            if (!key && ctc.length) {
+              const theoQid = new Map()
+              for (const r of ctc) if (r.qid && r.dap_an_dung !== null && !theoQid.has(r.qid)) theoQid.set(r.qid, r)
+              key = { phanI: [], phanII: [], phanIII: [], soCau: j(ca.so_cau_json) ?? undefined }
+              for (const [qid, r] of theoQid) {
+                if (r.phan === 'I') key.phanI.push({ id: qid, text: '', choices: ['', '', '', ''], correct: String(r.dap_an_dung) })
+                else if (r.phan === 'II') key.phanII.push({ id: qid, text: '', ideas: [], correct: String(r.dap_an_dung).split('') })
+                else if (r.phan === 'III') key.phanIII.push({ id: qid, text: '', correct: String(r.dap_an_dung) })
+              }
+              keyThay = true
+            }
+            const de = doc(`/tmp/d/de_${ma}.json`)
+            const ids = (b) => new Set(['phanI', 'phanII', 'phanIII'].flatMap((p) => (Array.isArray(b?.[p]) ? b[p] : []).map((q) => String(q?.id ?? q?.qid ?? ''))))
+            const idKey = ids(key), idDe = ids(de)
+            if (keyThay) console.log(`(tờ đáp án R2 không đọc được từ CI — dùng tờ THAY THẾ dựng từ ${ctc.length} dòng chi_tiet_cau của ca)`)
+            console.log(`tờ đáp án ${keyThay ? 'thay thế' : 'R2'}: ${key ? `${idKey.size} câu (I ${key.phanI?.length} · II ${key.phanII?.length} · III ${key.phanIII?.length}) · soCau ${JSON.stringify(key.soCau ?? null)} · bản đồ chụp ${Object.keys((key.boTheoEm?.bo ?? key.boTheoEm) || {}).length} em` : 'KHÔNG CÓ'} · gói đề R2: ${de ? idDe.size + ' câu' : 'KHÔNG CÓ'}`)
+            const luot = kq(`/tmp/d/luot_${ma}.json`)
+            // Thời gian từ lúc thầy bắt đầu tới lúc lượt của em được tạo (em bấm vào / máy em tự vào từ phòng chờ).
+            const tre = luot.filter((l) => Number(l.lan_thu) === 1).map((l) => giay(l.vao_luc, ca.bat_dau_thi_luc)).filter((x) => x !== null)
+            console.log(`vào sau mốc bắt đầu (giây, lượt 1): n ${tre.length} · p50 ${pt(tre, 0.5)} · p90 ${pt(tre, 0.9)} · max ${pt(tre, 1)} · âm (vào trước mốc) ${tre.filter((x) => x < 0).length}`)
+            const choToiBatDau = luot.map((l) => giay(ca.bat_dau_thi_luc, l.cho_luc)).filter((x) => x !== null)
+            console.log(`chờ trong phòng tới mốc bắt đầu (giây): n ${choToiBatDau.length} · p50 ${pt(choToiBatDau, 0.5)} · max ${pt(choToiBatDau, 1)}`)
+            const chan = kq(`/tmp/d/chan_${ma}.json`)
+            const chanTheoEm = new Map()
+            for (const c of chan) { const k = h(c.sbd); const a = chanTheoEm.get(k) ?? []; a.push(`${c.ly_do}@${vn(c.luc)}`); chanTheoEm.set(k, a) }
+            // Chấm thử bằng lõi máy chủ.
+            const dsLuot = luot.map((l) => {
+              const da = j(l.dap_an_json)
+              const bai = da && typeof da === 'object' ? { phanI: da.phanI ?? {}, phanII: da.phanII ?? {}, phanIII: da.phanIII ?? {} } : null
+              const s = (v) => (v === null || v === undefined || !Number.isFinite(Number(v)) ? null : Number(v))
+              return { sbd: String(l.sbd), hoTen: '', lanThu: Number(l.lan_thu) || 1, trangThai: String(l.trang_thai), dapAn: bai, giayCau: j(l.giay_cau_json), diem: { I: s(l.diem_i), II: null, III: null, tong: s(l.tong) } }
+            })
+            let cham = null
+            if (key && Array.isArray(key.phanI)) {
+              try { cham = chamLaiMotCa(ma, '', key, dsLuot, j(ca.so_cau_json), j(ca.bo_theo_em_json)) } catch (e) { console.log('chấm thử lỗi:', String(e?.message ?? e).slice(0, 200)) }
+            }
+            const tuChoi = new Map((cham?.tuChoi ?? []).map((t) => [t.sbd, t.viSao]))
+            const dat = new Map((cham?.em ?? []).map((e) => [e.sbd, e]))
+            const canh = new Map((cham?.canhBao ?? []).map((c) => [c.sbd, c.ma]))
+            console.log(`chấm thử (lõi máy chủ, tờ R2 + bản đồ D1): chấm được ${dat.size} · từ chối ${tuChoi.size} · cảnh báo ${canh.size}`)
+            console.log('em | lần | trạng thái | vào | nộp | cập nhật | có điểm | số câu đã trả lời | dòng chi tiết | nhận xét(máy chủ) | bổ sung | bộ D1 | rời màn | ghi chú | chấm thử | chặn vào')
+            const tt = { dang_lam: 0, da_nop: 0, khoa: 0 }
+            for (const l of [...luot].sort((a, b) => String(a.nop_luc ?? a.vao_luc).localeCompare(String(b.nop_luc ?? b.vao_luc)))) {
+              const da = j(l.dap_an_json) ?? {}
+              const soTl = Object.keys(da.phanI ?? {}).length + Object.keys(da.phanII ?? {}).length + Object.keys(da.phanIII ?? {}).length
+              const bo = Array.isArray(boD1?.[l.sbd]) ? boD1[l.sbd] : null
+              const ngoaiKey = bo ? bo.filter((q) => !idKey.has(q)).length : 0
+              const ngoaiDe = bo ? bo.filter((q) => !idDe.has(q)).length : 0
+              const gc = String(l.ghi_chu ?? '')
+              const gcLoai = !gc ? '-' : /khoá ca|khoa ca/.test(gc) ? 'thay_khoa_ca' : /chốt|chot/.test(gc) ? 'may_chu_chot' : 'khac'
+              // Không in điểm: chỉ «chấm được» + có khớp điểm D1 không.
+              const ketQua = tuChoi.has(l.sbd) ? `TỪ CHỐI: ${String(tuChoi.get(l.sbd)).slice(0, 200)}` : dat.has(l.sbd) ? `chấm được${dat.get(l.sbd).cu.tong === null ? ' (D1 chưa có điểm)' : dat.get(l.sbd).doi ? ' (LỆCH điểm D1)' : ' (khớp D1)'}${canh.has(l.sbd) ? ` cảnh báo ${canh.get(l.sbd).join(',')}` : ''}` : '(không chấm: chưa nộp/không bài)'
+              tt[l.trang_thai] = (tt[l.trang_thai] ?? 0) + 1
+              console.log([h(l.sbd), l.lan_thu, l.trang_thai, vn(l.vao_luc), vn(l.nop_luc), vn(l.cap_nhat_luc), l.tong === null ? 'KHÔNG' : 'có', soTl, l.n_ctc, `${l.n_nx}${l.nx_may_chu === null ? '' : `/${l.nx_may_chu}`}`, l.n_bs, bo ? `${bo.length}${ngoaiKey ? ` (ngoài tờ đáp án ${ngoaiKey})` : ''}${ngoaiDe ? ` (ngoài gói đề ${ngoaiDe})` : ''}` : 'KHÔNG', l.so_lan_roi_man, gcLoai, ketQua, (chanTheoEm.get(h(l.sbd)) ?? []).join(' ')].join(' | '))
+            }
+            // Lượt CHƯA CÓ ĐIỂM: dòng chi tiết câu ghi lúc nào (đường nào ghi), bộ câu có nằm trọn trong tờ đáp án (thay thế) không.
+            const ctcTheo = new Map()
+            for (const r of ctc) { const k = `${r.sbd}|${r.lan_thu}`; const a = ctcTheo.get(k) ?? []; a.push(r.cap_nhat_luc); ctcTheo.set(k, a) }
+            for (const l of luot.filter((x) => x.tong === null)) {
+              const a = (ctcTheo.get(`${l.sbd}|${l.lan_thu}`) ?? []).sort()
+              const bo = Array.isArray(boD1?.[l.sbd]) ? boD1[l.sbd] : []
+              console.log(`CHƯA ĐIỂM ${h(l.sbd)}: dòng chi tiết ${a.length} (ghi ${vn(a[0])}–${vn(a[a.length - 1])}) · bộ câu ${bo.length}, có trong tờ ${bo.filter((q) => idKey.has(q)).length} · rời màn ${l.so_lan_roi_man} · hết giờ ${vn(l.het_gio_luc)}`)
+            }
+            const soKhop = [...dat.values()].filter((e) => e.cu.tong !== null && !e.doi).length
+            const soLech = [...dat.values()].filter((e) => e.cu.tong !== null && e.doi).length
+            console.log(`đối chiếu lõi chấm với điểm D1 đang có: khớp ${soKhop} · lệch ${soLech} · D1 chưa điểm mà lõi chấm được ${[...dat.values()].filter((e) => e.cu.tong === null).length}`)
+            // Em bị chặn mà KHÔNG có lượt.
+            const coLuot = new Set(luot.map((l) => h(l.sbd)))
+            const chanKhongLuot = [...chanTheoEm].filter(([k]) => !coLuot.has(k))
+            console.log(`em bị chặn vào và KHÔNG có lượt: ${chanKhongLuot.length}`)
+            for (const [k, a] of chanKhongLuot) console.log(`  ${k} | ${a.join(' ')}`)
+            console.log(`tổng lượt theo trạng thái: ${JSON.stringify(tt)}`)
+          }
+          JS

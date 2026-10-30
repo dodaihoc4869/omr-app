@@ -2024,17 +2024,30 @@ export async function noiKhoCa(env: Env, b: Record<string, unknown>): Promise<Re
 
   const nay = NAY()
   const tatCaCau = [...pI, ...pII, ...pIII]
-  const lenh = tatCaCau.slice(0, 400).map((c) => {
+  // TỐC ĐỘ BẮT ĐẦU CA (30/10, ca 269333): máy thầy nối 344 câu ngoài kho lúc bấm Bắt đầu ⇒ bản cũ chạy NỐI TIẾP 4 lô ghi `kho_ca_them` (100 câu ghi/lô)
+  // + 2 lượt đọc–ghi R2 + 1 câu ghi `ca` — D1 nghẽn tối 30/10 ⇒ quá 25 giây, máy thầy bỏ cả 344 câu (đề «rút câu sai» mất câu sai cũ).
+  // Nay: `kho_ca_them` ghi bằng MỘT câu `json_each` mỗi lô ~0,9 MB (thường 1 câu), cùng câu `ca` trong MỘT batch (một vòng D1); hai đối tượng R2
+  // (`de/`, `key/`) độc lập nhau ⇒ đọc–ghi SONG SONG với lượt D1. Cùng dữ liệu ghi, cùng luật thêm/không ghi đè như cũ.
+  const dong = tatCaCau.slice(0, 400).map((c) => {
     const qid = chuoi(c.id || c.qid)
-    const da = dapAnMap.get(qid) || ''
-    return env.DB.prepare(
-      `INSERT INTO kho_ca_them (khoa, ma_ca, qid, cau_json, dap_an, luc) VALUES (?, ?, ?, ?, ?, ?)
-       ON CONFLICT(khoa) DO UPDATE SET cau_json = excluded.cau_json, dap_an = excluded.dap_an, luc = excluded.luc`,
-    ).bind(`${maCa}|${qid}`, maCa, qid, JSON.stringify(c), da, nay)
+    return [`${maCa}|${qid}`, qid, JSON.stringify(c), dapAnMap.get(qid) || '']
   })
-  for (let i = 0; i < lenh.length; i += 100) await env.DB.batch(lenh.slice(i, i + 100))
-
-  if (env.DE && tatCaCau.length > 0) {
+  const cauGhi: D1PreparedStatement[] = []
+  for (let i = 0; i < dong.length; ) {
+    const lo: string[][] = []
+    let byte = 0
+    while (i < dong.length && (lo.length === 0 || byte + dong[i]![2]!.length < 900_000)) { byte += dong[i]![2]!.length; lo.push(dong[i++]!) }
+    cauGhi.push(
+      env.DB.prepare(
+        `INSERT INTO kho_ca_them (khoa, ma_ca, qid, cau_json, dap_an, luc)
+         SELECT json_extract(value, '$[0]'), ?, json_extract(value, '$[1]'), json_extract(value, '$[2]'), json_extract(value, '$[3]'), ? FROM json_each(?) WHERE true
+         ON CONFLICT(khoa) DO UPDATE SET cau_json = excluded.cau_json, dap_an = excluded.dap_an, luc = excluded.luc`,
+      ).bind(maCa, nay, JSON.stringify(lo)),
+    )
+  }
+  cauGhi.push(env.DB.prepare('UPDATE ca SET cap_nhat_luc = ? WHERE ma_ca = ?').bind(nay, maCa))
+  const ghiD1 = async (): Promise<void> => { await env.DB.batch(cauGhi) }
+  const noiDe = async (): Promise<void> => {
     // 1. Cập nhật de/${maCa}.json trong R2
     try {
       const oDe = await env.DE.get(`de/${maCa}.json`)
@@ -2059,7 +2072,8 @@ export async function noiKhoCa(env: Env, b: Record<string, unknown>): Promise<Re
         }
       }
     } catch {}
-
+  }
+  const noiKey = async (): Promise<void> => {
     // 2. Cập nhật key/${maCa}.json trong R2
     try {
       const oKey = await env.DE.get(`key/${maCa}.json`)
@@ -2091,11 +2105,11 @@ export async function noiKhoCa(env: Env, b: Record<string, unknown>): Promise<Re
       }
     } catch {}
   }
-
-  await env.DB.prepare('UPDATE ca SET cap_nhat_luc = ? WHERE ma_ca = ?').bind(nay, maCa).run().catch(() => {})
+  const coR2 = !!env.DE && tatCaCau.length > 0
+  await Promise.all([ghiD1(), coR2 ? noiDe() : null, coR2 ? noiKey() : null])
   xoaDemCaBaoVe(); xoaDemPhongCho(env) // HẠ TẢI D1 (Boss 22/09): nối kho vào ca ⇒ bỏ đệm `protectedQuestions` ngay
 
-  return { ok: true, themBank: lenh.length, themKey: dapAnMap.size }
+  return { ok: true, themBank: dong.length, themKey: dapAnMap.size }
 }
 
 

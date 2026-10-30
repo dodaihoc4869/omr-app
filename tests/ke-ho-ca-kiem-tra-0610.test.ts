@@ -194,7 +194,7 @@ describe('Việc 1 — chốt lúc Bắt đầu thi rút lại khi có lượt m
     expect(chot.boTheoEm.A).toEqual(boCua(rt.kq, 'A'))
   })
 
-  it('có lượt mới của MỘT em ⇒ rút lại CẢ LỚP bằng hồ sơ mới; câu em vừa làm không còn là câu "mới"; báo số em', async () => {
+  it('có lượt mới của MỘT em ⇒ rút lại CẢ LỚP bằng hồ sơ mới (chỉ ĐỌC LẠI hồ sơ em đó — 30/10); câu em vừa làm không còn là câu "mới"; báo số em', async () => {
     const rt = await chayThuRutDeCa('', 'MAT', 'CA-M', ['A', 'B', 'C'], { cheDo: 'ca', ngay: NGAY })
     const boA = boCua(rt.kq, 'A')
     const vuaLam = boA[0]!
@@ -202,12 +202,16 @@ describe('Việc 1 — chốt lúc Bắt đầu thi rút lại khi có lượt m
     coLuotMoiTheoEm.mockResolvedValue({ em: ['A'] })
     const chot = await chotRutDeCa('', 'MAT', 'CA-M', ['A', 'B', 'C'], { cheDo: 'ca', ngay: NGAY, phamVi: 'gan_nhat' })
     expect(loiDenHanTheoEm).toHaveBeenCalledTimes(2)
-    expect(loiDenHanTheoEm.mock.calls[1]![2]).toEqual(['A', 'B', 'C']) // rút lại toàn bộ, không chỉ A
+    // TỐC ĐỘ BẮT ĐẦU CA (30/10): chỉ ĐỌC LẠI hồ sơ của em có lượt mới (B, C không đổi ⇒ dùng lại bản thô đã đọc); thang lấp vẫn chạy lại CẢ LỚP.
+    expect(loiDenHanTheoEm.mock.calls[1]![2]).toEqual(['A'])
     expect(chot.soEmCapNhat).toBe(1)
     expect(chot.boTheoEm.A).not.toContain(vuaLam) // kho 12 câu, đủ câu mới ⇒ em không nhận lại câu vừa làm
     expect(chot.boTheoEm.A).toHaveLength(4)
     expect(docRutThu('CA-M')!.hoSo.A!.daGap[vuaLam]).toBe(NGAY) // bản đồ lưu đã cập nhật
     expect(chot.canhBao.join(' ')).toBe('')
+    // Y HỆT bản đọc lại toàn bộ: rút lại cả lớp từ hồ sơ đọc mới hết ⇒ cùng bộ câu cho MỌI em.
+    const toanBo = await chayThuRutDeCa('', 'MAT', 'CA-M', ['A', 'B', 'C'], { cheDo: 'ca', ngay: NGAY })
+    for (const s of ['A', 'B', 'C']) expect(chot.boTheoEm[s]).toEqual(boCua(toanBo.kq, s))
   })
 
   it('em vào phòng chờ sau chạy thử cũng được xét lượt mới (danh sách = lớp ∪ phòng chờ)', async () => {

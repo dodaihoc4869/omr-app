@@ -59,6 +59,7 @@ import {docPhutCaDaThem,phutKhongHaSauKhiThem,themPhutCa} from './them-phut'
 import { doiTenHocSinh } from './doi-ten-hoc-sinh'
 import { capNhatTrangThaiToChieu, guiLenhToChieu, layLenhMoiToChieu, layPhienToChieu, taoHoacCapNhatPhienToChieu } from './to-chieu-remote'
 import {chuanBiChamLaiCa} from './cham-lai-ca'
+import {chamBuCa, cronChamBu} from './cham-bu'
 import {kiemChamCa} from './kiem-cham'
 import {phucHoiKeyCa} from './key-bank-bo-sung'
 import {buSoCauChoKeyBank, hopNhatKeyBank} from './key-bank-hop-nhat'
@@ -3364,6 +3365,9 @@ const boXuLy = {
     if(await cronResetHoa2(env,Date.now()).catch(e=>{console.error('[reset-hoa2] cron lỗi:',e);return false}))return
     // CAO ĐIỂM 20:00–23:59 giờ VN (thầy 29/09: em làm bài dồn vào khung này): cron mỗi phút nhẹ tối đa — việc không bắt buộc dời/thưa ra (xem dưới).
     if(event.cron==='* * * * *') {
+      // CHẤM BÙ (30/10, cham-bu.ts): lượt ĐÃ NỘP ≥ 2 phút mà chưa có điểm (3 giờ gần nhất) ⇒ chấm bằng lõi máy chủ, ghi qua `chamDiem`. Không có việc ⇒ một câu đọc nhỏ.
+      {const p=cronChamBu(env,Date.now(),chamDiem).then(r=>{if(r.soLuot)console.log('[cham-bu] cron',JSON.stringify(r))}).catch(e=>console.error('[cham-bu] cron lỗi:',e))
+      if(ctx?.waitUntil)ctx.waitUntil(p);else await p}
       await import('./kiem-tra-ca-nhan').then(m=>m.dongBoKtCn(env,Date.now(),2,true,new Date(Date.now()+7*3600000).getUTCHours()<19)).catch(e=>console.error('[kiem-tra-ca-nhan] cron',e))
       await import('./goi-bai-7').then(m=>m.dongBoGoi7(env,Date.now())).catch(e=>console.error('[goi7] đồng bộ',e))
       // B2 (15/10): dựng lại bảng siêu dữ liệu câu tính sẵn cho tờ vừa lập chỉ mục (cau-meta.ts). Thường ngày không tờ nào lệch ⇒ một câu đọc nhẹ.
@@ -4032,6 +4036,12 @@ const boXuLy = {
       if (p === '/cham-diem') return chamDiem(env, b)
       // CHẤM LẠI MỘT CA CŨ bằng luật chấm hiện hành rồi ghi lại D1 (thầy chốt 23/09 — việc còn lại của MỤC 3).
       if (p === '/ca/cham-lai') return chamLaiCaRoute(env, b)
+      // CHẤM BÙ MỘT CA (30/10): CHỈ lượt đã nộp mà CHƯA có điểm — không đụng điểm đã có. `xemTruoc: true` ⇒ chấm nhưng KHÔNG ghi (thầy xem trước).
+      if (p === '/ca/cham-bu') {
+        const maCa = String(b.maCa ?? '').trim()
+        if (!maCa) return ra({ ok: false, error: 'Thiếu mã ca' })
+        return ra(await chamBuCa(env, maCa, chamDiem, { xemTruoc: b.xemTruoc === true }))
+      }
       // KIỂM CHẤM MỘT CA — CHỈ ĐỌC (thầy 06/10): đối chiếu điểm + chi tiết câu + bản đồ câu sai đã ghi với kết quả chấm lại; trả số đếm và mẫu, KHÔNG ghi gì.
       if (p === '/ca/kiem-cham') {
         const maCa = String(b.maCa ?? '').trim()
