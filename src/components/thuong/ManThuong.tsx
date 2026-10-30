@@ -15,6 +15,7 @@ import { ManCuaHang, ManCuocKetQua, ManDatLaiTinhThe, ManNhiemVu, ManThangHoa } 
 import { ManHuyHieu, ManHuyHieuMoi } from './ManHuyHieu'
 import { BaoGoCua, ManHocCungBan, ManLoiMoi, ManMocDoi, ManMoiBan } from './ManBan'
 import { ManKimCuong, ManKimCuongDs } from './ManKimCuong'
+import { TamHuongDan, type LoaiBieuTuong, type ManHuongDan } from './TamHuongDan'
 
 export { ManBinhDaDo, ManChuoiNgay, ManCuuChuoi, ManMocChuoi, ManCuoiTuan, ManGiaiTuan, ManCuaHang, ManCuocKetQua, ManNhiemVu, ManThangHoa, ManHuyHieu, ManHuyHieuMoi,
   BaoGoCua, ManHocCungBan, ManLoiMoi, ManMocDoi, ManMoiBan, ManKimCuong, ManKimCuongDs }
@@ -22,7 +23,11 @@ export { ManBinhDaDo, ManChuoiNgay, ManCuuChuoi, ManMocChuoi, ManCuoiTuan, ManGi
 // Màn phủ tạm đóng app (hoc-tap/PhuTamDong.tsx) đi CÙNG mảnh nạp lười này (28/10, tác tử tốc độ): Lộ trình không cõng nó, không thêm tệp precache / mảnh mới.
 export { PhuTamDong } from '../hoc-tap/PhuTamDong'
 // Tấm hướng dẫn lửa / nguyên tử / tinh thể (thầy 30/10): cùng mảnh nạp lười này (ThanhThuong + màn làm chặng nạp khi em chạm biểu tượng).
-export { TamHuongDan } from './TamHuongDan'
+export { TamHuongDan }
+/** MỘT cửa nạp lười cho thanh số (ThanhThuong): `hd` ⇒ thẻ hướng dẫn, không ⇒ tấm thông báo thưởng — thanh số chỉ cõng MỘT lazy (đường mở app học sinh nhẹ hơn). */
+export function PhuThanhThuong(p: { hd?: LoaiBieuTuong; token: string; tq: TongQuanThuong; onHoc?: () => void; onMo?: (man: ManHuongDan) => void; onDong: () => void }) {
+  return p.hd ? <TamHuongDan loai={p.hd} tq={p.tq} onMo={p.onMo} onDong={p.onDong} /> : <ThongBaoThuong token={p.token} tongQuan={p.tq} onHoc={p.onHoc} />
+}
 export type TenManThuong = 'chuoi' | 'giai' | 'nhiem-vu' | 'cua-hang' | 'huy-hieu' | 'ban' | 'moi-ban' | 'kim-cuong'
 export interface PropsManThuong {
   man: TenManThuong
