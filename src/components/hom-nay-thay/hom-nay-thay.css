@@ -259,3 +259,60 @@ html:not([data-trong]) .gvhn-the-nut > .gvhn-the-chu { flex: 1 1 120px; }
   .nht-bac-xep { width: 100%; }
   .nht-tab[data-so='2'] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* ── BẰNG CHỨNG CỦA MỘT EM (thầy 30/10, BangChungEm.tsx): khối đầu tấm Hồ sơ — kết luận (nhãn màu) rồi số chứng minh. Màu: biến «Trong» --tr-* (app thầy
+   mặc định), lùi về bảng màu thầy --gvm-* khi tắt «Trong». Dải ngày dùng ĐÚNG màu bảng nhiệt Nhịp học (--gvm-xl / hp / ho). Chữ dài xuống dòng, không cắt. */
+.bce { display: flex; flex-direction: column; gap: 12px; margin: 0 0 16px; padding: 16px; border: 1px solid var(--tr-vien, var(--gvm-vien)); border-radius: 18px; background: var(--tr-mat, var(--gvm-mat)); color: var(--tr-chu, var(--gvm-chu)); }
+.bce h3 { margin: 0; font-size: 18px; font-weight: 800; line-height: 1.3; }
+.bce h4 { margin: 0 0 8px; color: var(--tr-chu-2, var(--gvm-chu-2)); font-size: 14px; font-weight: 800; letter-spacing: .02em; }
+.bce-chip { display: flex; flex-wrap: wrap; gap: 6px; }
+.bce-chip > span { padding: 4px 10px; border-radius: 999px; background: var(--tr-mat-2, var(--gvm-mat-2)); color: var(--tr-chu, var(--gvm-chu)); font-size: 13.5px; font-weight: 800; line-height: 1.35; overflow-wrap: anywhere; }
+.bce-chip > [data-k='luoi'] { background: var(--tr-sai-nhat, var(--gvm-ho-nen)); color: var(--tr-sai-chu, var(--gvm-ho-dam)); }
+.bce-chip > [data-k='cham'] { background: var(--tr-dung-nhat, var(--gvm-xl-nen)); color: var(--tr-dung-chu, var(--gvm-xl-dam)); }
+.bce-chip > [data-k='chua-deu'] { background: var(--tr-chu-y-nhat, var(--gvm-hp-nen)); color: var(--tr-chu-y-chu, var(--gvm-hp-dam)); }
+.bce-chip > [data-k='hoc-that'] { background: var(--tr-sao-nhat, var(--gvm-hp-nen)); color: var(--tr-sao-chu, var(--gvm-hp-dam)); }
+.bce-chip > [data-k='nang'] { background: var(--tr-sai, var(--gvm-ho)); color: var(--tr-trang, var(--gvm-tren-dac)); }
+.bce-chip > [data-k='doi-pho'] { background: var(--tr-tin-nhat, var(--gvm-xd-nen)); color: var(--tr-tin-chu, var(--gvm-xd-dam)); }
+.bce-khoi { padding-top: 12px; border-top: 1px solid var(--tr-vien, var(--gvm-vien)); }
+.bce-luat { margin: 0 0 10px; color: var(--tr-chu-2, var(--gvm-chu-2)); font-size: 14px; line-height: 1.5; }
+.bce-luat b { color: var(--tr-chu, var(--gvm-chu)); }
+.bce-luoi { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 8px; }
+.bce-o { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 10px 12px; border-radius: 12px; background: var(--tr-mat-2, var(--gvm-mat-2)); }
+.bce-o b { font-size: 22px; font-weight: 800; line-height: 1.15; }
+.bce-o span { color: var(--tr-chu-3, var(--gvm-chu-3)); font-size: 12.5px; line-height: 1.35; overflow-wrap: anywhere; }
+.bce-o[data-sac='xau'] b { color: var(--tr-sai-chu, var(--gvm-ho)); }
+.bce-o[data-sac='tot'] b { color: var(--tr-dung-chu, var(--gvm-xl)); }
+.bce-nhan { margin: 10px 0 0; color: var(--tr-chu-2, var(--gvm-chu-2)); font-size: 14px; line-height: 1.5; }
+.bce-nhan[data-sac='xau'] b { color: var(--tr-sai-chu, var(--gvm-ho)); }
+/* dải từng ngày: ô có số câu em làm, ngày dưới ô; nhiều ngày ⇒ xuống hàng (không cuộn ngang) */
+.bce-ngay { display: flex; flex-wrap: wrap; gap: 6px 4px; margin: 12px 0 0; padding: 0; list-style: none; }
+.bce-ngay li { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 34px; }
+.bce-o-ngay { display: grid; place-items: center; width: 34px; height: 30px; border-radius: 8px; background: var(--gvm-mat-2); font-size: 12.5px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.bce-o-ngay[data-muc='du'], .bce-chu-giai i[data-muc='du'] { background: var(--gvm-xl-nen); color: var(--gvm-xl-dam); }
+.bce-o-ngay[data-muc='thieu-it'], .bce-chu-giai i[data-muc='thieu-it'] { background: var(--gvm-hp-nen); color: var(--gvm-hp-dam); }
+.bce-o-ngay[data-muc='thieu-nhieu'], .bce-chu-giai i[data-muc='thieu-nhieu'] { background: var(--gvm-ho-nen); color: var(--gvm-ho-dam); }
+.bce-o-ngay[data-muc='khong-lam'], .bce-chu-giai i[data-muc='khong-lam'] { background: var(--gvm-ho); color: var(--gvm-tren-dac); }
+.bce-o-ngay[data-muc='hom-nay'] { background: var(--gvm-mat); box-shadow: inset 0 0 0 2px var(--gvm-xd); }
+.bce-o-ngay[data-muc='chua-vao'] { background: transparent; box-shadow: inset 0 0 0 1px var(--gvm-vien); color: var(--gvm-chu-3); }
+.bce-ngay small { color: var(--tr-chu-3, var(--gvm-chu-3)); font-size: 11px; font-variant-numeric: tabular-nums; }
+.bce-chu-giai { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 8px 0 0; color: var(--tr-chu-3, var(--gvm-chu-3)); font-size: 12px; line-height: 1.4; }
+.bce-chu-giai span { display: inline-flex; align-items: center; gap: 5px; }
+.bce-chu-giai i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; box-shadow: inset 0 0 0 1px var(--gvm-vien); }
+.bce-ds { display: flex; flex-direction: column; gap: 6px; margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+.bce-diem { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+.bce-diem > b { flex: none; display: flex; align-items: baseline; gap: 2px; font-size: 40px; font-weight: 900; line-height: 1; color: var(--tr-sao-chu, var(--gvm-hp-dam)); }
+.bce-diem > b[data-bac='2'] { color: var(--tr-chu-y-chu, var(--gvm-hp-dam)); }
+.bce-diem > b:is([data-bac='3'], [data-bac='4'], [data-bac='5']) { color: var(--tr-sai-chu, var(--gvm-ho)); }
+.bce-diem > b small { color: var(--tr-chu-3, var(--gvm-chu-3)); font-size: 15px; font-weight: 700; }
+.bce-diem > span { display: flex; flex-direction: column; gap: 2px; min-width: 0; color: var(--tr-chu-2, var(--gvm-chu-2)); font-size: 13.5px; line-height: 1.45; }
+.bce-diem > span b { color: var(--tr-chu, var(--gvm-chu)); font-size: 15px; }
+.bce-phat { display: flex; flex-direction: column; gap: 4px; margin: 10px 0; padding: 0; list-style: none; }
+.bce-phat li { display: flex; align-items: baseline; gap: 10px; padding: 6px 10px; border-radius: 10px; background: var(--tr-mat-2, var(--gvm-mat-2)); font-size: 14px; line-height: 1.45; }
+.bce-phat li[data-xau] { background: var(--tr-sai-nhat, var(--gvm-ho-nen)); }
+.bce-phat li span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.bce-phat li b { flex: none; color: var(--tr-sai-chu, var(--gvm-ho)); font-weight: 900; }
+@media (max-width: 600px) {
+  .bce { padding: 12px; border-radius: 14px; }
+  .bce-luoi { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .bce-diem > b { font-size: 34px; }
+}
