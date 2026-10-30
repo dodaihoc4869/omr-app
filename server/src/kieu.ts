@@ -66,6 +66,8 @@ export interface DurableObjectState {
   setWebSocketAutoResponse?(cap: unknown): void
   /** Lần cuối phòng TỰ trả lời gói ping của kết nối này (không cần thức dậy); chưa có ⇒ null. */
   getWebSocketAutoResponseTimestamp?(ws: WsMayChu): Date | null
+  /** Giữ ngăn sống tới khi việc nền xong (ngăn riêng học sinh — `ctx.waitUntil` của lệnh chạy trong ngăn). */
+  waitUntil(p: Promise<unknown>): void
 }
 export interface Env {
   PUSH_PUBLIC_KEY?: string
@@ -76,6 +78,10 @@ export interface Env {
   BAN_BIA?: DurableObjectNamespace
   /** Trạm gọi Gemini ghim châu Đại Dương (server/src/tram-gemini.ts) — chỉ dùng khi Google chặn vị trí trạm đang chạy. Vắng ⇒ gọi thẳng. */
   TRAM_GEMINI?: DurableObjectNamespace
+  /** Ngăn riêng từng học sinh (server/src/ngan-hoc-sinh.ts, 30/10): mọi lệnh app học sinh của một em vào cùng một Durable Object ⇒ đệm luôn ấm. Vắng ⇒ đường cũ. */
+  NGAN_HS?: DurableObjectNamespace
+  /** Công tắc khẩn: có giá trị ⇒ KHÔNG đi qua ngăn riêng (đường cũ y nguyên). */
+  TAT_NGAN_HS?: string
   /** Mã bí mật của thầy — đặt bằng `wrangler secret put MA_BI_MAT`, KHÔNG vào git. */
   MA_BI_MAT: string
   /** Khoá Gemini (Google AI Studio) cho phần hỏi thêm Thầy (server/src/hoi-tro-ly.ts) — Worker secret, KHÔNG vào git. Vắng ⇒ phần này tắt. */
