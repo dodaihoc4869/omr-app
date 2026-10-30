@@ -26,9 +26,9 @@ export const datCheDoGoiNgay = (m: CheDoGoiNgay = GOI_NGAY_CHE_DO): void => { ch
 /** Tài khoản thử của thầy (29/10). */
 export const SBD_THU: ReadonlySet<string> = new Set(['12121212'])
 export const CAU_MOI_CHANG = 6
-/** Số chặng của một gói: chặng kế + MỘT chặng dự phòng. Máy em lập lại gói NỀN sau mỗi chặng (câu sửa lỗi mới, bài thầy vừa giao) ⇒ không cần dư hơn; gói nhỏ
- *  ⇒ lượt lập gói đọc ít câu (≈ lượt mở chặng cũ), không dồn thêm tải D1 giờ cao điểm. */
-export const SO_CHANG_GOI = 2
+/** Số chặng của một gói: chặng kế + HAI chặng dự phòng (thầy 30/10 «tăng lên 3 chặng đi»). Máy em lập lại gói NỀN sau mỗi chặng (câu sửa lỗi mới, bài thầy vừa giao);
+ *  dư hai nhịp ⇒ mạng yếu / giờ cao điểm lượt lập lại về chậm hay hỏng một lần vẫn có chặng sẵn. Không lập cả ngày: mỗi lượt lập đọc + niêm phong đúng số câu này. */
+export const SO_CHANG_GOI = 3
 export const SO_CAU_GOI_NGAY = SO_CHANG_GOI * CAU_MOI_CHANG
 export const goiNgayBat = (sbd: string): boolean => cheDo === 'bat' || (cheDo === 'thu' && SBD_THU.has(sbd))
 const aadVe = (sbd: string, ngay: string) => `goi-ngay|${sbd}|${ngay}`
