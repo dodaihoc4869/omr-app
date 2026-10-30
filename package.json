@@ -20,7 +20,7 @@
     "kiem:sw": "node scripts/kiem-sw.mjs",
     "kiem:mau-giu": "node scripts/kiem-mau-giu-nguyen.mjs",
     "kiem:kho-so-o": "esbuild scripts/kiem-kho-so-o.ts --bundle --platform=node --format=esm --target=node22 --outfile=/tmp/kiem-kho-so-o.mjs --log-level=warning && node /tmp/kiem-kho-so-o.mjs",
-    "kiem:toc-do": "node scripts/kiem-toc-do-tai.mjs && vitest run tests/toc-do-may-chu-lenh-nong-1310.test.ts tests/toc-do-may-chu-ph-2110.test.ts tests/toc-do-may-chu-nop-2710.test.ts tests/san-sang-2710.test.ts --fileParallelism=false --reporter=dot",
+    "kiem:toc-do": "node scripts/kiem-toc-do-tai.mjs && vitest run tests/toc-do-may-chu-lenh-nong-1310.test.ts tests/toc-do-may-chu-ph-2110.test.ts tests/toc-do-may-chu-nop-2710.test.ts tests/san-sang-2710.test.ts --reporter=dot",
     "test:d1": "vitest run --config vitest.config.d1.ts"
   },
   "dependencies": {
