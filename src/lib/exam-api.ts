@@ -224,6 +224,8 @@ export type KetQuaVaoThi =
       thoiGianPhut: number
       congBo: CongBoDiem
       tenCa: string
+      /** Vé vào Sảnh đấu «Đấu Nguyên Tử» (game phòng chờ). Vắng ⇒ máy chủ tắt game mạng, em chỉ Tập với A.I. */
+      veDau?: string
     }
   | {
       ok: true
@@ -863,6 +865,7 @@ async function vaoThiQuaMayChuMoi(
       thoiGianPhut: Number(r.thoiGianPhut) || 45,
       congBo: (r.congBo ?? 'khong') as CongBoDiem,
       tenCa: String(r.tenCa ?? ''),
+      veDau: r.veDau || undefined,
     }
   }
   // Máy chủ nói "được vào" mà không nói vào bằng cách nào: dáng trả lời hỏng.

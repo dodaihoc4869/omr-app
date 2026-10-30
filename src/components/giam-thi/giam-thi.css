@@ -53,6 +53,12 @@
 .gtv :is(.gt-cuoi, .gt-nham).on { opacity: 1; }
 .gtv .gt-hieu > *, .gtv :is(.gt-tick, .gt-cheo) { opacity: 0; }
 
+/* Đèn pha đội đầu (chỉ màn kiểm tra kiểu Duo — giam-thi-nguoi.ts `den`): bật ⇒ kính vàng + quầng sáng. Chỉ opacity / fill của ba hình trong nhóm. */
+.gtn .gt-den-sang { opacity: 0; transition: opacity .16s ease-out; }
+.gtn .gt-den[data-bat] .gt-den-sang { opacity: .55; }
+.gtn .gt-den-kinh { transition: fill .16s ease-out; }
+.gtn .gt-den[data-bat] .gt-den-kinh { fill: var(--gn-sao) !important; }
+
 /* Khung chứa: thân thở trên lớp HTML (transform, lớp GPU riêng). */
 .gt-o { position: relative; }
 .gt-tho-o { transform-origin: 50% 92%; animation: gt-tho 3.4s ease-in-out infinite; will-change: transform; }

@@ -384,7 +384,7 @@ export default function ExamTakeScreen({ tuCong, onVe }: { tuCong?: TuCongHocSin
   )
   const [dangTraTen, setDangTraTen] = useState(false)
   // PHÒNG CHỜ (thầy chốt 07/09): em đã qua cổng nhưng thầy chưa bấm bắt đầu.
-  const [cho, setCho] = useState<{ tenCa: string; thoiGianPhut: number } | null>(null)
+  const [cho, setCho] = useState<{ tenCa: string; thoiGianPhut: number; maCa?: string; veDau?: string; batDau?: boolean } | null>(null)
   const [loiCho, setLoiCho] = useState('')
   // DANH TÍNH — máy chủ đối chiếu đủ ba (số báo danh, họ tên, năm sinh) với
   // danh sách thầy đã nạp. Nhớ trên máy để lần sau em chỉ gõ mã ca; đây là
@@ -1548,7 +1548,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       // để dựng. Sang màn chờ và hỏi lại máy chủ vài giây một lần.
       if (kq.cach === 'cho') {
         setLop(kq.lop)
-        setCho({ tenCa: kq.tenCa, thoiGianPhut: kq.thoiGianPhut })
+        setCho({ tenCa: kq.tenCa, thoiGianPhut: kq.thoiGianPhut, maCa: maCa.trim(), veDau: kq.veDau })
         setPhase('cho')
         return
       }
@@ -2726,7 +2726,8 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       try {
         const tt = await trangThaiPhongCho(url, maCa.trim())
         if (!con) return
-        if (tt.batDau) void vaoSauBatDau()
+        // Đấu Nguyên Tử: báo game phòng chờ dừng NGAY (đóng kết nối, dừng vẽ) trước khi vào bài.
+        if (tt.batDau) { setCho((c) => (c && !c.batDau ? { ...c, batDau: true } : c)); void vaoSauBatDau() }
       } catch (e) {
         // Ca bị thầy huỷ giữa lúc chờ: nói thẳng, đừng để em đứng mãi.
         if (con) setLoiCho(e instanceof Error ? e.message : 'Mất kết nối — em cứ chờ, máy tự hỏi lại.')
