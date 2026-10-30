@@ -32,20 +32,36 @@ export interface TuyChonHat {
   co?: number
 }
 
-/** Bắn hạt lục giác / sao từ tâm phần tử `el` (toạ độ màn hình lúc gọi). Trả số hạt đã bắn (0 khi yên lặng). */
+const khoLop: HTMLDivElement[] = []
+const khoHat: HTMLElement[] = []
+
+/** Bắn hạt lục giác / sao từ tâm phần tử `el` (toạ độ màn hình lúc gọi). Trả số hạt đã bắn (0 khi yên lặng).
+ *  Tối ưu 60fps máy yếu (30/10): tái sử dụng hồ phần tử DOM (`khoLop` / `khoHat`) trên lớp phủ `contain: strict` để không cấp phát rác bộ nhớ mỗi câu. */
 export function banHat(el: Element | null | undefined, t: TuyChonHat = {}): number {
   if (!el || yenLang()) return 0
   const r = el.getBoundingClientRect()
   if (!r.width && !r.height) return 0
   const so = Math.max(1, Math.min(40, t.so ?? 8)), mau = t.mau ?? MAU_MAC_DINH, ms = t.ms ?? 450, xa = t.xa ?? 64, co = t.co ?? 10
-  const lop = document.createElement('div')
+  const lop = (khoLop.pop() ?? document.createElement('div'))
   lop.setAttribute('aria-hidden', 'true')
   lop.style.cssText = 'position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:80;contain:strict'
   document.body.appendChild(lop)
   const cx = r.left + r.width / 2, cy = t.kieu === 'roi' ? r.top : r.top + r.height / 2
-  let con = so
+  let con = so, daThu = false
+  const hat: HTMLElement[] = []
+  const thuHoi = () => {
+    if (daThu) return
+    daThu = true
+    lop.remove()
+    for (const h of hat) {
+      h.remove()
+      if (khoHat.length < 80) khoHat.push(h)
+    }
+    if (khoLop.length < 4) khoLop.push(lop)
+  }
   for (let i = 0; i < so; i++) {
-    const h = document.createElement('i')
+    const h = khoHat.pop() ?? document.createElement('i')
+    hat.push(h)
     const c = co * (0.7 + ((i * 37) % 10) / 16)
     h.style.cssText = `position:absolute;left:${cx - c / 2}px;top:${cy - c / 2}px;width:${c}px;height:${c}px;background:var(${mau[i % mau.length]});clip-path:${t.hinh === 'sao' ? SAO : LUC_GIAC};will-change:transform,opacity`
     lop.appendChild(h)
@@ -54,16 +70,16 @@ export function banHat(el: Element | null | undefined, t: TuyChonHat = {}): numb
       const dx = (i / so - 0.5) * r.width * 1.1, dy = 140 + ((i * 53) % 9) * 22
       dau = { transform: `translate(${dx * 0.3}px, -10px) rotate(0deg)`, opacity: 0 }
       cuoi = { transform: `translate(${dx}px, ${dy}px) rotate(${200 + i * 23}deg)`, opacity: 0 }
-      h.animate([dau, { opacity: 1, offset: 0.15 }, cuoi], { duration: ms + (i % 5) * 90, delay: (i % 7) * 40, easing: 'ease-in', fill: 'both' }).onfinish = () => { if (--con <= 0) lop.remove() }
+      h.animate([dau, { opacity: 1, offset: 0.15 }, cuoi], { duration: ms + (i % 5) * 90, delay: (i % 7) * 40, easing: 'ease-in', fill: 'both' }).onfinish = () => { if (--con <= 0) thuHoi() }
       continue
     }
     const goc = (i / so) * Math.PI * 2 + (i % 2 ? 0.25 : 0), d = xa * (0.75 + (i % 3) * 0.18)
     dau = { transform: 'translate(0, 0) scale(.4) rotate(0deg)', opacity: 1 }
     cuoi = { transform: `translate(${Math.cos(goc) * d}px, ${Math.sin(goc) * d}px) scale(1) rotate(${90 + i * 30}deg)`, opacity: 0 }
-    h.animate([dau, cuoi], { duration: ms, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'both' }).onfinish = () => { if (--con <= 0) lop.remove() }
+    h.animate([dau, cuoi], { duration: ms, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'both' }).onfinish = () => { if (--con <= 0) thuHoi() }
   }
-  // Rào: trình duyệt hãm hoạt ảnh ở tab ẩn ⇒ vẫn gỡ lớp hạt.
-  window.setTimeout(() => lop.remove(), ms + 1200)
+  // Rào: trình duyệt hãm hoạt ảnh ở tab ẩn ⇒ vẫn gỡ lớp hạt và trả về hồ tái sử dụng.
+  window.setTimeout(thuHoi, ms + 1200)
   return so
 }
 

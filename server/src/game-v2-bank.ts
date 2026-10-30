@@ -87,6 +87,18 @@ export async function dongBoCacTo(env:Env,maDes:readonly string[]):Promise<numbe
   return n
 }
 const SQL_THEO_REF=`SELECT q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE q.ma_de=? AND q.qid=? AND q.version=? AND COALESCE(d.da_xoa,0)=0`
+// ĐỆM 2 TẦNG CÂU THEO REF CHO GIỜ CAO ĐIỂM (30/10 — hàng vạn học sinh cùng mở chặng / nộp câu):
+//  · Tầng 1: RAM isolate (`demCauRef`, TTL 30 s, tối đa 600 câu) ⇒ 0 ms, 0 truy vấn D1 trong cùng isolate.
+//  · Tầng 2: Cloudflare Edge Cache API (`caches.default`, TTL 30 s) ⇒ chia sẻ xuyên qua mọi isolate mới bật tại PoP biên Việt Nam (Hà Nội / TP.HCM / Đà Nẵng), không dội D1 khi hàng nghìn isolate khởi động đồng thời.
+//  · Thầy sửa / xoá đề (`xoaDemSync`) ⇒ xoá ngay đệm RAM và tăng thế hệ khoá biên.
+const demCauRef=new DemTTL<string>(30_000,600)
+let theHeDemRef=1
+let batDemRef=!(globalThis as {process?:{env?:Record<string,string|undefined>}}).process?.env?.VITEST
+export function batDemCauTheoRef(b:boolean):void{batDemRef=b;demCauRef.xoa();theHeDemRef++}
+function edgeCache():{match(u:string):Promise<Response|undefined>;put(u:string,r:Response):Promise<void>}|null{
+  const c=(globalThis as unknown as {caches?:{default?:{match(u:string):Promise<Response|undefined>;put(u:string,r:Response):Promise<void>}}}).caches?.default
+  return c&&typeof c.match==='function'&&typeof c.put==='function'?c:null
+}
 /** Câu ĐẦY ĐỦ (bản mới nhất: lời giải mới nhất) theo tham chiếu của lượt (ma_de, qid, version), chỉ khi tờ còn và chỉ mục khớp nguồn.
  *  Chỉ mục lệch (kho vừa ghi, chưa đồng bộ) ⇒ đồng bộ đúng tờ đó rồi tra lại. `null` ⇒ câu thật sự đổi đề/đáp án hoặc tờ đã rút. */
 export async function docCauTheoRef(env:Env,ref:{maDe:string;qid:string;version:string;btv?:unknown}):Promise<PrivateQuestion|null>{
@@ -95,18 +107,40 @@ export async function docCauTheoRef(env:Env,ref:{maDe:string;qid:string;version:
   // Vòng học v2 (02/10): qid ảo song sinh "<gốc>~ss0|1" ⇒ câu gốc (cùng mã đề, phiên bản) phủ đề/đáp án song sinh.
   // 06/10 (2c): `btv` của ref = phiên bản bộ sinh biến thể `~bt` lúc phát (vắng ⇒ 1; lạ ⇒ lùi câu gốc — ban-khac-ao.ts).
   const ss=tachSongSinh(ref.qid);if(ss.songSinh!==null){const goc=await docCauTheoRef(env,{maDe:ref.maDe,version:ref.version,qid:ss.goc});return goc?phuSongSinhTheoQid(env,goc,ref.qid,ref.btv):null}
+  const now=Date.now(),khoa=`${theHeDemRef}|${ref.maDe}|${ref.qid}|${ref.version}`
+  const urlEdge=`https://edge.omr.internal/cau-ref/${theHeDemRef}/${encodeURIComponent(ref.maDe)}/${encodeURIComponent(ref.qid)}/${encodeURIComponent(ref.version)}`
+  if(batDemRef){
+    const ram=demCauRef.doc(khoa,now)
+    if(ram){try{return JSON.parse(ram) as PrivateQuestion}catch{/* đọc tiếp */}}
+    const ec=edgeCache()
+    if(ec){
+      const hit=await ec.match(urlEdge).catch(()=>undefined)
+      if(hit){
+        const txt=await hit.text().catch(()=>'')
+        if(txt){demCauRef.ghi(khoa,now,txt);try{return JSON.parse(txt) as PrivateQuestion}catch{/* đọc tiếp D1 */}}
+      }
+    }
+  }
   const tra=()=>env.DB.prepare(SQL_THEO_REF).bind(ref.maDe,ref.qid,ref.version).first<{json:string}>()
   let row=await tra()
   if(!row&&await dongBoCacTo(env,[ref.maDe]))row=await tra()
   if(!row)return null
-  try{return JSON.parse(row.json) as PrivateQuestion}catch{return null}
+  try{
+    const parsed=JSON.parse(row.json) as PrivateQuestion
+    if(batDemRef){
+      demCauRef.ghi(khoa,now,row.json)
+      const ec=edgeCache()
+      if(ec)void ec.put(urlEdge,new Response(row.json,{headers:{'content-type':'application/json','cache-control':'public, max-age=30'}})).catch(()=>{})
+    }
+    return parsed
+  }catch{return null}
 }
 /** CAO ĐIỂM (29/09): mỗi lần em mở Đảo, máy em gọi `sync` (rồi lặp tới khi `remaining` = 0) ⇒ 300 em = 300+ lượt quét `de_kho` ×2 mỗi phút, và khi thầy vừa nạp đề
  *  thì MỌI máy cùng lập chỉ mục CÙNG một tờ. Nay: (1) kết quả "đã đủ" (`remaining` = 0) đệm 20 s trong isolate; (2) lượt `sync` đang chạy được chia sẻ (không lập trùng).
  *  Thầy ghi `de_kho` (nạp / sửa / xoá đề) ⇒ `xoaDemSync()` ngay (isolate đó); isolate khác trễ ≤ 20 s — câu của tờ lệch nguồn vẫn tự đồng bộ khi phục vụ (`docCauTheoRef`). */
 const demSyncDu=new DemTTL<true>(20_000,2)
 const syncDangBay=new WeakMap<object,Promise<{remaining:number;indexed:number}>>()
-export function xoaDemSync():void{demSyncDu.xoa()}
+export function xoaDemSync():void{demSyncDu.xoa();demCauRef.xoa();theHeDemRef++}
 export function syncIndex(env:Env):Promise<{remaining:number;indexed:number}> {
   if(demSyncDu.doc('du',Date.now()))return Promise.resolve({remaining:0,indexed:0})
   const k=dbGoc(env.DB as unknown as object),bay=syncDangBay.get(k)

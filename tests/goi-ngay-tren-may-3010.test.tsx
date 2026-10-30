@@ -144,4 +144,41 @@ describe('màn làm bài mở chặng từ gói', () => {
     fireEvent.click(nutKet)
     expect(docChangDangLam('s1')).toBeNull()
   })
+  it('làm vài câu trong chặng (kể cả khi gói thiếu goi7) rồi thoát ra Lộ trình ⇒ đồng bộ tức thì số câu đã làm của chặng thông qua onVa và bản lưu chặng dở', async () => {
+    await napGoiNgay('tk', vi.fn(async () => ({ ...goiMau(), goi7: undefined })))
+    vi.mocked(goiHoa2).mockImplementation(async (ten) => {
+      if (ten === 'hoc-tap-mo-goi') return { ok: true, id: 'phien-sync', qids: ['tn1', 'tn2', 'tn3'], sk: { tn1: 'tem-1', tn2: 'tem-2', tn3: 'tem-3' }, daLam: 0 }
+      if (ten === 'answer') return { ok: true, correct: true, answer: 'B', solution: '' }
+      return { ok: true }
+    })
+    let kqSanh = {
+      cheDo2: true as const,
+      sanh: {
+        ngay: homNayVn(),
+        goi7: { ...G7, daLamHomNay: 0, tuLamCon: 18, tiepCanCon: 6 },
+        hanhTrinh: { tang: 1, toiThieu: 24, daLam: 0, daXep: 24, conThieu: 0, soChang: 4, changHienTai: 1, cauTrongChang: 0 },
+        chienDich: null,
+        theLuc: { con: 24, tong: 24 },
+        huyetChien: false,
+        doan: { con: 0 },
+        dao: { con: 0 },
+        khoaDao: false,
+        loiKhoaDao: '',
+        ruong: { daLam: 0, tong: 24, moDuoc: false, daMo: false, qua: null },
+        bia: null,
+        tamGiuCa: 0,
+        thuSucThem: { duoc: false, soCau: 0 },
+      },
+    }
+    const onVa = vi.fn((f: (k: typeof kqSanh) => typeof kqSanh) => { kqSanh = f(kqSanh) })
+    render(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} onVa={onVa as never} homNay={{ daLam: 0, muc: 24, chang: 1, soChang: 4 }} />)
+    await screen.findByText(TN.text)
+    fireEvent.click(screen.getByRole('radio', { name: /\(CH3\)2NH/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Nộp câu · đã chọn B' }))
+    await screen.findByRole('button', { name: /Câu tiếp theo/ })
+    expect(onVa).toHaveBeenCalled()
+    expect(kqSanh.sanh.goi7.daLamHomNay).toBe(1)
+    expect(kqSanh.sanh.hanhTrinh.daLam).toBe(1)
+    expect(kqSanh.sanh.theLuc.con).toBe(23)
+  })
 })

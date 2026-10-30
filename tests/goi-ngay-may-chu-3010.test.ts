@@ -156,3 +156,58 @@ it('đang có phiên làm dở trong 2 giờ qua ⇒ gói cả ngày ưu tiên �
   const dauGoi = goi.chang.flatMap((c) => c.questions.map((q) => q.qid)).slice(0, conLai.length)
   expect(dauGoi).toEqual(conLai)
 })
+
+it('docDaLamVaVuaLam7: câu có gợi ý / hỗ trợ (assisted=true) vừa nộp khi sổ học chưa kịp ghi nền vẫn được cộng ngay vào soDaLam; câu làm lại cuối chặng thì không', async () => {
+  const k = await kho()
+  const { docDaLamVaVuaLam7 } = await import('../server/src/goi-bai-7')
+  const st = await startGoi7(k.env, 'S1', NOW - 60_000) as { ok: boolean; id: string; questions: { qid: string }[] }
+  const [q1, q2] = [st.questions[0]!.qid, st.questions[1]!.qid]
+  // Ghi câu 1 là câu tiếp cận có gợi ý (assisted: true) vào game_v2_attempt (giả lập lúc su_kien_hoc chưa kịp ghi nền)
+  k.d.sql.prepare('INSERT INTO game_v2_attempt(id,session,sbd,qid,content_group,json,created_at) VALUES(?,?,?,?,?,?,?)')
+    .run(`${st.id}|${q1}`, st.id, 'S1', q1, 'g1', JSON.stringify({ attempt: { assisted: true } }), new Date(NOW - 10_000).toISOString())
+  // Đánh dấu câu 2 trong phiên là lamLaiCuoi=1 và ghi lượt trả lời
+  const row = k.d.sql.prepare('SELECT json FROM game_v2_session WHERE id=?').get(st.id) as { json: string }
+  const sess = JSON.parse(row.json) as { questions: { qid: string; lamLaiCuoi?: number }[] }
+  sess.questions = sess.questions.map((x) => x.qid === q2 ? { ...x, lamLaiCuoi: 1 } : x)
+  k.d.sql.prepare('UPDATE game_v2_session SET json=? WHERE id=?').run(JSON.stringify(sess), st.id)
+  k.d.sql.prepare('INSERT INTO game_v2_attempt(id,session,sbd,qid,content_group,json,created_at) VALUES(?,?,?,?,?,?,?)')
+    .run(`${st.id}|${q2}`, st.id, 'S1', q2, 'g2', JSON.stringify({ attempt: { assisted: true } }), new Date(NOW - 5_000).toISOString())
+
+  const dl = await docDaLamVaVuaLam7(k.env, 'S1', '2026-10-29', NOW)
+  expect(dl.soDaLam).toBe(1)
+  expect(dl.daLam.has(q1)).toBe(true)
+})
+
+it('docCauTheoRef: đệm 2 tầng (RAM isolate + Cloudflare Edge Cache API caches.default) phục vụ tức thì 0 truy vấn D1 cho hàng nghìn isolate giờ cao điểm', async () => {
+  const k = await kho()
+  const { batDemCauTheoRef, docCauTheoRef, xoaDemSync } = await import('../server/src/game-v2-bank')
+  const khoEdge = new Map<string, string>()
+  const cachesCu = (globalThis as Record<string, unknown>).caches
+  ;(globalThis as Record<string, unknown>).caches = {
+    default: {
+      match: vi.fn(async (u: string) => khoEdge.has(u) ? new Response(khoEdge.get(u)!) : undefined),
+      put: vi.fn(async (u: string, r: Response) => { khoEdge.set(u, await r.text()) }),
+    },
+  }
+  try {
+    batDemCauTheoRef(true)
+    const row = k.d.sql.prepare("SELECT qid, version FROM game_v2_question WHERE ma_de='DH-B8' LIMIT 1").get() as { qid: string; version: string }
+    const q1 = await docCauTheoRef(k.env, { maDe: 'DH-B8', qid: row.qid, version: row.version })
+    expect(q1?.qid).toBe(row.qid)
+    await new Promise((r) => setTimeout(r, 10))
+    expect(khoEdge.size).toBe(1)
+
+    // Xoá bảng game_v2_question trong SQLite để chứng minh lần đọc kế lấy từ RAM / Edge Cache với 0 truy vấn D1
+    k.d.sql.prepare("DELETE FROM game_v2_question WHERE ma_de='DH-B8' AND qid=?").run(row.qid)
+    const q2 = await docCauTheoRef(k.env, { maDe: 'DH-B8', qid: row.qid, version: row.version })
+    expect(q2?.qid).toBe(row.qid)
+
+    // Khi thầy cập nhật đề (xoaDemSync) ⇒ tăng thế hệ khoá biên, không dùng bản đệm cũ nữa
+    xoaDemSync()
+    const q3 = await docCauTheoRef(k.env, { maDe: 'DH-B8', qid: row.qid, version: row.version })
+    expect(q3).toBeNull()
+  } finally {
+    batDemCauTheoRef(false)
+    ;(globalThis as Record<string, unknown>).caches = cachesCu
+  }
+})

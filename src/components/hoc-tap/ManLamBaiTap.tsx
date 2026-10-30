@@ -5,7 +5,7 @@ import { ChemText } from '../../lib/chem-format'
 import '../../lib/chem-trinh-bay' // thầy 27/10: phương trình rõ ràng (khoảng hẹp quanh toán tử, ⇌ cỡ chữ, «l» có đuôi) — chỉ app học sinh
 import type { TheCauProps } from '../TheCau'
 import { loiGiaiChuanTuKho } from '../loi-giai/KhoiLoiGiaiChuan'
-import { goiHoa2, type KetQuaSanh } from '../hoa2/api'
+import { ghiNhoKetQuaSanh, goiHoa2, type KetQuaSanh } from '../hoa2/api'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { nopCauLuong } from '../hoa2/doc-luong-nop'
 import { boChangMoTruoc, boGoiNgay, CAU_MOI_CHANG_GOI, docChangDangLam, ghiCauXong, GIAY_CHO_MO_CHANG, layChangGoi, layChangMoTruoc, layChangMoTruocNgay, luuChangDangLam, moChangTruoc, napGoiNgay, nghePhanAnRoiApp, xoaChangDangLam } from './mo-chang-truoc'
@@ -161,12 +161,25 @@ async function daySuaNgay(token: string, sbd: string, moKhoa = false): Promise<b
 
 /** Vá Sảnh NGAY (thầy 29/10 «làm xong thoát ra Lộ trình phải đồng bộ chính xác ngay lập tức»): nâng «đã làm hôm nay» lên `d` — KHÔNG bao giờ hạ; số câu còn lại
  *  trừ đúng phần nâng (câu tiếp cận trừ ở `tiepCanCon`). Máy chủ ghi sổ học SAU khi trả lời nên Sảnh nạp ngay lúc thoát có thể mang số cũ; máy chủ theo kịp ⇒ không đổi gì. */
-export const vaDaLamSanh = (d: number, tiep: number, ngay: string) => (kq: KetQuaSanh): KetQuaSanh => {
+export const vaDaLamSanh = (d: number, tiep: number, ngay: string, sbd?: string) => (kq: KetQuaSanh): KetQuaSanh => {
   if (!kq.cheDo2 || !('sanh' in kq)) return kq
-  const s = kq.sanh, g = s.goi7
-  if (!g || g.ngay !== ngay || g.daLamHomNay >= d) return kq // chỉ vá đúng NGÀY của chặng này (sang ngày mới bản vá hết tác dụng)
-  const them = d - g.daLamHomNay, tc = Math.min(g.tiepCanCon, tiep)
-  return { ...kq, sanh: { ...s, goi7: { ...g, daLamHomNay: d, tiepCanCon: g.tiepCanCon - tc, tuLamCon: Math.max(0, g.tuLamCon - (them - tc)) }, theLuc: { ...s.theLuc, con: Math.max(0, s.theLuc.con - them) } } }
+  const s = kq.sanh, g = s.goi7, ht = s.hanhTrinh
+  const ngaySanh = g?.ngay || s.ngay
+  if ((ngay && ngaySanh && ngaySanh !== ngay) || (!g && !ht)) return kq // chỉ vá đúng NGÀY của chặng này (sang ngày mới bản vá hết tác dụng)
+  const hienTai = g?.daLamHomNay ?? ht?.daLam ?? 0
+  if (hienTai >= d) return kq
+  const them = d - hienTai, tc = g ? Math.min(g.tiepCanCon, tiep) : 0
+  const kqMoi: KetQuaSanh = {
+    ...kq,
+    sanh: {
+      ...s,
+      ...(g && g.daLamHomNay < d ? { goi7: { ...g, daLamHomNay: d, tiepCanCon: g.tiepCanCon - tc, tuLamCon: Math.max(0, g.tuLamCon - (them - tc)) } } : {}),
+      ...(ht && ht.daLam < d ? { hanhTrinh: { ...ht, daLam: d } } : {}),
+      theLuc: { ...s.theLuc, con: Math.max(0, s.theLuc.con - them) },
+    },
+  }
+  if (sbd) ghiNhoKetQuaSanh(sbd, kqMoi)
+  return kqMoi
 }
 /** Nạp lại Sảnh thêm hai lần sau khi thoát (4 s, 12 s): lần nạp ngay lúc thoát có thể đọc trước khi sổ học kịp ghi. */
 const henNapLai = (f: () => void) => { for (const ms of [4000, 12000]) window.setTimeout(f, ms) }
@@ -235,15 +248,17 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   // câu đã bật viên «+N» (số trên bộ đếm đã cộng). Câu vừa chấm mà CHƯA bật ⇒ bộ đếm vẽ số TRƯỚC câu ngay từ lượt vẽ đầu (không loé số cuối rồi lăn ngược).
   const daCong = useRef(new Set<string>(Object.keys(dang0?.ket ?? {})))
   const demRef = useRef<HTMLSpanElement>(null), biGomRef = useRef<HTMLSpanElement>(null)
+  const d0BanDau = (g?: TomTatGoi7) => Math.max(g?.daLamHomNay ?? -1, homNay?.daLam ?? -1)
+  const ngayBanDau = (g?: TomTatGoi7) => g?.ngay || new Date(Date.now() + 7 * 3600_000).toISOString().slice(0, 10)
   // SỐ HÔM NAY TRONG CHẶNG (khẩn 12/10 22h30 — giờ cao điểm máy chủ chậm): nhánh Gói 7 lấy (đã làm, M) từ `hoc-tap-start` lúc mở chặng rồi lệnh nhẹ
   // `hoc-tap-dem` sau mỗi câu — KHÔNG gọi lại cả sảnh (`lapGoi7` ~25 truy vấn) sau mỗi câu. Sảnh nạp lại MỘT lần khi xong chặng / rời màn.
-  const [dem, setDem] = useState<{ daLam: number; muc: number } | null>(() => (dang0?.dem ?? (dau0?.g7 ? { daLam: dau0.g7.daLamHomNay, muc: dau0.g7.toiThieu } : null)))
+  const [dem, setDem] = useState<{ daLam: number; muc: number } | null>(() => (dang0?.dem ?? (dau0?.g7 ? { daLam: Math.max(0, d0BanDau(dau0.g7)), muc: dau0.g7.toiThieu } : homNay ? { daLam: homNay.daLam, muc: homNay.muc } : null)))
   const canTaiSanh = useRef(false), soLuotDem = useRef(0), capNhatRef = useRef(onCapNhat)
   capNhatRef.current = onCapNhat
   // Câu MỚI em làm trong lượt này (không tính làm lại) + số «đã làm» lúc mở chặng ⇒ số thật ngay sau mỗi câu, không chờ máy chủ.
-  const moi = useRef<{ qids: Set<string>; tiep: number; d0: number; ngay: string }>(dang0?.moi ? { qids: new Set(dang0.moi.qids), tiep: dang0.moi.tiep, d0: dang0.moi.d0, ngay: dang0.moi.ngay } : { qids: new Set(), tiep: 0, d0: dau0?.g7 ? dau0.g7.daLamHomNay : -1, ngay: dau0?.g7?.ngay ?? '' }), onVaRef = useRef(onVa)
+  const moi = useRef<{ qids: Set<string>; tiep: number; d0: number; ngay: string }>(dang0?.moi ? { qids: new Set(dang0.moi.qids), tiep: dang0.moi.tiep, d0: dang0.moi.d0 >= 0 ? dang0.moi.d0 : d0BanDau(dau0?.g7), ngay: dang0.moi.ngay || ngayBanDau(dau0?.g7) } : { qids: new Set(), tiep: 0, d0: d0BanDau(dau0?.g7), ngay: ngayBanDau(dau0?.g7) }), onVaRef = useRef(onVa)
   onVaRef.current = onVa
-  const vaSo = (d: number) => onVaRef.current?.(vaDaLamSanh(d, moi.current.tiep, moi.current.ngay))
+  const vaSo = (d: number) => onVaRef.current?.(vaDaLamSanh(d, moi.current.tiep, moi.current.ngay, sbd))
   const batDau = useRef(Date.now() - (dang0?.dhMs ?? 0)), gui = useRef(false), traRef = useRef(tra0)
   // CHẤM NHANH (thầy 28/10 «bấm kiểm tra … chưa tức thì ngay»): `cham` = đang chờ máy chủ chấm (dải «Đang chấm…» trượt lên ngay khi chạm); `tiepCho` = em bấm
   // «Tiếp tục» khi kết quả còn TẠM ⇒ sang câu ngay khi bản đầy đủ (đã ghi) về — câu kế không bao giờ nộp chồng lên lượt ghi của câu trước.
@@ -325,6 +340,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     const duongCu = () => layChangMoTruoc(token) ?? guiLaiBenVung(() => goiHoa2('hoc-tap-start', token, {}, GIAY_CHO_MO_CHANG))
     // Khôi phục chặng đang dở khi chưa kịp có mã phiên (thoát ngay lúc mở từ gói) hoặc tem đã quá 35 phút: giữ nguyên câu & vị trí đang làm (0 ms), chỉ làm tươi phiên + tem ở nền.
     if (dang0 && lan === 0) {
+      if (moi.current.qids.size > 0 && moi.current.d0 >= 0) vaSo(moi.current.d0 + moi.current.qids.size)
       const dsDang = dang0.ds
       const goi = layChangGoi(sbd, Date.now(), CAU_MOI_CHANG_GOI * 2)
       const temDai: Record<string, unknown> = {}
@@ -333,18 +349,22 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
       const layTuDuongCu = async () => {
         const r = await duongCu()
         const ds = Array.isArray(r.questions) ? r.questions as Cau[] : []
-        return { id: typeof r.id === 'string' ? r.id : '', sk: Object.fromEntries(ds.map(c => [c.qid, c.sk])) as Record<string, unknown> }
+        const g7 = docTomTatGoi7(r.goi7)
+        return { id: typeof r.id === 'string' ? r.id : '', sk: Object.fromEntries(ds.map(c => [c.qid, c.sk])) as Record<string, unknown>, daLam: g7?.daLamHomNay, g7 }
       }
       const mo = (goi && qidsCan.length && qidsCan.every(id => temDai[id])
         ? goiHoa2('hoc-tap-mo-goi', token, { ves: goi.ves, qids: qidsCan, sk: temDai }, GIAY_CHO_MO_CHANG).then(r => {
             if (r.ok !== true || typeof r.id !== 'string') throw new Error('goi')
-            return { id: r.id, sk: (r.sk && typeof r.sk === 'object' ? r.sk : {}) as Record<string, unknown> }
+            return { id: r.id, sk: (r.sk && typeof r.sk === 'object' ? r.sk : {}) as Record<string, unknown>, daLam: typeof r.daLam === 'number' ? r.daLam : undefined, g7: undefined }
           }).catch(layTuDuongCu)
         : layTuDuongCu()
-      ).then(({ id, sk }) => {
+      ).then(({ id, sk, daLam, g7 }) => {
         if (!huy && id) {
           moLucRef.current = Date.now()
           setPhien(id)
+          if (g7 && !goi7) setGoi7(g7)
+          if (typeof daLam === 'number' && moi.current.d0 < 0) moi.current.d0 = Math.max(0, daLam - moi.current.qids.size)
+          if (moi.current.qids.size > 0 && moi.current.d0 >= 0) vaSo(moi.current.d0 + moi.current.qids.size)
           setCau(prev => prev.map(c => typeof sk[c.qid] === 'string' ? { ...c, sk: sk[c.qid] as string } : c))
         }
         return { id, sk, qids: new Set(dsDang.map(c => c.qid)) }
@@ -359,8 +379,9 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     if (san) {
       moLucRef.current = Date.now()
       setTai(false); setLoi(''); setHetCau(''); setCau(san.ds); setSoGoc(san.ds.length); setPhien(san.id); setGoi7(san.g7); setXong(false); setKet({}); setViTri(0); setMsCau({}); setChang(null); setCombo(null); daXinLamLai.current = false; soLuotDem.current++
-      moi.current = { qids: new Set(), tiep: 0, d0: san.g7 ? san.g7.daLamHomNay : -1, ngay: san.g7?.ngay ?? '' }
-      setDem(san.g7 ? { daLam: san.g7.daLamHomNay, muc: san.g7.toiThieu } : null)
+      const d0 = d0BanDau(san.g7)
+      moi.current = { qids: new Set(), tiep: 0, d0, ngay: ngayBanDau(san.g7) }
+      setDem(san.g7 ? { daLam: Math.max(0, d0), muc: san.g7.toiThieu } : homNay ? { daLam: homNay.daLam, muc: homNay.muc } : null)
       return
     }
     setTai(true); setLoi(''); setHetCau(''); setCau([]); setPhien(''); setXong(false); setKet({}); setViTri(0); setMsCau({}); setChang(null); setDem(null); setSoGoc(0); setCombo(null); daXinLamLai.current = false; soLuotDem.current++
@@ -369,10 +390,10 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
       if (!r.ok) throw Object.assign(new Error(typeof r.error === 'string' ? r.error : 'Chưa mở được chặng học.'), { ma: r.ma })
       const ds = Array.isArray(r.questions) ? r.questions as Cau[] : []
       if (ds.some(cauHong)) throw new Error('Nội dung câu chưa đầy đủ. Em cập nhật lại bài học nhé.')
-      const g7 = docTomTatGoi7(r.goi7)
+      const g7 = docTomTatGoi7(r.goi7), d0 = d0BanDau(g7)
       moLucRef.current = Date.now()
-      setCau(ds); setSoGoc(ds.length); setViTri(0); setPhien(typeof r.id === 'string' ? r.id : ''); setGoi7(g7); moi.current = { qids: new Set(), tiep: 0, d0: g7 ? g7.daLamHomNay : -1, ngay: g7?.ngay ?? '' }
-      if (g7) setDem({ daLam: g7.daLamHomNay, muc: g7.toiThieu })
+      setCau(ds); setSoGoc(ds.length); setViTri(0); setPhien(typeof r.id === 'string' ? r.id : ''); setGoi7(g7); moi.current = { qids: new Set(), tiep: 0, d0, ngay: ngayBanDau(g7) }
+      if (g7) setDem({ daLam: Math.max(0, d0), muc: g7.toiThieu })
       // 27/10 (ảnh thầy: khung đỏ «Em đã hoàn thành phần được xếp hôm nay…» + «Thử lại» ⇒ em kẹt, thử lại ra đúng câu ấy): chặng rỗng KHÔNG phải lỗi —
       // thẻ trung tính + nút về trang chính (làm mới số ở đó), không «Thử lại».
       if (!ds.length) { xoaChangDangLam(sbd); setHetCau(typeof r.message === 'string' && r.message.trim() ? r.message : `Chưa có câu mới cho chặng này. Em về ${tenTrangChinh()} xem tiến độ.`) }
@@ -383,10 +404,10 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     const goi = layChangGoi(sbd, Date.now(), soCauGoi())
     const dsGoi = goi && dsTuGoi(goi.questions)
     const mo: Promise<{ id: string; sk: Record<string, unknown>; qids: Set<string> }> = goi && dsGoi ? (() => {
-      const g7 = g7Goi(goi.goi7)
+      const g7 = g7Goi(goi.goi7), d0 = d0BanDau(g7)
       moLucRef.current = Date.now()
-      setCau(dsGoi); setSoGoc(dsGoi.length); setGoi7(g7); moi.current = { qids: new Set(), tiep: 0, d0: g7 ? g7.daLamHomNay : -1, ngay: g7?.ngay ?? '' }
-      if (g7) setDem({ daLam: g7.daLamHomNay, muc: g7.toiThieu })
+      setCau(dsGoi); setSoGoc(dsGoi.length); setGoi7(g7); moi.current = { qids: new Set(), tiep: 0, d0, ngay: ngayBanDau(g7) }
+      if (g7) setDem({ daLam: Math.max(0, d0), muc: g7.toiThieu })
       setTai(false)
       const temDai: Record<string, unknown> = {}
       for (const c of goi.questions) if (typeof c.qid === 'string' && typeof c.sk === 'string') temDai[c.qid] = c.sk
@@ -457,9 +478,12 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   /** Câu MỚI (không phải làm lại, chưa tính trong lượt này) ⇒ cộng vào «đã làm hôm nay» NGAY và vá Sảnh — không chờ `hoc-tap-dem` / sổ học của máy chủ. */
   const tinhCauMoi = (c: Cau) => {
     const m = moi.current
-    if (!goi7 || m.d0 < 0 || c.vaiGoi7 === 'lam_lai' || m.qids.has(c.qid)) return
+    if (m.d0 < 0 && homNay) m.d0 = homNay.daLam
+    if (!m.ngay) m.ngay = ngayBanDau(goi7)
+    if (m.d0 < 0 || c.vaiGoi7 === 'lam_lai' || m.qids.has(c.qid)) return
     m.qids.add(c.qid); if (c.vaiGoi7 === 'tiep_can') m.tiep++
-    setDem(v => (v ? { ...v, daLam: Math.max(v.daLam, m.d0 + m.qids.size) } : v)); vaSo(m.d0 + m.qids.size)
+    canTaiSanh.current = true
+    setDem(v => (v ? { ...v, daLam: Math.max(v.daLam, m.d0 + m.qids.size) } : homNay ? { daLam: m.d0 + m.qids.size, muc: homNay.muc } : v)); vaSo(m.d0 + m.qids.size)
   }
   const doiTra = (v: string) => { phanHoi('chon'); setTra(v); traRef.current = v; try { localStorage.setItem(khoa, v) } catch { /* Em vẫn làm và nộp được. */ } }
   // Sang câu mới / vừa có kết quả ⇒ đưa màn về đầu (dải kết quả, đề) — em không phải tự vuốt ngược. Trình đọc màn hình: tiêu đề "Câu x/y" và dải
@@ -515,12 +539,12 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   // Rung phản hồi kiểu Duolingo (thầy 26/10) — chỉ app học sinh «Trong» (phan-hoi.ts tự kiểm): tấm kết quả đúng / sai, hết chặng.
   useEffect(() => { if (k && !k.choThay && !k.hocCoHoTro && !k.omni?.luot) phanHoi(k.correct ? 'dung' : 'sai') }, [!!k]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (xong) phanHoi('xong') }, [xong])
-  // NỘP TỨC THÌ (thầy 27/10): em đang đọc kết quả câu này ⇒ tải sẵn ảnh đề / phương án của câu KẾ (không gồm ảnh lời giải) — bấm «Tiếp tục» là câu hiện đủ ngay.
+  // NỘP TỨC THÌ (thầy 27/10): em đang đọc kết quả câu này ⇒ tải sẵn + giải mã sẵn ảnh đề / phương án của câu KẾ (không gồm ảnh lời giải) — bấm «Tiếp tục» là câu hiện đủ ngay, không nghẽn luồng chính trên máy yếu.
   useEffect(() => {
     const sau = k ? cau[viTri + 1] : undefined
     if (!sau) return
     const ds = [...sau.hinhAnh.filter(h => h.viTri !== 'sau_loi_giai').map(h => h.src), sau.thanCauImg, ...(sau.choiceImgs ?? []), ...(sau.ideaImgs ?? [])]
-    for (const src of ds) if (src && !src.startsWith('data:')) { const im = new Image(); im.decoding = 'async'; im.src = src }
+    for (const src of ds) if (src && !src.startsWith('data:')) { const im = new Image(); im.decoding = 'async'; im.src = src; im.decode?.().catch(() => {}) }
   }, [!!k, viTri, cau]) // eslint-disable-line react-hooks/exhaustive-deps
   const nopCau = async () => {
     if (!q || !phien && !phienCho.current || !duTraLoi(q.phan, tra) || gui.current || k) return
@@ -545,10 +569,12 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
         ph = m.id
         if (typeof m.sk[q.qid] === 'string') skCau = m.sk[q.qid] as string
       }
-      // CHẤM NHANH: dòng TẠM (đúng / sai từ bộ nhớ máy chủ) ⇒ đổi màu đúng / sai NGAY tại dải; thưởng / EXP đến cùng phản hồi đầy đủ ngay sau. Bản nháp giữ tới bản đầy đủ.
+      // CHẤM NHANH: dòng TẠM (đúng / sai từ bộ nhớ máy chủ) ⇒ đổi màu đúng / sai NGAY tại dải + đồng bộ tiến độ chặng ngay (0 ms) nếu em bấm thoát ngay sau đó; thưởng / EXP đến cùng phản hồi đầy đủ ngay sau. Bản nháp giữ tới bản đầy đủ.
       const khiTam = (o: Record<string, unknown>) => {
         if (typeof o.correct !== 'boolean' || typeof o.answer !== 'string') return
         setKet(v => v[qidNop] ? v : { ...v, [qidNop]: { ...(o as unknown as Ket), tam: true, assisted, ...(o.khongTinh === true ? { thuong: { tinh: false, nguyenTu: 0, dong: [], chuoiDung: 0 } } : {}) } })
+        ghiCauXong(sbd, q.qid)
+        if ((o.omni as { luot?: unknown } | undefined)?.luot !== true) tinhCauMoi(q)
       }
       const than = { session: ph, qid: q.qid, answer: tra, assisted, msLam, ...(typeof skCau === 'string' && skCau ? { sk: skCau, ...(luotChang.current > 0 ? { lm: luotChang.current } : {}) } : {}), doGiay: dhMs.current >= 1000 ? { g: Math.round(dhMs.current / 1000), v: dhT.current.v, a: dhT.current.a, l: Math.max(dhT.current.l, dhT.current.lang), n: dhT.current.n, w: dhW.current ? 1 : 0 } : undefined }
       const r = await guiLaiBenVung(() => duo ? nopCauLuong(token, than, 15, khiTam) : goiHoa2('answer', token, than, 15)) // chống trùng theo biên nhận ⇒ kẹt mạng tự gửi lại
@@ -569,10 +595,10 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
       if (daCham !== tra) { setTra(daCham); traRef.current = daCham }
       // Lượt đã chấm quyết định tự làm hay có hỗ trợ, kể cả nộp lại trên máy khác. Máy chủ cũ thiếu cờ thì dùng cờ đã gửi.
       const hoTro = (r.attempt as { assisted?: unknown } | undefined)?.assisted
-      setKet(v => ({ ...v, [q.qid]: { ...(r as unknown as Ket), assisted: typeof hoTro === 'boolean' ? hoTro : assisted, ...(r.replayed === true && daCham !== tra ? { chamLanTruoc: true } : {}) } })); try { localStorage.removeItem(khoa) } catch { /* Không cản nhận kết quả. */ } tinhCauMoi(q); capNhatSo()
+      setKet(v => ({ ...v, [q.qid]: { ...(r as unknown as Ket), assisted: typeof hoTro === 'boolean' ? hoTro : assisted, ...(r.replayed === true && daCham !== tra ? { chamLanTruoc: true } : {}) } })); try { localStorage.removeItem(khoa) } catch { /* Không cản nhận kết quả. */ } if ((r.omni as { luot?: unknown } | undefined)?.luot !== true) tinhCauMoi(q); capNhatSo()
     } catch (e) {
       // Bản đầy đủ không về được ⇒ bỏ kết quả TẠM (câu chưa chắc đã ghi), giữ nháp, em bấm lại (biên nhận chống trùng ⇒ không tính hai lần).
-      setKet(v => { const x = v[qidNop]; if (!x?.tam) return v; const { [qidNop]: _bo, ...con } = v; return con })
+      setKet(v => { const x = v[qidNop]; if (!x?.tam) return v; if (moi.current.qids.delete(qidNop) && q.vaiGoi7 === 'tiep_can' && moi.current.tiep > 0) moi.current.tiep--; const { [qidNop]: _bo, ...con } = v; return con })
       if (tachRoi.current.has(qidNop)) setLoi(`Câu ${cau.findIndex(c => c.qid === qidNop) + 1} chưa được lưu: ${chuCuaLoi(e, 'mất kết nối máy chủ')}. Em làm lại câu đó ở cuối chặng nhé.`) // đã sang câu khác: báo ở câu đang làm
       else { tiepCho.current = false; nutTiepRef.current?.removeAttribute('data-lun'); setLoi(chuCuaLoi(e, 'Chưa nộp được câu. Đáp án nháp vẫn được giữ.')) }
     }

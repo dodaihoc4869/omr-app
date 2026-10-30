@@ -225,6 +225,8 @@ export function luuChangDangLam(sbd: string, b: Omit<ChangDangLam, 'sbd' | 'ngay
   const d: ChangDangLam = { ...b, sbd, ngay: ngayMay(now), moLuc, luc: now }
   nhoDang.set(sbd, d)
   ghiJson(khoaDang(sbd), d)
+  ghiJson('omr_chang_dang_cua', d)
+  if (b.ket && Object.keys(b.ket).length > 0) try { localStorage.removeItem('ddh.khung-tinh-hs') } catch { /* bỏ qua */ }
 }
 
 /** Đọc trạng thái chặng đang làm dở của `sbd`; khác ngày / quá hạn phiên / dữ liệu hỏng ⇒ xoá và trả null. */
@@ -245,7 +247,7 @@ export function xoaChangDangLam(sbd: string): void {
   sbd = sbd.trim()
   if (!sbd) return
   nhoDang.delete(sbd)
-  try { localStorage.removeItem(khoaDang(sbd)) } catch { /* bỏ qua */ }
+  try { localStorage.removeItem(khoaDang(sbd)); localStorage.removeItem('omr_chang_dang_cua') } catch { /* bỏ qua */ }
 }
 
 /** Câu em vừa làm xong (đã chấm) — chặng kế trong gói bỏ câu này. */

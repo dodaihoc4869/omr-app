@@ -286,16 +286,16 @@ export async function docDaLamVaVuaLam7(env: Env, sbd: string, ngay: string, now
     // (29/10) + lượt LƯỚT của chặng (câu đã phát + đã trả lời) và cờ `ll` (câu làm lại cuối chặng): `daLam` GIỮ cả hai (không phát lại câu em vừa làm), `soDaLam` chỉ đếm câu của chặng.
     env.DB.prepare(`SELECT qid, MIN(CASE WHEN COALESCE(json_extract(raw_json,'$.ll'),0)=1 THEN 1 ELSE 0 END) AS ll, MIN(CASE WHEN purpose='luot' THEN 1 ELSE 0 END) AS chi_luot FROM su_kien_hoc WHERE sbd=? AND ngay_vn=? AND ma_nguon NOT LIKE 'ktcn:%' AND ${SQL_KHONG_TU_SUA} AND ((ket_qua IS NOT NULL AND ${SQL_LUOT_GOI7}) OR ${SQL_LA_LUOT_CHANG}) GROUP BY qid`).bind(sbd,ngay).all<{qid:string;ll:number;chi_luot:number}>(),
     env.DB.prepare("SELECT DISTINCT qid FROM goi_bai_7_gap WHERE sbd=? AND date(luc,'+7 hours')=?").bind(sbd,ngay).all<{qid:string}>(),
-    // `co_so`: lượt đã có dòng sổ (chỉ mục su_kien_hoc(sbd, qid, ngay_vn)) ⇒ sổ quyết định (lướt / chẩn đoán không tính); chưa có ⇒ đang chờ ghi, tính ngay.
-    tu ? env.DB.prepare("SELECT a.qid,EXISTS(SELECT 1 FROM su_kien_hoc s WHERE s.sbd=a.sbd AND s.qid=a.qid AND s.ngay_vn=? AND s.attempt_id=a.id) co_so,COALESCE(json_extract(a.json,'$.attempt.assisted'),0) tro FROM game_v2_attempt a WHERE a.sbd=? AND a.created_at>=?").bind(ngay,sbd,tu).all<{qid:string;co_so:number;tro:number}>().catch(() => ({ results: [] as {qid:string;co_so:number;tro:number}[] })) : Promise.resolve({ results: [] as {qid:string;co_so:number;tro:number}[] }),
+    // `co_so`: lượt đã có dòng sổ (chỉ mục su_kien_hoc(sbd, qid, ngay_vn)) ⇒ sổ quyết định (lướt / chẩn đoán không tính); chưa có ⇒ đang chờ ghi, tính ngay (kể cả câu tiếp cận có gợi ý/hỗ trợ; chỉ trừ câu lướt hoặc câu làm lại cuối chặng).
+    tu ? env.DB.prepare("SELECT a.qid,EXISTS(SELECT 1 FROM su_kien_hoc s WHERE s.sbd=a.sbd AND s.qid=a.qid AND s.ngay_vn=? AND s.attempt_id=a.id) co_so,(CASE WHEN COALESCE(json_extract(a.json,'$.omni.luot'),0)=1 OR EXISTS(SELECT 1 FROM game_v2_session gs,json_each(gs.json,'$.questions') gq WHERE gs.id=a.session AND gs.sbd=a.sbd AND json_extract(gq.value,'$.qid')=a.qid AND COALESCE(json_extract(gq.value,'$.lamLaiCuoi'),0)=1) THEN 1 ELSE 0 END) khong_tinh FROM game_v2_attempt a WHERE a.sbd=? AND a.created_at>=?").bind(ngay,sbd,tu).all<{qid:string;co_so:number;khong_tinh:number}>().catch(() => ({ results: [] as {qid:string;co_so:number;khong_tinh:number}[] })) : Promise.resolve({ results: [] as {qid:string;co_so:number;khong_tinh:number}[] }),
   ])
   const daLamNgay = new Set<string>(), tinh = new Set<string>()
   const chiLuot = new Set<string>()
   for(const r of done.results){daLamNgay.add(r.qid);if(!Number(r.ll))tinh.add(r.qid);if(Number(r.chi_luot)&&!Number(r.ll))chiLuot.add(r.qid)}
   for(const r of guidedToday.results){daLamNgay.add(r.qid);tinh.add(r.qid)}
   const vuaLam = new Set<string>()
-  // Lượt vừa trả lời mà sổ chưa kịp có: tính ngay, TRỪ lượt có hỗ trợ (câu làm lại cuối chặng luôn có hỗ trợ; câu học có hướng dẫn đã nằm trong `guidedToday`).
-  for(const r of vua.results){const q=str(r.qid);if(!q)continue;vuaLam.add(q);vuaLam.add(tachSongSinh(q).goc);if(!Number(r.co_so)){daLamNgay.add(q);if(!Number(r.tro))tinh.add(q)}}
+  // Lượt vừa trả lời mà sổ chưa kịp có: tính ngay vào số đã làm hôm nay (kể cả câu có gợi ý / hỗ trợ), TRỪ câu lướt hoặc câu làm lại cuối chặng.
+  for(const r of vua.results){const q=str(r.qid);if(!q)continue;vuaLam.add(q);vuaLam.add(tachSongSinh(q).goc);if(!Number(r.co_so)){daLamNgay.add(q);if(!Number(r.khong_tinh))tinh.add(q)}}
   return { daLam: daLamNgay, vuaLam, soVua: vua.results.length, soDaLam: tinh.size, luot: chiLuot }
 }
 /**

@@ -447,8 +447,38 @@ export default function GacTamDong({ p, kiem }: { p: PropsHomNayCu; kiem?: TomTa
     kiemDo={!p.coCa && kiem?.homNay && kiem.nopLuc === null && kiem.trangThai === 'can_lam' && kiem.daTra > 0 ? p.onKiemTra : undefined} /></Suspense> : null
 }
 
+/** Đồng bộ tức thì tiến độ chặng đang làm dở (`omr_chang_dang_cua`) vào `so` trên Lộ trình — học sinh làm vài câu rồi thoát ra hoặc tải lại trang thấy ngay vạch tiến độ và «Học tiếp» ở 0 ms. */
+function nangSoTuChangDangDo(so: SoHomNay | null): SoHomNay | null {
+  if (!so || typeof localStorage === 'undefined') return so
+  try {
+    const raw = localStorage.getItem('omr_chang_dang_cua')
+    if (!raw) return so
+    const d = JSON.parse(raw) as { sbd?: unknown; ngay?: unknown; cau?: unknown[]; soGoc?: unknown; ket?: Record<string, unknown>; moi?: { qids?: unknown[]; d0?: unknown }; dem?: { daLam?: unknown } | null; chang?: unknown } | null
+    const sbd = sbdPhien()
+    if (!d || d.ngay !== ngayVn(Date.now()) || (sbd && typeof d.sbd === 'string' && d.sbd !== sbd.trim()) || !Array.isArray(d.cau)) return so
+    const ket = d.ket && typeof d.ket === 'object' ? d.ket : {}
+    const soGoc = typeof d.soGoc === 'number' && d.soGoc > 0 ? d.soGoc : d.cau.length
+    let soDaTra = 0
+    for (const c of d.cau.slice(0, soGoc) as { qid?: unknown; vaiGoi7?: unknown }[]) {
+      if (!c || typeof c.qid !== 'string' || c.vaiGoi7 === 'lam_lai') continue
+      const k = ket[c.qid] as { omni?: { luot?: unknown } } | undefined
+      if (!k || k.omni?.luot === true) continue
+      soDaTra++
+    }
+    const qidsLen = Array.isArray(d.moi?.qids) ? d.moi.qids.length : 0
+    const daTra = Math.max(soDaTra, qidsLen)
+    if (daTra <= 0) return so
+    const d0 = typeof d.moi?.d0 === 'number' && d.moi.d0 >= 0 ? d.moi.d0 : typeof d.chang === 'number' && d.chang >= 1 ? (d.chang - 1) * 6 : Math.floor(so.daLam / 6) * 6
+    const daLam = Math.max(so.daLam, typeof d.dem?.daLam === 'number' ? d.dem.daLam : 0, d0 + daTra)
+    if (daLam <= so.daLam) return so
+    return { ...so, daLam, chang: so.soChang > 0 ? Math.min(so.soChang, Math.floor(daLam / 6) + 1) : so.chang }
+  } catch {
+    return so
+  }
+}
+
 export function MotTrangHs(p: PropsMotTrang) {
-  const so = p.so, kiem = p.kiem, hs = p.hs
+  const so = nangSoTuChangDangDo(p.so), kiem = p.kiem, hs = p.hs
   // THẺ BÀI GHIM (thầy 27/10: «ghim phần bài 8 amine lại»): dính ngay dưới hàng bộ đếm (đo chiều cao thật của hàng — ngang thấp khác dọc); vạch mốc
   // ngay trên thẻ khuất dưới hàng bộ đếm ⇒ thẻ đã dính ⇒ thu gọn (bỏ dòng nhãn nhỏ) + bóng đáy.
   const khung = useRef<HTMLDivElement>(null), mocBai = useRef<HTMLElement>(null)
