@@ -1,0 +1,38 @@
+# SOI VÒNG CHẶNG LỆCH (thầy 30/10 ảnh Lộ trình «4/8 chặng», chặng 5 đã đầy nửa vòng dù chưa làm) — CHỈ ĐỌC, chỉ tài khoản THỬ của thầy (SBD thử ghi ở
+# docs). Không in mã em: kết quả chỉ có mã câu, nguồn, giờ.
+name: Soi vòng chặng lệch (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/do-vong-chang-3010]
+    paths: ['.github/workflows/do-vong-chang-3010.yml']
+permissions:
+  contents: read
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đọc (chỉ SELECT)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+          S: '12121212'
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c ".[0].results[]" || echo "(lỗi)"; }
+          N=$(TZ=Asia/Ho_Chi_Minh date +%F); echo "Ngày VN $N · giờ $(TZ=Asia/Ho_Chi_Minh date +%H:%M)"
+          q "sổ học hôm nay (theo giờ): qid · nguồn · mục đích · kết quả · ll · giờ VN" \
+            "SELECT qid, nguon, purpose, ket_qua, COALESCE(json_extract(raw_json,'\$.ll'),0) ll, substr(time(luc,'+7 hours'),1,5) gio, substr(ma_nguon,1,24) mn FROM su_kien_hoc WHERE sbd='$S' AND ngay_vn='$N' ORDER BY luc"
+          q "gặp câu học cách giải hôm nay" "SELECT qid, kieu, substr(time(luc,'+7 hours'),1,5) gio FROM goi_bai_7_gap WHERE sbd='$S' AND date(luc,'+7 hours')='$N' ORDER BY luc"
+          q "phiên hôm nay: đuôi mã · giờ · gói · số câu · số lượt" \
+            "SELECT substr(id,-6) id, substr(time(created_at,'+7 hours'),1,8) gio, COALESCE(json_extract(json,'\$.goiNgay'),0) goi, COALESCE(json_extract(json,'\$.hocTap'),0) ht, json_array_length(json,'\$.questions') cau, (SELECT COUNT(*) FROM game_v2_attempt a WHERE a.session=s.id) luot, (SELECT group_concat(json_extract(value,'\$.qid')||CASE WHEN COALESCE(json_extract(value,'\$.lamLaiCuoi'),0)=1 THEN '*' ELSE '' END, ',') FROM json_each(s.json,'\$.questions')) ds FROM game_v2_session s WHERE sbd='$S' AND created_at >= datetime('$N','-7 hours') ORDER BY created_at"
+          q "lượt trả lời hôm nay: qid · đuôi phiên · giờ · đúng · lướt" \
+            "SELECT a.qid, substr(a.session,-6) ph, substr(time(a.created_at,'+7 hours'),1,8) gio, json_extract(a.json,'\$.correct') dung, COALESCE(json_extract(a.json,'\$.omni.luot'),0) luot FROM game_v2_attempt a WHERE a.sbd='$S' AND a.created_at >= datetime('$N','-7 hours') ORDER BY a.created_at"
+          q "mức hôm nay" "SELECT muc FROM goi_bai_7_muc_ngay WHERE sbd='$S' AND ngay='$N'"
