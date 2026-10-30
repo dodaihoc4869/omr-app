@@ -804,6 +804,22 @@
   [data-trong='hs'] :is(.da-nut[data-tt='dang'] .da-vong, .da-nut[data-tt='dang'] .da-vong .chay, .da-nut[data-tt='dang']::after, .da-nut > svg:not(.da-vong), .da-sao-bong) { animation: none !important; }
 }
 [data-trong='hs'].may-yeu :is(.da-nut[data-tt='dang'] .da-vong, .da-nut[data-tt='dang'] .da-vong .chay, .da-nut[data-tt='dang']::after, .da-nut > svg:not(.da-vong), .da-sao-bong) { animation: none; }
+/* VÒNG ĐOẠN (thầy 30/10 «chặng bao nhiêu câu thì chia bấy nhiêu đoạn, xong câu nào tô đoạn câu đó, làm khít lại, hiệu ứng tinh tế hơn», VongDoan ở TrongHs.tsx):
+   bỏ mặt nạ 4 khe; mỗi câu một cung đầu tròn, khe đều; vòng 100 px ôm sát nút (khe ~3 px hai bên). Đoạn VỪA xong: vẽ dần theo chiều kim đồng hồ rồi dày lên
+   một nhịp (so le 160 ms nếu nhiều đoạn); đoạn cũ đứng yên; nhịp thở của vòng nhẹ hơn. Giảm chuyển động ⇒ đứng yên; máy yếu ⇒ chỉ vẽ dần, không nhịp dày. */
+[data-trong='hs'] .da-vong[data-doan] { width: 100px; height: 100px; top: calc(50% - 3px); -webkit-mask: none; mask: none; }
+[data-trong='hs'] .da-vong[data-doan] circle { stroke-width: 7; stroke-linecap: round; }
+[data-trong='hs'] .da-nut[data-tt='dang'] .da-vong[data-doan] { animation: da-vong-tho-doan 2.4s ease-in-out infinite; }
+[data-trong='hs'] .da-nut[data-tt='dang'] .da-vong[data-doan] .chay { animation: none; }
+[data-trong='hs'] .da-nut[data-tt='dang'] .da-vong[data-doan] .chay[data-moi] {
+  animation: da-doan-ve 560ms cubic-bezier(.2, .8, .2, 1) var(--tre, 0ms) both, da-doan-day 520ms ease-out calc(var(--tre, 0ms) + 460ms) both;
+}
+[data-trong='hs'].may-yeu .da-nut[data-tt='dang'] .da-vong[data-doan] { animation: none; }
+[data-trong='hs'].may-yeu .da-nut[data-tt='dang'] .da-vong[data-doan] .chay[data-moi] { animation: da-doan-ve 400ms ease-out var(--tre, 0ms) both; }
+@keyframes da-doan-ve { from { stroke-dasharray: 0 400; } }
+@keyframes da-doan-day { 0%, 100% { stroke-width: 7; } 40% { stroke-width: 9.5; } }
+@keyframes da-vong-tho-doan { 0%, 100% { transform: translate(-50%, -50%) rotate(-90deg) scale(1); } 50% { transform: translate(-50%, -50%) rotate(-90deg) scale(.985); } }
+@media (prefers-reduced-motion: reduce) { [data-trong='hs'] .da-nut[data-tt='dang'] .da-vong[data-doan], [data-trong='hs'] .da-vong[data-doan] .chay[data-moi] { animation: none !important; } }
 [data-trong='hs'] .bi-loi[data-khong-bi] .bi-loi-bong { margin-bottom: 0; }
 [data-trong='hs'] .bi-loi[data-khong-bi] .bi-loi-bong::before { display: none; }
 /* biểu tượng trên nút chặng màu (xong / hiện tại / kiểm tra / sửa lỗi): trắng ở cả hai nền như Duolingo (nền tối trước đây là chữ tối trên nút) */
