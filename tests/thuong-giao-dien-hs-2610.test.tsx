@@ -87,7 +87,8 @@ describe('phần hiện ngay', () => {
     expect(c.querySelector('[data-k="lua"] .tp-so')?.textContent).toBe('12')
     expect(c.querySelector('[data-k="nt"] .tp-so')?.textContent).toBe('147')
     expect(screen.getByRole('button', { name: 'Mục tiêu hôm nay: 4 chặng · đã làm 3' })).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: '245 tinh thể' }))
+    fireEvent.click(screen.getByRole('button', { name: '245 tinh thể · xem hướng dẫn' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Mở Cửa hàng' }))
     expect(mo).toHaveBeenCalledWith('cua-hang')
   })
   it('vòng mục tiêu (thầy 27/10 «8/16 chặng» cạnh «Đủ 93/92 câu»): đo bằng CÂU cùng thẻ; đạt ⇒ «Đủ mức»; capNhatTongQuan ⇒ vòng đổi số NGAY', async () => {

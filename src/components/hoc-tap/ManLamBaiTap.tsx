@@ -59,6 +59,8 @@ import { DUONG, docKetBai, docThuongCau, khoaTam, layTam, ngayVn, type TongQuanT
 import { napSanGiuChan, TamGiuChanLuoi, useGiuChan } from './GiuChan'
 import { canGiuChan, chuoiHomNay, loiBangNhac, loiDongVien, loiGiuChan, type CauDaCham } from './giu-chan'
 const KetBaiThuong = lazy(() => import('../thuong/KetBaiThuong'))
+// Chạm ô nguyên tử trên thanh trên ⇒ tấm hướng dẫn (thầy 30/10) — đi trong mảnh nạp lười ManThuong, chỉ «Đã hiểu» (không rời bài).
+const TamHuongDan = lazy(() => import('../thuong/ManThuong').then((m) => ({ default: m.TamHuongDan })))
 // Giám thị theo mức câu (thầy chốt 27/10): mảnh lười + tờ riêng; ở đây chỉ phần chọn mức (nhỏ).
 const GiamThiCau = lazy(() => import('../giam-thi/GiamThi'))
 import { mucGiamThi } from '../giam-thi/muc-giam-thi'
@@ -247,7 +249,8 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   const [ntTre, setNtTre] = useState<number | null>(null)
   // câu đã bật viên «+N» (số trên bộ đếm đã cộng). Câu vừa chấm mà CHƯA bật ⇒ bộ đếm vẽ số TRƯỚC câu ngay từ lượt vẽ đầu (không loé số cuối rồi lăn ngược).
   const daCong = useRef(new Set<string>(Object.keys(dang0?.ket ?? {})))
-  const demRef = useRef<HTMLSpanElement>(null), biGomRef = useRef<HTMLSpanElement>(null)
+  const demRef = useRef<HTMLButtonElement>(null), biGomRef = useRef<HTMLSpanElement>(null)
+  const [hdNt, setHdNt] = useState(false)
   const d0BanDau = (g?: TomTatGoi7) => Math.max(g?.daLamHomNay ?? -1, homNay?.daLam ?? -1)
   const ngayBanDau = (g?: TomTatGoi7) => g?.ngay || new Date(Date.now() + 7 * 3600_000).toISOString().slice(0, 10)
   // SỐ HÔM NAY TRONG CHẶNG (khẩn 12/10 22h30 — giờ cao điểm máy chủ chậm): nhánh Gói 7 lấy (đã làm, M) từ `hoc-tap-start` lúc mở chặng rồi lệnh nhẹ
@@ -1049,9 +1052,10 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
         <button type="button" className="duo-dong" onClick={giu.xinThoat} disabled={nop} aria-label={`Lưu và về ${tenTrangChinh()}`}><XIcon size={26} aria-hidden="true" /></button>
         {/* A7 — ỐNG NGHIỆM: chất lỏng dâng theo câu, bọt nổi; chuỗi ≥ 3 ⇒ chất lỏng cam phát sáng + vệt sáng lướt. */}
         <div className="duo-thanh" data-combo={chuoi >= 3 || undefined} role="progressbar" aria-label={laLamLai ? `Làm lại · câu ${stt}/${lamLai.length}` : q ? `Câu ${stt}/${goc.length}${chang ? ` của chặng ${chang}` : ''}` : 'Chặng học của em'} aria-valuemin={0} aria-valuemax={goc.length || 1} aria-valuenow={Math.min(daCham, goc.length)}><i style={{ width: `${pct}%` }}><b /><b /><b />{k?.correct && <span key={q?.qid} className="duo-loe" />}</i></div>
-        {coNt ? <span ref={demRef} className="duo-chuoi" data-co={ntBai > 0 || undefined} role="img" aria-label={`Nguyên tử của bài này: ${ntBai}`}><IcNguyenTu /><SoLan v={ntHien} /></span>
+        {coNt ? <button ref={demRef} type="button" className="duo-chuoi duo-chuoi-nut" data-co={ntBai > 0 || undefined} aria-haspopup="dialog" aria-label={`Nguyên tử của bài này: ${ntBai} · xem hướng dẫn`} onPointerDown={() => { void import('../thuong/ManThuong').catch(() => {}) }} onClick={() => setHdNt(true)}><IcNguyenTu /><SoLan v={ntHien} /></button>
           : <span className="duo-chuoi" data-co={chuoi > 0 || undefined} aria-label={`Chuỗi ${chuoi} câu đúng liền`}><Flame size={22} aria-hidden="true" />{chuoi}</span>}
         {combo && <BangCombo key={combo.id} n={combo.n} />}
+        {hdNt && createPortal(<Suspense fallback={null}><TamHuongDan loai="nt" soBai={ntBai} onDong={() => setHdNt(false)} /></Suspense>, document.body)}
         {/* băng mốc (làm lại 27/10: «băng mốc che chữ TRẮC NGHIỆM»): nằm TRONG thanh trên dính, đè lên ống tiến độ ~1,4 s — không che chữ nào của câu */}
         {luot?.moc ? <p key={`m${luot.id}`} className="duo-moc" data-moc={luot.moc} role="status">{chuMoc(luot.chuoi)}</p> : null}
       </header>}

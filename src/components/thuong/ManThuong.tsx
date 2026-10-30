@@ -21,6 +21,8 @@ export { ManBinhDaDo, ManChuoiNgay, ManCuuChuoi, ManMocChuoi, ManCuoiTuan, ManGi
 
 // Màn phủ tạm đóng app (hoc-tap/PhuTamDong.tsx) đi CÙNG mảnh nạp lười này (28/10, tác tử tốc độ): Lộ trình không cõng nó, không thêm tệp precache / mảnh mới.
 export { PhuTamDong } from '../hoc-tap/PhuTamDong'
+// Tấm hướng dẫn lửa / nguyên tử / tinh thể (thầy 30/10): cùng mảnh nạp lười này (ThanhThuong + màn làm chặng nạp khi em chạm biểu tượng).
+export { TamHuongDan } from './TamHuongDan'
 export type TenManThuong = 'chuoi' | 'giai' | 'nhiem-vu' | 'cua-hang' | 'huy-hieu' | 'ban' | 'moi-ban' | 'kim-cuong'
 export interface PropsManThuong {
   man: TenManThuong
