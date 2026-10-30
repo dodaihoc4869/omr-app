@@ -1,4 +1,4 @@
-# ĐẾM «ĐÃ TẢI SẴN CHO TỪNG EM CHƯA» (CHỈ ĐỌC) — thầy 29/10: «Đã tải sẵn hết lộ trình ngày hôm nay cho từng hs chưa?». Chỉ SELECT gộp: không mã em, không tên.
+# ĐẾM «ĐÃ TẢI SẴN CHO TỪNG EM CHƯA» (CHỈ ĐỌC) — thầy 29/10; chạy lại 30/10 điều tra issue #613 (0/222 lúc 04:10). Chỉ SELECT gộp: không mã em, không tên.
 name: Đếm bộ nạp sẵn Sảnh + chặng (chỉ đọc)
 on:
   workflow_dispatch:
