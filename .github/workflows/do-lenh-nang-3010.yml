@@ -22,11 +22,12 @@ jobs:
           A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: bash scripts/lam-sach-khoa-cf.sh
       - name: Tail 120 giây
+        continue-on-error: true
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
         run: |
-          timeout 125 npx -y wrangler@4 tail omr --format json > /tmp/tail.ndjson 2>/tmp/tail.err || true
+          cd server && timeout 125 npx -y wrangler@4 tail omr --format json > /tmp/tail.ndjson 2>/tmp/tail.err || true
           echo "dòng tail: $(wc -l < /tmp/tail.ndjson)"; head -c 300 /tmp/tail.err | tr -d '\n'; echo
           node -e '
             const fs=require("fs");const L=fs.readFileSync("/tmp/tail.ndjson","utf8");const ev=[];let buf="",d=0
@@ -39,23 +40,8 @@ jobs:
             rows.sort((a,b)=>b.cpuTong-a.cpuTong)
             for(const r of rows.slice(0,45))console.log(`${r.p.padEnd(48)} n=${String(r.n).padStart(4)} cpuTong=${String(r.cpuTong).padStart(6)} tb=${r.cpuTb} p90=${r.cpu90} p99=${r.cpu99} max=${r.cpuMax} | tuong tb=${r.wallTb} p99=${r.wall99} | ${JSON.stringify(r.kq)}`)
           '
-      - name: Workers Logs khung 19:00–21:30 VN
-        env:
-          TOKEN: ${{ env.CF_TOKEN_SACH }}
-          ACC: ${{ env.CF_ACC_SACH }}
-        run: |
-          TU=$(date -u -d '2026-10-30T12:00:00Z' +%s)000; DEN=$(date -u -d '2026-10-30T14:30:00Z' +%s)000
-          for KEY in '$workers.event.request.path' '$workers.event.request.url'; do
-          jq -n --arg tu "$TU" --arg den "$DEN" --arg k "$KEY" '{queryId:"do-lenh-nang",timeframe:{from:($tu|tonumber),to:($den|tonumber)},view:"calculations",limit:60,
-            parameters:{datasets:["cloudflare-workers"],filters:[{key:"$workers.scriptName",operation:"eq",type:"string",value:"omr"}],
-              calculations:[{operator:"count"},{operator:"sum",key:"$workers.cpuTimeMs",keyType:"number"},{operator:"avg",key:"$workers.cpuTimeMs",keyType:"number"},{operator:"p99",key:"$workers.cpuTimeMs",keyType:"number"},{operator:"avg",key:"$workers.wallTimeMs",keyType:"number"},{operator:"p99",key:"$workers.wallTimeMs",keyType:"number"}],
-              groupBys:[{type:"string",value:$k}]}}' > /tmp/q.json
-          curl -sS -X POST -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' --data @/tmp/q.json "https://api.cloudflare.com/client/v4/accounts/$ACC/workers/observability/telemetry/query" > /tmp/obs.json
-          echo "== $KEY: success=$(jq -c '.success' /tmp/obs.json) loi=$(jq -c '.errors' /tmp/obs.json | head -c 300)"
-          jq -r '.result.calculations[]? | .alias as $a | .aggregates[]? | "\($a // "-") \(.groups|map(.value|tostring|split("?")[0]|.[0:70])|join(",")) = \(.value)"' /tmp/obs.json 2>/dev/null | sed -E 's/[0-9]{5,}/:so/g' | sort -t= -k2 -rn | head -120
-          jq -e '.success' /tmp/obs.json >/dev/null && break
-          done
       - name: D1 truy vấn nặng khung 19:00–21:30 VN
+        if: always()
         env:
           TOKEN: ${{ env.CF_TOKEN_SACH }}
           ACC: ${{ env.CF_ACC_SACH }}
