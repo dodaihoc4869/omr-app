@@ -5,7 +5,7 @@
 import { readFileSync } from 'node:fs'
 import { cleanup, render, screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
-import BangChungEm from '../src/components/hom-nay-thay/BangChungEm'
+import BangChungEm, { cauKetLuan } from '../src/components/hom-nay-thay/BangChungEm'
 import type { DongNhipHoc } from '../src/lib/nhip-hoc-thay'
 import type { EmLop } from '../src/lib/hoc-that-api'
 
@@ -54,6 +54,24 @@ describe('BangChungEm', () => {
     render(<BangChungEm d={D} htTai="co" hang={[]} />)
     expect(screen.getByText(/Em chưa có Điểm Thật tuần này/)).toBeTruthy()
     expect(screen.queryByText(/Điểm Thật ·/)).toBeNull()
+  })
+  it('câu kết luận một dòng bằng số: lười (so lớp, chuỗi bỏ, câu thiếu) · đối phó (đúng khi nhanh so với bình thường) · Học thật (vị trí trong trung tâm)', () => {
+    const lop = { ten: '12A1', soEm: 30, tbDuPt: 54, tbLam: 210, tbThieu: 120 }
+    expect(cauKetLuan(D, HT, lop, { tren: 40, tong: 201 })).toEqual([
+      'Lười: chỉ đủ mức 1/4 ngày = 25% (lớp 12A1 trung bình 54%), có 3 ngày liền không làm câu nào; còn thiếu 80 câu so với mức.',
+      'Đối phó: 23/54 lượt trả lời quá nhanh, mà chỉ đúng 28% (khi làm bình thường đúng 78%) — đoán cho xong, không đọc đề.',
+      'Không dạy nổi: Điểm Thật 31/100, cao hơn 20% số em có điểm tuần này — nhiều câu trả lời quá nhanh mà sai.',
+    ])
+    expect(cauKetLuan({ ...D, nhom: 'cham', soNgayDu: 4, chuoiDuGanNhat: 4, doiPho: null }, undefined)[0]).toBe('Chăm: đủ mức 4/4 ngày = 100%; 4 ngày đủ mức liền gần nhất, đã làm 30 câu.')
+  })
+  it('so với lớp: hai thanh em / lớp trung bình cho ngày đủ mức, câu đã làm, câu thiếu', () => {
+    render(<BangChungEm d={D} htTai="co" hang={[]} lop={{ ten: '12A1', soEm: 30, tbDuPt: 54, tbLam: 210, tbThieu: 120 }} />)
+    const k = screen.getByLabelText('So với lớp 12A1')
+    expect(k.textContent).toContain('So với 30 em lớp 12A1')
+    expect(k.textContent).toContain('Em 25%')
+    expect(k.textContent).toContain('Lớp TB 54%')
+    expect(k.textContent).toContain('Em 30')
+    expect(k.textContent).toContain('Lớp TB 210')
   })
   it('Hôm nay: tấm Hồ sơ nhận khối bằng chứng của đúng em đang mở', () => {
     const src = readFileSync('src/components/hom-nay-thay/NhipHocThay.tsx', 'utf8')

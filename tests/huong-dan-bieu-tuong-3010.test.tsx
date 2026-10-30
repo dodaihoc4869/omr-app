@@ -114,9 +114,9 @@ describe('chạm biểu tượng trên thanh số ⇒ tấm hướng dẫn', () 
 describe('nạp lười — không thêm byte mở app', () => {
   it('ThanhThuong và màn làm chặng nạp tấm qua mảnh ManThuong (import động), không nhập tĩnh TamHuongDan', () => {
     const tt = readFileSync('src/components/thuong/ThanhThuong.tsx', 'utf8')
-    expect(tt).toMatch(/lazy\(\(\) => import\('\.\/ManThuong'\)\.then\(\(m\) => \(\{ default: m\.TamHuongDan \}\)\)\)/)
+    expect(tt).toMatch(/lazy\(\(\) => import\('\.\/ManThuong'\)\.then\(\(m\) => \(\{ default: m\.PhuThanhThuong \}\)\)\)/)
     expect(tt).not.toMatch(/^import \{[^}]*TamHuongDan[^}]*\} from '\.\/TamHuongDan'/m)
-    expect(readFileSync('src/components/thuong/ManThuong.tsx', 'utf8')).toContain("export { TamHuongDan } from './TamHuongDan'")
+    expect(readFileSync('src/components/thuong/ManThuong.tsx', 'utf8')).toContain('export { TamHuongDan }')
     expect(readFileSync('src/components/hoc-tap/ManLamBaiTap.tsx', 'utf8')).toMatch(/import\('\.\.\/thuong\/ManThuong'\)\.then\(\(m\) => \(\{ default: m\.TamHuongDan \}\)\)/)
   })
 })

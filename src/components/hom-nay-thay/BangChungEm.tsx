@@ -11,6 +11,40 @@ import { ptChu, TEN_BAC_GV, type EmLop } from '../../lib/hoc-that-api'
 import type { CotXep, HocThatLop } from './XepHangEm'
 
 export interface HangEm { cot: CotXep; so: number; tong: number }
+/** So với các bạn cùng lớp (cùng khoảng ngày của Nhịp học): trung bình % ngày đủ mức, câu đã làm, câu còn thiếu. */
+export interface SoSanhLop { ten: string; soEm: number; tbDuPt: number; tbLam: number; tbThieu: number }
+/** Điểm Thật của em đứng trên bao nhiêu em có Điểm Thật tuần này. */
+export interface ViTriHt { tren: number; tong: number }
+
+const pt = (a: number, b: number) => (b > 0 ? Math.round((100 * a) / b) : 0)
+/** Câu kết luận MỘT dòng cho mỗi điều đã xếp (nhóm · đối phó · Học thật) — số thật, không tính từ cảm tính. Thuần. */
+export function cauKetLuan(d: DongNhipHoc | undefined, ht: EmLop | undefined, lop?: SoSanhLop, vt?: ViTriHt): string[] {
+  const ra: string[] = []
+  if (d && d.nhom !== 'chua-du') {
+    const n = d.soNgayQua, so = lop ? ` (lớp ${lop.ten} trung bình ${lop.tbDuPt}%)` : ''
+    const bo = d.chuoiKhongLam && d.chuoiKhongLam.dai >= 2 ? `, có ${d.chuoiKhongLam.dai} ngày liền không làm câu nào` : ''
+    if (d.nhom === 'luoi') ra.push(`Lười: chỉ đủ mức ${d.soNgayDu}/${n} ngày = ${pt(d.soNgayDu, n)}%${so}${bo}; còn thiếu ${d.tongCauThieu} câu so với mức.`)
+    else if (d.nhom === 'cham') ra.push(`Chăm: đủ mức ${d.soNgayDu}/${n} ngày = ${pt(d.soNgayDu, n)}%${so}; ${d.chuoiDuGanNhat} ngày đủ mức liền gần nhất, đã làm ${d.tongLam} câu.`)
+    else ra.push(`Chưa đều: đủ mức ${d.soNgayDu}/${n} ngày = ${pt(d.soNgayDu, n)}%${so}; ${d.soNgayKhongLam} ngày không làm, còn thiếu ${d.tongCauThieu} câu.`)
+  }
+  const q = d?.doiPho?.quaNhanh, c = d?.doiPho?.chonLap
+  if (q) ra.push(`Đối phó: ${q.nhanh}/${q.coGiay} lượt trả lời quá nhanh${q.dungNhanh !== null ? `, mà chỉ đúng ${q.dungNhanh}%${q.dungThuong !== null ? ` (khi làm bình thường đúng ${q.dungThuong}%)` : ''}` : ''} — đoán cho xong, không đọc đề.`)
+  else if (c) ra.push(`Đối phó: ${c.trongChuoi}/${c.tong} lượt trắc nghiệm nằm trong chuỗi chọn lặp (chọn ${c.chu} ${c.dai} lần liền).`)
+  if (ht) ra.push(`${TEN_BAC_GV[ht.bac]}: Điểm Thật ${Math.round(ht.diem)}/100${vt && vt.tong > 1 ? `, cao hơn ${pt(vt.tren, vt.tong - 1)}% số em có điểm tuần này` : ''}${ht.lyDo[0] ? ` — ${ht.lyDo[0]}` : ''}.`)
+  return ra
+}
+
+/** Hai thanh: em và trung bình lớp (cùng thước 0–max). */
+function ThanhSoSanh({ nhan, em, lop, dv = '', max }: { nhan: string; em: number; lop: number; dv?: string; max: number }) {
+  const w = (x: number) => `${max > 0 ? Math.min(100, Math.round((100 * x) / max)) : 0}%`
+  return (
+    <div className="bce-ss">
+      <span className="bce-ss-nhan">{nhan}</span>
+      <span className="bce-ss-dong" data-ai="em"><i style={{ width: w(em) }} /><b className="gvv2-so">Em {em}{dv}</b></span>
+      <span className="bce-ss-dong" data-ai="lop"><i style={{ width: w(lop) }} /><b className="gvv2-so">Lớp TB {lop}{dv}</b></span>
+    </div>
+  )
+}
 const TEN_COT: Record<CotXep, string> = { luoi: 'lười nhất', cham: 'chăm nhất', 'hoc-that': 'học thật nhất', 'doi-pho': 'đối phó nhiều nhất' }
 const TEN_MUC: Record<string, string> = { du: 'Đủ mức', 'thieu-it': 'Thiếu ít', 'thieu-nhieu': 'Thiếu nhiều', 'khong-lam': 'Không làm', 'chua-vao': 'Chưa vào học', 'hom-nay': 'Hôm nay (chưa hết ngày)' }
 
@@ -18,10 +52,11 @@ function So({ nhan, so, sac }: { nhan: string; so: string; sac?: 'xau' | 'tot' }
   return <div className="bce-o" data-sac={sac}><b className="gvv2-so">{so}</b><span>{nhan}</span></div>
 }
 
-export default function BangChungEm({ d, ht, htTai, hang }: { d?: DongNhipHoc; ht?: EmLop; htTai: HocThatLop['tt'] | 'tat'; hang: readonly HangEm[] }) {
+export default function BangChungEm({ d, ht, htTai, hang, lop, vt }: { d?: DongNhipHoc; ht?: EmLop; htTai: HocThatLop['tt'] | 'tat'; hang: readonly HangEm[]; lop?: SoSanhLop; vt?: ViTriHt }) {
   const n = d?.soNgayQua ?? 0
   const nhom = d && d.nhom !== 'chua-du' ? d.nhom : null
   const s = ht?.soLieu
+  const ket = cauKetLuan(d, ht, lop, vt)
   return (
     <section className="bce" aria-labelledby="bce-tieu">
       <h3 id="bce-tieu">Vì sao xếp em như vậy</h3>
@@ -32,6 +67,7 @@ export default function BangChungEm({ d, ht, htTai, hang }: { d?: DongNhipHoc; h
         {ht && <span data-k={ht.bac === 1 ? 'hoc-that' : ht.bac >= 4 ? 'nang' : ht.bac === 3 ? 'doi-pho' : 'chua-deu'}>{TEN_BAC_GV[ht.bac]} · Điểm Thật {Math.round(ht.diem)}</span>}
         {d?.doiPho && <span data-k="doi-pho">Có dấu hiệu đối phó</span>}
       </div>
+      {ket.length > 0 && <ul className="bce-ket" aria-label="Kết luận bằng số">{ket.map((x) => <li key={x}>{x}</li>)}</ul>}
 
       {d && (
         <div className="bce-khoi">
@@ -45,6 +81,14 @@ export default function BangChungEm({ d, ht, htTai, hang }: { d?: DongNhipHoc; h
             <So nhan="ngày đủ mức liền gần nhất" so={String(d.chuoiDuGanNhat)} sac={d.chuoiDuGanNhat >= 6 ? 'tot' : undefined} />
             <So nhan="hôm nay" so={d.homNay ? `${d.homNay.lam}/${d.homNay.muc}` : '—'} />
           </div>
+          {lop && lop.soEm > 1 && (
+            <div className="bce-ss-khoi" aria-label={`So với lớp ${lop.ten}`}>
+              <p className="bce-ss-tieu">So với {lop.soEm} em lớp {lop.ten}</p>
+              <ThanhSoSanh nhan="Ngày đủ mức" em={pt(d.soNgayDu, n)} lop={lop.tbDuPt} dv="%" max={100} />
+              <ThanhSoSanh nhan="Câu đã làm" em={d.tongLam} lop={lop.tbLam} max={Math.max(d.tongLam, lop.tbLam)} />
+              <ThanhSoSanh nhan="Câu còn thiếu" em={d.tongCauThieu} lop={lop.tbThieu} max={Math.max(d.tongCauThieu, lop.tbThieu)} />
+            </div>
+          )}
           {d.chuoiKhongLam && d.chuoiKhongLam.dai >= 2 && (
             <p className="bce-nhan" data-sac="xau">Bỏ dài nhất: <b>{d.chuoiKhongLam.dai} ngày liền không làm</b> ({ngayNgan(d.chuoiKhongLam.tu)} – {ngayNgan(d.chuoiKhongLam.den)}).</p>
           )}

@@ -321,7 +321,13 @@ export default function NhipHocThay({ du, dangTai, onThuLai, viec }: { du: DuNhi
     const them = (cot: CotXep, ds: readonly { sbd: string }[]) => { const i = ds.findIndex((x) => x.sbd === mo.sbd); if (i >= 0) hang.push({ cot, so: i + 1, tong: ds.length }) }
     them('luoi', luoi); them('cham', cham); them('hoc-that', hocThatDs); them('doi-pho', doiPho)
     const htTai = hocThat.tt === 'co' && hocThat.cheDo === 'tat' ? 'tat' : hocThat.tt
-    return <BangChungEm d={d} ht={ht} htTai={htTai} hang={hang} />
+    // So với bạn cùng lớp (cùng khoảng ngày) + vị trí Điểm Thật trong cả trung tâm — để kết luận có mốc so, không chỉ số trơn.
+    const cung = d ? (t?.dong ?? []).filter((x) => x.lop === d.lop && x.soNgayQua > 0) : []
+    const tb = (f: (x: DongNhipHoc) => number) => Math.round(cung.reduce((a, x) => a + f(x), 0) / Math.max(1, cung.length))
+    const lop = d && d.lop && cung.length ? { ten: d.lop, soEm: cung.length, tbDuPt: tb((x) => (100 * x.soNgayDu) / x.soNgayQua), tbLam: tb((x) => x.tongLam), tbThieu: tb((x) => x.tongCauThieu) } : undefined
+    const coDiem = hocThat.tt === 'co' ? hocThat.em.filter((x) => x.duDuLieu) : []
+    const vt = ht ? { tren: coDiem.filter((x) => x.diem < ht.diem).length, tong: coDiem.length } : undefined
+    return <BangChungEm d={d} ht={ht} htTai={htTai} hang={hang} lop={lop} vt={vt} />
   }, [mo, t, hocThat, luoi, cham, hocThatDs, doiPho])
 
   const onMo = useCallback((d: DongNhipHoc, nut: HTMLButtonElement) => {

@@ -14,9 +14,9 @@ import { soGon } from '../../lib/so-gon'
 import type { LoaiBieuTuong } from './TamHuongDan'
 import '../../styles/trong-thuong-gon.css'
 
-const ThongBaoThuong = lazy(() => import('./ManThuong').then((m) => ({ default: m.ThongBaoThuong })))
-// Tấm hướng dẫn lửa / nguyên tử / tinh thể (thầy 30/10) đi trong mảnh nạp lười ManThuong (đã được SW cất sẵn) ⇒ chạm là nạp, không thêm byte mở app.
-const TamHuongDan = lazy(() => import('./ManThuong').then((m) => ({ default: m.TamHuongDan })))
+// Tấm thông báo thưởng chưa xem + thẻ hướng dẫn lửa / nguyên tử / tinh thể (thầy 30/10): MỘT cửa nạp lười `PhuThanhThuong` trong mảnh ManThuong
+// (đã được SW cất sẵn) ⇒ chạm là nạp, không thêm byte mở app.
+const Phu = lazy(() => import('./ManThuong').then((m) => ({ default: m.PhuThanhThuong })))
 const CHU_VI = 138.2 // 2π·22
 
 export interface PropsThanhThuong {
@@ -71,8 +71,7 @@ export function ThanhThuong({ token, onMo, onHoc, thongBao = true, menu }: Props
     })()}
     {/* 27/10: tấm thông báo toàn khung (position: fixed) đưa ra <body> — thanh trên `.da-tren` có clip-path + sticky z-index ⇒ để bên trong thì tấm bị
         cắt còn đúng dải thanh trên (thấy nút Đóng + bộ đếm, mất thân). */}
-    {tb.length > 0 && typeof document !== 'undefined' && createPortal(<Suspense fallback={null}><ThongBaoThuong token={token!} tongQuan={du} onHoc={onHoc} /></Suspense>, document.body)}
-    {hd && typeof document !== 'undefined' && createPortal(<Suspense fallback={null}><TamHuongDan loai={hd} tq={du} onMo={onMo} onDong={() => setHd(null)} /></Suspense>, document.body)}
+    {(tb.length > 0 || hd) && typeof document !== 'undefined' && createPortal(<Suspense fallback={null}><Phu hd={hd ?? undefined} token={token!} tq={du} onHoc={onHoc} onMo={onMo} onDong={() => setHd(null)} /></Suspense>, document.body)}
   </div>
 }
 

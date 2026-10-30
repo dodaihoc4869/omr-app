@@ -311,6 +311,20 @@ html:not([data-trong]) .gvhn-the-nut > .gvhn-the-chu { flex: 1 1 120px; }
 .bce-phat li[data-xau] { background: var(--tr-sai-nhat, var(--gvm-ho-nen)); }
 .bce-phat li span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .bce-phat li b { flex: none; color: var(--tr-sai-chu, var(--gvm-ho)); font-weight: 900; }
+/* câu kết luận một dòng (số thật) — khối nổi ngay dưới nhãn, đọc là hiểu */
+.bce-ket { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 12px 14px 12px 32px; border-radius: 12px; background: var(--tr-mat-2, var(--gvm-mat-2)); font-size: 15px; font-weight: 700; line-height: 1.5; overflow-wrap: anywhere; }
+.bce-ket li::marker { color: var(--tr-chu-3, var(--gvm-chu-3)); }
+/* so với bạn cùng lớp: hai thanh cùng thước (em đậm theo màu nhóm, lớp xám) */
+.bce-ss-khoi { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; padding: 12px; border-radius: 12px; border: 1px solid var(--tr-vien, var(--gvm-vien)); }
+.bce-ss-tieu { margin: 0; color: var(--tr-chu-2, var(--gvm-chu-2)); font-size: 13px; font-weight: 800; }
+.bce-ss { display: grid; grid-template-columns: minmax(96px, 120px) minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 12px; row-gap: 3px; align-items: center; }
+.bce-ss-nhan { grid-row: span 2; color: var(--tr-chu-2, var(--gvm-chu-2)); font-size: 13px; font-weight: 700; line-height: 1.35; }
+.bce-ss-dong { position: relative; display: flex; align-items: center; min-height: 20px; border-radius: 6px; background: var(--tr-mat-2, var(--gvm-mat-2)); overflow: hidden; }
+.bce-ss-dong i { position: absolute; inset: 0 auto 0 0; border-radius: 6px; background: var(--tr-chinh, var(--gvm-xd)); }
+.bce-ss-dong[data-ai='lop'] i { background: var(--tr-vien-2, var(--gvm-vien)); }
+.bce:has(.bce-chip > [data-k='luoi']) .bce-ss-dong[data-ai='em'] i { background: var(--tr-sai, var(--gvm-ho)); }
+.bce:has(.bce-chip > [data-k='cham']) .bce-ss-dong[data-ai='em'] i { background: var(--tr-dung, var(--gvm-xl)); }
+.bce-ss-dong b { position: relative; padding: 0 8px; color: var(--tr-chu, var(--gvm-chu)); font-size: 12.5px; font-weight: 800; white-space: nowrap; text-shadow: 0 0 3px var(--tr-mat, var(--gvm-mat)); }
 @media (max-width: 600px) {
   .bce { padding: 12px; border-radius: 14px; }
   .bce-luoi { grid-template-columns: repeat(2, minmax(0, 1fr)); }
