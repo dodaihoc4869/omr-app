@@ -218,6 +218,8 @@ for (const k of ['border: 2px solid var(--tr-vien-2)', 'border-bottom: 2px solid
 // 27/10 thầy: «Chọn Lửa build luôn nhé» ⇒ linh vật Lửa (lua-dong.ts + lua.css, màu --lv-*) thay hình Bi vẽ trong Bi.tsx: 12 thuộc tính SVG fill="none"
 // của hình Bi cũ (không phải màu) biến mất cùng hình; đúng 12 lần, đúng tệp.
 MAU_CU_THAY_RA_LENH['src/components/linh-vat/Bi.tsx · fill: none'] = (MAU_CU_THAY_RA_LENH['src/components/linh-vat/Bi.tsx · fill: none'] ?? 0) + 12
+// 30/10 thầy: «Bóng mờ ngôi sao bạn bỏ đi nhé» ⇒ gỡ vệt bóng dưới ngôi sao nút chặng đang học (.da-sao-bong, Lộ trình HS): đúng 1 khai báo nền, đúng tệp.
+MAU_CU_THAY_RA_LENH['src/styles/trong-hs.css · background: var(--tr-day-khoi)'] = (MAU_CU_THAY_RA_LENH['src/styles/trong-hs.css · background: var(--tr-day-khoi)'] ?? 0) + 1
 // 27/10: đợt gỡ CSS chết thứ hai (tờ nạp chung index-*.css; luật tốc độ đỏ sau #430/#431) — danh sách đóng ở docs/css-chet-2710.json, cùng cách.
 for (const [k, n] of Object.entries(JSON.parse(readFileSync(new URL('../docs/css-chet-2710.json', import.meta.url), 'utf8')).cu)) MAU_CU_THAY_RA_LENH[k] = (MAU_CU_THAY_RA_LENH[k] ?? 0) + n
 // 27/10 chiều (máy yếu): CSS chết ở các tờ app học sinh / phụ huynh — danh sách đóng docs/css-chet-2710b.json, cùng cách.

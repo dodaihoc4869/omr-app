@@ -775,15 +775,12 @@
   45% { transform: translateY(-13px) scale(.97, 1.03); }
   80% { transform: translateY(-6px) scale(1, 1); }
 }
-@keyframes da-sao-bong { 0%, 100% { transform: translate(-50%, 0) scale(1); opacity: .9; } 12% { transform: translate(-50%, 0) scale(1.12); opacity: 1; } 45% { transform: translate(-50%, 0) scale(.62); opacity: .45; } 80% { transform: translate(-50%, 0) scale(1); opacity: .9; } }
 @keyframes da-lap-lanh { 0%, 100% { opacity: 1; transform: translateY(-6px) scale(1); } 50% { opacity: .78; transform: translateY(-6px) scale(1.08); } }
 [data-trong='hs'] .da-nut[data-tt='dang']:not(:disabled) { animation: none; }
 [data-trong='hs'] .da-nut[data-tt='dang'] .da-vong { animation: da-vong-tho 1.8s ease-in-out infinite; }
 [data-trong='hs'] .da-nut[data-tt='dang'] .da-vong .chay { animation: da-vong-to 600ms ease-out both; }
 [data-trong='hs'] .da-nut[data-tt='dang']::after { animation: da-mat-nhun 1.8s ease-in-out -.45s infinite; }
 [data-trong='hs'] .da-nut[data-tt='dang'] > svg:not(.da-vong) { transform-origin: 50% 100%; animation: da-sao-nay 1.8s cubic-bezier(.45, 0, .55, 1) infinite; }
-[data-trong='hs'] .da-sao-bong { position: absolute; left: 50%; top: calc(50% + 10px); z-index: 2; width: 26px; height: 6px; border-radius: 50%; background: var(--tr-day-khoi);
-  transform: translate(-50%, 0); animation: da-sao-bong 1.8s cubic-bezier(.45, 0, .55, 1) infinite; pointer-events: none; }
 [data-trong='hs'] .da-nut[data-tt='xong'] > svg:not(.da-vong) { animation: da-lap-lanh 3.2s ease-in-out infinite; }
 [data-trong='hs'] .da-o-nut:nth-child(3n + 2) .da-nut[data-tt='xong'] > svg:not(.da-vong) { animation-delay: -1.1s; }
 [data-trong='hs'] .da-o-nut:nth-child(3n) .da-nut[data-tt='xong'] > svg:not(.da-vong) { animation-delay: -2.2s; }
@@ -801,9 +798,9 @@
 [data-trong] .da-ruong .rg-ngoc-dam { fill: var(--tr-dung-chu); }
 [data-trong] .bi-loi[data-khong-bi] { justify-content: center; }
 @media (prefers-reduced-motion: reduce) {
-  [data-trong='hs'] :is(.da-nut[data-tt='dang'] .da-vong, .da-nut[data-tt='dang'] .da-vong .chay, .da-nut[data-tt='dang']::after, .da-nut > svg:not(.da-vong), .da-sao-bong) { animation: none !important; }
+  [data-trong='hs'] :is(.da-nut[data-tt='dang'] .da-vong, .da-nut[data-tt='dang'] .da-vong .chay, .da-nut[data-tt='dang']::after, .da-nut > svg:not(.da-vong)) { animation: none !important; }
 }
-[data-trong='hs'].may-yeu :is(.da-nut[data-tt='dang'] .da-vong, .da-nut[data-tt='dang'] .da-vong .chay, .da-nut[data-tt='dang']::after, .da-nut > svg:not(.da-vong), .da-sao-bong) { animation: none; }
+[data-trong='hs'].may-yeu :is(.da-nut[data-tt='dang'] .da-vong, .da-nut[data-tt='dang'] .da-vong .chay, .da-nut[data-tt='dang']::after, .da-nut > svg:not(.da-vong)) { animation: none; }
 /* VÒNG ĐOẠN (thầy 30/10 «chặng bao nhiêu câu thì chia bấy nhiêu đoạn, xong câu nào tô đoạn câu đó, làm khít lại, hiệu ứng tinh tế hơn», VongDoan ở TrongHs.tsx):
    bỏ mặt nạ 4 khe; mỗi câu một cung đầu tròn, khe đều; vòng 100 px ôm sát nút (khe ~3 px hai bên). Đoạn VỪA xong: vẽ dần theo chiều kim đồng hồ rồi dày lên
    một nhịp (so le 160 ms nếu nhiều đoạn); đoạn cũ đứng yên; nhịp thở của vòng nhẹ hơn. Giảm chuyển động ⇒ đứng yên; máy yếu ⇒ chỉ vẽ dần, không nhịp dày. */
@@ -1011,20 +1008,18 @@
   45% { transform: translateY(-9px) scale(.98, 1.02); }
   75% { transform: translateY(-6px) scale(1, 1); }
 }
-@keyframes da-sao-bong-nhe { 0%, 100% { transform: translate(-50%, 0) scale(1); opacity: .85; } 45% { transform: translate(-50%, 0) scale(.84); opacity: .6; } 75% { transform: translate(-50%, 0) scale(1); opacity: .85; } }
 @keyframes da-nhun-nhe { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -2px); } }
 [data-trong='hs'] .da-nut[data-tt='dang'] .da-vong { animation: da-vong-tho-nhe 2.4s ease-in-out infinite; }
 [data-trong='hs'] .da-nut[data-tt='dang']::after { animation: da-mat-nhun-nhe 2.4s ease-in-out infinite; }
 [data-trong='hs'] .da-nut[data-tt='dang'] > svg:not(.da-vong) { animation: da-sao-nay-nhe 2.4s cubic-bezier(.45, 0, .55, 1) infinite; }
-[data-trong='hs'] .da-sao-bong { animation: da-sao-bong-nhe 2.4s cubic-bezier(.45, 0, .55, 1) infinite; }
 [data-trong='hs'] .da-o-nut .da-nut[data-tt='xong'] > svg:not(.da-vong) { animation-delay: 0s; }
 [data-trong='hs'] .da-o-nut:has(.da-bong) { margin-top: 60px; }
 [data-trong='hs'] .da-bong { bottom: calc(100% + 32px); }
 [data-trong='hs'] .da-nut[data-tt='dang'] .da-bong { animation: da-nhun-nhe 1.8s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
-  [data-trong='hs'] :is(.da-nut[data-tt='dang'] .da-vong, .da-nut[data-tt='dang'] .da-vong .mo, .da-nut[data-tt='dang']::after, .da-nut > svg:not(.da-vong), .da-sao-bong, .da-nut[data-tt='dang'] .da-bong) { animation: none !important; }
+  [data-trong='hs'] :is(.da-nut[data-tt='dang'] .da-vong, .da-nut[data-tt='dang'] .da-vong .mo, .da-nut[data-tt='dang']::after, .da-nut > svg:not(.da-vong), .da-nut[data-tt='dang'] .da-bong) { animation: none !important; }
 }
-[data-trong='hs'].may-yeu :is(.da-nut[data-tt='dang'] .da-vong, .da-nut[data-tt='dang'] .da-vong .mo, .da-nut[data-tt='dang']::after, .da-nut > svg:not(.da-vong), .da-sao-bong, .da-nut[data-tt='dang'] .da-bong) { animation: none; }
+[data-trong='hs'].may-yeu :is(.da-nut[data-tt='dang'] .da-vong, .da-nut[data-tt='dang'] .da-vong .mo, .da-nut[data-tt='dang']::after, .da-nut > svg:not(.da-vong), .da-nut[data-tt='dang'] .da-bong) { animation: none; }
 /* khổ thấp (điện thoại ngang): thẻ gọn hơn để luôn vừa trên hoặc dưới nút */
 @media (max-height: 520px) {
   [data-trong] .da-pop { gap: 2px; padding: 12px 16px 14px; }

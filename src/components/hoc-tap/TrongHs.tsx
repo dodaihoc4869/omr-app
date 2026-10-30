@@ -357,7 +357,6 @@ function DuongChang({ ds, moDi, cam, moKhoa }: { ds: Nut[]; moDi: boolean; cam?:
             ôn tập (chặng đã chốt / tổng). Tự sửa lỗi / Bài tập về nhà không có số tổng ⇒ không vòng (vòng xám nguyên trông như «chưa làm gì»), giữ bong bóng. */}
         {n.vong !== undefined && <VongChang pt={n.vong} so={n.soDoan} da={n.daDoan} khoa={n.khoaVong} />}
         {n.bong && <span className="da-bong" aria-hidden="true">{n.bong}</span>}
-        {sao && <i className="da-sao-bong" aria-hidden="true" />}
         {/* ngôi sao đặc tự vẽ (không thêm biểu tượng thư viện vào mảnh dùng chung lúc mở app) */}
         {sao ? <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth={1.6} strokeLinejoin="round" aria-hidden="true"><path d="M12 2.8l2.8 5.8 6.3.8-4.6 4.4 1.2 6.3L12 17l-5.7 3.1 1.2-6.3-4.6-4.4 6.3-.8z" /></svg>
           : <Icon size={30} strokeWidth={2.6} aria-hidden="true" />}
