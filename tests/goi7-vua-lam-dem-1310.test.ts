@@ -128,3 +128,22 @@ it('câu Tự sửa lỗi không cộng vào đã làm hôm nay — sảnh, ô �
   expect((await ngayBaiCuaMotEm(k.env, 'S1', '2026-10-13', '2026-10-13', '2026-10-13'))?.map((n) => n.daLam)).toEqual([6])
   expect(lap.daLamNgay + lap.plan.viec.length).toBeGreaterThanOrEqual(lap0.toiThieu) // phần học còn lại vẫn được xếp đủ mức
 })
+
+// 30/10 (thầy: «Phần chặng tính số câu riêng nha, hs làm trong tu luyện là phần chặng tự nhiên xong»): câu Tự luyện (`nguon = 'tu_luyen'`) KHÔNG cộng vào
+// «đã làm hôm nay» (Lộ trình / ô đếm / lịch ngày cùng số).
+it('câu Tự luyện không cộng vào đã làm hôm nay — chặng không tự xong; sảnh, ô đếm, lịch ngày cùng số', async () => {
+  const k = await kho()
+  const lap0 = (await lapGoi7(k.env, 'S1', NOW))!
+  const ke = lap0.plan.viec.map((v) => v.qid)
+  const luc = NOW - 60_000
+  const hoc = ke.slice(0, 3)
+  ghiLuotNgay(k, hoc, luc)
+  const luyen = ke.slice(3, 9)
+  const dong = (nguon: string, q: string) => ({ nguon, maNguon: nguon === 'tu_luyen' ? 'luot-tl-1' : 'phien-cuoi', sbd: 'S1', qid: q, lan: 1, ketQua: 1, luc: new Date(luc).toISOString(), maDang: '', chuyenDe: '', mucDo: '', attemptId: `${nguon}|${q}`, assistance: 'none', purpose: nguon === 'tu_luyen' ? 'repair' : 'maintenance', receivedAt: luc })
+  await ghiSuKien(k.env, [...hoc.map((q) => dong('game', q)), ...luyen.map((q) => dong('tu_luyen', q))] as never)
+  const lap = (await lapGoi7(k.env, 'S1', NOW))!
+  expect(lap.daLamNgay).toBe(3) // trước: 9 ⇒ chặng 1 «xong» dù em mới làm 3 câu của chặng
+  expect((await demHomNay7(k.env, 'S1', NOW)).daLamHomNay).toBe(3)
+  expect((await ngayBaiCuaMotEm(k.env, 'S1', '2026-10-13', '2026-10-13', '2026-10-13'))?.map((n) => n.daLam)).toEqual([3])
+})
+

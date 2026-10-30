@@ -35,7 +35,7 @@ import { cungTap, layKeHoach7, nhoKeHoach7, xemKeHoach7 } from './goi-bai-7-nho'
 import { dangKyKichThuoc } from './dem-chung'
 import { lenhThuongTraLoi, tinhThuongHocCachGiai, type PhienNt } from './thuong-tra-loi'
 import { ngayVnTt } from './thuong-luat'
-import { CAU_MOT_BAI, SQL_KHONG_TU_SUA, SQL_LA_LUOT_CHANG } from './chuoi-ngay-bai'
+import { CAU_MOT_BAI, SQL_LA_LUOT_CHANG } from './chuoi-ngay-bai'
 
 type Row = Record<string, unknown>
 const str = (x: unknown) => String(x ?? '')
@@ -284,14 +284,15 @@ export async function docDaLamVaVuaLam7(env: Env, sbd: string, ngay: string, now
   const tu = now === undefined ? '' : new Date(Math.max(now - VUA_LAM_MS, Date.parse(`${ngay}T00:00:00+07:00`))).toISOString()
   const [done, guidedToday, vua] = await Promise.all([
     // (29/10) + lượt LƯỚT của chặng (câu đã phát + đã trả lời) và cờ `ll` (câu làm lại cuối chặng): `daLam` GIỮ cả hai (không phát lại câu em vừa làm), `soDaLam` chỉ đếm câu của chặng.
-    env.DB.prepare(`SELECT qid, MIN(CASE WHEN COALESCE(json_extract(raw_json,'$.ll'),0)=1 THEN 1 ELSE 0 END) AS ll, MIN(CASE WHEN purpose='luot' THEN 1 ELSE 0 END) AS chi_luot FROM su_kien_hoc WHERE sbd=? AND ngay_vn=? AND ma_nguon NOT LIKE 'ktcn:%' AND ${SQL_KHONG_TU_SUA} AND ((ket_qua IS NOT NULL AND ${SQL_LUOT_GOI7}) OR ${SQL_LA_LUOT_CHANG}) GROUP BY qid`).bind(sbd,ngay).all<{qid:string;ll:number;chi_luot:number}>(),
+    // (30/10) câu TỰ LUYỆN (`tl` = mọi dòng của câu đều từ Tự luyện): GIỮ trong `daLam` (chặng không phát lại câu em vừa luyện) nhưng KHÔNG đếm vào `soDaLam` (chặng tính số câu riêng).
+    env.DB.prepare(`SELECT qid, MIN(CASE WHEN COALESCE(json_extract(raw_json,'$.ll'),0)=1 THEN 1 ELSE 0 END) AS ll, MIN(CASE WHEN purpose='luot' THEN 1 ELSE 0 END) AS chi_luot, MIN(CASE WHEN nguon='tu_luyen' THEN 1 ELSE 0 END) AS tl FROM su_kien_hoc WHERE sbd=? AND ngay_vn=? AND ma_nguon NOT LIKE 'ktcn:%' AND COALESCE(nguon,'')<>'chua_loi' AND ((ket_qua IS NOT NULL AND ${SQL_LUOT_GOI7}) OR ${SQL_LA_LUOT_CHANG}) GROUP BY qid`).bind(sbd,ngay).all<{qid:string;ll:number;chi_luot:number;tl:number}>(),
     env.DB.prepare("SELECT DISTINCT qid FROM goi_bai_7_gap WHERE sbd=? AND date(luc,'+7 hours')=?").bind(sbd,ngay).all<{qid:string}>(),
     // `co_so`: lượt đã có dòng sổ (chỉ mục su_kien_hoc(sbd, qid, ngay_vn)) ⇒ sổ quyết định (lướt / chẩn đoán không tính); chưa có ⇒ đang chờ ghi, tính ngay (kể cả câu tiếp cận có gợi ý/hỗ trợ; chỉ trừ câu lướt hoặc câu làm lại cuối chặng).
     tu ? env.DB.prepare("SELECT a.qid,EXISTS(SELECT 1 FROM su_kien_hoc s WHERE s.sbd=a.sbd AND s.qid=a.qid AND s.ngay_vn=? AND s.attempt_id=a.id) co_so,(CASE WHEN COALESCE(json_extract(a.json,'$.omni.luot'),0)=1 OR EXISTS(SELECT 1 FROM game_v2_session gs,json_each(gs.json,'$.questions') gq WHERE gs.id=a.session AND gs.sbd=a.sbd AND json_extract(gq.value,'$.qid')=a.qid AND COALESCE(json_extract(gq.value,'$.lamLaiCuoi'),0)=1) THEN 1 ELSE 0 END) khong_tinh FROM game_v2_attempt a WHERE a.sbd=? AND a.created_at>=?").bind(ngay,sbd,tu).all<{qid:string;co_so:number;khong_tinh:number}>().catch(() => ({ results: [] as {qid:string;co_so:number;khong_tinh:number}[] })) : Promise.resolve({ results: [] as {qid:string;co_so:number;khong_tinh:number}[] }),
   ])
   const daLamNgay = new Set<string>(), tinh = new Set<string>()
   const chiLuot = new Set<string>()
-  for(const r of done.results){daLamNgay.add(r.qid);if(!Number(r.ll))tinh.add(r.qid);if(Number(r.chi_luot)&&!Number(r.ll))chiLuot.add(r.qid)}
+  for(const r of done.results){daLamNgay.add(r.qid);if(!Number(r.ll)&&!Number(r.tl))tinh.add(r.qid);if(Number(r.chi_luot)&&!Number(r.ll))chiLuot.add(r.qid)}
   for(const r of guidedToday.results){daLamNgay.add(r.qid);tinh.add(r.qid)}
   const vuaLam = new Set<string>()
   // Lượt vừa trả lời mà sổ chưa kịp có: tính ngay vào số đã làm hôm nay (kể cả câu có gợi ý / hỗ trợ), TRỪ câu lướt hoặc câu làm lại cuối chặng.
