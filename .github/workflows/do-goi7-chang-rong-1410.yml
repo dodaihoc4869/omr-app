@@ -1,11 +1,10 @@
 # LỖI 14/10 (thầy: "học sinh còn 1 câu nhưng app ko cho làm, sửa triệt để nhé") — em còn thiếu mức Gói 7 mà mở chặng rỗng: kế hoạch rỗng hay câu kế hoạch
 # bị lọc lúc phát? Chạy ĐÚNG mã máy chủ trên D1 thật, CHỈ ĐỌC (lớp mỏng chỉ gửi SELECT), CHỈ IN SỐ ĐẾM (repo công khai: không số báo danh / tên / mã câu).
 name: Gói 7 — chặng rỗng khi còn thiếu mức (chỉ đọc, chỉ đếm)
+# 30/10 21h (thầy: «app hs không bấm được, đơ luôn»): BỎ tự chạy khi đẩy nhánh sửa goi-bai-7.ts — mỗi lượt chạy mã kế hoạch cho rất nhiều em trên D1 THẬT
+# ~10 phút ⇒ D1 nghẽn giữa giờ cao điểm (lệnh đọc D1 3–4,5 s). Chỉ chạy BẤM TAY, ngoài khung 19–23h.
 on:
   workflow_dispatch:
-  push:
-    paths: ['.github/workflows/do-goi7-chang-rong-1410.yml', 'scripts/do-goi7-chang-rong-1410.ts', 'server/src/goi-bai-7.ts']
-    branches-ignore: [main]
 permissions:
   contents: read
 concurrency:
