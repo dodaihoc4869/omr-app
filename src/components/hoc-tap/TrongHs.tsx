@@ -447,34 +447,22 @@ export default function GacTamDong({ p, kiem }: { p: PropsHomNayCu; kiem?: TomTa
     kiemDo={!p.coCa && kiem?.homNay && kiem.nopLuc === null && kiem.trangThai === 'can_lam' && kiem.daTra > 0 ? p.onKiemTra : undefined} /></Suspense> : null
 }
 
-/** Đồng bộ tức thì tiến độ chặng đang làm dở (`omr_chang_dang_cua`) vào `so` trên Lộ trình — học sinh làm vài câu rồi thoát ra hoặc tải lại trang thấy ngay vạch tiến độ và «Học tiếp» ở 0 ms. */
+/** Đồng bộ tức thì tiến độ chặng đang làm dở (`omr_chang_dang_cua`) vào `so` trên Lộ trình — chỉ tính câu ĐÃ BẤM NỘP (`ket`), và giữ chặng ở trạng thái đang học (`changDangDo`, chưa tích ✓) cho tới khi màn báo hoàn thành chặng hiện ra. */
 function nangSoTuChangDangDo(so: SoHomNay | null): SoHomNay | null {
-  if (!so || typeof localStorage === 'undefined') return so
+  if (!so) return so
   try {
-    const raw = localStorage.getItem('omr_chang_dang_cua')
-    if (!raw) return so
-    const d = JSON.parse(raw) as { sbd?: unknown; ngay?: unknown; cau?: unknown[]; soGoc?: unknown; ket?: Record<string, unknown>; moi?: { qids?: unknown[]; d0?: unknown }; dem?: { daLam?: unknown } | null; chang?: unknown } | null
-    const sbd = sbdPhien()
-    if (!d || d.ngay !== ngayVn(Date.now()) || (sbd && typeof d.sbd === 'string' && d.sbd !== sbd.trim()) || !Array.isArray(d.cau)) return so
-    const ket = d.ket && typeof d.ket === 'object' ? d.ket : {}
-    const soGoc = typeof d.soGoc === 'number' && d.soGoc > 0 ? d.soGoc : d.cau.length
-    let soDaTra = 0
-    for (const c of d.cau.slice(0, soGoc) as { qid?: unknown; vaiGoi7?: unknown }[]) {
-      if (!c || typeof c.qid !== 'string' || c.vaiGoi7 === 'lam_lai') continue
-      const k = ket[c.qid] as { omni?: { luot?: unknown } } | undefined
-      if (!k || k.omni?.luot === true) continue
-      soDaTra++
+    const d = JSON.parse(localStorage.getItem('omr_chang_dang_cua') || 'null'), sbd = sbdPhien(), now = Date.now()
+    if (!d || d.ngay !== ngayVn(now) || (sbd && d.sbd && String(d.sbd).trim() !== sbd.trim()) || now - d.moLuc >= 6300_000 || !d.cau?.length) return so
+    const ket = d.ket || {}, g = d.soGoc > 0 ? d.soGoc : d.cau.length
+    const n = d.cau.slice(0, g).filter((c: { qid?: string; vaiGoi7?: string }) => c?.qid && c.vaiGoi7 !== 'lam_lai' && ket[c.qid] && ket[c.qid].omni?.luot !== true).length
+    const d0Luu = d.moi?.d0 ?? -1, ch = d.chang >= 1 && d.chang <= so.soChang ? d.chang : so.soChang > 0 ? Math.min(so.soChang, (((d0Luu >= 0 ? d0Luu : Math.max(0, so.daLam - n)) / 6) | 0) + 1) : 0
+    if (ch >= 1 && d0Luu < so.muc) {
+      const dau = Math.min((ch - 1) * 6, so.muc), cuoi = ch === so.soChang ? so.muc : Math.min(ch * 6, so.muc)
+      const d0 = d0Luu >= dau && d0Luu + g <= cuoi ? d0Luu : Math.max(dau, cuoi - g)
+      return { ...so, daLam: n > 0 ? Math.min(cuoi, Math.max(dau, d0 + n)) : Math.min(so.daLam, cuoi), chang: ch, changDangDo: n > 0 || so.daLam >= cuoi ? ch : undefined }
     }
-    const qidsLen = Array.isArray(d.moi?.qids) ? d.moi.qids.length : 0
-    const daTra = Math.max(soDaTra, qidsLen)
-    if (daTra <= 0) return so
-    const d0 = typeof d.moi?.d0 === 'number' && d.moi.d0 >= 0 ? d.moi.d0 : typeof d.chang === 'number' && d.chang >= 1 ? (d.chang - 1) * 6 : Math.floor(so.daLam / 6) * 6
-    const daLam = Math.max(so.daLam, typeof d.dem?.daLam === 'number' ? d.dem.daLam : 0, d0 + daTra)
-    if (daLam <= so.daLam) return so
-    return { ...so, daLam, chang: so.soChang > 0 ? Math.min(so.soChang, Math.floor(daLam / 6) + 1) : so.chang }
-  } catch {
-    return so
-  }
+    return n > 0 ? { ...so, daLam: Math.max(so.daLam, (d0Luu >= 0 ? d0Luu : Math.max(0, so.daLam - n)) + n) } : so
+  } catch { return so }
 }
 
 export function MotTrangHs(p: PropsMotTrang) {
@@ -568,7 +556,7 @@ export function MotTrangHs(p: PropsMotTrang) {
   useEffect(() => { if (p.muc === 'ket-qua' && p.token) napSanThanhTich(p.token) }, [p.muc, p.token])
   const moTp = (man: TenManThuong) => setTp({ man })
   const con = so ? Math.max(0, so.muc - so.daLam) : null
-  const du = con === 0
+  const du = con === 0 && !so?.changDangDo
   const nutHoc = chuNutHoc(so, p.hetCau, p.kho)
   const kiemXong = !!kiem && (kiem.nopLuc !== null || kiem.trangThai === 'het_han')
   const kiemLam = !!kiem && kiem.homNay && !kiemXong && kiem.trangThai === 'can_lam'
@@ -715,14 +703,15 @@ export function MotTrangHs(p: PropsMotTrang) {
   if (!p.ngayKiem) chang.forEach((c, i) => {
     if (nutSua && i === mocSua) nut.push(nutSua)
     const dang = c.tt === 'dang' && chinh === 'hoc' || c.tt === 'dang' && chinh === 'ca'
-    const thu = `Chặng ${i + 1} / ${chang.length}`, conChang = so ? Math.max(0, Math.min(c.co, dauChang + c.co - so.daLam)) : c.co
+    const dangDoNay = c.tt === 'dang' && so?.changDangDo === i + 1
+    const thu = `Chặng ${i + 1} / ${chang.length}`, conChang = so ? Math.max(dangDoNay ? 1 : 0, Math.min(c.co, dauChang + c.co - so.daLam)) : c.co
     dauChang += c.co
     if (khoaKt && c.tt !== 'xong') { nut.push({ k: `c${i}`, loai: 'hoc', tt: 'khoa', ten: `Chặng ${i + 1}: khoá đến khi làm xong Kiểm tra ôn tập`, pop: { tieu: tenBaiThe, phu: `${thu} · ${CHU_KHOA_KT}` } }); return }
     if (khoaSua && i >= mocSua && c.tt !== 'xong') { nut.push({ k: `c${i}`, loai: 'hoc', tt: 'khoa', ten: `Chặng ${i + 1}: khoá đến khi sửa xong lỗi hôm nay`, pop: { tieu: tenBaiThe, phu: `${thu} · Sửa xong ${conPhan} lỗi hôm nay để mở chặng tiếp` } }); return }
     nut.push(c.tt === 'xong' ? { k: `c${i}`, loai: 'hoc', tt: 'xong', ten: `Chặng ${i + 1}: đã xong`,
       pop: { tieu: tenBaiThe, phu: `${thu} · đã xong`, nut: hs ? { chu: 'Xem lại', onClick: hs.onXemLai } : undefined } }
       : c.tt === 'dang' ? { k: `c${i}`, loai: 'hoc', tt: 'dang', ten: nutHoc, bong: dang && chinh === 'hoc' ? (c.phan > 0 ? 'Học tiếp' : 'Bắt đầu') : undefined, vong: chinh === 'sua' ? undefined : c.phan,
-        pop: { tieu: tenBaiThe, phu: p.khoaHoc || p.hetCau ? nutHoc : `${thu} · ${conChang} câu`, nut: { chu: c.phan > 0 ? 'Tiếp tục' : 'Bắt đầu', onClick: p.onHoc, tat: p.khoaHoc } } }
+        pop: { tieu: tenBaiThe, phu: (p.khoaHoc || p.hetCau) && !dangDoNay ? nutHoc : `${thu} · ${conChang} câu`, nut: { chu: c.phan > 0 ? 'Tiếp tục' : 'Bắt đầu', onClick: p.onHoc, tat: p.khoaHoc && !dangDoNay } } }
       : { k: `c${i}`, loai: 'hoc', tt: 'khoa', ten: `Chặng ${i + 1}: chưa mở`, pop: { tieu: tenBaiThe, phu: `${thu} · Hoàn thành các chặng trước để mở khoá` } })
   })
   if (nutSua && mocSua >= chang.length) nut.push(nutSua) // hết chặng mới (hoặc ngày không có chặng) ⇒ sau chặng cuối

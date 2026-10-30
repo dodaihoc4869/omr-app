@@ -24,13 +24,8 @@ export function nhanPhim(v: string, phim: PhimSo, soO: number = TOI_DA_KY_TU): s
   const s = String(v ?? '')
   if (phim === 'xoa') return s.slice(0, -1)
   if (phim === 'xoa-het') return ''
-  if (phim === '-') {
-    const moi = doiDau(s)
-    return laAm(s) || moi.length <= soO ? moi : s
-  }
-  if (s.length >= soO) return s
-  if (phim === ',') return coPhay(s) ? s : s + ','
-  return s + phim
+  if (phim === '-') { const moi = doiDau(s); return laAm(s) || moi.length <= soO ? moi : s }
+  return s.length >= soO ? s : phim === ',' ? (coPhay(s) ? s : s + ',') : s + phim
 }
 
 /** Phím này bấm có đổi được gì không (để làm mờ phím hết tác dụng). */
@@ -40,12 +35,7 @@ export function phimCoTacDung(v: string, phim: PhimSo, soO: number = TOI_DA_KY_T
 
 /** Phím của máy tính → phím của bàn phím số (gõ số trên máy tính vẫn nhập được). Không phải phím của ô ⇒ null. */
 export function phimTuBanPhim(key: string): PhimSo | null {
-  if (/^[0-9]$/.test(key)) return key as PhimSo
-  if (key === ',' || key === '.' || key === 'Decimal') return ','
-  if (key === '-' || key === '−' || key === 'Subtract') return '-'
-  if (key === 'Backspace') return 'xoa'
-  if (key === 'Delete') return 'xoa-het'
-  return null
+  return /^[0-9]$/.test(key) ? key as PhimSo : key === ',' || key === '.' || key === 'Decimal' ? ',' : key === '-' || key === '−' || key === 'Subtract' ? '-' : key === 'Backspace' ? 'xoa' : key === 'Delete' ? 'xoa-het' : null
 }
 
 /** Chữ hiện trong từng ô: dấu trừ in "−" (U+2212) cho dễ nhìn, giá trị gửi đi vẫn "-". */
@@ -64,6 +54,8 @@ export interface SoHomNay {
   chang: number | null
   /** Số chặng của hôm nay (mỗi chặng tối đa 6 câu). */
   soChang: number
+  /** Chặng đang làm dở (1…soChang) chưa tới màn báo hoàn thành chặng ⇒ chưa tính xong chặng đó (chưa tích ✓). */
+  changDangDo?: number | null
 }
 /** Mỗi chặng tối đa 6 câu — cùng hằng với máy chủ (`server/src/hanh-trinh-ngay.ts` CAU_MOI_CHANG) và vạch chặng ở Hôm nay. */
 export const CAU_MOI_CHANG = 6
@@ -79,34 +71,30 @@ export const CAU_MOI_CHANG = 6
  *    em học Gói 7 hay Hành trình ⇒ null (khung xương / "Thử lại"), không vẽ "7/8" của kế hoạch cũ thành số hôm nay.
  */
 export function soHomNay(kq: KetQuaSanh | null | undefined, tienDoCu?: { daLam: number; mucTieu: number }): SoHomNay | null {
-  const sanh = kq && kq.cheDo2 && 'sanh' in kq ? kq.sanh : null
-  const goi7 = sanh?.goi7
-  const ht = sanh?.hanhTrinh
-  const cu = kq ? tienDoCu : undefined
-  const daLam = goi7?.daLamHomNay ?? ht?.daLam ?? (sanh ? Math.max(0, sanh.theLuc.tong - sanh.theLuc.con) : cu?.daLam ?? null)
-  const muc = goi7?.toiThieu ?? ht?.toiThieu ?? sanh?.theLuc.tong ?? cu?.mucTieu ?? null
+  const s = kq && kq.cheDo2 && 'sanh' in kq ? kq.sanh : null, g = s?.goi7, ht = s?.hanhTrinh, cu = kq ? tienDoCu : undefined
+  const daLam = g?.daLamHomNay ?? ht?.daLam ?? (s ? Math.max(0, s.theLuc.tong - s.theLuc.con) : cu?.daLam ?? null)
+  const muc = g?.toiThieu ?? ht?.toiThieu ?? s?.theLuc.tong ?? cu?.mucTieu ?? null
   if (daLam === null || muc === null || !Number.isFinite(daLam) || !Number.isFinite(muc) || muc <= 0) return null
-  // Số chặng đi CÙNG nguồn với M: Gói 7 ⇒ ceil(M/6) (12/10E: Sảnh có cả Hành trình lẫn Gói 7 thì trước đây lấy số chặng của Hành trình — "1/5 chặng" khi
-  // M = 32 cần 6 chặng); Hành trình ⇒ số chặng máy chủ xếp.
-  const soChang = goi7 ? Math.ceil(muc / CAU_MOI_CHANG) : (ht?.soChang ?? Math.ceil(muc / CAU_MOI_CHANG))
-  const chang = soChang <= 0 ? null : ht && !goi7 ? (ht.changHienTai >= 1 ? Math.min(ht.changHienTai, soChang) : null) : Math.min(soChang, Math.floor(daLam / CAU_MOI_CHANG) + 1)
+  const soChang = (g ? null : ht?.soChang) ?? Math.ceil(muc / CAU_MOI_CHANG)
+  const chang = soChang <= 0 ? null : ht && !g ? (ht.changHienTai >= 1 ? Math.min(ht.changHienTai, soChang) : null) : Math.min(soChang, ((daLam / CAU_MOI_CHANG) | 0) + 1)
   return { daLam, muc, chang, soChang }
 }
 
 
-/** Số chặng đã xong hôm nay — cùng luật vạch chặng ở Hôm nay. */
+/** Số chặng đã xong hôm nay — cùng luật vạch chặng ở Hôm nay; chặng đang dở chưa qua màn báo hoàn thành (`changDangDo`) chưa được tính là xong. */
 export function soChangXong(s: SoHomNay): number {
-  return Array.from({ length: s.soChang }, (_, i) => s.daLam >= Math.min((i + 1) * CAU_MOI_CHANG, s.muc)).filter(Boolean).length
+  let x = 0
+  for (let i = 0; i < s.soChang; i++) if (s.daLam >= Math.min((i + 1) * CAU_MOI_CHANG, s.muc)) x++
+  return s.changDangDo && x >= s.changDangDo ? s.changDangDo - 1 : x
 }
 
 // ───────────────────────────── CHỮ PHẢN HỒI ─────────────────────────────
 
 /** "Làm trong 41 giây" · "Làm trong 1 phút 05 giây". Không đo được ⇒ ''. */
 export function chuThoiGian(ms: number | undefined): string {
-  if (ms === undefined || !Number.isFinite(ms) || ms <= 0) return ''
+  if (!ms || !Number.isFinite(ms) || ms <= 0) return ''
   const g = Math.max(1, Math.round(ms / 1000))
-  if (g < 60) return `Làm trong ${g} giây`
-  return `Làm trong ${Math.floor(g / 60)} phút ${String(g % 60).padStart(2, '0')} giây`
+  return g < 60 ? `Làm trong ${g} giây` : `Làm trong ${Math.floor(g / 60)} phút ${String(g % 60).padStart(2, '0')} giây`
 }
 
 

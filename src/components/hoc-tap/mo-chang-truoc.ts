@@ -190,7 +190,7 @@ function napAnhSan(qs: KetQuaMo[]): void {
       if (typeof src === 'string' && src && !src.startsWith('data:') && !ds.includes(src)) ds.push(src)
   }
   if (!ds.length) return
-  const chay = () => { for (const src of ds) { const im = new Image(); im.decoding = 'async'; im.src = src } }
+  const chay = () => ds.forEach((src) => { const im = new Image(); im.decoding = 'async'; im.src = src })
   const w = globalThis as { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }
   if (w.requestIdleCallback) w.requestIdleCallback(chay, { timeout: 5000 }); else setTimeout(chay, 1500)
 }
@@ -202,31 +202,26 @@ export function layChangGoi(sbd: string, now: number = Date.now(), so = CAU_MOI_
   const g = docGoi(sbd)
   if (!g || g.ngay !== ngayMay(now)) return null
   const xong = docXong(sbd, g.ngay), questions: KetQuaMo[] = [], ves: string[] = []
-  for (const c of g.chang) {
-    for (const q of c.questions) {
-      if (questions.length >= so) break
-      if (typeof q.qid !== 'string' || xong.has(q.qid) || questions.some((x) => x.qid === q.qid)) continue
-      questions.push(q)
-      if (!ves.includes(c.ve)) ves.push(c.ve)
+  for (const c of g.chang) for (const q of c.questions) {
+    if (questions.length >= so) break
+    if (typeof q.qid === 'string' && !xong.has(q.qid) && !questions.some((x) => x.qid === q.qid)) {
+      questions.push(q); if (!ves.includes(c.ve)) ves.push(c.ve)
     }
   }
   return questions.length ? { ves, questions, goi7: g.goi7 } : null
 }
 function coChangGoiCua(token: string, now: number): boolean {
   const c = docJson(KHOA_CUA) as { sbd?: unknown; t?: unknown } | null
-  return !!c && typeof c.sbd === 'string' && c.t === duoiToken(token) && (!!docChangDangLam(c.sbd, now) || !!layChangGoi(c.sbd, now))
+  return !!c && typeof c.sbd === 'string' && c.t === duoiToken(token) && !!(docChangDangLam(c.sbd, now) || layChangGoi(c.sbd, now))
 }
 
 /** Lưu trạng thái chặng em đang làm dở trên máy — thoát bất thình lình mở lại đúng câu, đúng tiến độ tức thì 0 ms. */
 export function luuChangDangLam(sbd: string, b: Omit<ChangDangLam, 'sbd' | 'ngay' | 'luc'>, now: number = Date.now()): void {
   sbd = sbd.trim()
-  if (!batGoi || !sbd || !Array.isArray(b.cau) || !b.cau.length) return
-  const moLuc = typeof b.moLuc === 'number' && b.moLuc > 0 ? b.moLuc : now
-  const d: ChangDangLam = { ...b, sbd, ngay: ngayMay(now), moLuc, luc: now }
-  nhoDang.set(sbd, d)
-  ghiJson(khoaDang(sbd), d)
-  ghiJson('omr_chang_dang_cua', d)
-  if (b.ket && Object.keys(b.ket).length > 0) try { localStorage.removeItem('ddh.khung-tinh-hs') } catch { /* bỏ qua */ }
+  if (!batGoi || !sbd || !b.cau?.length) return
+  const d: ChangDangLam = { ...b, sbd, ngay: ngayMay(now), moLuc: b.moLuc > 0 ? b.moLuc : now, luc: now }
+  nhoDang.set(sbd, d); ghiJson(khoaDang(sbd), d); ghiJson('omr_chang_dang_cua', d)
+  if (b.ket && Object.keys(b.ket).length) try { localStorage.removeItem('ddh.khung-tinh-hs') } catch { /* bỏ qua */ }
 }
 
 /** Đọc trạng thái chặng đang làm dở của `sbd`; khác ngày / quá hạn phiên / dữ liệu hỏng ⇒ xoá và trả null. */
@@ -234,7 +229,7 @@ export function docChangDangLam(sbd: string, now: number = Date.now()): ChangDan
   sbd = sbd.trim()
   if (!batGoi || !sbd) return null
   const m = nhoDang.get(sbd) ?? (docJson(khoaDang(sbd)) as ChangDangLam | null)
-  if (!m || m.sbd !== sbd || m.ngay !== ngayMay(now) || typeof m.moLuc !== 'number' || now - m.moLuc >= HAN_CHANG_DANG_MS || !Array.isArray(m.cau) || !m.cau.length || typeof m.viTri !== 'number' || m.viTri < 0 || m.viTri >= m.cau.length) {
+  if (!m || m.sbd !== sbd || m.ngay !== ngayMay(now) || !(now - m.moLuc < HAN_CHANG_DANG_MS) || !m.cau?.length || !(m.viTri >= 0 && m.viTri < m.cau.length)) {
     if (m) xoaChangDangLam(sbd)
     return null
   }
@@ -254,9 +249,7 @@ export function xoaChangDangLam(sbd: string): void {
 export function ghiCauXong(sbd: string, qid: string, now: number = Date.now()): void {
   if (!batGoi || !sbd || !qid) return
   const n = ngayMay(now), q = docXong(sbd, n)
-  if (q.has(qid)) return
-  q.add(qid)
-  ghiJson(khoaXong(sbd), { n, q: [...q] })
+  if (!q.has(qid)) { q.add(qid); ghiJson(khoaXong(sbd), { n, q: [...q] }) }
 }
 
 /** Bỏ gói (máy chủ từ chối gói: hết hạn / bài đổi / em đã làm hết) — lần sau đi đường cũ tới khi gói mới về. */

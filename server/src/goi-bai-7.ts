@@ -779,16 +779,17 @@ async function startGoi7Thuc(env: Env, sbd: string, now: number, gsSom?: Promise
   const satHan = !(await duoSom) || lap.goi.some(g => g.quota > g.gapNgay.size && soNgayCon7(ngayVn7(now), g.han) <= 1) // cờ tắt ⇒ giữ thứ tự cũ
   const lanThu: (() => readonly (ViecGoi7 | RefGoi7)[])[] = [...(viec.length ? [() => viec] : []), () => xepBai6(lap.plan.viec, lap.pDung, { giuThuTu: satHan }), ...(lap.daLamNgay < lap.toiThieu ? [lap.duPhong] : [lap.hocThem])]
   const cauGoi = new Map(lap.goi.flatMap(g=>g.cau).map(c=>[c.qid,c] as const).reverse())
+  const soCauChang = 6 - (lap.daLamNgay % 6)
   for (const lay of lanThu) { if (refs.length) break
     const ds = lay()
     const ung = ds.map(v => { const oldRef = saved?.questions.find(r=>r.qid===v.qid); return { v, oldRef, meta: oldRef ?? lap.hs.meta.get(v.qid) ?? cauGoi.get(v.qid) } })
       .filter(x => x.meta && !lap.chan.has(x.v.qid) && !lap.chan.has(x.meta.group) && (ds === viec || !vuaLamGoc(x.v.qid)))
-    for (let i = 0; i < ung.length && refs.length < 6;) {
-    const lo = ung.slice(i, i + 6 - refs.length + 2); i += lo.length
+    for (let i = 0; i < ung.length && refs.length < soCauChang;) {
+    const lo = ung.slice(i, i + soCauChang - refs.length + 2); i += lo.length
     const daDoc = (await Promise.all(lo.map(x => currentQuestion(env, x.meta!).then(q => ({ ...x, q }), () => null)))).filter((x): x is NonNullable<typeof x> => !!x)
     const quaKhoi = new Set(await chanKhacKhoiEm(env,'goi7',{sbd,khoiEm:khoi},daDoc.map(x => x.q),{nghiSan:lap.nghi})) // CÙNG tập câu nghi với kế hoạch
     for (const x of daDoc) {
-    if (refs.length >= 6) break
+    if (refs.length >= soCauChang) break
     const v = x.v, oldRef = x.oldRef
     let q: PrivateQuestion = x.q
     if (!quaKhoi.has(q) || laCauTuLuan(q) || !q.reviewed || lap.control.types.length && (!q.dang || !lap.control.types.includes(q.dang))) continue

@@ -181,4 +181,63 @@ describe('màn làm bài mở chặng từ gói', () => {
     expect(kqSanh.sanh.hanhTrinh.daLam).toBe(1)
     expect(kqSanh.sanh.theLuc.con).toBe(23)
   })
+  it('khôi phục chặng đang dở khi homNay.daLam đã gồm câu đã nộp (kể cả khi d0 lưu lúc đầu là -1) ⇒ không bao giờ cộng đúp và chỉ xoá chặng dở khi mở màn báo hoàn thành chặng', async () => {
+    await napGoiNgay('tk', vi.fn(async () => ({ ...goiMau(), goi7: undefined })))
+    vi.mocked(goiHoa2).mockImplementation(async (ten) => {
+      if (ten === 'hoc-tap-mo-goi') return { ok: true, id: 'phien-k-dup', qids: ['tn1', 'tn2', 'tn3'], sk: { tn1: 'tem-1', tn2: 'tem-2', tn3: 'tem-3' }, daLam: 0 }
+      if (ten === 'answer') return { ok: true, correct: true, answer: 'B', solution: '' }
+      return { ok: true }
+    })
+    let kqSanh = {
+      cheDo2: true as const,
+      sanh: {
+        ngay: homNayVn(),
+        goi7: { ...G7, daLamHomNay: 0, tuLamCon: 18, tiepCanCon: 6 },
+        hanhTrinh: { tang: 1, toiThieu: 24, daLam: 0, daXep: 24, conThieu: 0, soChang: 4, changHienTai: 1, cauTrongChang: 0 },
+        chienDich: null,
+        theLuc: { con: 24, tong: 24 },
+        huyetChien: false,
+        doan: { con: 0 },
+        dao: { con: 0 },
+        khoaDao: false,
+        loiKhoaDao: '',
+        ruong: { daLam: 0, tong: 24, moDuoc: false, daMo: false, qua: null },
+        bia: null,
+        tamGiuCa: 0,
+        thuSucThem: { duoc: false, soCau: 0 },
+      },
+    }
+    const onVa = vi.fn((f: (k: typeof kqSanh) => typeof kqSanh) => { kqSanh = f(kqSanh) })
+    // Mở chặng 1 với homNay = null lúc đầu (giả lập d0 = -1), nộp Câu 1 và chọn nháp Câu 2 (chưa nộp) rồi thoát
+    const { unmount } = render(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} onVa={onVa as never} homNay={null} />)
+    await screen.findByText(TN.text)
+    fireEvent.click(screen.getByRole('radio', { name: /\(CH3\)2NH/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Nộp câu · đã chọn B' }))
+    await screen.findByRole('button', { name: /Câu tiếp theo/ })
+    fireEvent.click(screen.getByRole('button', { name: /Câu tiếp theo/ }))
+    await screen.findByText(TN2.text)
+    fireEvent.click(screen.getByRole('radio', { name: /\(CH3\)3N/ })) // chỉ chọn nháp Câu 2, chưa bấm nộp
+    unmount()
+    expect(docChangDangLam('s1')?.moi.qids).toEqual(['tn1']) // Câu 2 chưa nộp không được tính vào qids
+
+    // Mở lại với homNay.daLam = 1 (đã gồm Câu 1 vừa làm)
+    const { unmount: unmount2 } = render(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} onVa={onVa as never} homNay={{ daLam: 1, muc: 24, chang: 1, soChang: 4 }} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Nộp câu · đã chọn C' }))
+    await screen.findByRole('button', { name: /Câu tiếp theo/ })
+    expect(kqSanh.sanh.hanhTrinh.daLam).toBe(2) // Chính xác 2 câu (không bị cộng đúp 1 + 2 = 3)
+    fireEvent.click(screen.getByRole('button', { name: /Câu tiếp theo/ }))
+    await screen.findByText(TN3.text)
+    fireEvent.click(screen.getByRole('radio', { name: /\(CH3\)2NH/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Nộp câu · đã chọn B' }))
+    await screen.findByRole('button', { name: /Kết thúc chặng/ })
+    expect(kqSanh.sanh.hanhTrinh.daLam).toBe(3)
+    // Thoát ra TRƯỚC khi bấm «Kết thúc chặng» ⇒ bản lưu chặng dở vẫn còn để Lộ trình chưa tích ✓ chặng đó
+    unmount2()
+    expect(docChangDangLam('s1')).not.toBeNull()
+
+    // Vào lại đúng câu cuối đã chấm, bấm «Kết thúc chặng» hiện màn báo hoàn thành chặng ⇒ lúc này mới xoá bản lưu chặng dở
+    render(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} onVa={onVa as never} homNay={{ daLam: 3, muc: 24, chang: 1, soChang: 4 }} />)
+    fireEvent.click(screen.getByRole('button', { name: /Kết thúc chặng/ }))
+    expect(docChangDangLam('s1')).toBeNull()
+  })
 })

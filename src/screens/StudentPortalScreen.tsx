@@ -58,11 +58,8 @@ type ExamApi = typeof import('../lib/exam-api')
 let examApi: ExamApi | null = null
 const examApiCho = import('../lib/exam-api').then((m) => (examApi = m))
 examApiCho.catch(() => {}) // mất mạng lúc tải sẵn: không thành lỗi nền; lệnh gọi sau tự nhận lỗi qua chính lời hứa này
-const hsDangNhapApi: ExamApi['hsDangNhapApi'] = (...a) => examApi ? examApi.hsDangNhapApi(...a) : examApiCho.then((m) => m.hsDangNhapApi(...a))
-const hsDatMatKhauApi: ExamApi['hsDatMatKhauApi'] = (...a) => examApi ? examApi.hsDatMatKhauApi(...a) : examApiCho.then((m) => m.hsDatMatKhauApi(...a))
-const hsLichSuCaApi: ExamApi['hsLichSuCaApi'] = (...a) => examApi ? examApi.hsLichSuCaApi(...a) : examApiCho.then((m) => m.hsLichSuCaApi(...a))
-const hsBtvnApi: ExamApi['hsBtvnApi'] = (...a) => examApi ? examApi.hsBtvnApi(...a) : examApiCho.then((m) => m.hsBtvnApi(...a))
-const hsCauSaiApi: ExamApi['hsCauSaiApi'] = (...a) => examApi ? examApi.hsCauSaiApi(...a) : examApiCho.then((m) => m.hsCauSaiApi(...a))
+const goiExam = <K extends keyof ExamApi>(k: K): ExamApi[K] => ((...a: never[]) => examApi ? (examApi[k] as (...x: never[]) => unknown)(...a) : examApiCho.then((m) => (m[k] as (...x: never[]) => unknown)(...a))) as ExamApi[K]
+const hsDangNhapApi = goiExam('hsDangNhapApi'), hsDatMatKhauApi = goiExam('hsDatMatKhauApi'), hsLichSuCaApi = goiExam('hsLichSuCaApi'), hsBtvnApi = goiExam('hsBtvnApi'), hsCauSaiApi = goiExam('hsCauSaiApi')
 import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
 import KhungXemPhieu from '../components/KhungXemPhieu'
 import { tenBaiTapTrenThe, type TheChangView } from '../lib/btvn-ca-nhan-kieu'

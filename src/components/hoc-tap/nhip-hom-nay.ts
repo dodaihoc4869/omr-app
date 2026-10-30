@@ -14,29 +14,20 @@ export const xoaNhoNhipHocEm = (): void => NHO.clear()
 
 /** Nạp `/hs/nhip-hoc`: 'tai' (đang tải) · 'an' (không token / lỗi lần đầu ⇒ ẩn gọn) · số. Lỗi khi đã có số ⇒ giữ số cũ. */
 export function useNhipHocEm(token: string | undefined, lamMoi: number | null | undefined): NhipHocHs | 'tai' | 'an' {
-  // Bản hiện gắn với phiên: đổi em trên máy dùng chung không được giữ nhóm/nhịp của em trước.
   const [ban, setBan] = useState(() => ({ token, kq: token ? NHO.get(token)?.kq ?? null : null, hong: false }))
   useEffect(() => {
     if (!token) return
     const c = NHO.get(token)
-    if (c && c.khoa === lamMoi && Date.now() - c.luc < NHO_MS) {
-      setBan({ token, kq: c.kq, hong: false })
-      return
-    }
+    if (c && c.khoa === lamMoi && Date.now() - c.luc < NHO_MS) { setBan({ token, kq: c.kq, hong: false }); return }
     let huy = false
     void layNhipHocEm(token).then((r) => {
       if (huy) return
-      if (r) {
-        NHO.set(token, { kq: r, luc: Date.now(), khoa: lamMoi })
-        setBan({ token, kq: r, hong: false })
-      } else setBan(v => ({ token, kq: v.token === token ? v.kq : null, hong: true }))
+      if (r) { NHO.set(token, { kq: r, luc: Date.now(), khoa: lamMoi }); setBan({ token, kq: r, hong: false }) }
+      else setBan(v => ({ token, kq: v.token === token ? v.kq : null, hong: true }))
     })
-    return () => {
-      huy = true
-    }
+    return () => { huy = true }
   }, [token, lamMoi])
-  if (!token) return 'an'
-  return ban.token === token ? ban.kq ?? (ban.hong ? 'an' : 'tai') : NHO.get(token)?.kq ?? 'tai'
+  return !token ? 'an' : ban.token === token ? ban.kq ?? (ban.hong ? 'an' : 'tai') : NHO.get(token)?.kq ?? 'tai'
 }
 
 /** Các chặng của hôm nay: chặng i gồm câu (6·i, min(6·(i+1), M)] — đúng luật vạch chặng / `soChangXong`; chặng cuối lấy hết phần còn lại tới M. */
@@ -58,7 +49,7 @@ export function chuNutHoc(so: SoHomNay | null, hetCau: boolean, kho?: { choBoSun
   if (hetCau) return kho?.choBoSung ? `Hôm nay còn ${kho.choBoSung} câu chờ thầy bổ sung` : 'Đã làm hết câu được giao'
   if (!so) return 'Bắt đầu học'
   const con = Math.max(0, so.muc - so.daLam)
-  if (con === 0) return 'Học thêm'
+  if (con === 0) return so.changDangDo ? 'Học tiếp' : 'Học thêm'
   const dau = so.daLam > 0 ? 'Học tiếp' : 'Bắt đầu học'
   const sanSang = kho?.sanSang
   return sanSang !== undefined && sanSang > 0 && sanSang < con ? `${dau} · ${sanSang} câu sẵn sàng` : `${dau} · ${con} câu`
