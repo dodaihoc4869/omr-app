@@ -218,9 +218,10 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   // Số «đã làm» của gói (lúc lập) có thể cũ hơn Lộ trình ⇒ lấy số lớn hơn.
   const g7Goi = (raw: unknown) => { const g = docTomTatGoi7(raw), d0 = Math.max(g?.daLamHomNay ?? -1, homNay?.daLam ?? -1); return g && d0 > g.daLamHomNay ? { ...g, daLamHomNay: d0 } : g }
   const dsTuGoi = (qs: Record<string, unknown>[]) => { const ds = qs.map(({ sk: _sk, ...c }) => c as unknown as Cau); return ds.length && !ds.some(cauHong) ? ds : null }
-  // Số câu chặng từ gói: tới ranh chặng kế của Lộ trình (đã làm hôm nay chia 6) — không chặng lẻ khi em làm dở rồi thoát.
-  const soCauGoi = () => { const d = Math.max(homNay?.daLam ?? 0, 0); return 6 - (d % 6) }
-  const [goi0] = useState(() => { if (dang0 || mo0) return null; const g = layChangGoi(sbd, Date.now(), soCauGoi()), ds = g && dsTuGoi(g.questions); return g && ds ? { ds, g7: g7Goi(g.goi7) } : null })
+  // Số câu chặng từ gói: tới ranh chặng kế của Lộ trình (đã làm hôm nay chia 6) — không chặng lẻ khi em làm dở rồi thoát. Gói phải ĐỦ số câu ấy (thầy 30/10:
+  // gói sót 3 câu ⇒ chặng 3 câu ⇒ Lộ trình lệch ranh); chưa biết số hôm nay (homNay vắng) ⇒ không biết ranh ⇒ nhận gói như cũ.
+  const layGoiChang = () => homNay ? layChangGoi(sbd, Date.now(), 6 - (Math.max(homNay.daLam, 0) % 6)) : layChangGoi(sbd, Date.now(), CAU_MOI_CHANG_GOI, false)
+  const [goi0] = useState(() => { if (dang0 || mo0) return null; const g = layGoiChang(), ds = g && dsTuGoi(g.questions); return g && ds ? { ds, g7: g7Goi(g.goi7) } : null })
   const dau0 = dang0 ?? mo0 ?? goi0
   const viTri0 = dang0 ? Math.min(dang0.viTri, Math.max(0, dang0.ds.length - 1)) : 0
   const docTra0 = () => {
@@ -385,7 +386,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
       const dsDang = dang0.ds
       const qidsCan = dsDang.filter(c => !dang0.ket?.[c.qid]).map(c => c.qid)
       if (!qidsCan.length) return
-      const goi = layChangGoi(sbd, Date.now(), CAU_MOI_CHANG_GOI * 2)
+      const goi = layChangGoi(sbd, Date.now(), CAU_MOI_CHANG_GOI * 2, false)
       const temDai: Record<string, unknown> = {}
       for (const c of goi?.questions ?? []) if (typeof c.qid === 'string' && typeof c.sk === 'string') temDai[c.qid] = c.sk
       const layTuDuongCu = async () => {
@@ -443,7 +444,9 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     }
     // GÓI CẢ NGÀY (thầy 29/10 «cách khác hoàn toàn … tức thì ở mọi thời điểm, kể cả giờ cao điểm»; mo-chang-truoc.ts): máy em có sẵn chặng ⇒ câu hiện NGAY (không chờ máy
     // chủ); phiên mở NỀN bằng lệnh nhẹ `hoc-tap-mo-goi` rồi nhận mã phiên + tem mới, bỏ câu máy chủ báo em đã làm (máy khác). Máy chủ từ chối / lỗi ⇒ đường cũ.
-    const goi = layChangGoi(sbd, Date.now(), soCauGoi())
+    const goi = layGoiChang()
+    // Gói còn câu mà không đủ trọn chặng (thầy 30/10) ⇒ chặng này đi đường máy chủ (đủ câu), lập lại gói ở nền cho chặng sau.
+    if (!goi && layChangGoi(sbd, Date.now(), 1)) void napGoiNgay(token, goiHoa2, Date.now(), true)
     const dsGoi = goi && dsTuGoi(goi.questions)
     const mo: Promise<{ id: string; sk: Record<string, unknown>; qids: Set<string> }> = goi && dsGoi ? (() => {
       const g7 = g7Goi(goi.goi7), d0 = d0BanDau(g7)
@@ -460,6 +463,12 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
           throw Object.assign(new Error('goi'), { roiVe: true })
         }
         const qids = new Set(r.qids.filter((x): x is string => typeof x === 'string')), sk = (r.sk && typeof r.sk === 'object' ? r.sk : {}) as Record<string, unknown>
+        // Máy chủ bỏ bớt câu em đã làm ở máy khác ⇒ chặng hụt câu (thầy 30/10: Lộ trình lệch ranh, chặng sau «chỉ còn 3 câu»). Em chưa nộp câu nào ⇒ lấy chặng
+        // đủ câu từ đường máy chủ và lập lại gói ở nền; đã nộp ⇒ giữ (không đổi câu dưới tay em).
+        if (qids.size < dsGoi.length && moi.current.qids.size === 0) {
+          void napGoiNgay(token, goiHoa2, Date.now(), true)
+          throw Object.assign(new Error('goi-thieu'), { roiVe: true })
+        }
         if (!huy) {
           moLucRef.current = Date.now()
           const ds = dsGoi.filter(c => qids.has(c.qid)).map(c => typeof sk[c.qid] === 'string' ? { ...c, sk: sk[c.qid] as string } : c)

@@ -125,13 +125,15 @@ describe('đoạn mã nội tuyến — cổng học sinh', () => {
       await xong()
       for (const r of rs) expect(duongGoi(r)).toHaveLength(5)
     })
-    it('GÓI CẢ NGÀY (29/10): máy đã có gói hôm nay còn câu chưa làm ⇒ KHÔNG gửi; gói đã làm hết / gói ngày khác ⇒ gửi như cũ', async () => {
-      const goi = (ngay: string) => ({ ngay, luc: 1, chang: [{ ve: 'v', questions: [{ qid: 'a' }, { qid: 'b' }] }] })
+    it('GÓI CẢ NGÀY (29/10): máy đã có gói hôm nay còn ĐỦ một chặng (≥ 6 câu chưa làm, 30/10) ⇒ KHÔNG gửi; gói sót ít câu / đã làm hết / gói ngày khác ⇒ gửi như cũ', async () => {
+      const goi = (ngay: string) => ({ ngay, luc: 1, chang: [{ ve: 'v', questions: [{ qid: 'a' }, { qid: 'b' }, { qid: 'c' }, { qid: 'd' }] }, { ve: 'w', questions: [{ qid: 'e' }, { qid: 'f' }, { qid: 'g' }] }] })
+      const it3 = chay('/hs', '', { phien, diaChi: GOC, luu: { ...dem(CON(12)), 'omr_goi_ngay_99001': JSON.stringify(goi(hom())), 'omr_goi_ngay_xong_99001': JSON.stringify({ n: hom(), q: ['a', 'b', 'c', 'd'] }) }, caMo: 'khong' })
       const co = chay('/hs', '', { phien, diaChi: GOC, luu: { ...dem(CON(12)), 'omr_goi_ngay_99001': JSON.stringify(goi(hom())), 'omr_goi_ngay_xong_99001': JSON.stringify({ n: hom(), q: ['a'] }) }, caMo: 'khong' })
-      const het = chay('/hs', '', { phien, diaChi: GOC, luu: { ...dem(CON(12)), 'omr_goi_ngay_99001': JSON.stringify(goi(hom())), 'omr_goi_ngay_xong_99001': JSON.stringify({ n: hom(), q: ['a', 'b'] }) }, caMo: 'khong' })
+      const het = chay('/hs', '', { phien, diaChi: GOC, luu: { ...dem(CON(12)), 'omr_goi_ngay_99001': JSON.stringify(goi(hom())), 'omr_goi_ngay_xong_99001': JSON.stringify({ n: hom(), q: ['a', 'b', 'c', 'd', 'e', 'f', 'g'] }) }, caMo: 'khong' })
       const cu = chay('/hs', '', { phien, diaChi: GOC, luu: { ...dem(CON(12)), 'omr_goi_ngay_99001': JSON.stringify(goi('2000-01-01')) }, caMo: 'khong' })
       await xong()
       expect(duongGoi(co)).toHaveLength(5)
+      expect(duongGoi(it3).at(-1)).toBe('/game-v2/hoc-tap-start')
       expect(duongGoi(het).at(-1)).toBe('/game-v2/hoc-tap-start')
       expect(duongGoi(cu).at(-1)).toBe('/game-v2/hoc-tap-start')
     })

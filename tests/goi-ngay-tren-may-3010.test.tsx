@@ -3,7 +3,9 @@
 // Khoá:
 //   · kho gói: lưu gói máy chủ trả; chặng kế = chặng đầu còn câu máy này chưa làm; khác ngày ⇒ không dùng; máy chủ «tat» ⇒ nhớ, không hỏi lại;
 //   · màn làm bài có gói ⇒ câu hiện NGAY (máy chủ chưa trả gì), KHÔNG gọi `hoc-tap-start`; «Kiểm tra» trước khi phiên về ⇒ đợi phiên, nộp đúng mã phiên + tem MỚI;
-//   · máy chủ từ chối gói ⇒ bỏ gói, đường mở chặng cũ.
+//   · máy chủ từ chối gói ⇒ bỏ gói, đường mở chặng cũ;
+//   · (thầy 30/10, ảnh «4/8 chặng» chặng 5 chưa làm đã nửa vòng) gói THIẾU câu cho trọn chặng tới ranh Lộ trình ⇒ không dùng (đường máy chủ, chặng đủ câu) + lập
+//     lại gói; máy chủ bỏ bớt câu khi em chưa nộp câu nào ⇒ cũng vậy. Chưa biết số hôm nay ⇒ nhận gói như cũ.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import ManLamBaiTap from '../src/components/hoc-tap/ManLamBaiTap'
@@ -20,6 +22,10 @@ const TN2 = { ...TN, qid: 'tn2', text: 'Chất nào là amine bậc ba?', sk: 't
 const TN3 = { ...TN, qid: 'tn3', text: 'Chất nào là amine thơm?', sk: 'tem-dai-3' }
 const G7 = { bat: true, ngay: homNayVn(), goi: [], tuLamCon: 2, tiepCanCon: 0, thieuPhu: 0, thieuNgay: 0, kienThucCu: [], daLamHomNay: 0, toiThieu: 24 }
 const goiMau = () => ({ ok: true, sbd: 's1', ngay: homNayVn(), luc: Date.now(), goi7: G7, chang: [{ ve: 've-1', questions: [TN, TN2] }, { ve: 've-2', questions: [TN3] }] })
+/** Gói đủ một chặng 6 câu (ranh Lộ trình khi đã làm 0 / 6 / 12… câu). */
+const goiDu = () => ({ ...goiMau(), chang: [{ ve: 've-1', questions: [TN, TN2, TN3] }, { ve: 've-2', questions: [4, 5, 6].map((i) => ({ ...TN, qid: `tn${i}`, text: `Câu số ${i}?`, sk: `tem-dai-${i}` })) }] })
+/** Đã làm 3 câu hôm nay ⇒ ranh chặng kế còn 3 câu (đúng 3 câu của `goiMau`). */
+const HN3 = { daLam: 3, muc: 24, chang: 1, soChang: 4 }
 const lenh = (ten: string) => vi.mocked(goiHoa2).mock.calls.filter((c) => c[0] === ten)
 
 describe('kho gói cả ngày', () => {
@@ -27,20 +33,27 @@ describe('kho gói cả ngày', () => {
     const goi = vi.fn(async () => goiMau())
     await napGoiNgay('tk', goi)
     expect(goi).toHaveBeenCalledWith('hoc-tap-goi-ngay', 'tk', {}, 60)
-    expect(layChangGoi('s1')).toMatchObject({ ves: ['ve-1', 've-2'] })
+    expect(layChangGoi('s1')).toBeNull() // gói 3 câu KHÔNG đủ trọn chặng 6 câu (30/10)
+    expect(layChangGoi('s1', Date.now(), 6, false)).toMatchObject({ ves: ['ve-1', 've-2'] }) // chỉ lấy tem: nhận phần có
+    expect(layChangGoi('s1', Date.now(), 3)).toMatchObject({ ves: ['ve-1', 've-2'] })
     expect(layChangGoi('s1', Date.now(), 2)).toMatchObject({ ves: ['ve-1'] }) // chặng 2 câu: chỉ chặng đầu của gói góp câu
     expect(layChangGoi('khac')).toBeNull() // gói gắn em
     ghiCauXong('s1', 'tn1')
     expect(layChangGoi('s1', Date.now(), 2)?.questions.map((q) => q.qid)).toEqual(['tn2', 'tn3'])
     ghiCauXong('s1', 'tn2')
-    expect(layChangGoi('s1')).toMatchObject({ ves: ['ve-2'] })
+    expect(layChangGoi('s1', Date.now(), 1)).toMatchObject({ ves: ['ve-2'] })
+    expect(layChangGoi('s1', Date.now(), 2)).toBeNull() // còn 1 câu, cần 2
     expect(layChangGoi('s1', Date.now() + 86_400_000)).toBeNull() // sang ngày khác
   })
-  it('đã có chặng trong gói ⇒ Lộ trình KHÔNG mở trước bằng hoc-tap-start', async () => {
-    await napGoiNgay('tk', vi.fn(async () => goiMau()))
+  it('gói đủ một chặng ⇒ Lộ trình KHÔNG mở trước bằng hoc-tap-start; gói sót ít câu ⇒ mở trước như cũ (30/10)', async () => {
+    await napGoiNgay('tk', vi.fn(async () => goiDu()))
     const goi = vi.fn(async () => ({ ok: true }))
     moChangTruoc('tk', goi)
     expect(goi).not.toHaveBeenCalled()
+    localStorage.clear()
+    await napGoiNgay('tk', vi.fn(async () => goiMau()), Date.now(), true)
+    moChangTruoc('tk', goi)
+    expect(goi).toHaveBeenCalledWith('hoc-tap-start', 'tk', {}, expect.anything())
   })
   it('máy chủ «tat» ⇒ nhớ, không hỏi lại; không có gói', async () => {
     const goi = vi.fn(async () => ({ ok: true, tat: true, sbd: 's1' }))
@@ -64,7 +77,7 @@ describe('màn làm bài mở chặng từ gói', () => {
       if (ten === 'answer') return { ok: true, correct: true, answer: 'B', solution: '' }
       return { ok: true }
     })
-    render(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} homNay={{ daLam: 0, muc: 24, chang: 1, soChang: 4 }} />)
+    render(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} homNay={HN3} />)
     await screen.findByText(TN.text) // phiên chưa về mà câu đã hiện
     expect(lenh('hoc-tap-start')).toHaveLength(0)
     const mo = lenh('hoc-tap-mo-goi')
@@ -77,23 +90,35 @@ describe('màn làm bài mở chặng từ gói', () => {
     moXong({ ok: true, id: 'phien-goi', qids: ['tn1', 'tn2', 'tn3'], sk: { tn1: 'tem-moi-1', tn2: 'tem-moi-2' }, daLam: 0 })
     await waitFor(() => expect(lenh('answer')).toHaveLength(1))
     expect(lenh('answer')[0]![2]).toMatchObject({ session: 'phien-goi', qid: 'tn1', answer: 'B', sk: 'tem-moi-1' })
-    await waitFor(() => expect(layChangGoi('s1')?.questions.map((q) => q.qid)).toEqual(['tn2', 'tn3'])) // câu vừa làm không vào chặng kế
+    await waitFor(() => expect(layChangGoi('s1', Date.now(), 2)?.questions.map((q) => q.qid)).toEqual(['tn2', 'tn3'])) // câu vừa làm không vào chặng kế
   })
-  it('máy chủ bỏ câu em đã làm (máy khác) ⇒ màn bỏ câu ấy', async () => {
+  it('máy chủ bỏ câu em đã làm (máy khác) khi em chưa nộp câu nào ⇒ chặng hụt câu ⇒ lấy chặng đủ câu đường máy chủ + lập lại gói (30/10)', async () => {
     await napGoiNgay('tk', vi.fn(async () => goiMau()))
-    vi.mocked(goiHoa2).mockImplementation(async (ten) => ten === 'hoc-tap-mo-goi' ? { ok: true, id: 'p', qids: ['tn2'], sk: {} } : { ok: true })
-    render(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} />)
-    await screen.findByText(TN2.text)
-    await waitFor(() => expect(screen.queryByText(TN.text)).toBeNull())
+    const CU = { ...TN, qid: 'cu1', text: 'Câu của đường máy chủ?', sk: undefined }
+    vi.mocked(goiHoa2).mockImplementation(async (ten) => ten === 'hoc-tap-mo-goi' ? { ok: true, id: 'p', qids: ['tn2'], sk: {} } : ten === 'hoc-tap-start' ? { ok: true, id: 'p-du', questions: [CU] } : ten === 'hoc-tap-goi-ngay' ? goiMau() : { ok: true })
+    render(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} homNay={HN3} />)
+    await screen.findByText(CU.text)
+    expect(lenh('hoc-tap-start')).toHaveLength(1)
+    expect(lenh('hoc-tap-goi-ngay')).toHaveLength(1)
+  })
+  it('gói chỉ còn ít câu hơn ranh chặng ⇒ KHÔNG mở chặng hụt từ gói: đường máy chủ + lập lại gói (30/10)', async () => {
+    await napGoiNgay('tk', vi.fn(async () => goiMau())) // 3 câu, mà đã làm 0 câu ⇒ chặng cần 6
+    const CU = { ...TN, qid: 'cu1', text: 'Câu của đường máy chủ?', sk: undefined }
+    vi.mocked(goiHoa2).mockImplementation(async (ten) => ten === 'hoc-tap-start' ? { ok: true, id: 'p-du', questions: [CU] } : ten === 'hoc-tap-goi-ngay' ? goiDu() : { ok: true })
+    render(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} homNay={{ daLam: 0, muc: 24, chang: 1, soChang: 4 }} />)
+    await screen.findByText(CU.text)
+    expect(lenh('hoc-tap-mo-goi')).toHaveLength(0)
+    expect(lenh('hoc-tap-start')).toHaveLength(1)
+    expect(lenh('hoc-tap-goi-ngay')).toHaveLength(1)
   })
   it('máy chủ từ chối gói ⇒ bỏ gói, mở chặng đường cũ', async () => {
     await napGoiNgay('tk', vi.fn(async () => goiMau()))
     const CU = { ...TN, qid: 'cu1', text: 'Câu của đường cũ?', sk: undefined }
     vi.mocked(goiHoa2).mockImplementation(async (ten) => ten === 'hoc-tap-mo-goi' ? { ok: false, ma: 'GOI_CU' } : ten === 'hoc-tap-start' ? { ok: true, id: 'p-cu', questions: [CU] } : { ok: true })
-    render(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} />)
+    render(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} homNay={HN3} />)
     await screen.findByText(CU.text)
     expect(lenh('hoc-tap-start')).toHaveLength(1)
-    expect(layChangGoi('s1')).toBeNull()
+    expect(layChangGoi('s1', Date.now(), 1)).toBeNull()
   })
   it('không có gói ⇒ đúng đường cũ, không gọi lệnh gói', async () => {
     vi.mocked(goiHoa2).mockImplementation(async (ten) => ten === 'hoc-tap-start' ? { ok: true, id: 'p1', questions: [TN] } : { ok: true })
@@ -109,7 +134,7 @@ describe('màn làm bài mở chặng từ gói', () => {
       if (ten === 'answer') return { ok: true, correct: true, answer: 'B', solution: 'Giải thích chuẩn' }
       return { ok: true }
     })
-    const { unmount } = render(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} homNay={{ daLam: 0, muc: 24, chang: 1, soChang: 4 }} />)
+    const { unmount } = render(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} homNay={HN3} />)
     await screen.findByText(TN.text)
     // Làm xong Câu 1/3
     fireEvent.click(screen.getByRole('radio', { name: /\(CH3\)2NH/ }))
@@ -126,7 +151,7 @@ describe('màn làm bài mở chặng từ gói', () => {
 
     // Mở lại app: hiện TỨC THÌ 0ms đúng Câu 2/3 kèm nháp C và tiến độ Câu 1 đã đúng, không gọi lại hoc-tap-start hay hoc-tap-mo-goi
     vi.mocked(goiHoa2).mockClear()
-    render(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} homNay={{ daLam: 1, muc: 24, chang: 1, soChang: 4 }} />)
+    render(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} homNay={{ ...HN3, daLam: 4 }} />)
     expect(screen.getByText(TN2.text)).toBeTruthy()
     expect(screen.getByText(/Câu 2\/3/)).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Nộp câu · đã chọn C' })).toBeTruthy()
@@ -147,7 +172,7 @@ describe('màn làm bài mở chặng từ gói', () => {
   it('làm vài câu trong chặng (kể cả khi gói thiếu goi7) rồi thoát ra Lộ trình ⇒ đồng bộ tức thì số câu đã làm của chặng thông qua onVa và bản lưu chặng dở', async () => {
     await napGoiNgay('tk', vi.fn(async () => ({ ...goiMau(), goi7: undefined })))
     vi.mocked(goiHoa2).mockImplementation(async (ten) => {
-      if (ten === 'hoc-tap-mo-goi') return { ok: true, id: 'phien-sync', qids: ['tn1', 'tn2', 'tn3'], sk: { tn1: 'tem-1', tn2: 'tem-2', tn3: 'tem-3' }, daLam: 0 }
+      if (ten === 'hoc-tap-mo-goi') return { ok: true, id: 'phien-sync', qids: ['tn1', 'tn2', 'tn3'], sk: { tn1: 'tem-1', tn2: 'tem-2', tn3: 'tem-3' }, daLam: 3 }
       if (ten === 'answer') return { ok: true, correct: true, answer: 'B', solution: '' }
       return { ok: true }
     })
@@ -155,10 +180,10 @@ describe('màn làm bài mở chặng từ gói', () => {
       cheDo2: true as const,
       sanh: {
         ngay: homNayVn(),
-        goi7: { ...G7, daLamHomNay: 0, tuLamCon: 18, tiepCanCon: 6 },
-        hanhTrinh: { tang: 1, toiThieu: 24, daLam: 0, daXep: 24, conThieu: 0, soChang: 4, changHienTai: 1, cauTrongChang: 0 },
+        goi7: { ...G7, daLamHomNay: 3, tuLamCon: 18, tiepCanCon: 6 },
+        hanhTrinh: { tang: 1, toiThieu: 24, daLam: 3, daXep: 24, conThieu: 0, soChang: 4, changHienTai: 1, cauTrongChang: 3 },
         chienDich: null,
-        theLuc: { con: 24, tong: 24 },
+        theLuc: { con: 21, tong: 24 },
         huyetChien: false,
         doan: { con: 0 },
         dao: { con: 0 },
@@ -171,15 +196,15 @@ describe('màn làm bài mở chặng từ gói', () => {
       },
     }
     const onVa = vi.fn((f: (k: typeof kqSanh) => typeof kqSanh) => { kqSanh = f(kqSanh) })
-    render(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} onVa={onVa as never} homNay={{ daLam: 0, muc: 24, chang: 1, soChang: 4 }} />)
+    render(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} onVa={onVa as never} homNay={HN3} />)
     await screen.findByText(TN.text)
     fireEvent.click(screen.getByRole('radio', { name: /\(CH3\)2NH/ }))
     fireEvent.click(screen.getByRole('button', { name: 'Nộp câu · đã chọn B' }))
     await screen.findByRole('button', { name: /Câu tiếp theo/ })
     expect(onVa).toHaveBeenCalled()
-    expect(kqSanh.sanh.goi7.daLamHomNay).toBe(1)
-    expect(kqSanh.sanh.hanhTrinh.daLam).toBe(1)
-    expect(kqSanh.sanh.theLuc.con).toBe(23)
+    expect(kqSanh.sanh.goi7.daLamHomNay).toBe(4)
+    expect(kqSanh.sanh.hanhTrinh.daLam).toBe(4)
+    expect(kqSanh.sanh.theLuc.con).toBe(20)
   })
   it('khôi phục chặng đang dở khi homNay.daLam đã gồm câu đã nộp (kể cả khi d0 lưu lúc đầu là -1) ⇒ không bao giờ cộng đúp và chỉ xoá chặng dở khi mở màn báo hoàn thành chặng', async () => {
     await napGoiNgay('tk', vi.fn(async () => ({ ...goiMau(), goi7: undefined })))

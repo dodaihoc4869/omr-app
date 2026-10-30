@@ -196,8 +196,10 @@ function napAnhSan(qs: KetQuaMo[]): void {
 }
 
 /** Chặng kế tiếp trong gói của em: `so` câu đầu (theo thứ tự gói) máy này CHƯA làm hôm nay — ghép qua ranh các chặng của gói (gói lập lại giữa chừng vẫn đủ một
- *  chặng); `ves` = bộ ref niêm phong của các chặng góp câu. Không có / khác ngày ⇒ null. */
-export function layChangGoi(sbd: string, now: number = Date.now(), so = CAU_MOI_CHANG_GOI): { ves: string[]; questions: KetQuaMo[]; goi7: unknown } | null {
+ *  chặng); `ves` = bộ ref niêm phong của các chặng góp câu. Không có / khác ngày ⇒ null.
+ *  `du` (mặc định — thầy 30/10 ảnh «4/8 chặng», chặng 5 chưa làm đã nửa vòng): gói còn THIẾU câu cho trọn chặng ⇒ null (màn làm bài đi đường máy chủ, chặng
+ *  đủ câu; gói sót lại vài câu vì em đã làm qua đường cũ từng mở chặng 3 câu ⇒ ranh chặng trên Lộ trình lệch). `du=false` chỉ để lấy tem của câu đã có. */
+export function layChangGoi(sbd: string, now: number = Date.now(), so = CAU_MOI_CHANG_GOI, du = true): { ves: string[]; questions: KetQuaMo[]; goi7: unknown } | null {
   if (!batGoi || !sbd) return null
   const g = docGoi(sbd)
   if (!g || g.ngay !== ngayMay(now)) return null
@@ -208,7 +210,7 @@ export function layChangGoi(sbd: string, now: number = Date.now(), so = CAU_MOI_
       questions.push(q); if (!ves.includes(c.ve)) ves.push(c.ve)
     }
   }
-  return questions.length ? { ves, questions, goi7: g.goi7 } : null
+  return questions.length && (!du || questions.length >= so) ? { ves, questions, goi7: g.goi7 } : null
 }
 function coChangGoiCua(token: string, now: number): boolean {
   const c = docJson(KHOA_CUA) as { sbd?: unknown; t?: unknown } | null
