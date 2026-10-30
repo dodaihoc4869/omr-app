@@ -1006,6 +1006,11 @@ async function demSoDong(env: Env, sbds: readonly string[]): Promise<Map<string,
   for (const x of rows) ra.set(str(x.sbd), { n: Number(x.n) || 0, r: Number(x.r) || 0 })
   return ra
 }
+/** Sổ của MỘT em QUA ĐỆM (bộ nhớ isolate → kho ngăn riêng → D1 chỉ phần mới; chưa có đệm ⇒ cả sổ một lần rồi đệm) — mọi cột `COT_SO_MOI`.
+ *  30/10: cho các nơi trước đây tự đọc lại sổ theo khoảng (srs2 `docLanLam`: 9.930 lần × 2.221 dòng / 2,5 giờ cao điểm). Lỗi ⇒ null (nơi gọi đọc như cũ). */
+export async function soCuaEmQuaDem(env: Env, sbd: string): Promise<Row[] | null> {
+  try { return await docDongSo(env, [sbd], await demSoDong(env, [sbd])) } catch { return null }
+}
 /** Hồ sơ OMNI của nhiều em một lượt (một truy vấn sổ `sbd IN (…)`; đệm 60 s theo (em, ngày, số dòng sổ)). Lỗi ⇒ hồ sơ rỗng (prior). */
 export async function hoSoOmniNhieuEm(env: Env, dsSbd: readonly string[], nowMs: number): Promise<Map<string, HoSoOmniEm>> {
   const sbds = [...new Set(dsSbd.filter(Boolean))]
