@@ -1,0 +1,41 @@
+# TẠM ĐÓNG APP HỌC SINH (thầy 30/10 22:20: «báo app bảo trì luôn đi»). Cùng công tắc thầy bật ở app GV (Thi đua tuần ⇒ «Tạm đóng app học sinh»):
+# `cau_hinh.hs_tam_dong` = 'bat' ⇒ trong 1 phút máy các em hiện màn «App đang bảo trì»; bài kiểm tra / ca thi đang làm dở vẫn nộp được. Một lệnh ghi cấu hình.
+# Đổi BAT thành tat rồi đẩy lại để mở app.
+name: Tạm đóng app học sinh (bảo trì)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/tam-dong-hs-3010]
+    paths: ['.github/workflows/tam-dong-hs-3010.yml']
+permissions:
+  contents: read
+concurrency:
+  group: tam-dong-hs
+  cancel-in-progress: false
+jobs:
+  ghi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      BAT: bat
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Ghi công tắc rồi đọc lại
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          [ "$BAT" = bat ] || [ "$BAT" = tat ] || exit 1
+          NAY="strftime('%Y-%m-%dT%H:%M:%fZ','now')"
+          for i in 1 2 3 4; do
+            npx -y wrangler@4 d1 execute omr --remote --json --command "INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES ('hs_tam_dong', '$BAT', $NAY) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc" > /tmp/ghi.json && break
+            sleep $((i * 3))
+          done
+          jq -c '[.[].success]' /tmp/ghi.json
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT khoa, gia_tri, cap_nhat_luc FROM cau_hinh WHERE khoa IN ('hs_tam_dong','hs_tam_dong_cho_phep')" | jq -c '.[0].results'
