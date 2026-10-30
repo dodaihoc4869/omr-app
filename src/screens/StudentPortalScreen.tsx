@@ -1,7 +1,6 @@
 // App học sinh tập trung làm bài; giữ máy chủ giao câu, chấm và tiến độ hiện hành.
 import HocTapHomNay from '../components/hoc-tap/HocTapHomNay'
 import { soHomNay } from '../components/hoc-tap/lam-bai' // màn làm bài 12/10D: thanh trên "đã làm/M câu hôm nay" cùng nguồn vòng tròn Hôm nay
-import TheDiemDanhHs from '../components/diem-danh/TheDiemDanhHs'
 import { napTrongHs } from '../components/hoc-tap/nap-trong-hs'
 import { useKhoaCuonTrang } from '../lib/khoa-cuon-trang'
 import { canThanTuSanh, useSanhHoa2 } from '../components/hoa2/api'
@@ -72,6 +71,8 @@ import { boNap, nenNapTruoc, veNgayKhiCo, type BoNap } from '../components/hoa2/
 import { napManCauDaLam, napManTuLuyen } from '../components/hoa2/man-sanh-luoi'
 // Màn làm bài, chữa và xem lại chỉ tải khi em mở.
 const ManLamBaiTap = lazy(() => import('../components/hoc-tap/ManLamBaiTap'))
+// Thẻ điểm danh nổi của giao diện CŨ (không «Trong») — nạp lười (30/10): «Trong» dùng khối điểm danh trong menu (TrongHs, diem-danh-hs.ts).
+const TheDiemDanhHs = lazy(() => import('../components/diem-danh/TheDiemDanhHs'))
 /** MÁY YẾU 30/10 (hồ sơ CPU ×6): Lộ trình nằm ẩn (`inert`) dưới màn làm chặng / màn khác mà vẫn vẽ lại CẢ cây (~665 nút) mỗi lần cổng đổi trạng thái — ngay
  *  trong cú chạm «Bắt đầu» và sau mỗi câu (số tiến độ). Đang ẩn ⇒ giữ nguyên cây (không vẽ lại); hiện lại ⇒ vẽ một lượt với số mới nhất. */
 const DungKhiAn = memo(function DungKhiAn({ children }: { an: boolean; children: ReactNode }) { return <>{children}</> }, (_truoc, sau) => sau.an)
@@ -951,7 +952,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
       {hop}
       {/* ĐIỂM DANH BUỔI HỌC (bảng Dạy học của thầy, 28/09): thẻ nổi khi lớp em có buổi đang mở; quét QR ⇒ tự điểm danh. Không hiện khi đang thi. */}
       {/* + bong bóng A.I Đỗ Đại Học (24/10): chỉ ở Hôm nay, không khi đang thi / mở hồ sơ. */}
-      {auth.token && !manThi && tab === null && <>{!trongHs && <TheDiemDanhHs token={auth.token} />}{!moHoSoEm && <Suspense fallback={null}><BongBongAiDdh auth={auth} anBong={trongHs} /></Suspense>}</>}
+      {auth.token && !manThi && tab === null && <>{!trongHs && <Suspense fallback={null}><TheDiemDanhHs token={auth.token} /></Suspense>}{!moHoSoEm && <Suspense fallback={null}><BongBongAiDdh auth={auth} anBong={trongHs} /></Suspense>}</>}
       {auth.token && !manThi && (
         <div inert={tab !== null} aria-hidden={tab !== null || undefined}><DungKhiAn an={tab !== null}><HocTapHomNay nguon={duLieuBang.nguon} dangLamMoi={keHoachNgay.dangLamMoi} thongBao={<ThongBaoHocSinh token={auth.token} onOpen={(t) => { setTab(t); if (t === 'mom') void napDsMom(); if (t === 'btvn') void napLaiBtvn() }} />}
           canhBao={<TheCanhBaoThay vaiTro="hocsinh" now={nowHocTap} canhBao={duLieuBang.canhBaoThay ?? []} onDaXem={cb => void baoDaXemHocSinh(auth.token!, cb.id)} />}
