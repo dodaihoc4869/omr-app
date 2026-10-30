@@ -54,6 +54,8 @@ export function banHat(el: Element | null | undefined, t: TuyChonHat = {}): numb
     daThu = true
     lop.remove()
     for (const h of hat) {
+      // Huỷ hoạt ảnh WAAPI của hạt (fill: 'both' giữ hiệu ứng trên phần tử) trước khi trả về hồ — phần tử tái dùng không cõng hoạt ảnh cũ.
+      try { for (const a of h.getAnimations?.() ?? []) a.cancel() } catch { /* trình duyệt cũ */ }
       h.remove()
       if (khoHat.length < 80) khoHat.push(h)
     }

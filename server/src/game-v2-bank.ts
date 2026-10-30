@@ -91,7 +91,9 @@ const SQL_THEO_REF=`SELECT q.json FROM game_v2_question q JOIN de_kho d ON d.ma_
 //  · Tầng 1: RAM isolate (`demCauRef`, TTL 30 s, tối đa 600 câu) ⇒ 0 ms, 0 truy vấn D1 trong cùng isolate.
 //  · Tầng 2: Cloudflare Edge Cache API (`caches.default`, TTL 30 s) ⇒ chia sẻ xuyên qua mọi isolate mới bật tại PoP biên Việt Nam (Hà Nội / TP.HCM / Đà Nẵng), không dội D1 khi hàng nghìn isolate khởi động đồng thời.
 //  · Thầy sửa / xoá đề (`xoaDemSync`) ⇒ xoá ngay đệm RAM và tăng thế hệ khoá biên.
-const demCauRef=new DemTTL<string>(30_000,600)
+// TRẦN DUNG LƯỢNG (30/10 — chống exceededMemory): mỗi mục là JSON câu ĐẦY ĐỦ (đề + lời giải, vài–vài chục KB) ⇒ trọng lượng = số ký tự, tổng ≤ 1,5 triệu ký tự / isolate
+// (trước: 600 mục không trần dung lượng ⇒ có thể 6–12 MB mỗi isolate giờ cao điểm).
+const demCauRef=new DemTTL<string>(30_000,600,1_500_000)
 let theHeDemRef=1
 let batDemRef=!(globalThis as {process?:{env?:Record<string,string|undefined>}}).process?.env?.VITEST
 export function batDemCauTheoRef(b:boolean):void{batDemRef=b;demCauRef.xoa();theHeDemRef++}
@@ -117,7 +119,7 @@ export async function docCauTheoRef(env:Env,ref:{maDe:string;qid:string;version:
       const hit=await ec.match(urlEdge).catch(()=>undefined)
       if(hit){
         const txt=await hit.text().catch(()=>'')
-        if(txt){demCauRef.ghi(khoa,now,txt);try{return JSON.parse(txt) as PrivateQuestion}catch{/* đọc tiếp D1 */}}
+        if(txt){demCauRef.ghi(khoa,now,txt,txt.length);try{return JSON.parse(txt) as PrivateQuestion}catch{/* đọc tiếp D1 */}}
       }
     }
   }
@@ -128,7 +130,7 @@ export async function docCauTheoRef(env:Env,ref:{maDe:string;qid:string;version:
   try{
     const parsed=JSON.parse(row.json) as PrivateQuestion
     if(batDemRef){
-      demCauRef.ghi(khoa,now,row.json)
+      demCauRef.ghi(khoa,now,row.json,row.json.length)
       const ec=edgeCache()
       if(ec)void ec.put(urlEdge,new Response(row.json,{headers:{'content-type':'application/json','cache-control':'public, max-age=30'}})).catch(()=>{})
     }

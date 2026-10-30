@@ -647,7 +647,9 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
       daHoiThay: daHoiThay.current, hoTroCham: hoTroCham.current,
     })
   }
-  useEffect(() => { luuDangRef.current() }, [sbd, tai, xong, phien, cau, soGoc, viTri, ket, tra, tuLam, goiY, moLoiGiai, msCau, dem, moi, goi7, chang])
+  // MÁY YẾU (đo scripts/do-muot-hs.mjs CPU ×6, 30/10): ghi cả chặng (đề + kết quả, vài chục KB) vào localStorage NGAY trong lượt bấm «Kiểm tra» / «Tiếp tục» / mỗi lần gõ
+  // làm chậm thêm 35–50 ms mỗi lượt ⇒ gom ghi 400 ms sau thay đổi cuối. Rời app (ẩn tab / đóng trang / rời màn) vẫn ghi NGAY như trước — thoát bất thình lình không mất gì.
+  useEffect(() => { const h = window.setTimeout(() => luuDangRef.current(), 400); return () => window.clearTimeout(h) }, [sbd, tai, xong, phien, cau, soGoc, viTri, ket, tra, tuLam, goiY, moLoiGiai, msCau, dem, moi, goi7, chang])
   useEffect(() => {
     const f = () => { if (document.visibilityState === 'hidden') luuDangRef.current() }
     const g = () => luuDangRef.current()
