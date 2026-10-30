@@ -297,7 +297,7 @@ function TheNut({ id, sac, pop, mo, onDong }: { id: string; sac: string; pop: Po
   const n = pop.nut
   return createPortal(<div ref={the} id={id} className="da-pop" data-sac={sac} role="dialog" aria-label={pop.tieu} tabIndex={-1}>
     <b className="da-pop-tieu">{pop.tieu}</b><span className="da-pop-phu">{pop.phu}</span>
-    {n && <button type="button" className="da-pop-nut" disabled={n.tat || !n.onClick} onClick={() => { onDong(false); n.onClick?.() }}>{n.chu}</button>}
+    {n && <button type="button" className="da-pop-nut" disabled={n.tat || !n.onClick} onClick={() => { if (the.current) { the.current.style.opacity = '0'; the.current.style.pointerEvents = 'none' } n.onClick?.(); window.setTimeout(() => onDong(false), 200) }}>{n.chu}</button>}
   </div>, document.body)
 }
 const SAC_POP: Record<Nut['loai'], string> = { hoc: 'dung', kiem: 'tin', sua: 'sai', bt: 'chu-y' }
@@ -307,7 +307,7 @@ function DuongChang({ ds, moDi, cam, moKhoa }: { ds: Nut[]; moDi: boolean; cam?:
   // Chỉ MỘT thẻ mở một lúc: k của nút đang mở (rương = 'ruong') + phần tử nút (để đặt thẻ và trả focus).
   const [moThe, setMoThe] = useState<{ k: string; el: HTMLElement } | null>(null)
   const dongThe = useRef((traFocus: boolean) => setMoThe((m) => { if (traFocus) m?.el.focus(); return null })).current
-  const bam = (k: string, el: HTMLElement) => { cham(); setMoThe((m) => (m?.k === k ? null : { k, el })) }
+  const bam = (k: string, el: HTMLElement) => { cham(); setMoThe((m) => (m?.k === k ? null : { k, el })); void import('../giam-thi/GiamThi').then((m) => m.hamNongGiamThi()).catch(() => {}) }
   const [duong, setDuong] = useState('')
   const [vua, setVua] = useState<number | null>(null)
   const soChang = ds.filter((n) => n.k.startsWith('c')).length, soXong = ds.filter((n) => n.k.startsWith('c') && n.tt === 'xong').length
@@ -486,9 +486,17 @@ function nangSoTuChangDangDo(so: SoHomNay | null): SoHomNay | null {
     if (ch >= 1 && d0Luu < so.muc) {
       const dau = Math.min((ch - 1) * 6, so.muc), cuoi = ch === so.soChang ? so.muc : Math.min(ch * 6, so.muc)
       const d0 = d0Luu >= dau && d0Luu + g <= cuoi ? d0Luu : Math.max(dau, cuoi - g)
-      return { ...so, daLam: n > 0 ? Math.min(cuoi, Math.max(dau, d0 + n)) : Math.min(so.daLam, cuoi), chang: ch, changDangDo: n > 0 || so.daLam >= cuoi ? ch : undefined, cauChang: g, daCauChang: Math.min(n, g) }
+      return {
+        ...so,
+        daLam: n > 0 ? Math.min(cuoi, Math.max(dau, d0 + n)) : Math.min(so.daLam, cuoi),
+        chang: ch,
+        changDangDo: n > 0 ? ch : undefined,
+        cauChang: g,
+        daCauChang: Math.min(n, g),
+        soDaLamChang: n > 0 ? n : undefined,
+      }
     }
-    return n > 0 ? { ...so, daLam: Math.max(so.daLam, (d0Luu >= 0 ? d0Luu : Math.max(0, so.daLam - n)) + n) } : so
+    return n > 0 ? { ...so, daLam: Math.max(so.daLam, (d0Luu >= 0 ? d0Luu : Math.max(0, so.daLam - n)) + n), changDangDo: ch, soDaLamChang: n } : so
   } catch { return so }
 }
 
@@ -731,10 +739,11 @@ export function MotTrangHs(p: PropsMotTrang) {
     if (nutSua && i === mocSua) nut.push(nutSua)
     const dang = c.tt === 'dang' && chinh === 'hoc' || c.tt === 'dang' && chinh === 'ca'
     const dangDoNay = c.tt === 'dang' && so?.changDangDo === i + 1
-    const thu = `Chặng ${i + 1} / ${chang.length}`, conChang = so ? Math.max(dangDoNay ? 1 : 0, Math.min(c.co, dauChang + c.co - so.daLam)) : c.co
-    // vòng ĐOẠN (thầy 30/10): chặng đang dở trên máy ⇒ đúng số câu thật của chặng + số câu đã nộp; không ⇒ ranh 6 câu của Lộ trình (đã làm − đầu chặng)
-    const cauMay = so?.cauChang !== undefined && so.chang === i + 1
-    const soDoan = cauMay ? so!.cauChang! : c.co, daDoan = cauMay ? so!.daCauChang ?? 0 : so ? Math.max(0, Math.min(c.co, so.daLam - dauChang)) : 0
+    const thu = `Chặng ${i + 1} / ${chang.length}`
+    const cauMay = dangDoNay && so?.cauChang !== undefined && so.chang === i + 1
+    const soDoan = cauMay ? so!.cauChang! : c.co
+    const daDoan = dangDoNay ? (cauMay ? so!.daCauChang ?? 0 : typeof so?.soDaLamChang === 'number' ? so.soDaLamChang : 0) : 0
+    const conChang = so ? (dangDoNay ? (cauMay ? Math.max(1, soDoan - daDoan) : typeof so.soDaLamChang === 'number' ? Math.max(1, c.co - so.soDaLamChang) : Math.max(1, c.co - daDoan)) : c.co) : c.co
     dauChang += c.co
     if (khoaKt && c.tt !== 'xong') { nut.push({ k: `c${i}`, loai: 'hoc', tt: 'khoa', ten: `Chặng ${i + 1}: khoá đến khi làm xong Kiểm tra ôn tập`, pop: { tieu: tenBaiThe, phu: `${thu} · ${CHU_KHOA_KT}` } }); return }
     if (khoaSua && i >= mocSua && c.tt !== 'xong') { nut.push({ k: `c${i}`, loai: 'hoc', tt: 'khoa', ten: `Chặng ${i + 1}: khoá đến khi sửa xong lỗi hôm nay`, pop: { tieu: tenBaiThe, phu: `${thu} · Sửa xong ${conPhan} lỗi hôm nay để mở chặng tiếp` } }); return }

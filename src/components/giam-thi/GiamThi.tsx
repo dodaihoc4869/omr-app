@@ -19,6 +19,29 @@ const bay = () => performance.now()
 const CHON = '[aria-checked="true"], [aria-pressed="true"]'
 // 27/10 MƯỢT (đo scripts/do-muot-hs.mjs, chuyển câu CPU ×6): khối đề dựng lại mỗi câu ⇒ trước đây giám thị bị huỷ rồi dựng ~150 hình SVG mới. Nay câu cũ
 // rời đi thì giám thị được GỬI lại (không huỷ); câu mới cùng mức lấy về, chuyển sang khung mới (`doiCho`). Không ai lấy trong lượt này ⇒ huỷ thật.
+const khoGt = new Map<MucGT, GiamThi>()
+const CAC_MUC_GT: MucGT[] = ['nb', 'th', 'vd', 'vdc']
+let daHenHamGt = false
+/** Hâm nóng sẵn 4 giám thị vào kho lúc rảnh (mỗi mức dựng một lần trong từng vi-tác-vụ 25 ms) ⇒ mở câu đầu và đổi mức trong chặng chỉ `doiCho` (0 ms). */
+export function hamNongGiamThi(): void {
+  if (typeof document === 'undefined' || daHenHamGt) return
+  daHenHamGt = true
+  const cacMuc: MucGT[] = document.documentElement.classList.contains('may-yeu') ? ['nb', 'th'] : CAC_MUC_GT
+  let i = 0
+  const buoc = () => {
+    while (i < cacMuc.length && khoGt.has(cacMuc[i]!)) i++
+    if (i >= cacMuc.length) return
+    const m = cacMuc[i++]!
+    if (!document.querySelector('[role="radio"]')) {
+      const tam = document.createElement('div')
+      const g = taoGiamThi(tam, { muc: m })
+      g.tamDung(true)
+      khoGt.set(m, g)
+    }
+    if (i < cacMuc.length) window.setTimeout(buoc, 30)
+  }
+  window.setTimeout(buoc, 30)
+}
 let guiLai: { g: GiamThi; hen: number } | null = null
 function gui(g: GiamThi): void {
   if (guiLai) { clearTimeout(guiLai.hen); guiLai.g.huy() }
@@ -26,14 +49,18 @@ function gui(g: GiamThi): void {
   guiLai = muc
 }
 function layLai(muc: MucGT, el: HTMLElement, loiVao: HTMLElement | null | undefined): GiamThi | null {
-  if (!guiLai) return null
-  const g = guiLai.g
-  clearTimeout(guiLai.hen); guiLai = null
-  // 29/10 (ảnh thầy: «Có câu ko có giám thị»): câu liền trước KHÁC mức ⇒ giám thị cũ còn đang chờ huỷ (hẹn 0 ms) mà giám thị mới được dựng vào CHÍNH khung đó —
-  // hẹn chạy sau ⇒ `huy()` cũ xoá sạch khung (`khung.innerHTML = ''`) kéo theo giám thị mới ⇒ khung trống tới hết câu. Huỷ cái cũ NGAY, trước khi dựng cái mới.
-  if (g.muc !== muc) { g.huy(); return null }
-  g.doiCho(el, loiVao)
-  return g
+  if (guiLai) {
+    const g = guiLai.g
+    clearTimeout(guiLai.hen); guiLai = null
+    if (g.muc !== muc) g.huy()
+    else { g.doiCho(el, loiVao); return g }
+  }
+  const san = khoGt.get(muc)
+  if (!san) return null
+  khoGt.delete(muc)
+  san.doiCho(el, loiVao)
+  san.tamDung(false)
+  return san
 }
 
 export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
@@ -55,10 +82,6 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
     const el = host.current
     if (!el) return
     const loiVao = el.closest('.duo-gt-san')?.querySelector<HTMLElement>(':scope > .duo-gt-loi-o')
-    const cu = layLai(muc, el, loiVao)
-    const g = cu ?? taoGiamThi(el, { muc, loiVao })
-    if (cu && ket) g.datTrangThai('yen') // như giám thị mới dựng: câu đã có kết quả ⇒ đứng yên
-    gt.current = g
     if (nhip.phien !== phien) nhip = taoNhip(phien)
     cauMoi(nhip, qid)
     batDau.current = bay(); daNop.current = false
@@ -69,16 +92,29 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
     const doRong = (w: number) => el.style.setProperty('--gt-loi-max', `${Math.max(140, w - 4)}px`)
     const quanRong = san && typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => doRong(san.clientWidth)) : null // đọc trong lượt báo: bố cục đã sạch, không ép tính lại
     if (san && quanRong) quanRong.observe(san); else if (san) doRong(san.clientWidth)
-    // 28/10 TỨC THÌ (hồ sơ «Tiếp tục» CPU ×6: setAttribute của giám thị ~110 ms nằm giữa cú chạm và khung câu mới): đổi câu do cú chạm ⇒ React chạy hiệu ứng
-    // này ĐỒNG BỘ trước lần sơn. Dáng «đọc đề» đặt SAU khung đầu của câu mới (rAF → setTimeout) ⇒ câu hiện trước, giám thị chuyển dáng ngay khung sau.
-    let raf = 0, sauVe = 0
-    if (!ket) raf = requestAnimationFrame(() => { sauVe = window.setTimeout(() => {
-      if (gt.current !== g || coKet.current) return
-      g.datTrangThai('doc', { xong: () => { if (coKet.current) return; const chon = vung()?.querySelector(`.duo-tra ${CHON}`); chon ? g.nhinVao(chon) : g.nhin(0.5, 0.45); datHen('loi', 1200, () => { if (!coKet.current) noi('ngauNhien') }) } })
-      henCho()
-      datHen('dh', DONG_HO_GT[muc], () => { if (!coKet.current && !document.hidden) { datTT('dong-ho'); noi('dongHo') } })
-    }, 0) })
-    return () => { cancelAnimationFrame(raf); clearTimeout(sauVe); quanRong?.disconnect(); huyHen(); gui(g); gt.current = null }
+    const mayYeu = typeof document !== 'undefined' && document.documentElement.classList.contains('may-yeu')
+    let raf = 0, sauVe = 0, henTao = 0
+    const ganGiamThi = (g: GiamThi, laCu: boolean) => {
+      if (laCu && coKet.current) g.datTrangThai('yen') // như giám thị mới dựng: câu đã có kết quả ⇒ đứng yên
+      gt.current = g
+      if (!coKet.current) raf = requestAnimationFrame(() => { sauVe = window.setTimeout(() => {
+        if (gt.current !== g || coKet.current) return
+        g.datTrangThai('doc', { xong: () => { if (coKet.current) return; const chon = vung()?.querySelector(`.duo-tra ${CHON}`); chon ? g.nhinVao(chon) : g.nhin(0.5, 0.45); datHen('loi', 1200, () => { if (!coKet.current) noi('ngauNhien') }) } })
+        henCho()
+        datHen('dh', DONG_HO_GT[muc], () => { if (!coKet.current && !document.hidden) { datTT('dong-ho'); noi('dongHo') } })
+      }, mayYeu ? 40 : 0) })
+    }
+    const ganSan = () => {
+      const cu = layLai(muc, el, loiVao)
+      if (cu) ganGiamThi(cu, true)
+      else ganGiamThi(taoGiamThi(el, { muc, loiVao }), false)
+    }
+    if (mayYeu) {
+      henTao = window.setTimeout(() => { henTao = 0; ganSan() }, 50)
+    } else {
+      ganSan()
+    }
+    return () => { clearTimeout(henTao); cancelAnimationFrame(raf); clearTimeout(sauVe); quanRong?.disconnect(); huyHen(); if (gt.current) { gui(gt.current); gt.current = null } }
   }, [muc, qid]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // KHUNG CHỮ L — CHỈ khi chữ thật sự tràn xuống dưới chân giám thị (thầy 27/10: câu 4 dòng bị đáy rỗng). Đo trước khi vẽ (layout effect /
@@ -115,7 +151,14 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
     // TRƯỚC lần sơn (không nháy dáng sai). Trước: quyết ngay trong layout effect ⇒ ép tính kiểu cả câu mới giữa lượt dựng của React (~110 ms ở ×6),
     // rồi khung vẽ còn tính lại phần đổi sau đó.
     const ro = new ResizeObserver(() => {
-      if (dau) { dau = false; quyet(); ghiCo(); return }
+      if (dau) {
+        dau = false
+        if (typeof document !== 'undefined' && document.documentElement.classList.contains('may-yeu')) {
+          window.setTimeout(() => { quyet(); ghiCo() }, 80)
+          return
+        }
+        quyet(); ghiCo(); return
+      }
       if (san.clientWidth !== rong || de.offsetHeight !== cao) { quyet(); ghiCo() }
       else if (bong.offsetHeight !== bongCao) { bongCao = bong.offsetHeight; ve() }
     })
@@ -192,12 +235,38 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
   return <div ref={host} className="gt-o" aria-hidden="true" />
 }
 
+const hangTinh: (() => void)[] = []
+let dangChayTinh = false
+function xepHangTinh(f: () => void): () => void {
+  hangTinh.push(f)
+  if (!dangChayTinh) {
+    dangChayTinh = true
+    const tiep = () => {
+      const fn = hangTinh.shift()
+      if (!fn) { dangChayTinh = false; return }
+      fn()
+      if (hangTinh.length) window.setTimeout(tiep, 16)
+      else dangChayTinh = false
+    }
+    window.setTimeout(tiep, 0)
+  }
+  return () => {
+    const i = hangTinh.indexOf(f)
+    if (i >= 0) hangTinh.splice(i, 1)
+  }
+}
+
 /** Giám thị TĨNH (không hoạt ảnh) — cho chỗ khác dùng, vd. linh vật mờ cạnh Lộ trình: `xam` = xám, `mo` = mờ. */
 export function GiamThiTinh({ muc, trangThai = 'yen', buoc = 0, xam, mo, className, style }: { muc: MucGT; trangThai?: TrangThaiGT; buoc?: number; xam?: boolean; mo?: boolean; className?: string; style?: CSSProperties }) {
   const host = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const el = host.current
     if (!el) return
+    if (typeof document !== 'undefined' && document.documentElement.classList.contains('may-yeu')) {
+      let g: GiamThi | null = null
+      const bo = xepHangTinh(() => { g = taoGiamThi(el, { muc, tinh: true, xam, mo, trangThai, buoc }) })
+      return () => { bo(); g?.huy() }
+    }
     const g = taoGiamThi(el, { muc, tinh: true, xam, mo, trangThai, buoc })
     return () => g.huy()
   }, [muc, trangThai, buoc, xam, mo])

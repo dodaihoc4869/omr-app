@@ -61,7 +61,8 @@ export async function goiNgay7(env: Env, sbd: string, now: number): Promise<Reco
   const x = await g7.xayGoiNgay7(env, sbd, now, SO_CAU_GOI_NGAY)
   if (!x) return { ok: true, sbd, ngay: ngayVn7(now), luc: now, chang: [] }
   const daLam = Number((x.goi7 as { daLamHomNay?: unknown } | null)?.daLamHomNay) || 0
-  const dau = CAU_MOI_CHANG - (daLam % CAU_MOI_CHANG) // chặng đầu bù cho khớp ranh chặng của Lộ trình (⌊đã làm / 6⌋)
+  const conLai = Math.max(1, (Number((x.goi7 as { toiThieu?: unknown } | null)?.toiThieu) || 0) - daLam)
+  const dau = conLai < CAU_MOI_CHANG ? conLai : CAU_MOI_CHANG
   const chang: { ve: string; questions: Record<string, unknown>[] }[] = []
   for (let i = 0; i < x.refs.length && chang.length < SO_CHANG_GOI;) {
     const n = chang.length === 0 ? dau : CAU_MOI_CHANG

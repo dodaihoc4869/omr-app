@@ -59,6 +59,8 @@ export interface SoHomNay {
   /** (30/10) Chặng đang làm dở trên máy: số câu THẬT của chặng · số câu đã nộp — vòng tiến độ chia đúng bấy nhiêu đoạn (vắng ⇒ theo ranh 6 câu). */
   cauChang?: number
   daCauChang?: number
+  /** Số câu đã trả lời trong chặng đang làm dở (để vẽ vòng tiến độ chặng đó, các chặng chưa bắt đầu luôn = 0). */
+  soDaLamChang?: number | null
 }
 /** Mỗi chặng tối đa 6 câu — cùng hằng với máy chủ (`server/src/hanh-trinh-ngay.ts` CAU_MOI_CHANG) và vạch chặng ở Hôm nay. */
 export const CAU_MOI_CHANG = 6

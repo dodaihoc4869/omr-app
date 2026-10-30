@@ -28,7 +28,8 @@ import { Bi } from '../linh-vat/Bi'
 import { banHat, truotRa, useDemSo, yenLang } from '../../lib/hieu-ung'
 import { hamNongTuDien } from '../goi-y-cham/tu-dien'
 import { batAnKhiBiChe } from '../../lib/an-khi-bi-che'
-import { VungChamDe } from '../goi-y-cham/VungChamDe'
+import { VungChamDe, napSanRuotCham } from '../goi-y-cham/VungChamDe'
+import { napBangCanh } from '../../lib/experiments/nhe'
 // Lời giải kiểu sơ đồ (hợp đồng chạm để hiểu đề, chỗ 3): chỉ cần khi em mở «Lời giải từng bước» ⇒ nạp LƯỜI, lúc chờ vẽ lời giải cũ (không chớp trống).
 const LoiGiaiCauCoSoDo = lazy(() => import('../goi-y-cham/LoiGiaiCauCoSoDo'))
 // NÂNG CẤP 27/10 (bản vẽ ve-moi/nang-cap): tranh Hoá học (cảnh phản ứng dưới đề · phân tử trong ô phương án). Nằm CHUNG mảnh màn làm bài (mảnh này đã
@@ -62,8 +63,27 @@ const KetBaiThuong = lazy(() => import('../thuong/KetBaiThuong'))
 // Chạm ô nguyên tử trên thanh trên ⇒ tấm hướng dẫn (thầy 30/10) — đi trong mảnh nạp lười ManThuong, chỉ «Đã hiểu» (không rời bài).
 const TamHuongDan = lazy(() => import('../thuong/ManThuong').then((m) => ({ default: m.TamHuongDan })))
 // Giám thị theo mức câu (thầy chốt 27/10): mảnh lười + tờ riêng; ở đây chỉ phần chọn mức (nhỏ).
-const GiamThiCau = lazy(() => import('../giam-thi/GiamThi'))
+type ModGt = typeof import('../giam-thi/GiamThi')
+let modGt: ModGt | null = null
+let pGt: Promise<ModGt> | null = null
+const napGiamThi = () => (pGt ??= import('../giam-thi/GiamThi').then((m) => (modGt = m)))
+const GiamThiCau = lazy(napGiamThi)
 import { mucGiamThi } from '../giam-thi/muc-giam-thi'
+let daNapSanManLam = false
+export function napSanManLam(): void {
+  if (daNapSanManLam || typeof window === 'undefined') return
+  daNapSanManLam = true
+  const w = window as Window & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }
+  const ranh = (f: () => void) => (w.requestIdleCallback ? w.requestIdleCallback(f, { timeout: 1500 }) : window.setTimeout(f, 80))
+  const buoc = [
+    () => { void napGiamThi().catch(() => {}) },
+    () => { napSanRuotCham(); void napBangCanh().catch(() => {}) },
+    () => { napSanGiuChan(); hamNongTuDien() },
+  ]
+  let i = 0
+  const chay = () => { buoc[i++]?.(); if (i < buoc.length) ranh(chay) }
+  window.setTimeout(() => ranh(chay), 7000)
+}
 /** Trùng tên với TrongHs.SU_KIEN_MO_CHUOI (không nhập TrongHs vào mảnh màn làm bài). */
 const SU_KIEN_MO_CHUOI = 'ddh-thuong-mo-chuoi'
 // «Trong» 26/10 (nhóm 2): tờ trình bày styles/trong-lam-bai.css nạp RIÊNG, chỉ khi <html data-trong> (main.tsx gắn trước khi nạp màn) — không cộng byte lượt mở app.
@@ -235,7 +255,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   const [phien, setPhien] = useState(dang0?.phien ?? mo0?.id ?? ''), [cau, setCau] = useState<Cau[]>(dau0?.ds ?? []), [viTri, setViTri] = useState(viTri0)
   const [tra, setTra] = useState(tra0), [ket, setKet] = useState<Record<string, Ket>>((dang0?.ket as Record<string, Ket> | undefined) ?? {}), [tai, setTai] = useState(!dau0), [nop, setNop] = useState(false), [loi, setLoi] = useState(''), [hetCau, setHetCau] = useState(''), [lan, setLan] = useState(0), [xong, setXong] = useState(false), [goiY, setGoiY] = useState(!!dang0?.goiY)
   const [tuLam, setTuLam] = useState(dang0 ? (!!dang0.tuLam || !!tra0) : !!tra0), [moLoiGiai, setMoLoiGiai] = useState(!!dang0?.moLoiGiai), [msCau, setMsCau] = useState<Record<string, number>>(dang0?.msCau ?? {})
-  const [goi7, setGoi7] = useState<TomTatGoi7 | undefined>(dau0?.g7), [chang, setChang] = useState<number | null>(dang0?.chang ?? null)
+  const [goi7, setGoi7] = useState<TomTatGoi7 | undefined>(dau0?.g7)
   // «Làm chặng kiểu Duolingo» (thầy chốt bản vẽ docs/ban-ve-duo-2610, 26/10): CHỈ khi <html data-trong> — cùng state, cùng lệnh, cùng luồng chấm/lưu/đo giây;
   // chỉ dựng cây trình bày khác (nhánh `if (duo)` cuối hàm). Tắt «Trong» ⇒ màn y cũ.
   const [duo] = useState(() => typeof document !== 'undefined' && !!document.documentElement.dataset.trong)
@@ -289,6 +309,12 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     if (muc0 <= 0) return dang0?.dem ?? null
     const daLam0 = d0KhungDau >= 0 ? d0KhungDau + qidsDang0.length : Math.max(0, dang0?.dem?.daLam ?? homNay?.daLam ?? 0)
     return { daLam: daLam0, muc: muc0 }
+  })
+  const [chang, setChang] = useState<number | null>(() => {
+    if (dang0?.chang) return dang0.chang
+    if (d0KhungDau >= 0) return Math.min(homNay?.soChang ?? 999, Math.floor(d0KhungDau / 6) + 1)
+    if (!dau0) return null
+    return homNay?.chang ?? null
   })
   const canTaiSanh = useRef(false), soLuotDem = useRef(0), capNhatRef = useRef(onCapNhat)
   capNhatRef.current = onCapNhat
@@ -353,10 +379,11 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
         xin()
       } else { if (!anTu) anTu = Date.now(); khoaMan = null /* trình duyệt tự nhả khi ẩn */ }
     }
-    xin()
+    const hXin = window.setTimeout(xin, 300)
     document.addEventListener('visibilitychange', doiHien)
     return () => {
       het = true
+      window.clearTimeout(hXin)
       window.clearInterval(id)
       for (const e of ev) window.removeEventListener(e, cham, { capture: true })
       document.removeEventListener('visibilitychange', doiHien)
@@ -369,7 +396,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   soORef.current = soO
   const homNayHien: SoHomNay | null | undefined = (dem && soHomNayGoi7(dem.daLam, dem.muc)) || homNay
   // Số chặng CHỐT lúc mở chặng (sau mỗi câu số hôm nay cập nhật — chặng đang làm không nhảy giữa chừng). Trạng thái suy ra NGAY khi vẽ (không đợi effect).
-  if (!tai && chang === null && homNayHien?.chang) setChang(homNayHien.chang)
+  if (!tai && chang === null && homNayHien?.chang) setChang(d0KhungDau >= 0 ? Math.min(homNayHien.soChang, Math.floor(d0KhungDau / 6) + 1) : homNayHien.chang)
   const khoa = q ? `hoc-tap:nhap:${sbd}:${q.qid}:${q.version}` : ''
   useEffect(() => {
     if (daNapMo0.current && lan === 0) {
@@ -440,7 +467,9 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
       setDem(san.g7 ? { daLam: Math.max(0, d0), muc: san.g7.toiThieu } : homNay ? { daLam: homNay.daLam, muc: homNay.muc } : null)
       return
     }
-    setTai(true); setLoi(''); setHetCau(''); setCau([]); setPhien(''); setXong(false); setKet({}); setViTri(0); setMsCau({}); setChang(null); setDem(null); setSoGoc(0); setCombo(null); daXinLamLai.current = false; soLuotDem.current++
+    if (!(lan === 0 && goi0)) {
+      setTai(true); setLoi(''); setHetCau(''); setCau([]); setPhien(''); setXong(false); setKet({}); setViTri(0); setMsCau({}); setChang(null); setDem(null); setSoGoc(0); setCombo(null); daXinLamLai.current = false; soLuotDem.current++
+    }
     /** Nhận một lượt mở chặng (đường cũ — cũng là lối rơi về của gói cả ngày). */
     const nhan = (r: Record<string, unknown>) => {
       if (!r.ok) throw Object.assign(new Error(typeof r.error === 'string' ? r.error : 'Chưa mở được chặng học.'), { ma: r.ma })
@@ -460,13 +489,16 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     const goi = layGoiChang()
     // Gói còn câu mà không đủ trọn chặng (thầy 30/10) ⇒ chặng này đi đường máy chủ (đủ câu), lập lại gói ở nền cho chặng sau.
     if (!goi && layChangGoi(sbd, Date.now(), 1)) void napGoiNgay(token, goiHoa2, Date.now(), true)
-    const dsGoi = goi && dsTuGoi(goi.questions)
+    const dsGoi = (lan === 0 && goi0) ? goi0.ds : (goi && dsTuGoi(goi.questions))
     const mo: Promise<{ id: string; sk: Record<string, unknown>; qids: Set<string> }> = goi && dsGoi ? (() => {
-      const g7 = g7Goi(goi.goi7), d0 = d0BanDau(g7)
+      const g7 = (lan === 0 && goi0) ? goi0.g7 : g7Goi(goi.goi7), d0 = d0BanDau(g7)
       moLucRef.current = Date.now()
-      setCau(dsGoi); setSoGoc(dsGoi.length); setGoi7(g7); moi.current = { qids: new Set(), tiep: 0, d0, ngay: ngayBanDau(g7) }
-      if (g7) setDem({ daLam: Math.max(0, d0), muc: g7.toiThieu })
-      setTai(false)
+      moi.current = { qids: new Set(), tiep: 0, d0, ngay: ngayBanDau(g7) }
+      if (!(lan === 0 && goi0)) {
+        setCau(dsGoi); setSoGoc(dsGoi.length); setGoi7(g7)
+        if (g7) setDem({ daLam: Math.max(0, d0), muc: g7.toiThieu })
+        setTai(false)
+      }
       const temDai: Record<string, unknown> = {}
       for (const c of goi.questions) if (typeof c.qid === 'string' && typeof c.sk === 'string') temDai[c.qid] = c.sk
       // Lệnh nhẹ (một đợt đọc + một lệnh ghi): chờ tối đa 20 s rồi rơi về đường cũ — không để em đã bấm «Kiểm tra» chờ đủ 40 s + 40 s.
@@ -484,9 +516,15 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
         }
         if (!huy) {
           moLucRef.current = Date.now()
-          const ds = dsGoi.filter(c => qids.has(c.qid)).map(c => typeof sk[c.qid] === 'string' ? { ...c, sk: sk[c.qid] as string } : c)
-          setCau(ds); setSoGoc(ds.length); setViTri(v => Math.min(v, Math.max(0, ds.length - 1))); setPhien(r.id)
-          if (typeof r.daLam === 'number' && r.daLam >= 0 && moi.current.qids.size === 0) { const d = r.daLam; moi.current.d0 = d; setDem(v => v ? { ...v, daLam: d } : v) }
+          const giuNguyen = qids.size === dsGoi.length && dsGoi.every(c => qids.has(c.qid))
+          if (giuNguyen) {
+            for (const c of dsGoi) if (typeof sk[c.qid] === 'string') c.sk = sk[c.qid] as string
+            setPhien(r.id)
+          } else {
+            const ds = dsGoi.filter(c => qids.has(c.qid)).map(c => typeof sk[c.qid] === 'string' ? { ...c, sk: sk[c.qid] as string } : c)
+            setCau(ds); setSoGoc(ds.length); setViTri(v => Math.min(v, Math.max(0, ds.length - 1))); setPhien(r.id)
+          }
+          if (typeof r.daLam === 'number' && r.daLam >= 0 && moi.current.qids.size === 0) { const d = r.daLam; moi.current.d0 = d; setDem(v => v && v.daLam === d ? v : v ? { ...v, daLam: d } : v) }
         }
         return { id: r.id, sk, qids }
       }).catch(async () => { // mạng lỗi / máy chủ từ chối gói ⇒ đường cũ (lỗi của đường cũ hiện như trước)
@@ -595,7 +633,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     const ghimNgang = ngangThap && getComputedStyle(nutTiepRef.current?.closest('.duo-day') ?? document.body).position === 'fixed'
     if (ngangThap && !ghimNgang) nutTiepRef.current?.scrollIntoView?.({ block: 'nearest' })
     else {
-      if (!ngangThap) veDau()
+      if (!ngangThap && !duo) veDau()
       // thầy 27/10 (ảnh: tấm kết quả che nửa phương án D): tấm dính đáy ⇒ cuộn thêm cho phương án ĐÚNG nằm trọn trên mép tấm.
       if (duo) requestAnimationFrame(() => {
         const pa = gocRef.current?.querySelector<HTMLElement>('.ht2-lam-pa[data-ket=dung]'), tam = nutTiepRef.current?.closest<HTMLElement>('.duo-day')
@@ -748,8 +786,12 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     })
   }
   // MÁY YẾU (đo scripts/do-muot-hs.mjs CPU ×6, 30/10): ghi cả chặng (đề + kết quả, vài chục KB) vào localStorage NGAY trong lượt bấm «Kiểm tra» / «Tiếp tục» / mỗi lần gõ
-  // làm chậm thêm 35–50 ms mỗi lượt ⇒ gom ghi 400 ms sau thay đổi cuối. Rời app (ẩn tab / đóng trang / rời màn) vẫn ghi NGAY như trước — thoát bất thình lình không mất gì.
-  useEffect(() => { const h = window.setTimeout(() => luuDangRef.current(), 400); return () => window.clearTimeout(h) }, [sbd, tai, xong, phien, cau, soGoc, viTri, ket, tra, tuLam, goiY, moLoiGiai, msCau, dem, moi, goi7, chang])
+  // làm chậm thêm 35–50 ms mỗi lượt ⇒ gom ghi 400 ms sau thay đổi cuối. Mới mở câu 1 và chưa chọn/nhập gì ⇒ chưa cần hẹn ghi (rời app / ẩn tab / rời màn vẫn ghi NGAY).
+  useEffect(() => {
+    if (!dang0 && viTri === 0 && !tra && !tuLam && !goiY && !moLoiGiai && !Object.keys(ket).length) return
+    const h = window.setTimeout(() => luuDangRef.current(), 400)
+    return () => window.clearTimeout(h)
+  }, [sbd, tai, xong, phien, cau, soGoc, viTri, ket, tra, tuLam, goiY, moLoiGiai, msCau, dem, moi, goi7, chang])
   useEffect(() => {
     const f = () => { if (document.visibilityState === 'hidden') luuDangRef.current() }
     const g = () => luuDangRef.current()
@@ -996,9 +1038,9 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     else if (dangTraLoi && duocNop && !nop) { e.preventDefault(); phanHoi('chon'); void nopCau() }
   }
   // GIỮ CHÂN (màn Duo): đã chấm ≥ 1 câu, chặng chưa xong và còn câu phải làm ⇒ X / Esc / back mở tấm thay vì thoát thẳng.
-  useEffect(() => { if (duo) { napSanGiuChan(); void import('../giam-thi/GiamThi').catch(() => {}); hamNongTuDien() } }, [duo]) // nạp sẵn mảnh giám thị + hâm nóng bộ dò chạm-hiểu-đề trong lúc chờ câu
+  useEffect(() => { if (duo) { napSanGiuChan(); void napGiamThi().catch(() => {}); napSanRuotCham(); hamNongTuDien() } }, [duo]) // nạp sẵn mảnh giám thị + hâm nóng bộ dò chạm-hiểu-đề trong lúc chờ câu
   // 27/10 MƯỢT: màn làm chặng che kín Lộ trình (khung `inert` của cổng) ⇒ trình duyệt bỏ qua kiểu / bố cục / vẽ của Lộ trình suốt lúc làm (src/lib/an-khi-bi-che.ts)
-  useEffect(() => { const tr = document.querySelector('.ht2')?.closest<HTMLElement>('[inert]'); return tr ? batAnKhiBiChe(tr) : undefined }, [])
+  useEffect(() => { const tr = document.querySelector('.ht2')?.closest<HTMLElement>('[inert], [aria-hidden="true"]') ?? document.querySelector('.ht2')?.parentElement; return tr ? batAnKhiBiChe(tr) : undefined }, [])
   const conLai = cau.length - viTri - (k ? 1 : 0)
   const daChamGoc: CauDaCham[] = goc.flatMap((c) => {
     const r = ket[c.qid]
@@ -1183,7 +1225,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
           {laLamLai && !k && viTri === soGoc && <p key={`g${q.qid}`} className="duo-mo-ghi">Câu cùng dạng với câu em vừa sai. Lượt này tính là có hỗ trợ.</p>}
           {mucGt ? <div ref={sanRef} className="duo-gt-san">
               <div className="duo-gt-loi-o" />{/* hàng riêng của bong bóng càu nhàu: không đè nhãn, đề, phương án */}
-              <div className="duo-gt-nv"><Suspense fallback={null}><GiamThiCau muc={mucGt} qid={q.qid} phien={phien} nop={nop} ket={ketGt} vung={() => gocRef.current} /></Suspense></div>
+              <div className="duo-gt-nv">{modGt ? <modGt.default muc={mucGt} qid={q.qid} phien={phien} nop={nop} ket={ketGt} vung={() => gocRef.current} /> : <Suspense fallback={null}><GiamThiCau muc={mucGt} qid={q.qid} phien={phien} nop={nop} ket={ketGt} vung={() => gocRef.current} /></Suspense>}</div>
               {/* chữ L (bong bóng gần trọn bề ngang, khuyết góc trái trên ôm giám thị) CHỈ khi chữ thật sự tràn xuống dưới chân giám thị — mảnh GiamThi đo rồi bật `data-l` */}
               <div key={`b${q.qid}`} className="duo-gt-bong"><svg className="duo-gt-vien" aria-hidden="true"><path /></svg><span className="duo-gt-cho" aria-hidden="true" /><VungChamDe q={q} token={token} phien={phien} onHoTro={danhDauHoTro} nutBatDau={nutBatDau}><DeCau q={q} stt={stt} /></VungChamDe></div>
             </div>

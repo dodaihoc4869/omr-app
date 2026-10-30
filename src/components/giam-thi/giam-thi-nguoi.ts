@@ -343,7 +343,7 @@ export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; 
   if (tinh) khung.classList.add('gt-tinh')
   if (o.xam) khung.classList.add('gt-xam')
   if (o.mo) khung.classList.add('gt-mo-nhat')
-  const svg = tao('svg', { viewBox: '-110 -240 220 254', class: 'gtv gtn', 'data-muc': muc, 'aria-hidden': 'true', focusable: 'false' }, khung) as SVGSVGElement
+  const svg = tao('svg', { viewBox: '-110 -240 220 254', class: 'gtv gtn', 'data-muc': muc, 'aria-hidden': 'true', focusable: 'false' }, null) as SVGSVGElement
   const defs = tao('defs', null, svg)
   const P: Phan = {}
   const g = (ten: string, cha: Element) => (P[ten] = tao('g', null, cha))
@@ -671,6 +671,7 @@ export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; 
     nhin(nx, ny) { nhinXY = [Math.max(-1, Math.min(1, +nx || 0)), Math.max(-1, Math.min(1, +ny || 0))]; tichNhin(); if (giam) { v.px = dich.px!; v.py = dich.py!; ve() } return gt },
     nhinVao(el) {
       if (!el) return gt.nhin(0, 0)
+      if (giam) return gt.nhin(0.35, 0.45)
       const r1 = svg.getBoundingClientRect(), r2 = el.getBoundingClientRect()
       const dx = r2.left + r2.width / 2 - (r1.left + r1.width / 2), dy = r2.top + r2.height / 2 - (r1.top + r1.height * 0.33)
       const dd = Math.hypot(dx, dy) || 1, kk = Math.min(1, dd / 120)
@@ -732,5 +733,6 @@ export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; 
   for (const key in dich) { v[key] = dich[key]!; van[key] = 0 }
   ve()
   chay()
+  khung.appendChild(svg)
   return gt
 }

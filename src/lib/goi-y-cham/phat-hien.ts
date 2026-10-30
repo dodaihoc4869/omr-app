@@ -299,12 +299,13 @@ function doDeHoi(t: string, lc: string, daCo: UngVien[], ra: UngVien[]) {
 // Lần dò đầu dựng các biểu thức lớn (đơn vị, tên ~395 chất, từ then chốt) và V8 dịch mỗi biểu thức sang mã máy ở lượt chạy thứ hai — gộp lại
 // 200–400 ms ở CPU ×6, rơi đúng lúc em mở câu / bấm sang câu. Mỗi lần gọi `hamNongBuoc(i)` chỉ dựng + chạy thử (hai lượt, chuỗi có chữ Việt — V8
 // dịch riêng cho chuỗi hai byte) MỘT biểu thức ⇒ cửa nạp (components/goi-y-cham/tu-dien.ts) rải ra nhiều lượt rảnh nhỏ. Không đổi kết quả dò.
-const thuHai = (re: RegExp, a: string, b: string) => { re.lastIndex = 0; re.test(a); re.lastIndex = 0; re.test(b); re.lastIndex = 0 }
+const thuHai = (re: RegExp, a: string, b: string) => { re.lastIndex = 0; re.exec(a); re.lastIndex = 0; re.exec(b); re.lastIndex = 0 }
 const BUOC_HAM: (() => void)[] = [
   () => thuHai(reDonVi(), 'đun 5,6 gam', 'được 2 mol'),
   () => { tenDeDo() }, // nạp từ điển chất (bảng tra theo tên / công thức)
   () => { reTen() }, // dựng biểu thức tên chất
-  () => thuHai(reTen(), 'cho ethyl acetate', 'dung dịch NaOH'),
+  () => { const r = reTen(); r.lastIndex = 0; r.exec('cho ethyl acetate'); r.lastIndex = 0 },
+  () => { const r = reTen(); r.lastIndex = 0; r.exec('dung dịch NaOH'); r.lastIndex = 0 },
   () => thuHai(reKhoa().re, 'đun nóng hoàn toàn', 'kết tủa trắng'),
   () => thuHai(RE_CT, 'đốt CH4 và O2', 'tạo Fe2O3'),
 ]
