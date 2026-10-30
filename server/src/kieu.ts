@@ -51,7 +51,16 @@ export interface WsMayChu {
   serializeAttachment(v: unknown): void
   deserializeAttachment(): unknown
 }
+/** SQLite riêng của một Durable Object lớp SQLite (ngăn riêng học sinh): chỉ phần dùng tới. */
+export interface SqlNgan { exec(q: string, ...b: unknown[]): { toArray(): Record<string, unknown>[] } }
+/** Kho riêng của MỘT em trong ngăn của em (server/src/ngan-hoc-sinh.ts): dòng sổ đã đọc từ D1 + mốc (n, r) — sống qua lúc ngăn ngủ, không tốn bộ nhớ isolate. */
+export interface KhoEm {
+  sbd: string
+  docSo(): { rows: Record<string, unknown>[]; n: number; r: number } | null
+  ghiSo(rows: readonly Record<string, unknown>[], n: number, r: number, chiThem: boolean): void
+}
 export interface DurableObjectStorage {
+  sql?: SqlNgan
   get<T = unknown>(khoa: string): Promise<T | undefined>
   put(khoa: string, v: unknown): Promise<void>
   delete(khoa: string): Promise<boolean>
@@ -82,6 +91,8 @@ export interface Env {
   NGAN_HS?: DurableObjectNamespace
   /** Công tắc khẩn: có giá trị ⇒ KHÔNG đi qua ngăn riêng (đường cũ y nguyên). */
   TAT_NGAN_HS?: string
+  /** Chỉ có khi lệnh chạy TRONG ngăn của em (ngan-hoc-sinh.ts): kho riêng của đúng em đó. */
+  KHO_EM?: KhoEm
   /** Mã bí mật của thầy — đặt bằng `wrangler secret put MA_BI_MAT`, KHÔNG vào git. */
   MA_BI_MAT: string
   /** Khoá Gemini (Google AI Studio) cho phần hỏi thêm Thầy (server/src/hoi-tro-ly.ts) — Worker secret, KHÔNG vào git. Vắng ⇒ phần này tắt. */

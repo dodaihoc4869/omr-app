@@ -525,12 +525,15 @@ async function docDongSoTho(env: Env, sbds: readonly string[], tuNhan?: number):
  */
 interface SoDoan { sbd: string; tu: number | null; p: Promise<Row[] | null> }
 function docSoDoan(env: Env, s: string): SoDoan {
-  const cu = demSo.doc(s, Date.now())
+  const cu = demSo.doc(s, Date.now()) ?? khoSoCua(env, s) // 30/10: kho sổ của ngăn riêng ⇒ đoán trước chỉ phần mới, không đọc cả sổ
   const tu = cu && cu.r > 0 ? cu.r : null
   return { sbd: s, tu, p: (tu != null ? docDongSoTho(env, [s], tu) : docDongSoTho(env, [s])).then((x) => x, () => null) }
 }
 /** Dòng sổ của các em (một truy vấn `sbd IN (…)`). D1 cũ thiếu cột CNH-1.0 ⇒ lùi câu SQL không có cột mới (như `docLanLam`). `dem` (số đếm vừa đọc) ⇒ dùng đệm dòng sổ.
  *  `soDoan` (chỉ-thêm, tối ưu 05/10): dòng sổ một em đã đọc đoán trước — dùng thay lượt đọc giống hệt. */
+/** Kho sổ trong ngăn riêng của em (ngan-hoc-sinh.ts) — chỉ đúng em của ngăn; ngoài ngăn / lỗi ⇒ null. */
+const khoSoCua = (env: Env, s: string): { rows: Row[]; n: number; r: number } | null => (env.KHO_EM?.sbd === s ? env.KHO_EM.docSo() as { rows: Row[]; n: number; r: number } | null : null)
+const ghiKhoSo = (env: Env, s: string, rows: readonly Row[], n: number, r: number, chiThem: boolean): void => { if (env.KHO_EM?.sbd === s) env.KHO_EM.ghiSo(rows, n, r, chiThem) }
 async function docDongSo(env: Env, sbds: readonly string[], dem?: ReadonlyMap<string, DemSo>, soDoan?: SoDoan): Promise<Row[]> {
   if (!sbds.length) return []
   if (!dem) return docDongSoTho(env, sbds)
@@ -542,7 +545,9 @@ async function docDongSo(env: Env, sbds: readonly string[], dem?: ReadonlyMap<st
   type Buoc = { s: string; rows: Row[] } | { s: string; cu: { rows: Row[]; n: number; r: number }; d: DemSo; p: Promise<Row[]> } | { s: string }
   const buoc: Buoc[] = sbds.map((s) => {
     const d = dem.get(s) ?? { n: 0, r: 0 }
-    const cu = demSo.doc(s, now)
+    let cu = demSo.doc(s, now)
+    // 30/10: đệm bộ nhớ trượt ⇒ kho sổ trên đĩa của ngăn riêng (còn nguyên qua lúc ngăn ngủ / isolate mới) — nạp lại đệm bộ nhớ từ đó.
+    if (!cu) { const k = khoSoCua(env, s); if (k) { cu = k; if (k.n === d.n && k.r === d.r) demSo.ghi(s, now, k, k.rows.length) } }
     if (cu && cu.n === d.n && cu.r === d.r) return { s, rows: cu.rows }
     if (cu && cu.r > 0 && d.n > cu.n && d.r >= cu.r) {
       const p = doan(s, cu.r).then((x) => x ?? docDongSoTho(env, [s], cu.r))
@@ -560,6 +565,7 @@ async function docDongSo(env: Env, sbds: readonly string[], dem?: ReadonlyMap<st
         if (b.cu.n + moi.length === b.d.n) {
           const rows = [...b.cu.rows, ...moi]
           demSo.ghi(b.s, now, { rows, n: rows.length, r: maxNhan(rows) }, rows.length)
+          ghiKhoSo(env, b.s, moi, rows.length, maxNhan(rows), true)
           ra.push(...rows)
           continue
         }
@@ -572,7 +578,7 @@ async function docDongSo(env: Env, sbds: readonly string[], dem?: ReadonlyMap<st
     const theo = new Map<string, Row[]>(can.map((s) => [s, []]))
     for (const x of rows) theo.get(str(x.sbd))?.push(x)
     for (const [s, a] of theo) {
-      if (a.length && a.every((x) => x.received_at !== undefined)) demSo.ghi(s, now, { rows: a, n: a.length, r: maxNhan(a) }, a.length)
+      if (a.length && a.every((x) => x.received_at !== undefined)) { demSo.ghi(s, now, { rows: a, n: a.length, r: maxNhan(a) }, a.length); ghiKhoSo(env, s, a, a.length, maxNhan(a), false) }
       ra.push(...a)
     }
   }
