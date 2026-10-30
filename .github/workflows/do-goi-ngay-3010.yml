@@ -44,6 +44,10 @@ jobs:
             "SELECT nguon, COUNT(*) dong, COUNT(DISTINCT sbd) em FROM su_kien_hoc WHERE ngay_vn=strftime('%Y-%m-%d','now','+7 hours') GROUP BY nguon ORDER BY dong DESC"
           q "sổ học hôm nay: dòng mã có hậu tố lượt lặp #n · bản ảo ~ss|~bt|~yd · tổng" \
             "SELECT SUM(qid GLOB '*#[0-9]*') lap, SUM(qid GLOB '*~ss[0-9]*' OR qid GLOB '*~bt[0-9]*' OR qid GLOB '*~yd[0-9]*') ao, COUNT(*) tong FROM su_kien_hoc WHERE ngay_vn=strftime('%Y-%m-%d','now','+7 hours')"
+          q "cặp (em, câu gốc) hôm nay có bản ảo ~ss|~bt|~yd mà KHÔNG có dòng mã gốc nào (mọi ngày): số cặp · số em" \
+            "WITH a AS (SELECT DISTINCT sbd, substr(qid,1,instr(qid,'~')-1) goc FROM su_kien_hoc WHERE (qid GLOB '*~ss[0-9]*' OR qid GLOB '*~bt[0-9]*' OR qid GLOB '*~yd[0-9]*') AND ngay_vn=strftime('%Y-%m-%d','now','+7 hours')) SELECT COUNT(*) cap, COUNT(DISTINCT sbd) em FROM a WHERE NOT EXISTS (SELECT 1 FROM su_kien_hoc s WHERE s.sbd=a.sbd AND s.qid=a.goc)"
+          q "câu gốc của bản ảo hôm nay KHÔNG có trong kho (cau_meta / game_v2_question): số câu" \
+            "WITH a AS (SELECT DISTINCT substr(qid,1,instr(qid,'~')-1) goc FROM su_kien_hoc WHERE instr(qid,'~')>0 AND ngay_vn=strftime('%Y-%m-%d','now','+7 hours')) SELECT COUNT(*) n FROM a WHERE NOT EXISTS (SELECT 1 FROM game_v2_question g WHERE g.qid=a.goc)"
           q "cặp (em, câu gốc) 7 ngày qua chỉ có mã lượt lặp #n, KHÔNG có dòng mã gốc (Câu đã làm xin chi tiết theo mã gốc ⇒ rỗng): số cặp · số em" \
             "WITH l AS (SELECT DISTINCT sbd, substr(qid,1,instr(qid,'#')-1) goc FROM su_kien_hoc WHERE qid GLOB '*#[0-9]*' AND ngay_vn>=date('now','+7 hours','-7 days')) SELECT COUNT(*) cap, COUNT(DISTINCT sbd) em FROM l WHERE NOT EXISTS (SELECT 1 FROM su_kien_hoc s WHERE s.sbd=l.sbd AND s.qid=l.goc)"
           q "hành trình đang chạy (bước kiểm phát hành «ba hành trình»): mã · trạng thái · tạo lúc" \
