@@ -26,6 +26,8 @@ for (let e = 1; e <= SO_EM_TONG; e++) tatCa.push(sbdThu(e))
 const ngay = (ms: number) => new Date(ms).toISOString()
 themChienDich(k.d, { id: 'hanh-trinh-v3-khoi-12', qids: k.qids('DH-B8'), maDe: ['DH-B8'], sbd: tatCa, hanNop: '9999-12-31', taoLuc: ngay(NOW - 30 * 86_400_000), theLuc: 24, huyetChien: false })
 const g7 = await dongBoGoi7(k.env, NOW)
+// Vòng chữa câu sai BẬT cho mọi em (máy thật: /hs/chua-cau-sai là đường đông nhất giờ cao điểm 30/10).
+k.d.sql.exec(`INSERT OR REPLACE INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('chua_cau_sai_v1','{"bat":true,"phamVi":"tat_ca"}','x')`)
 const sql = k.d.sql
 const dem = (b: string) => Number((sql.prepare(`SELECT COUNT(*) n FROM ${b}`).get() as { n: number }).n)
 console.log(`nạp kho: ${Math.round(performance.now() - t0)} ms · hoc_sinh=${dem('hoc_sinh')} · su_kien_hoc=${dem('su_kien_hoc')} · game_v2_attempt=${dem('game_v2_attempt')} · gói 7: ${JSON.stringify(g7)}`)
