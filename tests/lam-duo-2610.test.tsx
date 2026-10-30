@@ -94,7 +94,7 @@ describe('làm chặng kiểu Duolingo («Trong»)', () => {
     expect(await screen.findByRole('heading', { name: 'Xong chặng 2!' })).toBeTruthy()
     const ket = screen.getByRole('region', { name: 'Kết quả chặng' })
     expect(ket.textContent).toContain('Tự làm đúng'); expect(ket.textContent).toContain('1/1')
-    expect(ket.textContent).toContain('Thời gian'); expect(ket.textContent).toContain('Hôm nay'); expect(ket.textContent).toContain('6/24')
+    expect(ket.textContent).toContain('Thời gian'); expect(ket.textContent).toContain('Hôm nay'); expect(ket.textContent).toContain('7/24') // 30/10 (b0840bf): số hôm nay tăng ngay sau câu vừa làm (6 + 1)
     expect(screen.getByRole('button', { name: 'Học tiếp chặng 3' })).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Về Lộ trình' })).toBeTruthy()
   })
