@@ -87,7 +87,11 @@ export function soHomNay(kq: KetQuaSanh | null | undefined, tienDoCu?: { daLam: 
 /** Số chặng đã xong hôm nay — cùng luật vạch chặng ở Hôm nay; chặng đang dở chưa qua màn báo hoàn thành (`changDangDo`) chưa được tính là xong. */
 export function soChangXong(s: SoHomNay): number {
   let x = 0
-  for (let i = 0; i < s.soChang; i++) if (s.daLam >= Math.min((i + 1) * CAU_MOI_CHANG, s.muc)) x++
+  const tongCau = Math.max(s.muc, s.soChang * CAU_MOI_CHANG)
+  for (let i = 0; i < s.soChang; i++) {
+    const ranh = i === s.soChang - 1 ? tongCau : Math.min((i + 1) * CAU_MOI_CHANG, tongCau)
+    if (s.daLam >= ranh) x++
+  }
   return s.changDangDo && x >= s.changDangDo ? s.changDangDo - 1 : x
 }
 

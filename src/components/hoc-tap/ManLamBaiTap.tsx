@@ -664,6 +664,12 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
         })
         ghiCauXong(sbd, q.qid)
         if ((o.omni as { luot?: unknown } | undefined)?.luot !== true) tinhCauMoi(q, { ...ket, [qidNop]: kTam })
+        // TỨC THÌ: nếu là câu cuối và có câu sai (hoặc câu này sai), kích hoạt xin làm lại sớm ngay từ lúc có kết quả tạm!
+        if (goi7 && !daXinLamLai.current && !lamLaiSom.current && q.vaiGoi7 !== 'lam_lai' && viTri + 1 >= cau.length && (cauSai.length > 0 || (o.correct === false && (o.omni as { luot?: unknown } | undefined)?.luot !== true))) {
+          const p = goiHoa2('hoc-tap-lam-lai', token, { session: ph }, 15)
+          p.catch(() => {})
+          lamLaiSom.current = p
+        }
       }
       const than = { session: ph, qid: q.qid, answer: tra, assisted, msLam, ...(typeof skCau === 'string' && skCau ? { sk: skCau, ...(luotChang.current > 0 ? { lm: luotChang.current } : {}) } : {}), doGiay: dhMs.current >= 1000 ? { g: Math.round(dhMs.current / 1000), v: dhT.current.v, a: dhT.current.a, l: Math.max(dhT.current.l, dhT.current.lang), n: dhT.current.n, w: dhW.current ? 1 : 0 } : undefined }
       const r = await guiLaiBenVung(() => duo ? nopCauLuong(token, than, 15, khiTam) : goiHoa2('answer', token, than, 15)) // chống trùng theo biên nhận ⇒ kẹt mạng tự gửi lại
@@ -719,10 +725,19 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   const ketThuc = () => {
     daXongRef.current = true
     xoaChangDangLam(sbd)
-    setXong(true)
+    const goc = gocRef.current, kh = goc ? khungCuonCua(goc) : null
+    if (kh && kh.scrollTop > 0) { kh.scrollTop = 0; daVeDau.current = true }
+    startTransition(() => {
+      setXong(true)
+    })
     if (moi.current.d0 >= 0 && moi.current.qids.size > 0) vaSo(moi.current.d0 + moi.current.qids.size)
     else onVaRef.current?.(k => (k ? { ...k } : k))
-    canTaiSanh.current = false; onCapNhat(); henNapLai(() => capNhatRef.current()); boChangMoTruoc(); void napGoiNgay(token, goiHoa2, Date.now(), true); moChangTruoc(token); /* LẶP CÂU 27/10: luôn mở trước lượt MỚI sau câu cuối, không giữ lượt cũ */ gocRef.current?.scrollIntoView?.({ block: 'start' })
+    canTaiSanh.current = false
+    onCapNhat()
+    henNapLai(() => capNhatRef.current())
+    boChangMoTruoc()
+    void napGoiNgay(token, goiHoa2, Date.now(), true)
+    moChangTruoc(token)
   }
   // A3 — câu cũ trượt trái mờ dần (bản sao, không trễ bước sang câu mới; chỉ màn Duo).
   // 27/10 MƯỢT (đo scripts/do-muot-hs.mjs): sang câu mới ⇒ đo khối câu cũ + cuộn khung về đầu NGAY TRONG lượt bấm, lúc bố cục còn sạch (rẻ), rồi mới dựng
@@ -799,10 +814,13 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   // bấm lún ngay, câu mới hiện ngay sau đó (28/10: máy thường cũng vậy, xem dưới).
   const dangSang = useRef(-1)
   const tiep = () => {
-    // Kết quả còn TẠM (bản đầy đủ đang về): giữ dáng lún, sang câu ngay khi bản đầy đủ về (nopCau `finally`).
-    // GHI NỀN: không phải câu cuối ⇒ sang câu kế ngay, lượt ghi chạy tiếp nền (câu kế đợi nó trước khi gửi). Câu cuối: chờ bản đầy đủ (kết chặng / làm lại cuối chặng đọc sổ đã ghi).
-    if (gui.current && k?.tam && viTri + 1 < cau.length && q) { tachRoi.current.add(q.qid); gui.current = false; setNop(false); setCham(false) }
-    else if (gui.current && k?.tam) { tiepCho.current = true; nutTiepRef.current?.setAttribute('data-lun', ''); return }
+    // TỨC THÌ 100%: kết quả còn TẠM (bản đầy đủ đang về nền) ⇒ tách rời lượt ghi chạy tiếp nền, sang câu mới hoặc kết thúc chặng TỨC THÌ 0ms, không đứng đợi mạng!
+    if (gui.current && k?.tam && q) {
+      tachRoi.current.add(q.qid)
+      gui.current = false
+      setNop(false)
+      setCham(false)
+    }
     if (gui.current || dangSang.current === viTri) return
     setLoi('')
     setCombo(null) // băng combo chỉ sống ở câu vừa đúng — sang câu mới thì tắt, không che đề

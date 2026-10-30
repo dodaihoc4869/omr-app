@@ -231,7 +231,7 @@ function VongChang({ pt, so = 4, da, khoa }: { pt?: number; so?: number; da?: nu
     {L > 0 && <circle className="chay" {...doan} mask={`url(#${id})`} />}</svg>
 }
 
-const KHE_DOAN = 13 // khe giữa hai đoạn (đơn vị khung 116; nét 7 đầu tròn ⇒ khe nhìn thấy ~5 px)
+const KHE_DOAN = 8 // khe giữa hai đoạn (đơn vị khung 116; nét 6 đầu tròn ⇒ khe nhìn thấy ~3.5 px thanh mảnh, ôm khít tinh tế)
 function VongDoan({ so, da, khoa }: { so: number; da: number; khoa?: string }) {
   const n = Math.max(1, Math.min(12, Math.round(so))), d = Math.max(0, Math.min(n, Math.round(da)))
   const doan = CV / n, cung = Math.max(4, doan - (n > 1 ? KHE_DOAN : 0))
@@ -734,7 +734,7 @@ export function MotTrangHs(p: PropsMotTrang) {
     const thu = `Chặng ${i + 1} / ${chang.length}`, conChang = so ? Math.max(dangDoNay ? 1 : 0, Math.min(c.co, dauChang + c.co - so.daLam)) : c.co
     // vòng ĐOẠN (thầy 30/10): chặng đang dở trên máy ⇒ đúng số câu thật của chặng + số câu đã nộp; không ⇒ ranh 6 câu của Lộ trình (đã làm − đầu chặng)
     const cauMay = so?.cauChang !== undefined && so.chang === i + 1
-    const soDoan = cauMay ? so!.cauChang! : c.co, daDoan = cauMay ? so!.daCauChang ?? 0 : so ? Math.max(0, Math.min(c.co, so.daLam - dauChang)) : 0
+    const soDoan = cauMay ? so!.cauChang! : c.co, daDoan = cauMay ? (so!.daCauChang ?? 0) : so ? Math.max(0, Math.min(c.co, so.daLam - dauChang)) : 0
     dauChang += c.co
     if (khoaKt && c.tt !== 'xong') { nut.push({ k: `c${i}`, loai: 'hoc', tt: 'khoa', ten: `Chặng ${i + 1}: khoá đến khi làm xong Kiểm tra ôn tập`, pop: { tieu: tenBaiThe, phu: `${thu} · ${CHU_KHOA_KT}` } }); return }
     if (khoaSua && i >= mocSua && c.tt !== 'xong') { nut.push({ k: `c${i}`, loai: 'hoc', tt: 'khoa', ten: `Chặng ${i + 1}: khoá đến khi sửa xong lỗi hôm nay`, pop: { tieu: tenBaiThe, phu: `${thu} · Sửa xong ${conPhan} lỗi hôm nay để mở chặng tiếp` } }); return }

@@ -804,8 +804,8 @@
 /* VÒNG ĐOẠN (thầy 30/10 «chặng bao nhiêu câu thì chia bấy nhiêu đoạn, xong câu nào tô đoạn câu đó, làm khít lại, hiệu ứng tinh tế hơn», VongDoan ở TrongHs.tsx):
    bỏ mặt nạ 4 khe; mỗi câu một cung đầu tròn, khe đều; vòng 100 px ôm sát nút (khe ~3 px hai bên). Đoạn VỪA xong: vẽ dần theo chiều kim đồng hồ rồi dày lên
    một nhịp (so le 160 ms nếu nhiều đoạn); đoạn cũ đứng yên; nhịp thở của vòng nhẹ hơn. Giảm chuyển động ⇒ đứng yên; máy yếu ⇒ chỉ vẽ dần, không nhịp dày. */
-[data-trong='hs'] .da-vong[data-doan] { width: 100px; height: 100px; top: calc(50% - 3px); -webkit-mask: none; mask: none; }
-[data-trong='hs'] .da-vong[data-doan] circle { stroke-width: 7; stroke-linecap: round; }
+[data-trong='hs'] .da-vong[data-doan] { width: 96px; height: 96px; top: calc(50% - 6px); -webkit-mask: none; mask: none; }
+[data-trong='hs'] .da-vong[data-doan] circle { stroke-width: 6; stroke-linecap: round; }
 [data-trong='hs'] .da-nut[data-tt='dang'] .da-vong[data-doan] { animation: da-vong-tho-doan 2.4s ease-in-out infinite; }
 [data-trong='hs'] .da-nut[data-tt='dang'] .da-vong[data-doan] .chay { animation: none; }
 [data-trong='hs'] .da-nut[data-tt='dang'] .da-vong[data-doan] .chay[data-moi] {
@@ -814,7 +814,7 @@
 [data-trong='hs'].may-yeu .da-nut[data-tt='dang'] .da-vong[data-doan] { animation: none; }
 [data-trong='hs'].may-yeu .da-nut[data-tt='dang'] .da-vong[data-doan] .chay[data-moi] { animation: da-doan-ve 400ms ease-out var(--tre, 0ms) both; }
 @keyframes da-doan-ve { from { stroke-dasharray: 0 400; } }
-@keyframes da-doan-day { 0%, 100% { stroke-width: 7; } 40% { stroke-width: 9.5; } }
+@keyframes da-doan-day { 0%, 100% { stroke-width: 6; } 40% { stroke-width: 8.5; } }
 @keyframes da-vong-tho-doan { 0%, 100% { transform: translate(-50%, -50%) rotate(-90deg) scale(1); } 50% { transform: translate(-50%, -50%) rotate(-90deg) scale(.985); } }
 @media (prefers-reduced-motion: reduce) { [data-trong='hs'] .da-nut[data-tt='dang'] .da-vong[data-doan], [data-trong='hs'] .da-vong[data-doan] .chay[data-moi] { animation: none !important; } }
 [data-trong='hs'] .bi-loi[data-khong-bi] .bi-loi-bong { margin-bottom: 0; }
@@ -993,7 +993,7 @@
 /* VÒNG + NHỊP NÚT HIỆN TẠI «SÁT LẠI, TINH TẾ HƠN» (thầy 27/10, ảnh Duolingo): vòng 104 px ôm sát mặt nút (khe ~5–7 px), nét ~7 px đầu tròn, 4 đoạn khe nhỏ
    (vẽ bằng nét đứt, không mặt nạ cắt); phần đã làm tô qua mặt nạ. Nhịp: vòng thở rất nhẹ 1 ↔ 1,02 (2,4 s) · mặt nút nhún 2 px · sao nảy 3 px hơi bẹp — CÙNG
    một nhịp, không lệch pha; dấu tick các chặng đã xong lấp lánh đồng loạt. Bong bóng cách vòng ~6 px, nhún 2 px / 1,8 s. */
-[data-trong='hs'] .da-vong { width: 104px; height: 104px; top: calc(50% - 3px); -webkit-mask: none; mask: none; }
+[data-trong='hs'] .da-vong { width: 96px; height: 96px; top: calc(50% - 6px); -webkit-mask: none; mask: none; }
 [data-trong='hs'] .da-vong .chay { stroke-linecap: round; }
 [data-trong='hs'] .da-vong .nen { stroke-linecap: round; }
 [data-trong='hs'] .da-vong mask { mask-type: alpha; } /* mặt nạ theo độ trong (màu nét không quan trọng) */

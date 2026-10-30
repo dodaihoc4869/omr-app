@@ -50,10 +50,18 @@ describe('vòng tiến độ chia theo câu', () => {
     expect(doan()).toHaveLength(3)
     expect(doan().filter((c) => c.getAttribute('class') === 'chay')).toHaveLength(1)
   })
-  it('khít hơn, tinh tế: vòng 100 px, nét 7 đầu tròn, bỏ mặt nạ 4 khe; giảm chuyển động ⇒ đứng yên', () => {
+  it('khít hơn, tinh tế: vòng 96 px, nét 6 đầu tròn, bỏ mặt nạ 4 khe; giảm chuyển động ⇒ đứng yên', () => {
     const css = readFileSync('src/styles/trong-hs.css', 'utf8')
-    expect(css).toContain("[data-trong='hs'] .da-vong[data-doan] { width: 100px; height: 100px; top: calc(50% - 3px); -webkit-mask: none; mask: none; }")
-    expect(css).toContain("[data-trong='hs'] .da-vong[data-doan] circle { stroke-width: 7; stroke-linecap: round; }")
+    expect(css).toContain("[data-trong='hs'] .da-vong[data-doan] { width: 96px; height: 96px; top: calc(50% - 6px); -webkit-mask: none; mask: none; }")
+    expect(css).toContain("[data-trong='hs'] .da-vong[data-doan] circle { stroke-width: 6; stroke-linecap: round; }")
     expect(css).toMatch(/prefers-reduced-motion: reduce\) \{ \[data-trong='hs'\] \.da-nut\[data-tt='dang'\] \.da-vong\[data-doan\], \[data-trong='hs'\] \.da-vong\[data-doan\] \.chay\[data-moi\] \{ animation: none !important; \} \}/)
+  })
+  it('chặng 5 mới mở (bài 8 chặng): đủ 6 câu chuẩn, 6 đoạn xám nguyên 0% khi vừa xong chặng 4', () => {
+    // 24 câu đã làm (xong 4 chặng), mức 24, bài 8 chặng ⇒ chặng 1-4 xong (4/8 chặng), chặng 5 là chặng đang học
+    const so8 = { daLam: 24, muc: 24, chang: 5, soChang: 8 } as PropsMotTrang['so']
+    render(<MotTrangHs {...goc(so8)} />)
+    expect(screen.getByText('4/8 chặng')).toBeTruthy()
+    expect(doan()).toHaveLength(6) // Đủ 6 câu chuẩn, không bị bóp thành 2 câu
+    expect(doan().filter((c) => c.getAttribute('class') === 'chay')).toHaveLength(0) // 0 đoạn tô màu khi chưa làm
   })
 })

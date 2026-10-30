@@ -30,15 +30,17 @@ export function useNhipHocEm(token: string | undefined, lamMoi: number | null | 
   return !token ? 'an' : ban.token === token ? ban.kq ?? (ban.hong ? 'an' : 'tai') : NHO.get(token)?.kq ?? 'tai'
 }
 
-/** Các chặng của hôm nay: chặng i gồm câu (6·i, min(6·(i+1), M)] — đúng luật vạch chặng / `soChangXong`; chặng cuối lấy hết phần còn lại tới M. */
+/** Các chặng của hôm nay: mỗi chặng chuẩn 6 câu; chặng cuối lấy hết phần còn lại tới tổng câu của bài. */
 export function chiaChang(so: SoHomNay): { co: number; tt: 'xong' | 'dang' | 'cho'; phan: number }[] {
   const xong = soChangXong(so)
+  const tongCau = Math.max(so.muc, so.soChang * CAU_MOI_CHANG)
   return Array.from({ length: so.soChang }, (_, i) => {
-    const dau = Math.min(i * CAU_MOI_CHANG, so.muc)
-    const cuoi = i === so.soChang - 1 ? so.muc : Math.min((i + 1) * CAU_MOI_CHANG, so.muc)
+    const dau = i * CAU_MOI_CHANG
+    const cuoi = i === so.soChang - 1 ? tongCau : Math.min((i + 1) * CAU_MOI_CHANG, tongCau)
     const co = Math.max(1, cuoi - dau)
     const tt = i < xong ? 'xong' : i === xong ? 'dang' : 'cho'
-    return { co, tt, phan: tt === 'dang' ? Math.max(0, Math.min(100, Math.round((100 * (so.daLam - dau)) / co))) : 0 }
+    const dangDo = tt === 'dang' && (so.changDangDo === i + 1 || (so.cauChang !== undefined && so.chang === i + 1))
+    return { co, tt, phan: dangDo ? Math.max(0, Math.min(100, Math.round((100 * Math.max(0, so.daLam - dau)) / co))) : 0 }
   })
 }
 
