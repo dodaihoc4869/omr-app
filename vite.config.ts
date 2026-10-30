@@ -373,7 +373,7 @@ export default defineConfig({
           // Cầu nối Cowork `window.__ddh` (26/10): App.tsx nạp LƯỜI sau khi thầy mở khoá ⇒ kho chạy-lúc; tải hỏng (mất mạng) ⇒ chỉ thiếu cầu nối, app chạy như thường.
           '**/cau-noi-ddh-*.js',
         // Mini-game phòng chờ chỉ tải lúc vào màn, dùng kho chạy-lúc hiện có.
-        '**/{ChuyenBay,BanNguyenTo}-*.{js,css}',
+        '**/{ChuyenBay,DauIon}-*.{js,css}',
           '**/404.html',
           // Trang đo tốc độ (02/10): luôn đi thẳng ra mạng để đo đúng, không lưu trên máy.
           '**/cai-kiem-toc-do.html',

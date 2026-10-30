@@ -46,7 +46,7 @@ export interface DurableObjectStub { fetch(req: Request): Promise<Response> }
 export interface DurableObjectNamespace { idFromName(ten: string): DurableObjectId; get(id: DurableObjectId, tuy?: { locationHint?: string }): DurableObjectStub }
 /** WebSocket phía máy chủ (Hibernation API): gắn dữ liệu nhỏ vào kết nối, sống qua lúc phòng ngủ. */
 export interface WsMayChu {
-  send(chu: string): void
+  send(chu: string | ArrayBuffer | ArrayBufferView): void
   close(ma?: number, lyDo?: string): void
   serializeAttachment(v: unknown): void
   deserializeAttachment(): unknown
@@ -91,6 +91,10 @@ export interface Env {
   NGAN_HS?: DurableObjectNamespace
   /** Công tắc khẩn: có giá trị ⇒ KHÔNG đi qua ngăn riêng (đường cũ y nguyên). */
   TAT_NGAN_HS?: string
+  /** Phòng đấu «Đấu Nguyên Tử» của phòng chờ thi (server/src/phong-dau-ion.ts, 30/10): một Durable Object mỗi ca. Vắng ⇒ không phát vé, máy em chỉ Tập với A.I. */
+  PHONG_DAU_ION?: DurableObjectNamespace
+  /** Công tắc tắt Đấu Nguyên Tử trên mạng: có giá trị ⇒ không phát vé, cửa trả 410, phòng đang mở bị đóng (máy em còn Tập với A.I cục bộ). */
+  TAT_DAU_ION?: string
   /** Chỉ có khi lệnh chạy TRONG ngăn của em (ngan-hoc-sinh.ts): kho riêng của đúng em đó. */
   KHO_EM?: KhoEm
   /** Mã bí mật của thầy — đặt bằng `wrangler secret put MA_BI_MAT`, KHÔNG vào git. */

@@ -126,6 +126,7 @@ import { gvKhoDeGiao } from './gv-kho-de-giao'
 import { damBaoChiMuc, dungChiMucCronDem } from './chi-muc-luc-chay'
 import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
 import { docGoiDeDem, docKeyBankDem, ghiKeyBank, doanCongBoNgay, layDemHetGioLuot, nhoCongBo, nhoHetGioLuot } from './dem-ca-thi'
+import { dongPhongDau, vaoPhongDau, veDauChoEm } from './dau-ion-ve'
 
 // CORS — app chạy ở `dodaihoc4869.github.io`, Worker ở `workers.dev`, nên MỌI
 // lượt gọi đều là chéo nguồn. Thiếu mấy dòng này là trình duyệt chặn sạch và
@@ -488,6 +489,8 @@ async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
     )
       .bind(`${maCa}|${sbd}`, maCa, sbd, String(b.hoTen ?? ''), new Date(now).toISOString())
       .run()
+    // ĐẤU ION (30/10): vé ký vào Sảnh đấu của ca — tên gọi lấy từ dòng danh sách lớp ĐÃ đọc ở trên (không nhận tên máy em gửi), 0 lệnh D1 thêm.
+    const veDau = await veDauChoEm(env, maCa, sbd, doc.em?.ho_ten)
     return ra({
       ok: true,
       cach: 'cho',
@@ -496,6 +499,7 @@ async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
       tenCa: ca.ten_ca ?? '',
       congBo: ca.cong_bo ?? 'khong',
       chiNop3PhutCuoi: Number((ca as any).chi_nop_3_phut_cuoi ?? 0) === 1,
+      ...(veDau ? { veDau } : {}),
     })
   }
 
@@ -958,7 +962,7 @@ async function dayCa(env: Env, b: Record<string, unknown>): Promise<Response> {
 }
 
 /** Thầy bấm BẮT ĐẦU THI — cả lớp nhận đề đúng một thời điểm. */
-async function batDauThi(env: Env, maCa: string, dongBoGio?: unknown): Promise<Response> {
+async function batDauThi(env: Env, maCa: string, dongBoGio?: unknown, ctx?: ExecutionContext): Promise<Response> {
   if (!maCa) return ra({ ok: false, error: 'Thiếu mã ca' })
   const ca = await docCa(env, maCa)
   if (!ca) return ra({ ok: false, error: 'Không tìm thấy ca kiểm tra' })
@@ -979,6 +983,8 @@ async function batDauThi(env: Env, maCa: string, dongBoGio?: unknown): Promise<R
   xoaDemCaBaoVe(); xoaDemPhongCho(env) // HẠ TẢI D1 (Boss 22/09): ghi bảng `ca` ⇒ bỏ đệm `protectedQuestions` ngay
   const daLuu = await docCa(env, maCa)
   if (!daLuu?.bat_dau_thi_luc) return ra({ ok: false, error: 'Ca vừa thay đổi. Thầy tải lại ca rồi thử lại.' })
+  // ĐẤU ION: phòng đấu của ca báo mọi máy «Thầy đã bắt đầu» rồi đóng — chạy NỀN (không thêm vòng chờ vào lệnh của thầy).
+  if (env.PHONG_DAU_ION) { const dong = dongPhongDau(env, maCa); if (ctx) ctx.waitUntil(dong); else await dong }
   return ra({ ok: true, batDauLuc: daLuu.bat_dau_thi_luc, daBatTruoc: r.meta.changes === 0,
     canBoTheoEm, coBoTheoEm, dongBoGio: Number(daLuu.dong_bo_gio) === 1 })
 }
@@ -3179,7 +3185,7 @@ function docCauTuGoiDe(de: Record<string, unknown>): Record<string, unknown>[] {
   return gom
 }
 
-async function goiCu(req: Request, env: Env, b: Record<string, unknown>): Promise<Response> {
+async function goiCu(req: Request, env: Env, b: Record<string, unknown>, ctx?: ExecutionContext): Promise<Response> {
   const act = String(b.action ?? '').trim()
   if (!act) return ra({ ok: false, error: 'Thiếu tên lệnh' }, 400)
   const thay = laThay(req, env, b)
@@ -3227,7 +3233,7 @@ async function goiCu(req: Request, env: Env, b: Record<string, unknown>): Promis
 
     // ---- CA THI ----------------------------------------------------------
     case 'publish': return dayCa(env, b)
-    case 'batDauThi': return batDauThi(env, String(b.maCa ?? ''), b.dongBoGio)
+    case 'batDauThi': return batDauThi(env, String(b.maCa ?? ''), b.dongBoGio, ctx)
     case 'chiTietCa': {
       // Đường cũ trả `{ok:false}` khi không có ca, và màn Theo dõi dựa vào đó.
       // Đường mới trả `{ok:true, coCa:false}` (hình dáng riêng của nó), nên chỗ
@@ -3675,7 +3681,7 @@ const boXuLy = {
       // CỔNG TƯƠNG THÍCH — tự phân quyền bên trong, nên đứng TRƯỚC cổng mã bí mật.
       if (p === '/goi') {
         if (String(b.action??'').trim()==='nopKhacPhuc') return await traLoiNopBtvn(()=>goiCu(req,env,b))
-        return goiCu(req, env, b)
+        return goiCu(req, env, b, ctx)
       }
       if (p === '/btvn/cua-em') return await btvnCuaEm(env, b)
       if (p === '/btvn/nop') return await traLoiNopBtvn(()=>sauGhi(env, b, nopBtvn(env, b)))
@@ -4153,9 +4159,13 @@ import { DAU_TRONG_NGAN, datXuLyNgan, vaoNgan } from './ngan-hoc-sinh'
 export { BanBiA } from './ban-bi-a-dong'
 export { TramGemini } from './tram-gemini'
 export { NganHocSinh } from './ngan-hoc-sinh'
+// Đấu Nguyên Tử (30/10): phòng đấu của phòng chờ thi — một Durable Object mỗi ca (migration `dau-ion-v1`).
+export { PhongDauIon } from './phong-dau-ion'
 const xuatWorker = {
   ...boXuLy,
   async fetch(req: Request, env: Env, ctx?: ExecutionContext): Promise<Response> {
+    // ĐẤU ION (30/10): nâng cấp WebSocket vào phòng đấu của ca — đi THẲNG, trước mọi lớp bọc (lớp bọc dưới dựng lại Response ⇒ mất kết nối 101).
+    if (req.method === 'GET' && req.url.includes('/dau-ion/') && new URL(req.url).pathname.startsWith('/dau-ion/')) return vaoPhongDau(req, env)
     // NGĂN RIÊNG TỪNG HỌC SINH (30/10, ngan-hoc-sinh.ts): lệnh app học sinh ⇒ Durable Object của đúng em (đệm luôn ấm); trong ngăn ⇒ đi thẳng xuống dưới.
     if (env.NGAN_HS && req.method === 'POST' && !req.headers.has(DAU_TRONG_NGAN)) {
       const r = await vaoNgan(req, env)
