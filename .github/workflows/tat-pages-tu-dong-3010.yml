@@ -2,6 +2,7 @@
 # 20:49 → 21:09 VN: tích hợp Git của Cloudflare tự dựng + phát hành Pages production cho MỖI lần đẩy lên main (5 bản / 20 phút, kể cả lần chỉ đổi workflow),
 # mỗi bản đổi sw-version ⇒ máy MỌI em tải lại cùng lúc ⇒ lệnh lên máy chủ gấp đôi, «Máy chủ đang bận», «Chưa nộp được câu», mỗi máy một kiểu.
 # Sau bước này Pages production CHỈ đổi qua workflow «Phát hành lên Cloudflare Pages» (deploy.yml, có cổng). Không in khoá; chỉ in cấu hình nguồn (không bí mật).
+# (đẩy lại 21:25 — lần đẩy đầu GitHub báo lỗi máy chủ, không khởi chạy.)
 name: Tắt Cloudflare tự phát hành Pages khi đẩy main
 on:
   workflow_dispatch:
