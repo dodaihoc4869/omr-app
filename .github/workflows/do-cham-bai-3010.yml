@@ -50,8 +50,10 @@ jobs:
             q "nhận xét (sendFeedback) ghi từ máy chủ: số · tuMayChu" "SELECT json_extract(noi_dung,'\$.tuMayChu') tu_may_chu, COUNT(*) n, MIN(luc) dau, MAX(luc) cuoi FROM nhan_xet WHERE ma_ca = '$MA' AND luc >= '$TU' GROUP BY 1"
             tep /tmp/d/luot_$MA.json "SELECT l.sbd, l.lan_thu, l.trang_thai, l.vao_luc, l.nop_luc, l.het_gio_luc, l.cap_nhat_luc, l.tong, l.diem_i, l.dap_an_json, l.giay_cau_json, l.ghi_chu, l.so_lan_roi_man, l.integrity_json, (SELECT COUNT(*) FROM chi_tiet_cau c WHERE c.ma_ca = l.ma_ca AND c.sbd = l.sbd AND c.lan_thu = l.lan_thu) n_ctc, (SELECT COUNT(*) FROM nhan_xet x WHERE x.sbd = l.sbd AND x.ma_ca = l.ma_ca) n_nx, (SELECT json_extract(x.noi_dung,'\$.tuMayChu') FROM nhan_xet x WHERE x.sbd = l.sbd AND x.ma_ca = l.ma_ca ORDER BY x.luc DESC LIMIT 1) nx_may_chu, (SELECT COUNT(*) FROM bai_bo_sung b WHERE b.ma_ca = l.ma_ca AND b.sbd = l.sbd) n_bs, (SELECT ghi_luc FROM phong_cho p WHERE p.khoa = l.ma_ca || '|' || l.sbd) cho_luc FROM luot l WHERE l.ma_ca = '$MA'"
             tep /tmp/d/chan_$MA.json "SELECT sbd, ly_do, luc FROM chan_vao WHERE ma_ca = '$MA' ORDER BY luc LIMIT 500"
-            npx -y wrangler@4 r2 object get "omr-de/key/$MA.json" --remote --file "/tmp/d/key_$MA.json" >/dev/null 2>/tmp/d/err || { echo "(không đọc được key/$MA.json)"; tail -n 2 /tmp/d/err | cut -c1-200; }
-            npx -y wrangler@4 r2 object get "omr-de/de/$MA.json" --remote --file "/tmp/d/de_$MA.json" >/dev/null 2>/tmp/d/err || echo "(không đọc được de/$MA.json)"
+            for K in key de; do
+              npx -y wrangler@4 r2 object get "omr-de/$K/$MA.json" --remote --file "/tmp/d/${K}_$MA.json" >/tmp/d/out 2>/tmp/d/err || { echo "(không đọc được $K/$MA.json)"; cat /tmp/d/out /tmp/d/err | grep -v "Logs were written" | grep -v '^\s*$' | tail -n 6 | cut -c1-240; }
+              [ -s "/tmp/d/${K}_$MA.json" ] && echo "$K/$MA.json: $(wc -c < /tmp/d/${K}_$MA.json) byte"
+            done
           done
           q "nhật ký lỗi máy từ 00:00 VN" "SELECT nguon, COUNT(*) n, MIN(luc) dau, MAX(luc) cuoi FROM nhat_ky_may WHERE luc >= '$TU' GROUP BY nguon"
       - name: Chấm thử trong bộ nhớ + in số (không in SBD / bài làm)
@@ -67,6 +69,18 @@ jobs:
           const vn = (iso) => { const t = Date.parse(String(iso ?? '')); return Number.isFinite(t) ? new Date(t + 7 * 3600e3).toISOString().slice(11, 19) : '-' }
           const giay = (a, b) => (a && b ? Math.round((Date.parse(a) - Date.parse(b)) / 1000) : null)
           const pt = (a, q) => { if (!a.length) return '-'; const s = [...a].sort((x, y) => x - y); return s[Math.min(s.length - 1, Math.floor(q * s.length))] }
+          // LƯỚI CHE SBD: gom mọi SBD đã biết (lượt, chặn vào, bản đồ) rồi thay MỌI chỗ xuất hiện trong dòng in bằng mã băm — kể cả trong chữ biên bản.
+          const sbdBiet = new Set()
+          for (const ca of kq('/tmp/d/ca.json')) {
+            const g = j(ca.bo_theo_em_json) ?? {}
+            for (const k of [g.bo, g.lap, g.dem, g.bac, g.daLam, g.daDung, g.bb?.v2?.thieu, g.bb?.canCua, g.bb?.soLapCua]) for (const x of Object.keys(k ?? {})) sbdBiet.add(x)
+            for (const l of kq(`/tmp/d/luot_${ca.ma_ca}.json`)) sbdBiet.add(String(l.sbd))
+            for (const c of kq(`/tmp/d/chan_${ca.ma_ca}.json`)) sbdBiet.add(String(c.sbd))
+          }
+          const sbdDs = [...sbdBiet].filter((x) => x.length >= 3).sort((a, b) => b.length - a.length)
+          const re = sbdDs.length ? new RegExp(sbdDs.map((x) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'g') : null
+          const goc = console.log.bind(console)
+          console.log = (...a) => goc(...a.map((x) => (re ? String(x).replace(re, (m) => '#' + h(m)) : x)))
           for (const ca of kq('/tmp/d/ca.json')) {
             const ma = ca.ma_ca
             console.log(`\n######## CA ${ma} · trạng thái ${ca.trang_thai} · công bố ${ca.cong_bo} · đề riêng ${ca.de_rieng} · lên bảng ${ca.len_bang} · phạm vi hỏi lại ${ca.pham_vi_hoi_lai || '(gan_nhat)'} · số câu ${ca.so_cau_json}`)
@@ -77,7 +91,9 @@ jobs:
             const bb = goi.bb ?? null
             console.log(`bản đồ D1: ${soEmBo} em · khoá gói: ${Object.keys(goi).join(',')}`)
             if (bb) {
-              console.log(`biên bản: lucRut ${vn(bb.lucRut)} · cheDo ${bb.v2?.cheDo ?? '-'} · mucTieu ${bb.v2?.mucTieu ? JSON.stringify(Object.fromEntries(Object.entries(bb.v2.mucTieu).map(([k, v]) => [k, Array.isArray(v) ? v.length : v]))) : '-'} · thieu ${JSON.stringify(bb.v2?.thieu ?? bb.thieu ?? null)?.slice(0, 120)}`)
+              const thieuV2 = bb.v2?.thieu ?? {}
+              // `thieu` có khoá theo SBD ⇒ CHỈ in số (repo công khai).
+              console.log(`biên bản: lucRut ${vn(bb.lucRut)} · cheDo ${bb.v2?.cheDo ?? '-'} · mucTieu ${bb.v2?.mucTieu ? JSON.stringify(Object.fromEntries(Object.entries(bb.v2.mucTieu).map(([k, v]) => [k, Array.isArray(v) ? v.length : v]))) : '-'} · thiếu: ${Object.keys(thieuV2).length} em / ${Object.values(thieuV2).reduce((a, x) => a + (Array.isArray(x) ? x.length : 0), 0)} ô`)
               for (const g of bb.ghiChu ?? []) console.log(`  ghiChu[${g.loai}] ${String(g.loi).slice(0, 220)}`)
               const bac = goi.bac ?? {}
               const demBac = {}
@@ -123,7 +139,8 @@ jobs:
               const ngoaiDe = bo ? bo.filter((q) => !idDe.has(q)).length : 0
               const gc = String(l.ghi_chu ?? '')
               const gcLoai = !gc ? '-' : /khoá ca|khoa ca/.test(gc) ? 'thay_khoa_ca' : /chốt|chot/.test(gc) ? 'may_chu_chot' : 'khac'
-              const ketQua = tuChoi.has(l.sbd) ? `TỪ CHỐI: ${String(tuChoi.get(l.sbd)).slice(0, 200)}` : dat.has(l.sbd) ? `ok ${dat.get(l.sbd).moi.tong}${dat.get(l.sbd).doi ? ` (D1 ${dat.get(l.sbd).cu.tong})` : ''}${canh.has(l.sbd) ? ` cảnh báo ${canh.get(l.sbd).join(',')}` : ''}` : '(không chấm: chưa nộp/không bài)'
+              // Không in điểm: chỉ «chấm được» + có khớp điểm D1 không.
+              const ketQua = tuChoi.has(l.sbd) ? `TỪ CHỐI: ${String(tuChoi.get(l.sbd)).slice(0, 200)}` : dat.has(l.sbd) ? `chấm được${dat.get(l.sbd).cu.tong === null ? ' (D1 chưa có điểm)' : dat.get(l.sbd).doi ? ' (LỆCH điểm D1)' : ' (khớp D1)'}${canh.has(l.sbd) ? ` cảnh báo ${canh.get(l.sbd).join(',')}` : ''}` : '(không chấm: chưa nộp/không bài)'
               tt[l.trang_thai] = (tt[l.trang_thai] ?? 0) + 1
               console.log([h(l.sbd), l.lan_thu, l.trang_thai, vn(l.vao_luc), vn(l.nop_luc), vn(l.cap_nhat_luc), l.tong === null ? 'KHÔNG' : 'có', soTl, l.n_ctc, `${l.n_nx}${l.nx_may_chu === null ? '' : `/${l.nx_may_chu}`}`, l.n_bs, bo ? `${bo.length}${ngoaiKey ? ` (ngoài tờ đáp án ${ngoaiKey})` : ''}${ngoaiDe ? ` (ngoài gói đề ${ngoaiDe})` : ''}` : 'KHÔNG', l.so_lan_roi_man, gcLoai, ketQua, (chanTheoEm.get(h(l.sbd)) ?? []).join(' ')].join(' | '))
             }
