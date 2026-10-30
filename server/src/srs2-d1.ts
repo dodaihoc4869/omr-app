@@ -463,7 +463,16 @@ export async function docLanLam(env: Env, sbd: string, qids: readonly string[], 
   const goc = [...new Set(qids)]
   const ds = JSON.stringify(goc.flatMap(cacQidSongSinh)), dsGoc = JSON.stringify(goc)
   let rows: Row[]
-  if (goc.length > 200) {
+  // 30/10 (D1 nghẽn giờ cao điểm): sổ của em đã có trong đệm (bộ nhớ / kho ngăn riêng) ⇒ lọc tại chỗ, đúng điều kiện câu SQL dưới (từ mốc, bỏ dòng xem lời
+  // giải / lướt / chữa bước; dòng ngoài tập câu bị `lanLamTuDongTc` bỏ như cũ). Đệm vắng ⇒ đọc D1 như cũ.
+  const so = await import('./omni-d1').then((m) => m.soCuaEmQuaDem(env, sbd)).catch(() => null)
+  if (so) {
+    const boMucDich = new Set(['xem_loi_giai', 'luot', 'chua_buoc'])
+    const tcCua = (j: unknown): unknown => { if (j == null || j === '') return null; try { const o = JSON.parse(String(j)) as Record<string, unknown> | null; return o && typeof o === 'object' ? (o.tc ?? null) : null } catch { return null } }
+    rows = so.filter((x) => str(x.luc) >= tuLuc && !boMucDich.has(x.purpose == null ? '' : str(x.purpose)))
+      .map((x) => ({ qid: x.qid, ngay_vn: x.ngay_vn, luc: x.luc, ket_qua: x.ket_qua, assistance: x.assistance, visibility: x.visibility, nguon: x.nguon, purpose: x.purpose, tc: tcCua(x.raw_json), khoa: x.khoa }))
+      .sort((a, b) => (str(a.luc) < str(b.luc) ? -1 : str(a.luc) > str(b.luc) ? 1 : str(a.khoa) < str(b.khoa) ? -1 : str(a.khoa) > str(b.khoa) ? 1 : 0))
+  } else if (goc.length > 200) {
     const sql = (coVis: boolean) => `SELECT qid, ngay_vn, luc, ket_qua, ${coVis ? 'assistance, visibility, purpose,' : ''} nguon, ${SQL_TC} AS tc FROM su_kien_hoc WHERE sbd = ? AND luc >= ? ${coVis ? `AND (${SQL_LA_LAN_LAM_GIU_CHAN_DOAN})` : ''}`
     try {
       rows = (await env.DB.prepare(sql(true)).bind(sbd, tuLuc).all<Row>()).results ?? []
