@@ -45,7 +45,9 @@ export function chiaChang(so: SoHomNay): { co: number; tt: 'xong' | 'dang' | 'ch
 /** Chữ nút học — MỘT nút cho cả màn (Hôm nay và Hành trình dùng chung).
  *  Gói 7 kho thiếu (khẩn 12/10 21h30): hết việc xếp được mà chưa đủ mức ⇒ "Hôm nay còn N câu chờ thầy bổ sung" (nút khoá); còn việc xếp được nhưng ít
  *  hơn phần còn lại của mức ⇒ nút VẪN BẤM ĐƯỢC, nói đúng số câu sẵn sàng ("Học tiếp · 1 câu sẵn sàng") — số "Còn N câu" phía trên vẫn theo M. */
-export function chuNutHoc(so: SoHomNay | null, hetCau: boolean, kho?: { choBoSung?: number; sanSang?: number }): string {
+export function chuNutHoc(so: SoHomNay | null, hetCau: boolean, kho?: { choBoSung?: number; sanSang?: number; caThi?: boolean }): string {
+  // (30/10) hết việc vì câu của bài đang khoá cho ca kiểm tra mở ⇒ nói đúng lý do (không phải thầy thiếu câu)
+  if (hetCau && kho?.caThi) return 'Đang có ca kiểm tra · câu bài này mở lại khi ca đóng'
   if (hetCau) return kho?.choBoSung ? `Hôm nay còn ${kho.choBoSung} câu chờ thầy bổ sung` : 'Đã làm hết câu được giao'
   if (!so) return 'Bắt đầu học'
   const con = Math.max(0, so.muc - so.daLam)

@@ -8,7 +8,7 @@ export default function TheGoi7({du}:{du:TomTatGoi7}) {
     {du.goi.map(g=><article className="ht-goi7" key={g.id}><h3>{g.ten}</h3>{g.nguonDayDu===false?<p role="status">Bộ bài đang chờ đủ nguồn của các tờ đã chọn. Chưa chốt tổng số câu hoặc xác nhận hoàn thành; em tiếp tục phần ôn đã sẵn sàng.</p>:<><p>Gặp câu gốc: <strong>{g.daGap}/{g.tong} câu</strong>{g.han ? ` · Hạn ${hienNgay(g.han)}` : ''}</p><progress aria-label={`Câu đã gặp trong ${g.ten}`} value={g.daGap} max={Math.max(1,g.tong)}/><p className="ht-chu-phu">Câu mới hôm nay: {g.gapHomNay}/{g.quota} (nằm trong {du.toiThieu} câu của ngày). Còn {g.con} câu trong bài.</p></>}
       {g.quaHan&&<p role="status">Đã qua hạn; phần chưa gặp vẫn được giữ để học tiếp và thầy hỗ trợ.</p>}{g.canBoSung>0&&<p>{g.canBoSung} câu đang chờ học liệu được duyệt.</p>}
     </article>)}
-    {du.thieuNgay>0&&<p role="status">Còn thiếu {du.thieuNgay} câu phù hợp so với mức ngày. Hệ thống giữ lịch ôn và báo thầy bổ sung.</p>}
+    {du.thieuNgay>0&&<p role="status">{du.khoaCaThi?`Đang có ca kiểm tra: ${du.thieuNgay} câu của mức ngày mở lại khi ca đóng.`:`Còn thiếu ${du.thieuNgay} câu phù hợp so với mức ngày. Hệ thống giữ lịch ôn và báo thầy bổ sung.`}</p>}
     {du.canHoTro&&<p role="status">Phần còn lại cần thêm hỗ trợ hoặc thời gian. Thầy có thể theo dõi để giúp em.</p>}
   </section>
 }

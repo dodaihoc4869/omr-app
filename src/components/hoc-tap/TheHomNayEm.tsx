@@ -44,6 +44,8 @@ export interface PropsTheHomNayEm {
   choBoSung?: number
   /** Gói 7: số việc kế hoạch xếp được lúc này (`theLuc.con`) — ít hơn số còn lại của mức (kho thiếu) thì nút nói "x câu sẵn sàng". */
   sanSang?: number
+  /** (30/10) hết việc vì câu của bài đang khoá cho ca kiểm tra mở ⇒ nút nói đúng lý do. */
+  caThi?: boolean
   /** Ca kiểm tra đang mở ⇒ nút học lùi thành nút viền (nút chính của màn là Vào ca kiểm tra). */
   nutPhu?: boolean
   /** Token phiên ⇒ phần Nhịp học (`/hs/nhip-hoc`); không có ⇒ không hiện. */
@@ -69,7 +71,7 @@ function PhanChinh(p: PropsTheHomNayEm & { chip: ReactNode }) {
   const du = con === 0
   const chang = so ? chiaChang(so) : []
   const xong = so ? soChangXong(so) : 0
-  const nut = chuNutHoc(so, p.hetCau, { choBoSung: p.choBoSung, sanSang: p.sanSang })
+  const nut = chuNutHoc(so, p.hetCau, { choBoSung: p.choBoSung, sanSang: p.sanSang, caThi: p.caThi })
   return (
     <div className="ht2-hn-chinh">
       <div className="ht2-hn-dau">
