@@ -465,7 +465,8 @@ export async function docLanLam(env: Env, sbd: string, qids: readonly string[], 
   let rows: Row[]
   // 30/10 (D1 nghẽn giờ cao điểm): sổ của em đã có trong đệm (bộ nhớ / kho ngăn riêng) ⇒ lọc tại chỗ, đúng điều kiện câu SQL dưới (từ mốc, bỏ dòng xem lời
   // giải / lướt / chữa bước; dòng ngoài tập câu bị `lanLamTuDongTc` bỏ như cũ). Đệm vắng ⇒ đọc D1 như cũ.
-  const so = await import('./omni-d1').then((m) => m.soCuaEmQuaDem(env, sbd)).catch(() => null)
+  // Chỉ trong ngăn riêng của CHÍNH em (đệm luôn ấm) — ngoài ngăn (app thầy / phụ huynh) giữ đường cũ, không thêm vòng chờ đếm sổ.
+  const so = env.KHO_EM?.sbd === sbd ? await import('./omni-d1').then((m) => m.soCuaEmQuaDem(env, sbd)).catch(() => null) : null
   if (so) {
     const boMucDich = new Set(['xem_loi_giai', 'luot', 'chua_buoc'])
     const tcCua = (j: unknown): unknown => { if (j == null || j === '') return null; try { const o = JSON.parse(String(j)) as Record<string, unknown> | null; return o && typeof o === 'object' ? (o.tc ?? null) : null } catch { return null } }

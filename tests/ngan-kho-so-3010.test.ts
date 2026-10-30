@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest'
 import { taoKhoEm } from '../server/src/ngan-hoc-sinh'
 import { xoaMoiDem } from '../server/src/dem-chung'
 import { hoSoOmniEm } from '../server/src/omni-d1'
+import { benLanLamMoi, docLanLam } from '../server/src/srs2-d1'
 import { taoKhoOmni } from './omni-3-ke-hoach-chung'
 import type { Env, SqlNgan } from '../server/src/kieu'
 
@@ -57,5 +58,30 @@ describe('kho sổ trong ngăn riêng', () => {
     xoaMoiDem()
     const thang = await hoSoOmniEm({ ...env0 } as Env, 'S1', now + 1) // không kho: đọc cả sổ
     expect(JSON.stringify(c)).toBe(JSON.stringify(thang))
+  })
+
+  it('lần làm (srs2 docLanLam) trong ngăn đọc qua đệm sổ: y hệt đường D1 (song sinh, câu anh em, chẩn đoán, xem lời giải, lướt, mốc thời gian)', async () => {
+    const k = taoKhoOmni({ 'DH-B8': 24 }, 3)
+    const ins = k.d.sql.prepare(`INSERT INTO su_kien_hoc(khoa,sbd,qid,nguon,ma_nguon,lan,ket_qua,giay,luc,ngay_vn,received_at,assistance,purpose,visibility,raw_json) VALUES(?,?,?,?,?,1,?,30,?,?,?,?,?,?,?)`)
+    const t0 = Date.parse('2026-10-01T10:00:00Z')
+    const dong: [string, string, number | null, string | null, string | null, string | null, string][] = [
+      ['DH-B8-0', 'game', 1, null, null, null, '{}'], ['DH-B8-0~ss1', 'game', 0, null, null, null, '{}'], ['DH-B8-1', 'game', 0, 'xem_loi_giai', null, null, '{}'],
+      ['DH-B8-2', 'chua_loi', 1, 'chan_doan', null, null, '{"tc":"DH-B8-1"}'], ['DH-B8-3', 'game', 1, null, null, null, '{"tc":"DH-B8-1"}'],
+      ['DH-B8-4', 'thi', 0, null, 'embargoed', null, '{}'], ['DH-B8-5', 'game', 0, 'luot', null, null, '{}'], ['DH-B8-6', 'game', null, null, null, 'assisted', '{"ms":5000}'],
+    ]
+    dong.forEach(([qid, nguon, kq, purpose, vis, ast, raw], i) => ins.run(`k${i}`, 'S1', qid, nguon, `m${i}`, kq, new Date(t0 + i * 60_000).toISOString(), '2026-10-01', t0 + i * 60_000, ast ?? 'none', purpose, vis, raw))
+    const env0 = k.env as Env
+    const qids = ['DH-B8-0', 'DH-B8-1', 'DH-B8-3', 'DH-B8-4', 'DH-B8-5', 'DH-B8-6']
+    const chuan = (x: unknown) => JSON.stringify(x, (_k, v) => (v instanceof Map ? [...v].sort() : v))
+    for (const tu of ['', new Date(t0 + 2 * 60_000).toISOString()]) {
+      const benA = benLanLamMoi(), benB = benLanLamMoi()
+      xoaMoiDem()
+      const a = await docLanLam(env0, 'S1', qids, tu, benA)
+      xoaMoiDem()
+      const b = await docLanLam({ ...env0, KHO_EM: taoKhoEm(sqlGia(), 'S1') } as Env, 'S1', qids, tu, benB)
+      const sx = (ds: { qid: string; luc?: string }[]) => [...ds].sort((x, y) => `${x.qid}|${x.luc}`.localeCompare(`${y.qid}|${y.luc}`))
+      expect(chuan(sx(b as never))).toBe(chuan(sx(a as never)))
+      expect(chuan(benB)).toBe(chuan(benA))
+    }
   })
 })
