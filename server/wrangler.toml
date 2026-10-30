@@ -54,6 +54,12 @@ class_name = "BanBiA"
 name = "TRAM_GEMINI"
 class_name = "TramGemini"
 
+# Ngăn riêng từng học sinh (30/10, server/src/ngan-hoc-sinh.ts): mọi lệnh app học sinh của một em vào CÙNG một Durable Object (idFromName(sbd)) ⇒
+# đệm của em luôn ấm, D1 chỉ còn phần thật sự đổi (30/10 21:40: lệnh rải ≥ 200 isolate, đệm gần như không trúng ⇒ D1 nghẽn).
+[[durable_objects.bindings]]
+name = "NGAN_HS"
+class_name = "NganHocSinh"
+
 [[migrations]]
 tag = "bia-v1"
 new_sqlite_classes = ["BanBiA"]
@@ -61,6 +67,10 @@ new_sqlite_classes = ["BanBiA"]
 [[migrations]]
 tag = "tram-gemini-v1"
 new_sqlite_classes = ["TramGemini"]
+
+[[migrations]]
+tag = "ngan-hs-v1"
+new_sqlite_classes = ["NganHocSinh"]
 
 [[r2_buckets]]
 binding = "DE"

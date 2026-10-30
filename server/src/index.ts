@@ -4139,11 +4139,19 @@ export function laGioCaoDiemVn(nowMs: number): boolean {
 
 /** Bọc `boXuLy.fetch`: đo thời gian trả lời từng lệnh (trừ OPTIONS) vào bộ nhớ ⇒ p50/p95 ⇒ `nhipDeNghi` + `/gv/suc-khoe-may-chu` (suc-khoe-may.ts). Không tốn truy vấn nào. */
 import { batDauYeuCau, ghiBoNhoDinhKy } from './do-bo-nho'
+import { DAU_TRONG_NGAN, datXuLyNgan, vaoNgan } from './ngan-hoc-sinh'
 export { BanBiA } from './ban-bi-a-dong'
 export { TramGemini } from './tram-gemini'
-export default {
+export { NganHocSinh } from './ngan-hoc-sinh'
+const xuatWorker = {
   ...boXuLy,
   async fetch(req: Request, env: Env, ctx?: ExecutionContext): Promise<Response> {
+    // NGĂN RIÊNG TỪNG HỌC SINH (30/10, ngan-hoc-sinh.ts): lệnh app học sinh ⇒ Durable Object của đúng em (đệm luôn ấm); trong ngăn ⇒ đi thẳng xuống dưới.
+    if (env.NGAN_HS && req.method === 'POST' && !req.headers.has(DAU_TRONG_NGAN)) {
+      const r = await vaoNgan(req, env)
+      if (r instanceof Response) return r
+      if (r) req = r
+    }
     const t0 = Date.now()
     let res: Response
     // ĐO BỘ NHỚ / ĐỒNG THỜI (29/10 22:00, do-bo-nho.ts): đếm lượt đang chạy; mỗi isolate tối đa một dòng `[bo-nho]` / phút.
@@ -4162,3 +4170,5 @@ export default {
     } finally { xongDo() }
   },
 }
+datXuLyNgan((r, e, c) => xuatWorker.fetch(r, e, c))
+export default xuatWorker
