@@ -123,10 +123,10 @@ describe('khung ca thi kiểu Duo (ThiDuo)', () => {
     expect(p.onMoLuoi).toHaveBeenCalledWith(false)
     expect(p.onDenCau).toHaveBeenCalledWith(2)
   })
-  it('tấm nộp: có Bi, câu chưa làm bấm được, «Nộp bài» gọi nộp; chỉ nộp phút cuối ⇒ nút khoá', async () => {
+  it('tấm nộp: có giám thị (Giáo sư Kíp, thay Bi 30/10), câu chưa làm bấm được, «Nộp bài» gọi nộp; chỉ nộp phút cuối ⇒ nút khoá', async () => {
     const { p, r } = await dung({ moNop: true })
     const tam = screen.getByRole('dialog', { name: 'Nộp bài?' })
-    expect(tam.querySelector('svg.bi')).toBeTruthy()
+    expect(tam.querySelector('.duo-kt-nop-bi[data-gt] .kt-gt-nop')).toBeTruthy() // 30/10: giám thị thay Bi ở tấm nộp ca thi
     expect(tam.textContent).toContain('Sau khi nộp không sửa được nữa.')
     fireEvent.click(screen.getAllByRole('button', { name: 'Câu 2' })[0]!)
     expect(p.onDenCau).toHaveBeenCalledWith(2)

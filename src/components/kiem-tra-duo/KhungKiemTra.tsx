@@ -133,10 +133,12 @@ export function TamLuoiKt({ cau, hien, onChon, onDong, tieuDe, phu, them, nutNop
 }
 
 /** Tấm xác nhận nộp có Bi: số câu đã làm, câu chưa làm (bấm để tới), câu đánh dấu xem lại, hậu quả, nút mang tên việc. */
-export function TamNopKt({ tieuDe, daLam, tong, chuaLam, danhDau = [], onToiCau, onLamTiep, nhanLamTiep, onNop, nhanNop, khoaNop, canh, hauQua }: {
+export function TamNopKt({ tieuDe, daLam, tong, chuaLam, danhDau = [], onToiCau, onLamTiep, nhanLamTiep, onNop, nhanNop, khoaNop, canh, hauQua, hinh }: {
   tieuDe: string; daLam: number; tong: number; chuaLam: number[]; danhDau?: number[]
   onToiCau: (so: number) => void; onLamTiep: () => void; nhanLamTiep: string
   onNop: () => void; nhanNop: ReactNode; khoaNop?: boolean; canh?: ReactNode; hauQua: string
+  /** Hình đầu tấm thay Bi (ca thi 30/10: giám thị Giáo sư Kíp). Vắng ⇒ Bi như cũ (Kiểm tra ôn tập). */
+  hinh?: ReactNode
 }) {
   useEscDong(true, onLamTiep)
   const cam: CamBi = chuaLam.length ? 'nghi' : 'vui'
@@ -148,7 +150,7 @@ export function TamNopKt({ tieuDe, daLam, tong, chuaLam, danhDau = [], onToiCau,
   return (
     <div className="duo-kt-phu" data-giua="">
       <section className="duo-kt-tam duo-kt-nop" role="dialog" aria-modal="true" aria-labelledby="duo-kt-nop-tieu">
-        <div className="duo-kt-nop-bi"><Bi cam={cam} size={104} /></div>
+        <div className="duo-kt-nop-bi" data-gt={hinh ? '' : undefined}>{hinh ?? <Bi cam={cam} size={104} />}</div>
         <h2 id="duo-kt-nop-tieu">{tieuDe}</h2>
         <p className="duo-kt-nop-so"><b>{daLam}/{tong}</b> câu đã làm</p>
         <div className="duo-kt-nop-noi">
