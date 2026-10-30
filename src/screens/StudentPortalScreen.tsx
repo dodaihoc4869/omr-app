@@ -1,7 +1,6 @@
 // App học sinh tập trung làm bài; giữ máy chủ giao câu, chấm và tiến độ hiện hành.
 import HocTapHomNay from '../components/hoc-tap/HocTapHomNay'
 import { soHomNay } from '../components/hoc-tap/lam-bai' // màn làm bài 12/10D: thanh trên "đã làm/M câu hôm nay" cùng nguồn vòng tròn Hôm nay
-import TheDiemDanhHs from '../components/diem-danh/TheDiemDanhHs'
 import { napTrongHs } from '../components/hoc-tap/nap-trong-hs'
 import { useKhoaCuonTrang } from '../lib/khoa-cuon-trang'
 import { canThanTuSanh, useSanhHoa2 } from '../components/hoa2/api'
@@ -31,7 +30,7 @@ import type { BaiMomM3 } from '../components/bang-nhiem-vu/MomM3'
 import '../components/bang-nhiem-vu/sheet-m3.css'
 // Tạm dừng hoạt ảnh Sảnh khi bị màn toàn màn hình che (lớp `sanh-bi-che`, xem hiệu ứng ngay dưới `cheDo2`).
 import '../styles/sanh-bi-che.css'
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState, useRef, type CSSProperties, type ReactNode } from 'react'
+import { lazy, memo, Suspense, useCallback, useEffect, useMemo, useState, useRef, type CSSProperties, type ReactNode } from 'react'
 const LuyenDeChuan=lazy(()=>import('../components/LuyenDeChuan'))
 import { taoKhoGio, useGiayConLai } from '../lib/dong-ho-thi'
 import {
@@ -72,6 +71,13 @@ import { boNap, nenNapTruoc, veNgayKhiCo, type BoNap } from '../components/hoa2/
 import { napManCauDaLam, napManTuLuyen } from '../components/hoa2/man-sanh-luoi'
 // Màn làm bài, chữa và xem lại chỉ tải khi em mở.
 const ManLamBaiTap = lazy(() => import('../components/hoc-tap/ManLamBaiTap'))
+// Thẻ điểm danh nổi của giao diện CŨ (không «Trong») — nạp lười (30/10): «Trong» dùng khối điểm danh trong menu (TrongHs, diem-danh-hs.ts).
+const TheDiemDanhHs = lazy(() => import('../components/diem-danh/TheDiemDanhHs'))
+/** MÁY YẾU 30/10 (hồ sơ CPU ×6): Lộ trình nằm ẩn (`inert`) dưới màn làm chặng / màn khác mà vẫn vẽ lại CẢ cây (~665 nút) mỗi lần cổng đổi trạng thái — ngay
+ *  trong cú chạm «Bắt đầu» và sau mỗi câu (số tiến độ). Đang ẩn ⇒ giữ nguyên cây (không vẽ lại); hiện lại ⇒ vẽ một lượt với số mới nhất. */
+const DungKhiAn = memo(function DungKhiAn({ children }: { an: boolean; children: ReactNode }) { return <>{children}</> }, (_truoc, sau) => sau.an)
+/** Sự kiện «em vừa về Lộ trình» (Lộ trình đứng yên lúc ẩn nên không tự biết) — thẻ điểm danh nghe để hỏi lại buổi học như trước. */
+const SU_KIEN_VE_LO_TRINH = 'ddh-ve-lo-trinh'
 const ManKiemTraCaNhan = lazy(() => import('../components/hoc-tap/ManKiemTraCaNhan'))
 // Hồ sơ làm bài của em (thầy 12/10: "Cho hs bấm vào bảng lười chăm. Khi bấm vào hiển thị đủ hồ sơ như trong nhịp học nhé") — nạp lười, ngoài precache.
 const HoSoCuaEmHs = lazy(() => import('../components/hoc-tap/HoSoCuaEmHs'))
@@ -935,15 +941,20 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
     else if (man === 'btvn') void napLaiBtvn()
   }
 
+  const daAnLoTrinh = useRef(false)
+  useEffect(() => {
+    if (tab === null && daAnLoTrinh.current) window.dispatchEvent(new Event(SU_KIEN_VE_LO_TRINH))
+    daAnLoTrinh.current = tab !== null
+  }, [tab])
   // KHI ĐÃ ĐĂNG NHẬP THÀNH CÔNG — MỘT màn "Bảng nhiệm vụ"; mọi màn cũ mở dạng sheet toàn màn.
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col">
       {hop}
       {/* ĐIỂM DANH BUỔI HỌC (bảng Dạy học của thầy, 28/09): thẻ nổi khi lớp em có buổi đang mở; quét QR ⇒ tự điểm danh. Không hiện khi đang thi. */}
       {/* + bong bóng A.I Đỗ Đại Học (24/10): chỉ ở Hôm nay, không khi đang thi / mở hồ sơ. */}
-      {auth.token && !manThi && tab === null && <>{!trongHs && <TheDiemDanhHs token={auth.token} />}{!moHoSoEm && <Suspense fallback={null}><BongBongAiDdh auth={auth} anBong={trongHs} /></Suspense>}</>}
+      {auth.token && !manThi && tab === null && <>{!trongHs && <Suspense fallback={null}><TheDiemDanhHs token={auth.token} /></Suspense>}{!moHoSoEm && <Suspense fallback={null}><BongBongAiDdh auth={auth} anBong={trongHs} /></Suspense>}</>}
       {auth.token && !manThi && (
-        <div inert={tab !== null} aria-hidden={tab !== null || undefined}><HocTapHomNay nguon={duLieuBang.nguon} dangLamMoi={keHoachNgay.dangLamMoi} thongBao={<ThongBaoHocSinh token={auth.token} onOpen={(t) => { setTab(t); if (t === 'mom') void napDsMom(); if (t === 'btvn') void napLaiBtvn() }} />}
+        <div inert={tab !== null} aria-hidden={tab !== null || undefined}><DungKhiAn an={tab !== null}><HocTapHomNay nguon={duLieuBang.nguon} dangLamMoi={keHoachNgay.dangLamMoi} thongBao={<ThongBaoHocSinh token={auth.token} onOpen={(t) => { setTab(t); if (t === 'mom') void napDsMom(); if (t === 'btvn') void napLaiBtvn() }} />}
           canhBao={<TheCanhBaoThay vaiTro="hocsinh" now={nowHocTap} canhBao={duLieuBang.canhBaoThay ?? []} onDaXem={cb => void baoDaXemHocSinh(auth.token!, cb.id)} />}
           tienDoCu={duLieuBang.nguon === 'ke_hoach_ngay' ? duLieuBang.tienDo : undefined} ten={auth.hoTen} lop={auth.lop} ketQua={hoa2.ketQua} dangTai={hoa2.dangTai} loi={hoa2.loi}
           coCa={!!caDangMo} soBaiTap={dsBtvn.filter((bt) => !bt?.daNop).length} coBaiTap={dsBtvn.length > 0} token={auth.token} onHoc={() => setTab('hoctap')} onXemLai={() => setTab('caudalam')}
@@ -951,7 +962,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
           onTuLuyen={() => setTab('tuluyen')} onLichSu={() => setTab('lichsuca')}
           onKetQua={() => moManCu('diem')} onLuyenLai={() => moManCu('khacphuc')} onBangTin={() => moManCu('bantin')} onBaiTap={() => moManCu('btvn')} onGiaDinh={() => moManCu('mom')} onTaiLai={hoa2.taiLai} onDangXuat={hoiDangXuat}
           onMoHoSo={() => setMoHoSoEm(true)} onKiemTra={() => setTab('kiemtra')} moDiemDanh={tab === null}
-        /></div>
+        /></DungKhiAn></div>
       )}
       {moHoSoEm && auth.token && tab === null && !manThi && <Suspense fallback={null}><HoSoCuaEmHs token={auth.token} tenEm={auth.hoTen ?? ''} lop={auth.lop ?? undefined} onDong={() => setMoHoSoEm(false)} onChuaCau={(qid) => { setMoHoSoEm(false); setQidChua(qid); setTab('tuchua') }} onMoBaiTap={() => { setMoHoSoEm(false); setTab('hoctap') }} /></Suspense>}
       {tab === 'hoctap' && auth.token && !manThi && <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain"><Suspense fallback={<ChoNapGame />}><ManLamBaiTap token={auth.token} sbd={auth.sbd} onVe={() => setTab(null)} onCapNhat={hoa2.taiLai} onVa={hoa2.va} onChua={(qid) => { setQidChua(qid); setTab('tuchua') }} homNay={soHomNay(hoa2.ketQua, duLieuBang.nguon === 'ke_hoach_ngay' ? duLieuBang.tienDo : undefined)} /></Suspense></div>}

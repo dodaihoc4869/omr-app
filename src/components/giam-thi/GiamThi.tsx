@@ -150,23 +150,36 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
     return () => { goc.removeEventListener('pointerover', re); goc.removeEventListener('pointerout', roi); goc.removeEventListener('click', cham); goc.removeEventListener('keydown', cham) }
   }, [qid]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // MÁY YẾU 30/10 (vết Chrome «Kiểm tra» CPU ×6: bong bóng càu nhàu đo vị trí khung ⇒ ép tính kiểu + bố cục ~40 ms NGAY trong lượt chạm): giám thị phản
+  // ứng SAU khung đầu (rAF → setTimeout) — tấm kết quả / nút lún vẽ trước, giám thị đổi dáng ngay khung sau (mắt người không thấy lệch).
+  const sauVe = useRef({ raf: 0, hen: 0 })
+  const henSauVe = (f: () => void) => {
+    const h = sauVe.current
+    cancelAnimationFrame(h.raf); clearTimeout(h.hen)
+    if (document.hidden) h.hen = window.setTimeout(f, 0); else h.raf = requestAnimationFrame(() => { h.hen = window.setTimeout(f, 0) })
+  }
+  useEffect(() => () => { cancelAnimationFrame(sauVe.current.raf); clearTimeout(sauVe.current.hen) }, [])
+
   // Bấm Kiểm tra: nhanh quá ⇒ liếc nghi ngờ (+ «Bấm nhanh thế…»), còn lại ⇒ cúi nhìn ô đã chọn.
   useEffect(() => {
     if (!nop || ket || daNop.current) return
     daNop.current = true
     huyHen('soi', 'cho', 'dh', 'loi')
-    if (bay() - batDau.current < NGUONG.voi) { datTT('nghi-ngo'); noi('voi') } else datTT('nop')
+    const voi = bay() - batDau.current < NGUONG.voi
+    henSauVe(() => { if (coKet.current) return; if (voi) { datTT('nghi-ngo'); noi('voi') } else datTT('nop') })
   }, [nop]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Kết quả: phản ứng CÙNG LÚC tấm kết quả trượt lên; câu đúng/sai có thể kèm một câu càu nhàu.
+  // Kết quả: phản ứng cùng nhịp tấm kết quả trượt lên (ngay khung sau); câu đúng/sai có thể kèm một câu càu nhàu.
   useEffect(() => {
     if (!ket) return
     huyHen()
-    if (ket === 'trung') { datTT('yen'); return }
-    datTT(ket)
-    if (ket === 'dung' || ket === 'combo') { nhip.saiLien = 0; noi(ket); return }
-    nhip.saiLien++
-    if (nhip.saiLien >= 2) { nhip.saiLien = 0; noi('sai2') } else if (ket === 'sai') noi('sai')
+    henSauVe(() => {
+      if (ket === 'trung') { datTT('yen'); return }
+      datTT(ket)
+      if (ket === 'dung' || ket === 'combo') { nhip.saiLien = 0; noi(ket); return }
+      nhip.saiLien++
+      if (nhip.saiLien >= 2) { nhip.saiLien = 0; noi('sai2') } else if (ket === 'sai') noi('sai')
+    })
   }, [ket]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Tab ẩn ⇒ không còn hoạt ảnh / hẹn giờ nào chạy; hiện lại ⇒ chạy tiếp, đếm lại nhịp chờ.
