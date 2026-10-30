@@ -56,6 +56,9 @@ export interface SoHomNay {
   soChang: number
   /** Chặng đang làm dở (1…soChang) chưa tới màn báo hoàn thành chặng ⇒ chưa tính xong chặng đó (chưa tích ✓). */
   changDangDo?: number | null
+  /** (30/10) Chặng đang làm dở trên máy: số câu THẬT của chặng · số câu đã nộp — vòng tiến độ chia đúng bấy nhiêu đoạn (vắng ⇒ theo ranh 6 câu). */
+  cauChang?: number
+  daCauChang?: number
 }
 /** Mỗi chặng tối đa 6 câu — cùng hằng với máy chủ (`server/src/hanh-trinh-ngay.ts` CAU_MOI_CHANG) và vạch chặng ở Hôm nay. */
 export const CAU_MOI_CHANG = 6

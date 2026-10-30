@@ -163,7 +163,7 @@ const docSuaNho = (tk?: string): number[] | null => {
 /** Phần của cổng HocTapHomNay mà Luyện tập / Thành tích cần (truyền nguyên props cổng — không thêm lệnh, không thêm số). */
 export interface HsTrong { lop?: string; onXemLai: () => void; onTuLuyen: () => void; onLichSu: () => void; onKetQua?: () => void; onLuyenLai?: () => void }
 /** Một nút trên con đường chặng (Lộ trình). `x` = độ lệch ngang (px) để đường uốn như bản vẽ. */
-type Nut = { k: string; loai: 'hoc' | 'kiem' | 'sua' | 'bt'; tt: 'xong' | 'dang' | 'khoa' | 'mo'; dem?: number; bong?: string; vong?: number; soDoan?: number; ten: string; pop: Pop }
+type Nut = { k: string; loai: 'hoc' | 'kiem' | 'sua' | 'bt'; tt: 'xong' | 'dang' | 'khoa' | 'mo'; dem?: number; bong?: string; vong?: number; soDoan?: number; daDoan?: number; khoaVong?: string; ten: string; pop: Pop }
 /** Thẻ bật ra khi bấm một nút Lộ trình (thầy 27/10, ảnh Duolingo «bấm vào hiện như thế này»): tiêu đề · dòng phụ · nút việc chính (không có ⇒ chỉ thông tin). */
 type Pop = { tieu: string; phu: string; nut?: { chu: string; onClick?: () => void; tat?: boolean } }
 const LECH = [0, -52, -80, -52, 0, 52, 80, 52]
@@ -216,8 +216,12 @@ function Ruong() {
 /** Vòng tiến độ quanh nút HIỆN TẠI (thầy 27/10, ảnh Duolingo; «làm sát lại, tinh tế hơn»): bốn đoạn đầu tròn, khe nhỏ, ôm sát nút (khe ~5–7 px), nền xám
  *  rất nhạt; phần đã làm cùng màu nút, tô dần 0 → tỉ lệ thật lúc mở (mặt nạ stroke-dashoffset, 500 ms ease-out). Không có số ⇒ vòng xám nguyên. */
 const CV = 2 * Math.PI * 54, KHE = 14 // khe theo đơn vị khung 116 (nét 8 đầu tròn ⇒ khe nhìn thấy ~5 px)
-/** `so` = số đoạn (mặc định 4). Nút Kiểm tra ôn tập (28/10): MỖI CHẶNG MỘT ĐOẠN, `pt` = chặng đã chốt / tổng ⇒ tô trọn đúng số đoạn (mặt nạ dừng giữa khe). */
-function VongChang({ pt, so = 4 }: { pt?: number; so?: number }) {
+/** `so` = số đoạn (mặc định 4). Nút Kiểm tra ôn tập (28/10): MỖI CHẶNG MỘT ĐOẠN, `pt` = chặng đã chốt / tổng ⇒ tô trọn đúng số đoạn (mặt nạ dừng giữa khe).
+ *  `da` (thầy 30/10 «chặng đó bao nhiêu câu thì chia thành bấy nhiêu đoạn, xong câu nào thì đoạn câu đó đồng bộ tức thì tô màu, làm khít lại, hiệu ứng tinh
+ *  tế hơn») ⇒ vòng ĐOẠN: `so` đoạn = số câu, `da` đoạn đầu tô trọn; đoạn VỪA xong kể từ lần vẽ trước (nhớ theo `khoa` trong phiên trình duyệt) vẽ dần + sáng
+ *  nhẹ, đoạn cũ hiện ngay. */
+function VongChang({ pt, so = 4, da, khoa }: { pt?: number; so?: number; da?: number; khoa?: string }) {
+  if (da !== undefined) return <VongDoan so={so} da={da} khoa={khoa} />
   const L = Math.max(0, Math.min(100, pt ?? 0)) / 100 * CV, DOAN = CV / Math.max(2, Math.min(8, so))
   const id = `da-vm${useId().replace(/[^a-zA-Z0-9]/g, '')}`
   const doan = { cx: 58, cy: 58, r: 54, strokeDasharray: `${DOAN - KHE} ${KHE}`, strokeDashoffset: DOAN - KHE / 2 }
@@ -225,6 +229,26 @@ function VongChang({ pt, so = 4 }: { pt?: number; so?: number }) {
     {L > 0 && <mask id={id}><circle className="mo" cx="58" cy="58" r="54" strokeDasharray={`${L} ${CV}`} style={{ '--L': `${L}` } as CSSProperties} /></mask>}
     <circle className="nen" {...doan} />
     {L > 0 && <circle className="chay" {...doan} mask={`url(#${id})`} />}</svg>
+}
+
+const KHE_DOAN = 13 // khe giữa hai đoạn (đơn vị khung 116; nét 7 đầu tròn ⇒ khe nhìn thấy ~5 px)
+function VongDoan({ so, da, khoa }: { so: number; da: number; khoa?: string }) {
+  const n = Math.max(1, Math.min(12, Math.round(so))), d = Math.max(0, Math.min(n, Math.round(da)))
+  const doan = CV / n, cung = Math.max(4, doan - (n > 1 ? KHE_DOAN : 0))
+  // đoạn tô MỚI kể từ lần vẽ trước: lần đầu trong phiên ⇒ không hiệu ứng (hiện ngay); quay về Lộ trình sau khi làm câu ⇒ chỉ các đoạn mới chạy
+  // mốc giữ nguyên qua các lần vẽ lại cùng số câu (màn còn vẽ lại sau khi hiện — mất mốc là mất hiệu ứng), đổi khi số câu đổi
+  const moc = useRef<{ d: number; tu: number } | null>(null)
+  if (moc.current === null) { let v = d; try { const x = khoa ? sessionStorage.getItem(khoa) : null; if (x !== null && Number(x) >= 0 && Number(x) < d) v = Number(x) } catch { /* bỏ qua */ } moc.current = { d, tu: v } }
+  else if (moc.current.d !== d) moc.current = { d, tu: Math.min(moc.current.d, d) }
+  const tu = moc.current.tu
+  useEffect(() => { try { if (khoa) sessionStorage.setItem(khoa, String(d)) } catch { /* bỏ qua */ } }, [khoa, d])
+  return <svg className="da-vong" data-doan="" viewBox="0 0 116 116" aria-hidden="true">
+    {Array.from({ length: n }, (_, i) => {
+      const moi = i < d && i >= tu
+      return <circle key={i} className={i < d ? 'chay' : 'nen'} data-moi={moi || undefined} cx="58" cy="58" r="54" strokeDasharray={`${cung} ${CV}`}
+        strokeDashoffset={-(i * doan + (n > 1 ? KHE_DOAN / 2 : 0))} style={moi ? { '--tre': `${(i - tu) * 160}ms` } as CSSProperties : undefined} />
+    })}
+  </svg>
 }
 
 /** THẺ BẬT RA dưới nút (thầy 27/10): rộng gần hết màn (lề 16 px, tối đa 440), mũi nhọn chỉ đúng tâm nút; gần đáy màn ⇒ bật LÊN TRÊN nút. Vẽ vào <body>
@@ -331,7 +355,7 @@ function DuongChang({ ds, moDi, cam, moKhoa }: { ds: Nut[]; moDi: boolean; cam?:
       const than = <>
         {/* 28/10 (thầy: «có 3 phần đã làm nhưng vòng xung quanh không tính vẫn màu xám»): vòng CHỈ vẽ khi có số tiến độ thật — chặng (phần đã làm), Kiểm tra
             ôn tập (chặng đã chốt / tổng). Tự sửa lỗi / Bài tập về nhà không có số tổng ⇒ không vòng (vòng xám nguyên trông như «chưa làm gì»), giữ bong bóng. */}
-        {n.vong !== undefined && <VongChang pt={n.vong} so={n.soDoan} />}
+        {n.vong !== undefined && <VongChang pt={n.vong} so={n.soDoan} da={n.daDoan} khoa={n.khoaVong} />}
         {n.bong && <span className="da-bong" aria-hidden="true">{n.bong}</span>}
         {sao && <i className="da-sao-bong" aria-hidden="true" />}
         {/* ngôi sao đặc tự vẽ (không thêm biểu tượng thư viện vào mảnh dùng chung lúc mở app) */}
@@ -459,7 +483,7 @@ function nangSoTuChangDangDo(so: SoHomNay | null): SoHomNay | null {
     if (ch >= 1 && d0Luu < so.muc) {
       const dau = Math.min((ch - 1) * 6, so.muc), cuoi = ch === so.soChang ? so.muc : Math.min(ch * 6, so.muc)
       const d0 = d0Luu >= dau && d0Luu + g <= cuoi ? d0Luu : Math.max(dau, cuoi - g)
-      return { ...so, daLam: n > 0 ? Math.min(cuoi, Math.max(dau, d0 + n)) : Math.min(so.daLam, cuoi), chang: ch, changDangDo: n > 0 || so.daLam >= cuoi ? ch : undefined }
+      return { ...so, daLam: n > 0 ? Math.min(cuoi, Math.max(dau, d0 + n)) : Math.min(so.daLam, cuoi), chang: ch, changDangDo: n > 0 || so.daLam >= cuoi ? ch : undefined, cauChang: g, daCauChang: Math.min(n, g) }
     }
     return n > 0 ? { ...so, daLam: Math.max(so.daLam, (d0Luu >= 0 ? d0Luu : Math.max(0, so.daLam - n)) + n) } : so
   } catch { return so }
@@ -705,12 +729,16 @@ export function MotTrangHs(p: PropsMotTrang) {
     const dang = c.tt === 'dang' && chinh === 'hoc' || c.tt === 'dang' && chinh === 'ca'
     const dangDoNay = c.tt === 'dang' && so?.changDangDo === i + 1
     const thu = `Chặng ${i + 1} / ${chang.length}`, conChang = so ? Math.max(dangDoNay ? 1 : 0, Math.min(c.co, dauChang + c.co - so.daLam)) : c.co
+    // vòng ĐOẠN (thầy 30/10): chặng đang dở trên máy ⇒ đúng số câu thật của chặng + số câu đã nộp; không ⇒ ranh 6 câu của Lộ trình (đã làm − đầu chặng)
+    const cauMay = so?.cauChang !== undefined && so.chang === i + 1
+    const soDoan = cauMay ? so!.cauChang! : c.co, daDoan = cauMay ? so!.daCauChang ?? 0 : so ? Math.max(0, Math.min(c.co, so.daLam - dauChang)) : 0
     dauChang += c.co
     if (khoaKt && c.tt !== 'xong') { nut.push({ k: `c${i}`, loai: 'hoc', tt: 'khoa', ten: `Chặng ${i + 1}: khoá đến khi làm xong Kiểm tra ôn tập`, pop: { tieu: tenBaiThe, phu: `${thu} · ${CHU_KHOA_KT}` } }); return }
     if (khoaSua && i >= mocSua && c.tt !== 'xong') { nut.push({ k: `c${i}`, loai: 'hoc', tt: 'khoa', ten: `Chặng ${i + 1}: khoá đến khi sửa xong lỗi hôm nay`, pop: { tieu: tenBaiThe, phu: `${thu} · Sửa xong ${conPhan} lỗi hôm nay để mở chặng tiếp` } }); return }
     nut.push(c.tt === 'xong' ? { k: `c${i}`, loai: 'hoc', tt: 'xong', ten: `Chặng ${i + 1}: đã xong`,
       pop: { tieu: tenBaiThe, phu: `${thu} · đã xong`, nut: hs ? { chu: 'Xem lại', onClick: hs.onXemLai } : undefined } }
       : c.tt === 'dang' ? { k: `c${i}`, loai: 'hoc', tt: 'dang', ten: nutHoc, bong: dang && chinh === 'hoc' ? (c.phan > 0 ? 'Học tiếp' : 'Bắt đầu') : undefined, vong: chinh === 'sua' ? undefined : c.phan,
+        soDoan, daDoan, khoaVong: `ddh.vong-chang.${ngayVn(Date.now())}.${sbdPhien() ?? ''}.${i}`,
         pop: { tieu: tenBaiThe, phu: (p.khoaHoc || p.hetCau) && !dangDoNay ? nutHoc : `${thu} · ${conChang} câu`, nut: { chu: c.phan > 0 ? 'Tiếp tục' : 'Bắt đầu', onClick: p.onHoc, tat: p.khoaHoc && !dangDoNay } } }
       : { k: `c${i}`, loai: 'hoc', tt: 'khoa', ten: `Chặng ${i + 1}: chưa mở`, pop: { tieu: tenBaiThe, phu: `${thu} · Hoàn thành các chặng trước để mở khoá` } })
   })
