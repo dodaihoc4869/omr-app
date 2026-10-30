@@ -1,0 +1,29 @@
+# ĐẾM EM ĐƯỢC NỐI LẠI CHUỖI 27–29/10 (CHỈ ĐỌC, thầy 30/10). Chỉ số gộp, không SBD, không tên.
+name: Đếm em được nối lại chuỗi 27–29/10 (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/do-khoi-phuc-chuoi-3010]
+    paths: ['.github/workflows/do-khoi-phuc-chuoi-3010.yml', 'scripts/do-khoi-phuc-chuoi-3010.ts']
+permissions:
+  contents: read
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24 }
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm (chỉ SELECT)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          npx -y esbuild@0.25.0 scripts/do-khoi-phuc-chuoi-3010.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/dem.mjs --log-level=warning
+          node /tmp/dem.mjs
