@@ -1,7 +1,11 @@
 // @vitest-environment node
 // B3 CHUỖI NGÀY THEO BÀI + BÌNH GIỮ CHUỖI (thầy chốt 26/10; docs/hop-dong-duolingo-2610.md mục 4–5) — hàm thuần chuoiNgayCuaEm.
-import { describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { chuoiNgayCuaEm, conTangThuHai, nguonDatLaiBinh, thuHaiCua, CAU_MOT_BAI, NGAY_LUAT_BINH_MOI, type NhatKyChuoi } from '../server/src/chuoi-ngay-bai'
+import { datNgayBaoTriChoTest } from '../server/src/ngay-bao-tri'
+// Luật chuỗi dùng ngày mẫu cuối tháng 10: ghim lịch bảo trì như lúc viết test (chỉ 27/10) — 28/10 + 29/10 thêm vào lịch vận hành 30/10 (tests/ngay-bao-tri-2710.test.ts).
+beforeAll(() => datNgayBaoTriChoTest(['2026-10-27']))
+afterAll(() => datNgayBaoTriChoTest())
 
 const nk = (o: { hoc?: Record<string, number>; tuSua?: string[]; phep?: string[]; mua?: Record<string, number> } = {}): NhatKyChuoi =>
   ({ soCau: new Map(Object.entries(o.hoc ?? {})), tuSua: new Set(o.tuSua ?? []), phep: new Set(o.phep ?? []), mua: new Map(Object.entries(o.mua ?? {})) })

@@ -18,7 +18,8 @@ const nk = (hoc: string[], mua: Record<string, number> = {}, cau = CAU_MOT_BAI):
 
 describe('ngày bảo trì 27/10', () => {
   it('danh sách', () => {
-    expect(NGAY_BAO_TRI).toEqual(['2026-10-27']); expect(laNgayBaoTri('2026-10-27')).toBe(true); expect(laNgayBaoTri('2026-10-28')).toBe(false)
+    // 30/10: thêm 28/10 + 29/10 (thầy «khôi phục chuỗi cho học sinh bị mất hôm qua và hôm kia» — giờ cao điểm app lag).
+    expect(NGAY_BAO_TRI).toEqual(['2026-10-27', '2026-10-28', '2026-10-29']); expect(laNgayBaoTri('2026-10-27')).toBe(true); expect(laNgayBaoTri('2026-10-29')).toBe(true); expect(laNgayBaoTri('2026-10-30')).toBe(false)
   })
   it('chuỗi B3: không làm 27/10 ⇒ giữ chuỗi, KHÔNG tiêu bình; làm đủ 27/10 ⇒ lửa +1 như thường', () => {
     const khong = chuoiNgayCuaEm(nk(['2026-10-24', '2026-10-25', '2026-10-26', '2026-10-28'], { '2026-10-24': 1 }), '2026-10-28')
@@ -26,9 +27,9 @@ describe('ngày bảo trì 27/10', () => {
     expect(khong.so).toBe(4); expect(khong.giuChuoi).toBe(1 + 1 /* thứ Hai 26/10 (luật cũ) */); expect(khong.binhVuaDo).toBeUndefined()
     const co = chuoiNgayCuaEm(nk(['2026-10-24', '2026-10-25', '2026-10-26', '2026-10-27', '2026-10-28']), '2026-10-28')
     expect(co.so).toBe(5); expect(co.lich7.find((x) => x.ngay === '2026-10-27')!.kieu).toBe('hoc')
-    // Ngày khác vẫn theo luật: lỡ 29/10, không bình ⇒ tắt.
-    const lo = chuoiNgayCuaEm(nk(['2026-10-26', '2026-10-28', '2026-10-30']), '2026-10-30')
-    expect(lo.lich7.find((x) => x.ngay === '2026-10-29')!.kieu).not.toBe('phep')
+    // Ngày khác vẫn theo luật: lỡ 31/10, không bình ⇒ tắt.
+    const lo = chuoiNgayCuaEm(nk(['2026-10-26', '2026-10-30', '2026-11-01']), '2026-11-01')
+    expect(lo.lich7.find((x) => x.ngay === '2026-10-31')!.kieu).not.toBe('phep')
   })
   it('lửa đôi + kiểu ngày cũ hơn 7 ngày: 27/10 là ngày được đỡ', () => {
     expect(kieuNgayCua(undefined, '2026-10-27', '2026-11-20')).toBe('phep')
@@ -42,7 +43,7 @@ describe('ngày bảo trì 27/10', () => {
   it('ngày nghỉ (khiên, chuỗi ngày đạt EXP, kế hoạch) có 27/10; cấu hình thô (EXP cấp) KHÔNG thêm; khiên không tính 27/10 là vắng', async () => {
     const d = taoD1That()
     const env = d.env as unknown as Env
-    expect(await docNgayNghi(env)).toEqual(new Set(['2026-10-27']))
+    expect(await docNgayNghi(env)).toEqual(new Set(['2026-10-27', '2026-10-28', '2026-10-29']))
     expect(phanTichNgayNghi('2026-09-02')).toEqual(new Set(['2026-09-02']))
     expect(soNgayVang('2026-10-27', '2026-10-20', new Set(['2026-10-26']), await docNgayNghi(env))).toBe(0)
     expect((await docCauHinhKeHoach(env)).ngayNghi.has('2026-10-27')).toBe(true)
@@ -73,5 +74,19 @@ describe('ngày bảo trì 27/10', () => {
     expect(r['A|2026-10-27']).toEqual([null, 1])
     expect(r['B|2026-10-27']![1]).toBe(0); expect(r['B|2026-10-27']![0]).not.toBeNull(); expect(r['B|2026-10-27']![0]).not.toBe('khong')
     expect(r['A|2026-10-26']).toEqual(['khong', 0])
+  })
+})
+
+describe('30/10 — khôi phục chuỗi 27/10 + 28/10 + 29/10 (thầy «khôi phục chuỗi cho học sinh bị mất hôm qua và hôm kia» · «khôi phục cả ngày 27/10 nữa»)', () => {
+  it('em đủ mức 26/10, không đủ 27–29/10, đủ 30/10 ⇒ chuỗi nối liền, KHÔNG tiêu bình; ba ngày vẽ «được đỡ»', () => {
+    const n = { ...nk(['2026-10-25', '2026-10-26', '2026-10-30']), soCau7: new Map([['2026-10-28', 6], ['2026-10-29', 3], ['2026-10-30', 24]]), muc: new Map([['2026-10-28', 24], ['2026-10-29', 24], ['2026-10-30', 24]]) }
+    const r = chuoiNgayCuaEm(n, '2026-10-30')
+    for (const d of ['2026-10-27', '2026-10-28', '2026-10-29']) expect(r.lich7.find((x) => x.ngay === d)!.kieu).toBe('phep')
+    expect(r.so).toBe(3); expect(r.binhVuaDo).toBeUndefined()
+  })
+  it('em ĐÃ đủ mức 28/10 ⇒ vẫn được lửa +1 như thường', () => {
+    const n = { ...nk(['2026-10-26']), soCau7: new Map([['2026-10-28', 24]]), muc: new Map([['2026-10-28', 24]]) }
+    const r = chuoiNgayCuaEm(n, '2026-10-28')
+    expect(r.lich7.find((x) => x.ngay === '2026-10-28')!.kieu).toBe('hoc'); expect(r.so).toBe(2)
   })
 })

@@ -1,9 +1,13 @@
 // @vitest-environment node
 // B3 CHUỖI NGÀY THEO BÀI — phần D1 (chạy thật trên D1 giả): đọc sổ học / tự sửa xong / vắng có phép / bình mua; cộng bình chống trùng; gác cờ duolingo_bai.
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import { taoKhoOmni } from './omni-3-ke-hoach-chung'
 import { docChuoiNgayBai, chuoiBaiNeuBat, congBinh } from '../server/src/chuoi-ngay-bai-d1'
 import { xoaDemPhamVi } from '../server/src/bai-da-day'
+import { datNgayBaoTriChoTest } from '../server/src/ngay-bao-tri'
+// Luật chuỗi dùng ngày mẫu cuối tháng 10: ghim lịch bảo trì như lúc viết test (chỉ 27/10) — 28/10 + 29/10 thêm vào lịch vận hành 30/10 (tests/ngay-bao-tri-2710.test.ts).
+beforeAll(() => datNgayBaoTriChoTest(['2026-10-27']))
+afterAll(() => datNgayBaoTriChoTest())
 
 afterEach(() => { xoaDemPhamVi() })
 // 29/10/2026 15:00 VN
