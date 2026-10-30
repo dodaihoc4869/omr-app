@@ -85,9 +85,13 @@ describe('thanh trên Hôm nay không tràn ngang ⇒ khung nhìn không bị n�
 })
 
 describe('Phòng chờ: bàn chơi không nuốt cú vuốt dọc', () => {
-  it('canvas Bắn nguyên tố dùng touch-action: pan-y (kéo ngang dời tàu, vuốt dọc cuộn phòng chờ) — không còn none', () => {
-    expect(giaTriCuoi(doc('src/components/phong-cho/ban-nguyen-to.css'), '.pc-bn-scene canvas', 'touch-action')).toBe('pan-y')
-    // game chỉ đọc toạ độ NGANG khi kéo — pan-y không lấy mất thao tác nào của game
-    expect(doc('src/components/phong-cho/BanNguyenTo.tsx')).toMatch(/onPointerMove=\{e => \{ if \(e\.pointerType === 'mouse' \|\| e\.buttons\) dk\.current\.dich\(tyLe\(e\.clientX\)\) \}\}/)
+  it('Đấu Nguyên Tử (30/10): thẻ Sảnh đấu trong phòng chờ KHÔNG có vùng nuốt cú vuốt; chỉ màn trận (phủ kín khung nhìn) mới khoá chạm', () => {
+    const css = doc('src/components/phong-cho/ban-nguyen-to.css')
+    // Ảnh bìa ở sảnh là canvas thường (không touch-action: none) ⇒ vuốt dọc vẫn cuộn phòng chờ.
+    expect(giaTriCuoi(css, '.di-bia canvas', 'touch-action')).toBeUndefined()
+    // Cần điều khiển + sân chỉ nằm trong màn trận cố định (.di-man) — màn này không cuộn, có overscroll-behavior: contain.
+    expect(giaTriCuoi(css, '.di-can', 'touch-action')).toBe('none')
+    expect(giaTriCuoi(css, '.pc-room.di-man', 'position')).toBe('fixed')
+    expect(giaTriCuoi(css, '.pc-room.di-man', 'overscroll-behavior')).toBe('contain')
   })
 })

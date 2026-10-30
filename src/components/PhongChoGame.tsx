@@ -2,7 +2,8 @@ import { Component, lazy, Suspense, type ReactNode } from 'react'
 import LogoHocSinh from './LogoHocSinh'
 import { laManThi } from './m3'
 import './phong-cho/phong-cho.css'
-const BanNguyenTo = lazy(() => import('./phong-cho/BanNguyenTo'))
+// Đấu Nguyên Tử (30/10): game bắn nhau với bạn cùng phòng chờ — mảnh nạp lười, chỉ tải khi em đã ở phòng chờ.
+const DauIon = lazy(() => import('./phong-cho/DauIon'))
 
 /** Mảnh game tải lỗi chỉ thay ô chơi; màn chờ và vòng nhận lệnh vào bài vẫn sống. */
 class DuPhongGame extends Component<{ children: ReactNode }, { loi: boolean }> {
@@ -16,7 +17,8 @@ class DuPhongGame extends Component<{ children: ReactNode }, { loi: boolean }> {
 }
 
 interface PhongChoGameProps {
-  cho?: { thoiGianPhut?: number; tenCa?: string; lop?: string } | null
+  /** `veDau`: vé vào Sảnh đấu (lệnh vào thi phát); `batDau`: màn cha vừa thấy thầy bắt đầu ⇒ game dừng ngay, đóng kết nối. */
+  cho?: { thoiGianPhut?: number; tenCa?: string; lop?: string; maCa?: string; veDau?: string; batDau?: boolean } | null
   loiCho?: string | null
 }
 
@@ -36,7 +38,7 @@ export default function PhongChoGame({ cho, loiCho }: PhongChoGameProps) {
         </div>}
         {loiCho && <div className="pc-error" role="status">{loiCho}</div>}
       </div>
-      <DuPhongGame><Suspense fallback={<div className="pc-loading" role="status">Đang chuẩn bị trò chơi…</div>}><BanNguyenTo /></Suspense></DuPhongGame>
+      <DuPhongGame><Suspense fallback={<div className="pc-loading" role="status">Đang chuẩn bị trò chơi…</div>}><DauIon maCa={cho?.maCa} veDau={cho?.veDau} batDau={!!cho?.batDau} /></Suspense></DuPhongGame>
       <p className="pc-assurance">Điểm chơi chỉ để vui trong lúc chờ.</p>
     </div>
   </section>

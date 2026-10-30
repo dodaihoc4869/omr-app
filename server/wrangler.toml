@@ -60,6 +60,12 @@ class_name = "TramGemini"
 name = "NGAN_HS"
 class_name = "NganHocSinh"
 
+# Đấu Nguyên Tử (30/10, server/src/phong-dau-ion.ts): phòng đấu bắn nhau của phòng chờ thi — MỘT Durable Object mỗi ca (idFromName `dau-ion:<mã ca>`),
+# WebSocket Hibernation, lớp SQLite (gói nào cũng dùng được), 0 lệnh D1. Tắt nhanh: biến/secret `TAT_DAU_ION` (xem docs/dac-ta-game-ban-sung-3010.md).
+[[durable_objects.bindings]]
+name = "PHONG_DAU_ION"
+class_name = "PhongDauIon"
+
 [[migrations]]
 tag = "bia-v1"
 new_sqlite_classes = ["BanBiA"]
@@ -71,6 +77,10 @@ new_sqlite_classes = ["TramGemini"]
 [[migrations]]
 tag = "ngan-hs-v1"
 new_sqlite_classes = ["NganHocSinh"]
+
+[[migrations]]
+tag = "dau-ion-v1"
+new_sqlite_classes = ["PhongDauIon"]
 
 [[r2_buckets]]
 binding = "DE"
