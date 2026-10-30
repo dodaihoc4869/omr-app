@@ -50,6 +50,12 @@ jobs:
             "WITH a AS (SELECT DISTINCT substr(qid,1,instr(qid,'~')-1) goc FROM su_kien_hoc WHERE instr(qid,'~')>0 AND ngay_vn=strftime('%Y-%m-%d','now','+7 hours')) SELECT COUNT(*) n FROM a WHERE NOT EXISTS (SELECT 1 FROM game_v2_question g WHERE g.qid=a.goc)"
           q "cặp (em, câu gốc) 7 ngày qua chỉ có mã lượt lặp #n, KHÔNG có dòng mã gốc (Câu đã làm xin chi tiết theo mã gốc ⇒ rỗng): số cặp · số em" \
             "WITH l AS (SELECT DISTINCT sbd, substr(qid,1,instr(qid,'#')-1) goc FROM su_kien_hoc WHERE qid GLOB '*#[0-9]*' AND ngay_vn>=date('now','+7 hours','-7 days')) SELECT COUNT(*) cap, COUNT(DISTINCT sbd) em FROM l WHERE NOT EXISTS (SELECT 1 FROM su_kien_hoc s WHERE s.sbd=l.sbd AND s.qid=l.goc)"
+          q "ca đang mở: mã · loại · công bố · bắt đầu · hết hạn vào · phút" \
+            "SELECT ma_ca, loai, cong_bo, bat_dau, het_han_vao, thoi_gian_phut FROM ca WHERE trang_thai='mo'"
+          q "dòng sổ học (nguồn game) theo 15 phút, 2 giờ qua (giờ VN) · số em" \
+            "SELECT strftime('%H:', luc, '+7 hours') || printf('%02d', (CAST(strftime('%M', luc) AS INT)/15)*15) k, COUNT(*) dong, COUNT(DISTINCT sbd) em FROM su_kien_hoc WHERE nguon='game' AND luc >= strftime('%Y-%m-%dT%H:%M:%fZ','now','-2 hours') GROUP BY k ORDER BY k"
+          q "tài khoản thử: kế hoạch gói 7 hôm nay (cột + 500 ký tự đầu)" \
+            "SELECT * FROM goi_bai_7_ngay WHERE sbd='12121212' AND ngay=strftime('%Y-%m-%d','now','+7 hours') LIMIT 2"
           q "hành trình đang chạy (bước kiểm phát hành «ba hành trình»): mã · trạng thái · tạo lúc" \
             "SELECT id, trang_thai, substr(COALESCE(tao_luc,''),1,16) tao FROM chien_dich WHERE trang_thai='dang_chay' ORDER BY id"
           q "kho theo khối + biên nhận gộp" "SELECT khoa, length(gia_tri) dai FROM cau_hinh WHERE khoa IN ('hanh_trinh_v3_kho_10','hanh_trinh_v3_kho_11','hanh_trinh_v3_kho_12','hanh_trinh_3_0910_v1')"
