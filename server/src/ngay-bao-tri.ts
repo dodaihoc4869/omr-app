@@ -5,7 +5,8 @@
 // EXP), chốt kết quả kế hoạch ngày, nhịp học (Lười).
 // 30/10 (thầy «khôi phục chuỗi cho học sinh bị mất hôm qua và hôm kia» · «khôi phục cả ngày 27/10 nữa»): 28/10 và 29/10 — giờ cao điểm app lag / «Máy chủ đang bận»
 // (exceededMemory 19–22h) — em không làm được đủ mức không bị thiệt, như tối bảo trì 27/10.
-const NGAY_BAO_TRI_GOC: readonly string[] = ['2026-10-27', '2026-10-28', '2026-10-29']
+// 30/10 (thầy 22:20 «báo app bảo trì luôn đi»): tối 30/10 máy chủ nghẽn giờ cao điểm, app tạm đóng — như 27/10.
+const NGAY_BAO_TRI_GOC: readonly string[] = ['2026-10-27', '2026-10-28', '2026-10-29', '2026-10-30']
 // `let` + gán lại trong `datNgayBaoTriChoTest`: liên kết sống của ES module ⇒ nơi nhập luôn thấy danh sách hiện hành.
 export let NGAY_BAO_TRI: readonly string[] = NGAY_BAO_TRI_GOC
 let TAP = new Set(NGAY_BAO_TRI)
