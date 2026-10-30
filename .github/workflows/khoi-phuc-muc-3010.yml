@@ -1,0 +1,56 @@
+# KHÔI PHỤC MỨC HÔM NAY BỊ HẠ SAI (thầy 30/10: «bổ sung chính xác câu cho tất cả các em bị ảnh hưởng»).
+# Lỗi: ca kiểm tra 269333 (18:20 VN) khoá TẠM câu bài ⇒ kế hoạch rỗng ⇒ luật «hết cả ôn sớm» (goi-bai-7.ts) hạ mức hôm nay xuống số câu đã làm. Đã sửa ở #635.
+# CHỈ hôm nay (ngày VN), CHỈ bảng mức hôm nay: dòng có muc < MAX(toi_thieu_tang, quota) (công thức chốt mucNgayGoi7) ⇒ trả về MAX(toi_thieu_tang, quota);
+# bỏ dòng kiểm tra nhẹ (toi_thieu_tang = 12 và muc = 12). Xoá bản sẵn (hoc_tap_san_sang, bộ đệm) của đúng các em ấy để Sảnh lập lại với mức mới.
+# Em thật sự hết câu trong kho ⇒ lần mở sau máy chủ tự hạ lại đúng luật. `dem` ⇒ chỉ đếm · `ghi` ⇒ thực hiện rồi đếm lại. Không in mã em.
+name: Khôi phục mức hôm nay bị hạ sai (30/10)
+on:
+  workflow_dispatch:
+    inputs:
+      che_do:
+        description: 'dem = chỉ đếm · ghi = khôi phục'
+        required: true
+        default: 'dem'
+        type: choice
+        options: [dem, ghi]
+permissions:
+  contents: read
+concurrency:
+  group: khoi-phuc-muc
+  cancel-in-progress: false
+jobs:
+  chay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Khôi phục
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+          CHE_DO: ${{ inputs.che_do }}
+        run: |
+          set -euo pipefail
+          HOM=$(TZ=Asia/Ho_Chi_Minh date +%F)
+          echo "Giờ VN: $(TZ=Asia/Ho_Chi_Minh date '+%d/%m %H:%M') · hôm nay $HOM · chế độ $CHE_DO"
+          d1() { npx -y wrangler@4 d1 execute omr --remote --json --command "$1"; }
+          DK="ngay='$HOM' AND muc < MAX(toi_thieu_tang, quota) AND NOT (toi_thieu_tang=12 AND muc=12)"
+          dem() {
+            echo "  dòng mức bị hạ: $(d1 "SELECT COUNT(*) n FROM goi_bai_7_muc_ngay WHERE $DK" | jq -r '.[0].results[0].n')"
+            echo "  phân bố (mức đang chốt → mức đúng: số em): $(d1 "SELECT muc || '→' || MAX(toi_thieu_tang, quota) k, COUNT(*) n FROM goi_bai_7_muc_ngay WHERE $DK GROUP BY k ORDER BY n DESC" | jq -c '[.[0].results[] | \"\(.k): \(.n)\"]')"
+            echo "  tổng dòng mức hôm nay: $(d1 "SELECT COUNT(*) n FROM goi_bai_7_muc_ngay WHERE ngay='$HOM'" | jq -r '.[0].results[0].n')"
+          }
+          echo "== TRƯỚC"; dem
+          if [ "$CHE_DO" = "ghi" ]; then
+            echo "== GHI"
+            echo "Mốc khôi phục D1 (Time Travel) trước khi ghi:"; npx -y wrangler@4 d1 time-travel info omr 2>&1 | tail -n 3 || true
+            r=$(d1 "DELETE FROM hoc_tap_san_sang WHERE sbd IN (SELECT sbd FROM goi_bai_7_muc_ngay WHERE $DK)" | jq -r '.[0].meta.changes'); echo "  xoá bản sẵn (bộ đệm): $r dòng"
+            r=$(d1 "UPDATE goi_bai_7_muc_ngay SET muc = MAX(toi_thieu_tang, quota) WHERE $DK" | jq -r '.[0].meta.changes'); echo "  trả mức: $r dòng"
+            echo "== SAU (phải về 0)"; dem
+          fi
