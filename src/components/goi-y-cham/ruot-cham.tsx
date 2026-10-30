@@ -1,12 +1,12 @@
 // RUỘT «Chạm để hiểu đề» + «Bắt đầu từ đâu?» — mảnh NẠP LƯỜI của VungChamDe (không vào gói mở app, không precache: kho chạy-lúc).
 // Vỏ (VungChamDe.tsx) giữ khung: khe trên (chú giải) · thân đề (children của màn) · khe dưới (gợi ý) · nút «Bắt đầu từ đâu?».
 // Ruột: bọc chữ đề tại chỗ (boc-chu.ts) · thẻ giải nghĩa (TamGiaiThich) · soi sáng · gợi ý 3 tầng (GoiY3Tang) · chú giải màu.
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { createPortal } from 'react-dom'
 import type { BanSoDo, GoiYTraVe, LoaiCham, TheGiaiNghia, VungCham } from '../../lib/goi-y-cham/kieu'
 import { docBanSoDo, taiGoiYSoDo } from '../../lib/goi-y-cham/api'
 import { bocVung, type KetQuaBoc } from './boc-chu'
-import { layTuDienSan, napTuDien, type TuDien } from './tu-dien'
+import { napTuDien, type TuDien } from './tu-dien'
 import TamGiaiThich, { giuCotPhai, useCoRe } from './TamGiaiThich'
 import GoiY3Tang, { tangTuBan, tangTuSinh, type TrangThaiGoiY } from './GoiY3Tang'
 import { BieuTuong } from './bieu-tuong'
@@ -75,50 +75,27 @@ export function RuotCham(p: RuotChamProps) {
     </button>
   )
   const coRe = useCoRe()
-  const [td, setTd] = useState<TuDien | null>(() => p.tuDien ?? layTuDienSan())
+  const [td, setTd] = useState<TuDien | null>(p.tuDien ?? null)
   useEffect(() => {
-    if (p.tuDien || td) return
+    if (p.tuDien) return
     let huy = false
     void napTuDien().then((t) => { if (!huy) setTd(t) })
     return () => { huy = true }
-  }, [p.tuDien, td])
+  }, [p.tuDien])
 
   // ── bọc chữ đề (một lần cho mỗi câu; vỏ đã gắn key = qid nên thân đề mới ⇒ ruột mới)
   const [boc, setBoc] = useState<KetQuaBoc | null>(null)
-  const [the, setThe] = useState<(TheGiaiNghia | null)[]>([])
-  const theNho = useRef(new WeakMap<VungCham, TheGiaiNghia | null>())
   useLayoutEffect(() => {
     const g = goc.current
     if (!g || !td) return
     let kq: KetQuaBoc | null = null, r = 0, h = 0
-    const nho = theNho.current
-    const mayYeu = typeof document !== 'undefined' && document.documentElement.classList.contains('may-yeu')
-    const boc = () => {
-      if (mayYeu) {
-        const vungRaw = td.phatHien(g.textContent || '')
-        const vungLoc = locLyThuyet(vungRaw, g.textContent || '')
-        for (const v of vungLoc) {
-          try { nho.set(v, td.theCho(v, g.textContent || '')) } catch { nho.set(v, null) }
-        }
-        h = window.setTimeout(() => {
-          kq = bocVung(g, () => vungRaw, (v) => !!nho.get(v), locLyThuyet)
-          setThe(kq.vung.map((v) => nho.get(v) ?? null))
-          setBoc(kq)
-        }, 16)
-        return
-      }
-      kq = bocVung(g, td.phatHien, (v, chu) => {
-        try { const t = td.theCho(v, chu); nho.set(v, t); return !!t } catch { nho.set(v, null); return false }
-      }, locLyThuyet)
-      setThe(kq.vung.map((v) => nho.get(v) ?? null))
-      setBoc(kq)
-    }
+    const boc = () => { kq = bocVung(g, td.phatHien, (v, chu) => { try { return !!td.theCho(v, chu) } catch { return false } }, locLyThuyet); setBoc(kq) }
     // 27/10 MƯỢT (đo scripts/do-muot-hs.mjs): dò + bọc chữ đề (5 ms máy mạnh, 20–40 ms ở CPU ×6; lần đầu phiên tới 100–300 ms) chạy NGAY SAU lần vẽ
-    // đầu của câu — câu hiện ngay khi bấm «Tiếp tục» / «Bắt đầu», chữ tô tím hiện ở khung kế tiếp (máy yếu tách 60 ms khỏi khung dựng SVG giám thị).
-    const tre = mayYeu ? 50 : 0
-    r = requestAnimationFrame(() => { h = window.setTimeout(boc, tre) })
+    // đầu của câu — câu hiện ngay khi bấm «Tiếp tục» / «Bắt đầu», chữ tô tím hiện ở khung kế tiếp (máy mạnh: chậm hơn một khung, mắt không thấy).
+    r = requestAnimationFrame(() => { h = window.setTimeout(boc, 0) })
     return () => { cancelAnimationFrame(r); clearTimeout(h); kq?.go() }
   }, [td, goc])
+  const the = useMemo<(TheGiaiNghia | null)[]>(() => (boc && td ? boc.vung.map((v) => { try { return td.theCho(v, boc.chuDe) } catch { return null } }) : []), [boc, td])
 
   // ── thẻ giải nghĩa đang mở: {i, ghim}; rê chuột (máy tính) = chưa ghim
   const [mo1, setMo1] = useState<{ i: number; ghim: boolean; phim?: boolean } | null>(null)
