@@ -5,10 +5,9 @@
 // số câu SQL, tổng ms SQLite (cùng máy SQLite như D1), câu nặng nhất. Chạy: DO_TAI=1 npx vitest run tests/do-tai-nong-3010.test.ts
 import { afterEach, beforeEach, it, vi } from 'vitest'
 import worker from '../server/src/index'
-import { taoKhoOmni, themChienDich } from './omni-3-ke-hoach-chung'
+import { themChienDich } from './omni-3-ke-hoach-chung'
+import { napKhoLon as napKhoLonChung } from './kho-tai-lon'
 import { dongBoGoi7 } from '../server/src/goi-bai-7'
-import { SQL_BANG_HANH_TRINH } from '../server/src/hanh-trinh-hop-nhat'
-import { SQL_SAN_SANG } from '../server/src/san-sang'
 import { damBaoBangBaiDaDay, xoaDemPhamVi } from '../server/src/bai-da-day'
 import { xoaDemChienDich, xoaDemMetaCau } from '../server/src/srs2-d1'
 import { xoaDemCaBaoVe } from '../server/src/game-v2-bank'
@@ -49,48 +48,8 @@ function boDo(goc: Env['DB']) {
   return { db: db as unknown as Env['DB'], batDau: () => { ghi = [] }, ketThuc: () => { const r = ghi ?? []; ghi = null; return r } }
 }
 
-function napKhoLon() {
-  const so: Record<string, number> = { 'DH-B8': 24 }
-  for (let i = 0; i < SO_DE; i++) so[`DH-X${i}`] = CAU_MOI_DE
-  const k = taoKhoOmni(so, 3)
-  for (const q of SQL_BANG_HANH_TRINH) k.d.sql.exec(q)
-  for (const q of SQL_SAN_SANG) k.d.sql.exec(q)
-  k.d.sql.exec('CREATE TABLE IF NOT EXISTS chien_dich_em (chien_dich_id TEXT NOT NULL, sbd TEXT NOT NULL, them_luc TEXT, bot_luc TEXT, PRIMARY KEY (chien_dich_id, sbd))')
-  const sql = k.d.sql
-  sql.exec(`UPDATE hoc_sinh SET lop='12', ten_lop=NULL, mat_khau='mk'`)
-  const de = sql.prepare('INSERT OR IGNORE INTO de_kho(ma_de,ten_de,so_cau,da_xoa,cap_nhat_luc) VALUES(?,?,?,0,?)')
-  const ix = sql.prepare('INSERT OR IGNORE INTO game_v2_index(ma_de,source_version,indexed_at) VALUES(?,?,?)')
-  for (const maDe of Object.keys(so)) { de.run(maDe, maDe === 'DH-B8' ? 'Bài 8. Amine' : `Đề ${maDe}`, so[maDe]!, 'v1'); ix.run(maDe, 'v1', 'x') }
-  sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('goi_bai_7_v1','{"bat":true,"batDau":"2026-10-10"}','x')`)
-  // Lịch sử cỡ thật: SO_EM em, mỗi em SK_MOI_EM sự kiện trải 60 ngày (game 60 % · chua_loi 20 % · thi 10 % · tu_luyen 10 %).
-  const qall: string[] = []
-  for (const maDe of Object.keys(so)) qall.push(...k.qids(maDe))
-  const em = sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc,mat_khau) VALUES(?,?,'12','x','mk')")
-  const sk = sql.prepare(`INSERT INTO su_kien_hoc(khoa,sbd,qid,nguon,ma_nguon,lan,ket_qua,giay,luc,ngay_vn,ma_dang,chuyen_de,muc_do,attempt_id,assistance,visibility,purpose,raw_json,received_at)
-    VALUES(?,?,?,?,?,1,?,?,?,?,?,NULL,NULL,?,?,NULL,NULL,?,?)`)
-  const at = sql.prepare('INSERT INTO game_v2_attempt(id,sbd,session,qid,content_group,json,created_at) VALUES(?,?,?,?,?,?,?)')
-  let seed = 7
-  const rnd = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648 }
-  sql.exec('BEGIN')
-  for (let e = 1; e <= SO_EM; e++) {
-    const sbd = e <= 3 ? `S${e}` : `E${e}`
-    if (e > 3) em.run(sbd, `Em ${e}`)
-    for (let j = 0; j < SK_MOI_EM; j++) {
-      const qid = qall[Math.floor(rnd() * qall.length)]!
-      const t = NOW - Math.floor(rnd() * 60 * 86_400_000) - 86_400_000
-      const luc = new Date(t).toISOString(), ngay = new Date(t + 7 * 3_600_000).toISOString().slice(0, 10)
-      const r = rnd(), nguon = r < 0.6 ? 'game' : r < 0.8 ? 'chua_loi' : r < 0.9 ? 'thi' : 'tu_luyen'
-      const id = `a-${sbd}-${j}`
-      sk.run(`k-${sbd}-${j}`, sbd, qid, nguon, nguon === 'game' ? `ss-${sbd}-${j >> 3}` : `m-${j}`, rnd() < 0.7 ? 1 : 0, 20 + Math.floor(rnd() * 90), luc, ngay, `${qid.split('-').slice(0, 2).join('-')}.D${j % 3}`, id, 'tu_lam', JSON.stringify({ tc: 1, tt: 'x', ll: 0 }), t)
-      if (nguon === 'game') at.run(id, sbd, `ss-${sbd}-${j >> 3}`, qid, `g-${qid}`, JSON.stringify({ traLoi: 'A', at: luc }), luc)
-    }
-  }
-  sql.exec('COMMIT')
-  sql.prepare('INSERT INTO bai_da_day(id,lop,khoa_bai,ten_bai,vi_tri,ma_to_json,tick_luc) VALUES(?,?,?,?,?,?,?)')
-    .run('amine', '12 - Lớp Thường', 'B8', 'Bài 8. Amine', 8, '["DH-B8"]', '2026-10-11T11:00:00Z')
-  sql.exec('ANALYZE')
-  return { k, qall }
-}
+// Kho cỡ thật: tách sang tests/kho-tai-lon.ts (31/10) để scripts/thu-tai-50k/sinh-kho.ts dựng D1 thử tải bằng CÙNG cách nạp.
+const napKhoLon = () => napKhoLonChung({ now: NOW, soDe: SO_DE, cauMoiDe: CAU_MOI_DE, soEm: SO_EM, skMoiEm: SK_MOI_EM })
 
 const tom = (ds: Do[]) => {
   const g = new Map<string, Do>()
