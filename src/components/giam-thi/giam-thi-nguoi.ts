@@ -333,7 +333,21 @@ const dangNhuongKhung = (now: number): boolean => now < nhuongDen
 export const GT_DANG_SONG = new Set<GiamThi>()
 
 // ─────────────── BỘ MÁY LÒ XO ───────────────
-export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; xam?: boolean; mo?: boolean; trangThai?: TrangThaiGT; buoc?: number; loiVao?: HTMLElement | null }): GiamThi {
+// ĐÈN PHA ĐỘI ĐẦU (màn kiểm tra kiểu Duo, thầy 30/10: «giám thị soi đèn pha vào đáp án học sinh bấm»). CHỈ khi `den` (màn làm chặng không có).
+// Vẽ vào lớp phụ kiện (đi theo mặt khi quay / nghiêng). Bật: gắn `data-bat` lên nhóm `.gt-den` (giam-thi.css: kính chuyển vàng + quầng sáng, chỉ
+// opacity / fill của ba hình trong nhóm — không tính lại kiểu cả cây). Tia sáng là lớp HTML riêng của màn kiểm tra (kiem-tra-duo/den-soi.ts).
+/** Tâm kính đèn (toạ độ đầu, gốc = cổ) theo người: trên tóc mái, không đè kính bảo hộ / kính cận. */
+export const DEN_Y: Record<MucGT, number> = { nb: -91, th: -70, vd: -80, vdc: -66 }
+function veDen(cha: Element, y: number): void {
+  const g = tao('g', { class: 'gt-den' }, cha)
+  net(tao('path', { d: `M-44,${y + 7}Q0,${y - 3} 44,${y + 7}` }, g), 'xam2', 4.6) // dây đeo vòng qua đầu
+  R(g, -13, y - 9.5, 26, 19, 8, 'xam3', { 'stroke-width': 2.2 }).style.stroke = M('xam2') // thân đèn
+  E(g, 0, y, 14, 14, 'sao', { class: 'gt-den-sang' }) // quầng sáng (tắt: trong suốt)
+  E(g, 0, y, 6.6, 6.6, 'trang', { class: 'gt-den-kinh', 'stroke-width': 1.8 }).style.stroke = M('xam2') // mặt kính
+  E(g, -2.2, y - 2.4, 1.9, 1.9, 'trang', { opacity: 0.8 })
+}
+
+export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; xam?: boolean; mo?: boolean; trangThai?: TrangThaiGT; buoc?: number; loiVao?: HTMLElement | null; den?: boolean }): GiamThi {
   const muc = o.muc, C = NV_NGUOI[muc], id = 'gtn' + ++soId, TTV = tuThe(muc)
   const tinh = !!o.tinh
   // 27/10 (thầy: «Máy yếu bị lag»): máy yếu cũng dùng tư thế tĩnh đổi theo cảm xúc — KHÔNG chạy vòng rAF lò xo (đo CPU×6: ~120 lượt rAF/giây suốt lúc làm bài).
@@ -387,6 +401,7 @@ export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; 
   const mtr = tao('g', { 'clip-path': `url(#${id}mi)` }, mieng)
   const rang = R(mtr, -14, 0, 28, 5, 2, 'trang'), luoi = E(mtr, 0, 0, 8, 6, 'luoi')
   C.dau(P)
+  if (o.den) veDen(P.phuKien!, DEN_Y[muc])
   for (const e of mat2) P.mat!.appendChild(e.may)
   // hiệu ứng: lấp lánh quanh đầu, giọt mồ hôi
   const sao = ([[-60, -74, 1], [58, -92, 0.8], [-44, -116, 0.7], [56, -40, 0.75]] as const).map(([x, y, s]) => {

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bản vẽ màn kiểm tra kiểu Duo · 30/10</title>
+<style>
+  /* Trang xem bản vẽ (không phải mã app). Ảnh chụp bằng Chromium từ CHÍNH thành phần thật (khung scripts/chup-kiem-tra-duo-3010/), số giả minh hoạ. */
+  :root { color-scheme: light dark; --nen: #f6f6fc; --mat: #fff; --chu: #1b1938; --phu: #5a587d; --vien: #e2e2f0; --nhan: #767eff; }
+  @media (prefers-color-scheme: dark) { :root { --nen: #1a1a29; --mat: #262738; --chu: #f1f0ff; --phu: #acaece; --vien: #414157; --nhan: #a8adff; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--nen); color: var(--chu); font: 16px/1.5 -apple-system, 'Segoe UI', Roboto, 'Noto Sans', sans-serif; }
+  header { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 12px 16px; background: var(--mat); border-bottom: 1px solid var(--vien); }
+  header h1 { margin: 0; font-size: 18px; }
+  header p { margin: 0; color: var(--phu); font-size: 14px; }
+  .nut { display: inline-flex; gap: 6px; }
+  .nut button { min-height: 44px; padding: 0 14px; border: 1px solid var(--vien); border-radius: 12px; background: var(--mat); color: var(--chu); font: inherit; cursor: pointer; }
+  .nut button[aria-pressed=true] { border-color: var(--nhan); color: var(--nhan); font-weight: 700; }
+  main { padding: 16px; display: grid; gap: 28px; max-width: 1600px; margin: 0 auto; }
+  section h2 { margin: 0 0 4px; font-size: 17px; }
+  section > p { margin: 0 0 12px; color: var(--phu); font-size: 14px; }
+  .hang { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+  figure { margin: 0; }
+  figure img { display: block; max-width: 100%; height: auto; border: 1px solid var(--vien); border-radius: 12px; }
+  figcaption { margin-top: 4px; font-size: 13px; color: var(--phu); }
+  .doc img { width: 260px; } .ngang img { width: 520px; } .may img { width: 720px; } .khung img { width: 220px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Màn kiểm tra kiểu Duo · chữ mảnh · giám thị · đèn pha</h1>
+  <p>Đặc tả: docs/dac-ta-kiem-tra-duo-3010.md · thầy tự duyệt 30/10 22:45 · ảnh Chromium thật, số giả minh hoạ</p>
+  <div class="nut" role="group" aria-label="Nền">
+    <button type="button" data-sac="sang" aria-pressed="true">Nền sáng</button>
+    <button type="button" data-sac="toi" aria-pressed="false">Nền tối</button>
+  </div>
+</header>
+<main id="noi"></main>
+<script>
+  const CANH = [
+    ['b', 'Vừa chạm phương án C: giám thị bật đèn pha, tia vươn tới ô, vũng sáng nở trên ô'],
+    ['a', 'Câu ngắn, chưa chọn: giám thị bên trái, đề trong bong bóng, chữ mảnh'],
+    ['e', 'Đề dài: bong bóng chữ L ôm giám thị, chữ tràn sát mép trái dưới chân giám thị'],
+    ['c2', 'Phần II · Đúng / Sai: đèn soi nút «Sai» em vừa chạm (Cô Cốc coi Phần II)'],
+    ['c3', 'Phần III · Trả lời ngắn: đèn soi hàng ô số khi em bấm phím (Chú Tam coi Phần III)'],
+    ['d', 'Tấm «Nộp bài?»: Giáo sư Kíp thay Bi, đèn bật'],
+  ]
+  const KHO = [['doc', 'Điện thoại dọc 390×844'], ['ngang', 'Điện thoại ngang 844×390'], ['may', 'Máy tính 1440×900']]
+  const noi = document.getElementById('noi')
+  function ve(sac) {
+    let h = ''
+    for (const [c, mo] of CANH) {
+      h += `<section><h2>Cảnh ${c}</h2><p>${mo}</p><div class="hang">`
+      for (const [k, ten] of KHO) h += `<figure class="${k}"><img loading="lazy" src="${k}-${c}-${sac}.jpg" alt="${ten} · cảnh ${c}"><figcaption>${ten}</figcaption></figure>`
+      h += '</div></section>'
+    }
+    h += `<section><h2>Đèn pha theo thời gian (điện thoại dọc)</h2><p>Dừng hoạt ảnh ở 40 · 140 · 260 · 520 ms sau khi đèn bật: quầng ở kính → tia vươn → vũng sáng nở → sáng đủ.</p><div class="hang">`
+    for (const [i, t] of [[1, 40], [2, 140], [3, 260], [4, 520]]) h += `<figure class="khung"><img loading="lazy" src="den-${sac}-${i}-${t}ms.jpg" alt="Đèn pha ${t} ms"><figcaption>${t} ms</figcaption></figure>`
+    h += `<figure class="khung"><img loading="lazy" src="doc-b-may-yeu-sang.jpg" alt="Máy yếu"><figcaption>Máy yếu: bản gọn (chỉ opacity), vẫn có đèn</figcaption></figure></div></section>`
+    noi.innerHTML = h
+    for (const b of document.querySelectorAll('[data-sac]')) b.setAttribute('aria-pressed', String(b.dataset.sac === sac))
+  }
+  for (const b of document.querySelectorAll('[data-sac]')) b.addEventListener('click', () => ve(b.dataset.sac))
+  ve(matchMedia('(prefers-color-scheme: dark)').matches ? 'toi' : 'sang')
+</script>
+</body>
+</html>

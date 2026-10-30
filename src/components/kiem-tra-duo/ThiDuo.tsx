@@ -7,6 +7,9 @@ import { useEffect, useLayoutEffect, useRef, type MouseEvent, type ReactNode } f
 import { phanHoi } from '../../lib/phan-hoi'
 import { batCheDoThi } from '../../lib/am-thanh'
 import { DayKt, NhanCauKt, TamLuoiKt, TamNopKt, ThanhTrenKt, useBangKt } from './KhungKiemTra'
+// Giám thị + đèn pha (thầy 30/10, đặc tả docs/dac-ta-kiem-tra-duo-3010.md): nhập thẳng — khung này vốn là mảnh nạp lười; hình người v3 nằm ở mảnh dùng
+// chung với màn làm chặng (giam-thi-*, kho chạy-lúc). Giám thị dựng SAU khung đầu của câu (không chặn lượt vẽ câu).
+import GiamThiThi, { GiamThiNop } from './GiamThiThi'
 
 type PhanThi = 'I' | 'II' | 'III'
 const TEN_PHAN: Record<PhanThi, string> = { I: 'Trắc nghiệm', II: 'Đúng / Sai', III: 'Trả lời ngắn' }
@@ -61,7 +64,10 @@ export default function ThiDuo(p: ThiDuoProps) {
   useLayoutEffect(() => {
     for (const el of Array.from(goc.current?.querySelectorAll<HTMLElement>('.duo-kt-than [id^="cau-"]') ?? [])) {
       const khung = (el.closest('.thi-cau-boc') as HTMLElement | null) ?? el
-      khung.hidden = el.id !== `cau-${p.cauHien}`
+      const hien = el.id === `cau-${p.cauHien}`
+      khung.hidden = !hien
+      // 30/10 (xoay ngang / máy tính: đề trái · phần trả lời phải): đánh dấu khối TRẢ LỜI của câu đang xem — CSS mục 5 đặt nó sang cột phải. Chỉ thuộc tính trình bày.
+      if (hien) el.querySelector('.pa-hang, .y-hang, .bns, input')?.closest('.the-cau > div:last-child > *')?.setAttribute('data-kt-tra', '')
     }
   })
   // Đổi câu ⇒ về đầu câu (khung cuộn là lớp phủ của cổng học sinh hoặc cả trang).
@@ -97,6 +103,7 @@ export default function ThiDuo(p: ThiDuoProps) {
       {p.tren}
       <main className="duo-kt-than thi-noi-dung">
         <NhanCauKt so={p.cauHien} tong={p.tong} phu={tenNhom(p.phan[p.cauHien - 1] ?? 'I')} />
+        <GiamThiThi phan={p.phan[p.cauHien - 1] ?? 'I'} cauHien={p.cauHien} gap={p.gap} goc={goc} />
         {p.children}
       </main>
       <DayKt coTruoc={p.cauHien > 1} onTruoc={() => di(p.cauHien - 1)} ghi={cuoi ? ghiNop : undefined}>
@@ -117,7 +124,7 @@ export default function ThiDuo(p: ThiDuoProps) {
           onToiCau={(so) => { p.onMoNop(false); di(so) }}
           onLamTiep={() => { p.onMoNop(false); if (p.chuaLam.length) di(p.chuaLam[0]!); else if (p.danhDau.length) di(p.danhDau[0]!) }} nhanLamTiep="Xem lại"
           onNop={() => { if (p.camNopSom) return; p.onMoNop(false); p.onNop() }} nhanNop={p.nhanNutNop} khoaNop={p.camNopSom} canh={ghiNop}
-          hauQua="Sau khi nộp không sửa được nữa." />
+          hauQua="Sau khi nộp không sửa được nữa." hinh={<GiamThiNop />} />
       )}
     </div>
   )
