@@ -1,0 +1,37 @@
+# TẮT CLOUDFLARE TỰ PHÁT HÀNH PAGES KHI ĐẨY LÊN main (thầy 30/10 21:20: «PHẢI LÀM MỌI THỨ ĐỂ APP HS TUYỆT ĐỐI KHÔNG ĐƯỢC XẢY RA HIỆN TƯỢNG NÀY NỮA»).
+# 20:49 → 21:09 VN: tích hợp Git của Cloudflare tự dựng + phát hành Pages production cho MỖI lần đẩy lên main (5 bản / 20 phút, kể cả lần chỉ đổi workflow),
+# mỗi bản đổi sw-version ⇒ máy MỌI em tải lại cùng lúc ⇒ lệnh lên máy chủ gấp đôi, «Máy chủ đang bận», «Chưa nộp được câu», mỗi máy một kiểu.
+# Sau bước này Pages production CHỈ đổi qua workflow «Phát hành lên Cloudflare Pages» (deploy.yml, có cổng). Không in khoá; chỉ in cấu hình nguồn (không bí mật).
+name: Tắt Cloudflare tự phát hành Pages khi đẩy main
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/tat-pages-tu-dong-3010]
+    paths: ['.github/workflows/tat-pages-tu-dong-3010.yml']
+permissions:
+  contents: read
+jobs:
+  tat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Tắt tự phát hành production (giữ nguyên mọi thứ khác)
+        env:
+          TOKEN: ${{ env.CF_TOKEN_SACH }}
+          ACC: ${{ env.CF_ACC_SACH }}
+        run: |
+          API="https://api.cloudflare.com/client/v4/accounts/$ACC/pages/projects/omr-app"
+          curl -sS -H "Authorization: Bearer $TOKEN" "$API" > /tmp/truoc.json
+          echo "== trước: $(jq -c '{success, nguon: .result.source.type, cauHinh: (.result.source.config | del(.owner, .owner_id, .repo_id))}' /tmp/truoc.json)"
+          jq -e '.success and .result.source != null' /tmp/truoc.json > /dev/null || { echo "Dự án không nối Git hoặc không đọc được ⇒ không có gì để tắt."; exit 0; }
+          jq -c '{source: (.result.source | .config.production_deployments_enabled = false | .config.preview_deployment_setting = "none")}' /tmp/truoc.json > /tmp/moi.json
+          curl -sS -X PATCH -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' --data @/tmp/moi.json "$API" > /tmp/kq.json
+          echo "== kết quả: $(jq -c '{success, loi: .errors}' /tmp/kq.json)"
+          curl -sS -H "Authorization: Bearer $TOKEN" "$API" | jq -c '{sau: (.result.source.config | {production_deployments_enabled, preview_deployment_setting, deployments_enabled, production_branch})}'
+          jq -e '.success' /tmp/kq.json > /dev/null
