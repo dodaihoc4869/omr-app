@@ -43,11 +43,11 @@ it('gói = các câu lượt mở chặng thường sẽ phát, chia chặng 6 c
   const goi = await goiNgay7(k.env, 'S1', NOW) as unknown as Goi
   expect(goi.ok).toBe(true)
   expect(goi.ngay).toBe('2026-10-29')
-  expect(goi.chang.length).toBeGreaterThanOrEqual(2)
+  expect(goi.chang).toHaveLength(3) // chặng kế + hai chặng dự phòng (thầy 30/10)
   for (const c of goi.chang) { expect(c.questions.length).toBeLessThanOrEqual(6); expect(typeof c.ve).toBe('string') }
   const tatCa = goi.chang.flatMap((c) => c.questions.map((q) => q.qid))
   expect(new Set(tatCa).size).toBe(tatCa.length)
-  expect(tatCa.length).toBeLessThanOrEqual(24)
+  expect(tatCa.length).toBeLessThanOrEqual(18)
   const chu = JSON.stringify(goi)
   expect(chu).not.toContain('"correct"'); expect(chu).not.toContain('"solution"')
   // Chặng đầu y hệt lượt mở chặng thường
