@@ -124,7 +124,9 @@ async function khoaHopLe(env:Env,sbd:string,now:number,x:{suKien:Map<string,SuKi
     const q=[`SELECT 't' AS k, c.ma_ca AS m FROM ca c WHERE c.ma_ca IN (SELECT value FROM json_each(?1)) AND c.trang_thai<>'da_xoa' AND ${SQL_DA_CONG_BO('c')}`]
     if(luyen.size)q.push(`SELECT 'l', ld.id FROM luyen_de_2026 ld WHERE ld.id IN (SELECT value FROM json_each(?2)) AND ld.sbd=?3 AND ld.status='submitted'`,
       `SELECT 'l', 'de_thu:'||dt.id FROM omni_de_thu dt WHERE dt.id IN (SELECT substr(value,8) FROM json_each(?2) WHERE value LIKE 'de_thu:%') AND dt.sbd=?3 AND dt.nop_luc IS NOT NULL AND dt.nop_luc<=?4`)
-    const r=await env.DB.prepare(q.join(' UNION ALL ')).bind(JSON.stringify([...thi]),JSON.stringify([...luyen]),sbd,new Date(now).toISOString()).all<{k:string;m:string}>()
+    // Số tham số PHẢI khớp số ô `?` (D1 / SQLite báo «column index out of range» khi thừa) — không có dòng luyện ⇒ chỉ ?1.
+    const ts=luyen.size?[JSON.stringify([...thi]),JSON.stringify([...luyen]),sbd,new Date(now).toISOString()]:[JSON.stringify([...thi])]
+    const r=await env.DB.prepare(q.join(' UNION ALL ')).bind(...ts).all<{k:string;m:string}>()
     for(const y of r.results??[])ok.add(`${y.k}|${y.m}`)
   }
   const results:{khoa:string}[]=[]
