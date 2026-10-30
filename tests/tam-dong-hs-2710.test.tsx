@@ -74,9 +74,9 @@ describe('màn phủ «App đang bảo trì»', () => {
     expect(document.body.textContent).toContain('Ngày mai vào làm bình thường.')
     expect(screen.queryByRole('button')).toBeNull()
   })
-  it('ngày không bảo trì (30/10) ⇒ chữ mới, KHÔNG hứa «không mất chuỗi», không hứa giờ', () => {
-    expect(chuTamDong(Date.parse('2026-10-29T16:59:00Z'))[0]).toBe('Tối nay các em không phải làm.') // 23:59 VN 29/10 (28/10 + 29/10 thêm vào ngày bảo trì 30/10)
-    const [d1, d2] = chuTamDong(Date.parse('2026-10-29T17:00:00Z')) // 00:00 VN 30/10
+  it('ngày không bảo trì (31/10) ⇒ chữ mới, KHÔNG hứa «không mất chuỗi», không hứa giờ', () => {
+    expect(chuTamDong(Date.parse('2026-10-30T16:59:00Z'))[0]).toBe('Tối nay các em không phải làm.') // 23:59 VN 30/10 (28/10 + 29/10 thêm vào ngày bảo trì 30/10; 30/10 thêm tối 30/10)
+    const [d1, d2] = chuTamDong(Date.parse('2026-10-30T17:00:00Z')) // 00:00 VN 31/10
     expect([d1, d2]).toEqual(['Các em chưa phải làm bài lúc này.', 'App mở lại các em vào làm tiếp bình thường.'])
     expect(`${d1} ${d2}`).not.toMatch(/chuỗi|\d+ ?(giờ|phút|h)\b/)
   })
