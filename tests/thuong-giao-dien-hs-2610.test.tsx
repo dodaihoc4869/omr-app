@@ -87,7 +87,7 @@ describe('phần hiện ngay', () => {
     expect(c.querySelector('[data-k="lua"] .tp-so')?.textContent).toBe('12')
     expect(c.querySelector('[data-k="nt"] .tp-so')?.textContent).toBe('147')
     expect(screen.getByRole('button', { name: 'Mục tiêu hôm nay: 4 chặng · đã làm 3' })).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: '245 tinh thể · xem hướng dẫn' }))
+    fireEvent.click(screen.getByRole('button', { name: '245 tinh thể' }))
     fireEvent.click(await screen.findByRole('button', { name: 'Mở Cửa hàng' }))
     expect(mo).toHaveBeenCalledWith('cua-hang')
   })

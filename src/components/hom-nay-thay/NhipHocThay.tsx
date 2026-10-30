@@ -20,7 +20,7 @@
 // dùng ĐÚNG bộ màu bảng nhiệt `bai-hang-ngay.css` (lớp `gvv2-bhn-mau-o`).
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import { Activity, ChartLine, Check, ChevronRight, Clock, Layers, RefreshCw, Search, TriangleAlert, Users } from 'lucide-react'
+import { Activity, ChartLine, Check, ChevronRight, Clock, Layers, RefreshCw, Search, TriangleAlert } from 'lucide-react'
 import {
   chipTinCay, chuCham, chuDieuKien, chuLuoi, chuMotO, demTheoBac, LUAT_NHOM_NHIP, ngayNgan, TEN_LOAI_O, TEN_NHOM_NHIP, tinhNhipHoc, xepCham, xepDoiPho, xepLuoi,
   xepTheoBac, type DongNhipHoc, type KetQuaNhipHoc, type ONgay,
@@ -30,6 +30,7 @@ import ChipBac from '../bac-cham-chi/ChipBac'
 import DaiDemBac from '../bac-cham-chi/DaiDemBac'
 import { chuBacSo } from '../bac-cham-chi/bac'
 import type { EmHoSo } from '../chien-dich/HoSoLamCauEm'
+import XepHangEm, { DsHocThatDu, useHocThatLop, xepHocThat, type CotXep } from './XepHangEm'
 import '../chien-dich/bai-hang-ngay.css'
 import './hom-nay-thay.css'
 
@@ -46,7 +47,7 @@ export const MOI_DOT_MO_RONG = 50
 /** «Một trang» (bản vẽ 26/10 chiều): số lớp ở khối «Nhịp học theo lớp» · số em ở «Em cần thầy để ý» — còn lại ở tấm «Xem đủ». */
 export const SO_LOP_MOT_TRANG = 6
 export const SO_EM_DE_Y = 3
-type TamMotTrang = 'lop' | 'em' | 'bac'
+type TamMotTrang = 'lop' | 'em' | 'bac' | 'hoc-that'
 
 export type DuNhip = { ok: true; kq: KetQuaNhipHoc } | { ok: false; chu: string }
 type Kieu = 'luoi' | 'cham' | 'doi-pho' | 'bac'
@@ -292,6 +293,8 @@ export default function NhipHocThay({ du, dangTai, onThuLai, viec }: { du: DuNhi
   const [moBac, setMoBac] = useState<{ bac: number; nut: HTMLButtonElement } | null>(null)
   // «Một trang»: khối đang mở đủ trong tấm (Nhịp học theo lớp · Em cần thầy để ý · 12 bậc + Đối phó)
   const [tam, setTam] = useState<TamMotTrang | null>(null)
+  // Xếp hạng (thầy 30/10): bảng Học thật hằng tuần — chỉ bản «Một trang» cần, nạp lúc rảnh sau khi màn đã vẽ.
+  const hocThat = useHocThatLop(trong)
 
   const kq = du?.ok ? du.kq : null
   const tatCa = useMemo(() => kq?.em ?? [], [kq])
@@ -307,11 +310,20 @@ export default function NhipHocThay({ du, dangTai, onThuLai, viec }: { du: DuNhi
   const coBac = useMemo(() => !!t && t.dong.some((d) => d.bacCham), [t])
   const theoBac = useMemo(() => (t ? t.dong.filter((d) => d.bacCham).sort(xepTheoBac) : []), [t])
   const demBac = useMemo(() => (t ? demTheoBac(t.dong) : []), [t])
+  const hocThatDs = useMemo(() => (hocThat.tt === 'co' ? xepHocThat(hocThat.em, tatCa, { khoi: khoiChon, lop: lopChon }) : []), [hocThat, tatCa, khoiChon, lopChon])
 
   const onMo = useCallback((d: DongNhipHoc, nut: HTMLButtonElement) => {
     nutVua.current = nut
     setMo({ sbd: d.sbd, ten: d.hoTen, khoi: d.khoi === '10' || d.khoi === '11' || d.khoi === '12' ? d.khoi : null, lop: d.lop })
   }, [])
+  // Bấm một em ở dải xếp hạng / tấm Học thật: em có trong Nhịp học ⇒ cùng tấm Hồ sơ như dòng em; chỉ có ở bảng Học thật ⇒ mở theo tên, lớp của bảng ấy.
+  const onMoEm = useCallback((sbd: string, nut: HTMLButtonElement) => {
+    const d = tatCa.find((e) => e.sbd === sbd)
+    nutVua.current = nut
+    if (d) { setMo({ sbd, ten: d.hoTen, khoi: d.khoi === '10' || d.khoi === '11' || d.khoi === '12' ? d.khoi : null, lop: d.lop }); return }
+    const e = hocThat.tt === 'co' ? hocThat.em.find((x) => x.sbd === sbd) : undefined
+    setMo({ sbd, ten: e?.ten ?? sbd, khoi: null, lop: e?.lop ?? '' })
+  }, [tatCa, hocThat])
   const onDong = useCallback(() => {
     setMo(null)
     nutVua.current?.focus()
@@ -802,7 +814,12 @@ export default function NhipHocThay({ du, dangTai, onThuLai, viec }: { du: DuNhi
       {tabHien !== 'doi-pho' && <ChuGiai coChuaVao={coChuaVao} tu={kq.tu} homNay={kq.homNay} />}
     </div>
   )
-  const tieuDeTam = { lop: 'Nhịp học theo lớp', em: 'Em cần thầy để ý', bac: coBac ? '12 bậc · Đối phó' : 'Có dấu hiệu đối phó' } as const
+  const tieuDeTam = { lop: 'Nhịp học theo lớp', em: 'Xếp hạng học sinh', bac: coBac ? '12 bậc · Đối phó' : 'Có dấu hiệu đối phó', 'hoc-that': 'Học thật nhất' } as const
+  // «Xem đủ» ở dải xếp hạng: Lười / Chăm / Đối phó ⇒ tấm danh sách em (cột cũ có ô tìm) mở đúng thẻ; Học thật ⇒ tấm bảng Học thật.
+  const xemDuXep = (k: CotXep) => {
+    if (k === 'hoc-that') { setTam('hoc-that'); return }
+    setXep('nhom'); setTab(k); setTam('em')
+  }
   const noiDungTam =
     tam === 'lop' ? (
       <>
@@ -819,6 +836,8 @@ export default function NhipHocThay({ du, dangTai, onThuLai, viec }: { du: DuNhi
         {coBac && nutXep}
         {dsEmTab}
       </>
+    ) : tam === 'hoc-that' ? (
+      <DsHocThatDu ds={hocThatDs} onMoEm={onMoEm} />
     ) : (
       <>
         {theBacKhoi(false)}
@@ -826,7 +845,6 @@ export default function NhipHocThay({ du, dangTai, onThuLai, viec }: { du: DuNhi
       </>
     )
   const lopLuoi = t.lop.filter((l) => l.pLuoi > 0).slice(0, 2)
-  const emDau = luoi[0]
   const tomTat = [
     { k: 'cham', ten: 'Chăm', so: dem.cham },
     { k: 'chua-deu', ten: 'Chưa đều', so: dem.chuaDeu },
@@ -861,6 +879,8 @@ export default function NhipHocThay({ du, dangTai, onThuLai, viec }: { du: DuNhi
           </div>
           {nhtODs}
         </div>
+
+        <XepHangEm luoi={luoi} cham={cham} doiPho={doiPho} hocThat={hocThat} hocThatDs={hocThatDs} hep={hep} tenLoc={tenLoc} onMoEm={onMoEm} onXemDu={xemDuXep} />
 
         {viec}
 
@@ -905,25 +925,6 @@ export default function NhipHocThay({ du, dangTai, onThuLai, viec }: { du: DuNhi
               </button>
             </section>
           )}
-          <section className="gvv2-the mt-de-y" data-kieu="luoi" aria-labelledby="mt-de-y-tieu">
-            <div className="mt-the-dau">
-              <h3 id="mt-de-y-tieu">Em cần thầy để ý</h3>
-              <span className="mt-chip gvv2-so">Lười · {luoi.length}</span>
-            </div>
-            {luoi.length === 0 ? (
-              <p className="nht-trong">Không em nào ở nhóm Lười{tenLoc}.</p>
-            ) : (
-              <ul className="nht-em-ds">
-                {luoi.slice(0, SO_EM_DE_Y).map((d) => (
-                  <DongEm key={d.sbd} d={d} kieu="luoi" onMo={onMo} />
-                ))}
-              </ul>
-            )}
-            <button type="button" className="gvv2-nut-chu tt-nhan mt-xem" aria-haspopup="dialog" onClick={moTam('em')}>
-              {luoi.length > SO_EM_DE_Y ? `Xem đủ ${luoi.length} em` : 'Xem các nhóm em'}
-              <ChevronRight size={16} aria-hidden="true" />
-            </button>
-          </section>
         </div>
 
         <div className="gvv2-the mt-mo" role="group" aria-label="Xem thêm">
@@ -934,18 +935,6 @@ export default function NhipHocThay({ du, dangTai, onThuLai, viec }: { du: DuNhi
             <span className="mt-mo-chu">
               <b>Nhịp học theo lớp</b>
               <small className="gvv2-so">{lopLuoi.length ? `Lười nhiều nhất: ${lopLuoi.map((l) => `${l.tenLop || 'Chưa xếp lớp'} ${l.pLuoi}%`).join('\u00a0· ')}` : `${t.lop.length} lớp · ${n} ngày đã qua`}</small>
-            </span>
-            <ChevronRight size={18} aria-hidden="true" className="mt-mui" />
-          </button>
-          <button type="button" className="mt-mo-dong tt-nhan" aria-haspopup="dialog" onClick={moTam('em')}>
-            <span className="mt-o" data-mau="sai" aria-hidden="true">
-              <Users size={18} />
-            </span>
-            <span className="mt-mo-chu">
-              <b>
-                Em cần thầy để ý · <span className="gvv2-so">{luoi.length}</span>
-              </b>
-              <small>{emDau ? `${emDau.hoTen} · ${chuLuoi(emDau).chinh}` : `Không em nào ở nhóm Lười${tenLoc}.`}</small>
             </span>
             <ChevronRight size={18} aria-hidden="true" className="mt-mui" />
           </button>

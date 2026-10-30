@@ -8,7 +8,7 @@ import { goi7Gia } from './goi-bai-7' // LÀN BÀI MỚI 7 NGÀY 12/10
 import { LA_TTC, LOP_TTC } from './thay-tu-chua' // LÀN THẦY TỰ CHỮA 12/10
 import { traLoiChuaBai } from './chua-bai' // LÀN CHỮA BÀI 12/10B
 import { traLoiHt2 } from './hanh-trinh-2-muc' // LÀN HÀNH TRÌNH 12/10B
-import { baiHangNgayTuNhip, hoSoTuNhip, laCanhNhipHoc, nhipHocGia, tenEmNhip } from './nhip-hoc' // LÀN HÔM NAY 12/10B
+import { baiHangNgayTuNhip, danhGiaLopGia, hoSoTuNhip, laCanhNhipHoc, nhipHocGia, tenEmNhip } from './nhip-hoc' // LÀN HÔM NAY 12/10B
 import { traLoiDd12c } from './diem-danh-1210c' // LÀN ĐIỂM DANH 12/10C
 
 const HT = [
@@ -78,6 +78,7 @@ export async function goiLenh(duong: string, body: unknown, _a?: string, _b?: st
   // ---------------------------------------------------------------- LÀN HÔM NAY 12/10B (gia/nhip-hoc.ts): Hôm nay › Nhịp học (262 em × 12 ngày)
   // + bảng từng ngày + tấm hồ sơ CÙNG bộ em; ba lệnh sau chỉ đổi khi cảnh có `&nh=…` (cảnh của làn khác giữ dữ liệu của làn ấy).
   if (duong === '/gv/nhip-hoc') return nhipHocGia()
+  if (duong === '/gv/danh-gia/lop') return danhGiaLopGia() // XẾP HẠNG 30/10: cột «Học thật nhất»
   if (laCanhNhipHoc()) {
     if (duong === '/gv/bai-hang-ngay') return { ok: true as const, du: baiHangNgayTuNhip() as unknown as Record<string, unknown> }
     if (duong === '/gv/ho-so-thai-do') return { ok: true as const, du: hoSoTuNhip(String(b.sbd)) as unknown as Record<string, unknown> }
