@@ -389,28 +389,41 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
       const goi = layChangGoi(sbd, Date.now(), CAU_MOI_CHANG_GOI * 2, false)
       const temDai: Record<string, unknown> = {}
       for (const c of goi?.questions ?? []) if (typeof c.qid === 'string' && typeof c.sk === 'string') temDai[c.qid] = c.sk
+      // 30/10 (ảnh thầy: bấm «Kiểm tra» ⇒ «Câu không thuộc lượt học.»): lượt làm tươi ở đây có thể KHÔNG chứa câu đang dở — đường cũ trả lượt mở sẵn của chặng
+      // KẾ (câu khác), máy chủ bỏ bớt câu em đã làm ở máy khác… Trước đây chỉ thay mã lượt, giữ câu cũ ⇒ nộp câu cũ vào lượt mới ⇒ máy chủ từ chối. Nay đối chiếu:
+      // câu chưa làm không có trong lượt mới ⇒ thay bằng câu của lượt mới (giữ câu đã nộp, giữ số câu chặng).
       const layTuDuongCu = async () => {
         const r = await duongCu()
-        const ds = Array.isArray(r.questions) ? r.questions as Cau[] : []
+        const ds = Array.isArray(r.questions) ? (r.questions as Cau[]).filter(c => !cauHong(c)) : []
         const g7 = docTomTatGoi7(r.goi7)
-        return { id: typeof r.id === 'string' ? r.id : '', sk: Object.fromEntries(ds.map(c => [c.qid, c.sk])) as Record<string, unknown>, daLam: g7?.daLamHomNay, g7 }
+        return { id: typeof r.id === 'string' ? r.id : '', sk: Object.fromEntries(ds.map(c => [c.qid, c.sk])) as Record<string, unknown>, daLam: g7?.daLamHomNay, g7, dsMoi: ds, coQid: new Set(ds.map(c => c.qid)) }
       }
       const mo = (goi && qidsCan.length && qidsCan.every(id => temDai[id])
         ? goiHoa2('hoc-tap-mo-goi', token, { ves: goi.ves, qids: qidsCan, sk: temDai }, GIAY_CHO_MO_CHANG).then(r => {
             if (r.ok !== true || typeof r.id !== 'string') throw new Error('goi')
-            return { id: r.id, sk: (r.sk && typeof r.sk === 'object' ? r.sk : {}) as Record<string, unknown>, daLam: typeof r.daLam === 'number' ? r.daLam : undefined, g7: undefined }
+            // máy chủ bỏ bớt câu đang dở (đã làm ở máy khác…) ⇒ lấy lượt đủ câu từ đường cũ
+            if (Array.isArray(r.qids) && !qidsCan.every(x => (r.qids as unknown[]).includes(x))) throw new Error('goi-thieu')
+            return { id: r.id, sk: (r.sk && typeof r.sk === 'object' ? r.sk : {}) as Record<string, unknown>, daLam: typeof r.daLam === 'number' ? r.daLam : undefined, g7: undefined, dsMoi: [] as Cau[], coQid: new Set(qidsCan) }
           }).catch(layTuDuongCu)
         : layTuDuongCu()
-      ).then(({ id, sk, daLam, g7 }) => {
+      ).then(({ id, sk, daLam, g7, dsMoi, coQid }) => {
+        const daNop = (c: Cau) => !!dang0.ket?.[c.qid]
+        const giu = dsDang.filter(c => daNop(c) || coQid.has(c.qid))
+        const them = giu.length < dsDang.length ? dsMoi.filter(c => !giu.some(x => x.qid === c.qid)).slice(0, dsDang.length - giu.length) : []
+        const dsMoiChang = them.length || giu.length < dsDang.length ? [...giu, ...them] : null
         if (!huy && id) {
           moLucRef.current = Date.now()
           setPhien(id)
           if (g7 && !goi7) setGoi7(g7)
           if (typeof daLam === 'number' && moi.current.d0 < 0) moi.current.d0 = Math.max(0, daLam - moi.current.qids.size)
           if (moi.current.qids.size > 0 && moi.current.d0 >= 0) vaSo(moi.current.d0 + moi.current.qids.size)
-          setCau(prev => prev.map(c => typeof sk[c.qid] === 'string' ? { ...c, sk: sk[c.qid] as string } : c))
+          const vaSk = (c: Cau) => typeof sk[c.qid] === 'string' ? { ...c, sk: sk[c.qid] as string } : c
+          if (dsMoiChang) {
+            const ds = dsMoiChang.map(vaSk), dau = ds.findIndex(c => !daNop(c))
+            setCau(ds); setSoGoc(n => Math.min(n || ds.length, ds.length)); setViTri(dau >= 0 ? dau : Math.max(0, ds.length - 1))
+          } else setCau(prev => prev.map(vaSk))
         }
-        return { id, sk, qids: new Set(dsDang.map(c => c.qid)) }
+        return { id, sk, qids: new Set((dsMoiChang ?? dsDang).filter(c => coQid.has(c.qid) || daNop(c)).map(c => c.qid)) }
       })
       phienCho.current = mo
       void mo.catch(() => {})
@@ -663,6 +676,9 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     } catch (e) {
       // Bản đầy đủ không về được ⇒ bỏ kết quả TẠM (câu chưa chắc đã ghi), giữ nháp, em bấm lại (biên nhận chống trùng ⇒ không tính hai lần).
       setKet(v => { const x = v[qidNop]; if (!x?.tam) return v; if (moi.current.qids.delete(qidNop) && q.vaiGoi7 === 'tiep_can' && moi.current.tiep > 0) moi.current.tiep--; const { [qidNop]: _bo, ...con } = v; return con })
+      // Lưới an toàn (30/10, ảnh thầy «Câu không thuộc lượt học.»): mã lượt trên máy không còn chứa câu này (lượt đã thay ở máy chủ) ⇒ không bắt em bấm lại
+      // vô ích — bỏ chặng dở trên máy, mở lại chặng (câu đã nộp vẫn tính, số hôm nay giữ nguyên).
+      if (e instanceof Error && /không thuộc lượt học/.test(e.message) && !tachRoi.current.has(qidNop)) { xoaChangDangLam(sbd); setLan(n => n + 1); return }
       if (tachRoi.current.has(qidNop)) setLoi(`Câu ${cau.findIndex(c => c.qid === qidNop) + 1} chưa được lưu: ${chuCuaLoi(e, 'mất kết nối máy chủ')}. Em làm lại câu đó ở cuối chặng nhé.`) // đã sang câu khác: báo ở câu đang làm
       else { tiepCho.current = false; nutTiepRef.current?.removeAttribute('data-lun'); setLoi(chuCuaLoi(e, 'Chưa nộp được câu. Đáp án nháp vẫn được giữ.')) }
     }

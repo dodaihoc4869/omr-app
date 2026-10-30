@@ -10,7 +10,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import ManLamBaiTap from '../src/components/hoc-tap/ManLamBaiTap'
 import { goiHoa2 } from '../src/components/hoa2/api'
-import { batGoiNgay, batMoChangTruoc, docChangDangLam, ghiCauXong, layChangGoi, moChangTruoc, napGoiNgay } from '../src/components/hoc-tap/mo-chang-truoc'
+import { batGoiNgay, batMoChangTruoc, docChangDangLam, ghiCauXong, layChangGoi, luuChangDangLam, moChangTruoc, napGoiNgay } from '../src/components/hoc-tap/mo-chang-truoc'
 vi.mock('../src/components/hoa2/api', async (goc) => ({ ...await goc<typeof import('../src/components/hoa2/api')>(), goiHoa2: vi.fn() }))
 beforeEach(() => { localStorage.clear(); batMoChangTruoc(true); batGoiNgay(true) })
 afterEach(() => { cleanup(); vi.clearAllMocks(); vi.mocked(goiHoa2).mockReset(); localStorage.clear(); batMoChangTruoc(false); batGoiNgay(false) })
@@ -168,6 +168,44 @@ describe('màn làm bài mở chặng từ gói', () => {
     const nutKet = await screen.findByRole('button', { name: /Kết thúc chặng/ })
     fireEvent.click(nutKet)
     expect(docChangDangLam('s1')).toBeNull()
+  })
+  // 30/10 (ảnh thầy: bấm «Kiểm tra» ⇒ «Câu không thuộc lượt học.»): mở lại chặng dở đã quá 35 phút ⇒ làm tươi lượt; lượt mới (chặng mở sẵn) KHÔNG chứa câu đang dở
+  // ⇒ câu chưa làm thay bằng câu của lượt mới, nộp đúng mã lượt mới; câu đã nộp giữ nguyên.
+  it('mở lại chặng dở quá 35 phút mà lượt làm tươi không chứa câu đang dở ⇒ thay câu chưa làm bằng câu của lượt mới, không bao giờ nộp câu lạ vào lượt (30/10)', async () => {
+    const TN4 = { ...TN, qid: 'tn4', text: 'Câu mới bốn?', sk: 'tem-4' }, TN5 = { ...TN, qid: 'tn5', text: 'Câu mới năm?', sk: 'tem-5' }
+    luuChangDangLam('s1', {
+      moLuc: Date.now() - 40 * 60_000, phien: 'phien-cu', cau: [TN, TN2, TN3] as never, soGoc: 3, viTri: 1,
+      ket: { tn1: { correct: true, answer: 'B' } }, tra: '', chang: 1, goi7: undefined, dem: { daLam: 4, muc: 24 },
+      moi: { qids: ['tn1'], tiep: 0, d0: 3, ngay: '' }, tuLam: false, goiY: false, moLoiGiai: false, msCau: {}, dhMs: 0, dhT: { v: 0, a: 0, l: 0, n: 0, lang: 0 },
+      daXinLamLai: false, luotChang: 0, daHoiThay: '', hoTroCham: '',
+    })
+    vi.mocked(goiHoa2).mockImplementation(async (ten) => {
+      if (ten === 'hoc-tap-start') return { ok: true, id: 'p-moi', questions: [TN4, TN5] }
+      if (ten === 'answer') return { ok: true, correct: true, answer: 'B' }
+      return { ok: true }
+    })
+    render(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} homNay={{ ...HN3, daLam: 4 }} />)
+    await screen.findByText(TN4.text)
+    expect(screen.queryByText(TN2.text)).toBeNull()
+    expect(screen.getByText(/Câu 2\/3/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('radio', { name: /\(CH3\)2NH/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Nộp câu · đã chọn B' }))
+    await screen.findByRole('button', { name: /Câu tiếp theo/ })
+    const nop = lenh('answer').map((c) => c[2] as { session: string; qid: string })
+    expect(nop).toEqual([expect.objectContaining({ session: 'p-moi', qid: 'tn4' })])
+  })
+  it('máy chủ vẫn báo «Câu không thuộc lượt học.» ⇒ tự mở lại chặng, không bắt em bấm lại vô ích (30/10)', async () => {
+    vi.mocked(goiHoa2).mockImplementation(async (ten) => {
+      if (ten === 'hoc-tap-start') return { ok: true, id: lenh('hoc-tap-start').length > 1 ? 'p2' : 'p1', questions: lenh('hoc-tap-start').length > 1 ? [TN2] : [TN] }
+      if (ten === 'answer') return { ok: false, error: 'Câu không thuộc lượt học.' }
+      return { ok: true }
+    })
+    render(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} />)
+    await screen.findByText(TN.text)
+    fireEvent.click(screen.getByRole('radio', { name: /\(CH3\)2NH/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Nộp câu · đã chọn B' }))
+    await screen.findByText(TN2.text)
+    expect(screen.queryByText(/không thuộc lượt học/)).toBeNull()
   })
   it('làm vài câu trong chặng (kể cả khi gói thiếu goi7) rồi thoát ra Lộ trình ⇒ đồng bộ tức thì số câu đã làm của chặng thông qua onVa và bản lưu chặng dở', async () => {
     await napGoiNgay('tk', vi.fn(async () => ({ ...goiMau(), goi7: undefined })))
