@@ -61,7 +61,7 @@ GIA = await vite.ssrLoadModule('/scripts/do-app-hs/may-chu-gia.ts')
 
 const timChromium = () => process.env.PW_CHROMIUM || ['/opt/pw-browsers/chromium-1243/chrome-linux64/chrome'].find((p) => existsSync(p))
 const trinh = await chromium.launch({ headless: true, executablePath: timChromium(), args: ['--ignore-certificate-errors', '--no-proxy-server', `--host-resolver-rules=MAP * 127.0.0.1:${CONG}, EXCLUDE 127.0.0.1`] })
-const KHO = [['dt', 360, 740], ['mtb', 768, 1024], ['mt', 1280, 800]]
+const KHO = [['hep', 320, 640], ['dt', 360, 740], ['ngang', 740, 360], ['mtb', 768, 1024], ['mt', 1280, 800]]
 const SAC = ['sang', 'toi']
 const BIEU = [['lua', 'lua'], ['nt', 'nguyen-tu'], ['tt', 'tinh-the']]
 const loi = []
@@ -83,6 +83,20 @@ try {
       await o.click()
       await p.locator('.tp-hd-tam').waitFor({ timeout: 10000 })
       await p.waitForTimeout(500)
+      // TRÀN CHỮ (thầy 30/10 «Chú ý tràn chữ trên app hs»): thẻ không vượt khung nhìn, không phần tử con nào bị cắt ngang.
+      const tran = await p.evaluate(() => {
+        const t = document.querySelector('.tp-hd-tam'), r = t.getBoundingClientRect(), loi = []
+        if (r.right > innerWidth + 0.5 || r.left < -0.5) loi.push(`thẻ ${Math.round(r.left)}–${Math.round(r.right)} / ${innerWidth}`)
+        if (t.scrollWidth > t.clientWidth + 1) loi.push(`thẻ cuộn ngang ${t.scrollWidth}>${t.clientWidth}`)
+        for (const e of t.querySelectorAll('h2,h3,p,li,span,b,button')) {
+          if (e.closest('svg')) continue
+          const c = e.getBoundingClientRect()
+          if (e.scrollWidth > e.clientWidth + 1 && getComputedStyle(e).overflowX !== 'visible') loi.push(`cắt: ${e.tagName} «${e.textContent.slice(0, 30)}»`)
+          if (c.right > r.right + 0.5) loi.push(`lòi phải: ${e.tagName} «${e.textContent.slice(0, 30)}»`)
+        }
+        return loi
+      })
+      if (tran.length) loi.push(`${ten}-${kho}-${sac}: ${tran.join(' · ')}`)
       const anh = join(RA, `${ten}-${kho}-${sac}.jpg`)
       await p.screenshot({ path: anh, type: 'jpeg', quality: 72 })
       console.log('chụp', anh)

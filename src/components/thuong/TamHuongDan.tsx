@@ -1,5 +1,5 @@
 // TẤM HƯỚNG DẪN BIỂU TƯỢNG (thầy 30/10 «hs khi bấm vào các biểu tượng tinh thể nguyên tử lửa đều có hướng dẫn dễ hiểu»): chạm lửa / nguyên tử / tinh thể
-// (hàng số trong menu Lộ trình, ô nguyên tử trên màn làm chặng) ⇒ tấm đáy: biểu tượng to + số của em · «là gì» một câu · cách có (đúng số của luật) ·
+// (hàng số trong menu Lộ trình, ô nguyên tử trên màn làm chặng) ⇒ thẻ trượt ra từ mép trái, ghim góc trên trái (thầy duyệt 30/10): biểu tượng to + số của em · «là gì» một câu · cách có (đúng số của luật) ·
 // dùng để làm gì · nút sang màn chi tiết («Đã hiểu» đóng). Số luật lấy CÙNG nguồn màn chi tiết (LUAT_CHUOI, thuong-api, bảng «Cách kiếm tinh thể»,
 // exp-cau-hinh.ts phía máy chủ) — không bịa. Công tắc tắt (giải tuần, Kim cương, thăng hoa) ⇒ dòng đó ẩn. Đi trong mảnh nạp lười ManThuong (CSS ở
 // trong-thuong.css) ⇒ không thêm byte mở app, không thêm tệp precache. Chạm nền mờ / Esc = đóng; mở ⇒ con trỏ vào nút chính, đóng ⇒ trả về chỗ cũ.
@@ -129,7 +129,6 @@ export function TamHuongDan({ loai, tq, soBai, onMo, onDong }: PropsTamHuongDan)
   return <div className="tp-hd" data-k={loai}>
     <div className="tp-hd-nen" aria-hidden="true" onClick={onDong} />
     <section className="tp-hd-tam" role="dialog" aria-modal="true" aria-labelledby={`${id}-t`} aria-describedby={`${id}-l`} onKeyDown={giuTab}>
-      <span className="tp-hd-keo" aria-hidden="true" />
       <div className="tp-hd-dau">
         <span className="tp-hd-hinh" aria-hidden="true">{Ic}</span>
         <div><h2 id={`${id}-t`}>{nd.tieu}</h2><p id={`${id}-l`}>{nd.la}</p></div>

@@ -601,64 +601,62 @@
 [data-trong='hs'] .tp-3o > div { display: grid; grid-row: span 2; grid-template-rows: subgrid; }
 [data-trong='hs'] .tp-3o p { display: grid; place-items: center; line-height: 1.25; }
 
-/* ── TẤM HƯỚNG DẪN BIỂU TƯỢNG (thầy 30/10, TamHuongDan.tsx): chạm lửa / nguyên tử / tinh thể ⇒ tấm đáy giải thích. Cùng dáng tấm giữ chân (trong-giu-chan.css):
-   nền mờ, tấm trượt lên có vạch kéo; máy tính ⇒ hộp giữa màn. Chỉ biến màu sẵn có; hoạt ảnh chỉ transform / opacity, giảm chuyển động / máy yếu ⇒ tắt. */
-[data-trong='hs'] .tp-hd { position: fixed; inset: 0; z-index: 85; display: flex; align-items: flex-end; justify-content: center; font-family: var(--tp-f); }
+/* ── THẺ HƯỚNG DẪN BIỂU TƯỢNG (thầy 30/10, TamHuongDan.tsx): chạm lửa / nguyên tử / tinh thể ⇒ thẻ giải thích. Thầy duyệt + đổi: «chảy ra từ mép trái và
+   cố định ở trên mép trái» ⇒ thẻ dán mép trái, ghim trên cùng, trượt ngang ra; nền mờ phía sau (chạm = đóng). Thẻ dài ⇒ nội dung cuộn, hai nút ghim đáy thẻ.
+   Chữ không tràn: cột số không xuống dòng, cột chữ co + xuống dòng (overflow-wrap). Chỉ biến màu sẵn có; hoạt ảnh chỉ transform / opacity, giảm chuyển động /
+   máy yếu ⇒ tắt. */
+[data-trong='hs'] .tp-hd { position: fixed; inset: 0; z-index: 85; display: flex; align-items: flex-start; justify-content: flex-start; font-family: var(--tp-f); }
 [data-trong='hs'] .tp-hd-nen { position: absolute; inset: 0; background: color-mix(in srgb, var(--tr-chu) 45%, transparent); animation: tp-hd-hien 200ms ease-out both; }
 @media (prefers-color-scheme: dark) { [data-trong='hs'] .tp-hd-nen { background: color-mix(in srgb, var(--tr-trang) 72%, transparent); } }
 [data-trong='hs'] .tp-hd-tam {
-  position: relative; width: min(560px, 100%); max-height: 92dvh; overflow-y: auto; overscroll-behavior: contain;
-  display: flex; flex-direction: column; gap: 10px; padding: 10px 20px calc(18px + env(safe-area-inset-bottom));
-  border-radius: 24px 24px 0 0; background: var(--tr-mat); color: var(--tr-chu); box-shadow: var(--tr-bong-3);
-  animation: tp-hd-truot 280ms cubic-bezier(.2, .9, .3, 1) both;
+  position: relative; box-sizing: border-box; width: min(440px, calc(100vw - 20px)); max-height: calc(100dvh - 16px - env(safe-area-inset-top));
+  margin-top: calc(8px + env(safe-area-inset-top)); overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain;
+  display: flex; flex-direction: column; gap: 10px; padding: 16px 18px 16px calc(18px + env(safe-area-inset-left));
+  border-radius: 0 22px 22px 0; background: var(--tr-mat); color: var(--tr-chu); box-shadow: var(--tr-bong-3);
+  animation: tp-hd-chay 300ms cubic-bezier(.2, .9, .3, 1) both;
 }
-[data-trong='hs'] .tp-hd-keo { align-self: center; width: 44px; height: 5px; margin-bottom: 2px; border-radius: 999px; background: var(--tr-vien-2); }
-[data-trong='hs'] .tp-hd-dau { display: flex; align-items: center; gap: 14px; }
-[data-trong='hs'] .tp-hd-hinh { display: grid; place-items: center; width: 64px; height: 64px; flex: none; border-radius: 20px; background: var(--tr-dung-nhat); font-size: 40px; }
+[data-trong='hs'] .tp-hd-dau { display: flex; align-items: center; gap: 12px; min-width: 0; }
+[data-trong='hs'] .tp-hd-dau > div { min-width: 0; }
+[data-trong='hs'] .tp-hd-hinh { display: grid; place-items: center; width: 56px; height: 56px; flex: none; border-radius: 18px; background: var(--tr-dung-nhat); font-size: 34px; }
 [data-trong='hs'] .tp-hd[data-k='lua'] .tp-hd-hinh { background: var(--tr-chu-y-nhat); }
 [data-trong='hs'] .tp-hd[data-k='tt'] .tp-hd-hinh { background: var(--tp-tt-nhat); }
-[data-trong='hs'] .tp-hd-dau h2 { margin: 0; font-size: clamp(21px, 5.6vw, 25px); font-weight: 900; line-height: 1.2; }
-[data-trong='hs'] .tp-hd-dau p { margin: 4px 0 0; color: var(--tr-chu-2); font-size: 15px; font-weight: 600; line-height: 1.45; }
-[data-trong='hs'] .tp-hd-nay { margin: 0; padding: 9px 12px; border-radius: 12px; background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); font-size: 15px; font-weight: 800; line-height: 1.4; }
-[data-trong='hs'] .tp-hd-tam h3 { margin: 6px 0 0; color: var(--tr-chu-3); font-size: 13px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+[data-trong='hs'] .tp-hd-dau h2 { margin: 0; font-size: clamp(19px, 5.4vw, 23px); font-weight: 900; line-height: 1.2; overflow-wrap: anywhere; }
+[data-trong='hs'] .tp-hd-dau p { margin: 3px 0 0; color: var(--tr-chu-2); font-size: 14.5px; font-weight: 600; line-height: 1.45; overflow-wrap: anywhere; }
+[data-trong='hs'] .tp-hd-nay { margin: 0; padding: 9px 12px; border-radius: 12px; background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); font-size: 14.5px; font-weight: 800; line-height: 1.4; overflow-wrap: anywhere; }
+[data-trong='hs'] .tp-hd-tam h3 { margin: 4px 0 0; color: var(--tr-chu-3); font-size: 12.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
 [data-trong='hs'] .tp-hd-ds, [data-trong='hs'] .tp-hd-dung { margin: 0; padding: 0; list-style: none; }
-[data-trong='hs'] .tp-hd-ds li { display: flex; align-items: center; gap: 10px; min-height: 36px; padding: 5px 0; border-top: 1px solid var(--tr-vien); font-size: 15px; line-height: 1.35; }
+[data-trong='hs'] .tp-hd-ds li { display: flex; align-items: center; gap: 10px; min-height: 36px; padding: 5px 0; border-top: 1px solid var(--tr-vien); font-size: 14.5px; line-height: 1.35; }
 [data-trong='hs'] .tp-hd-ds li:first-child { border-top: 0; }
-[data-trong='hs'] .tp-hd-ds li span { flex: 1; min-width: 0; color: var(--tr-chu); font-weight: 600; }
-[data-trong='hs'] .tp-hd-ds li b { flex: none; color: var(--tr-dung-chu); font-weight: 900; white-space: nowrap; }
+[data-trong='hs'] .tp-hd-ds li span { flex: 1; min-width: 0; color: var(--tr-chu); font-weight: 600; overflow-wrap: anywhere; }
+[data-trong='hs'] .tp-hd-ds li b { flex: none; max-width: 48%; color: var(--tr-dung-chu); font-weight: 900; text-align: right; }
 [data-trong='hs'] .tp-hd[data-k='tt'] .tp-hd-ds li b { color: var(--tp-tt-chu); }
 [data-trong='hs'] .tp-hd[data-k='lua'] .tp-hd-ds li b { color: var(--tr-chu-y-chu); }
 [data-trong='hs'] .tp-hd-dung { display: flex; flex-direction: column; gap: 6px; }
-[data-trong='hs'] .tp-hd-dung li { position: relative; padding-left: 16px; color: var(--tr-chu-2); font-size: 15px; font-weight: 600; line-height: 1.45; }
+[data-trong='hs'] .tp-hd-dung li { position: relative; padding-left: 16px; color: var(--tr-chu-2); font-size: 14.5px; font-weight: 600; line-height: 1.45; overflow-wrap: anywhere; }
 [data-trong='hs'] .tp-hd-dung li::before { content: ''; position: absolute; left: 3px; top: .62em; width: 6px; height: 6px; border-radius: 50%; background: var(--tr-vien-2); }
-[data-trong='hs'] .tp-hd-luu { margin: 0; padding: 9px 12px; border-radius: 12px; background: var(--tr-sai-nhat); color: var(--tr-sai-chu); font-size: 14px; font-weight: 700; line-height: 1.45; }
-/* nút ghim đáy tấm (tấm dài trên điện thoại vẫn thấy nút ngay, nội dung cuộn dưới nút) */
+[data-trong='hs'] .tp-hd-luu { margin: 0; padding: 9px 12px; border-radius: 12px; background: var(--tr-sai-nhat); color: var(--tr-sai-chu); font-size: 14px; font-weight: 700; line-height: 1.45; overflow-wrap: anywhere; }
+/* nút ghim đáy thẻ (thẻ dài trên điện thoại vẫn thấy nút ngay, nội dung cuộn dưới nút) */
 [data-trong='hs'] .tp-hd-nut {
-  position: sticky; bottom: calc(-18px - env(safe-area-inset-bottom)); z-index: 1; display: flex; flex-direction: column; gap: 2px;
-  margin: 4px -20px calc(-18px - env(safe-area-inset-bottom)); padding: 10px 20px calc(14px + env(safe-area-inset-bottom));
+  position: sticky; bottom: -16px; z-index: 1; display: flex; flex-direction: column; gap: 2px;
+  margin: 4px -18px -16px calc(-18px - env(safe-area-inset-left)); padding: 10px 18px 12px calc(18px + env(safe-area-inset-left));
   background: var(--tr-mat); box-shadow: 0 -1px 0 var(--tr-vien);
 }
 [data-trong='hs'] .tp-hd[data-k='tt'] .tp-hd-nut .tp-nut-lon:first-child { background: var(--tp-tt-dam); color: var(--tp-tren); }
+[data-trong='hs'] .tp-hd .tp-nut-lon { min-height: 50px; padding: 0 14px; font-size: 16px; white-space: normal; text-align: center; }
 [data-trong='hs'] .tp-hd-hieu {
-  min-height: 48px; padding: 0 16px; border: 0; border-radius: 14px; background: transparent; color: var(--tr-tin-chu);
-  font: 800 16px/1.2 var(--tp-f); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; touch-action: manipulation;
+  min-height: 46px; padding: 0 16px; border: 0; border-radius: 14px; background: transparent; color: var(--tr-tin-chu);
+  font: 800 15.5px/1.2 var(--tp-f); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; touch-action: manipulation;
 }
 [data-trong='hs'] .tp-hd-hieu:hover { background: var(--tr-tin-nhat); }
 [data-trong='hs'] .tp-hd :is(.tp-nut-lon, .tp-hd-hieu):focus-visible { outline: 3px solid var(--tr-tin); outline-offset: 2px; }
+/* khung thấp (xoay ngang): biểu tượng nhỏ lại, hai nút cùng hàng */
 @media (max-height: 560px) {
-  [data-trong='hs'] .tp-hd-tam { gap: 6px; padding-top: 6px; }
-  [data-trong='hs'] .tp-hd-hinh { width: 48px; height: 48px; font-size: 30px; border-radius: 16px; }
+  [data-trong='hs'] .tp-hd-tam { gap: 6px; padding-top: 10px; }
+  [data-trong='hs'] .tp-hd-hinh { width: 44px; height: 44px; font-size: 26px; border-radius: 14px; }
   [data-trong='hs'] .tp-hd-nut { flex-direction: row-reverse; }
   [data-trong='hs'] .tp-hd-nut > * { flex: 1; }
 }
-@media (min-width: 900px) and (min-height: 600px) {
-  [data-trong='hs'] .tp-hd { align-items: center; }
-  [data-trong='hs'] .tp-hd-tam { border-radius: 24px; padding: 20px 28px 22px; animation-name: tp-hd-noi; }
-  [data-trong='hs'] .tp-hd-nut { bottom: -22px; margin: 4px -28px -22px; padding: 10px 28px 18px; border-radius: 0 0 24px 24px; }
-  [data-trong='hs'] .tp-hd-keo { display: none; }
-}
 @keyframes tp-hd-hien { from { opacity: 0; } }
-@keyframes tp-hd-truot { from { transform: translateY(100%); } }
-@keyframes tp-hd-noi { from { opacity: 0; transform: translateY(24px) scale(.97); } }
+@keyframes tp-hd-chay { from { transform: translateX(-100%); } }
 @media (prefers-reduced-motion: reduce) { [data-trong='hs'] :is(.tp-hd-nen, .tp-hd-tam) { animation: none !important; } }
 [data-trong].may-yeu :is(.tp-hd-nen, .tp-hd-tam) { animation: none; }
