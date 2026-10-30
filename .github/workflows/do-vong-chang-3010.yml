@@ -28,11 +28,9 @@ jobs:
         run: |
           q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c ".[0].results[]" || echo "(lỗi)"; }
           N=$(TZ=Asia/Ho_Chi_Minh date +%F); echo "Ngày VN $N · giờ $(TZ=Asia/Ho_Chi_Minh date +%H:%M)"
-          q "sổ học hôm nay (theo giờ): qid · nguồn · mục đích · kết quả · ll · giờ VN" \
-            "SELECT qid, nguon, purpose, ket_qua, COALESCE(json_extract(raw_json,'\$.ll'),0) ll, substr(time(luc,'+7 hours'),1,5) gio, substr(ma_nguon,1,24) mn FROM su_kien_hoc WHERE sbd='$S' AND ngay_vn='$N' ORDER BY luc"
-          q "gặp câu học cách giải hôm nay" "SELECT qid, kieu, substr(time(luc,'+7 hours'),1,5) gio FROM goi_bai_7_gap WHERE sbd='$S' AND date(luc,'+7 hours')='$N' ORDER BY luc"
-          q "phiên hôm nay: đuôi mã · giờ · gói · số câu · số lượt" \
-            "SELECT substr(id,-6) id, substr(time(created_at,'+7 hours'),1,8) gio, COALESCE(json_extract(json,'\$.goiNgay'),0) goi, COALESCE(json_extract(json,'\$.hocTap'),0) ht, json_array_length(json,'\$.questions') cau, (SELECT COUNT(*) FROM game_v2_attempt a WHERE a.session=s.id) luot, (SELECT group_concat(json_extract(value,'\$.qid')||CASE WHEN COALESCE(json_extract(value,'\$.lamLaiCuoi'),0)=1 THEN '*' ELSE '' END, ',') FROM json_each(s.json,'\$.questions')) ds FROM game_v2_session s WHERE sbd='$S' AND created_at >= datetime('$N','-7 hours') ORDER BY created_at"
-          q "lượt trả lời hôm nay: qid · đuôi phiên · giờ · đúng · lướt" \
-            "SELECT a.qid, substr(a.session,-6) ph, substr(time(a.created_at,'+7 hours'),1,8) gio, json_extract(a.json,'\$.correct') dung, COALESCE(json_extract(a.json,'\$.omni.luot'),0) luot FROM game_v2_attempt a WHERE a.sbd='$S' AND a.created_at >= datetime('$N','-7 hours') ORDER BY a.created_at"
-          q "mức hôm nay" "SELECT muc FROM goi_bai_7_muc_ngay WHERE sbd='$S' AND ngay='$N'"
+          q "phiên 2 ngày qua có câu mang dấu làm lại cuối chặng: đuôi phiên · giờ · gói · câu có dấu" \
+            "SELECT substr(s.id,-6) id, substr(s.created_at,6,14) luc, COALESCE(json_extract(s.json,'\$.goiNgay'),0) goi, group_concat(json_extract(q.value,'\$.qid'), ',') cau_ll FROM game_v2_session s, json_each(s.json,'\$.questions') q WHERE s.sbd='$S' AND s.created_at >= datetime('$N','-31 hours') AND COALESCE(json_extract(q.value,'\$.lamLaiCuoi'),0)=1 GROUP BY s.id ORDER BY s.created_at"
+          q "câu I-26 / I-42 / I-45 trong các phiên: đuôi phiên · giờ · gói · lamLaiCuoi · lamLaiCua" \
+            "SELECT substr(s.id,-6) id, substr(s.created_at,6,14) luc, COALESCE(json_extract(s.json,'\$.goiNgay'),0) goi, json_extract(q.value,'\$.qid') qid, json_extract(q.value,'\$.lamLaiCuoi') llc, json_extract(q.value,'\$.lamLaiCua') llcua FROM game_v2_session s, json_each(s.json,'\$.questions') q WHERE s.sbd='$S' AND s.created_at >= datetime('$N','-31 hours') AND json_extract(q.value,'\$.qid') IN ('DH-12-C3-B9-P1-I-26','DH-12-C3-B9-P1-I-42','DH-12-C3-B9-P1-I-45') ORDER BY s.created_at"
+          q "toàn trung tâm hôm nay: dòng sổ mang ll=1 · trong đó câu KHÔNG phải câu làm lại của phiên ghi (dấu chép nhầm)" \
+            "SELECT COUNT(*) ll, SUM(NOT EXISTS(SELECT 1 FROM game_v2_session s, json_each(s.json,'\$.questions') q WHERE s.id=k.ma_nguon AND json_extract(q.value,'\$.qid')=k.qid AND json_extract(q.value,'\$.lamLaiCua') IS NOT NULL)) nham, COUNT(DISTINCT sbd) so_em FROM su_kien_hoc k WHERE ngay_vn='$N' AND COALESCE(json_extract(raw_json,'\$.ll'),0)=1"
