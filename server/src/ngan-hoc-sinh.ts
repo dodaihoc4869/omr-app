@@ -60,6 +60,13 @@ export function taoKhoEm(sql: SqlNgan, sbd: string): KhoEm {
   }
 }
 
+/**
+ * MỘT `env` dùng chung cho mọi ngăn trong isolate: đệm của máy chủ khoá theo đối tượng D1 gốc (`dbGoc`) — nếu mỗi ngăn mang `env` riêng thì dữ liệu CHUNG
+ * (kho câu, siêu dữ liệu câu, chiến dịch …) bị nhân bản theo từng em ⇒ tràn 128 MB của isolate. Ràng buộc (D1, R2, biến) như nhau ở mọi ngăn cùng lớp.
+ */
+let envChung: Env | null = null
+export const xoaEnvChungNgan = (): void => { envChung = null }
+
 export class NganHocSinh {
   private kho: KhoEm | null = null
   constructor(private readonly state: DurableObjectState, private readonly env: Env) {}
@@ -69,7 +76,8 @@ export class NganHocSinh {
     const ctx = { waitUntil: (p: Promise<unknown>) => state.waitUntil(p), passThroughOnException() {} } as unknown as ExecutionContext
     const sbd = req.headers.get(DAU_SBD_NGAN) ?? ''
     if (sbd && state.storage?.sql && (!this.kho || this.kho.sbd !== sbd)) this.kho = taoKhoEm(state.storage.sql, sbd)
-    const res = await xuLy(req, this.kho ? { ...this.env, KHO_EM: this.kho } : this.env, ctx)
+    const env = (envChung ??= this.env)
+    const res = await xuLy(req, this.kho ? { ...env, KHO_EM: this.kho } : env, ctx)
     // Dấu «đã qua ngăn» (đo được trên máy thật, không lộ gì): 1 = ngăn có kho sổ.
     const h = new Headers(res.headers)
     h.set('x-ngan', this.kho ? '1' : '0')

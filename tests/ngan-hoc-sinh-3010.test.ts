@@ -3,12 +3,13 @@
 // đăng nhập / thi / GET / thiếu token ⇒ không vào ngăn.
 import { describe, expect, it } from 'vitest'
 import worker, { NganHocSinh } from '../server/src/index'
-import { DAU_TRONG_NGAN, laDuongNgan, sbdChonNgan } from '../server/src/ngan-hoc-sinh'
+import { DAU_TRONG_NGAN, datXuLyNgan, laDuongNgan, sbdChonNgan, xoaEnvChungNgan } from '../server/src/ngan-hoc-sinh'
 import { gameToken } from '../server/src/game-v2-auth'
 import { taoKhoOmni } from './omni-3-ke-hoach-chung'
 import type { Env } from '../server/src/kieu'
 
 function khoCoNgan(loi = false) {
+  xoaEnvChungNgan() // mỗi ca một D1 giả riêng (máy thật: mọi ngăn cùng ràng buộc)
   const k = taoKhoOmni({}, 3)
   k.d.sql.exec(`UPDATE hoc_sinh SET mat_khau='mk'`)
   const vao: { ten: string; dau: boolean }[] = []
@@ -75,5 +76,18 @@ describe('ngăn riêng từng học sinh', () => {
     a.env.TAT_NGAN_HS = '1'
     await goi(a.env, '/game-v2/hoc-tap-dem', { token: await gameToken(a.k.env, 'S1') })
     expect(a.vao).toEqual([])
+  })
+
+  it('mọi ngăn trong isolate dùng CHUNG một env (đệm dữ liệu chung không nhân bản theo em)', async () => {
+    xoaEnvChungNgan()
+    const thay: unknown[] = []
+    datXuLyNgan(async (_r, e) => { thay.push(e.DB); return new Response('{}') })
+    const a = { DB: {} } as unknown as Env, b = { DB: {} } as unknown as Env
+    const st = { waitUntil() {} } as never
+    await new NganHocSinh(st, a).fetch(new Request('https://t/game-v2/x', { method: 'POST', body: '{}' }))
+    await new NganHocSinh(st, b).fetch(new Request('https://t/game-v2/x', { method: 'POST', body: '{}' }))
+    expect(thay[0]).toBe(thay[1])
+    datXuLyNgan((r, e, c) => worker.fetch(r, e, c))
+    xoaEnvChungNgan()
   })
 })
