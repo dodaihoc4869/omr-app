@@ -50,7 +50,10 @@ jobs:
           if [ "$CHE_DO" = "ghi" ]; then
             echo "== GHI"
             echo "Mốc khôi phục D1 (Time Travel) trước khi ghi:"; npx -y wrangler@4 d1 time-travel info omr 2>&1 | tail -n 3 || true
-            r=$(d1 "DELETE FROM hoc_tap_san_sang WHERE sbd IN (SELECT sbd FROM goi_bai_7_muc_ngay WHERE $DK)" | jq -r '.[0].meta.changes'); echo "  xoá bản sẵn (bộ đệm): $r dòng"
+            # bộ đệm bản sẵn: lấy danh sách em TRƯỚC khi trả mức (sau khi trả, điều kiện không còn khớp); xoá lỗi ⇒ in lỗi, vẫn trả mức
+            DS=$(d1 "SELECT json_group_array(sbd) ds FROM goi_bai_7_muc_ngay WHERE $DK" | jq -r '.[0].results[0].ds')
             r=$(d1 "UPDATE goi_bai_7_muc_ngay SET muc = MAX(toi_thieu_tang, quota) WHERE $DK" | jq -r '.[0].meta.changes'); echo "  trả mức: $r dòng"
+            o=$(d1 "DELETE FROM hoc_tap_san_sang WHERE sbd IN (SELECT value FROM json_each('$DS'))" 2>&1 || true)
+            echo "  xoá bản sẵn (bộ đệm): $(echo "$o" | jq -r '.[0].meta.changes // empty' 2>/dev/null || true) dòng"
             echo "== SAU (phải về 0)"; dem
           fi
