@@ -49,6 +49,7 @@ jobs:
             q "bài bổ sung theo trạng thái" "SELECT trang_thai, COUNT(*) n FROM bai_bo_sung WHERE ma_ca = '$MA' GROUP BY trang_thai"
             q "nhận xét (sendFeedback) ghi từ máy chủ: số · tuMayChu" "SELECT json_extract(noi_dung,'\$.tuMayChu') tu_may_chu, COUNT(*) n, MIN(luc) dau, MAX(luc) cuoi FROM nhan_xet WHERE ma_ca = '$MA' AND luc >= '$TU' GROUP BY 1"
             tep /tmp/d/luot_$MA.json "SELECT l.sbd, l.lan_thu, l.trang_thai, l.vao_luc, l.nop_luc, l.het_gio_luc, l.cap_nhat_luc, l.tong, l.diem_i, l.dap_an_json, l.giay_cau_json, l.ghi_chu, l.so_lan_roi_man, l.integrity_json, (SELECT COUNT(*) FROM chi_tiet_cau c WHERE c.ma_ca = l.ma_ca AND c.sbd = l.sbd AND c.lan_thu = l.lan_thu) n_ctc, (SELECT COUNT(*) FROM nhan_xet x WHERE x.sbd = l.sbd AND x.ma_ca = l.ma_ca) n_nx, (SELECT json_extract(x.noi_dung,'\$.tuMayChu') FROM nhan_xet x WHERE x.sbd = l.sbd AND x.ma_ca = l.ma_ca ORDER BY x.luc DESC LIMIT 1) nx_may_chu, (SELECT COUNT(*) FROM bai_bo_sung b WHERE b.ma_ca = l.ma_ca AND b.sbd = l.sbd) n_bs, (SELECT ghi_luc FROM phong_cho p WHERE p.khoa = l.ma_ca || '|' || l.sbd) cho_luc FROM luot l WHERE l.ma_ca = '$MA'"
+            tep /tmp/d/ctc_$MA.json "SELECT sbd, lan_thu, phan, so_cau, qid, dap_an_dung, cap_nhat_luc FROM chi_tiet_cau WHERE ma_ca = '$MA'"
             tep /tmp/d/chan_$MA.json "SELECT sbd, ly_do, luc FROM chan_vao WHERE ma_ca = '$MA' ORDER BY luc LIMIT 500"
             for K in key de; do
               npx -y wrangler@4 r2 object get "omr-de/$K/$MA.json" --remote --file "/tmp/d/${K}_$MA.json" >/tmp/d/out 2>/tmp/d/err || { echo "(không đọc được $K/$MA.json)"; cat /tmp/d/out /tmp/d/err | grep -v "Logs were written" | grep -v '^\s*$' | tail -n 6 | cut -c1-240; }
@@ -100,11 +101,26 @@ jobs:
               for (const m of Object.values(bac)) for (const b of Object.values(m ?? {})) demBac[b] = (demBac[b] ?? 0) + 1
               console.log(`  bậc lấp (cả lớp): ${JSON.stringify(demBac)}`)
             }
-            const key = doc(`/tmp/d/key_${ma}.json`)
+            // Token CI không có quyền đọc R2 ⇒ DỰNG TỜ ĐÁP ÁN THAY THẾ từ `chi_tiet_cau` của chính ca (đáp án đúng từng câu đã ghi lúc chấm) — chỉ để chấm thử.
+            const ctc = kq(`/tmp/d/ctc_${ma}.json`)
+            let key = doc(`/tmp/d/key_${ma}.json`)
+            let keyThay = false
+            if (!key && ctc.length) {
+              const theoQid = new Map()
+              for (const r of ctc) if (r.qid && r.dap_an_dung !== null && !theoQid.has(r.qid)) theoQid.set(r.qid, r)
+              key = { phanI: [], phanII: [], phanIII: [], soCau: j(ca.so_cau_json) ?? undefined }
+              for (const [qid, r] of theoQid) {
+                if (r.phan === 'I') key.phanI.push({ id: qid, text: '', choices: ['', '', '', ''], correct: String(r.dap_an_dung) })
+                else if (r.phan === 'II') key.phanII.push({ id: qid, text: '', ideas: [], correct: String(r.dap_an_dung).split('') })
+                else if (r.phan === 'III') key.phanIII.push({ id: qid, text: '', correct: String(r.dap_an_dung) })
+              }
+              keyThay = true
+            }
             const de = doc(`/tmp/d/de_${ma}.json`)
             const ids = (b) => new Set(['phanI', 'phanII', 'phanIII'].flatMap((p) => (Array.isArray(b?.[p]) ? b[p] : []).map((q) => String(q?.id ?? q?.qid ?? ''))))
             const idKey = ids(key), idDe = ids(de)
-            console.log(`tờ đáp án R2: ${key ? `${idKey.size} câu (I ${key.phanI?.length} · II ${key.phanII?.length} · III ${key.phanIII?.length}) · soCau ${JSON.stringify(key.soCau ?? null)} · bản đồ chụp ${Object.keys((key.boTheoEm?.bo ?? key.boTheoEm) || {}).length} em` : 'KHÔNG CÓ'} · gói đề R2: ${de ? idDe.size + ' câu' : 'KHÔNG CÓ'}`)
+            if (keyThay) console.log(`(tờ đáp án R2 không đọc được từ CI — dùng tờ THAY THẾ dựng từ ${ctc.length} dòng chi_tiet_cau của ca)`)
+            console.log(`tờ đáp án ${keyThay ? 'thay thế' : 'R2'}: ${key ? `${idKey.size} câu (I ${key.phanI?.length} · II ${key.phanII?.length} · III ${key.phanIII?.length}) · soCau ${JSON.stringify(key.soCau ?? null)} · bản đồ chụp ${Object.keys((key.boTheoEm?.bo ?? key.boTheoEm) || {}).length} em` : 'KHÔNG CÓ'} · gói đề R2: ${de ? idDe.size + ' câu' : 'KHÔNG CÓ'}`)
             const luot = kq(`/tmp/d/luot_${ma}.json`)
             // Thời gian từ lúc thầy bắt đầu tới lúc lượt của em được tạo (em bấm vào / máy em tự vào từ phòng chờ).
             const tre = luot.filter((l) => Number(l.lan_thu) === 1).map((l) => giay(l.vao_luc, ca.bat_dau_thi_luc)).filter((x) => x !== null)
@@ -144,6 +160,17 @@ jobs:
               tt[l.trang_thai] = (tt[l.trang_thai] ?? 0) + 1
               console.log([h(l.sbd), l.lan_thu, l.trang_thai, vn(l.vao_luc), vn(l.nop_luc), vn(l.cap_nhat_luc), l.tong === null ? 'KHÔNG' : 'có', soTl, l.n_ctc, `${l.n_nx}${l.nx_may_chu === null ? '' : `/${l.nx_may_chu}`}`, l.n_bs, bo ? `${bo.length}${ngoaiKey ? ` (ngoài tờ đáp án ${ngoaiKey})` : ''}${ngoaiDe ? ` (ngoài gói đề ${ngoaiDe})` : ''}` : 'KHÔNG', l.so_lan_roi_man, gcLoai, ketQua, (chanTheoEm.get(h(l.sbd)) ?? []).join(' ')].join(' | '))
             }
+            // Lượt CHƯA CÓ ĐIỂM: dòng chi tiết câu ghi lúc nào (đường nào ghi), bộ câu có nằm trọn trong tờ đáp án (thay thế) không.
+            const ctcTheo = new Map()
+            for (const r of ctc) { const k = `${r.sbd}|${r.lan_thu}`; const a = ctcTheo.get(k) ?? []; a.push(r.cap_nhat_luc); ctcTheo.set(k, a) }
+            for (const l of luot.filter((x) => x.tong === null)) {
+              const a = (ctcTheo.get(`${l.sbd}|${l.lan_thu}`) ?? []).sort()
+              const bo = Array.isArray(boD1?.[l.sbd]) ? boD1[l.sbd] : []
+              console.log(`CHƯA ĐIỂM ${h(l.sbd)}: dòng chi tiết ${a.length} (ghi ${vn(a[0])}–${vn(a[a.length - 1])}) · bộ câu ${bo.length}, có trong tờ ${bo.filter((q) => idKey.has(q)).length} · rời màn ${l.so_lan_roi_man} · hết giờ ${vn(l.het_gio_luc)}`)
+            }
+            const soKhop = [...dat.values()].filter((e) => e.cu.tong !== null && !e.doi).length
+            const soLech = [...dat.values()].filter((e) => e.cu.tong !== null && e.doi).length
+            console.log(`đối chiếu lõi chấm với điểm D1 đang có: khớp ${soKhop} · lệch ${soLech} · D1 chưa điểm mà lõi chấm được ${[...dat.values()].filter((e) => e.cu.tong === null).length}`)
             // Em bị chặn mà KHÔNG có lượt.
             const coLuot = new Set(luot.map((l) => h(l.sbd)))
             const chanKhongLuot = [...chanTheoEm].filter(([k]) => !coLuot.has(k))
