@@ -30,7 +30,11 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
         run: |
-          Q="SELECT (SELECT COUNT(DISTINCT e.sbd) FROM goi_bai_7_em e JOIN hoc_sinh h ON h.sbd=e.sbd WHERE e.han>=date('now','+7 hours') AND COALESCE(h.trang_thai,'')<>'khoa') AS co_goi, (SELECT COUNT(*) FROM hoc_tap_san_sang s WHERE s.ngay=date('now','+7 hours') AND s.dau LIKE 'v4%') AS san, (SELECT COUNT(*) FROM hoc_tap_san_sang s WHERE s.ngay=date('now','+7 hours') AND s.chang_json IS NOT NULL) AS co_chang, (SELECT MAX(luc) FROM hoc_tap_san_sang s WHERE s.ngay=date('now','+7 hours')) AS luc_cuoi"
+          # Bản dấu đọc THẲNG từ mã (san-sang.ts `BAN_DAU`) — 30/10: đếm cứng 'v4%' sau khi dấu lên v5 ⇒ báo động giả «0/222» (issue #613) dù đủ 271/271 em.
+          BAN=$(grep -oP "export const BAN_DAU = '\K[^']+" src/san-sang.ts)
+          [ -n "$BAN" ] || { echo "::error::Không đọc được BAN_DAU trong server/src/san-sang.ts"; exit 1; }
+          echo "Bản dấu: $BAN"
+          Q="SELECT (SELECT COUNT(DISTINCT e.sbd) FROM goi_bai_7_em e JOIN hoc_sinh h ON h.sbd=e.sbd WHERE e.han>=date('now','+7 hours') AND COALESCE(h.trang_thai,'')<>'khoa') AS co_goi, (SELECT COUNT(*) FROM hoc_tap_san_sang s WHERE s.ngay=date('now','+7 hours') AND s.dau LIKE '${BAN}§%') AS san, (SELECT COUNT(*) FROM hoc_tap_san_sang s WHERE s.ngay=date('now','+7 hours') AND s.chang_json IS NOT NULL) AS co_chang, (SELECT MAX(luc) FROM hoc_tap_san_sang s WHERE s.ngay=date('now','+7 hours')) AS luc_cuoi"
           R=$(npx -y wrangler@4 d1 execute omr --remote --json --command "$Q" | jq -c '.[0].results[0]')
           echo "$R"
           CO=$(echo "$R" | jq '.co_goi'); SAN=$(echo "$R" | jq '.san')
