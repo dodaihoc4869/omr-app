@@ -2,6 +2,7 @@
 # `cau_hinh.hs_tam_dong` = 'bat' ⇒ trong 1 phút máy các em hiện màn «App đang bảo trì»; bài kiểm tra / ca thi đang làm dở vẫn nộp được. Một lệnh ghi cấu hình.
 # Đổi BAT thành tat rồi đẩy lại để mở app.
 name: Tạm đóng app học sinh (bảo trì)
+# 31/10 07:15: thầy chọn «Mở ngay» ⇒ BAT: tat (mở lại app học sinh).
 on:
   workflow_dispatch:
   push:
@@ -17,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
-      BAT: bat
+      BAT: tat
     steps:
       - uses: actions/checkout@v4
       - name: Làm sạch khoá Cloudflare
