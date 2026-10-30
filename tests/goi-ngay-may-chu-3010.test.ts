@@ -141,3 +141,18 @@ it('thầy sửa đề / đáp án (đổi phiên bản) sau lúc lập gói ⇒
   expect(mo.ok).toBe(true)
   expect(mo.qids).toEqual(qs.slice(1))
 })
+
+it('đang có phiên làm dở trong 2 giờ qua ⇒ gói cả ngày ưu tiên đúng các câu còn lại của phiên đang dở lên đầu', async () => {
+  const k = await kho()
+  const st = await startGoi7(k.env, 'S1', NOW - 120_000) as { ok: boolean; id: string; questions: { qid: string }[] }
+  expect(st.ok).toBe(true)
+  const qidsPhien = st.questions.map((q) => q.qid)
+  // Giả sử học sinh đã trả lời câu đầu tiên trong phiên rồi thoát trên máy cũ và mở trên máy mới
+  k.d.sql.prepare('INSERT INTO goi_bai_7_gap(receipt,goi_id,sbd,qid,version,kieu,luc) VALUES(?,?,?,?,?,?,?)')
+    .run(`${st.id}|${qidsPhien[0]}|g1`, 'g1', 'S1', qidsPhien[0]!, 'v1', 'co_ho_tro', new Date(NOW - 60_000).toISOString())
+  const conLai = qidsPhien.slice(1)
+  const goi = await goiNgay7(k.env, 'S1', NOW) as unknown as Goi
+  expect(goi.ok).toBe(true)
+  const dauGoi = goi.chang.flatMap((c) => c.questions.map((q) => q.qid)).slice(0, conLai.length)
+  expect(dauGoi).toEqual(conLai)
+})

@@ -8,7 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import ManLamBaiTap from '../src/components/hoc-tap/ManLamBaiTap'
 import { goiHoa2 } from '../src/components/hoa2/api'
-import { batGoiNgay, batMoChangTruoc, ghiCauXong, layChangGoi, moChangTruoc, napGoiNgay } from '../src/components/hoc-tap/mo-chang-truoc'
+import { batGoiNgay, batMoChangTruoc, docChangDangLam, ghiCauXong, layChangGoi, moChangTruoc, napGoiNgay } from '../src/components/hoc-tap/mo-chang-truoc'
 vi.mock('../src/components/hoa2/api', async (goc) => ({ ...await goc<typeof import('../src/components/hoa2/api')>(), goiHoa2: vi.fn() }))
 beforeEach(() => { localStorage.clear(); batMoChangTruoc(true); batGoiNgay(true) })
 afterEach(() => { cleanup(); vi.clearAllMocks(); vi.mocked(goiHoa2).mockReset(); localStorage.clear(); batMoChangTruoc(false); batGoiNgay(false) })
@@ -101,5 +101,47 @@ describe('màn làm bài mở chặng từ gói', () => {
     await screen.findByText(TN.text)
     expect(lenh('hoc-tap-start')).toHaveLength(1)
     expect(lenh('hoc-tap-mo-goi')).toHaveLength(0)
+  })
+  it('thoát app bất thình lình giữa chặng ⇒ mở lại nạp tức thì 0ms đúng câu đang làm dở, đúng tiến độ và nháp; kết thúc chặng thì xoá bản lưu', async () => {
+    await napGoiNgay('tk', vi.fn(async () => goiMau()))
+    vi.mocked(goiHoa2).mockImplementation(async (ten) => {
+      if (ten === 'hoc-tap-mo-goi') return { ok: true, id: 'phien-dang-do', qids: ['tn1', 'tn2', 'tn3'], sk: { tn1: 'tem-1', tn2: 'tem-2', tn3: 'tem-3' }, daLam: 0 }
+      if (ten === 'answer') return { ok: true, correct: true, answer: 'B', solution: 'Giải thích chuẩn' }
+      return { ok: true }
+    })
+    const { unmount } = render(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} homNay={{ daLam: 0, muc: 24, chang: 1, soChang: 4 }} />)
+    await screen.findByText(TN.text)
+    // Làm xong Câu 1/3
+    fireEvent.click(screen.getByRole('radio', { name: /\(CH3\)2NH/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Nộp câu · đã chọn B' }))
+    await screen.findByRole('button', { name: /Câu tiếp theo/ })
+    fireEvent.click(screen.getByRole('button', { name: /Câu tiếp theo/ }))
+    await screen.findByText(TN2.text)
+    expect(screen.getByText(/Câu 2\/3/)).toBeTruthy()
+    // Đang ở Câu 2/3, chọn đáp án nháp C rồi thoát bất thình lình
+    fireEvent.click(screen.getByRole('radio', { name: /\(CH3\)3N/ }))
+    expect(screen.getByRole('button', { name: 'Nộp câu · đã chọn C' })).toBeTruthy()
+    unmount()
+    expect(docChangDangLam('s1')).toMatchObject({ phien: 'phien-dang-do', viTri: 1, tra: 'C' })
+
+    // Mở lại app: hiện TỨC THÌ 0ms đúng Câu 2/3 kèm nháp C và tiến độ Câu 1 đã đúng, không gọi lại hoc-tap-start hay hoc-tap-mo-goi
+    vi.mocked(goiHoa2).mockClear()
+    render(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} homNay={{ daLam: 1, muc: 24, chang: 1, soChang: 4 }} />)
+    expect(screen.getByText(TN2.text)).toBeTruthy()
+    expect(screen.getByText(/Câu 2\/3/)).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Nộp câu · đã chọn C' })).toBeTruthy()
+    expect(lenh('hoc-tap-start')).toHaveLength(0)
+    expect(lenh('hoc-tap-mo-goi')).toHaveLength(0)
+
+    // Làm nốt Câu 2 và Câu 3 rồi Kết thúc chặng ⇒ bản lưu chặng dở được xoá sạch
+    fireEvent.click(screen.getByRole('button', { name: 'Nộp câu · đã chọn C' }))
+    await screen.findByRole('button', { name: /Câu tiếp theo/ })
+    fireEvent.click(screen.getByRole('button', { name: /Câu tiếp theo/ }))
+    await screen.findByText(TN3.text)
+    fireEvent.click(screen.getByRole('radio', { name: /\(CH3\)2NH/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Nộp câu · đã chọn B' }))
+    const nutKet = await screen.findByRole('button', { name: /Kết thúc chặng/ })
+    fireEvent.click(nutKet)
+    expect(docChangDangLam('s1')).toBeNull()
   })
 })

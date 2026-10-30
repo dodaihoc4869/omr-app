@@ -311,10 +311,36 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
     return()=>{nhip.dung();window.removeEventListener('focus',kich);window.removeEventListener('online',kich);document.removeEventListener('visibilitychange',kich)}
   },[auth?.sbd,auth?.token])
 
-  // Tab
-  const [tab, setTabThat] = useState<TabType | null>(null)
-  const setTab = (t: TabType | null) => setTabThat(t === 'thanthu' || t === 'bia' ? 'hoctap' : t)
-  const [qidChua, setQidChua] = useState<string | undefined>()
+  // Tab — nếu học sinh thoát bất thình lình (F5 / đóng app) khi đang ở trong màn Làm bài tập, Tự sửa lỗi hoặc Tu luyện và còn bài làm dở trên máy ⇒ mở thẳng lại đúng màn ấy ngay khung vẽ đầu (0ms).
+  const docManDangMo = (): { tab: TabType | null; qidChua?: string } => {
+    if (!auth?.sbd) return { tab: null }
+    try {
+      const o = JSON.parse(localStorage.getItem('omr_hs_man_dang_mo_' + auth.sbd) || 'null') as { ngay?: string; tab?: TabType; qidChua?: string; luc?: number } | null
+      const nay = Date.now(), ngay = new Date(nay + 7 * 3600_000).toISOString().slice(0, 10)
+      if (!o || o.ngay !== ngay || nay - (o.luc || 0) > 105 * 60_000) return { tab: null }
+      if (o.tab === 'hoctap' && localStorage.getItem('omr_chang_dang_lam_' + auth.sbd)) return { tab: 'hoctap' }
+      if (o.tab === 'tuchua' && (o.qidChua || localStorage.getItem('omr_tu_sua_chon_' + auth.sbd))) return { tab: 'tuchua', qidChua: o.qidChua }
+      if (o.tab === 'tuluyen' && localStorage.getItem('ddh.tuluyen.dang.' + auth.sbd)) return { tab: 'tuluyen' }
+    } catch { /* bỏ qua */ }
+    return { tab: null }
+  }
+  const [man0] = useState(docManDangMo)
+  const [tab, setTabThat] = useState<TabType | null>(man0.tab)
+  const setTab = (t: TabType | null) => {
+    const m = t === 'thanthu' || t === 'bia' ? 'hoctap' : t
+    if (auth?.sbd) {
+      try {
+        if (m === 'hoctap' || m === 'tuchua' || m === 'tuluyen') {
+          const nay = Date.now(), ngay = new Date(nay + 7 * 3600_000).toISOString().slice(0, 10)
+          localStorage.setItem('omr_hs_man_dang_mo_' + auth.sbd, JSON.stringify({ ngay, tab: m, qidChua: m === 'tuchua' ? qidChua : undefined, luc: nay }))
+        } else if (m === null) {
+          localStorage.removeItem('omr_hs_man_dang_mo_' + auth.sbd)
+        }
+      } catch { /* bỏ qua */ }
+    }
+    setTabThat(m)
+  }
+  const [qidChua, setQidChua] = useState<string | undefined>(man0.qidChua)
   // Tấm Hồ sơ làm bài của em, mở từ thẻ "Hôm nay của em" (nút Xem hồ sơ làm bài của em).
   const [moHoSoEm, setMoHoSoEm] = useState(false)
   // «Trong» (bản vẽ hs-mot-trang-menu 26/10): Điểm danh + A.I Đỗ Đại Học vào menu dọc ⇒ không thẻ điểm danh nổi, không nút A.I nổi. Mảnh «Trong» tải hỏng

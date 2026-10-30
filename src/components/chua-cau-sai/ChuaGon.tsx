@@ -14,7 +14,7 @@ import { apiGonMo, apiGonNop, type KetQuaGon } from '../../lib/chua-cau-sai-api'
 import { apiGonNopLuong, ketTuTam } from '../../lib/chua-gon-luong'
 import { chuDapAn, daTraLoiDu, LUAT_BAN_MOI } from '../../lib/chua-truc-tiep'
 import { docSbdHs, ghiXongHomNay } from '../../lib/tu-sua-viec-hom-nay'
-import { luuXemLai } from '../../lib/xem-lai-sua'
+import { docChuaGonDang, luuChuaGonDang, luuXemLai, xoaChuaGonDang } from '../../lib/xem-lai-sua'
 import { sinhMaNgauNhien } from '../../lib/thiet-bi'
 import { phanHoi } from '../../lib/phan-hoi'
 // «Trong» HS (thầy 27/10 «Phần sửa câu tôi chưa thấy giao diện của doligo»): cùng logic, cây trình bày kiểu Duolingo ở ChuaGonDuo.tsx.
@@ -54,9 +54,14 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep, 
   const [duo] = useState(() => typeof document !== 'undefined' && document.documentElement.dataset.trong === 'hs')
   // Chốt kiểu khung ngay lần dựng ĐẦU (đã nạp ⇒ dùng thẳng; chưa ⇒ lazy): đổi kiểu giữa chừng sẽ dựng lại cả khung.
   const [KhungDuo] = useState(() => khungDuoDaNap ?? ChuaGonDuoLuoi)
-  const [mo, setMo] = useState<KetQuaGon>(dau)
-  const [kq, setKq] = useState<KetQuaGon | null>(dau.daKhepHomNay ? dau : null)
-  const [tra, setTra] = useState('')
+  const [dang0] = useState(() => {
+    if (dau.daKhepHomNay || !dau.ok) return null
+    const d = docChuaGonDang(docSbdHs(), qid)
+    return d && d.dotId === dotId && (!dau.ban || d.ban === dau.ban) ? d : null
+  })
+  const [mo, setMo] = useState<KetQuaGon>(() => dang0?.mo ?? dau)
+  const [kq, setKq] = useState<KetQuaGon | null>(() => (dau.daKhepHomNay ? dau : (dang0?.kq ?? null)))
+  const [tra, setTra] = useState(() => dang0?.tra ?? '')
   const [ban, setBan] = useState(false)
   const [loi, setLoi] = useState('')
   const [xemGiai, setXemGiai] = useState(false)
@@ -70,7 +75,7 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep, 
   // Câu đã khép (hoặc không mở được) ⇒ xong phần hôm nay của Việc hôm nay.
   const khep = daTuSua || (!!kq?.ket && KHEP.has(kq.ket)) || !mo.ok
   // Ghi theo cả mã đợt và mã câu: mục Việc hôm nay có thể mang mã đợt khác với đợt vừa mở (xem daXong) ⇒ thiếu mã câu là kẹt vòng.
-  const ghiXong = () => { ghiXongHomNay(dotId); ghiXongHomNay(qid) }
+  const ghiXong = () => { ghiXongHomNay(dotId); ghiXongHomNay(qid); xoaChuaGonDang(docSbdHs(), qid) }
   // Chỉ ghi «xong phần» khi kết quả là bản ĐẦY ĐỦ (đã ghi ở máy chủ) — dòng TẠM của tem (`kq.tam`) chỉ để hiện ngay, chưa được tính (bản đầy đủ lỗi ⇒ bỏ dòng tạm).
   const khepThat = khep && !kq?.tam
   useEffect(() => { if (khepThat) ghiXong() }, [khepThat, dotId, qid]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -89,7 +94,13 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep, 
   // khi đúng / hết lần) hiện NGAY; bản đầy đủ (đã ghi lần nộp, đóng đợt, thưởng) đến sau và thay thế. Chưa có bản đầy đủ thì «Tiếp tục» / «Làm lại» chờ nó (không bỏ sót ghi nhận).
   const luu = useRef<Promise<void> | null>(null)
   const luuLoi = useRef(false)
-  const sk2 = useRef<{ tem: string; lan: number } | null>(null)
+  const sk2 = useRef<{ tem: string; lan: number } | null>(dang0?.sk2 ?? null)
+  useEffect(() => {
+    const s = docSbdHs()
+    if (!s || khep || !mo.ok) return
+    if (!tra && !kq && (mo.lan ?? 1) <= (dau.lan ?? 1)) { xoaChuaGonDang(s, qid); return }
+    luuChuaGonDang(s, qid, { dotId, ban: mo.ban, tra, mo, kq, sk2: sk2.current, luc: Date.now() })
+  }, [dotId, qid, tra, mo, kq, khep, dau.lan])
   const nop = async () => {
     if (!de || !mo.ban || ban || !daTraLoiDu(phan, tra)) return
     if (!khoa.current) khoa.current = sinhMaNgauNhien()

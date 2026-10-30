@@ -93,16 +93,45 @@ export const datLaiBaoRoiApp = (): void => { cuoiBaoRoi = 0 }
 // Máy chủ tắt / em chưa được bật (`tat`) ⇒ nhớ 30 phút, mọi thứ y như cũ. Không có gói / gói hỏng / máy chủ từ chối ⇒ đường mở chặng cũ.
 type ChangGoi = { ve: string; questions: KetQuaMo[] }
 type GoiNgay = { ngay: string; luc: number; chang: ChangGoi[]; goi7?: unknown }
+/** Trạng thái chặng em đang làm dở trên máy (thầy 30/10 «Khi hs thoát app bất thình lình … phải load lại đúng chỗ em đang dở. Lưu đúng chỗ đó.»). */
+export type ChangDangLam = {
+  sbd: string
+  ngay: string
+  moLuc: number
+  luc: number
+  phien: string
+  cau: KetQuaMo[]
+  soGoc: number
+  viTri: number
+  ket: Record<string, unknown>
+  tra?: string
+  chang: number | null
+  goi7?: unknown
+  dem?: { daLam: number; muc: number } | null
+  moi?: { qids: string[]; tiep: number; d0: number; ngay: string }
+  tuLam?: boolean
+  goiY?: boolean
+  moLoiGiai?: boolean
+  msCau?: Record<string, number>
+  dhMs?: number
+  dhT?: { v: number; a: number; l: number; n: number; lang: number }
+  daXinLamLai?: boolean
+  luotChang?: number
+  daHoiThay?: string
+  hoTroCham?: string
+}
 // SBD bỏ khoảng trắng hai đầu: phiên lưu trên máy có thể mang khoảng trắng (mo-app-hs-nhanh-0510), máy chủ trả SBD sạch ⇒ cùng một khoá.
-const khoaGoi = (sbd: string) => `omr_goi_ngay_${sbd.trim()}`, khoaXong = (sbd: string) => `omr_goi_ngay_xong_${sbd.trim()}`
+const khoaGoi = (sbd: string) => `omr_goi_ngay_${sbd.trim()}`, khoaXong = (sbd: string) => `omr_goi_ngay_xong_${sbd.trim()}`, khoaDang = (sbd: string) => `omr_chang_dang_lam_${sbd.trim()}`
 const KHOA_CUA = 'omr_goi_ngay_cua', KHOA_TAT = 'omr_goi_ngay_tat'
 const ngayMay = (ms: number) => new Date(ms + 7 * 3600_000).toISOString().slice(0, 10)
 /** Lập lại gói tối đa một lần mỗi chừng này (trừ lượt sau chặng: luôn lập lại). */
 export const TUOI_GOI_MS = 10 * 60_000
 const HAN_TAT_MS = 30 * 60_000
+/** Phiên trên máy chủ sống 2 giờ (`startGoi7`); giữ chặng đang dở 105 phút trên máy để mở lại tức thì 0 ms đúng câu đang làm. */
+export const HAN_CHANG_DANG_MS = 105 * 60_000
 /** Số câu một chặng (máy chủ goi-ngay.ts `CAU_MOI_CHANG`). */
 export const CAU_MOI_CHANG_GOI = 6
-const nhoGoi = new Map<string, GoiNgay>(), nhoXong = new Map<string, { n: string; q: Set<string> }>()
+const nhoGoi = new Map<string, GoiNgay>(), nhoXong = new Map<string, { n: string; q: Set<string> }>(), nhoDang = new Map<string, ChangDangLam>()
 let napDang: Promise<void> | null = null, napCuoi = { token: '', luc: 0 }
 /** Bộ test mặc định TẮT (như `bat` ở trên: các test cũ đếm đúng số lệnh gửi máy chủ); test của gói bật bằng `batGoiNgay(true)`. */
 let batGoi = !(globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.VITEST
@@ -185,7 +214,38 @@ export function layChangGoi(sbd: string, now: number = Date.now(), so = CAU_MOI_
 }
 function coChangGoiCua(token: string, now: number): boolean {
   const c = docJson(KHOA_CUA) as { sbd?: unknown; t?: unknown } | null
-  return !!c && typeof c.sbd === 'string' && c.t === duoiToken(token) && !!layChangGoi(c.sbd, now)
+  return !!c && typeof c.sbd === 'string' && c.t === duoiToken(token) && (!!docChangDangLam(c.sbd, now) || !!layChangGoi(c.sbd, now))
+}
+
+/** Lưu trạng thái chặng em đang làm dở trên máy — thoát bất thình lình mở lại đúng câu, đúng tiến độ tức thì 0 ms. */
+export function luuChangDangLam(sbd: string, b: Omit<ChangDangLam, 'sbd' | 'ngay' | 'luc'>, now: number = Date.now()): void {
+  sbd = sbd.trim()
+  if (!batGoi || !sbd || !Array.isArray(b.cau) || !b.cau.length) return
+  const moLuc = typeof b.moLuc === 'number' && b.moLuc > 0 ? b.moLuc : now
+  const d: ChangDangLam = { ...b, sbd, ngay: ngayMay(now), moLuc, luc: now }
+  nhoDang.set(sbd, d)
+  ghiJson(khoaDang(sbd), d)
+}
+
+/** Đọc trạng thái chặng đang làm dở của `sbd`; khác ngày / quá hạn phiên / dữ liệu hỏng ⇒ xoá và trả null. */
+export function docChangDangLam(sbd: string, now: number = Date.now()): ChangDangLam | null {
+  sbd = sbd.trim()
+  if (!batGoi || !sbd) return null
+  const m = nhoDang.get(sbd) ?? (docJson(khoaDang(sbd)) as ChangDangLam | null)
+  if (!m || m.sbd !== sbd || m.ngay !== ngayMay(now) || typeof m.moLuc !== 'number' || now - m.moLuc >= HAN_CHANG_DANG_MS || !Array.isArray(m.cau) || !m.cau.length || typeof m.viTri !== 'number' || m.viTri < 0 || m.viTri >= m.cau.length) {
+    if (m) xoaChangDangLam(sbd)
+    return null
+  }
+  nhoDang.set(sbd, m)
+  return m
+}
+
+/** Xoá chặng đang làm dở (khi em đã hoàn thành chặng hoặc chặng rỗng). */
+export function xoaChangDangLam(sbd: string): void {
+  sbd = sbd.trim()
+  if (!sbd) return
+  nhoDang.delete(sbd)
+  try { localStorage.removeItem(khoaDang(sbd)) } catch { /* bỏ qua */ }
 }
 
 /** Câu em vừa làm xong (đã chấm) — chặng kế trong gói bỏ câu này. */
@@ -203,5 +263,5 @@ export function boGoiNgay(sbd: string): void {
   try { localStorage.removeItem(khoaGoi(sbd)) } catch { /* bỏ qua */ }
 }
 /** Chỉ cho test. */
-export const datLaiGoiNgay = (): void => { nhoGoi.clear(); nhoXong.clear(); napDang = null; napCuoi = { token: '', luc: 0 } }
+export const datLaiGoiNgay = (): void => { nhoGoi.clear(); nhoXong.clear(); nhoDang.clear(); napDang = null; napCuoi = { token: '', luc: 0 } }
 export function batGoiNgay(b: boolean): void { batGoi = b; datLaiGoiNgay() }

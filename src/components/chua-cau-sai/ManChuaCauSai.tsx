@@ -29,7 +29,7 @@ import { TrongManChua } from './trong-man-chua'
 import { canChuaTrucTiep, henGapLai, LUAT_BAN_MOI } from '../../lib/chua-truc-tiep'
 import { ghiXongHomNay } from '../../lib/tu-sua-viec-hom-nay'
 import { layNapTruocCauSua, layNapTruocCauSuaNgay } from '../../lib/nap-truoc-sua'
-import { docXemLai } from '../../lib/xem-lai-sua'
+import { docChuaGonDang, docXemLai } from '../../lib/xem-lai-sua'
 import { docSbdHs } from '../../lib/tu-sua-viec-hom-nay'
 import '../tu-luyen/tu-luyen.css'
 import './chua-cau-sai.css'
@@ -221,8 +221,11 @@ export default function ManChuaCauSai({
   // 29/10 (video 11:00 «Vẫn bị khựng chỗ mở câu»): lượt mở nạp trước ĐÃ VỀ ⇒ dựng thẳng màn câu ở lần vẽ ĐẦU (không khung «Đang mở câu…» một khung hình, không chờ vòng hiệu ứng).
   // 29/10 (thầy «Bấm vào để xem lại chưa tức thì»): câu ĐÃ khép hôm nay ⇒ máy em còn nhớ kết quả đầy đủ (xem-lai-sua.ts) ⇒ dựng thẳng, KHÔNG gọi máy chủ.
   const [pre] = useState<{ dotId: string; gon: KetQuaGon } | null>(() => {
-    const x = docXemLai(docSbdHs(), qid)
+    const s = docSbdHs()
+    const x = docXemLai(s, qid)
     if (x && x.dotId) return { dotId: x.dotId, gon: x }
+    const d = docChuaGonDang(s, qid)
+    if (d && d.dotId && d.mo.ok) return { dotId: d.dotId, gon: d.mo }
     const r = layNapTruocCauSuaNgay(token, qid)
     return r && r.ok && r.dotId && r.gon?.ok ? { dotId: r.dotId, gon: r.gon } : null
   })

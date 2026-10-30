@@ -85,6 +85,8 @@ interface BaiDangLam extends LuotDangLam {
   /** "Chấm từng câu" (chốt lúc rút): câu đã Kiểm tra ⇒ kết quả máy chủ trả (chỉ câu ấy có đáp án), khoá không sửa. */
   chamTungCau?: boolean
   daCham?: Record<string, KetQuaCau>
+  /** Câu em đang làm dở lúc thoát — mở lại cuộn về đúng câu ấy. */
+  cauDangNhin?: string
 }
 const khoaNho = (sbd: string) => `ddh.tuluyen.dang.${sbd}`
 function docNho(sbd: string): BaiDangLam | null {
@@ -337,12 +339,16 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
   baiRef.current = bai
   const luuDo = useCallback(() => {
     const b = baiRef.current
-    if (b) ghiNho(sbd, { ...b, giay: giayRef.current, giayCau: { ...giayCauRef.current } })
+    if (b) ghiNho(sbd, { ...b, giay: giayRef.current, giayCau: { ...giayCauRef.current }, cauDangNhin: cauDangNhin.current || b.cauDangNhin })
   }, [sbd])
   useEffect(() => {
     if (!bai || ketQua) return
     giayRef.current = bai.giay
     giayCauRef.current = { ...bai.giayCau }
+    if (bai.cauDangNhin && !cauDangNhin.current) {
+      cauDangNhin.current = bai.cauDangNhin
+      requestAnimationFrame(() => cuonToiCau(domIdLam(bai.cauDangNhin!)))
+    }
     let dem = 0
     const t = setInterval(() => {
       giayRef.current++
@@ -352,7 +358,14 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
     }, 1000)
     return () => clearInterval(t)
   }, [bai?.luotId, ketQua]) // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => { if (!ketQua && bai) luuDo() }, [bai?.traLoi, bai?.coGoiY, bai?.luotId, ketQua, luuDo]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (!ketQua && bai) luuDo() }, [bai?.traLoi, bai?.coGoiY, bai?.daCham, bai?.luotId, ketQua, luuDo]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const f = () => { if (document.visibilityState === 'hidden' && baiRef.current) luuDo() }
+    const g = () => { if (baiRef.current) luuDo() }
+    document.addEventListener('visibilitychange', f)
+    window.addEventListener('pagehide', g)
+    return () => { if (baiRef.current) luuDo(); document.removeEventListener('visibilitychange', f); window.removeEventListener('pagehide', g) }
+  }, [luuDo])
 
   const batDau = async (ts: ThamSoRut | null = thamSo) => {
     if (!ts) return

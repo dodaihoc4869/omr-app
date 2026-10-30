@@ -24,6 +24,7 @@ import { napTruocCauSua } from '../../lib/nap-truoc-sua'
 /** Bản nhớ danh sách còn mới (ms) để vẽ ngay khi mở màn Tự sửa lỗi; quá hạn ⇒ khung chờ như cũ. (29/10 tối: nâng lên 10 phút = NHO_TU_SUA_MS để bấm từ Lộ trình luôn hiện ngay 0 ms.) */
 const NHO_VE_NGAY_MS = 600_000
 import { dungViecHomNay, docSbdHs, luuViecHomNay } from '../../lib/tu-sua-viec-hom-nay'
+import { docTuSuaChon, luuTuSuaChon } from '../../lib/xem-lai-sua'
 import ViecHomNay from './ViecHomNay'
 import { useDanhDauHt2 } from './HocTapHomNay'
 import type { ViecHomNay as KieuViecHomNay, ViecMuc } from '../../lib/tu-sua-viec-hom-nay'
@@ -147,7 +148,7 @@ type Chon = { qid: string; ten?: string; kiemHoiThay?: boolean; /** câu mở th
 
 export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: string; qid?: string; onVe: () => void; onTuLuyen?: () => void }) {
   useDanhDauHt2() // <html data-ht2> (xem HocTapHomNay.tsx)
-  const [chon, setChon] = useState<Chon | null>(null)
+  const [chon, setChon] = useState<Chon | null>(() => (qid ? null : docTuSuaChon(docSbdHs())))
   /** Câu mở thẳng đang chờ danh sách để tìm đúng đợt. */
   const [doi, setDoi] = useState(qid ?? '')
   /** Lời báo khi không mở được câu em chọn (giữ mã câu để "Thử mở lại"). */
@@ -235,9 +236,10 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
   // Mở câu ⇒ màn chữa bắt đầu từ đầu (không kẹt ở giữa vì danh sách đã cuộn xuống).
   useEffect(() => {
     if (!chon) return
+    if (sbd && !chon.thu) luuTuSuaChon(sbd, { qid: chon.qid, ten: chon.ten, kiemHoiThay: chon.kiemHoiThay })
     const k = khungCuon(gocRef.current)
     if (k) k.scrollTop = 0
-  }, [chon])
+  }, [chon, sbd])
   // Quay ra ⇒ danh sách về đúng chỗ em đang đứng, con trỏ bàn phím ở lại thẻ câu vừa chữa.
   useEffect(() => {
     if (chon || kq?.trangThai !== 'bat' || !viTri.current) return
@@ -277,7 +279,7 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
   if (chon) {
     const d = dong.find((x) => goc(x.m.qid) === goc(chon.qid))
     const ten = d?.ten ?? chon.ten ?? (cdl.get(goc(chon.qid))?.tenDang || undefined)
-    const veDanhSach = () => { lang.current = true; choDongBoViTri.current = true; setChon(null); setLan((n) => n + 1) }
+    const veDanhSach = () => { if (sbd) luuTuSuaChon(sbd, null); lang.current = true; choDongBoViTri.current = true; setChon(null); setLan((n) => n + 1) }
     if (chon.kiemHoiThay) return (
       <div ref={gocRef} className="ht-app ht2 tcl-man m3">
         <header className="ht-thanh tcl-dau-trang"><button type="button" className="ht-nut-phu" onClick={veDanhSach}><ArrowLeft size={18} aria-hidden="true" />Quay lại danh sách</button><strong className="tcl-dau-trang-ten">Kiểm lại câu đã sửa</strong></header>

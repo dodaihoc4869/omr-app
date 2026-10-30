@@ -32,3 +32,60 @@ export function docXemLai(sbd: string, qid: string, nayMs = Date.now()): KetQuaG
   if (!sbd || !qid) return null
   return doc(sbd, nayMs).ds.find((x) => x.q === qid)?.dau ?? null
 }
+
+/** Bản lưu trạng thái câu đang sửa dở (nháp đang chọn, gợi ý lần 1, hoặc đã sang bước làm lại lần 2) — thoát bất thình lình mở lại đúng bước 0ms. */
+export interface ChuaGonDang {
+  ngay: string
+  dotId: string
+  ban?: string
+  tra: string
+  mo: KetQuaGon
+  kq: KetQuaGon | null
+  sk2: { tem: string; lan: number } | null
+  luc: number
+}
+const HAN_CHUA_DANG_MS = 35 * 60_000
+const khoaDang = (sbd: string, qid: string) => `omr_chua_gon_dang_${sbd}_${qid}`
+const khoaChon = (sbd: string) => `omr_tu_sua_chon_${sbd}`
+
+export function luuChuaGonDang(sbd: string, qid: string, d: Omit<ChuaGonDang, 'ngay'>, nayMs = Date.now()): void {
+  if (!sbd || !qid || !d.dotId || !d.mo?.ok) return
+  try {
+    localStorage.setItem(khoaDang(sbd, qid), JSON.stringify({ ...d, ngay: ngayVn(nayMs) }))
+  } catch { /* bỏ qua */ }
+}
+
+export function docChuaGonDang(sbd: string, qid: string, nayMs = Date.now()): ChuaGonDang | null {
+  if (!sbd || !qid) return null
+  try {
+    const d = JSON.parse(localStorage.getItem(khoaDang(sbd, qid)) || 'null') as ChuaGonDang | null
+    if (!d || d.ngay !== ngayVn(nayMs) || !d.dotId || !d.mo?.ok || nayMs - (d.luc || 0) > HAN_CHUA_DANG_MS) return null
+    return d
+  } catch {
+    return null
+  }
+}
+
+export function xoaChuaGonDang(sbd: string, qid: string): void {
+  if (!sbd || !qid) return
+  try { localStorage.removeItem(khoaDang(sbd, qid)) } catch { /* bỏ qua */ }
+}
+
+export function luuTuSuaChon(sbd: string, chon: { qid: string; ten?: string; kiemHoiThay?: boolean } | null, nayMs = Date.now()): void {
+  if (!sbd) return
+  try {
+    if (chon?.qid) localStorage.setItem(khoaChon(sbd), JSON.stringify({ ngay: ngayVn(nayMs), chon, luc: nayMs }))
+    else localStorage.removeItem(khoaChon(sbd))
+  } catch { /* bỏ qua */ }
+}
+
+export function docTuSuaChon(sbd: string, nayMs = Date.now()): { qid: string; ten?: string; kiemHoiThay?: boolean } | null {
+  if (!sbd) return null
+  try {
+    const o = JSON.parse(localStorage.getItem(khoaChon(sbd)) || 'null') as { ngay?: string; chon?: { qid: string; ten?: string; kiemHoiThay?: boolean }; luc?: number } | null
+    if (!o || o.ngay !== ngayVn(nayMs) || !o.chon?.qid || nayMs - (o.luc || 0) > 2 * 3600_000) return null
+    return o.chon
+  } catch {
+    return null
+  }
+}
