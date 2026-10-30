@@ -1,0 +1,62 @@
+# CHẤM BÙ 5 BÀI CA 269333 (thầy 30/10 23:00 đồng ý «Ghi điểm luôn»): lượt đã nộp mà chưa có điểm (khoá ca lúc D1 nghẽn). Gọi đúng lệnh thầy
+# `/ca/cham-bu` của mã main (#650: chỉ lượt CHƯA có điểm, không đụng 27 bài đã có điểm) qua `wrangler dev` nối D1/R2 thật, mã bí mật ngẫu nhiên của
+# riêng lượt chạy (như nap-kho-ma-hoa-2410.yml). XEM TRƯỚC rồi mới GHI, rồi xem lại. Log chỉ in con số + lý do — KHÔNG in SBD / điểm.
+name: Chấm bù 5 bài ca 269333
+on:
+  push:
+    branches: [claude/cham-bu-269333]
+    paths: ['.github/workflows/cham-bu-269333-3110.yml']
+permissions:
+  contents: read
+concurrency:
+  group: cham-bu-269333
+  cancel-in-progress: false
+jobs:
+  cham:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mã máy chủ đang sống (main)
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: srv
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts
+        working-directory: srv
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Chạy Worker main nối D1/R2 thật
+        working-directory: srv/server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          MB=$(openssl rand -hex 24); echo "::add-mask::$MB"; echo "MB_LUOT=$MB" >> "$GITHUB_ENV"
+          awk '/^\[triggers\]/{skip=1;next} /^\[/{skip=0} !skip{print} /^binding = "DB"$/||/^binding = "DE"$/{print "remote = true"}' wrangler.toml > wrangler.cham.toml
+          echo "Số binding nối thật: $(grep -c '^remote = true' wrangler.cham.toml)"
+          nohup npx -y wrangler@4 dev -c wrangler.cham.toml --ip 127.0.0.1 --port 8787 --var "MA_BI_MAT:$MB" > /tmp/wrangler-dev.log 2>&1 &
+          for i in $(seq 1 90); do curl -s -o /dev/null http://127.0.0.1:8787/ && break; sleep 2; done
+          curl -s -o /dev/null -w 'Worker cục bộ: %{http_code}\n' http://127.0.0.1:8787/
+      - name: Xem trước → ghi → xem lại (chỉ in con số)
+        run: |
+          goi() { curl -sS -X POST http://127.0.0.1:8787/ca/cham-bu -H 'content-type: application/json' -H "x-ma-bi-mat: $MB_LUOT" --data "$1"; }
+          tom='{ok, lyDo, error, soCan, soChamDuoc: (.bai|length), tuChoi: [.tuChoi[]?.viSao], soGhi}'
+          goi '{"maCa":"269333","xemTruoc":true}' > /tmp/truoc.json
+          echo "XEM TRƯỚC: $(jq -c "$tom" /tmp/truoc.json)"
+          if jq -e '.ok == true and (.bai|length) > 0' /tmp/truoc.json > /dev/null; then
+            goi '{"maCa":"269333"}' > /tmp/ghi.json
+            echo "GHI: $(jq -c "$tom" /tmp/ghi.json)"
+          else echo "Không có bài chấm được ⇒ không ghi."; fi
+          goi '{"maCa":"269333","xemTruoc":true}' > /tmp/sau.json
+          echo "XEM LẠI (còn chưa có điểm): $(jq -c "$tom" /tmp/sau.json)"
+      - name: Nhật ký Worker cục bộ (dòng lỗi)
+        if: always()
+        run: grep -iE 'error|exception|✘' /tmp/wrangler-dev.log | grep -vE '[0-9]{5,}' | head -20 || true
