@@ -122,6 +122,8 @@ export type ChangDangLam = {
 }
 // SBD bỏ khoảng trắng hai đầu: phiên lưu trên máy có thể mang khoảng trắng (mo-app-hs-nhanh-0510), máy chủ trả SBD sạch ⇒ cùng một khoá.
 const khoaGoi = (sbd: string) => `omr_goi_ngay_${sbd.trim()}`, khoaXong = (sbd: string) => `omr_goi_ngay_xong_${sbd.trim()}`, khoaDang = (sbd: string) => `omr_chang_dang_lam_${sbd.trim()}`
+/** Đề các câu của chặng đang dở — khoá RIÊNG, chỉ ghi khi bộ câu đổi (máy yếu 30/10, xem `luuChangDangLam`). */
+const khoaDangCau = (sbd: string) => `omr_chang_dang_cau_${sbd.trim()}`
 const KHOA_CUA = 'omr_goi_ngay_cua', KHOA_TAT = 'omr_goi_ngay_tat'
 const ngayMay = (ms: number) => new Date(ms + 7 * 3600_000).toISOString().slice(0, 10)
 /** Lập lại gói tối đa một lần mỗi chừng này (trừ lượt sau chặng: luôn lập lại). */
@@ -132,6 +134,8 @@ export const HAN_CHANG_DANG_MS = 105 * 60_000
 /** Số câu một chặng (máy chủ goi-ngay.ts `CAU_MOI_CHANG`). */
 export const CAU_MOI_CHANG_GOI = 6
 const nhoGoi = new Map<string, GoiNgay>(), nhoXong = new Map<string, { n: string; q: Set<string> }>(), nhoDang = new Map<string, ChangDangLam>()
+/** Bộ câu đã ghi xuống máy lần cuối (theo sbd) — cùng mảng ⇒ khỏi ghi lại đề. */
+const cauDaGhi = new Map<string, unknown>()
 let napDang: Promise<void> | null = null, napCuoi = { token: '', luc: 0 }
 /** Bộ test mặc định TẮT (như `bat` ở trên: các test cũ đếm đúng số lệnh gửi máy chủ); test của gói bật bằng `batGoiNgay(true)`. */
 let batGoi = !(globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.VITEST
@@ -217,20 +221,44 @@ function coChangGoiCua(token: string, now: number): boolean {
   return !!c && typeof c.sbd === 'string' && c.t === duoiToken(token) && !!(docChangDangLam(c.sbd, now) || layChangGoi(c.sbd, now))
 }
 
-/** Lưu trạng thái chặng em đang làm dở trên máy — thoát bất thình lình mở lại đúng câu, đúng tiến độ tức thì 0 ms. */
+/** Bản TÓM TẮT chặng đang dở cho Lộ trình (`nangSoTuChangDangDo` ở TrongHs đọc mỗi lần vẽ): đúng các trường nó dùng — qid / vai của từng câu, câu nào đã
+ *  nộp (lượt «lướt» OMNI giữ cờ), không đề, không lời giải. */
+function tomTatCua(d: ChangDangLam) {
+  const ket: Record<string, 1 | { omni: { luot: true } }> = {}
+  for (const k in d.ket) ket[k] = (d.ket[k] as { omni?: { luot?: unknown } } | null)?.omni?.luot === true ? { omni: { luot: true } } : 1
+  return { sbd: d.sbd, ngay: d.ngay, moLuc: d.moLuc, chang: d.chang, soGoc: d.soGoc, moi: d.moi ? { d0: d.moi.d0 } : undefined, ket,
+    cau: d.cau.map((c) => ({ qid: (c as { qid?: unknown }).qid, vaiGoi7: (c as { vaiGoi7?: unknown }).vaiGoi7 })) }
+}
+
+/** Lưu trạng thái chặng em đang làm dở trên máy — thoát bất thình lình mở lại đúng câu, đúng tiến độ tức thì 0 ms.
+ *  MÁY YẾU (30/10, đo CPU ×6): trước đây mỗi lượt lưu chuỗi hoá CẢ chặng (đề + kết quả, vài chục KB) HAI lần (khoá chặng + `omr_chang_dang_cua`) ⇒ rác bộ
+ *  nhớ ⇒ máy dọn rác ~100 ms đúng lúc em chạm phương án. Nay: đề ghi khoá riêng chỉ khi bộ câu đổi; khoá chặng giữ tiến độ (không đề); Lộ trình đọc bản tóm tắt nhỏ. */
 export function luuChangDangLam(sbd: string, b: Omit<ChangDangLam, 'sbd' | 'ngay' | 'luc'>, now: number = Date.now()): void {
   sbd = sbd.trim()
   if (!batGoi || !sbd || !b.cau?.length) return
   const d: ChangDangLam = { ...b, sbd, ngay: ngayMay(now), moLuc: b.moLuc > 0 ? b.moLuc : now, luc: now }
-  nhoDang.set(sbd, d); ghiJson(khoaDang(sbd), d); ghiJson('omr_chang_dang_cua', d)
+  nhoDang.set(sbd, d)
+  if (cauDaGhi.get(sbd) !== b.cau) { ghiJson(khoaDangCau(sbd), b.cau); cauDaGhi.set(sbd, b.cau) }
+  ghiJson(khoaDang(sbd), { ...d, cau: undefined, soCau: b.cau.length }); ghiJson('omr_chang_dang_cua', tomTatCua(d))
   if (b.ket && Object.keys(b.ket).length) try { localStorage.removeItem('ddh.khung-tinh-hs') } catch { /* bỏ qua */ }
+}
+
+/** Đọc bản lưu trên máy: khoá chặng (tiến độ) + khoá đề (`soCau` phải khớp). Bản lưu kiểu cũ (đề nằm trong khoá chặng) vẫn đọc được. */
+function docDangLuu(sbd: string): ChangDangLam | null {
+  const m = docJson(khoaDang(sbd)) as (ChangDangLam & { soCau?: number }) | null
+  if (!m || Array.isArray(m.cau)) return m
+  const cau = docJson(khoaDangCau(sbd))
+  if (!Array.isArray(cau) || cau.length !== m.soCau) return { ...m, cau: [] }
+  cauDaGhi.set(sbd, cau)
+  delete m.soCau
+  return { ...m, cau: cau as KetQuaMo[] }
 }
 
 /** Đọc trạng thái chặng đang làm dở của `sbd`; khác ngày / quá hạn phiên / dữ liệu hỏng ⇒ xoá và trả null. */
 export function docChangDangLam(sbd: string, now: number = Date.now()): ChangDangLam | null {
   sbd = sbd.trim()
   if (!batGoi || !sbd) return null
-  const m = nhoDang.get(sbd) ?? (docJson(khoaDang(sbd)) as ChangDangLam | null)
+  const m = nhoDang.get(sbd) ?? docDangLuu(sbd)
   if (!m || m.sbd !== sbd || m.ngay !== ngayMay(now) || !(now - m.moLuc < HAN_CHANG_DANG_MS) || !m.cau?.length || !(m.viTri >= 0 && m.viTri < m.cau.length)) {
     if (m) xoaChangDangLam(sbd)
     return null
@@ -243,8 +271,8 @@ export function docChangDangLam(sbd: string, now: number = Date.now()): ChangDan
 export function xoaChangDangLam(sbd: string): void {
   sbd = sbd.trim()
   if (!sbd) return
-  nhoDang.delete(sbd)
-  try { localStorage.removeItem(khoaDang(sbd)); localStorage.removeItem('omr_chang_dang_cua') } catch { /* bỏ qua */ }
+  nhoDang.delete(sbd); cauDaGhi.delete(sbd)
+  try { localStorage.removeItem(khoaDang(sbd)); localStorage.removeItem(khoaDangCau(sbd)); localStorage.removeItem('omr_chang_dang_cua') } catch { /* bỏ qua */ }
 }
 
 /** Câu em vừa làm xong (đã chấm) — chặng kế trong gói bỏ câu này. */
@@ -260,5 +288,5 @@ export function boGoiNgay(sbd: string): void {
   try { localStorage.removeItem(khoaGoi(sbd)) } catch { /* bỏ qua */ }
 }
 /** Chỉ cho test. */
-export const datLaiGoiNgay = (): void => { nhoGoi.clear(); nhoXong.clear(); nhoDang.clear(); napDang = null; napCuoi = { token: '', luc: 0 } }
+export const datLaiGoiNgay = (): void => { nhoGoi.clear(); nhoXong.clear(); nhoDang.clear(); cauDaGhi.clear(); napDang = null; napCuoi = { token: '', luc: 0 } }
 export function batGoiNgay(b: boolean): void { batGoi = b; datLaiGoiNgay() }

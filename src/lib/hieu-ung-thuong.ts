@@ -100,10 +100,14 @@ export function demSo(el: HTMLElement | null, tu: number, toi: number, ms = 700,
     const het = () => { huy = true; el.textContent = dinh(toi); go(); xong() }
     go = khiXong(het)
     const t0 = performance.now()
+    // MÁY YẾU 30/10 (hồ sơ «Tiếp tục» CPU ×6: số đếm ghi chữ MỖI khung ⇒ tính bố cục mỗi khung đúng lúc câu mới dựng): chỉ ghi khi số hiện ĐỔI; máy yếu ghi
+    // thưa (≥ 90 ms một lần) — số vẫn chạy tới số cuối, mắt không thấy khác.
+    const thua = mucChuyenDong() === 'nhe' ? 90 : 0
+    let cu = '', lanGhi = -1e9
     const buoc = (t: number) => {
       if (huy) return
       const p = Math.min(1, (t - t0) / ms), e = 1 - Math.pow(1 - p, 3)
-      el.textContent = dinh(Math.round(tu + (toi - tu) * e))
+      if (p >= 1 || t - lanGhi >= thua) { const s = dinh(Math.round(tu + (toi - tu) * e)); if (s !== cu) { el.textContent = s; cu = s; lanGhi = t } }
       if (p < 1) requestAnimationFrame(buoc); else { go(); xong() }
     }
     el.textContent = dinh(tu); requestAnimationFrame(buoc)

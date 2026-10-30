@@ -217,6 +217,7 @@ async function inHoSo(cdp, ten) {
     cdp.__sk = null
   }
   const { profile } = await cdp.send('Profiler.stop')
+  if (arg('ghi-ho-so', '')) writeFileSync(arg('ghi-ho-so', ''), JSON.stringify(profile))
   const tu = new Map(), theoId = new Map(profile.nodes.map((n) => [n.id, n]))
   const tong = new Map()
   const tep = (u) => String(u || '').split('/').pop().replace(/-[\w-]{8}\.(js|css)$/, '.$1') || '(native)'
@@ -275,6 +276,14 @@ async function moMay(trinh, { yeu }) {
   const ctx = await trinh.newContext({ viewport: MAN, screen: MAN, deviceScaleFactor: 2, isMobile: true, hasTouch: true, serviceWorkers: 'block', ignoreHTTPSErrors: true, locale: 'vi-VN', timezoneId: 'Asia/Ho_Chi_Minh',
     userAgent: 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36' })
   await ctx.addInitScript(DO_TRONG_TRANG)
+  // --theo-css=1: ghi mốc chèn / nạp xong từng tờ CSS (mỗi tờ mới = một lượt tính kiểu cả trang)
+  if (arg('theo-css', '')) await ctx.addInitScript(() => {
+    const ds = (window.__css = [])
+    new MutationObserver((ms) => { for (const m of ms) for (const n of m.addedNodes) if (n.tagName === 'LINK' && n.rel === 'stylesheet' || n.tagName === 'STYLE') {
+      const r = [String(n.href || 'style').split('/').pop().replace(/-[\w-]{8}\.css$/, ''), Math.round(performance.now()), 0]; ds.push(r)
+      n.addEventListener?.('load', () => { r[2] = Math.round(performance.now()) })
+    } }).observe(document, { childList: true, subtree: true })
+  })
   await ctx.addInitScript((yeu) => {
     Object.defineProperty(Navigator.prototype, 'deviceMemory', { get: () => (yeu ? 2 : 8), configurable: true })
     Object.defineProperty(Navigator.prototype, 'hardwareConcurrency', { get: () => (yeu ? 4 : 8), configurable: true })
@@ -333,6 +342,7 @@ try {
     await p.waitForTimeout(5000)
     await inHoSo(cdp, 'molai')
     const d = await layDo(p)
+    if (arg('theo-css', '')) console.error('CSS mở lại:', JSON.stringify(await p.evaluate(() => window.__css)))
     kq.moLai = { fcp: d.fcp, noiDung: Math.round(tLt), chamDuoc: tti(d.dai, tLt), taskMax: daiNhat(d.dai), quaMang: await taiTheoLoai(p), dai: d.dai.filter(([t]) => t >= tLt - 500).map(([t, du]) => `${t}+${du}`) }
   }
   buoc('lo-trinh')
@@ -367,6 +377,11 @@ try {
   }
   // 5. Làm câu
   kq.lamCau = { ...(await dungYen(p)) }
+  // --heap=1: bộ nhớ JS + số nút DOM / trình nghe (CDP) — máy yếu RAM ít ⇒ đống lớn = dọn rác lớn giữa lượt chạm
+  const doHeap = async (ten) => { if (!arg('heap', '')) return; const h = await cdp.send('Runtime.getHeapUsage'); const d = await cdp.send('Memory.getDOMCounters').catch(() => ({}));
+    const ls = await p.evaluate(() => { let n = 0; const ds = []; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i), v = localStorage.getItem(k) || ''; n += v.length; ds.push([k, v.length]) } return [n, ds.sort((a, b) => b[1] - a[1]).slice(0, 8)] })
+    console.error(`BỘ NHỚ ${ten}: đống ${(h.usedSize / 1e6).toFixed(1)}/${(h.totalSize / 1e6).toFixed(1)} MB · nút ${d.nodes} · nghe ${d.jsEventListeners} · localStorage ${(ls[0] / 1e3).toFixed(0)} K ký tự ${JSON.stringify(ls[1])}`) }
+  await doHeap('vào chặng')
   if (arg('thu-css', '')) {
     const r = await p.evaluate(() => {
       const doToanBo = () => { const t = performance.now(); document.documentElement.style.setProperty('--zz-do', String(Math.random())); void document.body.offsetHeight; return performance.now() - t }
@@ -452,6 +467,7 @@ try {
   kq.lamCau.cuon = await cuon(p, cdp, 3000, MAN.height * 0.4)
   const lon = (f) => Math.max(...cau.map(f))
   const giua = (f) => { const s = cau.map(f).sort((a, b) => a - b); return s[Math.floor(s.length / 2)] }
+  await doHeap('sau các câu')
   kq.tom = {
     moLaiChamDuoc: kq.moLai.chamDuoc, moLaiNoiDung: kq.moLai.noiDung, moDauTaiKB: kq.moDau.taiTong,
     loTrinhCuonP95: kq.loTrinh.cuon.p95, loTrinhCuonTren50: kq.loTrinh.cuon.tren50, loTrinhYenP95: kq.loTrinh.khungYen.p95, rafNen: kq.loTrinh.rafGiay, nutDom: kq.loTrinh.nutDom, voHan: kq.loTrinh.voHan,

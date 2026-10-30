@@ -471,10 +471,14 @@ export default function GacTamDong({ p, kiem }: { p: PropsHomNayCu; kiem?: TomTa
 }
 
 /** Đồng bộ tức thì tiến độ chặng đang làm dở (`omr_chang_dang_cua`) vào `so` trên Lộ trình — chỉ tính câu ĐÃ BẤM NỘP (`ket`), và giữ chặng ở trạng thái đang học (`changDangDo`, chưa tích ✓) cho tới khi màn báo hoàn thành chặng hiện ra. */
+let cuaDoc: { s: string | null; d: any } = { s: null, d: null } // eslint-disable-line @typescript-eslint/no-explicit-any
 function nangSoTuChangDangDo(so: SoHomNay | null): SoHomNay | null {
   if (!so) return so
   try {
-    const d = JSON.parse(localStorage.getItem('omr_chang_dang_cua') || 'null'), sbd = sbdPhien(), now = Date.now()
+    // Lộ trình vẽ lại nhiều lần ⇒ chỉ giải mã khi bản lưu đổi (máy yếu 30/10)
+    const s = localStorage.getItem('omr_chang_dang_cua')
+    if (s !== cuaDoc.s) cuaDoc = { s, d: JSON.parse(s || 'null') }
+    const d = cuaDoc.d, sbd = sbdPhien(), now = Date.now()
     if (!d || d.ngay !== ngayVn(now) || (sbd && d.sbd && String(d.sbd).trim() !== sbd.trim()) || now - d.moLuc >= 6300_000 || !d.cau?.length) return so
     const ket = d.ket || {}, g = d.soGoc > 0 ? d.soGoc : d.cau.length
     const n = d.cau.slice(0, g).filter((c: { qid?: string; vaiGoi7?: string }) => c?.qid && c.vaiGoi7 !== 'lam_lai' && ket[c.qid] && ket[c.qid].omni?.luot !== true).length

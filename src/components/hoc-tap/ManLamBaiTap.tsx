@@ -578,8 +578,17 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   const [oNutCham, setONutCham] = useState<HTMLElement | null>(null)
   useEffect(() => { if (!q) return; if (daMo.current && !daVeDau.current) veDau(); daVeDau.current = false; daMo.current = true }, [q?.qid]) // eslint-disable-line react-hooks/exhaustive-deps
   // Màn Duo ở khung thấp xoay ngang: tấm kết quả nằm ở cột phải DƯỚI phương án ⇒ đưa tấm (nút «Tiếp tục») vào khung nhìn thay vì cuộn về đầu.
+  // MÁY YẾU 30/10 (vết Chrome «Kiểm tra» CPU ×6: `scrollIntoView` + đo phương án ép tính kiểu + bố cục cả màn ~120 ms NGAY trong lượt chạm, trước khi tấm kết
+  // quả kịp vẽ): React chạy hiệu ứng của cú chạm ĐỒNG BỘ trước lần sơn ⇒ dời cuộn / đo / tiêu điểm sang SAU khung đầu (rAF → setTimeout). Tấm kết quả hiện
+  // ngay khung kế; cuộn chạy lúc bố cục đã sạch (rẻ).
   useEffect(() => {
     if (!k) return
+    let raf = 0, hen = 0
+    const lam = () => { if (gocRef.current) chinhKhiCoKet() }
+    if (document.hidden) hen = window.setTimeout(lam, 0); else raf = requestAnimationFrame(() => { hen = window.setTimeout(lam, 0) })
+    return () => { cancelAnimationFrame(raf); clearTimeout(hen) }
+  }, [!!k]) // eslint-disable-line react-hooks/exhaustive-deps
+  const chinhKhiCoKet = () => {
     const ngangThap = duo && !!window.matchMedia?.('(orientation: landscape) and (max-height: 500px)').matches
     // NGANG 27/10: khung thấp xoay ngang — dải kết quả GHIM ĐÁY trải bề ngang (position: fixed, trong-lam-ngang.css) ⇒ như bản dọc: cuộn cho phương án ĐÚNG
     // nằm trọn trên mép dải (không cuộn về đầu: đề cột trái ghim sẵn). Dải chưa ghim (tờ cũ) ⇒ đưa nút «Tiếp tục» vào khung như trước.
@@ -602,7 +611,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
       })
     }
     nutTiepRef.current?.focus({ preventScroll: true })
-  }, [!!k]) // eslint-disable-line react-hooks/exhaustive-deps
+  }
   // Rung phản hồi kiểu Duolingo (thầy 26/10) — chỉ app học sinh «Trong» (phan-hoi.ts tự kiểm): tấm kết quả đúng / sai, hết chặng.
   useEffect(() => { if (k && !k.choThay && !k.hocCoHoTro && !k.omni?.luot) phanHoi(k.correct ? 'dung' : 'sai') }, [!!k]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (xong) phanHoi('xong') }, [xong])

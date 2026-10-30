@@ -90,7 +90,10 @@ export function useDiemDanhHs(token: string, bat = true) {
       if (document.visibilityState === 'visible') void hoi()
     }
     document.addEventListener('visibilitychange', hien)
-    return () => document.removeEventListener('visibilitychange', hien)
+    // em vừa từ màn khác về Lộ trình (StudentPortalScreen `SU_KIEN_VE_LO_TRINH`) ⇒ hỏi lại buổi đang mở
+    const ve = () => { void hoi() }
+    window.addEventListener('ddh-ve-lo-trinh', ve)
+    return () => { document.removeEventListener('visibilitychange', hien); window.removeEventListener('ddh-ve-lo-trinh', ve) }
   }, [gui, hoi, bat])
 
   return { tt, setTt, mo, setMo, ma, setMa, loi, setLoi, dangGui, gui, oNhap, tuQr }
