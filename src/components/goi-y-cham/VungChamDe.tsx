@@ -32,30 +32,16 @@ export type VungChamDeProps = {
   tat?: boolean
 }
 
-let pRuot: Promise<RuotMod> | null = null
-let ruotSan: RuotMod | null = null
-const napRuot = () => {
-  pRuot ??= import('./ruot-cham').then((m) => { ruotSan = m; return m })
-  return pRuot
-}
-export const napSanRuotCham = (): void => { void napRuot().catch(() => {}) }
-
-const laMayYeu = () => typeof document !== 'undefined' && document.documentElement.classList.contains('may-yeu')
-
 export function VungChamDe({ q, children, tat, ...p }: VungChamDeProps) {
-  const [ruot, setRuot] = useState<RuotMod | null>(() => (tat || laMayYeu() ? null : ruotSan))
+  const [ruot, setRuot] = useState<RuotMod | null>(null)
   const goc = useRef<HTMLDivElement>(null), tren = useRef<HTMLDivElement>(null), duoi = useRef<HTMLDivElement>(null)
   const id = useId()
   useEffect(() => {
-    if (tat || ruot) return
+    if (tat) return
     let huy = false
-    if (ruotSan && laMayYeu()) {
-      const h = window.setTimeout(() => { if (!huy) setRuot(ruotSan) }, 16)
-      return () => { huy = true; window.clearTimeout(h) }
-    }
-    napRuot().then((m) => { if (!huy) setRuot(m) }, () => { /* mất mạng ⇒ đề trơn */ })
+    import('./ruot-cham').then((m) => { if (!huy) setRuot(m) }, () => { /* mất mạng ⇒ đề trơn */ })
     return () => { huy = true }
-  }, [tat, ruot])
+  }, [tat])
   if (tat) return <>{children}</>
   return (
     <div className="gyc">

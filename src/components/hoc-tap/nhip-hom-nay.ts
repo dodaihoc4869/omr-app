@@ -38,10 +38,7 @@ export function chiaChang(so: SoHomNay): { co: number; tt: 'xong' | 'dang' | 'ch
     const cuoi = i === so.soChang - 1 ? so.muc : Math.min((i + 1) * CAU_MOI_CHANG, so.muc)
     const co = Math.max(1, cuoi - dau)
     const tt = i < xong ? 'xong' : i === xong ? 'dang' : 'cho'
-    const dangDo = tt === 'dang' && so.changDangDo === i + 1
-    const daLamNay = typeof so.soDaLamChang === 'number' ? so.soDaLamChang : Math.max(0, so.daLam - dau)
-    const phan = dangDo ? Math.max(0, Math.min(100, Math.round((100 * daLamNay) / co))) : 0
-    return { co, tt, phan }
+    return { co, tt, phan: tt === 'dang' ? Math.max(0, Math.min(100, Math.round((100 * (so.daLam - dau)) / co))) : 0 }
   })
 }
 

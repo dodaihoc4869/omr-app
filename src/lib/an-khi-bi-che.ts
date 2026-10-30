@@ -37,10 +37,6 @@ export function batAnKhiBiChe(el: HTMLElement): () => void {
     if (!diem.every(([x, y]) => diemBiChe(el, x, y))) { if (++lan < 20) id = window.setTimeout(thu, 1000); return }
     const r = el.getBoundingClientRect()
     el.style.containIntrinsicSize = `${Math.round(r.width)}px ${Math.round(r.height)}px`
-    if (document.documentElement.classList.contains('may-yeu')) {
-      id = window.setTimeout(() => { el.style.contentVisibility = 'hidden'; daAn = true }, 16)
-      return
-    }
     el.style.contentVisibility = 'hidden'
     daAn = true
   }

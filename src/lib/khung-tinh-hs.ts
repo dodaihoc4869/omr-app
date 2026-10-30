@@ -123,7 +123,7 @@ const laAnhDiem = (a: AnhBi | undefined): a is AnhBi => !!a && /^data:image\/(?:
 export async function raAnhBi(): Promise<void> {
   try {
     const root = document.getElementById('root')
-    if (!root || !loTrinh || !chupDuoc(root)) return
+    if (!root) return
     const kho = docBi(), hom = ngayVn()
     let doi = false
     for (const svg of Array.from(root.querySelectorAll<SVGSVGElement>('.bi.lua > svg.lua-svg'))) {
@@ -207,7 +207,6 @@ let loTrinh = false
 /** MotTrangHs báo mục đang mở có phải Lộ trình không (chỉ chụp Lộ trình — Luyện tập / Thành tích không chụp). */
 export function baoLoTrinh(co: boolean): void {
   loTrinh = co
-  if (!co && hen) { window.clearTimeout(hen); hen = 0 }
 }
 
 /** Chụp NGAY (đã kiểm điều kiện). Máy chặn lưu / quá cỡ ⇒ bỏ qua, không bao giờ ném lỗi. */
