@@ -9,7 +9,7 @@ import type { Env, D1Result, D1PreparedStatement } from './kieu'
 import { dbGoc } from './cau-hinh-dem'
 import type { HoSo2 } from './srs2-d1'
 import { docMetaCau, docChienDichThoCuaEm } from './srs2-d1'
-import { docSuKienOmni, qCuaCau, damBaoBangOmni } from './omni-d1'
+import { docSuKienOmniKemNguon, qCuaCau, damBaoBangOmni } from './omni-d1'
 import { phatLaiEm, vknCaCau } from './omni-p-vkn'
 import { duBaoDiem, xacSuatDungCau } from './du-bao-diem'
 import { msKyVong } from './omni-toc-do'
@@ -113,14 +113,36 @@ async function docChienDichDayDaDoc(env:Env,sbd:string,id:string):ReturnType<typ
 }
 interface TheoHoSoDongCo { khoaBeta:string; coCd:boolean; cdId:string; beta:Promise<D1Result<{qid:string;beta:number}>>; full:ReturnType<typeof docChienDichDay>|undefined }
 type DongDongCoCu={cap_nhat_luc:number;bam_canh:string|null;canh_luc:number|null}
+/** Khoá sổ HỢP LỆ cho động cơ (đúng luật câu SELECT khoá cũ): bỏ dòng che (đã bỏ ở `docSuKienOmni`), dòng thi của ca đã xoá / chưa công bố, dòng luyện của đề
+ *  chưa nộp. 30/10: trước là một lượt đọc TẤT CẢ khoá sổ của em (1.287 dòng TB mỗi lượt Sảnh / kế hoạch, 4.726 lần / 2,5 giờ cao điểm) — nay chỉ hỏi các mã ca /
+ *  mã đề có trong sổ (không có dòng thi / luyện ⇒ không đọc gì). */
+async function khoaHopLe(env:Env,sbd:string,now:number,x:{suKien:Map<string,SuKienOmni[]>;maNguonCua:Map<string,{nguon:string;maNguon:string}>}):Promise<D1Result<{khoa:string}>>{
+  const thi=new Set<string>(),luyen=new Set<string>()
+  for(const v of x.maNguonCua.values())(v.nguon==='thi'?thi:luyen).add(v.maNguon)
+  const ok=new Set<string>()
+  if(thi.size||luyen.size){
+    const q=[`SELECT 't' AS k, c.ma_ca AS m FROM ca c WHERE c.ma_ca IN (SELECT value FROM json_each(?1)) AND c.trang_thai<>'da_xoa' AND ${SQL_DA_CONG_BO('c')}`]
+    if(luyen.size)q.push(`SELECT 'l', ld.id FROM luyen_de_2026 ld WHERE ld.id IN (SELECT value FROM json_each(?2)) AND ld.sbd=?3 AND ld.status='submitted'`,
+      `SELECT 'l', 'de_thu:'||dt.id FROM omni_de_thu dt WHERE dt.id IN (SELECT substr(value,8) FROM json_each(?2) WHERE value LIKE 'de_thu:%') AND dt.sbd=?3 AND dt.nop_luc IS NOT NULL AND dt.nop_luc<=?4`)
+    const r=await env.DB.prepare(q.join(' UNION ALL ')).bind(JSON.stringify([...thi]),JSON.stringify([...luyen]),sbd,new Date(now).toISOString()).all<{k:string;m:string}>()
+    for(const y of r.results??[])ok.add(`${y.k}|${y.m}`)
+  }
+  const results:{khoa:string}[]=[]
+  for(const ds of x.suKien.values())for(const e of ds){
+    const n=x.maNguonCua.get(e.khoa)
+    if(!n||ok.has(`${n.nguon==='thi'?'t':'l'}|${n.maNguon}`))results.push({khoa:e.khoa})
+  }
+  return {results,success:true,meta:{}} as unknown as D1Result<{khoa:string}>
+}
 export function docTruocDongCo(env:Env,sbd:string,now:number,ghi=true):DocTruocDongCo {
   const ddl=som(chayDdlMotLan(env,'hanh_trinh_v4',SQL_DONG_CO_HANH_TRINH))
   const sau=<T,>(f:()=>Promise<T>):Promise<T>=>som(ddl.then(f))
   const ddl5=som(chayDdlMotLan(env,'hanh_trinh_v5',SQL_HANH_TRINH_V5)), ddl6=ghi?som(chayDdlMotLan(env,'hanh_trinh_v6',SQL_HT6)):null
   const nhom=som(ddl5.then(()=>docNhom(env,sbd)))
+  const soKem=sau(()=>docSuKienOmniKemNguon(env,[sbd]))
   return { sbd, now, ghi, ddl, nhom, vaoNhom:ghi?som(nhom.then(n=>n?null:docDauVaoNhom(env,sbd,now))):null,
-    so:sau(()=>docSuKienOmni(env,[sbd])),
-    allowed:sau(()=>env.DB.prepare(`SELECT khoa FROM su_kien_hoc WHERE sbd=? AND COALESCE(visibility,'')<>'embargoed' AND (nguon<>'thi' OR EXISTS(SELECT 1 FROM ca c WHERE c.ma_ca=su_kien_hoc.ma_nguon AND c.trang_thai<>'da_xoa' AND ${SQL_DA_CONG_BO('c')})) AND (nguon<>'luyen' OR EXISTS(SELECT 1 FROM luyen_de_2026 ld WHERE ld.id=su_kien_hoc.ma_nguon AND ld.sbd=su_kien_hoc.sbd AND ld.status='submitted') OR EXISTS(SELECT 1 FROM omni_de_thu dt WHERE dt.id=substr(su_kien_hoc.ma_nguon,8) AND su_kien_hoc.ma_nguon LIKE 'de_thu:%' AND dt.sbd=su_kien_hoc.sbd AND dt.nop_luc IS NOT NULL AND dt.nop_luc<=?))`).bind(sbd,new Date(now).toISOString()).all<{khoa:string}>()),
+    so:soKem.then(x=>x.suKien),
+    allowed:soKem.then(x=>khoaHopLe(env,sbd,now,x)),
     xacNhan:sau(()=>env.DB.prepare('SELECT sbd,ma_dang AS maDang,ket,luc FROM omni_xac_nhan WHERE sbd=? AND luc<=?').bind(sbd,new Date(now).toISOString()).all<XacNhanThay>()),
     offers:sau(()=>env.DB.prepare('SELECT * FROM hanh_trinh_v4_can_thiep WHERE sbd=? AND goi_luc>=? AND do_luc IS NULL ORDER BY goi_luc DESC,ngay DESC,moc DESC LIMIT 96').bind(sbd,now-15*86400000).all<Row>()),
     stats:sau(()=>env.DB.prepare(`SELECT context,cach,SUM(CASE WHEN ket_qua=1 THEN 1 ELSE 0 END) dung,SUM(CASE WHEN ket_qua=0 THEN 1 ELSE 0 END) sai FROM hanh_trinh_v4_can_thiep WHERE do_luc>=? AND ket_qua IS NOT NULL GROUP BY context,cach`).bind(now-90*86400000).all<BangBandit>()),

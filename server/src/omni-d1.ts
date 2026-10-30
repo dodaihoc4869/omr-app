@@ -545,6 +545,7 @@ async function docDongSo(env: Env, sbds: readonly string[], dem?: ReadonlyMap<st
   type Buoc = { s: string; rows: Row[] } | { s: string; cu: { rows: Row[]; n: number; r: number }; d: DemSo; p: Promise<Row[]> } | { s: string }
   const buoc: Buoc[] = sbds.map((s) => {
     const d = dem.get(s) ?? { n: 0, r: 0 }
+    if (d.n === 0) return { s, rows: [] } // 30/10: đếm sổ (cùng lượt) báo em chưa có dòng nào ⇒ khỏi đọc
     let cu = demSo.doc(s, now)
     // 30/10: đệm bộ nhớ trượt ⇒ kho sổ trên đĩa của ngăn riêng (còn nguyên qua lúc ngăn ngủ / isolate mới) — nạp lại đệm bộ nhớ từ đó.
     if (!cu) { const k = khoSoCua(env, s); if (k) { cu = k; if (k.n === d.n && k.r === d.r) demSo.ghi(s, now, k, k.rows.length) } }
@@ -658,7 +659,7 @@ async function docPhamViNhieuEm(env: Env, sbds: readonly string[]): Promise<Map<
   const ds = await Promise.all(sbds.map((s) => phamViCuaEm(env, s).catch(() => null)))
   return new Map(sbds.map((s, i) => [s, ds[i] ?? null]))
 }
-interface SoVaMeta { suKien: Map<string, SuKienOmni[]>; kho: Map<string, CauKho>; goiY: Map<string, GoiYCau>; phamVi: Map<string, PhamViLop | null>; baiCuaQid: Map<string, Map<string, string>> }
+interface SoVaMeta { suKien: Map<string, SuKienOmni[]>; kho: Map<string, CauKho>; goiY: Map<string, GoiYCau>; phamVi: Map<string, PhamViLop | null>; baiCuaQid: Map<string, Map<string, string>>; maNguonCua: Map<string, { nguon: string; maNguon: string }> }
 /** Câu (qid gốc) có thời lượng làm (`raw_json.ms`) trong sổ — ĐÚNG thứ tự `dungHoSoNoi` duyệt `suKien` (em theo `sbds`, sự kiện theo (tiếp nhận, khoá)). Thuần. */
 function cauCoMsTuDong(sbds: readonly string[], theoEm: ReadonlyMap<string, readonly Row[]>): string[] {
   const ra = new Set<string>()
@@ -677,8 +678,10 @@ async function docSoVaMeta(env: Env, sbds: readonly string[], truocMs?: number, 
   const rows = await docDongSo(env, sbds, dem, som?.so)
   const theoEm = new Map<string, Row[]>()
   const goiY = new Map<string, GoiYCau>()
+  const maNguonCua = new Map<string, { nguon: string; maNguon: string }>() // khoá ⇒ nguồn thi / luyện (bộ máy hành trình lọc ca chưa công bố, đề chưa nộp)
   for (const x of rows) {
     if (str(x.visibility) === 'embargoed') continue
+    if (x.nguon === 'thi' || x.nguon === 'luyen') maNguonCua.set(str(x.khoa), { nguon: str(x.nguon), maNguon: str(x.ma_nguon) })
     if (truocMs != null && !(thoiDiemTiepNhan(x) < truocMs)) continue
     const s = str(x.sbd)
     let a = theoEm.get(s)
@@ -705,11 +708,21 @@ async function docSoVaMeta(env: Env, sbds: readonly string[], truocMs?: number, 
     suKien.set(s, ds)
     baiCuaQid.set(s, bai)
   }
-  return { suKien, kho, goiY, phamVi, baiCuaQid }
+  return { suKien, kho, goiY, phamVi, baiCuaQid, maNguonCua }
 }
 /** Sổ của các em ⇒ SuKienOmni[] (đã sắp (receivedAt, khoa), bỏ dòng ca chưa công bố). `truocMs` ⇒ chỉ dòng tiếp nhận trước mốc. */
 export async function docSuKienOmni(env: Env, sbds: readonly string[], tuy: { truocMs?: number } = {}): Promise<Map<string, SuKienOmni[]>> {
-  return (await docSoVaMeta(env, [...new Set(sbds.filter(Boolean))], tuy.truocMs)).suKien
+  // 30/10 (D1 nghẽn giờ cao điểm: đọc CẢ sổ của em 8.473 lần / 2,5 giờ, 1.256 dòng TB): bộ máy hành trình gọi hàm này ở MỖI lượt Sảnh / kế hoạch mà không qua
+  // đệm dòng sổ ⇒ luôn đọc lại cả sổ. Đọc sống (không `truocMs`, ít em) ⇒ đi qua đệm (đếm sổ là chỉ mục phủ, nhớ theo lượt): khớp ⇒ không đọc, thêm ⇒ chỉ phần mới.
+  return (await docSuKienOmniKemNguon(env, sbds, tuy)).suKien
+}
+/** Như `docSuKienOmni` + khoá ⇒ (nguồn, mã nguồn) của dòng thi / luyện — bộ máy hành trình tự lọc ca chưa công bố / đề chưa nộp từ đây (30/10: trước là
+ *  một lượt đọc riêng TẤT CẢ khoá sổ của em, 1.287 dòng TB mỗi lượt Sảnh / kế hoạch). */
+export async function docSuKienOmniKemNguon(env: Env, sbds: readonly string[], tuy: { truocMs?: number } = {}): Promise<{ suKien: Map<string, SuKienOmni[]>; maNguonCua: Map<string, { nguon: string; maNguon: string }> }> {
+  const ds = [...new Set(sbds.filter(Boolean))]
+  const dem = tuy.truocMs == null && ds.length > 0 && ds.length <= 3 ? await demSoDong(env, ds).catch(() => undefined) : undefined
+  const r = await docSoVaMeta(env, ds, tuy.truocMs, dem)
+  return { suKien: r.suKien, maNguonCua: r.maNguonCua }
 }
 
 // ---------------------------------------------------------------- β câu, xác nhận thầy, lớp
