@@ -16,6 +16,11 @@ on:
         default: 'dem'
         type: choice
         options: [dem, ghi]
+      bo_cong_ca_mo:
+        description: 'Thầy cho phép chạy khi đang có ca thi mở (chỉ tài khoản thử, chỉ hôm nay; 30/10 thầy chọn «Chạy ngay bây giờ»)'
+        required: false
+        default: false
+        type: boolean
 permissions:
   contents: read
 concurrency:
@@ -38,6 +43,7 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
           CHE_DO: ${{ inputs.che_do }}
+          BO_CONG: ${{ inputs.bo_cong_ca_mo }}
         run: |
           set -euo pipefail
           S="'12121212'"
@@ -50,7 +56,10 @@ jobs:
           # cổng: ca thi đang mở ⇒ dừng
           MO=$(d1 "SELECT COUNT(*) n FROM ca WHERE trang_thai='mo'" | jq -r '.[0].results[0].n')
           echo "Ca thi đang mở: $MO"
-          [ "$MO" = "0" ] || { echo "::error::Đang có ca thi mở — dừng."; exit 1; }
+          if [ "$MO" != "0" ]; then
+            [ "$BO_CONG" = "true" ] || { echo "::error::Đang có ca thi mở — dừng."; exit 1; }
+            echo "::warning::Đang có ca thi mở — thầy cho phép chạy (chỉ dòng hôm nay của tài khoản thử, không đụng ca thi)."
+          fi
           TON=$(d1 "SELECT COUNT(*) n FROM hoc_sinh WHERE sbd=$S" | jq -r '.[0].results[0].n')
           [ "$TON" = "1" ] || { echo "::error::Không thấy tài khoản thử — dừng."; exit 1; }
           # mô tả | bảng | điều kiện (luôn gắn với tài khoản thử + hôm nay)
