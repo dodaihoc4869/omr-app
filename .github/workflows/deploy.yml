@@ -15,9 +15,18 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      khan:
+        description: 'Khẩn (thầy cho phép): phát hành NGAY cả trong giờ học tối'
+        type: boolean
+        default: false
+  # 23:40 VN: phát hành bù bản main đã hoãn trong giờ học tối (không có gì mới ⇒ không làm gì).
+  schedule:
+    - cron: '40 16 * * *'
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: phat-hanh
@@ -26,9 +35,42 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  phat-hanh:
-    # Bản sống chỉ lấy từ main; nhánh cũ không được ghi đè luồng chữa đã phát hành.
+  # CỔNG GIỜ HỌC TỐI (thầy 30/10 21:20 «TUYỆT ĐỐI KHÔNG ĐƯỢC XẢY RA HIỆN TƯỢNG NÀY NỮA»): 20:49–21:09 VN app đổi bản 5 lần ⇒ máy MỌI em tải lại cùng lúc,
+  # lệnh lên máy chủ gấp đôi, «Máy chủ đang bận», «Chưa nộp được câu». 18:00–23:30 VN: lần đẩy main KHÔNG phát hành (Worker lẫn Pages), chờ lượt bù 23:40;
+  # chỉ «Chạy workflow» với ô Khẩn mới phát hành ngay. Lượt bù 23:40 chỉ chạy khi main có commit chưa phát hành.
+  cong:
     if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    outputs:
+      chay: ${{ steps.c.outputs.chay }}
+    steps:
+      - id: c
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SU_KIEN: ${{ github.event_name }}
+          KHAN: ${{ inputs.khan }}
+        run: |
+          H=$(TZ=Asia/Ho_Chi_Minh date +%H); M=$(TZ=Asia/Ho_Chi_Minh date +%M); P=$((10#$H * 60 + 10#$M))
+          GIO_HOC=false; [ "$P" -ge 1080 ] && [ "$P" -lt 1410 ] && GIO_HOC=true
+          CHAY=true
+          if [ "$SU_KIEN" = schedule ]; then
+            # Commit cuối đã thật sự phát hành = lượt gần nhất có bước «Đẩy lên Cloudflare Pages» thành công.
+            DA=""
+            for r in $(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/deploy.yml/runs?branch=main&per_page=30" --jq '.workflow_runs[] | select(.status=="completed") | "\(.id):\(.head_sha)"'); do
+              ok=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/${r%%:*}/jobs" --jq '[.jobs[].steps[]? | select(.name=="Đẩy lên Cloudflare Pages" and .conclusion=="success")] | length')
+              if [ "${ok:-0}" -gt 0 ]; then DA=${r#*:}; break; fi
+            done
+            if [ "$DA" = "$GITHUB_SHA" ]; then CHAY=false; echo "Bản main $GITHUB_SHA đã phát hành ⇒ lượt bù không làm gì."; else echo "Bản đã phát hành: ${DA:-?} ≠ main $GITHUB_SHA ⇒ phát hành bù."; fi
+          elif [ "$GIO_HOC" = true ] && [ "$KHAN" != true ]; then
+            CHAY=false
+            echo "::warning::Giờ học tối ($H:$M VN): HOÃN phát hành để máy các em không tải lại hàng loạt. Tự phát hành bù lúc 23:40; khẩn thì «Run workflow» và tích ô Khẩn."
+          fi
+          echo "chay=$CHAY" >> "$GITHUB_OUTPUT"; echo "Phát hành: $CHAY"
+
+  phat-hanh:
+    needs: cong
+    # Bản sống chỉ lấy từ main; nhánh cũ không được ghi đè luồng chữa đã phát hành.
+    if: github.ref == 'refs/heads/main' && needs.cong.outputs.chay == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
