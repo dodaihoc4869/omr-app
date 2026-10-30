@@ -1,4 +1,5 @@
 # ĐO GÓI BÀI CẢ NGÀY TRÊN BẢN SỐNG (CHỈ ĐỌC) — thầy 29/10 «app hs … tốc độ tức thì ở mọi khung giờ». Chỉ SELECT gộp: không mã em, không tên.
+# Chạy lại 30/10 19:05 VN (soi «Máy chủ chưa trả được đề» ở Câu đã làm: mã sổ có hậu tố #n / ~ss|bt|yd).
 # Chạy lại 30/10 17:55 VN (kiểm trước giờ cao điểm, sau #627–#629).
 # Phiên mở từ gói (`goiNgay: 1`, lệnh hoc-tap-mo-goi) so với phiên đường cũ (hoc-tap-start / bản sẵn), theo giờ VN; câu đã nộp trong từng loại phiên.
 name: Đo gói bài cả ngày (chỉ đọc)
@@ -41,6 +42,10 @@ jobs:
             "SELECT SUM(json_extract(json,'\$.goiNgay')=1) tu_goi, SUM(COALESCE(json_extract(json,'\$.goiNgay'),0)<>1) duong_cu FROM game_v2_session WHERE created_at >= strftime('%Y-%m-%dT%H:%M:%fZ','now','-6 hours') AND json_extract(json,'\$.hocTap')=1 AND COALESCE(json_array_length(json,'\$.questions'),0)=0"
           q "sổ học hôm nay theo nguồn (số dòng · số em): kiểm #629 câu Tự luyện" \
             "SELECT nguon, COUNT(*) dong, COUNT(DISTINCT sbd) em FROM su_kien_hoc WHERE ngay_vn=strftime('%Y-%m-%d','now','+7 hours') GROUP BY nguon ORDER BY dong DESC"
+          q "sổ học hôm nay: dòng mã có hậu tố lượt lặp #n · bản ảo ~ss|~bt|~yd · tổng" \
+            "SELECT SUM(qid GLOB '*#[0-9]*') lap, SUM(qid GLOB '*~ss[0-9]*' OR qid GLOB '*~bt[0-9]*' OR qid GLOB '*~yd[0-9]*') ao, COUNT(*) tong FROM su_kien_hoc WHERE ngay_vn=strftime('%Y-%m-%d','now','+7 hours')"
+          q "cặp (em, câu gốc) 7 ngày qua chỉ có mã lượt lặp #n, KHÔNG có dòng mã gốc (Câu đã làm xin chi tiết theo mã gốc ⇒ rỗng): số cặp · số em" \
+            "WITH l AS (SELECT DISTINCT sbd, substr(qid,1,instr(qid,'#')-1) goc FROM su_kien_hoc WHERE qid GLOB '*#[0-9]*' AND ngay_vn>=date('now','+7 hours','-7 days')) SELECT COUNT(*) cap, COUNT(DISTINCT sbd) em FROM l WHERE NOT EXISTS (SELECT 1 FROM su_kien_hoc s WHERE s.sbd=l.sbd AND s.qid=l.goc)"
           q "hành trình đang chạy (bước kiểm phát hành «ba hành trình»): mã · trạng thái · tạo lúc" \
             "SELECT id, trang_thai, substr(COALESCE(tao_luc,''),1,16) tao FROM chien_dich WHERE trang_thai='dang_chay' ORDER BY id"
           q "kho theo khối + biên nhận gộp" "SELECT khoa, length(gia_tri) dai FROM cau_hinh WHERE khoa IN ('hanh_trinh_v3_kho_10','hanh_trinh_v3_kho_11','hanh_trinh_v3_kho_12','hanh_trinh_3_0910_v1')"
