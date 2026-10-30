@@ -2,7 +2,7 @@
 // Phần HIỆN NGAY: vẽ từ bản gần nhất ở máy rồi cập nhật khi /hs/thuong trả (số đổi ⇒ đếm từ số cũ, không chớp). Chưa có bản nào ⇒ khung xương (không số).
 // Trường nào thiếu ⇒ ô đó ẩn (không bịa số). Có thông báo thưởng chưa xem (thăng hoa, bình đã đỡ, cuối tuần…) ⇒ nạp LƯỜI tấm thông báo.
 // Cắm: thay các viên số trong header.da-tren của Lộ trình (xem CAM-VAO.md).
-import { lazy, Suspense, type ReactNode } from 'react'
+import { lazy, Suspense, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { Bi } from '../linh-vat/Bi'
 import { IcLua, IcNguyenTu, IcTinhThe } from './hinh'
@@ -11,15 +11,20 @@ import { useTongQuan } from './dung-thuong'
 import { locThongBao } from './loc-thong-bao'
 import { vongMucTieu } from '../../lib/thuong-api'
 import { soGon } from '../../lib/so-gon'
+import type { LoaiBieuTuong } from './TamHuongDan'
 import '../../styles/trong-thuong-gon.css'
 
 const ThongBaoThuong = lazy(() => import('./ManThuong').then((m) => ({ default: m.ThongBaoThuong })))
+// Tấm hướng dẫn lửa / nguyên tử / tinh thể (thầy 30/10) đi trong mảnh nạp lười ManThuong (đã được SW cất sẵn) ⇒ chạm là nạp, không thêm byte mở app.
+const TamHuongDan = lazy(() => import('./ManThuong').then((m) => ({ default: m.TamHuongDan })))
+const napTruocHuongDan = () => { void import('./ManThuong').catch(() => {}) }
 const CHU_VI = 138.2 // 2π·22
 
 export interface PropsThanhThuong {
   token?: string
-  /** Bấm một bộ đếm ⇒ mở màn tương ứng (Chuỗi ngày · Nhiệm vụ ngày · Cửa hàng tinh thể). Không truyền ⇒ ô chỉ để xem. */
-  onMo?: (man: 'chuoi' | 'nhiem-vu' | 'cua-hang') => void
+  /** Mở màn chi tiết: vòng mục tiêu ⇒ Nhiệm vụ ngày; nút chính của tấm hướng dẫn lửa / nguyên tử / tinh thể ⇒ Chuỗi ngày · Giải tuần / Nhiệm vụ · Cửa hàng.
+   *  Không truyền ⇒ vòng chỉ để xem, tấm hướng dẫn chỉ có «Đã hiểu». */
+  onMo?: (man: 'chuoi' | 'giai' | 'nhiem-vu' | 'cua-hang') => void
   /** «Học ngay» trên tấm thông báo (thăng hoa, bình đã đỡ…). */
   onHoc?: () => void
   /** Tắt tấm thông báo tự bật (vd. đang ở màn khác). Mặc định bật. */
@@ -32,14 +37,18 @@ export interface PropsThanhThuong {
 
 export function ThanhThuong({ token, onMo, onHoc, thongBao = true, menu }: PropsThanhThuong) {
   const { du, tai } = useTongQuan(token)
+  const [hd, setHd] = useState<LoaiBieuTuong | null>(null)
   if (!du) return tai ? <div className="tp-tr" aria-busy="true" aria-label="Đang tải số của em">
     {[0, 1, 2].map((i) => <span key={i} className="tp-tr-o" data-k={['lua', 'nt', 'tt'][i]}><span className="tp-tr-cho" /></span>)}
   </div> : null
   const c = du.chuoiNgay, mt = vongMucTieu(du.mucTieu)
   const dat = !!mt && mt.dat
   const p = mt ? Math.min(1, mt.da / mt.can) : 0
-  // Một khuôn cho 3 bộ đếm + vòng mục tiêu (`lop` = 'tp-tr-muc'): có onMo ⇒ nút mở màn; không ⇒ ô chỉ để xem.
-  const o = (k: 'lua' | 'nt' | 'tt' | undefined, nhan: string, man: 'chuoi' | 'nhiem-vu' | 'cua-hang', con: ReactNode, lop = 'tp-tr-o', d?: true) => onMo
+  // Một khuôn cho 3 bộ đếm + vòng mục tiêu (`lop` = 'tp-tr-muc'). Lửa / nguyên tử / tinh thể (thầy 30/10) ⇒ LUÔN là nút mở tấm hướng dẫn (nút chính
+  // trong tấm mới sang màn chi tiết); vòng mục tiêu: có onMo ⇒ nút mở màn, không ⇒ ô chỉ để xem.
+  const o = (k: LoaiBieuTuong | undefined, nhan: string, man: 'chuoi' | 'nhiem-vu' | 'cua-hang', con: ReactNode, lop = 'tp-tr-o', d?: true) => k
+    ? <button type="button" className={lop} data-k={k} data-dat={d} aria-label={`${nhan} · xem hướng dẫn`} aria-haspopup="dialog" onPointerDown={napTruocHuongDan} onClick={() => setHd(k)}>{con}</button>
+    : onMo
     ? <button type="button" className={lop} data-k={k} data-dat={d} aria-label={nhan} onClick={() => onMo(man)}>{con}</button>
     : <span className={lop} data-k={k} data-dat={d} role="img" aria-label={nhan}>{con}</span>
   const dinh = menu ? soGon : undefined
@@ -64,6 +73,7 @@ export function ThanhThuong({ token, onMo, onHoc, thongBao = true, menu }: Props
     {/* 27/10: tấm thông báo toàn khung (position: fixed) đưa ra <body> — thanh trên `.da-tren` có clip-path + sticky z-index ⇒ để bên trong thì tấm bị
         cắt còn đúng dải thanh trên (thấy nút Đóng + bộ đếm, mất thân). */}
     {tb.length > 0 && typeof document !== 'undefined' && createPortal(<Suspense fallback={null}><ThongBaoThuong token={token!} tongQuan={du} onHoc={onHoc} /></Suspense>, document.body)}
+    {hd && typeof document !== 'undefined' && createPortal(<Suspense fallback={null}><TamHuongDan loai={hd} tq={du} onMo={onMo} onDong={() => setHd(null)} /></Suspense>, document.body)}
   </div>
 }
 
