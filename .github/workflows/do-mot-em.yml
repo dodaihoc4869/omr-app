@@ -1,0 +1,44 @@
+# ĐO MỘT EM (CHỈ ĐỌC) — thầy hỏi «em X được phân bao nhiêu câu». Số báo danh nhập tay lúc chạy, CHE trong nhật ký (::add-mask::), không ghi vào mã.
+# Chỉ SELECT: mức hôm nay (chặng học), hạn ngạch từng bài, đã làm hôm nay theo nguồn, Sửa lỗi hôm nay, phiên học hôm nay (số câu mỗi phiên). Không in mã em.
+name: Đo một em (chỉ đọc)
+on:
+  workflow_dispatch:
+    inputs:
+      sbd:
+        description: 'Số báo danh (che trong nhật ký)'
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Che số báo danh
+        run: |
+          S=$(jq -r '.inputs.sbd' "$GITHUB_EVENT_PATH" | tr -cd '0-9A-Za-z')
+          echo "::add-mask::$S"
+          echo "SBD_EM=$S" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm (chỉ SELECT)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          S="'${SBD_EM}'"
+          HOM=$(TZ=Asia/Ho_Chi_Minh date +%F)
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c ".[0].results" || echo "(lỗi)"; }
+          echo "Giờ VN: $(TZ=Asia/Ho_Chi_Minh date '+%d/%m %H:%M') · hôm nay $HOM"
+          q "mức hôm nay (chặng học): tầng · tối thiểu tầng · hạn ngạch · mức" "SELECT tang, toi_thieu_tang, quota, muc FROM goi_bai_7_muc_ngay WHERE sbd=$S AND ngay='$HOM'"
+          q "hạn ngạch từng bài hôm nay" "SELECT g.goi_id, substr(COALESCE(b.ten,''),1,40) ten, g.quota FROM goi_bai_7_ngay g LEFT JOIN goi_bai_7 b ON b.id=g.goi_id WHERE g.sbd=$S AND g.ngay='$HOM'"
+          q "sổ học hôm nay theo nguồn: số câu khác nhau · số dòng" "SELECT nguon, COUNT(DISTINCT qid) cau, COUNT(*) dong FROM su_kien_hoc WHERE sbd=$S AND ngay_vn='$HOM' GROUP BY nguon"
+          q "Sửa lỗi hôm nay: mục tiêu · số việc · đã xong · thêm" "SELECT (SELECT muc_tieu FROM tu_sua_muc_tieu_ngay WHERE sbd=$S AND ngay_vn='$HOM') muc_tieu, json_array_length(muc_json) viec, json_array_length(xong_json) xong, them FROM tu_sua_viec_ngay WHERE sbd=$S AND ngay_vn='$HOM'"
+          q "phiên học hôm nay: giờ VN · số câu · từ gói · đã trả lời" "SELECT strftime('%H:%M', s.created_at, '+7 hours') gio, json_array_length(s.json,'\$.questions') so_cau, COALESCE(json_extract(s.json,'\$.goiNgay'),0) tu_goi, (SELECT COUNT(*) FROM game_v2_attempt a WHERE a.session=s.id) tra_loi FROM game_v2_session s WHERE s.sbd=$S AND s.created_at >= '$(date -u -d "$HOM 00:00:00 +07:00" +%Y-%m-%dT%H:%M:%S)' ORDER BY s.created_at"
+          q "kế hoạch gói 7 đã lưu hôm nay (nếu có): số việc" "SELECT COUNT(*) n FROM ke_hoach_ngay WHERE sbd=$S AND ngay='$HOM'"
