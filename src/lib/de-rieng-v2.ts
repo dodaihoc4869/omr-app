@@ -46,7 +46,12 @@ export interface RutThuCa {
   mocDoc?: string
   /** Thời gian chạy thuật toán trên máy này (ms). */
   msThuatToan: number
+  /** Hồ sơ THÔ máy chủ trả cho từng em (lỗi kèm câu song sinh, câu đã gặp) — lúc chốt chỉ ĐỌC LẠI em có lượt mới, em khác dùng lại (30/10). */
+  tho?: HoSoTho
 }
+
+/** Hồ sơ thô `/ca/loi-den-han` của một nhóm em (đúng dáng `loiDenHanTheoEm` trả). */
+export type HoSoTho = { em: Record<string, LoiDenHanEm[]>; daGap: Record<string, Record<string, string>>; hong: string[]; nhomTrung?: Record<string, string> }
 
 const nho = new Map<string, RutThuCa>()
 /** Kết quả chạy thử đang giữ của một ca (màn Theo dõi đọc để vẽ bảng). */
@@ -107,8 +112,18 @@ async function docHoSoVaCauNgoai(
   ngay: string,
   ng: NguonRut,
   cauNgoai: Record<string, CauNgoai>,
+): Promise<{ hoSo: Record<string, HoSoEmV2>; hong: string[]; nhomTrung: Record<string, string>; tho: HoSoTho }> {
+  const tho = (await loiDenHanTheoEm(url, mat, dsSbd, ngay, ng.khoCa.map((c) => c.id))) as HoSoTho
+  return { ...(await dungHoSoVaCauNgoai(tho, dsSbd, ng, cauNgoai)), tho }
+}
+
+/** Dựng hồ sơ rút + câu ngoài kho từ hồ sơ THÔ đã có (không gọi mạng trừ lần đầu nạp cả kho máy thầy tìm câu gốc). */
+async function dungHoSoVaCauNgoai(
+  r: HoSoTho,
+  dsSbd: string[],
+  ng: NguonRut,
+  cauNgoai: Record<string, CauNgoai>,
 ): Promise<{ hoSo: Record<string, HoSoEmV2>; hong: string[]; nhomTrung: Record<string, string> }> {
-  const r = await loiDenHanTheoEm(url, mat, dsSbd, ngay, ng.khoCa.map((c) => c.id))
   const coTrongKho = new Set(ng.khoCa.map((c) => c.id))
   const canGoc = new Set<string>()
   for (const ds of Object.values(r.em)) for (const l of ds) if (!coTrongKho.has(l.qid) && !cauNgoai[l.qid]) canGoc.add(l.qid)
@@ -142,7 +157,7 @@ async function docHoSoVaCauNgoai(
       daGap: r.daGap[sbd] ?? {},
     }
   }
-  return { hoSo, hong: r.hong, nhomTrung: r.nhomTrung }
+  return { hoSo, hong: r.hong ?? [], nhomTrung: r.nhomTrung ?? {} }
 }
 
 /** Kho dùng để rút = kho ca + câu ngoài kho (đã lọc tự luận bằng `khoTuNguon`). Câu song sinh mang đúng mức/dạng câu gốc. */
@@ -172,13 +187,126 @@ export async function chayThuRutDeCa(
   const ng = await napNguon(maCa)
   const cauNgoai: Record<string, CauNgoai> = {}
   const mocDoc = new Date().toISOString() // TRƯỚC khi đọc: lượt làm xen giữa lúc đọc vẫn bị bắt ở lần kiểm sau
-  const { hoSo, hong, nhomTrung } = await docHoSoVaCauNgoai(url, mat, ds, ngay, ng, cauNgoai)
+  const { hoSo, hong, nhomTrung, tho } = await docHoSoVaCauNgoai(url, mat, ds, ngay, ng, cauNgoai)
+  return rutTuHoSo(maCa, ngay, tuyChon.cheDo, ds, ng, cauNgoai, { hoSo, hong, nhomTrung }, tho, mocDoc)
+}
+
+/** Phần THUẦN của một lượt rút cả lớp (sau khi đã có hồ sơ): chạy thang lấp, cất vào bộ nhớ màn. */
+function rutTuHoSo(
+  maCa: string,
+  ngay: string,
+  cheDo: 'ca' | 'diem_yeu',
+  ds: string[],
+  ng: NguonRut,
+  cauNgoai: Record<string, CauNgoai>,
+  hs: { hoSo: Record<string, HoSoEmV2>; hong: string[]; nhomTrung: Record<string, string> },
+  tho: HoSoTho,
+  mocDoc: string,
+): RutThuCa {
   const kho = khoDayDu(ng.khoCa, cauNgoai)
   const t0 = performance.now()
-  const kq = rutDeV2({ kho, soCau: ng.soCau, dsSbd: ds, hoSo, ngay, cheDo: tuyChon.cheDo, seed: maCa, nhomTrung })
-  const rt: RutThuCa = { maCa, ngay, cheDo: tuyChon.cheDo, kq, cauNgoai, hoSo, nhomTrung, kho, khoCa: ng.khoCa, hongHoSo: hong, lucRut: new Date().toISOString(), mocDoc, msThuatToan: performance.now() - t0 }
+  const kq = rutDeV2({ kho, soCau: ng.soCau, dsSbd: ds, hoSo: hs.hoSo, ngay, cheDo, seed: maCa, nhomTrung: hs.nhomTrung })
+  const rt: RutThuCa = { maCa, ngay, cheDo, kq, cauNgoai, hoSo: hs.hoSo, nhomTrung: hs.nhomTrung, kho, khoCa: ng.khoCa, hongHoSo: hs.hong, lucRut: new Date().toISOString(), mocDoc, msThuatToan: performance.now() - t0, tho }
   nho.set(maCa, rt)
   return rt
+}
+
+/**
+ * RÚT LẠI CẢ LỚP khi có em làm bài sau lúc chạy thử — nhưng CHỈ ĐỌC LẠI hồ sơ của em có lượt mới (và em chưa có / lần trước đọc hỏng).
+ * TỐC ĐỘ BẮT ĐẦU CA (30/10): bản cũ đọc lại hồ sơ CẢ LỚP (`/ca/loi-den-han`, ~10 truy vấn D1 mỗi em) — giờ cao điểm gần như luôn có một em
+ * vừa làm bài ⇒ mỗi lần bấm Bắt đầu là đọc lại 30+ hồ sơ giữa lúc D1 nghẽn. Em KHÔNG có lượt mới thì hồ sơ không đổi ⇒ dùng lại bản thô đã
+ * đọc; thang lấp vẫn chạy lại cho CẢ LỚP (cùng seed, cùng hồ sơ) ⇒ kết quả y hệt bản đọc lại toàn bộ.
+ */
+async function rutLaiTheoLuotMoi(
+  url: string,
+  mat: string,
+  maCa: string,
+  ds: string[],
+  emMoi: readonly string[],
+  cu: RutThuCa,
+  tuyChon: { cheDo: 'ca' | 'diem_yeu'; ngay: string },
+  mocDoc: string,
+): Promise<RutThuCa> {
+  if (!cu.tho) return chayThuRutDeCa(url, mat, maCa, ds, tuyChon)
+  const ng = await napNguon(maCa)
+  const hongCu = new Set(cu.tho.hong ?? [])
+  const moi = new Set(emMoi)
+  const canDoc = ds.filter((s) => moi.has(s) || !(s in cu.tho!.em) || hongCu.has(s))
+  const docLai = new Set(canDoc)
+  const giu = ds.filter((s) => !docLai.has(s))
+  const vua: HoSoTho = canDoc.length > 0
+    ? ((await loiDenHanTheoEm(url, mat, canDoc, tuyChon.ngay, ng.khoCa.map((c) => c.id))) as HoSoTho)
+    : { em: {}, daGap: {}, hong: [], nhomTrung: {} }
+  const tho: HoSoTho = {
+    em: { ...Object.fromEntries(giu.map((s) => [s, cu.tho!.em[s] ?? []])), ...vua.em },
+    daGap: { ...Object.fromEntries(giu.filter((s) => cu.tho!.daGap[s]).map((s) => [s, cu.tho!.daGap[s]!])), ...vua.daGap },
+    hong: [...(vua.hong ?? [])],
+    nhomTrung: { ...(cu.tho.nhomTrung ?? {}), ...(vua.nhomTrung ?? {}) },
+  }
+  const cauNgoai: Record<string, CauNgoai> = {}
+  const hs = await dungHoSoVaCauNgoai(tho, ds, ng, cauNgoai)
+  return rutTuHoSo(maCa, tuyChon.ngay, tuyChon.cheDo, ds, ng, cauNgoai, hs, tho, mocDoc)
+}
+
+/** Lượt nối sớm đang chạy theo ca — lúc chốt đợi nó (có trần) để biết câu nào đã nằm trong kho ca. */
+const dangNoiSom = new Map<string, Promise<number>>()
+/** Câu ngoài kho ĐÃ nối vào kho ca (theo ca, trong phiên màn này) — câu đã nối nằm luôn trong kho ca trên máy chủ, lúc chốt không gửi lại. */
+const daNoiTheoCa = new Map<string, Set<string>>()
+const daNoiCua = (maCa: string): Set<string> => { let s = daNoiTheoCa.get(maCa); if (!s) { s = new Set(); daNoiTheoCa.set(maCa, s) } return s }
+/** Câu ngoài kho đã nối sẵn của một ca (màn / test đọc). */
+export const docDaNoi = (maCa: string): ReadonlySet<string> => daNoiTheoCa.get(maCa) ?? new Set()
+/** Trần chờ lượt nối sớm lúc bấm Bắt đầu (ms): quá trần thì lượt chốt tự nối các câu ấy (nối lặp an toàn ở máy chủ). */
+const CHO_NOI_SOM_MS = 15_000
+
+/** Thêm câu vào bản đề CÓ đáp án của ca trên máy này — bỏ câu đã có (nối sớm và lượt chốt có thể cùng nối một câu). */
+async function luuBankThem(maCa: string, src: TeacherExamSource): Promise<void> {
+  const bank = (await loadSessionTeacherBank(maCa)) ?? []
+  const co = new Set(bank.flatMap((b) => [...b.phanI, ...b.phanII, ...b.phanIII].map((q) => q.id)))
+  const loc: TeacherExamSource = { ...src, phanI: src.phanI.filter((q) => !co.has(q.id)), phanII: src.phanII.filter((q) => !co.has(q.id)), phanIII: src.phanIII.filter((q) => !co.has(q.id)) }
+  if (loc.phanI.length + loc.phanII.length + loc.phanIII.length === 0) return
+  await saveSessionTeacherBank(maCa, [...bank, loc])
+}
+
+/** Nối một nhóm câu ngoài kho vào kho ca (bản gửi máy em KHÔNG đáp án + bản có đáp án) rồi cất vào bản đề của máy này. */
+async function noiVaoKhoCa(url: string, mat: string, maCa: string, canNoi: CauNgoai[]): Promise<void> {
+  const src: TeacherExamSource = {
+    maDe: `${maCa}-v2`,
+    phanI: canNoi.filter((c) => c.phan === 'I').map((c) => c.cau as TeacherMcqQuestion),
+    phanII: canNoi.filter((c) => c.phan === 'II').map((c) => c.cau as TeacherExamSource['phanII'][number]),
+    phanIII: canNoi.filter((c) => c.phan === 'III').map((c) => c.cau as TeacherShortAnswerQuestion),
+  }
+  await noiKhoCa(url, mat, maCa, mergeAndStrip([src]), { phanI: src.phanI, phanII: src.phanII, phanIII: src.phanIII })
+  await luuBankThem(maCa, src)
+}
+
+/**
+ * NỐI SỚM (30/10): ngay sau khi CHẠY THỬ (ca còn ở phòng chờ), nối trước vào kho ca các câu ngoài kho mà bản chạy thử đã chọn — việc nặng nhất
+ * của nút Bắt đầu (ca 269333: 344 câu, quá 25 giây lúc D1 nghẽn ⇒ đề mất hết câu sai cũ) dời ra lúc thầy còn chờ lớp vào phòng. Lúc bấm Bắt đầu
+ * chỉ còn nối phần CHÊNH (câu mới được chọn sau). Câu đã nối mà cuối cùng không dùng chỉ nằm thừa trong kho ca (bản em không có đáp án).
+ * Không chặn gì: lỗi ⇒ trả 0, lúc chốt nối như cũ.
+ */
+export async function noiSomCauNgoai(url: string, mat: string, maCa: string): Promise<number> {
+  const dang = dangNoiSom.get(maCa)
+  if (dang) return dang
+  const viec = (async () => {
+    const rt = nho.get(maCa)
+    if (!rt) return 0
+    const daNoi = daNoiCua(maCa)
+    const dung = new Set(Object.values(rt.kq.theoEm).flatMap((ds) => ds.map((c) => c.qid)))
+    const can = Object.entries(rt.cauNgoai).filter(([id]) => dung.has(id) && !daNoi.has(id))
+    if (can.length === 0) return 0
+    await noiVaoKhoCa(url, mat, maCa, can.map(([, c]) => c))
+    for (const [id] of can) daNoi.add(id)
+    return can.length
+  })()
+  dangNoiSom.set(maCa, viec)
+  try {
+    return await viec
+  } catch {
+    return 0
+  } finally {
+    dangNoiSom.delete(maCa)
+  }
 }
 
 export interface KetQuaChotV2 {
@@ -213,11 +341,12 @@ export async function chotRutDeCa(
     // trong danh sách ca ⇒ rút lại CẢ LỚP bằng hồ sơ mới (cùng seed `maCa`: em không đổi dữ liệu thì ra đúng bộ cũ). Lỗi ⇒ giữ bản cũ + nói ra.
     const dsCa = [...new Set([...Object.keys(rt.kq.theoEm), ...dsCho.map((x) => String(x || '').trim()).filter(Boolean)])].sort()
     try {
+      const mocKiem = new Date().toISOString() // TRƯỚC khi hỏi: lượt làm xen giữa vẫn bị bắt ở lần kiểm sau
       const { em: emMoi } = await coLuotMoiTheoEm(url, mat, dsCa, rt.mocDoc ?? rt.lucRut)
       if (emMoi.length > 0) {
         const cu = rt
         try {
-          rt = await chayThuRutDeCa(url, mat, maCa, dsCa, { cheDo: tuyChon.cheDo, ngay })
+          rt = await rutLaiTheoLuotMoi(url, mat, maCa, dsCa, emMoi, cu, { cheDo: tuyChon.cheDo, ngay }, mocKiem)
           soEmCapNhat = emMoi.length
         } catch (e) {
           rt = cu
@@ -233,35 +362,41 @@ export async function chotRutDeCa(
   if (them.length > 0) {
     const ng: NguonRut = { bank: (await loadSessionTeacherBank(maCa)) ?? [], soCau: { I: 0, II: 0, III: 0 }, khoCa: rt.khoCa }
     const cauNgoai = { ...rt.cauNgoai }
-    const { hoSo, hong, nhomTrung } = await docHoSoVaCauNgoai(url, mat, them, ngay, ng, cauNgoai)
+    const { hoSo, hong, nhomTrung, tho } = await docHoSoVaCauNgoai(url, mat, them, ngay, ng, cauNgoai)
     const kho = khoDayDu(rt.khoCa, cauNgoai)
     const kqThem = rutDeV2({ kho, soCau: { I: rt.kq.mucTieu.I.length, II: rt.kq.mucTieu.II.length, III: rt.kq.mucTieu.III.length }, mucTieu: rt.kq.mucTieu, dsSbd: them, hoSo, ngay, cheDo: rt.cheDo, seed: maCa, daDung: rt.kq.daDung })
-    rt = { ...rt, kq: gopKetQuaV2(rt.kq, kqThem), cauNgoai, kho, hoSo: { ...rt.hoSo, ...hoSo }, nhomTrung: { ...rt.nhomTrung, ...nhomTrung }, hongHoSo: [...rt.hongHoSo, ...hong] }
+    const thoGop: HoSoTho | undefined = rt.tho
+      ? { em: { ...rt.tho.em, ...tho.em }, daGap: { ...rt.tho.daGap, ...tho.daGap }, hong: [...(rt.tho.hong ?? []), ...(tho.hong ?? [])], nhomTrung: { ...(rt.tho.nhomTrung ?? {}), ...(tho.nhomTrung ?? {}) } }
+      : undefined
+    rt = { ...rt, kq: gopKetQuaV2(rt.kq, kqThem), cauNgoai, kho, hoSo: { ...rt.hoSo, ...hoSo }, nhomTrung: { ...rt.nhomTrung, ...nhomTrung }, hongHoSo: [...rt.hongHoSo, ...hong], ...(thoGop ? { tho: thoGop } : {}) }
     nho.set(maCa, rt)
   }
 
   // NỐI CÂU NGOÀI KHO ĐÃ ĐƯỢC CHỌN vào kho ca (bản gửi máy em + bản có đáp án) TRƯỚC khi chốt — câu không có trong gói đề thì máy em
   // không hiện được. Nối hỏng ⇒ rút lại cả lớp chỉ từ kho ca (không phát câu máy em không có), và nói ra.
+  // Lượt NỐI SỚM còn chạy ⇒ đợi nó (có trần) để biết câu nào đã nằm trong kho ca; câu đã nối sớm KHÔNG gửi lại.
+  const dangNoi = dangNoiSom.get(maCa)
+  if (dangNoi) await Promise.race([dangNoi.catch(() => 0), new Promise((xong) => setTimeout(xong, CHO_NOI_SOM_MS))])
+  const daNoi = daNoiCua(maCa)
   const dung = new Set(Object.values(rt.kq.theoEm).flatMap((ds) => ds.map((c) => c.qid)))
-  const canNoi = Object.entries(rt.cauNgoai).filter(([id]) => dung.has(id)).map(([, c]) => c)
-  let soCauNoiThem = 0
+  const canNoi = Object.entries(rt.cauNgoai).filter(([id]) => dung.has(id) && !daNoi.has(id)).map(([, c]) => c)
+  const daNoiDung = Object.keys(rt.cauNgoai).filter((id) => dung.has(id) && daNoi.has(id)).length
+  let soCauNoiThem = daNoiDung
   if (canNoi.length > 0) {
-    const src: TeacherExamSource = {
-      maDe: `${maCa}-v2`,
-      phanI: canNoi.filter((c) => c.phan === 'I').map((c) => c.cau as TeacherMcqQuestion),
-      phanII: canNoi.filter((c) => c.phan === 'II').map((c) => c.cau as TeacherExamSource['phanII'][number]),
-      phanIII: canNoi.filter((c) => c.phan === 'III').map((c) => c.cau as TeacherShortAnswerQuestion),
-    }
     try {
-      await noiKhoCa(url, mat, maCa, mergeAndStrip([src]), { phanI: src.phanI, phanII: src.phanII, phanIII: src.phanIII })
-      const bank = (await loadSessionTeacherBank(maCa)) ?? []
-      await saveSessionTeacherBank(maCa, [...bank, src])
-      soCauNoiThem = canNoi.length
+      await noiVaoKhoCa(url, mat, maCa, canNoi)
+      for (const c of canNoi) daNoi.add(c.cau.id)
+      soCauNoiThem = daNoiDung + canNoi.length
     } catch (e) {
-      canhBao.push(`Không nối được ${canNoi.length} câu ngoài kho (câu sai cũ, câu song sinh) vào ca — đã rút lại chỉ từ kho ca. ${e instanceof Error ? e.message : ''}`.trim())
+      // Câu ĐÃ nối sớm vẫn nằm trong kho ca ⇒ rút lại từ kho ca + những câu ấy (bản cũ bỏ HẾT câu ngoài kho ⇒ đề «rút câu sai» mất câu sai cũ).
+      canhBao.push(`Không nối được ${canNoi.length} câu ngoài kho (câu sai cũ, câu song sinh) vào ca — đã rút lại chỉ từ kho ca${daNoiDung > 0 ? ' và câu đã nối sẵn' : ''}. ${e instanceof Error ? e.message : ''}`.trim())
       const ds = Object.keys(rt.kq.theoEm)
-      const kq = rutDeV2({ kho: rt.khoCa, soCau: { I: rt.kq.mucTieu.I.length, II: rt.kq.mucTieu.II.length, III: rt.kq.mucTieu.III.length }, mucTieu: rt.kq.mucTieu, dsSbd: ds, hoSo: rt.hoSo, ngay, cheDo: rt.cheDo, seed: maCa })
-      rt = { ...rt, kq, cauNgoai: {}, kho: rt.khoCa }
+      const cauNgoaiCo = Object.fromEntries(Object.entries(rt.cauNgoai).filter(([id]) => daNoi.has(id)))
+      const kho = Object.keys(cauNgoaiCo).length > 0 ? khoDayDu(rt.khoCa, cauNgoaiCo) : rt.khoCa
+      const kq = rutDeV2({ kho, soCau: { I: rt.kq.mucTieu.I.length, II: rt.kq.mucTieu.II.length, III: rt.kq.mucTieu.III.length }, mucTieu: rt.kq.mucTieu, dsSbd: ds, hoSo: rt.hoSo, ngay, cheDo: rt.cheDo, seed: maCa, ...(rt.nhomTrung ? { nhomTrung: rt.nhomTrung } : {}) })
+      const dungMoi = new Set(Object.values(kq.theoEm).flatMap((x) => x.map((c) => c.qid)))
+      soCauNoiThem = Object.keys(cauNgoaiCo).filter((id) => dungMoi.has(id)).length
+      rt = { ...rt, kq, cauNgoai: cauNgoaiCo, kho }
       nho.set(maCa, rt)
     }
   }

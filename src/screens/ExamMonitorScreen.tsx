@@ -28,7 +28,7 @@ import { chayThuRutDeDaDung, chotRutDeDaDung, docRutThuDaDung, type RutThuDaDung
 import { dongCauSaiLai, loaiCauChuaDung, xepSaiLaiDaDung, type EmSaiLaiDaDung } from '../lib/rut-de-da-dung'
 import { BangRutThuDaDung, KhoiSaiLaiDaDung } from '../components/ca-thi/KhoiDaDung'
 import { dungDeRiengChoCa, dungLapTuMayChu } from '../lib/de-rieng-nguon'
-import { chayThuRutDeCa, chotRutDeCa, docRutThu, type RutThuCa } from '../lib/de-rieng-v2'
+import { chayThuRutDeCa, chotRutDeCa, docRutThu, noiSomCauNgoai, type RutThuCa } from '../lib/de-rieng-v2'
 import { demBac, MOI_BAC_LAP, PHAN_V2, TEN_BAC_LAP } from '../lib/rut-de-v2'
 import { choEmThiLai } from '../lib/thi-lai'
 import { gradeSubmissionFull, type GradedSubmission } from '../lib/exam-grade'
@@ -1122,7 +1122,11 @@ export default function ExamMonitorScreen() {
       setTenEmLop(ten)
       if (ds.size === 0) { setRutThu(null); return }
       if (laCaDaDungNay) setRutThuDaDung(await chayThuRutDeDaDung(scriptUrl.trim(), secret.trim(), maCaNay, [...ds], { tienDo: (xong, tong) => setTienDoThay({ xong, tong }) }))
-      else setRutThu(await chayThuRutDeCa(scriptUrl.trim(), secret.trim(), maCaNay, [...ds], { cheDo: cheDoRutV2 }))
+      else {
+        setRutThu(await chayThuRutDeCa(scriptUrl.trim(), secret.trim(), maCaNay, [...ds], { cheDo: cheDoRutV2 }))
+        // NỐI SỚM (30/10): nối trước câu ngoài kho bản chạy thử đã chọn — lúc bấm Bắt đầu chỉ còn phần chênh (ca 269333: 344 câu quá 25 giây).
+        void noiSomCauNgoai(scriptUrl.trim(), secret.trim(), maCaNay)
+      }
     } catch (e) {
       setLoiRutThu(e instanceof Error ? e.message : 'lỗi không rõ')
     } finally {
