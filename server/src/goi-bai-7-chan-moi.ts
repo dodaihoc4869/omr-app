@@ -6,11 +6,14 @@ import { sqlQuyetDinhNhan7, sqlEmDangNhan7 } from './goi-bai-7-quyen'
  * Câu đã gặp vẫn ôn/sửa; một QID dùng chung với gói còn nhận vẫn mở. Chỉ đọc mã, không tải câu/đáp án hay sổ em. */
 export async function docChanCauMoiGoi7(env: Env, sbd: string): Promise<Set<string>> {
   await damBaoGoi7(env)
+  // 31/10 (thử tải 50.000 em, lớp 100 em — câu này đọc 101.509 dòng / lần): CTE `em` vật chất hoá không có thống kê ⇒ SQLite bắt đầu từ bai_da_day rồi đọc
+  // MỌI em của từng gói (goi_bai_7_em theo goi_id) ⇒ O(cả trường). CROSS JOIN giữ thứ tự nối: đi từ em ⇒ gói của em (chỉ mục sbd) ⇒ bài. Kết quả y hệt (CROSS
+  // JOIN của SQLite chỉ khoá thứ tự vòng lặp, nghĩa vẫn là nối trong).
   const r=await env.DB.prepare(`SELECT qid FROM (WITH em AS MATERIALIZED(SELECT sbd,lop,ten_lop,trang_thai FROM hoc_sinh WHERE sbd=?1),
     goi AS MATERIALIZED(
-      SELECT g.id,g.tick_id,g.lop,b.bo_tick_luc FROM em h JOIN goi_bai_7 g ON g.lop=${sqlTenLopHs('h')} JOIN bai_da_day b ON b.id=g.tick_id
-      WHERE b.bo_tick_luc IS NOT NULL OR COALESCE(h.trang_thai,'')='khoa' OR NOT (${sqlQuyetDinhNhan7('g','h.sbd')})
-      UNION SELECT g.id,g.tick_id,g.lop,b.bo_tick_luc FROM em h JOIN goi_bai_7_em e ON e.sbd=h.sbd JOIN goi_bai_7 g ON g.id=e.goi_id JOIN bai_da_day b ON b.id=g.tick_id
+      SELECT g.id,g.tick_id,g.lop,b.bo_tick_luc FROM em h CROSS JOIN goi_bai_7 g CROSS JOIN bai_da_day b ON b.id=g.tick_id
+      WHERE g.lop=${sqlTenLopHs('h')} AND (b.bo_tick_luc IS NOT NULL OR COALESCE(h.trang_thai,'')='khoa' OR NOT (${sqlQuyetDinhNhan7('g','h.sbd')}))
+      UNION SELECT g.id,g.tick_id,g.lop,b.bo_tick_luc FROM em h CROSS JOIN goi_bai_7_em e ON e.sbd=h.sbd CROSS JOIN goi_bai_7 g ON g.id=e.goi_id CROSS JOIN bai_da_day b ON b.id=g.tick_id
       WHERE b.bo_tick_luc IS NOT NULL OR g.lop<>${sqlTenLopHs('h')} OR COALESCE(h.trang_thai,'')='khoa' OR NOT (${sqlQuyetDinhNhan7('g','h.sbd')})
     ) SELECT DISTINCT c.qid FROM em h CROSS JOIN goi g CROSS JOIN goi_bai_7_cau c
     WHERE c.goi_id=g.id
