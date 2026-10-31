@@ -18,14 +18,14 @@ concurrency:
   group: thu-tai-50k
   cancel-in-progress: false
 env:
-  LAN: '6'
+  LAN: '7'
   # Nhánh mã máy chủ đẩy lên omr-thu (mặc định main; thử nhánh trước khi gộp).
-  SRV_REF: 'claude/ngan-sat-d1-3110'
+  SRV_REF: 'main'
   # 1 = dựng lại D1 omr-thu từ kho giả (≈ 5–10 phút, xoá sạch dữ liệu lượt trước); 0 = giữ D1 đang có.
   DUNG_KHO: '0'
   # Giai đoạn cuối được phép chạy (500 | 2000 | 10000 | 50000).
   GIAI_DOAN_TOI: '10000'
-  RAMP_S: '120'
+  RAMP_S: '600'
   ON_DINH_S: '180'
 jobs:
   dung:
@@ -137,7 +137,7 @@ jobs:
     needs: [dung]
     if: needs.dung.result == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 28
     strategy:
       fail-fast: false
       max-parallel: 20
@@ -268,7 +268,7 @@ jobs:
     needs: [dung, cong500]
     if: always() && needs.dung.result == 'success' && needs.cong500.outputs.tiep == '1'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 28
     strategy:
       fail-fast: false
       max-parallel: 20
@@ -333,7 +333,7 @@ jobs:
     needs: [dung, cong2000]
     if: always() && needs.dung.result == 'success' && needs.cong2000.outputs.tiep == '1'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 28
     strategy:
       fail-fast: false
       max-parallel: 20
@@ -398,7 +398,7 @@ jobs:
     needs: [dung, cong10000]
     if: always() && needs.dung.result == 'success' && needs.cong10000.outputs.tiep == '1'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 28
     strategy:
       fail-fast: false
       max-parallel: 20
