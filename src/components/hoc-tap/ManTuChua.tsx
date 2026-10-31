@@ -20,7 +20,7 @@ import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, ChevronRight, Clock3, Lock, PencilLine, RotateCcw } from 'lucide-react'
 import type { KetQuaDanhSachChua, LichKiemLaiHoiThay, MucChua } from '../../lib/chua-cau-sai-api'
 import { docNhoTuSua, nhomMucChua, taiTuSuaLoi, type NhomMucChua } from '../../lib/tu-sua-loi'
-import { guiLaiSuaCho, napTruocCauSua, napTruocSuaNgay } from '../../lib/nap-truoc-sua'
+import { guiLaiSuaCho, napGoiSuaDem, napTruocCauSua, napTruocSuaNgay } from '../../lib/nap-truoc-sua'
 /** Bản nhớ danh sách còn mới (ms) để vẽ ngay khi mở màn Tự sửa lỗi; quá hạn ⇒ khung chờ như cũ. (29/10 tối: nâng lên 10 phút = NHO_TU_SUA_MS để bấm từ Lộ trình luôn hiện ngay 0 ms.) */
 const NHO_VE_NGAY_MS = 600_000
 import { dungViecHomNay, docSbdHs, luuViecHomNay } from '../../lib/tu-sua-viec-hom-nay'
@@ -46,7 +46,7 @@ const KiemHoiThay = lazy(() => import('../loi-giai/HoiThayKiemChung'))
 export { default as TheMoiTuSua } from './TheMoiTuSua'
 // Lộ trình «Trong» (TrongHs: số trên nút «Sửa lỗi») đọc việc hôm nay QUA mảnh này (đã là điểm nạp lười) — nạp động thẳng tu-sua-viec-hom-nay sẽ tách thêm mảnh precache.
 export { baoKhoaSua, conSuaHomNay, conSuaPhanNgay, docSbdHs, dungViecHomNay, luuViecHomNay, ngheXongSua } from '../../lib/tu-sua-viec-hom-nay'
-export { guiLaiSuaCho, napTruocCauSua, napTruocSuaNgay } from '../../lib/nap-truoc-sua'
+export { guiLaiSuaCho, napGoiSuaDem, napTruocCauSua, napTruocSuaNgay } from '../../lib/nap-truoc-sua'
 
 /** Trạng thái đợt chữa ⇒ chữ em đọc được (bảng từ chuẩn: không mã nội bộ). */
 export const CHU_TRANG_THAI_CHUA: Record<string, string> = {
@@ -211,7 +211,8 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
   const conLai = (viec?.muc ?? []).filter((x) => !x.xong && !x.m.kiemHoiThay).map((x) => x.m.qid).join('|')
   useEffect(() => {
     if (!conLai) return
-    const h = setTimeout(() => { void napTruocSuaNgay(token, conLai.split('|')) }, 1500)
+    // Gói đóng sẵn trước (một lượt, 31/10 goi-sua-dem.ts) rồi mới tải từng lượt phần còn thiếu.
+    const h = setTimeout(() => { void napGoiSuaDem(token).finally(() => napTruocSuaNgay(token, conLai.split('|'))) }, 1500)
     return () => clearTimeout(h)
   }, [token, conLai])
   useEffect(() => {

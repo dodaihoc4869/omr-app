@@ -126,7 +126,8 @@ async function quyenKemDocChung<T>(env: Env, b: Obj, sbdDaKiem: string | undefin
 const lamAm = (env: Env, sbd: string, qid: string): Promise<null> =>
   (qid && qid.length <= 160 ? Promise.all([cauDuocNho(env, sbd, qid).then((q) => (q ? cacBan(env, q) : null)), docHocLieuNho(env, qid).catch(() => null)]) : Promise.resolve(null)).then(() => null, () => null)
 
-export async function gonMo(env: Env, b: Obj, sbdDaKiem?: string): Promise<Response> {
+/** `hanTem` (31/10, goi-sua-dem.ts): gói Tự sửa lỗi đóng sẵn ban đêm cần tem hạn dài (dùng cả ngày); vắng ⇒ hạn thường 45 phút. */
+export async function gonMo(env: Env, b: Obj, sbdDaKiem?: string, hanTem?: number): Promise<Response> {
   const dotId = str(b.dotId)
   const nowMs = Date.now()
   const qHint = str(b.qid)
@@ -157,7 +158,7 @@ export async function gonMo(env: Env, b: Obj, sbdDaKiem?: string): Promise<Respo
     docCauHinhDem(env, KHOA_CH_DAP_AN_MAY).then((v) => dapAnMayBat(v, sbd), () => false),
   ])
   const x = { dotId, ban, lan, tuSua: tuSuaNeuDung, docGan, goiY }
-  const [sk, dm] = await Promise.all([niemSua(env, sbd, x), dmBat ? dmSua(env, sbd, x, nowMs) : Promise.resolve(undefined)])
+  const [sk, dm] = await Promise.all([niemSua(env, sbd, x, nowMs, hanTem), dmBat ? dmSua(env, sbd, x, nowMs) : Promise.resolve(undefined)])
   return Response.json({
     ok: true, dotId, lan, ban: ban.qid, banKhac: ban.qid !== q.qid,
     tuSuaNeuDung,
@@ -176,25 +177,34 @@ export const TOI_DA_TAI_SAN_SUA = 12
  */
 export async function gonMoNgay(env: Env, b: Obj, sbd: string): Promise<Response> {
   const qids = [...new Set((Array.isArray(b.qids) ? b.qids : []).filter((x): x is string => typeof x === 'string' && !!x && x.length <= 120))].slice(0, TOI_DA_TAI_SAN_SUA)
+  return Response.json({ ok: true, ds: await moNhieuCau(env, sbd, qids, { song: 3, hetMs: 8_000 }) })
+}
+
+/** Mở MỘT câu đúng như máy em bấm vào (`mo-dot` kèm `gon`): giao / dựng lại đợt rồi mở bản làm lại. Không ghi lần làm. Lỗi ⇒ null (câu này để máy em mở khi bấm). */
+export async function moMotCauNgay(env: Env, sbd: string, qid: string, hanTem?: number): Promise<Obj | null> {
+  try {
+    const r = await giaoDotCuaEm(env, sbd, qid, true)
+    const mo = (await r.json()) as Obj
+    if (r.ok && mo.ok === true && typeof mo.dotId === 'string') {
+      const g = await gonMo(env, { dotId: mo.dotId, qid }, sbd, hanTem)
+      mo.gon = { ...((await g.json()) as Obj), status: g.status }
+    }
+    return { ...mo, qid }
+  } catch { return null }
+}
+/** Mở nhiều câu, `song` câu một lúc, dừng nhận câu mới sau `hetMs` (dùng chung lượt tải sẵn của máy em và gói đóng sẵn ban đêm — goi-sua-dem.ts). */
+export async function moNhieuCau(env: Env, sbd: string, qids: readonly string[], o: { song: number; hetMs: number; hanTem?: number }): Promise<Obj[]> {
   const ds: Obj[] = []
-  const het = Date.now() + 8_000
+  const het = Date.now() + o.hetMs
   let i = 0
   const chay = async () => {
     while (i < qids.length && Date.now() < het) {
-      const qid = qids[i++]!
-      try {
-        const r = await giaoDotCuaEm(env, sbd, qid, true)
-        const mo = (await r.json()) as Obj
-        if (r.ok && mo.ok === true && typeof mo.dotId === 'string') {
-          const g = await gonMo(env, { dotId: mo.dotId, qid }, sbd)
-          mo.gon = { ...((await g.json()) as Obj), status: g.status }
-        }
-        ds.push({ ...mo, qid })
-      } catch { /* câu này để máy em mở khi bấm */ }
+      const x = await moMotCauNgay(env, sbd, qids[i++]!, o.hanTem)
+      if (x) ds.push(x)
     }
   }
-  await Promise.all(Array.from({ length: Math.min(3, qids.length) }, chay))
-  return Response.json({ ok: true, ds })
+  await Promise.all(Array.from({ length: Math.min(o.song, qids.length) }, chay))
+  return ds
 }
 
 export async function gonNop(env: Env, b: Obj): Promise<Response> {

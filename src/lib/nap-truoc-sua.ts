@@ -7,7 +7,7 @@
 // 31/10 (thầy «làm cả cho tự sửa lỗi»): TẢI SẴN PHẦN HÔM NAY — từng lượt 12 câu chưa xong (`gon-mo-ngay`), nối tiếp tới HẾT phần hôm nay, giữ cả ngày trên máy (bộ nhớ + localStorage) ⇒ bấm câu nào
 // cũng vào ngay, mất mạng vẫn làm được (gói `dm` cho máy em chấm tại chỗ — sua-loi-may.ts). Lần nộp không gửi được vì mất mạng ⇒ xếp hàng trên máy, có mạng gửi lại
 // theo đúng thứ tự (máy chủ chống trùng theo khoá) — `xepSuaChoGui` / `guiLaiSuaCho`.
-import { apiGonMoNgay, apiGonNop, apiMoDot, type KetQuaGon } from './chua-cau-sai-api'
+import { apiGoiSuaNgay, apiGonMoNgay, apiGonNop, apiMoDot, type KetQuaGon } from './chua-cau-sai-api'
 import { docSbdHs, ghiXongHomNay } from './tu-sua-viec-hom-nay'
 import { luuXemLai } from './xem-lai-sua'
 
@@ -54,7 +54,7 @@ export function layNapTruocCauSua(token: string, qid: string, nayMs = Date.now()
 }
 
 /** Bỏ mọi kết quả nạp trước (em vừa làm xong một câu / đổi tài khoản / test). */
-export function xoaNapTruocCauSua(): void { KHO.clear(); NGAY.clear(); COC.clear(); ngayDaDoc = ''; if (henTiep) { clearTimeout(henTiep); henTiep = undefined } }
+export function xoaNapTruocCauSua(): void { KHO.clear(); NGAY.clear(); COC.clear(); ngayDaDoc = ''; goiDangHoi = null; if (henTiep) { clearTimeout(henTiep); henTiep = undefined } }
 
 // ---------------------------------------------------------------------------- PHẦN HÔM NAY (giữ cả ngày, dùng một lần mỗi câu)
 const ngayVnCua = (ms: number) => new Date(ms + 7 * 3_600_000).toISOString().slice(0, 10)
@@ -117,6 +117,38 @@ function boNgay(qid: string, nayMs: number): void {
 }
 /** Câu đã có bản tải sẵn hôm nay (còn chưa dùng)? */
 export const coSuaNgay = (qid: string, nayMs = Date.now()): boolean => !!docKhoNgay(nayMs) && NGAY.has(qid)
+
+// GÓI ĐÓNG SẴN (31/10, thầy «hs mở app lên là mọi thứ sẵn rồi»; server/src/goi-sua-dem.ts): máy chủ đã đóng sẵn cả phần hôm nay (ban đêm / bù trong ngày) ⇒ mở app
+// hỏi NGAY một lượt (rẻ: một lần đọc R2 + một câu đọc D1) ⇒ cả phần hôm nay vào kho. Câu thiếu / chưa có gói ⇒ `napTruocSuaNgay` từng lượt như trước.
+// Mỗi phiên hỏi tối đa một lần / ngày; máy chủ báo đã có gói ⇒ nhớ trên máy, các lần mở app sau trong ngày khỏi hỏi lại.
+const KHOA_GOI = (sbd: string) => `omr_sua_goi_${sbd}`
+let goiDangHoi: { dau: string; p: Promise<number> } | null = null
+let henGoi: ReturnType<typeof setTimeout> | undefined
+/** Lấy gói đóng sẵn hôm nay (một lượt). Trả số câu mới vào kho; đang hỏi ⇒ dùng chung lượt đang bay. */
+export function napGoiSuaDem(token: string, nayMs = Date.now()): Promise<number> {
+  const dau = docKhoNgay(nayMs)
+  if (!token || !dau || (typeof navigator !== 'undefined' && navigator.onLine === false)) return Promise.resolve(0)
+  if (goiDangHoi?.dau === dau) return goiDangHoi.p
+  // em đang làm bài (màn phủ) ⇒ hoãn 30 giây (iPhone sập lúc «Tiếp tục», thầy 31/10)
+  if (dangLamBai()) { if (!henGoi) henGoi = setTimeout(() => { henGoi = undefined; void napGoiSuaDem(token) }, 30_000); return Promise.resolve(0) }
+  const sbd = docSbdHs(), ngay = ngayVnCua(nayMs)
+  try { if (localStorage.getItem(KHOA_GOI(sbd)) === ngay) return Promise.resolve(0) } catch { /* máy chặn ⇒ cứ hỏi */ }
+  const p = apiGoiSuaNgay(token).then((g) => {
+    if (!g || g.n !== ngay || ngayDaDoc !== dau) return 0
+    if (g.co) { try { localStorage.setItem(KHOA_GOI(sbd), ngay) } catch { /* bị chặn */ } }
+    let n = 0
+    for (const d of g.ds) {
+      if (!d.kq.ok || !d.kq.gon?.ok || NGAY.has(d.qid) || KHO.has(khoa(token, d.qid))) continue
+      const co = JSON.stringify(d.kq).length
+      if (tongCo() + co > NGAN_SACH) continue // ngân sách bộ nhớ (iPhone sập 31/10) — câu này mở khi bấm như cũ
+      datNgay(d.qid, d.kq, co); n++
+    }
+    if (n) luuKhoNgay(Date.now())
+    return n
+  }, () => 0)
+  goiDangHoi = { dau, p }
+  return p
+}
 
 /** Số câu mỗi lượt tải (khớp trần máy chủ `TOI_DA_TAI_SAN_SUA`): mỗi câu tải sẵn tốn ở máy chủ y như em bấm mở câu ⇒ chia lượt nhỏ cho D1 không dồn cục. */
 const MOI_LUOT = 12

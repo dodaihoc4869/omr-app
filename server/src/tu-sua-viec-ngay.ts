@@ -80,17 +80,22 @@ export async function hsGhiViecNgay(env: Env, b: Obj, nowMs: number = Date.now()
   // 28/10 «sửa phải xong mới hiện chặng sau»: máy em báo Lộ trình đang KHOÁ các chặng sau nút Tự sửa lỗi ⇒ ghi một dòng / ngày (giữ lần đầu). Ghi riêng,
   // lỗi (bảng chưa áp) bỏ qua — không làm hỏng bản lưu việc hôm nay.
   if (b.khoa === true) await env.DB.prepare('INSERT OR IGNORE INTO tu_sua_khoa_ngay(sbd,ngay_vn,luc) VALUES(?1,?2,?3)').bind(sbd, ngay, nowMs).run().catch(() => null)
+  await ghiViecNgay(env, sbd, ngay, { m, x, them, mt }, nowMs)
+  return Response.json({ ok: true, ngay })
+}
+
+/** Ghi / gộp bản việc hôm nay (danh sách DÀI hơn thắng, «đã xong» hợp lại, `them` / mục tiêu lấy lớn nhất). Dùng chung lệnh của máy em và gói đóng sẵn ban đêm (goi-sua-dem.ts). */
+export async function ghiViecNgay(env: Env, sbd: string, ngay: string, v: { m: MucNgay[]; x: string[]; them: number; mt: number }, nowMs: number): Promise<void> {
   // Mục tiêu của ngày (29/10): ghi riêng, song song — bảng chưa áp / lỗi thì bỏ qua, không làm hỏng bản lưu việc hôm nay (khoá đếm 12 câu như cũ).
-  const ghiMt = mt ? env.DB.prepare(`INSERT INTO tu_sua_muc_tieu_ngay(sbd,ngay_vn,muc_tieu) VALUES(?1,?2,?3)
-    ON CONFLICT(sbd,ngay_vn) DO UPDATE SET muc_tieu=MAX(tu_sua_muc_tieu_ngay.muc_tieu,excluded.muc_tieu)`).bind(sbd, ngay, mt).run().catch(() => null) : null
+  const ghiMt = v.mt ? env.DB.prepare(`INSERT INTO tu_sua_muc_tieu_ngay(sbd,ngay_vn,muc_tieu) VALUES(?1,?2,?3)
+    ON CONFLICT(sbd,ngay_vn) DO UPDATE SET muc_tieu=MAX(tu_sua_muc_tieu_ngay.muc_tieu,excluded.muc_tieu)`).bind(sbd, ngay, v.mt).run().catch(() => null) : null
   await env.DB.prepare(`INSERT INTO tu_sua_viec_ngay(sbd,ngay_vn,muc_json,xong_json,them,cap_nhat_luc) VALUES(?1,?2,?3,?4,?5,?6)
     ON CONFLICT(sbd,ngay_vn) DO UPDATE SET
       muc_json=CASE WHEN json_array_length(excluded.muc_json)>json_array_length(tu_sua_viec_ngay.muc_json) THEN excluded.muc_json ELSE tu_sua_viec_ngay.muc_json END,
       xong_json=(SELECT json_group_array(value) FROM (SELECT value FROM json_each(tu_sua_viec_ngay.xong_json) UNION SELECT value FROM json_each(excluded.xong_json))),
       them=MAX(tu_sua_viec_ngay.them,excluded.them),cap_nhat_luc=excluded.cap_nhat_luc`)
-    .bind(sbd, ngay, JSON.stringify(m), JSON.stringify(x), them, nowMs).run()
+    .bind(sbd, ngay, JSON.stringify(v.m), JSON.stringify(v.x), v.them, nowMs).run()
   await ghiMt
-  return Response.json({ ok: true, ngay })
 }
 
 // ─────────────────────────── KHOÁ CHẶNG SAU TỰ SỬA LỖI (thầy 28/10 «Tôi muốn sửa phải xong mới hiện chặng sau») ───────────────────────────

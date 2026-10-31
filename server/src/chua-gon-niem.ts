@@ -10,7 +10,7 @@
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { chamCauTuLuyen } from '../../src/lib/tu-luyen'
 import { gameSbdDaKy } from './game-v2-auth'
-import { moMa, niemMa } from './niem-phong'
+import { HAN_NIEM_CHUAN_BI_MS, HAN_NIEM_MS, moMa, niemMa } from './niem-phong'
 import { phatLuongNdjson } from './nop-luong'
 import type { Env } from './kieu'
 import { dmChuoi } from './dap-an-may'
@@ -48,11 +48,11 @@ function noiDungSua(x: LanSua): GoiSuaMay | null {
   }
 }
 
-/** Tem cho lần `lan` của bản `ban` trong đợt `dotId`. Không bao giờ ném. */
-export async function niemSua(env: Env, sbd: string, x: LanSua, nayMs = Date.now()): Promise<string | undefined> {
+/** Tem cho lần `lan` của bản `ban` trong đợt `dotId`. `hanMs`: gói đóng sẵn ban đêm (goi-sua-dem.ts) dùng hạn dài HAN_NIEM_CHUAN_BI_MS. Không bao giờ ném. */
+export async function niemSua(env: Env, sbd: string, x: LanSua, nayMs = Date.now(), hanMs = HAN_NIEM_MS): Promise<string | undefined> {
   try {
     const nd = sbd ? noiDungSua(x) : null
-    return nd ? await niemMa(env, aadSua(sbd, x.dotId, x.ban.qid), nd, nayMs) : undefined
+    return nd ? await niemMa(env, aadSua(sbd, x.dotId, x.ban.qid), nd, nayMs, hanMs) : undefined
   } catch { return undefined }
 }
 
@@ -65,10 +65,11 @@ export async function dmSua(env: Env, sbd: string, x: LanSua, nayMs = Date.now()
   } catch { return undefined }
 }
 
-/** Mở tem Sửa câu của em `sbd` (đợt + bản máy em đang nộp). Không bao giờ ném. */
+/** Mở tem Sửa câu của em `sbd` (đợt + bản máy em đang nộp). Nhận cả tem hạn dài của gói đóng sẵn ban đêm (≤ HAN_NIEM_CHUAN_BI_MS — tem vẫn gắn chặt em + đợt + bản;
+ *  trạng thái đổi sau lúc đóng gói ⇒ dòng 2 của máy chủ khác dòng 1 ⇒ máy em lấy dòng 2). Không bao giờ ném. */
 export async function moNiemSua(env: Env, sbd: string, dotId: string, ban: string, tem: unknown, nayMs = Date.now()): Promise<NiemSua | null> {
   if (!sbd || !dotId || !ban) return null
-  const nd = await moMa<NiemSua>(env, aadSua(sbd, dotId, ban), tem, nayMs)
+  const nd = await moMa<NiemSua>(env, aadSua(sbd, dotId, ban), tem, nayMs, HAN_NIEM_CHUAN_BI_MS)
   if (!nd || nd.d !== dotId || nd.b !== ban) return null
   if (nd.p !== 'I' && nd.p !== 'II' && nd.p !== 'III') return null
   if (typeof nd.c !== 'string' || !nd.c || !Number.isFinite(nd.L)) return null
