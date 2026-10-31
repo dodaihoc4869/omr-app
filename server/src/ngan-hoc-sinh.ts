@@ -8,6 +8,7 @@
 // Không đi qua ngăn: đăng nhập, thi (vào thi / lưu tạm / nộp), lệnh thầy / phụ huynh, GET.
 import type { DurableObjectState, Env, ExecutionContext, KhoEm, SqlNgan } from './kieu'
 import { gomD1, type D1Gom, type DemLenhD1 } from './gom-d1'
+import { duongGuiQuaNganGom } from './gom-lien-ngan'
 import { D1_GOC, dbGoc } from './cau-hinh-dem'
 import type { D1Database, D1DatabaseSession } from './kieu'
 
@@ -174,7 +175,8 @@ export class NganHocSinh {
     const sbd = req.headers.get(DAU_SBD_NGAN) ?? ''
     if (sbd && state.storage?.sql && (!this.kho || this.kho.sbd !== sbd)) this.kho = taoKhoEm(state.storage.sql, sbd)
     // Gom lệnh D1 (gom-d1.ts): mọi ngăn trong isolate dùng chung MỘT bộ gom ⇒ câu đọc của nhiều em trong cùng lượt cũng đi chung một lô.
-    let env = (envChung ??= this.env.TAT_GOM_D1 || !this.env.DB ? this.env : { ...this.env, DB: gomD1(this.env.DB) })
+    // 31/10: công tắc BAT_GOM_LIEN_NGAN ⇒ lô của bộ gom đi qua ngăn gom liên isolate (gom-lien-ngan.ts) — nhiều isolate chung MỘT lượt gửi D1.
+    let env = (envChung ??= this.env.TAT_GOM_D1 || !this.env.DB ? this.env : { ...this.env, DB: gomD1(this.env.DB, duongGuiQuaNganGom(this.env)) })
     // Đọc qua bản sao (công tắc): phiên mới từ dấu trang của em, bộ gom RIÊNG của lệnh (phiên khác nhau không gom chung), khoá đệm vẫn là D1 gốc.
     let phien: D1DatabaseSession | null = null
     const dt = state.storage?.sql ? dauTrangNgan(state.storage.sql) : null
