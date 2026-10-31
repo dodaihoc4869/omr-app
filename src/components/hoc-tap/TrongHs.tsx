@@ -12,7 +12,11 @@ import type { TomTatKiemTra } from '../../lib/kiem-tra-ca-nhan'
 import type { Props as PropsHomNayCu } from './HocTapHomNay'
 import { ngayGon, useDiemDanhHs } from '../diem-danh/diem-danh-hs'
 import type { BuoiCuaEm } from '../../lib/buoi-hoc-api'
-import { Bi, type CamBi } from '../linh-vat/Bi'
+import { Bi, SU_KIEN_LUA_CAP, type CamBi } from '../linh-vat/Bi'
+// LỬA ĐỔI CẢM XÚC (thầy «Chốt duyệt tất» 31/10, docs/DE-XUAT-BI-CAM-XUC-3110.md): luật + lời (hàm thuần) · sổ câu được tính trên máy · biểu tượng tab + chấm số.
+import { loiLua, mocDoiLua, xetLua, type CapLua, type VaoLua } from '../../lib/lua-cam-xuc'
+import { docLuaThat } from '../../lib/lua-that'
+import { gioMayChu } from '../../lib/gio-may-chu'
 import { banHat, yenLang } from '../../lib/hieu-ung'
 import { docNhoTuSua, ngheTuSua } from '../../lib/tu-sua-loi'
 // Việc hôm nay NẠP ĐỘNG qua mảnh ManTuChua (đã là điểm nạp lười, có trong precache, Lộ trình nạp sẵn lúc rảnh): nhập tĩnh / nạp thẳng tu-sua-viec-hom-nay làm
@@ -30,7 +34,7 @@ import { useTongQuan } from '../thuong/dung-thuong'
 import { napSanThanhTich } from '../../lib/thuong-api'
 import { laSamsungInternet } from '../../lib/nhac-samsung'
 import { giuToanManHs } from '../../lib/toan-man-hs'
-import { baoLoTrinh, goKhungTinh, henChupKhungTinhHs, sbdPhien } from '../../lib/khung-tinh-hs'
+import { anhSvg, baoLoTrinh, goKhungTinh, henChupKhungTinhHs, sbdPhien } from '../../lib/khung-tinh-hs'
 import type { TenManThuong } from '../thuong/ManThuong'
 const ManThuong = lazy(() => import('../thuong/ManThuong'))
 const GiamThiTinh = lazy(() => import('../giam-thi/GiamThi').then((m) => ({ default: m.GiamThiTinh })))
@@ -47,16 +51,26 @@ giuToanManHs()
 export const SU_KIEN_MO_CHUOI = 'ddh-thuong-mo-chuoi'
 /** Cột bên (thẻ Giải tuần + Nhiệm vụ) chỉ hiện ở máy tính / điện thoại ngang (cùng điều kiện CSS `.dm-ben`) ⇒ điện thoại dọc không nạp mảnh màn thưởng. */
 const MQ_BEN = '(min-width: 1000px), (max-height: 520px) and (min-width: 600px)'
-function useCoBen(): boolean {
-  const [co, setCo] = useState(() => typeof window !== 'undefined' && !!window.matchMedia?.(MQ_BEN).matches)
+function useMq(q: string): boolean {
+  const [co, setCo] = useState(() => typeof window !== 'undefined' && !!window.matchMedia?.(q).matches)
   useEffect(() => {
-    const m = window.matchMedia?.(MQ_BEN)
+    const m = window.matchMedia?.(q)
     if (!m) return
     const doi = () => setCo(m.matches)
     m.addEventListener?.('change', doi)
     return () => m.removeEventListener?.('change', doi)
-  }, [])
+  }, [q])
   return co
+}
+const useCoBen = (): boolean => useMq(MQ_BEN)
+/** Điện thoại ngang thấp (cao < 600 px): Lộ trình tự cuộn tới chặng hiện tại ⇒ bong bóng đầu trang khuất ⇒ từ cấp 2 Lửa nói CẠNH mình (đặc tả 31/10 mục 2.2). */
+const MQ_THAP_NGANG = '(max-height: 599px) and (min-width: 600px)'
+/** Biểu tượng tab đầu Lửa đỏ: ở mảnh lười lớp vẽ giận (chỉ cần từ cấp 4). */
+const iconTabLua = (cap: number) => { void import('../linh-vat/lua-gian').then((m) => m.datIconTabLua(cap, anhSvg)).catch(() => {}) }
+/** Chấm số trên biểu tượng app đã cài (`navigator.setAppBadge` — iPhone iOS 16.4+ đã cho phép thông báo, Chrome/Edge máy tính): = câu còn thiếu; 0 ⇒ xoá. */
+function chamSoApp(n: number): void {
+  const nav = (typeof navigator === 'undefined' ? {} : navigator) as { setAppBadge?: (n?: number) => Promise<void>; clearAppBadge?: () => Promise<void> }
+  try { (n > 0 ? nav.setAppBadge?.(Math.min(999, n)) : nav.clearAppBadge?.())?.catch(() => {}) } catch { /* không hỗ trợ */ }
 }
 
 // ── SỐ CỦA EM TRONG HÀNG ĐẦU MENU (thầy 27/10 xem bản sống: «Ko làm hai ẩn, chuyển hết 4 biểu tượng bên trái vào menu ẩn bên phải… thiết kế tinh tế dễ nhìn
@@ -317,7 +331,7 @@ function TheNut({ id, sac, pop, mo, onDong }: { id: string; sac: string; pop: Po
 }
 const SAC_POP: Record<Nut['loai'], string> = { hoc: 'dung', kiem: 'tin', sua: 'sai', bt: 'chu-y' }
 
-function DuongChang({ ds, moDi, cam, moKhoa }: { ds: Nut[]; moDi: boolean; cam?: CamBi; moKhoa?: 'kt' | 'sua' }) {
+function DuongChang({ ds, moDi, cam, moKhoa, cap = 0, onLuaO }: { ds: Nut[]; moDi: boolean; cam?: CamBi; moKhoa?: 'kt' | 'sua'; cap?: number; onLuaO?: (o: HTMLElement | null) => void }) {
   const goc = useRef<HTMLDivElement>(null)
   // Chỉ MỘT thẻ mở một lúc: k của nút đang mở (rương = 'ruong') + phần tử nút (để đặt thẻ và trả focus).
   const [moThe, setMoThe] = useState<{ k: string; el: HTMLElement } | null>(null)
@@ -397,11 +411,16 @@ function DuongChang({ ds, moDi, cam, moKhoa }: { ds: Nut[]; moDi: boolean; cam?:
             xám mờ, đã tới ⇒ hiện màu + thở. Xen kẽ Bi rồi 4 giám thị (Tí · Cô Cốc · Chú Tam · Giáo sư Kíp — GiamThiTinh, mảnh giám thị nạp lười);
             Lộ trình chưa biết mức câu của cụm chặng ⇒ xoay vòng nb → th → vd → vdc. */}
         {i % 3 === 1 && cam && (() => {
-          const thu = (i / 3) | 0, gt = thu === 0 ? null : MUC_LV[(thu - 1) % MUC_LV.length]!, toi = n.tt === 'khoa', ben = x > 0 || (x === 0 && thu % 2 === 0) ? -1 : 1
-          return <span className="da-linh-vat" aria-hidden="true" data-lv={gt ?? 'bi'} data-toi={toi || undefined}
-            style={{ '--lv': `${ben * 104 - x}px` } as CSSProperties}>
-            {gt ? <Suspense fallback={null}><GiamThiTinh muc={gt} xam={toi} mo={toi} className="da-lv-gt" /></Suspense> : <Bi cam={toi ? 'ngu' : cam} size={104} goc={ben < 0 ? 'phai' : 'trai'} />}
-          </span>
+          // LỬA ĐỔI CẢM XÚC (31/10): từ cấp 2 Lửa LUÔN có màu (kể cả chặng bên cạnh chưa mở) và đổi mặt theo cấp; cấp 4–5 to hơn (83 → 104 px)
+          const thu = (i / 3) | 0, gt = thu === 0 ? null : MUC_LV[(thu - 1) % MUC_LV.length]!, toi = n.tt === 'khoa' && (!!gt || cap < 2), ben = x > 0 || (x === 0 && thu % 2 === 0) ? -1 : 1
+          const lv = { '--lv': `${ben * 104 - x}px` } as CSSProperties
+          return <>
+            <span className="da-linh-vat" aria-hidden="true" data-lv={gt ?? 'bi'} data-toi={toi || undefined} data-cap={!gt && cap >= 4 ? cap : undefined} style={lv}>
+              {gt ? <Suspense fallback={null}><GiamThiTinh muc={gt} xam={toi} mo={toi} className="da-lv-gt" /></Suspense> : <Bi cam={toi ? 'ngu' : cam} cap={cap} size={104} goc={ben < 0 ? 'phai' : 'trai'} />}
+            </span>
+            {/* chỗ bong bóng NÓI CẠNH Lửa (điện thoại ngang thấp, cấp ≥ 2 — LoiBi vẽ vào đây) */}
+            {!gt && onLuaO && <span ref={onLuaO} className="da-lv-loi-o" data-cap={cap >= 4 ? cap : undefined} style={lv} />}
+          </>
         })()}
       </li>
       // Rương tinh thể + Bi đứng cạnh đường (bản vẽ nâng cấp): sau chặng giữa (đủ ≥ 2 chặng); rương lệch phía đối diện Bi.
@@ -424,7 +443,7 @@ const KHOA_LOI_BI = 'ddh.loi-bi'
 const docDaNhac = (): string[] => { try { const v = JSON.parse(localStorage.getItem(KHOA_LOI_BI) || '[]'); return Array.isArray(v) ? v : [] } catch { return [] } }
 const ghiDaNhac = (k: string) => { try { localStorage.setItem(KHOA_LOI_BI, JSON.stringify([...docDaNhac().filter((x) => x !== k).slice(-19), k])) } catch { /* không lưu được: lần sau nhắc lại */ } }
 
-function LoiBi({ cam, loi, coBi = true, khoa }: { cam: CamBi; loi: string; coBi?: boolean; khoa?: string }) {
+function LoiBi({ cam, loi, coBi = true, khoa, cap = 0, ben }: { cam: CamBi; loi: string; coBi?: boolean; khoa?: string; cap?: number; ben?: HTMLElement | null }) {
   // pha: hien (gõ chữ, giữ ~4 s) → thu (mờ + co chiều cao mượt, đường đi trượt lên) → an (gỡ hẳn). Không khoá (lời quan trọng) ⇒ luôn hiện.
   const [pha, setPha] = useState<'hien' | 'thu' | 'an'>(() => (khoa && docDaNhac().includes(khoa) ? 'an' : 'hien'))
   useEffect(() => {
@@ -445,8 +464,17 @@ function LoiBi({ cam, loi, coBi = true, khoa }: { cam: CamBi; loi: string; coBi?
     t = window.setTimeout(go, nhip)
     return () => window.clearTimeout(t)
   }, [loi])
+  // nói cạnh Lửa: bề ngang bong bóng vừa tới mép phải đường đi (đường cắt phần tràn ngang) — đo MỘT lần lúc gắn, chỉ ở điện thoại ngang thấp
+  useLayoutEffect(() => {
+    const d = ben?.closest('.da-duong')
+    if (!ben || !d) return
+    const r = d.getBoundingClientRect(), o = ben.getBoundingClientRect()
+    ben.style.setProperty('--rong', `${Math.round(Math.max(150, Math.min(230, r.right - 8 - (o.left - 60))))}px`)
+  }, [ben])
   if (pha === 'an') return null
-  return <div className="bi-loi-boc" data-thu={pha === 'thu' || undefined}><div className="bi-loi" data-khong-bi={!coBi || undefined}>{coBi && <Bi cam={cam} size={84} noi={loi} />}<p className="bi-loi-bong"><span className="ht2-an">{loi}</span><span aria-hidden="true">{loi.slice(0, n)}<span className="bi-loi-con">{loi.slice(n)}</span></span></p></div></div>
+  // cấp 4–5: viền bong bóng màu «sai» (token có sẵn). `ben` (điện thoại ngang thấp): bong bóng nói CẠNH Lửa trên đường, đuôi chỉ xuống Lửa.
+  const bong = <div className="bi-loi-boc" data-thu={pha === 'thu' || undefined} data-ben={ben ? '' : undefined}><div className="bi-loi" data-khong-bi={!coBi || !!ben || undefined}>{coBi && !ben && <Bi cam={cam} cap={cap} size={84} noi={loi} />}<p className="bi-loi-bong" data-cap={cap >= 4 ? cap : undefined}><span className="ht2-an">{loi}</span><span aria-hidden="true">{loi.slice(0, n)}<span className="bi-loi-con">{loi.slice(n)}</span></span></p></div></div>
+  return ben ? createPortal(bong, ben) : bong
 }
 
 const THU_NGAN = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
@@ -691,10 +719,57 @@ export function MotTrangHs(p: PropsMotTrang) {
   const chinh = p.coCa ? 'ca' : p.ngayKiem || khoaKt ? 'kiem' : toiSua ? 'sua' : du && kiemLam ? 'kiem' : du && coSua && !xongSuaNay ? 'sua' : du && p.soBaiTap ? 'bt' : 'hoc'
   const pct = so && so.muc > 0 ? Math.min(100, Math.round((100 * so.daLam) / so.muc)) : 0
 
+  // ── LỬA ĐỔI CẢM XÚC (thầy «Chốt duyệt tất» 31/10, docs/DE-XUAT-BI-CAM-XUC-3110.md): cấp 0–5 tính TRÊN MÁY từ số đã có (Sảnh, /hs/thuong, sổ `ddh.lua-that`)
+  // ⇒ 0 lệnh máy chủ, 0 lượt đọc D1. Tính lại khi quay lại tab / trang hiện lại, về từ chặng (số câu đổi), đúng mốc giờ kế (19 · 21 · 22 · 23 · 00 giờ, hết
+  // 30 phút vui) — không chạy ngầm. Giờ chốt lúc tính ⇒ chữ đứng yên. Đang tải (chưa có số) ⇒ cấp 1; thầy tạm đóng app ⇒ không có Lửa (phủ tạm đóng).
+  const [nhipLua, datNhipLua] = useState(0)
+  useEffect(() => {
+    const lai = () => { if (document.visibilityState !== 'hidden') datNhipLua((n) => n + 1) }
+    document.addEventListener('visibilitychange', lai)
+    window.addEventListener('pageshow', lai)
+    return () => { document.removeEventListener('visibilitychange', lai); window.removeEventListener('pageshow', lai) }
+  }, [])
+  const tLua = useMemo(() => gioMayChu(), [nhipLua, so?.daLam, so?.muc, p.dangTai]) // eslint-disable-line react-hooks/exhaustive-deps
+  const soThat = useMemo(() => docLuaThat(sbdPhien(), tLua), [tLua])
+  const lichNay = tq?.chuoiNgay?.lich7.find((x) => x.ngay.slice(0, 10) === ngayVn(tLua))
+  const vaoLua: VaoLua | null = so ? {
+    now: tLua, daLam: so.daLam, muc: so.muc, du, hetCau: p.hetCau || !!so.duNgay, coCa: p.coCa, kiem: p.ngayKiem || khoaKt,
+    nghi: lichNay?.kieu === 'phep' || lichNay?.kieu === 'tat', chuoi, giuHomNay, giuChuoi: tq?.chuoiNgay?.giuChuoi,
+    // ngày đầu: chưa có chuỗi, trước hôm nay chưa làm câu nào (dải 7 ngày không có ngày học / bình / cứu)
+    ngayDau: chuoi === 0 && !tq?.chuoiNgay?.lich7.some((x) => x.kieu === 'hoc' || x.kieu === 'binh' || x.kieu === 'cuu') && Math.max(0, (nhip?.tongDaLam ?? 0) - so.daLam) === 0,
+    cu: !!tqTai.loi || (typeof navigator !== 'undefined' && navigator.onLine === false), so: soThat,
+  } : null
+  const kLua = vaoLua ? xetLua(vaoLua) : null
+  const capLua: CapLua = kLua?.cap ?? 1
+  const mocLua = vaoLua ? mocDoiLua(vaoLua) : 0
+  useEffect(() => {
+    if (!mocLua) return
+    const h = window.setTimeout(() => { if (document.visibilityState !== 'hidden') datNhipLua((n) => n + 1) }, Math.max(1000, mocLua - gioMayChu() + 500))
+    return () => window.clearTimeout(h)
+  }, [mocLua])
+  // biểu tượng tab: cấp 4–5 ⇒ đầu Lửa đỏ (chụp lại khi một Lửa vẽ xong cấp mới); hạ cấp / rời Lộ trình ⇒ logo
+  const daDoiIcon = useRef(false)
+  useEffect(() => {
+    if (capLua < 4) { if (daDoiIcon.current) iconTabLua(0); daDoiIcon.current = false; return }
+    daDoiIcon.current = true
+    let h = 0
+    const chup = () => { cancelAnimationFrame(h); h = requestAnimationFrame(() => iconTabLua(capLua)) }
+    chup()
+    window.addEventListener(SU_KIEN_LUA_CAP, chup)
+    return () => { cancelAnimationFrame(h); window.removeEventListener(SU_KIEN_LUA_CAP, chup) }
+  }, [capLua])
+  useEffect(() => () => { if (daDoiIcon.current) iconTabLua(0) }, [])
+  // chấm số trên biểu tượng app = câu còn thiếu hôm nay (đủ mức / nghỉ / hết câu ⇒ xoá)
+  const chamApp = kLua && kLua.lyDo !== 'nghi' && !du && con ? con : 0
+  const coSoLua = !!so
+  useEffect(() => { if (coSoLua) chamSoApp(chamApp) }, [chamApp, coSoLua])
+  const thapNgang = useMq(MQ_THAP_NGANG)
+  const [luaO, datLuaO] = useState<HTMLElement | null>(null)
+
   // Thanh trên: ĐÚNG 3 bộ đếm thưởng phạt (chuỗi · nguyên tử hôm nay · tinh thể) + vòng Mục tiêu ngày (bản vẽ tp-4); thông báo thưởng chưa xem chỉ bật ở Lộ trình.
   // Khối trạng thái trong menu (thầy 27/10) — xem useChoSo. Chưa có chỗ vẽ (lần vẽ đầu) ⇒ chưa hiện, không chớp.
   const tren = coThuong ? choSo && createPortal(<header className="da-tren" data-menu="" aria-label="Số của em">
-    <ThanhThuong token={p.token} onMo={moTp} onHoc={p.onHoc} thongBao={!tp && (p.muc ?? 'hom-nay') === 'hom-nay'} menu />
+    <ThanhThuong token={p.token} onMo={moTp} onHoc={p.onHoc} capLua={capLua} thongBao={!tp && (p.muc ?? 'hom-nay') === 'hom-nay'} menu />
   </header>, choSo) : <header className="da-tren" aria-label="Số của em">
     <>
     {lopSo(hs?.lop) && <span data-sac="tin" aria-label={`Khối ${lopSo(hs?.lop)}`}><GraduationCap size={22} aria-hidden="true" />{lopSo(hs?.lop)}</span>}
@@ -820,8 +895,15 @@ export function MotTrangHs(p: PropsMotTrang) {
     : du ? (tiepTheo.length ? ['vui', `Đủ mức rồi! Giờ đến ${tiepTheo[0]} nhé.`, `du-${tiepTheo[0]}`] : ['mung', 'Xong hết việc hôm nay! Em giỏi lắm.', 'xong'])
     : so.daLam === 0 ? ['chao', 'Chào em! Hôm nay bắt đầu từ chặng Học nhé.', 'bat-dau'] : ['chao', `Học tiếp nhé! Còn ${con} câu nữa là đủ mức hôm nay.`, 'hoc-tiep']
 
+  // LỬA ĐỔI CẢM XÚC: cấp ≥ 2 (và cấp 0 «vừa làm thật») ⇒ lời theo cấp (chữ chỉ nói sự thật: giờ, số câu, chuỗi); còn lại giữ lời cũ. Khoá nhắc một lần
+  // = ngày | cấp | lý do ⇒ lên cấp là hiện lại một lần; cấp 4–5 hiện MỖI lần mở Lộ trình, không tự ẩn (thầy quyết 4).
+  const loiCap = kLua && vaoLua ? loiLua(kLua.cap, vaoLua, kLua) : null
+  const loiLuaBi: [CamBi, string, string] | null = loiCap && kLua ? [kLua.cap === 0 ? 'vui' : loiBi?.[0] ?? 'chao', loiCap, `lua${kLua.cap}-${kLua.lyDo}`] : loiBi
+
   // Bi đứng cạnh đường (bản vẽ nâng cấp 27/10) khi đường có ≥ 2 chặng ⇒ lời Bi phía trên chỉ còn bong bóng (không hai Bi).
   const coBiBen = chang.length >= 2
+  // điện thoại ngang thấp + cấp ≥ 2 + có Lửa cạnh đường ⇒ bong bóng nói cạnh Lửa
+  const benLua = thapNgang && capLua >= 2 && coBiBen && loiCap ? luaO : null
   return <div ref={khung} className="dm-khung" data-so-menu={coThuong || undefined} style={{ '--tren-cao': `${trenCao}px` } as CSSProperties}>{tren}
     <main className="da-vo" aria-busy={!so && p.dangTai}>
       {chinh === 'ca' && <section className="da-bang" data-sac="tin" aria-label="Ca kiểm tra đang mở"><span className="h"><ClipboardCheck size={26} aria-hidden="true" /></span><div className="giua"><b>Ca kiểm tra đang mở</b><span className="mo">Nhập mã ca và mật khẩu thầy cung cấp để vào phòng kiểm tra.</span></div><button type="button" className="nut-to" onClick={p.onThi}>Vào ca kiểm tra</button></section>}
@@ -841,12 +923,14 @@ export function MotTrangHs(p: PropsMotTrang) {
         <div className="da-dai"><b>{p.tenBai || 'Bài học hôm nay'}</b>
           {chang.length > 0 && <span className="da-dai-tien"><i><s style={{ width: `${Math.round((100 * xongChang) / chang.length)}%` }} /></i>{xongChang}/{chang.length} chặng</span>}</div>
       </div>}
-      {loiBi && <LoiBi key={loiBi[2]} cam={loiBi[0]} loi={loiBi[1]} coBi={!coBiBen} khoa={loiBi[2] === 'ca' ? undefined : `${ngayVn(Date.now())}|${loiBi[2]}|${p.tenBai ?? ''}`} />}
+      {loiLuaBi && <LoiBi key={loiLuaBi[2]} cam={loiLuaBi[0]} loi={loiLuaBi[1]} coBi={!coBiBen} cap={capLua} ben={benLua}
+        khoa={loiLuaBi[2] === 'ca' || capLua >= 4 ? undefined : `${ngayVn(Date.now())}|${loiLuaBi[2]}|${p.tenBai ?? ''}`} />}
       {p.ghi.map((g) => <p key={g} className="da-ghi">{g}</p>)}
       {p.token && chinh !== 'ca' && laSamsungInternet() && <Suspense fallback={null}><NhacSamsung /></Suspense>}
       {coThuong && <TheBanLoTrinh token={p.token} bat={tq?.bat.banBe} onMo={() => moTp('ban')} />}
       {/* 28/10 tối (ảnh thầy giờ cao điểm: Lộ trình chỉ có nút Sửa lỗi): Sảnh chưa về ⇒ chưa vẽ đường (nút Sửa lỗi về trước làm em tưởng hết bài), báo đang tải. */}
-      {!so && p.dangTai && !p.ngayKiem ? <p className="da-ghi" role="status">Đang tải bài học hôm nay…</p> : nut.length > 0 && <DuongChang ds={nut} moDi={chinh === 'ca'} cam={coBiBen ? loiBi?.[0] ?? 'chao' : undefined} moKhoa={moKt ? 'kt' : moSua ? 'sua' : undefined} />}
+      {!so && p.dangTai && !p.ngayKiem ? <p className="da-ghi" role="status">Đang tải bài học hôm nay…</p> : nut.length > 0 && <DuongChang ds={nut} moDi={chinh === 'ca'} cam={coBiBen ? loiLuaBi?.[0] ?? 'chao' : undefined} moKhoa={moKt ? 'kt' : moSua ? 'sua' : undefined}
+        cap={capLua} onLuaO={thapNgang ? datLuaO : undefined} />}
       {hocThem && <button type="button" className="mot-lien-ket" onClick={p.onHoc}>Học thêm câu mới<ChevronRight size={18} aria-hidden="true" /></button>}
     </main>
     <aside className="dm-ben" aria-label="Tóm tắt">
