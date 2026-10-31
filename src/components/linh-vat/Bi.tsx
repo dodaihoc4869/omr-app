@@ -5,7 +5,7 @@
 // Lửa giữ MÀU LÔNG CHÀM riêng ở mọi cảm xúc (không mang màu đúng / sai như Bi): cảm xúc đọc bằng dáng, tai, mắt, miệng.
 // Giảm chuyển động / máy yếu / không có rAF ⇒ Lửa đứng TĨNH ở tư thế của cảm xúc. Chỉ dùng trong app học sinh «Trong». aria-hidden: chữ đi kèm đã đủ nghĩa.
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
-import type { GocLua, Lua, TrangThaiLua, TuyChonLua } from './lua-dong'
+import type { DungGian, GocLua, Lua, TrangThaiLua, TuyChonLua } from './lua-dong'
 import '../../styles/bi.css' // khung bong bóng «Học tiếp nhé» (.bi-loi) vẫn ở tệp này
 import '../../styles/lua.css'
 
@@ -30,6 +30,23 @@ export function biDungYen(): boolean {
   return document.documentElement.classList.contains('may-yeu') || !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 }
 let moDong: typeof import('./lua-dong') | null = null
+/** LỬA ĐỔI CẢM XÚC (thầy chốt 31/10): cấp giận ⇒ dáng có sẵn — 2 Sốt ruột: dỗi khoanh tay · 3 Bực: càu nhàu · 4 Giận / 5 Siêu cáu: tức giận. Cấp 0–1 theo `cam` như cũ. */
+const TT_CAP: Record<number, TrangThaiLua> = { 2: 'doi', 3: 'caunhau', 4: 'gian', 5: 'gian' }
+export function ttTheoCap(cam: CamBi, nhip: PropsBi['nhip'], cap = 0): [TrangThaiLua, TuyChonLua] {
+  const t = TT_CAP[cap]
+  return t ? [t, nhip === 'yen' ? { em: true } : {}] : ttTheoCam(cam, nhip)
+}
+/** Lớp vẽ giận (mảnh lười riêng ./lua-gian, chỉ tải khi Lửa lên cấp ≥ 2). */
+let dungGian: DungGian | null = null
+let hua: Promise<DungGian | null> | null = null
+const napGian = (): Promise<DungGian | null> => (hua ??= import('./lua-gian').then((m) => (dungGian = m.dungGian), () => { hua = null; return null }))
+/** Sự kiện phát khi một Lửa vừa vẽ xong cấp giận mới (biểu tượng tab của Lộ trình chụp lại đầu Lửa). */
+export const SU_KIEN_LUA_CAP = 'ddh-lua-cap'
+function apCap(l: Lua, cap: number, con: () => boolean): void {
+  const xong = () => { if (!con()) return; l.datCap(cap, dungGian ?? undefined); window.dispatchEvent(new Event(SU_KIEN_LUA_CAP)) }
+  if (cap < 2 || dungGian) { if (l.cap !== cap) xong(); return }
+  void napGian().then(xong)
+}
 
 /** (28/10 «vẫn chưa tức thì») Ảnh TĨNH của linh vật ở Lộ trình lần mở trước (src/lib/khung-tinh-hs.ts chụp): `{ "<cỡ>|<cảm xúc>|<hướng>": { src, st } }`. */
 export const KHOA_BI_TINH = 'ddh.bi-tinh'
@@ -52,9 +69,14 @@ export interface PropsBi {
   noi?: string
   /** Đứng nghiêng: 'phai' = quay mặt sang phải, 'trai' = sang trái (Lộ trình: nhìn về phía đường). */
   goc?: GocLua
+  /** Cấp giận 0–5 (src/lib/lua-cam-xuc.ts). ≥ 2 ⇒ đổi dáng + mặt + màu (lớp vẽ giận nạp lười). Vắng = 0. */
+  cap?: number
 }
 
-export function Bi({ cam = 'chao', size = 96, className, nhip, noi, goc }: PropsBi) {
+export function Bi({ cam = 'chao', size = 96, className, nhip, noi, goc, cap: cap0 }: PropsBi) {
+  const cap = cap0 && cap0 >= 2 ? Math.min(5, Math.round(cap0)) : 0
+  // khoá ảnh tĩnh + data-cam: cấp ≥ 2 là hình khác hẳn ⇒ khoá riêng (không lấy ảnh vui vẻ của lần trước làm khung giữ chỗ cho Lửa đang giận, và ngược lại)
+  const camKhoa = cap >= 2 ? `gian${cap}` : cam
   const o = useRef<HTMLSpanElement>(null), lua = useRef<Lua | null>(null), dau = useRef(true)
   const [co, setCo] = useState(() => !!moDong)
   // Mảnh hoạt ảnh chưa về: đặt ẢNH TĨNH lần trước vào khung giữ chỗ (đúng cỡ, đúng tư thế) ⇒ linh vật hiện ngay từ khung đầu (khung tĩnh Lộ trình gỡ ra
@@ -62,7 +84,7 @@ export function Bi({ cam = 'chao', size = 96, className, nhip, noi, goc }: Props
   useLayoutEffect(() => {
     const el = o.current
     if (co || !el || el.firstChild) return
-    const a = anhBiTinh(size, cam, goc)
+    const a = anhBiTinh(size, camKhoa, goc)
     if (!a) return
     const img = document.createElement('img')
     img.className = 'lua-svg bi-tinh'
@@ -79,20 +101,23 @@ export function Bi({ cam = 'chao', size = 96, className, nhip, noi, goc }: Props
   }, [co])
   useEffect(() => {
     if (!co || !moDong || !o.current) return
-    const [trangThai, tuyChon] = ttTheoCam(cam, nhip)
+    const [trangThai, tuyChon] = ttTheoCap(cam, nhip, cap)
     o.current.querySelector(':scope > .bi-tinh')?.remove()
     const l = moDong.taoLua(o.current, { trangThai, tuyChon, tinh: biDungYen(), goc })
     if (noi) l.noi(noi, 40)
     lua.current = l
+    apCap(l, cap, () => lua.current === l)
     return () => { l.huy(); lua.current = null }
   }, [co]) // eslint-disable-line react-hooks/exhaustive-deps -- tạo một lần; đổi cảm xúc đi qua datTrangThai để chuyển mượt
   useEffect(() => {
     if (dau.current) { dau.current = false; return }
-    const [t, tc] = ttTheoCam(cam, nhip)
-    lua.current?.datTrangThai(t, tc)
-    if (noi) lua.current?.noi(noi, 40)
-  }, [cam, nhip, noi])
-  return <span ref={o} className={`bi lua${className ? ` ${className}` : ''}`} data-cam={cam} data-goc={goc} aria-hidden="true" style={{ '--lv-w': `${size}px` } as CSSProperties} />
+    const [t, tc] = ttTheoCap(cam, nhip, cap)
+    const l = lua.current
+    l?.datTrangThai(t, tc)
+    if (noi) l?.noi(noi, 40)
+    if (l) apCap(l, cap, () => lua.current === l)
+  }, [cam, nhip, noi, cap])
+  return <span ref={o} className={`bi lua${className ? ` ${className}` : ''}`} data-cam={camKhoa} data-cap={cap || undefined} data-goc={goc} aria-hidden="true" style={{ '--lv-w': `${size}px` } as CSSProperties} />
 }
 
 export default Bi

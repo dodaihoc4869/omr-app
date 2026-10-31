@@ -7,7 +7,7 @@
 // MỘT vòng rAF chung cho mọi Lửa trên màn; ra khỏi khung nhìn / tab ẩn / bị màn con che ⇒ không tính, không vẽ. Máy yếu ⇒ vẽ một khung rồi đứng.
 // Không màu thô: mọi màu là biến --cn-* (styles/cu-ngoc.css, nạp cùng mảnh này) pha từ token bảng «Chất chỉ thị» --tr-*.
 import '../../styles/cu-ngoc.css'
-export type TrangThaiLua = 'yen' | 'cuoi' | 'chao' | 'vui' | 'combo' | 'buon' | 'nghi' | 'covu' | 'ngu' | 'choc' | 'doi' | 'gian' | 'caunhau'
+export type TrangThaiLua = 'yen' | 'cuoi' | 'chao' | 'vui' | 'combo' | 'buon' | 'nghi' | 'covu' | 'ngu' | 'choc' | 'doi' | 'gian' | 'caunhau' | 'giam'
 export type GocLua = 'truoc' | 'phai' | 'trai'
 export interface TuyChonLua {
   /** Sau bao nhiêu ms thì tự chuyển sang `ve`. */
@@ -25,8 +25,19 @@ export interface Lua {
   readonly svg: SVGSVGElement
   /** Bước tay (bộ chụp / test): tiến `ms` mili giây rồi vẽ. */
   buoc(ms: number): void
+  /** LỬA ĐỔI CẢM XÚC (31/10): cấp giận 0–5. Từ cấp 2 cần lớp vẽ giận `dung` (mảnh lười ./lua-gian); cấp 0–1 giống hệt hình cũ. */
+  datCap(cap: number, dung?: DungGian): void
+  readonly cap: number
   huy(): void
 }
+/** Phần hình mà lớp vẽ giận (mảnh lười ./lua-gian) chồng chi tiết lên — mắt, mày, miệng, chỏm lửa, nhóm hiệu ứng. */
+export interface PhanLua {
+  svg: SVGSVGElement; defs: SVGElement; id: string
+  hieu: SVGElement; lua: SVGElement; mat: SVGElement; mq: SVGElement
+  mats: { tron: SVGElement; ng: SVGElement; miT: SVGElement; may: SVGElement; s: number }[]
+}
+export interface LopGian { cap(c: number): void; ve(t: number, tinh: boolean): void }
+export type DungGian = (p: PhanLua) => LopGian
 
 const NS = 'http://www.w3.org/2000/svg'
 type So = Record<string, number>
@@ -70,6 +81,7 @@ const CHUAN: So = { x: 0, y: 0, rot: 0, sq: 1, hr: 0, hy: 0, q: 0, tai: 0, aT: 2
 const ROI: Record<string, string | number> = { mat: 'mo', hT: 'nam', hP: 'nam', zT: 0, zP: 0, hieu: '' }
 const MK = new Set(['px', 'py', 'lt', 'ltP', 'la', 'es', 'may', 'ba', 'mw', 'mc', 'mt', 'mb', 'mk', 'ma'])
 const A = (...d: TT[]): TT => Object.assign({}, ...d)
+const GIAN: TT = { aT: 14, iT: [-36, -46], aP: 14, iP: [36, -46], zT: 1, zP: 1, lt: 0.3, ltP: 0.3, la: 22, may: 1, ba: 24, mw: -2, mc: -5, mt: -2, mb: 4, ma: 1.3, sq: 0.95, tai: -6, hieu: 'khoi' }
 export const CAM_XUC_LUA: Record<TrangThaiLua, TrangThaiVe> = {
   yen: { base: {}, loop: [{ d: 1700, k: 22, p: { rot: -1.5, hr: 2 } }, { d: 1700, k: 22, p: { rot: 1.5, hr: -1 } }] },
   cuoi: { base: { mat: 'cong', mw: 4, mc: 6, mt: -1, mb: 13, tai: -4 }, loop: [{ d: 1700, k: 22, p: { rot: -1.5, hr: 2 } }, { d: 1700, k: 22, p: { rot: 1.5, hr: -1 } }] },
@@ -112,13 +124,17 @@ export const CAM_XUC_LUA: Record<TrangThaiLua, TrangThaiVe> = {
     loop: [{ d: 1400, k: 60, p: {} }, { d: 260, k: 300, p: { hr: -12 } }, { d: 260, k: 300, p: {} }],
   },
   gian: { // tức giận: mày xếch, mắt dữ, nắm tay trước bụng, khói hồng
-    base: { aT: 14, iT: [-36, -46], aP: 14, iP: [36, -46], zT: 1, zP: 1, lt: 0.3, ltP: 0.3, la: 22, may: 1, ba: 24, mw: -2, mc: -5, mt: -2, mb: 4, ma: 1.3, sq: 0.95, tai: -6, hieu: 'khoi' },
+    base: GIAN,
     seq: [{ d: 100, k: 480, p: { y: -6, sq: 1.08 } }],
     loop: [{ d: 120, k: 600, p: { x: -2 } }, { d: 120, k: 600, p: { x: 2 } }, { d: 120, k: 600, p: { x: -2 } }, { d: 900, k: 200, p: {} }],
   },
   caunhau: { // càu nhàu: nhắm một mắt, miệng méo lẩm bẩm, cánh giơ, vạch tiếng hồng
     base: { aP: 100, bP: 150, hP: 'xoe', zP: 1, lt: 1, ltP: 0.4, la: 6, may: 1, ba: 8, mw: -3, mc: -2, mt: 0, mb: 4, mk: 2.5, hr: 6, tai: 4, hieu: 'lam' },
     loop: [{ d: 200, k: 400, p: { bP: 135, mb: 6 } }, { d: 200, k: 400, p: { mb: 2 } }, { d: 200, k: 400, p: { bP: 135, mb: 6 } }, { d: 700, k: 200, p: {} }],
+  },
+  giam: { // (31/10) bị chạm lúc đang bực / giận (cấp 3–5): giậm chân hai nhịp, mặt vẫn giận, KHÔNG cười — xong về trạng thái trước. Mỗi nhịp ≤ 250 ms.
+    base: GIAN,
+    seq: [{ d: 90, k: 520, p: { y: 4, sq: 0.86, rot: -4 } }, { d: 130, k: 420, p: { y: -10, sq: 1.08 } }, { d: 90, k: 520, p: { y: 4, sq: 0.86, rot: 4 } }, { d: 140, k: 420, p: { y: -6, sq: 1.04 } }, { d: 220, k: 300, p: {} }],
   },
 }
 
@@ -326,7 +342,7 @@ export function taoLua(noiGan: HTMLElement, tc: { trangThai?: TrangThaiLua; tuyC
         if (iK >= ds.length) {
           iK = 0
           if (gd === 'seq') {
-            if (ten === 'choc') { batDau(truocChoc, { em: true }); return }
+            if (ten === 'choc' || ten === 'giam') { batDau(truocChoc, { em: true }); return }
             gd = cx.loop?.length ? 'loop' : 'xong'
           }
         }
@@ -349,7 +365,7 @@ export function taoLua(noiGan: HTMLElement, tc: { trangThai?: TrangThaiLua; tuyC
   function ve() {
     const th = tinh ? 0 : Math.sin((t / 2400) * Math.PI * 2) * v.tho! * 0.018
     const sq = v.sq! * (1 + th * 0.5), sx = 1 + (1 - sq) * 0.6, q = v.q!, aq = Math.abs(q)
-    tf(P.goc!, `translate(${f1(v.x!)},${f1(v.y!)}) rotate(${f1(v.rot!)}) scale(${f1(sx * 1000) / 1000},${f1(sq * 1000) / 1000})`)
+    tf(P.goc!, `translate(${f1(v.x! * (cap >= 5 ? 2.5 : 1))},${f1(v.y!)}) rotate(${f1(v.rot!)}) scale(${f1(sx * 1000) / 1000},${f1(sq * 1000) / 1000})`)
     dat(bong, 'rx', String(f1(92 * (1 + Math.min(0, v.y!) / 120)))); dat(bong, 'opacity', String(f1(1 + Math.min(0, v.y!) / 90)))
     for (const { c, s } of chan) tf(c, `translate(${f1(s * 40 + q * 10)},0)`)
     tf(P.duoi!, `translate(${f1(-q * 36)},0) rotate(${f1(phu.x * 0.7 + v.rot! * 0.5)} -60 -40)`)
@@ -360,7 +376,10 @@ export function taoLua(noiGan: HTMLElement, tc: { trangThai?: TrangThaiLua; tuyC
       const s = i ? 1 : -1, xa = Math.max(0, s * q)
       tf(e, `translate(${f1(s * 62 - q * 18 - s * xa * 22)},-92) rotate(${f1(s * 20 + s * v.tai! + phu.x * (i ? 1 : 0.8))}) scale(${f1(s * 1.12 * (1 - 0.35 * xa))},1.12)`)
     })
-    tf(P.lua!, `translate(${f1(q * 20)},-88) rotate(${f1(phu.x * 1.2)}) scale(${f1(0.9 + 0.1 * v.lua!)},${f1(v.lua!)})`)
+    // chỏm lửa theo cấp giận: 4 to hơn, 5 bùng cao + chập chờn (nhịp 250 ms)
+    const [lx, ly, lt0] = cap >= 5 ? [1.45, 1.75, -4] : cap >= 4 ? [1.18, 1.3, -2] : [1, 1, 0], chap = cap >= 5 && !tinh ? 1 + 0.06 * Math.sin(t / 80) : 1
+    const f2 = (x: number) => (cap >= 4 ? f1(x * 100) / 100 : f1(x)) // cấp 0–3: đúng chuỗi cũ (hình y hệt)
+    tf(P.lua!, `translate(${f1(q * 20)},${-88 + lt0}) rotate(${f1(phu.x * 1.2)}) scale(${f2((0.9 + 0.1 * v.lua!) * lx)},${f2(v.lua! * ly * chap)})`)
     tf(P.mat!, `translate(${f1(q * 32)},0)`)
     tf(P.mask!, `scale(${f1(1 - 0.15 * aq)},1)`)
     tf(P.kinh!, `translate(${f1(q * 26)},0)`); tf(daiK, `translate(${f1(q * 22)},0)`)
@@ -369,15 +388,16 @@ export function taoLua(noiGan: HTMLElement, tc: { trangThai?: TrangThaiLua; tuyC
     for (const e of mats) {
       const s = e.s, md = roi.mat, xa = Math.max(0, s * q), x0 = s * 46 * (1 - 0.25 * xa)
       tf(e.mg, `translate(${f1(x0)},8) scale(${f1(v.es! * (1 - 0.3 * xa) * 100) / 100},${f1(v.es! * 100) / 100})`)
-      const lt = Math.min(1, Math.max(s < 0 ? v.lt! : v.ltP!, tinh ? 0 : ns)), thuong = md === 'mo'
+      const lt1 = Math.min(1, Math.max(s < 0 ? v.lt! : v.ltP!, tinh ? 0 : ns)), lt = cap >= 5 ? Math.max(lt1, 0.42) : lt1, thuong = md === 'mo'
       dat(e.tron, 'display', thuong && lt <= 0.92 ? '' : 'none')
       dat(e.cong, 'display', md === 'cong' ? '' : 'none')
       dat(e.nham, 'display', md === 'nham' || (thuong && lt > 0.92) ? '' : 'none')
       tf(e.ng, `translate(${f1(v.px! * 6)},${f1(v.py! * 5)})`)
       const yb = -27 + lt * 54
-      dat(e.miT, 'y', String(f1(yb - 80))); tf(e.miT, `rotate(${f1(-s * v.la!)} 0 ${f1(yb)})`)
+      dat(e.miT, 'y', String(f1(yb - 80))); tf(e.miT, `rotate(${f1(-s * (cap >= 5 ? 30 : v.la!))} 0 ${f1(yb)})`)
       dat(e.may, 'display', v.may! > 0.3 ? '' : 'none')
-      tf(e.may, `translate(${f1(x0)},${f1(-28 + (1 - v.may!) * 6)}) rotate(${f1(-s * v.ba!)})`)
+      // cấp 4–5: mày dày xếch chữ V ép sát mắt (nét dày do lớp giận đặt)
+      tf(e.may, `translate(${f1(x0)},${f1(-28 + (1 - v.may!) * 6 + (cap >= 5 ? 6 : cap >= 4 ? 3 : 0))}) rotate(${f1(-s * (cap >= 5 ? 34 : cap >= 4 ? 28 : v.ba!))})`)
     }
     dat(ma, 'opacity', String(f1(Math.min(1, v.ma!))))
     // miệng — mấp máy khi đang nói
@@ -406,13 +426,14 @@ export function taoLua(noiGan: HTMLElement, tc: { trangThai?: TrangThaiLua; tuyC
     const nh = (t % 600) / 600, kk = (t / 900) % 1
     hien('nhay', roi.hieu === 'nhay', `translate(${f1(Math.sin(nh * Math.PI) * 4)},${f1(-Math.sin(nh * Math.PI) * 4)})`)
     hien('hoi', roi.hieu === 'hoi', `translate(0,${f1(Math.sin(t / 300) * 4)})`)
-    hien('khoi', roi.hieu === 'khoi', `translate(0,${f1(-kk * 14)}) scale(${f1(0.85 + kk * 0.3)})`)
+    hien('khoi', roi.hieu === 'khoi' && cap < 5, `translate(0,${f1(-kk * 14)}) scale(${f1(0.85 + kk * 0.3)})`) // cấp 5: hơi nước hai tai thay khói
     hien('lam', roi.hieu === 'lam', `translate(${f1(Math.sin(t / 120) * 3)},0)`)
     const kg = t - tGiot - 120, coGiot = kg >= 0 && kg <= 1600
     hien('giot', coGiot, `translate(0,${f1(kg / 100)})`)
     if (coGiot) dat(hu.giot!, 'opacity', String(f1(kg < 200 ? kg / 200 : kg > 1200 ? (1600 - kg) / 400 : 1)))
     hien('zzz', roi.hieu === 'zzz')
     if (roi.hieu === 'zzz') [...hu.zzz!.children].forEach((z, i) => { const k = (t / 1800 + i / 3) % 1; dat(z, 'opacity', String(f1(tinh ? 1 : k < 0.2 ? k / 0.2 : 1 - (k - 0.2) / 0.8))); tf(z, `translate(${f1(tinh ? 0 : k * 10)},${f1(tinh ? 0 : -k * 16)})`) })
+    gian?.ve(t, tinh)
   }
   function ongTay(Sx: number, Sy: number, Ex: number, Ey: number, Hx: number, Hy: number, w1: number, w2: number, w3: number): string {
     const L1 = Math.hypot(Ex - Sx, Ey - Sy) || 1, L2 = Math.hypot(Hx - Ex, Hy - Ey) || 1
@@ -424,13 +445,17 @@ export function taoLua(noiGan: HTMLElement, tc: { trangThai?: TrangThaiLua; tuyC
     return `M${Q(A1.a)}L${Q(A1.p1)}Q${Q(A1.c)} ${Q(A1.p2)}L${Q(A1.b)}L${Q(B1.b)}L${Q(B1.p2)}Q${Q(B1.c)} ${Q(B1.p1)}L${Q(B1.a)}Q${Q([B1.a[0]! - u1[0] * w1 / 2, B1.a[1]! - u1[1] * w1 / 2])} ${Q(goc)}Q${Q([A1.a[0]! - u1[0] * w1 / 2, A1.a[1]! - u1[1] * w1 / 2])} ${Q(A1.a)}Z`
   }
 
+  // LỚP GIẬN (31/10): dựng LẦN ĐẦU lên cấp 2 (mảnh lười ./lua-gian) — cấp 0–1 không thêm nút nào
+  let cap = 0, gian: LopGian | null = null
+  const phan: PhanLua = { svg, defs, id, hieu: P.hieu!, lua: P.lua!, mat: P.mat!, mq, mats: mats.map((e) => ({ tron: e.tron, ng: e.ng, miT: e.miT, may: e.may, s: e.s })) }
   const song: Song = { tich, ve, hien: true, svg }
   let quan: IntersectionObserver | null = null
   if (!tinh && !tc.tay) {
     dangSong.add(song)
     if (typeof IntersectionObserver !== 'undefined') { quan = new IntersectionObserver((ds) => { song.hien = ds.some((x) => x.isIntersecting); if (song.hien) chay() }); quan.observe(svg) }
   }
-  const choc = () => { if (tinh || ten === 'choc') return; truocChoc = ten; batDau('choc'); chay() }
+  // cấp 3–5: chạm ⇒ giậm chân, không cười khúc khích (đặc tả 31/10 mục 5)
+  const choc = () => { if (tinh || ten === 'choc' || ten === 'giam') return; truocChoc = ten; batDau(cap >= 3 ? 'giam' : 'choc'); chay() }
   if (!tinh) svg.addEventListener('pointerdown', choc)
   batDau(tc.trangThai ?? 'yen', { ...tc.tuyChon, em: true })
   for (const k in dich) { v[k] = dich[k]!; van[k] = 0 }
@@ -443,6 +468,14 @@ export function taoLua(noiGan: HTMLElement, tc: { trangThai?: TrangThaiLua; tuyC
     noi(chuNoi, ms = 40) { if (!tinh) noiDen = t + chuNoi.length * ms + 60 },
     cham: choc,
     buoc(ms) { let c = ms; while (c > 0) { const dt = Math.min(c, 8); tich(dt / 1000); c -= dt } ve() },
+    get cap() { return cap },
+    datCap(c, dung) {
+      cap = Math.max(0, Math.min(5, Math.round(c) || 0))
+      if (cap >= 2 && !gian && dung) gian = dung(phan)
+      gian?.cap(cap)
+      if (cap >= 2) svg.setAttribute('data-cap-ve', String(cap)); else svg.removeAttribute('data-cap-ve') // cấp đã vẽ xong (biểu tượng tab chụp đúng hình)
+      ve(); chay()
+    },
     huy() { dangSong.delete(song); LUA_DANG_SONG.delete(lua); quan?.disconnect(); svg.removeEventListener('pointerdown', choc); svg.remove() },
   }
   LUA_DANG_SONG.add(lua)

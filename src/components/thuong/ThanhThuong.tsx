@@ -32,9 +32,11 @@ export interface PropsThanhThuong {
    *  4 mục — vòng mục tiêu · lửa · nguyên tử · tinh thể — mỗi mục biểu tượng trên, số gọn («12,3k») dưới, không nền; chạm ⇒ mở màn như cũ.
    *  Không truyền ⇒ y cũ (thanh ngang). Nhãn đủ chữ ở aria-label. */
   menu?: boolean
+  /** Cấp giận của Lửa (31/10, src/lib/lua-cam-xuc.ts): đầu Lửa trong vòng Mục tiêu ngày cùng mặt + màu với Lửa trên Lộ trình. Vắng = 0. */
+  capLua?: number
 }
 
-export function ThanhThuong({ token, onMo, onHoc, thongBao = true, menu }: PropsThanhThuong) {
+export function ThanhThuong({ token, onMo, onHoc, thongBao = true, menu, capLua }: PropsThanhThuong) {
   const { du, tai } = useTongQuan(token)
   const [hd, setHd] = useState<LoaiBieuTuong | null>(null)
   if (!du) return tai ? <div className="tp-tr" aria-busy="true" aria-label="Đang tải số của em">
@@ -61,7 +63,7 @@ export function ThanhThuong({ token, onMo, onHoc, thongBao = true, menu }: Props
       const nhan = `Mục tiêu hôm nay: ${mt.can} ${mt.donVi} · đã làm ${mt.da}${dat ? ', đủ mức' : ''}`
       const vong = <span className="tp-tr-vong" aria-hidden="true">
         <svg className="vm" viewBox="0 0 52 52"><circle className="nen" cx="26" cy="26" r="22" /><circle className="chay" cx="26" cy="26" r="22" strokeDasharray={`${p * CHU_VI} 200`} /></svg>
-        <Bi cam={dat ? 'mung' : 'chao'} size={menu ? 18 : 34} nhip="yen" />
+        <Bi cam={dat ? 'mung' : 'chao'} size={menu ? 18 : 34} nhip="yen" cap={capLua} />
       </span>
       // trong menu: vòng nhỏ trên, số «3/4» (đủ ⇒ «Đủ») dưới; thanh ngang cũ: nhãn «3/4 chặng» / «Đủ mức» dưới vòng
       const ruot = menu

@@ -1093,3 +1093,17 @@
 }
 [data-trong] .tdg-nut:active { transform: translateY(2px); box-shadow: none; }
 
+
+/* LỬA ĐỔI CẢM XÚC (thầy «Chốt duyệt tất» 31/10, docs/DE-XUAT-BI-CAM-XUC-3110.md mục 2.2): cấp 4–5 Lửa cạnh đường to hơn (83 → 104 px) để thấy rõ mặt;
+   bong bóng cấp 4–5 viền màu «sai» (token có sẵn). Màu giận của chính Lửa ở styles/lua-gian.css (nạp lười cùng lớp vẽ giận). */
+[data-trong] .da-linh-vat[data-cap] { width: 124px; }
+[data-trong] .da-linh-vat[data-cap] .bi { width: 104px; }
+@media (max-width: 380px) { [data-trong] .da-linh-vat[data-cap] { width: 104px; } [data-trong] .da-linh-vat[data-cap] .bi { width: 88px; } }
+[data-trong='hs'] .bi-loi-bong[data-cap], [data-trong='hs'] .bi-loi-bong[data-cap]::before { border-color: var(--tr-sai); }
+/* Điện thoại ngang thấp (cao < 600 px): bong bóng NÓI CẠNH Lửa (đầu trang đã cuộn khuất) — đặt trên đầu Lửa, đuôi chỉ xuống Lửa */
+[data-trong] .da-lv-loi-o { position: absolute; left: 50%; top: 50%; z-index: 2; width: 0; height: 0; transform: translateX(var(--lv)); }
+[data-trong='hs'] .da-lv-loi-o > .bi-loi-boc { position: absolute; left: -60px; bottom: 54px; width: var(--rong, 200px); }
+[data-trong='hs'] .da-lv-loi-o[data-cap] > .bi-loi-boc { bottom: 70px; }
+[data-trong='hs'] .da-lv-loi-o > .bi-loi-boc > .bi-loi { margin: 0; overflow: visible; }
+[data-trong='hs'] .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong { margin: 0 0 9px; padding: 10px 12px; font-size: 15px; box-shadow: 0 2px 0 var(--tr-vien); }
+[data-trong='hs'] .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong::before { display: block; left: 53px; bottom: -9px; transform: rotate(-45deg); }

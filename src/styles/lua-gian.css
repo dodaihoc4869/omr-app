@@ -1,0 +1,59 @@
+/* LỬA ĐỔI CẢM XÚC cấp 2–5 (thầy «Chốt duyệt tất» 31/10 — docs/DE-XUAT-BI-CAM-XUC-3110.md, bản vẽ scripts/ban-ve-bi-cam-xuc-3110/lua-gian.css) — nạp LƯỜI
+   cùng mảnh src/components/linh-vat/lua-gian.ts (chỉ khi Lửa lên cấp ≥ 2). Đè biến màu --cn-* của Lửa (cu-ngoc.css) theo cấp qua data-cap trên khung .lua
+   (Bi.tsx đặt). KHÔNG mã màu thô: mọi màu giận pha color-mix từ token có sẵn của app học sinh (--tr-sai, --tr-sai-day, --tr-chu-y-day, --tr-chu-y-nut,
+   --tr-sao, --tr-tin, --tr-hs*) với đen / trắng cố định (--btg-chu-doan / --btg-chu-doan-dam) — đúng cách cu-ngoc.css đang pha. Bộ biến mới (--g-do,
+   --cn-gian, --cn-matDo, --cn-matSang, --cn-hoi, --cn-luaNgoai, --cn-rang) là MÀU VẼ RIÊNG của linh vật, chỉ dùng trong hình SVG. */
+[data-trong='hs'] .lua[data-cap] {
+  /* «đỏ giận» gốc: nửa đáy-đỏ + nửa đáy-cam ⇒ đỏ tươi, gần như nhau ở nền sáng và tối */
+  --g-do: color-mix(in srgb, var(--tr-sai-day) 50%, var(--tr-chu-y-day));
+  --cn-gian: var(--tr-sai);
+  --cn-rang: var(--btg-chu-doan-dam);
+  --cn-hoi: color-mix(in srgb, var(--btg-chu-doan) 10%, var(--btg-chu-doan-dam));
+  --cn-matDo: color-mix(in srgb, var(--tr-sai-day) 45%, var(--tr-chu-y-nut));
+  --cn-matSang: var(--tr-sao);
+  --cn-luaNgoai: color-mix(in srgb, var(--g-do) 82%, var(--btg-chu-doan));
+}
+/* CẤP 2 · SỐT RUỘT — giữ màu lông, má hồng đậm hơn */
+[data-trong='hs'] .lua[data-cap='2'] {
+  --cn-ma: color-mix(in srgb, var(--tr-sai) 48%, var(--btg-chu-doan-dam));
+}
+/* CẤP 3 · BỰC — lông ấm lên một chút, mặt ửng hồng, má đỏ */
+[data-trong='hs'] .lua[data-cap='3'] {
+  --cn-long: color-mix(in oklab, color-mix(in srgb, var(--tr-hs) 50%, var(--tr-hs-nut)) 80%, var(--g-do));
+  --cn-longT: color-mix(in oklab, color-mix(in srgb, var(--tr-hs-nut) 55%, var(--tr-hs-day)) 80%, var(--g-do));
+  --cn-longS: color-mix(in oklab, color-mix(in srgb, var(--tr-hs) 72%, var(--btg-chu-doan-dam)) 80%, var(--g-do));
+  --cn-kem: color-mix(in srgb, var(--g-do) 16%, var(--btg-chu-doan-dam));
+  --cn-ma: color-mix(in srgb, var(--tr-sai) 75%, var(--btg-chu-doan-dam));
+}
+/* CẤP 4 · GIẬN — lông tím đỏ, mặt đỏ hồng, chỏm lửa cam, khói xám */
+[data-trong='hs'] .lua[data-cap='4'] {
+  --cn-long: color-mix(in oklab, color-mix(in srgb, var(--tr-hs) 50%, var(--tr-hs-nut)) 42%, color-mix(in srgb, var(--g-do) 85%, var(--btg-chu-doan)));
+  --cn-longT: color-mix(in oklab, color-mix(in srgb, var(--tr-hs-nut) 55%, var(--tr-hs-day)) 42%, color-mix(in srgb, var(--g-do) 62%, var(--btg-chu-doan)));
+  --cn-longS: color-mix(in oklab, color-mix(in srgb, var(--tr-hs) 72%, var(--btg-chu-doan-dam)) 42%, var(--g-do));
+  --cn-vien: color-mix(in oklab, color-mix(in oklab, var(--tr-hs-day) 70%, var(--btg-chu-doan)) 50%, color-mix(in srgb, var(--g-do) 35%, var(--btg-chu-doan)));
+  --cn-kem: color-mix(in srgb, var(--g-do) 42%, var(--btg-chu-doan-dam));
+  --cn-ma: var(--g-do);
+  --cn-hong: color-mix(in srgb, var(--tr-chu-y-nut) 62%, var(--tr-sai-day));
+  --cn-hongS: var(--tr-sao);
+  --cn-khoi: var(--cn-hoi);
+  --cn-bong: color-mix(in srgb, var(--g-do) 22%, transparent);
+}
+/* CẤP 5 · SIÊU CÁU, MẶT ĐỎ LỪ — cả con đỏ sẫm, mặt đỏ tươi, hốc mắt tối + tròng đỏ rực, răng nghiến, lửa bùng, hơi nước, quầng đỏ */
+[data-trong='hs'] .lua[data-cap='5'] {
+  --cn-long: color-mix(in srgb, var(--g-do) 64%, var(--btg-chu-doan));
+  --cn-longT: color-mix(in srgb, var(--g-do) 44%, var(--btg-chu-doan));
+  --cn-longS: color-mix(in srgb, var(--g-do) 54%, var(--btg-chu-doan));
+  --cn-vien: color-mix(in srgb, var(--g-do) 26%, var(--btg-chu-doan));
+  --cn-lucGiac: color-mix(in srgb, var(--g-do) 40%, var(--btg-chu-doan));
+  --cn-kem: color-mix(in srgb, var(--g-do) 88%, var(--btg-chu-doan));
+  --cn-ma: color-mix(in srgb, var(--g-do) 70%, var(--btg-chu-doan));
+  --cn-den: color-mix(in srgb, var(--g-do) 16%, var(--btg-chu-doan));
+  --cn-trang: color-mix(in srgb, var(--g-do) 10%, var(--btg-chu-doan-dam));
+  --cn-aoT: color-mix(in srgb, var(--g-do) 26%, var(--btg-chu-doan-dam));
+  --cn-hong: color-mix(in srgb, var(--tr-chu-y-nut) 58%, var(--tr-sai-day));
+  --cn-hongS: var(--tr-sao);
+  --cn-ngoc: color-mix(in srgb, var(--tr-tin) 62%, var(--btg-chu-doan));
+  --cn-ngocS: color-mix(in srgb, var(--tr-tin) 40%, var(--btg-chu-doan));
+  --cn-khoi: var(--cn-hoi);
+  --cn-bong: color-mix(in srgb, var(--g-do) 34%, transparent);
+}

@@ -56,6 +56,9 @@ import { BangCombo as BangComboTp, TamThuong } from '../thuong/TamThuong'
 import { IcNguyenTu } from '../thuong/hinh'
 import { capNhatTongQuan } from '../thuong/dung-thuong'
 import { DUONG, docKetBai, docThuongCau, khoaTam, layTam, ngayVn, type TongQuanThuong } from '../../lib/thuong-api'
+// LỬA ĐỔI CẢM XÚC (thầy chốt 31/10): sổ nhỏ trên máy «câu được tính / chưa được tính» (cùng mảnh thuong-gon) — Lộ trình đọc để Lửa vui / giận; 0 lệnh máy chủ.
+import { ghiCauLua, ghiXongChangLua } from '../../lib/lua-that'
+import { gioMayChu } from '../../lib/gio-may-chu'
 // GIỮ CHÂN KHI THOÁT + băng nhắc + lời động viên (thầy 27/10, ảnh Duolingo): móc nhỏ ở đây, tấm + CSS là mảnh nạp lười (GiuChan.tsx).
 import { napSanGiuChan, TamGiuChanLuoi, useGiuChan } from './GiuChan'
 import { canGiuChan, chuoiHomNay, loiBangNhac, loiDongVien, loiGiuChan, type CauDaCham } from './giu-chan'
@@ -701,6 +704,9 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
       const kDayDu: Ket = { ...(r as unknown as Ket), assisted: typeof hoTro === 'boolean' ? hoTro : assisted, ...(r.replayed === true && daCham !== tra ? { chamLanTruoc: true } : {}) }
       const ketMoi = { ...ket, [q.qid]: kDayDu }
       setKet(v => ({ ...v, [q.qid]: kDayDu })); try { localStorage.removeItem(khoa) } catch { /* Không cản nhận kết quả. */ }
+      // sổ Lửa: đúng cờ `thuong.tinh` máy chủ vừa gửi (câu hỗ trợ / lượt Omni / bản trả lại lần trước không ghi)
+      const thLua = docThuongCau(r.thuong)
+      if (thLua && r.replayed !== true && !r.choThay && !r.hocCoHoTro && (r.omni as { luot?: unknown } | undefined)?.luot !== true) ghiCauLua(sbd, thLua.tinh, gioMayChu())
       if ((r.omni as { luot?: unknown } | undefined)?.luot !== true) tinhCauMoi(q, ketMoi); else luuDangRef.current(ketMoi)
       capNhatSo()
     } catch (e) {
@@ -734,6 +740,9 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   const ketThuc = () => {
     daXongRef.current = true
     xoaChangDangLam(sbd)
+    // xong chặng làm thật (≥ 2/3 câu của chặng được tính, vd 4/6) ⇒ Lửa vui lại 30 phút (sổ trên máy)
+    const cauChang = soGoc ? cau.slice(0, soGoc) : cau
+    ghiXongChangLua(sbd, cauChang.filter(c => docThuongCau(ket[c.qid]?.thuong)?.tinh === true).length, cauChang.length, gioMayChu())
     const goc = gocRef.current, kh = goc ? khungCuonCua(goc) : null
     if (kh && kh.scrollTop > 0) { kh.scrollTop = 0; daVeDau.current = true }
     startTransition(() => {

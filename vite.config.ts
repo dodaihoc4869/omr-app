@@ -325,6 +325,8 @@ export default defineConfig({
           '**/kenh-day-*.js',
           // Lửa chuyển động (27/10, thay Bi): cùng cách — nạp lười, kho chạy-lúc (lần mở đầu mất mạng ⇒ khung giữ chỗ trống, không vỡ bố cục).
           '**/lua-dong-*.{js,css}',
+          // Lớp vẽ Lửa giận cấp 2–5 (31/10): chỉ tải khi Lửa lên cấp ≥ 2 ⇒ kho chạy-lúc; mất mạng ⇒ Lửa vẫn đổi dáng theo cấp, chỉ thiếu chi tiết giận.
+          '**/lua-gian-*.{js,css}',
           // Thẻ nhắc Samsung Internet (27/10): chỉ máy Samsung Internet tải, một lần ⇒ kho chạy-lúc; mất mạng ⇒ không hiện thẻ, Lộ trình vẫn đủ.
           '**/NhacSamsung-*.{js,css}',
           // Thẻ điểm danh nổi của giao diện CŨ (không «Trong», 30/10 nạp lười): chỉ máy tắt «Trong» tải ⇒ kho chạy-lúc.
@@ -621,7 +623,8 @@ export default defineConfig({
             // Thưởng phạt 26/10: phần HIỆN NGAY (thanh trên, tấm thưởng câu, băng chuỗi đúng, lớp gọi lệnh + bản lưu máy, hình, hiệu ứng, tiếng) dùng chung bởi mảnh «Trong»
             // (Lộ trình) và màn làm bài ⇒ gom MỘT mảnh (+ một tờ CSS) thay vì Rolldown xẻ 4–5 tệp nhỏ.
             // 30/10 (máy yếu): hook điểm danh `diem-danh-hs` (tách khỏi thẻ nổi cũ) đi cùng mảnh này — mảnh «Trong» của Lộ trình vốn nạp nó ⇒ không thêm tệp precache.
-            { name: 'thuong-gon', test: /src[\\/](?:components[\\/]diem-danh[\\/]diem-danh-hs\.ts|components[\\/]thuong[\\/](?:ThanhThuong|TamThuong|SoDem|hinh|dung-thuong|loc-thong-bao|ban-gon)\.tsx?|lib[\\/](?:thuong-api|hieu-ung-thuong|am-thanh-thuong|so-gon)\.ts|styles[\\/]trong-thuong-gon\.css)$/, includeDependenciesRecursively: false },
+            // 31/10 (Lửa đổi cảm xúc): sổ `lua-that` — màn làm chặng ghi, Lộ trình đọc ⇒ đi cùng mảnh này, không thêm tệp.
+            { name: 'thuong-gon', test: /src[\\/](?:components[\\/]diem-danh[\\/]diem-danh-hs\.ts|components[\\/]thuong[\\/](?:ThanhThuong|TamThuong|SoDem|hinh|dung-thuong|loc-thong-bao|ban-gon)\.tsx?|lib[\\/](?:thuong-api|hieu-ung-thuong|am-thanh-thuong|so-gon|lua-that)\.ts|styles[\\/]trong-thuong-gon\.css)$/, includeDependenciesRecursively: false },
             // …và phần dùng chung của các màn đầy đủ + màn kết bài (chung.tsx + tờ trong-thuong.css) — tên rõ để globIgnores bắt đúng (tên tự sinh `chung-*` quá chung).
             { name: 'thuong-chung', test: /src[\\/](?:components[\\/]thuong[\\/]chung\.tsx|styles[\\/]trong-thuong\.css)$/, includeDependenciesRecursively: false },
             // 27/10 (tốc độ cổng phụ huynh): bộ đọc lời giải một câu (`ph-moi/du-lieu-loi-giai`) nạp lười ⇒ gom vào mảnh màn chi tiết ca (nơi duy nhất dùng nó trong app)
