@@ -18,7 +18,7 @@ concurrency:
   group: thu-tai-50k
   cancel-in-progress: false
 env:
-  LAN: '15'
+  LAN: '16'
   # Biến riêng Worker thử (tao-cau-hinh.mjs): bật ngăn gom D1 liên isolate (#671) trên máy thử trước bản sống.
   VARS_THU: 'BAT_GOM_LIEN_NGAN=1'
   # Nhánh mã máy chủ đẩy lên omr-thu (mặc định main; thử nhánh trước khi gộp).
