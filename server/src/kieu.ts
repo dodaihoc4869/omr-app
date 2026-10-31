@@ -93,6 +93,8 @@ export interface Env {
   NGAN_HS?: DurableObjectNamespace
   /** Công tắc khẩn: có giá trị ⇒ KHÔNG đi qua ngăn riêng (đường cũ y nguyên). */
   TAT_NGAN_HS?: string
+  /** Có giá trị ⇒ tắt KÊNH ĐẨY hai thiết bị (kenh-day.ts): không phát vé, cửa `/hs/kenh` trả 410, ngăn thôi đẩy tin ⇒ app y như cũ (nhịp nền). */
+  TAT_KENH_DAY?: string
   /** Công tắc ngăn trung chuyển (ngan-hoc-sinh.ts): có giá trị ⇒ ngăn `apac|` như cũ, không bốc thăm. */
   TAT_NGAN_DINH?: string
   /** Công tắc gom lệnh D1 trong ngăn (gom-d1.ts): có giá trị ⇒ mỗi lệnh một yêu cầu như cũ. */

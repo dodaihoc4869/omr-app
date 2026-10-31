@@ -3866,6 +3866,8 @@ const boXuLy = {
       // ĐIỂM DANH BUỔI HỌC (bảng DẠY HỌC của mục Lên bảng, 28/09 — server/src/buoi-hoc.ts): em chỉ điểm danh CHO MÌNH (SBD từ token), mã đổi mỗi 60 giây.
       if (p === '/hs/buoi-hoc') return ra(await hsBuoiHocDangMo(env, b))
       if (p === '/hs/diem-danh') return ra(await hsDiemDanh(env, b))
+      // Vé kênh đẩy hai thiết bị (kenh-day.ts): kiểm chữ ký token, 0 lệnh D1.
+      if (p === DUONG_VE_KENH) return ra(await kenhVe(env, b))
 
       // ĐIỀU KHIỂN TỜ MÁY CHIẾU TỪ XA (điện thoại hoặc máy khác gửi lệnh qua mã phiên, không bắt buộc mã bí mật)
       if (p === '/gv/to-chieu/phien') return ra(taoHoacCapNhatPhienToChieu(b as any))
@@ -4182,7 +4184,8 @@ export function laGioCaoDiemVn(nowMs: number): boolean {
 
 /** Bọc `boXuLy.fetch`: đo thời gian trả lời từng lệnh (trừ OPTIONS) vào bộ nhớ ⇒ p50/p95 ⇒ `nhipDeNghi` + `/gv/suc-khoe-may-chu` (suc-khoe-may.ts). Không tốn truy vấn nào. */
 import { batDauYeuCau, ghiBoNhoDinhKy } from './do-bo-nho'
-import { DAU_TRONG_NGAN, datXuLyNgan, vaoNgan } from './ngan-hoc-sinh'
+import { DAU_TRONG_NGAN, datXuLyNgan, vaoKenh, vaoNgan } from './ngan-hoc-sinh'
+import { DUONG_KENH, DUONG_VE_KENH, kenhVe } from './kenh-day'
 export { BanBiA } from './ban-bi-a-dong'
 export { TramGemini } from './tram-gemini'
 export { NganHocSinh } from './ngan-hoc-sinh'
@@ -4194,6 +4197,8 @@ const xuatWorker = {
   async fetch(req: Request, env: Env, ctx?: ExecutionContext): Promise<Response> {
     // ĐẤU ION (30/10): nâng cấp WebSocket vào phòng đấu của ca — đi THẲNG, trước mọi lớp bọc (lớp bọc dưới dựng lại Response ⇒ mất kết nối 101).
     if (req.method === 'GET' && req.url.includes('/dau-ion/') && new URL(req.url).pathname.startsWith('/dau-ion/')) return vaoPhongDau(req, env)
+    // KÊNH ĐẨY HAI THIẾT BỊ (31/10, kenh-day.ts): nâng cấp WebSocket vào ngăn của em — cũng đi THẲNG (giữ kết nối 101).
+    if (req.method === 'GET' && req.url.includes(DUONG_KENH) && new URL(req.url).pathname === DUONG_KENH && !req.headers.has(DAU_TRONG_NGAN)) return vaoKenh(req, env, ctx)
     // NGĂN RIÊNG TỪNG HỌC SINH (30/10, ngan-hoc-sinh.ts): lệnh app học sinh ⇒ Durable Object của đúng em (đệm luôn ấm); trong ngăn ⇒ đi thẳng xuống dưới.
     if (env.NGAN_HS && req.method === 'POST' && !req.headers.has(DAU_TRONG_NGAN)) {
       const r = await vaoNgan(req, env, ctx)

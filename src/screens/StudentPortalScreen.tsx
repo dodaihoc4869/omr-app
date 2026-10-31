@@ -469,6 +469,22 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
     document.addEventListener('visibilitychange', kich)
     return () => { nhip.dung(); window.removeEventListener('focus', kich); window.removeEventListener('online', kich); document.removeEventListener('visibilitychange', kich) }
   }, [napDsMom])
+  // KÊNH ĐẨY HAI THIẾT BỊ (thầy 31/10, lib/kenh-day.ts — mảnh nạp lười): máy khác của em vừa làm bài / sửa lỗi / đổi EXP ⇒ máy này đọc lại NGAY Lộ trình + kế hoạch
+  // ngày (`lamMoiHang`), EXP, bài mẹ giao, thưởng (mọi chỗ đang hiện tổng quan) — không chờ quay lại app hay nhịp nền. Máy đang ẩn thì thôi (hiện lại đã tự làm mới như cũ). Kênh hỏng ⇒ y như cũ.
+  useEffect(() => {
+    if (!auth?.sbd || !auth.token) return
+    const token = auth.token
+    let dong: (() => void) | null = null, huy = false
+    void import('../lib/kenh-day').then((m) => { if (!huy) dong = m.moKenhDay(token) }).catch(() => {})
+    return () => { huy = true; dong?.() }
+  }, [auth?.sbd, auth?.token])
+  useEffect(() => {
+    if (!auth?.sbd || !auth.token) return
+    const sbd = auth.sbd, token = auth.token
+    const doi = () => { if (document.hidden) return; setLamMoiKeHoach((n) => n + 1); void syncStudentExp(sbd, token); void napDsMom(); void import('../components/thuong/dung-thuong').then((m) => m.capNhatTongQuan(token)).catch(() => {}) }
+    window.addEventListener('ddh:doi-may-khac', doi) // = SU_KIEN_DOI (lib/kenh-day.ts)
+    return () => window.removeEventListener('ddh:doi-may-khac', doi)
+  }, [auth?.sbd, auth?.token, napDsMom])
   useEffect(() => {
     if (!dangLamMom || !auth) return
     let huy = false
