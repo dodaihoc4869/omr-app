@@ -904,7 +904,9 @@ async function catPrior(env: Env, moc: string, khoa: string, pr: ReadonlyMap<str
 async function emBatOmniCuaLop(env: Env, lop: string): Promise<string[]> {
   const [coO, coH, r] = await Promise.all([
     docCoOmni(env), docCoHoa2(env),
-    env.DB.prepare("SELECT sbd FROM hoc_sinh WHERE COALESCE(lop, '') = ? AND COALESCE(trang_thai, '') <> 'khoa' ORDER BY sbd").bind(lop).all<Row>(),
+    // 31/10 (thử tải 50.000 em: `COALESCE(lop,'') = ?` quét CẢ bảng hoc_sinh — 50.000 dòng / lượt): cùng nghĩa, đi chỉ mục idx_hs_lop(lop, trang_thai).
+    (lop ? env.DB.prepare("SELECT sbd FROM hoc_sinh WHERE lop = ? AND COALESCE(trang_thai, '') <> 'khoa' ORDER BY sbd").bind(lop)
+      : env.DB.prepare("SELECT sbd FROM hoc_sinh WHERE (lop IS NULL OR lop = '') AND COALESCE(trang_thai, '') <> 'khoa' ORDER BY sbd")).all<Row>(),
   ])
   return (r.results ?? []).map((x) => str(x.sbd)).filter((s) => s && apDungOmniCho(coH, coO, s, lop))
 }

@@ -508,7 +508,8 @@ async function caChot(env: Env, id: string) {
   // Lớp = em của chiến dịch ∪ học sinh cùng lớp (chiến dịch giao theo lớp).
   let lop = [...cd.sbd]
   if (cd.lop) {
-    const rl = await env.DB.prepare("SELECT sbd FROM hoc_sinh WHERE COALESCE(lop, '') = ? AND COALESCE(trang_thai, '') <> 'khoa'").bind(cd.lop).all<Row>().catch(() => ({ results: [] as Row[] }))
+    const rl = await (cd.lop ? env.DB.prepare("SELECT sbd FROM hoc_sinh WHERE lop = ? AND COALESCE(trang_thai, '') <> 'khoa'").bind(cd.lop) // 31/10: đi chỉ mục idx_hs_lop (trước quét cả bảng)
+      : env.DB.prepare("SELECT sbd FROM hoc_sinh WHERE (lop IS NULL OR lop = '') AND COALESCE(trang_thai, '') <> 'khoa'")).all<Row>().catch(() => ({ results: [] as Row[] }))
     lop = [...new Set([...lop, ...(rl.results ?? []).map((x) => str(x.sbd))])]
   }
   const daGap = new Set<string>()
