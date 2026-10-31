@@ -1,5 +1,5 @@
 import { lazy, Suspense, use, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
-import { ArrowRight, Atom, BookOpen, ChevronRight, ClipboardCheck, History, Home, LineChart, LogOut, Mail, RefreshCw, Route, Users, X } from 'lucide-react'
+import { ArrowRight, Atom, BookOpen, ChevronRight, ClipboardCheck, History, Home, LineChart, LogOut, Mail, RefreshCw, RotateCcw, Route, Users, X } from 'lucide-react'
 import type { KetQuaSanh } from '../hoa2/api'
 import type { TomTatGoi7 } from '../../lib/goi-bai-7'
 import './hoc-tap.css'
@@ -35,6 +35,8 @@ export interface Props {
   onHoc: () => void; onXemLai: () => void; onChua: (qid?: string) => void; onThi: () => void
   onTuLuyen: () => void; onLichSu: () => void; onBaiTap: () => void; onGiaDinh: () => void
   onTaiLai: () => void; onDangXuat: () => void; coCa: boolean
+  /** «Làm mới app» khi app bị đơ (thầy 31/10, lib/lam-moi-app.ts): xoá phần nhớ tạm + đăng xuất, giữ bài chưa gửi. */
+  onLamMoiApp?: () => void
   /** Số bài tập về nhà thầy đang giao (dòng ở Hôm nay chỉ hiện khi > 0). */
   soBaiTap?: number
   /** Có bài tập về nhà nào (kể cả đã nộp) ⇒ Hôm nay giữ lối vào để xem lại / làm lại. */
@@ -240,6 +242,7 @@ export default function HocTapHomNay(p: Props) {
           <Dong ten="Bài gia đình giao" icon={Mail} sac="muc" onClick={dongTam(p.onGiaDinh)} />
           {p.onBangTin && <Dong ten="Thông tin từ gia đình" chu="Lời nhắn và thông báo" icon={Users} sac="muc" onClick={dongTam(p.onBangTin)} />}
         </div>
+        {p.onLamMoiApp && <button className="ht-nut-phu ht2-dang-xuat" onClick={dongTam(p.onLamMoiApp)}><RotateCcw size={18} aria-hidden="true" />Làm mới app (khi app bị đơ)</button>}
         <button className="ht-nut-phu ht2-dang-xuat" onClick={dongTam(p.onDangXuat)}><LogOut size={18} aria-hidden="true" />Đăng xuất</button>
       </div>
     </div>}

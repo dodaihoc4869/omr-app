@@ -317,6 +317,8 @@ export default defineConfig({
           '**/bi-dong-*.{js,css}',
           // Gói tờ đáp án ca kiểm tra đã khoá (31/10): exam-api nạp lười ở giây 20 của ca (đang có mạng vì vừa vào thi) ⇒ kho chạy-lúc; hỏng ⇒ nộp đi đường cũ.
           '**/khoa-de-thi-*.js',
+          // Làm mới app (31/10): chỉ tải khi em bấm nút trong «Của em» (cần mạng) ⇒ kho chạy-lúc.
+          '**/lam-moi-app-*.js',
           // Kênh đẩy hai thiết bị (31/10, lib/kenh-day.ts): cổng học sinh nạp lười sau đăng nhập (đang có mạng) ⇒ kho chạy-lúc; hỏng ⇒ nhịp nền như cũ.
           '**/kenh-day-*.js',
           // Lửa chuyển động (27/10, thay Bi): cùng cách — nạp lười, kho chạy-lúc (lần mở đầu mất mạng ⇒ khung giữ chỗ trống, không vỡ bố cục).
