@@ -9,7 +9,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { MoreHorizontal, RefreshCw, Search } from 'lucide-react'
 import type { EmTomTat } from '../lib/exam-api'
-import { conThieu, dinhDangTien, hocPhiCuaEm, TEN_TRANG_THAI, trangThaiHocPhi, type HocPhiEm, type TongHocPhi as Tong, type TrangThaiHocPhi } from '../lib/hoc-phi'
+import { conThieu, dinhDangTien, hocPhiCuaEm, TEN_TRANG_THAI, trangThaiCuaEm, type HocPhiEm, type TongHocPhi as Tong, type TrangThaiHocPhi } from '../lib/hoc-phi'
 import { danhSach, docBang } from '../components/chien-dich/api'
 import { taiGioiHan } from '../lib/tai-gioi-han'
 import { lyDoDeHieu } from '../lib/loi-de-hieu'
@@ -274,8 +274,8 @@ export default function HocSinhDanhSachV2(p: PropsDanhSachV2) {
                 const lop = p.tenLopEm(e.sbd, e.lop)
                 const khoi = p.khoiCua(e.namSinh)
                 const n = nhip?.get(e.sbd)
-                const hp = hocPhiCuaEm(e.sbd, p.hocPhi)
-                const tt = trangThaiHocPhi(hp.phaiNop, hp.daNop)
+                const hp = hocPhiCuaEm(e.sbd, p.hocPhi, e.trangThai === 'da_nghi')
+                const tt = trangThaiCuaEm(hp, e.trangThai === 'da_nghi')
                 const ti = n && n.toiThieu ? Math.min(100, Math.round((100 * n.daLam) / n.toiThieu)) : 0
                 const du = !!n && n.toiThieu !== null && n.daLam >= n.toiThieu
                 return (

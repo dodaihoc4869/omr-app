@@ -29,10 +29,15 @@ export const ghiChuHien = (g: string) => g.replace(/\s*\[excel:[^\]]*\]\s*$/u, '
 
 export const conThieu = (x: { phaiNop: number; daNop: number }) => Math.max(0, x.phaiNop - x.daNop)
 
-/** Học phí của một em: có ở máy chủ thì lấy, không thì mức chuẩn, chưa nộp. */
-export function hocPhiCuaEm(sbd: string, theoSbd: ReadonlyMap<string, HocPhiEm> | null | undefined): HocPhiEm {
-  return theoSbd?.get(sbd) ?? { sbd, phaiNop: MUC_HOC_PHI_CHUAN, daNop: 0, ghiChu: '', soLan: 0 }
+/** Học phí của một em: có ở máy chủ thì lấy, không thì mức chuẩn, chưa nộp.
+ *  `daNghi` (thầy tick «Nghỉ học», thầy 31/10 «hs tick nghỉ thì ko tính thêm phần học phí chưa nộp»): phải nộp chỉ còn bằng phần ĐÃ nộp ⇒ không còn thiếu,
+ *  tiền đã thu vẫn tính vào «Đã nộp». Sổ ở máy chủ KHÔNG đổi — em đi học lại (bỏ tick) ⇒ hiện lại đúng mức cũ. */
+export function hocPhiCuaEm(sbd: string, theoSbd: ReadonlyMap<string, HocPhiEm> | null | undefined, daNghi = false): HocPhiEm {
+  const h = theoSbd?.get(sbd) ?? { sbd, phaiNop: MUC_HOC_PHI_CHUAN, daNop: 0, ghiChu: '', soLan: 0 }
+  return daNghi ? { ...h, phaiNop: Math.min(h.phaiNop, h.daNop) } : h
 }
+/** Trạng thái hiện trên danh sách / chip lọc: em đã nghỉ ⇒ «Không thu» (không còn nằm trong «Chưa nộp» / «Còn thiếu»). */
+export const trangThaiCuaEm = (h: Pick<HocPhiEm, 'phaiNop' | 'daNop'>, daNghi = false): TrangThaiHocPhi => (daNghi ? 'khong_thu' : trangThaiHocPhi(h.phaiNop, h.daNop))
 
 export interface TongHocPhi {
   soEm: number
@@ -42,16 +47,18 @@ export interface TongHocPhi {
   dem: Record<TrangThaiHocPhi, number>
 }
 
-/** Tổng của một tập em (danh sách đang xem). Còn thiếu cộng theo TỪNG em (không lấy tổng phải − tổng đã ⇒ không bù trừ giữa các em). */
-export function tongHocPhi(sbds: readonly string[], theoSbd: ReadonlyMap<string, HocPhiEm> | null | undefined): TongHocPhi {
+/** Tổng của một tập em (danh sách đang xem). Còn thiếu cộng theo TỪNG em (không lấy tổng phải − tổng đã ⇒ không bù trừ giữa các em).
+ *  `daNghi`: em đã nghỉ — không cộng phần chưa nộp (xem `hocPhiCuaEm`), đếm vào «Không thu». */
+export function tongHocPhi(sbds: readonly string[], theoSbd: ReadonlyMap<string, HocPhiEm> | null | undefined, daNghi?: ReadonlySet<string>): TongHocPhi {
   const t: TongHocPhi = { soEm: 0, phaiNop: 0, daNop: 0, conThieu: 0, dem: { chua_nop: 0, con_thieu: 0, du: 0, khong_thu: 0 } }
   for (const s of new Set(sbds)) {
-    const h = hocPhiCuaEm(s, theoSbd)
+    const nghi = !!daNghi?.has(s)
+    const h = hocPhiCuaEm(s, theoSbd, nghi)
     t.soEm++
     t.phaiNop += h.phaiNop
     t.daNop += h.daNop
     t.conThieu += conThieu(h)
-    t.dem[trangThaiHocPhi(h.phaiNop, h.daNop)]++
+    t.dem[trangThaiCuaEm(h, nghi)]++
   }
   return t
 }

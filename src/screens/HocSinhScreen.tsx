@@ -31,7 +31,7 @@ import './hoc-sinh-m3.css'
 import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
 import TongHocPhi from '../components/hoc-phi/TongHocPhi'
 import HopHocPhi from '../components/hoc-phi/HopHocPhi'
-import { conThieu, dinhDangTien, hocPhiCuaEm, taiHocPhi, TEN_TRANG_THAI, tongHocPhi, trangThaiHocPhi, type HocPhiEm, type TrangThaiHocPhi } from '../lib/hoc-phi'
+import { conThieu, dinhDangTien, hocPhiCuaEm, taiHocPhi, TEN_TRANG_THAI, tongHocPhi, trangThaiCuaEm, type HocPhiEm, type TrangThaiHocPhi } from '../lib/hoc-phi'
 import '../components/hoc-phi/hoc-phi.css'
 import HocSinhDanhSachV2 from './HocSinhDanhSachV2'
 import { lyDoDeHieu } from '../lib/loi-de-hieu'
@@ -273,16 +273,18 @@ export default function HocSinhScreen() {
   const dsLoc = useMemo(() => {
     const q = timKiem.trim().toLowerCase()
     return dsTheoLop.filter((e) => {
-      const hp = locHocPhi ? hocPhiCuaEm(e.sbd, hocPhi) : null
+      const nghi = e.trangThai === 'da_nghi'
+      const hp = locHocPhi ? hocPhiCuaEm(e.sbd, hocPhi, nghi) : null
       return (
         (!q || e.sbd.includes(q) || e.hoTen.toLowerCase().includes(q) || tenLopEm(e.sbd, e.lop).toLowerCase().includes(q)) &&
-        (!hp || trangThaiHocPhi(hp.phaiNop, hp.daNop) === locHocPhi)
+        (!hp || trangThaiCuaEm(hp, nghi) === locHocPhi)
       )
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dsTheoLop, timKiem, locHocPhi, hocPhi])
 
-  const tongHp = useMemo(() => (hocPhi && ds ? tongHocPhi(dsTheoLop.map((e) => e.sbd), hocPhi) : null), [dsTheoLop, hocPhi, ds])
+  // Em đã tick «Nghỉ học» ⇒ không cộng phần học phí chưa nộp (thầy 31/10).
+  const tongHp = useMemo(() => (hocPhi && ds ? tongHocPhi(dsTheoLop.map((e) => e.sbd), hocPhi, new Set(dsTheoLop.filter((e) => e.trangThai === 'da_nghi').map((e) => e.sbd))) : null), [dsTheoLop, hocPhi, ds])
   const phamViHp = lopLoc ? `Lớp ${lopLoc}` : khoiLoc !== null ? `Khối ${khoiLoc}` : 'Toàn trung tâm'
 
   const caMoiNhat = useMemo(() => {
@@ -909,8 +911,8 @@ export default function HocSinhScreen() {
                       <KeyRound size={15} /> {dangResetMk ? 'Đang đặt lại…' : 'Đặt lại mật khẩu'}
                     </button>
                     {(() => {
-                      const hp = hocPhiCuaEm(e.sbd, hocPhi)
-                      const tt = trangThaiHocPhi(hp.phaiNop, hp.daNop)
+                      const hp = hocPhiCuaEm(e.sbd, hocPhi, e.trangThai === 'da_nghi')
+                      const tt = trangThaiCuaEm(hp, e.trangThai === 'da_nghi')
                       const chu = !hocPhi ? 'Học phí' : tt === 'con_thieu' ? `Thiếu ${dinhDangTien(conThieu(hp))}` : TEN_TRANG_THAI[tt]
                       return (
                         <button
