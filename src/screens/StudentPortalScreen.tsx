@@ -486,11 +486,14 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
     const sbd = auth.sbd, token = auth.token
     // Đang làm bài (màn phủ — `data-dang-lam-bai`) ⇒ HOÃN tới lúc em về Lộ trình (thầy 31/10, iPhone sập lúc bấm «Tiếp tục» khi máy kia đang làm): không đọc lại
     // Sảnh / kế hoạch / EXP / thưởng bên dưới màn phủ giữa lúc em làm câu.
+    // 31/10: + danh sách Tự sửa lỗi (số trên nút Sửa lỗi của Lộ trình nghe `ngheTuSua`) — trước chỉ đọc lại khi số «đã làm» đổi và bản nhớ quá 10 phút ⇒ máy kia sửa
+    // xong mà nút ở máy này vẫn «còn 8».
     const doi = () => {
       if (document.hidden) return
       if (document.documentElement.dataset.dangLamBai !== undefined) { choDoi.current = true; return }
       choDoi.current = false
       setLamMoiKeHoach((n) => n + 1); void syncStudentExp(sbd, token); void napDsMom(); void import('../components/thuong/dung-thuong').then((m) => m.capNhatTongQuan(token)).catch(() => {})
+      void import('../lib/tu-sua-loi').then((m) => m.taiTuSuaLoi(token, { moi: true })).catch(() => {})
     }
     doiRef.current = doi
     window.addEventListener('ddh:doi-may-khac', doi) // = SU_KIEN_DOI (lib/kenh-day.ts)

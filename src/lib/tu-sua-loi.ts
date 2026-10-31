@@ -93,6 +93,9 @@ export function taiTuSuaLoi(token: string, tuy: { moi?: boolean; toiDaMs?: numbe
   return p
 }
 
+/** Lùi khi tải danh sách Tự sửa lỗi hỏng (ms) — lượt cuối lặp tới khi có danh sách. */
+export const LUI_THU_TU_SUA_MS: readonly number[] = [3_000, 8_000, 20_000, 45_000, 90_000]
+
 /** Số câu em cần sửa cho thẻ mời ở Hôm nay: tải LƯỜI khi `bat` (Hôm nay đã có số của mình), dùng bản nhớ; `khoa` đổi (em vừa làm thêm câu) ⇒ xem lại
  *  bản nhớ, hết hạn mới hỏi máy chủ. Lỗi / chưa mở / đang tải ⇒ null (thẻ mời không hiện, không bao giờ chặn thẻ Hôm nay). */
 export function useSoCauCanSua(token: string | undefined, bat: boolean, khoa?: unknown): number | null {
@@ -103,15 +106,21 @@ export function useSoCauCanSua(token: string | undefined, bat: boolean, khoa?: u
       if (t === token) setKq(moi)
     })
   }, [token])
+  // 31/10 (thầy «load lại nhưng vẫn chưa thấy đồng bộ» — nút Sửa lỗi trên Lộ trình còn «8» trong khi máy chủ đã xong): lượt tải hỏng ⇒ tự hỏi lại lùi dần
+  // (chỉ khi app đang hiện) thay vì giữ số nhớ trên máy tới lần mở sau.
+  const [thu, datThu] = useState(0)
   useEffect(() => {
     if (!token || !bat) return
-    let huy = false
+    let huy = false, hen: ReturnType<typeof setTimeout> | undefined
     void taiTuSuaLoi(token).then((r) => {
-      if (!huy && r.trangThai !== 'loi') setKq(r)
+      if (huy) return
+      if (r.trangThai !== 'loi') { setKq(r); return }
+      hen = setTimeout(() => { if (typeof document === 'undefined' || !document.hidden) datThu((n) => n + 1) }, LUI_THU_TU_SUA_MS[Math.min(thu, LUI_THU_TU_SUA_MS.length - 1)]!)
     })
     return () => {
       huy = true
+      if (hen) clearTimeout(hen)
     }
-  }, [token, bat, khoa])
+  }, [token, bat, khoa, thu]) // eslint-disable-line react-hooks/exhaustive-deps
   return token ? soCauCanSua(kq, Date.now()) : null
 }

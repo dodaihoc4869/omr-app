@@ -42,3 +42,37 @@ jobs:
           q "Sửa lỗi hôm nay: mục tiêu · số việc · đã xong · thêm" "SELECT (SELECT muc_tieu FROM tu_sua_muc_tieu_ngay WHERE sbd=$S AND ngay_vn='$HOM') muc_tieu, json_array_length(muc_json) viec, json_array_length(xong_json) xong, them FROM tu_sua_viec_ngay WHERE sbd=$S AND ngay_vn='$HOM'"
           q "phiên học hôm nay: giờ VN · số câu · từ gói · đã trả lời" "SELECT strftime('%H:%M', s.created_at, '+7 hours') gio, json_array_length(s.json,'\$.questions') so_cau, COALESCE(json_extract(s.json,'\$.goiNgay'),0) tu_goi, (SELECT COUNT(*) FROM game_v2_attempt a WHERE a.session=s.id) tra_loi FROM game_v2_session s WHERE s.sbd=$S AND s.created_at >= '$(date -u -d "$HOM 00:00:00 +07:00" +%Y-%m-%dT%H:%M:%S)' ORDER BY s.created_at"
           q "kế hoạch gói 7 đã lưu hôm nay (nếu có): số việc" "SELECT COUNT(*) n FROM ke_hoach_ngay WHERE sbd=$S AND ngay='$HOM'"
+          # 31/10 (thầy «load lại nhưng vẫn chưa thấy đồng bộ»): bản Sảnh lập sẵn của em (san-sang.ts) — giờ lập, số đã làm trong bản, dấu so với mốc RIÊNG hiện tại.
+          q "bản Sảnh lập sẵn: ngày · giờ VN lập · đã làm trong bản · mức" "SELECT ngay, strftime('%H:%M:%S', luc/1000, 'unixepoch', '+7 hours') lap, json_extract(sanh_json,'\$.goi7.daLamHomNay') da_lam, json_extract(sanh_json,'\$.goi7.toiThieu') muc FROM hoc_tap_san_sang WHERE sbd=$S"
+          q "dấu bản lập sẵn (a § s § g § lg § cl § kt § …)" "SELECT substr(dau,1,400) dau FROM hoc_tap_san_sang WHERE sbd=$S"
+          # Kiểm tra ôn tập từ hôm nay trở đi (bài Sảnh gửi kèm): máy em đọc CHẶT (src/lib/kiem-tra-ca-nhan.ts `docKiemTra`) — hạn − mở phải đúng 24 giờ, đã trả ≤ tổng…
+          q "Kiểm tra ôn tập từ hôm nay: ngày · trạng thái · hạn−mở (giờ) · đã nộp · điểm · số câu · bài ngày · số chặng" "SELECT k.ngay, k.trang_thai, (k.han_luc - k.mo_luc)/3600000.0 han_mo_gio, k.nop_luc IS NOT NULL da_nop, k.diem, json_array_length(k.json,'\$.cau') tong, json_extract(k.json,'\$.baiNgayToiThieu') bai_ngay, json_array_length(k.json,'\$.chang') so_chang FROM kiem_tra_ca_nhan k WHERE k.sbd=$S AND k.ngay>='$HOM' ORDER BY (k.trang_thai='cho_nguon'), k.ngay LIMIT 3"
+          q "mốc riêng HIỆN TẠI: a (câu trả lời cuối) · s (sổ học cuối) · g · lg · cl" "SELECT (SELECT created_at FROM game_v2_attempt WHERE sbd=$S ORDER BY created_at DESC LIMIT 1) a, (SELECT received_at FROM su_kien_hoc WHERE sbd=$S ORDER BY received_at DESC LIMIT 1) s, (SELECT luc FROM goi_bai_7_gap WHERE sbd=$S ORDER BY luc DESC LIMIT 1) g, (SELECT luc FROM loi_giai_hoi WHERE sbd=$S ORDER BY luc DESC LIMIT 1) lg, (SELECT cap_nhat_luc FROM chua_loi_dot WHERE sbd=$S ORDER BY cap_nhat_luc DESC LIMIT 1) cl"
+      # 31/10 (truy «load lại vẫn chưa đồng bộ»): lượt gọi Worker / ngăn học sinh THEO PHÚT trong 60 phút vừa qua (GraphQL Analytics, chỉ số gộp — không đường,
+      # không IP, không em): có lỗi / chậm dồn lúc em báo không.
+      - name: Lỗi máy chủ theo phút, 60 phút vừa qua (chỉ đọc)
+        continue-on-error: true
+        env:
+          T: ${{ env.CF_TOKEN_SACH }}
+          A: ${{ env.CF_ACC_SACH }}
+        run: |
+          node - <<'JS'
+          const q = `query($a: String!, $f: Time!, $t: Time!) { viewer { accounts(filter: {accountTag: $a}) {
+            w: workersInvocationsAdaptive(limit: 400, filter: {scriptName: "omr", datetime_geq: $f, datetime_leq: $t}, orderBy: [datetimeMinute_ASC]) { dimensions { datetimeMinute status } sum { requests errors } }
+            q: workersInvocationsAdaptive(limit: 100, filter: {scriptName: "omr", datetime_geq: $f, datetime_leq: $t}, orderBy: [datetimeMinute_ASC]) { dimensions { datetimeMinute } sum { requests } quantiles { wallTimeP50 wallTimeP99 } }
+            d: durableObjectsInvocationsAdaptiveGroups(limit: 400, filter: {datetime_geq: $f, datetime_leq: $t}, orderBy: [datetimeMinute_ASC]) { dimensions { datetimeMinute status } sum { requests errors } }
+          } } }`
+          const r = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: { authorization: `Bearer ${process.env.T}`, 'content-type': 'application/json' },
+            body: JSON.stringify({ query: q, variables: { a: process.env.A, f: new Date(Date.now() - 3600e3).toISOString(), t: new Date().toISOString() } }) })
+          const j = await r.json().catch(() => null)
+          if (j?.errors?.length) console.log('lỗi GraphQL:', JSON.stringify(j.errors).slice(0, 600))
+          const acc = j?.data?.viewer?.accounts?.[0] ?? {}
+          console.log('== Worker theo phút VN: lượt · thời gian thực p50 / p99 (ms)')
+          for (const x of acc.q ?? []) console.log(new Date(Date.parse(x.dimensions.datetimeMinute) + 7 * 3600e3).toISOString().slice(11, 16), x.sum.requests, Math.round(x.quantiles.wallTimeP50 / 1000), Math.round(x.quantiles.wallTimeP99 / 1000))
+          for (const [ten, ds] of [['Worker', acc.w ?? []], ['Ngăn (DO)', acc.d ?? []]]) {
+            console.log(`== ${ten}: phút VN · trạng thái · lượt · lỗi`)
+            for (const x of ds) if (x.dimensions.status !== 'success' || x.sum.errors > 0) console.log(new Date(Date.parse(x.dimensions.datetimeMinute) + 7 * 3600e3).toISOString().slice(11, 16), x.dimensions.status, x.sum.requests, x.sum.errors)
+            const tong = ds.reduce((n, x) => n + x.sum.requests, 0), loi = ds.reduce((n, x) => n + x.sum.errors, 0)
+            console.log(`   tổng ${tong} lượt · ${loi} lỗi`)
+          }
+          JS
