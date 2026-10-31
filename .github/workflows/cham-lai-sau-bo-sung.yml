@@ -1,6 +1,6 @@
 # CHẤM LẠI MỘT LƯỢT SAU KHI THẦY NHẬN BÀI BỔ SUNG (31/10: thầy «Chấm lại bài cho 12070» — bấm Nhận lúc 19:45:52 đúng lúc Worker đổi bản ⇒ bài đã gộp đủ 28 câu nhưng
-// bước chấm lại cả ca hỏng, điểm vẫn 1,75; ca đã đóng nên không tự chấm nữa). Cách làm: xoá điểm CŨ của ĐÚNG lượt ấy (chỉ khi bài bổ sung của lượt đã `nhan`) ⇒ cron
-// chấm bù mỗi phút (server/src/cham-bu.ts) chấm lại bằng ĐÚNG lõi máy chủ và ghi qua ĐÚNG đường `chamDiem`. Một lượt, một em — không đụng em khác. SBD che trong nhật ký.
+# bước chấm lại cả ca hỏng, điểm vẫn 1,75; ca đã đóng nên không tự chấm nữa). Cách làm: xoá điểm CŨ của ĐÚNG lượt ấy (chỉ khi bài bổ sung của lượt đã `nhan`) ⇒ cron
+# chấm bù mỗi phút (server/src/cham-bu.ts) chấm lại bằng ĐÚNG lõi máy chủ và ghi qua ĐÚNG đường `chamDiem`. Một lượt, một em — không đụng em khác. SBD che trong nhật ký.
 name: Chấm lại một lượt sau khi nhận bài bổ sung
 on:
   workflow_dispatch:
