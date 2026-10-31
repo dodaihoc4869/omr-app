@@ -8,13 +8,23 @@ Thầy 31/10: «Máy chủ này chạy cả trăm ngàn cùng lúc được. T�
 |---|---|---|---|
 | 12 | #666 | 0% lỗi, p95 ổn định 0,53 s | dừng sau ~20 s, lỗi 23% (`MAY_CHU_BAN`) |
 | 13 | #668 β nhớ theo câu, #669 bảng tra chiến dịch | — | dừng sau ~70 s, lỗi 11%; D1 bận ~44% thời gian chạy câu, 293.667 câu |
-| 14 | #670 bỏ DDL mỗi isolate lạnh | (đang chạy) | |
+| 14 | #670 bỏ DDL mỗi isolate lạnh | 0% lỗi, ramp p95 0,71 s | dừng sau ~16 s; D1 theo phút: ~500–600 **lượt gửi**/s lúc dồn, mỗi lượt chỉ 0,5–5 ms ⇒ trần là SỐ LƯỢT GỬI |
+| 15 | #671 ngăn gom D1 liên isolate (bật trên máy thử) | — | hỏng từ 500 em: đầu nối dùng chéo ngăn (sửa #672) |
+| 16 | #672 ngăn gom (bật trên máy thử) | 0% lỗi, lượt gửi −25% | dừng sau ~70 s: lỗi HẾT GIỜ 30 s — 8 ngăn gom thành chỗ nghẽn mới (mỗi ngăn chỉ giữ vài lượt D1 cùng lúc) ⇒ GIỮ TẮT trên bản sống |
 
 - Câu đọc chiến dịch cả dòng (53% thời gian D1 ở lượt 12) biến mất ở lượt 13.
 - Đo từng lệnh với dữ liệu giống thật (`scratchpad/bao-cao-lenh-nong.md`):
   - Sảnh lạnh: 151 câu / 23 lượt gửi, trong đó 59 câu là DDL (đã bỏ ở #670).
   - Trả lời: 33–45 câu cho mỗi lần (5–6 câu ghi). 16–20 câu lặp y hệt lần trả lời trước.
   - Kế hoạch ngày lần đầu trong ngày: 44 câu.
+
+## 1b. Bài học lượt 14–16
+
+- Trần D1 là **số lượt gửi** (≈ 300/s an toàn, ≈ 500/s lỗi), không phải thời gian chạy câu.
+- Gom liên isolate qua vài ngăn gom: giảm được lượt gửi, nhưng ngăn gom tự thành nút thắt (hàng chờ, hết giờ).
+  - Muốn dùng phải: nhiều ngăn hơn, lô lớn hơn khi đông, giới hạn hàng chờ.
+  - Không phải lời giải chính.
+- ⇒ Lời giải chính vẫn là bớt hẳn câu / lượt gửi theo từng em: B2–B4 (ngăn em giữ dữ liệu của em).
 
 ## 2. Kết luận từ số đo
 
