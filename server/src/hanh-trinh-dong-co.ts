@@ -1,4 +1,5 @@
 // Điểm nối ba cỗ máy: chỉ kế hoạch Hành trình, không đổi chấm điểm/EXP/ca thi.
+import { docBetaDong } from './beta-dem'
 import { boChonV5, danhMuc, docChienDichDay, type BoChonV5 } from './hanh-trinh-v5-d1'
 import { ghiDoV6, docChonV6, docMoHinhV6 } from './hanh-trinh-v6-d1'
 import type { MoHinhV6 } from './hanh-trinh-v6-mo-hinh'
@@ -95,7 +96,6 @@ export interface DocTruocDongCo {
   /** Gói R 15/10: β câu ĐỌC ĐOÁN cho cả tập ứng viên của hồ sơ (`docBetaRongSom`, cùng đợt lượt đọc meta của hồ sơ). */
   betaRong?:{ds:ReadonlySet<string>;p:Promise<D1Result<{qid:string;beta:number}>>}
 }
-const SQL_BETA_CAU='SELECT qid,beta FROM omni_beta_cau WHERE qid IN (SELECT value FROM json_each(?))'
 /**
  * β câu ĐỌC ĐOÁN (Gói R 15/10 — luật thầy 13/10 "sửa xong máy chủ phải nhanh hơn"): nơi gọi biết tập ứng viên của hồ sơ (`docHoSo2` › `khiCoQids`, trước lượt đọc
  * meta/lần làm) ⇒ đọc β của CẢ tập ấy cùng đợt — trước: chờ hồ sơ xong mới đọc β đúng `hs.cau` (một đợt D1 riêng). `docTruocDongCoTheoHoSo` chỉ dùng khi `hs.cau`
@@ -103,7 +103,7 @@ const SQL_BETA_CAU='SELECT qid,beta FROM omni_beta_cau WHERE qid IN (SELECT valu
  */
 export function docBetaRongSom(env:Env,t:DocTruocDongCo,qids:readonly string[]):void {
   if(t.theoHoSo)return
-  t.betaRong={ds:new Set(qids),p:som(t.ddl.then(()=>env.DB.prepare(SQL_BETA_CAU).bind(JSON.stringify([...new Set(qids)])).all<{qid:string;beta:number}>()))}
+  t.betaRong={ds:new Set(qids),p:som(t.ddl.then(()=>docBetaDong(env,qids) as Promise<D1Result<{qid:string;beta:number}>>))} // 31/10: β nhớ theo qid (beta-dem.ts)
 }
 /** Dòng chiến dịch đầy đủ của `hs.chienDich` (Gói R 15/10 — dùng lại dòng chiến dịch ĐÃ ĐỌC): lấy từ danh sách chiến dịch của em mà hồ sơ vừa đọc (`docChienDichThoCuaEm`,
  *  đệm dùng chung — CÙNG ảnh chụp đã dựng `hs.chienDich`) thay cho một lượt đọc lại bảng `chien_dich`; không thấy dòng ⇒ đọc như cũ. */
@@ -168,7 +168,7 @@ export function docTruocDongCoTheoHoSo(env:Env,t:DocTruocDongCo,hs:Pick<HoSo2,'c
   const rong=t.betaRong,tap=new Set(hs.cau.map(c=>c.qid))
   const moi:TheoHoSoDongCo={khoaBeta,coCd,cdId,
     beta:rong&&[...tap].every(q=>rong.ds.has(q))?som(rong.p.then(r=>({...r,results:(r.results??[]).filter(x=>tap.has(x.qid))})))
-      :som(t.ddl.then(()=>env.DB.prepare(SQL_BETA_CAU).bind(khoaBeta).all<{qid:string;beta:number}>())),
+      :som(t.ddl.then(()=>docBetaDong(env,JSON.parse(khoaBeta) as string[],khoaBeta) as Promise<D1Result<{qid:string;beta:number}>>)),
     full:cd?som(ddl5.then(()=>docChienDichDayDaDoc(env,t.sbd,String(cd.id)))):undefined}
   t.theoHoSo=moi
   return moi

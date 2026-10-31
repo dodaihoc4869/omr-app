@@ -10,6 +10,7 @@
 //     bảng đệm không đổi hồ sơ (test). Không vòng lặp: prior chỉ đọc hồ sơ THÔ, hồ sơ thô không dùng prior.
 //   · β câu (`omni_beta_cau`) = trung vị thời gian lượt đúng tự làm 60 ngày (việc đêm). Thiếu ⇒ ước lượng theo phần × mức (omni-toc-do.ts).
 // Mọi đường đọc của em/PH: lỗi ⇒ trả giá trị an toàn (hồ sơ rỗng / null), KHÔNG làm hỏng Sảnh, trả lời, PH.
+import { docBetaDong, ghiBetaNho, layBetaNho } from './beta-dem'
 import type { Env } from './kieu'
 import { KHOP } from './cau-meta'
 import { dauKhoCau, dauTruocLucDoc } from './dau-kho-cau'
@@ -734,7 +735,8 @@ async function docBeta(env: Env, qids: readonly string[]): Promise<Map<string, n
   const ds = dsJson(qids)
   return nhoTheoLuot(env.DB, `omni_beta|${ds}`, async () => {
     const ra = new Map<string, number>()
-    const r = await env.DB.prepare('SELECT qid, beta FROM omni_beta_cau WHERE qid IN (SELECT value FROM json_each(?))').bind(ds).all<Row>().catch(() => ({ results: [] as Row[] }))
+    // 31/10: β nhớ theo qid trong isolate (beta-dem.ts) — chỉ câu chưa nhớ mới đọc D1.
+    const r = await docBetaDong(env, qids, ds, 'SELECT qid, beta FROM omni_beta_cau WHERE qid IN (SELECT value FROM json_each(?))').catch(() => ({ results: [] as { qid: string; beta: number }[] }))
     for (const x of r.results ?? []) if (x.beta != null && Number.isFinite(Number(x.beta))) ra.set(str(x.qid), Number(x.beta))
     return ra
   }, ['omni_beta_cau'])
@@ -745,13 +747,20 @@ export async function docBetaVaTau(env: Env, qids: readonly string[], sbds: read
   if (!sbds.length) return [await docBeta(env, qids), new Map<string, number>()]
   if (!qids.length) return [new Map<string, number>(), await docTauEm(env, sbds)]
   const dq = dsJson(qids), de = dsJson(sbds)
+  // 31/10: β nhớ theo qid (beta-dem.ts). Đủ β trong đệm ⇒ chỉ đọc τ (một câu); còn câu chưa nhớ ⇒ MỘT lệnh UNION như cũ cho đúng các câu ấy + τ.
   return nhoTheoLuot(env.DB, `omni_beta_tau|${dq}|${de}`, async () => {
+    const nho = layBetaNho(env) // đồng bộ; đệm tắt ⇒ null ⇒ đúng một lệnh UNION như cũ
+    const thieu = nho ? [...new Set(qids)].filter((q) => !nho.has(q)) : null
+    const tuNho = () => { const m = new Map<string, number>(); for (const q of qids) { const b = nho!.get(q); if (b != null) m.set(q, b) } return m }
+    if (nho && thieu && !thieu.length) return [tuNho(), await docTauEm(env, sbds)] as [Map<string, number>, Map<string, number>]
     const r = await env.DB.prepare(`SELECT 'b' AS k, qid AS id, beta AS v FROM omni_beta_cau WHERE qid IN (SELECT value FROM json_each(?1))
-      UNION ALL SELECT 't', sbd, tau FROM omni_em WHERE n_tau >= 5 AND sbd IN (SELECT value FROM json_each(?2))`).bind(dq, de).all<Row>().catch(() => null)
+      UNION ALL SELECT 't', sbd, tau FROM omni_em WHERE n_tau >= 5 AND sbd IN (SELECT value FROM json_each(?2))`).bind(thieu ? dsJson(thieu) : dq, de).all<Row>().catch(() => null)
     if (!r) return [await docBeta(env, qids), new Map<string, number>()] as [Map<string, number>, Map<string, number>]
     const beta = new Map<string, number>(), tau = new Map<string, number>()
     for (const x of r.results ?? []) if (x.v != null && Number.isFinite(Number(x.v))) (str(x.k) === 'b' ? beta : tau).set(str(x.id), Number(x.v))
-    return [beta, tau] as [Map<string, number>, Map<string, number>]
+    if (!nho || !thieu) return [beta, tau] as [Map<string, number>, Map<string, number>]
+    ghiBetaNho(nho, thieu, beta)
+    return [tuNho(), tau] as [Map<string, number>, Map<string, number>]
   }, ['omni_beta_cau', 'omni_em'])
 }
 /** τ OMNI của các em (đủ mẫu: `n_tau ≥ 5`) — ranh Mức làm 4 «Làm kỹ» theo thời gian thường RIÊNG của em (24/10: trước đó τ = 0 cho mọi em). Lỗi ⇒ rỗng. */
