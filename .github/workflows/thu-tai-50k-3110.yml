@@ -18,11 +18,13 @@ concurrency:
   group: thu-tai-50k
   cancel-in-progress: false
 env:
-  LAN: '4'
+  LAN: '5'
+  # Nhánh mã máy chủ đẩy lên omr-thu (mặc định main; thử nhánh trước khi gộp).
+  SRV_REF: 'claude/ngan-sat-d1-3110'
   # 1 = dựng lại D1 omr-thu từ kho giả (≈ 5–10 phút, xoá sạch dữ liệu lượt trước); 0 = giữ D1 đang có.
   DUNG_KHO: '0'
   # Giai đoạn cuối được phép chạy (500 | 2000 | 10000 | 50000).
-  GIAI_DOAN_TOI: '50000'
+  GIAI_DOAN_TOI: '2000'
   RAMP_S: '120'
   ON_DINH_S: '180'
 jobs:
@@ -36,10 +38,10 @@ jobs:
       d1: ${{ steps.d1.outputs.d1 }}
     steps:
       - uses: actions/checkout@v4
-      - name: Mã máy chủ đang sống (main)
+      - name: Mã máy chủ (SRV_REF)
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ env.SRV_REF }}
           path: srv
       - uses: actions/setup-node@v4
         with:
@@ -189,6 +191,39 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
         run: |
           cd server && timeout 330 npx -y wrangler@4 tail omr-thu --format json > /tmp/tail.ndjson 2>/tmp/tail.err || true
+          node -e '
+            const fs=require("fs");const L=fs.readFileSync("/tmp/tail.ndjson","utf8");const ev=[];let buf="",d=0
+            for(const ch of L){buf+=ch;if(ch==="{")d++;else if(ch==="}"){d--;if(d===0){try{ev.push(JSON.parse(buf.trim()))}catch{}buf=""}}}
+            const kq={},loi={},ngoai={},nd={},cpu=[];for(const e of ev){kq[e.outcome]=(kq[e.outcome]||0)+1;cpu.push(Number(e.cpuTime)||0)
+              for(const x of e.exceptions||[]){const k=String(x.name)+": "+String(x.message).slice(0,160);ngoai[k]=(ngoai[k]||0)+1}
+              for(const l of e.logs||[]){const m=(l.message||[]).map(v=>typeof v==="string"?v:JSON.stringify(v)).join(" ").replace(/[0-9]{5,}/g,"#");if(l.level==="error"||/lỗi|Error|error|overload|timed out|exceeded/.test(m)){const k=m.slice(0,200);loi[k]=(loi[k]||0)+1}
+                if(m.startsWith("[ngan-do]")){const t=m.split(" ")[2]||"";const tr=t.split(";")[0];nd[tr]=(nd[tr]||0)+1}}}
+            cpu.sort((a,b)=>a-b);const q=p=>cpu.length?cpu[Math.min(cpu.length-1,Math.floor(p*cpu.length))]:0
+            console.log("sự kiện",ev.length,"· kết cục",JSON.stringify(kq),"· CPU p50/p99/max",q(.5),q(.99),q(1),"· trạm ngăn",JSON.stringify(nd))
+            console.log("=== ngoại lệ");for(const [k,v] of Object.entries(ngoai).sort((a,b)=>b[1]-a[1]).slice(0,15))console.log(v+"×",k)
+            console.log("=== log lỗi");for(const [k,v] of Object.entries(loi).sort((a,b)=>b[1]-a[1]).slice(0,25))console.log(v+"×",k)
+          '
+  tail2000:
+    name: Nghe lỗi máy chủ thử trong giai đoạn 2000
+    needs: [dung, cong500]
+    if: always() && needs.dung.result == 'success' && needs.cong500.outputs.tiep == '1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: wrangler tail omr-thu suốt giai đoạn (gom lỗi gốc, kết cục, mẫu ngăn)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          cd server && timeout 420 npx -y wrangler@4 tail omr-thu --format json > /tmp/tail.ndjson 2>/tmp/tail.err || true
           node -e '
             const fs=require("fs");const L=fs.readFileSync("/tmp/tail.ndjson","utf8");const ev=[];let buf="",d=0
             for(const ch of L){buf+=ch;if(ch==="{")d++;else if(ch==="}"){d--;if(d===0){try{ev.push(JSON.parse(buf.trim()))}catch{}buf=""}}}
