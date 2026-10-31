@@ -1997,3 +1997,15 @@ table.ct-bang {
 /* SOÁT 26/10 (thầy: KHÔNG cắt chữ để vừa): tên em ở lưới theo dõi và link vào ca xuống dòng thay vì «…» — thẻ cao theo nội dung. */
 .ct-em .ten { overflow: visible; text-overflow: clip; white-space: normal; overflow-wrap: anywhere; }
 .ct-link span:not(.ct-nhan) { flex: 1 1 200px; overflow: visible; text-overflow: clip; white-space: normal; overflow-wrap: anywhere; }
+
+/* 31/10 Việc nhanh: vùng việc KHÔNG lùi lại (Kết thúc ca + Xoá ca) tách dưới vạch mảnh; nhãn trạng thái nhỏ cạnh tên em ở «Cần thầy xử lý». */
+.ct-vung-dung {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--gvm-vien);
+}
+.ct-vung-dung > .ct-ghi { margin: 0; }
+.ct-cb-tt { font-weight: 600; }

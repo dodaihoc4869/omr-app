@@ -9,6 +9,7 @@ import DuyetLoiGiaiScreen from '../../src/screens/DuyetLoiGiaiScreen'
 import LichSuCaScreen from '../../src/screens/LichSuCaScreen'
 import CauHoiScreen from '../../src/screens/CauHoiScreen'
 import TheoDoiCa from '../../src/components/ca-thi/TheoDoiCa'
+import NutThemPhutCa from '../../src/components/ca-thi/NutThemPhutCa'
 import ToanCanhEmScreen from '../../src/screens/ToanCanhEmScreen'
 import PhanCongScreen from '../../src/screens/PhanCongScreen'
 import GiaoDeTheoTuanScreen from '../../src/screens/GiaoDeTheoTuanScreen'
@@ -1019,7 +1020,8 @@ const EM_TD = [
 ].map(([hoTen, tt, daLam, diem, soLanRoiMan, tongGiayRoiMan], i) => ({ sbd: String(120100 + i), hoTen, tt, daLam, tongCau: daLam === null ? null : 20, soLanRoiMan, tongGiayRoiMan, diem })) as never[]
 const manTheoDoi = () => h('div', { className: 'gv-page', style: { padding: '16px clamp(12px, 3vw, 32px) 64px', maxWidth: 1320, margin: '0 auto' } }, h(TheoDoiCa, { tenCa: 'Kiểm tra 15 phút · 12A1', maCa: 'DH-12-C2-B6', link: 'https://omr-app-b3u.pages.dev/hs?ca=DH-12-C2-B6', daChepLink: false, onChepLink: noop, onChepLinkDiem: noop,
   moLuc: '19:30 · Thứ Hai 26/10/2026', hetHanVao: '19:40', thoiGianPhut: 15, congBoChu: 'Khi cả lớp nộp xong', phamViChu: 'Lớp 12A1', conGiay: 522, em: EM_TD, soChuaVao: 1,
-  nguongLan: 3, dangTai: false, dangDuyet: null, onLamMoi: noop, onMoKhoa: noop, onXemEm: noop, onChieuMa: noop, onKetThuc: noop, onDongCuaVao: noop, dangLamNgay: 6 } as never))
+  nguongLan: 3, dangTai: false, dangDuyet: null, onLamMoi: noop, onMoKhoa: noop, onXemEm: noop, onChieuMa: noop, onKetThuc: noop, onDongCuaVao: noop, dangLamNgay: 6,
+  viecNhanhThem: h(NutThemPhutCa, { tong: 0, chay: async () => ({ ok: true }) as never }), viecXoaThem: h('button', { type: 'button', className: 'ct-nut ct-nut-vien ct-nut-nho ct-nut-xoa-ca', style: { width: '100%', marginTop: 10, color: 'var(--gvm-ho-dam)' } }, 'Xoá ca này') } as never))
 // ═══ NGANG GV 26/10: `gv-lich-su-ca&mo=1` = màn Ca kiểm tra bọc như App.tsx khi cờ 2.0 bật (nút «Mở ca kiểm tra» góc phải đầu màn)
 const manCaHoa2 = () => h('div', { className: 'ca-hoa2-khung' }, h('button', { type: 'button', className: 'ca-hoa2-mo-ca' }, 'Mở ca kiểm tra'), h(LichSuCaScreen))
 // ═══ hết NGANG GV 26/10
