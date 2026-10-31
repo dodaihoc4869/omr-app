@@ -20,12 +20,15 @@ const RE_QUA_TAI = /overloaded|queued for too long|too many requests/i
 const cauHayLoi = new Set<string>()
 const that = (x: CauGom | D1PreparedStatement): D1PreparedStatement => (x instanceof CauGom ? x.that() : x)
 
+/** Bộ đếm theo lệnh (đo): số câu D1 và các lượt xả (≈ số vòng chờ D1 nối tiếp) mà lệnh đã dùng. */
+export interface DemLenhD1 { cau: number; vong: Set<number> }
+
 class CauGom {
-  constructor(readonly g: Gom, readonly q: string, readonly v: unknown[] | null) {}
-  bind(...v: unknown[]): CauGom { return new CauGom(this.g, this.q, v) }
-  all<T = unknown>(): Promise<D1Result<T>> { return this.g.xep([this], { kieu: 'all' }, this.q) as Promise<D1Result<T>> }
-  first<T = unknown>(cot?: string): Promise<T | null> { return this.g.xep([this], { kieu: 'first', cot }, this.q) as Promise<T | null> }
-  run<T = unknown>(): Promise<D1Result<T>> { return this.g.xep([this], { kieu: 'run' }, this.q) as Promise<D1Result<T>> }
+  constructor(readonly g: Gom, readonly q: string, readonly v: unknown[] | null, readonly dem?: DemLenhD1) {}
+  bind(...v: unknown[]): CauGom { return new CauGom(this.g, this.q, v, this.dem) }
+  all<T = unknown>(): Promise<D1Result<T>> { return this.g.xep([this], { kieu: 'all' }, this.q, this.dem) as Promise<D1Result<T>> }
+  first<T = unknown>(cot?: string): Promise<T | null> { return this.g.xep([this], { kieu: 'first', cot }, this.q, this.dem) as Promise<T | null> }
+  run<T = unknown>(): Promise<D1Result<T>> { return this.g.xep([this], { kieu: 'run' }, this.q, this.dem) as Promise<D1Result<T>> }
   /** Câu thật của D1 gốc (dựng lúc chạy — giá trị gắn giữ riêng trong câu gom). */
   that(): D1PreparedStatement { const st = this.g.goc.prepare(this.q); return this.v ? st.bind(...this.v) : st }
 }
@@ -36,9 +39,12 @@ class Gom {
   /** Số yêu cầu D1 thật đã gửi / số lệnh đã nhận (đo). */
   soYeuCau = 0
   soLenh = 0
+  /** Số lượt xả hàng (mỗi lượt ≥ một yêu cầu D1). */
+  lanXa = 0
   constructor(readonly goc: D1Database) {}
-  xep(ds: (CauGom | D1PreparedStatement)[], mot: Viec['mot'], khoa: string): Promise<unknown> {
+  xep(ds: (CauGom | D1PreparedStatement)[], mot: Viec['mot'], khoa: string, dem?: DemLenhD1): Promise<unknown> {
     this.soLenh++
+    if (dem) { dem.cau += ds.length; dem.vong.add(this.lanXa + 1) }
     return new Promise((ok, loi) => {
       this.hang.push({ ds, mot, khoa, ok, loi })
       if (!this.hen) { this.hen = true; setTimeout(() => this.xa(), 0) }
@@ -46,6 +52,7 @@ class Gom {
   }
   private xa(): void {
     this.hen = false
+    this.lanXa++
     const ds = this.hang.splice(0)
     let lo: Viec[] = [], n = 0
     for (const x of ds) {
@@ -113,13 +120,27 @@ class Gom {
   }
 }
 
-export interface D1Gom extends D1Database { readonly gom: { soYeuCau: number; soLenh: number } }
+export interface D1Gom extends D1Database {
+  readonly gom: { soYeuCau: number; soLenh: number }
+  /** Bản xem đếm câu / vòng của MỘT lệnh (đo), dùng chung bộ gom và khoá đệm D1 gốc. */
+  voiDem(dem: DemLenhD1): D1Database
+}
 
 /** Bọc D1: lệnh rời + batch() tường minh trong cùng lượt ⇒ một lô. Sessions API giữ nguyên nghĩa. */
 export function gomD1(goc: D1Database): D1Gom {
   const g = new Gom(goc)
+  const xem = (dem: DemLenhD1): D1Database => {
+    const v: D1Database = {
+      prepare: (q: string) => new CauGom(g, q, null, dem) as unknown as D1PreparedStatement,
+      batch: <T = unknown>(ds: D1PreparedStatement[]) => (ds.length ? g.xep(ds as (CauGom | D1PreparedStatement)[], null, ds.map((x) => (x instanceof CauGom ? x.q : '?')).join('\n'), dem) : goc.batch<T>([])) as Promise<D1Result<T>[]>,
+      ...(db.withSession ? { withSession: db.withSession } : {}),
+    }
+    ;(v as unknown as Record<symbol, unknown>)[D1_GOC] = dbGoc(goc as unknown as object)
+    return v
+  }
   const db: D1Gom = {
     gom: g,
+    voiDem: (dem) => xem(dem),
     prepare: (q: string) => new CauGom(g, q, null) as unknown as D1PreparedStatement,
     // batch() tường minh: giữ nguyên khối (một giao dịch), đi chung lô với việc khác cùng lượt.
     batch: <T = unknown>(ds: D1PreparedStatement[]) => (ds.length ? g.xep(ds as (CauGom | D1PreparedStatement)[], null, ds.map((x) => (x instanceof CauGom ? x.q : '?')).join('\n')) : goc.batch<T>([])) as Promise<D1Result<T>[]>,

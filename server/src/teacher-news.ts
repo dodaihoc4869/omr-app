@@ -28,10 +28,27 @@ export async function teacherNews(env:Env,b:Record<string,unknown>){
  return {ok:true,visits,day,updatedAt:new Date().toISOString(),exams,homework,examSubmitted:Number(submissions[0]?.n||0),homeworkSubmitted:Number(submittedHomework[0]?.n||0),board:board[0],changes}
 }
 
-export async function recordPresence(env:Env,b:Record<string,unknown>){
+// GOM GHI «ĐANG TRỰC TUYẾN» (31/10, thử tải 10.000 em: /presence là lệnh GHI D1 đông nhất — mỗi máy 165 giây một lần, mỗi lần một yêu cầu D1; D1 giới hạn số
+// yêu cầu ⇒ lúc dồn mở app /presence báo bận 57 %). Có `ctx` ⇒ dồn vào hàng của isolate, 3 giây sau ghi CẢ hàng bằng MỘT câu (json_each, ≤ 200 phiên / câu).
+// Cùng phiên gửi lặp trong 3 giây ⇒ một dòng (last_seen mới nhất). Ý nghĩa bảng không đổi: first_seen = lần đầu trong ngày, last_seen = lần gần nhất.
+const hangPresence=new Map<string,[string,string,string,string]>()
+let henPresence:Promise<void>|null=null
+const SQL_GHI_PRESENCE=`INSERT INTO app_presence(day,session_id,role,first_seen,last_seen) SELECT json_extract(value,'$[0]'),json_extract(value,'$[1]'),json_extract(value,'$[2]'),json_extract(value,'$[3]'),json_extract(value,'$[3]') FROM json_each(?) WHERE 1 ON CONFLICT(day,session_id,role) DO UPDATE SET last_seen=excluded.last_seen`
+async function xaPresence(env:Env){
+ const ds=[...hangPresence.values()];hangPresence.clear();henPresence=null
+ for(let i=0;i<ds.length;i+=200)await env.DB.prepare(SQL_GHI_PRESENCE).bind(JSON.stringify(ds.slice(i,i+200))).run()
+}
+export async function recordPresence(env:Env,b:Record<string,unknown>,ctx?:{waitUntil(p:Promise<unknown>):void}){
  const session=String(b.session||''),role=String(b.role||'')
  if(!/^[a-zA-Z0-9-]{12,90}$/.test(session)||!['gv','hs','ph'].includes(role))return {ok:false,error:'Phiên không hợp lệ.'}
  const now=new Date().toISOString()
+ if(ctx){
+  const day=newsDay()
+  hangPresence.set(`${day}|${session}|${role}`,[day,session,role,now])
+  if(hangPresence.size>=2000){const p=xaPresence(env).catch(e=>console.error('[presence] ghi gom lỗi:',e instanceof Error?e.message:e));ctx.waitUntil(p)}
+  else if(!henPresence){henPresence=new Promise<void>(r=>setTimeout(r,3000)).then(()=>xaPresence(env)).catch(e=>{henPresence=null;console.error('[presence] ghi gom lỗi:',e instanceof Error?e.message:e)});ctx.waitUntil(henPresence)}
+  return {ok:true}
+ }
  await env.DB.prepare('INSERT INTO app_presence(day,session_id,role,first_seen,last_seen) VALUES(?,?,?,?,?) ON CONFLICT(day,session_id,role) DO UPDATE SET last_seen=excluded.last_seen').bind(newsDay(),session,role,now,now).run()
  return {ok:true}
 }

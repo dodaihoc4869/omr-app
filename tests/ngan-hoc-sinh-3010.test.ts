@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 import worker, { NganHocSinh } from '../server/src/index'
 import { DAU_TRONG_NGAN, datXuLyNgan, laDuongNgan, sbdChonNgan, xoaEnvChungNgan } from '../server/src/ngan-hoc-sinh'
 import { gameToken } from '../server/src/game-v2-auth'
+import { dbGoc } from '../server/src/cau-hinh-dem'
 import { taoKhoOmni } from './omni-3-ke-hoach-chung'
 import type { Env } from '../server/src/kieu'
 
@@ -89,7 +90,7 @@ describe('ngăn riêng từng học sinh', () => {
     const st = { waitUntil() {} } as never
     await new NganHocSinh(st, a).fetch(new Request('https://t/game-v2/x', { method: 'POST', body: '{}' }))
     await new NganHocSinh(st, b).fetch(new Request('https://t/game-v2/x', { method: 'POST', body: '{}' }))
-    expect(thay[0]).toBe(thay[1])
+    expect(dbGoc(thay[0] as object)).toBe(dbGoc(thay[1] as object)) // cùng D1 gốc (lệnh được chọn đo mang bản xem đếm câu — khoá đệm vẫn là D1 gốc)
     datXuLyNgan((r, e, c) => worker.fetch(r, e, c))
     xoaEnvChungNgan()
   })

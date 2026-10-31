@@ -3,7 +3,7 @@
 // ngăn `d1|<sbd>` được TẠO bởi trung chuyển (không gợi ý ⇒ cạnh trung chuyển), lần sau Worker gọi thẳng. Chưa có danh sách ⇒ đường `apac|` cũ + bốc thăm ở nền.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import worker, { NganHocSinh } from '../server/src/index'
-import { DAU_CHUYEN_NGAN, DAU_SBD_NGAN, DAU_TRONG_NGAN, chonNganDinh, docDsDinh, xoaDemNganDinh, xoaEnvChungNgan } from '../server/src/ngan-hoc-sinh'
+import { BAN_BOC_THAM, DAU_CHUYEN_NGAN, DAU_SBD_NGAN, DAU_TRONG_NGAN, chonNganDinh, docCauHinhDinh, docDsDinh, xoaDemNganDinh, xoaEnvChungNgan } from '../server/src/ngan-hoc-sinh'
 import { gameToken } from '../server/src/game-v2-auth'
 import { taoKhoOmni } from './omni-3-ke-hoach-chung'
 import type { Env } from '../server/src/kieu'
@@ -49,9 +49,13 @@ describe('ngăn sát D1', () => {
     await xa(x.nen)
     const dinh = x.goi.filter((g) => g.ten.startsWith('dinh|'))
     expect(dinh.length).toBe(48)
-    expect(dinh.every((g) => g.goiY === 'apac')).toBe(true)
-    const ds = docDsDinh((x.k.d.sql.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa='ngan_dinh'").get() as { gia_tri: string }).gia_tri)
-    expect(ds.length).toBe(16)
+    expect(dinh.filter((g) => g.goiY === 'apac').map((g) => g.ten).every((t) => /^dinh\|\d+$/.test(t))).toBe(true)
+    expect(dinh.filter((g) => g.goiY === undefined).map((g) => g.ten).every((t) => /^dinh\|k\|\d+$/.test(t))).toBe(true) // 16 ngăn KHÔNG gợi ý (cạnh nơi chạy)
+    expect(dinh.filter((g) => g.goiY === undefined).length).toBe(16)
+    const ch = docCauHinhDinh((x.k.d.sql.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa='ngan_dinh'").get() as { gia_tri: string }).gia_tri)
+    expect(ch.ds.length).toBe(16)
+    expect(ch.v).toBe(BAN_BOC_THAM)
+    expect(ch.tien).toBe('d2|') // trong test mọi ngăn đo ~0 ms < 15 ⇒ chỗ sát D1 ⇒ tiền tố mới
     // lượt sau: không bốc thăm lại
     const n = x.goi.length
     await lenh(x, '/game-v2/hoc-tap-dem', { token })
@@ -61,7 +65,7 @@ describe('ngăn sát D1', () => {
 
   it('có danh sách ⇒ lần đầu qua trung chuyển (ngăn d1| tạo KHÔNG gợi ý), lần sau gọi thẳng; kết quả y hệt đường thẳng', async () => {
     const x = kho()
-    x.k.d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('ngan_dinh','{"ds":["dinh|7","dinh|9"]}','x')`)
+    x.k.d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('ngan_dinh','{"v":2,"ds":["dinh|7","dinh|9"]}','x')`)
     const token = await gameToken(x.k.env, 'S1')
     const a = await (await lenh(x, '/game-v2/hoc-tap-dem', { token })).json() as Record<string, unknown>
     expect(x.goi.slice(0, 2).map((g) => [g.ten, g.goiY, g.chuyen])).toEqual([[expect.stringMatching(/^dinh\|(7|9)$/), undefined, 'd1|S1'], ['d1|S1', undefined, null]])
@@ -75,7 +79,7 @@ describe('ngăn sát D1', () => {
 
   it('máy khách tự gửi x-ngan-chuyen ⇒ Worker xoá; trung chuyển chỉ nhận đúng d1|<sbd của lệnh>', async () => {
     const x = kho()
-    x.k.d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('ngan_dinh','{"ds":["dinh|1"]}','x')`)
+    x.k.d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('ngan_dinh','{"v":2,"ds":["dinh|1"]}','x')`)
     await lenh(x, '/game-v2/hoc-tap-dem', { token: await gameToken(x.k.env, 'S1') }, { [DAU_CHUYEN_NGAN]: 'd1|S2' })
     expect(x.goi.map((g) => g.ten)).toEqual(['dinh|1', 'd1|S1'])
     // Lệnh lạ tới thẳng trung chuyển (tên không khớp SBD) ⇒ tự xử lý, không mở ngăn em khác.
@@ -86,10 +90,28 @@ describe('ngăn sát D1', () => {
     expect(y.goi).toEqual([])
   })
 
+  it('cấu hình bốc thăm cũ (v1) ⇒ vẫn dùng danh sách cũ, bốc lại ở nền một lần; tiền tố mới d2| khi tìm được chỗ sát D1', async () => {
+    const x = kho()
+    x.k.d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('ngan_dinh','{"ds":["dinh|3"]}','x')`)
+    const token = await gameToken(x.k.env, 'S1')
+    await lenh(x, '/game-v2/hoc-tap-dem', { token })
+    // danh sách cũ, tiền tố cũ (lượt bốc thăm ở nền chạy xen, gọi ngăn KHÔNG mang x-ngan-chuyen)
+    expect(x.goi.filter((g) => g.chuyen).map((g) => [g.ten, g.chuyen])).toEqual([['dinh|3', 'd1|S1']])
+    expect(x.goi.some((g) => g.ten === 'd1|S1')).toBe(true)
+    await xa(x.nen)
+    const ch = docCauHinhDinh((x.k.d.sql.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa='ngan_dinh'").get() as { gia_tri: string }).gia_tri)
+    expect(ch.v).toBe(BAN_BOC_THAM)
+    expect(ch.tien).toBe('d2|')
+    xoaDemNganDinh() // isolate mới đọc cấu hình mới
+    const n = x.goi.length
+    await lenh(x, '/game-v2/hoc-tap-dem', { token })
+    expect(x.goi.slice(n).map((g) => g.ten)).toContain('d2|S1')
+  })
+
   it('công tắc TAT_NGAN_DINH ⇒ ngăn apac| như cũ, không bốc thăm', async () => {
     const x = kho()
     x.env.TAT_NGAN_DINH = '1'
-    x.k.d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('ngan_dinh','{"ds":["dinh|1"]}','x')`)
+    x.k.d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('ngan_dinh','{"v":2,"ds":["dinh|1"]}','x')`)
     await lenh(x, '/game-v2/hoc-tap-dem', { token: await gameToken(x.k.env, 'S1') })
     await xa(x.nen)
     expect(x.goi.map((g) => g.ten)).toEqual(['apac|S1'])
@@ -97,7 +119,7 @@ describe('ngăn sát D1', () => {
 
   it('bốc thăm giữ ngăn đo nhanh nhất; danh sách hỏng / tên lạ ⇒ bỏ', async () => {
     const x = kho()
-    const kq = await chonNganDinh(x.env, 10)
+    const kq = await chonNganDinh(x.env, 10, 0)
     expect(kq!.ds.length).toBe(10)
     expect(kq!.theoTram).toEqual({ HKG: 10 })
     expect(docDsDinh('{"ds":["dinh|1","apac|S1","dinh|x",3]}')).toEqual(['dinh|1'])

@@ -69,8 +69,9 @@ const dongBoDem7=new WeakMap<object,Map<string,{luc:number;p:Promise<{soGoi:numb
 
 /** Chỉ bài được chọn gần nhất của mỗi lớp ở thời điểm chuyển; những tick MỚI sau đó đều có gói riêng. */
 export async function dongBoGoi7(env: Env, now: number, tran = 2, lop = '', batBuoc=false): Promise<{ soGoi: number; soEm: number; soCau: number; hoan: boolean }> {
-  let m=dongBoDem7.get(env.DB)
-  if(!m){m=new Map();dongBoDem7.set(env.DB,m)}
+  const goc=dbGoc(env.DB as unknown as object) // khoá theo D1 GỐC: bản bọc / bản xem đo của ngăn vẫn dùng chung lượt đồng bộ đang chạy
+  let m=dongBoDem7.get(goc)
+  if(!m){m=new Map();dongBoDem7.set(goc,m)}
   const k=`${lop}|${tran}`,cu=m.get(k)
   if(!batBuoc&&cu&&now>=cu.luc&&now-cu.luc<20000){const r=await cu.p;return {soGoi:0,soEm:0,soCau:0,hoan:r.hoan}}
   const p=dongBoThat7(env,now,tran,lop);m.set(k,{luc:now,p})
