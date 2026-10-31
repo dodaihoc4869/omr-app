@@ -8,6 +8,7 @@
 // `batch()` tường minh của mã giữ nguyên khối (một giao dịch) nhưng đi chung lô với việc khác cùng lượt. Đệm theo D1 gốc (`dbGoc`) không đổi.
 import type { D1Database, D1PreparedStatement, D1Result } from './kieu'
 import { D1_GOC, dbGoc } from './cau-hinh-dem'
+import { thamSoAnToan, type CauGui } from './gom-lien-ngan'
 
 type Kieu = 'all' | 'first' | 'run'
 /** Một việc trong hàng: một câu rời (`mot`) hoặc một `batch()` tường minh của mã (`mot` = null — giữ nguyên khối, kết quả trả cả mảng). */
@@ -45,7 +46,22 @@ class Gom {
   soLenh = 0
   /** Số lượt xả hàng (mỗi lượt ≥ một yêu cầu D1). */
   lanXa = 0
-  constructor(readonly goc: D1Database) {}
+  /** `qua`: đường gửi qua ngăn gom liên isolate (gom-lien-ngan.ts) — vắng ⇒ gửi thẳng D1 như cũ. */
+  constructor(readonly goc: D1Database, readonly qua?: (cau: CauGui[]) => Promise<D1Result[]>) {}
+  /** Gửi một lô: qua ngăn gom khi mọi câu là câu gom có tham số kiểu JSON an toàn; còn lại gửi thẳng D1. */
+  private guiLo(ds: (CauGom | D1PreparedStatement)[]): Promise<D1Result<Record<string, unknown>>[]> {
+    if (this.qua && ds.every((x) => x instanceof CauGom && thamSoAnToan(x.v))) {
+      return this.qua(ds.map((x) => ({ q: (x as CauGom).q, v: (x as CauGom).v }))) as Promise<D1Result<Record<string, unknown>>[]>
+    }
+    return this.goc.batch<Record<string, unknown>>(ds.map(that))
+  }
+  /** Giá trị của một câu rời từ kết quả lô (đúng như `.all() / .run() / .first(cot)`). */
+  private motTu(mot: NonNullable<Viec['mot']>, kq: D1Result<Record<string, unknown>>[]): unknown {
+    const r = kq[0]!
+    if (mot.kieu !== 'first') return r
+    const dong = r?.results?.[0] ?? null
+    return dong && mot.cot !== undefined ? (dong[mot.cot] ?? null) : dong
+  }
   xep(ds: (CauGom | D1PreparedStatement)[], mot: Viec['mot'], khoa: string, dem?: DemLenhD1): Promise<unknown> {
     this.soLenh++
     if (dem) {
@@ -71,17 +87,14 @@ class Gom {
   }
   /** Trả kết quả cho một việc từ mảng kết quả của nó. */
   private tra(x: Viec, kq: D1Result<Record<string, unknown>>[]): void {
-    if (!x.mot) return x.ok(kq)
-    const r = kq[0]!
-    if (x.mot.kieu !== 'first') return x.ok(r)
-    const dong = r?.results?.[0] ?? null
-    x.ok(dong && x.mot.cot !== undefined ? (dong[x.mot.cot] ?? null) : dong)
+    x.ok(x.mot ? this.motTu(x.mot, kq) : kq)
   }
   private chayRieng(x: Viec): void {
     this.soYeuCau++
     let p: Promise<unknown>
     try {
-      if (!x.mot) p = this.goc.batch(x.ds.map(that))
+      if (!x.mot) p = this.guiLo(x.ds)
+      else if (this.qua && x.ds[0] instanceof CauGom && thamSoAnToan(x.ds[0].v)) { const mot = x.mot; p = this.guiLo(x.ds).then((kq) => this.motTu(mot, kq)) }
       else {
         const st = that(x.ds[0]!)
         p = x.mot.kieu === 'all' ? st.all() : x.mot.kieu === 'run' ? st.run() : st.first(x.mot.cot)
@@ -111,7 +124,7 @@ class Gom {
     this.soYeuCau++
     const cau = lo.flatMap((x) => x.ds)
     let p: Promise<D1Result<Record<string, unknown>>[]>
-    try { p = this.goc.batch<Record<string, unknown>>(cau.map(that)) } catch (e) { p = Promise.reject(e) }
+    try { p = this.guiLo(cau) } catch (e) { p = Promise.reject(e) }
     p.then(
       (kq) => {
         if (!Array.isArray(kq) || kq.length !== cau.length) { const e = new Error('D1_ERROR: lô trả thiếu kết quả'); for (const x of lo) x.loi(e); return }
@@ -134,8 +147,8 @@ export interface D1Gom extends D1Database {
 }
 
 /** Bọc D1: lệnh rời + batch() tường minh trong cùng lượt ⇒ một lô. Sessions API giữ nguyên nghĩa. */
-export function gomD1(goc: D1Database): D1Gom {
-  const g = new Gom(goc)
+export function gomD1(goc: D1Database, qua?: (cau: CauGui[]) => Promise<D1Result[]>): D1Gom {
+  const g = new Gom(goc, qua)
   const xem = (dem: DemLenhD1): D1Database => {
     const v: D1Database = {
       prepare: (q: string) => new CauGom(g, q, null, dem) as unknown as D1PreparedStatement,

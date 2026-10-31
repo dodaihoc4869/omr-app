@@ -66,6 +66,12 @@ class_name = "NganHocSinh"
 name = "PHONG_DAU_ION"
 class_name = "PhongDauIon"
 
+# Ngăn gom D1 liên isolate (31/10, server/src/gom-lien-ngan.ts): gộp lô của nhiều isolate thành MỘT lượt gửi D1 (trần D1 là số lượt gửi).
+# Chỉ dùng khi biến BAT_GOM_LIEN_NGAN bật; không lưu gì.
+[[durable_objects.bindings]]
+name = "GOM_D1"
+class_name = "NganGomD1"
+
 [[migrations]]
 tag = "bia-v1"
 new_sqlite_classes = ["BanBiA"]
@@ -81,6 +87,10 @@ new_sqlite_classes = ["NganHocSinh"]
 [[migrations]]
 tag = "dau-ion-v1"
 new_sqlite_classes = ["PhongDauIon"]
+
+[[migrations]]
+tag = "gom-d1-v1"
+new_sqlite_classes = ["NganGomD1"]
 
 [[r2_buckets]]
 binding = "DE"
