@@ -981,6 +981,14 @@ export async function xinGoiY(env: Env, b: Obj): Promise<Response> {
   return Response.json({ ok: true, mucHoTro: muc, noiDungGoiY: g.noiDung })
 }
 
+// Cùng luật nhomMucChua: hạn thiếu/sai hoặc còn ở tương lai vẫn là chờ; đúng giờ hạn thì cần sửa.
+const NHOM_DOT = `CASE WHEN trang_thai_day='da_tu_sua' THEN 'xong' WHEN trang_thai_day='cho_gap_lai_2' AND (julianday(den_han) IS NULL OR julianday(den_han)>julianday(?)) THEN 'cho' ELSE 'can' END`
+/** Đếm của danh sách Tự sửa lỗi (tong / can / cho / xong / daSua11 / xongHomNay) — dùng chung `danhSach` và gói đóng sẵn ban đêm (goi-sua-dem.ts). `nay` = mốc giờ ISO. */
+export const lenhDemSua = (env: Env, sbd: string, nay: string, nowMs: number) => env.DB.prepare(`WITH muc AS (SELECT ${NHOM_DOT} AS nhom,COALESCE(dong_luc,cap_nhat_luc) AS dl FROM chua_loi_dot WHERE sbd=?)
+      SELECT COUNT(*) AS tong,SUM(nhom='can') AS can,SUM(nhom='cho') AS cho,SUM(nhom='xong') AS xong,SUM(nhom='xong' AND dl>=?) AS daSua11,
+        (SELECT COUNT(DISTINCT dot_id) FROM chua_gon_lan WHERE sbd=? AND ngay_vn=? AND json_extract(ket,'$.ket')='tu_sua') AS xongHomNay FROM muc`)
+      .bind(nay, sbd, nowMs - MOC_DA_SUA_MS, sbd, ngayVn(nowMs))
+
 export async function danhSach(env: Env, b: Obj): Promise<Response> {
   const sbd = await quyen(env, b)
   if (sbd instanceof Response) return sbd
@@ -991,8 +999,6 @@ export async function danhSach(env: Env, b: Obj): Promise<Response> {
   // Giữ cùng mốc thời gian giữa các trang: câu tới lịch trong lúc đọc không bị đổi thứ tự hoặc lặp.
   const nay = c ? new Date(str(c.nay)).toISOString() : new Date().toISOString()
   const thuTu = `CASE WHEN trang_thai_day='cho_gap_lai_2' AND julianday(den_han)<=julianday(?) THEN 0 WHEN trang_thai_day='da_tu_sua' THEN 2 ELSE 1 END`
-  // Cùng luật nhomMucChua: hạn thiếu/sai hoặc còn ở tương lai vẫn là chờ; đúng giờ hạn thì cần sửa.
-  const nhom = `CASE WHEN trang_thai_day='da_tu_sua' THEN 'xong' WHEN trang_thai_day='cho_gap_lai_2' AND (julianday(den_han) IS NULL OR julianday(den_han)>julianday(?)) THEN 'cho' ELSE 'can' END`
   // Chữa câu gọn (thầy 25/10, chua-gon.ts): trang đầu ĐÓNG TRƯỚC các đợt em đã làm đúng lại qua luật tự làm — chạy đầu CÙNG lô (không thêm vòng chờ D1).
   const nowMs = Date.now()
   const dong = c || !denLuotDong(sbd, nowMs) ? [] : [env.DB.prepare(SQL_DONG_DA_DUNG_LAI).bind(nowMs, sbd, nowMs - NGAY_CUA_SO_GON * 86_400_000)]
@@ -1006,10 +1012,7 @@ export async function danhSach(env: Env, b: Obj): Promise<Response> {
         c ? num(c.giaoLuc) : 0, c ? num(c.giaoLuc) : 0, c ? str(c.dotId) : ''),
     // «Đã tự sửa hôm nay» = câu em TỰ SỬA XONG hôm nay ở màn sửa câu (chua_gon_lan), KHÔNG đếm theo dong_luc: câu đóng tự động hôm nay có thể là câu sửa từ hôm trước.
     // `daSua11` (29/10, Sửa lỗi 12–36 câu/ngày): câu đã tự sửa trong 11 ngày qua — cùng cửa sổ 12 ngày với số câu mỗi ngày (sua-loi-phan-bo.ts).
-    env.DB.prepare(`WITH muc AS (SELECT ${nhom} AS nhom,COALESCE(dong_luc,cap_nhat_luc) AS dl FROM chua_loi_dot WHERE sbd=?)
-      SELECT COUNT(*) AS tong,SUM(nhom='can') AS can,SUM(nhom='cho') AS cho,SUM(nhom='xong') AS xong,SUM(nhom='xong' AND dl>=?) AS daSua11,
-        (SELECT COUNT(DISTINCT dot_id) FROM chua_gon_lan WHERE sbd=? AND ngay_vn=? AND json_extract(ket,'$.ket')='tu_sua') AS xongHomNay FROM muc`)
-      .bind(nay, sbd, nowMs - MOC_DA_SUA_MS, sbd, ngayVn(nowMs)),
+    lenhDemSua(env, sbd, nay, nowMs),
   ]
   // Việc hôm nay của Tự sửa lỗi lưu trên máy chủ (tu-sua-viec-ngay.ts, 28/10): trang đầu đọc CÙNG lô (không thêm đợt chờ D1).
   const homNay = ngayVn(nowMs)

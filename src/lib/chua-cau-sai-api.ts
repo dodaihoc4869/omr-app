@@ -422,6 +422,13 @@ export async function apiGonNop(token: string, dotId: string, ban: string, traLo
 export async function apiGonMoNgay(token: string, qids: string[]): Promise<{ qid: string; kq: KetQuaDot & { gon?: KetQuaGon } }[]> {
   const j = await goi('gon-mo-ngay', token, { qids })
   if (!j?.ok || !Array.isArray(j.ds)) return []
-  return (j.ds as Obj[]).filter((x) => !!x && x.ok === true && typeof x.qid === 'string' && typeof x.dotId === 'string')
-    .map((x) => ({ qid: chu(x.qid), kq: { ...(x as unknown as KetQuaDot), ...(x.gon && typeof x.gon === 'object' ? { gon: docGon(x.gon as Obj) } : {}) } }))
+  return docDsNgay(j.ds as Obj[])
+}
+const docDsNgay = (ds: Obj[]): { qid: string; kq: KetQuaDot & { gon?: KetQuaGon } }[] => ds.filter((x) => !!x && x.ok === true && typeof x.qid === 'string' && typeof x.dotId === 'string')
+  .map((x) => ({ qid: chu(x.qid), kq: { ...(x as unknown as KetQuaDot), ...(x.gon && typeof x.gon === 'object' ? { gon: docGon(x.gon as Obj) } : {}) } }))
+/** GÓI SỬA LỖI HÔM NAY ĐÓNG SẴN (31/10, server/src/goi-sua-dem.ts): MỘT lượt — mỗi câu như `apiGonMoNgay`. `co` = máy chủ có gói hôm nay. Lỗi / máy chủ cũ ⇒ null. */
+export async function apiGoiSuaNgay(token: string): Promise<{ co: boolean; n: string; ds: { qid: string; kq: KetQuaDot & { gon?: KetQuaGon } }[] } | null> {
+  const j = await goi('goi-ngay', token)
+  if (!j?.ok || !Array.isArray(j.ds) || typeof j.n !== 'string') return null
+  return { co: j.co === true, n: j.n, ds: docDsNgay(j.ds as Obj[]) }
 }

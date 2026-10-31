@@ -17,7 +17,7 @@ import { banHat, yenLang } from '../../lib/hieu-ung'
 import { docNhoTuSua, ngheTuSua } from '../../lib/tu-sua-loi'
 // Việc hôm nay NẠP ĐỘNG qua mảnh ManTuChua (đã là điểm nạp lười, có trong precache, Lộ trình nạp sẵn lúc rảnh): nhập tĩnh / nạp thẳng tu-sua-viec-hom-nay làm
 // Rolldown tách chua-truc-tiep thành tệp riêng (+1 tệp precache, trần 170).
-type ModViec = Pick<typeof import('./ManTuChua'), 'baoKhoaSua' | 'conSuaHomNay' | 'conSuaPhanNgay' | 'docSbdHs' | 'dungViecHomNay' | 'luuViecHomNay' | 'ngheXongSua' | 'napTruocCauSua' | 'napTruocSuaNgay' | 'guiLaiSuaCho'>
+type ModViec = Pick<typeof import('./ManTuChua'), 'baoKhoaSua' | 'conSuaHomNay' | 'conSuaPhanNgay' | 'docSbdHs' | 'dungViecHomNay' | 'luuViecHomNay' | 'ngheXongSua' | 'napTruocCauSua' | 'napTruocSuaNgay' | 'napGoiSuaDem' | 'guiLaiSuaCho'>
 const SO_CAU_MOI_NGAY = 12 // = SO_CAU_MOI_NGAY của tu-sua-viec-hom-nay (chỉ dùng khi mảnh chưa nạp)
 import type { KetQuaDanhSachChua } from '../../lib/chua-cau-sai-api'
 import '../../styles/trong-hs.css'
@@ -148,9 +148,15 @@ function useConSuaHomNay(token: string | undefined, bat: boolean, nho: number[] 
   // 31/10 (thầy «làm cả cho tự sửa lỗi»): Lộ trình yên ⇒ TẢI SẴN cả phần Sửa lỗi hôm nay chưa xong (một lượt) + gửi lại lần nộp chờ từ lúc mất mạng.
   // Hẹn 3–15 giây ngẫu nhiên: cả lớp mở app cùng lúc không dồn lượt mở câu vào D1 trong cùng một giây.
   const conLaiSua = r?.viec?.muc?.filter((x) => !x.xong && !x.m.kiemHoiThay).map((x) => x.m.qid).join('|') ?? ''
+  // 31/10 (thầy «hs mở app lên là mọi thứ sẵn rồi»; server/src/goi-sua-dem.ts): GÓI ĐÓNG SẴN cả phần hôm nay ⇒ hỏi NGAY khi Lộ trình hiện (một lượt rẻ: R2 + một câu đọc D1).
+  useEffect(() => {
+    if (!mod || !token) return
+    const h = setTimeout(() => { void mod.napGoiSuaDem?.(token) }, 300)
+    return () => clearTimeout(h)
+  }, [mod, token])
   useEffect(() => {
     if (!mod || !token || !conLaiSua) return
-    const h = setTimeout(() => { void mod.guiLaiSuaCho?.(token); void mod.napTruocSuaNgay?.(token, conLaiSua.split('|')) }, 3000 + Math.random() * 12_000)
+    const h = setTimeout(() => { void mod.guiLaiSuaCho?.(token); void Promise.resolve(mod.napGoiSuaDem?.(token)).finally(() => mod.napTruocSuaNgay?.(token, conLaiSua.split('|'))) }, 3000 + Math.random() * 12_000)
     return () => clearTimeout(h)
   }, [mod, token, conLaiSua])
   // undefined = mảnh chưa nạp (chưa vẽ số, khỏi nháy 12 → 9); null = không dựng được việc hôm nay

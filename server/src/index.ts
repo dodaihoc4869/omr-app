@@ -3423,6 +3423,9 @@ const boXuLy = {
       // TỰ SỬA LỖI — ĐỢT CŨ HƠN 14 NGÀY (28/10, chua-gon-dem.ts): 00:30–05:59 VN đóng dần theo luật tự làm, một lô 60 đợt/phút; ngoài khung không truy vấn.
       {const p=import('./chua-gon-dem').then(m=>m.cronDongDotCu(env,Date.now())).then(r=>{if(r.dong)console.log('[tu-sua-dem] đóng',JSON.stringify(r))}).catch(e=>console.error('[tu-sua-dem] cron lỗi:',e))
       if(ctx?.waitUntil)ctx.waitUntil(p);else await p}
+      // GÓI TỰ SỬA LỖI HÔM NAY ĐÓNG SẴN (31/10, goi-sua-dem.ts): đêm 6 em/phút, sáng 4, chiều 3, tối 1 em/5 phút — mở app là cả phần hôm nay có ngay. Hết em ⇒ một câu đọc.
+      {const p=import('./goi-sua-dem').then(m=>m.cronGoiSuaDem(env,Date.now())).then(n=>{if(n)console.log('[goi-sua] đóng gói',n)}).catch(e=>console.error('[goi-sua] cron lỗi:',e))
+      if(ctx?.waitUntil)ctx.waitUntil(p);else await p}
       // MÁY SOẠN LỜI GIẢI SƠ ĐỒ (27/10, may-soan-cron.ts): cờ `cau_hinh.may_soan_so_do` tắt ⇒ một câu đọc có đệm rồi về. Bật ⇒ một lô nhỏ có khoá chạy,
       // chạy NỀN (waitUntil) để không giữ chân các việc cron phía sau (thông báo, nhắc bài). Phải đứng TRƯỚC dòng `return` dưới. Lỗi chỉ ghi log.
       {const p=import('./may-soan-cron').then(m=>m.chayMaySoanCron(env,Date.now())).then(r=>{if(r.chay)console.log('[may-soan] cron',JSON.stringify(r))}).catch(e=>console.error('[may-soan] cron lỗi:',e))
@@ -3848,6 +3851,18 @@ const boXuLy = {
         const khoa = kt.ktDangKhoaChang(await kt.docKtCn(env, sbd, Date.now(), true), Date.now())
         if (khoa) return ra({ ok: false, ma: kt.MA_KHOA_KT, error: kt.CHU_KHOA_KT, kiemTraCaNhan: khoa }, 409)
         return raChua(await chuaGonMoNgay(env, b, sbd))
+      }
+      // GÓI SỬA LỖI HÔM NAY ĐÓNG SẴN (31/10, goi-sua-dem.ts; thầy «hs mở app lên là mọi thứ sẵn rồi»): một lần đọc R2 + một câu đọc D1 kiểm lệch, song song với khoá
+      // Kiểm tra ôn tập. Quyền + khoá như `gon-mo-ngay`.
+      if (p === '/hs/chua-cau-sai/goi-ngay') {
+        const sbd = await chuaQuyen(env, b)
+        if (sbd instanceof Response) return raChua(sbd)
+        const nay = Date.now()
+        const [kt, gs] = await Promise.all([import('./kiem-tra-ca-nhan'), import('./goi-sua-dem')])
+        const [bai, goi] = await Promise.all([kt.docKtCn(env, sbd, nay, true), gs.docGoiSua(env, sbd, nay)])
+        const khoa = kt.ktDangKhoaChang(bai, nay)
+        if (khoa) return ra({ ok: false, ma: kt.MA_KHOA_KT, error: kt.CHU_KHOA_KT, kiemTraCaNhan: khoa }, 409)
+        return ra(goi)
       }
       if (p === '/hs/chua-cau-sai/phat-item') return raChua(await chuaPhatItem(env, b))
       if (p === '/hs/chua-cau-sai/nop-item') return raChua(await chuaNopItem(env, b))
