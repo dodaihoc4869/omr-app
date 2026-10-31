@@ -65,7 +65,7 @@ describe('ngăn sát D1', () => {
 
   it('có danh sách ⇒ lần đầu qua trung chuyển (ngăn d1| tạo KHÔNG gợi ý), lần sau gọi thẳng; kết quả y hệt đường thẳng', async () => {
     const x = kho()
-    x.k.d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('ngan_dinh','{"v":2,"ds":["dinh|7","dinh|9"]}','x')`)
+    x.k.d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('ngan_dinh','{"v":3,"ds":["dinh|7","dinh|9"]}','x')`)
     const token = await gameToken(x.k.env, 'S1')
     const a = await (await lenh(x, '/game-v2/hoc-tap-dem', { token })).json() as Record<string, unknown>
     expect(x.goi.slice(0, 2).map((g) => [g.ten, g.goiY, g.chuyen])).toEqual([[expect.stringMatching(/^dinh\|(7|9)$/), undefined, 'd1|S1'], ['d1|S1', undefined, null]])
@@ -79,7 +79,7 @@ describe('ngăn sát D1', () => {
 
   it('máy khách tự gửi x-ngan-chuyen ⇒ Worker xoá; trung chuyển chỉ nhận đúng d1|<sbd của lệnh>', async () => {
     const x = kho()
-    x.k.d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('ngan_dinh','{"v":2,"ds":["dinh|1"]}','x')`)
+    x.k.d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('ngan_dinh','{"v":3,"ds":["dinh|1"]}','x')`)
     await lenh(x, '/game-v2/hoc-tap-dem', { token: await gameToken(x.k.env, 'S1') }, { [DAU_CHUYEN_NGAN]: 'd1|S2' })
     expect(x.goi.map((g) => g.ten)).toEqual(['dinh|1', 'd1|S1'])
     // Lệnh lạ tới thẳng trung chuyển (tên không khớp SBD) ⇒ tự xử lý, không mở ngăn em khác.
@@ -111,7 +111,7 @@ describe('ngăn sát D1', () => {
   it('công tắc TAT_NGAN_DINH ⇒ ngăn apac| như cũ, không bốc thăm', async () => {
     const x = kho()
     x.env.TAT_NGAN_DINH = '1'
-    x.k.d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('ngan_dinh','{"v":2,"ds":["dinh|1"]}','x')`)
+    x.k.d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('ngan_dinh','{"v":3,"ds":["dinh|1"]}','x')`)
     await lenh(x, '/game-v2/hoc-tap-dem', { token: await gameToken(x.k.env, 'S1') })
     await xa(x.nen)
     expect(x.goi.map((g) => g.ten)).toEqual(['apac|S1'])
