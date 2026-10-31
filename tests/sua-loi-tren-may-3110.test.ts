@@ -199,6 +199,28 @@ describe('máy em: phần hôm nay + lần nộp chờ gửi', () => {
     } finally { vi.useRealTimers() }
   })
 
+  it('iPhone sập (thầy 31/10): đang làm bài ⇒ hoãn; đề nặng vượt ngân sách bộ nhớ ⇒ thôi tải thêm, không nối tiếp', async () => {
+    vi.useFakeTimers({ now: Date.parse('2026-10-31T03:00:00Z') })
+    try {
+      document.documentElement.dataset.dangLamBai = ''
+      expect(await napTruocSuaNgay('t', ['P1', 'P2'])).toBe(0) // mã riêng: câu các ca trên vừa hỏi còn trong 2 phút chặn hỏi lại
+      expect(api.apiGonMoNgay).not.toHaveBeenCalled()
+      delete document.documentElement.dataset.dangLamBai
+      await vi.advanceTimersByTimeAsync(31_000) // lượt hoãn tự chạy khi em đã về
+      expect(api.apiGonMoNgay).toHaveBeenCalledTimes(1)
+      // đề kèm ảnh nhúng ~1 MB mỗi câu ⇒ chỉ giữ tới ngân sách (2,5 triệu ký tự), không lưu chuỗi khổng lồ, không nối tiếp
+      xoaNapTruocCauSua(); vi.clearAllMocks(); localStorage.removeItem('omr_sua_ngay_10044')
+      const anh = 'data:image/png;base64,' + 'A'.repeat(1_000_000)
+      api.apiGonMoNgay.mockImplementation(async (_t: string, qids: string[]) => qids.map((q) => ({ qid: q, kq: { ...MO(q), gon: { ...MO(q).gon, de: { qid: q, phan: 'I', text: 'x', imageDataUrl: anh } } } })))
+      const ds = Array.from({ length: 20 }, (_, i) => `N${i}`)
+      expect(await napTruocSuaNgay('t', ds)).toBe(2)
+      await vi.advanceTimersByTimeAsync(60_000)
+      expect(api.apiGonMoNgay).toHaveBeenCalledTimes(1)
+      expect(localStorage.getItem('omr_sua_ngay_10044')).toBeNull()
+      expect(layNapTruocCauSuaNgay('t', 'N0')).toMatchObject({ dotId: 'D-N0' })
+    } finally { vi.useRealTimers(); delete document.documentElement.dataset.dangLamBai }
+  })
+
   it('mất mạng ⇒ không hỏi; lỗi ⇒ thôi', async () => {
     const onl = vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false)
     expect(await napTruocSuaNgay('t', ['A'])).toBe(0)
