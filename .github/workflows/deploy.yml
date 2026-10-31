@@ -20,6 +20,10 @@ on:
         description: 'Khẩn (thầy cho phép): phát hành NGAY cả trong giờ học tối'
         type: boolean
         default: false
+      vuot_ktcn:
+        description: 'Vượt chờ chặng kiểm tra cá nhân đang làm (thầy cho phép 31/10) — ca thi đang mở VẪN chặn'
+        type: boolean
+        default: false
   # 23:40 VN: phát hành bù bản main đã hoãn trong giờ học tối (không có gì mới ⇒ không làm gì).
   schedule:
     - cron: '40 16 * * *'
@@ -172,6 +176,7 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+          VUOT_CHO_KTCN: ${{ inputs.vuot_ktcn }}
 
       - name: Đẩy lên Cloudflare Worker (Máy chủ)
         uses: cloudflare/wrangler-action@v3
