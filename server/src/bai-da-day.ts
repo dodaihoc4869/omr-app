@@ -154,10 +154,57 @@ export async function lopCuaEm(env: Env, sbd: string): Promise<string | null> {
   const s = str(sbd).trim()
   if (!s) return null
   try {
-    return (await bangLopCacEm(env)).get(s)?.lop ?? null
+    return (await lopMotEm(env, s))?.lop ?? null
   } catch {
     return null
   }
+}
+
+// THỬ TẢI 31/10 (2000 em ảo): `lopCuaEm` đọc CẢ bảng hoc_sinh + danh_sach (50.000 dòng, ~35 ms D1 mỗi lần) chỉ để lấy lớp của MỘT em — mỗi isolate / ngăn
+// một lần mỗi 30 s ⇒ 1.367 lần trong 6 phút, 49 s D1 / 79 s ⇒ D1 quá tải, 30% «Máy chủ đang bận». Nay: bảng cả trường còn hạn (phía thầy vừa đọc) ⇒ dùng;
+// không ⇒ đọc ĐÚNG hai dòng của em (khoá chính sbd), đệm 30 s theo em. Kết quả y hệt `bangLopCacEm` (em khoá ⇒ null; danh_sach trước, hoc_sinh sau).
+const demLopEm = new DemTTL<{ db: object; v: EmLop | null }>(DEM_LOP_MS, 2000)
+/** Lượt đọc ĐANG BAY theo (D1 gốc, em) — khoá theo D1 gốc như `dangDocLop`: D1 khác (test / phiên) không chờ nhầm lượt treo của D1 cũ. */
+const dangDocLopEm = new WeakMap<object, Map<string, Promise<EmLop | null>>>()
+/** Lớp gần nhất đã đọc của từng em (kể cả quá hạn) — CHỈ để `phamViCuaEm` ĐOÁN lớp mà đọc trước phạm vi. */
+const lopEmGanNhat = new Map<string, string>()
+async function lopMotEm(env: Env, s: string, nowMs = Date.now()): Promise<EmLop | null> {
+  const db = dbGoc(env.DB as unknown as object)
+  const bang = demLop.doc('bang', nowMs)
+  if (bang && bang.db === db) return bang.v.get(s) ?? null
+  const o = demLopEm.doc(s, nowMs)
+  if (o && o.db === db) return o.v
+  let bay = dangDocLopEm.get(db)
+  if (!bay) dangDocLopEm.set(db, (bay = new Map()))
+  const dang = bay.get(s)
+  if (dang) return dang
+  const p = (async () => {
+    const hoi = async (sql: string): Promise<Row[] | null> => {
+      try {
+        return (await env.DB.prepare(sql).bind(s).all<Row>()).results ?? []
+      } catch {
+        return null
+      }
+    }
+    const [hsCo, ds] = await Promise.all([
+      hoi('SELECT ho_ten, lop, ten_lop, trang_thai FROM hoc_sinh WHERE sbd = ?'),
+      hoi('SELECT ho_ten, lop FROM danh_sach WHERE sbd = ?'),
+    ])
+    const hs = hsCo ?? (await hoi('SELECT ho_ten, lop, NULL AS ten_lop, trang_thai FROM hoc_sinh WHERE sbd = ?')) // chưa có cột ten_lop
+    if (!hs && !ds) return null // lỗi đọc ⇒ không đệm (như bảng cả trường)
+    const h = hs?.[0], d = ds?.[0]
+    const v: EmLop | null = h && str(h.trang_thai) === 'khoa' ? null
+      : d ? { lop: tenLopCuaEm(d.lop, h?.ten_lop), ten: str(h?.ho_ten).trim() || str(d.ho_ten).trim() || s }
+      : h ? { lop: tenLopCuaEm(h.lop, h.ten_lop), ten: str(h.ho_ten).trim() || s }
+      : null
+    demLopEm.ghi(s, nowMs, { db, v })
+    if (v?.lop) { lopEmGanNhat.delete(s); lopEmGanNhat.set(s, v.lop); if (lopEmGanNhat.size > 4000) lopEmGanNhat.delete(lopEmGanNhat.keys().next().value!) }
+    return v
+  })()
+  bay.set(s, p)
+  const bo = () => { if (bay.get(s) === p) bay.delete(s) }
+  p.then(bo, bo)
+  return p
 }
 
 /** Em của một lớp (theo `bangLopCacEm`), xếp theo SBD. */
@@ -283,7 +330,7 @@ export async function phamViCuaEm(env: Env, sbd: string): Promise<PhamViLop | nu
   try {
     // Gói R 15/10: đệm lớp vừa hết hạn ⇒ ĐOÁN lớp theo bảng dựng gần nhất và đọc trước phạm vi của lớp ấy CÙNG đợt với lượt đọc lại bảng lớp (phạm vi dùng chung
     // lượt đọc đang bay theo lớp — `phamViLop`). Đoán đúng (em không đổi lớp) ⇒ khỏi một đợt D1 nối tiếp; đoán sai ⇒ chỉ phí một lượt đọc, kết quả theo lớp thật.
-    const doan = bangLopGanNhat.get(dbGoc(env.DB as unknown as object))?.get(s)?.lop
+    const doan = bangLopGanNhat.get(dbGoc(env.DB as unknown as object))?.get(s)?.lop ?? lopEmGanNhat.get(s)
     if (doan) void phamViLop(env, doan).catch(() => null)
     const lop = await lopCuaEm(env, s)
     if (lop) {
