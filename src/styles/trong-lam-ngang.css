@@ -9,6 +9,9 @@
   :root[data-trong='hs'] .duo:not([data-xong]) .duo-tren { min-height: 44px; padding-top: 2px; }
   :root[data-trong='hs'] .duo:not([data-xong]) .duo-cot-tra { gap: 8px; padding-top: 6px; }
   :root[data-trong='hs'] .duo:not([data-xong]) .duo-cot-de { padding-top: 6px; }
+  /* cột đề vốn cuộn riêng (trong-lam-bai.css mục 13) — thanh cuộn mảnh luôn thấy để em biết đề còn dài (thầy 31/10) */
+  /* cao trừ thanh trên (~48px): chưa cuộn trang thì cột bắt đầu dưới thanh trên ⇒ 100dvh làm khuất cuối đề, cuộn trong cột không tới (cuộn bị giữ trong cột) */
+  :root[data-trong='hs'] .duo:not([data-xong]) .duo-cot-de { max-height: calc(100dvh - 52px); scrollbar-width: thin; scrollbar-color: var(--tr-vien-2) transparent; scrollbar-gutter: stable; }
   /* phương án gọn: ô 46px, khe 8px; phương án ngắn (≤ 8 kí tự) lưới 2 × 2 */
   :root[data-trong='hs'] .duo .ht2-lam-tn { gap: 8px; }
   :root[data-trong='hs'] .duo .ht2-lam-pa, :root[data-trong='hs'] .duo .ht2-lam-pa[data-ket] { min-height: 46px; padding: 6px 12px; gap: 10px; }
@@ -63,7 +66,14 @@
   :root[data-trong='hs'] :is(.duo[data-hai-cot][data-duo], .duo[data-co-phim]) :is(.duo-tren, .duo-than, .duo-giua) { max-width: 1160px; }
   :root[data-trong='hs'] .duo-than:is([data-de-dai], :has(.ht2-lam-phim)):has(> .duo-cot-de) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 40px; align-items: start; align-content: start; }
   :root[data-trong='hs'] .duo-than:is([data-de-dai], :has(.ht2-lam-phim)) > :is(.duo-cot-de, .duo-cot-tra) { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
-  :root[data-trong='hs'] .duo-than:is([data-de-dai], :has(.ht2-lam-phim)) > .duo-cot-de { position: sticky; top: 64px; }
+  /* CỘT ĐỀ CUỘN RIÊNG (thầy 31/10 «bên đề có thanh cuộn riêng ở chế độ xoay ngang và máy tính», ảnh Sửa lỗi Ethyl acetate): cột đề cao vừa khoảng giữa thanh
+   * trên (64px) và thanh đáy («Kiểm tra» ~88px), cuộn riêng với thanh cuộn mảnh luôn thấy — trước: ghim mà KHÔNG giới hạn cao ⇒ cuối đề dài khuất dưới thanh
+   * đáy, cuộn trang cũng không tới. Tấm kết quả (cao hơn thanh đáy) đang hiện ⇒ chừa đáy để cuộn cuối đề lên trên tấm. */
+  :root[data-trong='hs'] .duo-than:is([data-de-dai], :has(.ht2-lam-phim)) > .duo-cot-de {
+    position: sticky; top: 64px; max-height: calc(100dvh - 64px - 96px - 24px); overflow-y: auto; overscroll-behavior: contain;
+    scrollbar-width: thin; scrollbar-color: var(--tr-vien-2) transparent; scrollbar-gutter: stable; padding-right: 8px;
+  }
+  :root[data-trong='hs'] .duo:has(.duo-day.duo-ket) .duo-than:is([data-de-dai], :has(.ht2-lam-phim)) > .duo-cot-de { padding-bottom: 32dvh; }
   :root[data-trong='hs'] :is(.duo[data-hai-cot][data-duo], .duo[data-co-phim]) .duo-day > .duo-giua { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 40px; }
   :root[data-trong='hs'] :is(.duo[data-hai-cot][data-duo], .duo[data-co-phim]) .duo-day > .duo-giua > * { grid-column: 2; }
 }

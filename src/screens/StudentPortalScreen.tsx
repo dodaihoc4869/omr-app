@@ -71,6 +71,8 @@ import { boNap, nenNapTruoc, veNgayKhiCo, type BoNap } from '../components/hoa2/
 import { napManCauDaLam, napManTuLuyen } from '../components/hoa2/man-sanh-luoi'
 // Màn làm bài, chữa và xem lại chỉ tải khi em mở.
 const ManLamBaiTap = lazy(() => import('../components/hoc-tap/ManLamBaiTap'))
+/** Màn phủ đang làm bài (xem `data-dang-lam-bai`). */
+const TAB_LAM_BAI: ReadonlySet<string> = new Set(['hoctap', 'kiemtra', 'vaothi', 'tuluyen', 'btvn', 'mom', 'cauon', 'khacphuc'])
 // Thẻ điểm danh nổi của giao diện CŨ (không «Trong») — nạp lười (30/10): «Trong» dùng khối điểm danh trong menu (TrongHs, diem-danh-hs.ts).
 const TheDiemDanhHs = lazy(() => import('../components/diem-danh/TheDiemDanhHs'))
 /** MÁY YẾU 30/10 (hồ sơ CPU ×6): Lộ trình nằm ẩn (`inert`) dưới màn làm chặng / màn khác mà vẫn vẽ lại CẢ cây (~665 nút) mỗi lần cổng đổi trạng thái — ngay
@@ -376,6 +378,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
   const phieuMoRef = useRef(false)
   /** Tăng 1 khi hàng đợi nộp lại vừa nộp xong một việc ôn câu ⇒ hỏi lại kế hoạch ngày (cộng với lần "vừa đóng màn con"). */
   const [lamMoiHang, setLamMoiKeHoach] = useState(0)
+  const choDoi = useRef(false), doiRef = useRef<() => void>(() => {})
   /** HTML đề + lời giải của em, dựng TẠI MÁY. Rỗng = không mở lớp phủ.
    *
    * Bản trước mở `/t/<mã ca>` trong khung. Cách ấy phụ thuộc việc máy chủ trả
@@ -481,12 +484,29 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
   useEffect(() => {
     if (!auth?.sbd || !auth.token) return
     const sbd = auth.sbd, token = auth.token
+    // Đang làm bài (màn phủ — `data-dang-lam-bai`) ⇒ HOÃN tới lúc em về Lộ trình (thầy 31/10, iPhone sập lúc bấm «Tiếp tục» khi máy kia đang làm): không đọc lại
+    // Sảnh / kế hoạch / EXP / thưởng bên dưới màn phủ giữa lúc em làm câu.
     // 31/10: + danh sách Tự sửa lỗi (số trên nút Sửa lỗi của Lộ trình nghe `ngheTuSua`) — trước chỉ đọc lại khi số «đã làm» đổi và bản nhớ quá 10 phút ⇒ máy kia sửa
     // xong mà nút ở máy này vẫn «còn 8».
-    const doi = () => { if (document.hidden) return; setLamMoiKeHoach((n) => n + 1); void syncStudentExp(sbd, token); void napDsMom(); void import('../components/thuong/dung-thuong').then((m) => m.capNhatTongQuan(token)).catch(() => {}); void import('../lib/tu-sua-loi').then((m) => m.taiTuSuaLoi(token, { moi: true })).catch(() => {}) }
+    const doi = () => {
+      if (document.hidden) return
+      if (document.documentElement.dataset.dangLamBai !== undefined) { choDoi.current = true; return }
+      choDoi.current = false
+      setLamMoiKeHoach((n) => n + 1); void syncStudentExp(sbd, token); void napDsMom(); void import('../components/thuong/dung-thuong').then((m) => m.capNhatTongQuan(token)).catch(() => {})
+      void import('../lib/tu-sua-loi').then((m) => m.taiTuSuaLoi(token, { moi: true })).catch(() => {})
+    }
+    doiRef.current = doi
     window.addEventListener('ddh:doi-may-khac', doi) // = SU_KIEN_DOI (lib/kenh-day.ts)
     return () => window.removeEventListener('ddh:doi-may-khac', doi)
   }, [auth?.sbd, auth?.token, napDsMom])
+  // ĐANG LÀM BÀI: màn phủ chặng học / kiểm tra / thi / tự luyện / BTVN / bài mẹ giao / câu ôn / khắc phục ⇒ gắn `data-dang-lam-bai` trên <html>: việc nền nặng (tải sẵn
+  // Sửa lỗi — nap-truoc-sua.ts, làm mới theo kênh đẩy) hoãn tới lúc em về. Màn Tự sửa lỗi KHÔNG tính (chính nó cần phần tải sẵn). Về ⇒ chạy lượt làm mới đã hoãn.
+  useEffect(() => {
+    const h = document.documentElement
+    if (tab && TAB_LAM_BAI.has(tab)) { h.dataset.dangLamBai = ''; return }
+    delete h.dataset.dangLamBai
+    if (choDoi.current) doiRef.current()
+  }, [tab])
   useEffect(() => {
     if (!dangLamMom || !auth) return
     let huy = false
