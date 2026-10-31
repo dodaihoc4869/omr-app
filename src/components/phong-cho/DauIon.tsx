@@ -35,9 +35,10 @@ const ntLop = (nt: number) => `di-nt-${(NGUYEN_TO[nt] ?? 'Na').toLowerCase()}`
 function Nut({ nt, nho }: { nt: number; nho?: boolean }) { return <span className={`di-hat ${ntLop(nt)}${nho ? ' di-hat-nho' : ''}`} aria-hidden="true">{NGUYEN_TO[nt]}</span> }
 const CHU_TT: Record<TT, string> = { ranh: 'Rảnh', tim: 'Đang tìm trận', dau: 'Đang đấu' }
 
-export interface DauIonProps { maCa?: string; veDau?: string; batDau?: boolean }
+export interface DauIonProps { maCa?: string; veDau?: string; batDau?: boolean; /** Phòng báo thầy vừa bấm Bắt đầu (31/10) ⇒ màn thi vào bài ngay. */ onBatDau?: () => void }
 
-export default function DauIon({ maCa, veDau, batDau }: DauIonProps) {
+export default function DauIon({ maCa, veDau, batDau, onBatDau }: DauIonProps) {
+  const onBatDauRef = useRef(onBatDau); onBatDauRef.current = onBatDau
   const [cd, setCd] = useState<CaiDat>(docCaiDat)
   const [mang, setMang] = useState<Mang>(veDau && maCa ? 'chua' : 'tat')
   const [lanMat, setLanMat] = useState(0)
@@ -98,7 +99,7 @@ export default function DauIon({ maCa, veDau, batDau }: DauIonProps) {
         return
       }
       case 'pu': setPu({ tu: Number(j.tu), i: Number(j.i), luc: Date.now() }); return
-      case 'dong': setDong(true); return
+      case 'dong': setDong(true); if (j.ly === 'bat-dau') onBatDauRef.current?.(); return
     }
   }, [])
 

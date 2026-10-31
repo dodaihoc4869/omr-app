@@ -47,56 +47,34 @@ function moPhong(soMay: number, gianMs: () => number) {
 }
 
 describe('CÚ DỒN LÚC BẤM BẮT ĐẦU', () => {
-  it('BẢN CŨ — không giãn: cả lớp khởi hành trong một nhịp hỏi 3 giây', () => {
-    const cu = moPhong(30, () => Math.random() * 3000)
-    // eslint-disable-next-line no-console
-    console.log(`[phòng chờ] 30 em · KHÔNG giãn · em cuối chờ ${cu.choLauNhat}s · văng ra ${cu.vangRa}`)
-    // Không khẳng định bản cũ luôn văng ở 30 em — nó ở sát mép, và chính chỗ
-    // "sát mép" ấy là lý do thầy thấy lúc được lúc không.
-    expect(cu.choLauNhat).toBeGreaterThan(8)
+  // SỬA CÓ CHỦ Ý 31/10 (thầy «bấm bắt đầu là phải tức thì… Tối ưu triệt để»): mô phỏng cũ (moPhong) dựa trên KHOÁ TOÀN CỤC của đường Apps Script
+  // (gỡ 12/09). Máy chủ mới tạo lượt bằng MỘT câu INSERT theo dòng — không ai chờ ai ⇒ cửa sổ giãn 8 giây chỉ còn bắt em cuối hàng ngồi nhìn màn chờ
+  // ⇒ 0,8 giây. Giữ moPhong để thấy: KHÔNG khoá thì em cuối chỉ chờ đúng phần giãn của chính em.
+  const MAY_CHU = fs.readFileSync(path.join(process.cwd(), 'server/src/index.ts'), 'utf8')
+  it('máy chủ tạo lượt KHÔNG khoá toàn cục (một câu INSERT … ON CONFLICT theo dòng) — tiền đề để bỏ cửa sổ 8 giây', () => {
+    expect(MAY_CHU).toContain('Không khoá toàn cục')
+    expect(MAY_CHU).toMatch(/INSERT INTO luot \(khoa, ma_ca, sbd, lan_thu, id_thiet_bi, vao_luc, het_gio_luc, trang_thai, cap_nhat_luc\)/)
+    expect(KHOA_GIAY).toBeGreaterThan(0) // chỉ còn là mô hình lịch sử của đường cũ
+    expect(moPhong(30, () => 0).vangRa).toBe(0)
   })
 
-  it('BẢN MỚI — giãn 8 giây: em cuối chờ ÍT HƠN HẲN', () => {
-    const moi = moPhong(30, gianVaoSauBatDau)
-    const cu = moPhong(30, () => Math.random() * 3000)
-    // eslint-disable-next-line no-console
-    console.log(`[phòng chờ] 30 em · giãn 8s · em cuối chờ ${moi.choLauNhat}s · văng ra ${moi.vangRa}`)
-    expect(moi.choLauNhat).toBeLessThan(cu.choLauNhat)
-    expect(moi.vangRa).toBe(0)
-  })
-
-  it('LỚP 50 EM — chỗ bản cũ chắc chắn gãy, bản mới vẫn trong hạn', () => {
-    let cuTeNhat = 0
-    let moiTeNhat = 0
-    let moiVang = 0
-    for (let i = 0; i < 200; i++) {
-      cuTeNhat = Math.max(cuTeNhat, moPhong(50, () => Math.random() * 3000).choLauNhat)
-      const m = moPhong(50, gianVaoSauBatDau)
-      moiTeNhat = Math.max(moiTeNhat, m.choLauNhat)
-      moiVang += m.vangRa
-    }
-    // eslint-disable-next-line no-console
-    console.log(`[phòng chờ] 50 em · 200 lượt mô phỏng · cũ tệ nhất ${cuTeNhat}s · mới tệ nhất ${moiTeNhat}s · mới văng ${moiVang}`)
-    expect(moiTeNhat).toBeLessThan(cuTeNhat)
-    expect(moiVang).toBe(0)
-  })
-
-  it('cửa sổ giãn là 8 giây, và KHÔNG ăn vào giờ làm bài của em', () => {
-    expect(GIAN_VAO_SAU_BAT_DAU_MS).toBe(8000)
+  it('cửa sổ giãn sau Bắt đầu ≤ 1 giây (em cuối hàng không phải chờ), và KHÔNG ăn vào giờ làm bài của em', () => {
+    expect(GIAN_VAO_SAU_BAT_DAU_MS).toBeLessThanOrEqual(1000)
+    expect(HAN_GIAY).toBe(30)
     for (let i = 0; i < 300; i++) {
       const v = gianVaoSauBatDau()
       expect(v).toBeGreaterThanOrEqual(0)
       expect(v).toBeLessThanOrEqual(GIAN_VAO_SAU_BAT_DAU_MS)
     }
     // Đồng hồ của em chỉ chạy từ lúc MÁY CHỦ tạo lượt (`hetGioLuc` do máy chủ
-    // đặt), nên chờ ở máy em không ăn vào giờ của ai. Canh bằng mã nguồn.
+    // đặt), nên chờ ở đây không ăn vào giờ của ai. Canh bằng mã nguồn.
     expect(MAN).toContain('hetGioCua(attempt)')
   })
 
   it('30 máy giãn ra thành 30 mốc khác nhau, không dồn một khoảnh khắc', () => {
     const ds = Array.from({ length: 30 }, () => gianVaoSauBatDau())
-    expect(new Set(ds).size).toBeGreaterThan(25)
-    expect(Math.max(...ds) - Math.min(...ds)).toBeGreaterThan(3000)
+    expect(new Set(ds).size).toBeGreaterThan(20)
+    expect(Math.max(...ds) - Math.min(...ds)).toBeGreaterThan(400)
   })
 })
 
