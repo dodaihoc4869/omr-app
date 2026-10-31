@@ -18,11 +18,11 @@ concurrency:
   group: thu-tai-50k
   cancel-in-progress: false
 env:
-  LAN: '2'
+  LAN: '3'
   # 1 = dựng lại D1 omr-thu từ kho giả (≈ 5–10 phút, xoá sạch dữ liệu lượt trước); 0 = giữ D1 đang có.
   DUNG_KHO: '0'
   # Giai đoạn cuối được phép chạy (500 | 2000 | 10000 | 50000).
-  GIAI_DOAN_TOI: '500'
+  GIAI_DOAN_TOI: '50000'
   RAMP_S: '120'
   ON_DINH_S: '180'
 jobs:
