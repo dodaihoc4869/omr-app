@@ -1,0 +1,38 @@
+# SOI VÌ SAO «BỔ SUNG BÀI HÔM NAY» RÚT 0 CÂU (CHỈ ĐỌC, 01/11 — thầy: Bài 10 Quy tắc octet 63 câu nhưng «Câu rút được 0»).
+# CHỈ SELECT gộp trên kho đề (de_kho, game_v2_question, game_v2_index) + pham_vi_lop / bai_da_day: in mã tờ, tên tờ, SỐ ĐẾM — không mã em, không tên em.
+name: Soi rút câu bài mới (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/rut-cau-bai-moi-0111]
+    paths: ['.github/workflows/do-rut-cau-bai-0111.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-rut-cau-bai
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Soi (chỉ SELECT)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results[]' | head -n 80; }
+          q "0 cột de_kho" "SELECT name FROM pragma_table_info('de_kho')"
+          q "1 tờ có chữ octet / liên kết / Bài 10-12" "SELECT * FROM de_kho WHERE ten_de LIKE '%octet%' OR ten_de LIKE '%iên kết%' OR ten_de LIKE '%Bài 10%' OR ten_de LIKE '%Bài 11%' OR ten_de LIKE '%Bài 12%' LIMIT 60"
+          q "2 câu trong game_v2_question theo tờ khớp ở (1)" "SELECT ma_de, COUNT(*) n, SUM(json_valid(json)) hop_le, SUM(CASE WHEN json_valid(json) AND json_extract(json,'\$.reviewed') THEN 1 ELSE 0 END) duyet, GROUP_CONCAT(DISTINCT CASE WHEN json_valid(json) THEN json_extract(json,'\$.phan') END) phan, GROUP_CONCAT(DISTINCT CASE WHEN json_valid(json) THEN json_type(json,'\$.reviewed') END) kieu_duyet FROM game_v2_question WHERE ma_de IN (SELECT ma_de FROM de_kho WHERE ten_de LIKE '%octet%' OR ten_de LIKE '%iên kết%' OR ten_de LIKE '%Bài 10%' OR ten_de LIKE '%Bài 11%' OR ten_de LIKE '%Bài 12%') GROUP BY ma_de"
+          q "3 chỉ mục game_v2_index của các tờ ở (1)" "SELECT * FROM game_v2_index WHERE ma_de IN (SELECT ma_de FROM de_kho WHERE ten_de LIKE '%octet%' OR ten_de LIKE '%iên kết%' OR ten_de LIKE '%Bài 10%' OR ten_de LIKE '%Bài 11%' OR ten_de LIKE '%Bài 12%')"
+          q "4 tờ của bài ĐÃ giao chạy được (Bài 9 Ôn tập chương 2) để so cách đặt mã" "SELECT d.ma_de, d.ten_de, d.so_cau, (SELECT COUNT(*) FROM game_v2_question g WHERE g.ma_de = d.ma_de) n_cau FROM de_kho d WHERE d.ten_de LIKE '%Ôn tập chương 2%' OR d.ten_de LIKE '%n tập chương 2%' LIMIT 20"
+          q "5 phạm vi lớp 10 đã tick (bai_da_day mới nhất)" "SELECT lop, khoa_bai, ten_bai, vi_tri, ma_to_json, tick_luc, bo_tick_luc FROM bai_da_day WHERE lop LIKE '10%' ORDER BY tick_luc DESC LIMIT 8"
+          q "6 cột bai_da_day" "SELECT name FROM pragma_table_info('bai_da_day')"
