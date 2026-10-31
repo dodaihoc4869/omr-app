@@ -113,8 +113,20 @@ async function docTram(): Promise<string> {
   return tram
 }
 
+/**
+ * ĐỆM PHẢN HỒI LỆNH HỎI ĐỊNH KỲ trong ngăn của em (31/10, đo `[gom-lenh]` thử tải 2000 em: ca thi đang mở · buổi học · bài mẹ giao · thông báo · thưởng · cờ chữa
+ * câu sai ≈ 1/5 số yêu cầu D1 — máy em hỏi lại theo nhịp dù không có gì đổi; D1 giới hạn số yêu cầu mỗi giây). Chỉ đệm khi lệnh KHÔNG phát câu ghi nào (bộ gom
+ * báo) và trả 200 JSON; em có lệnh ghi bất kỳ (kể cả việc phụ sau phản hồi) ⇒ bỏ hết đệm của em ngay. Thứ thầy đổi (mở ca, giao bài) tới chậm tối đa thời hạn
+ * dưới đây. Trả lại đúng thân cũ, `serverNow` làm mới. Công tắc `TAT_DEM_PHAN_HOI`.
+ */
+export const HAN_DEM_PHAN_HOI: Readonly<Record<string, number>> = {
+  '/hs/ca-dang-mo': 10_000, '/hs/buoi-hoc': 20_000, '/mom/list': 20_000, '/notifications/list': 20_000, '/hs/thuong': 15_000, '/hs/chua-cau-sai/co': 20_000,
+}
+type DemPh = { luc: number; han: number; headers: [string, string][]; than: string }
+
 export class NganHocSinh {
   private kho: KhoEm | null = null
+  private demPh = new Map<string, DemPh>()
   constructor(private readonly state: DurableObjectState, private readonly env: Env) {}
   async fetch(req: Request): Promise<Response> {
     const duong = new URL(req.url).pathname
@@ -144,16 +156,39 @@ export class NganHocSinh {
     const env = (envChung ??= this.env.TAT_GOM_D1 || !this.env.DB ? this.env : { ...this.env, DB: gomD1(this.env.DB) })
     doViTri(env, ctx)
     const t0 = Date.now()
-    // ĐO THEO LỆNH (31/10): 1/10 lệnh mang bộ đếm câu / vòng D1 ⇒ log `[gom-lenh] <đường> cau=… vong=… xl=…` (wrangler tail gom theo đường) — không SBD.
-    const dem: DemLenhD1 | null = Math.random() < 0.1 && (env.DB as Partial<D1Gom>).voiDem ? { cau: 0, vong: new Set() } : null
-    const envLenh = dem ? { ...env, DB: (env.DB as D1Gom).voiDem(dem) } : env
+    const han = this.env.TAT_DEM_PHAN_HOI ? 0 : HAN_DEM_PHAN_HOI[duong] ?? 0
+    let khoaPh = ''
+    if (han && req.method === 'POST') {
+      const than = await req.text()
+      req = new Request(req.url, { method: 'POST', headers: req.headers, body: than })
+      khoaPh = `${duong}\u0001${than}`
+      const c = this.demPh.get(khoaPh)
+      if (c && t0 - c.luc >= 0 && t0 - c.luc < c.han) {
+        const h = new Headers(c.headers)
+        h.set('x-ngan-do', `${tram || '-'};d1=${d1Ms};xl=0;dem=1`)
+        return new Response(c.than.replace(/"serverNow":\d+/, `"serverNow":${Date.now()}`), { status: 200, headers: h })
+      }
+    }
+    // ĐO THEO LỆNH (31/10): mọi lệnh mang bộ đếm câu / vòng D1 (+ cờ «đã ghi» cho đệm phản hồi); 1/10 lệnh ghi log `[gom-lenh] <đường> cau=… vong=… xl=…`
+    // (wrangler tail gom theo đường) — không SBD. Lệnh của em có câu GHI ⇒ bỏ đệm phản hồi của em (cả khi ghi ở việc phụ sau phản hồi).
+    const coXem = !!(env.DB as Partial<D1Gom>).voiDem
+    const dem: DemLenhD1 = { cau: 0, vong: new Set(), khiGhi: () => this.demPh.clear() }
+    const envLenh = coXem ? { ...env, DB: (env.DB as D1Gom).voiDem(dem) } : env
     const res = await xuLy(req, this.kho ? { ...envLenh, KHO_EM: this.kho } : envLenh, ctx)
-    if (dem) console.log('[gom-lenh]', duong, `cau=${dem.cau}`, `vong=${dem.vong.size}`, `xl=${Date.now() - t0}`)
+    if (coXem && Math.random() < 0.1) console.log('[gom-lenh]', duong, `cau=${dem.cau}`, `vong=${dem.vong.size}`, `xl=${Date.now() - t0}`)
     // Dấu «đã qua ngăn» (đo được trên máy thật, không lộ gì): 1 = ngăn có kho sổ · trạm chạy ngăn · ms một vòng D1 · ms xử lý trong ngăn.
     const h = new Headers(res.headers)
     h.set('x-ngan', this.kho ? '1' : '0')
     h.set('x-ngan-do', `${tram || '-'};d1=${d1Ms};xl=${Date.now() - t0}`)
     const ex = h.get('access-control-expose-headers'); h.set('access-control-expose-headers', ex ? `${ex}, x-ngan, x-ngan-do` : 'x-ngan, x-ngan-do')
+    if (khoaPh && coXem && res.status === 200 && !dem.ghi && /json/.test(res.headers.get('content-type') ?? '') && !/ndjson/.test(res.headers.get('content-type') ?? '')) {
+      const than = await res.text()
+      if (!dem.ghi) {
+        if (this.demPh.size >= 16) this.demPh.delete(this.demPh.keys().next().value!)
+        this.demPh.set(khoaPh, { luc: t0, han, headers: [...h], than })
+      }
+      return new Response(than, { status: 200, statusText: res.statusText, headers: h })
+    }
     return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h })
   }
 }
