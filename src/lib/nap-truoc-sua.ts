@@ -54,7 +54,7 @@ export function layNapTruocCauSua(token: string, qid: string, nayMs = Date.now()
 }
 
 /** Bỏ mọi kết quả nạp trước (em vừa làm xong một câu / đổi tài khoản / test). */
-export function xoaNapTruocCauSua(): void { KHO.clear(); NGAY.clear(); ngayDaDoc = ''; if (henTiep) { clearTimeout(henTiep); henTiep = undefined } }
+export function xoaNapTruocCauSua(): void { KHO.clear(); NGAY.clear(); COC.clear(); ngayDaDoc = ''; if (henTiep) { clearTimeout(henTiep); henTiep = undefined } }
 
 // ---------------------------------------------------------------------------- PHẦN HÔM NAY (giữ cả ngày, dùng một lần mỗi câu)
 const ngayVnCua = (ms: number) => new Date(ms + 7 * 3_600_000).toISOString().slice(0, 10)
@@ -66,15 +66,31 @@ let ngayDaDoc = ''
 const daXin = new Map<string, number>()
 /** Trần cỡ bản lưu trên máy (ký tự) — đề có ảnh nhúng lớn ⇒ chỉ giữ trong bộ nhớ. */
 const TRAN_LUU = 1_500_000
+/** NGÂN SÁCH BỘ NHỚ của phần tải sẵn (ký tự JSON, ~2 byte/ký tự) — thầy 31/10 video iPhone «Đã có sự cố xảy ra liên tục» lúc bấm «Tiếp tục»: đề Sửa lỗi có thể kèm
+ *  ảnh nhúng (data URL) ⇒ 36 câu tải sẵn = hàng chục MB chuỗi + JSON.stringify cả kho mỗi lần đổi ⇒ máy yếu hết bộ nhớ. Vượt ngân sách ⇒ thôi tải thêm (câu còn lại
+ *  mở khi bấm như cũ); kho vượt trần lưu ⇒ không dựng chuỗi lưu nữa. */
+const NGAN_SACH = 2_500_000
+/** Cỡ (ký tự JSON) từng câu đang giữ — cộng dồn thay vì dựng lại chuỗi cả kho. */
+const COC = new Map<string, number>()
+const tongCo = () => { let t = 0; for (const v of COC.values()) t += v; return t }
+const datNgay = (q: string, v: KetQuaMo, co: number) => { NGAY.set(q, v); COC.set(q, co) }
+const xoaNgay = (q: string) => { COC.delete(q); return NGAY.delete(q) }
+/** Đang ở màn làm bài phủ trên Lộ trình (StudentPortalScreen gắn `data-dang-lam-bai` trên <html>) ⇒ việc nền nặng hoãn tới lúc em về. */
+const dangLamBai = () => typeof document !== 'undefined' && document.documentElement.dataset.dangLamBai !== undefined
 
 function docKhoNgay(nayMs: number): string {
   const sbd = docSbdHs(), n = ngayVnCua(nayMs), dau = `${sbd}|${n}`
   if (!sbd) return ''
   if (ngayDaDoc === dau) return dau
-  NGAY.clear(); ngayDaDoc = dau
+  NGAY.clear(); COC.clear(); ngayDaDoc = dau
   try {
-    const o = JSON.parse(localStorage.getItem(KHOA_NGAY(sbd)) ?? 'null') as { n?: string; ds?: Record<string, KetQuaMo> } | null
-    if (o?.n === n && o.ds && typeof o.ds === 'object') for (const [q, v] of Object.entries(o.ds)) if (v?.ok && v.gon?.ok) NGAY.set(q, v)
+    const t = localStorage.getItem(KHOA_NGAY(sbd))
+    const o = JSON.parse(t ?? 'null') as { n?: string; ds?: Record<string, KetQuaMo> } | null
+    if (o?.n === n && o.ds && typeof o.ds === 'object') {
+      const ds = Object.entries(o.ds).filter(([, v]) => v?.ok && v.gon?.ok)
+      const moi = ds.length ? Math.ceil((t?.length ?? 0) / ds.length) : 0
+      for (const [q, v] of ds) datNgay(q, v, moi)
+    }
   } catch { /* máy không cho đọc ⇒ chỉ bộ nhớ */ }
   return dau
 }
@@ -82,6 +98,8 @@ function luuKhoNgay(nayMs: number): void {
   const sbd = docSbdHs()
   if (!sbd) return
   try {
+    // Kho vượt trần ⇒ KHÔNG dựng chuỗi (trước: JSON.stringify cả kho rồi mới so trần — hàng chục MB mỗi lần đổi một câu).
+    if (tongCo() > TRAN_LUU) { localStorage.removeItem(KHOA_NGAY(sbd)); return }
     const t = JSON.stringify({ n: ngayVnCua(nayMs), ds: Object.fromEntries(NGAY) })
     if (t.length > TRAN_LUU) localStorage.removeItem(KHOA_NGAY(sbd))
     else localStorage.setItem(KHOA_NGAY(sbd), t)
@@ -91,11 +109,11 @@ function layNgay(qid: string, nayMs: number): KetQuaMo | null {
   if (!docKhoNgay(nayMs)) return null
   const v = NGAY.get(qid)
   if (!v) return null
-  NGAY.delete(qid); luuKhoNgay(nayMs)
+  xoaNgay(qid); luuKhoNgay(nayMs)
   return v
 }
 function boNgay(qid: string, nayMs: number): void {
-  if (docKhoNgay(nayMs) && NGAY.delete(qid)) luuKhoNgay(nayMs)
+  if (docKhoNgay(nayMs) && xoaNgay(qid)) luuKhoNgay(nayMs)
 }
 /** Câu đã có bản tải sẵn hôm nay (còn chưa dùng)? */
 export const coSuaNgay = (qid: string, nayMs = Date.now()): boolean => !!docKhoNgay(nayMs) && NGAY.has(qid)
@@ -111,6 +129,9 @@ const canTai = (token: string, qids: string[], nayMs: number) =>
  *  Lỗi / lượt không về câu nào ⇒ thôi (bấm câu vẫn mở như cũ). Trả số câu của lượt ĐẦU. */
 export function napTruocSuaNgay(token: string, qids: string[], nayMs = Date.now()): Promise<number> {
   if (!token || !docKhoNgay(nayMs) || (typeof navigator !== 'undefined' && navigator.onLine === false)) return Promise.resolve(0)
+  if (tongCo() >= NGAN_SACH) return Promise.resolve(0)
+  // em đang làm bài (màn phủ trên Lộ trình) ⇒ hoãn 30 giây, không tải / phân tích chục MB giữa lúc em bấm «Tiếp tục»
+  if (dangLamBai()) { if (henTiep) clearTimeout(henTiep); henTiep = setTimeout(() => { henTiep = undefined; void napTruocSuaNgay(token, qids) }, 30_000); return Promise.resolve(0) }
   const tatCa = canTai(token, qids, nayMs)
   const can = tatCa.slice(0, MOI_LUOT)
   if (!can.length) return Promise.resolve(0)
@@ -119,9 +140,15 @@ export function napTruocSuaNgay(token: string, qids: string[], nayMs = Date.now(
   const dau = ngayDaDoc
   return apiGonMoNgay(token, can).then((ds) => {
     if (ngayDaDoc !== dau) return 0
-    let n = 0
-    for (const d of ds) if (d.kq.ok && d.kq.gon?.ok && !NGAY.has(d.qid)) { NGAY.set(d.qid, d.kq); n++ }
+    let n = 0, day = false
+    for (const d of ds) {
+      if (!d.kq.ok || !d.kq.gon?.ok || NGAY.has(d.qid)) continue
+      const co = JSON.stringify(d.kq).length
+      if (tongCo() + co > NGAN_SACH) { day = true; continue }
+      datNgay(d.qid, d.kq, co); n++
+    }
     if (n) luuKhoNgay(Date.now())
+    if (day) return n // hết ngân sách bộ nhớ ⇒ không nối tiếp
     // Còn câu chưa tải ⇒ lượt kế sau 3–8 giây; chỉ còn câu vừa hỏng trong lượt này (đang chờ 2 phút) ⇒ thử lại sau 2 phút. ĐÚNG số câu được phân của em (thầy 31/10
     // «Em nào đc phân bao nhiêu câu thì tải đủ luôn»). Lượt không về câu nào ⇒ dừng (không dội máy chủ lúc bận).
     const conThieu = qids.some((q) => !!q && !NGAY.has(q) && !KHO.has(khoa(token, q)))
