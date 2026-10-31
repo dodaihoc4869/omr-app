@@ -122,7 +122,10 @@ export function napTruocSuaNgay(token: string, qids: string[], nayMs = Date.now(
     let n = 0
     for (const d of ds) if (d.kq.ok && d.kq.gon?.ok && !NGAY.has(d.qid)) { NGAY.set(d.qid, d.kq); n++ }
     if (n) luuKhoNgay(Date.now())
-    if (n && tatCa.length > can.length) henTiep = setTimeout(() => { henTiep = undefined; void napTruocSuaNgay(token, qids) }, 3000 + Math.random() * 5000)
+    // Còn câu chưa tải ⇒ lượt kế sau 3–8 giây; chỉ còn câu vừa hỏng trong lượt này (đang chờ 2 phút) ⇒ thử lại sau 2 phút. ĐÚNG số câu được phân của em (thầy 31/10
+    // «Em nào đc phân bao nhiêu câu thì tải đủ luôn»). Lượt không về câu nào ⇒ dừng (không dội máy chủ lúc bận).
+    const conThieu = qids.some((q) => !!q && !NGAY.has(q) && !KHO.has(khoa(token, q)))
+    if (n && conThieu) henTiep = setTimeout(() => { henTiep = undefined; void napTruocSuaNgay(token, qids) }, tatCa.length > can.length ? 3000 + Math.random() * 5000 : 2 * 60_000 + Math.random() * 30_000)
     return n
   }, () => 0)
 }
