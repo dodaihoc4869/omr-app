@@ -25,6 +25,7 @@ import { coQuyen, docPhamViNhieu, eligibleScope, QUYEN_TOAN_CHUONG_TRINH } from 
 // (trần độ khó theo mức đang luyện → luật lặp/family → §7.2). Cờ TẮT ⇒ không đổi hành vi, không thêm truy vấn.
 import { chonCauChoLuot, familyTuNhan, type CauUngVien } from './bo-chon-that'
 import { ngayVn } from './su-kien-hoc'
+import { DemTheoKho } from './dau-kho-cau'
 
 export const TOI_DA_QID_MOT_LUOT = 20
 export const DAI_QID_TOI_DA = 120
@@ -60,20 +61,43 @@ export interface PhucVuDuoc {
  * `baoVeDaBiet` (HẠ TẢI D1, Boss 22/09 M3): nơi gọi ĐÃ có `protectedQuestions(env)` của CÙNG một lượt xử lý (đề đang bảo vệ không đổi
  * giữa hai lần hỏi trong một request) thì truyền vào đây thay vì để hàm này tự hỏi lại — đỡ một lượt quét bảng `ca`. Không truyền ⇒ hành vi cũ.
  */
+/**
+ * ĐỆM «PHỤC VỤ ĐƯỢC» THEO KHO (31/10, thử tải 500 lớp × 100 em: câu đọc JSON đầy đủ này đứng thứ 2 thời gian D1 — 7.986 lần / 6 phút, ~1.390 dòng / lần; kế hoạch
+ * ngày dựng lại sau MỖI câu em nộp và hỏi lại mọi câu tới hạn ôn). Phần (1) chỉ phụ thuộc KHO câu (có trong chỉ mục tờ còn, nhóm nội dung, tự luận) — giống nhau
+ * cho mọi em ⇒ nhớ theo qid trong isolate, `DemTheoKho` (hạn 30 phút, quá 5 phút hỏi dấu kho; thầy sửa / lập lại chỉ mục ⇒ bỏ ngay). Chỉ qid chưa nhớ mới đọc
+ * D1 (vẫn đúng câu SQL, đúng thứ tự dòng như cũ). Phần (2) — đề bảo vệ — vẫn tính mỗi lượt như cũ.
+ */
+type PhanKho = { nhom: string | null; tuLuan: boolean }
+const demPhucVu = new DemTheoKho<Map<string, PhanKho>>(30 * 60_000, 5 * 60_000, 1, 1)
+const TRAN_DEM_PHUC_VU = 60_000
 export async function qidPhucVuDuoc(env: Env, qids: string[], baoVeDaBiet?: { baoVe: Set<string> | null; kiemDuocBaoVe: boolean }): Promise<PhucVuDuoc> {
   const xin = [...new Set(qids.filter((q) => q !== ''))]
   const ra: PhucVuDuoc = { duoc: new Set(), kiemDuocBaoVe: true, khongCoChiMuc: [], biBaoVe: [], tuLuan: [] }
   if (xin.length === 0) return ra
   const nhom = new Map<string, string>()
   const tuLuan = new Set<string>()
+  const nho = await demPhucVu.lay(env, 'phuc_vu', Date.now(), async () => new Map()).catch(() => new Map<string, PhanKho>())
+  const can = xin.filter((q) => !nho.has(q))
+  const moi = new Map<string, PhanKho>()
   // Chia mỗi 800 qid một truy vấn: một tham số JSON nhưng không để chuỗi phình vô hạn khi cả lô 50 em có hàng nghìn câu tới hạn.
-  for (let i = 0; i < xin.length; i += 800) {
-    const rc = await env.DB.prepare(`SELECT q.qid, q.content_group, q.json ${TU_CHI_MUC_GAME}`).bind(JSON.stringify(xin.slice(i, i + 800))).all<{ qid: string; content_group: string; json: string }>()
+  for (let i = 0; i < can.length; i += 800) {
+    const rc = await env.DB.prepare(`SELECT q.qid, q.content_group, q.json ${TU_CHI_MUC_GAME}`).bind(JSON.stringify(can.slice(i, i + 800))).all<{ qid: string; content_group: string; json: string }>()
     for (const x of rc.results ?? []) {
+      const q = String(x.qid)
+      const o = moi.get(q) ?? { nhom: null, tuLuan: false }
       // CẤM RÚT TỰ LUẬN (21/09): câu tự luận em từng sai vẫn ở hồ sơ, nhưng KHÔNG phục vụ lại — không vào kế hoạch ôn, không lấy được đề.
-      if (jsonLaTuLuan(x.json)) { tuLuan.add(String(x.qid)); continue }
-      if (!nhom.has(String(x.qid))) nhom.set(String(x.qid), String(x.content_group))
+      if (jsonLaTuLuan(x.json)) o.tuLuan = true
+      else if (o.nhom === null) o.nhom = String(x.content_group)
+      moi.set(q, o)
     }
+  }
+  if (nho.size + can.length > TRAN_DEM_PHUC_VU) nho.clear()
+  for (const q of can) nho.set(q, moi.get(q) ?? { nhom: null, tuLuan: false })
+  for (const q of xin) {
+    const o = nho.get(q) ?? moi.get(q)
+    if (!o) continue
+    if (o.tuLuan) tuLuan.add(q)
+    if (o.nhom !== null) nhom.set(q, o.nhom)
   }
   ra.tuLuan = xin.filter((q) => tuLuan.has(q) && !nhom.has(q))
   ra.khongCoChiMuc = xin.filter((q) => !nhom.has(q) && !tuLuan.has(q))
