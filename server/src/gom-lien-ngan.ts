@@ -91,8 +91,11 @@ export function duongGuiQuaNganGom(env: Env): ((cau: CauGui[]) => Promise<D1Resu
   const ns = (env as { GOM_D1?: DurableObjectNamespace }).GOM_D1
   if (!env.BAT_GOM_LIEN_NGAN || !ns) return undefined
   const so = Math.max(1, Math.min(64, Number(env.BAT_GOM_LIEN_NGAN) > 1 ? Number(env.BAT_GOM_LIEN_NGAN) : SO_NGAN_GOM))
-  const stub = ns.get(ns.idFromName(`gom|${Math.floor(Math.random() * so)}`))
+  const ten = `gom|${Math.floor(Math.random() * so)}`
+  // Đầu nối tạo TRONG MỖI lần gửi (đúng ngăn đang gửi): bộ gom dùng chung cả isolate ⇒ đầu nối tạo sẵn ở ngăn A mà ngăn B dùng ⇒ Cloudflare báo
+  // «Cannot perform I/O on behalf of a different Durable Object» (thử tải lượt 15, 31/10).
   return async (cau) => {
+    const stub = ns.get(ns.idFromName(ten))
     const r = await stub.fetch(new Request('https://gom/lo', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ cau }) }))
     const j = (await r.json()) as { kq?: D1Result[]; loi?: string }
     if (j.loi !== undefined || !Array.isArray(j.kq)) throw new Error(j.loi ?? 'D1_ERROR: ngăn gom không trả kết quả')
