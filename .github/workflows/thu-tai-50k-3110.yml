@@ -18,14 +18,14 @@ concurrency:
   group: thu-tai-50k
   cancel-in-progress: false
 env:
-  LAN: '7'
+  LAN: '8'
   # Nhánh mã máy chủ đẩy lên omr-thu (mặc định main; thử nhánh trước khi gộp).
-  SRV_REF: 'main'
+  SRV_REF: 'claude/gom-chung-3110'
   # 1 = dựng lại D1 omr-thu từ kho giả (≈ 5–10 phút, xoá sạch dữ liệu lượt trước); 0 = giữ D1 đang có.
   DUNG_KHO: '0'
   # Giai đoạn cuối được phép chạy (500 | 2000 | 10000 | 50000).
   GIAI_DOAN_TOI: '10000'
-  RAMP_S: '600'
+  RAMP_S: '120'
   ON_DINH_S: '180'
 jobs:
   dung:
@@ -202,6 +202,9 @@ jobs:
             console.log("sự kiện",ev.length,"· kết cục",JSON.stringify(kq),"· CPU p50/p99/max",q(.5),q(.99),q(1),"· trạm ngăn",JSON.stringify(nd))
             console.log("=== ngoại lệ");for(const [k,v] of Object.entries(ngoai).sort((a,b)=>b[1]-a[1]).slice(0,15))console.log(v+"×",k)
             console.log("=== log lỗi");for(const [k,v] of Object.entries(loi).sort((a,b)=>b[1]-a[1]).slice(0,25))console.log(v+"×",k)
+            const gl={};for(const e of ev)for(const l of e.logs||[]){const m=(l.message||[]).join(" ");if(m.startsWith("[gom-lenh]")){const [,d,c,v,x]=m.split(" ");const o=gl[d]||(gl[d]={n:0,cau:0,vong:0,xl:[]});o.n++;o.cau+=Number(c.slice(4));o.vong+=Number(v.slice(5));o.xl.push(Number(x.slice(3)))}}
+            console.log("=== D1 theo lệnh (mẫu 1/10): đường · n · câu TB · vòng TB · xử lý p50/p95 ms")
+            for(const [d,o] of Object.entries(gl).sort((a,b)=>b[1].n*b[1].vong-a[1].n*a[1].vong)){o.xl.sort((a,b)=>a-b);console.log(d.padEnd(34),o.n,(o.cau/o.n).toFixed(1),(o.vong/o.n).toFixed(1),o.xl[o.xl.length>>1],o.xl[Math.floor(o.xl.length*.95)])}
           '
   tail2000:
     name: Nghe lỗi máy chủ thử trong giai đoạn 2000
@@ -235,6 +238,9 @@ jobs:
             console.log("sự kiện",ev.length,"· kết cục",JSON.stringify(kq),"· CPU p50/p99/max",q(.5),q(.99),q(1),"· trạm ngăn",JSON.stringify(nd))
             console.log("=== ngoại lệ");for(const [k,v] of Object.entries(ngoai).sort((a,b)=>b[1]-a[1]).slice(0,15))console.log(v+"×",k)
             console.log("=== log lỗi");for(const [k,v] of Object.entries(loi).sort((a,b)=>b[1]-a[1]).slice(0,25))console.log(v+"×",k)
+            const gl={};for(const e of ev)for(const l of e.logs||[]){const m=(l.message||[]).join(" ");if(m.startsWith("[gom-lenh]")){const [,d,c,v,x]=m.split(" ");const o=gl[d]||(gl[d]={n:0,cau:0,vong:0,xl:[]});o.n++;o.cau+=Number(c.slice(4));o.vong+=Number(v.slice(5));o.xl.push(Number(x.slice(3)))}}
+            console.log("=== D1 theo lệnh (mẫu 1/10): đường · n · câu TB · vòng TB · xử lý p50/p95 ms")
+            for(const [d,o] of Object.entries(gl).sort((a,b)=>b[1].n*b[1].vong-a[1].n*a[1].vong)){o.xl.sort((a,b)=>a-b);console.log(d.padEnd(34),o.n,(o.cau/o.n).toFixed(1),(o.vong/o.n).toFixed(1),o.xl[o.xl.length>>1],o.xl[Math.floor(o.xl.length*.95)])}
           '
   cong500:
     name: Cổng sau 500 em
