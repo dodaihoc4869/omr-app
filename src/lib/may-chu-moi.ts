@@ -326,8 +326,10 @@ export async function nopMoi(
   khoaLuot?: string,
   /** Đo treo máy từng câu (22/10, docs/dac-ta-muc-lam-6-muc-2210.md): `{qid: {g, v, a, l, n, w}}` — vắng ⇒ thân gửi y như trước. */
   doGiay?: Record<string, unknown> | null,
-): Promise<{ ok: boolean; daNhan?: boolean; nopLuc?: string; congBo?: string; keyBank?: unknown; boSung?: number } | null> {
-  const r = await goiWorker<{ ok: boolean; lyDo?: string; daNhan?: boolean; nopLuc?: string; congBo?: string; keyBank?: unknown; boSung?: number }>(ch, '/nop', {
+  /** 31/10 (khoa-de-thi.ts): em giữ gói tờ đáp án đã khoá ⇒ `{coGoiDe, phienGoi}` — máy chủ chỉ trao chìa (`khoaKq`) thay cho tờ đáp án. */
+  goiDe?: Record<string, unknown>,
+): Promise<{ ok: boolean; daNhan?: boolean; nopLuc?: string; congBo?: string; keyBank?: unknown; boSung?: number; khoaKq?: unknown; phienGoi?: unknown } | null> {
+  const r = await goiWorker<{ ok: boolean; lyDo?: string; daNhan?: boolean; nopLuc?: string; congBo?: string; keyBank?: unknown; boSung?: number; khoaKq?: unknown; phienGoi?: unknown }>(ch, '/nop', {
     maCa,
     sbd,
     dapAn,
@@ -335,6 +337,7 @@ export async function nopMoi(
     giayCau,
     ...(khoaLuot ? { khoaLuot } : {}),
     ...(doGiay ? { doGiay } : {}),
+    ...(goiDe ?? {}),
   }, nhipNong(ch))
   if (!r) return null
   if (!r.ok && (r.lyDo === 'khong_tim_thay' || r.lyDo === 'thieu')) {

@@ -126,6 +126,7 @@ import { gvKhoDeGiao } from './gv-kho-de-giao'
 import { damBaoChiMuc, dungChiMucCronDem } from './chi-muc-luc-chay'
 import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
 import { docGoiDeDem, docKeyBankDem, ghiKeyBank, doanCongBoNgay, layDemHetGioLuot, nhoCongBo, nhoHetGioLuot } from './dem-ca-thi'
+import { chiaGoiDe, dongGoiDe, dungGoiDe } from './khoa-de-thi'
 import { dongPhongDau, vaoPhongDau, veDauChoEm } from './dau-ion-ve'
 
 // CORS — app chạy ở `dodaihoc4869.github.io`, Worker ở `workers.dev`, nên MỌI
@@ -670,7 +671,7 @@ async function nop(env: Env, b: Record<string, unknown>): Promise<Response> {
     if (doi === 0) sau = await docLuot().first<DongLuot>()
   }
 
-  const congBo = async (): Promise<Record<string, unknown>> => (maCa ? congBoSauNop(env, maCa, ca, keySom) : {})
+  const congBo = async (): Promise<Record<string, unknown>> => (maCa ? congBoSauNop(env, maCa, ca, keySom, b) : {})
   if (doi === 0) {
     // Đã nộp rồi thì TRẢ OK, không báo lỗi: máy em mất sóng rồi gửi lại là
     // chuyện thường, báo đỏ ở đây là em tưởng mất bài và nộp lại lần nữa.
@@ -685,6 +686,25 @@ async function nop(env: Env, b: Record<string, unknown>): Promise<Response> {
     return ra({ ok: false, lyDo: 'khong_tim_thay' })
   }
   return raCoKeyBank({ ok: true, nopLuc }, await congBo())
+}
+
+/**
+ * GÓI TỜ ĐÁP ÁN ĐÃ KHOÁ cho máy em (thầy 31/10, khoa-de-thi.ts): em đã có lượt ở ca ⇒ trả tờ đáp án của ca MÃ HOÁ bằng chìa riêng của em (máy em không tự
+ * có chìa; chìa chỉ trao khi nộp + ca được phép công bố — `/nop`, `ketQua`). Không có lượt / chưa có tờ đáp án ⇒ ok:false (máy em đi đường cũ khi nộp).
+ */
+async function khoaDe(env: Env, b: Record<string, unknown>): Promise<Response> {
+  const maCa = String(b.maCa ?? '').trim(), sbd = String(b.sbd ?? '').trim()
+  if (!maCa || !sbd || !env.DE || !env.MA_BI_MAT) return ra({ ok: false, lyDo: 'thieu' })
+  // MỘT lượt D1 (100k em): dòng ca chỉ về khi em có lượt trong ca; tờ đáp án đọc từ đệm isolate (dem-ca-thi.ts) song song.
+  const [ca, k] = await Promise.all([
+    env.DB.prepare('SELECT so_cau_json FROM ca WHERE ma_ca = ? AND EXISTS (SELECT 1 FROM luot WHERE ma_ca = ? AND sbd = ?)').bind(maCa, maCa, sbd).first<{ so_cau_json?: unknown }>(),
+    docKeyBankDem(env, maCa).catch(() => null),
+  ])
+  if (!ca) return ra({ ok: false, lyDo: 'khong_tim_thay' })
+  if (!k || k.giaTri === null || !k.tho || !k.etag) return ra({ ok: false, lyDo: 'chua_co' })
+  // Bù `soCau` thiếu như đường trả tờ đáp án cũ (key-bank-hop-nhat.ts) ⇒ gói mở ra đúng tờ máy em vẫn nhận khi nộp.
+  const bu = buSoCauChoKeyBank(k.giaTri, k.tho, ca.so_cau_json)
+  return ra({ ok: true, goi: await dongGoiDe(env, maCa, sbd, bu ? bu.tho : k.tho, k.etag), phien: k.etag })
 }
 
 /** Phản hồi `/nop` có tờ đáp án: ghép THẲNG nguyên văn JSON tờ đáp án (đã kiểm hợp lệ lúc đệm) thay vì parse rồi stringify lại ~100 KB
@@ -720,7 +740,8 @@ async function congBoSauNop(
   env: Env,
   maCa: string,
   ca: { cong_bo?: unknown; so_cau_json?: unknown } | null,
-  keySom: Promise<{ giaTri: unknown; tho: string | null } | null> | null,
+  keySom: Promise<{ giaTri: unknown; tho: string | null; etag?: string } | null> | null,
+  b: Record<string, unknown> = {},
 ): Promise<Record<string, unknown> & { __keyTho?: string | null }> {
   const congBo = String(ca?.cong_bo ?? 'khong')
   if (congBo !== 'ngay') return { congBo }
@@ -728,6 +749,9 @@ async function congBoSauNop(
   // Đệm isolate + hỏi R2 CÓ ĐIỀU KIỆN mỗi lần (dem-ca-thi.ts): tươi như đọc thẳng, không tải lại thân khi tờ đáp án không đổi.
   const k = (await keySom) ?? (await docKeyBankDem(env, maCa).catch(() => null))
   if (!k || k.giaTri === null) return { congBo, keyBank: null }
+  // 31/10 (khoa-de-thi.ts): máy em giữ sẵn gói tờ đáp án đã khoá, ĐÚNG phiên bản tờ mới nhất ⇒ chỉ trao chìa (43 ký tự) thay cho ~100 KB tờ đáp án.
+  const sbdNop = String(b.sbd ?? '').trim()
+  if (sbdNop && env.MA_BI_MAT && dungGoiDe(b, k.etag)) return { congBo, khoaKq: await chiaGoiDe(env, maCa, sbdNop), phienGoi: k.etag }
   // TỜ ĐÁP ÁN THIẾU `soCau` (bị ghi đè trước đây) ⇒ bù từ D1 (`ca.so_cau_json`, đã đọc cùng câu truy vấn — không tốn thêm vòng). Thiếu mẫu số thì máy em mở lại app
   // dựng bộ câu "bù cho đủ cả kho" và chấm loãng điểm. Chỉ BÙ khi thiếu; nối thẳng vào chuỗi JSON nguyên văn (khỏi stringify lại cả tờ đáp án).
   const bu = buSoCauChoKeyBank(k.giaTri, k.tho, ca?.so_cau_json)
@@ -3580,6 +3604,7 @@ const boXuLy = {
       if (p === '/vao-thi') return vaoThi(env, b)
       if (p === '/luu-tam') return luuTam(env, b)
       if (p === '/nop') return nop(env, b)
+      if (p === '/khoa-de') return khoaDe(env, b)
       if (p === '/trang-thai') return dayTrangThai(env, b)
       if (p === '/phong-cho') return ghiPhongCho(env, b)
       if (p === '/hs/dang-nhap') {

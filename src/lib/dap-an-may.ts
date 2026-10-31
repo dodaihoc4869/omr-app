@@ -23,21 +23,28 @@ export const tuB64u = (s: string): Uint8Array<ArrayBuffer> => {
 }
 const khoaAes = (khoa: string, dung: KeyUsage[]) => crypto.subtle.importKey('raw', tuB64u(khoa), { name: 'AES-GCM' }, false, dung)
 
-/** Mã hoá phần chấm của câu `qid` bằng `khoa` (base64url 32 byte): base64url(iv 12 byte ‖ bản mã), dữ liệu kèm = qid. */
-export async function maHoaDapAn(khoa: string, qid: string, da: unknown): Promise<string> {
+/** Mã hoá CHUỖI `chu` bằng `khoa` (base64url 32 byte), dữ liệu kèm `kem`: base64url(iv 12 byte ‖ bản mã). */
+export async function maHoaChuoi(khoa: string, kem: string, chu: string): Promise<string> {
   const iv = crypto.getRandomValues(new Uint8Array(new ArrayBuffer(12)))
-  const ma = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv, additionalData: enc.encode(qid) }, await khoaAes(khoa, ['encrypt']), enc.encode(JSON.stringify(da))))
+  const ma = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv, additionalData: enc.encode(kem) }, await khoaAes(khoa, ['encrypt']), enc.encode(chu)))
   const ra = new Uint8Array(12 + ma.length)
   ra.set(iv); ra.set(ma, 12)
   return b64u(ra)
 }
-/** Mở gói bằng `khoa`. Sai khoá / sai câu / gói hỏng ⇒ null. */
-export async function giaiDapAn(khoa: string, qid: string, goi: string): Promise<unknown> {
+/** Mở gói chuỗi. Sai khoá / sai dữ liệu kèm / gói hỏng ⇒ null. */
+export async function giaiChuoi(khoa: string, kem: string, goi: string): Promise<string | null> {
   try {
     const b = tuB64u(goi)
-    const ro = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b.slice(0, 12), additionalData: enc.encode(qid) }, await khoaAes(khoa, ['decrypt']), b.slice(12))
-    return JSON.parse(dec.decode(ro))
+    return dec.decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b.slice(0, 12), additionalData: enc.encode(kem) }, await khoaAes(khoa, ['decrypt']), b.slice(12)))
   } catch { return null }
+}
+/** Mã hoá phần chấm của câu `qid` bằng `khoa` (base64url 32 byte): base64url(iv 12 byte ‖ bản mã), dữ liệu kèm = qid. */
+export const maHoaDapAn = (khoa: string, qid: string, da: unknown): Promise<string> => maHoaChuoi(khoa, qid, JSON.stringify(da))
+/** Mở gói bằng `khoa`. Sai khoá / sai câu / gói hỏng ⇒ null. */
+export async function giaiDapAn(khoa: string, qid: string, goi: string): Promise<unknown> {
+  const chu = await giaiChuoi(khoa, qid, goi)
+  if (chu === null) return null
+  try { return JSON.parse(chu) } catch { return null }
 }
 /** Mở trường `dm` («khoá.gói») của câu `qid`. Không hợp lệ ⇒ null. */
 export async function moDm(qid: string, dm: unknown): Promise<DapAnMay | null> {

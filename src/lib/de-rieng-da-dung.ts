@@ -10,7 +10,8 @@
 // và nói ra (bảng Xem trước phân bổ + cảnh báo lúc Bắt đầu).
 import { mergeAndStrip, type TeacherExamSource, type TeacherMcqQuestion, type TeacherShortAnswerQuestion } from '../data/examContent'
 import { loadExamSources, loadSessionTeacherBank, saveSessionTeacherBank } from './exam-db'
-import { cauDaDungTheoEm, cauThayTheoEm, noiKhoCa, type CauDaDungEm, type YeuCauThayEm } from './exam-api'
+import { noiKhoCa } from './exam-api'
+import { cauDaDungTheoEm, cauThayTheoEm, type CauDaDungEm, type YeuCauThayEm } from './ca-em-thay-api'
 import { ngayVnCua } from './de-rieng-nguon'
 import { cauNgoaiTuBanDoiSo, khoDayDu, napNguon, timCau, type CauNgoai } from './de-rieng-v2'
 import type { CauKhoV2 } from './rut-de-v2'

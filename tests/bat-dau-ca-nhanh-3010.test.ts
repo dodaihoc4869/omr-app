@@ -19,9 +19,11 @@ const docSoCauCa = vi.fn()
 
 vi.mock('../src/lib/exam-api', async (goc) => ({
   ...(await goc<Record<string, unknown>>()),
+  noiKhoCa: (...a: unknown[]) => noiKhoCaMock(...(a as [])),
+}))
+vi.mock('../src/lib/ca-em-thay-api', () => ({
   loiDenHanTheoEm: (...a: unknown[]) => loiDenHanTheoEm(...a),
   coLuotMoiTheoEm: (...a: unknown[]) => coLuotMoiTheoEm(...a),
-  noiKhoCa: (...a: unknown[]) => noiKhoCaMock(...(a as [])),
 }))
 vi.mock('../src/lib/exam-db', async (goc) => ({
   ...(await goc<Record<string, unknown>>()),
