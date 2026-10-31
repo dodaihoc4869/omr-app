@@ -1,0 +1,51 @@
+# CHẤM LẠI MỘT LƯỢT SAU KHI THẦY NHẬN BÀI BỔ SUNG (31/10: thầy «Chấm lại bài cho 12070» — bấm Nhận lúc 19:45:52 đúng lúc Worker đổi bản ⇒ bài đã gộp đủ 28 câu nhưng
+// bước chấm lại cả ca hỏng, điểm vẫn 1,75; ca đã đóng nên không tự chấm nữa). Cách làm: xoá điểm CŨ của ĐÚNG lượt ấy (chỉ khi bài bổ sung của lượt đã `nhan`) ⇒ cron
+// chấm bù mỗi phút (server/src/cham-bu.ts) chấm lại bằng ĐÚNG lõi máy chủ và ghi qua ĐÚNG đường `chamDiem`. Một lượt, một em — không đụng em khác. SBD che trong nhật ký.
+name: Chấm lại một lượt sau khi nhận bài bổ sung
+on:
+  workflow_dispatch:
+    inputs:
+      ma_ca:
+        description: 'Mã ca'
+        required: true
+        type: string
+      sbd:
+        description: 'Số báo danh (che trong nhật ký)'
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  cham:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Che số báo danh
+        run: |
+          S=$(jq -r '.inputs.sbd' "$GITHUB_EVENT_PATH" | tr -cd '0-9A-Za-z')
+          echo "::add-mask::$S"
+          echo "SBD_EM=$S" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Xoá điểm cũ của đúng lượt (chỉ khi bài bổ sung đã nhận) rồi chờ cron chấm bù
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+          MA_CA: ${{ inputs.ma_ca }}
+        run: |
+          S="'${SBD_EM}'"; C="'$(echo "$MA_CA" | tr -cd '0-9A-Za-z_-')'"
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c ".[0] | {results, changes: .meta.changes}" || echo "(lỗi)"; }
+          q "trước: lần · trạng thái · điểm · bài bổ sung" "SELECT lan_thu, trang_thai, tong, (SELECT group_concat(trang_thai) FROM bai_bo_sung b WHERE b.ma_ca=l.ma_ca AND b.sbd=l.sbd) bo_sung FROM luot l WHERE l.ma_ca=$C AND l.sbd=$S"
+          q "xoá điểm cũ (một lượt)" "UPDATE luot SET tong=NULL WHERE ma_ca=$C AND sbd=$S AND trang_thai IN ('da_nop','khoa') AND EXISTS (SELECT 1 FROM bai_bo_sung b WHERE b.ma_ca=luot.ma_ca AND b.sbd=luot.sbd AND b.lan_thu=luot.lan_thu AND b.trang_thai='nhan')"
+          for i in 1 2 3 4 5 6 7 8; do
+            sleep 30
+            T=$(npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT tong FROM luot WHERE ma_ca=$C AND sbd=$S" | jq -r '.[0].results[0].tong')
+            echo "sau $((i*30)) giây: điểm = $T"
+            [ "$T" != "null" ] && break
+          done
+          q "sau: lần · trạng thái · điểm I/II/III · tổng · cập nhật (VN)" "SELECT lan_thu, trang_thai, diem_i, diem_ii, diem_iii, tong, strftime('%H:%M:%S', cap_nhat_luc, '+7 hours') cap_nhat FROM luot WHERE ma_ca=$C AND sbd=$S"
