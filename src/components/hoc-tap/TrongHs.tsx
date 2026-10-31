@@ -213,9 +213,11 @@ function Ruong() {
     <path className="rg-ngoc" d="M48 30l12 10-12 18-12-18z" /><path className="rg-ngoc-sang" d="M48 30l12 10H36z" /><path className="rg-ngoc-dam" d="M48 58l-12-18h12z" />
   </svg>
 }
-/** Vòng tiến độ quanh nút HIỆN TẠI (thầy 27/10, ảnh Duolingo; «làm sát lại, tinh tế hơn»): bốn đoạn đầu tròn, khe nhỏ, ôm sát nút (khe ~5–7 px), nền xám
- *  rất nhạt; phần đã làm cùng màu nút, tô dần 0 → tỉ lệ thật lúc mở (mặt nạ stroke-dashoffset, 500 ms ease-out). Không có số ⇒ vòng xám nguyên. */
-const CV = 2 * Math.PI * 54, KHE = 14 // khe theo đơn vị khung 116 (nét 8 đầu tròn ⇒ khe nhìn thấy ~5 px)
+/** Vòng tiến độ quanh nút HIỆN TẠI (thầy 27/10, ảnh Duolingo; «làm sát lại, tinh tế hơn»): bốn đoạn đầu tròn, khe nhỏ, ôm sát nút, nền xám
+ *  rất nhạt; phần đã làm cùng màu nút, tô dần 0 → tỉ lệ thật lúc mở (mặt nạ stroke-dashoffset, 500 ms ease-out). Không có số ⇒ vòng xám nguyên.
+ *  31/10 (thầy «vòng bị lệch, muốn khít cân đối»): cỡ / tâm / nét ở trong-hs.css (vòng đặt đúng tâm khối mặt + đáy, khe đều ~5 px mọi phía). */
+// khe giữa hai đoạn theo đơn vị khung 116 — CHUNG cho vòng 4 đoạn và vòng đoạn theo câu (nét 5,7 đầu tròn ⇒ khe nhìn thấy ~3 px ở vòng 102 px)
+const CV = 2 * Math.PI * 54, KHE = 9
 /** `so` = số đoạn (mặc định 4). Nút Kiểm tra ôn tập (28/10): MỖI CHẶNG MỘT ĐOẠN, `pt` = chặng đã chốt / tổng ⇒ tô trọn đúng số đoạn (mặt nạ dừng giữa khe).
  *  `da` (thầy 30/10 «chặng đó bao nhiêu câu thì chia thành bấy nhiêu đoạn, xong câu nào thì đoạn câu đó đồng bộ tức thì tô màu, làm khít lại, hiệu ứng tinh
  *  tế hơn») ⇒ vòng ĐOẠN: `so` đoạn = số câu, `da` đoạn đầu tô trọn; đoạn VỪA xong kể từ lần vẽ trước (nhớ theo `khoa` trong phiên trình duyệt) vẽ dần + sáng
@@ -231,10 +233,9 @@ function VongChang({ pt, so = 4, da, khoa }: { pt?: number; so?: number; da?: nu
     {L > 0 && <circle className="chay" {...doan} mask={`url(#${id})`} />}</svg>
 }
 
-const KHE_DOAN = 8 // khe giữa hai đoạn (đơn vị khung 116; nét 6 đầu tròn ⇒ khe nhìn thấy ~3.5 px thanh mảnh, ôm khít tinh tế)
 function VongDoan({ so, da, khoa }: { so: number; da: number; khoa?: string }) {
   const n = Math.max(1, Math.min(12, Math.round(so))), d = Math.max(0, Math.min(n, Math.round(da)))
-  const doan = CV / n, cung = Math.max(4, doan - (n > 1 ? KHE_DOAN : 0))
+  const doan = CV / n, cung = Math.max(4, doan - (n > 1 ? KHE : 0))
   // đoạn tô MỚI kể từ lần vẽ trước: lần đầu trong phiên ⇒ không hiệu ứng (hiện ngay); quay về Lộ trình sau khi làm câu ⇒ chỉ các đoạn mới chạy
   // mốc giữ nguyên qua các lần vẽ lại cùng số câu (màn còn vẽ lại sau khi hiện — mất mốc là mất hiệu ứng), đổi khi số câu đổi
   const moc = useRef<{ d: number; tu: number } | null>(null)
@@ -246,7 +247,7 @@ function VongDoan({ so, da, khoa }: { so: number; da: number; khoa?: string }) {
     {Array.from({ length: n }, (_, i) => {
       const moi = i < d && i >= tu
       return <circle key={i} className={i < d ? 'chay' : 'nen'} data-moi={moi || undefined} cx="58" cy="58" r="54" strokeDasharray={`${cung} ${CV}`}
-        strokeDashoffset={-(i * doan + (n > 1 ? KHE_DOAN / 2 : 0))} style={moi ? { '--tre': `${(i - tu) * 160}ms` } as CSSProperties : undefined} />
+        strokeDashoffset={-(i * doan + (n > 1 ? KHE / 2 : 0))} style={moi ? { '--tre': `${(i - tu) * 160}ms` } as CSSProperties : undefined} />
     })}
   </svg>
 }
