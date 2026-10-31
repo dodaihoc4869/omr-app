@@ -59,6 +59,7 @@ jobs:
           node - <<'JS'
           const q = `query($a: String!, $f: Time!, $t: Time!) { viewer { accounts(filter: {accountTag: $a}) {
             w: workersInvocationsAdaptive(limit: 400, filter: {scriptName: "omr", datetime_geq: $f, datetime_leq: $t}, orderBy: [datetimeMinute_ASC]) { dimensions { datetimeMinute status } sum { requests errors } }
+            q: workersInvocationsAdaptive(limit: 100, filter: {scriptName: "omr", datetime_geq: $f, datetime_leq: $t}, orderBy: [datetimeMinute_ASC]) { dimensions { datetimeMinute } sum { requests } quantiles { wallTimeP50 wallTimeP99 } }
             d: durableObjectsInvocationsAdaptiveGroups(limit: 400, filter: {datetime_geq: $f, datetime_leq: $t}, orderBy: [datetimeMinute_ASC]) { dimensions { datetimeMinute status } sum { requests errors } }
           } } }`
           const r = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: { authorization: `Bearer ${process.env.T}`, 'content-type': 'application/json' },
@@ -66,6 +67,8 @@ jobs:
           const j = await r.json().catch(() => null)
           if (j?.errors?.length) console.log('lỗi GraphQL:', JSON.stringify(j.errors).slice(0, 600))
           const acc = j?.data?.viewer?.accounts?.[0] ?? {}
+          console.log('== Worker theo phút VN: lượt · thời gian thực p50 / p99 (ms)')
+          for (const x of acc.q ?? []) console.log(new Date(Date.parse(x.dimensions.datetimeMinute) + 7 * 3600e3).toISOString().slice(11, 16), x.sum.requests, Math.round(x.quantiles.wallTimeP50 / 1000), Math.round(x.quantiles.wallTimeP99 / 1000))
           for (const [ten, ds] of [['Worker', acc.w ?? []], ['Ngăn (DO)', acc.d ?? []]]) {
             console.log(`== ${ten}: phút VN · trạng thái · lượt · lỗi`)
             for (const x of ds) if (x.dimensions.status !== 'success' || x.sum.errors > 0) console.log(new Date(Date.parse(x.dimensions.datetimeMinute) + 7 * 3600e3).toISOString().slice(11, 16), x.dimensions.status, x.sum.requests, x.sum.errors)
