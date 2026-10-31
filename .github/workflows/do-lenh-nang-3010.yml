@@ -1,4 +1,4 @@
-# ĐO LỆNH NẶNG (chạy lại 31/10 ~13h: sau #662+#663 — bốc thăm v2, đệm, log lỗi) THEO ĐƯỜNG (CHỈ ĐỌC, KHÔNG truy vấn D1) — thầy 30/10 21:35: «máy chủ thừa cho hàng trăm nghìn học sinh mà tối nào có 200 hs làm cũng kêu lag».
+# ĐO LỆNH NẶNG (chạy lại 31/10 ~13h05: sau #665 — bốc thăm v3 đo bản sao, đệm phản hồi) THEO ĐƯỜNG (CHỈ ĐỌC, KHÔNG truy vấn D1) — thầy 30/10 21:35: «máy chủ thừa cho hàng trăm nghìn học sinh mà tối nào có 200 hs làm cũng kêu lag».
 # 1) wrangler tail 120 giây giờ cao điểm: theo đường (bỏ chuỗi hỏi, rút gọn mã) — số lần, CPU tb/p90/p99/max, thời gian tường tb/p99, kết cục.
 # 2) Workers Logs (observability) cùng phép gộp cho khung 19:00–21:30 VN nếu khoá có quyền.
 # 3) D1: truy vấn theo tổng thời gian và theo thời gian TB (lâu nhất) khung 19:00–21:30 VN, SQL rút gọn 400 ký tự. Không in SBD / tên / khoá.
