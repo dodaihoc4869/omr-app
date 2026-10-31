@@ -37,17 +37,17 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.restoreAllMocks() })
 
 const ptr = (el: Element, type: string, o: Record<string, unknown>) => act(() => { const e = new Event(type, { bubbles: true }); Object.assign(e, { pointerId: 1, pointerType: 'touch', ...o }); el.dispatchEvent(e) })
-/** Vào sân mạng: bấm nút, mở kết nối, chào, phòng gửi sân 4 ghế (em + 3 A.I). */
-async function vaoSanMang(props: Record<string, unknown> = {}) {
+/** Vào sân mạng: bấm nút, mở kết nối, chào, phòng gửi sân 4 ghế — CHỈ NGƯỜI THẬT (thầy 01/11: không A.I). `soGhe` = 1 ⇒ sân chờ bạn. */
+async function vaoSanMang(props: Record<string, unknown> = {}, soGhe = 4) {
   const r = render(<DauIon maCa="123456" veDau="ve-ky" {...props} />)
   expect(WsGia.ds).toHaveLength(0)
   fireEvent.click(screen.getByRole('button', { name: 'Vào sân đấu' }))
   await act(async () => { await Promise.resolve(); await Promise.resolve() })
   const ws = WsGia.ds[0]
   await act(async () => { ws.moRa(); ws.nhan({ t: 'chao', v: PHIEN_BAN, toi: 1, ten: 'Minh Anh' }) })
-  const ghe = [[1, 'Minh Anh', 3, 0], [250, 'A.I Neon', 6, 1], [251, 'A.I Sulfur', 4, 1], [252, 'A.I Iron', 5, 1]]
+  const ghe = [[1, 'Minh Anh', 3, 0], [2, 'Quốc Bảo', 6, 0], [3, 'Khánh Ngọc', 4, 0], [4, 'Bạn Fe', 5, 0]].slice(0, soGhe)
   await act(async () => { ws.nhan({ t: 'san', v: PHIEN_BAN, so: 1, toi: 1, con: 60, ghe, vp: [[1, 'e', 100, 100]] }) })
-  // Ảnh trận: em ở (300, 300 + 100), bạn A.I ở xa.
+  // Ảnh trận: em ở (200, 200), các bạn ở xa.
   const tr = taoTran(ghe.map((g) => ({ id: g[0] as number, nt: g[2] as number })), 1)
   Object.assign(tr.ghe[0], { x: 200, y: 200 })
   const anh = maAnh(1, 60, tr.ghe, [])
@@ -85,7 +85,23 @@ describe('Đấu Nguyên Tử 2 · màn phòng chờ', () => {
     expect(document.querySelector('.dn-man')).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Rời sân' })).toBeTruthy()
     khung(3)
-    expect(document.body.textContent).toContain('Sân 1 · 1 bạn + 3 A.I')
+    expect(document.body.textContent).toContain('Sân 1 · 4/6 bạn')
+    expect(document.body.textContent).not.toMatch(/A\.I/)
+    expect(document.querySelector('.dn-cho-ban')).toBeNull()
+  })
+
+  it('sân chỉ có em (không A.I, thầy 01/11) ⇒ «Đang chờ bạn vào sân», đồng hồ hiện «Chờ»; bạn thứ 2 vào ⇒ hết chờ', async () => {
+    const { ws } = await vaoSanMang({}, 1)
+    khung(3)
+    expect(screen.getByText('Đang chờ bạn vào sân')).toBeTruthy()
+    expect(document.querySelector('.dn-so-o .dn-o b')!.textContent).toBe('Chờ')
+    expect(document.body.textContent).toContain('Sân 1 · đang chờ bạn thứ 2')
+    expect(document.body.textContent).not.toMatch(/A\.I/)
+    await act(async () => { ws.nhan({ t: 'ghe', ghe: [[1, 'Minh Anh', 3, 0], [2, 'Quốc Bảo', 6, 0]] }); ws.nhan({ t: 'van', con: 60, vp: [] }) })
+    khung(3)
+    expect(document.querySelector('.dn-cho-ban')).toBeNull()
+    expect(document.querySelector('.dn-so-o .dn-o b')!.textContent).toBe('1:00')
+    expect(document.body.textContent).toContain('Sân 1 · 2/6 bạn')
   })
 
   it('KÉO Ở BẤT KỲ ĐÂU (cả nửa dưới màn, ngoài sân) ⇒ cần nổi hiện dưới ngón, máy em gửi đúng HƯỚNG ĐI ~12 lần/giây', async () => {

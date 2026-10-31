@@ -20,9 +20,10 @@ const GIAY_HOI_MAU = 2.5
 const NHIP_HOI_MAU = 0.5
 /** Nhịp phòng đấu (giây). */
 export const BUOC = 1 / 20
-/** Tối đa người thật mỗi sân; A.I lấp cho đủ DU_AI. */
+/** Tối đa người thật mỗi sân (thầy 01/11: «đừng tự thêm máy ảo, hs thách bao nhiêu thì chơi bấy nhiêu, tối đa 6»). */
 export const TOI_DA = 6
-export const DU_AI = 4
+/** Đủ số này người thật thì ván mới chạy; ít hơn ⇒ sân chờ bạn (đồng hồ đứng, em đi thử sân). */
+export const TOI_THIEU = 2
 export const NGUYEN_TO = ['Na', 'O', 'N', 'Cl', 'S', 'Fe', 'Ne'] as const
 export const TEN_NGUYEN_TO = ['Sodium', 'Oxygen', 'Nitrogen', 'Chlorine', 'Sulfur', 'Iron', 'Neon'] as const
 

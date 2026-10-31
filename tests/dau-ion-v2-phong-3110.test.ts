@@ -1,13 +1,14 @@
 // @vitest-environment node
 // «ĐẤU NGUYÊN TỬ 2» · PHÒNG ĐẤU (Durable Object `PhongDauIon`, luật ở server/src/dau-ion-phong.ts) + VÉ + CÔNG TẮC — mô phỏng máy chủ.
-// Khoá: tự ghép sân (≤ 6 người thật, đủ 6 ⇒ sân mới), A.I lấp cho đủ 4 rồi nhường ghế, sân chỉ còn A.I ⇒ đóng, vào giữa ván, trùng nguyên tố ⇒ đổi,
+// Khoá: tự ghép sân (≤ 6 người thật, đủ 6 ⇒ sân mới), KHÔNG A.I (thầy 01/11): 1 em ⇒ chờ bạn, đồng hồ đứng; bạn thứ 2 ⇒ ván chạy; em ngồi chờ
+// một mình được chuyển sang sân còn chỗ; sân hết người ⇒ đóng, vào giữa ván, trùng nguyên tố ⇒ đổi,
 // máy chủ tự ngắm + tự bắn (máy em chỉ gửi hướng đi), cấp súng / vật phẩm chạy ở phòng, ghế vắng không tự bắn, rớt mạng giữ ghế 8 giây,
 // ván 60 giây xoay vòng, dội gói, thầy bắt đầu ⇒ {t:'dong'} + đóng 4000; GIAO THỨC CÓ PHIÊN BẢN: máy cũ ⇒ đóng sạch 4010; vé; 0 lệnh D1.
 import { describe, expect, it, vi } from 'vitest'
 import { CHU_BAN_CU, GIAY_CHO_NOI_LAI, MA_DONG, PHIEN_BAN, PhongDau, TRAN_KET_NOI, TRAN_SAN, type KetNoi } from '../server/src/dau-ion-phong'
 import { PhongDauIon } from '../server/src/phong-dau-ion'
 import { HAN_VE_MS, kiemVeDau, kyVeDau, tenGoi, vaoPhongDau, veDauChoEm } from '../server/src/dau-ion-ve'
-import { BUOC, DU_AI, GIAY_NGHI, GIAY_VAN, TOI_DA } from '../src/lib/dau-ion/loi'
+import { BUOC, GIAY_NGHI, GIAY_VAN, TOI_DA, aiDi } from '../src/lib/dau-ion/loi'
 import { docAnh, maYDinh } from '../src/lib/dau-ion/goi'
 import type { DurableObjectState, Env, WsMayChu } from '../server/src/kieu'
 
@@ -33,7 +34,7 @@ function phong() {
 const vaoSan = (p: PhongDau, s: string, nt = 0, t?: string) => { const k = kn(); p.vao(k, ve(s, t), nt, false); p.nhan(k, JSON.stringify({ t: 'vao-san' })); return k }
 const ghe = (k: KnGia) => (cuoi(k, 'ghe') ?? cuoi(k, 'san'))!.ghe as [number, string, number, number][]
 
-describe('Ghép sân + A.I lấp ghế', () => {
+describe('Ghép sân — chỉ người thật, 2–6 em', () => {
   it('vào phòng: chào có phiên bản giao thức, CHƯA vào sân (0 sân) ⇒ sảnh báo «Sân 1»', () => {
     const { p } = phong()
     const a = kn()
@@ -44,36 +45,42 @@ describe('Ghép sân + A.I lấp ghế', () => {
     expect(a.kem).toMatchObject({ v: PHIEN_BAN, id: 1, s: '11111' })
   })
 
-  it('một em vào sân ⇒ sân mới, A.I lấp cho đủ 4 (tên «A.I <nguyên tố>»); người thật vào ⇒ một A.I nhường ghế ngay', () => {
-    const { p } = phong()
+  it('một em vào sân ⇒ sân CHỈ có em, chờ bạn (đồng hồ đứng 60 giây); bạn thứ 2 vào ⇒ ván mới chạy ngay; không bao giờ có A.I', () => {
+    const { p, chay } = phong()
     const a = vaoSan(p, '1', 3, 'Minh Anh')
-    const san = cuoi(a, 'san')!
-    expect(san).toMatchObject({ v: PHIEN_BAN, so: 1, toi: 1, con: GIAY_VAN })
-    expect(ghe(a)).toHaveLength(DU_AI)
-    expect(ghe(a).filter((g) => g[3] === 1)).toHaveLength(3)
-    expect(ghe(a).filter((g) => g[3]).every((g) => /^A\.I [A-Z][a-z]+$/.test(g[1]))).toBe(true)
-    expect(p.dsSan()).toEqual([{ so: 1, that: 1, ai: 3 }])
-    vaoSan(p, '2', 0)
-    expect(p.dsSan()).toEqual([{ so: 1, that: 2, ai: 2 }])
-    expect(ghe(a)).toHaveLength(4)
+    expect(cuoi(a, 'san')).toMatchObject({ v: PHIEN_BAN, so: 1, toi: 1, con: GIAY_VAN })
+    expect(ghe(a)).toEqual([[1, 'Minh Anh', 3, 0]])
+    expect(p.dsSan()).toEqual([{ so: 1, that: 1, ghe: 1 }])
+    chay(5, [a])
+    expect(p.sanCua(1)!.con).toBe(GIAY_VAN)
+    expect(cuoi(a, 'van')).toBeUndefined()
+    expect(cuoi(a, 'ket')).toBeUndefined()
+    const b = vaoSan(p, '2', 0)
+    expect(cuoi(a, 'van')).toMatchObject({ con: GIAY_VAN })
+    expect(cuoi(b, 'van')).toMatchObject({ con: GIAY_VAN })
+    expect(p.dsSan()).toEqual([{ so: 1, that: 2, ghe: 2 }])
+    chay(2, [a, b])
+    expect(p.sanCua(1)!.con).toBeLessThan(GIAY_VAN - 1.5)
     vaoSan(p, '3'); vaoSan(p, '4')
-    expect(p.dsSan()).toEqual([{ so: 1, that: 4, ai: 0 }])
+    expect(p.dsSan()).toEqual([{ so: 1, that: 4, ghe: 4 }])
+    expect(p.sanCua(1)!.ghe.some((g) => g.ai)).toBe(false)
+    expect(JSON.stringify(a.tin)).not.toMatch(/A\.I/)
   })
 
-  it('tối đa 6 người thật mỗi sân; người thứ 7 ⇒ sân mới (có A.I lấp); sảnh báo đúng sân sẽ vào', () => {
+  it('tối đa 6 người thật mỗi sân; người thứ 7 ⇒ sân mới (chờ bạn); sảnh báo đúng sân sẽ vào', () => {
     const { p } = phong()
     const ds = Array.from({ length: TOI_DA }, (_, i) => vaoSan(p, `S${i}`, i % 7))
-    expect(p.dsSan()).toEqual([{ so: 1, that: 6, ai: 0 }])
+    expect(p.dsSan()).toEqual([{ so: 1, that: 6, ghe: 6 }])
     expect(ghe(ds[0])).toHaveLength(6)
     const cho = kn(); p.vao(cho, ve('CHO'), 0, false)
     expect(cuoi(cho, 'sanh')).toEqual({ t: 'sanh', so: 2, that: 0 })
     const thu7 = vaoSan(p, 'S7')
     expect(cuoi(thu7, 'san')).toMatchObject({ so: 2 })
-    expect(p.dsSan()).toEqual([{ so: 1, that: 6, ai: 0 }, { so: 2, that: 1, ai: 3 }])
+    expect(p.dsSan()).toEqual([{ so: 1, that: 6, ghe: 6 }, { so: 2, that: 1, ghe: 1 }])
     expect(cuoi(cho, 'sanh')).toEqual({ t: 'sanh', so: 2, that: 1 })
   })
 
-  it('mỗi sân 6 màu khác nhau: trùng nguyên tố ⇒ phòng đổi em sang nguyên tố còn trống (A.I trùng màu nhường ghế trước)', () => {
+  it('mỗi sân 6 màu khác nhau: trùng nguyên tố ⇒ phòng đổi em sang nguyên tố còn trống', () => {
     const { p } = phong()
     const a = vaoSan(p, '1', 3), b = vaoSan(p, '2', 3)
     const nt = ghe(a).map((g) => g[2])
@@ -82,15 +89,31 @@ describe('Ghép sân + A.I lấp ghế', () => {
     expect(ghe(b).find((g) => g[0] === 2)![2]).not.toBe(3)
   })
 
-  it('rời sân ⇒ A.I vào thay cho đủ 4; sân chỉ còn A.I ⇒ đóng sân, phòng được ngủ', () => {
-    const { p } = phong()
+  it('rời sân ⇒ còn 1 em thì sân về chờ bạn (đồng hồ đứng, không A.I vào thay); hết người ⇒ đóng sân, phòng được ngủ', () => {
+    const { p, chay } = phong()
     const a = vaoSan(p, '1'), b = vaoSan(p, '2')
+    chay(3, [a, b])
+    expect(p.sanCua(1)!.con).toBeLessThan(GIAY_VAN - 2)
     p.nhan(b, JSON.stringify({ t: 'roi-san' }))
-    expect(p.dsSan()).toEqual([{ so: 1, that: 1, ai: 3 }])
+    expect(p.dsSan()).toEqual([{ so: 1, that: 1, ghe: 1 }])
     expect(cuoi(b, 'sanh')).toBeTruthy()
+    chay(1, [a])
+    expect(p.sanCua(1)!.con).toBe(GIAY_VAN)
     p.nhan(a, JSON.stringify({ t: 'roi-san' }))
     expect(p.soSan).toBe(0)
     expect(p.canThuc()).toBe(false)
+  })
+
+  it('em ngồi chờ một mình mà sân khác còn chỗ ⇒ được chuyển sang đó, ván chạy luôn (không ai chờ một mình khi sân bên cạnh đang đấu)', () => {
+    const { p, chay } = phong()
+    const ds = Array.from({ length: TOI_DA }, (_, i) => vaoSan(p, `S${i}`, i % 7))
+    const thu7 = vaoSan(p, 'S7')
+    expect(cuoi(thu7, 'san')).toMatchObject({ so: 2 })
+    p.nhan(ds[5], JSON.stringify({ t: 'roi-san' }))
+    chay(0.1, [...ds.slice(0, 5), thu7])
+    expect(cuoi(thu7, 'san')).toMatchObject({ so: 1 })
+    expect(p.dsSan()).toEqual([{ so: 1, that: 6, ghe: 6 }])
+    expect(ghe(ds[0]).map((g) => g[0])).toContain(cuoi(thu7, 'san')!.toi)
   })
 
   it('sân đấu kín (14 sân) ⇒ báo chờ, không mở thêm', () => {
@@ -106,34 +129,39 @@ describe('Ghép sân + A.I lấp ghế', () => {
 describe('Phòng quyết mọi thứ: tự ngắm, bắn, cấp súng, vật phẩm', () => {
   it('máy em chỉ gửi hướng đi; phòng đi, tự ngắm, tự bắn ⇒ ảnh trận mã 3 có loạt bắn + mục tiêu, kèm ack của từng em', () => {
     const { p, chay } = phong()
-    const a = vaoSan(p, '1')
+    const a = vaoSan(p, '1'), b = vaoSan(p, '2')
     p.nhan(a, maYDinh(7, 1, 0))
     const x0 = p.sanCua(1)!.ghe.find((g) => g.id === 1)!.x
-    chay(3, [])
+    chay(3, [b])
     const tr = p.sanCua(1)!
     expect(tr.ghe.find((g) => g.id === 1)!.x).not.toBe(x0)
     const anh = a.anh.map((b) => docAnh(b)!)
     expect(anh.length).toBeGreaterThan(50)
-    expect(anh.every((x) => x.ghe.length === 4)).toBe(true)
+    expect(anh.every((x) => x.ghe.length === 2)).toBe(true)
     expect(anh.some((x) => x.su.some((s) => s.t === 'ban'))).toBe(true)
     expect(anh.some((x) => x.ghe.some((g) => g.muc > 0))).toBe(true)
     expect(anh[0].ack).toBe(7)
   })
 
-  it('súng tiến hoá theo electron và Xúc tác ở phòng; bị hạ thì xuống 1 cấp (một sân A.I chạy 60 giây)', () => {
-    const { p, chay } = phong()
-    const a = vaoSan(p, '1')
+  it('súng tiến hoá theo electron và Xúc tác ở phòng; bị hạ thì xuống 1 cấp (sân 4 em thật chạy 60 giây)', () => {
+    const { p, tien } = phong()
+    const ks = ['1', '2', '3', '4'].map((s) => vaoSan(p, s))
+    const ids = ks.map((k) => cuoi(k, 'san')!.toi as number)
     const su: string[] = []
     const capMax = new Map<number, number>()
-    for (let i = 0; i < 60; i++) {
-      chay(1, [a])
-      for (const b of a.anh.splice(0)) { const x = docAnh(b)!; for (const s of x.su) su.push(s.t); for (const g of x.ghe) capMax.set(g.id, Math.max(capMax.get(g.id) ?? 1, g.cap)) }
+    for (let t = 0; t < 60; t += BUOC) {
+      tien(BUOC * 1000)
+      // Mỗi em gửi hướng đi như người chơi (mượn hàm đi của lõi): nhặt vật phẩm, giữ khoảng cách, đi vòng.
+      const tr = p.sanCua(ids[0])!
+      ks.forEach((k, i) => { const g = tr.ghe.find((x) => x.id === ids[i])!; const y = aiDi(tr, g, BUOC); p.nhan(k, maYDinh(0, y.dx, y.dy)) })
+      p.buoc(BUOC)
+      for (const b of ks[0].anh.splice(0)) { const x = docAnh(b)!; for (const s of x.su) su.push(s.t); for (const g of x.ghe) capMax.set(g.id, Math.max(capMax.get(g.id) ?? 1, g.cap)) }
     }
     expect(su).toContain('nhat'); expect(su).toContain('len'); expect(su).toContain('trung'); expect(su).toContain('ha')
     expect(Math.max(...capMax.values())).toBeGreaterThanOrEqual(3)
   })
 
-  it('ghế vắng (không gửi hướng đi quá 3 giây): không tự bắn, không bị A.I ngắm; vắng quá 8 giây ⇒ rời sân, A.I vào thay', () => {
+  it('ghế vắng (không gửi hướng đi quá 3 giây): không tự bắn, không bị ngắm; vắng quá 8 giây ⇒ rời sân, sân về chờ bạn', () => {
     const { p, chay } = phong()
     const a = vaoSan(p, '1'), b = vaoSan(p, '2')
     chay(3.2, [b])
@@ -145,7 +173,7 @@ describe('Phòng quyết mọi thứ: tự ngắm, bắn, cấp súng, vật ph�
     expect(g.ban).toBe(banTruoc)
     expect(tr.ghe.filter((x) => x.id !== 1).every((x) => x.muc !== 1)).toBe(true)
     chay(3.5, [b])
-    expect(p.dsSan()).toEqual([{ so: 1, that: 1, ai: 3 }])
+    expect(p.dsSan()).toEqual([{ so: 1, that: 1, ghe: 1 }])
     expect(cuoi(a, 'sanh')).toBeTruthy()
   })
 
@@ -160,7 +188,7 @@ describe('Phòng quyết mọi thứ: tự ngắm, bắn, cấp súng, vật ph�
     expect(p.sanCua(1)!.ghe.find((x) => x.id === 1)!.cap).toBe(4)
     p.roi(a2)
     chay(GIAY_CHO_NOI_LAI + 0.5, [b])
-    expect(p.dsSan()).toEqual([{ so: 1, that: 1, ai: 3 }])
+    expect(p.dsSan()).toEqual([{ so: 1, that: 1, ghe: 1 }])
     expect(p.soNguoi).toBe(1)
   })
 
@@ -173,23 +201,28 @@ describe('Phòng quyết mọi thứ: tự ngắm, bắn, cấp súng, vật ph�
 
   it('ván 60 giây ⇒ bảng kết quả (hạ · bị hạ · cấp cao nhất · chuỗi hạ), nghỉ 6 giây rồi ván mới tự chạy, ai cũng về Cấp 1', () => {
     const { p, chay } = phong()
-    const a = vaoSan(p, '1')
-    chay(GIAY_VAN + 0.2, [a])
+    const a = vaoSan(p, '1'), b = vaoSan(p, '2')
+    chay(GIAY_VAN + 0.2, [a, b])
     const ket = cuoi(a, 'ket')!
     expect(ket.nghi).toBe(GIAY_NGHI)
-    expect((ket.bang as number[][])).toHaveLength(4)
+    expect((ket.bang as number[][])).toHaveLength(2)
     expect((ket.bang as number[][])[0]).toHaveLength(5)
-    chay(GIAY_NGHI + 0.2, [a])
+    const soVan = a.tin.filter((m) => m.t === 'van').length
+    chay(GIAY_NGHI + 0.2, [a, b])
+    expect(a.tin.filter((m) => m.t === 'van')).toHaveLength(soVan + 1)
     expect(cuoi(a, 'van')).toMatchObject({ con: GIAY_VAN })
     expect(p.sanCua(1)!.ghe.every((g) => g.cap === 1 && g.ha === 0)).toBe(true)
   })
 
   it('«Chơi ván mới»: mọi bạn thật trong sân cùng bấm ⇒ ván mới ngay', () => {
     const { p, chay } = phong()
-    const a = vaoSan(p, '1')
-    chay(GIAY_VAN + 0.2, [a])
+    const a = vaoSan(p, '1'), b = vaoSan(p, '2')
+    chay(GIAY_VAN + 0.2, [a, b])
+    const soVan = a.tin.filter((m) => m.t === 'van').length
     p.nhan(a, JSON.stringify({ t: 'van-moi' }))
-    expect(cuoi(a, 'van')).toBeTruthy()
+    expect(a.tin.filter((m) => m.t === 'van')).toHaveLength(soVan)
+    p.nhan(b, JSON.stringify({ t: 'van-moi' }))
+    expect(a.tin.filter((m) => m.t === 'van')).toHaveLength(soVan + 1)
   })
 
   it('phản ứng nhanh chỉ 4 câu có sẵn, 1 lần / 2 giây, chỉ trong sân; không có ô chat', () => {

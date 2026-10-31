@@ -1,10 +1,12 @@
 // PHÒNG ĐẤU «Đấu Nguyên Tử 2» — luật của MỘT phòng chờ thi (một ca), KHÔNG phụ thuộc cách truyền: Durable Object `PhongDauIon` (phong-dau-ion.ts)
 // chỉ nối WebSocket vào đây; test gọi thẳng với kết nối giả. Phòng QUYẾT mọi thứ (vị trí, TỰ NGẮM, bắn, trúng, hạ, vật phẩm, cấp súng) bằng lõi chung
 // src/lib/dau-ion/loi.ts; máy em chỉ gửi HƯỚNG ĐI. 0 lệnh D1: người vào được nhận diện bằng vé ký (dau-ion-ve.ts) do lệnh vào thi phát.
-// GHÉP SÂN TỰ ĐỘNG (thầy duyệt 31/10): «Vào sân đấu» ⇒ vào sân đang chơi còn chỗ (≤ 6 người thật); đủ 6 ⇒ mở sân mới. Sân dưới 4 người thật ⇒ A.I lấp
-// cho đủ 4; người thật vào ⇒ một A.I nhường ghế ngay; sân chỉ còn A.I ⇒ đóng. Ván 60 giây xoay vòng (nghỉ 6 giây xem bảng). Không thách, không nhóm.
+// GHÉP SÂN TỰ ĐỘNG (thầy duyệt 31/10): «Vào sân đấu» ⇒ vào sân đông người nhất còn chỗ (≤ 6); đủ 6 ⇒ mở sân mới. Ván 60 giây xoay vòng (nghỉ 6 giây
+// xem bảng). CHỈ NGƯỜI THẬT (thầy 01/11: «Game đừng tự thêm máy ảo, hs thách bao nhiêu thì chơi bấy nhiêu, tối đa 6 người chơi cùng lúc»):
+// sân có 1 em ⇒ CHỜ BẠN (đồng hồ đứng ở 60 giây, em đi thử sân); bạn thứ 2 vào ⇒ ván mới chạy ngay cho cả sân; còn 1 em ⇒ về chờ, và có sân khác
+// còn chỗ thì em được chuyển sang đó luôn (không ai ngồi chờ một mình khi sân bên cạnh đang đấu). Sân hết người ⇒ đóng.
 // Ai thấy ai: chỉ các em cùng sân; mỗi em là số thứ tự ngắn + tên gọi (hai chữ cuối) hoặc «Bạn <nguyên tố>» khi bật Ẩn tên. Số báo danh KHÔNG gửi đi.
-import { BUOC, DU_AI, GIAY_NGHI, NGUYEN_TO, TEN_NGUYEN_TO, TOI_DA, aiDi, boGhe, buocTran, laySuKien, taoTran, themGhe, vanMoi, xepBang, type Tran } from '../../src/lib/dau-ion/loi'
+import { BUOC, GIAY_NGHI, GIAY_VAN, NGUYEN_TO, TOI_DA, TOI_THIEU, boGhe, buocTran, laySuKien, taoTran, themGhe, vanMoi, xepBang, type Tran } from '../../src/lib/dau-ion/loi'
 import { PHIEN_BAN, datAck, docYDinh, maAnh } from '../../src/lib/dau-ion/goi'
 
 export interface KetNoi {
@@ -40,7 +42,8 @@ interface Nguoi {
 interface San { so: number; tr: Tran; ds: number[]; tick: number; nghi: number; muonMoi: Set<number>; bang: unknown[] }
 
 const json = (o: unknown) => JSON.stringify(o)
-const ID_AI = 250
+/** Số thứ tự ngắn của em (1…255, một byte trong ảnh trận). */
+const ID_TRAN = 256
 
 export class PhongDau {
   private nguoi = new Map<number, Nguoi>()
@@ -58,12 +61,12 @@ export class PhongDau {
   }
   /** Ảnh chụp để test / đo: ghế từng sân. */
   sanCua(id: number): Tran | null { const n = this.nguoi.get(id); return (n && this.san.get(n.san)?.tr) || null }
-  dsSan(): { so: number; that: number; ai: number }[] { return [...this.san.values()].map((s) => ({ so: s.so, that: s.ds.length, ai: s.tr.ghe.filter((g) => g.ai).length })) }
+  dsSan(): { so: number; that: number; ghe: number }[] { return [...this.san.values()].map((s) => ({ so: s.so, that: s.ds.length, ghe: s.tr.ghe.length })) }
 
   private tenHien(n: Nguoi): string { return n.an || !n.ten ? `Bạn ${NGUYEN_TO[n.nt] ?? 'Na'}` : n.ten }
   private gui(n: Nguoi | undefined, o: unknown): void { if (n?.kn) n.kn.gui(json(o)) }
   private kem(n: Nguoi): KemNguoi { return { v: PHIEN_BAN, id: n.id, s: n.sbd, t: n.ten, nt: n.nt, an: n.an } }
-  private idTrong(): number { for (let i = 1; i < ID_AI; i++) if (!this.nguoi.has(i)) return i; return 0 }
+  private idTrong(): number { for (let i = 1; i < ID_TRAN; i++) if (!this.nguoi.has(i)) return i; return 0 }
 
   /** Sân sẽ vào: sân đang chơi đông người thật nhất mà còn chỗ. */
   private sanSeVao(): San | null {
@@ -164,7 +167,7 @@ export class PhongDau {
   }
 
   private dongGhe(s: San): unknown[] {
-    return s.tr.ghe.map((g) => { const k = this.nguoi.get(g.id); return [g.id, g.ai || !k ? `A.I ${TEN_NGUYEN_TO[g.nt]}` : this.tenHien(k), g.nt, g.ai ? 1 : 0] })
+    return s.tr.ghe.map((g) => { const k = this.nguoi.get(g.id); return [g.id, k ? this.tenHien(k) : `Bạn ${NGUYEN_TO[g.nt] ?? 'Na'}`, g.nt, 0] })
   }
   private goiSan(s: San, n: Nguoi): unknown {
     return { t: 'san', v: PHIEN_BAN, so: s.so, toi: n.id, con: Math.ceil(s.tr.con), ghe: this.dongGhe(s), vp: s.tr.vp.map((v) => [v.id, v.k, Math.round(v.x), Math.round(v.y)]) }
@@ -177,16 +180,8 @@ export class PhongDau {
     for (let i = 0; i < NGUYEN_TO.length; i++) { const nt = (muon + i) % NGUYEN_TO.length; if (!dung.has(nt)) return nt }
     return muon
   }
-  /** A.I lấp cho đủ DU_AI ghế; thừa thì A.I nhường ghế. */
-  private lapAI(s: San): void {
-    const can = Math.max(0, DU_AI - s.ds.length)
-    let ai = s.tr.ghe.filter((g) => g.ai)
-    while (ai.length > can) { boGhe(s.tr, ai[ai.length - 1].id); ai = ai.slice(0, -1) }
-    for (let id = ID_AI; ai.length < can && id < 256; id++) {
-      if (s.tr.ghe.some((g) => g.id === id)) continue
-      ai.push(themGhe(s.tr, { id, nt: this.ntTrong(s, Math.floor(this.rng() * NGUYEN_TO.length)), ai: true }))
-    }
-  }
+  /** Sân đang chờ bạn (dưới TOI_THIEU người thật): đồng hồ đứng, không ai tự bắn được ai. */
+  private choBan(s: San): boolean { return s.ds.length < TOI_THIEU }
 
   private vaoSan(n: Nguoi): void {
     const cu = this.san.get(n.san)
@@ -198,28 +193,50 @@ export class PhongDau {
       s.tr.su = []
       this.san.set(s.so, s)
     }
-    // Người thật vào ⇒ A.I trùng màu (hoặc A.I cuối) nhường ghế TRƯỚC, rồi em ngồi.
-    if (s.ds.length + 1 + s.tr.ghe.filter((g) => g.ai).length > Math.max(DU_AI, s.ds.length + 1)) {
-      const ai = s.tr.ghe.filter((g) => g.ai), trung = ai.find((g) => g.nt === n.nt) ?? ai[ai.length - 1]
-      if (trung) boGhe(s.tr, trung.id)
-    }
-    s.ds.push(n.id); n.san = s.so; n.seq = 0; n.ydLuc = this.bayGio()
-    themGhe(s.tr, { id: n.id, nt: this.ntTrong(s, n.nt) })
-    this.lapAI(s)
-    this.gui(n, this.goiSan(s, n))
-    if (s.nghi > 0) this.gui(n, { t: 'ket', bang: s.bang, nghi: s.nghi })
-    this.baoGhe(s, n)
+    this.ngoiVao(s, n)
     this.baoSanh()
   }
 
-  private roiSan(s: San, n: Nguoi): void {
+  /** Em ngồi vào sân `s`. Sân đang chờ mà đủ người ⇒ ván mới chạy ngay cho cả sân (mọi người về Cấp 1, đồng hồ 60 giây). */
+  private ngoiVao(s: San, n: Nguoi): void {
+    const dangCho = this.choBan(s)
+    s.ds.push(n.id); n.san = s.so; n.seq = 0; n.ydLuc = this.bayGio()
+    themGhe(s.tr, { id: n.id, nt: this.ntTrong(s, n.nt) })
+    this.gui(n, this.goiSan(s, n))
+    if (s.nghi > 0) this.gui(n, { t: 'ket', bang: s.bang, nghi: s.nghi })
+    this.baoGhe(s, n)
+    if (dangCho && !this.choBan(s) && !(s.nghi > 0)) this.batVan(s)
+  }
+
+  /** Em ra khỏi sân `s` (không báo gì cho em). Sân hết người ⇒ đóng, không tốn nhịp. */
+  private boKhoiSan(s: San, n: Nguoi): void {
     s.ds = s.ds.filter((id) => id !== n.id); s.muonMoi.delete(n.id)
     boGhe(s.tr, n.id)
-    n.san = 0; n.vangLuc = 0
-    if (!s.ds.length) this.san.delete(s.so) // sân chỉ còn A.I ⇒ đóng, không tốn nhịp
-    else { this.lapAI(s); this.baoGhe(s) }
+    n.san = 0
+    if (!s.ds.length) this.san.delete(s.so)
+    else this.baoGhe(s)
+  }
+
+  private roiSan(s: San, n: Nguoi): void {
+    this.boKhoiSan(s, n)
+    n.vangLuc = 0
     if (n.kn) this.gui(n, this.chuSanh()); else this.nguoi.delete(n.id)
     this.baoSanh()
+  }
+
+  /** Em đang ngồi chờ MỘT MÌNH mà sân khác còn chỗ và đang có bạn ⇒ chuyển em sang đó (sân đông nhất trước). */
+  private gomSanLe(): void {
+    for (const s of [...this.san.values()]) {
+      if (s.ds.length !== 1) continue
+      const n = this.nguoi.get(s.ds[0])
+      if (!n?.kn) continue
+      let toi: San | null = null
+      for (const o of this.san.values()) if (o !== s && o.ds.length >= 1 && o.ds.length < TOI_DA && (!toi || o.ds.length > toi.ds.length)) toi = o
+      if (!toi) continue
+      this.boKhoiSan(s, n)
+      this.ngoiVao(toi, n)
+      this.baoSanh()
+    }
   }
 
   private batVan(s: San): void {
@@ -229,22 +246,24 @@ export class PhongDau {
     for (const id of s.ds) this.gui(this.nguoi.get(id), { t: 'van', con: Math.ceil(s.tr.con), vp })
   }
 
-  /** Một nhịp phòng (BUOC giây): bước mọi sân, gửi ảnh trận, xử ghế vắng / rớt quá lâu, xoay ván. */
+  /** Một nhịp phòng (BUOC giây): bước mọi sân, gửi ảnh trận, xử ghế vắng / rớt quá lâu, xoay ván, gom em ngồi chờ một mình. */
   buoc(dt = BUOC): void {
     const nay = this.bayGio()
+    this.gomSanLe()
     for (const s of [...this.san.values()]) {
       for (const id of [...s.ds]) {
         const k = this.nguoi.get(id)
         if (!k) continue
         const g = s.tr.ghe.find((x) => x.id === id)
         if (g && nay - k.ydLuc > GIAY_VANG * 1000) { g.vang = true; g.yd = { dx: 0, dy: 0 } }
-        // Rớt mạng quá 8 giây, hoặc mở mà vắng quá 8 giây ⇒ rời sân; A.I vào thay nếu sân dưới 4 người thật.
+        // Rớt mạng quá 8 giây, hoặc mở mà vắng quá 8 giây ⇒ rời sân (còn 1 em ⇒ sân về chờ bạn).
         if ((!k.kn && k.vangLuc && nay - k.vangLuc > GIAY_CHO_NOI_LAI * 1000) || nay - k.ydLuc > GIAY_CHO_NOI_LAI * 1000) this.roiSan(s, k)
       }
       if (!this.san.has(s.so)) continue
       if (s.nghi > 0) { s.nghi -= dt; if (s.nghi <= 0) this.batVan(s); continue }
-      for (const g of s.tr.ghe) if (g.ai) g.yd = aiDi(s.tr, g, dt)
       buocTran(s.tr, dt)
+      // Chờ bạn: em vẫn đi thử sân, nhưng đồng hồ đứng ở 60 giây (ván chỉ chạy khi có bạn thứ 2).
+      if (this.choBan(s)) s.tr.con = GIAY_VAN
       s.tick = (s.tick + 1) & 0xff
       const than = maAnh(s.tick, s.tr.con, s.tr.ghe, laySuKien(s.tr))
       for (const id of s.ds) { const k = this.nguoi.get(id); if (k?.kn) k.kn.gui(datAck(than.slice(), k.seq)) }
