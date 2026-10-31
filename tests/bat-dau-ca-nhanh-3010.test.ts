@@ -78,6 +78,20 @@ describe('máy thầy — nối sớm sau chạy thử, lúc Bắt đầu chỉ 
     expect(await noiSomCauNgoai('', 'MAT', 'CN1')).toBe(0)
   })
 
+  it('CHUẨN BỊ NGẦM (31/10): chốt chạy sẵn khi em vào phòng chờ ⇒ lúc bấm (trong 45 giây) KHÔNG hỏi lại bài mới làm, KHÔNG nối lại; quá 45 giây / không xin bỏ qua ⇒ hỏi như cũ', async () => {
+    await chayThuRutDeCa('', 'MAT', 'CN2', ['A', 'B'], { cheDo: 'ca', ngay: NGAY })
+    coLuotMoiTheoEm.mockResolvedValue({ em: [] })
+    await chotRutDeCa('', 'MAT', 'CN2', ['A', 'B'], { cheDo: 'ca', ngay: NGAY, phamVi: 'gan_nhat' }) // lượt chuẩn bị ngầm
+    expect(coLuotMoiTheoEm).toHaveBeenCalledTimes(1)
+    expect(noiKhoCaMock).toHaveBeenCalledTimes(1)
+    const bam = await chotRutDeCa('', 'MAT', 'CN2', ['A', 'B'], { cheDo: 'ca', ngay: NGAY, phamVi: 'gan_nhat', boQuaKiemMoiMs: 45_000 }) // thầy bấm
+    expect(coLuotMoiTheoEm).toHaveBeenCalledTimes(1) // không hỏi lại
+    expect(noiKhoCaMock).toHaveBeenCalledTimes(1) // không nối lại
+    expect(bam.boTheoEm.A).toContain('D-I-3~ss0')
+    await chotRutDeCa('', 'MAT', 'CN2', ['A', 'B'], { cheDo: 'ca', ngay: NGAY, phamVi: 'gan_nhat' }) // không xin bỏ qua ⇒ hỏi như cũ
+    expect(coLuotMoiTheoEm).toHaveBeenCalledTimes(2)
+  })
+
   it('đã nối sớm mà lượt nối phần chênh lúc Bắt đầu hỏng ⇒ VẪN giữ câu đã nối sẵn (bản cũ bỏ hết câu ngoài kho)', async () => {
     await chayThuRutDeCa('', 'MAT', 'CN2', ['A'], { cheDo: 'ca', ngay: NGAY })
     await noiSomCauNgoai('', 'MAT', 'CN2')

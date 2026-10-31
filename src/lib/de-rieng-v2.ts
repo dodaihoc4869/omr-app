@@ -329,7 +329,7 @@ export async function chotRutDeCa(
   mat: string,
   maCa: string,
   dsCho: string[],
-  tuyChon: { cheDo: 'ca' | 'diem_yeu'; ngay?: string; phamVi?: 'gan_nhat' | 'ba_ca' | 'khong' },
+  tuyChon: { cheDo: 'ca' | 'diem_yeu'; ngay?: string; phamVi?: 'gan_nhat' | 'ba_ca' | 'khong'; boQuaKiemMoiMs?: number },
 ): Promise<KetQuaChotV2> {
   const ngay = tuyChon.ngay ?? ngayVnCua(Date.now())
   const canhBao: string[] = []
@@ -341,9 +341,13 @@ export async function chotRutDeCa(
     // CHẠY THỬ CŨ: em làm bài (mọi kênh) từ lúc chạy thử tới giờ ⇒ câu ấy không còn là câu "mới" của em. Có lượt mới của BẤT KỲ em nào
     // trong danh sách ca ⇒ rút lại CẢ LỚP bằng hồ sơ mới (cùng seed `maCa`: em không đổi dữ liệu thì ra đúng bộ cũ). Lỗi ⇒ giữ bản cũ + nói ra.
     const dsCa = [...new Set([...Object.keys(rt.kq.theoEm), ...dsCho.map((x) => String(x || '').trim()).filter(Boolean)])].sort()
-    try {
+    // CHUẨN BỊ NGẦM (31/10, thầy «bấm bắt đầu phải tức thì»): máy thầy vừa kiểm «bài mới làm» trong `boQuaKiemMoiMs` (lượt chuẩn bị nền khi em vào phòng
+    // chờ) ⇒ lúc bấm KHÔNG hỏi lại (em đang ngồi phòng chờ, không làm bài). Mặc định 0 = luôn hỏi như cũ.
+    const vuaKiem = !!tuyChon.boQuaKiemMoiMs && !!rt.mocDoc && Date.now() - Date.parse(rt.mocDoc) < tuyChon.boQuaKiemMoiMs
+    if (!vuaKiem) try {
       const mocKiem = new Date().toISOString() // TRƯỚC khi hỏi: lượt làm xen giữa vẫn bị bắt ở lần kiểm sau
       const { em: emMoi } = await coLuotMoiTheoEm(url, mat, dsCa, rt.mocDoc ?? rt.lucRut)
+      if (emMoi.length === 0) { rt = { ...rt, mocDoc: mocKiem }; nho.set(maCa, rt) } // không ai làm thêm ⇒ dời mốc kiểm (lần sau hỏi từ đây)
       if (emMoi.length > 0) {
         const cu = rt
         try {
