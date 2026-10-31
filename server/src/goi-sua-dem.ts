@@ -58,6 +58,9 @@ export async function danhSachNgay(env: Env, sbd: string, nowMs: number): Promis
 }
 
 /** Đóng gói cho MỘT em. Trả số câu trong gói; null = chưa đóng được lúc này (ca thi mở / lỗi) ⇒ lượt cron sau thử lại. */
+/** Trần cỡ gói (ký tự JSON) — khớp ngân sách bộ nhớ máy em (src/lib/nap-truoc-sua.ts `NGAN_SACH`). */
+export const TRAN_GOI_SUA = 2_000_000
+
 export async function dongGoiSuaEm(env: Env, sbd: string, nowMs: number): Promise<number | null> {
   const ngay = ngayVn(nowMs)
   const danDau = (so: number) => env.DB.prepare(`INSERT INTO ${BANG_GOI_SUA}(sbd,ngay,luc,so) VALUES(?1,?2,?3,?4)
@@ -72,7 +75,11 @@ export async function dongGoiSuaEm(env: Env, sbd: string, nowMs: number): Promis
     const qids = (ds?.m ?? []).filter((x) => !ds!.xong.has(x.d || x.q) && !ds!.xong.has(x.q)).map((x) => x.q)
     if (!qids.length) { await danDau(0); return 0 }
     const mo = await moNhieuCau(env, sbd, qids, { song: 3, hetMs: 90_000, hanTem: HAN_NIEM_CHUAN_BI_MS })
+    // NGÂN SÁCH CỠ GÓI (thầy 31/10, iPhone sập lúc «Tiếp tục»): đề có thể kèm ảnh nhúng ⇒ gói chỉ giữ tới TRAN_GOI_SUA ký tự (máy em phân tích MỘT lượt);
+    // câu vượt ⇒ máy em tải từng lượt / khi bấm như cũ (cùng ngân sách bộ nhớ nap-truoc-sua.ts).
+    let co = 0
     const tot = mo.filter((x) => x.ok === true && !!x.gon && (x.gon as Obj).ok === true)
+      .filter((x) => { const n = JSON.stringify(x).length; if (co + n > TRAN_GOI_SUA) return false; co += n; return true })
     const goi: GoiSuaNgay = { v: 1, n: ngay, luc: nowMs, ds: tot }
     await env.DE.put(khoaGoiSua(ngay, sbd), JSON.stringify(goi), { httpMetadata: { contentType: 'application/json' } })
     await env.DE.delete(khoaGoiSua(ngayVn(nowMs - 86_400_000), sbd)).catch(() => {})
