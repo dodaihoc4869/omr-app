@@ -1,0 +1,53 @@
+# D1 NẶNG NHẤT MẤY PHÚT VỪA QUA (CHỈ ĐỌC) — 31/10 19:20 «D1 DB is overloaded. Requests queued for too long» giữa giờ cao điểm. In: D1 theo phút (số truy vấn,
+# tổng giây chạy, hàng đọc) và các nhóm truy vấn chiếm thời gian nhất trong PHUT phút (SQL rút gọn, không tham số, không tên / SBD).
+name: D1 nặng nhất mấy phút vừa qua (chỉ đọc)
+on:
+  workflow_dispatch:
+    inputs:
+      phut:
+        description: 'Số phút nhìn lại'
+        required: false
+        default: '30'
+permissions:
+  contents: read
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DB_ID: d2e6d322-374a-45d7-83a3-9fac486b23f1
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: D1 theo phút + truy vấn nặng nhất
+        env:
+          TOKEN: ${{ env.CF_TOKEN_SACH }}
+          ACC: ${{ env.CF_ACC_SACH }}
+          PHUT: ${{ inputs.phut }}
+        run: |
+          node - <<'JS'
+          const { TOKEN, ACC, DB_ID, PHUT } = process.env
+          const H = { authorization: `Bearer ${TOKEN}`, 'content-type': 'application/json' }
+          const hoi = async (query, variables) => {
+            const r = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ query, variables }) })
+            const j = await r.json(); if (j.errors?.length) console.log('LỖI GraphQL:', JSON.stringify(j.errors).slice(0, 600)); return j.data
+          }
+          const den = new Date(), tu = new Date(den.getTime() - Number(PHUT || 30) * 60e3)
+          const v = { acc: ACC, db: DB_ID, tu: tu.toISOString(), den: den.toISOString() }
+          const vn = (s) => new Date(Date.parse(s) + 7 * 3600e3).toISOString().slice(11, 16)
+          const p = await hoi(`query($acc:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+            d1AnalyticsAdaptiveGroups(limit:200,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[datetimeMinute_ASC]){
+            dimensions{datetimeMinute} sum{readQueries writeQueries rowsRead rowsWritten queryBatchTimeMs} quantiles{queryBatchTimeMsP50 queryBatchTimeMsP90}}}}}`, v)
+          console.log('=== D1 theo phút VN: đọc · ghi · hàng đọc · tổng giây · lô p50/p90 ms ===')
+          for (const x of p?.viewer?.accounts?.[0]?.d1AnalyticsAdaptiveGroups ?? []) console.log(vn(x.dimensions.datetimeMinute), x.sum.readQueries, x.sum.writeQueries, x.sum.rowsRead, (x.sum.queryBatchTimeMs / 1000).toFixed(1), Math.round(x.quantiles.queryBatchTimeMsP50), Math.round(x.quantiles.queryBatchTimeMsP90))
+          const d1 = await hoi(`query($acc:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+            d1QueriesAdaptiveGroups(limit:60,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[sum_queryDurationMs_DESC]){
+            count sum{queryDurationMs rowsRead rowsWritten} dimensions{query}}}}}`, v)
+          const ds = d1?.viewer?.accounts?.[0]?.d1QueriesAdaptiveGroups ?? []
+          console.log(`=== D1: nhóm nặng nhất ${PHUT} phút · tổng ${Math.round(ds.reduce((n, x) => n + x.sum.queryDurationMs, 0) / 1000)} s ===`)
+          for (const x of ds.slice(0, 25)) console.log([`lan=${x.count}`, `tongS=${(x.sum.queryDurationMs / 1000).toFixed(1)}`, `tbMs=${(x.sum.queryDurationMs / Math.max(1, x.count)).toFixed(1)}`, `docTB=${Math.round(x.sum.rowsRead / Math.max(1, x.count))}`, `ghi=${x.sum.rowsWritten}`, '|', String(x.dimensions.query).replace(/\s+/g, ' ').replace(/\d{5,}/g, '<so>').slice(0, 260)].join(' '))
+          JS
