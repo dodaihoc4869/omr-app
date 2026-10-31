@@ -48,10 +48,11 @@
 .dn-nut { min-height: 48px; border-radius: 16px; border: 0; font: inherit; font-weight: 800; font-size: 16px; padding: 0 18px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; touch-action: manipulation; transition: transform .1s; }
 .dn-nut:active { transform: translateY(2px); }
 .dn-nut:disabled { opacity: .55; cursor: default; }
-.dn-nut-chinh { background: var(--dn-nut); color: var(--dn-trang); box-shadow: inset 0 -4px 0 var(--dn-nut-day); }
-.dn-nut-vien { background: var(--dn-mat); color: var(--dn-hs-chu); border: 2px solid var(--dn-vien); box-shadow: 0 3px 0 var(--dn-vien); }
+/* .dn-nut.dn-* (0,2,0) thắng `.pc-room button { color: inherit }` của phòng chờ (0,1,1). */
+.dn-nut.dn-nut-chinh { background: var(--dn-nut); color: var(--dn-trang); box-shadow: inset 0 -4px 0 var(--dn-nut-day); }
+.dn-nut.dn-nut-vien { background: var(--dn-mat); color: var(--dn-hs-chu); border: 2px solid var(--dn-vien); box-shadow: 0 3px 0 var(--dn-vien); }
 .dn-nut-to { width: 100%; min-height: 56px; font-size: 18px; border-radius: 18px; }
-.dn-nut-chu { background: transparent; color: var(--dn-hs-chu); min-height: 44px; padding: 0 12px; }
+.dn-nut.dn-nut-chu { background: transparent; color: var(--dn-hs-chu); min-height: 44px; padding: 0 12px; }
 .dn-vao { display: flex; flex-direction: column; gap: 6px; }
 .dn-phu { margin: 0; font-size: 13px; line-height: 1.5; color: var(--dn-chu-3); text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; }
 .dn-hang { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -60,7 +61,7 @@
 .dn-nhan { font-size: 12px; font-weight: 700; color: var(--dn-chu-3); }
 .dn-chon { display: flex; flex-wrap: wrap; gap: 8px; }
 .dn-hat { width: 44px; height: 44px; border-radius: 50%; border: 0; display: grid; place-items: center; flex: none; font: inherit; font-weight: 800; font-size: 14px; background: var(--c); color: var(--dn-tren-mau); padding: 0; }
-.dn-chon .dn-hat { cursor: pointer; touch-action: manipulation; }
+.dn-chon .dn-hat { cursor: pointer; touch-action: manipulation; color: var(--dn-tren-mau); }
 .dn-hat[aria-checked='true'] { box-shadow: 0 0 0 3px var(--dn-mat), 0 0 0 6px var(--c); }
 .dn-cong-tac { display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 14px; color: var(--dn-chu-2); }
 .dn-cong-tac input { width: 20px; height: 20px; accent-color: var(--dn-nut); }
