@@ -6,11 +6,15 @@
 // D1 chỉ còn phần thật sự đổi. Mã xử lý KHÔNG đổi: ngăn gọi lại đúng `fetch` của Worker (dấu `x-trong-ngan-hs` ⇒ đi thẳng, không vòng lại).
 // An toàn: thiếu binding (test, bản cũ) / công tắc `TAT_NGAN_HS` / không đọc được SBD ⇒ đường cũ y nguyên; ngăn lỗi ⇒ tự quay về đường cũ với ĐÚNG thân gói.
 // Không đi qua ngăn: đăng nhập, thi (vào thi / lưu tạm / nộp), lệnh thầy / phụ huynh, GET.
-import type { DurableObjectState, Env, ExecutionContext, KhoEm, SqlNgan } from './kieu'
+import type { DurableObjectState, Env, ExecutionContext, KhoEm, SqlNgan, WsMayChu } from './kieu'
 import { gomD1, type D1Gom, type DemLenhD1 } from './gom-d1'
 import { duongGuiQuaNganGom } from './gom-lien-ngan'
 import { D1_GOC, dbGoc } from './cau-hinh-dem'
 import type { D1Database, D1DatabaseSession } from './kieu'
+import { CHO_PHAT_MS, DUONG_KENH, TOI_DA_KET_NOI, dauMay, kenhDayBat, kiemVeKenh, loaiLenhDoi } from './kenh-day'
+
+declare const WebSocketPair: { new (): { 0: WsMayChu; 1: WsMayChu } }
+declare const WebSocketRequestResponsePair: { new (yeuCau: string, traLoi: string): unknown }
 
 type XuLy = (req: Request, env: Env, ctx?: ExecutionContext) => Promise<Response>
 let xuLy: XuLy | null = null
@@ -33,6 +37,10 @@ export const TIEN_TO_NGAN_D1 = 'd1|'
 export const DAU_CHUYEN_NGAN = 'x-ngan-chuyen'
 /** Lệnh đo vị trí của ngăn (chỉ gọi được qua binding — Worker không chuyển đường này vào ngăn). */
 export const DUONG_DO_VI_TRI = '/__ngan/vi-tri'
+/** KÊNH ĐẨY (kenh-day.ts): dấu máy gửi lệnh (đuôi chữ ký token — chỉ Worker đặt, luôn xoá giá trị máy khách gửi) ⇒ ngăn không đẩy tin về chính máy vừa làm. */
+export const DAU_MAY_NGAN = 'x-ngan-may'
+/** «Chạm» ngăn của em qua ngăn trung chuyển (tạo ngăn cạnh D1 trước khi nối kênh thẳng) — chỉ qua binding. */
+export const DUONG_CHAM_NGAN = '/__ngan/cham'
 export const KHOA_NGAN_DINH = 'ngan_dinh'
 export const KHOA_NGAN_DINH_KHOA = 'ngan_dinh_khoa'
 const RE_TEN_DINH = /^dinh\|(k\|)?\d{1,4}$/
@@ -145,9 +153,16 @@ export class NganHocSinh {
   private demPh = new Map<string, DemPh>()
   /** Phiên D1 gần nhất của em (đọc qua bản sao) — dấu trang lấy từ đây cho lệnh sau. */
   private phienCuoi: D1DatabaseSession | null = null
-  constructor(private readonly state: DurableObjectState, private readonly env: Env) {}
+  /** Tin kênh đẩy đang gom (kenh-day.ts): loại + dấu các máy vừa làm (không đẩy về chúng). */
+  private choPhat: { k: Set<string>; tru: Set<string> } | null = null
+  constructor(private readonly state: DurableObjectState, private readonly env: Env) {
+    // Ping kênh `p` ⇒ `o` do Cloudflare tự trả, không đánh thức ngăn (ngăn ngủ, kết nối vẫn giữ).
+    try { state.setWebSocketAutoResponse?.(new WebSocketRequestResponsePair('p', 'o')) } catch { /* môi trường test */ }
+  }
   async fetch(req: Request): Promise<Response> {
     const duong = new URL(req.url).pathname
+    // KÊNH ĐẨY: Worker đã kiểm vé (vaoKenh — chỉ đường GET này) và đặt dấu máy ⇒ nhận kết nối ngủ đông. Lệnh POST (vaoNgan) không bao giờ mở kênh.
+    if (duong === DUONG_KENH && req.method === 'GET' && req.headers.get('upgrade')?.toLowerCase() === 'websocket') return this.moKenh(req.headers.get(DAU_MAY_NGAN) ?? '')
     // Đo vị trí (bốc thăm ngăn trung chuyển): trạm + bốn vòng `SELECT 1` nối tiếp tới D1 (vòng đầu có thể mang thời gian mở kết nối).
     if (duong === DUONG_DO_VI_TRI) {
       const ms: number[] = []
@@ -169,6 +184,8 @@ export class NganHocSinh {
       if (ns && m && RE_TIEN_D1.test(m[1]!) && m[2] === (req.headers.get(DAU_SBD_NGAN) ?? '')) return ns.get(ns.idFromName(chuyen)).fetch(lai)
       req = lai // tên lạ ⇒ tự xử lý như một ngăn thường (kết quả vẫn đúng, chỉ không sát D1)
     }
+    // «Chạm» (vaoKenh): ngăn của em đã có / vừa tạo cạnh trung chuyển ⇒ xong, kênh nối thẳng sau đó.
+    if (duong === DUONG_CHAM_NGAN) return new Response(null, { status: 204, headers: { 'x-ngan': '1' } })
     if (!xuLy) return new Response(JSON.stringify({ ok: false, error: 'Máy chủ đang khởi động, em thử lại nhé.', maLoi: 'MAY_CHU_BAN' }), { status: 503, headers: { 'content-type': 'application/json' } })
     const state = this.state
     const ctx = { waitUntil: (p: Promise<unknown>) => state.waitUntil(p), passThroughOnException() {} } as unknown as ExecutionContext
@@ -206,7 +223,10 @@ export class NganHocSinh {
     // ĐO THEO LỆNH (31/10): mọi lệnh mang bộ đếm câu / vòng D1 (+ cờ «đã ghi» cho đệm phản hồi); 1/10 lệnh ghi log `[gom-lenh] <đường> cau=… vong=… xl=…`
     // (wrangler tail gom theo đường) — không SBD. Lệnh của em có câu GHI ⇒ bỏ đệm phản hồi của em (cả khi ghi ở việc phụ sau phản hồi).
     const coXem = !!(env.DB as Partial<D1Gom>).voiDem
-    const dem: DemLenhD1 = { cau: 0, vong: new Set(), khiGhi: () => this.demPh.clear() }
+    // Kênh đẩy: lệnh làm đổi tiến độ CÓ câu ghi (kể cả việc phụ sau phản hồi) ⇒ hẹn đẩy tin tới máy khác của em. Lệnh lỗi / token giả không ghi gì ⇒ không đẩy.
+    const loaiDoi = this.env.TAT_KENH_DAY ? null : loaiLenhDoi(duong)
+    const may = req.headers.get(DAU_MAY_NGAN) ?? ''
+    const dem: DemLenhD1 = { cau: 0, vong: new Set(), khiGhi: () => { this.demPh.clear(); if (loaiDoi) this.henPhat(loaiDoi, may) } }
     const envLenh = coXem ? { ...env, DB: (env.DB as D1Gom).voiDem(dem) } : env
     const res = await xuLy(req, this.kho ? { ...envLenh, KHO_EM: this.kho } : envLenh, ctx)
     // Dấu trang: ghi ngay sau phản hồi, và lần nữa sau 3 giây (việc phụ của lệnh thường xong trong khoảng ấy) — ngăn ngủ dậy mở phiên đủ mới.
@@ -230,6 +250,38 @@ export class NganHocSinh {
     }
     return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h })
   }
+
+  // ---------------------------------------------------------------- kênh đẩy (kenh-day.ts)
+  private ketNoiKenh(): WsMayChu[] { try { return this.state.getWebSockets('kenh') } catch { return [] } }
+  private moKenh(may: string): Response {
+    const cu = this.ketNoiKenh()
+    for (const ws of cu.slice(0, Math.max(0, cu.length - TOI_DA_KET_NOI + 1))) { try { ws.close(1000, 'nhieu') } catch { /* đã đóng */ } }
+    const cap = new WebSocketPair()
+    this.state.acceptWebSocket(cap[1], ['kenh'])
+    cap[1].serializeAttachment({ m: may })
+    return new Response(null, { status: 101, webSocket: cap[0] } as ResponseInit)
+  }
+  /** Gom tin trong `CHO_PHAT_MS`; em chỉ có kết nối của chính máy vừa làm (thường gặp: một máy) ⇒ không hẹn gì. */
+  private henPhat(k: string, may: string): void {
+    if (this.choPhat) { this.choPhat.k.add(k); if (may) this.choPhat.tru.add(may); return }
+    if (!this.ketNoiKenh().some((ws) => { const a = ws.deserializeAttachment() as { m?: string } | null; return !may || a?.m !== may })) return
+    const c = { k: new Set([k]), tru: new Set(may ? [may] : []) }
+    this.choPhat = c
+    this.state.waitUntil(new Promise<void>((xong) => setTimeout(() => { this.phat(c); xong() }, CHO_PHAT_MS)))
+  }
+  private phat(c: { k: Set<string>; tru: Set<string> }): void {
+    if (this.choPhat === c) this.choPhat = null
+    if (this.env.TAT_KENH_DAY) return
+    const tin = JSON.stringify({ t: 'doi', k: [...c.k] })
+    for (const ws of this.ketNoiKenh()) {
+      const a = ws.deserializeAttachment() as { m?: string } | null
+      if (a?.m && c.tru.has(a.m)) continue
+      try { ws.send(tin) } catch { /* kết nối vừa đóng */ }
+    }
+  }
+  async webSocketMessage(): Promise<void> { /* máy em chỉ gửi ping `p` (tự trả lời) — gói khác bỏ qua */ }
+  async webSocketClose(ws: WsMayChu, ma: number): Promise<void> { try { ws.close(ma === 1005 || ma === 1006 ? 1000 : ma, 'dong') } catch { /* đã đóng */ } }
+  async webSocketError(ws: WsMayChu): Promise<void> { try { ws.close(1011, 'loi') } catch { /* đã đóng */ } }
 }
 
 /** Đường của app HỌC SINH đi qua ngăn (đều mang `token` game của em). */
@@ -375,13 +427,15 @@ export async function vaoNgan(req: Request, env: Env, ctx?: ExecutionContext): P
   if (!laDuongNgan(p)) return null
   const buf = await req.arrayBuffer()
   const lai = () => new Request(req.url, { method: 'POST', headers: req.headers, body: buf })
-  let sbd: string | null = null
-  try { sbd = sbdChonNgan(await docThan(buf, req)) } catch { /* thân hỏng ⇒ đường cũ báo lỗi JSON như trước */ }
+  let sbd: string | null = null, may = ''
+  try { const than = await docThan(buf, req); sbd = sbdChonNgan(than); may = dauMay((than as { token?: unknown } | null)?.token) } catch { /* thân hỏng ⇒ đường cũ báo lỗi JSON như trước */ }
   if (!sbd) return lai()
   const h = new Headers(req.headers)
   h.set(DAU_TRONG_NGAN, '1')
   h.set(DAU_SBD_NGAN, sbd)
   h.delete(DAU_CHUYEN_NGAN)
+  if (may) h.set(DAU_MAY_NGAN, may)
+  else h.delete(DAU_MAY_NGAN)
   try {
     const cd = env.TAT_NGAN_DINH ? null : await dsDinh(env, ctx)
     const dsD = cd?.ds ?? []
@@ -404,5 +458,40 @@ export async function vaoNgan(req: Request, env: Env, ctx?: ExecutionContext): P
   } catch (e) {
     console.error('[ngan-hs] không vào được ngăn, chạy đường cũ:', e instanceof Error ? e.message : e)
     return lai()
+  }
+}
+
+/**
+ * KÊNH ĐẨY (kenh-day.ts): `GET /hs/kenh?ve=…` (nâng cấp WebSocket) ⇒ ĐÚNG ngăn đang xử lý lệnh của em (cùng tên `d1|` / `apac|` như `vaoNgan`). Ngăn sát D1 chưa
+ * tạo ở isolate này ⇒ «chạm» qua ngăn trung chuyển trước (ngăn tạo cạnh D1 như lệnh đầu), rồi nối THẲNG — ngăn trung chuyển không đứng giữa kết nối.
+ */
+export async function vaoKenh(req: Request, env: Env, ctx?: ExecutionContext): Promise<Response> {
+  const ns = env.NGAN_HS
+  if (!ns || !kenhDayBat(env)) return new Response('Kênh đẩy đang tắt', { status: 410 })
+  if (req.headers.get('upgrade')?.toLowerCase() !== 'websocket') return new Response('Cần WebSocket', { status: 426 })
+  const ve = await kiemVeKenh(env.MA_BI_MAT, new URL(req.url).searchParams.get('ve'))
+  if (!ve) return new Response('Vé kênh không hợp lệ', { status: 403 })
+  const h = new Headers(req.headers)
+  h.set(DAU_TRONG_NGAN, '1')
+  h.set(DAU_SBD_NGAN, ve.s)
+  h.delete(DAU_CHUYEN_NGAN)
+  if (ve.m) h.set(DAU_MAY_NGAN, ve.m)
+  else h.delete(DAU_MAY_NGAN)
+  const toi = new Request(`${new URL(req.url).origin}${DUONG_KENH}`, { method: 'GET', headers: h }) // bỏ vé khỏi đường dẫn trong ngăn
+  try {
+    const cd = env.TAT_NGAN_DINH ? null : await dsDinh(env, ctx)
+    if (cd?.ds.length) {
+      const ten = `${cd.tien}${ve.s}`
+      if (!daTaoNgan.has(ten)) {
+        const hc = new Headers({ [DAU_TRONG_NGAN]: '1', [DAU_SBD_NGAN]: ve.s, [DAU_CHUYEN_NGAN]: ten })
+        const r = await ns.get(ns.idFromName(cd.ds[bamSbd(ve.s) % cd.ds.length]!)).fetch(new Request(`https://ngan${DUONG_CHAM_NGAN}`, { method: 'POST', headers: hc }))
+        if (r.headers.has('x-ngan')) { if (daTaoNgan.size >= 20_000) daTaoNgan.clear(); daTaoNgan.add(ten) }
+      }
+      return await ns.get(ns.idFromName(ten)).fetch(toi)
+    }
+    return await ns.get(ns.idFromName(`${TIEN_TO_NGAN}${ve.s}`), { locationHint: 'apac' }).fetch(toi)
+  } catch (e) {
+    console.error('[kenh-day] không nối được ngăn:', e instanceof Error ? e.message : e)
+    return new Response('Chưa nối được kênh', { status: 503 })
   }
 }
