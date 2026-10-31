@@ -5,7 +5,7 @@ import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assi
 import { qidDaGap, type SoCauMoiPhan } from '../lib/bo-cau-tu-bai-lam'
 import { giaiBoCauEm, lamPhangBo, LoiBoCauError } from '../lib/bo-cau-chuan'
 import { taoLinkPhieu } from '../lib/phieu-link'
-import { cauKhacPhuc, ghiPhieuKhacPhuc, lichSuEm as lichSuEmApi, tenTheoSbd, trangThaiPhongCho, vaoThi, phieuCuaEm as layBaiDaNop, layPhieu, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, guiCauHoi, layCauGocQuaMayChu, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, chuKyLechPhaMs, type KeyBank, type CongBoDiem, type KetQuaVaoThi, type ChiTietCauRow, type BaiDaNopCuaEm } from '../lib/exam-api'
+import { cauKhacPhuc, ghiPhieuKhacPhuc, lichSuEm as lichSuEmApi, tenTheoSbd, trangThaiPhongCho, napKhoaDe as napKhoaDeThi, vaoThi, phieuCuaEm as layBaiDaNop, layPhieu, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, guiCauHoi, layCauGocQuaMayChu, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, chuKyLechPhaMs, type KeyBank, type CongBoDiem, type KetQuaVaoThi, type ChiTietCauRow, type BaiDaNopCuaEm } from '../lib/exam-api'
 import { CongNhip, NHIP_TIM_LUU_TAM_GIAY } from '../lib/nhip-gui'
 import { goiCauHoi } from '../lib/hoi-bai'
 import type { CauChon } from '../components/TamTruotHoiBai'
@@ -61,7 +61,8 @@ import { flushSync } from 'react-dom'
 import MaCaInput from '../components/MaCaInput'
 import LogoHocSinh from '../components/LogoHocSinh'
 import { LogoDoc } from '../components/LogoVai'
-import PhongChoGame from '../components/PhongChoGame'
+// PHÒNG CHỜ NẠP LƯỜI (31/10): chỉ ca có phòng chờ mới cần — đường /t nhẹ đi (bù phần đề + đáp án tải sẵn); mảnh ngoài bộ cất sẵn (vite.config globIgnores).
+const PhongChoGame = lazy(() => import('../components/PhongChoGame'))
 import { TheNoiDung, NutChinh, OThongBao, Nhan } from '../components/DesignSystem'
 import { TriangleAlert, X, ArrowLeft, LayoutGrid, Flag, Lock, Maximize } from 'lucide-react'
 import { classify, moTaBieuDiem, type SoCauBaPhan } from '../engine/score'
@@ -2719,6 +2720,8 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     //
     // Máy chủ KHÔNG phải chỗ yếu: 60 lượt cùng lúc xong hết, 0 hỏng, chậm nhất
     // 4,3 giây. Thứ phải chữa là nhịp gọi của từng máy.
+    // Tải sẵn đề + đáp án đã khoá (31/10, khoa-de-thi.ts `taiSanPhongCho`), rải 0–4 giây.
+    setTimeout(() => void napKhoaDeThi().then((m) => m.taiSanPhongCho(url, maCa.trim(), sbd.trim())), Math.random() * 4e3)
     let dangHoi = false
     const hoi = async () => {
       if (dangHoi || dangVaoSauBatDauRef.current) return
@@ -2744,7 +2747,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       // tranh chỗ chạy với chính cú `vaoThi` của cả lớp.
       if (dangVaoSauBatDauRef.current) return
       void hoi()
-    }, chuKyLechPhaMs(3000))
+    }, chuKyLechPhaMs(1500))
     return () => {
       con = false
       clearInterval(dong)
@@ -3013,7 +3016,8 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     return (
       <Trang className="flex items-center justify-center px-2 sm:px-4 py-4">
         {/* Đang chờ Thầy bấm bắt đầu */}
-        <PhongChoGame cho={cho} loiCho={loiCho} />
+        {/* Sảnh Đấu Ion báo «thầy vừa bấm Bắt đầu» (WebSocket, 31/10) ⇒ vào thi ngay (game tự dừng khi phòng đóng), không đợi nhịp hỏi kế tiếp. */}
+        <Suspense fallback={<p role="status">Đang vào phòng chờ…</p>}><PhongChoGame cho={cho} loiCho={loiCho} onBatDau={vaoSauBatDau} /></Suspense>
       </Trang>
     )
   }

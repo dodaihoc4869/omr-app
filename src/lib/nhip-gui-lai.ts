@@ -92,8 +92,12 @@ export function gianVaoThi(nn: () => number = Math.random): number {
  * thì vẫn còn 10 lượt/giây, tức vẫn dồn.
  *
  * Tám giây KHÔNG làm em thiệt: đồng hồ của em chỉ chạy từ lúc máy chủ tạo lượt,
- * nên chờ ở đây không ăn vào giờ làm bài của ai. */
-export const GIAN_VAO_SAU_BAT_DAU_MS = 8000
+ * nên chờ ở đây không ăn vào giờ làm bài của ai.
+ *
+ * 31/10 (thầy «bấm bắt đầu là phải tức thì… Tối ưu triệt để»): KHOÁ TOÀN CỤC ẤY ĐÃ KHÔNG CÒN — nó là của đường Apps Script (gỡ 12/09). Máy chủ mới
+ * tạo lượt bằng MỘT câu INSERT theo dòng (server/src/index.ts `vaoThi`, «Không khoá toàn cục»): 50 em là 50 dòng khác nhau, không ai chờ ai. Cửa sổ
+ * 8 giây chỉ còn bắt em cuối hàng ngồi nhìn màn chờ. Giữ 0,8 giây để rải nhẹ đúng khoảnh khắc cả lớp cùng thấy `batDau`. */
+export const GIAN_VAO_SAU_BAT_DAU_MS = 800
 
 export function gianVaoSauBatDau(nn: () => number = Math.random): number {
   return Math.round(nn() * GIAN_VAO_SAU_BAT_DAU_MS)

@@ -82,7 +82,7 @@ describe('màn chờ: không chồng lượt, có lệch pha', () => {
     const than = thanPhongCho()
     // Mốc neo đổi 11/09: thân `setInterval` nay có thêm chốt ngừng hỏi khi đã
     // thấy `batDau`. Nhịp vẫn phải LỆCH PHA và vẫn là 3 giây.
-    expect(than).toContain('chuKyLechPhaMs(3000)')
+    expect(than).toContain('chuKyLechPhaMs(1500)') // 31/10: 1,5 giây (thầy «bấm bắt đầu là phải tức thì»)
     expect(than).not.toContain('}, 3000)')
   })
 

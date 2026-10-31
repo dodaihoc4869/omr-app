@@ -194,6 +194,6 @@ describe('MỌI NHỊP GỌI MẠNG TRONG CA đều phải có chốt và lệch
   })
 
   it('phòng chờ VẪN có chốt chống chồng lượt', () => {
-    expect(MAN).toContain('chuKyLechPhaMs(3000)')
+    expect(MAN).toContain('chuKyLechPhaMs(1500)') // 31/10: nhịp hỏi phòng chờ 1,5 giây (bấm Bắt đầu tức thì)
   })
 })

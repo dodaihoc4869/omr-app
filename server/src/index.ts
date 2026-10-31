@@ -128,6 +128,7 @@ import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
 import { docGoiDeDem, docKeyBankDem, ghiKeyBank, doanCongBoNgay, layDemHetGioLuot, nhoCongBo, nhoHetGioLuot } from './dem-ca-thi'
 import { chiaGoiDe, dongGoiDe, dungGoiDe } from './khoa-de-thi'
 import { dongPhongDau, vaoPhongDau, veDauChoEm } from './dau-ion-ve'
+import { chiaDeTruoc, deTruoc } from './de-truoc'
 
 // CORS — app chạy ở `dodaihoc4869.github.io`, Worker ở `workers.dev`, nên MỌI
 // lượt gọi đều là chéo nguồn. Thiếu mấy dòng này là trình duyệt chặn sạch và
@@ -586,6 +587,9 @@ async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
     boTheoEm: goiRieng,
     // KHÔNG trả gói đề trong thân: máy em tải riêng từ /de/:maCa, qua bộ đệm biên.
     deUrl: ca.bank_r2 ? `/de/${encodeURIComponent(maCa)}` : null,
+    // ĐỀ TẢI SẴN Ở PHÒNG CHỜ (31/10, de-truoc.ts): em đã được vào ⇒ trao chìa mở gói đề đã khoá máy em tải lúc chờ. Chỉ nhánh ĐÃ được vào (sau giờ
+    // bắt đầu, gói đề lúc ấy vốn đã công khai ở `/de`) ⇒ trao cho mọi lượt, máy không cần báo đang giữ gói (một HMAC, không thêm lượt D1).
+    ...(ca.bank_r2 && env.MA_BI_MAT ? { khoaDeTruoc: await chiaDeTruoc(env, maCa) } : {}),
     chiNop3PhutCuoi: Number((ca as any).chi_nop_3_phut_cuoi ?? 0) === 1,
   })
 }
@@ -697,7 +701,8 @@ async function khoaDe(env: Env, b: Record<string, unknown>): Promise<Response> {
   if (!maCa || !sbd || !env.DE || !env.MA_BI_MAT) return ra({ ok: false, lyDo: 'thieu' })
   // MỘT lượt D1 (100k em): dòng ca chỉ về khi em có lượt trong ca; tờ đáp án đọc từ đệm isolate (dem-ca-thi.ts) song song.
   const [ca, k] = await Promise.all([
-    env.DB.prepare('SELECT so_cau_json FROM ca WHERE ma_ca = ? AND EXISTS (SELECT 1 FROM luot WHERE ma_ca = ? AND sbd = ?)').bind(maCa, maCa, sbd).first<{ so_cau_json?: unknown }>(),
+    // Em ĐANG ở phòng chờ cũng tải được (31/10 «tải sẵn hết đề đáp án»): gói khoá riêng từng em, chìa chỉ trao SAU khi nộp ⇒ tải sớm không lộ gì.
+    env.DB.prepare('SELECT so_cau_json FROM ca WHERE ma_ca = ?1 AND (EXISTS (SELECT 1 FROM luot WHERE ma_ca = ?1 AND sbd = ?2) OR EXISTS (SELECT 1 FROM phong_cho WHERE khoa = ?3))').bind(maCa, sbd, `${maCa}|${sbd}`).first<{ so_cau_json?: unknown }>(),
     docKeyBankDem(env, maCa).catch(() => null),
   ])
   if (!ca) return ra({ ok: false, lyDo: 'khong_tim_thay' })
@@ -861,6 +866,10 @@ async function layDe(env: Env, maCa: string, req?: Request): Promise<Response> {
   const dau = { ...JSON_HEADERS, 'cache-control': 'no-cache, must-revalidate', etag: o.httpEtag }
   const hoi = req?.headers.get('if-none-match')
   if (hoi && o.httpEtag && hoi.split(',').some((x) => x.trim() === o.httpEtag)) return new Response(null, { status: 304, headers: dau })
+  // ĐỀ TẢI SẴN (31/10, de-truoc.ts): máy em giữ gói đã khoá phiên bản `?phien=` ⇒ đúng bản hiện hành thì chỉ đáp một dòng (không kéo lại ~100 KB);
+  // lệch ⇒ trả nguyên gói mới ngay trong lượt này. Tham số trên đường dẫn (không phải header) ⇒ không thêm lượt hỏi CORS.
+  const phienMay = req ? new URL(req.url).searchParams.get('phien') : null
+  if (phienMay && o.httpEtag && phienMay === o.httpEtag) return new Response(JSON.stringify({ ok: true, khongDoi: true, phien: o.httpEtag }), { headers: { ...JSON_HEADERS, 'cache-control': 'no-store' } })
   return new Response(o.than.slice(0), { headers: dau })
 }
 
@@ -3608,6 +3617,7 @@ const boXuLy = {
       if (p === '/luu-tam') return luuTam(env, b)
       if (p === '/nop') return nop(env, b)
       if (p === '/khoa-de') return khoaDe(env, b)
+      if (p === '/de-truoc') return ra(await deTruoc(env, b))
       if (p === '/trang-thai') return dayTrangThai(env, b)
       if (p === '/phong-cho') return ghiPhongCho(env, b)
       if (p === '/hs/dang-nhap') {
@@ -4051,7 +4061,12 @@ const boXuLy = {
       if (p === '/game-v2-admin') return ra(await adminGame(env,b))
       if (p === '/ca/day') return dayCa(env, b)
       // RÚT ĐỀ v2 (02/10, server/src/rut-de-v2.ts): chốt Bắt đầu MỘT lệnh (mốc + bản đồ); lỗi đến hạn theo em cho máy thầy chạy thử.
-      if (p === '/ca/chot-bat-dau') return ra({ ...(await chotBatDau(env, b)), chot: true })
+      if (p === '/ca/chot-bat-dau') {
+        const kq = await chotBatDau(env, b)
+        // BẮT ĐẦU TỨC THÌ (31/10): báo NGAY mọi máy đang ở Sảnh Đấu Ion của ca (WebSocket) ⇒ máy em vào thi không đợi nhịp hỏi phòng chờ kế tiếp.
+        if (kq.ok === true && env.PHONG_DAU_ION) { const d = dongPhongDau(env, String(b.maCa ?? '').trim()); if (ctx) ctx.waitUntil(d); else await d }
+        return ra({ ...kq, chot: true })
+      }
       if (p === '/ca/loi-den-han') return ra(await loiDenHan(env, b))
       // CA KIỂM TRA (06/10, server/src/ca-co-luot-moi.ts): em nào có lượt tự làm MỚI kể từ lúc chạy thử — để Bắt đầu thi rút lại bằng hồ sơ mới.
       if (p === '/ca/co-luot-moi') return ra(await coLuotMoi(env, b))

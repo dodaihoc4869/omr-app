@@ -143,7 +143,7 @@ describe('màn của em', () => {
     // giây một lượt, tức LÂU HƠN nhịp; ba mươi máy cùng nhịp là ba mươi lượt
     // dồn vào một khoảnh khắc. Kèm chốt chống chồng lượt ở `dangHoi`.
     // Mốc neo đổi 11/09 — xem ghi chú trong `phong-cho-ca-dong-0909.test.ts`.
-    expect(than).toContain('chuKyLechPhaMs(3000)')
+    expect(than).toContain('chuKyLechPhaMs(1500)') // 31/10: 1,5 giây (thầy «bấm bắt đầu là phải tức thì»)
     expect(than).toContain('let dangHoi = false')
     expect(than).toContain('clearInterval(dong)')
     // Thầy bấm bắt đầu thì đi lại ĐÚNG đường vaoThi — không có đường tắt nào

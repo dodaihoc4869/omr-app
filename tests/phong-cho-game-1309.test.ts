@@ -21,7 +21,7 @@ describe('Phòng chờ thi · Đấu Nguyên Tử (thay Bắn nguyên tố 30/10
     expect(tepPhongCho).toContain('Đang chờ Thầy bấm bắt đầu')
     expect(tepPhongCho).toContain('Điểm chơi chỉ để vui trong lúc chờ.')
     expect(tepPhongCho).toContain("lazy(() => import('./phong-cho/DauIon'))")
-    expect(tepPhongCho).toContain('<DauIon maCa={cho?.maCa} veDau={cho?.veDau} batDau={!!cho?.batDau} />')
+    expect(tepPhongCho).toContain('<DauIon maCa={cho?.maCa} veDau={cho?.veDau} batDau={!!cho?.batDau} onBatDau={onBatDau} />') // 31/10: phòng báo Bắt đầu ⇒ vào ngay
     expect(tepPhongCho).toContain('loiCho')
     // Màn thi báo game dừng NGAY khi thấy thầy bắt đầu (trước khi vào bài).
     expect(tepExamTake).toMatch(/if \(tt\.batDau\) \{ setCho\(\(c\) => \(c && !c\.batDau \? \{ \.\.\.c, batDau: true \} : c\)\); void vaoSauBatDau\(\) \}/)

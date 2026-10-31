@@ -20,10 +20,12 @@ interface PhongChoGameProps {
   /** `veDau`: vé vào Sảnh đấu (lệnh vào thi phát); `batDau`: màn cha vừa thấy thầy bắt đầu ⇒ game dừng ngay, đóng kết nối. */
   cho?: { thoiGianPhut?: number; tenCa?: string; lop?: string; maCa?: string; veDau?: string; batDau?: boolean } | null
   loiCho?: string | null
+  /** Sảnh Đấu Ion báo «thầy vừa bấm Bắt đầu» (WebSocket, 31/10) ⇒ màn cha vào thi NGAY, không đợi nhịp hỏi phòng chờ. */
+  onBatDau?: () => void
 }
 
 /** Màn chờ chỉ trình bày ca thật và mini-game cục bộ. ExamTakeScreen vẫn quyết định lúc vào bài. */
-export default function PhongChoGame({ cho, loiCho }: PhongChoGameProps) {
+export default function PhongChoGame({ cho, loiCho, onBatDau }: PhongChoGameProps) {
   const phong = <section className="pc-room" aria-label="Phòng chờ thi trực tuyến">
     <header className="pc-brand"><div><LogoHocSinh size={44} hienChu={false} /><span>AVOGADRO<small>Học một chút, tiến một bước.</small></span></div><span className="pc-room-label">Phòng chờ</span></header>
     <div className="pc-main">
@@ -38,7 +40,7 @@ export default function PhongChoGame({ cho, loiCho }: PhongChoGameProps) {
         </div>}
         {loiCho && <div className="pc-error" role="status">{loiCho}</div>}
       </div>
-      <DuPhongGame><Suspense fallback={<div className="pc-loading" role="status">Đang chuẩn bị trò chơi…</div>}><DauIon maCa={cho?.maCa} veDau={cho?.veDau} batDau={!!cho?.batDau} /></Suspense></DuPhongGame>
+      <DuPhongGame><Suspense fallback={<div className="pc-loading" role="status">Đang chuẩn bị trò chơi…</div>}><DauIon maCa={cho?.maCa} veDau={cho?.veDau} batDau={!!cho?.batDau} onBatDau={onBatDau} /></Suspense></DuPhongGame>
       <p className="pc-assurance">Điểm chơi chỉ để vui trong lúc chờ.</p>
     </div>
   </section>

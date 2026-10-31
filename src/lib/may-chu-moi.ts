@@ -243,6 +243,8 @@ export interface KetQuaVaoThiMoi {
   soCau?: { I: number; II: number; III: number }
   boTheoEm?: Record<string, string[]>
   deUrl?: string | null
+  /** Chìa mở gói đề tải sẵn ở phòng chờ (31/10, server/src/de-truoc.ts) — chỉ ở nhánh em đã được vào. */
+  khoaDeTruoc?: string
   lop?: string
   giuDeDoc?: boolean
   anHanGiay?: number
@@ -273,7 +275,7 @@ export async function vaoThiMoi(
 ): Promise<KetQuaVaoThiMoi | null> {
   if (!ch.BAT) return null
   // KHÔNG giãn ở đây nữa (13/10, luật thầy "sửa xong phải nhanh hơn"): màn thi đã giãn 0–3 giây ĐÚNG MỘT LẦN trước lượt vào đầu (T5, ExamTakeScreen
-  // `daGianVaoThiRef`), phòng chờ đã giãn 0–8 giây (`gianVaoSauBatDau`). Giãn thêm ở đây làm lượt đầu chờ tới 6 giây (phòng chờ tới 14) và lượt bấm
+  // `daGianVaoThiRef`), phòng chờ đã giãn 0–0,8 giây (`gianVaoSauBatDau`, 31/10). Giãn thêm ở đây làm lượt đầu chờ tới 6 giây (phòng chờ tới 14) và lượt bấm
   // lại sau khi hỏng vẫn phải chờ — trái luật "bấm lại thì vào thẳng".
   return goiWorker<KetQuaVaoThiMoi>(
     ch,

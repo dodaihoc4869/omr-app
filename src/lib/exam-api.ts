@@ -635,6 +635,8 @@ async function vaoThiQuaMayChuMoi(
   }
   const ch = { ...goc, BAT: true, URL: diaChi }
 
+  // Đề tải sẵn ở phòng chờ (31/10, khoa-de-thi.ts `truocVao`): SONG SONG với lượt vào, hỏi gói còn đúng phiên bản; lượt vào trả chìa.
+  const tr = canBank ? khoaDe?.truocVao(ch.URL, maCa) : undefined
   const r = await vaoThiMoi(ch, maCa, sbd, idThietBi, danhTinh)
   if (!r) throw new Error('Không kết nối được máy chủ — kiểm tra mạng rồi bấm Vào thi lại.')
 
@@ -685,8 +687,10 @@ async function vaoThiQuaMayChuMoi(
 
   // GÓI ĐỀ. Gói nằm ở R2 sau bộ đệm biên, máy chủ chỉ đưa đường dẫn. Hỏng ở
   // đâu thì nói đúng chỗ đó — cả ba câu dưới đều nêu việc em phải làm.
-  let bank: PublicExamBank | undefined
+  // Gói tải sẵn: đúng phiên bản ⇒ mở bằng chìa vừa nhận; máy chủ đã trả gói mới ⇒ dùng luôn. Hỏng gì ⇒ đường tải đề cũ ngay dưới.
+  let bank = (await tr?.(r.khoaDeTruoc)) as PublicExamBank | undefined
   if (canBank) {
+    if (!bank) {
     if (!r.deUrl) throw new Error('Ca này chưa được phát đề — báo Thầy bấm lại "Bắt đầu thi".')
     const bo = new AbortController()
     let res: Response | undefined
@@ -705,6 +709,7 @@ async function vaoThiQuaMayChuMoi(
         catch { throw new Error('Gói đề tải về bị hỏng — báo Thầy đẩy lại đề cho ca này.') }
       })(), HAN_GIAY * 1000, 'Tải đề quá lâu — kiểm tra mạng rồi bấm Vào thi lại, vẫn lỗi thì báo Thầy.', huy)
     } catch (e) { huy(); throw e }
+    }
     if (!bank) throw new Error('Gói đề rỗng — báo Thầy đẩy lại đề cho ca này.')
     // Ảnh đề nằm ở kho ảnh máy chủ (01/10, mở ca nhanh): tải sẵn ngay, mất mạng giữa bài vẫn thấy ảnh.
     taiSanAnhDe(bank)
@@ -743,11 +748,13 @@ async function vaoThiQuaMayChuMoi(
   }
 }
 
+
 // Mảnh gói tờ đáp án đã khoá (khoa-de-thi.ts) nạp lười lúc tải gói (giây thứ 20 của ca) ⇒ lúc nộp đã nằm sẵn trong bộ nhớ, không chờ mạng.
 // Chưa nạp (nộp trong 20 giây đầu, hoặc mở lại app rồi nộp ngay) ⇒ nộp đi đường cũ: máy chủ trả nguyên tờ đáp án.
 const CHO_TAI_GOI_MS = 20_000
 let khoaDe: typeof import('./khoa-de-thi') | null = null
-const napKhoaDe = () => import('./khoa-de-thi').then((m) => (khoaDe = m))
+/** Màn thi cũng nạp mảnh này khi em vào phòng chờ (tải sẵn gói đề + đáp án, 31/10) ⇒ `khoaDe` sẵn lúc vào thi. */
+export const napKhoaDe = () => import('./khoa-de-thi').then((m) => (khoaDe = m))
 
 /** VÀO THI. Một đường duy nhất, không còn đường lùi. */
 export async function vaoThi(
