@@ -39,6 +39,8 @@ export const NGUONG_DANH_GIA = {
   chenhThuocTru: 20,
   songSinhToiThieu: 10,
   lamLaiGocToiThieu: 5,
+  /** …chỉ gắn Đối phó khi ≥ 50% lần làm lại câu gốc đúng là bấm ngay chưa đọc xong đề (nhớ chữ đáp án, không làm lại bài). */
+  nhoChuTu: 0.5,
   /** Rời màn khi thi: ≥ 3 lần hoặc ≥ 60 giây mỗi bài. */
   roiManLan: 3,
   roiManGiay: 60,
@@ -217,11 +219,15 @@ export function danhGiaEm(v: DauVaoDanhGia): KetQuaDanhGia {
     if (daSai.has(l.cau)) (l.songSinh ? banKhac : lamLaiGoc).push(l)
     if (l.dung === false) daSai.add(l.cau)
   }
-  const dungLamLaiGoc = tiLe(lamLaiGoc.filter((l) => l.dung === true).length, lamLaiGoc.length)
+  const dungLai = lamLaiGoc.filter((l) => l.dung === true)
+  const dungLamLaiGoc = tiLe(dungLai.length, lamLaiGoc.length)
   const dungBanKhacCauSai = tiLe(banKhac.filter((l) => l.dung === true).length, banKhac.length)
   if (banKhac.length >= NG.songSinhToiThieu && lamLaiGoc.length >= NG.lamLaiGocToiThieu && dungLamLaiGoc !== null && dungBanKhacCauSai !== null) {
     const chenh = Math.round((dungLamLaiGoc - dungBanKhacCauSai) * 100) - NG.chenhThuocTru
-    if (chenh > 0) them('thuocKhongHieu', chenh, `câu từng sai: làm lại đúng câu ấy đúng ${pt(dungLamLaiGoc)}, gặp bản khác chỉ đúng ${pt(dungBanKhacCauSai)}: thuộc đáp án, chưa hiểu`, false, chenh >= 10)
+    // Chưa hiểu ≠ đối phó: chỉ trừ điểm. Tín hiệu XẤU khi lần làm lại câu gốc đúng phần lớn là BẤM NGAY chưa đọc xong đề (Mức 1, giây đo thật) — nhớ chữ đáp án.
+    const bamNgay = dungLai.filter((l) => l.ma === 1).length
+    const nhoChu = dungLai.length > 0 && bamNgay >= NG.nhoChuTu * dungLai.length
+    if (chenh > 0) them('thuocKhongHieu', chenh, `câu từng sai: làm lại đúng câu ấy đúng ${pt(dungLamLaiGoc)}${nhoChu ? ` (${bamNgay}/${dungLai.length} lần bấm ngay chưa đọc xong đề)` : ''}, gặp bản khác chỉ đúng ${pt(dungBanKhacCauSai)}: thuộc đáp án, chưa hiểu`, false, chenh >= 10 && nhoChu)
   }
   // B6–B7 · Thi / KTCN: rời màn; trùng lỗi sai thầy đã xác nhận (cờ đỏ).
   const baiRoi = v.thi.filter((t) => t.roiLan >= NG.roiManLan || t.roiGiay >= NG.roiManGiay).length
