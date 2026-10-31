@@ -50,10 +50,21 @@ describe('vòng tiến độ chia theo câu', () => {
     expect(doan()).toHaveLength(3)
     expect(doan().filter((c) => c.getAttribute('class') === 'chay')).toHaveLength(1)
   })
-  it('khít hơn, tinh tế: vòng 96 px, nét 6 đầu tròn, bỏ mặt nạ 4 khe; giảm chuyển động ⇒ đứng yên', () => {
+  it('khít, cân đối (thầy 31/10): nút 80 × 74, vòng 102 px đúng tâm khối mặt + đáy, nét 5,7 đầu tròn, không mặt nạ; vòng đứng yên; giảm chuyển động ⇒ đứng yên', () => {
     const css = readFileSync('src/styles/trong-hs.css', 'utf8')
-    expect(css).toContain("[data-trong='hs'] .da-vong[data-doan] { width: 96px; height: 96px; top: calc(50% - 6px); -webkit-mask: none; mask: none; }")
-    expect(css).toContain("[data-trong='hs'] .da-vong[data-doan] circle { stroke-width: 6; stroke-linecap: round; }")
+    expect(css).toContain("[data-trong='hs'] .da-nut[data-tt='dang'] { width: 80px; height: 74px; }")
+    expect(css).toContain("[data-trong='hs'] .da-vong { width: 92px; height: 92px; top: calc(50% - 3px); -webkit-mask: none; mask: none; }")
+    expect(css).toContain("[data-trong='hs'] .da-nut[data-tt='dang'] .da-vong { width: 102px; height: 102px; }")
+    expect(css).toContain("[data-trong='hs'] .da-vong circle { stroke-width: 5.7; }")
+    expect(css).toContain("[data-trong='hs'] .da-vong :is(.nen, .chay) { stroke-linecap: round; }")
+    // vòng không còn nhịp thở phóng to / thu nhỏ (cả hai kiểu vòng); không luật nào đè cỡ riêng cho vòng đoạn
+    expect(css).not.toMatch(/\.da-vong(\[data-doan\])? \{ animation: da-vong-tho/)
+    expect(css).not.toMatch(/\.da-vong\[data-doan\] \{[^}]*width/)
+    // mặt nút, sao, bong bóng: CÙNG một nhịp 2,4 s, cùng đường cong, không lệch pha
+    for (const ten of ['da-mat-tho', 'da-sao-tho', 'da-bong-tho']) expect(css).toContain(`animation: ${ten} 2.4s cubic-bezier(.45, 0, .55, 1) infinite; }`)
+    // mặt nút là ::after — không khớp trong :is() ⇒ luật đứng yên viết riêng (máy yếu / giảm chuyển động)
+    expect(css).toContain("[data-trong='hs'].may-yeu .da-nut[data-tt='dang']::after { animation: none; }")
+    expect(css).toContain("@media (prefers-reduced-motion: reduce) { [data-trong='hs'] .da-nut[data-tt='dang']::after { animation: none !important; } }")
     expect(css).toMatch(/prefers-reduced-motion: reduce\) \{ \[data-trong='hs'\] \.da-nut\[data-tt='dang'\] \.da-vong\[data-doan\], \[data-trong='hs'\] \.da-vong\[data-doan\] \.chay\[data-moi\] \{ animation: none !important; \} \}/)
   })
   it('chặng 5 mới mở (bài 8 chặng): đủ 6 câu chuẩn, 6 đoạn xám nguyên 0% khi vừa xong chặng 4', () => {

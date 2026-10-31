@@ -288,7 +288,8 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
     const vong = nut()[0]!.querySelector('.da-vong')!
     expect(vong).not.toBeNull()
     const nen = vong.querySelector('circle.nen')!, CV = 2 * Math.PI * 54
-    expect(Number(nen.getAttribute('stroke-dasharray')!.split(' ')[0]) + 14).toBeCloseTo(CV / 5, 3) // 5 đoạn = 5 chặng
+    const [cung, khe] = nen.getAttribute('stroke-dasharray')!.split(' ').map(Number) // cung + khe = một đoạn (khe chung hai kiểu vòng, 31/10)
+    expect(cung! + khe!).toBeCloseTo(CV / 5, 3) // 5 đoạn = 5 chặng
     expect(Number(vong.querySelector('mask circle')!.getAttribute('stroke-dasharray')!.split(' ')[0])).toBeCloseTo((CV * 3) / 5, 3) // tô 3 đoạn
     expect(vong.querySelector('circle.chay')).not.toBeNull()
     // máy chủ cũ chưa gửi số chặng ⇒ theo câu đã trả lời (18/28), không xám nguyên
