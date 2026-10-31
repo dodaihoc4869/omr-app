@@ -48,6 +48,15 @@ for (const k of khung) {
     ra('\n| # | lần | tổng s | tb ms | dòng đọc tb | câu (rút gọn) |\n|---:|---:|---:|---:|---:|---|')
     g.slice(0, 15).forEach((x, i) => ra(`| ${i + 1} | ${x.count} | ${r1(x.sum.queryDurationMs / 1000)} | ${r1(x.sum.queryDurationMs / x.count)} | ${Math.round(x.sum.rowsRead / x.count)} | \`${x.dimensions.query.replace(/\s+/g, ' ').replace(/[|`]/g, '¦').slice(0, 170)}\` |`))
   }
+  // ---- D1 theo phút: số LƯỢT GỬI (batch) vs số câu — D1 nghẽn vì lượt gửi hay vì câu (31/10) ----
+  const d1p = await gql(`query($acc:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
+    d1AnalyticsAdaptiveGroups(limit:100,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[datetimeMinute_ASC]){dimensions{datetimeMinute} count sum{readQueries writeQueries rowsRead rowsWritten} quantiles{queryBatchTimeMsP50 queryBatchTimeMsP90 queryBatchTimeMsP99}}}}}`, v)
+  if (d1p.loi) ra(`- D1 theo phút: lỗi GraphQL ${d1p.loi}`)
+  else {
+    const g = d1p.data.d1AnalyticsAdaptiveGroups ?? []
+    ra('\n| phút (UTC) | lượt gửi | lượt/s | câu đọc | câu ghi | câu/lượt | batch p50/p90/p99 ms |\n|---|---:|---:|---:|---:|---:|---|')
+    for (const x of g) ra(`| ${String(x.dimensions.datetimeMinute).slice(11, 16)} | ${x.count} | ${r1(x.count / 60)} | ${x.sum.readQueries} | ${x.sum.writeQueries} | ${r1((x.sum.readQueries + x.sum.writeQueries) / Math.max(1, x.count))} | ${r1(x.quantiles.queryBatchTimeMsP50)}/${r1(x.quantiles.queryBatchTimeMsP90)}/${r1(x.quantiles.queryBatchTimeMsP99)} |`)
+  }
   // ---- Worker ----
   const w = await gql(`query($acc:String!,$s:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$acc}){
     tong: workersInvocationsAdaptive(limit:5,filter:{scriptName:$s,datetime_geq:$tu,datetime_leq:$den}){sum{requests errors subrequests} quantiles{cpuTimeP50 cpuTimeP99 durationP50 durationP99}}
