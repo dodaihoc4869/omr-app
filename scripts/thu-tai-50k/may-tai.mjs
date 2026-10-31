@@ -42,6 +42,7 @@ const tuyen = new Map() // đường → số liệu
 const chuoi = new Map() // giây thứ (bội 10) → {n, loi}
 const gan = [] // [t, loi] 30 s gần nhất (dừng sớm)
 let dangChay = true, dungSom = null, dangBay = 0, dinhBay = 0
+const noiChay = {}
 const giaiDoanCua = (t) => (t < BAT_DAU + RAMP_MS ? 'ramp' : t < BAT_DAU + RAMP_MS + ON_DINH_MS ? 'onDinh' : 'sau')
 function ghiDo(duong, t0, ms, ok, ngan, loi) {
   let o = tuyen.get(duong)
@@ -70,6 +71,9 @@ async function goi(duong, than, tenDo = duong) {
   try {
     const r = await fetch(`${GOC}${duong}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(than), signal: AbortSignal.timeout(HET_GIO_MS) })
     ngan = r.headers.get('x-ngan') === '1'
+    // Nơi Worker chạy (smart placement: `cf-placement: remote-HKG` / `local-IAD`) + colo biên (đuôi cf-ray) — để đọc độ trễ cho đúng.
+    const k = `${r.headers.get('cf-placement') ?? 'không có cf-placement'} · biên ${String(r.headers.get('cf-ray') ?? '').split('-')[1] ?? '?'}`
+    noiChay[k] = (noiChay[k] ?? 0) + 1
     const chu = await r.text()
     try { j = JSON.parse(chu) } catch { j = null }
     if (r.status !== 200) loi = `HTTP ${r.status}${j ? ` ${j.maLoi ?? j.ma ?? ''} ${j.error ?? ''}`.trimEnd() : ` ${chu.slice(0, 60).replace(/\s+/g, ' ')}`}`
@@ -158,7 +162,7 @@ clearInterval(nhip)
 
 const ket = {
   giaiDoan: GIAI_DOAN, phan: PHAN, tongPhan: TONG_PHAN, soEmAo: ds.length, soEmGiaiDoan: SO_EM, batDau: BAT_DAU, ketThuc: Date.now(), rampMs: RAMP_MS, onDinhMs: ON_DINH_MS,
-  treBatDauMs: TRE_BAT_DAU_MS, dungSom, dinhBay, thongKeEm,
+  treBatDauMs: TRE_BAT_DAU_MS, dungSom, dinhBay, thongKeEm, noiChay,
   tuyen: Object.fromEntries(tuyen), chuoi: Object.fromEntries([...chuoi].sort((a, b) => a[0] - b[0])),
 }
 writeFileSync(RA, JSON.stringify(ket))

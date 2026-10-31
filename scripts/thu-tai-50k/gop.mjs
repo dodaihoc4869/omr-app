@@ -47,6 +47,8 @@ for (const gd of gds) {
   in2(`- Ramp (mở app dồn): ${nR} lệnh · p50/p95/p99 ${pv(rampMs, 0.5)}/${pv(rampMs, 0.95)}/${pv(rampMs, 0.99)} ms · lỗi ${phanTram(lR, nR)}% · answer ok ${ansOk ?? '-'}% · đỉnh đang bay/lát ${Math.max(...ds.map((j) => j.dinhBay))} · lát nhận việc muộn nhất ${Math.round(tre / 1000)} s${dung.length ? ` · **DỪNG SỚM ${dung.length} lát** (${dung.map((j) => `${j.dungSom.tiLe}%@${Math.round(j.dungSom.luc / 1000)}s`).join(', ')})` : ''}`)
   const tk = ds.reduce((a, j) => { for (const [k, v] of Object.entries(j.thongKeEm ?? {})) a[k] = (a[k] ?? 0) + v; return a }, {})
   in2(`- Em ảo: ${JSON.stringify(tk)}`)
+  const noi = ds.reduce((a, j) => { for (const [k, v] of Object.entries(j.noiChay ?? {})) a[k] = (a[k] ?? 0) + v; return a }, {})
+  in2(`- Nơi chạy: ${Object.entries(noi).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([k, v]) => `${k} ×${v}`).join(' · ')}`)
   in2('')
   in2('| đường | n (ổn định) | p50 | p95 | p99 ms | lỗi % | x-ngan:1 % | ramp p95 / lỗi % | lỗi hay gặp |')
   in2('|---|---:|---:|---:|---:|---:|---:|---:|---|')
