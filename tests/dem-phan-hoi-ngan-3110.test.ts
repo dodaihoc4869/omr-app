@@ -66,6 +66,14 @@ describe('đệm phản hồi lệnh hỏi định kỳ trong ngăn', () => {
     expect(x.d.n).toBeGreaterThan(n)
   })
 
+  it('phản hồi lỗi (ok:false, ví dụ token sai) KHÔNG đệm — lần sau chạy thật', async () => {
+    const x = kho()
+    const a = await x.goi('/hs/ca-dang-mo', { token: 'rác.khong-hop-le' })
+    expect(a.j.ok).toBe(false)
+    const b = await x.goi('/hs/ca-dang-mo', { token: 'rác.khong-hop-le' })
+    expect(b.do.endsWith('dem=1')).toBe(false)
+  })
+
   it('hết hạn ⇒ đọc lại; thân khác (token khác) ⇒ khoá khác', async () => {
     const x = kho()
     const token = await gameToken(x.k.env as Env, 'S1')

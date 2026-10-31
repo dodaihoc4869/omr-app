@@ -217,7 +217,10 @@ export class NganHocSinh {
     const ex = h.get('access-control-expose-headers'); h.set('access-control-expose-headers', ex ? `${ex}, x-ngan, x-ngan-do` : 'x-ngan, x-ngan-do')
     if (khoaPh && coXem && res.status === 200 && !dem.ghi && /json/.test(res.headers.get('content-type') ?? '') && !/ndjson/.test(res.headers.get('content-type') ?? '')) {
       const than = await res.text()
-      if (!dem.ghi) {
+      // Chỉ đệm phản hồi THÀNH CÔNG (ok: true): lỗi thoáng qua (xác thực, máy chủ bận) không bị kéo dài thêm thời hạn đệm.
+      let thanhCong = false
+      try { thanhCong = (JSON.parse(than) as { ok?: unknown }).ok === true } catch { /* không phải JSON ⇒ không đệm */ }
+      if (!dem.ghi && thanhCong) {
         if (this.demPh.size >= 16) this.demPh.delete(this.demPh.keys().next().value!)
         this.demPh.set(khoaPh, { luc: t0, han, headers: [...h], than })
       }
