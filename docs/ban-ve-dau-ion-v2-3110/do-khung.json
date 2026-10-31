@@ -1,0 +1,60 @@
+{
+ "luc": "2026-10-31T17:01:50.449Z",
+ "ghiChu": "Chromium không giao diện trong máy chủ (vẽ bằng CPU, không GPU) — chậm hơn điện thoại thật; khung nhìn 390×844 DPR 2, sân vẽ DPR 1,5 (máy yếu: DPR 1, trần 30 khung/giây). Đo 8 giây sau 2,5 giây làm nóng, trận 6 nguyên tử, A.I lái cả «Em».",
+ "kq": [
+  {
+   "cpu": 1,
+   "cheDo": "thường (tắt tự hạ)",
+   "soKhung": 480,
+   "khungMoiGiay": 60,
+   "trungViMs": 16.7,
+   "p95Ms": 16.8,
+   "toiDaMs": 16.8
+  },
+  {
+   "cpu": 1,
+   "cheDo": "máy yếu",
+   "soKhung": 240,
+   "khungMoiGiay": 30,
+   "trungViMs": 33.3,
+   "p95Ms": 33.4,
+   "toiDaMs": 33.5
+  },
+  {
+   "cpu": 4,
+   "cheDo": "thường (tắt tự hạ)",
+   "soKhung": 377,
+   "khungMoiGiay": 47,
+   "trungViMs": 16.7,
+   "p95Ms": 33.4,
+   "toiDaMs": 66.6
+  },
+  {
+   "cpu": 4,
+   "cheDo": "thường (tự hạ bật, không cần hạ)",
+   "soKhung": 386,
+   "khungMoiGiay": 48,
+   "trungViMs": 16.7,
+   "p95Ms": 33.4,
+   "toiDaMs": 50
+  },
+  {
+   "cpu": 4,
+   "cheDo": "máy yếu",
+   "soKhung": 239,
+   "khungMoiGiay": 30,
+   "trungViMs": 33.3,
+   "p95Ms": 33.4,
+   "toiDaMs": 50
+  },
+  {
+   "cpu": 6,
+   "cheDo": "máy yếu",
+   "soKhung": 232,
+   "khungMoiGiay": 29,
+   "trungViMs": 33.3,
+   "p95Ms": 50,
+   "toiDaMs": 83.3
+  }
+ ]
+}

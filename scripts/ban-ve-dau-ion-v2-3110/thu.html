@@ -1,0 +1,1265 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Đấu Nguyên Tử 2 · bản thử</title>
+<!--
+  BẢN THỬ «Đấu Nguyên Tử 2» (31/10/2026) — đề xuất docs/DE-XUAT-DAU-ION-V2-3110.md, bản vẽ docs/ban-ve-dau-ion-v2-3110/.
+  MỘT tệp tự đủ (HTML + Canvas 2D, không thư viện, không mạng): em + 5 A.I, điều khiển không nút, súng tự ngắm tự bắn,
+  vật phẩm, súng tiến hoá 5 cấp, hiệu ứng. Mở bằng trình duyệt điện thoại hoặc máy tính là chơi được.
+  Tham số: ?nen=toi|sang · ?yeu=1 (chế độ máy yếu) · ?fps=1 (hiện số khung/giây) · ?bang=1 (bảng cấp súng / vật phẩm / hiệu ứng) · ?tuHa=0 (tắt tự hạ khi máy chậm, chỉ để đo).
+  Màu: chép ĐÚNG giá trị token đang có của app (src/styles/tokens.css, src/styles/trong-hs-mau.css, src/components/phong-cho/phong-cho.css);
+  màu trong sân (--dn-*) pha từ các token đó bằng color-mix — bản build đặt các biến này trong tệp CSS của game (không màu thô mới).
+-->
+<style>
+:root {
+  /* tokens.css (chung) */
+  --tim: #6366f1; --do: #ef4444; --cam: #f59e0b; --xanh: #10b981; --gg-xanh: #1a73e8;
+  /* trong-hs-mau.css — bảng màu app học sinh «Chất chỉ thị» (thầy duyệt 27/10) */
+  --tr-nen: #f6f6fc; --tr-mat: #ffffff; --tr-mat-2: #f0f0fa; --tr-mat-3: #e1e1f1; --tr-vien: #e2e2f0; --tr-vien-2: #cbcbe3;
+  --tr-chu: #1b1938; --tr-chu-2: #454367; --tr-chu-3: #5a587d; --tr-trang: #ffffff;
+  --tr-dung: #00d396; --tr-dung-nhat: #c5ffe8; --tr-dung-chu: #007c58; --tr-dung-nut: #00a87b; --tr-dung-day: #008d66;
+  --tr-sai: #f4417c; --tr-sai-nhat: #fddfe9; --tr-sai-chu: #c70b5b; --tr-sai-day: #e5266d;
+  --tr-chu-y: #ff8c51; --tr-chu-y-nhat: #ffeee0; --tr-chu-y-chu: #b24f19; --tr-chu-y-day: #ce6837;
+  --tr-tin: #00bed8; --tr-tin-nhat: #dbf5fa; --tr-tin-chu: #007889; --tr-tin-day: #009eb5;
+  --tr-sao: #ffbf35; --tr-sao-nhat: #fff5d4; --tr-sao-chu: #956400; --tr-sao-day: #e3a605;
+  --tr-tim: #f373ce; --tr-tim-day: #c851a8; --tr-tim-chu: #b33d95;
+  --tr-hs: #8f9bff; --tr-hs-nut: #767eff; --tr-hs-day: #5e64cd; --tr-hs-nhat: #eeeeff; --tr-hs-chu: #565bbd;
+  --tr-phu: rgba(75, 75, 75, 0.5);
+  /* phong-cho.css — trang phòng chờ (giữ nguyên) */
+  --pc-page: rgb(246, 247, 242); --pc-card: rgb(255, 254, 250); --pc-ink: rgb(31, 57, 55); --pc-muted: rgb(88, 105, 102); --pc-line: rgb(220, 229, 220);
+  --pc-accent: rgb(57, 115, 98); --pc-soft: rgb(233, 239, 227);
+  color-scheme: light;
+}
+:root[data-nen='toi'] {
+  --tim: #818cf8; --do: #f87171; --cam: #fbbf24; --xanh: #34d399; --gg-xanh: #8ab4f8;
+  --tr-nen: #1a1a29; --tr-mat: #262738; --tr-mat-2: #2c2d40; --tr-mat-3: #414157; --tr-vien: #414157; --tr-vien-2: #52536a;
+  --tr-chu: #f1f0ff; --tr-chu-2: #cdceeb; --tr-chu-3: #acaece; --tr-trang: #1a1a29;
+  --tr-dung: #00d497; --tr-dung-nhat: #18382a; --tr-dung-chu: #00df9f; --tr-dung-nut: #00d497; --tr-dung-day: #00aa76;
+  --tr-sai: #f7498f; --tr-sai-nhat: #43272f; --tr-sai-chu: #ff9bba; --tr-sai-day: #cc146f;
+  --tr-chu-y: #ff9447; --tr-chu-y-nhat: #422a1a; --tr-chu-y-chu: #ffa569; --tr-chu-y-day: #de6a00;
+  --tr-tin: #00bfd4; --tr-tin-nhat: #0e373d; --tr-tin-chu: #00d5ed; --tr-tin-day: #0097ab;
+  --tr-sao: #ffc735; --tr-sao-nhat: #3b2f14; --tr-sao-chu: #ecb400; --tr-sao-day: #d8a100;
+  --tr-tim: #e17beb; --tr-tim-day: #b857c8; --tr-tim-chu: #f592ff;
+  --tr-hs: #a8adff; --tr-hs-nut: #a8adff; --tr-hs-day: #7e80ff; --tr-hs-nhat: #2c2e47; --tr-hs-chu: #b1b6ff;
+  --tr-phu: rgba(0, 0, 0, 0.6);
+  --pc-page: rgb(19, 30, 32); --pc-card: rgb(28, 42, 43); --pc-ink: rgb(232, 242, 229); --pc-muted: rgb(174, 193, 187); --pc-line: rgb(55, 75, 71);
+  --pc-accent: rgb(97, 158, 128); --pc-soft: rgb(43, 62, 52);
+  color-scheme: dark;
+}
+/* ── BIẾN GAME (màu trong sân) — pha từ token, không màu thô ── */
+:root {
+  --dn-na: color-mix(in srgb, var(--tr-hs-nut) 50%, var(--tr-tim)); --dn-o: var(--tr-sai); --dn-n: color-mix(in srgb, var(--tr-hs-nut) 70%, var(--tr-tin));
+  --dn-cl: var(--tr-dung); --dn-s: var(--tr-sao); --dn-fe: var(--tr-chu-y); --dn-ne: var(--tr-tin);
+  --dn-san-1: color-mix(in srgb, var(--tr-hs-nhat) 70%, var(--tr-mat)); --dn-san-2: color-mix(in srgb, var(--tr-tin-nhat) 45%, var(--tr-sao-nhat));
+  --dn-luoi: color-mix(in srgb, var(--tr-vien) 80%, var(--tr-hs-nhat)); --dn-luoi-dam: var(--tr-hs);
+  --dn-kinh: var(--tr-mat); --dn-kinh-vien: var(--tr-chu-3);
+  --dn-e: var(--tr-tin); --dn-xt: var(--tr-sao); --dn-kh: var(--tr-hs-nut);
+  --dn-tren-mau: var(--tr-chu);
+  --dn-cap-1: var(--tr-vien-2); --dn-cap-2: var(--tr-tin); --dn-cap-3: var(--tr-dung); --dn-cap-4: var(--tr-tim); --dn-cap-5: var(--tr-sao);
+}
+:root[data-nen='toi'] {
+  --dn-san-1: color-mix(in srgb, var(--tr-nen) 80%, var(--tr-hs-day)); --dn-san-2: color-mix(in srgb, var(--tr-nen) 86%, var(--tr-tin-day));
+  --dn-luoi: color-mix(in srgb, var(--tr-nen) 78%, var(--tr-hs)); --dn-kinh: var(--tr-mat-2); --dn-cap-1: var(--tr-chu-3); --dn-tren-mau: var(--tr-trang);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--pc-page); color: var(--pc-ink); font-family: 'DDH Rounded', 'Be Vietnam Pro', 'Noto Sans', system-ui, sans-serif; -webkit-text-size-adjust: 100%; }
+button { font: inherit; cursor: pointer; touch-action: manipulation; color: inherit; }
+button:focus-visible, canvas:focus-visible, input:focus-visible { outline: 3px solid var(--tr-hs-nut); outline-offset: 3px; }
+.so { font-variant-numeric: tabular-nums; }
+[hidden] { display: none !important; }
+
+/* ── PHÒNG CHỜ (giữ nguyên bố cục + màu phòng chờ hiện có) ── */
+.pc-brand { max-width: 980px; margin: auto; height: 76px; display: flex; justify-content: space-between; align-items: center; padding: 0 18px; }
+.pc-brand > div { display: flex; align-items: center; gap: 10px; }
+.pc-brand b { display: block; font-weight: 700; font-size: 13px; letter-spacing: .13em; }
+.pc-brand small { display: block; font-weight: 400; font-size: 10px; color: var(--pc-muted); margin-top: 4px; letter-spacing: 0; }
+.pc-nhan { font-size: 10px; color: var(--pc-muted); padding: 8px 10px; border: 1px solid var(--pc-line); border-radius: 30px; }
+.pc-main { max-width: 760px; margin: auto; padding: 8px 16px 28px; }
+.pc-wait { text-align: center; padding-bottom: 20px; }
+.pc-status { font-size: 11px; color: var(--pc-muted); display: inline-flex; align-items: center; gap: 7px; }
+.pc-status i { width: 6px; height: 6px; border-radius: 50%; background: var(--pc-accent); }
+.pc-wait h1 { font-size: 19px; line-height: 1.4; font-weight: 600; letter-spacing: -.03em; margin: 12px 0 6px; }
+.pc-wait p { color: var(--pc-muted); font-size: 13px; margin: 0; line-height: 1.8; }
+.pc-session { font-size: 11px; color: var(--pc-muted); margin-top: 12px; display: flex; flex-wrap: wrap; justify-content: center; column-gap: 6px; line-height: 1.9; }
+.pc-session span + span::before { content: "·"; margin-right: 6px; opacity: .55; }
+.pc-assurance { text-align: center; font-size: 11px; color: var(--pc-muted); margin: 16px 0 0; }
+@media (min-width: 521px) {
+  .pc-brand { height: 92px; padding: 0 20px; } .pc-brand b { font-size: 15px; } .pc-brand small { font-size: 11px; } .pc-nhan { font-size: 12px; padding: 9px 14px; }
+  .pc-main { padding: 6px 20px 32px; } .pc-wait { padding-bottom: 26px; } .pc-wait h1 { font-size: 24px; margin-top: 10px; } .pc-wait p { font-size: 15px; }
+}
+
+/* ── THẺ GAME trong phòng chờ — khung theo token app học sinh ── */
+.dn-the { background: var(--tr-mat); color: var(--tr-chu); border: 2px solid var(--tr-vien); border-radius: 22px; box-shadow: 0 4px 0 var(--tr-vien); padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.dn-dau { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; }
+.dn-mat { font-size: 11px; font-weight: 700; letter-spacing: .1em; color: var(--tr-chu-3); }
+.dn-the h2 { margin: 2px 0 0; font-size: 22px; font-weight: 800; line-height: 1.2; }
+.dn-thang { text-align: right; flex: none; }
+.dn-thang span { display: block; font-size: 12px; color: var(--tr-chu-3); }
+.dn-thang b { display: block; font-size: 24px; font-weight: 800; line-height: 1.1; color: var(--tr-sao-chu); }
+.dn-bia { height: 156px; border-radius: 16px; overflow: hidden; background: var(--tr-mat-2); }
+.dn-bia canvas { display: block; width: 100%; height: 100%; }
+@media (min-width: 700px) { .dn-bia { height: 200px; } }
+@media (orientation: landscape) and (max-height: 560px) { .dn-bia { height: 120px; } }
+.dn-luat { margin: 0; font-size: 15px; line-height: 1.5; color: var(--tr-chu-2); }
+.dn-luat b { color: var(--tr-chu); }
+.dn-cap-hang { display: flex; gap: 6px; flex-wrap: wrap; margin: 0; padding: 0; list-style: none; }
+.dn-cap-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 3px; border-radius: 20px; background: var(--tr-mat-2); font-size: 12px; font-weight: 700; color: var(--tr-chu-2); }
+.dn-cap-chip i { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 12px; color: var(--dn-tren-mau); background: var(--c); }
+.dn-nut { min-height: 48px; border-radius: 16px; border: 0; font-weight: 800; font-size: 16px; padding: 0 18px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: transform .1s; }
+.dn-nut:active { transform: translateY(2px); }
+.dn-nut-chinh { background: var(--tr-hs-nut); color: var(--tr-trang); box-shadow: inset 0 -4px 0 var(--tr-hs-day); }
+.dn-nut-vien { background: var(--tr-mat); color: var(--tr-hs-chu); border: 2px solid var(--tr-vien); box-shadow: 0 3px 0 var(--tr-vien); }
+.dn-nut-to { width: 100%; min-height: 56px; font-size: 18px; border-radius: 18px; }
+.dn-nut-chu { background: transparent; color: var(--tr-hs-chu); min-height: 44px; padding: 0 12px; }
+.dn-vao { display: flex; flex-direction: column; gap: 6px; }
+.dn-phu { margin: 0; font-size: 13px; line-height: 1.5; color: var(--tr-chu-3); text-align: center; }
+.dn-hang { display: flex; gap: 8px; flex-wrap: wrap; }
+.dn-hang > .dn-nut { flex: 1 1 150px; }
+.dn-cai { display: flex; flex-direction: column; gap: 8px; padding-top: 8px; border-top: 2px dashed var(--tr-vien); }
+.dn-nhan { font-size: 12px; font-weight: 700; color: var(--tr-chu-3); }
+.dn-chon { display: flex; flex-wrap: wrap; gap: 8px; }
+.dn-hat { width: 44px; height: 44px; border-radius: 50%; border: 0; display: grid; place-items: center; font-weight: 800; font-size: 14px; background: var(--c); color: var(--dn-tren-mau); padding: 0; }
+.dn-hat[aria-checked='true'] { box-shadow: 0 0 0 3px var(--tr-mat), 0 0 0 6px var(--c); }
+.dn-cong-tac { display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 14px; color: var(--tr-chu-2); }
+.dn-cong-tac input { width: 20px; height: 20px; accent-color: var(--tr-hs-nut); }
+.dn-dong { display: flex; flex-direction: column; gap: 4px; padding: 18px; border-radius: 16px; background: var(--tr-mat-2); text-align: center; }
+.dn-dong strong { font-size: 18px; } .dn-dong span { font-size: 14px; color: var(--tr-chu-3); }
+/* Bảng thử (chỉ có ở bản thử) */
+.dn-thu { margin-top: 18px; padding: 12px; border-radius: 16px; border: 1px dashed var(--pc-line); font-size: 13px; color: var(--pc-muted); display: flex; flex-direction: column; gap: 8px; }
+.dn-thu b { color: var(--pc-ink); }
+.dn-thu .dn-hang button { min-height: 44px; border-radius: 12px; border: 1px solid var(--pc-line); background: var(--pc-card); color: var(--pc-ink); font-size: 13px; font-weight: 700; padding: 0 12px; flex: 1 1 120px; }
+.dn-thu .dn-hang button[aria-pressed='true'] { background: var(--pc-soft); border-color: var(--pc-accent); }
+
+/* ── MÀN TRẬN: phủ kín khung nhìn, CẢ MÀN là vùng kéo (không có nút điều khiển) ── */
+.dn-man { position: fixed; inset: 0; z-index: 50; background: var(--tr-nen); color: var(--tr-chu); overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; overscroll-behavior: contain;
+  display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto auto minmax(0, 1fr); grid-template-areas: 'dai' 'hud' 'san' 'ben';
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  --canh: min(calc(100vw - 16px), calc(100dvh - 44px - 92px - 150px)); }
+.dn-dai { grid-area: dai; height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 4px 0 14px; font-size: 12px; color: var(--tr-chu-3); }
+.dn-dai > span { display: flex; align-items: center; gap: 8px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dn-cham { width: 8px; height: 8px; border-radius: 50%; background: var(--tr-dung); flex: none; animation: dn-nhip 1.2s ease-in-out infinite; }
+@keyframes dn-nhip { 50% { opacity: .3; } }
+.dn-hud { grid-area: hud; position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 0 8px 8px; }
+.dn-toi { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 10px; row-gap: 4px; align-items: center; padding: 8px 10px; border-radius: 16px; background: var(--tr-mat); border: 2px solid var(--tr-vien); box-shadow: 0 3px 0 var(--tr-vien); min-width: 0; }
+.dn-toi .dn-hat { width: 38px; height: 38px; font-size: 14px; grid-row: 1 / 4; }
+.dn-dong-1 { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 13px; font-weight: 700; }
+.dn-dong-1 b { font-size: 15px; }
+.dn-mau { flex: 1; height: 8px; border-radius: 4px; background: var(--tr-mat-3); overflow: hidden; min-width: 40px; }
+.dn-mau i { display: block; height: 100%; width: 100%; border-radius: 4px; background: var(--tr-dung); transform-origin: left; transition: transform .15s; }
+.dn-mau[data-it] i { background: var(--tr-sai); }
+.dn-dong-2 { font-size: 13px; font-weight: 700; color: var(--tr-chu-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dn-dong-2 em { font-style: normal; display: inline-block; padding: 0 7px; border-radius: 10px; background: var(--c, var(--tr-mat-3)); color: var(--dn-tren-mau); margin-right: 4px; }
+.dn-e { display: flex; align-items: center; gap: 3px; font-size: 12px; color: var(--tr-chu-3); min-width: 0; }
+.dn-e i { flex: 1; max-width: 16px; height: 6px; border-radius: 3px; background: var(--tr-mat-3); }
+.dn-e i[data-co] { background: var(--tr-tin); }
+.dn-e span { margin-left: 4px; white-space: nowrap; }
+.dn-so-o { display: grid; grid-template-rows: 1fr 1fr; gap: 6px; }
+.dn-o { min-width: 76px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 14px; background: var(--tr-mat); border: 2px solid var(--tr-vien); line-height: 1.05; padding: 2px 8px; }
+.dn-o small { font-size: 11px; color: var(--tr-chu-3); font-weight: 700; }
+.dn-o b { font-size: 20px; font-weight: 800; }
+.dn-o-ha b { color: var(--tr-sao-chu); }
+.dn-khung { grid-area: san; justify-self: center; position: relative; width: var(--canh); height: var(--canh); }
+.dn-khung canvas { display: block; width: 100%; height: 100%; border-radius: 22px; }
+.dn-ben { grid-area: ben; padding: 8px 10px 0; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
+.dn-ben h3 { margin: 0; font-size: 13px; font-weight: 800; color: var(--tr-chu-3); }
+.dn-xh { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.dn-xh li { display: grid; grid-template-columns: 16px 26px minmax(0, 1fr) auto; align-items: center; gap: 6px; padding: 4px 8px 4px 6px; border-radius: 12px; background: var(--tr-mat); border: 2px solid var(--tr-vien); min-height: 38px; font-size: 13px; }
+.dn-xh li[data-em] { border-color: var(--tr-hs-nut); }
+.dn-xh .dn-hat { width: 26px; height: 26px; font-size: 11px; }
+.dn-xh .h { font-weight: 800; color: var(--tr-chu-3); text-align: center; }
+.dn-xh .t { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dn-xh .t small { display: block; font-size: 11px; font-weight: 600; color: var(--tr-chu-3); }
+.dn-xh .k { font-weight: 800; font-size: 16px; color: var(--tr-sao-chu); text-align: right; }
+.dn-goi-y { margin: 0; text-align: center; font-size: 13px; color: var(--tr-chu-3); line-height: 1.5; transition: opacity .3s; }
+.dn-goi-y b { color: var(--tr-chu-2); }
+/* Hình gợi ý vùng kéo (chỉ là hình, không bấm): vòng nét đứt + chấm như cần nổi, mờ dần sau lần kéo đầu */
+.dn-man[data-keo] .dn-goi-y::before { display: none; }
+.dn-goi-y::before { content: ''; display: block; width: 64px; height: 64px; margin: 6px auto 6px; border-radius: 50%; border: 2px dashed var(--tr-vien-2); background: radial-gradient(circle, var(--tr-hs) 0 12px, transparent 13px); opacity: .7; }
+.dn-cach { display: none; }
+/* Cần nổi: CHỈ hiện dưới ngón tay khi đang kéo (không phải nút) */
+.dn-can { position: fixed; left: 0; top: 0; width: 112px; height: 112px; margin: -56px 0 0 -56px; border-radius: 50%; border: 2px dashed var(--tr-hs); background: color-mix(in srgb, var(--tr-hs) 12%, transparent); pointer-events: none; opacity: 0; transition: opacity .12s; z-index: 60; }
+.dn-can[data-hien] { opacity: 1; }
+.dn-can i { position: absolute; left: 50%; top: 50%; width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%; background: var(--tr-hs-nut); box-shadow: inset 0 -4px 0 var(--tr-hs-day); opacity: .9; }
+/* Tin nổi (hạ, lên cấp) */
+/* Tin nổi nằm trên khung trạng thái của em (ngoài sân) ⇒ không bao giờ che trận. */
+.dn-tin { position: absolute; left: 0; right: 0; bottom: 4px; display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none; z-index: 3; }
+.dn-tin div { max-width: 92%; padding: 5px 14px; border-radius: 20px; font-size: 14px; font-weight: 800; text-align: center; background: var(--tr-mat); color: var(--tr-chu); border: 2px solid var(--tr-vien); box-shadow: 0 3px 0 var(--tr-vien); animation: dn-hien 1.8s ease-out forwards; }
+.dn-tin div[data-k='ha'] { background: var(--tr-sao); border-color: var(--tr-sao-day); box-shadow: 0 3px 0 var(--tr-sao-day); color: var(--tr-chu); }
+:root[data-nen='toi'] .dn-tin div[data-k='ha'] { color: var(--tr-trang); }
+.dn-tin div[data-k='len'] { background: var(--c); border-color: var(--c); box-shadow: none; color: var(--dn-tren-mau); }
+.dn-tin div[data-k='bi'] { background: var(--tr-sai-nhat); border-color: var(--tr-sai); box-shadow: 0 3px 0 var(--tr-sai); color: var(--tr-sai-chu); }
+@keyframes dn-hien { 0% { opacity: 0; transform: translateY(6px) scale(.95); } 10% { opacity: 1; transform: none; } 82% { opacity: 1; } 100% { opacity: 0; } }
+.dn-tinh .dn-tin div { animation: none; }
+/* Hết ván */
+.dn-mo { position: absolute; inset: 0; border-radius: 22px; background: color-mix(in srgb, var(--tr-nen) 72%, transparent); }
+.dn-ket { position: absolute; inset: 0; margin: auto; width: min(94%, 430px); height: fit-content; max-height: 98%; overflow: auto; touch-action: pan-y; padding: 14px 14px 12px; border-radius: 22px; background: var(--tr-mat); border: 2px solid var(--tr-vien); box-shadow: 0 5px 0 var(--tr-vien); display: flex; flex-direction: column; gap: 8px; text-align: center; z-index: 4; }
+.dn-ket h2 { margin: 0; font-size: 22px; font-weight: 800; }
+.dn-ket-so { margin: 0; font-size: 14px; color: var(--tr-chu-3); font-weight: 700; }
+.dn-ket-so b { font-size: 30px; color: var(--tr-hs-chu); vertical-align: -3px; margin: 0 2px; }
+.dn-bang { width: 100%; border-collapse: collapse; font-size: 13px; }
+.dn-bang th, .dn-bang td { padding: 5px 3px; border-bottom: 1px solid var(--tr-vien); text-align: center; }
+.dn-bang thead th { font-size: 11px; color: var(--tr-chu-3); font-weight: 700; }
+.dn-bang tbody th { text-align: left; font-weight: 700; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dn-bang tbody th .dn-hat { width: 20px; height: 20px; font-size: 9px; display: inline-grid; flex: none; }
+.dn-ten-o { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; }
+.dn-ten-o b { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.dn-bang tr[data-em] { background: var(--tr-hs-nhat); }
+.dn-ket .dn-hang { justify-content: center; }
+.dn-dem { height: 6px; border-radius: 3px; background: var(--tr-mat-3); overflow: hidden; }
+.dn-dem i { display: block; height: 100%; background: var(--tr-hs-nut); transform-origin: left; }
+.dn-pu { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.dn-pu button { min-height: 44px; border-radius: 14px; border: 2px solid var(--tr-vien); background: var(--tr-mat-2); color: var(--tr-chu-2); font-weight: 700; font-size: 13px; padding: 0 10px; }
+.dn-fps { position: fixed; right: 8px; bottom: 8px; z-index: 70; font: 700 12px/1 ui-monospace, monospace; padding: 6px 8px; border-radius: 8px; background: var(--tr-mat); color: var(--tr-chu); border: 1px solid var(--tr-vien); }
+
+/* Điện thoại ngang: trạng thái em · sân · xếp hạng — vẫn kéo ở đâu cũng được */
+@media (orientation: landscape) and (max-height: 560px) {
+  .dn-man { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); grid-template-areas: 'dai dai dai' 'hud san ben'; --canh: min(calc(100dvh - 40px), calc(100vw - 420px)); }
+  .dn-dai { height: 36px; }
+  .dn-hud { grid-template-columns: minmax(0, 1fr); align-content: start; padding: 0 8px 8px; }
+  .dn-so-o { grid-template-rows: none; grid-template-columns: 1fr 1fr; }
+  .dn-toi .dn-hat { width: 32px; height: 32px; }
+  .dn-dong-2 { white-space: normal; }
+  .dn-tin { bottom: auto; top: calc(100% + 4px); }
+  .dn-ben { padding: 0 8px 8px; }
+  .dn-xh { grid-template-columns: 1fr; gap: 4px; }
+  .dn-xh li { min-height: 34px; padding: 2px 8px 2px 6px; }
+  .dn-xh .t small { display: none; }
+  .dn-goi-y { font-size: 12px; text-align: left; }
+  .dn-goi-y::before { display: none; }
+  .dn-ket { padding: 8px 10px; gap: 4px; }
+  .dn-ket { width: min(96%, 460px); }
+  .dn-ket h2 { font-size: 17px; } #ketSo, .dn-ket > .dn-phu { display: none; }
+  .dn-bang th, .dn-bang td { padding: 1px 3px; }
+  .dn-bang tbody th .dn-hat { width: 16px; height: 16px; font-size: 8px; }
+  .dn-ket .dn-nut { min-height: 44px; font-size: 15px; }
+  .dn-pu { display: none; }
+}
+/* Máy tính: sân lớn + cột phải (xếp hạng, cách chơi) */
+@media (min-width: 1024px) and (min-height: 561px) {
+  .dn-man { grid-template-columns: 1fr auto 340px 1fr; grid-template-rows: auto auto minmax(0, 1fr); grid-template-areas: 'dai dai dai dai' '. san hud .' '. san ben .'; column-gap: 24px; align-content: start; --canh: min(calc(100dvh - 44px - 24px), 820px); }
+  .dn-dai { padding: 0 16px 0 24px; font-size: 13px; }
+  .dn-khung { align-self: start; }
+  .dn-hud { padding: 0 0 12px; grid-template-columns: minmax(0, 1fr); }
+  .dn-so-o { grid-template-rows: none; grid-template-columns: 1fr 1fr; }
+  .dn-o { min-width: 96px; } .dn-o b { font-size: 24px; }
+  .dn-ben { padding: 0; align-self: start; }
+  .dn-xh { grid-template-columns: 1fr; }
+  .dn-xh li { min-height: 46px; font-size: 14px; }
+  .dn-goi-y { display: none; }
+  .dn-cach { display: block; padding: 14px 16px; border-radius: 18px; background: var(--tr-mat); border: 2px solid var(--tr-vien); }
+  .dn-cach ul { margin: 6px 0 0; padding-left: 18px; font-size: 14px; line-height: 1.65; color: var(--tr-chu-2); }
+  .dn-cach kbd { font: inherit; font-weight: 800; color: var(--tr-chu); padding: 0 6px; border-radius: 6px; border: 1px solid var(--tr-vien-2); background: var(--tr-mat-2); }
+}
+@media (prefers-reduced-motion: reduce) { .dn-cham, .dn-tin div { animation: none; } .dn-nut, .dn-mau i { transition: none; } }
+
+/* ── BẢNG cấp súng / vật phẩm / hiệu ứng (?bang=1) ── */
+.dn-bang-ve { max-width: 1400px; margin: 0 auto; padding: 24px; color: var(--tr-chu); }
+.dn-bang-ve h1 { margin: 0 0 4px; font-size: 26px; }
+.dn-bang-ve > p { margin: 0 0 18px; color: var(--tr-chu-3); font-size: 15px; }
+.dn-bang-ve h2 { margin: 18px 0 10px; font-size: 17px; color: var(--tr-chu-2); }
+.dn-luoi-o { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+.dn-luoi-o[data-n='6'] { grid-template-columns: repeat(6, 1fr); }
+.dn-luoi-o[data-n='4'] { grid-template-columns: repeat(4, 1fr); }
+.dn-o-ve { background: var(--tr-mat); border: 2px solid var(--tr-vien); border-radius: 18px; box-shadow: 0 3px 0 var(--tr-vien); padding: 8px 8px 10px; }
+.dn-o-ve canvas { display: block; width: 100%; aspect-ratio: 4 / 3; border-radius: 12px; }
+.dn-o-ve h3 { margin: 8px 2px 2px; font-size: 15px; display: flex; gap: 6px; align-items: center; }
+.dn-o-ve h3 i { font-style: normal; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; background: var(--c); color: var(--dn-tren-mau); flex: none; }
+.dn-o-ve p { margin: 0 2px; font-size: 13px; line-height: 1.45; color: var(--tr-chu-3); }
+body.dn-bb { background: var(--tr-nen); }
+</style>
+</head>
+<body>
+<div id="phong">
+  <header class="pc-brand"><div><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="var(--pc-accent)"/><ellipse cx="20" cy="20" rx="14" ry="5.5" fill="none" stroke="var(--pc-card)" stroke-width="2"/><ellipse cx="20" cy="20" rx="14" ry="5.5" fill="none" stroke="var(--pc-card)" stroke-width="2" transform="rotate(60 20 20)"/><ellipse cx="20" cy="20" rx="14" ry="5.5" fill="none" stroke="var(--pc-card)" stroke-width="2" transform="rotate(-60 20 20)"/><circle cx="20" cy="20" r="3.4" fill="var(--pc-card)"/></svg><span><b>AVOGADRO</b><small>Học một chút, tiến một bước.</small></span></div><span class="pc-nhan">Phòng chờ</span></header>
+  <div class="pc-main">
+    <div class="pc-wait">
+      <span class="pc-status"><i></i> Em đã vào phòng chờ</span>
+      <h1>Đang chờ Thầy bấm bắt đầu</h1>
+      <p>Em giữ nguyên màn hình này. Đề hiện ra ngay khi Thầy bắt đầu.</p>
+      <div class="pc-session"><span>Ca kiểm tra: Kiểm tra 15 phút · Ester</span><span>Lớp 12A1</span><span>Bài làm trong 15 phút, đồng hồ chạy từ lúc đó.</span></div>
+    </div>
+    <section class="dn-the" id="the" aria-label="Mini-game Đấu Nguyên Tử">
+      <div class="dn-dau"><div><div class="dn-mat">CHƠI MỘT CHÚT TRONG LÚC CHỜ</div><h2>Đấu Nguyên Tử</h2></div><div class="dn-thang"><span>Thắng hôm nay</span><b class="so" id="thang">0</b></div></div>
+      <div class="dn-bia"><canvas id="bia" aria-hidden="true"></canvas></div>
+      <p class="dn-luat">Súng <b>tự ngắm, tự bắn</b>. Em chỉ việc <b>kéo ở đâu cũng được</b> để đi, nhặt electron để súng tiến hoá tới Cấp 5.</p>
+      <ul class="dn-cap-hang" aria-label="Năm cấp súng" id="capHang"></ul>
+      <div class="dn-vao">
+        <button type="button" class="dn-nut dn-nut-chinh dn-nut-to" id="vao">Vào sân đấu</button>
+        <p class="dn-phu" id="vaoPhu">Sân 3 · 4/6 bạn đang chơi · ván 60 giây</p>
+      </div>
+      <div class="dn-cai">
+        <span class="dn-nhan">Nguyên tố của em</span>
+        <div class="dn-chon" role="radiogroup" aria-label="Nguyên tố của em" id="chon"></div>
+        <label class="dn-cong-tac"><input type="checkbox" id="anTen">Ẩn tên (bạn thấy «Bạn <span id="anKy">Cl</span>»)</label>
+      </div>
+    </section>
+    <p class="pc-assurance">Điểm chơi chỉ để vui trong lúc chờ.</p>
+    <div class="dn-thu" id="thu">
+      <span><b>Bảng thử</b> (chỉ có ở bản thử, bản thật không có): bản thử chơi với 5 A.I trên máy, không cần mạng.</span>
+      <div class="dn-hang">
+        <button type="button" id="tNen" aria-pressed="false">Nền tối</button>
+        <button type="button" id="tYeu" aria-pressed="false">Chế độ máy yếu</button>
+        <button type="button" id="tFps" aria-pressed="false">Hiện khung/giây</button>
+        <button type="button" id="tDung">Thử «Thầy bấm bắt đầu» sau 20 giây</button>
+      </div>
+      <span id="tDungChu" role="status"></span>
+    </div>
+  </div>
+</div>
+
+<div class="dn-man" id="man" role="dialog" aria-modal="true" aria-label="Trận Đấu Nguyên Tử" hidden>
+  <div class="dn-dai"><span><i class="dn-cham" aria-hidden="true"></i>Phòng chờ · Thầy bắt đầu là vào bài</span><button type="button" class="dn-nut dn-nut-chu" id="roi">Rời sân</button></div>
+  <div class="dn-hud">
+    <div class="dn-toi">
+      <span class="dn-hat" id="hEmHat">Cl</span>
+      <div class="dn-dong-1"><b>Em</b><span class="dn-mau" id="hMau" aria-hidden="true"><i></i></span><span class="so" id="hMauChu">Máu 10/10</span></div>
+      <div class="dn-dong-2" id="hCap"><em>Cấp 1</em>Liên kết đơn</div>
+      <div class="dn-e" id="hE" aria-label="Electron"></div>
+    </div>
+    <div class="dn-tin" id="tin" aria-live="polite"></div>
+    <div class="dn-so-o"><div class="dn-o"><small>Còn</small><b class="so" id="hGio">1:00</b></div><div class="dn-o dn-o-ha"><small>Hạ</small><b class="so" id="hHa">0</b></div></div>
+  </div>
+  <div class="dn-khung" id="khung">
+    <canvas id="san" tabindex="0" aria-label="Sân đấu. Kéo ở bất kỳ đâu để đi, chạm một điểm để đi tới đó; máy tính: rê chuột trên sân hoặc W A S D. Súng tự ngắm bạn gần nhất và tự bắn."></canvas>
+    <div class="dn-mo" id="mo" hidden></div>
+    <div class="dn-ket" id="ket" role="dialog" aria-labelledby="ketTieuDe" hidden>
+      <h2 id="ketTieuDe">Em nhất ván!</h2>
+      <p class="dn-ket-so" id="ketSo"></p>
+      <table class="dn-bang"><thead><tr><th scope="col">Bạn</th><th scope="col">Hạ</th><th scope="col">Bị hạ</th><th scope="col">Cấp cao nhất</th><th scope="col">Chuỗi hạ</th></tr></thead><tbody id="ketBang"></tbody></table>
+      <p class="dn-ket-so" id="ketDem">Ván mới sau 6 giây</p>
+      <div class="dn-dem" aria-hidden="true"><i id="ketDemThanh"></i></div>
+      <div class="dn-pu" aria-label="Phản ứng nhanh"><button type="button">Hay đấy!</button><button type="button">Suýt nữa!</button><button type="button">Đấu lại nhé</button><button type="button">Chơi đẹp</button></div>
+      <p class="dn-phu" id="puChu" role="status"></p>
+      <div class="dn-hang"><button type="button" class="dn-nut dn-nut-chinh" id="vanMoi">Chơi ván mới</button><button type="button" class="dn-nut dn-nut-vien" id="veSanh">Về sảnh</button></div>
+      <p class="dn-phu">Kết quả chỉ để vui, không lưu vào điểm.</p>
+    </div>
+  </div>
+  <div class="dn-ben">
+    <h3>Xếp hạng ván này</h3>
+    <ol class="dn-xh" id="xh"></ol>
+    <p class="dn-goi-y" id="goiY"><b>Kéo ở bất kỳ đâu</b> để đi · chạm một điểm để đi tới đó · súng tự bắn</p>
+    <div class="dn-cach"><h3>Cách chơi</h3><ul>
+      <li><b>Di chuyển:</b> rê chuột trên sân, nguyên tử đi theo con trỏ; hoặc <kbd>W A S D</kbd> / phím mũi tên</li>
+      <li><b>Súng tự ngắm</b> bạn gần nhất trong tầm và tự bắn</li>
+      <li>Nhặt <b>electron</b> để súng lên cấp; <b>Xúc tác</b> lên ngay một cấp; <b>Khiên</b> chặn 3 viên đạn kế tiếp</li>
+      <li>Bị hạ: súng xuống một cấp, hồi lại sau 1,5 giây</li></ul></div>
+  </div>
+</div>
+<div class="dn-can" id="can" aria-hidden="true"><i></i></div>
+<div class="dn-fps" id="fps" hidden></div>
+
+<script>
+'use strict'
+;(() => {
+// ═════════ 1. LUẬT — bản build: src/lib/dau-ion/loi.ts (chạy chung máy chủ + máy em; thuần, tất định) ═════════
+const SAN = 600, R = 18, TOC = 205, TOC_DAN = 460, TAM_DAN = 380, R_DAN = 5, TAM_NGAM = 320
+const MAU_MAX = 10, GIAY_HOI = 1.5, GIAY_CHE = 1.2, GIAY_VAN = 60, GIAY_NGHI = 6, GIAY_HOI_MAU = 2.5, NHIP_HOI_MAU = 0.5
+const NGUYEN_TO = ['Na', 'O', 'N', 'Cl', 'S', 'Fe', 'Ne']
+const TEN_NGUYEN_TO = ['Sodium', 'Oxygen', 'Nitrogen', 'Chlorine', 'Sulfur', 'Iron', 'Neon']
+const PI2 = Math.PI * 2
+/** 5 cấp súng: «vien» = các viên mỗi loạt (g: lệch góc, l: lệch ngang). */
+const CAP = [null,
+  { ngan: 'Đơn', ten: 'Liên kết đơn', vi: 'như H–H', mo: '1 viên mỗi loạt', nhip: 0.34, vien: [{ g: 0, l: 0 }] },
+  { ngan: 'Đôi', ten: 'Liên kết đôi', vi: 'như O=O', mo: '2 viên song song', nhip: 0.34, vien: [{ g: 0, l: -6 }, { g: 0, l: 6 }] },
+  { ngan: 'Ba', ten: 'Liên kết ba', vi: 'như N≡N', mo: '3 viên xoè', nhip: 0.36, vien: [{ g: -0.16, l: 0 }, { g: 0, l: 0 }, { g: 0.16, l: 0 }] },
+  { ngan: 'Dây chuyền', ten: 'Phản ứng dây chuyền', vi: 'như gốc Cl• tự do', mo: '3 viên, trúng thì nảy sang bạn gần nhất', nhip: 0.36, vien: [{ g: -0.14, l: 0 }, { g: 0, l: 0 }, { g: 0.14, l: 0 }], xich: 170 },
+  { ngan: 'Toả nhiệt', ten: 'Phản ứng toả nhiệt', vi: 'như Mg cháy sáng', mo: '5 viên, trúng thì nổ lan', nhip: 0.4, vien: [-0.28, -0.14, 0, 0.14, 0.28].map((g) => ({ g, l: 0 })), no: 46 },
+]
+/** Electron cần để lên cấp kế (cấp 1→2: 3, …, 4→5: 9). */
+const CAN_E = [0, 3, 5, 7, 9]
+const VAT = [
+  { k: 'tron', x: 300, y: 300, r: 42, ve: 'binh-cau', mau: 1 },
+  { k: 'tron', x: 172, y: 300, r: 20, ve: 'binh-non', mau: 4 },
+  { k: 'tron', x: 428, y: 300, r: 20, ve: 'binh-non', mau: 3 },
+  { k: 'cn', x: 140, y: 128, w: 124, h: 24, ve: 'gia-ong' },
+  { k: 'cn', x: 336, y: 448, w: 124, h: 24, ve: 'gia-ong' },
+  { k: 'cn', x: 404, y: 168, w: 40, h: 40, ve: 'coc', mau: 6 },
+  { k: 'cn', x: 156, y: 392, w: 40, h: 40, ve: 'coc', mau: 0 },
+]
+const CHO_RA = [[300, 52], [518, 176], [518, 424], [300, 548], [82, 424], [82, 176]]
+const CHO_XT = [[300, 206], [300, 394], [212, 212], [388, 388]]
+const CHO_KH = [[100, 300], [500, 300], [300, 120], [300, 480]]
+
+const kep = (v, a, b) => (v < a ? a : v > b ? b : v)
+function ngauNhien(tr) { let t = (tr.hat = (tr.hat + 0x6d2b79f5) | 0); t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296 }
+function dungVatCan(x, y, r) {
+  for (const v of VAT) {
+    if (v.k === 'tron') { if ((x - v.x) ** 2 + (y - v.y) ** 2 < (v.r + r) ** 2) return true }
+    else if ((x - kep(x, v.x, v.x + v.w)) ** 2 + (y - kep(y, v.y, v.y + v.h)) ** 2 < r * r) return true
+  }
+  return false
+}
+function dayRa(p, r) {
+  for (const v of VAT) {
+    if (v.k === 'tron') { const dx = p.x - v.x, dy = p.y - v.y, d = Math.hypot(dx, dy), m = v.r + r; if (d < m) { const k = d > 0.001 ? m / d : 1; p.x = v.x + (d > 0.001 ? dx : 1) * k; p.y = v.y + (d > 0.001 ? dy : 0) * k } }
+    else {
+      const cx = kep(p.x, v.x, v.x + v.w), cy = kep(p.y, v.y, v.y + v.h), dx = p.x - cx, dy = p.y - cy, d = Math.hypot(dx, dy)
+      if (d < r) {
+        if (d > 0.001) { p.x = cx + (dx / d) * r; p.y = cy + (dy / d) * r }
+        else { const a = p.x - v.x, b = v.x + v.w - p.x, c = p.y - v.y, e = v.y + v.h - p.y, m = Math.min(a, b, c, e); if (m === a) p.x = v.x - r; else if (m === b) p.x = v.x + v.w + r; else if (m === c) p.y = v.y - r; else p.y = v.y + v.h + r }
+      }
+    }
+  }
+  p.x = kep(p.x, r, SAN - r); p.y = kep(p.y, r, SAN - r)
+}
+function thayNhau(ax, ay, bx, by) { const n = Math.ceil(Math.hypot(bx - ax, by - ay) / 16); for (let i = 1; i < n; i++) if (dungVatCan(ax + ((bx - ax) * i) / n, ay + ((by - ay) * i) / n, R_DAN - 2)) return false; return true }
+const gheId = (tr, id) => tr.ghe.find((g) => g.id === id)
+
+function taoTran(ds, hat) {
+  const tr = { t: 0, con: GIAY_VAN, xong: false, ghe: [], dan: [], vp: [], su: [], hat: hat | 0 || 1, idDan: 1, idVp: 1, henE: 0, henXt: 9, henKh: 6, bang: null }
+  ds.forEach((d, i) => tr.ghe.push(taoGhe(d, i)))
+  for (let i = 0; i < 12; i++) themE(tr)
+  return tr
+}
+function taoGhe(d, i) {
+  const [x, y] = CHO_RA[i % 6]
+  return { id: d.id, nt: d.nt, ten: d.ten, ai: !!d.ai, x, y, vx: 0, vy: 0, ngam: Math.atan2(300 - y, 300 - x), mau: MAU_MAX, cap: 1, e: 0, capMax: 1, ha: 0, biHa: 0, chuoi: 0, chuoiMax: 0, cho: 0, che: GIAY_CHE, khien: 0, nap: 0.6 + i * 0.07, muc: 0, biTrungLuc: -9, hoiLuc: 0, ban: 0, trung: 0, yd: { dx: 0, dy: 0 }, ne: i % 2 ? 1 : -1, doiNe: 1 + i * 0.3, aiT: 0, aiX: 300, aiY: 300 }
+}
+function themE(tr, x, y, roi) {
+  if (x === undefined) {
+    for (let k = 0; k < 24; k++) {
+      const px = 36 + ngauNhien(tr) * 528, py = 36 + ngauNhien(tr) * 528
+      if (dungVatCan(px, py, 16) || tr.ghe.some((g) => g.cho <= 0 && Math.hypot(g.x - px, g.y - py) < 60) || tr.vp.some((v) => Math.hypot(v.x - px, v.y - py) < 26)) continue
+      x = px; y = py; break
+    }
+    if (x === undefined) return
+  }
+  const v = { id: tr.idVp++, k: 'e', x, y, t0: tr.t, roi: !!roi }
+  tr.vp.push(v); tr.su.push({ t: 'vp', k: 'e', id: v.id, x, y })
+}
+function themVp(tr, k) {
+  const ds = (k === 'xt' ? CHO_XT : CHO_KH).filter(([x, y]) => !tr.ghe.some((g) => g.cho <= 0 && Math.hypot(g.x - x, g.y - y) < 50))
+  if (!ds.length) return
+  const [x, y] = ds[Math.floor(ngauNhien(tr) * ds.length)]
+  const v = { id: tr.idVp++, k, x, y, t0: tr.t }
+  tr.vp.push(v); tr.su.push({ t: 'vp', k, id: v.id, x, y })
+}
+function lenCap(tr, g, vi) { g.cap++; g.capMax = Math.max(g.capMax, g.cap); tr.su.push({ t: 'len', ai: g.id, cap: g.cap, vi }) }
+function themEChoGhe(tr, g, n) {
+  if (g.cap >= 5) { g.mau = Math.min(MAU_MAX, g.mau + n); return }
+  g.e += n
+  while (g.cap < 5 && g.e >= CAN_E[g.cap]) { g.e -= CAN_E[g.cap]; lenCap(tr, g, 'e') }
+  if (g.cap >= 5) g.e = 0
+}
+function nhat(tr, g, v) {
+  tr.su.push({ t: 'nhat', k: v.k, ai: g.id, x: v.x, y: v.y, id: v.id })
+  if (v.k === 'e') themEChoGhe(tr, g, 1)
+  else if (v.k === 'xt') { if (g.cap < 5) lenCap(tr, g, 'xt'); else g.mau = MAU_MAX }
+  else g.khien = 3
+}
+/** Chọn mục tiêu tự ngắm: bạn gần nhất còn trên sân, hết khiên hồi sinh, trong tầm 320, không bị vật che; giữ mục tiêu cũ nếu chưa có ai gần hơn hẳn (25 %). */
+function chonMuc(tr, g) {
+  let tot = null, gan = TAM_NGAM
+  for (const k of tr.ghe) { if (k === g || k.cho > 0 || k.che > 0) continue; const d = Math.hypot(k.x - g.x, k.y - g.y); if (d < gan && thayNhau(g.x, g.y, k.x, k.y)) { gan = d; tot = k } }
+  const cu = g.muc ? gheId(tr, g.muc) : null
+  if (cu && cu !== tot && cu.cho <= 0 && cu.che <= 0) { const d = Math.hypot(cu.x - g.x, cu.y - g.y); if (d < TAM_NGAM && d < gan * 1.25 && thayNhau(g.x, g.y, cu.x, cu.y)) return cu }
+  return tot
+}
+function banLoat(tr, g) {
+  const c = CAP[g.cap], cs = Math.cos(g.ngam), sn = Math.sin(g.ngam)
+  g.nap = c.nhip; g.ban++
+  for (const b of c.vien) {
+    const a = g.ngam + b.g
+    tr.dan.push({ id: tr.idDan++, chu: g.id, nt: g.nt, cap: g.cap, x: g.x + cs * (R + 6) - sn * b.l, y: g.y + sn * (R + 6) + cs * b.l, vx: Math.cos(a) * TOC_DAN, vy: Math.sin(a) * TOC_DAN, con: TAM_DAN })
+  }
+  tr.su.push({ t: 'ban', chu: g.id, cap: g.cap, x: g.x + cs * (R + 12), y: g.y + sn * (R + 12), ngam: g.ngam })
+}
+function biTrung(tr, g, boi, x, y, cap, phu) {
+  if (g.cho > 0) return false
+  if (g.che > 0) { tr.su.push({ t: 'chan', ai: g.id, boi, x, y }); return false }
+  if (g.khien > 0) { g.khien--; tr.su.push({ t: 'chan', ai: g.id, boi, x, y, khien: g.khien }); return false }
+  g.mau--; g.biTrungLuc = tr.t
+  const b = gheId(tr, boi); if (b) b.trung++
+  tr.su.push({ t: 'trung', ai: g.id, boi, x, y, mau: g.mau, cap, phu })
+  if (g.mau <= 0) biHa(tr, g, b)
+  return true
+}
+function biHa(tr, g, b) {
+  g.cho = GIAY_HOI; g.biHa++; g.chuoi = 0; g.khien = 0; g.muc = 0; g.vx = g.vy = 0
+  const capCu = g.cap; g.cap = Math.max(1, g.cap - 1); g.e = 0
+  tr.su.push({ t: 'ha', ai: g.id, boi: b ? b.id : 0, x: g.x, y: g.y, capCu, chuoi: b ? b.chuoi + 1 : 0 })
+  for (let i = 0; i < 3; i++) { const a = ngauNhien(tr) * PI2, r = 16 + ngauNhien(tr) * 24, p = { x: g.x + Math.cos(a) * r, y: g.y + Math.sin(a) * r }; dayRa(p, 8); themE(tr, p.x, p.y, true) }
+  if (b) { b.ha++; b.chuoi++; b.chuoiMax = Math.max(b.chuoiMax, b.chuoi); themEChoGhe(tr, b, 2) }
+}
+function hoiSinh(tr, g) {
+  let tot = CHO_RA[0], xa = -1
+  for (const c of CHO_RA) { let gan = 1e9; for (const k of tr.ghe) if (k !== g && k.cho <= 0) gan = Math.min(gan, Math.hypot(k.x - c[0], k.y - c[1])); if (gan > xa) { xa = gan; tot = c } }
+  g.x = tot[0]; g.y = tot[1]; g.vx = g.vy = 0; g.mau = MAU_MAX; g.che = GIAY_CHE; g.cho = 0; g.nap = 0.3; g.hoiLuc = 0
+  tr.su.push({ t: 'hoi', ai: g.id, x: g.x, y: g.y })
+}
+function xepBang(tr) { return tr.ghe.map((g) => ({ id: g.id, nt: g.nt, ten: g.ten, ha: g.ha, biHa: g.biHa, capMax: g.capMax, chuoiMax: g.chuoiMax, cap: g.cap })).sort((a, b) => b.ha - a.ha || a.biHa - b.biHa || b.capMax - a.capMax) }
+
+/** Một bước của trận (máy chủ: 20 lần/giây; bản thử: 60). Sự kiện đẩy vào tr.su. */
+function buoc(tr, dt) {
+  if (tr.xong) return
+  tr.t += dt; tr.con = Math.max(0, tr.con - dt)
+  tr.henE -= dt
+  if (tr.henE <= 0) { tr.henE = 0.7; if (tr.vp.filter((v) => v.k === 'e').length < 14) themE(tr) }
+  if (!tr.vp.some((v) => v.k === 'xt')) { tr.henXt -= dt; if (tr.henXt <= 0) { tr.henXt = 14; themVp(tr, 'xt') } }
+  if (!tr.vp.some((v) => v.k === 'kh')) { tr.henKh -= dt; if (tr.henKh <= 0) { tr.henKh = 11; themVp(tr, 'kh') } }
+  for (const g of tr.ghe) {
+    if (g.cho > 0) { g.cho -= dt; if (g.cho <= 0) hoiSinh(tr, g); continue }
+    const k = Math.min(1, dt * 16)
+    g.vx += (g.yd.dx * TOC - g.vx) * k; g.vy += (g.yd.dy * TOC - g.vy) * k
+    const p = { x: g.x + g.vx * dt, y: g.y + g.vy * dt }; dayRa(p, R); g.x = p.x; g.y = p.y
+    g.che = Math.max(0, g.che - dt); g.nap -= dt
+    if (g.mau < MAU_MAX && tr.t - g.biTrungLuc > GIAY_HOI_MAU) { g.hoiLuc += dt; if (g.hoiLuc >= NHIP_HOI_MAU) { g.hoiLuc = 0; g.mau++ } } else g.hoiLuc = 0
+    const m = chonMuc(tr, g)
+    g.muc = m ? m.id : 0
+    if (m) g.ngam = Math.atan2(m.y - g.y, m.x - g.x)
+    else if (Math.hypot(g.vx, g.vy) > 40) g.ngam = Math.atan2(g.vy, g.vx)
+    if (m && g.nap <= 0 && g.che <= 0) banLoat(tr, g)
+    if (g.nap < 0) g.nap = 0
+    for (let i = tr.vp.length - 1; i >= 0; i--) {
+      const v = tr.vp[i], rr = v.k === 'e' ? R + 22 : R + 16
+      if (tr.t - v.t0 > 0.25 && (v.x - g.x) ** 2 + (v.y - g.y) ** 2 < rr * rr) { tr.vp.splice(i, 1); nhat(tr, g, v) }
+    }
+  }
+  for (let i = 0; i < tr.ghe.length; i++) for (let j = i + 1; j < tr.ghe.length; j++) {
+    const a = tr.ghe[i], b = tr.ghe[j]
+    if (a.cho > 0 || b.cho > 0) continue
+    const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy), m = R * 2
+    if (d < m && d > 0.001) { const k = (m - d) / 2 / d; a.x -= dx * k; a.y -= dy * k; b.x += dx * k; b.y += dy * k; dayRa(a, R); dayRa(b, R) }
+  }
+  for (let i = tr.dan.length - 1; i >= 0; i--) {
+    const d = tr.dan[i], n = Math.max(1, Math.ceil((TOC_DAN * dt) / 12))
+    let mat = false
+    for (let s = 0; s < n && !mat; s++) {
+      d.x += (d.vx * dt) / n; d.y += (d.vy * dt) / n; d.con -= (TOC_DAN * dt) / n
+      if (d.con <= 0) { mat = true; break }
+      if (d.x < 0 || d.y < 0 || d.x > SAN || d.y > SAN || dungVatCan(d.x, d.y, R_DAN - 1)) { mat = true; tr.su.push({ t: 'tat', x: kep(d.x, 0, SAN), y: kep(d.y, 0, SAN), nt: d.nt }); break }
+      for (const g of tr.ghe) {
+        if (g.id === d.chu || g.cho > 0) continue
+        if ((g.x - d.x) ** 2 + (g.y - d.y) ** 2 < (R + R_DAN) ** 2) {
+          mat = true
+          const ok = biTrung(tr, g, d.chu, d.x, d.y, d.cap)
+          if (ok && CAP[d.cap].xich) { // nảy sang bạn gần nhất (phản ứng dây chuyền)
+            let k2 = null, gan = CAP[d.cap].xich
+            for (const k of tr.ghe) { if (k.id === d.chu || k === g || k.cho > 0) continue; const dd = Math.hypot(k.x - g.x, k.y - g.y); if (dd < gan && thayNhau(g.x, g.y, k.x, k.y)) { gan = dd; k2 = k } }
+            if (k2) { tr.su.push({ t: 'xich', chu: d.chu, x1: d.x, y1: d.y, x2: k2.x, y2: k2.y }); biTrung(tr, k2, d.chu, k2.x, k2.y, d.cap, 'xich') }
+          }
+          if (ok && CAP[d.cap].no) { // nổ lan (phản ứng toả nhiệt)
+            tr.su.push({ t: 'no', chu: d.chu, x: d.x, y: d.y })
+            for (const k of tr.ghe) { if (k.id === d.chu || k === g || k.cho > 0) continue; if (Math.hypot(k.x - d.x, k.y - d.y) < CAP[d.cap].no + R) biTrung(tr, k, d.chu, k.x, k.y, d.cap, 'no') }
+          }
+          break
+        }
+      }
+    }
+    if (mat) tr.dan.splice(i, 1)
+  }
+  if (tr.con <= 0) { tr.xong = true; tr.bang = xepBang(tr); tr.su.push({ t: 'het' }) }
+}
+
+/** A.I CHỈ quyết hướng đi (súng tự ngắm như mọi người): nhặt vật phẩm, giữ khoảng cách, đi vòng, yếu máu thì lùi. */
+function aiNghi(tr, g) {
+  let dich = null, gan = 1e9
+  for (const k of tr.ghe) if (k !== g && k.cho <= 0) { const d = Math.hypot(k.x - g.x, k.y - g.y); if (d < gan) { gan = d; dich = k } }
+  let vp = null, diem = -1e9
+  for (const v of tr.vp) { const d = Math.hypot(v.x - g.x, v.y - g.y); const gia = v.k === 'xt' ? (g.cap < 5 ? 520 : 160) : v.k === 'kh' ? (g.khien ? 0 : 300) : g.cap < 5 ? 150 : g.mau < MAU_MAX ? 110 : 10; if (gia - d > diem) { diem = gia - d; vp = v } }
+  let tx = 300, ty = 300
+  if (g.mau <= 3 && dich && gan < 230) { const a = Math.atan2(g.y - dich.y, g.x - dich.x) + g.ne * 0.5; tx = g.x + Math.cos(a) * 170; ty = g.y + Math.sin(a) * 170 }
+  else if (vp && (diem > -60 || !dich || gan > 260)) { tx = vp.x; ty = vp.y }
+  else if (dich) { const a = Math.atan2(g.y - dich.y, g.x - dich.x) + g.ne * 0.9; tx = dich.x + Math.cos(a) * 190; ty = dich.y + Math.sin(a) * 190 }
+  g.aiX = kep(tx, 30, 570); g.aiY = kep(ty, 30, 570)
+}
+function aiDi(tr, g, dt) {
+  if (g.cho > 0) return { dx: 0, dy: 0 }
+  g.aiT -= dt; if (g.aiT <= 0) { g.aiT = 0.16 + ngauNhien(tr) * 0.12; aiNghi(tr, g) }
+  g.doiNe -= dt; if (g.doiNe <= 0) { g.doiNe = 1.4 + ngauNhien(tr) * 2; g.ne = -g.ne }
+  let dx = g.aiX - g.x, dy = g.aiY - g.y
+  const l = Math.hypot(dx, dy)
+  if (l < 8) return { dx: 0, dy: 0 }
+  const a0 = Math.atan2(dy, dx)
+  for (const x of [0, 0.7, -0.7, 1.4, -1.4, 2.2, -2.2]) { const a = a0 + x * g.ne, px = g.x + Math.cos(a) * 34, py = g.y + Math.sin(a) * 34; if (!dungVatCan(px, py, R) && px > R && px < SAN - R && py > R && py < SAN - R) { dx = Math.cos(a); dy = Math.sin(a); break } }
+  const t = Math.min(1, l / 40) * 0.92
+  return { dx: dx * t, dy: dy * t }
+}
+
+// ═════════ 2. BẢNG MÀU — đọc biến CSS lúc chạy (đổi sáng/tối là vẽ lại) ═════════
+function docBang() {
+  const p = document.createElement('i'); p.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden'; document.body.appendChild(p)
+  const c1 = document.createElement('canvas'); c1.width = c1.height = 1; const x1 = c1.getContext('2d', { willReadFrequently: true })
+  const lay = (bien) => { p.style.color = ''; p.style.color = `var(${bien})`; x1.clearRect(0, 0, 1, 1); x1.fillStyle = getComputedStyle(p).color; x1.fillRect(0, 0, 1, 1); const d = x1.getImageData(0, 0, 1, 1).data; return [d[0], d[1], d[2]] }
+  const b = {
+    toi: document.documentElement.dataset.nen === 'toi',
+    nt: ['na', 'o', 'n', 'cl', 's', 'fe', 'ne'].map((k) => lay(`--dn-${k}`)), cap: [null, 1, 2, 3, 4, 5].map((i) => (i ? lay(`--dn-cap-${i}`) : null)),
+    san1: lay('--dn-san-1'), san2: lay('--dn-san-2'), luoi: lay('--dn-luoi'), luoiDam: lay('--dn-luoi-dam'), kinh: lay('--dn-kinh'), kinhVien: lay('--dn-kinh-vien'),
+    chu: lay('--tr-chu'), the: lay('--tr-mat'), e: lay('--dn-e'), xt: lay('--dn-xt'), kh: lay('--dn-kh'), dung: lay('--tr-dung'), sai: lay('--tr-sai'), sao: lay('--tr-sao'), tim: lay('--tr-tim'),
+    phong: getComputedStyle(document.body).fontFamily,
+  }
+  p.remove(); return b
+}
+const TRANG = [255, 255, 255], DEN = [20, 18, 40]
+const RGBA = new Map()
+function rgba(c, a = 1) { a = Math.round(a * 50) / 50; const k = c[0] * 1e6 + c[1] * 1e3 + c[2] + a / 10; let s = RGBA.get(k); if (!s) { s = `rgba(${c[0]},${c[1]},${c[2]},${a})`; if (RGBA.size > 4000) RGBA.clear(); RGBA.set(k, s) } return s }
+const tron = (a, b, t) => [0, 1, 2].map((i) => Math.round(a[i] + (b[i] - a[i]) * t))
+const doSang = (c) => (0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]) / 255
+
+// ═════════ 3. LỚP VẼ — Canvas 2D thuần: nền vẽ một lần, nguyên tử + quầng sáng vẽ sẵn, hiệu ứng có trần ═════════
+const TUOI = { chop: 90, tia: 260, so: 700, bong: 760, vong: 420, hut: 220, set: 260, no: 380, sao: 560, puff: 170 }
+class Ve {
+  constructor(cv, bang, yeu) { this.cv = cv; this.ctx = cv.getContext('2d'); this.b = bang; this.yeu = yeu; this.nen = null; this.hat = []; this.qs = new Map(); this.hu = []; this.rung = null; this.doLuc = -1e9; this.s = 1; this.dpr = 1; this.view = { x0: 0, y0: 0, w: SAN, h: SAN }; this.goc = new Map(); this.loe = new Map(); this.giat = new Map(); this.rongTen = new Map(); this.nayCu = 0; this.diToi = null; this.soLuc = new Map() }
+  datCo(w, h, dpr, view) {
+    this.view = view || { x0: 0, y0: 0, w: SAN, h: SAN }; this.dpr = dpr
+    this.cv.width = Math.round(w * dpr); this.cv.height = Math.round(h * dpr); this.s = (w / this.view.w) * dpr
+    this.rongTen.clear(); this.qs.clear(); this.taoHat(); this.nen = null
+    if (!view) this.taoNen()
+  }
+  datBang(b) { this.b = b; this.rongTen.clear(); this.qs.clear(); this.taoHat(); if (this.nen) this.taoNen() }
+  px(n) { return (n * this.dpr) / this.s }
+  taoNen() { const c = document.createElement('canvas'); c.width = this.cv.width; c.height = this.cv.height; const x = c.getContext('2d'); x.setTransform(this.s, 0, 0, this.s, 0, 0); this.veSan(x); this.nen = c }
+  veSan(x, coVat = true) {
+    const b = this.b
+    x.save()
+    const g = x.createLinearGradient(0, 0, SAN, SAN); g.addColorStop(0, rgba(b.san1)); g.addColorStop(1, rgba(b.san2))
+    x.fillStyle = g; x.beginPath(); x.roundRect(0, 0, SAN, SAN, 28); x.fill(); x.clip()
+    // Vết dung dịch nhiều màu loang trên sàn.
+    for (const [vx, vy, i] of [[110, 90, 2], [490, 110, 0], [510, 490, 3], [100, 500, 4], [300, 300, 6], [300, 20, 5], [300, 590, 1]]) { const q = x.createRadialGradient(vx, vy, 0, vx, vy, 130); q.addColorStop(0, rgba(b.nt[i], b.toi ? 0.24 : 0.15)); q.addColorStop(1, rgba(b.nt[i], 0)); x.fillStyle = q; x.fillRect(vx - 130, vy - 130, 260, 260) }
+    // Lưới lục giác (vòng benzene); vài ô tô màu nguyên tố.
+    const a = 26, h = a * Math.sqrt(3)
+    const luc = (cx, cy, r) => { x.beginPath(); for (let k = 0; k <= 6; k++) { const an = (k * Math.PI) / 3; k ? x.lineTo(cx + r * Math.cos(an), cy + r * Math.sin(an)) : x.moveTo(cx + r * Math.cos(an), cy + r * Math.sin(an)) } }
+    let dem = 0
+    for (let col = 0; col * 1.5 * a < SAN + a; col++) for (let row = -1; row * h < SAN + h; row++) {
+      const cx = col * 1.5 * a, cy = row * h + (col % 2 ? h / 2 : 0)
+      if ((col * 7 + row * 13) % 23 === 0) { luc(cx, cy, a - 3); x.fillStyle = rgba(b.nt[dem++ % 7], b.toi ? 0.2 : 0.18); x.fill() }
+    }
+    x.strokeStyle = rgba(b.luoi); x.lineWidth = 1.3; x.beginPath()
+    for (let col = 0; col * 1.5 * a < SAN + a; col++) for (let row = -1; row * h < SAN + h; row++) {
+      const cx = col * 1.5 * a, cy = row * h + (col % 2 ? h / 2 : 0)
+      for (let k = 0; k <= 3; k++) { const an = (k * Math.PI) / 3 - Math.PI / 3; const px = cx + a * Math.cos(an), py = cy + a * Math.sin(an); k ? x.lineTo(px, py) : x.moveTo(px, py) }
+    }
+    x.stroke()
+    // Vòng giữa sân + bệ xuất phát (lục giác nét đứt).
+    x.setLineDash([8, 8]); x.lineWidth = 2; x.strokeStyle = rgba(b.luoiDam, 0.35); x.beginPath(); x.arc(300, 300, 100, 0, PI2); x.stroke()
+    for (const [cx, cy] of CHO_RA) { luc(cx, cy, 26); x.fillStyle = rgba(b.the, b.toi ? 0.12 : 0.55); x.fill(); x.strokeStyle = rgba(b.luoiDam, 0.45); x.stroke() }
+    x.setLineDash([])
+    x.restore()
+    if (coVat) for (const v of VAT) this.veVat(x, v)
+    x.strokeStyle = rgba(b.luoiDam, b.toi ? 0.45 : 0.35); x.lineWidth = 3; x.beginPath(); x.roundRect(1.5, 1.5, SAN - 3, SAN - 3, 27); x.stroke()
+  }
+  veVat(x, v) {
+    const b = this.b, liq = v.mau !== undefined ? b.nt[v.mau] : b.e
+    x.save(); x.lineJoin = 'round'
+    x.fillStyle = rgba(b.chu, b.toi ? 0.4 : 0.12)
+    if (v.k === 'tron') { x.beginPath(); x.ellipse(v.x + 4, v.y + 7, v.r, v.r * 0.92, 0, 0, PI2); x.fill() } else { x.beginPath(); x.roundRect(v.x + 4, v.y + 6, v.w, v.h, 10); x.fill() }
+    x.lineWidth = 2.5; x.strokeStyle = rgba(b.kinhVien, 0.9); x.fillStyle = rgba(b.kinh, 0.95)
+    if (v.k === 'tron') {
+      x.beginPath(); x.arc(v.x, v.y, v.r, 0, PI2); x.fill(); x.stroke()
+      x.save(); x.beginPath(); x.arc(v.x, v.y, v.r - 4, 0, PI2); x.clip()
+      const muc = v.ve === 'binh-cau' ? v.y - 4 : v.y - v.r * 0.2
+      const g = x.createLinearGradient(0, muc, 0, v.y + v.r); g.addColorStop(0, rgba(tron(liq, TRANG, 0.3))); g.addColorStop(1, rgba(liq))
+      x.fillStyle = g; x.beginPath(); x.moveTo(v.x - v.r, muc); for (let i = 0; i <= 8; i++) x.lineTo(v.x - v.r + (i * v.r) / 4, muc + Math.sin(i * 1.3) * 3); x.lineTo(v.x + v.r, v.y + v.r); x.lineTo(v.x - v.r, v.y + v.r); x.fill()
+      x.fillStyle = rgba(TRANG, 0.65); for (const [bx, by, br] of [[-0.3, 0.35, 0.1], [0.2, 0.55, 0.07], [0.4, 0.2, 0.06], [-0.1, 0.7, 0.05]]) { x.beginPath(); x.arc(v.x + bx * v.r, v.y + by * v.r, br * v.r + 1, 0, PI2); x.fill() }
+      x.restore()
+      x.fillStyle = rgba(b.kinh); x.strokeStyle = rgba(b.kinhVien, 0.9); x.lineWidth = 2.5
+      const co = v.ve === 'binh-cau' ? 13 : 8
+      x.beginPath(); x.arc(v.x, v.y, co, 0, PI2); x.fill(); x.stroke()
+      x.fillStyle = rgba(liq, 0.55); x.beginPath(); x.arc(v.x, v.y, co * 0.55, 0, PI2); x.fill()
+      x.strokeStyle = rgba(TRANG, 0.85); x.lineWidth = v.r > 30 ? 4 : 3; x.lineCap = 'round'; x.beginPath(); x.arc(v.x, v.y, v.r - (v.r > 30 ? 9 : 6), Math.PI * 1.08, Math.PI * 1.42); x.stroke()
+    } else if (v.ve === 'gia-ong') {
+      x.beginPath(); x.roundRect(v.x, v.y, v.w, v.h, 10); x.fill(); x.stroke()
+      for (let i = 0; i < 5; i++) {
+        const cx = v.x + 16 + (i * (v.w - 32)) / 4, cy = v.y + v.h / 2, c = b.nt[(i * 3 + 1) % 7]
+        x.fillStyle = rgba(b.kinh); x.strokeStyle = rgba(b.kinhVien, 0.9); x.lineWidth = 2; x.beginPath(); x.arc(cx, cy, 9, 0, PI2); x.fill(); x.stroke()
+        x.fillStyle = rgba(c); x.beginPath(); x.arc(cx, cy, 5.5, 0, PI2); x.fill()
+        x.fillStyle = rgba(TRANG, 0.8); x.beginPath(); x.arc(cx - 1.8, cy - 1.8, 1.6, 0, PI2); x.fill()
+      }
+    } else {
+      x.beginPath(); x.roundRect(v.x, v.y, v.w, v.h, 12); x.fill(); x.stroke()
+      const g = x.createLinearGradient(0, v.y + 8, 0, v.y + v.h); g.addColorStop(0, rgba(tron(liq, TRANG, 0.3))); g.addColorStop(1, rgba(liq))
+      x.fillStyle = g; x.beginPath(); x.roundRect(v.x + 6, v.y + 12, v.w - 12, v.h - 18, 7); x.fill()
+      x.strokeStyle = rgba(b.kinhVien, 0.75); x.lineWidth = 2; for (let i = 0; i < 3; i++) { x.beginPath(); x.moveTo(v.x + 6, v.y + 10 + i * 8); x.lineTo(v.x + 15, v.y + 10 + i * 8); x.stroke() }
+    }
+    x.restore()
+  }
+  /** Nguyên tử từng nguyên tố vẽ sẵn (cầu bóng + ký hiệu). */
+  taoHat() {
+    const b = this.b, s = this.s, d = Math.ceil((R + 2) * 2 * s)
+    this.hat = b.nt.map((c, i) => {
+      const cv = document.createElement('canvas'); cv.width = cv.height = d
+      const x = cv.getContext('2d'); x.setTransform(s, 0, 0, s, 0, 0); x.translate(R + 2, R + 2)
+      const g = x.createRadialGradient(-R * 0.35, -R * 0.4, R * 0.08, 0, 0, R)
+      g.addColorStop(0, rgba(tron(c, TRANG, 0.62))); g.addColorStop(0.55, rgba(c)); g.addColorStop(1, rgba(tron(c, DEN, 0.32)))
+      x.fillStyle = g; x.beginPath(); x.arc(0, 0, R, 0, PI2); x.fill()
+      x.strokeStyle = rgba(tron(c, DEN, 0.45)); x.lineWidth = 1.4; x.stroke()
+      x.fillStyle = rgba(TRANG, 0.55); x.beginPath(); x.ellipse(-R * 0.36, -R * 0.46, R * 0.3, R * 0.17, -0.6, 0, PI2); x.fill()
+      const sang = doSang(c) > 0.55
+      x.font = `800 ${NGUYEN_TO[i].length > 1 ? 13 : 15}px ${b.phong}`; x.textAlign = 'center'; x.textBaseline = 'middle'
+      x.fillStyle = sang ? rgba(tron(c, DEN, 0.8)) : rgba(TRANG); x.fillText(NGUYEN_TO[i], 0, 1.2)
+      return cv
+    })
+  }
+  /** Quầng sáng vẽ sẵn theo màu (không dùng shadowBlur trong vòng vẽ). */
+  quang(x, c, cx, cy, r, a) {
+    const k = c.join(), q0 = this.qs.get(k)
+    let q = q0
+    if (!q) { q = document.createElement('canvas'); q.width = q.height = 64; const y = q.getContext('2d'); const g = y.createRadialGradient(32, 32, 0, 32, 32, 32); g.addColorStop(0, rgba(c, 0.85)); g.addColorStop(0.35, rgba(c, 0.35)); g.addColorStop(1, rgba(c, 0)); y.fillStyle = g; y.fillRect(0, 0, 64, 64); this.qs.set(k, q) }
+    x.globalAlpha = a; x.drawImage(q, cx - r, cy - r, r * 2, r * 2); x.globalAlpha = 1
+  }
+  chu(x, cx, cy, s, coPx, mau, vien, dam = 800) {
+    x.font = `${dam} ${this.px(coPx)}px ${this.b.phong}`; x.textAlign = 'center'; x.textBaseline = 'middle'
+    if (vien) { x.lineWidth = this.px(4); x.strokeStyle = vien; x.lineJoin = 'round'; x.strokeText(s, cx, cy) }
+    x.fillStyle = mau; x.fillText(s, cx, cy)
+  }
+  /** Sự kiện trận ⇒ hiệu ứng. */
+  them(su, nay, emId, tr) {
+    const b = this.b, ntCua = (id) => { const g = gheId(tr, id); return g ? b.nt[g.nt] : b.sao }
+    const pu = (h) => { this.hu.push({ ...h, t0: nay, goc: (h.goc ?? 0) }); const tran = this.yeu ? 40 : 160; if (this.hu.length > tran) this.hu.splice(0, this.hu.length - tran) }
+    const coEm = su.ai === emId || su.boi === emId
+    switch (su.t) {
+      case 'ban': this.giat.set(su.chu, nay); if (!this.yeu) pu({ k: 'chop', x: su.x, y: su.y, mau: ntCua(su.chu), goc: su.ngam }); break
+      case 'trung':
+        this.loe.set(su.ai, nay)
+        pu({ k: 'tia', x: su.x, y: su.y, mau: ntCua(su.boi), goc: Math.random() * PI2 })
+        if (coEm && su.mau > 0 && nay - (this.soLuc.get(su.ai) ?? -1e9) > 300) this.soLuc.set(su.ai, nay), pu({ k: 'so', x: su.x + (Math.random() - 0.5) * 10, y: su.y - 14, chu: '−1', co: su.ai === emId ? 15 : 17, mau: su.ai === emId ? b.sai : b.sao })
+        if (su.ai === emId) { this.rung = { t0: nay, dur: 150, m: 3 }; this.doLuc = nay }
+        break
+      case 'chan': pu({ k: 'vong', x: su.x, y: su.y, mau: b.kh, r0: 6, r1: 22, w: 3, dur: 260 }); if (coEm) pu({ k: 'so', x: su.x, y: su.y - 16, chu: 'Chặn', co: 13, mau: b.kh }); break
+      case 'tat': if (!this.yeu) pu({ k: 'puff', x: su.x, y: su.y, mau: b.nt[su.nt] }); break
+      case 'ha': {
+        const g = gheId(tr, su.ai), c = g ? b.nt[g.nt] : b.sao
+        pu({ k: 'bong', x: su.x, y: su.y, mau: c, goc: Math.random() * PI2 })
+        pu({ k: 'vong', x: su.x, y: su.y, mau: c, r0: 10, r1: 64, w: 5, dur: 460 })
+        pu({ k: 'so', x: su.x, y: su.y - 8, chu: 'Hạ!', co: su.boi === emId ? 22 : 14, mau: su.boi === emId ? b.sao : b.the, vien: su.boi === emId ? rgba(DEN, 0.55) : rgba(b.chu, 0.6), dur: su.boi === emId ? 900 : 600 })
+        if (coEm) this.rung = { t0: nay, dur: 260, m: su.boi === emId ? 6 : 5 }
+        break
+      }
+      case 'hoi': pu({ k: 'vong', x: su.x, y: su.y, mau: b.the, r0: 40, r1: 14, w: 3, dur: 380 }); break
+      case 'len': {
+        const g = gheId(tr, su.ai); if (!g) break
+        const c = b.cap[su.cap]
+        pu({ k: 'vong', x: g.x, y: g.y, mau: c, r0: 18, r1: 70, w: 6, dur: 520, theo: g.id })
+        pu({ k: 'vong', x: g.x, y: g.y, mau: TRANG, r0: 10, r1: 46, w: 3, dur: 360, theo: g.id })
+        pu({ k: 'sao', x: g.x, y: g.y, mau: c, goc: Math.random() * PI2, theo: g.id })
+        if (su.ai === emId) pu({ k: 'so', x: g.x, y: g.y + 46, chu: `Cấp ${su.cap}`, co: 17, mau: c, vien: rgba(DEN, 0.6), theo: g.id, lech: 46, dur: 1000 })
+        break
+      }
+      case 'nhat':
+        if (su.k === 'e') { pu({ k: 'hut', x: su.x, y: su.y, mau: b.e, theo: su.ai }); if (su.ai === emId) pu({ k: 'so', x: su.x, y: su.y - 12, chu: '+1', co: 13, mau: b.e, vien: rgba(DEN, 0.5) }) }
+        else if (su.k === 'xt') { pu({ k: 'vong', x: su.x, y: su.y, mau: b.xt, r0: 8, r1: 80, w: 7, dur: 560 }); pu({ k: 'sao', x: su.x, y: su.y, mau: b.xt, goc: 0 }); if (su.ai !== emId) pu({ k: 'so', x: su.x, y: su.y - 26, chu: 'Xúc tác!', co: 13, mau: b.xt, vien: rgba(DEN, 0.6), dur: 800 }) }
+        else { pu({ k: 'vong', x: su.x, y: su.y, mau: b.kh, r0: 8, r1: 50, w: 5, dur: 460, theo: su.ai }); if (su.ai === emId) pu({ k: 'so', x: su.x, y: su.y - 26, chu: 'Khiên', co: 16, mau: b.kh, vien: rgba(TRANG, 0.8), dur: 900 }) }
+        break
+      case 'xich': {
+        const d = [], n = 7
+        for (let i = 0; i <= n; i++) { const t = i / n, j = i === 0 || i === n ? 0 : (Math.random() - 0.5) * 18; const nx = -(su.y2 - su.y1), ny = su.x2 - su.x1, l = Math.hypot(nx, ny) || 1; d.push([su.x1 + (su.x2 - su.x1) * t + (nx / l) * j, su.y1 + (su.y2 - su.y1) * t + (ny / l) * j]) }
+        pu({ k: 'set', x: su.x1, y: su.y1, mau: b.cap[4], d })
+        break
+      }
+      case 'no': pu({ k: 'no', x: su.x, y: su.y, mau: b.cap[5], goc: Math.random() * PI2 }); break
+    }
+  }
+  /** Vẽ một khung. `nay` = đồng hồ trận (ms). */
+  ve(tr, emId, nay, o = {}) {
+    const x = this.ctx, b = this.b, s = this.s, v = this.view
+    const dtVe = Math.min(0.1, Math.max(0, (nay - this.nayCu) / 1000)); this.nayCu = nay
+    x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, this.cv.width, this.cv.height)
+    let ox = 0, oy = 0
+    if (this.rung && !this.yeu) { const t = (nay - this.rung.t0) / this.rung.dur; if (t >= 0 && t < 1) { const m = this.rung.m * (1 - t); ox = Math.sin(nay * 0.13) * m; oy = Math.cos(nay * 0.17) * m } else if (t >= 1) this.rung = null }
+    if (this.nen) x.drawImage(this.nen, ox * s, oy * s)
+    x.setTransform(s, 0, 0, s, (ox - v.x0) * s, (oy - v.y0) * s)
+    if (!this.nen) this.veSan(x, o.coVat !== false)
+    // Điểm đến khi chạm một chỗ / rê chuột.
+    if (this.diToi && !o.anDiToi) { const em = gheId(tr, emId); if (em && em.cho <= 0) { x.strokeStyle = rgba(b.nt[em.nt], 0.7); x.lineWidth = this.px(2); x.setLineDash([this.px(4), this.px(4)]); x.beginPath(); x.arc(this.diToi.x, this.diToi.y, 10, 0, PI2); x.stroke(); x.setLineDash([]) } }
+    // Vật phẩm.
+    for (const it of tr.vp) {
+      const vao = Math.min(1, (tr.t - it.t0) / 0.25), bob = this.yeu ? 0 : Math.sin(nay / 300 + it.id) * 1.6
+      x.save(); x.translate(it.x, it.y + bob); x.scale(vao, vao)
+      if (it.k === 'e') {
+        if (!this.yeu) this.quang(x, b.e, 0, 0, 14, b.toi ? 0.95 : 0.6)
+        x.fillStyle = rgba(b.e); x.beginPath(); x.arc(0, 0, 4.4, 0, PI2); x.fill()
+        x.fillStyle = rgba(TRANG, 0.95); x.beginPath(); x.arc(-1.3, -1.3, 1.7, 0, PI2); x.fill()
+        if (!this.yeu) { x.strokeStyle = rgba(b.e, 0.6); x.lineWidth = 1; x.beginPath(); x.ellipse(0, 0, 9.5, 3.6, nay / 520 + it.id, 0, PI2); x.stroke() }
+      } else if (it.k === 'xt') {
+        if (!this.yeu) this.quang(x, b.xt, 0, 0, 30, b.toi ? 0.9 : 0.7)
+        x.rotate(this.yeu ? 0 : nay / 900)
+        x.fillStyle = rgba(b.the); x.strokeStyle = rgba(b.xt); x.lineWidth = 3.4
+        x.beginPath(); for (let k = 0; k <= 6; k++) { const a = (k * Math.PI) / 3 + Math.PI / 6; k ? x.lineTo(Math.cos(a) * 14, Math.sin(a) * 14) : x.moveTo(Math.cos(a) * 14, Math.sin(a) * 14) } x.fill(); x.stroke()
+        x.lineWidth = 2.4; x.beginPath(); x.arc(0, 0, 7, 0, PI2); x.stroke()
+      } else {
+        if (!this.yeu) this.quang(x, b.kh, 0, 0, 26, b.toi ? 0.8 : 0.5)
+        x.fillStyle = rgba(b.kh); x.strokeStyle = rgba(tron(b.kh, DEN, 0.35)); x.lineWidth = 2
+        x.beginPath(); x.moveTo(0, -14); x.quadraticCurveTo(11, -11, 12, -8); x.quadraticCurveTo(11, 8, 0, 14); x.quadraticCurveTo(-11, 8, -12, -8); x.quadraticCurveTo(-11, -11, 0, -14); x.fill(); x.stroke()
+        x.strokeStyle = rgba(TRANG, 0.85); x.lineWidth = 2; x.beginPath(); x.moveTo(-4, 0); x.lineTo(-1, 4); x.lineTo(5, -4); x.stroke()
+      }
+      x.restore()
+      if (it.k !== 'e' && vao >= 1) this.chu(x, it.x, it.y + 25, it.k === 'xt' ? 'Xúc tác' : 'Khiên', 10.5, rgba(b.chu), rgba(b.the, 0.9), 700)
+    }
+    // Đường ngắm: của em rõ (nét chạy về mục tiêu), của bạn khác mờ.
+    for (const g of tr.ghe) {
+      if (g.cho > 0 || !g.muc) continue
+      const m = gheId(tr, g.muc); if (!m || m.cho > 0) continue
+      const laEm = g.id === emId
+      if (!laEm && (this.yeu || o.anNgamKhac)) continue
+      const an = Math.atan2(m.y - g.y, m.x - g.x)
+      x.strokeStyle = rgba(b.nt[g.nt], laEm ? 0.9 : b.toi ? 0.32 : 0.26); x.lineWidth = this.px(laEm ? 2.4 : 1.5); x.lineCap = 'round'
+      x.setLineDash(laEm ? [this.px(6), this.px(6)] : [this.px(2), this.px(6)]); x.lineDashOffset = laEm && !this.yeu ? -nay / 25 : 0
+      x.beginPath(); x.moveTo(g.x + Math.cos(an) * (R + 14), g.y + Math.sin(an) * (R + 14)); x.lineTo(m.x - Math.cos(an) * (R + 10), m.y - Math.sin(an) * (R + 10)); x.stroke()
+    }
+    x.setLineDash([]); x.lineDashOffset = 0
+    // Đạn.
+    for (const d of tr.dan) {
+      const c = b.nt[d.nt], sp = Math.hypot(d.vx, d.vy) || 1, ux = d.vx / sp, uy = d.vy / sp, r = d.cap >= 5 ? 7.5 : d.cap >= 3 ? 6.4 : 6
+      if (!this.yeu) {
+        const dai = d.cap >= 5 ? 38 : d.cap >= 3 ? 28 : 24
+        x.lineCap = 'round'; x.strokeStyle = rgba(d.cap >= 5 ? b.cap[5] : c, d.cap >= 5 ? 0.6 : 0.42); x.lineWidth = r * 1.7
+        x.beginPath(); x.moveTo(d.x - ux * dai, d.y - uy * dai); x.lineTo(d.x, d.y); x.stroke()
+        if (b.toi || d.cap >= 4) this.quang(x, d.cap >= 5 ? b.cap[5] : c, d.x, d.y, r * 3, b.toi ? 0.9 : 0.5)
+      }
+      x.fillStyle = rgba(c)
+      if (d.cap === 3 || d.cap === 4) { x.save(); x.translate(d.x, d.y); x.rotate(Math.atan2(uy, ux)); x.beginPath(); x.roundRect(-r * 1.7, -r * 0.85, r * 3.4, r * 1.7, r * 0.85); x.fill(); if (!b.toi) { x.strokeStyle = rgba(DEN, 0.28); x.lineWidth = 1; x.stroke() } x.fillStyle = rgba(TRANG, 0.95); x.beginPath(); x.roundRect(-r * 0.9, -r * 0.35, r * 1.8, r * 0.7, r * 0.35); x.fill(); x.restore() }
+      else { x.beginPath(); x.arc(d.x, d.y, r, 0, PI2); x.fill(); if (!b.toi) { x.strokeStyle = rgba(DEN, 0.28); x.lineWidth = 1; x.stroke() } x.fillStyle = d.cap >= 5 ? rgba(tron(b.cap[5], TRANG, 0.5)) : rgba(TRANG, 0.95); x.beginPath(); x.arc(d.x, d.y, r * 0.48, 0, PI2); x.fill() }
+      if (d.cap === 4 && !this.yeu) { x.strokeStyle = rgba(b.cap[4], 0.9); x.lineWidth = 1.6; x.beginPath(); x.moveTo(d.x - ux * 8 - uy * 5, d.y - uy * 8 + ux * 5); x.lineTo(d.x - ux * 13 + uy * 4, d.y - uy * 13 - ux * 4); x.lineTo(d.x - ux * 19 - uy * 4, d.y - uy * 19 + ux * 4); x.stroke() }
+    }
+    // Nguyên tử (xếp theo y cho có chiều sâu).
+    const dau = tr.ghe.reduce((a, g) => (g.ha > (a ? a.ha : 0) ? g : a), null)
+    const ds = tr.ghe.filter((g) => g.cho <= 0).sort((p, q) => p.y - q.y)
+    for (const g of ds) {
+      let goc = this.goc.get(g.id)
+      if (goc === undefined || o.tinh) goc = g.ngam
+      else { let dd = g.ngam - goc; while (dd > Math.PI) dd -= PI2; while (dd < -Math.PI) dd += PI2; goc += dd * Math.min(1, dtVe * 20) }
+      this.goc.set(g.id, goc)
+      this.veNguyenTu(x, g, nay, g.id === emId, goc)
+    }
+    for (const g of ds) this.veTen(x, g, g.id === emId, dau && dau.id === g.id && dau.ha > 0)
+    // Vòng ngắm trên mục tiêu của em.
+    const em = gheId(tr, emId)
+    if (em && em.cho <= 0 && em.muc) {
+      const m = gheId(tr, em.muc)
+      if (m && m.cho <= 0) { x.save(); x.translate(m.x, m.y); x.rotate(this.yeu ? 0 : nay / 400); x.strokeStyle = rgba(b.nt[em.nt]); x.lineWidth = this.px(2.6); x.lineCap = 'round'; for (let k = 0; k < 4; k++) { const a = (k * Math.PI) / 2; x.beginPath(); x.arc(0, 0, R + 11, a - 0.38, a + 0.38); x.stroke() } x.restore() }
+    }
+    // Hiệu ứng.
+    for (let i = this.hu.length - 1; i >= 0; i--) {
+      const h = this.hu[i], dur = h.dur || TUOI[h.k], t = (nay - h.t0) / dur
+      if (t >= 1 || t < 0) { if (t >= 1) this.hu.splice(i, 1); continue }
+      if (h.theo) { const g = gheId(tr, h.theo); if (g && g.cho <= 0 && h.k !== 'hut') { h.x = g.x; h.y = g.y + (h.lech || 0) } }
+      this.veHieuUng(x, h, t, tr)
+    }
+    // Viền đỏ nhẹ khi em trúng đạn.
+    const dt2 = (nay - this.doLuc) / 240
+    if (dt2 >= 0 && dt2 < 1 && !this.yeu) { const g = x.createRadialGradient(300, 300, 200, 300, 300, 430); g.addColorStop(0, rgba(b.sai, 0)); g.addColorStop(1, rgba(b.sai, 0.42 * (1 - dt2))); x.fillStyle = g; x.fillRect(v.x0, v.y0, v.w, v.h) }
+    return dtVe
+  }
+  veHieuUng(x, h, t, tr) {
+    const b = this.b, c = h.mau, e = 1 - t
+    switch (h.k) {
+      case 'chop': x.fillStyle = rgba(c, e); x.beginPath(); x.arc(h.x, h.y, 3 + 6 * e, 0, PI2); x.fill(); x.fillStyle = rgba(TRANG, e); x.beginPath(); x.arc(h.x, h.y, 2 + 3 * e, 0, PI2); x.fill(); break
+      case 'tia': x.strokeStyle = rgba(c, e); x.lineWidth = 2.6; x.lineCap = 'round'; for (let j = 0; j < 7; j++) { const a = h.goc + (j * PI2) / 7, r1 = 6 + t * 20, r2 = r1 + 9 * e; x.beginPath(); x.moveTo(h.x + Math.cos(a) * r1, h.y + Math.sin(a) * r1); x.lineTo(h.x + Math.cos(a) * r2, h.y + Math.sin(a) * r2); x.stroke() } x.fillStyle = rgba(TRANG, e * 0.9); x.beginPath(); x.arc(h.x, h.y, 7 * e, 0, PI2); x.fill(); break
+      case 'so': { const n = t < 0.15 ? 0.7 + t * 2.4 : 1.06 - (t - 0.15) * 0.07; x.globalAlpha = t > 0.7 ? (1 - t) / 0.3 : 1; this.chu(x, h.x, h.y - t * 26, h.chu, h.co * n, rgba(c), h.vien || rgba(b.the, 0.9)); x.globalAlpha = 1; break }
+      case 'bong': for (let j = 0; j < 11; j++) { const a = h.goc + j * 2.39, sp = 26 + (j % 4) * 13, rr = 3 + (j % 3) * 2.6 + t * 4; x.strokeStyle = rgba(c, e); x.lineWidth = 2.2; x.beginPath(); x.arc(h.x + Math.cos(a) * sp * Math.sqrt(t) * 1.6, h.y + Math.sin(a) * sp * Math.sqrt(t) * 1.6 - t * 10, rr, 0, PI2); x.stroke(); if (j % 3 === 0) { x.fillStyle = rgba(TRANG, e * 0.7); x.beginPath(); x.arc(h.x + Math.cos(a) * sp * Math.sqrt(t) * 1.6 - rr * 0.3, h.y + Math.sin(a) * sp * Math.sqrt(t) * 1.6 - t * 10 - rr * 0.3, rr * 0.3, 0, PI2); x.fill() } } if (t < 0.25) { x.fillStyle = rgba(c, (0.25 - t) * 3); x.beginPath(); x.arc(h.x, h.y, R * (1 + t * 2), 0, PI2); x.fill() } break
+      case 'vong': x.strokeStyle = rgba(c, e); x.lineWidth = h.w * e + 0.5; x.beginPath(); x.arc(h.x, h.y, h.r0 + (h.r1 - h.r0) * (1 - e * e), 0, PI2); x.stroke(); break
+      case 'hut': { const g = gheId(tr, h.theo); const tx = g ? g.x : h.x, ty = g ? g.y : h.y, k = t * t; x.fillStyle = rgba(c, 1 - k * 0.5); x.beginPath(); x.arc(h.x + (tx - h.x) * k, h.y + (ty - h.y) * k, 4.4 * (1 - k * 0.5), 0, PI2); x.fill(); break }
+      case 'set': x.lineJoin = 'round'; x.lineCap = 'round'; for (const [w, col] of [[6, rgba(c, e * 0.55)], [2.2, rgba(TRANG, e)]]) { x.strokeStyle = col; x.lineWidth = w; x.beginPath(); h.d.forEach(([px, py], i) => (i ? x.lineTo(px, py) : x.moveTo(px, py))); x.stroke() } break
+      case 'no': { const r = 10 + 40 * (1 - e * e); x.fillStyle = rgba(c, 0.5 * e); x.beginPath(); x.arc(h.x, h.y, r, 0, PI2); x.fill(); x.fillStyle = rgba(TRANG, 0.7 * e * e); x.beginPath(); x.arc(h.x, h.y, r * 0.45, 0, PI2); x.fill(); x.strokeStyle = rgba(c, e); x.lineWidth = 3 * e + 0.5; x.beginPath(); x.arc(h.x, h.y, r + 4, 0, PI2); x.stroke(); break }
+      case 'sao': for (let j = 0; j < 8; j++) { const a = h.goc + (j * PI2) / 8, r = 20 + t * 34 + (j % 2) * 8, px = h.x + Math.cos(a) * r, py = h.y + Math.sin(a) * r, z = 4.5 * e; x.fillStyle = rgba(j % 2 ? TRANG : c, e); x.beginPath(); x.moveTo(px, py - z); x.lineTo(px + z * 0.3, py - z * 0.3); x.lineTo(px + z, py); x.lineTo(px + z * 0.3, py + z * 0.3); x.lineTo(px, py + z); x.lineTo(px - z * 0.3, py + z * 0.3); x.lineTo(px - z, py); x.lineTo(px - z * 0.3, py - z * 0.3); x.fill() } break
+      case 'puff': x.fillStyle = rgba(c, 0.5 * e); x.beginPath(); x.arc(h.x, h.y, 3 + 7 * t, 0, PI2); x.fill(); break
+    }
+  }
+  veNguyenTu(x, g, nay, laEm, goc) {
+    const b = this.b, c = b.nt[g.nt], cc = b.cap[g.cap]
+    const loe = (nay - (this.loe.get(g.id) ?? -1e9)) / 140, giat = (nay - (this.giat.get(g.id) ?? -1e9)) / 90
+    const quay = this.yeu ? 0 : nay / 1000
+    x.save(); x.translate(g.x, g.y)
+    if (b.toi && !this.yeu) this.quang(x, c, 0, 0, R + 20, 0.75)
+    else { x.fillStyle = rgba(b.chu, b.toi ? 0.4 : 0.16); x.beginPath(); x.ellipse(2, R * 0.9, R * 0.95, R * 0.36, 0, 0, PI2); x.fill() }
+    // Hào quang theo cấp súng.
+    if (g.cap >= 2) {
+      x.save(); x.rotate(quay * (g.cap >= 4 ? 1.6 : 0.6))
+      x.strokeStyle = rgba(cc, 0.9); x.lineWidth = g.cap >= 5 ? 3 : 2.4
+      if (g.cap === 4) x.setLineDash([7, 5])
+      x.beginPath(); x.arc(0, 0, R + 8, 0, PI2); x.stroke(); x.setLineDash([])
+      if (g.cap >= 3) { x.fillStyle = rgba(cc); for (let k = 0; k < (g.cap >= 5 ? 6 : 3); k++) { const a = (k * PI2) / (g.cap >= 5 ? 6 : 3); x.save(); x.rotate(a); x.beginPath(); if (g.cap >= 5) { const f = this.yeu ? 1 : 0.8 + 0.35 * Math.sin(nay / 70 + k * 1.7); x.moveTo(R + 6, -4); x.quadraticCurveTo(R + 12 + 7 * f, 0, R + 6, 4); } else { x.moveTo(R + 11, 0); x.lineTo(R + 6, -3.5); x.lineTo(R + 6, 3.5) } x.fill(); x.restore() } }
+      x.restore()
+    }
+    // Khiên hồi sinh: bong bóng.
+    if (g.che > 0) { x.fillStyle = rgba(b.the, b.toi ? 0.12 : 0.35); x.strokeStyle = rgba(b.toi ? b.chu : b.kh, 0.75); x.lineWidth = 2; x.setLineDash([5, 4]); x.beginPath(); x.arc(0, 0, R + 12, 0, PI2); x.fill(); x.stroke(); x.setLineDash([]) }
+    // Quỹ đạo: số electron quay = cấp súng.
+    x.save(); x.rotate(g.id * 0.9 + quay * 0.4)
+    x.strokeStyle = rgba(c, b.toi ? 0.6 : 0.5); x.lineWidth = 1.2; x.beginPath(); x.ellipse(0, 0, R + 6, (R + 6) * 0.42, 0, 0, PI2); x.stroke()
+    for (let i = 0; i < g.cap; i++) { const a = quay * 4.5 + (i * PI2) / g.cap; x.fillStyle = rgba(g.cap >= 2 ? cc : b.chu); x.beginPath(); x.arc(Math.cos(a) * (R + 6), Math.sin(a) * (R + 6) * 0.42, 2.5, 0, PI2); x.fill() }
+    x.restore()
+    // Nòng súng: hình theo cấp; giật lùi khi bắn.
+    x.save(); x.rotate(goc); if (giat >= 0 && giat < 1) x.translate(-(1 - giat) * 3, 0)
+    this.veNong(x, g.cap, c, cc)
+    x.restore()
+    // Thân: méo nhẹ + loé trắng khi trúng.
+    const ep = loe >= 0 && loe < 1 ? 1 - loe : 0
+    if (ep) x.scale(1 + ep * 0.16, 1 - ep * 0.13)
+    const h = this.hat[g.nt]; if (h) { const d = h.width / this.s; x.drawImage(h, -d / 2, -d / 2, d, d) }
+    if (ep) { x.fillStyle = rgba(TRANG, ep * 0.85); x.beginPath(); x.arc(0, 0, R, 0, PI2); x.fill() }
+    x.restore()
+    // Khiên vật phẩm: 3 cung = chặn 3 viên.
+    if (g.khien > 0) { x.save(); x.translate(g.x, g.y); x.lineCap = 'round'; for (let k = 0; k < 3; k++) { const a = -Math.PI / 2 + (k * PI2) / 3 + quay; x.strokeStyle = rgba(b.kh, k < g.khien ? 0.95 : 0.2); x.lineWidth = 4; x.beginPath(); x.arc(0, 0, R + 13, a + 0.25, a + PI2 / 3 - 0.25); x.stroke() } x.restore() }
+    // Thanh Máu dưới chân.
+    const w = this.px(30), hb = this.px(4.5), yb = g.y + R + this.px(7), tl = g.mau / MAU_MAX
+    x.fillStyle = rgba(b.chu, b.toi ? 0.5 : 0.2); x.beginPath(); x.roundRect(g.x - w / 2, yb, w, hb, hb / 2); x.fill()
+    x.fillStyle = rgba(tl > 0.5 ? b.dung : tl > 0.25 ? b.sao : b.sai); x.beginPath(); x.roundRect(g.x - w / 2, yb, w * tl, hb, hb / 2); x.fill()
+  }
+  veNong(x, cap, c, cc) {
+    const b = this.b, dam = rgba(tron(c, b.toi ? TRANG : DEN, b.toi ? 0.15 : 0.35))
+    x.fillStyle = dam
+    if (cap === 1) { x.beginPath(); x.roundRect(R - 6, -4, 17, 8, 4); x.fill() }
+    else if (cap === 2) { x.beginPath(); x.roundRect(R - 6, -8, 17, 6, 3); x.roundRect(R - 6, 2, 17, 6, 3); x.fill() }
+    else if (cap === 3) { for (const a of [-0.3, 0, 0.3]) { x.save(); x.rotate(a); x.beginPath(); x.roundRect(R - 7, -3, 18, 6, 3); x.fill(); x.restore() } }
+    else if (cap === 4) { x.beginPath(); x.roundRect(R - 6, -4.5, 19, 9, 4.5); x.fill(); x.strokeStyle = rgba(cc); x.lineWidth = 2; for (const px of [R + 2, R + 8]) { x.beginPath(); x.ellipse(px, 0, 2, 6.5, 0, 0, PI2); x.stroke() } }
+    else { x.beginPath(); x.moveTo(R - 6, -5); x.lineTo(R + 13, -10); x.quadraticCurveTo(R + 16, 0, R + 13, 10); x.lineTo(R - 6, 5); x.closePath(); x.fill(); x.strokeStyle = rgba(cc); x.lineWidth = 2.4; x.beginPath(); x.moveTo(R + 13, -9); x.quadraticCurveTo(R + 16, 0, R + 13, 9); x.stroke() }
+    x.fillStyle = rgba(cap >= 2 ? cc : TRANG); x.beginPath(); x.arc(R + (cap >= 5 ? 14 : 11), 0, 2.2, 0, PI2); x.fill()
+  }
+  veTen(x, g, laEm, laDau) {
+    const b = this.b, c = b.nt[g.nt], ten = laEm ? 'Em' : g.ten, co = 11
+    const k = ten + this.s
+    let w = this.rongTen.get(k)
+    x.font = `700 ${this.px(co)}px ${b.phong}`
+    if (w === undefined) { w = x.measureText(ten).width + this.px(12); this.rongTen.set(k, w) }
+    const bd = this.px(16), ty = g.y - R - this.px(15), tx = g.x + bd / 2
+    x.fillStyle = laEm ? rgba(c) : rgba(b.the, 0.9); x.beginPath(); x.roundRect(tx - w / 2, ty - this.px(9), w, this.px(18), this.px(9)); x.fill()
+    if (!laEm) { x.strokeStyle = rgba(c, 0.8); x.lineWidth = this.px(1.5); x.stroke() }
+    x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = laEm ? (doSang(c) > 0.55 ? rgba(DEN) : rgba(TRANG)) : rgba(b.chu); x.fillText(ten, tx, ty + this.px(0.5))
+    // Huy hiệu cấp súng (số trong vòng màu cấp).
+    const bx = tx - w / 2 - bd / 2 + this.px(2), cc = b.cap[g.cap]
+    x.fillStyle = rgba(cc); x.beginPath(); x.arc(bx, ty, bd / 2, 0, PI2); x.fill(); x.strokeStyle = rgba(b.the); x.lineWidth = this.px(1.5); x.stroke()
+    x.font = `800 ${this.px(10)}px ${b.phong}`; x.fillStyle = doSang(cc) > 0.55 ? rgba(DEN) : rgba(TRANG); x.fillText(String(g.cap), bx, ty + this.px(0.5))
+    if (laDau) { const sx = tx, sy = ty - this.px(16), z = this.px(7); x.fillStyle = rgba(b.sao); x.strokeStyle = rgba(DEN, 0.4); x.lineWidth = this.px(1); x.beginPath(); for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + (i * Math.PI) / 5, r = i % 2 ? z * 0.45 : z; i ? x.lineTo(sx + Math.cos(a) * r, sy + Math.sin(a) * r) : x.moveTo(sx + Math.cos(a) * r, sy + Math.sin(a) * r) } x.closePath(); x.fill(); x.stroke() }
+  }
+}
+
+// ═════════ 4. GIAO DIỆN BẢN THỬ ═════════
+const $ = (id) => document.getElementById(id)
+const tham = new URLSearchParams(location.search)
+const giamChuyenDong = matchMedia('(prefers-reduced-motion: reduce)').matches
+const st = { nen: tham.get('nen') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'toi' : 'sang'), yeu: tham.get('yeu') === '1' || giamChuyenDong, fps: tham.get('fps') === '1', nt: 3, anTen: false }
+try { const j = JSON.parse(localStorage.getItem('ddh.dauIon2.thu') || '{}'); if (Number.isInteger(j.nt)) st.nt = j.nt; st.anTen = !!j.anTen } catch { /* chế độ riêng tư */ }
+const luu = () => { try { localStorage.setItem('ddh.dauIon2.thu', JSON.stringify({ nt: st.nt, anTen: st.anTen })) } catch { /* bỏ qua */ } }
+const ngayNay = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' })
+function docThang() { try { const j = JSON.parse(localStorage.getItem('ddh.dauIon2.thang') || '{}'); return j.ngay === ngayNay() ? j.n | 0 : 0 } catch { return 0 } }
+function ghiThang(n) { try { localStorage.setItem('ddh.dauIon2.thang', JSON.stringify({ ngay: ngayNay(), n })) } catch { /* bỏ qua */ } }
+document.documentElement.dataset.nen = st.nen
+let bang = null
+const NT_CSS = ['--dn-na', '--dn-o', '--dn-n', '--dn-cl', '--dn-s', '--dn-fe', '--dn-ne']
+const hatHtml = (nt) => `<span class="dn-hat" style="--c: var(${NT_CSS[nt]})" aria-hidden="true">${NGUYEN_TO[nt]}</span>`
+const EM = 1
+
+// Thẻ sảnh.
+$('capHang').innerHTML = CAP.slice(1).map((c, i) => `<li class="dn-cap-chip"><i style="--c: var(--dn-cap-${i + 1})">${i + 1}</i>${['Đơn', 'Đôi', 'Ba', 'Dây chuyền', 'Toả nhiệt'][i]}</li>`).join('')
+function veChon() {
+  $('chon').innerHTML = NGUYEN_TO.map((k, i) => `<button type="button" role="radio" class="dn-hat" style="--c: var(${NT_CSS[i]})" aria-checked="${st.nt === i}" aria-label="${k}">${k}</button>`).join('')
+  $('anKy').textContent = NGUYEN_TO[st.nt]
+}
+$('chon').addEventListener('click', (e) => { const n = e.target.closest('button'); if (!n) return; st.nt = NGUYEN_TO.indexOf(n.textContent); luu(); veChon(); veBia() })
+$('anTen').checked = st.anTen
+$('anTen').addEventListener('change', (e) => { st.anTen = e.target.checked; luu() })
+veChon()
+$('thang').textContent = docThang()
+
+// Ảnh bìa: một cảnh nhỏ vẽ MỘT lần (không vòng lặp).
+function veBia() {
+  const cv = $('bia')
+  if (!cv || !bang) return
+  const r = cv.getBoundingClientRect()
+  if (!(r.width > 0)) return
+  const w = kep((170 * r.width) / r.height, 300, 600), view = { x0: 300 - w / 2, y0: 307 - (w * r.height) / r.width / 2, w, h: (w * r.height) / r.width }
+  const ve = new Ve(cv, bang, false); ve.datCo(r.width, r.height, Math.min(2, devicePixelRatio || 1), view)
+  const tr = taoTran([{ id: 1, nt: st.nt, ten: 'Em' }, { id: 2, nt: st.nt === 1 ? 4 : 1, ten: 'Quốc Bảo' }, { id: 3, nt: st.nt === 2 ? 6 : 2, ten: 'Thu Hà' }], 7)
+  tr.vp = [{ id: 1, k: 'e', x: 230, y: 330, t0: -1 }, { id: 2, k: 'e', x: 252, y: 352, t0: -1 }, { id: 3, k: 'e', x: 372, y: 248, t0: -1 }, { id: 4, k: 'xt', x: 300, y: 236, t0: -1 }]
+  const [a, bb, c] = tr.ghe
+  Object.assign(a, { x: 176, y: 352, cap: 3, che: 0, muc: 2 }); Object.assign(bb, { x: 430, y: 262, cap: 5, che: 0, muc: 1, mau: 6 }); Object.assign(c, { x: 392, y: 352, cap: 2, che: 0, muc: 1 })
+  for (const g of tr.ghe) { const m = gheId(tr, g.muc); g.ngam = Math.atan2(m.y - g.y, m.x - g.x) }
+  tr.t = 2
+  const dan = (g, k) => { const cp = CAP[g.cap]; for (const v of cp.vien) { const an = g.ngam + v.g, cs = Math.cos(g.ngam), sn = Math.sin(g.ngam), dd = R + 18 + k * 40; tr.dan.push({ nt: g.nt, cap: g.cap, x: g.x + Math.cos(an) * dd - sn * v.l, y: g.y + Math.sin(an) * dd + cs * v.l, vx: Math.cos(an) * TOC_DAN, vy: Math.sin(an) * TOC_DAN }) } }
+  dan(a, 1); dan(a, 3); dan(bb, 2); dan(c, 2)
+  ve.ve(tr, 1, 2000, { tinh: true, coVat: false })
+}
+
+// ── Màn trận ──
+const man = $('man'), cv = $('san'), khung = $('khung'), canEl = $('can')
+let ve = null, tr = null, ghe0 = null, raf = 0, che = 'sanh', du = 0, truoc = 0, nghi = 0, tinh = false, emAI = false, daKeo = false
+const phim = new Set()
+const can = { id: null, ox: 0, oy: 0, sx: 0, sy: 0, t0: 0, xa: 0, dx: 0, dy: 0 }
+let diToi = null, chuotTrongSan = false
+const tin = []
+let khoaHud = '', khoaXh = '', demKet = -1
+const dpr = () => (st.yeu ? 1 : Math.min(1.5, devicePixelRatio || 1))
+
+function doiCo() {
+  if (!ve) return
+  const r = khung.getBoundingClientRect(), n = Math.floor(Math.min(r.width, r.height))
+  if (n > 0 && (n !== ve._canh || ve._dpr !== dpr())) { ve._canh = n; ve._dpr = dpr(); ve.datCo(n, n, dpr()); if (tinh) veMot() }
+}
+new ResizeObserver(() => { doiCo(); veBia() }).observe(document.body)
+
+function vaoTran(o = {}) {
+  // Mỗi sân 6 màu khác nhau: trùng nguyên tố thì máy đổi sang nguyên tố còn trống.
+  const conLai = [1, 2, 4, 5, 6, 0, 3].filter((i) => i !== st.nt)
+  ghe0 = [{ id: EM, nt: st.nt, ten: 'Em' }, ...conLai.slice(0, 5).map((nt, i) => ({ id: i + 2, nt, ten: o.ten ? o.ten[i] : `A.I ${TEN_NGUYEN_TO[nt]}`, ai: true }))]
+  if (o.nt) o.nt.forEach((n, i) => { ghe0[i].nt = n })
+  tr = taoTran(ghe0, o.hat ?? (Date.now() & 0xffff)); tr.su.length = 0
+  che = 'tran'; man.hidden = false; document.body.style.overflow = 'hidden'
+  ve = new Ve(cv, bang, st.yeu); ve._canh = 0; doiCo()
+  tin.length = 0; $('tin').innerHTML = ''; khoaHud = ''; khoaXh = ''
+  $('ket').hidden = true; $('mo').hidden = true; demKet = -1; du = 0; truoc = 0; diToi = null
+  $('goiY').style.opacity = daKeo ? '0.55' : '1'
+  if (!raf && !tinh) raf = requestAnimationFrame(khungHinh)
+  capNhatHud()
+}
+function vanMoi() { $('puChu').textContent = ''; tr = taoTran(ghe0, (tr.hat ^ 0x5bd1) & 0xffff); tr.su.length = 0; ve.hu.length = 0; $('ket').hidden = true; $('mo').hidden = true; demKet = -1; khoaHud = ''; khoaXh = ''; tin.length = 0; $('tin').innerHTML = ''; capNhatHud() }
+function roiTran() { che = 'sanh'; man.hidden = true; document.body.style.overflow = ''; cancelAnimationFrame(raf); raf = 0; tr = null; ve = null; anCan(); $('thang').textContent = docThang() }
+
+function yDinhEm() {
+  let dx = 0, dy = 0
+  if (phim.size) {
+    dx = (phim.has('ArrowRight') || phim.has('KeyD') ? 1 : 0) - (phim.has('ArrowLeft') || phim.has('KeyA') ? 1 : 0)
+    dy = (phim.has('ArrowDown') || phim.has('KeyS') ? 1 : 0) - (phim.has('ArrowUp') || phim.has('KeyW') ? 1 : 0)
+    const l = Math.hypot(dx, dy); if (l > 1) { dx /= l; dy /= l }
+    if (dx || dy) { diToi = null; return { dx, dy } }
+  }
+  if (can.id !== null) return { dx: can.dx, dy: can.dy }
+  if (diToi) {
+    const g = gheId(tr, EM); if (!g || g.cho > 0) return { dx: 0, dy: 0 }
+    const ex = diToi.x - g.x, ey = diToi.y - g.y, l = Math.hypot(ex, ey)
+    if (l < 6) { if (!chuotTrongSan) diToi = null; return { dx: 0, dy: 0 } }
+    const t = Math.min(1, l / 40); return { dx: (ex / l) * t, dy: (ey / l) * t }
+  }
+  return { dx: 0, dy: 0 }
+}
+/** Chạy trận dt giây (bước cố định 1/60) — dùng chung cho chơi thật và dựng cảnh chụp. */
+function chay(dt) {
+  du = Math.min(0.25, du + dt)
+  while (du >= 1 / 60) {
+    du -= 1 / 60
+    if (tr.xong) break
+    for (const g of tr.ghe) g.yd = g.id === EM && !emAI ? yDinhEm() : g.ai || (g.id === EM && emAI) ? aiDi(tr, g, 1 / 60) : g.yd
+    buoc(tr, 1 / 60)
+    for (const s of tr.su) { ve.them(s, tr.t * 1000, EM, tr); xuLySu(s) }
+    tr.su.length = 0
+  }
+}
+function xuLySu(s) {
+  const ten = (id) => (id === EM ? 'em' : gheId(tr, id)?.ten || 'bạn')
+  if (s.t === 'ha') {
+    if (s.boi === EM) tin.push({ chu: `Em hạ ${ten(s.ai)}!${s.chuoi >= 2 ? ` · Hạ liền ${s.chuoi}` : ''}`, k: 'ha', t: tr.t })
+    else if (s.ai === EM) tin.push({ chu: `${s.boi ? gheId(tr, s.boi)?.ten : 'Bạn'} hạ em · súng xuống Cấp ${Math.max(1, s.capCu - 1)} · hồi lại sau 1,5 giây`, k: 'bi', t: tr.t })
+  } else if (s.t === 'len' && s.ai === EM) tin.push({ chu: `${s.vi === 'xt' ? 'Xúc tác! ' : ''}Lên Cấp ${s.cap} · ${CAP[s.cap].ten}`, k: 'len', cap: s.cap, t: tr.t })
+  else if (s.t === 'nhat' && s.ai === EM && s.k === 'kh') tin.push({ chu: 'Khiên: chặn 3 viên đạn kế tiếp', k: '', t: tr.t })
+  else if (s.t === 'het') ketVan()
+  try { if (s.t === 'trung' && s.ai === EM && !st.yeu) navigator.vibrate?.(12) } catch { /* không rung được */ }
+}
+function veTin() {
+  const box = $('tin'), nay = tr ? tr.t : 0
+  while (tin.length && (nay - tin[0].t > 1.8 || tin.length > 2)) tin.shift()
+  const khoa = tin.map((x) => x.t + x.chu).join('|')
+  if (box.dataset.k === khoa) return
+  box.dataset.k = khoa
+  const co = new Set([...box.children].map((e) => e.dataset.id))
+  for (const e of [...box.children]) if (!tin.some((x) => String(x.t) + x.chu === e.dataset.id)) e.remove()
+  for (const x of tin) { const id = String(x.t) + x.chu; if (co.has(id)) continue; const d = document.createElement('div'); d.dataset.id = id; d.dataset.k = x.k; if (x.cap) d.style.setProperty('--c', `var(--dn-cap-${x.cap})`); d.textContent = x.chu; box.appendChild(d) }
+}
+function capNhatHud() {
+  if (!tr) return
+  const g = gheId(tr, EM)
+  const k = `${g.mau}|${g.cap}|${g.e}|${g.ha}|${Math.ceil(tr.con)}|${g.nt}`
+  if (k !== khoaHud) {
+    khoaHud = k
+    $('hEmHat').style.setProperty('--c', `var(${NT_CSS[g.nt]})`); $('hEmHat').textContent = NGUYEN_TO[g.nt]
+    $('hMau').querySelector('i').style.transform = `scaleX(${g.mau / MAU_MAX})`; if (g.mau <= 3) $('hMau').dataset.it = ''; else delete $('hMau').dataset.it
+    $('hMauChu').textContent = `Máu ${g.mau}/${MAU_MAX}`
+    $('hCap').style.setProperty('--c', `var(--dn-cap-${g.cap})`); $('hCap').innerHTML = `<em>Cấp súng ${g.cap}/5</em>${CAP[g.cap].ngan}`
+    const can_ = CAN_E[g.cap] || 0
+    $('hE').innerHTML = g.cap >= 5 ? '<span>Cấp cao nhất · electron hồi 1 Máu</span>' : `${Array.from({ length: can_ }, (_, i) => `<i${i < g.e ? ' data-co' : ''}></i>`).join('')}<span class="so">Electron ${g.e}/${can_}</span>`
+    const con = Math.ceil(tr.con); $('hGio').textContent = `${Math.floor(con / 60)}:${String(con % 60).padStart(2, '0')}`
+    $('hHa').textContent = g.ha
+  }
+  const xh = xepBang(tr)
+  const k2 = xh.map((d) => `${d.id}${d.ha}${d.cap}`).join(',')
+  if (k2 !== khoaXh) {
+    khoaXh = k2
+    $('xh').innerHTML = xh.map((d, i) => `<li${d.id === EM ? ' data-em' : ''}><span class="h so">${i + 1}</span>${hatHtml(d.nt)}<span class="t">${d.id === EM ? 'Em' : d.ten}<small>Cấp ${d.cap}</small></span><span class="k so" aria-label="Hạ ${d.ha}">${d.ha}</span></li>`).join('')
+  }
+  veTin()
+}
+function ketVan() {
+  const bg = tr.bang, hang = bg.findIndex((d) => d.id === EM) + 1, dau = bg[0], nhat_ = hang === 1 && (bg.length < 2 || bg[1].ha < dau.ha)
+  if (nhat_) { const n = docThang() + 1; ghiThang(n) }
+  $('ketTieuDe').textContent = nhat_ ? 'Em nhất ván!' : hang === 1 ? 'Em đồng hạng nhất' : `Em hạng ${hang}/${bg.length}`
+  $('ketSo').innerHTML = `Hạng <b class="so">${hang}/${bg.length}</b> · Hạ <b class="so">${bg[hang - 1].ha}</b>`
+  $('ketBang').innerHTML = bg.map((d) => `<tr${d.id === EM ? ' data-em' : ''}><th scope="row"><span class="dn-ten-o">${hatHtml(d.nt)}<b>${d.id === EM ? 'Em' : d.ten}</b></span></th><td class="so">${d.ha}</td><td class="so">${d.biHa}</td><td class="so">${d.capMax}</td><td class="so">${d.chuoiMax}</td></tr>`).join('')
+  $('mo').hidden = false; $('ket').hidden = false; nghi = GIAY_NGHI
+}
+
+/** Tự hạ: đo 2 giây đầu trận (sau 1 giây làm nóng); dưới 45 khung/giây ⇒ bật chế độ máy yếu cho cả phiên (một lần, không hỏi). */
+const tuHaTat = tham.get('tuHa') === '0'
+let doHa = { t0: 0, n: 0, xong: false }
+function tuHa(nay) {
+  if (doHa.xong || st.yeu || tuHaTat || tr?.xong) return
+  if (!doHa.t0) { doHa.t0 = nay + 1000; return }
+  if (nay < doHa.t0) return
+  doHa.n++
+  if (nay - doHa.t0 >= 2000) { doHa.xong = true; if (doHa.n < 90) { st.yeu = true; ve.yeu = true; ve._canh = 0; doiCo(); $('tYeu').setAttribute('aria-pressed', 'true'); window.__dn.daTuHa = true } }
+}
+// Vòng vẽ: 60 khung/giây; máy yếu 30.
+let doKhung = [], fpsLuc = 0
+function khungHinh(nay) {
+  raf = requestAnimationFrame(khungHinh)
+  if (che !== 'tran' || !tr) return
+  if (document.hidden) { truoc = nay; return }
+  if (st.yeu && truoc && nay - truoc < 31) return
+  const dt = truoc ? Math.min(0.1, (nay - truoc) / 1000) : 0
+  if (truoc) doKhung.push(nay - truoc)
+  truoc = nay
+  tuHa(nay)
+  if (tr.xong) {
+    nghi -= dt
+    const s = Math.max(0, Math.ceil(nghi))
+    if (s !== demKet) { demKet = s; $('ketDem').textContent = `Ván mới sau ${s} giây` }
+    $('ketDemThanh').style.transform = `scaleX(${Math.max(0, nghi / GIAY_NGHI)})`
+    if (nghi <= 0) vanMoi()
+  } else chay(dt)
+  ve.diToi = diToi
+  ve.ve(tr, EM, tr.t * 1000)
+  capNhatHud()
+  if (st.fps && nay - fpsLuc > 500) { fpsLuc = nay; const a = doKhung.slice(-60); const tb = a.reduce((p, q) => p + q, 0) / (a.length || 1); $('fps').textContent = `${Math.round(1000 / tb)} khung/giây`; $('fps').hidden = false }
+  if (doKhung.length > 600) doKhung = doKhung.slice(-300)
+}
+
+// ── Điều khiển KHÔNG NÚT: kéo ở bất kỳ đâu (cần nổi vô hình) · chạm một điểm để đi tới · chuột dẫn đường · W A S D ──
+const RK = 54
+function anCan() { if (!daKeo) delete man.dataset.keo; delete canEl.dataset.hien; can.id = null; can.dx = can.dy = 0 }
+function diemSan(cx, cy) { const r = cv.getBoundingClientRect(); return { x: ((cx - r.left) / r.width) * SAN, y: ((cy - r.top) / r.height) * SAN, trong: cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom } }
+man.addEventListener('pointerdown', (e) => {
+  if (che !== 'tran' || e.target.closest('button, .dn-ket, .dn-dai') || e.pointerType === 'mouse' || can.id !== null) return
+  can.id = e.pointerId; can.ox = can.sx = e.clientX; can.oy = can.sy = e.clientY; can.t0 = performance.now(); can.xa = 0; can.dx = can.dy = 0
+  try { man.setPointerCapture(e.pointerId) } catch { /* bỏ qua */ }
+  canEl.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`; canEl.querySelector('i').style.transform = ''; canEl.dataset.hien = ''
+  diToi = null; man.dataset.keo = ''
+  if (!daKeo) { daKeo = true; $('goiY').style.opacity = '0.55' }
+})
+man.addEventListener('pointermove', (e) => {
+  if (e.pointerType === 'mouse') {
+    const p = diemSan(e.clientX, e.clientY)
+    if (p.trong && $('ket').hidden) { chuotTrongSan = true; diToi = { x: p.x, y: p.y } } else if (chuotTrongSan) { chuotTrongSan = false; diToi = null }
+    return
+  }
+  if (e.pointerId !== can.id) return
+  can.xa = Math.max(can.xa, Math.hypot(e.clientX - can.sx, e.clientY - can.sy))
+  let dx = e.clientX - can.ox, dy = e.clientY - can.oy
+  const l = Math.hypot(dx, dy)
+  if (l > RK) { can.ox += (dx / l) * (l - RK); can.oy += (dy / l) * (l - RK); dx = e.clientX - can.ox; dy = e.clientY - can.oy; canEl.style.transform = `translate(${can.ox}px, ${can.oy}px)` }
+  canEl.querySelector('i').style.transform = `translate(${dx}px, ${dy}px)`
+  const n = Math.min(1, Math.hypot(dx, dy) / RK)
+  if (n < 0.14) { can.dx = can.dy = 0 } else { const m = Math.hypot(dx, dy); can.dx = (dx / m) * n; can.dy = (dy / m) * n }
+})
+const tha = (e) => {
+  if (e.pointerId !== can.id) return
+  if (performance.now() - can.t0 < 240 && can.xa < 12) { const p = diemSan(e.clientX, e.clientY); if (p.trong) diToi = { x: p.x, y: p.y } }
+  anCan()
+}
+man.addEventListener('pointerup', tha); man.addEventListener('pointercancel', tha)
+cv.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse' && chuotTrongSan) { chuotTrongSan = false; diToi = null } })
+addEventListener('keydown', (e) => {
+  if (che !== 'tran') return
+  if (/^(Arrow|Key[WASD]$)/.test(e.code)) { phim.add(e.code); e.preventDefault() }
+  if (e.code === 'Escape' && !$('ket').hidden) roiTran()
+})
+addEventListener('keyup', (e) => phim.delete(e.code))
+addEventListener('blur', () => { phim.clear(); anCan() })
+
+$('vao').addEventListener('click', () => vaoTran())
+$('roi').addEventListener('click', roiTran)
+$('veSanh').addEventListener('click', roiTran)
+$('vanMoi').addEventListener('click', vanMoi)
+document.querySelector('.dn-pu').addEventListener('click', (e) => { const n = e.target.closest('button'); if (n) $('puChu').textContent = `Đã gửi «${n.textContent}» cho cả sân.` })
+
+// ── Bảng thử ──
+function doiNen(n) { st.nen = n; document.documentElement.dataset.nen = n; bang = docBang(); if (ve) { ve.datBang(bang) } $('tNen').setAttribute('aria-pressed', n === 'toi'); $('tNen').textContent = n === 'toi' ? 'Nền sáng' : 'Nền tối'; veBia() }
+$('tNen').addEventListener('click', () => doiNen(st.nen === 'toi' ? 'sang' : 'toi'))
+$('tYeu').addEventListener('click', () => { st.yeu = !st.yeu; $('tYeu').setAttribute('aria-pressed', st.yeu) })
+$('tFps').addEventListener('click', () => { st.fps = !st.fps; $('tFps').setAttribute('aria-pressed', st.fps); $('fps').hidden = !st.fps })
+let henDung = 0
+$('tDung').addEventListener('click', () => {
+  clearTimeout(henDung); let c = 20
+  $('tDungChu').textContent = 'Sẽ giả lập «Thầy bấm bắt đầu» sau 20 giây — vào sân chơi tiếp để xem game dừng ngay.'
+  henDung = setTimeout(dungTatCa, c * 1000)
+})
+/** Thầy bấm Bắt đầu (bản thật: máy chủ gửi {t:'dong', ly:'bat-dau'}) ⇒ tháo trận NGAY, huỷ vòng vẽ, chỉ còn một dòng chữ. */
+function dungTatCa() {
+  cancelAnimationFrame(raf); raf = 0; che = 'dong'; tr = null; ve = null; anCan(); man.hidden = true; document.body.style.overflow = ''
+  $('the').innerHTML = '<div class="dn-dong" role="status"><strong>Thầy đã bắt đầu thi</strong><span>Đấu Nguyên Tử đã dừng. Em đang được đưa vào bài…</span></div>'
+  $('tDungChu').textContent = 'Đã giả lập: game dừng trong cùng khung hình. Tải lại trang để chơi tiếp.'
+}
+
+// ── Bảng cấp súng / vật phẩm / hiệu ứng (?bang=1) ──
+function dungBang() {
+  document.body.classList.add('dn-bb')
+  $('phong').hidden = true
+  const goc = document.createElement('div'); goc.className = 'dn-bang-ve'
+  goc.innerHTML = `<h1>Đấu Nguyên Tử 2 · súng tiến hoá theo phản ứng</h1><p>Mỗi ô vẽ bằng đúng lớp vẽ của bản thử. Số trên huy hiệu = cấp súng; số electron quay quanh nguyên tử = cấp súng.</p>
+    <h2>Năm cấp súng</h2><div class="dn-luoi-o" id="oCap"></div><h2>Vật phẩm</h2><div class="dn-luoi-o" data-n="4" id="oVp"></div><h2>Hiệu ứng khi bắn, trúng, hạ, lên cấp</h2><div class="dn-luoi-o" data-n="6" id="oHu"></div>`
+  document.body.appendChild(goc)
+  const o = (cha, c, tieu, mo, cap) => { const d = document.createElement('div'); d.className = 'dn-o-ve'; d.innerHTML = `<canvas></canvas><h3>${cap ? `<i style="--c: var(--dn-cap-${cap})">${cap}</i>` : ''}${tieu}</h3><p>${mo}</p>`; $(cha).appendChild(d); return d.querySelector('canvas') }
+  const canh = (cvs, cx, cy, w, dung) => {
+    const r = cvs.getBoundingClientRect(), v = new Ve(cvs, bang, false), h = (w * r.height) / r.width
+    v.datCo(r.width, r.height, Math.min(2, devicePixelRatio || 1), { x0: cx - w / 2, y0: cy - h / 2, w, h })
+    const t = taoTran([{ id: 1, nt: 3, ten: 'Em' }, { id: 2, nt: 1, ten: 'Quốc Bảo' }, { id: 3, nt: 2, ten: 'Thu Hà' }, { id: 4, nt: 5, ten: 'Gia Huy' }], 5)
+    t.vp = []; t.dan = []; t.ghe.forEach((g) => { g.che = 0; g.x = -500; g.cho = 0 }); t.t = 3
+    dung(t, v); return { t, v }
+  }
+  const datG = (t, id, o2) => { const g = gheId(t, id); Object.assign(g, o2); return g }
+  const ngamVao = (t, g, m) => { g.muc = m.id; g.ngam = Math.atan2(m.y - g.y, m.x - g.x) }
+  const loat = (t, g, buoc_) => { const cp = CAP[g.cap]; for (const k of buoc_) for (const v of cp.vien) { const an = g.ngam + v.g, cs = Math.cos(g.ngam), sn = Math.sin(g.ngam), dd = R + 18 + k; t.dan.push({ nt: g.nt, cap: g.cap, x: g.x + Math.cos(an) * dd - sn * v.l, y: g.y + Math.sin(an) * dd + cs * v.l, vx: Math.cos(an) * TOC_DAN, vy: Math.sin(an) * TOC_DAN }) } }
+  for (let c = 1; c <= 5; c++) {
+    const cvs = o('oCap', c, `Cấp ${c} · ${CAP[c].ten}`, `${CAP[c].mo} (${CAP[c].vi}).${c < 5 ? ` Cần ${CAN_E[c]} electron để lên Cấp ${c + 1}.` : ' Electron nhặt thêm hồi 1 Máu.'}`, c)
+    canh(cvs, 300, 300, 260, (t, v) => { const a = datG(t, 1, { x: 210, y: 316, cap: c }), m = datG(t, 2, { x: 392, y: 282, cap: 1 }); ngamVao(t, a, m); loat(t, a, [6, 70]); v.ve(t, 1, 3000, { tinh: true, coVat: false, anNgamKhac: true }) })
+  }
+  const vps = [['e', 'Electron', 'Chấm sáng rải khắp sân, đi gần là tự hút vào. Nhặt đủ thì súng lên cấp. Bị hạ thì rơi 3 electron.'], ['xt', 'Xúc tác', 'Vòng benzene vàng, mỗi lần một cái ở giữa sân (14 giây hiện lại). Nhặt là lên ngay một cấp.'], ['kh', 'Khiên', 'Chặn 3 viên đạn kế tiếp (3 cung quanh nguyên tử, mất dần khi chặn). 11 giây hiện lại.'], ['roi', 'Electron rơi khi bị hạ', 'Bạn bị hạ rơi 3 electron tại chỗ; người hạ được cộng thẳng 2 electron.']]
+  for (const [k, ten, mo] of vps) {
+    const cvs = o('oVp', 0, ten, mo)
+    canh(cvs, 300, 300, 200, (t, v) => {
+      if (k === 'roi') { t.vp = [[268, 290], [300, 330], [326, 282]].map(([x, y], i) => ({ id: i + 1, k: 'e', x, y, t0: 0 })); v.them({ t: 'ha', ai: 2, boi: 1, x: 300, y: 300 }, 2900, 1, t); datG(t, 2, { x: 300, y: 300, cho: 1 }); v.ve(t, 1, 3080, { tinh: true, coVat: false }) }
+      else { t.vp = k === 'e' ? [[250, 300], [300, 270], [340, 320], [290, 340]].map(([x, y], i) => ({ id: i + 1, k: 'e', x, y, t0: 0 })) : [{ id: 1, k, x: 300, y: 290, t0: 0 }]; if (k === 'kh') { const g = datG(t, 1, { x: 360, y: 300, cap: 2, khien: 2 }); g.ngam = Math.PI; t.vp[0].x = 250 } v.ve(t, 1, 3000, { tinh: true, coVat: false }) }
+    })
+  }
+  const hus = [
+    ['Bắn', 'Loé đầu nòng, nòng giật lùi 3 đơn vị, đạn có vệt sáng theo màu nguyên tố.', (t, v) => { const a = datG(t, 1, { x: 250, y: 300, cap: 3 }), m = datG(t, 2, { x: 420, y: 300 }); ngamVao(t, a, m); loat(t, a, [10, 60]); v.them({ t: 'ban', chu: 1, x: a.x + R + 12, y: a.y, ngam: 0 }, 2980, 1, t); v.ve(t, 1, 3010, { tinh: true, coVat: false }) }],
+    ['Trúng', 'Tia vụn theo màu người bắn, mục tiêu loé trắng và méo nhẹ, số «−1» bay lên (chỉ khi có em).', (t, v) => { const a = datG(t, 1, { x: 210, y: 300, cap: 2 }), m = datG(t, 2, { x: 330, y: 300, mau: 6 }); ngamVao(t, a, m); loat(t, a, [40]); v.them({ t: 'trung', ai: 2, boi: 1, x: 314, y: 296, mau: 6 }, 2900, 1, t); v.ve(t, 1, 2990, { tinh: true, coVat: false }) }],
+    ['Hạ', 'Nguyên tử vỡ thành bong bóng + sóng tròn, chữ «Hạ!», màn rung nhẹ, rơi 3 electron.', (t, v) => { datG(t, 1, { x: 200, y: 330, cap: 3 }); v.them({ t: 'ha', ai: 2, boi: 1, x: 320, y: 300 }, 2800, 1, t); datG(t, 2, { x: 320, y: 300, cho: 1 }); t.vp = [[300, 286], [334, 322], [342, 284]].map(([x, y], i) => ({ id: i + 1, k: 'e', x, y, t0: 2.95 })); v.ve(t, 1, 3020, { tinh: true, coVat: false }) }],
+    ['Lên cấp', 'Hai vòng sáng màu cấp mới, sao lấp lánh, chữ «Cấp 4» và tin «Lên Cấp 4 · Phản ứng dây chuyền».', (t, v) => { const a = datG(t, 1, { x: 300, y: 312, cap: 4 }); a.ngam = -0.4; v.them({ t: 'len', ai: 1, cap: 4 }, 2830, 1, t); v.ve(t, 1, 3000, { tinh: true, coVat: false }) }],
+    ['Dây chuyền (Cấp 4)', 'Viên trúng bắn tia sét nảy sang bạn gần nhất trong 170 đơn vị, trừ thêm 1 Máu.', (t, v) => { const a = datG(t, 1, { x: 200, y: 330, cap: 4 }), m = datG(t, 2, { x: 330, y: 270 }), k = datG(t, 4, { x: 400, y: 345 }); ngamVao(t, a, m); v.them({ t: 'trung', ai: 2, boi: 1, x: 318, y: 276 }, 2950, 1, t); v.them({ t: 'xich', chu: 1, x1: 318, y1: 276, x2: k.x, y2: k.y }, 2950, 1, t); v.them({ t: 'trung', ai: 4, boi: 1, x: k.x, y: k.y }, 2950, 1, t); v.ve(t, 1, 3010, { tinh: true, coVat: false }) }],
+    ['Toả nhiệt (Cấp 5)', 'Viên trúng nổ lan bán kính 46: bạn đứng sát cũng mất 1 Máu. Vệt lửa vàng, đầu đạn trắng.', (t, v) => { const a = datG(t, 1, { x: 190, y: 300, cap: 5 }), m = datG(t, 2, { x: 340, y: 290 }), k = datG(t, 3, { x: 372, y: 336 }); ngamVao(t, a, m); loat(t, a, [20]); v.them({ t: 'trung', ai: 2, boi: 1, x: 326, y: 292 }, 2900, 1, t); v.them({ t: 'no', chu: 1, x: 326, y: 292 }, 2900, 1, t); v.them({ t: 'trung', ai: 3, boi: 1, x: k.x, y: k.y }, 2900, 1, t); v.ve(t, 1, 3000, { tinh: true, coVat: false }) }],
+  ]
+  for (const [ten, mo, f] of hus) { const cvs = o('oHu', 0, ten, mo); canh(cvs, 300, 300, 260, f) }
+}
+
+// ── Cửa cho máy chụp ảnh (scripts/ban-ve-dau-ion-v2-3110/chup.mjs) ──
+function veMot() { if (!tr || !ve) return; ve.diToi = diToi; ve.ve(tr, EM, tr.t * 1000, { tinh: true }); capNhatHud() }
+window.__dn = {
+  vaoTran: (o = {}) => { tinh = !!o.tinh; emAI = !!o.emAI; if (o.nt !== undefined) st.nt = o.nt[0]; vaoTran(o); if (tinh) { document.body.classList.add('dn-tinh'); cancelAnimationFrame(raf); raf = 0 } },
+  tua: (giay) => { const n = Math.round(giay * 60); for (let i = 0; i < n && !tr.xong; i++) chay(1 / 60); veMot() },
+  tuaToi: (dk, toiDa = 30) => { let thay = null; const goc_ = xuLySu; for (let i = 0; i < toiDa * 60 && !thay; i++) { du = 1 / 60; for (const g of tr.ghe) g.yd = (g.ai || (g.id === EM && emAI)) ? aiDi(tr, g, 1 / 60) : yDinhEm(); buoc(tr, 1 / 60); for (const s of tr.su) { ve.them(s, tr.t * 1000, EM, tr); goc_(s); if (!thay && dk(s, tr)) thay = s } tr.su.length = 0; du = 0 } veMot(); return thay },
+  dat: (f) => { f(tr, gheId); veMot() },
+  xoaTin: () => { tin.length = 0; veMot() },
+  ve: veMot, tr: () => tr, ghe: (id) => gheId(tr, id), diToi: (p) => { diToi = p; veMot() },
+  can: (cx, cy, dx, dy) => { man.dataset.keo = ''; canEl.style.transform = `translate(${cx}px, ${cy}px)`; canEl.querySelector('i').style.transform = `translate(${dx}px, ${dy}px)`; canEl.dataset.hien = '' },
+  nghi: (s) => { nghi = s; $('ketDem').textContent = `Ván mới sau ${Math.ceil(s)} giây`; $('ketDemThanh').style.transform = `scaleX(${s / GIAY_NGHI})` },
+  doKhung: () => doKhung.slice(), xoaDo: () => { doKhung = [] }, yeu: (v) => { st.yeu = v; if (ve) { ve.yeu = v; doiCo() } }, dung: dungTatCa, emAI: (v) => { emAI = v },
+}
+
+bang = docBang()
+$('tNen').setAttribute('aria-pressed', st.nen === 'toi'); $('tNen').textContent = st.nen === 'toi' ? 'Nền sáng' : 'Nền tối'
+$('tYeu').setAttribute('aria-pressed', st.yeu); $('tFps').setAttribute('aria-pressed', st.fps)
+if (tham.get('bang') === '1') dungBang()
+else { veBia(); document.fonts?.ready.then(() => { bang = docBang(); veBia() }) }
+})()
+</script>
+<!--PHONG-->
+<style>/* Phông ĐĐH Rounded của app học sinh (OFL 1.1, src/styles/phong-ddh/) nhúng sẵn để bản thử tự đủ. */
+@font-face{font-family:'DDH Rounded';font-style:normal;font-weight:100 549;font-display:swap;src:url(data:font/woff2;base64,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) format('woff2');unicode-range:U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB}
+@font-face{font-family:'DDH Rounded';font-style:normal;font-weight:100 549;font-display:swap;src:url(data:font/woff2;base64,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) format('woff2');unicode-range:U+0000-00FF, U+0394, U+03B1-03B2, U+2000-206F, U+2070-208F, U+20AC, U+2103, U+2190-2193, U+21C4, U+21CC, U+2212, U+2264-2265, U+FEFF, U+FFFD}
+@font-face{font-family:'DDH Rounded';font-style:normal;font-weight:550 1000;font-display:swap;src:url(data:font/woff2;base64,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) format('woff2');unicode-range:U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB}
+@font-face{font-family:'DDH Rounded';font-style:normal;font-weight:550 1000;font-display:swap;src:url(data:font/woff2;base64,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) format('woff2');unicode-range:U+0000-00FF, U+0394, U+03B1-03B2, U+2000-206F, U+2070-208F, U+20AC, U+2103, U+2190-2193, U+21C4, U+21CC, U+2212, U+2264-2265, U+FEFF, U+FFFD}</style>
+<!--/PHONG-->
+</body>
+</html>
