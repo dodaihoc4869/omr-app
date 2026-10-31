@@ -8,6 +8,8 @@
 // Không đi qua ngăn: đăng nhập, thi (vào thi / lưu tạm / nộp), lệnh thầy / phụ huynh, GET.
 import type { DurableObjectState, Env, ExecutionContext, KhoEm, SqlNgan } from './kieu'
 import { gomD1, type D1Gom, type DemLenhD1 } from './gom-d1'
+import { D1_GOC, dbGoc } from './cau-hinh-dem'
+import type { D1Database, D1DatabaseSession } from './kieu'
 
 type XuLy = (req: Request, env: Env, ctx?: ExecutionContext) => Promise<Response>
 let xuLy: XuLy | null = null
@@ -124,9 +126,24 @@ export const HAN_DEM_PHAN_HOI: Readonly<Record<string, number>> = {
 }
 type DemPh = { luc: number; han: number; headers: [string, string][]; than: string }
 
+/**
+ * ĐỌC QUA BẢN SAO GẦN NHẤT (31/10, công tắc `BAT_BAN_SAO_NGAN`, mặc định tắt): D1 thật bật bản sao đọc ('auto') — mỗi bản sao có hạn mức yêu cầu RIÊNG (tài liệu
+ * D1: «each read replica is a separate instance with its own limits») và có thể nằm gần ngăn hơn bản chính (ngăn ở NRT / KIX, bản chính ở Hồng Kông). Mỗi lệnh
+ * của em mở một phiên Sessions API bắt đầu từ DẤU TRANG của em (lệnh trước của em — kể cả việc phụ — đã ghi gì thì phiên mới chắc chắn thấy); lệnh ghi tự đi bản
+ * chính. Dấu trang giữ trong bộ nhớ ngăn + SQLite của ngăn (ngăn ngủ dậy vẫn đúng). Thứ người khác ghi (thầy, cron, ca thi) tới chậm theo độ trễ bản sao (vài giây).
+ */
+function dauTrangNgan(sql: SqlNgan) {
+  return {
+    doc(): string | null { try { sql.exec('CREATE TABLE IF NOT EXISTS phien_d1(id INTEGER PRIMARY KEY, bm TEXT NOT NULL)'); return String(sql.exec('SELECT bm FROM phien_d1 WHERE id = 1').toArray()[0]?.bm ?? '') || null } catch { return null } },
+    ghi(bm: string | null | undefined): void { if (!bm) return; try { sql.exec('CREATE TABLE IF NOT EXISTS phien_d1(id INTEGER PRIMARY KEY, bm TEXT NOT NULL)'); sql.exec('INSERT OR REPLACE INTO phien_d1(id, bm) VALUES (1, ?)', bm) } catch { /* không ghi được ⇒ lần sau mở phiên từ dấu trong bộ nhớ / bản chính */ } },
+  }
+}
+
 export class NganHocSinh {
   private kho: KhoEm | null = null
   private demPh = new Map<string, DemPh>()
+  /** Phiên D1 gần nhất của em (đọc qua bản sao) — dấu trang lấy từ đây cho lệnh sau. */
+  private phienCuoi: D1DatabaseSession | null = null
   constructor(private readonly state: DurableObjectState, private readonly env: Env) {}
   async fetch(req: Request): Promise<Response> {
     const duong = new URL(req.url).pathname
@@ -157,7 +174,18 @@ export class NganHocSinh {
     const sbd = req.headers.get(DAU_SBD_NGAN) ?? ''
     if (sbd && state.storage?.sql && (!this.kho || this.kho.sbd !== sbd)) this.kho = taoKhoEm(state.storage.sql, sbd)
     // Gom lệnh D1 (gom-d1.ts): mọi ngăn trong isolate dùng chung MỘT bộ gom ⇒ câu đọc của nhiều em trong cùng lượt cũng đi chung một lô.
-    const env = (envChung ??= this.env.TAT_GOM_D1 || !this.env.DB ? this.env : { ...this.env, DB: gomD1(this.env.DB) })
+    let env = (envChung ??= this.env.TAT_GOM_D1 || !this.env.DB ? this.env : { ...this.env, DB: gomD1(this.env.DB) })
+    // Đọc qua bản sao (công tắc): phiên mới từ dấu trang của em, bộ gom RIÊNG của lệnh (phiên khác nhau không gom chung), khoá đệm vẫn là D1 gốc.
+    let phien: D1DatabaseSession | null = null
+    const dt = state.storage?.sql ? dauTrangNgan(state.storage.sql) : null
+    if (this.env.BAT_BAN_SAO_NGAN && this.env.DB?.withSession && sbd) {
+      const bm = this.phienCuoi?.getBookmark?.() ?? dt?.doc() ?? null
+      phien = this.env.DB.withSession(bm || 'first-unconstrained')
+      this.phienCuoi = phien
+      const g = gomD1(phien as unknown as D1Database)
+      ;(g as unknown as Record<symbol, unknown>)[D1_GOC] = dbGoc(this.env.DB as unknown as object)
+      env = { ...env, DB: g }
+    }
     doViTri(env, ctx)
     const t0 = Date.now()
     const han = this.env.TAT_DEM_PHAN_HOI ? 0 : HAN_DEM_PHAN_HOI[duong] ?? 0
@@ -179,6 +207,8 @@ export class NganHocSinh {
     const dem: DemLenhD1 = { cau: 0, vong: new Set(), khiGhi: () => this.demPh.clear() }
     const envLenh = coXem ? { ...env, DB: (env.DB as D1Gom).voiDem(dem) } : env
     const res = await xuLy(req, this.kho ? { ...envLenh, KHO_EM: this.kho } : envLenh, ctx)
+    // Dấu trang: ghi ngay sau phản hồi, và lần nữa sau 3 giây (việc phụ của lệnh thường xong trong khoảng ấy) — ngăn ngủ dậy mở phiên đủ mới.
+    if (phien && dt) { dt.ghi(phien.getBookmark?.()); const p = phien; state.waitUntil(new Promise<void>((r) => setTimeout(r, 3000)).then(() => dt.ghi(p.getBookmark?.()))) }
     if (coXem && Math.random() < 0.1) console.log('[gom-lenh]', duong, `cau=${dem.cau}`, `vong=${dem.vong.size}`, `xl=${Date.now() - t0}`)
     // Dấu «đã qua ngăn» (đo được trên máy thật, không lộ gì): 1 = ngăn có kho sổ · trạm chạy ngăn · ms một vòng D1 · ms xử lý trong ngăn.
     const h = new Headers(res.headers)

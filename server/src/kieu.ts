@@ -21,6 +21,8 @@ export interface D1PreparedStatement {
 export interface D1DatabaseSession {
   prepare(query: string): D1PreparedStatement
   batch<T = unknown>(statements: D1PreparedStatement[]): Promise<D1Result<T>[]>
+  /** Dấu trang của phiên (mốc mới nhất phiên đã thấy) — mở phiên sau bằng dấu này ⇒ đọc thấy mọi thứ phiên trước đã ghi. D1 giả có thể vắng. */
+  getBookmark?(): string | null
 }
 export interface D1Database {
   prepare(query: string): D1PreparedStatement
@@ -97,6 +99,8 @@ export interface Env {
   TAT_GOM_D1?: string
   /** Công tắc đệm phản hồi lệnh hỏi định kỳ trong ngăn (ngan-hoc-sinh.ts). */
   TAT_DEM_PHAN_HOI?: string
+  /** Bật đọc qua bản sao D1 gần nhất trong ngăn học sinh (Sessions API + dấu trang riêng của em, ngan-hoc-sinh.ts). Mặc định tắt. */
+  BAT_BAN_SAO_NGAN?: string
   /** Phòng đấu «Đấu Nguyên Tử» của phòng chờ thi (server/src/phong-dau-ion.ts, 30/10): một Durable Object mỗi ca. Vắng ⇒ không phát vé, máy em chỉ Tập với A.I. */
   PHONG_DAU_ION?: DurableObjectNamespace
   /** Công tắc tắt Đấu Nguyên Tử trên mạng: có giá trị ⇒ không phát vé, cửa trả 410, phòng đang mở bị đóng (máy em còn Tập với A.I cục bộ). */
