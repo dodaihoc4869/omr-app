@@ -1,0 +1,35 @@
+# CA THI: EM NÀO BỊ CHỐT THIẾU CÂU (CHỈ ĐỌC) — 31/10: D1 quá tải 19:20–19:30 ⇒ lượt chốt bằng bản lưu tạm cũ (em 12070 làm 28 câu, máy chủ giữ 8).
+# In theo ca: mỗi lượt đã nộp → số câu đã trả lời máy chủ giữ / tổng câu, điểm, giờ nộp, có bài bổ sung chưa. SBD CHE (chỉ in 2 số cuối).
+name: Ca thi — em bị chốt thiếu câu (chỉ đọc)
+on:
+  workflow_dispatch:
+    inputs:
+      ma_ca:
+        description: 'Mã ca'
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm (chỉ SELECT)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+          MA_CA: ${{ inputs.ma_ca }}
+        run: |
+          C="'$(echo "$MA_CA" | tr -cd '0-9A-Za-z_-')'"
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c ".[0].results[]" || echo "(lỗi)"; }
+          DEM="(SELECT COUNT(*) FROM json_each(X,'\$.phanI') WHERE TRIM(COALESCE(value,''))<>'') + (SELECT COUNT(*) FROM json_each(X,'\$.phanII') WHERE value LIKE '%\"D\"%' OR value LIKE '%\"S\"%') + (SELECT COUNT(*) FROM json_each(X,'\$.phanIII') WHERE TRIM(COALESCE(value,''))<>'')"
+          q "ca: tên · trạng thái · số câu" "SELECT ten_ca, trang_thai, so_cau_json FROM ca WHERE ma_ca=$C"
+          q "lượt: …2 số cuối SBD · lần · trạng thái · nộp (VN) · câu đã trả lời · điểm · bổ sung (trạng thái:số câu)" "SELECT '…'||substr(l.sbd,-2) em, l.lan_thu, l.trang_thai, strftime('%H:%M:%S', l.nop_luc, '+7 hours') nop, ${DEM//X/l.dap_an_json} so_cau, l.tong, (SELECT group_concat(b.trang_thai||':'||${DEM//X/b.dap_an_json}) FROM bai_bo_sung b WHERE b.ma_ca=l.ma_ca AND b.sbd=l.sbd) bo_sung FROM luot l WHERE l.ma_ca=$C ORDER BY so_cau"
