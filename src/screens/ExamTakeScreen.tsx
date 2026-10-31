@@ -2647,6 +2647,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
   }, [mocGio, phase])
 
   useEffect(() => {
+    void napKhoaDeThi() // gói đề + đáp án tải sẵn (theo lớp / phòng chờ) sẵn sàng trước lượt vào thi (31/10)
     return () => {
       if (retryTimer.current) clearTimeout(retryTimer.current)
     }

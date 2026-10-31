@@ -862,6 +862,14 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
   const keHoachNgay = useKeHoachNgay({ token: auth?.token, sbd: auth?.sbd }, !!auth, lamMoiSheet + lamMoiHang)
   // Ô "Thi đua hôm nay" (8A): nạp /hs/thi-dua-hom-nay, làm mới mỗi 60 giây khi bảng đang hiện (không có lệnh ⇒ không ô).
   const caDangMo = useCaDangMo({ token: auth?.token, sbd: auth?.sbd }, !!auth)
+  // TẢI SẴN THEO LỚP (thầy 31/10 «Khi chọn đề thì tải luôn đề đáp án cho hs khối đó luôn»): lớp em có ca đang mở ⇒ tải ở nền gói đề + đáp án ĐÃ KHOÁ
+  // (khoa-de-thi.ts `taiTruocTheoLop`, mảnh nạp lười) ⇒ thầy bấm Bắt đầu là em vào thi tức thì. Đang làm bài thì đợi.
+  useEffect(() => {
+    if (!caDangMo || !auth?.token || tab) return
+    const t = auth.token
+    const h = setTimeout(() => void import('../lib/khoa-de-thi').then((m) => m.taiTruocTheoLop(t)).catch(() => {}), 1500 + Math.random() * 3000)
+    return () => clearTimeout(h)
+  }, [caDangMo, auth?.token, tab])
   const duLieuNhiemVu = useMemo(
     () =>
       dungBangNhiemVu({

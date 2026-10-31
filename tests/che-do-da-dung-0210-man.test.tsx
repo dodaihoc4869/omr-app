@@ -16,8 +16,10 @@ vi.mock('../src/lib/exam-api', async (goc) => ({
   ...(await goc<Record<string, unknown>>()),
   noiKhoCa: (...a: unknown[]) => noiKhoCa(...(a as [])),
 }))
+// 31/10: `noiKhoCa` dời từ exam-api sang ca-em-thay-api (học sinh khỏi tải mã của thầy) ⇒ giả ở chỗ mới.
 vi.mock('../src/lib/ca-em-thay-api', () => ({
   cauDaDungTheoEm: (...a: unknown[]) => cauDaDungTheoEm(...a),
+  noiKhoCa: (...a: unknown[]) => noiKhoCa(...(a as [])),
 }))
 vi.mock('../src/lib/exam-db', async (goc) => ({
   ...(await goc<Record<string, unknown>>()),

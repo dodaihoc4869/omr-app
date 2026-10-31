@@ -128,7 +128,7 @@ import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
 import { docGoiDeDem, docKeyBankDem, ghiKeyBank, doanCongBoNgay, layDemHetGioLuot, nhoCongBo, nhoHetGioLuot } from './dem-ca-thi'
 import { chiaGoiDe, dongGoiDe, dungGoiDe } from './khoa-de-thi'
 import { dongPhongDau, vaoPhongDau, veDauChoEm } from './dau-ion-ve'
-import { chiaDeTruoc, deTruoc } from './de-truoc'
+import { chiaDeTruoc, deTruoc, goiDapAnEm, goiDeCuaCa, maAnCa } from './de-truoc'
 
 // CORS — app chạy ở `dodaihoc4869.github.io`, Worker ở `workers.dev`, nên MỌI
 // lượt gọi đều là chéo nguồn. Thiếu mấy dòng này là trình duyệt chặn sạch và
@@ -589,7 +589,8 @@ async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
     deUrl: ca.bank_r2 ? `/de/${encodeURIComponent(maCa)}` : null,
     // ĐỀ TẢI SẴN Ở PHÒNG CHỜ (31/10, de-truoc.ts): em đã được vào ⇒ trao chìa mở gói đề đã khoá máy em tải lúc chờ. Chỉ nhánh ĐÃ được vào (sau giờ
     // bắt đầu, gói đề lúc ấy vốn đã công khai ở `/de`) ⇒ trao cho mọi lượt, máy không cần báo đang giữ gói (một HMAC, không thêm lượt D1).
-    ...(ca.bank_r2 && env.MA_BI_MAT ? { khoaDeTruoc: await chiaDeTruoc(env, maCa) } : {}),
+    // + MÃ ẨN của ca: máy em ghép gói tải sẵn lúc mở app (gắn mã ẩn, không gắn mã ca — `/hs/ca-tai-truoc`) với ca em vừa gõ mã.
+    ...(ca.bank_r2 && env.MA_BI_MAT ? { khoaDeTruoc: await chiaDeTruoc(env, maCa), idCa: await maAnCa(env, maCa) } : {}),
     chiNop3PhutCuoi: Number((ca as any).chi_nop_3_phut_cuoi ?? 0) === 1,
   })
 }
@@ -710,6 +711,33 @@ async function khoaDe(env: Env, b: Record<string, unknown>): Promise<Response> {
   // Bù `soCau` thiếu như đường trả tờ đáp án cũ (key-bank-hop-nhat.ts) ⇒ gói mở ra đúng tờ máy em vẫn nhận khi nộp.
   const bu = buSoCauChoKeyBank(k.giaTri, k.tho, ca.so_cau_json)
   return ra({ ok: true, goi: await dongGoiDe(env, maCa, sbd, bu ? bu.tho : k.tho, k.etag), phien: k.etag })
+}
+
+/**
+ * `POST /hs/ca-tai-truoc {token}` — TẢI SẴN THEO LỚP (thầy 31/10: «Khi chọn đề thì tải luôn đề đáp án cho hs khối đó luôn», «Tải sẵn hết mọi thứ về tôi
+ * bấm bắt đầu phải tức thì ngay»). Em MỞ APP mà lớp em có ca đang mở (đúng luật `/hs/ca-dang-mo`: cổng vào thi + phạm vi khối/danh sách) ⇒ trả, cho tối đa
+ * 2 ca: gói đề ĐÃ KHOÁ (chìa của ca, trao ở `/vao-thi` đã được vào) + gói tờ đáp án ĐÃ KHOÁ của chính em (chìa trao SAU khi nộp) — gắn MÃ ẨN, KHÔNG có mã
+ * ca / tên ca (máy em không biết mã ca trước khi thầy phát mã). Bắt buộc token. Lỗi từng gói ⇒ bỏ gói ấy (máy em đi đường cũ).
+ */
+async function hsCaTaiTruoc(env: Env, b: Record<string, unknown>): Promise<Response> {
+  if (!env.DE || !env.MA_BI_MAT) return ra({ ok: false, lyDo: 'thieu' })
+  let sbd = ''
+  try { sbd = await gameIdentity(env, b) } catch { return ra({ ok: false, error: 'Em cần đăng nhập lại.' }) }
+  if (!sbd || sbd.length > 40) return ra({ ok: false, error: 'Em cần đăng nhập lại.' })
+  const dong = (await docCaMoCuaEm(env, sbd)).results ?? []
+  const em = dong[0]
+  if (!em || Number(em.co) !== 1 || !String(em.lop ?? '').trim()) return ra({ ok: true, goi: [] })
+  const ca = locCaMoCuaEm(dong, em, sbd, Date.now()).slice(0, 2)
+  const goi = await Promise.all(ca.map(async (c) => {
+    const maCa = String(c.co_ca)
+    const [id, de, dapAn] = await Promise.all([
+      maAnCa(env, maCa),
+      c.bank_r2 ? goiDeCuaCa(env, maCa, String(c.bank_r2), String(c.ca_cap_nhat ?? '')).catch(() => null) : null,
+      goiDapAnEm(env, maCa, sbd, c.so_cau_json).catch(() => null),
+    ])
+    return { id, ...(de ? { de } : {}), ...(dapAn ? { dapAn } : {}) }
+  }))
+  return ra({ ok: true, goi: goi.filter((g) => g.de || g.dapAn) })
 }
 
 /** Phản hồi `/nop` có tờ đáp án: ghép THẲNG nguyên văn JSON tờ đáp án (đã kiểm hợp lệ lúc đệm) thay vì parse rồi stringify lại ~100 KB
@@ -2159,19 +2187,31 @@ async function xongLoBtvn(env: Env, b: Record<string, unknown>, ctx?: ExecutionC
  * hạn vào, chưa đóng/xoá, em chưa nộp — em đang làm dở thì vẫn mở) và `hopPhamVi` (khối/danh sách thầy chọn). Ca chỉ
  * mang cờ `mo` mà đã quá hạn vào KHÔNG tính (D1 thật đang có 7 ca như thế). Khớp lớp = `ca.lop` bằng `lop` của em
  * (hoc_sinh, không có thì danh_sach); ca không gắn lớp hay em không có lớp thì KHÔNG khớp — không đoán. */
+/** MỘT câu: em có thật + lớp + năm sinh, LEFT JOIN ca cờ `mo` của đúng lớp ấy kèm lượt gần nhất của em (dùng chung `/hs/ca-dang-mo` · `/hs/ca-tai-truoc`). */
+const docCaMoCuaEm = (env: Env, s: string) => env.DB.prepare(
+  `WITH em AS (SELECT COALESCE(NULLIF(h.lop, ''), d.lop, '') AS lop, d.nam_sinh AS nam_sinh,
+          CASE WHEN h.sbd IS NOT NULL OR d.sbd IS NOT NULL OR EXISTS (SELECT 1 FROM luot WHERE sbd = x.sbd) THEN 1 ELSE 0 END AS co
+     FROM (SELECT ?1 AS sbd) x LEFT JOIN hoc_sinh h ON h.sbd = x.sbd LEFT JOIN danh_sach d ON d.sbd = x.sbd)
+   SELECT em.lop, em.nam_sinh, em.co, c.ma_ca AS co_ca, c.trang_thai, c.loai, c.bat_dau, c.het_han_vao, c.thoi_gian_phut, c.dong_bo_gio, c.bat_dau_thi_luc, c.han_nop,
+          c.pham_vi, c.danh_sach_chon_json, c.bank_r2, c.cap_nhat_luc AS ca_cap_nhat, c.so_cau_json,
+          (SELECT l.trang_thai FROM luot l WHERE l.ma_ca = c.ma_ca AND l.sbd = ?1 ORDER BY l.lan_thu DESC LIMIT 1) AS luot_tt
+     FROM em LEFT JOIN ca c ON c.trang_thai = 'mo' AND COALESCE(c.loai, 'thi') = 'thi' AND TRIM(em.lop) <> '' AND TRIM(COALESCE(c.lop, '')) = TRIM(em.lop)`,
+).bind(s).all<Record<string, unknown>>()
+/** Ca đang mở mà em vào được: đúng luật cổng vào thi (`quyetDinhVaoThi`) + phạm vi khối/danh sách (`hopPhamVi`). */
+function locCaMoCuaEm(dong: Record<string, unknown>[], em: Record<string, unknown>, sbd: string, nay: number): Record<string, unknown>[] {
+  return dong.filter((c) => {
+    if (c.co_ca == null) return false
+    // Em đã nộp/khoá thì quyetDinhVaoThi trả ok=false; đang làm dở thì ok (khôi phục) — id thiết bị bỏ trống để không kẹt "máy khác".
+    const luot = c.luot_tt ? ({ trang_thai: String(c.luot_tt), lan_thu: 1, id_thiet_bi: '' } as unknown as DongLuot) : null
+    return quyetDinhVaoThi(c as unknown as DongCa, luot, '', nay).ok && hopPhamVi(c, { nam_sinh: em.nam_sinh as string | null }, sbd).ok
+  })
+}
+
 async function hsCaDangMo(env: Env, b: Record<string, unknown>): Promise<Response> {
   // 28/10 GIỜ CAO ĐIỂM (máy em hỏi sớm lệnh này mỗi lần mở app; «mở chặng sớm» CHỜ nó báo không có ca): trước 3 đợt D1 nối tiếp (mật khẩu → em → ca của lớp).
-  // Nay MỘT câu (em có thật + lớp + năm sinh, LEFT JOIN ca cờ `mo` của đúng lớp ấy kèm lượt gần nhất của em) chạy CÙNG đợt lượt đọc mật khẩu khi token đã qua
-  // kiểm chữ ký — kết quả chỉ dùng sau khi mật khẩu khớp. Cùng luật lọc như cũ (em có thật, lớp rỗng ⇒ không ca, quyetDinhVaoThi, hopPhamVi).
-  const doc = (s: string) => env.DB.prepare(
-    `WITH em AS (SELECT COALESCE(NULLIF(h.lop, ''), d.lop, '') AS lop, d.nam_sinh AS nam_sinh,
-            CASE WHEN h.sbd IS NOT NULL OR d.sbd IS NOT NULL OR EXISTS (SELECT 1 FROM luot WHERE sbd = x.sbd) THEN 1 ELSE 0 END AS co
-       FROM (SELECT ?1 AS sbd) x LEFT JOIN hoc_sinh h ON h.sbd = x.sbd LEFT JOIN danh_sach d ON d.sbd = x.sbd)
-     SELECT em.lop, em.nam_sinh, em.co, c.ma_ca AS co_ca, c.trang_thai, c.loai, c.bat_dau, c.het_han_vao, c.thoi_gian_phut, c.dong_bo_gio, c.bat_dau_thi_luc, c.han_nop,
-            c.pham_vi, c.danh_sach_chon_json,
-            (SELECT l.trang_thai FROM luot l WHERE l.ma_ca = c.ma_ca AND l.sbd = ?1 ORDER BY l.lan_thu DESC LIMIT 1) AS luot_tt
-       FROM em LEFT JOIN ca c ON c.trang_thai = 'mo' AND COALESCE(c.loai, 'thi') = 'thi' AND TRIM(em.lop) <> '' AND TRIM(COALESCE(c.lop, '')) = TRIM(em.lop)`,
-  ).bind(s).all<Record<string, unknown>>()
+  // Nay MỘT câu (`docCaMoCuaEm`) chạy CÙNG đợt lượt đọc mật khẩu khi token đã qua kiểm chữ ký — kết quả chỉ dùng sau khi mật khẩu khớp.
+  // Cùng luật lọc như cũ (em có thật, lớp rỗng ⇒ không ca, quyetDinhVaoThi, hopPhamVi).
+  const doc = (s: string) => docCaMoCuaEm(env, s)
   let som: { sbd: string; p: ReturnType<typeof doc> } | null = null
   const sbd = b.token ? await gameIdentity(env, b, (s) => { if (s.length > 40) return; const p = doc(s); p.catch(() => {}); som = { sbd: s, p } }) : String(b.sbd ?? '').trim()
   if (!sbd) return ra({ ok: false, error: 'Thiếu số báo danh' })
@@ -2181,16 +2221,7 @@ async function hsCaDangMo(env: Env, b: Record<string, unknown>): Promise<Respons
   const em = dong[0]
   if (!em || Number(em.co) !== 1) return ra({ ok: false, error: 'Không tìm thấy học sinh' })
   if (!String(em.lop ?? '').trim()) return ra({ ok: true, coCaMo: false, soCa: 0 })
-  const nay = Date.now()
-  let soCa = 0
-  for (const c of dong) {
-    if (c.co_ca == null) continue
-    // Em đã nộp/khoá thì quyetDinhVaoThi trả ok=false; đang làm dở thì ok (khôi phục) — id thiết bị bỏ trống để không kẹt "máy khác".
-    const luot = c.luot_tt ? ({ trang_thai: String(c.luot_tt), lan_thu: 1, id_thiet_bi: '' } as unknown as DongLuot) : null
-    if (!quyetDinhVaoThi(c as unknown as DongCa, luot, '', nay).ok) continue
-    if (!hopPhamVi(c, { nam_sinh: em.nam_sinh as string | null }, sbd).ok) continue
-    soCa++
-  }
+  const soCa = locCaMoCuaEm(dong, em, sbd, Date.now()).length
   return ra({ ok: true, coCaMo: soCa > 0, soCa })
 }
 
@@ -3896,6 +3927,7 @@ const boXuLy = {
       if (p === '/hs/thu-thach-hom-nay/nop') return ra({ ok: false, error: DA_GO_BO_NAO })
       // `await` là bắt buộc: trả thẳng promise thì lỗi (vd. token sai) lọt khỏi `catch` bên dưới.
       if (p === '/hs/ca-dang-mo') return themMocReset(env, await hsCaDangMo(env, b))
+      if (p === '/hs/ca-tai-truoc') return hsCaTaiTruoc(env, b)
 
       // ĐIỂM DANH BUỔI HỌC (bảng DẠY HỌC của mục Lên bảng, 28/09 — server/src/buoi-hoc.ts): em chỉ điểm danh CHO MÌNH (SBD từ token), mã đổi mỗi 60 giây.
       if (p === '/hs/buoi-hoc') return ra(await hsBuoiHocDangMo(env, b))

@@ -17,13 +17,11 @@ const loadSessionTeacherBank = vi.fn(async () => bankMay)
 const saveSessionTeacherBank = vi.fn(async (_m: string, b: unknown[]) => { bankMay = b })
 const docSoCauCa = vi.fn()
 
-vi.mock('../src/lib/exam-api', async (goc) => ({
-  ...(await goc<Record<string, unknown>>()),
-  noiKhoCa: (...a: unknown[]) => noiKhoCaMock(...(a as [])),
-}))
+// 31/10: `noiKhoCa` dời từ exam-api sang ca-em-thay-api (học sinh khỏi tải mã của thầy) ⇒ giả cùng chỗ với hai lệnh máy thầy kia.
 vi.mock('../src/lib/ca-em-thay-api', () => ({
   loiDenHanTheoEm: (...a: unknown[]) => loiDenHanTheoEm(...a),
   coLuotMoiTheoEm: (...a: unknown[]) => coLuotMoiTheoEm(...a),
+  noiKhoCa: (...a: unknown[]) => noiKhoCaMock(...(a as [])),
 }))
 vi.mock('../src/lib/exam-db', async (goc) => ({
   ...(await goc<Record<string, unknown>>()),
@@ -172,6 +170,7 @@ describe('máy thầy noiKhoCa — hạn 60 giây, máy chủ bận thì thử l
   })
   it('503 lần đầu ⇒ gửi lại đúng lệnh, lần hai thành công', async () => {
     vi.doUnmock('../src/lib/exam-api')
+    vi.doUnmock('../src/lib/ca-em-thay-api')
     const goi: Record<string, unknown>[] = []
     vi.stubGlobal('fetch', async (u: string, init?: RequestInit) => {
       if (String(u).includes('cau-hinh')) return new Response('{}', { status: 404 })
@@ -180,7 +179,9 @@ describe('máy thầy noiKhoCa — hạn 60 giây, máy chủ bận thì thử l
     })
     const api = await vi.importActual<typeof import('../src/lib/exam-api')>('../src/lib/exam-api')
     expect(api.HAN_NOI_KHO_CA_GIAY).toBe(60)
-    const r = await api.noiKhoCa('https://omr.example', 'MAT', 'C1', { phanI: [], phanII: [], phanIII: [] } as never, { phanI: [], phanII: [], phanIII: [] })
+    // 31/10: `noiKhoCa` nay ở ca-em-thay-api (chỉ máy thầy) — mã giữ nguyên, vẫn đi `postCoThuLai` của exam-api.
+    const thay = await vi.importActual<typeof import('../src/lib/ca-em-thay-api')>('../src/lib/ca-em-thay-api')
+    const r = await thay.noiKhoCa('https://omr.example', 'MAT', 'C1', { phanI: [], phanII: [], phanIII: [] } as never, { phanI: [], phanII: [], phanIII: [] })
     expect(r).toEqual({ themBank: 2, themKey: 2 })
     expect(goi).toHaveLength(2)
     expect(goi.every((g) => g.action === 'noiKhoCa' && g.maCa === 'C1')).toBe(true)
