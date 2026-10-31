@@ -1,0 +1,61 @@
+# BẮT LỖI TỪNG LỆNH TRÊN WORKER SỐNG (CHỈ ĐỌC) — thầy 31/10 19:18: «Bấm vào hồ sơ học sinh bị lỗi máy chủ đang bận». `wrangler tail` PHUT phút, gộp theo đường dẫn:
+# số lần · mã trả lời (503 = «Máy chủ đang bận») · thời gian thực p50/max; rồi in câu lỗi máy chủ ghi (console.error) của lượt ≥ 500 — che mọi dãy số ≥ 5 chữ số
+# (SBD, mã) và chuỗi hex dài. Không in thân yêu cầu / token.
+name: Bắt lỗi từng lệnh (chỉ đọc)
+on:
+  workflow_dispatch:
+    inputs:
+      phut:
+        description: 'Số phút theo dõi'
+        required: false
+        default: '6'
+permissions:
+  contents: read
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Theo dõi Worker sống rồi gộp lỗi
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+          PHUT: ${{ inputs.phut }}
+        run: |
+          timeout $(( ${PHUT:-6} * 60 )) npx -y wrangler@4 tail omr --format json > /tmp/tail.jsonl 2>/tmp/tail.err || true
+          echo "dòng nhận: $(wc -l < /tmp/tail.jsonl)"; tail -n 3 /tmp/tail.err | sed 's/[0-9a-f]\{32,\}/<id>/g'
+          node - <<'JS'
+          const fs = require('fs')
+          const raw = fs.readFileSync('/tmp/tail.jsonl', 'utf8')
+          const ev = []; let d = 0, s = -1, inStr = false, esc = false
+          for (let i = 0; i < raw.length; i++) { const c = raw[i]
+            if (inStr) { if (esc) esc = false; else if (c === '\\') esc = true; else if (c === '"') inStr = false; continue }
+            if (c === '"') { inStr = true; continue }
+            if (c === '{') { if (d++ === 0) s = i } else if (c === '}') { if (--d === 0 && s >= 0) { try { ev.push(JSON.parse(raw.slice(s, i + 1))) } catch {} s = -1 } } }
+          const che = (x) => String(x).replace(/\d{5,}/g, '<so>').replace(/[0-9a-f]{20,}/gi, '<id>').slice(0, 400)
+          const nhom = new Map(), loi = []
+          for (const e of ev) {
+            const url = e?.event?.request?.url; if (!url) continue
+            let p; try { p = new URL(url).pathname } catch { continue }
+            p = p.replace(/\/[0-9a-f-]{20,}/gi, '/<id>').replace(/\/\d{4,}/g, '/<so>')
+            const st = e?.event?.response?.status ?? (e.outcome === 'ok' ? '?' : e.outcome)
+            const g = nhom.get(p) ?? { n: 0, w: [], st: {} }; g.n++
+            if (typeof e.wallTime === 'number') g.w.push(e.wallTime)
+            g.st[st] = (g.st[st] ?? 0) + 1
+            nhom.set(p, g)
+            const ghi = [...(e.logs ?? []).filter((l) => l.level === 'error' || l.level === 'warn').map((l) => (l.message ?? []).map(che).join(' ')), ...(e.exceptions ?? []).map((x) => che(`${x.name}: ${x.message}`))]
+            if ((typeof st === 'number' && st >= 500) || e.outcome !== 'ok' || ghi.length) loi.push(`${p} · ${st} · ${Math.round(e.wallTime ?? 0)} ms · ${ghi.join(' | ') || '(không có dòng lỗi)'}`)
+          }
+          const pt = (a, q) => { if (!a.length) return '-'; const b = [...a].sort((x, y) => x - y); return Math.round(b[Math.min(b.length - 1, Math.floor(q * b.length))]) }
+          console.log('== đường dẫn | lần | mã trả lời | wall p50/max ms')
+          for (const [p, g] of [...nhom].sort((a, b) => b[1].n - a[1].n).slice(0, 50)) console.log(`${p} | ${g.n} | ${JSON.stringify(g.st)} | ${pt(g.w, .5)}/${pt(g.w, 1)}`)
+          console.log(`== lượt lỗi / có dòng lỗi: ${loi.length}`)
+          for (const x of loi.slice(0, 80)) console.log(x)
+          JS
