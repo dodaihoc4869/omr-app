@@ -8,6 +8,8 @@
 // Không đi qua ngăn: đăng nhập, thi (vào thi / lưu tạm / nộp), lệnh thầy / phụ huynh, GET.
 import type { DurableObjectState, Env, ExecutionContext, KhoEm, SqlNgan } from './kieu'
 import { gomD1, type D1Gom, type DemLenhD1 } from './gom-d1'
+import { D1_GOC, dbGoc } from './cau-hinh-dem'
+import type { D1Database, D1DatabaseSession } from './kieu'
 
 type XuLy = (req: Request, env: Env, ctx?: ExecutionContext) => Promise<Response>
 let xuLy: XuLy | null = null
@@ -36,7 +38,7 @@ const RE_TEN_DINH = /^dinh\|(k\|)?\d{1,4}$/
 /** Tiền tố ngăn sát D1 hợp lệ (`d1|`, `d2|` …) — đổi khi bốc thăm tìm được chỗ gần D1 hơn hẳn ⇒ mọi em sang ngăn mới đúng chỗ. */
 const RE_TIEN_D1 = /^d\d{1,2}\|$/
 /** Phiên bản bốc thăm: cấu hình cũ hơn ⇒ bốc thăm lại ở nền (vẫn dùng danh sách cũ trong lúc chờ). */
-export const BAN_BOC_THAM = 2
+export const BAN_BOC_THAM = 3
 
 /**
  * KHO RIÊNG CỦA EM trong SQLite của ngăn: dòng sổ (`su_kien_hoc` của em, đúng các cột omni-d1 đọc) + mốc (n = số dòng, r = received_at lớn nhất).
@@ -113,8 +115,35 @@ async function docTram(): Promise<string> {
   return tram
 }
 
+/**
+ * ĐỆM PHẢN HỒI LỆNH HỎI ĐỊNH KỲ trong ngăn của em (31/10, đo `[gom-lenh]` thử tải 2000 em: ca thi đang mở · buổi học · bài mẹ giao · thông báo · thưởng · cờ chữa
+ * câu sai ≈ 1/5 số yêu cầu D1 — máy em hỏi lại theo nhịp dù không có gì đổi; D1 giới hạn số yêu cầu mỗi giây). Chỉ đệm khi lệnh KHÔNG phát câu ghi nào (bộ gom
+ * báo) và trả 200 JSON; em có lệnh ghi bất kỳ (kể cả việc phụ sau phản hồi) ⇒ bỏ hết đệm của em ngay. Thứ thầy đổi (mở ca, giao bài) tới chậm tối đa thời hạn
+ * dưới đây. Trả lại đúng thân cũ, `serverNow` làm mới. Công tắc `TAT_DEM_PHAN_HOI`.
+ */
+export const HAN_DEM_PHAN_HOI: Readonly<Record<string, number>> = {
+  '/hs/ca-dang-mo': 10_000, '/hs/buoi-hoc': 20_000, '/mom/list': 20_000, '/notifications/list': 20_000, '/hs/thuong': 15_000, '/hs/chua-cau-sai/co': 20_000,
+}
+type DemPh = { luc: number; han: number; headers: [string, string][]; than: string }
+
+/**
+ * ĐỌC QUA BẢN SAO GẦN NHẤT (31/10, công tắc `BAT_BAN_SAO_NGAN`, mặc định tắt): D1 thật bật bản sao đọc ('auto') — mỗi bản sao có hạn mức yêu cầu RIÊNG (tài liệu
+ * D1: «each read replica is a separate instance with its own limits») và có thể nằm gần ngăn hơn bản chính (ngăn ở NRT / KIX, bản chính ở Hồng Kông). Mỗi lệnh
+ * của em mở một phiên Sessions API bắt đầu từ DẤU TRANG của em (lệnh trước của em — kể cả việc phụ — đã ghi gì thì phiên mới chắc chắn thấy); lệnh ghi tự đi bản
+ * chính. Dấu trang giữ trong bộ nhớ ngăn + SQLite của ngăn (ngăn ngủ dậy vẫn đúng). Thứ người khác ghi (thầy, cron, ca thi) tới chậm theo độ trễ bản sao (vài giây).
+ */
+function dauTrangNgan(sql: SqlNgan) {
+  return {
+    doc(): string | null { try { sql.exec('CREATE TABLE IF NOT EXISTS phien_d1(id INTEGER PRIMARY KEY, bm TEXT NOT NULL)'); return String(sql.exec('SELECT bm FROM phien_d1 WHERE id = 1').toArray()[0]?.bm ?? '') || null } catch { return null } },
+    ghi(bm: string | null | undefined): void { if (!bm) return; try { sql.exec('CREATE TABLE IF NOT EXISTS phien_d1(id INTEGER PRIMARY KEY, bm TEXT NOT NULL)'); sql.exec('INSERT OR REPLACE INTO phien_d1(id, bm) VALUES (1, ?)', bm) } catch { /* không ghi được ⇒ lần sau mở phiên từ dấu trong bộ nhớ / bản chính */ } },
+  }
+}
+
 export class NganHocSinh {
   private kho: KhoEm | null = null
+  private demPh = new Map<string, DemPh>()
+  /** Phiên D1 gần nhất của em (đọc qua bản sao) — dấu trang lấy từ đây cho lệnh sau. */
+  private phienCuoi: D1DatabaseSession | null = null
   constructor(private readonly state: DurableObjectState, private readonly env: Env) {}
   async fetch(req: Request): Promise<Response> {
     const duong = new URL(req.url).pathname
@@ -122,7 +151,11 @@ export class NganHocSinh {
     if (duong === DUONG_DO_VI_TRI) {
       const ms: number[] = []
       try { for (let i = 0; i < 4; i++) { const t0 = Date.now(); await this.env.DB.prepare('SELECT 1').first(); ms.push(Date.now() - t0) } } catch { /* D1 lỗi ⇒ ms thiếu, bên đo bỏ ngăn này */ }
-      return new Response(JSON.stringify({ tram: await docTram(), ms }), { headers: { 'content-type': 'application/json' } })
+      // 31/10 (v3): cùng phép đo qua BẢN SAO ĐỌC gần nhất (Sessions API 'first-unconstrained', mỗi vòng một phiên mới) — biết bản sao có nằm gần ngăn hơn bản chính
+      // không (D1 thật bật bản sao 'auto'; mỗi bản sao có hạn mức yêu cầu riêng). Chỉ ĐO, chưa đổi đường đọc.
+      const msBs: number[] = []
+      try { if (this.env.DB.withSession) for (let i = 0; i < 4; i++) { const t0 = Date.now(); await this.env.DB.withSession('first-unconstrained').prepare('SELECT 1').first(); msBs.push(Date.now() - t0) } } catch { /* không có bản sao ⇒ bỏ */ }
+      return new Response(JSON.stringify({ tram: await docTram(), ms, msBs }), { headers: { 'content-type': 'application/json' } })
     }
     // NGĂN TRUNG CHUYỂN: chuyển nguyên lệnh sang ngăn sát D1 của em (get() KHÔNG gợi ý ⇒ ngăn mới tạo cạnh trung chuyển). Chỉ nhận đúng tên `d1|<sbd của lệnh>`.
     const chuyen = req.headers.get(DAU_CHUYEN_NGAN)
@@ -141,19 +174,55 @@ export class NganHocSinh {
     const sbd = req.headers.get(DAU_SBD_NGAN) ?? ''
     if (sbd && state.storage?.sql && (!this.kho || this.kho.sbd !== sbd)) this.kho = taoKhoEm(state.storage.sql, sbd)
     // Gom lệnh D1 (gom-d1.ts): mọi ngăn trong isolate dùng chung MỘT bộ gom ⇒ câu đọc của nhiều em trong cùng lượt cũng đi chung một lô.
-    const env = (envChung ??= this.env.TAT_GOM_D1 || !this.env.DB ? this.env : { ...this.env, DB: gomD1(this.env.DB) })
+    let env = (envChung ??= this.env.TAT_GOM_D1 || !this.env.DB ? this.env : { ...this.env, DB: gomD1(this.env.DB) })
+    // Đọc qua bản sao (công tắc): phiên mới từ dấu trang của em, bộ gom RIÊNG của lệnh (phiên khác nhau không gom chung), khoá đệm vẫn là D1 gốc.
+    let phien: D1DatabaseSession | null = null
+    const dt = state.storage?.sql ? dauTrangNgan(state.storage.sql) : null
+    if (this.env.BAT_BAN_SAO_NGAN && this.env.DB?.withSession && sbd) {
+      const bm = this.phienCuoi?.getBookmark?.() ?? dt?.doc() ?? null
+      phien = this.env.DB.withSession(bm || 'first-unconstrained')
+      this.phienCuoi = phien
+      const g = gomD1(phien as unknown as D1Database)
+      ;(g as unknown as Record<symbol, unknown>)[D1_GOC] = dbGoc(this.env.DB as unknown as object)
+      env = { ...env, DB: g }
+    }
     doViTri(env, ctx)
     const t0 = Date.now()
-    // ĐO THEO LỆNH (31/10): 1/10 lệnh mang bộ đếm câu / vòng D1 ⇒ log `[gom-lenh] <đường> cau=… vong=… xl=…` (wrangler tail gom theo đường) — không SBD.
-    const dem: DemLenhD1 | null = Math.random() < 0.1 && (env.DB as Partial<D1Gom>).voiDem ? { cau: 0, vong: new Set() } : null
-    const envLenh = dem ? { ...env, DB: (env.DB as D1Gom).voiDem(dem) } : env
+    const han = this.env.TAT_DEM_PHAN_HOI ? 0 : HAN_DEM_PHAN_HOI[duong] ?? 0
+    let khoaPh = ''
+    if (han && req.method === 'POST') {
+      const than = await req.text()
+      req = new Request(req.url, { method: 'POST', headers: req.headers, body: than })
+      khoaPh = `${duong}\u0001${than}`
+      const c = this.demPh.get(khoaPh)
+      if (c && t0 - c.luc >= 0 && t0 - c.luc < c.han) {
+        const h = new Headers(c.headers)
+        h.set('x-ngan-do', `${tram || '-'};d1=${d1Ms};xl=0;dem=1`)
+        return new Response(c.than.replace(/"serverNow":\d+/, `"serverNow":${Date.now()}`), { status: 200, headers: h })
+      }
+    }
+    // ĐO THEO LỆNH (31/10): mọi lệnh mang bộ đếm câu / vòng D1 (+ cờ «đã ghi» cho đệm phản hồi); 1/10 lệnh ghi log `[gom-lenh] <đường> cau=… vong=… xl=…`
+    // (wrangler tail gom theo đường) — không SBD. Lệnh của em có câu GHI ⇒ bỏ đệm phản hồi của em (cả khi ghi ở việc phụ sau phản hồi).
+    const coXem = !!(env.DB as Partial<D1Gom>).voiDem
+    const dem: DemLenhD1 = { cau: 0, vong: new Set(), khiGhi: () => this.demPh.clear() }
+    const envLenh = coXem ? { ...env, DB: (env.DB as D1Gom).voiDem(dem) } : env
     const res = await xuLy(req, this.kho ? { ...envLenh, KHO_EM: this.kho } : envLenh, ctx)
-    if (dem) console.log('[gom-lenh]', duong, `cau=${dem.cau}`, `vong=${dem.vong.size}`, `xl=${Date.now() - t0}`)
+    // Dấu trang: ghi ngay sau phản hồi, và lần nữa sau 3 giây (việc phụ của lệnh thường xong trong khoảng ấy) — ngăn ngủ dậy mở phiên đủ mới.
+    if (phien && dt) { dt.ghi(phien.getBookmark?.()); const p = phien; state.waitUntil(new Promise<void>((r) => setTimeout(r, 3000)).then(() => dt.ghi(p.getBookmark?.()))) }
+    if (coXem && Math.random() < 0.1) console.log('[gom-lenh]', duong, `cau=${dem.cau}`, `vong=${dem.vong.size}`, `xl=${Date.now() - t0}`)
     // Dấu «đã qua ngăn» (đo được trên máy thật, không lộ gì): 1 = ngăn có kho sổ · trạm chạy ngăn · ms một vòng D1 · ms xử lý trong ngăn.
     const h = new Headers(res.headers)
     h.set('x-ngan', this.kho ? '1' : '0')
     h.set('x-ngan-do', `${tram || '-'};d1=${d1Ms};xl=${Date.now() - t0}`)
     const ex = h.get('access-control-expose-headers'); h.set('access-control-expose-headers', ex ? `${ex}, x-ngan, x-ngan-do` : 'x-ngan, x-ngan-do')
+    if (khoaPh && coXem && res.status === 200 && !dem.ghi && /json/.test(res.headers.get('content-type') ?? '') && !/ndjson/.test(res.headers.get('content-type') ?? '')) {
+      const than = await res.text()
+      if (!dem.ghi) {
+        if (this.demPh.size >= 16) this.demPh.delete(this.demPh.keys().next().value!)
+        this.demPh.set(khoaPh, { luc: t0, han, headers: [...h], than })
+      }
+      return new Response(than, { status: 200, statusText: res.statusText, headers: h })
+    }
     return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h })
   }
 }
@@ -240,16 +309,17 @@ async function dsDinh(env: Env, ctx?: ExecutionContext): Promise<CauHinhDinh> {
 export async function chonNganDinh(env: Env, so = 32, soKhong = 16): Promise<{ ds: string[]; tot: number; theoTram: Record<string, number>; tien: string } | null> {
   const ns = env.NGAN_HS
   if (!ns) return null
-  const kq: { ten: string; tram: string; ms: number }[] = []
+  const kq: { ten: string; tram: string; ms: number; msBs: number | null }[] = []
   const ten = (i: number) => (i < so ? `dinh|${i}` : `dinh|k|${i - so}`)
   for (let i = 0; i < so + soKhong; i += 8) {
     const lo = await Promise.all(Array.from({ length: Math.min(8, so + soKhong - i) }, async (_, j) => {
       const t = ten(i + j)
       try {
         const r = await (i + j < so ? ns.get(ns.idFromName(t), { locationHint: 'apac' }) : ns.get(ns.idFromName(t))).fetch(new Request(`https://ngan${DUONG_DO_VI_TRI}`, { method: 'POST' }))
-        const x = (await r.json()) as { tram?: unknown; ms?: unknown }
+        const x = (await r.json()) as { tram?: unknown; ms?: unknown; msBs?: unknown }
         const ms = Array.isArray(x.ms) ? x.ms.map(Number).filter(Number.isFinite) : []
-        return ms.length >= 2 ? { ten: t, tram: String(x.tram ?? '?'), ms: Math.min(...ms.slice(1)) } : null
+        const msBs = Array.isArray(x.msBs) ? x.msBs.map(Number).filter(Number.isFinite) : []
+        return ms.length >= 2 ? { ten: t, tram: String(x.tram ?? '?'), ms: Math.min(...ms.slice(1)), msBs: msBs.length ? Math.min(...msBs) : null } : null
       } catch { return null }
     }))
     for (const x of lo) if (x) kq.push(x)
@@ -262,10 +332,22 @@ export async function chonNganDinh(env: Env, so = 32, soKhong = 16): Promise<{ d
   const tien = tot < 15 ? 'd2|' : TIEN_TO_NGAN_D1
   const luc = new Date().toISOString()
   await env.DB.prepare('INSERT INTO cau_hinh(khoa, gia_tri, cap_nhat_luc) VALUES(?, ?, ?) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc')
-    .bind(KHOA_NGAN_DINH, JSON.stringify({ v: BAN_BOC_THAM, ds, tien, tot, theoTram, tramChon: [...new Set(kq.filter((x) => ds.includes(x.ten)).map((x) => x.tram))] }), luc).run()
+    .bind(KHOA_NGAN_DINH, JSON.stringify({ v: BAN_BOC_THAM, ds, tien, tot, theoTram, tramChon: [...new Set(kq.filter((x) => ds.includes(x.ten)).map((x) => x.tram))], banSao: banSaoTheoTram(kq) }), luc).run()
   dinh = { ds, tien, v: BAN_BOC_THAM, luc: Date.now() }
   console.log('[ngan-dinh] bốc thăm', JSON.stringify({ so: kq.length, chon: ds.length, tot, tien, theoTram }))
   return { ds, tot, theoTram, tien }
+}
+
+/** Đo bản sao theo trạm (v3): trạm → [ms tốt nhất tới bản chính, ms tốt nhất qua bản sao gần nhất]. */
+function banSaoTheoTram(kq: readonly { tram: string; ms: number; msBs: number | null }[]): Record<string, [number, number | null]> {
+  const ra: Record<string, [number, number | null]> = {}
+  for (const x of kq) {
+    const o = ra[x.tram]
+    const bs = x.msBs
+    if (!o) ra[x.tram] = [x.ms, bs]
+    else ra[x.tram] = [Math.min(o[0], x.ms), bs === null ? o[1] : o[1] === null ? bs : Math.min(o[1], bs)]
+  }
+  return ra
 }
 
 /** Chưa có danh sách ⇒ bốc thăm ở nền, mỗi lúc một nơi (khoá `ngan_dinh_khoa` 10 phút trong D1). */
