@@ -4,6 +4,11 @@
 name: Xem thử xếp học sinh (chỉ đọc)
 on:
   workflow_dispatch:
+    inputs:
+      tuan:
+        description: 'Thứ Hai của tuần cần xem thử (YYYY-MM-DD, trống = hôm nay) — so luật mới với bản chụp đã lưu (31/10)'
+        required: false
+        default: ''
   push:
     branches: [claude/stoic-einstein-7jkysb]
     paths: ['.github/workflows/do-danh-gia-thu-2410.yml', 'server/src/danh-gia-hoc-that.ts']
@@ -40,12 +45,14 @@ jobs:
           for i in $(seq 1 90); do curl -s -o /dev/null http://127.0.0.1:8787/ && break; sleep 2; done
           grep -iE 'remote|ready' /tmp/wrangler-dev.log | head -5 || true
       - name: Xem thử theo lô, gộp số đếm
+        env:
+          TUAN: ${{ inputs.tuan }}
         run: |
           node -e '
           const MB = process.env.MB_LUOT; let sau = "", tong = {}, soEm = 0
           ;(async () => {
             for (let i = 0; i < 40; i++) {
-              const r = await fetch("http://127.0.0.1:8787/gv/danh-gia/thu", { method: "POST", headers: { "content-type": "application/json", "x-ma-bi-mat": MB }, body: JSON.stringify({ sau }) })
+              const r = await fetch("http://127.0.0.1:8787/gv/danh-gia/thu", { method: "POST", headers: { "content-type": "application/json", "x-ma-bi-mat": MB }, body: JSON.stringify({ sau, tuan: process.env.TUAN || "" }) })
               const j = await r.json()
               if (!j.ok) { console.log("LOI", r.status, String(j.error || "").slice(0, 160)); process.exit(1) }
               soEm += j.soEm || 0
