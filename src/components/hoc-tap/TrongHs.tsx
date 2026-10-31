@@ -472,6 +472,16 @@ export default function GacTamDong({ p, kiem }: { p: PropsHomNayCu; kiem?: TomTa
 
 /** Đồng bộ tức thì tiến độ chặng đang làm dở (`omr_chang_dang_cua`) vào `so` trên Lộ trình — chỉ tính câu ĐÃ BẤM NỘP (`ket`), và giữ chặng ở trạng thái đang học (`changDangDo`, chưa tích ✓) cho tới khi màn báo hoàn thành chặng hiện ra. */
 let cuaDoc: { s: string | null; d: any } = { s: null, d: null } // eslint-disable-line @typescript-eslint/no-explicit-any
+/** Bỏ chặng dở đã cũ (đúng các khoá của `xoaChangDangLam` ở mo-chang-truoc.ts — không nhập mô-đun ấy vào mảnh mở app) + báo mô-đun ấy (nếu đã nạp) xoá bản nhớ. */
+function boChangDangCu(sbd: string): void {
+  try {
+    const em = sbd.trim()
+    if (em) { localStorage.removeItem(`omr_chang_dang_lam_${em}`); localStorage.removeItem(`omr_chang_dang_cau_${em}`) }
+    localStorage.removeItem('omr_chang_dang_cua')
+    cuaDoc = { s: null, d: null }
+    window.dispatchEvent(new CustomEvent('ddh-bo-chang-dang', { detail: em }))
+  } catch { /* bỏ qua */ }
+}
 function nangSoTuChangDangDo(so: SoHomNay | null): SoHomNay | null {
   if (!so) return so
   try {
@@ -482,7 +492,11 @@ function nangSoTuChangDangDo(so: SoHomNay | null): SoHomNay | null {
     if (!d || d.ngay !== ngayVn(now) || (sbd && d.sbd && String(d.sbd).trim() !== sbd.trim()) || now - d.moLuc >= 6300_000 || !d.cau?.length) return so
     const ket = d.ket || {}, g = d.soGoc > 0 ? d.soGoc : d.cau.length
     const n = d.cau.slice(0, g).filter((c: { qid?: string; vaiGoi7?: string }) => c?.qid && c.vaiGoi7 !== 'lam_lai' && ket[c.qid] && ket[c.qid].omni?.luot !== true).length
-    const d0Luu = d.moi?.d0 ?? -1, ch = d.chang >= 1 && d.chang <= so.soChang ? d.chang : so.soChang > 0 ? Math.min(so.soChang, (((d0Luu >= 0 ? d0Luu : Math.max(0, so.daLam - n)) / 6) | 0) + 1) : 0
+    const d0Luu = d.moi?.d0 ?? -1
+    // ĐỒNG BỘ NHIỀU MÁY (thầy 31/10: «hai thiết bị đăng nhập ko đồng bộ với nhau. Làm như doligo đi»): máy chủ biết em đã làm NHIỀU HƠN chặng dở lưu ở máy này
+    // (máy khác đã làm tiếp) ⇒ bản lưu ở máy này cũ: bỏ, hiện đúng số máy chủ — trước: kẹp số về cuối chặng cũ (máy chủ 18 mà máy hiện 12, «chặng 2 đang học»).
+    if (d0Luu >= 0 && so.daLam > d0Luu + n) { boChangDangCu(String(d.sbd || sbd || '')); return so }
+    const ch = d.chang >= 1 && d.chang <= so.soChang ? d.chang : so.soChang > 0 ? Math.min(so.soChang, (((d0Luu >= 0 ? d0Luu : Math.max(0, so.daLam - n)) / 6) | 0) + 1) : 0
     if (ch >= 1 && d0Luu < so.muc) {
       const dau = Math.min((ch - 1) * 6, so.muc), cuoi = ch === so.soChang ? so.muc : Math.min(ch * 6, so.muc)
       const d0 = d0Luu >= dau && d0Luu + g <= cuoi ? d0Luu : Math.max(dau, cuoi - g)
