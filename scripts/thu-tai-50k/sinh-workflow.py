@@ -105,6 +105,16 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
         run: |
           npx -y wrangler@4 d1 execute omr-thu --remote --config wrangler.nap.toml --yes --json --command "SELECT (SELECT COUNT(*) FROM hoc_sinh) hoc_sinh, (SELECT COUNT(*) FROM su_kien_hoc) su_kien_hoc, (SELECT COUNT(*) FROM game_v2_attempt) attempt, (SELECT COUNT(*) FROM game_v2_question) cau, (SELECT length(sbd_json) FROM chien_dich WHERE id='hanh-trinh-v3-khoi-12') sbd_json, (SELECT sha||' '||luc FROM thu_tai_moc WHERE id=1) moc" | jq -c '.[0].results[0]'
+      - name: Lập bảng tra chiến dịch (chien-dich-tv, #669) — Worker thử không có cron
+        working-directory: srv/server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          grep -q 'database_name = "omr-thu"' wrangler.nap.toml && ! grep -q d2e6d322 wrangler.nap.toml
+          if [ ! -f migration-z-3110-chien-dich-tv.sql ]; then echo "Mã máy chủ chưa có bảng tra — bỏ qua"; exit 0; fi
+          npx -y wrangler@4 d1 execute omr-thu --remote --config wrangler.nap.toml --file migration-z-3110-chien-dich-tv.sql --yes 2>&1 | grep -vE '^\s*$' | tail -3
+          npx -y wrangler@4 d1 execute omr-thu --remote --config wrangler.nap.toml --yes --json --command "DELETE FROM chien_dich_tv; INSERT OR IGNORE INTO chien_dich_tv (sbd, chien_dich_id) SELECT j.value, c.id FROM chien_dich c, json_each(CASE WHEN json_valid(c.sbd_json) AND json_type(c.sbd_json) = 'array' THEN c.sbd_json ELSE '[]' END) j WHERE j.type = 'text'; INSERT OR REPLACE INTO chien_dich_tv_dau (chien_dich_id, luc) SELECT id, strftime('%Y-%m-%dT%H:%M:%fZ','now') FROM chien_dich; SELECT (SELECT COUNT(*) FROM chien_dich_tv) tv, (SELECT COUNT(*) FROM chien_dich_tv_dau) dau, (SELECT COUNT(*) FROM chien_dich) cd" | jq -c '.[-1].results[0]'
       - name: R2 thử omr-thu-de (nếu khoá có quyền)
         working-directory: srv/server
         env:
