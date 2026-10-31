@@ -245,6 +245,8 @@ export interface KetQuaVaoThiMoi {
   deUrl?: string | null
   /** Chìa mở gói đề tải sẵn ở phòng chờ (31/10, server/src/de-truoc.ts) — chỉ ở nhánh em đã được vào. */
   khoaDeTruoc?: string
+  /** Mã ẩn của ca (ghép gói tải sẵn theo lớp lúc mở app — server/src/de-truoc.ts `maAnCa`). */
+  idCa?: string
   lop?: string
   giuDeDoc?: boolean
   anHanGiay?: number

@@ -31,6 +31,8 @@ const saveSessionTeacherBank = vi.fn(async () => {})
 const docSoCauCa = vi.fn()
 const loadExamSources = vi.fn()
 
+// 31/10: `noiKhoCa` dời từ exam-api sang ca-em-thay-api (học sinh khỏi tải mã của thầy) ⇒ giả ở chỗ mới.
+vi.mock('../src/lib/ca-em-thay-api', async (goc) => ({ ...(await goc<Record<string, unknown>>()), noiKhoCa: (...a: unknown[]) => noiKhoCa(...a) }))
 vi.mock('../src/lib/exam-api', async (goc) => ({
   ...(await goc<Record<string, unknown>>()),
   hoSoOnCa: (...a: unknown[]) => hoSoOnCa(...a),

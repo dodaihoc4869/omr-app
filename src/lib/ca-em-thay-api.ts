@@ -1,9 +1,10 @@
 // LỆNH MÁY THẦY RÚT ĐỀ RIÊNG / KIỂM CHỨNG CÂU ĐÃ ĐÚNG (`/ca/loi-den-han`, `/ca/co-luot-moi`, `/ca/cau-da-dung`, `/ca/cau-thay-so`) — tách khỏi exam-api 31/10:
 // exam-api nằm trong mảnh `app-nho` mà link phiếu `/p` và màn thi `/t` của học sinh nạp sẵn; bốn lệnh này chỉ máy thầy dùng (de-rieng-v2, de-rieng-da-dung)
 // ⇒ dời sang đây cho học sinh khỏi tải mã của thầy (bù phần gói tờ đáp án đã khoá, khoa-de-thi.ts). Mã giữ nguyên.
-import type { QuestionMedia } from '../data/examContent'
+import type { PublicExamBank, QuestionMedia, TeacherExamSource } from '../data/examContent'
 import { layDiaChiMayChu } from './dia-chi-may-chu'
 import { HAN_GIAY, fetchCoHan } from './fetch-co-han'
+import { HAN_NOI_KHO_CA_GIAY, postCoThuLai } from './exam-api'
 
 /** Một lỗi của em (hàng chữa lỗi) như `/ca/loi-den-han` trả về. `cauSongSinh` có ĐÁP ÁN — chỉ ở máy thầy, chỉ để nối vào kho ca. */
 export interface LoiDenHanEm {
@@ -206,4 +207,27 @@ export async function cauThayTheoEm(
   }
   await Promise.all(Array.from({ length: Math.min(3, lo.length) }, chay))
   return ra
+}
+
+/** NỐI THÊM CÂU VÀO KHO CỦA MỘT CA — chỉ dùng cho đề riêng từng em (dời từ exam-api 31/10, mã giữ nguyên).
+ *
+ * Câu em từng sai có thể nằm ngoài kho thầy vừa rút cho ca. Muốn hỏi lại đúng
+ * câu đó thì phải nối nó vào kho của ca trước khi phát đề (thầy chốt 08/09:
+ * "bất kể là tôi chọn chuyên đề gì thi mà ca trước sai 9 câu phải rút đúng 3
+ * câu đó ra vào đề mới").
+ *
+ * Máy chủ CHẶN khi ca đã bấm Bắt đầu: lúc đó kho là thứ em đang cầm. */
+export async function noiKhoCa(
+  scriptUrl: string,
+  secret: string,
+  maCa: string,
+  bank: PublicExamBank,
+  keyBank: { phanI: TeacherExamSource['phanI']; phanII: TeacherExamSource['phanII']; phanIII: TeacherExamSource['phanIII'] },
+): Promise<{ themBank: number; themKey: number }> {
+  // HẠN 60 GIÂY + THỬ LẠI 1 LẦN (30/10, ca 269333): nối 344 câu lúc bấm Bắt đầu quá hạn 25 giây chung khi D1 nghẽn ⇒ máy thầy bỏ HẾT câu sai cũ khỏi
+  // đề «rút câu sai». Gửi lại AN TOÀN: máy chủ ghi `kho_ca_them` theo khoá `maCa|qid` (ghi đè đúng dòng ấy bằng cùng nội dung) và chỉ THÊM câu chưa
+  // có vào `de/` + `key/` (so theo id) ⇒ lần hai không nhân đôi gì.
+  const r = await postCoThuLai(scriptUrl, { action: 'noiKhoCa', secret, maCa, bank, keyBank }, HAN_NOI_KHO_CA_GIAY, 2)
+  if (!r.ok) throw new Error(r.error || 'Không nối được kho ca')
+  return { themBank: Number(r.themBank) || 0, themKey: Number(r.themKey) || 0 }
 }

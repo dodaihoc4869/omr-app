@@ -6,7 +6,8 @@
 // cho một em. Quét cả thư mục năm sinh, chặn trần `TRAN_CA_QUET` ⇒ vẫn gộp cho
 // lớp 40 em, đúng ngưỡng ở bảng nghiệm thu.
 import { namSinhDaSo, namSinhTuTenCa } from './nam-sinh-ca'
-import { banDoSaiCa, chiTietCa, danhSachCa, danhSachEm, hoSoOnCa, noiKhoCa } from './exam-api'
+import { banDoSaiCa, chiTietCa, danhSachCa, danhSachEm, hoSoOnCa } from './exam-api'
+import { noiKhoCa } from './ca-em-thay-api'
 import { taoChiTietCau } from './chi-tiet-cau'
 import { docDeRiengCa, loadExamSources, loadSessionTeacherBank, docSoCauCa, saveSessionTeacherBank } from './exam-db'
 import { mergeAndStrip, mergeKeepAnswers, type SoCauMoiPhan, type TeacherExamSource } from '../data/examContent'

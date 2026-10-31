@@ -101,20 +101,58 @@ export async function moDeTruoc(g: GoiDeTruoc, khoa: unknown): Promise<unknown |
     return JSON.parse(new TextDecoder().decode(ro))
   } catch { return null }
 }
+// ── TẢI SẴN THEO LỚP LÚC MỞ APP (thầy 31/10 «Khi chọn đề thì tải luôn đề đáp án cho hs khối đó luôn», «Tải sẵn hết mọi thứ về tôi bấm bắt đầu phải tức
+// thì ngay»; máy chủ `/hs/ca-tai-truoc`). Lớp em có ca đang mở ⇒ tải ở nền gói đề + gói tờ đáp án ĐÃ KHOÁ, gắn MÃ ẨN (máy em không biết mã ca trước khi
+// thầy phát mã), cất Cache Storage (tắt mở app vẫn còn). Vào thi: `/vao-thi` trả mã ẩn ⇒ ghép đúng gói.
+interface GoiPhien { goi: string; phien: string }
+export interface GoiCaTruoc { id: string; de?: GoiPhien; dapAn?: GoiPhien; luc: number }
+const KHO_GOI_CA = 'ddh-goi-ca-v1', KHOA_GOI_CA = '/goi-ca'
+let goiCa: GoiCaTruoc[] = []
+const sanSang: Promise<void> = (async () => {
+  try { const r = await (await caches.open(KHO_GOI_CA)).match(KHOA_GOI_CA); if (r) goiCa = ((await r.json()) as GoiCaTruoc[]).filter((x) => x && typeof x.id === 'string') } catch { /* không Cache Storage ⇒ chỉ bộ nhớ */ }
+})()
+export const dsGoiCa = (): readonly GoiCaTruoc[] => goiCa
+let hoiLuc = 0
+
+/** Tải sẵn gói của các ca đang mở cho lớp em (Lộ trình gọi khi biết có ca). Hỏi lại tối đa 5 phút một lần. Lỗi ⇒ im lặng. */
+export async function taiTruocTheoLop(token: string): Promise<void> {
+  if (!token || Date.now() - hoiLuc < 5 * 60_000) return
+  hoiLuc = Date.now()
+  try {
+    await sanSang
+    const u = await layDiaChiMayChu()
+    if (!u) return
+    const r = (await (await fetch(`${u}/hs/ca-tai-truoc`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token }) })).json()) as { ok?: boolean; goi?: GoiCaTruoc[] }
+    if (r?.ok !== true || !Array.isArray(r.goi) || !r.goi.length) return
+    const nay = Date.now(), moi = r.goi.filter((x) => x && typeof x.id === 'string').map((x) => ({ ...x, luc: nay }))
+    goiCa = [...moi, ...goiCa.filter((x) => !moi.some((m) => m.id === x.id) && nay - x.luc < 2 * 86_400_000)].slice(0, 4)
+    await (await caches.open(KHO_GOI_CA)).put(KHOA_GOI_CA, new Response(JSON.stringify(goiCa), { headers: { 'content-type': 'application/json' } }))
+  } catch { hoiLuc = 0 }
+}
+/** Cho test. */
+export const datGoiCa = (ds: GoiCaTruoc[]): void => { goiCa = ds; hoiLuc = 0 }
+
 /**
- * Lượt vào thi (exam-api `vaoThiQuaMayChuMoi`): có gói tải sẵn ⇒ NGAY LÚC NÀY hỏi song song gói còn đúng phiên bản không (`/de?phien=`: đúng ⇒ máy chủ đáp
- * một dòng `khongDoi`; lệch ⇒ trả luôn gói mới) và trả hàm lấy gói đề khi đã có chìa: đúng phiên bản ⇒ mở bằng chìa `/vao-thi` trao; có gói mới ⇒ dùng
- * luôn; chờ quá 6 giây / hỏng ⇒ undefined (nơi gọi tải đề như cũ). Không có gói ⇒ undefined (đường cũ, không hỏi gì).
+ * Lượt vào thi (exam-api `vaoThiQuaMayChuMoi`): có gói tải sẵn (phòng chờ, hoặc tải theo lớp lúc mở app) ⇒ NGAY LÚC NÀY hỏi song song gói còn đúng phiên
+ * bản không (`/de?phien=`: đúng ⇒ máy chủ đáp một dòng `khongDoi`; lệch ⇒ trả luôn gói mới) và trả hàm nhận lời `/vao-thi`: ghép gói theo mã ẩn `idCa`
+ * (cất gói tờ đáp án của em như tải ở `/khoa-de`), đúng phiên bản ⇒ mở đề bằng chìa `khoaDeTruoc`; có gói mới ⇒ dùng luôn; quá 6 giây / hỏng ⇒ undefined
+ * (nơi gọi tải đề như cũ). Không có gói ⇒ undefined (đường cũ, không hỏi gì).
  */
-export function truocVao(goc: string, maCa: string): ((khoa: unknown) => Promise<unknown>) | undefined {
+export async function truocVao(goc: string, maCa: string, sbd: string): Promise<((r: { khoaDeTruoc?: unknown; idCa?: unknown }) => Promise<unknown>) | undefined> {
+  await sanSang
   const g = docDeTruoc(maCa)
-  if (!g) return undefined
-  const kiem = fetch(`${goc}/de/${encodeURIComponent(maCa)}?phien=${encodeURIComponent(g.phien)}`)
-    .then(async (res) => (res.ok ? ((await res.json()) as Record<string, unknown>) : null))
-    .catch(() => null)
-  return async (khoa) => {
+  const coDe = goiCa.filter((x) => x.de)
+  const phien = g?.phien ?? coDe[0]?.de?.phien
+  if (!phien && !goiCa.length) return undefined
+  const kiem = phien
+    ? fetch(`${goc}/de/${encodeURIComponent(maCa)}?phien=${encodeURIComponent(phien)}`).then(async (res) => (res.ok ? ((await res.json()) as Record<string, unknown>) : null)).catch(() => null)
+    : Promise.resolve(null)
+  return async (r) => {
+    const p = typeof r.idCa === 'string' ? goiCa.find((x) => x.id === r.idCa) : undefined
+    if (p?.dapAn && !docGoiDe(maCa, sbd)) luuGoiDe(sbd, { maCa, phien: p.dapAn.phien, goi: p.dapAn.goi })
+    const goiDe = g ?? (p?.de ? { maCa, phien: p.de.phien, goi: p.de.goi } : null)
     const j = await Promise.race([kiem, new Promise<null>((xong) => setTimeout(() => xong(null), 6000))])
-    if (j && j.khongDoi === true && j.phien === g.phien) return (await moDeTruoc(g, khoa)) ?? undefined
+    if (j && j.khongDoi === true && goiDe && j.phien === goiDe.phien) return (await moDeTruoc(goiDe, r.khoaDeTruoc)) ?? undefined
     if (j && j.khongDoi !== true && (Array.isArray(j.phanI) || Array.isArray(j.phanII) || Array.isArray(j.phanIII))) return j
     return undefined
   }

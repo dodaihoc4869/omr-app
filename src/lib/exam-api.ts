@@ -108,7 +108,7 @@ export function loiNenThuLai(loi: unknown): boolean {
  *
  * CẤM dùng cho lệnh ghi chưa có khoá chống trùng (mục 4 của đặc tả). Thêm lệnh
  * mới vào đây thì phải chỉ ra được khoá của nó trước. */
-async function postCoThuLai(scriptUrl: string, body: unknown, giay: number, soLan = NHIP_THU_LAI_MS.length): Promise<any> {
+export async function postCoThuLai(scriptUrl: string, body: unknown, giay: number, soLan = NHIP_THU_LAI_MS.length): Promise<any> {
   let cuoi: unknown = null
   for (let lan = 0; lan < soLan; lan++) {
     try {
@@ -429,28 +429,7 @@ export async function hoSoOnCa(
 /** Hạn chờ MỘT lượt `noiKhoCa` (giây) — lượt nối cả trăm câu lúc D1 nghẽn mất hơn 25 giây. */
 export const HAN_NOI_KHO_CA_GIAY = 60
 
-/** NỐI THÊM CÂU VÀO KHO CỦA MỘT CA — chỉ dùng cho đề riêng từng em.
- *
- * Câu em từng sai có thể nằm ngoài kho thầy vừa rút cho ca. Muốn hỏi lại đúng
- * câu đó thì phải nối nó vào kho của ca trước khi phát đề (thầy chốt 08/09:
- * "bất kể là tôi chọn chuyên đề gì thi mà ca trước sai 9 câu phải rút đúng 3
- * câu đó ra vào đề mới").
- *
- * Máy chủ CHẶN khi ca đã bấm Bắt đầu: lúc đó kho là thứ em đang cầm. */
-export async function noiKhoCa(
-  scriptUrl: string,
-  secret: string,
-  maCa: string,
-  bank: PublicExamBank,
-  keyBank: { phanI: TeacherExamSource['phanI']; phanII: TeacherExamSource['phanII']; phanIII: TeacherExamSource['phanIII'] },
-): Promise<{ themBank: number; themKey: number }> {
-  // HẠN 60 GIÂY + THỬ LẠI 1 LẦN (30/10, ca 269333): nối 344 câu lúc bấm Bắt đầu quá hạn 25 giây chung khi D1 nghẽn ⇒ máy thầy bỏ HẾT câu sai cũ khỏi
-  // đề «rút câu sai». Gửi lại AN TOÀN: máy chủ ghi `kho_ca_them` theo khoá `maCa|qid` (ghi đè đúng dòng ấy bằng cùng nội dung) và chỉ THÊM câu chưa
-  // có vào `de/` + `key/` (so theo id) ⇒ lần hai không nhân đôi gì.
-  const r = await postCoThuLai(scriptUrl, { action: 'noiKhoCa', secret, maCa, bank, keyBank }, HAN_NOI_KHO_CA_GIAY, 2)
-  if (!r.ok) throw new Error(r.error || 'Không nối được kho ca')
-  return { themBank: Number(r.themBank) || 0, themKey: Number(r.themKey) || 0 }
-}
+// `noiKhoCa` (nối câu vào kho ca — chỉ máy thầy) dời sang ca-em-thay-api.ts 31/10: học sinh / phụ huynh khỏi tải mã của thầy (bù phần tải sẵn theo lớp).
 
 /** RÚT ĐỀ v2 — `/ca/chot-bat-dau`: một lệnh ghi mốc bắt đầu + bản đồ đề riêng.
  *
@@ -636,7 +615,7 @@ async function vaoThiQuaMayChuMoi(
   const ch = { ...goc, BAT: true, URL: diaChi }
 
   // Đề tải sẵn ở phòng chờ (31/10, khoa-de-thi.ts `truocVao`): SONG SONG với lượt vào, hỏi gói còn đúng phiên bản; lượt vào trả chìa.
-  const tr = canBank ? khoaDe?.truocVao(ch.URL, maCa) : undefined
+  const tr = canBank ? khoaDe?.truocVao(ch.URL, maCa, sbd) : undefined
   const r = await vaoThiMoi(ch, maCa, sbd, idThietBi, danhTinh)
   if (!r) throw new Error('Không kết nối được máy chủ — kiểm tra mạng rồi bấm Vào thi lại.')
 
@@ -688,7 +667,7 @@ async function vaoThiQuaMayChuMoi(
   // GÓI ĐỀ. Gói nằm ở R2 sau bộ đệm biên, máy chủ chỉ đưa đường dẫn. Hỏng ở
   // đâu thì nói đúng chỗ đó — cả ba câu dưới đều nêu việc em phải làm.
   // Gói tải sẵn: đúng phiên bản ⇒ mở bằng chìa vừa nhận; máy chủ đã trả gói mới ⇒ dùng luôn. Hỏng gì ⇒ đường tải đề cũ ngay dưới.
-  let bank = (await tr?.(r.khoaDeTruoc)) as PublicExamBank | undefined
+  let bank = (await (await tr)?.(r)) as PublicExamBank | undefined
   if (canBank) {
     if (!bank) {
     if (!r.deUrl) throw new Error('Ca này chưa được phát đề — báo Thầy bấm lại "Bắt đầu thi".')

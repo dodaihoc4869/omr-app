@@ -9,8 +9,9 @@
 // mới trong CHÍNH lượt hỏi ấy (không thêm vòng chờ nào).
 // Cả lớp chung một gói mã hoá ⇒ mã hoá MỘT lần mỗi isolate cho mỗi phiên bản gói (đệm dưới), 100 em không bắt máy chủ mã hoá 100 lần.
 import type { Env } from './kieu'
-import { chiaTheoNhan } from './khoa-de-thi'
-import { docGoiDeDem } from './dem-ca-thi'
+import { chiaTheoNhan, dongGoiDe } from './khoa-de-thi'
+import { docGoiDeDem, docKeyBankDem } from './dem-ca-thi'
+import { buSoCauChoKeyBank } from './key-bank-hop-nhat'
 import { maHoaChuoi } from '../../src/lib/dap-an-may'
 
 /** Dữ liệu kèm của gói đề tải sẵn (máy em dùng đúng chuỗi này — src/lib/khoa-de-thi.ts `kemDeTruoc`). */
@@ -18,8 +19,34 @@ export const kemDeTruoc = (maCa: string, phien: string): string => `de-truoc|${m
 /** Chìa gói đề tải sẵn của ca — CHỈ trao ở nhánh `/vao-thi` đã cho em vào (sau giờ bắt đầu). */
 export const chiaDeTruoc = (env: Pick<Env, 'MA_BI_MAT'>, maCa: string): Promise<string> => chiaTheoNhan(env, `de-truoc|${maCa}`)
 
+/** MÃ ẨN của ca (thầy 31/10 «khi chọn đề thì tải luôn đề đáp án cho hs khối đó»): gói tải sẵn lúc em MỞ APP gắn mã này, KHÔNG gắn mã ca — máy chủ cố ý
+ *  không cho máy em biết mã ca trước khi thầy phát mã (`/hs/ca-dang-mo`). HMAC mã bí mật máy chủ ⇒ máy em không đoán ngược ra mã ca (kể cả mã 6 chữ số).
+ *  `/vao-thi` (nhánh đã được vào — em đã gõ đúng mã) trả lại mã ẩn ⇒ máy em ghép đúng gói. */
+export const maAnCa = async (env: Pick<Env, 'MA_BI_MAT'>, maCa: string): Promise<string> => (await chiaTheoNhan(env, `id-ca|${maCa}`)).slice(0, 16)
+
 const TRAN_DEM = 40
 const dem = new Map<string, { phien: string; goi: string }>()
+
+/** Gói đề đã khoá của ca (mã hoá một lần mỗi isolate cho mỗi phiên bản gói). Chưa có đề ⇒ null. */
+export async function goiDeCuaCa(env: Env, maCa: string, bankR2: string, capNhat: string): Promise<{ goi: string; phien: string } | null> {
+  const o = await docGoiDeDem(env, bankR2, capNhat)
+  if (!o || !o.httpEtag) return null
+  const cu = dem.get(maCa)
+  if (cu && cu.phien === o.httpEtag) return { goi: cu.goi, phien: cu.phien }
+  const goi = await maHoaChuoi(await chiaDeTruoc(env, maCa), kemDeTruoc(maCa, o.httpEtag), new TextDecoder().decode(o.than))
+  if (dem.size >= TRAN_DEM) dem.delete(dem.keys().next().value!)
+  dem.set(maCa, { phien: o.httpEtag, goi })
+  return { goi, phien: o.httpEtag }
+}
+
+/** Gói tờ đáp án đã khoá của em `sbd` ở ca `maCa` (chìa riêng em, chỉ trao SAU khi nộp — khoa-de-thi.ts). Chưa có tờ ⇒ null. */
+export async function goiDapAnEm(env: Env, maCa: string, sbd: string, soCauJson: unknown): Promise<{ goi: string; phien: string } | null> {
+  const k = await docKeyBankDem(env, maCa).catch(() => null)
+  if (!k || k.giaTri === null || !k.tho || !k.etag) return null
+  // Bù `soCau` thiếu như đường trả tờ đáp án cũ (key-bank-hop-nhat.ts) ⇒ gói mở ra đúng tờ máy em vẫn nhận khi nộp.
+  const bu = buSoCauChoKeyBank(k.giaTri, k.tho, soCauJson)
+  return { goi: await dongGoiDe(env, maCa, sbd, bu ? bu.tho : k.tho, k.etag), phien: k.etag }
+}
 
 /**
  * `POST /de-truoc {maCa, sbd}` — gói đề ĐÃ KHOÁ cho em đang ở phòng chờ (hoặc đã có lượt) của ca đang mở. MỘT lượt D1 (dòng ca chỉ về khi em có mặt),
@@ -33,14 +60,8 @@ export async function deTruoc(env: Env, b: Record<string, unknown>): Promise<Rec
        AND (EXISTS (SELECT 1 FROM phong_cho WHERE khoa = ?2) OR EXISTS (SELECT 1 FROM luot WHERE ma_ca = ?1 AND sbd = ?3))`,
   ).bind(maCa, `${maCa}|${sbd}`, sbd).first<{ bank_r2: string | null; cap_nhat_luc: string | null }>()
   if (!ca?.bank_r2) return { ok: false, lyDo: 'khong_tim_thay' }
-  const o = await docGoiDeDem(env, ca.bank_r2, String(ca.cap_nhat_luc ?? ''))
-  if (!o || !o.httpEtag) return { ok: false, lyDo: 'chua_co_de' }
-  const cu = dem.get(maCa)
-  if (cu && cu.phien === o.httpEtag) return { ok: true, goi: cu.goi, phien: cu.phien }
-  const goi = await maHoaChuoi(await chiaDeTruoc(env, maCa), kemDeTruoc(maCa, o.httpEtag), new TextDecoder().decode(o.than))
-  if (dem.size >= TRAN_DEM) dem.delete(dem.keys().next().value!)
-  dem.set(maCa, { phien: o.httpEtag, goi })
-  return { ok: true, goi, phien: o.httpEtag }
+  const g = await goiDeCuaCa(env, maCa, ca.bank_r2, String(ca.cap_nhat_luc ?? ''))
+  return g ? { ok: true, ...g } : { ok: false, lyDo: 'chua_co_de' }
 }
 
 /** Cho test: bỏ đệm gói đã mã hoá. */
