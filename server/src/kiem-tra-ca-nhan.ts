@@ -23,6 +23,7 @@ import { nguonTuongDuongKt } from './kiem-tra-ca-nhan-nguon'
 import { chonChuKyKt2026,nhomKienThucKt } from './kiem-tra-ca-nhan-ma-tran'
 import { chuanMucDo } from './lich-su-lam-cau'
 import { laNgayBaoTri, sqlKhongBaoTriBo, SQL_DS_BAO_TRI } from './ngay-bao-tri'
+import { dongGoiKt, ketGonKt } from './kiem-tra-ca-nhan-khoa'
 
 type Row = Record<string, unknown>
 const s = (v: unknown) => String(v ?? '')
@@ -264,17 +265,19 @@ export async function ktCnAction(env: Env, sbd: string, action: string, b: Row, 
   if (!await coKtCn(env)) throw new Error('Kiểm tra riêng chưa được bật.')
   let r=await docBai(env,sbd,s(b.id)), d=de(r)
   if (s(r.trang_thai)==='cho_nguon') throw new Error('Bài đang chờ đủ nguồn. Em tiếp tục lịch học thường.')
+  // GÓI PHẦN CHỮA ĐÃ KHOÁ (31/10, kiem-tra-ca-nhan-khoa.ts): máy em tải ở nền; chìa chỉ trao cùng phần chữa sau khi nộp. Không ghi gì, chỉ đọc bài đã có.
+  if(action==='hoc-tap-ktcn-goi'){if(!env.MA_BI_MAT)throw new Error('Máy chủ chưa sẵn sàng gói phần chữa.');return {ok:true,...await dongGoiKt(env,s(r.id),sbd,d.cau)}}
   if(action==='hoc-tap-ktcn-trang-thai'){
     if(laKtBaoTriBo(r,now))throw new Error(CHU_BAO_TRI_KT)
     if(!r.nop_luc&&now>=Number(r.han_luc))r=await chotKtCn(env,r,now,true)
     // 27/10 tốc độ (thầy: «chỗ bấm kiểm tra phải tức thì»): `kemKetQua` (CHỈ-THÊM) ⇒ bài đã nộp trả luôn phần chữa trong CÙNG lượt — máy em khỏi gọi
     // hoc-tap-ktcn-ket-qua nối tiếp. Đọc chặng và dựng kết quả chạy song song; kết quả giống hệt lệnh ket-qua (chốt lại rồi ketQuaKt).
-    const kem=b.kemKetQua===true&&!!r.nop_luc?chotKtCn(env,r,now).then(async x=>({x,k:await ketQuaKt(env,x,now)})):null
+    const kem=b.kemKetQua===true&&!!r.nop_luc?chotKtCn(env,r,now).then(async x=>({x,k:await ketGonKt(env,s(x.id),sbd,de(x).cau,await ketQuaKt(env,x,now),b)})):null
     const [rows,kq]=await Promise.all([env.DB.prepare('SELECT * FROM kiem_tra_ca_nhan_chang WHERE bai_id=?').bind(r.id).all<Row>(),kem])
     if(kq)r=kq.x
     // daTra từng chặng (đợt 20, CHỈ-THÊM): đếm chặt như tomTatKt từ đề + tra_json đã đọc sẵn ở docBai — không thêm lượt D1.
     const t=tra(r),phanQ=new Map(d.cau.map(c=>[c.q.qid,c.q.phan]))
-    return {ok:true,kiemTra:tomTatKt(r,now),...(kq?{ketQua:kq.k}:{}),chang:d.chang.map((c,i)=>{const cr=rows.results.find(v=>Number(v.stt)===i);return {stt:i,soCau:c.qids.length,giay:c.giay,han:cr?Number(cr.han):null,daChot:!!cr&&(!!cr.chot_luc||now>=Number(cr.han)),daTra:c.qids.filter(q=>duTraKt(phanQ.get(q)??'',typeof t[q]==='string'?t[q]:'')).length}})}
+    return {ok:true,kiemTra:tomTatKt(r,now),...(kq?kq.k:{}),chang:d.chang.map((c,i)=>{const cr=rows.results.find(v=>Number(v.stt)===i);return {stt:i,soCau:c.qids.length,giay:c.giay,han:cr?Number(cr.han):null,daChot:!!cr&&(!!cr.chot_luc||now>=Number(cr.han)),daTra:c.qids.filter(q=>duTraKt(phanQ.get(q)??'',typeof t[q]==='string'?t[q]:'')).length}})}
   }
   if (now<Number(r.mo_luc)) throw new Error('Chưa đến lịch kiểm tra của em.')
   if (laKtBaoTriBo(r,now)) throw new Error(CHU_BAO_TRI_KT)
@@ -290,12 +293,12 @@ export async function ktCnAction(env: Env, sbd: string, action: string, b: Row, 
       if (active) throw new Error('Em nộp chặng đang làm trước khi nộp toàn bài.')
       r=await chotKtCn(env,r,now)
     } else r=await chotKtCn(env,r,now)
-    return {ok:true,kiemTra:tomTatKt(r,now),ketQua:await ketQuaKt(env,r,now)}
+    return {ok:true,kiemTra:tomTatKt(r,now),...await ketGonKt(env,s(r.id),sbd,de(r).cau,await ketQuaKt(env,r,now),b)}
   }
   if (action==='hoc-tap-ktcn-ket-qua') {
     if (!r.nop_luc) throw new Error('Em nộp toàn bài trước khi xem phần chữa.')
     r=await chotKtCn(env,r,now)
-    return {ok:true,kiemTra:tomTatKt(r,now),ketQua:await ketQuaKt(env,r,now)}
+    return {ok:true,kiemTra:tomTatKt(r,now),...await ketGonKt(env,s(r.id),sbd,de(r).cau,await ketQuaKt(env,r,now),b)}
   }
   if (r.nop_luc) return {ok:true,kiemTra:tomTatKt(r,now),daNop:true}
   const stt=Number(b.chang)

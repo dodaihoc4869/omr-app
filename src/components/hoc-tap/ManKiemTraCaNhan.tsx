@@ -11,6 +11,7 @@ import { conLai, diemChu, dongHo, gioHan, gioVn, thuNgay } from './kiem-tra-chu'
 import { hoiXacNhan } from '../hop-thoai'
 import { taoKhoGio, useGiayConLai, type KhoGio } from '../../lib/dong-ho-thi'
 import { docKtcnDangLam, ghiKtcnDangLam, xoaKtcnDangLam } from '../../lib/ktcn-dang-lam'
+import { docGoiKt, luuGoiKt, moKetKt, thanGoiKt } from '../../lib/khoa-ktcn'
 import './hoc-tap.css'
 import './kiem-tra-ca-nhan.css'
 import { phanHoi } from '../../lib/phan-hoi'
@@ -29,6 +30,8 @@ const tenTrangChinh = (): string => (typeof document !== 'undefined' && document
 // docs/hop-dong-kiem-tra-ca-nhan-1310.md); chỉ đổi trình bày: trang bài = lộ trình chặng + tách "hạn nộp cả bài" với "giờ riêng từng chặng";
 // làm chặng = đồng hồ vòng (đỏ --gap khi còn dưới 1 phút), dấu câu đã trả lời, thanh đáy cố định; máy tính có cột phải; kết quả có lọc câu.
 // `daTra` của từng chặng: trường CHỈ-THÊM của hoc-tap-ktcn-trang-thai (máy chủ cũ không gửi ⇒ không hiện dòng ấy).
+/** Chờ trước khi tải gói phần chữa đã khoá (giây đầu dành cho câu hỏi). */
+const CHO_GOI_MS=20_000
 type Chang={stt:number;soCau:number;giay:number;han:number|null;daChot:boolean;daTra?:number}
 type Ket={bai:{ten:string;tong:number;daKiem:number;dungLanNay:number}[];cau:{de:Question;tra:string;dung:boolean;dapAn:string;loiGiai:unknown}[];chu:string}
 type Loc='tat-ca'|'on'|'trong'|'dung'
@@ -111,7 +114,12 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:
   try{const r=await goiHoa2('hoc-tap-ktcn-luu',token,{id,chang:i,tra,lucTra,revision:revision.current});if(typeof r.revision==='number')revision.current=r.revision;try{localStorage.removeItem(`ktcn:nhap:${sbd}:${id}:${i}`)}catch{/* không cản */}return r.daLuu===true}catch{return false}
  }
  const guiNhapTreCacChang=async(ds:Chang[],bayGio:number)=>{let co=false;for(const c of ds)if(c.daChot&&c.han&&await guiNhapTre(c.stt,c.han,bayGio))co=true;return co}
- const tai=async()=>{const lan=lanPhien.current;setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-trang-thai',token,{id,kemKetQua:true});if(!conPhien(lan))return;const t=nhan(r);setChang(r.chang as Chang[]);if(r.ketQua&&t.nopLuc!==null){setKet(r.ketQua as Ket);return}if(t.nopLuc===null&&await guiNhapTreCacChang(r.chang as Chang[],t.serverNow)&&conPhien(lan)){const r2=await goiHoa2('hoc-tap-ktcn-trang-thai',token,{id,kemKetQua:true});if(!conPhien(lan))return;nhan(r2);setChang(r2.chang as Chang[])}if(t.nopLuc!==null||t.trangThai==='het_han'){const k=await goiHoa2('hoc-tap-ktcn-ket-qua',token,{id});if(!conPhien(lan))return;nhan(k);setKet(k.ketQua as Ket)}}catch(e){if(conPhien(lan))setLoi(chuCuaLoi(e,'Chưa tải được bài kiểm tra.'))}finally{if(conPhien(lan))setBusy(false)}}
+ // GÓI PHẦN CHỮA ĐÃ KHOÁ (thầy 31/10, khoa-ktcn.ts): tải ở NỀN 20 giây sau khi em mở bài / chặng (nhường mạng cho câu hỏi; máy không có chìa); nộp / xem kết quả
+ // máy chủ chỉ trao chìa ⇒ hiện tức thì. Mở hỏng ⇒ hỏi lại phần chữa nguyên như cũ (không kèm phiên bản gói).
+ const goiDangTai=useRef(false)
+ const taiGoi=()=>{if(goiDangTai.current||docGoiKt(sbd,id))return;goiDangTai.current=true;void goiHoa2('hoc-tap-ktcn-goi',token,{id}).then(r=>{if(typeof r.goi==='string'&&typeof r.phien==='string')luuGoiKt(sbd,id,{goi:r.goi,phien:r.phien})}).catch(()=>{}).finally(()=>{goiDangTai.current=false})}
+ const ketTu=async(r:Record<string,unknown>):Promise<Ket>=>{const k=await moKetKt(sbd,id,r);if(k)return k as Ket;return (await goiHoa2('hoc-tap-ktcn-ket-qua',token,{id})).ketQua as Ket}
+ const tai=async()=>{const lan=lanPhien.current;setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-trang-thai',token,{id,kemKetQua:true,...thanGoiKt(sbd,id)});if(!conPhien(lan))return;const t=nhan(r);setChang(r.chang as Chang[]);if(r.ketQua&&t.nopLuc!==null){const k=await ketTu(r);if(conPhien(lan))setKet(k);return}if(t.homNay&&t.nopLuc===null&&t.trangThai==='can_lam')setTimeout(taiGoi,CHO_GOI_MS);if(t.nopLuc===null&&await guiNhapTreCacChang(r.chang as Chang[],t.serverNow)&&conPhien(lan)){const r2=await goiHoa2('hoc-tap-ktcn-trang-thai',token,{id,kemKetQua:true});if(!conPhien(lan))return;nhan(r2);setChang(r2.chang as Chang[])}if(t.nopLuc!==null||t.trangThai==='het_han'){const k=await goiHoa2('hoc-tap-ktcn-ket-qua',token,{id,...thanGoiKt(sbd,id)});if(!conPhien(lan))return;nhan(k);const kq=await ketTu(k);if(conPhien(lan))setKet(kq)}}catch(e){if(conPhien(lan))setLoi(chuCuaLoi(e,'Chưa tải được bài kiểm tra.'))}finally{if(conPhien(lan))setBusy(false)}}
  useEffect(()=>{
   mounted.current=true;tuTiep.current=true;lanPhien.current++;huyHenThuLai();lanThuLai.current=0;tuNop.current=false;revision.current=0;day.current=Promise.resolve();traRef.current={}
   lucRef.current={};chuaGui.current=false;lanDongBo.current=0;huyDongBo();setBan(false)
@@ -132,7 +140,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:
   });day.current=p
   return p
  }
- const mo=async(i:number)=>{const lan=lanPhien.current;huyHenThuLai();setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-start',token,{id,chang:i});if(!conPhien(lan))return;const t=nhan(r);if(r.daChot){xoaKtcnDangLam(sbd);setCs([]);setStt(null);await guiNhapTre(i,Number(r.hanChang),t.serverNow);await tai();return}const questions=r.questions as Question[];setCs(questions);setStt(i);setViTri(0);setHan(Number(r.hanChang));ghiKtcnDangLam(sbd,id,i,Number(r.hanChang));const a=r.tra as Record<string,string>;traRef.current=a;setTra(a);setLuu('Đã tải câu trả lời đã lưu');tuNop.current=false;lanThuLai.current=0
+ const mo=async(i:number)=>{const lan=lanPhien.current;huyHenThuLai();setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-start',token,{id,chang:i});if(!conPhien(lan))return;const t=nhan(r);if(r.daChot){xoaKtcnDangLam(sbd);setCs([]);setStt(null);await guiNhapTre(i,Number(r.hanChang),t.serverNow);await tai();return}const questions=r.questions as Question[];setCs(questions);setStt(i);setTimeout(taiGoi,CHO_GOI_MS);setViTri(0);setHan(Number(r.hanChang));ghiKtcnDangLam(sbd,id,i,Number(r.hanChang));const a=r.tra as Record<string,string>;traRef.current=a;setTra(a);setLuu('Đã tải câu trả lời đã lưu');tuNop.current=false;lanThuLai.current=0
   // Mở lại chặng (kể cả sau khi tắt app): TỰ nạp bản nháp trên máy vào đúng câu em đang làm rồi tự gửi — không còn nút «Khôi phục» (thầy 28/10).
   try{
    const vtLuu=Number(localStorage.getItem(`ktcn:vt:${sbd}:${id}:${i}`))
@@ -196,7 +204,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:
  // Câu đang làm cũng nhớ trên máy: mở lại chặng về đúng câu ấy (kể cả sau khi bản nháp đã đồng bộ lên máy chủ).
  useEffect(()=>{if(stt!==null&&han)try{localStorage.setItem(`ktcn:vt:${sbd}:${id}:${stt}`,String(viTri));const raw=localStorage.getItem(key);if(raw){const o=JSON.parse(raw);if(o&&o.han===han&&o.viTri!==viTri)localStorage.setItem(key,JSON.stringify({...o,viTri}))}}catch{/* không cản làm bài */}},[viTri,stt,han])
  const ve=async()=>{xoaKtcnDangLam(sbd);if(stt!==null){setBusy(true);try{await save();onVe();ra()}catch(e){if(laLoiTamThoi(e)){onVe();ra()}else setLoi(chuCuaLoi(e,'Chưa lưu được bài.'))}finally{setBusy(false)}}else{onVe();ra()}}
- const nop=async()=>{if(tt&&tt.daTra<tt.tong&&!await hoiXacNhan({tieuDe:'Nộp bài kiểm tra?',noiDung:`Còn ${tt.con} câu chưa trả lời. Nộp bài sẽ chốt kết quả hiện tại.`,nhanDongY:'Nộp bài',nhanKhong:'Làm tiếp',vo:'m3'}))return;setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-nop',token,{id});nhan(r);setKet(r.ketQua as Ket);ra()}catch(e){setLoi(chuCuaLoi(e,'Chưa nộp được bài.'))}finally{setBusy(false)}}
+ const nop=async()=>{if(tt&&tt.daTra<tt.tong&&!await hoiXacNhan({tieuDe:'Nộp bài kiểm tra?',noiDung:`Còn ${tt.con} câu chưa trả lời. Nộp bài sẽ chốt kết quả hiện tại.`,nhanDongY:'Nộp bài',nhanKhong:'Làm tiếp',vo:'m3'}))return;setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-nop',token,{id,...thanGoiKt(sbd,id)});nhan(r);setKet(await ketTu(r));ra()}catch(e){setLoi(chuCuaLoi(e,'Chưa nộp được bài.'))}finally{setBusy(false)}}
  const [loc,setLoc]=useState<Loc>('tat-ca')
  // Tấm hỏi nộp đang mở mà chặng đã đóng / hết giờ (lượt tự chốt đi trước) ⇒ trả «không» và đóng tấm.
  useEffect(()=>{if(hoiNop&&(stt===null||hetGio)){hoiNop(false);setHoiNop(null)}},[stt,hetGio,hoiNop])
