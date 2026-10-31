@@ -48,33 +48,28 @@ jobs:
           # Kiểm tra ôn tập từ hôm nay trở đi (bài Sảnh gửi kèm): máy em đọc CHẶT (src/lib/kiem-tra-ca-nhan.ts `docKiemTra`) — hạn − mở phải đúng 24 giờ, đã trả ≤ tổng…
           q "Kiểm tra ôn tập từ hôm nay: ngày · trạng thái · hạn−mở (giờ) · đã nộp · điểm · số câu · bài ngày · số chặng" "SELECT k.ngay, k.trang_thai, (k.han_luc - k.mo_luc)/3600000.0 han_mo_gio, k.nop_luc IS NOT NULL da_nop, k.diem, json_array_length(k.json,'\$.cau') tong, json_extract(k.json,'\$.baiNgayToiThieu') bai_ngay, json_array_length(k.json,'\$.chang') so_chang FROM kiem_tra_ca_nhan k WHERE k.sbd=$S AND k.ngay>='$HOM' ORDER BY (k.trang_thai='cho_nguon'), k.ngay LIMIT 3"
           q "mốc riêng HIỆN TẠI: a (câu trả lời cuối) · s (sổ học cuối) · g · lg · cl" "SELECT (SELECT created_at FROM game_v2_attempt WHERE sbd=$S ORDER BY created_at DESC LIMIT 1) a, (SELECT received_at FROM su_kien_hoc WHERE sbd=$S ORDER BY received_at DESC LIMIT 1) s, (SELECT luc FROM goi_bai_7_gap WHERE sbd=$S ORDER BY luc DESC LIMIT 1) g, (SELECT luc FROM loi_giai_hoi WHERE sbd=$S ORDER BY luc DESC LIMIT 1) lg, (SELECT cap_nhat_luc FROM chua_loi_dot WHERE sbd=$S ORDER BY cap_nhat_luc DESC LIMIT 1) cl"
-      # 31/10 (truy «load lại vẫn chưa đồng bộ»): NHẬT KÝ MÁY CHỦ (Workers Logs, observability bật trong wrangler.toml) quanh 17:00–17:45 VN cho các lệnh
-      # Sảnh / Tự sửa lỗi / kênh: giờ · đường · mã trả · kết quả · loại máy (Edge / điện thoại). KHÔNG in IP, thân, token, mã em.
-      - name: Nhật ký máy chủ quanh lúc thầy tải lại (chỉ đọc)
+      # 31/10 (truy «load lại vẫn chưa đồng bộ»): lượt gọi Worker / ngăn học sinh THEO PHÚT quanh 17:00–17:40 VN (GraphQL Analytics, chỉ số gộp — không đường,
+      # không IP, không em): có lỗi dồn lúc thầy tải lại (vừa phát hành 17:14) không.
+      - name: Lỗi máy chủ theo phút quanh lúc thầy tải lại (chỉ đọc)
         continue-on-error: true
         env:
           T: ${{ env.CF_TOKEN_SACH }}
           A: ${{ env.CF_ACC_SACH }}
         run: |
           node - <<'JS'
-          const from = Date.parse('2026-10-31T10:00:00Z'), to = Date.parse('2026-10-31T10:45:00Z')
-          const may = (h) => { const u = String(h?.['user-agent'] ?? h?.['User-Agent'] ?? ''); return /Edg\//.test(u) ? 'Edge' : /iPhone|iPad/.test(u) ? 'iPhone' : /Android/.test(u) ? 'Android' : /Windows/.test(u) ? 'Windows' : /Mac OS/.test(u) ? 'Mac' : u ? 'khac' : '-' }
-          const hoi = async (loc) => {
-            const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${process.env.A}/workers/observability/telemetry/query`, { method: 'POST',
-              headers: { authorization: `Bearer ${process.env.T}`, 'content-type': 'application/json' },
-              body: JSON.stringify({ queryId: 'tai-lai-3110', timeframe: { from, to }, view: 'events', limit: 300,
-                parameters: { datasets: ['cloudflare-workers'], filters: [{ key: '$workers.scriptName', operation: 'eq', type: 'string', value: 'omr' }, { key: '$workers.event.request.url', operation: 'includes', type: 'string', value: loc }] } }) })
-            const j = await r.json().catch(() => null)
-            if (!j?.success) { console.log('lỗi truy vấn', loc, r.status, JSON.stringify(j?.errors ?? j)?.slice(0, 400)); return }
-            const ev = j.result?.events?.events ?? []
-            console.log(`== ${loc}: ${ev.length} sự kiện`)
-            for (const e of ev.sort((a, b) => (a.timestamp ?? 0) - (b.timestamp ?? 0))) {
-              const w = e.$workers ?? {}, rq = w.event?.request ?? {}, rs = w.event?.response ?? {}
-              let p = '-'; try { p = new URL(rq.url).pathname } catch {}
-              const gio = new Date((e.timestamp ?? 0) + 7 * 3600e3).toISOString().slice(11, 19)
-              console.log(`${gio} ${w.entrypoint ?? ''} ${rq.method ?? ''} ${p} -> ${rs.status ?? '-'} ${w.outcome ?? ''} ${may(rq.headers)} ${w.wallTimeMs ?? ''}ms`)
-            }
-            if (ev[0]) console.log('khoá $workers mẫu:', Object.keys(ev[0].$workers ?? {}).join(','), '· khoá request:', Object.keys(ev[0].$workers?.event?.request ?? {}).join(','))
+          const q = `query($a: String!, $f: Time!, $t: Time!) { viewer { accounts(filter: {accountTag: $a}) {
+            w: workersInvocationsAdaptive(limit: 400, filter: {scriptName: "omr", datetime_geq: $f, datetime_leq: $t}, orderBy: [datetimeMinute_ASC]) { dimensions { datetimeMinute status } sum { requests errors } }
+            d: durableObjectsInvocationsAdaptiveGroups(limit: 400, filter: {datetime_geq: $f, datetime_leq: $t}, orderBy: [datetimeMinute_ASC]) { dimensions { datetimeMinute status } sum { requests errors } }
+          } } }`
+          const r = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: { authorization: `Bearer ${process.env.T}`, 'content-type': 'application/json' },
+            body: JSON.stringify({ query: q, variables: { a: process.env.A, f: '2026-10-31T10:00:00Z', t: '2026-10-31T10:40:00Z' } }) })
+          const j = await r.json().catch(() => null)
+          if (j?.errors?.length) console.log('lỗi GraphQL:', JSON.stringify(j.errors).slice(0, 600))
+          const acc = j?.data?.viewer?.accounts?.[0] ?? {}
+          for (const [ten, ds] of [['Worker', acc.w ?? []], ['Ngăn (DO)', acc.d ?? []]]) {
+            console.log(`== ${ten}: phút VN · trạng thái · lượt · lỗi`)
+            for (const x of ds) if (x.dimensions.status !== 'success' || x.sum.errors > 0) console.log(new Date(Date.parse(x.dimensions.datetimeMinute) + 7 * 3600e3).toISOString().slice(11, 16), x.dimensions.status, x.sum.requests, x.sum.errors)
+            const tong = ds.reduce((n, x) => n + x.sum.requests, 0), loi = ds.reduce((n, x) => n + x.sum.errors, 0)
+            console.log(`   tổng ${tong} lượt · ${loi} lỗi`)
           }
-          for (const loc of ['hoc-tap-sanh', 'chua-cau-sai/danh-sach', 'kenh']) await hoi(loc)
           JS
