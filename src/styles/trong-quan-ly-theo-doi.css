@@ -78,22 +78,48 @@
 [data-trong='gv'] [data-vung='theo-doi-ca'] .ct-em.c-xd:has(.d span:last-child:not(:empty)) .d span:last-child { color: var(--tr-chu-y-chu); font-weight: 500; }
 /* cần thầy xử lý: mỗi việc một dòng — biểu tượng · chữ · một nút; Mở khoá là nút chính của màn */
 [data-trong='gv'] [data-vung='theo-doi-ca'] .ct-canh-bao { gap: 0; margin: 0 -20px -20px; }
-[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-cb { grid-template-columns: 40px minmax(0, 1fr); align-items: center; gap: 12px; padding: 12px 20px; border-top: 1px solid var(--tr-vien); border-radius: 0; background: none; color: var(--tr-chu); }
-[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-cb > div:last-child { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'b nut' 'p nut'; column-gap: 12px; align-items: center; }
-[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-cb .bt { border-radius: 12px; background: var(--c-nen); color: var(--c-dam); }
+/* 31/10 (thầy «giao diện … làm cho đẹp tinh tế lại»): tên em MỘT dòng + trạng thái thành nhãn nhỏ; số liệu một dòng mảnh; nút GỌN đặt dưới chữ
+   (chữ có trọn bề ngang — hết cảnh tên em bị ngắt «Trịnh Quốc Huy bị / khoá bài» vì nút to chiếm nửa thẻ). */
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-cb { grid-template-columns: 36px minmax(0, 1fr); align-items: start; gap: 12px; padding: 14px 20px; border-top: 1px solid var(--tr-vien); border-radius: 0; background: none; color: var(--tr-chu); }
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-cb > div:last-child { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-width: 0; }
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-cb .bt { width: 36px; height: 36px; border-radius: 10px; background: var(--c-nen); color: var(--c-dam); }
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-cb .bt svg { width: 18px; height: 18px; }
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-cb.c-ho .bt { background: var(--tr-sai-nhat); color: var(--tr-sai-chu); }
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-cb.c-hp .bt { background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); }
 [data-trong='gv'] [data-vung='theo-doi-ca'] .ct-cb.c-xd .bt { background: var(--tr-mat-2); color: var(--tr-chu-2); }
-[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-cb b { grid-area: b; font-size: 14px; font-weight: 600; }
-[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-cb p { grid-area: p; margin: 0; font-size: 13px; color: var(--tr-chu-3); opacity: 1; }
-[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-cb .ct-nut { grid-area: nut; margin: 0; padding: 0 14px; }
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-cb b { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; max-width: 100%; font-size: 14px; font-weight: 600; line-height: 1.35; }
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-cb b .ten { min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-cb-tt { flex: none; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; line-height: 20px; background: var(--tr-mat-2); color: var(--tr-chu-2); }
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-cb.c-ho .ct-cb-tt { background: var(--tr-sai-nhat); color: var(--tr-sai-chu); }
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-cb.c-hp .ct-cb-tt { background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); }
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-cb p { margin: 0; font-size: 13px; line-height: 1.4; color: var(--tr-chu-3); opacity: 1; }
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-cb .ct-nut { margin: 6px 0 0; min-height: 36px; padding: 0 14px; border-radius: 10px; font-size: 13px; box-shadow: none; }
 [data-trong='gv'] [data-vung='theo-doi-ca'] .ct-canh-bao > .ct-ghi { padding: 0 20px 20px; }
 /* nút: phụ = trắng viền mảnh; chính = màu app; Kết thúc ca = đỏ đặc */
 [data-trong='gv'] [data-vung='theo-doi-ca'] .ct-nut {
   min-height: 44px; padding: 0 16px; border: 1px solid var(--tr-vien-2); border-radius: 12px; background: var(--tr-mat); color: var(--tr-chu); box-shadow: var(--tr-bong-1); font-size: 14px; font-weight: 600;
 }
 [data-trong='gv'] [data-vung='theo-doi-ca'] .ct-cb.c-ho .ct-nut { background: var(--tr-chinh-nut); border-color: var(--tr-chinh-nut); color: var(--tr-tren-chinh); }
-[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-nut.ct-nut-do { min-height: 44px; border: 0; border-radius: 12px; background: var(--tr-sai); color: var(--tr-tren-chinh); font-size: 15px; font-weight: 600; }
+/* VIỆC NHANH (31/10, thầy «các nút nhanh làm đẹp lại và tinh tế»): ô vuông mềm — biểu tượng trong ô màu nhạt trên, chữ dưới (hai ô luôn bằng nhau,
+   không còn nút này hai dòng nút kia một dòng); Thêm phút = một dòng đủ bề ngang; VÙNG KHÔNG LÙI LẠI dưới vạch mảnh: Kết thúc ca đỏ NHẠT (đậm khi rê),
+   lời dặn một dòng nhỏ, Xoá ca là nút chữ. */
 [data-trong='gv'] [data-vung='theo-doi-ca'] .ct-hd-nhanh { gap: 10px; }
-[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-hd-nhanh .ct-nut { padding: 6px 10px; }
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-hd-nhanh .ct-nut {
+  flex-direction: column; gap: 8px; min-height: 88px; padding: 14px 10px; border: 1px solid var(--tr-vien); border-radius: 16px; background: var(--tr-mat); box-shadow: none;
+  color: var(--tr-chu); font-size: 13px; font-weight: 600; line-height: 1.3; transition: background-color 150ms ease, border-color 150ms ease;
+}
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-hd-nhanh .ct-nut svg { box-sizing: border-box; width: 36px; height: 36px; padding: 9px; border-radius: 12px; background: var(--tr-chinh-nhat); color: var(--tr-chinh-chu); flex: none; }
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-hd-nhanh .ct-nut:hover:not(:disabled) { background: var(--tr-mat-2); border-color: var(--tr-vien-2); }
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-hd-nhanh .ct-nut:disabled svg { background: var(--tr-mat-2); color: var(--tr-chu-3); }
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-viec-nhanh .ct-them-phut { margin-top: 10px; }
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-viec-nhanh .ct-them-phut > .ct-nut { width: 100%; min-height: 44px; border: 1px solid var(--tr-vien); border-radius: 12px; background: var(--tr-mat); box-shadow: none; color: var(--tr-chu); font-size: 14px; }
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-viec-nhanh .ct-them-phut > .ct-nut:hover:not(:disabled) { background: var(--tr-mat-2); }
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-vung-dung { display: flex; flex-direction: column; gap: 8px; margin: 16px -20px -20px; padding: 16px 20px 18px; border-top: 1px solid var(--tr-vien); }
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-nut.ct-nut-do { min-height: 44px; border: 0; border-radius: 12px; background: var(--tr-sai-nhat); color: var(--tr-sai-chu); box-shadow: none; font-size: 14px; font-weight: 600; transition: background-color 150ms ease, color 150ms ease; }
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-nut.ct-nut-do:hover:not(:disabled) { background: var(--tr-sai); color: var(--tr-tren-chinh); }
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-vung-dung > .ct-ghi { margin: 0; font-size: 12px; line-height: 1.45; }
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-vung-dung .ct-nut-xoa-ca { margin-top: 0 !important; min-height: 40px; border: 0; background: none; box-shadow: none; font-size: 13px; font-weight: 600; }
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-vung-dung .ct-nut-xoa-ca:hover { background: var(--tr-sai-nhat); }
 @media (max-width: 1040px) {
   [data-trong='gv'] [data-vung='theo-doi-ca'] .ct-td-luoi { grid-template-columns: minmax(0, 1fr); }
 }
@@ -127,6 +153,8 @@
   [data-trong='gv'] [data-vung='theo-doi-ca'] .ct-em .d { flex-direction: row; gap: 8px; }
   [data-trong='gv'] [data-vung='theo-doi-ca'] .ct-cb { grid-template-columns: minmax(0, 1fr); padding: 12px 16px; }
   [data-trong='gv'] [data-vung='theo-doi-ca'] .ct-cb .bt { display: none; }
+  [data-trong='gv'] [data-vung='theo-doi-ca'] .ct-vung-dung { margin: 14px -16px -16px; padding: 14px 16px 16px; }
+  [data-trong='gv'] [data-vung='theo-doi-ca'] .ct-hd-nhanh .ct-nut { min-height: 80px; }
 }
 /* NGANG GV 26/10 (luật «không cắt chữ»): link vào ca bị cắt «omr-a…» ở khổ ngang / máy tính bảng ⇒ link xuống dòng (ngắt ở bất kỳ kí tự), đủ chữ để thầy đọc cho lớp */
 [data-trong='gv'] [data-vung='theo-doi-ca'] .ct-link > span.mono:not(.ct-nhan) { flex: 1 1 220px; overflow: visible; white-space: normal; text-overflow: clip; overflow-wrap: anywhere; }
