@@ -18,11 +18,11 @@ concurrency:
   group: thu-tai-50k
   cancel-in-progress: false
 env:
-  LAN: '11'
+  LAN: '12'
   # Nhánh mã máy chủ đẩy lên omr-thu (mặc định main; thử nhánh trước khi gộp).
   SRV_REF: 'main'
   # 1 = dựng lại D1 omr-thu từ kho giả (≈ 5–10 phút, xoá sạch dữ liệu lượt trước); 0 = giữ D1 đang có.
-  DUNG_KHO: '1'
+  DUNG_KHO: '0'
   # Giai đoạn cuối được phép chạy (500 | 2000 | 10000 | 50000).
   GIAI_DOAN_TOI: '10000'
   RAMP_S: '120'
