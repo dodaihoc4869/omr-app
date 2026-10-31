@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="vi" data-trong="hs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lửa đổi cảm xúc — bản vẽ 31/10 (dữ liệu giả)</title>
+<!-- BẢN VẼ CHỜ THẦY DUYỆT (docs/DE-XUAT-BI-CAM-XUC-3110.md). Hình Lửa THẬT nạp từ src/components/linh-vat/lua-dong.ts; màu khung trang chỉ dùng token app học sinh. -->
+<link rel="stylesheet" href="/src/styles/tokens.css">
+<link rel="stylesheet" href="/src/styles/trong.css">
+<link rel="stylesheet" href="/src/styles/trong-hs-mau.css">
+<link rel="stylesheet" href="/src/styles/lua.css">
+<link rel="stylesheet" href="./lua-gian.css">
+<style>
+  @font-face { font-family: 'DDH Rounded'; font-weight: 100 549; src: url('/src/styles/phong-ddh/ddh-rounded-de-vietnamese.woff2') format('woff2'); unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB; }
+  @font-face { font-family: 'DDH Rounded'; font-weight: 100 549; src: url('/src/styles/phong-ddh/ddh-rounded-de-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+2000-206F; }
+  @font-face { font-family: 'DDH Rounded'; font-weight: 550 1000; src: url('/src/styles/phong-ddh/ddh-rounded-dam-vietnamese.woff2') format('woff2'); unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB; }
+  @font-face { font-family: 'DDH Rounded'; font-weight: 550 1000; src: url('/src/styles/phong-ddh/ddh-rounded-dam-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+2000-206F; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--tr-nen); color: var(--tr-chu); font-family: 'DDH Rounded', 'Be Vietnam Pro', system-ui, sans-serif; color-scheme: light dark; }
+  .bang { width: 1320px; padding: 32px 32px 28px; }
+  .dau h1 { margin: 0; font-size: 30px; font-weight: 800; }
+  .dau p { margin: 6px 0 0; color: var(--tr-chu-2); font-size: 16px; font-weight: 600; }
+  .thang { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; margin: 22px 0 14px; height: 12px; border-radius: 6px; overflow: hidden; }
+  .thang i:nth-child(1) { background: var(--tr-dung); } .thang i:nth-child(2) { background: var(--tr-hs); } .thang i:nth-child(3) { background: var(--tr-sao); }
+  .thang i:nth-child(4) { background: var(--tr-chu-y); } .thang i:nth-child(5) { background: var(--tr-sai); } .thang i:nth-child(6) { background: var(--tr-sai-day); }
+  .luoi { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .the { display: flex; flex-direction: column; gap: 10px; padding: 16px 18px 18px; border: 2px solid var(--tr-vien); border-radius: 20px; background: var(--tr-mat); min-width: 0; }
+  .the[data-cap='4'] { border-color: var(--tr-sai); } .the[data-cap='5'] { border-color: var(--tr-sai-day); border-width: 3px; }
+  .the-dau { display: flex; align-items: baseline; gap: 10px; }
+  .chip { flex: none; padding: 3px 10px; border-radius: 999px; font-size: 14px; font-weight: 800; }
+  .the[data-cap='0'] .chip { background: var(--tr-dung-nhat); color: var(--tr-dung-chu); } .the[data-cap='1'] .chip { background: var(--tr-hs-nhat); color: var(--tr-hs-chu); }
+  .the[data-cap='2'] .chip { background: var(--tr-sao-nhat); color: var(--tr-sao-chu); } .the[data-cap='3'] .chip { background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); }
+  .the[data-cap='4'] .chip { background: var(--tr-sai-nhat); color: var(--tr-sai-chu); } .the[data-cap='5'] .chip { background: var(--tr-sai-day); color: var(--btg-chu-doan-dam); }
+  .ten { font-size: 22px; font-weight: 800; }
+  .san { position: relative; display: flex; justify-content: center; align-items: flex-end; height: 236px; border-radius: 14px; background: var(--tr-mat-2); overflow: hidden; }
+  .san .bi { width: 172px; margin-bottom: 6px; }
+  .khi { margin: 0; font-size: 15px; line-height: 1.45; color: var(--tr-chu-2); font-weight: 600; }
+  .khi b { color: var(--tr-chu); }
+  .loi { position: relative; margin: 2px 0 0 0; padding: 10px 14px; border: 2px solid var(--tr-vien-2); border-radius: 16px; background: var(--tr-mat); font-size: 15px; font-weight: 700; line-height: 1.4; }
+  .the[data-cap='4'] .loi, .the[data-cap='5'] .loi { border-color: var(--tr-sai); }
+  .loi::before { content: ''; position: absolute; left: 28px; top: -9px; width: 14px; height: 14px; border-style: solid none none solid; border-width: 2px; border-color: inherit; background: var(--tr-mat); transform: rotate(45deg); }
+  .ha { margin-top: 16px; padding: 14px 18px; border-radius: 16px; background: var(--tr-dung-nhat); color: var(--tr-dung-chu); font-size: 16px; font-weight: 700; line-height: 1.45; }
+  /* NƠI HIỆN */
+  .noi { width: 1320px; padding: 28px 32px 32px; }
+  .noi h2 { margin: 0 0 4px; font-size: 26px; font-weight: 800; }
+  .noi > p { margin: 0 0 18px; color: var(--tr-chu-2); font-size: 16px; font-weight: 600; }
+  .ba { display: grid; grid-template-columns: 1.15fr 1.25fr 1fr; gap: 16px; }
+  .o { padding: 16px 18px; border: 2px solid var(--tr-vien); border-radius: 20px; background: var(--tr-mat); display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .o h3 { margin: 0; font-size: 19px; font-weight: 800; }
+  .o .phu { margin: 0; color: var(--tr-chu-2); font-size: 14.5px; font-weight: 600; line-height: 1.45; }
+  .o[data-khong] { border-style: dashed; }
+  .tabs { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 12px; background: var(--tr-mat-3); }
+  .tab { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 14px; border-radius: 10px; background: var(--tr-mat); font-size: 15px; font-weight: 700; }
+  .tab img, .tab .dau-lua { width: 26px; height: 26px; flex: none; }
+  .tab small { margin-left: auto; color: var(--tr-chu-3); font-weight: 600; }
+  .dau-lua { position: relative; display: block; border-radius: 50%; overflow: hidden; background: var(--tr-mat-2); }
+  .dau-lua .bi { position: absolute; left: 0; top: 0; width: 100% !important; }
+  .dau-lua .bi > .lua-svg { transform: translateY(17%) scale(1.75); }
+  .tb { display: flex; gap: 12px; padding: 14px; border-radius: 16px; background: var(--tr-mat-2); border: 1px solid var(--tr-vien); }
+  .tb .dau-lua { width: 52px; height: 52px; flex: none; }
+  .tb b { display: block; font-size: 15.5px; } .tb span { display: block; margin-top: 2px; font-size: 14.5px; line-height: 1.4; color: var(--tr-chu-2); font-weight: 600; }
+  .tb small { display: block; font-size: 12.5px; color: var(--tr-chu-3); font-weight: 700; margin-bottom: 4px; }
+  .icon { display: flex; gap: 22px; align-items: flex-end; padding: 14px 10px 4px; }
+  .icon figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--tr-chu-2); }
+  .icon .h { position: relative; width: 72px; height: 72px; }
+  .icon .h img { width: 72px; height: 72px; border-radius: 16px; display: block; }
+  .icon .cham { position: absolute; right: -8px; top: -8px; min-width: 28px; height: 28px; padding: 0 7px; border-radius: 14px; background: var(--tr-sai); color: var(--btg-chu-doan-dam); font-size: 15px; font-weight: 800; display: grid; place-items: center; border: 2px solid var(--tr-mat); }
+  .icon .gach { position: absolute; inset: -6px; border: 3px solid var(--tr-sai); border-radius: 22px; }
+  .icon .gach::after { content: ''; position: absolute; left: 50%; top: -10px; bottom: -10px; width: 3px; background: var(--tr-sai); transform: rotate(45deg); }
+</style>
+</head>
+<body>
+<section class="bang" id="cac-cap">
+  <div class="dau">
+    <h1>Lửa đổi cảm xúc · 6 cấp, từ vui vẻ tới siêu cáu</h1>
+    <p>Hình thật của Lửa, chỉ đổi mặt, màu, chỏm lửa, hiệu ứng. Cấp đo theo: giờ trong ngày · số câu còn thiếu · câu có được tính không.</p>
+  </div>
+  <div class="thang" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="luoi" id="luoi"></div>
+  <div class="ha">Hạ nhiệt ngay khi em làm thật: 3 câu liền được tính ⇒ bỏ phần giận vì câu chưa tính · xong một chặng làm thật ⇒ Lửa vui lại 30 phút · đủ mức ⇒ vui (không bao giờ giận vì điểm thấp hay làm sai).</div>
+</section>
+
+<section class="noi" id="noi-hien">
+  <h2>Ngoài Lộ trình, Lửa giận hiện ở đâu?</h2>
+  <p>Làm được trên app web của mình (cài lên màn hình) — và chỗ KHÔNG làm được như app Duolingo cài từ kho.</p>
+  <div class="ba">
+    <div class="o">
+      <h3>Biểu tượng tab trình duyệt</h3>
+      <div class="tabs">
+        <div class="tab"><img src="/logo-hs-nho-v3.svg" alt="">Lộ trình · Đỗ Đại Học<small>cấp 0–3</small></div>
+        <div class="tab"><span class="dau-lua" data-dau="5"></span>Lộ trình · Đỗ Đại Học<small>cấp 4–5</small></div>
+      </div>
+      <p class="phu">Cấp 4–5: biểu tượng tab đổi thành đầu Lửa đỏ; hạ cấp là về logo. Thấy trên máy tính và trình duyệt điện thoại (không thấy khi mở app cài lên màn hình).</p>
+    </div>
+    <div class="o">
+      <h3>Thông báo đẩy (đợt 2, thầy chọn)</h3>
+      <div class="tb"><span class="dau-lua" data-dau="5"></span><div><small>Đỗ Đại Học · 22:45</small><b>Lửa cáu lắm rồi!</b><span>Còn 40 câu, hết hôm nay lúc 23:59. Chuỗi 12 ngày đang chờ em.</span></div></div>
+      <p class="phu">Chỉ em đã bật thông báo và chưa đủ mức. Tối đa 2 lần mỗi tối (21:30, 22:45). Ảnh trong thông báo là đầu Lửa theo cấp.</p>
+    </div>
+    <div class="o" data-khong>
+      <h3>Biểu tượng ngoài màn hình chính</h3>
+      <div class="icon">
+        <figure><span class="h"><img src="/logo-hs-192-v3.png" alt=""><span class="gach" aria-hidden="true"></span></span>Đổi hình: không được</figure>
+        <figure><span class="h"><img src="/logo-hs-192-v3.png" alt=""><span class="cham">40</span></span>Chấm số: được*</figure>
+      </div>
+      <p class="phu">App web không tự đổi hình biểu tượng theo từng em, từng giờ như Duolingo. Làm được: chấm số = câu còn thiếu. *iPhone iOS 16.4+ đã cài lên màn hình và cho phép thông báo; Chrome/Edge máy tính.</p>
+    </div>
+  </div>
+</section>
+
+<script src="./lua-gian.js"></script>
+<script type="module">
+  import { taoLua } from '/src/components/linh-vat/lua-dong.ts'
+  const CAP = [
+    { cap: 0, ten: 'Vui vẻ', tt: 'vui', ms: 300, khi: '<b>Đủ mức hôm nay</b>, hoặc vừa xong một chặng làm thật (trong 30 phút).', loi: 'Em làm thật, Lửa vui lắm! Còn 12 câu nữa là đủ mức.' },
+    { cap: 1, ten: 'Chờ em', tt: 'chao', ms: 160, khi: 'Chưa đủ mức, <b>trước 19:00</b> · hoặc đã làm từ nửa mức trở lên trước 21:00.', loi: 'Học tiếp nhé! Còn 18 câu nữa là đủ mức hôm nay.' },
+    { cap: 2, ten: 'Sốt ruột', tt: 'doi', ms: 500, khi: '<b>19:00–20:59</b> mà làm chưa tới nửa mức (kể cả chưa làm câu nào) · 21:00–21:59 đã quá nửa.', loi: 'Đã 20:15 rồi. Còn 28 câu nữa là đủ mức hôm nay.' },
+    { cap: 3, ten: 'Bực', tt: 'caunhau', ms: 420, khi: '<b>21:00–21:59</b> chưa tới nửa mức · 22:00–22:59 đã quá nửa · hoặc <b>3–4 trong 10 câu</b> gần nhất chưa được tính.', loi: 'Lửa bực rồi đấy! 21:30 mà còn 30 câu. Học ngay nhé.' },
+    { cap: 4, ten: 'Giận', tt: 'gian', ms: 420, khi: '<b>22:00–22:59</b> chưa tới nửa mức · từ 23:00 đã quá nửa · hoặc <b>3 câu liền</b> chưa được tính.', loi: 'Lửa giận rồi! 22:20 mà mới làm 6/40 câu. Chuỗi 12 ngày đang chờ em.' },
+    { cap: 5, ten: 'Siêu cáu · mặt đỏ lừ', tt: 'gian', ms: 420, khi: '<b>Từ 23:00</b> chưa làm câu nào, hoặc chuỗi sắp mất · hoặc câu chưa tính dồn lúc đã muộn.', loi: 'Lửa cáu lắm rồi! 23:05 mà chưa làm câu nào. Còn 54 phút (tới 23:59) để giữ chuỗi 12 ngày.' },
+  ]
+  const luoi = document.getElementById('luoi')
+  const veLua = (noi, tt, ms, cap) => {
+    const k = document.createElement('span'); k.className = 'bi lua'; noi.appendChild(k)
+    const l = taoLua(k, { trangThai: tt, tay: true }); l.buoc(ms); window.apCapGian(l.svg, cap)
+    return l
+  }
+  for (const c of CAP) {
+    const the = document.createElement('article'); the.className = 'the'; the.dataset.cap = c.cap
+    the.innerHTML = `<div class="the-dau"><span class="chip">Cấp ${c.cap}</span><span class="ten">${c.ten}</span></div><div class="san"></div><p class="khi">${c.khi}</p><p class="loi">${c.loi}</p>`
+    luoi.appendChild(the)
+    veLua(the.querySelector('.san'), c.tt, c.ms, c.cap)
+  }
+  for (const d of document.querySelectorAll('.dau-lua')) veLua(d, 'gian', 420, Number(d.dataset.dau))
+  document.documentElement.dataset.xong = '1'
+</script>
+</body>
+</html>
