@@ -33,6 +33,9 @@ for (const k of khoi) {
   }
   out.push(...l)
 }
+// Biến riêng cho Worker THỬ (31/10): VARS_THU="TEN=gia,TEN2=gia" ⇒ khối [vars] (vd. bật ngăn gom D1 liên isolate trên máy thử trước bản sống).
+const varsThu = (process.env.VARS_THU ?? '').split(',').map((x) => x.trim()).filter((x) => /^[A-Z][A-Z0-9_]*=[\w.-]*$/.test(x))
+if (varsThu.length) out.push('', '[vars]', ...varsThu.map((x) => { const [k, v] = x.split('='); return `${k} = "${v}"` }))
 const chu = out.join('\n').replace(/\n{3,}/g, '\n\n')
 const loi = []
 if (chu.includes(ID_THAT)) loi.push('còn id D1 thật')
@@ -44,4 +47,4 @@ if (!/database_name\s*=\s*"omr-thu"/.test(chu)) loi.push('thiếu D1 omr-thu')
 if (!/class_name\s*=\s*"NganHocSinh"/.test(chu)) loi.push('thiếu Durable Object NganHocSinh')
 if (loi.length) { console.error('CHẶN cấu hình thử:', loi.join(' · ')); process.exit(4) }
 writeFileSync(ra, chu)
-console.log(`Đã sinh ${ra}: Worker omr-thu · D1 omr-thu · R2 ${r2 === '-' ? '(bỏ)' : r2} · không cron · ${(chu.match(/class_name/g) ?? []).length} lớp Durable Object`)
+console.log(`Đã sinh ${ra}: Worker omr-thu · D1 omr-thu · R2 ${r2 === '-' ? '(bỏ)' : r2} · không cron · ${(chu.match(/class_name/g) ?? []).length} lớp Durable Object · biến thử: ${varsThu.join(' ') || '(không)'}`)

@@ -28,6 +28,8 @@ env:
   DUNG_KHO: '1'
   # Giai đoạn cuối được phép chạy (500 | 2000 | 10000 | 50000).
   GIAI_DOAN_TOI: '500'
+  # Biến riêng Worker thử (tao-cau-hinh.mjs), vd. 'BAT_GOM_LIEN_NGAN=1'.
+  VARS_THU: ''
   RAMP_S: '60'
   ON_DINH_S: '180'
 jobs:
