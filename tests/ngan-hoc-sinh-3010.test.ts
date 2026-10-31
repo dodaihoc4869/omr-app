@@ -15,7 +15,7 @@ function khoCoNgan(loi = false) {
   const vao: { ten: string; dau: boolean }[] = []
   const goiY: string[] = []
   const viec: Promise<unknown>[] = []
-  const env = { ...k.env } as Env
+  const env = { ...k.env, TAT_NGAN_DINH: '1' } as Env // đường apac| (ngăn trung chuyển: tests/ngan-sat-d1-3110.test.ts)
   env.NGAN_HS = {
     idFromName: (ten: string) => ({ toString: () => ten }),
     get: (id, tuy) => ({

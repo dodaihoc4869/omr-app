@@ -33,7 +33,9 @@ type Phan = readonly [khoa: string, bang: string, sql: string, chung?: 1]
 export const KHOA_CH_KHONG_DAU: readonly string[] = ['sai_nhanh_gv', 'nhac_tu_dong_lan', 'may_soan_em_sai_luc', 'ai_ddh_vp_luc', 'omni_dem_con_tro', 'omni_gan_con_tro', 'omni_kiem_q_tuan',
   'danh_gia_hoc_that_con_tro', 'tu_sua_dong_cu', 'chot_exp_ngay_qua', 'thuong_cron_ngay', 'khien_mat_ngay', 'giai_tuan_chot',
   // 31/10: công tắc bảo trì (tạm đóng app học sinh) không phải đầu vào kế hoạch — bật/tắt nó làm hỏng bản sẵn của MỌI em ⇒ sáng 31/10 ai mở app cũng lập lại từ đầu.
-  'hs_tam_dong', 'hs_tam_dong_cho_phep']
+  'hs_tam_dong', 'hs_tam_dong_cho_phep',
+  // 31/10: danh sách ngăn trung chuyển sát D1 (ngan-hoc-sinh.ts) — chỉ là định tuyến.
+  'ngan_dinh', 'ngan_dinh_khoa']
 const PHAN_DAU: readonly Phan[] = [
   ['a', 'game_v2_attempt', 'SELECT created_at FROM game_v2_attempt WHERE sbd=?1 ORDER BY created_at DESC LIMIT 1'], // game_v2_attempt_student(sbd,created_at)
   ['s', 'su_kien_hoc', 'SELECT received_at FROM su_kien_hoc WHERE sbd=?1 ORDER BY received_at DESC LIMIT 1'], // idx_skh_tiep_nhan(sbd,received_at,khoa)

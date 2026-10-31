@@ -91,6 +91,8 @@ export interface Env {
   NGAN_HS?: DurableObjectNamespace
   /** Công tắc khẩn: có giá trị ⇒ KHÔNG đi qua ngăn riêng (đường cũ y nguyên). */
   TAT_NGAN_HS?: string
+  /** Công tắc ngăn trung chuyển (ngan-hoc-sinh.ts): có giá trị ⇒ ngăn `apac|` như cũ, không bốc thăm. */
+  TAT_NGAN_DINH?: string
   /** Phòng đấu «Đấu Nguyên Tử» của phòng chờ thi (server/src/phong-dau-ion.ts, 30/10): một Durable Object mỗi ca. Vắng ⇒ không phát vé, máy em chỉ Tập với A.I. */
   PHONG_DAU_ION?: DurableObjectNamespace
   /** Công tắc tắt Đấu Nguyên Tử trên mạng: có giá trị ⇒ không phát vé, cửa trả 410, phòng đang mở bị đóng (máy em còn Tập với A.I cục bộ). */

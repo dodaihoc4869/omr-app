@@ -4168,7 +4168,7 @@ const xuatWorker = {
     if (req.method === 'GET' && req.url.includes('/dau-ion/') && new URL(req.url).pathname.startsWith('/dau-ion/')) return vaoPhongDau(req, env)
     // NGĂN RIÊNG TỪNG HỌC SINH (30/10, ngan-hoc-sinh.ts): lệnh app học sinh ⇒ Durable Object của đúng em (đệm luôn ấm); trong ngăn ⇒ đi thẳng xuống dưới.
     if (env.NGAN_HS && req.method === 'POST' && !req.headers.has(DAU_TRONG_NGAN)) {
-      const r = await vaoNgan(req, env)
+      const r = await vaoNgan(req, env, ctx)
       if (r instanceof Response) return r
       if (r) req = r
     }
