@@ -25,7 +25,7 @@ Bạn là tác tử tốc độ của omr-app. Luật: CLAUDE.md, mục «LUẬT
 4. **Sửa.**
    - Không đổi giao diện đã duyệt.
    - Không đổi luật chấm / thưởng.
-   - Đáp án không xuống máy trước khi nộp.
+   - Đáp án không xuống máy trước khi nộp (trừ ngoại lệ thầy duyệt 31/10 cho câu luyện tập mã hoá — xem CLAUDE.md).
 5. **Cổng đủ:** tsc, build, `kiem:toc-do` 0 đỏ (hạ mốc theo số mới), kiem-sw, check:mau, kiem:mau-giu, test liên quan.
 6. **Phát hành.** PR, gộp squash, deploy xanh. Ghi một dòng Nhật ký DIEU-PHOI kèm bảng số.
 

@@ -35,7 +35,8 @@ function bangDem(db: object): Map<string, O> {
  */
 // 06/10: thêm hai khoá ÔN BÀI CŨ (`on_bai_cu_deu` công tắc chia đều, `on_bai_cu_ti_le` tỉ lệ theo lớp — omni-on-bai-cu.ts) để đọc KÈM, không thêm vòng D1 ở Sảnh / kế hoạch ngày.
 // 26/10: `duolingo_bai` (cờ học kiểu Duolingo, duolingo-bai-co.ts) đọc KÈM cờ Gói 7 ⇒ Sảnh / mở chặng / phụ huynh không thêm lệnh D1.
-const NHOM_CO: readonly string[] = ['game_hoa_2', 'bi_a', 'omni', 'omni_tham_so', 'cnh_exp_kich_hoat', 'the_luc_lop', 'on_bai_cu_deu', 'on_bai_cu_ti_le', 'goi_bai_7_v1', 'kiem_tra_ca_nhan_v1', 'duolingo_bai']
+// 31/10: `dap_an_tren_may` (đáp án luyện tập xuống máy, dap-an-may.ts) đọc kèm ⇒ gắn `dm` lúc mở chặng không thêm lệnh D1.
+const NHOM_CO: readonly string[] = ['game_hoa_2', 'bi_a', 'omni', 'omni_tham_so', 'cnh_exp_kich_hoat', 'the_luc_lop', 'on_bai_cu_deu', 'on_bai_cu_ti_le', 'goi_bai_7_v1', 'kiem_tra_ca_nhan_v1', 'duolingo_bai', 'dap_an_tren_may']
 /** Khoá đang được đọc KÈM (theo D1 gốc) — không đọc kèm hai lần cùng lúc. */
 const dangKemTheoDb = new WeakMap<object, Set<string>>()
 /** Đời đệm (theo D1 gốc): tăng mỗi lần `xoaDemCauHinh` ⇒ câu đọc kèm bắt đầu TRƯỚC lần xoá không được ghi giá trị cũ vào đệm. */
