@@ -7,7 +7,7 @@
 // An toàn: thiếu binding (test, bản cũ) / công tắc `TAT_NGAN_HS` / không đọc được SBD ⇒ đường cũ y nguyên; ngăn lỗi ⇒ tự quay về đường cũ với ĐÚNG thân gói.
 // Không đi qua ngăn: đăng nhập, thi (vào thi / lưu tạm / nộp), lệnh thầy / phụ huynh, GET.
 import type { DurableObjectState, Env, ExecutionContext, KhoEm, SqlNgan } from './kieu'
-import { gomD1 } from './gom-d1'
+import { gomD1, type D1Gom, type DemLenhD1 } from './gom-d1'
 
 type XuLy = (req: Request, env: Env, ctx?: ExecutionContext) => Promise<Response>
 let xuLy: XuLy | null = null
@@ -139,7 +139,11 @@ export class NganHocSinh {
     const env = (envChung ??= this.env.TAT_GOM_D1 || !this.env.DB ? this.env : { ...this.env, DB: gomD1(this.env.DB) })
     doViTri(env, ctx)
     const t0 = Date.now()
-    const res = await xuLy(req, this.kho ? { ...env, KHO_EM: this.kho } : env, ctx)
+    // ĐO THEO LỆNH (31/10): 1/10 lệnh mang bộ đếm câu / vòng D1 ⇒ log `[gom-lenh] <đường> cau=… vong=… xl=…` (wrangler tail gom theo đường) — không SBD.
+    const dem: DemLenhD1 | null = Math.random() < 0.1 && (env.DB as Partial<D1Gom>).voiDem ? { cau: 0, vong: new Set() } : null
+    const envLenh = dem ? { ...env, DB: (env.DB as D1Gom).voiDem(dem) } : env
+    const res = await xuLy(req, this.kho ? { ...envLenh, KHO_EM: this.kho } : envLenh, ctx)
+    if (dem) console.log('[gom-lenh]', duong, `cau=${dem.cau}`, `vong=${dem.vong.size}`, `xl=${Date.now() - t0}`)
     // Dấu «đã qua ngăn» (đo được trên máy thật, không lộ gì): 1 = ngăn có kho sổ · trạm chạy ngăn · ms một vòng D1 · ms xử lý trong ngăn.
     const h = new Headers(res.headers)
     h.set('x-ngan', this.kho ? '1' : '0')

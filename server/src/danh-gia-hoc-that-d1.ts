@@ -8,6 +8,7 @@
 //   ĐUỔI KHÔNG BAO GIỜ tự gửi: chỉ khi thầy bấm «Xác nhận cho nghỉ» (`/gv/danh-gia/can-thiep {loai:'xac_nhan_nghi'}`).
 // BẢNG CHỈ-THÊM, tạo lúc chạy (IF NOT EXISTS): `danh_gia_em_tuan` (bản chụp tuần, tính lại được từ sổ), `danh_gia_cau_tuan` (tỉ lệ đúng của lớp từng câu),
 // `can_thiep_em` (nhật ký nhắc / báo / cam kết / xác nhận), `nhan_mu_thay` (nhãn mù thầy gán để hiệu chỉnh). Không sửa / xoá dữ liệu cũ nào.
+import { dbGoc } from './cau-hinh-dem'
 import type { Env, ExecutionContext } from './kieu'
 import { danhGiaChoHs } from './an-luoi-hs'
 import { gameIdentity } from './game-v2-auth'
@@ -49,9 +50,10 @@ const BANG = [
 ]
 const daDamBao = new WeakSet<object>()
 export async function damBaoBangDanhGia(env: Env): Promise<void> {
-  if (daDamBao.has(env.DB as unknown as object)) return
+  const goc = dbGoc(env.DB as unknown as object)
+  if (daDamBao.has(goc)) return
   await env.DB.batch(BANG.map((s) => env.DB.prepare(s)))
-  daDamBao.add(env.DB as unknown as object)
+  daDamBao.add(goc)
 }
 
 export async function docCheDo(env: Env): Promise<CheDoDanhGia> {
