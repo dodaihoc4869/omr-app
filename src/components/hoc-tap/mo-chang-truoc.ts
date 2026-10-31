@@ -275,6 +275,9 @@ export function xoaChangDangLam(sbd: string): void {
   try { localStorage.removeItem(khoaDang(sbd)); localStorage.removeItem(khoaDangCau(sbd)); localStorage.removeItem('omr_chang_dang_cua') } catch { /* bỏ qua */ }
 }
 
+// ĐỒNG BỘ NHIỀU MÁY (31/10): Lộ trình thấy máy chủ đã đi trước chặng dở của máy này (máy khác làm tiếp) ⇒ bỏ cả bản nhớ trong mô-đun.
+if (typeof window !== 'undefined') window.addEventListener('ddh-bo-chang-dang', (e) => { const em = String((e as CustomEvent).detail ?? ''); if (em) xoaChangDangLam(em) })
+
 /** Câu em vừa làm xong (đã chấm) — chặng kế trong gói bỏ câu này. */
 export function ghiCauXong(sbd: string, qid: string, now: number = Date.now()): void {
   if (!batGoi || !sbd || !qid) return
