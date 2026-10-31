@@ -1,0 +1,42 @@
+# BÀI THI MỘT EM HÔM NAY (CHỈ ĐỌC) — thầy 31/10 19:40: «Chấm lại bài cho 12070 ca thi vừa rồi. Hs làm đủ 28 câu nhưng app báo làm 8 câu» (D1 quá tải 19:20–19:30).
+# Số báo danh nhập tay lúc chạy, CHE trong nhật ký. In: các lượt hôm nay (ca, lần, trạng thái, giờ nộp, số câu đã trả lời trong bài máy chủ giữ, điểm) và bài bổ
+# sung (gửi sau khi lượt đóng) — chỉ số đếm, không in đáp án / tên.
+name: Bài thi một em hôm nay (chỉ đọc)
+on:
+  workflow_dispatch:
+    inputs:
+      sbd:
+        description: 'Số báo danh (che trong nhật ký)'
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Che số báo danh
+        run: |
+          S=$(jq -r '.inputs.sbd' "$GITHUB_EVENT_PATH" | tr -cd '0-9A-Za-z')
+          echo "::add-mask::$S"
+          echo "SBD_EM=$S" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm (chỉ SELECT)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          S="'${SBD_EM}'"
+          TU=$(date -u -d "$(TZ=Asia/Ho_Chi_Minh date +%F) 00:00:00 +07:00" +%Y-%m-%dT%H:%M:%S)
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c ".[0].results" || echo "(lỗi)"; }
+          DEM="(SELECT COUNT(*) FROM json_each(X,'\$.phanI') WHERE TRIM(COALESCE(value,''))<>'') + (SELECT COUNT(*) FROM json_each(X,'\$.phanII') WHERE value LIKE '%\"D\"%' OR value LIKE '%\"S\"%') + (SELECT COUNT(*) FROM json_each(X,'\$.phanIII') WHERE TRIM(COALESCE(value,''))<>'')"
+          q "lượt hôm nay: ca · tên ca · lần · trạng thái · vào · nộp (VN) · số câu đã trả lời (máy chủ giữ) · tổng điểm · cập nhật" "SELECT l.ma_ca, c.ten_ca, l.lan_thu, l.trang_thai, strftime('%H:%M:%S', l.vao_luc, '+7 hours') vao, strftime('%H:%M:%S', l.nop_luc, '+7 hours') nop, ${DEM//X/l.dap_an_json} so_cau, l.tong, strftime('%H:%M:%S', l.cap_nhat_luc, '+7 hours') cap_nhat, c.trang_thai ca_tt, c.so_cau_json FROM luot l LEFT JOIN ca c ON c.ma_ca=l.ma_ca WHERE l.sbd=$S AND l.vao_luc >= '$TU' ORDER BY l.vao_luc"
+          q "bài bổ sung (gửi sau khi lượt đóng): ca · lần · trạng thái · gửi lúc (VN) · số câu mới · số câu đã trả lời trong bài bổ sung" "SELECT ma_ca, lan_thu, trang_thai, strftime('%H:%M:%S', gui_luc, '+7 hours') gui, so_cau_moi, ${DEM//X/dap_an_json} so_cau FROM bai_bo_sung WHERE sbd=$S AND gui_luc >= '$TU'"
+          q "chi tiết câu đã chấm hôm nay: ca · số dòng · đúng · bỏ trống" "SELECT ma_ca, COUNT(*) n, SUM(CASE WHEN dung=1 THEN 1 ELSE 0 END) dung FROM chi_tiet_cau WHERE sbd=$S AND ma_ca IN (SELECT ma_ca FROM luot WHERE sbd=$S AND vao_luc >= '$TU') GROUP BY ma_ca"
