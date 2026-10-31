@@ -21,6 +21,7 @@ import { chanMetaKhacKhoi, docCauNghiDem, docKhoiEmCong } from './chan-khac-khoi
 import { DemTTL } from './dem-chung'
 import { dauKhoCau, dauTruocLucDoc } from './dau-kho-cau'
 import { chayDdlMotLan } from './ddl-mot-lan'
+import { DK_PHAM_VI_TV, SQL_DAU_TV, SQL_TV_CUA_EM } from './chien-dich-tv'
 import {
   lapKeHoachNgay, laNo, nhanNo, khoiLuongCan, TRAN_NGAY, type NguonNhan, tranHuyetChienTheo, phatLaiCau, canGoiY, moDuocRuong, tiLeChienDich, ngayThanhThaoSomNhat, soNgayConLai,
   coLoThuSucThem, congNgay,
@@ -205,7 +206,98 @@ type OChienDich = { ds: DsChienDich | null; dangDoc: boolean }
 // 28/10 (thử tải 270 em: câu này 13.870 lần / 13 phút — mỗi dòng mang sbd_json/qid_json lớn): lượt đồng thời chờ lượt đang đọc tới 3 s (trước 240 ms ⇒
 // D1 chậm hơn thế thì mọi lượt tự đọc lại, đàn đọc dồn).
 const demChienDich = new DemTTL<OChienDich>(60_000, 2)
-export function xoaDemChienDich(): void { demChienDich.xoa() }
+export function xoaDemChienDich(): void { demChienDich.xoa(); demNheCd.xoa(); demTvEm.xoa() }
+
+// ĐƯỜNG MỘT EM QUA BẢNG TRA (31/10, chien-dich-tv.ts — thử tải 10.000 em: câu đọc cả dòng `docMoiChienDich` chiếm 53% thời gian D1 khi isolate lạnh dồn).
+// MỘT câu đọc LAI (đệm 60 s mỗi isolate như đường cũ, cùng điều kiện, cùng thứ tự): chiến dịch ĐÃ lập chỉ mục (dấu `chien_dich_tv_dau`) KHÔNG mang sbd_json — em
+// thuộc hay không tra bảng `chien_dich_tv` (khoá chính theo sbd; cờ `cua_em` cho chính em hỏi đi CÙNG câu đọc); chiến dịch CHƯA lập chỉ mục mang sbd_json và tra như
+// cũ. Chưa có chỉ mục nào ⇒ đúng dữ liệu và số lệnh của đường cũ. Bảng tra chưa có / lỗi đọc ⇒ null ⇒ đường cũ (y hệt). Các đường của em không đọc danh sách em
+// của chiến dịch đã lập chỉ mục (rà 31/10) ⇒ `ChienDich.sbd` rỗng, dòng thô `sbd_json` null. Công tắc `TAT_CHIEN_DICH_TV` = luôn đường cũ.
+// Chỉ đệm giá trị ĐÃ XONG; lượt đồng thời chờ bằng hẹn giờ riêng (không chờ I/O của yêu cầu khác — luật đệm cờ 28/09).
+type DongCd = { row: Row; sbd: Set<string> | null } // sbd null ⇒ đã lập chỉ mục (tra bảng)
+type HuyCd = DongDaHuy & { lap: boolean }
+type NheChienDich = { luc: number; ds: DongCd[]; huy: HuyCd[]; bd: Map<string, string>; rd: Map<string, number>; dau: string; coLap: boolean }
+type TvEm = { dau: string; luc: number; ids: Set<string> }
+type ONhe = { db: object; luc: number; v: NheChienDich | null; dangDoc: boolean; han: number }
+const demNheCd = new DemTTL<ONhe>(60_000, 2)
+const demTvEm = new DemTTL<{ db: object; v: TvEm }>(30 * 60_000, 50_000)
+const RE_THIEU_BANG = /no such table|no such column/i
+async function docNheChienDich(env: Env, sbd: string): Promise<{ nhe: NheChienDich | null; tv?: TvEm }> {
+  const goc = dbGoc(env.DB as unknown as object)
+  const dung = (o: ONhe | undefined, t: number) => !!o && o.db === goc && !o.dangDoc && !(o.v === null && t - o.luc >= o.han)
+  const co = demNheCd.doc('nhe', Date.now())
+  for (let n = 0; co?.dangDoc && co.db === goc && demNheCd.doc('nhe', Date.now()) === co && n < 190; n++) await new Promise<void>((xong) => setTimeout(xong, 16))
+  const xong = demNheCd.doc('nhe', Date.now())
+  if (dung(xong, Date.now())) return { nhe: xong!.v }
+  const now = Date.now()
+  const o: ONhe = { db: goc, luc: now, v: null, dangDoc: true, han: 5_000 }
+  demNheCd.ghi('nhe', now, o)
+  try {
+    const [r, bd, rd] = await Promise.all([
+      env.DB.prepare(`SELECT c.id, c.ten, c.lop, CASE WHEN d.chien_dich_id IS NULL THEN c.sbd_json END AS sbd_json, c.ma_de_json, c.qid_json, c.han_nop, c.the_luc_ngay,
+          c.huyet_chien, c.ma_ca, c.tao_luc, c.dong_luc, c.trang_thai, d.chien_dich_id IS NOT NULL AS co_tv,
+          CASE WHEN d.chien_dich_id IS NOT NULL THEN EXISTS (SELECT 1 FROM chien_dich_tv t WHERE t.sbd = ?1 AND t.chien_dich_id = c.id) END AS cua_em, ${SQL_DAU_TV} AS dau_tv
+        FROM chien_dich c LEFT JOIN chien_dich_tv_dau d ON d.chien_dich_id = c.id WHERE ${DK_PHAM_VI_TV} ORDER BY c.tao_luc DESC`).bind(sbd).all<Row>(),
+      env.DB.prepare("SELECT id, bat_dau FROM chien_dich_bat_dau WHERE id IN (SELECT id FROM chien_dich WHERE trang_thai <> 'da_huy')").all<Row>().catch(() => ({ results: [] as Row[] })),
+      env.DB.prepare("SELECT id, rai_deu FROM chien_dich_tuy_chon WHERE id IN (SELECT id FROM chien_dich WHERE trang_thai <> 'da_huy')").all<Row>().catch(() => ({ results: [] as Row[] })),
+    ])
+    const dong = r.results ?? []
+    const dau = dong.length ? str(dong[0]!.dau_tv) : ''
+    const ds: DongCd[] = [], huy: HuyCd[] = [], ids = new Set<string>()
+    let coLap = false
+    for (const row of dong) {
+      const { co_tv: coTv, cua_em: cuaEm, dau_tv: _dau, ...gon } = row
+      const lap = Number(coTv) === 1
+      if (lap && Number(cuaEm) === 1) ids.add(str(row.id))
+      if (str(row.trang_thai) !== 'da_huy') { ds.push({ row: gon, sbd: lap ? null : tapChuoiJson(gon.sbd_json) }); coLap ||= lap }
+      // Hành trình gộp được lưu trữ khi khôi phục, KHÔNG phải thầy thu hồi câu sai của em (như đường cũ).
+      else if (!/^hanh-trinh-gioi-hoa-khoi-(10|11|12)$/.test(str(row.id))) {
+        huy.push({ id: str(row.id), taoLuc: str(row.tao_luc), dongLuc: str(row.dong_luc), sbdJson: lap ? '' : str(gon.sbd_json), qidJson: str(row.qid_json), lap })
+        coLap ||= lap
+      }
+    }
+    const nhe: NheChienDich = {
+      luc: now, ds, huy, dau, coLap,
+      bd: new Map((bd.results ?? []).map((x) => [str(x.id), str(x.bat_dau)])),
+      rd: new Map((rd.results ?? []).map((x) => [str(x.id), Number(x.rai_deu)])),
+    }
+    o.v = nhe
+    const tv: TvEm = { dau, luc: now, ids }
+    if (coLap) demTvEm.ghi(sbd, now, { db: goc, v: tv })
+    return { nhe, tv }
+  } catch (e) {
+    // bảng tra chưa có (trước lượt cron đầu) ⇒ đường cũ 2 phút; lỗi khác (D1 bận) ⇒ 5 s
+    o.han = RE_THIEU_BANG.test(String((e as Error)?.message ?? e)) ? 120_000 : 5_000
+    return { nhe: null }
+  } finally { o.dangDoc = false }
+}
+async function docTvEm(env: Env, sbd: string): Promise<TvEm> {
+  const luc = Date.now()
+  const r = await env.DB.prepare(SQL_TV_CUA_EM).bind(sbd).all<Row>()
+  const ids = new Set<string>()
+  let dau = ''
+  for (const x of r.results ?? []) if (str(x.k) === 'c') ids.add(str(x.v)); else dau = str(x.v)
+  const tv = { dau, luc, ids }
+  demTvEm.ghi(sbd, luc, { db: dbGoc(env.DB as unknown as object), v: tv })
+  return tv
+}
+/** Danh sách lai + các chiến dịch đã lập chỉ mục của em (`ids`, null khi không chiến dịch nào lập chỉ mục); null ⇒ đi đường cũ. Isolate lạnh: MỘT đợt D1, số lệnh
+ *  như đường cũ; isolate ấm: thành viên nhớ 30 phút theo dấu (dấu đổi ⇒ đọc lại). */
+async function chienDichCuaEmQuaTv(env: Env, sbd: string): Promise<{ nhe: NheChienDich; ids: Set<string> | null } | null> {
+  if (env.TAT_CHIEN_DICH_TV) return null
+  const { nhe, tv } = await docNheChienDich(env, sbd)
+  if (!nhe) return null
+  if (!nhe.coLap) return { nhe, ids: null }
+  if (tv) return { nhe, ids: tv.ids }
+  const co = demTvEm.doc(sbd, Date.now())
+  if (co && co.db === dbGoc(env.DB as unknown as object) && (co.v.dau === nhe.dau || co.v.luc >= nhe.luc)) return { nhe, ids: co.v.ids }
+  // dấu đổi mà bản nhớ cũ hơn danh sách / chưa nhớ ⇒ đọc thành viên (bản đọc SAU danh sách luôn mới hơn)
+  const moi = await docTvEm(env, sbd).catch(() => null)
+  return moi && (moi.dau === nhe.dau || moi.luc >= nhe.luc) ? { nhe, ids: moi.ids } : null
+}
+const laTvCua = (d: DongCd, ids: Set<string> | null, sbd: string): boolean => (d.sbd ? d.sbd.has(sbd) : !!ids?.has(str(d.row.id)))
+const laHuyCua = (c: HuyCd, ids: Set<string> | null, sbd: string): boolean =>
+  (c.lap ? !!ids?.has(c.id) : c.sbdJson.includes(JSON.stringify(sbd)) && tapChuoiJson(c.sbdJson).has(sbd))
 async function docMoiChienDich(env: Env): Promise<DsChienDich> {
   const co = demChienDich.doc('ds', Date.now())
   for (let n = 0; co?.dangDoc && demChienDich.doc('ds', Date.now()) === co && n < 190; n++) await new Promise<void>(xong => setTimeout(xong, 16))
@@ -244,6 +336,14 @@ async function docMoiChienDich(env: Env): Promise<DsChienDich> {
  * chiến dịch ấy sinh ra (thầy 06/10); mọi nơi khác vẫn không thấy chiến dịch đã huỷ.
  */
 export async function docChienDichKemDaHuyCuaEm(env: Env, sbd: string): Promise<{ ds: ChienDich[]; daHuy: ChienDichDaHuy[] }> {
+  const tv = await chienDichCuaEmQuaTv(env, sbd).catch(() => null)
+  if (tv) {
+    const { nhe, ids } = tv
+    return {
+      ds: nhe.ds.filter((d) => laTvCua(d, ids, sbd)).map(({ row }) => docChienDichTuDong({ ...row, bat_dau: nhe.bd.get(str(row.id)) ?? null, rai_deu: nhe.rd.get(str(row.id)) ?? null })),
+      daHuy: nhe.huy.filter((c) => laHuyCua(c, ids, sbd)).map((c): ChienDichDaHuy => ({ id: c.id, qids: qidCuaDaHuy(c), taoLuc: c.taoLuc, dongLuc: c.dongLuc })),
+    }
+  }
   const { ds, huy, bd, rd } = await docMoiChienDich(env)
   return {
     ds: ds.filter((x) => x.sbd.has(sbd)).map((x) => docChienDichTuDong({ ...x.row, bat_dau: bd.get(str(x.row.id)) ?? null, rai_deu: rd.get(str(x.row.id)) ?? null })),
@@ -261,6 +361,8 @@ export async function docChienDichCuaEm(env: Env, sbd: string): Promise<ChienDic
  */
 export async function docChienDichThoCuaEm(env: Env, sbd: string): Promise<Row[]> {
   try {
+    const tv = await chienDichCuaEmQuaTv(env, sbd).catch(() => null)
+    if (tv) return tv.nhe.ds.filter((d) => laTvCua(d, tv.ids, sbd)).map((d) => d.row)
     const { ds } = await docMoiChienDich(env)
     return ds.filter((x) => x.sbd.has(sbd)).map((x) => x.row)
   } catch {
