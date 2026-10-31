@@ -1,7 +1,7 @@
 // MÁY TẢI «50.000 EM CÙNG LÚC» (31/10) — Node ≥ 22, KHÔNG phụ thuộc gói nào (fetch có sẵn, giữ kết nối mặc định của undici).
 // Mỗi tiến trình chạy MỘT LÁT em ảo (em thứ e với (e-1) % TONG_PHAN == PHAN), mọi em ảo chạy xen nhau trên cùng vòng sự kiện.
 //
-// MỘT EM ẢO (khớp app thật + nhịp đo máy thật 30/10 21:40 — ~200 em / 120 s, xem README cùng thư mục):
+// MỘT EM ẢO (khớp app thật + nhịp đo máy thật 30/10 21:40 — ~200 em / 120 s):
 //   mở app  : hoc-tap-sanh + hs/ke-hoach-ngay + hs/ca-dang-mo + hs/buoi-hoc + presence (song song, như nap-truoc-man-em.ts)
 //   vòng học: hoc-tap-sanh → hs/ke-hoach-ngay → academic-sync → hoc-tap-start → trả lời 1–3 câu (nghĩ 5–15 s / câu; sau câu 50 % hoc-tap-dem;
 //             câu đầu kèm hs/goi-y-so-do) → hs/thuong (70 %) → hoc-tap-sanh → nghỉ (trung bình NGHI_S giây)
