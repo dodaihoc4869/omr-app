@@ -3,7 +3,7 @@
 Ba app cho trung tâm luyện thi Hoá của thầy Đỗ Đại Học: giáo viên (`/`, `/gv`), học sinh (`/hs`), phụ huynh (`/ph`). React + Vite + TS + Tailwind v4 (`src/`), máy chủ Cloudflare Worker + D1 + R2 (`server/`). Mã, chú thích, commit, PR viết TIẾNG VIỆT.
 
 ## 1. Luật chung — đọc trước
-- Mọi luật trong `CLAUDE.md` áp dụng nguyên cho Codex: luật tốc độ (`npm run build && npm run kiem:toc-do` 0 đỏ, mốc `docs/moc-toc-do.json` chỉ hạ), màu (`npm run check:mau`, `npm run kiem:mau-giu` 0), commit theo đường dẫn, không in bí mật, đáp án không xuống máy học sinh trước khi nộp, không rút câu tự luận.
+- Mọi luật trong `CLAUDE.md` áp dụng nguyên cho Codex: luật tốc độ (`npm run build && npm run kiem:toc-do` 0 đỏ, mốc `docs/moc-toc-do.json` chỉ hạ), màu (`npm run check:mau`, `npm run kiem:mau-giu` 0), commit theo đường dẫn, không in bí mật, đáp án không xuống máy học sinh trước khi nộp (ngoại lệ thầy duyệt 31/10: câu luyện tập mang `dm` mã hoá, máy chủ chấm lại — xem CLAUDE.md; câu thi / kiểm tra cá nhân / BTVN có điểm / câu bảo vệ ca thi / tự luận vẫn KHÔNG), không rút câu tự luận.
 - Chỉ dừng hỏi thầy khi: xoá/ghi đè dữ liệu D1 thật · schema không chỉ-thêm · đang có ca thi mở.
 - Làm chung với Claude: `docs/hop-dong-claude-codex-1310.md` (chia làn, tệp dùng chung, không phát hành chồng nhau). Nhật ký chung: cuối `DIEU-PHOI.md`.
 

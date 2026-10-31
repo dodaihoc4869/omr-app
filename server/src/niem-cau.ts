@@ -8,6 +8,8 @@ import { SO_TU_TOI_DA } from './do-giay-luot'
 import { HAN_NIEM_MS, lamMoiNiem, niemPhong } from './niem-phong'
 import type { omniChoTem as OmniChoTem } from './omni-d1'
 import type { Env } from './kieu'
+import { dapAnMayBat, dmCau, KHOA_CH_DAP_AN_MAY } from './dap-an-may'
+import { docCauHinhDem } from './cau-hinh-dem'
 
 /** Kết quả hỏi OMNI cho cả chặng (omni-d1.ts `omniChoTem`). */
 type OmniTem = NonNullable<Awaited<ReturnType<typeof OmniChoTem>>>
@@ -31,12 +33,23 @@ export async function niemPhongCau(env: Env, sbd: string, q: PrivateQuestion, ho
   } catch { return undefined }
 }
 
-/** Gắn `sk` vào từng câu công khai `cong[i]` (tương ứng riêng `rieng[i]`) — song song. Câu không niêm phong được thì giữ nguyên. */
+/** Gắn `sk` vào từng câu công khai `cong[i]` (tương ứng riêng `rieng[i]`) — song song. Câu không niêm phong được thì giữ nguyên.
+ *  31/10 (thầy «đáp án xuống máy trước khi nộp an toàn», dap-an-may.ts): câu có tem (đúng phạm vi chấm nhanh: không tự luận, trong kênh số, câu đã qua lọc ca thi)
+ *  còn mang `dm` — đáp án + lời giải MÃ HOÁ để máy em chấm tại chỗ; máy chủ vẫn chấm lại. Công tắc `cau_hinh.dap_an_tren_may` tắt ⇒ không gắn. */
 export async function ganNiemChoCau(env: Env, sbd: string, cong: Record<string, unknown>[], rieng: readonly PrivateQuestion[], hoa2: boolean, nayMs = Date.now(), hanMs = HAN_NIEM_MS): Promise<void> {
+  const dmBat = docCauHinhDem(env, KHOA_CH_DAP_AN_MAY).then((v) => dapAnMayBat(v, sbd), () => false)
   // Phiên Hoá 2.0: hỏi OMNI MỘT lần cho cả chặng (kỳ vọng từng câu + số lướt hôm nay) để tem quyết được câu SAI nhanh không cần D1. Lỗi ⇒ null ⇒ tem như cũ.
   // Nạp LƯỜI omni-d1 (mô-đun lớn, nhiều phụ thuộc): tránh vòng nhập khi mở chặng và giữ tem nhẹ cho đường không Hoá 2.0.
   const om = hoa2 ? await import('./omni-d1').then((m) => m.omniChoTem(env, sbd, rieng.filter(Boolean).map((q) => ({ qid: q.qid, phan: q.phan as 'I' | 'II' | 'III', mucDo: q.mucDo ?? null })), nayMs)).catch(() => null) : null
-  await Promise.all(cong.map(async (c, i) => { const q = rieng[i]; if (!q) return; const sk = await niemPhongCau(env, sbd, q, hoa2, nayMs, hanMs, om); if (sk) c.sk = sk }))
+  const bat = await dmBat
+  await Promise.all(cong.map(async (c, i) => {
+    const q = rieng[i]; if (!q) return
+    const sk = await niemPhongCau(env, sbd, q, hoa2, nayMs, hanMs, om); if (!sk) return
+    c.sk = sk
+    if (!bat) return
+    const dm = await dmCau(env, sbd, q.qid, { p: q.phan as 'I' | 'II' | 'III', c: q.correct, l: q.solution, m: q.hinhAnh.filter((x) => x.viTri === 'sau_loi_giai'), ...dauOmni(hoa2, om, q.qid) }, nayMs)
+    if (dm) c.dm = dm
+  }))
 }
 
 /** Bản SAO các câu công khai của chặng lập sẵn với tem làm MỚI (hạn 45 phút từ giờ); tem không làm mới được thì bỏ khỏi bản sao. Không sửa mảng gốc (đang nằm trong bản lập sẵn). */
