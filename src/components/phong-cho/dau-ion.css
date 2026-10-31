@@ -147,6 +147,10 @@
 .dn-dem i { display: block; height: 100%; background: var(--dn-nut); transform-origin: left; }
 .dn-pu { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
 .dn-pu button { min-height: 44px; border-radius: 14px; border: 2px solid var(--dn-vien); background: var(--dn-mat-2); color: var(--dn-chu-2); font: inherit; font-weight: 700; font-size: 13px; padding: 0 10px; cursor: pointer; }
+/* Sân chờ bạn (thầy 01/11: không A.I, chỉ người thật): dải nhỏ cuối sân (em ra sân ở bệ trên cùng), không chặn chạm — em vẫn đi thử được. */
+.dn-cho-ban { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); width: min(92%, 360px); padding: 10px 14px; border-radius: 16px; background: var(--dn-mat); border: 2px solid var(--dn-vien); box-shadow: 0 3px 0 var(--dn-vien); display: flex; flex-direction: column; gap: 2px; text-align: center; pointer-events: none; z-index: 3; }
+.dn-cho-ban b { font-size: 16px; font-weight: 800; color: var(--dn-chu); }
+.dn-cho-ban span { font-size: 13px; line-height: 1.4; color: var(--dn-chu-3); }
 .dn-loi { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; text-align: center; padding: 0 20px; border-radius: 22px; background: var(--dn-mat-2); color: var(--dn-chu); }
 
 /* Điện thoại ngang: khung em · sân · xếp hạng — vẫn kéo ở đâu cũng được */

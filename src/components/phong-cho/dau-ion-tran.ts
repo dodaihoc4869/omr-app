@@ -1,9 +1,9 @@
 // BỘ CHẠY TRẬN «Đấu Nguyên Tử 2» ở máy em — hai kiểu cùng một giao diện để lớp React / vẽ không cần biết đang chơi mạng hay tại máy:
 //  · TranAI: em + 5 A.I chạy NGAY trên máy bằng lõi chung, 0 mạng (khi sảnh tắt, vé hết hạn, mất mạng hẳn).
-//  · TranMang: phòng đấu quyết mọi thứ; máy em CHỈ gửi hướng đi (~12 lần/giây), đoán trước bước đi của CHÍNH em rồi khớp theo ảnh trận;
+//  · TranMang: phòng đấu quyết mọi thứ — CHỈ NGƯỜI THẬT, 2–6 bạn (thầy 01/11; sân 1 bạn ⇒ chờ bạn thứ 2, đồng hồ đứng); máy em CHỈ gửi hướng đi (~12 lần/giây), đoán trước bước đi của CHÍNH em rồi khớp theo ảnh trận;
 //    bạn khác vẽ trễ 100 ms, nội suy giữa hai ảnh. Đạn: phòng gửi một sự kiện mỗi loạt, máy em tự sinh 1–5 viên theo cấp và cho bay.
 //    Tự ngắm của em chạy cả ở máy (cùng hàm của lõi) để vẽ đường ngắm ngay, không chờ mạng.
-import { CAP, GIAY_NGHI, GIAY_VAN, MAU_MAX, R, R_DAN, SAN, TAM_DAN, TEN_NGUYEN_TO, TOC_DAN, aiDi, buocDi, buocTran, chonMuc, dungVatCan, laySuKien, taoTran, vanMoi, xepBang, type LoaiVp, type SuKien, type Tran } from '../../lib/dau-ion/loi'
+import { CAP, GIAY_NGHI, GIAY_VAN, MAU_MAX, R, R_DAN, SAN, TAM_DAN, TEN_NGUYEN_TO, TOC_DAN, TOI_DA, TOI_THIEU, aiDi, buocDi, buocTran, chonMuc, dungVatCan, laySuKien, taoTran, vanMoi, xepBang, type LoaiVp, type SuKien, type Tran } from '../../lib/dau-ion/loi'
 import { maYDinh, type Anh } from '../../lib/dau-ion/goi'
 import type { Canh, DanVe, GheVe, VpVe } from './dau-ion-ve'
 
@@ -27,6 +27,8 @@ export interface BoChay {
   conNghi(nay: number): number
   vanMoi(): void
   phu(): string
+  /** Sân đang chờ bạn (dưới 2 người thật): đồng hồ đứng, chưa đấu. */
+  cho(): boolean
 }
 
 const BUOC_MAY = 1 / 60
@@ -68,6 +70,7 @@ export class TranAI implements BoChay {
   conNghi(nay: number): number { return Math.max(0, (this.nghiDen - nay) / 1000) }
   vanMoi(): void { vanMoi(this.tr); this.tr.su = []; this.bang = null; this.du = 0 }
   phu(): string { return 'Chơi với A.I tại máy · em + 5 A.I' }
+  cho(): boolean { return false }
 }
 
 interface AnhCo { t: number; a: Anh }
@@ -242,9 +245,6 @@ export class TranMang implements BoChay {
   conNghi(nay: number): number { return Math.max(0, (this.nghiDen - nay) / 1000) }
   /** «Chơi ván mới»: phòng bắt ván mới khi mọi bạn thật trong sân cùng bấm (hoặc hết 6 giây). */
   vanMoi(): void { /* gửi ở lớp mạng */ }
-  phu(): string {
-    let that = 0, ai = 0
-    for (const d of this.ds.values()) if (d.ai) ai++; else that++
-    return `Sân ${this.so} · ${that} bạn${ai ? ` + ${ai} A.I` : ''}`
-  }
+  phu(): string { return this.cho() ? `Sân ${this.so} · đang chờ bạn thứ 2` : `Sân ${this.so} · ${this.ds.size}/${TOI_DA} bạn` }
+  cho(): boolean { return !this.bang && this.ds.size < TOI_THIEU }
 }

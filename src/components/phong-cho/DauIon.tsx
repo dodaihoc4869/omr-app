@@ -137,8 +137,8 @@ export default function DauIon({ maCa, veDau, batDau, onBatDau }: DauIonProps) {
     : mang === 'het-ve' ? 'Vé vào sảnh đấu đã hết hạn. Em vẫn chơi được với A.I tại máy.'
     : mang === 'may-khac' ? 'Em đang mở Đấu Nguyên Tử ở máy hoặc tab khác.'
     : mang === 'day' ? 'Sảnh đấu đã đủ người. Em chơi với A.I trong lúc chờ nhé.'
-    : sanh ? `Sân ${sanh.so} · ${sanh.that ? `${sanh.that}/${TOI_DA} bạn đang chơi` : 'A.I vào cho đủ 4'} · ván 60 giây`
-    : `Tối đa ${TOI_DA} bạn một sân · ván 60 giây`
+    : sanh ? `Sân ${sanh.so} · ${sanh.that >= 2 ? `${sanh.that}/${TOI_DA} bạn đang chơi` : sanh.that ? '1 bạn đang chờ đối thủ' : 'chưa có ai — em vào trước, có bạn vào là đấu'} · ván 60 giây`
+    : `2–${TOI_DA} bạn một sân · ván 60 giây`
 
   return <section className="dn-the" aria-label="Mini-game Đấu Nguyên Tử">
     <div className="dn-dau"><div><div className="dn-mat">CHƠI MỘT CHÚT TRONG LÚC CHỜ</div><h2>Đấu Nguyên Tử</h2></div><div className="dn-thang"><span>Thắng hôm nay</span><b className="so">{thang}</b></div></div>
@@ -185,7 +185,7 @@ interface ManTranProps {
   bo: BoChay; huyVong: { current: (() => void) | null }; pu: string; matMang: number
   onRoi: () => void; onXong: (bang: DongBang[], emId: number) => void; onVanMoi: () => void; onPu?: (i: number) => void
 }
-interface Hud { mau: number; cap: number; e: number; ha: number; nt: number; con: number }
+interface Hud { mau: number; cap: number; e: number; ha: number; nt: number; con: number; choBan: boolean }
 interface Tin { id: number; chu: string; k: string; cap?: number; t: number }
 const RK = 54
 
@@ -315,8 +315,8 @@ function ManTran({ bo, huyVong, pu, matMang, onRoi, onXong, onVanMoi, onPu }: Ma
       }
       if (ve) { ve.diToi = diToi; ve.ve(sc, bo.emId, nay, (id) => bo.ten(id)) }
       if (tins.length && nay - tins[0].t > 1800) { tins = tins.filter((x) => nay - x.t <= 1800); setTinDs(tins) }
-      const em = bo.em(), con = Math.ceil(bo.con())
-      if (em) { const k = `${em.mau}|${em.cap}|${em.e}|${em.ha}|${em.nt}|${con}`; if (k !== khoaHud) { khoaHud = k; setHud({ ...em, con }) } }
+      const em = bo.em(), con = Math.ceil(bo.con()), choBan = bo.cho()
+      if (em) { const k = `${em.mau}|${em.cap}|${em.e}|${em.ha}|${em.nt}|${con}|${choBan}`; if (k !== khoaHud) { khoaHud = k; setHud({ ...em, con, choBan }) } }
       const ds = bo.xep(), k2 = ds.map((d) => `${d.id}.${d.ha}.${d.cap}`).join(',')
       if (k2 !== khoaXh) { khoaXh = k2; setXh(ds) }
       const kq = bo.ket()
@@ -358,10 +358,11 @@ function ManTran({ bo, huyVong, pu, matMang, onRoi, onXong, onVanMoi, onPu }: Ma
           : <>{Array.from({ length: can }, (_, k) => <i key={k} data-co={k < hud.e ? '' : undefined} />)}<span className="so">Electron {hud.e}/{can}</span></>}</div>
       </div>}
       <div className="dn-tin" aria-live="polite">{tinDs.map((x) => <div key={x.id} data-k={x.k} className={x.cap ? `dn-c${x.cap}` : undefined}>{x.chu}</div>)}</div>
-      <div className="dn-so-o"><div className="dn-o"><small>Còn</small><b className="so">{Math.floor(giay / 60)}:{String(giay % 60).padStart(2, '0')}</b></div><div className="dn-o dn-o-ha"><small>Hạ</small><b className="so">{hud?.ha ?? 0}</b></div></div>
+      <div className="dn-so-o"><div className="dn-o"><small>{hud?.choBan ? 'Ván' : 'Còn'}</small><b className="so">{hud?.choBan ? 'Chờ' : `${Math.floor(giay / 60)}:${String(giay % 60).padStart(2, '0')}`}</b></div><div className="dn-o dn-o-ha"><small>Hạ</small><b className="so">{hud?.ha ?? 0}</b></div></div>
     </div>
     <div className="dn-khung" ref={khung}>
       <canvas ref={cv} tabIndex={0} aria-label="Sân đấu. Kéo ở bất kỳ đâu để đi, chạm một điểm để đi tới đó; máy tính: rê chuột trên sân hoặc W A S D. Súng tự ngắm bạn gần nhất và tự bắn." onContextMenu={(e) => e.preventDefault()} />
+      {hud?.choBan && !ket && <div className="dn-cho-ban" role="status"><b>Đang chờ bạn vào sân</b><span>Có thêm 1 bạn bấm «Vào sân đấu» là ván bắt đầu ngay. Tối đa {TOI_DA} bạn một sân.</span></div>}
       {khongVe && <div className="dn-loi">Máy này chưa vẽ được sân đấu. Em vẫn chờ thầy bắt đầu bình thường.</div>}
       {ket && <><div className="dn-mo" aria-hidden="true" />
         <div className="dn-ket" role="dialog" aria-labelledby="dn-ket-tieu-de">
