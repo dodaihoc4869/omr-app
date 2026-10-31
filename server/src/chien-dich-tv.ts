@@ -9,7 +9,7 @@ import { chayDdlMotLan } from './ddl-mot-lan'
 import { TU_NGAY } from './loi-hoc-luat'
 
 export const DDL_CHIEN_DICH_TV: readonly string[] = [
-  'CREATE TABLE IF NOT EXISTS chien_dich_tv (sbd TEXT NOT NULL, chien_dich_id TEXT NOT NULL, PRIMARY KEY (sbd, chien_dich_id)) WITHOUT ROWID',
+  'CREATE TABLE IF NOT EXISTS chien_dich_tv (sbd TEXT NOT NULL, chien_dich_id TEXT NOT NULL, PRIMARY KEY (sbd, chien_dich_id))',
   'CREATE INDEX IF NOT EXISTS idx_chien_dich_tv_cd ON chien_dich_tv(chien_dich_id)',
   'CREATE TABLE IF NOT EXISTS chien_dich_tv_dau (chien_dich_id TEXT PRIMARY KEY, luc TEXT NOT NULL)',
   `CREATE TRIGGER IF NOT EXISTS chien_dich_tv_sau_them AFTER INSERT ON chien_dich BEGIN

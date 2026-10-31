@@ -78,7 +78,8 @@ it('đàn đọc dồn: D1 chậm hơn 240 ms ⇒ lượt đồng thời CHỜ l
   const d = taoD1That()
   const goc = d.env as unknown as Env
   let lan = 0
-  const cham = (q: string) => /FROM chien_dich WHERE trang_thai <> 'da_huy' OR|FROM cau_hinh WHERE khoa/.test(q)
+  // 31/10: đường của em đọc danh sách chiến dịch bằng câu LAI (chien-dich-tv.ts) — cùng luật chờ lượt đang đọc
+  const cham = (q: string) => /FROM chien_dich WHERE trang_thai <> 'da_huy' OR|FROM chien_dich c LEFT JOIN chien_dich_tv_dau|FROM cau_hinh WHERE khoa/.test(q)
   const env = { ...goc, DB: { ...goc.DB, prepare: (q: string) => {
     const st = (goc.DB as unknown as { prepare(x: string): Record<string, (...a: unknown[]) => unknown> }).prepare(q)
     if (!cham(q)) return st

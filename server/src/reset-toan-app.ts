@@ -174,6 +174,8 @@ export const BANG_GIU: readonly string[] = [
   // GAME HÓA 2.0 (migration-2709-game-hoa-2.sql) — bảng SINH SAU lần 21/09. Job 21/09 đã `xong` (không bao giờ chạy lại); xếp GIỮ cho job ấy = KHÔNG đụng,
   // y hệt "chưa phân loại" (chỉ khác là không bị báo). Phân loại THẬT cho lần 2 nằm ở `reset-hoa2.ts` (`srs2_ke_hoach`, `ruong_bat_linh` XOÁ; `chien_dich`, `srs2_day_lai` GIỮ).
   'chien_dich', 'srs2_ke_hoach', 'srs2_day_lai', 'ruong_bat_linh',
+  // BẢNG TRA THÀNH VIÊN CHIẾN DỊCH (chien-dich-tv.ts, 31/10): phản chiếu `chien_dich.sbd_json` (đã GIỮ) + dấu lập chỉ mục ⇒ GIỮ cùng chiến dịch.
+  'chien_dich_tv', 'chien_dich_tv_dau',
   // Nhãn "Thầy đã chữa" (dau-gio.ts, 29/09) — đi cùng mốc dạy lại `srs2_day_lai` ⇒ GIỮ.
   'thay_da_chua',
   // THƯỞNG PHẠT KIỂU DUOLINGO (migration-2610-thuong-phat.sql, 26/10) — sinh SAU lần 21/09 (job đã xong): GIỮ = không đụng. Phân loại thật cho lần 2 ở reset-hoa2.ts.
