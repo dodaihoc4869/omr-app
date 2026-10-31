@@ -169,6 +169,25 @@ describe('máy em: phần hôm nay + lần nộp chờ gửi', () => {
     expect(layNapTruocCauSuaNgay('t', 'C', Date.parse('2026-11-01T03:00:00Z'))).toBeNull()
   })
 
+  it('tải NỐI TIẾP từng lượt 12 câu tới HẾT phần hôm nay (thầy 31/10 «Sao lại tải sẵn tối đa 12 câu thôi»); lượt lỗi ⇒ dừng', async () => {
+    vi.useFakeTimers({ now: Date.parse('2026-10-31T03:00:00Z') })
+    try {
+      const ds = Array.from({ length: 30 }, (_, i) => `Q${i}`)
+      expect(await napTruocSuaNgay('t', ds)).toBe(12)
+      await vi.advanceTimersByTimeAsync(8_000)
+      await vi.advanceTimersByTimeAsync(8_000)
+      expect(api.apiGonMoNgay.mock.calls.map((c) => (c[1] as string[]).length)).toEqual([12, 12, 6])
+      await vi.advanceTimersByTimeAsync(60_000)
+      expect(api.apiGonMoNgay).toHaveBeenCalledTimes(3)
+      for (const q of ds) expect(layNapTruocCauSuaNgay('t', q)).toMatchObject({ dotId: `D-${q}` })
+      // lượt không về câu nào ⇒ không nối tiếp (không dội máy chủ)
+      xoaNapTruocCauSua(); vi.clearAllMocks(); api.apiGonMoNgay.mockResolvedValue([])
+      expect(await napTruocSuaNgay('t', ds.map((q) => `R${q}`))).toBe(0)
+      await vi.advanceTimersByTimeAsync(60_000)
+      expect(api.apiGonMoNgay).toHaveBeenCalledTimes(1)
+    } finally { vi.useRealTimers() }
+  })
+
   it('mất mạng ⇒ không hỏi; lỗi ⇒ thôi', async () => {
     const onl = vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false)
     expect(await napTruocSuaNgay('t', ['A'])).toBe(0)

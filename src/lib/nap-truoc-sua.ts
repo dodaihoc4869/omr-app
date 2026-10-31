@@ -4,7 +4,7 @@
 // An toàn: `mo-dot` là lệnh MỞ (không chấm, không ghi tiến độ của em — chỉ giao đợt nếu chưa có, đã có thì không đổi gì); đề về chỉ là đề công khai, đáp án vẫn chỉ ra sau khi nộp.
 // Dùng MỘT lần rồi bỏ (lần mở lại sau khi làm / lần «Thử lại» luôn hỏi tươi ⇒ số «lần làm» không bao giờ cũ); quá hạn HAN_NAP_TRUOC_MS ⇒ bỏ. Chỉ nạp kết quả `ok` — lỗi không nằm lại.
 // Nơi gọi: màn Tự sửa lỗi (câu kế của Việc hôm nay, loại câu đang mở) và Lộ trình (câu đầu tiên chưa xong). Mảnh nạp lười — không cộng byte lượt mở cổng.
-// 31/10 (thầy «làm cả cho tự sửa lỗi»): TẢI SẴN PHẦN HÔM NAY — một lượt mở sẵn tới 12 câu chưa xong (`gon-mo-ngay`), giữ cả ngày trên máy (bộ nhớ + localStorage) ⇒ bấm câu nào
+// 31/10 (thầy «làm cả cho tự sửa lỗi»): TẢI SẴN PHẦN HÔM NAY — từng lượt 12 câu chưa xong (`gon-mo-ngay`), nối tiếp tới HẾT phần hôm nay, giữ cả ngày trên máy (bộ nhớ + localStorage) ⇒ bấm câu nào
 // cũng vào ngay, mất mạng vẫn làm được (gói `dm` cho máy em chấm tại chỗ — sua-loi-may.ts). Lần nộp không gửi được vì mất mạng ⇒ xếp hàng trên máy, có mạng gửi lại
 // theo đúng thứ tự (máy chủ chống trùng theo khoá) — `xepSuaChoGui` / `guiLaiSuaCho`.
 import { apiGonMoNgay, apiGonNop, apiMoDot, type KetQuaGon } from './chua-cau-sai-api'
@@ -54,7 +54,7 @@ export function layNapTruocCauSua(token: string, qid: string, nayMs = Date.now()
 }
 
 /** Bỏ mọi kết quả nạp trước (em vừa làm xong một câu / đổi tài khoản / test). */
-export function xoaNapTruocCauSua(): void { KHO.clear(); NGAY.clear(); ngayDaDoc = '' }
+export function xoaNapTruocCauSua(): void { KHO.clear(); NGAY.clear(); ngayDaDoc = ''; if (henTiep) { clearTimeout(henTiep); henTiep = undefined } }
 
 // ---------------------------------------------------------------------------- PHẦN HÔM NAY (giữ cả ngày, dùng một lần mỗi câu)
 const ngayVnCua = (ms: number) => new Date(ms + 7 * 3_600_000).toISOString().slice(0, 10)
@@ -100,11 +100,21 @@ function boNgay(qid: string, nayMs: number): void {
 /** Câu đã có bản tải sẵn hôm nay (còn chưa dùng)? */
 export const coSuaNgay = (qid: string, nayMs = Date.now()): boolean => !!docKhoNgay(nayMs) && NGAY.has(qid)
 
-/** TẢI SẴN các câu `qids` (Việc hôm nay, chưa xong) — một lượt, không chờ. Câu đã có bản / vừa hỏi trong 2 phút ⇒ bỏ qua. Lỗi ⇒ thôi (bấm câu vẫn mở như cũ). */
+/** Số câu mỗi lượt tải (khớp trần máy chủ `TOI_DA_TAI_SAN_SUA`): mỗi câu tải sẵn tốn ở máy chủ y như em bấm mở câu ⇒ chia lượt nhỏ cho D1 không dồn cục. */
+const MOI_LUOT = 12
+/** Lượt kế tiếp hẹn sau 3–8 giây (lệch ngẫu nhiên giữa các máy) cho tới khi CẢ phần hôm nay nằm trên máy (thầy 31/10 «Sao lại tải sẵn tối đa 12 câu thôi»). */
+let henTiep: ReturnType<typeof setTimeout> | undefined
+const canTai = (token: string, qids: string[], nayMs: number) =>
+  [...new Set(qids)].filter((q) => !!q && !NGAY.has(q) && !KHO.has(khoa(token, q)) && nayMs - (daXin.get(q) ?? 0) >= 2 * 60_000)
+
+/** TẢI SẴN các câu `qids` (Việc hôm nay, chưa xong) — từng lượt MOI_LUOT câu, lượt sau tự nối tiếp tới hết, không chờ. Câu đã có bản / vừa hỏi trong 2 phút ⇒ bỏ qua.
+ *  Lỗi / lượt không về câu nào ⇒ thôi (bấm câu vẫn mở như cũ). Trả số câu của lượt ĐẦU. */
 export function napTruocSuaNgay(token: string, qids: string[], nayMs = Date.now()): Promise<number> {
   if (!token || !docKhoNgay(nayMs) || (typeof navigator !== 'undefined' && navigator.onLine === false)) return Promise.resolve(0)
-  const can = [...new Set(qids)].filter((q) => !!q && !NGAY.has(q) && !KHO.has(khoa(token, q)) && nayMs - (daXin.get(q) ?? 0) >= 2 * 60_000).slice(0, 12)
+  const tatCa = canTai(token, qids, nayMs)
+  const can = tatCa.slice(0, MOI_LUOT)
   if (!can.length) return Promise.resolve(0)
+  if (henTiep) { clearTimeout(henTiep); henTiep = undefined }
   for (const q of can) daXin.set(q, nayMs)
   const dau = ngayDaDoc
   return apiGonMoNgay(token, can).then((ds) => {
@@ -112,6 +122,7 @@ export function napTruocSuaNgay(token: string, qids: string[], nayMs = Date.now(
     let n = 0
     for (const d of ds) if (d.kq.ok && d.kq.gon?.ok && !NGAY.has(d.qid)) { NGAY.set(d.qid, d.kq); n++ }
     if (n) luuKhoNgay(Date.now())
+    if (n && tatCa.length > can.length) henTiep = setTimeout(() => { henTiep = undefined; void napTruocSuaNgay(token, qids) }, 3000 + Math.random() * 5000)
     return n
   }, () => 0)
 }
