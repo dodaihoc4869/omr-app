@@ -60,10 +60,18 @@ describe('Điểm Thật một tuần', () => {
     ...luot(12, (i) => ({ cau: `S${i}`, dung: lamLai(i), ngay: NGAY[1]!, luc: `${NGAY[1]}T01:${String(i).padStart(2, '0')}:00Z` })),
     ...luot(12, (i) => ({ cau: `S${i}`, songSinh: true, dung: banKhac(i), ngay: NGAY[2]!, luc: `${NGAY[2]}T01:${String(i).padStart(2, '0')}:00Z` })),
   ]
-  it('thuộc mà không hiểu: câu từng sai — làm lại chính câu ấy thì đúng, gặp bản khác thì sai ⇒ phạt', () => {
+  it('thuộc mà không hiểu: câu từng sai — làm lại chính câu ấy thì đúng, gặp bản khác thì sai ⇒ trừ điểm, CHƯA gắn Đối phó (chưa hiểu ≠ đối phó)', () => {
     const k = danhGiaEm(vao([...luot(20, () => ({})), ...cauTungSai(() => true, (i) => i < 3)]))
-    expect(k.phat.find((p) => p.ma === 'thuocKhongHieu')).toBeTruthy()
+    expect(k.phat.find((p) => p.ma === 'thuocKhongHieu')).toMatchObject({ diem: 15 })
+    expect(k.phat.find((p) => p.ma === 'thuocKhongHieu')?.xau).toBeUndefined()
     expect(k.soLieu).toMatchObject({ dungLamLaiGoc: 1, dungBanKhacCauSai: 0.25 })
+    expect(k.bacTuan).toBe(1)
+  })
+  it('…làm lại câu gốc mà BẤM NGAY chưa đọc xong đề (nhớ chữ đáp án) ⇒ tín hiệu xấu ⇒ Đối phó', () => {
+    const l = cauTungSai(() => true, (i) => i < 3).map((x) => (x.ngay === NGAY[1] ? { ...x, ma: 1 as const, r: 0.2 } : x))
+    const k = danhGiaEm(vao([...luot(20, () => ({})), ...l]))
+    expect(k.phat.find((p) => p.ma === 'thuocKhongHieu')).toMatchObject({ xau: true })
+    expect(k.bacTuan).toBe(3)
   })
   it('bản khác thấp NHƯNG làm lại câu gốc cũng thấp (câu khó với em, em đang học) ⇒ không phạt; không so với mọi câu gốc (31/10)', () => {
     const k = danhGiaEm(vao([...luot(40, () => ({ dung: true })), ...cauTungSai((i) => i < 4, (i) => i < 3)]))
