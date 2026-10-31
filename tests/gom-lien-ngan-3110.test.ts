@@ -4,7 +4,7 @@
 // cho đúng `.first() / .first(cot) / .all() / .run() / batch()` như gửi thẳng; tham số không an toàn với JSON ⇒ gửi thẳng.
 import { describe, expect, it } from 'vitest'
 import { taoD1That } from './_d1-that'
-import { NganGomD1, thamSoAnToan, type CauGui } from '../server/src/gom-lien-ngan'
+import { NganGomD1, duongGuiQuaNganGom, thamSoAnToan, type CauGui } from '../server/src/gom-lien-ngan'
 import { gomD1 } from '../server/src/gom-d1'
 import type { D1Database, D1Result, Env } from '../server/src/kieu'
 
@@ -24,6 +24,19 @@ function dung() {
 const bo = (r: { kq?: D1Result[] }) => (r.kq ?? []).map((x) => x.results)
 
 describe('ngăn gom D1 liên isolate', () => {
+  it('đầu nối tới ngăn gom tạo TRONG MỖI lần gửi (bộ gom dùng chung cả isolate — đầu nối của ngăn này không được dùng ở ngăn khác: lượt 15)', async () => {
+    const x = dung()
+    let get = 0
+    const ns = { idFromName: (t: string) => ({ toString: () => t }), get: () => { get++; return { fetch: (r: Request) => x.ngan.fetch(r) } } }
+    const qua = duongGuiQuaNganGom({ DB: x.d.env.DB, GOM_D1: ns, BAT_GOM_LIEN_NGAN: '1' } as unknown as Env)!
+    expect(qua).toBeTypeOf('function')
+    expect(get).toBe(0)
+    await qua([{ q: 'SELECT 1 AS a', v: null }])
+    await qua([{ q: 'SELECT 2 AS a', v: null }])
+    expect(get).toBe(2)
+    expect(duongGuiQuaNganGom({ DB: x.d.env.DB, GOM_D1: ns } as unknown as Env)).toBeUndefined() // công tắc tắt ⇒ gửi thẳng
+  })
+
   it('ba nơi gửi cùng lúc ⇒ một lượt gửi D1; kết quả chia đúng từng nơi (cả ghi)', async () => {
     const x = dung()
     const [a, b, c] = await Promise.all([
