@@ -17,6 +17,8 @@ import { docSbdHs, ghiXongHomNay } from '../../lib/tu-sua-viec-hom-nay'
 import { docChuaGonDang, luuChuaGonDang, luuXemLai, xoaChuaGonDang } from '../../lib/xem-lai-sua'
 import { sinhMaNgauNhien } from '../../lib/thiet-bi'
 import { phanHoi } from '../../lib/phan-hoi'
+import { goiChoLan, ketSuaMay, moDmSua } from '../../lib/sua-loi-may'
+import { guiLaiSuaCho, xepSuaChoGui } from '../../lib/nap-truoc-sua'
 // «Trong» HS (thầy 27/10 «Phần sửa câu tôi chưa thấy giao diện của doligo»): cùng logic, cây trình bày kiểu Duolingo ở ChuaGonDuo.tsx.
 // Mảnh RIÊNG nạp lười (máy tắt «Trong» không tải; ManChuaCauSai nạp trước lúc mở đợt ⇒ không thêm vòng chờ).
 // Khung Duo: nạp lười như cũ, NHƯNG nhớ mô-đun ngay khi đã về (`napKhungDuo`, gọi lúc rảnh từ danh sách Tự sửa lỗi) ⇒ lần dựng sau dùng THẲNG, không qua `lazy` — React.lazy luôn treo một lượt dựng
@@ -95,6 +97,8 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep, 
   const luu = useRef<Promise<void> | null>(null)
   const luuLoi = useRef(false)
   const sk2 = useRef<{ tem: string; lan: number } | null>(dang0?.sk2 ?? null)
+  /** Lượt hiện trên màn (tăng mỗi lần nộp / mở lần sau): phản hồi đầy đủ của lần TRƯỚC tới muộn (em đã «Làm lại») không được vẽ đè lên lần đang làm. */
+  const luot = useRef(0)
   useEffect(() => {
     const s = docSbdHs()
     if (!s || khep || !mo.ok) return
@@ -106,19 +110,26 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep, 
     if (!khoa.current) khoa.current = sinhMaNgauNhien()
     setBan(true); setLoi('')
     let daRung = false
+    const luotNay = ++luot.current
     const khiTam = (t: KetQuaGon) => {
-      if (!song.current || !t.ket) return
+      if (!song.current || !t.ket || luot.current !== luotNay) return
       sk2.current = t.ket === 'goi_y' && t.sk2 && t.lan ? { tem: t.sk2, lan: t.lan + 1 } : null
       daRung = true; phanHoi(t.ket === 'tu_sua' || t.ket === 'xong_phan' ? 'dung' : 'sai') // rung phản hồi (chỉ «Trong»)
       setKq(ketTuTam(t, mo.de)); setBan(false)
     }
     const traLoi = tra.trim(), banNop = mo.ban, truoc = luu.current, khoaNop = khoa.current
+    // ĐÁP ÁN TRÊN MÁY (31/10, sua-loi-may.ts): gon-mo đã gửi gói `dm` ⇒ máy em chấm NGAY (đúng luật dòng tạm của máy chủ), không chờ mạng; gửi gon-nop ở nền để
+    // MÁY CHỦ CHẤM LẠI (bản đầy đủ thay dòng tạm, khác ⇒ theo máy chủ). Sai lần 1 ⇒ lần 2 cùng bản dựng tại máy (`goiChoLan`), khỏi chờ tem lần 2.
+    const g = mo.dm ? await moDmSua(mo.dm, dotId, banNop).then((x) => (x ? goiChoLan(x, mo.lan) : null)) : null
+    const taiMay = g ? (ketSuaMay(g, traLoi) as unknown as KetQuaGon) : null
+    if (taiMay) { khiTam(taiMay); if (taiMay.ket === 'goi_y' && luot.current === luotNay) sk2.current = { tem: '', lan: (taiMay.lan ?? 1) + 1 } }
     const chay = (async () => {
       if (truoc) await truoc // lần nộp trước của đợt này còn ghi nền (em vừa «Làm lại» ngay) ⇒ gửi SAU nó: máy chủ đếm lần theo các dòng đã ghi
+      if (taiMay) await guiLaiSuaCho(token) // lần nộp còn chờ gửi từ lúc mất mạng (nếu có) đi TRƯỚC — đúng thứ tự lần
       // Lỗi đường truyền (không có mã lỗi của máy chủ) ⇒ thử lại cùng khoá (máy chủ chống trùng theo khoá) — em có thể đã sang câu khác, không ai bấm lại được.
       let r: KetQuaGon = { ok: false }
       for (let lan = 0; lan < 3; lan++) {
-        r = mo.sk
+        r = mo.sk && !taiMay
           ? await apiGonNopLuong(token, { dotId, ban: banNop, traLoi, khoa: khoaNop, qid, sk: mo.sk }, khiTam)
           : await apiGonNop(token, dotId, banNop, traLoi, khoaNop, qid)
         if (r.ok || r.ma || lan >= 2) break
@@ -126,7 +137,20 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep, 
         await new Promise((x) => setTimeout(x, 1500 * (lan + 1)))
       }
       if (r.ok && r.ket && KHEP.has(r.ket)) { ghiXong(); luuXemLai(docSbdHs(), qid, { ...r, dotId }) } // ghi NGAY khi có kết quả đầy đủ (kể cả máy em đã rời màn); nhớ để «Xem lại» tức thì (xem-lai-sua.ts)
+      // Mất mạng mà máy em đã chấm xong ⇒ giữ kết quả trên màn, xếp lần nộp chờ gửi (có mạng gửi lại đúng thứ tự — nap-truoc-sua.ts).
+      const choGui = !r.ok && !r.ma && !!taiMay
+      if (choGui) {
+        xepSuaChoGui({ dotId, ban: banNop, traLoi, khoa: khoaNop, qid, luc: Date.now() })
+        if (taiMay.ket && KHEP.has(taiMay.ket)) ghiXong() // câu đã khép theo máy em ⇒ xong phần hôm nay trên máy; máy chủ ghi khi lần chờ gửi tới
+      }
+      const conLuot = luot.current === luotNay
       if (!song.current) return
+      if (choGui) {
+        if (conLuot) { khoa.current = ''; setBan(false); setLoi('Máy đang mất mạng: kết quả đã chấm trên máy, có mạng máy tự gửi lên.') }
+        luuLoi.current = false
+        return
+      }
+      if (!conLuot) { luuLoi.current = !r.ok; return } // em đã sang lần sau: không vẽ đè (lần sau tự đợi lượt này rồi mới gửi)
       setBan(false)
       if (!r.ok) {
         // Máy chủ đã từ chối hẳn (đổi bản / hết lần) ⇒ khoá mới cho lần sau; lỗi mạng ⇒ giữ khoá để gửi lại đúng lần này.
@@ -161,9 +185,10 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep, 
     // Có tem lần 2 ⇒ mở NGAY (lần nộp kế tự đợi lượt ghi lần 1 trong `nop`); không thì gon-mo đọc số lần đã ghi ⇒ chờ lượt ghi trước.
     if (!s2 && luu.current) { setBan(true); await luu.current; if (!song.current) return; if (luuLoi.current) { setBan(false); return } }
     if (s2) {
-      // Lần 2 cùng bản (tem do máy chủ cấp lúc chấm lần 1): mở NGAY tại máy em, khỏi gọi gon-mo.
+      // Lần 2 cùng bản (tem do máy chủ cấp lúc chấm lần 1, hoặc dựng tại máy từ gói `dm`): mở NGAY tại máy em, khỏi gọi gon-mo.
       sk2.current = null
-      setMo((m) => ({ ...m, lan: s2.lan, tuSuaNeuDung: false, sk: s2.tem })); setKq(null); setTra(''); setXemGiai(false); setBan(false)
+      luot.current++; khoa.current = '' // lần mới: khoá chống lặp mới; phản hồi muộn của lần 1 không vẽ đè
+      setMo((m) => ({ ...m, lan: s2.lan, tuSuaNeuDung: false, sk: s2.tem || undefined })); setKq(null); setTra(''); setXemGiai(false); setBan(false); setLoi('')
       requestAnimationFrame(() => tieuDe.current?.focus())
       return
     }

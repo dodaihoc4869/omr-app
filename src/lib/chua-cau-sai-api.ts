@@ -405,6 +405,8 @@ export interface KetQuaGon {
   tam?: boolean
   /** Tem của LẦN 2 (cùng bản) — chỉ có ở dòng `tam` khi sai lần 1: «Làm lại câu này» mở tại máy em. */
   sk2?: string
+  /** ĐÁP ÁN TRÊN MÁY (31/10, src/lib/sua-loi-may.ts): «khoá.gói» phần chấm của lần này — máy em chấm NGAY; máy chủ vẫn chấm lại ở gon-nop. */
+  dm?: string
   /** Phần chi tiết của dòng `tam` (đáp án + lời giải + ảnh sau lời giải) — chỉ khi đúng / hết lần thử; máy em ghép với đề đã có thành `chiTiet`. */
   ct?: { dapAn: string; loiGiai: unknown; hinhSau: { src: string; viTri: string; alt?: string }[] }
 }
@@ -415,4 +417,11 @@ export async function apiGonMo(token: string, dotId: string, qid?: string): Prom
 }
 export async function apiGonNop(token: string, dotId: string, ban: string, traLoi: string, khoa: string, qid?: string): Promise<KetQuaGon> {
   return docGon(await goi('gon-nop', token, { dotId, ban, traLoi, khoa, ...(qid ? { qid } : {}) }))
+}
+/** TẢI SẴN PHẦN SỬA LỖI HÔM NAY (31/10, server `gonMoNgay`): mỗi câu như `apiMoDot(…, gon = true)`. Lỗi / máy chủ cũ ⇒ []. */
+export async function apiGonMoNgay(token: string, qids: string[]): Promise<{ qid: string; kq: KetQuaDot & { gon?: KetQuaGon } }[]> {
+  const j = await goi('gon-mo-ngay', token, { qids })
+  if (!j?.ok || !Array.isArray(j.ds)) return []
+  return (j.ds as Obj[]).filter((x) => !!x && x.ok === true && typeof x.qid === 'string' && typeof x.dotId === 'string')
+    .map((x) => ({ qid: chu(x.qid), kq: { ...(x as unknown as KetQuaDot), ...(x.gon && typeof x.gon === 'object' ? { gon: docGon(x.gon as Obj) } : {}) } }))
 }
