@@ -100,12 +100,13 @@ describe('damBaoBangOmni — bảng chỉ-thêm khớp migration-0510', () => {
     const sqlCua = (sql: DatabaseSync) => JSON.stringify(sql.prepare("SELECT name, REPLACE(REPLACE(sql, char(10), ' '), '  ', ' ') AS s FROM sqlite_master WHERE type = 'index' AND sql IS NOT NULL ORDER BY name").all())
     expect(sqlCua(b)).toBe(sqlCua(a))
   })
-  it('chạy một lần mỗi isolate (một batch), gọi lại không lỗi', async () => {
+  // 31/10 (ddl-mot-lan.ts): isolate đọc tên đối tượng một lần; bảng OMNI đã có (D1 này nạp mọi migration) ⇒ KHÔNG gửi lô nào; trước: một lô mỗi isolate.
+  it('chạy tối đa một lần mỗi isolate, bảng đã có ⇒ không lô ghi nào; gọi lại không lỗi', async () => {
     const { d, env } = dung()
     const truoc = d.soLenh.batch
     await damBaoBangOmni(env)
     await damBaoBangOmni(env)
-    expect(d.soLenh.batch - truoc).toBe(1)
+    expect(d.soLenh.batch - truoc).toBe(0)
   })
 })
 

@@ -16,15 +16,29 @@ const LENH_4 = [
 ]
 
 describe('DDL một lần mỗi isolate', () => {
-  it('4 lệnh DDL ⇒ 1 vòng lần đầu (trước: 4 vòng MỖI lượt), 0 vòng các lượt sau', async () => {
+  // 31/10: isolate đọc MỘT lần tên đối tượng (sqlite_master) ⇒ bảng chưa có: đọc + một lô tạo (2 vòng, chỉ lần đầu trên D1 trống); bảng ĐÃ có (D1 thật):
+  // 1 vòng ĐỌC, KHÔNG lô ghi nào (trước: 1 vòng GHI mỗi isolate mới).
+  it('4 lệnh DDL ⇒ lần đầu trên D1 trống: đọc tên + 1 lô; các lượt sau 0 vòng; isolate mới khi bảng đã có: 1 vòng đọc, không lô ghi', async () => {
     const d = taoD1That()
     const { env, d: dem } = demVongD1(d.env as unknown as Env)
     await chayDdlMotLan(env, 'ddl_thu', LENH_4)
-    expect(dem.vong).toBe(1)
+    expect(dem.vong).toBe(2)
     await chayDdlMotLan(env, 'ddl_thu', LENH_4)
     await chayDdlMotLan(env, 'ddl_thu', LENH_4)
-    expect(dem.vong).toBe(1)
+    expect(dem.vong).toBe(2)
     expect(d.dem('ddl_thu_a')).toBe(0) // bảng có thật
+    // isolate mới (D1 gốc khác, cùng dữ liệu): bảng đã có ⇒ không gửi lô DDL nào
+    let lo = 0
+    const goc = d.env.DB as unknown as { prepare(q: string): unknown; batch(x: unknown[]): unknown }
+    const env2 = { ...d.env, DB: { prepare: (q: string) => goc.prepare(q), batch: (x: unknown[]) => { lo++; return goc.batch(x) } } } as unknown as Env
+    await chayDdlMotLan(env2, 'ddl_thu', LENH_4)
+    expect(lo).toBe(0)
+    // một tên thiếu ⇒ chạy lô như cũ
+    d.sql.exec('DROP INDEX idx_ddl_thu_b_a')
+    const env3 = { ...d.env, DB: { prepare: (q: string) => goc.prepare(q), batch: (x: unknown[]) => { lo++; return goc.batch(x) } } } as unknown as Env
+    await chayDdlMotLan(env3, 'ddl_thu', LENH_4)
+    expect(lo).toBe(1)
+    expect(d.sql.prepare("SELECT COUNT(*) AS n FROM sqlite_master WHERE name = 'idx_ddl_thu_b_a'").get()).toEqual({ n: 1 })
   })
   it('ghiBatDau: lượt 2 chỉ còn câu INSERT (trước: DDL + INSERT mỗi lượt)', async () => {
     const d = taoD1That()

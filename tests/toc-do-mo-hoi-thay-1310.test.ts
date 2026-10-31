@@ -10,6 +10,7 @@ import path from 'node:path'
 import worker from '../server/src/index'
 import { gameToken } from '../server/src/game-v2-auth'
 import { goiWorker, taoD1That, type D1That } from './_d1-that'
+import { SQL_BANG as SQL_BANG_HOI_TRO_LY } from '../server/src/hoi-tro-ly'
 import type { Env } from '../server/src/kieu'
 
 const MOC = { coHoSo: [5, 2], chiHoi: [4, 2], hoi: [3, 3] }
@@ -79,6 +80,8 @@ async function chuanBi() {
     expect(await thay(d, '/kho/loi-giai/nop', { qid: v.qid, bam: v.bam, hoSo: { ...h, qid: v.qid, bam: v.bam, co: [] } })).toMatchObject({ ok: true })
   }
   d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES('S-TD','Thử','12','mk','x')").run()
+  // 31/10: isolate mới đọc tên đối tượng một lần rồi bỏ qua nhóm DDL đã có (ddl-mot-lan.ts) ⇒ kho đo có sẵn bảng sổ hỏi thầy như D1 thật (tạo từ 13/10).
+  for (const q of SQL_BANG_HOI_TRO_LY) d.sql.exec(q)
   return { d, token: await gameToken(d.env, 'S-TD') }
 }
 
