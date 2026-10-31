@@ -1,4 +1,4 @@
-# ĐO LỆNH NẶNG (chạy lại 31/10 ~08h: ngăn châu Á + mẫu [ngan-do]) THEO ĐƯỜNG (CHỈ ĐỌC, KHÔNG truy vấn D1) — thầy 30/10 21:35: «máy chủ thừa cho hàng trăm nghìn học sinh mà tối nào có 200 hs làm cũng kêu lag».
+# ĐO LỆNH NẶNG (chạy lại 31/10 ~10h45: sau #661 — ngăn trung chuyển sát D1, gom lệnh D1; + log lỗi + cau_hinh.ngan_dinh) THEO ĐƯỜNG (CHỈ ĐỌC, KHÔNG truy vấn D1) — thầy 30/10 21:35: «máy chủ thừa cho hàng trăm nghìn học sinh mà tối nào có 200 hs làm cũng kêu lag».
 # 1) wrangler tail 120 giây giờ cao điểm: theo đường (bỏ chuỗi hỏi, rút gọn mã) — số lần, CPU tb/p90/p99/max, thời gian tường tb/p99, kết cục.
 # 2) Workers Logs (observability) cùng phép gộp cho khung 19:00–21:30 VN nếu khoá có quyền.
 # 3) D1: truy vấn theo tổng thời gian và theo thời gian TB (lâu nhất) khung 19:00–21:30 VN, SQL rút gọn 400 ký tự. Không in SBD / tên / khoá.
@@ -45,9 +45,18 @@ jobs:
             const nd=[];for(const e of ev)for(const l of e.logs||[]){const m=(l.message||[]).join(" ");if(m.startsWith("[ngan-do]"))nd.push(m.slice(10))}
             const theoTram={},xlTheo={};for(const m of nd){const [duong,h]=m.split(" ");const t=(h||"").split(";");const tr=t[0]||"-";theoTram[tr]=(theoTram[tr]||0)+1;const xl=Number((t[2]||"").replace("xl=",""));if(Number.isFinite(xl)){(xlTheo[duong]=xlTheo[duong]||[]).push(xl)}}
             console.log("[ngan-do] mẫu:",nd.length,"· theo trạm:",JSON.stringify(theoTram),"· d1 mẫu:",nd.slice(0,8).map(m=>(m.split(";")[1]||"")).join(" "))
+            const loi={};for(const e of ev)for(const l of e.logs||[]){const m=(l.message||[]).map(v=>typeof v==="string"?v:JSON.stringify(v)).join(" ").replace(/[0-9]{5,}/g,"#");if(l.level==="error"||/lỗi|Error|overloaded|\[ngan-dinh\]/.test(m)){const k=m.slice(0,180);loi[k]=(loi[k]||0)+1}}
+            console.log("=== log lỗi / ngăn trung chuyển");for(const [k,v] of Object.entries(loi).sort((a,b)=>b[1]-a[1]).slice(0,20))console.log(v+"×",k)
             for(const [d,a] of Object.entries(xlTheo)){a.sort((x,y)=>x-y);console.log("  xử lý trong ngăn",d,"n=",a.length,"p50=",a[a.length>>1],"max=",a[a.length-1])}
             for(const r of rows.slice(0,45))console.log(`${r.p.padEnd(48)} n=${String(r.n).padStart(4)} cpuTong=${String(r.cpuTong).padStart(6)} tb=${r.cpuTb} p90=${r.cpu90} p99=${r.cpu99} max=${r.cpuMax} | tuong tb=${r.wallTb} p99=${r.wall99} | ${JSON.stringify(r.kq)}`)
           '
+      - name: Ngăn trung chuyển đã chọn (cau_hinh.ngan_dinh — chỉ đọc)
+        continue-on-error: true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          cd server && npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT khoa, gia_tri, cap_nhat_luc FROM cau_hinh WHERE khoa IN ('ngan_dinh','ngan_dinh_khoa')" 2>/dev/null | jq -c '.[0].results' | head -c 1500; echo
       - name: D1 truy vấn nặng khung 19:00–21:30 VN
         if: always()
         env:
