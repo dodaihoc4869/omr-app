@@ -28,6 +28,7 @@ import { khoiCuaEm, khoiCuaLop, phanTichKhoiCau as phanTichKhoiCauGoc, type Khoi
 import { dangKyXoaDem } from './dem-chung'
 import { dbGoc } from './cau-hinh-dem'
 import { daNho, gieoNho, laBanGop, nhoTheoLuot } from './doc-d1-theo-luot'
+import { DemTheoKho } from './dau-kho-cau'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
@@ -128,12 +129,24 @@ function docNguonKhoiTho(env: Env, ds: readonly string[]): Promise<Row[]> {
 /** Bảng mà câu đọc nguồn khối đọc — lệnh ghi CÙNG lượt nhắc tới một trong số này ⇒ bỏ phần nhớ theo lượt (đọc lại). */
 const BANG_NGUON_KHOI: readonly string[] = ['game_v2_question', 'de_kho', 'cau_hoi']
 const khoaNguonKhoi = (q: string): string => `nguon_khoi|${q}`
+/**
+ * ĐỆM NGUỒN KHỐI GIỮA CÁC LỆNH (31/10, thử tải 2000 em: câu đọc nguồn khối 11.525 lần / 6 phút — 1.142 dòng mỗi lần, mỗi lệnh Sảnh / Mở chặng / kế hoạch
+ * đọc lại cho cùng tập câu; D1 giới hạn số yêu cầu ⇒ phần đọc lặp này chiếm suất của em khác). Dòng nguồn khối của một câu chỉ đổi khi kho câu đổi ⇒
+ * đệm theo kho (`DemTheoKho`: hạn 30 phút, quá 5 phút hỏi dấu kho; thầy sửa / lập lại chỉ mục ⇒ bỏ ngay). Chỉ câu CHƯA có trong đệm mới đọc D1.
+ */
+const demNguonKhoi = new DemTheoKho<Map<string, Row[]>>(30 * 60_000, 5 * 60_000, 1, 1)
+const TRAN_NGUON_KHOI = 60_000
 export async function docNguonKhoiD1(env: Env, qids: readonly string[]): Promise<Map<string, Row[]>> {
   const ra = new Map<string, Row[]>()
-  const ds = [...new Set(qids.map(qidGocKhoi).filter(Boolean))]
+  const ds0 = [...new Set(qids.map(qidGocKhoi).filter(Boolean))]
+  if (!ds0.length) return ra
+  const nho = await demNguonKhoi.lay(env, 'nguon_khoi', Date.now(), async () => new Map()).catch(() => new Map<string, Row[]>())
+  const ds = ds0.filter((q) => !nho.has(q))
+  for (const q of ds0) { const r = nho.get(q); if (r) ra.set(q, r.map((x) => ({ ...x }))) }
   if (!ds.length) return ra
   let rows: Row[]
-  if (!laBanGop(env.DB)) rows = await docNguonKhoiTho(env, ds).catch(() => [] as Row[])
+  let docDuoc = true
+  if (!laBanGop(env.DB)) rows = await docNguonKhoiTho(env, ds).catch(() => { docDuoc = false; return [] as Row[] })
   else {
     // NHỚ THEO LƯỢT TỪNG CÂU (đợt 18 — luật thầy 13/10 "sửa xong máy chủ phải nhanh hơn"): một lượt Sảnh / Mở chặng qua cổng khối 2–3 lần với các tập câu
     // chồng nhau (hồ sơ ⇒ kế hoạch gói ⇒ câu phát) — trước: mỗi lần một câu đọc, một đợt D1 nối tiếp. Nay câu đã đọc trong lượt dùng lại dòng của chính nó
@@ -146,14 +159,21 @@ export async function docNguonKhoiD1(env: Env, qids: readonly string[]): Promise
       const theoQ = lo.then((rs) => { const m = new Map<string, Row[]>(); for (const r of rs) { const k = str(r.qid); const a = m.get(k); if (a) a.push(r); else m.set(k, [r]) } return m })
       for (const q of thieu) gieoNho(env.DB, khoaNguonKhoi(q), theoQ.then((m) => (m.get(q) ?? []).slice()), BANG_NGUON_KHOI)
     }
-    const theo = await Promise.all(ds.map((q) => nhoTheoLuot(env.DB, khoaNguonKhoi(q), () => docNguonKhoiTho(env, [q]), BANG_NGUON_KHOI).catch(() => [] as Row[])))
+    const theo = await Promise.all(ds.map((q) => nhoTheoLuot(env.DB, khoaNguonKhoi(q), () => docNguonKhoiTho(env, [q]), BANG_NGUON_KHOI).catch(() => { docDuoc = false; return [] as Row[] })))
     rows = theo.flat()
   }
+  const moi = new Map<string, Row[]>()
   for (const r of rows) {
     const q = str(r.qid)
-    let a = ra.get(q)
-    if (!a) { a = []; ra.set(q, a) }
+    let a = moi.get(q)
+    if (!a) { a = []; moi.set(q, a) }
     a.push(r)
+  }
+  for (const [q, a] of moi) ra.set(q, a)
+  // Ghi đệm (bản sao) chỉ khi đọc trọn vẹn — lỗi đọc ⇒ lần sau đọc lại. Câu không có dòng nào cũng nhớ (rỗng), y như kết quả đọc D1.
+  if (docDuoc) {
+    if (nho.size + ds.length > TRAN_NGUON_KHOI) nho.clear()
+    for (const q of ds) nho.set(q, (moi.get(q) ?? []).map((x) => ({ ...x })))
   }
   return ra
 }
