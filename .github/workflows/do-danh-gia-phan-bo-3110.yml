@@ -1,0 +1,36 @@
+# ĐẾM BẢN XẾP HỌC THẬT / ĐỐI PHÓ ĐÃ LƯU (CHỈ ĐỌC, 31/10 — thầy: «Bỏ mục này đi tính toán lại toàn bộ chỉ số thật kĩ rồi đánh giá lại»).
+# Chạy TRƯỚC và SAU lượt đánh giá lại tự động của cron đêm (server/src/danh-gia-hoc-that-d1.ts `buocTinhLai`) để so số em mỗi mức.
+# CHỈ SELECT gộp trên bảng nhỏ `danh_gia_em_tuan` + `cau_hinh`: in SỐ ĐẾM theo tuần / mức / mục phạt — không mã em, không tên (repo công khai).
+name: Đếm bản xếp học thật (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/danh-gia-bo-vang-3110]
+    paths: ['.github/workflows/do-danh-gia-phan-bo-3110.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-danh-gia-phan-bo
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm (chỉ SELECT gộp)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results'; }
+          q "0 Công tắc / con trỏ" "SELECT khoa, gia_tri, cap_nhat_luc FROM cau_hinh WHERE khoa IN ('danh_gia_hoc_that', 'danh_gia_hoc_that_con_tro', 'danh_gia_hoc_that_tinh_lai')"
+          q "1 Số em mỗi mức theo tuần (bac 1 Học thật · 2 Cần theo dõi · 3 Đối phó · 4 Không dạy nổi · 5 ĐUỔI)" "SELECT tuan, bac, COUNT(*) n, ROUND(AVG(diem), 1) diem_tb, MIN(tinh_luc) tinh_som, MAX(tinh_luc) tinh_muon FROM danh_gia_em_tuan GROUP BY tuan, bac ORDER BY tuan, bac"
+          q "2 Số em có từng mục phạt (tuần mới nhất)" "SELECT json_extract(p.value, '\$.ma') ma, COUNT(*) n, SUM(COALESCE(json_extract(p.value, '\$.xau'), 0)) xau, ROUND(AVG(json_extract(p.value, '\$.diem')), 1) diem_tb FROM danh_gia_em_tuan d, json_each(d.phat_json) p WHERE d.tuan = (SELECT MAX(tuan) FROM danh_gia_em_tuan) GROUP BY 1 ORDER BY n DESC"
+          q "3 Chưa đủ dữ liệu / cờ đỏ (tuần mới nhất)" "SELECT SUM(du_du_lieu = 0) chua_du, SUM(co_do = 1) co_do, COUNT(*) tong FROM danh_gia_em_tuan WHERE tuan = (SELECT MAX(tuan) FROM danh_gia_em_tuan)"

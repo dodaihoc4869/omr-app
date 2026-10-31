@@ -38,7 +38,6 @@ export const CACH_GO: Readonly<Record<string, string>> = {
   thuocKhongHieu: 'Làm lại câu từng sai bằng cách hiểu, đừng nhớ đáp án.',
   thi: 'Khi kiểm tra, ở yên trong bài, không rời màn hình.',
   boKtcn: 'Làm đủ các bài kiểm tra cá nhân.',
-  vang: 'Đi học đủ buổi.',
   khongLam: 'Ngày nào cũng làm, đừng bỏ 3 ngày liền.',
 }
 const GO_CHUNG = ['nhanMaSai', 'bamLap', 'goiY', 'khongLam'] as const
