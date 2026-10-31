@@ -18,6 +18,8 @@ export interface TuyChonKhoLon {
   skNang?: number
   /** Tổng số em trong `hoc_sinh` (em từ soEm+1 tới soEmTong KHÔNG có lịch sử — em mới). Mặc định = soEm. */
   soEmTong?: number
+  /** Số em mỗi LỚP (31/10: kho giống thật — trước mọi em chung một lớp «12 - Lớp Thường» ⇒ câu theo lớp quét 100.000 dòng). Vắng ⇒ một lớp như cũ. */
+  lopCo?: number
   /** Gọi sau mỗi `moiBao` em (in tiến độ khi dựng kho lớn). */
   baoTienDo?: (e: number) => void
 }
@@ -36,7 +38,9 @@ export function napKhoLon(t: TuyChonKhoLon): { k: KhoOmni; qall: string[] } {
   for (const q of SQL_SAN_SANG) k.d.sql.exec(q)
   k.d.sql.exec('CREATE TABLE IF NOT EXISTS chien_dich_em (chien_dich_id TEXT NOT NULL, sbd TEXT NOT NULL, them_luc TEXT, bot_luc TEXT, PRIMARY KEY (chien_dich_id, sbd))')
   const sql = k.d.sql
-  sql.exec(`UPDATE hoc_sinh SET lop='12', ten_lop=NULL, mat_khau='mk'`)
+  const LOP_CO = t.lopCo && t.lopCo > 0 ? Math.floor(t.lopCo) : 0
+  const tenLop = (e: number): string | null => (LOP_CO ? `12A${Math.ceil(e / LOP_CO)}` : null)
+  sql.exec(`UPDATE hoc_sinh SET lop='12', ten_lop=${LOP_CO ? "'12A1'" : 'NULL'}, mat_khau='mk'`)
   const de = sql.prepare('INSERT OR IGNORE INTO de_kho(ma_de,ten_de,so_cau,da_xoa,cap_nhat_luc) VALUES(?,?,?,0,?)')
   const ix = sql.prepare('INSERT OR IGNORE INTO game_v2_index(ma_de,source_version,indexed_at) VALUES(?,?,?)')
   for (const maDe of Object.keys(so)) { de.run(maDe, maDe === 'DH-B8' ? 'Bài 8. Amine' : `Đề ${maDe}`, so[maDe]!, 'v1'); ix.run(maDe, 'v1', 'x') }
@@ -44,7 +48,8 @@ export function napKhoLon(t: TuyChonKhoLon): { k: KhoOmni; qall: string[] } {
   // Lịch sử cỡ thật: SO_EM em, mỗi em SK_MOI_EM sự kiện trải 60 ngày (game 60 % · chua_loi 20 % · thi 10 % · tu_luyen 10 %).
   const qall: string[] = []
   for (const maDe of Object.keys(so)) qall.push(...k.qids(maDe))
-  const em = sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc,mat_khau) VALUES(?,?,'12','x','mk')")
+  const em0 = sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,lop,ten_lop,cap_nhat_luc,mat_khau) VALUES(?,?,'12',?,'x','mk')")
+  const em = { run: (sbd: string, ten: string) => em0.run(sbd, ten, tenLop(Number(sbd.slice(1)) || 1)) }
   const sk = sql.prepare(`INSERT INTO su_kien_hoc(khoa,sbd,qid,nguon,ma_nguon,lan,ket_qua,giay,luc,ngay_vn,ma_dang,chuyen_de,muc_do,attempt_id,assistance,visibility,purpose,raw_json,received_at)
     VALUES(?,?,?,?,?,1,?,?,?,?,?,NULL,NULL,?,?,NULL,NULL,?,?)`)
   const at = sql.prepare('INSERT INTO game_v2_attempt(id,sbd,session,qid,content_group,json,created_at) VALUES(?,?,?,?,?,?,?)')
@@ -69,8 +74,9 @@ export function napKhoLon(t: TuyChonKhoLon): { k: KhoOmni; qall: string[] } {
   // Em mới (chưa có lịch sử): chỉ có dòng hồ sơ.
   for (let e = SO_EM + 1; e <= SO_EM_TONG; e++) em.run(sbdThu(e), `Em ${e}`)
   sql.exec('COMMIT')
-  sql.prepare('INSERT INTO bai_da_day(id,lop,khoa_bai,ten_bai,vi_tri,ma_to_json,tick_luc) VALUES(?,?,?,?,?,?,?)')
-    .run('amine', '12 - Lớp Thường', 'B8', 'Bài 8. Amine', 8, '["DH-B8"]', '2026-10-11T11:00:00Z')
+  const tick = sql.prepare('INSERT INTO bai_da_day(id,lop,khoa_bai,ten_bai,vi_tri,ma_to_json,tick_luc) VALUES(?,?,?,?,?,?,?)')
+  if (!LOP_CO) tick.run('amine', '12 - Lớp Thường', 'B8', 'Bài 8. Amine', 8, '["DH-B8"]', '2026-10-11T11:00:00Z')
+  else for (let l = 1; l <= Math.ceil(SO_EM_TONG / LOP_CO); l++) tick.run(`amine-12A${l}`, `12A${l}`, 'B8', 'Bài 8. Amine', 8, '["DH-B8"]', '2026-10-11T11:00:00Z')
   sql.exec('ANALYZE')
   return { k, qall }
 }

@@ -4,7 +4,7 @@
 // Chạy (esbuild đóng gói vì nhập mã máy chủ TypeScript):
 //   npx esbuild scripts/thu-tai-50k/sinh-kho.ts --bundle --platform=node --format=esm --target=node22 --outfile=/tmp/sinh-kho.mjs
 //   SO_EM_TONG=50000 SO_EM_LS=2000 SK=250 SO_EM_NANG=50 SK_NANG=1500 node /tmp/sinh-kho.mjs /tmp/kho.sql
-// Mọi em: lớp 12, mật khẩu 'mk' (máy tải tự ký token bằng MA_BI_MAT của Worker thử). SBD: S1–S3, E4…E<SO_EM_TONG>.
+// Mọi em: khối 12, lớp 12A1…12A500 (LOP_CO em / lớp), mật khẩu 'mk' (máy tải tự ký token bằng MA_BI_MAT của Worker thử). SBD: S1–S3, E4…E<SO_EM_TONG>.
 import { createWriteStream } from 'node:fs'
 import { napKhoLon, sbdThu } from '../../tests/kho-tai-lon'
 import { themChienDich } from '../../tests/omni-3-ke-hoach-chung'
@@ -18,14 +18,17 @@ const ra = process.argv[2] ?? 'kho.sql'
 const NOW = Date.now()
 
 const t0 = performance.now()
-const { k } = napKhoLon({ now: NOW, soDe: SO_DE, soEm: SO_EM_LS, skMoiEm: SK, soEmNang: SO_EM_NANG, skNang: SK_NANG, soEmTong: SO_EM_TONG, baoTienDo: (e) => console.log(`  … ${e} em có lịch sử`) })
+// 31/10: lớp 100 em (500 lớp 12A1…12A500, mỗi lớp tick Bài 8 riêng ⇒ gói 7 theo lớp) — trước mọi em chung một lớp, câu theo lớp quét cả trường.
+const { k } = napKhoLon({ now: NOW, soDe: SO_DE, soEm: SO_EM_LS, skMoiEm: SK, soEmNang: SO_EM_NANG, skNang: SK_NANG, soEmTong: SO_EM_TONG, lopCo: so('LOP_CO', 100), baoTienDo: (e) => console.log(`  … ${e} em có lịch sử`) })
 await damBaoBangBaiDaDay(k.env)
 // Hành trình khối 12: MỌI em (như máy thật: em lớp 12 đăng ký đều vào hành trình khối) — danh sách sbd_json cỡ thật của trường 50.000 em.
 const tatCa: string[] = []
 for (let e = 1; e <= SO_EM_TONG; e++) tatCa.push(sbdThu(e))
 const ngay = (ms: number) => new Date(ms).toISOString()
 themChienDich(k.d, { id: 'hanh-trinh-v3-khoi-12', qids: k.qids('DH-B8'), maDe: ['DH-B8'], sbd: tatCa, hanNop: '9999-12-31', taoLuc: ngay(NOW - 30 * 86_400_000), theLuc: 24, huyetChien: false })
-const g7 = await dongBoGoi7(k.env, NOW)
+// Gói 7: mỗi lượt đồng bộ chỉ xử lý vài lớp (`tran`) ⇒ chạy tới khi xong mọi lớp (500 lớp).
+let g7 = await dongBoGoi7(k.env, NOW, 50, '', true)
+for (let i = 0; i < 200 && !g7.hoan; i++) { const r = await dongBoGoi7(k.env, NOW, 50, '', true); g7 = { soGoi: g7.soGoi + r.soGoi, soEm: g7.soEm + r.soEm, soCau: g7.soCau + r.soCau, hoan: r.hoan }; if (!r.soGoi && !r.soEm) break } // lượt không thêm gì ⇒ xong
 // Vòng chữa câu sai BẬT cho mọi em (máy thật: /hs/chua-cau-sai là đường đông nhất giờ cao điểm 30/10).
 k.d.sql.exec(`INSERT OR REPLACE INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('chua_cau_sai_v1','{"bat":true,"phamVi":"tat_ca"}','x')`)
 const sql = k.d.sql
