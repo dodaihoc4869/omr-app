@@ -156,6 +156,30 @@ export async function docDauVaBan(env: Env, sbd: string, now: number): Promise<[
   return [null, null]
 }
 
+/** Phần CHUNG được phép cũ khi HIỆN Sảnh (lập lại ở nền): thầy sửa đề / giao bài / đổi cấu hình. KHÔNG gồm ca kiểm tra (`ca`) và câu nghi đáp án (`ng`) —
+ *  hai phần ấy đổi là khoá / mở câu ngay, phải lập lại trước khi hiện. */
+const CHUNG_CHO_CU = new Set(PHAN_DAU.filter((p) => p[3] && p[0] !== 'ca' && p[0] !== 'ng').map((p) => p[0]))
+/**
+ * Bản sẵn HIỆN ĐƯỢC NGAY (31/10 — kiểu Duolingo: hiện tức thì, làm tươi ở nền): cùng ngày, phần RIÊNG của em khớp (em chưa làm gì mới), chỉ phần chung
+ * «được phép cũ» đổi. Trước: một lần thầy sửa đề / giao bài làm hỏng bản sẵn của MỌI em cùng lúc ⇒ ai mở app lúc ấy cũng chờ lập lại (~12 vòng D1, CPU nặng)
+ * — giờ cao điểm là dồn tải. CHỈ cho hiện Sảnh; mở chặng vẫn đòi dấu khớp đủ (`dungDuoc`).
+ */
+export function hienDuocNgay(ban: BanSanSang | null, dau: string | null, ngay: string): ban is BanSanSang {
+  if (!ban || !dau || ban.ngay !== ngay) return false
+  if (ban.dau === dau) return true
+  const a = ban.dau.split('§'), b = dau.split('§')
+  if (a.length !== b.length || a[0] !== b[0] || a.length !== PHAN_DAU.length + 1) return false
+  for (let i = 0; i < PHAN_DAU.length; i++) if (a[i + 1] !== b[i + 1] && !CHUNG_CHO_CU.has(PHAN_DAU[i]![0])) return false
+  return true
+}
+/** Lập lại bản sẵn ở nền — mỗi em tối đa MỘT lượt đang chạy trong isolate. */
+const dangLapNen = new Set<string>()
+export function lapLaiNen(env: Env, sbd: string, now: number): Promise<unknown> {
+  if (dangLapNen.has(sbd)) return Promise.resolve(false)
+  dangLapNen.add(sbd)
+  return chuanBiSanSang(env, sbd, now).catch(() => false).finally(() => dangLapNen.delete(sbd))
+}
+
 /** Bản sẵn DÙNG ĐƯỢC: cùng ngày VN, dấu khớp (dấu đọc lỗi ⇒ không). */
 export function dungDuoc(ban: BanSanSang | null, dau: string | null, ngay: string): ban is BanSanSang {
   return !!ban && !!dau && ban.dau === dau && ban.ngay === ngay
