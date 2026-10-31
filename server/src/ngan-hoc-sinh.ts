@@ -74,11 +74,12 @@ export const xoaEnvChungNgan = (): void => { envChung = null }
  * (`/cdn-cgi/trace`, một lần) + thời gian một câu `SELECT 1` tới D1 (tối đa một lần / phút). Gắn vào phản hồi dạng header — không lộ gì của em.
  */
 let tram = ''
-let d1Ms = -1, d1Luc = 0
+let d1Ms = '-', d1Luc = 0
 function doViTri(env: Env, ctx: ExecutionContext): void {
   const now = Date.now()
   if (!tram) { tram = '…'; ctx.waitUntil(fetch('https://cloudflare.com/cdn-cgi/trace').then((r) => r.text()).then((t) => { tram = /colo=([A-Z]+)/.exec(t)?.[1] ?? '?' }).catch(() => { tram = '?' })) }
-  if (now - d1Luc > 60_000) { d1Luc = now; const t0 = Date.now(); ctx.waitUntil(env.DB.prepare('SELECT 1').first().then(() => { d1Ms = Date.now() - t0 }).catch(() => {})) }
+  // Hai câu nối tiếp: câu đầu có thể mang thời gian mở kết nối (isolate mới) — ghi «lần đầu/lần hai».
+  if (now - d1Luc > 60_000) { d1Luc = now; ctx.waitUntil((async () => { let t0 = Date.now(); await env.DB.prepare('SELECT 1').first(); const a = Date.now() - t0; t0 = Date.now(); await env.DB.prepare('SELECT 1').first(); d1Ms = `${a}/${Date.now() - t0}` })().catch(() => {})) }
 }
 
 export class NganHocSinh {
