@@ -13,11 +13,13 @@ function khoCoNgan(loi = false) {
   const k = taoKhoOmni({}, 3)
   k.d.sql.exec(`UPDATE hoc_sinh SET mat_khau='mk'`)
   const vao: { ten: string; dau: boolean }[] = []
+  const goiY: string[] = []
   const viec: Promise<unknown>[] = []
   const env = { ...k.env } as Env
   env.NGAN_HS = {
     idFromName: (ten: string) => ({ toString: () => ten }),
-    get: (id) => ({
+    get: (id, tuy) => ({
+      ...(goiY.push(tuy?.locationHint ?? ''), {}),
       fetch: async (req: Request) => {
         if (loi) throw new Error('ngăn hỏng')
         vao.push({ ten: id.toString(), dau: req.headers.has(DAU_TRONG_NGAN) })
@@ -26,7 +28,7 @@ function khoCoNgan(loi = false) {
       },
     }),
   }
-  return { k, env, vao, viec }
+  return { k, env, vao, viec, goiY }
 }
 const goi = (env: Env, duong: string, than: unknown, init: RequestInit = {}) =>
   worker.fetch(new Request(`https://test${duong}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(than), ...init }), env, { waitUntil() {}, passThroughOnException() {} } as never)
@@ -50,7 +52,8 @@ describe('ngăn riêng từng học sinh', () => {
     const a = khoCoNgan()
     const token = await gameToken(a.k.env, 'S1')
     const quaNgan = await (await goi(a.env, '/game-v2/hoc-tap-dem', { token })).json() as Record<string, unknown>
-    expect(a.vao).toEqual([{ ten: 'S1', dau: true }])
+    expect(a.vao).toEqual([{ ten: 'apac|S1', dau: true }])
+    expect(a.goiY).toEqual(['apac']) // ngăn luôn tạo ở châu Á, sát D1
     const b = khoCoNgan()
     const thang = await (await goi(b.k.env, '/game-v2/hoc-tap-dem', { token: await gameToken(b.k.env, 'S1') })).json() as Record<string, unknown>
     expect(quaNgan.ok).toBe(true)
