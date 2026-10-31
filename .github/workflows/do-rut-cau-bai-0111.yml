@@ -1,0 +1,37 @@
+# SOI VÌ SAO «BỔ SUNG BÀI HÔM NAY» RÚT 0 CÂU (CHỈ ĐỌC, 01/11 — thầy: Bài 10 Quy tắc octet 63 câu nhưng «Câu rút được 0»).
+# CHỈ SELECT gộp trên kho đề (de_kho, game_v2_question, game_v2_index) + pham_vi_lop / bai_da_day: in mã tờ, tên tờ, SỐ ĐẾM — không mã em, không tên em.
+name: Soi rút câu bài mới (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/rut-cau-bai-moi-0111]
+    paths: ['.github/workflows/do-rut-cau-bai-0111.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-rut-cau-bai
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Soi (chỉ SELECT)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results[]' | head -n 80; }
+          q "A tờ LỆCH chỉ mục (chưa vào kho câu luyện) — đếm" "SELECT COUNT(*) n, MIN(d.ngay_nap) som, MAX(d.ngay_nap) muon FROM de_kho d LEFT JOIN game_v2_index g ON g.ma_de=d.ma_de WHERE COALESCE(d.da_xoa,0)=0 AND (g.ma_de IS NULL OR g.source_version<>d.cap_nhat_luc)"
+          q "B tờ LỆCH — danh sách (mã · số câu · ngày nạp · đã có chỉ mục cũ?)" "SELECT d.ma_de, d.so_cau, d.ngay_nap, d.r2_khoa, g.ma_de IS NOT NULL co_cu FROM de_kho d LEFT JOIN game_v2_index g ON g.ma_de=d.ma_de WHERE COALESCE(d.da_xoa,0)=0 AND (g.ma_de IS NULL OR g.source_version<>d.cap_nhat_luc) ORDER BY d.ma_de LIMIT 300"
+          echo "== C tệp nguồn R2 của 6 tờ lệch ĐẦU TIÊN theo mã (sync cũ kẹt ở đây nếu thiếu)"
+          for k in $(npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT COALESCE(NULLIF(d.r2_khoa,''),'kho/'||d.ma_de||'.json') k FROM de_kho d LEFT JOIN game_v2_index g ON g.ma_de=d.ma_de WHERE COALESCE(d.da_xoa,0)=0 AND (g.ma_de IS NULL OR g.source_version<>d.cap_nhat_luc) ORDER BY d.ma_de LIMIT 6" | jq -r '.[0].results[].k'); do
+            n=$(npx -y wrangler@4 r2 object get "omr-de/$k" --remote --pipe 2>/dev/null | wc -c); echo "$k $n byte"
+          done

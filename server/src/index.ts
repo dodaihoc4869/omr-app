@@ -72,7 +72,7 @@ import { kemSanhBiTat, luongDangNhapKemSanh, sanhKemDangNhap } from './dang-nhap
 import { envGhiRieng, RAO_GHI } from './doc-d1-theo-luot'
 import { traLoiNopLuong } from './nop-luong'
 import { napPhienNhanh } from './cham-nhanh'
-import { xoaDemCaBaoVe, xoaDemSync } from './game-v2-bank'
+import { dongBoCacTo, xoaDemCaBaoVe, xoaDemSync } from './game-v2-bank'
 import { gameToken, gameIdentity, gameSbdDaKy } from './game-v2-auth'
 import { phanTichGianLanBtvn, type ThiThatBaseline, type ThongTinHocSinhBtvn } from './gian-lan-btvn'
 // MÁY CHỦ MỚI — bốn lệnh nóng lúc thi (MAY-CHU-MOI.md).
@@ -2496,6 +2496,8 @@ async function dayDeKho(env: Env, b: Record<string, unknown>): Promise<Response>
   }
   for (let i = 0; i < lenh.length; i += 150) await env.DB.batch(lenh.slice(i, i + 150))
   xoaDemSync() // de_kho vừa đổi ⇒ `sync` của em đếm lại ngay (đệm "đã đủ" 20 s, game-v2-bank.ts)
+  // 01/11 (thầy: «Câu rút được 0»): có gói ⇒ đưa tờ vào KHO CÂU LUYỆN NGAY (thầy tick bài liền sau khi nạp vẫn rút đủ câu; cron mỗi phút là lưới đỡ). Lỗi không chặn nạp đề.
+  if (de) await dongBoCacTo(env, [maDe]).catch(() => 0)
   // LỜI GIẢI TỪNG BƯỚC (29/09): câu mới / đổi nội dung tự vào hàng soạn. Móc CHỈ-THÊM — lỗi ở đây không được làm hỏng việc nạp đề.
   let loiGiai: Record<string, unknown> | null = null
   if (goi) { try { loiGiai = await ghiCauVaoHang(env, maDe, goi) } catch (e) { loiGiai = { loi: (e as Error).message } } }
@@ -3440,6 +3442,9 @@ const boXuLy = {
       if(ctx?.waitUntil)ctx.waitUntil(p);else await p}
       await import('./kiem-tra-ca-nhan').then(m=>m.dongBoKtCn(env,Date.now(),2,true,new Date(Date.now()+7*3600000).getUTCHours()<19)).catch(e=>console.error('[kiem-tra-ca-nhan] cron',e))
       await import('./goi-bai-7').then(m=>m.dongBoGoi7(env,Date.now())).catch(e=>console.error('[goi7] đồng bộ',e))
+      // KHO CÂU LUYỆN TỰ CẬP NHẬT (01/11, game-v2-bank.ts `dongBoKhoLech`): tờ thầy vừa nạp / sửa vào kho câu trong ≤ 1 phút (trước chỉ khi em mở Đảo — đã gỡ 27/10
+      // ⇒ «Câu rút được 0»). Khung học 18–24h 1 tờ/phút, ngoài khung 6 tờ/phút. Không tờ nào lệch ⇒ một câu đọc nhẹ. ĐỨNG TRƯỚC cau-meta để bảng meta dựng ngay phút đó.
+      await import('./game-v2-bank').then(m=>m.dongBoKhoLech(env,laKhungHocVn(Date.now())?1:6)).then(r=>{if(r.lap||r.loi)console.log('[kho-cau] lập chỉ mục',JSON.stringify(r))}).catch(e=>console.error('[kho-cau] cron lỗi:',e))
       // B2 (15/10): dựng lại bảng siêu dữ liệu câu tính sẵn cho tờ vừa lập chỉ mục (cau-meta.ts). Thường ngày không tờ nào lệch ⇒ một câu đọc nhẹ.
       await import('./cau-meta').then(m=>m.dongBoCauMeta(env,laGioCaoDiemVn(Date.now())?5:40)).catch(e=>console.error('[cau-meta] đồng bộ',e))
       // ĐO LẠI LƯỢT CŨ (21/10): lấp dần bảng kích thước đề từng câu (`cau_doc_giay`) — cao điểm chỉ 20 câu/phút, ngoài cao điểm 120; xong hết thì một câu đọc nhẹ.

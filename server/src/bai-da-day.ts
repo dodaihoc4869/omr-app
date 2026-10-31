@@ -23,7 +23,7 @@ import { cauGonTuDong, SQL_CAU_GON } from './cau-gon'
 import { DemTheoKho } from './dau-kho-cau'
 import { laMaDeTuLuan } from '../../src/lib/cau-tu-luan'
 import { tenLopCuaEm } from './ten-lop'
-import { cauCuaToChiTiet, gvChienDich, tachMaTo, THE_LUC_TOI_DA, trangThaiLop } from './srs2-gv'
+import { cauCuaToChiTiet, gvChienDich, maGocCuaTo, tachMaTo, THE_LUC_TOI_DA, trangThaiLop } from './srs2-gv'
 import { docBatDauMap, docChienDichCuaEm, docChienDichDangChayCuaCacEm, docChienDichKemBatDau, docChienDichTuDong, docRaiDeuMap, ngayVnCua, noCuCaLop } from './srs2-d1'
 import { congNgay, khoiLuongCan, soNgayConLai, soNgayGiua } from './srs2-loi'
 import { KHOA_THE_LUC_LOP, SQL_LA_LAN_LAM, THAM_SO_OMNI } from './omni-kieu'
@@ -547,10 +547,21 @@ async function docKhoChoXem(env: Env, dv: DauVaoBai, ctP: Promise<{ qids: string
 }
 
 // ---------------------------------------------------------------- các action
+/**
+ * Tờ của bài CHƯA vào kho câu luyện (nạp / sửa mà chỉ mục chưa lập) ⇒ lập NGAY trước khi đếm / giao (01/11 — thầy: «Bài 10 Quy tắc octet 63 câu mà Câu rút
+ * được 0»: tờ nạp 24/10 chưa bao giờ vào `game_v2_question`). Tờ đã khớp ⇒ một câu đọc nhẹ. Lỗi (nguồn R2 hỏng) ⇒ bỏ qua, đếm như cũ.
+ */
+async function damBaoKhoCauCuaBai(env: Env, maDe: readonly string[]): Promise<void> {
+  const goc = maGocCuaTo(maDe)
+  if (!goc.length || !env.DE) return
+  try { await (await import('./game-v2-bank')).dongBoCacTo(env, goc) } catch { /* đếm như cũ */ }
+}
+
 async function xemTruoc(env: Env, b: Row, nowMs: number): Promise<Record<string, unknown>> {
   const dv = await docDauVaoBai(env, b, nowMs, false)
   if ('loi' in dv) return { ok: false, error: dv.loi }
   if (!dv.em.length) return { ok: false, error: `Lớp ${dv.lop} chưa có học sinh nào.` }
+  await damBaoKhoCauCuaBai(env, dv.maDe)
   const homNay = ngayVnCua(nowMs)
   const ctP = cauCuaToChiTiet(env, dv.maDe)
   const khoP = docKhoChoXem(env, dv, ctP, nowMs) // chạy SONG SONG phần cũ (không thêm đợt D1); không bao giờ từ chối
@@ -633,6 +644,7 @@ async function tick(env: Env, b: Row, nowMs: number): Promise<Record<string, unk
   const treo = !!cu && !str(cu.chien_dich_id) && !(nowMs - Date.parse(str(cu.tick_luc)) < TREO_MS)
   if (cu && !treo) return traDaCo(env, cu)
   if (!dv.em.length) return { ok: false, error: `Lớp ${dv.lop} chưa có học sinh nào.` }
+  await damBaoKhoCauCuaBai(env, dv.maDe)
   const homNay = ngayVnCua(nowMs)
   const [han, cb] = await Promise.all([dv.hanNop ? Promise.resolve({ hanNop: dv.hanNop }) : tinhHan(env, dv, nowMs), docCauBai(env, dv.maDe).catch(() => ({ soTuLuan: 0, kienThuc: [] as string[] }))])
   if ('loi' in han) return { ok: false, error: han.loi }

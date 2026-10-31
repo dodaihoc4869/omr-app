@@ -9,6 +9,7 @@ const lanChanDoan = () => import('./chan-doan-buoc-sai')
 import {DemTTL} from './dem-chung'
 import { cauGonTuDong, SQL_CAU_GON_KIEN_THUC } from './cau-gon'
 import {dbGoc} from './cau-hinh-dem'
+import { xoaDemTheoKho } from './dau-kho-cau'
 import { khoiCuaEm, locCauHopKhoi, type Khoi } from '../../src/lib/khoi-cau'
 import { docKhoDeGiaoCuaEm, locTheoKhoDeGiao } from './kho-de-giao'
 import type { Env } from './kieu'
@@ -84,6 +85,7 @@ async function toLech(env:Env,maDes:readonly string[]):Promise<Row[]>{
 export async function dongBoCacTo(env:Env,maDes:readonly string[]):Promise<number>{
   let n=0
   for(const d of (await toLech(env,maDes)).slice(0,3)){try{await lapChiMucTo(env,d);n++}catch{/* nguồn R2 hỏng/chưa sẵn: giữ như cũ */}}
+  if(n){xoaDemSync();xoaDemTheoKho()} // isolate này đếm lại câu của tờ ngay (đệm theo kho); isolate khác tự thấy dấu kho đổi ≤ 5 phút
   return n
 }
 const SQL_THEO_REF=`SELECT q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE q.ma_de=? AND q.qid=? AND q.version=? AND COALESCE(d.da_xoa,0)=0`
@@ -153,11 +155,24 @@ export function syncIndex(env:Env):Promise<{remaining:number;indexed:number}> {
 }
 /** Work is bounded per call; cursor/checkpoints cover the entire bank, not eight sheets. */
 async function syncIndexTho(env:Env):Promise<{remaining:number;indexed:number}> {
-  const pending=await env.DB.prepare(`SELECT d.ma_de,d.r2_khoa,d.cap_nhat_luc FROM de_kho d LEFT JOIN game_v2_index g ON g.ma_de=d.ma_de WHERE COALESCE(d.da_xoa,0)=0 AND (g.ma_de IS NULL OR g.source_version<>d.cap_nhat_luc) ORDER BY d.ma_de LIMIT 3`).all<Row>()
-  let indexed=0
-  for(const d of pending.results){await lapChiMucTo(env,d);indexed++}
-  const n=await env.DB.prepare(`SELECT COUNT(*) n FROM de_kho d LEFT JOIN game_v2_index g ON g.ma_de=d.ma_de WHERE COALESCE(d.da_xoa,0)=0 AND (g.ma_de IS NULL OR g.source_version<>d.cap_nhat_luc)`).first<{n:number}>()
-  return {remaining:n?.n??0,indexed}
+  const r=await dongBoKhoLech(env,3)
+  return {remaining:r.conLai,indexed:r.lap}
+}
+/**
+ * TỰ ĐƯA TỜ MỚI VÀO KHO CÂU LUYỆN (01/11 — thầy: «Bài 10 Quy tắc octet 63 câu mà Câu rút được 0»). Trước đây chỉ mục `game_v2_question` chỉ được lập khi em mở
+ * Đảo (`sync`) — Đảo gỡ 27/10 ⇒ 73 tờ nạp/sửa sau đó (Bài 10–14 lớp 10, 12–14 lớp 11, 14 lớp 12, kho VIP27…) KHÔNG BAO GIỜ vào kho câu ⇒ rút 0 câu.
+ * Nay cron mỗi phút gọi hàm này. Tờ lệch nguồn (chưa lập / `source_version` ≠ `cap_nhat_luc`) — tờ VỪA nạp / sửa trước — lập tối đa `toiDa` tờ; tờ có nguồn R2
+ * hỏng thì BỎ QUA tờ đó, lập tiếp tờ sau (trước: kẹt mãi ở tờ hỏng đầu tiên theo mã). Không tờ nào lệch ⇒ một câu đọc nhẹ (bảng `de_kho` vài trăm dòng).
+ */
+export async function dongBoKhoLech(env:Env,toiDa:number):Promise<{lap:number;loi:number;conLai:number}>{
+  const ds=(await env.DB.prepare(`SELECT d.ma_de,d.r2_khoa,d.cap_nhat_luc FROM de_kho d LEFT JOIN game_v2_index g ON g.ma_de=d.ma_de WHERE COALESCE(d.da_xoa,0)=0 AND (g.ma_de IS NULL OR g.source_version<>d.cap_nhat_luc) ORDER BY d.cap_nhat_luc DESC, d.ma_de`).all<Row>()).results??[]
+  let lap=0,loi=0
+  for(const d of ds){
+    if(lap>=toiDa)break
+    try{await lapChiMucTo(env,d);lap++}catch(e){loi++;console.error('[kho-cau] chưa lập được tờ',str(d.ma_de),e instanceof Error?e.message:String(e))}
+  }
+  if(lap){xoaDemSync();xoaDemTheoKho()}
+  return {lap,loi,conLai:ds.length-lap}
 }
 // HẠ TẢI D1 (Boss 22/09, đo Code 1: truy vấn `ca` của hàm này đứng ĐẦU tổng dòng đọc — 3.077 lượt × 813 dòng ≈ 2,5 triệu/11,25 triệu
 // dòng). QUYẾT của Boss sau khi bàn về luật chống gian lận (thử đệm 30 giây thuần bị lùi lại vì trễ gỡ bảo vệ khi ca đổi trạng thái):
