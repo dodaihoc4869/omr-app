@@ -85,13 +85,16 @@ describe('thanh trên Hôm nay không tràn ngang ⇒ khung nhìn không bị n�
 })
 
 describe('Phòng chờ: bàn chơi không nuốt cú vuốt dọc', () => {
-  it('Đấu Nguyên Tử (30/10): thẻ Sảnh đấu trong phòng chờ KHÔNG có vùng nuốt cú vuốt; chỉ màn trận (phủ kín khung nhìn) mới khoá chạm', () => {
-    const css = doc('src/components/phong-cho/ban-nguyen-to.css')
-    // Ảnh bìa ở sảnh là canvas thường (không touch-action: none) ⇒ vuốt dọc vẫn cuộn phòng chờ.
-    expect(giaTriCuoi(css, '.di-bia canvas', 'touch-action')).toBeUndefined()
-    // Cần điều khiển + sân chỉ nằm trong màn trận cố định (.di-man) — màn này không cuộn, có overscroll-behavior: contain.
-    expect(giaTriCuoi(css, '.di-can', 'touch-action')).toBe('none')
-    expect(giaTriCuoi(css, '.pc-room.di-man', 'position')).toBe('fixed')
-    expect(giaTriCuoi(css, '.pc-room.di-man', 'overscroll-behavior')).toBe('contain')
+  // 31/10 cập nhật CÓ CHỦ Ý: «Đấu Nguyên Tử 2» (thầy duyệt docs/DE-XUAT-DAU-ION-V2-3110.md) thay tờ ban-nguyen-to.css bằng dau-ion.css; bỏ hai cần,
+  // CẢ màn trận là vùng kéo (cần nổi) ⇒ khoá chạm nằm ở .dn-man (phủ kín khung nhìn), thẻ sảnh trong phòng chờ vẫn cuộn bình thường.
+  it('Đấu Nguyên Tử 2 (31/10): thẻ game trong phòng chờ KHÔNG có vùng nuốt cú vuốt; chỉ màn trận (phủ kín khung nhìn) mới khoá chạm', () => {
+    const css = doc('src/components/phong-cho/dau-ion.css')
+    // Thẻ + ảnh bìa ở sảnh là khối / canvas thường (không touch-action: none) ⇒ vuốt dọc vẫn cuộn phòng chờ.
+    expect(giaTriCuoi(css, '.dn-bia canvas', 'touch-action')).toBeUndefined()
+    expect(giaTriCuoi(css, '.dn-the', 'touch-action')).toBeUndefined()
+    // Màn trận cố định (.dn-man) là vùng kéo ở bất kỳ đâu — không cuộn, có overscroll-behavior: contain.
+    expect(giaTriCuoi(css, '.dn-man', 'touch-action')).toBe('none')
+    expect(giaTriCuoi(css, '.dn-man', 'position')).toBe('fixed')
+    expect(giaTriCuoi(css, '.dn-man', 'overscroll-behavior')).toBe('contain')
   })
 })
