@@ -618,6 +618,8 @@ function sanhHoiSom(token: string | undefined, tapTrung: boolean): { than: strin
 }
 
 let bu: ((k: KetQuaSanh) => KetQuaSanh) | null = null // bản vá hiện hành của Sảnh (xem `va` trong useSanhHoa2)
+/** Lùi khi lượt làm tươi Sảnh hỏng (ms, ±20 % ngẫu nhiên) — lượt cuối lặp tới khi có số thật. */
+export const LUI_THU_SANH_MS: readonly number[] = [3_000, 8_000, 20_000, 45_000, 90_000]
 /**
  * Hỏi `hoa2-sanh` khi đăng nhập, mỗi lần `lamMoi` đổi (vừa đóng game / màn con), và khi quay lại tab (dội ≥ 20 giây).
  * SWR (09/10): nếu máy đã có bản đệm từ trước ⇒ hiện Sảnh NGAY 0ms (dangTai: true); ngầm gọi máy chủ làm tươi.
@@ -651,6 +653,12 @@ export function useSanhHoa2(token: string | undefined, sbd: string | undefined, 
     if (dangBay.current) { canThem.current = true; return }
     setLuot((n) => n + 1)
   }
+  // TỰ HỎI LẠI KHI LÀM TƯƠI HỎNG (31/10, thầy: «Sbd 12121212 load lại nhưng vẫn chưa thấy đồng bộ» — máy tính tải lại vẫn hiện số buổi sáng trong khi máy chủ đã đủ
+  // 12/12): Sảnh vẽ NGAY bản đệm rồi hỏi máy chủ; lượt ấy hỏng / quá hạn chờ (vừa phát hành, mạng chập chờn, em bấm tải lại giữa chừng) thì trước đây KHÔNG ai hỏi
+  // lại cho tới khi cửa sổ mất rồi được chọn lại — máy tính để yên ⇒ số cũ nằm mãi. Nay tự hỏi lại lùi dần (lệch ngẫu nhiên, chỉ khi app đang hiện) tới khi có số thật.
+  const lanLoi = useRef(0), henThu = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const boHenThu = () => { if (henThu.current) { clearTimeout(henThu.current); henThu.current = undefined } }
+  useEffect(() => boHenThu, [])
   // ĐỒNG BỘ NGAY (thầy 29/10 «làm xong thoát ra Lộ trình phải đồng bộ chính xác ngay lập tức, tải lại mới đúng»): số «đã làm» của Sảnh tính từ sổ học mà máy chủ ghi
   // SAU khi trả lời (việc nền) ⇒ Sảnh nạp ngay lúc em thoát có thể mang số CŨ. Màn làm bài biết số thật ⇒ `va(f)` VÁ ngay bản đang hiện và bản máy chủ trả về
   // từ đó (f chỉ nâng số CỦA ĐÚNG NGÀY, không bao giờ hạ) — máy chủ theo kịp thì f không đổi gì.
@@ -694,12 +702,17 @@ export function useSanhHoa2(token: string | undefined, sbd: string | undefined, 
       .then((kq0) => {
         if (huy) return
         const kq = bu ? bu(kq0) : kq0
+        lanLoi.current = 0
+        boHenThu()
         ghiNhoCheDo2(sbd, kq.cheDo2)
         ghiNhoKetQuaSanh(sbd, kq)
         setT({ pha: 'xong', cheDo2: kq.cheDo2, ketQua: kq, loi: '', dangTai: false })
       })
       .catch((e: unknown) => {
         if (huy) return
+        boHenThu()
+        const cho = LUI_THU_SANH_MS[Math.min(lanLoi.current++, LUI_THU_SANH_MS.length - 1)]! * (0.8 + Math.random() * 0.4)
+        henThu.current = setTimeout(() => { henThu.current = undefined; if (typeof document === 'undefined' || !document.hidden) xinNapLai() }, cho)
         setT((x) => ({
           ...x,
           pha: 'xong',

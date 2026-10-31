@@ -481,7 +481,9 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
   useEffect(() => {
     if (!auth?.sbd || !auth.token) return
     const sbd = auth.sbd, token = auth.token
-    const doi = () => { if (document.hidden) return; setLamMoiKeHoach((n) => n + 1); void syncStudentExp(sbd, token); void napDsMom(); void import('../components/thuong/dung-thuong').then((m) => m.capNhatTongQuan(token)).catch(() => {}) }
+    // 31/10: + danh sách Tự sửa lỗi (số trên nút Sửa lỗi của Lộ trình nghe `ngheTuSua`) — trước chỉ đọc lại khi số «đã làm» đổi và bản nhớ quá 10 phút ⇒ máy kia sửa
+    // xong mà nút ở máy này vẫn «còn 8».
+    const doi = () => { if (document.hidden) return; setLamMoiKeHoach((n) => n + 1); void syncStudentExp(sbd, token); void napDsMom(); void import('../components/thuong/dung-thuong').then((m) => m.capNhatTongQuan(token)).catch(() => {}); void import('../lib/tu-sua-loi').then((m) => m.taiTuSuaLoi(token, { moi: true })).catch(() => {}) }
     window.addEventListener('ddh:doi-may-khac', doi) // = SU_KIEN_DOI (lib/kenh-day.ts)
     return () => window.removeEventListener('ddh:doi-may-khac', doi)
   }, [auth?.sbd, auth?.token, napDsMom])

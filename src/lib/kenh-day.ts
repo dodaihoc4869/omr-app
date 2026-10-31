@@ -18,7 +18,7 @@ const GOP_MS = 400
 /** Mở kênh cho token của em; trả hàm đóng (đăng xuất / đổi em). */
 export function moKenhDay(token: string): () => void {
   if (!token || typeof window === 'undefined' || typeof WebSocket === 'undefined') return () => {}
-  let dung = false, ws: WebSocket | null = null, loi = 0, dangNoi = false
+  let dung = false, ws: WebSocket | null = null, loi = 0, dangNoi = false, daMo = false
   let hen: ReturnType<typeof setTimeout> | undefined, ping: ReturnType<typeof setTimeout> | undefined, gop: ReturnType<typeof setTimeout> | undefined
   const an = () => typeof document !== 'undefined' && document.hidden
   const tatPing = () => { if (ping) clearTimeout(ping); ping = undefined }
@@ -48,6 +48,9 @@ export function moKenhDay(token: string): () => void {
         loi = 0
         tatPing()
         henPing(w)
+        // NỐI LẠI (31/10): lúc mất kết nối máy kia có thể đã làm bài — tin đẩy khi ấy không tới ⇒ đọc lại một lượt. Lần nối ĐẦU không cần (màn vừa tự đọc lúc mở).
+        if (daMo) bao()
+        daMo = true
       }
       w.onmessage = (e) => { if (typeof e.data === 'string' && e.data.includes('"doi"')) bao() }
       w.onclose = () => { if (ws !== w) return; ws = null; tatPing(); henLai() }
