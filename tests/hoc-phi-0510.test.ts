@@ -150,6 +150,6 @@ describe('màn Học sinh: hàng lọc Học phí (thầy 05/10)', () => {
     const khoi = src.slice(src.indexOf('data-khoi="loc-hoc-phi"'), src.indexOf('data-khoi="loc-hoc-phi"') + 900)
     expect(khoi).toContain("[null, 'con_thieu', 'chua_nop']")
     expect(khoi).toContain('setLocHocPhi(t)')
-    expect(src).toContain('trangThaiHocPhi(hp.phaiNop, hp.daNop) === locHocPhi')
+    expect(src).toContain('trangThaiCuaEm(hp, nghi) === locHocPhi') // 31/10: em đã nghỉ ⇒ «Không thu» (hoc-phi-nghi-3110)
   })
 })
