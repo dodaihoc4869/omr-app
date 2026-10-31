@@ -7,6 +7,25 @@ Số liệu thật dùng để đặt ngưỡng: workflow chỉ đọc `.github/
 
 ---
 
+## SOÁT LẠI 31/10 (thầy: «Trên lớp sao mà biết đc. Bỏ mục này đi tính toán lại toàn bộ chỉ số thật kĩ rồi đánh giá lại») — ĐÈ lên các mục dưới
+
+Chỉ dùng điều APP ĐO ĐƯỢC. Mã: `server/src/danh-gia-hoc-that.ts` (`PHIEN_LUAT = '3110-bo-vang'`), `server/src/danh-gia-hoc-that-d1.ts`.
+
+| Mục | Trước | Từ 31/10 | Vì sao |
+|---|---|---|---|
+| A3 Vắng buổi học | 30 × tỉ lệ vắng, trần 15 | **BỎ** | App không biết em có mặt trên lớp (buổi không gắn lớp, phải đoán lớp). Báo cáo tuần phụ huynh cũng bỏ dòng «Đi học x/y buổi». |
+| Đường tắt ĐUỔI | bỏ ≥ 75% KTCN **và vắng** ≥ 50%, 4 tuần | bỏ ≥ 75% KTCN **và ≥ nửa số ngày không làm câu nào**, 4 tuần | Thay «vắng» bằng điều app đo được. Bản chụp cũ (`boVaVang`) không đọc nữa. |
+| B1 Bấm vội | Mức 1 từ mọi giây | chỉ giây **ĐO THẬT** (bỏ giây cũ / ước tính) | Giây ước tính không đủ tin để gọi em «bấm vội». |
+| B2 Bấm lặp | ≥ 6 lượt liền cùng chữ | ≥ 6 **câu khác nhau** liền cùng chữ **và sai ≥ 50%** | Đáp án thật trùng chữ nhiều câu liền / làm lại một câu nhiều lần không phải bấm bừa. |
+| B4 Xem gợi ý | mọi lượt «có hỗ trợ» | bỏ luyện **câu nền** (luôn ghi «có hỗ trợ») và làm lại sau khi **hỏi thầy** | Hai việc ấy là học, không phải đối phó. |
+| B5 Thuộc mà không hiểu | đúng MỌI câu gốc − đúng bản khác | trong nhóm **câu em từng sai**: đúng khi làm lại chính câu ấy − đúng bản khác (≥ 5 / ≥ 10 lượt) | So cũ lệch: bản khác chỉ ra cho câu em đã sai (vốn khó hơn với em) ⇒ em học thật cũng bị phạt. |
+| A1 Bỏ KTCN | mọi bài hết hạn | bài hết hạn mà trả lời **< nửa số câu** | Làm gần hết mà chưa kịp bấm nộp không phải bỏ. |
+| A2 Không làm | 14 ngày gồm hôm nay | 14 ngày **trọn tới hôm qua**; bỏ ngày trước khi em vào app, ngày bảo trì; ngày nộp KTCN / vào thi tính là có làm | Cron thứ Hai 01:00 từng coi thứ Hai là «ngày không làm». |
+| Tỉ lệ đúng của lớp từng câu | mọi dòng có kết quả | cùng luật «lượt làm» (bỏ dòng xem lời giải, lướt, chẩn đoán) | Dòng xem lời giải ghi «sai» làm câu trông khó hơn thật. |
+| Em đã nghỉ (`da_nghi`) | vẫn bị xếp | không xếp, không hiện | Thôi học thì không phải đối phó. |
+
+**Đánh giá lại:** đổi `PHIEN_LUAT` ⇒ cron đêm (01:00–06:00 VN) tự tính lại MỌI tuần đã lưu, cũ → mới, đúng mốc thứ Hai 01:00 của tuần ấy, rồi mới chạy tuần mới. Chỉ ghi lại bản chụp (dữ liệu suy ra) — không gửi nhắc / báo phụ huynh.
+
 ## 0. SOÁT LẠI MỨC LÀM 1–4 TRƯỚC KHI CHỐT (thầy 24/10: «quét lại… đo giây đọc đề cá nhân hoá chính xác cho từng hs chưa?», «tính thêm các câu hs lặp lại thì được đọc nhanh hơn bao nhiêu»)
 
 Nguồn: `.github/workflows/do-giay-doc-ca-nhan-2410.yml` (run 40083002666), 14 ngày, 17.476 lượt có đồng hồ mới, bỏ lượt treo.
@@ -197,7 +216,7 @@ Bản này thay mục 4 ở chỗ nào hai bên khác nhau.
 | Thuộc mà không hiểu (B5) | (đúng câu gốc − đúng bản khác) − 20, đơn vị điểm %, nếu dương | 15 |
 | Rời màn / trùng lỗi sai khi thi (B6, B7) | 10 mỗi bài vượt ngưỡng; trùng lỗi sai thầy đã xác nhận = 40 | 40 |
 | Bỏ KTCN (A1) | 40 × tỉ lệ bỏ | 20 |
-| Vắng không phép (A3) | 30 × tỉ lệ vắng không phép | 15 |
+| ~~Vắng không phép (A3)~~ — BỎ 31/10 | — | — |
 
 Vì sao «thông minh» hơn đếm thẳng:
 1. **Cận dưới Wilson:** em ít lượt không bị phạt oan vì 2–3 lần trượt tay. Ví dụ 3/5 lượt xấu cho cận dưới khoảng 27%, còn 30/50 lượt xấu cho khoảng 48%.

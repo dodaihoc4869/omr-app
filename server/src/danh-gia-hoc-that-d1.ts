@@ -22,9 +22,9 @@ import { nangCoTinhTheoNgay, type MucLamLuot } from './muc-lam'
 import { chuanMucDo, docDoMuc, lapLaiCacLuot } from './muc-lam-so'
 import { doThatCacDong, giaySoLuot, mucLamCuaDong, tapCanTraMucLam, type DongMucSo } from './muc-lam-lo'
 import { congNgay7, ngayVn7 } from './goi-bai-7-loi'
-import { tenLopCuaEm } from './ten-lop'
+import { laNgayBaoTri } from './ngay-bao-tri'
 import {
-  bacCongKhai, bacTheoLichSu, capTrungLoiSai, danhGiaEm, TEN_BAC,
+  bacCongKhai, bacTheoLichSu, capTrungLoiSai, danhGiaEm, PHIEN_LUAT, TEN_BAC,
   type BacDanhGia, type CanThiep, type KetLuanBac, type KetQuaDanhGia, type LoaiCanThiep, type LuotDanhGia, type TuanDaTinh,
 } from './danh-gia-hoc-that'
 
@@ -37,6 +37,10 @@ export type CheDoDanhGia = 'tat' | 'ngam' | 'bat'
 export const KHOA_CHE_DO = 'danh_gia_hoc_that'
 export const SO_NGAY_CUA_SO = 14
 export const LO_EM = 25
+/** Em được xếp: mọi em trừ tài khoản khoá và em ĐÃ NGHỈ (thôi học thì không xếp Đối phó vì «không làm»). */
+const SQL_EM_XEP = "COALESCE(trang_thai, '') NOT IN ('khoa', 'da_nghi')"
+/** Lượt tính là một lần làm (như sổ Mức làm): bỏ dòng đọc lời giải, lướt, chẩn đoán, chữa bước, dòng bị giữ kín. */
+const SQL_LUOT_LAM = "ket_qua IS NOT NULL AND COALESCE(purpose, '') NOT IN ('xem_loi_giai', 'luot', 'chan_doan', 'chua_buoc') AND COALESCE(visibility, '') <> 'embargoed'"
 
 const BANG = [
   `CREATE TABLE IF NOT EXISTS danh_gia_em_tuan (sbd TEXT NOT NULL, tuan TEXT NOT NULL, diem REAL NOT NULL, bac_tuan INTEGER NOT NULL, bac INTEGER NOT NULL,
@@ -81,52 +85,53 @@ export interface KetQuaEm {
   kq: KetQuaDanhGia
   bac: KetLuanBac
   coDoNang: NonNullable<TuanDaTinh['coDoNang']>
-  /** Buổi của lớp em trong cửa sổ (đã suy cho buổi «mọi lớp»); null = chưa xác định được lớp nào học buổi nào. */
-  buoi: { tong: number; coMat: number; coPhep: number } | null
 }
 
-/** Tính MỘT lô em (≤ LO_EM) cho tuần chứa `nowMs`, cửa sổ 14 ngày tới hôm nay. Không ghi gì. Ném lỗi khi không đọc được sổ. */
-export async function tinhLoEm(env: Env, sbds: readonly string[], nowMs: number, tuy: { chiDoc?: boolean; soNgay?: number } = {}): Promise<KetQuaEm[]> {
+/** Cửa sổ của lượt tính lúc `nowMs`: `soNgay` ngày TRỌN tới hết HÔM QUA (giờ VN) — hôm nay đang dở không tính (cron thứ Hai 01:00 không bị coi «thứ Hai
+ *  không làm»; tính lại tuần cũ ra đúng số như lúc ấy). Thuần. */
+export function cuaSoTinh(nowMs: number, soNgay: number = SO_NGAY_CUA_SO, denHomNay = false): { tu: string; cuoi: string; homNay: string; tuan: string; tuIso: string; denIso: string } {
+  const homNay = ngayVn7(nowMs), cuoi = denHomNay ? homNay : congNgay7(homNay, -1), tu = congNgay7(cuoi, -(soNgay - 1))
+  const iso = (ngay: string) => new Date(Date.parse(ngay + 'T00:00:00Z') - 7 * 3600_000).toISOString()
+  return { tu, cuoi, homNay, tuan: thuHaiCua(homNay), tuIso: iso(tu), denIso: iso(congNgay7(cuoi, 1)) }
+}
+/** Mốc giờ của bản chụp tuần `tuan` (thứ Hai 01:00 giờ VN) — lúc cron tuần chạy; tính lại tuần cũ dùng đúng mốc này. Thuần. */
+export const mocTuan = (tuan: string): number => Date.parse(tuan + 'T01:00:00+07:00')
+
+/** Tỉ lệ đúng của lớp từng câu cho tuần `tuan` (cùng cửa sổ, cùng luật lượt làm như bản xếp). Một câu gộp — chỉ chạy ngoài giờ cao điểm. */
+async function dungTiLeCauTuan(env: Env, nowMs: number): Promise<void> {
+  const w = cuaSoTinh(nowMs)
+  await env.DB.prepare(`INSERT OR REPLACE INTO danh_gia_cau_tuan (tuan, qid, n, dung) SELECT ?1, qid, COUNT(*), SUM(ket_qua = 1) FROM su_kien_hoc
+    WHERE ngay_vn BETWEEN ?2 AND ?3 AND ${SQL_LUOT_LAM} GROUP BY qid HAVING COUNT(*) >= 5`).bind(w.tuan, w.tu, w.cuoi).run()
+}
+
+/** Tính MỘT lô em (≤ LO_EM) cho tuần chứa `nowMs`, cửa sổ 14 ngày trọn tới hôm qua. Không ghi gì. Ném lỗi khi không đọc được sổ. */
+export async function tinhLoEm(env: Env, sbds: readonly string[], nowMs: number, tuy: { chiDoc?: boolean; soNgay?: number; denHomNay?: boolean } = {}): Promise<KetQuaEm[]> {
   if (!sbds.length) return []
   // `chiDoc` (xem thử / đo trên dữ liệu thật trước khi phát hành): KHÔNG tạo bảng; bảng mới chưa có ⇒ các lượt đọc ấy trả rỗng (đã `.catch`).
   if (!tuy.chiDoc) await damBaoBangDanhGia(env)
   const soNgay = tuy.soNgay && tuy.soNgay > 0 && tuy.soNgay <= 28 ? Math.floor(tuy.soNgay) : SO_NGAY_CUA_SO
-  const den = ngayVn7(nowMs), tu = congNgay7(den, -(soNgay - 1)), tuan = thuHaiCua(den)
-  const tuIso = new Date(Date.parse(tu + 'T00:00:00Z') - 7 * 3600_000).toISOString()
+  // `denHomNay` (báo cáo tuần phụ huynh «7 ngày tới hôm nay»): cửa sổ gồm cả hôm nay, khớp các số khác của báo cáo.
+  const { tu, cuoi, tuan, tuIso, denIso } = cuaSoTinh(nowMs, soNgay, tuy.denHomNay === true)
+  const nowIso = new Date(nowMs).toISOString()
   const ds = JSON.stringify(sbds)
-  const [rSo, rKt, rThi, rHs, rBuoi, rDd, rLs, rCt, rCauTuan, rMoiLop, rSiSo] = await Promise.all([
-    hoi(env, `SELECT s.sbd, s.qid, s.nguon, s.ma_nguon, s.ket_qua, s.giay, s.luc, s.muc_do, s.ngay_vn, s.assistance,
+  const [rSo, rKt, rThi, rHs, rLs, rCt, rCauTuan] = await Promise.all([
+    hoi(env, `SELECT s.sbd, s.qid, s.nguon, s.ma_nguon, s.ket_qua, s.giay, s.luc, s.muc_do, s.ngay_vn, s.assistance, s.purpose,
         CASE WHEN json_valid(s.raw_json) THEN json_extract(s.raw_json, '$.ms') END AS ms,
         CASE WHEN json_valid(s.raw_json) THEN json_extract(s.raw_json, '$.tc') END AS tc,
         CASE WHEN json_valid(s.raw_json) THEN json_extract(s.raw_json, '$.doc') END AS doc,
         CASE WHEN json_valid(s.raw_json) THEN UPPER(TRIM(CAST(COALESCE(json_extract(s.raw_json, '$.chon'), json_extract(s.raw_json, '$.traLoi')) AS TEXT))) END AS chon
-      FROM su_kien_hoc s WHERE s.sbd IN (SELECT value FROM json_each(?1)) AND s.ngay_vn BETWEEN ?2 AND ?3 AND s.ket_qua IS NOT NULL
-        AND COALESCE(s.purpose, '') NOT IN ('xem_loi_giai', 'luot', 'chan_doan', 'chua_buoc') AND COALESCE(s.visibility, '') <> 'embargoed'`, ds, tu, den),
-    hoi(env, 'SELECT sbd, trang_thai, diem, ngay FROM kiem_tra_ca_nhan WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay BETWEEN ?2 AND ?3 ORDER BY ngay', ds, tu, den).catch(() => [] as Row[]),
-    hoi(env, 'SELECT sbd, so_lan_roi_man, tong_giay_roi_man FROM luot WHERE sbd IN (SELECT value FROM json_each(?1)) AND vao_luc >= ?2', ds, tuIso).catch(() => [] as Row[]),
-    // Buổi học lưu TÊN LỚP (`tenLopCuaEm`: cột `ten_lop` nếu có, không thì lớp mặc định theo khối) — so đúng tên ấy, như buoi-hoc.ts.
-    hoi(env, 'SELECT sbd, lop, ten_lop FROM hoc_sinh WHERE sbd IN (SELECT value FROM json_each(?1))', ds).catch(() => hoi(env, 'SELECT sbd, lop, NULL AS ten_lop FROM hoc_sinh WHERE sbd IN (SELECT value FROM json_each(?1))', ds)).catch(() => [] as Row[]),
-    hoi(env, 'SELECT id, lop FROM buoi_hoc WHERE mo_luc >= ?1', tuIso).catch(() => [] as Row[]),
-    hoi(env, 'SELECT buoi_id, sbd, trang_thai FROM buoi_hoc_diem_danh WHERE sbd IN (SELECT value FROM json_each(?1))', ds).catch(() => [] as Row[]),
+      FROM su_kien_hoc s WHERE s.sbd IN (SELECT value FROM json_each(?1)) AND s.ngay_vn BETWEEN ?2 AND ?3 AND ${SQL_LUOT_LAM}`, ds, tu, cuoi),
+    // Bỏ KTCN = bài HẾT HẠN mà em trả lời chưa tới nửa số câu (đếm câu đã trả lời trong `tra_json`, chỉ cho bài hết hạn).
+    hoi(env, `SELECT k.sbd, k.trang_thai, k.diem, k.ngay,
+        CASE WHEN k.trang_thai = 'het_han' AND json_valid(k.tra_json) THEN (SELECT COUNT(*) FROM json_each(k.tra_json) a WHERE a.type = 'text' AND length(trim(a.value)) > 0) END AS da_tra,
+        CASE WHEN k.trang_thai = 'het_han' AND json_valid(k.json) THEN json_array_length(k.json, '$.cau') END AS tong
+      FROM kiem_tra_ca_nhan k WHERE k.sbd IN (SELECT value FROM json_each(?1)) AND k.ngay BETWEEN ?2 AND ?3 ORDER BY k.ngay`, ds, tu, cuoi).catch(() => [] as Row[]),
+    hoi(env, 'SELECT sbd, vao_luc, so_lan_roi_man, tong_giay_roi_man FROM luot WHERE sbd IN (SELECT value FROM json_each(?1)) AND vao_luc >= ?2 AND vao_luc < ?3', ds, tuIso, denIso).catch(() => [] as Row[]),
+    hoi(env, 'SELECT sbd, tao_luc FROM hoc_sinh WHERE sbd IN (SELECT value FROM json_each(?1))', ds).catch(() => [] as Row[]),
     hoi(env, 'SELECT * FROM danh_gia_em_tuan WHERE sbd IN (SELECT value FROM json_each(?1)) AND tuan < ?2 ORDER BY tuan DESC', ds, tuan).catch(() => [] as Row[]),
-    hoi(env, 'SELECT sbd, loai, gui_luc, em_xem_luc, ph_xem_luc FROM can_thiep_em WHERE sbd IN (SELECT value FROM json_each(?1)) AND gui_luc >= ?2', ds, new Date(nowMs - 70 * 86_400_000).toISOString()).catch(() => [] as Row[]),
-    hoi(env, 'SELECT MAX(tuan) AS t FROM danh_gia_cau_tuan').catch(() => [] as Row[]),
-    // Buổi «mọi lớp» (thầy không chọn lớp — 19/19 buổi tới 24/10): SUY lớp từ ai đã có mặt (mục dưới). MỘT câu gộp, cùng đợt.
-    hoi(env, `SELECT d.buoi_id, h.lop, h.ten_lop, COUNT(*) AS n FROM buoi_hoc_diem_danh d JOIN hoc_sinh h ON h.sbd = d.sbd
-      WHERE d.trang_thai = 'co_mat' AND d.buoi_id IN (SELECT id FROM buoi_hoc WHERE mo_luc >= ?1 AND COALESCE(lop, '') = '') GROUP BY d.buoi_id, h.lop, h.ten_lop`, tuIso).catch(() => [] as Row[]),
-    hoi(env, "SELECT lop, ten_lop, COUNT(*) AS n FROM hoc_sinh WHERE COALESCE(trang_thai, '') <> 'khoa' GROUP BY lop, ten_lop").catch(() => [] as Row[]),
+    hoi(env, 'SELECT sbd, loai, gui_luc, em_xem_luc, ph_xem_luc FROM can_thiep_em WHERE sbd IN (SELECT value FROM json_each(?1)) AND gui_luc >= ?2 AND gui_luc <= ?3', ds, new Date(nowMs - 70 * 86_400_000).toISOString(), nowIso).catch(() => [] as Row[]),
+    hoi(env, 'SELECT MAX(tuan) AS t FROM danh_gia_cau_tuan WHERE tuan <= ?1', tuan).catch(() => [] as Row[]),
   ])
-  // Buổi của lớp L = buổi gắn đúng lớp L, CỘNG buổi «mọi lớp» có ≥ max(3, 30% sĩ số L) em lớp L có mặt (lớp ấy thật sự học buổi đó).
-  const siSo = new Map<string, number>()
-  for (const x of rSiSo) { const l = tenLopCuaEm(x.lop, x.ten_lop); siSo.set(l, (siSo.get(l) ?? 0) + num(x.n)) }
-  const coMatLop = new Map<string, number>()
-  for (const x of rMoiLop) { const k = `${str(x.buoi_id)}|${tenLopCuaEm(x.lop, x.ten_lop)}`; coMatLop.set(k, (coMatLop.get(k) ?? 0) + num(x.n)) }
-  const buoiCuaLop = (lop: string): string[] => rBuoi.filter((x) => {
-    const l = str(x.lop)
-    if (l) return l === lop
-    const n = coMatLop.get(`${str(x.id)}|${lop}`) ?? 0
-    return n >= Math.max(3, 0.3 * (siSo.get(lop) ?? 0))
-  }).map((x) => str(x.id))
   // Lượt → Mức làm (CÙNG đường với Lịch sử làm câu / bảng điểm danh: hệ số lặp, τ riêng, β, đo lại lượt cũ).
   const dong: (DongMucSo & { chon: string; coGoiY: boolean })[] = rSo.map((x) => {
     const qid = str(x.qid), tc = str(x.tc)
@@ -135,7 +140,9 @@ export async function tinhLoEm(env: Env, sbds: readonly string[], nowMs: number,
       sbd: str(x.sbd), nguon: str(x.nguon), ngay: str(x.ngay_vn), maNguon: str(x.ma_nguon), luc: str(x.luc),
       goc: tc ? tachSongSinh(tc).goc : tachSongSinh(qid).goc, mucDo: chuanMucDo(x.muc_do),
       ketQua: kq === null || !Number.isFinite(kq) ? null : kq, giayCot: x.giay, ms: x.ms,
-      doMuc: docDoMuc({ doc: json<Row | null>(x.doc, null) }), qid, tc, chon: str(x.chon), coGoiY: str(x.assistance) === 'assisted',
+      doMuc: docDoMuc({ doc: json<Row | null>(x.doc, null) }), qid, tc, chon: str(x.chon),
+      // Gợi ý EM TỰ MỞ: luyện câu nền (`luyen_nen`, luôn ghi «có hỗ trợ») và làm lại sau khi hỏi thầy là việc học, không phải đối phó.
+      coGoiY: str(x.assistance) === 'assisted' && str(x.purpose) !== 'luyen_nen' && str(x.nguon) !== 'nen' && !str(x.ma_nguon).startsWith('hoi_thay_kiem:'),
     }
   })
   const doThat = doThatCacDong(dong)
@@ -159,7 +166,8 @@ export async function tinhLoEm(env: Env, sbds: readonly string[], nowMs: number,
     luotEm.get(d.sbd)?.push({ m: mucLamCuaDong(d, doThat[i] ?? null, gs, beta, kichThuoc, { lap: lap[i] ?? null, tau: tau.get(d.sbd) ?? null }), d })
   })
   const ngayCuaSo = Array.from({ length: soNgay }, (_, i) => congNgay7(tu, i))
-  const lopEm = new Map(rHs.map((x) => [str(x.sbd), tenLopCuaEm(x.lop, x.ten_lop)]))
+  // Ngày em vào app (tài khoản tạo): những ngày tới hết hôm ấy không bắt «không làm».
+  const ngayVao = new Map(rHs.map((x) => { const t = Date.parse(str(x.tao_luc)); return [str(x.sbd), Number.isFinite(t) ? ngayVn7(t) : ''] as const }))
   const ra: KetQuaEm[] = []
   for (const sbd of sbds) {
     const ls = luotEm.get(sbd) ?? []
@@ -170,43 +178,47 @@ export async function tinhLoEm(env: Env, sbds: readonly string[], nowMs: number,
       return {
         phan: (p as LuotDanhGia['phan']) ?? null,
         dung: x.d.ketQua === null ? null : x.d.ketQua === 1,
-        ma: m ? m.ma : null,
-        thuoc: !!m?.thuoc,
+        cau: x.d.goc,
+        // Bấm vội / Thuộc CHỈ từ giây ĐO THẬT (đồng hồ mới); giây cũ / ước tính (`uocTinh`) không đủ tin để gọi em «bấm vội».
+        ma: m && !m.uocTinh ? m.ma : null,
+        thuoc: !!m?.thuoc && !m.uocTinh,
         treo: m?.treo ?? null,
         r: m && m.giayDoc > 0 && !m.uocTinh ? m.giay / m.giayDoc : null,
         pLop: pLop.get(x.d.qid ?? '') ?? null,
         chon: x.d.chon || null,
         coGoiY: x.d.coGoiY,
-        songSinh: !!x.d.tc,
+        songSinh: !!x.d.tc || tachSongSinh(x.d.qid ?? '').songSinh !== null,
         ngay: x.d.ngay ?? '',
         luc: x.d.luc,
       }
     })
     const kt = rKt.filter((x) => str(x.sbd) === sbd)
-    const lop = lopEm.get(sbd) ?? ''
-    const buoiLop = lop ? buoiCuaLop(lop) : []
-    const dd = rDd.filter((x) => str(x.sbd) === sbd && buoiLop.includes(str(x.buoi_id)))
+    const boKt = (x: Row) => str(x.trang_thai) === 'het_han' && num(x.tong) > 0 && num(x.da_tra) < 0.5 * num(x.tong)
+    const lamKt = (x: Row) => str(x.trang_thai) === 'da_nop' || (str(x.trang_thai) === 'het_han' && num(x.tong) > 0 && !boKt(x))
+    const thiEm = rThi.filter((x) => str(x.sbd) === sbd)
+    const vao = ngayVao.get(sbd) ?? ''
+    const ngayPhaiLam = ngayCuaSo.filter((n) => n > vao && !laNgayBaoTri(n))
     const ct: CanThiep[] = rCt.filter((x) => str(x.sbd) === sbd).map((x) => ({ loai: str(x.loai) as LoaiCanThiep, luc: str(x.gui_luc), emXem: str(x.em_xem_luc) || null, phXem: str(x.ph_xem_luc) || null }))
     const gianLan = ct.filter((c) => c.loai === 'gian_lan_xac_nhan' && c.luc >= tuIso).length
     const kq = danhGiaEm({
       luot,
-      ngayCuaSo,
-      ktcn: { daNop: kt.filter((x) => str(x.trang_thai) === 'da_nop').length, boHan: kt.filter((x) => str(x.trang_thai) === 'het_han').length, diem: kt.filter((x) => str(x.trang_thai) === 'da_nop' && x.diem !== null).map((x) => num(x.diem)) },
-      thi: rThi.filter((x) => str(x.sbd) === sbd).map((x) => ({ roiLan: num(x.so_lan_roi_man), roiGiay: num(x.tong_giay_roi_man) })),
+      ngayCuaSo: ngayPhaiLam,
+      ngayCoLamKhac: [...kt.filter(lamKt).map((x) => str(x.ngay)), ...thiEm.map((x) => { const t = Date.parse(str(x.vao_luc)); return Number.isFinite(t) ? ngayVn7(t) : '' }).filter(Boolean)],
+      ktcn: { daNop: kt.filter(lamKt).length, boHan: kt.filter(boKt).length, diem: kt.filter((x) => str(x.trang_thai) === 'da_nop' && x.diem !== null).map((x) => num(x.diem)) },
+      thi: thiEm.map((x) => ({ roiLan: num(x.so_lan_roi_man), roiGiay: num(x.tong_giay_roi_man) })),
       gianLanXacNhan: gianLan,
-      buoi: buoiLop.length ? { tong: buoiLop.length, coMat: dd.filter((x) => str(x.trang_thai) === 'co_mat').length, coPhep: dd.filter((x) => str(x.trang_thai) === 'co_phep').length } : null,
     })
-    const vangKhongPhep = buoiLop.length ? Math.max(0, buoiLop.length - dd.length) / buoiLop.length : 0
+    const soNgayTinh = kq.soLieu.soNgayTinh ?? 0
     const tuanNay: TuanDaTinh = {
       tuan, diem: kq.diem, bacTuan: kq.bacTuan, bac: kq.bacTuan, coDo: kq.coDo,
-      coDoNang: { coTinh: kq.soLieu.ngayCoTinh >= 1, gianLan, boVaVang: (kq.soLieu.boKtcn ?? 0) >= 0.75 && vangKhongPhep >= 0.5 },
+      coDoNang: { coTinh: kq.soLieu.ngayCoTinh >= 1, gianLan, boHoc: (kq.soLieu.boKtcn ?? 0) >= 0.75 && soNgayTinh > 0 && (kq.soLieu.ngayKhongLam ?? 0) >= 0.5 * soNgayTinh },
     }
     const truoc: TuanDaTinh[] = rLs.filter((x) => str(x.sbd) === sbd).slice(0, 4).map((x) => ({
       tuan: str(x.tuan), diem: num(x.diem), bacTuan: num(x.bac_tuan) as 1 | 2 | 3, bac: num(x.bac) as BacDanhGia, coDo: num(x.co_do) === 1,
       coDoNang: json(x.co_do_nang_json, undefined as TuanDaTinh['coDoNang']),
     }))
     const bac = bacTheoLichSu(tuanNay, truoc, ct, kq.tienBo, new Date(nowMs).toISOString())
-    ra.push({ sbd, tuan, kq, bac, coDoNang: tuanNay.coDoNang!, buoi: buoiLop.length ? { tong: buoiLop.length, coMat: dd.filter((x) => str(x.trang_thai) === 'co_mat').length, coPhep: dd.filter((x) => str(x.trang_thai) === 'co_phep').length } : null })
+    ra.push({ sbd, tuan, kq, bac, coDoNang: tuanNay.coDoNang! })
   }
   return ra
 }
@@ -241,7 +253,43 @@ export async function lamViecTuDong(env: Env, ds: readonly KetQuaEm[], nowMs: nu
 // ───────────────────────── CRON (thứ Hai, ngoài cao điểm, chia lô) ─────────────────────────
 
 const KHOA_CON_TRO = 'danh_gia_hoc_that_con_tro'
-/** Gọi mỗi phút từ cron. Thứ Hai 01:00–06:00 giờ VN (hoặc tuần chưa tính xong): dựng tỉ lệ đúng từng câu rồi tính LO_EM em mỗi lượt cho tới hết. */
+/** Con trỏ ĐÁNH GIÁ LẠI theo luật mới (`PHIEN_LUAT`): danh sách tuần đã lưu (cũ → mới), tuần đang làm, em sau cùng đã tính. */
+export const KHOA_TINH_LAI = 'danh_gia_hoc_that_tinh_lai'
+interface ConTroTinhLai { luat?: string; ds?: string[]; i?: number; sau?: string; cau?: boolean; xong?: boolean }
+const ghiCauHinh = (env: Env, khoa: string, v: unknown, nay: string) => env.DB.prepare(`INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES (?, ?, ?) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc`).bind(khoa, JSON.stringify(v), nay).run()
+
+/**
+ * Một bước ĐÁNH GIÁ LẠI mọi tuần đã lưu theo luật mới (thầy 31/10 «tính toán lại toàn bộ chỉ số thật kĩ rồi đánh giá lại»). Tuần CŨ trước, mới sau (bậc
+ * tuần sau đọc lịch sử tuần trước); mỗi tuần: dựng lại tỉ lệ đúng từng câu (luật lượt làm mới) rồi tính lại từng lô 25 em ĐÃ có bản chụp tuần ấy, đúng mốc
+ * thứ Hai 01:00 của tuần ấy (cùng cửa sổ như cron tuần). CHỈ ghi lại bản chụp (dữ liệu suy ra, tính lại được từ sổ) — KHÔNG gửi nhắc / báo phụ huynh.
+ * Trả null khi đã xong (cron làm việc tuần như thường).
+ */
+export async function buocTinhLai(env: Env, nowMs: number): Promise<{ chay: boolean; soEm?: number; xong?: boolean; lyDo?: string } | null> {
+  const nay = new Date(nowMs).toISOString()
+  const tl = json<ConTroTinhLai>((await env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind(KHOA_TINH_LAI).first<Row>().catch(() => null))?.gia_tri, {})
+  if (tl.luat === PHIEN_LUAT && tl.xong) return null
+  if (tl.luat !== PHIEN_LUAT || !Array.isArray(tl.ds)) {
+    const ds = (await hoi(env, 'SELECT DISTINCT tuan FROM danh_gia_em_tuan ORDER BY tuan')).map((x) => str(x.tuan)).filter(Boolean)
+    await ghiCauHinh(env, KHOA_TINH_LAI, { luat: PHIEN_LUAT, ds, i: 0, sau: '', cau: false, xong: ds.length === 0 }, nay)
+    return { chay: true, soEm: 0, lyDo: 'tinh_lai_bat_dau' }
+  }
+  const i = tl.i ?? 0, tuan = tl.ds[i]
+  if (!tuan) { await ghiCauHinh(env, KHOA_TINH_LAI, { ...tl, xong: true }, nay); return { chay: true, soEm: 0, xong: true, lyDo: 'tinh_lai_xong' } }
+  const moc = mocTuan(tuan)
+  if (!tl.cau) {
+    await dungTiLeCauTuan(env, moc)
+    await ghiCauHinh(env, KHOA_TINH_LAI, { ...tl, cau: true, sau: '' }, nay)
+    return { chay: true, soEm: 0, lyDo: 'tinh_lai_cau' }
+  }
+  const lo = (await hoi(env, 'SELECT sbd FROM danh_gia_em_tuan WHERE tuan = ?1 AND sbd > ?2 ORDER BY sbd LIMIT ?3', tuan, tl.sau ?? '', LO_EM)).map((x) => str(x.sbd))
+  if (lo.length) await ghiBanChup(env, await tinhLoEm(env, lo, moc), nowMs)
+  const het = lo.length < LO_EM
+  await ghiCauHinh(env, KHOA_TINH_LAI, het ? { ...tl, i: i + 1, sau: '', cau: false } : { ...tl, sau: lo[lo.length - 1] }, nay)
+  return { chay: true, soEm: lo.length, lyDo: 'tinh_lai' }
+}
+
+/** Gọi mỗi phút từ cron. 01:00–06:00 giờ VN: (1) luật đổi ⇒ đánh giá lại mọi tuần đã lưu trước; (2) thứ Hai (hoặc tuần chưa tính xong): dựng tỉ lệ đúng
+ *  từng câu rồi tính LO_EM em mỗi lượt cho tới hết. */
 export async function cronDanhGiaTuan(env: Env, nowMs: number): Promise<{ chay: boolean; soEm?: number; xong?: boolean; lyDo?: string }> {
   const g = new Date(nowMs + 7 * 3600_000)
   const phut = g.getUTCHours() * 60 + g.getUTCMinutes()
@@ -249,21 +297,21 @@ export async function cronDanhGiaTuan(env: Env, nowMs: number): Promise<{ chay: 
   const cheDo = await docCheDo(env)
   if (cheDo === 'tat') return { chay: false, lyDo: 'tat' }
   await damBaoBangDanhGia(env)
+  const lai = await buocTinhLai(env, nowMs)
+  if (lai) return lai
   const homNay = ngayVn7(nowMs), tuan = thuHaiCua(homNay)
   const ct = json<{ tuan?: string; sau?: string; xong?: boolean }>((await env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind(KHOA_CON_TRO).first<Row>().catch(() => null))?.gia_tri, {})
   if (ct.tuan === tuan && ct.xong) return { chay: false, lyDo: 'da_xong' }
   // Chỉ bắt đầu tuần mới vào thứ Hai; tuần đang dở thì làm tiếp bất kể thứ.
   if (ct.tuan !== tuan && g.getUTCDay() !== 1) return { chay: false, lyDo: 'chua_thu_hai' }
   const nay = new Date(nowMs).toISOString()
-  const ghiCt = (v: unknown) => env.DB.prepare(`INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES (?, ?, ?) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc`).bind(KHOA_CON_TRO, JSON.stringify(v), nay).run()
+  const ghiCt = (v: unknown) => ghiCauHinh(env, KHOA_CON_TRO, v, nay)
   if (ct.tuan !== tuan) {
-    const tu = congNgay7(homNay, -(SO_NGAY_CUA_SO - 1))
-    await env.DB.prepare(`INSERT OR REPLACE INTO danh_gia_cau_tuan (tuan, qid, n, dung) SELECT ?1, qid, COUNT(*), SUM(ket_qua = 1) FROM su_kien_hoc
-      WHERE ngay_vn BETWEEN ?2 AND ?3 AND ket_qua IS NOT NULL GROUP BY qid HAVING COUNT(*) >= 5`).bind(tuan, tu, homNay).run()
+    await dungTiLeCauTuan(env, nowMs)
     await ghiCt({ tuan, sau: '', xong: false })
     return { chay: true, soEm: 0 }
   }
-  const lo = (await hoi(env, "SELECT sbd FROM hoc_sinh WHERE sbd > ?1 AND COALESCE(trang_thai, '') <> 'khoa' ORDER BY sbd LIMIT ?2", ct.sau ?? '', LO_EM)).map((x) => str(x.sbd))
+  const lo = (await hoi(env, `SELECT sbd FROM hoc_sinh WHERE sbd > ?1 AND ${SQL_EM_XEP} ORDER BY sbd LIMIT ?2`, ct.sau ?? '', LO_EM)).map((x) => str(x.sbd))
   if (!lo.length) { await ghiCt({ tuan, sau: ct.sau, xong: true }); return { chay: true, soEm: 0, xong: true } }
   const ds = await tinhLoEm(env, lo, nowMs)
   await ghiBanChup(env, ds, nowMs)
@@ -290,9 +338,10 @@ const banChupRa = (x: Row) => ({
 
 /** `POST /gv/danh-gia/lop` — bản chụp tuần mới nhất của mọi em (+ tên, lớp) + công tắc. Nhãn mù KHÔNG kèm ở đây (màn gán nhãn đọc riêng). */
 export async function gvDanhGiaLop(env: Env): Promise<Row> {
-  const [cheDo, ds, hs] = await Promise.all([docCheDo(env), docBanChupMoiNhat(env), hoi(env, "SELECT sbd, ho_ten, lop FROM hoc_sinh WHERE COALESCE(trang_thai, '') <> 'khoa'")])
+  const [cheDo, ds, hs] = await Promise.all([docCheDo(env), docBanChupMoiNhat(env), hoi(env, `SELECT sbd, ho_ten, lop FROM hoc_sinh WHERE ${SQL_EM_XEP}`)])
   const ten = new Map(hs.map((x) => [str(x.sbd), { ten: str(x.ho_ten), lop: str(x.lop) }]))
-  return { ok: true, cheDo, em: ds.map((x) => ({ ...banChupRa(x), ...(ten.get(str(x.sbd)) ?? { ten: str(x.sbd), lop: '' }) })) }
+  // Em đã nghỉ / tài khoản khoá: không hiện (bản chụp cũ của em ấy vẫn giữ).
+  return { ok: true, cheDo, em: ds.filter((x) => ten.has(str(x.sbd))).map((x) => ({ ...banChupRa(x), ...ten.get(str(x.sbd))! })) }
 }
 
 /** `POST /gv/danh-gia/em {sbd}` — tính TRỰC TIẾP tuần này (không ghi) + các tuần đã lưu + nhật ký can thiệp: hồ sơ một em / hồ sơ bằng chứng ĐUỔI. */
@@ -320,9 +369,12 @@ export async function gvDanhGiaEm(env: Env, b: Row, nowMs = Date.now()): Promise
  *  ngưỡng trên dữ liệu thật trước khi bật (workflow do-danh-gia-thu-2410.yml). */
 export async function gvDanhGiaThu(env: Env, b: Row, nowMs = Date.now()): Promise<Row> {
   const sau = str(b.sau)
-  const sbds = (await hoi(env, "SELECT sbd FROM hoc_sinh WHERE sbd > ?1 AND COALESCE(trang_thai, '') <> 'khoa' ORDER BY sbd LIMIT ?2", sau, LO_EM)).map((x) => str(x.sbd))
+  // `tuan` (YYYY-MM-DD thứ Hai): xem thử ĐÚNG tuần ấy (mốc thứ Hai 01:00) — so luật mới với bản chụp đã lưu.
+  const tuanXem = /^\d{4}-\d{2}-\d{2}$/.test(str(b.tuan)) ? str(b.tuan) : ''
+  const moc = tuanXem ? mocTuan(tuanXem) : nowMs
+  const sbds = (await hoi(env, `SELECT sbd FROM hoc_sinh WHERE sbd > ?1 AND ${SQL_EM_XEP} ORDER BY sbd LIMIT ?2`, sau, LO_EM)).map((x) => str(x.sbd))
   if (!sbds.length) return { ok: true, xong: true, soEm: 0 }
-  const ds = await tinhLoEm(env, sbds, nowMs, { chiDoc: true })
+  const ds = await tinhLoEm(env, sbds, moc, { chiDoc: true })
   const dem: Record<string, number> = {}
   const cong = (k: string, n = 1) => { dem[k] = (dem[k] ?? 0) + n }
   for (const x of ds) {
@@ -342,15 +394,12 @@ export async function gvDanhGiaTinhLai(env: Env, b: Row, nowMs = Date.now()): Pr
   await damBaoBangDanhGia(env)
   let sbds = (Array.isArray(b.sbds) ? b.sbds : []).map(str).filter((x) => x && x.length <= 40).slice(0, LO_EM)
   const sau = str(b.sau)
-  if (!sbds.length) sbds = (await hoi(env, "SELECT sbd FROM hoc_sinh WHERE sbd > ?1 AND COALESCE(trang_thai, '') <> 'khoa' ORDER BY sbd LIMIT ?2", sau, LO_EM)).map((x) => str(x.sbd))
+  if (!sbds.length) sbds = (await hoi(env, `SELECT sbd FROM hoc_sinh WHERE sbd > ?1 AND ${SQL_EM_XEP} ORDER BY sbd LIMIT ?2`, sau, LO_EM)).map((x) => str(x.sbd))
   if (!sbds.length) return { ok: true, soEm: 0, xong: true }
   // Tỉ lệ đúng từng câu của tuần: dựng nếu tuần này chưa có (một câu gộp, ngoài giờ cao điểm thầy mới bấm).
-  const den = ngayVn7(nowMs), tuan = thuHaiCua(den)
+  const tuan = thuHaiCua(ngayVn7(nowMs))
   const coCau = await hoi(env, 'SELECT 1 FROM danh_gia_cau_tuan WHERE tuan = ? LIMIT 1', tuan)
-  if (!coCau.length) {
-    await env.DB.prepare(`INSERT OR REPLACE INTO danh_gia_cau_tuan (tuan, qid, n, dung) SELECT ?1, qid, COUNT(*), SUM(ket_qua = 1) FROM su_kien_hoc
-      WHERE ngay_vn BETWEEN ?2 AND ?3 AND ket_qua IS NOT NULL GROUP BY qid HAVING COUNT(*) >= 5`).bind(tuan, congNgay7(den, -(SO_NGAY_CUA_SO - 1)), den).run()
-  }
+  if (!coCau.length) await dungTiLeCauTuan(env, nowMs)
   const ds = await tinhLoEm(env, sbds, nowMs)
   await ghiBanChup(env, ds, nowMs)
   return { ok: true, soEm: ds.length, sau: sbds[sbds.length - 1], xong: sbds.length < LO_EM }

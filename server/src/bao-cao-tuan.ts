@@ -121,7 +121,7 @@ export async function duLieuTuanCuaEm(env: Env, sbd: string, nowMs: number): Pro
     hoi(`SELECT chuyen_de, COUNT(*) AS n, SUM(ket_qua = 0) AS s FROM su_kien_hoc WHERE sbd = ?1 AND ngay_vn BETWEEN ?2 AND ?3 AND ${LOC}
       AND COALESCE(chuyen_de, '') <> '' GROUP BY chuyen_de HAVING SUM(ket_qua = 0) >= 3 ORDER BY s DESC LIMIT 2`, sbd, tu, den).catch(() => [] as Row[]),
     docCheDo(env).catch(() => 'ngam' as const),
-    tinhLoEm(env, [sbd], nowMs, { chiDoc: true, soNgay: 7 }).catch(() => []),
+    tinhLoEm(env, [sbd], nowMs, { chiDoc: true, soNgay: 7, denHomNay: true }).catch(() => []),
     hoi('SELECT tuan, bac, phat_json FROM danh_gia_em_tuan WHERE sbd = ? ORDER BY tuan DESC LIMIT 1', sbd).catch(() => [] as Row[]),
     hoi(`SELECT gui_luc FROM can_thiep_em WHERE sbd = ? AND loai IN ('bao_ph', 'xac_nhan_nghi') ORDER BY gui_luc DESC LIMIT 3`, sbd).catch(() => [] as Row[]),
   ])
@@ -135,7 +135,8 @@ export async function duLieuTuanCuaEm(env: Env, sbd: string, nowMs: number): Pro
     tu: ddmm(tu),
     den: ddmm(den),
     ngayKiem: ddmm(congNgay7(den, 7)),
-    buoi: c?.buoi ?? null,
+    // «Đi học x/y buổi» BỎ 31/10 (thầy: «Trên lớp sao mà biết đc») — app không biết em có mặt trên lớp; dòng ấy tự ẩn khi null.
+    buoi: null,
     soNgay: 7,
     ngayCoLam: coLam.size,
     ngayKhongLam: Array.from({ length: 7 }, (_, i) => congNgay7(tu, i)).filter((x) => !coLam.has(x)).map(ddmm),
