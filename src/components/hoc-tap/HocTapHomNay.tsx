@@ -114,11 +114,13 @@ export default function HocTapHomNay(p: Props) {
   // MỘT CON SỐ (thầy 12/10: "học sinh làm 24 câu nhưng lại báo 31 câu"): M và đã làm của hôm nay lấy MỘT chỗ — `soHomNay` (Gói 7 → Hành trình → thể
   // lực → kế hoạch cũ), cùng hàm màn làm bài dùng. "Đủ mức" khi đã làm ≥ M — đúng `datMuc` phía thầy / phụ huynh / Nhịp học; câu mới theo lịch còn lại
   // của gói KHÔNG chặn chữ đạt (máy chủ đã xếp chúng trong mức; phần chưa gặp dồn sang ngày sau).
-  const so = soHomNay(p.ketQua, p.tienDoCu)
+  const so0 = soHomNay(p.ketQua, p.tienDoCu)
   // `theLuc.con` = số việc kế hoạch XẾP ĐƯỢC lúc này. Gói 7 (khẩn 12/10 21h30): kho thiếu câu sẵn sàng (giữ cho ca kiểm tra, BTVN, chờ duyệt…) ⇒ con
   // có thể nhỏ hơn M − đã làm. Em VẪN bấm học được phần đã xếp; CHỈ khoá khi hết hẳn việc xếp được (con = 0), lúc ấy chưa đủ mức thì nút nói rõ
   // "Hôm nay còn N câu chờ thầy bổ sung" (N = M − đã làm). "Còn N câu" phía trên luôn theo M (`soHomNay`), không theo `theLuc`.
   const con = sanh?.theLuc.con ?? null
+  // Đủ mức + hết việc xếp được ⇒ mọi chặng tính xong (lam-bai.ts `duNgay`) — không kẹt «6/7 chặng» với nút khoá.
+  const so = so0 && con === 0 && so0.daLam >= so0.muc ? { ...so0, duNgay: true } : so0
   const khoaHoc = p.dangLamMoi || p.dangTai && !sanh || con === 0
   const conMuc = so ? Math.max(0, so.muc - so.daLam) : 0
   const kho = goi7 ? { choBoSung: con === 0 ? conMuc : 0, sanSang: con ?? undefined, caThi: con === 0 && (goi7.khoaCaThi ?? 0) > 0 } : undefined

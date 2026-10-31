@@ -59,6 +59,9 @@ export interface SoHomNay {
   /** (30/10) Chặng đang làm dở trên máy: số câu THẬT của chặng · số câu đã nộp — vòng tiến độ chia đúng bấy nhiêu đoạn (vắng ⇒ theo ranh 6 câu). */
   cauChang?: number
   daCauChang?: number
+  /** (31/10, ảnh thầy «Bài 7 · 6/7 chặng · Đã làm hết câu được giao», nút Bắt đầu khoá): ĐÃ ĐỦ MỨC và máy chủ HẾT việc xếp được (`theLuc.con` = 0) ⇒ mọi chặng
+   *  tính xong. Chặng cuối lấy chẵn 6 câu (mức 40 ⇒ chặng 7 tới câu 42) nên khi kho hết câu nó không bao giờ đủ ⇒ em kẹt ở «6/7». */
+  duNgay?: boolean
 }
 /** Mỗi chặng tối đa 6 câu — cùng hằng với máy chủ (`server/src/hanh-trinh-ngay.ts` CAU_MOI_CHANG) và vạch chặng ở Hôm nay. */
 export const CAU_MOI_CHANG = 6
@@ -86,6 +89,7 @@ export function soHomNay(kq: KetQuaSanh | null | undefined, tienDoCu?: { daLam: 
 
 /** Số chặng đã xong hôm nay — cùng luật vạch chặng ở Hôm nay; chặng đang dở chưa qua màn báo hoàn thành (`changDangDo`) chưa được tính là xong. */
 export function soChangXong(s: SoHomNay): number {
+  if (s.duNgay) return s.soChang
   let x = 0
   const tongCau = Math.max(s.muc, s.soChang * CAU_MOI_CHANG)
   for (let i = 0; i < s.soChang; i++) {
