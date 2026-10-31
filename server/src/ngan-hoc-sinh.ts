@@ -15,6 +15,8 @@ export const datXuLyNgan = (f: XuLy): void => { xuLy = f }
 export const DAU_TRONG_NGAN = 'x-trong-ngan-hs'
 /** SBD của ngăn (Worker ghi khi chuyển vào) — kho riêng chỉ phục vụ đúng em này. */
 export const DAU_SBD_NGAN = 'x-ngan-sbd'
+/** Tiền tố tên ngăn: đổi ⇒ mọi em sang ngăn mới (tạo lại đúng vùng theo `locationHint`). */
+export const TIEN_TO_NGAN = 'apac|'
 
 /**
  * KHO RIÊNG CỦA EM trong SQLite của ngăn: dòng sổ (`su_kien_hoc` của em, đúng các cột omni-d1 đọc) + mốc (n = số dòng, r = received_at lớn nhất).
@@ -144,7 +146,12 @@ export async function vaoNgan(req: Request, env: Env): Promise<Response | Reques
   h.set(DAU_TRONG_NGAN, '1')
   h.set(DAU_SBD_NGAN, sbd)
   try {
-    return await ns.get(ns.idFromName(sbd)).fetch(new Request(req.url, { method: 'POST', headers: h, body: buf }))
+    // 31/10 (đo x-ngan-do: ngăn tạo theo trạm của lượt gọi ĐẦU TIÊN — ngăn thử nằm ở IAD (Mỹ), mỗi vòng D1 233 ms ⇒ lưu một câu > 1 giây): ngăn LUÔN ở châu Á
+    // sát D1 (vùng APAC). Gợi ý vị trí chỉ có tác dụng lúc TẠO ngăn ⇒ đổi tên ngăn (`apac|`) để mọi em có ngăn mới đúng chỗ; ngăn cũ bỏ (kho sổ chỉ là đệm).
+    const res = await ns.get(ns.idFromName(`${TIEN_TO_NGAN}${sbd}`), { locationHint: 'apac' }).fetch(new Request(req.url, { method: 'POST', headers: h, body: buf }))
+    // Mẫu 1/20 lượt: trạm ngăn + ms một vòng D1 + ms xử lý (wrangler tail gom) — không SBD.
+    if (Math.random() < 0.05) console.log('[ngan-do]', new URL(req.url).pathname, res.headers.get('x-ngan-do') ?? '-')
+    return res
   } catch (e) {
     console.error('[ngan-hs] không vào được ngăn, chạy đường cũ:', e instanceof Error ? e.message : e)
     return lai()
