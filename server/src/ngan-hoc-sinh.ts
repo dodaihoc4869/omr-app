@@ -67,6 +67,18 @@ export function taoKhoEm(sql: SqlNgan, sbd: string): KhoEm {
 let envChung: Env | null = null
 export const xoaEnvChungNgan = (): void => { envChung = null }
 
+/**
+ * ĐO VỊ TRÍ NGĂN (31/10 sáng: lưu một câu Kiểm tra ôn tập 1,1–2,1 s dù ít em ⇒ nghi ngăn đặt XA D1, mỗi vòng D1 đi xa). Mỗi isolate: trạm Cloudflare đang chạy
+ * (`/cdn-cgi/trace`, một lần) + thời gian một câu `SELECT 1` tới D1 (tối đa một lần / phút). Gắn vào phản hồi dạng header — không lộ gì của em.
+ */
+let tram = ''
+let d1Ms = -1, d1Luc = 0
+function doViTri(env: Env, ctx: ExecutionContext): void {
+  const now = Date.now()
+  if (!tram) { tram = '…'; ctx.waitUntil(fetch('https://cloudflare.com/cdn-cgi/trace').then((r) => r.text()).then((t) => { tram = /colo=([A-Z]+)/.exec(t)?.[1] ?? '?' }).catch(() => { tram = '?' })) }
+  if (now - d1Luc > 60_000) { d1Luc = now; const t0 = Date.now(); ctx.waitUntil(env.DB.prepare('SELECT 1').first().then(() => { d1Ms = Date.now() - t0 }).catch(() => {})) }
+}
+
 export class NganHocSinh {
   private kho: KhoEm | null = null
   constructor(private readonly state: DurableObjectState, private readonly env: Env) {}
@@ -77,11 +89,14 @@ export class NganHocSinh {
     const sbd = req.headers.get(DAU_SBD_NGAN) ?? ''
     if (sbd && state.storage?.sql && (!this.kho || this.kho.sbd !== sbd)) this.kho = taoKhoEm(state.storage.sql, sbd)
     const env = (envChung ??= this.env)
+    doViTri(env, ctx)
+    const t0 = Date.now()
     const res = await xuLy(req, this.kho ? { ...env, KHO_EM: this.kho } : env, ctx)
-    // Dấu «đã qua ngăn» (đo được trên máy thật, không lộ gì): 1 = ngăn có kho sổ.
+    // Dấu «đã qua ngăn» (đo được trên máy thật, không lộ gì): 1 = ngăn có kho sổ · trạm chạy ngăn · ms một vòng D1 · ms xử lý trong ngăn.
     const h = new Headers(res.headers)
     h.set('x-ngan', this.kho ? '1' : '0')
-    const ex = h.get('access-control-expose-headers'); h.set('access-control-expose-headers', ex ? `${ex}, x-ngan` : 'x-ngan')
+    h.set('x-ngan-do', `${tram || '-'};d1=${d1Ms};xl=${Date.now() - t0}`)
+    const ex = h.get('access-control-expose-headers'); h.set('access-control-expose-headers', ex ? `${ex}, x-ngan, x-ngan-do` : 'x-ngan, x-ngan-do')
     return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h })
   }
 }
