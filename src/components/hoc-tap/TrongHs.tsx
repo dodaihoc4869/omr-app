@@ -525,7 +525,9 @@ export function MotTrangHs(p: PropsMotTrang) {
   const so = nangSoTuChangDangDo(p.so), kiem = p.kiem, hs = p.hs
   // THẺ BÀI GHIM (thầy 27/10: «ghim phần bài 8 amine lại»): dính ngay dưới hàng bộ đếm (đo chiều cao thật của hàng — ngang thấp khác dọc); vạch mốc
   // ngay trên thẻ khuất dưới hàng bộ đếm ⇒ thẻ đã dính ⇒ thu gọn (bỏ dòng nhãn nhỏ) + bóng đáy.
-  const khung = useRef<HTMLDivElement>(null), mocBai = useRef<HTMLElement>(null)
+  const khung = useRef<HTMLDivElement>(null)
+  // vạch mốc đáy thẻ bài: state (không phải ref) ⇒ thẻ dựng lại thì bộ theo dõi gắn sang vạch MỚI (ref cũ ⇒ theo dõi nút đã gỡ, dải kẹt «hiện» — thầy 31/10)
+  const [mocBai, datMocBai] = useState<HTMLElement | null>(null)
   const [trenCao, datTrenCao] = useState(52)
   const [dinh, datDinh] = useState(false)
   // dải gọn chỉ dựng từ lần dính đầu (chưa cuộn ⇒ không có bản sao tên bài trong cây); đã dựng thì giữ để thu / hiện mượt
@@ -547,7 +549,9 @@ export function MotTrangHs(p: PropsMotTrang) {
       const r = tr.getBoundingClientRect()
       let day = r.bottom
       tr.querySelectorAll(CHON).forEach((e) => { day = Math.max(day, e.getBoundingClientRect().bottom) })
-      datTrenCao(Math.round(day - r.top) + 8)
+      // hàng bộ đếm là THANH NGANG trên cùng (≤ ~2 dòng). Cao bất thường (cột dọc / bố cục lạ) ⇒ không phải thanh trên ⇒ ghim sát mép (8 px), không bật dải oan.
+      const cao = Math.round(day - r.top) + 8
+      datTrenCao(cao > 200 ? 8 : cao)
     }
     if (d.tr !== tr) {
       d.ro?.disconnect()
@@ -565,14 +569,36 @@ export function MotTrangHs(p: PropsMotTrang) {
   const laLoTrinh = (p.muc ?? 'hom-nay') === 'hom-nay'
   useEffect(() => { baoLoTrinh(laLoTrinh); if (laLoTrinh && so) henChupKhungTinhHs(sbdPhien()) }, [laLoTrinh, so])
   useEffect(() => () => baoLoTrinh(false), [])
+  // DẢI GỌN ⇔ thẻ bài đầy đủ ĐÃ CUỘN KHUẤT (thầy 31/10: «Giao diện thỉnh thoảng hiện 2 vạch màu tím, chỉ cho hiện 1 vạch thôi»): MỘT vạch tại một lúc.
+  // vạch mốc nằm ở ĐÁY thẻ: quyết bằng TOẠ ĐỘ THẬT đọc lúc ấy (một lần đọc, trong khung hình kế), không tin cờ cũ của IntersectionObserver — Lộ trình ẩn
+  // (màn phủ, tab nền, máy ngủ) cho hộp rỗng / toạ độ 0 ⇒ trước đây bật dải oan rồi kẹt. Không có hộp ⇒ không dải.
+  const xetDinh = useRef<() => void>(() => {})
   useEffect(() => {
-    const m = mocBai.current
-    if (!m || typeof IntersectionObserver !== 'function') return
-    // vạch mốc nằm ở ĐÁY thẻ đầy đủ: khuất dưới hàng bộ đếm ⇒ hiện dải gọn (chỉ đổi một thuộc tính; không tính gì trong onscroll)
-    const io = new IntersectionObserver(([e]) => { if (e) datDinh(!e.isIntersecting && e.boundingClientRect.top < trenCao + 2) }, { rootMargin: `-${trenCao + 1}px 0px 0px 0px`, threshold: 0 })
-    io.observe(m)
-    return () => io.disconnect()
-  }, [trenCao, !!mocBai.current]) // eslint-disable-line react-hooks/exhaustive-deps
+    const m = mocBai
+    if (!m) { datDinh(false); return }
+    let hen = 0
+    const xet = () => { hen = 0; const r = m.getBoundingClientRect(); datDinh(m.isConnected && r.width > 0 && r.top < trenCao + 2) }
+    const henXet = () => { if (!hen) hen = requestAnimationFrame(xet) }
+    xetDinh.current = henXet
+    const io = typeof IntersectionObserver === 'function' ? new IntersectionObserver(henXet, { rootMargin: `-${trenCao + 1}px 0px 0px 0px`, threshold: 0 }) : null
+    io?.observe(m)
+    // đổi khổ / quay lại app / trang hiện lại ⇒ xét lại (không tốn gì lúc đứng yên)
+    window.addEventListener('resize', henXet, { passive: true })
+    window.addEventListener('pageshow', henXet)
+    document.addEventListener('visibilitychange', henXet)
+    henXet()
+    return () => {
+      io?.disconnect(); cancelAnimationFrame(hen); xetDinh.current = () => {}
+      window.removeEventListener('resize', henXet); window.removeEventListener('pageshow', henXet); document.removeEventListener('visibilitychange', henXet)
+    }
+  }, [trenCao, mocBai])
+  // TỰ CHỮA khi dải ĐANG hiện: mỗi lượt cuộn (mọi khung cuộn) xét lại ⇒ thẻ về màn là dải tắt ngay. Dải tắt ⇒ gỡ nghe cuộn (cuộn thường không tính gì).
+  useEffect(() => {
+    if (!dinh) return
+    const nghe = () => xetDinh.current()
+    document.addEventListener('scroll', nghe, { passive: true, capture: true })
+    return () => document.removeEventListener('scroll', nghe, { capture: true })
+  }, [dinh])
   const nhipGoc = useNhipHocEm(p.ngayKiem ? undefined : p.token, null)
   const nhip = typeof nhipGoc === 'string' ? null : nhipTheoSanh(nhipGoc, so ? { muc: so.muc, daLam: so.daLam } : null)
   // Thưởng phạt: tổng quan /hs/thuong (bản lưu máy trước, máy chủ sau). Có chuỗi ngày theo bài (B3, cờ duolingo_bai) ⇒ MỌI chỗ hiện chuỗi dùng CÙNG số với
@@ -810,7 +836,7 @@ export function MotTrangHs(p: PropsMotTrang) {
       {!p.ngayKiem && <section className="da-bai" aria-label="Bài học hôm nay"><div className="giua">{p.viec && <small>{chuViecBai(p.viec, so)}</small>}<b>{p.tenBai || 'Bài học hôm nay'}</b></div>
         {chang.length > 0 && <div className="da-bai-tien" role="progressbar" aria-label="Chặng hôm nay" aria-valuemin={0} aria-valuemax={chang.length} aria-valuenow={xongChang}><i><s style={{ width: `${Math.round((100 * xongChang) / chang.length)}%` }} /></i>{xongChang}/{chang.length} chặng</div>}
         {!so && p.dangTai && <span className="mot-xuong" aria-hidden="true" />}</section>}
-      {!p.ngayKiem && <i ref={mocBai} className="da-bai-moc" aria-hidden="true" />}
+      {!p.ngayKiem && <i ref={datMocBai} className="da-bai-moc" aria-hidden="true" />}
       {!p.ngayKiem && (dinh || daDinh.current) && <div className="da-dai-dinh" data-hien={dinh || undefined} aria-hidden="true">
         <div className="da-dai"><b>{p.tenBai || 'Bài học hôm nay'}</b>
           {chang.length > 0 && <span className="da-dai-tien"><i><s style={{ width: `${Math.round((100 * xongChang) / chang.length)}%` }} /></i>{xongChang}/{chang.length} chặng</span>}</div>
