@@ -29,10 +29,9 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
         run: |
           q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results[]' | head -n 80; }
-          q "0 cột de_kho" "SELECT name FROM pragma_table_info('de_kho')"
-          q "1 tờ có chữ octet / liên kết / Bài 10-12" "SELECT * FROM de_kho WHERE ten_de LIKE '%octet%' OR ten_de LIKE '%iên kết%' OR ten_de LIKE '%Bài 10%' OR ten_de LIKE '%Bài 11%' OR ten_de LIKE '%Bài 12%' LIMIT 60"
-          q "2 câu trong game_v2_question theo tờ khớp ở (1)" "SELECT ma_de, COUNT(*) n, SUM(json_valid(json)) hop_le, SUM(CASE WHEN json_valid(json) AND json_extract(json,'\$.reviewed') THEN 1 ELSE 0 END) duyet, GROUP_CONCAT(DISTINCT CASE WHEN json_valid(json) THEN json_extract(json,'\$.phan') END) phan, GROUP_CONCAT(DISTINCT CASE WHEN json_valid(json) THEN json_type(json,'\$.reviewed') END) kieu_duyet FROM game_v2_question WHERE ma_de IN (SELECT ma_de FROM de_kho WHERE ten_de LIKE '%octet%' OR ten_de LIKE '%iên kết%' OR ten_de LIKE '%Bài 10%' OR ten_de LIKE '%Bài 11%' OR ten_de LIKE '%Bài 12%') GROUP BY ma_de"
-          q "3 chỉ mục game_v2_index của các tờ ở (1)" "SELECT * FROM game_v2_index WHERE ma_de IN (SELECT ma_de FROM de_kho WHERE ten_de LIKE '%octet%' OR ten_de LIKE '%iên kết%' OR ten_de LIKE '%Bài 10%' OR ten_de LIKE '%Bài 11%' OR ten_de LIKE '%Bài 12%')"
-          q "4 tờ của bài ĐÃ giao chạy được (Bài 9 Ôn tập chương 2) để so cách đặt mã" "SELECT d.ma_de, d.ten_de, d.so_cau, (SELECT COUNT(*) FROM game_v2_question g WHERE g.ma_de = d.ma_de) n_cau FROM de_kho d WHERE d.ten_de LIKE '%Ôn tập chương 2%' OR d.ten_de LIKE '%n tập chương 2%' LIMIT 20"
-          q "5 phạm vi lớp 10 đã tick (bai_da_day mới nhất)" "SELECT lop, khoa_bai, ten_bai, vi_tri, ma_to_json, tick_luc, bo_tick_luc FROM bai_da_day WHERE lop LIKE '10%' ORDER BY tick_luc DESC LIMIT 8"
-          q "6 cột bai_da_day" "SELECT name FROM pragma_table_info('bai_da_day')"
+          q "A tờ LỆCH chỉ mục (chưa vào kho câu luyện) — đếm" "SELECT COUNT(*) n, MIN(d.ngay_nap) som, MAX(d.ngay_nap) muon FROM de_kho d LEFT JOIN game_v2_index g ON g.ma_de=d.ma_de WHERE COALESCE(d.da_xoa,0)=0 AND (g.ma_de IS NULL OR g.source_version<>d.cap_nhat_luc)"
+          q "B tờ LỆCH — danh sách (mã · số câu · ngày nạp · đã có chỉ mục cũ?)" "SELECT d.ma_de, d.so_cau, d.ngay_nap, d.r2_khoa, g.ma_de IS NOT NULL co_cu FROM de_kho d LEFT JOIN game_v2_index g ON g.ma_de=d.ma_de WHERE COALESCE(d.da_xoa,0)=0 AND (g.ma_de IS NULL OR g.source_version<>d.cap_nhat_luc) ORDER BY d.ma_de LIMIT 300"
+          echo "== C tệp nguồn R2 của 6 tờ lệch ĐẦU TIÊN theo mã (sync cũ kẹt ở đây nếu thiếu)"
+          for k in $(npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT COALESCE(NULLIF(d.r2_khoa,''),'kho/'||d.ma_de||'.json') k FROM de_kho d LEFT JOIN game_v2_index g ON g.ma_de=d.ma_de WHERE COALESCE(d.da_xoa,0)=0 AND (g.ma_de IS NULL OR g.source_version<>d.cap_nhat_luc) ORDER BY d.ma_de LIMIT 6" | jq -r '.[0].results[].k'); do
+            n=$(npx -y wrangler@4 r2 object get "omr-de/$k" --remote --pipe 2>/dev/null | wc -c); echo "$k $n byte"
+          done
