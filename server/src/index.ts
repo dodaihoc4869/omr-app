@@ -94,8 +94,8 @@ import * as G from './goi-cu'
 import { tuLuyen } from './tu-luyen'
 import { tinhNangBat as tinhNangChuaBat } from './chua-cau-sai-cau-hinh'
 import { hangChieu, daChuaTrenLop } from './chua-cau-sai-chieu'
-import { moDot as chuaMoDot, phatItem as chuaPhatItem, nopItem as chuaNopItem, xinGoiY as chuaXinGoiY, danhSach as chuaDanhSach } from './chua-cau-sai'
-import { gonMo as chuaGonMo, gonNop as chuaGonNop } from './chua-gon-lenh'
+import { moDot as chuaMoDot, phatItem as chuaPhatItem, nopItem as chuaNopItem, xinGoiY as chuaXinGoiY, danhSach as chuaDanhSach, quyen as chuaQuyen } from './chua-cau-sai'
+import { gonMo as chuaGonMo, gonMoNgay as chuaGonMoNgay, gonNop as chuaGonNop } from './chua-gon-lenh'
 import { gonNopLuong } from './chua-gon-niem'
 import {tinhBoSungTheoDoi} from './btvn-theo-doi-nhom'
 import * as ND from './btvn-nang-do-d1'
@@ -3839,6 +3839,15 @@ const boXuLy = {
           mo.gon = { ...(await gRes.json() as Record<string, unknown>), status: gRes.status }
         }
         return ra(mo, moRes.status)
+      }
+      // TẢI SẴN PHẦN SỬA LỖI HÔM NAY (31/10, chua-gon-lenh.ts `gonMoNgay`): nhiều câu một lượt, mỗi câu như `mo-dot` kèm `gon`. Quyền + lịch Kiểm tra ôn tập như `mo-dot`.
+      if (p === '/hs/chua-cau-sai/gon-mo-ngay') {
+        const sbd = await chuaQuyen(env, b)
+        if (sbd instanceof Response) return raChua(sbd)
+        const kt = await import('./kiem-tra-ca-nhan')
+        const khoa = kt.ktDangKhoaChang(await kt.docKtCn(env, sbd, Date.now(), true), Date.now())
+        if (khoa) return ra({ ok: false, ma: kt.MA_KHOA_KT, error: kt.CHU_KHOA_KT, kiemTraCaNhan: khoa }, 409)
+        return raChua(await chuaGonMoNgay(env, b, sbd))
       }
       if (p === '/hs/chua-cau-sai/phat-item') return raChua(await chuaPhatItem(env, b))
       if (p === '/hs/chua-cau-sai/nop-item') return raChua(await chuaNopItem(env, b))

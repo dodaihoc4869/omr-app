@@ -8,7 +8,7 @@
 //   3. Công tắc `cau_hinh.dap_an_tren_may` (`{"bat":false}` ⇒ tắt ngay; vắng dòng ⇒ bật) — tắt thì máy em quay về chờ máy chủ chấm như cũ.
 // Không có cách nào giấu tuyệt đối đáp án đã nằm trên máy em (Duolingo cũng vậy) — bảo vệ thật nằm ở (1) phạm vi và việc máy chủ chấm lại.
 import type { Env } from './kieu'
-import { b64u, maHoaDapAn, type DapAnMay } from '../../src/lib/dap-an-may'
+import { b64u, maHoaChuoi, type DapAnMay } from '../../src/lib/dap-an-may'
 
 export { giaiDapAn, maHoaDapAn, type DapAnMay } from '../../src/lib/dap-an-may'
 
@@ -31,15 +31,18 @@ export function dapAnMayBat(giaTri: string | null, sbd: string): boolean {
 }
 
 const khoaNho = new Map<string, Promise<string>>()
-/** Gói đáp án gửi kèm câu: «khoá.gói» (khoá riêng em + ngày VN của `nayMs`; gói gắn chặt mã câu). Lỗi ⇒ undefined (câu đi không `dm`, máy em chờ máy chủ chấm). */
-export async function dmCau(env: Pick<Env, 'MA_BI_MAT'>, sbd: string, qid: string, da: DapAnMay, nayMs = Date.now()): Promise<string | undefined> {
+/** «khoá.gói» của chuỗi `chu` (khoá riêng em + ngày VN của `nayMs`; dữ liệu kèm `kem`). Lỗi ⇒ undefined. */
+export async function dmChuoi(env: Pick<Env, 'MA_BI_MAT'>, sbd: string, kem: string, chu: string, nayMs = Date.now()): Promise<string | undefined> {
   try {
-    if (!env.MA_BI_MAT || !sbd || !qid) return undefined
+    if (!env.MA_BI_MAT || !sbd || !kem) return undefined
     const ngay = new Date(nayMs + 7 * 3_600_000).toISOString().slice(0, 10)
     const k = `${sbd}|${ngay}`
     let p = khoaNho.get(k)
     if (!p) { if (khoaNho.size > 2000) khoaNho.clear(); p = khoaDapAnEm(env, sbd, ngay); khoaNho.set(k, p); p.catch(() => khoaNho.delete(k)) }
     const khoa = await p
-    return `${khoa}.${await maHoaDapAn(khoa, qid, da)}`
+    return `${khoa}.${await maHoaChuoi(khoa, kem, chu)}`
   } catch { return undefined }
 }
+/** Gói đáp án gửi kèm câu: «khoá.gói» (gói gắn chặt mã câu). Lỗi ⇒ undefined (câu đi không `dm`, máy em chờ máy chủ chấm). */
+export const dmCau = (env: Pick<Env, 'MA_BI_MAT'>, sbd: string, qid: string, da: DapAnMay, nayMs = Date.now()): Promise<string | undefined> =>
+  qid ? dmChuoi(env, sbd, qid, JSON.stringify(da), nayMs) : Promise.resolve(undefined)

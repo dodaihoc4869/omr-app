@@ -10,7 +10,7 @@
 import type { Env } from './kieu'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { cauCongKhai } from './cau-theo-qid'
-import { cauDuocNho, docHocLieuNho, quyen } from './chua-cau-sai'
+import { cauDuocNho, docHocLieuNho, giaoDotCuaEm, quyen } from './chua-cau-sai'
 import { NhoCoLuot } from './chua-gon-nho'
 import { boTroTheoQid } from './song-sinh-game'
 import type { BoTro } from './cau-bo-tro'
@@ -27,7 +27,9 @@ import { goiYTuLoiGiai } from './goi-y-rieng'
 import { docCauHinhExp, mocExpCuaEm } from './exp-d1'
 import { LOAI_TU_SUA, NT_TU_SUA_RA_HANG, NT_TU_SUA_TRAN_NGAY } from './exp-cau-hinh'
 import { tachSongSinh } from './loi-hoc-luat'
-import { niemSua, SO_LAN_MOI_NGAY } from './chua-gon-niem'
+import { dmSua, niemSua, SO_LAN_MOI_NGAY } from './chua-gon-niem'
+import { dapAnMayBat, KHOA_CH_DAP_AN_MAY } from './dap-an-may'
+import { docCauHinhDem } from './cau-hinh-dem'
 
 type Obj = Record<string, unknown>
 const str = (v: unknown) => (typeof v === 'string' ? v : '')
@@ -148,14 +150,51 @@ export async function gonMo(env: Env, b: Obj, sbdDaKiem?: string): Promise<Respo
   const ngaySai = str(c.dot.ngay_sai), docGan = Number(c.dot.doc_gan) === 1
   const tuSuaNeuDung = tinhTuSua(ban, q.qid, lan, { ngaySai, docGan, homNay: c.homNay })
   // TEM NIÊM PHONG (chua-gon-niem.ts): kết quả của cả hai đáp án cho LẦN này ⇒ «Kiểm tra» trả đúng / sai tức thì ở mọi isolate (gợi ý lần 1 đã được `lamAm` làm ấm).
-  const goiY = lan < SO_LAN_MOI_NGAY ? await goiYMot(env, str(c.dot.qid_chuan), ban).catch(() => undefined) : undefined
-  const sk = await niemSua(env, sbd, { dotId, ban, lan, tuSua: tuSuaNeuDung, docGan, goiY })
+  // ĐÁP ÁN TRÊN MÁY (31/10, src/lib/sua-loi-may.ts): cùng phần chấm, mã hoá khoá riêng em + ngày ⇒ máy em chấm NGAY, không chờ mạng; máy chủ vẫn chấm lại ở gon-nop.
+  // Công tắc thầy `cau_hinh.dap_an_tren_may` đọc từ đệm isolate (cau-hinh-dem.ts), song song với gợi ý.
+  const [goiY, dmBat] = await Promise.all([
+    lan < SO_LAN_MOI_NGAY ? goiYMot(env, str(c.dot.qid_chuan), ban).catch(() => undefined) : Promise.resolve(undefined),
+    docCauHinhDem(env, KHOA_CH_DAP_AN_MAY).then((v) => dapAnMayBat(v, sbd), () => false),
+  ])
+  const x = { dotId, ban, lan, tuSua: tuSuaNeuDung, docGan, goiY }
+  const [sk, dm] = await Promise.all([niemSua(env, sbd, x), dmBat ? dmSua(env, sbd, x, nowMs) : Promise.resolve(undefined)])
   return Response.json({
     ok: true, dotId, lan, ban: ban.qid, banKhac: ban.qid !== q.qid,
     tuSuaNeuDung,
     de: cauCongKhai(ban),
     ...(sk ? { sk } : {}),
+    ...(dm ? { dm } : {}),
   })
+}
+
+/** Số câu tối đa một lượt tải sẵn (phần ngày 12 câu đầu; câu sau tải ở lượt sau). */
+export const TOI_DA_TAI_SAN_SUA = 12
+/**
+ * TẢI SẴN PHẦN SỬA LỖI HÔM NAY (thầy 31/10): MỘT lượt mạng mở sẵn nhiều câu của Việc hôm nay — mỗi câu ĐÚNG như máy em bấm vào câu ấy (`mo-dot` kèm `gon`):
+ * giao / dựng lại đợt (`giaoDotCuaEm`, đóng đợt lệch sổ như lệnh mở của em) rồi mở bản làm lại (`gonMo`, kèm `sk` + `dm`). Không ghi lần làm, không chấm, không đổi tiến độ.
+ * Nơi gọi (index.ts) đã kiểm quyền + lịch Kiểm tra ôn tập như `mo-dot`. Chạy 3 câu một lúc, dừng nhận câu mới sau 8 giây (câu chưa mở ⇒ máy em mở khi bấm như cũ).
+ */
+export async function gonMoNgay(env: Env, b: Obj, sbd: string): Promise<Response> {
+  const qids = [...new Set((Array.isArray(b.qids) ? b.qids : []).filter((x): x is string => typeof x === 'string' && !!x && x.length <= 120))].slice(0, TOI_DA_TAI_SAN_SUA)
+  const ds: Obj[] = []
+  const het = Date.now() + 8_000
+  let i = 0
+  const chay = async () => {
+    while (i < qids.length && Date.now() < het) {
+      const qid = qids[i++]!
+      try {
+        const r = await giaoDotCuaEm(env, sbd, qid, true)
+        const mo = (await r.json()) as Obj
+        if (r.ok && mo.ok === true && typeof mo.dotId === 'string') {
+          const g = await gonMo(env, { dotId: mo.dotId, qid }, sbd)
+          mo.gon = { ...((await g.json()) as Obj), status: g.status }
+        }
+        ds.push({ ...mo, qid })
+      } catch { /* câu này để máy em mở khi bấm */ }
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(3, qids.length) }, chay))
+  return Response.json({ ok: true, ds })
 }
 
 export async function gonNop(env: Env, b: Obj): Promise<Response> {

@@ -20,7 +20,7 @@ import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, ChevronRight, Clock3, Lock, PencilLine, RotateCcw } from 'lucide-react'
 import type { KetQuaDanhSachChua, LichKiemLaiHoiThay, MucChua } from '../../lib/chua-cau-sai-api'
 import { docNhoTuSua, nhomMucChua, taiTuSuaLoi, type NhomMucChua } from '../../lib/tu-sua-loi'
-import { napTruocCauSua } from '../../lib/nap-truoc-sua'
+import { guiLaiSuaCho, napTruocCauSua, napTruocSuaNgay } from '../../lib/nap-truoc-sua'
 /** Bản nhớ danh sách còn mới (ms) để vẽ ngay khi mở màn Tự sửa lỗi; quá hạn ⇒ khung chờ như cũ. (29/10 tối: nâng lên 10 phút = NHO_TU_SUA_MS để bấm từ Lộ trình luôn hiện ngay 0 ms.) */
 const NHO_VE_NGAY_MS = 600_000
 import { dungViecHomNay, docSbdHs, luuViecHomNay } from '../../lib/tu-sua-viec-hom-nay'
@@ -46,7 +46,7 @@ const KiemHoiThay = lazy(() => import('../loi-giai/HoiThayKiemChung'))
 export { default as TheMoiTuSua } from './TheMoiTuSua'
 // Lộ trình «Trong» (TrongHs: số trên nút «Sửa lỗi») đọc việc hôm nay QUA mảnh này (đã là điểm nạp lười) — nạp động thẳng tu-sua-viec-hom-nay sẽ tách thêm mảnh precache.
 export { baoKhoaSua, conSuaHomNay, conSuaPhanNgay, docSbdHs, dungViecHomNay, luuViecHomNay, ngheXongSua } from '../../lib/tu-sua-viec-hom-nay'
-export { napTruocCauSua } from '../../lib/nap-truoc-sua'
+export { guiLaiSuaCho, napTruocCauSua, napTruocSuaNgay } from '../../lib/nap-truoc-sua'
 
 /** Trạng thái đợt chữa ⇒ chữ em đọc được (bảng từ chuẩn: không mã nội bộ). */
 export const CHU_TRANG_THAI_CHUA: Record<string, string> = {
@@ -206,6 +206,20 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
     const h = setTimeout(() => napTruocCauSua(token, tiepNap), 250) // 29/10 (video 11:00): 1200 → 250 ms — em chạm câu đầu sau ~1 s thì lượt mở đã bay sẵn
     return () => clearTimeout(h)
   }, [token, tiepNap])
+  // 31/10 (thầy «làm cả cho tự sửa lỗi»): TẢI SẴN cả phần hôm nay chưa xong (một lượt, nap-truoc-sua.ts) sau câu kế ⇒ bấm câu nào cũng vào ngay, mất mạng vẫn làm.
+  // Lần nộp chờ gửi từ lúc mất mạng ⇒ gửi lại khi mở danh sách và khi có mạng trở lại.
+  const conLai = (viec?.muc ?? []).filter((x) => !x.xong && !x.m.kiemHoiThay).map((x) => x.m.qid).join('|')
+  useEffect(() => {
+    if (!conLai) return
+    const h = setTimeout(() => { void napTruocSuaNgay(token, conLai.split('|')) }, 1500)
+    return () => clearTimeout(h)
+  }, [token, conLai])
+  useEffect(() => {
+    const f = () => { void guiLaiSuaCho(token) }
+    f()
+    window.addEventListener('online', f)
+    return () => window.removeEventListener('online', f)
+  }, [token])
   // 27/10 tốc độ (thầy: «sửa lỗi chỗ mở câu phải tức thì»): danh sách vừa mở ⇒ lúc rảnh nạp sẵn mảnh màn sửa câu, bấm câu là vào ngay, không màn chờ nạp mảnh.
   useEffect(() => {
     // Chỉ nạp mảnh màn sửa câu: khung Duo (ChuaGonDuo) do chính màn ấy nạp song song lệnh mở đợt — nạp thẳng từ đây làm Rolldown tách thêm mảnh dùng chung (+1 tệp precache).

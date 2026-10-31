@@ -37,9 +37,11 @@ describe('Chữa câu gọn — mở câu và nộp', () => {
     expect(j.gon).toMatchObject({ ok: true, ban: Q, lan: 1, status: 200 })
     expect(JSON.stringify(j.gon)).not.toMatch(/"correct"|"solution"|dapAn|loiGiai|bí mật lời giải/)
     const rieng = await (await gonMo(d.env, { token, dotId: j.dotId })).json() as Record<string, any>
-    const { status: _s, sk: skGon, ...gon } = j.gon
-    const { sk: skRieng, ...riengKhongTem } = rieng // tem niêm phong (29/10) có IV ngẫu nhiên ⇒ mỗi lần một chuỗi khác; còn lại phải y hệt
+    const { status: _s, sk: skGon, dm: dmGon, ...gon } = j.gon
+    // tem niêm phong (29/10) + gói đáp án trên máy `dm` (31/10) có IV ngẫu nhiên ⇒ mỗi lần một chuỗi khác; còn lại phải y hệt
+    const { sk: skRieng, dm: dmRieng, ...riengKhongTem } = rieng
     expect(typeof skGon).toBe('string'); expect(typeof skRieng).toBe('string')
+    expect(typeof dmGon).toBe('string'); expect(typeof dmRieng).toBe('string')
     expect(gon).toEqual(riengKhongTem)
     const khong = await goiWorker(worker, d.env, '/hs/chua-cau-sai/mo-dot', { token, qid: Q }) as Record<string, any>
     expect(khong.ok).toBe(true)

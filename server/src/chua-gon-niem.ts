@@ -13,6 +13,8 @@ import { gameSbdDaKy } from './game-v2-auth'
 import { moMa, niemMa } from './niem-phong'
 import { phatLuongNdjson } from './nop-luong'
 import type { Env } from './kieu'
+import { dmChuoi } from './dap-an-may'
+import { kemSuaMay, type GoiSuaMay } from '../../src/lib/sua-loi-may'
 
 type Obj = Record<string, unknown>
 export const SO_LAN_MOI_NGAY = 2
@@ -34,17 +36,32 @@ export interface NiemSua {
 
 const aadSua = (sbd: string, dotId: string, ban: string) => `chua|${sbd}|${dotId}|${ban}`
 
+type LanSua = { dotId: string; ban: PrivateQuestion; lan: number; tuSua: boolean; docGan: boolean; goiY?: string }
+/** Phần chấm của lần `lan` (chung cho tem `sk` và gói `dm`). Câu không chấm tự động được ⇒ null. */
+function noiDungSua(x: LanSua): GoiSuaMay | null {
+  if (!x.dotId || !x.ban?.qid || !String(x.ban.correct ?? '').trim()) return null
+  const p = x.ban.phan
+  if (p !== 'I' && p !== 'II' && p !== 'III') return null
+  return {
+    d: x.dotId, b: x.ban.qid, p, c: x.ban.correct, L: x.lan, tu: x.tuSua ? 1 : 0, dg: x.docGan ? 1 : 0, ...(x.goiY ? { gy: x.goiY } : {}),
+    l: x.ban.solution, h: (x.ban.hinhAnh ?? []).filter((h) => h.viTri === 'sau_loi_giai'),
+  }
+}
+
 /** Tem cho lần `lan` của bản `ban` trong đợt `dotId`. Không bao giờ ném. */
-export async function niemSua(env: Env, sbd: string, x: { dotId: string; ban: PrivateQuestion; lan: number; tuSua: boolean; docGan: boolean; goiY?: string }, nayMs = Date.now()): Promise<string | undefined> {
+export async function niemSua(env: Env, sbd: string, x: LanSua, nayMs = Date.now()): Promise<string | undefined> {
   try {
-    if (!sbd || !x.dotId || !x.ban?.qid || !String(x.ban.correct ?? '').trim()) return undefined
-    const p = x.ban.phan
-    if (p !== 'I' && p !== 'II' && p !== 'III') return undefined
-    const nd: Omit<NiemSua, 'v' | 'e'> = {
-      d: x.dotId, b: x.ban.qid, p, c: x.ban.correct, L: x.lan, tu: x.tuSua ? 1 : 0, dg: x.docGan ? 1 : 0, ...(x.goiY ? { gy: x.goiY } : {}),
-      l: x.ban.solution, h: (x.ban.hinhAnh ?? []).filter((h) => h.viTri === 'sau_loi_giai'),
-    }
-    return await niemMa(env, aadSua(sbd, x.dotId, x.ban.qid), nd, nayMs)
+    const nd = sbd ? noiDungSua(x) : null
+    return nd ? await niemMa(env, aadSua(sbd, x.dotId, x.ban.qid), nd, nayMs) : undefined
+  } catch { return undefined }
+}
+
+/** ĐÁP ÁN TRÊN MÁY (31/10, src/lib/sua-loi-may.ts): cùng phần chấm như tem, mã hoá bằng khoá riêng em + ngày (dap-an-may.ts), kèm đợt + bản ⇒ máy em chấm NGAY.
+ *  Nơi gọi đã xét công tắc `cau_hinh.dap_an_tren_may`. Không bao giờ ném. */
+export async function dmSua(env: Env, sbd: string, x: LanSua, nayMs = Date.now()): Promise<string | undefined> {
+  try {
+    const nd = sbd ? noiDungSua(x) : null
+    return nd ? await dmChuoi(env, sbd, kemSuaMay(nd.d, nd.b), JSON.stringify(nd), nayMs) : undefined
   } catch { return undefined }
 }
 
