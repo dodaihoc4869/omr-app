@@ -2035,10 +2035,12 @@ export default function ExamMonitorScreen() {
                       }}
                     />
                   )}
-                  <button type="button" onClick={() => setHoiXoa(true)} className="ct-nut ct-nut-vien ct-nut-nho" style={{ width: '100%', marginTop: 10, color: 'var(--gvm-ho-dam)' }}>
-                    <Trash2 size={16} aria-hidden="true" /> Xoá ca này
-                  </button>
                 </>
+              }
+              viecXoaThem={
+                <button type="button" onClick={() => setHoiXoa(true)} className="ct-nut ct-nut-vien ct-nut-nho ct-nut-xoa-ca" style={{ width: '100%', marginTop: 10, color: 'var(--gvm-ho-dam)' }}>
+                  <Trash2 size={16} aria-hidden="true" /> Xoá ca này
+                </button>
               }
             />
             </>

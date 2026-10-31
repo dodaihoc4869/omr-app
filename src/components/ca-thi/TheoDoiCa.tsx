@@ -43,11 +43,12 @@ export interface TheoDoiCaProps {
   daChepLinkDiem?: boolean
   /** KHU TRÊN LÀ CẢ MÀN (thầy 29/09: "bỏ từ phần 12:17 chỉ để lại phần trên"): các chỗ cắm cho những dòng/nút dời lên từ phía dưới.
    *  `dongPhu` dưới dòng thông tin ca (cửa vào ca, phòng chờ, Mở ca, mất kết nối); `canXuLyThem` đầu "Cần thầy xử lý" (đếm vào số `soCanXuLyThem`);
-   *  `viecNhanhThem` cuối "Việc nhanh" (Thêm 5 phút, Xoá ca); `cotPhaiThem` dưới "Việc nhanh". */
+   *  `viecNhanhThem` cuối "Việc nhanh" (Thêm 5 phút); `viecXoaThem` cuối vùng Kết thúc ca (Xoá ca — 31/10 tách khỏi việc nhanh); `cotPhaiThem` dưới "Việc nhanh". */
   dongPhu?: ReactNode
   canXuLyThem?: ReactNode
   soCanXuLyThem?: number
   viecNhanhThem?: ReactNode
+  viecXoaThem?: ReactNode
   cotPhaiThem?: ReactNode
   em: EmTheoDoi[]
   /** null = ca không có danh sách mời (không biết sĩ số) ⇒ ẩn số "Chưa vào". */
@@ -313,9 +314,9 @@ export default function TheoDoiCa(p: TheoDoiCaProps) {
                     <Lock size={20} aria-hidden="true" />
                   </div>
                   <div>
-                    <b>{e.hoTen || `SBD ${e.sbd}`} bị khoá bài</b>
+                    <b><span className="ten">{e.hoTen || `SBD ${e.sbd}`}</span> <span className="ct-cb-tt">bị khoá bài</span></b>
                     <p className="so">
-                      Rời màn {e.soLanRoiMan} lần, tổng {e.tongGiayRoiMan} giây{e.daLam !== null && e.tongCau ? ` · đã làm ${e.daLam}/${e.tongCau} câu` : ''}.
+                      Rời màn {e.soLanRoiMan} lần · {e.tongGiayRoiMan} giây{e.daLam !== null && e.tongCau ? ` · đã làm ${e.daLam}/${e.tongCau} câu` : ''}
                     </p>
                     <button type="button" className="ct-nut" onClick={() => p.onMoKhoa(e.sbd)} disabled={p.dangDuyet === e.sbd}>
                       {p.dangDuyet === e.sbd ? 'Đang mở khoá…' : 'Mở khoá cho em'}
@@ -330,7 +331,7 @@ export default function TheoDoiCa(p: TheoDoiCaProps) {
                   </div>
                   <div>
                     <b>
-                      {e.hoTen || `SBD ${e.sbd}`} rời màn {e.soLanRoiMan} lần
+                      <span className="ten">{e.hoTen || `SBD ${e.sbd}`}</span> <span className="ct-cb-tt">rời màn {e.soLanRoiMan} lần</span>
                     </b>
                     <p>{e.soLanRoiMan + 1 >= p.nguongLan ? 'Thêm 1 lần nữa là khoá bài.' : `Khoá bài khi rời màn ${p.nguongLan} lần.`}</p>
                     <button type="button" className="ct-nut" onClick={() => p.onXemEm(e.sbd)}>
@@ -357,7 +358,7 @@ export default function TheoDoiCa(p: TheoDoiCaProps) {
               ) : null}
             </div>
           </div>
-          <div className="ct-tam">
+          <div className="ct-tam ct-viec-nhanh">
             <div className="ct-tam-dau">
               <h2>Việc nhanh</h2>
             </div>
@@ -378,14 +379,18 @@ export default function TheoDoiCa(p: TheoDoiCaProps) {
                 </button>
               )}
             </div>
-            <button type="button" className="ct-nut ct-nut-do" style={{ width: '100%', marginTop: 10 }} onClick={p.onKetThuc}>
-              <Lock size={18} aria-hidden="true" />
-              Kết thúc ca ngay
-            </button>
-            <p className="ct-ghi so" style={{ marginTop: 8 }}>
-              Kết thúc ca: em đang làm bị nộp theo phần đã làm ({p.dangLamNgay} em), em chưa vào không vào được nữa. Máy hỏi lại trước khi làm.
-            </p>
             {p.viecNhanhThem}
+            {/* 31/10 (thầy «các nút nhanh làm đẹp lại và tinh tế»): vùng việc KHÔNG lùi lại tách riêng dưới vạch — Kết thúc ca (đỏ nhạt) + Xoá ca (chữ). */}
+            <div className="ct-vung-dung">
+              <button type="button" className="ct-nut ct-nut-do" style={{ width: '100%' }} onClick={p.onKetThuc}>
+                <Lock size={18} aria-hidden="true" />
+                Kết thúc ca ngay
+              </button>
+              <p className="ct-ghi so">
+                Kết thúc ca: em đang làm bị nộp theo phần đã làm ({p.dangLamNgay} em), em chưa vào không vào được nữa. Máy hỏi lại trước khi làm.
+              </p>
+              {p.viecXoaThem}
+            </div>
           </div>
           {p.cotPhaiThem}
         </div>
