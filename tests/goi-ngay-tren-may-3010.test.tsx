@@ -149,14 +149,17 @@ describe('màn làm bài mở chặng từ gói', () => {
     unmount()
     expect(docChangDangLam('s1')).toMatchObject({ phien: 'phien-dang-do', viTri: 1, tra: 'C' })
 
-    // Mở lại app: hiện TỨC THÌ 0ms đúng Câu 2/3 kèm nháp C và tiến độ Câu 1 đã đúng, không gọi lại hoc-tap-start hay hoc-tap-mo-goi
+    // Mở lại app: hiện TỨC THÌ 0ms đúng Câu 2/3 kèm nháp C và tiến độ Câu 1 đã đúng, không gọi hoc-tap-start. 31/10 (đồng bộ nhiều máy): làm tươi phiên ở NỀN
+    // bằng ĐÚNG MỘT lượt hoc-tap-mo-goi cho các câu chưa làm (máy chủ bỏ câu đã làm ở máy khác) — trước: dưới 35 phút không hỏi máy chủ.
     vi.mocked(goiHoa2).mockClear()
     render(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} homNay={{ ...HN3, daLam: 4 }} />)
     expect(screen.getByText(TN2.text)).toBeTruthy()
     expect(screen.getByText(/Câu 2\/3/)).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Nộp câu · đã chọn C' })).toBeTruthy()
     expect(lenh('hoc-tap-start')).toHaveLength(0)
-    expect(lenh('hoc-tap-mo-goi')).toHaveLength(0)
+    await waitFor(() => expect(lenh('hoc-tap-mo-goi')).toHaveLength(1))
+    expect(screen.getByText(/Câu 2\/3/)).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Nộp câu · đã chọn C' })).toBeTruthy()
 
     // Làm nốt Câu 2 và Câu 3 rồi Kết thúc chặng ⇒ bản lưu chặng dở được xoá sạch
     fireEvent.click(screen.getByRole('button', { name: 'Nộp câu · đã chọn C' }))

@@ -213,7 +213,9 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   }
   // Lượt dựng đầu chỉ XEM lượt mở trước (React có thể bỏ lượt dựng này rồi dựng lại); effect lúc màn đã hiện thật mới LẤY (mo-chang-truoc.ts `chiXem`).
   const [mo0] = useState(() => (dang0 ? null : docMoNgay(token, true)))
-  const daNapMo0 = useRef(!!((dang0 && ((dang0.phien && Date.now() - dang0.moLuc < 35 * 60_000) || (dang0.ds.length > 0 && dang0.ds.every(c => !!dang0.ket?.[c.qid])))) || mo0))
+  // ĐỒNG BỘ NHIỀU MÁY (thầy 31/10 «hai thiết bị đăng nhập ko đồng bộ … làm như doligo»): mở lại chặng dở LUÔN làm tươi phiên ở NỀN (câu & vị trí vẫn hiện ngay 0 ms) —
+  // trước: dưới 35 phút tin bản lưu, không hỏi máy chủ ⇒ máy khác đã làm tiếp mà máy này vẫn hiện câu cũ. Làm tươi đối chiếu câu (máy chủ bỏ câu đã làm ở máy khác).
+  const daNapMo0 = useRef(!!((dang0 && dang0.ds.length > 0 && dang0.ds.every(c => !!dang0.ket?.[c.qid])) || mo0))
   // GÓI CẢ NGÀY (mo-chang-truoc.ts): không có lượt mở trước đã về ⇒ chặng kế trong gói trên máy hiện NGAY từ khung vẽ đầu (đề công khai, bỏ tem dài); phiên mở NỀN ở effect.
   // Số «đã làm» của gói (lúc lập) có thể cũ hơn Lộ trình ⇒ lấy số lớn hơn.
   const g7Goi = (raw: unknown) => { const g = docTomTatGoi7(raw), d0 = Math.max(g?.daLamHomNay ?? -1, homNay?.daLam ?? -1); return g && d0 > g.daLamHomNay ? { ...g, daLamHomNay: d0 } : g }
