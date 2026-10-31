@@ -95,6 +95,8 @@ export interface Env {
   TAT_NGAN_DINH?: string
   /** Công tắc gom lệnh D1 trong ngăn (gom-d1.ts): có giá trị ⇒ mỗi lệnh một yêu cầu như cũ. */
   TAT_GOM_D1?: string
+  /** Công tắc đệm phản hồi lệnh hỏi định kỳ trong ngăn (ngan-hoc-sinh.ts). */
+  TAT_DEM_PHAN_HOI?: string
   /** Phòng đấu «Đấu Nguyên Tử» của phòng chờ thi (server/src/phong-dau-ion.ts, 30/10): một Durable Object mỗi ca. Vắng ⇒ không phát vé, máy em chỉ Tập với A.I. */
   PHONG_DAU_ION?: DurableObjectNamespace
   /** Công tắc tắt Đấu Nguyên Tử trên mạng: có giá trị ⇒ không phát vé, cửa trả 410, phòng đang mở bị đóng (máy em còn Tập với A.I cục bộ). */

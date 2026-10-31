@@ -20,8 +20,12 @@ const RE_QUA_TAI = /overloaded|queued for too long|too many requests/i
 const cauHayLoi = new Set<string>()
 const that = (x: CauGom | D1PreparedStatement): D1PreparedStatement => (x instanceof CauGom ? x.that() : x)
 
-/** Bộ đếm theo lệnh (đo): số câu D1 và các lượt xả (≈ số vòng chờ D1 nối tiếp) mà lệnh đã dùng. */
-export interface DemLenhD1 { cau: number; vong: Set<number> }
+/** Bộ đếm theo lệnh (đo): số câu D1 và các lượt xả (≈ số vòng chờ D1 nối tiếp) mà lệnh đã dùng; `ghi` = lệnh đã phát ít nhất một câu GHI
+ *  (`khiGhi` gọi ngay lúc ấy — kể cả việc phụ sau phản hồi). */
+export interface DemLenhD1 { cau: number; vong: Set<number>; ghi?: boolean; khiGhi?: () => void }
+const RE_CAU_DOC = /^\s*(SELECT|WITH)\b/i, RE_CO_GHI = /\b(INSERT|UPDATE|DELETE|REPLACE|CREATE|DROP|ALTER)\b/i
+/** Câu CHỈ ĐỌC (SELECT / WITH, không lẫn lệnh ghi). Câu không rõ chữ ⇒ coi là ghi. */
+export const laCauChiDoc = (q: string | null | undefined): boolean => !!q && RE_CAU_DOC.test(q) && !RE_CO_GHI.test(q)
 
 class CauGom {
   constructor(readonly g: Gom, readonly q: string, readonly v: unknown[] | null, readonly dem?: DemLenhD1) {}
@@ -44,7 +48,10 @@ class Gom {
   constructor(readonly goc: D1Database) {}
   xep(ds: (CauGom | D1PreparedStatement)[], mot: Viec['mot'], khoa: string, dem?: DemLenhD1): Promise<unknown> {
     this.soLenh++
-    if (dem) { dem.cau += ds.length; dem.vong.add(this.lanXa + 1) }
+    if (dem) {
+      dem.cau += ds.length; dem.vong.add(this.lanXa + 1)
+      if (ds.some((x) => !laCauChiDoc(x instanceof CauGom ? x.q : null))) { dem.ghi = true; dem.khiGhi?.() }
+    }
     return new Promise((ok, loi) => {
       this.hang.push({ ds, mot, khoa, ok, loi })
       if (!this.hen) { this.hen = true; setTimeout(() => this.xa(), 0) }
