@@ -1,5 +1,5 @@
 // «ĐẤU NGUYÊN TỬ 2» · MÀN (jsdom): 0 mạng khi em chưa bấm «Vào sân đấu»; bấm ⇒ đúng một WebSocket tới phòng của ca, gói đầu là vé + phiên bản giao thức,
-// chào xong tự xin vào sân; vào sân ⇒ màn trận phủ kín; KÉO Ở ĐÂU CŨNG ĐI (cần nổi), CHẠM NHANH THÌ ĐI TỚI; máy em chỉ gửi HƯỚNG ĐI;
+// chào xong tự xin vào sân; vào sân ⇒ màn trận phủ kín; KÉO Ở ĐÂU CŨNG ĐI (cần ảo vô hình, không vẽ gì che màn), CHẠM NHANH THÌ ĐI TỚI; máy em chỉ gửi HƯỚNG ĐI;
 // không vé ⇒ «Chơi với A.I» tại máy, 0 mạng; THẦY BẮT ĐẦU (`batDau` hoặc phòng báo `dong`) ⇒ huỷ requestAnimationFrame NGAY trong lượt đó,
 // đóng kết nối, tháo màn trận, chỉ còn một dòng chữ; `dong` của phòng gọi `onBatDau` để màn cha vào bài.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -104,11 +104,11 @@ describe('Đấu Nguyên Tử 2 · màn phòng chờ', () => {
     expect(document.body.textContent).toContain('Sân 1 · 2/6 bạn')
   })
 
-  it('KÉO Ở BẤT KỲ ĐÂU (cả nửa dưới màn, ngoài sân) ⇒ cần nổi hiện dưới ngón, máy em gửi đúng HƯỚNG ĐI ~12 lần/giây', async () => {
+  it('KÉO Ở BẤT KỲ ĐÂU (cả nửa dưới màn, ngoài sân) ⇒ KHÔNG vẽ cần / vòng tròn nào (thầy 01/11), máy em gửi đúng HƯỚNG ĐI ~12 lần/giây', async () => {
     const { ws } = await vaoSanMang()
     const man = document.querySelector('.dn-man')!, ben = document.querySelector('.dn-ben')!
     ptr(ben, 'pointerdown', { clientX: 100, clientY: 700 })
-    expect(document.querySelector('.dn-can')!.hasAttribute('data-hien')).toBe(true)
+    expect(document.querySelector('.dn-can')).toBeNull()
     ptr(man, 'pointermove', { clientX: 160, clientY: 700 })
     khung(70)
     const yd = ws.yDinh()
@@ -117,7 +117,8 @@ describe('Đấu Nguyên Tử 2 · màn phòng chờ', () => {
     ptr(man, 'pointerup', { clientX: 160, clientY: 700 })
     khung(10)
     expect(ws.yDinh().at(-1)).toMatchObject({ dx: 0, dy: 0 })
-    expect(document.querySelector('.dn-can')!.hasAttribute('data-hien')).toBe(false)
+    expect(document.querySelector('.dn-can')).toBeNull()
+    expect(man.hasAttribute('data-keo')).toBe(false)
   })
 
   it('CHẠM NHANH một điểm trên sân ⇒ đi tới điểm đó', async () => {

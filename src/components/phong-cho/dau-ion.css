@@ -112,15 +112,9 @@
 .dn-xh .k { font-weight: 800; font-size: 16px; color: var(--dn-sao-chu); text-align: right; }
 .dn-goi-y { margin: 0; text-align: center; font-size: 13px; color: var(--dn-chu-3); line-height: 1.5; transition: opacity .3s; }
 .dn-goi-y b { color: var(--dn-chu-2); }
-/* Hình gợi ý vùng kéo (chỉ là hình, không bấm), mờ dần sau lần kéo đầu */
-.dn-goi-y::before { content: ''; display: block; width: 64px; height: 64px; margin: 6px auto; border-radius: 50%; border: 2px dashed var(--dn-vien-2); background: radial-gradient(circle, var(--dn-hs) 0 12px, transparent 13px); opacity: .7; }
-.dn-man[data-keo] .dn-goi-y::before { display: none; }
+/* Gợi ý cách đi mờ dần sau lần kéo đầu. Không vẽ cần / vòng tròn nào (thầy 01/11: «Bỏ hiệu ứng nút di chuyển cho đỡ che màn hình»). */
 .dn-man[data-da-keo] .dn-goi-y { opacity: .55; }
 .dn-cach { display: none; }
-/* Cần nổi: CHỈ hiện dưới ngón tay khi đang kéo (không phải nút) */
-.dn-can { position: fixed; left: 0; top: 0; width: 112px; height: 112px; margin: -56px 0 0 -56px; border-radius: 50%; border: 2px dashed var(--dn-hs); background: color-mix(in srgb, var(--dn-hs) 12%, transparent); pointer-events: none; opacity: 0; transition: opacity .12s; z-index: 60; }
-.dn-can[data-hien] { opacity: 1; }
-.dn-can i { position: absolute; left: 50%; top: 50%; width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%; background: var(--dn-nut); box-shadow: inset 0 -4px 0 var(--dn-nut-day); opacity: .9; }
 /* Tin nổi nằm trên khung của em (ngoài sân) ⇒ không che trận. */
 .dn-tin { position: absolute; left: 0; right: 0; bottom: 4px; display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none; z-index: 3; }
 .dn-tin div { max-width: 92%; padding: 5px 14px; border-radius: 20px; font-size: 14px; font-weight: 800; text-align: center; background: var(--dn-mat); color: var(--dn-chu); border: 2px solid var(--dn-vien); box-shadow: 0 3px 0 var(--dn-vien); animation: dn-hien 1.8s ease-out forwards; }
