@@ -7,6 +7,7 @@
 // An toàn: thiếu binding (test, bản cũ) / công tắc `TAT_NGAN_HS` / không đọc được SBD ⇒ đường cũ y nguyên; ngăn lỗi ⇒ tự quay về đường cũ với ĐÚNG thân gói.
 // Không đi qua ngăn: đăng nhập, thi (vào thi / lưu tạm / nộp), lệnh thầy / phụ huynh, GET.
 import type { DurableObjectState, Env, ExecutionContext, KhoEm, SqlNgan } from './kieu'
+import { gomD1 } from './gom-d1'
 
 type XuLy = (req: Request, env: Env, ctx?: ExecutionContext) => Promise<Response>
 let xuLy: XuLy | null = null
@@ -92,14 +93,15 @@ let tram = ''
 let d1Ms = '-', d1Luc = 0
 function doViTri(env: Env, ctx: ExecutionContext): void {
   const now = Date.now()
-  if (!tram) { tram = '…'; ctx.waitUntil(fetch('https://cloudflare.com/cdn-cgi/trace').then((r) => r.text()).then((t) => { tram = /colo=([A-Z]+)/.exec(t)?.[1] ?? '?' }).catch(() => { tram = '?' })) }
+  // Dấu chờ PHẢI là ASCII: giá trị header chỉ nhận byte ≤ 255 (31/10: «…» làm lệnh đầu của mỗi isolate ngăn ném TypeError ⇒ Worker chạy lại đường cũ).
+  if (!tram) { tram = '~'; ctx.waitUntil(fetch('https://cloudflare.com/cdn-cgi/trace').then((r) => r.text()).then((t) => { tram = /colo=([A-Z]+)/.exec(t)?.[1] ?? '?' }).catch(() => { tram = '?' })) }
   // Hai câu nối tiếp: câu đầu có thể mang thời gian mở kết nối (isolate mới) — ghi «lần đầu/lần hai».
   if (now - d1Luc > 60_000) { d1Luc = now; ctx.waitUntil((async () => { let t0 = Date.now(); await env.DB.prepare('SELECT 1').first(); const a = Date.now() - t0; t0 = Date.now(); await env.DB.prepare('SELECT 1').first(); d1Ms = `${a}/${Date.now() - t0}` })().catch(() => {})) }
 }
 
 /** Trạm Cloudflare của isolate (đợi tối đa 2 giây). */
 async function docTram(): Promise<string> {
-  if (tram && tram !== '…') return tram
+  if (tram && tram !== '~') return tram
   try {
     const t = await (await fetch('https://cloudflare.com/cdn-cgi/trace', { signal: AbortSignal.timeout(2000) })).text()
     tram = /colo=([A-Z]+)/.exec(t)?.[1] ?? '?'
@@ -133,7 +135,8 @@ export class NganHocSinh {
     const ctx = { waitUntil: (p: Promise<unknown>) => state.waitUntil(p), passThroughOnException() {} } as unknown as ExecutionContext
     const sbd = req.headers.get(DAU_SBD_NGAN) ?? ''
     if (sbd && state.storage?.sql && (!this.kho || this.kho.sbd !== sbd)) this.kho = taoKhoEm(state.storage.sql, sbd)
-    const env = (envChung ??= this.env)
+    // Gom lệnh D1 (gom-d1.ts): mọi ngăn trong isolate dùng chung MỘT bộ gom ⇒ câu đọc của nhiều em trong cùng lượt cũng đi chung một lô.
+    const env = (envChung ??= this.env.TAT_GOM_D1 || !this.env.DB ? this.env : { ...this.env, DB: gomD1(this.env.DB) })
     doViTri(env, ctx)
     const t0 = Date.now()
     const res = await xuLy(req, this.kho ? { ...env, KHO_EM: this.kho } : env, ctx)
