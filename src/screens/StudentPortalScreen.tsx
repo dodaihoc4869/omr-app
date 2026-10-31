@@ -964,6 +964,15 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
       if (dongY) void dangXuat()
     })
   }
+  // LÀM MỚI APP (thầy 31/10 «nút reset app trong hồ sơ hs … nếu app bị đơ như iphone lúc nãy»): xoá phần nhớ tạm trên máy + đăng xuất ⇒ đăng nhập lại; bài chưa gửi giữ nguyên.
+  const hoiLamMoiApp = () => {
+    void hoi({ tieuDe: 'Làm mới app trên máy này?', noiDung: 'App xoá phần nhớ tạm, tải bản mới và đăng xuất. Em đăng nhập lại bằng số báo danh và mật khẩu. Bài em làm chưa gửi được vẫn giữ lại và tự gửi sau khi đăng nhập.', nutDongY: 'Làm mới app', nutHuy: 'Ở lại' }).then((dongY) => {
+      if (!dongY) return
+      void import('../lib/lam-moi-app').then((m) => m.lamMoiApp()).then((ok) => {
+        if (!ok) void bao('Máy đang mất mạng. Em bật mạng rồi bấm lại «Làm mới app».', 'Chưa làm mới được')
+      }).catch(() => { location.replace('/hs') })
+    })
+  }
   const tieuSheet =
     tab === 'diem' ? 'Kết quả bài đã nộp'
     : tab === 'btvn' ? 'Bài tập về nhà'
@@ -998,7 +1007,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
           coCa={!!caDangMo} soBaiTap={dsBtvn.filter((bt) => !bt?.daNop).length} coBaiTap={dsBtvn.length > 0} token={auth.token} onHoc={() => setTab('hoctap')} onXemLai={() => setTab('caudalam')}
           onChua={(q) => { setQidChua(typeof q === 'string' ? q : undefined); setTab('tuchua') }} onThi={() => { void boNapExam().catch(() => {}); setTab('vaothi') }}
           onTuLuyen={() => setTab('tuluyen')} onLichSu={() => setTab('lichsuca')}
-          onKetQua={() => moManCu('diem')} onLuyenLai={() => moManCu('khacphuc')} onBangTin={() => moManCu('bantin')} onBaiTap={() => moManCu('btvn')} onGiaDinh={() => moManCu('mom')} onTaiLai={hoa2.taiLai} onDangXuat={hoiDangXuat}
+          onKetQua={() => moManCu('diem')} onLuyenLai={() => moManCu('khacphuc')} onBangTin={() => moManCu('bantin')} onBaiTap={() => moManCu('btvn')} onGiaDinh={() => moManCu('mom')} onTaiLai={hoa2.taiLai} onDangXuat={hoiDangXuat} onLamMoiApp={hoiLamMoiApp}
           onMoHoSo={() => setMoHoSoEm(true)} onKiemTra={() => setTab('kiemtra')} moDiemDanh={tab === null}
         /></DungKhiAn></div>
       )}
