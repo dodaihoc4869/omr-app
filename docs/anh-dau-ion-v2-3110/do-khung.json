@@ -1,0 +1,56 @@
+{
+ "luc": "2026-10-31T18:16:50.136Z",
+ "ghiChu": "BẢN BUILD THẬT (dist/), Chromium không giao diện trong máy chủ (vẽ bằng CPU, không GPU) — chậm hơn điện thoại thật. 390×844 DPR 2, sân vẽ DPR 1,5 (máy yếu: DPR 1, trần 30 khung/giây). Trận mạng 6 bạn qua phòng đấu thật (Node). Đo 8 giây khung ĐÃ VẼ.",
+ "kq": [
+  {
+   "cpu": 1,
+   "cheDo": "thường",
+   "dprSan": 1.5,
+   "soKhung": 479,
+   "khungMoiGiay": 60,
+   "trungViMs": 16.7,
+   "p95Ms": 17.3,
+   "toiDaMs": 39.7
+  },
+  {
+   "cpu": 4,
+   "cheDo": "thường",
+   "dprSan": 1.5,
+   "soKhung": 404,
+   "khungMoiGiay": 51,
+   "trungViMs": 17.7,
+   "p95Ms": 30.1,
+   "toiDaMs": 64.4
+  },
+  {
+   "cpu": 4,
+   "cheDo": "thường (tự hạ bật, không cần hạ)",
+   "dprSan": 1.5,
+   "soKhung": 397,
+   "khungMoiGiay": 50,
+   "trungViMs": 18,
+   "p95Ms": 31.4,
+   "toiDaMs": 55.3
+  },
+  {
+   "cpu": 4,
+   "cheDo": "máy yếu",
+   "dprSan": 1,
+   "soKhung": 239,
+   "khungMoiGiay": 30,
+   "trungViMs": 33.3,
+   "p95Ms": 35,
+   "toiDaMs": 36.5
+  },
+  {
+   "cpu": 6,
+   "cheDo": "máy yếu",
+   "dprSan": 1,
+   "soKhung": 238,
+   "khungMoiGiay": 30,
+   "trungViMs": 33.4,
+   "p95Ms": 37.4,
+   "toiDaMs": 66.7
+  }
+ ]
+}
