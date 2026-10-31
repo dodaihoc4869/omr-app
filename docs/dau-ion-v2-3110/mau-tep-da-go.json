@@ -1,0 +1,6 @@
+{
+ "ghiChu": "31/10/2026 — thầy duyệt «Chốt duyệt tất» docs/DE-XUAT-DAU-ION-V2-3110.md, mục Thầy quyết số 6: «Màu khung game: theo app học sinh (chàm) [đề xuất]» ⇒ «Đấu Nguyên Tử 2» thay hẳn bản 30/10. Tờ màu cũ src/components/phong-cho/ban-nguyen-to.css (bảng --pc-bn-* / --di-* chỉ game cũ dùng; trang phòng chờ giữ nguyên --pc-* ở phong-cho.css) bị THAY bằng src/components/phong-cho/dau-ion.css (chỉ biến --tr-* / token chung, không màu thô). files = tệp xoá nguyên, kèm sha256 nội dung đúng lúc xoá ⇒ chỉ miễn đúng bản đã soát.",
+ "files": [
+  { "path": "src/components/phong-cho/ban-nguyen-to.css", "sha256": "b23d09c5c20a5080c9700743c3dc4fe126c65e1a1f3798d52d3e8856ebb63ea1" }
+ ]
+}
