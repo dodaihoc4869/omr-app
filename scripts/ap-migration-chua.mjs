@@ -33,12 +33,23 @@ const query = (sql) => {
   return rs.flatMap((x) => x.results ?? [])
 }
 const file = (path) => run(['--file', path, '--yes'])
+// 31/10: `--file` trên D1 thật đi đường NHẬP TỆP (chậm, mỗi lượt phát hành ~16–30 phút cho bước này). Mọi đối tượng của tệp (CREATE … IF NOT EXISTS) đã có
+// trong sqlite_master ⇒ chạy lại cũng không đổi gì ⇒ bỏ qua; thiếu dù chỉ một ⇒ chạy tệp như cũ.
+const tenTao = (path) => [...readFileSync(path, 'utf8').matchAll(/CREATE\s+(?:UNIQUE\s+)?(?:TABLE|INDEX|TRIGGER|VIEW)\s+IF\s+NOT\s+EXISTS\s+(\w+)/gi)].map((m) => m[1])
+const fileNeuThieu = (path) => {
+  const ten = [...new Set(tenTao(path))]
+  if (ten.length) {
+    const co = new Set(query(`SELECT name FROM sqlite_master WHERE name IN (${ten.map((t) => `'${t}'`).join(',')})`).map((x) => x.name))
+    if (ten.every((t) => co.has(t))) { console.log(`${path}: đủ ${ten.length} đối tượng — bỏ --file`); return }
+  }
+  file(path)
+}
 const initial = 'server/migration-0710-chua-cau-sai.sql'
 const extra = 'server/migration-0710-vong-chua-chat-luong.sql'
 const trigger = 'server/migration-z-0710-chua-giao-tu-so.sql'
 const temp = mkdtempSync(join(tmpdir(), 'chua-schema-'))
 try {
-  file(initial) // IF NOT EXISTS; có thể chạy lại với bản D1 đã áp PR189.
+  fileNeuThieu(initial) // IF NOT EXISTS; có thể chạy lại với bản D1 đã áp PR189.
   const columns = new Map()
   const pending = []
   for (const sql of readFileSync(extra, 'utf8')
@@ -77,7 +88,7 @@ try {
   }
   // Trigger chứa UPDATE có điều kiện cho đợt chữa cũ khi SỰ KIỆN SAI MỚI được ghi;
   // tạo trigger không chạy UPDATE trên dữ liệu cũ. Vì vậy dùng workflow riêng đã soát.
-  file(trigger)
+  fileNeuThieu(trigger)
   const rs = query(
     "SELECT name FROM sqlite_master WHERE type='trigger' AND name IN ('chua_giao_sai_sau_ghi','chua_giao_sai_sau_cong_bo')",
   )
