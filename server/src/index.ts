@@ -3606,7 +3606,7 @@ const boXuLy = {
       }
       if(p.startsWith('/notifications/'))return ra(await notifications(env,p.slice('/notifications/'.length),b))
       if (p === '/daily-honors') return ra(await dailyHonors(env))
-      if (p === '/presence') return ra(await recordPresence(env,b))
+      if (p === '/presence') return ra(await recordPresence(env,b,ctx))
       if (p.startsWith('/student-news/')) {
         const sbd = await gameIdentity(env,b)
         return ra(await parentNews(env,p.slice('/student-news/'.length),{sbd},'hs'))
