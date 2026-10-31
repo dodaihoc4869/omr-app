@@ -1,4 +1,4 @@
-# ĐO LỆNH NẶNG (chạy lại 31/10 sáng sau ngăn riêng) THEO ĐƯỜNG (CHỈ ĐỌC, KHÔNG truy vấn D1) — thầy 30/10 21:35: «máy chủ thừa cho hàng trăm nghìn học sinh mà tối nào có 200 hs làm cũng kêu lag».
+# ĐO LỆNH NẶNG (chạy lại 31/10 ~08h: ngăn châu Á + mẫu [ngan-do]) THEO ĐƯỜNG (CHỈ ĐỌC, KHÔNG truy vấn D1) — thầy 30/10 21:35: «máy chủ thừa cho hàng trăm nghìn học sinh mà tối nào có 200 hs làm cũng kêu lag».
 # 1) wrangler tail 120 giây giờ cao điểm: theo đường (bỏ chuỗi hỏi, rút gọn mã) — số lần, CPU tb/p90/p99/max, thời gian tường tb/p99, kết cục.
 # 2) Workers Logs (observability) cùng phép gộp cho khung 19:00–21:30 VN nếu khoá có quyền.
 # 3) D1: truy vấn theo tổng thời gian và theo thời gian TB (lâu nhất) khung 19:00–21:30 VN, SQL rút gọn 400 ký tự. Không in SBD / tên / khoá.
@@ -42,6 +42,10 @@ jobs:
             const tuoi=bn.map(x=>x.tuoiPhut).sort((a,b)=>a-b),q2=p=>tuoi.length?tuoi[Math.min(tuoi.length-1,Math.floor(p*tuoi.length))]:"-"
             console.log("[bo-nho] dòng:",bn.length,"· tuổi isolate (phút) p10/p50/p90/max:",q2(.1),q2(.5),q2(.9),q2(1),"· đỉnh đồng thời max:",Math.max(0,...bn.map(x=>x.dinh||0)),"· soYc p50:",bn.map(x=>x.soYc).sort((a,b)=>a-b)[bn.length>>1])
             for(const x of bn.slice(0,6))console.log("  mẫu:",JSON.stringify(x).slice(0,400))
+            const nd=[];for(const e of ev)for(const l of e.logs||[]){const m=(l.message||[]).join(" ");if(m.startsWith("[ngan-do]"))nd.push(m.slice(10))}
+            const theoTram={},xlTheo={};for(const m of nd){const [duong,h]=m.split(" ");const t=(h||"").split(";");const tr=t[0]||"-";theoTram[tr]=(theoTram[tr]||0)+1;const xl=Number((t[2]||"").replace("xl=",""));if(Number.isFinite(xl)){(xlTheo[duong]=xlTheo[duong]||[]).push(xl)}}
+            console.log("[ngan-do] mẫu:",nd.length,"· theo trạm:",JSON.stringify(theoTram),"· d1 mẫu:",nd.slice(0,8).map(m=>(m.split(";")[1]||"")).join(" "))
+            for(const [d,a] of Object.entries(xlTheo)){a.sort((x,y)=>x-y);console.log("  xử lý trong ngăn",d,"n=",a.length,"p50=",a[a.length>>1],"max=",a[a.length-1])}
             for(const r of rows.slice(0,45))console.log(`${r.p.padEnd(48)} n=${String(r.n).padStart(4)} cpuTong=${String(r.cpuTong).padStart(6)} tb=${r.cpuTb} p90=${r.cpu90} p99=${r.cpu99} max=${r.cpuMax} | tuong tb=${r.wallTb} p99=${r.wall99} | ${JSON.stringify(r.kq)}`)
           '
       - name: D1 truy vấn nặng khung 19:00–21:30 VN
