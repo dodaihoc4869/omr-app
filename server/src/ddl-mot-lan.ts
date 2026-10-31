@@ -10,6 +10,33 @@ const daChay = new WeakMap<object, Map<string, Promise<void>>>()
 /** Nhóm DDL đã CHẠY XONG (thành công) trong isolate, theo D1 gốc — chỉ để nơi gọi quyết có ĐỌC ĐOÁN TRƯỚC hay không (đợt 18), không đổi kết quả. */
 const daXong = new WeakMap<object, Set<string>>()
 
+// ĐỐI TƯỢNG ĐÃ CÓ (31/10, thầy «máy chủ chạy cả trăm ngàn em cùng lúc»). Đo lệnh nóng giống thật: mỗi isolate MỚI gửi 59 lệnh `CREATE … IF NOT EXISTS`
+// (6 lượt GHI — D1 coi DDL là ghi, giữ khoá ghi) dù bảng đã có từ lâu = 39% câu D1 của một lần mở Sảnh lạnh; ngăn mỗi em ⇒ mỗi isolate ngăn mới trả lại.
+// Nay: mỗi isolate đọc MỘT lần tên mọi đối tượng (`sqlite_master`, đệm 10 phút theo D1 gốc); nhóm mà MỌI câu là `CREATE … IF NOT EXISTS <tên>` và mọi tên
+// đã có ⇒ coi như đã chạy (không gửi gì) — đúng kết quả của lệnh cũ (IF NOT EXISTS trên đối tượng đã có là lệnh rỗng). Nhóm có câu khác (ALTER, INSERT…),
+// thiếu tên nào, hay đọc tên lỗi ⇒ chạy lô như cũ.
+const RE_TAO = /^\s*CREATE\s+(?:UNIQUE\s+)?(?:TABLE|INDEX|TRIGGER|VIEW)\s+IF\s+NOT\s+EXISTS\s+["`[]?(\w+)/i
+const tenCuaNhom = new WeakMap<readonly string[], string[] | null>()
+function tenTao(lenh: readonly string[]): string[] | null {
+  if (tenCuaNhom.has(lenh)) return tenCuaNhom.get(lenh)!
+  const ten: string[] = []
+  for (const s of lenh) { const m = RE_TAO.exec(s); if (!m) { tenCuaNhom.set(lenh, null); return null } ten.push(m[1]!) }
+  tenCuaNhom.set(lenh, ten)
+  return ten
+}
+const HAN_DOI_TUONG_MS = 10 * 60_000
+const doiTuongTheoDb = new WeakMap<object, { luc: number; p: Promise<Set<string> | null> }>()
+function docDoiTuong(env: Env, goc: object): Promise<Set<string> | null> {
+  const now = Date.now(), co = doiTuongTheoDb.get(goc)
+  if (co && now - co.luc >= 0 && now - co.luc < HAN_DOI_TUONG_MS) return co.p
+  let p: Promise<Set<string> | null>
+  try {
+    p = env.DB.prepare("SELECT name FROM sqlite_master WHERE type IN ('table', 'index', 'trigger', 'view')").all<{ name: string }>()
+      .then((r) => new Set((r.results ?? []).map((x) => String(x.name))), () => null)
+  } catch { p = Promise.resolve(null) } // D1 lạ (không có `all`) ⇒ chạy lô như cũ
+  doiTuongTheoDb.set(goc, { luc: now, p })
+  return p
+}
 export function chayDdlMotLan(env: Env, nhom: string, lenh: readonly string[]): Promise<void> {
   const goc = dbGoc(env.DB as unknown as object)
   let m = daChay.get(goc)
@@ -17,7 +44,11 @@ export function chayDdlMotLan(env: Env, nhom: string, lenh: readonly string[]): 
   let p = m.get(nhom)
   if (!p) {
     const bang = m
-    const xong = p = env.DB.batch(lenh.map((s) => env.DB.prepare(s))).then(() => undefined)
+    const chay = () => env.DB.batch(lenh.map((s) => env.DB.prepare(s))).then(() => undefined)
+    const ten = tenTao(lenh)
+    const xong = p = ten
+      ? docDoiTuong(env, goc).then((co) => (co && ten.every((t) => co.has(t)) ? undefined : chay().then(() => { if (co) for (const t of ten) co.add(t) })))
+      : chay()
     p.then(() => { if (bang.get(nhom) !== xong) return; let t = daXong.get(goc); if (!t) { t = new Set(); daXong.set(goc, t) } t.add(nhom) }, () => { if (bang.get(nhom) === xong) bang.delete(nhom) })
     m.set(nhom, p)
   }

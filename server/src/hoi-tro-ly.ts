@@ -91,7 +91,7 @@ export async function hoiThemBatCho(env: Env, sbd: string): Promise<boolean> {
   return emDuocDung(env, sbd, await docCauHinhHoiThem(env)).catch(() => false)
 }
 
-const SQL_BANG = [
+export const SQL_BANG = [
   `CREATE TABLE IF NOT EXISTS hoi_tro_ly (id INTEGER PRIMARY KEY AUTOINCREMENT, sbd TEXT NOT NULL, qid TEXT NOT NULL, ngay_vn TEXT NOT NULL, luc TEXT NOT NULL,
     nguon TEXT, cau_hoi TEXT NOT NULL, tra_loi TEXT, lien_quan INTEGER, model TEXT, token_vao INTEGER, token_ra INTEGER, ms INTEGER, loi TEXT)`,
   'CREATE INDEX IF NOT EXISTS idx_htl_em_ngay ON hoi_tro_ly(sbd, ngay_vn)',

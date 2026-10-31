@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { afterEach, describe, expect, it } from 'vitest'
-import { dongBoBaHanhTrinh, idHanhTrinh, KHOA_HANH_TRINH, ungVienHanhTrinh, khoCauTheoKhoi } from '../server/src/hanh-trinh-hop-nhat'
+import { dongBoBaHanhTrinh, idHanhTrinh, KHOA_HANH_TRINH, ungVienHanhTrinh, khoCauTheoKhoi, SQL_BANG_HANH_TRINH } from '../server/src/hanh-trinh-hop-nhat'
 import { layKeHoachHomNay, sanh2, xoaDemChienDich } from '../server/src/srs2-d1'
 import { taoKhoOmni, themChienDich, lam, T_SANG, HOM_NAY } from './omni-3-ke-hoach-chung'
 import { gvOmni } from '../server/src/omni-gv'
@@ -33,6 +33,8 @@ describe('Hành trình 3 khối: gộp, tự nhận kho mới, chốt ngày', ()
   it('quét nhiều trang không bỏ câu; ứng viên mỗi em có giới hạn và xoay khác nhau', async () => {
     const k=kho(15359)
     for (let i=0;i<8;i++) themChienDich(k.d,{id:`nguon-them-${i}`,maDe:['DH-B1'],qids:k.qids('DH-B1').slice(0,24),sbd:['S1'],taoLuc:'2026-10-01T02:00:00Z',hanNop:'2026-10-09'})
+    // 31/10 (ddl-mot-lan.ts): isolate đọc tên đối tượng một lần, bỏ qua nhóm DDL đã có ⇒ kho đo có sẵn bảng hành trình như D1 thật (ngân sách 40 câu là của lượt gộp)
+    for (const q of SQL_BANG_HANH_TRINH) k.d.sql.exec(q)
     const before=k.d.soLenh.prepare
     await dongBoBaHanhTrinh(k.env,T_SANG)
     expect(k.d.soLenh.prepare-before).toBeLessThanOrEqual(40)
