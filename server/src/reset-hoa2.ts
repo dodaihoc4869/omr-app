@@ -74,6 +74,8 @@ export const BANG_GIU_HOA2: readonly string[] = [
   'dong_bo',
   // GAME HÓA 2.0 do thầy chủ động tạo: chiến dịch luyện, mốc "Chữa xong" của buổi chữa.
   'chien_dich', 'srs2_day_lai',
+  // BẢNG TRA THÀNH VIÊN CHIẾN DỊCH (chien-dich-tv.ts, 31/10): phản chiếu `chien_dich.sbd_json` (đã GIỮ) + dấu lập chỉ mục ⇒ GIỮ cùng chiến dịch.
+  'chien_dich_tv', 'chien_dich_tv_dau',
   // Nhãn "Thầy đã chữa" của Kiểm tra đầu giờ (dau-gio.ts, 29/09) — đi cùng mốc dạy lại.
   'thay_da_chua',
   // Lời giải từng bước (loi-giai.ts, 29/09): hồ sơ thầy duyệt + chỉ mục câu + hàng soạn — học liệu ⇒ GIỮ.

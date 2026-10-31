@@ -97,6 +97,8 @@ export interface Env {
   TAT_NGAN_DINH?: string
   /** Công tắc gom lệnh D1 trong ngăn (gom-d1.ts): có giá trị ⇒ mỗi lệnh một yêu cầu như cũ. */
   TAT_GOM_D1?: string
+  /** 31/10: tắt bảng tra thành viên chiến dịch (chien-dich-tv.ts) ⇒ đường của em đọc cả dòng chien_dich như cũ. */
+  TAT_CHIEN_DICH_TV?: string
   /** Công tắc đệm phản hồi lệnh hỏi định kỳ trong ngăn (ngan-hoc-sinh.ts). */
   TAT_DEM_PHAN_HOI?: string
   /** Bật đọc qua bản sao D1 gần nhất trong ngăn học sinh (Sessions API + dấu trang riêng của em, ngan-hoc-sinh.ts). Mặc định tắt. */
