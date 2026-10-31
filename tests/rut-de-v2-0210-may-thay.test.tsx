@@ -15,8 +15,10 @@ const loadExamSources = vi.fn(async () => [])
 
 vi.mock('../src/lib/exam-api', async (goc) => ({
   ...(await goc<Record<string, unknown>>()),
-  loiDenHanTheoEm: (...a: unknown[]) => loiDenHanTheoEm(...a),
   noiKhoCa: (...a: unknown[]) => noiKhoCa(...(a as [])),
+}))
+vi.mock('../src/lib/ca-em-thay-api', () => ({
+  loiDenHanTheoEm: (...a: unknown[]) => loiDenHanTheoEm(...a),
 }))
 vi.mock('../src/lib/exam-db', async (goc) => ({
   ...(await goc<Record<string, unknown>>()),

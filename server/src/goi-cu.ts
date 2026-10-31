@@ -34,6 +34,7 @@ import { tenLopCuaEm } from './ten-lop'
 import { docTrangThaiCongBo, dongChuaCongBo, laSanSangCongBo } from './cong-bo-diem'
 import { chamLuotTuNganHang } from './cham-lai-ca'
 import { docKeyBankDem, ghiKeyBank } from './dem-ca-thi'
+import { chiaGoiDe, dungGoiDe } from './khoa-de-thi'
 import { buSoCauChoKeyBank, hopNhatKeyBank } from './key-bank-hop-nhat'
 import { expCuaEmTrongCa } from './ca-thi-them'
 
@@ -2141,6 +2142,15 @@ export async function ketQuaCuaEm(env: Env, b: Record<string, unknown>): Promise
   // ai vào thì KHÔNG tính là xong — nếu không, em mở link sớm là thấy đáp án.
   const sanSang = laSanSangCongBo(congBo, chuoi(ca.trang_thai), daVao, daNop) // MỘT nguồn luật công bố (cong-bo-diem.ts): ca đóng / cả lớp nộp / `ngay`
 
+  // 31/10 (khoa-de-thi.ts): máy em giữ sẵn gói tờ đáp án đã khoá ĐÚNG phiên bản mới nhất ⇒ chỉ trao chìa (cùng cổng công bố), không gửi lại ~100 KB.
+  if (sanSang && env.DE && env.MA_BI_MAT && b.coGoiDe === true) {
+    const sbdGoi = chuoi(b.sbd).trim()
+    const k = sbdGoi ? await docKeyBankDem(env, maCa).catch(() => null) : null
+    if (k && k.giaTri !== null && dungGoiDe(b, k.etag)) {
+      const expCa = await expCuaEmTrongCa(env, maCa, sbdGoi)
+      return { ok: true, congBo, sanSang, daNop, daVao, khoaKq: await chiaGoiDe(env, maCa, sbdGoi), phienGoi: k.etag, ...(expCa !== null ? { expCa } : {}) }
+    }
+  }
   let keyBank: unknown = null
   if (sanSang && env.DE) {
     const o = await env.DE.get(`key/${maCa}.json`)

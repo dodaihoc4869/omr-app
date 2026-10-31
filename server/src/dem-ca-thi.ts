@@ -105,9 +105,9 @@ export async function docGoiDeDem(env: Env, bankR2: string, phien: string, nay =
   try { return await p } finally { kho.deBay.delete(khoaBay) }
 }
 
-/** TỜ ĐÁP ÁN `key/<maCa>.json`: `{ giaTri, tho }` — `giaTri` là JSON đã parse (hỏng/không có ⇒ `null`, y như đọc thẳng cũ),
+/** TỜ ĐÁP ÁN `key/<maCa>.json`: `{ giaTri, tho, etag }` (etag = phiên bản R2 — gói đề đã khoá của máy em, khoa-de-thi.ts) — `giaTri` là JSON đã parse (hỏng/không có ⇒ `null`, y như đọc thẳng cũ),
  *  `tho` là nguyên văn JSON hợp lệ (để ghép thẳng vào phản hồi, khỏi stringify lại) hoặc `null`. Mỗi lần gọi đều hỏi R2 có điều kiện. */
-export async function docKeyBankDem(env: Env, maCa: string): Promise<{ giaTri: unknown; tho: string | null }> {
+export async function docKeyBankDem(env: Env, maCa: string): Promise<{ giaTri: unknown; tho: string | null; etag?: string }> {
   if (!env.DE) return { giaTri: null, tho: null }
   const khoa = `key/${maCa}.json`
   const kho = khoCua(env)
@@ -117,7 +117,7 @@ export async function docKeyBankDem(env: Env, maCa: string): Promise<{ giaTri: u
   // lượt đang bay: lượt bắt đầu trước một lần ghi không được trả cho lượt tới sau lần ghi ấy).
   if (!cu) {
     const dang = kho.keyBay.get(khoa)
-    if (dang) { const b = await dang; return b ? { giaTri: b.giaTri, tho: b.tho } : { giaTri: null, tho: null } }
+    if (dang) { const b = await dang; return b ? { giaTri: b.giaTri, tho: b.tho, etag: b.etag } : { giaTri: null, tho: null } }
   }
   const p = (async (): Promise<BanKey | null> => {
     const o = (await r2(env).get(khoa, cu ? { onlyIf: { etagDoesNotMatch: cu.etag } } : undefined)) as R2Doc | null
@@ -142,7 +142,7 @@ export async function docKeyBankDem(env: Env, maCa: string): Promise<{ giaTri: u
   if (!cu) kho.keyBay.set(khoa, p)
   try {
     const b = await p
-    return b ? { giaTri: b.giaTri, tho: b.tho } : { giaTri: null, tho: null }
+    return b ? { giaTri: b.giaTri, tho: b.tho, etag: b.etag } : { giaTri: null, tho: null }
   } finally {
     if (!cu && kho.keyBay.get(khoa) === p) kho.keyBay.delete(khoa)
   }

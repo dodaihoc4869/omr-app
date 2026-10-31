@@ -9,7 +9,8 @@
 // màn Theo dõi đi đường rút cũ (`dungDeRiengChoCa`), không lặng lẽ rút thiếu.
 import { mergeAndStrip, type TeacherExamSource, type TeacherMcqQuestion, type TeacherShortAnswerQuestion } from '../data/examContent'
 import { docSoCauCa, loadExamSources, loadSessionTeacherBank, saveSessionTeacherBank } from './exam-db'
-import { coLuotMoiTheoEm, loiDenHanTheoEm, noiKhoCa, type LoiDenHanEm } from './exam-api'
+import { noiKhoCa } from './exam-api'
+import { coLuotMoiTheoEm, loiDenHanTheoEm, type LoiDenHanEm } from './ca-em-thay-api'
 import { ngayVnCua } from './de-rieng-nguon'
 import {
   BAC_HOI_LAI,
