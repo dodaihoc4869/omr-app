@@ -7,6 +7,7 @@
 // An toàn: thiếu binding (test, bản cũ) / công tắc `TAT_NGAN_HS` / không đọc được SBD ⇒ đường cũ y nguyên; ngăn lỗi ⇒ tự quay về đường cũ với ĐÚNG thân gói.
 // Không đi qua ngăn: đăng nhập, thi (vào thi / lưu tạm / nộp), lệnh thầy / phụ huynh, GET.
 import type { DurableObjectState, Env, ExecutionContext, KhoEm, SqlNgan } from './kieu'
+import { gomD1 } from './gom-d1'
 
 type XuLy = (req: Request, env: Env, ctx?: ExecutionContext) => Promise<Response>
 let xuLy: XuLy | null = null
@@ -17,6 +18,21 @@ export const DAU_TRONG_NGAN = 'x-trong-ngan-hs'
 export const DAU_SBD_NGAN = 'x-ngan-sbd'
 /** Tiền tố tên ngăn: đổi ⇒ mọi em sang ngăn mới (tạo lại đúng vùng theo `locationHint`). */
 export const TIEN_TO_NGAN = 'apac|'
+
+// NGĂN SÁT D1 (31/10, đo máy thật `[ngan-do]`: ngăn của em nằm ở NRT / KIX còn D1 chính ở Hồng Kông ⇒ MỖI vòng D1 50–60 ms; Sảnh lần đầu 12 vòng ≈ 0,7 s).
+// `locationHint: 'apac'` chỉ chọn VÙNG; Cloudflare tạo ngăn «gần nơi gọi get() lần đầu». Cách đặt ngăn sát D1: (1) bốc thăm vài ngăn TRUNG CHUYỂN `dinh|i`
+// (gợi ý apac), mỗi ngăn tự đo một vòng `SELECT 1` tới D1 — giữ các ngăn đo nhanh nhất (cùng trạm với D1) vào `cau_hinh.ngan_dinh`; (2) ngăn của em mang tên
+// mới `d1|<sbd>`, lần đầu được TẠO bởi ngăn trung chuyển (get() không gợi ý ⇒ tạo ngay cạnh trung chuyển = cạnh D1). Đã tạo rồi thì Worker gọi thẳng.
+// Chưa có danh sách (máy mới / chưa đo xong) ⇒ đường `apac|` như cũ và bốc thăm ở nền. Công tắc `TAT_NGAN_DINH` ⇒ đường cũ.
+/** Tiền tố ngăn sát D1 (tạo qua ngăn trung chuyển). */
+export const TIEN_TO_NGAN_D1 = 'd1|'
+/** Worker → ngăn trung chuyển: tên ngăn của em cần tạo / gọi (chỉ Worker đặt; Worker luôn xoá giá trị máy khách gửi tới). */
+export const DAU_CHUYEN_NGAN = 'x-ngan-chuyen'
+/** Lệnh đo vị trí của ngăn (chỉ gọi được qua binding — Worker không chuyển đường này vào ngăn). */
+export const DUONG_DO_VI_TRI = '/__ngan/vi-tri'
+export const KHOA_NGAN_DINH = 'ngan_dinh'
+export const KHOA_NGAN_DINH_KHOA = 'ngan_dinh_khoa'
+const RE_TEN_DINH = /^dinh\|\d{1,4}$/
 
 /**
  * KHO RIÊNG CỦA EM trong SQLite của ngăn: dòng sổ (`su_kien_hoc` của em, đúng các cột omni-d1 đọc) + mốc (n = số dòng, r = received_at lớn nhất).
@@ -77,21 +93,50 @@ let tram = ''
 let d1Ms = '-', d1Luc = 0
 function doViTri(env: Env, ctx: ExecutionContext): void {
   const now = Date.now()
-  if (!tram) { tram = '…'; ctx.waitUntil(fetch('https://cloudflare.com/cdn-cgi/trace').then((r) => r.text()).then((t) => { tram = /colo=([A-Z]+)/.exec(t)?.[1] ?? '?' }).catch(() => { tram = '?' })) }
+  // Dấu chờ PHẢI là ASCII: giá trị header chỉ nhận byte ≤ 255 (31/10: «…» làm lệnh đầu của mỗi isolate ngăn ném TypeError ⇒ Worker chạy lại đường cũ).
+  if (!tram) { tram = '~'; ctx.waitUntil(fetch('https://cloudflare.com/cdn-cgi/trace').then((r) => r.text()).then((t) => { tram = /colo=([A-Z]+)/.exec(t)?.[1] ?? '?' }).catch(() => { tram = '?' })) }
   // Hai câu nối tiếp: câu đầu có thể mang thời gian mở kết nối (isolate mới) — ghi «lần đầu/lần hai».
   if (now - d1Luc > 60_000) { d1Luc = now; ctx.waitUntil((async () => { let t0 = Date.now(); await env.DB.prepare('SELECT 1').first(); const a = Date.now() - t0; t0 = Date.now(); await env.DB.prepare('SELECT 1').first(); d1Ms = `${a}/${Date.now() - t0}` })().catch(() => {})) }
+}
+
+/** Trạm Cloudflare của isolate (đợi tối đa 2 giây). */
+async function docTram(): Promise<string> {
+  if (tram && tram !== '~') return tram
+  try {
+    const t = await (await fetch('https://cloudflare.com/cdn-cgi/trace', { signal: AbortSignal.timeout(2000) })).text()
+    tram = /colo=([A-Z]+)/.exec(t)?.[1] ?? '?'
+  } catch { tram = tram || '?' }
+  return tram
 }
 
 export class NganHocSinh {
   private kho: KhoEm | null = null
   constructor(private readonly state: DurableObjectState, private readonly env: Env) {}
   async fetch(req: Request): Promise<Response> {
+    const duong = new URL(req.url).pathname
+    // Đo vị trí (bốc thăm ngăn trung chuyển): trạm + bốn vòng `SELECT 1` nối tiếp tới D1 (vòng đầu có thể mang thời gian mở kết nối).
+    if (duong === DUONG_DO_VI_TRI) {
+      const ms: number[] = []
+      try { for (let i = 0; i < 4; i++) { const t0 = Date.now(); await this.env.DB.prepare('SELECT 1').first(); ms.push(Date.now() - t0) } } catch { /* D1 lỗi ⇒ ms thiếu, bên đo bỏ ngăn này */ }
+      return new Response(JSON.stringify({ tram: await docTram(), ms }), { headers: { 'content-type': 'application/json' } })
+    }
+    // NGĂN TRUNG CHUYỂN: chuyển nguyên lệnh sang ngăn sát D1 của em (get() KHÔNG gợi ý ⇒ ngăn mới tạo cạnh trung chuyển). Chỉ nhận đúng tên `d1|<sbd của lệnh>`.
+    const chuyen = req.headers.get(DAU_CHUYEN_NGAN)
+    if (chuyen) {
+      const ns = this.env.NGAN_HS
+      const h = new Headers(req.headers)
+      h.delete(DAU_CHUYEN_NGAN)
+      const lai = new Request(req.url, { method: req.method, headers: h, body: req.method === 'GET' ? undefined : await req.arrayBuffer() })
+      if (ns && chuyen === `${TIEN_TO_NGAN_D1}${req.headers.get(DAU_SBD_NGAN) ?? ''}`) return ns.get(ns.idFromName(chuyen)).fetch(lai)
+      req = lai // tên lạ ⇒ tự xử lý như một ngăn thường (kết quả vẫn đúng, chỉ không sát D1)
+    }
     if (!xuLy) return new Response(JSON.stringify({ ok: false, error: 'Máy chủ đang khởi động, em thử lại nhé.', maLoi: 'MAY_CHU_BAN' }), { status: 503, headers: { 'content-type': 'application/json' } })
     const state = this.state
     const ctx = { waitUntil: (p: Promise<unknown>) => state.waitUntil(p), passThroughOnException() {} } as unknown as ExecutionContext
     const sbd = req.headers.get(DAU_SBD_NGAN) ?? ''
     if (sbd && state.storage?.sql && (!this.kho || this.kho.sbd !== sbd)) this.kho = taoKhoEm(state.storage.sql, sbd)
-    const env = (envChung ??= this.env)
+    // Gom lệnh D1 (gom-d1.ts): mọi ngăn trong isolate dùng chung MỘT bộ gom ⇒ câu đọc của nhiều em trong cùng lượt cũng đi chung một lô.
+    const env = (envChung ??= this.env.TAT_GOM_D1 || !this.env.DB ? this.env : { ...this.env, DB: gomD1(this.env.DB) })
     doViTri(env, ctx)
     const t0 = Date.now()
     const res = await xuLy(req, this.kho ? { ...env, KHO_EM: this.kho } : env, ctx)
@@ -129,11 +174,89 @@ async function docThan(buf: ArrayBuffer, req: Request): Promise<unknown> {
   return JSON.parse(new TextDecoder().decode(buf))
 }
 
+// ---------------------------------------------------------------- ngăn trung chuyển (sát D1)
+/** Danh sách ngăn trung chuyển trong isolate (đọc `cau_hinh.ngan_dinh`, 10 phút; hết hạn ⇒ dùng bản cũ, đọc lại ở nền). */
+let dinh: { ds: string[]; luc: number } | null = null
+let dangDocDinh: Promise<string[]> | null = null
+const HAN_DINH_MS = 10 * 60_000
+/** Ngăn `d1|` đã tạo (Worker gọi thẳng, khỏi qua trung chuyển). Tối đa 20.000 tên / isolate. */
+const daTaoNgan = new Set<string>()
+let daThuChon = false
+export function xoaDemNganDinh(): void { dinh = null; dangDocDinh = null; daTaoNgan.clear(); daThuChon = false }
+
+/** `{"ds":["dinh|3",…]}` ⇒ tên hợp lệ; hỏng ⇒ rỗng. */
+export function docDsDinh(gt: unknown): string[] {
+  try {
+    const j = JSON.parse(String(gt ?? '')) as { ds?: unknown }
+    return Array.isArray(j.ds) ? j.ds.filter((x): x is string => typeof x === 'string' && RE_TEN_DINH.test(x)).slice(0, 64) : []
+  } catch { return [] }
+}
+
+/** Băm SBD ⇒ chọn ngăn trung chuyển (ổn định, chia đều). */
+function bamSbd(s: string): number {
+  let h = 2166136261
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) }
+  return h >>> 0
+}
+
+async function dsDinh(env: Env, ctx?: ExecutionContext): Promise<string[]> {
+  const now = Date.now()
+  if (dinh && now - dinh.luc < HAN_DINH_MS) return dinh.ds
+  const doc = (dangDocDinh ??= env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind(KHOA_NGAN_DINH).first<{ gia_tri: string }>()
+    .then((r) => { const ds = docDsDinh(r?.gia_tri); dinh = { ds, luc: ds.length ? Date.now() : Date.now() - HAN_DINH_MS + 60_000 }; return ds }) // chưa bốc thăm xong ⇒ hỏi lại sau 1 phút
+    .catch(() => { const ds = dinh?.ds ?? []; dinh = { ds, luc: Date.now() - HAN_DINH_MS + 60_000 }; return ds }) // lỗi đọc ⇒ thử lại sau 1 phút
+    .finally(() => { dangDocDinh = null }))
+  if (dinh) { ctx?.waitUntil(doc); return dinh.ds } // bản cũ dùng ngay
+  return doc
+}
+
+/**
+ * BỐC THĂM ngăn trung chuyển: `so` ngăn `dinh|0…so-1` (gợi ý apac), mỗi ngăn đo bốn vòng `SELECT 1`; giữ tối đa 16 ngăn đo nhanh nhất (≤ max(8 ms, tốt nhất
+ * + 5 ms) — cùng trạm với D1) ⇒ ghi `cau_hinh.ngan_dinh`. Trả tóm tắt (không lộ gì của em).
+ */
+export async function chonNganDinh(env: Env, so = 48): Promise<{ ds: string[]; tot: number; theoTram: Record<string, number> } | null> {
+  const ns = env.NGAN_HS
+  if (!ns) return null
+  const kq: { ten: string; tram: string; ms: number }[] = []
+  for (let i = 0; i < so; i += 8) {
+    const lo = await Promise.all(Array.from({ length: Math.min(8, so - i) }, async (_, j) => {
+      const ten = `dinh|${i + j}`
+      try {
+        const r = await ns.get(ns.idFromName(ten), { locationHint: 'apac' }).fetch(new Request(`https://ngan${DUONG_DO_VI_TRI}`, { method: 'POST' }))
+        const x = (await r.json()) as { tram?: unknown; ms?: unknown }
+        const ms = Array.isArray(x.ms) ? x.ms.map(Number).filter(Number.isFinite) : []
+        return ms.length >= 2 ? { ten, tram: String(x.tram ?? '?'), ms: Math.min(...ms.slice(1)) } : null
+      } catch { return null }
+    }))
+    for (const x of lo) if (x) kq.push(x)
+  }
+  if (!kq.length) return null
+  const tot = Math.min(...kq.map((x) => x.ms))
+  const ds = kq.filter((x) => x.ms <= Math.max(8, tot + 5)).sort((a, b) => a.ms - b.ms).slice(0, 16).map((x) => x.ten)
+  const theoTram: Record<string, number> = {}
+  for (const x of kq) theoTram[x.tram] = (theoTram[x.tram] ?? 0) + 1
+  const luc = new Date().toISOString()
+  await env.DB.prepare('INSERT INTO cau_hinh(khoa, gia_tri, cap_nhat_luc) VALUES(?, ?, ?) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc')
+    .bind(KHOA_NGAN_DINH, JSON.stringify({ ds, tot, theoTram, tramChon: [...new Set(kq.filter((x) => ds.includes(x.ten)).map((x) => x.tram))] }), luc).run()
+  dinh = { ds, luc: Date.now() }
+  console.log('[ngan-dinh] bốc thăm', JSON.stringify({ so: kq.length, chon: ds.length, tot, theoTram }))
+  return { ds, tot, theoTram }
+}
+
+/** Chưa có danh sách ⇒ bốc thăm ở nền, mỗi lúc một nơi (khoá `ngan_dinh_khoa` 10 phút trong D1). */
+async function chonNganDinhNeuCan(env: Env): Promise<void> {
+  const now = Date.now()
+  const r = await env.DB.prepare(`INSERT INTO cau_hinh(khoa, gia_tri, cap_nhat_luc) VALUES(?1, ?2, ?3) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc
+    WHERE CAST(cau_hinh.gia_tri AS INTEGER) < ?4`).bind(KHOA_NGAN_DINH_KHOA, String(now), new Date(now).toISOString(), now - HAN_DINH_MS).run()
+  if (!(r.meta?.changes ?? 0)) return
+  await chonNganDinh(env)
+}
+
 /**
  * Lệnh của học sinh ⇒ chuyển vào ngăn của em, trả `Response`. Không thuộc ngăn ⇒ `null` (dùng `req` gốc). Đã đọc thân mà không vào được ngăn ⇒ trả
  * `Request` mới cùng thân để đường cũ xử lý.
  */
-export async function vaoNgan(req: Request, env: Env): Promise<Response | Request | null> {
+export async function vaoNgan(req: Request, env: Env, ctx?: ExecutionContext): Promise<Response | Request | null> {
   const ns = env.NGAN_HS
   if (!ns || env.TAT_NGAN_HS || req.method !== 'POST' || req.headers.has(DAU_TRONG_NGAN)) return null
   const p = new URL(req.url).pathname
@@ -146,10 +269,22 @@ export async function vaoNgan(req: Request, env: Env): Promise<Response | Reques
   const h = new Headers(req.headers)
   h.set(DAU_TRONG_NGAN, '1')
   h.set(DAU_SBD_NGAN, sbd)
+  h.delete(DAU_CHUYEN_NGAN)
   try {
-    // 31/10 (đo x-ngan-do: ngăn tạo theo trạm của lượt gọi ĐẦU TIÊN — ngăn thử nằm ở IAD (Mỹ), mỗi vòng D1 233 ms ⇒ lưu một câu > 1 giây): ngăn LUÔN ở châu Á
-    // sát D1 (vùng APAC). Gợi ý vị trí chỉ có tác dụng lúc TẠO ngăn ⇒ đổi tên ngăn (`apac|`) để mọi em có ngăn mới đúng chỗ; ngăn cũ bỏ (kho sổ chỉ là đệm).
-    const res = await ns.get(ns.idFromName(`${TIEN_TO_NGAN}${sbd}`), { locationHint: 'apac' }).fetch(new Request(req.url, { method: 'POST', headers: h, body: buf }))
+    const dsD = env.TAT_NGAN_DINH ? [] : await dsDinh(env, ctx)
+    let stub: ReturnType<typeof ns.get>
+    const tenD1 = `${TIEN_TO_NGAN_D1}${sbd}`
+    if (dsD.length) {
+      if (daTaoNgan.has(tenD1)) stub = ns.get(ns.idFromName(tenD1))
+      else { stub = ns.get(ns.idFromName(dsD[bamSbd(sbd) % dsD.length]!)); h.set(DAU_CHUYEN_NGAN, tenD1) }
+    } else {
+      // 31/10 (đo x-ngan-do: ngăn tạo theo trạm của lượt gọi ĐẦU TIÊN — ngăn thử nằm ở IAD (Mỹ), mỗi vòng D1 233 ms ⇒ lưu một câu > 1 giây): ngăn LUÔN ở châu Á
+      // (vùng APAC). Gợi ý vị trí chỉ có tác dụng lúc TẠO ngăn ⇒ đổi tên ngăn (`apac|`) để mọi em có ngăn mới đúng chỗ; ngăn cũ bỏ (kho sổ chỉ là đệm).
+      stub = ns.get(ns.idFromName(`${TIEN_TO_NGAN}${sbd}`), { locationHint: 'apac' })
+      if (ctx && !daThuChon && !env.TAT_NGAN_DINH) { daThuChon = true; ctx.waitUntil(chonNganDinhNeuCan(env).catch((e) => console.error('[ngan-dinh] bốc thăm lỗi:', e instanceof Error ? e.message : e))) }
+    }
+    const res = await stub.fetch(new Request(req.url, { method: 'POST', headers: h, body: buf }))
+    if (dsD.length && res.headers.has('x-ngan')) { if (daTaoNgan.size >= 20_000) daTaoNgan.clear(); daTaoNgan.add(tenD1) }
     // Mẫu 1/20 lượt: trạm ngăn + ms một vòng D1 + ms xử lý (wrangler tail gom) — không SBD.
     if (Math.random() < 0.05) console.log('[ngan-do]', new URL(req.url).pathname, res.headers.get('x-ngan-do') ?? '-')
     return res
