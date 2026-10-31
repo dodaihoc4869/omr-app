@@ -32,7 +32,11 @@ export const DAU_CHUYEN_NGAN = 'x-ngan-chuyen'
 export const DUONG_DO_VI_TRI = '/__ngan/vi-tri'
 export const KHOA_NGAN_DINH = 'ngan_dinh'
 export const KHOA_NGAN_DINH_KHOA = 'ngan_dinh_khoa'
-const RE_TEN_DINH = /^dinh\|\d{1,4}$/
+const RE_TEN_DINH = /^dinh\|(k\|)?\d{1,4}$/
+/** Tiền tố ngăn sát D1 hợp lệ (`d1|`, `d2|` …) — đổi khi bốc thăm tìm được chỗ gần D1 hơn hẳn ⇒ mọi em sang ngăn mới đúng chỗ. */
+const RE_TIEN_D1 = /^d\d{1,2}\|$/
+/** Phiên bản bốc thăm: cấu hình cũ hơn ⇒ bốc thăm lại ở nền (vẫn dùng danh sách cũ trong lúc chờ). */
+export const BAN_BOC_THAM = 2
 
 /**
  * KHO RIÊNG CỦA EM trong SQLite của ngăn: dòng sổ (`su_kien_hoc` của em, đúng các cột omni-d1 đọc) + mốc (n = số dòng, r = received_at lớn nhất).
@@ -127,7 +131,8 @@ export class NganHocSinh {
       const h = new Headers(req.headers)
       h.delete(DAU_CHUYEN_NGAN)
       const lai = new Request(req.url, { method: req.method, headers: h, body: req.method === 'GET' ? undefined : await req.arrayBuffer() })
-      if (ns && chuyen === `${TIEN_TO_NGAN_D1}${req.headers.get(DAU_SBD_NGAN) ?? ''}`) return ns.get(ns.idFromName(chuyen)).fetch(lai)
+      const m = /^(d\d{1,2}\|)(.+)$/.exec(chuyen)
+      if (ns && m && RE_TIEN_D1.test(m[1]!) && m[2] === (req.headers.get(DAU_SBD_NGAN) ?? '')) return ns.get(ns.idFromName(chuyen)).fetch(lai)
       req = lai // tên lạ ⇒ tự xử lý như một ngăn thường (kết quả vẫn đúng, chỉ không sát D1)
     }
     if (!xuLy) return new Response(JSON.stringify({ ok: false, error: 'Máy chủ đang khởi động, em thử lại nhé.', maLoi: 'MAY_CHU_BAN' }), { status: 503, headers: { 'content-type': 'application/json' } })
@@ -180,8 +185,9 @@ async function docThan(buf: ArrayBuffer, req: Request): Promise<unknown> {
 
 // ---------------------------------------------------------------- ngăn trung chuyển (sát D1)
 /** Danh sách ngăn trung chuyển trong isolate (đọc `cau_hinh.ngan_dinh`, 10 phút; hết hạn ⇒ dùng bản cũ, đọc lại ở nền). */
-let dinh: { ds: string[]; luc: number } | null = null
-let dangDocDinh: Promise<string[]> | null = null
+interface CauHinhDinh { ds: string[]; tien: string; v: number }
+let dinh: (CauHinhDinh & { luc: number }) | null = null
+let dangDocDinh: Promise<CauHinhDinh> | null = null
 const HAN_DINH_MS = 10 * 60_000
 /** Ngăn `d1|` đã tạo (Worker gọi thẳng, khỏi qua trung chuyển). Tối đa 20.000 tên / isolate. */
 const daTaoNgan = new Set<string>()
@@ -190,10 +196,15 @@ export function xoaDemNganDinh(): void { dinh = null; dangDocDinh = null; daTaoN
 
 /** `{"ds":["dinh|3",…]}` ⇒ tên hợp lệ; hỏng ⇒ rỗng. */
 export function docDsDinh(gt: unknown): string[] {
+  return docCauHinhDinh(gt).ds
+}
+/** Cấu hình ngăn trung chuyển: danh sách + tiền tố ngăn em (`d1|` mặc định) + phiên bản bốc thăm (vắng ⇒ 1). */
+export function docCauHinhDinh(gt: unknown): CauHinhDinh {
   try {
-    const j = JSON.parse(String(gt ?? '')) as { ds?: unknown }
-    return Array.isArray(j.ds) ? j.ds.filter((x): x is string => typeof x === 'string' && RE_TEN_DINH.test(x)).slice(0, 64) : []
-  } catch { return [] }
+    const j = JSON.parse(String(gt ?? '')) as { ds?: unknown; tien?: unknown; v?: unknown }
+    const ds = Array.isArray(j.ds) ? j.ds.filter((x): x is string => typeof x === 'string' && RE_TEN_DINH.test(x)).slice(0, 64) : []
+    return { ds, tien: typeof j.tien === 'string' && RE_TIEN_D1.test(j.tien) ? j.tien : TIEN_TO_NGAN_D1, v: Number(j.v) || 1 }
+  } catch { return { ds: [], tien: TIEN_TO_NGAN_D1, v: 0 } }
 }
 
 /** Băm SBD ⇒ chọn ngăn trung chuyển (ổn định, chia đều). */
@@ -203,33 +214,42 @@ function bamSbd(s: string): number {
   return h >>> 0
 }
 
-async function dsDinh(env: Env, ctx?: ExecutionContext): Promise<string[]> {
+async function dsDinh(env: Env, ctx?: ExecutionContext): Promise<CauHinhDinh> {
   const now = Date.now()
-  if (dinh && now - dinh.luc < HAN_DINH_MS) return dinh.ds
+  if (dinh && now - dinh.luc < HAN_DINH_MS) return dinh
   const doc = (dangDocDinh ??= env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind(KHOA_NGAN_DINH).first<{ gia_tri: string }>()
-    .then((r) => { const ds = docDsDinh(r?.gia_tri); dinh = { ds, luc: ds.length ? Date.now() : Date.now() - HAN_DINH_MS + 60_000 }; return ds }) // chưa bốc thăm xong ⇒ hỏi lại sau 1 phút
-    .catch(() => { const ds = dinh?.ds ?? []; dinh = { ds, luc: Date.now() - HAN_DINH_MS + 60_000 }; return ds }) // lỗi đọc ⇒ thử lại sau 1 phút
+    .then((r) => {
+      const c = docCauHinhDinh(r?.gia_tri)
+      dinh = { ...c, luc: c.ds.length ? Date.now() : Date.now() - HAN_DINH_MS + 60_000 } // chưa bốc thăm xong ⇒ hỏi lại sau 1 phút
+      // Bốc thăm phiên bản cũ ⇒ bốc lại ở nền (một lần / isolate, khoá D1 10 phút); trong lúc chờ vẫn dùng danh sách cũ.
+      if (c.ds.length && c.v < BAN_BOC_THAM && ctx && !daThuChon && !env.TAT_NGAN_DINH) { daThuChon = true; ctx.waitUntil(chonNganDinhNeuCan(env).catch((e) => console.error('[ngan-dinh] bốc thăm lỗi:', e instanceof Error ? e.message : e))) }
+      return c
+    })
+    .catch(() => { const c = dinh ?? { ds: [], tien: TIEN_TO_NGAN_D1, v: 0 }; dinh = { ...c, luc: Date.now() - HAN_DINH_MS + 60_000 }; return c }) // lỗi đọc ⇒ thử lại sau 1 phút
     .finally(() => { dangDocDinh = null }))
-  if (dinh) { ctx?.waitUntil(doc); return dinh.ds } // bản cũ dùng ngay
+  if (dinh) { ctx?.waitUntil(doc); return dinh } // bản cũ dùng ngay
   return doc
 }
 
 /**
- * BỐC THĂM ngăn trung chuyển: `so` ngăn `dinh|0…so-1` (gợi ý apac), mỗi ngăn đo bốn vòng `SELECT 1`; giữ tối đa 16 ngăn đo nhanh nhất (≤ max(8 ms, tốt nhất
- * + 5 ms) — cùng trạm với D1) ⇒ ghi `cau_hinh.ngan_dinh`. Trả tóm tắt (không lộ gì của em).
+ * BỐC THĂM ngăn trung chuyển: `so` ngăn `dinh|i` (gợi ý apac) + `soKhong` ngăn `dinh|k|i` KHÔNG gợi ý (tạo cạnh nơi đang chạy — lệnh của em ở Việt Nam ⇒
+ * trạm biên SIN / HKG, có thể sát D1 hơn hẳn vùng apac: máy thật 31/10 gợi ý apac chỉ ra NRT / KIX, tốt nhất 53 ms). Mỗi ngăn đo bốn vòng `SELECT 1`; giữ tối đa
+ * 16 ngăn đo nhanh nhất (≤ max(8 ms, tốt nhất + 5 ms)) ⇒ ghi `cau_hinh.ngan_dinh`. Tìm được chỗ < 15 ms ⇒ tiền tố ngăn em `d2|` (mọi em sang ngăn mới sát D1);
+ * không ⇒ giữ `d1|` (ngăn đang có giữ nguyên). Trả tóm tắt (không lộ gì của em).
  */
-export async function chonNganDinh(env: Env, so = 48): Promise<{ ds: string[]; tot: number; theoTram: Record<string, number> } | null> {
+export async function chonNganDinh(env: Env, so = 32, soKhong = 16): Promise<{ ds: string[]; tot: number; theoTram: Record<string, number>; tien: string } | null> {
   const ns = env.NGAN_HS
   if (!ns) return null
   const kq: { ten: string; tram: string; ms: number }[] = []
-  for (let i = 0; i < so; i += 8) {
-    const lo = await Promise.all(Array.from({ length: Math.min(8, so - i) }, async (_, j) => {
-      const ten = `dinh|${i + j}`
+  const ten = (i: number) => (i < so ? `dinh|${i}` : `dinh|k|${i - so}`)
+  for (let i = 0; i < so + soKhong; i += 8) {
+    const lo = await Promise.all(Array.from({ length: Math.min(8, so + soKhong - i) }, async (_, j) => {
+      const t = ten(i + j)
       try {
-        const r = await ns.get(ns.idFromName(ten), { locationHint: 'apac' }).fetch(new Request(`https://ngan${DUONG_DO_VI_TRI}`, { method: 'POST' }))
+        const r = await (i + j < so ? ns.get(ns.idFromName(t), { locationHint: 'apac' }) : ns.get(ns.idFromName(t))).fetch(new Request(`https://ngan${DUONG_DO_VI_TRI}`, { method: 'POST' }))
         const x = (await r.json()) as { tram?: unknown; ms?: unknown }
         const ms = Array.isArray(x.ms) ? x.ms.map(Number).filter(Number.isFinite) : []
-        return ms.length >= 2 ? { ten, tram: String(x.tram ?? '?'), ms: Math.min(...ms.slice(1)) } : null
+        return ms.length >= 2 ? { ten: t, tram: String(x.tram ?? '?'), ms: Math.min(...ms.slice(1)) } : null
       } catch { return null }
     }))
     for (const x of lo) if (x) kq.push(x)
@@ -239,12 +259,13 @@ export async function chonNganDinh(env: Env, so = 48): Promise<{ ds: string[]; t
   const ds = kq.filter((x) => x.ms <= Math.max(8, tot + 5)).sort((a, b) => a.ms - b.ms).slice(0, 16).map((x) => x.ten)
   const theoTram: Record<string, number> = {}
   for (const x of kq) theoTram[x.tram] = (theoTram[x.tram] ?? 0) + 1
+  const tien = tot < 15 ? 'd2|' : TIEN_TO_NGAN_D1
   const luc = new Date().toISOString()
   await env.DB.prepare('INSERT INTO cau_hinh(khoa, gia_tri, cap_nhat_luc) VALUES(?, ?, ?) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc')
-    .bind(KHOA_NGAN_DINH, JSON.stringify({ ds, tot, theoTram, tramChon: [...new Set(kq.filter((x) => ds.includes(x.ten)).map((x) => x.tram))] }), luc).run()
-  dinh = { ds, luc: Date.now() }
-  console.log('[ngan-dinh] bốc thăm', JSON.stringify({ so: kq.length, chon: ds.length, tot, theoTram }))
-  return { ds, tot, theoTram }
+    .bind(KHOA_NGAN_DINH, JSON.stringify({ v: BAN_BOC_THAM, ds, tien, tot, theoTram, tramChon: [...new Set(kq.filter((x) => ds.includes(x.ten)).map((x) => x.tram))] }), luc).run()
+  dinh = { ds, tien, v: BAN_BOC_THAM, luc: Date.now() }
+  console.log('[ngan-dinh] bốc thăm', JSON.stringify({ so: kq.length, chon: ds.length, tot, tien, theoTram }))
+  return { ds, tot, theoTram, tien }
 }
 
 /** Chưa có danh sách ⇒ bốc thăm ở nền, mỗi lúc một nơi (khoá `ngan_dinh_khoa` 10 phút trong D1). */
@@ -275,9 +296,10 @@ export async function vaoNgan(req: Request, env: Env, ctx?: ExecutionContext): P
   h.set(DAU_SBD_NGAN, sbd)
   h.delete(DAU_CHUYEN_NGAN)
   try {
-    const dsD = env.TAT_NGAN_DINH ? [] : await dsDinh(env, ctx)
+    const cd = env.TAT_NGAN_DINH ? null : await dsDinh(env, ctx)
+    const dsD = cd?.ds ?? []
     let stub: ReturnType<typeof ns.get>
-    const tenD1 = `${TIEN_TO_NGAN_D1}${sbd}`
+    const tenD1 = `${cd?.tien ?? TIEN_TO_NGAN_D1}${sbd}`
     if (dsD.length) {
       if (daTaoNgan.has(tenD1)) stub = ns.get(ns.idFromName(tenD1))
       else { stub = ns.get(ns.idFromName(dsD[bamSbd(sbd) % dsD.length]!)); h.set(DAU_CHUYEN_NGAN, tenD1) }
