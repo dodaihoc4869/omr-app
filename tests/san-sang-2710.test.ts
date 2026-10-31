@@ -174,7 +174,13 @@ it('dấu đổi ⇒ không dùng bản cũ: em vừa trả lời một câu; th
   expect((await goi(k, 'hoc-tap-sanh', {})).dot).toBeLessThanOrEqual(1) // bản mới (lượt chậm vừa cất) dùng được
   k.d.sql.exec("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('thu_san_sang','{}','z')")
   vi.setSystemTime(NOW + 41_000)
-  expect((await goi(k, 'hoc-tap-sanh', {})).dot).toBeGreaterThan(1)
+  // 31/10 kiểu Duolingo (san-sang.ts `hienDuocNgay`): thầy đổi cấu hình (phần CHUNG của dấu) ⇒ Sảnh HIỆN NGAY bản sẵn (≤ 1 đợt), lập lại ở NỀN — trước: mọi em
+  // lập lại trên đường chờ cùng lúc. Lượt sau dùng bản nền vừa cất (dấu khớp đủ).
+  expect((await goi(k, 'hoc-tap-sanh', {})).dot).toBeLessThanOrEqual(1)
+  vi.setSystemTime(NOW + 42_000)
+  const lai = await goi(k, 'hoc-tap-sanh', {})
+  expect(lai.dot).toBeLessThanOrEqual(1)
+  expect((lai.kq.goi7 as { daLamHomNay: number }).daLamHomNay).toBe(1)
 })
 
 it('câu cuối chặng ⇒ chuẩn bị nền: Sảnh ≤ 1 đợt, mở chặng ≤ 2 đợt, không phát lại câu vừa làm; cron đêm ⇒ Sảnh đầu ngày ≤ 1 đợt', async () => {
