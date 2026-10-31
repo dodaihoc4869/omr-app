@@ -167,6 +167,7 @@ async function thayCauChoEm(
 
 /** CHẠY THỬ cho cả lớp lúc màn Theo dõi mở một ca chế độ này chưa bắt đầu. Không ghi gì lên máy chủ. `tienDo` báo tiến độ bước thay câu (em đã xong / tổng). */
 export function chayThuRutDeDaDung(url: string, mat: string, maCa: string, dsSbd: string[], tuyChon: { ngay?: string; tienDo?: (xong: number, tong: number) => void } = {}): Promise<RutThuDaDung> {
+  daNoiDaDung.delete(maCa) // chạy thử MỚI ⇒ chọn lại câu ngoài kho từ đầu; lần chốt kế tiếp gửi lại đủ (nối trùng vô hại: máy chủ so theo id)
   const p = chayThuThat(url, mat, maCa, dsSbd, tuyChon)
   dangChay.set(maCa, p)
   const xong = () => { if (dangChay.get(maCa) === p) dangChay.delete(maCa) }
@@ -200,6 +201,8 @@ export interface KetQuaChotDaDung {
   canhBao: string[]
 }
 
+/** Câu ngoài kho ĐÃ nối vào kho ca theo ca (31/10): máy thầy chuẩn bị ngầm trong lúc em vào phòng chờ gọi chốt nhiều lần ⇒ lần sau chỉ nối câu MỚI chọn. */
+const daNoiDaDung = new Map<string, Set<string>>()
 /** CHỐT lúc bấm Bắt đầu: dùng lại chạy thử, rút thêm cho em trong phòng chờ chưa có bộ, nối câu ngoài kho đã chọn vào kho ca. */
 export async function chotRutDeDaDung(url: string, mat: string, maCa: string, dsCho: string[], tuyChon: { ngay?: string } = {}): Promise<KetQuaChotDaDung> {
   const ngay = tuyChon.ngay ?? ngayVnCua(Date.now())
@@ -229,8 +232,9 @@ export async function chotRutDeDaDung(url: string, mat: string, maCa: string, ds
   // NỐI CÂU NGOÀI KHO ĐÃ CHỌN vào kho ca TRƯỚC khi chốt — câu không có trong gói đề thì máy em không hiện được. Nối hỏng ⇒ rút lại cả
   // lớp chỉ từ câu em đã đúng CÓ SẴN trong kho ca (nguyên văn, không thay), và nói ra.
   const dung = new Set(Object.values(rt.kq.theoEm).flatMap((ds) => ds.map((c) => c.qid)))
-  const canNoi = Object.entries(rt.cauNgoai).filter(([id]) => dung.has(id)).map(([, c]) => c)
-  let soCauNoiThem = 0
+  const daNoi = daNoiDaDung.get(maCa) ?? new Set<string>()
+  const canNoi = Object.entries(rt.cauNgoai).filter(([id]) => dung.has(id) && !daNoi.has(id)).map(([, c]) => c)
+  let soCauNoiThem = Object.keys(rt.cauNgoai).filter((id) => dung.has(id) && daNoi.has(id)).length
   if (canNoi.length > 0) {
     const src: TeacherExamSource = {
       maDe: `${maCa}-da-dung`,
@@ -242,7 +246,9 @@ export async function chotRutDeDaDung(url: string, mat: string, maCa: string, ds
       await noiKhoCa(url, mat, maCa, mergeAndStrip([src]), { phanI: src.phanI, phanII: src.phanII, phanIII: src.phanIII })
       const bank = (await loadSessionTeacherBank(maCa)) ?? []
       await saveSessionTeacherBank(maCa, [...bank, src])
-      soCauNoiThem = canNoi.length
+      for (const c of canNoi) daNoi.add(c.cau.id)
+      daNoiDaDung.set(maCa, daNoi)
+      soCauNoiThem += canNoi.length
     } catch (e) {
       canhBao.push(`Không nối được ${canNoi.length} câu em đã làm đúng / câu thay (ngoài kho ca) vào ca — đã rút lại chỉ từ kho ca, em nhận nguyên văn câu đã làm đúng. ${e instanceof Error ? e.message : ''}`.trim())
       const coKho = new Set(rt.khoCa.map((c) => c.id))

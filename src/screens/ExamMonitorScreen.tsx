@@ -1144,6 +1144,26 @@ export default function ExamMonitorScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canRutThu, chiTiet?.ca.maCa, cheDoRutV2, laCaDaDungNay, scriptUrl, secret])
 
+  // CHUẨN BỊ ĐỀ NGẦM (thầy 31/10 «Tải sẵn hết mọi thứ về tôi bấm bắt đầu phải tức thì ngay»): ca đề riêng còn ở phòng chờ, chạy thử đã xong ⇒ mỗi khi
+  // danh sách em trong phòng chờ đổi (dội 3 giây) máy thầy chạy SẴN bước chốt rút đề: rút cho em mới vào, nối câu ngoài kho vào kho ca, kiểm bài mới làm.
+  // Chạy lại vô hại (de-rieng-v2 / de-rieng-da-dung nhớ phần đã làm, chỉ làm phần chênh); các lượt nối đuôi nhau. Bấm Bắt đầu ⇒ đợi lượt đang dở (nếu
+  // có) rồi chốt: chỉ còn ghi mốc + bản đồ. Lỗi ⇒ im lặng (lúc bấm làm lại đầy đủ như cũ).
+  const dsChoKhoa = (chiTiet?.dsCho ?? []).map((x) => x.sbd).filter(Boolean).sort().join(',')
+  const chuanBiNgam = useRef<Promise<unknown> | null>(null)
+  const daChayThu = laCaDaDungNay ? !!rutThuDaDung : !!rutThu
+  useEffect(() => {
+    if (!canRutThu || !chiTiet || !dsChoKhoa || !daChayThu || dangRutThu || dangBatDau || !scriptUrl.trim() || !secret.trim()) return
+    const maCaNay = chiTiet.ca.maCa, ds = dsChoKhoa.split(','), url = scriptUrl.trim(), mat = secret.trim(), daDung = laCaDaDungNay, cheDo = cheDoRutV2, pv = pvCa
+    const h = setTimeout(() => {
+      const truoc = chuanBiNgam.current ?? Promise.resolve()
+      chuanBiNgam.current = truoc.catch(() => undefined)
+        .then((): Promise<unknown> => (daDung ? chotRutDeDaDung(url, mat, maCaNay, ds) : chotRutDeCa(url, mat, maCaNay, ds, { cheDo, phamVi: pv })))
+        .catch(() => undefined)
+    }, 3000)
+    return () => clearTimeout(h)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canRutThu, chiTiet?.ca.maCa, dsChoKhoa, daChayThu, dangRutThu, dangBatDau, laCaDaDungNay, cheDoRutV2, pvCa, scriptUrl, secret])
+
   const batDauCaNay = async () => {
     if (!chiTiet) return
     setDangBatDau(true)
@@ -1175,6 +1195,8 @@ export default function ExamMonitorScreen() {
           setDangBatDau(false)
           return
         }
+        // CHUẨN BỊ NGẦM (31/10) còn đang chạy ⇒ đợi nó (cùng việc, đã làm gần xong) rồi chốt — không chạy hai lượt chồng nhau.
+        if (chuanBiNgam.current) await chuanBiNgam.current
         // PHẠM VI thầy chọn lúc mở ca, đọc từ máy chủ nên máy nào bấm Bắt đầu
         // cũng rút đúng thứ thầy đã chốt.
         const pv = docPhamViHoiLai((chiTiet.ca as { phamViHoiLai?: unknown }).phamViHoiLai)
@@ -1205,7 +1227,8 @@ export default function ExamMonitorScreen() {
           }
         } else if (pv !== 'khong') {
           try {
-            const v2 = await chotRutDeCa(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, dsCho, { cheDo: cheDoRutV2, phamVi: pv })
+            // Chuẩn bị ngầm vừa kiểm «bài mới làm» trong 45 giây ⇒ không hỏi lại lúc bấm (em đang ngồi phòng chờ).
+            const v2 = await chotRutDeCa(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, dsCho, { cheDo: cheDoRutV2, phamVi: pv, boQuaKiemMoiMs: 45_000 })
             boTheoEm = v2.boTheoEm
             lapTheoEm = v2.lapTheoEm
             bacTheoEm = v2.bacTheoEm
