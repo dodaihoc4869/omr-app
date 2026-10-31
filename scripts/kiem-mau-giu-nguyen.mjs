@@ -223,6 +223,9 @@ for (const k of ['border: 2px solid var(--tr-vien-2)', 'border-bottom: 2px solid
 MAU_CU_THAY_RA_LENH['src/components/linh-vat/Bi.tsx · fill: none'] = (MAU_CU_THAY_RA_LENH['src/components/linh-vat/Bi.tsx · fill: none'] ?? 0) + 12
 // 30/10 thầy: «Bóng mờ ngôi sao bạn bỏ đi nhé» ⇒ gỡ vệt bóng dưới ngôi sao nút chặng đang học (.da-sao-bong, Lộ trình HS): đúng 1 khai báo nền, đúng tệp.
 MAU_CU_THAY_RA_LENH['src/styles/trong-hs.css · background: var(--tr-day-khoi)'] = (MAU_CU_THAY_RA_LENH['src/styles/trong-hs.css · background: var(--tr-day-khoi)'] ?? 0) + 1
+// 01/11 thầy: «Bỏ hiệu ứng nút di chuyển cho đỡ che màn hình» ⇒ gỡ vòng cần nổi dưới ngón (.dn-can) + hình gợi ý vòng kéo (.dn-goi-y::before) ở
+// Đấu Nguyên Tử: đúng 6 khai báo, đúng tệp (điều khiển kéo vẫn y nguyên, chỉ không vẽ).
+for (const k of ['border: 2px dashed var(--dn-vien-2)', 'background: radial-gradient(circle, var(--dn-hs) 0 12px, transparent 13px)', 'border: 2px dashed var(--dn-hs)', 'background: color-mix(in srgb, var(--dn-hs) 12%, transparent)', 'background: var(--dn-nut)', 'box-shadow: inset 0 -4px 0 var(--dn-nut-day)']) MAU_CU_THAY_RA_LENH[`src/components/phong-cho/dau-ion.css · ${k}`] = (MAU_CU_THAY_RA_LENH[`src/components/phong-cho/dau-ion.css · ${k}`] ?? 0) + 1
 // 27/10: đợt gỡ CSS chết thứ hai (tờ nạp chung index-*.css; luật tốc độ đỏ sau #430/#431) — danh sách đóng ở docs/css-chet-2710.json, cùng cách.
 for (const [k, n] of Object.entries(JSON.parse(readFileSync(new URL('../docs/css-chet-2710.json', import.meta.url), 'utf8')).cu)) MAU_CU_THAY_RA_LENH[k] = (MAU_CU_THAY_RA_LENH[k] ?? 0) + n
 // 27/10 chiều (máy yếu): CSS chết ở các tờ app học sinh / phụ huynh — danh sách đóng docs/css-chet-2710b.json, cùng cách.

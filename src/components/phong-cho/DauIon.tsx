@@ -1,7 +1,7 @@
 // «ĐẤU NGUYÊN TỬ 2» — game bắn nhau của phòng chờ thi (thầy 31/10: «tự bắn tự ngắm vào đối thủ, bỏ hai nút điều khiển … vật phẩm ăn để tiến hoá súng,
 // tối đa 6 người … đơn giản nhẹ nhàng vui vẻ»; duyệt «Chốt duyệt tất» docs/DE-XUAT-DAU-ION-V2-3110.md, bản thử scripts/ban-ve-dau-ion-v2-3110/thu.html).
 // Mảnh nạp lười ngoài precache. Sảnh là thẻ trong phòng chờ (MỘT nút «Vào sân đấu», 0 kết nối tới khi bấm); trận phủ kín khung nhìn.
-// ĐIỀU KHIỂN KHÔNG NÚT: kéo ở đâu cũng được (cần nổi chỉ hiện dưới ngón), chạm một điểm để đi tới; máy tính: rê chuột hoặc W A S D. Súng tự ngắm, tự bắn.
+// ĐIỀU KHIỂN KHÔNG NÚT: kéo ở đâu cũng được (cần ảo vô hình — không vẽ vòng tròn che màn, thầy 01/11), chạm một điểm để đi tới; máy tính: rê chuột hoặc W A S D. Súng tự ngắm, tự bắn.
 // KHÔNG cản ca kiểm tra: `batDau` (màn cha thấy thầy bắt đầu) hoặc phòng báo `dong` ⇒ huỷ vòng vẽ, đóng WebSocket NGAY, chỉ còn một dòng chữ; `dong` của
 // phòng còn gọi `onBatDau` để màn cha vào bài tức thì. Kết quả chỉ để vui: không gửi điểm, không EXP.
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
@@ -194,7 +194,6 @@ function ManTran({ bo, huyVong, pu, matMang, onRoi, onXong, onVanMoi, onPu }: Ma
   const goc = useRef<HTMLDivElement>(null)
   const khung = useRef<HTMLDivElement>(null)
   const cv = useRef<HTMLCanvasElement>(null)
-  const canEl = useRef<HTMLDivElement>(null)
   const demEl = useRef<HTMLElement>(null)
   const [hud, setHud] = useState<Hud | null>(null)
   const [xh, setXh] = useState<{ id: number; ha: number; cap: number }[]>([])
@@ -205,8 +204,8 @@ function ManTran({ bo, huyVong, pu, matMang, onRoi, onXong, onVanMoi, onPu }: Ma
   const cb = useRef({ onXong }); cb.current = { onXong }
 
   useLayoutEffect(() => {
-    const c = cv.current, g = goc.current, kh = khung.current, cn = canEl.current
-    if (!c || !g || !kh || !cn) return
+    const c = cv.current, g = goc.current, kh = khung.current
+    if (!c || !g || !kh) return
     let ctx: CanvasRenderingContext2D | null = null
     try { ctx = c.getContext('2d') } catch { /* thiếu Canvas */ }
     if (!ctx) setKhongVe(true)
@@ -227,15 +226,14 @@ function ManTran({ bo, huyVong, pu, matMang, onRoi, onXong, onVanMoi, onPu }: Ma
     const phim = new Set<string>()
     const can = { id: -1, ox: 0, oy: 0, sx: 0, sy: 0, t0: 0, xa: 0, dx: 0, dy: 0 }
     let diToi: { x: number; y: number } | null = null, chuot = false
-    const i = cn.firstElementChild as HTMLElement
-    const anCan = () => { delete g.dataset.keo; delete cn.dataset.hien; can.id = -1; can.dx = can.dy = 0 }
+    // Cần ảo VÔ HÌNH (thầy 01/11: «Bỏ hiệu ứng nút di chuyển cho đỡ che màn hình»): vẫn kéo ở đâu cũng đi, không vẽ vòng tròn dưới ngón.
+    const anCan = () => { can.id = -1; can.dx = can.dy = 0 }
     const diemSan = (cx: number, cy: number) => { const r = c.getBoundingClientRect(); return { x: ((cx - r.left) / (r.width || 1)) * SAN, y: ((cy - r.top) / (r.height || 1)) * SAN, trong: cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom && r.width > 0 } }
     const xuong = (e: PointerEvent) => {
       if ((e.target as Element).closest?.('button, .dn-ket, .dn-dai') || e.pointerType === 'mouse' || can.id !== -1) return
       can.id = e.pointerId; can.ox = can.sx = e.clientX; can.oy = can.sy = e.clientY; can.t0 = performance.now(); can.xa = 0; can.dx = can.dy = 0
       try { g.setPointerCapture(e.pointerId) } catch { /* bỏ qua */ }
-      cn.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`; i.style.transform = ''; cn.dataset.hien = ''
-      diToi = null; g.dataset.keo = ''; g.dataset.daKeo = ''
+      diToi = null; g.dataset.daKeo = ''
     }
     const di = (e: PointerEvent) => {
       if (e.pointerType === 'mouse') {
@@ -248,8 +246,7 @@ function ManTran({ bo, huyVong, pu, matMang, onRoi, onXong, onVanMoi, onPu }: Ma
       let dx = e.clientX - can.ox, dy = e.clientY - can.oy
       const l = Math.hypot(dx, dy)
       // Kéo xa quá 54 px ⇒ tâm tự đi theo ngón, đổi hướng nhanh.
-      if (l > RK) { can.ox += (dx / l) * (l - RK); can.oy += (dy / l) * (l - RK); dx = e.clientX - can.ox; dy = e.clientY - can.oy; cn.style.transform = `translate(${can.ox}px, ${can.oy}px)` }
-      i.style.transform = `translate(${dx}px, ${dy}px)`
+      if (l > RK) { can.ox += (dx / l) * (l - RK); can.oy += (dy / l) * (l - RK); dx = e.clientX - can.ox; dy = e.clientY - can.oy }
       const n = Math.min(1, Math.hypot(dx, dy) / RK), m = Math.hypot(dx, dy) || 1
       if (n < 0.14) can.dx = can.dy = 0; else { can.dx = (dx / m) * n; can.dy = (dy / m) * n }
     }
@@ -389,6 +386,5 @@ function ManTran({ bo, huyVong, pu, matMang, onRoi, onXong, onVanMoi, onPu }: Ma
         <li>Bị hạ: súng xuống một cấp, hồi lại sau 1,5 giây</li>
         <li>{bo.phu()}</li></ul></div>
     </div>
-    <div className="dn-can" ref={canEl} aria-hidden="true"><i /></div>
   </div>
 }
