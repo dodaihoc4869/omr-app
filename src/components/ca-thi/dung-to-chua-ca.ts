@@ -5,11 +5,15 @@
 //   · Chuyển câu → khuôn tờ chiếu bằng `cauLuyenTuBoCau` + cùng các chỗ dự phòng lời giải như tờ chiến dịch (explanation / loiGiai / chốt).
 //   · Dải thống kê lớp (phím T) tính từ chính bài làm của ca (`thongKeLopCau`).
 //   · Thầy tự ra đề ca ⇒ câu tự luận (nếu có) vẫn hiện, như mọi chỗ thầy tự chọn.
-// Hai mảnh nặng (bai-tap-pdf, html-may-chieu — kèm `thongKeLopCau`) nạp ĐỘNG khi thầy bấm nút: màn Kết thúc ca không nặng thêm, không tách thêm mảnh.
+//   · GỌI LÊN BẢNG (01/11 tối): mỗi đợt mang danh sách em LÀM ĐÚNG câu (`data-goi-em`, đúng khuôn mảnh «Gọi em khác» của tờ chuẩn — sbd RỖNG, kèm giây)
+//     + dòng «n/N em làm đúng câu này» ở thanh dưới; tờ chọn ngẫu nhiên một em rồi chạy màn gọi tên chuẩn (`chieu-chua-ca-to.ts`).
+// Ba mảnh (bai-tap-pdf, html-may-chieu — kèm `thongKeLopCau`, to-chieu-goi-em-khac — mảnh sẵn có của tờ chiến dịch) nạp ĐỘNG khi thầy bấm nút: màn Kết thúc
+// ca không nặng thêm, không tách thêm mảnh.
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../../data/examContent'
 import type { CauLuyen } from '../../lib/bai-tap-pdf'
 import type { OBang } from '../../lib/html-may-chieu'
-import { theChuaDung, type CauChuaCa } from '../../lib/chieu-chua-ca'
+import { theChuaDung, type CauChuaCa, type TheChuaDung } from '../../lib/chieu-chua-ca'
+import type { DotGoiEm } from '../chien-dich/to-chieu-goi-em-khac'
 
 type CauGoc = { phan: 'I' | 'II' | 'III'; q: TeacherMcqQuestion | TeacherTrueFalseQuestion | TeacherShortAnswerQuestion }
 
@@ -31,8 +35,17 @@ export function bangTraCa(nguon: readonly TeacherExamSource[]): Map<string, CauG
 
 const giuChu = (v: unknown): string => (typeof v === 'string' ? v : '')
 
+/** Dữ liệu «Gọi lên bảng» của một câu, theo khuôn `DotGoiEm` của tờ chuẩn: em LÀM ĐÚNG (tên gọn + giây), KHÔNG số báo danh, không khoá ghi điểm. */
+export function dotGoiEmChuaBai(t: TheChuaDung): DotGoiEm {
+  return {
+    em: t.dung.map((e) => ({ sbd: '', ten: e.ten, khoa: '', nhan: '', giay: e.giay })),
+    coGhi: true,
+    chuLop: t.dung.length ? `${t.dung.length}/${t.lam} em làm đúng câu này` : 'Chưa em nào làm đúng câu này',
+  }
+}
+
 export async function dungToChuaCa(ds: readonly CauChuaCa[], nguon: readonly TeacherExamSource[], tenBuoi: string): Promise<{ html: string; soThieu: number }> {
-  const [{ cauLuyenTuBoCau }, { taoHtmlMayChieu, thongKeLopCau }] = await Promise.all([import('../../lib/bai-tap-pdf'), import('../../lib/html-may-chieu')])
+  const [{ cauLuyenTuBoCau }, { taoHtmlMayChieu, thongKeLopCau }, { chenGoiEmKhac }] = await Promise.all([import('../../lib/bai-tap-pdf'), import('../../lib/html-may-chieu'), import('../chien-dich/to-chieu-goi-em-khac')])
   const tra = bangTraCa(nguon)
   let soThieu = 0
   const dsO: OBang[] = ds.map((c) => {
@@ -51,5 +64,6 @@ export async function dungToChuaCa(ds: readonly CauChuaCa[], nguon: readonly Tea
     const tk = thongKeLopCau(c.phan, c.bai)
     return { sbd: '', hoTen: 'Cả lớp', soCau: c.soCau, ...(c.mucDo ? { mucDo: c.mucDo } : {}), cau, ...(tk ? { thongKe: tk } : {}), chuaDung: theChuaDung(c) }
   })
-  return { html: taoHtmlMayChieu(dsO, { tenBuoi, ngay: new Date(), chuaBai: true }), soThieu }
+  const html = taoHtmlMayChieu(dsO, { tenBuoi, ngay: new Date(), chuaBai: true })
+  return { html: chenGoiEmKhac(html, dsO.map((o) => (o.chuaDung ? dotGoiEmChuaBai(o.chuaDung) : null))), soThieu }
 }

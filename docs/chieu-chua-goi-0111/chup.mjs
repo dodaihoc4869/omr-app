@@ -3,7 +3,8 @@
 //   node docs/chieu-chua-goi-0111/chup.mjs
 // Ảnh JPG tự hạ chất lượng tới khi ≤ 150 KB, ghi vào docs/chieu-chua-goi-0111/anh/.
 // SOÁT (in cuối): lỗi trang · chữ `\frac` thô · TRÀN NGANG khỏi tấm giấy (câu Kc ở 1024/1280/1920 × cỡ chữ mặc định và lớn nhất, cả lúc mở lời giải)
-//   · phím L gọi đúng em làm đúng · «Gọi bạn khác» đổi em · tránh em vừa gọi ở câu trước · Esc đóng · câu không ai đúng ⇒ «Thầy chữa» · phím H vẫn thu gọn.
+//   · phím L chạy MÀN GỌI TÊN CHUẨN cho một em làm đúng (+ «Làm đúng trong n giây») rồi về thẻ tên, pha ĐANG CHỮA · «Gọi em khác» (E) của tờ chuẩn đổi em
+//   và dòng giây · D không ghi điểm · tránh em vừa gọi ở câu trước · câu không ai đúng ⇒ «Thầy chữa» kiểu tờ chuẩn · phím H vẫn thu gọn.
 import { execFileSync } from 'node:child_process'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
@@ -31,8 +32,8 @@ async function chup(t, ten) {
   console.log(`${ten}.jpg ${Math.round(buf.length / 1024)} KB`)
 }
 
-async function moTo(w, h, { nen = '', co = '' } = {}) {
-  const ctx = await trinh.newContext({ viewport: { width: w, height: h }, reducedMotion: 'reduce', locale: 'vi-VN' })
+async function moTo(w, h, { nen = '', co = '', dong = false } = {}) {
+  const ctx = await trinh.newContext({ viewport: { width: w, height: h }, reducedMotion: dong ? 'no-preference' : 'reduce', locale: 'vi-VN' })
   const t = await ctx.newPage()
   t.on('pageerror', (e) => ghi(`${w}×${h}: lỗi trang ${e.message}`))
   await t.goto(`file://${join(TAM, 'to.html')}`)
@@ -110,51 +111,60 @@ for (const [nen, ten] of [['', '01-cau-kc-1920-sang'], ['dark', '01-cau-kc-1920-
   await ctx.close()
 }
 
-// 3) Gọi lên bảng — câu Kc: L ⇒ em làm đúng; Gọi bạn khác đổi em; Esc đóng; sang câu khác tránh em vừa gọi.
+// 3) GỌI LÊN BẢNG = MÀN GỌI TÊN CHUẨN (góp ý sau PR 730: «Tên lên bảng làm giống hiệu ứng của các màn khác») — câu Kc, 1920 sáng + tối, có chuyển động:
+//    L ⇒ màn gọi tên chuẩn (.mc-goi: vòng sáng, hạt, «Mời em lên bảng», tên lớn, «Làm đúng trong n giây») ⇒ bay về thẻ tên, pha ĐANG CHỮA ⇒ «Gọi em khác» (E).
+for (const [nen, hau] of [['', 'sang'], ['dark', 'toi']]) {
+  const { ctx, t } = await moTo(1920, 1080, { nen, dong: true })
+  const dsDung = await t.evaluate(() => JSON.parse(window.__mcDot().getAttribute('data-goi-em')).em.map((e) => e.ten))
+  await t.keyboard.press('l'); await t.waitForTimeout(650)
+  const giua = await t.evaluate(() => ({ goi: !!document.querySelector('.mc-goi .mc-g-vong'), tg: document.querySelector('.mc-goi .mc-g-tg')?.textContent, ten: document.querySelector('.mc-goi .mc-g-tl')?.textContent, phu: document.querySelector('.mc-goi .mc-g-tp')?.textContent, pha: document.body.getAttribute('data-pha') }))
+  console.log(`gọi tên (${hau}): ${JSON.stringify(giua)}`)
+  if (!giua.goi || giua.tg !== 'Mời em lên bảng' || giua.pha !== 'goi') ghi(`${hau}: L không chạy màn gọi tên chuẩn ${JSON.stringify(giua)}`)
+  if (!dsDung.includes(giua.ten)) ghi(`${hau}: gọi «${giua.ten}» không nằm trong danh sách em làm đúng`)
+  if (!/^Làm đúng trong \d+ giây$/.test(giua.phu || '')) ghi(`${hau}: màn gọi tên thiếu dòng «Làm đúng trong n giây»: ${giua.phu}`)
+  await chup(t, `06-goi-ten-dang-hien-1920-${hau}`)
+  await t.waitForFunction(() => document.body.getAttribute('data-pha') === 'chua', null, { timeout: 4000 }).catch(() => ghi(`${hau}: không sang pha ĐANG CHỮA`))
+  await t.waitForTimeout(500)
+  const xong = await t.evaluate(() => { const the = window.__mcDot().querySelector('.mc-em[id]'); return { hien: !!the && !the.hidden, ten: the?.querySelector('.mc-ten')?.textContent, phu: the?.querySelector('.mc-em-phu')?.textContent, khac: !!document.querySelector('.mc-nut-em-khac:not([hidden])'), goiNut: getComputedStyle(document.getElementById('mc-goi-nut')).display, pha: document.getElementById('mc-pha').textContent, gon: document.body.classList.contains('mc-st-gon') } })
+  console.log(`sau gọi (${hau}): ${JSON.stringify(xong)}`)
+  if (!xong.hien || xong.ten !== giua.ten || xong.pha !== 'ĐANG CHỮA' || !xong.khac || xong.goiNut !== 'none' || !xong.gon) ghi(`${hau}: sau màn gọi tên chưa đúng khuôn chuẩn ${JSON.stringify(xong)}`)
+  await chup(t, `07-goi-ten-xong-1920-${hau}`)
+  if (!hau.includes('toi')) {
+    await t.keyboard.press('e'); await t.waitForTimeout(400)
+    const doi = await t.evaluate(() => { const the = window.__mcDot().querySelector('.mc-em[id]'); return { ten: the.querySelector('.mc-ten').textContent, phu: the.querySelector('.mc-em-phu')?.textContent ?? null } })
+    const e = await t.evaluate((ten) => JSON.parse(window.__mcDot().getAttribute('data-goi-em')).em.find((x) => x.ten === ten), doi.ten)
+    if (doi.ten === giua.ten || !e || doi.phu !== (e.giay == null ? null : `Làm đúng trong ${e.giay} giây`)) ghi(`Gọi em khác (E) không đổi đúng em / dòng giây: ${JSON.stringify(doi)}`)
+    const dk = await t.evaluate(() => { const ev = new KeyboardEvent('keydown', { key: 'd', bubbles: true, cancelable: true }); window.dispatchEvent(ev); return ev.defaultPrevented })
+    if (!dk) ghi('phím D vẫn ghi Đạt trên tờ chữa bài')
+  }
+  await ctx.close()
+}
+
+// 4) Tránh em vừa gọi ở câu trước (12 lượt, không chuyển động cho nhanh): gọi ở câu 1 rồi sang câu 3 gọi tiếp.
 {
   const { ctx, t } = await moTo(1920, 1080)
-  const dsDung = async () => t.evaluate(() => [...document.querySelectorAll('#mc-ray > .mc-dot')[window.__mcTrangThai().dot].querySelectorAll('.mc-st-dung li')].map((x) => x.textContent))
-  const dung = await dsDung()
-  await t.keyboard.press('l'); await t.waitForTimeout(350)
-  const ten1 = await t.textContent('#mc-goi-ten')
-  if (!dung.includes(ten1)) ghi(`L gọi «${ten1}» không nằm trong danh sách em làm đúng`)
-  const ke = await t.textContent('#mc-goi-ke'); const giay = await t.textContent('#mc-goi-giay')
-  console.log(`Gọi: ${ke} · ${ten1} · ${giay}`)
-  await chup(t, '06-goi-len-bang-1920')
-  await t.click('#mc-goi-khac'); await t.waitForTimeout(300)
-  const ten2 = await t.textContent('#mc-goi-ten')
-  if (ten2 === ten1 || !dung.includes(ten2)) ghi(`«Gọi bạn khác» không đổi sang em đúng khác (${ten1} → ${ten2})`)
-  await t.keyboard.press('Escape'); await t.waitForTimeout(200)
-  if (!(await t.evaluate(() => document.getElementById('mc-goi').hidden))) ghi('Esc không đóng tấm gọi')
-  if ((await t.textContent('#mc-pha')) !== 'CHỮA BÀI') ghi('pha đổi khỏi CHỮA BÀI sau khi gọi')
-  // Sang câu 3 (pH): em vừa gọi ở câu Kc không bị gọi lại khi còn em khác (thử 12 lần, mỗi lần gọi lại từ đầu ở câu 1).
+  const tenThe = () => t.evaluate(() => window.__mcDot().querySelector('.mc-em[id] .mc-ten').textContent)
   let trung = 0
   for (let k = 0; k < 12; k++) {
-    await toiCau(t, 1); await t.keyboard.press('l'); await t.waitForTimeout(80)
-    const a = await t.textContent('#mc-goi-ten'); await t.keyboard.press('Escape')
-    await toiCau(t, 3); await t.keyboard.press('l'); await t.waitForTimeout(80)
-    const b = await t.textContent('#mc-goi-ten'); await t.keyboard.press('Escape')
+    await toiCau(t, 1); await t.keyboard.press('l'); await t.waitForTimeout(60)
+    const a = await tenThe()
+    await toiCau(t, 3); await t.keyboard.press('l'); await t.waitForTimeout(60)
+    const b = await tenThe()
     if (a === b) trung++
   }
   if (trung) ghi(`gọi lại em vừa gọi ở câu trước ${trung}/12 lần dù còn em khác`)
   await ctx.close()
 }
 
-// 4) Câu không em nào đúng ⇒ «Thầy chữa» (câu 2/4), nền tối.
-{
-  const { ctx, t } = await moTo(1920, 1080, { nen: 'dark' })
+// 5) Câu không em nào đúng (câu 2/4) ⇒ Thầy chữa kiểu tờ chuẩn (không gọi tên) — 1920 sáng + tối.
+for (const [nen, hau] of [['', 'sang'], ['dark', 'toi']]) {
+  const { ctx, t } = await moTo(1920, 1080, { nen, dong: true })
   await toiCau(t, 2); await t.waitForTimeout(700)
-  await t.click('#mc-goi-nut'); await t.waitForTimeout(350)
-  const ten = await t.textContent('#mc-goi-ten'), moi = await t.textContent('#mc-goi-moi')
-  if (ten !== 'Thầy chữa' || !/Chưa em nào làm đúng/.test(moi)) ghi(`câu không ai đúng: «${moi} · ${ten}»`)
-  if (await t.isVisible('#mc-goi-khac')) ghi('tấm Thầy chữa vẫn có nút Gọi bạn khác')
-  await chup(t, '07-thay-chua-1920-toi')
-  await ctx.close()
-}
-{ // 5) Tấm gọi ở 1280 (máy chiếu nhỏ).
-  const { ctx, t } = await moTo(1280, 720)
-  await t.keyboard.press('l'); await t.waitForTimeout(350)
-  await chup(t, '08-goi-len-bang-1280')
+  await t.click('#mc-goi-nut'); await t.waitForTimeout(400)
+  const kq = await t.evaluate(() => ({ goi: !!document.querySelector('.mc-goi'), thay: window.__mcDot().hasAttribute('data-thay-chua'), pha: getComputedStyle(document.getElementById('mc-pha'), '::after').content, cot: getComputedStyle(window.__mcDot().querySelector('.mc-cot-lam-bai'), '::before').content, bao: document.querySelector('.mc-bao')?.textContent }))
+  console.log(`Thầy chữa (${hau}): ${JSON.stringify(kq)}`)
+  if (kq.goi || !kq.thay || !/THẦY CHỮA/.test(kq.pha) || !/Thầy chữa/.test(kq.cot) || !/Chưa em nào làm đúng/.test(kq.cot)) ghi(`${hau}: Thầy chữa chưa đúng kiểu tờ chuẩn ${JSON.stringify(kq)}`)
+  await chup(t, `08-thay-chua-1920-${hau}`)
   await ctx.close()
 }
 
@@ -176,5 +186,5 @@ for (const toi of [false, true]) {
 }
 
 await trinh.close()
-console.log(soat.length ? `SOÁT: ${soat.length} vấn đề\n- ${soat.join('\n- ')}` : 'SOÁT: 0 lỗi trang · 0 \\frac thô · 0 tràn ngang · gọi lên bảng / Thầy chữa / H đúng')
+console.log(soat.length ? `SOÁT: ${soat.length} vấn đề\n- ${soat.join('\n- ')}` : 'SOÁT: 0 lỗi trang · 0 \\frac thô · 0 tràn ngang · màn gọi tên chuẩn / Gọi em khác / Thầy chữa / H đúng')
 process.exitCode = soat.length ? 1 : 0
