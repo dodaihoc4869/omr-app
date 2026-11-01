@@ -177,6 +177,9 @@ body[data-pha="cho"].mc-bc .mc-b5 .mc-than:has(.mc-anh, .q-bang-cuon, table, .ex
    script chính chép nó lên dòng phụ của thanh trên khi đợt ấy đang hiện. */
 .mc-ghi-chu { display: none; }
 body.mc-bc .mc-dot:not(.mc-dot-don) > .mc-cot-lam-bai { display: none; }
+/* KHÔNG BAO GIỜ TRÀN MÉP GIẤY (thầy 01/11: phương án dài tràn ra ngoài tấm giấy): khối nào vẫn rộng hơn vùng đề ở cỡ chữ chuẩn (công thức liền «ct-lien»,
+   phương án là phương trình, sơ đồ) thì JS gắn «mc-ngat» ⇒ được xuống dòng, kể cả giữa một từ quá dài. Chữ KHÔNG co (luật 28/09). */
+body.mc-bc .mc-ngat, body.mc-bc .mc-ngat * { white-space: normal !important; overflow-wrap: anywhere !important; }
 @media print { body.mc-bc .mc-nua, body.mc-bc .mc-vung-de { overflow: visible; } .mc-ghi-chu { display: none; } }
 `
 
@@ -261,6 +264,30 @@ export function jsBoCuc(): string {
     void dot.offsetHeight; // ép trình duyệt bố cục lại NGAY, trước khi đọc scrollHeight
     // Số cột phương án (1/2/4) phụ thuộc bề ngang ô — đổi bậc là đổi bề ngang, phải chia lại cột TRƯỚC khi đo.
     if (window.__mcFitOptions) { window.__mcFitOptions(dot); void dot.offsetHeight; }
+    ngatTran(dot);
+  }
+
+  /** KHÔNG TRÀN NGANG (thầy 01/11): vùng đề còn rộng hơn khung ⇒ gắn «mc-ngat» (CSS cho xuống dòng) cho khối thò ra ngoài mép — lượt 1 khối NHỎ
+   *  (công thức liền, phân số, mũi tên có nhãn), còn tràn thì lượt 2 khối LỚN (phương án là phương trình, đoạn đề, mục lời giải). Mỗi lượt gỡ dấu cũ
+   *  trước ⇒ đổi cỡ chữ / cỡ cửa sổ thì tính lại từ đầu. Không tràn thì chỉ tốn MỘT lần đọc. */
+  var KHOI_NGAT = ['.ct-lien, .lt-ps, .lt-can, .mt, .so-do', '.mc-pa-chu, .mc-de, .sol-pa, .sol-ly, .sol-step, .sol-text, .sol-cot-loi, .sol-ket, .sol-dap'];
+  function ngatTran(goc) {
+    var dem = 0;
+    ds(goc, '.mc-ngat').forEach(function (x) { x.classList.remove('mc-ngat'); });
+    ds(goc, '.mc-vung-de').forEach(function (v) {
+      KHOI_NGAT.forEach(function (sel) {
+        if (v.scrollWidth <= v.clientWidth + DUNG_SAI) return;
+        var r = v.getBoundingClientRect(), cs = getComputedStyle(v);
+        var trai = r.left + (parseFloat(cs.paddingLeft) || 0) - DUNG_SAI, phai = r.right - (parseFloat(cs.paddingRight) || 0) + DUNG_SAI;
+        ds(v, sel).forEach(function (x) {
+          if (x.closest('.mc-ngat')) return;
+          var q = x.getBoundingClientRect();
+          if (q.width > 0 && (q.right > phai || q.left < trai || (x.clientWidth > 0 && x.scrollWidth > x.clientWidth + DUNG_SAI))) { x.classList.add('mc-ngat'); dem++; }
+        });
+        void v.offsetHeight;
+      });
+    });
+    return dem;
   }
 
   function ghiChu(dot, chu, kieu) {
@@ -374,6 +401,14 @@ export function jsBoCuc(): string {
   }
 
   window.addEventListener('resize', doiLai);
+  // Lời giải mở ra SAU lượt đo (lượt đo gỡ tạm lời giải): soát tràn ngang lại cho đợt đang có lời giải mở.
+  document.addEventListener('mc-giai-doi', function () {
+    setTimeout(function () {
+      var dem = 0;
+      ds(ray, '.mc-giai:not([hidden])').forEach(function (g) { var d = g.closest('.mc-dot'); if (d) dem += ngatTran(d); });
+      if (dem) document.dispatchEvent(new CustomEvent('mc-bo-cuc-xong')); // chiều cao đổi ⇒ tờ xếp trang lại
+    }, 0);
+  });
   document.addEventListener('fullscreenchange', doiLai);
   document.addEventListener('webkitfullscreenchange', doiLai);
   var co = document.getElementById('mc-size');
