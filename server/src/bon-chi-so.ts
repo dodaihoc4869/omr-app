@@ -253,7 +253,8 @@ export function tinhBon(v: DauVaoBon): KetQuaBon {
     ky: kyMau >= 30 && canDuoiWilson(kyThat, kyMau) >= 0.8,
     moi: moi.length >= 10 && canDuoiWilson(moi.filter((l) => l.dung === true).length, moi.length) >= 0.5,
     kt: ktKhop,
-    chu: hoi >= 1 || (ss.length >= 3 && canDuoiWilson(ssDung, ss.length) >= 0.5),
+    // «Chủ động hỏi» KHÔNG tính nhóm (dữ liệu thật 01/11: 264/272 em có lượt hỏi ⇒ không phân biệt được) — chỉ hiểu thật: đúng câu song sinh khác số liệu.
+    chu: ss.length >= 3 && canDuoiWilson(ssDung, ss.length) >= 0.5,
   }
   const soNhom = Object.values(nhom).filter(Boolean).length
   const vaoHt = duDuLieu && (nhom.sua || nhom.kt) && soNhom >= 3 && !vaoDp && manh <= 1 && ht !== null && ht >= NGUONG_BANG.ht
@@ -287,7 +288,7 @@ export function tinhBon(v: DauVaoBon): KetQuaBon {
   ht = ht === null ? null : vaoDp ? Math.min(ht, 100 - (dp2 ?? 0)) : ht
   Object.assign(soLieu, {
     nhanhLa: pt(nhanhLa.length, khoDung.length), traNgoai: pt(traNgoai.length, dungHet.length), do: pt(doDa.length, coDq.length), donHan: ngayDem.length ? tron(100 * donHanTL) : null,
-    photLo: v.dg && n ? pt(photLo, n) : null, hoi, ban: 2, vao, theoDoi, ho,
+    photLo: v.dg && n ? pt(photLo, n) : null, hoi, ban: BAN_BON, vao, theoDoi, ho,
   })
 
   // ───── Ví dụ
@@ -409,6 +410,9 @@ export function tinhBon(v: DauVaoBon): KetQuaBon {
     ngay: ngay14,
   }
 }
+
+/** Phiên bản bộ máy 4 bảng: 2 = v2 «chắc mới xếp» (01/11 chiều); 3 = bỏ «chủ động hỏi» khỏi nhóm Học thật (dữ liệu thật: 264/272 em có ⇒ không phân biệt). Đổi số ⇒ cron tính lại mọi em. */
+export const BAN_BON = 3
 
 /** Em có vào bảng không (ngưỡng hợp đồng). Thuần. */
 export function vaoBang(d: DiemBon, b: MaBang): boolean {
