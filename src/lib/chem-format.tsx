@@ -582,8 +582,9 @@ function timNgoacNhonDong(s: string, mo: number): number {
  *
  * BẢNG ĐÓNG — chỉ những lệnh đã thật sự gặp trong kho đề. Cấm nhận
  * `\<chữ>` chung chung: đường dẫn tệp, kí hiệu đơn vị, chữ thầy gõ có dấu
- * gạch chéo sẽ bị nuốt nhầm thành công thức và mất hẳn khỏi màn hình. */
-const LENH_LATEX_TOAN = new Set([
+ * gạch chéo sẽ bị nuốt nhầm thành công thức và mất hẳn khỏi màn hình.
+ * Phiếu in / tờ chiếu dựng HTML thuần theo ĐÚNG bảng này (`latex-html.ts`). */
+export const LENH_LATEX_TOAN = new Set([
   'bar', 'overline', 'underline', 'vec', 'hat', 'widehat', 'tilde', 'overrightarrow',
   'frac', 'dfrac', 'tfrac', 'cfrac', 'sqrt',
   'text', 'mathrm', 'mathit', 'mathbf', 'operatorname',

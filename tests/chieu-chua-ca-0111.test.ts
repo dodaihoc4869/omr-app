@@ -4,7 +4,7 @@
 //   · luật xếp: mức độ khó → dễ (Vận dụng → Hiểu → Biết, không rõ mức sau cùng), cùng mức sai nhiều → ít, bằng nhau ⇒ phần rồi số câu;
 //   · chỉ câu có em chưa đúng; bỏ trống = chưa đúng; Phần II sai 1 ý = chưa đúng; câu không chấm được (dungSai null) không đếm; đề riêng: đếm theo câu;
 //   · tên trên thẻ: hai chữ cuối, trùng ⇒ đủ họ tên, quá 30 em ⇒ 29 tên + «+n em»;
-//   · tờ chiếu: thẻ tên trong cột phải, chip mức độ, «Câu 1/N», pha «CHỮA BÀI», KHÔNG nút «Lên bảng», nút/phím H «Thu gọn tên»; tờ thường y như cũ;
+//   · tờ chiếu: thẻ tên trong cột phải, chip mức độ, «Câu 1/N», pha «CHỮA BÀI», «Gọi lên bảng» thay «Lên bảng» (01/11 tối), nút/phím H «Thu gọn tên»; tờ thường y như cũ;
 //   · dựng từ đề có đáp án của ca: đúng nội dung, đúng thứ tự, dải thống kê lớp (phím T) từ bài làm của ca.
 import { describe, expect, it } from 'vitest'
 import { TOI_DA_TEN, tenGon, theChuaDung, xepCauChuaCa, type EmBaiCa } from '../src/lib/chieu-chua-ca'
@@ -42,7 +42,7 @@ describe('tên trên thẻ', () => {
   it(`quá ${TOI_DA_TEN} em ⇒ ${TOI_DA_TEN - 1} tên + «+n em»`, () => {
     const sai = Array.from({ length: 34 }, (_, i) => ({ sbd: String(i), hoTen: `Họ Tên Em${i}` }))
     const t = theChuaDung({ sai, lam: 40 })
-    expect(t.ten).toHaveLength(TOI_DA_TEN - 1)
+    expect(t.em).toHaveLength(TOI_DA_TEN - 1)
     expect(t).toMatchObject({ them: 34 - (TOI_DA_TEN - 1), tong: 34, lam: 40 })
     expect(theChuaDung({ sai: sai.slice(0, TOI_DA_TEN), lam: 40 })).toMatchObject({ them: 0, tong: TOI_DA_TEN })
   })
@@ -51,8 +51,8 @@ describe('tên trên thẻ', () => {
 const cauLuyen = (text: string) => ({ phan: 'I' as const, id: 'q', maDe: 'KT', chuyenDe: '', dang: 'chua_ro' as const, sao: 1 as const, mucDo: 'van_dung' as const, text, luaChon: ['1', '2', '3', '4'], dapAn: 'A', chot: '', lyDo: null, buoc: null, ketQua: 'A' })
 
 describe('tờ chiếu chữa bài', () => {
-  it('thẻ tên trong cột phải, chip mức độ, Câu n/N, CHỮA BÀI, không Lên bảng, nút H Thu gọn tên', () => {
-    const o: OBang[] = [{ sbd: '', hoTen: 'Cả lớp', soCau: 7, mucDo: 'van_dung', cau: cauLuyen('Đề câu bảy'), chuaDung: { ten: ['Minh Anh', 'Thảo Chi'], them: 0, tong: 2, lam: 32 } }]
+  it('thẻ tên trong cột phải, chip mức độ, Câu n/N, CHỮA BÀI, Gọi lên bảng thay Lên bảng, nút H Thu gọn tên', () => {
+    const o: OBang[] = [{ sbd: '', hoTen: 'Cả lớp', soCau: 7, mucDo: 'van_dung', cau: cauLuyen('Đề câu bảy'), chuaDung: { em: [{ ten: 'Minh Anh', giay: 12 }, { ten: 'Thảo Chi', giay: null }], them: 0, tong: 2, lam: 32, dung: [{ ten: 'Gia Bảo', giay: 40 }] } }]
     const html = taoHtmlMayChieu(o, { tenBuoi: 'Chữa bài', chuaBai: true })
     expect(html).toMatch(/<body[^>]*data-chua-bai/)
     expect(html).not.toContain('id="mc-len-bang"')
@@ -60,7 +60,11 @@ describe('tờ chiếu chữa bài', () => {
     expect(html).toContain('Thu gọn tên')
     expect(html).toMatch(/<section class="mc-cot-lam-bai"[^>]*><aside class="mc-st"/)
     expect(html).toContain('<b>2<small>/32</small></b>')
-    expect(html).toContain('<li>Minh Anh</li><li>Thảo Chi</li>')
+    expect(html).toContain('<span class="mc-st-ten">Minh Anh</span><span class="mc-st-giay" title="12 giây">12<small>\u2009s</small></span>')
+    expect(html).toContain('<span class="mc-st-ten">Thảo Chi</span><span class="mc-st-giay mc-st-giay-trong" title="Chưa có số giây">—</span>')
+    expect(html).toContain('<ul class="mc-st-dung" hidden><li data-giay="40">Gia Bảo</li></ul>')
+    expect(html).toContain('id="mc-goi-nut"') // «Gọi lên bảng» thay «Lên bảng» (thầy 01/11 tối)
+    expect(html).toContain('id="mc-goi" hidden')
     expect(html).toContain('mc-st-muc">Vận dụng</span>')
     expect(html).toContain("'Câu ' : 'Đợt '")
     expect(html).toContain("'CHỮA BÀI' : 'CHỜ THẦY GỌI'")
@@ -71,6 +75,8 @@ describe('tờ chiếu chữa bài', () => {
     expect(html).not.toMatch(/<body[^>]*data-chua-bai/)
     expect(html).not.toContain('class="mc-st"')
     expect(html).not.toContain('id="mc-st-nut"')
+    expect(html).not.toContain('id="mc-goi-nut"')
+    expect(html).not.toContain('id="mc-goi"')
   })
   it('dựng từ đề có đáp án của ca: đúng nội dung theo mã, đúng thứ tự, thống kê lớp', async () => {
     const { dungToChuaCa } = await import('../src/components/ca-thi/dung-to-chua-ca')
@@ -88,7 +94,7 @@ describe('tờ chiếu chữa bài', () => {
     expect(soThieu).toBe(0)
     expect(html.indexOf('Câu khó về hiệu suất')).toBeGreaterThan(-1)
     expect(html.indexOf('Câu khó về hiệu suất')).toBeLessThan(html.indexOf('Câu dễ về acid'))
-    expect(html).toContain('<li>Văn An</li><li>Thị Bình</li>')
+    expect(html).toContain('<span class="mc-st-ten">Văn An</span><span class="mc-st-giay" title="30 giây">30<small>\u2009s</small></span></li><li class="mc-st-em"><span class="mc-st-ten">Thị Bình</span>')
     expect(html).toContain('mc-tk') // dải thống kê lớp (phím T)
     expect(html).toMatch(/<body[^>]*data-chua-bai/)
     expect(html).toContain('<b>2<small>/2</small></b>')
@@ -97,7 +103,7 @@ describe('tờ chiếu chữa bài', () => {
     const kq = await dungToChuaCa(thieu, nguon, 'Chữa bài')
     expect(kq.soThieu).toBe(1)
     expect(kq.html).toContain('Nội dung câu hỏi 3')
-    expect(kq.html).toContain('<li>Văn An</li>')
+    expect(kq.html).toContain('<span class="mc-st-ten">Văn An</span>')
   })
 })
 

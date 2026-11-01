@@ -28,6 +28,7 @@ import { tachDongTheoY } from './tach-dong-cau'
 import type { CauLuyen } from './bai-tap-pdf'
 import { cauHinhNop, type CauHinhNopKhacPhuc } from './cau-hinh-nop-khac-phuc'
 import { doanCongThuc, type DoanChu } from './chu-hoa-hoc-pdf'
+import { chuCoLatex } from './latex-html'
 import { gomTuCongThuc, tachDongSoDo } from './chem-format-so-do'
 import { goKyTuLa } from './chu-la-pdf'
 import { chuanHoaLoiGiaiCau } from './chuan-hoa-loi-giai'
@@ -129,15 +130,20 @@ export function chuHtml(s: unknown): string {
   }
   // Sơ đồ/phương trình dính trong câu chữ được tách ra đứng riêng một dòng
   // (`tachDongSoDo`, cùng luật với ChemText trên màn hình).
+  // LaTeX trần / `$…$` có lệnh trong bảng đóng (phân số, căn, ≤ …) dựng thành HTML thuần — không KaTeX (thầy 01/11: tờ chiếu in thô
+  // `\frac {…} {…}`). Chuỗi không có khúc LaTeX nào ra đúng từng byte như trước.
   return tachDongSoDo(goKyTuLa(str))
     .map((k) => {
-      const noi = doanHtmlLien(doanCongThuc(k.v))
+      const noi = chuCoLatex(k.v, chuHoaHoc)
       return k.t === 'sodo' ? `<span class="so-do" style="display:block;margin:.25em 0">${noi}</span>` : noi
     })
     .join('')
     // In đậm (thầy 01/11: «Chữ Không in đậm bỏ dấu sao hai đầu») — cùng luật với ChemText trên màn hình.
     .replace(/\*\*([^*\n]+?)\*\*/g, '<b>$1</b>')
 }
+
+/** Đường chữ hoá học của phiếu cho một khúc chữ thường (cũng là tử/mẫu của phân số dựng từ LaTeX). */
+const chuHoaHoc = (raw: string): string => doanHtmlLien(doanCongThuc(raw))
 
 /** Như `doanHtml` nhưng bọc LIỀN công thức và "mũi tên + chất sau" (`ct-lien`,
  * nowrap) để phiếu/tờ chiếu không ngắt dòng giữa (C₆H₁₀O₅ và ₙ. */
@@ -875,6 +881,23 @@ body.co-lam .thanh:not(#thanh-nop) { position: static; }
 /* Mũi tên trần (không nhãn) đứng ngay trong dòng chữ. */
 .mt-tran { margin: 0 .24em; }
 .mt-tran .mt-than { min-width: 1.6em; }
+
+/* PHÂN SỐ / CĂN / GẠCH TRÊN dựng từ LaTeX (latex-html.ts, thầy 01/11) — HTML thuần, không KaTeX. Vạch theo màu chữ (currentColor) nên đúng cả
+   nền sáng lẫn tối; vertical-align:middle đặt vạch đúng trục giữa dòng; tử/mẫu co và tự xuống dòng được khi chỗ hẹp (không tràn mép giấy). */
+.lt-ps { display: inline-flex; flex-direction: column; align-items: stretch; vertical-align: middle; max-width: 100%; margin: .08em .16em; text-align: center; line-height: 1.2; }
+.lt-tu, .lt-mau { display: block; min-width: 0; padding: 0 .22em; text-indent: 0; overflow-wrap: anywhere; }
+.lt-tu { padding-bottom: .1em; border-bottom: max(1px, .065em) solid currentColor; }
+.lt-mau { padding-top: .12em; }
+.lt-ps-nho { font-size: .82em; }
+.lt-ps .lt-ps { margin: 0 .08em; }
+.lt-can { display: inline-flex; align-items: stretch; vertical-align: middle; max-width: 100%; line-height: 1.2; }
+.lt-can-dau { display: flex; align-items: flex-end; font-size: 1.12em; line-height: 1; margin-right: -.04em; }
+.lt-can-trong { min-width: 0; padding: .1em .12em 0; border-top: max(1px, .065em) solid currentColor; overflow-wrap: anywhere; }
+.lt-can-bac { align-self: flex-start; font-size: .6em; margin-right: -.3em; }
+.lt-gach { text-decoration: overline; text-decoration-thickness: max(1px, .065em); }
+.lt-gach-duoi { text-decoration: underline; text-decoration-thickness: max(1px, .065em); }
+.lt-tren { position: relative; display: inline-block; padding-top: .32em; line-height: 1.1; }
+.lt-tren::before { content: attr(data-k); position: absolute; left: 0; right: 0; top: -.12em; font-size: .72em; line-height: 1; text-align: center; }
 
 /* HAI CỘT CỐ ĐỊNH trên màn rộng, đúng mẫu theo ảnh. */
 .q-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
