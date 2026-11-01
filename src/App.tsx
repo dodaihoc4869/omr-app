@@ -14,7 +14,10 @@ import { catPhien, donPhien, khoiPhucPhien } from './lib/khoa-phien'
 import { datDangMoKhoa } from './lib/cap-nhat-app'
 import { phaiHoiLai, type BanGhiKhoa } from './lib/khoa-app'
 import { docDuongVao, laManThayQuanLy } from './lib/vai-tro'
-import KhoaMayThayScreen from './screens/KhoaMayThayScreen'
+// CỬA MÃ BÍ MẬT (máy CHƯA có mã) NẠP LƯỜI (01/11, bù byte nút thu gọn thanh bên — luật tốc độ): máy thầy đã cấp quyền KHÔNG BAO GIỜ dựng màn này
+// ⇒ không tải nữa. Chỉ máy lạ / máy thầy mới tinh thấy nó, mà màn này vốn cần máy chủ chấm mã ⇒ kho chạy-lúc (vite.config.ts globIgnores), không precache.
+// Chờ mảnh: màn trống đúng nền — KHÔNG dựng gì của app (khoá cứng giữ nguyên).
+const KhoaMayThayScreen = lazy(() => import('./screens/KhoaMayThayScreen'))
 // Cầu nối Cowork `window.__ddh` nạp LƯỜI (26/10, tốc độ): mảnh của nó kéo bộ chấm + PDF bài tập (exam-grade, bai-tap-pdf…) mà màn khoá thầy
 // không cần — chỉ tải sau khi thầy mở khoá. Gỡ chỉ là xoá `window.__ddh` (= TEN_CAU_NOI trong cau-noi-ddh.ts) ⇒ không phải tải mảnh để gỡ.
 const napCauNoi = () => import('./lib/cau-noi-ddh')
@@ -408,7 +411,9 @@ function App() {
   if (khoa === 'chua_cap_quyen') {
     return (
       <ChanLoi o="Mở app">
-        <KhoaMayThayScreen onMoDuoc={() => setKhoa('can_dat')} />
+        <Suspense fallback={<div className="min-h-screen" style={{ background: 'var(--nen)' }} />}>
+          <KhoaMayThayScreen onMoDuoc={() => setKhoa('can_dat')} />
+        </Suspense>
       </ChanLoi>
     )
   }

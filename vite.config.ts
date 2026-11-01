@@ -335,6 +335,8 @@ export default defineConfig({
           '**/TheDiemDanhHs-*.{js,css}',
           // Hôm nay · 4 bảng (01/11): Nhịp học chỉ còn ở giao diện CŨ (không «Trong») + trang bằng chứng một em (mở khi bấm, vốn cần máy chủ) — nạp lười, kho chạy-lúc.
           '**/{NhipHocThay,BangChungBon,DuyetBoSung}-*.{js,css}',
+          // Cửa mã bí mật (01/11, nạp lười ở App.tsx): chỉ máy CHƯA có mã thấy, màn ấy vốn cần máy chủ chấm mã ⇒ kho chạy-lúc, precache giữ 170.
+          '**/KhoaMayThayScreen-*.{js,css}',
           // NGANG GV 26/10: CSS điện thoại ngang + máy ≥ 1600 của app thầy (mảnh chung các màn thầy nạp lười, tải song song mảnh màn) — kho chạy-lúc.
           '**/trong-gv-ngang-*.css',
           // Hỏi thêm cần máy chủ và chỉ mở trong lời giải: nạp khi dùng, không cất sẵn.

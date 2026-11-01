@@ -164,3 +164,33 @@ export function chuanBiLatex(t: 'ce' | 'math', latexGoc: string): { latex: strin
   const latex = chuanHoaCongThucTongQuat(chuanHoaNhanMuiTen(kyHieuToanVeLatex(t === 'ce' ? tachToanTuCongCe(chuanHoaMuiTenMhchem(latexGoc)) : latexGoc)))
   return { latex, dai: beRongUocTinh(latex) > DAI_PHAI_CUON }
 }
+
+// ── DỰNG CÔNG THỨC (dời từ chem-format.tsx 01/11 để lượt mở app không mang mã chỉ chạy khi đã có KaTeX) ──
+type KatexRender = { renderToString: (latex: string, opts: Record<string, unknown>) => string }
+const KATEX_OPTS = { throwOnError: true, strict: false, displayMode: false } as const
+export type KetQuaCongThuc = { latex: string; html: string; dai: boolean } | { latex: string; loi: true }
+// NHỚ KẾT QUẢ KaTeX (28/09). `katex.renderToString` là phần đắt nhất khi vẽ đề (~260 công thức/đề). Cùng chuỗi nguồn ⇒ cùng HTML, giữ theo kiểu LRU
+// (Map giữ thứ tự chèn; đọc trúng thì chèn lại xuống cuối; vượt trần thì bỏ mục cũ nhất). Kết quả hiển thị y hệt bản không nhớ.
+const TRAN_NHO_CONG_THUC = 2000
+const nhoCongThuc = new Map<string, KetQuaCongThuc>()
+export function dungCongThuc(katex: KatexRender, t: 'ce' | 'math', latexGoc: string): KetQuaCongThuc {
+  const khoa = t + '\u0000' + latexGoc
+  const co = nhoCongThuc.get(khoa)
+  if (co) {
+    nhoCongThuc.delete(khoa)
+    nhoCongThuc.set(khoa, co)
+    return co
+  }
+  // Chuẩn hoá TRƯỚC khi đưa cho mhchem
+  const { latex, dai } = chuanBiLatex(t, latexGoc)
+  let kq: KetQuaCongThuc
+  try {
+    // Phương trình dài GIỮ một dòng (ô cuộn ngang `ct-dai`) — thầy 01/11: «Cứ để thanh cuộn, đi xuống dòng thế không đúng cách».
+    kq = { latex, html: katex.renderToString(t === 'ce' ? `\\ce{${latex}}` : latex, KATEX_OPTS), dai }
+  } catch {
+    kq = { latex, loi: true }
+  }
+  nhoCongThuc.set(khoa, kq)
+  if (nhoCongThuc.size > TRAN_NHO_CONG_THUC) nhoCongThuc.delete(nhoCongThuc.keys().next().value as string)
+  return kq
+}
