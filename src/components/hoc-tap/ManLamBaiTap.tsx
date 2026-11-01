@@ -22,6 +22,7 @@ import { docTomTatGoi7, type TomTatGoi7 } from '../../lib/goi-bai-7'
 import { soOCuaCau } from '../../lib/so-o-tra-loi-ngan'
 import { BanDoY, BanPhimSo, ChonDungSai, ChonTracNghiem, DeCau, HinhCuoiCau, LoiGiaiCau, OTraLoiNgan, PhanHoiDungSai, PhanHoiTraLoiNgan, PhanHoiTracNghiem, traLoiCotPhai, useBoCucLam } from './LamCau'
 import { TroGiupDuo } from './TroGiupDuo'
+import { ThanhCuon } from './ThanhCuon' // CHẶNG NGANG 01/11: thanh cuộn riêng cột đề / cột trả lời (xoay ngang + máy tính)
 import { chuDS, chuThoiGian, kyTuHien, nhanPhim, phimTuBanPhim, soChangXong, soSanhDungSai, type PhimSo, type SoHomNay } from './lam-bai'
 import { chuDanhSachCau, coChuSo, cuonDeThayO, soHomNayGoi7 } from './lam-bai-man'
 import NutHoiThay from '../loi-giai/NutHoiThay'
@@ -592,7 +593,13 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   // (như Gợi ý, Hỏi thầy). Ruột tự vẽ thẻ giải nghĩa / gợi ý (TamGiaiThich); màn chỉ chừa chỗ đặt nút ở hàng nút đáy (`oNutCham`).
   const hoTroCham = useRef(dang0?.hoTroCham ?? '')
   const [oNutCham, setONutCham] = useState<HTMLElement | null>(null)
-  useEffect(() => { if (!q) return; if (daMo.current && !daVeDau.current) veDau(); daVeDau.current = false; daMo.current = true }, [q?.qid]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!q) return
+    if (daMo.current && !daVeDau.current) veDau(); daVeDau.current = false; daMo.current = true
+    // CHẶNG NGANG 01/11: cột đề (giữ nguyên qua các câu) cuộn riêng ở xoay ngang / máy tính ⇒ câu mới đọc từ đầu đề.
+    const cotDe = gocRef.current?.querySelector<HTMLElement>('.duo-cot-de')
+    if (cotDe?.scrollTop) cotDe.scrollTop = 0
+  }, [q?.qid]) // eslint-disable-line react-hooks/exhaustive-deps
   // Màn Duo ở khung thấp xoay ngang: tấm kết quả nằm ở cột phải DƯỚI phương án ⇒ đưa tấm (nút «Tiếp tục») vào khung nhìn thay vì cuộn về đầu.
   // MÁY YẾU 30/10 (vết Chrome «Kiểm tra» CPU ×6: `scrollIntoView` + đo phương án ép tính kiểu + bố cục cả màn ~120 ms NGAY trong lượt chạm, trước khi tấm kết
   // quả kịp vẽ): React chạy hiệu ứng của cú chạm ĐỒNG BỘ trước lần sơn ⇒ dời cuộn / đo / tiêu điểm sang SAU khung đầu (rAF → setTimeout). Tấm kết quả hiện
@@ -778,7 +785,13 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   // trong cây, chỉ phần chữ đề / nhãn / lệnh đổi theo câu (gắn key theo câu). Hiệu ứng «trượt vào» của khối (CSS duo-vao, chạy khi phần tử mới gắn) được
   // chạy lại bằng Web Animations cùng thông số — nhìn y như cũ; máy yếu / giảm chuyển động: không chạy (như CSS).
   const sanRef = useRef<HTMLDivElement>(null), sanQid = useRef('')
-  useLayoutEffect(() => { gocRef.current?.querySelector<HTMLElement>('.duo-than')?.style.removeProperty('opacity') }, [q?.qid, xong])
+  // CHẶNG NGANG 01/11: xoay ngang / máy tính hai cột ⇒ khung câu (`.duo-than`) là display: contents (không có hộp để mờ / chụp bản sao) ⇒ trượt + ẩn TỪNG CỘT.
+  const khoiCau = (): HTMLElement[] => {
+    const than = gocRef.current?.querySelector<HTMLElement>('.duo-than')
+    if (!than) return []
+    return getComputedStyle(than).display === 'contents' ? Array.from(than.querySelectorAll<HTMLElement>(':scope > .duo-cot-de, :scope > .duo-cot-tra')) : [than]
+  }
+  useLayoutEffect(() => { for (const e of gocRef.current?.querySelectorAll<HTMLElement>('.duo-than, .duo-cot-de') ?? []) e.style.removeProperty('opacity') }, [q?.qid, xong])
   // Rời app GIỮA chặng (đã trả lời ≥ 1 câu, chưa kết chặng) ⇒ báo máy chủ lập lại bản sẵn Sảnh + chặng (mo-chang-truoc.ts); câu cuối chặng máy chủ vốn đã lập sẵn.
   const dangDoRef = useRef(false)
   dangDoRef.current = !xong && Object.keys(ket).length > 0
@@ -817,12 +830,12 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     sanQid.current = id
   })
   const truotCauCu = () => {
-    const goc = gocRef.current, than = goc?.querySelector('.duo-than')
-    const r = duo && than ? than.getBoundingClientRect() : undefined
+    const goc = gocRef.current, khoi = duo ? khoiCau() : []
+    const rs = khoi.map((e) => e.getBoundingClientRect())
     const kh = goc ? khungCuonCua(goc) : null
     if (goc && kh) { const lech = goc.getBoundingClientRect().top - kh.getBoundingClientRect().top; if (lech) kh.scrollTop += lech; daVeDau.current = true }
     else if (goc && !kh && goc.getBoundingClientRect().top === 0) daVeDau.current = true // không khung nào cuộn được, màn đã ở đầu ⇒ khỏi cuộn
-    if (duo) truotRa(than, 180, r, 'svg.gtv')
+    khoi.forEach((e, i) => truotRa(e, 180, rs[i], 'svg.gtv'))
   }
   // Hết câu của chặng mà có câu TỰ LÀM SAI ⇒ xin vòng làm lại MỘT lần. Rỗng / lỗi mạng ⇒ vào màn kết chặng như cũ. Đang xin ⇒ chạm lặp không kết chặng giữa chừng.
   const xinLamLai = async () => {
@@ -876,7 +889,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
         // máy thường: bản sao câu cũ trượt ra phủ trên ⇒ câu thật ẩn bằng opacity (một phần tử, không lan xuống con) và câu kế dựng trong lượt chuyển
         // tiếp (chia nhỏ) — không giữ luồng chính một mạch ~200 ms. Câu kế gắn thì hiện lại (layout effect theo qid).
         truotCauCu()
-        gocRef.current?.querySelector<HTMLElement>('.duo-than')?.style.setProperty('opacity', '0')
+        for (const e of khoiCau()) e.style.setProperty('opacity', '0')
         startTransition(() => setViTri(i => i + 1))
       })
       else { dangSang.current = -1; truotCauCu(); setViTri(i => i + 1) }
@@ -1198,7 +1211,9 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
         </Suspense>
       </div>
     }
-    return <div ref={gocRef} className="ht-app ht2-lam duo" data-duo="" data-hai-cot={deDai || undefined} data-xong={xong || undefined} data-tt={k ? tt : undefined}>
+    // CHẶNG NGANG 01/11 (styles/trong-chang-ngang.css): `data-chang` = gốc riêng màn làm chặng (màn thi / kiểm tra / sửa câu dùng chung lớp .duo KHÔNG đổi);
+    // `data-phan` = loại câu (đúng–sai dành cột trả lời rộng hơn); `data-ket` = dải kết quả đang hiện (đang chấm / đã chấm) ⇒ điện thoại ngang chừa hàng đáy cho dải.
+    return <div ref={gocRef} className="ht-app ht2-lam duo" data-duo="" data-chang="" data-phan={q?.phan} data-ket={!xong && (!!k || cham) ? '' : undefined} data-hai-cot={deDai || undefined} data-xong={xong || undefined} data-tt={k ? tt : undefined}>
       {!xong && <header className="duo-tren">
         {/* thầy 27/10 (video Duolingo): đúng liền ≥ 2 câu ⇒ nhãn nhỏ «COMBO ×N» ngay TRÊN thanh tiến độ, số theo chuỗi */}
         {chuoi >= 2 && !laLamLai && <span key={chuoi} className="duo-combo-nhan" aria-hidden="true">COMBO ×{chuoi}</span>}
@@ -1247,6 +1262,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
           {coDangCanh(q.text) && <MinhHoaDe key={`m${q.qid}`} text={q.text} />}
           {q.goiY && goiY && dangTraLoi && <section key={`y${q.qid}`} id="ht2-lam-goi-y" className="ht2-lam-goi-y" aria-label="Gợi ý"><b><Lightbulb size={18} aria-hidden="true" />Gợi ý</b><p>{q.goiY.cotLoi || (q.goiY.gach?.length ? `Có thể loại phương án ${q.goiY.gach.join(', ')}.` : 'Đọc lại kiến thức cốt lõi của bài.')}</p></section>}
           </div>
+          <ThanhCuon key="cd" cot="de" />
           <div key={`t${q.qid}`} className="duo-cot-tra">
           {/* Thầy 27/10 (ảnh): ẩn khung «Câu này em chọn làm thế nào?» ở màn Duo — hai nút đáy «Học cách giải» / «Tự làm câu này» đã nói đủ. */}
           <div className="duo-tra" data-luoi={luoi || undefined} data-pa={doDaiPa} data-so={soPa || undefined}>{khoiTraLoi}</div>
@@ -1254,6 +1270,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
           {(dangTraLoi || k) && <HinhCuoiCau q={q} stt={stt} />}
           {ghiTraLoi}
           </div>
+          <ThanhCuon key={`ct${q.qid}`} cot="tra" />
         </> : null}
         {loi && !q && <div className="ht2-lam-loi" role="alert"><span>{loi}</span><button type="button" className="ht2-lam-nut ht2-lam-nut-phu" onClick={() => setLan(n => n + 1)}><RefreshCw size={17} aria-hidden="true" />Thử lại</button></div>}
         {hetCau && !q && !loi && <div className="ht2-lam-loi" data-tt="xong" role="status"><span>{hetCau}</span><button type="button" className="ht2-lam-nut ht2-lam-nut-phu" onClick={() => { onCapNhat(); onVe() }}>Về {tenTrangChinh()}</button></div>}

@@ -6,6 +6,7 @@
 @import '../components/hoc-tap/ban-phim-duo.css';
 @import '../components/hoc-tap/tro-giup-duo.css';
 @import './trong-lam-ngang.css'; /* ngang + máy tính 27/10: chỉ bố cục, tiền tố :root cho đủ nặng */
+@import './trong-chang-ngang.css'; /* CHẶNG NGANG 01/11: màn làm chặng (gốc data-chang) hai cột cuộn riêng + thanh cuộn luôn thấy — xoay ngang + máy tính */
 
 /* ── 1. MÀN THI DỌC · thanh trên: đồng hồ chữ to không nền · Đã làm · Danh sách câu · Nộp bài; vạch tiến độ mảnh ── */
 [data-trong] .m3 .thi-tren { background: color-mix(in srgb, var(--tr-nen) 90%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: inset 0 -1px 0 var(--tr-vien); }
