@@ -105,3 +105,31 @@ describe('Mol — màu, nạp lười, tên', () => {
     for (const t of ['src/components/kiem-tra-duo/BiNop.tsx', 'src/components/hoc-tap/ManKiemTraCaNhan.tsx']) expect(readFileSync(t, 'utf8')).toContain('Cùng Mol ôn lại nhé!')
   })
 })
+
+describe('Mol trong KHUNG TRÒN (vòng Mục tiêu — thầy 01/11 tối «phóng to mặt Mol đầy với khung tròn»)', () => {
+  it('khung nhìn vuông cắt sát mặt: quả cầu lấp 92–100 % đường kính, mắt ở giữa khung', async () => {
+    const { VIEWBOX_MOL_TRON } = await import('../src/components/linh-vat/mol-dong')
+    const [x, y, w, h] = VIEWBOX_MOL_TRON.split(' ').map(Number)
+    expect(w).toBe(h)
+    expect(152 / w!).toBeGreaterThanOrEqual(0.92); expect(152 / w!).toBeLessThanOrEqual(1) // cầu bán kính 76
+    expect(Math.abs(x! + w! / 2 - 100)).toBeLessThanOrEqual(1) // giữa ngang
+    expect(Math.abs(y! + h! / 2 - 98)).toBeLessThanOrEqual(3) // tầm mắt (Y = 98) ở giữa dọc
+  })
+  it('chỗ gắn có data-khung="tron" ⇒ Mol dùng khung cắt sát mặt; chỗ khác vẫn toàn thân', async () => {
+    const { VIEWBOX_MOL_TRON } = await import('../src/components/linh-vat/mol-dong')
+    const a = document.createElement('span'); a.dataset.khung = 'tron'; document.body.appendChild(a)
+    const b = document.createElement('span'); document.body.appendChild(b)
+    const la = taoLua(a, { trangThai: 'vui' }), lb = taoLua(b, { trangThai: 'vui' })
+    expect(la.svg.getAttribute('viewBox')).toBe(VIEWBOX_MOL_TRON)
+    expect(lb.svg.getAttribute('viewBox')).toBe(VIEWBOX_MOL)
+    la.huy(); lb.huy()
+  })
+  it('vòng Mục tiêu dùng khung tròn; CSS bo tròn + cắt; ảnh tĩnh toàn thân không dùng cho khung tròn', () => {
+    expect(readFileSync('src/components/thuong/ThanhThuong.tsx', 'utf8')).toMatch(/<Bi cam=\{dat \? 'mung' : 'chao'\} size=\{menu \? 18 : 34\} nhip="yen" cap=\{capLua\} khung="tron" \/>/)
+    const bi = readFileSync('src/components/linh-vat/Bi.tsx', 'utf8')
+    expect(bi).toContain('data-khung={khung}'); expect(bi).toContain('const a = khung ? null : anhBiTinh(size, camKhoa, goc)')
+    expect(readFileSync('src/styles/mol.css', 'utf8')).toContain(".bi.lua[data-khung='tron'] { aspect-ratio: 1; border-radius: 50%; overflow: hidden;")
+    const k = readFileSync('src/lib/khung-tinh-hs.ts', 'utf8')
+    expect(k).toContain('.bi.lua:not([data-khung]) > svg.lua-svg'); expect(k).toContain("!span.hasAttribute('data-khung')")
+  })
+})

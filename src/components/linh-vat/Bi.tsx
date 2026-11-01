@@ -74,9 +74,11 @@ export interface PropsBi {
   goc?: GocLua
   /** Cấp giận 0–5 (src/lib/lua-cam-xuc.ts). ≥ 2 ⇒ đổi dáng + mặt + màu (lớp vẽ giận nạp lười). Vắng = 0. */
   cap?: number
+  /** 'tron' = Mol trong KHUNG TRÒN (vòng Mục tiêu): khung vuông bo tròn, mặt Mol cắt sát lấp đầy khung (mol-dong.ts VIEWBOX_MOL_TRON). */
+  khung?: 'tron'
 }
 
-export function Bi({ cam = 'chao', size = 96, className, nhip, noi, goc, cap: cap0 }: PropsBi) {
+export function Bi({ cam = 'chao', size = 96, className, nhip, noi, goc, cap: cap0, khung }: PropsBi) {
   const cap = cap0 && cap0 >= 2 ? Math.min(5, Math.round(cap0)) : 0
   // khoá ảnh tĩnh + data-cam: cấp ≥ 2 là hình khác hẳn ⇒ khoá riêng (không lấy ảnh vui vẻ của lần trước làm khung giữ chỗ cho Lửa đang giận, và ngược lại)
   const camKhoa = cap >= 2 ? `gian${cap}` : cam
@@ -87,7 +89,7 @@ export function Bi({ cam = 'chao', size = 96, className, nhip, noi, goc, cap: ca
   useLayoutEffect(() => {
     const el = o.current
     if (co || !el || el.firstChild) return
-    const a = anhBiTinh(size, camKhoa, goc)
+    const a = khung ? null : anhBiTinh(size, camKhoa, goc) // khung tròn: không dùng ảnh tĩnh toàn thân làm chỗ giữ
     if (!a) return
     const img = document.createElement('img')
     img.className = 'lua-svg bi-tinh'
@@ -120,7 +122,7 @@ export function Bi({ cam = 'chao', size = 96, className, nhip, noi, goc, cap: ca
     if (noi) l?.noi(noi, 40)
     if (l) apCap(l, cap, () => lua.current === l)
   }, [cam, nhip, noi, cap])
-  return <span ref={o} className={`bi lua${className ? ` ${className}` : ''}`} data-cam={camKhoa} data-cap={cap || undefined} data-goc={goc} data-nho={size < 64 ? '' : undefined} aria-hidden="true" style={{ '--lv-w': `${size}px` } as CSSProperties} />
+  return <span ref={o} className={`bi lua${className ? ` ${className}` : ''}`} data-cam={camKhoa} data-cap={cap || undefined} data-goc={goc} data-khung={khung} data-nho={size < 64 ? '' : undefined} aria-hidden="true" style={{ '--lv-w': `${size}px` } as CSSProperties} />
 }
 
 export default Bi

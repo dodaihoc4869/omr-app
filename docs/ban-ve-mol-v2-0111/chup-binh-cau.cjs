@@ -77,6 +77,18 @@ m.innerHTML =
  '<div class="luoi" style="grid-template-columns:repeat(8,1fr)">' + MAT.map(([k, t, moi]) => '<figure>' + bi(k, 128) + '<span' + (moi ? ' class="moi-nhan"' : '') + '>' + t + (moi ? ' · mới' : '') + '</span></figure>').join('') + '</div></section>' +
  '<section class="khoi" id="mau"><h2>Ba tổ hợp màu đã thử (token có sẵn)</h2><p>1 · chàm sáng --tr-hs-nut + ngọc lam --tr-tin (CHỌN) · 2 · ngọc lam --tr-tin + hồng --tr-tim · 3 · chàm nhạt --tr-hs + cam --tr-chu-y (gần Mol cũ).</p>' +
  '<div class="luoi" style="grid-template-columns:repeat(3,1fr)">' + ['', 'thu2', 'thu3'].map((c, i) => '<figure class="' + c + '"><div style="display:flex;gap:4px">' + ['vui', 'khen', 'cau'].map((k) => bi(k, 118)).join('') + '</div>' + ['1 · chàm sáng + ngọc lam (chọn)', '2 · ngọc lam + hồng', '3 · chàm nhạt + cam'][i] + '</figure>').join('') + '</div></section>' +
+ (() => {
+   // VÒNG MỤC TIÊU (góc phải Lộ trình): vòng 42 px như trong-hs.css (.tr-menu .da-tren[data-menu] .tp-tr-vong), Mol 32 px bên trong
+   const vong = (ruot) => '<span style="position:relative;display:grid;place-items:center;width:42px;height:42px"><svg viewBox="0 0 52 52" style="position:absolute;inset:0;width:42px;height:42px;transform:rotate(-90deg)">' +
+     '<circle cx="26" cy="26" r="22" fill="none" stroke="var(--tr-mat-3)" stroke-width="5"/><circle cx="26" cy="26" r="22" fill="none" stroke="var(--tr-hs)" stroke-width="5" stroke-linecap="round" stroke-dasharray="90 200"/></svg>' + ruot + '</span>'
+   const truoc = (m) => vong('<span class="bi lua" data-nho style="width:32px;height:37px"><svg class="lua-svg mol-svg" viewBox="0 -26 200 230" data-mat="' + m + '" data-tinh>' + MOL.svgMol(m) + '</svg></span>')
+   const sau = (m) => vong('<span class="bi lua" data-khung="tron" data-nho style="width:32px"><svg class="lua-svg mol-svg" viewBox="' + MOL.VIEWBOX_MOL_TRON + '" data-mat="' + m + '" data-tinh>' + MOL.svgMol(m) + '</svg></span>')
+   const MAT5 = ['vui', 'khen', 'buon', 'cau', 'ratCau']
+   const hang = (ten, f) => '<span class="nhan-hang">' + ten + '</span>' + MAT5.map((k) => '<figure><div style="display:flex;align-items:center;gap:18px"><div style="zoom:3">' + f(k) + '</div>' + f(k) + '</div>' + k + '</figure>').join('')
+   return '<section class="khoi" id="avatar"><h2>Mol trong vòng Mục tiêu (góc phải Lộ trình) · trước / sau · nền ' + (matchMedia('(prefers-color-scheme: dark)').matches ? 'tối' : 'sáng') + '</h2>' +
+     '<p>Sau: khung nhìn cắt sát mặt (' + MOL.VIEWBOX_MOL_TRON + ') — quả cầu lấp ~96 % đường kính, mắt ở giữa, vòng tiến độ giữ nguyên. Mỗi ô: phóng ×3 và cỡ thật.</p>' +
+     '<div class="luoi" style="grid-template-columns:130px repeat(5,1fr)">' + hang('Trước · toàn thân thu nhỏ', truoc) + hang('Sau · cắt sát mặt', sau) + '</div></section>'
+ })() +
  '<section class="khoi" id="bo-mau"><h2>Ba bộ màu đổi mỗi ngày (theo ngày Việt Nam, qua 00:00 đổi) · nền ' + (matchMedia('(prefers-color-scheme: dark)').matches ? 'tối' : 'sáng') + '</h2>' +
  '<p>Bộ = số ngày VN mod 3 (src/lib/mau-mol-ngay.ts) · cùng ngày mọi máy cùng màu (giờ máy chủ). Giận đỏ sẫm dùng chung.</p><div class="luoi" style="grid-template-columns:repeat(3,1fr)">' +
  [['0', 'Bộ 0 · chàm sáng + ngọc lam'], ['1', 'Bộ 1 · ngọc lam + hồng'], ['2', 'Bộ 2 · chàm nhạt + cam']].map(([b, t]) => '<figure><div style="display:flex;gap:4px;align-items:flex-end">' + ['vui', 'khen', 'buon', 'cau'].map((k) => bi(k, 92, { bo: b })).join('') + '</div>' + t + '</figure>').join('') + '</div></section>' +
@@ -150,6 +162,14 @@ async function luu(chup, ten) {
   kq.push(await luu((o) => t.locator('#cam-xuc').screenshot(o), 'binh-cau-cam-xuc-toi.jpg'))
   kq.push(await luu((o) => t.locator('#bo-mau').screenshot(o), 'binh-cau-3-bo-mau-toi.jpg'))
   await t.close()
+  // avatar trước / sau: ghép sáng + tối
+  { const a2 = []
+    for (const toi of [false, true]) { const p = await mo(toi, '', 1240, 1.5); a2.push((await p.locator('#avatar').screenshot({ type: 'png' })).toString('base64')); await p.close() }
+    const g2 = await b.newPage({ viewport: { width: 1240, height: 900 }, deviceScaleFactor: 1 })
+    await g2.setContent(`<body style="margin:0"><div id="g" style="display:flex;flex-direction:column;width:1240px">${a2.map((a) => `<img src="data:image/png;base64,${a}" style="width:1240px">`).join('')}</div></body>`)
+    await g2.waitForTimeout(100)
+    kq.push(await luu((o) => g2.locator('#g').screenshot(o), 'avatar-truoc-sau.jpg'))
+    await g2.close() }
   // cỡ nhỏ: ghép sáng + tối thành một ảnh (chụp hai lượt, xếp chồng bằng trang phụ)
   const anh = []
   for (const toi of [false, true]) { const p = await mo(toi, '', 1240, 2); anh.push((await p.locator('#co-nho').screenshot({ type: 'png' })).toString('base64')); await p.close() }

@@ -21,6 +21,9 @@ import { boMauMol } from '../../lib/mau-mol-ngay'
 import type { DungGian, GocLua, Lua, TrangThaiLua, TuyChonLua } from './lua-dong'
 
 export const VIEWBOX_MOL = '0 -26 200 230'
+/** KHUNG TRÒN (thầy 01/11 tối «phóng to mặt Mol đầy với khung tròn»; vòng Mục tiêu góc phải — Bi khung="tron"): khung nhìn VUÔNG cắt sát mặt —
+ *  quả cầu (tâm 100,120 · bán kính 76) lấp 152 / 158 ≈ 96 % đường kính khung, tâm khung ở tầm mắt (y 98), thấy chút cổ phía trên, cắt đáy + bóng. */
+export const VIEWBOX_MOL_TRON = '21 19 158 158'
 /** Mặt vẽ được của Mol (4 mặt cuối là phương án, chưa gắn trạng thái). */
 export type MatMol = 'vui' | 'khen' | 'chao' | 'nghi' | 'ngac' | 'buon' | 'ngu' | 'doi' | 'buc' | 'cau' | 'ratCau' | 'nguong' | 'me' | 'nhay' | 'tuTin'
 /** Trạng thái cũ của Lửa ⇒ mặt Mol (giữ API: Bi.tsx truyền đúng các trạng thái này). */
@@ -161,7 +164,7 @@ export function svgMol(mat: MatMol, goc: GocLua = 'truoc'): string {
 export const MOL_DANG_SONG = new Set<Lua>()
 export function taoLua(noiGan: HTMLElement, tc: { trangThai?: TrangThaiLua; tuyChon?: TuyChonLua; tinh?: boolean; goc?: GocLua } = {}): Lua {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-  svg.setAttribute('viewBox', VIEWBOX_MOL)
+  svg.setAttribute('viewBox', noiGan.dataset.khung === 'tron' ? VIEWBOX_MOL_TRON : VIEWBOX_MOL) // khung tròn ⇒ cắt sát mặt
   svg.setAttribute('class', 'lua-svg mol-svg')
   svg.setAttribute('aria-hidden', 'true')
   svg.setAttribute('focusable', 'false')

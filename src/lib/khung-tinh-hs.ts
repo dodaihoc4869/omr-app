@@ -128,7 +128,7 @@ export async function raAnhBi(): Promise<void> {
     if (!root) return
     const kho = docBi(), hom = ngayVn()
     let doi = false
-    for (const svg of Array.from(root.querySelectorAll<SVGSVGElement>('.bi.lua > svg.lua-svg'))) {
+    for (const svg of Array.from(root.querySelectorAll<SVGSVGElement>('.bi.lua:not([data-khung]) > svg.lua-svg'))) { // khung tròn (cắt sát mặt) không vào kho ảnh toàn thân
       const k = khoaBi(svg.parentElement!)
       if (laAnhDiem(kho[k]) && kho[k]!.ngay === hom) continue
       const cs = getComputedStyle(svg), w = parseFloat(cs.width), h = parseFloat(cs.height)
@@ -160,7 +160,7 @@ function linhVatTinh(a: Element[], b: Element[], ban: Element, raBi: Record<stri
     if (!ban.contains(b[i]!)) continue
     if (e.classList.contains('gt-o')) { b[i]!.remove(); continue }
     if (e.tagName.toLowerCase() === 'svg' && e.classList.contains('lua-svg')) {
-      const span = e.closest('.bi.lua'), k = span ? khoaBi(span) : ''
+      const span = e.closest('.bi.lua'), k = span && !span.hasAttribute('data-khung') ? khoaBi(span) : '' // khung tròn ⇒ ảnh SVG của chính nó
       const co = k ? kho[k] : undefined
       const anh = laAnhDiem(co) ? co : anhSvg(e as SVGSVGElement)
       if (!anh) { b[i]!.remove(); continue }
