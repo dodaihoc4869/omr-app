@@ -3530,6 +3530,8 @@ const boXuLy = {
       // SAI RẤT NHANH RỒI ĐÚNG LẠI cho Bảng tin của thầy: tính lại mỗi 10 phút vào bản đệm `cau_hinh.sai_nhanh_gv` (bản còn mới ⇒ chỉ 1 truy vấn đọc); lỗi chỉ ghi log.
       // XẾP HỌC SINH (24/10): thứ Hai 01:00–06:00 giờ VN tính bản chụp tuần, ≤ 25 em/phút; công tắc «tắt» ⇒ một câu đọc rồi về; ngoài giờ ⇒ không truy vấn.
       await import('./danh-gia-hoc-that-d1').then(m=>m.cronDanhGiaTuan(env,Date.now())).then(r=>{if(r.chay)console.log('[danh-gia] tuần',JSON.stringify(r))}).catch(e=>console.error('[danh-gia] cron lỗi:',e))
+      // HÔM NAY · 4 BẢNG (01/11): mỗi phút ngoài cao điểm tính một lô em chưa có bản của hôm nay (đêm 25 em, ngày 12 em). Xong hết ⇒ một câu đọc rồi về.
+      await import('./bon-chi-so-d1').then(m=>m.cronBonChiSo(env,Date.now(),caoDiem)).then(r=>{if(r.chay)console.log('[bon-bang] cron',JSON.stringify(r))}).catch(e=>console.error('[bon-bang] cron lỗi:',e))
       // THƯỞNG PHẠT (26/10): 00:10–00:59 giờ VN, một lần mỗi ngày — thăng hoa, chốt cược, trả bù thưởng hôm qua, sinh 3 nhiệm vụ. Ngoài khung: không truy vấn.
       {const g=new Date(Date.now()+7*3600000),ph=g.getUTCHours()*60+g.getUTCMinutes();if(ph>=10&&ph<60)await import('./thuong-d1').then(m=>m.cronThuongNgay(env,Date.now())).then(r=>{if(r.chay)console.log('[thuong] đêm',JSON.stringify(r))}).catch(async e=>{console.error('[thuong] đêm lỗi:',e);await ghiLoiMay(env,'thuong_dem')})}
       // THƯỞNG PHẠT phần B (26/10): giải tuần — từ thứ Hai 00:05 VN chốt tuần trước theo lô 10 nhóm/phút (idempotent), rồi xếp nhóm em mới vào tuần
@@ -4056,6 +4058,9 @@ const boXuLy = {
       if (p === '/gv/thuong/cong-tac') { const kq = await import('./thuong-d1').then((m) => m.gvCongTacThuong(env, b)); return ra(kq, 'loi400' in kq ? 400 : 200) }
       // THƯỞNG PHẠT phần B: bảng thi đua tuần của một lớp (nguyên tử Học thật / bị loại, hạng giải, chuỗi, nhãn, học cùng). ĐỌC-CHỈ, một batch.
       if (p === '/gv/thi-dua-tuan') return ra(await import('./thuong-gv-ph').then((m) => m.gvThiDuaTuan(envDoc, { ...b, lop: b.lop ?? url.searchParams.get('lop') ?? '' })))
+      // HÔM NAY · 4 BẢNG Học thật / Học đối phó / Chăm / Lười (thầy chốt bản vẽ 01/11; bon-chi-so-d1.ts): đọc bảng tính sẵn ⇒ 4 bảng đã xếp; một em ⇒ bằng chứng.
+      if (p === '/gv/bon-bang') return ra(await import('./bon-chi-so-d1').then((m) => m.gvBonBang(envDoc, b)))
+      if (p === '/gv/bon-bang/em') return ra(await import('./bon-chi-so-d1').then((m) => m.gvBonBangEm(env, b)))
       if (p.startsWith('/gv/danh-gia/')) {
         const m = await import('./danh-gia-hoc-that-d1')
         const vi = p.slice('/gv/danh-gia/'.length)
