@@ -1,0 +1,445 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mol kẹo dẻo</title>
+<!-- BẢN VẼ «MOL ỐNG NGHIỆM KẸO DẺO» (01/11) — SVG thuần. Mọi màu là biến --k-* pha từ token THẬT của app học sinh
+     (giá trị chép nguyên từ src/styles/trong-hs-mau.css + tokens.css; thư mục docs không bị kiểm mã màu).
+     Mở: mol-keo-deo.html (sáng) · ?toi (tối) · ?lo-trinh (điện thoại Lộ trình, ghép với &toi). Chụp: node docs/ban-ve-mol-keo-deo-0111/chup.cjs -->
+<style>
+@font-face{font-family:'DDH Rounded';font-weight:100 549;src:url(../../src/styles/phong-ddh/ddh-rounded-de-vietnamese.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'DDH Rounded';font-weight:100 549;src:url(../../src/styles/phong-ddh/ddh-rounded-de-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+2000-206F,U+2190-2193,U+2212}
+@font-face{font-family:'DDH Rounded';font-weight:550 1000;src:url(../../src/styles/phong-ddh/ddh-rounded-dam-vietnamese.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'DDH Rounded';font-weight:550 1000;src:url(../../src/styles/phong-ddh/ddh-rounded-dam-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+2000-206F,U+2190-2193,U+2212}
+
+/* ── TOKEN THẬT app học sinh (trong-hs-mau.css) + cố định (tokens.css: --btg-chu-doan mực, --btg-chu-doan-dam trắng; trong.css: --tr-gv) ── */
+:root,.sang{color-scheme:light;
+  --tr-nen:#f6f6fc;--tr-mat:#ffffff;--tr-mat-2:#f0f0fa;--tr-mat-3:#e1e1f1;--tr-vien:#e2e2f0;--tr-vien-2:#cbcbe3;
+  --tr-chu:#1b1938;--tr-chu-2:#454367;--tr-chu-3:#5a587d;--tr-trang:#ffffff;
+  --tr-dung:#00d396;--tr-dung-nhat:#c5ffe8;--tr-dung-chu:#007c58;--tr-dung-nut:#00a87b;--tr-dung-day:#008d66;
+  --tr-sai:#f4417c;--tr-sai-nhat:#fddfe9;--tr-sai-chu:#c70b5b;--tr-sai-day:#e5266d;
+  --tr-chu-y:#ff8c51;--tr-chu-y-nhat:#ffeee0;--tr-chu-y-chu:#b24f19;--tr-chu-y-nut:#f06b27;--tr-chu-y-day:#ce6837;
+  --tr-tin:#00bed8;--tr-tin-nhat:#dbf5fa;--tr-tin-chu:#007889;--tr-tin-day:#009eb5;
+  --tr-sao:#ffbf35;--tr-sao-nhat:#fff5d4;--tr-sao-chu:#956400;--tr-sao-day:#e3a605;
+  --tr-tim:#f373ce;--tr-tim-day:#c851a8;--tr-tim-chu:#b33d95;
+  --tr-hs:#8f9bff;--tr-hs-nut:#767eff;--tr-hs-day:#5e64cd;--tr-hs-nhat:#eeeeff;--tr-hs-chu:#565bbd;--tr-hs-tren:#ffffff;
+  --tr-nguyen-tu-so:#009eb5;--tr-gv:#2563eb;--tr-gv-nhat:#eef4ff;--tr-gv-chu:#1e40af;
+  --btg-chu-doan:#1f1f1f;--btg-chu-doan-dam:#ffffff;
+  --k-tron:22%; /* mức pha mực vào thân khi giận (nền sáng) */
+}
+:root[data-toi],.toi{color-scheme:dark;
+  --tr-nen:#1a1a29;--tr-mat:#262738;--tr-mat-2:#2c2d40;--tr-mat-3:#414157;--tr-vien:#414157;--tr-vien-2:#52536a;
+  --tr-chu:#f1f0ff;--tr-chu-2:#cdceeb;--tr-chu-3:#acaece;--tr-trang:#1a1a29;
+  --tr-dung:#00d497;--tr-dung-nhat:#18382a;--tr-dung-chu:#00df9f;--tr-dung-nut:#00d497;--tr-dung-day:#00aa76;
+  --tr-sai:#f7498f;--tr-sai-nhat:#43272f;--tr-sai-chu:#ff9bba;--tr-sai-day:#cc146f;
+  --tr-chu-y:#ff9447;--tr-chu-y-nhat:#422a1a;--tr-chu-y-chu:#ffa569;--tr-chu-y-nut:#ff9447;--tr-chu-y-day:#de6a00;
+  --tr-tin:#00bfd4;--tr-tin-nhat:#0e373d;--tr-tin-chu:#00d5ed;--tr-tin-day:#0097ab;
+  --tr-sao:#ffc735;--tr-sao-nhat:#3b2f14;--tr-sao-chu:#ecb400;--tr-sao-day:#d8a100;
+  --tr-tim:#e17beb;--tr-tim-day:#b857c8;--tr-tim-chu:#f592ff;
+  --tr-hs:#a8adff;--tr-hs-nut:#a8adff;--tr-hs-day:#7e80ff;--tr-hs-nhat:#2c2e47;--tr-hs-chu:#b1b6ff;--tr-hs-tren:#1a1a29;
+  --tr-nguyen-tu-so:#00bfd4;--tr-gv:#528bff;--tr-gv-nhat:#102a56;--tr-gv-chu:#a6c4ff;
+  --k-tron:8%; /* nền tối: giận bớt pha mực để thân đỏ sẫm vẫn tách khỏi nền */
+}
+
+/* ── MÀU MOL KẸO DẺO — 1 màu chủ đạo + 1 sắc đậm (mặt phẳng) + bụng sáng + 1 vệt bóng; cam chỉ cho mũi + chân ──
+   Chủ đạo đã chọn: NGỌC LAM --tr-tin (đậm --tr-tin-day). Phương án thử: data-mau="tim" (hồng --tr-tim) · "hs" (chàm --tr-hs-nut). */
+.kd{overflow:visible;
+  --k-c:var(--tr-tin);              /* thân */
+  --k-d:var(--tr-tin-day);          /* sắc đậm: mép bóng, cánh, nắp, mí */
+  --k-s:color-mix(in oklab,var(--k-c) 40%,var(--btg-chu-doan-dam)); /* bụng sáng, vành ống, vòng mắt */
+  --k-t:var(--btg-chu-doan-dam);    /* trắng cố định: tròng, vệt bóng */
+  --k-m:color-mix(in oklab,var(--btg-chu-doan) 86%,var(--k-d)); /* mực: con ngươi, miệng */
+  --k-tr:color-mix(in oklab,var(--tr-sai) 72%,var(--btg-chu-doan-dam)); /* tròng mắt hồng đỏ khi giận */
+  --k-l:color-mix(in oklab,var(--tr-sai) 60%,var(--btg-chu-doan-dam)); /* lưỡi */
+}
+.kd[data-mau=tim]{--k-c:var(--tr-tim);--k-d:var(--tr-tim-day)}
+.kd[data-mau=hs]{--k-c:var(--tr-hs-nut);--k-d:var(--tr-hs-day)}
+/* Giận ĐỔI SẮC TOÀN THÂN sang đỏ sẫm (học cách đổi sắc của icon, không chép nhân vật); tròng mắt hồng đỏ, không răng, không gân. */
+.kd[data-gian=cau]{--k-c:color-mix(in oklab,var(--tr-sai-day) calc(100% - var(--k-tron)),var(--btg-chu-doan));--k-d:color-mix(in oklab,var(--tr-sai-day) 55%,var(--btg-chu-doan));--k-s:color-mix(in oklab,var(--tr-sai) 45%,var(--btg-chu-doan-dam))}
+.kd[data-gian=ratCau]{--k-c:color-mix(in oklab,var(--tr-sai-day) calc(84% - var(--k-tron)),var(--btg-chu-doan));--k-d:color-mix(in oklab,var(--tr-sai-day) 42%,var(--btg-chu-doan));--k-s:color-mix(in oklab,var(--tr-sai) 52%,var(--btg-chu-doan-dam));--k-tr:var(--tr-sai)}
+.kd .k-than{fill:var(--k-c)} .kd .k-day{fill:var(--k-d)} .kd .k-sang{fill:var(--k-s)} .kd .k-trang{fill:var(--k-t)}
+.kd .k-muc{fill:var(--k-m)} .kd .k-trong{fill:var(--k-tr)} .kd .k-luoi{fill:var(--k-l)}
+.kd .k-cam{fill:var(--tr-chu-y)} .kd .k-cam-d{fill:var(--tr-chu-y-nut)}
+.kd .k-net{fill:none;stroke:var(--k-m);stroke-linecap:round;stroke-linejoin:round}
+.kd .k-mi{fill:none;stroke:var(--k-d);stroke-width:2.8;stroke-linecap:round}
+.kd .k-bong{fill:none;stroke:var(--k-t);stroke-linecap:round;opacity:.55}
+.kd .k-chu{fill:var(--k-t);font:800 8.6px 'DDH Rounded',sans-serif;letter-spacing:.03em;opacity:.9}
+.kd .k-bongdat{fill:var(--btg-chu-doan);opacity:.12} .toi .kd .k-bongdat,[data-toi] .kd .k-bongdat{opacity:.4}
+.kd .k-lua1{fill:var(--tr-sai)} .kd .k-lua2{fill:var(--tr-chu-y)} .kd .k-lua3{fill:var(--tr-sao)}
+.kd .k-sao{fill:var(--tr-sao)} .kd .k-do{fill:var(--tr-sai)} .kd .k-ma{fill:var(--tr-tim);opacity:.5}
+.kd .k-fx{fill:var(--k-d);font:800 26px 'DDH Rounded',sans-serif}
+.kd .k-vet{fill:none;stroke:var(--k-d);stroke-width:3.2;stroke-linecap:round}
+.kd .k-rung{fill:none;stroke:var(--tr-sai);stroke-width:3.4;stroke-linecap:round}
+.kd .k-vien-sang{stroke:var(--k-s);stroke-width:3.5;paint-order:stroke;stroke-linejoin:round}
+.kd .k-giot{fill:var(--k-t);stroke:var(--k-d);stroke-width:1.6}
+.kd .k-khoi{fill:var(--tr-mat);stroke:var(--tr-vien-2);stroke-width:2}
+
+/* ── Trang bản vẽ ── */
+*{box-sizing:border-box}
+body{margin:0;background:var(--tr-nen);color:var(--tr-chu);font:500 15px/1.5 'DDH Rounded',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+main{max-width:1200px;margin:0 auto;padding:28px 20px 48px;display:flex;flex-direction:column;gap:28px}
+h1{margin:0;font-size:30px;font-weight:800;letter-spacing:-.01em}
+h2{margin:0;font-size:20px;font-weight:800}
+.phu{margin:4px 0 0;color:var(--tr-chu-2)}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.84em;white-space:nowrap;background:var(--tr-mat-2);padding:0 4px;border-radius:5px}
+.khoi{background:var(--tr-mat);border:2px solid var(--tr-vien);border-radius:24px;padding:22px 22px 24px;box-shadow:0 4px 0 var(--tr-vien)}
+.khoi > header{margin-bottom:16px}
+/* cũ | mới */
+.cm{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.cm article{border-radius:20px;background:var(--tr-nen);padding:16px 14px 14px;display:flex;flex-direction:column;gap:8px}
+.cm article.moi{box-shadow:inset 0 0 0 2.5px var(--tr-tin)}
+.cm h3{margin:0;font-size:18px;font-weight:800;display:flex;align-items:center;gap:8px}
+.cm h3 span{font-size:12px;font-weight:800;padding:2px 9px;border-radius:999px;background:var(--tr-mat-3);color:var(--tr-chu-2)}
+.cm article.moi h3 span{background:var(--tr-tin);color:var(--btg-chu-doan-dam)}
+.cm .hang4{display:grid;grid-template-columns:repeat(4,1fr);align-items:end;justify-items:center;gap:4px;min-height:170px}
+.cm .hang4 img,.cm .hang4 svg{width:124px;height:143px;object-fit:contain}
+.cm .hang4 figure{margin:0;display:flex;flex-direction:column;align-items:center;font-size:12.5px;font-weight:800;color:var(--tr-chu-2)}
+.cm .nho64{display:flex;gap:10px;align-items:flex-end;justify-content:center;padding:6px 0 0;border-top:2px dashed var(--tr-vien)}
+.cm .nho64 img,.cm .nho64 svg{width:64px;height:74px}
+.cm .nho64 small{align-self:center;font-size:12px;color:var(--tr-chu-3);font-weight:700;margin-right:4px}
+.cm ul{margin:4px 0 0;padding-left:18px;font-size:13.5px;color:var(--tr-chu-2);line-height:1.45}
+.cm .trong{display:grid;place-items:center;height:143px;color:var(--tr-chu-3);font-size:13px;grid-column:1/-1}
+/* màu thử */
+.mt{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.mt article{position:relative;border-radius:20px;overflow:hidden;background:var(--tr-nen);display:flex;flex-direction:column}
+.mt article.chon{box-shadow:inset 0 0 0 3px var(--tr-tin)}
+.mt .dau{padding:14px 16px 4px}
+.mt h3{margin:0;font-size:18px;font-weight:800}
+.mt .dau p{margin:2px 0 0;font-size:13px;color:var(--tr-chu-2);min-height:57px}
+.mt .nhan{position:absolute;top:12px;right:12px;font-size:12.5px;font-weight:800;padding:3px 10px;border-radius:999px;background:var(--tr-tin);color:var(--btg-chu-doan-dam)}
+.mt .lon{display:flex;justify-content:center;padding:4px 0 2px}
+.mt .lon svg{width:150px;height:172px}
+.mt .bon{display:flex;justify-content:center;gap:2px;padding:0 8px 10px}
+.mt .bon svg{width:70px;height:80px}
+.mt .toi{background:var(--tr-nen);padding:10px 8px 12px;display:flex;justify-content:center;gap:2px;align-items:flex-end}
+.mt .toi svg{width:70px;height:80px}
+.mt .toi i{font-style:normal;font-size:11.5px;color:var(--tr-chu-3);font-weight:700;align-self:center;margin-right:2px}
+/* cảm xúc */
+.cx{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:10px}
+.cx figure{margin:0;position:relative;display:flex;flex-direction:column;align-items:center;gap:0;padding:14px 4px 10px;border-radius:18px;background:var(--tr-nen);text-align:center}
+.cx svg{width:128px;height:147px}
+.cx b{font-size:15.5px;font-weight:800;margin-top:2px}
+.cx small{font-size:12px;color:var(--tr-chu-2);line-height:1.3}
+.cx .moi{position:absolute;top:8px;right:8px;font-size:11px;font-weight:800;padding:1px 8px;border-radius:999px;background:var(--tr-tim-day);color:var(--btg-chu-doan-dam)}
+.cx .cap{position:absolute;top:8px;left:8px;font-size:11px;font-weight:800;padding:1px 8px;border-radius:999px;background:var(--tr-mat-3);color:var(--tr-chu-2)}
+/* cỡ nhỏ */
+.cn{display:grid;grid-template-columns:1fr 1fr;border-radius:20px;overflow:hidden;border:2px solid var(--tr-vien)}
+.cn > div{background:var(--tr-nen);color:var(--tr-chu);padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.cn h3{margin:0;font-size:15px;font-weight:800}
+.hang{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
+.hang .nhan2{width:96px;font-size:12.5px;color:var(--tr-chu-2);font-weight:700;align-self:center;line-height:1.3}
+.hang figure{margin:0;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:var(--tr-chu-3);font-weight:700}
+.vong{border-radius:50%;overflow:hidden;background:var(--tr-tin-nhat);box-shadow:0 0 0 3px var(--tr-tin)}
+.vong svg{display:block}
+/* ── Điện thoại Lộ trình (ngữ cảnh) ── */
+.dt{width:390px;height:844px;position:relative;overflow:hidden;background:var(--tr-nen);font-family:'DDH Rounded',sans-serif}
+.dt .tren{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:2px solid var(--tr-vien);background:var(--tr-nen)}
+.dt .o{display:flex;align-items:center;gap:5px;font-size:16.5px;font-weight:800}
+.dt .o svg{width:23px;height:23px}
+.dt .o.lua{color:var(--tr-chu-y)} .dt .o.nt{color:var(--tr-nguyen-tu-so)} .dt .o.tt{color:var(--tr-tim-day)}
+.dt .vong-mt{width:44px;height:44px;border-radius:50%;padding:4px;background:conic-gradient(var(--tr-hs) 62%,var(--tr-mat-3) 0)}
+.dt .vong-mt > div{width:36px;height:36px;border-radius:50%;overflow:hidden;background:var(--tr-hs-nhat)}
+.dt .hero{margin:14px 16px 0;padding:16px 18px 20px;border-radius:20px;background:var(--tr-hs-nut);box-shadow:inset 0 -6px 0 var(--tr-hs-day);color:var(--tr-hs-tren);position:relative;overflow:hidden}
+.dt .hero small{display:block;font-size:13px;font-weight:700;opacity:.9;letter-spacing:.04em}
+.dt .hero b{display:block;font-size:26px;font-weight:800;margin:2px 0 12px}
+.dt .thanh{display:flex;align-items:center;gap:10px;font-size:14.5px;font-weight:800}
+.dt .thanh i{flex:1;height:12px;border-radius:99px;background:color-mix(in srgb,var(--tr-hs-tren) 30%,transparent);position:relative;overflow:hidden}
+.dt .thanh i::after{content:'';position:absolute;inset:0 71% 0 0;border-radius:99px;background:var(--tr-hs-tren)}
+.dt .chu-nen{position:absolute;color:var(--tr-mat-3);font-size:22px;font-weight:700;white-space:nowrap}
+.dt .chang{position:absolute;width:72px;height:64px;border-radius:50%;display:grid;place-items:center}
+.dt .chang.xong{background:var(--tr-hs-nut);box-shadow:inset 0 -6px 0 var(--tr-hs-day)}
+.dt .chang.khoa{background:var(--tr-mat-3);box-shadow:inset 0 -6px 0 var(--tr-vien-2)}
+.dt .chang.dang{width:80px;height:74px;background:var(--tr-hs-nut);box-shadow:inset 0 -7px 0 var(--tr-hs-day)}
+.dt .chang svg{width:30px;height:30px}
+.dt .vong-dang{position:absolute;width:104px;height:104px;border-radius:50%;border:7px dashed var(--tr-mat-3)}
+.dt .bat-dau{position:absolute;padding:8px 16px;border-radius:14px;background:var(--tr-mat);border:2px solid var(--tr-vien);box-shadow:0 3px 0 var(--tr-vien);color:var(--tr-dung-chu);font-weight:800;font-size:16px;letter-spacing:.04em}
+.dt .bat-dau::after{content:'';position:absolute;left:50%;bottom:-8px;margin-left:-7px;width:12px;height:12px;background:var(--tr-mat);border-right:2px solid var(--tr-vien);border-bottom:2px solid var(--tr-vien);transform:rotate(45deg)}
+.dt .mol-o{position:absolute}
+.dt .day{position:absolute;left:0;right:0;bottom:0;height:68px;background:var(--tr-mat);border-top:2px solid var(--tr-vien);display:flex;justify-content:space-around;align-items:center}
+.dt .day span{width:56px;height:44px;border-radius:14px;display:grid;place-items:center;color:var(--tr-chu-3)}
+.dt .day span.dang{background:var(--tr-hs-nhat);color:var(--tr-hs-nut);box-shadow:inset 0 0 0 2px var(--tr-hs)}
+.dt .day svg{width:26px;height:26px}
+/* ── BONG BÓNG LỜI TRÊN ĐẦU MOL — đổi màu theo cảm xúc, chỉ token có sẵn ── */
+.bb{--bb-nen:var(--tr-mat);--bb-vien:var(--tr-vien-2);--bb-chu:var(--tr-chu);--bb-bong:color-mix(in srgb,var(--bb-vien) 40%,transparent);
+  position:relative;display:inline-block;max-width:220px;padding:8px 13px 9px;border-radius:16px;border:2px solid var(--bb-vien);background:var(--bb-nen);color:var(--bb-chu);
+  font:700 14.5px/1.32 'DDH Rounded',sans-serif;text-align:left;box-shadow:0 3px 0 var(--bb-bong)}
+.bb::after{content:'';position:absolute;left:var(--duoi,50%);bottom:-8px;width:13px;height:13px;margin-left:-7px;background:var(--bb-nen);
+  border-right:2px solid var(--bb-vien);border-bottom:2px solid var(--bb-vien);border-bottom-right-radius:4px;transform:rotate(45deg)}
+.bb:is([data-cx=vui],[data-cx=chao]){--bb-nen:var(--tr-tin-nhat);--bb-vien:var(--tr-tin);--bb-chu:var(--tr-tin-chu)}
+.bb:is([data-cx=khen],[data-cx=nhay],[data-cx=tuTin]){--bb-nen:var(--tr-dung-nhat);--bb-vien:var(--tr-dung);--bb-chu:var(--tr-dung-chu)}
+.bb:is([data-cx=nghi],[data-cx=ngu]){--bb-nen:var(--tr-mat-2);--bb-vien:var(--tr-vien-2);--bb-chu:var(--tr-chu-2)}
+.bb[data-cx=ngac]{--bb-nen:var(--tr-sao-nhat);--bb-vien:var(--tr-sao);--bb-chu:var(--tr-sao-chu)}
+.bb[data-cx=buon]{--bb-nen:var(--tr-hs-nhat);--bb-vien:var(--tr-hs);--bb-chu:var(--tr-hs-chu)}
+.bb:is([data-cx=doi],[data-cx=nguong],[data-cx=me]){--bb-nen:color-mix(in srgb,var(--tr-tim) 15%,var(--tr-mat));--bb-vien:var(--tr-tim);--bb-chu:var(--tr-tim-chu)}
+.bb[data-cx=buc]{--bb-nen:var(--tr-chu-y-nhat);--bb-vien:var(--tr-chu-y);--bb-chu:var(--tr-chu-y-chu)}
+.bb[data-cx=cau]{--bb-nen:var(--tr-sai-nhat);--bb-vien:color-mix(in oklab,var(--tr-sai) 60%,var(--tr-chu-y));--bb-chu:var(--tr-sai-chu)}
+.bb[data-cx=ratCau]{--bb-nen:var(--tr-sai-day);--bb-vien:color-mix(in oklab,var(--tr-sai-day) 70%,var(--btg-chu-doan));--bb-chu:var(--btg-chu-doan-dam)}
+body.chi-dt main{display:none} body.chi-dt{margin:0} body:not(.chi-dt) .dt-goc{display:none}
+</style></head>
+<body>
+<main>
+  <header>
+    <h1>Mol ống nghiệm «kẹo dẻo» · bản vẽ chờ thầy duyệt</h1>
+    <p class="phu">01/11 · Khối mập mềm như viên kẹo dẻo, đáy tròn to, bụng sáng · một màu tươi làm chủ đạo · mắt to là chính, mí mắt kể cảm xúc · cả thân nhún, vươn, lún theo cảm xúc. Màu lấy từ token thật của app học sinh.</p>
+  </header>
+
+  <section class="khoi" id="cu-moi">
+    <header><h2>Ống nghiệm cũ (thầy chê) · Kẹo dẻo mới</h2>
+      <p class="phu">Cùng khung 200 × 230, cùng bốn cảm xúc, hàng dưới là cỡ 64 px.</p></header>
+    <div class="cm">
+      <article><h3>Ống nghiệm cũ <span>bị chê</span></h3><div class="hang4" id="cu-lon"><div class="trong">(chup.cjs chèn ảnh bản cũ từ nhánh claude/mol-v2-0111)</div></div>
+        <div class="nho64" id="cu-nho"><small>64 px</small></div>
+        <ul><li>Rối: nắp + chữ khắc + vạch chia + ngón cánh + ngón chân + bọt + má.</li><li>Tím nhạt, đục; mặt nạ trắng lớn; mắt chưa đủ to; dáng cứng như cái cốc.</li></ul></article>
+      <article class="moi"><h3>Kẹo dẻo mới <span>đề xuất</span></h3><div class="hang4" id="moi-lon"></div>
+        <div class="nho64" id="moi-nho"><small>64 px</small></div>
+        <ul><li>Bỏ vạch chia, bọt, má, ngón; chữ 6,022·10²³ chỉ một dòng nhỏ trên nắp.</li><li>Ngọc lam tươi; bụng sáng; một vệt bóng. Không mặt nạ: chỉ hai mắt to sát nhau, mí mắt kể cảm xúc.</li></ul></article>
+    </div>
+  </section>
+
+  <section class="khoi" id="mau-thu">
+    <header><h2>Ba màu đã thử</h2>
+      <p class="phu">Cùng hình, chỉ đổi màu chủ đạo (+ sắc đậm cùng họ). Hàng trên nền sáng, hàng dưới nền tối. Cam giữ riêng cho mũi + chân; giận luôn đổi sang đỏ sẫm.</p></header>
+    <div class="mt" id="mt"></div>
+  </section>
+
+  <section class="khoi" id="cam-xuc">
+    <header><h2>Bộ cảm xúc · 11 mặt đang dùng + 4 phương án</h2>
+      <p class="phu">Mí mắt sụp / cong lên kể cảm xúc; cả thân nhảy, vươn, lún, nghiêng. Giận cấp 4–5: thân đổi đỏ sẫm, tròng hồng đỏ, nắp bung lơ lửng trên lửa — không răng, không gân.</p></header>
+    <div class="cx" id="cx"></div>
+  </section>
+
+  <section class="khoi" id="co-nho">
+    <header><h2>Cỡ nhỏ · 28 / 40 / 64 px</h2>
+      <p class="phu">Cả thân vẫn đọc được cảm xúc từ 28 px vì mắt chiếm gần hết mặt. Ô tròn (vòng Mục tiêu, thẻ) dùng nửa trên: nắp + mắt. Chữ trên nắp chỉ hiện từ 96 px (nhỏ hơn thành nét nhiễu).</p></header>
+    <div class="cn" id="cn"></div>
+  </section>
+</main>
+<div class="dt-goc"><div class="dt" id="dt"></div></div>
+
+<script>
+// ═══ HÌNH MOL KẸO DẺO ═══ khung 200 × 230 (viewBox 0 -26 200 230, như mol-dong.ts) ⇒ thay vào app không đổi khung chứa.
+const VB = '0 -26 200 230', VB_DAU = '26 0 148 148'
+const EY = 97, ERX = 22.5, ERY = 25.5, XL = 77.5, XR = 122.5
+// Thân kẹo dẻo: miệng ống hẹp hơn, hông phình, đáy tròn to.
+const THAN = 'M50 45 C41 52 35 66 33 86 C31.5 100 31 114 31 131 C31 168 63 190 100 190 C137 190 169 168 169 131 C169 114 168.5 100 167 86 C165 66 159 52 150 45 Z'
+// Cánh mập bo tròn, mép dưới 3 khía gợi ngón. Gốc (0,0) = vai; hướng xuống; mép ngoài về −x.
+const CANH = 'M7 -5 C-8 -7 -24 9 -24 28 C-24 36 -22 41 -18.5 44.5 A4.6 4.6 0 0 0 -9.6 49.6 A4.6 4.6 0 0 0 -0.4 50 A4.6 4.6 0 0 0 7.6 45 C11.5 30 13.5 7 7 -5 Z'
+const NAP = 'M53 40 C53 22 72 12.5 100 12.5 C128 12.5 147 22 147 40 Z'
+const LUA = 'M66 42 C57 28 66 17 69 5 C75 13 80 11 81 -1 C89 7 94 1 98 -11 C104 1 110 3 114 -5 C118 5 124 9 129 1 C135 15 143 28 134 42 Z'
+
+const TU_THE_CANH = { thong: { a: 13 }, sat: { a: 2 }, ru: { a: -5 }, nanh: { a: -27 }, gio: { a: 150, sau: 1 }, xoe: { a: 58 } }
+/** Bảng cảm xúc. ng = nghiêng (độ), dx/dy = dời, sx/sy = co giãn quanh chân; mat = mắt; cL/cR = cánh; nap = nắp; fx = hiệu ứng. */
+const CX = {
+  vui:   { ten: 'vui', ghi: 'mặc định · làm đúng', ng: -5, mat: { px: 2, py: 2 }, mieng: 'cuoi', cL: 'thong', cR: 'thong' },
+  khen:  { ten: 'khen', ghi: 'đúng liền · kỷ lục', dy: -18, sx: .92, sy: 1.09, mat: { kieu: 'cuoi' }, mieng: 'cuoiMo', cL: { a: 152, sau: 1 }, cR: { a: 152, sau: 1 }, chan: 'kieng', nap: 'nay', fx: ['sao'] },
+  chao:  { ten: 'chào', ghi: 'mở app', ng: 7, mat: { px: 3, py: 1 }, mieng: 'cuoiMo', cL: 'thong', cR: { a: 148, sau: 1 }, fx: ['vay'] },
+  nghi:  { ten: 'nghĩ', ghi: 'gợi ý · đang làm', ng: 9, mat: { px: 6, py: -7, pr: 11, tren: [-.72, -.95] }, mieng: 'lech', cL: 'thong', cR: { a: -80, y: 6 }, fx: ['hoi'] },
+  ngac:  { ten: 'ngạc nhiên', ghi: 'chạm vào Mol', dy: -6, sx: .94, sy: 1.08, mat: { rx: 21.5, ry: 24.5, pr: 8, px: 0, py: 0 }, mieng: 'oTo', cL: 'xoe', cR: 'xoe', nap: 'nay', fx: ['cham'] },
+  buon:  { ten: 'buồn', ghi: 'làm sai', ng: -9, sx: 1.08, sy: .9, mat: { px: -2, py: 7, pr: 10.5, tren: [-1.08, -.28], cong: 3 }, mieng: 'buon', cL: 'ru', cR: 'ru', chan: 'khep', fx: ['giot'] },
+  ngu:   { ten: 'ngủ', ghi: 'lâu không học', ng: -8, sx: 1.07, sy: .92, mat: { kieu: 'nham' }, mieng: 'oNho', cL: 'sat', cR: 'sat', chan: 'khep', nap: 'lech', fx: ['zz'] },
+  doi:   { ten: 'dỗi', cap: 2, ghi: 'mí sụp · liếc ngang', ng: -6, mat: { px: -8, py: 4, pr: 11, tren: [-.12, -.18] }, mieng: 'doi', cL: 'nanh', cR: 'nanh', fx: [] },
+  buc:   { ten: 'bực', cap: 3, ghi: 'mày chau · nắp hé xì hơi', sx: .97, sy: 1.03, mat: { px: 0, py: 4, pr: 10.5, tren: [-.05, -.82] }, mieng: 'phang', cL: 'nanh', cR: 'nanh', nap: 'he', fx: ['khoi'] },
+  cau:   { ten: 'cáu', cap: 4, ghi: 'đỏ sẫm · nắp bung · lửa', gian: 'cau', sx: .96, sy: 1.05, mat: { px: 0, py: 4, pr: 8.5, trong: 1, tren: [.08, -.78] }, mieng: 'gian', cL: 'nanh', cR: 'nanh', nap: 'bung', lua: 1 },
+  ratCau:{ ten: 'rất cáu', cap: 5, ghi: 'lửa to · nắp bay · rung', gian: 'ratCau', dy: -2, sx: .98, sy: 1.07, mat: { px: 0, py: 4, pr: 6.5, trong: 1, tren: [.24, -.62] }, mieng: 'gian2', cL: { a: 118, sau: 1 }, cR: { a: 118, sau: 1 }, nap: 'bay', lua: 2, fx: ['rung'] },
+  nguong:{ ten: 'ngượng', moi: 1, ghi: 'được khen · nhận quà', ng: 9, sx: 1.02, sy: .97, mat: { px: -6, py: 8, pr: 11.5, tren: [-.5, -.62] }, mieng: 'meo', cL: { a: -50, y: 22 }, cR: { a: -50, y: 22 }, chan: 'khep', fx: ['ma'] },
+  me:    { ten: 'mê', moi: 1, ghi: 'mở rương · thành tích', ng: -6, mat: { kieu: 'tim' }, mieng: 'cuoiMo', cL: { a: -58, y: 14 }, cR: { a: -58, y: 14 }, fx: ['tim'] },
+  nhay:  { ten: 'vui nhảy', moi: 1, ghi: 'giữ chuỗi ngày', dy: -24, ng: 10, sx: .94, sy: 1.07, mat: { kieu: 'cuoi' }, mieng: 'cuoiMo', cL: { a: 160, sau: 1 }, cR: { a: 118, sau: 1 }, chan: 'nhac', fx: ['sao'] },
+  tuTin: { ten: 'tự tin', moi: 1, ghi: 'đủ mức hôm nay', ng: -5, sx: 1.03, sy: 1.02, mat: { px: 4, py: 1, pr: 10.5, tren: [-.42, -.48], duoi: .55 }, mieng: 'mim', cL: 'nanh', cR: 'nanh', fx: ['sao1'] },
+}
+const THU_TU = ['vui', 'khen', 'chao', 'nghi', 'ngac', 'buon', 'ngu', 'doi', 'buc', 'cau', 'ratCau', 'nguong', 'me', 'nhay', 'tuTin']
+
+let uid = 0
+let VONG = new URLSearchParams(location.search).get('vong') || 'sang'
+const r1 = (n) => Math.round(n * 10) / 10
+function canh(ben, t) {
+  const c = typeof t === 'string' ? TU_THE_CANH[t] : t
+  const px = (ben < 0 ? 41 : 159) + (c.x ?? 0) * -ben, py = 116 + (c.y ?? 0)
+  return { sau: !!c.sau, svg: `<g transform="translate(${px} ${py}) scale(${ben < 0 ? .9 : -.9} .9) rotate(${c.a})"><path d="${CANH}" class="k-day"/></g>` }
+}
+function tim(cx, cy, s, cls) {
+  return `<path d="M${cx} ${r1(cy + s * .8)} C${r1(cx - s * 1.25)} ${r1(cy - s * .05)} ${r1(cx - s * .78)} ${r1(cy - s * 1.05)} ${cx} ${r1(cy - s * .42)} C${r1(cx + s * .78)} ${r1(cy - s * 1.05)} ${r1(cx + s * 1.25)} ${r1(cy - s * .05)} ${cx} ${r1(cy + s * .8)} Z" class="${cls}"/>`
+}
+function sao(x, y, s) { return `<path d="M${x} ${y - s} Q${x} ${y} ${x + s} ${y} Q${x} ${y} ${x} ${y + s} Q${x} ${y} ${x - s} ${y} Q${x} ${y} ${x} ${y - s} Z" class="k-sao"/>` }
+
+function mat(e, u) {
+  const rx = e.rx ?? ERX, ry = e.ry ?? ERY
+  let s = ''
+  for (const [x, ben] of [[XL, -1], [XR, 1]]) {
+    const id = `${u}m${ben < 0 ? 'L' : 'R'}`
+    if (e.kieu === 'nham') { // ngủ: không tròng trắng — chỉ một vạch mi cong «‿» trên thân
+      s += `<path d="M${x - 14} ${EY + 1} Q${x} ${EY + 13} ${x + 14} ${EY + 1}" class="k-net" stroke-width="5"/>`
+      continue
+    }
+    if (e.kieu === 'cuoi') { // cười híp «∩»: vầng trăng trắng, viền sáng
+      const y0 = EY + 6
+      s += `<path d="M${x - rx} ${y0} C${x - rx} ${EY - ry * 1.25} ${x + rx} ${EY - ry * 1.25} ${x + rx} ${y0} Q${x} ${r1(EY - ry * .62)} ${x - rx} ${y0} Z" class="k-trang k-vien-sang"/>`
+      continue
+    }
+    if (VONG === 'sang') s += `<ellipse cx="${x}" cy="${EY}" rx="${rx + 3.5}" ry="${ry + 3.5}" class="k-sang"/>`
+    s += `<clipPath id="${id}"><ellipse cx="${x}" cy="${EY}" rx="${rx}" ry="${ry}"/></clipPath><ellipse cx="${x}" cy="${EY}" rx="${rx}" ry="${ry}" class="k-trang"/><g clip-path="url(#${id})">`
+    const px = x + (e.px ?? 2), py = EY + (e.py ?? 2), pr = e.pr ?? 13
+    if (e.kieu === 'tim') s += tim(x, EY + 3, 13.5, 'k-do') + `<circle cx="${x + 4.5}" cy="${EY - 2}" r="2.8" class="k-trang"/>`
+    else {
+      if (e.trong) s += `<circle cx="${px}" cy="${py}" r="${pr + 5.5}" class="k-trong"/>`
+      s += `<circle cx="${px}" cy="${py}" r="${pr}" class="k-muc"/><circle cx="${r1(px + pr * .36)}" cy="${r1(py - pr * .42)}" r="${r1(Math.max(2.6, pr * .37))}" class="k-trang"/><circle cx="${r1(px - pr * .42)}" cy="${r1(py + pr * .44)}" r="${r1(Math.max(1.3, pr * .16))}" class="k-trang"/>`
+    }
+    if (e.tren) { // mí trên: [trong, ngoài] theo đơn vị ry (−1 = mép trên, 0 = giữa)
+      const [hi, ho] = e.tren, xi = x - ben * (rx + 4), xo = x + ben * (rx + 4)
+      const yi = EY + hi * ry, yo = EY + ho * ry, yc = (yi + yo) / 2 + (e.cong ?? 0)
+      s += `<path d="M${xi} ${EY - ry - 8} L${xo} ${EY - ry - 8} L${xo} ${r1(yo)} Q${x} ${r1(yc)} ${xi} ${r1(yi)} Z" class="k-than"/><path d="M${xo} ${r1(yo)} Q${x} ${r1(yc)} ${xi} ${r1(yi)}" class="k-mi"/>`
+    }
+    if (e.duoi != null) { // mí dưới cong lên (ngượng / tự tin)
+      const yb = EY + e.duoi * ry
+      s += `<path d="M${x - rx - 4} ${EY + ry + 6} L${x - rx - 4} ${r1(yb + ry * .35)} Q${x} ${r1(yb - ry * .35)} ${x + rx + 4} ${r1(yb + ry * .35)} L${x + rx + 4} ${EY + ry + 6} Z" class="k-than"/><path d="M${x - rx - 4} ${r1(yb + ry * .35)} Q${x} ${r1(yb - ry * .35)} ${x + rx + 4} ${r1(yb + ry * .35)}" class="k-mi"/>`
+    }
+    s += '</g>'
+    if (VONG === 'day') s += `<ellipse cx="${x}" cy="${EY}" rx="${rx}" ry="${ry}" class="k-mi" style="stroke-width:3"/>`
+  }
+  return s
+}
+function mieng(k) { return `<g transform="translate(0 5)">${mieng0(k)}</g>` }
+function mieng0(k) {
+  const net = (d, w = 3.6) => `<path d="${d}" class="k-net" stroke-width="${w}"/>`
+  switch (k) {
+    case 'cuoi': return net('M92 129 Q100 137.5 108 129')
+    case 'cuoiMo': return '<path d="M89.5 127.5 Q100 129.5 110.5 127.5 Q109.5 141.5 100 141.5 Q90.5 141.5 89.5 127.5 Z" class="k-muc"/><path d="M94 137.6 Q100 132.6 106 137.6 Q100 141.6 94 137.6 Z" class="k-luoi"/>'
+    case 'oTo': return '<ellipse cx="100" cy="134" rx="5.6" ry="7.2" class="k-muc"/>'
+    case 'oNho': return '<ellipse cx="100" cy="132" rx="3.4" ry="3.9" class="k-muc"/>'
+    case 'buon': return net('M92.5 135 Q100 128.5 107.5 135')
+    case 'lech': return net('M98 132.5 Q103 130.5 108 132')
+    case 'doi': return net('M93 132.5 Q96.5 129.5 100 132.5 Q103.5 135.5 107 132.5', 3.4)
+    case 'phang': return net('M93 133 Q100 130.5 107 133')
+    case 'gian': return net('M92 135.5 Q100 129 108 135.5', 3.9)
+    case 'gian2': return '<path d="M89.5 138.5 Q100 124.5 110.5 138.5 Q100 134.5 89.5 138.5 Z" class="k-muc"/>'
+    case 'meo': return net('M92 130 Q96 134.5 100 130.5 Q104 134.5 108 130', 3.3)
+    case 'mim': return net('M92 131 Q101 136.5 108.5 128', 3.6)
+    default: return ''
+  }
+}
+function chan(k) {
+  const mot = (x, dy = 0, a = 0) => `<g transform="rotate(${a} ${x} ${190 + dy})"><ellipse cx="${x}" cy="${193 + dy}" rx="14.5" ry="9" class="k-cam-d"/><ellipse cx="${x}" cy="${191.5 + dy}" rx="13" ry="7.2" class="k-cam"/></g>`
+  if (k === 'khep') return mot(86) + mot(114)
+  if (k === 'kieng') return mot(83, 1, 14) + mot(117, 1, -14)
+  if (k === 'nhac') return mot(82, 0, 10) + mot(121, -9, -32)
+  return mot(80) + mot(120)
+}
+function nap(k, chu) {
+  const t = { dong: '', he: 'translate(0 -6) rotate(6 100 25)', nay: 'translate(0 -8) rotate(-7 100 25)', lech: 'rotate(-7 100 38)', bung: 'translate(5 -32) rotate(13 100 25)', bay: 'translate(9 -44) rotate(24 100 25)' }[k || 'dong']
+  return `<g transform="${t}"><path d="${NAP}" class="k-day"/>${chu ? '<text x="100" y="31" text-anchor="middle" class="k-chu">6,022·10²³</text>' : ''}</g>`
+}
+function lua(cap) {
+  const to = cap === 2 ? 1.2 : 1
+  const lop = (k, cls) => `<path d="${LUA}" class="${cls}" transform="translate(100 42) scale(${r1(to * k * 100) / 100}) translate(-100 -42)"/>`
+  let s = lop(1, 'k-lua1') + lop(.74, 'k-lua2') + lop(.46, 'k-lua3')
+  if (cap === 2) s += '<circle cx="58" cy="2" r="3" class="k-lua2"/><circle cx="146" cy="-4" r="2.6" class="k-lua3"/><circle cx="150" cy="16" r="2" class="k-lua1"/>'
+  return s
+}
+function fxNgoai(ds) {
+  let s = ''
+  for (const f of ds || []) {
+    if (f === 'sao') s += sao(28, 24, 9) + sao(172, 40, 7) + sao(160, 2, 4.5)
+    if (f === 'sao1') s += sao(170, 30, 7) + sao(158, 8, 4)
+    if (f === 'vay') s += '<path d="M180 22 Q188 34 182 48" class="k-vet"/><path d="M190 14 Q200 32 192 52" class="k-vet" opacity=".6"/>'
+    if (f === 'hoi') s += '<text x="160" y="22" class="k-fx">?</text>'
+    if (f === 'zz') s += '<text x="146" y="14" class="k-fx" style="font-size:20px">z</text><text x="162" y="-2" class="k-fx" style="font-size:14px">z</text>'
+    if (f === 'cham') s += '<path d="M44 14 l-8 -8 M38 30 l-11 -2 M156 14 l8 -8 M162 30 l11 -2" class="k-vet"/>'
+    if (f === 'tim') s += tim(30, 40, 8, 'k-do') + tim(170, 26, 10, 'k-do') + tim(158, 62, 5.5, 'k-do')
+    if (f === 'khoi') s += '<circle cx="150" cy="24" r="6.5" class="k-khoi"/><circle cx="161" cy="13" r="4.8" class="k-khoi"/><circle cx="170" cy="3" r="3.2" class="k-khoi"/>'
+    if (f === 'rung') s += '<path d="M20 78 l-9 -5 M17 96 h-11 M20 114 l-9 5 M180 78 l9 -5 M183 96 h11 M180 114 l9 5" class="k-rung"/>'
+  }
+  return s
+}
+function fxTrong(ds) {
+  let s = ''
+  for (const f of ds || []) {
+    if (f === 'giot') s += '<path d="M60 112 Q53 123 57 127 Q62 130 64.5 125 Q66 120 60 112 Z" class="k-giot"/>'
+    if (f === 'ma') s += '<ellipse cx="56" cy="128" rx="10" ry="5.5" class="k-ma"/><ellipse cx="144" cy="128" rx="10" ry="5.5" class="k-ma"/>'
+  }
+  return s
+}
+/** Vẽ một Mol. o: { w, h, vb, mau ('tin' | 'tim' | 'hs'), chu (khắc chữ trên nắp; mặc định khi w ≥ 64) } */
+function mol(m, o = {}) {
+  const c = CX[m], u = 'k' + (++uid)
+  const w = o.w ?? 200, h = o.h ?? 230, vb = o.vb ?? VB, chu = o.chu ?? w >= 96
+  const tf = `translate(${c.dx ?? 0} ${c.dy ?? 0}) rotate(${c.ng ?? 0} 100 196) translate(100 196) scale(${c.sx ?? 1} ${c.sy ?? 1}) translate(-100 -196)`
+  const cL = canh(-1, c.cL), cR = canh(1, c.cR)
+  const bd = 1 + (c.dy ?? 0) / 70
+  let s = `<ellipse cx="100" cy="201" rx="${r1(46 * bd)}" ry="${r1(4.6 * bd)}" class="k-bongdat"/><g transform="${tf}">`
+  s += (cL.sau ? cL.svg : '') + (cR.sau ? cR.svg : '') + chan(c.chan)
+  // thân: sắc đậm làm nền ⇒ màu chủ đạo dời lên-trái ⇒ còn một viền bóng phẳng ở mép phải-dưới (khối mềm, không gradient)
+  s += `<clipPath id="${u}t"><path d="${THAN}"/></clipPath><path d="${THAN}" class="k-day"/><g clip-path="url(#${u}t)"><path d="${THAN}" class="k-than" transform="translate(-5 -1) translate(100 46) scale(.965 .965) translate(-100 -46)"/><ellipse cx="100" cy="168" rx="42" ry="19" class="k-sang"/></g>`
+  s += '<path d="M51 62 C46.5 76 43.5 90 43 106" class="k-bong" stroke-width="6.5"/>'
+  if (c.lua) s += lua(c.lua === 2 ? 2 : 1)
+  s += '<rect x="38" y="35" width="124" height="13" rx="6.5" class="k-sang"/>' // vành miệng ống
+  s += nap(c.nap, chu)
+  s += mat(c.mat || {}, u)
+  s += '<ellipse cx="100" cy="124.5" rx="6.6" ry="5.6" class="k-cam"/><circle cx="102.4" cy="122.6" r="1.7" class="k-trang" opacity=".7"/>'
+  s += mieng(c.mieng) + fxTrong(c.fx)
+  s += (cL.sau ? '' : cL.svg) + (cR.sau ? '' : cR.svg) + '</g>' + fxNgoai(c.fx)
+  return `<svg class="kd" data-mau="${o.mau ?? 'tin'}"${c.gian ? ` data-gian="${c.gian}"` : ''}${vb === VB ? '' : ' style="overflow:hidden"'} viewBox="${vb}" width="${w}" height="${h}" role="img" aria-label="Mol ${c.ten}">${s}</svg>`
+}
+
+// ── Cũ | mới ──
+const BON = ['vui', 'khen', 'buon', 'cau']
+document.getElementById('moi-lon').innerHTML = BON.map((m) => `<figure>${mol(m, { w: 124, h: 143 })}${CX[m].ten}</figure>`).join('')
+document.getElementById('moi-nho').innerHTML += BON.map((m) => mol(m, { w: 64, h: 74 })).join('')
+/** chup.cjs gọi: chèn ảnh PNG bản ống nghiệm cũ (chụp từ nhánh claude/mol-v2-0111). */
+window.chenCu = (lon, nho) => {
+  document.getElementById('cu-lon').innerHTML = lon.map((src, i) => `<figure><img src="${src}" alt="">${CX[BON[i]].ten}</figure>`).join('')
+  document.getElementById('cu-nho').innerHTML = '<small>64 px</small>' + nho.map((src) => `<img src="${src}" alt="">`).join('')
+}
+
+// ── Màu thử ──
+const MAU = [
+  ['tin', 'Ngọc lam', '<code>--tr-tin</code> · đậm <code>--tr-tin-day</code>', 'Tươi, mát, «kẹo dẻo» nhất; trái màu với cam ⇒ mũi + chân nổi; xa xanh lá Duo, khác xanh Mol bình cầu; giận đỏ sẫm đổi hẳn sắc.', 1],
+  ['tim', 'Hồng kẹo', '<code>--tr-tim</code> · đậm <code>--tr-tim-day</code>', 'Rất ngọt, nhưng gần đỏ giận ⇒ cáu đổi sắc ít rõ; hồng + cam hơi chói.'],
+  ['hs', 'Chàm app', '<code>--tr-hs-nut</code> · đậm <code>--tr-hs-day</code>', 'Hợp màu chính app học sinh, nhưng chìm vào nút chặng / thẻ chàm và gần lối «tím đục» bị chê.'],
+]
+document.getElementById('mt').innerHTML = MAU.map(([k, ten, tok, ghi, chon]) => `<article class="${chon ? 'chon' : ''}">${chon ? '<span class="nhan">Chọn</span>' : ''}
+  <div class="dau"><h3>${ten}</h3><p>${tok}<br>${ghi}</p></div>
+  <div class="lon">${mol('vui', { w: 150, h: 172, mau: k })}</div>
+  <div class="bon">${['khen', 'buon', 'ngu', 'cau'].map((m) => mol(m, { w: 70, h: 80, mau: k })).join('')}</div>
+  <div class="toi"><i>tối</i>${['vui', 'khen', 'buon', 'cau'].map((m) => mol(m, { w: 70, h: 80, mau: k })).join('')}</div></article>`).join('')
+
+// ── Bộ cảm xúc ──
+document.getElementById('cx').innerHTML = THU_TU.map((m) => { const c = CX[m]; return `<figure>${c.cap ? `<span class="cap">cấp ${c.cap}</span>` : ''}${c.moi ? '<span class="moi">mới</span>' : ''}${mol(m, { w: 128, h: 147 })}<b>${c.ten}</b><small>${c.ghi}</small></figure>` }).join('')
+
+// ── Cỡ nhỏ ──
+const coNho = (cls, ten) => `<div class="${cls}"><h3>${ten}</h3>
+  <div class="hang"><span class="nhan2">Cả thân · vui</span>${[28, 40, 64].map((c) => `<figure>${mol('vui', { w: c, h: Math.round(c * 1.15) })}${c} px</figure>`).join('')}</div>
+  <div class="hang"><span class="nhan2">Cả thân · 40 px</span>${['khen', 'buon', 'ngu', 'cau', 'ratCau'].map((m) => `<figure>${mol(m, { w: 40, h: 46 })}${CX[m].ten}</figure>`).join('')}</div>
+  <div class="hang"><span class="nhan2">Cả thân · 64 px</span>${['khen', 'buon', 'cau', 'ratCau'].map((m) => `<figure>${mol(m, { w: 64, h: 74 })}${CX[m].ten}</figure>`).join('')}</div>
+  <div class="hang"><span class="nhan2">Ô tròn 40 · 28 px (nửa trên)</span>${['vui', 'buon', 'doi', 'cau'].map((m) => `<figure><div class="vong" style="width:40px;height:40px">${mol(m, { w: 40, h: 40, vb: VB_DAU })}</div>${CX[m].ten}</figure>`).join('')}${['vui', 'ratCau'].map((m) => `<figure><div class="vong" style="width:28px;height:28px">${mol(m, { w: 28, h: 28, vb: VB_DAU })}</div>${CX[m].ten} 28</figure>`).join('')}</div></div>`
+document.getElementById('cn').innerHTML = coNho('sang', 'Nền sáng') + coNho('toi', 'Nền tối')
+
+// ── Điện thoại: Lộ trình học sinh ──
+const kiemSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'
+const luaIc = '<svg viewBox="0 0 24 24"><path d="M12 2.5c1 3.2 4.8 5.2 4.8 10.1A4.8 4.8 0 0 1 12 21.5a4.8 4.8 0 0 1-4.8-4.9c0-2.4 1.2-3.6 2.3-4.9.3 1.5 1 2.3 1.9 2.6C11 11.2 11 6.5 12 2.5Z" fill="currentColor"/></svg>'
+const ntIc = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-60 12 12)"/><circle cx="12" cy="12" r="2.2" fill="currentColor"/></svg>'
+const ttIc = '<svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7Z" fill="currentColor"/></svg>'
+const saoIc = '<svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7Z" fill="var(--tr-hs-tren)"/></svg>'
+const khoaIc = '<svg viewBox="0 0 24 24" fill="none" stroke="var(--tr-chu-2)" stroke-width="2.6" stroke-linecap="round"><rect x="5" y="10.5" width="14" height="10" rx="3"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></svg>'
+const dayIc = ['<path d="M5 6h9a3 3 0 0 1 0 6H10a3 3 0 0 0 0 6h9"/><circle cx="5" cy="6" r="2"/><circle cx="19" cy="18" r="2"/>', '<path d="M14.5 6.5a4 4 0 0 0 5 5l-8 8a2.5 2.5 0 0 1-3.5-3.5Z"/>', '<path d="M7 4h10v5a5 5 0 0 1-10 0Z"/><path d="M12 14v4M8 20h8"/>', '<path d="M4 7h16M4 12h16M4 17h16"/>']
+const DINH = { cau: -46, ratCau: -62 } // đỉnh hình khi nắp bung (đơn vị khung vẽ); mặc định 10
+function dtHtml(m, chu) {
+  const MX = 206, MY = 352, MW = 150, MH = 173, W = 390, BW = 214
+  const tam = MX + MW / 2, dinh = MY + ((DINH[m] ?? 10) + 26) * MH / 230
+  const trai = Math.min(Math.max(tam - BW / 2, 12), W - 12 - BW), duoi = Math.round(tam - 14 - trai)
+  return `
+  <div class="tren"><span class="o lua">${luaIc}12</span><span class="o nt">${ntIc}340</span><span class="o tt">${ttIc}5</span>
+    <div class="vong-mt"><div>${mol(m, { w: 36, h: 36, vb: VB_DAU })}</div></div></div>
+  <div class="hero"><small>CHƯƠNG 1 · HOÁ 12</small><b>Este – Lipid</b><div class="thanh"><i></i>2/7 chặng</div></div>
+  <span class="chu-nen" style="left:24px;top:330px">n = m / M</span><span class="chu-nen" style="left:200px;top:580px">pV = nRT</span>
+  <span class="chu-nen" style="left:30px;top:660px">CaCO₃ → CaO + CO₂</span><span class="chu-nen" style="left:262px;top:552px">ΔH &lt; 0</span>
+  <span class="chang xong" style="left:132px;top:360px;color:var(--tr-hs-tren)">${kiemSvg}</span>
+  <span class="chang xong" style="left:70px;top:452px;color:var(--tr-hs-tren)">${kiemSvg}</span>
+  <span class="vong-dang" style="left:58px;top:566px"></span><span class="chang dang" style="left:70px;top:580px">${saoIc}</span>
+  <span class="bat-dau" style="left:52px;top:512px">BẮT ĐẦU</span>
+  <span class="chang khoa" style="left:126px;top:694px">${khoaIc}</span>
+  <div class="mol-o" style="left:${MX}px;top:${MY}px">${mol(m, { w: MW, h: MH })}</div>
+  <div class="bb" data-cx="${m}" style="position:absolute;left:${trai}px;bottom:${Math.round(844 - (dinh - 12))}px;width:${BW}px;--duoi:${duoi}px">${chu}</div>
+  <nav class="day">${dayIc.map((p, i) => `<span class="${i ? '' : 'dang'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${p}</svg></span>`).join('')}</nav>`
+}
+document.getElementById('dt').innerHTML = dtHtml('ratCau', 'Cáu lắm rồi! 5 câu liền chưa tính — đọc kĩ đề nhé')
+
+if (location.search.includes('toi')) document.documentElement.setAttribute('data-toi', '')
+if (location.search.includes('lo-trinh')) document.body.classList.add('chi-dt')
+</script>
+</body></html>
