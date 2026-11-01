@@ -1,0 +1,301 @@
+{
+ "ghiChu": "Kiểm trên BẢN BUILD THẬT (dist/, chup-ban-that.ts), máy chủ giả qua page.route. khongCuon = trang (và khung .mtc) không cuộn; chuCat phải rỗng; baCham = rút gọn sạch bằng «…».",
+ "capNhat": "2026-11-01T18:00:54.233Z",
+ "kho": {
+  "doc-390-sang": {
+   "khung": "390×844",
+   "sangToi": "sáng",
+   "con": "tot",
+   "bam": null,
+   "dat": true,
+   "cao": 844,
+   "khongCuon": true,
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuCat": [],
+   "baCham": [
+    "Bài 10/10 con làm chắc Phần I. Phầ",
+    "Kiểm tra 45 phút · Ester – Lipid ·",
+    "Xà phòng hoá chất béo",
+    "Số câu đúng / đã làm gần đây",
+    "23:59 · còn 2 chặng"
+   ],
+   "loiTrang": [],
+   "kb": 120
+  },
+  "doc-390-toi": {
+   "khung": "390×844",
+   "sangToi": "tối",
+   "con": "tot",
+   "bam": null,
+   "dat": true,
+   "cao": 844,
+   "khongCuon": true,
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuCat": [],
+   "baCham": [
+    "Bài 10/10 con làm chắc Phần I. Phầ",
+    "Kiểm tra 45 phút · Ester – Lipid ·",
+    "Xà phòng hoá chất béo",
+    "Số câu đúng / đã làm gần đây",
+    "23:59 · còn 2 chặng"
+   ],
+   "loiTrang": [],
+   "kb": 117
+  },
+  "zfold-gap-360-sang": {
+   "khung": "360×800",
+   "sangToi": "sáng",
+   "con": "tot",
+   "bam": null,
+   "dat": true,
+   "cao": 800,
+   "khongCuon": true,
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuCat": [],
+   "baCham": [
+    "Bài 10/10 con làm chắc Phần I. Phầ",
+    "tự nghĩ, tự sửa",
+    "bỏ ngày, làm ít",
+    "Kiểm tra gần nhất",
+    "Kiểm tra 45 phút · Ester – Lipid ·",
+    "Xà phòng hoá chất béo",
+    "Hiệu suất ester hoá",
+    "Hạn nộp BTVN",
+    "23:59 · còn 2 chặng"
+   ],
+   "loiTrang": [],
+   "kb": 104
+  },
+  "ngang-844-sang": {
+   "khung": "844×390",
+   "sangToi": "sáng",
+   "con": "tot",
+   "bam": null,
+   "dat": true,
+   "cao": 390,
+   "khongCuon": true,
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuCat": [],
+   "baCham": [
+    "Bài 10/10 con làm chắc Phần I. Phầ",
+    "Anh chị nên làm gì1/2 · Xem thêm",
+    "1/2 · Xem thêm"
+   ],
+   "loiTrang": [],
+   "kb": 116
+  },
+  "zfold-mo-904-sang": {
+   "khung": "904×690",
+   "sangToi": "sáng",
+   "con": "tot",
+   "bam": null,
+   "dat": true,
+   "cao": 690,
+   "khongCuon": true,
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuCat": [],
+   "baCham": [
+    "Bài 10/10 con làm chắc Phần I. Phầ",
+    "9/11 câu sai đã tự sửa",
+    "3/212 lượt chọn vội",
+    "12/14 ngày đủ mức",
+    "1/14 ngày không học"
+   ],
+   "loiTrang": [],
+   "kb": 122
+  },
+  "may-tinh-bang-1024-sang": {
+   "khung": "1024×768",
+   "sangToi": "sáng",
+   "con": "tot",
+   "bam": null,
+   "dat": true,
+   "cao": 768,
+   "khongCuon": true,
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuCat": [],
+   "baCham": [
+    "9/11 câu sai đã tự sửa"
+   ],
+   "loiTrang": [],
+   "kb": 102
+  },
+  "may-tinh-1440-sang": {
+   "khung": "1440×900",
+   "sangToi": "sáng",
+   "con": "tot",
+   "bam": null,
+   "dat": true,
+   "cao": 900,
+   "khongCuon": true,
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuCat": [],
+   "baCham": [],
+   "loiTrang": [],
+   "kb": 127
+  },
+  "may-tinh-1440-toi": {
+   "khung": "1440×900",
+   "sangToi": "tối",
+   "con": "tot",
+   "bam": null,
+   "dat": true,
+   "cao": 900,
+   "khongCuon": true,
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuCat": [],
+   "baCham": [],
+   "loiTrang": [],
+   "kb": 125
+  },
+  "con-chua-tot-390-sang": {
+   "khung": "390×844",
+   "sangToi": "sáng",
+   "con": "chua-tot",
+   "bam": null,
+   "dat": true,
+   "cao": 844,
+   "khongCuon": true,
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuCat": [],
+   "baCham": [
+    "Bài 10/10 con làm chắc Phần I. Phầ",
+    "Kiểm tra 45 phút · Ester – Lipid ·",
+    "Xà phòng hoá chất béo",
+    "Số câu đúng / đã làm gần đây",
+    "23:59 · còn 2 chặng"
+   ],
+   "loiTrang": [],
+   "kb": 120
+  },
+  "tam-doi-pho-390-sang": {
+   "khung": "390×844",
+   "sangToi": "sáng",
+   "con": "chua-tot",
+   "bam": ".mtc-so[data-ma=\"dp\"]",
+   "dat": true,
+   "cao": 844,
+   "khongCuon": true,
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuCat": [],
+   "baCham": [
+    "Bài 10/10 con làm chắc Phần I. Phầ",
+    "Kiểm tra 45 phút · Ester – Lipid ·",
+    "Xà phòng hoá chất béo",
+    "Số câu đúng / đã làm gần đây",
+    "23:59 · còn 2 chặng"
+   ],
+   "loiTrang": [],
+   "kb": 90
+  },
+  "tam-diem-904-sang": {
+   "khung": "904×690",
+   "sangToi": "sáng",
+   "con": "tot",
+   "bam": "[data-vung=\"diem-gan-nhat\"]",
+   "dat": true,
+   "cao": 690,
+   "khongCuon": true,
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuCat": [],
+   "baCham": [
+    "Bài 10/10 con làm chắc Phần I. Phầ",
+    "9/11 câu sai đã tự sửa",
+    "3/212 lượt chọn vội",
+    "12/14 ngày đủ mức",
+    "1/14 ngày không học"
+   ],
+   "loiTrang": [],
+   "kb": 98
+  },
+  "kiem-390x740": {
+   "khung": "390×740",
+   "sangToi": "sáng",
+   "con": "tot",
+   "bam": null,
+   "dat": true,
+   "cao": 740,
+   "khongCuon": true,
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuCat": [],
+   "baCham": [
+    "Bài 10/10 con làm chắc Phần I. Phầ",
+    "Xà phòng hoá chất béo",
+    "23:59 · còn 2 chặng"
+   ],
+   "loiTrang": [],
+   "kb": null
+  },
+  "kiem-360x700": {
+   "khung": "360×700",
+   "sangToi": "sáng",
+   "con": "tot",
+   "bam": null,
+   "dat": true,
+   "cao": 700,
+   "khongCuon": true,
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuCat": [],
+   "baCham": [
+    "Bài 10/10 con làm chắc Phần I. Phầ",
+    "tự nghĩ, tự sửa",
+    "bỏ ngày, làm ít",
+    "Xà phòng hoá chất béo",
+    "Hiệu suất ester hoá",
+    "Hạn nộp BTVN",
+    "23:59 · còn 2 chặng"
+   ],
+   "loiTrang": [],
+   "kb": null
+  },
+  "kiem-844x390-chua-tot": {
+   "khung": "844×390",
+   "sangToi": "sáng",
+   "con": "chua-tot",
+   "bam": null,
+   "dat": true,
+   "cao": 390,
+   "khongCuon": true,
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuCat": [],
+   "baCham": [
+    "Bài 10/10 con làm chắc Phần I. Phầ",
+    "Anh chị nên làm gì1/3 · Xem thêm",
+    "1/3 · Xem thêm",
+    "Học thật",
+    "Chăm"
+   ],
+   "loiTrang": [],
+   "kb": null
+  },
+  "kiem-1280x720": {
+   "khung": "1280×720",
+   "sangToi": "sáng",
+   "con": "tot",
+   "bam": null,
+   "dat": true,
+   "cao": 720,
+   "khongCuon": true,
+   "tranNgang": 0,
+   "dichNho": [],
+   "chuCat": [],
+   "baCham": [],
+   "loiTrang": [],
+   "kb": null
+  }
+ }
+}
