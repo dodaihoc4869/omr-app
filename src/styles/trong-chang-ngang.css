@@ -105,6 +105,16 @@
   }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-lg-dau { margin-right: calc(-1 * max(20px, env(safe-area-inset-right))); }
 
+  /* KIỂM TRA ÔN TẬP (ManKiemTraCaNhan, gốc .duo-kt — 02/11): lời báo lỗi / máy chủ bận trải hàng riêng trên hai cột (không đè đề); BẢNG CÂU thành tấm bên
+     phải (phủ cột trả lời, đề trái vẫn thấy) — trước: tấm trượt từ đáy phủ nửa dưới cả màn. Tấm nộp chặng giữ hộp giữa màn như cũ. */
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo.duo-kt[data-chang][data-duo]:not([data-xong]) .duo-than > :is(.ktcn-bao, .ktcn-ban) { grid-column: 1 / -1; grid-row: 2; align-self: start; margin: 0 0 8px; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo.duo-kt[data-chang][data-duo]:not([data-xong]):has(> .duo-than > :is(.ktcn-bao, .ktcn-ban)) :is(.duo-cot-de, .duo-than > .duo-cuon[data-cot='de']) { grid-row: 3 / -1; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo.duo-kt[data-chang][data-duo]:not([data-xong]) .duo-kt-phu:not([data-giua]) { justify-content: flex-end; align-items: stretch; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo.duo-kt[data-chang][data-duo]:not([data-xong]) .duo-kt-phu:not([data-giua]) > .duo-kt-tam {
+    width: var(--cn-lg-rong); max-width: 100%; max-height: none; height: 100dvh; border-radius: 24px 0 0 24px;
+    padding-right: max(20px, env(safe-area-inset-right)); animation: none;
+  }
+
   /* ĐÚNG–SAI: cặp nút Đúng | Sai đứng cạnh ý khi cột trả lời ≥ 400px (trước chỉ từ 560px) ⇒ bốn ý gọn gần nửa chiều cao */
   @container (min-width: 400px) {
     :root[data-trong='hs'] .duo[data-chang] .ht2-lam-ds .ht2-lam-y:not([data-ket]) { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 16px; }
