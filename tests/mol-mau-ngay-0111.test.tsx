@@ -57,9 +57,9 @@ describe('bong bóng lời trên đầu Mol (Lộ trình)', () => {
     expect(tsx).not.toMatch(/thapNgang/)
   })
   it('tự căn không tràn mép (rộng ≤ 280, --trai / --duoi đo một lần), màu theo cảm xúc qua data-cx, chân ngôn data-chan-ngon', () => {
-    expect(tsx).toMatch(/Math\.min\(RONG_TOI_DA, r\.width - 16\)/) // RONG_TOI_DA = 280 (src/lib/bong-bong-mol.ts)
+    expect(readFileSync('src/lib/bong-bong-mol.ts', 'utf8')).toMatch(/Math\.min\(RONG_TOI_DA, duong\.right - duong\.left - 16\)/) // RONG_TOI_DA = 280
     expect(readFileSync('src/lib/bong-bong-mol.ts', 'utf8')).toContain('export const RONG_TOI_DA = 280')
-    expect(tsx).toMatch(/setProperty\('--trai'/); expect(tsx).toMatch(/setProperty\('--duoi'/)
+    expect(tsx).toContain("['--trai', c.trai], ['--duoi', c.duoi]")
     expect(tsx).toMatch(/data-cx=\{cx\} data-chan-ngon=\{laChanNgon \|\| undefined\}/)
     expect(css).toContain("left: var(--trai, -60px)"); expect(css).toContain('left: var(--duoi, 53px)')
     for (const cx of ['vui', 'khen', 'chao', 'buon', 'doi', 'buc', 'cau', 'ratCau']) expect(css, cx).toContain(`.bi-loi-bong[data-cx='${cx}']`)

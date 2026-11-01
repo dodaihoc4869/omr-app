@@ -4,7 +4,7 @@
 import { lazy, Suspense, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
 import { createPortal } from 'react-dom'
 import { Award, Check, CheckCircle2, ChevronRight, ClipboardCheck, FlaskConical, Flame, GraduationCap, History, Layers, LineChart, Lock, PenLine, Play, QrCode, RefreshCw, Route, Sparkles, Target, Trophy, Wrench, type LucideIcon } from 'lucide-react'
-import { soChangXong, type SoHomNay } from './lam-bai'
+import { chuCauMuc, soChangXong, vuotMuc, type SoHomNay } from './lam-bai'
 import { chuViecBai } from './chu-viec-bai'
 import { chiaChang, chuNutHoc, useNhipHocEm } from './nhip-hom-nay'
 import { chuViecTiepHs, nhipTheoSanh } from '../../lib/nhip-hoc-em'
@@ -15,7 +15,7 @@ import type { BuoiCuaEm } from '../../lib/buoi-hoc-api'
 import { Bi, SU_KIEN_LUA_CAP, type CamBi } from '../linh-vat/Bi'
 // LỬA ĐỔI CẢM XÚC (thầy «Chốt duyệt tất» 31/10, docs/DE-XUAT-BI-CAM-XUC-3110.md): luật + lời (hàm thuần) · sổ câu được tính trên máy · biểu tượng tab + chấm số.
 import { chanNgon, loiLua, mocDoiLua, soLuot, xetLua, type CapLua, type VaoLua } from '../../lib/lua-cam-xuc'
-import { RONG_TOI_DA, RONG_TOI_THIEU, rongOmChu, viTriBong } from '../../lib/bong-bong-mol'
+import { chonChoBong, rongOmChu, type Hop } from '../../lib/bong-bong-mol'
 import { docLuaThat } from '../../lib/lua-that'
 import { gioMayChu } from '../../lib/gio-may-chu'
 import { banHat, yenLang } from '../../lib/hieu-ung'
@@ -461,19 +461,23 @@ function LoiBi({ cam, loi, coBi = true, khoa, cap = 0, ben, chanNgon: laChanNgon
   // BONG BÓNG TRÊN ĐẦU MOL (Boss soát PR 733): tự mờ dần sau ~6 s (cả lời cấp 4–5); có lời mới ⇒ LoiBi gắn lại (key) nên hiện lại; CHẠM MOL ⇒ hiện lại lời
   // gần nhất và hẹn ẩn lại từ đầu. Bong bóng không bao giờ chặn chạm (pointer-events: none — trong-hs.css). Giảm chuyển động ⇒ ẩn không hiệu ứng (CSS).
   const [lanCham, datLanCham] = useState(0)
+  // 02/11 (ảnh thật: bong bóng đè nút KIỂM TRA ÔN TẬP): không chỗ nào né được mọi nút ⇒ THU THÀNH NÚT NHỎ cạnh Mol (`gon`, chờ em chạm, không tự mờ);
+  // em chạm nút nhỏ / chạm Mol ⇒ ĐỌC (`doc`): bong bóng hiện ở chỗ ít đè nhất rồi tự mờ như thường.
+  const [gon, datGon] = useState(false)
+  const [doc, datDoc] = useState(false)
+  const docLai = () => { setPha('hien'); datDoc(true); datLanCham((x) => x + 1) }
   const daAn = pha === 'an'
   useEffect(() => {
-    if (!ben || daAn) return // hẹn lại chỉ khi vừa hiện (từ ẩn) hoặc chạm Mol — đổi «hiện → mờ» không được huỷ hẹn gỡ hẳn
-    const t1 = window.setTimeout(() => setPha('thu'), 6000), t2 = window.setTimeout(() => setPha('an'), 6400)
+    if (!ben || daAn || (gon && !doc)) return // hẹn lại chỉ khi vừa hiện (từ ẩn) hoặc chạm Mol — đổi «hiện → mờ» không được huỷ hẹn gỡ hẳn
+    const t1 = window.setTimeout(() => setPha('thu'), 6000), t2 = window.setTimeout(() => { setPha('an'); datDoc(false) }, 6400)
     return () => { window.clearTimeout(t1); window.clearTimeout(t2) }
-  }, [ben, daAn, lanCham])
+  }, [ben, daAn, lanCham, gon, doc])
   useEffect(() => {
     const mol = ben?.parentElement?.querySelector('.da-linh-vat[data-lv="bi"]')
     if (!mol) return
-    const cham = () => { setPha('hien'); datLanCham((x) => x + 1) }
-    mol.addEventListener('click', cham)
-    return () => mol.removeEventListener('click', cham)
-  }, [ben])
+    mol.addEventListener('click', docLai)
+    return () => mol.removeEventListener('click', docLai)
+  }, [ben]) // eslint-disable-line react-hooks/exhaustive-deps
   const [n, setN] = useState(loi.length)
   useEffect(() => {
     const yen = document.documentElement.classList.contains('may-yeu') || !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
@@ -488,60 +492,74 @@ function LoiBi({ cam, loi, coBi = true, khoa, cap = 0, ben, chanNgon: laChanNgon
   }, [loi])
   // BONG BÓNG TRÊN ĐẦU MOL: tự căn trong đường đi, không tràn mép; đuôi chỉ đầu Mol (lệch trái khỏi nút bấc / lửa) — hình học thuần ở src/lib/bong-bong-mol.ts.
   // Thầy 01/11 23h «Viền bong bóng phải gọn vừa với chữ nhé» ⇒ CO THEO CHỮ: cho bề rộng tối đa (≤ 280), chữ cân dòng (text-wrap: balance), đo DÒNG DÀI NHẤT
-  // ⇒ bong bóng ôm sát chữ; đặt lại vị trí + đuôi theo bề rộng thật. Đo lúc gắn và lại khi phông chữ nạp xong (--rong · --trai · --duoi · --nang).
+  // ⇒ bong bóng ôm sát chữ; đặt lại vị trí + đuôi theo bề rộng thật (--rong · --trai · --duoi · --nang · --tren).
+  // Thầy 02/11 (ảnh thật: bong bóng đè nút KIỂM TRA ÔN TẬP ngay trên Mol) ⇒ KHÔNG BAO GIỜ ĐÈ NÚT: né theo KHUNG THẬT của mọi thứ bấm được / nhãn trên đường đi
+  // (nút chặng · Kiểm tra ôn tập · Tự sửa lỗi · Bài tập · rương · nút đang chọn · vòng tiến độ tràn ngoài nút · nhãn «BẮT ĐẦU» · huy hiệu số): trên đầu Mol →
+  // nâng / thu hẹp → dưới Mol → cạnh Mol → thu thành nút nhỏ (chonChoBong). Đo SAU bố cục (ResizeObserver, như đường nối của DuongChang — không ép bố cục giữa
+  // lượt dựng) và lại khi đường đi đổi cỡ / xoay màn, nút đổi (thêm bớt, đổi trạng thái, mở thẻ), phông chữ nạp xong, cuộn xong.
   useLayoutEffect(() => {
-    const d = ben?.closest('.da-duong')
-    if (!ben || !d) return
-    const bb = ben.querySelector<HTMLElement>('.bi-loi-bong')
+    const d = ben?.closest('.da-duong'), bb = ben?.querySelector<HTMLElement>('.bi-loi-bong')
+    if (!ben || !d || !bb) return
+    const hop = (e: Element): Hop => { const q = e.getBoundingClientRect(); return { left: q.left, top: q.top, right: q.right, bottom: q.bottom } }
     const datCho = () => {
-      const r = d.getBoundingClientRect(), o = ben.getBoundingClientRect()
-      const dat = (rong: number, nang = 0, duong: { left: number; right: number } = r) => {
+      const o = ben.getBoundingClientRect(), mol = ben.parentElement?.querySelector('.da-linh-vat[data-lv="bi"]')
+      const vat = Array.from(d.querySelectorAll('button, [role="button"], a[href], .da-vong, .da-bong, .da-dem')).filter((e) => !ben.contains(e)).map(hop)
+        .filter((n) => n.right > n.left && n.bottom > n.top)
+      const daDo = new Map<number, { w: number; h: number }>()
+      const kho = (rong: number) => {
+        const cu = daDo.get(rong)
+        if (cu) return cu
         ben.style.setProperty('--rong', `${rong}px`)
-        ben.style.setProperty('--nang', `${nang}px`)
+        bb.style.width = ''
         let w = rong
-        if (bb) {
-          bb.style.width = ''
-          const chu = bb.querySelector('[aria-hidden="true"]'), rg = chu ? document.createRange?.() : undefined
-          if (chu && rg && typeof rg.getClientRects === 'function') {
-            rg.selectNodeContents(chu)
-            const cs = getComputedStyle(bb), so = (x: string) => parseFloat(x) || 0
-            const wc = rongOmChu(Array.from(rg.getClientRects()), so(cs.paddingLeft) + so(cs.paddingRight) + so(cs.borderLeftWidth) + so(cs.borderRightWidth))
-            if (wc) { w = Math.min(rong, wc + 1); bb.style.width = `${w}px` }
-          }
+        const chu = bb.querySelector('[aria-hidden="true"]'), rg = chu ? document.createRange?.() : undefined
+        if (chu && rg && typeof rg.getClientRects === 'function') {
+          rg.selectNodeContents(chu)
+          const cs = getComputedStyle(bb), so = (x: string) => parseFloat(x) || 0
+          const wc = rongOmChu(Array.from(rg.getClientRects()), so(cs.paddingLeft) + so(cs.paddingRight) + so(cs.borderLeftWidth) + so(cs.borderRightWidth))
+          if (wc) w = Math.min(rong, wc + 1)
         }
-        const { trai, duoi } = viTriBong(duong, o.left, w)
-        ben.style.setProperty('--trai', `${trai}px`)
-        ben.style.setProperty('--duoi', `${duoi}px`)
+        bb.style.width = `${w}px`
+        const kq = { w, h: bb.getBoundingClientRect().height }
+        daDo.set(rong, kq)
+        return kq
       }
-      const rong0 = Math.round(Math.max(150, Math.min(RONG_TOI_DA, r.width - 16)))
-      dat(rong0)
-      // NÉ NÚT CHẶNG / NHÃN («BẮT ĐẦU»…): giao nút ⇒ (1) nâng lên trên nút (giữ bề rộng), không được thì (2) thu hẹp về phía Mol (mép trong sát sau nút,
-      // ≥ 130 px); vẫn giao ⇒ giữ chỗ mặc định (không chặn chạm, tự ẩn sau ~6 s). Đuôi vẫn chỉ đầu Mol.
-      if (!bb) return
-      const nut = Array.from(d.querySelectorAll('.da-nut, .da-bong')).map((e) => e.getBoundingClientRect()).filter((n) => n.width > 0 && n.height > 0)
-      const giao = () => { const b = bb.getBoundingClientRect(); return nut.filter((n) => n.left < b.right && n.right > b.left && n.top < b.bottom && n.bottom > b.top) }
-      const g = giao()
-      if (!g.length) return
-      const b = bb.getBoundingClientRect(), nang = Math.ceil(b.bottom - (Math.min(...g.map((n) => n.top)) - 8))
-      if (nang > 0 && b.top - nang >= r.top) { dat(rong0, nang); if (!giao().length) return }
-      dat(rong0)
-      const phai = o.left > r.left + r.width / 2
-      const mep = phai ? Math.max(...g.map((n) => n.right)) + 8 : Math.min(...g.map((n) => n.left)) - 8
-      const rongHep = Math.round(phai ? r.right - 8 - mep : mep - (r.left + 8))
-      if (rongHep >= RONG_TOI_THIEU) { dat(rongHep, 0, phai ? { left: mep - 8, right: r.right } : { left: r.left, right: mep + 8 }); if (!giao().length) return }
-      dat(rong0)
+      const kq = chonChoBong({ duong: hop(d), neo: { x: o.left, y: o.top }, mol: mol ? hop(mol) : { left: o.left, right: o.left, top: o.top, bottom: o.top }, vat, to: ben.hasAttribute('data-cap'), kho })
+      const c = kq.bong
+      ben.dataset.cho = kq.cho ?? (doc ? c.cho : 'gon')
+      if (c.benTrai) ben.dataset.benTrai = ''; else delete ben.dataset.benTrai
+      ben.style.setProperty('--rong', `${c.rong}px`)
+      bb.style.width = `${c.w}px`
+      for (const [k, x] of [['--trai', c.trai], ['--duoi', c.duoi], ['--nang', c.nang], ['--tren', c.tren], ['--chip-trai', kq.chip?.trai ?? 0], ['--chip-tren', kq.chip?.tren ?? 0]] as const) ben.style.setProperty(k, `${x}px`)
+      datGon(kq.cho === null)
     }
-    datCho()
-    let con = true
-    void document.fonts?.ready.then(() => { if (con) datCho() })
-    return () => { con = false }
-  }, [ben, pha === 'an']) // eslint-disable-line react-hooks/exhaustive-deps
+    let con = true, hen = 0
+    const henDat = () => {
+      if (typeof requestAnimationFrame !== 'function') { if (con) datCho(); return }
+      cancelAnimationFrame(hen); hen = requestAnimationFrame(() => { if (con) datCho() })
+    }
+    const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(() => datCho()) : null
+    if (ro) ro.observe(d); else datCho()
+    const mo = typeof MutationObserver === 'function' ? new MutationObserver((ds) => { if (ds.some((m) => !ben.contains(m.target))) henDat() }) : null
+    mo?.observe(d, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['data-tt', 'data-loai', 'aria-expanded', 'data-hu'] })
+    window.addEventListener('resize', henDat)
+    window.addEventListener('scrollend', henDat, { capture: true, passive: true })
+    void document.fonts?.ready.then(henDat)
+    return () => {
+      con = false; if (hen) cancelAnimationFrame(hen); ro?.disconnect(); mo?.disconnect()
+      window.removeEventListener('resize', henDat); window.removeEventListener('scrollend', henDat, { capture: true })
+    }
+  }, [ben, daAn, doc]) // eslint-disable-line react-hooks/exhaustive-deps
   // màu bong bóng theo cảm xúc (trong-hs.css .bi-loi-bong[data-cx]): cấp ≥ 2 ⇒ dỗi · bực · cáu · rất cáu; còn lại theo mặt Mol
   const cx = cap >= 2 ? (['doi', 'buc', 'cau', 'ratCau'] as const)[Math.min(cap, 5) - 2] : cam === 'mung' || cam === 'lua' ? 'khen' : cam === 'sai' ? 'buon' : cam
   if (pha === 'an') return null
   // cấp 4–5: viền bong bóng màu «sai» (token có sẵn). `ben` (điện thoại ngang thấp): bong bóng nói CẠNH Lửa trên đường, đuôi chỉ xuống Lửa.
   const bong = <div className="bi-loi-boc" data-thu={pha === 'thu' || undefined} data-ben={ben ? '' : undefined}><div className="bi-loi" data-khong-bi={!coBi || !!ben || undefined}>{coBi && !ben && <Bi cam={cam} cap={cap} size={84} noi={loi} />}<p className="bi-loi-bong" data-cap={cap >= 4 ? cap : undefined} data-cx={cx} data-chan-ngon={laChanNgon || undefined}><span className="ht2-an">{loi}</span><span aria-hidden="true">{loi.slice(0, n)}<span className="bi-loi-con">{loi.slice(n)}</span></span></p></div></div>
-  return ben ? createPortal(bong, ben) : bong
+  if (!ben) return bong
+  // nút nhỏ «Mol nhắn» (hết chỗ trống): chạm ⇒ đọc. Bong bóng vẫn dựng (ẩn) để đo lại khi bố cục đổi.
+  return createPortal(<>{bong}{gon && !doc && <button type="button" className="da-lv-chip" aria-label={`Mol nhắn: ${loi}`} onClick={docLai}>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" /><path d="M8 12h.01M12 12h.01M16 12h.01" /></svg>
+  </button>}</>, ben)
 }
 
 const THU_NGAN = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
@@ -846,7 +864,7 @@ export function MotTrangHs(p: PropsMotTrang) {
     <>
     {lopSo(hs?.lop) && <span data-sac="tin" aria-label={`Khối ${lopSo(hs?.lop)}`}><GraduationCap size={22} aria-hidden="true" />{lopSo(hs?.lop)}</span>}
     <span data-sac="sao" aria-label={`Chuỗi ${chuoi} ngày đủ mức`}><Flame size={22} aria-hidden="true" />{chuoi}</span>
-    {so && <span data-sac="dung" aria-label={`${so.daLam}/${so.muc} câu hôm nay`}>{du ? <CheckCircle2 size={22} aria-hidden="true" /> : <Target size={22} aria-hidden="true" />}{so.daLam}/{so.muc}</span>}
+    {so && <span data-sac="dung" aria-label={vuotMuc(so) ? `Đã làm ${so.daLam} câu hôm nay, đủ mức ${so.muc}` : `${so.daLam}/${so.muc} câu hôm nay`}>{du ? <CheckCircle2 size={22} aria-hidden="true" /> : <Target size={22} aria-hidden="true" />}{vuotMuc(so) ? so.daLam : `${so.daLam}/${so.muc}`}</span>}
     </>
   </header>
   // Thầy tạm đóng app (27/10): phủ cả Lộ trình; còn ca đang mở / bài kiểm tra dở ⇒ nút vào nộp cho xong (máy chủ không chặn các lệnh ấy).
@@ -861,7 +879,7 @@ export function MotTrangHs(p: PropsMotTrang) {
   const dongHomNay = so && <div className="dm-the"><h3>Hôm nay</h3>
     <div className="dm-dong"><span className="h" data-sac="sao"><Flame size={22} aria-hidden="true" /></span><div className="giua"><b>Chuỗi {chuoi} ngày</b><span className="mo">{tq?.chuoiNgay ? chuLuatChuoi : du ? 'hôm nay đã đủ mức' : `làm ${con} câu nữa để đủ mức`}</span></div></div>
     <div className="dm-thanh" role="progressbar" aria-label="Câu hôm nay" aria-valuemin={0} aria-valuemax={so.muc} aria-valuenow={Math.min(so.daLam, so.muc)}><i style={{ width: `${pct}%` }} /></div>
-    <span className="mo">{tq?.chuoiNgay ? <>Mục tiêu hôm nay · {so.daLam}/{so.muc} câu{du ? ' · đã đủ' : ` · còn ${con} câu`}</> : <>{so.daLam}/{so.muc} câu hôm nay{du ? ' · đủ mức' : ''}</>}</span></div>
+    <span className="mo">{tq?.chuoiNgay ? <>Mục tiêu hôm nay · {chuCauMuc(so)}{du ? ' · đã đủ' : ` · còn ${con} câu`}</> : <>{vuotMuc(so) ? `Đã làm ${so.daLam} câu hôm nay (mức ${so.muc})` : `${so.daLam}/${so.muc} câu hôm nay`}{du ? ' · đủ mức' : ''}</>}</span></div>
   // Thầy 26/10: hệ lười (nhóm, bậc chăm, Học thật / Đối phó, mức làm) CHỈ thầy và phụ huynh xem ⇒ em chỉ thấy chuỗi ngày + việc tiếp trung tính.
   const theViec = nhip && <div className="dm-the da-viec"><h3>Chuỗi {chuoi} ngày</h3><span className="mo">Việc tiếp: {chuViecTiepHs(nhip)}</span></div>
 
@@ -981,9 +999,10 @@ export function MotTrangHs(p: PropsMotTrang) {
     <main className="da-vo" aria-busy={!so && p.dangTai}>
       {chinh === 'ca' && <section className="da-bang" data-sac="tin" aria-label="Ca kiểm tra đang mở"><span className="h"><ClipboardCheck size={26} aria-hidden="true" /></span><div className="giua"><b>Ca kiểm tra đang mở</b><span className="mo">Nhập mã ca và mật khẩu thầy cung cấp để vào phòng kiểm tra.</span></div><button type="button" className="nut-to" onClick={p.onThi}>Vào ca kiểm tra</button></section>}
       {/* 28/10 (thầy «Chúc mừng, em đã hoàn thành bài hôm nay — ghi rõ câu sửa, bài kiểm tra. Thay thẻ hoàn thành nhiệm vụ»): xong HẾT việc hôm nay ⇒ thẻ chúc mừng
-          kèm số câu học · câu sửa · Kiểm tra ôn tập; còn việc ⇒ thẻ «Đủ x/y câu» + việc tiếp như cũ. */}
+          kèm số câu học · câu sửa · Kiểm tra ôn tập; còn việc ⇒ thẻ «Đủ x/y câu» + việc tiếp như cũ. 02/11 (ảnh thật «Đủ 17/12 câu hôm nay!»): VƯỢT mức ⇒
+          «Đủ mức hôm nay! Đã làm 17 câu (mức 12)» — không viết như phân số (lam-bai.ts vuotMuc). */}
       {du && chinh !== 'ca' && so && <section className="da-bang" data-sac="dung" aria-label={tiepTheo.length ? 'Đủ mức hôm nay' : 'Hoàn thành bài hôm nay'}><span className="h"><Check size={26} strokeWidth={3} aria-hidden="true" /></span><div className="giua">{tiepTheo.length
-        ? <><b>Đủ {so.daLam}/{so.muc} câu hôm nay!</b><span className="mo">Tiếp theo: {tiepTheo.join(', rồi ')}</span></>
+        ? <><b>{vuotMuc(so) ? `Đủ mức hôm nay! Đã\u00a0làm\u00a0${so.daLam}\u00a0câu\u00a0(mức\u00a0${so.muc})` : `Đủ ${so.daLam}/${so.muc} câu hôm nay!`}</b><span className="mo">Tiếp theo: {tiepTheo.join(', rồi ')}</span></>
         : <><b>Chúc mừng, em đã hoàn thành bài hôm nay!</b><span className="mo">{so.daLam} câu học{daSuaNay ? ` · ${daSuaNay} câu sửa` : ''}{kiem?.homNay && kiem.nopLuc !== null ? ` · Kiểm tra ôn tập ${kiem.diem !== null ? `${diemChu(kiem.diem)}/10` : 'đã nộp'}` : ''}</span></>}</div></section>}
       {/* THẺ BÀI (thầy 27/10 «thu vào bị giật… cho thanh màu xanh xuống kẻo chèn vào ống nghiệm»): thẻ đầy đủ ĐỨNG YÊN trong luồng (giữ chỗ, không nhảy cuộn);
           cuộn qua ⇒ DẢI GỌN 54px (tên bài · thanh mảnh · chặng) dính dưới hàng bộ đếm, cross-fade opacity + translateY 200 ms; sau dải là nền trang đặc + mép mờ
