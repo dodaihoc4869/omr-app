@@ -104,7 +104,7 @@ window.DU_LIEU = {
       dangHoc: 'Ester – Lipid',
       cau: 'Hôm nay con <em>chưa làm câu nào</em>.',
       phu: 'Hôm qua con làm 14 câu trong 7 phút, nhiều câu chọn vội.',
-      chip: [{ mau: 'hp', bt: 'canh', chu: 'Chưa đủ mức hôm nay' }, { mau: 'mo', bt: 'lua', chu: 'Chuỗi ngày: chưa có' }],
+      chip: [{ mau: 'hp', bt: 'canh', chu: 'Chưa đủ mức' }, { mau: 'mo', bt: 'lua', chu: 'Chuỗi 0 ngày' }],
       ngay: ['du', 'thieu', 'khong', 'du', 'thieu', 'khong', 'khong', 'du', 'thieu', 'du', 'thieu', 'khong', 'thieu', 'chua'],
       ngayChu: '<b>4/14 ngày</b> đủ mức'
     },

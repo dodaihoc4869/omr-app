@@ -218,13 +218,21 @@ button.o:active, .so:active { transform: scale(0.985); }
 }
 /* Ngang thấp: bớt dòng phụ để vừa 390 px chiều cao */
 @media (min-width: 640px) and (max-height: 500px) {
-  .o { padding: 10px 12px; gap: 5px; border-radius: 16px; }
-  .o--ah { padding: 10px 14px; gap: 6px; justify-content: flex-start; }
-  .ah__cau { font-size: 18px; }
+  .o { padding: 9px 12px; gap: 4px; border-radius: 16px; }
+  .o--ah { padding: 9px 14px; gap: 5px; justify-content: flex-start; }
+  .ah__cau { font-size: 17px; }
+  .ah__hang { flex-wrap: nowrap; gap: 4px; }
+  .ah__chip { min-height: 24px; font-size: 12px; padding: 0 8px 0 6px; gap: 4px; }
+  .ah__chip .bt { width: 14px; height: 14px; }
+  .ah__o i { height: 12px; }
+  .chi-hep.o__them { display: inline; }
+  .nen li:nth-child(n+2) { display: none !important; }
+  .diem__xu { min-height: 16px; }
+  .sap { gap: 4px; }
+  .sap__ngay { height: 34px; }
   .ah__phu, .ah__giai, .yeu li:nth-child(3), .yeu__chu, .bon__dau span, .so__doi, .diem__nhan-ca { display: none !important; }
   .o--thay p { -webkit-line-clamp: 2; font-size: 13px; }
   .nen { font-size: 13px; gap: 3px; }
-  .nen li:nth-child(3) { display: none; }
   .nen li::before { width: 18px; height: 18px; font-size: 11px; }
   .so { padding: 8px 10px; row-gap: 3px; }
   .so__vong { width: 54px; height: 54px; }

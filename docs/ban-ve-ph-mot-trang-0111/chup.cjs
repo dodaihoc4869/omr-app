@@ -63,7 +63,7 @@ const DS = chon === 'dot1' ? DOT1 : chon === 'dot2' ? DOT2 : [...DOT1, ...DOT2]
           if (ca.overflowY === 'auto' || ca.overflowY === 'scroll') break
           if (ca.overflow === 'visible') continue
           const ra = a.getBoundingClientRect()
-          if (r.bottom > ra.bottom - parseFloat(ca.borderBottomWidth) + 1 || r.top < ra.top - 1 || r.right > ra.right + 1) { chuCat.push('bị khung cắt: ' + ten); break }
+          if (r.bottom > ra.bottom - parseFloat(ca.borderBottomWidth) + 1 || r.top < ra.top - 1 || r.right > ra.right + 1) { (tuCat(ca) ? baCham : chuCat).push((tuCat(ca) ? '' : 'bị khung cắt: ') + ten); break }
         }
       }
       return { chuCat, baCham, cao: de.scrollHeight, khung: innerHeight, khongCuon: de.scrollHeight <= innerHeight && document.body.scrollHeight <= innerHeight, tranNgang: de.scrollWidth - de.clientWidth, dichNho, oCat }

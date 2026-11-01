@@ -68,10 +68,6 @@
 .tca__thay span { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; }
 .tca__thay span .bt { width: 16px; height: 16px; color: var(--ph3-hp); }
 .tca__thay p { font-size: 15px; line-height: 1.5; }
-.tthay__nut { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
-.nut-nhan--rong { min-height: 48px; border-radius: 16px; font-size: 15px; }
-.nut-nhan--rong .bt { fill: none; }
-.nut-vien { display: flex; align-items: center; justify-content: center; min-height: 48px; border-radius: 16px; border: 1px solid var(--ph3-vien); color: var(--ph3-xd); font-size: 15px; font-weight: 700; }
 
 /* khổ rộng: ngăn kéo bên phải, cao trọn màn */
 @media (min-width: 640px) {

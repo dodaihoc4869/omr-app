@@ -146,8 +146,7 @@
       <p class="tam__chu-nho">Điểm trung bình lớp ${D.lop} ca này: ${C.tbLop}. App không hiện tên hay điểm của bạn khác.</p>
     </div>`
   const tamNen = () => `<ol class="tso__nen tso__nen--lon">${D.nen.map((n) => `<li>${bt('tim')}<span><b>${n.dong}</b> ${n.chu}</span></li>`).join('')}</ol>`
-  const tamThay = () => `<div class="tca__thay"><span>${bt('thay')}Thầy Đỗ Đại Học · ${D.thay.luc}</span><p>${D.thay.loi}</p></div>
-      <div class="tthay__nut"><a class="nut-nhan nut-nhan--rong" href="#">${bt('thay')}Nhắn lại thầy qua Zalo</a><a class="nut-vien" href="#">Gọi thầy</a></div>`
+  const tamThay = () => `<div class="tca__thay"><span>${bt('thay')}Thầy Đỗ Đại Học · ${D.thay.luc}</span><p>${D.thay.loi}</p></div>`
   const TIEU = { ht: 'Học thật', dp: 'Đối phó', ch: 'Chăm', lu: 'Lười', ca: `Ca kiểm tra · ${C.ten}`, nen: 'Anh chị nên làm gì', thay: 'Thầy Đỗ Đại Học nhắn' }
   const mo = (ma) => {
     if (!TIEU[ma]) return
@@ -161,7 +160,6 @@
     const n = e.target.closest('[data-tam]')
     if (n) { e.preventDefault(); mo(n.dataset.tam) }
   })
-  $('nutNhan').addEventListener('click', (e) => { e.preventDefault(); mo('thay') })
   $('tamDong').addEventListener('click', dong)
   che.addEventListener('click', dong)
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') dong() })
