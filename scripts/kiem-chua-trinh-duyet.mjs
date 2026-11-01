@@ -2,6 +2,10 @@
 // API/SQL thật được kiểm riêng trong chua-cau-sai-chat-luong + d1-runtime-chua-cau-sai.
 // 26/10: từ «Chữa câu gọn» (#373) màn em mở đợt rồi gọi `gon-mo` ⇒ 4 khổ đi luồng gọn (Kiểm tra → mất mạng → gửi lại đúng khoá → «Em đã tự sửa xong câu này»);
 // lượt «lối cũ» 360px: Worker chưa có lệnh gọn (404 «Không có đường này») ⇒ rơi về sửa từng bước (phat-item / nop-item) như trước.
+// 02/11: từ 16227d1 (29/10) `goi` (src/lib/chua-cau-sai-api.ts) tự thử lại MỘT lần sau lỗi đường truyền (cùng body ⇒ cùng khoá) ⇒ đứt mạng
+// MỘT nhịp không còn hiện thông báo (máy tự gửi lại). Kịch bản giả MẤT MẠNG HẲN (mọi lượt nộp đứt tới khi «có mạng lại») để vẫn kiểm:
+// thông báo lỗi · giữ đáp án · cho gửi lại · mọi lượt gửi cùng khoá + payload · em bấm gửi lại đúng MỘT lượt; thêm lượt «chop-mang-360»
+// kiểm đứt một nhịp: không thông báo, tự gửi lại đúng một lần cùng khoá, có kết quả.
 import assert from 'node:assert/strict'
 import { mkdirSync, existsSync } from 'node:fs'
 import { spawn } from 'node:child_process'
@@ -74,12 +78,13 @@ try {
         ? { executablePath: '/usr/bin/chromium' }
         : {}),
   })
-  for (const { width, height, ten, loiCu = false } of [
+  for (const { width, height, ten, loiCu = false, chop = false } of [
     { width: 360, height: 900, ten: '360' },
     { width: 430, height: 900, ten: '430' },
     { width: 844, height: 390, ten: 'xoay-ngang-844' },
     { width: 1280, height: 900, ten: 'may-tinh-1280' },
     { width: 360, height: 900, ten: 'loi-cu-360', loiCu: true },
+    { width: 360, height: 900, ten: 'chop-mang-360', chop: true },
   ]) {
     const page = await browser.newPage({
       viewport: { width, height },
@@ -87,7 +92,13 @@ try {
     })
     const errors = []
     page.on('pageerror', (e) => errors.push(e.message))
+    // Mất mạng hẳn: mọi lượt nộp đứt tới khi kịch bản cho «có mạng lại». `chop`: chỉ đứt đúng một nhịp.
     let matMang = true
+    const dut = () => {
+      if (!matMang) return false
+      if (chop) matMang = false
+      return true
+    }
     const nops = []
     await page.route('https://chua.test/**', async (route) => {
       const url = route.request().url(),
@@ -103,10 +114,7 @@ try {
           : route.fulfill({ json: mo })
       if (url.endsWith('/gon-nop')) {
         nops.push(b)
-        if (matMang) {
-          matMang = false
-          return route.abort('failed')
-        }
+        if (dut()) return route.abort('failed')
         return route.fulfill({
           json: {
             ok: true,
@@ -122,10 +130,7 @@ try {
       if (url.endsWith('/phat-item')) return route.fulfill({ json: ph })
       if (url.endsWith('/nop-item')) {
         nops.push(b)
-        if (matMang) {
-          matMang = false
-          return route.abort('failed')
-        }
+        if (dut()) return route.abort('failed')
         return route.fulfill({
           json: {
             ok: true,
@@ -169,7 +174,19 @@ try {
           name: 'Em đã tự sửa xong câu này',
           exact: true,
         })
-    if (loiCu) {
+    // Số lượt nộp đã đứt lúc máy báo mất mạng (trước khi em bấm gửi lại).
+    let luotDut = 0
+    if (chop) {
+      await page.getByRole('textbox', { name: 'Đáp án của em' }).fill('40')
+      await page.getByRole('button', { name: 'Kiểm tra', exact: true }).click()
+      await phanHoi.waitFor()
+      assert.equal(
+        await page.getByRole('alert').count(),
+        0,
+        'Đứt mạng một nhịp: máy tự gửi lại, không báo lỗi',
+      )
+      assert.equal(nops.length, 2, 'Đứt một nhịp: tự gửi lại đúng một lần')
+    } else if (loiCu) {
       await page.getByRole('textbox', { name: 'Câu trả lời của em' }).fill('40')
       await page.getByRole('button', { name: 'Tự thử lại' }).click()
       await page.getByRole('alert').waitFor()
@@ -180,6 +197,8 @@ try {
         true,
         'Mất mạng phải giữ câu trả lời đã nộp',
       )
+      luotDut = nops.length
+      matMang = false
       await page
         .getByRole('button', { name: 'Gửi lại câu trả lời đã giữ' })
         .click()
@@ -195,15 +214,30 @@ try {
         'Mất mạng phải giữ đáp án em đã gõ',
       )
       assert.equal(await kiem.isEnabled(), true, 'Mất mạng phải cho gửi lại')
+      luotDut = nops.length
+      matMang = false
       await kiem.click()
     }
     await phanHoi.waitFor()
-    assert.equal(nops.length, 2, 'Phải có đúng một lần gửi lại')
-    assert.deepEqual(
-      nops[0],
-      nops[1],
-      'Retry phải giữ nguyên khoá chống lặp và payload',
+    if (!chop) {
+      assert.ok(luotDut >= 1, 'Mất mạng: phải có lượt nộp đứt trước thông báo')
+      assert.ok(luotDut <= 3, `Mất mạng: không dội máy chủ (${luotDut} lượt đứt)`)
+      assert.equal(
+        nops.length,
+        luotDut + 1,
+        'Em bấm gửi lại: phải có đúng một lần gửi lại',
+      )
+    }
+    assert.ok(
+      nops[0]?.[loiCu ? 'attemptId' : 'khoa'],
+      'Lượt nộp phải mang khoá chống lặp',
     )
+    for (const n of nops.slice(1))
+      assert.deepEqual(
+        n,
+        nops[0],
+        'Retry phải giữ nguyên khoá chống lặp và payload',
+      )
     await page.waitForTimeout(1000)
     await phanHoi.waitFor()
     assert.equal(errors.length, 0, errors.join('\n'))
@@ -246,7 +280,7 @@ try {
     await page.close()
   }
   console.log(
-    'PASS: chữa câu gọn 360/430/xoay ngang 844/máy tính 1280px + lối cũ sửa từng bước 360px; không tràn ngang; Tab giữ trong dialog; Escape trả tiêu điểm; retry nguyên khoá + payload; phản hồi được giữ; tờ chữa chung giấu tên/lời gỡ, Thầy chữa ghi qua cầu nối iframe thật.',
+    'PASS: chữa câu gọn 360/430/xoay ngang 844/máy tính 1280px + lối cũ sửa từng bước 360px; không tràn ngang; Tab giữ trong dialog; Escape trả tiêu điểm; mất mạng hẳn ⇒ báo lỗi, giữ đáp án, em gửi lại đúng một lượt; đứt một nhịp ⇒ tự gửi lại không báo; mọi lượt nguyên khoá + payload; phản hồi được giữ; tờ chữa chung giấu tên/lời gỡ, Thầy chữa ghi qua cầu nối iframe thật.',
   )
 } finally {
   await browser?.close()
