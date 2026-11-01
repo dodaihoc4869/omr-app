@@ -5,7 +5,7 @@
 // Sheet (ghiDiem) để phân tích về sau. Mỗi em một hàng `.ca-hang` kèm <Nhan>:
 // xám chờ thi lại · tím đang làm · cam rời màn N lần · đỏ bị khoá · xanh đã nộp.
 // Xoá ca = xoá mềm, phải gõ đúng mã ca.
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { BANG_NHIP_THAY, NHIP_PHONG_CHO_THAY, TUY_CHON_NHIP_THAY, useNhipThay } from '../lib/nhip-may-thay'
 import DongMatKetNoiCa from '../components/theo-doi-ca/DongMatKetNoiCa'
 import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
@@ -49,6 +49,10 @@ import { demCauDaLam, tongSoCauCa } from '../lib/con-lai-ca'
 import './ca-thi-m3.css'
 // CA THI 28/09 (docs/ban-ve-ca-thi-2809): đầu màn Theo dõi, màn Kết thúc ca, Báo cáo chi tiết — THAY khối gập BaoCaoCaLop + trang BaoCaoMotEm cũ.
 import TheoDoiCa, { type EmTheoDoi } from '../components/ca-thi/TheoDoiCa'
+import { xepCauChuaCa } from '../lib/chieu-chua-ca'
+import { dungToChuaCa } from '../components/ca-thi/dung-to-chua-ca'
+// CHIẾU CHỮA BÀI SAU CA (thầy chốt 01/11): khung xem tờ chiếu nạp lười — chỉ khi thầy bấm nút.
+const KhungXemPhieu = lazy(() => import('../components/KhungXemPhieu'))
 import NutThemPhutCa from '../components/ca-thi/NutThemPhutCa'
 import PhongChoCa from '../components/ca-thi/PhongChoCa'
 import KetThucCa from '../components/ca-thi/KetThucCa'
@@ -675,7 +679,8 @@ export default function ExamMonitorScreen() {
       }
       return { sbd: e.sbd, hoTen: e.hoTen, lop: e.lop, trangThai: e.moiNhat.trangThai, diem: e.diem, score: e.graded?.score ?? null, vaoLuc: e.moiNhat.vaoLuc, nopLuc: e.moiNhat.nopLuc, soLanRoiMan: e.moiNhat.soLanRoiMan, tongGiayRoiMan: e.moiNhat.tongGiayRoiMan, rows }
     })
-  const tinhBaoCaoLop = () => tinhBaoCaoCaLop(dungEmChoBaoCao(dungNganHangBaoCao()), dsEm.length)
+  // Ca đã đóng ⇒ bảng chấm từng em dựng MỘT lượt (`emBaoCaoDong`, dưới) — báo cáo lớp tính ở máy và tờ «Chiếu chữa bài» dùng chung, không chấm hai lần.
+  const tinhBaoCaoLop = () => tinhBaoCaoCaLop(emBaoCaoDong ?? dungEmChoBaoCao(dungNganHangBaoCao()), dsEm.length)
   // BÁO CÁO MỘT EM (GV-2): chỉ dựng khi thầy MỞ trang của một em (sbdHoSo), nhớ theo cùng khoá — không chạy khi màn chỉ làm mới.
   // eslint-disable-next-line react-hooks/exhaustive-deps -- khoá `khoaBaoCaoLop` quyết định lúc nào tính lại
   const baoCaoMotEm = useMemo(() => {
@@ -740,6 +745,29 @@ export default function ExamMonitorScreen() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- khoá quyết định lúc hỏi lại
   }, [canBaoCao, khoaBcMay])
+  // CHIẾU CHỮA BÀI SAU CA (thầy chốt 01/11, docs/ban-ve-chieu-chua-ca-0111): câu có em chưa đúng, xếp khó → dễ, cùng mức sai nhiều → ít; tên em chưa đúng ở
+  // góc tờ chiếu. CHỈ dùng bảng chấm từng câu đã có ở máy này (cùng nguồn «Câu cả lớp sai nhiều nhất») — không gọi mạng; tính khi ca đã đóng, nhớ theo khoá báo cáo.
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- khoá `khoaBaoCaoLop` quyết định lúc nào tính lại
+  const emBaoCaoDong = useMemo(() => (caDaDong && chiTiet && teacherBank?.length ? dungEmChoBaoCao(dungNganHangBaoCao()) : null), [caDaDong, chiTiet?.ca.maCa, khoaBaoCaoLop])
+  const cauChuaCa = useMemo(
+    () => (emBaoCaoDong ? { ds: xepCauChuaCa(emBaoCaoDong), coBang: emBaoCaoDong.some((e) => (e.rows ?? []).some((r) => r.dungSai != null)) } : null),
+    [emBaoCaoDong],
+  )
+  const [htmlChuaCa, setHtmlChuaCa] = useState('')
+  const [dangDungChua, setDangDungChua] = useState(false)
+  const moChieuChua = async () => {
+    if (!chiTiet || !teacherBank || !cauChuaCa?.ds.length || dangDungChua) return
+    setDangDungChua(true)
+    try {
+      const kq = await dungToChuaCa(cauChuaCa.ds, teacherBank, `Chữa bài · ${tenHienCua(chiTiet.ca.tenCa, chiTiet.ca.maCa)}`)
+      if (kq.soThieu > 0) showToast(`${kq.soThieu} câu không có nội dung trên máy này — tờ ghi «Nội dung câu hỏi»`, 'warn')
+      setHtmlChuaCa(kq.html)
+    } catch {
+      showToast('Chưa dựng được tờ chiếu — thầy thử lại', 'error')
+    } finally {
+      setDangDungChua(false)
+    }
+  }
   const congBoNgay = async () => {
     if (!chiTiet) return
     setDangCongBo(true)
@@ -2083,7 +2111,18 @@ export default function ExamMonitorScreen() {
               onXemBaoCao={() => setMoBaoCao('lop')}
               onMoEm={(sbd) => setSbdHoSo(sbd)}
               emChuaNop={dsEm.filter((e) => e.moiNhat.trangThai === 'dang_lam' || e.moiNhat.trangThai === 'duoc_duyet_lai').map((e) => ({ sbd: e.sbd, hoTen: e.hoTen }))}
+              chieu={(() => {
+                const conLam = dsEm.filter((e) => e.moiNhat.trangThai === 'dang_lam' || e.moiNhat.trangThai === 'duoc_duyet_lai').length
+                const ly = !teacherBank || teacherBank.length === 0 ? 'Máy này chưa có đề có đáp án của ca' : !cauChuaCa ? 'Đang tổng hợp…' : !cauChuaCa.coBang ? 'Chưa có bảng chấm từng câu của ca này' : cauChuaCa.ds.length === 0 ? 'Cả lớp đúng hết · không có câu cần chữa' : ''
+                return { soCau: cauChuaCa?.ds.length ?? 0, ly, canhBao: conLam > 0 ? `${conLam} em còn đang làm — chiếu lúc này các em ấy thấy đề và lời giải` : '', dang: dangDungChua }
+              })()}
+              onChieu={() => void moChieuChua()}
             />
+          )}
+          {htmlChuaCa && (
+            <Suspense fallback={null}>
+              <KhungXemPhieu html={htmlChuaCa} ten="Tờ máy chiếu — Chữa bài sau ca" dong={() => setHtmlChuaCa('')} />
+            </Suspense>
           )}
           {/* HỘP XÁC NHẬN KHOÁ — nêu ĐÚNG SỐ ĐẾM THẬT, không nói chung chung.
               Thầy phải biết mình đang cắt bài của mấy em trước khi bấm. */}

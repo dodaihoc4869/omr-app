@@ -1,6 +1,6 @@
 // (c) MÀN KẾT THÚC CA — bản vẽ thầy chốt 28/09/2026 (docs/ban-ve-ca-thi-2809, màn c). Chỉ VẼ số đã có: `BaoCaoCaLop` (máy chủ `/gv/bao-cao-ca` hoặc tính ở máy)
 // + phần thêm (`ThemBaoCaoCa`). Dải "Công bố điểm" chỉ hiện khi ca ĐÃ ĐÓNG mà chưa công bố (máy chủ `/gv/cong-bo-ca`). Khối nào không có số thật ⇒ ẩn.
-import { Eye, FileText } from 'lucide-react'
+import { Eye, FileText, Presentation } from 'lucide-react'
 import type { BaoCaoCaLop } from '../../lib/bao-cao-ca-lop'
 import type { ThemBaoCaoCa } from '../../lib/bao-cao-chi-tiet'
 import { soVn } from '../../lib/ket-qua-sau-nop'
@@ -35,6 +35,9 @@ export interface KetThucCaProps {
   onXemBaoCao: () => void
   onMoEm: (sbd: string) => void
   emChuaNop: { sbd: string; hoTen: string }[]
+  /** CHIẾU CHỮA BÀI (thầy chốt 01/11): số câu có em chưa đúng; `ly` ≠ '' ⇒ nút mờ + lý do; `canhBao` = dòng nhắc (vẫn bấm được). Vắng ⇒ không nút. */
+  chieu?: { soCau: number; ly: string; canhBao: string; dang: boolean }
+  onChieu?: () => void
 }
 
 export default function KetThucCa(p: KetThucCaProps) {
@@ -57,6 +60,17 @@ export default function KetThucCa(p: KetThucCaProps) {
             <FileText size={18} aria-hidden="true" />
             Xem báo cáo chi tiết
           </button>
+          {p.chieu && (
+            <div className="ct-chieu">
+              <button type="button" className="ct-nut ct-nut-chinh" disabled={!!p.chieu.ly || p.chieu.dang} onClick={p.onChieu} aria-describedby="ct-chieu-ghi">
+                <Presentation size={18} aria-hidden="true" />
+                {p.chieu.dang ? 'Đang dựng tờ chiếu…' : p.chieu.ly ? 'Chiếu chữa bài' : `Chiếu chữa bài · ${p.chieu.soCau} câu`}
+              </button>
+              <span id="ct-chieu-ghi" className="ct-ghi" data-canh-bao={!p.chieu.ly && p.chieu.canhBao ? '' : undefined}>
+                {p.chieu.ly || p.chieu.canhBao || 'Xếp khó → dễ, cùng mức thì sai nhiều → ít'}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 

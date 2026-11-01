@@ -27,7 +27,11 @@ import { CSS_GIAO_DIEN_NUT_CHAM, CSS_GIAO_DIEN_TO_CHIEU, GIAO_DIEN_TO_CHIEU, mau
 import type { NhanLichSuCau } from './lich-su-cau-len-bang'
 import { CSS_CAU_NOI_TO_CHIEU, chuanMaPhien, jsCauNoiToChieu, khoaToChieu, mangNutChamToChieu, mangNutThayChua } from './to-chieu-cau-noi'
 import { CSS_LEN_BANG_MOI, jsLenBangMoi, thongKeHtml, type ThongKeLopCau } from './len-bang-moi-to-chieu'
+/** Cho tờ «Chiếu chữa bài sau ca» (`components/ca-thi/dung-to-chua-ca.ts`) lấy cùng mảnh khi nạp động — không tách mảnh mới. */
+export { thongKeLopCau } from './len-bang-moi-to-chieu'
 import { laCauTuLuan } from './cau-tu-luan'
+import type { TheChuaDung } from './chieu-chua-ca'
+import { CSS_CHUA_BAI, JS_CHUA_BAI, NUT_THU_GON, chipMucDoHtml, theChuaDungHtml } from './chieu-chua-ca-to'
 
 /** Câu phần III TỰ LUẬN theo nội dung (bảng Dạy học 28/09: thầy chọn câu tự luận thì tờ ghi đúng "Tự luận", không ghi "Trả lời ngắn"). Không xét mã đề. */
 const laTuLuanChieu = (c: CauLuyen): boolean => c.phan === 'III' && laCauTuLuan({ phan: 'III', text: c.text, dapAn: c.dapAn }, 'III')
@@ -73,6 +77,8 @@ export interface OBang {
   /** Cả lượt bài tập về nhà của em: làm bao nhiêu trên tổng, đúng, sai, chưa
    * làm. Bỏ trống nghĩa là em chưa được giao bài nào. */
   btvnTom?: { soCauGiao: number; soDaLam: number; soDung: number; soSai: number; soChuaLam: number }
+  /** CHỮA BÀI SAU CA (01/11): thẻ tên em chưa đúng câu này ở góc cột phải + chip mức độ đầu đề (`chieu-chua-ca-to.ts`). Vắng ⇒ như cũ. */
+  chuaDung?: TheChuaDung
   /** THẦN THÚ CỦA EM — góc phải tờ chiếu. Bỏ trống khi em chưa chọn thần thú
    * hoặc máy chủ không trả kịp; tờ chiếu khi ấy in như cũ, không chừa ô rỗng. */
   thanThu?: {
@@ -115,6 +121,8 @@ export interface TuyChonMayChieu {
   nutAiSai?: boolean
   /** Ngân sách buổi (phút) — chữ "Buổi: x/N phút" ở thanh dưới. Thiếu thì chỉ ghi số phút đã trôi. */
   nganSachPhut?: number
+  /** TỜ CHỮA BÀI SAU CA (01/11): «Câu n/N», pha «CHỮA BÀI», không «Lên bảng» (phím L tắt), nút/phím H thu gọn thẻ tên. */
+  chuaBai?: boolean
 }
 
 
@@ -267,7 +275,7 @@ const TEN_PHAN_CAU: Record<string, string> = { I: 'Trắc nghiệm', II: 'Đúng
 /** Dòng đầu của thẻ đề khi câu chiếm 2/3 bảng (bản vẽ "câu dài"): chip số câu + chip phần. Ở đợt đôi (mỗi em nửa bảng) dòng này
  * ẨN — số câu đã nằm trên thẻ tên. Hai bản cùng một chữ, CSS chọn bản nào hiện theo bố cục. */
 function dauDeHtml(o: OBang): string {
-  return `<div class="mc-de-dau"><span class="mc-de-so">Câu ${o.soCau}</span><span class="mc-de-phan">Phần ${o.cau.phan}${!o.chuaCuoi && laTuLuanChieu(o.cau) ? ' · Tự luận' : TEN_PHAN_CAU[o.cau.phan] ? ` · ${TEN_PHAN_CAU[o.cau.phan]}` : ''}</span></div>`
+  return `<div class="mc-de-dau"><span class="mc-de-so">Câu ${o.soCau}</span><span class="mc-de-phan">Phần ${o.cau.phan}${!o.chuaCuoi && laTuLuanChieu(o.cau) ? ' · Tự luận' : TEN_PHAN_CAU[o.cau.phan] ? ` · ${TEN_PHAN_CAU[o.cau.phan]}` : ''}</span>${o.chuaDung ? chipMucDoHtml(o.mucDo) : ''}</div>`
 }
 
 /** Tên gọi ở nhãn vùng làm bài: từ cuối của họ tên ("Nguyễn Văn Minh" → "Minh"). */
@@ -366,7 +374,7 @@ function dotMotEmHtml(o: OBang, soDot: number, tuyChon: TuyChonMayChieu): string
     </div>
     <div class="mc-trang" aria-hidden="true" ${thuocTinhNhan(o)}></div>
   </section>
-  <section class="mc-cot-lam-bai" aria-label="Bảng để học sinh lên làm" ${thuocTinhNhan(o)}></section>
+  <section class="mc-cot-lam-bai" aria-label="Bảng để học sinh lên làm" ${thuocTinhNhan(o)}>${o.chuaDung ? theChuaDungHtml(o.chuaDung) : ''}</section>
 </div>`
 }
 
@@ -820,12 +828,12 @@ const JS_MAY_CHIEU = `
     var nutLenBang = document.getElementById('mc-len-bang');
     if (nutLenBang) { nutLenBang.hidden = !pha; nutLenBang.disabled = pha !== 'cho'; nutLenBang.textContent = pha === 'cho' ? 'Lên bảng' : 'Đã gọi lên bảng'; }
     thanh.setAttribute('data-pha', pha);
-    if (phaEl) phaEl.textContent = pha === 'cho' ? 'CHỜ THẦY GỌI' : pha === 'chua' ? 'ĐANG CHỮA' : pha === 'goi' ? 'MỜI LÊN BẢNG' : '';
+    if (phaEl) phaEl.textContent = pha === 'cho' ? (document.body.hasAttribute('data-chua-bai') ? 'CHỮA BÀI' : 'CHỜ THẦY GỌI') : pha === 'chua' ? 'ĐANG CHỮA' : pha === 'goi' ? 'MỜI LÊN BẢNG' : '';
     veGhiChu();
   }
   function ve() {
     if (dotDangVao !== i) { dotDangVao = i; vaoDot(); }
-    if (dem) dem.textContent = 'Đợt ' + (i + 1) + '/' + dots.length;
+    if (dem) dem.textContent = (document.body.hasAttribute('data-chua-bai') ? 'Câu ' : 'Đợt ') + (i + 1) + '/' + dots.length;
     veThanh();
     if (truoc) truoc.disabled = i <= 0;
     if (sau) sau.disabled = i >= dots.length - 1;
@@ -1119,14 +1127,13 @@ export function taoHtmlMayChieu(dsO: OBang[], tuyChonGoc: TuyChonMayChieu = {}):
     <button type="button" id="mc-sau" aria-label="Đợt tiếp">▸</button>
   </div>
   <span class="mc-pha" id="mc-pha"></span>
-  <button type="button" id="mc-len-bang">Lên bảng</button>
-  <div class="mc-phim-nhom" id="mc-phim-nhom">
+${tuyChon.chuaBai ? '' : '  <button type="button" id="mc-len-bang">Lên bảng</button>\n'}  <div class="mc-phim-nhom" id="mc-phim-nhom">
     <button type="button" class="mc-nut-phim" data-k="C" hidden><kbd>C</kbd><span class="mc-nut-chu">Thầy chữa</span></button>
 ${coAiSai ? '    <button type="button" class="mc-nut-phim" data-k="X" hidden><kbd>X</kbd><span class="mc-nut-chu">Ai sai</span></button>\n' : ''}    <button type="button" class="mc-nut-phim" data-k="D" hidden><kbd>D</kbd><span class="mc-nut-chu">Đạt</span></button>
     <button type="button" class="mc-nut-phim" data-k="K" hidden><kbd>K</kbd><span class="mc-nut-chu">Không đạt</span></button>
     <button type="button" class="mc-nut-phim" data-k="G"><kbd>G</kbd><span class="mc-nut-chu">Giải</span></button>
     <button type="button" class="mc-nut-phim" data-k="T"><kbd>T</kbd><span class="mc-nut-chu">Thống kê</span></button>
-    <button type="button" class="mc-nut-phim" data-k="B"><kbd>B</kbd><span class="mc-nut-chu">Bút</span></button>
+${tuyChon.chuaBai ? `    ${NUT_THU_GON}\n` : ''}    <button type="button" class="mc-nut-phim" data-k="B"><kbd>B</kbd><span class="mc-nut-chu">Bút</span></button>
     <button type="button" class="mc-nut-phim" data-k="Tab"><kbd>Tab</kbd><span class="mc-nut-chu">Tổng quan</span></button>
     <button type="button" class="mc-nut-phim" data-k="?"><kbd>?</kbd><span class="mc-nut-chu">Phím</span></button>
   </div>
@@ -1145,7 +1152,7 @@ ${coAiSai ? '    <button type="button" class="mc-nut-phim" data-k="X" hidden><kb
   return `<!DOCTYPE html>
 <html lang="vi" data-projector="matte-light" data-sang><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${thoat(tuyChon.tenBuoi || 'Gọi lên bảng')} — tờ máy chiếu</title>
-<style>${CSS_PHIEU}</style><style>${CSS_MAY_CHIEU}</style><style>${CSS_BO_CUC}</style><style>${CSS_GIAO_DIEN_TO_CHIEU}</style><style>${CSS_LEN_BANG_MOI}</style>${maPhien ? `<style>${CSS_CAU_NOI_TO_CHIEU}</style><style>${CSS_GIAO_DIEN_NUT_CHAM}</style>` : ''}</head>
-<body class="mc${tuyChon.dayHoc ? ' mc-day-hoc' : ''}"${maPhien ? ` data-cau-noi="${maPhien}"` : ''}${nganSach > 0 ? ` data-ngan-sach="${nganSach}"` : ''}>${than}
-<script>${JS_MAY_CHIEU}</script><script>${jsBoCuc()}</script>${maPhien ? `<script>${jsCauNoiToChieu()}</script>` : ''}<script>${jsLenBangMoi({ cauNoi: Boolean(maPhien) })}</script></body></html>`
+<style>${CSS_PHIEU}</style><style>${CSS_MAY_CHIEU}</style><style>${CSS_BO_CUC}</style><style>${CSS_GIAO_DIEN_TO_CHIEU}</style><style>${CSS_LEN_BANG_MOI}</style>${tuyChon.chuaBai ? `<style>${CSS_CHUA_BAI}</style>` : ''}${maPhien ? `<style>${CSS_CAU_NOI_TO_CHIEU}</style><style>${CSS_GIAO_DIEN_NUT_CHAM}</style>` : ''}</head>
+<body class="mc${tuyChon.dayHoc ? ' mc-day-hoc' : ''}"${tuyChon.chuaBai ? ' data-chua-bai' : ''}${maPhien ? ` data-cau-noi="${maPhien}"` : ''}${nganSach > 0 ? ` data-ngan-sach="${nganSach}"` : ''}>${than}
+<script>${JS_MAY_CHIEU}</script><script>${jsBoCuc()}</script>${maPhien ? `<script>${jsCauNoiToChieu()}</script>` : ''}<script>${jsLenBangMoi({ cauNoi: Boolean(maPhien) })}</script>${tuyChon.chuaBai ? `<script>${JS_CHUA_BAI}</script>` : ''}</body></html>`
 }
