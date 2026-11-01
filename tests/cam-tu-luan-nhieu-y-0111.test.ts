@@ -21,6 +21,14 @@ describe('Phần III nhiều ý yêu cầu ⇒ tự luận', () => {
     expect(laCauTuLuan({ phan: 'III', text: 'Cho 5,6 gam Fe vào dung dịch HCl dư. (a) Viết phương trình phản ứng. (b) Tính thể tích khí H₂ (đkc).', correct: '2,479' })).toBe(true)
     expect(laCauTuLuan({ phan: 'III', text: 'Cho dữ kiện sau.\na) Hãy nêu hiện tượng.\nb) Trong điều kiện chuẩn, tính ΔH.', correct: '-92' })).toBe(true)
   })
+  it('soát kho thật 01/11: ý hỏi «Tại sao …?», ý tự đặt câu hỏi «… bao nhiêu …?», «cho biết … toả nhiệt hay thu nhiệt» ⇒ tự luận; «Viết PTHH và tính hiệu suất» vẫn rút được', () => {
+    expect(laCauTuLuan({ phan: 'III', text: 'Hỗn hợp N₂O₄ và N₂H₄ dùng làm nhiên liệu tên lửa. a) Tính nhiệt lượng toả ra khi đốt cháy 1 kg hỗn hợp lỏng theo đúng tỉ lệ phản ứng. b) Tại sao hỗn hợp lỏng N₂O₄ và N₂H₄ được dùng làm nhiên liệu tên lửa?', correct: '6724,2' })).toBe(true)
+    expect(laCauTuLuan({ phan: 'III', text: 'Nguyên tử nitrogen có 7 proton và 7 neutron trong hạt nhân. a) Nguyên tử nitrogen này có bao nhiêu electron? b) Tính khối lượng của hạt nhân, vỏ nguyên tử và của nguyên tử nitrogen. c) Khối lượng hạt nhân chiếm bao nhiêu phần trăm?', correct: '100,0' })).toBe(true)
+    expect(lyDoTuLuan({ phan: 'III', text: 'Cho phản ứng NO₂(g) + SO₂(g) → NO(g) + SO₃(g). Tính biến thiên enthalpy của phản ứng và cho biết phản ứng trên là tỏa nhiệt hay thu nhiệt.', correct: '-41' })).toBe('phần III bắt kết luận bằng lời (… hay …) — tự luận')
+    expect(laCauTuLuan({ phan: 'III', text: 'Dẫn hỗn hợp X qua bình chứa xúc tác V₂O₅, thu được hỗn hợp khí Y có tỉ khối so với H₂ bằng 30. Viết phương trình hóa học và tính hiệu suất của phản ứng oxi hóa SO₂ thành SO₃.', correct: '80' })).toBe(false)
+    expect(laCauTuLuan({ phan: 'III', text: 'Cho các nhận xét sau: (a) Nước chua có tính acid nên làm protein bị đông tụ. (b) Thạch cao có thể thay nước chua. (c) Đậu phụ giàu protein. Có bao nhiêu nhận xét đúng?', correct: '3' })).toBe(false)
+  })
+
   it('danh sách phát biểu / thí nghiệm + câu hỏi đếm ⇒ vẫn là trả lời ngắn', () => {
     const phatBieu = 'Cho các phát biểu sau:\n(a) Glucose có phản ứng tráng bạc.\n(b) Tính chất hoá học đặc trưng của kim loại là tính khử.\n(c) Saccharose thuộc loại disaccharide.\n(d) Cho Fe vào dung dịch CuSO₄ có kim loại Cu bám vào.\nSố phát biểu đúng là'
     expect(soYConYeuCau(phatBieu)).toBe(0)

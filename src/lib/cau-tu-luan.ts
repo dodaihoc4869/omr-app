@@ -94,8 +94,13 @@ const HOI_DAI_LUONG = /bao nhiêu|số thứ tự|dãy số|bộ số|liệt kê
  * là danh từ, không phải lệnh «tính».
  */
 const DONG_TU_YEU_CAU = /^(?:hãy\s+)?(?:viết|xác định|tính(?!\s+(?:chất|oxi|oxy|khử|acid|axit|base|bazơ|bazo|tan|dẻo|dẫn|cứng|lưỡng|kim loại|phi kim|tương đối|thấm|bền))|giải thích|trình bày|nêu|so sánh|nhận xét|đề xuất|lập|vẽ|chứng minh|hoàn thành|cân bằng|gọi tên|phân biệt|dự đoán|cho biết|tìm|sắp xếp|biểu diễn|mô tả|nhận biết|điều chế|thiết lập|đề nghị|chỉ ra)(?![\p{L}])/iu
+/** Ý con HỎI MỞ: mở đầu bằng câu hỏi lý do / cách thức («Tại sao …», «Vì sao …») — một việc phải trả lời bằng lời. */
+const HOI_Y_CON = /^(?:tại sao|vì sao|như thế nào|bằng cách nào|có nên)(?![\p{L}])/iu
 const DAU_Y_CON = /(?:^|[\s.:;?!])\(?([a-e])\)\s*/giu
-/** Số Ý CON (khác chữ cái) mà nội dung mở đầu — hoặc sau dấu phẩy đầu, vd «Ở 427 °C, tính …» — bằng động từ yêu cầu. */
+/** Đề bắt KẾT LUẬN BẰNG LỜI giữa hai khả năng («cho biết phản ứng là toả nhiệt hay thu nhiệt», «cho biết … tăng hay giảm») — đáp án số không chấm được phần này. */
+const KET_LUAN_BANG_LOI = /cho biết[^.?!\n]{0,90}?(?:tỏa|toả|thu|tăng|giảm|mạnh|yếu|nhanh|chậm|đúng|sai|có|không|thuận|nghịch)[^.?!\n]{0,30}\shay\s/iu
+/** Số Ý CON (khác chữ cái) là MỘT VIỆC phải làm: mở đầu — hoặc sau dấu phẩy đầu, vd «Ở 427 °C, tính …» — bằng động từ yêu cầu, hoặc hỏi mở («Tại sao …»),
+ *  hoặc tự đặt một câu hỏi (có «?» trong ý — «a) Nguyên tử này có bao nhiêu electron?»). Danh sách phát biểu chỉ có «?» ở câu hỏi đếm cuối ⇒ tối đa 1. */
 export function soYConYeuCau(text: string): number {
   const t = text.normalize('NFC')
   const dau: { chu: string; tu: number; den: number }[] = []
@@ -105,7 +110,7 @@ export function soYConYeuCau(text: string): number {
   dau.forEach((d, i) => {
     const doan = t.slice(d.tu, i + 1 < dau.length ? dau[i + 1]!.den : t.length).trim().slice(0, 160)
     const dauDoan = doan.split(/[,;]/).slice(0, 2).map((x) => x.trim())
-    if (dauDoan.some((x) => DONG_TU_YEU_CAU.test(x))) co.add(d.chu)
+    if (dauDoan.some((x) => DONG_TU_YEU_CAU.test(x) || HOI_Y_CON.test(x)) || doan.includes('?')) co.add(d.chu)
   })
   return co.size
 }
@@ -187,6 +192,7 @@ export function lyDoTuLuan(c: unknown, phanMacDinh?: PhanCau): string | null {
     if (coDapAn && da.replace(/[^DSĐdsđ]/g, '').length !== 4) return 'phần II không có đáp án đúng/sai đủ 4 ý'
   } else if (phan === 'III') {
     if (text && soYConYeuCau(text) >= 2) return 'phần III gồm nhiều ý yêu cầu (a, b, c …) — tự luận'
+    if (text && KET_LUAN_BANG_LOI.test(text.normalize('NFC'))) return 'phần III bắt kết luận bằng lời (… hay …) — tự luận'
     if (coDapAn) {
       if (!da) return 'phần III không có đáp án để chấm tự động'
       if ((da.length > 20 && /\s/.test(da)) || /[\n;→⇌:]/.test(da)) return 'phần III đáp án dài / nhiều dòng (tự luận)'
