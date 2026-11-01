@@ -33,6 +33,23 @@ export const SQL_LA_LUOT_CHANG = "(nguon='game' AND purpose='luot')"
 /** Dòng sổ có kết quả HOẶC là lượt lướt của chặng — thay cho `ket_qua IS NOT NULL` ở các nơi đếm «câu của chặng hôm nay». */
 export const SQL_CO_KET_QUA_HOAC_LUOT = `(ket_qua IS NOT NULL OR ${SQL_LA_LUOT_CHANG})`
 export const SQL_CAU_TINH_MUC = `ma_nguon NOT LIKE 'ktcn:%' AND ${SQL_KHONG_TU_SUA} AND ${SQL_KHONG_LAM_LAI} AND (${SQL_LA_LUOT_CHANG} OR (${SQL_LA_LAN_LAM} AND COALESCE(visibility,'')<>'embargoed' AND (nguon<>'thi' OR EXISTS(SELECT 1 FROM ca c WHERE c.ma_ca=su_kien_hoc.ma_nguon AND c.trang_thai<>'da_xoa' AND ${SQL_DA_CONG_BO('c')}))))`
+// MỘT MỨC, MỘT SỐ ĐẾM (02/11, thầy: «Kiểm tra xem có học sinh nào làm đủ bị mất chuỗi không? Nếu có khôi phục chuỗi cho học sinh nhé»). Đo dữ liệu thật
+//  (scripts/kiem-chuoi-0211.ts): 31/10 và 01/11 có 17 + 42 em màn báo «Đủ x/y câu hôm nay!» (máy chủ đã trả thưởng «đạt mục tiêu ngày») mà chuỗi TẮT. Lý do: từ
+//  #520 (7915b8b, luật chuỗi «đủ mức» 28/10) chuỗi chỉ đếm SỔ HỌC, còn Lộ trình / vòng «Đủ mức» (`docDaLamVaVuaLam7`) và lịch ngày (bai-hang-ngay `SQL_DEM_GAP`)
+//  cộng thêm CÂU HỌC CÁCH GIẢI (`goi_bai_7_gap`: em bấm học lời giải — câu ấy không đi qua `answer` nên sổ không có dòng). Nay chuỗi đếm đúng tập ấy.
+/** Số câu học cách giải của em `sbd` trong ngày VN `ngay` mà sổ CHƯA có dòng tính mức (y `SQL_DEM_GAP` của bai-hang-ngay). `sbd` / `ngay` là biểu thức trỏ ra
+ *  truy vấn ngoài (vd `su_kien_hoc.sbd`, `goi_bai_7_muc_ngay.ngay`); tầng trong chỉ dùng `g` và bảng sổ của chính nó. Chỉ mục goi_bai_7_gap_sbd_luc(sbd, luc). */
+export const sqlCauHocCachGiai = (sbd: string, ngay: string): string => `(SELECT COUNT(DISTINCT g.qid) FROM goi_bai_7_gap g WHERE g.sbd = ${sbd}
+    AND g.luc >= strftime('%Y-%m-%dT%H:%M:%fZ', ${ngay}, '-7 hours') AND g.luc < strftime('%Y-%m-%dT%H:%M:%fZ', ${ngay}, '+17 hours')
+    AND NOT EXISTS (SELECT 1 FROM su_kien_hoc WHERE su_kien_hoc.sbd = g.sbd AND su_kien_hoc.ngay_vn = date(g.luc, '+7 hours') AND su_kien_hoc.qid = g.qid
+      AND ${SQL_CO_KET_QUA_HOAC_LUOT} AND ${SQL_CAU_TINH_MUC}))`
+/** SỐ CÂU TÍNH MỨC của nhóm (sbd, ngay_vn) trong câu `… FROM su_kien_hoc WHERE … AND SQL_CO_KET_QUA_HOAC_LUOT GROUP BY sbd, ngay_vn` (bảng không bí danh):
+ *  câu trong sổ + câu học cách giải chưa có trong sổ — ĐÚNG con số «Đủ x/y câu» của Lộ trình. Một nguồn cho chuỗi em (B3), bảng thầy / bạn bè / phụ huynh, cược. */
+export const SQL_SO_CAU_MUC = `(COUNT(DISTINCT CASE WHEN ${SQL_CAU_TINH_MUC} THEN qid END) + ${sqlCauHocCachGiai('su_kien_hoc.sbd', 'su_kien_hoc.ngay_vn')})`
+/** Dòng mức hôm nay `t` (bảng goi_bai_7_muc_ngay, tên hoặc bí danh) mà em ĐÃ ĐỦ: số câu tính mức (cùng phép SQL_SO_CAU_MUC) ≥ mức. Dùng khi xoá mức để chốt lại
+ *  (giao bài mới #708 / sửa hạn / sửa danh sách em): em đã thấy «Đủ x/y» thì GIỮ mức đã đủ — không để mức nhảy lên rồi chuỗi tính theo mức mới (một mức thống nhất). */
+export const sqlDaDuMuc = (t: string): string => `((SELECT COUNT(DISTINCT qid) FROM su_kien_hoc WHERE su_kien_hoc.sbd = ${t}.sbd AND su_kien_hoc.ngay_vn = ${t}.ngay
+    AND ${SQL_CO_KET_QUA_HOAC_LUOT} AND ${SQL_CAU_TINH_MUC}) + ${sqlCauHocCachGiai(`${t}.sbd`, `${t}.ngay`)} >= ${t}.muc)`
 
 export const CAU_MOT_BAI = 6
 export const BAI_CUU = 2

@@ -35,7 +35,7 @@ import { cungTap, layKeHoach7, nhoKeHoach7, xemKeHoach7 } from './goi-bai-7-nho'
 import { dangKyKichThuoc } from './dem-chung'
 import { lenhThuongTraLoi, tinhThuongHocCachGiai, type PhienNt } from './thuong-tra-loi'
 import { ngayVnTt } from './thuong-luat'
-import { CAU_MOT_BAI, SQL_LA_LUOT_CHANG } from './chuoi-ngay-bai'
+import { CAU_MOT_BAI, SQL_LA_LUOT_CHANG, sqlDaDuMuc } from './chuoi-ngay-bai'
 
 type Row = Record<string, unknown>
 const str = (x: unknown) => String(x ?? '')
@@ -130,6 +130,7 @@ async function dongBoThat7(env: Env, now: number, tran: number, lop: string): Pr
  *  · Xoá số kế hoạch TÍNH SẴN từ hôm nay của các em nhận gói mới (`goi_bai_7_ngay` mọi gói + `goi_bai_7_muc_ngay`) — như sửa hạn / sửa danh sách em
  *    (goi-bai-7-thay.ts, goi-bai-7-membership.ts). Lượt đọc kế tiếp tính lại: số câu hôm nay = max(mức theo tầng, Σ hạn mức các gói kể cả câu ĐÃ làm hôm nay)
  *    ⇒ THAY số cũ, không cộng dồn lên số cũ; câu đã làm / đã gặp hôm nay không bị giao lại. Sổ làm bài, điểm, phiên đang dở không đụng tới.
+ *    (02/11) TRỪ em đã ĐỦ mức hôm nay (`sqlDaDuMuc`): giữ mức đã đủ ⇒ màn và chuỗi cùng một mức, em không mất chuỗi vì thầy giao thêm bài lúc tối.
  *  · Bỏ đệm kế hoạch trong isolate rồi BÁO MÁY CÁC EM qua kênh đẩy (`k: goi`) ⇒ máy đang mở tự tải lại gói cả ngày (câu + đáp án đã khoá `dm`).
  * Chỉ chạy khi gói THẬT SỰ vừa tạo (INSERT có dòng) và không có ca thi mở (gói không tạo khi ca mở). Lỗi báo máy không ảnh hưởng gì.
  */
@@ -140,7 +141,8 @@ async function xepLaiHomNayChoGoiMoi(env: Env, goiMoi: readonly string[], now: n
   const ds = JSON.stringify(em)
   await env.DB.batch([
     env.DB.prepare(`DELETE FROM goi_bai_7_ngay WHERE ngay>=? AND sbd IN (SELECT value FROM json_each(?)) AND ${KHONG_CA}`).bind(ngay, ds),
-    env.DB.prepare(`DELETE FROM goi_bai_7_muc_ngay WHERE ngay>=? AND sbd IN (SELECT value FROM json_each(?)) AND ${KHONG_CA}`).bind(ngay, ds),
+    // (02/11) em ĐÃ ĐỦ mức hôm nay giữ mức đã đủ (không nhảy «Đủ 12/12» thành «12/30» rồi chuỗi tính theo 30); bài mới vào phần luyện từ mai / «Học thêm câu mới».
+    env.DB.prepare(`DELETE FROM goi_bai_7_muc_ngay WHERE ngay>=? AND sbd IN (SELECT value FROM json_each(?)) AND ${KHONG_CA} AND NOT ${sqlDaDuMuc('goi_bai_7_muc_ngay')}`).bind(ngay, ds),
   ])
   const { emCoGhi } = await import('./dem-ke-hoach')
   for (const s of em) emCoGhi(s)
