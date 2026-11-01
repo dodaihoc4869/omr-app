@@ -1,3 +1,27 @@
+# Mol v2 — BUILD (thầy chốt «Chốt bình cầu, chọn cả 3 bộ màu thay đổi mỗi ngày»)
+
+- **3 bộ màu đổi mỗi ngày:** bộ 0 chàm sáng + ngọc lam · bộ 1 ngọc lam + hồng · bộ 2 chàm nhạt + cam (`binh-cau-mau.jpg`).
+  - Chọn bằng `src/lib/mau-mol-ngay.ts`: `boMauMol(giờ máy chủ)` = ngày VN mod 3, qua 00:00 VN đổi bộ.
+  - Mol mang `data-mol-mau`; CSS bộ 1 / 2 ở `mol.css`; giận đỏ sẫm dùng chung.
+  - Ảnh tĩnh giữ chỗ của bộ ngày khác bị bỏ (`Bi.tsx`).
+  - Ảnh: `binh-cau-3-bo-mau-sang.jpg`, `binh-cau-3-bo-mau-toi.jpg`.
+- **Bong bóng lời trên đầu Mol** (Lộ trình, mọi hướng màn): có Mol cạnh đường ⇒ mọi lời lên bong bóng trên đầu Mol, thay thẻ riêng ở trên.
+  - Tự căn rộng ≤ 280 px, không tràn mép, đuôi chỉ đầu Mol.
+  - Màu theo cảm xúc (`data-cx`, token, chuyển 300 ms); rất cáu viền đập nhẹ, giảm chuyển động ⇒ đứng yên.
+  - Lưu ý: bong bóng nằm trên đường đi (z-index 2) nên có thể che một phần nút chặng phía trên Mol.
+  - Ảnh: `binh-cau-lo-trinh-toi.jpg` (cấp 4), `binh-cau-lo-trinh-cap5-toi.jpg` (cấp 5), `binh-cau-lo-trinh-doi-sang.jpg` (câu dỗi dài), `binh-cau-lo-trinh-chan-ngon-sang.jpg` (chân ngôn).
+- **Kho câu (một tệp `src/lib/loi-mol.ts`):**
+  - **Giận vì câu chưa được tính** — gọi thẳng «đối phó» (thầy cho phép chữ này trong lời Mol giận):
+    - cấp 2 dỗi / 3 bực: câu ngắn + 5 câu dỗi của thầy;
+    - cấp 4 cáu: 3 câu;
+    - cấp 5 rất cáu: 3 câu (2 câu Boss gọt nhẹ từ nguyên văn thầy — ghi trong tệp).
+  - **Giận vì muộn:** giục vào học.
+  - **Chân ngôn:** nguyên văn thầy, hiện ở 1/3 lượt vui (in nghiêng, đặt trong «»).
+  - **Cách chọn:**
+    - Xoay vòng tất định theo lượt (số câu đã làm + ngày VN), không lặp liền câu vừa hiện.
+    - Lộ trình nhớ câu theo lượt ở `localStorage` `ddh.loi-mol`.
+    - Bỏ số / giải thích dài khỏi bong bóng; số câu, chuỗi vẫn ở vòng Mục tiêu và thẻ Chuỗi ngày.
+
 # Mol v2 — HƯỚNG HIỆN TẠI: GIỮ BÌNH CẦU, sửa thẳng mã thật (01/11 tối, chưa PR)
 
 Thầy: «Giữ nguyên hình cầu đi, điều chỉnh lại cảm xúc cho dễ thương, thêm 6,022, phối màu lại cho đẹp mịn siêu dễ thương».

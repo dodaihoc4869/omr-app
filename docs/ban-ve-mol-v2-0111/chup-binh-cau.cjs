@@ -18,6 +18,7 @@ const jsCu = goi(path.join(TAM, 'linh-vat/mol-dong.ts'), 'MOLCU')
 const cssCu = execFileSync('git', ['show', 'origin/main:src/styles/mol.css'], { cwd: GOC, encoding: 'utf8' }).replace(/\.mol-svg/g, '.cu .mol-svg').replace(/html\.may-yeu \.cu /g, 'html.may-yeu ')
 const font = (w, f) => `@font-face{font-family:'DDH Rounded';font-weight:${w};src:url(file://${path.join(GOC, 'src/styles/phong-ddh', f)}) format('woff2')}`
 const css = [doc('src/styles/tokens.css'), doc('src/styles/trong.css'), doc('src/styles/trong-hs-mau.css'), doc('src/styles/mol.css'), cssCu,
+  doc('src/styles/bi.css').replace(/@import[^;]*;/g, ''), doc('src/styles/trong-hs.css').replace(/@import[^;]*;/g, ''),
   font('100 549', 'ddh-rounded-de-vietnamese.woff2'), font('100 549', 'ddh-rounded-de-latin.woff2'), font('550 1000', 'ddh-rounded-dam-vietnamese.woff2'), font('550 1000', 'ddh-rounded-dam-latin.woff2'), `
 /* Ba tổ hợp màu ĐÃ THỬ (chỉ trong trang chụp — bản build dùng tổ hợp 1 trong mol.css) */
 .thu2 .mol-svg{--mol-x:var(--tr-tin);--mol-x-sang:color-mix(in oklab,var(--tr-tin) 45%,var(--btg-chu-doan-dam));--mol-x-toi:var(--tr-tin-day);
@@ -62,7 +63,7 @@ const MAT = [['vui', 'vui'], ['khen', 'khen'], ['chao', 'chào'], ['nghi', 'ngh�
   ['nguong', 'ngượng', 1], ['me', 'mê', 1], ['nhay', 'vui nhảy', 1], ['tuTin', 'tự tin', 1]]
 const html = `<!doctype html><html lang="vi" data-trong="hs"><head><meta charset="utf-8"><style>${css}</style></head><body><main id="m"></main><div id="dt"></div>
 <script>${jsMoi}</script><script>${jsCu}</script><script>
-const bi = (m, w, o = {}) => '<span class="bi lua' + (o.cu ? ' cu' : '') + '"' + (w < 64 ? ' data-nho' : '') + ' style="width:' + w + 'px;height:' + Math.round(w * 1.15) + 'px"><svg class="lua-svg mol-svg" viewBox="0 -26 200 230" data-mat="' + m + '" data-tinh>' + (o.cu ? MOLCU.svgMol(m) : MOL.svgMol(m)) + '</svg></span>'
+const bi = (m, w, o = {}) => '<span class="bi lua' + (o.cu ? ' cu' : '') + '"' + (w < 64 ? ' data-nho' : '') + ' style="width:' + w + 'px;height:' + Math.round(w * 1.15) + 'px"><svg class="lua-svg mol-svg" viewBox="0 -26 200 230" data-mat="' + m + '"' + (o.bo ? ' data-mol-mau="' + o.bo + '"' : '') + ' data-tinh>' + (o.cu ? MOLCU.svgMol(m) : MOL.svgMol(m)) + '</svg></span>'
 const nua = (m, w) => '<span class="bi lua"' + (w < 64 ? ' data-nho' : '') + ' style="width:' + w + 'px;height:' + w + 'px;overflow:hidden;border-radius:50%"><svg class="lua-svg mol-svg" viewBox="5 6 190 190" data-mat="' + m + '" data-tinh>' + MOL.svgMol(m) + '</svg></span>'
 const MAT = ${JSON.stringify(MAT)}
 const q = new URLSearchParams(location.search)
@@ -76,21 +77,29 @@ m.innerHTML =
  '<div class="luoi" style="grid-template-columns:repeat(8,1fr)">' + MAT.map(([k, t, moi]) => '<figure>' + bi(k, 128) + '<span' + (moi ? ' class="moi-nhan"' : '') + '>' + t + (moi ? ' · mới' : '') + '</span></figure>').join('') + '</div></section>' +
  '<section class="khoi" id="mau"><h2>Ba tổ hợp màu đã thử (token có sẵn)</h2><p>1 · chàm sáng --tr-hs-nut + ngọc lam --tr-tin (CHỌN) · 2 · ngọc lam --tr-tin + hồng --tr-tim · 3 · chàm nhạt --tr-hs + cam --tr-chu-y (gần Mol cũ).</p>' +
  '<div class="luoi" style="grid-template-columns:repeat(3,1fr)">' + ['', 'thu2', 'thu3'].map((c, i) => '<figure class="' + c + '"><div style="display:flex;gap:4px">' + ['vui', 'khen', 'cau'].map((k) => bi(k, 118)).join('') + '</div>' + ['1 · chàm sáng + ngọc lam (chọn)', '2 · ngọc lam + hồng', '3 · chàm nhạt + cam'][i] + '</figure>').join('') + '</div></section>' +
+ '<section class="khoi" id="bo-mau"><h2>Ba bộ màu đổi mỗi ngày (theo ngày Việt Nam, qua 00:00 đổi) · nền ' + (matchMedia('(prefers-color-scheme: dark)').matches ? 'tối' : 'sáng') + '</h2>' +
+ '<p>Bộ = số ngày VN mod 3 (src/lib/mau-mol-ngay.ts) · cùng ngày mọi máy cùng màu (giờ máy chủ). Giận đỏ sẫm dùng chung.</p><div class="luoi" style="grid-template-columns:repeat(3,1fr)">' +
+ [['0', 'Bộ 0 · chàm sáng + ngọc lam'], ['1', 'Bộ 1 · ngọc lam + hồng'], ['2', 'Bộ 2 · chàm nhạt + cam']].map(([b, t]) => '<figure><div style="display:flex;gap:4px;align-items:flex-end">' + ['vui', 'khen', 'buon', 'cau'].map((k) => bi(k, 92, { bo: b })).join('') + '</div>' + t + '</figure>').join('') + '</div></section>' +
  '<section class="khoi" id="so"><h2>Cận cảnh 6,022·10²³ ở dung dịch dưới bụng · vui / cáu / rất cáu</h2><p>Chữ trắng 88 % + bóng mảnh, cong theo đáy cầu, đứng yên khi dung dịch đỏ dâng. Hàng dưới: cỡ thật 48 (ẩn chữ) / 64 / 96 px.</p>' +
  '<div class="luoi" style="grid-template-columns:repeat(3,1fr)">' + ['vui', 'cau', 'ratCau'].map((k) => '<figure><span class="bi lua" style="width:330px;height:160px;overflow:hidden;border-radius:14px"><svg class="lua-svg mol-svg" viewBox="38 128 124 60" data-mat="' + k + '" data-tinh style="width:330px;height:160px;overflow:hidden">' + MOL.svgMol(k) + '</svg></span><div style="display:flex;align-items:flex-end;gap:12px;margin-top:6px">' + [48, 64, 96].map((w) => bi(k, w)).join('') + '</div>' + k + '</figure>').join('') + '</div></section>' +
  '<section class="khoi" id="co-nho"><h2>Cỡ nhỏ · 28 / 40 / 48 / 64 px (toàn hình) và vòng 40 px · nền ' + (matchMedia('(prefers-color-scheme: dark)').matches ? 'tối' : 'sáng') + '</h2><p>Chữ 6,022·10²³ ở bụng hiện từ 64 px (đã thử 48 px: chữ cao ~3,5 px, không đọc được ⇒ ẩn).</p>' +
  '<div class="luoi" style="grid-template-columns:repeat(5,1fr)">' + ['vui', 'khen', 'buon', 'cau', 'ratCau'].map((k) => '<figure><div style="display:flex;align-items:flex-end;gap:10px">' + [28, 40, 48, 64].map((w) => bi(k, w)).join('') + '<span class="vong" style="display:inline-block;padding:3px;border-radius:50%;background:var(--tr-hs)">' + nua(k, 40) + '</span></div>' + k + '</figure>').join('') + '</div></section>'
-// Điện thoại Lộ trình (cáu) + bong bóng trên đầu Mol
+// Điện thoại Lộ trình + BONG BÓNG THẬT trên đầu Mol (markup + CSS như TrongHs.tsx / trong-hs.css; tự căn như LoiBi: rộng ≤ 280, không tràn mép đường đi)
 const kiem = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'
-const MX = 206, MY = 330, MW = 150, tam = MX + MW / 2, dinh = MY + (-34 + 26) * (MW * 1.15) / 230, BW = 214, trai = Math.min(Math.max(tam - BW / 2, 12), 390 - 12 - BW)
-document.getElementById('dt').innerHTML = '<div class="dt"><div class="tren"><span class="o lua">🔥12</span><span class="o nt">⚛ 340</span><span class="o tt">★ 5</span><span class="vong">' + nua('cau', 36) + '</span></div>' +
+const DT = { cau: ['cau', 4, 'cau', 'Không biết học đối phó có lợi ích gì?'], cau5: ['ratCau', 5, 'ratCau', 'Tại sao phải đối phó với một giáo viên top 3 miền Bắc dạy Hoá?'],
+  doi: ['doi', 2, 'doi', 'Để học giỏi Hoá cần 2 điều kiện: hiểu tiếng Việt và giỏi toán lớp 4.'], cn: ['vui', 0, 'vui', '«Tập trung vào quá trình, kết quả là tất yếu.»', 1] }
+const [mat, cap, cx, cau, laCn] = DT[q.get('dt')] || DT.cau
+const MW = 104, MX = 236, MY = 380, tamX = MX + MW / 2, tamY = MY + MW * 1.15 / 2, L = 16, Rp = 374
+const rong = Math.round(Math.max(150, Math.min(280, (Rp - L) - 16))), trai = Math.round(Math.min(Math.max(tamX - rong / 2, L + 8), Rp - 8 - rong) - tamX), duoi = Math.round(Math.min(Math.max(-trai - 20, 18), rong - 18))
+document.getElementById('dt').innerHTML = '<div class="dt"><div class="tren"><span class="o lua">🔥12</span><span class="o nt">⚛ 340</span><span class="o tt">★ 5</span><span class="vong">' + nua(mat, 36) + '</span></div>' +
  '<div class="hero"><small>CHƯƠNG 1 · HOÁ 12</small><b>Este – Lipid</b><div class="thanh"><i></i>2/7 chặng</div></div>' +
- '<span class="chu-nen" style="left:24px;top:330px">n = m / M</span><span class="chu-nen" style="left:30px;top:650px">CaCO₃ → CaO + CO₂</span><span class="chu-nen" style="left:220px;top:600px">pV = nRT</span>' +
- '<span class="chang xong" style="left:140px;top:350px">' + kiem + '</span><span class="chang xong" style="left:76px;top:444px">' + kiem + '</span>' +
+ '<span class="chu-nen" style="left:24px;top:330px">n = m / M</span><span class="chu-nen" style="left:30px;top:690px">CaCO₃ → CaO + CO₂</span><span class="chu-nen" style="left:230px;top:620px">pV = nRT</span>' +
+ '<span class="chang xong" style="left:150px;top:300px">' + kiem + '</span><span class="chang xong" style="left:76px;top:420px">' + kiem + '</span>' +
  '<span class="vong-dang" style="left:58px;top:556px"></span><span class="chang dang" style="left:70px;top:570px">★</span><span class="bat-dau" style="left:52px;top:500px">BẮT ĐẦU</span>' +
- '<span class="chang khoa" style="left:126px;top:686px">🔒</span>' +
- '<div style="position:absolute;left:' + MX + 'px;top:' + MY + 'px">' + bi('cau', MW) + '</div>' +
- '<div class="bb" style="left:' + trai + 'px;bottom:' + Math.round(844 - (dinh - 12)) + 'px;width:' + BW + 'px;--duoi:' + Math.round(tam - 24 - trai) + 'px">Cáu rồi đó! 3 câu liền chưa tính — làm chậm lại nhé.</div>' +
+ '<span class="chang khoa" style="left:126px;top:700px">🔒</span>' +
+ '<div style="position:absolute;left:' + MX + 'px;top:' + MY + 'px">' + bi(mat, MW) + '</div>' +
+ '<span class="da-lv-loi-o"' + (cap >= 4 ? ' data-cap="' + cap + '"' : '') + ' style="left:' + tamX + 'px;top:' + tamY + 'px;transform:none;--rong:' + rong + 'px;--trai:' + trai + 'px;--duoi:' + duoi + 'px">' +
+ '<div class="bi-loi-boc" data-ben=""><div class="bi-loi" data-khong-bi=""><p class="bi-loi-bong"' + (cap >= 4 ? ' data-cap="' + cap + '"' : '') + ' data-cx="' + cx + '"' + (laCn ? ' data-chan-ngon=""' : '') + '><span aria-hidden="true">' + cau + '<span class="bi-loi-con"></span></span></p></div></div></span>' +
  '<nav class="day"><span class="dang2">◎</span><span>✎</span><span>🏆</span><span>☰</span></nav></div>'
 if (q.has('dt')) m.style.display = 'none'; else document.getElementById('dt').style.display = 'none'
 </script></body></html>`
@@ -116,9 +125,11 @@ async function luu(chup, ten) {
   kq.push(await luu((o) => s.locator('#cam-xuc').screenshot(o), 'binh-cau-cam-xuc-sang.jpg'))
   kq.push(await luu((o) => s.locator('#mau').screenshot(o), 'binh-cau-mau.jpg'))
   kq.push(await luu((o) => s.locator('#so').screenshot(o), 'binh-cau-so-can-canh.jpg'))
+  kq.push(await luu((o) => s.locator('#bo-mau').screenshot(o), 'binh-cau-3-bo-mau-sang.jpg'))
   await s.close()
   const t = await mo(true)
   kq.push(await luu((o) => t.locator('#cam-xuc').screenshot(o), 'binh-cau-cam-xuc-toi.jpg'))
+  kq.push(await luu((o) => t.locator('#bo-mau').screenshot(o), 'binh-cau-3-bo-mau-toi.jpg'))
   await t.close()
   // cỡ nhỏ: ghép sáng + tối thành một ảnh (chụp hai lượt, xếp chồng bằng trang phụ)
   const anh = []
@@ -128,9 +139,11 @@ async function luu(chup, ten) {
   await g.waitForTimeout(100)
   kq.push(await luu((o) => g.locator('#g').screenshot(o), 'binh-cau-co-nho.jpg'))
   await g.close()
-  const d = await mo(true, '?dt', 390, 2)
-  kq.push(await luu((o) => d.locator('.dt').screenshot(o), 'binh-cau-lo-trinh-toi.jpg'))
-  await d.close()
+  for (const [k, toi, ten] of [['cau', true, 'binh-cau-lo-trinh-toi.jpg'], ['cau5', true, 'binh-cau-lo-trinh-cap5-toi.jpg'], ['doi', false, 'binh-cau-lo-trinh-doi-sang.jpg'], ['cn', false, 'binh-cau-lo-trinh-chan-ngon-sang.jpg']]) {
+    const d = await mo(toi, '?dt=' + k, 390, 2)
+    kq.push(await luu((o) => d.locator('.dt').screenshot(o), ten))
+    await d.close()
+  }
   console.log(kq.join('\n'))
   await b.close()
 })()
