@@ -29,6 +29,9 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
         run: |
           q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results[]' | head -n 60; }
+          echo "== T nhật ký cron 150 giây (chỉ dòng [tu-luan] [kho-cau] [cau-meta] [hanh-trinh] / lỗi; che số)"
+          timeout 150 npx -y wrangler@4 tail omr --format json 2>/dev/null | jq -c --unbuffered 'select(.event.cron != null) | {cron:.event.cron, outcome, ex:[.exceptions[]?.message], logs:[.logs[]? | (.message|tostring) | select(test("tu-luan|kho-cau|cau-meta|hanh-trinh|lỗi|Error|exceeded"))]}' | sed -E 's/[0-9]{5,}/***/g' | head -n 12 || true
+          q "S5 em trong chiến dịch lớp 11 chưa rõ khối (đếm)" "SELECT c.id, COUNT(*) n FROM chien_dich c, json_each(c.sbd_json) j LEFT JOIN hoc_sinh h ON h.sbd=j.value WHERE c.trang_thai='dang_chay' AND c.id NOT LIKE 'hanh-trinh-v3-%' AND h.sbd IS NOT NULL AND COALESCE(h.trang_thai,'')<>'khoa' AND NOT (COALESCE(h.lop,'') GLOB '1[012]*' OR COALESCE(h.ten_lop,'') GLOB '1[012]*') GROUP BY c.id"
           q "S1 câu H2S + 7 câu luật mới: cờ tự luận đã gắn chưa" "SELECT qid, json_extract(json,'\$.tuLuan') tl FROM game_v2_question WHERE qid IN ('DH-11-C2-B7-III-39','DB-11-B7-D3-III-3','DB-11-B6-D3-III-10','DH-11-C2-B6-III-36','DH-10-C1-B1-III-26','DB-10-B1-D1-III-169','DH-11-C2-B7-III-15','DB-11-B8-D3-III-17')"
           q "S2 con trỏ quét cờ tự luận" "SELECT gia_tri, cap_nhat_luc FROM cau_hinh WHERE khoa='co_tu_luan_quet'"
           q "S3 chiến dịch đang chạy NGOÀI ba hành trình (bước kiểm sau phát hành)" "SELECT id, lop, tao_luc, json_array_length(qid_json) so_cau, json_array_length(sbd_json) so_em FROM chien_dich WHERE trang_thai='dang_chay' AND id NOT IN ('hanh-trinh-v3-khoi-10','hanh-trinh-v3-khoi-11','hanh-trinh-v3-khoi-12') ORDER BY tao_luc DESC LIMIT 10"
