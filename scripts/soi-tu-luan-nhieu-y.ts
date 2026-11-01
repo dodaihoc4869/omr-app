@@ -18,3 +18,22 @@ for (const r of rows) {
 }
 console.log(`== phần III có ý a)/b): ${tong} câu · luật mới kết tội thêm: ${moi} câu`)
 for (const [k, v] of [...theoTo].sort((a, b) => b[1] - a[1])) console.log(`  ${k}: ${v}`)
+
+// NGHI NGỜ KHÁC (phần III đang rút được nhưng chữ đề có dấu hiệu tự luận) — chỉ in mã câu + dấu hiệu, để soát tay.
+const DAU_HIEU: [string, RegExp][] = [
+  ['giải thích/trình bày/nhận xét/đề xuất', /(?:^|[^\p{L}])(?:giải thích|trình bày|nhận xét|đề xuất|đề nghị|so sánh)(?![\p{L}])/iu],
+  ['vì sao/tại sao', /vì sao|tại sao/iu],
+  ['… hay …?', /cho biết[^.?]{0,80}\bhay\b/iu],
+  ['viết biểu thức/cấu hình', /viết (?:biểu thức|cấu hình|công thức|phương trình)/iu],
+  ['≥ 2 dấu hỏi', /\?[^?]+\?/u],
+]
+let nghi = 0
+for (const r of (JSON.parse(readFileSync(process.argv[3] ?? process.argv[2]!, 'utf8')) as { results: Record<string, unknown>[] }[])[0]!.results) {
+  const text = String(r.text ?? '')
+  if (Number(r.tl) === 1 || laCauTuLuan({ qid: r.qid, phan: r.phan, text, correct: r.correct })) continue
+  const co = DAU_HIEU.filter(([, re]) => re.test(text)).map(([k]) => k)
+  if (!co.length) continue
+  nghi++
+  console.log(`NGHI ${r.qid} · ${co.join(' + ')} · đáp án ${String(r.correct ?? '').slice(0, 12)}`)
+}
+console.log(`== nghi ngờ còn lại: ${nghi} câu`)
