@@ -133,6 +133,34 @@ html.may-yeu[data-trong='gv'] .bb-the[data-bang='dp']::after { opacity: 0.6; }
   [data-trong='gv'] .bb-chan-phu { display: none; }
 }
 
+/* XOAY NGANG (thầy 01/11: «Xoay ngang đt tôi muốn màn hôm nay hiển thị 4 ô như máy tính … tối ưu xoay ngang trên đt và máy tính»): máy NGANG từ 640 px
+   ⇒ lưới 2×2 như máy tính (đè luật một cột < 1100 ở trên; không còn ô chọn bảng). 640–1100: dòng gọn (ảnh 32, cột điểm 60) để tên còn chỗ trong thẻ
+   ~315–480 px. Máy THẤP (≤ 600 px cao — điện thoại ngang): đầu thẻ / dòng / chân gọn theo chiều cao; chữ ≥ 13 px, đích bấm ≥ 44 px. Máy dọc giữ nguyên. */
+@media (orientation: landscape) and (min-width: 640px) {
+  [data-trong='gv'] .bb-bon { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (orientation: landscape) and (min-width: 640px) and (max-width: 1100px) {
+  [data-trong='gv'] .bb-bon { gap: 12px; }
+  [data-trong='gv'] .bb-ds { padding: 0 4px 4px; }
+  [data-trong='gv'] .bb-dong { grid-template-columns: 24px 32px minmax(0, 1fr) 60px; gap: 8px; padding: 8px; }
+  [data-trong='gv'] .bb-hang { width: 24px; height: 24px; }
+  [data-trong='gv'] .bb-av { width: 32px; height: 32px; }
+  [data-trong='gv'] .bb-diem b { font-size: 18px; }
+  [data-trong='gv'] .bb-thanh { width: 52px; }
+  [data-trong='gv'] .bb-dau { padding: 14px 14px 8px; }
+  [data-trong='gv'] .bb-chan { padding: 2px 14px 10px; }
+  [data-trong='gv'] .bb-trong { padding: 4px 14px 16px; }
+}
+@media (orientation: landscape) and (max-height: 600px) {
+  [data-trong='gv'] .bb-khung { gap: 10px; }
+  [data-trong='gv'] .bb-the[data-bang] .bb-dau { padding-top: 12px; }
+  [data-trong='gv'] :is(.bb-dau .bb-chip, .bb-dau .bb-vinh, .bb-diem b small) { font-size: 13px; }
+  [data-trong='gv'] .bb-dau .bb-vinh { letter-spacing: 0.08em; }
+  [data-trong='gv'] .bb-dong { min-height: 48px; padding-top: 4px; padding-bottom: 4px; }
+  [data-trong='gv'] .bb-chan { padding-bottom: 6px; }
+  [data-trong='gv'] .bb-td .bb-dau { padding-bottom: 10px; }
+}
+
 /* ───────── BẰNG CHỨNG (tấm toàn màn) ───────── */
 [data-trong='gv'] .bbc-che { position: fixed; inset: 0; z-index: 60; background: var(--tr-nen); }
 [data-trong='gv'] .bbc-man { position: fixed; inset: 0; z-index: 60; display: flex; flex-direction: column; background: var(--tr-nen); color: var(--tr-chu); --bb-c: var(--tr-chinh); --bb-nhat: var(--tr-chinh-nhat); --bb-chu: var(--tr-chinh-chu); }
@@ -235,3 +263,6 @@ html.may-yeu[data-trong='gv'] .bb-the[data-bang='dp']::after { opacity: 0.6; }
 
 /* màn Hôm nay «Trong»: 4 bảng rồi Việc cần thầy */
 [data-trong='gv'] .gvhn-bon { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+@media (orientation: landscape) and (max-height: 600px) {
+  [data-trong='gv'] .gvhn-bon { gap: 12px; }
+}
