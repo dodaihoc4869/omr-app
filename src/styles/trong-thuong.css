@@ -660,3 +660,14 @@
 @keyframes tp-hd-chay { from { transform: translateX(-100%); } }
 @media (prefers-reduced-motion: reduce) { [data-trong='hs'] :is(.tp-hd-nen, .tp-hd-tam) { animation: none !important; } }
 [data-trong].may-yeu :is(.tp-hd-nen, .tp-hd-tam) { animation: none; }
+
+/* KẾT CHẶNG khi điện thoại xoay ngang thấp (cao ≤ 420 — thầy 01/11 «chặng xoay ngang trên điện thoại chưa được»): hình nhỏ đứng CẠNH tiêu đề ⇒ ba ô số lên
+   trong khung đầu, không còn bị thanh «Tiếp tục» che (trước: hình 130px đẩy ba ô số xuống dưới thanh nút). Chỉ bố cục; bản hoàn hảo (hình huy hiệu) giữ nguyên. */
+@media (max-height: 420px) and (min-width: 600px) {
+  [data-trong='hs'] .tp-ket .tp-man[data-hai] > .cot-a:has(> .tp-hinh) { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; column-gap: 14px; row-gap: 6px; text-align: left; }
+  [data-trong='hs'] .tp-ket .tp-man[data-hai] > .cot-a:has(> .tp-hinh) > .tp-hinh { grid-row: 1 / span 2; width: 92px; height: 84px; }
+  [data-trong='hs'] .tp-ket .tp-man[data-hai] > .cot-a:has(> .tp-hinh) > .tp-hinh > div:not(.bi-o) > .bi { width: 72px; height: auto; }
+  [data-trong='hs'] .tp-ket .tp-man[data-hai] > .cot-a:has(> .tp-hinh) > :not(.tp-hinh, .tp-3o) { grid-column: 2; margin: 0; }
+  [data-trong='hs'] .tp-ket .tp-man[data-hai] > .cot-a:has(> .tp-hinh) > .tp-3o { grid-column: 1 / -1; }
+  [data-trong='hs'] .tp-ket .tp-man[data-hai] h1 { font-size: 22px; }
+}

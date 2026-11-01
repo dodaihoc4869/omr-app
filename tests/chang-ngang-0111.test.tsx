@@ -101,7 +101,8 @@ describe('tờ trong-chang-ngang.css — chỉ màn làm chặng, chỉ ngang / 
   it('ngoài @media ngang / máy tính chỉ có luật ẩn lớp phủ ⇒ điện thoại dọc giữ nguyên; điều kiện @media khớp hằng của ThanhCuon', () => {
     expect(ds.filter((r) => !r.trongMedia).map((r) => r.chon)).toEqual([':root[data-trong] .duo-cuon'])
     expect(boChu(CSS)).toContain(`@media ${MQ_CHANG_HAI_COT} {`)
-    for (const m of boChu(CSS).match(/@media[^{]+/g) ?? []) expect(m).toMatch(/orientation: landscape\) and \(max-height: 500px\)|min-width: 1000px\) and \(min-height: 501px\)|min-width: 1700px\) and \(min-height: 900px\)/)
+    // 01/11 (máy gập mở): mọi @media đều nằm TRONG luật hai cột chung (bo-cuc-lam.ts) — quét lưới ở tests/chang-ngang-2-0111.test.tsx
+    for (const m of boChu(CSS).match(/@media[^{]+/g) ?? []) expect(m).toMatch(/orientation: landscape\) and \(min-width: (640|1100)px\)|min-aspect-ratio: 10\/13\)/)
   })
   it('màu: không mã thô, chỉ biến --tr-* (và biến bố cục --cn-* / --gyc-cot-phai)', () => {
     const s = boChu(CSS)
@@ -121,7 +122,8 @@ describe('tờ trong-chang-ngang.css — chỉ màn làm chặng, chỉ ngang / 
     expect(s).toMatch(/\.duo-cuon\[data-con\]::after \{ opacity: 1; \}/)
   })
   it('điện thoại ngang: thanh trên 44px; dải kết quả là HÀNG ĐÁY riêng trải bề ngang (không fixed phủ đề), đề thu lên hàng 2–3', () => {
-    const i = boChu(CSS).indexOf('@media (orientation: landscape) and (max-height: 500px) {\n')
+    const i = boChu(CSS).indexOf('@media (orientation: landscape) and (min-width: 640px) and (max-height: 500px) {\n')
+    expect(i).toBeGreaterThan(0)
     const k = boChu(CSS).slice(i)
     expect(k).toMatch(/> \.duo-tren \{ min-height: 44px;/)
     expect(k).toMatch(/\[data-ket\] \{ grid-template-rows: auto auto minmax\(0, 1fr\) auto; \}/)
@@ -130,7 +132,8 @@ describe('tờ trong-chang-ngang.css — chỉ màn làm chặng, chỉ ngang / 
   })
   it('máy tính: bề rộng tổng tối đa 1240px căn giữa, cột đề rộng hơn (dòng đề 60–70 ký tự), thẻ kết quả ở cột phải; lời giải tấm bên phải không phủ đề', () => {
     const s = boChu(CSS)
-    expect(s).toContain('--cn-rong: 1240px; --cn-le: max(24px, calc((100% - var(--cn-rong)) / 2));')
+    expect(s).toContain('--cn-rong: 1240px; --cn-le: max(20px, calc((100% - var(--cn-rong)) / 2));')
+    expect(s).toContain('--cn-le: max(24px, calc((100% - var(--cn-rong)) / 2));')
     expect(s).toContain('grid-template-columns: minmax(0, 1.32fr) minmax(340px, 1fr);')
     expect(s).toMatch(/\[data-hai-cot\]:not\(\[data-xong\]\) \.duo-cot-de \.ht2-lam-de-chu \{ font-size: 19px; line-height: 1\.6; \}/)
     expect(s).toMatch(/> \.duo-day\.duo-ket \{[^}]*max-height: 52dvh;[^}]*border-radius: 20px;/)

@@ -1,8 +1,10 @@
-/* ── CHẶNG NGANG 01/11 — màn làm chặng (ManLamBaiTap nhánh Duo) khi XOAY NGANG và trên MÁY TÍNH (thầy 01/11: «Phần chặng của học sinh tối ưu thêm cho
- * màn xoay ngang và máy tính cho đẹp mắt bố cục khoa học nhé, đề dài nhớ có thanh cuộn»). Ảnh trước / sau: docs/chang-ngang-0111/.
+/* ── CHẶNG NGANG 01/11 — màn làm chặng (ManLamBaiTap nhánh Duo) + màn sửa câu của chặng sửa (ChuaGonDuo) khi XOAY NGANG, MÁY GẬP MỞ, MÁY TÍNH
+ * (thầy 01/11: «Phần chặng của học sinh tối ưu thêm cho màn xoay ngang và máy tính … đề dài nhớ có thanh cuộn» · «Tối ưu cho máy gập khi mở cùng giao
+ * diện với xoay ngang nhé»). HAI CỘT theo MỘT NGUỒN `haiCotLam` / `MQ_HAI_COT` (components/hoc-tap/bo-cuc-lam.ts): rộng > cao từ 640 px, hoặc rộng ≥ 700 mà
+ * cao ≤ 1,3 × rộng (Fold mở xoay dọc). Bậc chiều cao chỉnh cỡ chữ / đệm: rất thấp ≤ 380 · thấp ≤ 500 · vừa / cao > 500. Ảnh: docs/chang-ngang-0111/.
  * Nạp qua @import đầu trong-lam-bai.css (sau trong-lam-ngang.css) ⇒ đứng TRƯỚC luật tờ ấy; mọi bộ chọn bắt đầu bằng P =
- * `:root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong])` (nặng 0,8,0) cho đủ thắng. CHỈ màn làm chặng có `data-chang`
- * ⇒ màn thi, kiểm tra cá nhân, sửa câu (dùng chung lớp .duo / .duo-cot-*) KHÔNG đổi. Điện thoại DỌC không đổi (mọi luật nằm trong @media dưới).
+ * `:root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong])` (nặng 0,8,0) cho đủ thắng. CHỈ màn có gốc `data-chang` (làm chặng,
+ * sửa câu) ⇒ màn thi, kiểm tra cá nhân (dùng chung lớp .duo / .duo-cot-*) KHÔNG đổi. Điện thoại DỌC không đổi (mọi luật nằm trong @media dưới).
  * Màu: chỉ biến --tr-* sẵn có.
  *
  * BỐ CỤC (một màn, KHÔNG cuộn trang): lưới cao đúng khung —
@@ -14,7 +16,7 @@
  * Hàng lưới: 1 thanh trên · 2 viên chuỗi đúng (thưởng) · 3 cột phải = min(nội dung, chỗ còn lại) · 4 «Kiểm tra» / thẻ kết quả · 5 phần trống. ── */
 :root[data-trong] .duo-cuon { display: none; }
 
-@media (orientation: landscape) and (max-height: 500px), (min-width: 1000px) and (min-height: 501px) {
+@media (orientation: landscape) and (min-width: 640px), (min-width: 700px) and (min-aspect-ratio: 10/13) {
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) {
     display: grid; height: 100dvh; min-height: 0; max-width: none; margin: 0; overflow: clip; /* clip: không thành khung cuộn ⇒ scrollIntoView không xô lệch lưới */
     grid-template-rows: auto auto minmax(0, max-content) auto minmax(0, 1fr); align-items: start;
@@ -56,6 +58,9 @@
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-day:not(.duo-ket) { background: transparent; padding: 8px 0 calc(12px + env(safe-area-inset-bottom)); }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-day:not(.duo-ket) > .duo-giua { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: none; margin: 0; }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-day:not(.duo-ket) > .duo-giua > * { grid-column: auto; }
+  /* CÂU MỚI («Học cách giải» · «Tự làm câu này», chưa có phương án): hai nút xếp dọc, giữa cột phải ngang tầm đề — trước: một cột, nút dính đáy, nửa màn trống */
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong])[data-chon-cach] > .duo-day { grid-row: 3 / -1; align-self: center; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong])[data-chon-cach] > .duo-day .duo-hai { grid-template-columns: minmax(0, 1fr); gap: 12px; }
 
   /* THANH CUỘN VẼ TAY (ThanhCuon.tsx): lớp phủ CÙNG ô lưới với cột, không nằm trong vùng cuộn ⇒ đứng yên; rãnh mảnh + con trượt mép phải, bóng mờ đáy */
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-than > .duo-cuon {
@@ -109,7 +114,7 @@
 }
 
 /* ── ĐIỆN THOẠI XOAY NGANG (cao ≤ 500): thanh trên 44px, lề theo tai thỏ, phần đầu cột đề gọn; dải kết quả = HÀNG ĐÁY riêng trải hết bề ngang ── */
-@media (orientation: landscape) and (max-height: 500px) {
+@media (orientation: landscape) and (min-width: 640px) and (max-height: 500px) {
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) {
     --cn-trai: max(16px, env(safe-area-inset-left)); --cn-phai: max(16px, env(safe-area-inset-right)); --cn-lg-rong: 46%;
     grid-template-columns: minmax(0, 1.12fr) minmax(300px, 1fr); column-gap: 20px;
@@ -151,26 +156,64 @@
   }
 }
 
-/* ── MÁY TÍNH BẢNG NGANG / MÁY TÍNH (≥ 1000 × > 500): MỌI kiểu câu hai cột (trước chỉ đề dài / bàn phím số; đề ngắn một cột giữa ⇒ phương án, nút đổi chỗ
- * theo câu). Bề rộng tổng tối đa 1240px căn giữa (≥ 1700 × 900: 1360px); cột đề ~1,3 phần ⇒ dòng đề 60–70 ký tự; chữ đề dài 19px / 1,6. Thẻ kết quả ở cột phải. ── */
-@media (min-width: 1000px) and (min-height: 501px) {
+/* ── RẤT THẤP (cao ≤ 380: Samsung Internet có thanh trên + thanh dưới ~740×280–300, điện thoại nhỏ 640×360 bớt thanh) ──
+ * Đầu cột đề chỉ còn MỘT hàng (nhãn + bóng đèn; dòng lệnh vẫn đọc được bằng trình đọc màn hình — phương án / bàn phím đã nói em làm gì), hàng càu nhàu của
+ * giám thị không giữ chỗ (bong bóng nổi lên trên hàng nhãn trong lúc nói), giám thị nhỏ lại ⇒ đề bắt đầu cao hơn ~100px. Trả lời ngắn: bàn phím số HAI HÀNG
+ * (1–7 · 8 9 0 , − ⌫ Xoá hết) ⇒ ô đáp án + đủ 14 phím + «Kiểm tra» vừa khung, không phải cuộn (trước: 4 hàng, hàng dưới khuất). ── */
+@media (orientation: landscape) and (min-width: 640px) and (max-height: 380px) {
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-de > .duo-lenh > h2 { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-de > .duo-lenh > .duo-tg { grid-row: 1; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-gt-san { --gt-nvw: 76px; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-gt-loi-o { position: relative; z-index: 4; min-height: 0; padding: 0; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-gt-loi-o .gt-loi { position: absolute; left: 0; bottom: 6px; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-de .ht2-lam-de-chu { font-size: 16px; line-height: 1.5; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-day:not(.duo-ket) { padding-top: 4px; padding-bottom: calc(6px + env(safe-area-inset-bottom)); }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-day:not(.duo-ket) .duo-nut { min-height: 44px; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong])[data-phan='III'] { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-tra .ht2-lam-o { height: 44px; font-size: 24px; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-tra .ht2-lam-phim { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px 3px; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-tra .ht2-lam-phim button, :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-tra .ht2-lam-phim button[data-rong] { grid-column: auto; height: 44px; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-tra .ht2-lam-phim button[data-rong][data-chuc] .ht2-lam-phim-mat { font-size: 13px; }
+  /* thứ tự hiện: 1 2 3 4 5 6 7 / 8 9 0 , − ⌫ Xoá hết (thứ tự phím trong mã: 1 2 3 ⌫ · 4 5 6 , · 7 8 9 − · 0 Xoá hết) */
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-tra .ht2-lam-phim > :nth-child(5) { order: 4; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-tra .ht2-lam-phim > :nth-child(6) { order: 5; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-tra .ht2-lam-phim > :nth-child(7) { order: 6; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-tra .ht2-lam-phim > :nth-child(9) { order: 7; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-tra .ht2-lam-phim > :nth-child(10) { order: 8; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-tra .ht2-lam-phim > :nth-child(11) { order: 9; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-tra .ht2-lam-phim > :nth-child(13) { order: 10; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-tra .ht2-lam-phim > :nth-child(8) { order: 11; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-tra .ht2-lam-phim > :nth-child(12) { order: 12; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-tra .ht2-lam-phim > :nth-child(4) { order: 13; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-tra .ht2-lam-phim > :nth-child(14) { order: 14; }
+}
+
+/* ── MÁY GẬP MỞ / MÁY TÍNH BẢNG / MÁY TÍNH (hai cột, cao > 500): MỌI kiểu câu hai cột. Bề rộng tổng tối đa 1240px căn giữa (≥ 1700 × 900: 1360px);
+ * cột đề ~1,25–1,32 phần. Thẻ kết quả ở cột phải. Fold mở (~900×690, 760×884): khe 28px, chữ đề 18–19px, giám thị 96px; từ 1100px: khe 48px, chữ 19–21px. ── */
+@media (orientation: landscape) and (min-width: 640px) and (min-height: 501px), (min-width: 700px) and (min-aspect-ratio: 10/13) and (min-height: 501px) {
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) {
-    --cn-rong: 1240px; --cn-le: max(24px, calc((100% - var(--cn-rong)) / 2)); --cn-lg-rong: max(380px, 44%);
-    grid-template-columns: minmax(0, 1.32fr) minmax(340px, 1fr); column-gap: 48px;
-    padding: 0 calc(var(--cn-le) + var(--gyc-cot-phai, 0px)) 0 var(--cn-le);
+    --cn-rong: 1240px; --cn-le: max(20px, calc((100% - var(--cn-rong)) / 2)); --cn-lg-rong: max(360px, 46%);
+    grid-template-columns: minmax(0, 1.25fr) minmax(300px, 1fr); column-gap: 28px;
+    padding: 0 calc(max(var(--cn-le), env(safe-area-inset-right)) + var(--gyc-cot-phai, 0px)) 0 max(var(--cn-le), env(safe-area-inset-left));
   }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong])[data-phan='II'] { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); }
-  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-tren { min-height: 64px; padding-top: 6px; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-tren { min-height: 60px; padding-top: 6px; }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-tren .duo-dong { margin-left: -10px; }
-  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-de { row-gap: 14px; padding-top: 14px; padding-bottom: 32px; }
-  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-tra { gap: 14px; padding-top: 18px; }
-  /* chữ đề: ngắn 21px · dài 19px dòng 1,6 (cột đọc ~60–70 ký tự) */
-  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-de .ht2-lam-de-chu { font-size: 21px; }
-  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo][data-hai-cot]:not([data-xong]) .duo-cot-de .ht2-lam-de-chu { font-size: 19px; line-height: 1.6; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-de { row-gap: 12px; padding-top: 12px; padding-bottom: 28px; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-tra { gap: 12px; padding-top: 16px; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-gt-san { --gt-nvw: 96px; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-de .ht2-lam-de-chu { font-size: 19px; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo][data-hai-cot]:not([data-xong]) .duo-cot-de .ht2-lam-de-chu { font-size: 18px; line-height: 1.6; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-lenh h2 { font-size: 20px; }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-tra[data-luoi] .ht2-lam-tn { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  /* phương án 64px (trước 72 — bốn ô + «Kiểm tra» + thẻ kết quả vừa khung 1180 × 820) */
-  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) :is(.ht2-lam-pa, .ht2-lam-pa[data-ket]) { min-height: 64px; }
-  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-day:not(.duo-ket) { padding-top: 14px; padding-bottom: 20px; }
+  /* cột trả lời hẹp (Fold mở xoay dọc 760×884 — cột phải ~300px): phương án số «50,16%» bẻ dòng trong ô 2×2 ⇒ xếp một cột (đủ cao, không cuộn) */
+  @container (max-width: 379px) {
+    :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-tra[data-luoi] .ht2-lam-tn { grid-template-columns: minmax(0, 1fr); }
+  }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) :is(.ht2-lam-pa, .ht2-lam-pa[data-ket]) { min-height: 58px; font-size: 18px; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-day:not(.duo-ket) { padding-top: 12px; padding-bottom: calc(18px + env(safe-area-inset-bottom)); }
+  /* đúng–sai: cặp nút Đúng | Sai gọn (64px mỗi nút) ⇒ chữ ý rộng hơn, bốn ý vừa cột ở máy gập / máy tính bảng nhỏ */
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .ht2-lam-ds .ht2-lam-y-nut { grid-template-columns: repeat(2, 64px); }
   /* THẺ KẾT QUẢ ở cột phải, ngay dưới phương án (thay chỗ «Kiểm tra»): bo góc, cao tối đa nửa khung — phần chữ cuộn trong thẻ, nút luôn thấy */
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-day.duo-ket {
     display: flex; flex-direction: column; max-height: 52dvh; margin: 12px 0 20px; padding: 14px 18px 16px; border-radius: 20px;
@@ -180,7 +223,21 @@
   }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-day.duo-ket > .duo-giua > * { grid-column: auto; }
 }
-@media (min-width: 1700px) and (min-height: 900px) {
+/* rộng từ 1100 (máy tính bảng lớn, máy tính): khe 48px, giám thị cỡ máy tính, chữ đề ngắn 21px · dài 19px dòng 1,6 (cột đọc ~60–70 ký tự), phương án 64px */
+@media (orientation: landscape) and (min-width: 1100px) and (min-height: 501px), (min-width: 1100px) and (min-aspect-ratio: 10/13) and (min-height: 501px) {
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) { grid-template-columns: minmax(0, 1.32fr) minmax(340px, 1fr); column-gap: 48px; --cn-le: max(24px, calc((100% - var(--cn-rong)) / 2)); --cn-lg-rong: max(380px, 44%); }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-tren { min-height: 64px; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-de { row-gap: 14px; padding-top: 14px; padding-bottom: 32px; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-tra { gap: 14px; padding-top: 18px; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-gt-san { --gt-nvw: 136px; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-de .ht2-lam-de-chu { font-size: 21px; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo][data-hai-cot]:not([data-xong]) .duo-cot-de .ht2-lam-de-chu { font-size: 19px; line-height: 1.6; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-lenh h2 { font-size: 24px; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) :is(.ht2-lam-pa, .ht2-lam-pa[data-ket]) { min-height: 64px; font-size: 20px; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .ht2-lam-ds .ht2-lam-y-nut { grid-template-columns: repeat(2, 76px); }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-day:not(.duo-ket) { padding-top: 14px; padding-bottom: 20px; }
+}
+@media (min-width: 1700px) and (min-height: 900px) and (min-aspect-ratio: 10/13) {
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) { --cn-rong: 1360px; column-gap: 56px; }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo][data-hai-cot]:not([data-xong]) .duo-cot-de .ht2-lam-de-chu { font-size: 20px; }
 }

@@ -5,9 +5,10 @@
 // MƯỢT: không vẽ lại React khi cuộn — cuộn / đổi cỡ chỉ xin một khung rAF, đặt `transform` + `height` của con trượt và hai thuộc tính trên CHÍNH lớp phủ
 // (không lan xuống chữ đề). Dọc điện thoại: lớp phủ `display: none`, khung không khớp ⇒ không đo gì.
 import { useEffect, useRef } from 'react'
+import { MQ_HAI_COT } from './bo-cuc-lam'
 
-/** Khổ dùng bố cục hai cột cuộn riêng — CÙNG điều kiện @media của styles/trong-chang-ngang.css (test khoá). */
-export const MQ_CHANG_HAI_COT = '(orientation: landscape) and (max-height: 500px), (min-width: 1000px) and (min-height: 501px)'
+/** Khổ dùng bố cục hai cột cuộn riêng — MỘT NGUỒN với styles/trong-chang-ngang.css + `chonBoCucLam` (bo-cuc-lam.ts, test khoá). */
+export const MQ_CHANG_HAI_COT = MQ_HAI_COT
 /** Con trượt ngắn nhất (px) — vẫn thấy rõ khi đề rất dài. */
 export const CON_TRUOT_MIN = 28
 /** Lề rãnh trên / dưới trong ô cột (px). */

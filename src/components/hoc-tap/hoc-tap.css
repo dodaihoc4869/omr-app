@@ -251,8 +251,8 @@ body[data-hoc-tap=hs] .h2-cdl{--h2c-xanh-chu:var(--the)}
 .ht2-lam-hom-nay-the{display:flex;flex-direction:column;gap:10px}
 .ht2-lam-hom-nay-dau{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:4px 8px}.ht2-lam-hom-nay-dau b{font-size:16px;font-variant-numeric:tabular-nums}.ht2-lam-hom-nay-dau span{font-size:13px;color:var(--nhat)}
 .ht2-lam-chang{display:grid;gap:6px}.ht2-lam-chang i{height:8px;border-radius:999px;background:var(--lam-vien)}.ht2-lam-chang i[data-xong]{background:var(--lg-nhan)}
-/* màn rộng (máy tính, máy tính bảng ngang): hai cột — cùng thẻ, thanh đáy thành cột phải dính trên */
-@media(min-width:900px){
+/* màn rộng (máy tính, máy tính bảng ngang, máy gập mở — 01/11 cùng luật hai cột bo-cuc-lam.ts, cao > 560): hai cột — cùng thẻ, thanh đáy thành cột phải dính trên */
+@media (orientation:landscape) and (min-width:640px) and (min-height:561px),(min-width:700px) and (min-aspect-ratio:10/13) and (min-height:561px){
   .ht2-lam-tren{min-height:calc(72px + env(safe-area-inset-top));padding-left:32px;padding-right:32px;grid-template-columns:48px minmax(0,1fr) minmax(80px,auto)}
   .ht2-lam-giua{width:min(560px,100%);justify-self:center}.ht2-lam .ht2-lam-tieu{font-size:15px;text-align:center}
   .ht2-lam-khung{display:grid;grid-template-columns:minmax(0,1fr) 360px;align-items:start;gap:32px;max-width:1180px;margin:0 auto;padding:28px 32px 48px}
@@ -274,7 +274,7 @@ body[data-hoc-tap=hs] .h2-cdl{--h2c-xanh-chu:var(--the)}
    Trắc nghiệm / đúng–sai: cột phải thôi là thẻ (các phương án, các ý vốn là thẻ — khỏi thẻ lồng thẻ), hai cột rộng bằng nhau để đề đọc vừa mắt
    (~60 chữ/dòng). Trả lời ngắn: cột phải giữ thẻ, 4 ô nằm ngay trên bàn phím số. Bản dọc không đổi. Màu: chỉ biến sẵn có của khối `.ht2-lam`. */
 .ht2-lam-cot-tra-loi{display:flex;flex-direction:column;gap:12px;min-width:0}
-@media(min-width:900px){
+@media (orientation:landscape) and (min-width:640px) and (min-height:561px),(min-width:700px) and (min-aspect-ratio:10/13) and (min-height:561px){
   .ht2-lam-khung[data-tra-loi]{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px}
   .ht2-lam-khung[data-tra-loi=III]{grid-template-columns:minmax(0,1fr) 400px}
   .ht2-lam-day:is([data-tra-loi=I],[data-tra-loi=II]){gap:14px;padding:0;background:transparent;border:0;border-radius:0;box-shadow:none}

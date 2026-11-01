@@ -35,6 +35,7 @@ const KHO = [
   { ten: 'may-tinh-1440x900', w: 1440, h: 900 },
   { ten: 'may-tinh-1920x1080', w: 1920, h: 1080 },
   { ten: 'dt-doc-390x844', w: 390, h: 844, dt: true, doc: true },
+  { ten: 'fold-gap-360x800', w: 360, h: 800, dt: true, doc: true }, // Galaxy Z Fold GẬP (màn ngoài) — dọc, giữ nguyên
 ].filter((k) => !CHI || CHI.includes(`${k.w}x${k.h}`))
 const cho = (ms) => new Promise((r) => setTimeout(r, ms))
 
