@@ -66,6 +66,13 @@ export interface SoHomNay {
 /** Mỗi chặng tối đa 6 câu — cùng hằng với máy chủ (`server/src/hanh-trinh-ngay.ts` CAU_MOI_CHANG) và vạch chặng ở Hôm nay. */
 export const CAU_MOI_CHANG = 6
 
+/** VƯỢT MỨC (thầy 02/11, ảnh thật «Đủ 17/12 câu hôm nay!» khó hiểu — làm vượt mức mà viết như phân số): đã làm > mức ⇒ chỗ hiện số KHÔNG viết «17/12»
+ *  mà «Đã làm 17 câu (mức 12)». Mức = `muc` của `soHomNay` (một nguồn: dòng chốt `goi_bai_7_muc_ngay` — ngày có Kiểm tra ôn tập mức nhẹ 12, ngày thường
+ *  theo tầng 24/30/36 hoặc tổng câu mới theo lịch nếu lớn hơn); vòng Mục tiêu (thuong-d1.ts) đọc cùng cột ấy. */
+export const vuotMuc = (s: Pick<SoHomNay, 'daLam' | 'muc'>): boolean => s.muc > 0 && s.daLam > s.muc
+/** «12/30 câu» khi chưa vượt · «17 câu (mức 12)» khi vượt mức. */
+export const chuCauMuc = (s: Pick<SoHomNay, 'daLam' | 'muc'>): string => (vuotMuc(s) ? `${s.daLam} câu (mức ${s.muc})` : `${s.daLam}/${s.muc} câu`)
+
 /**
  * Cùng chuỗi nguồn với vòng tròn Hôm nay: Gói 7 ngày (`goi7.daLamHomNay`/`toiThieu`) → Hành trình (`hanhTrinh.daLam`/`toiThieu`) → thể lực của Sảnh
  * → tiến độ kế hoạch ngày cũ. Thiếu số (hoặc M ≤ 0) ⇒ null (màn ẩn ô ấy — không bịa). Chặng: Hành trình có `changHienTai` của máy chủ;

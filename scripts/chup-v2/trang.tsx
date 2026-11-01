@@ -688,14 +688,20 @@ const MT_TT = thamSo.get('tt') ?? 'thuong', MT_DD = thamSo.get('dd') ?? 'mo'
 const mtNgay = new Date(now + 7 * 3600_000).toISOString().slice(0, 10), mtMo = Date.parse(`${mtNgay}T00:00:00+07:00`)
 // 27/10 «kiểm tra tuần lên đầu, làm xong mới mở khoá»: `&kt=khoa` = Kiểm tra ôn tập HÔM NAY đang mở chưa nộp (nút kiểm tra đầu đường, chặng khoá) · `&kt=xong` =
 // đã nộp (điểm 8,5; mở trang ngay sau `kt=khoa` ⇒ hiệu ứng vỡ khoá) · mặc định = bài kiểm tra NGÀY MAI (đường như cũ, không khoá).
-const MT_KT = thamSo.get('kt')
+// 02/11 `&anh=0211` = dữ liệu GIỐNG ẢNH THẬT thầy gửi (bong bóng Mol đè nút KIỂM TRA ÔN TẬP, dải «Đủ 17/12 câu hôm nay!»): mức ngày có Kiểm tra ôn tập = 12,
+// đã làm 17, 2/2 chặng xong, Kiểm tra ôn tập HÔM NAY chưa làm (nút đầu đường, ngay trên Mol).
+const MT_ANH = thamSo.get('anh') === '0211'
+const MT_KT = thamSo.get('kt') ?? (MT_ANH ? 'khoa' : null)
 const MT_KIEM = { id: 'kt1', ngay: mtNgay, moLuc: mtMo, hanLuc: mtMo + 86400_000, serverNow: now, trangThai: 'can_lam', homNay: true, baiNgayToiThieu: 12, tong: 28, daTra: 0, con: 28,
   soChang: 4, phut: 50, soBai: 6, tongKienThuc: 10, phuDe: 10, nguonDayDu: true, lyDo: '', thieuNguon: 0, diem: null as number | null, nopLuc: null as number | null,
   // `&kt=lam` (28/10, ảnh thầy): đang làm dở — 3/5 chặng đã chốt, 18/28 câu đã trả lời ⇒ vòng nút kiểm tra tô 3/5 đoạn
   ...(MT_KT === 'xong' ? { trangThai: 'da_nop', daTra: 28, con: 0, diem: 8.5, nopLuc: now - 60_000 } : MT_KT === 'lam' ? { soChang: 5, daTra: 18, con: 10, changChot: 3 } : MT_KT === 'khoa' ? {}
     : { ngay: new Date(mtMo + 86400_000 + 7 * 3600_000).toISOString().slice(0, 10), moLuc: mtMo + 86400_000, hanLuc: mtMo + 2 * 86400_000, trangThai: 'sap_den', homNay: false }) }
 const mtLam = MT_TT === 'du' ? 30 : 12
-const SANH_MT = { ...SANH_MOI, chienDich: { id: 'cd1', ten: 'Ester – Lipid' }, hanhTrinh: { ...SANH_MOI.hanhTrinh, tang: 2, toiThieu: 30, daLam: mtLam, daXep: 30, soChang: 5, changHienTai: MT_TT === 'du' ? 5 : 3 },
+const SANH_MT = MT_ANH
+  ? { ...SANH_MOI, chienDich: { id: 'cd1', ten: 'Bài 9. Amino acid (P1)' }, hanhTrinh: { ...SANH_MOI.hanhTrinh, tang: 1, toiThieu: 12, daLam: 17, daXep: 18, soChang: 2, changHienTai: 2 },
+    theLuc: { con: 1, tong: 18 }, ruong: { ...SANH_MOI.ruong, daLam: 17, tong: 12 }, tamGiuCa: 0, kiemTraCaNhan: MT_KIEM }
+  : { ...SANH_MOI, chienDich: { id: 'cd1', ten: 'Ester – Lipid' }, hanhTrinh: { ...SANH_MOI.hanhTrinh, tang: 2, toiThieu: 30, daLam: mtLam, daXep: 30, soChang: 5, changHienTai: MT_TT === 'du' ? 5 : 3 },
   theLuc: MT_TT === 'du' ? { con: 6, tong: 36 } : { con: 18, tong: 30 }, ruong: { ...SANH_MOI.ruong, daLam: mtLam, tong: 30 }, tamGiuCa: 0, kiemTraCaNhan: MT_KIEM }
 if (man === 'hs-mot') {
   try { localStorage.setItem('omr-ai-ddh-co', JSON.stringify({ sbd: '12121212', bat: true, luc: Date.now() })) } catch { /* bỏ qua */ }

@@ -1113,6 +1113,23 @@
    do LoiBi đo và đặt (TrongHs.tsx · src/lib/bong-bong-mol.ts). Máy chưa có text-wrap: balance ⇒ xuống dòng thường, vẫn ôm dòng dài nhất. */
 [data-trong='hs'] .da-lv-loi-o .bi-loi-bong { flex: none; max-width: 100%; box-sizing: border-box; text-wrap: balance; }
 [data-trong='hs'] .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong::before { display: block; left: var(--duoi, 53px); bottom: -9px; transform: rotate(-45deg); }
+/* Thầy 02/11 (ảnh thật: bong bóng đè nút KIỂM TRA ÔN TẬP): KHÔNG BAO GIỜ ĐÈ NÚT — LoiBi chọn chỗ theo khung thật (src/lib/bong-bong-mol.ts chonChoBong) và
+   ghi data-cho: «duoi» = dưới Mol, đuôi hướng lên · «canh» = cạnh Mol, đuôi chỉ ngang (data-ben-trai: bong bóng bên trái Mol) · «gon» = hết chỗ trống ⇒
+   bong bóng ẩn (vẫn dựng để đo lại), hiện NÚT NHỎ «Mol nhắn» cạnh Mol — chạm để đọc. */
+[data-trong='hs'] .da-lv-loi-o:is([data-cho='duoi'], [data-cho='canh']) > .bi-loi-boc { top: var(--tren, 50px); bottom: auto; }
+[data-trong='hs'] .da-lv-loi-o[data-cho='duoi'] .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong { margin: 9px 0 0; }
+[data-trong='hs'] .da-lv-loi-o[data-cho='duoi'] .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong::before { top: -9px; bottom: auto; transform: rotate(135deg); }
+[data-trong='hs'] .da-lv-loi-o[data-cho='canh'] .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong { margin: 0; }
+[data-trong='hs'] .da-lv-loi-o[data-cho='canh'] .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong::before { left: -9px; top: calc(50% - 7px); bottom: auto; transform: rotate(45deg); }
+[data-trong='hs'] .da-lv-loi-o[data-cho='canh'][data-ben-trai] .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong::before { left: auto; right: -9px; transform: rotate(-135deg); }
+[data-trong='hs'] .da-lv-loi-o[data-cho='gon'] > .bi-loi-boc { visibility: hidden; }
+[data-trong='hs'] .da-lv-loi-o .da-lv-chip {
+  position: absolute; left: var(--chip-trai, 10px); top: var(--chip-tren, -70px); display: grid; place-items: center; width: 40px; height: 40px; padding: 0;
+  border: 2px solid var(--tr-hs); border-radius: 50%; background: var(--tr-hs-nhat); color: var(--tr-hs-chu); box-shadow: 0 2px 0 var(--tr-vien);
+  font: inherit; pointer-events: auto; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+[data-trong='hs'] .da-lv-loi-o .da-lv-chip:focus-visible { outline: 3px solid var(--tr-chinh); outline-offset: 3px; }
+[data-trong='hs'] .da-lv-loi-o .da-lv-chip:active { transform: translateY(1px); box-shadow: none; }
 /* BONG BÓNG TRÊN ĐẦU MOL ĐỔI MÀU THEO CẢM XÚC (thầy 01/11 tối; bản vẽ docs/ban-ve-mol-v2-0111 «bong-bong-mau»): nền + viền + chữ theo data-cx, chuyển mượt
    ≤ 300 ms (C13); chỉ token có sẵn. Rất cáu: viền đập rất nhẹ (thầy yêu cầu) — giảm chuyển động / máy yếu ⇒ đứng yên. Chân ngôn: chữ nghiêng. */
 [data-trong='hs'] .bi-loi-bong[data-cx='vui'] { --bb-nen: var(--tr-hs-nhat); --bb-vien: var(--tr-hs); --bb-chu: var(--tr-hs-chu); }

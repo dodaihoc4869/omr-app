@@ -40,12 +40,12 @@ describe('bong bóng trên đầu Mol (Lộ trình)', () => {
     expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\) \{ \[data-trong\] \.bi-loi-boc \{ transition: none; \} \}/)
     expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\) \{ \[data-trong='hs'\] \.bi-loi-bong\[data-cx\] \{ animation: none !important; transition: none; \} \}/)
   })
-  it('né nút chặng / nhãn: thu hẹp về phía Mol rồi nâng lên (--nang), đuôi vẫn chỉ Mol', () => {
-    const tsx = readFileSync('src/components/hoc-tap/TrongHs.tsx', 'utf8'), css = readFileSync('src/styles/trong-hs.css', 'utf8')
-    expect(tsx).toContain("d.querySelectorAll('.da-nut, .da-bong')")
-    expect(tsx).toMatch(/if \(rongHep >= RONG_TOI_THIEU\)/) // = 130 px (src/lib/bong-bong-mol.ts)
-    expect(readFileSync('src/lib/bong-bong-mol.ts', 'utf8')).toContain('export const RONG_TOI_THIEU = 130')
-    expect(tsx).toMatch(/setProperty\('--nang'/)
+  it('né nút chặng / nhãn: nâng lên (--nang) rồi thu hẹp về phía trống, đuôi vẫn chỉ Mol — 02/11: hết cách thì dưới / cạnh Mol / nút nhỏ (bong-bong-khong-de-nut-0211)', () => {
+    const tsx = readFileSync('src/components/hoc-tap/TrongHs.tsx', 'utf8'), css = readFileSync('src/styles/trong-hs.css', 'utf8'), lib = readFileSync('src/lib/bong-bong-mol.ts', 'utf8')
+    expect(tsx).toContain(`d.querySelectorAll('button, [role="button"], a[href], .da-vong, .da-bong, .da-dem')`)
+    expect(lib).toMatch(/return rong >= RONG_TOI_THIEU \?/) // = 130 px
+    expect(lib).toContain('export const RONG_TOI_THIEU = 130')
+    expect(tsx).toContain("['--nang', c.nang]")
     expect(css).toContain('bottom: calc(54px + var(--nang, 0px))'); expect(css).toContain('bottom: calc(70px + var(--nang, 0px))')
   })
 })
