@@ -10,6 +10,8 @@
 //   · câu THIẾU chuyên đề (`coGhi` false — luật cũ: máy chủ không ghi được): ẩn D / K của đợt ấy, phím D / K chỉ báo "chưa có chuyên đề", không
 //     gắn nhãn Đạt giả lên thẻ tên;
 //   · dòng số liệu lớp của câu ở thanh dưới ("18/34 em lớp sai câu này").
+//   · TỜ CHỮA BÀI SAU CA (01/11 tối, `dung-to-chua-ca.ts`) dùng lại đúng mảnh này: danh sách là em LÀM ĐÚNG câu (sbd rỗng — không số báo danh trên tờ,
+//     kèm `giay`); tờ chọn ngẫu nhiên em đầu qua `__mcGoiEmDat(i)` rồi gọi màn gọi tên chuẩn (`__mcLenBang`), «Gọi em khác» đi tiếp từ em ấy.
 // Màu: CHỈ biến sẵn có của tờ (`--mc-*`), không màu thô (cổng `kiem:mau-giu`).
 
 /** Một em gọi được của một đợt. `khoa` = khoá ô `sbd|qid` (rỗng ⇒ đợt không có ô ghi / mốc). `nhan` = dòng trong thẻ tên. */
@@ -18,6 +20,8 @@ export interface UngVienDot {
   ten: string
   khoa: string
   nhan: string
+  /** Tờ chữa bài: số giây em làm câu (null ⇒ không có). Mảnh này không đọc — tờ chữa bài đọc để ghi «Làm đúng trong n giây». */
+  giay?: number | null
 }
 export interface DotGoiEm {
   em: UngVienDot[]
@@ -118,6 +122,13 @@ export const JS_GOI_EM_KHAC = `
     ve();
   }
   window.__mcGoiEmKhac = doiEm;
+  /** Đặt em ĐANG GỌI của đợt hiện tại (chỉ số trong danh sách đợt) TRƯỚC khi gọi lên bảng — tờ chữa bài chọn ngẫu nhiên em làm đúng. «Gọi em khác» đi tiếp từ em này. */
+  window.__mcGoiEmDat = function (i) {
+    var d = dot(), x = du(d), n = x ? x.em.length : 0;
+    if (!n) return null;
+    d.__gekI = ((Math.floor(i) % n) + n) % n; d.__gekGan = true; ganKhoa(d, x.em[d.__gekI]); ve();
+    return x.em[d.__gekI];
+  };
   // D / K ở đợt THIẾU chuyên đề: không ghi được ⇒ chặn trước lớp phím của tờ (không gắn nhãn Đạt giả lên thẻ tên), nói thật vì sao.
   window.addEventListener('keydown', function (ev) {
     if (ev.target && ev.target.closest && ev.target.closest('input,textarea,select')) return;

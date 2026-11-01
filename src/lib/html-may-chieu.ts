@@ -31,7 +31,7 @@ import { CSS_LEN_BANG_MOI, jsLenBangMoi, thongKeHtml, type ThongKeLopCau } from 
 export { thongKeLopCau } from './len-bang-moi-to-chieu'
 import { laCauTuLuan } from './cau-tu-luan'
 import type { TheChuaDung } from './chieu-chua-ca'
-import { CSS_CHUA_BAI, JS_CHUA_BAI, NUT_GOI, NUT_THU_GON, TAM_GOI, chipMucDoHtml, theChuaDungHtml } from './chieu-chua-ca-to'
+import { CSS_CHUA_BAI, JS_CHUA_BAI, NUT_GOI, NUT_THU_GON, chipMucDoHtml, theChuaDungHtml } from './chieu-chua-ca-to'
 
 /** Câu phần III TỰ LUẬN theo nội dung (bảng Dạy học 28/09: thầy chọn câu tự luận thì tờ ghi đúng "Tự luận", không ghi "Trả lời ngắn"). Không xét mã đề. */
 const laTuLuanChieu = (c: CauLuyen): boolean => c.phan === 'III' && laCauTuLuan({ phan: 'III', text: c.text, dapAn: c.dapAn }, 'III')
@@ -122,7 +122,7 @@ export interface TuyChonMayChieu {
   /** Ngân sách buổi (phút) — chữ "Buổi: x/N phút" ở thanh dưới. Thiếu thì chỉ ghi số phút đã trôi. */
   nganSachPhut?: number
   /** TỜ CHỮA BÀI SAU CA (01/11): «Câu n/N», pha «CHỮA BÀI», nút/phím H thu gọn thẻ tên; thay «Lên bảng» của tờ chuẩn bằng «Gọi lên bảng» (phím L)
-   *  chọn ngẫu nhiên một em LÀM ĐÚNG câu đang chiếu — không ai đúng ⇒ «Thầy chữa» (thầy 01/11 tối; `chieu-chua-ca-to.ts`). */
+   *  chọn ngẫu nhiên một em LÀM ĐÚNG câu đang chiếu rồi chạy ĐÚNG màn gọi tên của tờ chuẩn — không ai đúng ⇒ «Thầy chữa» (`chieu-chua-ca-to.ts`). */
   chuaBai?: boolean
 }
 
@@ -1155,7 +1155,7 @@ ${tuyChon.chuaBai ? `    ${NUT_THU_GON}\n` : ''}    <button type="button" class=
   <label>Cỡ chữ đề<select id="mc-size" aria-label="Cỡ chữ đề chiếu"><option value="0.85">Chữ vừa</option><option value="1" selected>Chữ lớn</option><option value="1.2">Chữ rất lớn</option><option value="1.4">Chữ cực lớn</option></select></label>
   <button type="button" id="mc-toan" class="mc-vien">⛶ Toàn màn hình</button>
 </div>
-<div class="mc-ray" id="mc-ray">${dot.join('')}</div>${tuyChon.chuaBai ? TAM_GOI : ''}`
+<div class="mc-ray" id="mc-ray">${dot.join('')}</div>`
 
   return `<!DOCTYPE html>
 <html lang="vi" data-projector="matte-light" data-sang><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">

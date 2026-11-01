@@ -4,10 +4,13 @@
 //   · thẻ tên: số giây mỗi em, NGẮN NHẤT trước, null cuối, bằng nhau giữ thứ tự ca; «+n em» như cũ; danh sách em ĐÚNG (tên gọn + giây), không SBD;
 //   · LaTeX trần / `$…$` ⇒ HTML thuần: `\frac {…} {…}` thành phân số có tử/mẫu (chỉ số dưới vẫn đúng), bảng đóng (không nuốt `\<chữ>` lạ), chuỗi không
 //     LaTeX ra đúng như cũ; tờ chữa bài của câu Kc trong ảnh thầy không còn chữ `\frac` thô;
-//   · chọn em lên bảng: chỉ em đúng, tránh theo thứ tự ưu tiên; tờ: phím L ⇒ «Mời <tên> lên bảng», «Gọi bạn khác», Esc đóng; không ai đúng ⇒ «Thầy chữa».
+//   · chọn em lên bảng: chỉ em đúng, tránh theo thứ tự ưu tiên; tờ: phím L ⇒ điền em vào THẺ TÊN CHUẨN rồi chạy ĐÚNG màn gọi tên của tờ chuẩn
+//     (`__mcLenBang`) — góp ý sau PR 730 «Tên lên bảng làm giống hiệu ứng của các màn khác»; đổi em = «Gọi em khác» (E) của tờ chuẩn; không ai đúng ⇒ «Thầy
+//     chữa» kiểu tờ chuẩn (không gọi tên); D/K không ghi điểm.
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { giayHopLe, theChuaDung, xepCauChuaCa, xepTheoGiay, type EmBaiCa } from '../src/lib/chieu-chua-ca'
-import { JS_CHUA_BAI, TAM_GOI, chonEmGoi, theChuaDungHtml } from '../src/lib/chieu-chua-ca-to'
+import { JS_CHUA_BAI, chonEmGoi, theChuaDungHtml } from '../src/lib/chieu-chua-ca-to'
+import { dotGoiEmChuaBai } from '../src/components/ca-thi/dung-to-chua-ca'
 import { chuHtml } from '../src/lib/html-phieu'
 import { chuCoLatex, nutLatex, tachKhucLatex } from '../src/lib/latex-html'
 import { LENH_LATEX_TOAN } from '../src/lib/chem-format'
@@ -37,7 +40,7 @@ describe('thẻ tên: số giây, ngắn nhất trước', () => {
     expect(html.indexOf('Minh Châu')).toBeLessThan(html.indexOf('Văn An'))
     expect(html.indexOf('Văn An')).toBeLessThan(html.indexOf('Thị Bình'))
     expect(html).toContain('Số giây làm câu · nhanh nhất trước')
-    expect(html).toContain('<ul class="mc-st-dung" hidden><li data-giay="33">Thu Hà</li></ul>')
+    expect(dotGoiEmChuaBai(t)).toEqual({ em: [{ sbd: '', ten: 'Thu Hà', khoa: '', nhan: '', giay: 33 }], coGhi: true, chuLop: '1/6 em làm đúng câu này' })
     for (const sbd of ['101', '102', '103', '104', '105', '106']) expect(html).not.toContain(sbd) // KHÔNG số báo danh trên tờ
   })
   it('giây không hợp lệ ⇒ null; không em nào có giây ⇒ không ô giây, không chú thích', () => {
@@ -113,50 +116,65 @@ describe('chọn em lên bảng', () => {
   })
 })
 
-describe('tờ chữa bài: phím L gọi em làm đúng / Thầy chữa (chạy JS thật của tờ)', () => {
+describe('tờ chữa bài: phím L chạy màn gọi tên CHUẨN cho em làm đúng / Thầy chữa (chạy JS thật của tờ)', () => {
   afterEach(() => {
     vi.restoreAllMocks()
     document.body.innerHTML = ''
+    document.body.removeAttribute('data-pha')
+    document.body.className = ''
   })
-  const dung = (ds: [string, number | null][]) => `<ul class="mc-st-dung" hidden>${ds.map(([t, g]) => `<li${g == null ? '' : ` data-giay="${g}"`}>${t}</li>`).join('')}</ul>`
-  function dungTo(): { den: (i: number) => void } {
+  const goiEm = (ds: [string, number | null][]) => JSON.stringify({ em: ds.map(([ten, giay]) => ({ sbd: '', ten, khoa: '', nhan: '', giay })), coGhi: true, chuLop: '' }).replace(/"/g, '&quot;')
+  const dot = (so: number, ds: [string, number | null][]) => `<div class="mc-dot mc-dot-don" data-goi-em="${goiEm(ds)}"><span class="mc-de-so">Câu ${so}</span><header class="mc-em" id="em-${so}" hidden><div class="mc-ten-hang"><span class="mc-ten">Cả lớp</span></div><span class="mc-xem-ct">Chi tiết ›</span></header><section class="mc-cot-lam-bai" data-nhan-em="Phần làm bài của lớp"></section></div>`
+  function dungTo() {
     let i = 0
-    document.body.innerHTML = `<div id="mc-ray"><div class="mc-dot"><span class="mc-de-so">Câu 7</span>${dung([['Minh Anh', 42], ['Gia Bảo', null]])}</div><div class="mc-dot"><span class="mc-de-so">Câu 3</span>${dung([])}</div><div class="mc-dot"><span class="mc-de-so">Câu 9</span>${dung([['Minh Anh', 30], ['Thảo Chi', 51]])}</div></div><button id="mc-goi-nut"></button>${TAM_GOI}`
-    ;(window as unknown as { __mcTrangThai: () => { dot: number } }).__mcTrangThai = () => ({ dot: i })
+    document.body.innerHTML = `<div id="mc-ray">${dot(7, [['Minh Anh', 42], ['Gia Bảo', null]])}${dot(3, [])}${dot(9, [['Minh Anh', 30], ['Thảo Chi', 51]])}</div><button id="mc-goi-nut"></button><button id="mc-st-nut"><span class="mc-nut-chu"></span></button><div class="mc-bao"></div>`
+    document.body.setAttribute('data-pha', 'cho')
+    const dots = [...document.querySelectorAll<HTMLElement>('#mc-ray > .mc-dot')]
+    const w = window as unknown as Record<string, unknown>
+    const lenBang = vi.fn(() => document.body.setAttribute('data-pha', 'chua')) // màn gọi tên chuẩn (JS_MAY_CHIEU) — ở đây chỉ đổi pha
+    const dat = vi.fn()
+    Object.assign(w, { __mcDot: () => dots[i], __mcChiSo: () => i, __mcLenBang: lenBang, __mcGoiEmDat: dat })
     new Function(JS_CHUA_BAI)()
-    return { den: (k) => { i = k; document.dispatchEvent(new CustomEvent('mc-vao-dot')) } }
+    const den = (k: number) => { i = k; document.body.setAttribute('data-pha', 'cho'); document.dispatchEvent(new CustomEvent('mc-vao-dot')) }
+    return { dots, lenBang, dat, den }
   }
-  const phim = (key: string) => window.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
-  const chu = (id: string) => document.getElementById(id)!.textContent
-  const mo = () => !document.getElementById('mc-goi')!.hidden
+  const phim = (key: string) => { const e = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }); window.dispatchEvent(e); return e }
+  const the = (d: HTMLElement) => ({ ten: d.querySelector('.mc-ten')!.textContent, phu: d.querySelector('.mc-em-phu')?.textContent ?? null })
 
-  it('L ⇒ «Mời <em đúng> lên bảng chữa câu này» + giây; Gọi bạn khác đổi em; Esc đóng; sang câu khác tránh em vừa gọi', () => {
-    const to = dungTo()
+  it('L ⇒ em làm đúng vào thẻ tên chuẩn + «Làm đúng trong n giây», rồi gọi __mcLenBang; tránh em vừa gọi ở câu trước; Gọi em khác đổi dòng giây', () => {
+    const { dots, lenBang, dat, den } = dungTo()
     vi.spyOn(Math, 'random').mockReturnValue(0)
-    phim('l')
-    expect(mo()).toBe(true)
-    expect([chu('mc-goi-ke'), chu('mc-goi-moi'), chu('mc-goi-ten'), chu('mc-goi-viec'), chu('mc-goi-giay')]).toEqual(['Câu 7 · 2 em làm đúng', 'Mời', 'Minh Anh', 'lên bảng chữa câu này', 'Làm đúng trong 42 giây'])
-    phim('l') // khi tấm mở: L = gọi bạn khác
-    expect(chu('mc-goi-ten')).toBe('Gia Bảo')
-    expect(document.getElementById('mc-goi-giay')!.hidden).toBe(true) // không có số giây ⇒ không dòng giây
-    phim('l')
-    expect(chu('mc-goi-ten')).toBe('Minh Anh') // hai em đều đã gọi ⇒ vòng lại, nhưng không lặp em đang hiện
-    phim('Escape')
-    expect(mo()).toBe(false)
-    to.den(2)
-    phim('l') // Math.random = 0 lẽ ra là «Minh Anh» — em vừa gọi ở câu trước ⇒ tránh, còn «Thảo Chi»
-    expect(chu('mc-goi-ten')).toBe('Thảo Chi')
-    expect(chu('mc-goi-giay')).toBe('Làm đúng trong 51 giây')
-    to.den(0)
-    expect(mo()).toBe(false) // đổi câu ⇒ tấm đóng
+    const e = phim('l')
+    expect(e.defaultPrevented).toBe(true)
+    expect(the(dots[0]!)).toEqual({ ten: 'Minh Anh', phu: 'Làm đúng trong 42 giây' })
+    expect(dat).toHaveBeenLastCalledWith(0) // «Gọi em khác» đi tiếp từ em này
+    expect(lenBang).toHaveBeenCalledTimes(1)
+    expect(dots[0]!.querySelector('.mc-cot-lam-bai')!.getAttribute('data-nhan-em')).toBe('Phần làm bài của Anh')
+    expect(document.body.classList.contains('mc-st-gon')).toBe(true) // tự thu gọn thẻ em chưa đúng để có chỗ viết
+    expect(phim('l').defaultPrevented).toBe(false) // đã gọi (pha ĐANG CHỮA): L để tờ chuẩn xử lý như mọi màn
+    expect(lenBang).toHaveBeenCalledTimes(1)
+    expect(phim('d').defaultPrevented).toBe(true) // không ghi Đạt / Chưa đạt
+    expect(document.querySelector('.mc-bao')!.textContent).toBe('Tờ chữa bài không ghi Đạt / Chưa đạt')
+    den(2)
+    expect(document.body.classList.contains('mc-st-gon')).toBe(false) // sang câu khác: mở lại thẻ
+    phim('L') // Math.random = 0 lẽ ra «Minh Anh» — em vừa gọi ở câu trước ⇒ tránh
+    expect(the(dots[2]!)).toEqual({ ten: 'Thảo Chi', phu: 'Làm đúng trong 51 giây' })
+    expect(dat).toHaveBeenLastCalledWith(1)
+    dots[2]!.querySelector('.mc-ten')!.textContent = 'Minh Anh' // mảnh «Gọi em khác» chuẩn vừa đổi tên
+    document.dispatchEvent(new CustomEvent('mc-doi-em'))
+    expect(the(dots[2]!)).toEqual({ ten: 'Minh Anh', phu: 'Làm đúng trong 30 giây' })
+    den(0)
+    phim('l') // em vừa gọi là «Minh Anh» (câu 9) ⇒ câu 7 gọi «Gia Bảo»; không có số giây ⇒ không dòng giây
+    expect(the(dots[0]!)).toEqual({ ten: 'Gia Bảo', phu: null })
   })
-  it('câu không em nào làm đúng ⇒ «Chưa em nào làm đúng câu này — Thầy chữa», không nút gọi bạn khác', () => {
-    const to = dungTo()
-    to.den(1)
+  it('câu không em nào làm đúng ⇒ Thầy chữa kiểu tờ chuẩn: không gọi tên, đợt mang data-thay-chua, báo một dòng', () => {
+    const { dots, lenBang, den } = dungTo()
+    den(1)
     document.getElementById('mc-goi-nut')!.click()
-    expect([chu('mc-goi-moi'), chu('mc-goi-ten')]).toEqual(['Chưa em nào làm đúng câu này', 'Thầy chữa'])
-    expect(document.getElementById('mc-goi-khac')!.hidden).toBe(true)
-    expect(document.getElementById('mc-goi')!.classList.contains('mc-goi-thay')).toBe(true)
+    expect(lenBang).not.toHaveBeenCalled()
+    expect(dots[1]!.hasAttribute('data-thay-chua')).toBe(true)
+    expect(document.querySelector('.mc-bao')!.textContent).toBe('Chưa em nào làm đúng câu này — Thầy chữa')
+    expect(dots[1]!.querySelector('.mc-em')!.hasAttribute('hidden')).toBe(true)
   })
 })
 
@@ -175,6 +193,7 @@ describe('tờ chữa bài dựng từ ca: câu Kc trong ảnh thầy', () => {
     expect((than.match(/class="lt-ps"/g) ?? []).length).toBeGreaterThanOrEqual(4)
     expect(than).toContain('<span class="lt-mau">[H<sub>2</sub>O]</span>')
     expect(than).toContain('id="mc-goi-nut"')
-    expect(than).toContain('<li data-giay="64">Thảo Chi</li>')
+    expect(than).toContain('&quot;ten&quot;:&quot;Thảo Chi&quot;,&quot;khoa&quot;:&quot;&quot;,&quot;nhan&quot;:&quot;&quot;,&quot;giay&quot;:64')
+    expect(than).not.toContain('mc-goi-the') // không tấm gọi riêng: dùng màn gọi tên chuẩn
   })
 })
