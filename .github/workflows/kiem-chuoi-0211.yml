@@ -1,0 +1,41 @@
+# KIỂM CHUỖI MẤT OAN TRÊN DỮ LIỆU THẬT (CHỈ ĐỌC, 02/11 — thầy: «Kiểm tra xem có học sinh nào làm đủ bị mất chuỗi không?»).
+# Một tệp scripts/kiem-chuoi-0211.ts: chỉ chạy câu SELECT (chặn cứng trong mã) qua `wrangler d1 execute --remote --json`, hàng kết quả chỉ nằm trong bộ nhớ,
+# rồi mô phỏng lại chuỗi bằng CHÍNH hàm máy chủ `chuoiNgayCuaEm`. Log CHỈ có SỐ ĐẾM GỘP: không SBD, không tên (repo công khai ⇒ log công khai).
+# KHÔNG `wrangler d1 export` (CLAUDE.md). Đẩy lại nhánh claude/kiem-chuoi-0211 (đổi tệp mã / tệp này) để đo lại.
+name: Kiểm chuỗi mất oan (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/kiem-chuoi-0211]
+    paths: ['.github/workflows/kiem-chuoi-0211.yml', 'scripts/kiem-chuoi-0211.ts']
+permissions:
+  contents: read
+concurrency:
+  group: kiem-chuoi-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  kiem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Mã đo không có lệnh ghi D1
+        run: |
+          # Lớp chặn thứ hai (lớp một: hàm `chon` trong mã chỉ nhận một câu SELECT/WITH). Không được gọi wrangler với lệnh khác ngoài «d1 execute … --command».
+          if grep -nE "\b(INSERT|UPDATE|DELETE|DROP|ALTER|REPLACE|TRUNCATE)\b +(INTO|FROM|TABLE|[a-z_]+ SET)" scripts/kiem-chuoi-0211.ts; then echo "Có lệnh ghi — dừng."; exit 1; fi
+          if grep -nE "'(export|migrations)'|--file" scripts/kiem-chuoi-0211.ts; then echo "Có lệnh wrangler ngoài d1 execute --command — dừng."; exit 1; fi
+          echo "OK: chỉ SELECT"
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm gộp chuỗi mất oan (chỉ đọc)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+          THU_MUC_WRANGLER: server
+        run: npx -y tsx@4.19.2 scripts/kiem-chuoi-0211.ts
