@@ -3445,6 +3445,9 @@ const boXuLy = {
       // KHO CÂU LUYỆN TỰ CẬP NHẬT (01/11, game-v2-bank.ts `dongBoKhoLech`): tờ thầy vừa nạp / sửa vào kho câu trong ≤ 1 phút (trước chỉ khi em mở Đảo — đã gỡ 27/10
       // ⇒ «Câu rút được 0»). Khung học 18–24h 1 tờ/phút, ngoài khung 6 tờ/phút. Không tờ nào lệch ⇒ một câu đọc nhẹ. ĐỨNG TRƯỚC cau-meta để bảng meta dựng ngay phút đó.
       await import('./game-v2-bank').then(m=>m.dongBoKhoLech(env,laKhungHocVn(Date.now())?1:6)).then(r=>{if(r.lap||r.loi)console.log('[kho-cau] lập chỉ mục',JSON.stringify(r))}).catch(e=>console.error('[kho-cau] cron lỗi:',e))
+      // LUẬT TỰ LUẬN ĐỔI (01/11, game-v2-bank.ts `danhCoTuLuanKho`): quét kho gắn cờ `tuLuan` cho câu luật mới kết tội (kênh chỉ đọc cờ cũng chặn). Khung học 200 câu/phút,
+      // ngoài khung 1.500 câu/phút; quét xong ⇒ một câu đọc nhẹ.
+      await import('./game-v2-bank').then(m=>m.danhCoTuLuanKho(env,laKhungHocVn(Date.now())?200:1500)).then(r=>{if(r.gan)console.log('[tu-luan] quét',JSON.stringify(r))}).catch(e=>console.error('[tu-luan] cron lỗi:',e))
       // B2 (15/10): dựng lại bảng siêu dữ liệu câu tính sẵn cho tờ vừa lập chỉ mục (cau-meta.ts). Thường ngày không tờ nào lệch ⇒ một câu đọc nhẹ.
       await import('./cau-meta').then(m=>m.dongBoCauMeta(env,laGioCaoDiemVn(Date.now())?5:40)).catch(e=>console.error('[cau-meta] đồng bộ',e))
       // ĐO LẠI LƯỢT CŨ (21/10): lấp dần bảng kích thước đề từng câu (`cau_doc_giay`) — cao điểm chỉ 20 câu/phút, ngoài cao điểm 120; xong hết thì một câu đọc nhẹ.

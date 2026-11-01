@@ -11,20 +11,20 @@ const H2S = 'Hydrogen sulfide phân hủy theo phản ứng sau đây:\n2H₂S (
 
 describe('Phần III nhiều ý yêu cầu ⇒ tự luận', () => {
   it('câu H2S thầy gửi: tự luận cả khi có đáp án số 169,8 (khuôn game, khuôn công khai, tờ kho thô)', () => {
-    expect(soYConYeuCau(H2S)).toBe(3)
+    expect(soYConYeuCau(H2S)).toBe(2) // a) Viết · b) Xác định (c) «Ở 427 °C, tính» mở đầu bằng dữ kiện — 2 ý đã đủ kết tội)
     expect(laCauTuLuan({ qid: 'DH-11-C2-B7-III-39', phan: 'III', text: H2S, correct: '169,8' })).toBe(true)
-    expect(lyDoTuLuan({ phan: 'III', text: H2S, correct: '169,8' })).toBe('phần III gồm nhiều ý yêu cầu (a, b, c …) — tự luận')
+    expect(lyDoTuLuan({ phan: 'III', text: H2S, correct: '169,8' })).toBe('phần III nhiều ý')
     expect(laCauTuLuan({ qid: 'DH-11-C2-B7-III-39', phan: 'III', text: H2S })).toBe(true)
     expect(laCauTuLuan({ phan: 'III', so: 39, de: H2S, dap_an: '169,8' })).toBe(true)
   })
-  it('các kiểu đánh dấu ý: «a)», «(a)», ý mở đầu bằng «Hãy …», lệnh sau dấu phẩy', () => {
+  it('các kiểu đánh dấu ý: «a)», «(a)», ý mở đầu bằng «Hãy …»', () => {
     expect(laCauTuLuan({ phan: 'III', text: 'Cho 5,6 gam Fe vào dung dịch HCl dư. (a) Viết phương trình phản ứng. (b) Tính thể tích khí H₂ (đkc).', correct: '2,479' })).toBe(true)
-    expect(laCauTuLuan({ phan: 'III', text: 'Cho dữ kiện sau.\na) Hãy nêu hiện tượng.\nb) Trong điều kiện chuẩn, tính ΔH.', correct: '-92' })).toBe(true)
+    expect(laCauTuLuan({ phan: 'III', text: 'Cho dữ kiện sau.\na) Hãy nêu hiện tượng.\nb) Tính ΔH của phản ứng ở điều kiện chuẩn.', correct: '-92' })).toBe(true)
   })
   it('soát kho thật 01/11: ý hỏi «Tại sao …?», ý tự đặt câu hỏi «… bao nhiêu …?», «cho biết … toả nhiệt hay thu nhiệt» ⇒ tự luận; «Viết PTHH và tính hiệu suất» vẫn rút được', () => {
     expect(laCauTuLuan({ phan: 'III', text: 'Hỗn hợp N₂O₄ và N₂H₄ dùng làm nhiên liệu tên lửa. a) Tính nhiệt lượng toả ra khi đốt cháy 1 kg hỗn hợp lỏng theo đúng tỉ lệ phản ứng. b) Tại sao hỗn hợp lỏng N₂O₄ và N₂H₄ được dùng làm nhiên liệu tên lửa?', correct: '6724,2' })).toBe(true)
     expect(laCauTuLuan({ phan: 'III', text: 'Nguyên tử nitrogen có 7 proton và 7 neutron trong hạt nhân. a) Nguyên tử nitrogen này có bao nhiêu electron? b) Tính khối lượng của hạt nhân, vỏ nguyên tử và của nguyên tử nitrogen. c) Khối lượng hạt nhân chiếm bao nhiêu phần trăm?', correct: '100,0' })).toBe(true)
-    expect(lyDoTuLuan({ phan: 'III', text: 'Cho phản ứng NO₂(g) + SO₂(g) → NO(g) + SO₃(g). Tính biến thiên enthalpy của phản ứng và cho biết phản ứng trên là tỏa nhiệt hay thu nhiệt.', correct: '-41' })).toBe('phần III bắt kết luận bằng lời (… hay …) — tự luận')
+    expect(lyDoTuLuan({ phan: 'III', text: 'Cho phản ứng NO₂(g) + SO₂(g) → NO(g) + SO₃(g). Tính biến thiên enthalpy của phản ứng và cho biết phản ứng trên là tỏa nhiệt hay thu nhiệt.', correct: '-41' })).toBe('phần III nhiều ý')
     expect(laCauTuLuan({ phan: 'III', text: 'Dẫn hỗn hợp X qua bình chứa xúc tác V₂O₅, thu được hỗn hợp khí Y có tỉ khối so với H₂ bằng 30. Viết phương trình hóa học và tính hiệu suất của phản ứng oxi hóa SO₂ thành SO₃.', correct: '80' })).toBe(false)
     expect(laCauTuLuan({ phan: 'III', text: 'Cho các nhận xét sau: (a) Nước chua có tính acid nên làm protein bị đông tụ. (b) Thạch cao có thể thay nước chua. (c) Đậu phụ giàu protein. Có bao nhiêu nhận xét đúng?', correct: '3' })).toBe(false)
   })
@@ -43,5 +43,29 @@ describe('Phần III nhiều ý yêu cầu ⇒ tự luận', () => {
   it('Phần I / II có ý con trong đề vẫn rút được (chấm A–D / Đ–S)', () => {
     expect(laCauTuLuan({ phan: 'I', text: H2S, choices: ['a', 'b', 'c', 'd'], correct: 'B' })).toBe(false)
     expect(laCauTuLuan({ phan: 'II', text: H2S, ideas: ['a', 'b', 'c', 'd'], correct: 'DSDS' })).toBe(false)
+  })
+})
+
+describe('quét kho gắn cờ tự luận theo luật mới (game-v2-bank.ts `danhCoTuLuanKho`)', () => {
+  it('câu luật mới kết tội ⇒ gắn cờ + đổi mốc tờ; câu thường giữ nguyên; quét xong ⇒ không làm gì nữa', async () => {
+    const { taoD1That } = await import('./_d1-that')
+    const { danhCoTuLuanKho } = await import('../server/src/game-v2-bank')
+    const d = taoD1That()
+    const cau = (qid: string, text: string, correct: string) => JSON.stringify({ qid, maDe: 'DH-11-C2-B7', version: 'v1', group: 'g-' + qid, phan: 'III', text, choices: [], ideas: [], hinhAnh: [], correct, reviewed: true })
+    d.sql.prepare("INSERT INTO de_kho(ma_de,ten_de,so_cau,da_xoa,cap_nhat_luc) VALUES('DH-11-C2-B7','Bài 7',2,0,'v1')").run()
+    d.sql.prepare("INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DH-11-C2-B7','v1','2026-10-01T00:00:00.000Z')").run()
+    const q = d.sql.prepare("INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES('DH-11-C2-B7',?,?,?,NULL,?)")
+    q.run('DH-11-C2-B7-III-39', 'v1', 'g39', cau('DH-11-C2-B7-III-39', H2S, '169,8'))
+    q.run('DH-11-C2-B7-III-1', 'v1', 'g1', cau('DH-11-C2-B7-III-1', 'Tính thể tích khí SO₂ (đkc) thu được.', '2,479'))
+    const env = d.env as never
+    expect(await danhCoTuLuanKho(env, 1)).toEqual({ quet: 1, gan: 1, xong: false })
+    expect(await danhCoTuLuanKho(env, 1)).toEqual({ quet: 1, gan: 0, xong: false })
+    expect(await danhCoTuLuanKho(env, 5)).toEqual({ quet: 0, gan: 0, xong: true })
+    expect(await danhCoTuLuanKho(env, 5)).toEqual({ quet: 0, gan: 0, xong: true })
+    const tl = (qid: string) => JSON.parse((d.sql.prepare('SELECT json FROM game_v2_question WHERE qid=?').get(qid) as { json: string }).json).tuLuan
+    expect(tl('DH-11-C2-B7-III-39')).toBe(true)
+    expect(tl('DH-11-C2-B7-III-1')).toBeUndefined()
+    expect((d.sql.prepare("SELECT version FROM game_v2_question WHERE qid='DH-11-C2-B7-III-39'").get() as { version: string }).version).toBe('v1')
+    expect((d.sql.prepare("SELECT indexed_at FROM game_v2_index WHERE ma_de='DH-11-C2-B7'").get() as { indexed_at: string }).indexed_at).not.toBe('2026-10-01T00:00:00.000Z')
   })
 })

@@ -28,6 +28,8 @@ import { docSoPhanIII } from './doc-so-phan-iii'
 import { chuanHoaSoNhap, tachSoVaDonVi } from './cham-so-policy'
 
 export type PhanCau = 'I' | 'II' | 'III'
+/** Phiên bản LUẬT tự luận — đổi khi siết luật ⇒ máy chủ quét lại cả kho, gắn cờ `tuLuan` cho câu mới bị kết tội (game-v2-bank.ts `danhCoTuLuanKho`). */
+export const LUAT_TU_LUAN = 'tl2'
 
 type Cau = Record<string, unknown>
 
@@ -87,33 +89,16 @@ const DONG_TU_HOI_MO = /(?:^|[.?!:;]\s*|(?:^|[^\p{L}])hãy\s+)(?:giải thích|t
 const DONG_TU_LAM_CHU = /(?:^|[.?!:;,]\s*|(?:^|[^\p{L}])hãy\s+)(?:xác định (?:công thức|cấu tạo|tên)|viết (?:công thức|phương trình|các phương trình|cấu tạo|sơ đồ|tên)|lập (?:công thức|phương trình|sơ đồ)|vẽ|chứng minh)(?![\p{L}])/iu
 const HOI_DAI_LUONG = /bao nhiêu|số thứ tự|dãy số|bộ số|liệt kê|giá trị|tổng (?:hệ số|số)|là mấy|làm tròn|phần trăm|hiệu suất|khối lượng|thể tích|nồng độ|số mol|(?:^|[^\p{L}])tính(?![\p{L}])/iu
 /**
- * 01/11 (thầy gửi ảnh câu «Hydrogen sulfide phân huỷ … a) Viết biểu thức KC … b) Xác định biến thiên enthalpy … cho biết toả nhiệt hay thu nhiệt. c) Ở 427 °C, tính K'C…»
- * lọt vào chặng học, đáp án kho «169,8»): câu Phần III gồm ≥ 2 Ý CON (a) b) c)…) mà mỗi ý là MỘT YÊU CẦU (viết / xác định / tính / giải thích / cho biết …) — nhiều việc
- * trong một câu, một đáp án số chỉ khớp một ý ⇒ không chấm tự động được ⇒ TỰ LUẬN, KỂ CẢ khi kho có đáp án số. Danh sách PHÁT BIỂU / THÍ NGHIỆM «(a) … (b) …» kèm câu
- * hỏi đếm («Số phát biểu đúng là») KHÔNG dính: ý con mở đầu bằng chất / hiện tượng / «Cho … vào …», không phải động từ yêu cầu. «Tính chất / tính khử / tính acid …»
- * là danh từ, không phải lệnh «tính».
+ * 01/11 (thầy gửi ảnh câu H2S «a) Viết biểu thức KC … b) Xác định biến thiên enthalpy … cho biết toả nhiệt hay thu nhiệt. c) Ở 427 °C, tính K'C…» lọt vào chặng học,
+ * đáp án kho «169,8»): câu Phần III có ≥ 2 Ý CON (a) b) …) mà mỗi ý là MỘT VIỆC — mở đầu bằng động từ yêu cầu / hỏi
+ * mở («Tại sao …»), hoặc tự đặt câu hỏi («a) … có bao nhiêu electron?») — một đáp án số chỉ khớp một ý ⇒ TỰ LUẬN, kể cả khi kho có đáp án số. Danh sách PHÁT BIỂU /
+ * THÍ NGHIỆM «(a) … (b) …» chỉ có «?» ở câu hỏi đếm cuối ⇒ tối đa 1 ý ⇒ vẫn là trả lời ngắn. «Tính chất / tính khử …» là danh từ. Soát kho thật 01/11: đúng 8 câu bị kết tội.
+ * Viết GỌN (luật tốc độ: tệp này nằm trong mọi app).
  */
-const DONG_TU_YEU_CAU = /^(?:hãy\s+)?(?:viết|xác định|tính(?!\s+(?:chất|oxi|oxy|khử|acid|axit|base|bazơ|bazo|tan|dẻo|dẫn|cứng|lưỡng|kim loại|phi kim|tương đối|thấm|bền))|giải thích|trình bày|nêu|so sánh|nhận xét|đề xuất|lập|vẽ|chứng minh|hoàn thành|cân bằng|gọi tên|phân biệt|dự đoán|cho biết|tìm|sắp xếp|biểu diễn|mô tả|nhận biết|điều chế|thiết lập|đề nghị|chỉ ra)(?![\p{L}])/iu
-/** Ý con HỎI MỞ: mở đầu bằng câu hỏi lý do / cách thức («Tại sao …», «Vì sao …») — một việc phải trả lời bằng lời. */
-const HOI_Y_CON = /^(?:tại sao|vì sao|như thế nào|bằng cách nào|có nên)(?![\p{L}])/iu
-const DAU_Y_CON = /(?:^|[\s.:;?!])\(?([a-e])\)\s*/giu
-/** Đề bắt KẾT LUẬN BẰNG LỜI giữa hai khả năng («cho biết phản ứng là toả nhiệt hay thu nhiệt», «cho biết … tăng hay giảm») — đáp án số không chấm được phần này. */
-const KET_LUAN_BANG_LOI = /cho biết[^.?!\n]{0,90}?(?:tỏa|toả|thu|tăng|giảm|mạnh|yếu|nhanh|chậm|đúng|sai|có|không|thuận|nghịch)[^.?!\n]{0,30}\shay\s/iu
-/** Số Ý CON (khác chữ cái) là MỘT VIỆC phải làm: mở đầu — hoặc sau dấu phẩy đầu, vd «Ở 427 °C, tính …» — bằng động từ yêu cầu, hoặc hỏi mở («Tại sao …»),
- *  hoặc tự đặt một câu hỏi (có «?» trong ý — «a) Nguyên tử này có bao nhiêu electron?»). Danh sách phát biểu chỉ có «?» ở câu hỏi đếm cuối ⇒ tối đa 1. */
-export function soYConYeuCau(text: string): number {
-  const t = text.normalize('NFC')
-  const dau: { chu: string; tu: number; den: number }[] = []
-  for (const m of t.matchAll(DAU_Y_CON)) dau.push({ chu: m[1]!.toLowerCase(), tu: m.index! + m[0].length, den: m.index! })
-  if (dau.length < 2) return 0
-  const co = new Set<string>()
-  dau.forEach((d, i) => {
-    const doan = t.slice(d.tu, i + 1 < dau.length ? dau[i + 1]!.den : t.length).trim().slice(0, 160)
-    const dauDoan = doan.split(/[,;]/).slice(0, 2).map((x) => x.trim())
-    if (dauDoan.some((x) => DONG_TU_YEU_CAU.test(x) || HOI_Y_CON.test(x)) || doan.includes('?')) co.add(d.chu)
-  })
-  return co.size
-}
+const YC = /^(?:hãy )?(?:viết|xác định|tính(?! (?:chất|khử|oxi|acid|axit|base|tan|dẫn|dẻo))|giải thích|trình bày|nêu|so sánh|nhận xét|đề xuất|cho biết|tìm|(?:tại|vì) sao)(?!\p{L})/iu
+/** Số ý con là MỘT VIỆC (luật trên). `t` đã chuẩn NFC (`chuoi`). */
+export const soYConYeuCau = (t: string): number =>
+  t.split(/(?:^|[\s.:;?!])\(?[a-e]\)\s*/iu).slice(1).filter((d) => d.includes('?') || YC.test(d.trim())).length
 
 const hoiMo = (text: string): boolean => {
   const t = text.toLowerCase()
@@ -168,11 +153,11 @@ export function lyDoTuLuan(c: unknown, phanMacDinh?: PhanCau): string | null {
   if (!laDoiTuong(c)) return 'không phải câu hỏi'
   const kieu = chuoi(lay(c, 'kieu', 'loai', 'type', 'loaiCau'))
   if (kieu && KIEU_TU_LUAN.test(kieu)) return 'câu gắn nhãn tự luận'
-  if (c.tuLuan === true || c.tu_luan === true) return 'câu gắn cờ tự luận (kho)'
-  if (laMaDeTuLuan(chuoi(lay(c, 'maDe', 'ma_de'))) || laMaDeTuLuan(chuoi(lay(c, 'qid', 'id')))) return 'mã đề thuộc mục dạy học / tự luận (-VD, -DT, -TL)'
+  if (c.tuLuan === true || c.tu_luan === true) return 'cờ tự luận'
+  if (laMaDeTuLuan(chuoi(lay(c, 'maDe', 'ma_de'))) || laMaDeTuLuan(chuoi(lay(c, 'qid', 'id')))) return 'mã đề -VD/-DT/-TL'
 
   const phan = phanCua(c, phanMacDinh)
-  if (phan === 'khac') return 'phần của câu không phải I, II, III (tự luận)'
+  if (phan === 'khac') return 'phần không phải I, II, III'
   const text = chuoi(lay(c, 'text', 'de', 'cauHoi', 'noiDung'))
   const daRaw = lay(c, 'correct', 'dapAn', 'dap_an', 'dapAnDung')
   // `CauLuyen` của bài cá nhân hoá luôn có `dapAn: ''` kèm `caNhan.chuaCoDapAn` (máy chủ chưa gửi đáp án): đó là CHƯA BIẾT, không phải "không có đáp án"
@@ -183,23 +168,23 @@ export function lyDoTuLuan(c: unknown, phanMacDinh?: PhanCau): string | null {
   if (phan === 'I') {
     const pa = lay(c, 'choices', 'pa', 'luaChon', 'phuongAn', 'options')
     const coPa = c.choices !== undefined || c.pa !== undefined || c.luaChon !== undefined || c.phuongAn !== undefined || c.options !== undefined
-    if (coPa && demCoNoiDung(pa, lay(c, 'choiceImgs', 'anhLuaChon'), lay(c, 'hinh', 'hinhAnh'), 'sau_pa_') < 4) return 'phần I thiếu phương án (không đủ 4)'
+    if (coPa && demCoNoiDung(pa, lay(c, 'choiceImgs', 'anhLuaChon'), lay(c, 'hinh', 'hinhAnh'), 'sau_pa_') < 4) return 'phần I thiếu phương án'
     if (coDapAn && !/^[A-D]$/i.test(da.replace(/[.)\s]+$/, '').trim())) return 'phần I không có đáp án A–D'
   } else if (phan === 'II') {
     const y = lay(c, 'ideas', 'y', 'cacY', 'statements')
     const coY = c.ideas !== undefined || c.y !== undefined || c.cacY !== undefined || c.statements !== undefined
-    if (coY && demCoNoiDung(y, lay(c, 'ideaImgs', 'anhY'), lay(c, 'hinh', 'hinhAnh'), 'sau_y_') < 4) return 'phần II thiếu ý (không đủ 4)'
-    if (coDapAn && da.replace(/[^DSĐdsđ]/g, '').length !== 4) return 'phần II không có đáp án đúng/sai đủ 4 ý'
+    if (coY && demCoNoiDung(y, lay(c, 'ideaImgs', 'anhY'), lay(c, 'hinh', 'hinhAnh'), 'sau_y_') < 4) return 'phần II thiếu ý'
+    if (coDapAn && da.replace(/[^DSĐdsđ]/g, '').length !== 4) return 'phần II không đủ 4 ý Đ/S'
   } else if (phan === 'III') {
-    if (text && soYConYeuCau(text) >= 2) return 'phần III gồm nhiều ý yêu cầu (a, b, c …) — tự luận'
-    if (text && KET_LUAN_BANG_LOI.test(text.normalize('NFC'))) return 'phần III bắt kết luận bằng lời (… hay …) — tự luận'
+    // «cho biết … hay …»: bắt KẾT LUẬN BẰNG LỜI giữa hai khả năng (toả / thu nhiệt …) — đáp án số không chấm được phần này.
+    if (text && (soYConYeuCau(text) > 1 || /cho biết[^.?!\n]{0,120}\shay\s/iu.test(text))) return 'phần III nhiều ý'
     if (coDapAn) {
-      if (!da) return 'phần III không có đáp án để chấm tự động'
-      if ((da.length > 20 && /\s/.test(da)) || /[\n;→⇌:]/.test(da)) return 'phần III đáp án dài / nhiều dòng (tự luận)'
-      if (laChuNhieuTu(da)) return 'phần III đáp án là chữ nhiều từ (không phải số hay mã ngắn)'
-      if (!laMotSoPhanIII(da)) return 'phần III đáp án không phải một số (công thức / chữ / nhiều số) — không chấm tự động'
+      if (!da) return 'phần III không có đáp án'
+      if ((da.length > 20 && /\s/.test(da)) || /[\n;→⇌:]/.test(da)) return 'phần III đáp án dài'
+      if (laChuNhieuTu(da)) return 'phần III đáp án chữ nhiều từ'
+      if (!laMotSoPhanIII(da)) return 'phần III đáp án không phải một số'
     }
-    if (text && !(coDapAn && laMotSoPhanIII(da)) && hoiMo(text)) return 'phần III hỏi mở (theo em / phương pháp nào / giải thích / viết công thức …)'
+    if (text && !(coDapAn && laMotSoPhanIII(da)) && hoiMo(text)) return 'phần III hỏi mở'
   }
   return null
 }

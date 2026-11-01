@@ -7,7 +7,7 @@ const rows = (JSON.parse(readFileSync(process.argv[2]!, 'utf8')) as { results: R
 let tong = 0, moi = 0
 const theoTo = new Map<string, number>()
 for (const r of rows) {
-  const text = String(r.text ?? ''), c = { qid: r.qid, phan: r.phan, text, correct: r.correct }
+  const text = String(r.text ?? '').normalize('NFC'), c = { qid: r.qid, phan: r.phan, text, correct: r.correct }
   tong++
   if (soYConYeuCau(text) < 2 || !laCauTuLuan(c)) continue
   if (Number(r.tl) === 1) continue

@@ -1,5 +1,5 @@
 import { docNhanKhoHanhTrinh } from '../../src/lib/hanh-trinh-nhan'
-import {laCauTuLuan} from '../../src/lib/cau-tu-luan'
+import {LUAT_TU_LUAN,laCauTuLuan} from '../../src/lib/cau-tu-luan'
 import { ngoaiKenhSo } from '../../src/lib/so-o-tra-loi-ngan'
 import { tachSongSinh } from './loi-hoc-luat'
 import { phuSongSinhTheoQid } from './song-sinh-game'
@@ -7,7 +7,7 @@ import { laQidChanDoan } from './lam-lai-so'
 /** 06/10: giải mã câu chẩn đoán bước sai — nhập trễ (chan-doan-buoc-sai.ts kéo theo omni-d1 / thang-tu-go: tránh vòng nạp với tệp nền này). */
 const lanChanDoan = () => import('./chan-doan-buoc-sai')
 import {DemTTL} from './dem-chung'
-import { cauGonTuDong, SQL_CAU_GON_KIEN_THUC } from './cau-gon'
+import { cauGonTuDong, SQL_CAU_GON, SQL_CAU_GON_KIEN_THUC, tuLuanTuMeta } from './cau-gon'
 import {dbGoc} from './cau-hinh-dem'
 import { xoaDemTheoKho } from './dau-kho-cau'
 import { khoiCuaEm, locCauHopKhoi, type Khoi } from '../../src/lib/khoi-cau'
@@ -152,6 +152,30 @@ export function syncIndex(env:Env):Promise<{remaining:number;indexed:number}> {
   const p=syncIndexTho(env).then(r=>{if(r.remaining===0)demSyncDu.ghi('du',Date.now(),true);return r}).finally(()=>{if(syncDangBay.get(k)===p)syncDangBay.delete(k)})
   syncDangBay.set(k,p)
   return p
+}
+/**
+ * GẮN CỜ TỰ LUẬN CHO CẢ KHO khi LUẬT đổi (01/11 — thầy: «Khi phân câu tự luận vẫn lọt vào. Sửa lại triệt để tất cả các khối»). Phần lớn kênh hỏi `laCauTuLuan` lúc phát
+ * câu (luật mới có hiệu lực ngay), nhưng vài kênh chỉ đọc CỜ đã lưu trong chỉ mục (`json.tuLuan` — kho OMNI `omni-d1.ts`, `cau_meta.tu_luan`, đếm của thầy). Hàm này
+ * quét `game_v2_question` theo rowid (con trỏ `cau_hinh.co_tu_luan_quet`, gắn với `LUAT_TU_LUAN`): câu luật hiện hành kết tội mà chưa mang cờ ⇒ gắn `tuLuan: true`
+ * (KHÔNG đổi đề / đáp án / phiên bản câu ⇒ lượt đang mở không bị coi là câu đổi), rồi đổi mốc `indexed_at` của tờ ⇒ bảng meta dựng lại + mọi đệm theo kho đọc lại.
+ * Chỉ GẮN thêm, không bao giờ gỡ cờ. Quét xong luật này ⇒ một câu đọc nhẹ mỗi lượt. Đổi `LUAT_TU_LUAN` ⇒ quét lại từ đầu.
+ */
+export async function danhCoTuLuanKho(env:Env,toiDa:number):Promise<{quet:number;gan:number;xong:boolean}>{
+  const KHOA='co_tu_luan_quet'
+  const r=await env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa=?').bind(KHOA).first<{gia_tri:string}>().catch(()=>null)
+  let ct:{luat?:string;sau?:number;xong?:boolean}={};try{ct=JSON.parse(r?.gia_tri??'{}')}catch{/* đọc lại từ đầu */}
+  if(ct.luat===LUAT_TU_LUAN&&ct.xong)return {quet:0,gan:0,xong:true}
+  const sau=ct.luat===LUAT_TU_LUAN?Number(ct.sau)||0:0
+  const ds=(await env.DB.prepare(`SELECT rowid AS rid, ma_de, qid, ${SQL_CAU_GON} FROM game_v2_question WHERE rowid>? AND json_valid(json) AND COALESCE(json_extract(json,'$.tuLuan'),0)<>1 ORDER BY rowid LIMIT ?`).bind(sau,toiDa).all<Row>()).results??[]
+  const gan=ds.filter(x=>tuLuanTuMeta(x))
+  const luc=new Date().toISOString(),toMoi=[...new Set(gan.map(x=>str(x.ma_de)))]
+  const lenh=[...gan.map(x=>env.DB.prepare(`UPDATE game_v2_question SET json=json_set(json,'$.tuLuan',json('true')) WHERE ma_de=? AND qid=?`).bind(str(x.ma_de),str(x.qid))),
+    ...toMoi.map(m=>env.DB.prepare('UPDATE game_v2_index SET indexed_at=? WHERE ma_de=?').bind(luc,m)),
+    env.DB.prepare('INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES(?,?,?) ON CONFLICT(khoa) DO UPDATE SET gia_tri=excluded.gia_tri,cap_nhat_luc=excluded.cap_nhat_luc')
+      .bind(KHOA,JSON.stringify({luat:LUAT_TU_LUAN,sau:ds.length?Number(ds[ds.length-1]!.rid):sau,xong:ds.length<toiDa}),luc)]
+  await env.DB.batch(lenh)
+  if(gan.length){xoaDemSync();xoaDemTheoKho();console.log('[tu-luan] gắn cờ',gan.map(x=>str(x.qid)).join(','))}
+  return {quet:ds.length,gan:gan.length,xong:ds.length<toiDa}
 }
 /** Work is bounded per call; cursor/checkpoints cover the entire bank, not eight sheets. */
 async function syncIndexTho(env:Env):Promise<{remaining:number;indexed:number}> {
