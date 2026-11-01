@@ -1,9 +1,6 @@
-// BẢN VẼ — màn «Ca đã kết thúc» THẬT (`KetThucCa`, dữ liệu giả) + NGUYÊN MẪU nút mới «Chiếu chữa bài». Bundle bằng esbuild trong `chup.mjs`.
+// BẢN VẼ — màn «Ca đã kết thúc» THẬT (`KetThucCa`, dữ liệu giả) + nút «Chiếu chữa bài» (mã thật từ 01/11). Bundle bằng esbuild trong `chup.mjs`.
 // Trạng thái chọn bằng hash: #tt=co (có câu sai) · #tt=dung-het (cả lớp đúng hết) · #tt=khong-de (máy này chưa có đề có đáp án) · #tt=con-em (còn em đang làm).
-import { useLayoutEffect, useState } from 'react'
-import { createPortal } from 'react-dom'
 import { createRoot } from 'react-dom/client'
-import { Presentation } from 'lucide-react'
 import KetThucCa from '../../src/components/ca-thi/KetThucCa'
 import type { BaoCaoCaLop } from '../../src/lib/bao-cao-ca-lop'
 
@@ -30,25 +27,6 @@ const lop: BaoCaoCaLop = {
   coBangCham: tt !== 'khong-de',
 }
 
-/** NÚT MỚI (nguyên mẫu): nút chính đứng TRƯỚC «Xem báo cáo chi tiết» ở đầu màn. */
-function NutChieu() {
-  const [cho, setCho] = useState<Element | null>(null)
-  useLayoutEffect(() => setCho(document.querySelector('[data-vung="ket-thuc-ca"] .ct-hang-nut')), [])
-  if (!cho) return null
-  const tat = tt === 'dung-het' || tt === 'khong-de'
-  const nhan = tt === 'dung-het' ? 'Cả lớp đúng hết · không có câu cần chữa' : tt === 'khong-de' ? 'Máy này chưa có đề có đáp án của ca' : tt === 'con-em' ? '2 em còn đang làm — chiếu lúc này các em ấy thấy đề và lời giải' : 'Xếp khó → dễ, cùng mức thì sai nhiều → ít'
-  return createPortal(
-    <div className="ve-chieu">
-      <button type="button" className="ct-nut ct-nut-chinh" disabled={tat} aria-describedby="ve-chieu-ghi">
-        <Presentation size={18} aria-hidden="true" />
-        {tt === 'dung-het' || tt === 'khong-de' ? 'Chiếu chữa bài' : 'Chiếu chữa bài · 9 câu'}
-      </button>
-      <span id="ve-chieu-ghi" className="ct-ghi">{nhan}</span>
-    </div>,
-    cho,
-  )
-}
-
 function Man() {
   return (
     <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
@@ -67,11 +45,14 @@ function Man() {
         onXemBaoCao={() => {}}
         onMoEm={() => {}}
         emChuaNop={tt === 'con-em' ? [{ sbd: '9', hoTen: 'Lý Hoàng Nam' }, { sbd: '10', hoTen: 'Mai Thuỳ Trang' }] : []}
+        chieu={{
+          soCau: tt === 'dung-het' || tt === 'khong-de' ? 0 : 9,
+          ly: tt === 'dung-het' ? 'Cả lớp đúng hết · không có câu cần chữa' : tt === 'khong-de' ? 'Máy này chưa có đề có đáp án của ca' : '',
+          canhBao: tt === 'con-em' ? '2 em còn đang làm — chiếu lúc này các em ấy thấy đề và lời giải' : '',
+          dang: false,
+        }}
+        onChieu={() => {}}
       />
-      {tt === 'con-em' && (
-        <style>{`.ve-chieu .ct-ghi{color:var(--gvm-ho-dam)}`}</style>
-      )}
-      <NutChieu />
     </div>
   )
 }

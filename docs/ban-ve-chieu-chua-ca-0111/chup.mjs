@@ -22,12 +22,12 @@ const esb = join(GOC, 'node_modules/.bin/esbuild')
 // 1) Tờ chiếu thật + nguyên mẫu.
 execFileSync(esb, [join(VE, 'to-chieu.ts'), '--bundle', '--platform=node', '--format=esm', `--outfile=${join(TAM, 'to.mjs')}`, '--log-level=warning', '--loader:.css=empty'])
 execFileSync('node', [join(TAM, 'to.mjs'), join(TAM, 'to-goc.html')])
-writeFileSync(join(TAM, 'to.html'), readFileSync(join(TAM, 'to-goc.html'), 'utf8').replace('</body>', `<script>${readFileSync(join(VE, 'nguyen-mau.js'), 'utf8')}</script></body>`))
+writeFileSync(join(TAM, 'to.html'), readFileSync(join(TAM, 'to-goc.html'), 'utf8'))
 
 // 2) Màn app thầy.
 execFileSync(esb, [join(VE, 'ket-thuc-ca.tsx'), '--bundle', '--format=esm', '--jsx=automatic', `--outfile=${join(TAM, 'ktc.js')}`, '--log-level=warning', '--loader:.css=empty', '--define:process.env.NODE_ENV="production"'])
 const css = readdirSync(join(GOC, 'dist/assets')).filter((f) => f.endsWith('.css')).map((f) => `<link rel="stylesheet" href="/assets/${f}">`).join('')
-writeFileSync(join(TAM, 'ktc.html'), `<!doctype html><html lang="vi" data-trong="gv"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${css}<link rel="stylesheet" href="/goc/src/styles/trong-gv.css"><style>.ve-chieu{display:flex;flex-direction:column;gap:4px;align-items:flex-end}.ve-chieu .ct-ghi{font-size:13px}@media (max-width:640px){.ve-chieu{align-items:stretch;width:100%;order:-1}.ve-chieu .ct-nut{width:100%;justify-content:center}}</style></head><body><div id="goc"></div><script type="module" src="/tam/ktc.js"></script></body></html>`)
+writeFileSync(join(TAM, 'ktc.html'), `<!doctype html><html lang="vi" data-trong="gv"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${css}<link rel="stylesheet" href="/goc/src/styles/trong-gv.css"></head><body><div id="goc"></div><script type="module" src="/tam/ktc.js"></script></body></html>`)
 
 const LOAI = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.woff2': 'font/woff2', '.woff': 'font/woff', '.svg': 'image/svg+xml', '.png': 'image/png' }
 const may = createServer((req, res) => {
@@ -63,7 +63,7 @@ for (const [kho, w, h, dpr] of [['390-doc', 390, 844, 1.25], ['844-ngang', 844, 
     const t = await ctx.newPage()
     t.on('pageerror', (e) => soat.push(`app ${kho}: lỗi trang ${e.message}`))
     await t.goto(`${GOC_URL}/tam/ktc.html#tt=co`)
-    await t.waitForSelector('.ve-chieu'); await t.evaluate(() => document.fonts.ready); await t.waitForTimeout(200)
+    await t.waitForSelector('.ct-chieu'); await t.evaluate(() => document.fonts.ready); await t.waitForTimeout(200)
     await chup(t, `01-app-ket-thuc-ca-${kho}-${toi ? 'toi' : 'sang'}`, { full: kho !== '844-ngang' })
     await ctx.close()
   }
@@ -74,7 +74,7 @@ for (const tt of ['dung-het', 'khong-de', 'con-em']) {
   const t = await ctx.newPage()
   t.on('pageerror', (e) => soat.push(`app ${tt}: lỗi trang ${e.message}`))
   await t.goto(`${GOC_URL}/tam/ktc.html#tt=${tt}`)
-  await t.waitForSelector('.ve-chieu'); await t.evaluate(() => document.fonts.ready); await t.waitForTimeout(200)
+  await t.waitForSelector('.ct-chieu'); await t.evaluate(() => document.fonts.ready); await t.waitForTimeout(200)
   await chup(t, `02-app-trang-thai-${tt}`, { full: false })
   await ctx.close()
 }
@@ -85,7 +85,7 @@ async function moTo(w, h, toi) {
   const t = await ctx.newPage()
   t.on('pageerror', (e) => soat.push(`chiếu ${w}: lỗi trang ${e.message}`))
   await t.goto(`file://${join(TAM, 'to.html')}`)
-  await t.waitForSelector('.ve-sai'); await t.waitForTimeout(1500)
+  await t.waitForSelector('.mc-st'); await t.waitForTimeout(1500)
   if (toi) { await t.evaluate(() => { const s = document.getElementById('mc-palette'); s.value = 'dark'; s.dispatchEvent(new Event('change', { bubbles: true })) }); await t.waitForTimeout(300) }
   return { ctx, t }
 }
@@ -115,10 +115,20 @@ for (const [w, h] of [[1920, 1080], [1280, 720]]) {
   await chup(t, '06-chieu-cau-9-mot-em-1920', { full: false, kiem: false })
   await ctx.close()
 }
-{
+{ // Phím H thu gọn tên (thầy chốt 01/11: lấy diện tích chữa bảng); phím L không gọi em; lật câu vẫn giữ thu gọn.
   const { ctx, t } = await moTo(1920, 1080, false)
-  await t.click('#mc-phim-nhom .mc-nut-phim:has-text("Ẩn tên")'); await t.waitForTimeout(200)
-  await chup(t, '07-chieu-cau-1-an-ten-1920', { full: false, kiem: false })
+  const pha0 = await t.textContent('#mc-pha')
+  await t.keyboard.press('l'); await t.waitForTimeout(300)
+  if ((await t.textContent('#mc-pha')) !== pha0 || pha0 !== 'CHỮA BÀI') soat.push(`phím L đổi pha: ${pha0} → ${await t.textContent('#mc-pha')}`)
+  await t.keyboard.press('h'); await t.waitForTimeout(250)
+  const gon = await t.evaluate(() => ({ gon: document.body.classList.contains('mc-st-gon'), ds: getComputedStyle(document.querySelector('.mc-dot .mc-st-ds')).display, nut: document.querySelector('#mc-st-nut .mc-nut-chu').textContent, cao: Math.round(document.querySelector('.mc-dot .mc-st').getBoundingClientRect().height) }))
+  if (!gon.gon || gon.ds !== 'none' || gon.nut !== 'Hiện tên') soat.push(`phím H không thu gọn: ${JSON.stringify(gon)}`)
+  console.log('thu gọn:', JSON.stringify(gon), '· đếm:', await t.textContent('#mc-dem'))
+  await chup(t, '07-chieu-cau-1-thu-gon-ten-1920', { full: false, kiem: false })
+  await t.click('#mc-sau'); await t.waitForTimeout(350)
+  if (!(await t.evaluate(() => document.body.classList.contains('mc-st-gon')))) soat.push('lật câu mất thu gọn')
+  await t.locator('.mc-st-dau:visible').first().click(); await t.waitForTimeout(250)
+  if (await t.evaluate(() => document.body.classList.contains('mc-st-gon'))) soat.push('bấm thẻ không mở lại tên')
   await ctx.close()
 }
 await trinh.close(); may.close()

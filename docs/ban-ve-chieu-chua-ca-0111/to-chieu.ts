@@ -1,9 +1,10 @@
 // BẢN VẼ «CHIẾU CHỮA BÀI SAU CA» (thầy 01/11) — dựng TỜ CHIẾU THẬT bằng `taoHtmlMayChieu` (đúng màn chiếu chuẩn Chiếu lên bảng), dữ liệu GIẢ sát thực tế
-// (ca «Kiểm tra 15 phút · 11A2», 32 em, 9 câu có em sai). Phần MỚI (thẻ tên em chưa đúng ở góc, đếm «Câu n/9», chip mức độ) là nguyên mẫu ở `nguyen-mau.js`.
+// (ca «Kiểm tra 15 phút · 11A2», 32 em, 9 câu có em sai). Từ 01/11 (thầy chốt) dùng MÃ THẬT: `chuaDung` + `chuaBai` (src/lib/chieu-chua-ca-to.ts).
 //   npx esbuild docs/ban-ve-chieu-chua-ca-0111/to-chieu.ts --bundle --platform=node --format=esm --outfile=<tmp>.mjs && node <tmp>.mjs <ra.html>
 import { writeFileSync } from 'node:fs'
 import { taoHtmlMayChieu, type OBang } from '../../src/lib/html-may-chieu'
 import { thongKeLopCau } from '../../src/lib/thong-ke-lop-cau'
+import { theChuaDung } from '../../src/lib/chieu-chua-ca'
 import type { CauLuyen } from '../../src/lib/bai-tap-pdf'
 
 /** 32 em (tên giả). */
@@ -37,10 +38,7 @@ const cauLuyen = (c: CauMau): CauLuyen => ({ phan: c.phan, id: `KT15-${c.so}`, m
 
 const o: OBang[] = XEP.map((c) => {
   const lam = LOP.map((_, i) => { const k = c.sai.indexOf(i); return k < 0 ? { dung: true, chon: c.dapAn, dapAnDung: c.dapAn } : { dung: false, chon: c.chon[k] ?? '', dapAnDung: c.dapAn } })
-  return { sbd: '', hoTen: 'Cả lớp', soCau: c.so, mucDo: c.mucDo, qid: `KT15-${c.so}`, cau: cauLuyen(c), thongKe: thongKeLopCau(c.phan, lam) }
+  return { sbd: '', hoTen: 'Cả lớp', soCau: c.so, mucDo: c.mucDo, cau: cauLuyen(c), thongKe: thongKeLopCau(c.phan, lam), chuaDung: theChuaDung({ sai: c.sai.map((i) => ({ sbd: String(i), hoTen: LOP[i]! })), lam: LOP.length }) }
 })
 
-/** Dữ liệu cho nguyên mẫu thẻ tên (mỗi đợt một câu, đúng thứ tự xếp). */
-const ds = XEP.map((c) => ({ so: c.so, mucDo: c.mucDo, sai: c.sai.map((i) => LOP[i]!), lam: LOP.length }))
-const html = taoHtmlMayChieu(o, { tenBuoi: 'Chữa bài · Kiểm tra 15 phút · 11A2' })
-writeFileSync(process.argv[2]!, html.replace('</body>', `<script>window.__DS=${JSON.stringify(ds)}</script></body>`))
+writeFileSync(process.argv[2]!, taoHtmlMayChieu(o, { tenBuoi: 'Chữa bài · Kiểm tra 15 phút · 11A2', chuaBai: true }))

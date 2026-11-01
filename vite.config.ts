@@ -630,6 +630,10 @@ export default defineConfig({
             // 27/10 (tốc độ cổng phụ huynh): bộ đọc lời giải một câu (`ph-moi/du-lieu-loi-giai`) nạp lười ⇒ gom vào mảnh màn chi tiết ca (nơi duy nhất dùng nó trong app)
             // thay vì một tệp precache riêng.
             { name: 'ManChiTietCa', test: /src[\\/](?:components[\\/]ph-v3[\\/]ManChiTietCa\.tsx|lib[\\/]ph-moi[\\/]du-lieu-loi-giai\.ts)$/, includeDependenciesRecursively: false },
+            // 01/11 (Chiếu chữa bài sau ca): màn theo dõi ca nạp lười tờ chiếu (`html-may-chieu`) ⇒ Rolldown xẻ `to-chieu-cau-noi` + `chon-em-phan-tang` khỏi mảnh
+            // ChonEm thành nhiều tệp (+tệp precache, danh sách mảnh trong App nặng thêm ở /gv /p). Gom lại ĐÚNG bốn mô-đun của mảnh cũ (đọc từ sourcemap bản main
+            // b3bb4c7: ChonEm.tsx + chon-em.css, ghi-to-chieu, to-chieu-cau-noi, chon-em-phan-tang) ⇒ các đường khác không đổi byte.
+            { name: 'ChonEm', test: /src[\\/](?:components[\\/](?:goi-len-bang[\\/](?:ChonEm\.tsx|chon-em\.css)|chien-dich[\\/]ghi-to-chieu\.ts)|lib[\\/](?:to-chieu-cau-noi|chon-em-phan-tang)\.ts)$/, includeDependenciesRecursively: false },
             { name: 'exam-grade', test: /src[\\/]lib[\\/](?:phan-tich-lam-bai|loai-cau-chua-dung|rut-de-chua|phan-cau-len-bang|chan-doan-cau-hinh|chan-doan|chan-doan-phieu|chong-gian-lan|phieu-du-lieu|phieu-link|exam-grade|nhan-xet-theo-ca|cau-hinh-chua)\.ts$/, includeDependenciesRecursively: false },
           ],
         },

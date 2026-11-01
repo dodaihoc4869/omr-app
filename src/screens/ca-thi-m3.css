@@ -557,3 +557,29 @@
     transition: none;
   }
 }
+
+/* CHIẾU CHỮA BÀI (thầy chốt 01/11): nút chính + dòng luật xếp / lý do / nhắc ở dưới. Máy tính: đứng phải; điện thoại: lên đầu, rộng hết hàng.
+ * Đặt ở CSS riêng của màn theo dõi ca (nạp lười) — không vào ca-thi.css chung lúc mở app. */
+.ct-chieu {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-end;
+}
+.ct-chieu .ct-ghi {
+  font-size: 13px;
+}
+.ct-chieu .ct-ghi[data-canh-bao] {
+  color: var(--gvm-ho-dam);
+}
+@media (max-width: 640px) {
+  .ct-chieu {
+    order: -1;
+    width: 100%;
+    align-items: stretch;
+  }
+  .ct-chieu .ct-nut {
+    width: 100%;
+    justify-content: center;
+  }
+}

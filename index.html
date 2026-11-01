@@ -25,6 +25,9 @@
       Sửa cả hai: `start_url` nay mang sẵn `?vai=`, và thẻ manifest được chọn
       bằng đoạn mã đồng bộ ngay dưới đây, đọc vai từ chính đường dẫn đang mở.
       Không có JS thì vẫn còn thẻ `<link>` dự phòng ở sau. -->
+    <!-- (chú thích để ở HTML — lúc build bị lọc, không tải xuống máy) App học sinh (thầy 28/10 «full hẳn, không dải đen»): thanh trạng thái CÙNG MÀU NỀN
+         app học sinh (--tr-nen sáng / tối ở src/styles/trong-hs-mau.css). Script dưới viết thẻ theme-color của app học sinh TRƯỚC ba thẻ chung ⇒ trình duyệt
+         lấy thẻ khớp đầu tiên. Sau khi app chạy, src/lib/toan-man-hs.ts còn tự đặt lại theo nền đang vẽ. -->
     <script>
       (function () {
         try {
@@ -45,9 +48,6 @@
           var ten2 = vai === 'hs' ? 'ĐĐH Học Sinh' : vai === 'ph' ? 'ĐĐH Phụ Huynh' : 'ĐỖ ĐẠI HỌC'
           document.write('<link rel="manifest" href="/' + ten + '">')
           document.write('<meta name="apple-mobile-web-app-title" content="' + ten2 + '">')
-          // App học sinh (thầy 28/10 «full hẳn, không dải đen»): thanh trạng thái CÙNG MÀU NỀN app học sinh (--tr-nen sáng / tối ở
-          // src/styles/trong-hs-mau.css). Viết TRƯỚC ba thẻ theme-color chung bên dưới ⇒ trình duyệt lấy thẻ khớp đầu tiên là thẻ này.
-          // Sau khi app chạy, src/lib/toan-man-hs.ts còn tự đặt lại theo nền đang vẽ.
           if (vai === 'hs') {
             document.write('<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f6fc">')
             document.write('<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1a1a29">')
@@ -83,6 +83,7 @@
       @media (prefers-color-scheme: dark) { body { background: #0f1419; } }
     </style>
     <!-- TƯƠNG THÍCH MÁY IOS CŨ (< iOS 18) & CHỐNG TRẮNG MÀN HÌNH -->
+    <!-- Script dưới: giữ chẩn đoán khởi động (hienLoiKhoiDong), không xoá cache/bài làm khi máy chỉ tải chậm. -->
     <script>
       (function () {
         try {
@@ -139,7 +140,6 @@
           }
         } catch (e) {}
 
-        // Giữ chẩn đoán khởi động, không xoá cache/bài làm khi máy chỉ tải chậm.
         function hienLoiKhoiDong(message) {
           var root = document.getElementById('root')
           if (!root || (root.childElementCount && !root.querySelector('[data-startup-status]'))) return
