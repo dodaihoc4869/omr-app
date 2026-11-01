@@ -1,18 +1,18 @@
-// LINH VẬT CHÍNH «Lửa» — hình «CÚ NGỌC» (thầy chốt 28/10 «Chốt build thay»; trước đó 27/10 là chó shiba cam): lông chàm tím, chỏm lửa hồng, kính bảo hộ
-// ngọc lam, blouse trắng, ống nghiệm hồng, huy hiệu lục giác — ở mọi chỗ của app học sinh. Tên trên màn VẪN là «Lửa» (Cú Ngọc là tên concept).
+// LINH VẬT CHÍNH «MOL» — MẶT BÌNH CẦU (thầy chốt 01/11: «Chọn Mol bình cầu, thêm cả cáu, rất cáu nữa nhé. Đặt tên linh vật là Mol thôi»; bản vẽ
+// docs/ban-ve-mol-0111): chỉ có mặt, đầu bình cầu xanh dương của app, dung dịch cam ở cằm, mắt to — ở mọi chỗ của app học sinh. Thay hình cú ngọc «Lửa» (28/10).
 // GIỮ NGUYÊN API <Bi cam size className nhip noi> nên người gọi không đổi; thêm `goc` (tuỳ chọn) để đứng nghiêng.
-// Hình + chuyển động ở mảnh NẠP LƯỜI ./lua-dong (không vào nhóm mở app); trong lúc chờ mảnh về: khung giữ chỗ đúng tỉ lệ 200 : 230 (không xô bố cục).
-// Lửa giữ MÀU LÔNG CHÀM riêng ở mọi cảm xúc (không mang màu đúng / sai như Bi): cảm xúc đọc bằng dáng, tai, mắt, miệng.
-// Giảm chuyển động / máy yếu / không có rAF ⇒ Lửa đứng TĨNH ở tư thế của cảm xúc. Chỉ dùng trong app học sinh «Trong». aria-hidden: chữ đi kèm đã đủ nghĩa.
+// Hình + chuyển động ở mảnh NẠP LƯỜI ./mol-dong (SVG + CSS) (không vào nhóm mở app); trong lúc chờ mảnh về: khung giữ chỗ đúng tỉ lệ 200 : 230 (không xô bố cục).
+// Mol giữ màu xanh dương của app ở mọi cảm xúc (giận ⇒ dung dịch trong bình hoá đỏ, dâng lên, sôi): cảm xúc đọc bằng mắt, mày, miệng.
+// Giảm chuyển động / máy yếu ⇒ Mol đứng TĨNH ở tư thế của cảm xúc. Chỉ dùng trong app học sinh «Trong». aria-hidden: chữ đi kèm đã đủ nghĩa.
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
-import type { DungGian, GocLua, Lua, TrangThaiLua, TuyChonLua } from './lua-dong'
+import type { GocLua, Lua, TrangThaiLua, TuyChonLua } from './lua-dong'
 import '../../styles/bi.css' // khung bong bóng «Học tiếp nhé» (.bi-loi) vẫn ở tệp này
 import '../../styles/lua.css'
 
 export type CamBi = 'chao' | 'vui' | 'nghi' | 'sai' | 'mung' | 'ngu' | 'lua'
 export const CAM_BI: readonly CamBi[] = ['chao', 'vui', 'nghi', 'sai', 'mung', 'ngu', 'lua']
-/** Tên hiển thị của linh vật (chuẩn từ: «Lửa»). */
-export const TEN_LINH_VAT = 'Lửa'
+/** Tên hiển thị của linh vật (chuẩn từ: «Mol», thầy 01/11). */
+export const TEN_LINH_VAT = 'Mol'
 
 /** Cảm xúc Bi cũ ⇒ trạng thái Lửa (map 1-1): chào → vẫy tay · vui → nảy cười híp · nghĩ → chống cằm + dấu hỏi · sai → giật mình, tai cụp, mồ hôi ·
  *  mừng → combo nhảy cao giơ hai tay + lấp lánh · ngủ → ngủ gật zzz · lửa (chuỗi ngày) → cổ vũ đấm tay, nháy mắt. */
@@ -29,27 +29,24 @@ export function biDungYen(): boolean {
   if (typeof window === 'undefined' || typeof window.requestAnimationFrame !== 'function') return true
   return document.documentElement.classList.contains('may-yeu') || !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 }
-let moDong: typeof import('./lua-dong') | null = null
+let moDong: typeof import('./mol-dong') | null = null
 /** LỬA ĐỔI CẢM XÚC (thầy chốt 31/10): cấp giận ⇒ dáng có sẵn — 2 Sốt ruột: dỗi khoanh tay · 3 Bực: càu nhàu · 4 Giận / 5 Siêu cáu: tức giận. Cấp 0–1 theo `cam` như cũ. */
 const TT_CAP: Record<number, TrangThaiLua> = { 2: 'doi', 3: 'caunhau', 4: 'gian', 5: 'gian' }
 export function ttTheoCap(cam: CamBi, nhip: PropsBi['nhip'], cap = 0): [TrangThaiLua, TuyChonLua] {
   const t = TT_CAP[cap]
   return t ? [t, nhip === 'yen' ? { em: true } : {}] : ttTheoCam(cam, nhip)
 }
-/** Lớp vẽ giận (mảnh lười riêng ./lua-gian, chỉ tải khi Lửa lên cấp ≥ 2). */
-let dungGian: DungGian | null = null
-let hua: Promise<DungGian | null> | null = null
-const napGian = (): Promise<DungGian | null> => (hua ??= import('./lua-gian').then((m) => (dungGian = m.dungGian), () => { hua = null; return null }))
-/** Sự kiện phát khi một Lửa vừa vẽ xong cấp giận mới (biểu tượng tab của Lộ trình chụp lại đầu Lửa). */
+/** Sự kiện phát khi một linh vật vừa vẽ xong cấp giận mới (biểu tượng tab của Lộ trình chụp lại đầu Mol). */
 export const SU_KIEN_LUA_CAP = 'ddh-lua-cap'
+/** Mol tự vẽ 4 mức giận (dỗi · bực · cáu · rất cáu) — không cần mảnh vẽ giận riêng như hình cú cũ. */
 function apCap(l: Lua, cap: number, con: () => boolean): void {
-  const xong = () => { if (!con()) return; l.datCap(cap, dungGian ?? undefined); window.dispatchEvent(new Event(SU_KIEN_LUA_CAP)) }
-  if (cap < 2 || dungGian) { if (l.cap !== cap) xong(); return }
-  void napGian().then(xong)
+  if (l.cap === cap || !con()) return
+  l.datCap(cap)
+  window.dispatchEvent(new Event(SU_KIEN_LUA_CAP))
 }
 
 /** (28/10 «vẫn chưa tức thì») Ảnh TĨNH của linh vật ở Lộ trình lần mở trước (src/lib/khung-tinh-hs.ts chụp): `{ "<cỡ>|<cảm xúc>|<hướng>": { src, st } }`. */
-export const KHOA_BI_TINH = 'ddh.bi-tinh'
+export const KHOA_BI_TINH = 'ddh.bi-tinh-mol' // 01/11 đổi khoá: ảnh tĩnh cú ngọc cũ không làm khung giữ chỗ cho Mol
 let biTinh: Record<string, { src?: string; st?: string }> | null = null
 /** Ảnh tĩnh khớp đúng cỡ + cảm xúc + hướng (không khớp ⇒ không có, giữ khung trống như trước). */
 function anhBiTinh(size: number, cam: string, goc?: string): { src?: string; st?: string } | null {
@@ -96,7 +93,7 @@ export function Bi({ cam = 'chao', size = 96, className, nhip, noi, goc, cap: ca
   useEffect(() => {
     if (co) return
     let con = true
-    import('./lua-dong').then((m) => { moDong = m; if (con) setCo(true) }, () => {})
+    import('./mol-dong').then((m) => { moDong = m; if (con) setCo(true) }, () => {})
     return () => { con = false }
   }, [co])
   useEffect(() => {

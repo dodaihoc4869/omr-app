@@ -327,6 +327,8 @@ export default defineConfig({
           '**/lua-dong-*.{js,css}',
           // Lớp vẽ Lửa giận cấp 2–5 (31/10): chỉ tải khi Lửa lên cấp ≥ 2 ⇒ kho chạy-lúc; mất mạng ⇒ Lửa vẫn đổi dáng theo cấp, chỉ thiếu chi tiết giận.
           '**/lua-gian-*.{js,css}',
+          // Mol (01/11, thay hình Lửa): mặt bình cầu nạp lười như lua-dong ⇒ kho chạy-lúc; mất mạng lần mở đầu ⇒ khung giữ chỗ trống, không vỡ bố cục.
+          '**/mol-dong-*.{js,css}',
           // Thẻ nhắc Samsung Internet (27/10): chỉ máy Samsung Internet tải, một lần ⇒ kho chạy-lúc; mất mạng ⇒ không hiện thẻ, Lộ trình vẫn đủ.
           '**/NhacSamsung-*.{js,css}',
           // Thẻ điểm danh nổi của giao diện CŨ (không «Trong», 30/10 nạp lười): chỉ máy tắt «Trong» tải ⇒ kho chạy-lúc.

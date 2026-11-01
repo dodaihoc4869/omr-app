@@ -2,6 +2,7 @@
 // LINH VẬT CHÍNH «Lửa» thay «Bi» (thầy 27/10 «Chọn Lửa build luôn nhé»): GIỮ API <Bi cam size className nhip noi> nên mọi người gọi không đổi;
 // 7 cảm xúc map 1-1 sang trạng thái Lửa; khung giữ chỗ tỉ lệ 200 : 230; aria-hidden; mảnh lua-dong nạp LƯỜI; không màu thô; giảm chuyển động ⇒ tĩnh;
 // không xuất hiện ở màn thi, đăng nhập, app thầy, app phụ huynh. 28/10: hình đổi sang «Cú Ngọc» (tên trên màn vẫn «Lửa»), màu --cn-* ở cu-ngoc.css (nạp lười).
+// 01/11: linh vật đổi sang «Mol» (mặt bình cầu, mol-dong.ts — test riêng tests/mol-0111.test.tsx); bộ máy Cú Ngọc ở lua-dong.ts GIỮ LẠI (kiểu `Lua` + đường lùi) ⇒ test bộ máy giữ nguyên.
 import { readFileSync } from 'node:fs'
 import { render, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -19,7 +20,7 @@ describe('Lửa thay Bi', () => {
     expect(ttTheoCam('mung')).toEqual(['combo', { sau: 3600, ve: 'vui' }])
     expect(ttTheoCam('chao', 'yen')).toEqual(['yen', { em: true }])
     expect(ttTheoCam('mung', 'yen')[0]).toBe('cuoi')
-    expect(TEN_LINH_VAT).toBe('Lửa')
+    expect(TEN_LINH_VAT).toBe('Mol')
   })
   it('mọi trạng thái có tư thế; đúng có lấy đà ≤ 80 ms rồi nảy; sai có giật mình', () => {
     for (const t of TRANG_THAI_LUA) { const v = CAM_XUC_LUA[t]; expect((v.seq?.length ?? 0) + (v.loop?.length ?? 0), t).toBeGreaterThan(0) }
@@ -27,13 +28,14 @@ describe('Lửa thay Bi', () => {
     expect((CAM_XUC_LUA.vui.seq![1]!.p!.y as number)).toBeLessThan(0)
     expect((CAM_XUC_LUA.buon.seq![0]!.p!.es as number)).toBeGreaterThan(1)
   })
-  it('khung giữ chỗ đúng tỉ lệ, aria-hidden, rồi vẽ Lửa (mảnh nạp lười); đổi cảm xúc ⇒ đổi trạng thái', async () => {
+  it('khung giữ chỗ đúng tỉ lệ, aria-hidden, rồi vẽ Mol (mảnh nạp lười); đổi cảm xúc ⇒ đổi trạng thái', async () => {
     const { container, rerender } = render(<Bi cam="vui" size={64} />)
     const span = container.querySelector('span.bi.lua') as HTMLElement
     expect(span.getAttribute('aria-hidden')).toBe('true')
     expect(span.style.getPropertyValue('--lv-w')).toBe('64px')
     await waitFor(() => expect(span.querySelector('svg.lua-svg')).not.toBeNull())
-    expect(span.querySelector('svg')!.getAttribute('viewBox')).toBe('-170 -372 340 391') // 340 : 391 = 200 : 230
+    expect(span.querySelector('svg')!.getAttribute('viewBox')).toBe('0 -26 200 230') // Mol: đúng tỉ lệ 200 : 230
+    expect(span.querySelector('svg.mol-svg')!.getAttribute('data-mat')).toBe('vui')
     rerender(<Bi cam="sai" size={64} />)
     expect(span.getAttribute('data-cam')).toBe('sai')
   })
@@ -70,8 +72,8 @@ describe('Lửa thay Bi', () => {
     for (const k of dung) expect(co.has(k), '--cn-' + k).toBe(true)
     l.huy()
     for (const luat of css.split('}').map((x) => x.split('{')[0]!.trim()).filter((x) => x && !x.startsWith('@'))) expect(luat).toMatch(/\[data-trong='hs'\]/)
-    expect(tsx).toMatch(/import\('\.\/lua-dong'\)/)
-    expect(tsx).not.toMatch(/^import (?!type)[^\n]*from '\.\/lua-dong'/m)
+    expect(tsx).toMatch(/import\('\.\/mol-dong'\)/) // 01/11: Bi.tsx nạp lười Mol, chỉ lấy KIỂU từ lua-dong
+    expect(tsx).not.toMatch(/^import (?!type)[^\n]*from '\.\/(?:lua|mol)-dong'/m)
   })
   it('Cú Ngọc: đủ biểu cảm bản vẽ (dỗi, tức giận, càu nhàu); đứng nghiêng (trái = gương); màu nạp cùng mảnh lười; cỡ mới trên màn', () => {
     for (const t of ['doi', 'gian', 'caunhau', 'nghi', 'covu'] as const) expect(TRANG_THAI_LUA).toContain(t)

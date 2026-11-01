@@ -340,7 +340,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:
 
   {ket&&kq&&<main className="ktcn-khung ktcn-ket">
    <div className="ktcn-ket-trai">
-    {duo&&<BiKetQua cam={camTheoDiem(tt?.diem)} tieuDe={tt?.diem!=null&&tt.diem>=8?'Làm tốt lắm!':tt?.diem!=null&&tt.diem<5?'Cùng Lửa ôn lại nhé!':'Em đã nộp bài!'} phu="Bấm từng câu bên dưới để xem đáp án và lời giải."/>}
+    {duo&&<BiKetQua cam={camTheoDiem(tt?.diem)} tieuDe={tt?.diem!=null&&tt.diem>=8?'Làm tốt lắm!':tt?.diem!=null&&tt.diem<5?'Cùng Mol ôn lại nhé!':'Em đã nộp bài!'} phu="Bấm từng câu bên dưới để xem đáp án và lời giải."/>}
     <section className="ktcn-ket-dau" aria-label="Kết quả lần kiểm tra này">
      <p className="ktcn-nhan" data-sac="xanh">Đã nộp{tt?.nopLuc?` · ${gioVn(tt.nopLuc)}`:''}</p>
      <div className="ktcn-ket-hang">

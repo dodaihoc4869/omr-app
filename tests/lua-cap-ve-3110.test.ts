@@ -86,10 +86,10 @@ describe('màu + nạp lười', () => {
     l.huy()
     for (const luat of css.split('}').map((x) => x.split('{')[0]!.trim()).filter((x) => x && !x.startsWith('@'))) expect(luat).toMatch(/\[data-trong='hs'\]/)
   })
-  it('Bi.tsx chỉ nạp lớp giận bằng import() (mảnh riêng, kho chạy-lúc); lua-dong không nhập lua-gian', () => {
+  it('01/11 Mol thay hình: Bi.tsx / Lộ trình KHÔNG còn nạp lớp giận Cú Ngọc (Mol tự vẽ cấp 2–5); lua-dong không nhập lua-gian', () => {
     const tsx = readFileSync('src/components/linh-vat/Bi.tsx', 'utf8')
-    expect(tsx).toMatch(/import\('\.\/lua-gian'\)/)
-    expect(tsx).not.toMatch(/^import (?!type)[^\n]*from '\.\/lua-gian'/m)
+    expect(tsx).not.toMatch(/lua-gian'/)
+    expect(readFileSync('src/components/hoc-tap/TrongHs.tsx', 'utf8')).toMatch(/import\('\.\.\/linh-vat\/mol-dong'\)\.then\(\(m\) => m\.datIconTabMol\(/)
     expect(readFileSync('src/components/linh-vat/lua-dong.ts', 'utf8')).not.toMatch(/^import (?!type)[^\n]*lua-gian/m)
     expect(readFileSync('vite.config.ts', 'utf8')).toMatch(/'\*\*\/lua-gian-\*\.\{js,css\}'/)
   })
