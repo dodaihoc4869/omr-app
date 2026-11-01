@@ -31,7 +31,7 @@ import { CSS_LEN_BANG_MOI, jsLenBangMoi, thongKeHtml, type ThongKeLopCau } from 
 export { thongKeLopCau } from './len-bang-moi-to-chieu'
 import { laCauTuLuan } from './cau-tu-luan'
 import type { TheChuaDung } from './chieu-chua-ca'
-import { CSS_CHUA_BAI, JS_CHUA_BAI, NUT_THU_GON, chipMucDoHtml, theChuaDungHtml } from './chieu-chua-ca-to'
+import { CSS_CHUA_BAI, JS_CHUA_BAI, NUT_GOI, NUT_THU_GON, chipMucDoHtml, theChuaDungHtml } from './chieu-chua-ca-to'
 
 /** Câu phần III TỰ LUẬN theo nội dung (bảng Dạy học 28/09: thầy chọn câu tự luận thì tờ ghi đúng "Tự luận", không ghi "Trả lời ngắn"). Không xét mã đề. */
 const laTuLuanChieu = (c: CauLuyen): boolean => c.phan === 'III' && laCauTuLuan({ phan: 'III', text: c.text, dapAn: c.dapAn }, 'III')
@@ -121,7 +121,8 @@ export interface TuyChonMayChieu {
   nutAiSai?: boolean
   /** Ngân sách buổi (phút) — chữ "Buổi: x/N phút" ở thanh dưới. Thiếu thì chỉ ghi số phút đã trôi. */
   nganSachPhut?: number
-  /** TỜ CHỮA BÀI SAU CA (01/11): «Câu n/N», pha «CHỮA BÀI», không «Lên bảng» (phím L tắt), nút/phím H thu gọn thẻ tên. */
+  /** TỜ CHỮA BÀI SAU CA (01/11): «Câu n/N», pha «CHỮA BÀI», nút/phím H thu gọn thẻ tên; thay «Lên bảng» của tờ chuẩn bằng «Gọi lên bảng» (phím L)
+   *  chọn ngẫu nhiên một em LÀM ĐÚNG câu đang chiếu rồi chạy ĐÚNG màn gọi tên của tờ chuẩn — không ai đúng ⇒ «Thầy chữa» (`chieu-chua-ca-to.ts`). */
   chuaBai?: boolean
 }
 
@@ -593,6 +594,13 @@ body.mc-timing .mc-ray{box-sizing:border-box;padding-bottom:64px}
 .mc-nut-phim.mc-nut-giai-thanh{background:rgba(37,99,235,0.22);border:1.5px solid #60a5fa;color:#fff;font-weight:800}
 .mc-nut-phim.mc-nut-giai-thanh.mc-bat{background:#f59e0b;border-color:#fbbf24;color:#000}
 /* Màu khối lời giải (sáng/tối) khai báo thành biến --mc-ll-* ở CSS_LEN_BANG_MOI: nhãn đủ tương phản ≥4,5:1 trên MỌI nền tờ. */
+/* PHÂN SỐ / CĂN dựng từ LaTeX (latex-html.ts, 01/11): khối lời giải ép MỌI phần tử giãn dòng 1,6 và cùng cỡ — trả giãn dòng 1,2 cho tử/mẫu để
+   phân số gọn như trong đề (đủ độ ưu tiên thắng các luật «.sol-box *»). */
+html body.mc .mc-giai .sol-box .lt-ps,html body.mc .mc-giai .sol-box .lt-tu,html body.mc .mc-giai .sol-box .lt-mau,html body.mc .mc-giai .sol-box .lt-can,html body.mc .mc-giai .sol-box .lt-can-trong,html body.mc .mc-giai .sol-box .lt-can-dau,html body.mc .mc-giai .sol-box .lt-tren{line-height:1.2!important}
+html body.mc .mc-giai .sol-box .lt-can-bac{font-size:.6em!important}
+/* «Kiến thức cốt lõi / Lời giải ngắn» và «Kết quả» là MỘT đoạn chữ: luật flex cột của .sol-text (dành cho các dòng phương án) xé từng chỉ số dưới,
+   từng phân số thành một dòng riêng («K» / «C» / «=») — trả về khối chữ thường. */
+html body.mc .mc-giai .sol-box .sol-text.sol-cot-loi,html body.mc .mc-giai .sol-box .sol-text.sol-ket{display:block!important}
 @media print{:root[data-projector]{--mc-nen:white;--mc-muc:black;--mc-nhat:#444}.mc-de,.mc-pa,.mc-giai .sol-box{font-size:20px}}
 `
 
@@ -1131,7 +1139,7 @@ ${tuyChon.chuaBai ? '' : '  <button type="button" id="mc-len-bang">Lên bảng</
     <button type="button" class="mc-nut-phim" data-k="C" hidden><kbd>C</kbd><span class="mc-nut-chu">Thầy chữa</span></button>
 ${coAiSai ? '    <button type="button" class="mc-nut-phim" data-k="X" hidden><kbd>X</kbd><span class="mc-nut-chu">Ai sai</span></button>\n' : ''}    <button type="button" class="mc-nut-phim" data-k="D" hidden><kbd>D</kbd><span class="mc-nut-chu">Đạt</span></button>
     <button type="button" class="mc-nut-phim" data-k="K" hidden><kbd>K</kbd><span class="mc-nut-chu">Không đạt</span></button>
-    <button type="button" class="mc-nut-phim" data-k="G"><kbd>G</kbd><span class="mc-nut-chu">Giải</span></button>
+${tuyChon.chuaBai ? `    ${NUT_GOI}\n` : ''}    <button type="button" class="mc-nut-phim" data-k="G"><kbd>G</kbd><span class="mc-nut-chu">Giải</span></button>
     <button type="button" class="mc-nut-phim" data-k="T"><kbd>T</kbd><span class="mc-nut-chu">Thống kê</span></button>
 ${tuyChon.chuaBai ? `    ${NUT_THU_GON}\n` : ''}    <button type="button" class="mc-nut-phim" data-k="B"><kbd>B</kbd><span class="mc-nut-chu">Bút</span></button>
     <button type="button" class="mc-nut-phim" data-k="Tab"><kbd>Tab</kbd><span class="mc-nut-chu">Tổng quan</span></button>

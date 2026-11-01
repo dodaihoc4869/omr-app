@@ -231,6 +231,12 @@ for (const k of ['border: 2px dashed var(--dn-vien-2)', 'background: radial-grad
 // 01/11 thầy: «phần kết luận bằng chứng kiểu mới tôi ko muốn nó thành khung như thế, viết chữ bình thường dãn cách dòng tinh tế» ⇒ bỏ vạch viền
 // ô từng lý do (.bbc-ket-ds li, thêm ở #716 cùng ngày): đúng 1 khai báo, đúng tệp.
 MAU_CU_THAY_RA_LENH['src/components/hom-nay-thay/bon-bang.css · border-left: 4px solid var(--bb-c)'] = (MAU_CU_THAY_RA_LENH['src/components/hom-nay-thay/bon-bang.css · border-left: 4px solid var(--bb-c)'] ?? 0) + 1
+// 01/11 tối thầy (góp ý sau PR 730): «Tên lên bảng làm giống hiệu ứng của các màn khác» ⇒ tờ chữa bài bỏ TẤM GỌI RIÊNG (.mc-goi-the / .mc-goi-*, thêm ở
+// PR 730 cùng ngày) để chạy đúng màn gọi tên chuẩn của tờ chiếu: đúng 15 khai báo (18 lần), đúng tệp.
+for (const [k, n] of [['background: var(--mc-giay)', 1], ['color: var(--mc-chu)', 4], ['border: 0', 1], ['color: var(--mc-phu)', 2], ['background: transparent', 1],
+  ['background: color-mix(in srgb,var(--mc-bang) 80%,transparent)', 1], ['box-shadow: 0 0 0 1px var(--mc-vien),0 calc(var(--u)*1.4) calc(var(--u)*5) color-mix(in srgb,var(--mc-den) 45%,transparent)', 1],
+  ['color: var(--mc-nhan)', 1], ['background: var(--mc-chip)', 1], ['color: var(--mc-chip-chu)', 1], ['box-shadow: inset 0 0 0 1px currentColor', 1], ['background: var(--mc-chu)', 1],
+  ['color: var(--mc-giay)', 1], ['border: 1px solid var(--mc-vien)', 1], ['outline: 3px solid var(--mc-nhan)', 1]]) MAU_CU_THAY_RA_LENH[`src/lib/chieu-chua-ca-to.ts · ${k}`] = (MAU_CU_THAY_RA_LENH[`src/lib/chieu-chua-ca-to.ts · ${k}`] ?? 0) + n
 // 27/10: đợt gỡ CSS chết thứ hai (tờ nạp chung index-*.css; luật tốc độ đỏ sau #430/#431) — danh sách đóng ở docs/css-chet-2710.json, cùng cách.
 for (const [k, n] of Object.entries(JSON.parse(readFileSync(new URL('../docs/css-chet-2710.json', import.meta.url), 'utf8')).cu)) MAU_CU_THAY_RA_LENH[k] = (MAU_CU_THAY_RA_LENH[k] ?? 0) + n
 // 27/10 chiều (máy yếu): CSS chết ở các tờ app học sinh / phụ huynh — danh sách đóng docs/css-chet-2710b.json, cùng cách.

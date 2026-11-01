@@ -1,0 +1,201 @@
+{
+ "luc": "2026-11-01T14:12:53.191Z",
+ "loiTrang": [],
+ "anh": [
+  {
+   "anh": "docs/ban-ve-dau-ion-3v3-0111/sanh-390-sang.jpg",
+   "kb": 125,
+   "tran": false,
+   "nho": [],
+   "sbdHien": false,
+   "san": null
+  },
+  {
+   "anh": "docs/ban-ve-dau-ion-3v3-0111/tran-390-sang.jpg",
+   "kb": 92,
+   "tran": false,
+   "nho": [],
+   "sbdHien": false,
+   "san": {
+    "w": 367,
+    "h": 734,
+    "phuManNgang": 0.94,
+    "phuManDoc": 0.87,
+    "doc": "1"
+   }
+  },
+  {
+   "anh": "docs/ban-ve-dau-ion-3v3-0111/vao-thay-390-sang.jpg",
+   "kb": 100,
+   "tran": false,
+   "nho": [],
+   "sbdHien": false,
+   "san": {
+    "w": 367,
+    "h": 734,
+    "phuManNgang": 0.94,
+    "phuManDoc": 0.87,
+    "doc": "1"
+   }
+  },
+  {
+   "anh": "docs/ban-ve-dau-ion-3v3-0111/het-van-390-sang.jpg",
+   "kb": 114,
+   "tran": false,
+   "nho": [],
+   "sbdHien": false,
+   "san": {
+    "w": 367,
+    "h": 734,
+    "phuManNgang": 0.94,
+    "phuManDoc": 0.87,
+    "doc": "1"
+   }
+  },
+  {
+   "anh": "docs/ban-ve-dau-ion-3v3-0111/sanh-390-toi.jpg",
+   "kb": 120,
+   "tran": false,
+   "nho": [],
+   "sbdHien": false,
+   "san": null
+  },
+  {
+   "anh": "docs/ban-ve-dau-ion-3v3-0111/sanh-844-sang.jpg",
+   "kb": 96,
+   "tran": false,
+   "nho": [],
+   "sbdHien": false,
+   "san": null
+  },
+  {
+   "anh": "docs/ban-ve-dau-ion-3v3-0111/goi-y-dau-844-sang.jpg",
+   "kb": 87,
+   "tran": false,
+   "nho": [],
+   "sbdHien": false,
+   "san": {
+    "w": 748,
+    "h": 374,
+    "phuManNgang": 0.89,
+    "phuManDoc": 0.96,
+    "doc": "0"
+   }
+  },
+  {
+   "anh": "docs/ban-ve-dau-ion-3v3-0111/tran-844-sang.jpg",
+   "kb": 86,
+   "tran": false,
+   "nho": [],
+   "sbdHien": false,
+   "san": {
+    "w": 748,
+    "h": 374,
+    "phuManNgang": 0.89,
+    "phuManDoc": 0.96,
+    "doc": "0"
+   }
+  },
+  {
+   "anh": "docs/ban-ve-dau-ion-3v3-0111/vao-thay-844-sang.jpg",
+   "kb": 94,
+   "tran": false,
+   "nho": [],
+   "sbdHien": false,
+   "san": {
+    "w": 748,
+    "h": 374,
+    "phuManNgang": 0.89,
+    "phuManDoc": 0.96,
+    "doc": "0"
+   }
+  },
+  {
+   "anh": "docs/ban-ve-dau-ion-3v3-0111/het-van-844-sang.jpg",
+   "kb": 105,
+   "tran": false,
+   "nho": [],
+   "sbdHien": false,
+   "san": {
+    "w": 748,
+    "h": 374,
+    "phuManNgang": 0.89,
+    "phuManDoc": 0.96,
+    "doc": "0"
+   }
+  },
+  {
+   "anh": "docs/ban-ve-dau-ion-3v3-0111/tran-844-toi.jpg",
+   "kb": 87,
+   "tran": false,
+   "nho": [],
+   "sbdHien": false,
+   "san": {
+    "w": 748,
+    "h": 374,
+    "phuManNgang": 0.89,
+    "phuManDoc": 0.96,
+    "doc": "0"
+   }
+  },
+  {
+   "anh": "docs/ban-ve-dau-ion-3v3-0111/tran-932-sang.jpg",
+   "kb": 96,
+   "tran": false,
+   "nho": [],
+   "sbdHien": false,
+   "san": {
+    "w": 828,
+    "h": 414,
+    "phuManNgang": 0.89,
+    "phuManDoc": 0.96,
+    "doc": "0"
+   }
+  },
+  {
+   "anh": "docs/ban-ve-dau-ion-3v3-0111/sanh-1440-sang.jpg",
+   "kb": 71,
+   "tran": false,
+   "nho": [],
+   "sbdHien": false,
+   "san": null
+  },
+  {
+   "anh": "docs/ban-ve-dau-ion-3v3-0111/tran-1440-sang.jpg",
+   "kb": 92,
+   "tran": false,
+   "nho": [],
+   "sbdHien": false,
+   "san": {
+    "w": 1392,
+    "h": 696,
+    "phuManNgang": 0.97,
+    "phuManDoc": 0.77,
+    "doc": "0"
+   }
+  },
+  {
+   "anh": "docs/ban-ve-dau-ion-3v3-0111/het-van-1440-sang.jpg",
+   "kb": 82,
+   "tran": false,
+   "nho": [],
+   "sbdHien": false,
+   "san": {
+    "w": 1392,
+    "h": 696,
+    "phuManNgang": 0.97,
+    "phuManDoc": 0.77,
+    "doc": "0"
+   }
+  },
+  {
+   "anh": "docs/ban-ve-dau-ion-3v3-0111/so-do-san.jpg",
+   "kb": 102,
+   "duongBan": [
+    "từ giữa sân bắn thẳng vào bệ giữa: CHẶN",
+    "em → bạn nấp sau bình cầu: CHẶN",
+    "cánh trên → bệ cánh trên: CHẶN"
+   ]
+  }
+ ]
+}

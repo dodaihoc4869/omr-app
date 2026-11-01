@@ -187,9 +187,29 @@ const CAU_ANILINE: CauGia = { ...nen, qid: 'GT5', maDe: 'BAI8', phan: 'I', tenDa
   'Bước 2: Oxi hoá 2,4,6-trinitroaniline bằng Na2Cr2O7/H+ tạo thành 2,4,6-trinitrophenol.',
   'Giả sử một nhà máy thải ra 1000 lít nước (khối lượng riêng 1 g/mL) chứa 0,05% khối lượng aniline. Để xử lý toàn bộ lượng aniline này, người ta sử dụng dung dịch HNO3 68% (khối lượng riêng 1,42 g/mL). Thể tích dung dịch HNO3 tối thiểu cần dùng là bao nhiêu lít?',
 ].join('\n'), choices: ['1,05', '0,35', '1,52', '3,15'], ideas: [], dapAn: 'A', loiGiai: { chot: 'm aniline = 500 g ⇒ 5,376 mol ⇒ HNO3 16,13 mol = 1016 g ⇒ dung dịch 1494 g ⇒ 1,05 lít.' } }
+// ═══ CHẶNG NGANG 01/11: `lam13&lam=chang-ngang` (thầy «Phần chặng của học sinh tối ưu thêm cho màn xoay ngang và máy tính … đề dài nhớ có thanh cuộn»):
+// đủ 4 kiểu câu theo thứ tự chụp — trắc nghiệm ngắn (D1) · ĐỀ DÀI (6 đoạn + phương trình dài `\ce{}` ⇒ ô cuộn ngang `.ct-dai` + bảng + hình) ·
+// đúng–sai 4 ý (L4) · trả lời ngắn có bàn phím số (D4). Số liệu đề dài tự giải: V tb = 13,20 mL ⇒ n(KMnO4) = 1,32·10⁻⁴ ⇒ n(Fe²⁺) 10 mL = 6,6·10⁻⁴
+// ⇒ 100 mL: 6,6·10⁻³ mol × 152 = 1,0032 g ⇒ 50,16 %.
+const hinhChuanDo = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="360" height="220" viewBox="0 0 360 220"><rect width="360" height="220" fill="white"/><g stroke="black" stroke-width="2" fill="none"><rect x="160" y="10" width="22" height="120"/><line x1="171" y1="130" x2="171" y2="150"/><path d="M130 150 h82 l26 56 h-134 z"/><line x1="40" y1="206" x2="320" y2="206"/></g><g font-family="sans-serif" font-size="14" fill="black"><text x="192" y="40">Burette</text><text x="192" y="58">KMnO4 0,0100 M</text><text x="226" y="186">10,00 mL dung dịch X</text></g></svg>')
+const CAU_DAI_NGANG: CauGia = { ...nen, qid: 'NG2', maDe: 'BAI-OXH', phan: 'I', tenDang: 'Chuẩn độ oxi hoá – khử', text: [
+  'Thuốc tím (potassium permanganate, KMnO4) là chất oxi hoá mạnh, được dùng phổ biến để chuẩn độ xác định hàm lượng sắt trong mẫu quặng và trong viên thuốc bổ sung sắt.',
+  'Một nhóm học sinh tiến hành như sau: hoà tan hoàn toàn 2,00 gam mẫu viên thuốc bổ sung sắt (chứa FeSO4) trong dung dịch H2SO4 loãng dư, thu được 100,0 mL dung dịch X. Lấy 10,00 mL dung dịch X cho vào bình tam giác rồi chuẩn độ bằng dung dịch KMnO4 0,0100 M như hình dưới đây.',
+  'Phản ứng chuẩn độ xảy ra theo phương trình:',
+  '\\ce{2KMnO4 + 10FeSO4 + 8H2SO4 -> K2SO4 + 2MnSO4 + 5Fe2(SO4)3 + 8H2O}',
+  'Biết các tạp chất trong viên thuốc không phản ứng với KMnO4; điểm tương đương nhận ra khi dung dịch trong bình chuyển sang màu hồng nhạt bền trong khoảng 20 giây. Kết quả ba lần chuẩn độ được ghi trong bảng sau.',
+  'Phần trăm khối lượng FeSO4 trong mẫu viên thuốc là',
+].join('\n'), table: [['Lần chuẩn độ', '1', '2', '3'], ['Thể tích KMnO4 (mL)', '13,10', '13,20', '13,30']],
+  hinhAnh: [{ src: hinhChuanDo, viTri: 'sau_de', alt: 'Sơ đồ chuẩn độ bằng burette' }],
+  choices: ['50,16%', '10,03%', '25,08%', '45,60%'], ideas: [], dapAn: 'A',
+  loiGiai: { chot: 'V trung bình = 13,20 mL ⇒ n(KMnO4) = 0,0100 × 0,01320 = 1,32·10⁻⁴ mol ⇒ n(Fe²⁺) trong 10,00 mL = 5 × 1,32·10⁻⁴ = 6,6·10⁻⁴ mol.',
+    buoc: ['Trong 100,0 mL dung dịch X: n(FeSO4) = 6,6·10⁻³ mol', 'm(FeSO4) = 6,6·10⁻³ × 152 = 1,0032 gam', '%m(FeSO4) = 1,0032 : 2,00 × 100 = 50,16%'],
+    tung_pa: { A: { dung: true, vi_sao: 'Đúng tỉ lệ 1 KMnO4 : 5 Fe²⁺ và nhân 10 cho cả 100 mL.' }, B: { dung: false, vi_sao: 'Quên nhân 5 theo tỉ lệ mol KMnO4 : FeSO4 = 2 : 10 = 1 : 5 trong phương trình.' }, C: { dung: false, vi_sao: 'Nhầm tỉ lệ 1 : 2,5.' }, D: { dung: false, vi_sao: 'Dùng thể tích lần 1 thay vì thể tích trung bình và làm tròn sớm.' } } } }
+const CAU_NGANG: CauGia[] = [{ ...CAU_DUO[0]!, qid: 'NG1' }, CAU_DAI_NGANG, { ...CAU[3]!, qid: 'NG3' }, { ...CAU_DUO[3]!, qid: 'NG4' }]
+// ═══ hết CHẶNG NGANG 01/11
 const DAU_GT: Record<string, CauGia> = { ngan: { ...CAU[1]!, qid: 'GT1' }, '4dong': CAU_4DONG, '6dong': CAU_6DONG, dai: CAU_TOLUIDINE, aniline: CAU_ANILINE }
 const CAU_DUO_GT = DAU_GT[thamSo.get('gtde') ?? ''] ? [DAU_GT[thamSo.get('gtde')!]!, ...CAU_DUO_CHAM] : CAU_DUO_CHAM
-const ds0 = kieu === 'duo-tn' ? CAU_TN : kieu === 'duo-bang' ? CAU_BANG : kieu === 'duo-pt' ? CAU_PT : kieu === 'duo-nc' ? CAU_NC : kieu === 'duo-combo' ? CAU_COMBO : kieu === 'duo-xau' ? CAU_XAU : kieu === 'duo' ? CAU_DUO_GT : kieu === 'g7' ? CAU_G7 : kieu === 'ds-dau' ? [CAU[3]!, CAU[4]!, CAU[5]!] : kieu === 'so-o' ? CAU_SO_O : CAU
+const ds0 = kieu === 'chang-ngang' ? CAU_NGANG : kieu === 'duo-tn' ? CAU_TN : kieu === 'duo-bang' ? CAU_BANG : kieu === 'duo-pt' ? CAU_PT : kieu === 'duo-nc' ? CAU_NC : kieu === 'duo-combo' ? CAU_COMBO : kieu === 'duo-xau' ? CAU_XAU : kieu === 'duo' ? CAU_DUO_GT : kieu === 'g7' ? CAU_G7 : kieu === 'ds-dau' ? [CAU[3]!, CAU[4]!, CAU[5]!] : kieu === 'so-o' ? CAU_SO_O : CAU
 const ds = MUC_GT !== undefined ? ds0.map((c) => ({ ...c, mucDo: MUC_GT || null })) : ds0
 const GOI7 = { bat: true, ngay: '2026-10-12', toiThieu: 24, daLamHomNay: 12, tuLamCon: 9, tiepCanCon: 3, thieuPhu: 0, thieuNgay: 0, canHoTro: false, kienThucCu: { tong: 0, dat: 0, tyLe: null },
   goi: [{ id: 'g8', ten: 'Bài 8. Amine', batDau: '2026-10-10', han: '2026-10-16', tong: 40, daGap: 10, con: 30, quota: 6, gapHomNay: 2, quaHan: false, canBoSung: 0, to: ['BAI8-AMINE'] }], diemDaDo: [] }

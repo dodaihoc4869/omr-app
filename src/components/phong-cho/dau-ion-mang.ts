@@ -1,6 +1,7 @@
 // KẾT NỐI SẢNH ĐẤU «Đấu Nguyên Tử» — một WebSocket tới phòng đấu của ca (Durable Object, máy chủ Worker). Chỉ mở khi em bấm vào Sảnh đấu.
 // Không dùng setInterval: ping 25 giây và nối lại lùi dần (1 → 2 → 4 → 8 giây, tối đa 5 lần) đều bằng setTimeout. Đóng sạch khi game tháo khỏi màn.
 // Mã đóng của phòng: 4000 thầy bắt đầu thi · 4010 công tắc tắt · 4003 vé sai/hết hạn · 4002 mở ở máy khác · 4009 sảnh đầy ⇒ KHÔNG nối lại.
+// 3 ĐẤU 3 (01/11): 4009 kèm lý do «sang:k» = phòng này đã đủ 78 em ⇒ TỰ nối ngay phòng k của ca (…/dau-ion/<ca>/<k>), em không phải làm gì.
 import { docAnh, type Anh } from '../../lib/dau-ion/goi'
 
 export type TinMang =
@@ -24,9 +25,12 @@ export class MangDau {
   private lan = 0
   private daDong = false
   private url: string
+  private goc: string
   private goiVao: () => Record<string, unknown>
   private bao: (t: TinMang) => void
-  constructor(url: string, goiVao: () => Record<string, unknown>, bao: (t: TinMang) => void) { this.url = url; this.goiVao = goiVao; this.bao = bao }
+  constructor(url: string, goiVao: () => Record<string, unknown>, bao: (t: TinMang) => void) { this.url = this.goc = url; this.goiVao = goiVao; this.bao = bao }
+  /** Phòng đang nối (0 = phòng đầu của ca). */
+  soPhong = 0
 
   mo(): void {
     if (this.daDong) return
@@ -46,6 +50,8 @@ export class MangDau {
       if (this.ws !== ws) return
       this.ws = null; clearTimeout(this.henPing)
       if (this.daDong) return
+      const sang = e.code === 4009 ? /^sang:(\d)$/.exec(e.reason || '') : null
+      if (sang && Number(sang[1]) > this.soPhong) { this.soPhong = Number(sang[1]); this.url = `${this.goc}/${this.soPhong}`; this.lan = 0; this.mo(); return }
       if (KHONG_NOI_LAI.has(e.code)) { this.daDong = true; this.bao({ k: 'dong', ma: e.code, ly: e.reason }); return }
       this.matKetNoi()
     }
