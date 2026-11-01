@@ -93,6 +93,16 @@ describe('/gv/bon-bang + /gv/bon-bang/em', () => {
     expect(e.diem.ht).not.toBeNull()
     expect((d.sql.prepare("SELECT COUNT(*) n FROM bon_chi_so_em WHERE sbd = 'S02'").get() as { n: number }).n).toBe(1)
   })
+  it('kết luận bản cũ (một đoạn, chưa có v: 2) ⇒ bấm em là tính lại ngay: mỗi lý do một dòng, lưu bản mới', async () => {
+    const { d, env } = moi()
+    await M.cronBonChiSo(env, NOW); await M.cronBonChiSo(env, NOW)
+    d.sql.prepare("UPDATE bon_chi_so_em SET ket_json = ? WHERE sbd = 'S03'").run(JSON.stringify({ dp: 'Em làm 14/14 ngày đủ mức nhưng làm cho có: treo máy cho đủ giờ: **16**; **52%** số câu.', ht: '', ch: '', lu: '' }))
+    const e = await M.gvBonBangEm(env, { sbd: 'S03', bang: 'dp' }, NOW)
+    if (!e.ok) throw new Error(e.error)
+    expect(e.ketLuan.split('\n').length).toBeGreaterThanOrEqual(2)
+    expect(e.ketLuan.split('\n')[1]).toMatch(/^\*\*\d+%\*\* số câu chọn đáp án khi chưa kịp đọc hết đề — sai \d+\/\d+ câu$/)
+    expect(JSON.parse((d.sql.prepare("SELECT ket_json j FROM bon_chi_so_em WHERE sbd = 'S03'").get() as { j: string }).j).v).toBe(2)
+  })
   it('tên câu ngắn: «Bài N · đầu đề…»', () => {
     expect(M.tenCauNgan('Bài 10. Quy tắc octet', 'Nguyên tử   Na có cấu hình')).toBe('Bài 10 · Nguyên tử Na có cấu hình')
     expect(M.tenCauNgan('', '')).toBe('Câu luyện tập')

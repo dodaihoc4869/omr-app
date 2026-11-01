@@ -45,7 +45,7 @@ const BC: TraLoiBangChung = {
   soLuot: 191,
   bang: 'dp',
   hang: { thu: 1, tong: 18 },
-  ketLuan: 'Em làm khá đều nhưng **46%** số câu chọn khi chưa kịp đọc hết đề.',
+  ketLuan: 'Em làm 12/14 ngày đủ mức nhưng làm cho có:\n**46%** số câu chọn đáp án khi chưa kịp đọc hết đề — sai 40/88 câu\n**3 lần** bấm cùng một chữ từ 6 câu liền trở lên',
   the: [
     { ma: 'voi', tieu: 'Chọn đáp án khi chưa kịp đọc hết đề', lon: '88/191', nhoSo: 'lượt · 46%', so: 46, lop: 7, viDu: [{ luc: '2026-10-30T14:14:00Z', cau: 'Bài 7 · Fe và Cu tác dụng với HCl', phu: 'đề 64 chữ ⇒ cần ít nhất 16 giây để đọc', kq: 'chọn sau 3 giây · B · sai', dung: false }] },
     { ma: 'lap', tieu: 'Bấm cùng một chữ nhiều câu liền', lon: '5', nhoSo: 'chuỗi từ 6 câu', chuoi: { chu: 'BBBBBBBBBBB', dung: [3, 8] } },
@@ -122,7 +122,9 @@ describe('4 bảng', () => {
     expect(sheet.textContent).toContain('Kết luận · Học đối phó · hạng 1/18')
     expect(sheet.textContent).toContain('12A1 · 14 ngày 18/10 – 31/10 · 191 lượt làm câu')
     expect(sheet.textContent).not.toContain('Cách tính')
-    expect(within(sheet).getByText('46%', { selector: '.bbc-ket-chu b' })).toBeTruthy()
+    // thầy 01/11: kết luận = dòng nhận định + mỗi lý do một dòng, con số to (không còn hai con số liền nhau)
+    expect(sheet.querySelector('.bbc-ket-chu')?.textContent).toBe('Em làm 12/14 ngày đủ mức nhưng làm cho có:')
+    expect([...sheet.querySelectorAll('.bbc-ket-ds li')].map((x) => x.querySelector('b')?.textContent)).toEqual(['46%', '3 lần'])
     expect(sheet.querySelectorAll('.bbc-chuoi span')).toHaveLength(11)
     expect(sheet.querySelectorAll('.bbc-chuoi span[data-dung]')).toHaveLength(2)
     expect(sheet.querySelector('.bbc-hai [data-lech] b')?.textContent).toBe('3,5/10')
