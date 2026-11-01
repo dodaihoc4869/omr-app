@@ -1,0 +1,103 @@
+# KHÔI PHỤC CHUỖI MẤT OAN (02/11) — scripts/khoi-phuc-chuoi-0211.sql. ⚠ Phần GHI đụng dữ liệu thật ⇒ CHỈ chạy sau khi Boss soát.
+#   · Đẩy nhánh claude/sua-chuoi-0211 (đổi tệp SQL / tệp này): CHỈ ĐẾM (khối DEM_TRUOC, một SELECT) — không ghi gì.
+#   · Bấm tay (Actions → «Khôi phục chuỗi mất oan» → Run workflow, ghi = co, xac_nhan = KHOI PHUC): đếm trước → tạo bảng sao lưu chỉ-thêm
+#     chuoi_sao_luu_0211 → chép giá trị cũ → hạ mức đúng các ngày oan → đếm sau → đếm lại (phải rỗng). Chạy lại không ghi thêm (khoá sao lưu + điều kiện mức cũ).
+#     Lưu ý GitHub: nút «Run workflow» chỉ hiện khi tệp workflow đã có trên nhánh mặc định (main).
+# Log chỉ in ngày + SỐ ĐẾM (repo công khai): không SBD, không tên. Không `wrangler d1 export`, không `--file` (dùng --command từng câu).
+name: Khôi phục chuỗi mất oan
+on:
+  workflow_dispatch:
+    inputs:
+      ghi:
+        description: 'co = GHI THẬT (hạ mức các ngày oan, có sao lưu) · khong = chỉ đếm'
+        required: true
+        default: khong
+        type: choice
+        options: [khong, co]
+      bang_chung:
+        description: 'manh = chỉ ngày đủ nhờ câu học cách giải (mặc định) · ca_thuong = thêm ngày chỉ có thưởng «đạt mục tiêu» (28–30/10)'
+        required: true
+        default: manh
+        type: choice
+        options: [manh, ca_thuong]
+      xac_nhan:
+        description: 'Gõ đúng KHOI PHUC khi ghi = co'
+        required: false
+        default: ''
+  push:
+    branches: [claude/sua-chuoi-0211]
+    paths: ['.github/workflows/khoi-phuc-chuoi-0211.yml', 'scripts/khoi-phuc-chuoi-0211.sql']
+permissions:
+  contents: read
+concurrency:
+  group: khoi-phuc-chuoi-0211
+  cancel-in-progress: false
+jobs:
+  chay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Tách khối SQL + soát lệnh
+        env:
+          BANG_CHUNG: ${{ inputs.bang_chung || 'manh' }}
+        run: |
+          mkdir -p /tmp/kp
+          case "$BANG_CHUNG" in manh) ;; ca_thuong) sed -i "s/'ca_thuong' = 'manh'/'ca_thuong' = 'ca_thuong'/" scripts/khoi-phuc-chuoi-0211.sql ;; *) echo "bang_chung sai"; exit 1 ;; esac
+          echo "Bằng chứng: $BANG_CHUNG"
+          node -e '
+            const fs = require("fs"), tep = fs.readFileSync("scripts/khoi-phuc-chuoi-0211.sql", "utf8")
+            const khoi = (ten) => { const m = tep.split(/^-- @@ /m).find((x) => x.startsWith(ten + " ")); if (!m) throw new Error("thiếu khối " + ten)
+              return m.split("\n").slice(1).filter((d) => !/^\s*--/.test(d)).join(" ").replace(/\s+/g, " ").trim() }
+            const mau = { DEM_TRUOC: /^SELECT /, DEM_SAU: /^SELECT /, GHI_1: /^CREATE TABLE IF NOT EXISTS chuoi_sao_luu_0211 /,
+              GHI_2: /^INSERT OR IGNORE INTO chuoi_sao_luu_0211 /, GHI_3: /^UPDATE goi_bai_7_muc_ngay SET muc = \(SELECT b\.muc_moi FROM chuoi_sao_luu_0211 b / }
+            for (const [ten, re] of Object.entries(mau)) {
+              const s = khoi(ten), bo = s.replace(/'"'"'[^'"'"']*'"'"'/g, "")
+              if (!re.test(s)) throw new Error(ten + ": không đúng dạng cho phép")
+              if (/;\s*\S/.test(bo) || /\b(DELETE|DROP|ALTER|REPLACE|PRAGMA|ATTACH)\b/i.test(bo)) throw new Error(ten + ": có lệnh ngoài phạm vi")
+              fs.writeFileSync("/tmp/kp/" + ten + ".sql", s.replace(/;$/, ""))
+            }
+            console.log("OK: DEM_TRUOC/DEM_SAU là SELECT; GHI chỉ tạo bảng sao lưu, chép vào bảng sao lưu, hạ mức theo bảng sao lưu")'
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm trước (chỉ đọc)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          npx -y wrangler@4 d1 execute omr --remote --json --command "$(cat /tmp/kp/DEM_TRUOC.sql)" > /tmp/kp/truoc.json
+          echo "Số dòng mức sẽ hạ theo ngày (so_em · tong_cau_ha · du_nho_cau_hoc_cach_giai · chi_co_thuong_dat_muc_tieu):"
+          jq -c '.[0].results[]' /tmp/kp/truoc.json
+      - name: GHI — sao lưu rồi hạ mức các ngày oan
+        if: github.event_name == 'workflow_dispatch' && inputs.ghi == 'co'
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+          XAC_NHAN: ${{ inputs.xac_nhan }}
+        run: |
+          if [ "$XAC_NHAN" != "KHOI PHUC" ]; then echo "::error::Chưa xác nhận (xac_nhan phải là «KHOI PHUC») — không ghi."; exit 1; fi
+          MO=$(npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT COUNT(*) AS n FROM ca WHERE trang_thai = 'mo'" | jq '.[0].results[0].n')
+          if [ "$MO" != "0" ]; then echo "::error::Đang có $MO ca thi mở — dừng, chạy lại sau."; exit 1; fi
+          for k in GHI_1 GHI_2 GHI_3; do
+            npx -y wrangler@4 d1 execute omr --remote --json --command "$(cat /tmp/kp/$k.sql)" > /tmp/kp/$k.json
+            echo "$k: $(jq '.[0].meta.changes' /tmp/kp/$k.json) dòng thay đổi"
+          done
+      - name: Đếm sau (chỉ đọc)
+        if: github.event_name == 'workflow_dispatch' && inputs.ghi == 'co'
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          echo "Bảng sao lưu theo ngày (sao_luu · da_ha · chua_ha):"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "$(cat /tmp/kp/DEM_SAU.sql)" | jq -c '.[0].results[]'
+          echo "Còn ngày oan trong khung (phải rỗng):"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "$(cat /tmp/kp/DEM_TRUOC.sql)" | jq -c '.[0].results'

@@ -1,5 +1,6 @@
 import type { Env } from './kieu'
 import { coGoi7, damBaoGoi7, dongBoGoi7, SQL_LUOT_GOI7, duNguonGoi7, mang7, sqlTenLopHs } from './goi-bai-7'
+import { sqlDaDuMuc } from './chuoi-ngay-bai'
 import { lyDoChua7, diemConDungNguon7, ngayVn7, type CauGoi7 } from './goi-bai-7-loi'
 import { docCauTheoRef, loiCauDoi } from './game-v2-bank'
 import { sqlEmDangNhan7 } from './goi-bai-7-quyen'
@@ -128,7 +129,8 @@ async function suaHanCacGoi(env:Env,goi:{goiId:string;hanCu:string}[],han:string
     env.DB.prepare(`UPDATE goi_bai_7_em SET han=? WHERE goi_id IN(${daChot})`).bind(han,ids),
     // Đây là số kế hoạch tính sẵn, không phải bài đã làm. Lượt đọc tiếp theo tính lại theo từng em và lịch kiểm tra thực tế.
     env.DB.prepare(`DELETE FROM goi_bai_7_ngay WHERE ngay>=? AND goi_id IN(${daChot})`).bind(ngay,ids),
-    env.DB.prepare(`DELETE FROM goi_bai_7_muc_ngay WHERE ngay>=? AND sbd IN(SELECT e.sbd FROM goi_bai_7_em e JOIN goi_bai_7 g ON g.id=e.goi_id JOIN hoc_sinh h ON h.sbd=e.sbd AND ${sqlTenLopHs('h')}=g.lop WHERE e.goi_id IN(${daChot}) AND ${sqlEmDangNhan7('e','g','h')})`).bind(ngay,ids),
+    // (02/11) em ĐÃ ĐỦ mức hôm nay giữ mức đã đủ (một mức cho màn và chuỗi — `sqlDaDuMuc`).
+    env.DB.prepare(`DELETE FROM goi_bai_7_muc_ngay WHERE ngay>=? AND sbd IN(SELECT e.sbd FROM goi_bai_7_em e JOIN goi_bai_7 g ON g.id=e.goi_id JOIN hoc_sinh h ON h.sbd=e.sbd AND ${sqlTenLopHs('h')}=g.lop WHERE e.goi_id IN(${daChot}) AND ${sqlEmDangNhan7('e','g','h')}) AND NOT ${sqlDaDuMuc('goi_bai_7_muc_ngay')}`).bind(ngay,ids),
   ])
   if(Number(rs[0]?.meta.changes)!==doi.length)throw new Error('Hạn vừa thay đổi hoặc có ca kiểm tra mở. Thầy cập nhật rồi thử lại.')
   return {daDoi:true,tuDongTinhLai:true}

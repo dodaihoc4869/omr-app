@@ -1,5 +1,6 @@
 import type { Env } from './kieu'
 import { damBaoGoi7, sqlTenLopHs } from './goi-bai-7'
+import { sqlDaDuMuc } from './chuoi-ngay-bai'
 import { sqlEmDangNhan7 } from './goi-bai-7-quyen'
 import { ngayVn7 } from './goi-bai-7-loi'
 import { emCoGhi } from './dem-ke-hoach'
@@ -89,7 +90,8 @@ export async function gvDanhSachEm7(env: Env, b: Row, now = Date.now()): Promise
         ON CONFLICT(goi_id) DO UPDATE SET revision=excluded.revision`).bind(goiId,Number(r.revision)+1,...co()),
       // Chỉ số kế hoạch tính sẵn của các em thực sự đổi; sổ gặp/phiên/điểm/đề đã công bố không nằm trong batch.
       env.DB.prepare(`DELETE FROM goi_bai_7_ngay WHERE goi_id=? AND ngay>=? AND sbd IN(SELECT json_extract(value,'$.sbd') FROM json_each(?)) AND ${daChot}`).bind(goiId,ngay,thayDoi,...co()),
-      env.DB.prepare(`DELETE FROM goi_bai_7_muc_ngay WHERE ngay>=? AND sbd IN(SELECT json_extract(value,'$.sbd') FROM json_each(?)) AND ${daChot}`).bind(ngay,thayDoi,...co()),
+      // (02/11) em ĐÃ ĐỦ mức hôm nay giữ mức đã đủ (một mức cho màn và chuỗi — `sqlDaDuMuc`).
+      env.DB.prepare(`DELETE FROM goi_bai_7_muc_ngay WHERE ngay>=? AND sbd IN(SELECT json_extract(value,'$.sbd') FROM json_each(?)) AND ${daChot} AND NOT ${sqlDaDuMuc('goi_bai_7_muc_ngay')}`).bind(ngay,thayDoi,...co()),
     ])
     if (!Number(rs[0]?.meta.changes)) {
       const retry=await env.DB.prepare('SELECT payload,ack_json FROM goi_bai_7_sua_em WHERE goi_id=? AND request_id=?').bind(goiId,requestId).first<Row>()

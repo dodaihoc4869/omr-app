@@ -1,12 +1,12 @@
 // B3 CHUỖI NGÀY THEO BÀI — phần D1 (hàm thuần ở chuoi-ngay-bai.ts). Bốn lượt ĐỌC độc lập đi CÙNG một đợt (Promise.all), nơi gọi bắt đầu sớm ⇒ không thêm vòng chờ.
-//   1. sổ học `su_kien_hoc`: số câu khác nhau có kết quả theo ngày VN (chỉ mục idx_skh_em_ngay_qid)
+//   1. sổ học `su_kien_hoc`: số câu khác nhau có kết quả theo ngày VN (chỉ mục idx_skh_em_ngay_qid) + câu tính mức (sổ ∪ học cách giải, từ 28/10)
 //   2. `chua_loi_dot`: ngày em tự sửa xong (trang_thai_day = 'da_tu_sua', theo `dong_luc`)
 //   3. điểm danh `buoi_hoc_diem_danh` 'co_phep' ⇒ ngày của buổi (theo `buoi_hoc.mo_luc`)
 //   4. bình mua `chuoi_binh_mua` (bảng CHỈ-THÊM, tạo khi cộng bình lần đầu) + dòng đặt lại bình 27/10 (NGUON_DAT_LAI_BINH)
 // Lượt 2–4 lỗi / bảng chưa có ⇒ coi như rỗng; lượt 1 lỗi ⇒ trả null (nơi gọi giữ số cũ, không bịa).
 import type { Env } from './kieu'
 import { chayDdlMotLan } from './ddl-mot-lan'
-import { chuoiNgayCuaEm, ngayVn, NGAY_CHUOI_DU_MUC, SO_NGAY_DOC, SQL_CAU_TINH_MUC, SQL_CO_KET_QUA_HOAC_LUOT, SQL_COT_BINH_MUA, type ChuoiNgay, type NhatKyChuoi } from './chuoi-ngay-bai'
+import { chuoiNgayCuaEm, ngayVn, NGAY_CHUOI_DU_MUC, SO_NGAY_DOC, SQL_CO_KET_QUA_HOAC_LUOT, SQL_COT_BINH_MUA, SQL_SO_CAU_MUC, type ChuoiNgay, type NhatKyChuoi } from './chuoi-ngay-bai'
 
 export const SQL_CHUOI_BINH = [
   'CREATE TABLE IF NOT EXISTS chuoi_binh_mua (id TEXT PRIMARY KEY, sbd TEXT NOT NULL, so INTEGER NOT NULL, nguon TEXT NOT NULL, luc TEXT NOT NULL)',
@@ -19,7 +19,8 @@ const rongNeuLoi = (p: Promise<{ results?: Row[] }>) => p.then((r) => r.results 
 export async function docNhatKyChuoi(env: Env, sbd: string, nowMs: number): Promise<NhatKyChuoi> {
   const homNay = ngayVn(nowMs), tu = lui(homNay, SO_NGAY_DOC), tuIso = `${lui(tu, 1)}T00:00:00Z`
   const [sk, sua, phep, mua, muc] = await Promise.all([
-    env.DB.prepare(`SELECT ngay_vn AS n, COUNT(DISTINCT CASE WHEN ket_qua IS NOT NULL THEN qid END) AS c, COUNT(DISTINCT CASE WHEN ngay_vn >= ? AND ${SQL_CAU_TINH_MUC} THEN qid END) AS c7
+    // c7 (02/11): câu tính mức = sổ + câu HỌC CÁCH GIẢI chưa có trong sổ (SQL_SO_CAU_MUC) — đúng số «Đủ x/y câu» của Lộ trình. Chỉ ngày từ mốc mới đọc thêm.
+    env.DB.prepare(`SELECT ngay_vn AS n, COUNT(DISTINCT CASE WHEN ket_qua IS NOT NULL THEN qid END) AS c, CASE WHEN ngay_vn >= ? THEN ${SQL_SO_CAU_MUC} ELSE 0 END AS c7
         FROM su_kien_hoc WHERE sbd = ? AND ngay_vn >= ? AND ngay_vn <= ? AND ${SQL_CO_KET_QUA_HOAC_LUOT} GROUP BY ngay_vn`)
       .bind(NGAY_CHUOI_DU_MUC, sbd, tu, homNay).all<Row>(),
     rongNeuLoi(env.DB.prepare("SELECT DISTINCT date(dong_luc, '+7 hours') AS n FROM chua_loi_dot WHERE sbd = ? AND trang_thai_day = 'da_tu_sua' AND dong_luc >= ?").bind(sbd, tuIso).all<Row>()),
