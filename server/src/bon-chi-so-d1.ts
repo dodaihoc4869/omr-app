@@ -9,7 +9,7 @@ import type { Env } from './kieu'
 import { docDanhSachEm, docNgayCacEm, type EmGoc } from './bai-hang-ngay'
 import { docNgayVao, ngayDuocTinh } from './nhip-hoc'
 import { cuaSoTinh, tinhLoEm } from './danh-gia-hoc-that-d1'
-import { tinhBon, trungVi, vaoBang, type KetQuaBon, type SoLieuBon, type TheTho } from './bon-chi-so'
+import { BAN_BON, tinhBon, trungVi, vaoBang, type KetQuaBon, type SoLieuBon, type TheTho } from './bon-chi-so'
 import { THU_TU_BANG, type DiemBon, type DongBang, type LoiBon, type MaBang, type TheBangChung, type TraLoiBangChung, type TraLoiBonBang } from '../../src/lib/bon-bang-kieu'
 
 type Row = Record<string, unknown>
@@ -80,8 +80,8 @@ export async function cronBonChiSo(env: Env, nowMs: number, caoDiem = false): Pr
   const w = cuaSoTinh(nowMs)
   const em = await docDanhSachEm(env, [])
   if (!em?.length) return { chay: false, lyDo: 'khong_em' }
-  // bản của hôm nay VÀ đúng bộ máy v2 (`ban` = 2) mới coi là xong — bản cũ trong ngày được tính lại dần (01/11, đánh giá v2).
-  const xong = new Set((await hoi(env, "SELECT sbd FROM bon_chi_so_em WHERE ngay = ?1 AND json_valid(so_lieu_json) AND json_extract(so_lieu_json, '$.ban') = 2", w.homNay)).map((x) => str(x.sbd)))
+  // bản của hôm nay VÀ đúng phiên bản bộ máy (`ban` = BAN_BON) mới coi là xong — bản cũ trong ngày được tính lại dần (01/11, đánh giá v2).
+  const xong = new Set((await hoi(env, "SELECT sbd FROM bon_chi_so_em WHERE ngay = ?1 AND json_valid(so_lieu_json) AND json_extract(so_lieu_json, '$.ban') = ?2", w.homNay, BAN_BON)).map((x) => str(x.sbd)))
   const can = em.filter((e) => !xong.has(e.sbd))
   if (!can.length) return { chay: false, lyDo: 'xong' }
   const lo = can.slice(0, phut < 6 * 60 ? LO_BON_DEM : LO_BON_NGAY)
