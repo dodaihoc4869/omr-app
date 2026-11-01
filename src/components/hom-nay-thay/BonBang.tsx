@@ -8,7 +8,7 @@
 //   · Bấm một em ⇒ trang bằng chứng (`BangChungBon`, NẠP KHI BẤM); đóng ⇒ tiêu điểm về đúng dòng.
 // Màu: chỉ biến «Trong» --tr-* (bon-bang.css, dưới [data-trong='gv']).
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { ChevronDown, ChevronRight, Flame, Pause, RefreshCw, Search, Star, TriangleAlert } from 'lucide-react'
+import { Award, ChevronDown, ChevronRight, Flame, Pause, RefreshCw, Search, TriangleAlert } from 'lucide-react'
 import { layBonBang, docDemBonBang } from '../../lib/bon-bang-api'
 import { TEN_BANG, THU_TU_BANG, type DongBang, type MaBang, type TraLoiBonBang } from '../../lib/bon-bang-kieu'
 import './bon-bang.css'
@@ -25,7 +25,7 @@ const MO_TA: Readonly<Record<MaBang, string>> = {
   ch: 'Làm đủ mức gần như mọi ngày, câu nào cũng làm thật',
   lu: 'Bỏ ngày, thiếu câu được giao, để câu sai không sửa',
 }
-const ICON: Readonly<Record<MaBang, typeof Star>> = { ht: Star, dp: TriangleAlert, ch: Flame, lu: Pause }
+const ICON: Readonly<Record<MaBang, typeof Award>> = { ht: Award, dp: TriangleAlert, ch: Flame, lu: Pause }
 const TEN_NGAN: Readonly<Record<MaBang, string>> = { ht: 'Học thật', dp: 'Đối phó', ch: 'Chăm', lu: 'Lười' }
 
 /** «**x**» ⇒ <b>x</b> (máy chủ bọc phần cần nhấn). Thuần, có test. */
