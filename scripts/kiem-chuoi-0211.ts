@@ -134,6 +134,7 @@ type NguyenNhan = 'gap' | 'chot_lai' | 'khac'
 interface Dem { datLuat: number; duMan: number; thuong: number; oan: number; kieu: Partial<Record<KieuNgay, number>>; nn: Record<NguyenNhan, number>; ngoaiLuat: number; neuGhiDu: number; chotLai: number }
 const theoNgay = new Map(cacNgay.map((d) => [d, { datLuat: 0, duMan: 0, thuong: 0, oan: 0, kieu: {}, nn: { gap: 0, chot_lai: 0, khac: 0 }, ngoaiLuat: 0, neuGhiDu: 0, chotLai: 0 } as Dem]))
 let coSo14 = 0, emOan = 0, emThapHon = 0, emVe01 = 0, tongChenh = 0, emMatBinh = 0, viPham = 0, khoiPhucDung = 0, khoiPhucThieu = 0, ngayKhongHaDuoc = 0
+let banSuaDu = 0, banSuaMotPhan = 0
 const loLeRa: number[] = [], loHienTai: number[] = []
 const chu = (k: Partial<Record<KieuNgay, number>>) => Object.entries(k).map(([a, b]) => `${a} ${b}`).join(' · ') || '—'
 
@@ -185,11 +186,16 @@ for (const e of ds.values()) {
     if (!e.muc.has(d) || c7 < 1) { ngayKhongHaDuoc++; return null }
     return { muc: Math.min(e.muc.get(d)!.m, c7) }
   }), homNay, true)
+  // Bản sửa nguyên nhân (nhánh claude/sua-chuoi-0211): chuỗi đếm thêm câu học cách giải như màn ⇒ mọi ngày từ 28/10 cộng `gap`, không ghi dữ liệu.
+  const banSua = chuoiNgayCuaEm(nhatKy(e, (d) => (d >= NGAY_CHUOI_DU_MUC && e.gap.has(d) ? { soCau7: (e.soCau7.get(d) ?? 0) + e.gap.get(d)! } : null)), homNay, true)
   loHienTai.push(hien.so); loLeRa.push(leRa.so)
   if (leRa.so < hien.so) viPham++
   if (leRa.so > hien.so) { emThapHon++; tongChenh += leRa.so - hien.so; if (hien.so <= 1) emVe01++ }
   if (leRa.giuChuoi > hien.giuChuoi) emMatBinh++
-  if (leRa.so > hien.so || leRa.giuChuoi > hien.giuChuoi) { if (khoiPhuc.so === leRa.so && khoiPhuc.giuChuoi === leRa.giuChuoi) khoiPhucDung++; else khoiPhucThieu++ }
+  if (leRa.so > hien.so || leRa.giuChuoi > hien.giuChuoi) {
+    if (khoiPhuc.so === leRa.so && khoiPhuc.giuChuoi === leRa.giuChuoi) khoiPhucDung++; else khoiPhucThieu++
+    if (banSua.so >= leRa.so && banSua.giuChuoi >= leRa.giuChuoi) banSuaDu++; else if (banSua.so > hien.so) banSuaMotPhan++
+  }
 }
 
 const nhom = (xs: number[]) => {
@@ -219,3 +225,5 @@ console.log(`  phân bố chuỗi hiện tại: ${nhom(loHienTai)}`)
 console.log(`  phân bố chuỗi lẽ ra có:  ${nhom(loLeRa)}`)
 console.log(`  kiểm đơn điệu (lẽ ra < hiện tại — phải 0): ${viPham}`)
 console.log(`  mô phỏng khôi phục (hạ mức ngày oan về số câu luật đếm): khớp lẽ ra ${khoiPhucDung} em · chưa khớp ${khoiPhucThieu} em · ngày oan không hạ được (không dòng mức / 0 câu) ${ngayKhongHaDuoc}`)
+console.log(`  mô phỏng CHỈ bản sửa mã (chuỗi đếm câu học cách giải, không ghi dữ liệu): trả đủ ${banSuaDu} em · trả một phần ${banSuaMotPhan} em`)
+console.log(`  số dòng mức sẽ hạ (đối chiếu «đếm trước» của scripts/khoi-phuc-chuoi-0211.sql): ${[...theoNgay].filter(([d]) => d >= NGAY_CHUOI_DU_MUC).map(([d, t]) => `${d}: ${t.oan}`).join(' · ')}`)
