@@ -29,6 +29,11 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
         run: |
           q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results[]' | head -n 60; }
+          q "S1 câu H2S + 7 câu luật mới: cờ tự luận đã gắn chưa" "SELECT qid, json_extract(json,'\$.tuLuan') tl FROM game_v2_question WHERE qid IN ('DH-11-C2-B7-III-39','DB-11-B7-D3-III-3','DB-11-B6-D3-III-10','DH-11-C2-B6-III-36','DH-10-C1-B1-III-26','DB-10-B1-D1-III-169','DH-11-C2-B7-III-15','DB-11-B8-D3-III-17')"
+          q "S2 con trỏ quét cờ tự luận" "SELECT gia_tri, cap_nhat_luc FROM cau_hinh WHERE khoa='co_tu_luan_quet'"
+          q "S3 chiến dịch đang chạy NGOÀI ba hành trình (bước kiểm sau phát hành)" "SELECT id, lop, tao_luc, json_array_length(qid_json) so_cau, json_array_length(sbd_json) so_em FROM chien_dich WHERE trang_thai='dang_chay' AND id NOT IN ('hanh-trinh-v3-khoi-10','hanh-trinh-v3-khoi-11','hanh-trinh-v3-khoi-12') ORDER BY tao_luc DESC LIMIT 10"
+          q "S4 bài tick gần nhất" "SELECT lop, khoa_bai, tick_luc, chien_dich_id IS NOT NULL co_cd FROM bai_da_day WHERE bo_tick_luc IS NULL ORDER BY tick_luc DESC LIMIT 6"
+          exit 0
           npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT qid, ma_de, json_extract(json,'\$.phan') phan, json_extract(json,'\$.text') text, json_extract(json,'\$.correct') correct, json_extract(json,'\$.tuLuan') tl FROM game_v2_question WHERE json_valid(json) AND json_extract(json,'\$.phan')='III' AND (json_extract(json,'\$.text') LIKE '%a)%')" > /tmp/p3.json
           npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT qid, ma_de, json_extract(json,'\$.phan') phan, json_extract(json,'\$.text') text, json_extract(json,'\$.correct') correct, json_extract(json,'\$.tuLuan') tl FROM game_v2_question WHERE json_valid(json) AND json_extract(json,'\$.phan')='III'" > /tmp/p3all.json
           (cd .. && npx -y esbuild@0.25.10 scripts/soi-tu-luan-nhieu-y.ts --bundle --platform=node --format=esm --outfile=/tmp/soi.mjs --log-level=warning && node /tmp/soi.mjs /tmp/p3.json /tmp/p3all.json)
