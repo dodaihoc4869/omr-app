@@ -1,0 +1,504 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mol ống nghiệm · bản vẽ</title>
+<!-- BẢN VẼ MOL v2 (01/11 tối) — Mol toàn thân hình ỐNG NGHIỆM. SVG thuần, mọi màu là biến --mol-* pha từ token THẬT của app học sinh
+     (giá trị chép từ src/styles/trong-hs-mau.css + tokens.css; thư mục docs không bị kiểm mã màu). Mở: mol-v2.html (sáng) · ?toi (tối) · ?dien-thoai (ảnh ngữ cảnh).
+     Chụp: node docs/ban-ve-mol-v2-0111/chup.cjs -->
+<style>
+@font-face{font-family:'DDH Rounded';font-weight:100 549;src:url(../../src/styles/phong-ddh/ddh-rounded-de-vietnamese.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'DDH Rounded';font-weight:100 549;src:url(../../src/styles/phong-ddh/ddh-rounded-de-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+2000-206F,U+2190-2193,U+2212}
+@font-face{font-family:'DDH Rounded';font-weight:550 1000;src:url(../../src/styles/phong-ddh/ddh-rounded-dam-vietnamese.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'DDH Rounded';font-weight:550 1000;src:url(../../src/styles/phong-ddh/ddh-rounded-dam-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+2000-206F,U+2190-2193,U+2212}
+
+/* ── TOKEN THẬT app học sinh «B · Chất chỉ thị» (trong-hs-mau.css) + cố định (tokens.css) ── */
+:root,.sang{
+  --tr-nen:#f6f6fc;--tr-mat:#ffffff;--tr-mat-2:#f0f0fa;--tr-mat-3:#e1e1f1;--tr-vien:#e2e2f0;--tr-vien-2:#cbcbe3;
+  --tr-chu:#1b1938;--tr-chu-2:#454367;--tr-chu-3:#5a587d;
+  --tr-dung:#00d396;--tr-dung-chu:#007c58;--tr-dung-nut:#00a87b;--tr-dung-day:#008d66;
+  --tr-sai:#f4417c;--tr-sai-day:#e5266d;
+  --tr-chu-y:#ff8c51;--tr-chu-y-nut:#f06b27;--tr-chu-y-day:#ce6837;
+  --tr-tin:#00bed8;--tr-tin-day:#009eb5;
+  --tr-sao:#ffbf35;--tr-sao-day:#e3a605;
+  --tr-tim:#f373ce;--tr-tim-day:#c851a8;
+  --tr-hs:#8f9bff;--tr-hs-nut:#767eff;--tr-hs-day:#5e64cd;--tr-hs-nhat:#eeeeff;--tr-hs-chu:#565bbd;--tr-hs-tren:#ffffff;
+  --tr-nguyen-tu-so:#009eb5;--tr-gv:#2563eb;
+  --btg-chu-doan:#1f1f1f;--btg-chu-doan-dam:#ffffff;
+  color-scheme:light;
+}
+:root[data-toi],.toi{
+  --tr-nen:#1a1a29;--tr-mat:#262738;--tr-mat-2:#2c2d40;--tr-mat-3:#414157;--tr-vien:#414157;--tr-vien-2:#52536a;
+  --tr-chu:#f1f0ff;--tr-chu-2:#cdceeb;--tr-chu-3:#acaece;
+  --tr-dung:#00d497;--tr-dung-chu:#00df9f;--tr-dung-nut:#00d497;--tr-dung-day:#00aa76;
+  --tr-sai:#f7498f;--tr-sai-day:#cc146f;
+  --tr-chu-y:#ff9447;--tr-chu-y-nut:#ff9447;--tr-chu-y-day:#de6a00;
+  --tr-tin:#00bfd4;--tr-tin-day:#0097ab;
+  --tr-sao:#ffc735;--tr-sao-day:#d8a100;
+  --tr-tim:#e17beb;--tr-tim-day:#b857c8;
+  --tr-hs:#a8adff;--tr-hs-nut:#a8adff;--tr-hs-day:#7e80ff;--tr-hs-nhat:#2c2e47;--tr-hs-chu:#b1b6ff;--tr-hs-tren:#1a1a29;
+  --tr-nguyen-tu-so:#00bfd4;--tr-gv:#528bff;
+  color-scheme:dark;
+}
+
+/* ── MÀU MOL v2: chung cho mọi phương án (mảng mặt trắng, mắt mực, má, lưỡi, giận) ── */
+.mv{
+  --mol-muc:color-mix(in oklab,var(--tr-hs-day) 30%,var(--btg-chu-doan));
+  --mol-trang:var(--btg-chu-doan-dam);
+  --mol-na:var(--btg-chu-doan-dam);
+  --mol-na-toi:color-mix(in oklab,var(--tr-hs) 12%,var(--btg-chu-doan-dam));
+  --mol-ma:color-mix(in srgb,var(--tr-tim) 42%,var(--btg-chu-doan-dam));
+  --mol-ma-net:color-mix(in srgb,var(--tr-tim) 80%,var(--btg-chu-doan-dam));
+  --mol-luoi:color-mix(in srgb,var(--tr-sai) 70%,var(--btg-chu-doan-dam));
+  --mol-sao:var(--tr-sao);
+  --mol-tim:var(--tr-sai);
+  --mol-not:var(--tr-tim);
+  --mol-nuoc-mat:color-mix(in oklab,var(--tr-tin) 55%,var(--btg-chu-doan-dam));
+  --mol-soi:color-mix(in oklab,var(--tr-sai) 70%,var(--tr-chu-y));
+  --mol-soi-sang:color-mix(in oklab,var(--mol-soi) 60%,var(--btg-chu-doan-dam));
+  --mol-soi-toi:color-mix(in oklab,var(--tr-sai-day) 80%,var(--tr-chu-y-day));
+  --mol-do:var(--tr-sai);
+  --mol-do-sang:color-mix(in oklab,var(--tr-sai) 62%,var(--btg-chu-doan-dam));
+  --mol-do-toi:var(--tr-sai-day);
+  --mol-hoi:var(--btg-chu-doan-dam);
+  --mol-hoi-vien:color-mix(in oklab,var(--tr-hs) 45%,var(--btg-chu-doan-dam));
+  --mol-bong:color-mix(in srgb,var(--tr-hs-day) 24%,transparent);
+  overflow:visible;
+}
+/* A · Chàm + Ngọc lam (đề xuất): thân = --tr-hs (màu chính app học sinh), dung dịch = --tr-tin, mũi = --tr-chu-y */
+.pa-A{
+  --mol-than:var(--tr-hs);
+  --mol-than-sang:color-mix(in oklab,var(--tr-hs) 58%,var(--btg-chu-doan-dam));
+  --mol-than-toi:color-mix(in oklab,var(--tr-hs-nut) 45%,var(--tr-hs-day));
+  --mol-vanh:color-mix(in oklab,var(--tr-hs) 38%,var(--btg-chu-doan-dam));
+  --mol-tay:color-mix(in oklab,var(--tr-hs-nut) 72%,var(--tr-hs-day));
+  --mol-chan:var(--tr-hs-day);
+  --mol-nuoc:var(--tr-tin);
+  --mol-nuoc-sang:color-mix(in oklab,var(--tr-tin) 52%,var(--btg-chu-doan-dam));
+  --mol-nuoc-toi:var(--tr-tin-day);
+  --mol-mui:var(--tr-chu-y);
+}
+/* B · Chàm + Cam (giữ dung dịch cam của Mol cũ): thân = --tr-hs, dung dịch = --tr-chu-y, mũi = --tr-chu-y-nut */
+.pa-B{
+  --mol-than:var(--tr-hs);
+  --mol-than-sang:color-mix(in oklab,var(--tr-hs) 58%,var(--btg-chu-doan-dam));
+  --mol-than-toi:color-mix(in oklab,var(--tr-hs-nut) 45%,var(--tr-hs-day));
+  --mol-vanh:color-mix(in oklab,var(--tr-hs) 38%,var(--btg-chu-doan-dam));
+  --mol-tay:color-mix(in oklab,var(--tr-hs-nut) 72%,var(--tr-hs-day));
+  --mol-chan:var(--tr-hs-day);
+  --mol-nuoc:var(--tr-chu-y);
+  --mol-nuoc-sang:color-mix(in oklab,var(--tr-chu-y) 52%,var(--btg-chu-doan-dam));
+  --mol-nuoc-toi:var(--tr-chu-y-day);
+  --mol-mui:var(--tr-chu-y-nut);
+}
+/* C · Ngọc lam + Hồng chỉ thị (phenolphtalein): thân = --tr-tin, dung dịch = --tr-tim, mũi = --tr-chu-y */
+.pa-C{
+  --mol-than:var(--tr-tin);
+  --mol-than-sang:color-mix(in oklab,var(--tr-tin) 55%,var(--btg-chu-doan-dam));
+  --mol-than-toi:var(--tr-tin-day);
+  --mol-vanh:color-mix(in oklab,var(--tr-tin) 36%,var(--btg-chu-doan-dam));
+  --mol-tay:color-mix(in oklab,var(--tr-tin-day) 85%,var(--tr-hs-day));
+  --mol-chan:color-mix(in oklab,var(--tr-tin-day) 70%,var(--tr-hs-day));
+  --mol-nuoc:var(--tr-tim);
+  --mol-nuoc-sang:color-mix(in oklab,var(--tr-tim) 52%,var(--btg-chu-doan-dam));
+  --mol-nuoc-toi:var(--tr-tim-day);
+  --mol-mui:var(--tr-chu-y);
+}
+.mv .s-than-sang{stop-color:var(--mol-than-sang)} .mv .s-than{stop-color:var(--mol-than)} .mv .s-than-toi{stop-color:var(--mol-than-toi)}
+.mv .s-vanh{stop-color:var(--mol-vanh)} .mv .s-na{stop-color:var(--mol-na)} .mv .s-na-toi{stop-color:var(--mol-na-toi)}
+.mv .s-nuoc-sang{stop-color:var(--mol-nuoc-sang)} .mv .s-nuoc{stop-color:var(--mol-nuoc)} .mv .s-nuoc-toi{stop-color:var(--mol-nuoc-toi)}
+.mv .s-soi-sang{stop-color:var(--mol-soi-sang)} .mv .s-soi{stop-color:var(--mol-soi)} .mv .s-soi-toi{stop-color:var(--mol-soi-toi)}
+.mv .s-do-sang{stop-color:var(--mol-do-sang)} .mv .s-do{stop-color:var(--mol-do)} .mv .s-do-toi{stop-color:var(--mol-do-toi)}
+.mv .s-tru0{stop-color:var(--btg-chu-doan);stop-opacity:0} .mv .s-tru1{stop-color:var(--btg-chu-doan);stop-opacity:.16}
+.mv .m-muc{fill:var(--mol-muc)} .mv .m-trang{fill:var(--mol-trang)} .mv .m-na{fill:var(--mol-na)}
+.mv .m-ma{fill:var(--mol-ma);opacity:.75} .mv .m-mui{fill:var(--mol-mui)} .mv .m-mieng{fill:var(--mol-muc)} .mv .m-luoi{fill:var(--mol-luoi)}
+.mv .m-tay{fill:var(--mol-tay)} .mv .m-tay-n{fill:none;stroke:var(--mol-tay);stroke-width:15;stroke-linecap:round}
+.mv .m-chan{fill:var(--mol-chan)} .mv .m-z{fill:var(--mol-than-toi)} .mv .m-mieng-ong{fill:var(--mol-than-toi);opacity:.55} .mv .m-bong{fill:var(--mol-bong)} .mv .m-bong-vanh{fill:var(--mol-than-toi);opacity:.35}
+.mv .m-sang{fill:var(--mol-trang);opacity:.6} .mv .m-sang-n{fill:none;stroke:var(--mol-trang);stroke-linecap:round;opacity:.5}
+.mv .m-bot{fill:var(--mol-trang);opacity:.6} .mv .m-sao{fill:var(--mol-sao)} .mv .m-tim{fill:var(--mol-tim)} .mv .m-not{fill:var(--mol-not)}
+.mv .m-not-n{fill:none;stroke:var(--mol-not);stroke-width:3.4;stroke-linecap:round}
+.mv .m-nuoc-mat{fill:var(--mol-nuoc-mat)} .mv .m-hoi{fill:var(--mol-hoi);stroke:var(--mol-hoi-vien);stroke-width:2.5}
+.mv .m-net{fill:none;stroke:var(--mol-muc);stroke-linecap:round;stroke-linejoin:round}
+.mv .m-net-t{fill:none;stroke:var(--mol-trang);stroke-linecap:round;stroke-linejoin:round}
+.mv .m-net-do{fill:none;stroke:var(--mol-do);stroke-linecap:round}
+.mv .m-net-ma{fill:none;stroke:var(--mol-ma-net);stroke-linecap:round;stroke-width:2.4}
+.mv .m-net-nhe{fill:none;stroke:var(--mol-tay);stroke-linecap:round;stroke-width:3.2;opacity:.6}
+.mv .m-net-mui{fill:none;stroke:var(--mol-mui);stroke-linecap:round;stroke-width:4}
+.mv .mol-chu{font-family:inherit;font-weight:800}
+.mv.cat{overflow:hidden}
+
+/* ── MOL CŨ (bình cầu #713 — chép từ mol.css để so sánh) ── */
+.mc{--mol-x:var(--tr-gv);--mol-xd:color-mix(in oklab,var(--tr-gv) 78%,var(--btg-chu-doan));--mol-vien:color-mix(in oklab,var(--tr-gv) 42%,var(--btg-chu-doan));
+  --mol-t:var(--btg-chu-doan-dam);--mol-muc:var(--btg-chu-doan);--mol-cam:var(--tr-chu-y);--mol-camS:color-mix(in srgb,var(--tr-chu-y) 40%,var(--btg-chu-doan-dam));
+  --mol-luoi:color-mix(in srgb,var(--tr-chu-y) 62%,var(--tr-sai));--mol-ma:color-mix(in srgb,var(--tr-chu-y) 42%,var(--btg-chu-doan-dam));overflow:visible}
+.mc .m-x{fill:var(--mol-x)} .mc .m-xd{fill:var(--mol-xd)} .mc .m-vien{fill:var(--mol-vien)} .mc .m-t{fill:var(--mol-t)} .mc .m-muc{fill:var(--mol-muc)}
+.mc .m-cam{fill:var(--mol-cam)} .mc .m-camS{fill:var(--mol-camS)} .mc .m-luoi{fill:var(--mol-luoi)} .mc .m-ma{fill:var(--mol-ma);opacity:.6}
+.mc .m-bot{fill:var(--mol-t);opacity:.55} .mc .m-sang{fill:var(--mol-t);opacity:.18} .mc .m-vien-n{stroke:var(--mol-vien);stroke-width:3.5}
+
+/* ── Trang bản vẽ ── */
+*{box-sizing:border-box}
+body{margin:0;background:var(--tr-nen);color:var(--tr-chu);font:500 15px/1.5 'DDH Rounded',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+main{max-width:1200px;margin:0 auto;padding:28px 20px 48px;display:flex;flex-direction:column;gap:28px}
+h1{margin:0;font-size:30px;font-weight:800;letter-spacing:-.01em}
+h2{margin:0;font-size:20px;font-weight:800}
+.phu{margin:4px 0 0;color:var(--tr-chu-2)}
+.khoi{background:var(--tr-mat);border:2px solid var(--tr-vien);border-radius:24px;padding:22px 22px 24px;box-shadow:0 4px 0 var(--tr-vien)}
+.khoi > header{margin-bottom:16px}
+/* so sánh */
+.ss{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.ss figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:8px;padding:18px 12px 16px;border-radius:20px;background:var(--tr-nen)}
+.ss figure.moi{box-shadow:inset 0 0 0 2px var(--tr-hs-nut)}
+.ss svg{width:220px;height:253px}
+.ss b{font-size:18px;font-weight:800}
+.ss small{color:var(--tr-chu-2);font-size:14px;text-align:center;max-width:300px}
+.ss code,.phu code{font-family:ui-monospace,Menlo,monospace;font-size:.86em;white-space:nowrap;background:var(--tr-mat-2);padding:0 4px;border-radius:5px}
+/* phương án */
+.pa3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.pa{position:relative;display:flex;flex-direction:column;gap:12px;padding:18px 16px 16px;border-radius:20px;background:var(--tr-nen)}
+.pa.de{box-shadow:inset 0 0 0 2.5px var(--tr-hs-nut)}
+.pa .nhan{position:absolute;top:14px;right:14px;font-size:12.5px;font-weight:800;padding:3px 10px;border-radius:999px;background:var(--tr-hs-nut);color:var(--tr-hs-tren)}
+.pa h3{margin:0;font-size:19px;font-weight:800}
+.pa .lon{display:flex;justify-content:center}
+.pa .lon svg{width:170px;height:196px}
+.pa .nho{display:flex;justify-content:center;gap:4px}
+.pa .nho figure{margin:0;display:flex;flex-direction:column;align-items:center;font-size:12px;color:var(--tr-chu-2);font-weight:700}
+.pa .nho svg{width:66px;height:76px}
+.dai{display:flex;align-items:center;gap:12px;padding:12px;border-radius:16px;background:var(--tr-mat);border:2px solid var(--tr-vien)}
+.nut-chinh{flex:1;height:48px;border:0;border-radius:14px;background:var(--tr-hs-nut);color:var(--tr-hs-tren);font:800 16px 'DDH Rounded',sans-serif;letter-spacing:.04em;box-shadow:inset 0 -4px 0 var(--tr-hs-day)}
+.nut-chang{width:56px;height:50px;border-radius:50%;background:var(--tr-hs-nut);box-shadow:inset 0 -5px 0 var(--tr-hs-day);display:grid;place-items:center;flex:none}
+.nut-chang svg{width:24px;height:24px}
+.loi{display:flex;align-items:flex-end;gap:8px}
+.loi svg{width:56px;height:64px;flex:none}
+.loi p{margin:0;flex:1;padding:10px 12px;border-radius:16px;border:2px solid var(--tr-vien-2);background:var(--tr-mat);font-weight:800;font-size:14.5px;line-height:1.35;position:relative}
+.loi p::before{content:'';position:absolute;left:-8px;bottom:14px;width:12px;height:12px;background:var(--tr-mat);border-left:2px solid var(--tr-vien-2);border-bottom:2px solid var(--tr-vien-2);transform:rotate(45deg)}
+.tok{margin:0;padding:0;list-style:none;font-size:12.5px;line-height:1.55;color:var(--tr-chu-2)}
+.tok code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--tr-chu);background:var(--tr-mat-2);padding:0 4px;border-radius:5px}
+.tok i{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin-right:5px;border:1px solid var(--tr-vien-2)}
+.pa .uu{font-size:13px;color:var(--tr-chu-2);margin:0}
+/* cảm xúc */
+.cx{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.cx figure{margin:0;position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 4px 10px;border-radius:18px;background:var(--tr-nen);text-align:center}
+.cx svg{width:132px;height:152px}
+.cx b{font-size:15px;font-weight:800}
+.cx small{font-size:12px;color:var(--tr-chu-2);line-height:1.3}
+.cx .moi{position:absolute;top:8px;right:8px;font-size:11px;font-weight:800;padding:1px 8px;border-radius:999px;background:var(--tr-tim);color:var(--btg-chu-doan-dam)}
+.cx .cap{position:absolute;top:8px;left:8px;font-size:11px;font-weight:800;padding:1px 8px;border-radius:999px;background:var(--tr-mat-3);color:var(--tr-chu-2)}
+/* cỡ nhỏ */
+.cn{display:grid;grid-template-columns:1fr 1fr;gap:0;border-radius:20px;overflow:hidden;border:2px solid var(--tr-vien)}
+.cn > div{background:var(--tr-nen);color:var(--tr-chu);padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.cn h3{margin:0;font-size:15px;font-weight:800}
+.hang{display:flex;align-items:flex-end;gap:18px}
+.hang .nhan2{width:150px;font-size:13px;color:var(--tr-chu-2);font-weight:700;align-self:center}
+.hang figure{margin:0;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11.5px;color:var(--tr-chu-3);font-weight:700}
+.vong{border-radius:50%;overflow:hidden;background:var(--tr-hs-nhat);box-shadow:0 0 0 3px var(--tr-hs-nut)}
+.toi .vong{background:color-mix(in oklab,var(--tr-hs-day) 40%,var(--tr-mat))}
+.vong svg{display:block}
+.o-tab{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:10px 10px 0 0;background:var(--tr-mat);border:1px solid var(--tr-vien);font-size:12px;color:var(--tr-chu-2)}
+.o-tab svg{width:16px;height:16px}
+
+/* ── Điện thoại (ngữ cảnh) ── */
+.dt{width:390px;height:844px;position:relative;overflow:hidden;background:var(--tr-nen);font-family:'DDH Rounded',sans-serif;border-radius:0}
+.dt .tren{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:2px solid var(--tr-vien);background:var(--tr-nen)}
+.dt .o{display:flex;align-items:center;gap:5px;font-size:16.5px;font-weight:800}
+.dt .o svg{width:23px;height:23px}
+.dt .o.lua{color:var(--tr-chu-y)} .dt .o.nt{color:var(--tr-nguyen-tu-so)} .dt .o.tt{color:var(--tr-tim-day)}
+.dt .vong-mt{width:44px;height:44px;border-radius:50%;padding:4px;background:conic-gradient(var(--tr-hs) 62%,var(--tr-mat-3) 0)}
+.dt .vong-mt > div{width:36px;height:36px;border-radius:50%;overflow:hidden;background:var(--tr-hs-nhat)}
+.dt .hero{margin:14px 16px 0;padding:16px 18px 20px;border-radius:20px;background:var(--tr-hs-nut);box-shadow:inset 0 -6px 0 var(--tr-hs-day);color:var(--tr-hs-tren);position:relative;overflow:hidden}
+.dt .hero small{display:block;font-size:13px;font-weight:700;opacity:.9;letter-spacing:.04em}
+.dt .hero b{display:block;font-size:26px;font-weight:800;margin:2px 0 12px}
+.dt .thanh{display:flex;align-items:center;gap:10px;font-size:14.5px;font-weight:800}
+.dt .thanh i{flex:1;height:12px;border-radius:99px;background:color-mix(in srgb,var(--tr-hs-tren) 30%,transparent);position:relative;overflow:hidden}
+.dt .thanh i::after{content:'';position:absolute;inset:0 71% 0 0;border-radius:99px;background:var(--tr-hs-tren)}
+.dt .luc{position:absolute;right:-18px;top:-10px;width:120px;height:120px;opacity:.16}
+.dt .bong-loi{position:absolute;left:16px;right:16px;top:214px;padding:12px 16px;border-radius:18px;border:2px solid var(--tr-vien-2);background:var(--tr-mat);font-size:17px;font-weight:800;line-height:1.38;box-shadow:0 3px 0 var(--tr-vien)}
+.dt .bong-loi::after{content:'';position:absolute;right:86px;bottom:-9px;width:14px;height:14px;background:var(--tr-mat);border-right:2px solid var(--tr-vien-2);border-bottom:2px solid var(--tr-vien-2);transform:rotate(45deg)}
+.dt .chu-nen{position:absolute;color:var(--tr-mat-3);font-size:22px;font-weight:700;white-space:nowrap}
+.dt .chang{position:absolute;width:72px;height:64px;border-radius:50%;display:grid;place-items:center}
+.dt .chang.xong{background:var(--tr-hs-nut);box-shadow:inset 0 -6px 0 var(--tr-hs-day)}
+.dt .chang.khoa{background:var(--tr-mat-3);box-shadow:inset 0 -6px 0 var(--tr-vien-2)}
+.dt .chang.dang{width:80px;height:74px;background:var(--tr-hs-nut);box-shadow:inset 0 -7px 0 var(--tr-hs-day)}
+.dt .chang svg{width:30px;height:30px}
+.dt .vong-dang{position:absolute;width:104px;height:104px;border-radius:50%;border:7px dashed var(--tr-mat-3)}
+.dt .bat-dau{position:absolute;padding:8px 16px;border-radius:14px;background:var(--tr-mat);border:2px solid var(--tr-vien);box-shadow:0 3px 0 var(--tr-vien);color:var(--tr-dung-chu);font-weight:800;font-size:16px;letter-spacing:.04em}
+.dt .bat-dau::after{content:'';position:absolute;left:50%;bottom:-8px;margin-left:-7px;width:12px;height:12px;background:var(--tr-mat);border-right:2px solid var(--tr-vien);border-bottom:2px solid var(--tr-vien);transform:rotate(45deg)}
+.dt .mol-o{position:absolute}
+.dt .day{position:absolute;left:0;right:0;bottom:0;height:68px;background:var(--tr-mat);border-top:2px solid var(--tr-vien);display:flex;justify-content:space-around;align-items:center}
+.dt .day span{width:56px;height:44px;border-radius:14px;display:grid;place-items:center;color:var(--tr-chu-3)}
+.dt .day span.dang{background:var(--tr-hs-nhat);color:var(--tr-hs-nut);box-shadow:inset 0 0 0 2px var(--tr-hs)}
+.dt .day svg{width:26px;height:26px}
+body.chi-dt main{display:none}
+body.chi-dt{margin:0}
+body:not(.chi-dt) .dt-goc{display:none}
+</style></head>
+<body>
+<main>
+  <header>
+    <h1>Mol ống nghiệm · bản vẽ chờ thầy duyệt</h1>
+    <p class="phu">01/11 tối · Mol toàn thân hình ống nghiệm, khối bo tròn, màu chuyển mịn, không viền đen · mọi màu lấy từ token thật của app học sinh.</p>
+  </header>
+
+  <section class="khoi" id="so-sanh">
+    <header><h2>Mol cũ · cú Lửa · Mol mới (cùng khung 200 × 230)</h2>
+      <p class="phu">Mol mới đứng toàn thân như cú Lửa nên vừa đúng các chỗ cú đứng trước đây (Lộ trình, bong bóng lời) — khung không đổi.</p></header>
+    <div class="ss">
+      <figure><svg class="mc" viewBox="0 -26 200 230" data-ve="cu"></svg><b>Mol cũ · bình cầu</b><small>Đang chạy (#713). Chỉ có mặt; xanh <code>--tr-gv</code> là màu app thầy, lệch với app học sinh.</small></figure>
+      <figure><!-- cú Lửa: ảnh SVG tĩnh chụp từ src/components/linh-vat/lua-dong.ts (trạng thái yên, token hs sáng) --><svg class="cu" viewBox="-170 -372 340 391" aria-hidden="true" focusable="false"><defs><clipPath id="lua1t"><path d="M-75,-84Q-64,-118 -24,-118L24,-118Q64,-118 75,-84L75,-84Q86,-50 78,-26L78,-26Q70,-2 44,-2L-44,-2Q-70,-2 -78,-26L-78,-26Q-86,-50 -75,-84Z" fill="color(srgb 0.511765 0.55098 1)"></path></clipPath><clipPath id="lua1d"><path d="M-90,-50Q-70,-90 -18,-90L18,-90Q70,-90 90,-50L90,-50Q110,-10 111,10L111.5,20Q112,30 106,36L102.8,39.2Q100,42 102.5,45.1L104,47Q108,52 97.8,61.6L89,70Q70,88 30,88L-30,88Q-70,88 -89,70L-97.8,61.6Q-108,52 -104,47L-102.5,45.1Q-100,42 -102.8,39.2L-106,36Q-112,30 -111.5,20L-111,10Q-110,-10 -90,-50Z" fill="color(srgb 0.511765 0.55098 1)"></path></clipPath><clipPath id="lua1e0"><circle r="27"></circle></clipPath><clipPath id="lua1e2"><circle r="27"></circle></clipPath><clipPath id="lua1m"><path d="M-15,-5Q0,-7 15,-5Q0,17 -15,-5Z"></path></clipPath></defs><g><ellipse cx="0" cy="6" rx="92" ry="12" opacity="1" fill="color(srgb 0.368627 0.392157 0.803922 / 0.18)"></ellipse><g transform="translate(0,0) rotate(1.5) scale(1,1)"><g transform="translate(0,0) rotate(0.8 -60 -40)"><g transform="translate(-100,-62)"><ellipse cx="0" cy="0" rx="50" ry="46" stroke-width="5.5" stroke-linejoin="round" style="paint-order: stroke;" fill="color(srgb 0.511765 0.55098 1)" stroke="oklab(0.458523 0.0143123 -0.110746)"></ellipse><path d="M44,-14C54,18 30,46 -2,46C-28,46 -46,30 -50,8C-38,30 -8,40 14,30C34,22 44,4 44,-14Z" fill="color(srgb 0.420392 0.448235 0.911765)"></path><path d="M-4,-34C-30,-30 -40,-4 -30,16C-26,24 -18,28 -12,30C-24,14 -24,-12 -4,-34Z" fill="rgb(0, 190, 216)"></path><path d="M-10,-26C-22,-18 -26,-6 -24,4C-20,-8 -16,-16 -10,-26Z" fill="color(srgb 0.55 0.885294 0.931176)"></path><ellipse cx="8" cy="4" rx="13" ry="12" fill="color(srgb 0.420392 0.448235 0.911765)"></ellipse></g></g><ellipse cx="0" cy="-4" rx="27" ry="14" stroke-width="5.5" stroke-linejoin="round" transform="translate(-40,0)" style="paint-order: stroke;" fill="color(srgb 0.683765 0.717647 1)" stroke="oklab(0.458523 0.0143123 -0.110746)"></ellipse><ellipse cx="0" cy="-4" rx="27" ry="14" stroke-width="5.5" stroke-linejoin="round" transform="translate(40,0)" style="paint-order: stroke;" fill="color(srgb 0.683765 0.717647 1)" stroke="oklab(0.458523 0.0143123 -0.110746)"></ellipse><g><g><path d="M-87.9,-103.6L-92.9,-87.3Q-96,-79.5 -97.5,-71.2L-99.1,-56.3L-74.5,-51.9L-70.9,-66.5Q-69.9,-72 -67.9,-77.2L-60.1,-92.4Q-54.5,-106.3 -68.4,-111.9Q-82.3,-117.5 -87.9,-103.6Z" stroke-width="4.5" stroke-linejoin="round" style="paint-order: stroke;" fill="rgb(255, 255, 255)" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><g transform="translate(-86.8,-54.1) scale(-1,1) rotate(-10)"><g><path d="M-15,-4C-20,8 -18,24 -6,30Q0,34 6,30C18,24 20,8 15,-4Z" stroke-width="5.5" stroke-linejoin="round" style="paint-order: stroke;" fill="color(srgb 0.511765 0.55098 1)" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><path d="M-4,22L-2,28M4,22L4,29" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="oklab(0.458523 0.0143123 -0.110746)"></path></g></g></g><g><path d="M60.1,-92.4L67.9,-77.2Q69.9,-72 70.9,-66.5L74.5,-51.9L99.1,-56.3L97.5,-71.2Q96,-79.5 92.9,-87.3L87.9,-103.6Q82.3,-117.5 68.4,-111.9Q54.5,-106.3 60.1,-92.4Z" stroke-width="4.5" stroke-linejoin="round" style="paint-order: stroke;" fill="rgb(255, 255, 255)" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><g transform="translate(86.8,-54.1) scale(1,1) rotate(-10)"><g><path d="M-15,-4C-20,8 -18,24 -6,30Q0,34 6,30C18,24 20,8 15,-4Z" stroke-width="5.5" stroke-linejoin="round" style="paint-order: stroke;" fill="color(srgb 0.511765 0.55098 1)" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><path d="M-4,22L-2,28M4,22L4,29" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="oklab(0.458523 0.0143123 -0.110746)"></path></g></g></g></g><g transform="translate(0,0) scale(1,1)"><path d="M-75,-84Q-64,-118 -24,-118L24,-118Q64,-118 75,-84L75,-84Q86,-50 78,-26L78,-26Q70,-2 44,-2L-44,-2Q-70,-2 -78,-26L-78,-26Q-86,-50 -75,-84Z" fill="color(srgb 0.511765 0.55098 1)"></path><g clip-path="url(#lua1t)"><path d="M-120,-112L-30,-112L0,-64L30,-112L120,-112V20H-120Z" fill="rgb(255, 255, 255)"></path><path d="M40,-112L120,-112V20H52Q66,-40 40,-112Z" fill="color(srgb 0.93851 0.945098 1)"></path></g><g transform="translate(0,0)"><path d="M-46,-112L0,-58L46,-112M0,-58V-4" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><path d="M-46,-113L-30,-113L0,-64L-6,-56ZM46,-113L30,-113L0,-64L6,-56Z" stroke-width="3.6" stroke-linejoin="round" style="paint-order: stroke;" fill="rgb(255, 255, 255)" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><g transform="translate(-40,-46)"><g transform="rotate(-6)"><rect x="-8" y="-34" width="16" height="42" rx="8" stroke-width="3.2" stroke-linejoin="round" style="paint-order: stroke;" fill="color(srgb 0.92 0.979608 0.987765)" stroke="oklab(0.458523 0.0143123 -0.110746)"></rect><path d="M-6.4,-14H6.4V0A6.4,6.4 0 0 1 -6.4,0Z" fill="rgb(243, 115, 206)"></path><rect x="-3.6" y="-28" width="3" height="11" rx="1.5" fill="rgb(255, 255, 255)"></rect></g><rect x="-20" y="-4" width="40" height="26" rx="6" stroke-width="4" stroke-linejoin="round" style="paint-order: normal;" fill="rgb(255, 255, 255)" stroke="oklab(0.458523 0.0143123 -0.110746)"></rect></g><g transform="translate(40,-58)"><path d="M0,-21L18.2,-10.5V10.5L0,21L-18.2,10.5V-10.5Z" stroke-width="3.4" stroke-linejoin="round" style="paint-order: stroke;" fill="oklab(0.496106 0.0167639 -0.129731)" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><path d="M0,-12C6,-6 9,-1 8,5C7,10 3,13 0,13C-4,13 -8,10 -8,5C-8,1 -6,-2 -3,-5C-3,-1 -1,1 1,1C2,-3 1,-7 0,-12Z" fill="rgb(255, 255, 255)"></path></g></g><path d="M-75,-84Q-64,-118 -24,-118L24,-118Q64,-118 75,-84L75,-84Q86,-50 78,-26L78,-26Q70,-2 44,-2L-44,-2Q-70,-2 -78,-26L-78,-26Q-86,-50 -75,-84Z" fill="none" stroke-width="5.5" stroke-linejoin="round" style="paint-order: stroke;" stroke="oklab(0.458523 0.0143123 -0.110746)"></path></g><g transform="translate(0,-196) rotate(-1)"><g><g transform="translate(-62,-92) rotate(-20) scale(-1.1,1.12)"><path d="M-30.5,24.6Q-34,34 -24.3,31.6L20.3,20.4Q30,18 25.3,9.2L-0.2,-38.9Q-4,-46 -6.8,-38.5Z" stroke-width="5.5" stroke-linejoin="round" style="paint-order: stroke;" fill="color(srgb 0.511765 0.55098 1)" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><path d="M-18.1,16.3Q-20,22 -14.2,20.4L10.2,13.6Q16,12 13.2,6.7L-1.7,-21.6Q-4,-26 -5.6,-21.3Z" fill="color(srgb 1 0.977412 0.928706)"></path></g><g transform="translate(62,-92) rotate(20) scale(1.1,1.12)"><path d="M-30.5,24.6Q-34,34 -24.3,31.6L20.3,20.4Q30,18 25.3,9.2L-0.2,-38.9Q-4,-46 -6.8,-38.5Z" stroke-width="5.5" stroke-linejoin="round" style="paint-order: stroke;" fill="color(srgb 0.511765 0.55098 1)" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><path d="M-18.1,16.3Q-20,22 -14.2,20.4L10.2,13.6Q16,12 13.2,6.7L-1.7,-21.6Q-4,-26 -5.6,-21.3Z" fill="color(srgb 1 0.977412 0.928706)"></path></g></g><g transform="translate(0,-88) rotate(0) scale(1,1)"><path d="M0,0C-18,-2 -26,-18 -18,-34C-14,-24 -8,-22 -6,-26C-10,-38 -4,-52 8,-58C4,-44 12,-40 16,-34C22,-26 24,-10 14,-2C10,0 4,1 0,0Z" stroke-width="4.5" stroke-linejoin="round" style="paint-order: stroke;" fill="rgb(243, 115, 206)" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><path d="M2,-6C-6,-8 -10,-16 -6,-24C-2,-18 4,-20 4,-26C10,-20 12,-12 8,-7C6,-6 4,-6 2,-6Z" fill="color(srgb 0.978824 0.752941 0.913529)"></path></g><path d="M-90,-50Q-70,-90 -18,-90L18,-90Q70,-90 90,-50L90,-50Q110,-10 111,10L111.5,20Q112,30 106,36L102.8,39.2Q100,42 102.5,45.1L104,47Q108,52 97.8,61.6L89,70Q70,88 30,88L-30,88Q-70,88 -89,70L-97.8,61.6Q-108,52 -104,47L-102.5,45.1Q-100,42 -102.8,39.2L-106,36Q-112,30 -111.5,20L-111,10Q-110,-10 -90,-50Z" fill="color(srgb 0.511765 0.55098 1)"></path><g clip-path="url(#lua1d)"><path d="M60,-120Q120,-40 96,100H140V-120Z" fill="color(srgb 0.420392 0.448235 0.911765)"></path><ellipse cx="-50" cy="-66" rx="34" ry="14" transform="rotate(-20 -50 -66)" opacity="0.8" fill="color(srgb 0.683765 0.717647 1)"></ellipse></g><g transform="translate(0,0)"><g transform="scale(1,1)"><path d="M-104,26C-106,-20 -78,-30 -50,-28C-28,-26 -12,-18 0,-2C12,-18 28,-26 50,-28C78,-30 106,-20 104,26C102,64 64,86 0,86C-64,86 -102,64 -104,26ZM-53,-40a9,6 0 1,0 18,0a9,6 0 1,0 -18,0M35,-40a9,6 0 1,0 18,0a9,6 0 1,0 -18,0" fill="color(srgb 1 0.977412 0.928706)"></path></g><path d="M-89,40a17,10.5 0 1,0 34,0a17,10.5 0 1,0 -34,0M55,40a17,10.5 0 1,0 34,0a17,10.5 0 1,0 -34,0" opacity="0.9" fill="color(srgb 0.987059 0.776471 0.845882)"></path><g transform="translate(-46,8) scale(1,1)"><g><circle r="27" fill="oklab(0.345775 0.00695726 -0.0537883)"></circle><g clip-path="url(#lua1e0)"><g transform="translate(0,0)"><path d="M-1.5,-9a9.5,9.5 0 1,0 19,0a9.5,9.5 0 1,0 -19,0M-14,9a4,4 0 1,0 8,0a4,4 0 1,0 -8,0" fill="rgb(255, 255, 255)"></path></g><rect x="-32" y="-107" width="64" height="80" rx="0" transform="rotate(0 0 -27)" fill="color(srgb 1 0.977412 0.928706)"></rect></g></g><path d="M-18,0Q0,14 18,0" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display: none;" stroke="oklab(0.345775 0.00695726 -0.0537883)"></path><path d="M-18,6Q0,-16 18,6" stroke-width="5.5" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display: none;" stroke="oklab(0.345775 0.00695726 -0.0537883)"></path></g><path d="M-14,0H14" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round" transform="translate(-46,-22) rotate(0)" style="display: none;" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><g transform="translate(46,8) scale(1,1)"><g><circle r="27" fill="oklab(0.345775 0.00695726 -0.0537883)"></circle><g clip-path="url(#lua1e2)"><g transform="translate(0,0)"><path d="M-1.5,-9a9.5,9.5 0 1,0 19,0a9.5,9.5 0 1,0 -19,0M-14,9a4,4 0 1,0 8,0a4,4 0 1,0 -8,0" fill="rgb(255, 255, 255)"></path></g><rect x="-32" y="-107" width="64" height="80" rx="0" transform="rotate(0 0 -27)" fill="color(srgb 1 0.977412 0.928706)"></rect></g></g><path d="M-18,0Q0,14 18,0" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display: none;" stroke="oklab(0.345775 0.00695726 -0.0537883)"></path><path d="M-18,6Q0,-16 18,6" stroke-width="5.5" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display: none;" stroke="oklab(0.345775 0.00695726 -0.0537883)"></path></g><path d="M-14,0H14" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round" transform="translate(46,-22) rotate(0)" style="display: none;" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><path d="M-11,19Q0,14 11,19Q8,29 0,31Q-8,29 -11,19Z" fill="oklab(0.345775 0.00695726 -0.0537883)"></path><g transform="translate(0,44)"><path d="M-15,-5Q0,-7 15,-5Q0,17 -15,-5Z" stroke-width="3.6" stroke-linejoin="round" style="paint-order: stroke;" fill="color(srgb 0.856627 0.238902 0.44251)" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><g clip-path="url(#lua1m)"><ellipse cx="0" cy="9" rx="9" ry="6" fill="color(srgb 0.976274 0.590196 0.717451)"></ellipse></g></g></g><path d="M-90,-50Q-70,-90 -18,-90L18,-90Q70,-90 90,-50L90,-50Q110,-10 111,10L111.5,20Q112,30 106,36L102.8,39.2Q100,42 102.5,45.1L104,47Q108,52 97.8,61.6L89,70Q70,88 30,88L-30,88Q-70,88 -89,70L-97.8,61.6Q-108,52 -104,47L-102.5,45.1Q-100,42 -102.8,39.2L-106,36Q-112,30 -111.5,20L-111,10Q-110,-10 -90,-50Z" fill="none" stroke-width="5.5" stroke-linejoin="round" style="paint-order: stroke;" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><g clip-path="url(#lua1d)"><g transform="translate(0,0)"><path d="M-130,-34Q0,-118 130,-34V-14Q0,-98 -130,-14Z" stroke-width="4" stroke-linejoin="round" style="paint-order: stroke;" fill="rgb(0, 190, 216)" stroke="oklab(0.458523 0.0143123 -0.110746)"></path></g></g><g transform="translate(0,0)"><g transform="translate(-44,-62) rotate(-13) scale(0.9,0.9)"><rect x="-31" y="-20" width="62" height="40" rx="16" stroke-width="4.5" stroke-linejoin="round" style="paint-order: stroke;" fill="rgb(0, 190, 216)" stroke="oklab(0.458523 0.0143123 -0.110746)"></rect><rect x="-23" y="-13" width="46" height="26" rx="11" fill="color(srgb 0.55 0.885294 0.931176)"></rect><path d="M-16,-9H-4L-12,7H-20ZM7,-7a3,3 0 1,0 6,0a3,3 0 1,0 -6,0" opacity="0.85" fill="rgb(255, 255, 255)"></path></g><g transform="translate(44,-62) rotate(13) scale(0.9,0.9)"><rect x="-31" y="-20" width="62" height="40" rx="16" stroke-width="4.5" stroke-linejoin="round" style="paint-order: stroke;" fill="rgb(0, 190, 216)" stroke="oklab(0.458523 0.0143123 -0.110746)"></rect><rect x="-23" y="-13" width="46" height="26" rx="11" fill="color(srgb 0.55 0.885294 0.931176)"></rect><path d="M-16,-9H-4L-12,7H-20ZM7,-7a3,3 0 1,0 6,0a3,3 0 1,0 -6,0" opacity="0.85" fill="rgb(255, 255, 255)"></path></g><path d="M0,-80L10,-74V-62L0,-56L-10,-62V-74Z" stroke-width="3" stroke-linejoin="round" style="paint-order: stroke;" fill="oklab(0.496106 0.0167639 -0.129731)" stroke="oklab(0.458523 0.0143123 -0.110746)"></path></g></g><g></g></g></g><g></g></svg><b>Cú Lửa · linh vật trước</b><small>Toàn thân, đầu rộng, mắt to; lông chàm <code>--tr-hs</code>. Lấy tỉ lệ «mập, mắt to» từ đây.</small></figure>
+      <figure class="moi"><svg class="mv pa-A" viewBox="0 -26 200 230" data-mat="chao"></svg><b>Mol mới · ống nghiệm (A)</b><small>Toàn thân, thân chàm <code>--tr-hs</code>, dung dịch ngọc lam <code>--tr-tin</code>, mũi cam <code>--tr-chu-y</code>.</small></figure>
+    </div>
+  </section>
+
+  <section class="khoi" id="phuong-an">
+    <header><h2>Ba phương án màu · đặt cạnh nút, chặng và bong bóng lời của app</h2>
+      <p class="phu">Mỗi phương án là tổ hợp token có sẵn. Giận: dung dịch hoá đỏ <code>--tr-sai</code>, dâng và sôi — như Mol cũ.</p></header>
+    <div class="pa3" id="pa3"></div>
+  </section>
+
+  <section class="khoi" id="cam-xuc">
+    <header><h2>Bộ cảm xúc toàn thân · phương án A</h2>
+      <p class="phu">11 cảm xúc đang có (giữ đủ, cùng chỗ dùng) + 3 cảm xúc mới để thầy chọn thêm. Dáng người nói cảm xúc: tay, chân, nghiêng, nhảy.</p></header>
+    <div class="cx" id="cx"></div>
+  </section>
+
+  <section class="khoi" id="co-nho">
+    <header><h2>Cỡ nhỏ 28 / 40 / 64 px · nền sáng và tối (phương án A)</h2>
+      <p class="phu">Đề xuất: từ 48 px trở lên vẽ toàn thân; dưới 48 px (vòng Mục tiêu, biểu tượng tab) chỉ hiện nửa trên — miệng ống + mặt.</p></header>
+    <div class="cn" id="cn"></div>
+  </section>
+</main>
+<div class="dt-goc"><div class="dt" id="dt"></div></div>
+
+<script>
+// ═══════════ MOL v2 · ỐNG NGHIỆM — bộ vẽ (thuần chuỗi SVG; khi build chép sang src/components/linh-vat/mol-dong.ts) ═══════════
+// Khung 200 × 230, viewBox '0 -26 200 230' (y −26…204) như Mol cũ ⇒ <Bi …> và mọi khung chứa giữ nguyên.
+// Hình: ống nghiệm dựng đứng (vành ở đỉnh, đáy tròn), mảng mặt trắng hai thuỳ, hai mắt to, mũi tròn, dung dịch nửa dưới có bọt, hai tay nét tròn, hai chân bo, bóng elip.
+let so = 0
+const f = (n) => Math.round(n * 10) / 10
+const L = 76, R = 124, Y = 72                // tâm hai mắt
+const TU = 'M46 12 H154 V128 A54 54 0 0 1 46 128 Z'  // thân ống: rộng 108, đáy tròn bán kính 54 ⇒ y 12…182
+const NA = 'M52 76 C52 58 62 48 76 48 C87 48 94 52 100 58 C106 52 113 48 124 48 C138 48 148 58 148 76 V98 C148 116 127 128 100 128 C73 128 52 116 52 98 Z'
+const SONG = (S) => { let d = `M10 ${S}`; for (let x = 10; x < 200; x += 30) d += ` Q${x + 15} ${S - 5} ${x + 30} ${S}`; return d }
+
+function mat(x, o = {}) { // mắt mở: bầu dục mực + hai đốm sáng (dx/dy = hướng nhìn)
+  const { dx = 0, dy = 0, rx = 16, ry = 19, hs = 1 } = o
+  return `<ellipse cx="${f(x + dx * 0.35)}" cy="${f(Y + dy * 0.35)}" rx="${rx}" ry="${ry}" class="m-muc"/>` +
+    `<circle cx="${f(x + 5 + dx)}" cy="${f(Y - 6 + dy)}" r="${f(6.2 * hs)}" class="m-trang"/>` +
+    `<circle cx="${f(x - 5 + dx * 0.6)}" cy="${f(Y + 7 + dy * 0.6)}" r="${f(2.8 * hs)}" class="m-trang"/>`
+}
+const cung = (x, w = 6.5) => `<path d="M${x - 14} ${Y + 5} Q${x} ${Y - 15} ${x + 14} ${Y + 5}" class="m-net" stroke-width="${w}"/>`
+/** Mí + mày: ng > 0 ⇒ ngoài cao trong thấp (giận), ng < 0 ⇒ trong cao ngoài thấp (buồn); phu = mí sụp thêm. */
+function mi(x, ben, ng, phu, u, day = 5.5) {
+  const yN = Y - 12 - ng * 7 + phu, yT = Y - 12 + ng * 7 + phu
+  const [y1, y2] = ben < 0 ? [yN, yT] : [yT, yN]
+  const o = (t) => f(y1 + (y2 - y1) * t)
+  return `<clipPath id="${u}"><ellipse cx="${x}" cy="${Y}" rx="17" ry="20"/></clipPath>` +
+    `<path clip-path="url(#${u})" d="M${x - 24} ${Y - 36} H${x + 24} V${f(y2)} L${x - 24} ${f(y1)} Z" class="m-na"/>` +
+    `<path d="M${x - 19} ${o(5 / 48)} L${x + 19} ${o(43 / 48)}" class="m-net" stroke-width="${day}"/>`
+}
+const tim = (x, y, s = 1, lop = 'm-tim') => `<path transform="translate(${x} ${y}) scale(${s})" d="M0 9 C-15 -1 -11 -14 0 -6 C11 -14 15 -1 0 9Z" class="${lop}"/>`
+const sao = (x, y, s) => `<path transform="translate(${x} ${y}) scale(${s})" d="M0 -11 L3 -3 L11 0 L3 3 L0 11 L-3 3 L-11 0 L-3 -3Z" class="m-sao"/>`
+const not = (x, y, s) => `<g transform="translate(${x} ${y}) scale(${s}) rotate(-8)"><ellipse cx="0" cy="0" rx="6.5" ry="5" transform="rotate(-22)" class="m-not"/><path d="M5.6 -1.5 V-24 Q13 -21 15 -13" class="m-not-n"/></g>`
+
+function matVe(m, u) {
+  const hai = (g) => g(L, -1, u + 'ma') + g(R, 1, u + 'mb')
+  switch (m) {
+    case 'khen': case 'nhay': return cung(L) + cung(R)
+    case 'nguong': return cung(L, 6) + cung(R, 6)
+    case 'chao': return mat(L, { dx: 2 }) + cung(R)
+    case 'ngu': return [L, R].map((x) => `<path d="M${x - 14} ${Y + 2} Q${x} ${Y + 13} ${x + 14} ${Y + 2}" class="m-net" stroke-width="6"/>`).join('')
+    case 'ngac': return mat(L, { rx: 18, ry: 22, hs: 0.72 }) + mat(R, { rx: 18, ry: 22, hs: 0.72 }) +
+      [L, R].map((x) => `<path d="M${x - 13} ${Y - 31} Q${x} ${Y - 40} ${x + 13} ${Y - 31}" class="m-net" stroke-width="5"/>`).join('')
+    case 'nghi': return mat(L, { dx: 4, dy: -6 }) + mat(R, { dx: 4, dy: -6 }) + `<path d="M${R - 13} ${Y - 30} Q${R} ${Y - 39} ${R + 13} ${Y - 31}" class="m-net" stroke-width="5"/>`
+    case 'buon': return hai((x, b, id) => mat(x, { dy: 3, hs: 0.8 }) + `<ellipse cx="${x}" cy="${Y + 12}" rx="11" ry="5" class="m-nuoc-mat"/>` + mi(x, b, -1, 0, id))
+    case 'doi': return hai((x, b, id) => mat(x, { dx: -7, dy: 4 }) + mi(x, b, 0, 13, id))
+    case 'buc': return hai((x, b, id) => mat(x, { dy: 3 }) + mi(x, b, 0.9, 2, id))
+    case 'cau': return hai((x, b, id) => mat(x, { dy: 4, hs: 0.8 }) + mi(x, b, 1.6, 2, id, 6))
+    case 'ratCau': return hai((x, b, id) => mat(x, { dy: 5, hs: 0.6 }) + mi(x, b, 2.2, 3, id, 6.5))
+    case 'me': return [L, R].map((x) => tim(x, Y, 1.55) + `<circle cx="${x - 6}" cy="${Y - 6}" r="3.4" class="m-trang"/>`).join('')
+    default: return mat(L) + mat(R)
+  }
+}
+function miengVe(m) {
+  const to = '<path d="M82 103 Q100 136 118 103 Z" class="m-mieng"/><path d="M89 118 Q100 110 111 118 Q100 129 89 118Z" class="m-luoi"/>'
+  switch (m) {
+    case 'khen': case 'chao': case 'nhay': case 'me': return to
+    case 'ngac': return '<ellipse cx="100" cy="114" rx="7.5" ry="9.5" class="m-mieng"/>'
+    case 'nghi': return '<path d="M90 114 Q98 109 112 112" class="m-net" stroke-width="4.5"/>'
+    case 'buon': return '<path d="M88 118 Q100 106 112 118" class="m-net" stroke-width="5"/>'
+    case 'ngu': return '<ellipse cx="100" cy="112" rx="4.5" ry="3.5" class="m-mieng"/>'
+    case 'doi': return '<path d="M92 115 Q100 109 110 116" class="m-net" stroke-width="4.5"/>'
+    case 'buc': return '<path d="M88 114 H112" class="m-net" stroke-width="5"/>'
+    case 'cau': return '<rect x="84" y="104" width="32" height="15" rx="5.5" class="m-mieng"/><path d="M87 111.5 H113 M92 106 V117 M100 106 V117 M108 106 V117" class="m-net-t" stroke-width="2.2"/>'
+    case 'ratCau': return '<path d="M80 123 Q100 94 120 123 Z" class="m-mieng"/><path d="M85 119 L91 112 L97 118 L103 111 L109 118 L115 112" class="m-net-t" stroke-width="2.4"/>'
+    case 'nguong': return '<path d="M89 109 Q100 120 111 109" class="m-net" stroke-width="4.5"/>'
+    default: return '<path d="M85 104 Q100 128 115 104 Z" class="m-mieng"/><path d="M91 114 Q100 108 109 114 Q100 122 91 114Z" class="m-luoi"/>'
+  }
+}
+/** Tay: nét tròn dày (vai ở mép ống) + bàn tay tròn ở cuối. [trái hình, phải hình]. */
+const TAY = {
+  ha: ['M46 112 Q32 124 32 142', 'M154 112 Q168 124 168 142'],
+  gio: ['M46 106 Q24 90 24 60', 'M154 106 Q176 90 176 60'],
+  vay: ['M46 112 Q32 124 32 142', 'M154 108 Q178 96 178 64'],
+  cam: ['M46 112 Q32 124 32 142', 'M154 114 Q152 140 124 128'],
+  gioThap: ['M46 108 Q24 106 20 84', 'M154 108 Q176 106 180 84'],
+  ru: ['M48 114 Q42 132 44 150', 'M152 114 Q158 132 156 150'],
+  khoanh: ['M46 116 Q64 148 122 138', 'M154 116 Q136 148 78 138'],
+  nam: ['M46 112 Q30 122 28 140', 'M154 112 Q170 122 172 140'],
+  rung: ['M46 108 Q24 108 22 86', 'M154 108 Q176 108 178 86'],
+  maMa: ['M46 114 Q36 104 56 103', 'M154 114 Q164 104 144 103'],
+  chap: ['M46 114 Q58 136 94 128', 'M154 114 Q142 136 106 128'],
+  nhay: ['M46 106 Q26 90 30 62', 'M154 114 Q172 126 178 142'],
+}
+const tayVe = (k) => TAY[k].map((d) => { const p = d.split(' ').slice(-2); return `<path d="${d}" class="m-tay-n"/><circle cx="${p[0]}" cy="${p[1]}" r="9" class="m-tay"/>` }).join('')
+/** Dáng toàn thân theo cảm xúc: tay, nhảy (dịch lên), nghiêng (độ, quanh chân), chân co. */
+const DANG = {
+  vui: { tay: 'ha' }, khen: { tay: 'gio', nhay: -14 }, chao: { tay: 'vay' }, nghi: { tay: 'cam', xoay: 3 }, ngac: { tay: 'gioThap', nhay: -5 },
+  buon: { tay: 'ru', xoay: -2 }, ngu: { tay: 'ru', xoay: -5 }, doi: { tay: 'ha', xoay: 4 }, buc: { tay: 'khoanh' }, cau: { tay: 'nam' }, ratCau: { tay: 'rung' },
+  nguong: { tay: 'maMa', xoay: -3 }, me: { tay: 'chap' }, nhay: { tay: 'nhay', xoay: -7, chan: 1, nhay: -6 },
+}
+/** GIẬN = DUNG DỊCH SÔI (giữ luật Mol cũ): cáu ⇒ đỏ cam, dâng 16; rất cáu ⇒ đỏ, dâng 34 tới mũi; bọt trồi lên mặt (sôi). */
+const SOI = {
+  cau: { dy: -16, lop: 'soi', them: (S) => `<circle cx="80" cy="${S - 1}" r="4" class="m-bot"/><circle cx="118" cy="${S - 2}" r="5" class="m-bot"/>` },
+  ratCau: { dy: -34, lop: 'do', them: (S) => `<circle cx="72" cy="${S - 2}" r="5" class="m-bot"/><circle cx="104" cy="${S - 3}" r="6" class="m-bot"/><circle cx="134" cy="${S - 1}" r="4" class="m-bot"/><circle cx="90" cy="${S + 14}" r="4.4" class="m-bot"/>` },
+}
+const HOI = (n) => [[96, -6, 8], [111, -13, 10], [84, -16, 6.5], [124, -4, 6.5], [100, -21, 5]].slice(0, n).map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" class="m-hoi"/>`).join('')
+function themVe(m) {
+  switch (m) {
+    case 'khen': return sao(26, 34, 1) + sao(176, 30, 0.8) + sao(160, 2, 0.55) + sao(40, 4, 0.5)
+    case 'chao': return '<path d="M188 52 Q194 60 190 70 M194 44 Q204 58 197 74" class="m-net-nhe"/>'
+    case 'nghi': return '<text x="160" y="38" class="m-mui mol-chu" font-size="32">?</text>'
+    case 'ngac': return '<path d="M56 -14 L60 -3 M100 -22 V-9 M144 -14 L140 -3" class="m-net-mui"/>'
+    case 'buon': return `<path d="M${L - 15} ${Y + 18} q-6 11 0 15 q6 -4 0 -15z" class="m-nuoc-mat"/><path d="M${R + 15} ${Y + 18} q-6 11 0 15 q6 -4 0 -15z" class="m-nuoc-mat"/>`
+    case 'ngu': return '<text x="164" y="-2" class="m-z mol-chu" font-size="24">z</text><text x="181" y="-18" class="m-z mol-chu" font-size="16" opacity=".7">z</text>'
+    case 'doi': return '<circle cx="128" cy="116" r="4" class="m-hoi"/><circle cx="136" cy="110" r="2.6" class="m-hoi"/>'
+    case 'cau': return HOI(2) + '<g transform="translate(170 40)"><path d="M-9 -3 Q-3 -3 -3 -9 M3 -9 Q3 -3 9 -3 M9 3 Q3 3 3 9 M-3 9 Q-3 3 -9 3" class="m-net-do" stroke-width="3.6"/></g>'
+    case 'ratCau': return HOI(5) + '<g transform="translate(172 36)"><path d="M-9 -3 Q-3 -3 -3 -9 M3 -9 Q3 -3 9 -3 M9 3 Q3 3 3 9 M-3 9 Q-3 3 -9 3" class="m-net-do" stroke-width="3.8"/></g>' +
+      '<path d="M14 120 Q8 132 14 144 M6 114 Q-2 132 6 150 M186 120 Q192 132 186 144 M194 114 Q202 132 194 150" class="m-net-do" stroke-width="3" opacity=".7"/>'
+    case 'nguong': return sao(26, 54, 0.75) + sao(176, 44, 0.9) + sao(162, 14, 0.5) + '<path d="M52 98 l-4 6 M58 98 l-4 6 M146 98 l-4 6 M152 98 l-4 6" class="m-net-ma"/>'
+    case 'me': return tim(24, 46, 0.9) + tim(178, 30, 1.1) + tim(162, 0, 0.65) + tim(36, 8, 0.55)
+    case 'nhay': return not(18, 60, 1) + not(180, 26, 0.85) + sao(170, 70, 0.5)
+    default: return ''
+  }
+}
+function svgMol(m) {
+  const u = 'mv' + ++so, d = DANG[m] || DANG.vui, soi = SOI[m] || { dy: 0, lop: 'nuoc', them: () => '' }
+  const S = 140 + soi.dy, nh = d.nhay || 0, xo = d.xoay || 0
+  const ma = m === 'nguong' ? '<ellipse cx="59" cy="105" rx="12" ry="7" class="m-ma"/><ellipse cx="141" cy="105" rx="12" ry="7" class="m-ma"/>'
+    : '<ellipse cx="60" cy="106" rx="9" ry="5.5" class="m-ma"/><ellipse cx="140" cy="106" rx="9" ry="5.5" class="m-ma"/>'
+  const chan = d.chan ? '<ellipse cx="80" cy="183" rx="15" ry="9" class="m-chan"/><ellipse cx="130" cy="170" rx="15" ry="9" class="m-chan" transform="rotate(-30 130 170)"/>'
+    : '<ellipse cx="80" cy="183" rx="15" ry="9" class="m-chan"/><ellipse cx="120" cy="183" rx="15" ry="9" class="m-chan"/>'
+  return `<defs>
+    <linearGradient id="${u}t" x1="0" x2="1" y1="0" y2="0"><stop offset="0" class="s-than-sang"/><stop offset=".42" class="s-than"/><stop offset="1" class="s-than-toi"/></linearGradient>
+    <linearGradient id="${u}v" x1="0" x2="1" y1="0" y2="0"><stop offset="0" class="s-vanh"/><stop offset=".5" class="s-than-sang"/><stop offset="1" class="s-than"/></linearGradient>
+    <linearGradient id="${u}n" x1="0" x2="0" y1="0" y2="1"><stop offset=".35" class="s-na"/><stop offset="1" class="s-na-toi"/></linearGradient>
+    <linearGradient id="${u}l" x1="0" x2="0" y1="0" y2="1"><stop offset="0" class="s-${soi.lop}-sang"/><stop offset=".3" class="s-${soi.lop}"/><stop offset="1" class="s-${soi.lop}-toi"/></linearGradient>
+    <linearGradient id="${u}b" x1="0" x2="1" y1="0" y2="0"><stop offset=".5" class="s-tru0"/><stop offset="1" class="s-tru1"/></linearGradient>
+    <clipPath id="${u}c"><path d="${TU}"/></clipPath></defs>
+  <ellipse cx="100" cy="195" rx="${nh < -8 ? 36 : 48}" ry="${nh < -8 ? 4.5 : 6}" class="m-bong"/>
+  <g class="mol-than" transform="translate(0 ${nh}) rotate(${xo} 100 190)">
+    ${chan}
+    <path d="${TU}" fill="url(#${u}t)"/>
+    <g clip-path="url(#${u}c)">
+      <rect x="46" y="12" width="108" height="14" class="m-bong-vanh"/>
+      <path d="${NA}" fill="url(#${u}n)"/>${ma}
+      <path d="${SONG(S)} V200 H10 Z" fill="url(#${u}l)"/>
+      <path d="${SONG(S)}" class="m-sang-n" stroke-width="2.6"/>
+      <circle cx="70" cy="${S + 24}" r="5" class="m-bot"/><circle cx="126" cy="${S + 30}" r="3.6" class="m-bot"/><circle cx="102" cy="${S + 15}" r="2.6" class="m-bot"/>${soi.them(S)}
+      <rect x="46" y="12" width="108" height="172" fill="url(#${u}b)"/>
+      <rect x="52" y="26" width="7" height="30" rx="3.5" class="m-sang"/>
+      <path d="M53 ${Math.max(S + 8, 130)} Q55 170 72 178" class="m-sang-n" stroke-width="4"/>
+    </g>
+    <rect x="38" y="2" width="124" height="15" rx="7.5" fill="url(#${u}v)"/>
+    <ellipse cx="100" cy="5.5" rx="52" ry="3" class="m-mieng-ong"/>
+    <path d="M48 12 H108" class="m-sang-n" stroke-width="2.6"/>
+    <circle cx="100" cy="95" r="6.8" class="m-mui"/><circle cx="97.6" cy="92.6" r="2.1" class="m-trang" opacity=".75"/>
+    ${matVe(m, u)}${miengVe(m)}
+    ${tayVe(d.tay)}
+    ${themVe(m)}
+  </g>`
+}
+
+// ── Mol cũ (chép mol-dong.ts, mặt «vui») — chỉ để so sánh ──
+function svgMolCu() {
+  const Lc = 77, Rc = 123, Yc = 92
+  const mt = [Lc, Rc].map((x) => `<ellipse cx="${x}" cy="${Yc}" rx="22" ry="28" class="m-t m-vien-n"/><circle cx="${x + 5}" cy="${Yc + 3}" r="11" class="m-muc"/><circle cx="${x + 8.5}" cy="${Yc - 1.6}" r="4" class="m-t"/>`).join('')
+  return `<defs><clipPath id="mccl"><circle cx="100" cy="120" r="76"/></clipPath></defs>
+    <rect x="80" y="12" width="40" height="44" rx="6" class="m-xd"/><rect x="73" y="8" width="54" height="13" rx="6.5" class="m-vien"/>
+    <circle cx="100" cy="120" r="76" class="m-x"/>
+    <g clip-path="url(#mccl)"><path d="M20 176 Q50 166 80 174 T140 172 T190 168 V210 H10Z" class="m-cam"/>
+      <circle cx="70" cy="190" r="5" class="m-bot"/><circle cx="128" cy="192" r="3.5" class="m-bot"/><circle cx="104" cy="188" r="2.6" class="m-bot"/></g>
+    <ellipse cx="66" cy="78" rx="22" ry="11" class="m-sang" transform="rotate(-32 66 78)"/>${mt}
+    <path d="M70 142 Q100 180 130 142 Z" class="m-vien"/><path d="M85 160 Q100 152 115 160 Q100 174 85 160Z" class="m-luoi"/>
+    <circle cx="100" cy="124" r="8.5" class="m-cam"/><circle cx="97.5" cy="121.5" r="2.6" class="m-camS"/>
+    <ellipse cx="56" cy="142" rx="9" ry="5" class="m-ma"/><ellipse cx="144" cy="142" rx="9" ry="5" class="m-ma"/>`
+}
+
+const VB = '0 -26 200 230', VB_NHO = '20 -4 160 160'  // nửa trên cho cỡ < 48 px: miệng ống + mặt + vai (cắt, không tràn)
+const sv = (pa, m, w, h, vb = VB) => `<svg class="mv pa-${pa}${vb === VB ? '' : ' cat'}" viewBox="${vb}" width="${w}" height="${h}">${svgMol(m)}</svg>`
+const kiemSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'
+
+document.querySelectorAll('svg[data-mat]').forEach((s) => { s.innerHTML = svgMol(s.dataset.mat) })
+document.querySelectorAll('svg[data-ve="cu"]').forEach((s) => { s.innerHTML = svgMolCu() })
+
+// ── Ba phương án ──
+const PA = [
+  { k: 'A', ten: 'A · Chàm + Ngọc lam', de: true, chu: 'Mol vui lắm! Em đúng 5 câu liền rồi.',
+    tok: [['thân', '--tr-hs → --tr-hs-nut / --tr-hs-day', 'var(--tr-hs)'], ['dung dịch', '--tr-tin / --tr-tin-day', 'var(--tr-tin)'], ['mũi', '--tr-chu-y', 'var(--tr-chu-y)'], ['má · lưỡi', '--tr-tim · --tr-sai', 'var(--tr-tim)'], ['giận', '--tr-sai / --tr-sai-day', 'var(--tr-sai)']],
+    uu: 'Cùng màu chính của app học sinh (như cú Lửa); ngọc lam ↔ đỏ khi giận tương phản rõ nhất; cam ở mũi giữ chất Mol.' },
+  { k: 'B', ten: 'B · Chàm + Cam', chu: 'Mol vui lắm! Em đúng 5 câu liền rồi.',
+    tok: [['thân', '--tr-hs → --tr-hs-nut / --tr-hs-day', 'var(--tr-hs)'], ['dung dịch', '--tr-chu-y / --tr-chu-y-day', 'var(--tr-chu-y)'], ['mũi', '--tr-chu-y-nut', 'var(--tr-chu-y-nut)'], ['má · lưỡi', '--tr-tim · --tr-sai', 'var(--tr-tim)'], ['giận', '--tr-sai / --tr-sai-day', 'var(--tr-sai)']],
+    uu: 'Giữ dung dịch cam quen của Mol cũ; nhưng cam → đỏ khi giận đổi ít, khó thấy ở cỡ nhỏ.' },
+  { k: 'C', ten: 'C · Ngọc lam + Hồng chỉ thị', chu: 'Mol vui lắm! Em đúng 5 câu liền rồi.',
+    tok: [['thân', '--tr-tin / --tr-tin-day', 'var(--tr-tin)'], ['dung dịch', '--tr-tim / --tr-tim-day (phenolphtalein)', 'var(--tr-tim)'], ['mũi', '--tr-chu-y', 'var(--tr-chu-y)'], ['má · lưỡi', '--tr-tim · --tr-sai', 'var(--tr-tim)'], ['giận', '--tr-sai / --tr-sai-day', 'var(--tr-sai)']],
+    uu: 'Tươi, đậm chất «chất chỉ thị»; nhưng lệch màu chính chàm của app, hồng → đỏ khi giận gần nhau.' },
+]
+document.getElementById('pa3').innerHTML = PA.map((p) => `<article class="pa${p.de ? ' de' : ''}">${p.de ? '<span class="nhan">Đề xuất</span>' : ''}
+  <h3>${p.ten}</h3>
+  <div class="lon">${sv(p.k, 'vui', 170, 196)}</div>
+  <div class="nho">${[['khen', 'khen'], ['buon', 'buồn'], ['cau', 'cáu'], ['ratCau', 'rất cáu']].map(([m, t]) => `<figure>${sv(p.k, m, 66, 76)}${t}</figure>`).join('')}</div>
+  <div class="dai"><span class="nut-chang" style="color:var(--tr-hs-tren)">${kiemSvg}</span><button class="nut-chinh">TIẾP TỤC</button></div>
+  <div class="loi">${sv(p.k, 'khen', 56, 64)}<p>${p.chu}</p></div>
+  <ul class="tok">${p.tok.map(([a, b, c]) => `<li><i style="background:${c}"></i>${a}: <code>${b}</code></li>`).join('')}</ul>
+  <p class="uu">${p.uu}</p></article>`).join('')
+
+// ── Bộ cảm xúc (A) ──
+const CX = [
+  ['vui', 'vui', 'mặc định · làm đúng'], ['khen', 'khen', 'đúng liền · kỷ lục'], ['chao', 'chào', 'mở app'], ['nghi', 'nghĩ', 'gợi ý · đang làm'],
+  ['ngac', 'ngạc nhiên', 'chạm vào Mol'], ['buon', 'buồn', 'làm sai'], ['ngu', 'ngủ', 'lâu không học'],
+  ['doi', 'dỗi', 'chậm chuỗi', 2], ['buc', 'bực', 'trễ mục tiêu', 3], ['cau', 'cáu', 'dung dịch đỏ sôi', 4], ['ratCau', 'rất cáu', 'đỏ dâng · hơi nước', 5],
+  ['nguong', 'ngượng', 'được khen · nhận quà', 0, 1], ['me', 'mê', 'mở rương · thành tích', 0, 1], ['nhay', 'vui nhảy', 'giữ chuỗi ngày', 0, 1],
+]
+document.getElementById('cx').innerHTML = CX.map(([m, t, g, cap, moi]) => `<figure>${cap ? `<span class="cap">cấp ${cap}</span>` : ''}${moi ? '<span class="moi">mới</span>' : ''}${sv('A', m, 132, 152)}<b>${t}</b><small>${g}</small></figure>`).join('')
+
+// ── Cỡ nhỏ ──
+const coNho = (cls, ten) => `<div class="${cls}"><h3>${ten}</h3>
+  <div class="hang"><span class="nhan2">Toàn thân (≥ 48 px)</span>${[28, 40, 64].map((c) => `<figure>${sv('A', 'vui', c, Math.round(c * 1.15))}${c} px</figure>`).join('')}${[28, 40, 64].map((c) => `<figure>${sv('A', 'ratCau', c, Math.round(c * 1.15))}${c}</figure>`).join('')}</div>
+  <div class="hang"><span class="nhan2">Nửa trên (&lt; 48 px)</span>${[28, 40, 64].map((c) => `<figure>${sv('A', 'vui', c, c, VB_NHO)}${c} px</figure>`).join('')}${[28, 40, 64].map((c) => `<figure>${sv('A', 'ratCau', c, c, VB_NHO)}${c}</figure>`).join('')}</div>
+  <div class="hang"><span class="nhan2">Vòng Mục tiêu 40 px · tab</span><figure><div class="vong" style="width:40px;height:40px">${sv('A', 'vui', 40, 40, VB_NHO)}</div>vui</figure><figure><div class="vong" style="width:40px;height:40px">${sv('A', 'cau', 40, 40, VB_NHO)}</div>cáu</figure>
+    <figure><span class="o-tab">${sv('A', 'ratCau', 16, 16, VB_NHO)}Học Hoá</span>tab 16 px</figure></div></div>`
+document.getElementById('cn').innerHTML = coNho('sang', 'Nền sáng') + coNho('toi', 'Nền tối')
+
+// ── Điện thoại: Lộ trình học sinh ──
+const luaIc = '<svg viewBox="0 0 24 24"><path d="M12 2.5c1 3.2 4.8 5.2 4.8 10.1A4.8 4.8 0 0 1 12 21.5a4.8 4.8 0 0 1-4.8-4.9c0-2.4 1.2-3.6 2.3-4.9.3 1.5 1 2.3 1.9 2.6C11 11.2 11 6.5 12 2.5Z" fill="currentColor"/></svg>'
+const ntIc = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-60 12 12)"/><circle cx="12" cy="12" r="2.2" fill="currentColor"/></svg>'
+const ttIc = '<svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7Z" fill="currentColor"/></svg>'
+const saoIc = '<svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7Z" fill="var(--tr-hs-tren)"/></svg>'
+const khoaIc = '<svg viewBox="0 0 24 24" fill="none" stroke="var(--tr-chu-2)" stroke-width="2.6" stroke-linecap="round"><rect x="5" y="10.5" width="14" height="10" rx="3"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></svg>'
+const dayIc = ['<path d="M5 6h9a3 3 0 0 1 0 6H10a3 3 0 0 0 0 6h9"/><circle cx="5" cy="6" r="2"/><circle cx="19" cy="18" r="2"/>', '<path d="M14.5 6.5a4 4 0 0 0 5 5l-8 8a2.5 2.5 0 0 1-3.5-3.5Z"/>', '<path d="M7 4h10v5a5 5 0 0 1-10 0Z"/><path d="M12 14v4M8 20h8"/>', '<path d="M4 7h16M4 12h16M4 17h16"/>']
+document.getElementById('dt').innerHTML = `
+  <div class="tren"><span class="o lua">${luaIc}12</span><span class="o nt">${ntIc}340</span><span class="o tt">${ttIc}5</span>
+    <div class="vong-mt"><div>${sv('A', 'vui', 36, 36, VB_NHO)}</div></div></div>
+  <div class="hero"><small>CHƯƠNG 1 · HOÁ 12</small><b>Este – Lipid</b><div class="thanh"><i></i>2/7 chặng</div>
+    <svg class="luc" viewBox="0 0 100 100" fill="none" stroke="var(--tr-hs-tren)" stroke-width="7"><path d="M50 8l36 21v42L50 92 14 71V29Z"/><path d="M50 26l20 12v24L50 74 30 62V38Z"/></svg></div>
+  <span class="chu-nen" style="left:24px;top:330px">n = m / M</span><span class="chu-nen" style="left:200px;top:540px">pV = nRT</span>
+  <span class="chu-nen" style="left:30px;top:640px">CaCO₃ → CaO + CO₂</span><span class="chu-nen" style="left:262px;top:520px">ΔH &lt; 0</span>
+  <div class="bong-loi">Em làm thật, Mol vui lắm! Còn 28 câu nữa là đủ mức hôm nay.</div>
+  <span class="chang xong" style="left:150px;top:340px;color:var(--tr-hs-tren)">${kiemSvg}</span>
+  <span class="chang xong" style="left:86px;top:434px;color:var(--tr-hs-tren)">${kiemSvg}</span>
+  <span class="vong-dang" style="left:58px;top:546px"></span><span class="chang dang" style="left:70px;top:560px">${saoIc}</span>
+  <span class="bat-dau" style="left:52px;top:490px">BẮT ĐẦU</span>
+  <span class="chang khoa" style="left:126px;top:676px">${khoaIc}</span><span class="chang khoa" style="left:214px;top:770px">${khoaIc}</span>
+  <div class="mol-o" style="left:206px;top:318px">${sv('A', 'chao', 150, 173)}</div>
+  <nav class="day">${dayIc.map((p, i) => `<span class="${i ? '' : 'dang'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${p}</svg></span>`).join('')}</nav>`
+
+if (location.search.includes('toi')) document.documentElement.setAttribute('data-toi', '')
+if (location.search.includes('dien-thoai')) document.body.classList.add('chi-dt')
+</script>
+</body></html>
