@@ -1,126 +1,118 @@
-# Mol v2 · ống nghiệm lùn mập có cánh (bản vẽ chờ thầy duyệt, 01/11/2026 tối)
+# Mol v2 · ống nghiệm lùn mập có nắp, cánh có ngón (bản vẽ chờ thầy duyệt, 01/11/2026 tối)
 
 **Thầy góp ý 01/11 tối, theo thứ tự:**
-1. «Phối màu lại cho phù hợp nhất với app… mịn màng… theo kích thước của con cú».
-2. «Làm cảm xúc hình dạng ống nghiệm y hệt như thế này» (gửi ảnh bảng cảm xúc mẫu).
-3. «Phần cáu bỏ miệng răng đi, làm cho tinh tế giống con cú cáu ấy».
-4. «Thử thay tay bằng cánh… Cho lùn hơn chiều ngang to hơn».
-5. Thêm dòng số Avogadro lên Mol «thật tinh tế đẹp mắt» — thầy chốt **6,022·10²³** (SGK 2018).
-
-⇒ Mol là nhân vật TOÀN THÂN hình ỐNG NGHIỆM lùn mập, có hai cánh nhỏ, khắc mờ số Avogadro trên thân. Hướng «mặt cú khối vuông» đã bỏ.
+1. Phối màu hợp app, mịn màng, theo kích thước cú.
+2. «Cảm xúc hình dạng ống nghiệm».
+3. «Cáu bỏ miệng răng, tinh tế».
+4. «Thay tay bằng cánh, lùn hơn ngang to hơn».
+5. Khắc số Avogadro **6,022·10²³** (SGK 2018), chốt «lên đầu gần mép miệng ống».
+6. «Cánh to có ngón như cánh cú, xếp bậc, xoè được», thêm «chống nạnh», cáu / rất cáu «bốc lửa lên đầu».
+7. «Chân đẹp hơn, hợp thân».
+8. «Ống nghiệm có nắp đóng… cáu, rất cáu nắp bung lơ lửng trên lửa; có thể khắc 6.022 trên nắp».
 
 - **Bản vẽ:** `mol-v2.html` (SVG thuần, màu = biến CSS chép giá trị token thật). Mở thường là bản sáng; `?toi` là bản tối; `?dien-thoai` là ảnh ngữ cảnh.
-- **Chụp lại:** `node docs/ban-ve-mol-v2-0111/chup.cjs` (cần `node_modules` của repo + `/opt/pw-browsers/chromium`).
+- **Chụp lại:** `node docs/ban-ve-mol-v2-0111/chup.cjs` (cần `node_modules` của repo + `/opt/pw-browsers/chromium`; ảnh tĩnh chụp ở chế độ giảm chuyển động).
 - **Ảnh** (`anh/`, mỗi ảnh ≤ 150 KB):
 
   | Ảnh | Nội dung |
   |---|---|
   | `so-sanh-cu-moi.jpg` | Mol cũ · cú Lửa · Mol mới, cùng khung 200 × 230 |
-  | `3-phuong-an-mau-sang.jpg`, `3-phuong-an-mau-toi.jpg` | 3 phương án màu, cạnh nút chính, nút chặng, bong bóng lời |
-  | `cam-xuc-A-sang.jpg`, `cam-xuc-A-toi.jpg` | 14 cảm xúc của phương án A, có tên dưới mỗi hình |
-  | `gian-truoc-sau.jpg` | Dỗi · bực · cáu · rất cáu: trước góp ý (miệng răng) và sau (tinh tế) |
-  | `so-avogadro-can-canh.jpg` | Chữ khắc: 2 phương án vị trí, cận cảnh + khi giận + 64 / 40 px |
-  | `co-nho.jpg` | Cỡ 28 / 40 / 64 px trên nền sáng và tối (toàn thân, nửa trên, vòng Mục tiêu, biểu tượng tab) |
-  | `ngu-canh-dien-thoai.jpg` | Màn Lộ trình 390 × 844: Mol vẫy cánh chào dưới bong bóng lời, Mol nhỏ ở vòng Mục tiêu |
+  | `3-phuong-an-mau-sang.jpg`, `3-phuong-an-mau-toi.jpg` | 3 phương án màu cạnh nút / chặng / bong bóng lời |
+  | `cam-xuc-A-sang.jpg`, `cam-xuc-A-toi.jpg` | 15 cảm xúc (11 cũ + 4 mới), có tên |
+  | `gian-truoc-sau.jpg` | Dỗi · bực · cáu · rất cáu: trước (miệng răng) và sau |
+  | `canh-chan-can-canh.jpg` | Cánh khép / xoè, đôi chân, chống nạnh, kiễng, nhấc chân, chân khép |
+  | `nap-can-canh.jpg` | Nắp đóng · khen · cáu · rất cáu · hai vị trí chữ (+ 64 px) |
+  | `so-avogadro-can-canh.jpg` | Chữ khắc hai vị trí, cận cảnh, khi giận, 64 / 40 px |
+  | `co-nho.jpg` | 28 / 40 / 64 px, sáng / tối |
+  | `ngu-canh-dien-thoai.jpg` | Lộ trình 390 × 844 |
 
 ## Thiết kế
-- **Thân:** ống nghiệm LÙN MẬP, rộng 136 × cao 156 (cao : rộng ≈ 1,15 : 1) trong khung 200 × 230. Vành miệng ống rộng theo thân, đáy tròn to (bán kính 68), chân ngắn sát đáy, bóng elip mờ.
-- **Mặt:** mảng trắng hai thuỳ ôm hai mắt to (mắt mực có hai đốm sáng) ở nửa trên. Mũi tròn cam của Mol, má hồng, miệng đổi theo cảm xúc.
-- **Cánh** (thay tay): hai cánh chim non bo tròn, không vẽ lông, màu thân đậm hơn một chút, có vệt sáng mép trên.
-  - Gốc cánh nấp sau mép thân.
-  - Dáng khép trước bụng / che má thì vẽ đè lên thân.
-- **Dung dịch:** đáy tròn, mặt sóng sáng, có bọt khí.
-- **Chữ khắc «6,022·10²³»:**
-  - khắc MỜ trên thuỷ tinh: nét trắng bán trong + bóng chìm 0,7 px, cỡ nhỏ, không khung nhãn;
-  - cạnh 3 vạch chia mảnh như ống đong;
-  - mũ «23» là chữ số mũ thật (tspan nâng chân chữ), dấu phẩy thập phân, chấm giữa.
-  - **Vị trí A (đề xuất):** ngang bụng, cong nhẹ theo thân, ngay trên mặt dung dịch, dưới mặt. Đọc thẳng, cân đối.
-  - **Vị trí B:** dọc mép phải theo vạch chia. Kín đáo hơn nhưng phải nghiêng đầu mới đọc, dễ bị cánh che.
-  - **Cỡ:** từ 64 px trở lên hiện chữ; nhỏ hơn ẩn chữ, giữ vạch.
-  - **Giận:** dung dịch đỏ dâng qua chữ, chữ trắng vẫn đọc được.
-- **Mịn màng:**
-  - thân chuyển màu ngang (sáng trái → đậm phải) nên đọc ra khối trụ thuỷ tinh;
-  - vệt sáng ở vai ống và trong đáy, bóng trụ mờ mép phải;
-  - KHÔNG viền đen, KHÔNG bộ lọc (filter).
-- **Giận tinh tế** (thầy: bỏ miệng răng):
-  - **mặt:** mày chau nghiêng che nửa trên con ngươi, mí dưới nheo, miệng khép thành nét ngắn; mũi cam giữ nguyên;
-  - **bực:** cánh khép chéo trước bụng;
-  - **cáu:** chống hông, làn hơi mảnh bốc khỏi miệng ống, dung dịch hơi đỏ;
-  - **rất cáu:** hơi đậm hơn, dung dịch đỏ dâng cao, rung nhẹ.
-  - Không răng, không gân đỏ, đứng thẳng.
-- **Bản quyền (bắt buộc):** KHÔNG chép cú Duolingo: không lông/chỏm tai, không mỏ, không màu xanh lá của Duo, không đường nét lông ở ngực. Mol là ống nghiệm của app, màu theo token app. Chỉ học «ngôn ngữ biểu cảm / dáng» (nhảy, vẫy, chống cằm…) của bảng mẫu, không chép nhân vật.
+- **Thân:** ống nghiệm LÙN MẬP, rộng 136 × cao 156 (cao : rộng ≈ 1,15 : 1). Vành miệng ống rộng, đáy tròn to.
+  - Mảng mặt trắng hai thuỳ, hai mắt to, mũi tròn cam, má hồng.
+  - Dung dịch ở đáy có bọt.
+  - Thân chuyển màu ngang như khối trụ thuỷ tinh, vệt sáng, bóng trụ mờ; không viền đen, không filter.
+- **Nắp:** nút cao su hơi hình nấm, vành dưới khít miệng ống, một rãnh ngang, núm tròn nhỏ trên đỉnh (như một nguyên tử).
+  - Màu `--tr-tim` (hồng chỉ thị), bóng pha `--tr-hs-day`. Hồng tách khỏi lửa cam–đỏ nên nắp bay vẫn rõ, hợp má hồng. Phương án C (dung dịch hồng) dùng nắp `--tr-chu-y`.
+  - Mặt thường: đóng. Khen / ngạc nhiên / vui nhảy: nắp nảy nhẹ (đề xuất).
+  - Cáu: nắp bật lên nghiêng, lơ lửng trên ngọn lửa. Rất cáu: bay cao hơn, nghiêng nhiều, vài tia lửa nhỏ.
+  - Nắp bung vượt khung 200 × 230 phía trên khoảng 10–20 px; `mol.css` đã `overflow: visible`.
+- **Cánh có ngón:** thân cánh giọt dài áp hông + 4 lông bo tròn ở đuôi cánh.
+  - Lông ngoài dài nhất, vào trong ngắn dần, sáng dần (xếp bậc).
+  - Khép: lông sát nhau. Xoè (khen, ngạc nhiên, vui nhảy, chào): lông toả rời.
+  - Màu thân đậm (`--tr-hs-nut` pha `--tr-hs-day`), lông trong pha sáng dần về `--tr-hs`.
+- **Chân:** ống chân ngắn mập, gốc chìm vào đáy tròn; bàn chân bo + 3 ngón tròn xếp bậc (cùng ngôn ngữ với cánh).
+  - Màu cùng họ cánh. Cam để dành riêng cho mũi và lửa ⇒ một điểm nhấn, không loạn.
+  - Dáng đổi theo cảm xúc: đứng tách vững; chống nạnh chân rộng; buồn / ngủ chân khép; khen / ngạc nhiên kiễng; vui nhảy một chân nhấc.
+- **Chữ khắc «6,022·10²³»** (dấu phẩy thập phân, chấm giữa, mũ 23 thật): khắc mờ, nét trắng bán trong + bóng chìm, cong nhẹ, cân giữa, không khung nhãn.
+  - **B · dưới vành miệng ống (ĐỀ XUẤT):** trên thân chàm có bóng vành ⇒ tương phản tốt hơn, không nghiêng khi nắp bung; lửa và cánh không che.
+  - **A · trên nắp:** xinh, bay theo nắp; nhưng chữ trắng trên hồng kém tương phản hơn, nghiêng / bay khỏi khung khi giận.
+  - Từ 64 px hiện chữ; nhỏ hơn chỉ giữ vạch.
+- **Giận tinh tế:** không răng, không gân đỏ.
 
-## Ba phương án màu (token có sẵn của app học sinh «Chất chỉ thị», `src/styles/trong-hs-mau.css`)
+  | Mức | Mặt | Dáng | Lửa / dung dịch |
+  |---|---|---|---|
+  | bực | mày chau che nửa trên con ngươi, mí dưới nheo, miệng khép thành nét ngắn | chống nạnh | — |
+  | cáu | như bực | chống nạnh | một ngọn lửa cam–đỏ đỡ nắp, dung dịch hơi đỏ |
+  | rất cáu | như bực | cánh nắm sát thân, rung nhẹ | lửa to ba lưỡi đỏ đậm, nắp bay cao, dung dịch đỏ dâng |
+
+  - Lửa ba lớp: ngoài `--tr-sai` (cáu pha `--tr-chu-y`) → giữa `--tr-chu-y` → lõi `--tr-sao` pha trắng. Bản tối tự sáng theo token.
+- **Bản quyền (bắt buộc):** KHÔNG chép cú Duolingo: không lông/chỏm tai, không mỏ, không màu xanh lá của Duo, không đường nét lông ở ngực. Mol là ống nghiệm của app, màu theo token app. Chỉ học «ngôn ngữ biểu cảm / dáng», không chép nhân vật.
+
+## Ba phương án màu (token có sẵn «Chất chỉ thị», `src/styles/trong-hs-mau.css`)
 
 **Phần chung cả ba phương án:**
-- mảng mặt `--btg-chu-doan-dam`;
+- mặt `--btg-chu-doan-dam`;
 - mắt và miệng `--tr-hs-day` pha `--btg-chu-doan`;
 - má `--tr-tim`, lưỡi `--tr-sai`, lấp lánh `--tr-sao`;
-- nước mắt `--tr-tin`;
-- chữ khắc / vạch `--btg-chu-doan-dam` (mờ) + bóng chìm màu thân đậm;
-- giận `--tr-sai` / `--tr-sai-day` (cáu pha `--tr-chu-y`).
+- giận / lửa `--tr-sai` · `--tr-chu-y` · `--tr-sao`.
 
-| | Thân + cánh | Dung dịch | Mũi | Nhận xét |
-|---|---|---|---|---|
-| **A · Chàm + Ngọc lam (đề xuất)** | `--tr-hs` → `--tr-hs-nut` / `--tr-hs-day` | `--tr-tin` / `--tr-tin-day` | `--tr-chu-y` | Đúng màu chính app học sinh (như cú Lửa, nút chặng, nút Tiếp tục). Ngọc lam ↔ đỏ khi giận đổi rõ nhất, kể cả ở 28 px |
-| B · Chàm + Cam | như A | `--tr-chu-y` / `--tr-chu-y-day` | `--tr-chu-y-nut` | Giữ dung dịch cam của Mol cũ; nhưng cam → đỏ khi giận đổi ít |
-| C · Ngọc lam + Hồng chỉ thị | `--tr-tin` / `--tr-tin-day` | `--tr-tim` / `--tr-tim-day` (phenolphtalein) | `--tr-chu-y` | Tươi, đậm chất «chất chỉ thị»; lệch màu chính chàm, hồng → đỏ gần nhau |
+| | Thân + cánh + chân | Dung dịch | Mũi | Nắp | Nhận xét |
+|---|---|---|---|---|---|
+| **A · Chàm + Ngọc lam (đề xuất)** | `--tr-hs` / `--tr-hs-nut` / `--tr-hs-day` | `--tr-tin` / `--tr-tin-day` | `--tr-chu-y` | `--tr-tim` | Đúng màu chính app học sinh; ngọc lam ↔ đỏ khi giận rõ nhất |
+| B · Chàm + Cam | như A | `--tr-chu-y` / `--tr-chu-y-day` | `--tr-chu-y-nut` | `--tr-tim` | Giữ cam Mol cũ; cam → đỏ đổi ít |
+| C · Ngọc lam + Hồng chỉ thị | `--tr-tin` / `--tr-tin-day` | `--tr-tim` / `--tr-tim-day` | `--tr-chu-y` | `--tr-chu-y` | Tươi; lệch màu chính chàm |
 
-Mol cũ dùng `--tr-gv` (xanh app THẦY), lệch với bảng chàm của app học sinh. Đó là lý do đổi màu.
+## Cảm xúc (phương án A) và chỗ dùng
+- **11 mặt đang có:** vui · khen · chào · nghĩ · ngạc nhiên · buồn · ngủ · 2 dỗi · 3 bực · 4 cáu · 5 rất cáu.
+- **4 mặt MỚI để thầy chọn:**
 
-## Cảm xúc (phương án A)
+  | Mặt mới | Gợi ý dùng |
+  |---|---|
+  | ngượng | được khen / nhận quà |
+  | mê | mở rương / thành tích |
+  | vui nhảy | giữ chuỗi ngày (`covu`) |
+  | **tự tin (chống nạnh, cười nhếch)** | đủ mức hôm nay / lên hạng giải tuần |
 
-**Giữ đủ 11 mặt đang có:**
-
-| Cảm xúc | Dáng |
-|---|---|
-| vui | đứng cười, cánh thả |
-| khen | nhảy, hai cánh xoè vỗ lên |
-| chào | một cánh vẫy, nháy mắt |
-| nghĩ | đầu cánh chạm cằm, «?» |
-| ngạc nhiên | mắt to, cánh xoè |
-| buồn | cánh rủ, mắt rưng nước mắt xanh |
-| ngủ | mắt nhắm, «z» |
-| 2 dỗi | mí sụp nửa |
-| 3 bực | cánh khép chéo |
-| 4 cáu | chống hông, hơi mảnh |
-| 5 rất cáu | cánh nắm chặt, rung, đỏ dâng |
-
-**3 cảm xúc MỚI để thầy chọn:**
-
-| Cảm xúc | Dáng | Gợi ý dùng |
-|---|---|---|
-| ngượng | hai cánh che má, lấp lánh | được khen / nhận quà |
-| mê | mắt trái tim, tim bay | mở rương / thành tích |
-| vui nhảy | nghiêng người, cánh dang nghiêng, nốt nhạc | giữ chuỗi ngày (`covu`) |
+  Bực và cáu cũng dùng dáng chống nạnh.
 
 ## Cỡ nhỏ (đề xuất)
-- **Từ 48 px trở lên:** vẽ toàn thân (khung 200 × 230 như cũ).
-- **Dưới 48 px** (vòng Mục tiêu 40 px, biểu tượng tab): chỉ hiện NỬA TRÊN — viewBox `20 -2 160 160`, cắt tràn: thấy miệng ống, mặt, vai cánh.
+- **Từ 48 px:** toàn thân.
+- **Dưới 48 px:** NỬA TRÊN — viewBox `20 -2 160 160`, cắt tràn.
 - **Chữ khắc** chỉ hiện từ 64 px.
 
 ## Kế hoạch build (sau khi thầy chốt — CHƯA sửa `src/`)
 
 1. **`src/components/linh-vat/mol-dong.ts`:**
-   - thay `svgMol` bằng bộ vẽ trong `<script>` của `mol-v2.html` (`TU`, `NA`, `mat`, `mi`, `CANH`, `DANG`, `SOI`, `HOI`, `khacVe`);
-   - giữ nguyên `VIEWBOX_MOL = '0 -26 200 230'`, kiểu `Lua`, `taoLua`, `datCap`, `noi`, `cham`, `MOL_DANG_SONG` ⇒ `<Bi …>` và mọi chỗ gọi không đổi;
-   - `MatMol` thêm `nguong | me | nhay` nếu thầy duyệt;
-   - map trạng thái cũ ⇒ mặt mới: `combo`/`cuoi` → khen, `covu` → vui nhảy (hoặc khen), `choc` → ngạc nhiên, cấp 2–5 → dỗi / bực / cáu / rất cáu;
-   - **id duy nhất mỗi hình** (gradient, clip mí `…ma`/`…mb`, đường chữ khắc `…k`): bản vẽ đã gặp lỗi trùng hậu tố `…b` ⇒ mí phải lộ khối trắng.
+   - chép bộ vẽ trong `<script>` của `mol-v2.html` (`TU`, `NA`, `mat`, `mi`, `canhHinh`/`canh`/`CANH`, `chanVe`/`CHAN`, `napVe`/`NAP_DANG`, `LUA`, `SOI`, `khacVe`, `DANG`);
+   - giữ `VIEWBOX_MOL = '0 -26 200 230'`, kiểu `Lua`, `taoLua`, `datCap`, `noi`, `cham`, `MOL_DANG_SONG` ⇒ `<Bi …>` không đổi;
+   - `MatMol` thêm `nguong | me | nhay | tuTin` nếu duyệt;
+   - map trạng thái cũ ⇒ mặt mới: `combo`/`cuoi` → khen, `covu` → vui nhảy, `choc` → ngạc nhiên, cấp 2–5 → dỗi / bực / cáu / rất cáu;
+   - **id duy nhất mỗi hình** (gradient thân / vành / mặt / dung dịch / trụ / nắp, clip mí `…ma`/`…mb`, đường chữ `…k`/`…kn`): bản vẽ từng gặp lỗi trùng hậu tố ⇒ mí lộ khối trắng.
 2. **`src/styles/mol.css`:**
-   - bảng `--mol-*` phương án A (chỉ `color-mix` token sẵn có, không mã màu thô), lớp `stop-color`, `.m-canh`, `.m-khac`, `.m-vach`, `.m-hoi-n`;
-   - ẩn chữ khắc khi `Bi` nhỏ hơn 64 px: `.bi[data-nho] .m-khac` hoặc thuộc tính cỡ;
+   - bảng `--mol-*` phương án A (chỉ `color-mix` token sẵn có);
+   - lớp `stop-color`, `.m-canh`/`.m-ngon*`, `.m-nap*`, `.m-lua*`, `.m-khac`, `.m-vach`;
    - chuyển động CSS (không rAF):
-     - thở nhẹ, chớp mắt, bọt nổi;
-     - vỗ cánh khi khen (xoay nhóm cánh quanh gốc), vẫy cánh khi chào;
-     - làn hơi bay lên + mờ dần khi cáu / rất cáu, rung nhẹ khi rất cáu;
+     - lửa: `.mol-lua` scaleY 0,92 ↔ 1,06 + skewX ±4°, gốc ở đáy lửa; cáu 0,9 s, rất cáu 0,45 s; lớp giữa lệch pha;
+     - nắp: `.mol-nap` nhấp nhô theo lửa, translateY 0 ↔ −3 px + rotate ±3°;
+     - cánh: vỗ khi khen (xoay nhóm cánh quanh gốc), vẫy khi chào;
+     - thở, chớp mắt, bọt nổi, rung nhẹ khi rất cáu;
    - giảm chuyển động / máy yếu ⇒ đứng yên.
 3. **Cỡ nhỏ:**
-   - `Bi.tsx` gắn `data-nho` khi `size < 48` ⇒ viewBox nửa trên + `overflow: hidden`;
-   - vòng Mục tiêu dùng cùng khung cắt;
-   - `datIconTabMol` đổi vùng cắt `drawImage` theo khung nửa trên (x 20…180, y −2…158).
+   - `Bi.tsx` gắn `data-nho` khi `size < 48` (viewBox nửa trên + `overflow: hidden`);
+   - ẩn chữ khắc khi < 64 px;
+   - `datIconTabMol` đổi vùng cắt theo khung nửa trên.
 4. **Cổng phải qua:**
    - test: `tests/mol-0111.test.tsx`, `tests/bi-2610.test.tsx`, `tests/lua-cap-ve-3110.test.ts`;
    - `npm run check:mau`, `npm run kiem:mau-giu`, `npm run build && npm run kiem:toc-do`;
-   - số nút SVG: bản vẽ đo được 63–81 nút mỗi hình (kể cả 5 gradient ≈ 20 nút + chữ khắc 6 nút). Mol cũ 26–46, cú Lửa ~120. Không filter. Nếu cần nhẹ hơn: gộp gradient dùng chung một `<defs>` cho cả trang, bỏ lớp bóng chìm của chữ;
+   - số nút SVG: bản vẽ thêm nắp, cánh có ngón, chân có ngón ⇒ đo trên bản vẽ 95–120 nút mỗi hình. Mol cũ 26–46, cú Lửa ~120. Không filter. Có thể gộp gradient chung một `<defs>` / dùng `<use>` cho ngón để nhẹ hơn;
    - chạy tác tử `toc-do` sau gộp.

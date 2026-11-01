@@ -14,7 +14,7 @@ async function luu(chup, ten) { // hạ chất lượng tới khi ≤ 150 KB
 ;(async () => {
   const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' })
   const mo = async (hoi, w, h, dsf) => {
-    const p = await b.newPage({ viewport: { width: w, height: h }, deviceScaleFactor: dsf })
+    const p = await b.newPage({ viewport: { width: w, height: h }, deviceScaleFactor: dsf, reducedMotion: 'reduce' }) // ảnh tĩnh: lửa đứng yên
     const loi = []; p.on('pageerror', (e) => loi.push(String(e)))
     await p.goto(TEP + hoi)
     await p.evaluate(() => document.fonts.ready); await p.waitForTimeout(200)
@@ -27,6 +27,8 @@ async function luu(chup, ten) { // hạ chất lượng tới khi ≤ 150 KB
   kq.push(await luu((o) => sang.locator('#cam-xuc').screenshot(o), 'cam-xuc-A-sang.jpg'))
   kq.push(await luu((o) => sang.locator('#gian').screenshot(o), 'gian-truoc-sau.jpg'))
   kq.push(await luu((o) => sang.locator('#avo').screenshot(o), 'so-avogadro-can-canh.jpg'))
+  kq.push(await luu((o) => sang.locator('#canh').screenshot(o), 'canh-chan-can-canh.jpg'))
+  kq.push(await luu((o) => sang.locator('#nap').screenshot(o), 'nap-can-canh.jpg'))
   await sang.close()
   const nho = await mo('', 1240, 900, 2)
   kq.push(await luu((o) => nho.locator('#co-nho').screenshot(o), 'co-nho.jpg'))
