@@ -165,50 +165,6 @@ export function chuanBiLatex(t: 'ce' | 'math', latexGoc: string): { latex: strin
   return { latex, dai: beRongUocTinh(latex) > DAI_PHAI_CUON }
 }
 
-/** Tách một phương trình mhchem thành cụm ngắt dòng được: [{dau: '' | '+' | '->…', chat}] ở cấp ngoài cùng (ngoài mọi ngoặc).
- *  `2Al(s) + 3H2O(l) -> Al2O3(s) + 6H+ + 6e` ⇒ 2Al(s) · + 3H2O(l) · -> Al2O3(s) · + 6H+ · + 6e. Dưới 3 cụm / ngoặc lệch ⇒ null. Thuần (có test). */
-export function tachCumCe(ce: string): { dau: string; chat: string }[] | null {
-  const tok: string[] = []
-  let sau = 0, cur = ''
-  for (const ch of ce) {
-    if ('([{'.includes(ch)) sau++
-    else if (')]}'.includes(ch)) sau--
-    if (sau < 0) return null
-    if (ch === ' ' && sau === 0) { if (cur) tok.push(cur); cur = ''; continue }
-    cur += ch
-  }
-  if (cur) tok.push(cur)
-  if (sau !== 0) return null
-  const laDau = (x: string) => x === '+' || /^(->|<=>|<-|<->|=)/.test(x)
-  const ra: { dau: string; chat: string }[] = []
-  let dau = ''
-  for (const x of tok) {
-    if (laDau(x)) { if (dau) return null; dau = x; continue }
-    if (!dau && ra.length) { ra[ra.length - 1]!.chat += ' ' + x; continue } // hệ số tách rời («2 H2O») ⇒ dính vào chất
-    ra.push({ dau, chat: x }); dau = ''
-  }
-  if (dau) return null
-  return ra.length >= 3 ? ra : null
-}
-
-/** PHƯƠNG TRÌNH DÀI NGẮT DÒNG (thầy 01/11: «đầu dòng dãn cách phải đẹp chỉnh chu để hs dễ đọc nhất»): HTML một khối flex-wrap, mỗi cụm «dấu + chất» đi liền
- *  (mũi tên luôn đi cùng chất phía sau). `ve(t, latex)` = KaTeX của chem-format (có nhớ); một cụm lỗi / không tách được ⇒ null (ô cuộn như cũ). */
-export function ngatCe(t: 'ce' | 'math', latex: string, dai: boolean, ve: (t: 'ce' | 'math', latex: string) => string | null): string | null {
-  // `\ce{…}` cả công thức (dạng $\ce{…}$) cũng tính; ngắn (≤ 23 kí tự) mà không «dài» ⇒ để nguyên trong dòng.
-  const ce = t === 'ce' ? latex : /^\s*\\ce\{([\s\S]*)\}\s*$/.exec(latex)?.[1]
-  if (!ce || (!dai && ce.length <= 23)) return null
-  const cum = tachCumCe(ce)
-  if (!cum) return null
-  let html = ''
-  for (const c of cum) {
-    const chat = ve('ce', c.chat)
-    const dau = c.dau ? ve(c.dau === '+' ? 'math' : 'ce', c.dau) : ''
-    if (chat === null || dau === null) return null
-    html += `<span style="white-space:nowrap">${dau ? `<span style="margin-right:.3em">${dau}</span>` : ''}${chat}</span>`
-  }
-  return `<span class="ct-ngat" style="display:inline-flex;flex-wrap:wrap;align-items:baseline;column-gap:.3em;row-gap:.15em;max-width:100%">${html}</span>`
-}
-
 // ── DỰNG CÔNG THỨC (dời từ chem-format.tsx 01/11 để lượt mở app không mang mã chỉ chạy khi đã có KaTeX) ──
 type KatexRender = { renderToString: (latex: string, opts: Record<string, unknown>) => string }
 const KATEX_OPTS = { throwOnError: true, strict: false, displayMode: false } as const
@@ -229,9 +185,8 @@ export function dungCongThuc(katex: KatexRender, t: 'ce' | 'math', latexGoc: str
   const { latex, dai } = chuanBiLatex(t, latexGoc)
   let kq: KetQuaCongThuc
   try {
-    // PHƯƠNG TRÌNH DÀI (thầy 01/11): ngắt dòng ở «+» / mũi tên thay vì ô cuộn.
-    const ngat = ngatCe(t, latex, dai, (t2, l) => { const r = dungCongThuc(katex, t2, l); return 'html' in r ? r.html : null })
-    kq = ngat ? { latex, html: ngat, dai: false } : { latex, html: katex.renderToString(t === 'ce' ? `\\ce{${latex}}` : latex, KATEX_OPTS), dai }
+    // Phương trình dài GIỮ một dòng (ô cuộn ngang `ct-dai`) — thầy 01/11: «Cứ để thanh cuộn, đi xuống dòng thế không đúng cách».
+    kq = { latex, html: katex.renderToString(t === 'ce' ? `\\ce{${latex}}` : latex, KATEX_OPTS), dai }
   } catch {
     kq = { latex, loi: true }
   }

@@ -752,7 +752,7 @@ function useKatex(can = true): Katex | null {
 }
 
 /** Kết quả dựng một công thức — HÀM THUẦN của (t, latex gốc) nên nhớ lại được. */
-// DỰNG CÔNG THỨC + NHỚ KẾT QUẢ (LRU) + NGẮT PHƯƠNG TRÌNH DÀI: ở mảnh nạp lười chem-latex.ts (`dungCongThuc`) — chỉ chạy khi đã có KaTeX (01/11: bớt byte lượt mở).
+// DỰNG CÔNG THỨC + NHỚ KẾT QUẢ (LRU): ở mảnh nạp lười chem-latex.ts (`dungCongThuc`) — chỉ chạy khi đã có KaTeX (01/11: bớt byte lượt mở).
 /** memo: đồng hồ màn thi / chọn đáp án làm cha vẽ lại, công thức không đổi chuỗi
  * thì KHÔNG dựng lại (so nông đúng cả hai prop `t` + `latex`, đều là chuỗi). */
 const ChemFormula = memo(function ChemFormula({ t, latex: latexGoc }: { t: 'ce' | 'math'; latex: string }): JSX.Element {

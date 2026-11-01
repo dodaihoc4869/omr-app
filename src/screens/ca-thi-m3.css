@@ -583,3 +583,98 @@
     justify-content: center;
   }
 }
+
+/* ═══ ĐIỆN THOẠI NGANG (thầy 01/11: «Cả phần theo dõi ca kiểm tra cũng tối ưu xoay ngang giống máy tính») ═══
+ * Máy ngang thấp (≤ 600 px cao, ≤ 1040 px rộng: 844×390, 932×430, 740×360…) dùng BỐ CỤC MÁY TÍNH thay cho kiểu xếp chồng của điện thoại dọc:
+ *  · Theo dõi ca: đầu màn gọn (tên ca 20 px, đồng hồ vòng giữ bên phải), dải 4 số MỘT hàng, «Từng em» bên trái — «Cần thầy xử lý» + «Việc nhanh»
+ *    là CỘT PHẢI (máy tính 400 px, ở đây 250–300 px) thay vì chèn lên trên danh sách; danh sách em chia 2 cột khi khung đủ rộng (≥ 2 × 210 px).
+ *  · Kết thúc ca: điểm lớn | phổ điểm, câu sai nhiều | em cần để ý + ba phần thành hai cột như máy tính; bảng em giữ bảng 5 cột đủ bề ngang.
+ * CHỈ trình bày (không đổi nút, chữ, thứ tự đọc). Nút ≥ 44 px, chữ ≥ 13 px, không cuộn ngang trang. Chỉ token màu sẵn có.
+ * Độ ưu tiên: tờ này đứng TRƯỚC trong-quan-ly-theo-doi.css trong mảnh màn ⇒ bộ chọn mở đầu `.ct.ct-khung[data-vung=…]` (hơn tờ «Trong» một bậc)
+ * cho luật chung hai bản; `[data-trong='gv'] …` cho riêng bản «Trong»; `:root:not([data-trong='gv']) …` cho riêng bản cũ (lùi `ddh.trong`). */
+@media (orientation: landscape) and (max-height: 600px) and (max-width: 1040px) {
+  /* ── THEO DÕI CA ── */
+  .ct.ct-khung[data-vung='theo-doi-ca'] { gap: 12px; }
+  /* đầu màn: hai cột (chữ | đồng hồ) như máy tính — kể cả khổ 740 (luật ≤ 760 px đổi đồng hồ thành dòng chữ, ở đây trả về vòng) */
+  .ct.ct-khung[data-vung='theo-doi-ca'] .ct-td-dau { grid-template-columns: minmax(0, 1fr) auto; gap: 8px 16px; align-items: center; }
+  .ct.ct-khung[data-vung='theo-doi-ca'] .ct-td-dau h1 { font-size: 20px; line-height: 1.25; }
+  /* ô link: link trọn MỘT dòng đầu (đọc cho lớp chép), mã ca + hai nút chép ở dòng dưới — không còn link vỡ ba dòng giữa các nút */
+  .ct.ct-khung[data-vung='theo-doi-ca'] .ct-link { gap: 8px; }
+  .ct.ct-khung[data-vung='theo-doi-ca'] .ct-link > span.mono:not(.ct-nhan) { flex: 1 1 calc(100% - 30px); }
+  .ct.ct-khung[data-vung='theo-doi-ca'] .ct-link .ct-nut { padding: 0 12px; }
+  /* đồng hồ vòng 120 px: nhãn «phút còn lại» 13 px (≈ 75 px) nằm gọn trong lòng vòng */
+  .ct.ct-khung[data-vung='theo-doi-ca'] .ct-vong { order: 0; width: 120px; height: 120px; }
+  .ct.ct-khung[data-vung='theo-doi-ca'] .ct-vong svg { display: block; width: 120px; height: 120px; }
+  .ct.ct-khung[data-vung='theo-doi-ca'] .ct-vong .giua { position: absolute; display: grid; text-align: center; }
+  .ct.ct-khung[data-vung='theo-doi-ca'] .ct-vong .giua > div { display: block; }
+  .ct.ct-khung[data-vung='theo-doi-ca'] .ct-vong .giua b { font-size: 24px; }
+  .ct.ct-khung[data-vung='theo-doi-ca'] .ct-vong .giua span { display: block; font-size: 13px; line-height: 1.2; white-space: nowrap; }
+  /* dải 4 số: một hàng */
+  .ct.ct-khung[data-vung='theo-doi-ca'] .ct-luoi-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  /* «Từng em» trái · cột phải «Cần thầy xử lý» + «Việc nhanh» (bỏ `order: -1` của khổ hẹp) */
+  .ct.ct-khung[data-vung='theo-doi-ca'] .ct-td-luoi { grid-template-columns: minmax(0, 1fr) clamp(250px, 34%, 300px); gap: 12px; }
+  .ct.ct-khung[data-vung='theo-doi-ca'] .ct-td-luoi > div:last-child { order: 0; gap: 12px; }
+  /* chạm được: nút trong thẻ việc + Xoá ca ≥ 44 px (máy tính dùng 36–40 px cho chuột) */
+  .ct.ct-khung[data-vung='theo-doi-ca'] .ct-cb .ct-nut,
+  .ct.ct-khung[data-vung='theo-doi-ca'] .ct-vung-dung .ct-nut-xoa-ca { min-height: 44px; }
+  .ct.ct-khung[data-vung='theo-doi-ca'] .ct-cb-tt,
+  .ct.ct-khung[data-vung='theo-doi-ca'] .ct-vung-dung > .ct-ghi { font-size: 13px; }
+
+  /* bản «Trong»: thẻ đệm 16 px (như điện thoại), số 22 px, bốn ô chia vạch dọc; danh sách em = bảng gọn 2 cột (vạch giữa cột) */
+  [data-trong='gv'] .ct.ct-khung[data-vung='theo-doi-ca'] .ct-tam { padding: 16px; }
+  [data-trong='gv'] .ct.ct-khung[data-vung='theo-doi-ca'] :is(.ct-o-em, .ct-canh-bao) { margin-left: -16px; margin-right: -16px; }
+  [data-trong='gv'] .ct.ct-khung[data-vung='theo-doi-ca'] .ct-canh-bao { margin-bottom: -16px; }
+  [data-trong='gv'] .ct.ct-khung[data-vung='theo-doi-ca'] .ct-canh-bao > .ct-ghi { padding: 0 16px 16px; }
+  [data-trong='gv'] .ct.ct-khung[data-vung='theo-doi-ca'] .ct-vung-dung { margin: 14px -16px -16px; padding: 14px 16px 16px; }
+  [data-trong='gv'] .ct.ct-khung[data-vung='theo-doi-ca'] .ct-so-o { padding: 10px 14px; border-top: 0; border-left: 1px solid var(--tr-vien); }
+  [data-trong='gv'] .ct.ct-khung[data-vung='theo-doi-ca'] .ct-so-o.c-xl { border-left: 0; }
+  [data-trong='gv'] .ct.ct-khung[data-vung='theo-doi-ca'] .ct-so-o .lon { font-size: 22px; }
+  [data-trong='gv'] .ct.ct-khung[data-vung='theo-doi-ca'] .ct-hang-chip { flex-wrap: wrap; overflow-x: visible; }
+  [data-trong='gv'] .ct.ct-khung[data-vung='theo-doi-ca'] .ct-chip { padding: 0 11px; }
+  [data-trong='gv'] .ct.ct-khung[data-vung='theo-doi-ca'] .ct-o-em { columns: 210px 2; column-gap: 0; column-rule: 1px solid var(--tr-vien); border-top: 0; }
+  [data-trong='gv'] .ct.ct-khung[data-vung='theo-doi-ca'] .ct-em {
+    break-inside: avoid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'ten nhan' 'sbd d' 'tien tien'; gap: 4px 10px; padding: 10px 12px;
+    border-top: 1px solid var(--tr-vien);
+  }
+  [data-trong='gv'] .ct.ct-khung[data-vung='theo-doi-ca'] .ct-em:first-child { border-top: 1px solid var(--tr-vien); }
+  [data-trong='gv'] .ct.ct-khung[data-vung='theo-doi-ca'] .ct-em .h .ct-nhan { justify-self: end; }
+  [data-trong='gv'] .ct.ct-khung[data-vung='theo-doi-ca'] .ct-em :is(.sbd, .d) { align-self: start; }
+  [data-trong='gv'] .ct.ct-khung[data-vung='theo-doi-ca'] .ct-em .tien { margin-top: 2px; }
+  [data-trong='gv'] .ct.ct-khung[data-vung='theo-doi-ca'] .ct-cb { padding: 12px 16px; }
+  [data-trong='gv'] .ct.ct-khung[data-vung='theo-doi-ca'] .ct-hd-nhanh .ct-nut { min-height: 76px; padding: 10px 8px; gap: 6px; }
+
+  /* bản cũ (không «Trong»): đầu màn bớt đệm, ô số gọn */
+  :root:not([data-trong='gv']) .ct.ct-khung[data-vung='theo-doi-ca'] .ct-td-dau { padding: 14px 18px; }
+  :root:not([data-trong='gv']) .ct.ct-khung[data-vung='theo-doi-ca'] .ct-luoi-4 { gap: 10px; }
+  :root:not([data-trong='gv']) .ct.ct-khung[data-vung='theo-doi-ca'] .ct-so-o { padding: 12px 14px; border-radius: 20px; }
+  :root:not([data-trong='gv']) .ct.ct-khung[data-vung='theo-doi-ca'] .ct-so-o .lon { font-size: 28px; }
+  :root:not([data-trong='gv']) .ct.ct-khung[data-vung='theo-doi-ca'] .ct-tam { padding: 16px; border-radius: 22px; }
+
+  /* ── KẾT THÚC CA ── */
+  .ct.ct-khung[data-vung='ket-thuc-ca'] { gap: 12px; }
+  .ct.ct-khung[data-vung='ket-thuc-ca'] .ct-tam { padding: 16px; border-radius: 22px; }
+  .ct.ct-khung[data-vung='ket-thuc-ca'] .ct-cong-bo { padding: 12px 16px; }
+  .ct.ct-khung[data-vung='ket-thuc-ca'] .ct-kt-hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+  .ct.ct-khung[data-vung='ket-thuc-ca'] .ct-diem-to { gap: 10px; padding: 16px 18px; border-radius: 24px; }
+  .ct.ct-khung[data-vung='ket-thuc-ca'] .ct-diem-to .so-lon { font-size: 56px; }
+  .ct.ct-khung[data-vung='ket-thuc-ca'] .ct-diem-to .so-lon small { font-size: 18px; }
+  .ct.ct-khung[data-vung='ket-thuc-ca'] .ct-diem-to .ba { gap: 8px; }
+  .ct.ct-khung[data-vung='ket-thuc-ca'] .ct-diem-to .ba div { padding: 8px 10px; }
+  .ct.ct-khung[data-vung='ket-thuc-ca'] .ct-diem-to .ba b { font-size: 18px; }
+  .ct.ct-khung[data-vung='ket-thuc-ca'] .ct-diem-to .ba span { font-size: 13px; }
+  .ct.ct-khung[data-vung='ket-thuc-ca'] .ct-pho { gap: 6px; height: 150px; padding-top: 22px; }
+  .ct.ct-khung[data-vung='ket-thuc-ca'] :is(.ct-pho .cot span, .ct-pho .cot i b, .ct-cs .ti small, .ct-cy .tt span) { font-size: 13px; }
+  .ct.ct-khung[data-vung='ket-thuc-ca'] .ct-kt-luoi { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 12px; }
+  .ct.ct-khung[data-vung='ket-thuc-ca'] .ct-cot-doc { gap: 12px; }
+  .ct.ct-khung[data-vung='ket-thuc-ca'] .ct-cs { grid-template-columns: 60px minmax(0, 1fr) auto; gap: 10px; padding: 10px 12px; }
+  .ct.ct-khung[data-vung='ket-thuc-ca'] .ct-cs .c { width: 60px; }
+  .ct.ct-khung[data-vung='ket-thuc-ca'] .ct-cs .c span { display: block; font-size: 13px; }
+  /* thẻ thời gian + bảng em: GIỮ một cột — bảng cần khung ≥ 600 px mới thành bảng 5 cột như máy tính (cột trái 2 cột chỉ ~470 px ⇒ thẻ xếp dọc,
+     cao gấp ba); hộp cuộn bảng cao gần hết màn thay vì 58 % (≈ 226 px ở 390) */
+  .ca-luoi { gap: 12px; }
+  .ca-bang--cuon { max-height: max(220px, calc(100dvh - 120px)); }
+  .ca-bang-dau { font-size: 13px; letter-spacing: 0.04em; }
+  .ca-gio { padding: 16px; }
+  .ca-gio-so { font-size: 36px; }
+  .ca-nhan-nho { font-size: 13px; }
+}

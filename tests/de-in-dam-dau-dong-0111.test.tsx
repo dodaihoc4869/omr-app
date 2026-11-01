@@ -42,13 +42,11 @@ describe('đầu dòng', () => {
   })
 })
 
-describe('phương trình dài ngắt dòng', () => {
-  it('tách cụm ở «+» và mũi tên cấp ngoài; hệ số rời dính vào chất; ngoặc lệch ⇒ null', async () => {
-    const { tachCumCe } = await import('../src/lib/chem-latex')
-    expect(tachCumCe('2Al(s) + 3H2O(l) -> Al2O3(s) + 6H+ + 6e')).toEqual([
-      { dau: '', chat: '2Al(s)' }, { dau: '+', chat: '3H2O(l)' }, { dau: '->', chat: 'Al2O3(s)' }, { dau: '+', chat: '6H+' }, { dau: '+', chat: '6e' }])
-    expect(tachCumCe('Cu(s) + 2Fe^{3+}(aq) <=> Cu^{2+}(aq) + 2Fe^{2+}(aq)')?.map((c) => c.dau)).toEqual(['', '+', '<=>', '+'])
-    expect(tachCumCe('2 H2O -> O2')).toBeNull() // dưới 3 cụm ⇒ để nguyên
-    expect(tachCumCe('A + (B -> C')).toBeNull()
+describe('phương trình dài', () => {
+  it('GIỮ một dòng trong ô cuộn ngang (thầy 01/11: «Cứ để thanh cuộn, đi xuống dòng thế không đúng cách»), kể cả trong dòng đánh số', async () => {
+    const { findByText, container } = render(<ChemText text={'Cho:\n(1) $\\ce{2Al(s) + 3H2O(l) -> Al2O3(s) + 6H+ + 6e}$\n(2) $\\ce{2H2O(l) + 2e -> H2(g) + 2OH^-(aq)}$\nHỏi gì?'} />)
+    await findByText('(1)')
+    expect(container.querySelector('.ct-ngat')).toBeNull()
+    expect(container.querySelectorAll('.de-muc .ct-dai').length).toBeGreaterThan(0)
   })
 })
