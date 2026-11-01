@@ -25,6 +25,8 @@ async function luu(chup, ten) { // hạ chất lượng tới khi ≤ 150 KB
   const sang = await mo('', 1240, 900, 1.5)
   kq.push(await luu((o) => sang.locator('#so-sanh').screenshot(o), 'so-sanh-cu-moi.jpg'))
   kq.push(await luu((o) => sang.locator('#cam-xuc').screenshot(o), 'cam-xuc-A-sang.jpg'))
+  kq.push(await luu((o) => sang.locator('#gian').screenshot(o), 'gian-truoc-sau.jpg'))
+  kq.push(await luu((o) => sang.locator('#avo').screenshot(o), 'so-avogadro-can-canh.jpg'))
   await sang.close()
   const nho = await mo('', 1240, 900, 2)
   kq.push(await luu((o) => nho.locator('#co-nho').screenshot(o), 'co-nho.jpg'))

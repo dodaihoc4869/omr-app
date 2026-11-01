@@ -51,7 +51,8 @@
   --mol-tim:var(--tr-sai);
   --mol-not:var(--tr-tim);
   --mol-nuoc-mat:color-mix(in oklab,var(--tr-tin) 55%,var(--btg-chu-doan-dam));
-  --mol-soi:color-mix(in oklab,var(--tr-sai) 70%,var(--tr-chu-y));
+  --mol-soi:color-mix(in oklab,var(--tr-sai) 58%,var(--tr-chu-y));
+  --mol-tay:var(--mol-canh);
   --mol-soi-sang:color-mix(in oklab,var(--mol-soi) 60%,var(--btg-chu-doan-dam));
   --mol-soi-toi:color-mix(in oklab,var(--tr-sai-day) 80%,var(--tr-chu-y-day));
   --mol-do:var(--tr-sai);
@@ -68,7 +69,7 @@
   --mol-than-sang:color-mix(in oklab,var(--tr-hs) 58%,var(--btg-chu-doan-dam));
   --mol-than-toi:color-mix(in oklab,var(--tr-hs-nut) 45%,var(--tr-hs-day));
   --mol-vanh:color-mix(in oklab,var(--tr-hs) 38%,var(--btg-chu-doan-dam));
-  --mol-tay:color-mix(in oklab,var(--tr-hs-nut) 72%,var(--tr-hs-day));
+  --mol-canh:color-mix(in oklab,var(--tr-hs-nut) 72%,var(--tr-hs-day));
   --mol-chan:var(--tr-hs-day);
   --mol-nuoc:var(--tr-tin);
   --mol-nuoc-sang:color-mix(in oklab,var(--tr-tin) 52%,var(--btg-chu-doan-dam));
@@ -81,7 +82,7 @@
   --mol-than-sang:color-mix(in oklab,var(--tr-hs) 58%,var(--btg-chu-doan-dam));
   --mol-than-toi:color-mix(in oklab,var(--tr-hs-nut) 45%,var(--tr-hs-day));
   --mol-vanh:color-mix(in oklab,var(--tr-hs) 38%,var(--btg-chu-doan-dam));
-  --mol-tay:color-mix(in oklab,var(--tr-hs-nut) 72%,var(--tr-hs-day));
+  --mol-canh:color-mix(in oklab,var(--tr-hs-nut) 72%,var(--tr-hs-day));
   --mol-chan:var(--tr-hs-day);
   --mol-nuoc:var(--tr-chu-y);
   --mol-nuoc-sang:color-mix(in oklab,var(--tr-chu-y) 52%,var(--btg-chu-doan-dam));
@@ -94,7 +95,7 @@
   --mol-than-sang:color-mix(in oklab,var(--tr-tin) 55%,var(--btg-chu-doan-dam));
   --mol-than-toi:var(--tr-tin-day);
   --mol-vanh:color-mix(in oklab,var(--tr-tin) 36%,var(--btg-chu-doan-dam));
-  --mol-tay:color-mix(in oklab,var(--tr-tin-day) 85%,var(--tr-hs-day));
+  --mol-canh:color-mix(in oklab,var(--tr-tin-day) 85%,var(--tr-hs-day));
   --mol-chan:color-mix(in oklab,var(--tr-tin-day) 70%,var(--tr-hs-day));
   --mol-nuoc:var(--tr-tim);
   --mol-nuoc-sang:color-mix(in oklab,var(--tr-tim) 52%,var(--btg-chu-doan-dam));
@@ -110,7 +111,10 @@
 .mv .m-muc{fill:var(--mol-muc)} .mv .m-trang{fill:var(--mol-trang)} .mv .m-na{fill:var(--mol-na)}
 .mv .m-ma{fill:var(--mol-ma);opacity:.75} .mv .m-mui{fill:var(--mol-mui)} .mv .m-mieng{fill:var(--mol-muc)} .mv .m-luoi{fill:var(--mol-luoi)}
 .mv .m-tay{fill:var(--mol-tay)} .mv .m-tay-n{fill:none;stroke:var(--mol-tay);stroke-width:15;stroke-linecap:round}
-.mv .m-chan{fill:var(--mol-chan)} .mv .m-z{fill:var(--mol-than-toi)} .mv .m-mieng-ong{fill:var(--mol-than-toi);opacity:.55} .mv .m-bong{fill:var(--mol-bong)} .mv .m-bong-vanh{fill:var(--mol-than-toi);opacity:.35}
+.mv .m-chan{fill:var(--mol-chan)} .mv .m-canh{fill:var(--mol-canh)} .mv .m-canh-s{fill:var(--mol-than-sang);opacity:.45}
+.mv .m-khac{fill:var(--mol-trang);opacity:.85;font-family:inherit;font-weight:800;letter-spacing:.3px} .mv .m-khac-bong{fill:var(--mol-than-toi);opacity:.45;font-family:inherit;font-weight:800;letter-spacing:.3px}
+.mv .m-vach{fill:none;stroke:var(--mol-trang);stroke-width:1.7;stroke-linecap:round;opacity:.62}
+.mv .m-hoi-n{fill:none;stroke:var(--mol-hoi-vien);stroke-linecap:round} .mv .m-hoi-n2{fill:none;stroke:var(--mol-than-sang);stroke-linecap:round} .mv .m-z{fill:var(--mol-than-toi)} .mv .m-mieng-ong{fill:var(--mol-than-toi);opacity:.55} .mv .m-bong{fill:var(--mol-bong)} .mv .m-bong-vanh{fill:var(--mol-than-toi);opacity:.35}
 .mv .m-sang{fill:var(--mol-trang);opacity:.6} .mv .m-sang-n{fill:none;stroke:var(--mol-trang);stroke-linecap:round;opacity:.5}
 .mv .m-bot{fill:var(--mol-trang);opacity:.6} .mv .m-sao{fill:var(--mol-sao)} .mv .m-tim{fill:var(--mol-tim)} .mv .m-not{fill:var(--mol-not)}
 .mv .m-not-n{fill:none;stroke:var(--mol-not);stroke-width:3.4;stroke-linecap:round}
@@ -192,6 +196,21 @@ h2{margin:0;font-size:20px;font-weight:800}
 .vong svg{display:block}
 .o-tab{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:10px 10px 0 0;background:var(--tr-mat);border:1px solid var(--tr-vien);font-size:12px;color:var(--tr-chu-2)}
 .o-tab svg{width:16px;height:16px}
+/* trước / sau mặt giận */
+.gtr{display:grid;grid-template-columns:110px repeat(4,1fr);gap:10px;align-items:center}
+.gtr .nhan3{font-size:15px;font-weight:800;color:var(--tr-chu-2)}
+.gtr figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 4px;border-radius:18px;background:var(--tr-nen);font-size:14px;font-weight:800}
+.gtr figure.sau{box-shadow:inset 0 0 0 2px var(--tr-hs-nut)}
+.gtr svg{width:150px;height:172px}
+/* chữ khắc cận cảnh */
+.avo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+.avo article{display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:20px;background:var(--tr-nen);min-width:0}
+.avo .tren2{display:flex;gap:14px;align-items:center;justify-content:center}
+.avo article.de{box-shadow:inset 0 0 0 2.5px var(--tr-hs-nut)}
+.avo h3{margin:0;font-size:17px;font-weight:800}
+.avo .zoom{border-radius:16px;background:var(--tr-mat);border:2px solid var(--tr-vien)}
+.avo .hai{display:flex;gap:10px;justify-content:center;align-items:flex-end;flex-wrap:wrap}
+.avo p{margin:0;font-size:13.5px;color:var(--tr-chu-2)}
 
 /* ── Điện thoại (ngữ cảnh) ── */
 .dt{width:390px;height:844px;position:relative;overflow:hidden;background:var(--tr-nen);font-family:'DDH Rounded',sans-serif;border-radius:0}
@@ -237,29 +256,41 @@ body:not(.chi-dt) .dt-goc{display:none}
 
   <section class="khoi" id="so-sanh">
     <header><h2>Mol cũ · cú Lửa · Mol mới (cùng khung 200 × 230)</h2>
-      <p class="phu">Mol mới đứng toàn thân như cú Lửa nên vừa đúng các chỗ cú đứng trước đây (Lộ trình, bong bóng lời) — khung không đổi.</p></header>
+      <p class="phu">Mol mới đứng toàn thân như cú Lửa nên vừa đúng các chỗ cú đứng trước đây (Lộ trình, bong bóng lời) — khung không đổi. Thân lùn mập (cao : rộng ≈ 1,15 : 1), hai cánh nhỏ, khắc mờ 6,022·10²³.</p></header>
     <div class="ss">
       <figure><svg class="mc" viewBox="0 -26 200 230" data-ve="cu"></svg><b>Mol cũ · bình cầu</b><small>Đang chạy (#713). Chỉ có mặt; xanh <code>--tr-gv</code> là màu app thầy, lệch với app học sinh.</small></figure>
       <figure><!-- cú Lửa: ảnh SVG tĩnh chụp từ src/components/linh-vat/lua-dong.ts (trạng thái yên, token hs sáng) --><svg class="cu" viewBox="-170 -372 340 391" aria-hidden="true" focusable="false"><defs><clipPath id="lua1t"><path d="M-75,-84Q-64,-118 -24,-118L24,-118Q64,-118 75,-84L75,-84Q86,-50 78,-26L78,-26Q70,-2 44,-2L-44,-2Q-70,-2 -78,-26L-78,-26Q-86,-50 -75,-84Z" fill="color(srgb 0.511765 0.55098 1)"></path></clipPath><clipPath id="lua1d"><path d="M-90,-50Q-70,-90 -18,-90L18,-90Q70,-90 90,-50L90,-50Q110,-10 111,10L111.5,20Q112,30 106,36L102.8,39.2Q100,42 102.5,45.1L104,47Q108,52 97.8,61.6L89,70Q70,88 30,88L-30,88Q-70,88 -89,70L-97.8,61.6Q-108,52 -104,47L-102.5,45.1Q-100,42 -102.8,39.2L-106,36Q-112,30 -111.5,20L-111,10Q-110,-10 -90,-50Z" fill="color(srgb 0.511765 0.55098 1)"></path></clipPath><clipPath id="lua1e0"><circle r="27"></circle></clipPath><clipPath id="lua1e2"><circle r="27"></circle></clipPath><clipPath id="lua1m"><path d="M-15,-5Q0,-7 15,-5Q0,17 -15,-5Z"></path></clipPath></defs><g><ellipse cx="0" cy="6" rx="92" ry="12" opacity="1" fill="color(srgb 0.368627 0.392157 0.803922 / 0.18)"></ellipse><g transform="translate(0,0) rotate(1.5) scale(1,1)"><g transform="translate(0,0) rotate(0.8 -60 -40)"><g transform="translate(-100,-62)"><ellipse cx="0" cy="0" rx="50" ry="46" stroke-width="5.5" stroke-linejoin="round" style="paint-order: stroke;" fill="color(srgb 0.511765 0.55098 1)" stroke="oklab(0.458523 0.0143123 -0.110746)"></ellipse><path d="M44,-14C54,18 30,46 -2,46C-28,46 -46,30 -50,8C-38,30 -8,40 14,30C34,22 44,4 44,-14Z" fill="color(srgb 0.420392 0.448235 0.911765)"></path><path d="M-4,-34C-30,-30 -40,-4 -30,16C-26,24 -18,28 -12,30C-24,14 -24,-12 -4,-34Z" fill="rgb(0, 190, 216)"></path><path d="M-10,-26C-22,-18 -26,-6 -24,4C-20,-8 -16,-16 -10,-26Z" fill="color(srgb 0.55 0.885294 0.931176)"></path><ellipse cx="8" cy="4" rx="13" ry="12" fill="color(srgb 0.420392 0.448235 0.911765)"></ellipse></g></g><ellipse cx="0" cy="-4" rx="27" ry="14" stroke-width="5.5" stroke-linejoin="round" transform="translate(-40,0)" style="paint-order: stroke;" fill="color(srgb 0.683765 0.717647 1)" stroke="oklab(0.458523 0.0143123 -0.110746)"></ellipse><ellipse cx="0" cy="-4" rx="27" ry="14" stroke-width="5.5" stroke-linejoin="round" transform="translate(40,0)" style="paint-order: stroke;" fill="color(srgb 0.683765 0.717647 1)" stroke="oklab(0.458523 0.0143123 -0.110746)"></ellipse><g><g><path d="M-87.9,-103.6L-92.9,-87.3Q-96,-79.5 -97.5,-71.2L-99.1,-56.3L-74.5,-51.9L-70.9,-66.5Q-69.9,-72 -67.9,-77.2L-60.1,-92.4Q-54.5,-106.3 -68.4,-111.9Q-82.3,-117.5 -87.9,-103.6Z" stroke-width="4.5" stroke-linejoin="round" style="paint-order: stroke;" fill="rgb(255, 255, 255)" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><g transform="translate(-86.8,-54.1) scale(-1,1) rotate(-10)"><g><path d="M-15,-4C-20,8 -18,24 -6,30Q0,34 6,30C18,24 20,8 15,-4Z" stroke-width="5.5" stroke-linejoin="round" style="paint-order: stroke;" fill="color(srgb 0.511765 0.55098 1)" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><path d="M-4,22L-2,28M4,22L4,29" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="oklab(0.458523 0.0143123 -0.110746)"></path></g></g></g><g><path d="M60.1,-92.4L67.9,-77.2Q69.9,-72 70.9,-66.5L74.5,-51.9L99.1,-56.3L97.5,-71.2Q96,-79.5 92.9,-87.3L87.9,-103.6Q82.3,-117.5 68.4,-111.9Q54.5,-106.3 60.1,-92.4Z" stroke-width="4.5" stroke-linejoin="round" style="paint-order: stroke;" fill="rgb(255, 255, 255)" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><g transform="translate(86.8,-54.1) scale(1,1) rotate(-10)"><g><path d="M-15,-4C-20,8 -18,24 -6,30Q0,34 6,30C18,24 20,8 15,-4Z" stroke-width="5.5" stroke-linejoin="round" style="paint-order: stroke;" fill="color(srgb 0.511765 0.55098 1)" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><path d="M-4,22L-2,28M4,22L4,29" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="oklab(0.458523 0.0143123 -0.110746)"></path></g></g></g></g><g transform="translate(0,0) scale(1,1)"><path d="M-75,-84Q-64,-118 -24,-118L24,-118Q64,-118 75,-84L75,-84Q86,-50 78,-26L78,-26Q70,-2 44,-2L-44,-2Q-70,-2 -78,-26L-78,-26Q-86,-50 -75,-84Z" fill="color(srgb 0.511765 0.55098 1)"></path><g clip-path="url(#lua1t)"><path d="M-120,-112L-30,-112L0,-64L30,-112L120,-112V20H-120Z" fill="rgb(255, 255, 255)"></path><path d="M40,-112L120,-112V20H52Q66,-40 40,-112Z" fill="color(srgb 0.93851 0.945098 1)"></path></g><g transform="translate(0,0)"><path d="M-46,-112L0,-58L46,-112M0,-58V-4" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><path d="M-46,-113L-30,-113L0,-64L-6,-56ZM46,-113L30,-113L0,-64L6,-56Z" stroke-width="3.6" stroke-linejoin="round" style="paint-order: stroke;" fill="rgb(255, 255, 255)" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><g transform="translate(-40,-46)"><g transform="rotate(-6)"><rect x="-8" y="-34" width="16" height="42" rx="8" stroke-width="3.2" stroke-linejoin="round" style="paint-order: stroke;" fill="color(srgb 0.92 0.979608 0.987765)" stroke="oklab(0.458523 0.0143123 -0.110746)"></rect><path d="M-6.4,-14H6.4V0A6.4,6.4 0 0 1 -6.4,0Z" fill="rgb(243, 115, 206)"></path><rect x="-3.6" y="-28" width="3" height="11" rx="1.5" fill="rgb(255, 255, 255)"></rect></g><rect x="-20" y="-4" width="40" height="26" rx="6" stroke-width="4" stroke-linejoin="round" style="paint-order: normal;" fill="rgb(255, 255, 255)" stroke="oklab(0.458523 0.0143123 -0.110746)"></rect></g><g transform="translate(40,-58)"><path d="M0,-21L18.2,-10.5V10.5L0,21L-18.2,10.5V-10.5Z" stroke-width="3.4" stroke-linejoin="round" style="paint-order: stroke;" fill="oklab(0.496106 0.0167639 -0.129731)" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><path d="M0,-12C6,-6 9,-1 8,5C7,10 3,13 0,13C-4,13 -8,10 -8,5C-8,1 -6,-2 -3,-5C-3,-1 -1,1 1,1C2,-3 1,-7 0,-12Z" fill="rgb(255, 255, 255)"></path></g></g><path d="M-75,-84Q-64,-118 -24,-118L24,-118Q64,-118 75,-84L75,-84Q86,-50 78,-26L78,-26Q70,-2 44,-2L-44,-2Q-70,-2 -78,-26L-78,-26Q-86,-50 -75,-84Z" fill="none" stroke-width="5.5" stroke-linejoin="round" style="paint-order: stroke;" stroke="oklab(0.458523 0.0143123 -0.110746)"></path></g><g transform="translate(0,-196) rotate(-1)"><g><g transform="translate(-62,-92) rotate(-20) scale(-1.1,1.12)"><path d="M-30.5,24.6Q-34,34 -24.3,31.6L20.3,20.4Q30,18 25.3,9.2L-0.2,-38.9Q-4,-46 -6.8,-38.5Z" stroke-width="5.5" stroke-linejoin="round" style="paint-order: stroke;" fill="color(srgb 0.511765 0.55098 1)" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><path d="M-18.1,16.3Q-20,22 -14.2,20.4L10.2,13.6Q16,12 13.2,6.7L-1.7,-21.6Q-4,-26 -5.6,-21.3Z" fill="color(srgb 1 0.977412 0.928706)"></path></g><g transform="translate(62,-92) rotate(20) scale(1.1,1.12)"><path d="M-30.5,24.6Q-34,34 -24.3,31.6L20.3,20.4Q30,18 25.3,9.2L-0.2,-38.9Q-4,-46 -6.8,-38.5Z" stroke-width="5.5" stroke-linejoin="round" style="paint-order: stroke;" fill="color(srgb 0.511765 0.55098 1)" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><path d="M-18.1,16.3Q-20,22 -14.2,20.4L10.2,13.6Q16,12 13.2,6.7L-1.7,-21.6Q-4,-26 -5.6,-21.3Z" fill="color(srgb 1 0.977412 0.928706)"></path></g></g><g transform="translate(0,-88) rotate(0) scale(1,1)"><path d="M0,0C-18,-2 -26,-18 -18,-34C-14,-24 -8,-22 -6,-26C-10,-38 -4,-52 8,-58C4,-44 12,-40 16,-34C22,-26 24,-10 14,-2C10,0 4,1 0,0Z" stroke-width="4.5" stroke-linejoin="round" style="paint-order: stroke;" fill="rgb(243, 115, 206)" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><path d="M2,-6C-6,-8 -10,-16 -6,-24C-2,-18 4,-20 4,-26C10,-20 12,-12 8,-7C6,-6 4,-6 2,-6Z" fill="color(srgb 0.978824 0.752941 0.913529)"></path></g><path d="M-90,-50Q-70,-90 -18,-90L18,-90Q70,-90 90,-50L90,-50Q110,-10 111,10L111.5,20Q112,30 106,36L102.8,39.2Q100,42 102.5,45.1L104,47Q108,52 97.8,61.6L89,70Q70,88 30,88L-30,88Q-70,88 -89,70L-97.8,61.6Q-108,52 -104,47L-102.5,45.1Q-100,42 -102.8,39.2L-106,36Q-112,30 -111.5,20L-111,10Q-110,-10 -90,-50Z" fill="color(srgb 0.511765 0.55098 1)"></path><g clip-path="url(#lua1d)"><path d="M60,-120Q120,-40 96,100H140V-120Z" fill="color(srgb 0.420392 0.448235 0.911765)"></path><ellipse cx="-50" cy="-66" rx="34" ry="14" transform="rotate(-20 -50 -66)" opacity="0.8" fill="color(srgb 0.683765 0.717647 1)"></ellipse></g><g transform="translate(0,0)"><g transform="scale(1,1)"><path d="M-104,26C-106,-20 -78,-30 -50,-28C-28,-26 -12,-18 0,-2C12,-18 28,-26 50,-28C78,-30 106,-20 104,26C102,64 64,86 0,86C-64,86 -102,64 -104,26ZM-53,-40a9,6 0 1,0 18,0a9,6 0 1,0 -18,0M35,-40a9,6 0 1,0 18,0a9,6 0 1,0 -18,0" fill="color(srgb 1 0.977412 0.928706)"></path></g><path d="M-89,40a17,10.5 0 1,0 34,0a17,10.5 0 1,0 -34,0M55,40a17,10.5 0 1,0 34,0a17,10.5 0 1,0 -34,0" opacity="0.9" fill="color(srgb 0.987059 0.776471 0.845882)"></path><g transform="translate(-46,8) scale(1,1)"><g><circle r="27" fill="oklab(0.345775 0.00695726 -0.0537883)"></circle><g clip-path="url(#lua1e0)"><g transform="translate(0,0)"><path d="M-1.5,-9a9.5,9.5 0 1,0 19,0a9.5,9.5 0 1,0 -19,0M-14,9a4,4 0 1,0 8,0a4,4 0 1,0 -8,0" fill="rgb(255, 255, 255)"></path></g><rect x="-32" y="-107" width="64" height="80" rx="0" transform="rotate(0 0 -27)" fill="color(srgb 1 0.977412 0.928706)"></rect></g></g><path d="M-18,0Q0,14 18,0" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display: none;" stroke="oklab(0.345775 0.00695726 -0.0537883)"></path><path d="M-18,6Q0,-16 18,6" stroke-width="5.5" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display: none;" stroke="oklab(0.345775 0.00695726 -0.0537883)"></path></g><path d="M-14,0H14" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round" transform="translate(-46,-22) rotate(0)" style="display: none;" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><g transform="translate(46,8) scale(1,1)"><g><circle r="27" fill="oklab(0.345775 0.00695726 -0.0537883)"></circle><g clip-path="url(#lua1e2)"><g transform="translate(0,0)"><path d="M-1.5,-9a9.5,9.5 0 1,0 19,0a9.5,9.5 0 1,0 -19,0M-14,9a4,4 0 1,0 8,0a4,4 0 1,0 -8,0" fill="rgb(255, 255, 255)"></path></g><rect x="-32" y="-107" width="64" height="80" rx="0" transform="rotate(0 0 -27)" fill="color(srgb 1 0.977412 0.928706)"></rect></g></g><path d="M-18,0Q0,14 18,0" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display: none;" stroke="oklab(0.345775 0.00695726 -0.0537883)"></path><path d="M-18,6Q0,-16 18,6" stroke-width="5.5" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display: none;" stroke="oklab(0.345775 0.00695726 -0.0537883)"></path></g><path d="M-14,0H14" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round" transform="translate(46,-22) rotate(0)" style="display: none;" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><path d="M-11,19Q0,14 11,19Q8,29 0,31Q-8,29 -11,19Z" fill="oklab(0.345775 0.00695726 -0.0537883)"></path><g transform="translate(0,44)"><path d="M-15,-5Q0,-7 15,-5Q0,17 -15,-5Z" stroke-width="3.6" stroke-linejoin="round" style="paint-order: stroke;" fill="color(srgb 0.856627 0.238902 0.44251)" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><g clip-path="url(#lua1m)"><ellipse cx="0" cy="9" rx="9" ry="6" fill="color(srgb 0.976274 0.590196 0.717451)"></ellipse></g></g></g><path d="M-90,-50Q-70,-90 -18,-90L18,-90Q70,-90 90,-50L90,-50Q110,-10 111,10L111.5,20Q112,30 106,36L102.8,39.2Q100,42 102.5,45.1L104,47Q108,52 97.8,61.6L89,70Q70,88 30,88L-30,88Q-70,88 -89,70L-97.8,61.6Q-108,52 -104,47L-102.5,45.1Q-100,42 -102.8,39.2L-106,36Q-112,30 -111.5,20L-111,10Q-110,-10 -90,-50Z" fill="none" stroke-width="5.5" stroke-linejoin="round" style="paint-order: stroke;" stroke="oklab(0.458523 0.0143123 -0.110746)"></path><g clip-path="url(#lua1d)"><g transform="translate(0,0)"><path d="M-130,-34Q0,-118 130,-34V-14Q0,-98 -130,-14Z" stroke-width="4" stroke-linejoin="round" style="paint-order: stroke;" fill="rgb(0, 190, 216)" stroke="oklab(0.458523 0.0143123 -0.110746)"></path></g></g><g transform="translate(0,0)"><g transform="translate(-44,-62) rotate(-13) scale(0.9,0.9)"><rect x="-31" y="-20" width="62" height="40" rx="16" stroke-width="4.5" stroke-linejoin="round" style="paint-order: stroke;" fill="rgb(0, 190, 216)" stroke="oklab(0.458523 0.0143123 -0.110746)"></rect><rect x="-23" y="-13" width="46" height="26" rx="11" fill="color(srgb 0.55 0.885294 0.931176)"></rect><path d="M-16,-9H-4L-12,7H-20ZM7,-7a3,3 0 1,0 6,0a3,3 0 1,0 -6,0" opacity="0.85" fill="rgb(255, 255, 255)"></path></g><g transform="translate(44,-62) rotate(13) scale(0.9,0.9)"><rect x="-31" y="-20" width="62" height="40" rx="16" stroke-width="4.5" stroke-linejoin="round" style="paint-order: stroke;" fill="rgb(0, 190, 216)" stroke="oklab(0.458523 0.0143123 -0.110746)"></rect><rect x="-23" y="-13" width="46" height="26" rx="11" fill="color(srgb 0.55 0.885294 0.931176)"></rect><path d="M-16,-9H-4L-12,7H-20ZM7,-7a3,3 0 1,0 6,0a3,3 0 1,0 -6,0" opacity="0.85" fill="rgb(255, 255, 255)"></path></g><path d="M0,-80L10,-74V-62L0,-56L-10,-62V-74Z" stroke-width="3" stroke-linejoin="round" style="paint-order: stroke;" fill="oklab(0.496106 0.0167639 -0.129731)" stroke="oklab(0.458523 0.0143123 -0.110746)"></path></g></g><g></g></g></g><g></g></svg><b>Cú Lửa · linh vật trước</b><small>Toàn thân, đầu rộng, mắt to; lông chàm <code>--tr-hs</code>. Lấy tỉ lệ «mập, mắt to» từ đây.</small></figure>
-      <figure class="moi"><svg class="mv pa-A" viewBox="0 -26 200 230" data-mat="chao"></svg><b>Mol mới · ống nghiệm (A)</b><small>Toàn thân, thân chàm <code>--tr-hs</code>, dung dịch ngọc lam <code>--tr-tin</code>, mũi cam <code>--tr-chu-y</code>.</small></figure>
+      <figure class="moi"><svg class="mv pa-A" viewBox="0 -26 200 230" data-mat="chao"></svg><b>Mol mới · ống nghiệm (A)</b><small>Lùn mập, hai cánh; thân chàm <code>--tr-hs</code>, dung dịch ngọc lam <code>--tr-tin</code>, mũi cam <code>--tr-chu-y</code>.</small></figure>
     </div>
   </section>
 
   <section class="khoi" id="phuong-an">
     <header><h2>Ba phương án màu · đặt cạnh nút, chặng và bong bóng lời của app</h2>
-      <p class="phu">Mỗi phương án là tổ hợp token có sẵn. Giận: dung dịch hoá đỏ <code>--tr-sai</code>, dâng và sôi — như Mol cũ.</p></header>
+      <p class="phu">Mỗi phương án là tổ hợp token có sẵn. Giận: dung dịch hoá đỏ <code>--tr-sai</code>, dâng và sôi — như Mol cũ; mặt giận tinh tế, không răng.</p></header>
     <div class="pa3" id="pa3"></div>
   </section>
 
   <section class="khoi" id="cam-xuc">
     <header><h2>Bộ cảm xúc toàn thân · phương án A</h2>
-      <p class="phu">11 cảm xúc đang có (giữ đủ, cùng chỗ dùng) + 3 cảm xúc mới để thầy chọn thêm. Dáng người nói cảm xúc: tay, chân, nghiêng, nhảy.</p></header>
+      <p class="phu">11 cảm xúc đang có (giữ đủ, cùng chỗ dùng) + 3 cảm xúc mới để thầy chọn thêm. Dáng nói cảm xúc: cánh, chân, nghiêng, nhảy. Giận tinh tế: mày chau, mắt nheo, miệng khép — không răng.</p></header>
     <div class="cx" id="cx"></div>
+  </section>
+
+  <section class="khoi" id="gian">
+    <header><h2>Mặt giận · trước và sau góp ý «bỏ miệng răng, tinh tế»</h2>
+      <p class="phu">Sau: mày chau nghiêng che nửa trên con ngươi, mắt nheo, miệng khép thành nét ngắn, mũi cam giữ nguyên; cáu = làn hơi mảnh + dung dịch hơi đỏ; rất cáu = hơi đậm hơn, đỏ dâng, rung nhẹ. Không răng, không gân đỏ.</p></header>
+    <div class="gtr" id="gtr"></div>
+  </section>
+
+  <section class="khoi" id="avo">
+    <header><h2>Chữ khắc 6,022·10²³ · hai phương án vị trí (cận cảnh)</h2>
+      <p class="phu">Khắc mờ trên thuỷ tinh: nét trắng bán trong, cỡ nhỏ, cạnh vạch chia như ống đong — không khung nhãn, không lấn mắt mũi. Giận: chữ vẫn đọc được trên dung dịch đỏ.</p></header>
+    <div class="avo" id="avo2"></div>
   </section>
 
   <section class="khoi" id="co-nho">
     <header><h2>Cỡ nhỏ 28 / 40 / 64 px · nền sáng và tối (phương án A)</h2>
-      <p class="phu">Đề xuất: từ 48 px trở lên vẽ toàn thân; dưới 48 px (vòng Mục tiêu, biểu tượng tab) chỉ hiện nửa trên — miệng ống + mặt.</p></header>
+      <p class="phu">Đề xuất: từ 48 px trở lên vẽ toàn thân; dưới 48 px (vòng Mục tiêu, biểu tượng tab) chỉ hiện nửa trên — miệng ống + mặt. Chữ khắc 6,022·10²³ chỉ hiện từ 64 px; nhỏ hơn giữ vạch chia.</p></header>
     <div class="cn" id="cn"></div>
   </section>
 </main>
@@ -268,29 +299,32 @@ body:not(.chi-dt) .dt-goc{display:none}
 <script>
 // ═══════════ MOL v2 · ỐNG NGHIỆM — bộ vẽ (thuần chuỗi SVG; khi build chép sang src/components/linh-vat/mol-dong.ts) ═══════════
 // Khung 200 × 230, viewBox '0 -26 200 230' (y −26…204) như Mol cũ ⇒ <Bi …> và mọi khung chứa giữ nguyên.
-// Hình: ống nghiệm dựng đứng (vành ở đỉnh, đáy tròn), mảng mặt trắng hai thuỳ, hai mắt to, mũi tròn, dung dịch nửa dưới có bọt, hai tay nét tròn, hai chân bo, bóng elip.
+// Hình (thầy 01/11 tối: «thay tay bằng cánh», «lùn hơn, ngang to hơn»): ống nghiệm MẬP rộng 136 × cao 156 (≈ 1,15 : 1), vành miệng ống rộng, đáy tròn to;
+// mảng mặt trắng hai thuỳ, hai mắt to, mũi tròn cam; dung dịch dưới bụng có bọt; khắc mờ «6,022·10²³» + vạch chia; hai cánh nhỏ bo tròn; chân ngắn; bóng elip.
 let so = 0
 const f = (n) => Math.round(n * 10) / 10
-const L = 76, R = 124, Y = 72                // tâm hai mắt
-const TU = 'M46 12 H154 V128 A54 54 0 0 1 46 128 Z'  // thân ống: rộng 108, đáy tròn bán kính 54 ⇒ y 12…182
-const NA = 'M52 76 C52 58 62 48 76 48 C87 48 94 52 100 58 C106 52 113 48 124 48 C138 48 148 58 148 76 V98 C148 116 127 128 100 128 C73 128 52 116 52 98 Z'
+const L = 72, R = 128, Y = 70                // tâm hai mắt
+const TU = 'M32 22 H168 V110 A68 68 0 0 1 32 110 Z'  // thân: x 32…168, y 22…178, đáy bán kính 68
+const NA = 'M46 76 C46 56 58 44 72 44 C85 44 94 49 100 56 C106 49 115 44 128 44 C142 44 154 56 154 76 V96 C154 116 130 130 100 130 C70 130 46 116 46 96 Z'
+const MUC = 150                               // mặt dung dịch lúc yên (chữ khắc nằm ngay trên)
 const SONG = (S) => { let d = `M10 ${S}`; for (let x = 10; x < 200; x += 30) d += ` Q${x + 15} ${S - 5} ${x + 30} ${S}`; return d }
 
 function mat(x, o = {}) { // mắt mở: bầu dục mực + hai đốm sáng (dx/dy = hướng nhìn)
-  const { dx = 0, dy = 0, rx = 16, ry = 19, hs = 1 } = o
+  const { dx = 0, dy = 0, rx = 18, ry = 21, hs = 1 } = o
   return `<ellipse cx="${f(x + dx * 0.35)}" cy="${f(Y + dy * 0.35)}" rx="${rx}" ry="${ry}" class="m-muc"/>` +
-    `<circle cx="${f(x + 5 + dx)}" cy="${f(Y - 6 + dy)}" r="${f(6.2 * hs)}" class="m-trang"/>` +
-    `<circle cx="${f(x - 5 + dx * 0.6)}" cy="${f(Y + 7 + dy * 0.6)}" r="${f(2.8 * hs)}" class="m-trang"/>`
+    `<circle cx="${f(x + 6 + dx)}" cy="${f(Y - 7 + dy)}" r="${f(7 * hs)}" class="m-trang"/>` +
+    `<circle cx="${f(x - 6 + dx * 0.6)}" cy="${f(Y + 8 + dy * 0.6)}" r="${f(3 * hs)}" class="m-trang"/>`
 }
-const cung = (x, w = 6.5) => `<path d="M${x - 14} ${Y + 5} Q${x} ${Y - 15} ${x + 14} ${Y + 5}" class="m-net" stroke-width="${w}"/>`
-/** Mí + mày: ng > 0 ⇒ ngoài cao trong thấp (giận), ng < 0 ⇒ trong cao ngoài thấp (buồn); phu = mí sụp thêm. */
-function mi(x, ben, ng, phu, u, day = 5.5) {
-  const yN = Y - 12 - ng * 7 + phu, yT = Y - 12 + ng * 7 + phu
+const cung = (x, w = 6.5) => `<path d="M${x - 16} ${Y + 5} Q${x} ${Y - 16} ${x + 16} ${Y + 5}" class="m-net" stroke-width="${w}"/>`
+/** Mí trên + mày (+ mí dưới nheo): ng > 0 ⇒ ngoài cao trong thấp (giận), ng < 0 ⇒ trong cao ngoài thấp (buồn); phu = mí sụp thêm; duoi = mí dưới (nheo). */
+function mi(x, ben, ng, phu, u, day = 6, duoi = 0) {
+  const yN = Y - 13 - ng * 8 + phu, yT = Y - 13 + ng * 8 + phu
   const [y1, y2] = ben < 0 ? [yN, yT] : [yT, yN]
-  const o = (t) => f(y1 + (y2 - y1) * t)
-  return `<clipPath id="${u}"><ellipse cx="${x}" cy="${Y}" rx="17" ry="20"/></clipPath>` +
-    `<path clip-path="url(#${u})" d="M${x - 24} ${Y - 36} H${x + 24} V${f(y2)} L${x - 24} ${f(y1)} Z" class="m-na"/>` +
-    `<path d="M${x - 19} ${o(5 / 48)} L${x + 19} ${o(43 / 48)}" class="m-net" stroke-width="${day}"/>`
+  const o = (t) => f(y1 + (y2 - y1) * t), cp = `url(#${u})`
+  return `<clipPath id="${u}"><ellipse cx="${x}" cy="${Y}" rx="19" ry="22"/></clipPath>` +
+    `<path clip-path="${cp}" d="M${x - 27} ${Y - 40} H${x + 27} V${f(y2)} L${x - 27} ${f(y1)} Z" class="m-na"/>` +
+    (duoi ? `<path clip-path="${cp}" d="M${x - 27} ${Y + duoi} Q${x} ${Y + duoi - 6} ${x + 27} ${Y + duoi} V${Y + 30} H${x - 27} Z" class="m-na"/>` : '') +
+    `<path d="M${x - 21} ${o(6 / 54)} L${x + 21} ${o(48 / 54)}" class="m-net" stroke-width="${day}"/>`
 }
 const tim = (x, y, s = 1, lop = 'm-tim') => `<path transform="translate(${x} ${y}) scale(${s})" d="M0 9 C-15 -1 -11 -14 0 -6 C11 -14 15 -1 0 9Z" class="${lop}"/>`
 const sao = (x, y, s) => `<path transform="translate(${x} ${y}) scale(${s})" d="M0 -11 L3 -3 L11 0 L3 3 L0 11 L-3 3 L-11 0 L-3 -3Z" class="m-sao"/>`
@@ -302,16 +336,17 @@ function matVe(m, u) {
     case 'khen': case 'nhay': return cung(L) + cung(R)
     case 'nguong': return cung(L, 6) + cung(R, 6)
     case 'chao': return mat(L, { dx: 2 }) + cung(R)
-    case 'ngu': return [L, R].map((x) => `<path d="M${x - 14} ${Y + 2} Q${x} ${Y + 13} ${x + 14} ${Y + 2}" class="m-net" stroke-width="6"/>`).join('')
-    case 'ngac': return mat(L, { rx: 18, ry: 22, hs: 0.72 }) + mat(R, { rx: 18, ry: 22, hs: 0.72 }) +
-      [L, R].map((x) => `<path d="M${x - 13} ${Y - 31} Q${x} ${Y - 40} ${x + 13} ${Y - 31}" class="m-net" stroke-width="5"/>`).join('')
-    case 'nghi': return mat(L, { dx: 4, dy: -6 }) + mat(R, { dx: 4, dy: -6 }) + `<path d="M${R - 13} ${Y - 30} Q${R} ${Y - 39} ${R + 13} ${Y - 31}" class="m-net" stroke-width="5"/>`
-    case 'buon': return hai((x, b, id) => mat(x, { dy: 3, hs: 0.8 }) + `<ellipse cx="${x}" cy="${Y + 12}" rx="11" ry="5" class="m-nuoc-mat"/>` + mi(x, b, -1, 0, id))
-    case 'doi': return hai((x, b, id) => mat(x, { dx: -7, dy: 4 }) + mi(x, b, 0, 13, id))
-    case 'buc': return hai((x, b, id) => mat(x, { dy: 3 }) + mi(x, b, 0.9, 2, id))
-    case 'cau': return hai((x, b, id) => mat(x, { dy: 4, hs: 0.8 }) + mi(x, b, 1.6, 2, id, 6))
-    case 'ratCau': return hai((x, b, id) => mat(x, { dy: 5, hs: 0.6 }) + mi(x, b, 2.2, 3, id, 6.5))
-    case 'me': return [L, R].map((x) => tim(x, Y, 1.55) + `<circle cx="${x - 6}" cy="${Y - 6}" r="3.4" class="m-trang"/>`).join('')
+    case 'ngu': return [L, R].map((x) => `<path d="M${x - 16} ${Y + 2} Q${x} ${Y + 14} ${x + 16} ${Y + 2}" class="m-net" stroke-width="6"/>`).join('')
+    case 'ngac': return mat(L, { rx: 20, ry: 24, hs: 0.72 }) + mat(R, { rx: 20, ry: 24, hs: 0.72 }) +
+      [L, R].map((x) => `<path d="M${x - 14} ${Y - 34} Q${x} ${Y - 43} ${x + 14} ${Y - 34}" class="m-net" stroke-width="5"/>`).join('')
+    case 'nghi': return mat(L, { dx: 4, dy: -7 }) + mat(R, { dx: 4, dy: -7 }) + `<path d="M${R - 15} ${Y - 33} Q${R} ${Y - 43} ${R + 15} ${Y - 34}" class="m-net" stroke-width="5"/>`
+    case 'buon': return hai((x, b, id) => mat(x, { dy: 3, hs: 0.8 }) + `<ellipse cx="${x}" cy="${Y + 13}" rx="12" ry="5.5" class="m-nuoc-mat"/>` + mi(x, b, -1, 0, id))
+    case 'doi': return hai((x, b, id) => mat(x, { dx: -8, dy: 5 }) + mi(x, b, 0, 14, id))
+    // GIẬN TINH TẾ (thầy 01/11 «bỏ miệng răng, tinh tế giống con cú cáu»): mày chau nghiêng che nửa trên con ngươi + mí dưới nheo; không răng
+    case 'buc': return hai((x, b, id) => mat(x, { dy: 9 }) + mi(x, b, 0.8, 5, id, 6, 17))
+    case 'cau': return hai((x, b, id) => mat(x, { dy: 9, hs: 0.8 }) + mi(x, b, 1.1, 8, id, 6.5, 15))
+    case 'ratCau': return hai((x, b, id) => mat(x, { dy: 9, hs: 0.65 }) + mi(x, b, 1.3, 10, id, 7, 14))
+    case 'me': return [L, R].map((x) => tim(x, Y, 1.75) + `<circle cx="${x - 7}" cy="${Y - 7}" r="3.6" class="m-trang"/>`).join('')
     default: return mat(L) + mat(R)
   }
 }
@@ -324,66 +359,93 @@ function miengVe(m) {
     case 'buon': return '<path d="M88 118 Q100 106 112 118" class="m-net" stroke-width="5"/>'
     case 'ngu': return '<ellipse cx="100" cy="112" rx="4.5" ry="3.5" class="m-mieng"/>'
     case 'doi': return '<path d="M92 115 Q100 109 110 116" class="m-net" stroke-width="4.5"/>'
-    case 'buc': return '<path d="M88 114 H112" class="m-net" stroke-width="5"/>'
-    case 'cau': return '<rect x="84" y="104" width="32" height="15" rx="5.5" class="m-mieng"/><path d="M87 111.5 H113 M92 106 V117 M100 106 V117 M108 106 V117" class="m-net-t" stroke-width="2.2"/>'
-    case 'ratCau': return '<path d="M80 123 Q100 94 120 123 Z" class="m-mieng"/><path d="M85 119 L91 112 L97 118 L103 111 L109 118 L115 112" class="m-net-t" stroke-width="2.4"/>'
+    case 'buc': return '<path d="M93 114 H107" class="m-net" stroke-width="5"/>'                           // miệng khép: nét ngắn
+    case 'cau': return '<path d="M92 116 Q100 111.5 108 116" class="m-net" stroke-width="5"/>'              // trễ nhẹ
+    case 'ratCau': return '<path d="M93.5 117 Q100 112 106.5 117" class="m-net" stroke-width="5.5"/>'        // mím chặt
     case 'nguong': return '<path d="M89 109 Q100 120 111 109" class="m-net" stroke-width="4.5"/>'
     default: return '<path d="M85 104 Q100 128 115 104 Z" class="m-mieng"/><path d="M91 114 Q100 108 109 114 Q100 122 91 114Z" class="m-luoi"/>'
   }
 }
-/** Tay: nét tròn dày (vai ở mép ống) + bàn tay tròn ở cuối. [trái hình, phải hình]. */
-const TAY = {
-  ha: ['M46 112 Q32 124 32 142', 'M154 112 Q168 124 168 142'],
-  gio: ['M46 106 Q24 90 24 60', 'M154 106 Q176 90 176 60'],
-  vay: ['M46 112 Q32 124 32 142', 'M154 108 Q178 96 178 64'],
-  cam: ['M46 112 Q32 124 32 142', 'M154 114 Q152 140 124 128'],
-  gioThap: ['M46 108 Q24 106 20 84', 'M154 108 Q176 106 180 84'],
-  ru: ['M48 114 Q42 132 44 150', 'M152 114 Q158 132 156 150'],
-  khoanh: ['M46 116 Q64 148 122 138', 'M154 116 Q136 148 78 138'],
-  nam: ['M46 112 Q30 122 28 140', 'M154 112 Q170 122 172 140'],
-  rung: ['M46 108 Q24 108 22 86', 'M154 108 Q176 108 178 86'],
-  maMa: ['M46 114 Q36 104 56 103', 'M154 114 Q164 104 144 103'],
-  chap: ['M46 114 Q58 136 94 128', 'M154 114 Q142 136 106 128'],
-  nhay: ['M46 106 Q26 90 30 62', 'M154 114 Q172 126 178 142'],
+/** CÁNH (thầy 01/11 «thay tay bằng cánh»): cánh chim non bo tròn, không lông. Gốc ở vai (lẫn sau mép thân), mũi cánh rủ xuống;
+ *  a = góc giương ra ngoài (0 = rủ thẳng, 150 = vỗ lên, âm = khép vào trước bụng / mặt), k = cỡ, t = vẽ TRƯỚC thân, g = gốc cánh trái (cánh phải đối xứng). */
+const CANH_D = 'M-6 -6 C8 -12 22 -2 23 16 C24 32 17 46 6 47 C-3 48 -9 38 -9 24 C-9 10 -12 -3 -6 -6 Z'
+const CANH_S = 'M-3 1 C5 -4 15 1 17 13 C11 6 3 4 -3 8 Z'
+function canh(ben, c) {
+  const { a = 22, k = 0.85, g } = c
+  const [x, y] = g ? (ben < 0 ? g : [200 - g[0], g[1]]) : [ben < 0 ? 38 : 162, 98]
+  return `<g transform="translate(${x} ${y})${ben < 0 ? ' scale(-1 1)' : ''} rotate(${-a}) scale(${k})"><path d="${CANH_D}" class="m-canh"/><path d="${CANH_S}" class="m-canh-s"/></g>`
 }
-const tayVe = (k) => TAY[k].map((d) => { const p = d.split(' ').slice(-2); return `<path d="${d}" class="m-tay-n"/><circle cx="${p[0]}" cy="${p[1]}" r="9" class="m-tay"/>` }).join('')
-/** Dáng toàn thân theo cảm xúc: tay, nhảy (dịch lên), nghiêng (độ, quanh chân), chân co. */
+const CANH = { // [trái hình, phải hình]
+  ha: [{ a: 22 }, { a: 22 }],
+  vo: [{ a: 150, k: 0.9 }, { a: 150, k: 0.9 }],                                   // khen: hai cánh xoè vỗ lên
+  vay: [{ a: 22 }, { a: 155, k: 0.9 }],                                            // chào: một cánh vẫy
+  cam: [{ a: 22 }, { a: -62, k: 1.1, t: 1, g: [40, 104] }],                        // nghĩ: đầu cánh chạm cằm
+  xoe: [{ a: 128 }, { a: 128 }],                                                   // ngạc nhiên
+  ru: [{ a: 6, g: [38, 106] }, { a: 6, g: [38, 106] }],                            // buồn / ngủ: rủ xuống
+  khoanh: [{ a: -80, k: 1.4, t: 1, g: [42, 132] }, { a: -80, k: 1.4, t: 1, g: [42, 132] }], // bực: khép chéo trước bụng
+  hong: [{ a: -12, k: 0.8, t: 1, g: [34, 112] }, { a: -12, k: 0.8, t: 1, g: [34, 112] }],   // cáu: chống hông
+  nam: [{ a: 12, k: 0.82 }, { a: 12, k: 0.82 }],                                   // rất cáu: nắm chặt sát thân, rung
+  maMa: [{ a: -70, k: 0.75, t: 1, g: [40, 100] }, { a: -70, k: 0.75, t: 1, g: [40, 100] }], // ngượng: che má
+  dang: [{ a: 55 }, { a: 55 }],                                                    // mê
+  nhay: [{ a: 150, k: 0.9 }, { a: 40 }],                                           // vui nhảy: dang nghiêng
+}
+/** Dáng toàn thân theo cảm xúc: cánh, nhảy (dịch lên), nghiêng (độ, quanh chân), co chân. Giận: đứng thẳng. */
 const DANG = {
-  vui: { tay: 'ha' }, khen: { tay: 'gio', nhay: -14 }, chao: { tay: 'vay' }, nghi: { tay: 'cam', xoay: 3 }, ngac: { tay: 'gioThap', nhay: -5 },
-  buon: { tay: 'ru', xoay: -2 }, ngu: { tay: 'ru', xoay: -5 }, doi: { tay: 'ha', xoay: 4 }, buc: { tay: 'khoanh' }, cau: { tay: 'nam' }, ratCau: { tay: 'rung' },
-  nguong: { tay: 'maMa', xoay: -3 }, me: { tay: 'chap' }, nhay: { tay: 'nhay', xoay: -7, chan: 1, nhay: -6 },
+  vui: { canh: 'ha' }, khen: { canh: 'vo', nhay: -12 }, chao: { canh: 'vay' }, nghi: { canh: 'cam', xoay: 3 }, ngac: { canh: 'xoe', nhay: -5 },
+  buon: { canh: 'ru', xoay: -2 }, ngu: { canh: 'ru', xoay: -4 }, doi: { canh: 'ha', xoay: 4 }, buc: { canh: 'khoanh' }, cau: { canh: 'hong' }, ratCau: { canh: 'nam' },
+  nguong: { canh: 'maMa', xoay: -3 }, me: { canh: 'dang' }, nhay: { canh: 'nhay', xoay: -7, chan: 1, nhay: -6 },
 }
-/** GIẬN = DUNG DỊCH SÔI (giữ luật Mol cũ): cáu ⇒ đỏ cam, dâng 16; rất cáu ⇒ đỏ, dâng 34 tới mũi; bọt trồi lên mặt (sôi). */
+/** GIẬN = DUNG DỊCH (giữ luật Mol cũ, tinh tế hơn): cáu ⇒ hơi đỏ, dâng nhẹ; rất cáu ⇒ đỏ, dâng cao, bọt sôi. */
 const SOI = {
-  cau: { dy: -16, lop: 'soi', them: (S) => `<circle cx="80" cy="${S - 1}" r="4" class="m-bot"/><circle cx="118" cy="${S - 2}" r="5" class="m-bot"/>` },
-  ratCau: { dy: -34, lop: 'do', them: (S) => `<circle cx="72" cy="${S - 2}" r="5" class="m-bot"/><circle cx="104" cy="${S - 3}" r="6" class="m-bot"/><circle cx="134" cy="${S - 1}" r="4" class="m-bot"/><circle cx="90" cy="${S + 14}" r="4.4" class="m-bot"/>` },
+  cau: { dy: -12, lop: 'soi', them: (S) => `<circle cx="84" cy="${S - 1}" r="3.5" class="m-bot"/>` },
+  ratCau: { dy: -30, lop: 'do', them: (S) => `<circle cx="70" cy="${S - 2}" r="4.5" class="m-bot"/><circle cx="106" cy="${S - 2}" r="5" class="m-bot"/><circle cx="136" cy="${S - 1}" r="3.6" class="m-bot"/><circle cx="90" cy="${S + 14}" r="4" class="m-bot"/>` },
 }
-const HOI = (n) => [[96, -6, 8], [111, -13, 10], [84, -16, 6.5], [124, -4, 6.5], [100, -21, 5]].slice(0, n).map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" class="m-hoi"/>`).join('')
+/** Làn hơi mảnh bốc khỏi miệng ống (thay cụm hơi tròn + gân «💢»). */
+const HOI = {
+  cau: '<path d="M88 7 q-6 -7 0 -13 q6 -6 0 -12 M112 5 q6 -7 0 -13 q-6 -6 0 -12" class="m-hoi-n" stroke-width="3"/>',
+  ratCau: '<path d="M80 8 q-7 -8 0 -15 q7 -7 0 -14 M100 5 q7 -8 0 -15 q-7 -7 0 -14 M120 8 q7 -8 0 -15 q-7 -7 0 -14" class="m-hoi-n2" stroke-width="4.4"/>',
+}
 function themVe(m) {
   switch (m) {
-    case 'khen': return sao(26, 34, 1) + sao(176, 30, 0.8) + sao(160, 2, 0.55) + sao(40, 4, 0.5)
-    case 'chao': return '<path d="M188 52 Q194 60 190 70 M194 44 Q204 58 197 74" class="m-net-nhe"/>'
-    case 'nghi': return '<text x="160" y="38" class="m-mui mol-chu" font-size="32">?</text>'
-    case 'ngac': return '<path d="M56 -14 L60 -3 M100 -22 V-9 M144 -14 L140 -3" class="m-net-mui"/>'
-    case 'buon': return `<path d="M${L - 15} ${Y + 18} q-6 11 0 15 q6 -4 0 -15z" class="m-nuoc-mat"/><path d="M${R + 15} ${Y + 18} q-6 11 0 15 q6 -4 0 -15z" class="m-nuoc-mat"/>`
-    case 'ngu': return '<text x="164" y="-2" class="m-z mol-chu" font-size="24">z</text><text x="181" y="-18" class="m-z mol-chu" font-size="16" opacity=".7">z</text>'
+    case 'khen': return sao(20, 44, 1) + sao(182, 36, 0.8) + sao(166, 0, 0.55) + sao(32, 4, 0.5)
+    case 'chao': return '<path d="M186 40 Q192 48 188 58 M193 33 Q201 46 195 62" class="m-net-nhe"/>'
+    case 'nghi': return '<text x="172" y="62" class="m-mui mol-chu" font-size="30">?</text>'
+    case 'ngac': return '<path d="M54 -12 L58 -1 M100 -20 V-7 M146 -12 L142 -1" class="m-net-mui"/>'
+    case 'buon': return `<path d="M${L - 17} ${Y + 19} q-6 11 0 15 q6 -4 0 -15z" class="m-nuoc-mat"/><path d="M${R + 17} ${Y + 19} q-6 11 0 15 q6 -4 0 -15z" class="m-nuoc-mat"/>`
+    case 'ngu': return '<text x="168" y="0" class="m-z mol-chu" font-size="24">z</text><text x="184" y="-16" class="m-z mol-chu" font-size="16" opacity=".7">z</text>'
     case 'doi': return '<circle cx="128" cy="116" r="4" class="m-hoi"/><circle cx="136" cy="110" r="2.6" class="m-hoi"/>'
-    case 'cau': return HOI(2) + '<g transform="translate(170 40)"><path d="M-9 -3 Q-3 -3 -3 -9 M3 -9 Q3 -3 9 -3 M9 3 Q3 3 3 9 M-3 9 Q-3 3 -9 3" class="m-net-do" stroke-width="3.6"/></g>'
-    case 'ratCau': return HOI(5) + '<g transform="translate(172 36)"><path d="M-9 -3 Q-3 -3 -3 -9 M3 -9 Q3 -3 9 -3 M9 3 Q3 3 3 9 M-3 9 Q-3 3 -9 3" class="m-net-do" stroke-width="3.8"/></g>' +
-      '<path d="M14 120 Q8 132 14 144 M6 114 Q-2 132 6 150 M186 120 Q192 132 186 144 M194 114 Q202 132 194 150" class="m-net-do" stroke-width="3" opacity=".7"/>'
-    case 'nguong': return sao(26, 54, 0.75) + sao(176, 44, 0.9) + sao(162, 14, 0.5) + '<path d="M52 98 l-4 6 M58 98 l-4 6 M146 98 l-4 6 M152 98 l-4 6" class="m-net-ma"/>'
-    case 'me': return tim(24, 46, 0.9) + tim(178, 30, 1.1) + tim(162, 0, 0.65) + tim(36, 8, 0.55)
-    case 'nhay': return not(18, 60, 1) + not(180, 26, 0.85) + sao(170, 70, 0.5)
+    case 'cau': return HOI.cau
+    case 'ratCau': return HOI.ratCau + '<path d="M12 112 q-5 9 0 18 M188 112 q5 9 0 18" class="m-net-nhe"/>'
+    case 'nguong': return sao(24, 50, 0.75) + sao(178, 42, 0.9) + sao(164, 8, 0.5)
+    case 'me': return tim(20, 46, 0.9) + tim(182, 36, 1.1) + tim(166, 2, 0.65) + tim(32, 6, 0.55)
+    case 'nhay': return not(14, 66, 1) + not(184, 30, 0.85) + sao(178, 80, 0.5)
     default: return ''
   }
 }
-function svgMol(m) {
+/** CHỮ KHẮC MỜ «6,022·10²³» (số Avogadro, SGK 2018; thầy 01/11) + vạch chia như ống đong — nét trắng bán trong, không khung nhãn.
+ *  kieu 'A' = khắc ngang bụng, cong nhẹ theo thân, ngay trên mặt dung dịch; 'B' = khắc dọc mép phải theo vạch chia. chu = false (cỡ < 64 px) ⇒ chỉ giữ vạch. */
+function khacVe(u, kieu, chu) {
+  const chuSo = () => `6,022·10<tspan dy="-3.8" font-size="7.4">23</tspan>`
+  if (kieu === 'B') {
+    const vach = '<path d="M157 128 H166 M161 135 H166 M153 142 H166 M161 149 H166" class="m-vach"/>'
+    if (!chu) return vach
+    const t = (cls, d) => `<text transform="translate(${163 + d} ${121 + d}) rotate(-90)" class="${cls}" font-size="10.5">${chuSo()}</text>`
+    return vach + t('m-khac-bong', 0.7) + t('m-khac', 0)
+  }
+  const vach = '<path d="M141 137 H150 M136 143.5 H150 M141 150 H150" class="m-vach"/>'
+  if (!chu) return vach
+  const t = (cls, d) => `<text class="${cls}" font-size="11" text-anchor="middle"${d ? ` transform="translate(0 ${d})"` : ''}><textPath href="#${u}k" startOffset="50%">${chuSo()}</textPath></text>`
+  return `<path id="${u}k" d="M64 142.5 Q100 147 136 142.5" fill="none"/>` + vach + t('m-khac-bong', 0.7) + t('m-khac', 0)
+}
+function svgMol(m, o = {}) {
   const u = 'mv' + ++so, d = DANG[m] || DANG.vui, soi = SOI[m] || { dy: 0, lop: 'nuoc', them: () => '' }
-  const S = 140 + soi.dy, nh = d.nhay || 0, xo = d.xoay || 0
-  const ma = m === 'nguong' ? '<ellipse cx="59" cy="105" rx="12" ry="7" class="m-ma"/><ellipse cx="141" cy="105" rx="12" ry="7" class="m-ma"/>'
-    : '<ellipse cx="60" cy="106" rx="9" ry="5.5" class="m-ma"/><ellipse cx="140" cy="106" rx="9" ry="5.5" class="m-ma"/>'
-  const chan = d.chan ? '<ellipse cx="80" cy="183" rx="15" ry="9" class="m-chan"/><ellipse cx="130" cy="170" rx="15" ry="9" class="m-chan" transform="rotate(-30 130 170)"/>'
-    : '<ellipse cx="80" cy="183" rx="15" ry="9" class="m-chan"/><ellipse cx="120" cy="183" rx="15" ry="9" class="m-chan"/>'
+  const S = MUC + soi.dy, nh = d.nhay || 0, xo = d.xoay || 0
+  const cs = CANH[d.canh].map((c, i) => [i ? 1 : -1, c])
+  const sau = cs.filter(([, c]) => !c.t).map(([b, c]) => canh(b, c)).join(''), truoc = cs.filter(([, c]) => c.t).map(([b, c]) => canh(b, c)).join('')
+  const ma = m === 'nguong' ? '<ellipse cx="58" cy="104" rx="12" ry="7" class="m-ma"/><ellipse cx="142" cy="104" rx="12" ry="7" class="m-ma"/>'
+    : '<ellipse cx="58" cy="104" rx="10" ry="6" class="m-ma"/><ellipse cx="142" cy="104" rx="10" ry="6" class="m-ma"/>'
+  const chan = d.chan ? '<ellipse cx="82" cy="183" rx="16" ry="8" class="m-chan"/><ellipse cx="128" cy="174" rx="16" ry="8" class="m-chan" transform="rotate(-28 128 174)"/>'
+    : '<ellipse cx="82" cy="183" rx="16" ry="8" class="m-chan"/><ellipse cx="118" cy="183" rx="16" ry="8" class="m-chan"/>'
   return `<defs>
     <linearGradient id="${u}t" x1="0" x2="1" y1="0" y2="0"><stop offset="0" class="s-than-sang"/><stop offset=".42" class="s-than"/><stop offset="1" class="s-than-toi"/></linearGradient>
     <linearGradient id="${u}v" x1="0" x2="1" y1="0" y2="0"><stop offset="0" class="s-vanh"/><stop offset=".5" class="s-than-sang"/><stop offset="1" class="s-than"/></linearGradient>
@@ -391,26 +453,27 @@ function svgMol(m) {
     <linearGradient id="${u}l" x1="0" x2="0" y1="0" y2="1"><stop offset="0" class="s-${soi.lop}-sang"/><stop offset=".3" class="s-${soi.lop}"/><stop offset="1" class="s-${soi.lop}-toi"/></linearGradient>
     <linearGradient id="${u}b" x1="0" x2="1" y1="0" y2="0"><stop offset=".5" class="s-tru0"/><stop offset="1" class="s-tru1"/></linearGradient>
     <clipPath id="${u}c"><path d="${TU}"/></clipPath></defs>
-  <ellipse cx="100" cy="195" rx="${nh < -8 ? 36 : 48}" ry="${nh < -8 ? 4.5 : 6}" class="m-bong"/>
+  <ellipse cx="100" cy="194" rx="${nh < -8 ? 42 : 56}" ry="${nh < -8 ? 4.5 : 6}" class="m-bong"/>
   <g class="mol-than" transform="translate(0 ${nh}) rotate(${xo} 100 190)">
-    ${chan}
+    ${sau}${chan}
     <path d="${TU}" fill="url(#${u}t)"/>
     <g clip-path="url(#${u}c)">
-      <rect x="46" y="12" width="108" height="14" class="m-bong-vanh"/>
+      <rect x="32" y="22" width="136" height="12" class="m-bong-vanh"/>
       <path d="${NA}" fill="url(#${u}n)"/>${ma}
       <path d="${SONG(S)} V200 H10 Z" fill="url(#${u}l)"/>
       <path d="${SONG(S)}" class="m-sang-n" stroke-width="2.6"/>
-      <circle cx="70" cy="${S + 24}" r="5" class="m-bot"/><circle cx="126" cy="${S + 30}" r="3.6" class="m-bot"/><circle cx="102" cy="${S + 15}" r="2.6" class="m-bot"/>${soi.them(S)}
-      <rect x="46" y="12" width="108" height="172" fill="url(#${u}b)"/>
-      <rect x="52" y="26" width="7" height="30" rx="3.5" class="m-sang"/>
-      <path d="M53 ${Math.max(S + 8, 130)} Q55 170 72 178" class="m-sang-n" stroke-width="4"/>
+      <circle cx="66" cy="${S + 16}" r="5" class="m-bot"/><circle cx="132" cy="${S + 19}" r="3.6" class="m-bot"/><circle cx="100" cy="${S + 10}" r="2.6" class="m-bot"/>${soi.them(S)}
+      <rect x="32" y="22" width="136" height="160" fill="url(#${u}b)"/>
+      ${khacVe(u, o.khac || 'A', o.chu !== false)}
+      <rect x="38" y="32" width="7" height="30" rx="3.5" class="m-sang"/>
+      <path d="M54 149 A60 60 0 0 0 75 164" class="m-sang-n" stroke-width="4"/>
     </g>
-    <rect x="38" y="2" width="124" height="15" rx="7.5" fill="url(#${u}v)"/>
-    <ellipse cx="100" cy="5.5" rx="52" ry="3" class="m-mieng-ong"/>
-    <path d="M48 12 H108" class="m-sang-n" stroke-width="2.6"/>
-    <circle cx="100" cy="95" r="6.8" class="m-mui"/><circle cx="97.6" cy="92.6" r="2.1" class="m-trang" opacity=".75"/>
+    <rect x="24" y="12" width="152" height="16" rx="8" fill="url(#${u}v)"/>
+    <ellipse cx="100" cy="15.5" rx="68" ry="3.2" class="m-mieng-ong"/>
+    <path d="M34 23.5 H120" class="m-sang-n" stroke-width="2.4"/>
+    <circle cx="100" cy="94" r="7" class="m-mui"/><circle cx="97.6" cy="91.6" r="2.1" class="m-trang" opacity=".75"/>
     ${matVe(m, u)}${miengVe(m)}
-    ${tayVe(d.tay)}
+    ${truoc}
     ${themVe(m)}
   </g>`
 }
@@ -430,8 +493,11 @@ function svgMolCu() {
     <ellipse cx="56" cy="142" rx="9" ry="5" class="m-ma"/><ellipse cx="144" cy="142" rx="9" ry="5" class="m-ma"/>`
 }
 
-const VB = '0 -26 200 230', VB_NHO = '20 -4 160 160'  // nửa trên cho cỡ < 48 px: miệng ống + mặt + vai (cắt, không tràn)
-const sv = (pa, m, w, h, vb = VB) => `<svg class="mv pa-${pa}${vb === VB ? '' : ' cat'}" viewBox="${vb}" width="${w}" height="${h}">${svgMol(m)}</svg>`
+const VB = '0 -26 200 230', VB_NHO = '20 -2 160 160'  // nửa trên cho cỡ < 48 px: miệng ống + mặt + vai (cắt, không tràn)
+// chữ khắc chỉ hiện từ 64 px (thầy 01/11); nhỏ hơn giữ vạch chia
+const sv = (pa, m, w, h, vb = VB, o = {}) => `<svg class="mv pa-${pa}${vb === VB ? '' : ' cat'}" viewBox="${vb}" width="${w}" height="${h}">${svgMol(m, { chu: w >= 64, ...o })}</svg>`
+// 4 mặt giận bản 01/11 chiều (TRƯỚC góp ý «bỏ miệng răng») — markup tĩnh chụp từ bản vẽ cũ, chỉ để so trước / sau
+const GIAN_CU = {"doi": "<defs><linearGradient id=\"mvcu66t\" x1=\"0\" x2=\"1\" y1=\"0\" y2=\"0\"><stop offset=\"0\" class=\"s-than-sang\"/><stop offset=\".42\" class=\"s-than\"/><stop offset=\"1\" class=\"s-than-toi\"/></linearGradient><linearGradient id=\"mvcu66v\" x1=\"0\" x2=\"1\" y1=\"0\" y2=\"0\"><stop offset=\"0\" class=\"s-vanh\"/><stop offset=\".5\" class=\"s-than-sang\"/><stop offset=\"1\" class=\"s-than\"/></linearGradient><linearGradient id=\"mvcu66n\" x1=\"0\" x2=\"0\" y1=\"0\" y2=\"1\"><stop offset=\".35\" class=\"s-na\"/><stop offset=\"1\" class=\"s-na-toi\"/></linearGradient><linearGradient id=\"mvcu66l\" x1=\"0\" x2=\"0\" y1=\"0\" y2=\"1\"><stop offset=\"0\" class=\"s-nuoc-sang\"/><stop offset=\".3\" class=\"s-nuoc\"/><stop offset=\"1\" class=\"s-nuoc-toi\"/></linearGradient><linearGradient id=\"mvcu66b\" x1=\"0\" x2=\"1\" y1=\"0\" y2=\"0\"><stop offset=\".5\" class=\"s-tru0\"/><stop offset=\"1\" class=\"s-tru1\"/></linearGradient><clipPath id=\"mvcu66c\"><path d=\"M46 12 H154 V128 A54 54 0 0 1 46 128 Z\"/></clipPath></defs><ellipse cx=\"100\" cy=\"195\" rx=\"48\" ry=\"6\" class=\"m-bong\"/><g class=\"mol-than\" transform=\"translate(0 0) rotate(4 100 190)\"><ellipse cx=\"80\" cy=\"183\" rx=\"15\" ry=\"9\" class=\"m-chan\"/><ellipse cx=\"120\" cy=\"183\" rx=\"15\" ry=\"9\" class=\"m-chan\"/><path d=\"M46 12 H154 V128 A54 54 0 0 1 46 128 Z\" fill=\"url(#mvcu66t)\"/><g clip-path=\"url(#mvcu66c)\"><rect x=\"46\" y=\"12\" width=\"108\" height=\"14\" class=\"m-bong-vanh\"/><path d=\"M52 76 C52 58 62 48 76 48 C87 48 94 52 100 58 C106 52 113 48 124 48 C138 48 148 58 148 76 V98 C148 116 127 128 100 128 C73 128 52 116 52 98 Z\" fill=\"url(#mvcu66n)\"/><ellipse cx=\"60\" cy=\"106\" rx=\"9\" ry=\"5.5\" class=\"m-ma\"/><ellipse cx=\"140\" cy=\"106\" rx=\"9\" ry=\"5.5\" class=\"m-ma\"/><path d=\"M10 140 Q25 135 40 140 Q55 135 70 140 Q85 135 100 140 Q115 135 130 140 Q145 135 160 140 Q175 135 190 140 Q205 135 220 140 V200 H10 Z\" fill=\"url(#mvcu66l)\"/><path d=\"M10 140 Q25 135 40 140 Q55 135 70 140 Q85 135 100 140 Q115 135 130 140 Q145 135 160 140 Q175 135 190 140 Q205 135 220 140\" class=\"m-sang-n\" stroke-width=\"2.6\"/><circle cx=\"70\" cy=\"164\" r=\"5\" class=\"m-bot\"/><circle cx=\"126\" cy=\"170\" r=\"3.6\" class=\"m-bot\"/><circle cx=\"102\" cy=\"155\" r=\"2.6\" class=\"m-bot\"/><rect x=\"46\" y=\"12\" width=\"108\" height=\"172\" fill=\"url(#mvcu66b)\"/><rect x=\"52\" y=\"26\" width=\"7\" height=\"30\" rx=\"3.5\" class=\"m-sang\"/><path d=\"M53 148 Q55 170 72 178\" class=\"m-sang-n\" stroke-width=\"4\"/></g><rect x=\"38\" y=\"2\" width=\"124\" height=\"15\" rx=\"7.5\" fill=\"url(#mvcu66v)\"/><ellipse cx=\"100\" cy=\"5.5\" rx=\"52\" ry=\"3\" class=\"m-mieng-ong\"/><path d=\"M48 12 H108\" class=\"m-sang-n\" stroke-width=\"2.6\"/><circle cx=\"100\" cy=\"95\" r=\"6.8\" class=\"m-mui\"/><circle cx=\"97.6\" cy=\"92.6\" r=\"2.1\" class=\"m-trang\" opacity=\".75\"/><ellipse cx=\"73.6\" cy=\"73.4\" rx=\"16\" ry=\"19\" class=\"m-muc\"/><circle cx=\"74\" cy=\"70\" r=\"6.2\" class=\"m-trang\"/><circle cx=\"66.8\" cy=\"81.4\" r=\"2.8\" class=\"m-trang\"/><clipPath id=\"mvcu66ma\"><ellipse cx=\"76\" cy=\"72\" rx=\"17\" ry=\"20\"/></clipPath><path clip-path=\"url(#mvcu66ma)\" d=\"M52 36 H100 V73 L52 73 Z\" class=\"m-na\"/><path d=\"M57 73 L95 73\" class=\"m-net\" stroke-width=\"5.5\"/><ellipse cx=\"121.6\" cy=\"73.4\" rx=\"16\" ry=\"19\" class=\"m-muc\"/><circle cx=\"122\" cy=\"70\" r=\"6.2\" class=\"m-trang\"/><circle cx=\"114.8\" cy=\"81.4\" r=\"2.8\" class=\"m-trang\"/><clipPath id=\"mvcu66mb\"><ellipse cx=\"124\" cy=\"72\" rx=\"17\" ry=\"20\"/></clipPath><path clip-path=\"url(#mvcu66mb)\" d=\"M100 36 H148 V73 L100 73 Z\" class=\"m-na\"/><path d=\"M105 73 L143 73\" class=\"m-net\" stroke-width=\"5.5\"/><path d=\"M92 115 Q100 109 110 116\" class=\"m-net\" stroke-width=\"4.5\"/><path d=\"M46 112 Q32 124 32 142\" class=\"m-tay-n\"/><circle cx=\"32\" cy=\"142\" r=\"9\" class=\"m-tay\"/><path d=\"M154 112 Q168 124 168 142\" class=\"m-tay-n\"/><circle cx=\"168\" cy=\"142\" r=\"9\" class=\"m-tay\"/><circle cx=\"128\" cy=\"116\" r=\"4\" class=\"m-hoi\"/><circle cx=\"136\" cy=\"110\" r=\"2.6\" class=\"m-hoi\"/></g>", "buc": "<defs><linearGradient id=\"mvcu67t\" x1=\"0\" x2=\"1\" y1=\"0\" y2=\"0\"><stop offset=\"0\" class=\"s-than-sang\"/><stop offset=\".42\" class=\"s-than\"/><stop offset=\"1\" class=\"s-than-toi\"/></linearGradient><linearGradient id=\"mvcu67v\" x1=\"0\" x2=\"1\" y1=\"0\" y2=\"0\"><stop offset=\"0\" class=\"s-vanh\"/><stop offset=\".5\" class=\"s-than-sang\"/><stop offset=\"1\" class=\"s-than\"/></linearGradient><linearGradient id=\"mvcu67n\" x1=\"0\" x2=\"0\" y1=\"0\" y2=\"1\"><stop offset=\".35\" class=\"s-na\"/><stop offset=\"1\" class=\"s-na-toi\"/></linearGradient><linearGradient id=\"mvcu67l\" x1=\"0\" x2=\"0\" y1=\"0\" y2=\"1\"><stop offset=\"0\" class=\"s-nuoc-sang\"/><stop offset=\".3\" class=\"s-nuoc\"/><stop offset=\"1\" class=\"s-nuoc-toi\"/></linearGradient><linearGradient id=\"mvcu67b\" x1=\"0\" x2=\"1\" y1=\"0\" y2=\"0\"><stop offset=\".5\" class=\"s-tru0\"/><stop offset=\"1\" class=\"s-tru1\"/></linearGradient><clipPath id=\"mvcu67c\"><path d=\"M46 12 H154 V128 A54 54 0 0 1 46 128 Z\"/></clipPath></defs><ellipse cx=\"100\" cy=\"195\" rx=\"48\" ry=\"6\" class=\"m-bong\"/><g class=\"mol-than\" transform=\"translate(0 0) rotate(0 100 190)\"><ellipse cx=\"80\" cy=\"183\" rx=\"15\" ry=\"9\" class=\"m-chan\"/><ellipse cx=\"120\" cy=\"183\" rx=\"15\" ry=\"9\" class=\"m-chan\"/><path d=\"M46 12 H154 V128 A54 54 0 0 1 46 128 Z\" fill=\"url(#mvcu67t)\"/><g clip-path=\"url(#mvcu67c)\"><rect x=\"46\" y=\"12\" width=\"108\" height=\"14\" class=\"m-bong-vanh\"/><path d=\"M52 76 C52 58 62 48 76 48 C87 48 94 52 100 58 C106 52 113 48 124 48 C138 48 148 58 148 76 V98 C148 116 127 128 100 128 C73 128 52 116 52 98 Z\" fill=\"url(#mvcu67n)\"/><ellipse cx=\"60\" cy=\"106\" rx=\"9\" ry=\"5.5\" class=\"m-ma\"/><ellipse cx=\"140\" cy=\"106\" rx=\"9\" ry=\"5.5\" class=\"m-ma\"/><path d=\"M10 140 Q25 135 40 140 Q55 135 70 140 Q85 135 100 140 Q115 135 130 140 Q145 135 160 140 Q175 135 190 140 Q205 135 220 140 V200 H10 Z\" fill=\"url(#mvcu67l)\"/><path d=\"M10 140 Q25 135 40 140 Q55 135 70 140 Q85 135 100 140 Q115 135 130 140 Q145 135 160 140 Q175 135 190 140 Q205 135 220 140\" class=\"m-sang-n\" stroke-width=\"2.6\"/><circle cx=\"70\" cy=\"164\" r=\"5\" class=\"m-bot\"/><circle cx=\"126\" cy=\"170\" r=\"3.6\" class=\"m-bot\"/><circle cx=\"102\" cy=\"155\" r=\"2.6\" class=\"m-bot\"/><rect x=\"46\" y=\"12\" width=\"108\" height=\"172\" fill=\"url(#mvcu67b)\"/><rect x=\"52\" y=\"26\" width=\"7\" height=\"30\" rx=\"3.5\" class=\"m-sang\"/><path d=\"M53 148 Q55 170 72 178\" class=\"m-sang-n\" stroke-width=\"4\"/></g><rect x=\"38\" y=\"2\" width=\"124\" height=\"15\" rx=\"7.5\" fill=\"url(#mvcu67v)\"/><ellipse cx=\"100\" cy=\"5.5\" rx=\"52\" ry=\"3\" class=\"m-mieng-ong\"/><path d=\"M48 12 H108\" class=\"m-sang-n\" stroke-width=\"2.6\"/><circle cx=\"100\" cy=\"95\" r=\"6.8\" class=\"m-mui\"/><circle cx=\"97.6\" cy=\"92.6\" r=\"2.1\" class=\"m-trang\" opacity=\".75\"/><ellipse cx=\"76\" cy=\"73.1\" rx=\"16\" ry=\"19\" class=\"m-muc\"/><circle cx=\"81\" cy=\"69\" r=\"6.2\" class=\"m-trang\"/><circle cx=\"71\" cy=\"80.8\" r=\"2.8\" class=\"m-trang\"/><clipPath id=\"mvcu67ma\"><ellipse cx=\"76\" cy=\"72\" rx=\"17\" ry=\"20\"/></clipPath><path clip-path=\"url(#mvcu67ma)\" d=\"M52 36 H100 V68.3 L52 55.7 Z\" class=\"m-na\"/><path d=\"M57 57 L95 67\" class=\"m-net\" stroke-width=\"5.5\"/><ellipse cx=\"124\" cy=\"73.1\" rx=\"16\" ry=\"19\" class=\"m-muc\"/><circle cx=\"129\" cy=\"69\" r=\"6.2\" class=\"m-trang\"/><circle cx=\"119\" cy=\"80.8\" r=\"2.8\" class=\"m-trang\"/><clipPath id=\"mvcu67mb\"><ellipse cx=\"124\" cy=\"72\" rx=\"17\" ry=\"20\"/></clipPath><path clip-path=\"url(#mvcu67mb)\" d=\"M100 36 H148 V55.7 L100 68.3 Z\" class=\"m-na\"/><path d=\"M105 67 L143 57\" class=\"m-net\" stroke-width=\"5.5\"/><path d=\"M88 114 H112\" class=\"m-net\" stroke-width=\"5\"/><path d=\"M46 116 Q64 148 122 138\" class=\"m-tay-n\"/><circle cx=\"122\" cy=\"138\" r=\"9\" class=\"m-tay\"/><path d=\"M154 116 Q136 148 78 138\" class=\"m-tay-n\"/><circle cx=\"78\" cy=\"138\" r=\"9\" class=\"m-tay\"/></g>", "cau": "<defs><linearGradient id=\"mvcu68t\" x1=\"0\" x2=\"1\" y1=\"0\" y2=\"0\"><stop offset=\"0\" class=\"s-than-sang\"/><stop offset=\".42\" class=\"s-than\"/><stop offset=\"1\" class=\"s-than-toi\"/></linearGradient><linearGradient id=\"mvcu68v\" x1=\"0\" x2=\"1\" y1=\"0\" y2=\"0\"><stop offset=\"0\" class=\"s-vanh\"/><stop offset=\".5\" class=\"s-than-sang\"/><stop offset=\"1\" class=\"s-than\"/></linearGradient><linearGradient id=\"mvcu68n\" x1=\"0\" x2=\"0\" y1=\"0\" y2=\"1\"><stop offset=\".35\" class=\"s-na\"/><stop offset=\"1\" class=\"s-na-toi\"/></linearGradient><linearGradient id=\"mvcu68l\" x1=\"0\" x2=\"0\" y1=\"0\" y2=\"1\"><stop offset=\"0\" class=\"s-soi-sang\"/><stop offset=\".3\" class=\"s-soi\"/><stop offset=\"1\" class=\"s-soi-toi\"/></linearGradient><linearGradient id=\"mvcu68b\" x1=\"0\" x2=\"1\" y1=\"0\" y2=\"0\"><stop offset=\".5\" class=\"s-tru0\"/><stop offset=\"1\" class=\"s-tru1\"/></linearGradient><clipPath id=\"mvcu68c\"><path d=\"M46 12 H154 V128 A54 54 0 0 1 46 128 Z\"/></clipPath></defs><ellipse cx=\"100\" cy=\"195\" rx=\"48\" ry=\"6\" class=\"m-bong\"/><g class=\"mol-than\" transform=\"translate(0 0) rotate(0 100 190)\"><ellipse cx=\"80\" cy=\"183\" rx=\"15\" ry=\"9\" class=\"m-chan\"/><ellipse cx=\"120\" cy=\"183\" rx=\"15\" ry=\"9\" class=\"m-chan\"/><path d=\"M46 12 H154 V128 A54 54 0 0 1 46 128 Z\" fill=\"url(#mvcu68t)\"/><g clip-path=\"url(#mvcu68c)\"><rect x=\"46\" y=\"12\" width=\"108\" height=\"14\" class=\"m-bong-vanh\"/><path d=\"M52 76 C52 58 62 48 76 48 C87 48 94 52 100 58 C106 52 113 48 124 48 C138 48 148 58 148 76 V98 C148 116 127 128 100 128 C73 128 52 116 52 98 Z\" fill=\"url(#mvcu68n)\"/><ellipse cx=\"60\" cy=\"106\" rx=\"9\" ry=\"5.5\" class=\"m-ma\"/><ellipse cx=\"140\" cy=\"106\" rx=\"9\" ry=\"5.5\" class=\"m-ma\"/><path d=\"M10 124 Q25 119 40 124 Q55 119 70 124 Q85 119 100 124 Q115 119 130 124 Q145 119 160 124 Q175 119 190 124 Q205 119 220 124 V200 H10 Z\" fill=\"url(#mvcu68l)\"/><path d=\"M10 124 Q25 119 40 124 Q55 119 70 124 Q85 119 100 124 Q115 119 130 124 Q145 119 160 124 Q175 119 190 124 Q205 119 220 124\" class=\"m-sang-n\" stroke-width=\"2.6\"/><circle cx=\"70\" cy=\"148\" r=\"5\" class=\"m-bot\"/><circle cx=\"126\" cy=\"154\" r=\"3.6\" class=\"m-bot\"/><circle cx=\"102\" cy=\"139\" r=\"2.6\" class=\"m-bot\"/><circle cx=\"80\" cy=\"123\" r=\"4\" class=\"m-bot\"/><circle cx=\"118\" cy=\"122\" r=\"5\" class=\"m-bot\"/><rect x=\"46\" y=\"12\" width=\"108\" height=\"172\" fill=\"url(#mvcu68b)\"/><rect x=\"52\" y=\"26\" width=\"7\" height=\"30\" rx=\"3.5\" class=\"m-sang\"/><path d=\"M53 132 Q55 170 72 178\" class=\"m-sang-n\" stroke-width=\"4\"/></g><rect x=\"38\" y=\"2\" width=\"124\" height=\"15\" rx=\"7.5\" fill=\"url(#mvcu68v)\"/><ellipse cx=\"100\" cy=\"5.5\" rx=\"52\" ry=\"3\" class=\"m-mieng-ong\"/><path d=\"M48 12 H108\" class=\"m-sang-n\" stroke-width=\"2.6\"/><circle cx=\"100\" cy=\"95\" r=\"6.8\" class=\"m-mui\"/><circle cx=\"97.6\" cy=\"92.6\" r=\"2.1\" class=\"m-trang\" opacity=\".75\"/><ellipse cx=\"76\" cy=\"73.4\" rx=\"16\" ry=\"19\" class=\"m-muc\"/><circle cx=\"81\" cy=\"70\" r=\"5\" class=\"m-trang\"/><circle cx=\"71\" cy=\"81.4\" r=\"2.2\" class=\"m-trang\"/><clipPath id=\"mvcu68ma\"><ellipse cx=\"76\" cy=\"72\" rx=\"17\" ry=\"20\"/></clipPath><path clip-path=\"url(#mvcu68ma)\" d=\"M52 36 H100 V73.2 L52 50.8 Z\" class=\"m-na\"/><path d=\"M57 53.1 L95 70.9\" class=\"m-net\" stroke-width=\"6\"/><ellipse cx=\"124\" cy=\"73.4\" rx=\"16\" ry=\"19\" class=\"m-muc\"/><circle cx=\"129\" cy=\"70\" r=\"5\" class=\"m-trang\"/><circle cx=\"119\" cy=\"81.4\" r=\"2.2\" class=\"m-trang\"/><clipPath id=\"mvcu68mb\"><ellipse cx=\"124\" cy=\"72\" rx=\"17\" ry=\"20\"/></clipPath><path clip-path=\"url(#mvcu68mb)\" d=\"M100 36 H148 V50.8 L100 73.2 Z\" class=\"m-na\"/><path d=\"M105 70.9 L143 53.1\" class=\"m-net\" stroke-width=\"6\"/><rect x=\"84\" y=\"104\" width=\"32\" height=\"15\" rx=\"5.5\" class=\"m-mieng\"/><path d=\"M87 111.5 H113 M92 106 V117 M100 106 V117 M108 106 V117\" class=\"m-net-t\" stroke-width=\"2.2\"/><path d=\"M46 112 Q30 122 28 140\" class=\"m-tay-n\"/><circle cx=\"28\" cy=\"140\" r=\"9\" class=\"m-tay\"/><path d=\"M154 112 Q170 122 172 140\" class=\"m-tay-n\"/><circle cx=\"172\" cy=\"140\" r=\"9\" class=\"m-tay\"/><circle cx=\"96\" cy=\"-6\" r=\"8\" class=\"m-hoi\"/><circle cx=\"111\" cy=\"-13\" r=\"10\" class=\"m-hoi\"/><g transform=\"translate(170 40)\"><path d=\"M-9 -3 Q-3 -3 -3 -9 M3 -9 Q3 -3 9 -3 M9 3 Q3 3 3 9 M-3 9 Q-3 3 -9 3\" class=\"m-net-do\" stroke-width=\"3.6\"/></g></g>", "ratCau": "<defs><linearGradient id=\"mvcu69t\" x1=\"0\" x2=\"1\" y1=\"0\" y2=\"0\"><stop offset=\"0\" class=\"s-than-sang\"/><stop offset=\".42\" class=\"s-than\"/><stop offset=\"1\" class=\"s-than-toi\"/></linearGradient><linearGradient id=\"mvcu69v\" x1=\"0\" x2=\"1\" y1=\"0\" y2=\"0\"><stop offset=\"0\" class=\"s-vanh\"/><stop offset=\".5\" class=\"s-than-sang\"/><stop offset=\"1\" class=\"s-than\"/></linearGradient><linearGradient id=\"mvcu69n\" x1=\"0\" x2=\"0\" y1=\"0\" y2=\"1\"><stop offset=\".35\" class=\"s-na\"/><stop offset=\"1\" class=\"s-na-toi\"/></linearGradient><linearGradient id=\"mvcu69l\" x1=\"0\" x2=\"0\" y1=\"0\" y2=\"1\"><stop offset=\"0\" class=\"s-do-sang\"/><stop offset=\".3\" class=\"s-do\"/><stop offset=\"1\" class=\"s-do-toi\"/></linearGradient><linearGradient id=\"mvcu69b\" x1=\"0\" x2=\"1\" y1=\"0\" y2=\"0\"><stop offset=\".5\" class=\"s-tru0\"/><stop offset=\"1\" class=\"s-tru1\"/></linearGradient><clipPath id=\"mvcu69c\"><path d=\"M46 12 H154 V128 A54 54 0 0 1 46 128 Z\"/></clipPath></defs><ellipse cx=\"100\" cy=\"195\" rx=\"48\" ry=\"6\" class=\"m-bong\"/><g class=\"mol-than\" transform=\"translate(0 0) rotate(0 100 190)\"><ellipse cx=\"80\" cy=\"183\" rx=\"15\" ry=\"9\" class=\"m-chan\"/><ellipse cx=\"120\" cy=\"183\" rx=\"15\" ry=\"9\" class=\"m-chan\"/><path d=\"M46 12 H154 V128 A54 54 0 0 1 46 128 Z\" fill=\"url(#mvcu69t)\"/><g clip-path=\"url(#mvcu69c)\"><rect x=\"46\" y=\"12\" width=\"108\" height=\"14\" class=\"m-bong-vanh\"/><path d=\"M52 76 C52 58 62 48 76 48 C87 48 94 52 100 58 C106 52 113 48 124 48 C138 48 148 58 148 76 V98 C148 116 127 128 100 128 C73 128 52 116 52 98 Z\" fill=\"url(#mvcu69n)\"/><ellipse cx=\"60\" cy=\"106\" rx=\"9\" ry=\"5.5\" class=\"m-ma\"/><ellipse cx=\"140\" cy=\"106\" rx=\"9\" ry=\"5.5\" class=\"m-ma\"/><path d=\"M10 106 Q25 101 40 106 Q55 101 70 106 Q85 101 100 106 Q115 101 130 106 Q145 101 160 106 Q175 101 190 106 Q205 101 220 106 V200 H10 Z\" fill=\"url(#mvcu69l)\"/><path d=\"M10 106 Q25 101 40 106 Q55 101 70 106 Q85 101 100 106 Q115 101 130 106 Q145 101 160 106 Q175 101 190 106 Q205 101 220 106\" class=\"m-sang-n\" stroke-width=\"2.6\"/><circle cx=\"70\" cy=\"130\" r=\"5\" class=\"m-bot\"/><circle cx=\"126\" cy=\"136\" r=\"3.6\" class=\"m-bot\"/><circle cx=\"102\" cy=\"121\" r=\"2.6\" class=\"m-bot\"/><circle cx=\"72\" cy=\"104\" r=\"5\" class=\"m-bot\"/><circle cx=\"104\" cy=\"103\" r=\"6\" class=\"m-bot\"/><circle cx=\"134\" cy=\"105\" r=\"4\" class=\"m-bot\"/><circle cx=\"90\" cy=\"120\" r=\"4.4\" class=\"m-bot\"/><rect x=\"46\" y=\"12\" width=\"108\" height=\"172\" fill=\"url(#mvcu69b)\"/><rect x=\"52\" y=\"26\" width=\"7\" height=\"30\" rx=\"3.5\" class=\"m-sang\"/><path d=\"M53 130 Q55 170 72 178\" class=\"m-sang-n\" stroke-width=\"4\"/></g><rect x=\"38\" y=\"2\" width=\"124\" height=\"15\" rx=\"7.5\" fill=\"url(#mvcu69v)\"/><ellipse cx=\"100\" cy=\"5.5\" rx=\"52\" ry=\"3\" class=\"m-mieng-ong\"/><path d=\"M48 12 H108\" class=\"m-sang-n\" stroke-width=\"2.6\"/><circle cx=\"100\" cy=\"95\" r=\"6.8\" class=\"m-mui\"/><circle cx=\"97.6\" cy=\"92.6\" r=\"2.1\" class=\"m-trang\" opacity=\".75\"/><ellipse cx=\"76\" cy=\"73.8\" rx=\"16\" ry=\"19\" class=\"m-muc\"/><circle cx=\"81\" cy=\"71\" r=\"3.7\" class=\"m-trang\"/><circle cx=\"71\" cy=\"82\" r=\"1.7\" class=\"m-trang\"/><clipPath id=\"mvcu69ma\"><ellipse cx=\"76\" cy=\"72\" rx=\"17\" ry=\"20\"/></clipPath><path clip-path=\"url(#mvcu69ma)\" d=\"M52 36 H100 V78.4 L52 47.6 Z\" class=\"m-na\"/><path d=\"M57 50.8 L95 75.2\" class=\"m-net\" stroke-width=\"6.5\"/><ellipse cx=\"124\" cy=\"73.8\" rx=\"16\" ry=\"19\" class=\"m-muc\"/><circle cx=\"129\" cy=\"71\" r=\"3.7\" class=\"m-trang\"/><circle cx=\"119\" cy=\"82\" r=\"1.7\" class=\"m-trang\"/><clipPath id=\"mvcu69mb\"><ellipse cx=\"124\" cy=\"72\" rx=\"17\" ry=\"20\"/></clipPath><path clip-path=\"url(#mvcu69mb)\" d=\"M100 36 H148 V47.6 L100 78.4 Z\" class=\"m-na\"/><path d=\"M105 75.2 L143 50.8\" class=\"m-net\" stroke-width=\"6.5\"/><path d=\"M80 123 Q100 94 120 123 Z\" class=\"m-mieng\"/><path d=\"M85 119 L91 112 L97 118 L103 111 L109 118 L115 112\" class=\"m-net-t\" stroke-width=\"2.4\"/><path d=\"M46 108 Q24 108 22 86\" class=\"m-tay-n\"/><circle cx=\"22\" cy=\"86\" r=\"9\" class=\"m-tay\"/><path d=\"M154 108 Q176 108 178 86\" class=\"m-tay-n\"/><circle cx=\"178\" cy=\"86\" r=\"9\" class=\"m-tay\"/><circle cx=\"96\" cy=\"-6\" r=\"8\" class=\"m-hoi\"/><circle cx=\"111\" cy=\"-13\" r=\"10\" class=\"m-hoi\"/><circle cx=\"84\" cy=\"-16\" r=\"6.5\" class=\"m-hoi\"/><circle cx=\"124\" cy=\"-4\" r=\"6.5\" class=\"m-hoi\"/><circle cx=\"100\" cy=\"-21\" r=\"5\" class=\"m-hoi\"/><g transform=\"translate(172 36)\"><path d=\"M-9 -3 Q-3 -3 -3 -9 M3 -9 Q3 -3 9 -3 M9 3 Q3 3 3 9 M-3 9 Q-3 3 -9 3\" class=\"m-net-do\" stroke-width=\"3.8\"/></g><path d=\"M14 120 Q8 132 14 144 M6 114 Q-2 132 6 150 M186 120 Q192 132 186 144 M194 114 Q202 132 194 150\" class=\"m-net-do\" stroke-width=\"3\" opacity=\".7\"/></g>"}
 const kiemSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'
 
 document.querySelectorAll('svg[data-mat]').forEach((s) => { s.innerHTML = svgMol(s.dataset.mat) })
@@ -462,10 +528,26 @@ document.getElementById('pa3').innerHTML = PA.map((p) => `<article class="pa${p.
 const CX = [
   ['vui', 'vui', 'mặc định · làm đúng'], ['khen', 'khen', 'đúng liền · kỷ lục'], ['chao', 'chào', 'mở app'], ['nghi', 'nghĩ', 'gợi ý · đang làm'],
   ['ngac', 'ngạc nhiên', 'chạm vào Mol'], ['buon', 'buồn', 'làm sai'], ['ngu', 'ngủ', 'lâu không học'],
-  ['doi', 'dỗi', 'chậm chuỗi', 2], ['buc', 'bực', 'trễ mục tiêu', 3], ['cau', 'cáu', 'dung dịch đỏ sôi', 4], ['ratCau', 'rất cáu', 'đỏ dâng · hơi nước', 5],
+  ['doi', 'dỗi', 'chậm chuỗi', 2], ['buc', 'bực', 'cánh khép chéo', 3], ['cau', 'cáu', 'chống hông · hơi mảnh', 4], ['ratCau', 'rất cáu', 'đỏ dâng · rung nhẹ', 5],
   ['nguong', 'ngượng', 'được khen · nhận quà', 0, 1], ['me', 'mê', 'mở rương · thành tích', 0, 1], ['nhay', 'vui nhảy', 'giữ chuỗi ngày', 0, 1],
 ]
 document.getElementById('cx').innerHTML = CX.map(([m, t, g, cap, moi]) => `<figure>${cap ? `<span class="cap">cấp ${cap}</span>` : ''}${moi ? '<span class="moi">mới</span>' : ''}${sv('A', m, 132, 152)}<b>${t}</b><small>${g}</small></figure>`).join('')
+
+// ── Trước / sau mặt giận ──
+const GTEN = [['doi', 'dỗi'], ['buc', 'bực'], ['cau', 'cáu'], ['ratCau', 'rất cáu']]
+document.getElementById('gtr').innerHTML = '<span class="nhan3">Trước<br>(01/11 chiều)</span>' +
+  GTEN.map(([m, t]) => `<figure><svg class="mv pa-A" viewBox="${VB}" width="150" height="172">${GIAN_CU[m]}</svg>${t}</figure>`).join('') +
+  '<span class="nhan3">Sau<br>(tinh tế)</span>' + GTEN.map(([m, t]) => `<figure class="sau">${sv('A', m, 150, 172)}${t}</figure>`).join('')
+
+// ── Chữ khắc: cận cảnh hai phương án ──
+const VB_BUNG = { A: '40 112 120 54', B: '120 52 60 112' }
+document.getElementById('avo2').innerHTML = [['A', 'A · Khắc ngang bụng, trên mặt dung dịch (đề xuất)', 'Cong nhẹ theo thân, nằm giữa bụng ngay dưới mặt; ba vạch chia bên phải. Đọc thẳng, cân đối, cỡ 64 px vẫn thấy như một dải chữ mảnh.'],
+  ['B', 'B · Khắc dọc mép phải theo vạch chia', 'Chạy dọc mép thân như thang đo ống đong; kín đáo hơn, không chạm mặt; nhưng phải nghiêng đầu mới đọc, dễ bị cánh che khi vẫy.']]
+  .map(([k, t, p]) => `<article class="${k === 'A' ? 'de' : ''}"><h3>${t}</h3>
+    <div class="tren2">${sv('A', 'vui', 200, 230, VB, { khac: k })}
+      <svg class="mv pa-A cat zoom" viewBox="${VB_BUNG[k]}" width="${k === 'A' ? 300 : 130}" height="${k === 'A' ? 135 : 243}">${svgMol('vui', { khac: k })}</svg></div>
+    <div class="hai">${sv('A', 'cau', 96, 110, VB, { khac: k })}${sv('A', 'ratCau', 96, 110, VB, { khac: k })}${sv('A', 'vui', 64, 74, VB, { khac: k })}${sv('A', 'vui', 40, 46, VB, { khac: k })}</div>
+    <p>${p} Hàng nhỏ: cáu · rất cáu (chữ trên dung dịch đỏ) · 64 px · 40 px (ẩn chữ, giữ vạch).</p></article>`).join('')
 
 // ── Cỡ nhỏ ──
 const coNho = (cls, ten) => `<div class="${cls}"><h3>${ten}</h3>
