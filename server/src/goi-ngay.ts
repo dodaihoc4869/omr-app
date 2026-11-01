@@ -31,7 +31,8 @@ export const CAU_MOI_CHANG = 6
 export const SO_CHANG_GOI = 3
 export const SO_CAU_GOI_NGAY = SO_CHANG_GOI * CAU_MOI_CHANG
 export const goiNgayBat = (sbd: string): boolean => cheDo === 'bat' || (cheDo === 'thu' && SBD_THU.has(sbd))
-const aadVe = (sbd: string, ngay: string) => `goi-ngay|${sbd}|${ngay}`
+// `v2` (01/11, luật tự luận siết): gói cả ngày niêm trước đó có thể mang câu tự luận ⇒ mở không được (GOI_CU) ⇒ máy em bỏ gói cũ, tải gói mới.
+const aadVe = (sbd: string, ngay: string) => `goi-ngay|v2|${sbd}|${ngay}`
 
 type Ref = { qid: string; group: string; maDe?: unknown; version?: unknown } & Record<string, unknown>
 
