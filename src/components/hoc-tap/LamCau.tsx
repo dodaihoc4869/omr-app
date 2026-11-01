@@ -16,20 +16,23 @@ import type { Question } from '../../game/than-thu-v2/core'
 import { TOI_DA_KY_TU, chuDS, kyTuHien, phimCoTacDung, phimTuBanPhim, soSanhDungSai, type PhimSo } from './lam-bai'
 import { LUN_TOI_THIEU_MS, cuonThayBanPhim, doiO } from './ban-phim-hieu-ung'
 import { phanHoi } from '../../lib/phan-hoi'
+import { MQ_HAI_COT, haiCotLam } from './bo-cuc-lam'
+// Thanh cuộn vẽ tay của hai cột: xuất lại từ đây ⇒ nằm CÙNG mảnh dùng chung với LamCau (màn làm chặng + sửa câu), không đẻ thêm tệp precache.
+export { ThanhCuon } from './ThanhCuon'
 import '../m3/the-cau.css'
 
 // ── BỐ CỤC THEO KHỔ MÀN (làn B đợt 16, thầy 12/10: "Tối ưu cho dọc ngang máy tính tất cả các màn làm bài của học sinh phải siêu đẹp và
-// thân thiện"). CÙNG điểm ngắt với hoc-tap.css: 'rong' = màn ≥ 900 px và cao > 560 px (máy tính, máy tính bảng ngang) · 'thap' = điện
-// thoại xoay ngang (cao ≤ 560 px, rộng ≥ 640 px) · còn lại 'doc' (GIỮ NGUYÊN bản dọc). Không có matchMedia (jsdom, máy chủ) ⇒ 'doc'.
+// thân thiện"). CÙNG điểm ngắt với hoc-tap.css. 01/11 (thầy, Galaxy Z Fold mở): hai cột theo MỘT NGUỒN `haiCotLam` (bo-cuc-lam.ts — rộng > cao
+// từ 640 px, hoặc rộng ≥ 700 mà cao ≤ 1,3 × rộng); trong đó 'thap' = cao ≤ 560 px (điện thoại xoay ngang), 'rong' = cao hơn (máy gập mở, máy tính
+// bảng ngang, máy tính) · còn lại 'doc' (GIỮ NGUYÊN bản dọc, kể cả máy tính bảng dọc 768×1024). Không có matchMedia (jsdom, máy chủ) ⇒ 'doc'.
 // Chỉ quyết CHỖ ĐẶT phần trả lời (cột trái dưới đề hay cột phải cạnh nút Nộp) — không đổi đáp án, nháp, thời gian, lệnh máy chủ.
 export type BoCucLam = 'doc' | 'rong' | 'thap'
 export const MQ_LAM_THAP = '(max-height: 560px) and (min-width: 640px)'
-export const MQ_LAM_RONG = '(min-width: 900px)'
+export const MQ_LAM_RONG = MQ_HAI_COT.split(', ').map((m) => `${m} and (min-height: 561px)`).join(', ')
 /** Bố cục theo bề rộng × chiều cao khung nhìn (thuần — test được không cần trình duyệt). */
 export function chonBoCucLam(rong: number, cao: number): BoCucLam {
-  if (cao <= 560 && rong >= 640) return 'thap'
-  if (rong >= 900) return 'rong'
-  return 'doc'
+  if (!haiCotLam(rong, cao)) return 'doc'
+  return cao <= 560 ? 'thap' : 'rong'
 }
 const coMq = () => typeof window !== 'undefined' && typeof window.matchMedia === 'function'
 function docBoCucLam(): BoCucLam {

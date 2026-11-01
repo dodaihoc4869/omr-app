@@ -120,8 +120,11 @@ describe('CSS bố cục ba khổ', () => {
     const css = bo(doc('src/components/hoc-tap/hoc-tap.css'))
     const i = css.indexOf('.ht2-lam-khung[data-tra-loi]')
     expect(i).toBeGreaterThan(0)
-    expect(css.lastIndexOf('@media(min-width:900px)', i)).toBeGreaterThan(0)
-    const khoi = css.slice(css.lastIndexOf('@media(min-width:900px)', i))
+    // 01/11 (máy gập mở): điểm ngắt «rộng» = luật hai cột chung bo-cuc-lam.ts (MQ_LAM_RONG), không còn ≥ 900 px
+    const RONG = '@media (orientation:landscape) and (min-width:640px) and (min-height:561px),(min-width:700px) and (min-aspect-ratio:10/13) and (min-height:561px)'
+    expect(MQ_LAM_RONG.replace(/: /g, ':').replace(/, /g, ',')).toBe(RONG.slice(7))
+    expect(css.lastIndexOf(RONG, i)).toBeGreaterThan(0)
+    const khoi = css.slice(css.lastIndexOf(RONG, i))
     expect(khoi).toContain('@media(max-height:560px) and (min-width:640px){\n  .ht2-lam-khung[data-tra-loi]')
     expect(khoi.slice(0, 2600)).not.toMatch(/#[0-9a-fA-F]{3,8}\b|\brgba?\(/)
   })
