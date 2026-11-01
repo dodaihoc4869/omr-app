@@ -1,0 +1,4 @@
+{
+ "ghiChu": "01/11/2026 — thầy: «Tôi muốn bỏ chỗ này khi bấm vào ca thi nó hiện nhìn rất xấu, nếu cần duyệt thì cho hiện rõ vào 1 chỗ đẹp hơn chuyên nghiệp hơn» rồi «chốt bản vẽ làm đi» (docs/ban-ve-trong-2610/gv-duyet-bo-sung.html). Khối cũ src/components/KhungBaiBoSung.tsx (màn Theo dõi ca) bị THAY bằng src/components/hom-nay-thay/DuyetBoSung.tsx + duyet-bo-sung.css (chỉ biến --tr-*). files = tệp xoá nguyên, kèm sha256 nội dung đúng lúc xoá ⇒ chỉ đúng bản này được miễn.",
+ "files": [{ "path": "src/components/KhungBaiBoSung.tsx", "sha256": "ca14344ecc7f8b4dcbe5166fb5ccba78b94d04d7ca2b563e0998e45242185012" }]
+}

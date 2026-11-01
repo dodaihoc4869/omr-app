@@ -1,0 +1,80 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GV · Bài bổ sung chờ duyệt</title><link rel="stylesheet" href="trong.css">
+<style>
+/* BẢN VẼ 01/11 — DUYỆT BÀI BỔ SUNG (thầy: «bỏ chỗ này khi bấm vào ca thi … nếu cần duyệt thì cho hiện rõ vào 1 chỗ đẹp hơn chuyên nghiệp hơn»).
+   Mở từ «Việc cần thầy» ở màn Hôm nay. Chỉ dùng var(--…) của trong.css. */
+.tom{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
+.tom .so-lon{font-size:32px;line-height:1}
+.tom .mo{margin:0}
+.nhom-dau{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--vien)}
+.nhom-dau .giua{flex:1;min-width:0}
+.nhom-dau .ten{margin:0;font-weight:600}
+.nhom-dau .mo{margin:2px 0 0}
+.bs{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px 20px;border-top:1px solid var(--vien)}
+.bs:first-of-type{border-top:0}
+.bs .ten{margin:0;font-weight:600;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px}
+.bs .ten small{font-weight:500;color:var(--chu-3);font-size:13px}
+.bs .mo{margin:2px 0 0}
+.bs .mo b{color:var(--chu);font-weight:600}
+.bs .nut-hai{display:flex;gap:8px}
+.bs.xong{opacity:.55}
+@media (max-width:600px){
+  .bs{grid-template-columns:36px minmax(0,1fr);padding:14px 16px}
+  .bs .nut-hai{grid-column:1 / -1;justify-content:flex-end}
+  .bs .nut-hai .nut{flex:1}
+  .nhom-dau{padding:14px 16px}
+}
+</style></head>
+<body data-app="gv" data-tab="hom-nay" data-khung="man-con" data-tieu="Bài bổ sung chờ duyệt" data-phu="7 bài · 3 ca kiểm tra · cũ nhất 25/10" data-ve="Hôm nay">
+<main class="khung cot" style="gap:16px">
+  <!-- GỌN HƠN: bỏ hẳn khối «7 bài bổ sung chờ thầy duyệt» chữ to ở màn Theo dõi ca (hiện cả bài của ca khác). Gom về MỘT chỗ:
+       Hôm nay › Việc cần thầy › «Bài bổ sung chờ duyệt» › trang này, xếp theo ca, mỗi em một dòng gọn, hai nút Bỏ / Nhận. -->
+  <div class="ghi-chu tin">
+    <i data-i="info"></i>
+    <div>Máy em còn giữ câu làm thêm, nhưng máy chủ đã chốt bài trước khi nhận được.
+      <b>Nhận</b>: gộp câu làm thêm vào bài và chấm lại ca. <b>Bỏ</b>: giữ điểm cũ.</div>
+  </div>
+
+  <section class="the dem">
+    <div class="nhom-dau"><span class="o-icon tin"><i data-i="clipboard"></i></span>
+      <div class="giua"><p class="ten">Kiểm tra 15 phút · LD3 – Đồ thị</p><p class="mo">Máy chủ chốt bài 19:54 · 25/10 · 4 bài chờ</p></div>
+      <span class="nut nhe an-dt">Nhận cả 4 bài</span>
+    </div>
+    <div class="bs"><span class="av a1">TT</span>
+      <div><p class="ten">Đỗ Thanh Tùng <small>12A2 · SBD 12901</small></p><p class="mo"><b>1 câu</b> làm thêm · gửi 19:55, sau chốt 1 phút</p></div>
+      <div class="nut-hai"><span class="nut trong">Bỏ</span><span class="nut">Nhận</span></div></div>
+    <div class="bs"><span class="av a2">NA</span>
+      <div><p class="ten">Vũ Ngọc Ánh <small>12A2 · SBD 12902</small></p><p class="mo"><b>2 câu</b> làm thêm · gửi 19:55, sau chốt 1 phút</p></div>
+      <div class="nut-hai"><span class="nut trong">Bỏ</span><span class="nut">Nhận</span></div></div>
+    <div class="bs"><span class="av a3">GB</span>
+      <div><p class="ten">Trịnh Gia Bảo <small>12A1 · SBD 12903</small></p><p class="mo"><b>1 câu</b> làm thêm · gửi 19:55, sau chốt 1 phút</p></div>
+      <div class="nut-hai"><span class="nut trong">Bỏ</span><span class="nut">Nhận</span></div></div>
+    <div class="bs"><span class="av a4">KL</span>
+      <div><p class="ten">Mai Khánh Linh <small>12A1 · SBD 12904</small></p><p class="mo"><b>1 câu</b> làm thêm · gửi 19:56, sau chốt 2 phút</p></div>
+      <div class="nut-hai"><span class="nut trong">Bỏ</span><span class="nut">Nhận</span></div></div>
+  </section>
+
+  <section class="the dem">
+    <div class="nhom-dau"><span class="o-icon tin"><i data-i="clipboard"></i></span>
+      <div class="giua"><p class="ten">Kiểm tra · 12L1-L5</p><p class="mo">Máy chủ chốt bài 19:20 · 30/10 · 1 bài chờ</p></div>
+    </div>
+    <div class="bs"><span class="av a1">MK</span>
+      <div><p class="ten">Lê Minh Khoa <small>12A1 · SBD 12905</small></p><p class="mo"><b>3 câu</b> làm thêm · gửi 19:22, sau chốt 2 phút</p></div>
+      <div class="nut-hai"><span class="nut trong">Bỏ</span><span class="nut">Nhận</span></div></div>
+  </section>
+
+  <section class="the dem">
+    <div class="nhom-dau"><span class="o-icon tin"><i data-i="clipboard"></i></span>
+      <div class="giua"><p class="ten">Kiểm tra · 12L2-L3</p><p class="mo">Máy chủ chốt bài 17:57 · 09/10 · 2 bài chờ</p></div>
+      <span class="nut nhe an-dt">Nhận cả 2 bài</span>
+    </div>
+    <div class="bs"><span class="av a2">TH</span>
+      <div><p class="ten">Phạm Thu Hà <small>12A2 · SBD 12906</small></p><p class="mo"><b>2 câu</b> làm thêm · gửi 18:26 · 30/10, sau chốt 21 ngày</p></div>
+      <div class="nut-hai"><span class="nut trong">Bỏ</span><span class="nut">Nhận</span></div></div>
+    <div class="bs xong"><span class="av a3">QH</span>
+      <div><p class="ten">Ngô Quang Huy <small>12A2 · SBD 12907</small></p><p class="mo"><span class="dung-mau">Đã nhận · đã chấm lại ca 12L2-L3</span></p></div>
+      <div class="nut-hai"><span class="chip dung"><i data-i="check" class="nho"></i> Xong</span></div></div>
+  </section>
+</main>
+<script src="khung.js"></script>
+</body></html>
