@@ -9,6 +9,8 @@
 6. «Cánh to có ngón như cánh cú, xếp bậc, xoè được», thêm «chống nạnh», cáu / rất cáu «bốc lửa lên đầu».
 7. «Chân đẹp hơn, hợp thân».
 8. «Ống nghiệm có nắp đóng… cáu, rất cáu nắp bung lơ lửng trên lửa; có thể khắc 6.022 trên nắp».
+9. «Cáu theo kiểu icon của Duolingo» ⇒ giận ĐỔI SẮC TOÀN THÂN (chỉ học cách đổi sắc, không chép nhân vật).
+10. «Phần Mol cáu chữ hiện bong bóng trên đầu Mol… bong bóng đổi màu theo cảm xúc» (thay thẻ riêng ở trên màn Lộ trình).
 
 - **Bản vẽ:** `mol-v2.html` (SVG thuần, màu = biến CSS chép giá trị token thật). Mở thường là bản sáng; `?toi` là bản tối; `?dien-thoai` là ảnh ngữ cảnh.
 - **Chụp lại:** `node docs/ban-ve-mol-v2-0111/chup.cjs` (cần `node_modules` của repo + `/opt/pw-browsers/chromium`; ảnh tĩnh chụp ở chế độ giảm chuyển động).
@@ -24,7 +26,9 @@
   | `nap-can-canh.jpg` | Nắp đóng · khen · cáu · rất cáu · hai vị trí chữ (+ 64 px) |
   | `so-avogadro-can-canh.jpg` | Chữ khắc hai vị trí, cận cảnh, khi giận, 64 / 40 px |
   | `co-nho.jpg` | 28 / 40 / 64 px, sáng / tối |
-  | `ngu-canh-dien-thoai.jpg` | Lộ trình 390 × 844 |
+  | `ngu-canh-dien-thoai.jpg` | Lộ trình 390 × 844, Mol vẫy chào + bong bóng trên đầu |
+  | `bong-bong-lo-trinh-sang.jpg`, `bong-bong-lo-trinh-toi.jpg` | Hai điện thoại 390 × 844: cáu · rất cáu, bong bóng trên đầu Mol, KHÔNG còn thẻ riêng |
+  | `bong-bong-mau.jpg` | Bong bóng 15 cảm xúc cạnh mặt Mol, sáng + tối |
 
 ## Thiết kế
 - **Thân:** ống nghiệm LÙN MẬP, rộng 136 × cao 156 (cao : rộng ≈ 1,15 : 1). Vành miệng ống rộng, đáy tròn to.
@@ -47,6 +51,15 @@
   - **B · dưới vành miệng ống (ĐỀ XUẤT):** trên thân chàm có bóng vành ⇒ tương phản tốt hơn, không nghiêng khi nắp bung; lửa và cánh không che.
   - **A · trên nắp:** xinh, bay theo nắp; nhưng chữ trắng trên hồng kém tương phản hơn, nghiêng / bay khỏi khung khi giận.
   - Từ 64 px hiện chữ; nhỏ hơn chỉ giữ vạch.
+- **Giận đổi sắc toàn thân** (bản mới; `gian-truoc-sau.jpg` có 3 cột: miệng răng · tinh tế · đổi sắc):
+  - **dỗi (2) / bực (3):** chỉ ửng má (`--tr-sai` pha trắng 50 % / 68 %), thân giữ màu.
+  - **cáu (4):** thân sẫm vừa, chuyển gradient sang tím đỏ — `--tr-sai` pha `--tr-hs-day` / `--tr-hs`, mép tối pha mực.
+    - Tròng mắt đỏ hồng (`--tr-sai` 38 % trắng), con ngươi nhỏ nhìn trừng.
+    - Mí trên sập nặng màu thân sẫm, nghiêng gắt; quầng tối quanh mắt (`--tr-sai-day` pha mực).
+    - Má đỏ `--tr-sai`; cánh, chân sẫm theo.
+  - **rất cáu (5):** sẫm hẳn, đỏ rực, mép trong tối dày hơn, tròng đỏ đậm, ánh đỏ mờ quanh mắt (gradient tròn `--tr-sai` → trong suốt, không filter).
+  - Cả cáu và rất cáu giữ nắp bung + lửa.
+  - Cách làm: cả hình bọc trong nhóm `.gian4` / `.gian5` đặt lại biến `--mol-*` ⇒ stop gradient kế thừa, không cần vẽ hình thứ hai.
 - **Giận tinh tế:** không răng, không gân đỏ.
 
   | Mức | Mặt | Dáng | Lửa / dung dịch |
@@ -57,6 +70,34 @@
 
   - Lửa ba lớp: ngoài `--tr-sai` (cáu pha `--tr-chu-y`) → giữa `--tr-chu-y` → lõi `--tr-sao` pha trắng. Bản tối tự sáng theo token.
 - **Bản quyền (bắt buộc):** KHÔNG chép cú Duolingo: không lông/chỏm tai, không mỏ, không màu xanh lá của Duo, không đường nét lông ở ngực. Mol là ống nghiệm của app, màu theo token app. Chỉ học «ngôn ngữ biểu cảm / dáng», không chép nhân vật.
+
+## Bong bóng lời trên đầu Mol (thay thẻ riêng ở trên)
+- **Hình:**
+  - gọn ≤ 2 dòng, rộng ≤ 220 px, chữ 14,5 px đậm vừa, bo 16 px, viền 2 px, gờ dưới 3 px;
+  - đuôi nhọn bo chỉ xuống đầu Mol, lệch ~24 px khỏi tâm để tránh nắp / lửa.
+- **Tự căn:** `trái = kẹp(tâm Mol − rộng/2, 12, màn − 12 − rộng)`; đuôi = tâm Mol − 24 − trái ⇒ Mol sát phải thì bong bóng lệch trái, đuôi vẫn chỉ đúng Mol.
+  - Đáy bong bóng = đỉnh hình Mol − 12 px. Khi nắp bung, đỉnh hình cao hơn nên bong bóng lên theo.
+- **Hiện:** nảy nhẹ (scale 0,85 → 1, 0,5 s). Câu dài rút ý chính, vd. «Cáu lắm rồi! 5 câu liền chưa tính — đọc kĩ đề nhé».
+- **Đổi màu theo cảm xúc:** `transition` 0,35 s cho nền, viền, chữ. Rất cáu thêm viền nhấp nháy rất nhẹ (vòng 4 px `--tr-sai` 30 %). Giảm chuyển động ⇒ đứng yên.
+
+  | Cảm xúc | Nền | Viền | Chữ |
+  |---|---|---|---|
+  | vui | `--tr-hs-nhat` | `--tr-hs` | `--tr-hs-chu` |
+  | khen, vui nhảy | `--tr-tin-nhat` | `--tr-tin` | `--tr-tin-chu` |
+  | chào, tự tin | `--tr-hs-day` | `--tr-hs-chu` | `--tr-hs-tren` |
+  | nghĩ, ngủ (xám xanh) | `--tr-mat-2` | `--tr-vien-2` | `--tr-chu-2` |
+  | ngạc nhiên | `--tr-sao-nhat` | `--tr-sao` | `--tr-sao-chu` |
+  | buồn (xanh lam nhạt) | `--tr-gv-nhat` | `--tr-gv` | `--tr-gv-chu` |
+  | dỗi, ngượng, mê (tím nhạt) | `--tr-tim` 15 % trên `--tr-mat` | `--tr-tim` | `--tr-tim-chu` |
+  | bực (cam nhạt) | `--tr-chu-y-nhat` | `--tr-chu-y` | `--tr-chu-y-chu` |
+  | cáu (đỏ cam) | `--tr-sai-nhat` | `--tr-sai` pha `--tr-chu-y` | `--tr-sai-chu` |
+  | rất cáu (đỏ đậm) | `--tr-sai-chu` | `--tr-sai-day` | `--tr-trang` |
+
+  Mọi cặp chữ / nền ≥ 4,5 ở nền sáng (chào dùng `--tr-hs-day` thay `--tr-hs-nut` cho đủ tương phản). Nền tối các token tự đổi.
+- **Build:**
+  - thẻ lời Mol hiện ở trên Lộ trình (`bi-loi`) chuyển thành bong bóng neo theo khung Mol, gắn `data-cx` = mặt đang vẽ;
+  - CSS ở `mol.css` hoặc tờ của Lộ trình;
+  - đo vị trí bằng `getBoundingClientRect` của khung Mol một lần khi hiện (không theo dõi liên tục).
 
 ## Ba phương án màu (token có sẵn «Chất chỉ thị», `src/styles/trong-hs-mau.css`)
 

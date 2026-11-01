@@ -6,9 +6,9 @@ const RA = path.join(__dirname, 'anh'); fs.mkdirSync(RA, { recursive: true })
 const TEP = 'file://' + path.join(__dirname, 'mol-v2.html')
 const TRAN = 150 * 1024
 async function luu(chup, ten) { // hạ chất lượng tới khi ≤ 150 KB
-  for (let q = 86; q >= 40; q -= 6) {
+  for (let q = 86; ; q -= 6) {
     const buf = await chup({ type: 'jpeg', quality: q })
-    if (buf.length <= TRAN || q <= 40) { fs.writeFileSync(path.join(RA, ten), buf); return `${ten} ${Math.round(buf.length / 1024)} KB q${q}` }
+    if (buf.length <= TRAN || q <= 32) { fs.writeFileSync(path.join(RA, ten), buf); return `${ten} ${Math.round(buf.length / 1024)} KB q${q}` }
   }
 }
 ;(async () => {
@@ -33,6 +33,9 @@ async function luu(chup, ten) { // hạ chất lượng tới khi ≤ 150 KB
   const nho = await mo('', 1240, 900, 2)
   kq.push(await luu((o) => nho.locator('#co-nho').screenshot(o), 'co-nho.jpg'))
   await nho.close()
+  const bbm = await mo('', 1240, 900, 1.2) // lưới bong bóng 2 nền ⇒ 1,2×
+  kq.push(await luu((o) => bbm.locator('#bb-mau').screenshot(o), 'bong-bong-mau.jpg'))
+  await bbm.close()
   for (const [hoi, ten] of [['', 'sang'], ['?toi', 'toi']]) { // bảng phương án cao ⇒ chụp 1,2× cho vừa 150 KB
     const p = await mo(hoi, 1240, 900, 1.2)
     kq.push(await luu((o) => p.locator('#phuong-an').screenshot(o), `3-phuong-an-mau-${ten}.jpg`))
@@ -41,6 +44,11 @@ async function luu(chup, ten) { // hạ chất lượng tới khi ≤ 150 KB
   const toi = await mo('?toi', 1240, 900, 1.5)
   kq.push(await luu((o) => toi.locator('#cam-xuc').screenshot(o), 'cam-xuc-A-toi.jpg'))
   await toi.close()
+  for (const [hoi, ten] of [['?bong-bong', 'sang'], ['?bong-bong&toi', 'toi']]) { // hai điện thoại: cáu | rất cáu
+    const p = await mo(hoi, 800, 844, 1.5)
+    kq.push(await luu((o) => p.locator('#bb-dt').screenshot(o), `bong-bong-lo-trinh-${ten}.jpg`))
+    await p.close()
+  }
   const dt = await mo('?dien-thoai', 390, 844, 2)
   kq.push(await luu((o) => dt.screenshot(o), 'ngu-canh-dien-thoai.jpg'))
   await dt.close()
