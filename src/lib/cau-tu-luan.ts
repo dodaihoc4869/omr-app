@@ -86,6 +86,30 @@ const DONG_TU_HOI_MO = /(?:^|[.?!:;]\s*|(?:^|[^\p{L}])hãy\s+)(?:giải thích|t
  * (`HOI_DAI_LUONG`), vì phần III hay có "Viết phương trình … Tổng hệ số là bao nhiêu?" — đó vẫn là trả lời ngắn. */
 const DONG_TU_LAM_CHU = /(?:^|[.?!:;,]\s*|(?:^|[^\p{L}])hãy\s+)(?:xác định (?:công thức|cấu tạo|tên)|viết (?:công thức|phương trình|các phương trình|cấu tạo|sơ đồ|tên)|lập (?:công thức|phương trình|sơ đồ)|vẽ|chứng minh)(?![\p{L}])/iu
 const HOI_DAI_LUONG = /bao nhiêu|số thứ tự|dãy số|bộ số|liệt kê|giá trị|tổng (?:hệ số|số)|là mấy|làm tròn|phần trăm|hiệu suất|khối lượng|thể tích|nồng độ|số mol|(?:^|[^\p{L}])tính(?![\p{L}])/iu
+/**
+ * 01/11 (thầy gửi ảnh câu «Hydrogen sulfide phân huỷ … a) Viết biểu thức KC … b) Xác định biến thiên enthalpy … cho biết toả nhiệt hay thu nhiệt. c) Ở 427 °C, tính K'C…»
+ * lọt vào chặng học, đáp án kho «169,8»): câu Phần III gồm ≥ 2 Ý CON (a) b) c)…) mà mỗi ý là MỘT YÊU CẦU (viết / xác định / tính / giải thích / cho biết …) — nhiều việc
+ * trong một câu, một đáp án số chỉ khớp một ý ⇒ không chấm tự động được ⇒ TỰ LUẬN, KỂ CẢ khi kho có đáp án số. Danh sách PHÁT BIỂU / THÍ NGHIỆM «(a) … (b) …» kèm câu
+ * hỏi đếm («Số phát biểu đúng là») KHÔNG dính: ý con mở đầu bằng chất / hiện tượng / «Cho … vào …», không phải động từ yêu cầu. «Tính chất / tính khử / tính acid …»
+ * là danh từ, không phải lệnh «tính».
+ */
+const DONG_TU_YEU_CAU = /^(?:hãy\s+)?(?:viết|xác định|tính(?!\s+(?:chất|oxi|oxy|khử|acid|axit|base|bazơ|bazo|tan|dẻo|dẫn|cứng|lưỡng|kim loại|phi kim|tương đối|thấm|bền))|giải thích|trình bày|nêu|so sánh|nhận xét|đề xuất|lập|vẽ|chứng minh|hoàn thành|cân bằng|gọi tên|phân biệt|dự đoán|cho biết|tìm|sắp xếp|biểu diễn|mô tả|nhận biết|điều chế|thiết lập|đề nghị|chỉ ra)(?![\p{L}])/iu
+const DAU_Y_CON = /(?:^|[\s.:;?!])\(?([a-e])\)\s*/giu
+/** Số Ý CON (khác chữ cái) mà nội dung mở đầu — hoặc sau dấu phẩy đầu, vd «Ở 427 °C, tính …» — bằng động từ yêu cầu. */
+export function soYConYeuCau(text: string): number {
+  const t = text.normalize('NFC')
+  const dau: { chu: string; tu: number; den: number }[] = []
+  for (const m of t.matchAll(DAU_Y_CON)) dau.push({ chu: m[1]!.toLowerCase(), tu: m.index! + m[0].length, den: m.index! })
+  if (dau.length < 2) return 0
+  const co = new Set<string>()
+  dau.forEach((d, i) => {
+    const doan = t.slice(d.tu, i + 1 < dau.length ? dau[i + 1]!.den : t.length).trim().slice(0, 160)
+    const dauDoan = doan.split(/[,;]/).slice(0, 2).map((x) => x.trim())
+    if (dauDoan.some((x) => DONG_TU_YEU_CAU.test(x))) co.add(d.chu)
+  })
+  return co.size
+}
+
 const hoiMo = (text: string): boolean => {
   const t = text.toLowerCase()
   return CUM_HOI_MO.some((m) => t.includes(m)) || DONG_TU_HOI_MO.test(t) || (DONG_TU_LAM_CHU.test(t) && !HOI_DAI_LUONG.test(t))
@@ -162,6 +186,7 @@ export function lyDoTuLuan(c: unknown, phanMacDinh?: PhanCau): string | null {
     if (coY && demCoNoiDung(y, lay(c, 'ideaImgs', 'anhY'), lay(c, 'hinh', 'hinhAnh'), 'sau_y_') < 4) return 'phần II thiếu ý (không đủ 4)'
     if (coDapAn && da.replace(/[^DSĐdsđ]/g, '').length !== 4) return 'phần II không có đáp án đúng/sai đủ 4 ý'
   } else if (phan === 'III') {
+    if (text && soYConYeuCau(text) >= 2) return 'phần III gồm nhiều ý yêu cầu (a, b, c …) — tự luận'
     if (coDapAn) {
       if (!da) return 'phần III không có đáp án để chấm tự động'
       if ((da.length > 20 && /\s/.test(da)) || /[\n;→⇌:]/.test(da)) return 'phần III đáp án dài / nhiều dòng (tự luận)'

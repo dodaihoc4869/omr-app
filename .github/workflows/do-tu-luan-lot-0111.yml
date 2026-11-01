@@ -29,6 +29,8 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
         run: |
           q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results[]' | head -n 60; }
+          npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT qid, ma_de, json_extract(json,'\$.phan') phan, json_extract(json,'\$.text') text, json_extract(json,'\$.correct') correct, json_extract(json,'\$.tuLuan') tl FROM game_v2_question WHERE json_valid(json) AND json_extract(json,'\$.phan')='III' AND (json_extract(json,'\$.text') LIKE '%a)%')" > /tmp/p3.json
+          (cd .. && npx -y esbuild@0.25.10 scripts/soi-tu-luan-nhieu-y.ts --bundle --platform=node --format=esm --outfile=/tmp/soi.mjs --log-level=warning && node /tmp/soi.mjs /tmp/p3.json)
           q "1 câu H2S trong kho câu luyện" "SELECT q.ma_de, q.qid, json_extract(q.json,'\$.phan') phan, json_extract(q.json,'\$.correct') dap_an, json_extract(q.json,'\$.tuLuan') tu_luan, json_extract(q.json,'\$.reviewed') duyet, d.ten_de, d.lop FROM game_v2_question q LEFT JOIN de_kho d ON d.ma_de=q.ma_de WHERE q.json LIKE '%Hydrogen sulfide%' AND q.json LIKE '%427%'"
           q "2 tờ ấy có trong phạm vi lớp nào / gói 7 nào" "SELECT p.lop, p.khoa_bai, p.nguon FROM pham_vi_lop p WHERE p.ma_de_json LIKE '%' || (SELECT substr(q.ma_de,1,12) FROM game_v2_question q WHERE q.json LIKE '%Hydrogen sulfide%' AND q.json LIKE '%427%' LIMIT 1) || '%' LIMIT 20"
           q "3 gói 7 chứa câu ấy" "SELECT g.goi_id, json_extract(g.meta_json,'\$.hopLe') hop_le, json_extract(g.meta_json,'\$.tuLuan') tu_luan FROM goi_bai_7_cau g WHERE g.qid IN (SELECT q.qid FROM game_v2_question q WHERE q.json LIKE '%Hydrogen sulfide%' AND q.json LIKE '%427%')"
