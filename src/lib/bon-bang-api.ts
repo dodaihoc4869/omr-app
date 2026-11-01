@@ -41,6 +41,7 @@ export function docBonBang(du: unknown): TraLoiBonBang | null {
     tong: so(o.tong) ?? 0,
     bang,
     trungVi: docDiem(o.trungVi),
+    ...(Array.isArray(o.theoDoi) ? { theoDoi: mang(o.theoDoi).map(docDong).filter((d): d is DongBang => d !== null) } : {}),
   }
 }
 

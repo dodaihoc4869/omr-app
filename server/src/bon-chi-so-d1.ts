@@ -37,17 +37,23 @@ export async function tinhLoBon(env: Env, em: readonly EmGoc[], nowMs: number): 
   if (!em.length) return []
   const w = cuaSoTinh(nowMs)
   const sbds = em.map((e) => e.sbd)
-  const [dg, ngayEm, vao, cuoi] = await Promise.all([
+  const [dg, ngayEm, vao, cuoi, rHoi] = await Promise.all([
     tinhLoEm(env, sbds, nowMs, { giuDauVao: true }).catch(() => null),
     docNgayCacEm(env, em, w.tu, w.cuoi, w.homNay, []),
     docNgayVao(env, em, w.tu),
     hoi(env, 'SELECT sbd, MAX(ngay_vn) AS n FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?1)) AND ket_qua IS NOT NULL GROUP BY sbd', JSON.stringify(sbds)).catch(() => [] as Row[]),
+    // v2: số lần CHỦ ĐỘNG hỏi trong cửa sổ (Hỏi thầy + hỏi trợ lý về câu) — một lệnh, song song (luật tốc độ).
+    hoi(env, `SELECT sbd, SUM(n) AS n FROM (
+        SELECT sbd, COUNT(*) AS n FROM loi_giai_hoi WHERE sbd IN (SELECT value FROM json_each(?1)) AND substr(luc, 1, 10) BETWEEN ?2 AND ?3 GROUP BY sbd
+        UNION ALL SELECT sbd, COUNT(*) AS n FROM hoi_tro_ly WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay_vn BETWEEN ?2 AND ?3 GROUP BY sbd) GROUP BY sbd`,
+      JSON.stringify(sbds), w.tu, w.cuoi).catch(() => [] as Row[]),
   ])
   const lanCuoi = new Map(cuoi.map((x) => [str(x.sbd), str(x.n)]))
+  const soHoi = new Map(rHoi.map((x) => [str(x.sbd), Number(x.n) || 0]))
   return em.map((e) => {
     const d = dg?.find((x) => x.sbd === e.sbd)
     const ngay = ngayDuocTinh(ngayEm.get(e.sbd) ?? [], vao.get(e.sbd) ?? w.tu).filter((n) => n.ngay <= w.cuoi)
-    return { sbd: e.sbd, kq: tinhBon({ dg: d && d.dauVao ? { kq: d.kq, dauVao: d.dauVao } : null, ngay, lanCuoiHoc: lanCuoi.get(e.sbd) ?? '', den: w.cuoi }) }
+    return { sbd: e.sbd, kq: tinhBon({ dg: d && d.dauVao ? { kq: d.kq, dauVao: d.dauVao } : null, ngay, lanCuoiHoc: lanCuoi.get(e.sbd) ?? '', den: w.cuoi, hoi: soHoi.get(e.sbd) ?? 0 }) }
   })
 }
 
@@ -74,7 +80,8 @@ export async function cronBonChiSo(env: Env, nowMs: number, caoDiem = false): Pr
   const w = cuaSoTinh(nowMs)
   const em = await docDanhSachEm(env, [])
   if (!em?.length) return { chay: false, lyDo: 'khong_em' }
-  const xong = new Set((await hoi(env, 'SELECT sbd FROM bon_chi_so_em WHERE ngay = ?1', w.homNay)).map((x) => str(x.sbd)))
+  // bản của hôm nay VÀ đúng bộ máy v2 (`ban` = 2) mới coi là xong — bản cũ trong ngày được tính lại dần (01/11, đánh giá v2).
+  const xong = new Set((await hoi(env, "SELECT sbd FROM bon_chi_so_em WHERE ngay = ?1 AND json_valid(so_lieu_json) AND json_extract(so_lieu_json, '$.ban') = 2", w.homNay)).map((x) => str(x.sbd)))
   const can = em.filter((e) => !xong.has(e.sbd))
   if (!can.length) return { chay: false, lyDo: 'xong' }
   const lo = can.slice(0, phut < 6 * 60 ? LO_BON_DEM : LO_BON_NGAY)
@@ -89,8 +96,9 @@ function trungViCaLop(rows: readonly Row[]): DiemBon {
 }
 function xepBang(rows: readonly Row[], emTheo: ReadonlyMap<string, EmGoc>, b: MaBang): DongBang[] {
   return rows
-    .map((r) => ({ r, d: diemCua(r), e: emTheo.get(str(r.sbd)) }))
-    .filter((x) => x.e && vaoBang(x.d, b))
+    .map((r) => ({ r, d: diemCua(r), e: emTheo.get(str(r.sbd)), vao: json<Partial<Record<MaBang, boolean>> | null>(r.vao, null) }))
+    // v2: quyết định «chắc mới xếp» lưu sẵn trong số đo; bản cũ (chưa tính lại) dùng ngưỡng điểm như trước.
+    .filter((x) => x.e && (x.vao ? x.vao[b] === true : vaoBang(x.d, b)))
     .map((x) => ({ sbd: x.e!.sbd, hoTen: x.e!.hoTen, lop: x.e!.lop, khoi: x.e!.khoi, diem: x.d[b] as number, bc: json<Record<string, string>>(x.r.bc_json, {})[b] ?? '' }))
     .sort((a, c) => c.diem - a.diem || a.hoTen.localeCompare(c.hoTen, 'vi'))
 }
@@ -98,7 +106,7 @@ function xepBang(rows: readonly Row[], emTheo: ReadonlyMap<string, EmGoc>, b: Ma
 export async function gvBonBang(env: Env, _b: Row, nowMs = Date.now()): Promise<TraLoiBonBang | LoiBon> {
   await damBaoBangBon(env)
   const w = cuaSoTinh(nowMs)
-  const [em, rows] = await Promise.all([docDanhSachEm(env, []), hoi(env, 'SELECT sbd, ngay, tinh_luc, ht, dp, ch, lu, bc_json FROM bon_chi_so_em')])
+  const [em, rows] = await Promise.all([docDanhSachEm(env, []), hoi(env, "SELECT sbd, ngay, tinh_luc, ht, dp, ch, lu, bc_json, CASE WHEN json_valid(so_lieu_json) THEN json_extract(so_lieu_json, '$.vao') END AS vao, CASE WHEN json_valid(so_lieu_json) THEN json_extract(so_lieu_json, '$.theoDoi') END AS theo_doi FROM bon_chi_so_em")])
   if (!em) return { ok: false, error: 'Không đọc được danh sách học sinh.' }
   const emTheo = new Map(em.map((e) => [e.sbd, e]))
   const cua = rows.filter((r) => emTheo.has(str(r.sbd)))
@@ -108,6 +116,10 @@ export async function gvBonBang(env: Env, _b: Row, nowMs = Date.now()): Promise<
     tinhLuc: cua.reduce((m, r) => (str(r.tinh_luc) > m ? str(r.tinh_luc) : m), ''),
     daTinh: cua.filter((r) => str(r.ngay) === w.homNay).length, tong: em.length,
     bang, trungVi: trungViCaLop(cua),
+    // v2: em CÓ dấu hiệu nhưng CHƯA đủ chắc để xếp — không vào bảng nào (thà theo dõi thêm còn hơn xếp sai).
+    theoDoi: cua.filter((r) => str(r.theo_doi) && emTheo.has(str(r.sbd)))
+      .map((r) => { const e = emTheo.get(str(r.sbd))!; return { sbd: e.sbd, hoTen: e.hoTen, lop: e.lop, khoi: e.khoi, diem: 0, bc: str(r.theo_doi) } })
+      .sort((a, c) => a.hoTen.localeCompare(c.hoTen, 'vi')),
   }
 }
 

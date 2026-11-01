@@ -29,6 +29,8 @@ export interface DauVaoBon {
   lanCuoiHoc: string
   /** Hôm qua (ngày cuối cửa sổ) — để nói «N ngày trước». */
   den: string
+  /** CHỈ THÊM 01/11 (v2): số lần em CHỦ ĐỘNG hỏi (Hỏi thầy · hỏi trợ lý về câu) trong cửa sổ; không có ⇒ 0. */
+  hoi?: number
 }
 
 /** Số đo của em — khoá trùng `TheBangChung.so` để lệnh thầy tính trung vị cả lớp. Mọi tỉ lệ là phần trăm 0–100. */
@@ -50,6 +52,21 @@ export interface SoLieuBon {
   cauLam: number | null
   /** Giây trung vị mỗi lượt (đo thật). */
   giayTV: number | null
+  /** v2 (01/11): % câu KHÓ (lớp đúng < 35%) em đúng nhanh hơn thời gian đọc đề; % câu đúng ngay sau khi rời app ≥ 8 giây; % ngày dồn hạn (≥ 70% câu sau 23:00);
+   *  % ngày phớt lờ lời nhắc (21:00 còn thiếu mà không làm thêm); số lần chủ động hỏi. */
+  nhanhLa?: number | null
+  traNgoai?: number | null
+  donHan?: number | null
+  photLo?: number | null
+  hoi?: number
+  /** Phiên bản bộ máy (2 = v2). Bản cũ (không có) ⇒ cron tính lại. */
+  ban?: number
+  /** Quyết định vào bảng của v2 (đủ chắc mới xếp). */
+  vao?: Record<MaBang, boolean>
+  /** Lý do «Đang theo dõi» (có dấu hiệu nhưng chưa đủ chắc); null = không theo dõi. */
+  theoDoi?: string | null
+  /** Các họ bằng chứng Đối phó đã bật (0/1/2) — minh bạch, để soát. */
+  ho?: Record<string, number>
 }
 
 export interface KetQuaBon {
@@ -162,11 +179,8 @@ export function tinhBon(v: DauVaoBon): KetQuaBon {
   const coLam = ngay.filter((n) => n.lam > 0).length
   const giao = ngay.reduce((s, n) => s + n.muc, 0)
   const daLam = ngay.reduce((s, n) => s + n.lam, 0)
-  const tlKy = kyMau > 0 ? kyN / kyMau : 1
   let chuoi = 0
   for (let i = ngay.length - 1; i >= 0 && ngay[i]!.lam >= ngay[i]!.muc; i--) chuoi++
-  const ch = ngay.length >= 3 ? tron(100 * (0.5 * (du / ngay.length) + 0.3 * Math.min(1, (daLam * tlKy) / Math.max(1, giao)) + 0.2 * Math.min(1, chuoi / 7))) : null
-  const lu = ch === null ? null : 100 - ch
 
   const soLieu: SoLieuBon = {
     soLuot: lam.length, soDo: doLuot.length,
@@ -174,6 +188,95 @@ export function tinhBon(v: DauVaoBon): KetQuaBon {
     dungMoi: pt(moi.filter((l) => l.dung === true).length, moi.length), songSinh: pt(ss.filter((l) => l.dung === true).length, ss.length),
     ngayDu: pt(du, ngay.length), ngayCoLam: pt(coLam, ngay.length), cauLam: pt(daLam, giao), giayTV: trungVi(giays),
   }
+
+  // ═════ V2 (thầy 01/11: «tự đo tự làm tất tự tối ưu và phải đạt 99%») — CHẮC MỚI XẾP: mỗi bảng cần NHIỀU NHÓM bằng chứng độc lập + đủ mẫu (cận dưới Wilson);
+  // có dấu hiệu mà chưa đủ ⇒ «Đang theo dõi» (không xếp sai). Bốn bảng loại trừ chéo: Học thật không thể Lười; Đối phó không được Chăm. Tự đo: tests/danh-gia-99-mo-phong.
+  const gioVn = (l: LuotDanhGia) => { const t = Date.parse(l.luc); return Number.isFinite(t) ? new Date(t + 7 * 3_600_000).getUTCHours() : -1 }
+  // Đúng nhanh bất thường ở câu KHÓ (lớp đúng < 35%): nhanh hơn 60% thời gian đọc đề (hoặc «thuộc») mà đúng ⇒ biết trước đáp án / chép.
+  const khoDung = lam.filter((l) => l.dung === true && l.pLop !== null && l.pLop < 0.35 && !l.treo)
+  const nhanhLa = khoDung.filter((l) => l.thuoc || (typeof l.giay === 'number' && typeof l.giayDoc === 'number' && l.giayDoc > 0 && l.giay < 0.6 * l.giayDoc))
+  // Rời app ≥ 8 giây (chưa tới mức treo) rồi quay lại chọn ĐÚNG câu không dễ ⇒ nghi tra ngoài (Google / A.I / hỏi bạn).
+  const dungHet = lam.filter((l) => l.dung === true && !l.treo)
+  const traNgoai = dungHet.filter((l) => typeof l.an === 'number' && l.an >= 8 && l.an < 180 && (l.pLop === null || l.pLop < 0.6))
+  // Theo ngày: câu làm THẬT (bỏ câu vội-sai, câu treo), dồn hạn, phớt lờ lời nhắc 21:00.
+  const theoNgay = new Map<string, LuotDanhGia[]>()
+  for (const l of lam) if (l.ngay) theoNgay.set(l.ngay, [...(theoNgay.get(l.ngay) ?? []), l])
+  const xau = (l: LuotDanhGia) => !!l.treo || (l.ma === 1 && l.dung === false)
+  const lamThat = (n: NgayNhip) => (v.dg ? Math.max(0, n.lam - (theoNgay.get(n.ngay) ?? []).filter(xau).length) : n.lam)
+  const ngayDem = [...theoNgay.values()].filter((ds) => ds.length >= 10)
+  const ngayDon = ngayDem.filter((ds) => ds.filter((l) => gioVn(l) >= 23).length >= 0.7 * ds.length).length
+  const donHanTL = ngayDem.length ? ngayDon / ngayDem.length : 0
+  const photLo = v.dg ? ngay.filter((n) => { const ds = theoNgay.get(n.ngay) ?? []; return n.lam < n.muc && ds.filter((l) => gioVn(l) >= 21).length === 0 && ds.filter((l) => gioVn(l) >= 0 && gioVn(l) < 21).length < n.muc }).length : 0
+  const hoi = Math.max(0, v.hoi ?? 0)
+
+  // Kiểm tra cá nhân KHỚP luyện tập (≥ 6 điểm, không thấp hơn luyện tập quá 1,5 điểm) = năng lực đã được xác nhận khi phải tự làm.
+  const ktKhop = ktTB !== null && dungLuyen !== null && ktTB >= 6 && ktTB / 10 >= dungLuyen - 0.15
+  // ── Đối phó: HỌ bằng chứng (0 / 1 / 2 = nhẹ / mạnh). Vào bảng khi ≥ 2 họ độc lập và tổng ≥ 3.
+  const ho: Record<string, number> = {}
+  const voiSaiTL = doLuot.length ? voiSai.length / doLuot.length : 0
+  if (doLuot.length >= LUOT_TOI_THIEU_BON && voiSaiTL >= 0.15) ho.voi = voiSaiTL >= 0.3 ? 2 : 1
+  if (lap.so) ho.lap = lap.so >= 3 ? 2 : 1
+  if (treo.some((l) => l.treo === 'co_tinh')) ho.treo = 2
+  else if (treo.length >= 3 && treo.length >= 0.05 * lam.length) ho.treo = 1
+  if (phat('thuocKhongHieu') > 0) ho.thuoc = phat('thuocKhongHieu') >= 10 ? 2 : 1
+  // Luyện tập cao hơn kiểm tra cá nhân: luật cũ (luyện ≥ 70%, kiểm tra ≤ 5) = mạnh; chênh từ 2,5 điểm trở lên mà kiểm tra ≤ 6 = nhẹ.
+  if (lechKt) ho.lech = 2
+  else if (ktTB !== null && dungLuyen !== null && ktTB <= 6 && ktTB / 10 <= dungLuyen - 0.25) ho.lech = 1
+  if (sc.tong >= 8 && boMacTiLe >= 0.6) ho.boMac = 1
+  // Kiểm tra khớp ⇒ «đúng nhanh câu khó» là GIỎI THẬT (không tính); «rời app rồi đúng» hạ còn nhẹ (có thể do thông báo, năng lực đã xác nhận).
+  if (!ktKhop && nhanhLa.length >= 3 && nhanhLa.length >= 0.15 * khoDung.length) ho.nhanh = nhanhLa.length >= 5 && nhanhLa.length >= 0.3 * khoDung.length ? 2 : 1
+  if (traNgoai.length >= 3 && traNgoai.length >= 0.1 * dungHet.length) ho.tra = !ktKhop && traNgoai.length >= 6 && traNgoai.length >= 0.2 * dungHet.length ? 2 : 1
+  if (phat('goiY') > 0) ho.goiY = 1
+  if (phat('thi') > 0) ho.thi = phat('thi') >= 20 ? 2 : 1
+  const soHo = Object.keys(ho).length
+  const manh = Object.values(ho).reduce((a, b) => a + b, 0)
+  const vaoDp = duDuLieu && soHo >= 2 && manh >= 3
+  const dp2 = duDuLieu ? tron(kep(0.6 * dpTho + 10 * manh)) : null
+
+  // ── Học thật: 5 NHÓM; bắt buộc có «sửa sai thật» hoặc «kiểm tra khớp»; cần ≥ 3 nhóm đạt và KHÔNG có dấu hiệu đối phó đáng kể.
+  const kyThat = doLuot.length - voi.length // chọn vội mà ĐÚNG cũng không phải «đọc kỹ»
+  const ssDung = ss.filter((l) => l.dung === true).length
+  const nhom = {
+    sua: sc.tong >= 4 && canDuoiWilson(sc.sua, sc.tong) >= 0.55,
+    ky: kyMau >= 30 && canDuoiWilson(kyThat, kyMau) >= 0.8,
+    moi: moi.length >= 10 && canDuoiWilson(moi.filter((l) => l.dung === true).length, moi.length) >= 0.5,
+    kt: ktKhop,
+    chu: hoi >= 1 || (ss.length >= 3 && canDuoiWilson(ssDung, ss.length) >= 0.5),
+  }
+  const soNhom = Object.values(nhom).filter(Boolean).length
+  const vaoHt = duDuLieu && (nhom.sua || nhom.kt) && soNhom >= 3 && !vaoDp && manh <= 1 && ht !== null && ht >= NGUONG_BANG.ht
+
+  // ── Chăm (chỉ tính câu làm THẬT) — Lười đo RIÊNG (không còn = 100 − Chăm).
+  const n = ngay.length
+  // đủ mức THẬT: câu làm thật ≥ 90% mức (một vài câu vội-sai trong ngày không làm mất ngày)
+  const duThat = ngay.filter((x) => lamThat(x) >= 0.9 * x.muc).length
+  const daLamThat = ngay.reduce((s2, x) => s2 + lamThat(x), 0)
+  let chuoiThat = 0
+  for (let i = n - 1; i >= 0 && lamThat(ngay[i]!) >= 0.9 * ngay[i]!.muc; i--) chuoiThat++
+  const ch2 = n >= 3 ? tron(100 * (0.5 * (duThat / n) + 0.2 * Math.min(1, daLamThat / Math.max(1, giao)) + 0.15 * Math.min(1, chuoiThat / 7) + 0.15 * (1 - donHanTL))) : null
+  const vaoCh = n >= 5 && ch2 !== null && ch2 >= 80 && duThat >= 0.8 * n && donHanTL < 0.5 && !vaoDp && manh < 2 // có dấu hiệu đối phó mạnh ⇒ không Chăm (theo dõi)
+  const khongNgay = n - coLam
+  const boKt = v.dg?.dauVao.ktcn.boHan ?? 0
+  const boMacMoi = sc.tong >= 3 ? (sc.tong - sc.sua) / sc.tong : 0
+  // vắng hẳn cả cửa sổ ⇒ 100; còn lại: ngày không làm (55%) · câu được giao chưa làm thật (25%) · phớt lờ lời nhắc (10%) · bỏ mặc câu sai / bỏ kiểm tra cá nhân (10%)
+  const boTerm = coLam === 0 ? 1 : Math.max(boMacMoi, Math.min(1, boKt / 2))
+  const lu2 = n >= 3 ? tron(100 * (0.55 * (khongNgay / n) + 0.25 * (1 - Math.min(1, daLamThat / Math.max(1, giao))) + 0.1 * (photLo / n) + 0.1 * boTerm)) : null
+  const vaoLu = n >= 5 && lu2 !== null && lu2 >= 55 && khongNgay >= 0.4 * n && !vaoHt
+
+  const vao: Record<MaBang, boolean> = { ht: vaoHt, dp: vaoDp, ch: vaoCh && !vaoLu, lu: vaoLu }
+  const theoDoi = vao.ht || vao.dp || vao.ch || vao.lu ? null
+    : !duDuLieu && n < 5 ? null
+    : manh >= 2 ? 'Có dấu hiệu đối phó nhưng chưa đủ hai nhóm bằng chứng'
+    : ht !== null && ht >= 70 && !(nhom.sua || nhom.kt) ? 'Làm kỹ nhưng chưa có bằng chứng sửa sai / kiểm tra khớp'
+    : ht !== null && ht >= 70 ? 'Gần đạt Học thật, cần thêm bằng chứng'
+    : ch2 !== null && ch2 >= 70 ? (donHanTL >= 0.5 ? 'Làm đủ nhưng hay dồn sát giờ chốt' : 'Gần đạt Chăm')
+    : lu2 !== null && lu2 >= 45 ? 'Có dấu hiệu lười, chưa đủ ngày để kết luận'
+    : null
+  ht = ht === null ? null : vaoDp ? Math.min(ht, 100 - (dp2 ?? 0)) : ht
+  Object.assign(soLieu, {
+    nhanhLa: pt(nhanhLa.length, khoDung.length), traNgoai: pt(traNgoai.length, dungHet.length), donHan: ngayDem.length ? tron(100 * donHanTL) : null,
+    photLo: v.dg && n ? pt(photLo, n) : null, hoi, ban: 2, vao, theoDoi, ho,
+  })
 
   // ───── Ví dụ
   const viDuVoi = (l: LuotDanhGia): ViDuTho => ({
@@ -284,7 +387,7 @@ export function tinhBon(v: DauVaoBon): KetQuaBon {
   const ngay14: NgayBon[] = v.ngay.map((n) => { const vo = Math.min(n.lam, voiNgay.get(n.ngay) ?? 0); return { ngay: n.ngay, muc: n.muc, ky: Math.max(0, n.lam - vo), voi: vo } })
 
   return {
-    diem: { ht, dp, ch, lu }, soLieu, bc, ketLuan: kl,
+    diem: { ht, dp: dp2, ch: ch2, lu: lu2 }, soLieu, bc, ketLuan: kl,
     the: { dp: theDp.map(({ w: _w, ...t }) => t).slice(0, 4), ht: theHt.slice(0, 4), ch: theCh.slice(0, 4), lu: theLu.slice(0, 4) },
     ngay: ngay14,
   }

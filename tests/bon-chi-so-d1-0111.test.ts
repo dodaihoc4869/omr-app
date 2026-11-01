@@ -17,8 +17,10 @@ let tick = 0
 const L = (o: Partial<LuotDanhGia> & { ngay: string }): LuotDanhGia => ({ phan: 'I', dung: true, ma: 3, r: 1.2, pLop: 0.6, chon: 'A', coGoiY: false, songSinh: false, luc: new Date(Date.parse(`${o.ngay}T01:00:00Z`) + ++tick * 10_000).toISOString(), cau: `C${tick}`, giay: 40, giayDoc: 16, qid: 'DH-11-C2-B7-I-1', ...o })
 function dauVaoCua(sbd: string): DauVaoDanhGia {
   const k = KIEU[sbd]
-  const luot = k === 'luoi' ? [] : NGAY.flatMap((n) => Array.from({ length: 36 }, (_, i) => (k === 'doiPho' ? L({ ngay: n, ma: i < 20 ? 1 : 3, dung: i >= 20, giay: 3 }) : L({ ngay: n }))))
-  return { luot, ngayCuaSo: NGAY, ktcn: { daNop: 0, boHan: 0, diem: [] }, thi: [], gianLanXacNhan: 0 }
+  // v2: «làm thật» phải có BẰNG CHỨNG — có câu sai rồi sửa đúng bằng câu song sinh 2 ngày sau, và kiểm tra cá nhân khớp luyện tập.
+  const luot = k === 'luoi' ? [] : NGAY.flatMap((n, d) => Array.from({ length: 36 }, (_, i) => (k === 'doiPho' ? L({ ngay: n, ma: i < 20 ? 1 : 3, dung: i >= 20, giay: 3 })
+    : i < 2 && d < 10 ? L({ ngay: n, cau: `${sbd}-S${d}-${i}`, dung: false }) : i >= 34 && d >= 2 ? L({ ngay: n, cau: `${sbd}-S${d - 2}-${i - 34}`, songSinh: true }) : L({ ngay: n }))))
+  return { luot, ngayCuaSo: NGAY, ktcn: { daNop: k === 'that' ? 1 : 0, boHan: 0, diem: k === 'that' ? [9] : [] }, thi: [], gianLanXacNhan: 0 }
 }
 vi.mock('../server/src/bai-hang-ngay', async (goc) => ({
   ...(await goc<typeof import('../server/src/bai-hang-ngay')>()),
@@ -73,6 +75,7 @@ describe('/gv/bon-bang + /gv/bon-bang/em', () => {
     expect(b.bang.ch.length).toBeGreaterThanOrEqual(5)
     for (const k of ['ht', 'dp', 'ch', 'lu'] as const) for (let i = 1; i < b.bang[k].length; i++) expect(b.bang[k][i - 1]!.diem).toBeGreaterThanOrEqual(b.bang[k][i]!.diem)
     expect(b.trungVi.lu).not.toBeNull()
+    expect(Array.isArray(b.theoDoi)).toBe(true) // v2: «Đang theo dõi» (có dấu hiệu, chưa đủ chắc)
 
     const e = await M.gvBonBangEm(env, { sbd: 'S03', bang: 'dp' }, NOW)
     if (!e.ok) throw new Error(e.error)

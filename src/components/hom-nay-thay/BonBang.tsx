@@ -75,6 +75,37 @@ function DongEm({ d, thu, bang, onMo }: { d: DongBang; thu: number; bang: MaBang
   )
 }
 
+/** «Đang theo dõi» (đánh giá v2, 01/11): em có dấu hiệu nhưng CHƯA đủ chắc để xếp — không vào bảng nào (thà theo dõi thêm còn hơn xếp sai). Gọn, mặc định thu. */
+function TheTheoDoi({ ds }: { ds: readonly DongBang[] }) {
+  const [mo, setMo] = useState(false)
+  if (!ds.length) return null
+  return (
+    <section className="bb-the bb-td" aria-labelledby="bb-tieu-td">
+      <div className="bb-dau">
+        <span className="bb-o" aria-hidden="true"><Search size={20} /></span>
+        <div className="bb-dau-chu">
+          <h2 id="bb-tieu-td">Đang theo dõi <span className="bb-chip gvv2-so">{ds.length} em</span></h2>
+          <p>Có dấu hiệu nhưng chưa đủ bằng chứng để xếp bảng — máy theo dõi thêm, đủ chắc mới xếp.</p>
+        </div>
+        <button type="button" className="gvv2-nut-chu tt-nhan bb-xem" aria-expanded={mo} onClick={() => setMo((x) => !x)}>
+          {mo ? 'Thu gọn' : 'Xem'}
+          <ChevronDown size={16} aria-hidden="true" style={{ transform: mo ? 'rotate(180deg)' : undefined }} />
+        </button>
+      </div>
+      {mo && (
+        <ul className="bb-td-ds">
+          {ds.map((d) => (
+            <li key={d.sbd}>
+              <b>{d.hoTen}</b> <small>{d.lop}</small>
+              <span>{d.bc}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  )
+}
+
 function TheBang({ bang, ds, tong, onMo }: { bang: MaBang; ds: readonly DongBang[]; tong: number; onMo: (d: DongBang, bang: MaBang, nut: HTMLButtonElement) => void }) {
   const [moRong, setMoRong] = useState(false)
   const Icon = ICON[bang]
@@ -244,6 +275,7 @@ export default function BonBang({ onTai }: { onTai?: (du: TraLoiBonBang, luc: nu
           <TheBang key={`${k}-${khoiChon}-${tim}`} bang={k} ds={loc[k]} tong={du.tong} onMo={onMo} />
         ))}
       </div>
+      {du.theoDoi && du.theoDoi.length > 0 && <TheTheoDoi ds={locBang(du.theoDoi, khoiChon, tim)} />}
       {mo && (
         <Suspense fallback={<div className="bbc-che" role="status" aria-label="Đang mở bằng chứng" />}>
           <BangChungBon sbd={mo.sbd} hoTen={mo.hoTen} lop={mo.lop} bang={mo.bang} onDong={onDong} />

@@ -192,7 +192,7 @@ export async function tinhLoEm(env: Env, sbds: readonly string[], nowMs: number,
         songSinh: !!x.d.tc || tachSongSinh(x.d.qid ?? '').songSinh !== null,
         ngay: x.d.ngay ?? '',
         luc: x.d.luc,
-        ...(tuy.giuDauVao ? { giay: m && !m.uocTinh ? m.giay : null, giayDoc: m && m.giayDoc > 0 ? m.giayDoc : null, qid: x.d.qid ?? x.d.goc } : {}),
+        ...(tuy.giuDauVao ? { giay: m && !m.uocTinh ? m.giay : null, giayDoc: m && m.giayDoc > 0 ? m.giayDoc : null, qid: x.d.qid ?? x.d.goc, an: x.d.doMuc?.treo?.a ?? null } : {}),
       }
     })
     const kt = rKt.filter((x) => str(x.sbd) === sbd)

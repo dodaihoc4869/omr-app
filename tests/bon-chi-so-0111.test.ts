@@ -54,7 +54,7 @@ describe('Học đối phó', () => {
     const t = lech.the.dp.find((x) => x.ma === 'lech')!
     expect(t.lon).toBe('90% → 3,5')
     expect(t.hai![1]).toMatchObject({ so: '3,5/10', lech: true })
-    expect(lech.diem.dp! - khop.diem.dp!).toBe(20)
+    expect(lech.diem.dp! - khop.diem.dp!).toBeGreaterThanOrEqual(20) // v2: + họ «lệch kiểm tra» (mạnh)
     expect(khop.the.dp.some((x) => x.ma === 'lech')).toBe(false)
   })
   it('bấm cùng một chữ mà phần lớn ĐÚNG (đáp án thật trùng chữ) ⇒ không tính bấm lặp', () => {
