@@ -32,6 +32,10 @@ export function moKenhDay(token: string): () => void {
     if (gop) return
     gop = setTimeout(() => { gop = undefined; window.dispatchEvent(new CustomEvent(SU_KIEN_DOI)) }, GOP_MS)
   }
+  // THẦY GIAO BÀI MỚI (tin `k: goi`, thầy 01/11): phần luyện hôm nay vừa xếp lại ⇒ tải lại NGAY gói cả ngày (câu + đáp án đã khoá) — không chờ hết chặng. `luon` =
+  // bỏ nhịp 10 phút. Nối lại sau khi mất kết nối ⇒ tải theo nhịp thường (tin lúc mất kết nối không tới).
+  // Qua mảnh màn làm bài (đã nạp sẵn ở Lộ trình để mở chặng tức thì) — không tách thêm mảnh mới (giữ trần precache).
+  const napGoi = (luon: boolean) => { void import('../components/hoc-tap/ManLamBaiTap').then((m) => m.napGoiNgay(token, undefined, Date.now(), luon)).catch(() => {}) }
   async function noi(): Promise<void> {
     if (dung || ws || dangNoi || an()) return
     dangNoi = true
@@ -49,10 +53,10 @@ export function moKenhDay(token: string): () => void {
         tatPing()
         henPing(w)
         // NỐI LẠI (31/10): lúc mất kết nối máy kia có thể đã làm bài — tin đẩy khi ấy không tới ⇒ đọc lại một lượt. Lần nối ĐẦU không cần (màn vừa tự đọc lúc mở).
-        if (daMo) bao()
+        if (daMo) { bao(); napGoi(false) }
         daMo = true
       }
-      w.onmessage = (e) => { if (typeof e.data === 'string' && e.data.includes('"doi"')) bao() }
+      w.onmessage = (e) => { if (typeof e.data === 'string' && e.data.includes('"doi"')) { if (e.data.includes('"goi"')) napGoi(true); bao() } }
       w.onclose = () => { if (ws !== w) return; ws = null; tatPing(); henLai() }
       w.onerror = () => { try { w.close() } catch { /* đã đóng */ } }
     } catch {

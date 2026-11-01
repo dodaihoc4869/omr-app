@@ -41,6 +41,10 @@ export const DUONG_DO_VI_TRI = '/__ngan/vi-tri'
 export const DAU_MAY_NGAN = 'x-ngan-may'
 /** «Chạm» ngăn của em qua ngăn trung chuyển (tạo ngăn cạnh D1 trước khi nối kênh thẳng) — chỉ qua binding. */
 export const DUONG_CHAM_NGAN = '/__ngan/cham'
+/** BÁO MÁY EM có việc mới (thầy 01/11: giao bài mới ⇒ máy em tự tải câu + đáp án đã khoá): Worker → ngăn của em ⇒ ngăn đẩy `{"t":"doi","k":[loại]}` tới MỌI máy
+ *  đang mở của em. Chỉ qua binding, kèm dấu `DAU_BAO_NGAN` (Worker luôn xoá dấu này ở lệnh / kênh của máy khách). */
+export const DUONG_BAO_NGAN = '/__ngan/bao'
+export const DAU_BAO_NGAN = 'x-ngan-bao'
 export const KHOA_NGAN_DINH = 'ngan_dinh'
 export const KHOA_NGAN_DINH_KHOA = 'ngan_dinh_khoa'
 const RE_TEN_DINH = /^dinh\|(k\|)?\d{1,4}$/
@@ -186,6 +190,11 @@ export class NganHocSinh {
     }
     // «Chạm» (vaoKenh): ngăn của em đã có / vừa tạo cạnh trung chuyển ⇒ xong, kênh nối thẳng sau đó.
     if (duong === DUONG_CHAM_NGAN) return new Response(null, { status: 204, headers: { 'x-ngan': '1' } })
+    if (duong === DUONG_BAO_NGAN && req.method === 'POST' && req.headers.has(DAU_BAO_NGAN)) {
+      const loai = (req.headers.get(DAU_BAO_NGAN) ?? '').replace(/[^a-z]/g, '').slice(0, 12) || 'goi'
+      this.phat({ k: new Set([loai]), tru: new Set() })
+      return new Response(null, { status: 204, headers: { 'x-ngan': '1' } })
+    }
     if (!xuLy) return new Response(JSON.stringify({ ok: false, error: 'Máy chủ đang khởi động, em thử lại nhé.', maLoi: 'MAY_CHU_BAN' }), { status: 503, headers: { 'content-type': 'application/json' } })
     const state = this.state
     const ctx = { waitUntil: (p: Promise<unknown>) => state.waitUntil(p), passThroughOnException() {} } as unknown as ExecutionContext
@@ -434,6 +443,7 @@ export async function vaoNgan(req: Request, env: Env, ctx?: ExecutionContext): P
   h.set(DAU_TRONG_NGAN, '1')
   h.set(DAU_SBD_NGAN, sbd)
   h.delete(DAU_CHUYEN_NGAN)
+  h.delete(DAU_BAO_NGAN)
   if (may) h.set(DAU_MAY_NGAN, may)
   else h.delete(DAU_MAY_NGAN)
   try {
@@ -475,6 +485,7 @@ export async function vaoKenh(req: Request, env: Env, ctx?: ExecutionContext): P
   h.set(DAU_TRONG_NGAN, '1')
   h.set(DAU_SBD_NGAN, ve.s)
   h.delete(DAU_CHUYEN_NGAN)
+  h.delete(DAU_BAO_NGAN)
   if (ve.m) h.set(DAU_MAY_NGAN, ve.m)
   else h.delete(DAU_MAY_NGAN)
   const toi = new Request(`${new URL(req.url).origin}${DUONG_KENH}`, { method: 'GET', headers: h }) // bỏ vé khỏi đường dẫn trong ngăn
@@ -494,4 +505,31 @@ export async function vaoKenh(req: Request, env: Env, ctx?: ExecutionContext): P
     console.error('[kenh-day] không nối được ngăn:', e instanceof Error ? e.message : e)
     return new Response('Chưa nối được kênh', { status: 503 })
   }
+}
+
+/**
+ * BÁO MÁY CÁC EM (thầy 01/11: «Khi giao bài mới thì học sinh ngay lập tức được phân câu lại … Tự động tải lại câu mới đề và đáp án về máy học sinh»): mỗi em ⇒ ngăn
+ * của em (CÙNG tên `d1|` / `apac|` như `vaoNgan` / `vaoKenh`; ngăn sát D1 luôn đi qua ngăn trung chuyển ⇒ ngăn chưa có thì được tạo cạnh D1, không tạo lệch chỗ)
+ * ⇒ ngăn đẩy `{"t":"doi","k":[loai]}` tới mọi máy đang mở của em. Máy không mở app ⇒ không có kết nối, không tốn gì; mở app sau thì tự đọc gói mới.
+ * 0 truy vấn D1 (danh sách ngăn định đọc từ đệm). Tối đa 8 lượt gọi song song. Kênh tắt ⇒ không làm gì. Không bao giờ ném lỗi; trả số em đã báo.
+ */
+export async function baoMayCacEm(env: Env, sbds: readonly string[], loai = 'goi', ctx?: ExecutionContext): Promise<number> {
+  const ns = env.NGAN_HS
+  if (!ns || !kenhDayBat(env) || !sbds.length) return 0
+  let cd: CauHinhDinh | null = null
+  try { cd = env.TAT_NGAN_DINH ? null : await dsDinh(env, ctx) } catch { cd = null }
+  const ds = [...new Set(sbds.map((x) => String(x ?? '').trim()).filter(Boolean))]
+  let n = 0, i = 0
+  const mot = async (sbd: string) => {
+    const h = new Headers({ [DAU_TRONG_NGAN]: '1', [DAU_SBD_NGAN]: sbd, [DAU_BAO_NGAN]: loai })
+    try {
+      let stub: ReturnType<typeof ns.get>
+      if (cd?.ds.length) { h.set(DAU_CHUYEN_NGAN, `${cd.tien}${sbd}`); stub = ns.get(ns.idFromName(cd.ds[bamSbd(sbd) % cd.ds.length]!)) }
+      else stub = ns.get(ns.idFromName(`${TIEN_TO_NGAN}${sbd}`), { locationHint: 'apac' })
+      const r = await stub.fetch(new Request(`https://ngan${DUONG_BAO_NGAN}`, { method: 'POST', headers: h }))
+      if (r.status === 204) n++
+    } catch { /* ngăn bận / lỗi ⇒ máy em tự đọc lại khi mở app */ }
+  }
+  await Promise.all(Array.from({ length: Math.min(8, ds.length) }, async () => { while (i < ds.length) await mot(ds[i++]!) }))
+  return n
 }

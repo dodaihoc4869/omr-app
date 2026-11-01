@@ -14,7 +14,7 @@ import { boChangMoTruoc, boGoiNgay, CAU_MOI_CHANG_GOI, docChangDangLam, ghiCauXo
 const tenTrangChinh = (): string => (typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Lộ trình' : 'Hôm nay')
 
 // Hôm nay nạp ĐỘNG đúng mảnh này để mở chặng trước (không sinh thêm tệp nạp / precache; mảnh màn làm bài được nạp sẵn luôn).
-export { moChangTruoc } from './mo-chang-truoc'
+export { moChangTruoc, napGoiNgay } from './mo-chang-truoc'
 import type { HinhAnh } from '../../data/examContent'
 import type { Question } from '../../game/than-thu-v2/core'
 import { docTomTatGoi7, type TomTatGoi7 } from '../../lib/goi-bai-7'

@@ -88,6 +88,7 @@ async function dongBoThat7(env: Env, now: number, tran: number, lop: string): Pr
     AND (julianday(b.tick_luc)>=julianday(?) OR NOT EXISTS(SELECT 1 FROM bai_da_day n WHERE n.lop=b.lop AND n.bo_tick_luc IS NULL AND (n.tick_luc>b.tick_luc OR (n.tick_luc=b.tick_luc AND n.vi_tri>b.vi_tri))))
     ORDER BY b.tick_luc DESC,b.vi_tri DESC LIMIT ?`).bind(lop,lop,cfg.batLuc??cfg.batDau+'T00:00:00+07:00', Math.max(1, tran)).all<Row>()
   let soGoi = 0, soEm = 0, soCau = 0
+  const goiMoi: string[] = []
   for (const b of ticks.results) {
     const cau = await cauTuTick7(env,b)
     // Không bỏ qua bài thiếu chỉ mục: hàng giáo viên vẫn thấy gói rỗng cần bổ sung.
@@ -99,7 +100,9 @@ async function dongBoThat7(env: Env, now: number, tran: number, lop: string): Pr
       env.DB.prepare(`INSERT OR IGNORE INTO goi_bai_7_em(goi_id,sbd,bat_dau,han) SELECT ?,h.sbd,?,? FROM hoc_sinh h JOIN goi_bai_7 g ON g.id=? WHERE ${sqlTenLopHs('h')}=? AND COALESCE(h.trang_thai,'')<>'khoa' AND ${sqlQuyetDinhNhan7('g','h.sbd')} AND ${KHONG_CA}`).bind(id,batDau,han,id,b.lop),
     ])
     soGoi += Number(rs[0]?.meta.changes ?? 0); soCau += Number(rs[1]?.meta.changes ?? 0); soEm += Number(rs[2]?.meta.changes ?? 0)
+    if (Number(rs[0]?.meta.changes ?? 0) > 0) goiMoi.push(id)
   }
+  if (goiMoi.length) await xepLaiHomNayChoGoiMoi(env, goiMoi, now)
   // Nạp lại chỉ mục đã duyệt: gói rỗng hồi phục, bản sửa được gặp lại; không sửa sổ trả lời.
   // CHỈ GHI KHI ĐỔI (khẩn 12/10 22h30, số đo D1 thật: lệnh upsert này ghi ~1 triệu dòng/ngày — cron mỗi phút ghi lại y nguyên ~164 dòng/gói): dòng câu
   // giống hệt bản mới ⇒ `DO UPDATE … WHERE` bỏ qua, câu đã mang hopLe=false ⇒ không ghi lại. Kết quả trong bảng y hệt trước.
@@ -119,6 +122,29 @@ async function dongBoThat7(env: Env, now: number, tran: number, lop: string): Pr
   await env.DB.prepare(`INSERT OR IGNORE INTO goi_bai_7_em(goi_id,sbd,bat_dau,han)
     SELECT g.id,h.sbd,g.bat_dau,g.han FROM goi_bai_7 g JOIN hoc_sinh h ON ${sqlTenLopHs('h')}=g.lop AND COALESCE(h.trang_thai,'')<>'khoa' JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE ${sqlQuyetDinhNhan7('g','h.sbd')} AND ${KHONG_CA}`).run()
   return { soGoi, soEm, soCau, hoan: false }
+}
+
+/**
+ * GIAO BÀI MỚI ⇒ XẾP LẠI PHẦN LUYỆN HÔM NAY NGAY (thầy 01/11: «Khi giao bài mới thì học sinh ngay lập tức được phân câu lại, tự động xoá bỏ lượt phân câu trong
+ * ngày không đè lên số câu cũ trước đó. Tự động tải lại câu mới đề và đáp án về máy học sinh như đã cấu hình»).
+ *  · Xoá số kế hoạch TÍNH SẴN từ hôm nay của các em nhận gói mới (`goi_bai_7_ngay` mọi gói + `goi_bai_7_muc_ngay`) — như sửa hạn / sửa danh sách em
+ *    (goi-bai-7-thay.ts, goi-bai-7-membership.ts). Lượt đọc kế tiếp tính lại: số câu hôm nay = max(mức theo tầng, Σ hạn mức các gói kể cả câu ĐÃ làm hôm nay)
+ *    ⇒ THAY số cũ, không cộng dồn lên số cũ; câu đã làm / đã gặp hôm nay không bị giao lại. Sổ làm bài, điểm, phiên đang dở không đụng tới.
+ *  · Bỏ đệm kế hoạch trong isolate rồi BÁO MÁY CÁC EM qua kênh đẩy (`k: goi`) ⇒ máy đang mở tự tải lại gói cả ngày (câu + đáp án đã khoá `dm`).
+ * Chỉ chạy khi gói THẬT SỰ vừa tạo (INSERT có dòng) và không có ca thi mở (gói không tạo khi ca mở). Lỗi báo máy không ảnh hưởng gì.
+ */
+async function xepLaiHomNayChoGoiMoi(env: Env, goiMoi: readonly string[], now: number): Promise<void> {
+  const ngay = ngayVn7(now), ids = JSON.stringify(goiMoi)
+  const em = (await env.DB.prepare('SELECT DISTINCT sbd FROM goi_bai_7_em WHERE goi_id IN (SELECT value FROM json_each(?))').bind(ids).all<Row>()).results.map((r) => str(r.sbd)).filter(Boolean)
+  if (!em.length) return
+  const ds = JSON.stringify(em)
+  await env.DB.batch([
+    env.DB.prepare(`DELETE FROM goi_bai_7_ngay WHERE ngay>=? AND sbd IN (SELECT value FROM json_each(?)) AND ${KHONG_CA}`).bind(ngay, ds),
+    env.DB.prepare(`DELETE FROM goi_bai_7_muc_ngay WHERE ngay>=? AND sbd IN (SELECT value FROM json_each(?)) AND ${KHONG_CA}`).bind(ngay, ds),
+  ])
+  const { emCoGhi } = await import('./dem-ke-hoach')
+  for (const s of em) emCoGhi(s)
+  try { await (await import('./ngan-hoc-sinh')).baoMayCacEm(env, em, 'goi') } catch { /* máy em tự đọc gói mới khi mở app */ }
 }
 
 async function cauTuTick7(env: Env,b: Row): Promise<CauGoi7[]> {
