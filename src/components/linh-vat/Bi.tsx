@@ -7,6 +7,8 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import type { GocLua, Lua, TrangThaiLua, TuyChonLua } from './lua-dong'
 import '../../styles/bi.css' // khung bong bóng «Học tiếp nhé» (.bi-loi) vẫn ở tệp này
+import { gioMayChu } from '../../lib/gio-may-chu'
+import { boMauMol } from '../../lib/mau-mol-ngay'
 import '../../styles/lua.css'
 
 export type CamBi = 'chao' | 'vui' | 'nghi' | 'sai' | 'mung' | 'ngu' | 'lua'
@@ -47,12 +49,16 @@ function apCap(l: Lua, cap: number, con: () => boolean): void {
 
 /** (28/10 «vẫn chưa tức thì») Ảnh TĨNH của linh vật ở Lộ trình lần mở trước (src/lib/khung-tinh-hs.ts chụp): `{ "<cỡ>|<cảm xúc>|<hướng>": { src, st } }`. */
 export const KHOA_BI_TINH = 'ddh.bi-tinh-mol2' // 01/11 đổi khoá: ảnh tĩnh cú ngọc cũ không làm khung giữ chỗ cho Mol; tối 01/11 Mol phối màu mới ⇒ đổi khoá lần nữa
-let biTinh: Record<string, { src?: string; st?: string }> | null = null
+let biTinh: Record<string, { src?: string; st?: string; ngay?: string }> | null = null
 /** Ảnh tĩnh khớp đúng cỡ + cảm xúc + hướng (không khớp ⇒ không có, giữ khung trống như trước). */
 function anhBiTinh(size: number, cam: string, goc?: string): { src?: string; st?: string } | null {
   if (!biTinh) { try { biTinh = JSON.parse(localStorage.getItem(KHOA_BI_TINH) || '{}') || {} } catch { biTinh = {} } }
   const a = biTinh![`${size}px|${cam}|${goc ?? ''}`]
-  return a && typeof a.src === 'string' && /^data:image\/(?:svg\+xml|webp|png)/.test(a.src) ? a : null
+  if (!a || typeof a.src !== 'string' || !/^data:image\/(?:svg\+xml|webp|png)/.test(a.src)) return null
+  // Mol đổi bộ màu mỗi ngày (mau-mol-ngay.ts): ảnh tĩnh của bộ màu ngày khác ⇒ bỏ (không chớp màu hôm qua lúc mảnh Mol chưa về).
+  // Ảnh điểm có `ngay` (ngày VN lúc chụp) ⇒ so bộ màu của ngày ấy; ảnh SVG ⇒ đọc thẳng data-mol-mau trong ảnh.
+  const bo = boMauMol(gioMayChu())
+  return (a.ngay ? boMauMol(Date.parse(a.ngay)) === bo : a.src.includes(`data-mol-mau='${bo}'`)) ? a : null
 }
 
 export interface PropsBi {

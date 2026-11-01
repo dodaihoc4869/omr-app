@@ -99,8 +99,8 @@ describe('Mol — màu, nạp lười, tên', () => {
   it('Bi.tsx nạp Mol bằng import() (mảnh lười, kho chạy-lúc); tên «Mol» ở lời nói + nút', () => {
     expect(readFileSync('src/components/linh-vat/Bi.tsx', 'utf8')).toMatch(/import\('\.\/mol-dong'\)/)
     expect(readFileSync('vite.config.ts', 'utf8')).toMatch(/'\*\*\/mol-dong-\*\.\{js,css\}'/)
-    const loi = readFileSync('src/lib/lua-cam-xuc.ts', 'utf8')
-    for (const c of ['Mol vui lắm', 'Mol cáu lắm rồi!', 'Mol giận rồi!', 'Mol bực rồi đấy!']) expect(loi).toContain(c)
+    const loi = readFileSync('src/lib/lua-cam-xuc.ts', 'utf8') + readFileSync('src/lib/loi-mol.ts', 'utf8') // kho câu ở loi-mol.ts (01/11 tối)
+    for (const c of ['Mol vui lắm', 'Bực thật đấy! Lại đối phó.', 'Cáu rồi nhé! Đối phó mãi thế?', 'Mất công học thì học thật đi!']) expect(loi).toContain(c) // kho câu thầy 01/11 tối
     expect(loi).not.toMatch(/`(?:Em làm thật, )?Lửa (?:vui|cáu|giận|bực)/)
     for (const t of ['src/components/kiem-tra-duo/BiNop.tsx', 'src/components/hoc-tap/ManKiemTraCaNhan.tsx']) expect(readFileSync(t, 'utf8')).toContain('Cùng Mol ôn lại nhé!')
   })

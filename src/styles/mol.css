@@ -40,6 +40,26 @@
   --mol-not: var(--tr-tim);
   overflow: visible;
 }
+/* BA BỘ MÀU ĐỔI MỖI NGÀY (thầy 01/11 tối «chọn cả 3 bộ màu thay đổi mỗi ngày»; src/lib/mau-mol-ngay.ts chọn theo ngày VN): 0 = bộ mặc định ở trên
+   (chàm sáng + ngọc lam) · 1 ngọc lam --tr-tin + dung dịch hồng --tr-tim · 2 chàm nhạt --tr-hs + dung dịch cam --tr-chu-y. Má hồng, giận đỏ sẫm dùng chung. */
+.mol-svg[data-mol-mau='1'] {
+  --mol-x: var(--tr-tin);
+  --mol-x-sang: color-mix(in oklab, var(--tr-tin) 45%, var(--btg-chu-doan-dam));
+  --mol-x-toi: var(--tr-tin-day);
+  --mol-vanh: color-mix(in oklab, var(--tr-tin-day) 62%, var(--btg-chu-doan));
+  --mol-vien: color-mix(in oklab, var(--tr-tin-day) 45%, var(--btg-chu-doan));
+  --mol-nuoc: var(--tr-tim);
+  --mol-nuoc-sang: color-mix(in oklab, var(--tr-tim) 50%, var(--btg-chu-doan-dam));
+  --mol-nuoc-toi: var(--tr-tim-day);
+}
+.mol-svg[data-mol-mau='2'] {
+  --mol-x: var(--tr-hs);
+  --mol-x-sang: color-mix(in oklab, var(--tr-hs) 42%, var(--btg-chu-doan-dam));
+  --mol-x-toi: var(--tr-hs-nut);
+  --mol-nuoc: var(--tr-chu-y);
+  --mol-nuoc-sang: color-mix(in oklab, var(--tr-sao) 50%, var(--tr-chu-y));
+  --mol-nuoc-toi: var(--tr-chu-y-day);
+}
 /* Giận: dỗi / bực chỉ ửng má; cáu sẫm vừa (tím đỏ), rất cáu sẫm hẳn (đỏ rực) — tròng hồng đỏ, mí trên màu thân sẫm. */
 .mol-svg .mol-g2 { --mol-ma: color-mix(in srgb, var(--tr-sai) 48%, var(--btg-chu-doan-dam)); }
 .mol-svg .mol-g3 { --mol-ma: color-mix(in srgb, var(--tr-sai) 66%, var(--btg-chu-doan-dam)); }

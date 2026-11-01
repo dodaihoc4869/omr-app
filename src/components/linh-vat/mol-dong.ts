@@ -6,6 +6,7 @@
 //     + lông mày mềm; miệng nhỏ xinh. Giận KHÔNG răng: mày chau, mắt nheo, miệng khép.
 //   · CÁU / RẤT CÁU: cả bình ĐỔI SẮC đỏ sẫm (nhóm .mol-g4 / .mol-g5 đặt lại biến màu ⇒ cả stop gradient đổi theo), tròng hồng đỏ, con ngươi nhỏ;
 //     NÚT BẤC trên cổ bình bung lên lơ lửng trên NGỌN LỬA (hai lưỡi); dung dịch đỏ dâng. Dỗi / bực: chỉ ửng má.
+//   · BA BỘ MÀU đổi mỗi ngày (thầy «chọn cả 3 bộ màu thay đổi mỗi ngày»): svg mang data-mol-mau = boMauMol(giờ máy chủ) — src/lib/mau-mol-ngay.ts.
 //   · «6,022·10²³» ở phần DUNG DỊCH dưới bụng (thầy: «chuyển xuống dưới bụng chỗ dung dịch, cho to nổi bật hơn»): cong theo đáy cầu, trắng đậm + bóng mảnh,
 //     đứng yên khi dung dịch đỏ dâng (cáu / rất cáu) — ẩn khi Bi < 64 px (.bi[data-nho] trong mol.css; 48 px đã thử: không đọc được).
 // CHỈ CÓ MẶT: hình cú ngọc (lua-dong.ts) chỉ còn là kiểu `Lua` + đường lùi; Bi.tsx và mọi chỗ gọi <Bi …> không đổi. Mảnh NẠP LƯỜI (chỉ Bi.tsx gọi import('./mol-dong')).
@@ -15,6 +16,8 @@
 //     Giảm chuyển động / máy yếu ⇒ đứng yên (CSS). Không vòng rAF, không filter.
 // Khung vẽ 200 × 230 (= tỉ lệ 200 : 230 của khung Bi cũ) ⇒ mọi khung chứa giữ nguyên.
 import '../../styles/mol.css'
+import { gioMayChu } from '../../lib/gio-may-chu'
+import { boMauMol } from '../../lib/mau-mol-ngay'
 import type { DungGian, GocLua, Lua, TrangThaiLua, TuyChonLua } from './lua-dong'
 
 export const VIEWBOX_MOL = '0 -26 200 230'
@@ -171,6 +174,7 @@ export function taoLua(noiGan: HTMLElement, tc: { trangThai?: TrangThaiLua; tuyC
     const m = mat()
     svg.innerHTML = svgMol(m, goc)
     svg.setAttribute('data-mat', m)
+    svg.setAttribute('data-mol-mau', String(boMauMol(gioMayChu()))) // bộ màu của NGÀY VN (qua 0h ⇒ lần vẽ kế tiếp đổi)
     const dong = cap >= 5 ? 'run' : cap === 4 ? 'giat' : DONG[tt]
     if (dong && !tc.tinh) svg.setAttribute('data-dong', dong); else svg.removeAttribute('data-dong')
     if (cap) svg.setAttribute('data-cap-ve', String(cap)); else svg.removeAttribute('data-cap-ve')

@@ -139,6 +139,7 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
   })
   it('lời Bi trọn câu (soát 27/10: ảnh chụp lúc đang gõ trông «cụt» ở chữ «là»): câu đủ ý và gõ xong trong ≤ 0,7 s', () => {
     vi.useFakeTimers()
+    vi.setSystemTime(Date.UTC(2026, 9, 31, 3, 0)) // 10:00 giờ VN: trước mốc Mol giận theo giờ (test cũ phụ thuộc giờ chạy — tối là đỏ)
     try {
       const { container } = render(<MotTrangHs {...goc()} />)
       const bong = container.querySelector('.bi-loi-bong')!
