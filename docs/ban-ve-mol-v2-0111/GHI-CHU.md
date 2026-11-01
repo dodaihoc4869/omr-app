@@ -8,7 +8,11 @@
 - **Bong bóng lời trên đầu Mol** (Lộ trình, mọi hướng màn): có Mol cạnh đường ⇒ mọi lời lên bong bóng trên đầu Mol, thay thẻ riêng ở trên.
   - Tự căn rộng ≤ 280 px, không tràn mép, đuôi chỉ đầu Mol.
   - Màu theo cảm xúc (`data-cx`, token, chuyển 300 ms); rất cáu viền đập nhẹ, giảm chuyển động ⇒ đứng yên.
-  - Lưu ý: bong bóng nằm trên đường đi (z-index 2) nên có thể che một phần nút chặng phía trên Mol.
+  - Không che nút (Boss soát PR 733):
+    - bong bóng `pointer-events: none`, không bao giờ chặn chạm;
+    - tự mờ sau ~6 giây; chạm Mol thì hiện lại lời gần nhất;
+    - giao nút chặng / nhãn ⇒ nâng lên trên nút (giữ bề rộng), không đủ chỗ thì thu hẹp về phía Mol (≥ 130 px, câu dài thành nhiều dòng hơn);
+    - giảm chuyển động ⇒ không hiệu ứng.
   - Ảnh: `binh-cau-lo-trinh-toi.jpg` (cấp 4), `binh-cau-lo-trinh-cap5-toi.jpg` (cấp 5), `binh-cau-lo-trinh-doi-sang.jpg` (câu dỗi dài), `binh-cau-lo-trinh-chan-ngon-sang.jpg` (chân ngôn).
 - **Kho câu (một tệp `src/lib/loi-mol.ts`):**
   - **Giận vì câu chưa được tính** — gọi thẳng «đối phó» (thầy cho phép chữ này trong lời Mol giận):

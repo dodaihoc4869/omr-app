@@ -453,9 +453,26 @@ function LoiBi({ cam, loi, coBi = true, khoa, cap = 0, ben, chanNgon: laChanNgon
   useEffect(() => {
     if (!khoa || pha !== 'hien') return
     ghiDaNhac(khoa)
+    if (ben) return // bong bóng trên đầu Mol: hẹn ẩn riêng (~6 s) ở dưới
     const t1 = window.setTimeout(() => setPha('thu'), 4700), t2 = window.setTimeout(() => setPha('an'), 5100)
     return () => { window.clearTimeout(t1); window.clearTimeout(t2) }
-  }, [khoa]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [khoa, ben]) // eslint-disable-line react-hooks/exhaustive-deps
+  // BONG BÓNG TRÊN ĐẦU MOL (Boss soát PR 733): tự mờ dần sau ~6 s (cả lời cấp 4–5); có lời mới ⇒ LoiBi gắn lại (key) nên hiện lại; CHẠM MOL ⇒ hiện lại lời
+  // gần nhất và hẹn ẩn lại từ đầu. Bong bóng không bao giờ chặn chạm (pointer-events: none — trong-hs.css). Giảm chuyển động ⇒ ẩn không hiệu ứng (CSS).
+  const [lanCham, datLanCham] = useState(0)
+  const daAn = pha === 'an'
+  useEffect(() => {
+    if (!ben || daAn) return // hẹn lại chỉ khi vừa hiện (từ ẩn) hoặc chạm Mol — đổi «hiện → mờ» không được huỷ hẹn gỡ hẳn
+    const t1 = window.setTimeout(() => setPha('thu'), 6000), t2 = window.setTimeout(() => setPha('an'), 6400)
+    return () => { window.clearTimeout(t1); window.clearTimeout(t2) }
+  }, [ben, daAn, lanCham])
+  useEffect(() => {
+    const mol = ben?.parentElement?.querySelector('.da-linh-vat[data-lv="bi"]')
+    if (!mol) return
+    const cham = () => { setPha('hien'); datLanCham((x) => x + 1) }
+    mol.addEventListener('click', cham)
+    return () => mol.removeEventListener('click', cham)
+  }, [ben])
   const [n, setN] = useState(loi.length)
   useEffect(() => {
     const yen = document.documentElement.classList.contains('may-yeu') || !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
@@ -474,12 +491,32 @@ function LoiBi({ cam, loi, coBi = true, khoa, cap = 0, ben, chanNgon: laChanNgon
     const d = ben?.closest('.da-duong')
     if (!ben || !d) return
     const r = d.getBoundingClientRect(), o = ben.getBoundingClientRect()
-    const rong = Math.round(Math.max(150, Math.min(280, r.width - 16)))
-    const trai = Math.round(Math.min(Math.max(o.left - rong / 2, r.left + 8), r.right - 8 - rong) - o.left)
-    ben.style.setProperty('--rong', `${rong}px`)
-    ben.style.setProperty('--trai', `${trai}px`)
-    ben.style.setProperty('--duoi', `${Math.round(Math.min(Math.max(-trai - 20, 18), rong - 18))}px`)
-  }, [ben])
+    const dat = (rong: number, trai: number, nang = 0) => {
+      ben.style.setProperty('--rong', `${rong}px`)
+      ben.style.setProperty('--trai', `${trai}px`)
+      ben.style.setProperty('--duoi', `${Math.round(Math.min(Math.max(-trai - 20, 18), rong - 18))}px`)
+      ben.style.setProperty('--nang', `${nang}px`)
+    }
+    const rong0 = Math.round(Math.max(150, Math.min(280, r.width - 16)))
+    const trai0 = Math.round(Math.min(Math.max(o.left - rong0 / 2, r.left + 8), r.right - 8 - rong0) - o.left)
+    dat(rong0, trai0)
+    // NÉ NÚT CHẶNG / NHÃN («BẮT ĐẦU»…): bong bóng giao nút ⇒ (1) nâng lên trên nút (giữ bề rộng ⇒ vẫn ≤ 2–3 dòng; còn trong đường đi), không được thì
+    // (2) thu hẹp về phía Mol (mép trong sát sau nút, ≥ 130 px); vẫn giao ⇒ giữ chỗ mặc định (không chặn chạm, tự ẩn sau ~6 s). Đuôi vẫn chỉ đầu Mol.
+    const bb = ben.querySelector<HTMLElement>('.bi-loi-bong')
+    if (!bb) return
+    const nut = Array.from(d.querySelectorAll('.da-nut, .da-bong')).map((e) => e.getBoundingClientRect()).filter((n) => n.width > 0 && n.height > 0)
+    const giao = () => { const b = bb.getBoundingClientRect(); return nut.filter((n) => n.left < b.right && n.right > b.left && n.top < b.bottom && n.bottom > b.top) }
+    const g = giao()
+    if (!g.length) return
+    const b = bb.getBoundingClientRect(), nang = Math.ceil(b.bottom - (Math.min(...g.map((n) => n.top)) - 8))
+    if (nang > 0 && b.top - nang >= r.top) { dat(rong0, trai0, nang); if (!giao().length) return }
+    dat(rong0, trai0)
+    const phai = o.left > r.left + r.width / 2
+    const mep = phai ? Math.max(...g.map((n) => n.right)) + 8 : Math.min(...g.map((n) => n.left)) - 8
+    const rongHep = Math.round(phai ? r.right - 8 - mep : mep - (r.left + 8))
+    if (rongHep >= 130) { dat(rongHep, Math.round((phai ? mep : r.left + 8) - o.left)); if (!giao().length) return }
+    dat(rong0, trai0)
+  }, [ben, pha === 'an']) // eslint-disable-line react-hooks/exhaustive-deps
   // màu bong bóng theo cảm xúc (trong-hs.css .bi-loi-bong[data-cx]): cấp ≥ 2 ⇒ dỗi · bực · cáu · rất cáu; còn lại theo mặt Mol
   const cx = cap >= 2 ? (['doi', 'buc', 'cau', 'ratCau'] as const)[Math.min(cap, 5) - 2] : cam === 'mung' || cam === 'lua' ? 'khen' : cam === 'sai' ? 'buon' : cam
   if (pha === 'an') return null

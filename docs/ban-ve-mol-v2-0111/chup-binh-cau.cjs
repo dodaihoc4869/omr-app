@@ -94,7 +94,7 @@ const rong = Math.round(Math.max(150, Math.min(280, (Rp - L) - 16))), trai = Mat
 document.getElementById('dt').innerHTML = '<div class="dt"><div class="tren"><span class="o lua">🔥12</span><span class="o nt">⚛ 340</span><span class="o tt">★ 5</span><span class="vong">' + nua(mat, 36) + '</span></div>' +
  '<div class="hero"><small>CHƯƠNG 1 · HOÁ 12</small><b>Este – Lipid</b><div class="thanh"><i></i>2/7 chặng</div></div>' +
  '<span class="chu-nen" style="left:24px;top:330px">n = m / M</span><span class="chu-nen" style="left:30px;top:690px">CaCO₃ → CaO + CO₂</span><span class="chu-nen" style="left:230px;top:620px">pV = nRT</span>' +
- '<span class="chang xong" style="left:150px;top:300px">' + kiem + '</span><span class="chang xong" style="left:76px;top:420px">' + kiem + '</span>' +
+ '<span class="chang xong" style="left:150px;top:268px">' + kiem + '</span><span class="chang xong" style="left:76px;top:420px">' + kiem + '</span>' +
  '<span class="vong-dang" style="left:58px;top:556px"></span><span class="chang dang" style="left:70px;top:570px">★</span><span class="bat-dau" style="left:52px;top:500px">BẮT ĐẦU</span>' +
  '<span class="chang khoa" style="left:126px;top:700px">🔒</span>' +
  '<div style="position:absolute;left:' + MX + 'px;top:' + MY + 'px">' + bi(mat, MW) + '</div>' +
@@ -102,6 +102,25 @@ document.getElementById('dt').innerHTML = '<div class="dt"><div class="tren"><sp
  '<div class="bi-loi-boc" data-ben=""><div class="bi-loi" data-khong-bi=""><p class="bi-loi-bong"' + (cap >= 4 ? ' data-cap="' + cap + '"' : '') + ' data-cx="' + cx + '"' + (laCn ? ' data-chan-ngon=""' : '') + '><span aria-hidden="true">' + cau + '<span class="bi-loi-con"></span></span></p></div></div></span>' +
  '<nav class="day"><span class="dang2">◎</span><span>✎</span><span>🏆</span><span>☰</span></nav></div>'
 if (q.has('dt')) m.style.display = 'none'; else document.getElementById('dt').style.display = 'none'
+// NÉ NÚT (cùng thuật toán LoiBi trong TrongHs.tsx): bong bóng giao nút chặng / nhãn ⇒ thu hẹp về phía Mol (≥ 130 px), không được thì nâng lên trên nút
+if (q.has('dt')) {
+  const neo = document.querySelector('.da-lv-loi-o'), bb = neo.querySelector('.bi-loi-bong'), k = document.querySelector('.dt').getBoundingClientRect()
+  const r = { left: k.left + L, right: k.left + Rp, top: k.top + 205, width: Rp - L }, o = neo.getBoundingClientRect()
+  const dat = (rong, trai, nang = 0) => { neo.style.setProperty('--rong', rong + 'px'); neo.style.setProperty('--trai', trai + 'px'); neo.style.setProperty('--duoi', Math.round(Math.min(Math.max(-trai - 20, 18), rong - 18)) + 'px'); neo.style.setProperty('--nang', nang + 'px') }
+  const nut = Array.from(document.querySelectorAll('.dt .chang, .dt .bat-dau')).map((e) => e.getBoundingClientRect())
+  const giao = () => { const b = bb.getBoundingClientRect(); return nut.filter((n) => n.left < b.right && n.right > b.left && n.top < b.bottom && n.bottom > b.top) }
+  let g = giao()
+  if (g.length) {
+    const phai = o.left > r.left + r.width / 2, mep = phai ? Math.max(...g.map((n) => n.right)) + 8 : Math.min(...g.map((n) => n.left)) - 8
+    const rongHep = Math.round(phai ? r.right - 8 - mep : mep - (r.left + 8))
+    let xong = false
+    const b = bb.getBoundingClientRect(), nang = Math.ceil(b.bottom - (Math.min(...g.map((n) => n.top)) - 8))
+    if (nang > 0 && b.top - nang >= r.top) { dat(rong, trai, nang); xong = !giao().length }
+    if (!xong) { dat(rong, trai); if (rongHep >= 130) { dat(rongHep, Math.round((phai ? mep : r.left + 8) - o.left)); xong = !giao().length } }
+    if (!xong) dat(rong, trai)
+    document.body.dataset.ne = xong ? 'da-ne' : 'giu-mac-dinh'
+  } else document.body.dataset.ne = 'khong-giao'
+}
 </script></body></html>`
 const TRANG = path.join(TAM, 'binh-cau.html'); fs.writeFileSync(TRANG, html)
 async function luu(chup, ten) {
@@ -141,7 +160,7 @@ async function luu(chup, ten) {
   await g.close()
   for (const [k, toi, ten] of [['cau', true, 'binh-cau-lo-trinh-toi.jpg'], ['cau5', true, 'binh-cau-lo-trinh-cap5-toi.jpg'], ['doi', false, 'binh-cau-lo-trinh-doi-sang.jpg'], ['cn', false, 'binh-cau-lo-trinh-chan-ngon-sang.jpg']]) {
     const d = await mo(toi, '?dt=' + k, 390, 2)
-    kq.push(await luu((o) => d.locator('.dt').screenshot(o), ten))
+    kq.push(await luu((o) => d.locator('.dt').screenshot(o), ten) + ' · ' + await d.evaluate(() => document.body.dataset.ne))
     await d.close()
   }
   console.log(kq.join('\n'))

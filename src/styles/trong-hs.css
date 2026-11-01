@@ -1102,8 +1102,11 @@
 [data-trong='hs'] .bi-loi-bong[data-cap], [data-trong='hs'] .bi-loi-bong[data-cap]::before { border-color: var(--tr-sai); }
 /* Điện thoại ngang thấp (cao < 600 px): bong bóng NÓI CẠNH Lửa (đầu trang đã cuộn khuất) — đặt trên đầu Lửa, đuôi chỉ xuống Lửa */
 [data-trong] .da-lv-loi-o { position: absolute; left: 50%; top: 50%; z-index: 2; width: 0; height: 0; transform: translateX(var(--lv)); }
-[data-trong='hs'] .da-lv-loi-o > .bi-loi-boc { position: absolute; left: var(--trai, -60px); bottom: 54px; width: var(--rong, 200px); }
-[data-trong='hs'] .da-lv-loi-o[data-cap] > .bi-loi-boc { bottom: 70px; }
+[data-trong='hs'] .da-lv-loi-o > .bi-loi-boc { position: absolute; left: var(--trai, -60px); bottom: calc(54px + var(--nang, 0px)); width: var(--rong, 200px); }
+[data-trong='hs'] .da-lv-loi-o[data-cap] > .bi-loi-boc { bottom: calc(70px + var(--nang, 0px)); }
+/* Bong bóng trên đầu Mol KHÔNG BAO GIỜ chặn chạm vào nút chặng; chạm Mol (chỉ Mol, không giám thị) ⇒ hiện lại lời gần nhất (TrongHs.tsx LoiBi). */
+[data-trong='hs'] .da-lv-loi-o, [data-trong='hs'] .da-lv-loi-o * { pointer-events: none; }
+[data-trong='hs'] .da-linh-vat[data-lv='bi'] > .bi { pointer-events: auto; cursor: pointer; }
 [data-trong='hs'] .da-lv-loi-o > .bi-loi-boc > .bi-loi { margin: 0; overflow: visible; }
 [data-trong='hs'] .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong { margin: 0 0 9px; padding: 10px 12px; font-size: 15px; box-shadow: 0 2px 0 var(--tr-vien); }
 [data-trong='hs'] .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong::before { display: block; left: var(--duoi, 53px); bottom: -9px; transform: rotate(-45deg); }
