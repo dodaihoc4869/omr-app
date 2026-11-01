@@ -1,0 +1,115 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GV · Hôm nay · 4 bảng</title><link rel="stylesheet" href="trong.css">
+<style>
+/* BẢN VẼ 01/11 (thầy: «bỏ hết màn hồ sơ cũ, ẩn hết các thông số; đo chính xác 4 thông số Học thật · Học đối phó · Lười · Chăm; 4 bảng xếp từ cao tới thấp;
+   bấm em ⇒ bảng bằng chứng»). Chỉ dùng var(--…) của trong.css. */
+.dau-man{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.bon{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.bang-dau{display:flex;align-items:flex-start;gap:12px;padding:18px 20px 10px}
+.bang-dau .o-icon{flex:none}
+.bang-dau .h3{display:flex;align-items:center;gap:8px}
+.bang-dau .mo{margin-top:2px}
+.xh{list-style:none;margin:0;padding:0 8px 4px}
+.xh li{display:grid;grid-template-columns:28px 36px minmax(0,1fr) 92px;gap:12px;align-items:center;padding:10px 12px;border-radius:12px;min-height:60px;cursor:pointer}
+.xh li:hover{background:var(--mat-2)}
+.xh .hang-so{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:600;background:var(--mat-3);color:var(--chu-2)}
+.xh li:nth-child(-n+3) .hang-so{background:var(--c-nhat);color:var(--c-chu)}
+.xh .ten{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.xh .ten small{font-weight:500;color:var(--chu-3);margin-left:6px;font-size:13px}
+.xh .bc{font-size:13px;color:var(--chu-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.xh .bc b{color:var(--c-chu);font-weight:600}
+.diem{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.diem b{font-size:20px;font-weight:600;line-height:1;color:var(--chu)}
+.diem b small{font-size:12px;color:var(--chu-3);font-weight:500;margin-left:2px}
+.diem .thanh{width:72px;height:6px}
+.diem .thanh>i{background:var(--c)}
+.bang-chan{display:flex;align-items:center;justify-content:space-between;padding:6px 20px 16px}
+.ht{--c:var(--sao);--c-nhat:var(--sao-nhat);--c-chu:var(--sao-chu)}
+.dp{--c:var(--tin);--c-nhat:var(--tin-nhat);--c-chu:var(--tin-chu)}
+.ch{--c:var(--dung);--c-nhat:var(--dung-nhat);--c-chu:var(--dung-chu)}
+.lu{--c:var(--sai);--c-nhat:var(--sai-nhat);--c-chu:var(--sai-chu)}
+.chon4{display:none}
+@media (max-width:1100px){.bon{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){
+  .chon4{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .chon4 span{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:48px;padding:0 14px;border-radius:12px;background:var(--mat);border:1px solid var(--vien);font-weight:600;font-size:14px}
+  .chon4 span b{font-weight:600;color:var(--chu-2)}
+  .chon4 span.on{border-color:var(--c);background:var(--c-nhat);color:var(--c-chu)}
+  .chon4 span.on b{color:var(--c-chu)}
+  .bon>section:not(.mo-dt){display:none}
+  .xh li{grid-template-columns:24px 36px minmax(0,1fr) 64px;gap:10px;padding:10px 8px}
+  .xh .hang-so{width:24px;height:24px;font-size:12px}
+  .diem .thanh{width:52px}
+  .dau-man .hang{width:100%}.dau-man .nut{flex:1}
+}
+</style></head>
+<body data-app="gv" data-tab="hom-nay">
+<main class="khung cot" style="gap:20px">
+  <!-- GỌN HƠN: bỏ dải 5 con số, Nhịp học theo lớp, 12 bậc, Em cần thầy để ý và hồ sơ làm bài cũ. Còn ĐÚNG 4 bảng xếp hạng (2 trục: chất lượng học · độ chăm),
+       mỗi dòng = hạng · tên · điểm 0–100 · MỘT bằng chứng sắc nhất. Bấm em ⇒ bảng bằng chứng (gv-bang-chung-em.html). -->
+  <div class="dau-man">
+    <div style="flex:1;min-width:0">
+      <p class="nhan">Thứ Bảy 01/11 · 262 em · 14 ngày gần nhất (19/10 – 01/11) · cập nhật 06:00</p>
+      <h1 class="tieu-de mt-1">Hôm nay của thầy</h1>
+    </div>
+    <div class="hang"><span class="nut an-dt"><i data-i="plus"></i>Bổ sung bài hôm nay</span><span class="nut chinh"><i data-i="eye"></i>Theo dõi ca đang mở</span></div>
+  </div>
+
+  <div class="hang" style="flex-wrap:wrap;gap:10px">
+    <div class="tab"><span class="on">Tất cả 262</span><span>K10 · 46</span><span>K11 · 89</span><span>K12 · 127</span></div>
+    <div class="o-nhap" style="flex:1;min-width:200px"><i data-i="search" class="nho"></i>Tìm tên học sinh</div>
+  </div>
+
+  <div class="chon4">
+    <span class="ht on">Học thật <b>43</b></span><span class="dp">Đối phó <b>18</b></span>
+    <span class="ch">Chăm <b>78</b></span><span class="lu">Lười <b>101</b></span>
+  </div>
+
+  <div class="bon">
+    <section class="the dem ht mo-dt" id="ht">
+      <div class="bang-dau"><span class="o-icon sao"><i data-i="star"></i></span><div style="flex:1;min-width:0"><div class="h3">Học thật <span class="chip sao">43 em</span></div><p class="mo">Sửa câu sai đến khi đúng · đọc kỹ đề · kiểm tra khớp luyện tập</p></div></div>
+      <ol class="xh"></ol>
+      <div class="bang-chan"><a class="lien-ket">Xem đủ 43 em <i data-i="chevron" class="nho"></i></a><span class="mo an-dt">cao → thấp</span></div>
+    </section>
+    <section class="the dem dp" id="dp">
+      <div class="bang-dau"><span class="o-icon tin"><i data-i="alert"></i></span><div style="flex:1;min-width:0"><div class="h3">Học đối phó <span class="chip tin">18 em</span></div><p class="mo">Chọn khi chưa đọc hết đề · bấm lặp một chữ · luyện cao mà kiểm tra thấp</p></div></div>
+      <ol class="xh"></ol>
+      <div class="bang-chan"><a class="lien-ket">Xem đủ 18 em <i data-i="chevron" class="nho"></i></a><span class="mo an-dt">cao → thấp</span></div>
+    </section>
+    <section class="the dem ch" id="ch">
+      <div class="bang-dau"><span class="o-icon dung"><i data-i="flame"></i></span><div style="flex:1;min-width:0"><div class="h3">Chăm <span class="chip dung">78 em</span></div><p class="mo">Làm đủ mức gần như mọi ngày, câu nào cũng làm thật</p></div></div>
+      <ol class="xh"></ol>
+      <div class="bang-chan"><a class="lien-ket">Xem đủ 78 em <i data-i="chevron" class="nho"></i></a><span class="mo an-dt">cao → thấp</span></div>
+    </section>
+    <section class="the dem lu" id="lu">
+      <div class="bang-dau"><span class="o-icon sai"><i data-i="pause"></i></span><div style="flex:1;min-width:0"><div class="h3">Lười <span class="chip sai">101 em</span></div><p class="mo">Bỏ ngày, thiếu câu được giao, để câu sai không sửa</p></div></div>
+      <ol class="xh"></ol>
+      <div class="bang-chan"><a class="lien-ket">Xem đủ 101 em <i data-i="chevron" class="nho"></i></a><span class="mo an-dt">cao → thấp</span></div>
+    </section>
+  </div>
+
+  <section class="the dem">
+    <div class="the-dau" style="padding:18px 20px 4px;margin:0"><div class="h3">Việc cần thầy</div><span class="chip">3 việc</span></div>
+    <div class="ds">
+      <div class="dong"><span class="o-icon"><i data-i="clipboard"></i></span><div class="giua"><p class="ten">Ca đang mở · Kiểm tra 15 phút 12A1</p><p class="mo">Đã nộp 12/36 em</p></div><span class="nut">Theo dõi</span></div>
+      <div class="dong"><span class="o-icon sai"><i data-i="pen"></i></span><div class="giua"><p class="ten">Cần thầy chữa · 4 chỗ</p><p class="mo">3 câu sai từ 4 lần trở lên · 1 câu có thể nhầm đáp án</p></div><span class="nut">Chữa bài</span></div>
+      <div class="dong"><span class="o-icon tin"><i data-i="ask"></i></span><div class="giua"><p class="ten">Học sinh hỏi · 2 lượt</p><p class="mo">Kiểm tra 15 phút 11A2</p></div><span class="nut">Xem</span></div>
+    </div>
+  </section>
+</main>
+<script src="khung.js"></script>
+<script>
+const DS = {
+  ht: [['Phan Thảo Vy','11A2',96,'Sửa đúng <b>19/20</b> câu từng sai'],['Lương Đức Mạnh','12A1',94,'Kiểm tra <b>8,5</b> khớp luyện tập 82%'],['Hà Minh Châu','10A1',93,'Đúng <b>11/12</b> câu song sinh khác số liệu'],['Tống Gia Huy','12A2',91,'Đọc kỹ: <b>46 giây</b>/câu · cả lớp 27'],['Âu Ngọc Lan','11A1',90,'Sửa đúng <b>14/15</b> câu từng sai'],['Kha Tuấn Phát','12A1',88,'Kiểm tra <b>9,0</b> · luyện tập 86%']],
+  dp: [['Doãn Thanh Tâm','12A1',88,'<b>46%</b> câu chọn khi chưa đọc hết đề'],['Văn Quốc Bảo','11B',81,'Chọn <b>B</b> liền <b>11 câu</b> trong 74 giây'],['Lạc Mỹ Duyên','12A2',77,'Luyện đúng 71% · kiểm tra <b>3,5</b>'],['Ông Trọng Nhân','10A2',72,'<b>27/31</b> câu sai để đó không sửa'],['Thân Hải Yến','11A1',66,'Mở lời giải rồi chọn sau <b>3 giây</b> · 14 lần'],['Bế Khánh Linh','12A1',61,'<b>38%</b> câu chọn khi chưa đọc hết đề']],
+  ch: [['Lã Thanh Hương','12A1',99,'Đủ mức <b>14/14</b> ngày · 512 câu'],['Trương Bảo Anh','11A2',98,'Đủ mức <b>14/14</b> ngày · chuỗi 31 ngày'],['Đàm Quang Vinh','10A1',96,'Đủ mức <b>13/14</b> ngày · 96% câu làm kỹ'],['Giáp Thu Hà','12A2',95,'Đủ mức <b>13/14</b> ngày · 488 câu'],['Ninh Đức Toàn','11A1',93,'Đủ mức <b>13/14</b> ngày'],['Mẫn Ngọc Ánh','12A1',92,'Đủ mức <b>12/14</b> ngày · sửa 100% câu sai']],
+  lu: [['Từ Văn Hùng','12 Thường',99,'<b>14/14</b> ngày không làm · lần cuối 12/10'],['Cù Thị Mai','10A2',96,'<b>12/14</b> ngày không làm'],['Sầm Minh Khôi','11B',91,'Làm <b>38/504</b> câu được giao'],['Chung Hoài An','12A2',88,'<b>9</b> ngày liền không làm (24/10 → 01/11)'],['Quan Bảo Ngọc','10A1',84,'<b>10/14</b> ngày dưới mức · 0 câu sai được sửa'],['Lò Thành Đạt','11A3',80,'<b>8/14</b> ngày không làm']],
+}
+const ten2 = (t) => t.split(' ').slice(-2).map((x) => x[0]).join('')
+const MAU = ['a1','a2','a3','a4','','a1']
+for (const [k, ds] of Object.entries(DS)) {
+  document.querySelector('#' + k + ' .xh').innerHTML = ds.map(([ten, lop, d, bc], i) =>
+    `<li><span class="hang-so">${i + 1}</span><span class="av ${MAU[i]}">${ten2(ten)}</span><div style="min-width:0"><p class="ten">${ten}<small>${lop}</small></p><p class="bc">${bc}</p></div><div class="diem"><b>${d}<small>/100</small></b><div class="thanh"><i style="width:${d}%"></i></div></div></li>`).join('')
+}
+</script>
+</body></html>

@@ -33,7 +33,9 @@ import { danhSach, docBang, type BangChienDich, type CauCanDayLai, type ChienDic
 import { baiDaDayDanhSach, docBangOmniCua, docCoOmni } from '../components/chien-dich/api-omni'
 import { nhomCanThayChua } from '../components/chien-dich/omni-bang'
 import { hienNgay, ngayVn } from '../components/chien-dich/ngay'
-import NhipHocThay, { type DuNhip } from '../components/hom-nay-thay/NhipHocThay'
+import type { DuNhip } from '../components/hom-nay-thay/NhipHocThay'
+// HÔM NAY · 4 BẢNG (thầy chốt 01/11): «Trong» vẽ 4 bảng Học thật / Học đối phó / Chăm / Lười thay Nhịp học + xếp hạng + 12 bậc + hồ sơ cũ.
+import BonBang from '../components/hom-nay-thay/BonBang'
 import type { CanThayChua } from '../../server/src/omni-kieu'
 import { caConEmDangLam } from '../lib/ca-dang-chay'
 import './gv-hoa2.css'
@@ -46,6 +48,8 @@ import '../styles/trong-gv-ngang.css' // NGANG GV 26/10: dải biểu tượng �
 // 21/10 (thầy: "nút này làm riêng bấm vào popup lên để chọn luôn chứ không gắn vào phần hành trình nữa"): "Bổ sung bài hôm nay" / "Bổ sung bài" mở
 // hộp NGAY TẠI CHỖ — mảnh nạp lười, chỉ tải khi bấm (mở màn Hôm nay không thêm byte).
 const HopBoSungBai = lazy(() => import('../components/day-hoc/HopBoSungBai'))
+// Bố cục CŨ (máy tắt «Trong»): Nhịp học nạp lười — «Trong» không còn dùng tới nên không cõng vào mảnh màn Hôm nay.
+const NhipHocThay = lazy(() => import('../components/hom-nay-thay/NhipHocThay'))
 
 // ------------------------------------------------------------------ PHÉP TÍNH THUẦN
 
@@ -328,6 +332,9 @@ export default function GvHomNayScreen() {
   const [du, setDu] = useState<DuLieuHomNay | null>(demDu?.du ?? null)
   const [dangTai, setDangTai] = useState(false)
   const [nhip, setNhip] = useState<DuNhip | null>(demNhip?.du ?? null)
+  // «Trong» (main.tsx gắn `<html data-trong="gv">` lúc mở app, không đổi giữa chừng) ⇒ 4 bảng, KHÔNG hỏi `/gv/nhip-hoc` (lệnh nặng nhất màn này).
+  const [trong] = useState(() => typeof document !== 'undefined' && document.documentElement.dataset.trong === 'gv')
+  const [tongBon, setTongBon] = useState<number | null>(null)
   const [dangTaiNhip, setDangTaiNhip] = useState(false)
   const [capNhat, setCapNhat] = useState<number | null>(demNhip?.luc ?? demDu?.luc ?? null)
 
@@ -371,13 +378,13 @@ export default function GvHomNayScreen() {
       const hen = setTimeout(xong, 5000)
       void viec.finally(() => { clearTimeout(hen); xong() })
     })
-    void cho.then(() => { if (!huy) void taiNhip() })
+    void cho.then(() => { if (!huy && !trong) void taiNhip() })
     return () => {
       huy = true
       lanTai.current++
       lanNhip.current++
     }
-  }, [tai, taiNhip])
+  }, [tai, taiNhip, trong])
 
   const now = gioMayChu()
   const caMo = useMemo(() => (du?.ca ?? []).filter((c) => c.loai !== 'baitap' && caConEmDangLam(c, now)), [du, now])
@@ -475,10 +482,9 @@ export default function GvHomNayScreen() {
 
   // Nút chính góc phải = việc gấp nhất: có ca đang mở ⇒ theo dõi ca ấy; không thì bổ sung bài hôm nay.
   const nutChinh = caMo.length > 0 ? { chu: 'Theo dõi ca đang mở', lam: () => moChiTietCa(caMo[0]!.maCa) } : { chu: 'Bổ sung bài hôm nay', lam: () => setMoBoSung(true) }
-  const soEm = nhip?.ok ? nhip.kq.em.length : null
+  const soEm = trong ? tongBon : nhip?.ok ? nhip.kq.em.length : null
 
   // «Trong» · «Một trang» (bản vẽ 26/10 chiều): khối Việc cần thầy là cột đầu của lưới một khung hình (NhipHocThay đặt); không «Trong» ⇒ đúng chỗ cũ.
-  const trong = typeof document !== 'undefined' && document.documentElement.dataset.trong === 'gv'
   const soViec = viec.filter((v) => v.nut && !v.loi).length
   const catViec = trong && !moHetViec && viec.length > SO_VIEC_MOT_TRANG + 1
   const viecHien = catViec ? viec.slice(0, SO_VIEC_MOT_TRANG) : viec
@@ -576,7 +582,21 @@ export default function GvHomNayScreen() {
 
       {!trong && khoiViec}
 
-      <NhipHocThay du={nhip} dangTai={dangTaiNhip} onThuLai={() => void taiNhip()} viec={trong ? khoiViec : undefined} />
+      {trong ? (
+        <div className="gvhn-bon">
+          <BonBang
+            onTai={(d, luc) => {
+              setTongBon(d.tong)
+              setCapNhat(luc)
+            }}
+          />
+          {khoiViec}
+        </div>
+      ) : (
+        <Suspense fallback={null}>
+          <NhipHocThay du={nhip} dangTai={dangTaiNhip} onThuLai={() => void taiNhip()} />
+        </Suspense>
+      )}
       {moBoSung && (
         <Suspense fallback={null}>
           <HopBoSungBai

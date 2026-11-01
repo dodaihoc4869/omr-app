@@ -86,6 +86,10 @@ export interface LuotDanhGia {
   songSinh: boolean
   ngay: string
   luc: string
+  /** CHỈ THÊM 01/11 (4 bảng Hôm nay — bằng chứng có ví dụ): giây làm đo thật, thời gian đọc tối thiểu của đề (T_đọc, giây), mã câu THẬT của lượt. Vắng ⇒ không có ví dụ. */
+  giay?: number | null
+  giayDoc?: number | null
+  qid?: string
 }
 
 export interface DauVaoDanhGia {

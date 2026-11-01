@@ -25,7 +25,7 @@ import { congNgay7, ngayVn7 } from './goi-bai-7-loi'
 import { laNgayBaoTri } from './ngay-bao-tri'
 import {
   bacCongKhai, bacTheoLichSu, capTrungLoiSai, danhGiaEm, PHIEN_LUAT, TEN_BAC,
-  type BacDanhGia, type CanThiep, type KetLuanBac, type KetQuaDanhGia, type LoaiCanThiep, type LuotDanhGia, type TuanDaTinh,
+  type BacDanhGia, type CanThiep, type DauVaoDanhGia, type KetLuanBac, type KetQuaDanhGia, type LoaiCanThiep, type LuotDanhGia, type TuanDaTinh,
 } from './danh-gia-hoc-that'
 
 type Row = Record<string, unknown>
@@ -85,6 +85,8 @@ export interface KetQuaEm {
   kq: KetQuaDanhGia
   bac: KetLuanBac
   coDoNang: NonNullable<TuanDaTinh['coDoNang']>
+  /** CHỈ THÊM 01/11: đầu vào lõi (lượt + kiểm tra) khi gọi với `giuDauVao` — 4 bảng Hôm nay (`bon-chi-so-d1.ts`) dựng bằng chứng từ đây. */
+  dauVao?: DauVaoDanhGia
 }
 
 /** Cửa sổ của lượt tính lúc `nowMs`: `soNgay` ngày TRỌN tới hết HÔM QUA (giờ VN) — hôm nay đang dở không tính (cron thứ Hai 01:00 không bị coi «thứ Hai
@@ -105,7 +107,7 @@ async function dungTiLeCauTuan(env: Env, nowMs: number): Promise<void> {
 }
 
 /** Tính MỘT lô em (≤ LO_EM) cho tuần chứa `nowMs`, cửa sổ 14 ngày trọn tới hôm qua. Không ghi gì. Ném lỗi khi không đọc được sổ. */
-export async function tinhLoEm(env: Env, sbds: readonly string[], nowMs: number, tuy: { chiDoc?: boolean; soNgay?: number; denHomNay?: boolean } = {}): Promise<KetQuaEm[]> {
+export async function tinhLoEm(env: Env, sbds: readonly string[], nowMs: number, tuy: { chiDoc?: boolean; soNgay?: number; denHomNay?: boolean; giuDauVao?: boolean } = {}): Promise<KetQuaEm[]> {
   if (!sbds.length) return []
   // `chiDoc` (xem thử / đo trên dữ liệu thật trước khi phát hành): KHÔNG tạo bảng; bảng mới chưa có ⇒ các lượt đọc ấy trả rỗng (đã `.catch`).
   if (!tuy.chiDoc) await damBaoBangDanhGia(env)
@@ -190,6 +192,7 @@ export async function tinhLoEm(env: Env, sbds: readonly string[], nowMs: number,
         songSinh: !!x.d.tc || tachSongSinh(x.d.qid ?? '').songSinh !== null,
         ngay: x.d.ngay ?? '',
         luc: x.d.luc,
+        ...(tuy.giuDauVao ? { giay: m && !m.uocTinh ? m.giay : null, giayDoc: m && m.giayDoc > 0 ? m.giayDoc : null, qid: x.d.qid ?? x.d.goc } : {}),
       }
     })
     const kt = rKt.filter((x) => str(x.sbd) === sbd)
@@ -200,14 +203,15 @@ export async function tinhLoEm(env: Env, sbds: readonly string[], nowMs: number,
     const ngayPhaiLam = ngayCuaSo.filter((n) => n > vao && !laNgayBaoTri(n))
     const ct: CanThiep[] = rCt.filter((x) => str(x.sbd) === sbd).map((x) => ({ loai: str(x.loai) as LoaiCanThiep, luc: str(x.gui_luc), emXem: str(x.em_xem_luc) || null, phXem: str(x.ph_xem_luc) || null }))
     const gianLan = ct.filter((c) => c.loai === 'gian_lan_xac_nhan' && c.luc >= tuIso).length
-    const kq = danhGiaEm({
+    const dauVao = {
       luot,
       ngayCuaSo: ngayPhaiLam,
       ngayCoLamKhac: [...kt.filter(lamKt).map((x) => str(x.ngay)), ...thiEm.map((x) => { const t = Date.parse(str(x.vao_luc)); return Number.isFinite(t) ? ngayVn7(t) : '' }).filter(Boolean)],
       ktcn: { daNop: kt.filter(lamKt).length, boHan: kt.filter(boKt).length, diem: kt.filter((x) => str(x.trang_thai) === 'da_nop' && x.diem !== null).map((x) => num(x.diem)) },
       thi: thiEm.map((x) => ({ roiLan: num(x.so_lan_roi_man), roiGiay: num(x.tong_giay_roi_man) })),
       gianLanXacNhan: gianLan,
-    })
+    }
+    const kq = danhGiaEm(dauVao)
     const soNgayTinh = kq.soLieu.soNgayTinh ?? 0
     const tuanNay: TuanDaTinh = {
       tuan, diem: kq.diem, bacTuan: kq.bacTuan, bac: kq.bacTuan, coDo: kq.coDo,
@@ -218,7 +222,7 @@ export async function tinhLoEm(env: Env, sbds: readonly string[], nowMs: number,
       coDoNang: json(x.co_do_nang_json, undefined as TuanDaTinh['coDoNang']),
     }))
     const bac = bacTheoLichSu(tuanNay, truoc, ct, kq.tienBo, new Date(nowMs).toISOString())
-    ra.push({ sbd, tuan, kq, bac, coDoNang: tuanNay.coDoNang! })
+    ra.push({ sbd, tuan, kq, bac, coDoNang: tuanNay.coDoNang!, ...(tuy.giuDauVao ? { dauVao } : {}) })
   }
   return ra
 }

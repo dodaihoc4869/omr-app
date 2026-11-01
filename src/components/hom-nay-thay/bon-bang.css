@@ -1,0 +1,172 @@
+/* HÔM NAY · 4 BẢNG + BẰNG CHỨNG (thầy chốt bản vẽ 01/11, docs/ban-ve-hom-nay-4-bang-0111). Chỉ dưới [data-trong='gv'], chỉ biến --tr-* có sẵn (trong.css).
+ * Màu bảng (một khái niệm một màu, như bản xếp hạng 30/10): Học thật = sao · Học đối phó = tin · Chăm = dung · Lười = sai. Đích bấm ≥ 44 px. */
+[data-trong='gv'] .bb-khung { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+[data-trong='gv'] [data-bang='ht'] { --bb-c: var(--tr-sao); --bb-nhat: var(--tr-sao-nhat); --bb-chu: var(--tr-sao-chu); }
+[data-trong='gv'] [data-bang='dp'] { --bb-c: var(--tr-tin); --bb-nhat: var(--tr-tin-nhat); --bb-chu: var(--tr-tin-chu); }
+[data-trong='gv'] [data-bang='ch'] { --bb-c: var(--tr-dung); --bb-nhat: var(--tr-dung-nhat); --bb-chu: var(--tr-dung-chu); }
+[data-trong='gv'] [data-bang='lu'] { --bb-c: var(--tr-sai); --bb-nhat: var(--tr-sai-nhat); --bb-chu: var(--tr-sai-chu); }
+
+/* lọc khối + tìm tên */
+[data-trong='gv'] .bb-loc { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+[data-trong='gv'] .bb-khoi { display: inline-flex; gap: 2px; padding: 3px; border-radius: 12px; background: var(--tr-mat-2); flex-wrap: wrap; }
+[data-trong='gv'] .bb-khoi-nut { min-height: 44px; padding: 0 14px; border: 0; border-radius: 10px; background: transparent; color: var(--tr-chu-2); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+[data-trong='gv'] .bb-khoi-nut span { font-weight: 500; color: var(--tr-chu-3); }
+[data-trong='gv'] .bb-khoi-nut[aria-checked='true'] { background: var(--tr-mat); color: var(--tr-chu); box-shadow: var(--tr-bong-1); }
+[data-trong='gv'] .bb-tim { flex: 1 1 220px; min-width: 0; display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border: 1px solid var(--tr-vien); border-radius: 12px; background: var(--tr-mat); color: var(--tr-chu-3); }
+[data-trong='gv'] .bb-tim input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--tr-chu); font: inherit; font-size: 15px; }
+[data-trong='gv'] .bb-ghi { margin: -4px 0 0; font-size: 13px; color: var(--tr-chu-3); }
+
+/* 4 thẻ */
+[data-trong='gv'] .bb-bon { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+[data-trong='gv'] .bb-the { min-width: 0; border: 1px solid var(--tr-vien); border-radius: 20px; background: var(--tr-mat); box-shadow: var(--tr-bong-1); }
+[data-trong='gv'] .bb-xuong { display: flex; flex-direction: column; gap: 10px; padding: 20px; }
+[data-trong='gv'] .bb-dau { display: flex; align-items: flex-start; gap: 12px; padding: 18px 20px 10px; }
+[data-trong='gv'] .bb-o { flex: none; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--bb-nhat); color: var(--bb-chu); }
+[data-trong='gv'] .bb-dau-chu { min-width: 0; flex: 1; }
+[data-trong='gv'] .bb-dau h2 { margin: 0; display: flex; align-items: center; gap: 8px; font-size: 17px; font-weight: 600; color: var(--tr-chu); }
+[data-trong='gv'] .bb-chip { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--bb-nhat); color: var(--bb-chu); }
+[data-trong='gv'] .bb-dau p { margin: 2px 0 0; font-size: 13px; color: var(--tr-chu-2); line-height: 1.45; }
+[data-trong='gv'] .bb-ds { list-style: none; margin: 0; padding: 0 8px 4px; }
+[data-trong='gv'] .bb-dong { width: 100%; min-height: 60px; display: grid; grid-template-columns: 28px 36px minmax(0, 1fr) 88px; gap: 12px; align-items: center; padding: 10px 12px; border: 0; border-radius: 12px; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+[data-trong='gv'] .bb-dong:hover { background: var(--tr-mat-2); }
+[data-trong='gv'] .bb-dong:focus-visible { outline: 2px solid var(--bb-c); outline-offset: -2px; }
+[data-trong='gv'] .bb-hang { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 600; background: var(--tr-mat-3); color: var(--tr-chu-2); }
+[data-trong='gv'] .bb-ds li:nth-child(-n + 3) .bb-hang { background: var(--bb-nhat); color: var(--bb-chu); }
+[data-trong='gv'] .bb-av { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 600; background: var(--tr-tin-nhat); color: var(--tr-tin-chu); }
+[data-trong='gv'] .bb-av[data-mau='1'] { background: var(--tr-dung-nhat); color: var(--tr-dung-chu); }
+[data-trong='gv'] .bb-av[data-mau='2'] { background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); }
+[data-trong='gv'] .bb-av[data-mau='3'] { background: var(--tr-sao-nhat); color: var(--tr-sao-chu); }
+[data-trong='gv'] .bb-giua { min-width: 0; display: flex; flex-direction: column; }
+[data-trong='gv'] .bb-ten { font-weight: 600; color: var(--tr-chu); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+[data-trong='gv'] .bb-ten small { font-weight: 500; color: var(--tr-chu-3); margin-left: 6px; font-size: 13px; }
+[data-trong='gv'] .bb-bc { margin-top: 2px; font-size: 13px; color: var(--tr-chu-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+[data-trong='gv'] .bb-bc b { color: var(--bb-chu); font-weight: 600; }
+[data-trong='gv'] .bb-diem { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+[data-trong='gv'] .bb-diem b { font-size: 20px; font-weight: 600; line-height: 1; color: var(--tr-chu); }
+[data-trong='gv'] .bb-diem b small { font-size: 12px; color: var(--tr-chu-3); font-weight: 500; margin-left: 2px; }
+[data-trong='gv'] .bb-thanh { width: 72px; height: 6px; border-radius: 999px; background: var(--tr-mat-3); overflow: hidden; }
+[data-trong='gv'] .bb-thanh i { display: block; height: 100%; border-radius: inherit; background: var(--bb-c); }
+[data-trong='gv'] .bb-chan { display: flex; align-items: center; justify-content: space-between; padding: 4px 20px 14px; }
+[data-trong='gv'] .bb-xem { min-height: 44px; display: inline-flex; align-items: center; gap: 4px; }
+[data-trong='gv'] .bb-chan-phu { font-size: 13px; color: var(--tr-chu-3); }
+[data-trong='gv'] .bb-trong { margin: 0; padding: 4px 20px 20px; font-size: 14px; color: var(--tr-chu-2); }
+[data-trong='gv'] .bb-loi { padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+[data-trong='gv'] .bb-loi p { margin: 0; color: var(--tr-chu); }
+
+/* ô chọn bảng — chỉ điện thoại */
+[data-trong='gv'] .bb-chon { display: none; }
+@media (max-width: 1100px) {
+  [data-trong='gv'] .bb-bon { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 600px) {
+  [data-trong='gv'] .bb-chon { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  [data-trong='gv'] .bb-chon-nut { min-height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--tr-vien); background: var(--tr-mat); color: var(--tr-chu); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+  [data-trong='gv'] .bb-chon-nut b { font-weight: 600; color: var(--tr-chu-2); }
+  [data-trong='gv'] .bb-chon-nut[aria-checked='true'] { border-color: var(--bb-c); background: var(--bb-nhat); color: var(--bb-chu); }
+  [data-trong='gv'] .bb-chon-nut[aria-checked='true'] b { color: var(--bb-chu); }
+  [data-trong='gv'] .bb-bon[data-chon='ht'] > .bb-the:not([data-bang='ht']),
+  [data-trong='gv'] .bb-bon[data-chon='dp'] > .bb-the:not([data-bang='dp']),
+  [data-trong='gv'] .bb-bon[data-chon='ch'] > .bb-the:not([data-bang='ch']),
+  [data-trong='gv'] .bb-bon[data-chon='lu'] > .bb-the:not([data-bang='lu']) { display: none; }
+  [data-trong='gv'] .bb-dong { grid-template-columns: 24px 36px minmax(0, 1fr) 62px; gap: 10px; padding: 10px 8px; }
+  [data-trong='gv'] .bb-hang { width: 24px; height: 24px; font-size: 12px; }
+  [data-trong='gv'] .bb-thanh { width: 52px; }
+  [data-trong='gv'] .bb-chan-phu { display: none; }
+}
+
+/* ───────── BẰNG CHỨNG (tấm toàn màn) ───────── */
+[data-trong='gv'] .bbc-che { position: fixed; inset: 0; z-index: 60; background: var(--tr-nen); }
+[data-trong='gv'] .bbc-man { position: fixed; inset: 0; z-index: 60; display: flex; flex-direction: column; background: var(--tr-nen); color: var(--tr-chu); --bb-c: var(--tr-chinh); --bb-nhat: var(--tr-chinh-nhat); --bb-chu: var(--tr-chinh-chu); }
+[data-trong='gv'] .bbc-tren { flex: none; display: flex; align-items: center; gap: 12px; padding: 10px 20px; border-bottom: 1px solid var(--tr-vien); background: var(--tr-mat); }
+[data-trong='gv'] .bbc-ve { min-height: 44px; display: inline-flex; flex-shrink: 0; white-space: nowrap; align-items: center; gap: 6px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent; color: var(--tr-chu-2); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+[data-trong='gv'] .bbc-ve:hover { background: var(--tr-mat-2); }
+[data-trong='gv'] .bbc-tren-chu { min-width: 0; }
+[data-trong='gv'] .bbc-tren h1 { margin: 0; font-size: 18px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+[data-trong='gv'] .bbc-tren p { margin: 1px 0 0; font-size: 13px; color: var(--tr-chu-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+[data-trong='gv'] .bbc-than { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 24px 20px 40px; }
+[data-trong='gv'] .bbc-cho { display: flex; flex-direction: column; gap: 16px; max-width: 1160px; margin: 0 auto; }
+[data-trong='gv'] .bbc-luoi { max-width: 1160px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+[data-trong='gv'] .bbc-cot-chinh, [data-trong='gv'] .bbc-cot-phu { min-width: 0; display: flex; flex-direction: column; gap: 20px; }
+[data-trong='gv'] .bbc-ket { padding: 18px 20px; border-radius: 16px; background: var(--bb-nhat); font-size: 16px; line-height: 1.6; }
+[data-trong='gv'] .bbc-ket-nhan { margin: 0 0 6px; font-size: 13px; font-weight: 600; color: var(--bb-chu); }
+[data-trong='gv'] .bbc-ket-chu { margin: 0; color: var(--tr-chu); }
+[data-trong='gv'] .bbc-ket-chu b { color: var(--bb-chu); }
+[data-trong='gv'] .bbc-the-dau { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 18px 20px 6px; }
+[data-trong='gv'] .bbc-the-dau h3 { margin: 0; font-size: 16px; font-weight: 600; }
+[data-trong='gv'] .bbc-the-dau span { font-size: 13px; color: var(--tr-chu-3); }
+[data-trong='gv'] .bbc-the-bc { padding-bottom: 8px; }
+[data-trong='gv'] .bbc-bc { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 14px; padding: 18px 20px; border-top: 1px solid var(--tr-vien); }
+[data-trong='gv'] .bbc-the-dau + .bbc-bc { border-top: 0; }
+[data-trong='gv'] .bbc-so-tt { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-weight: 600; background: var(--bb-nhat); color: var(--bb-chu); }
+[data-trong='gv'] .bbc-bc-than { min-width: 0; }
+[data-trong='gv'] .bbc-tieu { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+[data-trong='gv'] .bbc-tieu h4 { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.4; }
+[data-trong='gv'] .bbc-lon { font-size: 20px; font-weight: 600; color: var(--bb-chu); white-space: nowrap; }
+[data-trong='gv'] .bbc-lon small { font-size: 13px; font-weight: 500; color: var(--tr-chu-2); margin-left: 4px; }
+[data-trong='gv'] .bbc-ss-khoi { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+[data-trong='gv'] .bbc-ss { display: grid; grid-template-columns: 64px minmax(0, 1fr) 48px; gap: 10px; align-items: center; font-size: 13px; color: var(--tr-chu-2); }
+[data-trong='gv'] .bbc-ss b { text-align: right; color: var(--tr-chu); font-weight: 600; }
+[data-trong='gv'] .bbc-thanh { height: 10px; border-radius: 999px; background: var(--tr-mat-3); overflow: hidden; }
+[data-trong='gv'] .bbc-thanh i { display: block; height: 100%; border-radius: inherit; }
+[data-trong='gv'] .bbc-thanh[data-loai='em'] i { background: var(--bb-c); }
+[data-trong='gv'] .bbc-thanh[data-loai='lop'] i { background: var(--tr-chu-3); }
+[data-trong='gv'] .bbc-chuoi { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+[data-trong='gv'] .bbc-chuoi span { width: 34px; height: 38px; border-radius: 8px; display: grid; place-items: center; font-weight: 600; font-size: 15px; background: var(--tr-mat-2); border: 1px solid var(--tr-vien); color: var(--tr-sai-chu); }
+[data-trong='gv'] .bbc-chuoi span[data-dung] { border-color: var(--tr-dung); color: var(--tr-dung-chu); }
+[data-trong='gv'] .bbc-hai { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+[data-trong='gv'] .bbc-hai div { padding: 12px 14px; border-radius: 12px; background: var(--tr-mat-2); display: flex; flex-direction: column; gap: 2px; font-size: 13px; color: var(--tr-chu-2); }
+[data-trong='gv'] .bbc-hai b { font-size: 24px; font-weight: 600; color: var(--tr-chu); }
+[data-trong='gv'] .bbc-hai div[data-lech] b { color: var(--tr-sai-chu); }
+[data-trong='gv'] .bbc-vd { margin-top: 12px; border: 1px solid var(--tr-vien); border-radius: 12px; overflow: hidden; }
+[data-trong='gv'] .bbc-vd > div { display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 9px 12px; font-size: 13px; border-top: 1px solid var(--tr-vien); }
+[data-trong='gv'] .bbc-vd > div:first-child { border-top: 0; }
+[data-trong='gv'] .bbc-vd time { color: var(--tr-chu-3); }
+[data-trong='gv'] .bbc-vd p { margin: 0; min-width: 0; color: var(--tr-chu); }
+[data-trong='gv'] .bbc-vd p small { display: block; color: var(--tr-chu-3); font-size: 12px; margin-top: 1px; }
+[data-trong='gv'] .bbc-kq { white-space: nowrap; font-weight: 600; color: var(--tr-chu-2); }
+[data-trong='gv'] .bbc-kq[data-dung='sai'] { color: var(--tr-sai-chu); }
+[data-trong='gv'] .bbc-kq[data-dung='dung'] { color: var(--tr-dung-chu); }
+[data-trong='gv'] .bbc-chu { margin: 8px 0 0; font-size: 13px; color: var(--tr-chu-2); line-height: 1.5; }
+[data-trong='gv'] .bbc-chu b { color: var(--tr-chu); }
+[data-trong='gv'] .bbc-bon-so { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 20px; padding: 6px 20px 20px; }
+[data-trong='gv'] .bbc-cs { display: flex; flex-direction: column; gap: 6px; }
+[data-trong='gv'] .bbc-cs-dau { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+[data-trong='gv'] .bbc-cs-dau span { font-size: 13px; font-weight: 600; color: var(--tr-chu-2); }
+[data-trong='gv'] .bbc-cs-dau b { font-size: 22px; font-weight: 600; line-height: 1; }
+[data-trong='gv'] .bbc-cs-dau b small { font-size: 12px; color: var(--tr-chu-3); font-weight: 500; }
+[data-trong='gv'] .bbc-cs[data-trong] .bbc-cs-dau b { color: var(--tr-chu-3); }
+[data-trong='gv'] .bbc-ray { position: relative; height: 8px; border-radius: 999px; background: var(--tr-mat-3); }
+[data-trong='gv'] .bbc-ray i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: inherit; background: var(--bb-c); }
+[data-trong='gv'] .bbc-ray u { position: absolute; top: -4px; bottom: -4px; width: 2px; border-radius: 1px; background: var(--tr-chu-3); }
+[data-trong='gv'] .bbc-ngay { position: relative; display: grid; gap: 6px; align-items: end; height: 140px; margin: 8px 20px 0; }
+[data-trong='gv'] .bbc-cot { display: flex; flex-direction: column-reverse; height: 100%; border-radius: 6px 6px 2px 2px; overflow: hidden; background: var(--tr-mat-2); }
+[data-trong='gv'] .bbc-cot i { display: block; }
+[data-trong='gv'] .bbc-cot i[data-loai='ky'] { background: var(--tr-dung); }
+[data-trong='gv'] .bbc-cot i[data-loai='voi'] { background: var(--tr-tin); }
+[data-trong='gv'] .bbc-cot[data-khong] { background: var(--tr-sai-nhat); box-shadow: inset 0 -3px 0 var(--tr-sai); }
+[data-trong='gv'] .bbc-muc { position: absolute; left: 0; right: 0; border-top: 1.5px dashed var(--tr-chu-3); }
+[data-trong='gv'] .bbc-ngay-nhan { display: grid; gap: 6px; margin: 6px 20px 0; font-size: 11px; color: var(--tr-chu-3); text-align: center; }
+[data-trong='gv'] .bbc-chu-giai { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 10px 20px 18px; font-size: 12px; color: var(--tr-chu-2); }
+[data-trong='gv'] .bbc-chu-giai span::before { content: ''; display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+[data-trong='gv'] .bbc-chu-giai span[data-loai='ky']::before { background: var(--tr-dung); }
+[data-trong='gv'] .bbc-chu-giai span[data-loai='voi']::before { background: var(--tr-tin); }
+[data-trong='gv'] .bbc-chu-giai span[data-loai='khong']::before { background: var(--tr-sai); }
+@media (max-width: 1100px) {
+  [data-trong='gv'] .bbc-luoi { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 600px) {
+  [data-trong='gv'] .bbc-tren { padding: 8px 12px; }
+  [data-trong='gv'] .bbc-than { padding: 16px 12px 32px; }
+  [data-trong='gv'] .bbc-bc { grid-template-columns: 28px minmax(0, 1fr); gap: 10px; padding: 16px; }
+  [data-trong='gv'] .bbc-so-tt { width: 28px; height: 28px; }
+  [data-trong='gv'] .bbc-vd > div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  [data-trong='gv'] .bbc-kq { white-space: normal; }
+  [data-trong='gv'] .bbc-ss { grid-template-columns: 56px minmax(0, 1fr) 44px; }
+  [data-trong='gv'] .bbc-chuoi span { width: 28px; height: 34px; }
+  [data-trong='gv'] .bbc-ngay { gap: 3px; height: 110px; }
+  [data-trong='gv'] .bbc-ngay-nhan { gap: 3px; font-size: 10px; }
+  [data-trong='gv'] .bbc-hai { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* màn Hôm nay «Trong»: 4 bảng rồi Việc cần thầy */
+[data-trong='gv'] .gvhn-bon { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
