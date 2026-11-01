@@ -1,7 +1,7 @@
--- HÔM NAY · 4 BẢNG — SOÁT TRÊN DỮ LIỆU THẬT (CHỈ ĐỌC, 01/11; bản v2 «chắc mới xếp»). Một câu SELECT, chỉ SỐ ĐẾM GỘP: không SBD, không tên (repo công khai).
+-- HÔM NAY · 4 BẢNG — SOÁT TRÊN DỮ LIỆU THẬT (CHỈ ĐỌC, 01/11 · đếm lại 02/11 sau tính đêm BAN_BON 3; bản v2 «chắc mới xếp»). Một câu SELECT, chỉ SỐ ĐẾM GỘP: không SBD, không tên (repo công khai).
 SELECT
   COUNT(*) AS so_em,
-  SUM(json_extract(so_lieu_json, '$.ban') = 2) AS da_tinh_v2,
+  SUM(json_extract(so_lieu_json, '$.ban') = 3) AS da_tinh_ban3,
   SUM(json_extract(so_lieu_json, '$.vao.ht') = 1) AS bang_hoc_that,
   SUM(json_extract(so_lieu_json, '$.vao.dp') = 1) AS bang_doi_pho,
   SUM(json_extract(so_lieu_json, '$.vao.ch') = 1) AS bang_cham,
