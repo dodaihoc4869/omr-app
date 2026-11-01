@@ -63,7 +63,7 @@ export function ThanhThuong({ token, onMo, onHoc, thongBao = true, menu, capLua 
       const nhan = `Mục tiêu hôm nay: ${mt.can} ${mt.donVi} · đã làm ${mt.da}${dat ? ', đủ mức' : ''}`
       const vong = <span className="tp-tr-vong" aria-hidden="true">
         <svg className="vm" viewBox="0 0 52 52"><circle className="nen" cx="26" cy="26" r="22" /><circle className="chay" cx="26" cy="26" r="22" strokeDasharray={`${p * CHU_VI} 200`} /></svg>
-        <Bi cam={dat ? 'mung' : 'chao'} size={menu ? 18 : 34} nhip="yen" cap={capLua} />
+        <Bi cam={dat ? 'mung' : 'chao'} size={menu ? 18 : 34} nhip="yen" cap={capLua} khung="tron" />
       </span>
       // trong menu: vòng nhỏ trên, số «3/4» (đủ ⇒ «Đủ») dưới; thanh ngang cũ: nhãn «3/4 chặng» / «Đủ mức» dưới vòng
       const ruot = menu

@@ -3,8 +3,12 @@
 // `ddh.lua-that`) ⇒ 0 lệnh máy chủ mới, 0 lượt đọc D1.
 // 6 cấp: 0 Vui vẻ · 1 Chờ em · 2 Sốt ruột · 3 Bực · 4 Giận · 5 Siêu cáu, mặt đỏ lừ.
 // Lửa giận vì VIỆC (muộn mà chưa làm, làm vội nên câu chưa được tính) — KHÔNG BAO GIỜ vì điểm thấp hay làm sai. Em làm thật là Lửa hết giận ngay.
-// Không dùng nhãn tuần «Học thật / Đối phó» (thầy quyết 2: giữ lệnh 26/10 giấu nhãn khỏi máy em).
+// Không dùng nhãn tuần «Học thật / Đối phó» (thầy quyết 2: giữ lệnh 26/10 giấu nhãn khỏi máy em). NGOẠI LỆ thầy 01/11 tối: lời Mol giận vì câu chưa được
+// tính được gọi thẳng hành vi «đối phó» (thầy: «Làm kiểu câu ngắn kiểu: Bực thật đấy, lại đối phó») — chỉ trong bong bóng, không phải nhãn tuần.
 import type { SoLuaThat } from './lua-that'
+import { KHO_CHAN_NGON, KHO_DOI_PHO, KHO_GIUC_HOC } from './loi-mol'
+// Kho câu (giận · dỗi · chân ngôn) ở MỘT tệp hằng số src/lib/loi-mol.ts — xuất lại để chỗ gọi cũ không đổi.
+export { KHO_CHAN_NGON, KHO_DOI_PHO, KHO_GIUC_HOC }
 
 export type CapLua = 0 | 1 | 2 | 3 | 4 | 5
 /** Tên cấp trên bản vẽ (chỉ để đọc mã / test — màn em không hiện tên cấp). */
@@ -42,6 +46,8 @@ export interface VaoLua {
   cu?: boolean
   /** Sổ `ddh.lua-that` hôm nay. */
   so?: SoLuaThat | null
+  /** (01/11 tối) Câu bong bóng giận đã hiện ở LƯỢT TRƯỚC — kho câu không lặp liền (Lộ trình nhớ ở localStorage `ddh.loi-mol`). */
+  loiTruoc?: string
 }
 
 export interface KetLua {
@@ -130,32 +136,34 @@ export function xetLua(v: VaoLua): KetLua {
 /** Cấp 0–5 (hàm thuần, một nguồn). */
 export const capGianLua = (v: VaoLua): CapLua => xetLua(v).cap
 
-/** Lời chuỗi ở cấp 4–5 (thầy quyết 6): chỉ khi chuỗi ≥ 3 ngày và hôm nay chưa giữ. */
-const nhacChuoi = (v: VaoLua): boolean => (v.chuoi ?? 0) >= 3 && !v.giuHomNay
-
 /**
- * LỜI BONG BÓNG theo cấp (mục 3). `null` ⇒ GIỮ lời cũ của Lộ trình (cấp 1, đủ mức, ngày nghỉ, ca kiểm tra, Kiểm tra ôn tập). Chữ chỉ nói SỰ THẬT (giờ,
- * số câu, chuỗi) — không doạ, không nhãn; số nào cũng có nhãn (câu · ngày · phút); giờ HH:MM; ≤ 110 ký tự. Phần áp lực nằm ở mặt Lửa.
+ * LỜI BONG BÓNG theo cấp (mục 3). `null` ⇒ GIỮ lời cũ của Lộ trình (cấp 1, đủ mức, ngày nghỉ, ca kiểm tra, Kiểm tra ôn tập).
+ * 01/11 tối (thầy: «Câu văn trong bong bóng theo hướng gắt một chút» rồi «Làm kiểu câu ngắn kiểu: Bực thật đấy, lại đối phó»): cấp 2–5 là câu CỰC NGẮN, một dòng,
+ * gắt dần, KHÔNG số, không giải thích (số câu / giờ / chuỗi vẫn ở vòng Mục tiêu và thẻ Chuỗi ngày sẵn có). Đúng sự thật theo LÝ DO: giận vì câu chưa được tính
+ * ⇒ gọi thẳng «đối phó»; giận vì muộn mà chưa đủ câu ⇒ giục vào học (không nói «đối phó» khi em chưa làm). Không chữ xúc phạm, không chê con người em.
  */
 export function loiLua(cap: CapLua, v: VaoLua, k: KetLua = xetLua(v)): string | null {
   if (k.lyDo === 'ca' || k.lyDo === 'nghi' || v.kiem) return null
   const con = Math.max(0, v.muc - v.daLam)
   if (cap === 0) return k.lyDo === 'that' && !v.du && con > 0 ? `Em làm thật, Mol vui lắm! Còn ${con} câu nữa là đủ mức.` : null
   if (cap === 1) return null
-  const gio = chuGio(v.now)
-  if (k.lyDo === 'chuaTinh') {
-    const bao = k.lien >= 3 ? `${k.lien} câu liền chưa được tính` : `${k.chua} trong ${k.tong} câu vừa rồi chưa được tính`
-    if (cap >= 5) return `Mol cáu lắm rồi! ${bao}. Đọc kĩ đề rồi làm.`
-    if (cap === 4) return `Mol giận rồi! ${bao}. Dừng lại, đọc kĩ đề.`
-    return 'Mấy câu vừa rồi chưa được tính. Đọc kĩ đề rồi làm nhé.'
-  }
-  if (cap === 2) return `Đã ${gio} rồi. Còn ${con} câu nữa là đủ mức hôm nay.`
-  if (cap === 3) return `Mol bực rồi đấy! ${gio} mà còn ${con} câu. Học ngay nhé.`
-  const lam = v.daLam > 0 ? `mới làm ${v.daLam}/${v.muc} câu` : 'chưa làm câu nào'
-  if (cap === 4) return `Mol giận rồi! ${gio} mà ${lam}.${nhacChuoi(v) ? ` Chuỗi ${v.chuoi} ngày đang chờ em.` : ''}`
-  // cấp 5: thời gian còn lại kèm mốc thật (thầy quyết 3 — ngoại lệ C14 chỉ cho Lửa cấp 4–5), chữ đứng yên
-  const conPhut = Math.max(1, 23 * 60 + 59 - (k.gio * 60 + k.phut))
-  return `Mol cáu lắm rồi! ${gio} mà ${lam}. Còn ${conPhut} phút (tới 23:59) để ${nhacChuoi(v) ? `giữ chuỗi ${v.chuoi} ngày` : 'đủ mức hôm nay'}.`
+  return chonCau(k.lyDo === 'chuaTinh' ? KHO_DOI_PHO[cap] : KHO_GIUC_HOC[cap], soLuot(v.daLam, v.now), v.loiTruoc)
+}
+/** LƯỢT nói của Mol = số câu đã làm hôm nay + số ngày Việt Nam ⇒ mỗi lần làm thêm câu là một lượt mới; cùng lượt ⇒ cùng câu (tất định, không chớp khi vẽ lại). */
+export const soLuot = (daLam: number, now: number): number => daLam + Math.floor((now + 7 * 3_600_000) / 86_400_000)
+/** Lời VUI xen chân ngôn: cứ 3 lượt vui thì 1 lượt (lượt chia hết cho 3) thay lời khen bằng một câu chân ngôn; 2/3 còn lại giữ lời khen cũ.
+ *  Lượt chân ngôn kế tiếp luôn sang câu khác (chọn theo lượt / 3, tránh câu của lượt chân ngôn trước) ⇒ không lặp liền. `null` ⇒ giữ lời khen. */
+export function chanNgon(luot: number): string | null {
+  if (((luot % 3) + 3) % 3 !== 0) return null
+  const vong = Math.floor(luot / 3)
+  return chonCau(KHO_CHAN_NGON, vong, chonCau(KHO_CHAN_NGON, vong - 1))
+}
+/** Chọn một câu trong kho theo lượt (tất định); trùng câu vừa hiện ở lượt trước ⇒ lấy câu kế tiếp (kho ≥ 2 câu thì không bao giờ lặp liền). */
+export function chonCau(kho: readonly string[], luot: number, truoc?: string): string {
+  const n = kho.length
+  let i = ((Math.floor(luot) % n) + n) % n
+  if (n > 1 && kho[i] === truoc) i = (i + 1) % n
+  return kho[i]!
 }
 
 /** Giờ (ms) cấp có thể đổi lần tới chỉ vì giờ trôi: mốc 19 · 21 · 22 · 23 · 00 giờ Việt Nam, hoặc hết 30 phút vui sau chặng làm thật. */

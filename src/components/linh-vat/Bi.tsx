@@ -7,6 +7,8 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import type { GocLua, Lua, TrangThaiLua, TuyChonLua } from './lua-dong'
 import '../../styles/bi.css' // khung bong bóng «Học tiếp nhé» (.bi-loi) vẫn ở tệp này
+import { gioMayChu } from '../../lib/gio-may-chu'
+import { boMauMol } from '../../lib/mau-mol-ngay'
 import '../../styles/lua.css'
 
 export type CamBi = 'chao' | 'vui' | 'nghi' | 'sai' | 'mung' | 'ngu' | 'lua'
@@ -46,13 +48,17 @@ function apCap(l: Lua, cap: number, con: () => boolean): void {
 }
 
 /** (28/10 «vẫn chưa tức thì») Ảnh TĨNH của linh vật ở Lộ trình lần mở trước (src/lib/khung-tinh-hs.ts chụp): `{ "<cỡ>|<cảm xúc>|<hướng>": { src, st } }`. */
-export const KHOA_BI_TINH = 'ddh.bi-tinh-mol' // 01/11 đổi khoá: ảnh tĩnh cú ngọc cũ không làm khung giữ chỗ cho Mol
-let biTinh: Record<string, { src?: string; st?: string }> | null = null
+export const KHOA_BI_TINH = 'ddh.bi-tinh-mol2' // 01/11 đổi khoá: ảnh tĩnh cú ngọc cũ không làm khung giữ chỗ cho Mol; tối 01/11 Mol phối màu mới ⇒ đổi khoá lần nữa
+let biTinh: Record<string, { src?: string; st?: string; ngay?: string }> | null = null
 /** Ảnh tĩnh khớp đúng cỡ + cảm xúc + hướng (không khớp ⇒ không có, giữ khung trống như trước). */
 function anhBiTinh(size: number, cam: string, goc?: string): { src?: string; st?: string } | null {
   if (!biTinh) { try { biTinh = JSON.parse(localStorage.getItem(KHOA_BI_TINH) || '{}') || {} } catch { biTinh = {} } }
   const a = biTinh![`${size}px|${cam}|${goc ?? ''}`]
-  return a && typeof a.src === 'string' && /^data:image\/(?:svg\+xml|webp|png)/.test(a.src) ? a : null
+  if (!a || typeof a.src !== 'string' || !/^data:image\/(?:svg\+xml|webp|png)/.test(a.src)) return null
+  // Mol đổi bộ màu mỗi ngày (mau-mol-ngay.ts): ảnh tĩnh của bộ màu ngày khác ⇒ bỏ (không chớp màu hôm qua lúc mảnh Mol chưa về).
+  // Ảnh điểm có `ngay` (ngày VN lúc chụp) ⇒ so bộ màu của ngày ấy; ảnh SVG ⇒ đọc thẳng data-mol-mau trong ảnh.
+  const bo = boMauMol(gioMayChu())
+  return (a.ngay ? boMauMol(Date.parse(a.ngay)) === bo : a.src.includes(`data-mol-mau='${bo}'`)) ? a : null
 }
 
 export interface PropsBi {
@@ -68,9 +74,11 @@ export interface PropsBi {
   goc?: GocLua
   /** Cấp giận 0–5 (src/lib/lua-cam-xuc.ts). ≥ 2 ⇒ đổi dáng + mặt + màu (lớp vẽ giận nạp lười). Vắng = 0. */
   cap?: number
+  /** 'tron' = Mol trong KHUNG TRÒN (vòng Mục tiêu): khung vuông bo tròn, mặt Mol cắt sát lấp đầy khung (mol-dong.ts VIEWBOX_MOL_TRON). */
+  khung?: 'tron'
 }
 
-export function Bi({ cam = 'chao', size = 96, className, nhip, noi, goc, cap: cap0 }: PropsBi) {
+export function Bi({ cam = 'chao', size = 96, className, nhip, noi, goc, cap: cap0, khung }: PropsBi) {
   const cap = cap0 && cap0 >= 2 ? Math.min(5, Math.round(cap0)) : 0
   // khoá ảnh tĩnh + data-cam: cấp ≥ 2 là hình khác hẳn ⇒ khoá riêng (không lấy ảnh vui vẻ của lần trước làm khung giữ chỗ cho Lửa đang giận, và ngược lại)
   const camKhoa = cap >= 2 ? `gian${cap}` : cam
@@ -81,7 +89,7 @@ export function Bi({ cam = 'chao', size = 96, className, nhip, noi, goc, cap: ca
   useLayoutEffect(() => {
     const el = o.current
     if (co || !el || el.firstChild) return
-    const a = anhBiTinh(size, camKhoa, goc)
+    const a = khung ? null : anhBiTinh(size, camKhoa, goc) // khung tròn: không dùng ảnh tĩnh toàn thân làm chỗ giữ
     if (!a) return
     const img = document.createElement('img')
     img.className = 'lua-svg bi-tinh'
@@ -114,7 +122,7 @@ export function Bi({ cam = 'chao', size = 96, className, nhip, noi, goc, cap: ca
     if (noi) l?.noi(noi, 40)
     if (l) apCap(l, cap, () => lua.current === l)
   }, [cam, nhip, noi, cap])
-  return <span ref={o} className={`bi lua${className ? ` ${className}` : ''}`} data-cam={camKhoa} data-cap={cap || undefined} data-goc={goc} aria-hidden="true" style={{ '--lv-w': `${size}px` } as CSSProperties} />
+  return <span ref={o} className={`bi lua${className ? ` ${className}` : ''}`} data-cam={camKhoa} data-cap={cap || undefined} data-goc={goc} data-khung={khung} data-nho={size < 64 ? '' : undefined} aria-hidden="true" style={{ '--lv-w': `${size}px` } as CSSProperties} />
 }
 
 export default Bi

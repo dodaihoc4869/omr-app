@@ -1,0 +1,20 @@
+{
+  "ly_do": "01/11 tối thầy: «Giữ nguyên hình cầu đi, điều chỉnh lại cảm xúc cho dễ thương, thêm 6,022, phối màu lại cho đẹp mịn siêu dễ thương» ⇒ đổi bảng màu linh vật Mol (src/styles/mol.css): thân --tr-gv ⇒ chàm sáng --tr-hs-nut + gradient mịn, dung dịch cam ⇒ ngọc lam --tr-tin, má cam ⇒ hồng --tr-tim. Ngoại lệ ĐÓNG: đúng 15 khai báo cũ dưới đây được phép biến mất đúng một lần; màu mới chỉ pha token có sẵn.",
+  "cu": {
+    "src/styles/mol.css · --mol-x: var(--tr-gv)": 1,
+    "src/styles/mol.css · --mol-xd: color-mix(in oklab, var(--tr-gv) 78%, var(--btg-chu-doan))": 1,
+    "src/styles/mol.css · --mol-vien: color-mix(in oklab, var(--tr-gv) 42%, var(--btg-chu-doan))": 1,
+    "src/styles/mol.css · --mol-muc: var(--btg-chu-doan)": 1,
+    "src/styles/mol.css · --mol-cam: var(--cam)": 1,
+    "src/styles/mol.css · --mol-cams: color-mix(in srgb, var(--cam) 40%, var(--btg-chu-doan-dam))": 1,
+    "src/styles/mol.css · --mol-luoi: color-mix(in srgb, var(--cam) 62%, var(--tr-sai))": 1,
+    "src/styles/mol.css · --mol-ma: color-mix(in srgb, var(--cam) 42%, var(--btg-chu-doan-dam))": 1,
+    "src/styles/mol.css · --mol-nuoc: color-mix(in srgb, var(--tr-gv) 34%, var(--btg-chu-doan-dam))": 1,
+    "src/styles/mol.css · --mol-soi: color-mix(in srgb, var(--tr-sai) 62%, var(--cam))": 1,
+    "src/styles/mol.css · fill: var(--mol-xd)": 1,
+    "src/styles/mol.css · fill: var(--mol-ma)": 1,
+    "src/styles/mol.css · fill: var(--mol-nuoc)": 1,
+    "src/styles/mol.css · fill: var(--mol-soi)": 1,
+    "src/styles/mol.css · fill: var(--mol-do)": 1
+  }
+}

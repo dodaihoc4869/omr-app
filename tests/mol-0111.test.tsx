@@ -1,40 +1,49 @@
 // @vitest-environment jsdom
 // LINH VẬT «MOL» — MẶT BÌNH CẦU (thầy chốt 01/11: «Chọn Mol bình cầu, thêm cả cáu, rất cáu nữa nhé. Đặt tên linh vật là Mol thôi»; bản vẽ docs/ban-ve-mol-0111).
-// Khoá: đủ 11 mặt; cấp giận 2 dỗi · 3 bực · 4 CÁU · 5 RẤT CÁU (đầu đỏ dần, rất cáu có hơi nước + run); trạng thái cũ map đúng mặt; chạm ⇒ ngạc nhiên rồi về
+// Khoá: đủ 11 mặt (+ 4 mặt phương án); cấp giận 2 dỗi · 3 bực · 4 CÁU · 5 RẤT CÁU; trạng thái cũ map đúng mặt; chạm ⇒ ngạc nhiên rồi về
 // (đang giận thì không); tĩnh ⇒ không chuyển động; huỷ ⇒ gỡ sạch; ≤ 130 nút SVG (luật tốc độ 28/10); không màu thô; tên «Mol» trên màn.
+// 01/11 tối (thầy «giữ hình cầu, cảm xúc dễ thương, thêm 6,022, phối màu mịn»): giận ĐỔI SẮC + nút bấc bung trên lửa, KHÔNG răng; khắc 6,022·10²³ ẩn < 64 px.
 import { readFileSync } from 'node:fs'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { MAT_THEO_CAP, MAT_THEO_TRANG_THAI, MOL_DANG_SONG, VIEWBOX_MOL, svgMol, taoLua, type MatMol } from '../src/components/linh-vat/mol-dong'
 import { TRANG_THAI_LUA } from '../src/components/linh-vat/lua-dong'
 
 const MAT: MatMol[] = ['vui', 'khen', 'chao', 'nghi', 'ngac', 'buon', 'ngu', 'doi', 'buc', 'cau', 'ratCau']
+const MAT_MOI: MatMol[] = ['nguong', 'me', 'nhay', 'tuTin'] // phương án, chưa gắn trạng thái
 const moi = (o: Parameters<typeof taoLua>[1] = {}) => { const s = document.createElement('span'); s.className = 'bi lua'; document.body.appendChild(s); return { s, l: taoLua(s, o) } }
 afterEach(() => { vi.useRealTimers(); document.body.innerHTML = '' })
 
 describe('Mol — hình', () => {
-  it('11 mặt dựng được, khung 200 : 230, mỗi mặt ≤ 130 nút SVG; mặt khác nhau thì hình khác nhau', () => {
+  it('11 mặt + 4 mặt phương án dựng được, khung 200 : 230, mỗi mặt ≤ 130 nút SVG; mặt khác nhau thì hình khác nhau', () => {
     expect(VIEWBOX_MOL).toBe('0 -26 200 230')
     const ve = new Set<string>()
-    for (const m of MAT) {
+    for (const m of [...MAT, ...MAT_MOI]) {
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
       svg.innerHTML = svgMol(m)
       expect(svg.querySelectorAll('*').length + 1, m).toBeLessThanOrEqual(130)
       ve.add(svgMol(m).replace(/molb?\d+/g, 'id'))
     }
-    expect(ve.size).toBe(MAT.length)
+    expect(ve.size).toBe(MAT.length + MAT_MOI.length)
   })
   it('mọi trạng thái cũ của Lửa có mặt Mol; cấp giận 2–5 ⇒ dỗi · bực · cáu · rất cáu', () => {
     for (const t of TRANG_THAI_LUA) expect(MAT, t).toContain(MAT_THEO_TRANG_THAI[t])
     expect(MAT_THEO_CAP).toEqual({ 2: 'doi', 3: 'buc', 4: 'cau', 5: 'ratCau' })
   })
-  it('giận = dung dịch sôi: cáu ⇒ đỏ cam dâng tới miệng; rất cáu ⇒ đỏ dâng sát mắt + hơi nước; mặt thường dung dịch cam ở cằm', () => {
+  it('giận = ĐỔI SẮC + dung dịch đỏ dâng + nút bấc bung trên lửa, KHÔNG răng; dỗi / bực chỉ ửng má; mọi mặt có khắc 6,022·10²³', () => {
     const cau = svgMol('cau'), rat = svgMol('ratCau'), vui = svgMol('vui')
-    const dang = (x: string) => Number(/translate\(0 (-?\d+)\)/.exec(x)![1])
-    expect(dang(vui)).toBe(0); expect(dang(cau)).toBeLessThan(0); expect(dang(rat)).toBeLessThan(dang(cau))
-    expect(vui).toMatch(/class="m-cam mol-nuoc-cam"/); expect(cau).toMatch(/class="m-soi mol-nuoc-cam"/); expect(rat).toMatch(/class="m-soi2 mol-nuoc-cam"/)
-    expect(cau).toContain('m-net-do'); expect(cau).not.toContain('mol-hoi')
-    expect(rat).toContain('m-net-do'); expect(rat).toContain('mol-hoi')
-    expect(vui).not.toContain('mol-hoi'); expect(vui).not.toContain('m-net-do')
+    const muc = (x: string) => Number(/<path d="M20 (\d+) C/.exec(x)![1]) // mặt dung dịch
+    expect(muc(vui)).toBe(166); expect(muc(cau)).toBeLessThan(muc(vui)); expect(muc(rat)).toBeLessThan(muc(cau))
+    expect(vui).toMatch(/class="s-nuoc"/); expect(cau).toMatch(/class="s-soi"/); expect(rat).toMatch(/class="s-do"/)
+    expect(vui).toContain('class="mol-g0"'); expect(svgMol('doi')).toContain('class="mol-g2"'); expect(svgMol('buc')).toContain('class="mol-g3"')
+    expect(cau).toContain('class="mol-g4"'); expect(rat).toContain('class="mol-g5"')
+    for (const x of [cau, rat]) { expect(x).toContain('mol-lua'); expect(x).toMatch(/<g transform="translate\([^"]+\) rotate\([^"]+\)"><g class="mol-nut">/) }
+    expect(vui).not.toContain('mol-lua'); expect(vui).toMatch(/<g><g class="mol-nut">/)
+    for (const m of [...MAT, ...MAT_MOI]) {
+      const x = svgMol(m)
+      expect(x, m).not.toMatch(/m-net-t|M\d+ \d+ L\d+ \d+ L\d+ \d+ L\d+ \d+ L\d+ \d+/) // không răng, không zigzag
+      expect(x, m).toContain('6,022·10<tspan'); expect(x, m).toContain('class="mol-khac"')
+      expect(x, m).toMatch(/id="molb\d+k" d="M56 172 A66 66 0 0 0 144 172"/) // ở phần dung dịch dưới bụng, cong theo đáy cầu
+    }
   })
 })
 
@@ -81,16 +90,49 @@ describe('Mol — màu, nạp lười, tên', () => {
     const ts = readFileSync('src/components/linh-vat/mol-dong.ts', 'utf8').replace(/^\s*\/\/.*$/gm, '')
     const css = readFileSync('src/styles/mol.css', 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
     for (const x of [ts, css]) { expect(x).not.toMatch(/#[0-9a-fA-F]{3,8}\b/); expect(x).not.toMatch(/\b(?:rgba?|hsla?)\(/) }
-    for (const k of ['--tr-gv', '--cam', '--tr-sai', '--btg-chu-doan']) expect(css).toContain(`var(${k})`)
+    for (const k of ['--tr-hs-nut', '--tr-tin', '--tr-chu-y', '--tr-tim', '--tr-sai', '--btg-chu-doan']) expect(css).toContain(`var(${k})`)
+    expect(css).toContain('.bi[data-nho] .mol-svg .mol-khac { display: none; }') // chữ 6,022·10²³ ẩn khi Bi < 64 px
+    expect(readFileSync('src/components/linh-vat/Bi.tsx', 'utf8')).toContain("data-nho={size < 64 ? '' : undefined}")
     expect(css).toMatch(/prefers-reduced-motion: reduce\) \{ \.mol-svg \* \{ animation: none !important; \} \}/)
     expect(css).toMatch(/html\.may-yeu \.mol-svg \* \{ animation: none !important; \}/)
   })
   it('Bi.tsx nạp Mol bằng import() (mảnh lười, kho chạy-lúc); tên «Mol» ở lời nói + nút', () => {
     expect(readFileSync('src/components/linh-vat/Bi.tsx', 'utf8')).toMatch(/import\('\.\/mol-dong'\)/)
     expect(readFileSync('vite.config.ts', 'utf8')).toMatch(/'\*\*\/mol-dong-\*\.\{js,css\}'/)
-    const loi = readFileSync('src/lib/lua-cam-xuc.ts', 'utf8')
-    for (const c of ['Mol vui lắm', 'Mol cáu lắm rồi!', 'Mol giận rồi!', 'Mol bực rồi đấy!']) expect(loi).toContain(c)
+    const loi = readFileSync('src/lib/lua-cam-xuc.ts', 'utf8') + readFileSync('src/lib/loi-mol.ts', 'utf8') // kho câu ở loi-mol.ts (01/11 tối)
+    for (const c of ['Mol vui lắm', 'Bực thật đấy! Lại đối phó.', 'Cáu rồi nhé! Đối phó mãi thế?', 'Mất công học thì học thật đi!']) expect(loi).toContain(c) // kho câu thầy 01/11 tối
     expect(loi).not.toMatch(/`(?:Em làm thật, )?Lửa (?:vui|cáu|giận|bực)/)
     for (const t of ['src/components/kiem-tra-duo/BiNop.tsx', 'src/components/hoc-tap/ManKiemTraCaNhan.tsx']) expect(readFileSync(t, 'utf8')).toContain('Cùng Mol ôn lại nhé!')
+  })
+})
+
+describe('Mol trong KHUNG TRÒN (vòng Mục tiêu — thầy 01/11 tối «phóng to mặt Mol đầy với khung tròn»)', () => {
+  it('khung nhìn vuông cắt sát CỤM MẶT (thầy «bỏ luôn cổ đi»): mắt chiếm phần lớn bề ngang, miệng sát mép dưới, vòng tròn nằm trọn trong cầu', async () => {
+    const { VIEWBOX_MOL_TRON } = await import('../src/components/linh-vat/mol-dong')
+    const [x, y, w, h] = VIEWBOX_MOL_TRON.split(' ').map(Number) as [number, number, number, number]
+    expect(w).toBe(h)
+    expect(Math.abs(x + w / 2 - 100)).toBeLessThanOrEqual(1) // giữa ngang
+    expect((153 - 47) / w).toBeGreaterThanOrEqual(0.85) // hai mắt (viền ngoài 47…153) chiếm ≥ 85 % bề ngang
+    expect(x).toBeLessThanOrEqual(47); expect(x + w).toBeGreaterThanOrEqual(153) // không cắt mất mắt
+    expect(y).toBeGreaterThan(44) // trên đỉnh cầu (y 44) ⇒ không thấy cổ bình / nút bấc / lửa
+    expect(y + h).toBeGreaterThanOrEqual(150); expect(y + h).toBeLessThanOrEqual(172) // miệng (≤ 152) sát mép dưới, chưa tới chữ 6,022 / đáy
+    expect(Math.hypot(x + w / 2 - 100, y + h / 2 - 120) + w / 2).toBeLessThanOrEqual(76) // vòng tròn nội tiếp nằm trọn trong cầu ⇒ nền màu thân tràn khung
+  })
+  it('chỗ gắn có data-khung="tron" ⇒ Mol dùng khung cắt sát mặt; chỗ khác vẫn toàn thân', async () => {
+    const { VIEWBOX_MOL_TRON } = await import('../src/components/linh-vat/mol-dong')
+    const a = document.createElement('span'); a.dataset.khung = 'tron'; document.body.appendChild(a)
+    const b = document.createElement('span'); document.body.appendChild(b)
+    const la = taoLua(a, { trangThai: 'vui' }), lb = taoLua(b, { trangThai: 'vui' })
+    expect(la.svg.getAttribute('viewBox')).toBe(VIEWBOX_MOL_TRON)
+    expect(lb.svg.getAttribute('viewBox')).toBe(VIEWBOX_MOL)
+    la.huy(); lb.huy()
+  })
+  it('vòng Mục tiêu dùng khung tròn; CSS bo tròn + cắt; ảnh tĩnh toàn thân không dùng cho khung tròn', () => {
+    expect(readFileSync('src/components/thuong/ThanhThuong.tsx', 'utf8')).toMatch(/<Bi cam=\{dat \? 'mung' : 'chao'\} size=\{menu \? 18 : 34\} nhip="yen" cap=\{capLua\} khung="tron" \/>/)
+    const bi = readFileSync('src/components/linh-vat/Bi.tsx', 'utf8')
+    expect(bi).toContain('data-khung={khung}'); expect(bi).toContain('const a = khung ? null : anhBiTinh(size, camKhoa, goc)')
+    expect(readFileSync('src/styles/mol.css', 'utf8')).toContain(".bi.lua[data-khung='tron'] { aspect-ratio: 1; border-radius: 50%; overflow: hidden;")
+    const k = readFileSync('src/lib/khung-tinh-hs.ts', 'utf8')
+    expect(k).toContain('.bi.lua:not([data-khung]) > svg.lua-svg'); expect(k).toContain("!span.hasAttribute('data-khung')")
   })
 })

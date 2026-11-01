@@ -1102,8 +1102,31 @@
 [data-trong='hs'] .bi-loi-bong[data-cap], [data-trong='hs'] .bi-loi-bong[data-cap]::before { border-color: var(--tr-sai); }
 /* Điện thoại ngang thấp (cao < 600 px): bong bóng NÓI CẠNH Lửa (đầu trang đã cuộn khuất) — đặt trên đầu Lửa, đuôi chỉ xuống Lửa */
 [data-trong] .da-lv-loi-o { position: absolute; left: 50%; top: 50%; z-index: 2; width: 0; height: 0; transform: translateX(var(--lv)); }
-[data-trong='hs'] .da-lv-loi-o > .bi-loi-boc { position: absolute; left: -60px; bottom: 54px; width: var(--rong, 200px); }
-[data-trong='hs'] .da-lv-loi-o[data-cap] > .bi-loi-boc { bottom: 70px; }
+[data-trong='hs'] .da-lv-loi-o > .bi-loi-boc { position: absolute; left: var(--trai, -60px); bottom: calc(54px + var(--nang, 0px)); width: var(--rong, 200px); }
+[data-trong='hs'] .da-lv-loi-o[data-cap] > .bi-loi-boc { bottom: calc(70px + var(--nang, 0px)); }
+/* Bong bóng trên đầu Mol KHÔNG BAO GIỜ chặn chạm vào nút chặng; chạm Mol (chỉ Mol, không giám thị) ⇒ hiện lại lời gần nhất (TrongHs.tsx LoiBi). */
+[data-trong='hs'] .da-lv-loi-o, [data-trong='hs'] .da-lv-loi-o * { pointer-events: none; }
+[data-trong='hs'] .da-linh-vat[data-lv='bi'] > .bi { pointer-events: auto; cursor: pointer; }
 [data-trong='hs'] .da-lv-loi-o > .bi-loi-boc > .bi-loi { margin: 0; overflow: visible; }
 [data-trong='hs'] .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong { margin: 0 0 9px; padding: 10px 12px; font-size: 15px; box-shadow: 0 2px 0 var(--tr-vien); }
-[data-trong='hs'] .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong::before { display: block; left: 53px; bottom: -9px; transform: rotate(-45deg); }
+[data-trong='hs'] .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong::before { display: block; left: var(--duoi, 53px); bottom: -9px; transform: rotate(-45deg); }
+/* BONG BÓNG TRÊN ĐẦU MOL ĐỔI MÀU THEO CẢM XÚC (thầy 01/11 tối; bản vẽ docs/ban-ve-mol-v2-0111 «bong-bong-mau»): nền + viền + chữ theo data-cx, chuyển mượt
+   ≤ 300 ms (C13); chỉ token có sẵn. Rất cáu: viền đập rất nhẹ (thầy yêu cầu) — giảm chuyển động / máy yếu ⇒ đứng yên. Chân ngôn: chữ nghiêng. */
+[data-trong='hs'] .bi-loi-bong[data-cx='vui'] { --bb-nen: var(--tr-hs-nhat); --bb-vien: var(--tr-hs); --bb-chu: var(--tr-hs-chu); }
+[data-trong='hs'] .bi-loi-bong[data-cx='khen'] { --bb-nen: var(--tr-tin-nhat); --bb-vien: var(--tr-tin); --bb-chu: var(--tr-tin-chu); }
+[data-trong='hs'] .bi-loi-bong[data-cx='chao'] { --bb-nen: var(--tr-hs-day); --bb-vien: var(--tr-hs-chu); --bb-chu: var(--tr-hs-tren); }
+[data-trong='hs'] .bi-loi-bong:is([data-cx='nghi'], [data-cx='ngu']) { --bb-nen: var(--tr-mat-2); --bb-vien: var(--tr-vien-2); --bb-chu: var(--tr-chu-2); }
+[data-trong='hs'] .bi-loi-bong[data-cx='buon'] { --bb-nen: var(--tr-gv-nhat); --bb-vien: var(--tr-gv); --bb-chu: var(--tr-gv-chu); }
+[data-trong='hs'] .bi-loi-bong[data-cx='doi'] { --bb-nen: color-mix(in srgb, var(--tr-tim) 15%, var(--tr-mat)); --bb-vien: var(--tr-tim); --bb-chu: var(--tr-tim-chu); }
+[data-trong='hs'] .bi-loi-bong[data-cx='buc'] { --bb-nen: var(--tr-chu-y-nhat); --bb-vien: var(--tr-chu-y); --bb-chu: var(--tr-chu-y-chu); }
+[data-trong='hs'] .bi-loi-bong[data-cx='cau'] { --bb-nen: var(--tr-sai-nhat); --bb-vien: color-mix(in oklab, var(--tr-sai) 60%, var(--tr-chu-y)); --bb-chu: var(--tr-sai-chu); }
+[data-trong='hs'] .bi-loi-bong[data-cx='ratCau'] { --bb-nen: var(--tr-sai-chu); --bb-vien: var(--tr-sai-day); --bb-chu: var(--tr-trang); }
+[data-trong='hs'] .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong[data-cx], [data-trong='hs'] .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong[data-cx]::before {
+  background: var(--bb-nen, var(--tr-mat)); border-color: var(--bb-vien, var(--tr-vien-2)); transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease;
+}
+[data-trong='hs'] .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong[data-cx] { color: var(--bb-chu, var(--tr-chu)); }
+[data-trong='hs'] .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong[data-cx='ratCau'] { animation: bb-dap 1.4s ease-in-out infinite; }
+[data-trong='hs'] .bi-loi-bong[data-chan-ngon] { font-style: italic; font-weight: 600; }
+@keyframes bb-dap { 50% { box-shadow: 0 2px 0 var(--tr-vien), 0 0 0 4px color-mix(in srgb, var(--tr-sai) 30%, transparent); } }
+@media (prefers-reduced-motion: reduce) { [data-trong='hs'] .bi-loi-bong[data-cx] { animation: none !important; transition: none; } }
+html.may-yeu[data-trong='hs'] .bi-loi-bong[data-cx] { animation: none !important; }

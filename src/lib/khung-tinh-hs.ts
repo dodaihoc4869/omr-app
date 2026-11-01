@@ -66,7 +66,9 @@ export function catNgoaiMan(a: Element[], b: Element[], ban: Element, rong: numb
 const KIEU_SVG: [string, string][] = [['fill', 'rgb(0, 0, 0)'], ['fill-opacity', '1'], ['fill-rule', 'nonzero'], ['stroke', 'none'], ['stroke-width', '1px'], ['stroke-opacity', '1'],
   ['stroke-linecap', 'butt'], ['stroke-linejoin', 'miter'], ['stroke-dasharray', 'none'], ['stroke-dashoffset', '0px'], ['opacity', '1'], ['transform', 'none'],
   ['transform-origin', ''], ['transform-box', 'view-box'], ['display', 'inline'], ['visibility', 'visible'], ['clip-path', 'none'], ['mask', 'none'], ['filter', 'none'],
-  ['font-family', ''], ['font-size', ''], ['font-weight', ''], ['text-anchor', 'start'], ['dominant-baseline', 'auto'], ['paint-order', 'normal']]
+  ['font-family', ''], ['font-size', ''], ['font-weight', ''], ['text-anchor', 'start'], ['dominant-baseline', 'auto'], ['paint-order', 'normal'],
+  // 01/11 tối: Mol mịn dùng gradient (màu stop qua lớp CSS) ⇒ ghi cả màu stop, không thì ảnh tĩnh / biểu tượng tab ra đen
+  ['stop-color', 'rgb(0, 0, 0)'], ['stop-opacity', '1']]
 /** Kiểu của chính thẻ <svg> chuyển sang <img> thay nó (cỡ, dịch / phóng, mờ). */
 const KIEU_GOC = ['display', 'width', 'height', 'transform', 'transform-origin', 'opacity', 'position', 'left', 'top', 'right', 'bottom', 'margin']
 
@@ -126,7 +128,7 @@ export async function raAnhBi(): Promise<void> {
     if (!root) return
     const kho = docBi(), hom = ngayVn()
     let doi = false
-    for (const svg of Array.from(root.querySelectorAll<SVGSVGElement>('.bi.lua > svg.lua-svg'))) {
+    for (const svg of Array.from(root.querySelectorAll<SVGSVGElement>('.bi.lua:not([data-khung]) > svg.lua-svg'))) { // khung tròn (cắt sát mặt) không vào kho ảnh toàn thân
       const k = khoaBi(svg.parentElement!)
       if (laAnhDiem(kho[k]) && kho[k]!.ngay === hom) continue
       const cs = getComputedStyle(svg), w = parseFloat(cs.width), h = parseFloat(cs.height)
@@ -158,7 +160,7 @@ function linhVatTinh(a: Element[], b: Element[], ban: Element, raBi: Record<stri
     if (!ban.contains(b[i]!)) continue
     if (e.classList.contains('gt-o')) { b[i]!.remove(); continue }
     if (e.tagName.toLowerCase() === 'svg' && e.classList.contains('lua-svg')) {
-      const span = e.closest('.bi.lua'), k = span ? khoaBi(span) : ''
+      const span = e.closest('.bi.lua'), k = span && !span.hasAttribute('data-khung') ? khoaBi(span) : '' // khung tròn ⇒ ảnh SVG của chính nó
       const co = k ? kho[k] : undefined
       const anh = laAnhDiem(co) ? co : anhSvg(e as SVGSVGElement)
       if (!anh) { b[i]!.remove(); continue }
