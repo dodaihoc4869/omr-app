@@ -394,6 +394,7 @@ export function PhanHoiDungSai({ q, tra, dapAn, lyDo }: { q: Question; tra: stri
               <b className="ht2-lam-chu-cai" aria-hidden="true">{y.chu}</b>
               <div className="ht2-lam-y-chu"><NoiDung chu={q.ideas[i] ?? ''} anh={q.ideaImgs?.[i]} alt={`Ý ${y.chu}`} /></div>
             </div>
+            <HinhTaiViTri hinhAnh={hinh(q)} viTri={`sau_y_${y.chu}`} nhan={`ý ${y.chu}`} />
             <p className="ht2-lam-y-ket">
               {ket === 'sai' ? <DauSai /> : <DauDung />}
               {y.chon ? `Em chọn ${chuDS(y.chon)} · đáp án ${chuDS(y.dapAn)}` : `Đáp án ${chuDS(y.dapAn)}`}
