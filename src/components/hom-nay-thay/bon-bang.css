@@ -104,6 +104,14 @@
 html.may-yeu[data-trong='gv'] .bb-the[data-bang='dp']::after, html.may-yeu[data-trong='gv'] .bb-the[data-bang='dp'] .bb-o::after, html.may-yeu[data-trong='gv'] .bb-canh i { animation: none; }
 html.may-yeu[data-trong='gv'] .bb-the[data-bang='dp']::after { opacity: 0.6; }
 
+/* ĐANG THEO DÕI (v2, 01/11): thẻ trung tính dưới 4 bảng, mặc định thu. */
+[data-trong='gv'] .bb-td { --bb-c: var(--tr-chu-3); --bb-nhat: var(--tr-mat-2); --bb-chu: var(--tr-chu-2); }
+[data-trong='gv'] .bb-td .bb-dau { align-items: center; padding-bottom: 14px; }
+[data-trong='gv'] .bb-td-ds { list-style: none; margin: 0; padding: 0 20px 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 6px 20px; }
+[data-trong='gv'] .bb-td-ds li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; padding: 8px 0; border-top: 1px solid var(--tr-vien); font-size: 14px; }
+[data-trong='gv'] .bb-td-ds small { color: var(--tr-chu-3); font-size: 12px; }
+[data-trong='gv'] .bb-td-ds span { flex-basis: 100%; color: var(--tr-chu-2); font-size: 13px; }
+
 /* ô chọn bảng — chỉ điện thoại */
 [data-trong='gv'] .bb-chon { display: none; }
 @media (max-width: 1100px) {

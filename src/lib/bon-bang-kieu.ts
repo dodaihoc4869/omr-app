@@ -47,6 +47,8 @@ export interface TraLoiBonBang {
   bang: Record<MaBang, DongBang[]>
   /** Trung vị cả lớp (mọi em đủ dữ liệu) từng điểm — vạch xám ở trang bằng chứng. */
   trungVi: DiemBon
+  /** v2 (01/11): em có dấu hiệu nhưng CHƯA đủ chắc để xếp bảng nào (`bc` = lý do). Không có ⇒ máy chủ cũ. */
+  theoDoi?: DongBang[]
 }
 
 /** Một ví dụ cụ thể có ngày giờ (bằng chứng «tâm phục khẩu phục»). */

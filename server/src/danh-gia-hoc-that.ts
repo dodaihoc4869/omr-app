@@ -90,6 +90,8 @@ export interface LuotDanhGia {
   giay?: number | null
   giayDoc?: number | null
   qid?: string
+  /** CHỈ THÊM 01/11 (đánh giá v2): giây em ẩn app / rời tab trong lượt này (`raw_json.doc.a`); null = không đo. Rời rồi quay lại chọn đúng câu khó ⇒ nghi tra ngoài. */
+  an?: number | null
 }
 
 export interface DauVaoDanhGia {
