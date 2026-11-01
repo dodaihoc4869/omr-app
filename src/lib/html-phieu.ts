@@ -135,6 +135,8 @@ export function chuHtml(s: unknown): string {
       return k.t === 'sodo' ? `<span class="so-do" style="display:block;margin:.25em 0">${noi}</span>` : noi
     })
     .join('')
+    // In đậm (thầy 01/11: «Chữ Không in đậm bỏ dấu sao hai đầu») — cùng luật với ChemText trên màn hình.
+    .replace(/\*\*([^*\n]+?)\*\*/g, '<b>$1</b>')
 }
 
 /** Như `doanHtml` nhưng bọc LIỀN công thức và "mũi tên + chất sau" (`ct-lien`,
