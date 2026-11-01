@@ -53,6 +53,57 @@
 [data-trong='gv'] .bb-loi { padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
 [data-trong='gv'] .bb-loi p { margin: 0; color: var(--tr-chu); }
 
+/* HỌC THẬT = BẢNG VINH DANH (thầy 01/11: «nổi bật hơn hẳn, đẹp hơn, wow hơn, kiểu tôn vinh tinh tế nhẹ nhàng»). Chỉ pha từ token có sẵn:
+ * vàng --tr-sao (sao-nhat / sao-chu), bạc --tr-chu-3, đồng --cam. Không hoạt ảnh (máy yếu, đọc nhanh trên lớp). */
+[data-trong='gv'] .bb-the[data-bang='ht'] {
+  border-color: color-mix(in srgb, var(--tr-sao) 45%, var(--tr-vien));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--tr-sao-nhat) 85%, var(--tr-mat)) 0, var(--tr-mat) 150px);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--tr-sao) 18%, transparent), 0 12px 32px -14px color-mix(in srgb, var(--tr-sao) 45%, transparent);
+}
+[data-trong='gv'] .bb-the[data-bang='ht'] .bb-dau { padding-top: 20px; }
+[data-trong='gv'] .bb-the[data-bang='ht'] .bb-o { width: 48px; height: 48px; border-radius: 50%; background: var(--tr-mat); color: var(--tr-sao-chu); box-shadow: 0 0 0 2px var(--tr-sao), 0 6px 16px -6px color-mix(in srgb, var(--tr-sao) 70%, transparent); }
+[data-trong='gv'] .bb-dau .bb-vinh { margin: 0 0 2px; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--tr-sao-chu); }
+[data-trong='gv'] .bb-the[data-bang='ht'] .bb-dau h2 { font-size: 19px; }
+[data-trong='gv'] .bb-the[data-bang='ht'] .bb-diem b { color: var(--tr-sao-chu); }
+/* ba em đầu: huy hiệu vàng · bạc · đồng, vòng sáng quanh ảnh đại diện; em số 1 có dải sáng nhẹ */
+[data-trong='gv'] .bb-the[data-bang='ht'] .bb-ds li:nth-child(-n + 3) .bb-hang { color: var(--tr-mat); font-weight: 700; }
+[data-trong='gv'] .bb-the[data-bang='ht'] .bb-ds li:nth-child(1) .bb-hang { background: var(--tr-sao); box-shadow: 0 2px 6px -1px color-mix(in srgb, var(--tr-sao) 70%, transparent); }
+[data-trong='gv'] .bb-the[data-bang='ht'] .bb-ds li:nth-child(2) .bb-hang { background: color-mix(in srgb, var(--tr-chu-3) 75%, var(--tr-mat)); }
+[data-trong='gv'] .bb-the[data-bang='ht'] .bb-ds li:nth-child(3) .bb-hang { background: color-mix(in srgb, var(--cam) 70%, var(--tr-sai)); }
+[data-trong='gv'] .bb-the[data-bang='ht'] .bb-ds li:nth-child(-n + 3) .bb-av { box-shadow: 0 0 0 2px var(--tr-mat), 0 0 0 4px color-mix(in srgb, var(--tr-sao) 55%, transparent); }
+[data-trong='gv'] .bb-the[data-bang='ht'] .bb-ds li:nth-child(1) .bb-dong { background: linear-gradient(90deg, color-mix(in srgb, var(--tr-sao-nhat) 90%, transparent), transparent 70%); }
+[data-trong='gv'] .bb-the[data-bang='ht'] .bb-ds li:nth-child(1) .bb-dong:hover { background: var(--tr-sao-nhat); }
+[data-trong='gv'] .bb-the[data-bang='ht'] .bb-chip { background: var(--tr-sao); color: var(--tr-mat); }
+
+/* HỌC ĐỐI PHÓ = BÁO ĐỘNG NHẸ (thầy 01/11: «kiểu báo động nhẹ nhàng nhấp nháy tinh tế đẹp nhưng đủ để thấy»). Giữ màu bảng (chàm --tr-tin);
+ * nhấp nháy CHỈ bằng opacity / transform của lớp giả nhỏ (không vẽ lại cả thẻ); giảm chuyển động / máy yếu ⇒ đứng yên. */
+[data-trong='gv'] .bb-the[data-bang='dp'] {
+  position: relative;
+  border-color: color-mix(in srgb, var(--tr-tin) 40%, var(--tr-vien));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--tr-tin-nhat) 70%, var(--tr-mat)) 0, var(--tr-mat) 130px);
+}
+[data-trong='gv'] .bb-the[data-bang='dp']::after {
+  content: ''; position: absolute; inset: -1px; border-radius: inherit; pointer-events: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--tr-tin) 30%, transparent), 0 0 28px 2px color-mix(in srgb, var(--tr-tin) 28%, transparent);
+  opacity: 0; animation: bb-bao 2.6s ease-in-out infinite;
+}
+[data-trong='gv'] .bb-the[data-bang='dp'] .bb-dau { padding-top: 20px; }
+[data-trong='gv'] .bb-the[data-bang='dp'] .bb-o { position: relative; width: 48px; height: 48px; border-radius: 50%; background: var(--tr-mat); color: var(--tr-tin-chu); box-shadow: 0 0 0 2px var(--tr-tin); }
+[data-trong='gv'] .bb-the[data-bang='dp'] .bb-o::after { content: ''; position: absolute; inset: -2px; border-radius: 50%; border: 2px solid var(--tr-tin); opacity: 0; animation: bb-song 2.6s ease-out infinite; }
+[data-trong='gv'] .bb-the[data-bang='dp'] .bb-dau h2 { font-size: 19px; }
+[data-trong='gv'] .bb-dau .bb-canh { display: flex; align-items: center; gap: 6px; color: var(--tr-sai-chu); }
+[data-trong='gv'] .bb-canh i { width: 8px; height: 8px; border-radius: 50%; background: var(--tr-sai); animation: bb-nhay 1.4s ease-in-out infinite; }
+[data-trong='gv'] .bb-the[data-bang='dp'] .bb-diem b { color: var(--tr-tin-chu); }
+@keyframes bb-bao { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+@keyframes bb-song { 0% { transform: scale(1); opacity: 0.75; } 70%, 100% { transform: scale(1.55); opacity: 0; } }
+@keyframes bb-nhay { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+@media (prefers-reduced-motion: reduce) {
+  [data-trong='gv'] .bb-the[data-bang='dp']::after, [data-trong='gv'] .bb-the[data-bang='dp'] .bb-o::after, [data-trong='gv'] .bb-canh i { animation: none; }
+  [data-trong='gv'] .bb-the[data-bang='dp']::after { opacity: 0.6; }
+}
+html.may-yeu[data-trong='gv'] .bb-the[data-bang='dp']::after, html.may-yeu[data-trong='gv'] .bb-the[data-bang='dp'] .bb-o::after, html.may-yeu[data-trong='gv'] .bb-canh i { animation: none; }
+html.may-yeu[data-trong='gv'] .bb-the[data-bang='dp']::after { opacity: 0.6; }
+
 /* ô chọn bảng — chỉ điện thoại */
 [data-trong='gv'] .bb-chon { display: none; }
 @media (max-width: 1100px) {
@@ -91,11 +142,12 @@
 [data-trong='gv'] .bbc-ket-nhan { margin: 0 0 6px; font-size: 13px; font-weight: 600; color: var(--bb-chu); }
 [data-trong='gv'] .bbc-ket-chu { margin: 0; color: var(--tr-chu); }
 [data-trong='gv'] .bbc-ket-chu b { color: var(--bb-chu); }
-/* Kết luận rõ ràng (thầy 01/11): dòng nhận định đậm; mỗi lý do một ô riêng, con số có đơn vị TO bên trái, vạch màu bảng. */
+/* Kết luận (thầy 01/11): dòng nhận định đậm; mỗi lý do MỘT DÒNG CHỮ THƯỜNG (thầy: «không muốn nó thành khung … viết chữ bình thường dãn cách dòng
+ * tinh tế, tô đậm màu cho đẹp hơn nữa») — không ô, không viền; dãn dòng thoáng; con số đậm màu bảng, nhỉnh hơn chữ một chút. */
 [data-trong='gv'] .bbc-ket-chu { font-size: 17px; font-weight: 600; }
-[data-trong='gv'] .bbc-ket-ds { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-[data-trong='gv'] .bbc-ket-ds li { padding: 10px 14px; border-radius: 12px; border-left: 4px solid var(--bb-c); background: var(--tr-mat); color: var(--tr-chu); font-size: 15px; line-height: 1.5; }
-[data-trong='gv'] .bbc-ket-ds li b { display: inline-block; margin-right: 6px; font-size: 22px; line-height: 1.2; font-weight: 700; color: var(--bb-chu); font-variant-numeric: tabular-nums; }
+[data-trong='gv'] .bbc-ket-ds { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+[data-trong='gv'] .bbc-ket-ds li { color: var(--tr-chu); font-size: 16px; line-height: 1.65; }
+[data-trong='gv'] .bbc-ket-ds li b { font-size: 1.12em; font-weight: 700; color: var(--bb-chu); font-variant-numeric: tabular-nums; }
 [data-trong='gv'] .bbc-the-dau { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 18px 20px 6px; }
 [data-trong='gv'] .bbc-the-dau h3 { margin: 0; font-size: 16px; font-weight: 600; }
 [data-trong='gv'] .bbc-the-dau span { font-size: 13px; color: var(--tr-chu-3); }
