@@ -35,5 +35,7 @@ for (const r of (JSON.parse(readFileSync(process.argv[3] ?? process.argv[2]!, 'u
   if (!co.length) continue
   nghi++
   console.log(`NGHI ${r.qid} · ${co.join(' + ')} · đáp án ${String(r.correct ?? '').slice(0, 12)}`)
+  // Mẩu ngắn quanh dấu hiệu — CHỈ tờ luyện tập (không in tờ kiểm tra `-KT-` / VIP), để soát tay luật.
+  if (!/-KT-|^VIP/.test(String(r.qid))) for (const [, re] of DAU_HIEU) { const m = re.exec(text); if (m) { const i = Math.max(0, m.index - 70); console.log(`   … ${text.slice(i, m.index + 90).replace(/\s+/g, ' ')} …`) } }
 }
 console.log(`== nghi ngờ còn lại: ${nghi} câu`)
