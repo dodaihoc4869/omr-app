@@ -4023,7 +4023,7 @@ const boXuLy = {
         }
         // Gói 7 bật: gói mới tạo ⇒ xếp lại phần luyện hôm nay + báo máy các em (goi-bai-7.ts `xepLaiHomNayChoGoiMoi`). Gói 7 tắt (đường chiến dịch — kế hoạch hôm nay tự
         // dựng lại theo chiến dịch mới) ⇒ chỉ báo máy các em tải lại gói cả ngày (thầy 01/11).
-        if(kq.ok===true && String(b.action??'')==='tick'){const goi7=import('./goi-bai-7').then(async m=>{await m.dongBoGoi7(env,Date.now(),10,String(b.lop??''))
+        if(kq.ok===true && String(b.action??'')==='tick'){const goi7=import('./goi-bai-7').then(async m=>{await m.dongBoGoi7(env,Date.now(),10,String(b.lop??''),true) // batBuoc (01/11): thầy giao nhiều bài liền nhau ⇒ bài sau không chờ đệm 20 giây / cron
           if(kq.daCo!==true&&kq.chienDichId&&!(await m.coGoi7(env)).bat){const r=await env.DB.prepare('SELECT sbd_json FROM chien_dich WHERE id=?').bind(String(kq.chienDichId)).first<{sbd_json:string}>().catch(()=>null)
             let ds:string[]=[];try{ds=JSON.parse(r?.sbd_json??'[]')}catch{/* bỏ qua */}
             if(Array.isArray(ds)&&ds.length)await (await import('./ngan-hoc-sinh')).baoMayCacEm(env,ds.map(String),'goi')}}).catch(e=>console.error('[goi7] tick',e));if(ctx)ctx.waitUntil(goi7);else await goi7}

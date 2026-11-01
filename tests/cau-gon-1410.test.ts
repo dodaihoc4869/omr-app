@@ -73,14 +73,14 @@ async function cauCuaToCu(env: Env, maDe: readonly string[]) {
     const k = String(x.ma_de)
     theoGoc.set(k, [...(theoGoc.get(k) ?? []), { qid: String(x.qid), phan: String(q.phan ?? ''), mucDo: String(q.mucDo ?? '').trim() }])
   }
-  const qids: string[] = [], da = new Set<string>(), theoTo: Record<string, number> = {}, theoMucDo: Record<string, number> = {}
+  const qids: string[] = [], da = new Set<string>(), theoTo: Record<string, number> = {}, theoMucDo: Record<string, number> = {}, theoPhan: Record<string, number> = {}
   for (const m of maDe) {
     const { goc: g, phan } = tachMaTo(m)
     let n = 0
-    for (const c of theoGoc.get(g) ?? []) if ((!phan || c.phan === phan) && !da.has(c.qid)) { da.add(c.qid); qids.push(c.qid); n++; const md = c.mucDo || 'Chưa gắn mức độ'; theoMucDo[md] = (theoMucDo[md] ?? 0) + 1 }
+    for (const c of theoGoc.get(g) ?? []) if ((!phan || c.phan === phan) && !da.has(c.qid)) { da.add(c.qid); qids.push(c.qid); n++; const md = c.mucDo || 'Chưa gắn mức độ'; theoMucDo[md] = (theoMucDo[md] ?? 0) + 1; theoPhan[c.phan] = (theoPhan[c.phan] ?? 0) + 1 }
     theoTo[m] = (theoTo[m] ?? 0) + n
   }
-  return { qids, theoTo, theoMucDo }
+  return { qids, theoTo, theoMucDo, theoPhan } // 01/11: + số câu theo phần (thẻ «Câu sẽ luyện»)
 }
 
 describe('câu RÚT GỌN thay JSON đầy đủ (giờ cao điểm 14/10)', () => {

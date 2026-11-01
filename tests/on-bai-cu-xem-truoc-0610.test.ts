@@ -134,7 +134,7 @@ describe('xem-truoc · khối `onBaiCu` VẮNG (không hiện dòng, màn y hệ
     const { env } = dung()
     const r = await gvBaiDaDay(env, { action: 'xem-truoc', lop: LOP, khoaBai: 'B6', tenBai: TEN_B6, viTri: 6, maDe: MA_B6 }, T0)
     expect('onBaiCu' in r).toBe(false)
-    expect(r).toEqual({ ok: true, soCau: 9, soTuLuan: 1, hanNop: '2026-10-11', D: 7, luotCan: 18, sucChua: 280, soEmChon: 3, duLuot: 3, tongEm: 3, duDiem8: null, quaTai: [], theLucNgay: 40 })
+    expect(r).toEqual({ ok: true, soCau: 9, soTuLuan: 1, theoPhan: { I: 6, II: 2, III: 1 }, hanNop: '2026-10-11', D: 7, luotCan: 18, sucChua: 280, soEmChon: 3, duLuot: 3, tongEm: 3, duDiem8: null, quaTai: [], theLucNgay: 40 })
   })
   it('kho 0 ⇒ không có trường: phạm vi chỉ gồm tờ TU LUYỆN / khối 11 / bài sắp giao; hoặc mọi câu thuộc chiến dịch đang chạy', async () => {
     const { env } = dung()

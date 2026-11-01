@@ -112,6 +112,8 @@ export interface XemTruocTick {
   theLucNgay: number
   /** Dòng "Ôn bài cũ" (06/10, máy chủ tính; chỉ-thêm): vắng ⇒ không dòng (máy chủ cũ / lỗi / kho 0). */
   onBaiCu?: OnBaiCuXem
+  /** Số câu rút được theo phần I (Trắc nghiệm) · II (Đúng sai) · III (Trả lời ngắn) — 01/11; máy chủ cũ vắng ⇒ không có. */
+  theoPhan?: { I: number; II: number; III: number }
 }
 export interface KetQuaTick {
   chienDichId: string
@@ -179,6 +181,7 @@ export async function baiDaDayXemTruoc(dv: DauVaoBai): Promise<KetQuaLenh<XemTru
       quaTai: Array.isArray(d.quaTai) ? d.quaTai.filter(laHo).map((e) => ({ sbd: chu(e.sbd), ten: chu(e.ten) || chu(e.sbd) })) : [],
       theLucNgay: soNguyen(d.theLucNgay),
       ...(onBaiCu ? { onBaiCu } : {}),
+      ...(laHo(d.theoPhan) ? { theoPhan: { I: soNguyen(d.theoPhan.I), II: soNguyen(d.theoPhan.II), III: soNguyen(d.theoPhan.III) } } : {}),
     },
   }
 }

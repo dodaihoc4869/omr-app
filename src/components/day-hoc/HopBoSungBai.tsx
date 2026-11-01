@@ -17,25 +17,34 @@ import { khoDayHoc } from '../../lib/day-hoc-len-bang'
 import { theoDoiBaiDangGiao } from '../../lib/bai-dang-giao-thay-doi'
 // Nhập QUA bảng Dạy học (cùng mảnh, kèm kiểu dáng day-hoc): bước Bài hôm nay không tách mảnh riêng ⇒ app thầy mở không thêm tên mảnh nào; hộp nạp
 // mảnh bảng Dạy học — vẫn nhẹ hơn đường cũ (sang cả màn Hành trình), và đã có sẵn nếu thầy vừa mở Hành trình.
-import { BuocBaiHomNay, useBaiHomNay, type BaiChonNho } from './DayHocLenBang'
+import { useBaiHomNay, type BaiChonNho } from './DayHocLenBang'
+// 01/11 (thầy chốt bản vẽ docs/ban-ve-chon-nhieu-bai-0111): thân hộp = chọn NHIỀU bài một lúc (BoSungNhieuBai.tsx) thay cây chọn một bài.
+import { BoSungNhieuBai, useGiaoNhieuBai } from './BoSungNhieuBai'
 import './hop-bo-sung-bai.css'
 
 /** Khoá nhớ theo buổi — CÙNG khoá với bảng Dạy học (`DayHocLenBang.tsx`); hộp chỉ đọc / ghi hai trường của mình. */
 const khoaNho = (idBuoi: string) => `ddh.dayHoc.${idBuoi || '_'}`
-function docNho(idBuoi: string): { lopNhan: string[] | null; baiChon: BaiChonNho | null } {
+type NhoNhieuBai = { khoi: string; ds: string[] }
+function docNho(idBuoi: string): { lopNhan: string[] | null; baiChon: BaiChonNho | null; baiChonDs: NhoNhieuBai | null } {
   try {
-    const j = JSON.parse(localStorage.getItem(khoaNho(idBuoi)) || 'null') as { lopNhan?: unknown; baiChon?: Partial<BaiChonNho> } | null
+    const j = JSON.parse(localStorage.getItem(khoaNho(idBuoi)) || 'null') as { lopNhan?: unknown; baiChon?: Partial<BaiChonNho>; baiChonDs?: Partial<NhoNhieuBai> } | null
     const lop = Array.isArray(j?.lopNhan) ? [...new Set(j!.lopNhan.filter((x): x is string => typeof x === 'string'))] : null
-    const b = j?.baiChon
-    return { lopNhan: lop, baiChon: b && typeof b.khoaBai === 'string' && typeof b.khoi === 'string' ? { khoaBai: b.khoaBai, khoi: b.khoi, tenBai: typeof b.tenBai === 'string' ? b.tenBai : '' } : null }
+    const b = j?.baiChon, d = j?.baiChonDs
+    return {
+      lopNhan: lop,
+      baiChon: b && typeof b.khoaBai === 'string' && typeof b.khoi === 'string' ? { khoaBai: b.khoaBai, khoi: b.khoi, tenBai: typeof b.tenBai === 'string' ? b.tenBai : '' } : null,
+      // Nhiều bài (01/11); phần nhớ cũ chỉ có MỘT bài ⇒ chọn sẵn bài ấy.
+      baiChonDs: d && typeof d.khoi === 'string' && Array.isArray(d.ds) ? { khoi: d.khoi, ds: d.ds.filter((x): x is string => typeof x === 'string') } : b && typeof b.khoaBai === 'string' && typeof b.khoi === 'string' ? { khoi: b.khoi, ds: [b.khoaBai] } : null,
+    }
   } catch {
-    return { lopNhan: null, baiChon: null }
+    return { lopNhan: null, baiChon: null, baiChonDs: null }
   }
 }
-function ghiNho(idBuoi: string, lopNhan: string[] | null, baiChon: BaiChonNho | null) {
+/** `baiChon` = undefined ⇒ giữ nguyên trường cũ (màn Lên bảng còn đọc). */
+function ghiNho(idBuoi: string, lopNhan: string[] | null, baiChon: BaiChonNho | null | undefined, baiChonDs: NhoNhieuBai | null) {
   try {
     const cu = JSON.parse(localStorage.getItem(khoaNho(idBuoi)) || 'null') as Record<string, unknown> | null
-    localStorage.setItem(khoaNho(idBuoi), JSON.stringify({ maChon: [], boCau: [], giao: {}, ...(cu && typeof cu === 'object' ? cu : {}), lopNhan, baiChon }))
+    localStorage.setItem(khoaNho(idBuoi), JSON.stringify({ maChon: [], boCau: [], giao: {}, ...(cu && typeof cu === 'object' ? cu : {}), lopNhan, ...(baiChon !== undefined ? { baiChon } : {}), baiChonDs }))
   } catch {
     /* máy chặn bộ nhớ: chỉ mất phần nhớ khi mở lại */
   }
@@ -102,6 +111,8 @@ export default function HopBoSungBai({ onDong }: { onDong: (daGiao: boolean) => 
   const buoi = useBuoiChoHop()
   const { kho, loiKho, napKho } = useKhoDayHoc()
   const bhn = useBaiHomNay(buoi, kho, napKho)
+  const [nhoDs, setNhoDs] = useState<NhoNhieuBai | null>(null)
+  const gn = useGiaoNhieuBai(bhn, nhoDs)
   const idBuoi = buoi.tt?.buoi.id ?? ''
   const daGiao = useRef(false)
   useEffect(() => theoDoiBaiDangGiao(() => (daGiao.current = true)), [])
@@ -112,15 +123,19 @@ export default function HopBoSungBai({ onDong }: { onDong: (daGiao: boolean) => 
     if (buoi.dangTai || daNap.current) return
     daNap.current = true
     const n = docNho(idBuoi)
-    if (n.lopNhan || n.baiChon) bhn.datNho(n.lopNhan, n.baiChon)
+    if (n.lopNhan) bhn.datNho(n.lopNhan, null)
+    if (n.baiChonDs?.ds.length) setNhoDs(n.baiChonDs)
     // Chỉ chạy khi buổi vừa đọc xong.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [buoi.dangTai, idBuoi])
   useEffect(() => {
-    if (daNap.current) ghiNho(idBuoi, bhn.lopTay, bhn.chonNho)
-  }, [idBuoi, bhn.lopTay, bhn.chonNho])
+    // Bài chọn sau cùng còn ghi vào `baiChon` (một bài) — chỗ khác (Lên bảng) vẫn đọc trường cũ này.
+    const cuoi = gn.baiChon[gn.baiChon.length - 1]
+    if (daNap.current) ghiNho(idBuoi, bhn.lopTay, cuoi ? { khoaBai: cuoi.khoaBai, khoi: bhn.khoi, tenBai: cuoi.tenBai } : undefined, gn.nho)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idBuoi, bhn.lopTay, gn.nho])
 
-  const dangGiao = bhn.dangGiao
+  const dangGiao = gn.dangGiao || bhn.dangGiao || !!bhn.dangBo
   const goiDong = useRef(onDong)
   goiDong.current = onDong
   const dong = useCallback(() => {
@@ -138,7 +153,8 @@ export default function HopBoSungBai({ onDong }: { onDong: (daGiao: boolean) => 
     const phim = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         // Esc trong bộ chọn lớp / em đóng bộ chọn trước.
-        if (tam.current?.querySelector('[aria-expanded="true"]')) return
+        // (Nút mở / gọn chương và «Chi tiết» của danh sách bài cũng mang aria-expanded nhưng không phải bộ chọn nổi ⇒ không tính.)
+        if (tam.current?.querySelector('[aria-expanded="true"]:not(.cbm-chuong-dau):not(.cbm-ct-nut)')) return
         e.preventDefault()
         dongMoiNhat.current()
         return
@@ -175,7 +191,7 @@ export default function HopBoSungBai({ onDong }: { onDong: (daGiao: boolean) => 
           <header className="hbs-dau">
             <div>
               <h2 id={`${id}-tieu`}>Bổ sung bài hôm nay</h2>
-              <p id={`${id}-phu`}>Tick bài vừa dạy — app tự giao luyện theo bài cho lớp thầy chọn. Bài đứng trước bài đã tick là bài cũ để ôn lại.</p>
+              <p id={`${id}-phu`}>Tick các bài vừa dạy (chọn được nhiều bài) — app tự giao luyện theo bài cho lớp thầy chọn. Bài đứng trước bài đã giao là bài cũ để ôn lại.</p>
             </div>
             <button ref={nutDong} type="button" className="hbs-dong" aria-label="Đóng" disabled={dangGiao} onClick={dong}>
               <X size={22} aria-hidden="true" />
@@ -200,7 +216,7 @@ export default function HopBoSungBai({ onDong }: { onDong: (daGiao: boolean) => 
             ) : bhn.co && !bhn.bat ? (
               <p className="dh-phu">Tick bài vừa dạy cần bật OMNI cho lớp ở Cài đặt › OMNI (theo lớp).</p>
             ) : (
-              <BuocBaiHomNay bhn={bhn} kho={kho} loiKho={loiKho} thuKho={() => void napKho()} anDau />
+              <BoSungNhieuBai bhn={bhn} gn={gn} kho={kho} loiKho={loiKho} thuKho={() => void napKho()} />
             )}
           </div>
         </section>

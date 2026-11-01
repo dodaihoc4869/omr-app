@@ -776,7 +776,7 @@ export function BuocBaiHomNay({ bhn, kho, loiKho = '', thuKho, soBuoc = 4, anDau
  *    bấm chip ⇒ đúng các em có mặt, rồi "Chỉnh từng em" nếu cần. Trước đây hai bộ chọn này nằm sâu trong thẻ xác nhận (chỉ hiện sau khi chọn bài) nên thầy không thấy.
  * Chỉ dựng khi đã có danh sách em; chưa có ⇒ giao cả lớp như cũ (không gửi `sbd`).
  */
-function GiaoChoAi({ bhn }: { bhn: BaiHomNay }) {
+export function GiaoChoAi({ bhn }: { bhn: BaiHomNay }) {
   const idChu = useId()
   const { dsEm, chonEm, setChonEm, emLop, sbdChon, chipBuoi, lopChon, cheDoGiao } = bhn
   const nhieu = lopChon.length > 1
@@ -847,7 +847,7 @@ function GiaoChoAi({ bhn }: { bhn: BaiHomNay }) {
 }
 
 /** Nạp danh sách em của bộ chọn màn Giao (`useDsEmGiao`) — chỉ dựng khi OMNI bật và đã có lớp (OMNI tắt ⇒ không gọi thêm lệnh nào). */
-function NapDsEm({ onCo }: { onCo: (ds: EmLop[]) => void }) {
+export function NapDsEm({ onCo }: { onCo: (ds: EmLop[]) => void }) {
   const ds = useDsEmGiao()
   useEffect(() => {
     onCo(ds)
@@ -856,7 +856,7 @@ function NapDsEm({ onCo }: { onCo: (ds: EmLop[]) => void }) {
 }
 
 /** Lưới 6 con số của MỘT lớp (ô "Đủ lượt để ca chốt ≥ 8" ẩn khi chưa có P). */
-function LuoiSo({ xem, hanSua, theLucSua, dangXem }: { xem: XemTruocTick; hanSua: string; theLucSua: number | undefined; dangXem: boolean }) {
+export function LuoiSo({ xem, hanSua, theLucSua, dangXem }: { xem: XemTruocTick; hanSua: string; theLucSua: number | undefined; dangXem: boolean }) {
   const pct = xem.sucChua > 0 ? Math.round((100 * xem.luotCan) / xem.sucChua) : null
   return (
     <div className="cd-kpi-hang" data-khoi="sau-con-so" aria-busy={dangXem}>
@@ -914,7 +914,7 @@ function LuoiSo({ xem, hanSua, theLucSua, dangXem }: { xem: XemTruocTick; hanSua
 }
 
 /** Cảnh báo quá tải của một lớp (nhiều lớp: kèm tên lớp). */
-function CanhBaoQuaTai({ xem, lop, kemLop }: { xem: XemTruocTick; lop: string; kemLop: boolean }) {
+export function CanhBaoQuaTai({ xem, lop, kemLop }: { xem: XemTruocTick; lop: string; kemLop: boolean }) {
   const quaTai = xem.quaTai
   if (!quaTai.length) return null
   return (
@@ -942,7 +942,7 @@ const docPhanTram = (s: string): number | null => {
  * khối `onBaiCu` ⇒ KHÔNG vẽ gì (thẻ y hệt trước). Tỉ lệ mới áp cho kế hoạch được lập sau lúc lưu — kế hoạch hôm nay đã chốt của từng em giữ nguyên (nói thật ở dòng phụ).
  * Chữ: "Ôn bài cũ" (bảng A2); nút = động từ + kết quả; đích chạm ≥ 44 px (lớp `dh-nut`); màu CHỈ biến `--bts-*` có sẵn.
  */
-function OnBaiCuTheoLop({ bhn, lop, xem }: { bhn: Pick<BaiHomNay, 'xemLai'>; lop: string; xem: XemTruocTick }) {
+export function OnBaiCuTheoLop({ bhn, lop, xem }: { bhn: Pick<BaiHomNay, 'xemLai'>; lop: string; xem: XemTruocTick }) {
   const ob = xem.onBaiCu
   const showToast = useAppStore((s) => s.showToast)
   const idMoTa = useId()

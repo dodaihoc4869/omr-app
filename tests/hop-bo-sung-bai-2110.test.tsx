@@ -59,10 +59,10 @@ describe('hộp Bổ sung bài hôm nay', () => {
     const r = render(<HopBoSungBai onDong={dong} />)
     const hop = screen.getByRole('dialog', { name: 'Bổ sung bài hôm nay' })
     expect(within(hop).queryByRole('heading', { name: 'Bài hôm nay' })).toBeNull()
-    const radio = await within(hop).findByRole('radio', { name: /Bài 2\. Lipid/ }, { timeout: 4000 })
+    const radio = await within(hop).findByRole('checkbox', { name: /Bài 2\. Lipid/ }, { timeout: 4000 })
     expect(hop.textContent).toContain('12A1')
     fireEvent.click(radio)
-    await waitFor(() => expect(JSON.parse(localStorage.getItem('ddh.dayHoc.BH-9')!)).toMatchObject({ maChon: ['DH-12-C1-B1'], baiChon: { khoaBai: expect.stringContaining('B2'), khoi: '12' } }))
+    await waitFor(() => expect(JSON.parse(localStorage.getItem('ddh.dayHoc.BH-9')!)).toMatchObject({ maChon: ['DH-12-C1-B1'], baiChon: { khoaBai: expect.stringContaining('B2'), khoi: '12' }, baiChonDs: { khoi: '12', ds: [expect.stringContaining('B2')] } }))
     // hộp chỉ đọc buổi một lần, không nhịp làm mới
     expect(lenh('/gv/buoi-hoc', 'dang-mo')).toHaveLength(1)
     fireEvent.keyDown(document, { key: 'Escape' })
@@ -70,7 +70,7 @@ describe('hộp Bổ sung bài hôm nay', () => {
     r.unmount()
 
     render(<HopBoSungBai onDong={dong} />)
-    await waitFor(() => expect((screen.getByRole('radio', { name: /Bài 2\. Lipid/ }) as HTMLInputElement).checked).toBe(true), { timeout: 4000 })
+    await waitFor(() => expect((screen.getByRole('checkbox', { name: /Bài 2\. Lipid/ }) as HTMLInputElement).checked).toBe(true), { timeout: 4000 })
     fireEvent.click(screen.getByRole('button', { name: 'Đóng' }))
     expect(dong).toHaveBeenCalledTimes(2)
   })
@@ -87,7 +87,7 @@ describe('hộp Bổ sung bài hôm nay', () => {
     expect((await screen.findByRole('alert')).textContent).toContain('Chưa tải được phần Tick bài: Không nối được máy chủ.')
     co = { bat: true, lop: ['12A1'], sbd: [] }
     fireEvent.click(screen.getByRole('button', { name: 'Thử tải Tick bài lại' }))
-    expect(await screen.findByRole('radio', { name: /Bài 1\. Ester/ }, { timeout: 4000 })).toBeTruthy()
+    expect(await screen.findByRole('checkbox', { name: /Bài 1\. Ester/ }, { timeout: 4000 })).toBeTruthy()
   })
 
   it('bước Dạy học của Hành trình ghi phần nhớ KHÔNG đè lớp + bài hộp vừa chọn (lỗi Đợt 16); Hành trình không đọc cờ OMNI', async () => {
