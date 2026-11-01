@@ -4,16 +4,19 @@
 -- VÌ SAO KHÔNG «UPDATE số chuỗi»: chuỗi KHÔNG lưu ở đâu cả — máy chủ tính lại mỗi lần từ sổ học + mức đã chốt (chuoiNgayCuaEm). Ngày oan = màn báo «Đủ x/y câu
 -- hôm nay!» (sổ + câu học cách giải ≥ mức, hoặc máy chủ đã trả thưởng `tt|<ngày>|muc_tieu`) mà luật chuỗi (chỉ đếm sổ) báo thiếu. Cách khôi phục: HẠ MỨC
 -- của đúng ngày oan ấy xuống ĐÚNG số câu luật chuỗi đếm được (c7 ≥ 1) ⇒ ngày ấy thành «đủ mức» ⇒ chuỗi tính lại lên đúng giá trị lẽ ra có (đã mô phỏng
--- trên dữ liệu thật bằng chính hàm máy chủ: scripts/kiem-chuoi-0211.ts — 98/98 em khớp, 0 em giảm). Hạ mức một ngày chỉ có thể biến ngày thiếu thành ngày
+-- trên dữ liệu thật bằng chính hàm máy chủ: scripts/kiem-chuoi-0211.ts — ca_thuong: 98/98 em về đúng chuỗi lẽ ra; manh: 68 em đủ + 4 em một phần, gồm mọi em đứt chuỗi; 0 em giảm). Hạ mức một ngày chỉ có thể biến ngày thiếu thành ngày
 -- đủ ⇒ chuỗi chỉ TĂNG, bình chỉ còn nhiều hơn; dòng không thoả điều kiện (em không bị ảnh hưởng, ngày đã đạt) không bị đụng. Bảng thầy «Bài hằng ngày»
 -- ngày ấy vẫn «đủ» (vốn đã đủ vì đếm cả câu học cách giải); số mức hiện = số câu em làm trong sổ.
 --
+-- BẰNG CHỨNG (mặc định «manh»): chỉ ngày sổ + câu học cách giải ≥ mức (đúng số «Đủ x/y» cuối ngày) — gồm MỌI ngày đứt chuỗi / tiêu bình oan (31/10, 01/11).
+-- Ngày CHỈ có thưởng «đạt mục tiêu» mà cuối ngày vẫn thiếu (36 em-ngày, đều 28–30/10 ngày bảo trì: không đứt chuỗi, chỉ thiếu +1; 30/10 hụt tới 537 câu
+-- — thưởng có thể trả theo chặng lúc mức chưa chốt) chỉ tính khi workflow chọn bang_chung = ca_thuong (đổi 'manh' thành 'ca_thuong' ở điều kiện dưới).
 -- Khung ngày: 28/10 (mốc luật «đủ mức») → 01/11. 28–30/10 là ngày bảo trì (không mất chuỗi) nhưng em đã đủ thì lẽ ra +1 lửa ⇒ cũng trả.
 -- Điều kiện «em đủ theo màn» viết lại y SQL_CAU_TINH_MUC / SQL_CO_KET_QUA_HOAC_LUOT / sqlCauHocCachGiai (server/src/chuoi-ngay-bai.ts, bản 02/11).
 -- Mỗi khối dưới đây là MỘT câu lệnh, mở bằng dòng «-- @@ TÊN». Workflow chạy: DEM_TRUOC → (ghi = co) GHI_1 → GHI_2 → GHI_3 → DEM_SAU → DEM_CON_LAI.
 -- KHÔNG có SBD / tên trong kết quả in ra (repo công khai): chỉ ngày + số đếm.
 
--- @@ DEM_TRUOC — số dòng mức sẽ hạ theo ngày (phải khớp «số dòng mức sẽ hạ» của kiem-chuoi-0211: 28/10 14 · 29/10 30 · 30/10 28 · 31/10 17 · 01/11 42)
+-- @@ DEM_TRUOC — số dòng mức sẽ hạ theo ngày (đo 02/11: manh 28/10 11 · 29/10 22 · 30/10 3 · 31/10 17 · 01/11 42 = 95; ca_thuong 14 · 30 · 28 · 17 · 42 = 131)
 SELECT x.ngay AS ngay, COUNT(*) AS so_em, SUM(x.muc - x.c7) AS tong_cau_ha, SUM(x.c7 + x.k >= x.muc) AS du_nho_cau_hoc_cach_giai, SUM(x.c7 + x.k < x.muc) AS chi_co_thuong_dat_muc_tieu
 FROM (
   SELECT m.sbd AS sbd, m.ngay AS ngay, m.muc AS muc,
@@ -30,7 +33,7 @@ FROM (
     EXISTS (SELECT 1 FROM vang_so v WHERE v.sbd = m.sbd AND v.khoa_yeu_cau = 'tt|' || m.ngay || '|muc_tieu') AS th
   FROM goi_bai_7_muc_ngay m WHERE m.ngay BETWEEN '2026-10-28' AND '2026-11-01' AND m.muc > 0
 ) x
-WHERE x.c7 >= 1 AND x.c7 < x.muc AND (x.c7 + x.k >= x.muc OR x.th = 1)
+WHERE x.c7 >= 1 AND x.c7 < x.muc AND (x.c7 + x.k >= x.muc OR (x.th = 1 AND 'ca_thuong' = 'manh'))
 GROUP BY x.ngay ORDER BY x.ngay;
 
 -- @@ GHI_1 — bảng sao lưu CHỈ-THÊM (giá trị cũ của đúng các dòng sẽ hạ; khoá (sbd, ngay) ⇒ chạy lại không ghi đè bản sao lưu đầu tiên)
@@ -55,7 +58,7 @@ FROM (
     EXISTS (SELECT 1 FROM vang_so v WHERE v.sbd = m.sbd AND v.khoa_yeu_cau = 'tt|' || m.ngay || '|muc_tieu') AS th
   FROM goi_bai_7_muc_ngay m WHERE m.ngay BETWEEN '2026-10-28' AND '2026-11-01' AND m.muc > 0
 ) x
-WHERE x.c7 >= 1 AND x.c7 < x.muc AND (x.c7 + x.k >= x.muc OR x.th = 1);
+WHERE x.c7 >= 1 AND x.c7 < x.muc AND (x.c7 + x.k >= x.muc OR (x.th = 1 AND 'ca_thuong' = 'manh'));
 
 -- @@ GHI_3 — hạ mức ĐÚNG các dòng đã sao lưu, chỉ khi mức hiện tại vẫn bằng giá trị cũ đã chép (không ai sửa xen giữa) và mức mới nhỏ hơn (chỉ hạ, ≥ 1)
 UPDATE goi_bai_7_muc_ngay SET muc = (SELECT b.muc_moi FROM chuoi_sao_luu_0211 b WHERE b.sbd = goi_bai_7_muc_ngay.sbd AND b.ngay = goi_bai_7_muc_ngay.ngay)

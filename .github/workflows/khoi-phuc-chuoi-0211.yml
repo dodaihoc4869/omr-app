@@ -14,6 +14,12 @@ on:
         default: khong
         type: choice
         options: [khong, co]
+      bang_chung:
+        description: 'manh = chỉ ngày đủ nhờ câu học cách giải (mặc định) · ca_thuong = thêm ngày chỉ có thưởng «đạt mục tiêu» (28–30/10)'
+        required: true
+        default: manh
+        type: choice
+        options: [manh, ca_thuong]
       xac_nhan:
         description: 'Gõ đúng KHOI PHUC khi ghi = co'
         required: false
@@ -36,8 +42,12 @@ jobs:
         with:
           node-version: 22
       - name: Tách khối SQL + soát lệnh
+        env:
+          BANG_CHUNG: ${{ inputs.bang_chung || 'manh' }}
         run: |
           mkdir -p /tmp/kp
+          case "$BANG_CHUNG" in manh) ;; ca_thuong) sed -i "s/'ca_thuong' = 'manh'/'ca_thuong' = 'ca_thuong'/" scripts/khoi-phuc-chuoi-0211.sql ;; *) echo "bang_chung sai"; exit 1 ;; esac
+          echo "Bằng chứng: $BANG_CHUNG"
           node -e '
             const fs = require("fs"), tep = fs.readFileSync("scripts/khoi-phuc-chuoi-0211.sql", "utf8")
             const khoi = (ten) => { const m = tep.split(/^-- @@ /m).find((x) => x.startsWith(ten + " ")); if (!m) throw new Error("thiếu khối " + ten)
