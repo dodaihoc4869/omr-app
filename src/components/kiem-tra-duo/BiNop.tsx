@@ -5,6 +5,6 @@ import { BiKetQua, camTheoDiem } from './KhungKiemTra'
 
 export default function BiNop({ diem, phu }: { diem?: number | null; phu: string }) {
   const coDiem = typeof diem === 'number' && Number.isFinite(diem)
-  const tieuDe = !coDiem ? 'Em đã nộp bài!' : diem >= 8 ? 'Làm tốt lắm!' : diem < 5 ? 'Cùng Lửa ôn lại nhé!' : 'Em đã nộp bài!'
+  const tieuDe = !coDiem ? 'Em đã nộp bài!' : diem >= 8 ? 'Làm tốt lắm!' : diem < 5 ? 'Cùng Mol ôn lại nhé!' : 'Em đã nộp bài!'
   return <BiKetQua lop="xd-muc__mo-ta" cam={camTheoDiem(coDiem ? diem : null)} tieuDe={tieuDe} phu={phu} />
 }

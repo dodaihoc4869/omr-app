@@ -140,22 +140,22 @@ const nhacChuoi = (v: VaoLua): boolean => (v.chuoi ?? 0) >= 3 && !v.giuHomNay
 export function loiLua(cap: CapLua, v: VaoLua, k: KetLua = xetLua(v)): string | null {
   if (k.lyDo === 'ca' || k.lyDo === 'nghi' || v.kiem) return null
   const con = Math.max(0, v.muc - v.daLam)
-  if (cap === 0) return k.lyDo === 'that' && !v.du && con > 0 ? `Em làm thật, Lửa vui lắm! Còn ${con} câu nữa là đủ mức.` : null
+  if (cap === 0) return k.lyDo === 'that' && !v.du && con > 0 ? `Em làm thật, Mol vui lắm! Còn ${con} câu nữa là đủ mức.` : null
   if (cap === 1) return null
   const gio = chuGio(v.now)
   if (k.lyDo === 'chuaTinh') {
     const bao = k.lien >= 3 ? `${k.lien} câu liền chưa được tính` : `${k.chua} trong ${k.tong} câu vừa rồi chưa được tính`
-    if (cap >= 5) return `Lửa cáu lắm rồi! ${bao}. Đọc kĩ đề rồi làm.`
-    if (cap === 4) return `Lửa giận rồi! ${bao}. Dừng lại, đọc kĩ đề.`
+    if (cap >= 5) return `Mol cáu lắm rồi! ${bao}. Đọc kĩ đề rồi làm.`
+    if (cap === 4) return `Mol giận rồi! ${bao}. Dừng lại, đọc kĩ đề.`
     return 'Mấy câu vừa rồi chưa được tính. Đọc kĩ đề rồi làm nhé.'
   }
   if (cap === 2) return `Đã ${gio} rồi. Còn ${con} câu nữa là đủ mức hôm nay.`
-  if (cap === 3) return `Lửa bực rồi đấy! ${gio} mà còn ${con} câu. Học ngay nhé.`
+  if (cap === 3) return `Mol bực rồi đấy! ${gio} mà còn ${con} câu. Học ngay nhé.`
   const lam = v.daLam > 0 ? `mới làm ${v.daLam}/${v.muc} câu` : 'chưa làm câu nào'
-  if (cap === 4) return `Lửa giận rồi! ${gio} mà ${lam}.${nhacChuoi(v) ? ` Chuỗi ${v.chuoi} ngày đang chờ em.` : ''}`
+  if (cap === 4) return `Mol giận rồi! ${gio} mà ${lam}.${nhacChuoi(v) ? ` Chuỗi ${v.chuoi} ngày đang chờ em.` : ''}`
   // cấp 5: thời gian còn lại kèm mốc thật (thầy quyết 3 — ngoại lệ C14 chỉ cho Lửa cấp 4–5), chữ đứng yên
   const conPhut = Math.max(1, 23 * 60 + 59 - (k.gio * 60 + k.phut))
-  return `Lửa cáu lắm rồi! ${gio} mà ${lam}. Còn ${conPhut} phút (tới 23:59) để ${nhacChuoi(v) ? `giữ chuỗi ${v.chuoi} ngày` : 'đủ mức hôm nay'}.`
+  return `Mol cáu lắm rồi! ${gio} mà ${lam}. Còn ${conPhut} phút (tới 23:59) để ${nhacChuoi(v) ? `giữ chuỗi ${v.chuoi} ngày` : 'đủ mức hôm nay'}.`
 }
 
 /** Giờ (ms) cấp có thể đổi lần tới chỉ vì giờ trôi: mốc 19 · 21 · 22 · 23 · 00 giờ Việt Nam, hoặc hết 30 phút vui sau chặng làm thật. */

@@ -65,8 +65,8 @@ function useMq(q: string): boolean {
 const useCoBen = (): boolean => useMq(MQ_BEN)
 /** Điện thoại ngang thấp (cao < 600 px): Lộ trình tự cuộn tới chặng hiện tại ⇒ bong bóng đầu trang khuất ⇒ từ cấp 2 Lửa nói CẠNH mình (đặc tả 31/10 mục 2.2). */
 const MQ_THAP_NGANG = '(max-height: 599px) and (min-width: 600px)'
-/** Biểu tượng tab đầu Lửa đỏ: ở mảnh lười lớp vẽ giận (chỉ cần từ cấp 4). */
-const iconTabLua = (cap: number) => { void import('../linh-vat/lua-gian').then((m) => m.datIconTabLua(cap, anhSvg)).catch(() => {}) }
+/** Biểu tượng tab mặt Mol cáu (đầu đỏ): ở mảnh lười mol-dong (đã nạp cùng linh vật; chỉ cần từ cấp 4). */
+const iconTabLua = (cap: number) => { void import('../linh-vat/mol-dong').then((m) => m.datIconTabMol(cap, anhSvg)).catch(() => {}) }
 /** Chấm số trên biểu tượng app đã cài (`navigator.setAppBadge` — iPhone iOS 16.4+ đã cho phép thông báo, Chrome/Edge máy tính): = câu còn thiếu; 0 ⇒ xoá. */
 function chamSoApp(n: number): void {
   const nav = (typeof navigator === 'undefined' ? {} : navigator) as { setAppBadge?: (n?: number) => Promise<void>; clearAppBadge?: () => Promise<void> }

@@ -1,0 +1,68 @@
+/* LINH VẬT «MOL» — mặt bình cầu (src/components/linh-vat/mol-dong.ts; thầy chốt 01/11) — nạp LƯỜI cùng mảnh mol-dong.
+   BẢNG MÀU: không mã thô; xanh dương = --tr-gv (xanh chủ đạo của app), cam = --cam, đỏ giận = --tr-sai, trắng / mực CỐ ĐỊNH = --btg-chu-doan-dam / --btg-chu-doan.
+   Nền tối: --tr-gv / --cam tự sáng lên ⇒ Mol sáng hơn một chút, vẫn tách khỏi nền tối. */
+.mol-svg {
+  --mol-x: var(--tr-gv);
+  --mol-xd: color-mix(in oklab, var(--tr-gv) 78%, var(--btg-chu-doan));
+  --mol-vien: color-mix(in oklab, var(--tr-gv) 42%, var(--btg-chu-doan));
+  --mol-t: var(--btg-chu-doan-dam);
+  --mol-muc: var(--btg-chu-doan);
+  --mol-cam: var(--cam);
+  --mol-camS: color-mix(in srgb, var(--cam) 40%, var(--btg-chu-doan-dam));
+  --mol-luoi: color-mix(in srgb, var(--cam) 62%, var(--tr-sai));
+  --mol-ma: color-mix(in srgb, var(--cam) 42%, var(--btg-chu-doan-dam));
+  --mol-nuoc: color-mix(in srgb, var(--tr-gv) 34%, var(--btg-chu-doan-dam));
+  --mol-do: var(--tr-sai);
+  --mol-soi: color-mix(in srgb, var(--tr-sai) 62%, var(--cam));
+  overflow: visible;
+}
+.mol-svg .m-x { fill: var(--mol-x); }
+.mol-svg .m-xd { fill: var(--mol-xd); }
+.mol-svg .m-vien { fill: var(--mol-vien); }
+.mol-svg .m-t { fill: var(--mol-t); }
+.mol-svg .m-muc { fill: var(--mol-muc); }
+.mol-svg .m-cam { fill: var(--mol-cam); }
+.mol-svg .m-camS { fill: var(--mol-camS); }
+.mol-svg .m-luoi { fill: var(--mol-luoi); }
+.mol-svg .m-ma { fill: var(--mol-ma); opacity: 0.6; }
+.mol-svg .m-nuoc { fill: var(--mol-nuoc); }
+.mol-svg .m-bot { fill: var(--mol-t); opacity: 0.55; }
+.mol-svg .m-sang { fill: var(--mol-t); opacity: 0.18; }
+.mol-svg .m-hoi { fill: var(--mol-t); stroke: var(--mol-vien); stroke-width: 2.5; opacity: 0.9; }
+.mol-svg .m-soi { fill: var(--mol-soi); }
+.mol-svg .m-soi2 { fill: var(--mol-do); }
+.mol-svg .m-khong { fill: none; }
+.mol-svg .m-vien-n { stroke: var(--mol-vien); stroke-width: 3.5; }
+.mol-svg .m-net { fill: none; stroke: var(--mol-vien); stroke-linecap: round; stroke-linejoin: round; }
+.mol-svg .m-net-t { fill: none; stroke: var(--mol-t); stroke-linecap: round; stroke-linejoin: round; }
+.mol-svg .m-net-do { fill: none; stroke: var(--mol-do); stroke-linecap: round; }
+.mol-svg .mol-chu { font-family: inherit; font-weight: 800; }
+/* Giận: dung dịch đỏ dâng + sôi (mol-dong.ts SOI) — đầu vẫn xanh của app. */
+
+/* ── Chuyển động (CSS; giảm chuyển động / máy yếu / Mol tĩnh ⇒ tắt) ── */
+.mol-svg .mol-than { transform-box: view-box; transform-origin: 100px 196px; animation: mol-tho 3.6s ease-in-out infinite; }
+.mol-svg .mol-mat { transform-box: fill-box; transform-origin: center; animation: mol-chop 4.8s infinite; }
+.mol-svg .mol-bot { animation: mol-bot 2.8s ease-in infinite; }
+.mol-svg .mol-bot.b2 { animation-delay: 0.9s; }
+.mol-svg .mol-bot.b3 { animation-delay: 1.7s; }
+.mol-svg .mol-hoi { animation: mol-hoi 1.2s ease-out infinite; }
+.mol-svg[data-mat='cau'] .mol-bot { animation-duration: 1.6s; }
+.mol-svg[data-mat='ratCau'] .mol-bot { animation-duration: 0.9s; }
+.mol-svg.mol-noi .mol-mieng { transform-box: fill-box; transform-origin: center top; animation: mol-noi 0.24s ease-in-out infinite alternate; }
+.mol-svg[data-dong='nhun'] .mol-than { animation: mol-nhun 0.7s cubic-bezier(0.3, 1.6, 0.5, 1) 3; }
+.mol-svg[data-dong='lac'] .mol-than { animation: mol-lac 1.4s ease-in-out 2; }
+.mol-svg[data-dong='chung'] .mol-than { animation: mol-chung 0.6s ease-out 1 forwards; }
+.mol-svg[data-dong='giat'] .mol-than { animation: mol-giat 0.5s ease-in-out infinite; }
+.mol-svg[data-dong='run'] .mol-than { animation: mol-run 0.16s linear infinite; }
+@keyframes mol-tho { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.012, 0.988); } }
+@keyframes mol-chop { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+@keyframes mol-bot { 0% { transform: translateY(0); opacity: 0.6; } 100% { transform: translateY(-30px); opacity: 0; } }
+@keyframes mol-hoi { 0% { transform: translateY(0) scale(0.7); opacity: 0.9; } 100% { transform: translateY(-18px) scale(1.2); opacity: 0; } }
+@keyframes mol-noi { from { transform: scaleY(1); } to { transform: scaleY(0.55); } }
+@keyframes mol-nhun { 0%, 100% { transform: translateY(0) scale(1, 1); } 40% { transform: translateY(-14px) scale(0.97, 1.04); } 70% { transform: translateY(0) scale(1.04, 0.96); } }
+@keyframes mol-lac { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-6deg); } 75% { transform: rotate(6deg); } }
+@keyframes mol-chung { 0% { transform: translateY(0); } 100% { transform: translateY(4px) scale(1.01, 0.98); } }
+@keyframes mol-giat { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-2deg); } 75% { transform: rotate(2deg); } }
+@keyframes mol-run { 0% { transform: translate(0, 0); } 25% { transform: translate(-2px, 1px); } 50% { transform: translate(2px, -1px); } 75% { transform: translate(-1px, -1px); } 100% { transform: translate(1px, 1px); } }
+.mol-svg[data-tinh] *, html.may-yeu .mol-svg * { animation: none !important; }
+@media (prefers-reduced-motion: reduce) { .mol-svg * { animation: none !important; } }
