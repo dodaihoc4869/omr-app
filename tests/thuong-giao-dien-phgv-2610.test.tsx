@@ -8,7 +8,6 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
-import AppPhuHuynh from '../src/components/ph-v3/AppPhuHuynh'
 import { cauGiai, cauHocThat } from '../src/components/ph-v3/DocPh'
 import { docBaoCaoTuanCon, docTuanCon } from '../src/lib/bao-cao-tuan-ph-api'
 import { docCongTac, docEm, docThiDua, nhoGhi } from '../src/lib/thi-dua-tuan-api'
@@ -124,43 +123,8 @@ describe('đọc số — chặt, không bịa', () => {
   })
 })
 
-describe('PH — thẻ «Tuần này của con» (tp-14)', () => {
-  beforeEach(() => {
-    document.documentElement.dataset.trong = 'ph'
-    window.history.replaceState(null, '', '/?vai=phuhuynh')
-  })
-  // mỗi lần mở một SBD riêng: DocPh nhớ báo cáo tuần theo SBD trong phiên
-  const mo = (sbd = '12121212') => render(<div className="m3"><AppPhuHuynh sbd={sbd} hoTen="Nguyễn Minh Khôi" lop="12A1" onDoiSbd={() => {}} /></div>).container
-  it('đủ khối ⇒ 3 ô số + câu giải + % học thật + học cùng; KHÔNG gọi thêm lệnh (bao-cao-tuan đúng 1 lần)', async () => {
-    const c = mo()
-    await waitFor(() => expect(c.querySelector('[data-vung="tuan-nay"]')).toBeTruthy())
-    const t = c.querySelector<HTMLElement>('[data-vung="tuan-nay"]')!
-    expect([...t.querySelectorAll('.pd-ba-so > div > span')].map((x) => x.textContent)).toEqual(['Chuỗi ngày', 'Số bài', 'Giải tuần'])
-    expect(t.querySelector('.pd-ba-so')!.textContent).toContain('12ngày')
-    expect(t.querySelector('.hhg[data-kl="bac"]')?.getAttribute('aria-label')).toBe('Giải Bạc')
-    expect(t.querySelector('[data-vung="cau-giai"]')!.textContent).toBe('Giải tuần là bảng thi đua mỗi tuần, 6 bậc từ Sắt lên Kim cương. Con đang ở bậc Bạc (bậc 3/6), hạng 4/30 trong nhóm. Cuối tuần vào top 5 thì lên bậc Vàng.')
-    expect(t.querySelector('[data-vung="ti-le-hoc-that"]')!.textContent).toContain('nguyên tử (điểm thưởng) tuần này là từ câu con tự làm đúng')
-    expect(t.querySelector('[data-vung="ti-le-hoc-that"] b')!.textContent).toBe('90%')
-    expect(t.querySelector('[data-vung="hoc-cung"]')!.textContent).toContain('Trần Gia Bảo')
-    expect(c.querySelector('.pd-luoi')!.hasAttribute('data-tuan')).toBe(true)
-    expect(goi.filter((x) => x.duong === '/ph/bao-cao-tuan')).toHaveLength(1)
-    expect(goi.some((x) => /tuan|thi-dua|thuong/.test(x.duong) && x.duong !== '/ph/bao-cao-tuan')).toBe(false)
-  })
-  it('thiếu trường ⇒ ẩn ô ấy; thiếu cả khối ⇒ không có thẻ', async () => {
-    may['/ph/bao-cao-tuan'] = () => ({ ok: true, soLieu: 'x', duLieu: { ...DU_LIEU, tuan: { soBai: 5 } } })
-    const c = mo('12121213')
-    await waitFor(() => expect(c.querySelector('[data-vung="tuan-nay"]')).toBeTruthy())
-    expect(c.querySelectorAll('[data-vung="tuan-nay"] .pd-ba-so > div')).toHaveLength(1)
-    expect(c.querySelector('[data-vung="cau-giai"], [data-vung="ti-le-hoc-that"], [data-vung="hoc-cung"]')).toBeNull()
-    cleanup()
-    may['/ph/bao-cao-tuan'] = () => ({ ok: true, soLieu: 'x', duLieu: DU_LIEU })
-    const c2 = mo('12121214')
-    await waitFor(() => expect(c2.querySelector('[data-vung="hom-nay-doc"]')).toBeTruthy())
-    await waitFor(() => expect(goi.filter((x) => x.duong === '/ph/bao-cao-tuan')).toHaveLength(2))
-    await new Promise((r) => setTimeout(r, 20))
-    expect(c2.querySelector('[data-vung="tuan-nay"]')).toBeNull()
-  })
-})
+// Thẻ «Tuần này của con» nằm trong màn «Chỉ đọc» (DocPh) — màn này đã được thay bằng «Một trang về con» (thầy chốt bản vẽ 01/11, không có thẻ tuần);
+// phép thuần cauGiai / cauHocThat vẫn khoá ở trên, màn mới khoá ở tests/ph-mot-trang-con-0111.test.tsx.
 
 describe('GV — màn «Thi đua tuần» (tp-15)', () => {
   it('vẽ NGAY bản lưu máy rồi cập nhật từ máy chủ', async () => {

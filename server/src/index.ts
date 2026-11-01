@@ -3718,6 +3718,8 @@ const boXuLy = {
       if (p === '/ph/nhip-hoc') return ra(await import('./ph-ho-so-con').then((m) => m.phNhipHoc(env, b, Date.now(), envDoc, ctx)))
       if (p === '/ph/danh-gia') return ra(await import('./danh-gia-hoc-that-d1').then((m) => m.phDanhGia(env, b, Date.now(), ctx)))
       if (p === '/ph/bao-cao-tuan') return ra(await import('./bao-cao-tuan').then((m) => m.phBaoCaoTuan(env, b, Date.now(), ctx)))
+      // «Một trang về con» (thầy chốt 01/11): 4 số đo Học thật · Đối phó · Chăm · Lười của ĐÚNG con — một câu đọc bản đã tính sẵn (ph-bon-so-do.ts).
+      if (p === '/ph/bon-so-do') return ra(await import('./ph-bon-so-do').then((m) => m.phBonSoDo(env, b, envDoc, ctx)))
       if (p === '/ph/ho-so-thai-do') return ra(await import('./ph-ho-so-con').then((m) => m.phHoSoThaiDo(env, b, Date.now(), envDoc, ctx)))
       if (p === '/ph/lich-su-lam-cau') return ra(await import('./ph-ho-so-con').then((m) => m.phLichSuLamCau(env, b, envDoc, ctx)))
       if (p.startsWith('/luyen-de/')) return ra(await luyenDe(env, p.slice('/luyen-de/'.length), b))
