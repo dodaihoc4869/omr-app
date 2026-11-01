@@ -92,6 +92,12 @@ export interface LuotDanhGia {
   qid?: string
   /** CHỈ THÊM 01/11 (đánh giá v2): giây em ẩn app / rời tab trong lượt này (`raw_json.doc.a`); null = không đo. Rời rồi quay lại chọn đúng câu khó ⇒ nghi tra ngoài. */
   an?: number | null
+  /** CHỈ THÊM 01/11 (đánh giá 99% đợt 2, đo ở máy em `src/lib/doi-dap-an.ts`): số lần đổi lựa chọn trước «Kiểm tra» · số phương án KHÁC NHAU đã thử (Phần I;
+   *  ≥ 3 = dò đáp án) · giây ẩn app trong 30 giây ngay trước lựa chọn cuối · số lần ẩn app trong lượt. Vắng = máy em chưa đo (bản cũ) ⇒ luật cũ. */
+  dd?: number
+  dq?: number
+  ar?: number
+  rn?: number
 }
 
 export interface DauVaoDanhGia {

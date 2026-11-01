@@ -30,6 +30,13 @@ export interface DoMucLuot {
   phan: PhanMucLam
   /** Số đo treo máy (22/10); vắng = máy em chưa gửi ⇒ "Chưa đo treo máy". */
   treo?: DoTreo
+  /** CHỈ THÊM 01/11 (đánh giá 99% đợt 2, `do-giay-luot.ts` DoHanhVi): số lần đổi lựa chọn · số phương án khác nhau đã thử (Phần I) · số lần ẩn app ·
+   *  giây ẩn app trong 30 giây ngay trước lựa chọn cuối · mã máy luyện tập. Vắng = máy em chưa gửi (không đoán). */
+  dd?: number
+  dq?: number
+  rn?: number
+  ar?: number
+  tb?: string
 }
 
 /** `raw_json.doc` → đầu vào Mức làm: CHỈ khi giây đến từ đồng hồ MỚI (`dh = 1`) và có số từ + phần hợp lệ. Còn lại ⇒ null. */
@@ -43,7 +50,11 @@ export function docDoMuc(raw: Row | null): DoMucLuot | null {
   const so = (k: string) => (typeof o[k] === 'number' && Number.isFinite(o[k]) && (o[k] as number) >= 0 ? (o[k] as number) : null)
   const v = so('v'), a = so('a'), l = so('l')
   const treo = v !== null && a !== null && l !== null ? { v, a, l, n: so('n') ?? 0, w: o.w === 1 ? (1 as const) : (0 as const) } : null
-  return { soTu: t, coHinh: o.h === 1, phan, ...(treo ? { treo } : {}) }
+  // Hành vi (01/11): từng trường riêng — có thì trả, vắng thì bỏ (bản ghi cũ không có).
+  const hv: Pick<DoMucLuot, 'dd' | 'dq' | 'rn' | 'ar' | 'tb'> = {}
+  for (const k of ['dd', 'dq', 'rn', 'ar'] as const) { const x = so(k); if (x !== null) hv[k] = x }
+  if (typeof o.tb === 'string' && o.tb) hv.tb = o.tb
+  return { soTu: t, coHinh: o.h === 1, phan, ...(treo ? { treo } : {}), ...hv }
 }
 
 /** Một lượt đã đọc xong các trường cần cho Mức làm. */

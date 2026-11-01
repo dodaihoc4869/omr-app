@@ -119,7 +119,8 @@ export interface MucTraLoi {
   dapAn: string
   giay?: number
   /** 20/10 đo giây: giây đo thật của máy em (src/lib/dong-ho-cau.ts). Kích thước đề do máy chủ tự đo từ câu nó chấm. */
-  doGiay?: { g: number; v?: number; a?: number; l?: number; n?: number; w?: 0 | 1 }
+  /** 01/11 (đánh giá 99% đợt 2): cùng cụm có thể mang thêm dd · dq · rn · ar · tb (`src/lib/doi-dap-an.ts`, máy chủ làm sạch ở `do-giay-luot.ts`); vắng ⇒ như cũ. */
+  doGiay?: { g: number; v?: number; a?: number; l?: number; n?: number; w?: 0 | 1; dd?: number; dq?: number; rn?: number; ar?: number; tb?: string }
 }
 
 /** `POST /hs/on-lai/nop` — BẮT BUỘC token học sinh. Đáp án/lời giải chỉ có trong phản hồi `ok:true`. */

@@ -32,7 +32,10 @@ describe('Làm bài tập: đồng hồ đo giây', () => {
     const dg = body.doGiay as { g: number; v: number; a: number; l: number; n: number; w: number }
     expect(dg.g).toBeGreaterThanOrEqual(1)
     expect(dg.g).toBeLessThanOrEqual(3)
-    expect(Object.keys(dg)).toEqual(['g', 'v', 'a', 'l', 'n', 'w'])
+    // 01/11 (đánh giá 99% đợt 2): cùng cụm thêm dd · dq · rn · ar · tb (src/lib/doi-dap-an.ts) — chọn một lần, không rời app.
+    expect(Object.keys(dg)).toEqual(['g', 'v', 'a', 'l', 'n', 'w', 'dd', 'dq', 'rn', 'ar', 'tb'])
+    expect(dg).toMatchObject({ dd: 0, dq: 1, rn: 0, ar: 0 })
+    expect((dg as unknown as { tb: string }).tb).toMatch(/^[A-Za-z0-9]{1,16}$/)
     expect(dg.v).toBeGreaterThanOrEqual(dg.g)
     expect([dg.a, dg.n, dg.w]).toEqual([0, 0, 0])
     expect(dg.l).toBeLessThanOrEqual(3)
@@ -116,6 +119,38 @@ describe('Làm bài tập: giữ màn sáng khi đang làm câu (22/10)', () => 
     } finally {
       vi.useRealTimers()
       delete (navigator as unknown as Record<string, unknown>).wakeLock
+    }
+  }, 20000)
+})
+
+// 01/11 ĐỢT 2 ĐÁNH GIÁ 99%: đổi / dò đáp án + rời app NGAY trước lựa chọn cuối, đo trên màn thật, gửi cùng cụm `doGiay` (không thêm lệnh).
+describe('Làm bài tập: đổi đáp án, dò đáp án, rời app ngay trước khi chọn (01/11)', () => {
+  const datHien = (hien: boolean) => { Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => (hien ? 'visible' : 'hidden') }); Object.defineProperty(document, 'hidden', { configurable: true, get: () => !hien }); document.dispatchEvent(new Event('visibilitychange')) }
+  afterEach(() => datHien(true))
+  it('A → (rời app 10 giây) → C → B rồi Kiểm tra ⇒ dd 2, dq 3, rn 1, ar ≈ 10; mã máy giữ nguyên giữa hai lần mở', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    try {
+      vi.mocked(goiHoa2).mockImplementation(async (hanh: string) => (hanh === 'answer' ? { ok: true, correct: true, answer: 'B' } : { ok: true, id: 'p1', questions: [TN] }) as never)
+      render(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()} homNay={{ daLam: 0, muc: 12, chang: 1, soChang: 3 }} />)
+      await screen.findByText(TN.text)
+      fireEvent.pointerDown(window)
+      const pa = () => screen.getAllByRole('radio')
+      fireEvent.click(pa()[0]!)
+      await vi.advanceTimersByTimeAsync(5_000)
+      datHien(false); await vi.advanceTimersByTimeAsync(10_000); datHien(true)
+      await vi.advanceTimersByTimeAsync(1_000)
+      fireEvent.click(pa()[2]!)
+      fireEvent.click(pa()[1]!)
+      fireEvent.click(screen.getByRole('button', { name: /^Nộp|^Kiểm tra|Nộp/ }))
+      await waitFor(() => expect(vi.mocked(goiHoa2).mock.calls.some((c) => c[0] === 'answer')).toBe(true))
+      const dg = (vi.mocked(goiHoa2).mock.calls.find((c) => c[0] === 'answer')![2] as { doGiay: Record<string, number | string> }).doGiay
+      expect(dg).toMatchObject({ dd: 2, dq: 3, rn: 1 })
+      expect(dg.ar).toBeGreaterThanOrEqual(9)
+      expect(dg.ar).toBeLessThanOrEqual(11)
+      expect(dg.a).toBeGreaterThanOrEqual(9) // tổng giây ẩn (đo cũ) vẫn gửi như trước
+      expect(dg.tb).toBe(localStorage.getItem('ddh_id_thiet_bi')!.replace(/[^A-Za-z0-9]/g, '').slice(0, 16))
+    } finally {
+      vi.useRealTimers()
     }
   }, 20000)
 })

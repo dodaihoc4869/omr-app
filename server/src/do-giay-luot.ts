@@ -22,6 +22,30 @@ export interface DoLuot {
   dh?: 1
   /** ĐO TREO MÁY (22/10, docs/dac-ta-muc-lam-6-muc-2210.md mục 3): vắng = máy em chưa có đồng hồ mới ⇒ "Chưa đo treo máy". */
   treo?: DoTreo
+  /** CHỈ THÊM 01/11 (đánh giá 99% đợt 2): đổi đáp án / rời app ngay trước khi chọn / mã máy luyện tập. Vắng = máy em chưa gửi (bản cũ). */
+  hv?: DoHanhVi
+}
+
+/**
+ * HÀNH VI TRONG MỘT LƯỢT LUYỆN TẬP (01/11, đợt 2 «đánh giá 4 bảng v2»), máy em đo bằng `src/lib/doi-dap-an.ts`, gửi CÙNG cụm `doGiay` (không thêm lệnh):
+ *   dd · số lần đổi lựa chọn trước khi bấm «Kiểm tra» · dq · số phương án KHÁC NHAU đã thử (chỉ Phần I A–D; «dò đáp án» = dq ≥ 3)
+ *   rn · số lần ẩn app trong lượt · ar · giây ẩn app trong 30 giây ngay trước lựa chọn CUỐI (0 = không rời) · tb · mã máy luyện tập ngắn (KHÔNG phải IP).
+ * Mỗi trường làm sạch riêng: sai khuôn ⇒ bỏ trường đó (không đoán), các trường khác vẫn nhận.
+ */
+export interface DoHanhVi { dd?: number; dq?: number; rn?: number; ar?: number; tb?: string }
+/** Trần của từng số (số nguyên không âm; vượt trần ⇒ kẹp về trần). `ar` đo trong cửa sổ 30 giây ⇒ không thể quá 30. */
+export const TRAN_HANH_VI = { dd: 99, dq: 4, rn: 99, ar: 30 } as const
+const KHUON_MA_MAY = /^[A-Za-z0-9_-]{1,32}$/
+
+/** Làm sạch cụm hành vi trong `doGiay` (`dd, dq, rn, ar, tb`). Không trường nào hợp lệ ⇒ null. Thuần. */
+export function lamSachHanhVi(x: Record<string, unknown>): DoHanhVi | null {
+  const ra: DoHanhVi = {}
+  for (const k of ['dd', 'dq', 'rn', 'ar'] as const) {
+    const v = x[k]
+    if (laSo(v) && v >= 0) ra[k] = Math.min(TRAN_HANH_VI[k], Math.round(v))
+  }
+  if (typeof x.tb === 'string' && KHUON_MA_MAY.test(x.tb)) ra.tb = x.tb
+  return Object.keys(ra).length ? ra : null
 }
 
 /** Số đo treo máy của MỘT lượt (giây nguyên). v: mở khi tab hiện · a: mở khi tab ẩn/màn tắt · l: khoảng lặng dài nhất · n: số khoảng lặng 120–179 giây · w: 1 = màn giữ sáng suốt lượt. */
@@ -51,7 +75,9 @@ export function lamSachDo(x: unknown): DoLuot | null {
   const phan = x.p === 'I' || x.p === 'II' || x.p === 'III' ? x.p : null
   if (giay === null && tu === null) return null
   const treo = giay !== null ? lamSachTreo(x) : null
-  return { giay, tu, hinh, phan, ...(giay !== null ? { dh: 1 as const } : {}), ...(treo ? { treo } : {}) }
+  // Hành vi (01/11) chỉ nhận khi có giây ĐO THẬT của đồng hồ mới — cùng điều kiện với cụm treo máy.
+  const hv = giay !== null ? lamSachHanhVi(x) : null
+  return { giay, tu, hinh, phan, ...(giay !== null ? { dh: 1 as const } : {}), ...(treo ? { treo } : {}), ...(hv ? { hv } : {}) }
 }
 
 /**
@@ -84,7 +110,8 @@ export function docDoGiayNhieu(body: unknown): Map<string, DoLuot> {
 export function ghepDocVaoRaw(raw: unknown, d: DoLuot | null | undefined): unknown {
   if (!d || d.tu === null) return raw
   const goc = laObj(raw) ? { ...raw } : {}
-  goc.doc = { t: d.tu, ...(d.hinh !== null ? { h: d.hinh } : {}), ...(d.phan ? { p: d.phan } : {}), ...(d.dh ? { dh: 1 } : {}), ...(d.dh && d.treo ? d.treo : {}) }
+  // `hv` (01/11) trải phẳng vào `doc`: dd, dq, rn, ar, tb — khoá không trùng khoá nào sẵn có (t h p dh v a l n w).
+  goc.doc = { t: d.tu, ...(d.hinh !== null ? { h: d.hinh } : {}), ...(d.phan ? { p: d.phan } : {}), ...(d.dh ? { dh: 1 } : {}), ...(d.dh && d.treo ? d.treo : {}), ...(d.dh && d.hv ? d.hv : {}) }
   return goc
 }
 

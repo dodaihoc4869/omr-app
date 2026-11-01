@@ -9,6 +9,7 @@ import { ghiNhoKetQuaSanh, goiHoa2, type KetQuaSanh } from '../hoa2/api'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { nopCauLuong } from '../hoa2/doc-luong-nop'
 import { chamTaiMay, moDm } from '../../lib/dap-an-may' // ĐÁP ÁN TRÊN MÁY (thầy 31/10): chấm tại máy, nằm trong mảnh màn làm bài (đã nạp lười)
+import { chotHanhVi, ghiAn, ghiChon, ghiHien, maMayNgan, taoDem, type DemLuot } from '../../lib/doi-dap-an' // đợt 2 đánh giá 99% (01/11): đổi / dò đáp án, rời app ngay trước khi chọn, mã máy
 import { boChangMoTruoc, boGoiNgay, CAU_MOI_CHANG_GOI, docChangDangLam, ghiCauXong, GIAY_CHO_MO_CHANG, layChangGoi, layChangMoTruoc, layChangMoTruocNgay, luuChangDangLam, moChangTruoc, napGoiNgay, nghePhanAnRoiApp, xoaChangDangLam } from './mo-chang-truoc'
 // Tên trang chính trên nút «về» (Boss 27/10): giao diện Trong ⇒ «Lộ trình»; giao diện cũ ⇒ «Hôm nay». Viết tại chỗ: nhập mô-đun dùng chung sẽ đẻ mảnh tải riêng (+1 tệp mở app).
 const tenTrangChinh = (): string => (typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Lộ trình' : 'Hôm nay')
@@ -325,6 +326,10 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   // w (1 = xin được giữ màn sáng: màn ẩn lúc ấy là em tự rời app/tắt màn, không phải màn tự tắt). Gửi cùng cụm `doGiay`.
   const dhMs = useRef(dang0?.dhMs ?? 0), dhCham = useRef(Date.now()), giuDh = useRef(!!dang0)
   const dhT = useRef(dang0?.dhT ? { ...dang0.dhT } : { v: 0, a: 0, l: 0, n: 0, lang: 0 }), dhW = useRef(false)
+  // ĐỢT 2 ĐÁNH GIÁ 99% (01/11, src/lib/doi-dap-an.ts): bộ đếm đổi / dò đáp án + rời app ngay trước khi chọn của câu đang làm — ref, đổi tại chỗ (0 lần vẽ lại
+  // mỗi chạm); tạo mới khi sang câu (effect `khoa` dưới), gửi cùng cụm `doGiay`. `tb` = mã máy ngắn, đọc một lần sau khi mở màn (ngoài lượt chạm).
+  const demDoi = useRef<DemLuot>(null as unknown as DemLuot), maMay = useRef('')
+  if (!demDoi.current) demDoi.current = taoDem() // tạo MỘT lần (không cấp phát mỗi lần vẽ)
   useEffect(() => { if (giuDh.current) { giuDh.current = false; dhCham.current = Date.now(); return } dhMs.current = 0; dhCham.current = Date.now(); dhT.current = { v: 0, a: 0, l: 0, n: 0, lang: 0 } }, [q?.qid])
   useEffect(() => {
     const id = window.setInterval(() => {
@@ -356,13 +361,17 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     const doiHien = () => {
       if (document.visibilityState === 'visible') {
         if (anTu) { const t = dhT.current; t.a = Math.min(7200, t.a + Math.round((Date.now() - anTu) / 1000)); anTu = 0 }
+        ghiHien(demDoi.current, Date.now())
         xin()
-      } else { if (!anTu) anTu = Date.now(); khoaMan = null /* trình duyệt tự nhả khi ẩn */ }
+      } else { if (!anTu) anTu = Date.now(); ghiAn(demDoi.current, Date.now()); khoaMan = null /* trình duyệt tự nhả khi ẩn */ }
     }
     xin()
     document.addEventListener('visibilitychange', doiHien)
+    // Mã máy ngắn đọc NGOÀI lượt chạm (một lần đọc localStorage, sau khi màn đã vẽ) — «Kiểm tra» không phải đọc lại.
+    const henMay = window.setTimeout(() => { if (!maMay.current) maMay.current = maMayNgan() }, 1500)
     return () => {
       het = true
+      window.clearTimeout(henMay)
       window.clearInterval(id)
       for (const e of ev) window.removeEventListener(e, cham, { capture: true })
       document.removeEventListener('visibilitychange', doiHien)
@@ -522,10 +531,11 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   }, [token, lan]) // eslint-disable-line react-hooks/exhaustive-deps -- sbd đi cùng token; số «đã làm» của Lộ trình chỉ đọc lúc mở chặng
   const giuKhoa = useRef(!!dang0)
   useEffect(() => {
-    if (giuKhoa.current) { giuKhoa.current = false; batDau.current = Date.now() - (dang0?.dhMs ?? 0); return }
+    if (giuKhoa.current) { giuKhoa.current = false; batDau.current = Date.now() - (dang0?.dhMs ?? 0); demDoi.current = taoDem(traRef.current, q?.phan, Date.now(), document.hidden); return }
     let nhap = ''
     if (khoa) try { nhap = localStorage.getItem(khoa) || '' } catch { /* Lưu nháp không khả dụng. */ }
     setTra(nhap); traRef.current = nhap; setGoiY(false); setMoLoiGiai(false); setTuLam(!!nhap); batDau.current = Date.now()
+    demDoi.current = taoDem(nhap, q?.phan, Date.now(), document.hidden) // câu mới: đáp án nháp khôi phục không tính là «đổi»
   }, [khoa]) // eslint-disable-line react-hooks/exhaustive-deps
   // Rời màn (Về, Tự chữa…) khi đã nộp câu mà sảnh chưa nạp lại ⇒ nạp MỘT lần để Hôm nay đúng số.
   useEffect(() => () => { if (canTaiSanh.current) { canTaiSanh.current = false; capNhatRef.current(); henNapLai(() => capNhatRef.current()) } }, [])
@@ -558,7 +568,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     canTaiSanh.current = true
     setDem(v => (v ? { ...v, daLam: Math.max(v.daLam, m.d0 + m.qids.size) } : homNay ? { daLam: m.d0 + m.qids.size, muc: homNay.muc } : v)); vaSo(m.d0 + m.qids.size)
   }
-  const doiTra = (v: string) => { phanHoi('chon'); setTra(v); traRef.current = v; try { localStorage.setItem(khoa, v) } catch { /* Em vẫn làm và nộp được. */ } }
+  const doiTra = (v: string) => { phanHoi('chon'); ghiChon(demDoi.current, q?.phan, v, Date.now()); setTra(v); traRef.current = v; try { localStorage.setItem(khoa, v) } catch { /* Em vẫn làm và nộp được. */ } }
   // Sang câu mới / vừa có kết quả ⇒ đưa màn về đầu (dải kết quả, đề) — em không phải tự vuốt ngược. Trình đọc màn hình: tiêu đề "Câu x/y" và dải
   // kết quả tự đọc (aria-live / role=status); có kết quả thì con trỏ bàn phím sang nút chính "Câu tiếp theo" (Enter = đi tiếp), không vẽ viền khi em chạm.
   const veDau = () => gocRef.current?.scrollIntoView?.({ block: 'start' })
@@ -640,6 +650,9 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     // Chỉ mã giao diện (không có đáp án); đáp án vẫn chỉ về cùng phản hồi chấm.
     if (duo) { void import('../goi-y-cham/LoiGiaiCauCoSoDo').catch(() => {}); if (viTri + 1 >= cau.length) void import('../thuong/KetBaiThuong').catch(() => {}) }
     const msLam = Math.max(0, Date.now() - batDau.current)
+    // Chốt đổi / dò đáp án + rời app ngay trước lựa chọn cuối NGAY lúc bấm «Kiểm tra» (trước mọi lần chờ mạng).
+    if (!maMay.current) maMay.current = maMayNgan()
+    const hanhVi = chotHanhVi(demDoi.current, q.phan, maMay.current)
     const assisted = !!q.goiY || daHoiThay.current === q.qid || hoTroCham.current === q.qid
     // KẾT QUẢ TẠM (dòng 1 của máy chủ, hoặc chấm tại máy): đổi màu đúng / sai NGAY tại dải + đồng bộ tiến độ chặng (0 ms) nếu em bấm thoát ngay sau đó; thưởng / EXP đến cùng phản hồi đầy đủ.
     // Tạm đầu tiên thắng; bản đầy đủ của máy chủ luôn thay (lệch ⇒ theo máy chủ); bản đầy đủ không về ⇒ bỏ tạm (dưới).
@@ -682,7 +695,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
           lamLaiSom.current = p
         }
       }
-      const than = { session: ph, qid: q.qid, answer: tra, assisted, msLam, ...(typeof skCau === 'string' && skCau ? { sk: skCau, ...(luotChang.current > 0 ? { lm: luotChang.current } : {}) } : {}), doGiay: dhMs.current >= 1000 ? { g: Math.round(dhMs.current / 1000), v: dhT.current.v, a: dhT.current.a, l: Math.max(dhT.current.l, dhT.current.lang), n: dhT.current.n, w: dhW.current ? 1 : 0 } : undefined }
+      const than = { session: ph, qid: q.qid, answer: tra, assisted, msLam, ...(typeof skCau === 'string' && skCau ? { sk: skCau, ...(luotChang.current > 0 ? { lm: luotChang.current } : {}) } : {}), doGiay: dhMs.current >= 1000 ? { g: Math.round(dhMs.current / 1000), v: dhT.current.v, a: dhT.current.a, l: Math.max(dhT.current.l, dhT.current.lang), n: dhT.current.n, w: dhW.current ? 1 : 0, ...hanhVi } : undefined }
       const r = await guiLaiBenVung(() => duo ? nopCauLuong(token, than, 15, khiTam) : goiHoa2('answer', token, than, 15)) // chống trùng theo biên nhận ⇒ kẹt mạng tự gửi lại
       if (typeof r.correct !== 'boolean' || typeof r.answer !== 'string') throw new Error(typeof r.error === 'string' ? r.error : 'Chưa xác nhận được bài nộp. Em thử lại; kết quả không bị tính hai lần.')
       setMsCau(v => ({ ...v, [q.qid]: msLam })); ghiCauXong(sbd, q.qid)

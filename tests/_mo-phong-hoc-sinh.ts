@@ -1,6 +1,9 @@
 // MÔ PHỎNG HỌC SINH CÓ ĐÁP ÁN — thước tự đo cho đánh giá 4 bảng v2 (thầy 01/11: «tự đo tự làm tất tự tối ưu và phải đạt 99%»).
 // Mỗi kiểu em có TẬP BẢNG ĐƯỢC PHÉP (xếp vào bảng ngoài tập ⇒ SAI) và bảng PHẢI CÓ (để đo độ phủ). Có cả các kiểu DỄ BỊ XẾP OAN: em giỏi làm nhanh, em hay bị
 // thông báo kéo ra khỏi app, em dồn hạn, em chăm mà yếu. Số liệu sinh theo phân bố sát thực tế (36 câu/ngày, 14 ngày, độ khó câu, thời gian đọc đề theo phần).
+// Đợt 2 (01/11): mỗi lượt có thêm số đo máy em (src/lib/doi-dap-an.ts) — dd đổi lựa chọn · dq số phương án đã thử (Phần I) · rn số lần rời app · ar giây rời app
+// trong 30 giây ngay trước lựa chọn cuối. Em thật: thỉnh thoảng đổi một lần (dd 0–1, dq ≤ 2; em yếu hiếm khi phân vân 3 phương án); em bị thông báo kéo ra:
+// rn > 0 nhưng ar gần như luôn 0 (quay lại còn đọc tiếp); em tra ngoài: rời rồi quay lại chọn ngay (ar lớn); em DÒ ĐÁP ÁN (`dp_do`): thử 3–4 phương án nhiều lượt.
 import { danhGiaEm, type DauVaoDanhGia, type LuotDanhGia } from '../server/src/danh-gia-hoc-that'
 import type { DauVaoBon, NgayNhip } from '../server/src/bon-chi-so'
 import type { MaBang } from '../src/lib/bon-bang-kieu'
@@ -26,7 +29,7 @@ export const DEN = NGAY[13]!
 
 export type Kieu =
   | 'ht' | 'ht_yeu' | 'ht_it_ngay' | 'gioi_nhanh' | 'ht_thong_bao'
-  | 'dp_voi' | 'dp_tra' | 'dp_lap' | 'dp_treo'
+  | 'dp_voi' | 'dp_tra' | 'dp_lap' | 'dp_treo' | 'dp_do'
   | 'cham_yeu' | 'trung_binh' | 'don_han'
   | 'luoi_han' | 'luoi_mot_phan'
 
@@ -41,6 +44,7 @@ export const NHAN: Record<Kieu, { duoc: MaBang[]; phai: MaBang[]; mo: string }> 
   dp_tra: { duoc: ['dp'], phai: ['dp'], mo: 'Đối phó: rời app tra đáp án rồi chọn đúng, luyện cao mà kiểm tra thấp' },
   dp_lap: { duoc: ['dp'], phai: ['dp'], mo: 'Đối phó: bấm một chữ liền nhiều câu + chọn vội' },
   dp_treo: { duoc: ['dp'], phai: [], mo: 'Đối phó: treo máy cho đủ giờ + chọn vội' },
+  dp_do: { duoc: ['dp'], phai: ['dp'], mo: 'Đối phó: dò đáp án — thử 3–4 phương án trước khi bấm Kiểm tra ở nhiều lượt, luyện cao mà kiểm tra thấp' },
   cham_yeu: { duoc: ['ch', 'ht'], phai: ['ch'], mo: 'Chăm, làm thật nhưng yếu, sửa sai một phần' },
   trung_binh: { duoc: ['ch', 'ht'], phai: [], mo: 'Trung bình, lẫn lộn — phần lớn nên «Đang theo dõi»' },
   don_han: { duoc: ['ht'], phai: [], mo: 'Làm đủ nhưng dồn hết sau 23:00 (không được Chăm)' },
@@ -52,10 +56,12 @@ export const CAC_KIEU = Object.keys(NHAN) as Kieu[]
 interface ThamSo {
   nangLuc: number; ngayLam: number; voi: number; voiDung: number; sua: number; an: number; anDung: boolean; treo: number
   lap: number; donHan: boolean; nhanh: boolean; ktLech: number | null; hoi: number; vuot: number
+  /** Đợt 2: tỉ lệ lượt đổi lựa chọn MỘT lần (em thật) · tỉ lệ lượt Phần I phân vân 3 phương án (em yếu, hiếm) · tỉ lệ lượt Phần I DÒ đáp án (dp_do). */
+  doi: number; phanVan: number; doTL: number
 }
 function thamSo(k: Kieu, r: Rng): ThamSo {
   const c: ThamSo = { nangLuc: giua(r, 0.45, 0.8), ngayLam: 14, voi: giua(r, 0, 0.04), voiDung: 0.3, sua: giua(r, 0.82, 0.97), an: giua(r, 0, 0.03), anDung: false, treo: 0,
-    lap: 0, donHan: false, nhanh: false, ktLech: giua(r, -0.8, 0.8), hoi: nguyen(r, 0, 2), vuot: nguyen(r, 0, 6) }
+    lap: 0, donHan: false, nhanh: false, ktLech: giua(r, -0.8, 0.8), hoi: nguyen(r, 0, 2), vuot: nguyen(r, 0, 6), doi: giua(r, 0.06, 0.15), phanVan: 0, doTL: 0 }
   switch (k) {
     case 'ht': return c
     case 'ht_yeu': return { ...c, nangLuc: giua(r, 0.12, 0.3), sua: giua(r, 0.72, 0.92) }
@@ -65,9 +71,10 @@ function thamSo(k: Kieu, r: Rng): ThamSo {
     case 'dp_voi': return { ...c, nangLuc: giua(r, 0.25, 0.6), voi: giua(r, 0.3, 0.6), voiDung: 0.25, sua: giua(r, 0, 0.3), ktLech: null, hoi: 0, vuot: 0, ngayLam: nguyen(r, 11, 14) }
     case 'dp_tra': return { ...c, nangLuc: giua(r, 0.2, 0.45), an: giua(r, 0.45, 0.75), anDung: true, voi: giua(r, 0.03, 0.1), sua: giua(r, 0.5, 0.9), ktLech: -giua(r, 3, 4.5), hoi: 0, ngayLam: nguyen(r, 12, 14) }
     case 'dp_lap': return { ...c, nangLuc: giua(r, 0.25, 0.55), lap: nguyen(r, 2, 6), voi: giua(r, 0.15, 0.35), voiDung: 0.25, sua: giua(r, 0, 0.4), ktLech: null, hoi: 0, ngayLam: nguyen(r, 11, 14) }
+    case 'dp_do': return { ...c, nangLuc: giua(r, 0.2, 0.45), doTL: giua(r, 0.25, 0.5), voi: giua(r, 0.03, 0.08), sua: giua(r, 0.5, 0.9), ktLech: -giua(r, 3, 4.5), hoi: 0, ngayLam: nguyen(r, 12, 14) }
     case 'dp_treo': return { ...c, nangLuc: giua(r, 0.3, 0.6), treo: giua(r, 0.1, 0.2), voi: giua(r, 0.12, 0.25), voiDung: 0.25, sua: giua(r, 0.1, 0.5), ktLech: null, hoi: 0, ngayLam: nguyen(r, 12, 14) }
-    case 'cham_yeu': return { ...c, nangLuc: giua(r, 0.12, 0.3), sua: giua(r, 0.35, 0.6), ktLech: giua(r, -1, 0.5) }
-    case 'trung_binh': return { ...c, nangLuc: giua(r, 0.35, 0.6), voi: giua(r, 0.06, 0.12), voiDung: 0.4, sua: giua(r, 0.4, 0.75), ngayLam: nguyen(r, 12, 14), an: giua(r, 0, 0.06), hoi: nguyen(r, 0, 1) }
+    case 'cham_yeu': return { ...c, nangLuc: giua(r, 0.12, 0.3), sua: giua(r, 0.35, 0.6), ktLech: giua(r, -1, 0.5), phanVan: giua(r, 0, 0.02) }
+    case 'trung_binh': return { ...c, nangLuc: giua(r, 0.35, 0.6), voi: giua(r, 0.06, 0.12), voiDung: 0.4, sua: giua(r, 0.4, 0.75), ngayLam: nguyen(r, 12, 14), an: giua(r, 0, 0.06), hoi: nguyen(r, 0, 1), phanVan: giua(r, 0, 0.02) }
     case 'don_han': return { ...c, donHan: true, voi: giua(r, 0.05, 0.1), voiDung: 0.4, sua: giua(r, 0.4, 0.85), vuot: 0 }
     case 'luoi_han': return { ...c, ngayLam: nguyen(r, 0, 3), sua: giua(r, 0, 0.3), ktLech: null, hoi: 0, vuot: 0 }
     case 'luoi_mot_phan': return { ...c, ngayLam: nguyen(r, 5, 8), sua: giua(r, 0.1, 0.6), ktLech: null, vuot: 0 }
@@ -103,10 +110,22 @@ export function taoEm(k: Kieu, r: Rng, ma = 'X'): DauVaoBon {
       if (den.length && r() < 0.35) { const x = den.shift()!; saiCho.splice(saiCho.indexOf(x), 1); cau = x.cau; songSinh = true }
       const voi = conLap > 0 || r() < t.voi
       const treo = !voi && r() < t.treo
-      const an = !voi && !treo && r() < t.an ? giua(r, 9, t.anDung ? 60 : 20) : r() < 0.2 ? giua(r, 0, 4) : 0
-      const pDung = songSinh ? (r() < t.sua ? 0.97 : 0.15) : voi ? t.voiDung : an > 8 && t.anDung ? 0.95 : kep01(pLop + (t.nangLuc - 0.5) * 0.9)
+      const roiLau = !voi && !treo && r() < t.an
+      const an = roiLau ? giua(r, 9, t.anDung ? 60 : 20) : r() < 0.2 ? giua(r, 0, 4) : 0
+      // ar: em tra ngoài quay lại chọn NGAY (còn 1–8 giây trong cửa sổ 30 giây); em bị thông báo kéo ra: 80% quay lại còn đọc tiếp quá 30 giây (ar = 0),
+      // 20% rời 1–8 giây trong cửa sổ; liếc ra ngoài vài giây: ar ≤ số giây đã rời.
+      const ar = an <= 0 ? 0 : roiLau ? (t.anDung ? Math.round(Math.min(an, 30 - giua(r, 1, 8))) : r() < 0.2 ? Math.min(Math.round(an), nguyen(r, 1, 8)) : 0)
+        : r() < 0.3 ? Math.min(Math.round(an), nguyen(r, 0, 4)) : 0
+      const rn = an <= 0 ? 0 : roiLau && !t.anDung && t.an >= 0.1 ? nguyen(r, 1, 3) : nguyen(r, 1, 2)
+      // dd / dq: dò đáp án (dp_do, Phần I) thử 3–4 phương án; em yếu hiếm khi phân vân 3; em thật thỉnh thoảng đổi một lần; chọn vội / bấm lặp không đổi.
+      const doDa = phan === 'I' && !voi && !treo && r() < t.doTL
+      const phanVan = !doDa && phan === 'I' && !voi && r() < t.phanVan
+      const doiMot = !doDa && !phanVan && !voi && conLap <= 0 && r() < t.doi
+      const dq = phan !== 'I' ? undefined : doDa ? (r() < 0.6 ? 3 : 4) : phanVan ? 3 : doiMot ? 2 : 1
+      const dd = doDa ? dq! - 1 + nguyen(r, 0, 2) : phanVan ? 2 : doiMot ? 1 : 0
+      const pDung = songSinh ? (r() < t.sua ? 0.97 : 0.15) : voi ? t.voiDung : an > 8 && t.anDung ? 0.95 : doDa ? 0.85 : kep01(pLop + (t.nangLuc - 0.5) * 0.9)
       const dung = r() < pDung
-      const giay = treo ? giua(r, 400, 900) : voi ? giua(r, 2, Math.min(7, giayDoc * 0.5)) : t.nhanh ? giayDoc * giua(r, 0.75, 1.1) : giayDoc * giua(r, 1.15, 2.6)
+      const giay = treo ? giua(r, 400, 900) : voi ? giua(r, 2, Math.min(7, giayDoc * 0.5)) : doDa ? giayDoc * giua(r, 1.3, 3) : t.nhanh ? giayDoc * giua(r, 0.75, 1.1) : giayDoc * giua(r, 1.15, 2.6)
       const chon = phan === 'I' ? (conLap > 0 ? chuLap : 'ABCD'[nguyen(r, 0, 3)]!) : null
       if (conLap > 0) conLap--
       phut += Math.max(1, giay / 60 + giua(r, 0, 1.5))
@@ -114,7 +133,7 @@ export function taoEm(k: Kieu, r: Rng, ma = 'X'): DauVaoBon {
       const luc = new Date(Date.parse(`${n}T00:00:00Z`) - 7 * 3_600_000 + gio * 60_000).toISOString()
       const ma4: LuotDanhGia['ma'] = treo ? 3 : giay < giayDoc ? (t.nhanh && dung ? 2 : 1) : giay < giayDoc * 1.3 ? 2 : 3
       luot.push({ phan, dung, cau, ma: ma4, thuoc: t.nhanh && dung && giay < giayDoc, treo: treo ? 'treo' : null, r: giay / giayDoc, pLop, chon, coGoiY: false, songSinh,
-        ngay: n, luc, giay, giayDoc, qid: cau, an })
+        ngay: n, luc, giay, giayDoc, qid: cau, an, dd, ...(dq !== undefined ? { dq } : {}), ar, rn })
       if (!dung && !songSinh) saiCho.push({ cau, ngay: d })
     }
     ngay.push({ ngay: n, muc, lam: so })

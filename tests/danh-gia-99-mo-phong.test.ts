@@ -3,6 +3,7 @@
 // Thước: học sinh MÔ PHỎNG có đáp án (tests/_mo-phong-hoc-sinh.ts — 14 kiểu, gồm các kiểu dễ bị xếp oan). Với mỗi bảng:
 //   ĐỘ CHÍNH XÁC = số em app xếp vào bảng mà đúng kiểu / số em app xếp vào bảng — PHẢI ≥ 99% ở cả 4 bảng, trên 3 hạt ngẫu nhiên khác nhau.
 //   ĐỘ PHỦ (kiểu «phải có» được xếp đúng) — in ra, chặn dưới để không «an toàn» bằng cách không xếp ai.
+// Đợt 2 (01/11): lượt mô phỏng mang thêm dd / dq / ar / rn như máy em đo (src/lib/doi-dap-an.ts); thêm kiểu `dp_do` (dò đáp án).
 import { describe, expect, it } from 'vitest'
 import { tinhBon } from '../server/src/bon-chi-so'
 import { CAC_KIEU, NHAN, taoEm, taoRng, type Kieu } from './_mo-phong-hoc-sinh'
@@ -42,6 +43,7 @@ describe('đánh giá 4 bảng v2 — tự đo trên học sinh mô phỏng có 
       // độ phủ: kiểu rõ ràng phải được xếp phần lớn (không «an toàn» bằng cách bỏ trống bảng)
       const can = (k: Kieu, b: MaBang, toiThieu: number) => { const x = kq.phu[`${k}:${b}`]!; expect(pc(x.co, x.can), `phủ ${k}:${b}`).toBeGreaterThanOrEqual(toiThieu) }
       can('ht', 'ht', 70); can('dp_voi', 'dp', 80); can('dp_tra', 'dp', 80); can('dp_lap', 'dp', 80); can('luoi_han', 'lu', 90); can('ht', 'ch', 80)
+      can('dp_do', 'dp', 80) // đợt 2 (01/11): dò đáp án — thử từ 3 phương án trở lên trước khi bấm Kiểm tra
     })
   }
 })
