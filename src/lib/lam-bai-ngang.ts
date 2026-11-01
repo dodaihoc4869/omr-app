@@ -182,6 +182,7 @@ export function thuVaoToanManHinh(doc: Document = document): boolean {
   const d = doc as TaiLieuFs
   if (d.fullscreenElement || d.webkitFullscreenElement) return false
   const el = doc.documentElement as PhanTuFs
+  lucAppXin = performance.now()
   try {
     if (typeof el.requestFullscreen === 'function') {
       const p = el.requestFullscreen({ navigationUI: 'hide' } as FullscreenOptions)
@@ -197,6 +198,18 @@ export function thuVaoToanManHinh(doc: Document = document): boolean {
     /* bị từ chối — dùng bố cục chiếm trọn khung nhìn */
   }
   return false
+}
+
+/** THI TẬP TRUNG (thầy 01/11): mọi lượt APP TỰ XIN toàn màn hình đi qua `thuVaoToanManHinh` (cú bấm Bắt đầu, «Bật toàn màn hình», «Vào lại toàn
+ * màn hình») và để lại mốc ở đây. Lúc trình duyệt chuyển vào toàn màn (hoạt ảnh của macOS / Windows) cửa sổ có thể chớp mất tiêu điểm: bộ đếm rời màn
+ * ở ExamTakeScreen chờ HẾT quãng này rồi mới đọc lại `hasFocus()` — chớp xong là thôi, KHÔNG đếm; em rời thật thì lúc đọc lại vẫn mất tiêu điểm ⇒ vẫn
+ * tính như cũ (không nới luật). Còn `fullscreenchange` khi VÀO toàn màn vốn chỉ khép một lần rời đang mở (ghi 'focus'), không bao giờ cộng đếm;
+ * RA khỏi toàn màn giữ nguyên luật cũ. */
+export const MS_APP_XIN_TOAN_MAN = 1500
+let lucAppXin = -Infinity
+/** Còn bao nhiêu ms trong quãng chờ sau lượt app tự xin toàn màn gần nhất (0 = ngoài quãng). */
+export function msChoAppXinToanMan(nay: number = performance.now()): number {
+  return Math.max(0, lucAppXin + MS_APP_XIN_TOAN_MAN - nay)
 }
 
 /** Nộp bài / thoát ca ⇒ trả lại màn hình thường. Không ở toàn màn hình thì thôi. */

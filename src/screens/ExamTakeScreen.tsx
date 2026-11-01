@@ -103,7 +103,7 @@ import BangNhapSo from '../components/BangNhapSo'
 import { soOHopLe } from '../lib/so-o-tra-loi-ngan'
 import type { BoDoTreoMayTrang } from '../lib/do-treo-may-thi'
 import type { CauPhieu } from './LamBaiNgang'
-import { thoatToanManHinh, thuVaoToanManHinh, useBoCuc } from '../lib/lam-bai-ngang'
+import { msChoAppXinToanMan, thoatToanManHinh, thuVaoToanManHinh, useBoCuc } from '../lib/lam-bai-ngang'
 import type { ThiDuoProps } from '../components/kiem-tra-duo/ThiDuo'
 // «Trong» 26/10 (nhóm 2): tờ trình bày styles/trong-lam-bai.css nạp RIÊNG, chỉ khi <html data-trong> (main.tsx gắn trước khi nạp màn) — không cộng byte lượt mở app.
 if (typeof document !== 'undefined' && document.documentElement.dataset.trong) void import('../styles/trong-lam-bai.css').catch(() => {})
@@ -196,15 +196,6 @@ export function loiKhuyenToanManHinh(coBatDuoc: boolean, trongUngDung: boolean, 
   if (trongUngDung) return 'Em đang mở trong ứng dụng khác. Bấm ⋯ rồi chọn "Mở trong Safari", sau đó bấm Chia sẻ → "Thêm vào Màn hình chính" và mở app từ biểu tượng đó.'
   if (ios) return 'Bấm nút Chia sẻ ở thanh dưới rồi chọn "Thêm vào Màn hình chính", sau đó mở app từ biểu tượng vừa hiện.'
   return 'Thêm app vào màn hình chính (hướng dẫn ở trên) rồi mở lại từ đó.'
-}
-async function batToanManHinh(): Promise<void> {
-  const el = document.documentElement as HTMLElement & { webkitRequestFullscreen?: () => Promise<void> | void }
-  try {
-    if (typeof el.requestFullscreen === 'function') await el.requestFullscreen({ navigationUI: 'hide' } as FullscreenOptions)
-    else if (typeof el.webkitRequestFullscreen === 'function') await el.webkitRequestFullscreen()
-  } catch {
-    // trình duyệt từ chối (vd iOS Safari) — ô nhắc phía trên đã hướng dẫn thêm vào màn hình chính
-  }
 }
 
 const formatClock = dinhDangDongHo
@@ -1892,7 +1883,8 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     }
     // BLUR KHÔNG ĐÁNG TIN (thầy báo 06/09: iPhone khoá oan). Trên máy cảm ứng
     // bỏ hẳn; trên máy có chuột phải chờ rồi đọc lại `hasFocus()` mới tính.
-    // Xem khối luật ở đầu `chong-gian-lan.ts`.
+    // Xem khối luật ở đầu `chong-gian-lan.ts`. Ngay sau lượt app TỰ xin toàn màn hình (thi tập trung 01/11) chờ hết quãng chuyển rồi mới đọc lại
+    // (msChoAppXinToanMan, lam-bai-ngang.ts): chớp tiêu điểm do chính app gây ra không đếm; rời thật vẫn tính.
     const camUng = laMayCamUng()
     let henBlur: ReturnType<typeof setTimeout> | null = null
     const onBlur = () => {
@@ -1901,7 +1893,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       henBlur = setTimeout(() => {
         henBlur = null
         if (tinhLaRoiMan('mat_tieu_diem', camUng, document.hasFocus())) logEvent('blur')
-      }, MS_XAC_NHAN_BLUR)
+      }, Math.max(MS_XAC_NHAN_BLUR, msChoAppXinToanMan()))
     }
     const onFocus = () => {
       // Tiêu điểm về trước khi kịp xác nhận ⇒ chưa từng tính là rời màn, nên
@@ -2969,7 +2961,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                     {loiKhuyenToanManHinh(coTheBatToanManHinh(), laTrinhDuyetTrongUngDung(), laIOS())}
                   </OThongBao>
                   {coTheBatToanManHinh() && (
-                    <NutChinh variant="phu" onClick={batToanManHinh}>
+                    <NutChinh variant="phu" onClick={() => thuVaoToanManHinh()}>
                       Bật toàn màn hình
                     </NutChinh>
                   )}
@@ -4142,6 +4134,9 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       tren: daiBao,
       congCu: <NutDiuMat bat={diuMat} onDoi={doiDiuMat} />,
       tatPhim: showBackDialog || !!zoomSrc || !!lyDoChe,
+      // Thi tập trung (01/11): ca có giờ ⇒ ẩn thanh trên + báo 12 · 6 · 1 phút (đọc kho giờ, không đổi đồng hồ); lượt = khoá nhớ mốc đã báo.
+      gio: laBaiTap ? null : khoGio,
+      luot: attempt.maCa + attempt.startedAt,
     }
     const theDuo = (
       <>

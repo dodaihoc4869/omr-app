@@ -3,9 +3,16 @@
 // hồ, lưu, nộp, chống rời màn, giữ để đọc, vân tay… đều do ExamTakeScreen dựng và truyền vào. Ở đây: thanh trên (thoát ⇒ hộp «không thoát được» cũ ·
 // thanh tiến độ «đã làm» · đồng hồ · lưới câu), một câu một màn, đáy dính «Câu tiếp» / «Nộp bài», tấm lưới số câu, tấm xác nhận nộp có Bi.
 // LUẬT THI: không hiện đúng/sai, không tấm xanh/đỏ, không đáp án — mảnh này không nhận đáp án nào. Âm thanh: màn thi bật cờ «đang kiểm tra» (batCheDoThi, am-thanh.ts) ⇒ chỉ rung.
-import { useEffect, useLayoutEffect, useRef, type MouseEvent, type ReactNode } from 'react'
+// THI TẬP TRUNG (thầy 01/11: «… khi vào kiểm tra thì ẩn hết đi … 15 phút cuối, 5 phút cuối, 1 phút cuối thì hiện thời gian lên … báo một lần rồi lại ẩn
+// đi … full màn hình»): ca CÓ GIỜ (`gio`) ⇒ thanh trên ẩn (vẫn trong DOM, chỉ trượt khỏi màn); tay nắm mảnh ở mép trên (chạm / vuốt xuống từ mép / Esc /
+// Tab tới) ⇒ hiện MS_HIEN_TREN rồi tự ẩn; báo giờ một lần ở mốc 12 · 6 · 1 phút (thầy chốt lại 01/11; lib/thi-tap-trung.ts, nhớ theo lượt). Bài tập
+// về nhà (không giờ) y cũ.
+import { useEffect, useLayoutEffect, useRef, useState, type FocusEvent, type MouseEvent, type ReactNode } from 'react'
+import { Clock } from 'lucide-react'
 import { phanHoi } from '../../lib/phan-hoi'
 import { batCheDoThi } from '../../lib/am-thanh'
+import type { KhoGio } from '../../lib/dong-ho-thi'
+import { MS_HIEN_BAO, MS_HIEN_TREN, chuBaoGio, docSoBao, ghiSoBao, mocCanBao } from '../../lib/thi-tap-trung'
 import { DayKt, NhanCauKt, TamLuoiKt, TamNopKt, ThanhTrenKt, useBangKt } from './KhungKiemTra'
 // Giám thị + đèn pha (thầy 30/10, đặc tả docs/dac-ta-kiem-tra-duo-3010.md): nhập thẳng — khung này vốn là mảnh nạp lười; hình người v3 nằm ở mảnh dùng
 // chung với màn làm chặng (giam-thi-*, kho chạy-lúc). Giám thị dựng SAU khung đầu của câu (không chặn lượt vẽ câu).
@@ -47,7 +54,62 @@ export interface ThiDuoProps {
   congCu?: ReactNode
   /** Có lớp phủ khác đang mở (hộp thoát, phóng ảnh, tấm che) ⇒ không nhận phím ← →. */
   tatPhim: boolean
+  /** Kho giờ của ca (chỉ ĐỌC giây còn lại). Có ⇒ chế độ tập trung + báo giờ; null / vắng (bài tập về nhà) ⇒ thanh trên luôn hiện như cũ. */
+  gio?: KhoGio | null
+  /** Khoá lượt làm (mã ca + giờ vào) — nhớ mốc đã báo qua tải lại. */
+  luot?: string
   children: ReactNode
+}
+
+/** Lời báo giờ (nút lá: nghe kho giờ, chỉ vẽ lại lúc báo / tắt báo). Hai vùng đọc màn hình luôn có sẵn: 12 · 6 phút «polite», 1 phút «assertive». */
+function BaoGio({ gio, luot }: { gio: KhoGio; luot: string }) {
+  const [moc, setMoc] = useState<number | null>(null)
+  useEffect(() => {
+    const so = docSoBao(luot, gio.conLaiNgay())
+    let tat: ReturnType<typeof setTimeout> | undefined
+    const xet = () => {
+      const m = mocCanBao(gio.conLaiNgay(), so.vao, so.da)
+      if (m === null) return
+      so.da = [...so.da, m]
+      ghiSoBao(luot, so)
+      setMoc(m)
+      clearTimeout(tat)
+      tat = setTimeout(() => setMoc(null), MS_HIEN_BAO)
+    }
+    xet()
+    const go = gio.dangKy(xet)
+    return () => { go(); clearTimeout(tat) }
+  }, [gio, luot])
+  const vien = moc !== null && <span className="duo-kt-bao-vien" data-moc={moc}><Clock size={18} aria-hidden="true" /><b>{chuBaoGio(moc)}</b></span>
+  return (
+    <>
+      <div className="duo-kt-bao-gio" aria-live="polite" aria-atomic="true">{moc !== 60 && vien}</div>
+      <div className="duo-kt-bao-gio" aria-live="assertive" aria-atomic="true">{moc === 60 && vien}</div>
+    </>
+  )
+}
+
+/** Thanh trên của chế độ tập trung: ẩn sẵn; `hien()` ⇒ hiện rồi tự ẩn sau MS_HIEN_TREN; `hien(true)` ⇒ GIỮ (đang Tab trong thanh) tới khi `tha()`. */
+function useThanhAn(bat: boolean) {
+  const [hienTren, setHienTren] = useState(false)
+  const r = useRef<{ hen?: ReturnType<typeof setTimeout>; giu: boolean }>({ giu: false }).current
+  const [ham] = useState(() => ({
+    hien(giu?: boolean) {
+      clearTimeout(r.hen)
+      r.giu = !!giu
+      setHienTren(true)
+      if (!giu) r.hen = setTimeout(() => setHienTren(false), MS_HIEN_TREN)
+    },
+    an() { clearTimeout(r.hen); r.giu = false; setHienTren(false) },
+    /** Tiêu điểm phím rời thanh đang giữ ⇒ đếm 5 giây rồi ẩn. */
+    tha() { if (r.giu) ham.hien() },
+  }))
+  useEffect(() => () => clearTimeout(r.hen), [r])
+  return { hienTren: bat && hienTren, ...ham }
+}
+const trongThanh = (el: EventTarget | null) => el instanceof Element && !!el.closest('.duo-kt-tren')
+const laTieuDiemPhim = (el: EventTarget | null) => {
+  try { return el instanceof Element && el.matches(':focus-visible') } catch { return false }
 }
 
 export default function ThiDuo(p: ThiDuoProps) {
@@ -73,10 +135,38 @@ export default function ThiDuo(p: ThiDuoProps) {
   // Đổi câu ⇒ về đầu câu (khung cuộn là lớp phủ của cổng học sinh hoặc cả trang).
   useEffect(() => { goc.current?.scrollIntoView?.({ block: 'start' }) }, [p.cauHien])
   const di = (so: number) => p.onDenCau(Math.max(1, Math.min(p.tong, so)))
-  // Máy tính: ← → đổi câu (không khi đang gõ ô nhập, đang mở tấm/hộp).
+  // Chế độ tập trung: chỉ ca có giờ. <html data-thi-tap-trung> ⇒ CSS cất nút «Đóng phòng thi» nổi của cổng học sinh (đè đúng góc thanh trên / cờ
+  // «Xem lại sau»; đường thoát của khung là nút X trên thanh — hộp «không thoát được» như cũ).
+  const tapTrung = !!p.gio
+  const { hienTren, hien, an, tha } = useThanhAn(tapTrung)
+  const tay = useRef<HTMLButtonElement>(null)
+  useLayoutEffect(() => {
+    if (!tapTrung) return
+    const g = document.documentElement
+    g.setAttribute('data-thi-tap-trung', '')
+    return () => g.removeAttribute('data-thi-tap-trung')
+  }, [tapTrung])
+  // Vuốt xuống từ mép trên (một ngón, bắt đầu trong dải tay nắm) ⇒ hiện thanh. Chỉ đo vị trí tay nắm khi chạm gần mép (không ép bố cục mỗi lần chạm).
+  useEffect(() => {
+    if (!tapTrung) return
+    let y0: number | null = null
+    const bd = (e: TouchEvent) => {
+      const t = e.touches.length === 1 ? e.touches[0] : undefined
+      y0 = t && t.clientY < 120 && t.clientY <= (tay.current?.getBoundingClientRect().bottom ?? 44) + 8 ? t.clientY : null
+    }
+    const di = (e: TouchEvent) => {
+      const t = e.touches[0]
+      if (y0 !== null && t && t.clientY - y0 > 24) { y0 = null; hien() }
+    }
+    window.addEventListener('touchstart', bd, { passive: true })
+    window.addEventListener('touchmove', di, { passive: true })
+    return () => { window.removeEventListener('touchstart', bd); window.removeEventListener('touchmove', di) }
+  }, [tapTrung, hien])
+  // Máy tính: ← → đổi câu (không khi đang gõ ô nhập, đang mở tấm/hộp). Esc (chế độ tập trung) ⇒ hiện thanh trên.
   const phim = useRef<(e: KeyboardEvent) => void>(() => {})
   phim.current = (e) => {
     if (p.tatPhim || p.moLuoi || p.moNop || e.ctrlKey || e.metaKey || e.altKey || e.repeat) return
+    if (e.key === 'Escape' && tapTrung) { hien(); return }
     if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return
     const t = e.target instanceof HTMLElement ? e.target : null
     if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.closest('[role=dialog]'))) return
@@ -96,10 +186,20 @@ export default function ThiDuo(p: ThiDuoProps) {
   }
   const cuoi = p.cauHien >= p.tong
   const ghiNop = p.camNopSom ? 'Chỉ nộp bài trong 1 phút cuối' : undefined
+  // Chạm trong thanh đang hiện ⇒ đếm lại 5 giây; chạm ngoài thanh (làm câu tiếp) ⇒ cất ngay. Tab tới nút trên thanh ⇒ hiện, giữ tới khi rời thanh.
+  const chamGoc = tapTrung ? (e: MouseEvent) => { if (trongThanh(e.target)) hien(); else if (hienTren && e.target !== tay.current) an() } : undefined
+  const vaoThanh = tapTrung ? (e: FocusEvent) => { if (trongThanh(e.target) && laTieuDiemPhim(e.target)) hien(true) } : undefined
+  const roiThanh = tapTrung ? (e: FocusEvent) => { if (!trongThanh(e.relatedTarget)) tha() } : undefined
   return (
-    <div ref={goc} className="duo-kt duo-kt-thi" onClickCapture={rungKhiBam}>
+    <div ref={goc} className="duo-kt duo-kt-thi" onClickCapture={rungKhiBam} data-tap-trung={tapTrung || undefined} data-tren-hien={hienTren || undefined}
+      onPointerDownCapture={chamGoc} onFocus={vaoThanh} onBlur={roiThanh}>
       <ThanhTrenKt onDong={p.onThoat} nhanDong="Thoát bài làm" daLam={p.daLam} tong={p.tong} gio={p.dongHo} nhanGio={p.nhanDongHo} gap={p.gap}
         onMoLuoi={() => p.onMoLuoi(true)} luu={p.luu} />
+      {tapTrung && (
+        <button ref={tay} type="button" className="duo-kt-tay" onClick={() => hien()} aria-expanded={hienTren}
+          aria-label="Hiện thanh trên: thời gian còn lại, danh sách câu, thoát"><i aria-hidden="true" /></button>
+      )}
+      {p.gio && p.luot && <BaoGio gio={p.gio} luot={p.luot} />}
       {p.tren}
       <main className="duo-kt-than thi-noi-dung">
         <NhanCauKt so={p.cauHien} tong={p.tong} phu={tenNhom(p.phan[p.cauHien - 1] ?? 'I')} />
