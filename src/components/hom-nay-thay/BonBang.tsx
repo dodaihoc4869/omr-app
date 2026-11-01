@@ -86,6 +86,10 @@ function TheBang({ bang, ds, tong, onMo }: { bang: MaBang; ds: readonly DongBang
           <Icon size={20} />
         </span>
         <div className="bb-dau-chu">
+          {/* Học thật = BẢNG VINH DANH (thầy 01/11: «nổi bật hơn hẳn … kiểu tôn vinh tinh tế nhẹ nhàng») */}
+          {bang === 'ht' && <p className="bb-vinh">Bảng vinh danh</p>}
+          {/* Đối phó = BÁO ĐỘNG NHẸ (thầy 01/11: «báo động nhẹ nhàng nhấp nháy tinh tế đẹp nhưng đủ để thấy») */}
+          {bang === 'dp' && <p className="bb-vinh bb-canh"><i aria-hidden="true" />Cần để ý</p>}
           <h2 id={`bb-tieu-${bang}`}>
             {TEN_BANG[bang]} <span className="bb-chip gvv2-so">{ds.length} em</span>
           </h2>
