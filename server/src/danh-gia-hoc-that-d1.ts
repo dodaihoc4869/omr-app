@@ -19,7 +19,7 @@ import { tachSongSinh } from './loi-hoc-luat'
 import { docBetaVaTau } from './omni-d1'
 import { docKichThuocCau, type KichThuocCau } from './cau-doc-giay'
 import { nangCoTinhTheoNgay, type MucLamLuot } from './muc-lam'
-import { chuanMucDo, docDoMuc, lapLaiCacLuot } from './muc-lam-so'
+import { chuanMucDo, docDoMuc, lapLaiCacLuot, type DoMucLuot } from './muc-lam-so'
 import { doThatCacDong, giaySoLuot, mucLamCuaDong, tapCanTraMucLam, type DongMucSo } from './muc-lam-lo'
 import { congNgay7, ngayVn7 } from './goi-bai-7-loi'
 import { laNgayBaoTri } from './ngay-bao-tri'
@@ -32,6 +32,12 @@ type Row = Record<string, unknown>
 const str = (x: unknown): string => (x === null || x === undefined ? '' : String(x)).trim()
 const num = (x: unknown): number => (typeof x === 'number' ? x : Number(x)) || 0
 const json = <T>(x: unknown, macDinh: T): T => { try { return x ? (JSON.parse(String(x)) as T) : macDinh } catch { return macDinh } }
+/** Hành vi của lượt (01/11, đánh giá 99% đợt 2): chỉ trường máy em ĐÃ đo (`raw_json.doc.dd/dq/ar/rn`); vắng ⇒ không thêm khoá (lõi dùng luật cũ). Thuần. */
+const hanhViLuot = (d: DoMucLuot | null | undefined): Pick<LuotDanhGia, 'dd' | 'dq' | 'ar' | 'rn'> => {
+  const ra: Pick<LuotDanhGia, 'dd' | 'dq' | 'ar' | 'rn'> = {}
+  if (d) for (const k of ['dd', 'dq', 'ar', 'rn'] as const) if (typeof d[k] === 'number') ra[k] = d[k]
+  return ra
+}
 
 export type CheDoDanhGia = 'tat' | 'ngam' | 'bat'
 export const KHOA_CHE_DO = 'danh_gia_hoc_that'
@@ -192,7 +198,7 @@ export async function tinhLoEm(env: Env, sbds: readonly string[], nowMs: number,
         songSinh: !!x.d.tc || tachSongSinh(x.d.qid ?? '').songSinh !== null,
         ngay: x.d.ngay ?? '',
         luc: x.d.luc,
-        ...(tuy.giuDauVao ? { giay: m && !m.uocTinh ? m.giay : null, giayDoc: m && m.giayDoc > 0 ? m.giayDoc : null, qid: x.d.qid ?? x.d.goc, an: x.d.doMuc?.treo?.a ?? null } : {}),
+        ...(tuy.giuDauVao ? { giay: m && !m.uocTinh ? m.giay : null, giayDoc: m && m.giayDoc > 0 ? m.giayDoc : null, qid: x.d.qid ?? x.d.goc, an: x.d.doMuc?.treo?.a ?? null, ...hanhViLuot(x.d.doMuc) } : {}),
       }
     })
     const kt = rKt.filter((x) => str(x.sbd) === sbd)

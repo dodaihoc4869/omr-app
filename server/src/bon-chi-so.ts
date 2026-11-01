@@ -10,6 +10,8 @@
 //   · CHĂM CHỈ — dựng trên ĐÚNG mức ngày / đã làm của Nhịp học (nhip-hoc.ts, ngày vào app, ngày bảo trì đã bỏ):
 //       Chăm = 50% ngày đủ mức + 30% câu làm KỸ / câu được giao (câu chọn vội mà sai không tính) + 20% chuỗi ngày đủ mức gần nhất (đủ 7 ngày = trọn). Lười = 100 − Chăm.
 //       Dưới 3 ngày phải làm ⇒ null.
+// Đợt 2 (01/11): máy em đo thêm trong lượt luyện tập (`src/lib/doi-dap-an.ts` → `raw_json.doc`): dd đổi lựa chọn · dq số phương án đã thử · ar giây rời app
+// ngay trước lựa chọn cuối · rn số lần rời app ⇒ họ Đối phó «dò đáp án» (`ho.do`) + luật «tra ngoài» dùng `ar` khi có. Lượt cũ (chưa đo) ⇒ luật cũ.
 // Bằng chứng: mỗi bảng 3–4 thẻ, CHỈ số đo + ví dụ có giờ (thầy 01/11: «ẩn phần cách tính, chỉ hiện các thông số sắc bén»). `so` của thẻ cùng khoá với `soLieu`
 // ⇒ lệnh thầy điền «cả lớp» (trung vị) lúc trả lời.
 import { canDuoiWilson, type DauVaoDanhGia, type KetQuaDanhGia, type LuotDanhGia } from './danh-gia-hoc-that'
@@ -56,6 +58,8 @@ export interface SoLieuBon {
    *  % ngày phớt lờ lời nhắc (21:00 còn thiếu mà không làm thêm); số lần chủ động hỏi. */
   nhanhLa?: number | null
   traNgoai?: number | null
+  /** Đợt 2 (01/11): % lượt Phần I (có đo) em thử từ 3 phương án khác nhau trở lên trước khi bấm «Kiểm tra» (dò đáp án); null = chưa có lượt đo. */
+  do?: number | null
   donHan?: number | null
   photLo?: number | null
   hoi?: number
@@ -195,9 +199,15 @@ export function tinhBon(v: DauVaoBon): KetQuaBon {
   // Đúng nhanh bất thường ở câu KHÓ (lớp đúng < 35%): nhanh hơn 60% thời gian đọc đề (hoặc «thuộc») mà đúng ⇒ biết trước đáp án / chép.
   const khoDung = lam.filter((l) => l.dung === true && l.pLop !== null && l.pLop < 0.35 && !l.treo)
   const nhanhLa = khoDung.filter((l) => l.thuoc || (typeof l.giay === 'number' && typeof l.giayDoc === 'number' && l.giayDoc > 0 && l.giay < 0.6 * l.giayDoc))
-  // Rời app ≥ 8 giây (chưa tới mức treo) rồi quay lại chọn ĐÚNG câu không dễ ⇒ nghi tra ngoài (Google / A.I / hỏi bạn).
+  // Rời app rồi quay lại chọn ĐÚNG câu không dễ ⇒ nghi tra ngoài (Google / A.I / hỏi bạn). Đợt 2 (01/11): máy em đo `ar` = giây ẩn app trong 30 giây NGAY
+  // TRƯỚC lựa chọn cuối ⇒ có `ar` thì xét ar ≥ 6 (rời ngay trước khi chọn — thông báo kéo ra lúc đang đọc đề rồi quay lại đọc tiếp không tính);
+  // lượt cũ chưa có `ar` ⇒ luật cũ (tổng giây ẩn ≥ 8). Ẩn từ 180 giây (gần treo máy) không tính ở cả hai luật.
   const dungHet = lam.filter((l) => l.dung === true && !l.treo)
-  const traNgoai = dungHet.filter((l) => typeof l.an === 'number' && l.an >= 8 && l.an < 180 && (l.pLop === null || l.pLop < 0.6))
+  const roiTruocChon = (l: LuotDanhGia) => (typeof l.ar === 'number' ? l.ar >= 6 && !(typeof l.an === 'number' && l.an >= 180) : typeof l.an === 'number' && l.an >= 8 && l.an < 180)
+  const traNgoai = dungHet.filter((l) => roiTruocChon(l) && (l.pLop === null || l.pLop < 0.6))
+  // DÒ ĐÁP ÁN (đợt 2, 01/11): lượt Phần I em thử từ 3 phương án KHÁC NHAU trở lên trước khi bấm «Kiểm tra» (`dq`, đo ở máy em). Mẫu = lượt Phần I CÓ đo `dq`.
+  const coDq = lam.filter((l) => l.phan === 'I' && typeof l.dq === 'number')
+  const doDa = coDq.filter((l) => l.dq! >= 3)
   // Theo ngày: câu làm THẬT (bỏ câu vội-sai, câu treo), dồn hạn, phớt lờ lời nhắc 21:00.
   const theoNgay = new Map<string, LuotDanhGia[]>()
   for (const l of lam) if (l.ngay) theoNgay.set(l.ngay, [...(theoNgay.get(l.ngay) ?? []), l])
@@ -226,6 +236,8 @@ export function tinhBon(v: DauVaoBon): KetQuaBon {
   // Kiểm tra khớp ⇒ «đúng nhanh câu khó» là GIỎI THẬT (không tính); «rời app rồi đúng» hạ còn nhẹ (có thể do thông báo, năng lực đã xác nhận).
   if (!ktKhop && nhanhLa.length >= 3 && nhanhLa.length >= 0.15 * khoDung.length) ho.nhanh = nhanhLa.length >= 5 && nhanhLa.length >= 0.3 * khoDung.length ? 2 : 1
   if (traNgoai.length >= 3 && traNgoai.length >= 0.1 * dungHet.length) ho.tra = !ktKhop && traNgoai.length >= 6 && traNgoai.length >= 0.2 * dungHet.length ? 2 : 1
+  // Dò đáp án: ≥ 5 lượt và ≥ 10% ⇒ nhẹ; ≥ 10 lượt và ≥ 20% ⇒ mạnh. Kiểm tra cá nhân KHỚP ⇒ chỉ nhẹ (em phân vân nhiều nhưng năng lực đã được xác nhận).
+  if (doDa.length >= 5 && doDa.length >= 0.1 * coDq.length) ho.do = !ktKhop && doDa.length >= 10 && doDa.length >= 0.2 * coDq.length ? 2 : 1
   if (phat('goiY') > 0) ho.goiY = 1
   if (phat('thi') > 0) ho.thi = phat('thi') >= 20 ? 2 : 1
   const soHo = Object.keys(ho).length
@@ -274,7 +286,7 @@ export function tinhBon(v: DauVaoBon): KetQuaBon {
     : null
   ht = ht === null ? null : vaoDp ? Math.min(ht, 100 - (dp2 ?? 0)) : ht
   Object.assign(soLieu, {
-    nhanhLa: pt(nhanhLa.length, khoDung.length), traNgoai: pt(traNgoai.length, dungHet.length), donHan: ngayDem.length ? tron(100 * donHanTL) : null,
+    nhanhLa: pt(nhanhLa.length, khoDung.length), traNgoai: pt(traNgoai.length, dungHet.length), do: pt(doDa.length, coDq.length), donHan: ngayDem.length ? tron(100 * donHanTL) : null,
     photLo: v.dg && n ? pt(photLo, n) : null, hoi, ban: 2, vao, theoDoi, ho,
   })
 
@@ -297,6 +309,10 @@ export function tinhBon(v: DauVaoBon): KetQuaBon {
     theDp.push({ w: 1.5 * phat('bamLap') + 0.1, ma: 'lap', tieu: 'Bấm cùng một chữ nhiều câu liền', lon: `${lap.so}`, nhoSo: 'chuỗi từ 6 câu', chuoi: { chu: d.map((l) => l.chon).join(''), dung: d.map((l, i) => (l.dung === true ? i : -1)).filter((i) => i >= 0) },
       chu: `Dài nhất: ${ngayVi(d[0]!)} **${d.length} câu liền chọn ${d[0]!.chon} trong ${tron(giay)} giây** (trung bình ${tron(giay / d.length)} giây/câu), đúng ${d.filter((l) => l.dung === true).length}/${d.length}.` })
   }
+  // Đợt 2 (01/11): dò đáp án — mạnh xếp đầu thẻ (bằng chứng hành vi trực tiếp), dưới ngưỡng vẫn hiện số nhưng xếp cuối.
+  if (doDa.length) theDp.push({ w: ho.do ? 12 * ho.do : 0.5, ma: 'do', tieu: 'Dò đáp án', lon: `${doDa.length}/${coDq.length}`, nhoSo: `lượt · ${soLieu.do}%`, so: soLieu.do ?? undefined,
+    viDu: [...doDa].sort(theoLuc).slice(-3).reverse().map((l) => ({ luc: l.luc, qid: l.qid ?? l.cau ?? '', phu: `thử ${l.dq} phương án${typeof l.dd === 'number' ? `, đổi ${l.dd} lần` : ''} trước khi bấm Kiểm tra`, kq: `chốt ${l.chon ?? '?'} · ${chuKq(l)}`, dung: l.dung })),
+    chu: `Em thử từ 3 phương án trở lên ở ${doDa.length}/${coDq.length} lượt Phần I; đúng ${doDa.filter((l) => l.dung === true).length}/${doDa.length} lượt ấy.` })
   if (lechKt && ktTB !== null && dungLuyen !== null) theDp.push({ w: 20, ma: 'lech', tieu: 'Luyện tập cao, kiểm tra thấp', lon: `${tron(dungLuyen * 100)}% → ${so1(ktTB)}`,
     hai: [{ nhan: 'Luyện tập · 14 ngày', so: `${tron(dungLuyen * 100)}%`, phu: `${lam.filter((l) => l.dung === true).length}/${lam.length} câu đúng` }, { nhan: `Kiểm tra cá nhân · ${kt!.diem.length} bài`, so: `${so1(ktTB)}/10`, phu: 'tự làm một lần, không lời giải', lech: true }],
     chu: 'Khi có lời giải và làm lại được, em đúng nhiều; khi phải tự làm một lần, điểm thấp hẳn.' })
@@ -339,7 +355,7 @@ export function tinhBon(v: DauVaoBon): KetQuaBon {
 
   // ───── Một dòng + kết luận
   const nhan = (x: string) => `**${x}**`
-  const bcDp = theDp[0] ? (theDp[0].ma === 'voi' ? `${nhan(`${soLieu.voi}%`)} câu chọn khi chưa đọc hết đề` : theDp[0].ma === 'lap' ? `Chọn ${nhan(lap.dai[0]!.chon ?? '')} liền ${nhan(`${lap.dai.length} câu`)}` : theDp[0].ma === 'lech' ? `Luyện đúng ${tron((dungLuyen ?? 0) * 100)}% · kiểm tra ${nhan(so1(ktTB ?? 0))}` : theDp[0].ma === 'boMac' ? `${nhan(`${sc.tong - sc.sua}/${sc.tong}`)} câu sai để đó không sửa` : `${theDp[0].tieu}: ${nhan(theDp[0].lon)}`) : ''
+  const bcDp = theDp[0] ? (theDp[0].ma === 'voi' ? `${nhan(`${soLieu.voi}%`)} câu chọn khi chưa đọc hết đề` : theDp[0].ma === 'lap' ? `Chọn ${nhan(lap.dai[0]!.chon ?? '')} liền ${nhan(`${lap.dai.length} câu`)}` : theDp[0].ma === 'lech' ? `Luyện đúng ${tron((dungLuyen ?? 0) * 100)}% · kiểm tra ${nhan(so1(ktTB ?? 0))}` : theDp[0].ma === 'boMac' ? `${nhan(`${sc.tong - sc.sua}/${sc.tong}`)} câu sai để đó không sửa` : theDp[0].ma === 'do' ? `${nhan(`${doDa.length} lượt`)} dò đáp án` : `${theDp[0].tieu}: ${nhan(theDp[0].lon)}`) : ''
   const bc: Record<MaBang, string> = {
     ht: sc.tong >= 3 ? `Sửa đúng ${nhan(`${sc.sua}/${sc.tong}`)} câu từng sai` : soLieu.ky !== null ? `Đọc kỹ ${nhan(`${soLieu.ky}%`)} lượt` : '',
     dp: bcDp,
@@ -359,6 +375,7 @@ export function tinhBon(v: DauVaoBon): KetQuaBon {
       case 'goiY': return `${nhan(`${goiY}/${lam.length} lượt`)} mở lời giải trước khi tự làm`
       case 'songSinh': return `${nhan(`${soLieu.songSinh ?? 0}%`)} câu song sinh đổi số liệu làm đúng — thuộc đáp án, chưa hiểu bài`
       case 'thi': return `${nhan(`${t.lon} bài`)} thi rời màn hình`
+      case 'do': return `${nhan(`${doDa.length} lượt`)} dò đáp án — thử từ 3 phương án trở lên`
       default: return `${nhan(`${t.lon}${t.nhoSo ? ` ${t.nhoSo}` : ''}`)} ${t.tieu.toLowerCase()}`
     }
   }
