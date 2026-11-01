@@ -1,4 +1,4 @@
-// «ĐẤU NGUYÊN TỬ» — game bắn nhau của phòng chờ thi. BẢN VẼ 3 ĐẤU 3 (thầy 01/11 tối, docs/ban-ve-dau-ion-3v3-0111/DAC-TA.md — CHƯA DUYỆT):
+// «ĐẤU NGUYÊN TỬ» — game bắn nhau của phòng chờ thi. 3 ĐẤU 3 (thầy 01/11 tối, duyệt bản vẽ docs/ban-ve-dau-ion-3v3-0111/DAC-TA.md):
 //  · Sảnh là thẻ trong phòng chờ, MỘT nút lớn «Đấu» (0 kết nối tới khi bấm). Bấm ⇒ vào ngay sân đang chạy còn ghế A.I (em thế chỗ A.I) hoặc sân mới
 //    1 em + 5 A.I; ván 60 giây nối ván liên tục. Hai phe Bazơ (xanh) / Axit (đỏ); phe em luôn ở TRÁI (ngang) hoặc DƯỚI (dọc).
 //  · Trận TRÀN MÀN: sân chữ nhật ngang 2 : 1 vừa khít điện thoại xoay ngang; điện thoại xin toàn màn + khoá ngang khi máy cho (iOS không khoá được ⇒
@@ -138,6 +138,8 @@ export default function DauIon({ maCa, veDau, batDau, onBatDau }: DauIonProps) {
   if (ketThuc) {
     return <section className="dn-the" aria-label="Mini-game Đấu Nguyên Tử">
       <div className="dn-dong" role="status"><strong>Thầy đã bắt đầu thi</strong><span>Đấu Nguyên Tử đã dừng. Em đang được đưa vào bài…</span></div>
+      {/* Dải nhẹ 1,5 giây (chỉ CSS, không hẹn giờ): game đã dừng + màn cha đã vào bài cùng lượt — dải chỉ phủ lúc bài đang tải. */}
+      {createPortal(<div className="dn-sap-thi" role="status" aria-label="Sắp vào thi">Sắp vào thi<i aria-hidden="true">·</i><b>3</b><b>2</b><b>1</b></div>, document.body)}
     </section>
   }
 
@@ -150,9 +152,8 @@ export default function DauIon({ maCa, veDau, batDau, onBatDau }: DauIonProps) {
     else if (!coMang) choiAI()
   }
   const roi = (bo: BoChay) => { if (bo.mang) mangRef.current?.gui({ t: 'roi-san' }); boMang.current = null; setTran(null); raToanMan() }
-  const xongVan = (bang: DongBang[], pheEm: number) => {
-    const [a, b] = [0, 1].map((p) => bang.filter((d) => d.phe === p).reduce((s, d) => s + d.ha, 0))
-    if ((pheEm === 0 ? a > b : b > a)) { const n = docThang() + 1; setThang(n); ghiKho({ ngay: ngayNay(), thang: n }) }
+  const xongVan = (ti: [number, number], pheEm: number) => {
+    if (ti[pheEm & 1] > ti[1 - (pheEm & 1)]) { const n = docThang() + 1; setThang(n); ghiKho({ ngay: ngayNay(), thang: n }) }
   }
   const phu = mang === 'noi' ? 'Đang vào sân đấu…'
     : mang === 'mat' ? (lanMat >= 5 ? 'Chưa nối được sân đấu. Bấm «Đấu» để chơi với A.I tại máy.' : `Mất kết nối sân đấu — đang thử lại (lần ${lanMat + 1})…`)
@@ -212,7 +213,7 @@ function AnhBia({ nt }: { nt: number }) {
 interface ManTranProps {
   bo: BoChay; huyVong: { current: (() => void) | null }; pu: string; matMang: number
   goiY: boolean; onDaXemGoiY: () => void
-  onRoi: () => void; onXong: (bang: DongBang[], pheEm: number) => void; onPu?: (i: number) => void
+  onRoi: () => void; onXong: (ti: [number, number], pheEm: number) => void; onPu?: (i: number) => void
 }
 interface Hud { mau: number; cap: number; e: number; ha: number; nt: number; phe: number; con: number; ts: [number, number] }
 interface Tin { id: number; chu: string; k: string; cap?: number; phe?: number; t: number }
@@ -354,7 +355,8 @@ function ManTran({ bo, huyVong, pu, matMang, goiY, onDaXemGoiY, onRoi, onXong, o
         else if (nay >= doHa.t0) { doHa.n++; if (nay - doHa.t0 >= 2000) { doHa.xong = true; if (doHa.n < 90) { haCaPhien = yeu = true; if (ve) ve.yeu = true; doiCo() } } }
       }
       const p = bo.pheCua(bo.emId)
-      if (p !== pheEm) { pheEm = p; doiCo() }
+      // Ván mới chia lại phe: phe em đổi ⇒ xoay lại sân (phe em vẫn ở trái / dưới) + báo nhẹ.
+      if (p !== pheEm) { pheEm = p; doiCo(); themTin(`Ván mới · em ở Phe ${PHE[p]}`, 'thay', nay, { phe: p }) }
       const h = huong()
       bo.buoc(dt, h.dx, h.dy, nay)
       const sc = xoayCanh(bo.canh(nay), xoay)
@@ -365,7 +367,7 @@ function ManTran({ bo, huyVong, pu, matMang, goiY, onDaXemGoiY, onRoi, onXong, o
           else if (s.ai === bo.emId) themTin(`${s.boi ? bo.ten(s.boi) : 'Bạn'} hạ em · về bệ sau 1 giây, súng giữ Cấp ${s.capCu}`, 'bi', nay)
         } else if (s.t === 'len' && s.ai === bo.emId) themTin(`${s.xt ? 'Xúc tác! ' : ''}Lên Cấp ${s.cap} · ${NGAN_CAP[s.cap]}`, 'len', nay, { cap: s.cap })
         else if (s.t === 'nhat' && s.ai === bo.emId && s.k === 'kh') themTin('Khiên: chặn 3 viên đạn kế tiếp', '', nay)
-        else if (s.t === 'thay') { const ph = bo.pheCua(s.ai); themTin(`${s.ai === bo.emId ? 'Em' : bo.ten(s.ai)} vào thay A.I · Phe ${PHE[ph]}`, 'thay', nay, { phe: ph }) }
+        else if (s.t === 'thay' && s.moi !== undefined) { const ph = bo.pheCua(s.moi); themTin(s.laAI ? `A.I vào thay ${s.tenCu ?? 'bạn'} · Phe ${PHE[ph]}` : `${bo.ten(s.moi)} vào thay A.I · Phe ${PHE[ph]}`, 'thay', nay, { phe: ph }) }
         else if (s.t === 'trung' && s.ai === bo.emId && !yeu) { try { navigator.vibrate?.(10) } catch { /* không rung được */ } }
       }
       if (ve) { if (diToi) { const [x, y] = ra(diToi.x, diToi.y, xoay); ve.diToi = { x, y } } else ve.diToi = null; ve.ve(sc, bo.emId, nay, (id) => bo.ten(id)) }
@@ -375,7 +377,7 @@ function ManTran({ bo, huyVong, pu, matMang, goiY, onDaXemGoiY, onRoi, onXong, o
       const ds = bo.xep(), k2 = ds.map((d) => `${d.id}.${d.phe}.${d.ha}.${d.cap}`).join(',')
       if (k2 !== khoaXh) { khoaXh = k2; setXh(ds) }
       const kq = bo.ket()
-      if (kq && !daKet) { daKet = true; setKet(kq); cb.current.onXong(kq, pheEm) }
+      if (kq && !daKet) { daKet = true; setKet(kq); cb.current.onXong(bo.tiSo(), pheEm) }
       else if (!kq && daKet) { daKet = false; setKet(null); dem = -1 }
       if (kq) {
         const n = bo.conNghi(nay), s = Math.ceil(n)
@@ -399,7 +401,7 @@ function ManTran({ bo, huyVong, pu, matMang, goiY, onDaXemGoiY, onRoi, onXong, o
   const ts = hud?.ts ?? [0, 0]
   const giay = Math.max(0, hud?.con ?? 60)
   const can = hud && hud.cap < 5 ? CAN_E[hud.cap] : 0
-  const tsKet = ket ? [0, 1].map((p) => ket.filter((d) => d.phe === p).reduce((s, d) => s + d.ha, 0)) : [0, 0]
+  const tsKet = ket ? bo.tiSo() : [0, 0]
   const pheThang: number = tsKet[0] === tsKet[1] ? -1 : tsKet[0] > tsKet[1] ? 0 : 1
   const hh = ket ? huyHieu(ket) : null
   const hhEm = hh?.get(bo.emId)

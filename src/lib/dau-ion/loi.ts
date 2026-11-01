@@ -1,7 +1,7 @@
 // LÕI THUẦN «Đấu Nguyên Tử» — súng TỰ NGẮM và TỰ BẮN, em chỉ quyết hướng đi; nhặt electron để súng tiến hoá 5 cấp; Xúc tác lên ngay một cấp;
 // Khiên chặn 3 viên; ván 60 giây. KHÔNG đụng DOM, mạng, đồng hồ thật: nhận `dt` (giây) từ ngoài; ngẫu nhiên là hạt giống nằm trong trận ⇒ tất định.
 // Dùng chung hai nơi: phòng đấu trên máy chủ (server/src/dau-ion-phong.ts — nơi QUYẾT mọi thứ) và máy em (chơi tại máy; tự ngắm của em để vẽ ngay).
-// BẢN VẼ 3 ĐẤU 3 (thầy 01/11 tối, docs/ban-ve-dau-ion-3v3-0111/DAC-TA.md — CHƯA DUYỆT, chưa phát hành):
+// 3 ĐẤU 3 (thầy 01/11 tối, duyệt bản vẽ «Chốt build đi nhé» — docs/ban-ve-dau-ion-3v3-0111/DAC-TA.md):
 //  · Hai phe theo giấy quỳ: Bazơ (0, căn cứ ĐẦU TRÁI) và Axit (1, căn cứ ĐẦU PHẢI). Máy em xoay khi vẽ để phe em luôn ở trái (ngang) / dưới (dọc).
 //  · Sân CHỮ NHẬT NGANG 1040 × 520 (2 : 1, khớp điện thoại xoay ngang — «màn hình chơi to thoải mái xoay ngang to tràn»), đối xứng gương hai trục.
 //  · Tự ngắm ĐỐI THỦ gần nhất trên CẢ SÂN mà đường bắn không bị che; đạn bay hết sân; không bắn / không trúng đồng đội.
@@ -143,10 +143,14 @@ export type SuKien =
   | { t: 'no'; chu: number; x: number; y: number }
   /** Đạn tắt vào vật che / mép sân (chỉ hiệu ứng ở máy em, không gửi qua mạng). */
   | { t: 'tat'; x: number; y: number; nt: number; phe?: number }
-  /** Em vào thay ghế A.I (chỉ ở máy em, từ gói JSON `thay`): A.I biến đi bằng bong bóng. */
-  | { t: 'thay'; ai: number }
+  /** Đổi người ở một ghế (chỉ ở máy em, từ gói JSON `thay`): ghế `ai` tan thành bong bóng. */
+  | { t: 'thay'; ai: number; moi?: number; laAI?: boolean; tenCu?: string }
+  /** Đạn CỦA EM chạm đối thủ tại máy (chỉ hình, phòng vẫn quyết trúng): nháy ngay không chờ mạng. */
+  | { t: 'cham'; ai: number; boi: number; x: number; y: number }
 export interface Tran {
   t: number; con: number; xong: boolean
+  /** Tỉ số hai phe [Bazơ, Axit] = số lần hạ của cả phe trong ván (giữ nguyên khi ghế đổi người / A.I). */
+  ti: [number, number]
   ghe: Ghe[]; dan: Dan[]; vp: VatPham[]; su: SuKien[]
   hat: number; idVp: number; henE: number; henXt: number; henKh: number
 }
@@ -229,14 +233,14 @@ function choHoi(tr: Tran, g: Ghe): readonly [number, number] {
 const BE_THU = [1, 0, 2]
 function datLai(g: Ghe, o: number): void {
   const [x, y] = (BE_PHE[g.phe] ?? BE_PHE[0])[BE_THU[o % 3]]
-  Object.assign(g, { x, y, vx: 0, vy: 0, ngam: Math.atan2(TAM_Y - y, TAM_X - x), mau: MAU_MAX, cap: 1, e: 0, capMax: 1, ha: 0, biHa: 0, chuoi: 0, chuoiMax: 0, cho: 0, che: GIAY_CHE, khien: 0, nap: 0.6 + o * 0.07 + g.phe * 0.035, muc: 0, biTrungLuc: -9, hoiLuc: 0, ban: 0, trung: 0, nhatE: 0, hoTro: 0, song: 0, songMax: 0, boiLuc: {}, yd: { dx: 0, dy: 0 }, aiT: 0, aiX: TAM_X, aiY: TAM_Y })
+  Object.assign(g, { x, y, vx: 0, vy: 0, ngam: Math.atan2(TAM_Y - y, TAM_X - x), mau: MAU_MAX, cap: 1, e: 0, capMax: 1, ha: 0, biHa: 0, chuoi: 0, chuoiMax: 0, cho: 0, che: GIAY_CHE, khien: 0, nap: 0.6 + o * 0.07, muc: 0, biTrungLuc: -9, hoiLuc: 0, ban: 0, trung: 0, nhatE: 0, hoTro: 0, song: 0, songMax: 0, boiLuc: {}, yd: { dx: 0, dy: 0 }, aiT: 0, aiX: TAM_X, aiY: TAM_Y })
 }
 /** Phe ít ghế hơn (bằng nhau ⇒ Bazơ). */
 function pheIt(tr: Tran): number { const n = [0, 0]; for (const g of tr.ghe) n[g.phe & 1]++; return n[1] < n[0] ? 1 : 0 }
 function taoGhe(tr: Tran, d: { id: number; nt: number; ai?: boolean; phe?: number }): Ghe {
   const phe = d.phe === 0 || d.phe === 1 ? d.phe : pheIt(tr)
   const o = tr.ghe.filter((k) => k.phe === phe).length
-  const g = { id: d.id, nt: kep(d.nt | 0, 0, NGUYEN_TO.length - 1), ai: !!d.ai, phe, vang: false, ne: o % 2 ? 1 : -1, doiNe: 1 + (o + phe * 3) * 0.3 } as Ghe
+  const g = { id: d.id, nt: kep(d.nt | 0, 0, NGUYEN_TO.length - 1), ai: !!d.ai, phe, vang: false, ne: o % 2 ? 1 : -1, doiNe: 1 + o * 0.3 } as Ghe
   datLai(g, o)
   return g
 }
@@ -274,7 +278,7 @@ function themVp(tr: Tran, k: 'xt' | 'kh'): void {
 
 /** Trận mới với danh sách ghế (tối đa 6; không ghi phe ⇒ vào phe ít ghế hơn, xen kẽ). */
 export function taoTran(ds: readonly { id: number; nt: number; ai?: boolean; phe?: number }[], hat = 1): Tran {
-  const tr: Tran = { t: 0, con: GIAY_VAN, xong: false, ghe: [], dan: [], vp: [], su: [], hat: hat | 0 || 1, idVp: 0, henE: 0, henXt: 9, henKh: 6 }
+  const tr: Tran = { t: 0, con: GIAY_VAN, xong: false, ti: [0, 0], ghe: [], dan: [], vp: [], su: [], hat: hat | 0 || 1, idVp: 0, henE: 0, henXt: 9, henKh: 6 }
   ds.slice(0, TOI_DA).forEach((d) => tr.ghe.push(taoGhe(tr, d)))
   for (let i = 0; i < 8; i++) themE(tr)
   return tr
@@ -282,7 +286,7 @@ export function taoTran(ds: readonly { id: number; nt: number; ai?: boolean; phe
 
 /** Ván mới cùng những ghế đang có: mọi người về Cấp 1, vật phẩm rải lại. */
 export function vanMoi(tr: Tran): void {
-  tr.t = 0; tr.con = GIAY_VAN; tr.xong = false; tr.dan = []; tr.vp = []; tr.su = []; tr.henE = 0; tr.henXt = 9; tr.henKh = 6
+  tr.t = 0; tr.con = GIAY_VAN; tr.xong = false; tr.ti = [0, 0]; tr.dan = []; tr.vp = []; tr.su = []; tr.henE = 0; tr.henXt = 9; tr.henKh = 6
   const n = [0, 0]
   for (const g of tr.ghe) datLai(g, n[g.phe & 1]++)
   for (let i = 0; i < 8; i++) themE(tr)
@@ -368,7 +372,7 @@ function biHa(tr: Tran, g: Ghe, b: Ghe | undefined): void {
     const a = ngauNhien(tr) * PI2, r = 16 + ngauNhien(tr) * 24, p = { x: g.x + Math.cos(a) * r, y: g.y + Math.sin(a) * r }
     dayRa(p, 8); themE(tr, p.x, p.y)
   }
-  if (b) { b.ha++; b.chuoi++; b.chuoiMax = Math.max(b.chuoiMax, b.chuoi); themEChoGhe(tr, b, 2) }
+  if (b) { tr.ti[b.phe & 1]++; b.ha++; b.chuoi++; b.chuoiMax = Math.max(b.chuoiMax, b.chuoi); themEChoGhe(tr, b, 2) }
 }
 function hoiSinh(tr: Tran, g: Ghe): void {
   const [x, y] = choHoi(tr, g)

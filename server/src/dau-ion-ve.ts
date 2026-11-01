@@ -48,21 +48,24 @@ export async function veDauChoEm(env: Env, maCa: string, sbd: string, hoTen: unk
   try { return await kyVeDau(env.MA_BI_MAT, { c: maCa, s: sbd, t: tenGoi(hoTen), h: Date.now() + HAN_VE_MS }) } catch { return undefined }
 }
 
-const phongCua = (env: Env, maCa: string) => env.PHONG_DAU_ION!.get(env.PHONG_DAU_ION!.idFromName(`dau-ion:${maCa}`), { locationHint: 'apac' })
+/** Tối đa phòng mỗi ca (khớp SO_PHONG_TOI_DA ở dau-ion-phong.ts). Phòng 0 giữ tên cũ `dau-ion:<ca>`; phòng k ≥ 1: `dau-ion:<ca>:<k>`. */
+const SO_PHONG = 8
+const phongCua = (env: Env, maCa: string, so = 0) => env.PHONG_DAU_ION!.get(env.PHONG_DAU_ION!.idFromName(so ? `dau-ion:${maCa}:${so}` : `dau-ion:${maCa}`), { locationHint: 'apac' })
 
-/** Thầy bấm Bắt đầu thi ⇒ phòng đấu của ca báo mọi máy rồi đóng (lớp chặn thứ hai, cạnh việc máy em tự tháo game khi thấy ca bắt đầu). */
+/** Thầy bấm Bắt đầu thi ⇒ MỌI phòng đấu của ca báo mọi máy rồi đóng (song song; lớp chặn thứ hai, cạnh việc máy em tự tháo game khi thấy ca bắt đầu). */
 export async function dongPhongDau(env: Env, maCa: string): Promise<void> {
   if (!env.PHONG_DAU_ION || !maCa) return
-  try { await phongCua(env, maCa).fetch(new Request('https://phong-dau/dong', { method: 'POST' })) } catch { /* phòng chưa từng mở / lỗi mạng nội bộ: bỏ qua */ }
+  await Promise.allSettled(Array.from({ length: SO_PHONG }, (_, k) => phongCua(env, maCa, k).fetch(new Request('https://phong-dau/dong', { method: 'POST' }))))
 }
 
-/** `GET /dau-ion/<mã ca>` (nâng cấp WebSocket) ⇒ Durable Object của ca. Vé gửi trong gói đầu `{t:'vao', ve}`, không nằm trên đường dẫn. */
+/** `GET /dau-ion/<mã ca>[/<số phòng>]` (nâng cấp WebSocket) ⇒ Durable Object của ca (phòng 0…7). Vé gửi trong gói đầu `{t:'vao', ve}`, không nằm trên đường dẫn. */
 export async function vaoPhongDau(req: Request, env: Env): Promise<Response> {
-  const maCa = decodeURIComponent(new URL(req.url).pathname.slice('/dau-ion/'.length)).trim()
+  const [ma, soChu] = decodeURIComponent(new URL(req.url).pathname.slice('/dau-ion/'.length)).trim().split('/')
+  const maCa = (ma ?? '').trim(), so = soChu === undefined ? 0 : Number(soChu)
   if (!dauIonBat(env)) return new Response('Đấu Nguyên Tử đang tắt', { status: 410 })
-  if (!/^[A-Za-z0-9_-]{1,40}$/.test(maCa)) return new Response('Mã ca không hợp lệ', { status: 400 })
+  if (!/^[A-Za-z0-9_-]{1,40}$/.test(maCa) || !(Number.isInteger(so) && so >= 0 && so < SO_PHONG)) return new Response('Mã ca không hợp lệ', { status: 400 })
   if (req.headers.get('upgrade')?.toLowerCase() !== 'websocket') return new Response('Cần WebSocket', { status: 426 })
   const h = new Headers(req.headers)
-  h.set('x-ma-ca', maCa)
-  return phongCua(env, maCa).fetch(new Request(req.url, { method: 'GET', headers: h }))
+  h.set('x-ma-ca', maCa); h.set('x-phong-so', String(so))
+  return phongCua(env, maCa, so).fetch(new Request(req.url, { method: 'GET', headers: h }))
 }

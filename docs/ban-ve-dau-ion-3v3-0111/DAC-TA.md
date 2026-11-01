@@ -1,11 +1,33 @@
-# Đặc tả + bản vẽ «Đấu Nguyên Tử» 3 đấu 3 — 01/11/2026 (CHƯA DUYỆT)
+# Đặc tả + bản vẽ «Đấu Nguyên Tử» 3 đấu 3 — 01/11/2026 · THẦY ĐÃ DUYỆT («Chốt build đi nhé») · ĐÃ BUILD trên nhánh, chờ soát / gộp
 
 **Thầy yêu cầu (01/11 tối):** «Game phòng chờ tự phân chia làm 2 phe, ba đấu ba, nhân vật mỗi phe khác màu phân biệt dễ nhất; bắn hiện tại vẫn hơi giật lag làm mượt hẳn nhé. Chế độ tự bắn tự ngắm đối thủ có khoảng cách gần nhất, ko cần đến gần mới tự bắn. Chướng ngại vật thiết kế thông minh hiệu quả cho cả hai phe, chiến thuật hơn. Tự động tạo phe để hs vào phòng chờ bấm vào đấu là chơi đc liên tục, nếu ko đủ thì bot tự tạo đủ, hs xin vào bot tự ẩn đi. Tất cả hs đều phải chơi đc. Vẽ trước tôi xem rồi build nhé.»
 Thầy thêm: «Cho màn hình chơi to thoải mái xoay ngang to tràn điện thoại luôn nhé» · «Tối ưu thân thiện nhất để học sinh thực sự có những giây phút giải trí trước bài thi nhé».
 
 > **Lệnh mới THAY lệnh sáng 01/11** (#705, «đừng tự thêm máy ảo, hs thách bao nhiêu thì chơi bấy nhiêu»): từ nay sân luôn đủ 6 ghế, thiếu người thì **A.I** ngồi ghế, em vào là A.I nhường chỗ. A.I luôn ghi rõ «A.I» trước tên.
 
-Nhánh `claude/dau-ion-3v3-0111`. Mã nguyên mẫu đã có trên nhánh (ảnh là bản build thật, Chromium thật); phần mạng / A.I nhường chỗ ở máy chủ / nhiều phòng / mượt hẳn làm ở bước build sau khi thầy duyệt.
+Nhánh `claude/dau-ion-3v3-0111`. Ảnh là bản build thật (`npm run build:cf`), Chromium thật.
+
+## Kết quả build (01/11)
+
+**Đã làm đủ 5 phần:** lõi 3 đấu 3 (sân 1040 × 520, tự ngắm xa / nấp giữ đạn, không bắn đồng đội, bị hạ không tụt cấp, A.I bắn chậm hơn 25 % + biết nấp / nhặt) · phòng đấu (sân luôn 6 ghế, «Đấu» thế chỗ A.I ở sân đông người thật + phe ít người thật, không có ⇒ sân 1 em + 5 A.I chạy ngay, rời ⇒ A.I vào lại đúng ghế, ván nối ván chia lại phe, gom em ngồi một mình, phòng đầy 78 em ⇒ tự sang phòng kế, tối đa 8 phòng / ca, giao thức 3 ⇒ máy cũ được báo tải lại) · mượt hẳn (mục 5) · màn (tràn màn, xoay, lớp phủ, gợi ý 3 giây, hết ván theo phe + huy hiệu, dải «Sắp vào thi · 3 · 2 · 1», chơi tại máy cũng 3 đấu 3) · test.
+
+**Đo độ mượt trước / sau** (`do-muot.mjs` → `do-muot.json`): bản build thật, Chromium, 844 × 390 DPR 2, 6 người thật (em đứng yên + 5 bạn mẫu đi lại), **mạng giả 120 ± 40 ms mỗi chiều + CPU ×4**, 20 giây, 4 lượt mỗi bản. «Trước» = `main` 3f0a74e.
+
+| Chỉ số (trung bình 4 lượt) | Trước | Sau |
+|---|---|---|
+| **Giật** — khung nguyên tử nhảy bù (> 3 × bước thường và > 6 px), mỗi 20 giây | **70** (76 · 74 · 52 · 77) | **0,25** (0 · 0 · 0 · 1) |
+| Đứng hình > 80 ms rồi giật bù | 0 | 0 |
+| Khung tệ nhất (ms) | 64,6 | 49,4 |
+| p95 khung (ms) | 36,3 | 35,5 |
+| Trung vị khung (ms) | 33,4 | 33,4 |
+
+Ghi chú đo: Chromium không giao diện vẽ bằng CPU nên CẢ HAI bản tự hạ về 30 khung/giây (cơ chế máy yếu có sẵn) ⇒ p95 khung gần như chạm trần 33 ms ở cả hai; cái khác biệt rõ là **hình bạn khác hết giật** (bản cũ nội suy theo giờ nhận gói nên gói dồn cục ⇒ nhảy bù ~3,5 lần mỗi giây; bản mới theo đồng hồ phòng). Đo thô lượt đầu (chưa lọc bạn mẫu kẹt vật che) có ghi vài «đứng» ở cả hai bản — là bạn mẫu đứng thật, không phải hình đứng.
+
+**Test** (vitest, 159 / 159 xanh ở 11 tệp liên quan): `tests/dau-ion-v2-loi-3110.test.ts` (24 — ngắm xa, nấp giữ đạn + nòng dõi, xuyên đồng đội, dây chuyền / nổ lan bỏ đồng đội, A.I chậm 25 %, rải đối xứng, không tụt cấp, góp sức, huy hiệu, sân đối xứng + không ô an toàn tuyệt đối, 100 ván 6 A.I cân hai phe: 1578 – 1436, 0 lần trúng đồng đội), `dau-ion-v2-phong-3110.test.ts` (31 — sân 1 + 5 A.I chạy ngay, thế chỗ A.I phe ít người thật, `thay`, rời ⇒ A.I vào lại, chia lại phe, gom sân, phòng đầy ⇒ `sang:1`, nhịp đồng hồ thật bù ≤ 4 bước, cửa nhiều phòng + đóng 8 phòng, vé, giao thức 3), `dau-ion-v2-goi-3110.test.ts` (4 — giao thức 3, × 50, bước trận + tỉ số, ~78 B/ảnh), `dau-ion-v2-man-3110.test.tsx` (12), `dau-ion-3v3-muot-0111.test.ts` (5 — xoay 4 khung, nội suy đều dưới mạng rung, ngoại suy ≤ 120 ms, súng em bắn tại máy). `npx tsc -p . --noEmit` + `server` sạch.
+
+**Cổng:** `npm run build:cf` SW 13/13, precache 170 / 170 · `node scripts/kiem-toc-do-tai.mjs` 0 đỏ (mọi đường bằng hoặc nhẹ hơn mốc) · `kiem:mau-giu` 0 vi phạm · `check:mau` sạch · ảnh: 0 lỗi trang, 0 tràn, 0 đích bấm < 44 px, không lộ số báo danh.
+
+**Chưa làm / để sau:** A.I tạm lái ghế của em đang rớt mạng (nay ghế đứng «vắng» 8 giây rồi A.I vào thay hẳn); 4 biểu cảm mới (giữ 4 câu cũ); xoá khối CSS cũ không dùng (cần thầy duyệt vì `kiem:mau-giu` coi là xoá màu); đo trên điện thoại thật.
 
 ## Ảnh bản vẽ (thư mục này, JPG ≤ 150 KB)
 
@@ -121,7 +143,7 @@ Thứ tự vật che dọc sân xen kẽ: x 300 (cốc cánh) · 400 (bình nón
 - **PHIÊN BẢN GIAO THỨC 3** (đã đổi): toạ độ × 50 (sân 1040 vừa 16 bit, sai số 0,02 đơn vị); ảnh trận mã 4. Bước build thêm **mốc thời gian trận** (2 byte, ms trong ván) vào đầu ảnh trận cho kế hoạch mượt (mục dưới).
 
 ## 5. Ngoại lệ
-- Mất mạng giữa ván: ghế giữ 8 giây (đang chạy như nay), A.I tạm điều khiển ghế đó thay vì đứng im (bước build); quá 8 giây A.I giữ hẳn ghế.
+- Mất mạng giữa ván: ghế giữ 8 giây («vắng»: không bắn, không bị ngắm); quá 8 giây ⇒ A.I vào hẳn ghế đó (đã làm). A.I tạm lái ghế trong 8 giây: để sau.
 - Bấm «Đấu» liên tục: nút khoá khi đang nối; gói `vao-san` lặp bị bỏ.
 - Tên dài: nhãn cắt «…» 16 ký tự (như nay). Ẩn tên ⇒ «Bạn Cl».
 - Đổi tab / khoá màn: vòng vẽ ngủ; phòng coi là vắng sau 3 giây (không bị ngắm, không bắn) — như nay.
@@ -129,13 +151,13 @@ Thứ tự vật che dọc sân xen kẽ: x 300 (cốc cánh) · 400 (bình nón
 - Máy yếu: giữ tự hạ (DPR 1, 30 khung/giây, bỏ quầng / vệt đạn / rung).
 - Máy còn bản cũ (giao thức 2): phòng đóng `4010` «Đấu Nguyên Tử đã có bản mới. Em tải lại trang để vào sân nhé.» (cơ chế sẵn có).
 
-### Kế hoạch MƯỢT HẲN + cách đo (bước build)
+### MƯỢT HẲN + cách đo (ĐÃ LÀM — số đo ở đầu tệp)
 1. **Phòng bước theo đồng hồ thật:** `setInterval` không đều ⇒ mỗi nhịp đọc `Date.now()`, dồn vào bộ tích luỹ, chạy đủ số bước cố định 1/20 giây (tối đa 4 bước bù), gửi ảnh trận kèm **mốc thời gian trận**.
 2. **Máy em nội suy theo dòng thời gian của phòng** (không theo giờ nhận gói): ước lượng lệch đồng hồ (trung vị trượt), vẽ ở `thờiGianPhòng − đệm`; **đệm tự co giãn 100–200 ms** theo độ rung mạng (trung bình + 2 × độ lệch chuẩn khoảng cách gói); thiếu ảnh ⇒ **ngoại suy ngắn ≤ 120 ms** theo vận tốc thay vì đứng hình.
 3. **Súng CỦA EM bắn ngay tại máy** đúng nhịp cấp súng khi máy em thấy có mục tiêu lộ (chỉ là hình; phòng vẫn quyết trúng / hạ); loạt phòng gửi về khớp với loạt đã vẽ theo số thứ tự, không vẽ đôi. Trúng ⇒ nháy hiệu ứng ngay tại máy, «−1» chờ phòng xác nhận.
 4. Nòng bạn khác quay mượt (đã có làm mềm góc, hạ hệ số 20 → 14); nòng dõi đối thủ gần nhất khi không có mục tiêu.
-5. Khớp vị trí em êm hơn: sai số < 6 đơn vị bỏ qua; 6–80 ⇒ kéo dần 10 %/khung (cũ 25 %/gói); > 80 ⇒ nhảy.
-- **Đo trước / sau** (bản build thật, Chromium, mạng giả **120 ± 40 ms** chèn ở `routeWebSocket`, 6 ghế, 30 giây, CPU ×1 và ×4): (a) số khung «đứng hình» = khung mà một bạn khác đang di chuyển không nhích quá 80 ms; (b) độ giật nòng = bước nhảy góc nòng > 0,3 rad giữa hai khung; (c) độ giật đạn = viên đạn đổi hướng / nhảy > 12 đơn vị giữa hai khung; (d) trễ từ ý định tới hình em di chuyển. Đạt khi (a) giảm ≥ 80 % và về < 1 %, (b)(c) ≈ 0, (d) ≤ 1 khung. Ghi `do-muot.json`.
+5. Khớp vị trí em êm hơn: sai lệch kéo dần theo hàm mũ (~100 ms, cũ: 25 % mỗi gói), lệch < 1 đơn vị bỏ qua, > 80 ⇒ nhảy.
+- **Đo trước / sau:** `node docs/ban-ve-dau-ion-3v3-0111/do-muot.mjs --goc=<thư mục có dist> --phong=<phong-*.ts> --nut=… --nhan=… --cpu=4 --ra=docs/ban-ve-dau-ion-3v3-0111/do-muot.json` — mạng giả 120 ± 40 ms mỗi chiều chèn ở `routeWebSocket` (giữ thứ tự gói), vị trí nguyên tử lấy từ lệnh vẽ ảnh nguyên tử (cùng cách ở hai bản), đếm khung nhảy bù, đứng hình > 80 ms rồi giật bù, trung vị / p95 / tệ nhất khoảng khung.
 
 ## 6. Chi phí máy chủ
 - **0 lệnh D1**, như nay (vé ký sẵn khi vào thi). A.I chạy trong Durable Object: 14 sân × 6 ghế, A.I quyết hướng ~5 lần/giây, bước lõi 20 lần/giây. Mô phỏng tại máy: 200 ván 60 giây (6 A.I) chạy trong ~13 giây CPU ⇒ một sân ≈ 1 ms CPU mỗi giây trận; 14 sân ≈ 14 ms/giây — dư xa giới hạn DO. Bước build thêm test đo CPU 14 sân.
@@ -149,7 +171,7 @@ Thứ tự vật che dọc sân xen kẽ: x 300 (cốc cánh) · 400 (bình nón
 - Ảnh Chromium (`kiem.json`): 0 lỗi trang · 0 tràn ngang · 0 đích bấm < 44 px · không lộ số báo danh (đã đạt ở bản vẽ).
 - Đo mượt: `do-muot.json` đạt ngưỡng mục 5.
 
-## Các tệp sẽ sửa
+## Các tệp đã sửa
 | Tệp | Bản vẽ (đã có) | Bước build |
 |---|---|---|
 | `src/lib/dau-ion/loi.ts` | phe, sân mới, tự ngắm xa, xuyên đồng đội, bước hai lượt, huy hiệu, không tụt cấp | chỉnh tham số theo đo |
@@ -173,8 +195,8 @@ Thứ tự vật che dọc sân xen kẽ: x 300 (cốc cánh) · 400 (bình nón
 - **iOS** không cho khoá ngang / toàn màn ⇒ chơi dọc + lời nhắc xoay.
 - **Bị hạ không tụt cấp** ⇒ nhiều em Cấp 5 hơn (58 % ghế, trung vị giây 41). Nếu thầy muốn giữ tụt cấp thì đổi một dòng ở lõi.
 
-## Điều cần thầy quyết
-1. **Bị hạ không tụt cấp súng** (đề xuất, đã làm trong bản vẽ) — giữ hay trả lại «tụt 1 cấp»?
-2. **Dải «Sắp vào thi · 3 · 2 · 1»** (≤ 1,5 giây, chồng lên lúc bài đang tải) — có làm không?
-3. **Đổi màu electron (xanh dương → xanh lá) và màu 5 cấp súng** để khỏi lẫn với hai phe — đồng ý?
-4. 4 biểu cảm nhanh «Hay! · Vui quá · Cháy! · GG» thay 4 câu cũ — có đổi không?
+## Đã chốt (thầy «Chốt build đi nhé», 01/11)
+1. Bị hạ KHÔNG tụt cấp súng — đã làm.
+2. Dải «Sắp vào thi · 3 · 2 · 1» 1,5 giây (chỉ CSS; game dừng và màn cha vào bài NGAY trong cùng lượt) — đã làm.
+3. Electron xanh lá, 5 cấp súng xám → lục → cam → chàm → vàng (biến mới `--dn-e`, `--dn-capm-*`) — đã làm.
+4. 4 biểu cảm mới — chưa đổi (không bắt buộc), giữ 4 câu cũ.

@@ -88,6 +88,8 @@ export class Ve {
   private giat = new Map<number, number>()
   private rongTen = new Map<string, number>()
   private soLuc = new Map<number, number>()
+  /** Lúc đạn CỦA EM chạm (tại máy) từng đối thủ — để «trung» của phòng không nháy lần hai. */
+  private chamLuc = new Map<number, number>()
   private nayCu = 0
   /** Khung xoay + phe em (phe em ở trái / dưới khung vẽ). */
   private xoay: Xoay = KHONG_XOAY
@@ -256,9 +258,10 @@ export class Ve {
     const den = (a: number) => rgba(b.den, a)
     switch (su.t) {
       case 'ban': this.giat.set(su.chu, nay); if (!this.yeu) pu({ k: 'chop', x: su.x, y: su.y, mau: mauCua(su.chu), goc: su.ngam }); break
+      // Đạn của em chạm đối thủ TẠI MÁY: nháy ngay (phòng xác nhận sau bằng «trung» ⇒ chỉ thêm «−1», không nháy lần hai).
+      case 'cham': this.loe.set(su.ai, nay); this.chamLuc.set(su.ai, nay); pu({ k: 'tia', x: su.x, y: su.y, mau: mauCua(su.boi), goc: Math.random() * PI2 }); break
       case 'trung':
-        this.loe.set(su.ai, nay)
-        pu({ k: 'tia', x: su.x, y: su.y, mau: mauCua(su.boi), goc: Math.random() * PI2 })
+        if (!(su.boi === emId && nay - (this.chamLuc.get(su.ai) ?? -1e9) < 600)) { this.loe.set(su.ai, nay); pu({ k: 'tia', x: su.x, y: su.y, mau: mauCua(su.boi), goc: Math.random() * PI2 }) }
         // «−1» hiện BÊN PHẢI nguyên tử (không đè nhãn tên).
         if (coEm && su.mau > 0 && nay - (this.soLuc.get(su.ai) ?? -1e9) > 300) { this.soLuc.set(su.ai, nay); const g = gId(su.ai); pu({ k: 'so', x: (g ? g.x : su.x) + R + 16, y: (g ? g.y : su.y) + 4, chu: '−1', co: su.ai === emId ? 15 : 17, mau: su.ai === emId ? b.sai : b.sao }) }
         if (su.ai === emId) { this.rung = { t0: nay, dur: 120, m: 1.5 }; this.doLuc = nay }

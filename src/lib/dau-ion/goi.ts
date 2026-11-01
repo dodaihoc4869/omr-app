@@ -1,7 +1,9 @@
 // GÓI NHỊ PHÂN của «Đấu Nguyên Tử 2» — dùng chung máy em ↔ phòng đấu (server/src/dau-ion-phong.ts). Thuần, không DOM.
 // PHIÊN BẢN GIAO THỨC = 3 (bản vẽ 3 đấu 3, 01/11: sân 1040 × 520 ⇒ toạ độ × 50; gói `vao` mang `v: 3`; bản khác ⇒ phòng đóng sạch mã 4010, máy cũ được báo tải lại).
 // Máy em → phòng: Ý ĐỊNH 8 byte [1, seq, dx, dy, 0, 0, 0, 0] ~12 lần/giây — CHỈ hướng đi. Ngắm, bắn, Máu, cấp: phòng quyết.
-// Phòng → máy em: ẢNH TRẬN MÃ 4 (bản cũ mã 3 ⇒ không đọc lẫn) 20 lần/giây = đầu 6 byte + 10 byte mỗi ghế + sự kiện mới.
+// Phòng → máy em: ẢNH TRẬN MÃ 4 (bản cũ mã 3 ⇒ không đọc lẫn) 20 lần/giây = đầu 10 byte + 10 byte mỗi ghế + sự kiện mới.
+// Đầu: [4, tick, ack, giây còn, số ghế, số sự kiện, BƯỚC TRẬN (uint16 — mốc thời gian của phòng, 1 bước = 1/20 giây), tỉ số Bazơ, tỉ số Axit].
+// Máy em nội suy theo BƯỚC TRẬN (đồng hồ của phòng), không theo giờ nhận gói ⇒ mạng rung không làm giật hình.
 // Đạn: một sự kiện MỖI LOẠT (vị trí, góc, cấp); máy em tự sinh 1–5 viên theo cấp và cho bay. Trúng hay không thì phòng báo.
 import { MAU_MAX, type Ghe, type LoaiVp, type SuKien } from './loi'
 
@@ -31,19 +33,22 @@ export function docYDinh(buf: ArrayBuffer | Uint8Array): { seq: number; dx: numb
 }
 
 export interface GheAnh { id: number; x: number; y: number; muc: number; mau: number; cap: number; cho: boolean; che: boolean; khien: number; vang: boolean; ha: number; e: number }
-export interface Anh { tick: number; ack: number; con: number; ghe: GheAnh[]; su: SuKien[] }
+/** `buoc`: bước trận của phòng (uint16, quay vòng); `ti`: tỉ số hai phe [Bazơ, Axit]. */
+export interface Anh { tick: number; ack: number; con: number; buoc: number; ti: [number, number]; ghe: GheAnh[]; su: SuKien[] }
+const DAU = 10
 
 const MA: Partial<Record<SuKien['t'], number>> = { ban: 1, trung: 2, chan: 3, ha: 4, hoi: 5, vp: 6, nhat: 7, len: 8, xich: 9, no: 10 }
 const DAI = [0, 9, 9, 4, 8, 2, 7, 3, 3, 4, 6]
 
 /** Thân ảnh trận (ack khác nhau từng em, ghi bằng `datAck`). Sự kiện `tat` chỉ có ở máy em ⇒ bỏ. */
-export function maAnh(tick: number, con: number, ghe: readonly Ghe[], suVao: readonly SuKien[]): Uint8Array {
+export function maAnh(tick: number, con: number, ghe: readonly Ghe[], suVao: readonly SuKien[], buoc = 0, ti: readonly [number, number] = [0, 0]): Uint8Array {
   const su = suVao.filter((k) => MA[k.t]).slice(0, 255)
-  let dai = 6 + ghe.length * 10
+  let dai = DAU + ghe.length * 10
   for (const k of su) dai += DAI[MA[k.t]!]
   const b = new Uint8Array(dai), v = new DataView(b.buffer)
   b[0] = GOI_ANH; b[1] = tick & 0xff; b[3] = Math.max(0, Math.min(255, Math.ceil(con))); b[4] = ghe.length; b[5] = su.length
-  let o = 6
+  v.setUint16(6, buoc & 0xffff, true); b[8] = Math.min(255, ti[0]); b[9] = Math.min(255, ti[1])
+  let o = DAU
   for (const g of ghe) {
     b[o] = g.id; v.setUint16(o + 1, toaDo(g.x), true); v.setUint16(o + 3, toaDo(g.y), true); b[o + 5] = g.muc
     b[o + 6] = (Math.max(0, Math.min(15, g.mau)) & 15) | ((g.cap & 7) << 4)
@@ -76,10 +81,10 @@ export function datAck(b: Uint8Array, ack: number): Uint8Array { b[2] = ack & 0x
 
 export function docAnh(buf: ArrayBuffer | Uint8Array): Anh | null {
   const b = buf instanceof Uint8Array ? buf : new Uint8Array(buf)
-  if (b.length < 6 || b[0] !== GOI_ANH) return null
+  if (b.length < DAU || b[0] !== GOI_ANH) return null
   const v = new DataView(b.buffer, b.byteOffset, b.byteLength)
   const nGhe = b[4], nSu = b[5]
-  let o = 6
+  let o = DAU
   if (b.length < o + nGhe * 10) return null
   const xy = (p: number) => [v.getUint16(p, true) / 50, v.getUint16(p + 2, true) / 50] as const
   const ghe: GheAnh[] = []
@@ -105,5 +110,5 @@ export function docAnh(buf: ArrayBuffer | Uint8Array): Anh | null {
     }
     o += DAI[m]
   }
-  return { tick: b[1], ack: b[2], con: b[3], ghe, su }
+  return { tick: b[1], ack: b[2], con: b[3], buoc: v.getUint16(6, true), ti: [b[8], b[9]], ghe, su }
 }

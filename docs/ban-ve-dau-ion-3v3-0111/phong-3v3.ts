@@ -31,6 +31,7 @@ export class Phong3v3 {
   private seq = 0
   private tick = 0
   private trongSan = false
+  private buocSo = 0
   /** Ghế vừa vào thay còn khiên (giây trận). */
   private cheDen = new Map<number, number>()
   constructor(ntEm = 3) {
@@ -66,7 +67,7 @@ export class Phong3v3 {
   }
   private vaoSan(): void {
     this.datCanh()
-    this.gui?.(JSON.stringify({ t: 'san', v: PHIEN_BAN, so: 1, toi: 1, con: 42, ghe: this.dongGhe(), vp: this.tr.vp.map((v) => [v.id, v.k, Math.round(v.x), Math.round(v.y)]) }))
+    this.gui?.(JSON.stringify({ t: 'san', v: PHIEN_BAN, so: 1, toi: 1, con: 42, buoc: this.buocSo, ti: [7, 5], ghe: this.dongGhe(), vp: this.tr.vp.map((v) => [v.id, v.k, Math.round(v.x), Math.round(v.y)]) }))
     this.trongSan = true
     if (!this.vong) this.vong = setInterval(() => this.nhip(), BUOC * 1000)
   }
@@ -76,17 +77,18 @@ export class Phong3v3 {
     buocTran(this.tr, BUOC)
     this.tr.con = 42
     this.tick = (this.tick + 1) & 0xff
-    this.gui(datAck(maAnh(this.tick, this.tr.con, this.tr.ghe, laySuKien(this.tr)), this.seq))
+    this.buocSo = (this.buocSo + 1) & 0xffff
+    this.gui(datAck(maAnh(this.tick, this.tr.con, this.tr.ghe, laySuKien(this.tr), this.buocSo, [7, 5]), this.seq))
   }
   /** Cảnh C: Gia Huy vào thay ghế A.I của phe Bazơ — A.I tan tại chỗ, Gia Huy hiện ở bệ cánh của phe (khiên 3 giây). */
   thay(id = 3, ten = 'Gia Huy'): void {
     const c = this.canh.find((k) => k.id === id)!
-    this.gui?.(JSON.stringify({ t: 'thay', id, ten, phe: c.phe }))
+    this.gui?.(JSON.stringify({ t: 'thay', cu: id, moi: id, ten, nt: c.nt, phe: c.phe, ai: 0 }))
     c.ai = false; c.ten = ten; [c.x, c.y] = BE_PHE[c.phe][2]
     this.cheDen.set(id, this.tr.t + 3)
     this.gui?.(JSON.stringify({ t: 'ghe', ghe: this.dongGhe() }))
   }
   /** Cảnh D: hết ván. */
-  ket(): void { this.trongSan = false; this.gui?.(JSON.stringify({ t: 'ket', bang: BANG_KET, nghi: 6 })) }
+  ket(): void { this.trongSan = false; this.gui?.(JSON.stringify({ t: 'ket', bang: BANG_KET, nghi: 6, ti: [12, 9] })) }
   dung(): void { if (this.vong) clearInterval(this.vong); this.vong = null; this.gui = null }
 }

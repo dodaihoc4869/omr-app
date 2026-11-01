@@ -185,7 +185,7 @@
 }
 @media (prefers-reduced-motion: reduce) { .dn-cham, .dn-tin div { animation: none; } .dn-nut, .dn-mau i { transition: none; } }
 
-/* ══ BẢN VẼ 3 ĐẤU 3 (thầy 01/11 tối, docs/ban-ve-dau-ion-3v3-0111/DAC-TA.md — CHƯA DUYỆT) ══
+/* ══ 3 ĐẤU 3 (thầy 01/11 tối, duyệt bản vẽ docs/ban-ve-dau-ion-3v3-0111/DAC-TA.md) ══
    Khối này ĐÈ lên khối cũ phía trên (cùng độ ưu tiên, đứng sau ⇒ thắng). Khối cũ giữ nguyên từng khai báo màu cho `npm run kiem:mau-giu`;
    lớp cũ không còn dùng (.dn-dai, .dn-hud, .dn-ben, .dn-xh, .dn-bang, .dn-cho-ban…) xoá ở bước build SAU KHI thầy duyệt (luật màu 05/10).
    Hai màu phe theo giấy quỳ — Bazơ = --dn-tin (xanh), Axit = --dn-sai (đỏ); chữ màu phe dùng --*-chu (≥ 4,5 trên thẻ / nền nhạt).
@@ -339,3 +339,11 @@
   .dn-tin { bottom: 108px; }
 }
 @media (prefers-reduced-motion: reduce) { .dn-tin div, .dn-goi-y-dau, .dn-goi-y-dau svg { animation: none; } }
+/* Thầy bấm Bắt đầu: dải nhẹ «Sắp vào thi · 3 · 2 · 1» 1,5 giây (chỉ CSS). Nằm ở document.body ⇒ đọc thẳng token app (không qua --dn-*). */
+.dn-sap-thi { position: fixed; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 12px); transform: translateX(-50%); z-index: 90; display: flex; align-items: center; gap: 10px; padding: 8px 18px; border-radius: 20px; background: var(--tr-mat, var(--the)); color: var(--tr-chu, var(--muc)); border: 2px solid var(--tr-vien, var(--vien)); box-shadow: 0 4px 0 var(--tr-vien, var(--vien)); font-family: var(--sans); font-size: 16px; font-weight: 800; pointer-events: none; animation: dn-sap 1.5s ease-out forwards; }
+.dn-sap-thi i { font-style: normal; color: var(--tr-chu-3, var(--mo)); }
+.dn-sap-thi b { min-width: 20px; text-align: center; color: var(--tr-chu-3, var(--mo)); opacity: .35; animation: dn-so .5s ease-out forwards; }
+.dn-sap-thi b:nth-of-type(2) { animation-delay: .5s; } .dn-sap-thi b:nth-of-type(3) { animation-delay: 1s; }
+@keyframes dn-so { 30%, 100% { opacity: 1; color: var(--tr-hs-chu, var(--lg-nhan)); } }
+@keyframes dn-sap { 0%, 85% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .dn-sap-thi, .dn-sap-thi b { animation: none; opacity: 1; } }
