@@ -17,7 +17,7 @@ import './kiem-tra-ca-nhan.css'
 import { phanHoi } from '../../lib/phan-hoi'
 import { CHU_MAY_CHU_BAN_EM, choLuiDanMs, chuCuaLoi, laLoiMayChuBan, laLoiTamThoi } from '../../lib/loi-may-chu'
 import { batCheDoThi } from '../../lib/am-thanh'
-import { ChonDungSai, ChonTracNghiem, DeCau, HinhCuoiCau, OTraLoiNgan, BanPhimSo } from './LamCau'
+import { ChonDungSai, ChonTracNghiem, DeCau, HinhCuoiCau, OTraLoiNgan, BanPhimSo, ThanhCuon } from './LamCau'
 import { nhanPhim, phimTuBanPhim, type PhimSo } from './lam-bai'
 import { soOCuaCau } from '../../lib/so-o-tra-loi-ngan'
 import { BiKetQua, camTheoDiem, DayKt, laKiemTraDuo, NhanCauKt, OGioKt, TamLuoiKt, TamNopKt, ThanhTrenKt } from '../kiem-tra-duo/KhungKiemTra'
@@ -244,7 +244,9 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:
   const chuaLam=cs.flatMap((c,i)=>daTraDu(c,tra[c.qid])?[]:[i+1])
   // thầy 28/10 «Ẩn cái chữ … đã lưu»: không hiện chữ trạng thái lưu thường (Đang lưu / Đã lưu / Đã tải) — chỉ còn lời báo cần em biết (hết giờ, chưa lưu được)
   const nhanLuu=LUU_AN.has(luu)?'':luu
-  return <div className="ht-app ht2-lam duo duo-kt" ref={khung} data-duo="" data-hai-cot={deDai||undefined}>
+  // KTCN NGANG 02/11 (thầy «Kiểm tra ôn tập cũng tối ưu xoay ngang, máy tính và Z Fold»): gốc `data-chang` ⇒ CÙNG bố cục hai cột cuộn riêng với màn làm chặng
+  // (styles/trong-chang-ngang.css, luật hai cột chung bo-cuc-lam.ts): đề trái + thanh cuộn luôn thấy · trả lời + nút phải. Chỉ bố cục — lưu / giờ / chốt / nộp giữ nguyên.
+  return <div className="ht-app ht2-lam duo duo-kt" ref={khung} data-duo="" data-chang="" data-phan={q.phan} data-hai-cot={deDai||undefined}>
    <ThanhTrenKt onDong={()=>void ve()} nhanDong={`Lưu và về ${tenTrangChinh()}`} khoaDong={busy} daLam={daTraChang} tong={cs.length}
     gio={<GioChangDuo kho={khoChang} nhan={`Thời gian chặng ${stt+1} còn lại`}/>} nhanGio="" onMoLuoi={()=>{phanHoi('chon');setMoLuoi(true)}}/>
    <main className="duo-than" data-de-dai={deDai||undefined}>
@@ -254,6 +256,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:
      <NhanCauKt so={viTri+1} tong={cs.length} phu={`Chặng ${stt+1}/${chang.length||stt+1}`}/>
      <DeCau q={q} stt={viTri+1}/>
     </div>
+    <ThanhCuon key={`cd${q.qid}`} cot="de"/>
     <div key={`t${q.qid}`} className="duo-cot-tra">
      <div className="duo-tra" data-luoi={luoiPa||undefined} data-pa={doDaiPa}>
       {q.phan==='II'?<ChonDungSai q={q} value={v} khoa={khoa} onChon={(i,x)=>{const a=v.padEnd(4,'-').split('');a[i]=x;doi(q.qid,a.join(''))}}/>
@@ -263,6 +266,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:
      {q.phan==='III'&&<BanPhimSo value={v} khoa={khoa} soO={soODuo} onPhim={(p:PhimSo)=>doi(q.qid,nhanPhim(v,p,soODuo))}/>}
      <HinhCuoiCau q={q} stt={viTri+1}/>
     </div>
+    <ThanhCuon key={`ct${q.qid}`} cot="tra"/>
    </main>
    <DayKt coTruoc={viTri>0} onTruoc={()=>toi(viTri-1)} ghi={nhanLuu||undefined}>
     {cuoi?<button type="button" className="duo-nut" onClick={()=>{phanHoi('chon');void chot()}} disabled={busy}>Nộp chặng {stt+1}</button>
@@ -277,7 +281,9 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:
     hauQua="Nộp chặng sẽ chốt các câu đã lưu, không sửa lại được."/>}
   </div>
  }
- return <div className="ht-app ktcn-man" ref={khung} data-dang-lam={stt!==null||undefined}>
+ // KTCN NGANG 02/11: trang bài (tổng quan + chặng) và kết quả ⇒ `data-mot-man`: khi chia hai cột (luật chung bo-cuc-lam.ts) MỘT màn, mỗi cột cuộn riêng (CSS).
+ const motMan=(!!tt&&stt===null&&!ket&&tt.homNay&&tt.nopLuc===null)||(!!ket&&!!kq)
+ return <div className="ht-app ktcn-man" ref={khung} data-dang-lam={stt!==null||undefined} data-mot-man={motMan||undefined}>
   <header className="ktcn-thanh">
    <button type="button" className="ktcn-ve" onClick={()=>void ve()} disabled={busy&&stt!==null}><ArrowLeft size={20} aria-hidden="true"/>{stt!==null?'Lưu và về':tenTrangChinh()}</button>
    <p className="ktcn-thanh-giua">{tieuDe}</p>
@@ -299,6 +305,8 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:
      <div><Timer size={22} aria-hidden="true"/><b>Giờ riêng từng chặng</b><small>Chỉ chạy khi em bấm Làm chặng</small></div>
     </div>
    </section>
+   {/* KTCN NGANG 02/11: cột chặng bọc riêng (dọc: display: contents ⇒ y như cũ) để hai cột cuộn riêng khi xoay ngang / máy gập / máy tính. */}
+   <div className="ktcn-cot-chang">
    {/* Thẻ tổng quan vẽ ngay từ số Sảnh; chặng chưa về ⇒ khung chờ ngay dưới thẻ (27/10 tốc độ). */}
    {busy&&!chang.length&&<div className="ktcn-xuong" aria-hidden="true"><span/><span/><span/></div>}
    <ol className="ktcn-chang" aria-label="Các chặng">{chang.map(c=>{
@@ -316,6 +324,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:
     <p>{xongHet?`Em đã xong cả ${chang.length} chặng. Nộp toàn bài để xem kết quả.`:`Xong cả ${chang.length||tt.soChang} chặng thì nộp toàn bài. Nộp sớm vẫn được — câu bỏ trống tính là chưa trả lời.`}</p>
     <button type="button" className={xongHet?'ktcn-nut-chinh':'ktcn-nut-phu'} onClick={()=>void nop()} disabled={busy||!!dangChay}>Nộp toàn bài</button>
     {dangChay&&<p className="ktcn-ch-ghi">Nộp chặng {dangChay.stt+1} trước khi nộp toàn bài.</p>}
+   </div>
    </div>
   </main>:<main className="ktcn-khung"><TheKiemTraCaNhan du={tt}/></main>)}
 
