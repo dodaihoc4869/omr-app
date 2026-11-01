@@ -5,6 +5,8 @@
 // xem bảng). CHỈ NGƯỜI THẬT (thầy 01/11: «Game đừng tự thêm máy ảo, hs thách bao nhiêu thì chơi bấy nhiêu, tối đa 6 người chơi cùng lúc»):
 // sân có 1 em ⇒ CHỜ BẠN (đồng hồ đứng ở 60 giây, em đi thử sân); bạn thứ 2 vào ⇒ ván mới chạy ngay cho cả sân; còn 1 em ⇒ về chờ, và có sân khác
 // còn chỗ thì em được chuyển sang đó luôn (không ai ngồi chờ một mình khi sân bên cạnh đang đấu). Sân hết người ⇒ đóng.
+// BẢN VẼ 3 ĐẤU 3 (01/11, CHƯA DUYỆT): ghế mới vào phe ít ghế hơn (lõi tự chia); dòng ghế thêm [là A.I, phe]; bảng hết ván thêm số liệu huy hiệu.
+// Ghép A.I nhường chỗ + nhiều phòng: kế hoạch ở docs/ban-ve-dau-ion-3v3-0111/DAC-TA.md mục 4 (làm ở bước build).
 // Ai thấy ai: chỉ các em cùng sân; mỗi em là số thứ tự ngắn + tên gọi (hai chữ cuối) hoặc «Bạn <nguyên tố>» khi bật Ẩn tên. Số báo danh KHÔNG gửi đi.
 import { BUOC, GIAY_NGHI, GIAY_VAN, NGUYEN_TO, TOI_DA, TOI_THIEU, boGhe, buocTran, laySuKien, taoTran, themGhe, vanMoi, xepBang, type Tran } from '../../src/lib/dau-ion/loi'
 import { PHIEN_BAN, datAck, docYDinh, maAnh } from '../../src/lib/dau-ion/goi'
@@ -167,7 +169,7 @@ export class PhongDau {
   }
 
   private dongGhe(s: San): unknown[] {
-    return s.tr.ghe.map((g) => { const k = this.nguoi.get(g.id); return [g.id, k ? this.tenHien(k) : `Bạn ${NGUYEN_TO[g.nt] ?? 'Na'}`, g.nt, 0] })
+    return s.tr.ghe.map((g) => { const k = this.nguoi.get(g.id); return [g.id, k ? this.tenHien(k) : `Bạn ${NGUYEN_TO[g.nt] ?? 'Na'}`, g.nt, g.ai ? 1 : 0, g.phe] })
   }
   private goiSan(s: San, n: Nguoi): unknown {
     return { t: 'san', v: PHIEN_BAN, so: s.so, toi: n.id, con: Math.ceil(s.tr.con), ghe: this.dongGhe(s), vp: s.tr.vp.map((v) => [v.id, v.k, Math.round(v.x), Math.round(v.y)]) }
@@ -269,7 +271,7 @@ export class PhongDau {
       for (const id of s.ds) { const k = this.nguoi.get(id); if (k?.kn) k.kn.gui(datAck(than.slice(), k.seq)) }
       if (s.tr.xong) {
         s.nghi = GIAY_NGHI; s.muonMoi.clear()
-        s.bang = xepBang(s.tr).map((d) => [d.id, d.ha, d.biHa, d.capMax, d.chuoiMax])
+        s.bang = xepBang(s.tr).map((d) => [d.id, d.ha, d.biHa, d.capMax, d.chuoiMax, d.nhatE, d.hoTro, d.trung, d.songMax])
         for (const id of s.ds) this.gui(this.nguoi.get(id), { t: 'ket', bang: s.bang, nghi: GIAY_NGHI })
       }
     }

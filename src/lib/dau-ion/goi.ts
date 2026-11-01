@@ -1,17 +1,18 @@
 // GÓI NHỊ PHÂN của «Đấu Nguyên Tử 2» — dùng chung máy em ↔ phòng đấu (server/src/dau-ion-phong.ts). Thuần, không DOM.
-// PHIÊN BẢN GIAO THỨC = 2 (gói `vao` mang `v: 2`; bản cũ không mang ⇒ phòng đóng sạch mã 4010, máy cũ chỉ còn chơi tại máy).
+// PHIÊN BẢN GIAO THỨC = 3 (bản vẽ 3 đấu 3, 01/11: sân 1040 × 520 ⇒ toạ độ × 50; gói `vao` mang `v: 3`; bản khác ⇒ phòng đóng sạch mã 4010, máy cũ được báo tải lại).
 // Máy em → phòng: Ý ĐỊNH 8 byte [1, seq, dx, dy, 0, 0, 0, 0] ~12 lần/giây — CHỈ hướng đi. Ngắm, bắn, Máu, cấp: phòng quyết.
-// Phòng → máy em: ẢNH TRẬN MÃ 3 (bản cũ mã 2 ⇒ không đọc lẫn) 20 lần/giây = đầu 6 byte + 10 byte mỗi ghế + sự kiện mới.
+// Phòng → máy em: ẢNH TRẬN MÃ 4 (bản cũ mã 3 ⇒ không đọc lẫn) 20 lần/giây = đầu 6 byte + 10 byte mỗi ghế + sự kiện mới.
 // Đạn: một sự kiện MỖI LOẠT (vị trí, góc, cấp); máy em tự sinh 1–5 viên theo cấp và cho bay. Trúng hay không thì phòng báo.
 import { MAU_MAX, type Ghe, type LoaiVp, type SuKien } from './loi'
 
-export const PHIEN_BAN = 2
+export const PHIEN_BAN = 3
 export const GOI_Y_DINH = 1
-export const GOI_ANH = 3
+export const GOI_ANH = 4
 const HAI_PI = Math.PI * 2
 const goc16 = (a: number) => Math.round(((((a % HAI_PI) + HAI_PI) % HAI_PI) / HAI_PI) * 65535) & 0xffff
 const tuGoc16 = (n: number) => (n / 65535) * HAI_PI
-const toaDo = (v: number) => Math.max(0, Math.min(65535, Math.round(v * 100)))
+/** Toạ độ × 50 (sân 1040 × 520 vừa 16 bit, sai số 0,02 đơn vị). */
+const toaDo = (v: number) => Math.max(0, Math.min(65535, Math.round(v * 50)))
 const so8 = (v: number) => Math.max(-100, Math.min(100, Math.round(v * 100)))
 const LOAI_VP: readonly LoaiVp[] = ['e', 'xt', 'kh']
 
@@ -80,7 +81,7 @@ export function docAnh(buf: ArrayBuffer | Uint8Array): Anh | null {
   const nGhe = b[4], nSu = b[5]
   let o = 6
   if (b.length < o + nGhe * 10) return null
-  const xy = (p: number) => [v.getUint16(p, true) / 100, v.getUint16(p + 2, true) / 100] as const
+  const xy = (p: number) => [v.getUint16(p, true) / 50, v.getUint16(p + 2, true) / 50] as const
   const ghe: GheAnh[] = []
   for (let i = 0; i < nGhe; i++, o += 10) {
     const [x, y] = xy(o + 1), c = b[o + 7]

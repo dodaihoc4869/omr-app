@@ -184,3 +184,158 @@
   .dn-cach kbd { font: inherit; font-weight: 800; color: var(--dn-chu); padding: 0 6px; border-radius: 6px; border: 1px solid var(--dn-vien-2); background: var(--dn-mat-2); }
 }
 @media (prefers-reduced-motion: reduce) { .dn-cham, .dn-tin div { animation: none; } .dn-nut, .dn-mau i { transition: none; } }
+
+/* ══ BẢN VẼ 3 ĐẤU 3 (thầy 01/11 tối, docs/ban-ve-dau-ion-3v3-0111/DAC-TA.md — CHƯA DUYỆT) ══
+   Khối này ĐÈ lên khối cũ phía trên (cùng độ ưu tiên, đứng sau ⇒ thắng). Khối cũ giữ nguyên từng khai báo màu cho `npm run kiem:mau-giu`;
+   lớp cũ không còn dùng (.dn-dai, .dn-hud, .dn-ben, .dn-xh, .dn-bang, .dn-cho-ban…) xoá ở bước build SAU KHI thầy duyệt (luật màu 05/10).
+   Hai màu phe theo giấy quỳ — Bazơ = --dn-tin (xanh), Axit = --dn-sai (đỏ); chữ màu phe dùng --*-chu (≥ 4,5 trên thẻ / nền nhạt).
+   Trận TRÀN MÀN: canvas giữ tỉ lệ 2 : 1 (JS tính cỡ) giữa vùng an toàn (tai thỏ); lớp phủ mỏng ở góc. */
+.dn-the, .dn-man {
+  --dn-tin-chu: var(--tr-tin-chu, var(--gg-xanh));
+  /* Electron đổi sang lục (cũ: xanh) để khỏi lẫn với đạn phe Bazơ. */
+  --dn-phe-0: var(--dn-tin); --dn-phe-0-chu: var(--dn-tin-chu); --dn-phe-0-nhat: var(--dn-tin-nhat);
+  --dn-phe-1: var(--dn-sai); --dn-phe-1-chu: var(--dn-sai-chu); --dn-phe-1-nhat: var(--dn-sai-nhat);
+  --dn-e: var(--dn-dung);
+  /* Màu 5 cấp súng trong 3 đấu 3: xám → lục → cam → chàm → vàng (bỏ xanh / hồng của bộ cũ để khỏi lẫn màu hai phe). */
+  --dn-capm-1: var(--dn-vien-2); --dn-capm-2: var(--dn-dung); --dn-capm-3: var(--dn-chu-y); --dn-capm-4: var(--dn-hs); --dn-capm-5: var(--dn-sao);
+}
+@media (prefers-color-scheme: dark) { .dn-the, .dn-man { --dn-capm-1: var(--dn-chu-3); } }
+.dn-the .dn-c1, .dn-man .dn-c1 { --c: var(--dn-capm-1); } .dn-the .dn-c2, .dn-man .dn-c2 { --c: var(--dn-capm-2); } .dn-the .dn-c3, .dn-man .dn-c3 { --c: var(--dn-capm-3); }
+.dn-the .dn-c4, .dn-man .dn-c4 { --c: var(--dn-capm-4); } .dn-the .dn-c5, .dn-man .dn-c5 { --c: var(--dn-capm-5); }
+.dn-phe-0 { --p: var(--dn-phe-0); --p-chu: var(--dn-phe-0-chu); --p-nhat: var(--dn-phe-0-nhat); --c: var(--dn-phe-0); }
+.dn-phe-1 { --p: var(--dn-phe-1); --p-chu: var(--dn-phe-1-chu); --p-nhat: var(--dn-phe-1-nhat); --c: var(--dn-phe-1); }
+
+/* ── Thẻ game: hai phe + MỘT nút «Đấu» + một dòng luật ── */
+.dn-luat { font-size: 14px; }
+.dn-hai-phe { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 8px; }
+.dn-hai-phe > b { font-size: 14px; font-weight: 800; color: var(--dn-chu-2); white-space: nowrap; }
+.dn-hai-phe > .dn-phe-0 { justify-self: end; } .dn-hai-phe > .dn-phe-1 { justify-self: start; }
+.dn-chip-phe { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 3px; border-radius: 20px; background: var(--p-nhat); color: var(--p-chu); border: 2px solid var(--p); font-size: 13px; font-weight: 800; white-space: nowrap; }
+.dn-chip-phe i { font-style: normal; min-width: 28px; height: 22px; padding: 0 5px; border-radius: 11px; display: grid; place-items: center; background: var(--p); color: var(--dn-tren-mau); font-size: 11px; }
+/* Chọn ký hiệu: ô TRUNG TÍNH (màu trên sân là màu phe, không phải màu nguyên tố). */
+.dn-chon .dn-hat.dn-ky { background: var(--dn-mat-2); color: var(--dn-chu); box-shadow: inset 0 0 0 2px var(--dn-vien); }
+.dn-chon .dn-hat.dn-ky[aria-checked='true'] { background: var(--dn-hs-nhat); color: var(--dn-hs-chu); box-shadow: 0 0 0 3px var(--dn-mat), 0 0 0 6px var(--dn-nut); }
+.dn-nut-to { min-height: 60px; font-size: 22px; letter-spacing: .02em; }
+/* `.pc-room button { font: inherit }` (0,1,1) đè mất độ đậm của nút ⇒ (0,2,0). */
+.dn-the .dn-nut { font-weight: 800; }
+.dn-luat-ngan { margin: 0; text-align: center; font-size: 14px; font-weight: 700; line-height: 1.45; color: var(--dn-chu-2); }
+.dn-hat.dn-phe-0, .dn-hat.dn-phe-1 { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--p) 70%, var(--dn-chu)); }
+
+/* ── MÀN TRẬN TRÀN MÀN. Mặc định = điện thoại NGANG. ── */
+.dn-man { display: block; padding: 0; font-size: 14px;
+  --an-t: env(safe-area-inset-top, 0px); --an-r: env(safe-area-inset-right, 0px); --an-b: env(safe-area-inset-bottom, 0px); --an-l: env(safe-area-inset-left, 0px);
+  --phu-nen: color-mix(in srgb, var(--dn-mat) 88%, transparent); }
+.dn-khung { position: absolute; grid-area: auto; justify-self: auto; width: auto; height: auto; top: calc(var(--an-t) + 14px); right: calc(var(--an-r) + 2px); bottom: calc(var(--an-b) + 2px); left: calc(var(--an-l) + 2px); display: grid; place-items: center; }
+.dn-khung canvas { border-radius: 18px; }
+/* Lớp phủ: thanh trên (Rời sân · tỉ số + đồng hồ), ô của em (góc phải trên), tin nổi (giữa dưới). Không chặn kéo (pointer-events chỉ ở nút). */
+.dn-tren { position: absolute; top: calc(var(--an-t) + 3px); left: calc(var(--an-l) + 8px); right: calc(var(--an-r) + 8px); display: flex; justify-content: center; align-items: flex-start; pointer-events: none; z-index: 3; }
+.dn-nut.dn-nut-roi { position: absolute; left: 0; top: -3px; min-height: 44px; height: 44px; padding: 0 12px 0 6px; gap: 2px; font-size: 13px; border-radius: 14px; background: var(--phu-nen); color: var(--dn-chu-2); border: 1.5px solid var(--dn-vien); pointer-events: auto; }
+.dn-nut-roi svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.dn-ti-so { display: flex; align-items: center; gap: 6px; padding: 2px 4px; border-radius: 16px; background: var(--phu-nen); border: 1.5px solid var(--dn-vien); font-size: 13px; font-weight: 800; white-space: nowrap; box-shadow: 0 2px 0 var(--dn-vien); }
+.dn-ts { display: inline-flex; align-items: center; gap: 6px; padding: 2px 4px; border-radius: 12px; background: var(--p-nhat); color: var(--p-chu); border: 1.5px solid var(--p); }
+.dn-ts i { font-style: normal; font-size: 11px; padding: 1px 5px; border-radius: 8px; background: var(--p); color: var(--dn-tren-mau); }
+.dn-ts b { min-width: 24px; padding: 0 3px; text-align: center; font-size: 18px; line-height: 1.1; color: var(--dn-chu); }
+.dn-ts-gach { color: var(--dn-chu-3); }
+.dn-ts-gio { margin-left: 2px; padding: 0 8px; font-size: 16px; color: var(--dn-chu); border-left: 1.5px solid var(--dn-vien); }
+.dn-em-o { position: absolute; top: calc(var(--an-t) + 3px); right: calc(var(--an-r) + 8px); z-index: 3; display: flex; align-items: center; gap: 6px; height: 34px; padding: 0 8px 0 3px; border-radius: 17px; background: var(--phu-nen); border: 1.5px solid var(--p); pointer-events: none; }
+.dn-em-o .dn-hat { width: 28px; height: 28px; font-size: 11px; }
+.dn-em-d1, .dn-em-d2 { display: contents; }
+.dn-em-o .dn-mau { width: 54px; flex: none; min-width: 0; }
+.dn-em-o .dn-e { width: 54px; flex: none; }
+.dn-em-d1, .dn-em-d2 { display: flex; align-items: center; gap: 6px; min-width: 0; font-size: 12px; font-weight: 700; color: var(--dn-chu-2); white-space: nowrap; }
+.dn-em-d1 b { font-size: 13px; color: var(--p-chu); }
+.dn-em-o .dn-mau { height: 7px; }
+.dn-em-o .dn-mau i, .dn-em-o .dn-mau[data-it] i { background: var(--p); }
+.dn-em-d2 em { font-style: normal; padding: 0 6px; border-radius: 8px; background: var(--c); color: var(--dn-tren-mau); }
+.dn-em-o .dn-e { display: inline-flex; gap: 2px; }
+.dn-em-o .dn-e i { max-width: 12px; }
+.dn-em-o .dn-e i[data-co] { background: var(--dn-e); }
+.dn-em-ha { color: var(--dn-sao-chu); }
+.dn-tin { position: absolute; left: 50%; right: auto; top: auto; bottom: calc(var(--an-b) + 14px); transform: translateX(-50%); width: min(92vw, 460px); }
+.dn-tin div { animation: dn-hien 2.2s ease-out forwards; }
+/* Bị hạ: tin DỊU (xám), không đỏ chói. */
+.dn-tin div[data-k='bi'] { background: var(--dn-mat-2); border-color: var(--dn-vien-2); box-shadow: none; color: var(--dn-chu-2); }
+.dn-tin div[data-k='thay'] { background: var(--p-nhat); border-color: var(--p); box-shadow: 0 3px 0 var(--p); color: var(--p-chu); }
+.dn-mat-mang { position: absolute; left: 50%; top: calc(var(--an-t) + 56px); transform: translateX(-50%); margin: 0; padding: 4px 12px; border-radius: 14px; background: var(--phu-nen); font-size: 12px; color: var(--dn-chu-2); display: flex; gap: 8px; align-items: center; z-index: 3; }
+/* Gợi ý lần đầu (3 giây): giữa sân, không chặn chạm. */
+.dn-goi-y-dau { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 4; display: flex; align-items: center; gap: 10px; padding: 12px 18px 12px 14px; border-radius: 20px; background: var(--phu-nen); border: 2px solid var(--dn-vien); box-shadow: 0 4px 0 var(--dn-vien); pointer-events: none; animation: dn-goi-y 3s ease-out forwards; white-space: nowrap; }
+.dn-goi-y-dau svg { width: 34px; height: 34px; fill: none; stroke: var(--dn-hs-chu); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; animation: dn-keo 1.2s ease-in-out infinite; }
+.dn-goi-y-dau b { font-size: 18px; font-weight: 800; }
+.dn-goi-y-dau span { font-size: 15px; font-weight: 700; color: var(--dn-chu-2); }
+.dn-goi-y-dau span::before { content: '·'; margin-right: 10px; color: var(--dn-chu-3); }
+@keyframes dn-goi-y { 0% { opacity: 0; } 8% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes dn-keo { 50% { transform: translate(8px, -4px); } }
+.dn-nhac-xoay { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(var(--an-b) + 64px); margin: 0; z-index: 4; display: flex; align-items: center; gap: 8px; padding: 7px 14px 7px 10px; border-radius: 18px; background: var(--phu-nen); border: 1.5px solid var(--dn-vien); font-size: 13px; font-weight: 700; color: var(--dn-chu-2); white-space: nowrap; pointer-events: none; }
+.dn-nhac-xoay svg { width: 22px; height: 22px; fill: none; stroke: var(--dn-hs-chu); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+/* Hai cột phe (chỉ máy tính, dưới sân). */
+.dn-doi { display: none; }
+/* Hết ván: thắng thua theo PHE, mỗi em một huy hiệu — không số thứ hạng. */
+.dn-mo { border-radius: 0; background: color-mix(in srgb, var(--dn-nen) 62%, transparent); z-index: 5; }
+.dn-ket { inset: auto; margin: 0; height: auto; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(calc(100vw - 24px), 560px); max-height: calc(100% - var(--an-t) - var(--an-b) - 16px); padding: 14px 14px 12px; gap: 8px; z-index: 6; }
+.dn-ket h2 { font-size: 22px; color: var(--p-chu, var(--dn-chu)); }
+.dn-ket-em { margin: 0; font-size: 14px; font-weight: 700; color: var(--dn-chu-2); }
+.dn-ket-em b { color: var(--dn-sao-chu); }
+.dn-ket-cot { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; text-align: left; }
+.dn-cot { border-radius: 16px; border: 2px solid var(--p); background: color-mix(in srgb, var(--p-nhat) 60%, var(--dn-mat)); padding: 6px 6px 4px; min-width: 0; }
+.dn-cot h3 { margin: 0 0 4px; display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 800; color: var(--p-chu); }
+.dn-cot h3 i { font-style: normal; font-size: 11px; padding: 1px 6px; border-radius: 8px; background: var(--p); color: var(--dn-tren-mau); }
+.dn-cot h3 b { margin-left: auto; font-size: 20px; color: var(--dn-chu); }
+.dn-cot ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.dn-cot li { display: grid; grid-template-columns: 26px minmax(0, 1fr); column-gap: 6px; row-gap: 2px; align-items: center; padding: 4px 6px 4px 4px; border-radius: 12px; background: var(--dn-mat); min-height: 40px; }
+.dn-cot li[data-em] { box-shadow: inset 0 0 0 2px var(--p); }
+.dn-cot li[data-ai] { opacity: .78; }
+.dn-cot .dn-hat { width: 26px; height: 26px; font-size: 10px; grid-row: 1 / 3; }
+.dn-cot .t { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
+.dn-cot .t b { font-size: 13px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dn-cot .t small { font-size: 11px; color: var(--dn-chu-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dn-huy { grid-column: 2; justify-self: start; display: inline-flex; align-items: center; gap: 3px; padding: 1px 8px 1px 4px; border-radius: 10px; background: var(--dn-sao-nhat); color: var(--dn-sao-chu); font-size: 11px; font-weight: 800; white-space: nowrap; }
+.dn-huy svg { width: 13px; height: 13px; fill: var(--dn-sao); }
+.dn-ket-sau { margin: 0; font-size: 13px; font-weight: 700; color: var(--dn-chu-3); }
+.dn-ket-sau b { font-size: 16px; color: var(--dn-hs-chu); }
+.dn-dem { flex: none; }
+.dn-ket-nut { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; align-items: center; }
+.dn-ket-nut .dn-nut { min-height: 44px; font-size: 15px; }
+.dn-pu { display: flex; }
+
+/* Điện thoại / máy NGANG thấp: hết ván gọn (vừa 390 px chiều cao). */
+@media (orientation: landscape) and (max-height: 560px) {
+  .dn-ket { padding: 8px 10px; gap: 5px; width: min(calc(100vw - 24px), 600px); }
+  .dn-ket h2 { font-size: 19px; }
+  .dn-ket-em, .dn-ket-sau { font-size: 12px; }
+  .dn-cot li { min-height: 36px; padding: 2px 6px 2px 4px; }
+  .dn-ket > .dn-phu { display: none; }
+  .dn-goi-y-dau b { font-size: 16px; }
+  /* Một hàng mỏng: Rời sân · tỉ số (ngay sau) · ô của em (góc phải) — chỉ đè dải viền trên của sân. */
+  .dn-tren { justify-content: flex-start; padding-left: 100px; }
+  .dn-ts i, .dn-em-d1 .so { display: none; }
+}
+/* Điện thoại DỌC: sân dựng đứng (phe em dưới); tỉ số ở dải trên, ô của em ở dải dưới (không đè sân). */
+.dn-man[data-doc='1'] .dn-khung { top: calc(var(--an-t) + 50px); bottom: calc(var(--an-b) + 60px); }
+.dn-man[data-doc='1'] .dn-nut-roi { padding: 0; width: 44px; justify-content: center; font-size: 0; }
+.dn-man[data-doc='1'] .dn-ti-so { margin-left: 46px; padding: 3px 4px; }
+.dn-man[data-doc='1'] .dn-tren { top: calc(var(--an-t) + 4px); }
+.dn-man[data-doc='1'] .dn-ts i { display: none; }
+.dn-man[data-doc='1'] .dn-em-o { top: auto; right: auto; left: 50%; transform: translateX(-50%); bottom: calc(var(--an-b) + 8px); height: 44px; padding: 0 12px 0 6px; border-radius: 22px; }
+.dn-man[data-doc='1'] .dn-em-o .dn-hat { width: 34px; height: 34px; font-size: 12px; }
+.dn-man[data-doc='1'] .dn-tin { bottom: calc(var(--an-b) + 70px); }
+.dn-man[data-doc='1'] .dn-nhac-xoay { bottom: auto; top: calc(var(--an-t) + 60px); }
+.dn-man[data-doc='1'] .dn-ket-cot { grid-template-columns: 1fr; }
+/* Máy tính: sân lớn giữa, thanh trên + hai cột phe dưới sân (dư chỗ). */
+@media (min-width: 1024px) and (min-height: 640px) {
+  .dn-khung { top: 64px; bottom: 92px; left: 24px; right: 24px; }
+  .dn-tren { top: 10px; left: 24px; right: 24px; }
+  .dn-ti-so { font-size: 15px; padding: 4px 6px; }
+  .dn-ts b { font-size: 22px; }
+  .dn-ts-gio { font-size: 19px; }
+  .dn-em-o { top: 10px; right: 24px; }
+  .dn-doi { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: min(calc(100vw - 48px), 880px); z-index: 3; pointer-events: none; }
+  .dn-doi-cot { list-style: none; margin: 0; padding: 6px; border-radius: 16px; border: 2px solid var(--p); background: var(--phu-nen); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .dn-doi-cot li { display: grid; grid-template-columns: 26px minmax(0, 1fr); column-gap: 6px; align-items: center; padding: 2px 6px 2px 2px; border-radius: 10px; font-size: 13px; }
+  .dn-doi-cot li[data-em] { background: var(--p-nhat); }
+  .dn-doi-cot .dn-hat { width: 26px; height: 26px; font-size: 10px; grid-row: 1 / 3; }
+  .dn-doi-cot .t { font-weight: 800; color: var(--p-chu); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dn-doi-cot small { font-size: 11px; color: var(--dn-chu-3); }
+  .dn-doi-cot .k { display: none; }
+  .dn-tin { bottom: 108px; }
+}
+@media (prefers-reduced-motion: reduce) { .dn-tin div, .dn-goi-y-dau, .dn-goi-y-dau svg { animation: none; } }
