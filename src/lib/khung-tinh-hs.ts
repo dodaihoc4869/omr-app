@@ -66,7 +66,9 @@ export function catNgoaiMan(a: Element[], b: Element[], ban: Element, rong: numb
 const KIEU_SVG: [string, string][] = [['fill', 'rgb(0, 0, 0)'], ['fill-opacity', '1'], ['fill-rule', 'nonzero'], ['stroke', 'none'], ['stroke-width', '1px'], ['stroke-opacity', '1'],
   ['stroke-linecap', 'butt'], ['stroke-linejoin', 'miter'], ['stroke-dasharray', 'none'], ['stroke-dashoffset', '0px'], ['opacity', '1'], ['transform', 'none'],
   ['transform-origin', ''], ['transform-box', 'view-box'], ['display', 'inline'], ['visibility', 'visible'], ['clip-path', 'none'], ['mask', 'none'], ['filter', 'none'],
-  ['font-family', ''], ['font-size', ''], ['font-weight', ''], ['text-anchor', 'start'], ['dominant-baseline', 'auto'], ['paint-order', 'normal']]
+  ['font-family', ''], ['font-size', ''], ['font-weight', ''], ['text-anchor', 'start'], ['dominant-baseline', 'auto'], ['paint-order', 'normal'],
+  // 01/11 tối: Mol mịn dùng gradient (màu stop qua lớp CSS) ⇒ ghi cả màu stop, không thì ảnh tĩnh / biểu tượng tab ra đen
+  ['stop-color', 'rgb(0, 0, 0)'], ['stop-opacity', '1']]
 /** Kiểu của chính thẻ <svg> chuyển sang <img> thay nó (cỡ, dịch / phóng, mờ). */
 const KIEU_GOC = ['display', 'width', 'height', 'transform', 'transform-origin', 'opacity', 'position', 'left', 'top', 'right', 'bottom', 'margin']
 

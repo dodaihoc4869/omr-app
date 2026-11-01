@@ -46,7 +46,7 @@ function apCap(l: Lua, cap: number, con: () => boolean): void {
 }
 
 /** (28/10 «vẫn chưa tức thì») Ảnh TĨNH của linh vật ở Lộ trình lần mở trước (src/lib/khung-tinh-hs.ts chụp): `{ "<cỡ>|<cảm xúc>|<hướng>": { src, st } }`. */
-export const KHOA_BI_TINH = 'ddh.bi-tinh-mol' // 01/11 đổi khoá: ảnh tĩnh cú ngọc cũ không làm khung giữ chỗ cho Mol
+export const KHOA_BI_TINH = 'ddh.bi-tinh-mol2' // 01/11 đổi khoá: ảnh tĩnh cú ngọc cũ không làm khung giữ chỗ cho Mol; tối 01/11 Mol phối màu mới ⇒ đổi khoá lần nữa
 let biTinh: Record<string, { src?: string; st?: string }> | null = null
 /** Ảnh tĩnh khớp đúng cỡ + cảm xúc + hướng (không khớp ⇒ không có, giữ khung trống như trước). */
 function anhBiTinh(size: number, cam: string, goc?: string): { src?: string; st?: string } | null {
@@ -114,7 +114,7 @@ export function Bi({ cam = 'chao', size = 96, className, nhip, noi, goc, cap: ca
     if (noi) l?.noi(noi, 40)
     if (l) apCap(l, cap, () => lua.current === l)
   }, [cam, nhip, noi, cap])
-  return <span ref={o} className={`bi lua${className ? ` ${className}` : ''}`} data-cam={camKhoa} data-cap={cap || undefined} data-goc={goc} aria-hidden="true" style={{ '--lv-w': `${size}px` } as CSSProperties} />
+  return <span ref={o} className={`bi lua${className ? ` ${className}` : ''}`} data-cam={camKhoa} data-cap={cap || undefined} data-goc={goc} data-nho={size < 64 ? '' : undefined} aria-hidden="true" style={{ '--lv-w': `${size}px` } as CSSProperties} />
 }
 
 export default Bi

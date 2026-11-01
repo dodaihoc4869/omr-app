@@ -240,6 +240,9 @@ for (const [k, n] of Object.entries(JSON.parse(readFileSync(new URL('../docs/css
 for (const [k, n] of Object.entries(GON_MA_2710.cu)) MAU_CU_THAY_RA_LENH[k] = (MAU_CU_THAY_RA_LENH[k] ?? 0) + n
 // 28/10 thầy «Chốt build thay» (Cú Ngọc): CSS vẽ hình Bi cũ (bi.css) + bảng --lv-* hình shiba (lua.css) thành chết — danh sách đóng docs/css-chet-2810.json.
 for (const [k, n] of Object.entries(JSON.parse(readFileSync(new URL('../docs/css-chet-2810.json', import.meta.url), 'utf8')).cu)) MAU_CU_THAY_RA_LENH[k] = (MAU_CU_THAY_RA_LENH[k] ?? 0) + n
+// 01/11 tối thầy RA LỆNH đổi màu linh vật: «Giữ nguyên hình cầu đi, điều chỉnh lại cảm xúc cho dễ thương, thêm 6,022, phối màu lại cho đẹp mịn siêu dễ thương»
+// ⇒ bảng màu Mol (src/styles/mol.css) đổi sang chàm sáng / ngọc lam / hồng phấn pha từ token sẵn có — danh sách đóng docs/mol-doi-mau-0111.json (15 khai báo cũ, mỗi cái 1 lần).
+for (const [k, n] of Object.entries(JSON.parse(readFileSync(new URL('../docs/mol-doi-mau-0111.json', import.meta.url), 'utf8')).cu)) MAU_CU_THAY_RA_LENH[k] = (MAU_CU_THAY_RA_LENH[k] ?? 0) + n
 // 27/10 thầy duyệt bộ màu riêng B «Chất chỉ thị»: «Chốt bảng màu chất chỉ thị, làm cho sáng bằng độ sáng của doligo nhé» ⇒ BỐN màu thân giám thị
 // đổi sang sắc bộ B (độ sáng / độ tươi ngang Duolingo, ve-moi/mau-rieng/de-xuat-build.md): bốn mã Duolingo cũ được phép biến mất đúng một lần.
 // 28/10 thầy: «đo chế độ tối của Duolingo tinh chỉnh thông số» ⇒ nền tối HS sáng lên (#1a1a29) ⇒ bốn mã giám thị hạ L ≤ 0,03 để bong bóng càu nhàu giữ ≥ 4,5

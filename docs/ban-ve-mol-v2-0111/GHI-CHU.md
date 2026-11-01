@@ -1,4 +1,49 @@
-# Mol v2 · ống nghiệm lùn mập có nắp, cánh có ngón (bản vẽ chờ thầy duyệt, 01/11/2026 tối)
+# Mol v2 — HƯỚNG HIỆN TẠI: GIỮ BÌNH CẦU, sửa thẳng mã thật (01/11 tối, chưa PR)
+
+Thầy: «Giữ nguyên hình cầu đi, điều chỉnh lại cảm xúc cho dễ thương, thêm 6,022, phối màu lại cho đẹp mịn siêu dễ thương».
+⇒ Bỏ hướng ống nghiệm (phần dưới tệp này + `mol-v2.html`, `huong-phong-cach.html` chỉ còn để tham khảo).
+
+## Mã đã sửa (nhánh `claude/mol-v2-0111`)
+
+| Tệp | Đổi gì |
+|---|---|
+| `src/components/linh-vat/mol-dong.ts` | Vẽ lại bình cầu (giữ cầu + cổ + vành, khung 200 × 230, API `<Bi …>` y nguyên) |
+| `src/styles/mol.css` | Bảng màu mới + lớp gradient + hoạt ảnh lửa / nút bấc |
+| `src/components/linh-vat/Bi.tsx` | `data-nho` khi < 64 px (ẩn chữ khắc); đổi khoá ảnh tĩnh `ddh.bi-tinh-mol2` để máy em không dùng ảnh Mol cũ |
+| `src/lib/khung-tinh-hs.ts` | Ảnh tĩnh / biểu tượng tab ghi thêm `stop-color`, `stop-opacity` (không thì gradient ra đen) |
+
+- **Màu (tổ hợp 1 — chọn):** thân chàm sáng `--tr-hs-nut`, gradient tròn từ `--tr-hs` pha trắng (trên-trái) → `--tr-hs-day` (dưới-phải). Đã thử 3 tổ hợp: `anh/binh-cau-mau.jpg`.
+  - dung dịch ngọc lam `--tr-tin`;
+  - mũi `--tr-chu-y`, má hồng phấn `--tr-tim` (gradient tròn);
+  - nút bấc `--tr-sao` pha `--tr-chu-y-day`.
+- **Mắt:** tròng tròn to, con ngươi to, đốm sáng to + nhỏ. Cười = mí dưới cong; chán / giận = mí trên sụp nghiêng. Mày chỉ dùng khi cảm xúc cần; miệng nhỏ.
+- **Giận:** không răng.
+  - Dỗi / bực chỉ ửng má.
+  - Cáu / rất cáu: cả bình đổi sắc đỏ sẫm, tròng hồng đỏ, con ngươi nhỏ, rất cáu có ánh đỏ.
+  - Nút bấc bung lơ lửng trên ngọn lửa hai lưỡi; dung dịch đỏ dâng.
+- **Chữ khắc 6,022·10²³:** cong theo vai bình ngay dưới cổ, ẩn khi < 64 px.
+- **Mặt phương án** (chưa gắn trạng thái nào): ngượng · mê · vui nhảy · tự tin.
+- **Ảnh** (Chromium, từ mã thật; chụp lại: `node docs/ban-ve-mol-v2-0111/chup-binh-cau.cjs`):
+
+  | Ảnh | Nội dung |
+  |---|---|
+  | `binh-cau-cu-moi.jpg` | Mol cũ / mới, cùng 5 mặt |
+  | `binh-cau-cam-xuc-sang.jpg`, `binh-cau-cam-xuc-toi.jpg` | 15 mặt, nền sáng / tối |
+  | `binh-cau-mau.jpg` | 3 tổ hợp màu đã thử |
+  | `binh-cau-lo-trinh-toi.jpg` | Màn Lộ trình nền tối, mặt cáu + bong bóng lời |
+  | `binh-cau-co-nho.jpg` | 28 / 40 / 64 px + vòng 40 px, nền sáng / tối |
+
+  Bong bóng trên Lộ trình mới vẽ trong trang chụp; build sau khi thầy duyệt.
+- **Màu cũ đổi (thầy ra lệnh):** ngoại lệ ĐÓNG `docs/mol-doi-mau-0111.json` (15 khai báo cũ), nạp ở `scripts/kiem-mau-giu-nguyen.mjs`.
+- **Cổng đã chạy:**
+  - test Mol / Bi / lớp giận / khung tĩnh / màu: xanh;
+  - `check:mau` sạch; `kiem:mau-giu` (so điểm rẽ nhánh `3f0a74e`) 0 vi phạm; `tsc` sạch;
+  - `build` + byte tải xanh (học sinh 232,0 KB, mốc 232,1);
+  - test máy chủ `nop-cau` 10 / 9 đợt D1 đỏ có sẵn từ gốc, nhánh không đổi `server/`.
+
+---
+
+# (Tham khảo) Mol v2 · ống nghiệm lùn mập có nắp, cánh có ngón (bản vẽ cũ, 01/11/2026 tối)
 
 **Thầy góp ý 01/11 tối, theo thứ tự:**
 1. Phối màu hợp app, mịn màng, theo kích thước cú.
