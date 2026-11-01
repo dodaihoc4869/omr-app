@@ -21,14 +21,16 @@ export interface TienDoSua {
 }
 
 /** Khung Duo dùng chung của màn sửa câu: thanh trên (X + thanh tiến độ) · thân · đáy. Dùng cả lúc đang mở câu / báo lỗi (ManChuaCauSai). */
-export function KhungDuoSua({ onVe, khoaVe, pct, nhanThanh, loe, xong, tt, deDai, children, day, goc }: {
+// CHẶNG NGANG 01/11 (thầy: máy gập mở / xoay ngang): gốc `data-chang` ⇒ cùng bố cục hai cột cuộn riêng với màn làm chặng (styles/trong-chang-ngang.css);
+// `phan` = loại câu (đúng–sai cột trả lời rộng hơn), `ket` = dải kết quả đang hiện (điện thoại ngang: hàng đáy riêng). Dọc không đổi.
+export function KhungDuoSua({ onVe, khoaVe, pct, nhanThanh, loe, xong, tt, deDai, children, day, goc, phan, ket }: {
   onVe: () => void; khoaVe?: boolean; pct: number; nhanThanh: string; loe?: boolean; xong?: boolean; tt?: string; deDai?: boolean
-  children: ReactNode; day?: ReactNode; goc?: Ref<HTMLDivElement>
+  children: ReactNode; day?: ReactNode; goc?: Ref<HTMLDivElement>; phan?: string; ket?: boolean
 }) {
   // Vệt sáng lướt xong thì gỡ (thanh đầy 100% ⇒ vệt dừng ngoài mép phải — bị cắt nhưng vẫn tính là tràn khi đo).
   const [hetLoe, setHetLoe] = useState(false)
   return (
-    <div ref={goc} className="ht-app ht2-lam duo duo-sua" data-duo="" data-hai-cot={deDai || undefined} data-xong={xong || undefined} data-tt={tt}>
+    <div ref={goc} className="ht-app ht2-lam duo duo-sua" data-duo="" data-chang="" data-phan={phan} data-ket={!xong && ket ? '' : undefined} data-hai-cot={deDai || undefined} data-xong={xong || undefined} data-tt={tt}>
       {!xong && <header className="duo-tren">
         <button type="button" className="duo-dong" onClick={onVe} disabled={khoaVe} aria-label="Quay lại"><XIcon size={26} aria-hidden="true" /></button>
         <div className="duo-thanh" role="progressbar" aria-label={nhanThanh} aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct}><i style={{ width: `${pct}%` }}><b /><b /><b />{loe && !hetLoe && !(typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) && <span className="duo-loe" onAnimationEnd={() => setHetLoe(true)} />}</i></div>

@@ -12,7 +12,7 @@ import type { DeGon, KetQuaGon } from '../../lib/chua-cau-sai-api'
 import type { ChiTietCau } from '../hoa2/api'
 import { chiSoDuoiRo } from '../hoa2/cau-chuyen'
 import { chuDapAn, daTraLoiDu, LUAT_BAN_MOI } from '../../lib/chua-truc-tiep'
-import { BanPhimSo, ChonDungSai, ChonTracNghiem, DeCau, HinhCuoiCau, LoiGiaiCau, OTraLoiNgan, PhanHoiDungSai, PhanHoiTraLoiNgan, PhanHoiTracNghiem } from '../hoc-tap/LamCau'
+import { BanPhimSo, ChonDungSai, ChonTracNghiem, DeCau, HinhCuoiCau, LoiGiaiCau, OTraLoiNgan, PhanHoiDungSai, PhanHoiTraLoiNgan, PhanHoiTracNghiem, ThanhCuon } from '../hoc-tap/LamCau'
 import { nhanPhim, phimTuBanPhim, soSanhDungSai, type PhimSo } from '../hoc-tap/lam-bai'
 import { TroGiupDuo } from '../hoc-tap/TroGiupDuo'
 import NutHoiThay from '../loi-giai/NutHoiThay'
@@ -232,7 +232,7 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
   const lan = mo.lan ?? 1
 
   return (
-    <KhungDuoSua goc={goc} onVe={giu.xinThoat} khoaVe={ban} pct={pct} nhanThanh={nhanThanh} loe={p.khep && tt === 'dung'} tt={tt} deDai={deDai} day={day}>
+    <KhungDuoSua goc={goc} onVe={giu.xinThoat} khoaVe={ban} pct={pct} nhanThanh={nhanThanh} loe={p.khep && tt === 'dung'} tt={tt} deDai={deDai} day={day} phan={q?.phan} ket={!!kq && !!ket}>
       {q && mo.ok && !(p.daTuSua && !kq) ? <>
         <div key={`d${q.qid}${lan}`} className="duo-cot-de">
           <p className="duo-nhan" data-sua=""><span>{mo.banKhac ? 'Bản mới của câu em đã sai' : 'Câu em đã sai'}{lan > 1 ? ' · lần 2' : ''}</span>{tienDo ? <span className="duo-chip">Chặng sửa {tienDo.so}</span> : null}</p>
@@ -242,11 +242,13 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
           {lan === 1 && dangLam && <p className="duo-mo-ghi">{mo.tuSuaNeuDung ? LUAT_BAN_MOI : 'Em vừa sai câu này hôm nay: làm đúng bây giờ tính xong phần hôm nay. Ngày khác tự làm đúng mới tính là đã tự sửa.'}</p>}
           <DeCau q={q} stt={1} />
         </div>
+        <ThanhCuon key={`cd${q.qid}${lan}`} cot="de" />
         <div key={`t${q.qid}${lan}`} className="duo-cot-tra">
           <div className="duo-tra" data-luoi={luoi || undefined} data-pa={doDaiPa}>{traLoi}</div>
           {dangLam && phan === 'III' && <BanPhimSo value={tra} khoa={ban} soO={soO} onPhim={(ps: PhimSo) => p.onTra(nhanPhim(tra, ps, soO))} />}
           <HinhCuoiCau q={q} stt={1} />
         </div>
+        <ThanhCuon key={`ct${q.qid}${lan}`} cot="tra" />
       </> : !mo.ok ? <section className="duo-sua-bao" data-tt="loi">
           <Bi cam="nghi" size={120} />
           <h1>Chưa mở được câu này ở đây</h1>

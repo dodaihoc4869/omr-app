@@ -33,3 +33,17 @@
 @media (min-width: 1000px) {
   :root[data-trong='hs'] .tp-vo[data-man='kim-cuong-ds'] { max-width: 720px; }
 }
+/* LỘ TRÌNH khi XOAY NGANG / MÁY GẬP MỞ (thầy 01/11: «chặng xoay ngang trên điện thoại chưa được» · «Tối ưu cho máy gập khi mở cùng giao diện với xoay ngang»).
+ * Điện thoại ngang (cao ≤ 520): cột phải «Hôm nay · Luyện tập» GHIM khi cuộn — trước: Lộ trình tự cuộn tới chặng đang học ⇒ cột phải trôi mất, nửa phải màn
+ * trống; chặng đang học được cuộn vào GIỮA khung chừa chỗ bong bóng «Bắt đầu» phía trên (trước: bong bóng khuất sau băng tên bài dính đầu).
+ * Máy gập mở / máy tính bảng nhỏ (hai cột theo bo-cuc-lam.ts, rộng < 1000, cao > 520): cùng bố cục đường chặng | cột tóm tắt ghim như máy tính (trước: một
+ * cột kiểu điện thoại dọc, cột tóm tắt ẩn). */
+@media (max-height: 520px) and (min-width: 600px) {
+  :root[data-trong='hs'] .ht2[data-mot] .dm-ben { position: sticky; top: 12px; align-self: start; }
+  :root[data-trong='hs'] .ht2[data-mot] .da-nut[data-tt='dang'] { scroll-margin-top: 104px; }
+}
+@media (orientation: landscape) and (min-width: 640px) and (max-width: 999px) and (min-height: 521px), (min-width: 700px) and (max-width: 999px) and (min-aspect-ratio: 10/13) and (min-height: 521px) {
+  :root[data-trong='hs'] .ht2[data-mot] .dm-khung:not([data-muc]) { grid-template-columns: minmax(0, 1fr) 290px; column-gap: 20px; }
+  :root[data-trong='hs'] .ht2[data-mot] .dm-khung:not([data-muc]) .dm-ben { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 72px; align-self: start; padding-top: 16px; }
+  :root[data-trong='hs'] .ht2[data-mot] .da-nut[data-tt='dang'] { scroll-margin-top: 104px; }
+}
