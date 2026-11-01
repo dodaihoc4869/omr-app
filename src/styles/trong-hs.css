@@ -1102,13 +1102,16 @@
 [data-trong='hs'] .bi-loi-bong[data-cap], [data-trong='hs'] .bi-loi-bong[data-cap]::before { border-color: var(--tr-sai); }
 /* Điện thoại ngang thấp (cao < 600 px): bong bóng NÓI CẠNH Lửa (đầu trang đã cuộn khuất) — đặt trên đầu Lửa, đuôi chỉ xuống Lửa */
 [data-trong] .da-lv-loi-o { position: absolute; left: 50%; top: 50%; z-index: 2; width: 0; height: 0; transform: translateX(var(--lv)); }
-[data-trong='hs'] .da-lv-loi-o > .bi-loi-boc { position: absolute; left: var(--trai, -60px); bottom: calc(54px + var(--nang, 0px)); width: var(--rong, 200px); }
+[data-trong='hs'] .da-lv-loi-o > .bi-loi-boc { position: absolute; left: var(--trai, -60px); bottom: calc(54px + var(--nang, 0px)); width: max-content; max-width: var(--rong, 200px); }
 [data-trong='hs'] .da-lv-loi-o[data-cap] > .bi-loi-boc { bottom: calc(70px + var(--nang, 0px)); }
 /* Bong bóng trên đầu Mol KHÔNG BAO GIỜ chặn chạm vào nút chặng; chạm Mol (chỉ Mol, không giám thị) ⇒ hiện lại lời gần nhất (TrongHs.tsx LoiBi). */
 [data-trong='hs'] .da-lv-loi-o, [data-trong='hs'] .da-lv-loi-o * { pointer-events: none; }
 [data-trong='hs'] .da-linh-vat[data-lv='bi'] > .bi { pointer-events: auto; cursor: pointer; }
 [data-trong='hs'] .da-lv-loi-o > .bi-loi-boc > .bi-loi { margin: 0; overflow: visible; }
-[data-trong='hs'] .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong { margin: 0 0 9px; padding: 10px 12px; font-size: 15px; box-shadow: 0 2px 0 var(--tr-vien); }
+[data-trong='hs'] .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong { margin: 0 0 9px; padding: 9px 13px; font-size: 15px; box-shadow: 0 2px 0 var(--tr-vien); }
+/* Thầy 01/11 23h «Viền bong bóng phải gọn vừa với chữ»: bong bóng CO THEO CHỮ (không giãn hết khung), câu dài xuống dòng cân bằng; bề rộng = dòng dài nhất
+   do LoiBi đo và đặt (TrongHs.tsx · src/lib/bong-bong-mol.ts). Máy chưa có text-wrap: balance ⇒ xuống dòng thường, vẫn ôm dòng dài nhất. */
+[data-trong='hs'] .da-lv-loi-o .bi-loi-bong { flex: none; max-width: 100%; box-sizing: border-box; text-wrap: balance; }
 [data-trong='hs'] .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong::before { display: block; left: var(--duoi, 53px); bottom: -9px; transform: rotate(-45deg); }
 /* BONG BÓNG TRÊN ĐẦU MOL ĐỔI MÀU THEO CẢM XÚC (thầy 01/11 tối; bản vẽ docs/ban-ve-mol-v2-0111 «bong-bong-mau»): nền + viền + chữ theo data-cx, chuyển mượt
    ≤ 300 ms (C13); chỉ token có sẵn. Rất cáu: viền đập rất nhẹ (thầy yêu cầu) — giảm chuyển động / máy yếu ⇒ đứng yên. Chân ngôn: chữ nghiêng. */
