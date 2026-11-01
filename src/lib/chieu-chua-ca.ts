@@ -76,3 +76,13 @@ export function theChuaDung(c: Pick<CauChuaCa, 'sai' | 'lam'>): TheChuaDung {
   const hien = ten.length > TOI_DA_TEN ? ten.slice(0, TOI_DA_TEN - 1) : ten
   return { ten: hien, them: ten.length - hien.length, tong: c.sai.length, lam: c.lam }
 }
+
+/** Số em CÒN TRONG GIỜ làm bài (cảnh báo trước khi chiếu chữa bài sau ca). Chỉ lượt `dang_lam` mà hạn giờ còn tới sau `nowMs`;
+ *  «được duyệt thi lại» (chờ thi lại) và lượt bỏ dở đã hết giờ KHÔNG tính (thầy 01/11: «nộp hết rồi nhưng vẫn báo còn 1 em đang làm»). Thuần. */
+export function demConTrongGio(luot: readonly { trangThai: string; hetGioLuc?: string | null }[], nowMs: number): number {
+  return luot.filter((l) => {
+    if (l.trangThai !== 'dang_lam') return false
+    const het = Date.parse(l.hetGioLuc || '')
+    return Number.isFinite(het) && het > nowMs
+  }).length
+}
