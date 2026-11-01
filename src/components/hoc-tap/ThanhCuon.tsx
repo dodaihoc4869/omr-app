@@ -45,10 +45,10 @@ export function ganThanhCuon(cot: HTMLElement, phu: HTMLElement): () => void {
   const mo = typeof MutationObserver === 'function' ? new MutationObserver(() => { theoDoi(); xin() }) : null
   mo?.observe(cot, { childList: true })
   mq?.addEventListener?.('change', xin)
-  // Chuột kéo con trượt (máy tính): kéo dọc ⇒ cuộn cột theo tỉ lệ rãnh.
+  // Kéo con trượt (chuột hoặc ngón tay): kéo dọc ⇒ cuộn cột theo tỉ lệ rãnh.
   let keo: { y: number; top: number; tl: number } | null = null
   const bat = (e: PointerEvent) => {
-    if (e.pointerType === 'touch' || !truot) return
+    if (!truot) return
     const ranh = phu.clientHeight - 2 * LE_RANH, dai = truot.offsetHeight, du = cot.scrollHeight - cot.clientHeight
     if (ranh <= dai || du <= 0) return
     e.preventDefault(); truot.setPointerCapture?.(e.pointerId)

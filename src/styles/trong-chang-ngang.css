@@ -16,7 +16,7 @@
 
 @media (orientation: landscape) and (max-height: 500px), (min-width: 1000px) and (min-height: 501px) {
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) {
-    display: grid; height: 100dvh; min-height: 0; max-width: none; margin: 0; overflow: hidden;
+    display: grid; height: 100dvh; min-height: 0; max-width: none; margin: 0; overflow: clip; /* clip: không thành khung cuộn ⇒ scrollIntoView không xô lệch lưới */
     grid-template-rows: auto auto minmax(0, max-content) auto minmax(0, 1fr); align-items: start;
   }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-tren { grid-column: 1 / -1; grid-row: 1; width: 100%; max-width: none; margin: 0; padding-inline: 0; }
@@ -39,8 +39,6 @@
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-de > .duo-lenh { display: contents; }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-de > .duo-lenh > h2 { grid-column: 1; grid-row: 2; min-width: 0; }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-de > .duo-lenh > .duo-tg { grid-column: 2; grid-row: 1 / span 2; align-self: center; margin-left: 0; }
-  /* bóng đèn «Trợ giúp» mở tấm thả xuống: cột cuộn sẽ cắt tấm ⇒ trong lúc tấm mở cho cột tràn (như tro-giup-duo.css cho khổ thấp) */
-  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-de:has(.duo-tg-tam:not([hidden])) { overflow: visible; }
 
   /* CỘT TRẢ LỜI: hàng 3 = vừa nội dung, thiếu chỗ thì cuộn riêng; «Kiểm tra» ngay dưới */
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-cot-tra {

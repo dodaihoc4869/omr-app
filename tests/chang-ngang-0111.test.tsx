@@ -112,7 +112,7 @@ describe('tờ trong-chang-ngang.css — chỉ màn làm chặng, chỉ ngang / 
   })
   it('bố cục: một màn không cuộn trang; cột đề + cột trả lời cuộn riêng (thanh trình duyệt ẩn, thay bằng thanh vẽ tay); «Kiểm tra» ngay dưới cột phải', () => {
     const s = boChu(CSS)
-    expect(s).toMatch(/\.duo\[data-chang\]\[data-duo\]:not\(\[data-xong\]\) \{[^}]*display: grid; height: 100dvh;[^}]*overflow: hidden;[^}]*grid-template-rows: auto auto minmax\(0, max-content\) auto minmax\(0, 1fr\);/)
+    expect(s).toMatch(/\.duo\[data-chang\]\[data-duo\]:not\(\[data-xong\]\) \{[^}]*display: grid; height: 100dvh;[^}]*overflow: clip;[^}]*grid-template-rows: auto auto minmax\(0, max-content\) auto minmax\(0, 1fr\);/)
     expect(s).toMatch(/\.duo-cot-de \{[^}]*grid-column: 1; grid-row: 2 \/ -1;[^}]*overflow-y: auto;[^}]*scrollbar-width: none;/)
     expect(s).toMatch(/\.duo-cot-tra \{[^}]*grid-column: 2; grid-row: 3;[^}]*overflow-y: auto;/)
     expect(s).toMatch(/> \.duo-day \{[^}]*grid-column: 2; grid-row: 4; position: relative;/)
