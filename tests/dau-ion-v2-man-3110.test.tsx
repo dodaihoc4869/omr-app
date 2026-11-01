@@ -1,7 +1,7 @@
-// «ĐẤU NGUYÊN TỬ 2» · MÀN (jsdom): 0 mạng khi em chưa bấm «Vào sân đấu»; bấm ⇒ đúng một WebSocket tới phòng của ca, gói đầu là vé + phiên bản giao thức,
-// chào xong tự xin vào sân; vào sân ⇒ màn trận phủ kín; KÉO Ở ĐÂU CŨNG ĐI (cần ảo vô hình, không vẽ gì che màn), CHẠM NHANH THÌ ĐI TỚI; máy em chỉ gửi HƯỚNG ĐI;
-// không vé ⇒ «Chơi với A.I» tại máy, 0 mạng; THẦY BẮT ĐẦU (`batDau` hoặc phòng báo `dong`) ⇒ huỷ requestAnimationFrame NGAY trong lượt đó,
-// đóng kết nối, tháo màn trận, chỉ còn một dòng chữ; `dong` của phòng gọi `onBatDau` để màn cha vào bài.
+// «ĐẤU NGUYÊN TỬ» 3 ĐẤU 3 · MÀN (jsdom): sảnh MỘT nút «Đấu» + dòng luật; 0 mạng khi em chưa bấm; bấm ⇒ đúng một WebSocket tới phòng của ca, gói đầu là vé +
+// giao thức 3, chào xong tự xin vào sân; sân đến ⇒ màn trận tràn màn (tỉ số phe + đồng hồ); `thay` ⇒ tên mới + tin «… vào thay A.I»; ván mới đổi phe ⇒ báo;
+// phòng đầy ⇒ tự nối phòng kế; KÉO Ở ĐÂU CŨNG ĐI, CHẠM NHANH THÌ ĐI TỚI; gợi ý lần đầu 3 giây; hết ván theo PHE, không thứ hạng, huy hiệu; không vé ⇒
+// «Đấu» chơi 3 đấu 3 với A.I tại máy, 0 mạng; THẦY BẮT ĐẦU ⇒ huỷ requestAnimationFrame NGAY, đóng kết nối, dải «Sắp vào thi · 3 · 2 · 1».
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 
@@ -32,107 +32,137 @@ beforeEach(() => {
   vi.stubGlobal('requestAnimationFrame', (f: FrameRequestCallback) => { hang.push(f); return hang.length })
   vi.stubGlobal('cancelAnimationFrame', (id: number) => { huyRaf(id); hang = [] })
   vi.spyOn(performance, 'now').mockImplementation(() => dongHo)
-  try { localStorage.clear() } catch { /* bỏ qua */ }
+  try { localStorage.clear(); localStorage.setItem('ddh.dauIon', JSON.stringify({ daXemGoiY: true, nt: 3 })) } catch { /* bỏ qua */ }
 })
-afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.restoreAllMocks() })
+afterEach(() => { cleanup(); vi.useRealTimers(); vi.unstubAllGlobals(); vi.restoreAllMocks() })
 
 const ptr = (el: Element, type: string, o: Record<string, unknown>) => act(() => { const e = new Event(type, { bubbles: true }); Object.assign(e, { pointerId: 1, pointerType: 'touch', ...o }); el.dispatchEvent(e) })
-/** Vào sân mạng: bấm nút, mở kết nối, chào, phòng gửi sân 4 ghế — CHỈ NGƯỜI THẬT (thầy 01/11: không A.I). `soGhe` = 1 ⇒ sân chờ bạn. */
-async function vaoSanMang(props: Record<string, unknown> = {}, soGhe = 4) {
+/** Sân 3 đấu 3: em (Bazơ) + 2 bạn thật + 3 A.I. Dòng ghế [id, tên, nguyên tố, là A.I, phe]. */
+const GHE = [[1, 'Minh Anh', 3, 0, 0], [2, 'Quốc Bảo', 6, 0, 1], [3, 'Khánh Ngọc', 4, 0, 0], [200, 'Sodium', 0, 1, 0], [201, 'Oxygen', 1, 1, 1], [202, 'Iron', 5, 1, 1]]
+async function vaoSanMang(props: Record<string, unknown> = {}) {
   const r = render(<DauIon maCa="123456" veDau="ve-ky" {...props} />)
   expect(WsGia.ds).toHaveLength(0)
-  fireEvent.click(screen.getByRole('button', { name: 'Vào sân đấu' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Đấu' }))
   await act(async () => { await Promise.resolve(); await Promise.resolve() })
   const ws = WsGia.ds[0]
   await act(async () => { ws.moRa(); ws.nhan({ t: 'chao', v: PHIEN_BAN, toi: 1, ten: 'Minh Anh' }) })
-  const ghe = [[1, 'Minh Anh', 3, 0], [2, 'Quốc Bảo', 6, 0], [3, 'Khánh Ngọc', 4, 0], [4, 'Bạn Fe', 5, 0]].slice(0, soGhe)
-  await act(async () => { ws.nhan({ t: 'san', v: PHIEN_BAN, so: 1, toi: 1, con: 60, ghe, vp: [[1, 'e', 100, 100]] }) })
+  await act(async () => { ws.nhan({ t: 'san', v: PHIEN_BAN, so: 1, toi: 1, con: 60, buoc: 0, ti: [7, 5], ghe: GHE, vp: [[1, 'e', 100, 100]] }) })
   // Ảnh trận: em ở (200, 200), các bạn ở xa.
-  const tr = taoTran(ghe.map((g) => ({ id: g[0] as number, nt: g[2] as number })), 1)
+  const tr = taoTran(GHE.map((g) => ({ id: g[0] as number, nt: g[2] as number, phe: g[4] as number })), 1)
   Object.assign(tr.ghe[0], { x: 200, y: 200 })
-  const anh = maAnh(1, 60, tr.ghe, [])
-  await act(async () => { ws.nhan(anh.buffer); ws.nhan(maAnh(2, 60, tr.ghe, []).buffer) })
-  return { ...r, ws }
+  await act(async () => { ws.nhan(maAnh(1, 42, tr.ghe, [], 1, [7, 5]).buffer); ws.nhan(maAnh(2, 42, tr.ghe, [], 2, [7, 5]).buffer) })
+  return { ...r, ws, tr }
 }
 
-describe('Đấu Nguyên Tử 2 · màn phòng chờ', () => {
-  it('không vé (sảnh tắt / ca cũ) ⇒ báo sảnh chưa mở, nút chính «Chơi với A.I», KHÔNG mở WebSocket; chơi tại máy rồi Rời sân', async () => {
+describe('Đấu Nguyên Tử 3 đấu 3 · màn phòng chờ', () => {
+  it('sảnh: tiêu đề, hai phe, MỘT nút lớn «Đấu» + dòng luật, 7 ký hiệu; 0 kết nối tới khi bấm', () => {
+    render(<DauIon maCa="123456" veDau="ve-ky" />)
+    expect(screen.getByRole('heading', { name: 'Đấu Nguyên Tử' })).toBeTruthy()
+    expect(document.querySelectorAll('.dn-nut-chinh')).toHaveLength(1)
+    expect(screen.getByRole('button', { name: 'Đấu' })).toBeTruthy()
+    expect(screen.getByText('3 đấu 3 · thiếu bạn thì A.I vào thay · bạn vào là A.I nhường chỗ')).toBeTruthy()
+    expect(document.body.textContent).toMatch(/Phe Bazơ.*3 đấu 3.*Phe Axit/)
+    expect(screen.getAllByRole('radio')).toHaveLength(7)
+    expect(WsGia.ds).toHaveLength(0)
+  })
+
+  it('không vé (sảnh tắt / ca cũ) ⇒ «Đấu» chơi 3 đấu 3 với A.I TẠI MÁY, 0 mạng; hai cột phe 3 + 3; Rời sân', async () => {
     render(<DauIon maCa="123456" />)
     expect(await screen.findByText(/Sảnh đấu chưa mở ở ca này/)).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: 'Chơi với A.I' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Đấu' }))
     expect(document.querySelector('.dn-man')).toBeTruthy()
     khung(5)
-    expect(screen.getAllByText(/A\.I /).length).toBeGreaterThan(0)
+    const cot = document.querySelectorAll('.dn-doi-cot')
+    expect(cot).toHaveLength(2)
+    expect([...cot].map((c) => c.querySelectorAll('li').length)).toEqual([3, 3])
+    expect(document.querySelector('.dn-doi')!.textContent).toMatch(/A\.I /)
     expect(WsGia.ds).toHaveLength(0)
-    fireEvent.click(screen.getByRole('button', { name: 'Rời sân' }))
+    fireEvent.click(screen.getByRole('button', { name: /Rời sân/ }))
     expect(document.querySelector('.dn-man')).toBeNull()
   })
 
-  it('sảnh: tiêu đề, 5 chip cấp, MỘT nút chính, 7 nguyên tố; KHÔNG còn «Thách theo số báo danh» / «Nhóm 3–4 bạn»', () => {
-    render(<DauIon maCa="123456" veDau="ve-ky" />)
-    expect(screen.getByRole('heading', { name: 'Đấu Nguyên Tử' })).toBeTruthy()
-    expect(screen.getAllByRole('radio')).toHaveLength(7)
-    expect(document.querySelectorAll('.dn-cap-hang li')).toHaveLength(5)
-    expect(document.querySelectorAll('.dn-nut-chinh')).toHaveLength(1)
-    expect(document.body.textContent).not.toMatch(/Thách|Nhóm 3–4|Đấu nhanh/)
-  })
-
-  it('có vé ⇒ chỉ nối khi bấm; gói đầu là vé + v:2; chào xong tự xin vào sân; sân đến ⇒ màn trận', async () => {
+  it('có vé ⇒ chỉ nối khi bấm; gói đầu là vé + giao thức 3; chào xong tự xin vào sân; sân đến ⇒ trận với tỉ số PHE + đồng hồ từ ảnh trận', async () => {
     const { ws } = await vaoSanMang()
     expect(ws.url).toBe('wss://may-chu.test/dau-ion/123456')
     expect(ws.gui[0]).toMatchObject({ t: 'vao', v: PHIEN_BAN, ve: 've-ky' })
     expect(ws.gui).toContainEqual({ t: 'vao-san' })
     expect(document.querySelector('.dn-man')).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Rời sân' })).toBeTruthy()
     khung(3)
-    expect(document.body.textContent).toContain('Sân 1 · 4/6 bạn')
-    expect(document.body.textContent).not.toMatch(/A\.I/)
-    expect(document.querySelector('.dn-cho-ban')).toBeNull()
+    const ts = document.querySelector('.dn-ti-so')!
+    expect(ts.getAttribute('aria-label')).toBe('Phe Bazơ 7, Phe Axit 5, còn 0:42')
+    expect(document.querySelector('.dn-doi')!.textContent).toContain('A.I Sodium')
   })
 
-  it('sân chỉ có em (không A.I, thầy 01/11) ⇒ «Đang chờ bạn vào sân», đồng hồ hiện «Chờ»; bạn thứ 2 vào ⇒ hết chờ', async () => {
-    const { ws } = await vaoSanMang({}, 1)
-    khung(3)
-    expect(screen.getByText('Đang chờ bạn vào sân')).toBeTruthy()
-    expect(document.querySelector('.dn-so-o .dn-o b')!.textContent).toBe('Chờ')
-    expect(document.body.textContent).toContain('Sân 1 · đang chờ bạn thứ 2')
-    expect(document.body.textContent).not.toMatch(/A\.I/)
-    await act(async () => { ws.nhan({ t: 'ghe', ghe: [[1, 'Minh Anh', 3, 0], [2, 'Quốc Bảo', 6, 0]] }); ws.nhan({ t: 'van', con: 60, vp: [] }) })
-    khung(3)
-    expect(document.querySelector('.dn-cho-ban')).toBeNull()
-    expect(document.querySelector('.dn-so-o .dn-o b')!.textContent).toBe('1:00')
-    expect(document.body.textContent).toContain('Sân 1 · 2/6 bạn')
-  })
-
-  it('KÉO Ở BẤT KỲ ĐÂU (cả nửa dưới màn, ngoài sân) ⇒ KHÔNG vẽ cần / vòng tròn nào (thầy 01/11), máy em gửi đúng HƯỚNG ĐI ~12 lần/giây', async () => {
+  it('`thay {cu, moi}`: tên mới vào cột phe ngay, tin «Gia Huy vào thay A.I · Phe Bazơ»; ván mới đổi phe em ⇒ «Ván mới · em ở Phe Axit»', async () => {
     const { ws } = await vaoSanMang()
-    const man = document.querySelector('.dn-man')!, ben = document.querySelector('.dn-ben')!
-    ptr(ben, 'pointerdown', { clientX: 100, clientY: 700 })
-    expect(document.querySelector('.dn-can')).toBeNull()
-    ptr(man, 'pointermove', { clientX: 160, clientY: 700 })
+    khung(2)
+    await act(async () => { ws.nhan({ t: 'thay', cu: 200, moi: 4, ten: 'Gia Huy', nt: 0, phe: 0, ai: 0 }) })
+    khung(2)
+    expect(document.querySelector('.dn-tin')!.textContent).toContain('Gia Huy vào thay A.I · Phe Bazơ')
+    await act(async () => { ws.nhan({ t: 'van', con: 60, buoc: 50, vp: [], ghe: GHE.map((g) => [g[0], g[1], g[2], g[3], 1 - (g[4] as number)]) }) })
+    khung(2)
+    expect(document.querySelector('.dn-tin')!.textContent).toContain('Ván mới · em ở Phe Axit')
+  })
+
+  it('phòng đầy ⇒ đóng 4009 «sang:1» ⇒ máy em TỰ nối phòng 1 của ca, không báo lỗi', async () => {
+    const { ws } = await vaoSanMang()
+    await act(async () => { ws.onclose?.({ code: 4009, reason: 'sang:1' }) })
+    expect(WsGia.ds).toHaveLength(2)
+    expect(WsGia.ds[1].url).toBe('wss://may-chu.test/dau-ion/123456/1')
+  })
+
+  it('KÉO Ở BẤT KỲ ĐÂU ⇒ KHÔNG vẽ cần / vòng tròn nào, máy em gửi đúng HƯỚNG ĐI ~12 lần/giây', async () => {
+    const { ws } = await vaoSanMang()
+    const man = document.querySelector('.dn-man')!, kh = document.querySelector('.dn-khung')!
+    ptr(kh, 'pointerdown', { clientX: 100, clientY: 300 })
+    ptr(man, 'pointermove', { clientX: 160, clientY: 300 })
     khung(70)
     const yd = ws.yDinh()
     expect(yd.length).toBeGreaterThanOrEqual(12); expect(yd.length).toBeLessThanOrEqual(16)
     expect(yd.at(-1)!.dx).toBeGreaterThan(0.9); expect(Math.abs(yd.at(-1)!.dy)).toBeLessThan(0.05)
-    ptr(man, 'pointerup', { clientX: 160, clientY: 700 })
+    ptr(man, 'pointerup', { clientX: 160, clientY: 300 })
     khung(10)
     expect(ws.yDinh().at(-1)).toMatchObject({ dx: 0, dy: 0 })
     expect(document.querySelector('.dn-can')).toBeNull()
-    expect(man.hasAttribute('data-keo')).toBe(false)
   })
 
   it('CHẠM NHANH một điểm trên sân ⇒ đi tới điểm đó', async () => {
     const { ws } = await vaoSanMang()
     const cv = document.querySelector('.dn-khung canvas')!
-    vi.spyOn(cv, 'getBoundingClientRect').mockReturnValue({ left: 0, top: 0, right: 600, bottom: 600, width: 600, height: 600, x: 0, y: 0, toJSON() {} } as DOMRect)
-    ptr(cv, 'pointerdown', { clientX: 500, clientY: 200 })
-    ptr(cv, 'pointerup', { clientX: 500, clientY: 200 })
+    vi.spyOn(cv, 'getBoundingClientRect').mockReturnValue({ left: 0, top: 0, right: 600, bottom: 300, width: 600, height: 300, x: 0, y: 0, toJSON() {} } as DOMRect)
+    ptr(cv, 'pointerdown', { clientX: 500, clientY: 100 })
+    ptr(cv, 'pointerup', { clientX: 500, clientY: 100 })
     khung(12)
-    const cuoi = ws.yDinh().at(-1)!
-    expect(cuoi.dx).toBeGreaterThan(0.9) // em ở (200, 200) ⇒ đi sang phải
+    expect(ws.yDinh().at(-1)!.dx).toBeGreaterThan(0.9) // em ở (200, 200) ⇒ đi sang phải
   })
 
-  it('thầy bắt đầu (màn cha báo batDau) ⇒ huỷ requestAnimationFrame NGAY trong lượt đó, đóng kết nối, chỉ còn một dòng chữ', async () => {
+  it('lần đầu vào sân ⇒ gợi ý «Kéo để chạy · súng tự ngắm, tự bắn» 3 giây rồi tự tắt, lần sau không hiện', async () => {
+    try { localStorage.setItem('ddh.dauIon', JSON.stringify({ daXemGoiY: false, nt: 3 })) } catch { /* bỏ qua */ }
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+    await vaoSanMang()
+    expect(document.querySelector('.dn-goi-y-dau')!.textContent).toMatch(/Kéo để chạy.*súng tự ngắm, tự bắn/)
+    await act(async () => { vi.advanceTimersByTime(3100) })
+    expect(document.querySelector('.dn-goi-y-dau')).toBeNull()
+    expect(JSON.parse(localStorage.getItem('ddh.dauIon')!).daXemGoiY).toBe(true)
+  })
+
+  it('hết ván: «Phe Bazơ thắng 12 – 9», hai cột phe, KHÔNG số thứ hạng, mỗi em thật một huy hiệu, A.I «lấp ghế», đếm ngược ván mới', async () => {
+    const { ws } = await vaoSanMang()
+    khung(2)
+    const bang = [[1, 4, 2, 4, 2, 9, 2, 21, 24], [2, 4, 4, 5, 2, 10, 1, 26, 15], [3, 5, 3, 3, 3, 6, 1, 25, 18], [200, 3, 1, 3, 1, 14, 3, 15, 31], [201, 3, 3, 3, 1, 7, 4, 17, 20], [202, 2, 5, 2, 1, 5, 0, 12, 9]]
+    await act(async () => { ws.nhan({ t: 'ket', bang, nghi: 6, ti: [12, 9] }) })
+    khung(2)
+    const ket = document.querySelector('.dn-ket')!
+    expect(ket.querySelector('h2')!.textContent).toBe('Phe Bazơ thắng 12 – 9')
+    expect(ket.textContent).toContain('Phe em thắng!')
+    expect(ket.querySelectorAll('.dn-cot')).toHaveLength(2)
+    expect(ket.querySelectorAll('.dn-huy')).toHaveLength(3)
+    expect(ket.textContent).toContain('A.I lấp ghế')
+    expect(ket.textContent).not.toMatch(/Hạng|hạng \d/)
+    expect(ket.textContent).toMatch(/Ván mới sau 6 giây/)
+  })
+
+  it('thầy bắt đầu (màn cha báo batDau) ⇒ huỷ requestAnimationFrame NGAY trong lượt đó, đóng kết nối, dải «Sắp vào thi · 3 · 2 · 1»', async () => {
     const { ws, rerender } = await vaoSanMang()
     khung(2)
     expect(hang.length).toBe(1)
@@ -142,9 +172,10 @@ describe('Đấu Nguyên Tử 2 · màn phòng chờ', () => {
     expect(ws.dong).toBe(true)
     expect(document.querySelector('.dn-man')).toBeNull()
     expect(screen.getByText('Thầy đã bắt đầu thi')).toBeTruthy()
+    expect(document.querySelector('.dn-sap-thi')!.textContent).toBe('Sắp vào thi·321')
   })
 
-  it('phòng báo {t:"dong", ly:"bat-dau"} ⇒ dừng game trong cùng lượt + gọi onBatDau (màn cha vào bài ngay)', async () => {
+  it('phòng báo {t:"dong", ly:"bat-dau"} ⇒ dừng game trong cùng lượt + gọi onBatDau (màn cha vào bài ngay, không chờ dải 3 · 2 · 1)', async () => {
     const onBatDau = vi.fn()
     const { ws } = await vaoSanMang({ onBatDau })
     khung(2)
@@ -156,10 +187,10 @@ describe('Đấu Nguyên Tử 2 · màn phòng chờ', () => {
     expect(screen.getByText('Thầy đã bắt đầu thi')).toBeTruthy()
   })
 
-  it('phòng đóng 4010 (bản cũ / sảnh tắt) ⇒ thoát màn trận, nút chính thành «Chơi với A.I»', async () => {
+  it('phòng đóng 4010 (bản cũ / sảnh tắt) ⇒ thoát màn trận, «Đấu» chuyển sang chơi với A.I tại máy', async () => {
     const { ws } = await vaoSanMang()
     await act(async () => { ws.onclose?.({ code: 4010, reason: 'tat' }) })
     expect(document.querySelector('.dn-man')).toBeNull()
-    expect(screen.getByRole('button', { name: 'Chơi với A.I' })).toBeTruthy()
+    expect(screen.getByText(/Bấm «Đấu» để chơi với A.I tại máy/)).toBeTruthy()
   })
 })

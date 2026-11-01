@@ -4,6 +4,8 @@
 // Luật nằm ở dau-ion-phong.ts (test được không cần Cloudflare). 0 lệnh D1. Lớp SQLite (migration `dau-ion-v1`) nhưng không lưu gì.
 // GIAO THỨC CÓ PHIÊN BẢN (31/10, Đấu Nguyên Tử 2): gói `vao` phải mang `v: PHIEN_BAN`; máy còn mảnh game cũ trong bộ nhớ đệm ⇒ đóng sạch mã 4010
 // (máy cũ hiểu là «sảnh chưa mở», không nối lại) thay vì nhận ảnh trận nó không đọc được. Kết nối gắn dữ liệu bản cũ khi phòng thức dậy ⇒ cũng đóng 4010.
+// 3 ĐẤU 3 (01/11): ca đông chia nhiều phòng — phòng số k (header `x-phong-so`, 0…7) đầy ⇒ đóng 4009 «sang:k+1», máy em tự nối phòng kế.
+// Vòng 20 lần/giây gọi `nhip()` (bước theo ĐỒNG HỒ THẬT, bộ tích luỹ) thay cho `buoc()` cố định.
 import type { DurableObjectState, Env, WsMayChu } from './kieu'
 import { BUOC } from '../../src/lib/dau-ion/loi'
 import { CHU_BAN_CU, MA_DONG, PHIEN_BAN, PhongDau, type KemNguoi, type KetNoi } from './dau-ion-phong'
@@ -12,12 +14,14 @@ import { kiemVeDau } from './dau-ion-ve'
 declare const WebSocketPair: { new (): { 0: WsMayChu; 1: WsMayChu } }
 declare const WebSocketRequestResponsePair: { new (yeuCau: string, traLoi: string): unknown }
 
-interface KemKetNoi extends Partial<KemNguoi> { ca?: string; mo?: number }
+interface KemKetNoi extends Partial<KemNguoi> { ca?: string; mo?: number; so?: number }
 
 export class PhongDauIon {
   private phong: PhongDau | null = null
   private kn = new WeakMap<WsMayChu, KetNoi>()
   private vong: ReturnType<typeof setInterval> | null = null
+  /** Số phòng trong ca (0 = phòng đầu). */
+  private soPhong = 0
 
   constructor(private ctx: DurableObjectState, private env: Env) {
     try { ctx.setWebSocketAutoResponse?.(new WebSocketRequestResponsePair('{"t":"ping"}', '{"t":"pong"}')) } catch { /* môi trường test */ }
@@ -39,8 +43,10 @@ export class PhongDauIon {
   /** Phòng trong bộ nhớ; vừa thức dậy ⇒ dựng lại sảnh từ dữ liệu gắn trên các kết nối còn mở. */
   private p(): PhongDau {
     if (!this.phong) {
-      this.phong = new PhongDau()
-      for (const ws of this.ctx.getWebSockets()) {
+      const dsWs = this.ctx.getWebSockets()
+      for (const ws of dsWs) { const a = ws.deserializeAttachment() as KemKetNoi | null; if (a?.so) { this.soPhong = a.so; break } }
+      this.phong = new PhongDau(Date.now, Math.random, this.soPhong)
+      for (const ws of dsWs) {
         const a = ws.deserializeAttachment() as KemKetNoi | null
         if (a?.id) this.phong.khoiPhuc(this.ketNoi(ws), a as KemNguoi)
       }
@@ -51,10 +57,10 @@ export class PhongDauIon {
   private damBaoVong(): void {
     const can = !!this.phong?.canThuc()
     if (can && !this.vong) this.vong = setInterval(() => this.nhip(), BUOC * 1000)
-    else if (!can && this.vong) { clearInterval(this.vong); this.vong = null }
+    else if (!can && this.vong) { clearInterval(this.vong); this.vong = null; this.phong?.nghiNhip() }
   }
   private nhip(): void {
-    try { this.p().buoc(BUOC) } finally { this.damBaoVong() }
+    try { this.p().nhip() } finally { this.damBaoVong() }
   }
 
   async fetch(req: Request): Promise<Response> {
@@ -68,7 +74,9 @@ export class PhongDauIon {
     const cap = new WebSocketPair()
     const mayChu = cap[1]
     this.ctx.acceptWebSocket(mayChu)
-    mayChu.serializeAttachment({ ca: req.headers.get('x-ma-ca') ?? '', mo: Date.now() } satisfies KemKetNoi)
+    const so = Math.max(0, Math.min(7, Number(req.headers.get('x-phong-so')) | 0))
+    if (!this.phong) this.soPhong = so
+    mayChu.serializeAttachment({ ca: req.headers.get('x-ma-ca') ?? '', mo: Date.now(), so } satisfies KemKetNoi)
     return new Response(null, { status: 101, webSocket: cap[0] } as ResponseInit)
   }
 

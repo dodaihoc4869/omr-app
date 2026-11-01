@@ -1,17 +1,23 @@
-// LỚP VẼ «Đấu Nguyên Tử 2» — Canvas 2D thuần, không thư viện, không ảnh (theo bản thử thầy duyệt 31/10: scripts/ban-ve-dau-ion-v2-3110/thu.html).
+// LỚP VẼ «Đấu Nguyên Tử» — Canvas 2D thuần, không thư viện, không ảnh.
 // Màu đọc từ biến CSS của game (--dn-*, pha từ token app học sinh trong dau-ion.css) lúc chạy ⇒ đổi sáng/tối là đọc lại và vẽ lại nền.
 // Nhẹ cho máy yếu: nền (sàn lục giác, dụng cụ thí nghiệm) vẽ MỘT lần vào canvas phụ; nguyên tử và quầng sáng vẽ sẵn thành ảnh nhỏ (không shadowBlur);
 // hiệu ứng có trần (160; máy yếu 40). Máy yếu: bỏ quầng sáng, vệt đạn, loé đầu nòng, rung màn, electron quay, đường ngắm của bạn khác.
-import { CAP, CHO_RA, MAU_MAX, NGUYEN_TO, R, SAN, VAT_CAN, type LoaiVp, type SuKien, type VatCan } from '../../lib/dau-ion/loi'
+// BẢN VẼ 3 ĐẤU 3 (01/11, docs/ban-ve-dau-ion-3v3-0111): vẽ trong KHUNG ĐÃ XOAY (dau-ion-xoay.ts — phe em ở trái / dưới); cả quả nguyên tử tô MÀU PHE
+// (Bazơ xanh --dn-phe-0, Axit đỏ --dn-phe-1), ký hiệu nguyên tố ở giữa; vòng viền + thanh Máu màu phe; em có vòng trắng ngoài + nhãn «Em»;
+// tên đồng đội / đối thủ chữ màu phe; đối thủ em đang ngắm có dấu ngắm nhỏ; đối thủ đang ngắm EM có vạch mờ báo. Hiệu ứng dịu (thầy: «vui nhưng dịu mắt»).
+import { BE_PHE, CAP, MAU_MAX, NGUYEN_TO, R, type LoaiVp, type SuKien } from '../../lib/dau-ion/loi'
+import { KHONG_XOAY, coSan, ra, vatRa, type VatVe, type Xoay } from './dau-ion-xoay'
 
 type Rgb = readonly [number, number, number]
-export interface GheVe { id: number; nt: number; x: number; y: number; ngam: number; mau: number; cap: number; cho: number; che: number; khien: number; muc: number; ha: number; vang?: boolean }
-export interface DanVe { nt: number; cap: number; x: number; y: number; vx: number; vy: number }
+export interface GheVe { id: number; nt: number; phe: number; ai?: boolean; x: number; y: number; ngam: number; mau: number; cap: number; cho: number; che: number; khien: number; muc: number; ha: number; vang?: boolean }
+export interface DanVe { nt: number; phe: number; cap: number; x: number; y: number; vx: number; vy: number }
 export interface VpVe { id: number; k: LoaiVp; x: number; y: number; t0: number }
 /** Cảnh để vẽ một khung (trận tại máy dùng thẳng Tran của lõi; trận mạng dựng từ ảnh trận). `t` = giây của trận. */
 export interface Canh { t: number; ghe: GheVe[]; dan: DanVe[]; vp: VpVe[] }
 export interface Bang {
   toi: boolean; nt: Rgb[]; cap: Rgb[]
+  /** Màu hai phe [Bazơ, Axit] và chữ màu phe (đậm hơn, đọc được trên thẻ). */
+  phe: [Rgb, Rgb]; pheChu: [Rgb, Rgb]
   san1: Rgb; san2: Rgb; luoi: Rgb; luoiDam: Rgb; kinh: Rgb; kinhVien: Rgb; chu: Rgb; the: Rgb; e: Rgb; xt: Rgb; kh: Rgb; dung: Rgb; sai: Rgb; sao: Rgb
   /** Sáng nhất / tối nhất của bảng (ánh bóng, chữ trên nền màu) — lấy từ token, không màu thô. */
   trang: Rgb; den: Rgb
@@ -22,6 +28,8 @@ interface HieuUng { k: string; x: number; y: number; t0: number; mau: Rgb; goc?:
 
 const PI2 = Math.PI * 2
 const NT = ['na', 'o', 'n', 'cl', 's', 'fe', 'ne']
+/** Màu lát sàn / dung dịch trung tính (Na tím, Cl lục, S vàng, Fe cam) — không đỏ / xanh để khỏi lẫn màu phe. */
+const NT_TRUNG_TINH = [0, 3, 4, 5]
 const doSang = (c: Rgb) => (0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]) / 255
 const tron = (a: Rgb, b: Rgb, t: number): Rgb => [0, 1, 2].map((i) => Math.round(a[i] + (b[i] - a[i]) * t)) as unknown as Rgb
 const RGBA = new Map<number, string>()
@@ -52,9 +60,10 @@ export function docBang(goc: HTMLElement): Bang {
   const the = lay('mat'), chu = lay('chu'), nen = lay('nen')
   const [den, trang] = doSang(chu) < doSang(nen) ? [chu, nen] : [nen, chu]
   const b: Bang = {
-    toi: doSang(the) < 0.4, nt: NT.map((k) => lay(k)), cap: [0, 1, 2, 3, 4, 5].map((i) => lay(`cap-${i || 1}`)),
+    toi: doSang(the) < 0.4, nt: NT.map((k) => lay(k)), cap: [0, 1, 2, 3, 4, 5].map((i) => lay(`capm-${i || 1}`)),
+    phe: [lay('phe-0'), lay('phe-1')], pheChu: [lay('phe-0-chu'), lay('phe-1-chu')],
     san1: lay('san-1'), san2: lay('san-2'), luoi: lay('luoi'), luoiDam: lay('hs'), kinh: lay('kinh'), kinhVien: lay('chu-3'),
-    chu, the, e: lay('tin'), xt: lay('sao'), kh: lay('nut'), dung: lay('dung'), sai: lay('sai'), sao: lay('sao'), trang, den,
+    chu, the, e: lay('e'), xt: lay('sao'), kh: lay('nut'), dung: lay('dung'), sai: lay('sai'), sao: lay('sao'), trang, den,
     phong: getComputedStyle(goc).fontFamily || 'sans-serif',
   }
   p.remove()
@@ -73,23 +82,42 @@ export class Ve {
   private doLuc = -1e9
   private s = 1
   private dpr = 1
-  private view: View = { x0: 0, y0: 0, w: SAN, h: SAN }
+  private view: View
   private goc = new Map<number, number>()
   private loe = new Map<number, number>()
   private giat = new Map<number, number>()
   private rongTen = new Map<string, number>()
   private soLuc = new Map<number, number>()
+  /** Lúc đạn CỦA EM chạm (tại máy) từng đối thủ — để «trung» của phòng không nháy lần hai. */
+  private chamLuc = new Map<number, number>()
   private nayCu = 0
-  /** Điểm đến (chạm một điểm / rê chuột) — vòng nét đứt. */
+  /** Khung xoay + phe em (phe em ở trái / dưới khung vẽ). */
+  private xoay: Xoay = KHONG_XOAY
+  private pheEm = 0
+  private vw: number
+  private vh: number
+  private vat: VatVe[] = vatRa(KHONG_XOAY, 0)
+  /** Điểm đến (chạm một điểm / rê chuột) — vòng nét đứt (toạ độ vẽ). */
   diToi: { x: number; y: number } | null = null
 
   private cv: HTMLCanvasElement
   b: Bang
   yeu: boolean
-  constructor(cv: HTMLCanvasElement, ctx: CanvasRenderingContext2D, b: Bang, yeu: boolean) { this.cv = cv; this.ctx = ctx; this.b = b; this.yeu = yeu }
+  constructor(cv: HTMLCanvasElement, ctx: CanvasRenderingContext2D, b: Bang, yeu: boolean) {
+    this.cv = cv; this.ctx = ctx; this.b = b; this.yeu = yeu
+    const c = coSan(this.xoay); this.vw = c.w; this.vh = c.h; this.view = { x0: 0, y0: 0, w: c.w, h: c.h }
+  }
 
+  /** Đổi khung xoay / phe em (vào trận, xoay máy) ⇒ vẽ lại nền. Trả về cỡ sân vẽ. */
+  datSan(xoay: Xoay, pheEm: number): { w: number; h: number } {
+    const c = coSan(xoay)
+    if (xoay.doc !== this.xoay.doc || xoay.lat !== this.xoay.lat || pheEm !== this.pheEm) {
+      this.xoay = xoay; this.pheEm = pheEm; this.vw = c.w; this.vh = c.h; this.vat = vatRa(xoay, pheEm); this.nen = null; this.goc.clear()
+    }
+    return c
+  }
   datCo(w: number, h: number, dpr: number, view?: View): void {
-    this.view = view || { x0: 0, y0: 0, w: SAN, h: SAN }; this.dpr = dpr
+    this.view = view || { x0: 0, y0: 0, w: this.vw, h: this.vh }; this.dpr = dpr
     this.cv.width = Math.round(w * dpr); this.cv.height = Math.round(h * dpr); this.s = (w / this.view.w) * dpr
     this.rongTen.clear(); this.qs.clear(); this.taoHat(); this.nen = null
     if (!view) this.taoNen()
@@ -104,34 +132,43 @@ export class Ve {
   }
 
   private veSan(x: CanvasRenderingContext2D, coVat = true): void {
-    const b = this.b
+    const b = this.b, W = this.vw, H = this.vh, doc = this.xoay.doc
+    const pheEm = this.pheEm, pheKia = 1 - pheEm
     x.save()
-    const g = x.createLinearGradient(0, 0, SAN, SAN); g.addColorStop(0, rgba(b.san1)); g.addColorStop(1, rgba(b.san2))
-    x.fillStyle = g; x.beginPath(); x.roundRect(0, 0, SAN, SAN, 28); x.fill(); x.clip()
-    // Vết dung dịch nhiều màu loang trên sàn.
-    for (const [vx, vy, i] of [[110, 90, 2], [490, 110, 0], [510, 490, 3], [100, 500, 4], [300, 300, 6], [300, 20, 5], [300, 590, 1]]) {
-      const q = x.createRadialGradient(vx, vy, 0, vx, vy, 130); q.addColorStop(0, rgba(b.nt[i], b.toi ? 0.24 : 0.15)); q.addColorStop(1, rgba(b.nt[i], 0))
-      x.fillStyle = q; x.fillRect(vx - 130, vy - 130, 260, 260)
+    const g = x.createLinearGradient(0, 0, W, H); g.addColorStop(0, rgba(b.san1)); g.addColorStop(1, rgba(b.san2))
+    x.fillStyle = g; x.beginPath(); x.roundRect(0, 0, W, H, 28); x.fill(); x.clip()
+    // Hai nửa sân loang màu hai phe (nửa của em: trái khi ngang, dưới khi dọc).
+    const [ex, ey] = ra(...BE_PHE[pheEm][1], this.xoay), [kx, ky] = ra(...BE_PHE[pheKia][1], this.xoay), rr = Math.max(W, H) * 0.62
+    for (const [cx, cy, c] of [[ex, ey, b.phe[pheEm]], [kx, ky, b.phe[pheKia]]] as const) {
+      const q = x.createRadialGradient(cx, cy, 0, cx, cy, rr); q.addColorStop(0, rgba(c, b.toi ? 0.26 : 0.17)); q.addColorStop(1, rgba(c, 0))
+      x.fillStyle = q; x.fillRect(cx - rr, cy - rr, rr * 2, rr * 2)
     }
-    // Lưới lục giác (vòng benzene); vài ô tô màu nguyên tố.
+    // Lưới lục giác (vòng benzene); vài ô tô màu trung tính.
     const a = 26, h = a * Math.sqrt(3)
     const luc = (cx: number, cy: number, r: number) => { x.beginPath(); for (let k = 0; k <= 6; k++) { const an = (k * Math.PI) / 3; if (k) x.lineTo(cx + r * Math.cos(an), cy + r * Math.sin(an)); else x.moveTo(cx + r * Math.cos(an), cy + r * Math.sin(an)) } }
     let dem = 0
-    const moiO = (f: (cx: number, cy: number, col: number, row: number) => void) => { for (let col = 0; col * 1.5 * a < SAN + a; col++) for (let row = -1; row * h < SAN + h; row++) f(col * 1.5 * a, row * h + (col % 2 ? h / 2 : 0), col, row) }
-    moiO((cx, cy, col, row) => { if ((col * 7 + row * 13) % 23 === 0) { luc(cx, cy, a - 3); x.fillStyle = rgba(b.nt[dem++ % 7], b.toi ? 0.2 : 0.18); x.fill() } })
+    const moiO = (f: (cx: number, cy: number, col: number, row: number) => void) => { for (let col = 0; col * 1.5 * a < W + a; col++) for (let row = -1; row * h < H + h; row++) f(col * 1.5 * a, row * h + (col % 2 ? h / 2 : 0), col, row) }
+    moiO((cx, cy, col, row) => { if ((col * 7 + row * 13) % 23 === 0) { luc(cx, cy, a - 3); x.fillStyle = rgba(b.nt[NT_TRUNG_TINH[dem++ % 4]], b.toi ? 0.16 : 0.14); x.fill() } })
     x.strokeStyle = rgba(b.luoi); x.lineWidth = 1.3; x.beginPath()
     moiO((cx, cy) => { for (let k = 0; k <= 3; k++) { const an = (k * Math.PI) / 3 - Math.PI / 3, px = cx + a * Math.cos(an), py = cy + a * Math.sin(an); if (k) x.lineTo(px, py); else x.moveTo(px, py) } })
     x.stroke()
-    // Vòng giữa sân + bệ xuất phát (lục giác nét đứt).
-    x.setLineDash([8, 8]); x.lineWidth = 2; x.strokeStyle = rgba(b.luoiDam, 0.35); x.beginPath(); x.arc(300, 300, 100, 0, PI2); x.stroke()
-    for (const [cx, cy] of CHO_RA) { luc(cx, cy, 26); x.fillStyle = rgba(b.the, b.toi ? 0.12 : 0.55); x.fill(); x.strokeStyle = rgba(b.luoiDam, 0.45); x.stroke() }
+    // Vạch giữa sân + vòng giữa (nét đứt).
+    x.setLineDash([10, 10]); x.lineWidth = 2.5; x.strokeStyle = rgba(b.luoiDam, 0.32); x.beginPath()
+    if (doc) { x.moveTo(0, H / 2); x.lineTo(W, H / 2) } else { x.moveTo(W / 2, 0); x.lineTo(W / 2, H) }
+    x.stroke(); x.beginPath(); x.arc(W / 2, H / 2, 112, 0, PI2); x.stroke()
+    // Bệ xuất phát: lục giác màu phe.
+    x.setLineDash([6, 6]); x.lineWidth = 2
+    for (const p of [pheEm, pheKia]) for (const [bx, by] of BE_PHE[p]) {
+      const [cx, cy] = ra(bx, by, this.xoay)
+      luc(cx, cy, 27); x.fillStyle = rgba(b.phe[p], b.toi ? 0.22 : 0.18); x.fill(); x.strokeStyle = rgba(b.phe[p], 0.75); x.stroke()
+    }
     x.setLineDash([])
     x.restore()
-    if (coVat) for (const v of VAT_CAN) this.veVat(x, v)
-    x.strokeStyle = rgba(b.luoiDam, b.toi ? 0.45 : 0.35); x.lineWidth = 3; x.beginPath(); x.roundRect(1.5, 1.5, SAN - 3, SAN - 3, 27); x.stroke()
+    if (coVat) for (const v of this.vat) this.veVat(x, v)
+    x.strokeStyle = rgba(b.luoiDam, b.toi ? 0.45 : 0.35); x.lineWidth = 3; x.beginPath(); x.roundRect(1.5, 1.5, W - 3, H - 3, 27); x.stroke()
   }
 
-  private veVat(x: CanvasRenderingContext2D, v: VatCan): void {
+  private veVat(x: CanvasRenderingContext2D, v: VatVe): void {
     const b = this.b, liq = v.mau !== undefined ? b.nt[v.mau] : b.e
     x.save(); x.lineJoin = 'round'
     x.fillStyle = rgba(b.chu, b.toi ? 0.4 : 0.12)
@@ -156,11 +193,13 @@ export class Ve {
       x.fillStyle = rgba(liq, 0.55); x.beginPath(); x.arc(v.x, v.y, co * 0.55, 0, PI2); x.fill()
       x.strokeStyle = rgba(b.trang, 0.85); x.lineWidth = v.r > 30 ? 4 : 3; x.lineCap = 'round'; x.beginPath(); x.arc(v.x, v.y, v.r - (v.r > 30 ? 9 : 6), Math.PI * 1.08, Math.PI * 1.42); x.stroke()
     } else if (v.ve === 'gia-ong') {
+      // Giá ống nghiệm = tường chắn căn cứ: ống chứa dung dịch MÀU PHE của căn cứ đó.
+      const c = b.phe[v.cuaEm ? this.pheEm : 1 - this.pheEm], dung = v.h > v.w, dai = dung ? v.h : v.w
       x.beginPath(); x.roundRect(v.x, v.y, v.w, v.h, 10); x.fill(); x.stroke()
       for (let i = 0; i < 5; i++) {
-        const cx = v.x + 16 + (i * (v.w - 32)) / 4, cy = v.y + v.h / 2
+        const t = 16 + (i * (dai - 32)) / 4, cx = dung ? v.x + v.w / 2 : v.x + t, cy = dung ? v.y + t : v.y + v.h / 2
         x.fillStyle = rgba(b.kinh); x.strokeStyle = rgba(b.kinhVien, 0.9); x.lineWidth = 2; x.beginPath(); x.arc(cx, cy, 9, 0, PI2); x.fill(); x.stroke()
-        x.fillStyle = rgba(b.nt[(i * 3 + 1) % 7]); x.beginPath(); x.arc(cx, cy, 5.5, 0, PI2); x.fill()
+        x.fillStyle = rgba(c); x.beginPath(); x.arc(cx, cy, 5.5, 0, PI2); x.fill()
         x.fillStyle = rgba(b.trang, 0.8); x.beginPath(); x.arc(cx - 1.8, cy - 1.8, 1.6, 0, PI2); x.fill()
       }
     } else {
@@ -173,23 +212,24 @@ export class Ve {
     x.restore()
   }
 
-  /** Nguyên tử từng nguyên tố vẽ sẵn (cầu bóng + ký hiệu) — mỗi khung chỉ còn drawImage. */
+  /** Nguyên tử vẽ sẵn theo (phe, nguyên tố): cầu bóng MÀU PHE + ký hiệu nguyên tố — mỗi khung chỉ còn drawImage. */
   private taoHat(): void {
     const b = this.b, s = this.s, d = Math.ceil((R + 2) * 2 * s)
-    this.hat = b.nt.map((c, i) => {
-      const cv = document.createElement('canvas'); cv.width = cv.height = d
+    this.hat = []
+    for (let p = 0; p < 2; p++) for (let i = 0; i < NGUYEN_TO.length; i++) {
+      const c = b.phe[p], cv = document.createElement('canvas'); cv.width = cv.height = d
+      this.hat.push(cv)
       const x = cv.getContext('2d')
-      if (!x) return cv
+      if (!x) continue
       x.setTransform(s, 0, 0, s, 0, 0); x.translate(R + 2, R + 2)
       const g = x.createRadialGradient(-R * 0.35, -R * 0.4, R * 0.08, 0, 0, R)
-      g.addColorStop(0, rgba(tron(c, b.trang, 0.62))); g.addColorStop(0.55, rgba(c)); g.addColorStop(1, rgba(tron(c, b.den, 0.32)))
+      g.addColorStop(0, rgba(tron(c, b.trang, 0.55))); g.addColorStop(0.55, rgba(c)); g.addColorStop(1, rgba(tron(c, b.den, 0.3)))
       x.fillStyle = g; x.beginPath(); x.arc(0, 0, R, 0, PI2); x.fill()
-      x.strokeStyle = rgba(tron(c, b.den, 0.45)); x.lineWidth = 1.4; x.stroke()
-      x.fillStyle = rgba(b.trang, 0.55); x.beginPath(); x.ellipse(-R * 0.36, -R * 0.46, R * 0.3, R * 0.17, -0.6, 0, PI2); x.fill()
+      x.fillStyle = rgba(b.trang, 0.5); x.beginPath(); x.ellipse(-R * 0.36, -R * 0.46, R * 0.3, R * 0.17, -0.6, 0, PI2); x.fill()
       x.font = `800 ${NGUYEN_TO[i].length > 1 ? 13 : 15}px ${b.phong}`; x.textAlign = 'center'; x.textBaseline = 'middle'
-      x.fillStyle = doSang(c) > 0.55 ? rgba(tron(c, b.den, 0.8)) : rgba(b.trang); x.fillText(NGUYEN_TO[i], 0, 1.2)
-      return cv
-    })
+      // Chữ tối trên màu phe (Bazơ, Axit đều đủ sáng) ⇒ tương phản ≥ 4,5.
+      x.fillStyle = doSang(c) > 0.2 ? rgba(tron(c, b.den, 0.85)) : rgba(b.trang); x.fillText(NGUYEN_TO[i], 0, 1.2)
+    }
   }
   /** Quầng sáng vẽ sẵn theo màu (không dùng shadowBlur trong vòng vẽ). */
   private quang(x: CanvasRenderingContext2D, c: Rgb, cx: number, cy: number, r: number, a: number): void {
@@ -209,32 +249,43 @@ export class Ve {
     x.fillStyle = mau; x.fillText(s, cx, cy)
   }
 
-  /** Sự kiện trận ⇒ hiệu ứng. `nay` = đồng hồ vẽ (ms). */
+  /** Sự kiện trận (toạ độ VẼ) ⇒ hiệu ứng. `nay` = đồng hồ vẽ (ms). Hiệu ứng dịu: rung nhẹ, không chớp dồn dập. */
   them(su: SuKien, nay: number, emId: number, canh: Canh): void {
     const b = this.b, gId = (id: number) => canh.ghe.find((g) => g.id === id)
-    const mauCua = (id: number) => { const g = gId(id); return g ? b.nt[g.nt] : b.sao }
+    const mauCua = (id: number) => { const g = gId(id); return g ? b.phe[g.phe & 1] : b.sao }
     const pu = (h: Omit<HieuUng, 't0'>) => { this.hu.push({ ...h, t0: nay }); const tran = this.yeu ? 40 : 160; if (this.hu.length > tran) this.hu.splice(0, this.hu.length - tran) }
     const coEm = 'ai' in su && (su.ai === emId || ('boi' in su && su.boi === emId))
     const den = (a: number) => rgba(b.den, a)
     switch (su.t) {
       case 'ban': this.giat.set(su.chu, nay); if (!this.yeu) pu({ k: 'chop', x: su.x, y: su.y, mau: mauCua(su.chu), goc: su.ngam }); break
+      // Đạn của em chạm đối thủ TẠI MÁY: nháy ngay (phòng xác nhận sau bằng «trung» ⇒ chỉ thêm «−1», không nháy lần hai).
+      case 'cham': this.loe.set(su.ai, nay); this.chamLuc.set(su.ai, nay); pu({ k: 'tia', x: su.x, y: su.y, mau: mauCua(su.boi), goc: Math.random() * PI2 }); break
       case 'trung':
-        this.loe.set(su.ai, nay)
-        pu({ k: 'tia', x: su.x, y: su.y, mau: mauCua(su.boi), goc: Math.random() * PI2 })
-        if (coEm && su.mau > 0 && nay - (this.soLuc.get(su.ai) ?? -1e9) > 300) { this.soLuc.set(su.ai, nay); pu({ k: 'so', x: su.x + (Math.random() - 0.5) * 10, y: su.y - 14, chu: '−1', co: su.ai === emId ? 15 : 17, mau: su.ai === emId ? b.sai : b.sao }) }
-        if (su.ai === emId) { this.rung = { t0: nay, dur: 150, m: 3 }; this.doLuc = nay }
+        if (!(su.boi === emId && nay - (this.chamLuc.get(su.ai) ?? -1e9) < 600)) { this.loe.set(su.ai, nay); pu({ k: 'tia', x: su.x, y: su.y, mau: mauCua(su.boi), goc: Math.random() * PI2 }) }
+        // «−1» hiện BÊN PHẢI nguyên tử (không đè nhãn tên).
+        if (coEm && su.mau > 0 && nay - (this.soLuc.get(su.ai) ?? -1e9) > 300) { this.soLuc.set(su.ai, nay); const g = gId(su.ai); pu({ k: 'so', x: (g ? g.x : su.x) + R + 16, y: (g ? g.y : su.y) + 4, chu: '−1', co: su.ai === emId ? 15 : 17, mau: su.ai === emId ? b.sai : b.sao }) }
+        if (su.ai === emId) { this.rung = { t0: nay, dur: 120, m: 1.5 }; this.doLuc = nay }
         break
       case 'chan': { const g = gId(su.ai); if (!g) break; pu({ k: 'vong', x: g.x, y: g.y, mau: b.kh, r0: 6, r1: 26, w: 3, dur: 260, theo: g.id }); if (coEm) pu({ k: 'so', x: g.x, y: g.y - 30, chu: 'Chặn', co: 13, mau: b.kh }); break }
-      case 'tat': if (!this.yeu) pu({ k: 'puff', x: su.x, y: su.y, mau: b.nt[su.nt] ?? b.sao }); break
+      case 'tat': if (!this.yeu) pu({ k: 'puff', x: su.x, y: su.y, mau: b.phe[(su.phe ?? 0) & 1] }); break
       case 'ha': {
         const c = mauCua(su.ai)
         pu({ k: 'bong', x: su.x, y: su.y, mau: c, goc: Math.random() * PI2 })
-        pu({ k: 'vong', x: su.x, y: su.y, mau: c, r0: 10, r1: 64, w: 5, dur: 460 })
-        pu({ k: 'so', x: su.x, y: su.y - 8, chu: 'Hạ!', co: su.boi === emId ? 22 : 14, mau: su.boi === emId ? b.sao : b.the, vien: su.boi === emId ? den(0.55) : rgba(b.chu, 0.6), dur: su.boi === emId ? 900 : 600 })
-        if (coEm) this.rung = { t0: nay, dur: 260, m: su.boi === emId ? 6 : 5 }
+        pu({ k: 'vong', x: su.x, y: su.y, mau: c, r0: 10, r1: 60, w: 4, dur: 460 })
+        pu({ k: 'so', x: su.x, y: su.y - 8, chu: 'Hạ!', co: su.boi === emId ? 20 : 14, mau: su.boi === emId ? b.sao : b.the, vien: su.boi === emId ? den(0.55) : rgba(b.chu, 0.6), dur: su.boi === emId ? 900 : 600 })
+        if (coEm) this.rung = { t0: nay, dur: 200, m: su.boi === emId ? 3 : 2.5 }
         break
       }
-      case 'hoi': { const g = gId(su.ai); if (g) pu({ k: 'vong', x: g.x, y: g.y, mau: b.the, r0: 40, r1: 14, w: 3, dur: 380, theo: g.id }); break }
+      case 'hoi': { const g = gId(su.ai); if (g) pu({ k: 'vong', x: g.x, y: g.y, mau: b.phe[g.phe & 1], r0: 40, r1: 14, w: 3, dur: 380, theo: g.id }); break }
+      // Em vào thay A.I: A.I tan thành bong bóng màu phe, vòng sáng thu về chỗ em.
+      case 'thay': {
+        const g = gId(su.ai); if (!g) break
+        const c = b.phe[g.phe & 1]
+        pu({ k: 'bong', x: g.x, y: g.y, mau: c, goc: Math.random() * PI2, dur: 900 })
+        pu({ k: 'vong', x: g.x, y: g.y, mau: b.trang, r0: 56, r1: 16, w: 4, dur: 520, theo: g.id })
+        pu({ k: 'vong', x: g.x, y: g.y, mau: c, r0: 70, r1: 22, w: 3, dur: 700, theo: g.id })
+        break
+      }
       case 'len': {
         const g = gId(su.ai); if (!g) break
         const c = b.cap[su.cap]
@@ -261,7 +312,7 @@ export class Ve {
     }
   }
 
-  /** Vẽ một khung. `nay` = đồng hồ vẽ (ms); `ten` = tên trên thẻ. */
+  /** Vẽ một khung (cảnh đã xoay về khung vẽ). `nay` = đồng hồ vẽ (ms); `ten` = tên trên thẻ. */
   ve(c: Canh, emId: number, nay: number, ten: (id: number) => string, o: { tinh?: boolean; anNgamKhac?: boolean } = {}): void {
     const x = this.ctx, b = this.b, s = this.s, v = this.view
     const dtVe = Math.min(0.1, Math.max(0, (nay - this.nayCu) / 1000)); this.nayCu = nay
@@ -273,8 +324,9 @@ export class Ve {
     x.setTransform(s, 0, 0, s, (ox - v.x0) * s, (oy - v.y0) * s)
     if (!this.nen) this.veSan(x, false)
     const em = gId(emId)
+    const pheEm = em ? em.phe & 1 : this.pheEm
     // Điểm đến khi chạm một chỗ / rê chuột.
-    if (this.diToi && em && em.cho <= 0) { x.strokeStyle = rgba(b.nt[em.nt], 0.7); x.lineWidth = this.px(2); x.setLineDash([this.px(4), this.px(4)]); x.beginPath(); x.arc(this.diToi.x, this.diToi.y, 10, 0, PI2); x.stroke(); x.setLineDash([]) }
+    if (this.diToi && em && em.cho <= 0) { x.strokeStyle = rgba(b.phe[pheEm], 0.7); x.lineWidth = this.px(2); x.setLineDash([this.px(4), this.px(4)]); x.beginPath(); x.arc(this.diToi.x, this.diToi.y, 10, 0, PI2); x.stroke(); x.setLineDash([]) }
     // Vật phẩm.
     for (const it of c.vp) {
       const vao = Math.max(0, Math.min(1, (c.t - it.t0) / 0.25)), bob = this.yeu ? 0 : Math.sin(nay / 300 + it.id) * 1.6
@@ -299,21 +351,21 @@ export class Ve {
       x.restore()
       if (it.k !== 'e' && vao >= 1) this.chu(x, it.x, it.y + 25, it.k === 'xt' ? 'Xúc tác' : 'Khiên', 10.5, rgba(b.chu), rgba(b.the, 0.9), 700)
     }
-    // Đường ngắm: của em rõ (nét chạy về mục tiêu), của bạn khác mờ (máy yếu: chỉ của em).
+    // Đường ngắm: của EM rõ (nét chạy tới đối thủ, kể cả ở xa); đối thủ đang ngắm em: vạch chấm mờ màu phe họ (biết mà nấp). Bạn khác: không vẽ cho đỡ rối.
     for (const g of c.ghe) {
       if (g.cho > 0 || !g.muc) continue
       const m = gId(g.muc); if (!m || m.cho > 0) continue
-      const laEm = g.id === emId
-      if (!laEm && (this.yeu || o.anNgamKhac)) continue
+      const laEm = g.id === emId, ngamEm = g.muc === emId && g.phe !== pheEm
+      if (!laEm && (!ngamEm || this.yeu || o.anNgamKhac)) continue
       const an = Math.atan2(m.y - g.y, m.x - g.x)
-      x.strokeStyle = rgba(b.nt[g.nt], laEm ? 0.9 : b.toi ? 0.32 : 0.26); x.lineWidth = this.px(laEm ? 2.4 : 1.5); x.lineCap = 'round'
-      x.setLineDash(laEm ? [this.px(6), this.px(6)] : [this.px(2), this.px(6)]); x.lineDashOffset = laEm && !this.yeu ? -nay / 25 : 0
-      x.beginPath(); x.moveTo(g.x + Math.cos(an) * (R + 14), g.y + Math.sin(an) * (R + 14)); x.lineTo(m.x - Math.cos(an) * (R + 10), m.y - Math.sin(an) * (R + 10)); x.stroke()
+      x.strokeStyle = rgba(b.phe[g.phe & 1], laEm ? 0.85 : b.toi ? 0.4 : 0.32); x.lineWidth = this.px(laEm ? 2.4 : 1.6); x.lineCap = 'round'
+      x.setLineDash(laEm ? [this.px(7), this.px(6)] : [this.px(2), this.px(7)]); x.lineDashOffset = laEm && !this.yeu ? -nay / 25 : 0
+      x.beginPath(); x.moveTo(g.x + Math.cos(an) * (R + 14), g.y + Math.sin(an) * (R + 14)); x.lineTo(m.x - Math.cos(an) * (R + 12), m.y - Math.sin(an) * (R + 12)); x.stroke()
     }
     x.setLineDash([]); x.lineDashOffset = 0
-    // Đạn.
+    // Đạn (màu phe người bắn).
     for (const d of c.dan) {
-      const cl = b.nt[d.nt], sp = Math.hypot(d.vx, d.vy) || 1, ux = d.vx / sp, uy = d.vy / sp, r = d.cap >= 5 ? 7.5 : d.cap >= 3 ? 6.4 : 6
+      const cl = b.phe[d.phe & 1], sp = Math.hypot(d.vx, d.vy) || 1, ux = d.vx / sp, uy = d.vy / sp, r = d.cap >= 5 ? 7.5 : d.cap >= 3 ? 6.4 : 6
       if (!this.yeu) {
         const dai = d.cap >= 5 ? 38 : d.cap >= 3 ? 28 : 24
         x.lineCap = 'round'; x.strokeStyle = rgba(d.cap >= 5 ? b.cap[5] : cl, d.cap >= 5 ? 0.6 : 0.42); x.lineWidth = r * 1.7
@@ -332,26 +384,24 @@ export class Ve {
       }
       if (d.cap === 4 && !this.yeu) { x.strokeStyle = rgba(b.cap[4], 0.9); x.lineWidth = 1.6; x.beginPath(); x.moveTo(d.x - ux * 8 - uy * 5, d.y - uy * 8 + ux * 5); x.lineTo(d.x - ux * 13 + uy * 4, d.y - uy * 13 - ux * 4); x.lineTo(d.x - ux * 19 - uy * 4, d.y - uy * 19 + ux * 4); x.stroke() }
     }
-    // Nguyên tử (xếp theo y cho có chiều sâu); người dẫn đầu có ngôi sao vàng.
-    let dau: GheVe | null = null
-    for (const g of c.ghe) if (g.ha > (dau ? dau.ha : 0)) dau = g
+    // Nguyên tử (xếp theo y cho có chiều sâu).
     const ds = c.ghe.filter((g) => g.cho <= 0).sort((p, q) => p.y - q.y)
     for (const g of ds) {
       let goc = this.goc.get(g.id)
       if (goc === undefined || o.tinh) goc = g.ngam
-      else { let dd = g.ngam - goc; while (dd > Math.PI) dd -= PI2; while (dd < -Math.PI) dd += PI2; goc += dd * Math.min(1, dtVe * 20) }
+      else { let dd = g.ngam - goc; while (dd > Math.PI) dd -= PI2; while (dd < -Math.PI) dd += PI2; goc += dd * Math.min(1, dtVe * 14) }
       this.goc.set(g.id, goc)
       if (g.vang) x.globalAlpha = 0.45
-      this.veNguyenTu(x, g, nay, goc)
+      this.veNguyenTu(x, g, nay, goc, g.id === emId)
       x.globalAlpha = 1
     }
-    for (const g of ds) this.veTen(x, g, g.id === emId ? 'Em' : ten(g.id), g.id === emId, dau === g)
-    // Vòng ngắm quay trên mục tiêu của em.
+    for (const g of ds) this.veTen(x, g, g.id === emId ? 'Em' : ten(g.id), g.id === emId)
+    // Dấu ngắm NHỎ trên đối thủ em đang ngắm.
     if (em && em.cho <= 0 && em.muc) {
       const m = gId(em.muc)
       if (m && m.cho <= 0) {
-        x.save(); x.translate(m.x, m.y); x.rotate(this.yeu ? 0 : nay / 400); x.strokeStyle = rgba(b.nt[em.nt]); x.lineWidth = this.px(2.6); x.lineCap = 'round'
-        for (let k = 0; k < 4; k++) { const a = (k * Math.PI) / 2; x.beginPath(); x.arc(0, 0, R + 11, a - 0.38, a + 0.38); x.stroke() }
+        x.save(); x.translate(m.x, m.y); x.rotate(this.yeu ? 0 : nay / 500); x.strokeStyle = rgba(b.phe[pheEm]); x.lineWidth = this.px(2.4); x.lineCap = 'round'
+        for (let k = 0; k < 4; k++) { const a = (k * Math.PI) / 2; x.beginPath(); x.arc(0, 0, R + 9, a - 0.3, a + 0.3); x.stroke() }
         x.restore()
       }
     }
@@ -362,9 +412,9 @@ export class Ve {
       if (h.theo && h.k !== 'hut') { const g = gId(h.theo); if (g && g.cho <= 0) { h.x = g.x; h.y = g.y + (h.lech || 0) } }
       this.veHieuUng(x, h, t, c)
     }
-    // Viền đỏ nhẹ khi em trúng đạn.
+    // Viền đỏ rất nhẹ khi em trúng đạn (dịu mắt).
     const t2 = (nay - this.doLuc) / 240
-    if (t2 >= 0 && t2 < 1 && !this.yeu) { const g = x.createRadialGradient(300, 300, 200, 300, 300, 430); g.addColorStop(0, rgba(b.sai, 0)); g.addColorStop(1, rgba(b.sai, 0.42 * (1 - t2))); x.fillStyle = g; x.fillRect(v.x0, v.y0, v.w, v.h) }
+    if (t2 >= 0 && t2 < 1 && !this.yeu) { const cx = v.x0 + v.w / 2, cy = v.y0 + v.h / 2, rr = Math.max(v.w, v.h) * 0.6; const g = x.createRadialGradient(cx, cy, rr * 0.55, cx, cy, rr); g.addColorStop(0, rgba(b.sai, 0)); g.addColorStop(1, rgba(b.sai, 0.26 * (1 - t2))); x.fillStyle = g; x.fillRect(v.x0, v.y0, v.w, v.h) }
   }
 
   private veHieuUng(x: CanvasRenderingContext2D, h: HieuUng, t: number, c: Canh): void {
@@ -374,7 +424,7 @@ export class Ve {
       case 'tia':
         x.strokeStyle = rgba(cl, e); x.lineWidth = 2.6; x.lineCap = 'round'
         for (let j = 0; j < 7; j++) { const a = goc + (j * PI2) / 7, r1 = 6 + t * 20, r2 = r1 + 9 * e; x.beginPath(); x.moveTo(h.x + Math.cos(a) * r1, h.y + Math.sin(a) * r1); x.lineTo(h.x + Math.cos(a) * r2, h.y + Math.sin(a) * r2); x.stroke() }
-        x.fillStyle = rgba(b.trang, e * 0.9); x.beginPath(); x.arc(h.x, h.y, 7 * e, 0, PI2); x.fill(); break
+        x.fillStyle = rgba(b.trang, e * 0.7); x.beginPath(); x.arc(h.x, h.y, 7 * e, 0, PI2); x.fill(); break
       case 'so': { const n = t < 0.15 ? 0.7 + t * 2.4 : 1.06 - (t - 0.15) * 0.07; x.globalAlpha = t > 0.7 ? (1 - t) / 0.3 : 1; this.chu(x, h.x, h.y - t * 26, h.chu!, h.co! * n, rgba(cl), h.vien || rgba(b.the, 0.9)); x.globalAlpha = 1; break }
       case 'bong':
         for (let j = 0; j < 11; j++) {
@@ -390,7 +440,7 @@ export class Ve {
         x.lineJoin = 'round'; x.lineCap = 'round'
         for (const [w, col] of [[6, rgba(cl, e * 0.55)], [2.2, rgba(b.trang, e)]] as const) { x.strokeStyle = col; x.lineWidth = w; x.beginPath(); h.d!.forEach(([px, py], i) => (i ? x.lineTo(px, py) : x.moveTo(px, py))); x.stroke() }
         break
-      case 'no': { const r = 10 + 40 * (1 - e * e); x.fillStyle = rgba(cl, 0.5 * e); x.beginPath(); x.arc(h.x, h.y, r, 0, PI2); x.fill(); x.fillStyle = rgba(b.trang, 0.7 * e * e); x.beginPath(); x.arc(h.x, h.y, r * 0.45, 0, PI2); x.fill(); x.strokeStyle = rgba(cl, e); x.lineWidth = 3 * e + 0.5; x.beginPath(); x.arc(h.x, h.y, r + 4, 0, PI2); x.stroke(); break }
+      case 'no': { const r = 10 + 40 * (1 - e * e); x.fillStyle = rgba(cl, 0.5 * e); x.beginPath(); x.arc(h.x, h.y, r, 0, PI2); x.fill(); x.fillStyle = rgba(b.trang, 0.5 * e * e); x.beginPath(); x.arc(h.x, h.y, r * 0.45, 0, PI2); x.fill(); x.strokeStyle = rgba(cl, e); x.lineWidth = 3 * e + 0.5; x.beginPath(); x.arc(h.x, h.y, r + 4, 0, PI2); x.stroke(); break }
       case 'sao':
         for (let j = 0; j < 8; j++) {
           const a = goc + (j * PI2) / 8, r = 20 + t * 34 + (j % 2) * 8, px = h.x + Math.cos(a) * r, py = h.y + Math.sin(a) * r, z = 4.5 * e
@@ -401,26 +451,31 @@ export class Ve {
     }
   }
 
-  private veNguyenTu(x: CanvasRenderingContext2D, g: GheVe, nay: number, goc: number): void {
-    const b = this.b, c = b.nt[g.nt], cc = b.cap[g.cap] ?? b.cap[1]
+  private veNguyenTu(x: CanvasRenderingContext2D, g: GheVe, nay: number, goc: number, laEm: boolean): void {
+    const b = this.b, p = g.phe & 1, c = b.phe[p], cc = b.cap[g.cap] ?? b.cap[1]
     const loe = (nay - (this.loe.get(g.id) ?? -1e9)) / 140, giat = (nay - (this.giat.get(g.id) ?? -1e9)) / 90
     const quay = this.yeu ? 0 : nay / 1000
     x.save(); x.translate(g.x, g.y)
-    if (b.toi && !this.yeu) this.quang(x, c, 0, 0, R + 20, 0.75)
+    if (b.toi && !this.yeu) this.quang(x, c, 0, 0, R + 20, 0.7)
     else { x.fillStyle = rgba(b.chu, b.toi ? 0.4 : 0.16); x.beginPath(); x.ellipse(2, R * 0.9, R * 0.95, R * 0.36, 0, 0, PI2); x.fill() }
+    // Em: vòng TRẮNG ngoài (viền tối mảnh để nổi cả trên sàn sáng).
+    if (laEm) {
+      x.strokeStyle = rgba(b.den, b.toi ? 0.5 : 0.28); x.lineWidth = 7; x.beginPath(); x.arc(0, 0, R + 9, 0, PI2); x.stroke()
+      x.strokeStyle = rgba(b.trang); x.lineWidth = 4; x.beginPath(); x.arc(0, 0, R + 9, 0, PI2); x.stroke()
+    }
     // Hào quang theo cấp súng.
     if (g.cap >= 2) {
       x.save(); x.rotate(quay * (g.cap >= 4 ? 1.6 : 0.6))
       x.strokeStyle = rgba(cc, 0.9); x.lineWidth = g.cap >= 5 ? 3 : 2.4
       if (g.cap === 4) x.setLineDash([7, 5])
-      x.beginPath(); x.arc(0, 0, R + 8, 0, PI2); x.stroke(); x.setLineDash([])
+      x.beginPath(); x.arc(0, 0, R + (laEm ? 13.5 : 8), 0, PI2); x.stroke(); x.setLineDash([])
       if (g.cap >= 3) {
         x.fillStyle = rgba(cc)
-        const n = g.cap >= 5 ? 6 : 3
+        const n = g.cap >= 5 ? 6 : 3, rg = laEm ? R + 11.5 : R + 6
         for (let k = 0; k < n; k++) {
           x.save(); x.rotate((k * PI2) / n); x.beginPath()
-          if (g.cap >= 5) { const f = this.yeu ? 1 : 0.8 + 0.35 * Math.sin(nay / 70 + k * 1.7); x.moveTo(R + 6, -4); x.quadraticCurveTo(R + 12 + 7 * f, 0, R + 6, 4) }
-          else { x.moveTo(R + 11, 0); x.lineTo(R + 6, -3.5); x.lineTo(R + 6, 3.5) }
+          if (g.cap >= 5) { const f = this.yeu ? 1 : 0.8 + 0.35 * Math.sin(nay / 70 + k * 1.7); x.moveTo(rg, -4); x.quadraticCurveTo(rg + 6 + 7 * f, 0, rg, 4) }
+          else { x.moveTo(rg + 5, 0); x.lineTo(rg, -3.5); x.lineTo(rg, 3.5) }
           x.fill(); x.restore()
         }
       }
@@ -437,23 +492,24 @@ export class Ve {
     x.save(); x.rotate(goc); if (giat >= 0 && giat < 1) x.translate(-(1 - giat) * 3, 0)
     this.veNong(x, g.cap, c, cc)
     x.restore()
-    // Thân: méo nhẹ + loé trắng khi trúng.
+    // Thân MÀU PHE (méo nhẹ + loé trắng khi trúng) + vòng viền màu phe đậm.
     const ep = loe >= 0 && loe < 1 ? 1 - loe : 0
-    if (ep) x.scale(1 + ep * 0.16, 1 - ep * 0.13)
-    const h = this.hat[g.nt]
+    if (ep) x.scale(1 + ep * 0.12, 1 - ep * 0.1)
+    const h = this.hat[p * NGUYEN_TO.length + g.nt]
     if (h) { const d = h.width / this.s; x.drawImage(h, -d / 2, -d / 2, d, d) }
-    if (ep) { x.fillStyle = rgba(b.trang, ep * 0.85); x.beginPath(); x.arc(0, 0, R, 0, PI2); x.fill() }
+    x.strokeStyle = rgba(tron(c, b.den, 0.35)); x.lineWidth = 2.6; x.beginPath(); x.arc(0, 0, R + 0.5, 0, PI2); x.stroke()
+    if (ep) { x.fillStyle = rgba(b.trang, ep * 0.6); x.beginPath(); x.arc(0, 0, R, 0, PI2); x.fill() }
     x.restore()
     // Khiên vật phẩm: 3 cung = chặn 3 viên.
     if (g.khien > 0) {
       x.save(); x.translate(g.x, g.y); x.lineCap = 'round'
-      for (let k = 0; k < 3; k++) { const a = -Math.PI / 2 + (k * PI2) / 3 + quay; x.strokeStyle = rgba(b.kh, k < g.khien ? 0.95 : 0.2); x.lineWidth = 4; x.beginPath(); x.arc(0, 0, R + 13, a + 0.25, a + PI2 / 3 - 0.25); x.stroke() }
+      for (let k = 0; k < 3; k++) { const a = -Math.PI / 2 + (k * PI2) / 3 + quay; x.strokeStyle = rgba(b.kh, k < g.khien ? 0.95 : 0.2); x.lineWidth = 4; x.beginPath(); x.arc(0, 0, R + 15, a + 0.25, a + PI2 / 3 - 0.25); x.stroke() }
       x.restore()
     }
-    // Thanh Máu dưới chân.
-    const w = this.px(30), hb = this.px(4.5), yb = g.y + R + this.px(7), tl = Math.max(0, g.mau) / MAU_MAX
+    // Thanh Máu MÀU PHE dưới chân.
+    const w = this.px(32), hb = this.px(5), yb = g.y + R + this.px(laEm ? 11 : 7), tl = Math.max(0, g.mau) / MAU_MAX
     x.fillStyle = rgba(b.chu, b.toi ? 0.5 : 0.2); x.beginPath(); x.roundRect(g.x - w / 2, yb, w, hb, hb / 2); x.fill()
-    x.fillStyle = rgba(tl > 0.5 ? b.dung : tl > 0.25 ? b.sao : b.sai); x.beginPath(); x.roundRect(g.x - w / 2, yb, w * tl, hb, hb / 2); x.fill()
+    x.fillStyle = rgba(c); x.beginPath(); x.roundRect(g.x - w / 2, yb, w * tl, hb, hb / 2); x.fill()
   }
 
   private veNong(x: CanvasRenderingContext2D, cap: number, c: Rgb, cc: Rgb): void {
@@ -468,46 +524,40 @@ export class Ve {
     x.fillStyle = rgba(cap >= 2 ? cc : b.trang); x.beginPath(); x.arc(R + (cap >= 5 ? 14 : 11), 0, 2.2, 0, PI2); x.fill()
   }
 
-  private veTen(x: CanvasRenderingContext2D, g: GheVe, ten: string, laEm: boolean, laDau: boolean): void {
-    const b = this.b, c = b.nt[g.nt], k = ten + this.s
-    x.font = `700 ${this.px(11)}px ${b.phong}`
+  /** Nhãn tên: EM = viên đặc màu phe chữ trắng «Em»; người khác = thẻ sáng viền + CHỮ màu phe (A.I ghi «A.I …»). Huy hiệu cấp súng bên trái. */
+  private veTen(x: CanvasRenderingContext2D, g: GheVe, ten: string, laEm: boolean): void {
+    const b = this.b, p = g.phe & 1, c = b.phe[p], k = ten + this.s
+    x.font = `${laEm ? 800 : 700} ${this.px(11)}px ${b.phong}`
     let w = this.rongTen.get(k)
     if (w === undefined) { w = x.measureText(ten).width + this.px(12); this.rongTen.set(k, w) }
-    const bd = this.px(16), ty = g.y - R - this.px(15), tx = g.x + bd / 2
+    const bd = this.px(16), ty = g.y - R - this.px(laEm ? 19 : 15), tx = g.x + bd / 2
     if (g.vang) x.globalAlpha = 0.5
-    x.fillStyle = laEm ? rgba(c) : rgba(b.the, 0.9); x.beginPath(); x.roundRect(tx - w / 2, ty - this.px(9), w, this.px(18), this.px(9)); x.fill()
-    if (!laEm) { x.strokeStyle = rgba(c, 0.8); x.lineWidth = this.px(1.5); x.stroke() }
-    x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = laEm ? (doSang(c) > 0.55 ? rgba(b.den) : rgba(b.trang)) : rgba(b.chu); x.fillText(ten, tx, ty + this.px(0.5))
-    // Huy hiệu cấp súng (số trong vòng màu cấp).
+    x.fillStyle = laEm ? rgba(c) : rgba(b.the, 0.92); x.beginPath(); x.roundRect(tx - w / 2, ty - this.px(9), w, this.px(18), this.px(9)); x.fill()
+    x.strokeStyle = laEm ? rgba(b.trang) : rgba(c, 0.85); x.lineWidth = this.px(laEm ? 2 : 1.5); x.stroke()
+    x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = laEm ? (doSang(c) > 0.2 ? rgba(b.den) : rgba(b.trang)) : rgba(b.pheChu[p]); x.fillText(ten, tx, ty + this.px(0.5))
     const bx = tx - w / 2 - bd / 2 + this.px(2), cc = b.cap[g.cap] ?? b.cap[1]
     x.fillStyle = rgba(cc); x.beginPath(); x.arc(bx, ty, bd / 2, 0, PI2); x.fill(); x.strokeStyle = rgba(b.the); x.lineWidth = this.px(1.5); x.stroke()
     x.font = `800 ${this.px(10)}px ${b.phong}`; x.fillStyle = doSang(cc) > 0.55 ? rgba(b.den) : rgba(b.trang); x.fillText(String(g.cap), bx, ty + this.px(0.5))
-    if (laDau) {
-      const sx = tx, sy = ty - this.px(16), z = this.px(7)
-      x.fillStyle = rgba(b.sao); x.strokeStyle = rgba(b.den, 0.4); x.lineWidth = this.px(1); x.beginPath()
-      for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + (i * Math.PI) / 5, r = i % 2 ? z * 0.45 : z; if (i) x.lineTo(sx + Math.cos(a) * r, sy + Math.sin(a) * r); else x.moveTo(sx + Math.cos(a) * r, sy + Math.sin(a) * r) }
-      x.closePath(); x.fill(); x.stroke()
-    }
     x.globalAlpha = 1
   }
 
-  /** Ảnh bìa ở sảnh: một cảnh nhỏ vẽ MỘT lần (không vòng lặp). */
+  /** Ảnh bìa ở sảnh: một cảnh 3 đấu 3 nhỏ vẽ MỘT lần (không vòng lặp) — phe Bazơ (em) trái, phe Axit phải. */
   static veBia(cv: HTMLCanvasElement, b: Bang, nt: number): void {
     const r = cv.getBoundingClientRect(), ctx = cv.getContext('2d')
     if (!ctx || !(r.width > 0) || !(r.height > 0)) return
-    const w = Math.max(300, Math.min(600, (170 * r.width) / r.height)), h = (w * r.height) / r.width
+    // Giữ trọn chiều cao cảnh (236 đơn vị); thẻ rộng thì thấy thêm hai đầu sân.
+    const h = 236, w = (h * r.width) / r.height
     const v = new Ve(cv, ctx, b, false)
-    v.datCo(r.width, r.height, Math.min(2, devicePixelRatio || 1), { x0: 300 - w / 2, y0: 307 - h / 2, w, h })
-    const g = (id: number, nt_: number, x: number, y: number, cap: number, muc: number, mau = MAU_MAX): GheVe => ({ id, nt: nt_, x, y, ngam: 0, mau, cap, cho: 0, che: 0, khien: 0, muc, ha: 0 })
-    const ghe = [g(1, nt, 176, 352, 3, 2), g(2, nt === 1 ? 4 : 1, 430, 262, 5, 1, 6), g(3, nt === 2 ? 6 : 2, 392, 352, 2, 1)]
+    v.datCo(r.width, r.height, Math.min(2, devicePixelRatio || 1), { x0: 520 - w / 2, y0: 262 - h / 2, w, h })
+    const g = (id: number, phe: number, nt_: number, x: number, y: number, cap: number, muc: number, mau = MAU_MAX): GheVe => ({ id, phe, nt: nt_, x, y, ngam: 0, mau, cap, cho: 0, che: 0, khien: 0, muc, ha: 0 })
+    const ghe = [g(1, 0, nt, 404, 324, 3, 3), g(2, 0, nt === 4 ? 2 : 4, 336, 214, 2, 4), g(3, 1, 1, 640, 340, 4, 1, 6), g(4, 1, 5, 676, 214, 2, 2)]
     for (const k of ghe) { const m = ghe.find((q) => q.id === k.muc)!; k.ngam = Math.atan2(m.y - k.y, m.x - k.x) }
     const dan: DanVe[] = []
-    for (const [k, n] of [[ghe[0], 1], [ghe[0], 3], [ghe[1], 2], [ghe[2], 2]] as const) {
+    for (const [k, n] of [[ghe[0], 1], [ghe[0], 3], [ghe[1], 2], [ghe[2], 2], [ghe[3], 1]] as const) {
       const cs = Math.cos(k.ngam), sn = Math.sin(k.ngam)
-      for (const vi of CAP[k.cap].vien) { const an = k.ngam + vi.g, dd = R + 18 + n * 40; dan.push({ nt: k.nt, cap: k.cap, x: k.x + Math.cos(an) * dd - sn * vi.l, y: k.y + Math.sin(an) * dd + cs * vi.l, vx: Math.cos(an), vy: Math.sin(an) }) }
+      for (const vi of CAP[k.cap].vien) { const an = k.ngam + vi.g, dd = R + 18 + n * 40; dan.push({ nt: k.nt, phe: k.phe, cap: k.cap, x: k.x + Math.cos(an) * dd - sn * vi.l, y: k.y + Math.sin(an) * dd + cs * vi.l, vx: Math.cos(an), vy: Math.sin(an) }) }
     }
-    const vp: VpVe[] = [[230, 330], [252, 352], [372, 248]].map(([x, y], i) => ({ id: i + 1, k: 'e' as const, x, y, t0: -1 }))
-    vp.push({ id: 4, k: 'xt', x: 300, y: 236, t0: -1 })
-    v.ve({ t: 2, ghe, dan, vp }, 1, 2000, (id) => (['', 'Em', 'Quốc Bảo', 'Thu Hà'][id] ?? ''), { tinh: true })
+    const vp: VpVe[] = [[452, 248], [470, 380], [596, 300]].map(([x, y], i) => ({ id: i + 1, k: 'e' as const, x, y, t0: -1 }))
+    v.ve({ t: 2, ghe, dan, vp }, 1, 2000, (id) => (['', 'Em', 'A.I Sulfur', 'Quốc Bảo', 'Ngọc Trâm'][id] ?? ''), { tinh: true })
   }
 }
