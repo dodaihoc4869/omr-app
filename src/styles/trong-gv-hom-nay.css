@@ -313,13 +313,9 @@
 }
 
 /* điện thoại ngang (thấp ≤ 520): thanh bên thu thành DẢI BIỂU TƯỢNG thay thanh trên + thanh đáy (chỉ khi đang ở Hôm nay — màn khác giữ khung cũ);
-   Việc cần thầy trái | dải số + ba dòng mở thêm phải; bỏ dòng tiêu đề (còn nút đầu màn khi chưa có ca đang mở) */
+   Việc cần thầy trái | dải số + ba dòng mở thêm phải. (01/11, 4 bảng: Việc cần thầy xuống cuối màn ⇒ đầu màn — tiêu đề + nút — hiện lại, khối «XOAY NGANG 01/11».) */
 @media (max-width: 900px) and (max-height: 520px) {
   [data-trong='gv'] .m3.vo-thay .giua-noi-dung > .gv2-trang.gvhn.gvhn-1210 { height: 100vh; height: 100dvh; gap: 8px; padding: 8px 16px; }
-  /* tiêu đề chỉ còn cho trình đọc màn hình (không chiếm chỗ) */
-  [data-trong='gv'] .gvhn-1210 .gvhn-dau-chu,
-  [data-trong='gv'] .gvhn-1210 .gvhn-dau[data-co-ca] { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-  [data-trong='gv'] .gvhn-1210 .gvhn-dau { justify-content: flex-end; }
   [data-trong='gv'] .gvhn-1210 .mt-luoi {
     gap: 8px 12px; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; grid-template-areas: 'viec so' 'viec mo' 'xep xep';
   }
@@ -386,9 +382,27 @@
 @media (max-width: 900px) and (max-height: 520px) {
   [data-trong='gv'] .m3.vo-thay .giua-noi-dung > .gv2-trang.gvhn.gvhn-1210 { height: auto; min-height: 100vh; min-height: 100dvh; }
   [data-trong='gv'] .gvhn-1210 .mt-luoi { grid-template-rows: auto 1fr auto; }
-  [data-trong='gv'] .gvhn-1210 > .gvhn-dau { flex-wrap: nowrap; }
 }
 /* ═══ hết NGANG GV 26/10 */
+
+/* ═══ XOAY NGANG 01/11 (thầy: «Xoay ngang đt tôi muốn màn hôm nay hiển thị 4 ô như máy tính … tối ưu xoay ngang trên đt và máy tính cho phần hôm
+   nay»). Máy THẤP nằm ngang (≤ 600 px cao): 4 bảng 2×2 (bon-bang.css) rồi Việc cần thầy ở cuối ⇒ đầu màn một hàng gọn: ngày + tiêu đề 22 bên trái,
+   «Bổ sung bài hôm nay» + «Theo dõi ca đang mở» bên phải (luật ≤ 900 ẩn hai nút này vì Việc cần thầy từng đứng đầu — nay nó ở cuối nên hiện lại);
+   không đủ ngang thì nút xuống hàng. Dòng Việc cần thầy thấp hơn (56, đích bấm vẫn ≥ 44). */
+@media (orientation: landscape) and (max-height: 600px) {
+  [data-trong='gv'] .m3.vo-thay .giua-noi-dung > .gv2-trang.gvhn.gvhn-1210 { gap: 12px; padding: 10px 16px 16px; }
+  [data-trong='gv'] .m3.vo-thay[data-hoa2] .giua-noi-dung .gvhn-1210 h1.gvv2-h1 { font-size: 22px !important; }
+  [data-trong='gv'] .gvhn-1210 > .gvhn-dau { flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+  /* dòng ngày dạng ngắn của điện thoại («Chủ Nhật 01/11 · 262 em · cập nhật 18:49»); khối chữ co lại (xuống dòng, không cắt) trước khi đẩy nút xuống hàng */
+  [data-trong='gv'] .gvhn-1210 .gvhn-dau-chu { flex: 1 1 200px; min-width: 0; }
+  [data-trong='gv'] .gvhn-1210 .gvhn-dau .gvv2-phu { font-size: 13px; }
+  [data-trong='gv'] .gvhn-1210 .gvhn-dau .nht-an-hep { display: none; }
+  [data-trong='gv'] .gvhn-1210 .gvhn-dau .nht-chi-hep { display: inline; }
+  [data-trong='gv'] .gvhn-1210 .gvhn-dau[data-co-ca] > button,
+  [data-trong='gv'] .gvhn-1210 .gvhn-dau > .gvhn-nut-phu { display: inline-flex; }
+  [data-trong='gv'] .gvhn-1210 .gvhn-dau :is(.gvv2-nut-chinh, .gvhn-nut-phu) { padding: 0 14px; font-size: 14px; }
+  [data-trong='gv'] .gvhn-1210 :is(.gvhn-the-nut, .gvhn-xuong-the) { min-height: 56px; padding: 6px 16px; }
+}
 
 /* ── XẾP HẠNG HỌC SINH (thầy 30/10 «nhìn vào là tôi biết e nào lười nhất chăm nhất học thật nhất», XepHangEm.tsx): một dải ngay dưới dải số.
    ≥ 1101: 4 cột · 601–1100: 2 × 2 · ≤ 600: một thẻ + 4 thẻ chọn. Mỗi cột một màu (viền trên + số hạng): Lười đỏ · Chăm xanh lá · Học thật vàng sao · Đối phó chàm (CÙNG màu ô «Đối phó» của dải số).

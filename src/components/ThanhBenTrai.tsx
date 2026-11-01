@@ -16,7 +16,8 @@
 //   2.0 theo lệnh thầy 28/09 "bỏ hẳn BTVN" (docs/ban-ve-gv-2809/RA-SOAT.md mục 8) — tắt 2.0 là hiện lại.
 //   (Lịch sử: 28/09 docs/ban-ve-gv-2809/GV-ThanhBen — "Mở ca kiểm tra" + Tổng quan · Ca kiểm tra · Chiến dịch luyện · Chữa trên lớp · Học sinh.)
 // Cùng một phần tử `.ben-trai`: hai dạng đầu chỉ khác nhau ở CSS (vo-thay.css). `KhungXemPhieu` đo mép của `.ben-trai` để chừa lề.
-import { Award, CalendarDays, ClipboardCheck, FileText, Home, Library, LifeBuoy, MessageCircleQuestion, Plus, Presentation, Route, Settings, Users, type LucideIcon } from 'lucide-react'
+import { Award, CalendarDays, ChevronRight, ClipboardCheck, FileText, Home, Library, LifeBuoy, MessageCircleQuestion, Plus, Presentation, Route, Settings, Users, type LucideIcon } from 'lucide-react'
+import { useLayoutEffect, useState } from 'react'
 import { useAppStore, type ScreenId } from '../store/appStore'
 import LogoGiaoVien from './LogoGiaoVien'
 import { AnhLogo } from './LogoVai'
@@ -94,6 +95,17 @@ export function soDemMuc(id: ScreenId, so: { caMo: number | null; canThayChua: n
   return null
 }
 
+/** THU GỌN THANH BÊN (thầy 01/11: «trên máy tính thanh bên trái có thể thu nhỏ vào đc»). Chỉ «Trong», chỉ ≥ 1100 px (trong-gv.css; hẹp hơn đã là dải
+ *  biểu tượng / thanh đáy): nút cuối thanh ⇒ dải biểu tượng 76 px, nội dung rộng ra. Dấu `data-ben-thu` trên <html>; nhớ trong máy (localStorage). */
+export const KHOA_BEN_THU = 'ddh.benThu'
+const docThu = () => {
+  try {
+    return localStorage.getItem(KHOA_BEN_THU) === '1'
+  } catch {
+    return false // chặn lưu trữ ⇒ mở rộng như cũ
+  }
+}
+
 export default function ThanhBenTrai() {
   const screen = useAppStore((s) => s.screen)
   const setScreen = useAppStore((s) => s.setScreen)
@@ -101,6 +113,33 @@ export default function ThanhBenTrai() {
   const sang = mucDangSang(screen, hoa2)
   const caMo = useSoDemGv((s) => s.caMo)
   const canThayChua = useSoDemGv((s) => s.canThayChua)
+  const [thu, setThu] = useState(docThu)
+  // trước lần vẽ đầu (không nháy bản mở rộng rồi mới thu)
+  useLayoutEffect(() => {
+    document.documentElement.toggleAttribute('data-ben-thu', thu)
+  }, [thu])
+  const nhanThu = thu ? 'Mở rộng thanh bên' : 'Thu gọn thanh bên'
+  const nutThu = document.documentElement.dataset.trong === 'gv' && (
+    // mặc áo một mục thanh bên (`ben-trai-muc`: cao 44, hiện/ẩn chữ theo dải) — không phải đích điều hướng, không có `aria-current`
+    <button
+      type="button"
+      className="ben-trai-muc ben-trai-thu"
+      aria-expanded={!thu}
+      aria-label={nhanThu}
+      title={nhanThu}
+      onClick={() => {
+        setThu(!thu)
+        try {
+          localStorage.setItem(KHOA_BEN_THU, thu ? '0' : '1')
+        } catch {
+          /* chỉ mất phần nhớ */
+        }
+      }}
+    >
+      <ChevronRight size={20} aria-hidden="true" />
+      <span className="ben-trai-ten">Thu gọn</span>
+    </button>
+  )
 
   const nut = (m: MucDieuHuong, phu = false) => {
     const Icon = m.icon
@@ -140,6 +179,7 @@ export default function ThanhBenTrai() {
           <div className="ben-trai-vach" role="separator" />
           {MUC_HOA2_DAY.map((m) => nut(m, true))}
         </div>
+        {nutThu}
       </nav>
     )
   }
@@ -157,6 +197,7 @@ export default function ThanhBenTrai() {
 
       <div className="ben-trai-danh-sach">{MUC_DIEU_HUONG.filter((m) => !m.cuoi).map((m) => nut(m))}</div>
       <div className="ben-trai-cuoi">{MUC_DIEU_HUONG.filter((m) => m.cuoi).map((m) => nut(m))}</div>
+      {nutThu}
     </nav>
   )
 }
