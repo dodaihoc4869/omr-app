@@ -21,7 +21,11 @@ Thầy: «Giữ nguyên hình cầu đi, điều chỉnh lại cảm xúc cho d�
   - Dỗi / bực chỉ ửng má.
   - Cáu / rất cáu: cả bình đổi sắc đỏ sẫm, tròng hồng đỏ, con ngươi nhỏ, rất cáu có ánh đỏ.
   - Nút bấc bung lơ lửng trên ngọn lửa hai lưỡi; dung dịch đỏ dâng.
-- **Chữ khắc 6,022·10²³:** cong theo vai bình ngay dưới cổ, ẩn khi < 64 px.
+- **Chữ 6,022·10²³** (thầy: «chuyển xuống dưới bụng chỗ dung dịch, cho to nổi bật hơn»):
+  - nằm ở phần DUNG DỊCH dưới bụng, cong theo đáy cầu, căn giữa;
+  - cỡ 14,4 (≈ 1,7 lần bản vai bình), trắng 88 % + bóng mảnh;
+  - đứng yên khi dung dịch đỏ dâng, vẫn đọc được trên đỏ (`anh/binh-cau-so-can-canh.jpg`).
+  - Đã thử 48 px: chữ cao ~3,5 px, không đọc được ⇒ chỉ hiện từ 64 px.
 - **Mặt phương án** (chưa gắn trạng thái nào): ngượng · mê · vui nhảy · tự tin.
 - **Ảnh** (Chromium, từ mã thật; chụp lại: `node docs/ban-ve-mol-v2-0111/chup-binh-cau.cjs`):
 

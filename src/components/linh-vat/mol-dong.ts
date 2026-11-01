@@ -6,7 +6,8 @@
 //     + lông mày mềm; miệng nhỏ xinh. Giận KHÔNG răng: mày chau, mắt nheo, miệng khép.
 //   · CÁU / RẤT CÁU: cả bình ĐỔI SẮC đỏ sẫm (nhóm .mol-g4 / .mol-g5 đặt lại biến màu ⇒ cả stop gradient đổi theo), tròng hồng đỏ, con ngươi nhỏ;
 //     NÚT BẤC trên cổ bình bung lên lơ lửng trên NGỌN LỬA (hai lưỡi); dung dịch đỏ dâng. Dỗi / bực: chỉ ửng má.
-//   · Khắc mờ «6,022·10²³» cong theo vai bình ngay dưới cổ (ẩn khi Bi < 64 px: .bi[data-nho] trong mol.css).
+//   · «6,022·10²³» ở phần DUNG DỊCH dưới bụng (thầy: «chuyển xuống dưới bụng chỗ dung dịch, cho to nổi bật hơn»): cong theo đáy cầu, trắng đậm + bóng mảnh,
+//     đứng yên khi dung dịch đỏ dâng (cáu / rất cáu) — ẩn khi Bi < 64 px (.bi[data-nho] trong mol.css; 48 px đã thử: không đọc được).
 // CHỈ CÓ MẶT: hình cú ngọc (lua-dong.ts) chỉ còn là kiểu `Lua` + đường lùi; Bi.tsx và mọi chỗ gọi <Bi …> không đổi. Mảnh NẠP LƯỜI (chỉ Bi.tsx gọi import('./mol-dong')).
 //   · Cảm xúc: vui · khen · chào · nghĩ · ngạc nhiên · buồn · ngủ + 4 mức giận theo cấp: 2 dỗi · 3 bực · 4 CÁU · 5 RẤT CÁU.
 //     Mặt phương án (thầy chọn sau, chưa gắn trạng thái nào): ngượng · mê · vui nhảy · tự tin.
@@ -141,10 +142,10 @@ export function svgMol(mat: MatMol, goc: GocLua = 'truoc'): string {
     <circle cx="100" cy="120" r="76" fill="url(#${g}q)"/>
     <g clip-path="url(#${g})"><g class="mol-nuoc-cam"><path d="M20 ${S} C50 ${S - 7} 70 ${S + 5} 100 ${S} C130 ${S - 5} 150 ${S + 6} 182 ${S - 1} V212 H20Z" fill="url(#${g}l)"/>
       <path d="M20 ${S} C50 ${S - 7} 70 ${S + 5} 100 ${S} C130 ${S - 5} 150 ${S + 6} 182 ${S - 1}" class="m-mat-nuoc" stroke-width="2.6"/>
-      <circle cx="74" cy="${S + 16}" r="4" class="m-bot mol-bot b1"/><circle cx="124" cy="${S + 20}" r="2.8" class="m-bot mol-bot b3"/>${soi.them.replace(/cy="(\d+)"/g, (_, y: string) => `cy="${Number(y) + soi.dy}"`)}</g>
+      <circle cx="54" cy="${S + 10}" r="3.6" class="m-bot mol-bot b1"/><circle cx="148" cy="${S + 12}" r="2.6" class="m-bot mol-bot b3"/>${soi.them.replace(/cy="(\d+)"/g, (_, y: string) => `cy="${Number(y) + soi.dy}"`)}</g>
       <path d="M152 162 A76 76 0 0 1 110 195" class="m-anh-vien" stroke-width="4"/></g>
+    <path id="${g}k" d="M56 172 A66 66 0 0 0 144 172" fill="none"/><g class="mol-khac"><text class="m-khac-bong" font-size="14.4" text-anchor="middle" transform="translate(0 1)"><textPath href="#${g}k" startOffset="50%">6,022·10<tspan dy="-5.4" font-size="9.4">23</tspan></textPath></text><text class="m-khac" font-size="14.4" text-anchor="middle"><textPath href="#${g}k" startOffset="50%">6,022·10<tspan dy="-5.4" font-size="9.4">23</tspan></textPath></text></g>
     <ellipse cx="62" cy="70" rx="22" ry="12" fill="url(#${g}h)" transform="rotate(-36 62 70)"/><circle cx="48" cy="96" r="3.4" class="m-sang"/>
-    <path id="${g}k" d="M70 61 A67 67 0 0 1 130 61" fill="none"/><g class="mol-khac"><text class="m-khac-bong" font-size="8.4" text-anchor="middle" transform="translate(0 .7)"><textPath href="#${g}k" startOffset="50%">6,022·10<tspan dy="-3" font-size="5.6">23</tspan></textPath></text><text class="m-khac" font-size="8.4" text-anchor="middle"><textPath href="#${g}k" startOffset="50%">6,022·10<tspan dy="-3" font-size="5.6">23</tspan></textPath></text></g>
     <ellipse cx="47" cy="130" rx="15" ry="9" fill="url(#${g}m)"/><ellipse cx="153" cy="130" rx="15" ry="9" fill="url(#${g}m)"/>
     ${matVe(mat, goc, g)}
     <circle cx="100" cy="128" r="7" class="m-cam"/><circle cx="97.6" cy="125.6" r="2.2" class="m-camS"/>

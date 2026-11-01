@@ -42,6 +42,7 @@ describe('Mol — hình', () => {
       const x = svgMol(m)
       expect(x, m).not.toMatch(/m-net-t|M\d+ \d+ L\d+ \d+ L\d+ \d+ L\d+ \d+ L\d+ \d+/) // không răng, không zigzag
       expect(x, m).toContain('6,022·10<tspan'); expect(x, m).toContain('class="mol-khac"')
+      expect(x, m).toMatch(/id="molb\d+k" d="M56 172 A66 66 0 0 0 144 172"/) // ở phần dung dịch dưới bụng, cong theo đáy cầu
     }
   })
 })
@@ -90,7 +91,7 @@ describe('Mol — màu, nạp lười, tên', () => {
     const css = readFileSync('src/styles/mol.css', 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
     for (const x of [ts, css]) { expect(x).not.toMatch(/#[0-9a-fA-F]{3,8}\b/); expect(x).not.toMatch(/\b(?:rgba?|hsla?)\(/) }
     for (const k of ['--tr-hs-nut', '--tr-tin', '--tr-chu-y', '--tr-tim', '--tr-sai', '--btg-chu-doan']) expect(css).toContain(`var(${k})`)
-    expect(css).toContain('.bi[data-nho] .mol-svg .mol-khac { display: none; }') // chữ khắc ẩn khi Bi < 64 px
+    expect(css).toContain('.bi[data-nho] .mol-svg .mol-khac { display: none; }') // chữ 6,022·10²³ ẩn khi Bi < 64 px
     expect(readFileSync('src/components/linh-vat/Bi.tsx', 'utf8')).toContain("data-nho={size < 64 ? '' : undefined}")
     expect(css).toMatch(/prefers-reduced-motion: reduce\) \{ \.mol-svg \* \{ animation: none !important; \} \}/)
     expect(css).toMatch(/html\.may-yeu \.mol-svg \* \{ animation: none !important; \}/)

@@ -34,6 +34,7 @@
   --mol-lua1: color-mix(in oklab, var(--tr-sai) 55%, var(--tr-chu-y));
   --mol-lua2: color-mix(in oklab, var(--tr-sao) 60%, var(--tr-chu-y));
   --mol-bong: color-mix(in srgb, var(--tr-hs-day) 24%, transparent);
+  --mol-khac-bong: color-mix(in oklab, var(--tr-hs-day) 45%, var(--btg-chu-doan));
   --mol-sao: var(--tr-sao);
   --mol-tim: var(--tr-sai);
   --mol-not: var(--tr-tim);
@@ -109,10 +110,10 @@
 .mol-svg .m-net-not { fill: none; stroke: var(--mol-not); stroke-linecap: round; }
 .mol-svg .m-mat-nuoc { fill: none; stroke: var(--mol-t); opacity: 0.5; stroke-linecap: round; }
 .mol-svg .m-anh-vien { fill: none; stroke: var(--mol-x-sang); opacity: 0.4; stroke-linecap: round; }
-.mol-svg .m-khac { fill: var(--mol-t); opacity: 0.62; font-family: inherit; font-weight: 800; letter-spacing: 0.3px; }
-.mol-svg .m-khac-bong { fill: var(--mol-x-toi); opacity: 0.45; font-family: inherit; font-weight: 800; letter-spacing: 0.3px; }
+.mol-svg .m-khac { fill: var(--mol-t); opacity: 0.88; font-family: inherit; font-weight: 800; letter-spacing: 0.4px; }
+.mol-svg .m-khac-bong { fill: var(--mol-khac-bong); opacity: 0.5; font-family: inherit; font-weight: 800; letter-spacing: 0.4px; }
 .mol-svg .mol-chu { font-family: inherit; font-weight: 800; }
-/* Chữ khắc 6,022·10²³ chỉ hiện từ 64 px (Bi.tsx gắn data-nho khi nhỏ hơn). */
+/* Chữ 6,022·10²³ ở bụng chỉ hiện từ 64 px (Bi.tsx gắn data-nho khi nhỏ hơn; thử 48 px: chữ cao ~3,5 px, không đọc được). */
 .bi[data-nho] .mol-svg .mol-khac { display: none; }
 
 /* ── Chuyển động (CSS; giảm chuyển động / máy yếu / Mol tĩnh ⇒ tắt) ── */

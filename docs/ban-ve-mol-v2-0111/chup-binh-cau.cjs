@@ -69,15 +69,17 @@ const q = new URLSearchParams(location.search)
 const m = document.getElementById('m')
 const cu5 = ['vui', 'khen', 'buon', 'cau', 'ratCau']
 m.innerHTML =
- '<section class="khoi" id="cu-moi"><h2>Mol cũ (đang chạy, #713) · Mol mới (mã thật nhánh này)</h2><p>Giữ hình cầu + cổ bình. Mới: thân chàm sáng mịn, mắt tròn to, mí + mày nói cảm xúc, má hồng phấn, khắc 6,022·10²³ ở vai bình, giận đổi sắc + nút bấc bung trên lửa.</p>' +
+ '<section class="khoi" id="cu-moi"><h2>Mol cũ (đang chạy, #713) · Mol mới (mã thật nhánh này)</h2><p>Giữ hình cầu + cổ bình. Mới: thân chàm sáng mịn, mắt tròn to, mí + mày nói cảm xúc, má hồng phấn, 6,022·10²³ trắng nổi ở dung dịch dưới bụng, giận đổi sắc + nút bấc bung trên lửa.</p>' +
  '<div class="luoi" style="grid-template-columns:90px repeat(5,1fr)"><span class="nhan-hang">Cũ</span>' + cu5.map((k) => '<figure>' + bi(k, 150, { cu: 1 }) + k + '</figure>').join('') +
  '<span class="nhan-hang">Mới</span>' + cu5.map((k) => '<figure>' + bi(k, 150) + k + '</figure>').join('') + '</div></section>' +
  '<section class="khoi" id="cam-xuc"><h2>Mol bình cầu · 11 mặt + 4 mặt phương án</h2><p>Cười = mí dưới cong; chán / giận = mí trên sụp nghiêng; mày mềm; miệng nhỏ. Giận không răng. Cáu, rất cáu: đổi sắc đỏ sẫm, tròng hồng đỏ, nút bấc bung trên lửa, dung dịch đỏ dâng.</p>' +
  '<div class="luoi" style="grid-template-columns:repeat(8,1fr)">' + MAT.map(([k, t, moi]) => '<figure>' + bi(k, 128) + '<span' + (moi ? ' class="moi-nhan"' : '') + '>' + t + (moi ? ' · mới' : '') + '</span></figure>').join('') + '</div></section>' +
  '<section class="khoi" id="mau"><h2>Ba tổ hợp màu đã thử (token có sẵn)</h2><p>1 · chàm sáng --tr-hs-nut + ngọc lam --tr-tin (CHỌN) · 2 · ngọc lam --tr-tin + hồng --tr-tim · 3 · chàm nhạt --tr-hs + cam --tr-chu-y (gần Mol cũ).</p>' +
  '<div class="luoi" style="grid-template-columns:repeat(3,1fr)">' + ['', 'thu2', 'thu3'].map((c, i) => '<figure class="' + c + '"><div style="display:flex;gap:4px">' + ['vui', 'khen', 'cau'].map((k) => bi(k, 118)).join('') + '</div>' + ['1 · chàm sáng + ngọc lam (chọn)', '2 · ngọc lam + hồng', '3 · chàm nhạt + cam'][i] + '</figure>').join('') + '</div></section>' +
- '<section class="khoi" id="co-nho"><h2>Cỡ nhỏ · 28 / 40 / 64 px (toàn hình) và vòng 40 px · nền ' + (matchMedia('(prefers-color-scheme: dark)').matches ? 'tối' : 'sáng') + '</h2><p>Chữ khắc 6,022·10²³ chỉ hiện từ 64 px.</p>' +
- '<div class="luoi" style="grid-template-columns:repeat(5,1fr)">' + ['vui', 'khen', 'buon', 'cau', 'ratCau'].map((k) => '<figure><div style="display:flex;align-items:flex-end;gap:10px">' + [28, 40, 64].map((w) => bi(k, w)).join('') + '<span class="vong" style="display:inline-block;padding:3px;border-radius:50%;background:var(--tr-hs)">' + nua(k, 40) + '</span></div>' + k + '</figure>').join('') + '</div></section>'
+ '<section class="khoi" id="so"><h2>Cận cảnh 6,022·10²³ ở dung dịch dưới bụng · vui / cáu / rất cáu</h2><p>Chữ trắng 88 % + bóng mảnh, cong theo đáy cầu, đứng yên khi dung dịch đỏ dâng. Hàng dưới: cỡ thật 48 (ẩn chữ) / 64 / 96 px.</p>' +
+ '<div class="luoi" style="grid-template-columns:repeat(3,1fr)">' + ['vui', 'cau', 'ratCau'].map((k) => '<figure><span class="bi lua" style="width:330px;height:160px;overflow:hidden;border-radius:14px"><svg class="lua-svg mol-svg" viewBox="38 128 124 60" data-mat="' + k + '" data-tinh style="width:330px;height:160px;overflow:hidden">' + MOL.svgMol(k) + '</svg></span><div style="display:flex;align-items:flex-end;gap:12px;margin-top:6px">' + [48, 64, 96].map((w) => bi(k, w)).join('') + '</div>' + k + '</figure>').join('') + '</div></section>' +
+ '<section class="khoi" id="co-nho"><h2>Cỡ nhỏ · 28 / 40 / 48 / 64 px (toàn hình) và vòng 40 px · nền ' + (matchMedia('(prefers-color-scheme: dark)').matches ? 'tối' : 'sáng') + '</h2><p>Chữ 6,022·10²³ ở bụng hiện từ 64 px (đã thử 48 px: chữ cao ~3,5 px, không đọc được ⇒ ẩn).</p>' +
+ '<div class="luoi" style="grid-template-columns:repeat(5,1fr)">' + ['vui', 'khen', 'buon', 'cau', 'ratCau'].map((k) => '<figure><div style="display:flex;align-items:flex-end;gap:10px">' + [28, 40, 48, 64].map((w) => bi(k, w)).join('') + '<span class="vong" style="display:inline-block;padding:3px;border-radius:50%;background:var(--tr-hs)">' + nua(k, 40) + '</span></div>' + k + '</figure>').join('') + '</div></section>'
 // Điện thoại Lộ trình (cáu) + bong bóng trên đầu Mol
 const kiem = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'
 const MX = 206, MY = 330, MW = 150, tam = MX + MW / 2, dinh = MY + (-34 + 26) * (MW * 1.15) / 230, BW = 214, trai = Math.min(Math.max(tam - BW / 2, 12), 390 - 12 - BW)
@@ -113,6 +115,7 @@ async function luu(chup, ten) {
   kq.push(await luu((o) => s.locator('#cu-moi').screenshot(o), 'binh-cau-cu-moi.jpg'))
   kq.push(await luu((o) => s.locator('#cam-xuc').screenshot(o), 'binh-cau-cam-xuc-sang.jpg'))
   kq.push(await luu((o) => s.locator('#mau').screenshot(o), 'binh-cau-mau.jpg'))
+  kq.push(await luu((o) => s.locator('#so').screenshot(o), 'binh-cau-so-can-canh.jpg'))
   await s.close()
   const t = await mo(true)
   kq.push(await luu((o) => t.locator('#cam-xuc').screenshot(o), 'binh-cau-cam-xuc-toi.jpg'))
