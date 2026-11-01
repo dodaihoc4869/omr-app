@@ -78,7 +78,7 @@
 [data-trong='gv'] .bbc-che { position: fixed; inset: 0; z-index: 60; background: var(--tr-nen); }
 [data-trong='gv'] .bbc-man { position: fixed; inset: 0; z-index: 60; display: flex; flex-direction: column; background: var(--tr-nen); color: var(--tr-chu); --bb-c: var(--tr-chinh); --bb-nhat: var(--tr-chinh-nhat); --bb-chu: var(--tr-chinh-chu); }
 [data-trong='gv'] .bbc-tren { flex: none; display: flex; align-items: center; gap: 12px; padding: 10px 20px; border-bottom: 1px solid var(--tr-vien); background: var(--tr-mat); }
-[data-trong='gv'] .bbc-ve { min-height: 44px; display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent; color: var(--tr-chu-2); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+[data-trong='gv'] .bbc-ve { min-height: 44px; display: inline-flex; flex-shrink: 0; white-space: nowrap; align-items: center; gap: 6px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent; color: var(--tr-chu-2); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
 [data-trong='gv'] .bbc-ve:hover { background: var(--tr-mat-2); }
 [data-trong='gv'] .bbc-tren-chu { min-width: 0; }
 [data-trong='gv'] .bbc-tren h1 { margin: 0; font-size: 18px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

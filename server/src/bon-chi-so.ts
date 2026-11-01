@@ -225,9 +225,11 @@ export function tinhBon(v: DauVaoBon): KetQuaBon {
   if (kyMau) theCh.push({ ma: 'ky', tieu: 'Câu nào cũng làm thật', lon: `${soLieu.ky}%`, nhoSo: 'câu làm kỹ', so: soLieu.ky ?? undefined, chu: 'Câu chọn khi chưa đọc hết đề mà sai KHÔNG được tính vào Chăm.' })
   theCh.push({ ma: 'chuoi', tieu: 'Chuỗi ngày đủ mức', lon: `${chuoi}`, nhoSo: 'ngày liền' })
   const theLu: TheTho[] = []
+  // lần cuối học = ngày muộn nhất giữa sổ học (su_kien_hoc) và các ngày trong cửa sổ có làm câu — sổ trống mà em có làm ⇒ không được nói «chưa làm câu nào»
+  const lanCuoi = [v.lanCuoiHoc, ...ngay.filter((n) => n.lam > 0).map((n) => n.ngay)].filter(Boolean).sort().pop() ?? ''
   const khong = ngay.length - coLam
   if (ngay.length) theLu.push({ ma: 'ngayCoLam', tieu: khong ? 'Ngày không làm câu nào' : 'Ngày có làm', lon: `${khong ? khong : coLam}/${ngay.length}`, nhoSo: 'ngày', so: soLieu.ngayCoLam ?? undefined, chu: khong ? `Có làm ${coLam}/${ngay.length} ngày, đủ mức ${du} ngày.` : undefined })
-  if (v.lanCuoiHoc) theLu.push({ ma: 'lanCuoi', tieu: 'Lần cuối học', lon: ngayNgan(v.lanCuoiHoc), nhoSo: cachNgay(v.lanCuoiHoc, v.den) > 0 ? `${cachNgay(v.lanCuoiHoc, v.den) + 1} ngày trước` : 'hôm qua' })
+  if (lanCuoi) theLu.push({ ma: 'lanCuoi', tieu: 'Lần cuối học', lon: ngayNgan(lanCuoi), nhoSo: lanCuoi > v.den ? 'hôm nay' : cachNgay(lanCuoi, v.den) > 0 ? `${cachNgay(lanCuoi, v.den) + 1} ngày trước` : 'hôm qua' })
   else theLu.push({ ma: 'lanCuoi', tieu: 'Lần cuối học', lon: 'chưa có', nhoSo: 'em chưa làm câu nào' })
   if (giao) theLu.push({ ma: 'cauLam', tieu: 'Câu được giao chưa làm', lon: `${Math.max(0, giao - daLam)}/${giao}`, nhoSo: 'câu', so: Math.min(100, soLieu.cauLam ?? 0) })
   if (sc.tong - sc.sua > 0) theLu.push({ ma: 'boMac', tieu: 'Câu sai chưa sửa', lon: `${sc.tong - sc.sua}`, nhoSo: 'câu', so: soLieu.boMac ?? undefined })
@@ -239,13 +241,13 @@ export function tinhBon(v: DauVaoBon): KetQuaBon {
     ht: sc.tong >= 3 ? `Sửa đúng ${nhan(`${sc.sua}/${sc.tong}`)} câu từng sai` : soLieu.ky !== null ? `Đọc kỹ ${nhan(`${soLieu.ky}%`)} lượt` : '',
     dp: bcDp,
     ch: `Đủ mức ${nhan(`${du}/${ngay.length}`)} ngày${daLam ? ` · ${daLam} câu` : ''}`,
-    lu: khong >= ngay.length && ngay.length ? `${nhan(`${khong}/${ngay.length}`)} ngày không làm${v.lanCuoiHoc ? ` · lần cuối ${ngayNgan(v.lanCuoiHoc)}` : ''}` : khong ? `${nhan(`${khong}/${ngay.length}`)} ngày không làm` : `Làm ${nhan(`${daLam}/${giao}`)} câu được giao`,
+    lu: khong >= ngay.length && ngay.length ? `${nhan(`${khong}/${ngay.length}`)} ngày không làm${lanCuoi ? ` · lần cuối ${ngayNgan(lanCuoi)}` : ''}` : khong ? `${nhan(`${khong}/${ngay.length}`)} ngày không làm` : `Làm ${nhan(`${daLam}/${giao}`)} câu được giao`,
   }
   const kl: Record<MaBang, string> = {
-    dp: [`Em làm ${du}/${ngay.length} ngày đủ mức`, theDp.slice(0, 2).map((t) => t.ma === 'voi' ? `${nhan(`${soLieu.voi}%`)} số câu em chọn đáp án khi chưa kịp đọc hết đề và sai ${voiSai.length}/${voi.length} trong số đó` : t.ma === 'lap' ? `có ${nhan(`${lap.so} lần`)} bấm cùng một chữ từ 6 câu liền` : t.ma === 'lech' ? `luyện tập đúng ${tron((dungLuyen ?? 0) * 100)}% nhưng kiểm tra cá nhân chỉ ${nhan(so1(ktTB ?? 0))}` : t.ma === 'boMac' ? `${nhan(`${sc.tong - sc.sua}/${sc.tong}`)} câu sai để đó không sửa` : `${t.tieu.toLowerCase()}: ${nhan(t.lon)}`).join('; ')].filter(Boolean).join(' nhưng làm cho có: ') + '.',
+    dp: [du ? `Em làm ${du}/${ngay.length} ngày đủ mức` : 'Em', theDp.slice(0, 2).map((t) => t.ma === 'voi' ? `${nhan(`${soLieu.voi}%`)} số câu em chọn đáp án khi chưa kịp đọc hết đề và sai ${voiSai.length}/${voi.length} trong số đó` : t.ma === 'lap' ? `có ${nhan(`${lap.so} lần`)} bấm cùng một chữ từ 6 câu liền` : t.ma === 'lech' ? `luyện tập đúng ${tron((dungLuyen ?? 0) * 100)}% nhưng kiểm tra cá nhân chỉ ${nhan(so1(ktTB ?? 0))}` : t.ma === 'boMac' ? `${nhan(`${sc.tong - sc.sua}/${sc.tong}`)} câu sai để đó không sửa` : `${t.tieu.toLowerCase()}: ${nhan(t.lon)}`).join('; ')].filter(Boolean).join(' nhưng làm cho có: ').replace(/^Em nhưng làm cho có/, 'Em làm cho có') + '.',
     ht: `Em học thật: ${[sc.tong >= 3 ? `sửa đúng ${nhan(`${sc.sua}/${sc.tong}`)} câu từng sai` : '', soLieu.ky !== null ? `đọc kỹ đề (${nhan(`${soLieu.ky}%`)} lượt đủ thời gian)` : '', ktTB !== null && !lechKt ? `kiểm tra cá nhân ${nhan(so1(ktTB))} khớp mức luyện tập ${tron((dungLuyen ?? 0) * 100)}%` : ''].filter(Boolean).join(', ')}.`,
     ch: `Em đủ mức ${nhan(`${du}/${ngay.length} ngày`)}, làm ${nhan(`${daLam} câu`)} (mức giao ${giao})${soLieu.ky !== null ? `, ${nhan(`${soLieu.ky}%`)} số câu làm kỹ` : ''}; chuỗi ngày đủ mức hiện tại ${nhan(`${chuoi} ngày`)}.`,
-    lu: `${khong ? `${nhan(`${khong}/${ngay.length} ngày`)} gần nhất em không làm câu nào` : `Em có làm nhưng chỉ đủ mức ${nhan(`${du}/${ngay.length} ngày`)}`}${v.lanCuoiHoc ? `; lần cuối em học là ${nhan(ngayNgan(v.lanCuoiHoc))}` : '; em chưa làm câu nào'}. ${nhan(`${Math.max(0, giao - daLam)} câu`)} được giao chưa làm${sc.tong - sc.sua > 0 ? `, ${nhan(`${sc.tong - sc.sua} câu sai`)} vẫn để nguyên` : ''}.`,
+    lu: `${khong ? `${nhan(`${khong}/${ngay.length} ngày`)} gần nhất em không làm câu nào` : `Em có làm nhưng chỉ đủ mức ${nhan(`${du}/${ngay.length} ngày`)}`}${lanCuoi ? `; lần cuối em học là ${nhan(ngayNgan(lanCuoi))}` : '; em chưa làm câu nào'}. ${nhan(`${Math.max(0, giao - daLam)} câu`)} được giao chưa làm${sc.tong - sc.sua > 0 ? `, ${nhan(`${sc.tong - sc.sua} câu sai`)} vẫn để nguyên` : ''}.`,
   }
 
   // ───── 14 ngày (cột chồng)

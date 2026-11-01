@@ -120,3 +120,7 @@ Số liệu và tên trong bản vẽ là GIẢ.
 - Cổng: `tests/toc-do-may-chu-lenh-nong-1310.test.ts` (lệnh mới 1 đợt chờ).
 - `npm run build && node scripts/kiem-toc-do-tai.mjs` 0 đỏ (màn Hôm nay nhẹ đi vì bỏ 4 khối); `npm run kiem:mau-giu` 0.
 - Ảnh Chromium 0 lỗi trang, 0 tràn, 0 đích bấm < 44 px.
+
+## Đã build (01/11) — ảnh giao diện THẬT
+- Chụp từ đúng mã `BonBang` / `BangChungBon` với dữ liệu GIẢ (30 em tên giả) đi qua đúng bộ máy máy chủ `bon-chi-so.ts`: `anh/that-bon-may-tinh-light.jpg`, `anh/that-bon-may-tinh-dark.jpg`, `anh/that-bc-may-tinh-light.jpg`, `anh/that-bon-doc-light.jpg`, `anh/that-bc-doc-dark.jpg`. Không tràn ngang ở 390 px.
+- Sửa khi soát ảnh thật: (1) «Lần cuối học» lấy ngày muộn nhất giữa sổ học và các ngày có làm trong 14 ngày — không còn nói «em chưa làm câu nào» khi em có làm; (2) Đối phó mà 0 ngày đủ mức ⇒ «Em làm cho có: …»; (3) nút «Hôm nay» trên điện thoại không xuống dòng.
