@@ -1,0 +1,56 @@
+<!doctype html>
+<!-- BẢN VẼ «Một trang về con» — app phụ huynh /ph (thầy 01/11). DỮ LIỆU GIẢ, TÊN GIẢ. Một trang, không cuộn ở mọi khổ; chi tiết mở bằng tấm.
+     ?con=chua-tot  ⇒ hồ sơ con «chưa tốt» (Đối phó cao + Lười)      #tam=ht|dp|ch|lu|ca|nen  ⇒ mở sẵn tấm chi tiết (để chụp ảnh)
+     Đặc tả: DAC-TA.md cùng thư mục. Màu: mau.css (chép token --ph3-* thật). -->
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Một trang về con</title>
+<link rel="stylesheet" href="mau.css">
+<link rel="stylesheet" href="trang.css">
+<link rel="stylesheet" href="o-khoi.css">
+<link rel="stylesheet" href="tam.css">
+</head>
+<body>
+<div class="trang">
+  <header class="dau">
+    <div class="dau__con">
+      <span class="dau__chu-cai" id="chuCai" aria-hidden="true"></span>
+      <div class="dau__ten"><b id="tenCon"></b><span id="lopNgay"></span></div>
+    </div>
+    <a class="nut-nhan" href="#tam=thay" id="nutNhan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5h16v10.5H9l-5 4z"/></svg>Nhắn thầy</a>
+    <button class="nut-tron" type="button" aria-label="Thêm: đổi con, cài giờ học, hướng dẫn"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="18" cy="12" r="1.8"/></svg></button>
+  </header>
+
+  <main class="luoi">
+    <div class="cot cot--1">
+      <section class="o o--ah" id="oHomNay" aria-label="Hôm nay của con"></section>
+      <button class="o o--thay" type="button" id="oThay" data-tam="thay"></button>
+      <button class="o o--nen" type="button" id="oNen" data-tam="nen"></button>
+    </div>
+    <div class="cot cot--2">
+      <section class="o-bon" id="oBon" aria-label="Bốn số đo cách con học"></section>
+    </div>
+    <div class="cot cot--3">
+      <button class="o o--diem" type="button" id="oDiem" data-tam="ca"></button>
+      <section class="o o--yeu" id="oYeu" aria-label="Dạng con cần luyện thêm"></section>
+      <section class="o o--sap" id="oSap" aria-label="Việc sắp tới"></section>
+    </div>
+  </main>
+</div>
+
+<div class="man-che" id="manChe" hidden></div>
+<aside class="tam" id="tam" role="dialog" aria-modal="true" aria-labelledby="tamTen" hidden>
+  <div class="tam__dau">
+    <span class="tam__keo" aria-hidden="true"></span>
+    <h2 id="tamTen"></h2>
+    <button class="nut-tron" type="button" id="tamDong" aria-label="Đóng"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" class="net"/></svg></button>
+  </div>
+  <div class="tam__than" id="tamThan"></div>
+</aside>
+
+<script src="du-lieu.js"></script>
+<script src="ve.js"></script>
+</body>
+</html>

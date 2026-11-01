@@ -1,0 +1,87 @@
+/* BẢN VẼ «Một trang về con» — KHUNG TRANG + BỐ CỤC theo khổ. Luật: trang cao đúng 100dvh, KHÔNG cuộn; ô nào thiếu chỗ thì co / ẩn dòng phụ,
+ * không bao giờ đẩy trang dài ra. Chi tiết sâu nằm trong tấm (tam.css).
+ *   Dọc (< 640 px rộng):         một cột hai nửa — Hôm nay · 4 số đo · [Điểm | Luyện thêm] · [Sắp tới | Thầy nhắn] · Nên làm gì
+ *   Ngang / Z Fold mở / máy tính: ba cột — [Hôm nay, Thầy nhắn, Nên làm gì] · [4 số đo] · [Điểm, Luyện thêm, Sắp tới] */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: var(--ph3-nen); color: var(--ph3-chu);
+  font-family: var(--ph3-phong); font-size: var(--t-than); line-height: 1.4;
+  -webkit-font-smoothing: antialiased; overflow: hidden;
+}
+button, a { font: inherit; color: inherit; background: none; border: 0; text-align: left; text-decoration: none; cursor: pointer; touch-action: manipulation; }
+ul, ol { list-style: none; }
+svg { display: block; }
+.bt { width: 18px; height: 18px; flex: none; fill: currentColor; }
+.net, .bt .net { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.so-hang { font-variant-numeric: tabular-nums; }
+:focus-visible { outline: 3px solid var(--ph3-xd); outline-offset: 2px; border-radius: 12px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+.trang {
+  height: 100vh; height: 100dvh; max-width: 1400px; margin: 0 auto;
+  display: flex; flex-direction: column;
+  padding: 0 max(12px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+}
+
+/* ── ĐẦU TRANG: con + Nhắn thầy (một nút chính duy nhất) + Thêm */
+.dau { flex: none; display: flex; align-items: center; gap: var(--k2); min-height: 56px; padding-top: env(safe-area-inset-top); }
+.dau__con { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; }
+.dau__chu-cai { width: 40px; height: 40px; border-radius: 20px; flex: none; display: grid; place-items: center; background: var(--ph3-xd-nen); color: var(--ph3-xd-dam); font-size: 14px; font-weight: 800; }
+.dau__ten { min-width: 0; display: flex; flex-direction: column; }
+.dau__ten b { font-size: var(--t-the); font-weight: 750; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dau__ten span { font-size: 12.5px; color: var(--ph3-chu-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nut-nhan { flex: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 16px; border-radius: 22px; background: var(--ph3-xd); color: var(--ph3-mat); font-size: 14px; font-weight: 700; white-space: nowrap; }
+.nut-nhan svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; }
+.nut-tron { flex: none; width: 44px; height: 44px; border-radius: 22px; display: grid; place-items: center; background: var(--ph3-mat-2); color: var(--ph3-chu-2); }
+.nut-tron svg { width: 22px; height: 22px; fill: currentColor; }
+
+/* ── LƯỚI — mặc định: điện thoại dọc */
+.luoi {
+  flex: 1; min-height: 0; display: grid; gap: 7px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+  grid-template-areas: "ah ah" "bon bon" "diem yeu" "sap thay" "nen nen";
+}
+.cot { display: contents; }
+#oHomNay { grid-area: ah; } #oBon { grid-area: bon; } #oDiem { grid-area: diem; } #oYeu { grid-area: yeu; }
+#oSap { grid-area: sap; } #oThay { grid-area: thay; } #oNen { grid-area: nen; }
+
+/* Chữ chỉ hiện ở khổ hẹp / khổ rộng */
+.chi-rong { display: none; }
+@media (max-width: 419px) { .dau__chu-cai { display: none; } }
+/* Điện thoại thấp (thanh địa chỉ, Z Fold gập): bớt dòng phụ, không bớt thông tin chính */
+@media (max-width: 639px) and (max-height: 820px) {
+  .ah__phu { display: none !important; }
+}
+@media (max-width: 639px) and (max-height: 740px) {
+  .bon__dau span, .ah__tren { display: none !important; }
+  .luoi { gap: 6px; }
+}
+
+/* ── BA CỘT: ngang, Z Fold mở, máy tính bảng, máy tính */
+@media (min-width: 640px) {
+  .chi-rong { display: inline; }
+  .chi-hep { display: none; }
+  .luoi { grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); grid-template-areas: none; gap: 12px; }
+  .cot { display: flex; flex-direction: column; gap: 12px; min-height: 0; min-width: 0; }
+  #oHomNay { flex: 1 1 auto; }
+  #oBon { flex: 1; }
+  #oDiem { flex: 1 1 auto; }
+}
+@media (min-width: 1100px) and (min-height: 760px) {
+  .trang { padding: 0 32px 24px; }
+  .dau { min-height: 80px; }
+  .dau__chu-cai { width: 48px; height: 48px; border-radius: 24px; font-size: 16px; }
+  .dau__ten b { font-size: 20px; }
+  .dau__ten span { font-size: 14px; }
+  .luoi, .cot { gap: 16px; }
+  .luoi { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) minmax(0, 1fr); }
+}
+/* Ngang thấp (điện thoại xoay ngang): đầu trang gọn */
+@media (min-width: 640px) and (max-height: 500px) {
+  .dau { min-height: 50px; }
+  .dau__chu-cai { display: none; }
+  .luoi, .cot { gap: 8px; }
+  .trang { padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+}
