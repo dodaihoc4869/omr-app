@@ -34,7 +34,8 @@ export function moKenhDay(token: string): () => void {
   }
   // THẦY GIAO BÀI MỚI (tin `k: goi`, thầy 01/11): phần luyện hôm nay vừa xếp lại ⇒ tải lại NGAY gói cả ngày (câu + đáp án đã khoá) — không chờ hết chặng. `luon` =
   // bỏ nhịp 10 phút. Nối lại sau khi mất kết nối ⇒ tải theo nhịp thường (tin lúc mất kết nối không tới).
-  const napGoi = (luon: boolean) => { void import('../components/hoc-tap/mo-chang-truoc').then((m) => m.napGoiNgay(token, undefined, Date.now(), luon)).catch(() => {}) }
+  // Qua mảnh màn làm bài (đã nạp sẵn ở Lộ trình để mở chặng tức thì) — không tách thêm mảnh mới (giữ trần precache).
+  const napGoi = (luon: boolean) => { void import('../components/hoc-tap/ManLamBaiTap').then((m) => m.napGoiNgay(token, undefined, Date.now(), luon)).catch(() => {}) }
   async function noi(): Promise<void> {
     if (dung || ws || dangNoi || an()) return
     dangNoi = true

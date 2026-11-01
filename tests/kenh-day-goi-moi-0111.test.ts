@@ -5,7 +5,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 const napGoiNgay = vi.fn(async () => {})
-vi.mock('../src/components/hoc-tap/mo-chang-truoc', () => ({ napGoiNgay }))
+vi.mock('../src/components/hoc-tap/ManLamBaiTap', () => ({ napGoiNgay }))
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu.test' }))
 import { moKenhDay, SU_KIEN_DOI } from '../src/lib/kenh-day'
 
