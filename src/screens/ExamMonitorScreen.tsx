@@ -49,7 +49,7 @@ import { demCauDaLam, tongSoCauCa } from '../lib/con-lai-ca'
 import './ca-thi-m3.css'
 // CA THI 28/09 (docs/ban-ve-ca-thi-2809): đầu màn Theo dõi, màn Kết thúc ca, Báo cáo chi tiết — THAY khối gập BaoCaoCaLop + trang BaoCaoMotEm cũ.
 import TheoDoiCa, { type EmTheoDoi } from '../components/ca-thi/TheoDoiCa'
-import { xepCauChuaCa } from '../lib/chieu-chua-ca'
+import { demConTrongGio, xepCauChuaCa } from '../lib/chieu-chua-ca'
 import { dungToChuaCa } from '../components/ca-thi/dung-to-chua-ca'
 // CHIẾU CHỮA BÀI SAU CA (thầy chốt 01/11): khung xem tờ chiếu nạp lười — chỉ khi thầy bấm nút.
 const KhungXemPhieu = lazy(() => import('../components/KhungXemPhieu'))
@@ -2112,9 +2112,11 @@ export default function ExamMonitorScreen() {
               onMoEm={(sbd) => setSbdHoSo(sbd)}
               emChuaNop={dsEm.filter((e) => e.moiNhat.trangThai === 'dang_lam' || e.moiNhat.trangThai === 'duoc_duyet_lai').map((e) => ({ sbd: e.sbd, hoTen: e.hoTen }))}
               chieu={(() => {
-                const conLam = dsEm.filter((e) => e.moiNhat.trangThai === 'dang_lam' || e.moiNhat.trangThai === 'duoc_duyet_lai').length
+                // Màn này chỉ hiện khi ca ĐÃ ĐÓNG (thầy 01/11: «học sinh nộp hết ca này rồi nhưng vẫn báo còn 1 em đang làm»): «được duyệt thi lại» là CHỜ
+                // thi lại, không phải đang làm; lượt bỏ dở đã hết giờ cũng không làm tiếp được. Chỉ cảnh báo em còn TRONG GIỜ làm bài thật.
+                const conLam = demConTrongGio(dsEm.map((e) => e.moiNhat), gioMayChu())
                 const ly = !teacherBank || teacherBank.length === 0 ? 'Máy này chưa có đề có đáp án của ca' : !cauChuaCa ? 'Đang tổng hợp…' : !cauChuaCa.coBang ? 'Chưa có bảng chấm từng câu của ca này' : cauChuaCa.ds.length === 0 ? 'Cả lớp đúng hết · không có câu cần chữa' : ''
-                return { soCau: cauChuaCa?.ds.length ?? 0, ly, canhBao: conLam > 0 ? `${conLam} em còn đang làm — chiếu lúc này các em ấy thấy đề và lời giải` : '', dang: dangDungChua }
+                return { soCau: cauChuaCa?.ds.length ?? 0, ly, canhBao: conLam > 0 ? `${conLam} em còn trong giờ làm bài — chiếu lúc này các em ấy thấy đề và lời giải` : '', dang: dangDungChua }
               })()}
               onChieu={() => void moChieuChua()}
             />

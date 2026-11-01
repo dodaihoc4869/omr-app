@@ -100,3 +100,17 @@ describe('tờ chiếu chữa bài', () => {
     expect(kq.html).toContain('<li>Văn An</li>')
   })
 })
+
+describe('cảnh báo «còn trong giờ làm bài» (thầy 01/11: nộp hết rồi vẫn báo còn 1 em đang làm)', () => {
+  it('chỉ đếm lượt đang làm còn hạn giờ; «được duyệt thi lại» và lượt bỏ dở đã hết giờ không tính', async () => {
+    const { demConTrongGio } = await import('../src/lib/chieu-chua-ca')
+    const now = Date.parse('2026-11-01T09:00:00Z')
+    expect(demConTrongGio([
+      { trangThai: 'da_nop', hetGioLuc: '2026-11-01T09:30:00Z' },
+      { trangThai: 'duoc_duyet_lai', hetGioLuc: '2026-11-01T09:30:00Z' },
+      { trangThai: 'dang_lam', hetGioLuc: '2026-11-01T08:40:00Z' },
+      { trangThai: 'dang_lam', hetGioLuc: '' },
+    ], now)).toBe(0)
+    expect(demConTrongGio([{ trangThai: 'dang_lam', hetGioLuc: '2026-11-01T09:05:00Z' }], now)).toBe(1)
+  })
+})
