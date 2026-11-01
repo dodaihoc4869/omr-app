@@ -133,8 +133,8 @@
 .mol-svg .m-khac { fill: var(--mol-t); opacity: 0.88; font-family: inherit; font-weight: 800; letter-spacing: 0.4px; }
 .mol-svg .m-khac-bong { fill: var(--mol-khac-bong); opacity: 0.5; font-family: inherit; font-weight: 800; letter-spacing: 0.4px; }
 .mol-svg .mol-chu { font-family: inherit; font-weight: 800; }
-/* KHUNG TRÒN (vòng Mục tiêu góc phải; Bi khung="tron" + viewBox cắt sát mặt VIEWBOX_MOL_TRON): khung vuông bo tròn, mặt Mol lấp ~96 % đường kính,
-   vòng tiến độ bên ngoài giữ nguyên; cảm xúc + bộ màu theo ngày như mọi chỗ. */
+/* KHUNG TRÒN (vòng Mục tiêu góc phải; Bi khung="tron" + viewBox cắt sát CỤM MẶT VIEWBOX_MOL_TRON): khung vuông bo tròn, mắt mũi miệng đầy khung,
+   thân cầu chỉ là nền màu quanh mặt (không cổ / nút bấc / lửa); vòng tiến độ bên ngoài giữ nguyên; cảm xúc + bộ màu theo ngày như mọi chỗ. */
 .bi.lua[data-khung='tron'] { aspect-ratio: 1; border-radius: 50%; overflow: hidden; background: var(--tr-mat-2); }
 .bi.lua[data-khung='tron'] > .mol-svg { overflow: hidden; }
 /* Chữ 6,022·10²³ ở bụng chỉ hiện từ 64 px (Bi.tsx gắn data-nho khi nhỏ hơn; thử 48 px: chữ cao ~3,5 px, không đọc được). */

@@ -107,13 +107,16 @@ describe('Mol — màu, nạp lười, tên', () => {
 })
 
 describe('Mol trong KHUNG TRÒN (vòng Mục tiêu — thầy 01/11 tối «phóng to mặt Mol đầy với khung tròn»)', () => {
-  it('khung nhìn vuông cắt sát mặt: quả cầu lấp 92–100 % đường kính, mắt ở giữa khung', async () => {
+  it('khung nhìn vuông cắt sát CỤM MẶT (thầy «bỏ luôn cổ đi»): mắt chiếm phần lớn bề ngang, miệng sát mép dưới, vòng tròn nằm trọn trong cầu', async () => {
     const { VIEWBOX_MOL_TRON } = await import('../src/components/linh-vat/mol-dong')
-    const [x, y, w, h] = VIEWBOX_MOL_TRON.split(' ').map(Number)
+    const [x, y, w, h] = VIEWBOX_MOL_TRON.split(' ').map(Number) as [number, number, number, number]
     expect(w).toBe(h)
-    expect(152 / w!).toBeGreaterThanOrEqual(0.92); expect(152 / w!).toBeLessThanOrEqual(1) // cầu bán kính 76
-    expect(Math.abs(x! + w! / 2 - 100)).toBeLessThanOrEqual(1) // giữa ngang
-    expect(Math.abs(y! + h! / 2 - 98)).toBeLessThanOrEqual(3) // tầm mắt (Y = 98) ở giữa dọc
+    expect(Math.abs(x + w / 2 - 100)).toBeLessThanOrEqual(1) // giữa ngang
+    expect((153 - 47) / w).toBeGreaterThanOrEqual(0.85) // hai mắt (viền ngoài 47…153) chiếm ≥ 85 % bề ngang
+    expect(x).toBeLessThanOrEqual(47); expect(x + w).toBeGreaterThanOrEqual(153) // không cắt mất mắt
+    expect(y).toBeGreaterThan(44) // trên đỉnh cầu (y 44) ⇒ không thấy cổ bình / nút bấc / lửa
+    expect(y + h).toBeGreaterThanOrEqual(150); expect(y + h).toBeLessThanOrEqual(172) // miệng (≤ 152) sát mép dưới, chưa tới chữ 6,022 / đáy
+    expect(Math.hypot(x + w / 2 - 100, y + h / 2 - 120) + w / 2).toBeLessThanOrEqual(76) // vòng tròn nội tiếp nằm trọn trong cầu ⇒ nền màu thân tràn khung
   })
   it('chỗ gắn có data-khung="tron" ⇒ Mol dùng khung cắt sát mặt; chỗ khác vẫn toàn thân', async () => {
     const { VIEWBOX_MOL_TRON } = await import('../src/components/linh-vat/mol-dong')

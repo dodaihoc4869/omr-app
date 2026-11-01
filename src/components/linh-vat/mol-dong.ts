@@ -21,9 +21,10 @@ import { boMauMol } from '../../lib/mau-mol-ngay'
 import type { DungGian, GocLua, Lua, TrangThaiLua, TuyChonLua } from './lua-dong'
 
 export const VIEWBOX_MOL = '0 -26 200 230'
-/** KHUNG TRÒN (thầy 01/11 tối «phóng to mặt Mol đầy với khung tròn»; vòng Mục tiêu góc phải — Bi khung="tron"): khung nhìn VUÔNG cắt sát mặt —
- *  quả cầu (tâm 100,120 · bán kính 76) lấp 152 / 158 ≈ 96 % đường kính khung, tâm khung ở tầm mắt (y 98), thấy chút cổ phía trên, cắt đáy + bóng. */
-export const VIEWBOX_MOL_TRON = '21 19 158 158'
+/** KHUNG TRÒN (vòng Mục tiêu góc phải — Bi khung="tron"). Thầy 01/11 tối: «phóng to mặt Mol đầy với khung tròn» rồi «phóng to sát mặt, mặt mắt miệng
+ *  đầy vào khung, bỏ luôn cổ đi» ⇒ khung nhìn VUÔNG cắt sát CỤM MẶT (hai mắt 47…153 ≈ 93 % bề ngang, mày, mũi, má, miệng sát mép dưới). Vòng tròn nội tiếp
+ *  (tâm 100,110 · bán kính 57) nằm trọn trong quả cầu ⇒ thân chỉ còn là nền màu (giận: đỏ sẫm); không cổ, không nút bấc / lửa, không đáy. */
+export const VIEWBOX_MOL_TRON = '43 53 114 114'
 /** Mặt vẽ được của Mol (4 mặt cuối là phương án, chưa gắn trạng thái). */
 export type MatMol = 'vui' | 'khen' | 'chao' | 'nghi' | 'ngac' | 'buon' | 'ngu' | 'doi' | 'buc' | 'cau' | 'ratCau' | 'nguong' | 'me' | 'nhay' | 'tuTin'
 /** Trạng thái cũ của Lửa ⇒ mặt Mol (giữ API: Bi.tsx truyền đúng các trạng thái này). */

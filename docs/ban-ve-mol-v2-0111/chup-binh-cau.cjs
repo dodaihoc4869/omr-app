@@ -82,12 +82,13 @@ m.innerHTML =
    const vong = (ruot) => '<span style="position:relative;display:grid;place-items:center;width:42px;height:42px"><svg viewBox="0 0 52 52" style="position:absolute;inset:0;width:42px;height:42px;transform:rotate(-90deg)">' +
      '<circle cx="26" cy="26" r="22" fill="none" stroke="var(--tr-mat-3)" stroke-width="5"/><circle cx="26" cy="26" r="22" fill="none" stroke="var(--tr-hs)" stroke-width="5" stroke-linecap="round" stroke-dasharray="90 200"/></svg>' + ruot + '</span>'
    const truoc = (m) => vong('<span class="bi lua" data-nho style="width:32px;height:37px"><svg class="lua-svg mol-svg" viewBox="0 -26 200 230" data-mat="' + m + '" data-tinh>' + MOL.svgMol(m) + '</svg></span>')
-   const sau = (m) => vong('<span class="bi lua" data-khung="tron" data-nho style="width:32px"><svg class="lua-svg mol-svg" viewBox="' + MOL.VIEWBOX_MOL_TRON + '" data-mat="' + m + '" data-tinh>' + MOL.svgMol(m) + '</svg></span>')
+   const tronVb = (vb) => (m) => vong('<span class="bi lua" data-khung="tron" data-nho style="width:32px"><svg class="lua-svg mol-svg" viewBox="' + vb + '" data-mat="' + m + '" data-tinh>' + MOL.svgMol(m) + '</svg></span>')
+   const sau1 = tronVb('21 19 158 158'), sau = tronVb(MOL.VIEWBOX_MOL_TRON)
    const MAT5 = ['vui', 'khen', 'buon', 'cau', 'ratCau']
    const hang = (ten, f) => '<span class="nhan-hang">' + ten + '</span>' + MAT5.map((k) => '<figure><div style="display:flex;align-items:center;gap:18px"><div style="zoom:3">' + f(k) + '</div>' + f(k) + '</div>' + k + '</figure>').join('')
    return '<section class="khoi" id="avatar"><h2>Mol trong vòng Mục tiêu (góc phải Lộ trình) · trước / sau · nền ' + (matchMedia('(prefers-color-scheme: dark)').matches ? 'tối' : 'sáng') + '</h2>' +
-     '<p>Sau: khung nhìn cắt sát mặt (' + MOL.VIEWBOX_MOL_TRON + ') — quả cầu lấp ~96 % đường kính, mắt ở giữa, vòng tiến độ giữ nguyên. Mỗi ô: phóng ×3 và cỡ thật.</p>' +
-     '<div class="luoi" style="grid-template-columns:130px repeat(5,1fr)">' + hang('Trước · toàn thân thu nhỏ', truoc) + hang('Sau · cắt sát mặt', sau) + '</div></section>'
+     '<p>Sau 1 (lượt trước): cắt sát quả cầu (21 19 158 158). Sau 2 (thầy «sát mặt, bỏ luôn cổ»): cắt sát cụm mặt (' + MOL.VIEWBOX_MOL_TRON + ') — mắt mũi miệng đầy khung, thân chỉ là nền màu, giận đỏ sẫm; vòng tiến độ giữ nguyên. Mỗi ô: phóng ×3 và cỡ thật.</p>' +
+     '<div class="luoi" style="grid-template-columns:130px repeat(5,1fr)">' + hang('Trước · toàn thân thu nhỏ', truoc) + hang('Sau 1 · cắt sát cầu', sau1) + hang('Sau 2 · cắt sát mặt', sau) + '</div></section>'
  })() +
  '<section class="khoi" id="bo-mau"><h2>Ba bộ màu đổi mỗi ngày (theo ngày Việt Nam, qua 00:00 đổi) · nền ' + (matchMedia('(prefers-color-scheme: dark)').matches ? 'tối' : 'sáng') + '</h2>' +
  '<p>Bộ = số ngày VN mod 3 (src/lib/mau-mol-ngay.ts) · cùng ngày mọi máy cùng màu (giờ máy chủ). Giận đỏ sẫm dùng chung.</p><div class="luoi" style="grid-template-columns:repeat(3,1fr)">' +
