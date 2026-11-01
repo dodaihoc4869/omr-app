@@ -1,0 +1,174 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GV · Bằng chứng của em</title><link rel="stylesheet" href="trong.css">
+<style>
+/* BẢN VẼ 01/11 — BẢNG BẰNG CHỨNG (bấm một em ở 4 bảng Hôm nay). Mẫu chọn bằng #dp · #ht · #ch · #lu. Chỉ dùng var(--…) của trong.css. */
+.bon-so{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 20px}
+.cs{display:flex;flex-direction:column;gap:6px}
+.cs .dau{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.cs .dau span{font-size:13px;font-weight:600;color:var(--chu-2)}
+.cs .dau b{font-size:22px;font-weight:600;line-height:1}
+.cs .dau b small{font-size:12px;color:var(--chu-3);font-weight:500}
+.cs .ray{position:relative;height:8px;border-radius:999px;background:var(--mat-3)}
+.cs .ray i{position:absolute;left:0;top:0;bottom:0;border-radius:inherit;background:var(--c)}
+.cs .ray u{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--chu-3);border-radius:1px}
+.cs .mo{font-size:12px}
+.cs.ht{--c:var(--sao)}.cs.dp{--c:var(--tin)}.cs.ch{--c:var(--dung)}.cs.lu{--c:var(--sai)}
+.cs.nhat .dau b{color:var(--chu-3)}
+.ket{padding:18px 20px;border-radius:var(--bo-2);background:var(--c-nhat);color:var(--chu);font-size:16px;line-height:1.6}
+.ket b{color:var(--c-chu)}
+.ket .nhan{color:var(--c-chu);margin-bottom:6px}
+.bc{display:grid;grid-template-columns:32px minmax(0,1fr);gap:14px;padding:18px 20px;border-top:1px solid var(--vien)}
+.bc:first-of-type{border-top:0}
+.bc .so-tt{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:600;background:var(--c-nhat);color:var(--c-chu)}
+.bc .tieu{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.bc .tieu h4{margin:0;font-size:16px;font-weight:600;line-height:1.4}
+.bc .tieu .lon{font-size:20px;font-weight:600;color:var(--c-chu);white-space:nowrap}
+.bc .tieu .lon small{font-size:13px;font-weight:500;color:var(--chu-2);margin-left:4px}
+.ss{display:grid;grid-template-columns:72px minmax(0,1fr) 54px;gap:10px;align-items:center;font-size:13px;color:var(--chu-2);margin-top:8px}
+.ss .thanh{height:10px}
+.ss .thanh.em>i{background:var(--c)}
+.ss .thanh.lop>i{background:var(--chu-3)}
+.ss b{text-align:right;color:var(--chu);font-weight:600}
+.vd{margin-top:12px;border:1px solid var(--vien);border-radius:12px;overflow:hidden}
+.vd div{display:grid;grid-template-columns:96px minmax(0,1fr) auto;gap:12px;align-items:center;padding:9px 12px;font-size:13px;border-top:1px solid var(--vien)}
+.vd div:first-child{border-top:0}
+.vd time{color:var(--chu-3);font-variant-numeric:tabular-nums}
+.vd p{margin:0;min-width:0;color:var(--chu)}
+.vd p small{display:block;color:var(--chu-3);font-size:12px;margin-top:1px}
+.vd .kq{white-space:nowrap;font-weight:600}
+.vd .kq.sai{color:var(--sai-chu)}.vd .kq.dung{color:var(--dung-chu)}
+.chuoi{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.chuoi span{width:34px;height:38px;border-radius:8px;display:grid;place-items:center;font-weight:600;background:var(--mat-2);border:1px solid var(--vien);font-size:15px;position:relative}
+.chuoi span.d{border-color:var(--dung);color:var(--dung-chu)}
+.chuoi span.s{color:var(--sai-chu)}
+.hai{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
+.hai div{padding:12px 14px;border-radius:12px;background:var(--mat-2)}
+.hai b{display:block;font-size:24px;font-weight:600;margin-top:4px}
+.hai div.lech b{color:var(--sai-chu)}
+.ngay{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:6px;align-items:end;height:140px;position:relative;margin-top:8px}
+.ngay .cot-n{display:flex;flex-direction:column-reverse;height:100%;border-radius:6px 6px 2px 2px;overflow:hidden;background:var(--mat-2)}
+.ngay .cot-n i{display:block}
+.ngay .cot-n i.ky{background:var(--dung)}.ngay .cot-n i.voi{background:var(--tin)}
+.ngay .cot-n.khong{background:var(--sai-nhat);box-shadow:inset 0 -3px 0 var(--sai)}
+.ngay .muc{position:absolute;left:0;right:0;border-top:1.5px dashed var(--chu-3)}
+.ngay-nhan{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:6px;font-size:11px;color:var(--chu-3);text-align:center;margin-top:6px}
+.chu-giai{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px}
+.chu-giai span{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--chu-2)}
+.chu-giai i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.cach li{margin:0 0 8px;font-size:13px;line-height:1.55;color:var(--chu-2)}
+.cach b{color:var(--chu)}
+.dp{--c:var(--tin);--c-nhat:var(--tin-nhat);--c-chu:var(--tin-chu)}
+.ht{--c:var(--sao);--c-nhat:var(--sao-nhat);--c-chu:var(--sao-chu)}
+.ch{--c:var(--dung);--c-nhat:var(--dung-nhat);--c-chu:var(--dung-chu)}
+.lu{--c:var(--sai);--c-nhat:var(--sai-nhat);--c-chu:var(--sai-chu)}
+@media (max-width:600px){
+  .bon-so{gap:14px}
+  .vd div{grid-template-columns:minmax(0,1fr);gap:2px}.vd .kq{white-space:normal}
+  .ss{grid-template-columns:60px minmax(0,1fr) 48px}
+  .ngay{gap:3px;height:110px}.ngay-nhan{gap:3px;font-size:10px}
+  .bc{grid-template-columns:28px minmax(0,1fr);gap:10px;padding:16px}
+  .bc .so-tt{width:28px;height:28px}
+  .chuoi span{width:28px;height:34px}
+}
+</style></head>
+<body data-app="gv" data-tab="hom-nay" data-khung="man-con" data-ve="Hôm nay">
+<main class="khung cot" style="gap:20px" id="goc">
+  <!-- GỌN HƠN: thay hồ sơ làm bài cũ (6 mức, 7 ngày, sáu tín hiệu, giây theo mức độ…) bằng MỘT trang: 4 chỉ số · kết luận một câu · 3–4 bằng chứng có
+       ví dụ ghi giờ cụ thể · 14 ngày · cách tính. Mọi con số so với cả lớp. -->
+</main>
+<script>
+const M = {
+  dp: { ten: 'Doãn Thanh Tâm', lop: '12A1', luot: 191, so: { ht: 12, dp: 88, ch: 86, lu: 14 }, nhan: 'Học đối phó · hạng 1/18',
+    ket: 'Em làm khá đều (<b>12/14 ngày</b> đủ mức) nhưng phần lớn là làm cho có: <b>46%</b> số câu em chọn đáp án khi chưa kịp đọc hết đề và sai 4/5 trong số đó; bài Kiểm tra 15 phút 31/10 em được <b>3,5</b> — thấp xa mức em luyện cùng dạng (đúng 71%).',
+    bc: [
+      { t: 'Chọn đáp án khi chưa kịp đọc hết đề', lon: '88/191<small>lượt · 46%</small>', ss: [46, 7], vd: [
+        ['30/10 21:14', 'Bài 7 · Fe và Cu tác dụng với HCl', 'đề 64 chữ ⇒ cần ít nhất 16 giây để đọc', 'chọn sau 3 giây · B · sai', 'sai'],
+        ['30/10 21:15', 'Bài 7 · Nhiệt phân CaCO₃', 'đề 41 chữ ⇒ cần ít nhất 10 giây', 'chọn sau 2 giây · D · sai', 'sai'],
+        ['28/10 19:48', 'Bài 5 · Cân bằng N₂ + 3H₂ ⇌ 2NH₃', 'đề 57 chữ ⇒ cần ít nhất 14 giây', 'chọn sau 4 giây · A · sai', 'sai']], chu: 'Trong 88 câu này em sai 71 câu (81%). Ở những câu em đọc đủ thời gian, em đúng 64%.' },
+      { t: 'Bấm cùng một chữ nhiều câu liền', lon: '5<small>chuỗi từ 6 câu</small>', chuoi: 'BBBBBBBBBBB', dung: [3, 8], chu: 'Dài nhất: 29/10 20:05 → 20:07, <b>11 câu liền chọn B trong 74 giây</b> (trung bình 7 giây/câu), đúng 2/11. Đáp án đúng của 11 câu này rải đều A, B, C, D.' },
+      { t: 'Luyện tập cao, kiểm tra thấp (cùng dạng)', lon: '71% → 3,5', hai: [['Luyện tập · Cân bằng hoá học', '71%', '42/59 câu đúng · 19/10 – 30/10'], ['Kiểm tra 15 phút · 31/10', '3,5/10', 'cùng dạng, không xem được lời giải', true]], chu: 'Khi có lời giải và làm lại được, em đúng nhiều; khi phải tự làm một lần, em sai gần hết.' },
+      { t: 'Câu sai để đó không sửa', lon: '27/31<small>câu</small>', ss: [87, 42], ssNhan: ['Em', 'Cả lớp'], vd: [
+        ['27/10 20:31', 'Bài 6 · pH dung dịch sau trộn', 'sai, đã xếp vào Sửa lỗi 28/10', 'chưa làm lại', 'sai'],
+        ['26/10 21:02', 'Bài 5 · Hằng số cân bằng KC', 'sai, đã xếp vào Sửa lỗi 27/10', 'lướt 4 giây · sai', 'sai']], chu: 'Chỉ 4/31 câu sai được em làm lại đúng sau 3 ngày (cả lớp: 58%).' },
+    ],
+    ngay: [[18,20],[14,22],[20,16],[0,0],[16,20],[12,24],[22,14],[18,18],[10,26],[0,0],[16,20],[14,22],[20,16],[8,12]] },
+  ht: { ten: 'Phan Thảo Vy', lop: '11A2', luot: 468, so: { ht: 96, dp: 3, ch: 92, lu: 8 }, nhan: 'Học thật · hạng 1/43',
+    ket: 'Em học thật: sửa đúng <b>19/20</b> câu từng sai (cả lớp 58%), đọc kỹ đề (trung bình <b>46 giây</b>/câu, cả lớp 27 giây) và điểm kiểm tra khớp với mức luyện tập (luyện đúng 82% · Kiểm tra 15 phút <b>8,5</b>).',
+    bc: [
+      { t: 'Sửa câu sai đến khi đúng', lon: '19/20<small>câu · 95%</small>', ss: [95, 58], ssNhan: ['Em', 'Cả lớp'], vd: [
+        ['27/10 → 28/10', 'Bài 5 · Cân bằng N₂ + 3H₂ ⇌ 2NH₃', 'sai ý a → đọc lời giải 2 phút 10 giây → hôm sau làm câu song sinh khác số liệu', 'đúng', 'dung'],
+        ['29/10 → 30/10', 'Bài 6 · pH dung dịch sau trộn', 'sai (1,7) → làm lại ở Sửa lỗi sau 1 ngày', 'đúng · 2', 'dung']], chu: 'Câu còn lại (Bài 7 · hiệu suất) em đã làm lại 2 lần, đang đợi lượt thứ 3 trong Sửa lỗi.' },
+      { t: 'Làm đúng câu song sinh khác số liệu', lon: '11/12', chu: 'Câu song sinh giữ cách làm nhưng đổi số liệu và thứ tự phương án — đúng câu này nghĩa là em hiểu cách làm, không nhớ đáp án.' },
+      { t: 'Đọc kỹ trước khi chọn', lon: '98%<small>lượt đủ thời gian đọc</small>', ss: [98, 76], ssNhan: ['Em', 'Cả lớp'], chu: 'Trung bình 46 giây/câu (cả lớp 27 giây). Không lần nào chọn khi chưa kịp đọc hết đề ở câu tính toán.' },
+      { t: 'Kiểm tra khớp luyện tập', lon: '82% → 8,5', hai: [['Luyện tập · 14 ngày', '82%', '384/468 câu đúng'], ['Kiểm tra 15 phút · 31/10', '8,5/10', 'tự làm, không lời giải']], chu: 'Điểm khi tự làm một lần ngang với mức luyện tập ⇒ phần luyện tập là thật.' },
+    ],
+    ngay: [[34,0],[36,2],[38,0],[30,0],[36,0],[40,1],[36,0],[0,0],[36,0],[38,0],[36,2],[34,0],[36,0],[24,0]] },
+  ch: { ten: 'Lã Thanh Hương', lop: '12A1', luot: 512, so: { ht: 84, dp: 5, ch: 99, lu: 1 }, nhan: 'Chăm · hạng 1/78',
+    ket: 'Em đủ mức cả <b>14/14 ngày</b>, làm <b>512 câu</b> (mức giao 504), <b>96%</b> số câu làm kỹ; chuỗi ngày học hiện tại <b>31 ngày</b>.',
+    bc: [
+      { t: 'Đủ mức mọi ngày', lon: '14/14<small>ngày</small>', ss: [100, 41], ssNhan: ['Em', 'Cả lớp'], chu: 'Mức mỗi ngày 36 câu. Ngày ít nhất 36 câu (25/10), ngày nhiều nhất 41 câu.' },
+      { t: 'Làm đủ số câu được giao', lon: '512/504<small>câu</small>', chu: 'Phần vượt là Tự luyện em tự chọn thêm.' },
+      { t: 'Câu nào cũng làm thật', lon: '96%<small>câu làm kỹ</small>', ss: [96, 76], ssNhan: ['Em', 'Cả lớp'], chu: 'Câu chọn khi chưa kịp đọc hết đề KHÔNG được tính vào Chăm — làm nhiều cho có không được xếp chăm.' },
+      { t: 'Chuỗi ngày học', lon: '31<small>ngày liền</small>', chu: 'Bắt đầu 02/10, chưa bỏ ngày nào.' },
+    ],
+    ngay: [[36,1],[38,0],[37,2],[36,0],[40,1],[36,0],[39,2],[36,0],[38,1],[37,0],[36,2],[41,0],[37,1],[36,0]] },
+  lu: { ten: 'Từ Văn Hùng', lop: '12 Thường', luot: 0, so: { ht: null, dp: null, ch: 1, lu: 99 }, nhan: 'Lười · hạng 1/101',
+    ket: '<b>14/14 ngày</b> gần nhất em không làm câu nào; lần cuối em học là <b>12/10</b>. <b>504 câu</b> được giao chưa làm, <b>23 câu sai</b> từ trước vẫn để nguyên.',
+    bc: [
+      { t: 'Không làm ngày nào', lon: '0/14<small>ngày</small>', ss: [0, 81], ssNhan: ['Em', 'Cả lớp'], chu: 'Cả lớp có làm trung bình 11/14 ngày.' },
+      { t: 'Lần cuối học', lon: '12/10<small>20 ngày trước</small>', vd: [['12/10 20:14', 'Chặng 1 · Bài 3 Liên kết ion', 'làm 9/36 câu rồi dừng', 'bỏ dở', 'sai']] },
+      { t: 'Câu được giao chưa làm', lon: '504/504<small>câu</small>' },
+      { t: 'Câu sai cũ chưa sửa', lon: '23<small>câu</small>', chu: 'Từ các bài làm trước 12/10, đã xếp vào Sửa lỗi nhưng chưa mở.' },
+    ],
+    ngay: Array.from({ length: 14 }, () => [0, 0]) },
+}
+const k = (location.hash.slice(1) || 'dp')
+const d = M[k]
+document.body.dataset.tieu = 'Bằng chứng · ' + d.ten
+document.body.dataset.phu = d.lop + ' · 14 ngày 19/10 – 01/11 · ' + (d.luot ? d.luot + ' lượt làm câu' : 'không có lượt làm câu')
+const NGAY = ['19','20','21','22','23','24','25','26','27','28','29','30','31','01']
+const cs = (lop, ten, v, tb) => `<div class="cs ${lop}${v == null ? ' nhat' : ''}"><div class="dau"><span>${ten}</span><b>${v == null ? '—' : v}<small>${v == null ? ' chưa đủ dữ liệu' : '/100'}</small></b></div><div class="ray">${v == null ? '' : `<i style="width:${v}%"></i>`}<u style="left:${tb}%" title="trung vị cả lớp"></u></div></div>`
+const bc = (b, i) => `<div class="bc"><span class="so-tt">${i + 1}</span><div style="min-width:0">
+  <div class="tieu"><h4>${b.t}</h4><span class="lon">${b.lon}</span></div>
+  ${b.ss ? `<div class="ss"><span>${(b.ssNhan || ['Em', 'Cả lớp'])[0]}</span><div class="thanh em"><i style="--p:${b.ss[0]}%"></i></div><b>${b.ss[0]}%</b></div><div class="ss" style="margin-top:4px"><span>${(b.ssNhan || ['Em', 'Cả lớp'])[1]}</span><div class="thanh lop"><i style="--p:${b.ss[1]}%"></i></div><b>${b.ss[1]}%</b></div>` : ''}
+  ${b.chuoi ? `<div class="chuoi">${[...b.chuoi].map((c, j) => `<span class="${b.dung.includes(j) ? 'd' : 's'}">${c}</span>`).join('')}</div>` : ''}
+  ${b.hai ? `<div class="hai">${b.hai.map(([n, v, m, lech]) => `<div class="${lech ? 'lech' : ''}"><span class="mo">${n}</span><b>${v}</b><span class="mo">${m}</span></div>`).join('')}</div>` : ''}
+  ${b.vd ? `<div class="vd">${b.vd.map(([t, c, m, kq, l]) => `<div><time>${t}</time><p>${c}<small>${m}</small></p><span class="kq ${l}">${kq}</span></div>`).join('')}</div>` : ''}
+  ${b.chu ? `<p class="mo mt-2">${b.chu}</p>` : ''}
+</div></div>`
+const max = 44, muc = 36
+document.getElementById('goc').innerHTML += `
+<div class="chinh-phu">
+  <div class="cot" style="gap:20px">
+    <div class="ket ${k}"><p class="nhan">Kết luận · ${d.nhan}</p>${d.ket}</div>
+    <section class="the dem ${k}">
+      <div class="the-dau" style="padding:18px 20px 0;margin:0"><div class="h3">Bằng chứng</div><span class="mo">xếp từ mạnh tới nhẹ</span></div>
+      ${d.bc.map(bc).join('')}
+      <div style="padding:4px 20px 18px"><a class="lien-ket">${d.luot ? `Xem đủ ${d.luot} lượt làm câu` : 'Xem lịch sử làm câu'} <i data-i="chevron" class="nho"></i></a></div>
+    </section>
+  </div>
+  <div class="cot" style="gap:20px">
+    <section class="the">
+      <div class="the-dau"><div class="h3">4 chỉ số của em</div><span class="mo">vạch xám = giữa lớp</span></div>
+      <div class="bon-so">${cs('ht', 'Học thật', d.so.ht, 61)}${cs('dp', 'Học đối phó', d.so.dp, 18)}${cs('ch', 'Chăm', d.so.ch, 58)}${cs('lu', 'Lười', d.so.lu, 42)}</div>
+    </section>
+    <section class="the">
+      <div class="the-dau"><div class="h3">14 ngày của em</div><span class="mo">mức ${muc} câu/ngày</span></div>
+      <div class="ngay">${d.ngay.map(([ky, voi]) => ky + voi === 0 ? '<div class="cot-n khong" style="height:12%"></div>' : `<div class="cot-n" style="height:${Math.round((ky + voi) / max * 100)}%"><i class="ky" style="height:${Math.round(ky / (ky + voi) * 100)}%"></i><i class="voi" style="height:${Math.round(voi / (ky + voi) * 100)}%"></i></div>`).join('')}<span class="muc" style="bottom:${Math.round(muc / max * 100)}%"></span></div>
+      <div class="ngay-nhan">${NGAY.map((n) => `<span>${n}</span>`).join('')}</div>
+      <div class="chu-giai"><span><i style="background:var(--dung)"></i>câu làm kỹ</span><span><i style="background:var(--tin)"></i>câu chọn khi chưa đọc hết đề</span><span><i style="background:var(--sai)"></i>không làm</span></div>
+    </section>
+    <section class="the cach">
+      <div class="the-dau"><div class="h3">Cách tính</div><span class="mo">giống nhau cho mọi em</span></div>
+      <ul style="margin:0;padding-left:18px">
+        <li><b>Học thật</b> = 35% sửa đúng câu từng sai trong 3 ngày (cùng câu hoặc câu song sinh) + 25% câu đọc đủ thời gian + 20% đúng ở câu mới lần đầu, không xem lời giải + 20% kiểm tra khớp luyện tập.</li>
+        <li><b>Học đối phó</b>: cộng các dấu hiệu — chọn khi chưa đọc hết đề (đề N chữ cần ít nhất N/4 giây) mà sai · bấm một chữ từ 6 câu liền · mở lời giải rồi chọn dưới 5 giây · treo máy quá 2 phút/câu · luyện từ 70% mà kiểm tra cùng dạng từ 5 điểm trở xuống · câu sai không sửa.</li>
+        <li><b>Chăm</b> = 50% số ngày đủ mức + 30% câu làm kỹ trên số câu được giao + 20% chuỗi ngày đủ mức. Câu làm vội không tính. <b>Lười</b> = 100 − Chăm.</li>
+        <li>Mọi tỉ lệ lấy mức chắc chắn 90% (ít câu thì không bị thổi phồng). Dưới 40 lượt làm câu ⇒ chưa xếp Học thật / Đối phó.</li>
+      </ul>
+    </section>
+  </div>
+</div>`
+</script>
+<script src="khung.js"></script>
+</body></html>
