@@ -714,7 +714,9 @@
 [data-trong] .duo .duo-tra { container-type: inline-size; }
 @container (min-width: 560px) {
   [data-trong] .duo .ht2-lam-ds .ht2-lam-y:not([data-ket]) { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 20px; }
-  [data-trong] .duo .ht2-lam-ds .ht2-lam-y:not([data-ket]) .ht2-lam-y-nut { align-self: center; }
+  [data-trong] .duo .ht2-lam-ds .ht2-lam-y:not([data-ket]) .ht2-lam-y-nut { align-self: center; grid-area: 1 / 2; }
+  /* 01/11 (thầy chụp ý c «Sơ đồ … N₂»): ảnh riêng của ý (`sau_y_x`) rơi vào cột nút ⇒ cột chữ bị bóp còn 1 ký tự/dòng, ảnh đè chữ. Ảnh nằm trọn hàng dưới chữ. */
+  [data-trong] .duo .ht2-lam-ds .ht2-lam-y:not([data-ket]) > .cau-hinh { grid-column: 1 / -1; margin: 0; }
 }
 /* Điện thoại ngang thấp: hai cột đề | trả lời + tấm kết quả cột phải đã có ở mục 13 (lưới trên .ht2-lam.duo, đề ghim cột trái) — không chồng thêm lưới thứ hai. */
 @media (min-width: 1100px) and (min-height: 501px) {
