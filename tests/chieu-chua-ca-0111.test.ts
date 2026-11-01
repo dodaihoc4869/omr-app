@@ -62,9 +62,9 @@ describe('tờ chiếu chữa bài', () => {
     expect(html).toContain('<b>2<small>/32</small></b>')
     expect(html).toContain('<span class="mc-st-ten">Minh Anh</span><span class="mc-st-giay" title="12 giây">12<small>\u2009s</small></span>')
     expect(html).toContain('<span class="mc-st-ten">Thảo Chi</span><span class="mc-st-giay mc-st-giay-trong" title="Chưa có số giây">—</span>')
-    expect(html).toContain('<ul class="mc-st-dung" hidden><li data-giay="40">Gia Bảo</li></ul>')
-    expect(html).toContain('id="mc-goi-nut"') // «Gọi lên bảng» thay «Lên bảng» (thầy 01/11 tối)
-    expect(html).toContain('id="mc-goi" hidden')
+    expect(html).toContain('id="mc-goi-nut"') // «Gọi lên bảng» thay «Lên bảng» (thầy 01/11 tối) — chạy màn gọi tên chuẩn của tờ
+    expect(html).not.toContain('mc-goi-the') // không tấm gọi riêng (góp ý sau PR 730: «giống hiệu ứng của các màn khác»)
+    expect(html).toContain("tg.textContent = 'Mời em lên bảng'") // màn gọi tên chuẩn vẫn nằm trong tờ
     expect(html).toContain('mc-st-muc">Vận dụng</span>')
     expect(html).toContain("'Câu ' : 'Đợt '")
     expect(html).toContain("'CHỮA BÀI' : 'CHỜ THẦY GỌI'")
@@ -104,6 +104,11 @@ describe('tờ chiếu chữa bài', () => {
     expect(kq.soThieu).toBe(1)
     expect(kq.html).toContain('Nội dung câu hỏi 3')
     expect(kq.html).toContain('<span class="mc-st-ten">Văn An</span>')
+    // GỌI LÊN BẢNG: đợt mang danh sách em LÀM ĐÚNG theo khuôn «Gọi em khác» của tờ chuẩn (sbd rỗng) + mảnh chuẩn được chèn
+    expect(html).toContain('data-goi-em="{&quot;em&quot;:[{&quot;sbd&quot;:&quot;&quot;,&quot;ten&quot;:&quot;Thị Bình&quot;,&quot;khoa&quot;:&quot;&quot;,&quot;nhan&quot;:&quot;&quot;,&quot;giay&quot;:30}],&quot;coGhi&quot;:true,&quot;chuLop&quot;:&quot;1/2 em làm đúng câu này&quot;}"')
+    expect(html).toContain('&quot;em&quot;:[],&quot;coGhi&quot;:true,&quot;chuLop&quot;:&quot;Chưa em nào làm đúng câu này&quot;')
+    expect(html).toContain('window.__mcGoiEmKhac = doiEm')
+    expect(html).toContain('window.__mcGoiEmDat')
   })
 })
 
