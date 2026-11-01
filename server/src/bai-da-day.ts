@@ -579,7 +579,7 @@ async function xemTruoc(env: Env, b: Row, nowMs: number): Promise<Record<string,
   const onBaiCu = kho ? xemOnBaiCu({ soNgay: han.D, theLuc: dv.theLuc, khoCau: kho.khoCau, soBai: kho.soBai, tiLe: kho.tiLe }) : null
   return {
     ok: true,
-    soCau: ct.qids.length, soTuLuan: cb.soTuLuan,
+    soCau: ct.qids.length, soTuLuan: cb.soTuLuan, theoPhan: { I: ct.theoPhan?.I ?? 0, II: ct.theoPhan?.II ?? 0, III: ct.theoPhan?.III ?? 0 },
     hanNop: han.hanNop, D: han.D,
     luotCan: han.luotCan, sucChua,
     // "Giao N em" = soEmChon (em được giao sau lọc); tongEm = số em của lớp. duLuot / quaTai / duDiem8 tính trên em được giao.

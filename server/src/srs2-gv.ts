@@ -100,13 +100,13 @@ export const maGocCuaTo = (maDe: readonly string[]): string[] => [...new Set(maD
  * Câu hợp lệ của các tờ đề (đã duyệt, bỏ tự luận), theo thứ tự tờ rồi thứ tự câu trong tờ; câu trùng giữa các tờ chỉ tính MỘT lần (tờ đứng trước giữ).
  * `theoTo`: số câu dùng được mà MỖI tờ góp vào (sau khi bỏ trùng) — cộng lại đúng bằng `qids.length`, để màn giao hiện số từng tờ khớp tổng.
  */
-type CauCuaTo = { qids: string[]; theoTo: Record<string, number>; theoMucDo: Record<string, number> }
+type CauCuaTo = { qids: string[]; theoTo: Record<string, number>; theoMucDo: Record<string, number>; /** Số câu dùng được theo phần I / II / III (01/11 — thẻ «Câu sẽ luyện» hiện đúng số máy chủ rút). */ theoPhan?: Record<string, number> }
 /** 28/10 (Analytics D1 27/10 19–23h: câu này 8 % thời gian D1): đệm theo kho trong isolate (dau-kho-cau.ts `DemTheoKho`) — khoá = danh sách tờ đúng thứ tự;
  *  trọng lượng = số câu. Trả BẢN SAO (nơi gọi có thể sửa mảng/đối tượng). */
 const demCauCuaTo = new DemTheoKho<CauCuaTo>(30 * 60_000, 5 * 60_000, 64, 400_000)
 export async function cauCuaToChiTiet(env: Env, maDe: readonly string[]): Promise<CauCuaTo> {
   const v = await demCauCuaTo.lay(env, JSON.stringify(maDe), Date.now(), () => cauCuaToChiTietD1(env, maDe), (x) => x.qids.length + 1)
-  return { qids: [...v.qids], theoTo: { ...v.theoTo }, theoMucDo: { ...v.theoMucDo } }
+  return { qids: [...v.qids], theoTo: { ...v.theoTo }, theoMucDo: { ...v.theoMucDo }, theoPhan: { ...(v.theoPhan ?? {}) } }
 }
 async function cauCuaToChiTietD1(env: Env, maDe: readonly string[]): Promise<CauCuaTo> {
   // 14/10: đọc câu RÚT GỌN (cau-gon.ts — không ảnh/lời giải, ~650 so với ~3.950 ký tự/câu): chỉ cần duyệt / tự luận / phần / mức độ. Dòng JSON hỏng bị bỏ như cũ.
@@ -118,14 +118,14 @@ async function cauCuaToChiTietD1(env: Env, maDe: readonly string[]): Promise<Cau
     const k = str(x.ma_de)
     theoGoc.set(k, [...(theoGoc.get(k) ?? []), { qid: str(x.qid), phan: str(q.phan), mucDo: str((q as { mucDo?: unknown }).mucDo).trim() }])
   }
-  const qids: string[] = [], da = new Set<string>(), theoTo: Record<string, number> = {}, theoMucDo: Record<string, number> = {}
+  const qids: string[] = [], da = new Set<string>(), theoTo: Record<string, number> = {}, theoMucDo: Record<string, number> = {}, theoPhan: Record<string, number> = {}
   for (const m of maDe) {
     const { goc, phan } = tachMaTo(m)
     let n = 0
-    for (const c of theoGoc.get(goc) ?? []) if ((!phan || c.phan === phan) && !da.has(c.qid)) { da.add(c.qid); qids.push(c.qid); n++; const md = c.mucDo || 'Chưa gắn mức độ'; theoMucDo[md] = (theoMucDo[md] ?? 0) + 1 }
+    for (const c of theoGoc.get(goc) ?? []) if ((!phan || c.phan === phan) && !da.has(c.qid)) { da.add(c.qid); qids.push(c.qid); n++; const md = c.mucDo || 'Chưa gắn mức độ'; theoMucDo[md] = (theoMucDo[md] ?? 0) + 1; theoPhan[c.phan] = (theoPhan[c.phan] ?? 0) + 1 }
     theoTo[m] = (theoTo[m] ?? 0) + n
   }
-  return { qids, theoTo, theoMucDo }
+  return { qids, theoTo, theoMucDo, theoPhan }
 }
 async function cauCuaTo(env: Env, maDe: readonly string[]): Promise<string[]> {
   return (await cauCuaToChiTiet(env, maDe)).qids
