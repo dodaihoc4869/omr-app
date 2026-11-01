@@ -40,6 +40,12 @@ describe('Học đối phó', () => {
     expect(lap.chuoi).toEqual({ chu: 'BBBBBBBBBBB', dung: [3, 8] })
     expect(k.bc.dp).toMatch(/\*\*\d+%\*\* câu chọn khi chưa đọc hết đề/)
     expect(k.ketLuan.dp).toContain('làm cho có')
+    // thầy 01/11: hai lý do KHÔNG liền nhau — mỗi lý do một dòng, mở đầu bằng con số có đơn vị
+    const dong = k.ketLuan.dp.split('\n')
+    expect(dong[0]).toMatch(/^Em làm \d+\/\d+ ngày đủ mức nhưng làm cho có:$/)
+    expect(dong.length).toBeGreaterThanOrEqual(3)
+    for (const d of dong.slice(1)) expect(d).toMatch(/^\*\*[^*]+\*\* /)
+    expect(dong.find((d) => d.includes('bấm cùng một chữ'))).toMatch(/^\*\*\d+ lần\*\* /)
   })
   it('luyện tập đúng ≥ 70% mà kiểm tra cá nhân TB ≤ 5 ⇒ thẻ «Luyện tập cao, kiểm tra thấp» (ô kiểm tra tô đỏ), cộng Đối phó', () => {
     const luot = NGAY.flatMap((n) => Array.from({ length: 10 }, (_, i) => L({ ngay: n, dung: i < 9 })))
@@ -73,7 +79,7 @@ describe('Học thật', () => {
     expect(sua.lon).toMatch(/^\d+\/\d+$/)
     expect(sua.viDu![0]!.phu).toMatch(/^sai \d\d\/\d\d → làm lại câu song sinh khác số liệu \d\d\/\d\d$/)
     expect(k.the.ht.find((t) => t.ma === 'khop')!.hai![1]!.so).toBe('8,3/10')
-    expect(k.ketLuan.ht).toMatch(/^Em học thật: sửa đúng \*\*/)
+    expect(k.ketLuan.ht).toMatch(/^Em học thật:\n\*\*\d+\/\d+ câu\*\* từng sai đã sửa đến khi đúng\n/) // mỗi lý do một dòng, số có đơn vị đứng đầu
   })
   it('dưới 40 lượt đo thật ⇒ Học thật / Đối phó chưa xếp (null)', () => {
     const luot = NGAY.slice(0, 3).flatMap((n) => Array.from({ length: 10 }, () => L({ ngay: n })))
@@ -107,22 +113,22 @@ describe('Chăm / Lười', () => {
     expect(k.the.lu[0]!.lon).toBe('14/14')
     expect(k.the.lu[1]!.lon).toBe('12/10')
     expect(k.bc.lu).toBe('**14/14** ngày không làm · lần cuối 12/10')
-    expect(k.ketLuan.lu).toContain('lần cuối em học là **12/10**')
+    expect(k.ketLuan.lu.split('\n')).toEqual(['Em lười:', '**14/14 ngày** gần nhất không làm câu nào', '**12/10** là lần cuối em học', '**504 câu** được giao chưa làm'])
     expect(k.ngay.every((n) => n.ky === 0 && n.voi === 0)).toBe(true)
   })
   it('sổ học trống nhưng trong 14 ngày có làm ⇒ «lần cuối» = ngày cuối có làm, KHÔNG nói «chưa làm câu nào»', () => {
     const ngay = NGAY.map((n, i) => ({ ngay: n, muc: 36, lam: i === 2 || i === 4 ? 8 : 0 }))
     const k = tinhBon({ dg: dg([]), ngay, lanCuoiHoc: '', den: DEN })
     expect(k.the.lu.find((t) => t.ma === 'lanCuoi')!.lon).toBe('22/10')
-    expect(k.ketLuan.lu).toContain('lần cuối em học là **22/10**')
-    expect(k.ketLuan.lu).not.toContain('chưa làm câu nào')
+    expect(k.ketLuan.lu).toContain('**22/10** là lần cuối em học')
+    expect(k.ketLuan.lu).not.toContain('Chưa từng làm câu nào')
     const homNay = tinhBon({ dg: dg([]), ngay, lanCuoiHoc: '2026-11-01', den: '2026-10-31' })
     expect(homNay.the.lu.find((t) => t.ma === 'lanCuoi')!.nhoSo).toBe('hôm nay')
   })
   it('Đối phó mà 0 ngày đủ mức ⇒ kết luận «Em làm cho có: …» (không viết «0/14 ngày đủ mức nhưng…»)', () => {
     const luot = NGAY.flatMap((n) => Array.from({ length: 10 }, (_, i) => L({ ngay: n, ma: i < 7 ? 1 : 3, dung: i >= 7, giay: 3 })))
     const k = tinhBon({ dg: dg(luot), ngay: ngayDu(36, 10), lanCuoiHoc: DEN, den: DEN })
-    expect(k.ketLuan.dp).toMatch(/^Em làm cho có: \*\*\d+%\*\* số câu/)
+    expect(k.ketLuan.dp).toMatch(/^Em làm cho có:\n\*\*\d+%\*\* số câu/)
   })
   it('dưới 3 ngày phải làm ⇒ Chăm / Lười null', () => {
     const k = tinhBon({ dg: dg([]), ngay: ngayDu().slice(0, 2), lanCuoiHoc: '', den: DEN })

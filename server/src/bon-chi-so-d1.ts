@@ -51,6 +51,10 @@ export async function tinhLoBon(env: Env, em: readonly EmGoc[], nowMs: number): 
   })
 }
 
+/** Kết luận lưu kèm số phiên bản chữ: 2 = mỗi lý do một dòng (thầy 01/11). Bản cũ (chưa có `v: 2`) ⇒ trang bằng chứng tính lại ngay khi thầy bấm. */
+const BAN_KET = 2
+const ketJson = (k: KetQuaBon): string => JSON.stringify({ ...k.ketLuan, v: BAN_KET })
+const ketCu = (r: Row): boolean => json<{ v?: number }>(r.ket_json, {}).v !== BAN_KET
 async function ghiBon(env: Env, ds: readonly { sbd: string; kq: KetQuaBon }[], nowMs: number): Promise<void> {
   if (!ds.length) return
   const w = cuaSoTinh(nowMs), nay = new Date(nowMs).toISOString()
@@ -58,7 +62,7 @@ async function ghiBon(env: Env, ds: readonly { sbd: string; kq: KetQuaBon }[], n
     `INSERT INTO bon_chi_so_em (sbd, ngay, tinh_luc, ht, dp, ch, lu, so_luot, so_lieu_json, bc_json, ket_json, the_json, ngay_json) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
      ON CONFLICT(sbd) DO UPDATE SET ngay=excluded.ngay, tinh_luc=excluded.tinh_luc, ht=excluded.ht, dp=excluded.dp, ch=excluded.ch, lu=excluded.lu, so_luot=excluded.so_luot,
        so_lieu_json=excluded.so_lieu_json, bc_json=excluded.bc_json, ket_json=excluded.ket_json, the_json=excluded.the_json, ngay_json=excluded.ngay_json`,
-  ).bind(sbd, w.homNay, nay, kq.diem.ht, kq.diem.dp, kq.diem.ch, kq.diem.lu, kq.soLieu.soLuot, JSON.stringify(kq.soLieu), JSON.stringify(kq.bc), JSON.stringify(kq.ketLuan), JSON.stringify(kq.the), JSON.stringify(kq.ngay))))
+  ).bind(sbd, w.homNay, nay, kq.diem.ht, kq.diem.dp, kq.diem.ch, kq.diem.lu, kq.soLieu.soLuot, JSON.stringify(kq.soLieu), JSON.stringify(kq.bc), ketJson(kq), JSON.stringify(kq.the), JSON.stringify(kq.ngay))))
 }
 
 /** Một bước cron: ngoài giờ cao điểm (18:00–23:30 giờ VN không chạy), tính một lô em chưa có bản của hôm nay. */
@@ -125,13 +129,15 @@ export async function gvBonBangEm(env: Env, b: Row, nowMs = Date.now()): Promise
   const e = em?.find((x) => x.sbd === sbd)
   if (!em || !e) return { ok: false, error: 'Không tìm thấy học sinh này trong danh sách đang học.' }
   let r = rows.find((x) => str(x.sbd) === sbd)
-  if (!r) {
+  if (!r || ketCu(r)) {
     const [mot] = await tinhLoBon(env, [e], nowMs)
     if (!mot) return { ok: false, error: 'Chưa tính được số liệu của em.' }
     await ghiBon(env, [mot], nowMs)
     const k = mot.kq
-    r = { sbd, ngay: w.homNay, tinh_luc: new Date(nowMs).toISOString(), ht: k.diem.ht, dp: k.diem.dp, ch: k.diem.ch, lu: k.diem.lu, so_luot: k.soLieu.soLuot, so_lieu_json: JSON.stringify(k.soLieu), bc_json: JSON.stringify(k.bc), ket_json: JSON.stringify(k.ketLuan), the_json: JSON.stringify(k.the), ngay_json: JSON.stringify(k.ngay) }
-    rows.push(r)
+    r = { sbd, ngay: w.homNay, tinh_luc: new Date(nowMs).toISOString(), ht: k.diem.ht, dp: k.diem.dp, ch: k.diem.ch, lu: k.diem.lu, so_luot: k.soLieu.soLuot, so_lieu_json: JSON.stringify(k.soLieu), bc_json: JSON.stringify(k.bc), ket_json: ketJson(k), the_json: JSON.stringify(k.the), ngay_json: JSON.stringify(k.ngay) }
+    const cu = rows.findIndex((x) => str(x.sbd) === sbd)
+    if (cu >= 0) rows[cu] = r
+    else rows.push(r)
   }
   const emTheo = new Map(em.map((x) => [x.sbd, x]))
   const cua = rows.filter((x) => emTheo.has(str(x.sbd)))

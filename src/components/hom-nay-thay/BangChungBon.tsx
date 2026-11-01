@@ -176,6 +176,7 @@ export default function BangChungBon({ sbd, hoTen, lop, bang, onDong }: { sbd: s
     ? `${du.em.lop || lop} · 14 ngày ${ngayNgan(du.tu)} – ${ngayNgan(du.den)} · ${du.soLuot ? `${du.soLuot} lượt làm câu` : 'không có lượt làm câu'}`
     : lop
   const k = du?.bang ?? bang
+  const dongKet = (du?.ketLuan ?? '').split('\n').map((x) => x.trim()).filter(Boolean)
 
   return createPortal(
     <div className="m3 m3-thay vo-thay" style={{ display: 'contents' }}>
@@ -215,7 +216,13 @@ export default function BangChungBon({ sbd, hoTen, lop, bang, onDong }: { sbd: s
                       Kết luận · {TEN_BANG[k]}
                       {du.hang ? ` · hạng ${du.hang.thu}/${du.hang.tong}` : ''}
                     </p>
-                    <p className="bbc-ket-chu">{chuDam(du.ketLuan)}</p>
+                    {/* thầy 01/11: «làm rõ ràng và nổi bật hơn, hai con số kia liền nhau, cách dòng xuống» ⇒ dòng đầu = nhận định, mỗi lý do một dòng, số to */}
+                    <p className="bbc-ket-chu">{chuDam(dongKet[0] ?? '')}</p>
+                    {dongKet.length > 1 && (
+                      <ul className="bbc-ket-ds">
+                        {dongKet.slice(1).map((x, i) => <li key={i}>{chuDam(x)}</li>)}
+                      </ul>
+                    )}
                   </div>
                 )}
                 <section className="bb-the bbc-the-bc" aria-labelledby="bbc-bc-tieu">
