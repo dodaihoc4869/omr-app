@@ -22,7 +22,7 @@ import { taiThongTinPhuHuynh } from '../../lib/tai-thong-tin-ph'
 import { baoDaXemPhuHuynh } from '../../lib/canh-bao-thay-may-chu'
 import type { CanhBaoThay } from '../../lib/canh-bao-thay-hien-thi'
 import { BtTrai } from './BieuTuong'
-import { docTuyen, khoaCuon, laManCon, type Tuyen } from './tien-ich'
+import { chuThay, docTuyen, khoaCuon, laManCon, type Tuyen } from './tien-ich'
 import { DangTai } from './dung-chung'
 import { HO_SO_TRONG, PHAN, docPhanTuHash, idPhan, phanCo, type IdPhan, type TaiHoSo } from './trang-ve-con-chung'
 import { layHoSoThaiDoCon, layLichSuLamCauCon, layNhipHocCon } from '../../lib/ho-so-con-ph-api'
@@ -38,12 +38,12 @@ import ManLoiThay from './ManLoiThay'
 const ManChiTietCa = lazy(() => import('./ManChiTietCa'))
 const ManTienBo = lazy(() => import('./ManTienBo'))
 const ManDiemSo = lazy(() => import('./ManDiemSo'))
-// «CHỈ ĐỌC» (thầy chốt bản vẽ 26/10, DocPh.tsx — thay màn «Một trang» 8 ô): main.tsx gắn <html data-trong="ph"> (lùi một máy: localStorage
-// ddh.trong='tat' ⇒ trang cũ y như trước, không tải mảnh này). Bật ⇒ mảnh màn chỉ đọc tải NGAY lúc mô-đun này chạy (song song các lệnh lúc mở); tải hỏng ⇒ vẽ trang cũ.
-type ModMot = typeof import('./DocPh')
+// «MỘT TRANG VỀ CON» (thầy chốt bản vẽ 01/11, MotTrangCon.tsx — thay màn «Chỉ đọc» DocPh 26/10): main.tsx gắn <html data-trong="ph"> (lùi một máy:
+// localStorage ddh.trong='tat' ⇒ trang cũ y như trước, không tải mảnh này). Bật ⇒ mảnh tải NGAY lúc mô-đun này chạy (song song các lệnh lúc mở); tải hỏng ⇒ vẽ trang cũ.
+type ModMot = typeof import('./MotTrangCon')
 const laMotTrang = (): boolean => typeof document !== 'undefined' && document.documentElement.dataset.trong === 'ph'
 let huaMot: Promise<ModMot | null> | null = null
-const napMot = (): Promise<ModMot | null> => (huaMot ??= import('./DocPh').catch(() => ((huaMot = null), null)))
+const napMot = (): Promise<ModMot | null> => (huaMot ??= import('./MotTrangCon').catch(() => ((huaMot = null), null)))
 if (laMotTrang()) void napMot()
 // TRANG CŨ «Hôm nay của con» (TrangVeCon + trang-con.css) NẠP LƯỜI (26/10, luật tốc độ: đường /ph chỉ nhẹ đi) — màn «Chỉ đọc» không cần nó; chỉ tải khi
 // vỏ cũ hiện (ddh.trong='tat', màn con mở từ trang, hoặc mảnh chỉ đọc tải hỏng). Tắt giao diện mới ⇒ tải NGAY lúc mô-đun chạy như mảnh chỉ đọc.
@@ -272,7 +272,7 @@ function PhienBaoCao({ sbd, hoTen, lop, onDoiSbd }: ThongTinPhuHuynh) {
   if (mot && manChinh)
     return (
       <div className="ph3 tvc-app" data-app="ph3" data-mot-trang="">
-        {modMot ? <modMot.default {...pTrang} taiKhoan={<TaiKhoan ten={ten} onDoiSbd={() => setHoiDoiSbd(true)} />} thongBao={thongBao} /> : <DangTai chu="Đang mở…" />}
+        {modMot ? <modMot.default {...pTrang} chuThay={chuThay} manLoiThay={<ManLoiThay ds={loiThay.ds} loi={loiThay.chuLoi} thuLai={napLoiThay} />} taiKhoan={<TaiKhoan ten={ten} onDoiSbd={() => setHoiDoiSbd(true)} />} thongBao={thongBao} /> : <DangTai chu="Đang mở…" />}
         {hopDoiSbd}
       </div>
     )

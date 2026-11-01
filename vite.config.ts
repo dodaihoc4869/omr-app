@@ -362,6 +362,8 @@ export default defineConfig({
           '**/TrongHs-*.{js,css}',
           // App phụ huynh «Chỉ đọc» (26/10, thay «Một trang»): mảnh nạp lười khi <html data-trong="ph"> (AppPhuHuynh) ⇒ kho chạy-lúc; tải hỏng ⇒ app vẽ trang cũ.
           '**/DocPh-*.{js,css}',
+          // «Một trang về con» (thầy chốt 01/11, thay «Chỉ đọc»): cùng luật — mảnh nạp lười khi <html data-trong="ph"> ⇒ kho chạy-lúc; tải hỏng ⇒ trang cũ.
+          '**/MotTrangCon-*.{js,css}',
           // …và lệnh Báo cáo tuần của con (dùng chung DocPh + phần dưới trang cũ TrangVeConDuoi ⇒ thành mảnh riêng), cũng chỉ nạp lười.
           '**/bao-cao-tuan-ph-api-*.js',
           // Thưởng phạt 26/10: màn Thi đua tuần của thầy (+ lệnh, tờ kiểu) và huy hiệu kim loại dùng chung với thẻ tuần phụ huynh (DocPh) — chỉ nạp lười ⇒ kho chạy-lúc.

@@ -8,7 +8,7 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, waitFor } from '@testing-library/react'
+import { cleanup, render, waitFor } from '@testing-library/react'
 import AppPhuHuynh from '../src/components/ph-v3/AppPhuHuynh'
 import { dongBtvn, dongKiemTra, dongSuaLoi, lyDoCach, nhanNgay, tomTat7, trangThaiHomNay } from '../src/components/ph-v3/DocPh'
 import type { TomTatKiemTra } from '../src/lib/kiem-tra-ca-nhan'
@@ -128,52 +128,7 @@ describe('phép thuần của màn chỉ đọc', () => {
   })
 })
 
-describe('«Chỉ đọc» bật (<html data-trong="ph">)', () => {
-  beforeEach(() => { document.documentElement.dataset.trong = 'ph' })
-
-  it('thứ tự đầu → Hôm nay → 7 ngày → nhóm → Lời thầy → Kiểm tra và sửa lỗi; không ô bấm, nút duy nhất là ảnh đại diện; chỉ lệnh sẵn có', async () => {
-    const c = mo()
-    await waitFor(() => expect(c.querySelector('[data-vung="ph-chi-doc"] [data-vung="hom-nay-doc"]')).toBeTruthy())
-    const man = c.querySelector('[data-vung="ph-chi-doc"]')!
-    expect(man.querySelector('h1')!.textContent).toBe('Khôi · Lớp 12A1')
-    expect([...man.querySelectorAll('.pd-luoi > section')].map((x) => x.getAttribute('data-vung'))).toEqual(['hom-nay-doc', 'bay-ngay', 'nhom-con', 'loi-thay-doc', 'kiem-tra-sua-loi'])
-    expect([...man.querySelectorAll('.pd-kt li')].map((x) => x.querySelector('b')!.textContent)).toEqual(['Kiểm tra ôn tập', 'Tự sửa lỗi', 'Bài tập về nhà'])
-    expect([...man.querySelectorAll('button')].map((b) => b.getAttribute('aria-label'))).toEqual(['Tài khoản: mở để đổi số báo danh'])
-    expect(man.querySelectorAll('a')).toHaveLength(0)
-    expect(c.querySelector('.tvc-muc-luc, .tvc-ben, [role="dialog"]')).toBeNull()
-    // Hôm nay (bộ giả: 18/30 câu, có mặt 17:52) · 7 cột · nhóm Chưa đều · Học thật (số câu)
-    expect(man.querySelector('[data-vung="cau-hom-nay"]')!.textContent).toBe('Con đã làm 18/30 câu')
-    expect(man.querySelector('[data-vung="hom-nay-doc"]')!.textContent).toContain('còn hạn đến 24:00')
-    expect(man.querySelector('[data-vung="hom-nay-doc"]')!.textContent).toContain('Có mặt buổi học 17:52')
-    await waitFor(() => expect(man.querySelectorAll('.pd-7 .c')).toHaveLength(7))
-    expect(man.querySelector('.pd-7 .c[data-tt="nay"] small')!.textContent).toBe('Hôm nay')
-    await waitFor(() => expect(man.querySelector('.pd-thang [data-on]')!.textContent).toBe('Chưa đều'))
-    await waitFor(() => expect(man.querySelector('[data-vung="cach-lam-bai"]')!.textContent).toBe('Học thậtLàm nhanh vì đã thuộc 126 câu · bấm vội mà sai 8 câu'))
-    await waitFor(() => expect(man.querySelector('.pd-kt li[data-ma="sua-loi"] > div > span')!.textContent!.replace(/\u00a0/g, ' ')).toBe('Còn 19 câu chưa sửa · 14 ngày qua con tự sửa 6 câu'))
-    expect(man.querySelector('.pd-kt li[data-ma="btvn"]')!.getAttribute('data-mau')).toBe('cam')
-    for (const d of goi) expect(Object.keys(MAY)).toContain(d)
-    expect(goi.filter((x) => x === '/ph/bao-cao-tuan')).toHaveLength(1)
-    for (const d of ['/ph/ho-so-thai-do', '/ph/lich-su-lam-cau']) expect(goi).not.toContain(d)
-    expect(c.textContent).not.toMatch(/CA-45|12121212/)
-  })
-
-  it('Lời thầy: cảnh báo của thầy, CHỈ ĐỌC (không nút «Đã xem»)', async () => {
-    const c = mo()
-    await waitFor(() => expect(c.querySelector('[data-vung="loi-thay-doc"] [data-vung="canh-bao-thay"]')).toBeTruthy())
-    expect(c.querySelector('[data-vung="loi-thay-doc"] button')).toBeNull()
-    expect(daXem).not.toHaveBeenCalled()
-  })
-
-  it('ảnh đại diện ⇒ menu «Đổi số báo danh» (hỏi lại trước khi đổi)', async () => {
-    const c = mo()
-    await waitFor(() => expect(c.querySelector('[data-vung="ph-chi-doc"] .ph3-tron__nut')).toBeTruthy())
-    fireEvent.click(c.querySelector('[data-vung="ph-chi-doc"] .ph3-tron__nut')!)
-    const muc = () => [...c.querySelectorAll('[role="menuitem"]')].find((x) => x.textContent === 'Đổi số báo danh')
-    await waitFor(() => expect(muc()).toBeTruthy())
-    fireEvent.click(muc()!)
-    await waitFor(() => expect(document.body.textContent).toContain('Đổi số báo danh?'))
-  })
-})
+// Màn «Chỉ đọc» (DocPh) đã được thay bằng «Một trang về con» (thầy chốt 01/11) — khoá màn mới ở tests/ph-mot-trang-con-0111.test.tsx. Phép thuần của DocPh vẫn khoá ở trên.
 
 describe('giao diện mới tắt (không data-trong / ddh.trong=tat)', () => {
   it('trang cũ y nguyên: thanh mục, các phần, không có ô', async () => {
