@@ -1,0 +1,50 @@
+/* DUYỆT BÀI BỔ SUNG (thầy chốt bản vẽ 01/11, docs/ban-ve-trong-2610/gv-duyet-bo-sung.html) — tấm toàn màn mở từ Hôm nay › Việc cần thầy.
+ * Nạp lười cùng DuyetBoSung.tsx. Chỉ biến --tr-* có sẵn (trong.css, khai ở :root). Đích bấm ≥ 44 px. */
+.dbs-man { position: fixed; inset: 0; z-index: 60; display: flex; flex-direction: column; background: var(--tr-nen); color: var(--tr-chu); }
+.dbs-tren { flex: none; display: flex; align-items: center; gap: 12px; padding: 10px 20px; border-bottom: 1px solid var(--tr-vien); background: var(--tr-mat); }
+.dbs-ve { min-height: 44px; flex-shrink: 0; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent; color: var(--tr-chu-2); font: inherit; font-size: 15px; font-weight: 500; cursor: pointer; }
+.dbs-ve:hover { background: var(--tr-mat-2); }
+.dbs-tren-chu { min-width: 0; }
+.dbs-tren h1 { margin: 0; font-size: 18px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dbs-tren p { margin: 1px 0 0; font-size: 13px; color: var(--tr-chu-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dbs-than { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 24px 20px 40px; }
+.dbs-khung { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+.dbs-ghi { margin: 0; display: flex; gap: 10px; align-items: flex-start; padding: 14px 16px; border-radius: 14px; background: var(--tr-tin-nhat); color: var(--tr-tin-chu); font-size: 15px; line-height: 1.55; }
+.dbs-ghi svg { flex: none; margin-top: 2px; }
+.dbs-trong { margin: 0; padding: 24px; text-align: center; color: var(--tr-chu-2); }
+.dbs-the { border: 1px solid var(--tr-vien); border-radius: 16px; background: var(--tr-mat); overflow: hidden; }
+.dbs-nhom { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--tr-vien); }
+.dbs-o { flex: none; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--tr-tin-nhat); color: var(--tr-tin-chu); }
+.dbs-nhom-chu { flex: 1; min-width: 0; }
+.dbs-nhom h2 { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.4; }
+.dbs-nhom p { margin: 2px 0 0; font-size: 13px; color: var(--tr-chu-2); }
+.dbs-ds { list-style: none; margin: 0; padding: 0; }
+.dbs-dong { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 14px 20px; border-top: 1px solid var(--tr-vien); }
+.dbs-dong:first-child { border-top: 0; }
+.dbs-dong[data-xong] .dbs-av, .dbs-dong[data-xong] .dbs-ten { opacity: 0.6; }
+.dbs-av { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-size: 14px; font-weight: 600; background: var(--tr-chinh-nhat); color: var(--tr-chinh-chu); }
+.dbs-dong-chu { min-width: 0; }
+.dbs-ten { margin: 0; font-size: 15px; font-weight: 600; line-height: 1.4; }
+.dbs-ten small { margin-left: 4px; font-size: 13px; font-weight: 500; color: var(--tr-chu-3); }
+.dbs-mo { margin: 2px 0 0; font-size: 13px; color: var(--tr-chu-2); }
+.dbs-mo b { color: var(--tr-chu); font-weight: 600; }
+.dbs-mo[data-ket='nhan'] { color: var(--tr-dung-chu); }
+.dbs-loi { margin: 4px 0 0; font-size: 13px; color: var(--tr-sai-chu); }
+.dbs-hai { display: flex; gap: 8px; align-items: center; }
+.dbs-nut { min-height: 44px; padding: 0 18px; border-radius: 12px; border: 1px solid var(--tr-vien-2); background: var(--tr-mat); color: var(--tr-chu); font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.dbs-nut:hover:not(:disabled) { background: var(--tr-mat-2); }
+.dbs-nut:disabled { opacity: 0.55; cursor: default; }
+.dbs-nut-trong { border-color: transparent; background: transparent; color: var(--tr-chu-2); }
+.dbs-nut-nhe { border-color: transparent; background: var(--tr-chinh-nhat); color: var(--tr-chinh-chu); }
+.dbs-nut-nhe:hover:not(:disabled) { background: var(--tr-chinh-nhat); filter: brightness(0.97); }
+.dbs-xong { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px; background: var(--tr-dung-nhat); color: var(--tr-dung-chu); font-size: 13px; font-weight: 600; }
+@media (max-width: 600px) {
+  .dbs-tren { padding: 8px 12px; }
+  .dbs-than { padding: 16px 12px 32px; }
+  .dbs-nhom { padding: 14px 16px; flex-wrap: wrap; }
+  .dbs-nhom .dbs-nut-nhe { display: none; }
+  .dbs-dong { grid-template-columns: 36px minmax(0, 1fr); padding: 14px 16px; }
+  .dbs-av { width: 36px; height: 36px; }
+  .dbs-hai { grid-column: 1 / -1; justify-content: flex-end; }
+  .dbs-hai .dbs-nut { flex: 1; }
+}

@@ -334,7 +334,7 @@ export default defineConfig({
           // Thẻ điểm danh nổi của giao diện CŨ (không «Trong», 30/10 nạp lười): chỉ máy tắt «Trong» tải ⇒ kho chạy-lúc.
           '**/TheDiemDanhHs-*.{js,css}',
           // Hôm nay · 4 bảng (01/11): Nhịp học chỉ còn ở giao diện CŨ (không «Trong») + trang bằng chứng một em (mở khi bấm, vốn cần máy chủ) — nạp lười, kho chạy-lúc.
-          '**/{NhipHocThay,BangChungBon}-*.{js,css}',
+          '**/{NhipHocThay,BangChungBon,DuyetBoSung}-*.{js,css}',
           // NGANG GV 26/10: CSS điện thoại ngang + máy ≥ 1600 của app thầy (mảnh chung các màn thầy nạp lười, tải song song mảnh màn) — kho chạy-lúc.
           '**/trong-gv-ngang-*.css',
           // Hỏi thêm cần máy chủ và chỉ mở trong lời giải: nạp khi dùng, không cất sẵn.

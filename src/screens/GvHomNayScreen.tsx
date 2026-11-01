@@ -17,7 +17,7 @@
 // SỐ CHỈ TỪ API, không số giả: lệnh nào lỗi thì phần của nó KHÔNG vẽ. "Cần thầy chữa" = cùng nguồn và cùng cách gộp với danh sách Cần thầy chữa.
 // Ghi số cho thanh bên (`useSoDemGv`: ca đang mở, Cần thầy chữa). Phép tính thuần xuất ra để test (tests/gv-hom-nay-0910.test.tsx).
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { BookOpen, Check, ChevronRight, CircleHelp, Eye, MonitorCheck, PenLine, Plus, RefreshCw, type LucideIcon } from 'lucide-react'
+import { BookOpen, Check, ChevronRight, CircleHelp, Eye, MonitorCheck, PenLine, Plus, RefreshCw, Upload, type LucideIcon } from 'lucide-react'
 import { danhSachCa, danhSachCauHoi, type CaTomTat } from '../lib/exam-api'
 import { gomTheoCa } from '../lib/hoi-bai'
 import { lyDoDeHieu } from '../lib/loi-de-hieu'
@@ -36,6 +36,7 @@ import { hienNgay, ngayVn } from '../components/chien-dich/ngay'
 import type { DuNhip } from '../components/hom-nay-thay/NhipHocThay'
 // HÔM NAY · 4 BẢNG (thầy chốt 01/11): «Trong» vẽ 4 bảng Học thật / Học đối phó / Chăm / Lười thay Nhịp học + xếp hạng + 12 bậc + hồ sơ cũ.
 import BonBang from '../components/hom-nay-thay/BonBang'
+import { layBaiBoSung, type BaiBoSung } from '../lib/bai-bo-sung'
 import type { CanThayChua } from '../../server/src/omni-kieu'
 import { caConEmDangLam } from '../lib/ca-dang-chay'
 import './gv-hoa2.css'
@@ -50,6 +51,8 @@ import '../styles/trong-gv-ngang.css' // NGANG GV 26/10: dải biểu tượng �
 const HopBoSungBai = lazy(() => import('../components/day-hoc/HopBoSungBai'))
 // Bố cục CŨ (máy tắt «Trong»): Nhịp học nạp lười — «Trong» không còn dùng tới nên không cõng vào mảnh màn Hôm nay.
 const NhipHocThay = lazy(() => import('../components/hom-nay-thay/NhipHocThay'))
+// Duyệt bài bổ sung (thầy chốt 01/11): tấm toàn màn nạp khi bấm «Duyệt» ở Việc cần thầy (thay khối cũ ở màn Theo dõi ca).
+const DuyetBoSung = lazy(() => import('../components/hom-nay-thay/DuyetBoSung'))
 
 // ------------------------------------------------------------------ PHÉP TÍNH THUẦN
 
@@ -337,6 +340,18 @@ export default function GvHomNayScreen() {
   const [tongBon, setTongBon] = useState<number | null>(null)
   const [dangTaiNhip, setDangTaiNhip] = useState(false)
   const [capNhat, setCapNhat] = useState<number | null>(demNhip?.luc ?? demDu?.luc ?? null)
+  // BÀI BỔ SUNG CHỜ DUYỆT (01/11): một lệnh nhẹ `/bo-sung/ds`, hỏi SAU phần việc; có bài ⇒ một dòng «Việc cần thầy». Lỗi / chưa có mã ⇒ im lặng.
+  const [boSung, setBoSung] = useState<BaiBoSung[]>([])
+  const [moDuyet, setMoDuyet] = useState(false)
+  const matKhauThay = useCallback(async () => ((await loadTeacherSecret()) || '').trim(), [])
+  const taiBoSung = useCallback(async () => {
+    try {
+      const m = await matKhauThay()
+      if (m) setBoSung(await layBaiBoSung(m))
+    } catch {
+      /* máy chủ bận / mất mạng: lần mở sau đọc lại */
+    }
+  }, [matKhauThay])
 
   const lanTai = useRef(0)
   const tai = useCallback(async () => {
@@ -378,13 +393,17 @@ export default function GvHomNayScreen() {
       const hen = setTimeout(xong, 5000)
       void viec.finally(() => { clearTimeout(hen); xong() })
     })
-    void cho.then(() => { if (!huy && !trong) void taiNhip() })
+    void cho.then(() => {
+      if (huy) return
+      void taiBoSung()
+      if (!trong) void taiNhip()
+    })
     return () => {
       huy = true
       lanTai.current++
       lanNhip.current++
     }
-  }, [tai, taiNhip, trong])
+  }, [tai, taiNhip, taiBoSung, trong])
 
   const now = gioMayChu()
   const caMo = useMemo(() => (du?.ca ?? []).filter((c) => c.loai !== 'baitap' && caConEmDangLam(c, now)), [du, now])
@@ -423,6 +442,24 @@ export default function GvHomNayScreen() {
   if (du?.canThayChua && du.canThayChua.tong > 0) {
     const n = du.canThayChua.tong
     viec.push({ key: 'can-chua', mau: 'hp', icon: PenLine, tieuDe: `Cần thầy chữa · ${n} chỗ`, ten: 'Cần thầy chữa', soNgan: `${n} chỗ`, phu: chuCanThayChua(du.canThayChua), nut: 'Chữa bài', lam: () => moHanhTrinh({ the: 'can-chua' }) })
+  }
+  if (boSung.length > 0) {
+    const n = boSung.length
+    const soCa = new Set(boSung.map((b) => b.maCa)).size
+    const cu = boSung.map((b) => b.guiLuc).filter(Boolean).sort()[0]
+    const ngCu = cu ? ngayVn(Date.parse(cu)) : ''
+    const cuNhat = ngCu ? `${ngCu.slice(8, 10)}/${ngCu.slice(5, 7)}` : ''
+    viec.push({
+      key: 'bo-sung',
+      mau: 'hp',
+      icon: Upload,
+      tieuDe: `Bài bổ sung chờ duyệt · ${n} bài`,
+      ten: 'Bài bổ sung chờ duyệt',
+      soNgan: `${n} bài`,
+      phu: `Em làm thêm sau khi máy chủ chốt bài · ${soCa} ca${cuNhat ? ` · cũ nhất ${cuNhat}` : ''}`,
+      nut: 'Duyệt',
+      lam: () => setMoDuyet(true),
+    })
   }
   if (du?.hoi && du.hoi.chuaChua > 0) {
     const h = du.hoi
@@ -595,6 +632,18 @@ export default function GvHomNayScreen() {
       ) : (
         <Suspense fallback={null}>
           <NhipHocThay du={nhip} dangTai={dangTaiNhip} onThuLai={() => void taiNhip()} />
+        </Suspense>
+      )}
+      {moDuyet && (
+        <Suspense fallback={null}>
+          <DuyetBoSung
+            ds={boSung}
+            matKhau={matKhauThay}
+            onDong={() => {
+              setMoDuyet(false)
+              void taiBoSung() // đọc lại: bài đã Nhận / Bỏ biến khỏi Việc cần thầy
+            }}
+          />
         </Suspense>
       )}
       {moBoSung && (

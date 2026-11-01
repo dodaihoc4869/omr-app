@@ -11,7 +11,6 @@ import DongMatKetNoiCa from '../components/theo-doi-ca/DongMatKetNoiCa'
 import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
 import { Check, Trash2, ChevronRight, Unlock, Pencil, LogIn, BarChart3, ArrowLeft } from 'lucide-react'
 import { Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
-import KhungBaiBoSung from '../components/KhungBaiBoSung'
 import { classify } from '../engine/score'
 import { danhSachCa, danhSachEm, type CaTomTat, batDauThi, capNhatKeyBank, chiTietCa, doiTenCa, dongBoTenCa, moTaLyDoChan, ghiDiem, khoaCa, moKhoa, moKhoaCa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem } from '../lib/exam-api'
 import { chuanTenCa, tenHienCua, TEN_CA_TOI_DA } from '../lib/ten-ca'
@@ -1913,7 +1912,6 @@ export default function ExamMonitorScreen() {
       </div>
 
       {/* 01/10: bài bổ sung chờ duyệt (máy em gửi phần làm thêm sau khi máy chủ đã chốt bài). Không có thì không hiện gì. */}
-      <KhungBaiBoSung maCa={chiTiet?.ca.maCa} secret={secret} />
       {!chiTiet && (
         <TheNoiDung>
           <div style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Nhập mã ca</div>

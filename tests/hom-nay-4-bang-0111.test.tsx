@@ -10,9 +10,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import type { TraLoiBangChung, TraLoiBonBang, DongBang } from '../src/lib/bon-bang-kieu'
 
-const m = vi.hoisted(() => ({ goi: vi.fn(), danhSachCa: vi.fn() }))
+const m = vi.hoisted(() => ({ goi: vi.fn(), danhSachCa: vi.fn(), boSung: vi.fn(async () => [] as unknown[]) }))
 vi.mock('../src/lib/goi-lenh-thay', () => ({ goiLenh: (duong: string, body: Record<string, unknown>) => m.goi(duong, body), CHU_HUONG_DAN_MA: '' }))
 vi.mock('../src/lib/exam-api', () => ({ danhSachCa: (...a: unknown[]) => m.danhSachCa(...a), danhSachCauHoi: async () => [], xoaNhieuCa: vi.fn(), khoiPhucCa: vi.fn(), xoaVinhVienCa: vi.fn() }))
+vi.mock('../src/lib/bai-bo-sung', () => ({ layBaiBoSung: (...a: unknown[]) => m.boSung(...a), xuLyBaiBoSung: vi.fn() }))
 vi.mock('../src/lib/exam-db', () => ({ loadScriptUrl: async () => 'https://gia/exec', loadTeacherSecret: async () => 'mat', loadExamSources: async () => [] }))
 vi.mock('../src/lib/gio-may-chu', () => ({ gioMayChu: () => new Date('2026-11-01T03:00:00Z').getTime() }))
 vi.mock('../src/lib/chua-cau-sai-thay-api', () => ({ goiChuaThay: async () => ({ ok: true, bat: true, ds: [], conNua: false }) }))
@@ -165,5 +166,19 @@ describe('màn Hôm nay «Trong»', () => {
     await waitFor(() => expect(container.querySelector('.gvhn-dau .gvv2-phu')?.textContent).toContain('262 em'))
     await new Promise((r) => setTimeout(r, 30))
     expect(m.goi.mock.calls.some(([d]) => d === '/gv/nhip-hoc')).toBe(false)
+  })
+  it('có bài bổ sung chờ duyệt ⇒ một việc «Bài bổ sung chờ duyệt · N bài» → bấm mở tấm duyệt (thầy chốt 01/11)', async () => {
+    xoaDemBonBang()
+    m.boSung.mockResolvedValueOnce([
+      { khoa: 'k1', maCa: 'C1', tenCa: 'LD3', sbd: '91', hoTen: 'Đỗ Thanh Tùng', lanThu: 1, soCauMoi: 1, guiLuc: '2026-10-25T12:55:00Z', nopLuc: '2026-10-25T12:54:00Z' },
+      { khoa: 'k2', maCa: 'C2', tenCa: '12L1', sbd: '92', hoTen: 'Lê Minh Khoa', lanThu: 1, soCauMoi: 3, guiLuc: '2026-10-30T12:22:00Z', nopLuc: '2026-10-30T12:20:00Z' },
+    ])
+    const { default: GvHomNayScreen } = await import('../src/screens/GvHomNayScreen')
+    render(<GvHomNayScreen />)
+    const nut = await screen.findByRole('button', { name: /Bài bổ sung chờ duyệt · 2 bài/ })
+    expect(nut.textContent).toContain('2 ca · cũ nhất 25/10')
+    expect(m.boSung).toHaveBeenCalledWith('mat')
+    fireEvent.click(nut)
+    expect(await screen.findByRole('dialog', { name: 'Bài bổ sung chờ duyệt' })).toBeTruthy()
   })
 })
