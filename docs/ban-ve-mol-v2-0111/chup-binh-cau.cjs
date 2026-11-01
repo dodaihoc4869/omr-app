@@ -1,7 +1,7 @@
 // Chụp Mol BÌNH CẦU từ MÃ THẬT (01/11 tối: «giữ hình cầu, cảm xúc dễ thương, thêm 6,022, phối màu mịn»):
 //   node docs/ban-ve-mol-v2-0111/chup-binh-cau.cjs  ⇒ anh/binh-cau-*.jpg (≤ 150 KB)
 // Đóng gói src/components/linh-vat/mol-dong.ts (esbuild) + CSS thật (tokens.css, trong.css, trong-hs-mau.css, mol.css) dưới <html data-trong="hs">;
-// Mol CŨ lấy từ origin/main (git show) để đặt cạnh. Sáng / tối = prefers-color-scheme của Chromium (token tự đổi như trong app).
+// Mol CŨ (bình cầu #713) lấy từ commit 3f0a74e (trước #733) để đặt cạnh. Sáng / tối = prefers-color-scheme của Chromium (token tự đổi như trong app).
 const { chromium } = require('playwright')
 const esbuild = require('esbuild')
 const { execFileSync } = require('child_process')
@@ -13,9 +13,10 @@ const goi = (tep, ten) => esbuild.buildSync({ entryPoints: [tep], bundle: true, 
 // Mol mới (cây làm việc) + Mol cũ (origin/main)
 const jsMoi = goi(path.join(GOC, 'src/components/linh-vat/mol-dong.ts'), 'MOL')
 fs.mkdirSync(path.join(TAM, 'linh-vat'), { recursive: true })
-fs.writeFileSync(path.join(TAM, 'linh-vat/mol-dong.ts'), execFileSync('git', ['show', 'origin/main:src/components/linh-vat/mol-dong.ts'], { cwd: GOC, encoding: 'utf8' }).replace("import '../../styles/mol.css'\n", '').replace(/from '\.\/lua-dong'/, `from '${path.join(GOC, 'src/components/linh-vat/lua-dong')}'`))
+fs.writeFileSync(path.join(TAM, 'linh-vat/mol-dong.ts'), execFileSync('git', ['show', '3f0a74e:src/components/linh-vat/mol-dong.ts'], { cwd: GOC, encoding: 'utf8' }).replace("import '../../styles/mol.css'\n", '').replace(/from '\.\/lua-dong'/, `from '${path.join(GOC, 'src/components/linh-vat/lua-dong')}'`))
 const jsCu = goi(path.join(TAM, 'linh-vat/mol-dong.ts'), 'MOLCU')
-const cssCu = execFileSync('git', ['show', 'origin/main:src/styles/mol.css'], { cwd: GOC, encoding: 'utf8' }).replace(/\.mol-svg/g, '.cu .mol-svg').replace(/html\.may-yeu \.cu /g, 'html.may-yeu ')
+const jsBb = goi(path.join(GOC, 'src/lib/bong-bong-mol.ts'), 'BB') // hình học thuần của bong bóng (cùng mã với app)
+const cssCu = execFileSync('git', ['show', '3f0a74e:src/styles/mol.css'], { cwd: GOC, encoding: 'utf8' }).replace(/\.mol-svg/g, '.cu .mol-svg').replace(/html\.may-yeu \.cu /g, 'html.may-yeu ')
 const font = (w, f) => `@font-face{font-family:'DDH Rounded';font-weight:${w};src:url(file://${path.join(GOC, 'src/styles/phong-ddh', f)}) format('woff2')}`
 const css = [doc('src/styles/tokens.css'), doc('src/styles/trong.css'), doc('src/styles/trong-hs-mau.css'), doc('src/styles/mol.css'), cssCu,
   doc('src/styles/bi.css').replace(/@import[^;]*;/g, ''), doc('src/styles/trong-hs.css').replace(/@import[^;]*;/g, ''),
@@ -62,7 +63,7 @@ figure small{font-weight:600;font-size:11.5px;color:var(--tr-chu-3)} .moi-nhan{c
 const MAT = [['vui', 'vui'], ['khen', 'khen'], ['chao', 'chào'], ['nghi', 'nghĩ'], ['ngac', 'ngạc nhiên'], ['buon', 'buồn'], ['ngu', 'ngủ'], ['doi', 'dỗi · 2'], ['buc', 'bực · 3'], ['cau', 'cáu · 4'], ['ratCau', 'rất cáu · 5'],
   ['nguong', 'ngượng', 1], ['me', 'mê', 1], ['nhay', 'vui nhảy', 1], ['tuTin', 'tự tin', 1]]
 const html = `<!doctype html><html lang="vi" data-trong="hs"><head><meta charset="utf-8"><style>${css}</style></head><body><main id="m"></main><div id="dt"></div>
-<script>${jsMoi}</script><script>${jsCu}</script><script>
+<script>${jsMoi}</script><script>${jsCu}</script><script>${jsBb}</script><script>
 const bi = (m, w, o = {}) => '<span class="bi lua' + (o.cu ? ' cu' : '') + '"' + (w < 64 ? ' data-nho' : '') + ' style="width:' + w + 'px;height:' + Math.round(w * 1.15) + 'px"><svg class="lua-svg mol-svg" viewBox="0 -26 200 230" data-mat="' + m + '"' + (o.bo ? ' data-mol-mau="' + o.bo + '"' : '') + ' data-tinh>' + (o.cu ? MOLCU.svgMol(m) : MOL.svgMol(m)) + '</svg></span>'
 const nua = (m, w) => '<span class="bi lua"' + (w < 64 ? ' data-nho' : '') + ' style="width:' + w + 'px;height:' + w + 'px;overflow:hidden;border-radius:50%"><svg class="lua-svg mol-svg" viewBox="5 6 190 190" data-mat="' + m + '" data-tinh>' + MOL.svgMol(m) + '</svg></span>'
 const MAT = ${JSON.stringify(MAT)}
@@ -97,43 +98,68 @@ m.innerHTML =
  '<div class="luoi" style="grid-template-columns:repeat(3,1fr)">' + ['vui', 'cau', 'ratCau'].map((k) => '<figure><span class="bi lua" style="width:330px;height:160px;overflow:hidden;border-radius:14px"><svg class="lua-svg mol-svg" viewBox="38 128 124 60" data-mat="' + k + '" data-tinh style="width:330px;height:160px;overflow:hidden">' + MOL.svgMol(k) + '</svg></span><div style="display:flex;align-items:flex-end;gap:12px;margin-top:6px">' + [48, 64, 96].map((w) => bi(k, w)).join('') + '</div>' + k + '</figure>').join('') + '</div></section>' +
  '<section class="khoi" id="co-nho"><h2>Cỡ nhỏ · 28 / 40 / 48 / 64 px (toàn hình) và vòng 40 px · nền ' + (matchMedia('(prefers-color-scheme: dark)').matches ? 'tối' : 'sáng') + '</h2><p>Chữ 6,022·10²³ ở bụng hiện từ 64 px (đã thử 48 px: chữ cao ~3,5 px, không đọc được ⇒ ẩn).</p>' +
  '<div class="luoi" style="grid-template-columns:repeat(5,1fr)">' + ['vui', 'khen', 'buon', 'cau', 'ratCau'].map((k) => '<figure><div style="display:flex;align-items:flex-end;gap:10px">' + [28, 40, 48, 64].map((w) => bi(k, w)).join('') + '<span class="vong" style="display:inline-block;padding:3px;border-radius:50%;background:var(--tr-hs)">' + nua(k, 40) + '</span></div>' + k + '</figure>').join('') + '</div></section>'
-// Điện thoại Lộ trình + BONG BÓNG THẬT trên đầu Mol (markup + CSS như TrongHs.tsx / trong-hs.css; tự căn như LoiBi: rộng ≤ 280, không tràn mép đường đi)
+// Điện thoại Lộ trình + BONG BÓNG THẬT trên đầu Mol (markup + CSS như TrongHs.tsx / trong-hs.css). Đặt chỗ = CÙNG thuật toán LoiBi: bong bóng CO THEO CHỮ
+// (đo dòng dài nhất bằng Range, src/lib/bong-bong-mol.ts rongOmChu / viTriBong), né nút chặng (nâng lên rồi thu hẹp). ?ngang ⇒ điện thoại xoay ngang 844 × 390.
 const kiem = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'
 const DT = { cau: ['cau', 4, 'cau', 'Không biết học đối phó có lợi ích gì?'], cau5: ['ratCau', 5, 'ratCau', 'Tại sao phải đối phó với một giáo viên top 3 miền Bắc dạy Hoá?'],
-  doi: ['doi', 2, 'doi', 'Để học giỏi Hoá cần 2 điều kiện: hiểu tiếng Việt và giỏi toán lớp 4.'], cn: ['vui', 0, 'vui', '«Tập trung vào quá trình, kết quả là tất yếu.»', 1] }
+  doi: ['doi', 2, 'doi', 'Để học giỏi Hoá cần 2 điều kiện: hiểu tiếng Việt và giỏi toán lớp 4.'], cn: ['vui', 0, 'vui', '«Tập trung vào quá trình, kết quả là tất yếu.»', 1],
+  ngan1: ['doi', 2, 'doi', 'Ơ, lại vội rồi đấy.'], ngan2: ['ratCau', 5, 'ratCau', 'Đủ rồi! Vào học ngay!'],
+  dai1: ['vui', 0, 'vui', '«Năng lực của tình yêu là chữa lành và nuôi lớn.»', 1], dai2: ['ratCau', 5, 'ratCau', 'Tại sao phải đối phó với một giáo viên top 3 miền Bắc dạy Hoá?'] }
+const ngang = q.has('ngang')
 const [mat, cap, cx, cau, laCn] = DT[q.get('dt')] || DT.cau
-const MW = 104, MX = 236, MY = 380, tamX = MX + MW / 2, tamY = MY + MW * 1.15 / 2, L = 16, Rp = 374
-const rong = Math.round(Math.max(150, Math.min(280, (Rp - L) - 16))), trai = Math.round(Math.min(Math.max(tamX - rong / 2, L + 8), Rp - 8 - rong) - tamX), duoi = Math.round(Math.min(Math.max(-trai - 20, 18), rong - 18))
-document.getElementById('dt').innerHTML = '<div class="dt"><div class="tren"><span class="o lua">🔥12</span><span class="o nt">⚛ 340</span><span class="o tt">★ 5</span><span class="vong">' + nua(mat, 36) + '</span></div>' +
- '<div class="hero"><small>CHƯƠNG 1 · HOÁ 12</small><b>Este – Lipid</b><div class="thanh"><i></i>2/7 chặng</div></div>' +
- '<span class="chu-nen" style="left:24px;top:330px">n = m / M</span><span class="chu-nen" style="left:30px;top:690px">CaCO₃ → CaO + CO₂</span><span class="chu-nen" style="left:230px;top:620px">pV = nRT</span>' +
- '<span class="chang xong" style="left:150px;top:268px">' + kiem + '</span><span class="chang xong" style="left:76px;top:420px">' + kiem + '</span>' +
- '<span class="vong-dang" style="left:58px;top:556px"></span><span class="chang dang" style="left:70px;top:570px">★</span><span class="bat-dau" style="left:52px;top:500px">BẮT ĐẦU</span>' +
- '<span class="chang khoa" style="left:126px;top:700px">🔒</span>' +
+const W = ngang ? 844 : 390, H = ngang ? 390 : 844, MW = 104, MX = ngang ? 600 : 236, MY = ngang ? 200 : 380, L = 16, Rp = W - 16, TREN = ngang ? 66 : 205
+const tamX = MX + MW / 2, tamY = MY + MW * 1.15 / 2
+const nutDoc = '<span class="chang xong" style="left:150px;top:268px">' + kiem + '</span><span class="chang xong" style="left:76px;top:420px">' + kiem + '</span>' +
+  '<span class="vong-dang" style="left:58px;top:556px"></span><span class="chang dang" style="left:70px;top:570px">★</span><span class="bat-dau" style="left:52px;top:500px">BẮT ĐẦU</span>' +
+  '<span class="chang khoa" style="left:126px;top:700px">🔒</span>'
+const nutNgang = '<span class="chang xong" style="left:470px;top:84px">' + kiem + '</span><span class="chang xong" style="left:360px;top:180px">' + kiem + '</span>' +
+  '<span class="bat-dau" style="left:250px;top:232px">BẮT ĐẦU</span><span class="chang dang" style="left:300px;top:292px">★</span>'
+document.getElementById('dt').innerHTML = '<div class="dt" style="width:' + W + 'px;height:' + H + 'px"><div class="tren"><span class="o lua">🔥12</span><span class="o nt">⚛ 340</span><span class="o tt">★ 5</span><span class="vong">' + nua(mat, 36) + '</span></div>' +
+ (ngang ? '' : '<div class="hero"><small>CHƯƠNG 1 · HOÁ 12</small><b>Este – Lipid</b><div class="thanh"><i></i>2/7 chặng</div></div>' +
+   '<span class="chu-nen" style="left:24px;top:330px">n = m / M</span><span class="chu-nen" style="left:30px;top:690px">CaCO₃ → CaO + CO₂</span><span class="chu-nen" style="left:230px;top:620px">pV = nRT</span>') +
+ (ngang ? nutNgang : nutDoc) +
  '<div style="position:absolute;left:' + MX + 'px;top:' + MY + 'px">' + bi(mat, MW) + '</div>' +
- '<span class="da-lv-loi-o"' + (cap >= 4 ? ' data-cap="' + cap + '"' : '') + ' style="left:' + tamX + 'px;top:' + tamY + 'px;transform:none;--rong:' + rong + 'px;--trai:' + trai + 'px;--duoi:' + duoi + 'px">' +
+ '<span class="da-lv-loi-o"' + (cap >= 4 ? ' data-cap="' + cap + '"' : '') + ' style="left:' + tamX + 'px;top:' + tamY + 'px;transform:none">' +
  '<div class="bi-loi-boc" data-ben=""><div class="bi-loi" data-khong-bi=""><p class="bi-loi-bong"' + (cap >= 4 ? ' data-cap="' + cap + '"' : '') + ' data-cx="' + cx + '"' + (laCn ? ' data-chan-ngon=""' : '') + '><span aria-hidden="true">' + cau + '<span class="bi-loi-con"></span></span></p></div></div></span>' +
- '<nav class="day"><span class="dang2">◎</span><span>✎</span><span>🏆</span><span>☰</span></nav></div>'
+ (ngang ? '' : '<nav class="day"><span class="dang2">◎</span><span>✎</span><span>🏆</span><span>☰</span></nav>') + '</div>'
 if (q.has('dt')) m.style.display = 'none'; else document.getElementById('dt').style.display = 'none'
-// NÉ NÚT (cùng thuật toán LoiBi trong TrongHs.tsx): bong bóng giao nút chặng / nhãn ⇒ thu hẹp về phía Mol (≥ 130 px), không được thì nâng lên trên nút
-if (q.has('dt')) {
+window.datCho = () => {
+  if (!q.has('dt')) return
   const neo = document.querySelector('.da-lv-loi-o'), bb = neo.querySelector('.bi-loi-bong'), k = document.querySelector('.dt').getBoundingClientRect()
-  const r = { left: k.left + L, right: k.left + Rp, top: k.top + 205, width: Rp - L }, o = neo.getBoundingClientRect()
-  const dat = (rong, trai, nang = 0) => { neo.style.setProperty('--rong', rong + 'px'); neo.style.setProperty('--trai', trai + 'px'); neo.style.setProperty('--duoi', Math.round(Math.min(Math.max(-trai - 20, 18), rong - 18)) + 'px'); neo.style.setProperty('--nang', nang + 'px') }
+  const r = { left: k.left + L, right: k.left + Rp, top: k.top + TREN, width: Rp - L }, o = neo.getBoundingClientRect()
+  const dat = (rong, nang = 0, duong = r) => {
+    neo.style.setProperty('--rong', rong + 'px'); neo.style.setProperty('--nang', nang + 'px')
+    bb.style.width = ''
+    const rg = document.createRange(); rg.selectNodeContents(bb.querySelector('[aria-hidden="true"]'))
+    const cs = getComputedStyle(bb), so = (x) => parseFloat(x) || 0
+    const wc = BB.rongOmChu(Array.from(rg.getClientRects()), so(cs.paddingLeft) + so(cs.paddingRight) + so(cs.borderLeftWidth) + so(cs.borderRightWidth))
+    let w = rong
+    if (wc) { w = Math.min(rong, wc + 1); bb.style.width = w + 'px' }
+    const v = BB.viTriBong(duong, o.left, w)
+    neo.style.setProperty('--trai', v.trai + 'px'); neo.style.setProperty('--duoi', v.duoi + 'px')
+  }
+  const rong0 = Math.round(Math.max(150, Math.min(BB.RONG_TOI_DA, r.width - 16)))
+  dat(rong0)
   const nut = Array.from(document.querySelectorAll('.dt .chang, .dt .bat-dau')).map((e) => e.getBoundingClientRect())
   const giao = () => { const b = bb.getBoundingClientRect(); return nut.filter((n) => n.left < b.right && n.right > b.left && n.top < b.bottom && n.bottom > b.top) }
-  let g = giao()
+  const g = giao()
+  let kq = 'khong-giao'
   if (g.length) {
-    const phai = o.left > r.left + r.width / 2, mep = phai ? Math.max(...g.map((n) => n.right)) + 8 : Math.min(...g.map((n) => n.left)) - 8
-    const rongHep = Math.round(phai ? r.right - 8 - mep : mep - (r.left + 8))
-    let xong = false
+    kq = 'giu-mac-dinh'
     const b = bb.getBoundingClientRect(), nang = Math.ceil(b.bottom - (Math.min(...g.map((n) => n.top)) - 8))
-    if (nang > 0 && b.top - nang >= r.top) { dat(rong, trai, nang); xong = !giao().length }
-    if (!xong) { dat(rong, trai); if (rongHep >= 130) { dat(rongHep, Math.round((phai ? mep : r.left + 8) - o.left)); xong = !giao().length } }
-    if (!xong) dat(rong, trai)
-    document.body.dataset.ne = xong ? 'da-ne' : 'giu-mac-dinh'
-  } else document.body.dataset.ne = 'khong-giao'
+    if (nang > 0 && b.top - nang >= r.top) { dat(rong0, nang); if (!giao().length) kq = 'nang' }
+    if (kq !== 'nang') {
+      dat(rong0)
+      const phai = o.left > r.left + r.width / 2, mep = phai ? Math.max(...g.map((n) => n.right)) + 8 : Math.min(...g.map((n) => n.left)) - 8
+      const rongHep = Math.round(phai ? r.right - 8 - mep : mep - (r.left + 8))
+      if (rongHep >= BB.RONG_TOI_THIEU) { dat(rongHep, 0, phai ? { left: mep - 8, right: r.right } : { left: r.left, right: mep + 8 }); if (!giao().length) kq = 'thu-hep' }
+      if (kq !== 'thu-hep') dat(rong0)
+    }
+  }
+  const b = bb.getBoundingClientRect()
+  document.body.dataset.ne = kq + ' · rộng ' + Math.round(b.width) + ' · đuôi ' + Math.round(b.left + parseFloat(neo.style.getPropertyValue('--duoi')) - o.left) + ' so tâm Mol'
 }
+window.datCho()
 </script></body></html>`
 const TRANG = path.join(TAM, 'binh-cau.html'); fs.writeFileSync(TRANG, html)
 async function luu(chup, ten) {
@@ -148,7 +174,7 @@ async function luu(chup, ten) {
   const mo = async (toi, hoi = '', w = 1240, dsf = 1.4) => {
     const p = await b.newPage({ viewport: { width: w, height: 900 }, deviceScaleFactor: dsf, colorScheme: toi ? 'dark' : 'light', reducedMotion: 'reduce' })
     const loi = []; p.on('pageerror', (e) => loi.push(String(e)))
-    await p.goto('file://' + TRANG + hoi); await p.evaluate(() => document.fonts.ready); await p.waitForTimeout(200)
+    await p.goto('file://' + TRANG + hoi); await p.evaluate(() => document.fonts.ready); await p.evaluate(() => window.datCho && window.datCho()); await p.waitForTimeout(200)
     if (loi.length) console.log('LỖI', loi)
     return p
   }
@@ -183,6 +209,20 @@ async function luu(chup, ten) {
     const d = await mo(toi, '?dt=' + k, 390, 2)
     kq.push(await luu((o) => d.locator('.dt').screenshot(o), ten) + ' · ' + await d.evaluate(() => document.body.dataset.ne))
     await d.close()
+  }
+  const ghep = async (ds, doc, ten) => {
+    const g3 = await b.newPage({ viewport: { width: 1700, height: 900 }, deviceScaleFactor: 1 })
+    await g3.setContent(`<body style="margin:0;background:#888"><div id="g" style="display:inline-flex;flex-direction:${doc ? 'column' : 'row'};gap:12px;padding:12px;background:#888">${ds.map((a) => `<img src="data:image/png;base64,${a}" style="display:block">`).join('')}</div></body>`)
+    await g3.waitForTimeout(100)
+    kq.push(await luu((o) => g3.locator('#g').screenshot(o), ten))
+    await g3.close()
+  }
+  for (const [toi, ten] of [[false, 'sang'], [true, 'toi']]) {
+    const doc = [], ngang = []
+    for (const k of ['ngan1', 'ngan2', 'dai1', 'dai2']) { const d = await mo(toi, '?dt=' + k, 390, 1); doc.push((await d.locator('.dt').screenshot({ type: 'png' })).toString('base64')); kq.push(k + ' dọc ' + ten + ' · ' + await d.evaluate(() => document.body.dataset.ne)); await d.close() }
+    for (const k of ['ngan2', 'dai2']) { const d = await mo(toi, '?dt=' + k + '&ngang', 844, 1); ngang.push((await d.locator('.dt').screenshot({ type: 'png' })).toString('base64')); kq.push(k + ' ngang ' + ten + ' · ' + await d.evaluate(() => document.body.dataset.ne)); await d.close() }
+    await ghep(doc, false, `bong-bong-gon-doc-${ten}.jpg`)
+    await ghep(ngang, true, `bong-bong-gon-ngang-${ten}.jpg`)
   }
   console.log(kq.join('\n'))
   await b.close()
