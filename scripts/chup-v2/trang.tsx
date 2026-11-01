@@ -932,6 +932,16 @@ const DK_CAU = [
   { ...CAU_HOC[0]!, qid: 'K5', tenDang: 'Ester', text: 'Số đồng phân ester ứng với công thức phân tử C₃H₆O₂ là', choices: ['1.', '2.', '3.', '4.'] },
   { ...CAU_HOC[2]!, qid: 'K6', soO: 4 },
 ]
+// ═══ KTCN NGANG 02/11: `&dai=1` ⇒ câu 3 là ĐỀ DÀI (nhiều đoạn + phương trình dài + bảng) — chụp thanh cuộn riêng cột đề của Kiểm tra ôn tập.
+if (thamSo.get('dai') === '1') DK_CAU[2] = { ...CAU_HOC[0]!, qid: 'K3', tenDang: 'Chuẩn độ oxi hoá – khử', text: [
+  'Thuốc tím (potassium permanganate, KMnO4) là chất oxi hoá mạnh, được dùng phổ biến để chuẩn độ xác định hàm lượng sắt trong mẫu quặng và trong viên thuốc bổ sung sắt.',
+  'Một nhóm học sinh hoà tan hoàn toàn 2,00 gam mẫu viên thuốc bổ sung sắt (chứa FeSO4) trong dung dịch H2SO4 loãng dư, thu được 100,0 mL dung dịch X. Lấy 10,00 mL dung dịch X cho vào bình tam giác rồi chuẩn độ bằng dung dịch KMnO4 0,0100 M.',
+  'Phản ứng chuẩn độ xảy ra theo phương trình:',
+  '\\ce{2KMnO4 + 10FeSO4 + 8H2SO4 -> K2SO4 + 2MnSO4 + 5Fe2(SO4)3 + 8H2O}',
+  'Biết các tạp chất không phản ứng với KMnO4. Kết quả ba lần chuẩn độ được ghi trong bảng sau.',
+  'Phần trăm khối lượng FeSO4 trong mẫu viên thuốc là',
+].join('\n'), table: [['Lần chuẩn độ', '1', '2', '3'], ['Thể tích KMnO4 (mL)', '13,10', '13,20', '13,30']], choices: ['50,16%', '10,03%', '25,08%', '45,60%'] } as typeof DK_CAU[number]
+// ═══ hết KTCN NGANG 02/11
 const DK_KET = { chu: 'Em vững phần Ester – Lipid; phần Amine cần luyện thêm bậc amine và tính base.',
   bai: [{ ten: 'Bài 6. Ester – Lipid', tong: 8, daKiem: 8, dungLanNay: 7 }, { ten: 'Bài 8. Amine', tong: 6, daKiem: 6, dungLanNay: 4 }],
   cau: Array.from({ length: 12 }, (_, i) => ({ de: DK_CAU[i % 3]!, tra: i === 5 ? '' : 'A', dung: ![2, 5, 9].includes(i), dapAn: 'A', loiGiai: null })) }
