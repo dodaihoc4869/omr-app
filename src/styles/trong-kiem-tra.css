@@ -378,3 +378,48 @@
   [data-trong='hs'] .duo-kt-thi > .duo-day .duo-kt-hang > .duo-nut { flex: 0 0 auto; width: auto; min-width: 260px; padding-inline: 32px; }
 }
 @media (prefers-reduced-motion: reduce) { [data-trong='hs'] .kt-den > i { transition: none; } }
+
+/* ── 6. THI TẬP TRUNG (thầy 01/11: «Thanh màu xanh đồng hồ và nút hơi rối, khi vào kiểm tra thì ẩn hết đi … hiện thời gian lên tinh tế đẹp mắt báo một
+ * lần rồi lại ẩn đi … full màn hình»; mốc báo thầy chốt: 12 · 6 · 1 phút). Chỉ ca CÓ GIỜ (ThiDuo gắn `[data-tap-trung]`). Thanh trên (X · thanh
+ * tiến độ · đồng hồ · lưới câu) thành lớp nổi TRƯỢT khỏi mép trên — vẫn trong DOM (Tab tới được); `[data-tren-hien]` ⇒ trượt xuống, đè lên đề (không
+ * đẩy bố cục). Tay nắm mảnh giữa mép trên (vùng chạm 96×44). Lời báo giờ: viên giữa mép trên, hiện ~4 s rồi mờ đi. Chỉ biến --tr-*. ── */
+[data-trong='hs'] .duo-kt-thi[data-tap-trung] > .duo-kt-tren.duo-tren {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 40; width: auto; transform: translateY(calc(-100% - 12px)); transition: transform .22s ease;
+}
+[data-trong='hs'] .duo-kt-thi[data-tren-hien] > .duo-kt-tren.duo-tren { transform: none; box-shadow: var(--tr-bong-2); }
+/* đề lên sát mép trên (chừa vùng an toàn + tay nắm) · dải cảnh báo rời màn dính ngay mép trên */
+[data-trong='hs'] .duo-kt-thi[data-tap-trung] > .duo-kt-than { padding-top: calc(env(safe-area-inset-top) + 22px); }
+[data-trong='hs'] .duo-kt-thi[data-tap-trung] > .sticky { top: env(safe-area-inset-top) !important; }
+[data-trong='hs'] .duo-kt-tay {
+  position: fixed; top: 0; left: 50%; z-index: 39; width: 96px; height: calc(44px + env(safe-area-inset-top)); margin: 0 0 0 -48px;
+  padding: env(safe-area-inset-top) 0 0; border: 0; background: transparent; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+[data-trong='hs'] .duo-kt-tay > i {
+  position: absolute; left: 50%; top: calc(env(safe-area-inset-top) + 8px); width: 40px; height: 5px; margin-left: -20px; border-radius: 999px;
+  background: var(--tr-vien-2); transition: background-color .15s ease, width .15s ease, margin .15s ease;
+}
+[data-trong='hs'] .duo-kt-tay:is(:hover, :focus-visible) > i { width: 56px; margin-left: -28px; background: var(--tr-chu-3); }
+[data-trong='hs'] .duo-kt-tay:focus-visible { outline: none; }
+[data-trong='hs'] .duo-kt-tay:focus-visible > i { box-shadow: 0 0 0 3px var(--tr-tin-nhat); }
+[data-trong='hs'] .duo-kt-thi[data-tren-hien] > .duo-kt-tay { visibility: hidden; }
+/* lời báo giờ: hai vùng đọc màn hình (polite · assertive) luôn có sẵn, rỗng thì không chiếm chỗ */
+[data-trong='hs'] .duo-kt-bao-gio { position: fixed; top: calc(env(safe-area-inset-top) + 10px); left: 50%; z-index: 41; transform: translateX(-50%); pointer-events: none; }
+[data-trong='hs'] .duo-kt-bao-vien {
+  display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px 9px 14px; border: 2px solid var(--tr-vien); border-radius: 999px;
+  background: var(--tr-mat); color: var(--tr-chu); box-shadow: var(--tr-bong-3); font-size: 17px; font-weight: 800; letter-spacing: -0.01em;
+  white-space: nowrap; animation: duo-kt-bao 4s ease both;
+}
+[data-trong='hs'] .duo-kt-bao-vien svg { color: var(--tr-tin-chu); }
+[data-trong='hs'] .duo-kt-bao-vien[data-moc='360'] { border-color: var(--tr-chu-y); background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); }
+[data-trong='hs'] .duo-kt-bao-vien[data-moc='60'] { border-color: var(--tr-sai); background: var(--tr-sai-nhat); color: var(--tr-sai-chu); }
+[data-trong='hs'] .duo-kt-bao-vien:is([data-moc='360'], [data-moc='60']) svg { color: inherit; }
+@keyframes duo-kt-bao { 0% { opacity: 0; transform: translateY(-14px) scale(.96); } 9%, 86% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-8px); } }
+@keyframes duo-kt-bao-mo { 0% { opacity: 0; } 9%, 86% { opacity: 1; } 100% { opacity: 0; } }
+/* nút «Đóng phòng thi» nổi của cổng học sinh (góc phải trên, đè thanh trên / cờ «Xem lại sau») cất đi khi đang làm ca có giờ — thoát bằng X trên thanh */
+[data-trong='hs'][data-thi-tap-trung] .man-thi-phu > button[aria-label^='Đóng phòng thi'] { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  [data-trong='hs'] .duo-kt-thi[data-tap-trung] > .duo-kt-tren.duo-tren { transition: none; }
+  [data-trong='hs'] .duo-kt-bao-vien { animation-name: duo-kt-bao-mo; }
+}
+[data-trong='hs'].may-yeu .duo-kt-thi[data-tap-trung] > .duo-kt-tren.duo-tren { transition: none; }
+[data-trong='hs'].may-yeu .duo-kt-bao-vien { animation-name: duo-kt-bao-mo; }
