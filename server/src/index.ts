@@ -3863,6 +3863,8 @@ const boXuLy = {
       // GỢI Ý 3 TẦNG + LỜI GIẢI KIỂU SƠ ĐỒ (26/10, server/src/loi-giai-so-do.ts): trước nộp cắt mọi kết quả, sau nộp trả đủ; tắt khi ca kiểm tra / KTCN / câu đang bảo vệ.
       // Một đợt D1; việc ghi «có trợ giúp» vào lượt game chạy sau phản hồi.
       if (p === '/hs/goi-y-so-do') return ra(await import('./loi-giai-so-do').then((m) => m.hsGoiYSoDo(env, b, { sau: ctx ? (viec) => ctx.waitUntil(viec) : undefined })))
+      // LỜI GIẢI KÍNH (thầy chốt 02/11): tải sẵn bản Kính mã hoá cho câu em đang có (loi-giai-kinh.ts — cùng luật phạm vi với gói đáp án dm).
+      if (p === '/hs/loi-giai-kinh') return ra(await import('./loi-giai-kinh').then((m) => m.hsGoiKinh(env, b)))
       if (p === '/hs/hoi-thay') {
         // HỎI THÊM THẦY (13/10, hoi-tro-ly.ts): phản hồi mở được lời giải ⇒ kèm `hoiThem` = máy em hiện ô nhắn hỏi Thầy (AI) dưới lời giải.
         // Tốc độ (thầy 13/10): cờ đọc SONG SONG với các lượt kiểm của hsHoiThay; việc ghi sổ chạy sau phản hồi (ctx.waitUntil).

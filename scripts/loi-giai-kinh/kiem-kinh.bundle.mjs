@@ -1,11 +1,12 @@
+/* eslint-disable */
 // TỆP SINH TỰ ĐỘNG — đừng sửa tay. Dựng: node scripts/loi-giai-kinh/dung-kiem-kinh.mjs
 
-// ../../src/lib/loi-giai-kinh/kieu.ts
+// src/lib/loi-giai-kinh/kieu.ts
 var PHIEN_BAN_KINH = 1;
 var HINH_NHIP = ["binh", "ong-nghiem", "dun", "chiet", "loc", "can", "khi", "ket-tua", "mau", "nhiet", "ap-suat", "xuc-tac", "nguyen-tu", "phan-tu", "lien-ket", "dien", "pin", "do-thi", "mui-ten", "kinh-lup", "so-sanh", "cong-thuc"];
 var MAU_LOP = ["trong", "xanh", "cam", "vang", "hong", "tim", "nau", "trang-duc"];
 
-// ../../src/lib/doc-so-phan-iii.ts
+// src/lib/doc-so-phan-iii.ts
 function docSoPhanIII(raw) {
   var s2 = String(raw == null ? "" : raw);
   var MU = {
@@ -112,7 +113,7 @@ function docSoPhanIII(raw) {
   return { so: dau + ketQua, donVi: duoi };
 }
 
-// ../../src/lib/cham-so-policy.ts
+// src/lib/cham-so-policy.ts
 var POLICY_VERSION = "CNH-1.0";
 var THAM_SO_CHAM_CNH_1_0 = Object.freeze({
   policyVersion: POLICY_VERSION,
@@ -514,10 +515,10 @@ function chamTheoPolicy(raw) {
 }
 var POLICY_MAC_DINH_PHAN_III = "numeric-value-v1";
 
-// ../../src/lib/cau-tu-luan.ts
+// src/lib/cau-tu-luan.ts
 var YC = new RegExp("^(?:hãy )?(?:viết|xác định|tính(?! (?:chất|khử|oxi|acid|axit|base|tan|dẫn|dẻo))|giải thích|trình bày|nêu|so sánh|nhận xét|đề xuất|cho biết|tìm|(?:tại|vì) sao)(?!\\p{L})", "iu");
 
-// ../../src/lib/loi-giai-kiem.ts
+// src/lib/loi-giai-kiem.ts
 function tinhBieuThuc(bt) {
   const s2 = bt.replace(/\s+/g, "");
   if (!/^[0-9.+\-*/()eE]+$/.test(s2)) throw new Error("biểu thức có kí tự lạ: " + bt);
@@ -567,7 +568,7 @@ function tinhBieuThuc(bt) {
   return v;
 }
 
-// ../../src/lib/loi-giai-kinh/kiem.ts
+// src/lib/loi-giai-kinh/kiem.ts
 var laObj = (x) => x !== null && typeof x === "object" && !Array.isArray(x);
 var s = (v, tran = 600) => typeof v === "string" || typeof v === "number" ? String(v).normalize("NFC").replace(/\s+/g, " ").trim().slice(0, tran) : "";
 var mang = (v) => Array.isArray(v) ? v : [];
@@ -765,8 +766,34 @@ function banKinhDungDuoc(x, phan, dapAn) {
   const k = kiemBanKinh(x, { phan, dapAn, qid: x.qid, nguon: { thanChu: mang(x.thanChu).map((t) => s(t, 160)), thayNoi: x.thayNoi ? [s(x.thayNoi, 300)] : [], meo: x.meo ? [s(x.meo, 300)] : [] } });
   return k.ket === "dat" ? k.ban : null;
 }
+var soKhop = (t) => String(t ?? "").replace(/<[^>]*>/g, " ").replace(/&[a-z#0-9]+;/gi, " ").normalize("NFC").toLowerCase().replace(/[\s ]+/g, "").replace(/[.。]+$/, "");
+function xepTheoCauPhat(tho, q) {
+  if (!laObj(tho)) return null;
+  const { _goc, ...ban } = tho;
+  const b = ban;
+  if (!Array.isArray(b.lyDo)) return null;
+  if (q.phan === "III") {
+    if (b.ketQua && !khopLamTron(docSoViet(b.ketQua) ?? NaN, q.correct)) return null;
+    return b;
+  }
+  const khoa = q.phan === "I" ? KHOA_I : KHOA_II;
+  const hien = (q.phan === "I" ? q.choices : q.ideas) ?? [];
+  const goc = (q.phan === "I" ? _goc?.pa : _goc?.y) ?? null;
+  const theoGoc = new Map(b.lyDo.map((l) => [l.khoa, l]));
+  let lyDo;
+  if (goc && hien.length === 4) {
+    const chuGoc = new Map(Object.entries(goc).map(([k, v]) => [soKhop(v), k]));
+    const ghep = hien.map((t) => chuGoc.get(soKhop(t)));
+    if (ghep.some((k) => !k) || new Set(ghep).size !== 4) return null;
+    lyDo = ghep.map((k, i) => ({ ...theoGoc.get(k), khoa: khoa[i] }));
+  } else lyDo = khoa.map((k) => theoGoc.get(k)).filter(Boolean);
+  if (lyDo.length !== 4) return null;
+  const d = dungTheoKho(q.phan, q.correct);
+  if (!d || lyDo.some((l) => l.dung !== d.get(l.khoa))) return null;
+  return { ...b, lyDo };
+}
 
-// ../../src/lib/cham-so.ts
+// src/lib/cham-so.ts
 function soKhopSo(v, d, cheDo) {
   const a = chuanHoaSoNhap(v), b = chuanHoaSoNhap(d);
   if (!a || !b) return false;
@@ -789,7 +816,7 @@ function soKhopSo(v, d, cheDo) {
 }
 var khopPhanIII = (cuaEm, dapAn) => soKhopSo(cuaEm, dapAn, "so_hoc");
 
-// ../../server/src/so-do-cong.ts
+// server/src/so-do-cong.ts
 var SO_BUOC_TOI_DA = 3;
 var str = (v) => v == null ? "" : String(v);
 var CO_MU = /(?:[×x*·]\s*10|\.\s*10\s*\^|\^|[eE][+-]?\d|[⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺])/;
@@ -1048,7 +1075,7 @@ function khopDapAnSo(v, dapAn, d) {
   return Math.abs(v) < 1e15 && khopPhanIII(v.toFixed(soChu), dapAn);
 }
 
-// ../../server/src/kinh-than-chu.ts
+// server/src/kinh-than-chu.ts
 var THAN_CHU = [
   {
     "chu": "Tăng thu, giảm toả",
@@ -1186,5 +1213,6 @@ export {
   khopLamTron,
   kiemBanKinh,
   kiemCong,
-  kiemPhepTinh
+  kiemPhepTinh,
+  xepTheoCauPhat
 };
