@@ -359,3 +359,19 @@ html[data-trong='hs'] .dm-khung[data-muc] .da-vo > .kb-dau { grid-column: 1 / -1
 html[data-trong='hs'] .tr-menu > .kb-them-tieu { grid-row: 1; }
 html[data-trong='hs'] .tr-menu:has(> .tr-menu-dem .tp-tr:empty) > .tr-menu-ds, html[data-trong='hs'] .tr-menu:has(> .tr-menu-dem .tp-tr:empty) > .tr-menu-cai { grid-column: ds-start / -1; }
 html[data-trong='hs'] .tr-menu > .tr-menu-dem:has(.tp-tr:empty) { display: none; }
+/* MÀN THƯỞNG THẬT (khung «thuong» của MotTrangHs — bản vẽ chuoi-ngay · giai-tuan · nhiem-vu · cua-hang · hoc-cung-ban): hàng đầu = NÚT KÍNH TRÒN «‹»
+   + TIÊU ĐỀ CÙNG HÀNG (thay chữ «← QUAY LẠI» nhỏ). Nút giữ tên «Quay lại» cho trình đọc màn hình (chữ thu cỡ 0); màn đã có tiêu đề riêng ⇒ tiêu đề ấy
+   ẩn hình (vẫn đọc được), hàng đầu hiện đúng chữ ấy. Không thêm chức năng, không đổi DOM. */
+html[data-trong='hs'] .dm-khung[data-muc='thuong'] .tp-vo > div:first-child { display: flex; align-items: center; gap: 14px; min-height: 48px; margin: 2px 0 4px; }
+html[data-trong='hs'] .dm-khung[data-muc='thuong'] .tp-vo > div:first-child > .tp-nut-chu { flex: none; width: 48px; height: 48px; min-height: 48px; padding: 0; border-radius: 24px;
+  font-size: 0; letter-spacing: 0; color: var(--tr-chu); background: var(--kinh-ve); box-shadow: inset 0 1px 0 var(--kinh-vien), inset 0 0 0 1px var(--kinh-vien-2), var(--kinh-bong); }
+html[data-trong='hs'] .dm-khung[data-muc='thuong'] .tp-vo > div:first-child > .tp-nut-chu > svg { width: 22px; height: 22px; }
+html[data-trong='hs'] .dm-khung[data-muc='thuong'] .tp-vo > div:first-child::after { font-size: 26px; font-weight: 800; line-height: 1.15; letter-spacing: -.02em; color: var(--tr-chu); }
+html[data-trong='hs'] .dm-khung[data-muc='thuong'] .tp-vo[data-man='chuoi'] > div:first-child::after { content: 'Chuỗi ngày'; }
+html[data-trong='hs'] .dm-khung[data-muc='thuong'] .tp-vo[data-man='giai'] > div:first-child::after { content: 'Giải tuần'; }
+html[data-trong='hs'] .dm-khung[data-muc='thuong'] .tp-vo[data-man='cua-hang'] > div:first-child::after { content: 'Cửa hàng'; }
+html[data-trong='hs'] .dm-khung[data-muc='thuong'] .tp-vo[data-man='ban'] > div:first-child::after { content: 'Học cùng bạn'; }
+html[data-trong='hs'] .dm-khung[data-muc='thuong'] .tp-vo[data-man='nhiem-vu'] > div:first-child::after { content: 'Nhiệm vụ hôm nay'; }
+html[data-trong='hs'] .dm-khung[data-muc='thuong'] .tp-vo[data-man='kim-cuong-ds'] > div:first-child::after { content: 'Thử thách Kim cương'; }
+html[data-trong='hs'] .dm-khung[data-muc='thuong'] .tp-vo:is([data-man='ban'], [data-man='nhiem-vu'], [data-man='kim-cuong-ds']) .tp-tieu {
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }

@@ -51,6 +51,13 @@ export const CANH = [
   ['thi-cau', 'man=duo-kt&v=thi&vai=hocsinh', 'cho:600', false],
   ['thi-chon', 'man=duo-kt&v=thi&vai=hocsinh', 'nut:^B\\.', false],
   ['thi-kq', 'man=duo-kt&v=kq&vai=hocsinh', '', true],
+  // màn thưởng THẬT (MotTrangHs → Thành tích → bấm mục ⇒ ManThuong trong khung «thuong» của app, không qua khung giả gia/thuong.tsx)
+  ['tpt-chuoi', 'man=hs-mot&tp=1&dd=khong', 'nut:^Thành tích$ » nut:^Chuỗi ngày » cho:900', true],
+  ['tpt-giai', 'man=hs-mot&tp=1&dd=khong', 'nut:^Thành tích$ » nut:^Giải tuần » cho:900', true],
+  ['tpt-huy-hieu', 'man=hs-mot&tp=1&dd=khong', 'nut:^Thành tích$ » nut:^Huy hiệu » cho:900', true],
+  ['tpt-ban', 'man=hs-mot&tp=1&dd=khong', 'nut:^Thành tích$ » nut:^Học cùng bạn » cho:900', true],
+  ['tpt-cua-hang', 'man=hs-mot&tp=1&dd=khong', 'nut:^Thành tích$ » nut:^Cửa hàng » cho:900', true],
+  ['tpt-nhiem-vu', 'man=hs-mot&tp=1&dd=khong', 'bam:.kb-chip[data-k=nt] » cho:900', true],
   ['tp-chuoi', 'man=tp&v=chuoi', '', true],
   ['tp-giai', 'man=tp&v=giai', '', true],
   ['tp-nhiem-vu', 'man=tp&v=nv', '', true],
