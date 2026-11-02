@@ -575,3 +575,9 @@ html[data-trong='hs'] .kb-thanh .kb-thanh-muc.tr-menu-cham[aria-expanded='true']
    (<html data-vua-mo>, gắn ở TrongHs.tsx) — hoạt ảnh vào màn (menu trượt, ô tích, rương thở…) nhảy thẳng tới trạng thái cuối nhờ trễ âm; hoạt ảnh lặp vẫn chạy
    (chỉ lệch pha); không chuyển tiếp (màu dung dịch, nút). */
 html[data-vua-mo] *, html[data-vua-mo] *::before, html[data-vua-mo] *::after { animation-delay: -30s !important; transition-duration: 0s !important; transition-delay: 0s !important; }
+
+/* MOL Ở GÓC TRÁI THẺ ĐẦU (chốt 03/11, docs/ban-ve-mol-goc-0311) (thầy «cho mol hiển thị lên bảng đầu tiên góc trái cho tinh tế đẹp mắt hiển thị cả bong bóng cảm xúc của mol») */
+html[data-trong='hs'] .kb-mol { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; margin: -6px 0 2px -8px; min-width: 0; }
+html[data-trong='hs'] .kb-mol .bi { flex: none; }
+html[data-trong='hs'] .kb-mol .kb-mol-bong { position: relative; margin: 0; padding: 8px 12px; max-width: 100%; min-width: 0; font-size: 14.5px; line-height: 1.3; border-radius: 16px 16px 16px 6px; text-wrap: balance; }
+html[data-trong='hs'] .kb-mol .kb-mol-bong::before { display: block; left: -6px; top: calc(50% - 6px); bottom: auto; width: 12px; height: 12px; transform: rotate(45deg); }

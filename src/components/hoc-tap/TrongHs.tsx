@@ -557,7 +557,7 @@ type NhoLoiMol = { l?: string; c?: string; t?: string }
 const docLoiMol = (): NhoLoiMol => { try { const v = JSON.parse(localStorage.getItem(KHOA_LOI_MOL) || '{}'); return v && typeof v === 'object' ? v : {} } catch { return {} } }
 const ghiLoiMol = (v: NhoLoiMol) => { try { localStorage.setItem(KHOA_LOI_MOL, JSON.stringify(v)) } catch { /* không lưu được: lượt sau có thể lặp câu */ } }
 
-function LoiBi({ cam, loi, coBi = true, khoa, cap = 0, ben, chanNgon: laChanNgon }: { cam: CamBi; loi: string; coBi?: boolean; khoa?: string; cap?: number; ben?: HTMLElement | null; chanNgon?: boolean }) {
+function LoiBi({ cam, loi, coBi = true, khoa, cap = 0, ben, chanNgon: laChanNgon, goc }: { cam: CamBi; loi: string; coBi?: boolean; khoa?: string; cap?: number; ben?: HTMLElement | null; chanNgon?: boolean; goc?: boolean }) {
   // pha: hien (gõ chữ, giữ ~4 s) → thu (mờ + co chiều cao mượt, đường đi trượt lên) → an (gỡ hẳn). Không khoá (lời quan trọng) ⇒ luôn hiện.
   const [pha, setPha] = useState<'hien' | 'thu' | 'an'>(() => (khoa && docDaNhac().includes(khoa) ? 'an' : 'hien'))
   useEffect(() => {
@@ -662,6 +662,8 @@ function LoiBi({ cam, loi, coBi = true, khoa, cap = 0, ben, chanNgon: laChanNgon
   }, [ben, daAn, doc]) // eslint-disable-line react-hooks/exhaustive-deps
   // màu bong bóng theo cảm xúc (trong-hs.css .bi-loi-bong[data-cx]): cấp ≥ 2 ⇒ dỗi · bực · cáu · rất cáu; còn lại theo mặt Mol
   const cx = cap >= 2 ? (['doi', 'buc', 'cau', 'ratCau'] as const)[Math.min(cap, 5) - 2] : cam === 'mung' || cam === 'lua' ? 'khen' : cam === 'sai' ? 'buon' : cam
+  // MOL Ở GÓC TRÁI THẺ ĐẦU (thầy 03/11 «cho mol hiển thị lên bảng đầu tiên góc trái … hiển thị cả bong bóng cảm xúc», chốt bản vẽ docs/ban-ve-mol-goc-0311): Mol nhỏ ở góc trái thẻ «Tổng câu hôm nay», bong bóng cảm xúc cạnh Mol
+  if (goc) return <div className="kb-mol"><Bi cam={cam} cap={cap} size={58} noi={loi} /><p className="bi-loi-bong kb-mol-bong" data-cap={cap >= 4 ? cap : undefined} data-cx={cx} data-chan-ngon={laChanNgon || undefined}><span className="ht2-an">{loi}</span><span aria-hidden="true">{loi.slice(0, n)}<span className="bi-loi-con">{loi.slice(n)}</span></span></p></div>
   if (pha === 'an') return null
   // cấp 4–5: viền bong bóng màu «sai» (token có sẵn). `ben` (điện thoại ngang thấp): bong bóng nói CẠNH Lửa trên đường, đuôi chỉ xuống Lửa.
   const bong = <div className="bi-loi-boc" data-thu={pha === 'thu' || undefined} data-ben={ben ? '' : undefined}><div className="bi-loi" data-khong-bi={!coBi || !!ben || undefined}>{coBi && !ben && <Bi cam={cam} cap={cap} size={84} noi={loi} />}<p className="bi-loi-bong" data-cap={cap >= 4 ? cap : undefined} data-cx={cx} data-chan-ngon={laChanNgon || undefined}><span className="ht2-an">{loi}</span><span aria-hidden="true">{loi.slice(0, n)}<span className="bi-loi-con">{loi.slice(n)}</span></span></p></div></div>
@@ -1122,9 +1124,7 @@ export function MotTrangHs(p: PropsMotTrang) {
   const loiLuaBi: [CamBi, string, string] | null = cn && loiLuaBi0 ? [loiLuaBi0[0], `«${cn}»`, `${loiLuaBi0[2]}-cn`] : loiLuaBi0
 
   // Bi đứng cạnh đường (bản vẽ nâng cấp 27/10) khi đường có ≥ 2 chặng ⇒ lời Bi phía trên chỉ còn bong bóng (không hai Bi).
-  const coBiBen = false // hệ Kính: không còn linh vật cạnh đường ⇒ Mol nói ngay trên nút chính
   // 01/11 tối (thầy «chữ hiện bong bóng trên đầu Mol»): có Mol cạnh đường + lời theo cấp ⇒ bong bóng TRÊN ĐẦU Mol ở mọi hướng màn (thay thẻ riêng ở trên)
-  const benLua = null
   return <div ref={khung} className="dm-khung" data-so-menu={coThuong || undefined} style={{ '--tren-cao': `${trenCao}px` } as CSSProperties}>{tren}
     <main className="da-vo" aria-busy={!so && p.dangTai}><div className="kb-cot-trai">
       {/* THẺ BÀI (thầy 27/10 «thu vào bị giật… cho thanh màu xanh xuống kẻo chèn vào ống nghiệm»): thẻ đầy đủ ĐỨNG YÊN trong luồng (giữ chỗ, không nhảy cuộn);
@@ -1133,6 +1133,7 @@ export function MotTrangHs(p: PropsMotTrang) {
       {dauKinh(<><p>{ngayTuan()}{hs?.lop ? ` · ${hs.lop}` : ''}</p><h1>Chào {p.ten || 'em'}</h1></>, true)}
       {/* HỆ KÍNH (thầy chốt 02/11): thẻ «Mức hôm nay» — số lớn + bình tam giác (thay thẻ bài). Tên bài + việc + chặng giữ nguyên nguồn cũ. */}
       <section className="kb-hero" data-du={duNgay || undefined} aria-label={`Tổng câu hôm nay${coTong ? `: ${daNgay}/${tongNgay}` : ''}${duNgay ? ' · đã xong' : ''}${p.viec ? ` · ${chuViecBai(p.viec, so)}` : ''}`} aria-busy={!coTong && p.dangTai}>
+        {loiLuaBi && <LoiBi key={`g${loiLuaBi[2]}`} cam={loiLuaBi[0]} loi={loiLuaBi[1]} cap={capLua} chanNgon={!!cn} goc />}
         <div className="kb-hero-chu">
           <span className="kb-nhan">{duNgay ? 'Xong hết hôm nay' : p.ngayKiem ? 'Ngày Kiểm tra ôn tập' : 'Tổng câu hôm nay'}</span>
           {coTong ? <div className="kb-so">{daNgay}<small>/{tongNgay} câu</small></div> : <span className="mot-xuong" aria-hidden="true" />}
@@ -1160,8 +1161,7 @@ export function MotTrangHs(p: PropsMotTrang) {
         <div className="da-dai"><b>{p.tenBai || 'Bài học hôm nay'}</b>
           {chang.length > 0 && <span className="da-dai-tien"><i><s style={{ width: `${Math.round((100 * xongChang) / chang.length)}%` }} /></i>{xongChang}/{chang.length} chặng</span>}</div>
       </div>}
-      {loiLuaBi && <LoiBi key={loiLuaBi[2]} cam={loiLuaBi[0]} loi={loiLuaBi[1]} coBi={!coBiBen} cap={capLua} ben={benLua} chanNgon={!!cn}
-        khoa={loiLuaBi[2] === 'ca' || capLua >= 4 ? undefined : `${ngayVn(Date.now())}|${loiLuaBi[2]}|${p.tenBai ?? ''}`} />}
+      {/* thầy 03/11 chốt bản vẽ docs/ban-ve-mol-goc-0311: Mol nói ở GÓC TRÁI THẺ ĐẦU (kb-mol) — bỏ chỗ cũ giữa thẻ đầu và nút chính */}
       {p.ghi.map((g) => <p key={g} className="da-ghi">{g}</p>)}
       {p.token && chinh !== 'ca' && laSamsungInternet() && <Suspense fallback={null}><NhacSamsung /></Suspense>}
       {/* 28/10 tối (ảnh thầy giờ cao điểm: Lộ trình chỉ có nút Sửa lỗi): Sảnh chưa về ⇒ chưa vẽ đường (nút Sửa lỗi về trước làm em tưởng hết bài), báo đang tải. */}

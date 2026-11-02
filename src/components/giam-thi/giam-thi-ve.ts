@@ -4,6 +4,22 @@
 // tư thế, nét mặt chuyển bằng transition trên biến CSS (nội suy từ giá trị đang có); động tác một lần bằng WAAPI, động tác mới trên cùng phần tử
 // lấy giá trị ĐANG HIỆN làm điểm đầu (không nhảy cóc); mắt dõi theo bằng lerp trên requestAnimationFrame. Tab ẩn ⇒ dừng mọi hoạt ảnh và hẹn giờ;
 // giảm chuyển động ⇒ đứng yên, chỉ đổi nét mặt. Chế độ `tinh` (+ `xam`, `mo`): hình tĩnh xám mờ cho chỗ khác dùng (vd. cạnh Lộ trình).
+/** Bong bóng CO VỪA CHỮ (thầy 03/11 «Bong bóng của giám thị khung phải tự động vừa với chữ nhé»): `width: max-content` kẹp ở bề ngang tối đa ⇒ chữ xuống dòng
+ *  (cân dòng) vẫn để khung rộng hết cỡ, thừa khoảng trống bên phải. Đo dòng chữ DÀI NHẤT (Range) rồi đặt bề rộng khung đúng bằng nó (+ đệm). Một lần đo mỗi lời. */
+function coVuaChu(el: HTMLElement): void {
+  try {
+    const r = document.createRange(); r.selectNodeContents(el)
+    const ds = [...r.getClientRects()]
+    if (ds.length < 2) return // một dòng: max-content đã vừa
+    const dong = new Map<number, [number, number]>()
+    for (const d of ds) { if (!d.width) continue; const k = Math.round(d.top); const c = dong.get(k); dong.set(k, c ? [Math.min(c[0], d.left), Math.max(c[1], d.right)] : [d.left, d.right]) }
+    let rong = 0
+    for (const [a, b] of dong.values()) rong = Math.max(rong, b - a)
+    const cs = getComputedStyle(el), dem = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + parseFloat(cs.borderLeftWidth) + parseFloat(cs.borderRightWidth)
+    if (rong > 0 && rong + dem + 1 < el.getBoundingClientRect().width) el.style.width = `${Math.ceil(rong + dem + 1)}px`
+  } catch { /* trình duyệt cũ: giữ như cũ */ }
+}
+
 export type MucGT = 'nb' | 'th' | 'vd' | 'vdc'
 export type TrangThaiGT = 'yen' | 'doc' | 'cho' | 'soi' | 'dong-ho' | 'nghi-ngo' | 'nop' | 'dung' | 'sai' | 'chua-tinh' | 'combo' | 'xong'
 export const THU_TU_GT: readonly MucGT[] = ['nb', 'th', 'vd', 'vdc']
@@ -387,7 +403,9 @@ export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; 
       const lech = vao === khung ? 0 : khung.getBoundingClientRect().left - vao.getBoundingClientRect().left
       el.style.setProperty('--gt-loi-duoi', Math.max(14, lech + khung.clientWidth * 0.5 - 7).toFixed(1) + 'px') // tâm mũi nhọn (14 px) = giữa đầu
       vao.appendChild(el)
-      if (tinh || giam || dung) { da.textContent = chu; if (tinh) return g } else con.textContent = chu
+      if (tinh || giam || dung) da.textContent = chu; else con.textContent = chu
+      coVuaChu(el) // khung vừa dòng chữ dài nhất (thầy 03/11)
+      if (tinh) return g
       if (typeof el.animate === 'function') el.animate([{ opacity: 0, transform: 'scale(.6)' }, { opacity: 1, transform: 'scale(1.05)', offset: 0.65 }, { opacity: 1, transform: 'scale(1)' }], { duration: 320, easing: NAY })
       if (!giam && !dung) { let i = 0; const go = window.setInterval(() => { i++; da.textContent = chu.slice(0, i); con.textContent = chu.slice(i); if (i >= chu.length) clearInterval(go) }, 34); loiHen.push(go) }
       loiHen.push(window.setTimeout(() => { if (typeof el.animate !== 'function') { el.remove(); return } const an = el.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(-6px) scale(.96)' }], { duration: 300, easing: 'ease-in', fill: 'forwards' }); an.onfinish = () => el.remove() }, chu.length * 34 + (oo.giu ?? 1900)))
