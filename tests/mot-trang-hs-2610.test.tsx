@@ -462,6 +462,18 @@ describe('Menu dọc «Một trang» — MENU 6 MỤC (thầy 27/10): Điểm da
     expect(within(nav()).queryByRole('button', { name: 'Ca kiểm tra' })).toBeNull()
   })
 
+  it('nút Thêm bật / tắt: bấm lần 1 mở bảng, bấm lần 2 ẩn bảng (thầy 02/11 «bấm 1 lần thì hiện bảng bấm lần nữa thì không ẩn bảng»)', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => traLoi({ ok: true, buoi: null })))
+    menu({ moDiemDanh: false })
+    const nut = screen.getByRole('button', { name: 'Thêm' })
+    fireEvent.click(nut)
+    expect(nut.getAttribute('aria-expanded')).toBe('true')
+    expect(nav().hasAttribute('data-mo')).toBe(true)
+    fireEvent.click(nut)
+    expect(nut.getAttribute('aria-expanded')).toBe('false')
+    expect(nav().hasAttribute('data-mo')).toBe(false)
+  })
+
   it('Cài đặt mở tấm con (Âm thanh · Rung · Cập nhật bài học · Của em), Quay lại / Esc về 6 mục; công tắc ghi localStorage ddh.am / ddh.rung (mặc định Bật)', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => traLoi({ ok: true, buoi: null })))
     const onTaiLai = vi.fn(), onCuaEm = vi.fn()
