@@ -12,6 +12,7 @@ const tenTrangChinh = (): string => (typeof document !== 'undefined' && document
 const ManChuaCauSai = lazy(() => import('../chua-cau-sai/ManChuaCauSai'))
 import { apiCoChua } from '../../lib/chua-cau-sai-api'
 import TheCau from '../TheCau'
+import { bocKinh } from '../loi-giai-kinh/boc-kinh'
 import { hoiXacNhan } from '../hop-thoai'
 import '../m3'
 import './tu-luyen.css'
@@ -990,6 +991,7 @@ function TheCauXem({ cau: c, kq, stt, luotId, onHoi }: { cau: CauCongKhai; kq: K
     cheDo: 'xem_lai' as const,
     // Hỏi thầy trên đầu thẻ; Lời giải từng bước trong khối lời giải của TheCau (lệnh 30/09 + 13/10).
     hoiThay: { qid: c.qid, nguon: 'tu_luyen', luotId, onHoi, gon: true },
+    bocLoiGiai: bocKinh(c.qid),
     stt,
     text: chiSoDuoiRo(c.text),
     thanCauImg: c.anhThanCau,

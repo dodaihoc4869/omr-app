@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { useGiayConLai, type KhoGio } from '../lib/dong-ho-thi'
 import TheCau from './TheCau'
+import { bocKinh } from './loi-giai-kinh/boc-kinh'
 import { createPortal } from 'react-dom'
 import { ArrowUpRight, Clock3, FileText, ChevronLeft, Award, ChevronDown } from 'lucide-react'
 import { demDaLam, useLuyenDe } from './luyen-de/dung-luyen-de'
@@ -220,6 +221,8 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
                 loiGiai: sol?.loiGiai,
                 // Hỏi thầy dưới phần trả lời của TheCau, cả lúc đang làm (Thầy gợi hướng); Lời giải từng bước chỉ sau nộp (lệnh 30/09 + 13/10).
                 hoiThay: { qid: q.id, nguon: 'luyen_de', gon: true },
+                // LỜI GIẢI KÍNH (thầy 02/11): chỉ sau nộp (xem lại).
+                bocLoiGiai: done ? bocKinh(q.id) : undefined,
               }
               if ('choices' in q)
                 return boc(q.id, (

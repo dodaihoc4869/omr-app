@@ -10,6 +10,7 @@
 import ChuTheLoc, { tenTheLoc } from '../ChuTheLoc'
 import { startTransition, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import TheCau from '../TheCau'
+import { bocKinh } from '../loi-giai-kinh/boc-kinh'
 import KhungXemPhieu from '../KhungXemPhieu'
 import { ChemText } from '../../lib/chem-format'
 import '../m3'
@@ -569,7 +570,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
         ) : (
           <div className="m3 h2-the-cau">
             {/* Hỏi thầy nằm trong khối lời giải (thầy lệnh 30/09): chỉ hiện khi lời giải đã tải và đang hiện. Máy chủ tự khoá câu đang thi. */}
-            <TheCau {...propsTheCau(tt.ct, c.stt)} hoiThay={{ qid: c.qid, nguon: 'cau_da_lam' }} />
+            <TheCau {...propsTheCau(tt.ct, c.stt)} hoiThay={{ qid: c.qid, nguon: 'cau_da_lam' }} bocLoiGiai={bocKinh(c.qid)} />
           </div>
         )}
         {c.lichSu.length > 0 && (
