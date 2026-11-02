@@ -20,7 +20,7 @@ import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, ChevronRight, Clock3, Lock, PencilLine, RotateCcw } from 'lucide-react'
 import type { KetQuaDanhSachChua, LichKiemLaiHoiThay, MucChua } from '../../lib/chua-cau-sai-api'
 import { docNhoTuSua, nhomMucChua, taiTuSuaLoi, type NhomMucChua } from '../../lib/tu-sua-loi'
-import { coSuaNgay, guiLaiSuaCho, napGoiSuaDem, napTruocCauSua, napTruocSuaNgay } from '../../lib/nap-truoc-sua'
+import { guiLaiSuaCho, napGoiSuaDem, napTruocCauSua, napTruocSuaNgay } from '../../lib/nap-truoc-sua'
 /** Bản nhớ danh sách còn mới (ms) để vẽ ngay khi mở màn Tự sửa lỗi; quá hạn ⇒ khung chờ như cũ. (29/10 tối: nâng lên 10 phút = NHO_TU_SUA_MS để bấm từ Lộ trình luôn hiện ngay 0 ms.) */
 const NHO_VE_NGAY_MS = 600_000
 import { dungViecHomNay, docSbdHs, luuViecHomNay } from '../../lib/tu-sua-viec-hom-nay'
@@ -198,19 +198,6 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
   const daDuHomNay = !!viec && viec.tong > 0 && !viec.tiep
   const xongHomNayQ = useMemo(() => new Set((viec?.muc ?? []).filter((x) => x.xong).map((x) => x.m.qid)), [viec])
   const [baoDu, setBaoDu] = useState(false)
-  // CÂU NGOÀI PHẦN HÔM NAY (thầy 02/11 «câu ngoài hôm nay tải sẵn hết»): em mở «Tất cả câu cần sửa» ⇒ tải sẵn 12 câu kế tiếp của danh sách vào kho ngày
-  // (một lượt `gon-mo-ngay`, như phần hôm nay — bấm là vào ngay, mất mạng vẫn làm); em sửa xong câu nào ⇒ câu kế tiếp vào thay, luôn có 12 câu sẵn. Không tải cả
-  // danh sách một lần: mỗi câu tải sẵn = máy chủ GIAO câu ấy cho em (mở cửa sổ đo 7 ngày, ~10 lệnh D1) — tải cả trăm câu em chưa định làm sẽ làm lệch lịch sửa các ngày
-  // sau + dồn D1 giờ cao điểm; kho trên máy có trần bộ nhớ (iPhone sập 31/10). Câu ngoài 12 câu ấy vẫn mở sẵn lúc ngón tay chạm (`chamCau`).
-  const [moTatCa, setMoTatCa] = useState(false)
-  const ngoaiNgay = moTatCa && !daDuHomNay
-    ? dong.filter((d) => d.nhom === 'can' && !d.m.kiemHoiThay && !coSuaNgay(d.m.qid)).slice(0, 12).map((d) => d.m.qid).join('|')
-    : ''
-  useEffect(() => {
-    if (!ngoaiNgay) return
-    const h = setTimeout(() => void napTruocSuaNgay(token, ngoaiNgay.split('|')), 300)
-    return () => clearTimeout(h)
-  }, [token, ngoaiNgay])
   // 29/10 (thầy «Mở câu quá lâu»): câu CHƯA XONG kế tiếp của Việc hôm nay (khác câu đang mở) ⇒ mở sẵn ở máy chủ lúc em còn xem danh sách / làm câu trước; bấm vào là có ngay.
   // Trễ 1,2 giây để không tranh lượt với chính lần mở em vừa bấm.
   const tiepNap = viec?.muc.find((x) => !x.xong && !x.m.kiemHoiThay && x.m.qid !== chon?.qid)?.m.qid
@@ -438,9 +425,11 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
               {(['can', 'cho', 'xong'] as Nhom[]).map((n) => {
                 const ds = dong.filter((d) => d.nhom === n)
                 if (!ds.length || (daDuHomNay && n !== 'xong')) return null // đã sửa đủ hôm nay: ẩn các câu còn lại (không cho sửa thêm)
+                // thầy 02/11 tối («Câu ngoài phần hôm nay chọn bỏ»): có phần hôm nay ⇒ KHÔNG còn danh sách «Tất cả câu cần sửa» — em chỉ sửa đúng phần hôm nay (đã tải sẵn, vào ngay)
+                if (n === 'can' && viec && viec.tong > 0) return null
                 // Có việc hôm nay ⇒ danh sách đầy đủ gập lại (em không phải nhìn cả trăm câu một lúc).
                 return viec && viec.tong > 0
-                  ? <details className="vh-gap" key={n} onToggle={n === 'can' ? (e) => setMoTatCa(e.currentTarget.open) : undefined}><summary><b>{n === 'can' ? 'Tất cả câu cần sửa' : TEN_NHOM[n]}</b><span>{dem?.[n] ?? ds.length} câu</span></summary><DanhSach nhom={n} ds={ds} tong={dem?.[n]} onChon={moCau} onCham={chamCau} /></details>
+                  ? <details className="vh-gap" key={n}><summary><b>{n === 'can' ? 'Tất cả câu cần sửa' : TEN_NHOM[n]}</b><span>{dem?.[n] ?? ds.length} câu</span></summary><DanhSach nhom={n} ds={ds} tong={dem?.[n]} onChon={moCau} onCham={chamCau} /></details>
                   : <DanhSach key={n} nhom={n} ds={ds} tong={dem?.[n]} onChon={moCau} onCham={chamCau} />
               })}
             </div>

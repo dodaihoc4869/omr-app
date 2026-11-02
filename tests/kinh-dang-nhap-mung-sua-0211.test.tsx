@@ -46,13 +46,10 @@ describe('hiệu ứng kết thúc chặng mới (bộ ăn mừng «chang»)', (
   })
 })
 
-describe('câu ngoài phần hôm nay tải sẵn', () => {
-  it('mở «Tất cả câu cần sửa» ⇒ luôn có 12 câu kế tiếp tải sẵn (một lượt gon-mo-ngay), câu dùng xong thì câu sau vào thay', () => {
+describe('câu ngoài phần hôm nay: bỏ (thầy 02/11 tối «Câu ngoài phần hôm nay chọn bỏ»)', () => {
+  it('có phần hôm nay ⇒ không dựng nhóm «Tất cả câu cần sửa»; không tải sẵn câu ngoài phần hôm nay', () => {
     const s = doc('src/components/hoc-tap/ManTuChua.tsx')
-    expect(s).toMatch(/onToggle=\{n === 'can' \? \(e\) => setMoTatCa\(e\.currentTarget\.open\)/)
-    expect(s).toMatch(/d\.nhom === 'can' && !d\.m\.kiemHoiThay && !coSuaNgay\(d\.m\.qid\)\)\.slice\(0, 12\)/)
-    expect(s).toMatch(/napTruocSuaNgay\(token, ngoaiNgay\.split\('\|'\)\)/)
-    // đã sửa đủ hôm nay ⇒ danh sách ẩn ⇒ không tải
-    expect(s).toMatch(/const ngoaiNgay = moTatCa && !daDuHomNay/)
+    expect(s).toMatch(/if \(n === 'can' && viec && viec\.tong > 0\) return null/)
+    expect(s).not.toMatch(/ngoaiNgay|setMoTatCa/)
   })
 })
