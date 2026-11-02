@@ -182,7 +182,7 @@ export default function HocTapHomNay(p: Props) {
     const eGiu = !!sanh?.tamGiuCa && <div className="ht-thong-bao">Một số câu đang được giữ cho ca kiểm tra.</div>
     const mot = !!MotTrang
     return <div className="ht-app ht2" data-nguon={p.nguon} data-mot={mot || undefined}>
-    {trong && MenuDoc ? <MenuDoc muc={muc} ds={MENU} onMuc={(id) => setMuc(id as Muc)} coCa={p.coCa} onThi={p.onThi} thongBao={p.thongBao} dangTai={p.dangTai} onTaiLai={p.onTaiLai}
+    {trong && MenuDoc ? <MenuDoc muc={muc} ds={MENU} onMuc={(id) => setMuc(id as Muc)} coCa={p.coCa} onThi={p.onThi} thongBao={mot ? undefined : p.thongBao} dangTai={p.dangTai} onTaiLai={p.onTaiLai}
       chuDau={chuCaiDau(p.ten || 'Em')} moCuaEm={moCuaEm} onCuaEm={() => setMoCuaEm(true)} nutCuaEm={nutCuaEm} token={p.token} moDiemDanh={p.moDiemDanh !== false} />
      : <header className="ht-thanh ht2-thanh">
       <a className="ht-thuong-hieu" href="/hs"><span className="ht2-logo" aria-hidden="true"><Atom size={22} /></span><span>Đỗ Đại Học<small>Học Hoá mỗi ngày</small></span></a>
@@ -202,7 +202,7 @@ export default function HocTapHomNay(p: Props) {
         {p.loi && <div className="ht-thong-bao ht2-loi" role="alert"><span>{p.loi}</span><button className="ht-nut-phu" onClick={p.onTaiLai}>Thử lại</button></div>}
         {p.coCa && !mot && <section className="ht2-ca" aria-label="Ca kiểm tra đang mở"><span className="ht2-dong-bt" data-sac="cham" aria-hidden="true"><ClipboardCheck size={20} /></span><span className="ht2-ca-chu"><strong>Ca kiểm tra đang mở</strong><small>Nhập mã ca và mật khẩu thầy cung cấp để vào phòng kiểm tra.</small></span><button className="ht-nut-chinh ht2-nut-lon" onClick={p.onThi}>Vào ca kiểm tra<ArrowRight size={20} aria-hidden="true" /></button></section>}
 
-        {MotTrang ? <MotTrang muc={muc} hs={p} so={so} dangTai={p.dangTai && !sanh} tenBai={tenBai} viec={viec} onHoc={p.onHoc} khoaHoc={khoaHoc} hetCau={con === 0} kho={kho}
+        {MotTrang ? <MotTrang muc={muc} hs={p} ten={p.ten} thongBao={p.thongBao} so={so} dangTai={p.dangTai && !sanh} tenBai={tenBai} viec={viec} onHoc={p.onHoc} khoaHoc={khoaHoc} hetCau={con === 0} kho={kho}
           coCa={p.coCa} onThi={p.onThi} token={p.token} soSua={soSua} onChua={() => p.onChua()} hinhSua={hinhTuSua()} kiem={kiem} ngayKiem={ngayKiem} onKiemTra={p.onKiemTra}
           soBaiTap={p.soBaiTap} coBaiTap={p.coBaiTap} onBaiTap={p.onBaiTap}
           ghi={[ht?.conThieu ? `Hôm nay còn thiếu ${ht.conThieu} câu phù hợp. Em vẫn làm được phần đã có.` : '', sanh?.tamGiuCa ? 'Một số câu đang được giữ cho ca kiểm tra.' : ''].filter(Boolean)} />

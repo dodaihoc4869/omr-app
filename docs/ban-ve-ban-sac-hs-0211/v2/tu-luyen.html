@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="vi" data-trong="hs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tu luyện · chọn chế độ và bộ lọc</title>
+<link rel="stylesheet" href="kinh.css">
+</head><body>
+<main class="trang" data-rong-1>
+  <header class="dau-con"><button class="nut-tron kinh" aria-label="Quay lại"><span data-i="trai"></span></button><h1>Tu luyện</h1></header>
+  <div class="phan kinh" role="tablist"><button role="tab" aria-selected="true">Luyện</button><button role="tab" aria-selected="false">Tổng hợp</button><button role="tab" aria-selected="false">Luyện đề</button></div>
+  <div class="bento">
+    <button class="kinh ob" style="box-shadow:inset 0 0 0 2.5px var(--tr-hs-day),var(--kinh-bong)"><span class="oi" data-sac="sai"><span data-i="wrench"></span></span><b>Sửa câu sai</b><span class="mo">Làm lại câu em đã sai từ 29/09</span></button>
+    <button class="kinh ob"><span class="oi" data-sac="tim"><span data-i="refresh"></span></span><b>Dạng câu sai</b><span class="mo">Câu mới cùng dạng với câu em sai</span></button>
+    <button class="kinh ob"><span class="oi" data-sac="hs"><span data-i="layers"></span></span><b>Dạng bài</b><span class="mo">Chọn Lớp → Bài → Dạng để luyện sâu</span></button>
+    <button class="kinh ob"><span class="oi" data-sac="sao"><span data-i="sparkles"></span></span><b>Tự do</b><span class="mo">Rút ngẫu nhiên, lọc theo sao và loại câu</span></button>
+  </div>
+  <section class="kinh the-p" style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between"><b>Số câu</b><div style="display:flex;align-items:center;gap:12px"><button class="nut-tron kinh" aria-label="Bớt">−</button><b style="font-size:22px;min-width:32px;text-align:center">10</b><button class="nut-tron kinh" aria-label="Thêm"><span data-i="cong"></span></button></div></div>
+    <div style="display:flex;flex-direction:column;gap:8px"><b>Loại câu</b><div class="hang-chip"><button class="chip kinh" aria-pressed="true">Ngẫu nhiên</button><button class="chip kinh" aria-pressed="false">2 sao</button><button class="chip kinh" aria-pressed="false">1 sao</button><button class="chip kinh" aria-pressed="false">Lý thuyết</button></div></div>
+    <div class="phan kinh" style="background:var(--kinh-dam)"><button aria-selected="true">Chấm từng câu</button><button aria-selected="false">Làm hết rồi nộp</button></div>
+  </section>
+  <button class="nut" data-l="chinh" data-rong style="min-height:60px">Bắt đầu luyện · 10 câu</button>
+</main>
+<div class="thanh"><nav class="kinh" aria-label="Điều hướng học sinh"><a href="#"><span data-i="sparkles"></span>Hôm nay</a><a href="#" aria-current="page"><span data-i="wrench"></span>Luyện tập</a><a href="#"><span data-i="trophy"></span>Thành tích</a><a href="#"><span data-i="luoi"></span>Thêm<span class="cham">1</span></a></nav><button class="ai kinh" aria-label="Hỏi A.I Đỗ Đại Học"><span data-i="chat"></span></button></div>
+<script src="../ve.js"></script><script src="kve.js"></script><script src="binh.js"></script>
+</body></html>

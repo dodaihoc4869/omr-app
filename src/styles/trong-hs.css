@@ -490,8 +490,6 @@
 [data-trong='hs'] .ht2[data-mot] { position: relative; isolation: isolate; }
 [data-trong='hs'] .ht2[data-mot]::before {
   content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: var(--tr-vien-2); opacity: .32;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='97' viewBox='0 0 56 97'%3E%3Cpath d='M28 1 54 16v30L28 61 2 46V16zM28 61v36' fill='none' stroke='black' stroke-width='1.2'/%3E%3C/svg%3E") repeat;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='97' viewBox='0 0 56 97'%3E%3Cpath d='M28 1 54 16v30L28 61 2 46V16zM28 61v36' fill='none' stroke='black' stroke-width='1.2'/%3E%3C/svg%3E") repeat;
 }
 [data-trong='hs'] .ht2[data-mot] .ht-noi-dung { min-height: 100dvh; max-width: none; justify-content: flex-start; gap: 0; padding: 0 0 40px; }
 [data-trong] .ht2[data-mot] .ht2-mo-dau { display: none; }
@@ -530,8 +528,6 @@
 }
 [data-trong] .da-bai::before {
   content: ''; position: absolute; right: -18px; top: -26px; width: 150px; height: 150px; opacity: .2; background: var(--tr-trang);
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='none' stroke='black' stroke-width='3'%3E%3Cpath d='M50 8 86 29v42L50 92 14 71V29z'/%3E%3Cpath d='M50 22 74 36v28L50 78 26 64V36z'/%3E%3Ccircle cx='50' cy='8' r='5' fill='black'/%3E%3Ccircle cx='86' cy='71' r='5' fill='black'/%3E%3Ccircle cx='14' cy='71' r='5' fill='black'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='none' stroke='black' stroke-width='3'%3E%3Cpath d='M50 8 86 29v42L50 92 14 71V29z'/%3E%3Cpath d='M50 22 74 36v28L50 78 26 64V36z'/%3E%3Ccircle cx='50' cy='8' r='5' fill='black'/%3E%3Ccircle cx='86' cy='71' r='5' fill='black'/%3E%3Ccircle cx='14' cy='71' r='5' fill='black'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
 }
 [data-trong] .da-bai .giua { position: relative; flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 [data-trong] .da-bai small { font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; opacity: .92; overflow-wrap: anywhere; }
@@ -824,8 +820,7 @@
 /* NỀN «BẢNG TÍNH HOÁ» (thầy 27/10: bỏ nền tổ ong, thay «kiểu hoá học phép tính hiển thị ngang dọc phức tạp»): một ô SVG lặp (data URI, không thêm tệp)
    — phương trình đã cân bằng, n = m/M, pV = nRT, phép tính mol, mũi tên ⇌, vòng benzene, chỉ số dưới; vài cụm xoay 90° cho cảm giác ngang dọc. Rất mờ
    (chữ phụ, ~5% sáng / ~6% tối), tĩnh, không cạnh tranh nội dung. Dùng chung cho mọi màn HS đang có nền hoạ tiết (.ht2[data-mot]). */
-[data-trong='hs'] .ht2[data-mot]::before { background: var(--tr-chu-2); opacity: .04;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='560' height='560' font-family='Nunito,ui-rounded,Arial Rounded MT Bold,Helvetica Neue,Arial,sans-serif' font-size='14' font-weight='300' fill='black'%3E %3Ctext x='22' y='38'%3E2Al + 6HCl %E2%86%92 2AlCl%E2%82%83 + 3H%E2%82%82%3C/text%3E %3Ctext x='300' y='70'%3EpV = nRT%3C/text%3E %3Ctext x='40' y='96'%3En =%3C/text%3E%3Ctext x='70' y='86'%3Em%3C/text%3E%3Cline x1='66' y1='91' x2='84' y2='91' stroke='black' stroke-width='.8'/%3E%3Ctext x='68' y='106'%3EM%3C/text%3E %3Ctext x='120' y='100'%3EC%E2%82%86H%E2%82%85NH%E2%82%82 + HCl %E2%86%92 C%E2%82%86H%E2%82%85NH%E2%82%83Cl%3C/text%3E %3Cg transform='translate(470 120) rotate(90)'%3E%3Ctext%3EN%E2%82%82 + 3H%E2%82%82 %E2%87%8C 2NH%E2%82%83 %CE%94H %26lt; 0%3C/text%3E%3C/g%3E %3Cg fill='none' stroke='black' stroke-width='.8'%3E%3Cpath d='M90 150l26 15v30l-26 15-26-15v-30z'/%3E%3Ccircle cx='90' cy='180' r='16'/%3E%3C/g%3E %3Ctext x='150' y='175'%3ECH%E2%82%83%E2%80%93CH(CH%E2%82%83)%E2%80%93NH%E2%82%82%3C/text%3E %3Ctext x='150' y='215'%3E0,1 %C3%97 129,5 = 12,95%3C/text%3E %3Cg transform='translate(36 250) rotate(90)'%3E%3Ctext%3EC%E2%82%82H%E2%82%85OH + 3O%E2%82%82 %E2%86%92 2CO%E2%82%82 + 3H%E2%82%82O%3C/text%3E%3C/g%3E %3Cpath d='M110 270l40 70h-80z' fill='none' stroke='black' stroke-width='.8'/%3E %3Ctext x='176' y='290'%3En = V / 24,79%3C/text%3E %3Ctext x='176' y='330'%3EFe + CuSO%E2%82%84 %E2%86%92 FeSO%E2%82%84 + Cu%3C/text%3E %3Ctext x='70' y='400'%3ECH%E2%82%83COOH + C%E2%82%82H%E2%82%85OH %E2%87%8C CH%E2%82%83COOC%E2%82%82H%E2%82%85 + H%E2%82%82O%3C/text%3E %3Cg transform='translate(520 330) rotate(-90)'%3E%3Ctext%3ECM = n / V%3C/text%3E%3C/g%3E %3Ctext x='90' y='450'%3E4,5 : 45 = 0,1 mol%3C/text%3E %3Ctext x='300' y='470'%3E%CE%94H %26lt; 0%3C/text%3E %3Cg fill='none' stroke='black' stroke-width='.8'%3E%3Cpath d='M300 500h70m-10-6 10 6-10 6M300 516h70m-60-6-10 6 10 6'/%3E%3C/g%3E %3Ctext x='40' y='520'%3ECaCO%E2%82%83 %E2%86%92 CaO + CO%E2%82%82%3C/text%3E %3Ctext x='400' y='540'%3EH%E2%82%82O%3C/text%3E %3C/svg%3E") repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='560' height='560' font-family='Nunito,ui-rounded,Arial Rounded MT Bold,Helvetica Neue,Arial,sans-serif' font-size='14' font-weight='300' fill='black'%3E %3Ctext x='22' y='38'%3E2Al + 6HCl %E2%86%92 2AlCl%E2%82%83 + 3H%E2%82%82%3C/text%3E %3Ctext x='300' y='70'%3EpV = nRT%3C/text%3E %3Ctext x='40' y='96'%3En =%3C/text%3E%3Ctext x='70' y='86'%3Em%3C/text%3E%3Cline x1='66' y1='91' x2='84' y2='91' stroke='black' stroke-width='.8'/%3E%3Ctext x='68' y='106'%3EM%3C/text%3E %3Ctext x='120' y='100'%3EC%E2%82%86H%E2%82%85NH%E2%82%82 + HCl %E2%86%92 C%E2%82%86H%E2%82%85NH%E2%82%83Cl%3C/text%3E %3Cg transform='translate(470 120) rotate(90)'%3E%3Ctext%3EN%E2%82%82 + 3H%E2%82%82 %E2%87%8C 2NH%E2%82%83 %CE%94H %26lt; 0%3C/text%3E%3C/g%3E %3Cg fill='none' stroke='black' stroke-width='.8'%3E%3Cpath d='M90 150l26 15v30l-26 15-26-15v-30z'/%3E%3Ccircle cx='90' cy='180' r='16'/%3E%3C/g%3E %3Ctext x='150' y='175'%3ECH%E2%82%83%E2%80%93CH(CH%E2%82%83)%E2%80%93NH%E2%82%82%3C/text%3E %3Ctext x='150' y='215'%3E0,1 %C3%97 129,5 = 12,95%3C/text%3E %3Cg transform='translate(36 250) rotate(90)'%3E%3Ctext%3EC%E2%82%82H%E2%82%85OH + 3O%E2%82%82 %E2%86%92 2CO%E2%82%82 + 3H%E2%82%82O%3C/text%3E%3C/g%3E %3Cpath d='M110 270l40 70h-80z' fill='none' stroke='black' stroke-width='.8'/%3E %3Ctext x='176' y='290'%3En = V / 24,79%3C/text%3E %3Ctext x='176' y='330'%3EFe + CuSO%E2%82%84 %E2%86%92 FeSO%E2%82%84 + Cu%3C/text%3E %3Ctext x='70' y='400'%3ECH%E2%82%83COOH + C%E2%82%82H%E2%82%85OH %E2%87%8C CH%E2%82%83COOC%E2%82%82H%E2%82%85 + H%E2%82%82O%3C/text%3E %3Cg transform='translate(520 330) rotate(-90)'%3E%3Ctext%3ECM = n / V%3C/text%3E%3C/g%3E %3Ctext x='90' y='450'%3E4,5 : 45 = 0,1 mol%3C/text%3E %3Ctext x='300' y='470'%3E%CE%94H %26lt; 0%3C/text%3E %3Cg fill='none' stroke='black' stroke-width='.8'%3E%3Cpath d='M300 500h70m-10-6 10 6-10 6M300 516h70m-60-6-10 6 10 6'/%3E%3C/g%3E %3Ctext x='40' y='520'%3ECaCO%E2%82%83 %E2%86%92 CaO + CO%E2%82%82%3C/text%3E %3Ctext x='400' y='540'%3EH%E2%82%82O%3C/text%3E %3C/svg%3E") repeat; -webkit-mask-size: 560px 560px; mask-size: 560px 560px; }
+[data-trong='hs'] .ht2[data-mot]::before { background: var(--tr-chu-2); opacity: .04; }
 /* 27/10 soát ảnh: tối đọc được cả câu ⇒ hạ 3,5% (sáng 4%), chữ không chân nét mảnh — gần như chỉ còn hoa văn. Ô SVG làm ảnh nên không dùng được phông
    tự host của app: ưu tiên Nunito / phông tròn của máy, lùi về sans-serif (không còn chữ có chân). */
 @media (prefers-color-scheme: dark) { [data-trong='hs'] .ht2[data-mot]::before { opacity: .035; } }
@@ -1150,3 +1145,65 @@
 @keyframes bb-dap { 50% { box-shadow: 0 2px 0 var(--tr-vien), 0 0 0 4px color-mix(in srgb, var(--tr-sai) 30%, transparent); } }
 @media (prefers-reduced-motion: reduce) { [data-trong='hs'] .bi-loi-bong[data-cx] { animation: none !important; transition: none; } }
 html.may-yeu[data-trong='hs'] .bi-loi-bong[data-cx] { animation: none !important; }
+/* ═══ HỆ KÍNH — TỰ SINH bởi scripts/tao-kinh-css.py (thầy chốt 02/11). Đừng sửa tay: sửa bộ sinh rồi chạy lại. ═══ */
+[data-trong='hs'] body { background: var(--kinh-nen); }
+[data-trong='hs'] :is(.m3-the, .gv2-the, .cd-the, .ht-the, .ht-ca, .ht-ke-hoach, .gv2-viec, .gv2-kpi) { background: var(--kinh-mat); }
+[data-trong='hs'] :is(.m3-nut-tonal, .m3-nut-vien, .gv2-nut-vien, .ht-nut-phu, .ht-nut-bieu-tuong, .gv2-nut-icon, .m3-nut-tron) { background: var(--kinh-mat); }
+[data-trong='hs'] nav.ben-trai { background: var(--kinh-mat); }
+[data-trong='hs'] .day-thay { background: var(--kinh-mat); }
+html.may-yeu[data-trong] .ht-thanh { background: var(--kinh-nen); }
+[data-trong='hs'] .m3-hop { background: var(--kinh-mat); }
+[data-trong='hs'] :is(input[type=text], input[type=search], input[type=password], input[type=number], input[type=tel], input:not([type]), select, textarea) { background: var(--kinh-mat); }
+[data-trong='hs'] .tr-menu { background: var(--kinh-mat); }
+[data-trong='hs'] .tr-menu-muc[aria-current='page'] .tr-menu-o { background: var(--kinh-mat); }
+[data-trong='hs'] .tr-dd-o > span:not(.sr-only) { background: var(--kinh-mat); }
+[data-trong='hs'] .tr-dd-nut { box-shadow: 0 3px 0 color-mix(in srgb, var(--tr-tin-chu) 55%, var(--tr-chu)), 0 10px 24px -16px var(--tr-phu); }
+[data-trong='hs'] .ht2-ca .ht2-dong-bt { background: var(--kinh-mat); }
+[data-trong='hs'] .ht2-noi-dung > .ht2-nhom, [data-trong='hs'] .tr-hn-luoi .ht2-nhom { background: var(--kinh-mat); }
+[data-trong='hs'] :is(.htn-lo, .htn-bai-nhom, .htn-sua, .htn-on-ds) { background: var(--kinh-mat); }
+[data-trong='hs'] .htn-nut[data-phu] { background: var(--kinh-mat); }
+[data-trong='hs'] :is(.m3-sheet, .m3-phong) { background: var(--kinh-nen); }
+[data-trong='hs'] .m3-sheet :is(.btm-the, .mom-the, .mom-cau, .mom-dong-ho, .mom-nop, .lsc-ds) { background: var(--kinh-mat); }
+[data-trong='hs'] .m3-sheet .m3-khoi { background: var(--kinh-mat); }
+[data-trong='hs'] .m3-phong .vtf { background: var(--kinh-mat); }
+[data-trong='hs'] .m3-phong .vtf-nhap { background: var(--kinh-mat); }
+[data-trong='hs']:root body .h2-cdl { background: var(--kinh-nen); }
+[data-trong='hs'] .h2-cdl .h2-the { background: var(--kinh-mat); }
+[data-trong='hs'] .h2-cdl .h2-cdl-nut-chinh { background: var(--kinh-mat); }
+[data-trong='hs'] .hs-ho-so-em .gvv2-hs { background: var(--kinh-nen); }
+[data-trong='hs'] .hs-ho-so-em :is(.gvv2-hs-the, .gvv2-the) { background: var(--kinh-mat); }
+[data-trong='hs'] .aid-tam { background: var(--kinh-nen); }
+[data-trong='hs'] .aid-dau { background: var(--kinh-mat); }
+[data-trong='hs'] .aid-go-vo { background: var(--kinh-nen); }
+[data-trong='hs'] .aid-go { background: var(--kinh-mat); }
+[data-trong='hs'] .da-tren { background: var(--kinh-mat); }
+[data-trong='hs'] .da-bang { background: var(--kinh-mat); }
+[data-trong='hs'] .da-bang .h { box-shadow: inset 0 -4px 0 color-mix(in srgb, var(--tr-phu) 60%, transparent), 0 10px 24px -16px var(--tr-phu); }
+[data-trong='hs'] .da-bang .nut-to { box-shadow: inset 0 -4px 0 color-mix(in srgb, var(--tr-phu) 60%, transparent), 0 10px 24px -16px var(--tr-phu); }
+[data-trong='hs'] .da-bai { box-shadow: 0 10px 24px -16px var(--tr-phu); }
+[data-trong='hs'] .da-bong { background: var(--kinh-mat); }
+[data-trong='hs'] .da-o { border-bottom-width: 1px; background: var(--kinh-mat); }
+[data-trong='hs'] .da-o .h, [data-trong='hs'] .dm-dong .h { box-shadow: inset 0 -4px 0 color-mix(in srgb, var(--tr-phu) 55%, transparent), 0 10px 24px -16px var(--tr-phu); }
+[data-trong='hs'] .dm-the { background: var(--kinh-mat); }
+[data-trong='hs'] .da-huy i[data-sac] { box-shadow: inset 0 -5px 0 color-mix(in srgb, var(--tr-phu) 55%, transparent), 0 10px 24px -16px var(--tr-phu); }
+[data-trong='hs'] .da-ban { background: var(--kinh-mat); }
+[data-trong='hs'] .da-ban-go { box-shadow: 0 10px 24px -16px var(--tr-phu); }
+:root[data-trong='hs'] :is(.da-bang .h, .da-o .h, .dm-dong .h, .da-huy i[data-sac]) { box-shadow: inset 0 -4px 0 var(--d, var(--tr-vien-2)), 0 10px 24px -16px var(--tr-phu); }
+:root[data-trong='hs'] .da-bang .nut-to { box-shadow: 0 10px 24px -16px var(--tr-phu); }
+:root[data-trong='hs'] .da-bai { box-shadow: 0 10px 24px -16px var(--tr-phu); }
+:root[data-trong='hs'] .da-lua { box-shadow: 0 10px 24px -16px var(--tr-phu); }
+:root[data-trong='hs'] :is(.m3-nut-chinh, .ht-nut-chinh, .h2-nut-chinh) { box-shadow: 0 10px 24px -16px var(--tr-phu); }
+:root[data-trong='hs'] .tr-menu-o { box-shadow: 0 10px 24px -16px var(--tr-phu); }
+:root[data-trong='hs'] .tr-dd-h { box-shadow: 0 10px 24px -16px var(--tr-phu); }
+:root[data-trong='hs'] .tr-dd-nut { box-shadow: 0 10px 24px -16px var(--tr-phu); }
+[data-trong='hs'] .da-dai { box-shadow: 0 10px 24px -16px var(--tr-phu); }
+:root[data-trong='hs'] .da-dai { box-shadow: 0 10px 18px -12px var(--tr-phu), 0 10px 24px -16px var(--tr-phu); }
+[data-trong='hs'] .da-pop-nut { background: var(--kinh-mat); box-shadow: 0 4px 0 color-mix(in srgb, var(--p) 45%, var(--tr-vien-2)), 0 10px 24px -16px var(--tr-phu); }
+:root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr-o:focus-visible { background: var(--kinh-mat); }
+:root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr-muc:focus-visible { background: var(--kinh-mat); }
+[data-trong='hs'] .tdg-phu { background: var(--kinh-nen); -webkit-backdrop-filter: var(--kinh-mo); backdrop-filter: var(--kinh-mo); }
+[data-trong='hs'] .tdg-nut { box-shadow: inset 0 -4px 0 color-mix(in srgb, var(--tr-chu) 18%, transparent), 0 10px 24px -16px var(--tr-phu); }
+[data-trong='hs'] .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong { box-shadow: 0 10px 24px -16px var(--tr-phu); }
+[data-trong='hs'] .da-lv-loi-o .da-lv-chip { box-shadow: 0 10px 24px -16px var(--tr-phu); }
+@media (max-height: 520px) and (min-width: 600px) { [data-trong='hs'] .tr-menu-ray { background: var(--kinh-mat); } }
+/* ═══ HẾT HỆ KÍNH TỰ SINH ═══ */

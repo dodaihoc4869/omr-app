@@ -28,7 +28,8 @@ afterEach(() => { cleanup(); vi.unstubAllGlobals(); window.history.replaceState(
 
 // 26/10 tối (thầy chốt bản vẽ ve-moi/dm-*.html — hướng Duolingo + chất Hoá): Hôm nay «Một trang» nay là LỘ TRÌNH — con đường chặng giữ ĐÚNG thứ tự việc
 // (học → Kiểm tra ôn tập → Tự sửa lỗi → Bài tập về nhà; ca đang mở / ngày chỉ kiểm tra như cũ), cùng nút, cùng lệnh. Luyện tập / Thành tích là hai mục còn lại.
-const duong = () => screen.getByRole('list', { name: 'Lộ trình hôm nay' })
+// hệ Kính 02/11: Rương thành thẻ riêng dưới «Việc hôm nay» (vẫn bấm được, vẫn bật thẻ); Bài tập về nhà bỏ khỏi app học sinh (thầy 02/11 «phần btvn không còn nữa bỏ đi»)
+const duong = () => screen.getByRole('list', { name: 'Việc hôm nay' }) // hệ Kính 02/11: con đường nút tròn thành danh sách «Việc hôm nay» (cùng thứ tự, khoá, tên nút)
 const nut = () => within(duong()).getAllByRole('listitem').map((li) => (li.firstElementChild as HTMLElement))
 const HS = { lop: '12A1', onXemLai: noop, onTuLuyen: noop, onLichSu: noop, onKetQua: noop }
 
@@ -65,8 +66,8 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
     const xong = await waitFor(() => within(duong()).getByRole('button', { name: 'Tự sửa lỗi: hôm nay đã sửa xong' }))
     expect(xong.getAttribute('data-tt')).toBe('xong')
     expect(xong.querySelector('.da-dem')).toBeNull()
-    // Bài tập về nhà thành việc chính; thẻ của nút đã xong KHÔNG còn nút sửa thêm (thầy 29/10: sửa hết câu của ngày thì không cho sửa thêm)
-    expect(screen.getByRole('button', { name: 'Bài tập về nhà' }).getAttribute('data-tt')).toBe('dang')
+    // thẻ của nút đã xong KHÔNG còn nút sửa thêm (thầy 29/10: sửa hết câu của ngày thì không cho sửa thêm); Bài tập về nhà đã bỏ (thầy 02/11)
+    expect(screen.queryByRole('button', { name: 'Bài tập về nhà' })).toBeNull()
     fireEvent.click(xong)
     const thePop = within(screen.getByRole('dialog', { name: 'Tự sửa lỗi' }))
     expect(thePop.queryByRole('button', { name: 'Sửa thêm' })).toBeNull()
@@ -126,8 +127,8 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
     try {
       const a = render(<MotTrangHs {...goc()} />)
       expect(a.container.querySelector('.bi-loi')).not.toBeNull()
-      // 01/11 (Boss soát PR 733): Mol đứng cạnh đường ⇒ lời nằm trên đầu Mol, tự mờ sau ~6 s (thẻ trên cùng cũ: ~4,7 s)
-      act(() => { vi.advanceTimersByTime(6100) })
+      // hệ Kính 02/11: không còn Mol đứng cạnh đường ⇒ lời ở thẻ Mol trên danh sách, tự thu sau ~4,7 s (mốc thẻ trên cùng cũ)
+      act(() => { vi.advanceTimersByTime(4800) })
       expect(a.container.querySelector('.bi-loi-boc[data-thu]')).not.toBeNull()
       act(() => { vi.advanceTimersByTime(500) })
       expect(a.container.querySelector('.bi-loi')).toBeNull()
@@ -156,16 +157,20 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
     render(<MotTrangHs {...goc({ kiem: KIEM_SAU, onKiemTra: noop, onHoc, hs: HS })} />)
     const ds = nut()
     // thầy 27/10: Kiểm tra ôn tập LUÔN đầu đường; Tự sửa lỗi chèn GIỮA hành trình (sau chặng mới thứ 2 kể từ chỗ đang học)
-    expect(ds.map((n) => n.getAttribute('aria-label'))).toEqual(['Kiểm tra ôn tập: Thứ Tư 28/10 · còn 2 ngày', 'Chặng 1: đã xong', 'Chặng 2: đã xong', 'Học tiếp · 18 câu', 'Rương hôm nay',
-      'Chặng 4: chưa mở', KHOA_SUA, 'Chặng 5: chưa mở', 'Bài tập về nhà'])
+    expect(ds.map((n) => n.getAttribute('aria-label'))).toEqual(['Kiểm tra ôn tập: Thứ Tư 28/10 · còn 2 ngày', 'Chặng 1: đã xong', 'Chặng 2: đã xong', 'Học tiếp · 18 câu',
+      'Chặng 4: chưa mở', KHOA_SUA, 'Chặng 5: chưa mở'])
+    expect(screen.getByRole('button', { name: 'Rương hôm nay' })).toBeTruthy() // Rương: thẻ riêng dưới danh sách
     fireEvent.click(screen.getByRole('button', { name: 'Học tiếp · 18 câu' }))
     fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Bắt đầu' }))
     expect(onHoc).toHaveBeenCalledOnce()
     expect(screen.getByRole('button', { name: 'Học tiếp · 18 câu' }).textContent).toContain('Bắt đầu') // chặng 3 chưa làm câu nào
     expect(screen.getByLabelText('12/30 câu hôm nay')).toBeTruthy()
     expect(screen.getByLabelText('Khối 12')).toBeTruthy()
-    expect(screen.getByText('Ester – Lipid')).toBeTruthy()
-    expect(screen.getByText('2/5 chặng')).toBeTruthy()
+    // hệ Kính: tên bài ở nút chính «Bắt đầu · Chặng 3 — Ester – Lipid · còn 6 câu»; số chặng = 2 dòng chặng ✓ trên 5 dòng chặng (thay thẻ «2/5 chặng»)
+    expect(screen.getAllByText(/Ester – Lipid/).length).toBeGreaterThan(0)
+    const chang = nut().filter((n) => /^(Chặng \d|Học tiếp|Bắt đầu)/.test(n.getAttribute('aria-label') ?? ''))
+    expect(chang).toHaveLength(5)
+    expect(chang.filter((n) => n.getAttribute('data-tt') === 'xong')).toHaveLength(2)
   })
 
   it('ca kiểm tra đang mở ⇒ băng ca + nút Vào ca kiểm tra ở đầu, đường chặng mờ đi', () => {
@@ -173,7 +178,7 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
     render(<MotTrangHs {...goc({ coCa: true, onThi })} />)
     fireEvent.click(within(screen.getByRole('region', { name: 'Ca kiểm tra đang mở' })).getByRole('button', { name: /Vào ca kiểm tra/ }))
     expect(onThi).toHaveBeenCalledOnce()
-    expect(duong().closest('.da-duong')!.hasAttribute('data-mo-di')).toBe(true)
+    expect(duong().hasAttribute('data-mo-di')).toBe(true) // danh sách việc mờ đi (như đường chặng cũ)
   })
 
   it('đủ mức ⇒ băng «Đủ 30/30 câu hôm nay!», Tự sửa lỗi là nút hiện tại, «Học thêm câu mới» thành liên kết', () => {
@@ -181,7 +186,8 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
     render(<MotTrangHs {...goc({ so: { daLam: 30, muc: 30, chang: 5, soChang: 5 } as PropsMotTrang['so'], onChua, onHoc })} />)
     const bang = screen.getByRole('region', { name: 'Đủ mức hôm nay' })
     expect(bang.textContent).toContain('Đủ 30/30 câu hôm nay!')
-    expect(bang.textContent).toContain('Tiếp theo: Tự sửa lỗi, rồi Bài tập về nhà')
+    expect(bang.textContent).toContain('Tiếp theo: Tự sửa lỗi')
+    expect(bang.textContent).not.toContain('Bài tập về nhà') // BTVN đã bỏ (thầy 02/11)
     const sua = screen.getByRole('button', { name: 'Tự sửa lỗi: hôm nay còn 5 câu' })
     expect(sua.getAttribute('data-tt')).toBe('dang')
     fireEvent.click(sua)
@@ -239,11 +245,11 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
     const onHoc = vi.fn(), onKiemTra = vi.fn(), onChua = vi.fn()
     render(<MotTrangHs {...goc({ kiem: KIEM, onKiemTra, onHoc, onChua, hs: HS })} />)
     expect(nut().map((n) => n.getAttribute('aria-label'))).toEqual(['Kiểm tra ôn tập: 28 câu · khoảng 50 phút · hạn nộp 24:00', 'Chặng 1: đã xong', 'Chặng 2: đã xong',
-      'Chặng 3: khoá đến khi làm xong Kiểm tra ôn tập', 'Rương hôm nay', 'Chặng 4: khoá đến khi làm xong Kiểm tra ôn tập', 'Tự sửa lỗi: khoá đến khi làm xong Kiểm tra ôn tập',
-      'Chặng 5: khoá đến khi làm xong Kiểm tra ôn tập', 'Bài tập về nhà'])
+      'Chặng 3: khoá đến khi làm xong Kiểm tra ôn tập', 'Chặng 4: khoá đến khi làm xong Kiểm tra ôn tập', 'Tự sửa lỗi: khoá đến khi làm xong Kiểm tra ôn tập',
+      'Chặng 5: khoá đến khi làm xong Kiểm tra ôn tập'])
     const kiem = nut()[0]!
     expect(kiem.getAttribute('data-tt')).toBe('dang')
-    expect(kiem.querySelector('.da-bong')!.textContent).toBe('Kiểm tra ôn tập')
+    expect(kiem.querySelector('.kb-viec')!.textContent).toBe('Kiểm tra ôn tập')
     expect(kiem.querySelector('.da-vong')).not.toBeNull()
     // chặng khoá: thẻ xám «Làm Kiểm tra ôn tập trước để mở khoá», không có nút bắt đầu
     fireEvent.click(screen.getByRole('button', { name: 'Chặng 3: khoá đến khi làm xong Kiểm tra ôn tập' }))
@@ -266,11 +272,11 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
     const nhan = () => nut().map((n) => n.getAttribute('aria-label'))
     // không có kiểm tra: chặng 3 đang học ⇒ Tự sửa lỗi sau chặng 4 (chặng mới thứ 2), trước chặng 5
     let r = render(<MotTrangHs {...goc()} />)
-    expect(nhan()).toEqual(['Chặng 1: đã xong', 'Chặng 2: đã xong', 'Học tiếp · 18 câu', 'Rương hôm nay', 'Chặng 4: chưa mở', KHOA_SUA, 'Chặng 5: chưa mở', 'Bài tập về nhà'])
+    expect(nhan()).toEqual(['Chặng 1: đã xong', 'Chặng 2: đã xong', 'Học tiếp · 18 câu', 'Chặng 4: chưa mở', KHOA_SUA, 'Chặng 5: chưa mở'])
     r.unmount(); localStorage.clear()
     // chỉ có tự sửa (không kiểm tra, không bài tập)
     r = render(<MotTrangHs {...goc({ soBaiTap: 0, coBaiTap: false })} />)
-    expect(nhan()).toEqual(['Chặng 1: đã xong', 'Chặng 2: đã xong', 'Học tiếp · 18 câu', 'Rương hôm nay', 'Chặng 4: chưa mở', KHOA_SUA, 'Chặng 5: chưa mở'])
+    expect(nhan()).toEqual(['Chặng 1: đã xong', 'Chặng 2: đã xong', 'Học tiếp · 18 câu', 'Chặng 4: chưa mở', KHOA_SUA, 'Chặng 5: chưa mở'])
     r.unmount(); localStorage.clear()
     // còn 2 chặng mới ⇒ sau chặng mới đầu tiên
     r = render(<MotTrangHs {...goc({ so: { daLam: 18, muc: 30, chang: 4, soChang: 5 } as PropsMotTrang['so'], soBaiTap: 0, coBaiTap: false })} />)
@@ -278,10 +284,10 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
     r.unmount()
     // cùng ngày, em học qua mốc đã nhớ (sau chặng 4) ⇒ nút không trôi; Tự sửa lỗi thành việc hiện tại (bong bóng), chặng 5 không còn bong bóng / vòng
     render(<MotTrangHs {...goc({ so: { daLam: 24, muc: 30, chang: 5, soChang: 5 } as PropsMotTrang['so'], soBaiTap: 0, coBaiTap: false })} />)
-    expect(nhan()).toEqual(['Chặng 1: đã xong', 'Chặng 2: đã xong', 'Chặng 3: đã xong', 'Rương hôm nay', 'Chặng 4: đã xong', 'Tự sửa lỗi: hôm nay còn 5 câu', 'Học tiếp · 6 câu'])
+    expect(nhan()).toEqual(['Chặng 1: đã xong', 'Chặng 2: đã xong', 'Chặng 3: đã xong', 'Chặng 4: đã xong', 'Tự sửa lỗi: hôm nay còn 5 câu', 'Học tiếp · 6 câu'])
     const sua = screen.getByRole('button', { name: 'Tự sửa lỗi: hôm nay còn 5 câu' })
     expect(sua.getAttribute('data-tt')).toBe('dang')
-    expect(sua.querySelector('.da-bong')!.textContent).toBe('Sửa lỗi')
+    expect(sua.querySelector('.kb-viec')!.textContent).toBe('Sửa lỗi')
     expect(screen.getByRole('button', { name: 'Học tiếp · 6 câu' }).querySelector('.da-bong, .da-vong')).toBeNull()
   })
 
@@ -318,7 +324,7 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
     expect(nut()[0]!.getAttribute('data-tt')).toBe('xong')
     expect(screen.getByRole('button', { name: 'Học tiếp · 18 câu' }).getAttribute('data-tt')).toBe('dang')
     expect(screen.getByRole('button', { name: KHOA_SUA }).getAttribute('data-tt')).toBe('khoa') // thầy 29/10: còn chặng phía trên ⇒ khoá
-    expect(container.querySelectorAll('.da-vo-khoa').length).toBe(1) // chặng hiện tại vỡ khoá; Tự sửa lỗi còn khoá (chặng phía trên chưa xong — thầy 29/10)
+    expect(container.querySelectorAll('.kb-o[data-hu="mo"]').length).toBe(1) // chặng hiện tại vỡ khoá; Tự sửa lỗi còn khoá (chặng phía trên chưa xong — thầy 29/10)
     expect(localStorage.getItem('ddh.kt-khoa')).toBeNull()
     unmount()
     render(<MotTrangHs {...goc({ kiem: { ...KIEM, homNay: false, trangThai: 'het_han' as TomTatKiemTra['trangThai'] } })} />)
@@ -359,7 +365,7 @@ describe('Hệ lười chỉ thầy / phụ huynh xem (thầy 26/10)', () => {
       if (muc === 'ket-qua') {
         const the = await screen.findByText(/^Việc tiếp:/)
         expect(the.closest('.dm-the')!.querySelector('h3')!.textContent).toMatch(/^Chuỗi \d+ ngày$/)
-      } else await screen.findByLabelText('Bài học hôm nay')
+      } else await screen.findByRole('region', { name: /^Mức hôm nay/ }) // hệ Kính: thẻ mức hôm nay thay thẻ «Bài học hôm nay»
       expect(container.textContent).not.toMatch(/lười|chăm|chưa đều|bậc|đối phó|học thật|bấm vội|treo|quá nhanh/i)
       expect(container.innerHTML).not.toMatch(/data-nhom|da-12|da-bac/)
       unmount()
@@ -382,14 +388,14 @@ describe('Menu dọc «Một trang» — MENU 6 MỤC (thầy 27/10): Điểm da
     })
     vi.stubGlobal('fetch', f)
     menu()
-    fireEvent.click(await screen.findByRole('button', { name: 'Mở menu · Buổi học đang mở điểm danh' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Thêm · Buổi học đang mở điểm danh' }))
     const khoi = screen.getByRole('form', { name: 'Điểm danh buổi học' })
     expect(within(khoi).getByText('Buổi 26/10')).toBeTruthy()
     fireEvent.change(within(khoi).getByLabelText('Mã 6 số trên máy chiếu'), { target: { value: '482 915' } })
     fireEvent.click(within(khoi).getByRole('button', { name: 'Điểm danh' }))
     expect(await screen.findByText('Đã điểm danh')).toBeTruthy()
     expect(screen.getByText('Buổi 26/10 · 12A1')).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Mở menu' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Thêm' })).toBeTruthy()
   })
 
   it('không có buổi ⇒ KHÔNG có khối Điểm danh; QR ?diem-danh= vẫn tự gửi một lần và mở menu', async () => {
@@ -408,7 +414,7 @@ describe('Menu dọc «Một trang» — MENU 6 MỤC (thầy 27/10): Điểm da
     expect(screen.queryByLabelText('Điểm danh buổi học')).toBeNull()
     expect(screen.queryByText(/Chưa có buổi học/)).toBeNull()
     expect(nav().hasAttribute('data-dd')).toBe(false)
-    expect(screen.getByRole('button', { name: 'Mở menu' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Thêm' })).toBeTruthy()
   })
 
   it('đúng 6 mục theo thứ tự, mỗi mục một ô biểu tượng; chuông ở đầu menu; Ca kiểm tra gọi onThi (ẩn khi ca đang mở); chạm mục ⇒ phanHoi(chon)', async () => {
@@ -417,9 +423,9 @@ describe('Menu dọc «Một trang» — MENU 6 MỤC (thầy 27/10): Điểm da
     const onThi = vi.fn(), onMuc = vi.fn()
     const { unmount } = menu({ moDiemDanh: false, onThi, onMuc })
     const muc = () => within(nav()).getAllByRole('button').filter((b) => b.classList.contains('tr-menu-muc'))
-    expect(muc().map((b) => b.textContent)).toEqual(['Lộ trình', 'Luyện tập', 'Thành tích', 'Ca kiểm tra', 'Hỏi A.I Đỗ Đại Học', 'Cài đặt'])
+    expect(muc().map((b) => b.textContent)).toEqual(['Hôm nay', 'Luyện tập', 'Thành tích', 'Ca kiểm tra', 'Hỏi A.I Đỗ Đại Học', 'Cài đặt']) // hệ Kính 02/11: «Lộ trình» đổi tên «Hôm nay» (thầy chốt)
     expect(muc().every((b) => b.querySelector('.tr-menu-o'))).toBe(true)
-    expect(within(nav()).getByRole('button', { name: 'Lộ trình' }).getAttribute('aria-current')).toBe('page')
+    expect(within(nav()).getByRole('button', { name: 'Hôm nay' }).getAttribute('aria-current')).toBe('page')
     expect(nav().querySelector('.tr-menu-ds hr')).toBeNull() // không vạch ngăn giữa 6 mục
     // chuông THẬT nằm ở hàng đầu menu, cạnh «Đỗ Đại Học»
     expect(nav().querySelector('.tr-menu-dau .tr-menu-tb .m3-tb-chuong')).not.toBeNull()
@@ -439,13 +445,13 @@ describe('Menu dọc «Một trang» — MENU 6 MỤC (thầy 27/10): Điểm da
     vi.stubGlobal('fetch', vi.fn(async () => traLoi({ ok: true, buoi: null })))
     const onTaiLai = vi.fn(), onCuaEm = vi.fn()
     menu({ moDiemDanh: false, onTaiLai, onCuaEm })
-    fireEvent.click(screen.getByRole('button', { name: 'Mở menu' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Thêm' }))
     expect(screen.queryByRole('switch', { name: /Âm thanh/ })).toBeNull() // tấm con chưa mở ⇒ công tắc ẩn
     const cai = within(nav()).getByRole('button', { name: 'Cài đặt' })
     expect(cai.getAttribute('aria-expanded')).toBe('false')
     fireEvent.click(cai)
     const tam = screen.getByRole('group', { name: 'Cài đặt' })
-    expect(within(nav()).queryByRole('button', { name: 'Lộ trình' })).toBeNull()
+    expect(within(nav()).queryByRole('button', { name: 'Hôm nay' })).toBeNull()
     await waitFor(() => expect(document.activeElement).toBe(within(tam).getByRole('button', { name: 'Quay lại menu' })))
     expect(within(tam).getByRole('button', { name: 'Cập nhật bài học' })).toBeTruthy()
     expect(within(tam).getByRole('button', { name: 'Của em' }).getAttribute('aria-haspopup')).toBe('dialog')
@@ -463,16 +469,16 @@ describe('Menu dọc «Một trang» — MENU 6 MỤC (thầy 27/10): Điểm da
     await waitFor(() => expect(document.activeElement).toBe(within(nav()).getByRole('button', { name: 'Cài đặt' })))
     fireEvent.click(within(nav()).getByRole('button', { name: 'Cài đặt' }))
     fireEvent.click(screen.getByRole('button', { name: 'Quay lại menu' }))
-    expect(within(nav()).getByRole('button', { name: 'Lộ trình' })).toBeTruthy()
+    expect(within(nav()).getByRole('button', { name: 'Hôm nay' })).toBeTruthy()
     fireEvent.keyDown(window, { key: 'Escape' })
     expect(nav().hasAttribute('data-mo')).toBe(false)
     // Cập nhật bài học / Của em giữ nguyên hành vi
-    fireEvent.click(screen.getByRole('button', { name: 'Mở menu' }))
-    expect(within(nav()).getByRole('button', { name: 'Lộ trình' })).toBeTruthy() // mở lại ⇒ luôn về 6 mục
+    fireEvent.click(screen.getByRole('button', { name: 'Thêm' }))
+    expect(within(nav()).getByRole('button', { name: 'Hôm nay' })).toBeTruthy() // mở lại ⇒ luôn về 6 mục
     fireEvent.click(within(nav()).getByRole('button', { name: 'Cài đặt' }))
     fireEvent.click(screen.getByRole('button', { name: 'Cập nhật bài học' }))
     expect(onTaiLai).toHaveBeenCalledOnce()
-    fireEvent.click(screen.getByRole('button', { name: 'Mở menu' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Thêm' }))
     fireEvent.click(within(nav()).getByRole('button', { name: 'Cài đặt' }))
     fireEvent.click(screen.getByRole('button', { name: 'Của em' }))
     expect(onCuaEm).toHaveBeenCalledOnce()
@@ -489,7 +495,7 @@ describe('Menu dọc «Một trang» — MENU 6 MỤC (thầy 27/10): Điểm da
     fireEvent.click(document.querySelector('.tr-menu-ray .tr-ray-ai')!)
     window.removeEventListener('ddh:mo-ai', nghe)
     expect(nghe).toHaveBeenCalledTimes(2)
-    expect([...document.querySelectorAll('.tr-menu-ray .tr-ray-muc')].map((b) => b.getAttribute('aria-label'))).toEqual(['Lộ trình', 'Luyện tập', 'Thành tích', 'A.I Đỗ Đại Học'])
+    expect([...document.querySelectorAll('.tr-menu-ray .tr-ray-muc')].map((b) => b.getAttribute('aria-label'))).toEqual(['Hôm nay', 'Luyện tập', 'Thành tích', 'Hỏi A.I Đỗ Đại Học']) // hệ Kính: thanh nổi 3 mục + nút A.I tròn
     expect(document.querySelector('.tr-menu-ray .tr-menu-cham')).not.toBeNull()
   })
 })

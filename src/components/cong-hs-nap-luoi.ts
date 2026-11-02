@@ -37,3 +37,27 @@ if (typeof document !== 'undefined' && document.documentElement.dataset.trong ==
   const ric = (window as Window & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }).requestIdleCallback
   window.setTimeout(() => (ric ? ric(napMol, { timeout: 5000 }) : napMol()), 4000)
 }
+
+// 02/11 HỆ KÍNH (thầy «mọi hiệu ứng tải sẵn» · «Nạp sẵn hết hiệu ứng và giao diện đảm bảo máy yếu cũng chạy được mượt mà lung linh»): sau Mol, NẠP LẦN LƯỢT
+// các màn em mở từ Hôm nay mà trước đây tải lúc bấm — giám thị mới (đứng cạnh mọi câu), màn thưởng (chuỗi · giải tuần · nhiệm vụ · cửa hàng · huy hiệu ·
+// bạn), Tu luyện, Câu đã làm; mỗi mảnh kéo theo tờ kiểu của nó ⇒ giao diện có sẵn. Một mảnh một lúc, mỗi mảnh đợi lúc rảnh (napTruocLanLuot); tiết kiệm
+// dữ liệu / 2G / mất mạng ⇒ thôi. Em đã mở màn con (Hôm nay nằm dưới khung `inert`) ⇒ dừng: chèn tờ kiểu lúc em đang làm câu là một lượt tính kiểu cả trang.
+// Toàn mảnh có sẵn (không thêm tệp precache); vòng nạp viết NGAY Ở ĐÂY (không gọi napTruocLanLuot của hoa2/nap-truoc-man — mảnh ấy nằm trong lượt
+// mở /hs, gọi thêm hàm của nó là kéo hàm vào lượt mở +149 byte nén) ⇒ lượt mở /hs không cộng byte.
+if (typeof document !== 'undefined' && document.documentElement.dataset.trong === 'hs') {
+  const c = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection
+  const nenNap = navigator.onLine !== false && !c?.saveData && !/2g/.test(c?.effectiveType ?? '')
+  const hang: (() => Promise<unknown>)[] = [
+    () => import('./giam-thi/GiamThi'),
+    () => import('./thuong/ManThuong'),
+    () => import('./tu-luyen/ManTuLuyen'),
+    () => import('./hoa2/CauDaLam'),
+  ]
+  const ric = (window as Window & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }).requestIdleCallback
+  const tiep = (): void => {
+    if (!hang.length || document.querySelector('[inert] .ht2[data-mot]')) return
+    const lam = () => { if (!document.querySelector('[inert] .ht2[data-mot]')) hang.shift()?.().then(tiep, () => { hang.length = 0 }) }
+    if (ric) ric(lam, { timeout: 2000 }); else window.setTimeout(lam, 200)
+  }
+  if (nenNap) window.setTimeout(tiep, 6000)
+}

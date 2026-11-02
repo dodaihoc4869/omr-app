@@ -137,3 +137,6 @@
 }
 [data-trong='hs'].may-yeu :is(.tp-ong, .tp-combo) * { animation: none !important; }
 [data-trong='hs'] .tp-lat { position: relative; display: inline-block; }
+/* ═══ HỆ KÍNH — TỰ SINH bởi scripts/tao-kinh-css.py (thầy chốt 02/11). Đừng sửa tay: sửa bộ sinh rồi chạy lại. ═══ */
+[data-trong='hs'] .tp-ct { background: var(--kinh-mat); }
+/* ═══ HẾT HỆ KÍNH TỰ SINH ═══ */

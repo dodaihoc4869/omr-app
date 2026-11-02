@@ -12,7 +12,7 @@ import { chamTaiMay, moDm } from '../../lib/dap-an-may' // ĐÁP ÁN TRÊN MÁY 
 import { chotHanhVi, ghiAn, ghiChon, ghiHien, maMayNgan, taoDem, type DemLuot } from '../../lib/doi-dap-an' // đợt 2 đánh giá 99% (01/11): đổi / dò đáp án, rời app ngay trước khi chọn, mã máy
 import { boChangMoTruoc, boGoiNgay, CAU_MOI_CHANG_GOI, docChangDangLam, ghiCauXong, GIAY_CHO_MO_CHANG, layChangGoi, layChangMoTruoc, layChangMoTruocNgay, luuChangDangLam, moChangTruoc, napGoiNgay, nghePhanAnRoiApp, xoaChangDangLam } from './mo-chang-truoc'
 // Tên trang chính trên nút «về» (Boss 27/10): giao diện Trong ⇒ «Lộ trình»; giao diện cũ ⇒ «Hôm nay». Viết tại chỗ: nhập mô-đun dùng chung sẽ đẻ mảnh tải riêng (+1 tệp mở app).
-const tenTrangChinh = (): string => (typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Lộ trình' : 'Hôm nay')
+const tenTrangChinh = (): string => (typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Hôm nay' : 'Hôm nay') // hệ Kính 02/11: trang chính đổi tên «Lộ trình» → «Hôm nay»
 
 // Hôm nay nạp ĐỘNG đúng mảnh này để mở chặng trước (không sinh thêm tệp nạp / precache; mảnh màn làm bài được nạp sẵn luôn).
 export { moChangTruoc, napGoiNgay } from './mo-chang-truoc'
@@ -1232,7 +1232,10 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
         {chuoi >= 2 && !laLamLai && <span key={chuoi} className="duo-combo-nhan" aria-hidden="true">COMBO ×{chuoi}</span>}
         <button type="button" className="duo-dong" onClick={giu.xinThoat} disabled={nop} aria-label={`Lưu và về ${tenTrangChinh()}`}><XIcon size={26} aria-hidden="true" /></button>
         {/* A7 — ỐNG NGHIỆM: chất lỏng dâng theo câu, bọt nổi; chuỗi ≥ 3 ⇒ chất lỏng cam phát sáng + vệt sáng lướt. */}
-        <div className="duo-thanh" data-combo={chuoi >= 3 || undefined} role="progressbar" aria-label={laLamLai ? `Làm lại · câu ${stt}/${lamLai.length}` : q ? `Câu ${stt}/${goc.length}${chang ? ` của chặng ${chang}` : ''}` : 'Chặng học của em'} aria-valuemin={0} aria-valuemax={goc.length || 1} aria-valuenow={Math.min(daCham, goc.length)}><i style={{ width: `${pct}%` }}><b /><b /><b />{k?.correct && <span key={q?.qid} className="duo-loe" />}</i></div>
+        <div className="duo-thanh" data-combo={chuoi >= 3 || undefined} role="progressbar" aria-label={laLamLai ? `Làm lại · câu ${stt}/${lamLai.length}` : q ? `Câu ${stt}/${goc.length}${chang ? ` của chặng ${chang}` : ''}` : 'Chặng học của em'} aria-valuemin={0} aria-valuemax={goc.length || 1} aria-valuenow={Math.min(daCham, goc.length)}>{!laLamLai && goc.length > 1 && goc.length <= 12
+          // HỆ KÍNH 02/11 (bản vẽ v2): mỗi câu MỘT ĐOẠN — tự làm đúng (chàm) · có hỗ trợ (vàng) · sai (hồng) · câu đang làm (viền); vòng làm lại giữ ống cũ
+          ? goc.map((c, i) => { const kk = ket[c.qid], t = kk ? (kk.correct ? (kk.assisted || kk.hocCoHoTro ? 'h' : 'x') : 's') : i === viTri ? 'dang' : undefined; return <i key={c.qid} className="duo-doan" data-t={t}>{kk?.correct && c.qid === q?.qid && <span key={c.qid} className="duo-loe" />}</i> })
+          : <i style={{ width: `${pct}%` }}><b /><b /><b />{k?.correct && <span key={q?.qid} className="duo-loe" />}</i>}</div>
         {coNt ? <button ref={demRef} type="button" className="duo-chuoi duo-chuoi-nut" data-co={ntBai > 0 || undefined} aria-haspopup="dialog" aria-label={`Nguyên tử của bài này: ${ntBai} · xem hướng dẫn`} onClick={() => setHdNt(true)}><IcNguyenTu /><SoLan v={ntHien} /></button>
           : <span className="duo-chuoi" data-co={chuoi > 0 || undefined} aria-label={`Chuỗi ${chuoi} câu đúng liền`}><Flame size={22} aria-hidden="true" />{chuoi}</span>}
         {combo && <BangCombo key={combo.id} n={combo.n} />}

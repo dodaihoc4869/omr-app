@@ -15,7 +15,7 @@ const goc = (so: PropsMotTrang['so']): PropsMotTrang => ({
   ngayKiem: false, soBaiTap: 0, coBaiTap: false, onBaiTap: noop, ghi: [],
 })
 const so = (daLam: number, chang: number) => ({ daLam, muc: 30, chang, soChang: 5 }) as PropsMotTrang['so']
-const nut = () => within(screen.getByRole('list', { name: 'Lộ trình hôm nay' })).getAllByRole('listitem').map((li) => li.firstElementChild as HTMLElement)
+const nut = () => within(screen.getByRole('list', { name: 'Việc hôm nay' })).getAllByRole('listitem').map((li) => li.firstElementChild as HTMLElement)
 const luuChang3 = () => {
   const cau = Array.from({ length: 6 }, (_, i) => ({ qid: `c${i}`, phan: 'I', text: `Câu ${i}`, choices: ['A', 'B', 'C', 'D'], hinhAnh: [], ideas: [], kienThuc: [] }))
   luuChangDangLam('s1', {

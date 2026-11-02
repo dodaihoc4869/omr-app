@@ -75,3 +75,7 @@
   [data-trong='hs'] .giu-bi > i { animation: none; opacity: .9; }
 }
 [data-trong].may-yeu :is(.giu-nen, .giu-tam) { animation: none; }
+/* ═══ HỆ KÍNH — TỰ SINH bởi scripts/tao-kinh-css.py (thầy chốt 02/11). Đừng sửa tay: sửa bộ sinh rồi chạy lại. ═══ */
+[data-trong='hs'] .giu-tam { background: var(--kinh-mat); }
+[data-trong='hs'] .giu-dong-vien { background: var(--kinh-mat); }
+/* ═══ HẾT HỆ KÍNH TỰ SINH ═══ */

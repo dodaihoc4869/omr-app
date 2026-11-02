@@ -560,6 +560,12 @@ if (LA_LAM13 && ['duo', 'duo-nc', 'duo-bang', 'duo-pt', 'duo-tn', 'chang-ngang']
 // trang chụp mở thẳng màn làm chặng nên nạp tờ đó tại đây cho giống app thật.
 // Phông tròn chỉ bật khi cổng đã vẽ (<html data-ht2> do Hôm nay gắn — app thật luôn gắn Hôm nay dưới màn con) ⇒ trang chụp gắn .ht2 rỗng ẩn + data-ht2.
 if (LA_LAM13 && ['duo', 'duo-nc', 'duo-bang', 'duo-pt', 'duo-tn', 'chang-ngang'].includes(thamSo.get('lam') ?? '') && document.documentElement.dataset.trong === 'hs') { void import('../../src/styles/trong-hs.css'); document.body.insertAdjacentHTML('beforeend', '<div class="ht2" hidden></div>'); document.documentElement.setAttribute('data-ht2', '') }
+// HỆ KÍNH 02/11: màn con mở từ Hôm nay (Tự sửa lỗi, Tu luyện, Chữa câu sai…) — app thật luôn có Hôm nay (TrongHs + ba tờ kiểu của nó) nằm dưới ⇒ trang chụp
+// nạp đúng ba tờ ấy + .ht2 ẩn, nếu không ảnh thiếu mọi lớp kính (nền trắng) — không giống app thật.
+if (man.startsWith('hs12-') && document.documentElement.dataset.trong === 'hs') {
+  void import('../../src/styles/trong-hs.css').then(() => import('../../src/styles/trong-hs-ngang.css')).then(() => import('../../src/styles/trong-kinh.css'))
+  document.body.insertAdjacentHTML('beforeend', '<div class="ht2" hidden></div>'); document.documentElement.setAttribute('data-ht2', '')
+}
 // ═══ hết DUO APP 26/10
 // ═══ GIỮ CHÂN 27/10: `lam13&lam=duo&tp=1&giu=1` — bản tổng quan thưởng ở máy như app thật đã nạp lúc mở (chuỗi 12 ngày, hôm nay chưa đạt, mục tiêu 3/4).
 import { DUONG as DUONG_TP, docTongQuan as docTqGiu, ghiTam as ghiTamGiu, khoaTam as khoaTamGiu } from '../../src/lib/thuong-api'

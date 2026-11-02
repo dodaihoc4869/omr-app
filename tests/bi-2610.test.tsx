@@ -91,7 +91,8 @@ describe('Lửa thay Bi', () => {
     expect(hs).toMatch(/\.da-linh-vat \.bi \{ display: block; width: 83px;/) // Lộ trình: hình cao ≈ 86 px
     expect(gon).toMatch(/\.tp-tr-muc \{[^}]*width: 54px; height: 54px;/) // vòng mục tiêu 54 px
     expect(readFileSync('src/components/hoc-tap/ManLamBaiTap.tsx', 'utf8')).toMatch(/<Bi cam="mung" size=\{135\} \/>/) // kết chặng: hình cao ≈ 140 px
-    expect(readFileSync('src/components/hoc-tap/TrongHs.tsx', 'utf8')).toMatch(/goc=\{ben < 0 \? 'phai' : 'trai'\}/)
+    // hệ Kính 02/11: không còn Mol đứng cạnh đường (đứng nghiêng theo phía đường) — Mol nói ở thẻ lời trên «Việc hôm nay», vẫn đổi mặt theo cấp Lửa
+    expect(readFileSync('src/components/hoc-tap/TrongHs.tsx', 'utf8')).toMatch(/<Bi cam=\{cam\} cap=\{cap\} size=\{84\} noi=\{loi\} \/>/)
   })
   it('không xuất hiện ở màn thi, đăng nhập, app thầy, app phụ huynh', () => {
     for (const t of ['src/screens/ExamTakeScreen.tsx', 'src/AppThi.tsx', 'src/screens/StudentLoginScreen.tsx', 'src/App.tsx', 'src/AppPhuHuynh.tsx']) {
