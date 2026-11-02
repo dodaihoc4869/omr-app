@@ -423,3 +423,7 @@ html[data-trong='hs'] .tlu .tlu-the-che-do[data-che-do='5'] .tlu-the-che-do-icon
   html[data-trong='hs'] .dm-khung[data-muc='luyen'] .da-o .so .so-dv { font-size: 12.5px; }
 }
 html[data-trong='hs'] .da-lua > :not(.bi):not(svg) { min-width: 0; }
+/* ca kiểm tra đang mở ⇒ danh sách việc mờ đi (như đường chặng cũ `.da-duong[data-mo-di]`) */
+html[data-trong='hs'] .kb-viec-ds[data-mo-di] { opacity: .5; }
+/* THẺ BẬT RA dưới dòng việc (thầy 27/10 «không vào thẳng» — giữ màu thẻ cũ theo loại việc), mặt kính */
+html[data-trong='hs'] .da-pop { border-radius: 26px; }

@@ -331,22 +331,81 @@ export function BinhHomNay({ da, muc, ranh }: { da: number; muc: number; ranh: n
 }
 
 /** VIỆC HÔM NAY (hệ Kính — thay con đường nút tròn): mỗi nút cũ thành MỘT DÒNG ô tích theo ĐÚNG thứ tự và khoá cũ (tuần tự từ trên xuống, thầy 29/10).
- *  Bấm dòng ⇒ gọi ĐÚNG việc của thẻ bật ra cũ (pop.nut.onClick); dòng khoá / không có việc ⇒ chỉ đọc lý do (dòng phụ). Giữ hiệu ứng: chặng vừa xong (sao bay),
+ *  Chạm dòng ⇒ THẺ BẬT RA như con đường cũ (thầy 27/10 «không vào thẳng»: tên việc, lý do, nút việc chính); dòng khoá ⇒ thẻ nói lý do. Giữ hiệu ứng: chặng vừa xong (sao bay),
  *  vỡ khoá lần lượt sau khi nộp Kiểm tra ôn tập / sửa xong lỗi, rương mở (anMung). Không vẽ đường / linh vật cạnh đường nữa. */
+/** THẺ BẬT RA dưới nút (thầy 27/10): rộng gần hết màn (lề 16 px, tối đa 440), mũi nhọn chỉ đúng tâm nút; gần đáy màn ⇒ bật LÊN TRÊN nút. Vẽ vào <body>
+ *  (position: fixed, trên dải thẻ ghim) ⇒ không bị khung nào cắt. Chạm ra ngoài / cuộn / đổi khổ / Esc ⇒ đóng; Esc trả focus về nút. */
+function TheNut({ id, sac, pop, mo, onDong }: { id: string; sac: string; pop: Pop; mo: HTMLElement; onDong: (traFocus: boolean) => void }) {
+  const the = useRef<HTMLDivElement>(null)
+  const dat = useRef<() => void>(() => {})
+  useLayoutEffect(() => {
+    const t = the.current
+    if (!t) return
+    let goc0 = mo.getBoundingClientRect().top
+    // cuộn nhỏ (trình duyệt đưa nút vào khung, cuộn mượt đang dừng) ⇒ thẻ đi theo nút; cuộn hẳn (> 40 px) ⇒ đóng
+    dat.current = () => { if (Math.abs(mo.getBoundingClientRect().top - goc0) > 40) onDong(false); else datCho() }
+    const datCho = () => {
+      const r = mo.getBoundingClientRect(), vw = document.documentElement.clientWidth || window.innerWidth, vh = window.innerHeight
+      const w = Math.min(vw - 32, 440), cx = r.left + r.width / 2, left = Math.max(16, Math.min(vw - 16 - w, cx - w / 2))
+      t.style.width = `${w}px`; t.style.left = `${left}px`
+      t.style.setProperty('--ox', `${Math.max(24, Math.min(w - 24, cx - left))}px`)
+      const h = t.offsetHeight, duoi = r.bottom + 14, tren = r.top - 14 - h
+      const lenTren = duoi + h > vh - 12 && tren >= 8
+      t.toggleAttribute('data-tren', lenTren)
+      t.style.top = `${lenTren ? tren : duoi}px`
+    }
+    datCho()
+    // khổ thấp (điện thoại ngang): trên / dưới nút đều không đủ chỗ ⇒ cuộn khung NGAY (không mượt) cho thẻ nằm trọn dưới nút, rồi đặt lại
+    const r = mo.getBoundingClientRect(), du = r.bottom + 14 + t.offsetHeight - (window.innerHeight - 12)
+    if (du > 0 && !t.hasAttribute('data-tren')) {
+      let k: Element | null = mo.parentElement
+      while (k && !(/(auto|scroll)/.test(getComputedStyle(k).overflowY) && k.scrollHeight > k.clientHeight)) k = k.parentElement
+      ;(k ?? document.scrollingElement)?.scrollBy?.({ top: Math.min(du, r.top - 8), behavior: 'instant' as ScrollBehavior })
+      goc0 = mo.getBoundingClientRect().top
+      datCho()
+    }
+    ;(t.querySelector<HTMLElement>('.da-pop-nut:not(:disabled)') ?? t).focus({ preventScroll: true })
+  }, [mo]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const ngoai = (e: Event) => { const x = e.target as Node; if (!the.current?.contains(x) && !mo.contains(x)) onDong(false) }
+    const dong = () => onDong(false), cuon = () => dat.current()
+    const phim = (e: KeyboardEvent) => { if (e.key === 'Escape') { e.preventDefault(); onDong(true) } }
+    document.addEventListener('pointerdown', ngoai, true)
+    window.addEventListener('scroll', cuon, true)
+    window.addEventListener('resize', dong)
+    document.addEventListener('keydown', phim)
+    return () => { document.removeEventListener('pointerdown', ngoai, true); window.removeEventListener('scroll', cuon, true); window.removeEventListener('resize', dong); document.removeEventListener('keydown', phim) }
+  }, [mo, onDong])
+  const n = pop.nut
+  return createPortal(<div ref={the} id={id} className="da-pop" data-sac={sac} role="dialog" aria-label={pop.tieu} tabIndex={-1}>
+    <b className="da-pop-tieu">{pop.tieu}</b><span className="da-pop-phu">{pop.phu}</span>
+    {n && <button type="button" className="da-pop-nut" disabled={n.tat || !n.onClick} onClick={() => { onDong(false); n.onClick?.() }}>{n.chu}</button>}
+  </div>, document.body)
+}
 /** RƯƠNG HÔM NAY (giữ từ con đường cũ: sáng khi xong cả các chặng, chạm ⇒ mở rương — anMung) thành THẺ KÍNH riêng dưới danh sách như bản vẽ. */
 function TheRuong({ ds }: { ds: Nut[] }) {
   const chang = ds.filter((n) => n.k.startsWith('c')), soChang = chang.length, soXong = chang.filter((n) => n.tt === 'xong').length, duR = soChang > 0 && soXong === soChang
+  const [mo, setMo] = useState<HTMLElement | null>(null)
+  const dong = useRef((traFocus: boolean) => setMo((m) => { if (traFocus) m?.focus(); return null })).current
   if (soChang < 2) return null
-  return <button type="button" className="kb-the-ruong da-ruong-nut" data-mo={duR || undefined} aria-label="Rương hôm nay"
-    onClick={(e) => { const nut = e.currentTarget; cham(); if (kichRuong({ duMo: duR, cham: true })) anMung('ruong', { goc: nut, nap: nut.querySelector('.rg-nap'), rung: true }) }}>
+  const phu = duR ? `Em đã xong cả ${soChang} chặng hôm nay, rương đã sáng!` : `Rương sáng lên khi em xong cả ${soChang} chặng hôm nay · còn ${soChang - soXong} chặng`
+  return <><button type="button" className="kb-the-ruong da-ruong-nut" data-mo={duR || undefined} aria-label="Rương hôm nay" aria-haspopup="dialog" aria-expanded={!!mo}
+    aria-controls={mo ? 'da-pop-ruong' : undefined}
+    onClick={(e) => { const nut = e.currentTarget, dangMo = !!mo; cham(); setMo(dangMo ? null : nut); if (!dangMo && kichRuong({ duMo: duR, cham: true })) anMung('ruong', { goc: nut, nap: nut.querySelector('.rg-nap'), rung: true }) }}>
     <span className="kb-ruong" aria-hidden="true"><Ruong /></span>
     <span className="kb-giua"><b>Rương hôm nay</b><span className="kb-phu">{duR ? `Em đã xong cả ${soChang} chặng hôm nay, rương đã sáng!` : `Rương sáng lên khi em xong cả ${soChang} chặng hôm nay · còn ${soChang - soXong} chặng`}</span></span>
     <ChevronRight size={20} aria-hidden="true" />
   </button>
+  {mo && <TheNut id="da-pop-ruong" sac="sao" mo={mo} onDong={dong} pop={{ tieu: 'Rương hôm nay', phu }} />}</>
 }
-function DanhSachViec({ ds, moKhoa }: { ds: Nut[]; moKhoa?: 'kt' | 'sua' }) {
+/** màu THẺ BẬT RA giữ đúng như con đường cũ (thầy 05/10 «giữ nguyên mọi màu sắc»): chặng xanh · kiểm tra lam · sửa đỏ · bài tập vàng */
+const SAC_THE: Record<Nut['loai'], string> = { hoc: 'dung', kiem: 'tin', sua: 'sai', bt: 'chu-y' }
+function DanhSachViec({ ds, moKhoa, moDi }: { ds: Nut[]; moKhoa?: 'kt' | 'sua'; moDi?: boolean }) {
   const goc = useRef<HTMLOListElement>(null)
   const [vua, setVua] = useState<number | null>(null)
+  // chỉ MỘT thẻ mở một lúc: k của dòng đang mở + phần tử dòng (đặt thẻ, trả focus khi Esc)
+  const [moThe, setMoThe] = useState<{ k: string; el: HTMLElement } | null>(null)
+  const dongThe = useRef((traFocus: boolean) => setMoThe((m) => { if (traFocus) m?.el.focus(); return null })).current
   const chang = ds.filter((n) => n.k.startsWith('c')), soChang = chang.length, soXong = chang.filter((n) => n.tt === 'xong').length
   useEffect(() => {
     const v = changVuaXong(soXong, soChang)
@@ -360,20 +419,25 @@ function DanhSachViec({ ds, moKhoa }: { ds: Nut[]; moKhoa?: 'kt' | 'sua' }) {
   const viSua = ds.findIndex((m) => m.k === 'sua')
   const vuaMo = (m: Nut, j: number) => m.tt !== 'khoa' && m.tt !== 'xong' && (moKhoa === 'kt' ? m.k.startsWith('c') || m.k === 'sua' : m.k.startsWith('c') && viSua >= 0 && j > viSua)
   let thuChang = 0
-  return <ol ref={goc} className="kb-viec-ds" aria-label="Việc hôm nay">
+  // ca kiểm tra đang mở ⇒ danh sách mờ đi (như đường chặng cũ `data-mo-di`): mắt dồn vào băng ca phía trên
+  return <ol ref={goc} className="kb-viec-ds" data-mo-di={moDi || undefined} aria-label="Việc hôm nay">
     {ds.map((n, i) => {
       if (n.loai === 'hoc') thuChang++
       const thuMo = moKhoa && vuaMo(n, i) ? ds.slice(0, i).filter(vuaMo).length : -1
       const hu = moKhoa ? (n.tt === 'xong' && n.k === (moKhoa === 'kt' ? 'kiem' : 'sua') ? 'xong' : thuMo >= 0 ? 'mo' : undefined) : i === vua ? 'xong' : vua !== null && i === vua + 1 && n.tt === 'dang' ? 'mo' : undefined
-      const viec = n.pop.nut, bam = viec?.onClick && !viec.tat ? viec.onClick : undefined
+      const viec = n.pop.nut, mo = moThe?.k === n.k
       const Icon = n.tt === 'xong' ? Check : Lock
       return <li key={n.k} className="kb-o" data-hu={hu} style={thuMo >= 0 ? { '--tre': `${300 + thuMo * 160}ms` } as CSSProperties : undefined}>
-        <button type="button" className="kb-dong" data-loai={n.loai} data-tt={n.tt} data-sac={SAC_POP[n.loai]} aria-label={n.ten} disabled={!bam}
-          onClick={bam ? () => { cham(); bam() } : undefined}>
+        {/* chạm dòng KHÔNG vào thẳng (thầy 27/10): thẻ bật ra dưới dòng — việc chính nằm trong thẻ; dòng khoá ⇒ thẻ nói lý do */}
+        <button type="button" className="kb-dong" data-loai={n.loai} data-tt={n.tt} data-sac={SAC_POP[n.loai]} aria-label={n.ten} aria-haspopup="dialog" aria-expanded={mo}
+          aria-controls={mo ? `da-pop-${n.k}` : undefined} onClick={(e) => { const el = e.currentTarget; cham(); setMoThe((m) => (m?.k === n.k ? null : { k: n.k, el })) }}>
           <span className="kb-tich">{n.vong !== undefined && n.tt === 'dang' ? <VongChang pt={n.vong} so={n.soDoan} da={n.daDoan} khoa={n.khoaVong} /> : null}{n.tt === 'xong' || n.tt === 'khoa' ? <Icon size={n.tt === 'khoa' ? 15 : 18} strokeWidth={n.tt === 'xong' ? 3 : 2.4} aria-hidden="true" /> : null}</span>
           <span className="kb-giua"><b>{tenDong(n, thuChang)}</b><span className="kb-phu">{phuDong(n)}</span></span>
           {n.tt === 'dang' ? <span className="kb-viec" aria-hidden="true">{n.daDoan !== undefined && n.soDoan ? `${n.daDoan}/${n.soDoan}` : n.bong ?? viec?.chu ?? ''}</span> : <i className="kb-loai" aria-hidden="true" />}
+          {/* huy hiệu số như chấm thông báo (thầy 27/10 — số câu Tự sửa lỗi còn hôm nay…); tên đầy đủ ở aria-label + thẻ bật ra */}
+          {n.dem ? <b className="da-dem kb-dem" aria-hidden="true">{n.dem > 99 ? '99+' : n.dem}</b> : null}
         </button>
+        {mo && <TheNut id={`da-pop-${n.k}`} sac={n.tt === 'khoa' ? 'khoa' : SAC_THE[n.loai]} pop={n.pop} mo={moThe!.el} onDong={dongThe} />}
       </li>
     })}
   </ol>
@@ -953,7 +1017,8 @@ export function MotTrangHs(p: PropsMotTrang) {
       {/* 28/10 (thầy «Chúc mừng, em đã hoàn thành bài hôm nay — ghi rõ câu sửa, bài kiểm tra. Thay thẻ hoàn thành nhiệm vụ»): xong HẾT việc hôm nay ⇒ thẻ chúc mừng
           kèm số câu học · câu sửa · Kiểm tra ôn tập; còn việc ⇒ thẻ «Đủ x/y câu» + việc tiếp như cũ. 02/11 (ảnh thật «Đủ 17/12 câu hôm nay!»): VƯỢT mức ⇒
           «Đủ mức hôm nay! Đã làm 17 câu (mức 12)» — không viết như phân số (lam-bai.ts vuotMuc). */}
-      {du && chinh !== 'ca' && so && !tiepTheo.length && <section className="da-bang" data-sac="dung" aria-label={tiepTheo.length ? 'Đủ mức hôm nay' : 'Hoàn thành bài hôm nay'}><span className="h"><Check size={26} strokeWidth={3} aria-hidden="true" /></span><div className="giua">{tiepTheo.length
+      {/* đủ mức ⇒ băng «Đủ x/y câu hôm nay! · Tiếp theo: …» (còn việc) / «Hoàn thành bài hôm nay» (xong hết) — giữ như cũ, thẻ mức đổi hồng đi cùng */}
+      {du && chinh !== 'ca' && so && <section className="da-bang" data-sac="dung" aria-label={tiepTheo.length ? 'Đủ mức hôm nay' : 'Hoàn thành bài hôm nay'}><span className="h"><Check size={26} strokeWidth={3} aria-hidden="true" /></span><div className="giua">{tiepTheo.length
         ? <><b>{vuotMuc(so) ? `Đủ mức hôm nay! Đã\u00a0làm\u00a0${so.daLam}\u00a0câu\u00a0(mức\u00a0${so.muc})` : `Đủ ${so.daLam}/${so.muc} câu hôm nay!`}</b><span className="mo">Tiếp theo: {tiepTheo.join(', rồi ')}</span></>
         : <><b>Chúc mừng, em đã hoàn thành bài hôm nay!</b><span className="mo">{so.daLam} câu học{daSuaNay ? ` · ${daSuaNay} câu sửa` : ''}{kiem?.homNay && kiem.nopLuc !== null ? ` · Kiểm tra ôn tập ${kiem.diem !== null ? `${diemChu(kiem.diem)}/10` : 'đã nộp'}` : ''}</span></>}</div></section>}
       {/* THẺ BÀI (thầy 27/10 «thu vào bị giật… cho thanh màu xanh xuống kẻo chèn vào ống nghiệm»): thẻ đầy đủ ĐỨNG YÊN trong luồng (giữ chỗ, không nhảy cuộn);
@@ -961,7 +1026,7 @@ export function MotTrangHs(p: PropsMotTrang) {
           ⇒ nút chặng / linh vật trượt khuất gọn dưới dải. Dải nằm trong khối cao 0 ⇒ không chiếm chỗ. */}
       {dauKinh(<><p>{ngayTuan()}{hs?.lop ? ` · ${hs.lop}` : ''}</p><h1>Chào {p.ten || 'em'}</h1></>, true)}
       {/* HỆ KÍNH (thầy chốt 02/11): thẻ «Mức hôm nay» — số lớn + bình tam giác (thay thẻ bài). Tên bài + việc + chặng giữ nguyên nguồn cũ. */}
-      <section className="kb-hero" data-du={du || undefined} aria-label={`${du ? 'Đủ mức hôm nay' : 'Mức hôm nay'}${p.viec ? ` · ${chuViecBai(p.viec, so)}` : ''}`} aria-busy={!so && p.dangTai}>
+      <section className="kb-hero" data-du={du || undefined} aria-label={`Mức hôm nay${du ? ' · đã đủ' : ''}${p.viec ? ` · ${chuViecBai(p.viec, so)}` : ''}`} aria-busy={!so && p.dangTai}>
         <div className="kb-hero-chu">
           <span className="kb-nhan">{du ? 'Đủ mức hôm nay' : p.ngayKiem ? 'Ngày Kiểm tra ôn tập' : 'Mức hôm nay'}</span>
           {so ? <div className="kb-so">{du && vuotMuc(so) ? <>{so.daLam}<small> câu</small></> : <>{so.daLam}<small>/{so.muc} câu</small></>}</div> : <span className="mot-xuong" aria-hidden="true" />}
@@ -992,7 +1057,7 @@ export function MotTrangHs(p: PropsMotTrang) {
           <ChevronRight size={22} aria-hidden="true" /></button> })()}
       </div><div className="kb-cot-phai">
       {!so && p.dangTai && !p.ngayKiem ? null : nut.length > 0 && <section className="kb-viec" aria-label="Việc hôm nay"><h2>Việc hôm nay<span>{nut.filter((n) => n.tt === 'xong').length}/{nut.length} xong</span></h2>
-        <DanhSachViec ds={nut} moKhoa={moKt ? 'kt' : moSua ? 'sua' : undefined} /></section>}
+        <DanhSachViec ds={nut} moDi={chinh === 'ca'} moKhoa={moKt ? 'kt' : moSua ? 'sua' : undefined} /></section>}
       {coThuong && <TheBanLoTrinh token={p.token} bat={tq?.bat.banBe} onMo={() => moTp('ban')} />}
       {!(!so && p.dangTai) && <TheRuong ds={nut} />}
       {hocThem && <button type="button" className="mot-lien-ket" onClick={p.onHoc}>Học thêm câu mới<ChevronRight size={18} aria-hidden="true" /></button>}
