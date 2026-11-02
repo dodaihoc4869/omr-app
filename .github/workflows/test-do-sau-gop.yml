@@ -19,6 +19,8 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # tests/dat-lai-*-2710 cần lịch sử git (HEAD~1, merge-base --is-ancestor); checkout nông 1 commit ⇒ đỏ giả
       - uses: actions/setup-node@v4
         with:
           node-version: 24
