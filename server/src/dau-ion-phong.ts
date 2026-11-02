@@ -109,7 +109,7 @@ export class PhongDau {
     kn.gui(json({ t: 'chao', v: PHIEN_BAN, toi: n.id, ten: this.tenHien(n) }))
     const s = this.san.get(n.san)
     // Nối lại giữa ván: về đúng sân, đúng ghế.
-    if (s) { kn.gui(json(this.goiSan(s, n))); if (s.nghi > 0) kn.gui(json({ t: 'ket', bang: s.bang, nghi: s.nghi, ti: s.tr.ti })) }
+    if (s) { kn.gui(json(this.goiSan(s, n))); if (s.nghi > 0) kn.gui(json(this.goiKet(s))) }
     else kn.gui(json(this.chuSanh()))
     return n
   }
@@ -178,8 +178,10 @@ export class PhongDau {
     return s.tr.ghe.map((g) => { const k = g.ai ? undefined : this.nguoi.get(g.id); return [g.id, k ? this.tenHien(k) : g.ai ? TEN_NGUYEN_TO[g.nt] : `Bạn ${NGUYEN_TO[g.nt] ?? 'Na'}`, g.nt, g.ai ? 1 : 0, g.phe] })
   }
   private goiSan(s: San, n: Nguoi): unknown {
-    return { t: 'san', v: PHIEN_BAN, so: s.so, toi: n.id, con: Math.ceil(s.tr.con), buoc: s.buoc, ti: s.tr.ti, ghe: this.dongGhe(s), vp: s.tr.vp.map((v) => [v.id, v.k, Math.round(v.x), Math.round(v.y)]) }
+    return { t: 'san', v: PHIEN_BAN, so: s.so, toi: n.id, con: Math.ceil(s.tr.con), buoc: s.buoc, ti: s.tr.ti, ghe: this.dongGhe(s), vp: s.tr.vp.map((v) => [v.id, v.k, Math.round(v.x), Math.round(v.y)]), km: s.tr.km }
   }
+  /** Gói hết ván (v4): bảng + phe thắng (0 / 1, 2 = hoà) + lý do ('vo' tinh thể vỡ / 'gio' hết giờ) + máu khối lúc kết thúc. */
+  private goiKet(s: San): unknown { return { t: 'ket', bang: s.bang, nghi: s.nghi > 0 ? s.nghi : GIAY_NGHI, ti: s.tr.ti, thang: s.tr.thang, ly: s.tr.lyDo, km: s.tr.km, con: Math.ceil(s.tr.con) } }
   private baoCaSan(s: San, o: unknown, tru?: Nguoi): void { const c = json(o); for (const id of s.ds) { const k = this.nguoi.get(id); if (k !== tru && k?.kn) k.kn.gui(c) } }
 
   /** Nguyên tố còn trống trong sân (mỗi sân 6 nguyên tố khác nhau nếu được). */
@@ -227,7 +229,7 @@ export class PhongDau {
     const g = themGhe(s.tr, { id: n.id, nt: this.ntTrong(s, n.nt), phe: ai.phe })
     s.ds.push(n.id); n.san = s.so; n.seq = 0; n.ydLuc = this.bayGio(); n.vangLuc = 0
     this.gui(n, this.goiSan(s, n))
-    if (s.nghi > 0) this.gui(n, { t: 'ket', bang: s.bang, nghi: s.nghi, ti: s.tr.ti })
+    if (s.nghi > 0) this.gui(n, this.goiKet(s))
     this.baoCaSan(s, { t: 'thay', cu: ai.id, moi: n.id, ten: this.tenHien(n), nt: g.nt, phe: g.phe, ai: 0 }, n)
     this.baoCaSan(s, { t: 'ghe', ghe: this.dongGhe(s) }, n)
     return true
@@ -312,14 +314,14 @@ export class PhongDau {
       s.buoc = (s.buoc + 1) & 0xffff
       if (guiAnh || s.tr.xong) {
         s.tick = (s.tick + 1) & 0xff
-        const than = maAnh(s.tick, s.tr.con, s.tr.ghe, laySuKien(s.tr), s.buoc, s.tr.ti)
+        const than = maAnh(s.tick, s.tr.con, s.tr.ghe, laySuKien(s.tr), s.buoc, s.tr.ti, s.tr.km)
         for (const id of s.ds) { const k = this.nguoi.get(id); if (k?.kn) k.kn.gui(datAck(than.slice(), k.seq)) }
       }
       if (s.tr.xong) {
         s.nghi = GIAY_NGHI
-        // Dòng: [id, hạ, bị hạ, cấp cao nhất, chuỗi hạ, electron đã nhặt, góp sức, trúng, giây trụ liền] — máy em tự tính huy hiệu.
-        s.bang = xepBang(s.tr).map((d) => [d.id, d.ha, d.biHa, d.capMax, d.chuoiMax, d.nhatE, d.hoTro, d.trung, d.songMax])
-        this.baoCaSan(s, { t: 'ket', bang: s.bang, nghi: GIAY_NGHI, ti: s.tr.ti })
+        // Dòng (v4): [id, hạ, bị hạ, cấp cao nhất, chuỗi hạ, bắn trúng khối, góp sức, trúng, giây trụ liền, tháp phá, hộ vệ] — máy em tự tính huy hiệu.
+        s.bang = xepBang(s.tr).map((d) => [d.id, d.ha, d.biHa, d.capMax, d.chuoiMax, d.danhKhoi, d.hoTro, d.trung, d.songMax, d.phaThap, d.hoVe])
+        this.baoCaSan(s, this.goiKet(s))
       }
     }
   }

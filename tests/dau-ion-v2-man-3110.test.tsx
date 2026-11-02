@@ -89,7 +89,8 @@ describe('Đấu Nguyên Tử 3 đấu 3 · màn phòng chờ', () => {
     expect(document.querySelector('.dn-man')).toBeTruthy()
     khung(3)
     const ts = document.querySelector('.dn-ti-so')!
-    expect(ts.getAttribute('aria-label')).toBe('Phe Bazơ 7, Phe Axit 5, còn 0:42')
+    // v4: thanh máu hai tinh thể + số tháp còn đứng thay tỉ số số lần hạ (thầy chốt 02/11 tối)
+    expect(ts.getAttribute('aria-label')).toBe('Tinh thể Phe Bazơ còn 100%, 3 tháp; tinh thể Phe Axit còn 100%, 3 tháp; còn 0:42')
     expect(document.querySelector('.dn-doi')!.textContent).toContain('A.I Sodium')
   })
 
@@ -146,15 +147,17 @@ describe('Đấu Nguyên Tử 3 đấu 3 · màn phòng chờ', () => {
     expect(JSON.parse(localStorage.getItem('ddh.dauIon')!).daXemGoiY).toBe(true)
   })
 
-  it('hết ván: «Phe Bazơ thắng 12 – 9», hai cột phe, KHÔNG số thứ hạng, mỗi em thật một huy hiệu, A.I «lấp ghế», đếm ngược ván mới', async () => {
+  it('v4 hết ván: «Phe Bazơ phá vỡ tinh thể Phe Axit!» + ô máu hai tinh thể, hai cột phe, KHÔNG số thứ hạng, mỗi em thật một huy hiệu, A.I «lấp ghế», đếm ngược ván mới', async () => {
     const { ws } = await vaoSanMang()
     khung(2)
     const bang = [[1, 4, 2, 4, 2, 9, 2, 21, 24], [2, 4, 4, 5, 2, 10, 1, 26, 15], [3, 5, 3, 3, 3, 6, 1, 25, 18], [200, 3, 1, 3, 1, 14, 3, 15, 31], [201, 3, 3, 3, 1, 7, 4, 17, 20], [202, 2, 5, 2, 1, 5, 0, 12, 9]]
-    await act(async () => { ws.nhan({ t: 'ket', bang, nghi: 6, ti: [12, 9] }) })
+    const km = [20, 20, 30, 8, 8, 8, 12, 0, 20, 0, 8, 0, 8, 0]
+    await act(async () => { ws.nhan({ t: 'ket', bang, nghi: 6, ti: [12, 9], thang: 0, ly: 'vo', km, con: 30 }) })
     khung(2)
     const ket = document.querySelector('.dn-ket')!
-    expect(ket.querySelector('h2')!.textContent).toBe('Phe Bazơ thắng 12 – 9')
-    expect(ket.textContent).toContain('Phe em thắng!')
+    expect(ket.querySelector('h2')!.textContent).toBe('Phe Bazơ phá vỡ tinh thể Phe Axit!')
+    expect(ket.textContent).toContain('Phe em thắng sớm (còn 0:30)!')
+    expect(ket.querySelector('.dn-ket-tt')!.textContent).toBe('Tinh thể Bazơcòn 50%Tinh thể Axitđã vỡ')
     expect(ket.querySelectorAll('.dn-cot')).toHaveLength(2)
     expect(ket.querySelectorAll('.dn-huy')).toHaveLength(3)
     expect(ket.textContent).toContain('A.I lấp ghế')

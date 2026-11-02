@@ -249,7 +249,8 @@ function changVuaXong(xong: number, tong: number): number | null {
  *  lộ quầng vàng + 3 tinh thể lục giác. Màu chỉ biến --tr-*. */
 function Ruong({ mo }: { mo?: boolean }) {
   const u = useId().replace(/[^a-zA-Z0-9]/g, '')
-  return <svg className="rv" viewBox="0 0 120 100" aria-hidden="true">
+  // khung cắt sát rương ĐÓNG (y 14–100) ⇒ rương nằm chính giữa thẻ (thầy 02/11 «Rương nằm chưa chính giữa»); nắp mở tràn lên trên (overflow: visible)
+  return <svg className="rv" viewBox="0 14 120 86" aria-hidden="true">
     <defs>
       <linearGradient id={`${u}t`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" className="rv-t0" /><stop offset="1" className="rv-t1" /></linearGradient>
       <linearGradient id={`${u}n`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" className="rv-n0" /><stop offset="1" className="rv-n1" /></linearGradient>
