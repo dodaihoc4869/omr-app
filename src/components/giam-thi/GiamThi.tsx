@@ -131,7 +131,7 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
     const goc = vung()
     if (!goc) return
     const oTra = (e: Event) => (e.target as Element | null)?.closest?.('.duo-tra button, .duo-tra [role="radio"], .ht2-lam-ban-phim button')
-    const nhinChon = () => { const c = goc.querySelector(`.duo-tra ${CHON}`); c ? gt.current?.nhinVao(c) : gt.current?.nhin(0.5, 0.45) }
+    const nhinChon = () => { const c = goc.querySelector(`.duo-tra ${CHON}`); if (c) gt.current?.nhinVao(c); else gt.current?.nhin(0.5, 0.45) }
     const re = (e: Event) => { if (coKet.current) return; const b = oTra(e); if (b) gt.current?.nhinVao(b) }
     const roi = (e: PointerEvent) => { if (coKet.current) return; if (oTra(e) && !(e.relatedTarget as Element | null)?.closest?.('.duo-tra')) nhinChon() }
     const cham = (e: Event) => {
