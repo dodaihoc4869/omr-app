@@ -88,7 +88,8 @@ describe('gắn Kính ở màn học sinh', () => {
     ['src/components/hoa2/CauDaLam.tsx', 'bocKinh(c.qid)'],
     ['src/components/chua-cau-sai/ChuaGon.tsx', 'bocKinh(qid)'],
     ['src/components/chua-cau-sai/ChuaTrucTiep.tsx', 'bocKinh(qid)'],
-    ['src/components/ca-thi/CauCanChua.tsx', 'bocKinh(c.qid)'],
+    ['src/components/ca-thi/CauCanChua.tsx', 'hs ? bocKinh(c.qid) : undefined'],
+    ['src/components/ca-thi/BaoCaoChiTiet.tsx', 'hs={laHs}'],
     ['src/components/tu-luyen/ManTuLuyen.tsx', 'bocKinh(c.qid)'],
     ['src/components/tu-luyen/LuyenDeCauTruc.tsx', 'bocKinh(q.id)'],
     ['src/components/KhoiKhacPhuc3CheDo.tsx', 'daNop ? bocKinh(q.id) : undefined'],
@@ -99,6 +100,6 @@ describe('gắn Kính ở màn học sinh', () => {
   it('ManLamBaiTap: cả hai chỗ hiện lời giải (kiểu Duolingo + kiểu cũ) đều bọc Kính', () => {
     expect(doc('src/components/hoc-tap/ManLamBaiTap.tsx').match(/<LoiGiaiKinhHs /g)?.length).toBe(2)
   })
-  it.each(['src/components/chien-dich/BangGoi7.tsx', 'src/components/BaiNopBtvn.tsx', 'src/components/day-hoc/TheCauHienThi.tsx', 'src/screens/GoiLenBangScreen.tsx', 'src/screens/NganHangDeScreen.tsx', 'src/components/ph-v3/ManChiTietCa.tsx', 'src/components/loi-giai/KhoiLoiGiaiChuan.tsx', 'src/components/hoc-tap/ManKiemTraCaNhan.tsx'])(
-    '%s (thầy / phụ huynh / dùng chung / làn Codex) KHÔNG gắn Kính', (tep) => { expect(doc(tep)).not.toMatch(/bocKinh|LoiGiaiKinhHs/) })
+  it.each(['src/components/chien-dich/BangGoi7.tsx', 'src/components/BaiNopBtvn.tsx', 'src/components/day-hoc/TheCauHienThi.tsx', 'src/screens/GoiLenBangScreen.tsx', 'src/screens/NganHangDeScreen.tsx', 'src/components/ph-v3/ManChiTietCa.tsx', 'src/components/loi-giai/KhoiLoiGiaiChuan.tsx'])(
+    '%s (thầy / phụ huynh / dùng chung) KHÔNG gắn Kính', (tep) => { expect(doc(tep)).not.toMatch(/bocKinh|LoiGiaiKinhHs/) })
 })

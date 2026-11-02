@@ -54,10 +54,10 @@ export function chiTietTuCauSai(c: CauSaiHienThi): ChiTietCau {
 }
 
 /** Đề + lời giải chuẩn của một câu — bọc `m3 h2-the-cau` đúng như thẻ Câu đã làm. */
-export default function CauCanChua({ c, stt }: { c: CauSaiHienThi; stt: number }) {
+export default function CauCanChua({ c, stt, hs }: { c: CauSaiHienThi; stt: number; /** Báo cáo mở ở app HỌC SINH ⇒ lời giải Kính (app thầy giữ lời giải cũ). */ hs?: boolean }) {
   return (
     <div className="m3 h2-the-cau">
-      <TheCau {...propsTheCau(chiTietTuCauSai(c), stt)} hoiThay={{ qid: c.qid, nguon: 'bao_cao_ca' }} bocLoiGiai={bocKinh(c.qid)} />
+      <TheCau {...propsTheCau(chiTietTuCauSai(c), stt)} hoiThay={{ qid: c.qid, nguon: 'bao_cao_ca' }} bocLoiGiai={hs ? bocKinh(c.qid) : undefined} />
       {/* Báo cáo ca ĐÃ công bố (màn này chỉ hiện sau công bố): nút Hỏi thầy như mọi chỗ luyện tập — máy chủ vẫn tự chặn nếu ca chưa công bố. */}
     </div>
   )
