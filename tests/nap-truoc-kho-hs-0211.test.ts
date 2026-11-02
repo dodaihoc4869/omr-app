@@ -19,7 +19,7 @@ describe('plugin kho-hs.json', () => {
 
 describe('tải ngầm phía máy em', () => {
   afterEach(() => { vi.useRealTimers(); vi.restoreAllMocks(); vi.resetModules() })
-  const datMoiTruong = (o: { sw?: boolean; saveData?: boolean; loai?: string; coSan?: string[] }) => {
+  const datMoiTruong = (o: { sw?: boolean; saveData?: boolean; loai?: string; coSan?: string[]; html?: boolean }) => {
     Object.defineProperty(navigator, 'serviceWorker', { configurable: true, value: o.sw === false ? undefined : { controller: {} } })
     Object.defineProperty(navigator, 'connection', { configurable: true, value: { saveData: !!o.saveData, effectiveType: o.loai ?? '4g' } })
     const coSan = new Set(o.coSan ?? [])
@@ -28,7 +28,7 @@ describe('tải ngầm phía máy em', () => {
     vi.stubGlobal('fetch', vi.fn(async (u: string) => {
       goi.push(u)
       if (u.endsWith('kho-hs.json')) return new Response(JSON.stringify({ ds: ['assets/a-12345678.js', 'assets/b-12345678.css', '../la.js', 'assets/c-12345678.js'] }))
-      return new Response('x')
+      return o.html ? new Response('<!doctype html>', { headers: { 'content-type': 'text/html; charset=utf-8' } }) : new Response('x')
     }))
     return goi
   }
@@ -39,6 +39,14 @@ describe('tải ngầm phía máy em', () => {
     napTruocKhoHs(); napTruocKhoHs() // gọi hai lần ⇒ chạy một lượt
     await vi.runAllTimersAsync()
     expect(goi).toEqual(['/kho-hs.json', '/assets/a-12345678.js', '/assets/c-12345678.js'])
+  })
+  it('máy chủ trả trang HTML (danh sách lệch bản đang phục vụ) ⇒ dừng ngay, không tải phí các mảnh sau', async () => {
+    vi.useFakeTimers()
+    const goi = datMoiTruong({ html: true })
+    const { napTruocKhoHs } = await import('../src/lib/nap-truoc-kho-hs')
+    napTruocKhoHs()
+    await vi.runAllTimersAsync()
+    expect(goi).toEqual(['/kho-hs.json', '/assets/a-12345678.js'])
   })
   it('không chạy khi không có service worker / tiết kiệm dữ liệu / 2G', async () => {
     const { nenTaiNgam } = await import('../src/lib/nap-truoc-kho-hs')
