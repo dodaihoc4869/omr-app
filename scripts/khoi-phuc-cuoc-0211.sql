@@ -14,22 +14,29 @@ SELECT date(c.xong_luc, '+7 hours') AS ngay_chot, COUNT(*) AS so_thua, COUNT(DIS
     AND EXISTS (SELECT 1 FROM chuoi_sao_luu_0211 b WHERE b.sbd = c.em AND b.ngay BETWEEN c.tu_ngay AND c.den_ngay)) AS co_ngay_oan_khac
 FROM cuoc_chuoi c WHERE c.trang_thai = 'thua' AND c.xong_luc >= '2026-10-27T17:00:00Z' GROUP BY 1 ORDER BY 1;
 
--- @@ DEM_TRUOC — cược thua oan CHƯA hoàn, theo ngày làm thua: số cược · số em · tổng tinh thể sẽ hoàn
-SELECT b.ngay AS ngay_thua, COUNT(*) AS so_cuoc, COUNT(DISTINCT c.em) AS so_em, SUM(c.dat) AS tinh_the_hoan
-FROM cuoc_chuoi c JOIN chuoi_sao_luu_0211 b ON b.sbd = c.em AND b.ngay = date(c.xong_luc, '+7 hours', '-1 day') AND b.ngay BETWEEN c.tu_ngay AND c.den_ngay
-  JOIN goi_bai_7_muc_ngay m ON m.sbd = b.sbd AND m.ngay = b.ngay AND m.muc = b.muc_moi
-WHERE c.trang_thai = 'thua' AND c.dat > 0 AND NOT EXISTS (SELECT 1 FROM vang_so v WHERE v.sbd = c.em AND v.khoa_yeu_cau = 'tt|cuoc|' || c.id || '|hoan')
-GROUP BY b.ngay ORDER BY b.ngay;
+-- @@ DEM_TRUOC — cược thua oan CHƯA hoàn, theo ngày làm thua: số cược · số em · tổng tinh thể sẽ hoàn. Thua oan = ngày làm thua là (a) ngày oan đã khôi phục
+-- chuỗi của chính em, hoặc (b) — thầy 02/11 «Hoàn nốt 10 lượt cược thua ngày bảo trì» — ngày bảo trì 27–30/10 (ngay-bao-tri.ts: luật hiện hành cược không thua ngày ấy).
+SELECT date(c.xong_luc, '+7 hours', '-1 day') AS ngay_thua, COUNT(*) AS so_cuoc, COUNT(DISTINCT c.em) AS so_em, SUM(c.dat) AS tinh_the_hoan
+FROM cuoc_chuoi c
+WHERE c.trang_thai = 'thua' AND c.dat > 0 AND date(c.xong_luc, '+7 hours', '-1 day') BETWEEN c.tu_ngay AND c.den_ngay
+  AND (date(c.xong_luc, '+7 hours', '-1 day') IN ('2026-10-27', '2026-10-28', '2026-10-29', '2026-10-30')
+    OR EXISTS (SELECT 1 FROM chuoi_sao_luu_0211 b JOIN goi_bai_7_muc_ngay m ON m.sbd = b.sbd AND m.ngay = b.ngay AND m.muc = b.muc_moi
+      WHERE b.sbd = c.em AND b.ngay = date(c.xong_luc, '+7 hours', '-1 day')))
+  AND NOT EXISTS (SELECT 1 FROM vang_so v WHERE v.sbd = c.em AND v.khoa_yeu_cau = 'tt|cuoc|' || c.id || '|hoan')
+GROUP BY 1 ORDER BY 1;
 
 -- @@ GHI_1 — bảng chỉ-thêm ghi các lượt hoàn (khoá id cược ⇒ chạy lại không ghi đè)
 CREATE TABLE IF NOT EXISTS cuoc_hoan_0211 (id TEXT PRIMARY KEY, em TEXT NOT NULL, dat INTEGER NOT NULL, ngay_thua TEXT NOT NULL, luc TEXT NOT NULL);
 
--- @@ GHI_2 — chép đúng các cược thua oan chưa hoàn vào bảng chỉ-thêm
+-- @@ GHI_2 — chép đúng các cược thua oan chưa hoàn (cùng điều kiện DEM_TRUOC) vào bảng chỉ-thêm
 INSERT OR IGNORE INTO cuoc_hoan_0211 (id, em, dat, ngay_thua, luc)
-SELECT c.id, c.em, c.dat, b.ngay, strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
-FROM cuoc_chuoi c JOIN chuoi_sao_luu_0211 b ON b.sbd = c.em AND b.ngay = date(c.xong_luc, '+7 hours', '-1 day') AND b.ngay BETWEEN c.tu_ngay AND c.den_ngay
-  JOIN goi_bai_7_muc_ngay m ON m.sbd = b.sbd AND m.ngay = b.ngay AND m.muc = b.muc_moi
-WHERE c.trang_thai = 'thua' AND c.dat > 0 AND NOT EXISTS (SELECT 1 FROM vang_so v WHERE v.sbd = c.em AND v.khoa_yeu_cau = 'tt|cuoc|' || c.id || '|hoan');
+SELECT c.id, c.em, c.dat, date(c.xong_luc, '+7 hours', '-1 day'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+FROM cuoc_chuoi c
+WHERE c.trang_thai = 'thua' AND c.dat > 0 AND date(c.xong_luc, '+7 hours', '-1 day') BETWEEN c.tu_ngay AND c.den_ngay
+  AND (date(c.xong_luc, '+7 hours', '-1 day') IN ('2026-10-27', '2026-10-28', '2026-10-29', '2026-10-30')
+    OR EXISTS (SELECT 1 FROM chuoi_sao_luu_0211 b JOIN goi_bai_7_muc_ngay m ON m.sbd = b.sbd AND m.ngay = b.ngay AND m.muc = b.muc_moi
+      WHERE b.sbd = c.em AND b.ngay = date(c.xong_luc, '+7 hours', '-1 day')))
+  AND NOT EXISTS (SELECT 1 FROM vang_so v WHERE v.sbd = c.em AND v.khoa_yeu_cau = 'tt|cuoc|' || c.id || '|hoan');
 
 -- @@ GHI_3 — cộng lại tinh thể đã cược (một dòng mỗi cược, khoá duy nhất ⇒ không cộng đôi)
 INSERT OR IGNORE INTO vang_so (sbd, loai, so_vang, exp_tru, ma_mon, khoa_yeu_cau, luc)
