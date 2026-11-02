@@ -41,3 +41,4 @@ bo-nao/CHAY-NGAY.txt
 # Bản build cũ và bộ đệm công cụ — không bao giờ commit (dọn 02/11: 214 tệp / 60 MB từng lọt vào git)
 .dist-old-*/
 graphify-out/
+.may-soan-kinh/

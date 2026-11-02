@@ -4229,6 +4229,11 @@ const boXuLy = {
       if (p === '/kho/loi-giai/viec') return ra(await layViec(env, b))
       if (p === '/kho/loi-giai/nop') return ra(await nopHoSo(env, b))
       if (p === '/kho/loi-giai/tong') return ra(await tongHang(env))
+      // LỜI GIẢI KÍNH (thầy chốt 02/11, loi-giai-kinh.ts): máy soạn nhận lô / nộp bản / xem số phủ — cùng cổng mã bí mật ở trên.
+      if (p === '/kho/loi-giai-kinh/nap-hang') return ra(await import('./loi-giai-kinh').then((m) => m.napHangKinh(env)))
+      if (p === '/kho/loi-giai-kinh/viec') return ra(await import('./loi-giai-kinh').then((m) => m.layViecKinh(env, b)))
+      if (p === '/kho/loi-giai-kinh/nop') return ra(await import('./loi-giai-kinh').then((m) => m.nopBanKinh(env, b)))
+      if (p === '/kho/loi-giai-kinh/tong') return ra(await import('./loi-giai-kinh').then((m) => m.tongKinh(env)))
       // HỌC LIỆU MÁY SOẠN 05/10 (hoc-lieu-may-soan.ts): nộp bản khác + ý Đ–S đã qua hai lượt, xem hàng câu em đã sai — cùng cổng mã bí mật ở trên.
       if (p.startsWith('/kho/may-soan/')) return ra(await duongMaySoan(env, p, b))
       // HỎI THÊM THẦY · lệnh thầy (13/10): xem lượt hôm nay của một em, đặt lại lượt hôm nay, thêm/bớt SBD thử không giới hạn lượt.
