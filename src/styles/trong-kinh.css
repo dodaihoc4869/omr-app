@@ -482,3 +482,48 @@ html[data-trong='hs'] .da-vo .bi-loi > .bi-loi-bong { flex: 0 1 auto; width: fit
 html:root[data-trong='hs'] body .m3-sheet, html:root[data-trong='hs'] body .m3-phong, html:root[data-trong='hs'] body .h2-cdl, html:root[data-trong='hs'] body .hs-ho-so-em .gvv2-hs,
 html:root[data-trong='hs'] body .aid-tam, html:root[data-trong='hs'] body .m3.kq-kinh, html:root[data-trong='hs'] body .ccs, html:root[data-trong='hs'] body .ktcn-man {
   background-color: var(--tr-nen); background-image: var(--kinh-loang); }
+
+/* ═══ TẤM «THÊM» GỌN (thầy 02/11 tối, ảnh điện thoại tối: «Phần thêm này thu gọn lại làm đẹp và tinh tế hơn nhé») — chỉ trình bày, không đổi chức năng.
+   Trước: tấm cao cố định ~70 % màn (nửa dưới trống), lưới hai cột làm thẻ danh sách giãn theo cột số dọc (khoảng trống thừa), tay nắm kéo lọt giữa lưới,
+   tiêu đề 32 px. Nay: tấm cao VỪA NỘI DUNG, một cột — tiêu đề nhỏ · hàng 4 ô số có nhãn · Điểm danh (nếu có) · danh sách; điện thoại: neo ngay trên thanh nổi
+   (thanh vẫn rõ để bấm «Thêm» đóng lại); khổ rộng / máy tính: tấm nổi cạnh ray, giữa theo chiều dọc. Đè bằng độ ưu tiên cao (không xoá luật / màu cũ). */
+html:root[data-trong='hs'] .tr-menu.tr-menu { display: flex; flex-direction: column; gap: 10px; min-height: 0; height: max-content; padding: 14px 12px 12px; grid-template-areas: none; }
+html:root[data-trong='hs'] .tr-menu.tr-menu::before { display: none; }
+html:root[data-trong='hs'] .tr-menu.tr-menu > .kb-them-tieu { order: 0; padding: 2px 8px 0; font-size: 22px; line-height: 1.2; }
+html:root[data-trong='hs'] .tr-menu.tr-menu > .tr-menu-dau { order: 1; }
+html:root[data-trong='hs'] .tr-menu.tr-menu > .tr-menu-dem { order: 2; display: block; width: auto; margin: 0; padding: 0; box-shadow: none; }
+html:root[data-trong='hs'] .tr-menu.tr-menu > .tr-menu-dem:empty, html:root[data-trong='hs'] .tr-menu.tr-menu > .tr-menu-dem:has(.tp-tr:empty) { display: none; }
+html:root[data-trong='hs'] .tr-menu.tr-menu > .tr-dd { order: 3; }
+html:root[data-trong='hs'] .tr-menu.tr-menu > .tr-menu-ds, html:root[data-trong='hs'] .tr-menu.tr-menu > .tr-menu-cai { order: 4; min-width: 0; }
+/* hàng số: 4 ô kính bằng nhau — biểu tượng + số trên, nhãn nhỏ dưới (chuẩn từ ngữ: con số nào cũng có nhãn) */
+html:root[data-trong='hs'] .tr-menu .da-tren[data-menu] { display: block; width: auto; margin: 0; padding: 0; } /* máy tính: bỏ lề âm ±24 px của thanh trên cũ (trong-hs-ngang.css) */
+html:root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 6px; width: auto; }
+html:root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr-o, html:root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr-muc {
+  display: flex; flex-flow: row wrap; align-content: center; justify-content: center; align-items: center; gap: 2px 5px; width: auto; min-width: 0; height: 58px; min-height: 48px;
+  padding: 6px 4px; border-radius: 18px; background: var(--kinh-ve); box-shadow: inset 0 1px 0 var(--kinh-vien), inset 0 0 0 1px var(--kinh-vien-2); color: var(--tr-chu); font-size: 15px; }
+html:root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr-o::after, html:root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr-muc::after {
+  flex-basis: 100%; text-align: center; font-size: 11px; font-weight: 700; line-height: 1.1; color: var(--tr-chu-3); white-space: nowrap; }
+html:root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr-o[data-k='lua']::after { content: 'ngày liền'; }
+html:root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr-o[data-k='nt']::after { content: 'nguyên tử'; }
+html:root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr-o[data-k='tt']::after { content: 'tinh thể'; }
+html:root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr-muc::after { content: 'mục tiêu'; }
+html:root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr-so { color: var(--tr-chu); }
+html:root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr-o .tp-dv { width: 18px; height: 18px; }
+html:root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr-vong, html:root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr-vong svg.vm { width: 24px; height: 24px; }
+html:root[data-trong='hs'] .tr-menu .da-tren[data-menu] .tp-tr-vong > .bi { width: 18px; }
+/* danh sách: hàng 52 px, không khoảng trống thừa dưới */
+html:root[data-trong='hs'] .tr-menu.tr-menu .tr-menu-ds, html:root[data-trong='hs'] .tr-menu.tr-menu .tr-menu-cai { display: flex; flex-direction: column; gap: 0; padding: 4px; border-radius: 22px; }
+html:root[data-trong='hs'] .tr-menu.tr-menu .tr-menu-ds[hidden], html:root[data-trong='hs'] .tr-menu.tr-menu .tr-menu-cai[hidden] { display: none; }
+html:root[data-trong='hs'] .tr-menu.tr-menu .tr-menu-muc { min-height: 52px; padding: 6px 10px; font-size: 16px; }
+html:root[data-trong='hs'] .tr-menu.tr-menu .tr-menu-o { width: 36px; height: 36px; border-radius: 12px; }
+/* điện thoại dọc: tấm nổi ngay trên thanh nổi (thanh 68 px + mép 14 px), không phủ thanh; thanh lên trên lớp mờ để bấm «Thêm» đóng */
+html:root[data-trong='hs'] .tr-menu.tr-menu { inset-block: auto calc(92px + env(safe-area-inset-bottom)); left: 10px; right: 10px; width: auto; max-width: 440px; max-height: calc(100dvh - 112px - env(safe-area-inset-bottom)); border-radius: 28px; }
+html[data-trong='hs'] .tr-menu-ray.kb-thanh:has(.tr-menu-cham[aria-expanded='true']) { z-index: 43; }
+html[data-trong='hs'] .kb-thanh .kb-thanh-muc.tr-menu-cham[aria-expanded='true'] em { display: none; } /* tấm đang mở đã có thẻ Điểm danh — nhãn nổi trên nút thôi chồng lên tấm */
+/* khổ rộng (ngang, Z Fold mở) + máy tính: tấm nổi cạnh ray, giữa theo chiều dọc, cao vừa nội dung */
+@media (orientation: landscape) and (min-width: 640px), (min-width: 700px) and (min-aspect-ratio: 10/13) {
+  html:root[data-trong='hs'] .tr-menu.tr-menu { inset-block: 0; margin-block: auto; left: calc(104px + env(safe-area-inset-left)); right: auto; width: min(360px, calc(100vw - 124px)); max-height: calc(100dvh - 24px); }
+}
+@media (min-width: 1024px) and (min-height: 600px) {
+  html:root[data-trong='hs'] .ht2[data-mot] .tr-menu.tr-menu { inset: 0 auto 0 112px; margin-block: auto; width: min(380px, calc(100vw - 140px)); height: max-content; max-height: calc(100dvh - 24px); padding: 14px 12px 12px; }
+}
