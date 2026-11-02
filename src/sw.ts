@@ -142,7 +142,8 @@ registerRoute(
   ({ url }) => CUNG_NGUON(url) && /\/assets\/[^/]+\.(?:js|css|woff2?|ttf|png|jpe?g|svg|webp|gif)$/.test(url.pathname),
   new CacheFirst({
     cacheName: 'omr-manh-chay-lan',
-    plugins: [KHONG_LUU_HTML, new ExpirationPlugin({ maxEntries: 150, maxAgeSeconds: 30 * 24 * 3600, purgeOnQuotaError: true })],
+    // 02/11: 150 → 320 mục — cổng học sinh tải ngầm ~110 mảnh của nó (lib/nap-truoc-kho-hs.ts) + mảnh màn thầy; mảnh cũ vẫn hết hạn sau 30 ngày.
+    plugins: [KHONG_LUU_HTML, new ExpirationPlugin({ maxEntries: 320, maxAgeSeconds: 30 * 24 * 3600, purgeOnQuotaError: true })],
   }),
 )
 registerRoute(

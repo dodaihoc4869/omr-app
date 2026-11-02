@@ -19,6 +19,7 @@ import { chonChoBong, rongOmChu, type Hop } from '../../lib/bong-bong-mol'
 import { docLuaThat } from '../../lib/lua-that'
 import { gioMayChu } from '../../lib/gio-may-chu'
 import { anMung, banHat, KHOA_AM_AN_MUNG, kichRuong, napAnMung, napTruocAnMung, yenLang } from '../../lib/hieu-ung'
+import { napTruocKhoHs } from '../../lib/nap-truoc-kho-hs'
 import { docNhoTuSua, ngheTuSua } from '../../lib/tu-sua-loi'
 // Việc hôm nay NẠP ĐỘNG qua mảnh ManTuChua (đã là điểm nạp lười, có trong precache, Lộ trình nạp sẵn lúc rảnh): nhập tĩnh / nạp thẳng tu-sua-viec-hom-nay làm
 // Rolldown tách chua-truc-tiep thành tệp riêng (+1 tệp precache, trần 170).
@@ -764,6 +765,7 @@ export function MotTrangHs(p: PropsMotTrang) {
   // TẢI SẴN bộ hiệu ứng ăn mừng (thầy 02/11 «tải luôn hiệu ứng sẵn cho máy yếu»): Lộ trình đã hiện ⇒ nạp mảnh hiệu ứng lúc trình duyệt rảnh (kho chạy-lúc,
   // không cộng byte lượt mở) ⇒ vào làm câu / mở rương là chạy tức thì.
   useEffect(() => { napTruocAnMung() }, [])
+  useEffect(() => { napTruocKhoHs() }, []) // 02/11: lúc rảnh tải ngầm mọi mảnh app học sinh máy chưa có (lib/nap-truoc-kho-hs.ts)
   // Thành tích mở ⇒ gọi sẵn giải + bạn + huy hiệu (song song) để bấm ô là có số.
   useEffect(() => { if (p.muc === 'ket-qua' && p.token) napSanThanhTich(p.token) }, [p.muc, p.token])
   const moTp = (man: TenManThuong) => setTp({ man })
