@@ -1,0 +1,32 @@
+/* TOKEN MÀU — CHÉP NGUYÊN VĂN src/styles/trong-hs-mau.css (hai khối :root sáng/tối). KHÔNG thêm màu mới: bản vẽ chỉ dùng biến --tr-*. */
+:root[data-trong='hs'] {
+  --tr-nen: #f6f6fc; --tr-mat: #ffffff; --tr-mat-2: #f0f0fa; --tr-mat-3: #e1e1f1; --tr-vien: #e2e2f0; --tr-vien-2: #cbcbe3;
+  --tr-chu: #1b1938; --tr-chu-2: #454367; --tr-chu-3: #5a587d; --tr-trang: #ffffff;
+  --tr-dung: #00d396; --tr-dung-nhat: #c5ffe8; --tr-dung-chu: #007c58; --tr-dung-nut: #00a87b; --tr-dung-day: #008d66;
+  --tr-sai: #f4417c; --tr-sai-nhat: #fddfe9; --tr-sai-chu: #c70b5b; --tr-sai-day: #e5266d;
+  --tr-chu-y: #ff8c51; --tr-chu-y-nhat: #ffeee0; --tr-chu-y-chu: #b24f19; --tr-chu-y-nut: #f06b27; --tr-chu-y-day: #ce6837;
+  --tr-tin: #00bed8; --tr-tin-nhat: #dbf5fa; --tr-tin-chu: #007889; --tr-tin-day: #009eb5;
+  --tr-sao: #ffbf35; --tr-sao-nhat: #fff5d4; --tr-sao-chu: #956400; --tr-sao-day: #e3a605;
+  --tr-tim: #f373ce; --tr-tim-day: #c851a8; --tr-tim-chu: #b33d95;
+  --tr-hs: #8f9bff; --tr-hs-nut: #767eff; --tr-hs-day: #5e64cd; --tr-hs-nhat: #eeeeff; --tr-hs-chu: #565bbd; --tr-hs-tren: #ffffff;
+  --tr-nguyen-tu: #00bed8; --tr-nguyen-tu-so: #009eb5;
+  --tr-phu: rgba(75, 75, 75, 0.5);
+  --tr-bong-1: 0 2px 0 #e2e2f0; --tr-bong-2: 0 4px 0 #e2e2f0; --tr-bong-3: 0 8px 0 rgba(0, 0, 0, 0.1);
+  --tp-tt: var(--tr-tim); --tp-tt-chu: var(--tr-tim-chu);
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-trong='hs'] {
+    --tr-nen: #1a1a29; --tr-mat: #262738; --tr-mat-2: #2c2d40; --tr-mat-3: #414157; --tr-vien: #414157; --tr-vien-2: #52536a;
+    --tr-chu: #f1f0ff; --tr-chu-2: #cdceeb; --tr-chu-3: #acaece; --tr-trang: #1a1a29;
+    --tr-dung: #00d497; --tr-dung-nhat: #18382a; --tr-dung-chu: #00df9f; --tr-dung-nut: #00d497; --tr-dung-day: #00aa76;
+    --tr-sai: #f7498f; --tr-sai-nhat: #43272f; --tr-sai-chu: #ff9bba; --tr-sai-day: #cc146f;
+    --tr-chu-y: #ff9447; --tr-chu-y-nhat: #422a1a; --tr-chu-y-chu: #ffa569; --tr-chu-y-nut: #ff9447; --tr-chu-y-day: #de6a00;
+    --tr-tin: #00bfd4; --tr-tin-nhat: #0e373d; --tr-tin-chu: #00d5ed; --tr-tin-day: #0097ab;
+    --tr-sao: #ffc735; --tr-sao-nhat: #3b2f14; --tr-sao-chu: #ecb400; --tr-sao-day: #d8a100;
+    --tr-tim: #e17beb; --tr-tim-day: #b857c8; --tr-tim-chu: #f592ff;
+    --tr-hs: #a8adff; --tr-hs-nut: #a8adff; --tr-hs-day: #7e80ff; --tr-hs-nhat: #2c2e47; --tr-hs-chu: #b1b6ff; --tr-hs-tren: #1a1a29;
+    --tr-nguyen-tu: #00bfd4; --tr-nguyen-tu-so: #00bfd4;
+    --tr-phu: rgba(0, 0, 0, 0.6);
+    --tr-bong-1: 0 2px 0 #0e0e1a; --tr-bong-2: 0 4px 0 #0e0e1a; --tr-bong-3: 0 8px 0 rgba(0, 0, 0, 0.35);
+  }
+}

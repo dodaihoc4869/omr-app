@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="vi" data-trong="hs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hỏi A.I Đỗ Đại Học · trò chuyện</title>
+<link rel="stylesheet" href="he.css">
+<style>
+  .chat { height: 100dvh; display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; grid-template-rows: auto minmax(0, 1fr) auto; max-width: 720px; margin: 0 auto; width: 100%; }
+  .chat-dau { display: flex; align-items: center; gap: 12px; padding: 10px 8px 10px 14px; border-bottom: 1px solid var(--nhat); background: color-mix(in oklab, var(--tr-nen) 88%, transparent); }
+  .chat-dau .o { width: 44px; height: 44px; border-radius: 15px; }
+  .chat-dau b { display: block; font-size: 17px; font-weight: 800; }
+  .chat-dau .tt { display: flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 600; color: var(--tr-dung-chu); }
+  .chat-dau .tt::before { content: ''; width: 8px; height: 8px; border-radius: 4px; background: var(--tr-dung); }
+  .tin { overflow: auto; padding: 16px 14px; display: flex; flex-direction: column; gap: 10px; }
+  .bb { max-width: 84%; padding: 11px 14px; border-radius: 20px; font-size: 16px; font-weight: 550; line-height: 1.45; }
+  .bb[data-ai] { align-self: flex-start; background: var(--tr-mat); box-shadow: inset 0 0 0 1.5px var(--tr-vien); border-bottom-left-radius: 6px; }
+  .bb[data-em] { align-self: flex-end; background: var(--tr-hs-nut); color: var(--tr-hs-tren); border-bottom-right-radius: 6px; }
+  .anh-de { align-self: flex-end; width: 220px; border-radius: 18px; padding: 12px; background: var(--tr-mat); box-shadow: inset 0 0 0 1.5px var(--tr-vien); display: flex; flex-direction: column; gap: 6px; }
+  .anh-de i { display: block; height: 7px; border-radius: 4px; background: var(--tr-mat-3); }
+  .anh-de small { font-size: 12.5px; font-weight: 700; color: var(--tr-chu-3); }
+  .dang { align-self: flex-start; font-size: 14px; font-weight: 650; color: var(--tr-chu-3); padding-left: 4px; }
+  .chat-duoi { padding: 8px 12px max(12px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--nhat); background: var(--tr-nen); }
+  .goi { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .goi .chip { height: auto; min-height: 56px; flex-direction: column; justify-content: center; gap: 3px; padding: 6px; white-space: normal; text-align: center; line-height: 1.15; border-radius: 14px; font-size: 13.5px; background: var(--tr-mat); box-shadow: inset 0 0 0 1.5px var(--tr-vien); color: var(--tr-chu-2); }
+  .goi .chip svg.i { width: 18px; height: 18px; color: var(--tr-hs-chu); }
+  .o-chat { display: flex; gap: 8px; align-items: center; }
+  .o-chat input { flex: 1; min-width: 0; height: 52px; border: 0; border-radius: 16px; padding: 0 16px; font: inherit; font-size: 16px; background: var(--tr-mat); color: var(--tr-chu); box-shadow: inset 0 0 0 1.5px var(--tr-vien-2); }
+  .o-chat .nut { width: 52px; padding: 0; flex: none; }
+  .luot { font-size: 12.5px; font-weight: 650; color: var(--tr-chu-3); text-align: center; }
+  @media (min-width: 700px) { .app .chat { height: calc(100dvh); } }
+</style>
+</head><body data-mot-man>
+<div class="app">
+  <nav class="ray" data-ve="ray" data-muc="ai"></nav>
+  <section class="chat" aria-label="A.I Đỗ Đại Học">
+    <header class="chat-dau"><span class="o" data-sac="tim"><i data-i="chat"></i></span><div style="flex:1"><b>A.I Đỗ Đại Học</b><span class="tt">Đang trực, nhắn gì cũng được</span></div><button class="nut-x" aria-label="Đóng" style="width:44px;height:44px;display:grid;place-items:center;color:var(--tr-chu-3)"><i data-i="x"></i></button></header>
+    <div class="tin">
+      <p class="bb" data-ai>Chào An! Có gì cứ nói với tôi nhé.</p>
+      <div class="anh-de" role="img" aria-label="Ảnh đề em gửi"><small>Ảnh đề · câu 12</small><i></i><i style="width:86%"></i><i style="width:92%"></i><i style="width:60%"></i></div>
+      <p class="bb" data-em>Câu này tính khối lượng muối kiểu gì vậy?</p>
+      <p class="bb" data-ai>Bạn vẽ sơ đồ cột dọc nhé: glycine → muối ClH<sub>3</sub>N–CH<sub>2</sub>–COOH. Bảo toàn N: n<sub>muối</sub> = n<sub>glycine</sub> = 0,1 mol. Một phép tính: m = 0,1 × 111,5 = 11,15 gam.</p>
+      <p class="dang" role="status">Tôi đang nghe đây…</p>
+    </div>
+    <div class="chat-duoi">
+      <div class="goi"><button class="chip"><span data-i="camera"></span>Chụp ảnh đề</button><button class="chip"><span data-i="anh"></span>Chọn ảnh có sẵn</button><button class="chip"><span data-i="dan"></span>Dán đề bài</button></div>
+      <div class="o-chat"><input placeholder="Nhắn gì cũng được…" aria-label="Tin nhắn"><button class="nut" data-loai="chinh" aria-label="Gửi"><i data-i="gui"></i></button></div>
+      <p class="luot">Hôm nay bạn còn 18/20 lượt nhắn</p>
+    </div>
+  </section>
+</div>
+<script src="ve.js"></script>
+</body></html>

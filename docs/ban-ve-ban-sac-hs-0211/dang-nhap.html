@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="vi" data-trong="hs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Đăng nhập học sinh</title>
+<link rel="stylesheet" href="he.css">
+<style>
+  .dn { min-height: 100dvh; display: grid; place-items: center; padding: 24px 16px; }
+  .dn-the { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 14px; }
+  .dn-dau { display: flex; flex-direction: column; align-items: center; gap: 6px; margin-bottom: 4px; }
+  .dn-dau .mol-dn { width: 120px; }
+  .dn h1 { font-size: 28px; font-weight: 800; text-align: center; }
+  .o-nhap { display: flex; flex-direction: column; gap: 6px; font-weight: 700; font-size: 15px; color: var(--tr-chu-2); }
+  .o-nhap input { height: 56px; border-radius: 16px; border: 0; padding: 0 16px; font: inherit; font-size: 18px; font-weight: 650; color: var(--tr-chu); background: var(--tr-mat); box-shadow: inset 0 0 0 1.5px var(--tr-vien-2); }
+  .o-nhap input:focus-visible, .o-nhap input[data-dang] { outline: 0; box-shadow: inset 0 0 0 2.5px var(--tr-hs-nut); }
+  .o-nhap small { font-weight: 550; color: var(--tr-chu-3); }
+  .ky-hieu { display: flex; gap: 6px; justify-content: center; }
+  .ky-hieu .o { width: 40px; height: 40px; border-radius: 12px; font-weight: 800; font-size: 15px; }
+  @media (min-width: 700px) and (max-height: 600px) {
+    .dn-the { max-width: 760px; display: grid; grid-template-columns: 260px 1fr; gap: 12px 32px; align-items: center; }
+    .dn-dau { grid-row: 1 / span 4; } .dn-dau .mol-dn { width: 100px; } .dn h1 { font-size: 24px; }
+    .o-nhap input { height: 48px; }
+  }
+</style>
+</head><body class="o-ly">
+<main class="dn">
+  <form class="dn-the" aria-label="Đăng nhập">
+    <div class="dn-dau">
+      <div class="mol-dn" data-mol="chao"></div>
+      <div class="ky-hieu" aria-hidden="true"><span class="o" data-sac="hs">Đỗ</span><span class="o" data-sac="tin">Đại</span><span class="o" data-sac="dung">Học</span></div>
+      <h1>Hành trình giỏi Hóa</h1>
+    </div>
+    <label class="o-nhap">Số báo danh (SBD)<input data-dang inputmode="numeric" placeholder="Ví dụ: 110234 hoặc 12026" value="120341"></label>
+    <label class="o-nhap">Mật khẩu <small>(Lần đầu chưa có để trống để đặt)</small><input type="password" value="matkhau1"></label>
+    <button class="nut" data-loai="chinh" data-rong type="button">Đăng nhập</button>
+    <p class="mo" style="text-align:center">Quên mật khẩu: nhắn thầy để đặt lại.</p>
+  </form>
+</main>
+<script src="ve.js"></script>
+</body></html>
