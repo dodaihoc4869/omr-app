@@ -213,7 +213,7 @@ describe('câu sai hiện đủ đề, ảnh, bốn ý phần II và lời giả
 
   it('mỗi cổng vẽ câu sai bằng khối DÙNG CHUNG, không tự dựng lời giải', () => {
     // báo cáo em bản mới: khuôn Câu đã làm (CauCanChua → TheCau)
-    expect(HS).toContain('<CauCanChua c={c.cau} stt={c.soCau} />')
+    expect(HS).toContain('<CauCanChua c={c.cau} stt={c.soCau} hs={laHs} />')
     expect(HS).not.toContain('chuanHoaLoiGiaiCau')
     expect(HS).not.toContain('cauSaiMoRong')
   })

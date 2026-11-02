@@ -639,7 +639,7 @@ export default function BaoCaoChiTiet(p: BaoCaoChiTietProps) {
                       <details key={c.qid} className="ct-xl ct-xl-mo">
                         <summary aria-label={`Câu ${c.soCau}: bấm để xem đề và lời giải`}>{dau}</summary>
                         <div className="ct-xl-giai">
-                          <CauCanChua c={c.cau} stt={c.soCau} />
+                          <CauCanChua c={c.cau} stt={c.soCau} hs={laHs} />
                         </div>
                       </details>
                     ) : (

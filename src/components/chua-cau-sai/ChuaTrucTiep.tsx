@@ -14,6 +14,7 @@
 // sau lần sai; giữ mọi trạng thái, số, lời báo lỗi và nút. Nút không còn dấu gạch dài ("Em chưa làm được · xem lời giải").
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import TheCau, { type TheCauProps } from '../TheCau'
+import { bocKinh } from '../loi-giai-kinh/boc-kinh'
 import NutHoiThay from '../loi-giai/NutHoiThay'
 import { chiSoDuoiRo, propsTheCau } from '../hoa2/cau-chuyen'
 import type { HinhAnh } from '../../data/examContent'
@@ -343,7 +344,7 @@ export default function ChuaTrucTiep({ token, qid, ph, ban, nhanVe, onVe, onLamG
                 </div>
               )}
             </dl>
-            {khungCau({ ...propsTheCau(ct, 1), hoiThay: { qid, nguon: 'tu_chua' } })}
+            {khungCau({ ...propsTheCau(ct, 1), hoiThay: { qid, nguon: 'tu_chua' }, bocLoiGiai: bocKinh(qid) })}
           </>
         ) : null}
 

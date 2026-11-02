@@ -18,6 +18,7 @@ import {
   ChevronDown,
 } from 'lucide-react'
 import TheCau from './TheCau'
+import { bocKinh } from './loi-giai-kinh/boc-kinh'
 import { docSoDem } from './DongDemCau'
 import {
   danhMucDangBai,
@@ -856,6 +857,8 @@ export default function KhoiKhacPhuc3CheDo({
                 explanation: q.chot || (q.buoc && q.buoc.length > 0 ? q.buoc.join('\n') : undefined),
                 // Hỏi thầy dưới phần trả lời của TheCau, cả lúc đang làm (Thầy gợi hướng); Lời giải từng bước chỉ sau nộp (lệnh 30/09 + 13/10).
                 hoiThay: { qid: q.id, nguon: 'khac_phuc', gon: true },
+                // LỜI GIẢI KÍNH (thầy 02/11): chỉ khi đã nộp (xem lại).
+                bocLoiGiai: daNop ? bocKinh(q.id) : undefined,
               }
 
               if (q.phan === 'I') {

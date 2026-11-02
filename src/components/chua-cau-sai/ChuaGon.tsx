@@ -6,6 +6,7 @@
 // Chỉ lớp kiểu `ccs-*` sẵn có (chua-cau-sai.css) — không màu mới.
 import { lazy, Suspense, useEffect, useRef, useState, type ComponentProps, type ReactNode } from 'react'
 import TheCau, { type TheCauProps } from '../TheCau'
+import { bocKinh } from '../loi-giai-kinh/boc-kinh'
 import NutHoiThay from '../loi-giai/NutHoiThay'
 import { docChiTiet } from '../hoa2/api'
 import { propsTheCau } from '../hoa2/cau-chuyen'
@@ -216,7 +217,7 @@ export default function ChuaGon({ token, qid, dotId, dau, nhanVe, onVe, onTiep, 
         <div data-kieu="dung"><dt>Đáp án đúng</dt><dd>{chuDapAn(ct.de.phan, ct.dapAn)}</dd></div>
         {kq?.ket !== 'loi_giai' ? null : tra ? <div data-kieu="em"><dt>Lần em làm lại</dt><dd>{chuDapAn(phan, tra)}</dd></div> : null}
       </dl>
-      {khung({ ...propsTheCau(ct, 1), hoiThay: { qid, nguon: 'tu_chua' } })}
+      {khung({ ...propsTheCau(ct, 1), hoiThay: { qid, nguon: 'tu_chua' }, bocLoiGiai: bocKinh(qid) })}
     </>
   ) : null
 

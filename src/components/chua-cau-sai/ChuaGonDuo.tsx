@@ -30,6 +30,8 @@ import './duo-sua.css'
 // GIÁM THỊ MỚI ở màn sửa câu (thầy 02/11 «Cho cả giám thị mới … vào tất cả các câu mọi chỗ trong app đã có»): cùng mảnh nạp lười + cùng khung `.duo-gt-san`
 // như màn làm chặng. Đề gọn của máy chủ không có mức độ ⇒ người coi theo PHẦN câu như màn thi (GT_THEO_PHAN: I nb · II th · III vd).
 const GiamThiCau = lazy(() => import('../giam-thi/GiamThi'))
+// LỜI GIẢI KÍNH (thầy 02/11): bản Kính khi câu có, không thì lời giải cũ — nạp lười.
+const LoiGiaiKinhHs = lazy(() => import('../loi-giai-kinh/LoiGiaiKinhHs'))
 const GT_PHAN = { I: 'nb', II: 'th', III: 'vd' } as const
 
 /** Đề gọn của máy chủ ⇒ câu cho các ô Duo (LamCau). Chỉ đề công khai — không đáp án. */
@@ -283,7 +285,7 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
       {moGiai && ct && qKet && <div className="duo-lg" role="dialog" aria-modal="true" aria-label="Lời giải">
         <div className="duo-lg-the">
           <header className="duo-lg-dau"><b>Lời giải</b><button type="button" className="duo-dong" aria-label="Đóng lời giải" onClick={() => { setMoGiai(false); nutChinh.current?.focus({ preventScroll: true }) }}><XIcon size={24} aria-hidden="true" /></button></header>
-          <LoiGiaiCau q={qKet} solution={ct.loiGiai} dapAn={ct.dapAn} />
+          <Suspense fallback={<LoiGiaiCau q={qKet} solution={ct.loiGiai} dapAn={ct.dapAn} />}><LoiGiaiKinhHs qid={qid} phan={qKet.phan} choices={qKet.choices} ideas={qKet.ideas} dapAn={ct.dapAn} em={tra || undefined} duPhong={<LoiGiaiCau q={qKet} solution={ct.loiGiai} dapAn={ct.dapAn} />} /></Suspense>
           <NutHoiThay gon chi="giai" qid={qid} nguon="tu_chua" dapAnEm={tra || undefined} />
         </div>
       </div>}
