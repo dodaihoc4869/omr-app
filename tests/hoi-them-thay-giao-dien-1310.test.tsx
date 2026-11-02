@@ -90,7 +90,7 @@ describe('nút Hỏi thầy + Lời giải từng bước', () => {
   it('hai nút; "Hỏi thầy" ⇒ hộp thoại "Hỏi Thầy" có đề câu + ô nhắn, KHÔNG mở lời giải từng bước; Esc đóng', async () => {
     moCau = { ok: true, coLoiGiai: true, cau, hoSo, hoiThem: true }
     render(<NutHoiThay qid="DE-I-1" nguon="luyen_de" />)
-    expect(screen.getByRole('button', { name: 'Lời giải từng bước' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Lời giải từng bước' })).toBeNull() // thầy 02/11 khuya «Ẩn hết nút lời giải từng bước»
     fireEvent.click(screen.getByRole('button', { name: 'Hỏi thầy' }))
     const hop = await screen.findByRole('dialog', { name: 'Hỏi Thầy' })
     expect(hop.textContent).toContain('Câu 1 · Ester')
@@ -137,12 +137,11 @@ describe('nút Hỏi thầy + Lời giải từng bước', () => {
     expect((screen.getByRole('button', { name: 'Hỏi thầy' }) as HTMLButtonElement).disabled).toBe(false)
   })
 
-  it('"Lời giải từng bước" ⇒ khung lời giải (iframe), không có hộp hỏi Thầy', async () => {
+  it('thầy 02/11 khuya «Ẩn hết nút lời giải từng bước»: có lời giải vẫn KHÔNG hiện nút, chỉ còn Hỏi thầy', async () => {
     moCau = { ok: true, coLoiGiai: true, cau, hoSo, hoiThem: true }
     render(<NutHoiThay qid="DE-I-1" nguon="on_lai" />)
-    fireEvent.click(screen.getByRole('button', { name: 'Lời giải từng bước' }))
-    await waitFor(() => expect(document.querySelector('iframe')).toBeTruthy())
-    expect(screen.queryByRole('dialog', { name: 'Hỏi Thầy' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Lời giải từng bước' })).toBeNull()
+    expect(screen.getByRole('button', { name: 'Hỏi thầy' })).toBeTruthy()
   })
 
   it('phần hỏi Thầy chưa bật cho em ⇒ "Hỏi thầy" mở lời giải như cũ (không nút chết)', async () => {
@@ -180,13 +179,12 @@ describe('nút Hỏi thầy + Lời giải từng bước', () => {
     expect(screen.queryByRole('dialog')).toBeNull()
   })
 
-  it('câu chưa có lời giải từng bước vẫn hỏi Thầy được; nút lời giải báo "đang soạn"', async () => {
+  it('câu chưa có lời giải từng bước vẫn hỏi Thầy được; không có nút lời giải (đã ẩn — thầy 02/11 khuya)', async () => {
     moCau = { ok: true, coLoiGiai: false, cau, loiGiaiChu: { dapAn: 'A', chot: 'x', tung: [], buoc: [], ketQua: '' }, hoiThem: true }
     render(<NutHoiThay qid="DE-I-1" nguon="btvn" />)
     fireEvent.click(screen.getByRole('button', { name: 'Hỏi thầy' }))
     expect(await screen.findByRole('dialog', { name: 'Hỏi Thầy' })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Đóng' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Lời giải từng bước' }))
-    await screen.findByText(/Thầy đang soạn lời giải từng bước/)
+    expect(screen.queryByRole('button', { name: 'Lời giải từng bước' })).toBeNull()
   })
 })

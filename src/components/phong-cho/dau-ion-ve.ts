@@ -185,7 +185,7 @@ export class Ve {
     this.veKhoiDong(x, c, nay, dtVe, km)
   }
   /** Khoá phần tĩnh: mỗi khối còn / vỡ / nứt (< 60 %) / bảo hộ — đổi vài lần mỗi ván (máu từng viên vẽ ở phần động). */
-  private khoaTinh(km: readonly number[]): string { let s = ''; for (let i = 0; i < SO_KHOI; i++) s += km[i] <= 0 ? '0' : km[i] / KHOI[i].max < 0.6 ? 'n' : danhDuoc(km, i) ? 'd' : 'c'; return s }
+  private khoaTinh(km: readonly number[]): string { let s = this.yeu ? 'y' : ''; for (let i = 0; i < SO_KHOI; i++) s += km[i] <= 0 ? '0' : km[i] / KHOI[i].max < 0.6 ? 'n' : danhDuoc(km, i) ? 'd' : 'c'; return s }
   /** Phần ĐỨNG YÊN của khối (theo máu): tường, tinh thể (vòng máu, vết nứt), thân tháp, thanh máu, quầng. `chi` = chỉ vẽ khối đó. */
   private veKhoiTinh(x: CanvasRenderingContext2D, km: readonly number[], chi = -1): void {
     const b = this.b, k = this.xoay
@@ -245,6 +245,9 @@ export class Ve {
       // rãnh thanh máu (phần màu vẽ ở phần động)
       const w = r * 1.7, yb = cy + r + 6
       x.fillStyle = rgba(b.chu, b.toi ? 0.5 : 0.2); x.beginPath(); x.roundRect(cx - w / 2, yb, w, 5, 2.5); x.fill()
+      // MÁY YẾU: đầu tháp vẽ TĨNH vào nền gộp (chĩa về tinh thể phe kia), không vẽ / xoay lại mỗi khung — đo hồ sơ CPU ×6 02/11: phần tô của đầu tháp + thanh
+      // máy mỗi khung là phần v4 tốn hơn bản trước
+      if (this.yeu) { const [tx, ty] = ra(KHOI[TT_CUA[1 - kh.phe]].x, KHOI[TT_CUA[1 - kh.phe]].y, k); this.dauThap(x, cx, cy, Math.atan2(ty - cy, tx - cx), kh.k === 'thap-lon', r, dam) }
     }
   }
   /** Phần ĐỘNG mỗi khung: vùng tháp đang bị lấn, đầu tháp xoay về đối thủ / người bị bắn, loé đầu khi bắn, loé khi khối trúng. */
@@ -285,6 +288,7 @@ export class Ve {
       while (dd < -Math.PI) dd += PI2
       g0 += dd * Math.min(1, dtVe * 10); this.thapGoc.set(i, g0)
       if (lan && b.toi && !this.yeu) this.quang(x, m, cx, cy, r + 26, 0.5)
+      if (this.yeu) continue // máy yếu: đầu tháp đứng yên trong nền gộp
       // ĐẦU TINH THỂ nhọn hướng về đối thủ (giật lùi nhẹ khi bắn)
       const giat = (nay - banLuc) / 120
       x.save(); x.translate(cx, cy); x.rotate(g0); if (giat >= 0 && giat < 1) x.translate(-(1 - giat) * 3, 0)
@@ -298,6 +302,12 @@ export class Ve {
       if (giat >= 0 && giat < 1 && !this.yeu) { x.fillStyle = rgba(b.trang, 0.8 * (1 - giat)); x.beginPath(); x.arc(L + 2, 0, 5 * (1 - giat) + 2, 0, PI2); x.fill() }
       x.restore()
     }
+  }
+  /** Đầu tháp nhọn (một lần tô, màu đậm) quay góc `g` — tính thẳng toạ độ, không save/rotate/restore. */
+  private dauThap(x: CanvasRenderingContext2D, cx: number, cy: number, g: number, lon: boolean, r: number, dam: Rgb): void {
+    const L = lon ? r * 1.25 : r * 1.15, W = lon ? 9 : 7.5, c = Math.cos(g), s = Math.sin(g), d = (u: number, v: number) => [cx + u * c - v * s, cy + u * s + v * c] as const
+    const p = [d(r * 0.3, 0), d(r * 0.55, -W), d(L, 0), d(r * 0.55, W)]
+    x.fillStyle = rgba(dam); x.beginPath(); x.moveTo(p[0][0], p[0][1]); for (let i = 1; i < 4; i++) x.lineTo(p[i][0], p[i][1]); x.closePath(); x.fill()
   }
   private lucGiac(x: CanvasRenderingContext2D, cx: number, cy: number, r: number): void {
     x.beginPath()
@@ -338,7 +348,8 @@ export class Ve {
   }
   private chu(x: CanvasRenderingContext2D, cx: number, cy: number, s: string, coPx: number, mau: string, vien?: string, dam = 800): void {
     x.font = `${dam} ${this.px(coPx)}px ${this.b.phong}`; x.textAlign = 'center'; x.textBaseline = 'middle'
-    if (vien) { x.lineWidth = this.px(4); x.strokeStyle = vien; x.lineJoin = 'round'; x.strokeText(s, cx, cy) }
+    if (vien && this.yeu) { x.fillStyle = vien; x.fillText(s, cx + this.px(1.2), cy + this.px(1.4)) } // máy yếu: bóng đổ thay viền dày (strokeText tô nặng)
+    else if (vien) { x.lineWidth = this.px(4); x.strokeStyle = vien; x.lineJoin = 'round'; x.strokeText(s, cx, cy) }
     x.fillStyle = mau; x.fillText(s, cx, cy)
   }
 

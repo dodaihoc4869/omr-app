@@ -19,13 +19,13 @@ const nutGiai = () => screen.queryByRole('button', { name: /Lời giải từng 
 const CHUNG = { stt: 1, text: 'Chất nào là ester?', phan: 'I' as const, choices: ['A1', 'B1', 'C1', 'D1'] as [string, string, string, string], choicePerm: [0, 1, 2, 3], selected: 'A' as const, hoiThay: { qid: '12-X-I-1', nguon: 'luyen_de', gon: true } }
 
 describe('TheCau: Hỏi thầy ở mọi câu, ngay dưới phần trả lời', () => {
-  it('đang làm ⇒ có Hỏi thầy, KHÔNG có Lời giải từng bước; xem lại có lời giải ⇒ đủ hai nút, đứng trên khối lời giải', () => {
+  it('đang làm ⇒ có Hỏi thầy, KHÔNG có Lời giải từng bước; xem lại có lời giải ⇒ Hỏi thầy đứng trên khối lời giải, nút Lời giải từng bước ĐÃ ẨN (thầy 02/11 khuya)', () => {
     const { rerender } = render(<TheCau {...CHUNG} cheDo="thi" />)
     expect(nut()).not.toBeNull()
     expect(nutGiai()).toBeNull()
     rerender(<TheCau {...CHUNG} cheDo="xem_lai" correct="B" loiGiai={{ chot: 'Ester có nhóm COO' }} />)
     expect(nut()).not.toBeNull()
-    expect(nutGiai()).not.toBeNull()
+    expect(nutGiai()).toBeNull()
     expect(nut()!.closest('.lg-nut-hang')!.nextElementSibling!.querySelector('.loi-giai')).toBeTruthy()
     rerender(<TheCau {...CHUNG} cheDo="thi" />)
     expect(nutGiai()).toBeNull()
@@ -44,10 +44,10 @@ describe('TheCau: Hỏi thầy ở mọi câu, ngay dưới phần trả lời',
 })
 
 describe('LoiGiaiCauSai (game Đảo cũ, ôn lại, Võ đài): hộp lời giải', () => {
-  it('có lời giải ⇒ hai nút; hộp trống lời giải ⇒ chỉ Hỏi thầy; hộp chưa vẽ ⇒ không nút', () => {
+  it('có lời giải ⇒ chỉ Hỏi thầy (nút Lời giải từng bước đã ẩn — thầy 02/11 khuya); hộp trống lời giải ⇒ chỉ Hỏi thầy; hộp chưa vẽ ⇒ không nút', () => {
     const { rerender, container } = render(<LoiGiaiCauSai c={{ text: 'x', phan: 'I', dapAnDung: 'B', loiGiai: { chot: 'Chốt thử' } } as never} qid="q1" nguon="game" />)
     expect(nut()).not.toBeNull()
-    expect(nutGiai()).not.toBeNull()
+    expect(nutGiai()).toBeNull()
     rerender(<LoiGiaiCauSai c={{ text: 'x', phan: 'I', dapAnDung: 'B' } as never} qid="q1" nguon="game" />)
     expect(nut()).not.toBeNull()
     expect(nutGiai()).toBeNull()

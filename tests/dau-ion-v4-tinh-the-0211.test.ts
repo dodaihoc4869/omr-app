@@ -156,3 +156,35 @@ describe('Cân bằng (mô phỏng 6 A.I — số đo DAC-TA mục THÁP + TƯ�
     expect(khongPha).toBe(0)
   }, 240_000)
 })
+
+// Tối ưu tầm nhìn (02/11 khuya, đo CPU ×6): loại nhanh khối xa đường ngắm + đầu tường tính sẵn — KẾT QUẢ PHẢI Y HỆT cách tính cũ (thử từng điểm × mọi khối).
+describe('tầm nhìn tối ưu = cách tính cũ', () => {
+  it('20 000 đường ngắm + điểm ngẫu nhiên, nhiều trạng thái khối vỡ: thayNhau / chamKhoi trùng khớp bản tham chiếu', async () => {
+    const L = await import('../src/lib/dau-ion/loi')
+    const PI2 = Math.PI * 2
+    const trongCung = (a: number, a0: number, a1: number) => { let d = a - a0; d -= Math.floor(d / PI2) * PI2; let w = a1 - a0; w -= Math.floor(w / PI2) * PI2; return d <= w }
+    const chamCu = (i: number, x: number, y: number, r: number) => {
+      const k = L.KHOI[i]
+      if (k.k !== 'tuong') return (x - k.x) ** 2 + (y - k.y) ** 2 < (k.r + r) ** 2
+      const dx = x - k.x, dy = y - k.y, d = Math.hypot(dx, dy)
+      if (Math.abs(d - k.r) < L.TUONG_DAY + r && trongCung(Math.atan2(dy, dx), k.a0!, k.a1!)) return true
+      for (const a of [k.a0!, k.a1!]) { const ex = k.x + Math.cos(a) * k.r, ey = k.y + Math.sin(a) * k.r; if ((x - ex) ** 2 + (y - ey) ** 2 < (L.TUONG_DAY + r) ** 2) return true }
+      return false
+    }
+    const thayCu = (ax: number, ay: number, bx: number, by: number, km: number[], bo: number) => {
+      const n = Math.ceil(Math.hypot(bx - ax, by - ay) / 10)
+      for (let i = 1; i < n; i++) { const x = ax + ((bx - ax) * i) / n, y = ay + ((by - ay) * i) / n; for (let j = 0; j < L.SO_KHOI; j++) if (j !== bo && km[j] > 0 && chamCu(j, x, y, L.R_DAN - 2)) return false }
+      return true
+    }
+    let s = 12345; const rd = () => { s = (s * 1103515245 + 12345) % 2147483648; return s / 2147483648 }
+    let lech = 0
+    for (let t = 0; t < 20000; t++) {
+      const km = L.KHOI.map((k) => (rd() < 0.25 ? 0 : k.max))
+      const ax = rd() * L.SAN_W, ay = rd() * L.SAN_H, bx = rd() * L.SAN_W, by = rd() * L.SAN_H, bo = rd() < 0.3 ? Math.floor(rd() * L.SO_KHOI) : -1
+      if (L.thayNhau(ax, ay, bx, by, km, bo) !== thayCu(ax, ay, bx, by, km, bo)) lech++
+      const i = Math.floor(rd() * L.SO_KHOI), r = rd() * 30
+      if (L.chamKhoi(i, ax, ay, r) !== chamCu(i, ax, ay, r)) lech++
+    }
+    expect(lech).toBe(0)
+  })
+})

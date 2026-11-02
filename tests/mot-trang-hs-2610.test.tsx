@@ -444,14 +444,16 @@ describe('Menu dọc «Một trang» — MENU 6 MỤC (thầy 27/10): Điểm da
     const onThi = vi.fn(), onMuc = vi.fn()
     const { unmount } = menu({ moDiemDanh: false, onThi, onMuc })
     const muc = () => within(nav()).getAllByRole('button').filter((b) => b.classList.contains('tr-menu-muc'))
-    expect(muc().map((b) => b.textContent)).toEqual(['Hôm nay', 'Luyện tập', 'Thành tích', 'Ca kiểm tra', 'Hỏi A.I Đỗ Đại Học', 'Cài đặt']) // hệ Kính 02/11: «Lộ trình» đổi tên «Hôm nay» (thầy chốt)
+    // thầy 02/11 khuya «Đổi vị trí Luyện tập bằng Kiểm tra, bỏ dòng a.i đỗ đại học»: tấm Thêm còn Luyện tập (hiện) + Cài đặt; Kiểm tra lên thanh nổi
+    expect(muc().map((b) => b.textContent)).toEqual(['Hôm nay', 'Luyện tập', 'Thành tích', 'Cài đặt'])
+    expect(within(nav()).getByRole('button', { name: 'Luyện tập' }).hasAttribute('data-hien')).toBe(true)
     expect(muc().every((b) => b.querySelector('.tr-menu-o'))).toBe(true)
     expect(within(nav()).getByRole('button', { name: 'Hôm nay' }).getAttribute('aria-current')).toBe('page')
     expect(nav().querySelector('.tr-menu-ds hr')).toBeNull() // không vạch ngăn giữa 6 mục
     // chuông THẬT nằm ở hàng đầu menu, cạnh «Đỗ Đại Học»
     expect(nav().querySelector('.tr-menu-dau .tr-menu-tb .m3-tb-chuong')).not.toBeNull()
     expect(nav().querySelector('.tr-menu-dau')!.textContent).toContain('Đỗ Đại Học')
-    fireEvent.click(within(nav()).getByRole('button', { name: 'Ca kiểm tra' }))
+    fireEvent.click(document.querySelector<HTMLElement>('.kb-thanh-ds [aria-label="Kiểm tra"]')!)
     expect(onThi).toHaveBeenCalledOnce()
     fireEvent.click(within(nav()).getByRole('button', { name: 'Thành tích' }))
     expect(onMuc).toHaveBeenCalledWith('ket-qua')
@@ -460,6 +462,7 @@ describe('Menu dọc «Một trang» — MENU 6 MỤC (thầy 27/10): Điểm da
     unmount()
     menu({ moDiemDanh: false, coCa: true })
     expect(within(nav()).queryByRole('button', { name: 'Ca kiểm tra' })).toBeNull()
+    expect(within(nav()).queryByRole('button', { name: 'Hỏi A.I Đỗ Đại Học' })).toBeNull()
   })
 
   it('nút Thêm bật / tắt: bấm lần 1 mở bảng, bấm lần 2 ẩn bảng (thầy 02/11 «bấm 1 lần thì hiện bảng bấm lần nữa thì không ẩn bảng»)', async () => {
@@ -517,18 +520,16 @@ describe('Menu dọc «Một trang» — MENU 6 MỤC (thầy 27/10): Điểm da
     expect(onCuaEm).toHaveBeenCalledOnce()
   })
 
-  it('mục Hỏi A.I Đỗ Đại Học bắn sự kiện mở ĐÚNG tấm chat của BongBongAiDdh', () => {
+  it('nút A.I tròn riêng bắn sự kiện mở ĐÚNG tấm chat của BongBongAiDdh; tấm Thêm KHÔNG còn dòng Hỏi A.I (thầy 02/11 khuya); thanh nổi: Hôm nay · Kiểm tra · Thành tích', () => {
     vi.stubGlobal('fetch', vi.fn(async () => traLoi({ ok: true, buoi: null })))
     const nghe = vi.fn()
     window.addEventListener('ddh:mo-ai', nghe)
     menu({ moDiemDanh: false })
-    fireEvent.click(within(document.getElementById('tr-menu')!).getByRole('button', { name: 'Hỏi A.I Đỗ Đại Học' }))
-    expect(nghe).toHaveBeenCalledOnce()
-    // khung thấp xoay ngang: dải biểu tượng có cùng lối A.I + 3 mục chính (dọc: dải bị CSS ẩn)
+    expect(within(document.getElementById('tr-menu')!).queryByRole('button', { name: 'Hỏi A.I Đỗ Đại Học' })).toBeNull()
     fireEvent.click(document.querySelector('.tr-menu-ray .tr-ray-ai')!)
     window.removeEventListener('ddh:mo-ai', nghe)
-    expect(nghe).toHaveBeenCalledTimes(2)
-    expect([...document.querySelectorAll('.tr-menu-ray .tr-ray-muc')].map((b) => b.getAttribute('aria-label'))).toEqual(['Hôm nay', 'Luyện tập', 'Thành tích', 'Hỏi A.I Đỗ Đại Học']) // hệ Kính: thanh nổi 3 mục + nút A.I tròn
+    expect(nghe).toHaveBeenCalledTimes(1)
+    expect([...document.querySelectorAll('.tr-menu-ray .tr-ray-muc')].map((b) => b.getAttribute('aria-label'))).toEqual(['Hôm nay', 'Kiểm tra', 'Thành tích', 'Hỏi A.I Đỗ Đại Học'])
     expect(document.querySelector('.tr-menu-ray .tr-menu-cham')).not.toBeNull()
   })
 })

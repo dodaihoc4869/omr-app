@@ -9,6 +9,7 @@ import { BangSoLieu, CauHinh, HinhTaiViTri } from '../QuestionMedia'
 import KhoiLoiGiaiChuan, { loiGiaiChuanTuKho } from '../loi-giai/KhoiLoiGiaiChuan'
 import { ChemText } from '../../lib/chem-format'
 import { tachDongTheoY } from '../../lib/tach-dong-cau'
+import { ngatYSoSau } from '../../lib/ngat-y-so-sau'
 import { giuLienPhuongTrinh, tachDoanDe } from '../../lib/gian-y-de'
 import { laChuGiuCho } from '../../lib/anh-phuong-an'
 import type { HinhAnh } from '../../data/examContent'
@@ -66,7 +67,7 @@ const CHU_PA = ['A', 'B', 'C', 'D'] as const
 // 28/10 MƯỢT: ghi nhớ theo (câu, số thứ tự) — mỗi lần màn làm bài vẽ lại (chọn phương án, Kiểm tra, đổi câu) không phải dựng lại chữ đề (tách dòng +
 // công thức hoá). Đề là hàm thuần của `q` + `stt`.
 export const DeCau = memo(function DeCau({ q, stt }: { q: Question; stt: number }) {
-  const de = tachDongTheoY(q.text)
+  const de = ngatYSoSau(tachDongTheoY(q.text)) // thầy 02/11 khuya: ý có số đứng sau «… (1); … (2);» ⇒ mỗi ý một dòng
   return (
     <section className="ht2-lam-de" aria-label={`Đề câu ${stt}`}>
       {q.thanCauImg ? (

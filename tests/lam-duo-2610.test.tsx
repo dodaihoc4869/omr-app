@@ -75,8 +75,7 @@ describe('làm chặng kiểu Duolingo («Trong»)', () => {
     expect(tam.textContent).toContain('lịch ôn 1 · 3 · 7 ngày')
     expect(tam.textContent).not.toContain('Sửa câu này') // thầy 26/10 «Bỏ câu sai từng bước»: chỉ Lời giải từng bước + Hỏi thầy
     expect(document.querySelector('.ht2-lam-loi-giai')).toBeNull() // lời giải không chen giữa màn
-    fireEvent.click(screen.getByRole('button', { name: /Lời giải từng bước/ }))
-    expect(screen.getByRole('dialog', { name: 'Lời giải từng bước' }).querySelector('.ht2-lam-loi-giai')).not.toBeNull()
+    expect(screen.queryByRole('button', { name: /Lời giải từng bước/ })).toBeNull() // thầy 02/11 khuya «Ẩn hết nút lời giải từng bước»
     expect(screen.getByLabelText('Chuỗi 0 câu đúng liền')).toBeTruthy()
   })
 

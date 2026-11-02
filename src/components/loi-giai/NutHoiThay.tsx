@@ -10,6 +10,8 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { BookOpenText, MessageCircleQuestion } from 'lucide-react'
 import { CHU_LAM_XONG, docTokenHs, hoiThay, type CauChoKhung, type HoSoLoiGiai, type KiemKhung } from '../../lib/loi-giai-api'
+/** Thầy 02/11 khuya: «Ẩn hết nút lời giải từng bước». */
+const AN_LOI_GIAI_TUNG_BUOC = true
 import './loi-giai.css'
 
 // LUẬT TỐC ĐỘ (thầy 13/10): nút nằm ở MỌI thẻ câu (mảnh tải lúc mở app) ⇒ hộp hỏi Thầy, khung lời giải, nút chữa từng bước tách mảnh,
@@ -86,7 +88,8 @@ function NutHoiThayCau({ qid, nguon, onHoi, gon = false, dangLam = false, chi, d
           <span>{dangTai === 'hoi' ? 'Đang mở…' : 'Hỏi thầy'}</span>
         </button>
       )}
-      {coGiai && (
+      {/* thầy 02/11 khuya «Ẩn hết nút lời giải từng bước» */}
+      {coGiai && !AN_LOI_GIAI_TUNG_BUOC && (
         <button type="button" className="lg-nut-loi-giai" onClick={() => void bam('giai')} disabled={ban}>
           <BookOpenText aria-hidden="true" size={18} strokeWidth={2} />
           <span>{dangTai === 'giai' ? 'Đang mở…' : 'Lời giải từng bước'}</span>
