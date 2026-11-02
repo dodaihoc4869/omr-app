@@ -105,10 +105,11 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:
  // XONG CHẶNG / NỘP BÀI (thầy 02/11 «hiệu ứng kết thúc chặng … kiểm tra ôn tập thay hiệu ứng mới»): em tự nộp chặng hoặc nộp bài xong ⇒ pháo giấy hai góc
  // + quầng của bộ ăn mừng quanh khối đầu màn (máy yếu bản gọn). Hết giờ tự chốt / mở lại kết quả cũ / nộp bài điểm < 5 («Cùng Mol ôn lại nhé!»): không bắn. Mảnh hiệu ứng nạp sẵn lúc rảnh khi mở màn.
  const [mung,setMung]=useState(0)
- useEffect(()=>{napTruocAnMung()},[])
- useEffect(()=>{if(!mung)return;const d=ttRef.current?.diem;if(ket&&typeof d==='number'&&d<5)return;let huy=()=>{};const t=window.setTimeout(()=>{huy=anMung('chang',{goc:khung.current?.querySelector('.duo-kt-ket-bi, .ktcn-ket-dau, .ktcn-dau, h2')})},180);return()=>{window.clearTimeout(t);huy()}},[mung])
  useEffect(()=>{if(stt!==null)khung.current?.scrollIntoView?.({block:'start'})},[stt])
  const ttRef=useRef(tt),ra=()=>{onCapNhat();const t=ttRef.current;if(t)onVa?.(vaKt(t))}
+ useEffect(()=>{napTruocAnMung()},[])
+ // Điểm < 5 khi nộp bài ⇒ nơi gọi không tăng `mung` (quyết ở `nop`, không đọc `ket` trong hiệu ứng). Huỷ hẹn giờ qua ô `h` (không gán lại biến của hiệu ứng).
+ useEffect(()=>{if(!mung)return;const h={huy:()=>{}};const t=window.setTimeout(()=>{h.huy=anMung('chang',{goc:khung.current?.querySelector('.duo-kt-ket-bi, .ktcn-ket-dau, .ktcn-dau, h2')})},180);return()=>{window.clearTimeout(t);h.huy()}},[mung])
  const nhan=(r:Record<string,unknown>)=>{const t=docKiemTra(r.kiemTra);if(!t)throw new Error('Số liệu bài kiểm tra chưa đầy đủ. Em tải lại nhé.');setTt(t);ttRef.current=t;setOffset(t.serverNow-Date.now());if(typeof r.revision==='number')revision.current=r.revision;return t}
  /** Bản nháp trên máy của chặng i: câu trả lời + mốc trả lời từng câu + câu đang làm. Hỏng / không có ⇒ null. */
  const docNhap=(i:number):{han:number;tra:Record<string,unknown>;luc:Record<string,number>;viTri?:number}|null=>{try{const o=JSON.parse(localStorage.getItem(`ktcn:nhap:${sbd}:${id}:${i}`)||'null');if(!o||typeof o!=='object'||!o.tra||typeof o.tra!=='object')return null;return {han:Number(o.han),tra:o.tra,luc:o.luc&&typeof o.luc==='object'?o.luc:{},viTri:typeof o.viTri==='number'?o.viTri:undefined}}catch{return null}}
@@ -210,7 +211,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:
  // Câu đang làm cũng nhớ trên máy: mở lại chặng về đúng câu ấy (kể cả sau khi bản nháp đã đồng bộ lên máy chủ).
  useEffect(()=>{if(stt!==null&&han)try{localStorage.setItem(`ktcn:vt:${sbd}:${id}:${stt}`,String(viTri));const raw=localStorage.getItem(key);if(raw){const o=JSON.parse(raw);if(o&&o.han===han&&o.viTri!==viTri)localStorage.setItem(key,JSON.stringify({...o,viTri}))}}catch{/* không cản làm bài */}},[viTri,stt,han])
  const ve=async()=>{xoaKtcnDangLam(sbd);if(stt!==null){setBusy(true);try{await save();onVe();ra()}catch(e){if(laLoiTamThoi(e)){onVe();ra()}else setLoi(chuCuaLoi(e,'Chưa lưu được bài.'))}finally{setBusy(false)}}else{onVe();ra()}}
- const nop=async()=>{if(tt&&tt.daTra<tt.tong&&!await hoiXacNhan({tieuDe:'Nộp bài kiểm tra?',noiDung:`Còn ${tt.con} câu chưa trả lời. Nộp bài sẽ chốt kết quả hiện tại.`,nhanDongY:'Nộp bài',nhanKhong:'Làm tiếp',vo:'m3'}))return;setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-nop',token,{id,...thanGoiKt(sbd,id)});nhan(r);setKet(await ketTu(r));ra();setMung(n=>n+1)}catch(e){setLoi(chuCuaLoi(e,'Chưa nộp được bài.'))}finally{setBusy(false)}}
+ const nop=async()=>{if(tt&&tt.daTra<tt.tong&&!await hoiXacNhan({tieuDe:'Nộp bài kiểm tra?',noiDung:`Còn ${tt.con} câu chưa trả lời. Nộp bài sẽ chốt kết quả hiện tại.`,nhanDongY:'Nộp bài',nhanKhong:'Làm tiếp',vo:'m3'}))return;setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-nop',token,{id,...thanGoiKt(sbd,id)});const t=nhan(r);setKet(await ketTu(r));ra();if(!(typeof t.diem==='number'&&t.diem<5))setMung(n=>n+1)}catch(e){setLoi(chuCuaLoi(e,'Chưa nộp được bài.'))}finally{setBusy(false)}}
  const [loc,setLoc]=useState<Loc>('tat-ca')
  // Tấm hỏi nộp đang mở mà chặng đã đóng / hết giờ (lượt tự chốt đi trước) ⇒ trả «không» và đóng tấm.
  useEffect(()=>{if(hoiNop&&(stt===null||hetGio)){hoiNop(false);setHoiNop(null)}},[stt,hetGio,hoiNop])
