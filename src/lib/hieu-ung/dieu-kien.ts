@@ -88,6 +88,16 @@ export const kichXongChang = (o: { xong: boolean; daChay: boolean }): boolean =>
 /** MỞ RƯƠNG trên Lộ trình: rương đã sáng (xong cả các chặng hôm nay) và em chạm vào rương. */
 export const kichRuong = (o: { duMo: boolean; cham: boolean }): boolean => o.duMo && o.cham
 
+// ───────────────────────────── tự hạ xuống bản gọn
+/** Ngưỡng khung chậm (ms) khi hiệu ứng bản đầy đủ đang chạy. */
+export const KHUNG_CHAM_MS = 40
+/** Khoảng cách giữa các khung (ms) đo trong lúc hiệu ứng bản đầy đủ chạy ⇒ máy này không kham nổi ⇒ hạ xuống bản GỌN cho cả phiên dùng app: bỏ 2 khung đầu
+ *  (khung dựng dải kết quả), bỏ khoảng > 1 s (tab ẩn); còn ≥ 2 khung > 40 ms, hoặc 1 khung > 70 ms. */
+export function nenHaGon(khoang: readonly number[]): boolean {
+  const ds = khoang.slice(2).filter((x) => x > 0 && x < 1000)
+  return ds.filter((x) => x > KHUNG_CHAM_MS).length >= 2 || ds.some((x) => x > 70)
+}
+
 // ───────────────────────────── âm thanh / rung
 
 /** Công tắc «Tiếng ăn mừng» ở menu app học sinh: localStorage = 'bat' mới kêu. MẶC ĐỊNH TẮT (chưa đặt ⇒ im). */

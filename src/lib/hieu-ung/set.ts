@@ -61,9 +61,11 @@ export function set(ph: Phien, d: DatSet): void {
       svg.setAttribute('width', bw.toFixed(0)); svg.setAttribute('height', bh.toFixed(0)); svg.setAttribute('viewBox', `${bx.toFixed(1)} ${by.toFixed(1)} ${bw.toFixed(1)} ${bh.toFixed(1)}`)
       svg.style.cssText = `position:absolute;left:${bx.toFixed(1)}px;top:${by.toFixed(1)}px;overflow:visible;will-change:opacity`
       const g = document.createElementNS(NS, 'g')
-      const lopNet: [number, string, number][] = day_du ? [[28, 'var(--tr-tin)', 0.22], [13, 'var(--tr-hs)', 0.45], [6, 'var(--tr-hs)', 1], [2.8, M.trangVar, 1]] : [[10, 'var(--tr-hs)', 0.5], [3, M.trangVar, 1]]
+      // ít nét (đo CPU ×6: mỗi nét vẽ lại khi tia chạy xuống): nét chính = quầng rộng mờ + lõi sáng; mỗi nhánh MỘT nét mảnh
+      const lopNet: [number, string, number][] = day_du ? [[16, 'var(--tr-hs)', 0.4], [3.2, M.trangVar, 1]] : [[10, 'var(--tr-hs)', 0.5], [3, M.trangVar, 1]]
+      const lopNhanh: [number, string, number][] = [[5, 'var(--tr-hs)', 0.85]]
       const duong = (p: [number, number][]) => 'M' + p.map((q) => `${q[0].toFixed(1)} ${q[1].toFixed(1)}`).join('L')
-      ds.forEach((p, nh) => lopNet.forEach(([w, mau, a]) => {
+      ds.forEach((p, nh) => (nh ? lopNhanh : lopNet).forEach(([w, mau, a]) => {
         const e = document.createElementNS(NS, 'path')
         e.setAttribute('d', duong(p)); e.setAttribute('pathLength', '1')
         e.setAttribute('style', `fill:none;stroke:${mau};stroke-opacity:${a};stroke-width:${(w * s * (nh ? 0.5 : 1)).toFixed(2)};stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1`)

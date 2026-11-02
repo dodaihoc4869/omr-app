@@ -7,20 +7,27 @@
 //  · KHÔNG BAO GIỜ làm rớt khung khi em bấm: chạm xuống (pointerdown) lúc hiệu ứng đang chạy ⇒ kết thúc ngay mọi hiệu ứng (về trạng thái cuối);
 //    lượt bắn lớn chia nhiều khung; khung trước > 50 ms ⇒ bỏ nửa số hạt còn chờ; tối đa 40 hạt bay cùng lúc (gọn: 10).
 // Màu: chỉ biến màu sẵn có của app học sinh (--tr-*), đọc lúc chạy.
-import { thongSo, type CheDoAnMung, type ThongSoAnMung } from './dieu-kien'
+import { nenHaGon, thongSo, type CheDoAnMung, type ThongSoAnMung } from './dieu-kien'
+import { daHaXuongGon, haXuongGon } from './nap'
 import { duocPhanHoi } from '../rung'
 
 // ───────────────────────────── màu (biến --tr-* của app; không mã màu thô)
 export interface BangMau { hs: string; tin: string; sao: string; cam: string; sai: string; dung: string; nt: string; trang: string; toi: boolean
   /** biến CSS cho SVG / lớp phủ (đổi theo sáng / tối) */ trangVar: string }
+let mauDem: { luc: number; m: BangMau } | null = null
 export function bangMau(): BangMau {
+  // đọc biến màu một lần mỗi giây (getComputedStyle trên <html> / <body> không lặp lại trong một lượt ăn mừng)
+  const bayGio = performance.now()
+  if (mauDem && bayGio - mauDem.luc < 1000) return mauDem.m
   const cs = getComputedStyle(document.documentElement)
   const du = getComputedStyle(document.body).color
   const v = (k: string) => cs.getPropertyValue(k).trim() || du
   let toi = false
   try { toi = window.matchMedia('(prefers-color-scheme: dark)').matches } catch { /* sáng */ }
-  return { hs: v('--tr-hs'), tin: v('--tr-tin'), sao: v('--tr-sao'), cam: v('--tr-chu-y'), sai: v('--tr-sai'), dung: v('--tr-dung'), nt: v('--tr-nguyen-tu'),
+  const m = { hs: v('--tr-hs'), tin: v('--tr-tin'), sao: v('--tr-sao'), cam: v('--tr-chu-y'), sai: v('--tr-sai'), dung: v('--tr-dung'), nt: v('--tr-nguyen-tu'),
     trang: v(toi ? '--tr-chu' : '--tr-mat'), toi, trangVar: toi ? 'var(--tr-chu)' : 'var(--tr-mat)' }
+  mauDem = { luc: bayGio, m }
+  return m
 }
 
 export const rnd = (a: number, b: number) => a + Math.random() * (b - a)
@@ -60,7 +67,8 @@ export interface Hat {
 const kho: HTMLElement[] = []
 /** Hạt đang bay (mọi hiệu ứng cộng lại) — trần TRAN_HAT: nhiều hiệu ứng chồng nhau (sét + Bi + dải kết quả) không đẻ quá nhiều lớp vẽ cùng lúc. */
 const song = new Set<HTMLElement>()
-const TRAN_HAT = { 'day-du': 40, gon: 10, tinh: 0 } as const
+// đo CPU ×6 02/11 (điều phối: «≤ 18 hạt ở bản đầy đủ»): trên 18 hạt cùng lúc thì việc ghép lớp làm khung p95 tệ nhất vượt bản trước
+const TRAN_HAT = { 'day-du': 18, gon: 10, tinh: 0 } as const
 function traNut(e: HTMLElement) {
   try { for (const a of e.getAnimations?.() ?? []) a.cancel() } catch { /* trình duyệt cũ */ }
   e.remove()
@@ -109,14 +117,13 @@ export function dungHat(p: Hat, gon: boolean): { w: number; h: number; css: stri
 const MOT_LUOT = 28
 type Cho = { p: Hat; t0: number }
 /** Dựng các hạt đang chờ — tối đa MOT_LUOT mỗi khung (lượt bắn lớn chia nhiều khung, không thành một tác vụ dài); khung trước chậm > 50 ms ⇒ bỏ nửa số còn chờ. */
-function boBan(hang: Cho[], gon: boolean, them: (e: HTMLElement) => void, conSong: () => boolean, tranRieng?: number): void {
-  const tran = tranRieng ?? TRAN_HAT[gon ? 'gon' : 'day-du']
+function boBan(hang: Cho[], laGon: () => boolean, them: (e: HTMLElement) => void, conSong: () => boolean, tranRieng?: number): void {
   let truoc = 0
   const xa = (now?: number) => {
     if (!conSong() || !hang.length) return
     if (truoc && now && now - truoc > 50 && hang.length > 8) hang.splice(0, hang.length, ...hang.filter((_, i) => i % 2 === 0))
     truoc = now ?? performance.now()
-    const cha = layLop(), luc = performance.now()
+    const cha = layLop(), luc = performance.now(), gon = laGon(), tran = gon ? TRAN_HAT.gon : tranRieng ?? TRAN_HAT['day-du']
     for (const { p, t0 } of hang.splice(0, MOT_LUOT)) {
       if (song.size >= tran) { hang.length = 0; break } // quá trần ⇒ bỏ phần còn lại (hạt đến muộn còn tệ hơn thiếu hạt)
       const { w, h, css, kf } = dungHat(p, gon)
@@ -166,9 +173,28 @@ export interface Phien {
   /** trần hạt riêng của hiệu ứng này (màn tĩnh như kết chặng được nhiều hạt hơn màn làm câu) */ tranHat?: number
   /** việc chắc chắn chạy một lần lúc kết thúc (hết giờ hoặc bị huỷ) */ khiXong(f: () => void): void
   /** kết thúc sau `ms` */ dong(ms: number): void
+  /** hạ xuống bản gọn ngay giữa chừng (canh khung thấy chậm) */ haGon(): void
   huy(): void
 }
 const dangChay = new Set<Phien>()
+
+// CANH KHUNG (điều phối 02/11: «tự hạ xuống bản gọn ngay khi phát hiện khung > 40 ms trong lúc chạy»): khi có hiệu ứng BẢN ĐẦY ĐỦ đang chạy, đo khoảng giữa
+// các khung (một lượt rAF rỗng mỗi khung); máy không kham nổi (dieu-kien.ts nenHaGon) ⇒ mọi hiệu ứng đang chạy hạ xuống bản gọn NGAY, và từ đó tới khi tải
+// lại app máy này chạy bản gọn (nap.ts haXuongGon). Hết hiệu ứng đầy đủ ⇒ thôi đo.
+let canhRaf = 0, canhTruoc = 0, canhDs: number[] = []
+function canhKhung(): void {
+  if (canhRaf || daHaXuongGon() || typeof requestAnimationFrame !== 'function') return
+  canhTruoc = 0; canhDs = []
+  const b = (t: number) => {
+    canhRaf = 0
+    if (document.hidden || ![...dangChay].some((p) => p.che === 'day-du')) return
+    if (canhTruoc) { canhDs.push(t - canhTruoc); if (canhDs.length > 40) canhDs.shift() }
+    canhTruoc = t
+    if (nenHaGon(canhDs)) { haXuongGon(); for (const p of [...dangChay]) p.haGon(); return }
+    canhRaf = requestAnimationFrame(b)
+  }
+  canhRaf = requestAnimationFrame(b)
+}
 const chamXuong = () => { for (const p of [...dangChay]) p.huy() }
 function theoDoiCham(bat: boolean) {
   if (bat) window.addEventListener('pointerdown', chamXuong, { capture: true, passive: true })
@@ -182,8 +208,8 @@ function donLop() {
 
 export function moPhien(che: CheDoAnMung): Phien {
   const hen: number[] = [], hoat: Animation[] = [], nut: Element[] = [], ket: (() => void)[] = [], nutHat: HTMLElement[] = [], hang: Cho[] = []
-  let xong = false
-  const yen = che === 'tinh'
+  let xong = false, boDem = 0
+  const yen = che === 'tinh', cheGoc = che
   const p: Phien = {
     che, ts: thongSo(che),
     sau(ms, f) { if (!xong) hen.push(window.setTimeout(() => { if (!xong) f() }, Math.max(0, ms))) },
@@ -199,8 +225,14 @@ export function moPhien(che: CheDoAnMung): Phien {
     them(e, cha) { (cha ?? layLop()).appendChild(e); nut.push(e); return e },
     hat(h) {
       if (xong || p.ts.heSoHat <= 0 || typeof Element.prototype.animate !== 'function') return
-      if (!hang.length) boBan(hang, che === 'gon', (e) => nutHat.push(e), () => !xong, p.tranHat)
+      if (cheGoc === 'day-du' && p.che === 'gon' && boDem++ % 4) return // vừa hạ xuống gọn: lớp hạt đã tính theo bản đầy đủ ⇒ giữ 1/4
+      if (!hang.length) boBan(hang, () => p.che === 'gon', (e) => nutHat.push(e), () => !xong, p.tranHat)
       hang.push({ p: h, t0: performance.now() })
+    },
+    haGon() {
+      if (xong || p.che !== 'day-du') return
+      p.che = 'gon'; p.ts = thongSo('gon')
+      hang.splice(0, hang.length, ...hang.filter((_, i) => i % 4 === 0))
     },
     khiXong(f) { ket.push(f) },
     dong(ms) { p.sau(ms, () => p.huy()) },
@@ -219,6 +251,7 @@ export function moPhien(che: CheDoAnMung): Phien {
   }
   if (!dangChay.size) theoDoiCham(true)
   dangChay.add(p)
+  if (che === 'day-du') canhKhung()
   return p
 }
 

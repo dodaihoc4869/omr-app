@@ -10,7 +10,7 @@ import {
   amAnMungBat, cheDoAnMung, chuoiSauCau, demChuoiDung, kichDuMuc, kichLuaChuoi, kichNguyenTu, kichRuong, kichSet, kichXongChang, kieuThe, mucSet, soHat,
   soNguyenTuBay, thoiGian, thongSo,
 } from '../src/lib/hieu-ung/dieu-kien'
-import { anMung, cheDoMayNay, napAnMung } from '../src/lib/hieu-ung/nap'
+import { anMung, boHaGon, cheDoMayNay, napAnMung } from '../src/lib/hieu-ung/nap'
 
 describe('chọn chế độ theo máy', () => {
   it('giảm chuyển động ⇒ tĩnh (thắng cả máy yếu); máy yếu ⇒ gọn; còn lại đầy đủ', () => {
@@ -104,7 +104,7 @@ function traTrinhDuyet() {
 const lop = () => document.querySelector<HTMLElement>('.hu-lop')
 
 describe('bộ chạy hiệu ứng', () => {
-  beforeEach(async () => { giaTrinhDuyet(); await napAnMung() })
+  beforeEach(async () => { boHaGon(); giaTrinhDuyet(); await napAnMung() })
   afterEach(() => { window.dispatchEvent(new Event('pointerdown')); traTrinhDuyet(); document.body.innerHTML = '' })
 
   it('mảnh nạp lười chạy đủ 7 hiệu ứng không lỗi; lớp phủ không chặn bấm; chạm xuống ⇒ kết thúc ngay, gỡ lớp phủ', async () => {
@@ -139,7 +139,8 @@ describe('bộ chạy hiệu ứng', () => {
     document.body.innerHTML = '<div class="ruong"></div>'
     anMung('ruong', { goc: document.querySelector('.ruong') })
     await new Promise((r) => setTimeout(r, 500))
-    expect(lop()!.querySelectorAll('i').length).toBeGreaterThan(20) // 26 tia lửa + 16 lấp lánh + sóng xung (bản đầy đủ)
+    const soHatDom = lop()!.querySelectorAll('i').length
+    expect(soHatDom).toBeGreaterThan(0); expect(soHatDom).toBeLessThanOrEqual(18) // trần 18 hạt bay cùng lúc ở bản đầy đủ (rương xin 43); máy kiểm thử chậm ⇒ tự hạ gọn (10)
     expect(lop()!.querySelector('canvas')).toBeNull()
     await waitFor(() => expect(lop()).toBeNull(), { timeout: 3500 })
   })
@@ -157,6 +158,27 @@ describe('bộ chạy hiệu ứng', () => {
     expect(l.querySelectorAll('i').length).toBeLessThanOrEqual(11) // ⌊26/4⌋ tia lửa + ⌊16/4⌋ lấp lánh + 1 sóng xung (đầy đủ: 43)
     expect([...l.children].some((e) => (e as HTMLElement).style.inset === '0px' || (e as HTMLElement).style.background === 'var(--tr-phu)')).toBe(false) // không loé / tối màn
     expect(l.querySelectorAll('span svg').length).toBeLessThanOrEqual(2) // ≤ 1/4 của 8 nguyên tử
+  })
+})
+
+describe('tự hạ xuống bản gọn khi khung chậm', () => {
+  it('≥ 2 khung > 40 ms hoặc 1 khung > 70 ms (bỏ 2 khung đầu, bỏ khoảng tab ẩn) ⇒ hạ', async () => {
+    const { nenHaGon } = await import('../src/lib/hieu-ung/dieu-kien')
+    expect(nenHaGon([16, 17, 16, 17, 33, 16])).toBe(false)
+    expect(nenHaGon([90, 60, 16, 17, 16])).toBe(false) // hai khung đầu (dựng dải kết quả) không tính
+    expect(nenHaGon([16, 16, 45, 17, 48])).toBe(true)
+    expect(nenHaGon([16, 16, 17, 75])).toBe(true)
+    expect(nenHaGon([16, 16, 5000, 16])).toBe(false) // tab ẩn
+  })
+  it('đã hạ ⇒ máy này chạy bản gọn tới khi tải lại', async () => {
+    giaTrinhDuyet()
+    const nap = await import('../src/lib/hieu-ung/nap')
+    try {
+      nap.boHaGon()
+      expect(nap.cheDoMayNay()).toBe('day-du')
+      nap.haXuongGon()
+      expect(nap.cheDoMayNay()).toBe('gon')
+    } finally { nap.boHaGon(); traTrinhDuyet() }
   })
 })
 
@@ -178,7 +200,7 @@ vi.mock('../src/components/hoa2/api', async (g) => ({ ...await g<typeof import('
 vi.mock('../src/components/hoa2/doc-luong-nop', async () => { const api = await import('../src/components/hoa2/api'); return { nopCauLuong: (token: string, du: Record<string, unknown>, giay: number) => api.goiHoa2('answer', token, du, giay) } })
 
 describe('màn làm chặng không vỡ khi hiệu ứng chạy', () => {
-  beforeEach(() => { document.documentElement.dataset.trong = 'hs'; giaTrinhDuyet() })
+  beforeEach(() => { boHaGon(); document.documentElement.dataset.trong = 'hs'; giaTrinhDuyet() })
   afterEach(() => { window.dispatchEvent(new Event('pointerdown')); cleanup(); traTrinhDuyet(); localStorage.clear(); delete document.documentElement.dataset.trong })
 
   it('5 câu đúng liền ⇒ sét đánh (lớp phủ có tia), thẻ đúng tắt nảy CSS; câu sai ⇒ thẻ em chọn lắc; «Tiếp tục» vẫn bấm được ngay', async () => {

@@ -34,6 +34,13 @@ export function napTruocAnMung(ngay = false): void {
 
 export const anMungSanSang = (): boolean => !!mod
 
+/** Đã thấy khung chậm khi bản đầy đủ chạy (bo-chay.ts canh khung) ⇒ từ giờ tới khi tải lại app, máy này chạy bản GỌN. */
+let haGon = false
+export function haXuongGon(): void { haGon = true }
+export const daHaXuongGon = (): boolean => haGon
+/** Bỏ dấu đã hạ (kiểm thử dùng; app thật chỉ bỏ khi tải lại). */
+export function boHaGon(): void { haGon = false }
+
 /** Chế độ của máy này: xin giảm chuyển động ⇒ tĩnh; lớp `may-yeu` (máy yếu, kể cả đo khung thật ⇒ `ddh.mayYeu`) ⇒ gọn. Không có matchMedia /
  *  Element.animate (máy kiểm thử, trình duyệt quá cũ) ⇒ tĩnh. */
 export function cheDoMayNay(): CheDoAnMung {
@@ -41,7 +48,7 @@ export function cheDoMayNay(): CheDoAnMung {
   if (typeof window.matchMedia !== 'function' || typeof Element.prototype.animate !== 'function') return 'tinh'
   let giam = false
   try { giam = window.matchMedia('(prefers-reduced-motion: reduce)').matches } catch { /* coi như không */ }
-  return cheDoAnMung({ mayYeu: document.documentElement.classList.contains('may-yeu'), giamChuyenDong: giam })
+  return cheDoAnMung({ mayYeu: haGon || document.documentElement.classList.contains('may-yeu'), giamChuyenDong: giam })
 }
 
 const CHO_TOI_DA = 700
