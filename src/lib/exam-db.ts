@@ -10,11 +10,11 @@ import { chuanHoaMayChu, diaChiMayChuHopLe, type CauHinhMayChu } from './cau-hin
 import type { SoSuaDang } from './sua-dang'
 import { themMau, type MauGiayThuc } from './hieu-chinh-giay-thuc'
 import { voiHanCho } from './han-cho'
-// 02/11 (tác tử tốc độ, issue số 778): nhập TĨNH — hai tệp dưới nằm CÙNG mảnh `bieu-tuong` với tệp này (vite.config.ts nhóm mảnh), nên `import()` động
-// không tách được gì mà còn buộc trình đóng gói dựng đối tượng không gian tên giữ MỌI hàm xuất (kể cả hàm chỉ test dùng) + vỏ nạp trước ⇒ thêm byte tải mở.
-// Vòng nhập exam-db ⇄ may-chu-moi / dia-chi-may-chu vô hại: chỉ gọi nhau BÊN TRONG hàm, không mã cấp đầu tệp nào dùng chéo.
+// 02/11 (tác tử tốc độ, issue số 778): nhập TĨNH may-chu-moi — tệp ấy nằm CÙNG mảnh `bieu-tuong` với tệp này (vite.config.ts nhóm mảnh), nên `import()` động
+// không tách được gì mà còn thêm một vỏ nạp trước (`__vitePreload`) ⇒ thêm byte tải mở. Vòng nhập exam-db ⇄ may-chu-moi vô hại: chỉ gọi nhau BÊN TRONG hàm.
+// `dia-chi-may-chu` vẫn `import()` động: nhập tĩnh làm vòng exam-db → dia-chi-may-chu → may-chu-moi, khiến `vi.doMock(may-chu-moi, importOriginal)` của
+// tests/vao-thi-may-chu-moi-1109.test.ts trao bản GỐC cho dia-chi-may-chu (13 test đỏ) — muốn bỏ nốt thì sửa cách giả mô-đun của test ấy trước.
 import { quenCauHinhMayChu } from './may-chu-moi'
-import { layDiaChiMayChu } from './dia-chi-may-chu'
 
 export interface AnswerRecord {
   phanI: Record<string, 'A' | 'B' | 'C' | 'D'> // qid -> lựa chọn (đã quy về chữ cái GỐC, chưa xáo)
@@ -424,6 +424,7 @@ export async function loadScriptUrl(): Promise<string> {
     // Máy sạch/IndexedDB hỏng vẫn có cấu hình công khai.
   }
   try {
+    const { layDiaChiMayChu } = await import('./dia-chi-may-chu')
     return await layDiaChiMayChu()
   } catch {
     return ''
@@ -484,6 +485,7 @@ export async function loadScriptUrlHoacMacDinh(): Promise<string> {
   const daLuu = await loadScriptUrl()
   if (daLuu) return daLuu
   try {
+    const { layDiaChiMayChu } = await import('./dia-chi-may-chu')
     return await layDiaChiMayChu()
   } catch {
     return ''

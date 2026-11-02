@@ -652,9 +652,7 @@ export default defineConfig({
             { name: 'react', test: /node_modules[\\/](?:react|react-dom|scheduler)[\\/]/ },
             // 25/10 (báo "đang mở app" nạp lười sau khi trang tải xong): `nhip-ben-vung` rời mảnh vào ⇒ gom vào mảnh này (mọi đường đều nạp sẵn) thay vì
             // để Rolldown tách tệp riêng (+1 tệp, +~0,1 KB nén ở cổng học sinh / phụ huynh vốn nhập tĩnh nó).
-            // 02/11 (issue số 778): bộ nạp trước của Vite (`vite/preload-helper`) cũng ở đây — trước nó nằm mảnh này nhờ exam-db `import()` động; bỏ `import()` ấy thì
-            // Rolldown dời bộ nạp sang mảnh lời giải ⇒ mảnh vào kéo cả mảnh lời giải (+12 KB nén lượt mở /gv /ph). Ghim lại ⇒ mảnh nào cũng như cũ.
-            { name: 'bieu-tuong', test: (id: string) => laBieuTuongVo(id) || /vite[\\/]preload-helper/.test(id) || /src[\\/]lib[\\/](?:may-yeu|vai-tro|dia-chi-may-chu|hieu-chinh-giay-thuc|nhip-ben-vung)\.ts$/.test(id) },
+            { name: 'bieu-tuong', test: (id: string) => laBieuTuongVo(id) || /src[\\/]lib[\\/](?:may-yeu|vai-tro|dia-chi-may-chu|hieu-chinh-giay-thuc|nhip-ben-vung)\.ts$/.test(id) },
             { name: 'bieu-tuong-them', test: /node_modules[\\/]lucide-react[\\/]/ },
             // fflate (nạp động trong day-ca-may-chu-moi.ts) — đặt tên mảnh rõ để globIgnores ở trên bắt đúng nó (tên tự sinh là `browser-*`, quá chung).
             { name: 'fflate', test: /node_modules[\\/]fflate[\\/]/ },
