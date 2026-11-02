@@ -4132,6 +4132,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       onNop: () => doSubmit(attemptRef.current ?? attempt),
       onThoat: () => setShowBackDialog(true),
       tren: daiBao,
+      roi: canhBaoRoi, // giám thị kiểu Duo nhắc một câu khi màn thi vừa TÍNH một lần rời màn (02/11)
       congCu: <NutDiuMat bat={diuMat} onDoi={doiDiuMat} />,
       tatPhim: showBackDialog || !!zoomSrc || !!lyDoChe,
       // Thi tập trung (01/11): ca có giờ ⇒ ẩn thanh trên + báo 12 · 6 · 1 phút (đọc kho giờ, không đổi đồng hồ); lượt = khoá nhớ mốc đã báo.

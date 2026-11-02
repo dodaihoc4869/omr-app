@@ -50,6 +50,8 @@ export interface ThiDuoProps {
   onThoat: () => void
   /** Dải cảnh báo rời màn / báo thêm giờ (dính dưới thanh trên). */
   tren?: ReactNode
+  /** Lần rời màn vừa được tính (đối tượng cảnh báo của ExamTakeScreen, đổi mỗi lần) — giám thị nhắc một câu khi em quay lại. */
+  roi?: unknown
   /** Công cụ đọc (Dịu mắt) — đặt trong tấm lưới. */
   congCu?: ReactNode
   /** Có lớp phủ khác đang mở (hộp thoát, phóng ảnh, tấm che) ⇒ không nhận phím ← →. */
@@ -203,7 +205,7 @@ export default function ThiDuo(p: ThiDuoProps) {
       {p.tren}
       <main className="duo-kt-than thi-noi-dung">
         <NhanCauKt so={p.cauHien} tong={p.tong} phu={tenNhom(p.phan[p.cauHien - 1] ?? 'I')} />
-        <GiamThiThi phan={p.phan[p.cauHien - 1] ?? 'I'} cauHien={p.cauHien} gap={p.gap} goc={goc} />
+        <GiamThiThi phan={p.phan[p.cauHien - 1] ?? 'I'} cauHien={p.cauHien} roi={p.roi} goc={goc} />
         {p.children}
       </main>
       <DayKt coTruoc={p.cauHien > 1} onTruoc={() => di(p.cauHien - 1)} ghi={cuoi ? ghiNop : undefined}>

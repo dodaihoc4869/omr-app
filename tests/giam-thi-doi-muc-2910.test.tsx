@@ -11,7 +11,8 @@ beforeEach(() => { vi.useFakeTimers(); document.documentElement.dataset.trong = 
 afterEach(() => { cleanup(); vi.useRealTimers(); delete document.documentElement.dataset.trong })
 
 const gt = (muc: MucGT, qid: string) => <div className="duo-gt-san"><div className="duo-gt-loi-o" /><GiamThiCau muc={muc} qid={qid} phien="p" nop={false} ket={null} vung={() => document.body} /></div>
-const svg = (c: HTMLElement) => c.querySelector('.gt-o svg.gtn')
+// 02/11: giám thị «sống động» — khung hình là `.gtm[data-muc]` (giam-thi-nguoi.ts)
+const svg = (c: HTMLElement) => c.querySelector('.gt-o .gtm')
 const xong = () => act(() => { vi.advanceTimersByTime(50) })
 
 describe('giám thị qua các câu', () => {
@@ -23,7 +24,7 @@ describe('giám thị qua các câu', () => {
     xong()
     expect(svg(container), 'khung trống sau khi đổi mức').toBeTruthy()
     expect(svg(container)?.getAttribute('data-muc')).toBe('vd')
-    expect(container.querySelectorAll('.gt-o svg.gtn')).toHaveLength(1)
+    expect(container.querySelectorAll('.gt-o .gtm')).toHaveLength(1)
   })
   it('giữ nguyên mức ⇒ dùng lại đúng giám thị; đổi qua lại nhiều lần ⇒ luôn đúng MỘT giám thị đúng mức, không rò rỉ', () => {
     const { container, rerender } = render(gt('nb', 'q1'))
@@ -33,7 +34,7 @@ describe('giám thị qua các câu', () => {
     expect(svg(container)).toBe(dau)
     for (const [m, q] of [['vdc', 'q3'], ['th', 'q4'], ['th', 'q5'], ['nb', 'q6'], ['vd', 'q7']] as const) {
       rerender(gt(m, q)); xong()
-      expect(container.querySelectorAll('.gt-o svg.gtn'), `${m} ${q}`).toHaveLength(1)
+      expect(container.querySelectorAll('.gt-o .gtm'), `${m} ${q}`).toHaveLength(1)
       expect(svg(container)?.getAttribute('data-muc')).toBe(m)
     }
     expect(GT_DANG_SONG.size).toBe(1)

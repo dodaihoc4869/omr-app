@@ -1,0 +1,1320 @@
+<title>Giám thị sống động</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Nunito:wght@700;800;900&display=swap');
+:root {
+  /* Bố cục: một cột đọc từ trên xuống — trước | sau, sân khấu + bảng thử, bốn giám thị, cảnh màn làm câu. Màu trang theo bảng app học sinh (chàm + chất chỉ thị). */
+  --nen: #f6f6fc; --mat: #ffffff; --mat-2: #f0f0fa; --mat-3: #e1e1f1; --vien: #e2e2f0; --vien-2: #cbcbe3;
+  --chu: #1b1938; --chu-2: #454367; --chu-3: #5a587d;
+  --nhan: #767eff; --nhan-day: #5e64cd; --nhan-nhat: #eeeeff; --nhan-chu: #565bbd; --tren-nhan: #ffffff;
+  --dung: #00d396; --dung-nut: #00a87b; --dung-day: #008d66; --dung-nhat: #c5ffe8; --dung-chu: #007c58;
+  --sai: #f4417c; --sai-day: #e5266d; --sai-nhat: #fddfe9; --sai-chu: #c70b5b; --gian-nen: #e5266d; --gian-day: #b8124f; --tren-gian: #ffffff;
+  --cy: #ff8c51; --cy-nhat: #ffeee0; --cy-chu: #b24f19;
+  --sao: #ffbf35; --sao-nhat: #fff5d4; --sao-chu: #956400;
+  --tin: #00bed8; --tin-day: #009eb5; --tin-nhat: #dbf5fa; --tin-chu: #007889;
+  --tim: #f373ce; --tim-nhat: #fde6f6; --tim-chu: #b33d95;
+  --san-1: #ffffff; --san-2: #ececfb; --anh-nen: #ffffff;
+  --f-hien: 'Nunito', 'Be Vietnam Pro', ui-rounded, system-ui, sans-serif;
+  --f-than: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  /* BẢNG MÀU TRANH của bốn giám thị — như bảng màu linh vật trong app: không đổi theo nền sáng / tối */
+  --gt-net: #1b1938; --gt-trang: #ffffff; --gt-ma: #ff7fa0; --gt-mieng: #6a1f45; --gt-mieng-net: #4a1838; --gt-luoi: #ff8aa5;
+  --gt-vang: #ffbf35; --gt-vang-s: #e3a605; --gt-tia: #fff1a8; --gt-den: #9297b8; --gt-den-s: #676c8f;
+  --gt-but: #3d3a73; --gt-but-d: #f4417c; --gt-but-1: #00bed8; --gt-but-2: #f4417c;
+  --gt-thuy: #eefbff; --gt-thuy-v: #bfe9f4; --gt-giay-to: #ffffff; --gt-dong: #cfd2e6; --gt-ok: #00c08a; --gt-x: #f4417c;
+  --gt-bia: #c9874f; --gt-bia-s: #a96b38; --gt-so: #00bed8; --gt-so-s: #0097ab; --gt-nut-ong: #8d6bd8;
+  --gt-bong: rgba(27, 25, 56, .13);
+  /* Tí — trợ giảng trẻ, blouse ngọc lam */
+  --nb-ao: #00bfd2; --nb-ao-l: #4fd8e7; --nb-ao-s: #0aa0b6; --nb-ao-d: #07889c; --nb-ao2: #ffffff;
+  --nb-da: #f9cfb2; --nb-da-l: #ffe4d2; --nb-da-s: #eeae8e; --nb-toc: #6b3b2c; --nb-toc-l: #95583f; --nb-toc-s: #48261c; --nb-may: #5a3125;
+  --nb-quan: #2d3b5e; --nb-giay: #d8f2f7; --nb-giay-s: #00a9be; --nb-kinh-v: #00a6bb; --nb-kinh-t: #e3f9fd; --nb-quai: #1d6c79;
+  --nb-long: #ff6fae; --nb-long-l: #ffb6d6;
+  /* Cô Cốc — nghiên cứu sinh, blouse tím, kính tròn */
+  --th-ao: #988eff; --th-ao-l: #b9b2ff; --th-ao-s: #7d72ea; --th-ao-d: #6a5fd8; --th-ao2: #ffffff;
+  --th-da: #a9694c; --th-da-l: #c4845f; --th-da-s: #8a5139; --th-toc: #2a2130; --th-toc-l: #4f4160; --th-toc-s: #17111b; --th-may: #1f1824;
+  --th-quan: #3a3263; --th-giay: #6f63dd; --th-giay-s: #4f45b8; --th-gong: #3a2f8f; --th-bang: #988eff;
+  --th-long: #b12fd6; --th-long-l: #e391f7;
+  /* Chú Tam — kĩ thuật viên, sơ mi xanh + tạp dề cam, kính ôm mắt, găng tay */
+  --vd-ao: #9be4f1; --vd-ao-l: #c6f1f9; --vd-ao-s: #6fd0e2; --vd-ao-d: #3fb6cd; --vd-ao2: #ffffff;
+  --vd-da: #f5c9a0; --vd-da-l: #ffe0c2; --vd-da-s: #e0a97d; --vd-toc: #23222c; --vd-toc-l: #46444f; --vd-toc-s: #131218; --vd-may: #23222c; --vd-bac: #b4c0cf;
+  --vd-quan: #3b3e4a; --vd-giay: #7e3050; --vd-giay-s: #5c203a; --vd-kinh-v: #00bed8; --vd-kinh-t: #c8f2fa; --vd-quai: #2b2a33;
+  --vd-tap: #ff8a3c; --vd-tap-l: #ffa86b; --vd-tap-s: #e8701f; --vd-gang: #00bed8; --vd-gang-s: #0091a6;
+  /* Giáo sư Kíp — khó tính nhất, blouse hồng, tóc bạc búi, kính nửa vầng trăng */
+  --vdc-ao: #f1489b; --vdc-ao-l: #f877b8; --vdc-ao-s: #d42f80; --vdc-ao-d: #ba206c; --vdc-ao2: #ffffff;
+  --vdc-da: #fdd8d1; --vdc-da-l: #ffebe7; --vdc-da-s: #f1b6ac; --vdc-toc: #e3e8f0; --vdc-toc-l: #f8fafc; --vdc-toc-s: #b4bfce; --vdc-may: #93a0b4;
+  --vdc-quan: #4b3653; --vdc-giay: #7e3050; --vdc-giay-s: #5c203a; --vdc-gong: #2b2740; --vdc-tay-but: #f5c9a0; --vdc-tay-tay: #ff8fb1;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --nen: #1a1a29; --mat: #262738; --mat-2: #2c2d40; --mat-3: #414157; --vien: #414157; --vien-2: #52536a;
+    --chu: #f1f0ff; --chu-2: #cdceeb; --chu-3: #acaece;
+    --nhan: #a8adff; --nhan-day: #7e80ff; --nhan-nhat: #2c2e47; --nhan-chu: #b1b6ff; --tren-nhan: #1a1a29;
+    --dung: #00d497; --dung-nut: #00d497; --dung-day: #00aa76; --dung-nhat: #18382a; --dung-chu: #00df9f;
+    --sai: #f7498f; --sai-day: #cc146f; --sai-nhat: #43272f; --sai-chu: #ff9bba; --gian-nen: #cc146f; --gian-day: #8e0d4d;
+    --cy: #ff9447; --cy-nhat: #422a1a; --cy-chu: #ffa569;
+    --sao: #ffc735; --sao-nhat: #3b2f14; --sao-chu: #ecb400;
+    --tin: #00bfd4; --tin-day: #0097ab; --tin-nhat: #0e373d; --tin-chu: #00d5ed;
+    --tim: #e17beb; --tim-nhat: #48365a; --tim-chu: #f592ff;
+    --san-1: #2c2d40; --san-2: #212233; --anh-nen: #ffffff;
+    --gt-bong: rgba(0, 0, 0, .34);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --nen: #1a1a29; --mat: #262738; --mat-2: #2c2d40; --mat-3: #414157; --vien: #414157; --vien-2: #52536a;
+  --chu: #f1f0ff; --chu-2: #cdceeb; --chu-3: #acaece;
+  --nhan: #a8adff; --nhan-day: #7e80ff; --nhan-nhat: #2c2e47; --nhan-chu: #b1b6ff; --tren-nhan: #1a1a29;
+  --dung: #00d497; --dung-nut: #00d497; --dung-day: #00aa76; --dung-nhat: #18382a; --dung-chu: #00df9f;
+  --sai: #f7498f; --sai-day: #cc146f; --sai-nhat: #43272f; --sai-chu: #ff9bba; --gian-nen: #cc146f; --gian-day: #8e0d4d;
+  --cy: #ff9447; --cy-nhat: #422a1a; --cy-chu: #ffa569;
+  --sao: #ffc735; --sao-nhat: #3b2f14; --sao-chu: #ecb400;
+  --tin: #00bfd4; --tin-day: #0097ab; --tin-nhat: #0e373d; --tin-chu: #00d5ed;
+  --tim: #e17beb; --tim-nhat: #48365a; --tim-chu: #f592ff;
+  --san-1: #2c2d40; --san-2: #212233; --anh-nen: #ffffff;
+  --gt-bong: rgba(0, 0, 0, .34);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--nen); color: var(--chu); font-family: var(--f-than); font-size: 15px; line-height: 1.5; -webkit-tap-highlight-color: transparent; }
+button { font: inherit; color: inherit; }
+.khung {
+  max-width: 1120px; margin: 0 auto; display: grid; gap: 26px; min-width: 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 16px 28px;
+}
+.dau { display: grid; gap: 4px; min-width: 0; }
+.mat-nhan { margin: 0; font-family: var(--f-hien); font-weight: 900; font-size: 12.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--nhan-chu); }
+.dau h1 { margin: 0; font-family: var(--f-hien); font-weight: 900; font-size: clamp(27px, 5.6vw, 36px); line-height: 1.08; letter-spacing: -.2px; text-wrap: balance; }
+.dau p { margin: 0; color: var(--chu-2); max-width: 70ch; }
+section { display: grid; gap: 12px; min-width: 0; }
+.tieu { display: grid; gap: 2px; min-width: 0; }
+h2 { margin: 0; font-family: var(--f-hien); font-weight: 900; font-size: 21px; line-height: 1.2; text-wrap: balance; }
+.tieu p { margin: 0; color: var(--chu-3); font-size: 14px; max-width: 72ch; }
+
+/* ── Trước | sau ── */
+.ts-luoi { display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.ts-cap { min-width: 0; display: grid; gap: 6px; padding: 10px 10px 8px; border-radius: 20px; background: var(--mat); border: 2px solid var(--vien); }
+.ts-cap h3 { margin: 0; display: grid; font-family: var(--f-hien); font-weight: 900; font-size: 15px; line-height: 1.2; }
+.ts-cap h3 span { font-family: var(--f-than); font-weight: 600; font-size: 11.5px; color: var(--chu-3); }
+.ts-cot { display: grid; gap: 4px; justify-items: center; min-width: 0; }
+.ts-n { padding: 0 8px; border-radius: 999px; font-family: var(--f-hien); font-weight: 800; font-size: 11px; line-height: 1.7; background: var(--mat-2); color: var(--chu-2); border: 1px solid var(--vien); }
+.ts-n-moi { background: var(--nhan-nhat); color: var(--nhan-chu); border-color: var(--nhan); }
+.ts-doi { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.ts-o { position: relative; width: 100%; min-width: 0; border-radius: 14px; overflow: hidden; aspect-ratio: 180 / 240; max-width: 100%; }
+.ts-cu { background-color: var(--anh-nen); background-image: url(data:image/jpeg;base64,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888888888qfLp4+888888888mdUcYXfL7l88888888j1hJIYl88888888oiDMCAAAAAC888888888txjzh3888888888dqzPs0ahtW8888888bBBBAEBBS8888888saAUD4TjTkC8888888/hxmxxP3888888888RABLqD0QEi8888888sxWeq0CFB3888888tB3DFFucoEw8888888CDDDDDDAy8888888pAAonwijhA68888885JFFtYaOrzf888888pf2zMenJ0KY888888+AB9JGCCCD7888888sJA0YLSCjAR888888+DLWciiCBOX888888pG28cX8SVzA8888881JCSkiBYgFB8888888KX7h6KIKAG8888888Dn0TFsmIBX888888vERNrQzwZqe888884mjCnaGSvCBA8888888rQgVHPS0Gd888888/DjJ3gsprC+8888889ABS/rRBeE8888887sCy86FP9jTY8888888oLAAAAAAD888888887DDAThRhP8APPPPPPPCAAIE8AAEvPPPPPPHQFOsrgwRhjPPPPPPPJtssBQBmnfPPPPPPPPACSRAwDnPPPPPPPL3+8rJEhxGPPPPPPPPPwoMDvepBfvPPPPPPIAhCq6agtvPPPPPPPL4kWbTARvPPPPPPPHf/UcctWf6fPPPPPPPOZSksIgnPPPPPPPPOCxnGtAjwnfPPPPPPPGAsx3pSgfPPPPPPPPf1mS3V2/+VPPPPPPPC1QdPeGufPPPPPPPKi0gFEyyQk/PPPPPPPAAjehAow3vPPPPPPlPEAo2tOf7/vPPPPPO6hiXqsSsv/PPPPPPLaQTi4KkQlvPPPPPPPCAhdgSywvPPPPPPPGbpnAhMnmYtfPPPPPKgUiRNQqwWPPPPPPPPKc07EShggPPPPPPPPO84Q2oiwnPPPPPPPLdaUSzgC6wP/PPPPPKQQUKTdgQbPPPPPPPPLwgE9aR68/PPPPPPPKTDAKAiot/PPPPPPPNYU+Ch6pslvPPPPPLYSnSSpf4/vPPPPPPPOziDBimEgHfPPPPPPKgggoArA3fPPPPPPPH4AMMFeSwC/PPPPPPSwb0eWYR/PPPPPPPPPPAFPgRwUPPPPPPPPKQggoAsEl/PPPPPPPCgAAAEPP2NvPPPPPPgQfkxyREdfPPPPPPPPPCAPQXfPPPPPPPPPDx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); background-size: 400% 100%; background-repeat: no-repeat; border: 1.5px solid var(--vien); }
+.ts-cu[data-i="0"] { background-position: 0% 0; } .ts-cu[data-i="1"] { background-position: 33.333% 0; } .ts-cu[data-i="2"] { background-position: 66.667% 0; } .ts-cu[data-i="3"] { background-position: 100% 0; }
+.ts-moi { background: radial-gradient(120% 80% at 50% 40%, var(--san-1) 0%, var(--san-1) 45%, var(--san-2) 100%); border: 1.5px solid var(--nhan); display: flex; align-items: flex-end; justify-content: center; }
+.ts-moi .gt { width: 116%; max-width: none; flex: none; margin-bottom: -1%; }
+.ts-ghi { margin: 2px 0 0; padding-left: 18px; color: var(--chu-2); font-size: 13.5px; display: grid; gap: 2px; max-width: 80ch; }
+@media (min-width: 820px) { .ts-luoi { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+/* ── Giám thị (hình vẽ) ── */
+.gt { position: relative; min-width: 0; aspect-ratio: 220 / 254; max-width: 100%; }
+.gt-tho { position: absolute; inset: 0; transform-origin: 50% 94%; animation: gt-tho var(--tho, 4s) ease-in-out var(--tre, 0s) infinite; }
+.gt[data-nghi] .gt-tho, .gt.gt-tinh .gt-tho { animation-play-state: paused; }
+.gt.gt-tinh .gt-tho { animation: none; }
+@keyframes gt-tho { 0%, 100% { transform: scale(1, 1); } 48% { transform: scale(.996, 1.013); } }
+.gt svg { display: block; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.gt .s-ao { stop-color: var(--ao); } .gt .s-ao-l { stop-color: var(--ao-l); } .gt .s-ao-s { stop-color: var(--ao-s); }
+.gt .s-da { stop-color: var(--da); } .gt .s-da-l { stop-color: var(--da-l); } .gt .s-da-s { stop-color: var(--da-s); }
+.gt .s-toc { stop-color: var(--toc); } .gt .s-toc-l { stop-color: var(--toc-l); } .gt .s-toc-s { stop-color: var(--toc-s); }
+.gt .s-ma { stop-color: var(--gt-ma); } .gt .s-tia { stop-color: var(--gt-tia); } .gt .s-bong { stop-color: var(--gt-bong); }
+.gt .f-ao { fill: var(--ao); } .gt .f-ao-l { fill: var(--ao-l); } .gt .f-ao-s { fill: var(--ao-s); } .gt .f-ao-d { fill: var(--ao-d); } .gt .f-ao2 { fill: var(--ao2); }
+.gt .f-da { fill: var(--da); } .gt .f-da-s { fill: var(--da-s); } .gt .f-toc { fill: var(--toc); } .gt .f-toc-s { fill: var(--toc-s); } .gt .f-toc-l { fill: var(--toc-l); }
+.gt .f-quan { fill: var(--quan); } .gt .f-giay { fill: var(--giay); } .gt .f-giay-s { fill: var(--giay-s); }
+.gt .f-tay { fill: var(--tay); } .gt .f-net { fill: var(--gt-net); } .gt .f-trang { fill: var(--gt-trang); } .gt .f-mieng { fill: var(--gt-mieng); } .gt .f-luoi { fill: var(--gt-luoi); }
+.gt .f-vang { fill: var(--gt-vang); } .gt .f-vang-s { fill: var(--gt-vang-s); } .gt .f-tia { fill: var(--gt-tia); } .gt .f-den { fill: var(--gt-den); } .gt .f-den-s { fill: var(--gt-den-s); }
+.gt .f-but { fill: var(--gt-but); } .gt .f-but-d { fill: var(--gt-but-d); } .gt .f-but-1 { fill: var(--gt-but-1); } .gt .f-but-2 { fill: var(--gt-but-2); }
+.gt .f-thuy { fill: var(--gt-thuy); fill-opacity: .92; } .gt .f-thuy-v { fill: var(--gt-thuy-v); } .gt .f-giay-to { fill: var(--gt-giay-to); }
+.gt .f-bia { fill: var(--gt-bia); } .gt .f-bia-s { fill: var(--gt-bia-s); } .gt .f-so { fill: var(--gt-so); } .gt .f-so-s { fill: var(--gt-so-s); } .gt .f-nut-ong { fill: var(--gt-nut-ong); }
+.gt .f-long { fill: var(--long); } .gt .f-long-l { fill: var(--long-l); }
+.gt .f-kinh-v { fill: var(--kinh-v); } .gt .f-kinh-t { fill: var(--kinh-t); } .gt .f-quai { fill: var(--quai); } .gt .f-bac { fill: var(--bac); } .gt .f-bang { fill: var(--bang); }
+.gt .f-tap { fill: var(--tap); } .gt .f-tap-l { fill: var(--tap-l); } .gt .f-tap-s { fill: var(--tap-s); } .gt .f-tay-s { fill: var(--tay-s); }
+.gt .f-bong { fill: var(--gt-bong); }
+.gt .n { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.gt .n-net { stroke: var(--gt-net); } .gt .n-trang { stroke: var(--gt-trang); } .gt .n-mieng { stroke: var(--gt-mieng-net); } .gt .n-may { stroke: var(--may); }
+.gt .n-ao { stroke: var(--ao); } .gt .n-ao-l { stroke: var(--ao-l); } .gt .n-ao-d { stroke: var(--ao-d); } .gt .n-tay-s { stroke: var(--tay-s); }
+.gt .n-toc-l { stroke: var(--toc-l); } .gt .n-toc-s { stroke: var(--toc-s); } .gt .n-quai { stroke: var(--quai); } .gt .n-gong { stroke: var(--gong); } .gt .n-kinh-v { stroke: var(--kinh-v); }
+.gt .n-vang { stroke: var(--gt-vang); } .gt .n-dong { stroke: var(--gt-dong); } .gt .n-ok { stroke: var(--gt-ok); } .gt .n-x { stroke: var(--gt-x); } .gt .n-tap { stroke: var(--tap); } .gt .n-so-s { stroke: var(--gt-so-s); }
+.gt[data-nv="nb"] { --ao: var(--nb-ao); --ao-l: var(--nb-ao-l); --ao-s: var(--nb-ao-s); --ao-d: var(--nb-ao-d); --ao2: var(--nb-ao2); --da: var(--nb-da); --da-l: var(--nb-da-l); --da-s: var(--nb-da-s); --toc: var(--nb-toc); --toc-l: var(--nb-toc-l); --toc-s: var(--nb-toc-s); --may: var(--nb-may); --quan: var(--nb-quan); --giay: var(--nb-giay); --giay-s: var(--nb-giay-s); --tay: var(--nb-da); --tay-s: var(--nb-da-s); --kinh-v: var(--nb-kinh-v); --kinh-t: var(--nb-kinh-t); --quai: var(--nb-quai); --long: var(--nb-long); --long-l: var(--nb-long-l); }
+.gt[data-nv="th"] { --ao: var(--th-ao); --ao-l: var(--th-ao-l); --ao-s: var(--th-ao-s); --ao-d: var(--th-ao-d); --ao2: var(--th-ao2); --da: var(--th-da); --da-l: var(--th-da-l); --da-s: var(--th-da-s); --toc: var(--th-toc); --toc-l: var(--th-toc-l); --toc-s: var(--th-toc-s); --may: var(--th-may); --quan: var(--th-quan); --giay: var(--th-giay); --giay-s: var(--th-giay-s); --tay: var(--th-da); --tay-s: var(--th-da-s); --gong: var(--th-gong); --bang: var(--th-bang); --long: var(--th-long); --long-l: var(--th-long-l); }
+.gt[data-nv="vd"] { --ao: var(--vd-ao); --ao-l: var(--vd-ao-l); --ao-s: var(--vd-ao-s); --ao-d: var(--vd-ao-d); --ao2: var(--vd-ao2); --da: var(--vd-da); --da-l: var(--vd-da-l); --da-s: var(--vd-da-s); --toc: var(--vd-toc); --toc-l: var(--vd-toc-l); --toc-s: var(--vd-toc-s); --may: var(--vd-may); --bac: var(--vd-bac); --quan: var(--vd-quan); --giay: var(--vd-giay); --giay-s: var(--vd-giay-s); --tay: var(--vd-gang); --tay-s: var(--vd-gang-s); --kinh-v: var(--vd-kinh-v); --kinh-t: var(--vd-kinh-t); --quai: var(--vd-quai); --tap: var(--vd-tap); --tap-l: var(--vd-tap-l); --tap-s: var(--vd-tap-s); }
+.gt[data-nv="vdc"] { --ao: var(--vdc-ao); --ao-l: var(--vdc-ao-l); --ao-s: var(--vdc-ao-s); --ao-d: var(--vdc-ao-d); --ao2: var(--vdc-ao2); --da: var(--vdc-da); --da-l: var(--vdc-da-l); --da-s: var(--vdc-da-s); --toc: var(--vdc-toc); --toc-l: var(--vdc-toc-l); --toc-s: var(--vdc-toc-s); --may: var(--vdc-may); --quan: var(--vdc-quan); --giay: var(--vdc-giay); --giay-s: var(--vdc-giay-s); --tay: var(--vdc-da); --tay-s: var(--vdc-da-s); --gong: var(--vdc-gong); }
+.gt .tay-but-g { fill: var(--vdc-tay-but); } .gt .tay-tay { fill: var(--vdc-tay-tay); }
+
+/* ── Bong bóng lời: ôm vừa chữ, màu theo tình huống ── */
+.loi-hop { position: absolute; left: 0; right: 0; display: flex; justify-content: center; pointer-events: none; z-index: 3; }
+.loi {
+  --bb-nen: var(--mat-2); --bb-vien: var(--vien-2); --bb-chu: var(--chu-2);
+  position: relative; width: fit-content; max-width: min(300px, 100%); padding: 7px 13px 8px; border-radius: 16px;
+  background: var(--bb-nen); border: 2px solid var(--bb-vien); box-shadow: 0 3px 0 var(--bb-vien); color: var(--bb-chu);
+  font-family: var(--f-hien); font-weight: 800; font-size: 15px; line-height: 1.3; text-align: center; text-wrap: balance;
+  transform-origin: var(--goc-x, 50%) 120%; opacity: 0; transform: scale(.6) translateY(8px);
+  transition: opacity .18s ease, transform .18s ease;
+}
+.loi::after {
+  content: ""; position: absolute; left: var(--duoi-x, 50%); bottom: -8px; width: 12px; height: 12px; margin-left: -6px;
+  background: var(--bb-nen); border-right: 2px solid var(--bb-vien); border-bottom: 2px solid var(--bb-vien); border-bottom-right-radius: 3px; transform: rotate(45deg);
+}
+.loi.bat { opacity: 1; transform: none; animation: loi-bat .4s cubic-bezier(.2, 1.5, .4, 1) both; }
+@keyframes loi-bat { 0% { transform: scale(.55) translateY(10px); opacity: 0; } 55% { opacity: 1; } 100% { transform: none; opacity: 1; } }
+.loi[data-cam="khen"] { --bb-nen: var(--dung-nhat); --bb-vien: var(--dung); --bb-chu: var(--dung-chu); }
+.loi[data-cam="chan"] { --bb-nen: var(--tim-nhat); --bb-vien: var(--tim); --bb-chu: var(--tim-chu); }
+.loi[data-cam="sai"] { --bb-nen: var(--cy-nhat); --bb-vien: var(--cy); --bb-chu: var(--cy-chu); }
+.loi[data-cam="doi"] { --bb-nen: var(--sai-nhat); --bb-vien: var(--sai); --bb-chu: var(--sai-chu); }
+.loi[data-cam="gian"] { --bb-nen: var(--gian-nen); --bb-vien: var(--gian-day); --bb-chu: var(--tren-gian); }
+.loi[data-cam="nghi"] { --bb-nen: var(--tin-nhat); --bb-vien: var(--tin); --bb-chu: var(--tin-chu); }
+
+/* ── Sân khấu + bảng thử ── */
+.bo { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); align-items: start; }
+.san {
+  position: relative; min-width: 0; overflow: hidden; border-radius: 28px; border: 2px solid var(--vien);
+  background: radial-gradient(120% 75% at 50% 52%, var(--san-1) 0%, var(--san-1) 40%, var(--san-2) 100%);
+  display: grid; justify-items: center; padding: 12px 12px 14px;
+}
+.san-de { position: absolute; right: 14px; top: 92px; width: 34%; max-width: 150px; display: grid; gap: 6px; opacity: .55; }
+.san-de i { display: block; height: 9px; border-radius: 6px; background: var(--mat-3); }
+.san-de i:nth-child(2) { width: 82%; } .san-de i:nth-child(3) { width: 64%; }
+.san-gt { position: relative; width: min(84%, 380px, max(230px, calc((100dvh - 360px) * .866))); margin-top: 92px; }
+.san-gt .loi-hop { bottom: calc(100% + 2px); left: -12%; right: -12%; }
+.san-cham { position: absolute; inset: 8% 22% 0; border-radius: 40%; border: 0; background: transparent; cursor: pointer; z-index: 2; }
+.san-cham:focus-visible { outline: 3px solid var(--nhan); outline-offset: 2px; }
+.duoi-san { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; margin-top: 4px; }
+.the-tt {
+  display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 4px 14px 4px 10px; border-radius: 999px;
+  background: var(--mat); border: 2px solid var(--vien); font-family: var(--f-hien); font-weight: 800; font-size: 14px; color: var(--chu);
+}
+.the-tt i { width: 10px; height: 10px; border-radius: 50%; background: var(--nhan); }
+.the-tt[data-loai="phan-ung"] i { background: var(--sao); } .the-tt[data-loai="thi"] i { background: var(--sai); }
+.goi-y { margin: 0; color: var(--chu-3); font-size: 13px; text-align: center; }
+.bang { min-width: 0; display: grid; gap: 14px; padding: 14px; border-radius: 24px; background: var(--mat); border: 2px solid var(--vien); }
+.muc { display: grid; gap: 8px; min-width: 0; }
+.nhan-muc { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin: 0; font-family: var(--f-hien); font-weight: 900; font-size: 12.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--chu-3); }
+.nhan-muc span { letter-spacing: 0; text-transform: none; font-weight: 600; font-family: var(--f-than); font-size: 12.5px; }
+.ds-nut { display: flex; flex-wrap: wrap; gap: 8px; }
+.nut {
+  display: inline-flex; align-items: center; gap: 7px; min-height: 44px; padding: 6px 13px; border-radius: 14px; cursor: pointer;
+  background: var(--mat); border: 2px solid var(--vien); border-bottom-width: 4px; color: var(--chu);
+  font-family: var(--f-hien); font-weight: 800; font-size: 14.5px; line-height: 1.15; text-align: left;
+  transition: background-color .15s, border-color .15s, transform .08s;
+}
+.nut:hover { background: var(--mat-2); }
+.nut:active { transform: translateY(2px); border-bottom-width: 2px; margin-bottom: 2px; }
+.nut:focus-visible, .the-nv:focus-visible, .pa:focus-visible, .nut-chinh:focus-visible, .cong-tac:focus-visible { outline: 3px solid var(--nhan); outline-offset: 2px; }
+.nut[aria-pressed="true"] { background: var(--nhan-nhat); border-color: var(--nhan); color: var(--nhan-chu); }
+.nut .cham { width: 10px; height: 10px; border-radius: 50%; flex: none; background: var(--c, var(--nhan)); }
+.nut.nho { min-height: 38px; padding: 4px 11px; font-size: 13.5px; border-radius: 12px; }
+.nut-pu { --c: var(--nhan); }
+.nut-pu[data-c="voi"] { --c: var(--sai); } .nut-pu[data-c="dung"] { --c: var(--dung); } .nut-pu[data-c="sai"] { --c: var(--cy); } .nut-pu[data-c="thi"] { --c: var(--sao); } .nut-pu[data-c="roi"] { --c: var(--gian-day); }
+.ds-ky { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; min-height: 30px; }
+.ds-ky li { padding: 2px 10px; border-radius: 999px; background: var(--mat-2); border: 1.5px solid var(--vien); font-size: 12.5px; color: var(--chu-2); font-weight: 600; }
+.ds-ky li:first-child { background: var(--nhan-nhat); border-color: var(--nhan); color: var(--nhan-chu); }
+.ds-ky li[data-loai="phan-ung"]:first-child { background: var(--sao-nhat); border-color: var(--sao); color: var(--sao-chu); }
+.chu-thich { margin: 0; color: var(--chu-3); font-size: 12.5px; }
+@media (min-width: 760px) {
+  .bo { grid-template-columns: minmax(0, 1fr) minmax(300px, 380px); }
+  .san { min-height: 100%; }
+}
+
+/* ── Bốn giám thị ── */
+.bon { display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.the-nv {
+  min-width: 0; display: grid; gap: 4px; justify-items: center; padding: 10px 8px 12px; border-radius: 22px; cursor: pointer; text-align: center;
+  background: var(--mat); border: 2px solid var(--vien); border-bottom-width: 4px;
+}
+.the-nv[aria-pressed="true"] { border-color: var(--nhan); background: var(--nhan-nhat); }
+.the-nv .gt { width: min(100%, 190px); }
+.the-nv strong { font-family: var(--f-hien); font-weight: 900; font-size: 16px; line-height: 1.2; }
+.the-nv .muc-c { display: inline-block; padding: 0 9px; border-radius: 999px; font-size: 11.5px; font-weight: 700; background: var(--mat-2); color: var(--chu-2); border: 1px solid var(--vien); }
+.the-nv small { color: var(--chu-3); font-size: 12.5px; line-height: 1.35; }
+@media (min-width: 820px) { .bon { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+/* ── Cảnh màn làm câu ── */
+.canh { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); align-items: start; }
+.dt {
+  position: relative; width: 100%; max-width: 400px; justify-self: center; min-width: 0; border-radius: 30px; border: 2px solid var(--vien);
+  background: var(--mat); padding: 14px 14px 0; display: grid; gap: 10px; overflow: hidden;
+}
+.dt-dau { display: flex; align-items: center; gap: 12px; }
+.dt-x { width: 22px; height: 22px; flex: none; color: var(--chu-3); }
+.dt-tien { flex: 1; height: 16px; border-radius: 999px; background: var(--mat-3); overflow: hidden; }
+.dt-tien i { display: block; height: 100%; width: var(--tien, 20%); border-radius: inherit; background: var(--dung); transition: width .4s ease; }
+.dt-nt { display: inline-flex; align-items: center; gap: 4px; font-family: var(--f-hien); font-weight: 900; color: var(--tin); font-size: 16px; }
+.dt-nt svg { width: 20px; height: 20px; }
+.dt-loai { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.dt-loai .c1 { font-family: var(--f-hien); font-weight: 900; font-size: 13.5px; color: var(--tin-chu); letter-spacing: .03em; text-transform: uppercase; }
+.dt-loai .c2 { padding: 1px 10px; border-radius: 999px; background: var(--mat-2); color: var(--chu-2); font-size: 12.5px; font-weight: 600; }
+.dt-tieu { margin: 0; font-family: var(--f-hien); font-weight: 900; font-size: 21px; line-height: 1.2; }
+.dt-loi { position: relative; min-height: 50px; display: flex; align-items: flex-end; }
+.dt-loi .loi { --goc-x: 14%; --duoi-x: 44px; max-width: 100%; font-size: 14px; }
+.dt-san { display: grid; grid-template-columns: 30% minmax(0, 1fr); gap: 4px; align-items: start; }
+.dt-nv { position: relative; z-index: 2; margin-top: -6px; margin-left: -10%; width: 125%; }
+.dt-bong { position: relative; min-width: 0; padding: 11px 13px; border: 2px solid var(--vien); border-radius: 18px; background: var(--mat); font-size: 15px; line-height: 1.45; }
+.dt-bong::before { content: ""; position: absolute; left: -8px; top: 34px; width: 13px; height: 13px; background: var(--mat); border-left: 2px solid var(--vien); border-bottom: 2px solid var(--vien); border-bottom-left-radius: 4px; transform: rotate(45deg); }
+.dt-bong b { color: var(--tin-chu); }
+.dt-pa { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.pa {
+  display: flex; align-items: center; gap: 10px; min-height: 58px; padding: 8px 10px; border-radius: 16px; cursor: pointer; text-align: left;
+  background: var(--mat); border: 2px solid var(--vien); border-bottom-width: 4px; font-family: var(--f-hien); font-weight: 800; font-size: 17px; color: var(--chu); min-width: 0;
+}
+.pa span:first-child { flex: none; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; border: 2px solid var(--vien); font-size: 13px; color: var(--chu-3); }
+.pa span:last-child { min-width: 0; overflow-wrap: anywhere; }
+.pa[aria-checked="true"] { background: var(--tin-nhat); border-color: var(--tin); color: var(--tin-chu); }
+.pa[aria-checked="true"] span:first-child { border-color: var(--tin); color: var(--tin-chu); }
+.pa[data-kq="dung"] { background: var(--dung-nhat); border-color: var(--dung); color: var(--dung-chu); }
+.pa[data-kq="sai"] { background: var(--sai-nhat); border-color: var(--sai); color: var(--sai-chu); }
+.pa:disabled { cursor: default; }
+.dt-day { margin: 4px -14px 0; padding: 12px 14px 16px; border-top: 2px solid var(--vien); display: grid; gap: 8px; background: var(--mat); transition: background-color .25s; }
+.dt-day[data-kq="dung"] { background: var(--dung-nhat); border-color: var(--dung-nhat); }
+.dt-day[data-kq="sai"] { background: var(--sai-nhat); border-color: var(--sai-nhat); }
+.dt-kq { margin: 0; font-family: var(--f-hien); font-weight: 900; font-size: 18px; }
+.dt-day[data-kq="dung"] .dt-kq { color: var(--dung-chu); } .dt-day[data-kq="sai"] .dt-kq { color: var(--sai-chu); }
+.nut-chinh {
+  min-height: 50px; border-radius: 16px; cursor: pointer; border: 0; border-bottom: 4px solid var(--nhan-day); background: var(--nhan); color: var(--tren-nhan);
+  font-family: var(--f-hien); font-weight: 900; font-size: 16px; letter-spacing: .06em; text-transform: uppercase;
+}
+.nut-chinh:disabled { background: var(--mat-3); border-color: var(--vien-2); color: var(--chu-3); cursor: default; }
+.dt-day[data-kq="dung"] .nut-chinh { background: var(--dung-nut); border-color: var(--dung-day); }
+.dt-day[data-kq="sai"] .nut-chinh { background: var(--sai); border-color: var(--sai-day); }
+.dt-thi-ghi { margin: 0; font-size: 13px; color: var(--chu-3); text-align: center; }
+.cong-tac { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 4px 12px 4px 6px; border-radius: 999px; cursor: pointer; background: var(--mat); border: 2px solid var(--vien); font-family: var(--f-hien); font-weight: 800; font-size: 14px; }
+.cong-tac i { position: relative; width: 38px; height: 22px; border-radius: 999px; background: var(--mat-3); transition: background-color .2s; }
+.cong-tac i::after { content: ""; position: absolute; left: 3px; top: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--mat); transition: transform .2s; }
+.cong-tac[aria-checked="true"] i { background: var(--sao); }
+.cong-tac[aria-checked="true"] i::after { transform: translateX(16px); }
+.canh-ghi { display: grid; gap: 10px; min-width: 0; align-content: start; }
+.canh-ghi ul { margin: 0; padding-left: 18px; color: var(--chu-2); font-size: 14px; display: grid; gap: 4px; }
+@media (min-width: 820px) { .canh { grid-template-columns: minmax(0, 400px) minmax(0, 1fr); } }
+
+/* ── Câu ↔ tình huống (nhỏ, gọn) ── */
+details.gan { border-radius: 18px; background: var(--mat); border: 2px solid var(--vien); padding: 10px 14px; }
+details.gan summary { cursor: pointer; font-family: var(--f-hien); font-weight: 900; font-size: 14.5px; }
+details.gan summary:focus-visible { outline: 3px solid var(--nhan); outline-offset: 2px; border-radius: 6px; }
+.bang-cuon { overflow-x: auto; margin-top: 8px; }
+.bang-cuon table { width: 100%; min-width: 520px; border-collapse: collapse; font-size: 12.5px; }
+.bang-cuon th, .bang-cuon td { text-align: left; vertical-align: top; padding: 6px 8px; border-top: 1px solid var(--vien); }
+.bang-cuon th { font-family: var(--f-hien); font-weight: 900; color: var(--chu-3); font-size: 11.5px; letter-spacing: .05em; text-transform: uppercase; border-top: 0; }
+.bang-cuon td:first-child { font-weight: 700; white-space: nowrap; }
+.bang-cuon .thay { color: var(--nhan-chu); font-weight: 600; }
+.cuoi { margin: 0; color: var(--chu-3); font-size: 12.5px; text-align: center; }
+
+@media (prefers-reduced-motion: reduce) {
+  .gt-tho { animation: none; }
+  .loi, .loi.bat { animation: none; transition: opacity .2s; transform: none; }
+  .dt-tien i, .cong-tac i, .cong-tac i::after { transition: none; }
+}
+</style>
+
+<div class="khung">
+  <header class="dau">
+    <p class="mat-nhan">Bản vẽ duyệt · Giám thị cạnh đề</p>
+    <h1>Giám thị sống động</h1>
+    <p>Vẽ lại bốn giám thị của màn làm câu bằng vector: đầu to, mắt to có đốm sáng, khối bo tròn, bóng đổ mềm, cùng nét với Mol. Mỗi người tự chọn động tác nhàn rỗi ngẫu nhiên, phản ứng theo thao tác của em, và nói câu của thầy đúng tình huống.</p>
+  </header>
+
+  <section aria-labelledby="ts-tieu">
+    <div class="tieu"><h2 id="ts-tieu">Hiện tại | Bản mới</h2><p>Cùng bốn người, cùng màu áo, cùng kính và đạo cụ. Bên trái là ảnh chụp app đang chạy (02/11), bên phải là bản vẽ mới ở dáng đứng yên.</p></div>
+    <div class="ts-luoi" id="ts-luoi"></div>
+    <ul class="ts-ghi">
+      <li>Đầu chiếm hơn nửa chiều cao, mắt to gấp rưỡi, con ngươi có hai đốm sáng, má hồng mờ.</li>
+      <li>Khối bo tròn, đổ bóng mềm bằng chuyển sắc nhẹ; bỏ bớt chi tiết vụn ở tay, áo, chân.</li>
+      <li>Giữ nhận diện: Tí kính bảo hộ trên trán, Cô Cốc kính tròn và búi tóc, Chú Tam kính ôm mắt và tạp dề cam, Giáo sư Kíp kính nửa vầng trăng và búi tóc bạc cài bút chì.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="san-tieu">
+    <div class="tieu"><h2 id="san-tieu">Sân khấu</h2><p>Để yên vài giây: giám thị tự chớp mắt, thở, đảo mắt, đẩy kính, lắc ống nghiệm… không lặp lại theo nhịp cố định. Di chuột hoặc chạm vào khung để mắt dõi theo tay.</p></div>
+    <div class="bo">
+      <div class="san" id="san">
+        <div class="san-de" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="san-gt">
+          <div class="loi-hop"><div class="loi" id="san-loi" role="status" aria-live="polite"></div></div>
+          <div class="gt" id="san-nv"></div>
+          <button class="san-cham" id="san-cham" type="button" aria-label="Chọc giám thị"></button>
+        </div>
+        <div class="duoi-san">
+          <span class="the-tt" id="san-tt" data-loai="nhan-roi"><i></i><span id="san-tt-chu">Đứng yên</span></span>
+        </div>
+        <p class="goi-y">Bóng lời chỉ hiện khi có tình huống, không nói liên tục.</p>
+      </div>
+      <div class="bang">
+        <div class="muc">
+          <p class="nhan-muc">Giám thị <span id="san-ten">Cô Cốc · Thông hiểu</span></p>
+          <div class="ds-nut" id="chon-nv" role="group" aria-label="Chọn giám thị"></div>
+        </div>
+        <div class="muc">
+          <p class="nhan-muc">Thử phản ứng <span>có câu nói kèm</span></p>
+          <div class="ds-nut" role="group" aria-label="Phản ứng">
+            <button class="nut nut-pu" id="pu-chon" type="button" data-pu="chon"><span class="cham"></span>Chọn đáp án</button>
+            <button class="nut nut-pu" id="pu-voi" type="button" data-pu="voi" data-c="voi"><span class="cham"></span>Chọn vội</button>
+            <button class="nut nut-pu" id="pu-dung" type="button" data-pu="dung" data-c="dung"><span class="cham"></span>Đúng</button>
+            <button class="nut nut-pu" id="pu-dung-lien" type="button" data-pu="dungLien" data-c="dung"><span class="cham"></span>Đúng liền</button>
+            <button class="nut nut-pu" id="pu-sai" type="button" data-pu="sai" data-c="sai"><span class="cham"></span>Sai</button>
+            <button class="nut nut-pu" id="pu-sai-lien" type="button" data-pu="saiLien" data-c="voi"><span class="cham"></span>Sai liên tiếp</button>
+            <button class="nut nut-pu" id="pu-thi" type="button" data-pu="thi" data-c="thi" aria-pressed="false"><span class="cham"></span>Lúc thi soi đèn</button>
+            <button class="nut nut-pu" id="pu-roi" type="button" data-pu="roi" data-c="roi"><span class="cham"></span>Rời màn lúc thi</button>
+          </div>
+        </div>
+        <div class="muc">
+          <p class="nhan-muc">Động tác nhàn rỗi <span>bấm để xem ngay</span></p>
+          <div class="ds-nut" id="ds-nr"></div>
+        </div>
+        <div class="muc">
+          <p class="nhan-muc">Nhịp <span>khoảng nghỉ giữa hai động tác</span></p>
+          <div class="ds-nut" role="group" aria-label="Nhịp động tác">
+            <button class="nut nho" id="nhip-that" type="button" aria-pressed="true">Như thật</button>
+            <button class="nut nho" id="nhip-nhanh" type="button" aria-pressed="false">Nhanh ×3 để xem</button>
+          </div>
+        </div>
+        <div class="muc">
+          <p class="nhan-muc">Vừa diễn <span>mới nhất trước</span></p>
+          <ol class="ds-ky" id="nhat-ky" aria-live="off"></ol>
+          <p class="chu-thich">Mỗi lần chọn ngẫu nhiên có trọng số theo tính cách, không lặp liền động tác vừa diễn. Chớp mắt chạy riêng, thỉnh thoảng chớp đôi.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="bon-tieu">
+    <div class="tieu"><h2 id="bon-tieu">Bốn giám thị cạnh nhau</h2><p>Mỗi người một nhịp và một bộ động tác riêng. Bấm vào thẻ để đưa lên sân khấu.</p></div>
+    <div class="bon" id="bon"></div>
+  </section>
+
+  <section aria-labelledby="canh-tieu">
+    <div class="tieu"><h2 id="canh-tieu">Trong màn làm câu</h2><p>Làm thử ba câu thật. Giám thị liếc theo ô em chọn, gật đầu khi đúng, nhíu mày chỉ vào đề khi sai. Bật «Lúc thi» để xem đèn pha quét các phương án.</p></div>
+    <div class="canh">
+      <div class="dt" id="dt">
+        <div class="dt-dau">
+          <svg class="dt-x" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>
+          <div class="dt-tien" aria-hidden="true"><i id="dt-tien"></i></div>
+          <span class="dt-nt"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="12" rx="10" ry="4.2"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(-60 12 12)"/></g><circle cx="12" cy="12" r="2" fill="currentColor"/></svg><span id="dt-diem">10</span></span>
+        </div>
+        <div class="dt-loai"><span class="c1">Trắc nghiệm</span><span class="c2">Hợp chất chứa nitrogen</span></div>
+        <p class="dt-tieu" id="dt-tieu">Chọn đáp án đúng</p>
+        <div class="dt-loi"><div class="loi" id="dt-loi" role="status" aria-live="polite"></div></div>
+        <div class="dt-san">
+          <div class="dt-nv"><div class="gt" id="dt-nv"></div></div>
+          <div class="dt-bong" id="dt-de"></div>
+        </div>
+        <div class="dt-pa" id="dt-pa" role="radiogroup" aria-label="Phương án"></div>
+        <div class="dt-day" id="dt-day">
+          <p class="dt-kq" id="dt-kq" hidden></p>
+          <p class="dt-thi-ghi" id="dt-thi-ghi" hidden>Lúc thi giám thị không biết đáp án, chỉ soi ô em vừa chạm và giữ im lặng.</p>
+          <button class="nut-chinh" id="dt-nut" type="button" disabled>Kiểm tra</button>
+        </div>
+      </div>
+      <div class="canh-ghi">
+        <div class="ds-nut">
+          <button class="cong-tac" id="dt-thi" type="button" role="switch" aria-checked="false"><i></i>Lúc thi</button>
+        </div>
+        <ul>
+          <li>Bấm Kiểm tra trong 4 giây đầu ⇒ giám thị coi là chọn vội.</li>
+          <li>Sai hai câu liền ⇒ nhíu mày rõ hơn, nói câu về học đối phó.</li>
+          <li>Bóng lời có nhịp nghỉ: nói xong thì nghỉ một, hai lượt mới nói tiếp (riêng sai liên tiếp và rời màn lúc thi luôn nói).</li>
+          <li>Lúc thi: im lặng. Chỉ khi em rời màn rồi quay lại mới nói một câu, gọn.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <details class="gan" id="gan">
+    <summary>Câu nói gán theo tình huống</summary>
+    <div class="bang-cuon"><table id="bang-gan"><thead><tr><th>Tình huống</th><th>Động tác</th><th>Câu (xoay vòng, không lặp liền)</th></tr></thead><tbody></tbody></table></div>
+  </details>
+
+  <p class="cuoi">Bản vẽ để duyệt — sau khi chốt sẽ đưa vào app, nhẹ, chạy được trên máy yếu</p>
+</div>
+
+<script>
+(() => {
+'use strict'
+// ───────────────── tiện ích ─────────────────
+const rand = (a, b) => a + Math.random() * (b - a)
+const randI = (a, b) => Math.floor(rand(a, b + 1))
+const kep = (v, a, b) => Math.max(a, Math.min(b, v))
+const f = (v) => (Math.round(v * 100) / 100).toString()
+const f3 = (v) => (Math.round(v * 1000) / 1000).toString()
+const HUY = Symbol('huy')
+const giamMQ = matchMedia('(prefers-reduced-motion: reduce)')
+let soU = 0
+let lanBam = performance.now()
+let NHANH = 1
+const chonTS = (ds) => { let t = 0; for (const [, w] of ds) t += w; let r = Math.random() * t; for (const [k, w] of ds) { r -= w; if (r <= 0) return k } return ds[ds.length - 1][0] }
+const tron = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]] } return a }
+
+// Khung SVG GIỐNG app (-110 -240 220 254) để khi đưa vào app không đổi bố cục bong bóng chữ L; người vẽ trong nhóm thu 0,93.
+const VB = { x: -110, y: -240, w: 220, h: 254 }, TL = 0.93
+const MAT_Y = -147, MAT_X = 21
+
+// ───────────────── 4 GIÁM THỊ ─────────────────
+const NV = {
+  nb: { ten: 'Tí', muc: 'Nhận biết', vai: 'Trợ giảng trẻ · hiền, nghiêm nhẹ', lid: 0, ma0: -2, mieng: 'cuoi', miengY: -121, mayY: -171, nhip: .85, kinh: 'tran', vat: 'binh',
+    nhanRoi: { nhinDe: 3, daoMat: 2.6, nghieng: 3, lac: 3, kinh: 1.6, nhun: 2.2, ngap: 1.2 } },
+  th: { ten: 'Cô Cốc', muc: 'Thông hiểu', vai: 'Nghiên cứu sinh · chỉn chu, đeo kính', lid: .06, ma0: 0, mieng: 'cuoi', miengY: -121, mayY: -172, nhip: 1, kinh: 'tron', vat: 'ong',
+    nhanRoi: { nhinDe: 3.4, daoMat: 2, nghieng: 2, lac: 2.6, kinh: 2.8, nheo: .7, ngap: 1 } },
+  vd: { ten: 'Chú Tam', muc: 'Vận dụng', vai: 'Kĩ thuật viên · kĩ tính, bảng kẹp', lid: .14, ma0: 3, mieng: 'phang', miengY: -114, mayY: -175, nhip: 1.1, kinh: 'om', vat: 'kep', gang: true,
+    nhanRoi: { nhinDe: 3, daoMat: 2, nghieng: 1.2, goBut: 3.2, kinh: 2, nheo: 1.2, ngap: 1 } },
+  vdc: { ten: 'Giáo sư Kíp', muc: 'Vận dụng cao', vai: 'Giáo sư · khó tính nhất', lid: .3, ma0: 4, mieng: 'phang', miengY: -120, mayY: -172, nhip: 1.25, kinh: 'trang', vat: 'so',
+    nhanRoi: { nhinDe: 3, daoMat: 1.4, nghieng: 1, goBut: 2.6, kinh: 3, nheo: 2.4, ngap: .8 } },
+}
+const THU_TU = ['nb', 'th', 'vd', 'vdc']
+const TEN_DT = (k, t) => ({
+  nhinDe: 'Nhìn sang đề', daoMat: 'Đảo mắt', nghieng: 'Nghiêng đầu', nhun: 'Nhún chân', ngap: 'Ngáp nhẹ', nheo: 'Nheo mắt soi',
+  lac: k === 'nb' ? 'Lắc bình tam giác' : 'Lắc ống nghiệm',
+  kinh: k === 'nb' ? 'Nhướng mày, kính nhảy' : 'Đẩy kính lên',
+  goBut: k === 'vd' ? 'Gõ bút vào bảng kẹp' : 'Gõ bút vào sổ',
+})[t] || t
+
+// ───────────────── CÂU NÓI ─────────────────
+// Câu của thầy: src/lib/loi-mol.ts (origin/main) · lời giám thị: src/components/giam-thi/loi-giam-thi.ts. Nguyên văn.
+const THAY = {
+  doiPho: ['Ơ, lại vội rồi đấy.', 'Bực thật đấy! Lại đối phó.', 'Không biết học đối phó có lợi ích gì?', 'Nhét data vào đầu đi, thầy ăn cơm em không thể no được.'],
+  sai: ['Học thật, nỗ lực thật thì kết quả mới thật được.', 'Em không thể trồng cây chuối mà lại ra quả bưởi được.', 'Để học giỏi Hoá cần 2 điều kiện: hiểu tiếng Việt và giỏi toán lớp 4.'],
+  chanNgon: ['Tập trung vào quá trình, kết quả là tất yếu.', 'Cái gì nhận ra được thì không phải là ta.', 'Lòng biết ơn là nguyên lý của sự giàu có.', 'Năng lực của tình yêu là chữa lành và nuôi lớn.', 'Luôn phải thật khiêm hạ. Luôn phải thật xứng đáng.'],
+  thiRoi: ['Mất công học thì học thật đi!', 'Tại sao phải đối phó với một giáo viên top 3 miền Bắc dạy Hoá?'],
+}
+const GT_LOI = {
+  nb: { voi: ['Bấm nhanh thế, đã đọc đề chưa?', 'Từ từ, đọc đề đã nào.'], sai2: ['Làm nên trò trống gì không đây?', 'Hai câu liền rồi, chậm lại nào.'], sai: ['Học với hành!', 'Ôi, câu dễ thế mà.', 'Đọc lại lí thuyết nhé.'], dung: ['Giỏi!', 'Đúng rồi, cứ thế!', 'Chuẩn!'], combo: ['Giỏi lắm, giữ nhịp nhé!'], cho: ['Còn ngồi nghĩ à?', 'Câu này dễ mà, chọn đi em.'] },
+  th: { voi: ['Bấm nhanh thế, đã đọc đề chưa?', 'Chưa hiểu đã chọn à?'], sai2: ['Làm nên trò trống gì không đây?', 'Hai câu rồi. Ôn lại lí thuyết đi.'], sai: ['Hừ. Học với hành!', 'Thuộc mà chưa hiểu rồi.', 'Xem lại bản chất đi em.'], dung: ['Được, hiểu đúng bản chất.', 'Tốt.', 'Đúng. Nhớ lí do nhé.'], combo: ['Ừ, khá đấy.'], cho: ['Còn ngồi nghĩ à?', 'Nghĩ lâu quá, bản chất là gì?'] },
+  vd: { voi: ['Bấm nhanh thế, đã đọc đề chưa?', 'Chưa tính xong đã bấm?'], sai2: ['Làm nên trò trống gì không đây?', 'Hai câu liền. Chú ghi sổ đấy.'], sai: ['Hừ. Học với hành!', 'Sai phép tính rồi.', 'Ẩu quá. Tính lại đi.'], dung: ['Được. Tích một cái.', 'Đúng. Làm thế là chắc.'], combo: ['Khá. Giữ tay cho chắc.'], cho: ['Còn ngồi nghĩ à?', 'Tính đến đâu rồi?'] },
+  vdc: { voi: ['Bấm nhanh thế, đã đọc đề chưa?', 'Câu này mà bấm vội à?'], sai2: ['Làm nên trò trống gì không đây?'], sai: ['Hừ. Học với hành!', 'Ta ghi sổ rồi đấy.', 'Thiếu một trường hợp.'], dung: ['Được. Lần này tạm chấp nhận.', 'Hừm. Không tệ.'], combo: ['Khá. Ta bắt đầu để ý em rồi.'], cho: ['Còn ngồi nghĩ à?', 'Hừ. Nghĩ ra chưa?'] },
+}
+// Tình huống → kho câu (câu thầy trước, xen lời giám thị) + màu bóng lời
+const GAN = {
+  voi: { ten: 'Chọn vội · làm cho xong', dong: 'Liếc nghi ngờ ô vừa chọn, nhíu mày, chỉ vào đề', cam: 'doi', thay: () => THAY.doiPho, gt: (k) => GT_LOI[k].voi },
+  saiLien: { ten: 'Sai liên tiếp', dong: 'Nhíu mày rõ, lắc đầu, chỉ vào đề (Chú Tam, Giáo sư Kíp ghi sổ)', cam: 'doi', thay: () => THAY.doiPho, gt: (k) => GT_LOI[k].sai2 },
+  sai: { ten: 'Sai một câu', dong: 'Nhíu mày nhẹ, chỉ vào đề', cam: 'sai', thay: () => THAY.sai, gt: (k) => GT_LOI[k].sai },
+  dung: { ten: 'Đúng', dong: 'Gật đầu, giơ ngón cái', cam: 'khen', thay: () => [], gt: (k) => GT_LOI[k].dung },
+  dungLien: { ten: 'Đúng liền · tiến bộ', dong: 'Nhún bật, giơ ngón cái, gật đầu, lấp lánh', cam: 'khen', thay: () => [], gt: (k) => [...GT_LOI[k].combo, ...GT_LOI[k].dung] },
+  thiRoi: { ten: 'Lúc thi · rời màn rồi quay lại', dong: 'Hạ đèn về phía em, nheo mắt; nói một câu rồi im', cam: 'gian', thay: () => THAY.thiRoi, gt: () => [] },
+  cho: { ten: 'Lâu không thao tác', dong: 'Ngáp nhẹ', cam: 'nghi', thay: () => [], gt: (k) => GT_LOI[k].cho },
+}
+class XoayVong {
+  constructor(thay, gt) { this.thay = thay; this.gt = gt; this.bo = []; this.truoc = null; this.dau = true }
+  lay() {
+    if (!this.bo.length) {
+      const a = tron(this.thay.slice()), b = tron(this.gt.slice()), bo = []
+      // xen kẽ, câu của thầy nhiều hơn; lượt đầu luôn mở bằng câu của thầy
+      while (a.length || b.length) { if (a.length) bo.push(a.pop()); if (a.length && Math.random() < .5) bo.push(a.pop()); if (b.length) bo.push(b.pop()) }
+      if (!this.dau && bo.length > 1 && bo[0] === this.truoc) bo.push(bo.shift())
+      this.bo = bo; this.dau = false
+    }
+    return (this.truoc = this.bo.shift())
+  }
+}
+const KHO = new Map()
+const khoCua = (k, th) => { const key = k + ':' + th; if (!KHO.has(key)) KHO.set(key, new XoayVong(GAN[th].thay(), GAN[th].gt(k))); return KHO.get(key) }
+const KHO_CHAN = new XoayVong(THAY.chanNgon, [])
+let demKhen = 0, chanTruoc = false
+function chonCau(k, th) {
+  if (th === 'dung' || th === 'dungLien') {
+    // chân ngôn ~1/3 lượt khen: không hai lượt liền, không quá hai lượt khen ngắn liền nhau
+    const p = th === 'dungLien' ? .5 : .33
+    const chan = !chanTruoc && (demKhen >= 2 || Math.random() < p)
+    chanTruoc = chan
+    if (chan) { demKhen = 0; return { chu: KHO_CHAN.lay(), cam: 'chan' } }
+    demKhen++
+    return { chu: khoCua(k, th).lay(), cam: 'khen' }
+  }
+  return { chu: khoCua(k, th).lay(), cam: GAN[th].cam }
+}
+class BongLoi {
+  constructor(el, o = {}) { this.el = el; this.nhip = !!o.nhip; this.nghi = 0; this.hen = 0; this.lanCuoi = -1e9 }
+  noi(k, th, luon) {
+    const now = performance.now()
+    if (!luon && this.nhip && th !== 'saiLien' && th !== 'thiRoi') {
+      if (this.nghi > 0 || now - this.lanCuoi < 5000) { this.nghi = Math.max(0, this.nghi - 1); return null }
+    }
+    const c = chonCau(k, th)
+    this.hien(c.chu, c.cam)
+    this.nghi = randI(1, 2); this.lanCuoi = now
+    return c
+  }
+  hien(chu, cam) {
+    const el = this.el
+    clearTimeout(this.hen)
+    el.classList.remove('bat'); void el.offsetWidth
+    el.textContent = chu; el.dataset.cam = cam
+    el.classList.add('bat')
+    this.hen = setTimeout(() => el.classList.remove('bat'), kep(1700 + chu.length * 50, 2300, 5200))
+  }
+  an() { clearTimeout(this.hen); this.el.classList.remove('bat') }
+}
+
+// ───────────────── HÌNH VẼ ─────────────────
+const DAU = 'M0,-206 C39,-206 61,-188 61,-153 C61,-120 42,-98 0,-98 C-42,-98 -61,-120 -61,-153 C-61,-188 -39,-206 0,-206Z'
+const SAO = 'M0,-9 Q1.7,-1.7 9,0 Q1.7,1.7 0,9 Q-1.7,1.7 -9,0 Q-1.7,-1.7 0,-9Z'
+function veNV(k, u) {
+  const n = NV[k]
+  const giay = (s) => `<g transform="translate(${s * 11.5} 0) scale(${s} 1)"><path d="M-9,-11.5 C-3,-13 6,-11.5 10.5,-6.5 C13,-3.5 12.5,0 9.5,0 L-9,0 C-11.5,0 -12.5,-2 -12.5,-4.8 C-12.5,-8.4 -11.3,-10.8 -9,-11.5Z" class="f-giay"/><path d="M-12.5,-3.4 L12.6,-3.4 C12.3,-1.2 11.2,0 9.5,0 L-9,0 C-11.2,0 -12.4,-1.2 -12.5,-3.4Z" class="f-giay-s"/><ellipse cx="2" cy="-9" rx="4" ry="1.6" class="f-trang" opacity=".45"/></g>`
+  const ao = (hem) => `
+    <path d="M-25,-104 C-34,-104 -39,-98 -40,-89 L-45,${hem - 9} C-46,${hem - 3} -42,${hem} -35,${hem} L35,${hem} C42,${hem} 46,${hem - 3} 45,${hem - 9} L40,-89 C39,-98 34,-104 25,-104Z" fill="url(#${u}ao)"/>
+    <path d="M27,-103 C35,-102 39,-97 40,-89 L45,${hem - 9} C46,${hem - 3} 42,${hem} 35,${hem} L30,${hem} L33.5,-88 C33.5,-96 31,-101 27,-103Z" class="f-ao-s" opacity=".5"/>`
+  const ve = (hem) => `
+    <path d="M-12.5,-105 L0,-79 L12.5,-105Z" class="f-ao2"/>
+    <path d="M-14.5,-105 L-1,-75 L-4.5,-58 L-22,-89 C-21,-97 -18.5,-103 -14.5,-105Z" class="f-ao-l"/>
+    <path d="M14.5,-105 L1,-75 L4.5,-58 L22,-89 C21,-97 18.5,-103 14.5,-105Z" class="f-ao-l" opacity=".8"/>
+    <path d="M0,-70 L0,${hem - 1}" class="n n-ao-d" stroke-width="2"/>
+    <circle cx="-5.5" cy="-50" r="2.3" class="f-ao-d"/><circle cx="-5.5" cy="-35" r="2.3" class="f-ao-d"/>
+    <rect x="18.5" y="-72" width="3.6" height="11" rx="1.8" class="f-but-1"/><rect x="23.6" y="-70" width="3.6" height="9" rx="1.8" class="f-but-2"/>
+    <rect x="15" y="-64" width="16" height="12" rx="3.5" class="f-ao-d" opacity=".6"/>`
+  let than = '', tocSau = '', toc = '', kinh = '', ria = '', vat = '', them = ''
+  if (k === 'nb') {
+    than = ao(-21) + ve(-21)
+    toc = `<path d="M-62,-146 C-67,-190 -37,-214 2,-214 C42,-214 67,-191 62,-148 C59,-160 52,-168 42,-172 C30,-180 12,-176 -2,-180 C-18,-184 -40,-178 -52,-163 C-57,-158 -60,-152 -62,-146Z" fill="url(#${u}toc)"/>
+      <path d="M-6,-211 C-3,-229 18,-238 35,-228 C27,-226 23,-222 21,-216 C31,-220 42,-215 46,-206 C30,-210 14,-209 -6,-211Z" class="f-toc"/>
+      <path d="M-40,-196 Q-25,-207 -8,-208" class="n n-toc-l" stroke-width="4" opacity=".8"/>`
+    kinh = `<path d="M-61,-178 Q0,-200 61,-178" class="n n-quai" stroke-width="7"/>
+      <g transform="translate(-16 -190)"><rect x="-14" y="-10.5" width="28" height="21" rx="9.5" class="f-kinh-v"/><rect x="-10" y="-6.8" width="20" height="13.6" rx="6.4" class="f-kinh-t"/><path d="M-5.5,-3 L-1,-3" class="n n-trang" stroke-width="2.6"/></g>
+      <g transform="translate(16 -190)"><rect x="-14" y="-10.5" width="28" height="21" rx="9.5" class="f-kinh-v"/><rect x="-10" y="-6.8" width="20" height="13.6" rx="6.4" class="f-kinh-t"/><path d="M-5.5,-3 L-1,-3" class="n n-trang" stroke-width="2.6"/></g>
+      <rect x="-4" y="-193" width="8" height="6" rx="3" class="f-kinh-v"/>`
+    vat = `<path d="M-5,-12 L-5,2 L-19.5,25 C-21.5,29 -18.5,33 -14,33 L14,33 C18.5,33 21.5,29 19.5,25 L5,2 L5,-12Z" class="f-thuy"/>
+      <g clip-path="url(#${u}vat)"><g data-k="song"><path d="M-34,16 Q-17,13 0,16 Q17,19 34,16 L34,44 L-34,44Z" class="f-long"/><circle cx="-6" cy="26" r="2.1" class="f-long-l"/><circle cx="5" cy="22" r="1.4" class="f-long-l"/><circle cx="9" cy="28" r="1.1" class="f-long-l"/></g></g>
+      <path d="M-12,27 L-4,9" class="n n-trang" stroke-width="2.6" opacity=".8"/>
+      <rect x="-7.5" y="-16" width="15" height="5.5" rx="2.75" class="f-thuy-v"/>`
+    them = `<clipPath id="${u}vat"><path d="M-5,-12 L-5,2 L-19.5,25 C-21.5,29 -18.5,33 -14,33 L14,33 C18.5,33 21.5,29 19.5,25 L5,2 L5,-12Z"/></clipPath>`
+  } else if (k === 'th') {
+    than = ao(-14) + ve(-14)
+    tocSau = `<circle cx="0" cy="-219" r="21" fill="url(#${u}toc)"/><path d="M-11,-230 Q-4,-236 5,-235" class="n n-toc-l" stroke-width="3.4" opacity=".9"/>
+      <rect x="-16" y="-204" width="32" height="9" rx="4.5" class="f-bang"/><rect x="-11" y="-202.5" width="12" height="2.6" rx="1.3" class="f-trang" opacity=".5"/>`
+    toc = `<path d="M-63,-144 C-67,-192 -35,-212 0,-212 C35,-212 67,-192 63,-144 C59,-160 51,-170 40,-175 C29,-182 12,-184 0,-180 C-12,-184 -29,-182 -40,-175 C-51,-170 -59,-160 -63,-144Z" fill="url(#${u}toc)"/>
+      <path d="M-38,-197 Q-24,-206 -8,-207" class="n n-toc-l" stroke-width="3.6" opacity=".9"/>
+      <circle cx="-59" cy="-128" r="3.2" class="f-vang"/><circle cx="59" cy="-128" r="3.2" class="f-vang"/>`
+    kinh = `<path d="M-40.5,-150 L-57,-154 M40.5,-150 L57,-154" class="n n-gong" stroke-width="3"/>
+      <circle cx="-21" cy="-147" r="19.5" class="f-trang" fill-opacity=".14"/><circle cx="21" cy="-147" r="19.5" class="f-trang" fill-opacity=".14"/>
+      <circle cx="-21" cy="-147" r="19.5" class="n n-gong" stroke-width="3.6"/><circle cx="21" cy="-147" r="19.5" class="n n-gong" stroke-width="3.6"/>
+      <path d="M-2,-151 Q0,-154.5 2,-151" class="n n-gong" stroke-width="3.2"/>
+      <path d="M-32,-157 L-26,-163" class="n n-trang" stroke-width="2.6" opacity=".85"/><path d="M10,-157 L16,-163" class="n n-trang" stroke-width="2.6" opacity=".85"/>`
+    vat = `<path d="M-6,-16 L6,-16 L6,22 A6,6 0 0 1 -6,22Z" class="f-thuy"/>
+      <g clip-path="url(#${u}vat)"><g data-k="song"><path d="M-16,8 Q-8,6.5 0,8 Q8,9.5 16,8 L16,36 L-16,36Z" class="f-long"/><circle cx="-1.5" cy="17" r="1.6" class="f-long-l"/><circle cx="2" cy="12.5" r="1.1" class="f-long-l"/></g></g>
+      <path d="M-2.6,-10 L-2.6,18" class="n n-trang" stroke-width="2.2" opacity=".8"/>
+      <rect x="-8" y="-24" width="16" height="9.5" rx="3.4" class="f-nut-ong"/>`
+    them = `<clipPath id="${u}vat"><path d="M-6,-16 L6,-16 L6,22 A6,6 0 0 1 -6,22Z"/></clipPath>`
+  } else if (k === 'vd') {
+    than = ao(-21) + `
+      <path d="M-13,-105 L-4,-92 L-13,-88 L-20,-100Z" class="f-ao-l"/><path d="M13,-105 L4,-92 L13,-88 L20,-100Z" class="f-ao-l"/>
+      <path d="M-20,-84 L-14,-104 M20,-84 L14,-104" class="n n-tap" stroke-width="5"/>
+      <path d="M-21,-84 L21,-84 L23,-58 L33,-52 L35,-27 C35,-23 32,-21 28,-21 L-28,-21 C-32,-21 -35,-23 -35,-27 L-33,-52 L-23,-58Z" class="f-tap"/>
+      <path d="M14,-84 L21,-84 L23,-58 L33,-52 L35,-27 C35,-23 32,-21 28,-21 L22,-21 L24,-52 L17,-58Z" class="f-tap-s" opacity=".6"/>
+      <rect x="-36" y="-56" width="72" height="5" rx="2.5" class="f-tap-s"/>
+      <rect x="-3" y="-80" width="3.4" height="11" rx="1.7" class="f-but-1"/><rect x="2" y="-78" width="3.4" height="9" rx="1.7" class="f-but-2"/>
+      <rect x="-11" y="-72" width="22" height="12" rx="4" class="f-tap-l"/>`
+    toc = `<path d="M-61,-148 C-63,-184 -52,-206 -30,-209 L30,-209 C52,-206 63,-184 61,-148 C58,-161 54,-170 47,-176 L-47,-176 C-54,-170 -58,-161 -61,-148Z" fill="url(#${u}toc)"/>
+      <path d="M-61,-148 C-62,-160 -60,-170 -56,-176 L-48,-176 L-50,-150Z" class="f-bac"/><path d="M61,-148 C62,-160 60,-170 56,-176 L48,-176 L50,-150Z" class="f-bac"/>
+      <path d="M-30,-203 L22,-203" class="n n-toc-l" stroke-width="4" opacity=".8"/>`
+    kinh = `<rect x="-62" y="-153" width="18" height="8" rx="4" class="f-quai"/><rect x="44" y="-153" width="18" height="8" rx="4" class="f-quai"/>
+      <rect x="-45" y="-167" width="90" height="41" rx="18" class="f-kinh-t" fill-opacity=".24"/>
+      <rect x="-45" y="-167" width="90" height="41" rx="18" class="n n-kinh-v" stroke-width="3.8"/>
+      <path d="M-33,-161 L-25,-161 L-39,-136 L-43,-142Z" class="f-trang" opacity=".55"/><path d="M14,-161 L18,-161 L8,-140 L5,-144Z" class="f-trang" opacity=".4"/>`
+    ria = `<path d="M-16,-123 C-11,-130 -3,-128 0,-125 C3,-128 11,-130 16,-123 C11,-119 4,-120 0,-122 C-4,-120 -11,-119 -16,-123Z" class="f-toc"/>`
+    vat = `<rect x="-4" y="-24" width="34" height="44" rx="4.5" class="f-bia"/><rect x="26" y="-24" width="4" height="44" rx="2" class="f-bia-s"/>
+      <rect x="0" y="-18" width="26" height="34" rx="2" class="f-giay-to"/>
+      <path d="M4,-10 l2.2,2.2 l3.6,-4.4 M4,-1 l2.2,2.2 l3.6,-4.4" class="n n-ok" stroke-width="2"/><path d="M4.5,6.5 l4.5,4.5 M9,6.5 l-4.5,4.5" class="n n-x" stroke-width="2"/>
+      <path d="M13,-10 H22 M13,-1 H22 M13,8.5 H20" class="n n-dong" stroke-width="2.4"/>
+      <rect x="6" y="-28" width="14" height="8" rx="3" class="f-den"/><rect x="10" y="-30" width="6" height="4" rx="2" class="f-den-s"/>`
+  } else {
+    than = ao(-19) + ve(-19) + `<path d="M-15,-106 C-10,-98 -4,-95 0,-95 C4,-95 10,-98 15,-106 L12,-90 C8,-87 4,-86 0,-86 C-4,-86 -8,-87 -12,-90Z" class="f-trang"/><circle cx="0" cy="-88" r="3.6" class="f-vang"/>`
+    tocSau = `<path d="M-67,-120 C-75,-162 -62,-206 0,-208 C62,-206 75,-162 67,-120 C64,-108 55,-104 49,-108 L-49,-108 C-55,-104 -64,-108 -67,-120Z" fill="url(#${u}toc)"/>
+      <g transform="rotate(30 0 -216)"><rect x="-3.6" y="-252" width="7.2" height="38" rx="3.6" class="f-vang"/><path d="M-3.6,-252 L0,-261 L3.6,-252Z" class="tay-but-g"/><path d="M-1.2,-258 L0,-261 L1.2,-258Z" class="f-net"/><rect x="-3.6" y="-219" width="7.2" height="6" rx="2.4" class="tay-tay"/></g>
+      <circle cx="0" cy="-216" r="19" class="f-toc n-toc-s" stroke-width="2.4"/><path d="M-10,-212 Q-6,-226 6,-226 Q12,-222 9,-214" class="n n-toc-s" stroke-width="2.6" opacity=".8"/>`
+    toc = `<path d="M-63,-146 C-67,-193 -31,-214 4,-212 C41,-210 67,-191 63,-150 C57,-166 45,-177 27,-180 C13,-172 -9,-171 -26,-177 C-41,-173 -55,-163 -63,-146Z" fill="url(#${u}toc)"/>
+      <path d="M-40,-196 Q-22,-207 -2,-207" class="n n-trang" stroke-width="4" opacity=".75"/>`
+    kinh = `<path d="M-39,-139 H-3 A18,13 0 0 1 -39,-139Z" class="f-trang" fill-opacity=".34"/><path d="M3,-139 H39 A18,13 0 0 1 3,-139Z" class="f-trang" fill-opacity=".34"/>
+      <path d="M-39,-139 H-3 A18,13 0 0 1 -39,-139Z M3,-139 H39 A18,13 0 0 1 3,-139Z" class="n n-gong" stroke-width="3.2"/>
+      <path d="M-3,-139 Q0,-142.5 3,-139" class="n n-gong" stroke-width="3"/>
+      <path d="M-33,-134 L-28,-130" class="n n-trang" stroke-width="2.2" opacity=".85"/><path d="M9,-134 L14,-130" class="n n-trang" stroke-width="2.2" opacity=".85"/>
+      <path d="M-39,-138 Q-57,-116 -42,-100 M39,-138 Q57,-116 42,-100" class="n n-vang" stroke-width="1.8" stroke-dasharray="2 2.6"/>`
+    vat = `<rect x="-4" y="-24" width="32" height="42" rx="4.5" class="f-so"/><rect x="24" y="-24" width="4" height="42" rx="2" class="f-so-s"/>
+      <rect x="4" y="-17" width="17" height="9" rx="2" class="f-giay-to"/>
+      <rect x="4" y="-3" width="3.4" height="3.4" rx=".8" class="f-giay-to"/><rect x="17.6" y="-3" width="3.4" height="3.4" rx=".8" class="f-giay-to"/>
+      <rect x="4" y="1.6" width="3.4" height="3.4" rx=".8" class="f-giay-to"/><rect x="8.5" y="1.6" width="3.4" height="3.4" rx=".8" class="f-vang"/><rect x="13" y="1.6" width="3.4" height="3.4" rx=".8" class="f-giay-to"/><rect x="17.6" y="1.6" width="3.4" height="3.4" rx=".8" class="f-giay-to"/>
+      <path d="M5,11 H20" class="n n-so-s" stroke-width="2.2"/>
+      <path d="M-4,-17 h5 M-4,-9 h5 M-4,-1 h5 M-4,7 h5" class="n n-trang" stroke-width="2.2"/>`
+  }
+  const mat1 = (s, b) => `<g transform="translate(${s * MAT_X} ${MAT_Y})">
+    <g data-k="mo${b}"><ellipse rx="14.5" ry="16.5" class="f-trang"/>
+      <g clip-path="url(#${u}e)"><g data-k="con${b}"><circle r="9.4" class="f-net"/><circle cx="-3.3" cy="-3.9" r="3.5" class="f-trang"/><circle cx="3.3" cy="3.5" r="1.5" class="f-trang"/></g>
+        <g data-k="mi${b}"><path d="M-19,-44 H19 V-1.5 Q0,3 -19,-1.5Z" class="f-da"/><path d="M-19,-1.5 Q0,3 19,-1.5" class="n n-net" stroke-width="2.6"/></g></g>
+      <ellipse rx="14.5" ry="16.5" class="n n-net" stroke-width="2.3"/></g>
+    <path data-k="nham${b}" d="M-12,-1 Q0,6 12,-1" class="n n-net" stroke-width="3.4" opacity="0"/>
+    <path data-k="cong${b}" d="M-11.5,5 Q0,-8.5 11.5,5" class="n n-net" stroke-width="3.8" opacity="0"/></g>`
+  const tay = (s, b) => `<g data-k="tay${b}">
+    <path d="M0,0 L0,25" class="n n-ao" stroke-width="15"/><path d="M${-s * 3.6},3 L${-s * 3.6},21" class="n n-ao-l" stroke-width="3" opacity=".6"/>
+    <g data-k="khuyu${b}"><path d="M0,0 L0,18" class="n n-ao" stroke-width="14"/>
+      <rect x="-7.8" y="14" width="15.6" height="7.5" rx="3.2" class="${n.gang ? 'f-tay-s' : 'f-ao-d'}"/>
+      <g data-k="ban${b}" transform="translate(0 27)">${b === 'T' ? `<g data-k="vat">${vat}</g><g><circle r="8.3" class="f-tay"/><path d="M-5,-1 Q-1,1.2 3,-1 M-5,3 Q-1,5.2 3,3" class="n n-tay-s" stroke-width="1.5"/></g>` : banPhai(u)}</g></g></g>`
+  return `<defs>
+    <linearGradient id="${u}ao" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="s-ao-l"/><stop offset=".45" class="s-ao"/><stop offset="1" class="s-ao-s"/></linearGradient>
+    <radialGradient id="${u}da" cx=".4" cy=".3" r=".78"><stop offset="0" class="s-da-l"/><stop offset=".55" class="s-da"/><stop offset="1" class="s-da-s"/></radialGradient>
+    <linearGradient id="${u}toc" x1=".2" y1="0" x2=".5" y2="1"><stop offset="0" class="s-toc-l"/><stop offset=".55" class="s-toc"/><stop offset="1" class="s-toc-s"/></linearGradient>
+    <radialGradient id="${u}ma"><stop offset="0" class="s-ma" stop-opacity=".85"/><stop offset="1" class="s-ma" stop-opacity="0"/></radialGradient>
+    <linearGradient id="${u}tia" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="s-tia" stop-opacity=".75"/><stop offset="1" class="s-tia" stop-opacity="0"/></linearGradient>
+    <radialGradient id="${u}bong"><stop offset="0" class="s-bong"/><stop offset=".6" class="s-bong" stop-opacity=".75"/><stop offset="1" class="s-bong" stop-opacity="0"/></radialGradient>
+    <clipPath id="${u}e"><ellipse rx="14.5" ry="16.5"/></clipPath>${them}
+  </defs>
+  <g transform="scale(${TL})">
+  <ellipse data-k="bong" cx="0" cy="0" rx="52" ry="9" fill="url(#${u}bong)"/>
+  <g data-k="goc">
+    <g><rect x="-16.5" y="-31" width="11" height="26" rx="5.5" class="f-quan"/><rect x="5.5" y="-31" width="11" height="26" rx="5.5" class="f-quan"/>${giay(-1)}${giay(1)}</g>
+    <g data-k="than">
+      <g>${than}<path d="M-15,-104 Q0,-97 15,-104" class="n n-ao-d" stroke-width="2.4" opacity=".35"/></g>
+      <g data-k="dau">
+        ${tocSau}
+        <g data-k="tai"><ellipse cx="-59" cy="-143" rx="8" ry="10.5" class="f-da"/><ellipse cx="-59.5" cy="-143" rx="3.6" ry="6" class="f-da-s"/><ellipse cx="59" cy="-143" rx="8" ry="10.5" class="f-da"/><ellipse cx="59.5" cy="-143" rx="3.6" ry="6" class="f-da-s"/></g>
+        <path d="${DAU}" fill="url(#${u}da)"/>
+        <g data-k="mat">
+          <g data-k="ma"><ellipse cx="-37" cy="-126" rx="10.5" ry="6.5" fill="url(#${u}ma)"/><ellipse cx="37" cy="-126" rx="10.5" ry="6.5" fill="url(#${u}ma)"/></g>
+          ${mat1(-1, 'T')}${mat1(1, 'P')}
+          <g data-k="mayT"><path d="M-8.5,1.6 Q0,-3 8.5,1.6" class="n n-may" stroke-width="4.4"/></g>
+          <g data-k="mayP"><path d="M-8.5,1.6 Q0,-3 8.5,1.6" class="n n-may" stroke-width="4.4"/></g>
+          <ellipse cx="0" cy="-132" rx="4.3" ry="3.2" class="f-da-s"/><ellipse cx="-1.4" cy="-133.3" rx="1.5" ry=".9" class="f-trang" opacity=".55"/>
+          ${ria}
+          <g data-k="mieng">
+            <path data-m="cuoi" d="M-7,-1.5 Q0,5.5 7,-1.5" class="n n-mieng" stroke-width="3.2"/>
+            <g data-m="cuoiTo"><path d="M-10.5,-3 Q0,-1 10.5,-3 Q9,10.5 0,11 Q-9,10.5 -10.5,-3Z" class="f-mieng"/><path d="M-6,6.6 Q0,3.6 6,6.6 Q4,10.4 0,10.7 Q-4,10.4 -6,6.6Z" class="f-luoi"/><path d="M-8.8,-2.5 Q0,-.9 8.8,-2.5 L8,.8 Q0,2 -8,.8Z" class="f-trang"/></g>
+            <path data-m="phang" d="M-6.5,0 Q0,1.2 6.5,0" class="n n-mieng" stroke-width="3.2"/>
+            <path data-m="meo" d="M-7,3 Q0,-2.8 7,3" class="n n-mieng" stroke-width="3.2"/>
+            <ellipse data-m="o" cx="0" cy="1" rx="3.6" ry="4.4" class="f-mieng"/>
+            <g data-m="ngap"><ellipse cx="0" cy="2" rx="7.5" ry="10.5" class="f-mieng"/><ellipse cx="0" cy="8.5" rx="5" ry="3.4" class="f-luoi"/></g>
+            <path data-m="nhech" d="M-6.5,1.6 Q1,4.4 8,-2.6" class="n n-mieng" stroke-width="3.2"/>
+            <path data-m="hmm" d="M-6.5,1 Q-3.2,-1.6 0,1 Q3.2,3.6 6.5,.6" class="n n-mieng" stroke-width="3"/>
+          </g>
+        </g>
+        <g data-k="tocT">${toc}</g>
+        <g data-k="kinh">${kinh}</g>
+        <g data-k="sao" opacity="0">
+          <path d="${SAO}" class="f-vang" transform="translate(-64 -200)"/><path d="${SAO}" class="f-vang" transform="translate(66 -188) scale(.8)"/>
+          <path d="${SAO}" class="f-vang" transform="translate(74 -138) scale(.6)"/><path d="${SAO}" class="f-vang" transform="translate(-74 -148) scale(.55)"/>
+          <circle cx="-48" cy="-226" r="2.6" class="f-vang"/><circle cx="52" cy="-222" r="2" class="f-vang"/>
+        </g>
+      </g>
+      ${tay(-1, 'T')}${tay(1, 'P')}
+    </g>
+  </g></g>`
+}
+function banPhai(u) {
+  return `
+  <g data-b="mo"><ellipse cx="-6.6" cy="-1.5" rx="3.6" ry="4.8" class="f-tay"/><circle r="8.3" class="f-tay"/><path d="M-4,4.5 Q0,6.6 4,4.5" class="n n-tay-s" stroke-width="1.5"/></g>
+  <g data-b="chi"><rect x="-2.9" y="2" width="5.8" height="15.5" rx="2.9" class="f-tay"/><circle r="8" class="f-tay"/><ellipse cx="-6.4" cy="1" rx="3.2" ry="4.2" class="f-tay"/><path d="M-4,-2 Q0,0 4,-2" class="n n-tay-s" stroke-width="1.4"/></g>
+  <g data-b="cai"><rect x="-3.7" y="3" width="7.4" height="13" rx="3.7" class="f-tay"/><circle r="8.5" class="f-tay"/><path d="M-5.6,-3 H4 M-5.6,1 H4 M-5,-7 H3" class="n n-tay-s" stroke-width="1.5"/></g>
+  <g data-b="but"><g transform="rotate(-90)"><rect x="-1.9" y="-12" width="3.8" height="30" rx="1.9" class="f-but"/><path d="M-1.9,17.5 L0,23 L1.9,17.5Z" class="f-net"/><rect x="-1.9" y="-12" width="3.8" height="6" rx="1.9" class="f-but-d"/></g><circle r="8" class="f-tay"/><path d="M-5,-1 Q-1,1.2 3,-1" class="n n-tay-s" stroke-width="1.4"/></g>
+  <g data-b="den"><g data-k="tia" opacity="0"><path d="M-6.5,23 L-66,300 L66,300 L6.5,23Z" fill="url(#${u}tia)"/><ellipse cx="0" cy="24" rx="14" ry="6.5" class="f-tia" opacity=".7"/></g>
+    <rect x="-5.5" y="-9" width="11" height="23" rx="3" class="f-den"/><path d="M-5.5,12 L-8.2,21 L8.2,21 L5.5,12Z" class="f-den-s"/><ellipse cx="0" cy="21.4" rx="8.2" ry="2.8" class="f-vang"/>
+    <circle r="8.3" class="f-tay"/><path d="M-5,-1 Q-1,1.2 3,-1" class="n n-tay-s" stroke-width="1.4"/></g>`
+}
+
+// ───────────────── BỘ MÁY LÒ XO ─────────────────
+const gocNV = (n) => ({ by: 0, sx: 1, sy: 1, br: 0, hr: 0, hx: 0, hy: 0, gx: .12, gy: .06, lid: n.lid, lidT: 0, lidP: 0, myT: 0, myP: 0, maT: n.ma0, maP: n.ma0,
+  a1P: 10, a2P: -6, a1T: 12, a2T: -112, lac: 0, song: 0, kinh: 0, sao: 0, tia: 0, mp: 1, ma: .72 })
+const DS = new Set()
+let tayX = 0, tayY = 0, tayLuc = -1e9
+
+class GiamThi {
+  constructor(host, k, o = {}) {
+    this.k = k; this.n = NV[k]; this.o = o; this.u = 'g' + (++soU) + '_'
+    this.tinh = !!o.tinh; this.giam = giamMQ.matches
+    host.classList.add('gt'); host.dataset.nv = k
+    if (this.tinh) host.classList.add('gt-tinh')
+    host.style.setProperty('--tho', rand(3.4, 4.6).toFixed(2) + 's'); host.style.setProperty('--tre', (-rand(0, 4)).toFixed(2) + 's')
+    host.innerHTML = `<div class="gt-tho"><svg viewBox="${VB.x} ${VB.y} ${VB.w} ${VB.h}" aria-hidden="true" focusable="false">${veNV(k, this.u)}</svg></div>`
+    this.host = host; this.svg = host.querySelector('svg')
+    this.e = {}; this.svg.querySelectorAll('[data-k]').forEach((el) => (this.e[el.dataset.k] = el))
+    this.m = {}; this.svg.querySelectorAll('[data-m]').forEach((el) => (this.m[el.dataset.m] = el))
+    this.b = {}; this.svg.querySelectorAll('[data-b]').forEach((el) => (this.b[el.dataset.b] = el))
+    this.goc = gocNV(this.n); this.s = {}
+    for (const t in this.goc) this.s[t] = { x: this.goc[t], v: 0, t: this.goc[t], k: 170, z: .62 }
+    this.rm = {}; this.cache = new Map(); this.chopTu = -1e9; this.tok = 0; this.hen = new Set()
+    this.raf = 0; this.song = false; this.hien = !this.tinh; this.thi = false; this.dangLam = null; this.khoaMat = false; this.truoc = null; this.hop = null
+    this.datMieng(this.n.mieng, true); this.datBan('mo'); this.datMat('mo')
+    this.khung = this.khung.bind(this)
+    this.ve(performance.now())
+    if (!this.tinh) { DS.add(this); QUAN.observe(host); this.datSong(!document.hidden) }
+  }
+  // ── trạng thái rời ──
+  datMieng(m, ngay) {
+    if (this.rm.mieng === m) return
+    this.rm.mieng = m
+    for (const t in this.m) this.m[t].setAttribute('display', t === m ? 'inline' : 'none')
+    if (!ngay && !this.giam) { this.s.mp.x = .72; this.s.mp.t = 1; this.s.mp.k = 420; this.s.mp.z = .45; this.chay() }
+  }
+  datBan(b) { if (this.rm.ban === b) return; this.rm.ban = b; for (const t in this.b) this.b[t].setAttribute('display', t === b ? 'inline' : 'none') }
+  datMat(m) {
+    this.rm.mat = m
+    for (const b of ['T', 'P']) {
+      this.e['mo' + b].setAttribute('opacity', m === 'mo' ? '1' : '0')
+      this.e['cong' + b].setAttribute('opacity', m === 'cong' ? '1' : '0')
+      this.e['nham' + b].setAttribute('opacity', m === 'nham' ? '1' : '0')
+    }
+    this.cache.delete('nhamT#o'); this.cache.delete('nhamP#o')
+  }
+  // ── đặt đích lò xo ──
+  dat(p, k = 170, z = .62) {
+    for (const t in p) {
+      const v = p[t]
+      if (t === 'mieng') { this.datMieng(v); continue }
+      if (t === 'ban') { this.datBan(v); continue }
+      if (t === 'mat') { this.datMat(v); continue }
+      const s = this.s[t]; if (!s) continue
+      s.t = v; s.k = k; s.z = z
+      if (this.giam || this.tinh) { s.x = v; s.v = 0 }
+    }
+    if (this.giam || this.tinh) this.ve(performance.now()); else this.chay()
+  }
+  veGoc(k = 150, z = .7) {
+    const g = { ...this.goc }
+    if (this.thi) Object.assign(g, { a1P: this.s.a1P.t, a2P: this.s.a2P.t, tia: 1, lid: this.n.lid + .08, maT: this.n.ma0 + 4, maP: this.n.ma0 + 4 })
+    this.dat(g, k, z)
+    this.datMieng(this.thi ? 'phang' : this.n.mieng); this.datMat('mo'); if (!this.thi) this.datBan('mo')
+  }
+  nhay() { if (this.rm.mat !== 'mo') return; this.chopTu = performance.now(); this.chay() }
+  // ── vòng khung: chỉ chạy khi còn lò xo động, đang chớp mắt hoặc tay đang rê ──
+  chay() { if (this.raf || !this.song || this.tinh) return; this.last = performance.now(); this.raf = requestAnimationFrame(this.khung) }
+  khung(now) {
+    this.raf = 0
+    const dt = Math.min(.05, Math.max(.001, (now - this.last) / 1000)); this.last = now
+    const tay = now - tayLuc < 1400 && !this.khoaMat && this.hien
+    if (tay) this.theoTay()
+    if (this.thi && !tay && !this.khoaMat) { const th = (this.s.a1P.x + this.s.a2P.x) * Math.PI / 180; this.s.gx.t = Math.sin(th) * .95; this.s.gy.t = Math.cos(th) * .85; this.s.gx.k = this.s.gy.k = 120; this.s.gx.z = this.s.gy.z = .8 }
+    let yen = true
+    const n = Math.max(1, Math.ceil(dt * 120))
+    for (let i = 0; i < n; i++) yen = this.buoc(dt / n)
+    this.ve(now)
+    if (!yen || now - this.chopTu < 180 || tay) this.raf = requestAnimationFrame(this.khung)
+  }
+  buoc(dt) {
+    const s = this.s
+    s.song.t = -s.lac.x * 1.15 - s.lac.v * .035; s.song.k = 70; s.song.z = .28
+    let yen = true
+    for (const t in s) {
+      const p = s[t]
+      const c = 2 * Math.sqrt(p.k) * p.z
+      p.v += (p.k * (p.t - p.x) - c * p.v) * dt; p.x += p.v * dt
+      if (Math.abs(p.t - p.x) < .004 && Math.abs(p.v) < .03) { p.x = p.t; p.v = 0 } else yen = false
+    }
+    return yen
+  }
+  chop(now) { const t = now - this.chopTu; if (t < 0 || t > 170) return 0; if (t < 62) return t / 62; if (t < 84) return 1; return 1 - (t - 84) / 86 }
+  tf(k, v) { if (this.cache.get(k) !== v) { this.cache.set(k, v); this.e[k]?.setAttribute('transform', v) } }
+  op(k, v) { const kk = k + '#o'; if (this.cache.get(kk) !== v) { this.cache.set(kk, v); this.e[k]?.setAttribute('opacity', v) } }
+  ve(now) {
+    const x = {}; for (const t in this.s) x[t] = this.s[t].x
+    const gx = kep(x.gx, -1.2, 1.2), gy = kep(x.gy, -1.2, 1.2)
+    this.tf('goc', `translate(0 ${f(x.by)}) scale(${f3(x.sx)} ${f3(x.sy)})`)
+    const cao = Math.max(0, -x.by), sb = kep(1 - cao / 60, .55, 1.1)
+    this.tf('bong', `scale(${f3(sb * x.sx)} 1)`); this.op('bong', f3(kep(1 - cao / 90, .4, 1)))
+    this.tf('than', `rotate(${f(x.br)} 0 -24)`)
+    this.tf('dau', `translate(${f(x.hx + gx * 1.6)} ${f(x.hy + gy * 1.3)}) rotate(${f(x.hr + gx * 2.4)} 0 -100)`)
+    this.tf('mat', `translate(${f(gx * 4.2)} ${f(gy * 2.8)})`)
+    this.tf('tocT', `translate(${f(gx * 1.8)} ${f(gy * .9)})`)
+    this.tf('tai', `translate(${f(-gx * 2.2)} 0)`)
+    this.tf('kinh', `translate(${f(gx * 3.8)} ${f(gy * 2.6 + x.kinh)})`)
+    const b = this.chop(now)
+    for (const [ben, lx] of [['T', x.lidT], ['P', x.lidP]]) {
+      this.tf('con' + ben, `translate(${f(gx * 5)} ${f(gy * 5.2)})`)
+      const L = kep(x.lid + lx, 0, 1)
+      this.tf('mi' + ben, `translate(0 ${f(-19.5 + L * 36)})`)
+      if (this.rm.mat === 'mo') { this.tf('mo' + ben, `scale(1 ${f3(1 - .92 * b)})`); this.op('nham' + ben, f3(kep((b - .55) / .45, 0, 1))) }
+    }
+    const my = this.n.mayY
+    this.tf('mayT', `translate(${-MAT_X} ${f(my + x.myT)}) rotate(${f(x.maT)})`)
+    this.tf('mayP', `translate(${MAT_X} ${f(my + x.myP)}) rotate(${f(-x.maP)})`)
+    this.tf('mieng', `translate(0 ${this.n.miengY}) scale(${f3(x.mp)})`)
+    this.op('ma', f3(kep(x.ma, 0, 1)))
+    this.tf('tayP', `translate(33 -92) rotate(${f(-x.a1P)})`); this.tf('khuyuP', `translate(0 25) rotate(${f(-x.a2P)})`)
+    this.tf('tayT', `translate(-33 -92) rotate(${f(x.a1T)})`); this.tf('khuyuT', `translate(0 25) rotate(${f(x.a2T)})`)
+    this.tf('vat', `rotate(${f(-(x.a1T + x.a2T) + x.lac)})`)
+    if (this.e.song) this.tf('song', `rotate(${f(x.song)} 0 ${this.k === 'th' ? 8 : 16})`)
+    const sv = kep(x.sao, 0, 1.3)
+    this.op('sao', f3(kep(x.sao, 0, 1))); this.tf('sao', `translate(0 -150) scale(${f3(.55 + .45 * sv)}) rotate(${f(sv * 12)}) translate(0 150)`)
+    if (this.e.tia) this.op('tia', f3(kep(x.tia, 0, 1)))
+  }
+  // ── mắt dõi theo tay / nhìn một điểm ──
+  diemMat() {
+    const r = this.hop || (this.hop = this.svg.getBoundingClientRect())
+    return { x: r.left + (0 - VB.x) / VB.w * r.width, y: r.top + (MAT_Y * TL - VB.y) / VB.h * r.height, sc: r.width / VB.w }
+  }
+  huong(px, py, xa = 170) {
+    const c = this.diemMat(), dx = px - c.x, dy = py - c.y, d = Math.hypot(dx, dy) || 1, kk = Math.min(1, d / xa)
+    return { gx: dx / d * kk, gy: dy / d * kk * .9 }
+  }
+  theoTay() {
+    this.hop = null
+    const g = this.huong(tayX, tayY)
+    const s = this.s
+    s.gx.t = g.gx; s.gy.t = g.gy; s.gx.k = s.gy.k = 150; s.gx.z = s.gy.z = .72
+  }
+  // ── hẹn giờ có huỷ ──
+  ngu(ms) { const tok = this.tok; return new Promise((res, rej) => { const id = setTimeout(() => { this.hen.delete(id); tok === this.tok ? res() : rej(HUY) }, ms); this.hen.add(id) }) }
+  huy() { this.tok++; for (const id of this.hen) clearTimeout(id); this.hen.clear() }
+  async lam(ten, fn, phanUng) {
+    this.huy(); const tok = this.tok
+    this.dangLam = ten; this.khoaMat = false
+    if (this.o.tt) this.o.tt(ten, phanUng)
+    try { await fn.call(this) } catch (e) { if (e !== HUY) console.error(e); return }
+    if (tok !== this.tok) return
+    this.dangLam = null; this.khoaMat = false
+    if (this.thi && ten !== 'thi') { this.lam('thi', this.vongThi, 'thi'); return }
+    if (!this.thi) { this.veGoc(); if (this.o.tt) this.o.tt(null) }
+    this.henNhanRoi()
+  }
+  // ── sống / nghỉ (ngoài màn hình hoặc tab ẩn ⇒ nghỉ hết) ──
+  datSong(b) {
+    b = b && this.hien && !document.hidden
+    if (b === this.song) return
+    this.song = b
+    this.host.toggleAttribute('data-nghi', !b)
+    if (b) { this.henChop(); if (this.thi) this.lam('thi', this.vongThi, 'thi'); else { this.veGoc(); this.henNhanRoi() } }
+    else { this.huy(); clearTimeout(this.hNR); clearTimeout(this.hC); if (this.raf) cancelAnimationFrame(this.raf); this.raf = 0; this.dangLam = null }
+  }
+  henChop() {
+    clearTimeout(this.hC); if (!this.song) return
+    const d = this.giam ? rand(4200, 8000) : rand(1700, 5400)
+    this.hC = setTimeout(() => { this.nhay(); if (!this.giam && Math.random() < .22) setTimeout(() => this.nhay(), rand(190, 270)); this.henChop() }, d)
+  }
+  henNhanRoi() {
+    clearTimeout(this.hNR); if (!this.song || this.giam || this.thi) return
+    this.hNR = setTimeout(() => this.nhanRoi(), rand(1300, 3900) * this.n.nhip / NHANH)
+  }
+  lauKhongBam() { return performance.now() - lanBam > 15000 / NHANH }
+  nhanRoi() {
+    if (this.dangLam) return this.henNhanRoi()
+    const lau = this.lauKhongBam()
+    const ds = Object.entries(this.n.nhanRoi).filter(([t]) => t !== this.truoc && (t !== 'ngap' || lau)).map(([t, w]) => [t, t === 'ngap' ? w * 2.2 : w])
+    const ten = chonTS(ds)
+    this.thu(ten)
+  }
+  thu(ten) { this.truoc = ten; if (this.o.ghi) this.o.ghi(TEN_DT(this.k, ten), 'nhan-roi'); this.lam(ten, DT[ten]) }
+  phanUng(loai, o = {}) {
+    lanBam = performance.now()
+    if (loai === 'thi') { this.batThi(!this.thi); return }
+    if (loai === 'roi') { if (!this.thi) this.batThi(true); if (this.o.ghi) this.o.ghi(TEN_PU.roi, 'phan-ung'); this.lam('roi', function () { return PU.roi.call(this, o) }, 'phan-ung'); return }
+    if (loai === 'soi') { if (this.thi) this.lam('soi', function () { return PU.soi.call(this, o) }, 'thi'); return }
+    if (this.thi) this.batThi(false, true)
+    if (this.o.ghi) this.o.ghi(TEN_PU[loai], 'phan-ung')
+    this.lam(loai, function () { return PU[loai].call(this, o) }, 'phan-ung')
+  }
+  batThi(bat, im) {
+    this.thi = bat
+    if (this.o.thi) this.o.thi(bat)
+    if (bat) { if (this.o.ghi) this.o.ghi('Lúc thi: soi đèn', 'phan-ung'); this.lam('thi', this.vongThi, 'thi') }
+    else { this.huy(); this.dangLam = null; this.dat({ tia: 0 }, 200, .9); this.veGoc(); if (!im) { if (this.o.tt) this.o.tt(null); this.henNhanRoi() } }
+  }
+  noi(th, luon) { if (this.o.loi) return this.o.loi.noi(this.k, th, luon); return null }
+  // ── chỉ vào đề (đề nằm bên phải giám thị như trong app) ──
+  chiDe() { this.datBan('chi'); this.dat({ a1P: 100, a2P: 6, gx: .9, gy: -.3, hr: 4 }, 230, .6) }
+  async vongThi() {
+    const n = this.n
+    if (this.rm.ban !== 'den') {
+      this.datBan('den'); this.datMieng('phang')
+      this.dat({ a1P: 58, a2P: -4, tia: 1, lid: n.lid + .08, maT: n.ma0 + 4, maP: n.ma0 + 4, myT: 0, myP: 0, ma: .6, sao: 0 }, 140, .8)
+      await this.ngu(700)
+    }
+    if (this.giam) { await this.ngu(864e5); return }
+    let phai = Math.random() < .5
+    for (;;) {
+      phai = !phai
+      this.dat({ a1P: phai ? rand(80, 104) : rand(26, 48), a2P: rand(-8, 6) }, rand(3.2, 5.5), 1)
+      await this.ngu(rand(1700, 2800))
+      if (Math.random() < .32) {
+        this.dat({ lid: n.lid + .42, maT: n.ma0 + 10, maP: n.ma0 + 10, myT: 2, myP: 2 }, 260, .7); this.datMieng(this.k === 'nb' ? 'hmm' : 'phang')
+        await this.ngu(rand(650, 1100))
+        this.dat({ lid: n.lid + .08, maT: n.ma0 + 4, maP: n.ma0 + 4, myT: 0, myP: 0 }, 200, .7)
+      } else if (Math.random() < .3) { await this.ngu(rand(500, 900)) }
+    }
+  }
+}
+const TEN_PU = { chon: 'Liếc ô em chọn', voi: 'Chọn vội: nhíu mày, chỉ đề', dung: 'Đúng: gật đầu, ngón cái', dungLien: 'Đúng liền: bật nhảy', sai: 'Sai: nhíu mày, chỉ đề', saiLien: 'Sai liên tiếp', choc: 'Bị chọc', roi: 'Rời màn lúc thi: nhắc một câu', soi: 'Soi ô em vừa chạm' }
+
+// ───────────────── ĐỘNG TÁC NHÀN RỖI ─────────────────
+const DT = {
+  async nhinDe() {
+    const gx = rand(.62, .95), gy = rand(-.38, -.05)
+    this.dat({ gx, gy, hr: rand(2, 5) }, 130, .75)
+    await this.ngu(rand(450, 750))
+    const lan = randI(1, 3)
+    for (let i = 0; i < lan; i++) {
+      this.dat({ gx: gx - rand(.28, .5), gy: gy + .08 }, 300, .8); await this.ngu(rand(240, 380))
+      this.dat({ gx, gy: gy + rand(0, .12) }, 260, .8); await this.ngu(rand(380, 700))
+    }
+    if (Math.random() < .45) { this.dat({ hy: 2.5 }, 300, .6); await this.ngu(170); this.dat({ hy: 0 }, 220, .6); await this.ngu(240) }
+  },
+  async daoMat() {
+    const lan = randI(2, 3)
+    let gx0 = this.s.gx.t
+    for (let i = 0; i < lan; i++) {
+      let gx = rand(-.95, .95); if (Math.abs(gx - gx0) < .5) gx = -Math.sign(gx0 || 1) * rand(.5, .95); gx0 = gx
+      this.dat({ gx, gy: rand(-.5, .45), hr: gx * rand(2, 4) }, rand(220, 340), .78)
+      await this.ngu(rand(420, 900))
+      if (Math.random() < .35) this.nhay()
+    }
+    if (Math.random() < .5) { this.dat({ gx: 0, gy: .02, hr: 0 }, 200, .8); await this.ngu(rand(500, 800)) }
+  },
+  async nghieng() {
+    const s = Math.random() < .5 ? -1 : 1
+    this.dat({ hr: s * rand(7, 10), hx: s * 2, gx: s * .3, gy: -.1, [s > 0 ? 'myT' : 'myP']: -4.5, br: s * 1.2 }, 140, .55)
+    this.datMieng(this.k === 'vdc' ? 'phang' : (Math.random() < .5 ? 'hmm' : 'o'))
+    await this.ngu(rand(900, 1500))
+    if (Math.random() < .4) { this.nhay(); await this.ngu(rand(250, 400)) }
+  },
+  async lac() {
+    const nb = this.k === 'nb'
+    this.dat({ gx: -.35, gy: .55, a1T: 16 }, 200, .7)
+    await this.ngu(240)
+    const lan = nb ? 4 : 5
+    for (let i = 0; i < lan; i++) {
+      const s = i % 2 ? 1 : -1
+      this.dat({ lac: s * (nb ? rand(9, 13) : rand(11, 16)), a1T: 16 + s * 3, a2T: -112 + (nb ? s * 4 : 0) }, nb ? 260 : 420, .5)
+      await this.ngu(nb ? rand(170, 230) : rand(110, 150))
+    }
+    this.dat({ lac: 0, a1T: 12, a2T: -112 }, 170, .6)
+    await this.ngu(rand(500, 800))
+    if (Math.random() < .5) { this.dat({ gx: .3, gy: 0, myT: -2, myP: -2 }, 200); this.datMieng(this.k === 'nb' ? 'cuoi' : 'hmm'); await this.ngu(rand(400, 700)) }
+  },
+  async kinh() {
+    if (this.k === 'nb') {
+      for (let i = 0; i < 2; i++) {
+        this.dat({ myT: -6, myP: -6, kinh: -7 }, 520, .45); this.datMieng('o'); await this.ngu(150)
+        this.dat({ myT: 0, myP: 0, kinh: 0 }, 260, .5); await this.ngu(rand(200, 300))
+      }
+      this.datMieng('cuoi'); await this.ngu(400)
+      return
+    }
+    this.datBan('chi')
+    this.dat({ a1P: 150, a2P: 55, gx: .05, gy: -.05 }, 210, .72)
+    await this.ngu(rand(300, 380))
+    this.nhay()
+    this.dat({ kinh: -3.4, lid: Math.max(0, this.n.lid - .06) }, 520, .55)
+    await this.ngu(rand(160, 220))
+    this.dat({ kinh: 0 }, 180, .6)
+    await this.ngu(rand(140, 220))
+    this.dat({ a1P: 10, a2P: -6 }, 150, .72)
+    await this.ngu(260); this.datBan('mo'); await this.ngu(rand(250, 450))
+  },
+  async goBut() {
+    this.datBan('but')
+    this.dat({ a1P: -12, a2P: -86, gx: -.32, gy: .8, hr: -2 }, 170, .72)
+    await this.ngu(rand(380, 460))
+    const lan = randI(3, 5)
+    for (let i = 0; i < lan; i++) {
+      this.dat({ a2P: -96 }, 640, .5); await this.ngu(rand(90, 120))
+      this.dat({ a2P: -86 }, 640, .5); await this.ngu(i === 1 && Math.random() < .5 ? rand(380, 600) : rand(140, 200))
+    }
+    if (Math.random() < .5) { this.dat({ gx: .5, gy: -.1 }, 220); await this.ngu(rand(300, 500)) }
+    this.dat({ a1P: 10, a2P: -6, hr: 0 }, 150, .72)
+    await this.ngu(280); this.datBan('mo'); await this.ngu(rand(250, 400))
+  },
+  async ngap() {
+    this.dat({ hr: -5, hy: -2.5, myT: -4, myP: -4, sy: 1.025, sx: .99, a1T: 18, gy: -.3 }, 90, .7)
+    this.datMat('nham'); this.datMieng('o')
+    await this.ngu(260)
+    this.datMieng('ngap')
+    await this.ngu(rand(850, 1150))
+    this.datMieng('o'); this.dat({ hr: 2, hy: 0, sy: 1, sx: 1, myT: 0, myP: 0, a1T: 12 }, 120, .6)
+    await this.ngu(220); this.datMat('mo'); this.datMieng(this.n.mieng)
+    this.nhay(); await this.ngu(240); this.nhay()
+    if (this.o.loi && Math.random() < .6) this.noi('cho')
+    await this.ngu(rand(500, 800))
+  },
+  async nheo() {
+    const s = Math.random() < .5 ? -1 : 1
+    this.dat({ lid: this.n.lid + .4, maT: this.n.ma0 + 9, maP: this.n.ma0 + 9, myT: 2, myP: 2, gx: s * rand(.4, .7), gy: rand(.1, .4), hr: s * 2 }, 220, .7)
+    this.datMieng('phang')
+    await this.ngu(rand(850, 1350))
+    if (Math.random() < .5) { this.dat({ gx: -s * .5 }, 200, .7); await this.ngu(rand(500, 800)) }
+  },
+  async nhun() {
+    this.dat({ sy: .94, sx: 1.04, by: 1 }, 480, .55); await this.ngu(110)
+    this.dat({ sy: 1.04, sx: .97, by: -7, hr: rand(-3, 3) }, 300, .5); await this.ngu(170)
+    this.dat({ sy: .96, sx: 1.03, by: 0 }, 380, .45); await this.ngu(140)
+    this.dat({ sy: 1, sx: 1 }, 260, .5)
+    if (Math.random() < .5) { this.datMieng('cuoiTo'); await this.ngu(500); this.datMieng('cuoi') }
+    await this.ngu(rand(300, 500))
+  },
+}
+
+// ───────────────── PHẢN ỨNG ─────────────────
+const PU = {
+  async chon(o) {
+    this.khoaMat = true
+    const g = o.diem ? this.huong(o.diem.x, o.diem.y, 120) : { gx: .55, gy: .78 }
+    this.dat({ gx: g.gx, gy: g.gy, hr: g.gx * 3, myT: -2.5, myP: -2.5, lid: this.n.lid * .6 }, 380, .72)
+    if (this.k === 'vdc') this.dat({ myP: -5, myT: 1, lidT: .1 }, 380, .72)
+    this.datMieng(this.k === 'nb' ? 'o' : 'hmm')
+    await this.ngu(rand(360, 480)); this.nhay()
+    await this.ngu(rand(480, 800))
+    this.dat({ hy: 1.8 }, 300, .6); await this.ngu(170); this.dat({ hy: 0 }, 220, .6)
+    await this.ngu(rand(320, 600))
+  },
+  async voi(o) {
+    this.khoaMat = true
+    const g = o.diem ? this.huong(o.diem.x, o.diem.y, 120) : { gx: .55, gy: .78 }
+    this.dat({ gx: g.gx, gy: g.gy, lidT: .26, myP: -5.5, myT: 2.5, maT: this.n.ma0 + 9, hr: -3 }, 420, .65)
+    this.datMieng('hmm')
+    await this.ngu(420)
+    this.dat({ maT: 12, maP: 12, myT: 2.5, myP: 2.5, lidT: .12, lidP: .12 }, 300, .7); this.datMieng('meo')
+    this.noi('voi', o.luon)
+    await this.ngu(240)
+    this.chiDe()
+    await this.ngu(520)
+    for (let i = 0; i < 2; i++) { this.dat({ a1P: 91 }, 620, .5); await this.ngu(140); this.dat({ a1P: 100 }, 620, .5); await this.ngu(170) }
+    await this.ngu(rand(900, 1200))
+  },
+  async sai(o) {
+    this.khoaMat = true
+    this.dat({ by: -2.5, sy: 1.03 }, 520, .5)
+    this.dat({ maT: 10, maP: 10, myT: 2, myP: 2, lid: this.n.lid + .1, gy: .25, gx: .1 }, 280, .7); this.datMieng('meo')
+    await this.ngu(140); this.dat({ by: 0, sy: 1 }, 260, .55)
+    this.noi('sai', o.luon)
+    await this.ngu(rand(240, 340))
+    for (const s of [-1, 1]) { this.dat({ hr: s * 4 }, 440, .5); await this.ngu(150) }
+    this.dat({ hr: 0 }, 300, .6)
+    this.chiDe()
+    await this.ngu(620)
+    this.dat({ a1P: 93 }, 580, .5); await this.ngu(160); this.dat({ a1P: 100 }, 580, .5)
+    await this.ngu(rand(900, 1200))
+  },
+  async saiLien(o) {
+    this.khoaMat = true
+    this.dat({ maT: 14, maP: 14, myT: 3, myP: 3, lid: this.n.lid + .16, gy: .2 }, 300, .7); this.datMieng('meo')
+    this.noi('saiLien', true)
+    for (const s of [-1, 1, -1]) { this.dat({ hr: s * 5, gx: -s * .2 }, 460, .5); await this.ngu(160) }
+    this.dat({ hr: 0, gx: .1 }, 300, .6)
+    if (this.k === 'vd' || this.k === 'vdc') {
+      // ghi sổ: gõ bút vào bảng kẹp / sổ
+      this.datBan('but'); this.dat({ a1P: -12, a2P: -86, gx: -.32, gy: .8 }, 190, .72)
+      await this.ngu(420)
+      for (let i = 0; i < 4; i++) { this.dat({ a2P: i % 2 ? -86 : -98, a1P: -12 + (i % 2) * 3 }, 520, .55); await this.ngu(130) }
+      this.dat({ a1P: 10, a2P: -6 }, 160, .72); await this.ngu(260); this.datBan('mo')
+    } else {
+      this.chiDe(); await this.ngu(560)
+      for (let i = 0; i < 2; i++) { this.dat({ a1P: 90 }, 620, .5); await this.ngu(140); this.dat({ a1P: 100 }, 620, .5); await this.ngu(170) }
+    }
+    await this.ngu(rand(900, 1200))
+  },
+  async dung(o) { await khen.call(this, false, o) },
+  async dungLien(o) { await khen.call(this, true, o) },
+  async choc() {
+    this.khoaMat = true
+    this.dat({ sy: .9, sx: 1.06, by: 2 }, 520, .5); await this.ngu(90)
+    this.dat({ sy: 1.06, sx: .96, by: -6, gx: 0, gy: .05, myT: -5, myP: -5 }, 320, .5)
+    this.datMieng(this.k === 'vdc' ? 'hmm' : 'o')
+    await this.ngu(200); this.dat({ sy: 1, sx: 1, by: 0 }, 300, .5)
+    await this.ngu(240)
+    if (this.k === 'vdc' || this.k === 'vd') { this.dat({ lidT: .9 }, 400, .7); this.datMieng('nhech'); await this.ngu(380); this.dat({ lidT: 0 }, 300, .7) }
+    else { this.datMat('cong'); this.datMieng('cuoiTo'); this.dat({ ma: 1 }, 200); await this.ngu(600); this.datMat('mo') }
+    await this.ngu(400)
+  },
+  async roi() {
+    this.khoaMat = true
+    const n = this.n
+    this.dat({ a1P: 16, a2P: -4, gx: 0, gy: .06, hr: 0 }, 150, .8)
+    this.dat({ lid: n.lid + .36, maT: n.ma0 + 13, maP: n.ma0 + 13, myT: 2.5, myP: 2.5 }, 280, .7); this.datMieng('meo')
+    await this.ngu(380)
+    this.noi('thiRoi', true)
+    for (let i = 0; i < 2; i++) { this.dat({ a2P: 14 }, 520, .5); await this.ngu(140); this.dat({ a2P: -4 }, 520, .5); await this.ngu(170) }
+    await this.ngu(2200)
+    this.dat({ lid: n.lid + .08, maT: n.ma0 + 4, maP: n.ma0 + 4, myT: 0, myP: 0 }, 200, .7); this.datMieng('phang')
+  },
+  async soi(o) {
+    // lúc thi: em chạm ô ⇒ đèn quay sang soi đúng ô ấy (không bàn về câu)
+    this.khoaMat = true
+    const r = this.svg.getBoundingClientRect(), sc = r.width / VB.w
+    const vx = r.left + (33 * TL - VB.x) * sc, vy = r.top + (-92 * TL - VB.y) * sc
+    const th = kep(Math.atan2(o.diem.x - vx, o.diem.y - vy) * 180 / Math.PI, 8, 125)
+    this.dat({ a1P: th, a2P: 0 }, 70, .85)
+    const g = this.huong(o.diem.x, o.diem.y, 110)
+    this.dat({ gx: g.gx, gy: g.gy }, 200, .8)
+    await this.ngu(420)
+    this.dat({ lid: this.n.lid + .34, maT: this.n.ma0 + 8, maP: this.n.ma0 + 8 }, 260, .7)
+    await this.ngu(rand(900, 1200))
+    this.dat({ lid: this.n.lid + .08, maT: this.n.ma0 + 4, maP: this.n.ma0 + 4 }, 200, .7)
+    await this.ngu(400)
+  },
+}
+async function khen(lien, o) {
+  this.khoaMat = true
+  const k = this.k, gia = k === 'vdc'
+  this.dat({ sy: .93, sx: 1.04, by: 1.5 }, 520, .55); this.dat({ gx: 0, gy: -.05, hr: 0 }, 300, .7)
+  await this.ngu(90)
+  const nhay = !gia && (lien || k === 'nb')
+  this.dat({ sy: 1.05, sx: .97, by: nhay ? (lien ? -13 : -7) : 0 }, 300, .5)
+  this.datBan('cai'); this.dat({ a1P: 35, a2P: 130 }, 260, .55)
+  if (gia) { this.datMieng(lien ? 'cuoi' : 'nhech'); this.dat({ lidT: .88, lidP: 0, lid: .12, myT: 2, myP: -3.5, ma: 1, maT: 0, maP: 0 }, 300, .7) }
+  else { this.datMat(k === 'vd' && !lien ? 'mo' : 'cong'); this.datMieng(k === 'vd' && !lien ? 'cuoi' : 'cuoiTo'); this.dat({ ma: 1, myT: -3, myP: -3, lid: 0, maT: -2, maP: -2 }, 300, .7) }
+  this.dat({ sao: 1 }, 220, .5)
+  this.noi(lien ? 'dungLien' : 'dung', o.luon)
+  await this.ngu(lien ? 260 : 200)
+  this.dat({ by: 0, sy: 1, sx: 1 }, 320, .45)
+  for (let i = 0; i < 2; i++) { this.dat({ hy: 4.5, gy: .25 }, 430, .55); await this.ngu(160); this.dat({ hy: -1, gy: 0 }, 430, .55); await this.ngu(170) }
+  if (lien && !gia) {
+    this.dat({ sy: .93, sx: 1.04, by: 1.5 }, 520, .55); await this.ngu(90)
+    this.dat({ sy: 1.05, sx: .97, by: -10, hr: -4 }, 300, .5); await this.ngu(220)
+    this.dat({ by: 0, sy: 1, sx: 1, hr: 0 }, 320, .45)
+  }
+  this.dat({ hy: 0 }, 300, .6)
+  await this.ngu(rand(800, 1100))
+  this.dat({ sao: 0 }, 140, .7)
+  if (gia) this.dat({ lidT: 0 }, 300, .7)
+  await this.ngu(200)
+}
+
+// ───────────────── nghe chung: ngoài màn hình / tab ẩn / tay rê ─────────────────
+const QUAN = new IntersectionObserver((ds) => { for (const d of ds) { const g = [...DS].find((x) => x.host === d.target); if (g) { g.hien = d.isIntersecting; g.hop = null; g.datSong(true) } } }, { rootMargin: '40px' })
+document.addEventListener('visibilitychange', () => { for (const g of DS) g.datSong(!document.hidden) })
+const reTay = (e) => { tayX = e.clientX; tayY = e.clientY; tayLuc = performance.now(); for (const g of DS) { g.hop = null; g.chay() } }
+document.addEventListener('pointermove', reTay, { passive: true })
+document.addEventListener('pointerdown', (e) => { lanBam = performance.now(); reTay(e) }, { passive: true })
+document.addEventListener('keydown', () => { lanBam = performance.now() })
+addEventListener('scroll', () => { for (const g of DS) g.hop = null }, { passive: true })
+addEventListener('resize', () => { for (const g of DS) g.hop = null })
+const huyGT = (g) => { if (!g) return; g.datSong(false); DS.delete(g); QUAN.unobserve(g.host) }
+
+// ───────────────── TRANG ─────────────────
+const $ = (id) => document.getElementById(id)
+let chon = 'th'
+// Trước | sau
+const luoiTS = $('ts-luoi')
+THU_TU.forEach((k, i) => {
+  const c = document.createElement('div'); c.className = 'ts-cap'
+  c.innerHTML = `<h3>${NV[k].ten}<span>${NV[k].muc}</span></h3><div class="ts-doi"><div class="ts-cot"><div class="ts-o ts-cu" data-i="${i}" role="img" aria-label="${NV[k].ten} hiện tại"></div><b class="ts-n">Hiện tại</b></div><div class="ts-cot"><div class="ts-o ts-moi"><div class="gt"></div></div><b class="ts-n ts-n-moi">Bản mới</b></div></div>`
+  luoiTS.appendChild(c)
+  new GiamThi(c.querySelector('.ts-moi .gt'), k, { tinh: true })
+})
+
+// Sân khấu
+const bongSan = new BongLoi($('san-loi'))
+const ky = $('nhat-ky'), ttChu = $('san-tt-chu'), tt = $('san-tt')
+let soKy = 0
+const ghi = (chu, loai) => {
+  const li = document.createElement('li'); li.textContent = chu; li.dataset.loai = loai
+  ky.prepend(li); while (ky.children.length > 7) ky.lastChild.remove()
+  soKy++
+}
+let gtSan = null
+function dungSan() {
+  huyGT(gtSan)
+  gtSan = new GiamThi($('san-nv'), chon, {
+    loi: bongSan, ghi,
+    tt: (ten, loai) => { tt.dataset.loai = loai === 'phan-ung' ? 'phan-ung' : loai === 'thi' || gtSan?.thi ? 'thi' : 'nhan-roi'; ttChu.textContent = ten ? (loai === 'phan-ung' ? (TEN_PU[ten] || 'Phản ứng') : ten === 'thi' ? 'Lúc thi: đèn pha quét chậm' : ten === 'soi' ? 'Soi ô em chạm' : TEN_DT(chon, ten)) : (gtSan?.thi ? 'Lúc thi: đèn pha quét chậm' : 'Đứng yên') },
+    thi: (b) => { $('pu-thi').setAttribute('aria-pressed', String(b)) },
+  })
+  $('san-ten').textContent = `${NV[chon].ten} · ${NV[chon].muc}`
+  $('pu-thi').setAttribute('aria-pressed', 'false')
+  const dsnr = $('ds-nr'); dsnr.innerHTML = ''
+  for (const t of Object.keys(NV[chon].nhanRoi)) {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'nut nho'; b.id = 'nr-' + t; b.textContent = TEN_DT(chon, t)
+    b.addEventListener('click', () => { lanBam = performance.now(); if (gtSan.thi) gtSan.batThi(false, true); gtSan.thu(t) })
+    dsnr.appendChild(b)
+  }
+  document.querySelectorAll('#chon-nv .nut').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.nv === chon)))
+  document.querySelectorAll('.the-nv').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.nv === chon)))
+}
+const chonNv = $('chon-nv')
+for (const k of THU_TU) {
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'nut nho'; b.id = 'nv-' + k; b.dataset.nv = k; b.textContent = NV[k].ten
+  b.addEventListener('click', () => doiNV(k)); chonNv.appendChild(b)
+}
+function doiNV(k) { if (k === chon) return; chon = k; bongSan.an(); dungSan(); dungCanh() }
+document.querySelectorAll('.nut-pu').forEach((b) => b.addEventListener('click', () => gtSan.phanUng(b.dataset.pu, { luon: true })))
+$('san-cham').addEventListener('click', () => { if (gtSan.thi) return; gtSan.phanUng('choc') })
+for (const [id, v] of [['nhip-that', 1], ['nhip-nhanh', 3]]) $(id).addEventListener('click', () => {
+  NHANH = v; $('nhip-that').setAttribute('aria-pressed', String(v === 1)); $('nhip-nhanh').setAttribute('aria-pressed', String(v === 3))
+  for (const g of DS) if (!g.dangLam) g.henNhanRoi()
+})
+
+// Bốn giám thị
+const bon = $('bon')
+for (const k of THU_TU) {
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'the-nv'; b.id = 'the-' + k; b.dataset.nv = k; b.setAttribute('aria-pressed', 'false')
+  b.innerHTML = `<div class="gt"></div><strong>${NV[k].ten}</strong><span class="muc-c">${NV[k].muc}</span><small>${NV[k].vai}</small>`
+  b.addEventListener('click', () => { doiNV(k); $('san').scrollIntoView({ behavior: giamMQ.matches ? 'auto' : 'smooth', block: 'center' }) })
+  bon.appendChild(b)
+  new GiamThi(b.querySelector('.gt'), k)
+}
+
+// Cảnh màn làm câu
+const CAU = [
+  { de: 'Số đồng phân <b>amine</b> có công thức phân tử C<sub>4</sub>H<sub>11</sub>N tác dụng với dung dịch HNO<sub>2</sub> (ở nhiệt độ thường) tạo ra <b>alcohol</b> là', pa: ['2', '8', '3', '4'], dung: 3 },
+  { de: 'Chất nào sau đây là <b>amine bậc hai</b>?', pa: ['CH<sub>3</sub>NH<sub>2</sub>', '(CH<sub>3</sub>)<sub>2</sub>NH', '(CH<sub>3</sub>)<sub>3</sub>N', 'C<sub>6</sub>H<sub>5</sub>NH<sub>2</sub>'], dung: 1 },
+  { de: 'Dung dịch chất nào sau đây làm <b>quỳ tím hoá xanh</b>?', pa: ['Aniline', 'Glycine', 'Methylamine', 'Acetic acid'], dung: 2 },
+]
+const bongCanh = new BongLoi($('dt-loi'), { nhip: true })
+let gtCanh = null, iCau = 0, chonPA = -1, daKiem = false, hienLuc = 0, dungLien = 0, saiLien = 0, thiCanh = false, diem = 10
+const paEl = $('dt-pa'), nutEl = $('dt-nut'), dayEl = $('dt-day'), kqEl = $('dt-kq')
+function dungCanh() {
+  huyGT(gtCanh)
+  gtCanh = new GiamThi($('dt-nv'), chon, { loi: bongCanh })
+  if (thiCanh) gtCanh.batThi(true)
+}
+function veCau() {
+  const c = CAU[iCau]
+  $('dt-de').innerHTML = c.de
+  paEl.innerHTML = ''
+  c.pa.forEach((p, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'pa'; b.id = 'pa-' + 'ABCD'[i]; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', 'false')
+    b.innerHTML = `<span>${'ABCD'[i]}</span><span>${p}</span>`
+    b.addEventListener('click', () => chonO(i, b)); paEl.appendChild(b)
+  })
+  chonPA = -1; daKiem = false; hienLuc = performance.now()
+  dayEl.removeAttribute('data-kq'); kqEl.hidden = true
+  nutEl.textContent = 'Kiểm tra'; nutEl.disabled = true
+  $('dt-tien').style.setProperty('--tien', (20 + iCau * 27) + '%')
+}
+function tamO(b) { const r = b.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 } }
+function chonO(i, b) {
+  if (daKiem) return
+  chonPA = i
+  paEl.querySelectorAll('.pa').forEach((x, j) => x.setAttribute('aria-checked', String(j === i)))
+  nutEl.disabled = thiCanh
+  if (thiCanh) gtCanh.phanUng('soi', { diem: tamO(b) })
+  else gtCanh.phanUng('chon', { diem: tamO(b) })
+}
+nutEl.addEventListener('click', () => {
+  if (thiCanh) return
+  if (daKiem) { iCau = (iCau + 1) % CAU.length; veCau(); return }
+  if (chonPA < 0) return
+  daKiem = true
+  const c = CAU[iCau], dung = chonPA === c.dung, voi = performance.now() - hienLuc < 4000
+  const ds = paEl.querySelectorAll('.pa')
+  ds.forEach((x) => (x.disabled = true))
+  ds[chonPA].dataset.kq = dung ? 'dung' : 'sai'; if (!dung) ds[c.dung].dataset.kq = 'dung'
+  dayEl.dataset.kq = dung ? 'dung' : 'sai'; kqEl.hidden = false
+  kqEl.textContent = dung ? 'Chính xác!' : `Chưa đúng · Đáp án: ${'ABCD'[c.dung]}`
+  nutEl.textContent = 'Tiếp tục'
+  if (dung) { dungLien++; saiLien = 0; diem += 10; $('dt-diem').textContent = diem } else { saiLien++; dungLien = 0 }
+  const ketQua = () => gtCanh.phanUng(dung ? (dungLien >= 2 ? 'dungLien' : 'dung') : (saiLien >= 2 ? 'saiLien' : 'sai'), { luon: false })
+  if (voi) { gtCanh.phanUng('voi', { diem: tamO(ds[chonPA]), luon: false }); setTimeout(() => { if (daKiem) ketQua() }, 2600) }
+  else ketQua()
+})
+$('dt-thi').addEventListener('click', () => {
+  thiCanh = !thiCanh
+  $('dt-thi').setAttribute('aria-checked', String(thiCanh))
+  $('dt-thi-ghi').hidden = !thiCanh; nutEl.hidden = thiCanh
+  bongCanh.an()
+  if (daKiem || thiCanh) veCau()
+  gtCanh.batThi(thiCanh)
+})
+// rời màn lúc thi rồi quay lại ⇒ một câu, gọn
+let anLuc = 0
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { anLuc = performance.now(); return }
+  if (performance.now() - anLuc < 600) return
+  setTimeout(() => { if (thiCanh && gtCanh?.song) gtCanh.phanUng('roi'); else if (gtSan?.thi && gtSan.song) gtSan.phanUng('roi') }, 350)
+})
+
+// Bảng gán câu ↔ tình huống
+const tb = $('bang-gan').tBodies[0]
+for (const th of ['voi', 'saiLien', 'sai', 'dung', 'dungLien', 'thiRoi', 'cho']) {
+  const g = GAN[th], tr = document.createElement('tr')
+  const thay = th === 'dung' || th === 'dungLien' ? THAY.chanNgon : g.thay()
+  const gtDs = th === 'cho' ? ['Còn ngồi nghĩ à?', '…theo từng giám thị'] : th === 'thiRoi' ? [] : th === 'dung' ? ['Giỏi! · Tốt. · Hừm. Không tệ. …'] : th === 'dungLien' ? ['Giỏi lắm, giữ nhịp nhé! · Ừ, khá đấy. …'] : th === 'voi' ? ['Bấm nhanh thế, đã đọc đề chưa?', '…'] : th === 'saiLien' ? ['Làm nên trò trống gì không đây?', '…'] : ['Học với hành! · Thuộc mà chưa hiểu rồi. · Sai phép tính rồi. …']
+  const ghiChu = th === 'dung' || th === 'dungLien' ? `<div class="thay">Chân ngôn của thầy (~${th === 'dung' ? '1/3' : '1/2'} lượt):</div>` : thay.length ? '<div class="thay">Câu của thầy:</div>' : ''
+  tr.innerHTML = `<td>${g.ten}</td><td>${g.dong}</td><td>${ghiChu}${thay.map((x) => `«${x}»`).join(' ')}${gtDs.length ? `<div>Lời giám thị: ${gtDs.join(' ')}</div>` : ''}</td>`
+  tb.appendChild(tr)
+}
+
+dungSan(); dungCanh(); veCau()
+window.__gt = { DS, NV, GiamThi, PU, DT, get san() { return gtSan }, get canh() { return gtCanh }, nhanh: (v) => { NHANH = v } }
+})()
+
+</script>

@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest'
 import { mucGiamThi } from '../src/components/giam-thi/muc-giam-thi'
 import { khoaMucDo } from '../src/lib/muc-do-nhan-thuc'
-import { LOI_GIAM_THI, cauMoi, suLoi, taoNhip, type NguCanhLoi } from '../src/components/giam-thi/loi-giam-thi'
+import { LOI_GIAM_THI, LOI_THAY, cauMoi, suLoi, taoNhip } from '../src/components/giam-thi/loi-giam-thi'
 import { THU_TU_GT, duongL, gocTay, khuyetL, kichBan, veGiamThi, type TrangThaiGT } from '../src/components/giam-thi/giam-thi-ve'
 import { readFileSync } from 'node:fs'
 
@@ -24,52 +24,39 @@ describe('chọn giám thị theo mức câu', () => {
   })
 })
 
-describe('kho lời càu nhàu', () => {
-  const tatCa = THU_TU_GT.flatMap((m) => Object.values(LOI_GIAM_THI[m]).flat())
-  it('mỗi câu ≤ 42 kí tự (một dòng ở 360 px), không emoji, không rỗng', () => {
+// 02/11: kho lời mới (câu của thầy ghép theo tình huống) — chi tiết ở tests/giam-thi-moi-0211.test.tsx.
+describe('kho lời giám thị', () => {
+  const tatCa = [...THU_TU_GT.flatMap((m) => Object.values(LOI_GIAM_THI[m]).flat()), ...Object.values(LOI_THAY).flat()]
+  it('không emoji, không rỗng; lời riêng giám thị vẫn ≤ 42 kí tự', () => {
     for (const c of tatCa) {
-      expect([...c].length, c).toBeLessThanOrEqual(42)
       expect(c.trim().length).toBeGreaterThan(0)
       expect(/\p{Extended_Pictographic}/u.test(c), c).toBe(false)
     }
+    for (const c of THU_TU_GT.flatMap((m) => Object.values(LOI_GIAM_THI[m]).flat())) expect([...c].length, c).toBeLessThanOrEqual(42)
   })
-  it('có đủ các câu thầy đưa và câu theo ngữ cảnh', () => {
-    expect(tatCa).toContain('Hừ.')
+  it('giữ các câu thầy đã duyệt 27/10', () => {
     expect(tatCa.some((c) => c.includes('Học với hành!'))).toBe(true)
     expect(tatCa).toContain('Làm nên trò trống gì không đây?')
-    expect(LOI_GIAM_THI.vdc.ngauNhien).toContain('Hừ. Để xem em có qua được câu này không.')
     expect(LOI_GIAM_THI.vdc.dung).toContain('Được. Lần này tạm chấp nhận.')
     expect(LOI_GIAM_THI.nb.dung).toContain('Giỏi!')
-    for (const m of THU_TU_GT) {
-      for (const k of ['ngauNhien', 'cho', 'dongHo', 'voi', 'sai', 'sai2', 'dung', 'combo', 'xong'] as NguCanhLoi[]) expect(LOI_GIAM_THI[m][k].length, `${m}.${k}`).toBeGreaterThan(0)
-      expect(LOI_GIAM_THI[m].ngauNhien.length).toBeGreaterThanOrEqual(8)
-    }
   })
 })
 
-describe('nhịp càu nhàu', () => {
-  it('tối đa 1 lần mỗi 2–3 câu; sai 2 câu liền và xong chặng luôn nói', () => {
+describe('nhịp lời', () => {
+  it('tối đa 1 lần mỗi câu rồi nghỉ 1–2 câu; sai liên tiếp luôn nói', () => {
     const n = taoNhip('p'), luon = () => 0
     cauMoi(n, 'c1')
     expect(suLoi(n, 'th', 'sai', 10_000, luon)).toBeTruthy()
-    expect(suLoi(n, 'th', 'ngauNhien', 10_000, luon)).toBeNull() // cùng câu: đã nói
+    expect(suLoi(n, 'th', 'voi', 20_000, luon)).toBeNull() // cùng câu: đã nói
     cauMoi(n, 'c2')
-    expect(suLoi(n, 'th', 'cho', 10_000, luon)).toBeNull() // câu kế: còn nghỉ
-    expect(suLoi(n, 'th', 'sai2', 10_000, luon)).toBe('Làm nên trò trống gì không đây?')
-    cauMoi(n, 'c3'); cauMoi(n, 'c4'); cauMoi(n, 'c5')
-    expect(suLoi(n, 'th', 'xong', 10_000, luon)).toBeTruthy()
+    expect(suLoi(n, 'th', 'cho', 30_000, luon)).toBeNull() // câu kế: còn nghỉ
+    expect(suLoi(n, 'th', 'saiLien', 30_000, luon)).toBeTruthy()
   })
-  it('không chen ngay sau khi em chạm phương án (1,5 giây)', () => {
+  it('lời «lâu không làm» không chen ngay sau khi em chạm (1,5 giây)', () => {
     const n = taoNhip('p'), luon = () => 0
     cauMoi(n, 'c1'); n.lanCham = 9_000
-    expect(suLoi(n, 'vd', 'ngauNhien', 10_000, luon)).toBeNull()
-    expect(suLoi(n, 'vd', 'ngauNhien', 10_600, luon)).toBeTruthy()
-  })
-  it('mức cao hiếm khen hơn', () => {
-    const n1 = taoNhip(), n2 = taoNhip(), r = () => 0.45
-    cauMoi(n1, 'a'); cauMoi(n2, 'a')
-    expect(suLoi(n1, 'nb', 'dung', 1e6, r)).toBeTruthy()
-    expect(suLoi(n2, 'vdc', 'dung', 1e6, r)).toBeNull()
+    expect(suLoi(n, 'vd', 'cho', 10_000, luon)).toBeNull()
+    expect(suLoi(n, 'vd', 'cho', 10_600, luon)).toBeTruthy()
   })
 })
 
