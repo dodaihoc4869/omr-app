@@ -60,7 +60,6 @@ examApiCho.catch(() => {}) // mất mạng lúc tải sẵn: không thành lỗi
 const goiExam = <K extends keyof ExamApi>(k: K): ExamApi[K] => ((...a: never[]) => examApi ? (examApi[k] as (...x: never[]) => unknown)(...a) : examApiCho.then((m) => (m[k] as (...x: never[]) => unknown)(...a))) as ExamApi[K]
 const hsDangNhapApi = goiExam('hsDangNhapApi'), hsDatMatKhauApi = goiExam('hsDatMatKhauApi'), hsLichSuCaApi = goiExam('hsLichSuCaApi'), hsBtvnApi = goiExam('hsBtvnApi'), hsCauSaiApi = goiExam('hsCauSaiApi')
 import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
-import KhungXemPhieu from '../components/KhungXemPhieu'
 import { tenBaiTapTrenThe, type TheChangView } from '../lib/btvn-ca-nhan-kieu'
 import { nhoVaiDaDung } from '../lib/vai-tro'
 import { datManifestTheoVai } from '../lib/pwa-install'
@@ -116,7 +115,7 @@ const ModalKhacPhucCauSai = lazy(() => napKhoiPhu().then((m) => ({ default: m.Mo
 // mã ba khối ấy cùng cửa nạp kho đề, thuật toán rút câu sai, phiếu luyện mà chỉ chúng dùng). Mảnh được nạp trước lúc rảnh ở Hôm nay (cùng nhịp nạp trước màn thi, dưới) ⇒ lúc em bấm, khối đã có thì VẼ THẲNG (veNgayKhiCo,
 // không treo Suspense, không màn chờ); chưa có (2G / tiết kiệm dữ liệu / bấm quá sớm) ⇒ React.lazy, chỗ chờ giữ khung như các khối lười khác.
 type KhoiPhu = typeof import('../components/cong-hs-nap-luoi')
-function khoiPhu<K extends 'KhoiKhacPhuc3CheDo' | 'BtvnM3' | 'MomDanhSachM3' | 'MomLamBaiM3' | 'LichSuCaM3'>(ten: K) {
+function khoiPhu<K extends 'KhoiKhacPhuc3CheDo' | 'BtvnM3' | 'MomDanhSachM3' | 'MomLamBaiM3' | 'LichSuCaM3' | 'KhungXemPhieu'>(ten: K) {
   const bo: BoNap<{ default: KhoiPhu[K] }> = Object.assign(() => napKhoiPhu().then((m) => ({ default: m[ten] })), {
     san: () => {
       const m = napKhoiPhu.san()
@@ -130,6 +129,9 @@ const BtvnM3 = khoiPhu('BtvnM3')
 const MomDanhSachM3 = khoiPhu('MomDanhSachM3')
 const MomLamBaiM3 = khoiPhu('MomLamBaiM3')
 const LichSuCaM3 = khoiPhu('LichSuCaM3') // tab «Xem điểm» (25/10: nạp lười cùng mảnh trên)
+// 02/11 (tác tử tốc độ): khung xem phiếu chỉ hiện khi em BẤM mở phiếu / đề kèm lỗi sai ⇒ vào mảnh trên (mảnh ấy đã chứa nó qua hộp Khắc phục) — lượt mở /hs
+// bớt ~2,5 KB nén; mảnh đã nạp trước lúc rảnh ⇒ lúc bấm vẽ ngay, không treo Suspense.
+const KhungXemPhieu = khoiPhu('KhungXemPhieu')
 // Bong bóng A.I Đỗ Đại Học (thầy 24/10): kênh hỏi bài của văn phòng; chỉ ở Hôm nay; mảnh riêng ngoài precache, cửa nạp qua cong-hs-nap-luoi.
 const BongBongAiDdh = lazy(() => napKhoiPhu().then((m) => m.napBong()))
 import { baoDaXemHocSinh } from '../lib/canh-bao-thay-may-chu'
@@ -1984,15 +1986,18 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
       )}
 
       {xemDeHtml && (
+        <Suspense fallback={null}>
         <KhungXemPhieu
           html={xemDeHtml}
           ten="Đề và lời giải kèm lỗi sai"
           dong={() => setXemDeHtml('')}
         />
+        </Suspense>
       )}
 
       {/* Khung xem đề bài tập & khắc phục câu sai (chuẩn HTML tương tác) */}
       {phieuHtml && (
+        <Suspense fallback={null}>
         <KhungXemPhieu
           html={phieuHtml}
           ten="Bài tập & Phiếu làm bài"
@@ -2043,6 +2048,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
             ) : null
           }
         />
+        </Suspense>
       )}
 
       {/* BÁO CÁO CHI TIẾT CA — BẢN MỚI (BaoCaoChiTiet chế độ em, thầy 28/09 "thay thế hết bằng bản mới"). */}
