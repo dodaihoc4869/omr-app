@@ -955,7 +955,7 @@ export function MotTrangHs(p: PropsMotTrang) {
   // 01/11 tối (thầy «chữ hiện bong bóng trên đầu Mol»): có Mol cạnh đường + lời theo cấp ⇒ bong bóng TRÊN ĐẦU Mol ở mọi hướng màn (thay thẻ riêng ở trên)
   const benLua = null
   return <div ref={khung} className="dm-khung" data-so-menu={coThuong || undefined} style={{ '--tren-cao': `${trenCao}px` } as CSSProperties}>{tren}
-    <main className="da-vo" aria-busy={!so && p.dangTai}>
+    <main className="da-vo" aria-busy={!so && p.dangTai}><div className="kb-cot-trai">
       {chinh === 'ca' && <section className="da-bang" data-sac="tin" aria-label="Ca kiểm tra đang mở"><span className="h"><ClipboardCheck size={26} aria-hidden="true" /></span><div className="giua"><b>Ca kiểm tra đang mở</b><span className="mo">Nhập mã ca và mật khẩu thầy cung cấp để vào phòng kiểm tra.</span></div><button type="button" className="nut-to" onClick={p.onThi}>Vào ca kiểm tra</button></section>}
       {/* 28/10 (thầy «Chúc mừng, em đã hoàn thành bài hôm nay — ghi rõ câu sửa, bài kiểm tra. Thay thẻ hoàn thành nhiệm vụ»): xong HẾT việc hôm nay ⇒ thẻ chúc mừng
           kèm số câu học · câu sửa · Kiểm tra ôn tập; còn việc ⇒ thẻ «Đủ x/y câu» + việc tiếp như cũ. 02/11 (ảnh thật «Đủ 17/12 câu hôm nay!»): VƯỢT mức ⇒
@@ -997,11 +997,13 @@ export function MotTrangHs(p: PropsMotTrang) {
           <span className="kb-banh" aria-hidden="true"><svg viewBox="0 0 100 100"><path d={BANH_12} fill="currentColor" stroke="currentColor" strokeWidth={0} /></svg><Ic size={24} strokeWidth={2.6} /></span>
           <span className="kb-giua"><b>{d.bong ?? d.pop.nut!.chu} · {d.loai === 'hoc' ? tenDong(d, nut.slice(0, nut.indexOf(d) + 1).filter((x) => x.loai === 'hoc').length) : d.pop.tieu}</b><span className="kb-phu">{d.loai === 'hoc' ? `${p.tenBai || 'Bài học hôm nay'} · ${phuDong(d).replace(/^.*· (còn \d+ câu)$/, '$1')}` : phuDong(d)}</span></span>
           <ChevronRight size={22} aria-hidden="true" /></button> })()}
+      </div><div className="kb-cot-phai">
       {!so && p.dangTai && !p.ngayKiem ? null : nut.length > 0 && <section className="kb-viec" aria-label="Việc hôm nay"><h2>Việc hôm nay<span>{nut.filter((n) => n.tt === 'xong').length}/{nut.length} xong</span></h2>
         <DanhSachViec ds={nut} moKhoa={moKt ? 'kt' : moSua ? 'sua' : undefined} /></section>}
       {coThuong && <TheBanLoTrinh token={p.token} bat={tq?.bat.banBe} onMo={() => moTp('ban')} />}
       {!(!so && p.dangTai) && <TheRuong ds={nut} />}
       {hocThem && <button type="button" className="mot-lien-ket" onClick={p.onHoc}>Học thêm câu mới<ChevronRight size={18} aria-hidden="true" /></button>}
+    </div>
     </main>
     <aside className="dm-ben" aria-label="Tóm tắt">
       {dongHomNay}
@@ -1157,7 +1159,7 @@ export function MenuDocTrong(p: {
         luật cũ `.tr-menu-cham s` (đọc số chưa đọc của chuông thật). */}
     <div className="tr-menu-ray kb-thanh">
       <div className="kb-thanh-ds">
-        {MENU_DUO.map(({ id, ten, icon: Icon }) => <button key={id} type="button" className="tr-ray-muc kb-thanh-muc" onClick={chon(() => p.onMuc(id))} aria-current={p.muc === id ? 'page' : undefined}><Icon size={22} aria-hidden="true" /><span>{ten}</span></button>)}
+        {MENU_DUO.map(({ id, ten, icon: Icon }) => <button key={id} type="button" className="tr-ray-muc kb-thanh-muc" onClick={chon(() => p.onMuc(id))} aria-current={p.muc === id ? 'page' : undefined} aria-label={ten}><Icon size={22} aria-hidden="true" /><span aria-hidden="true">{ten}</span></button>)}
         <button ref={nut} type="button" className="tr-menu-cham kb-thanh-muc" data-dd={ddMo || undefined} aria-label={ddMo ? 'Thêm · Buổi học đang mở điểm danh' : 'Thêm'} aria-expanded={mo} aria-controls="tr-menu" onClick={() => setMo(true)}>
           <i /><s /><Luoi4 size={22} /><span aria-hidden="true">Thêm</span>{ddMo && <em aria-hidden="true"><QrCode size={14} />Điểm danh</em>}
         </button>
