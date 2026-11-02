@@ -112,6 +112,15 @@ describe('tự đo độ chính xác trên số liệu thật — /gv/bon-bang �
     expect(kd.tam).toEqual({ ht: 1, dp: 0 })
     expect(kd.niemPhong.dp).toEqual({ tong: 3, cung: 1, lat: 1 })
     expect(kd.niemPhong.ht).toEqual({ tong: 1, cung: 1, lat: 0 })
+    // < 30 nhãn niêm phong ⇒ «chưa đủ mẫu», không in con số
+    expect(kd.chinhXac).toEqual({ ht: null, dp: null })
+  })
+  it('≥ 30 nhãn niêm phong ⇒ có độ chính xác + cận dưới Wilson; 1 lật / 300 ⇒ cận dưới < 99% vẫn phải hiện đúng', () => {
+    const ds = Array.from({ length: 300 }, (_, i) => ({ vao: JSON.stringify({ dp: true }), kiem_cl: 'da', lop_nhan: i === 0 ? 'ht' : 'dp', ng_nhan: 'dp', ng_llr: 1 }))
+    const kd = kiemDinhBon(ds)
+    expect(kd.chinhXac!.dp!.ti).toBeCloseTo(299 / 300, 6)
+    expect(kd.chinhXac!.dp!.canDuoi).toBeLessThan(kd.chinhXac!.dp!.ti)
+    expect(kd.chinhXac!.ht).toBeNull()
   })
 })
 

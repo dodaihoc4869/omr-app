@@ -56,6 +56,9 @@ export interface TraLoiBonBang {
     daKiem: { ht: number; dp: number }
     tam: { ht: number; dp: number }
     niemPhong: Record<'ht' | 'dp', { tong: number; cung: number; lat: number }>
+    /** Độ chính xác nhãn ĐÃ KIỂM trên số liệu thật = 1 − lật / niêm phong, kèm cận dưới Wilson 95% một phía. CHỈ có khi ≥ 30 nhãn niêm phong;
+     *  null = «chưa đủ mẫu» (không in con số). Lời hứa 99%: cận dưới ≥ 0,99. */
+    chinhXac?: Record<'ht' | 'dp', { ti: number; canDuoi: number } | null>
   }
 }
 

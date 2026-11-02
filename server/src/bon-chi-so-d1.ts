@@ -14,6 +14,7 @@ import { cuaSoTinh, sqlChuyenDeKho, sqlQidGoc, SQL_LUOT_LAM, tinhLoEm } from './
 import { BAN_BON, tinhBon, trungVi, vaoBang, type KetQuaBon, type SoLieuBon, type TheTho } from './bon-chi-so'
 import { SO_NGAY_CA, type CauCaThi, type LuotBang, type LuyenCuDv } from './bon-ca-thi'
 import { congNgay7 } from './goi-bai-7-loi'
+import { canDuoiWilson } from './danh-gia-hoc-that'
 import { THU_TU_BANG, type DiemBon, type DongBang, type LoiBon, type MaBang, type TheBangChung, type TraLoiBangChung, type TraLoiBonBang } from '../../src/lib/bon-bang-kieu'
 
 type Row = Record<string, unknown>
@@ -76,6 +77,7 @@ export async function tinhLoBon(env: Env, em: readonly EmGoc[], nowMs: number): 
   const ds = JSON.stringify(sbds)
   const [dg, ngayEm, vao, cuoi, rHoi, rCa, rCu, doKho] = await Promise.all([
     tinhLoEm(env, sbds, nowMs, { giuDauVao: true }).catch(() => null),
+    // KHÔNG nuốt lỗi ở đây (soát 02/11): rỗng ⇒ cả lô thành «chưa có ngày phải làm» ⇒ hàng loạt Chăm sai. Lỗi ⇒ lô không ghi, phút sau tính lại.
     docNgayCacEm(env, em, w.tu, w.cuoi, w.homNay, []),
     docNgayVao(env, em, w.tu),
     hoi(env, 'SELECT sbd, MAX(ngay_vn) AS n FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?1)) AND ket_qua IS NOT NULL GROUP BY sbd', JSON.stringify(sbds)).catch(() => [] as Row[]),
@@ -186,6 +188,9 @@ export async function gvBonBang(env: Env, _b: Row, nowMs = Date.now()): Promise<
   }
 }
 
+/** Số nhãn niêm phong tối thiểu mỗi nhãn để báo độ chính xác trên số liệu thật. */
+export const MAU_TOI_THIEU_KD = 30
+
 /** HƯỚNG B — tự đo độ chính xác trên số liệu thật (thuần, chỉ đếm gộp). Nhãn niêm phong từ các buổi TRƯỚC buổi trên lớp gần nhất (`nguoc.nhan`) so với:
  *  (a) chính buổi gần nhất — cùng chiều hay không (một buổi còn nhiễu, chỉ để xem xu hướng); (b) toàn bộ dữ liệu mới nhất (`lop.nhan`) — chốt NGƯỢC là SAI. */
 export function kiemDinhBon(rows: readonly Row[]): NonNullable<TraLoiBonBang['kiemDinh']> {
@@ -206,6 +211,9 @@ export function kiemDinhBon(rows: readonly Row[]): NonNullable<TraLoiBonBang['ki
       if ((moi === 'ht' || moi === 'dp') && moi !== ng) x.lat++
     }
   }
+  // Chưa đủ 30 nhãn niêm phong ⇒ «chưa đủ mẫu» (null) — không in con số khi mẫu còn nhỏ.
+  const cx = (x: { tong: number; lat: number }) => (x.tong >= MAU_TOI_THIEU_KD ? { ti: (x.tong - x.lat) / x.tong, canDuoi: canDuoiWilson(x.tong - x.lat, x.tong) } : null)
+  kd.chinhXac = { ht: cx(kd.niemPhong.ht), dp: cx(kd.niemPhong.dp) }
   return kd
 }
 
