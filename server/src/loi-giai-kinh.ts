@@ -146,7 +146,16 @@ export async function tongKinh(env: Env) {
     env.DB.prepare('SELECT COALESCE(phan, ?) AS phan, trang_thai, COUNT(*) AS n FROM loi_giai_kinh_viec GROUP BY 1, 2').bind('?').all<Obj>(),
     env.DB.prepare('SELECT phan, cong, nghi, COUNT(*) AS n FROM loi_giai_kinh WHERE phien_ban >= ? GROUP BY 1, 2, 3').bind(PHIEN_BAN_KINH).all<Obj>(),
   ])
-  return { ok: true, phienBan: PHIEN_BAN_KINH, hang: hang.results ?? [], ban: ban.results ?? [] }
+  // ĐỐI CHIẾU PHỦ (thầy 03/11 «Kho có hơn 15000 câu mà sao chỉ phải làm hơn 8000 câu»): câu kho ĐANG DÙNG (chỉ mục game, tờ chưa xoá) so với chỉ mục lời giải.
+  const KHO = `FROM game_v2_question q JOIN de_kho d ON d.ma_de = q.ma_de JOIN game_v2_index g ON g.ma_de = d.ma_de AND g.source_version = d.cap_nhat_luc
+    WHERE COALESCE(d.da_xoa, 0) = 0`
+  const [kho, thieu, thieuDe, chiMuc] = await Promise.all([
+    env.DB.prepare(`SELECT json_extract(q.json,'$.phan') AS phan, COUNT(*) AS n, COUNT(DISTINCT q.content_group) AS nhom ${KHO} GROUP BY 1`).all<Obj>().then((r) => r.results ?? [], () => []),
+    env.DB.prepare(`SELECT json_extract(q.json,'$.phan') AS phan, COUNT(*) AS n ${KHO} AND q.qid NOT IN (SELECT qid FROM loi_giai_cau) GROUP BY 1`).all<Obj>().then((r) => r.results ?? [], () => []),
+    env.DB.prepare(`SELECT q.ma_de, COUNT(*) AS n ${KHO} AND q.qid NOT IN (SELECT qid FROM loi_giai_cau) GROUP BY 1 ORDER BY 2 DESC LIMIT 15`).all<Obj>().then((r) => r.results ?? [], () => []),
+    env.DB.prepare('SELECT COUNT(*) AS qid, COUNT(DISTINCT bam) AS bam FROM loi_giai_cau').first<Obj>().catch(() => null),
+  ])
+  return { ok: true, phienBan: PHIEN_BAN_KINH, hang: hang.results ?? [], ban: ban.results ?? [], doiChieu: { kho, thieu, thieuDe, chiMuc } }
 }
 
 /** BẢN ĐẠT cho danh sách qid (băm hiện tại trong `loi_giai_cau`; phiên bản hiện hành). Câu máy nghi đáp án VẪN hiện (thầy 03/11: «Câu nào nghi đáp án thì lấy luôn lời giải mới nhé ko cần tôi duyệt») — cột `nghi` chỉ còn để đếm. Một câu D1, dùng trong đợt đọc sẵn của nơi gọi. */

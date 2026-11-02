@@ -178,6 +178,7 @@ if (co('--tong')) {
   const cong = {}; for (const x of t.ban) cong[`${x.phan}·${x.cong}${x.nghi ? '·nghi' : ''}`] = x.n
   const hang = {}; for (const x of t.hang) hang[`${x.phan}·${x.trang_thai}`] = x.n
   console.log('Bản Kính (phiên bản', t.phienBan + '):', JSON.stringify(cong)); console.log('Hàng việc:', JSON.stringify(hang))
+  if (t.doiChieu) console.log('Đối chiếu kho:', JSON.stringify(t.doiChieu))
   process.exit(0)
 }
 console.log(`[${gio()}] Máy soạn Lời giải Kính: ${LUONG} luồng × ${SO_CAU} câu/lô${MODEL ? ' · model ' + MODEL : ''}${co('--thu') ? ' · CHẠY THỬ' : ''} · ${os.hostname()}`)
