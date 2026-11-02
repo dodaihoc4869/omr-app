@@ -1,0 +1,485 @@
+{
+ "ghiChu": "Đo 02/11 bằng docs/mol-song-dong-0211/do-mol.mjs, CPU ×6 (Chromium throttling), khổ 390×844, máy chủ giả; trước = origin/main 4ec7f381, sau = nhánh claude/mol-song-dong-0211. yeu1 = máy yếu (app tự bật chế độ gọn), yeu0 = máy thường. Máy đo dùng chung với phiên khác (nhiễu ±1 khung).",
+ "byteMoApp": {
+  "truoc": {
+   "app": {
+    "giao-vien": {
+     "tep": 11,
+     "gzip": 180695
+    },
+    "hoc-sinh": {
+     "tep": 38,
+     "gzip": 237649
+    },
+    "phu-huynh": {
+     "tep": 20,
+     "gzip": 167147
+    }
+   },
+   "duong": {
+    "thay /gv": 182770,
+    "phieu /p": 235416,
+    "phu-huynh /ph": 168857,
+    "thi /t": 264451,
+    "dang-nhap-hs /hs": 130452,
+    "cong-hs /hs (đã đăng nhập)": 249518
+   }
+  },
+  "sau": {
+   "app": {
+    "giao-vien": {
+     "tep": 11,
+     "gzip": 180683
+    },
+    "hoc-sinh": {
+     "tep": 38,
+     "gzip": 237635
+    },
+    "phu-huynh": {
+     "tep": 20,
+     "gzip": 167143
+    }
+   },
+   "duong": {
+    "thay /gv": 182758,
+    "phieu /p": 235400,
+    "phu-huynh /ph": 168852,
+    "thi /t": 264442,
+    "dang-nhap-hs /hs": 130449,
+    "cong-hs /hs (đã đăng nhập)": 249504
+   }
+  }
+ },
+ "truoc-yeu1": {
+  "cpu": 6,
+  "mayYeu": true,
+  "luc": "2026-11-02T02:55:56.715Z",
+  "loTrinh": {
+   "yen": {
+    "khung": 176,
+    "p50": 17,
+    "p95": 17,
+    "tren50": 1,
+    "max": 100,
+    "jsMs": 255,
+    "jsMoiKhung": 1.45,
+    "rafGiay": 0,
+    "daiTren50": 1,
+    "voHan": 0,
+    "molChay": 0,
+    "cheDo": "cu"
+   },
+   "chamMol": {
+    "khung": 171,
+    "p50": 17,
+    "p95": 17,
+    "tren50": 1,
+    "max": 83,
+    "jsMs": 107,
+    "jsMoiKhung": 0.63,
+    "rafGiay": 1,
+    "daiTren50": 0,
+    "voHan": 0,
+    "molChay": 0,
+    "cheDo": "cu"
+   },
+   "tay": {
+    "khung": 142,
+    "p50": 17,
+    "p95": 17,
+    "tren50": 1,
+    "max": 167,
+    "jsMs": 118,
+    "jsMoiKhung": 0.83,
+    "rafGiay": 0,
+    "daiTren50": 1,
+    "voHan": 0,
+    "molChay": 0,
+    "cheDo": "cu"
+   },
+   "sauTuongTac": {
+    "khung": 111,
+    "p50": 17,
+    "p95": 17,
+    "tren50": 3,
+    "max": 83,
+    "jsMs": 20,
+    "jsMoiKhung": 0.18,
+    "rafGiay": 0,
+    "daiTren50": 0,
+    "voHan": 0,
+    "molChay": 0,
+    "cheDo": "cu"
+   },
+   "cuon": {
+    "khung": 177,
+    "p50": 17,
+    "p95": 17,
+    "tren50": 1,
+    "max": 67,
+    "jsMs": 94,
+    "jsMoiKhung": 0.53,
+    "rafGiay": 0,
+    "daiTren50": 0,
+    "voHan": 0,
+    "molChay": 0,
+    "cheDo": "cu"
+   }
+  },
+  "lamCau": {
+   "yen": {
+    "khung": 181,
+    "p50": 17,
+    "p95": 17,
+    "tren50": 0,
+    "max": 17,
+    "jsMs": 35,
+    "jsMoiKhung": 0.2,
+    "rafGiay": 0,
+    "daiTren50": 0,
+    "voHan": 0,
+    "molChay": 0,
+    "cheDo": "cu"
+   },
+   "bamPa": {
+    "khung": 87,
+    "p50": 17,
+    "p95": 17,
+    "tren50": 1,
+    "max": 67,
+    "jsMs": 45,
+    "jsMoiKhung": 0.52,
+    "rafGiay": 1,
+    "daiTren50": 1,
+    "voHan": 0,
+    "molChay": 0,
+    "cheDo": "cu"
+   }
+  },
+  "loi": []
+ },
+ "truoc-yeu0": {
+  "cpu": 6,
+  "mayYeu": false,
+  "luc": "2026-11-02T02:56:38.809Z",
+  "loTrinh": {
+   "yen": {
+    "khung": 170,
+    "p50": 17,
+    "p95": 17,
+    "tren50": 1,
+    "max": 167,
+    "jsMs": 317,
+    "jsMoiKhung": 1.86,
+    "rafGiay": 0,
+    "daiTren50": 1,
+    "voHan": 9,
+    "molChay": 0,
+    "cheDo": "cu"
+   },
+   "chamMol": {
+    "khung": 165,
+    "p50": 17,
+    "p95": 17,
+    "tren50": 3,
+    "max": 117,
+    "jsMs": 120,
+    "jsMoiKhung": 0.73,
+    "rafGiay": 1,
+    "daiTren50": 2,
+    "voHan": 9,
+    "molChay": 0,
+    "cheDo": "cu"
+   },
+   "tay": {
+    "khung": 140,
+    "p50": 17,
+    "p95": 17,
+    "tren50": 1,
+    "max": 167,
+    "jsMs": 90,
+    "jsMoiKhung": 0.64,
+    "rafGiay": 0,
+    "daiTren50": 1,
+    "voHan": 9,
+    "molChay": 0,
+    "cheDo": "cu"
+   },
+   "sauTuongTac": {
+    "khung": 120,
+    "p50": 17,
+    "p95": 17,
+    "tren50": 0,
+    "max": 17,
+    "jsMs": 14,
+    "jsMoiKhung": 0.11,
+    "rafGiay": 0,
+    "daiTren50": 0,
+    "voHan": 9,
+    "molChay": 0,
+    "cheDo": "cu"
+   },
+   "cuon": {
+    "khung": 177,
+    "p50": 17,
+    "p95": 17,
+    "tren50": 1,
+    "max": 67,
+    "jsMs": 118,
+    "jsMoiKhung": 0.67,
+    "rafGiay": 0,
+    "daiTren50": 0,
+    "voHan": 9,
+    "molChay": 0,
+    "cheDo": "cu"
+   }
+  },
+  "lamCau": {
+   "yen": {
+    "khung": 180,
+    "p50": 17,
+    "p95": 17,
+    "tren50": 0,
+    "max": 17,
+    "jsMs": 219,
+    "jsMoiKhung": 1.22,
+    "rafGiay": 60,
+    "daiTren50": 0,
+    "voHan": 3,
+    "molChay": 0,
+    "cheDo": "cu"
+   },
+   "bamPa": {
+    "khung": 88,
+    "p50": 17,
+    "p95": 17,
+    "tren50": 0,
+    "max": 50,
+    "jsMs": 116,
+    "jsMoiKhung": 1.32,
+    "rafGiay": 59,
+    "daiTren50": 0,
+    "voHan": 3,
+    "molChay": 0,
+    "cheDo": "cu"
+   }
+  },
+  "loi": []
+ },
+ "sau-yeu1": {
+  "cpu": 6,
+  "mayYeu": true,
+  "luc": "2026-11-02T03:36:49.989Z",
+  "loTrinh": {
+   "yen": {
+    "khung": 176,
+    "p50": 17,
+    "p95": 17,
+    "tren50": 1,
+    "max": 100,
+    "jsMs": 269,
+    "jsMoiKhung": 1.53,
+    "rafGiay": 0,
+    "daiTren50": 1,
+    "voHan": 0,
+    "molChay": 0,
+    "cheDo": "gon"
+   },
+   "chamMol": {
+    "khung": 173,
+    "p50": 17,
+    "p95": 17,
+    "tren50": 1,
+    "max": 67,
+    "jsMs": 319,
+    "jsMoiKhung": 1.84,
+    "rafGiay": 58,
+    "daiTren50": 1,
+    "voHan": 0,
+    "molChay": 1,
+    "cheDo": "gon"
+   },
+   "tay": {
+    "khung": 143,
+    "p50": 17,
+    "p95": 17,
+    "tren50": 1,
+    "max": 150,
+    "jsMs": 152,
+    "jsMoiKhung": 1.06,
+    "rafGiay": 0,
+    "daiTren50": 1,
+    "voHan": 0,
+    "molChay": 0,
+    "cheDo": "gon"
+   },
+   "sauTuongTac": {
+    "khung": 120,
+    "p50": 17,
+    "p95": 17,
+    "tren50": 0,
+    "max": 17,
+    "jsMs": 26,
+    "jsMoiKhung": 0.22,
+    "rafGiay": 0,
+    "daiTren50": 0,
+    "voHan": 0,
+    "molChay": 0,
+    "cheDo": "gon"
+   },
+   "cuon": {
+    "khung": 175,
+    "p50": 17,
+    "p95": 17,
+    "tren50": 1,
+    "max": 117,
+    "jsMs": 86,
+    "jsMoiKhung": 0.49,
+    "rafGiay": 0,
+    "daiTren50": 0,
+    "voHan": 0,
+    "molChay": 0,
+    "cheDo": "gon"
+   }
+  },
+  "lamCau": {
+   "yen": {
+    "khung": 181,
+    "p50": 17,
+    "p95": 17,
+    "tren50": 0,
+    "max": 17,
+    "jsMs": 65,
+    "jsMoiKhung": 0.36,
+    "rafGiay": 0,
+    "daiTren50": 0,
+    "voHan": 0,
+    "molChay": 0,
+    "cheDo": "gon"
+   },
+   "bamPa": {
+    "khung": 84,
+    "p50": 17,
+    "p95": 17,
+    "tren50": 1,
+    "max": 100,
+    "jsMs": 73,
+    "jsMoiKhung": 0.86,
+    "rafGiay": 1,
+    "daiTren50": 1,
+    "voHan": 0,
+    "molChay": 0,
+    "cheDo": "gon"
+   }
+  },
+  "loi": []
+ },
+ "sau-yeu0": {
+  "cpu": 6,
+  "mayYeu": false,
+  "luc": "2026-11-02T03:36:06.897Z",
+  "loTrinh": {
+   "yen": {
+    "khung": 171,
+    "p50": 17,
+    "p95": 17,
+    "tren50": 1,
+    "max": 133,
+    "jsMs": 288,
+    "jsMoiKhung": 1.69,
+    "rafGiay": 0,
+    "daiTren50": 1,
+    "voHan": 14,
+    "molChay": 0,
+    "cheDo": "day-du"
+   },
+   "chamMol": {
+    "khung": 157,
+    "p50": 17,
+    "p95": 33,
+    "tren50": 3,
+    "max": 133,
+    "jsMs": 366,
+    "jsMoiKhung": 2.33,
+    "rafGiay": 53,
+    "daiTren50": 2,
+    "voHan": 10,
+    "molChay": 1,
+    "cheDo": "day-du"
+   },
+   "tay": {
+    "khung": 111,
+    "p50": 17,
+    "p95": 33,
+    "tren50": 2,
+    "max": 100,
+    "jsMs": 259,
+    "jsMoiKhung": 2.33,
+    "rafGiay": 44,
+    "daiTren50": 0,
+    "voHan": 10,
+    "molChay": 1,
+    "cheDo": "day-du"
+   },
+   "sauTuongTac": {
+    "khung": 116,
+    "p50": 17,
+    "p95": 17,
+    "tren50": 0,
+    "max": 50,
+    "jsMs": 39,
+    "jsMoiKhung": 0.34,
+    "rafGiay": 2,
+    "daiTren50": 0,
+    "voHan": 14,
+    "molChay": 0,
+    "cheDo": "day-du"
+   },
+   "cuon": {
+    "khung": 151,
+    "p50": 17,
+    "p95": 33,
+    "tren50": 0,
+    "max": 50,
+    "jsMs": 354,
+    "jsMoiKhung": 2.35,
+    "rafGiay": 48,
+    "daiTren50": 0,
+    "voHan": 10,
+    "molChay": 1,
+    "cheDo": "day-du"
+   }
+  },
+  "lamCau": {
+   "yen": {
+    "khung": 180,
+    "p50": 17,
+    "p95": 17,
+    "tren50": 0,
+    "max": 17,
+    "jsMs": 236,
+    "jsMoiKhung": 1.31,
+    "rafGiay": 60,
+    "daiTren50": 0,
+    "voHan": 3,
+    "molChay": 0,
+    "cheDo": "day-du"
+   },
+   "bamPa": {
+    "khung": 81,
+    "p50": 17,
+    "p95": 33,
+    "tren50": 1,
+    "max": 100,
+    "jsMs": 139,
+    "jsMoiKhung": 1.71,
+    "rafGiay": 55,
+    "daiTren50": 1,
+    "voHan": 3,
+    "molChay": 0,
+    "cheDo": "day-du"
+   }
+  },
+  "loi": []
+ }
+}

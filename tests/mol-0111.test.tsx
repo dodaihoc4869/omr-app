@@ -3,6 +3,8 @@
 // Khoá: đủ 11 mặt (+ 4 mặt phương án); cấp giận 2 dỗi · 3 bực · 4 CÁU · 5 RẤT CÁU; trạng thái cũ map đúng mặt; chạm ⇒ ngạc nhiên rồi về
 // (đang giận thì không); tĩnh ⇒ không chuyển động; huỷ ⇒ gỡ sạch; ≤ 130 nút SVG (luật tốc độ 28/10); không màu thô; tên «Mol» trên màn.
 // 01/11 tối (thầy «giữ hình cầu, cảm xúc dễ thương, thêm 6,022, phối màu mịn»): giận ĐỔI SẮC + nút bấc bung trên lửa, KHÔNG răng; khắc 6,022·10²³ ẩn < 64 px.
+// 02/11 MOL SỐNG ĐỘNG (thầy «Chốt Mol sống động…»): một bộ khung SVG, mặt = bộ số qua lò xo; chạm ⇒ cười khúc khích (ngủ ⇒ giật mình 1,5 s; chọc 6 lần ⇒ dỗi 3 s);
+// nhịp CSS theo data-mat (thay data-dong); test vòng khung / máy yếu / chuyển trộn ở tests/mol-song-dong-0211.test.tsx.
 import { readFileSync } from 'node:fs'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { MAT_THEO_CAP, MAT_THEO_TRANG_THAI, MOL_DANG_SONG, VIEWBOX_MOL, svgMol, taoLua, type MatMol } from '../src/components/linh-vat/mol-dong'
@@ -20,8 +22,8 @@ describe('Mol — hình', () => {
     for (const m of [...MAT, ...MAT_MOI]) {
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
       svg.innerHTML = svgMol(m)
-      expect(svg.querySelectorAll('*').length + 1, m).toBeLessThanOrEqual(130)
-      ve.add(svgMol(m).replace(/molb?\d+/g, 'id'))
+      expect(svg.querySelectorAll('*').length + 1, m).toBeLessThanOrEqual(130) // phần chỉ mặt khác cần (lửa, sao, tim…) dựng lần đầu cần
+      ve.add(svgMol(m).replace(/mol\d+_/g, 'id'))
     }
     expect(ve.size).toBe(MAT.length + MAT_MOI.length)
   })
@@ -31,54 +33,67 @@ describe('Mol — hình', () => {
   })
   it('giận = ĐỔI SẮC + dung dịch đỏ dâng + nút bấc bung trên lửa, KHÔNG răng; dỗi / bực chỉ ửng má; mọi mặt có khắc 6,022·10²³', () => {
     const cau = svgMol('cau'), rat = svgMol('ratCau'), vui = svgMol('vui')
-    const muc = (x: string) => Number(/<path d="M20 (\d+) C/.exec(x)![1]) // mặt dung dịch
+    const muc = (x: string) => Number(/data-k="nghieng" transform="rotate\([-\d.]+ 100 ([\d.]+)\)"/.exec(x)![1]) // mặt dung dịch (tâm giữ thăng bằng)
     expect(muc(vui)).toBe(166); expect(muc(cau)).toBeLessThan(muc(vui)); expect(muc(rat)).toBeLessThan(muc(cau))
-    expect(vui).toMatch(/class="s-nuoc"/); expect(cau).toMatch(/class="s-soi"/); expect(rat).toMatch(/class="s-do"/)
+    // dung dịch: biến nước đổi theo nhóm giận (mol.css .mol-g4 sôi / .mol-g5 đỏ) — điểm dừng gradient nằm TRONG nhóm màu ⇒ cả bình đổi sắc
+    for (const x of [vui, cau, rat]) { expect(x).toMatch(/class="s-nuoc"/); expect(x).toMatch(/^<g data-k="nhom" class="mol-g\d"><defs>/) }
     expect(vui).toContain('class="mol-g0"'); expect(svgMol('doi')).toContain('class="mol-g2"'); expect(svgMol('buc')).toContain('class="mol-g3"')
     expect(cau).toContain('class="mol-g4"'); expect(rat).toContain('class="mol-g5"')
-    for (const x of [cau, rat]) { expect(x).toContain('mol-lua'); expect(x).toMatch(/<g transform="translate\([^"]+\) rotate\([^"]+\)"><g class="mol-nut">/) }
-    expect(vui).not.toContain('mol-lua'); expect(vui).toMatch(/<g><g class="mol-nut">/)
+    const nut = (x: string) => /<g data-k="nut" transform="([^"]+)">/.exec(x)![1]
+    expect(nut(cau)).toBe('translate(-4 -22) rotate(-14 100 3)'); expect(nut(rat)).toBe('translate(6 -32) rotate(18 100 3)') // bung như hình tĩnh 01/11
+    for (const x of [cau, rat]) expect(x).toMatch(/<g data-k="lua"[^>]*display="inline"/)
+    expect(rat).toMatch(/<g data-k="luaTo" opacity="1"/) // rất cáu: lửa to (hai lưỡi bên)
+    expect(vui).not.toContain('mol-lua'); expect(nut(vui)).toBe('translate(0 0) rotate(0 100 3)')
     for (const m of [...MAT, ...MAT_MOI]) {
       const x = svgMol(m)
       expect(x, m).not.toMatch(/m-net-t|M\d+ \d+ L\d+ \d+ L\d+ \d+ L\d+ \d+ L\d+ \d+/) // không răng, không zigzag
       expect(x, m).toContain('6,022·10<tspan'); expect(x, m).toContain('class="mol-khac"')
-      expect(x, m).toMatch(/id="molb\d+k" d="M56 172 A66 66 0 0 0 144 172"/) // ở phần dung dịch dưới bụng, cong theo đáy cầu
+      expect(x, m).toMatch(/id="mol\d+_kp" d="M56 172 A66 66 0 0 0 144 172"/) // ở phần dung dịch dưới bụng, cong theo đáy cầu
     }
   })
 })
 
 describe('Mol — bộ máy (giữ giao diện Lua)', () => {
-  it('cấp 4 ⇒ mặt cáu + giật; cấp 5 ⇒ rất cáu + run; hạ cấp ⇒ về mặt theo trạng thái; data-cap-ve cho biểu tượng tab', () => {
+  it('cấp 4 ⇒ mặt cáu (nhịp giật); cấp 5 ⇒ rất cáu (nhịp run); hạ cấp ⇒ về mặt theo trạng thái; data-cap-ve cho biểu tượng tab', () => {
     const { l } = moi({ trangThai: 'vui' })
     expect(l.svg.getAttribute('data-mat')).toBe('vui')
     l.datCap(4); expect(l.cap).toBe(4)
-    expect(l.svg.getAttribute('data-mat')).toBe('cau'); expect(l.svg.getAttribute('data-dong')).toBe('giat'); expect(l.svg.getAttribute('data-cap-ve')).toBe('4')
+    expect(l.svg.getAttribute('data-mat')).toBe('cau'); expect(l.svg.getAttribute('data-cap-ve')).toBe('4')
+    const css = readFileSync('src/styles/mol.css', 'utf8')
+    expect(css).toContain("[data-mat='cau'] .mol-dong { animation: mol-giat"); expect(css).toContain("[data-mat='ratCau'] .mol-dong { animation: mol-run")
     l.datCap(5)
-    expect(l.svg.getAttribute('data-mat')).toBe('ratCau'); expect(l.svg.getAttribute('data-dong')).toBe('run')
+    expect(l.svg.getAttribute('data-mat')).toBe('ratCau')
     l.datCap(1)
     expect(l.cap).toBe(0); expect(l.svg.getAttribute('data-mat')).toBe('vui'); expect(l.svg.hasAttribute('data-cap-ve')).toBe(false)
     l.huy()
   })
-  it('chạm ⇒ ngạc nhiên 0,9 giây rồi về; đang giận (cấp ≥ 2) chạm không đổi mặt', () => {
+  it('chạm ⇒ cười khúc khích (giữ mặt); đang ngủ ⇒ giật mình 1,5 s rồi ngủ lại; chọc 6 lần liền ⇒ dỗi 3 s; đang giận chạm không đổi mặt', () => {
     vi.useFakeTimers()
     const { l } = moi({ trangThai: 'chao' })
     l.svg.dispatchEvent(new Event('click'))
-    expect(l.svg.getAttribute('data-mat')).toBe('ngac')
-    vi.advanceTimersByTime(1000)
+    expect(l.svg.getAttribute('data-mat')).toBe('chao')
+    const ngu = moi({ trangThai: 'ngu' }).l
+    ngu.svg.dispatchEvent(new Event('click'))
+    expect(ngu.svg.getAttribute('data-mat')).toBe('ngac')
+    vi.advanceTimersByTime(1600)
+    expect(ngu.svg.getAttribute('data-mat')).toBe('ngu')
+    for (let i = 0; i < 5; i++) { l.svg.dispatchEvent(new Event('click')); l.buoc(100) }
+    expect(l.svg.getAttribute('data-mat')).toBe('doi')
+    vi.advanceTimersByTime(3100)
     expect(l.svg.getAttribute('data-mat')).toBe('chao')
     l.datCap(3); l.svg.dispatchEvent(new Event('click'))
     expect(l.svg.getAttribute('data-mat')).toBe('buc')
-    l.huy()
+    l.huy(); ngu.huy()
   })
   it('mừng xong về vui (sau / ve); nói ⇒ miệng mấp máy rồi thôi; tĩnh ⇒ không chuyển động; huỷ ⇒ gỡ sạch', () => {
     vi.useFakeTimers()
     const { s, l } = moi({ trangThai: 'combo', tuyChon: { sau: 600, ve: 'vui' } })
-    expect(l.svg.getAttribute('data-dong')).toBe('nhun')
-    vi.advanceTimersByTime(700); expect(l.trangThai).toBe('vui')
+    expect(l.svg.getAttribute('data-mat')).toBe('khen') // nhịp nhún của khen ở mol.css [data-mat='khen'] .mol-dong
+    vi.advanceTimersByTime(700); expect(l.trangThai).toBe('vui'); expect(l.svg.getAttribute('data-mat')).toBe('vui')
     l.noi('Học tiếp nhé'); expect(l.svg.classList.contains('mol-noi')).toBe(true)
     vi.advanceTimersByTime(7000); expect(l.svg.classList.contains('mol-noi')).toBe(false)
     const t = moi({ trangThai: 'combo', tinh: true }).l
-    expect(t.svg.hasAttribute('data-tinh')).toBe(true); expect(t.svg.hasAttribute('data-dong')).toBe(false)
+    expect(t.svg.hasAttribute('data-tinh')).toBe(true); expect(t.svg.getAttribute('data-che-do')).toBe('tinh')
     expect(MOL_DANG_SONG.size).toBe(2)
     l.huy(); t.huy()
     expect(s.querySelector('svg')).toBeNull(); expect(MOL_DANG_SONG.size).toBe(0)
@@ -86,14 +101,14 @@ describe('Mol — bộ máy (giữ giao diện Lua)', () => {
 })
 
 describe('Mol — màu, nạp lười, tên', () => {
-  it('không màu thô trong mol-dong.ts / mol.css; màu chỉ từ token có sẵn; giảm chuyển động / máy yếu tắt hoạt ảnh', () => {
-    const ts = readFileSync('src/components/linh-vat/mol-dong.ts', 'utf8').replace(/^\s*\/\/.*$/gm, '')
+  it('không màu thô trong mol-dong.ts / mol-lo-xo.ts / mol.css; màu chỉ từ token có sẵn; giảm chuyển động / máy yếu tắt hoạt ảnh', () => {
+    const ts = ['mol-dong', 'mol-lo-xo'].map((t) => readFileSync(`src/components/linh-vat/${t}.ts`, 'utf8').replace(/^\s*\/\/.*$/gm, '')).join('\n')
     const css = readFileSync('src/styles/mol.css', 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
     for (const x of [ts, css]) { expect(x).not.toMatch(/#[0-9a-fA-F]{3,8}\b/); expect(x).not.toMatch(/\b(?:rgba?|hsla?)\(/) }
     for (const k of ['--tr-hs-nut', '--tr-tin', '--tr-chu-y', '--tr-tim', '--tr-sai', '--btg-chu-doan']) expect(css).toContain(`var(${k})`)
     expect(css).toContain('.bi[data-nho] .mol-svg .mol-khac { display: none; }') // chữ 6,022·10²³ ẩn khi Bi < 64 px
     expect(readFileSync('src/components/linh-vat/Bi.tsx', 'utf8')).toContain("data-nho={size < 64 ? '' : undefined}")
-    expect(css).toMatch(/prefers-reduced-motion: reduce\) \{ \.mol-svg \* \{ animation: none !important; \} \}/)
+    expect(css).toMatch(/prefers-reduced-motion: reduce\) \{ \.mol-svg, \.mol-svg \* \{ animation: none !important; \}/)
     expect(css).toMatch(/html\.may-yeu \.mol-svg \* \{ animation: none !important; \}/)
   })
   it('Bi.tsx nạp Mol bằng import() (mảnh lười, kho chạy-lúc); tên «Mol» ở lời nói + nút', () => {
