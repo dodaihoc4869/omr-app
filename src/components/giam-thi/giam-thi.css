@@ -4,7 +4,7 @@
 /* BẢNG MÀU LINH VẬT (thầy 27/10: «tươi mịn mắt như Duolingo») — CHỈNH MỘT CHỖ Ở ĐÂY. Là màu TRANH (như bảng màu game): không đổi theo nền sáng/tối;
    bóng đổ phẳng = một tông đậm hơn, highlight nhẹ, không gradient, viền cùng sắc (không viền đen). Chỉ 4 mã gốc này là màu thô (check-mau.mjs +
    kiem-mau-giu-nguyen.mjs ghi lệnh thầy); mọi sắc khác pha từ chúng với --gt-trang / --gt-toi (trắng / tối cố định ở cả hai nền). */
-.gtv, .gt-loi {
+.gtv, .gt-loi, .gtm {
   --gt-mau-nb: #00bfd2; --gt-mau-th: #988eff; --gt-mau-vd: #ff8a3c; --gt-mau-vdc: #f1489b;
   --gt-c: var(--gt-mau-nb); --gt-toi: var(--tr-chu); --gt-trang: var(--tr-trang);
   --gt-sang: color-mix(in srgb, var(--gt-c) 55%, var(--gt-trang)); --gt-dam: color-mix(in srgb, var(--gt-c) 80%, var(--gt-toi)); --gt-kinh: color-mix(in srgb, var(--gt-c) 15%, var(--gt-trang));
@@ -101,7 +101,9 @@
 /* Hàng RIÊNG đầu khối cho bong bóng càu nhàu (trong luồng): 54 px = bong bóng một dòng + khe 10 px tới đề; câu dài xuống hai dòng thì hàng tự cao thêm.
    Lề trái theo khối (16 px từ mép màn), cách nhãn phía trên bằng khe của cột đề. */
 [data-trong] .duo-gt-loi-o { grid-column: 1 / -1; grid-row: 1; display: flex; align-items: flex-start; min-height: 54px; padding-bottom: 10px; min-width: 0; }
-[data-trong] .duo-gt-loi-o .gt-loi { position: relative; left: auto; bottom: auto; max-width: 100%; }
+/* 02/11 (lời thầy dài 2–3 dòng): bong bóng NỔI trên hàng riêng, mọc lên từ đáy hàng (đè nhãn phía trên vài giây) ⇒ đề không bao giờ bị đẩy xuống. */
+[data-trong] .duo-gt-loi-o { position: relative; z-index: 5; }
+[data-trong] .duo-gt-loi-o .gt-loi { position: absolute; left: 0; bottom: 10px; max-width: 100%; }
 [data-trong] .duo-gt-bong { grid-column: 2; grid-row: 2; position: relative; min-width: 0; margin-left: 12px; padding: 12px 14px; border: 2px solid var(--tr-vien); border-radius: 18px; background: var(--tr-mat); }
 [data-trong] .duo-gt-bong::before { content: ''; position: absolute; left: -9px; top: var(--duoi, 50%); width: 14px; height: 14px; margin-top: -7px; background: var(--tr-mat); border-left: 2px solid var(--tr-vien); border-bottom: 2px solid var(--tr-vien); border-bottom-left-radius: 4px; transform: rotate(45deg); }
 [data-trong] .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 19px; }
@@ -237,3 +239,71 @@
   --gn-ao: var(--gt-mau-vdc);
   --gn-coTay: var(--gn-aoT);
 }
+
+/* ── GIÁM THỊ «SỐNG ĐỘNG» (thầy duyệt 02/11, bản vẽ docs/ban-ve-giam-thi-moi-0211/giam-thi.html) — hình ở giam-thi-hinh.ts, chuyển động ở giam-thi-nguoi.ts.
+   BẢNG MÀU TRANH của 4 giám thị (như bảng linh vật: không đổi theo nền sáng / tối, trừ bóng chân). Màu áo thân 4 người = 4 mã --gt-mau-* sẵn có ở trên;
+   mọi mã thô còn lại là màu tranh của bản vẽ thầy duyệt, ghi trong danh sách đóng docs/giam-thi-moi-mau-0211.json (kiem-mau-giu-nguyen.mjs). */
+.gtm { --gm-net: #1b1938; --gm-trang: #ffffff; --gm-ma: #ff7fa0; --gm-mieng: #6a1f45; --gm-mieng-net: #4a1838; --gm-luoi: #ff8aa5; --gm-vang: #ffbf35; --gm-vang-s: #e3a605; --gm-tia: #fff1a8; --gm-den: #9297b8; --gm-den-s: #676c8f; --gm-but: #3d3a73; --gm-but-d: #f4417c; --gm-but-1: #00bed8; --gm-but-2: #f4417c; --gm-thuy: #eefbff; --gm-thuy-v: #bfe9f4; --gm-giay-to: #ffffff; --gm-dong: #cfd2e6; --gm-ok: #00c08a; --gm-x: #f4417c; --gm-bia: #c9874f; --gm-bia-s: #a96b38; --gm-so: #00bed8; --gm-so-s: #0097ab; --gm-nut-ong: #8d6bd8; --gm-bong: rgba(27, 25, 56, .13); }
+@media (prefers-color-scheme: dark) { .gtm { --gm-bong: rgba(0, 0, 0, .34); } }
+.gtm[data-muc='nb'] { --gm-ao: var(--gt-mau-nb); --gm-ao-l: #4fd8e7; --gm-ao-s: #0aa0b6; --gm-ao-d: #07889c; --gm-ao2: #ffffff; --gm-da: #f9cfb2; --gm-da-l: #ffe4d2; --gm-da-s: #eeae8e; --gm-toc: #6b3b2c; --gm-toc-l: #95583f; --gm-toc-s: #48261c; --gm-may: #5a3125; --gm-quan: #2d3b5e; --gm-giay: #d8f2f7; --gm-giay-s: #00a9be; --gm-tay: #f9cfb2; --gm-tay-s: #eeae8e; --gm-kinh-v: #00a6bb; --gm-kinh-t: #e3f9fd; --gm-quai: #1d6c79; --gm-long: #ff6fae; --gm-long-l: #ffb6d6; }
+.gtm[data-muc='th'] { --gm-ao: var(--gt-mau-th); --gm-ao-l: #b9b2ff; --gm-ao-s: #7d72ea; --gm-ao-d: #6a5fd8; --gm-ao2: #ffffff; --gm-da: #a9694c; --gm-da-l: #c4845f; --gm-da-s: #8a5139; --gm-toc: #2a2130; --gm-toc-l: #4f4160; --gm-toc-s: #17111b; --gm-may: #1f1824; --gm-quan: #3a3263; --gm-giay: #6f63dd; --gm-giay-s: #4f45b8; --gm-tay: #a9694c; --gm-tay-s: #8a5139; --gm-gong: #3a2f8f; --gm-bang: #988eff; --gm-long: #b12fd6; --gm-long-l: #e391f7; }
+.gtm[data-muc='vd'] { --gm-ao: #9be4f1; --gm-ao-l: #c6f1f9; --gm-ao-s: #6fd0e2; --gm-ao-d: #3fb6cd; --gm-ao2: #ffffff; --gm-da: #f5c9a0; --gm-da-l: #ffe0c2; --gm-da-s: #e0a97d; --gm-toc: #23222c; --gm-toc-l: #46444f; --gm-toc-s: #131218; --gm-may: #23222c; --gm-bac: #b4c0cf; --gm-quan: #3b3e4a; --gm-giay: #7e3050; --gm-giay-s: #5c203a; --gm-tay: #00bed8; --gm-tay-s: #0091a6; --gm-kinh-v: #00bed8; --gm-kinh-t: #c8f2fa; --gm-quai: #2b2a33; --gm-tap: var(--gt-mau-vd); --gm-tap-l: #ffa86b; --gm-tap-s: #e8701f; }
+.gtm[data-muc='vdc'] { --gm-tay-but: #f5c9a0; --gm-tay-tay: #ff8fb1; --gm-ao: var(--gt-mau-vdc); --gm-ao-l: #f877b8; --gm-ao-s: #d42f80; --gm-ao-d: #ba206c; --gm-ao2: #ffffff; --gm-da: #fdd8d1; --gm-da-l: #ffebe7; --gm-da-s: #f1b6ac; --gm-toc: #e3e8f0; --gm-toc-l: #f8fafc; --gm-toc-s: #b4bfce; --gm-may: #93a0b4; --gm-quan: #4b3653; --gm-giay: #7e3050; --gm-giay-s: #5c203a; --gm-tay: #fdd8d1; --gm-tay-s: #f1b6ac; --gm-gong: #2b2740; }
+.gtm svg { display: block; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.gtm .gs-ao { stop-color: var(--gm-ao); } .gtm .gs-ao-l { stop-color: var(--gm-ao-l); } .gtm .gs-ao-s { stop-color: var(--gm-ao-s); }
+.gtm .gs-da { stop-color: var(--gm-da); } .gtm .gs-da-l { stop-color: var(--gm-da-l); } .gtm .gs-da-s { stop-color: var(--gm-da-s); }
+.gtm .gs-toc { stop-color: var(--gm-toc); } .gtm .gs-toc-l { stop-color: var(--gm-toc-l); } .gtm .gs-toc-s { stop-color: var(--gm-toc-s); }
+.gtm .gs-ma { stop-color: var(--gm-ma); } .gtm .gs-tia { stop-color: var(--gm-tia); } .gtm .gs-bong { stop-color: var(--gm-bong); }
+.gtm .gf-ao { fill: var(--gm-ao); } .gtm .gf-ao-l { fill: var(--gm-ao-l); } .gtm .gf-ao-s { fill: var(--gm-ao-s); } .gtm .gf-ao-d { fill: var(--gm-ao-d); } .gtm .gf-ao2 { fill: var(--gm-ao2); }
+.gtm .gf-da { fill: var(--gm-da); } .gtm .gf-da-s { fill: var(--gm-da-s); } .gtm .gf-toc { fill: var(--gm-toc); } .gtm .gf-toc-s { fill: var(--gm-toc-s); } .gtm .gf-toc-l { fill: var(--gm-toc-l); }
+.gtm .gf-quan { fill: var(--gm-quan); } .gtm .gf-giay { fill: var(--gm-giay); } .gtm .gf-giay-s { fill: var(--gm-giay-s); }
+.gtm .gf-tay { fill: var(--gm-tay); } .gtm .gf-net { fill: var(--gm-net); } .gtm .gf-trang { fill: var(--gm-trang); } .gtm .gf-mieng { fill: var(--gm-mieng); } .gtm .gf-luoi { fill: var(--gm-luoi); }
+.gtm .gf-vang { fill: var(--gm-vang); } .gtm .gf-vang-s { fill: var(--gm-vang-s); } .gtm .gf-tia { fill: var(--gm-tia); } .gtm .gf-den { fill: var(--gm-den); } .gtm .gf-den-s { fill: var(--gm-den-s); }
+.gtm .gf-but { fill: var(--gm-but); } .gtm .gf-but-d { fill: var(--gm-but-d); } .gtm .gf-but-1 { fill: var(--gm-but-1); } .gtm .gf-but-2 { fill: var(--gm-but-2); }
+.gtm .gf-thuy { fill: var(--gm-thuy); fill-opacity: .92; } .gtm .gf-thuy-v { fill: var(--gm-thuy-v); } .gtm .gf-giay-to { fill: var(--gm-giay-to); }
+.gtm .gf-bia { fill: var(--gm-bia); } .gtm .gf-bia-s { fill: var(--gm-bia-s); } .gtm .gf-so { fill: var(--gm-so); } .gtm .gf-so-s { fill: var(--gm-so-s); } .gtm .gf-nut-ong { fill: var(--gm-nut-ong); }
+.gtm .gf-long { fill: var(--gm-long); } .gtm .gf-long-l { fill: var(--gm-long-l); }
+.gtm .gf-kinh-v { fill: var(--gm-kinh-v); } .gtm .gf-kinh-t { fill: var(--gm-kinh-t); } .gtm .gf-quai { fill: var(--gm-quai); } .gtm .gf-bac { fill: var(--gm-bac); } .gtm .gf-bang { fill: var(--gm-bang); }
+.gtm .gf-tap { fill: var(--gm-tap); } .gtm .gf-tap-l { fill: var(--gm-tap-l); } .gtm .gf-tap-s { fill: var(--gm-tap-s); } .gtm .gf-tay-s { fill: var(--gm-tay-s); }
+.gtm .gf-bong { fill: var(--gm-bong); }
+.gtm .gn { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.gtm .gn-net { stroke: var(--gm-net); } .gtm .gn-trang { stroke: var(--gm-trang); } .gtm .gn-mieng { stroke: var(--gm-mieng-net); } .gtm .gn-may { stroke: var(--gm-may); }
+.gtm .gn-ao { stroke: var(--gm-ao); } .gtm .gn-ao-l { stroke: var(--gm-ao-l); } .gtm .gn-ao-d { stroke: var(--gm-ao-d); } .gtm .gn-tay-s { stroke: var(--gm-tay-s); }
+.gtm .gn-toc-l { stroke: var(--gm-toc-l); } .gtm .gn-toc-s { stroke: var(--gm-toc-s); } .gtm .gn-quai { stroke: var(--gm-quai); } .gtm .gn-gong { stroke: var(--gm-gong); } .gtm .gn-kinh-v { stroke: var(--gm-kinh-v); }
+.gtm .gn-vang { stroke: var(--gm-vang); } .gtm .gn-dong { stroke: var(--gm-dong); } .gtm .gn-ok { stroke: var(--gm-ok); } .gtm .gn-x { stroke: var(--gm-x); } .gtm .gn-tap { stroke: var(--gm-tap); } .gtm .gn-so-s { stroke: var(--gm-so-s); }
+.gtm .gtay-but-g { fill: var(--gm-tay-but); } .gtm .gtay-tay { fill: var(--gm-tay-tay); }
+
+/* Khung + thở (lớp HTML, transform — GPU). Nghỉ / tĩnh / máy yếu / giảm chuyển động ⇒ đứng yên. Xám (mốc Lộ trình chưa tới) như bản cũ. */
+.gtm { position: relative; aspect-ratio: 220 / 254; height: auto; }
+/* lớp vẽ RIÊNG (như .gt-tho-o bản cũ): ô đáp án / đề vẽ lại không phải vẽ lại giám thị + chùm đèn đè lên chúng (đo màn thi 02/11) */
+.gtm-tho { position: absolute; inset: 0; transform-origin: 50% 94%; animation: gtm-tho var(--tho, 4s) ease-in-out var(--tre, 0s) infinite; will-change: transform; }
+@keyframes gtm-tho { 0%, 100% { transform: scale(1, 1); } 48% { transform: scale(.996, 1.013); } }
+.gtm[data-nghi] .gtm-tho, .gt-dung .gtm-tho { animation-play-state: paused; }
+/* lúc thi (cầm đèn, ngồi cả ca): KHÔNG thở — hoạt ảnh vô hạn trên lớp hình lớn làm phần vẽ sau mỗi lần chạm ô dài thêm ~15 ms (đo màn thi CPU ×4, 02/11) */
+.gtm[data-thi] .gtm-tho { animation: none; }
+.gt-tinh .gtm-tho, [data-trong].may-yeu .gtm-tho { animation: none; }
+.gt-tinh .gtm-tho { will-change: auto; }
+@media (prefers-reduced-motion: reduce) { .gtm-tho { animation: none; } }
+.gt-xam .gtm { filter: grayscale(1); }
+.gtm .gtm-tho svg { cursor: default; }
+
+/* BONG BÓNG LỜI THEO TÌNH HUỐNG (bản vẽ 02/11): khen xanh · chân ngôn tím · sai cam · đối phó / sai liền hồng · rời màn lúc thi đỏ đậm · lâu không làm
+   ngọc lam. Nền nhạt + viền + chữ đậm cùng sắc (token --tr-* sẵn có); đè màu thân giám thị (`data-muc`) khi có `data-cam`. */
+.gt-loi[data-cam] { border: 2px solid var(--gt-loi-day); border-bottom-width: 4px; color: var(--gt-loi-chu); font-weight: 800; text-wrap: balance; }
+.gt-loi[data-cam]::after { top: calc(100% - 2px); }
+.gt-loi[data-cam]::before { top: calc(100% + 1px); }
+.gt-loi[data-cam='khen'] { --gt-loi-nen: var(--tr-dung-nhat); --gt-loi-day: var(--tr-dung); --gt-loi-chu: var(--tr-dung-chu); }
+.gt-loi[data-cam='chan'] { --gt-loi-nen: color-mix(in srgb, var(--tr-tim) 14%, var(--tr-mat)); --gt-loi-day: var(--tr-tim); --gt-loi-chu: var(--tr-tim-chu); }
+.gt-loi[data-cam='sai'] { --gt-loi-nen: var(--tr-chu-y-nhat); --gt-loi-day: var(--tr-chu-y); --gt-loi-chu: var(--tr-chu-y-chu); }
+.gt-loi[data-cam='doi'] { --gt-loi-nen: var(--tr-sai-nhat); --gt-loi-day: var(--tr-sai); --gt-loi-chu: var(--tr-sai-chu); }
+.gt-loi[data-cam='gian'] { --gt-loi-nen: color-mix(in srgb, var(--tr-sai-day) 80%, var(--gt-toi)); --gt-loi-day: color-mix(in srgb, var(--tr-sai-day) 55%, var(--gt-toi)); --gt-loi-chu: var(--gt-trang); }
+.gt-loi[data-cam='nghi'] { --gt-loi-nen: var(--tr-tin-nhat); --gt-loi-day: var(--tr-tin); --gt-loi-chu: var(--tr-tin-chu); }
+
+/* MÁY YẾU (02/11, như Mol): TÔ PHẲNG — 6 dải màu chuyển (áo, da, tóc, má, bóng chân, tia đèn) thành màu đặc cùng sắc (thuộc tính CSS `fill` đè `fill="url(…)"`)
+   ⇒ mỗi lần giám thị đổi dáng / chuyển câu vẽ lại rẻ hơn. Máy thường giữ bóng mềm của bản vẽ. */
+[data-trong].may-yeu .gtm .gg-ao { fill: var(--gm-ao); }
+[data-trong].may-yeu .gtm .gg-da { fill: var(--gm-da); }
+[data-trong].may-yeu .gtm .gg-toc { fill: var(--gm-toc); }
+[data-trong].may-yeu .gtm .gg-ma { fill: var(--gm-ma); fill-opacity: .45; }
+[data-trong].may-yeu .gtm .gg-bong { fill: var(--gm-bong); }
+[data-trong].may-yeu .gtm .gg-tia { fill: var(--gm-tia); fill-opacity: .35; }

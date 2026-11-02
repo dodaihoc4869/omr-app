@@ -7,17 +7,21 @@
 // Thẻ câu (TheCau) do ExamTakeScreen dựng ⇒ KHÔNG sửa thẻ: mảnh này ĐO đề của câu đang xem (ResizeObserver — báo sau khi trình duyệt tự tính bố cục) rồi
 // đặt giám thị bằng transform + gắn thuộc tính trình bày (`data-kt-l`, biến `--kt-du`) lên khối đề; CSS ở styles/trong-kiem-tra.css mục 5.
 // MƯỢT: dựng giám thị SAU khung đầu (rAF → setTimeout) — câu hiện trước; phản ứng chạm cũng sau khung đầu (ô được chọn vẽ trước, đèn bật khung sau).
+// 02/11 GIÁM THỊ «SỐNG ĐỘNG» (thầy duyệt bản vẽ docs/ban-ve-giam-thi-moi-0211): giám thị CẦM đèn pha quét chậm; em chạm ô ⇒ tay quay đèn về ô ấy rồi tia
+// (den-soi.ts) soi đúng ô. «Lúc thi giám thị im lặng, chỉ nói khi em rời màn hình» ⇒ bỏ lời nhắc sắp hết giờ; một câu của thầy khi màn thi ĐÃ tính một lần
+// rời màn (prop `roi` = dải cảnh báo rời màn của ExamTakeScreen — cùng luật đếm, không nghe riêng để không nhắc oan lượt app tự xin toàn màn).
 import { useEffect, useRef } from 'react'
 import { taoGiamThi, type GiamThi } from '../giam-thi/giam-thi-nguoi'
 import type { MucGT } from '../giam-thi/giam-thi-ve'
 import { taoDenSoi, type DenSoi } from './den-soi'
+import { suLoi, taoNhip } from '../giam-thi/loi-giam-thi'
 import '../giam-thi/giam-thi.css'
 
 export type PhanThiGT = 'I' | 'II' | 'III'
 /** Người coi theo phần. */
 export const GT_THEO_PHAN: Record<PhanThiGT, MucGT> = { I: 'nb', II: 'th', III: 'vd' }
-/** Lời nhắc DUY NHẤT của giám thị trong ca (lúc đồng hồ chuyển gấp) — không bàn về câu, không gợi ý. */
-export const LOI_SAP_HET_GIO = 'Sắp hết giờ, soát lại bài nhé.'
+/** Nhịp lời trong ca: chỉ lời «rời màn» (luôn nói). */
+const nhipThi = taoNhip('thi')
 const MS_CHO = 25_000
 /** Ô em chạm được: phương án Phần I, nút Đúng / Sai Phần II, phím số Phần III. */
 const O_CHAM = '.pa-hang, .y-nut button, .bns-phim button'
@@ -34,8 +38,10 @@ function oSoi(el: Element): Element | null {
   return el
 }
 
-export default function GiamThiThi({ phan, cauHien, gap, goc }: {
-  phan: PhanThiGT; cauHien: number; gap: boolean
+export default function GiamThiThi({ phan, cauHien, roi, goc }: {
+  phan: PhanThiGT; cauHien: number
+  /** Lần rời màn màn thi vừa tính (đổi đối tượng mỗi lần) — giám thị nhắc một câu khi em đã quay lại. */
+  roi?: unknown
   /** Gốc khung ThiDuo (nghe chạm, tìm thẻ câu `#cau-N`). */
   goc: React.RefObject<HTMLElement | null>
 }) {
@@ -116,10 +122,11 @@ export default function GiamThiThi({ phan, cauHien, gap, goc }: {
       const g = gt.current, lop = lopRef.current, kinh = g?.svg.querySelector('.gt-den-kinh')
       const dich = oSoi(o)
       if (!g || !lop || !kinh || !dich || host.current?.hidden) return
-      g.nhinVao(dich)
+      // tay quay đèn về ô em chạm (~0,3 s); tia bắt đầu từ kính đèn ở dáng ĐÍCH (máy tính sẵn) ⇒ tia luôn dính đèn, không đo lúc tay đang quay
+      const k = g.soiVao(dich)
       g.svg.querySelector('.gt-den')?.setAttribute('data-bat', '')
-      const rl = lop.getBoundingClientRect(), rk = kinh.getBoundingClientRect(), rd = dich.getBoundingClientRect()
-      den.current?.soi({ x: rk.left + rk.width / 2 - rl.left, y: rk.top + rk.height / 2 - rl.top }, { x: rd.left - rl.left, y: rd.top - rl.top, w: rd.width, h: rd.height })
+      const rl = lop.getBoundingClientRect(), rk = k ?? (() => { const r = kinh.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 } })(), rd = dich.getBoundingClientRect()
+      den.current?.soi({ x: rk.x - rl.left, y: rk.y - rl.top }, { x: rd.left - rl.left, y: rd.top - rl.top, w: rd.width, h: rd.height })
     }
     const henSoi = (o: Element) => { huySoi?.(); huySoi = sauKhungDau(() => soi(o)) }
     const thucDay = () => {
@@ -156,14 +163,24 @@ export default function GiamThiThi({ phan, cauHien, gap, goc }: {
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Đồng hồ chuyển gấp: xem đồng hồ + MỘT lời nhắc (một lần mỗi ca).
-  const daNhac = useRef(false)
+  // Rời màn (màn thi đã tính): đợi em quay lại hẳn (tab hiện + có tiêu điểm) rồi hạ đèn về phía em + MỘT câu của thầy.
   useEffect(() => {
-    if (!gap || daNhac.current) return
-    daNhac.current = true
-    const huy = sauKhungDau(() => { const g = gt.current; if (!g || document.hidden) return; g.datTrangThai('dong-ho'); g.noi(LOI_SAP_HET_GIO, { giu: 3200 }); window.setTimeout(() => { if (gt.current === g && g.trangThai() === 'dong-ho') g.datTrangThai('yen') }, 4200) })
-    return huy
-  }, [gap])
+    if (!roi) return
+    let huy: (() => void) | null = null
+    const chay = () => {
+      huy = sauKhungDau(() => {
+        const g = gt.current
+        if (!g || document.hidden) return
+        g.phanUng('roi')
+        const c = suLoi(nhipThi, muc, 'thiRoi', performance.now())
+        if (c) g.noi(c.chu, { cam: c.cam, giu: 4200 })
+      })
+    }
+    const ve = () => !document.hidden && (typeof document.hasFocus !== 'function' || document.hasFocus())
+    const hien = () => { if (ve()) { document.removeEventListener('visibilitychange', hien); window.removeEventListener('focus', hien); chay() } }
+    if (ve()) chay(); else { document.addEventListener('visibilitychange', hien); window.addEventListener('focus', hien) }
+    return () => { huy?.(); document.removeEventListener('visibilitychange', hien); window.removeEventListener('focus', hien) }
+  }, [roi]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>
