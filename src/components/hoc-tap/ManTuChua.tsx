@@ -40,7 +40,19 @@ if (typeof document !== 'undefined' && document.documentElement.dataset.trong) v
 // Tên trang chính trên nút «về» (Boss 27/10): giao diện Trong ⇒ «Lộ trình»; giao diện cũ ⇒ «Hôm nay». Viết tại chỗ: nhập mô-đun dùng chung sẽ đẻ mảnh tải riêng (+1 tệp mở app).
 const tenTrangChinh = (): string => (typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Hôm nay' : 'Hôm nay')
 
-const ManChua = lazy(() => import('../chua-cau-sai/ManChuaCauSai'))
+// MÀN SỬA CÂU TỨC THÌ NGAY LẦN BẤM ĐẦU (thầy 02/11 khuya: «khi lần đầu bấm vào app chỗ đó thì nó load 1 tý, sau đó thoát ra bấm lại thì ko bị nữa … cần tải gì
+// về sẵn tải luôn … bấm vào phải tức thì»). Nguyên nhân gốc: mảnh màn sửa câu + khung Duo chỉ nạp khi DANH SÁCH Tự sửa lỗi mở lần đầu ⇒ lần bấm đầu hiện khung chờ
+// (Suspense) tới khi mảnh về; lần sau mô-đun đã nhớ ⇒ vào ngay. Sửa: (1) mảnh này vừa nạp (Hôm nay nạp nó ngay khi hiện) ⇒ lúc rảnh nạp luôn màn sửa câu + khung Duo;
+// (2) mô-đun đã về ⇒ vẽ THẲNG (không qua lazy ⇒ không có cả một khung chờ); chưa về mới dùng lazy như cũ. Không thêm mảnh (cùng import động sẵn có).
+let ManChuaDaNap: typeof import('../chua-cau-sai/ManChuaCauSai').default | null = null
+const napManChua = () => import('../chua-cau-sai/ManChuaCauSai').then((m) => { ManChuaDaNap = m.default; return m })
+/** Nạp sẵn màn sửa câu + khung Duo (gọi được nhiều lần; đã nạp ⇒ không tải lại). */
+const napManSua = (): void => { void napManChua().then((m) => m.napKhungDuo?.()).catch(() => {}) }
+if (typeof window !== 'undefined') {
+  const ric = (globalThis as { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }).requestIdleCallback
+  if (ric) ric(napManSua, { timeout: 1500 }); else setTimeout(napManSua, 300)
+}
+const ManChuaLuoi = lazy(napManChua)
 const KiemHoiThay = lazy(() => import('../loi-giai/HoiThayKiemChung'))
 // Thẻ mời ở Hôm nay đi CÙNG khối mã với màn này (một khối nạp lười, không thêm tệp precache — trần 170 tệp của kiem-sw).
 export { default as TheMoiTuSua } from './TheMoiTuSua'
@@ -149,6 +161,8 @@ type Chon = { qid: string; ten?: string; kiemHoiThay?: boolean; /** câu mở th
 export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: string; qid?: string; onVe: () => void; onTuLuyen?: () => void }) {
   useDanhDauHt2() // <html data-ht2> (xem HocTapHomNay.tsx)
   const [chon, setChon] = useState<Chon | null>(() => (qid ? null : docTuSuaChon(docSbdHs())))
+  // mô-đun màn sửa câu đã về lúc mở màn này ⇒ vẽ thẳng (cố định suốt đời màn: đổi kiểu giữa chừng sẽ dựng lại màn sửa)
+  const [ManChua_] = useState(() => ManChuaDaNap ?? ManChuaLuoi)
   /** Câu mở thẳng đang chờ danh sách để tìm đúng đợt. */
   const [doi, setDoi] = useState(qid ?? '')
   /** Lời báo khi không mở được câu em chọn (giữ mã câu để "Thử mở lại"). */
@@ -225,9 +239,7 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
   useEffect(() => {
     // Chỉ nạp mảnh màn sửa câu: khung Duo (ChuaGonDuo) do chính màn ấy nạp song song lệnh mở đợt — nạp thẳng từ đây làm Rolldown tách thêm mảnh dùng chung (+1 tệp precache).
     // 29/10 (video 11:00 «khựng chỗ mở câu»): nạp luôn KHUNG DUO của màn sửa câu (`napKhungDuo`, nằm trong mảnh ManChuaCauSai ⇒ không thêm mảnh) — bấm câu là có khung ngay, không khung trắng.
-    const nap = () => { void import('../chua-cau-sai/ManChuaCauSai').then((m) => m.napKhungDuo?.()).catch(() => {}) }
-    const ric = (globalThis as { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }).requestIdleCallback
-    if (ric) ric(nap, { timeout: 2000 }); else setTimeout(nap, 600)
+    napManSua()
   }, [])
 
   // Câu mở thẳng: danh sách về ⇒ mở đúng đợt (hoặc thử mở câu chưa có đợt); vòng chữa tắt ⇒ bỏ, hiện màn "chưa mở cho em".
@@ -310,7 +322,7 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
     return (
       <div ref={gocRef}>
         <Suspense fallback={<div className="ht-app ht2 tcl-man"><p className="ht-noi-dung tcl-cho-mo" role="status"><span className="chu-cho-tre">Đang mở câu…</span></p></div>}>
-          <ManChua
+          <ManChua_
             token={token}
             qid={chon.qid}
             tenCau={ten}
