@@ -276,6 +276,9 @@ const MAU_THAY_RA_LENH = new Set([
   'src/components/giam-thi/giam-thi.css · --gt-mau-th: #988eff',
   'src/components/giam-thi/giam-thi.css · --gt-mau-vd: #ff8a3c',
   'src/components/giam-thi/giam-thi.css · --gt-mau-vdc: #f1489b',
+  // 02/11 thầy gửi bản vẽ giám thị mới («Đây là bản giám thị mới», docs/ban-ve-giam-thi-moi-0211): bảng màu TRANH của hình (da, tóc, kính, đạo cụ) dưới .gtm
+  // — danh sách đóng docs/giam-thi-moi-mau-0211.json (chỉ THÊM, không màu cũ nào đổi / xoá).
+  ...JSON.parse(readFileSync(new URL('../docs/giam-thi-moi-mau-0211.json', import.meta.url), 'utf8')).moi,
 ])
 
 const loi = []

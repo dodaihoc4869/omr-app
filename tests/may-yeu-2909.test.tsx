@@ -126,6 +126,9 @@ describe('27/10 (thầy: «Máy yếu bị lag») — 4 GB, đo nhịp khung th�
     expect(doc('src/components/cong-hs-nap-luoi.ts')).toMatch(/henDoNhipKhung\(window\)/)
   })
   it('giám thị: máy yếu dùng tư thế tĩnh (không vòng rAF lò xo), như giảm chuyển động', () => {
-    expect(doc('src/components/giam-thi/giam-thi-nguoi.ts')).toMatch(/const giam = !tinh && \(\(typeof matchMedia[^\n]*classList\.contains\('may-yeu'\)\)/)
+    // 02/11 giám thị «sống động»: cùng luật (khoá hành vi: tests/giam-thi-nguoi-2710 «máy yếu: không vòng rAF»)
+    const ma = doc('src/components/giam-thi/giam-thi-nguoi.ts')
+    expect(ma).toMatch(/const laGiam = \(\) => \(typeof matchMedia[^\n]*classList\.contains\('may-yeu'\)/)
+    expect(ma).toMatch(/this\.giam = !this\.tinh && laGiam\(\)/)
   })
 })
