@@ -1,5 +1,5 @@
 // LÀM LẠI CÂU SAI BẰNG BẢN KHÁC — THANG 4 BẬC (thầy 05/10: "thay vì lặp lại câu sai bạn hãy tìm cách để học sinh vẫn hoàn thành được câu sai
-// đó nhưng không học thuộc đáp án được"; đặc tả: DE-XUAT-LAM-LAI-CAU-SAI-0510.md). Mọi luật mới ở ĐÂY (+ phần thuần ở lam-lai-so.ts); chỗ cũ chỉ móc một dòng.
+// đó nhưng không học thuộc đáp án được"; đặc tả: docs/dac-ta-cu/DE-XUAT-LAM-LAI-CAU-SAI-0510.md). Mọi luật mới ở ĐÂY (+ phần thuần ở lam-lai-so.ts); chỗ cũ chỉ móc một dòng.
 //
 // Câu sai Q tới lượt làm lại (cửa sổ lỗi `laCuaSoLoi`: lỗi mở / chờ kiểm / kiểm duy trì theo luật chung `phatLaiLoi` — `HoSo2.loiV2`) lấy bậc đầu tiên có sẵn:
 //   1. SONG SINH (sẵn có: hang-chua-loi `phuNeuCan` trong `napLuot`, qid ảo "<Q>~ss0..3", trần TRAN_SONG_SINH = 4). Thêm ở đây: lượt chờ kiểm SAU khi

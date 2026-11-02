@@ -1,5 +1,5 @@
 // LỜI GIẢI TỪNG BƯỚC — MÁY CHỦ (phương án A, thầy chốt 29/09/2026: duyệt theo đề lúc giao · 4 luồng soạn · khối 12 trước).
-// Thiết kế: DE-XUAT-LOI-GIAI-A-2909.md. Lõi thuần (chuẩn hoá câu, băm, bộ kiểm 6 khoá): src/lib/loi-giai-kiem.ts.
+// Thiết kế: docs/dac-ta-cu/DE-XUAT-LOI-GIAI-A-2909.md. Lõi thuần (chuẩn hoá câu, băm, bộ kiểm 6 khoá): src/lib/loi-giai-kiem.ts.
 //
 // DÂY CHUYỀN
 //   nạp đề (dayDeKho) ──móc──▶ loi_giai_cau (qid → băm) + loi_giai_viec (hàng việc theo BĂM, gộp câu trùng)

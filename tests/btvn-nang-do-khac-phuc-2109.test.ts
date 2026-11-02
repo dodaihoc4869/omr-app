@@ -1,4 +1,4 @@
-// BTVN "NÂNG ĐỠ" — KHẮC PHỤC LUÔN (`dieuChinh.khacPhuc`, Code 1, 21/09/2026; `prompt-bo-nao.md` CẬP NHẬT 2, Boss giao gấp vì Bộ não A.I chạy thật).
+// BTVN "NÂNG ĐỠ" — KHẮC PHỤC LUÔN (`dieuChinh.khacPhuc`, Code 1, 21/09/2026; `docs/dac-ta-cu/prompt-bo-nao.md` CẬP NHẬT 2, Boss giao gấp vì Bộ não A.I chạy thật).
 // Luật: rút 2–4 câu cùng dạng CHƯA giao từ kho của chính bài, đúng bậc đích (hoặc thấp hơn một bậc), chèn vào chặng CHƯA mở kế tiếp, BỚT câu củng cố dễ nhất của dạng KHÁC để tổng tải không tăng;
 // DEADLINE THẮNG MỌI NÚM (số chặng, lõi, thử thách, chặng đã mở, hạn không đổi); không đủ câu thì làm được bao nhiêu trả bấy nhiêu + lý do; vắng khắc phục ⇒ Y HỆT bản không có cổng.
 import { describe, expect, it } from 'vitest'

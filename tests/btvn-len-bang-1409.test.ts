@@ -252,7 +252,9 @@ describe('MÁY CHỦ — quy bài tập về nhà về TỪNG CÂU', () => {
 
   it('CHẤM và HỒ SƠ dùng CHUNG một hàm đọc đáp án — không hai bảng đáp án', () => {
     const SRV = doc('server/src/goi-cu.ts')
-    expect(SRV).toContain('homeworkKeys(await homeworkQuestions(env,chuoi(bt.ma_de)))')
+    // 02/11: cập nhật theo 49ab77f20 + 2c7ff0179 (tách biến để kiểm đáp án trước khi ghi, giữ câu kho để đo kích thước đề) —
+    // chấm vẫn lấy đáp án bằng homeworkKeys(homeworkQuestions(mã đề)), rồi mới gradeHomework.
+    expect(SRV).toMatch(/cauKho = await homeworkQuestions\(env, chuoi\(bt\.ma_de\)[^\n]*\n\s*const keys = homeworkKeys\(cauKho\)\n\s*graded = gradeHomework\(keys, lam, chuoi\(bt\.ma_de\)\)/)
     expect(SRV).toContain('dapAnLuot.set(m, await dapAnTheoMaDe(env, luotTheoMa.get(m)?.maDe ?? ')
   })
 })

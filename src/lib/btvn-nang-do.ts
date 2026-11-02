@@ -1,4 +1,4 @@
-// BTVN "NÂNG ĐỠ" — LÕI THUẦN (Code 1, 21/09/2026). Đề bài `prompt-btvn-nang-do.md` (mục Code 1), thiết kế `DE-XUAT-BTVN-NANG-DO-2109.md`.
+// BTVN "NÂNG ĐỠ" — LÕI THUẦN (Code 1, 21/09/2026). Đề bài `docs/dac-ta-cu/prompt-btvn-nang-do.md` (mục Code 1), thiết kế `docs/dac-ta-cu/DE-XUAT-BTVN-NANG-DO-2109.md`.
 //
 // Giao 80 câu, mỗi em nhận BỘ CÂU VỪA SỨC: LÕI CHUNG (cả lớp giống nhau, phủ hết các dạng) + PHẦN RIÊNG (theo hồ sơ em, đúng "bậc thang" của em),
 // chia thành CHẶNG mỗi ngày. Máy chủ import tệp này như `doan-core` (`import … from '../../src/lib/btvn-nang-do'`).
@@ -225,7 +225,7 @@ export interface KetQuaThichNghi {
   khacPhuc?: KetQuaKhacPhuc[]
 }
 
-/** NÚT VẶN TỪNG DẠNG của bộ não đêm (`DE-XUAT-BO-NAO-AI-2109.md` mục 4): ưu tiên · hạ một bậc · cho thử lên bậc · tạm nghỉ. */
+/** NÚT VẶN TỪNG DẠNG của bộ não đêm (`docs/dac-ta-cu/DE-XUAT-BO-NAO-AI-2109.md` mục 4): ưu tiên · hạ một bậc · cho thử lên bậc · tạm nghỉ. */
 export type NutDang = 'uu_tien' | 'ha_mot_bac' | 'cho_thu_len_bac' | 'tam_nghi'
 
 /** ĐIỀU CHỈNH THEO EM (cổng TUỲ CHỌN của `chonBoCuaEm`; máy chủ kiểm từng trường trước khi đưa vào). Vắng ⇒ kết quả Y HỆT không có cổng (test khoá).

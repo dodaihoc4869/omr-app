@@ -1,4 +1,4 @@
-// `POST /gv/bang-tin {}` — BẢNG TIN CỦA THẦY bản 3 (thầy lệnh 21/09; đề bài prompt-bang-tin-thay-v3.md mục 1; hợp đồng docs/hop-dong-bang-tin-v3-2109.md — Code 3 → Code 4).
+// `POST /gv/bang-tin {}` — BẢNG TIN CỦA THẦY bản 3 (thầy lệnh 21/09; đề bài docs/dac-ta-cu/prompt-bang-tin-thay-v3.md mục 1; hợp đồng docs/hop-dong-bang-tin-v3-2109.md — Code 3 → Code 4).
 // MỘT lệnh ĐỌC-CHỈ cho cả màn Hôm nay: ≤ 12 truy vấn D1, không ghi, không AI. Mọi con số "hôm nay" chỉ đếm sự kiện `luc ≥ mốc` (`cau_hinh.bang_tin_tu`); mốc CHỈ LỌC HIỂN THỊ (thuật toán cá nhân hoá vẫn dùng toàn bộ lịch sử).
 // Khối nào thiếu số liệu thật thì VẮNG (không bịa, không số 0 giả); thiếu bảng/cột ⇒ khối vắng + `lyDoThieu`, lệnh vẫn ok.
 import type { Env } from './kieu'

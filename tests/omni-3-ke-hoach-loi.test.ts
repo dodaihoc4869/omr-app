@@ -1,4 +1,4 @@
-// OMNI 3 · làn A2 — luật thuần mới của `lapKeHoachNgay` (đặc tả DAC-TA-BUILD-OMNI-3-0510.md mục 1 bước 3 + 11, mục 4.9; prompt tick bài mục B, C, D, G):
+// OMNI 3 · làn A2 — luật thuần mới của `lapKeHoachNgay` (đặc tả docs/dac-ta-cu/DAC-TA-BUILD-OMNI-3-0510.md mục 1 bước 3 + 11, mục 4.9; prompt tick bài mục B, C, D, G):
 // nhiều bài song song (EDF, quota riêng, Huyết Chiến), trọng số câu, dạng đã vững, ôn bài cũ, chế độ chờ. Mọi trường TUỲ CHỌN.
 import { describe, expect, it } from 'vitest'
 import { congNgay, lapKeHoachNgay, phatLaiCau, quotaCauMoi, type CauSrs, type LanLam, type TrangThaiCau, type TuyChonKeHoach } from '../server/src/srs2-loi'

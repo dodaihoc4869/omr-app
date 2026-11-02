@@ -83,8 +83,9 @@ describe('hàng BTVN trong danh sách của em (hợp đồng mã nguồn)', () 
 
 // ───────── thầy 21/09: tên thẻ, tổng số chặng, hạn bằng ngày giờ thật ─────────
 describe('thẻ bài cá nhân hoá — tên "Bài tập về nhà · Chặng k", "trong K chặng", hạn thật', () => {
-  const HAN_CHANG = new Date(2026, 8, 21, 23, 59).toISOString() // Thứ Hai 21/09 23:59
-  const HAN_BAI = new Date(2026, 8, 24, 23, 59).toISOString() // Thứ Năm 24/09 23:59
+  // 02/11: cập nhật theo 381ca747 (hạn hiện theo GIỜ VIỆT NAM qua gioDayDu, không theo múi giờ máy) — mốc dựng bằng giờ VN (+07:00) thay vì giờ máy chạy test
+  const HAN_CHANG = new Date('2026-09-21T23:59:00+07:00').toISOString() // Thứ Hai 21/09 23:59 (giờ VN)
+  const HAN_BAI = new Date('2026-09-24T23:59:00+07:00').toISOString() // Thứ Năm 24/09 23:59 (giờ VN)
   const TEN_TO = 'Bài tập: DH-12-C2-B6-TN'
   const cn = (chiSo: number, hanCung: string | null, hanBai?: string, soChang: unknown = 7, tongLoKeHoach: unknown = 7) => {
     const kh = keHoach([v({ id: `btvn_lo:B-CN:${chiSo}`, loai: 'btvn_lo', soCau: 8, hanCung, hanMem: null, chiTiet: { ma: 'B-CN', chiSo, tongLo: tongLoKeHoach, treNhip: false, caNhan: true } })])

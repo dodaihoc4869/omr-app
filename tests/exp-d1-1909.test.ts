@@ -1,6 +1,6 @@
 // @vitest-environment node
 // LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chỉ phát câu ĐÚNG khối em; em/câu KHÔNG RÕ khối ⇒ chặn ⇒ em giả ghi lớp 12, câu giả ghi khối `lop` 12 (như `de_kho.lop`).
-// EXP HỌC TẬP + MẢNH KHIÊN — TẦNG D1 (DE-XUAT-EXP-MANH-KHIEN-1909.md, Bước 2). Chạy trên SQLite THẬT (lược đồ thật + mọi migration).
+// EXP HỌC TẬP + MẢNH KHIÊN — TẦNG D1 (docs/dac-ta-cu/DE-XUAT-EXP-MANH-KHIEN-1909.md, Bước 2). Chạy trên SQLite THẬT (lược đồ thật + mọi migration).
 import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest'
 import worker from '../server/src/index'
 import { capNhatExp, chotExpNgayQua, congVaoHoSoGame, docCauHinhExp, docExpHomNay, docThanhTichNgay, ghiTiepSuc, hsKeHoachNgayCoExp, mocExpCuaEm } from '../server/src/exp-d1'

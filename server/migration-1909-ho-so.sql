@@ -1,4 +1,4 @@
--- GĐ 1 — HỒ SƠ NẮM KIẾN THỨC (DE-XUAT-CA-NHAN-HOA-1909.md mục 1.2).
+-- GĐ 1 — HỒ SƠ NẮM KIẾN THỨC (docs/dac-ta-cu/DE-XUAT-CA-NHAN-HOA-1909.md mục 1.2).
 --
 -- Hai bảng này là BẢN DỰNG LẠI từ `su_kien_hoc` bằng `phatLaiSuKien` (hàm thuần,
 -- phát lại hai lần ra cùng trạng thái). Mất là dựng lại được từ sổ, nên không

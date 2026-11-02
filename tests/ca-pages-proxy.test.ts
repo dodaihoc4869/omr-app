@@ -5,18 +5,22 @@ afterEach(()=>vi.unstubAllGlobals())
 it('app chính gửi ca qua cùng tên miền, không đổi đích của máy chủ riêng',()=>{
  expect(diaChiGuiCa('https://omr.ttadodaihoc.workers.dev','https://omr-app-b3u.pages.dev')).toBe('https://omr-app-b3u.pages.dev/api')
  expect(diaChiGuiCa('https://other.test','https://omr-app-b3u.pages.dev')).toBe('https://other.test')
- expect(diaChiGuiCa('https://omr.ttadodaihoc.workers.dev','https://fake.test')).toBe('https://omr.ttadodaihoc.workers.dev')
+ // 02/11: cập nhật theo 200539500 (tên miền riêng của app cũng đi cùng tên miền; chỉ localhost/127.0.0.1 gọi thẳng máy chủ)
+ expect(diaChiGuiCa('https://omr.ttadodaihoc.workers.dev','https://fake.test')).toBe('https://fake.test/api')
+ expect(diaChiGuiCa('https://omr.ttadodaihoc.workers.dev','http://localhost:5173')).toBe('https://omr.ttadodaihoc.workers.dev')
+ expect(diaChiGuiCa('https://omr.ttadodaihoc.workers.dev','http://127.0.0.1:5173')).toBe('https://omr.ttadodaihoc.workers.dev')
 })
 it.each([200,403,413,500])('chuyển tiếp nguyên gói, giữ mã trả về %s và không cấp thêm quyền',async status=>{
  let body=''
  const f=vi.fn(async (url:any,init:any)=>{
   expect(url).toBe('https://omr.ttadodaihoc.workers.dev/ca/day')
   body=await new Response(init.body).text()
+  // 02/11: cập nhật theo 421a056a3 (proxy chuyển NGUYÊN content-type của yêu cầu, để gói gzip đi được) — vẫn không thêm đầu nào khác
   expect(init.headers).toEqual({'content-type':'text/plain;charset=utf-8'})
   return new Response(JSON.stringify({ok:status===200}),{status})
  });vi.stubGlobal('fetch',f)
  const payload=JSON.stringify({secret:'test-only',ca:{maCa:'TEST'},bank:{}})
- const response=await onRequest({env:{OMR:{fetch}},request:new Request('https://omr-app-b3u.pages.dev/api/ca/day',{method:'POST',body:payload})})
+ const response=await onRequest({env:{OMR:{fetch}},request:new Request('https://omr-app-b3u.pages.dev/api/ca/day',{method:'POST',body:payload,headers:{'content-type':'text/plain;charset=utf-8'}})})
  expect(response.status).toBe(status);expect(body).toBe(payload)
  expect(response.headers.get('cache-control')).toBe('no-store')
 })

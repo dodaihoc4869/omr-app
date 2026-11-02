@@ -1,4 +1,4 @@
-// MỤC "BÀI TẬP VỀ NHÀ ĐÃ GIAO" THIẾT KẾ LẠI — PHẦN THUẦN (Code 1, 21/09/2026; thầy chốt 18:1x; đề prompt-btvn-da-giao-thiet-ke-lai-2109.md, hợp đồng docs/hop-dong-btvn-theo-doi-v2-2109.md).
+// MỤC "BÀI TẬP VỀ NHÀ ĐÃ GIAO" THIẾT KẾ LẠI — PHẦN THUẦN (Code 1, 21/09/2026; thầy chốt 18:1x; đề docs/dac-ta-cu/prompt-btvn-da-giao-thiet-ke-lai-2109.md, hợp đồng docs/hop-dong-btvn-theo-doi-v2-2109.md).
 // LUẬT: màn KHÔNG tự tính nhóm em (chưa mở / đúng nhịp / chậm nhịp / xong chặng hôm nay / đã nộp) — chỉ ĐỌC số máy chủ trả (`nhom`) rồi sắp, cộng các dòng cùng một lần giao, đổi ra chữ và độ rộng đoạn.
 // Máy chủ cũ thiếu khoá ⇒ `nhom = null` ⇒ thẻ không thanh nhóm, KHÔNG bịa số. Không nhãn năng lực, không xếp hạng em với em.
 import type { NhomBtvn } from './nhom-btvn'

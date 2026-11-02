@@ -19,7 +19,8 @@ import { describe, expect, it } from 'vitest'
 import { TEN_BAC_THEO_THU } from '../src/game/than-thu-hoa-hoc/hinh-thai'
 
 /** Tên thần thú — long, ly, quy, phượng, lân, thuỷ long. */
-const CHU_THU = ['long', 'lân', 'quy', 'phượng', 'kỳ lân', 'thần thú']
+// 02/11: cập nhật theo b52706159 (thêm thần thú mới: giao long, điêu/bằng, sư tử, hồ ly, hươu, thiên mã ⇒ thêm đúng các danh xưng ấy)
+const CHU_THU = ['long', 'lân', 'quy', 'phượng', 'kỳ lân', 'thần thú', 'giao', 'điêu', 'bằng', 'sư', 'hồ', 'hươu', 'mã']
 
 const co = (s: string, ds: string[]) => ds.some((t) => s.toLowerCase().includes(t))
 

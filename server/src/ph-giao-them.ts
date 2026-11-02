@@ -1,4 +1,4 @@
-// `POST /ph/giao-them` — MỘT NÚT "Giao thêm bài cho con" của phụ huynh (thầy lệnh 21/09; đề bài prompt-ph-giao-them-bai-2109.md; hợp đồng docs/hop-dong-ph-giao-them-2109.md mục 5).
+// `POST /ph/giao-them` — MỘT NÚT "Giao thêm bài cho con" của phụ huynh (thầy lệnh 21/09; đề bài docs/dac-ta-cu/prompt-ph-giao-them-bai-2109.md; hợp đồng docs/hop-dong-ph-giao-them-2109.md mục 5).
 // Máy chủ DỰNG đầu vào cho hàm thuần `tinhGiaoThem` (Code 1, `src/lib/giao-them-cho-con.ts`: quyết ĐỊNH giao hay từ chối và CƠ CẤU), rồi CHỌN qid cụ thể theo cơ cấu đó (KHÔNG tự luận, KHÔNG đề thi đang bảo vệ, KHÔNG câu của bài tập về nhà chưa nộp,
 // KHÔNG câu làm trong 14 ngày trừ câu đến lịch ôn, KHÔNG vượt bậc + 1), tạo bài qua đường "Bài gia đình giao" (`mom_bai`), ghi lượt vào `ph_giao_them` (trần 3 lượt THÀNH CÔNG/ngày VN, bấm đúp không tạo hai gói) và báo cho con MỘT tin.
 // Lượt bị từ chối KHÔNG ghi gì và KHÔNG mất lượt. Không đáp án xuống máy phụ huynh: lệnh chỉ trả cơ cấu + chữ, không trả câu.

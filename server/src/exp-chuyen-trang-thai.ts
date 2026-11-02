@@ -1,5 +1,5 @@
 // CHUYỂN TRẠNG THÁI HỒ SƠ TRONG MỘT NGÀY — HÀM THUẦN, dùng cho EXP "lên bậc", "khắc phục xong", mảnh khiên "dạng rời danh sách yếu"
-// (DE-XUAT-EXP-MANH-KHIEN-1909.md mục 2 và 4).
+// (docs/dac-ta-cu/DE-XUAT-EXP-MANH-KHIEN-1909.md mục 2 và 4).
 //
 // Không có luật thứ hai: chỉ PHÁT LẠI sổ bằng đúng `phatLaiSuKien`/`dangYeu` của hồ sơ, hai lần (trước và sau ngày `ngay`), rồi so hai
 // trạng thái. Nên "lên bậc", "đạt da_khac_phuc", "dạng yếu" ở đây LUÔN khớp với hồ sơ mà kế hoạch ngày đọc.

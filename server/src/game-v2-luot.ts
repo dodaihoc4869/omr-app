@@ -1,4 +1,4 @@
-// ĐỢT 2 "THẦN THÚ MỖI NGÀY" — MÁY CHỦ (prompt-than-thu-moi-ngay-2109.md; DE-XUAT-THAN-THU-MOI-NGAY-2109.md Điều 3, 4, 5): kho rút câu = phần LỚP đã học, quota lượt/ngày ở máy chủ, chặn câu bài tập về nhà CHƯA nộp.
+// ĐỢT 2 "THẦN THÚ MỖI NGÀY" — MÁY CHỦ (docs/dac-ta-cu/prompt-than-thu-moi-ngay-2109.md; docs/dac-ta-cu/DE-XUAT-THAN-THU-MOI-NGAY-2109.md Điều 3, 4, 5): kho rút câu = phần LỚP đã học, quota lượt/ngày ở máy chủ, chặn câu bài tập về nhà CHƯA nộp.
 // Hàm thuần chọn lượt (`chooseLuotMoi`, `luotHomNay`) của Code 1 ở src/game/than-thu-v2/core.ts; ở đây chỉ ĐỌC dữ liệu và đóng gói. Mọi đọc bọc try/catch: thiếu bảng/cột (Worker lên trước migration) ⇒ giá trị an toàn, KHÔNG ném lỗi.
 import type { Env } from './kieu'
 import type { Mastery } from '../../src/game/than-thu-v2/core'

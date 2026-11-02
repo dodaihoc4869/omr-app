@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// SINH BẢN VẼ "XEM ĐIỂM + BÁO CÁO CHI TIẾT" bản 2 (Code 2, 21/09/2026) — đề bài `prompt-xem-diem-bao-cao-v2.md`.
+// SINH BẢN VẼ "XEM ĐIỂM + BÁO CÁO CHI TIẾT" bản 2 (Code 2, 21/09/2026) — đề bài `docs/dac-ta-cu/prompt-xem-diem-bao-cao-v2.md`.
 //   node docs/ban-ve-xem-diem-2109/sinh-ban-ve.mjs            ghi các trang HTML tĩnh tự chứa (CSS nhúng sẵn) vào thư mục này
 //   node docs/ban-ve-xem-diem-2109/sinh-ban-ve.mjs --anh      thêm: chụp Chromium 390 + 1440, sáng + tối, JPG ≤ 150 KB vào ./anh/
 // Chỉ dữ liệu GIẢ (tên giả). Màu đọc từ tokens.css + m3-theme.css của app (không màu riêng); sáng/tối theo prefers-color-scheme.
@@ -353,7 +353,7 @@ P['ban-in-a4'] = () => {
 }
 
 // ───────────────────────────── PH · THẺ "CA KIỂM TRA GẦN NHẤT CỦA CON" + TRANG "TẤT CẢ VỀ CON" ─────────────────────────────
-// Thầy lệnh 21/09 ~12:40: "Có một chỗ hiện điểm ca thi gần nhất siêu đẹp siêu xịn, bấm vào là xem được hết mọi thứ của con, trừ game." (prompt-ph-giao-them-bai-2109.md mục D)
+// Thầy lệnh 21/09 ~12:40: "Có một chỗ hiện điểm ca thi gần nhất siêu đẹp siêu xịn, bấm vào là xem được hết mọi thứ của con, trừ game." (docs/dac-ta-cu/prompt-ph-giao-them-bai-2109.md mục D)
 // Ghép từ bộ xd-* đã chốt, giọng phụ huynh (con · anh/chị). KHÔNG thần thú/EXP/khiên/Đoàn, KHÔNG xếp hạng, KHÔNG so con với bạn. Dữ liệu GIẢ theo hợp đồng docs/hop-dong-xem-diem-v2-2109.md mục 6 (`/ph/tat-ca-ve-con`).
 const PHD = {
   btvnDangChay: [{ ten: 'Bài tập về nhà · Kim loại kiềm', chang: 2, tong: 5, han: 'Hạn nộp 12:00 trưa mai (Thứ Ba 22/09) · còn khoảng 17 giờ' }],

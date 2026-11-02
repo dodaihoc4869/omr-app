@@ -1,5 +1,5 @@
 // THẦY LỆNH 21/09 (kèm ảnh Bảng nhiệm vụ phụ huynh): "App phụ huynh KHÔNG được hiện thần thú hay bất cứ gì liên quan tới game."
-// Đề: prompt-ph-giao-them-bai-2109.md mục B. GIỮ: điểm, số câu, lên bậc, dạng con vấp, lịch ôn, bài tập về nhà, hạn nộp, "Vinh danh hôm nay".
+// Đề: docs/dac-ta-cu/prompt-ph-giao-them-bai-2109.md mục B. GIỮ: điểm, số câu, lên bậc, dạng con vấp, lịch ôn, bài tập về nhà, hạn nộp, "Vinh danh hôm nay".
 // CHỐT CHẶN: dữ liệu ĐẦY game (thú, EXP, mảnh khiên, Đoàn, thử thách, cảnh báo/lời có chữ game, việc `than_thu`) đi vào MÀN PHỤ HUYNH ⇒ chữ HIỂN THỊ (nội dung + aria-label + title + alt)
 // của cả cây không còn "thần thú|EXP|khiên|Đoàn|Đảo|Võ đài". Học sinh giữ nguyên (không quét).
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'

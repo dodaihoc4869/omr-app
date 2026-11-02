@@ -1,4 +1,4 @@
-// EXP HỌC TẬP + MẢNH KHIÊN — HÀM THUẦN (DE-XUAT-EXP-MANH-KHIEN-1909.md). Không đọc đồng hồ, không đọc D1, không Math.random.
+// EXP HỌC TẬP + MẢNH KHIÊN — HÀM THUẦN (docs/dac-ta-cu/DE-XUAT-EXP-MANH-KHIEN-1909.md). Không đọc đồng hồ, không đọc D1, không Math.random.
 //
 // EXP = công sức × độ khó × chất lượng × đúng nhịp; MỌI EXP do máy chủ tính từ sổ `su_kien_hoc` và các bảng phụ, KHÔNG có EXP nào do máy em khai.
 // Tất định: cùng đầu vào → cùng danh sách; thứ tự theo `luc`, hoà thì theo `khoa`. Mọi khoản có KHOÁ idempotent; khoá nằm trong `daCoKhoa` thì

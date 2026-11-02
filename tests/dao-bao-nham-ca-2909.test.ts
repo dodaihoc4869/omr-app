@@ -7,14 +7,15 @@
 //   (a) ca đóng mà chưa công bố khoá câu còn lại của kế hoạch ⇒ Đảo rỗng + rương kẹt
 //   (c) câu còn lại đã rút khỏi kho ⇒ Đảo rỗng + rương kẹt
 // Sau khi sửa: lý do báo ĐÚNG, rương/thể lực không kẹt vì câu bị khoá.
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { taoD1That } from './_d1-that'
 import { gvChienDich } from '../server/src/srs2-gv'
 import { layKeHoachHomNay, qidGoc, sanh2 } from '../server/src/srs2-d1'
 import { hoa2Action, startDao2 } from '../server/src/srs2-game'
 import { xoaDemCaBaoVe } from '../server/src/game-v2-bank'
-import { ghiSuKien, type SuKien } from '../server/src/su-kien-hoc'
+import { ghiSuKien, ngayVn, type SuKien } from '../server/src/su-kien-hoc'
 import type { Env } from '../server/src/kieu'
+import { gopDocD1 } from '../server/src/doc-d1-theo-luot'
 
 const NGAY = 86_400_000
 const LOI_CA = 'đang dùng cho ca kiểm tra'
@@ -43,7 +44,7 @@ function fixture(soCau = 30) {
 }
 async function giao(env: Env) {
   const nay = Date.now()
-  const r = await gvChienDich(env, { action: 'tao', ten: 'Ester – Lipid', lop: '12A1', maDe: ['DE1'], hanNop: new Date(nay + 5 * NGAY).toISOString().slice(0, 10) }, nay - 3 * NGAY)
+  const r = await gvChienDich(env, { action: 'tao', ten: 'Ester – Lipid', lop: '12A1', maDe: ['DE1'], hanNop: ngayVn(nay + 5 * NGAY) }, nay - 3 * NGAY)
   expect(r.ok).toBe(true)
 }
 const suKien = (qid: string, msLuc: number, dung: boolean): SuKien => ({ nguon: 'game', maNguon: `phien-${qid}-${msLuc}`, sbd: 'S1', qid, lan: 1, ketQua: dung ? 1 : 0, luc: new Date(msLuc).toISOString() })
@@ -69,7 +70,15 @@ function caChuaCongBo(d: ReturnType<typeof fixture>['d'], qids: string[], o: { t
 }
 const qidsCua = (r: Record<string, unknown>) => ((r.questions as { qid: string }[]) ?? []).map((q) => q.qid)
 
-beforeEach(() => xoaDemCaBaoVe())
+// 02/11: hạn nộp theo ngày VN (`ngayVn`) + ĐỒNG HỒ CỐ ĐỊNH 12:00 VN (chỉ giả `Date`) — cùng cách sửa của tests/cau-hong-giua-ngay-3009.test.ts:
+// chạy từ 00:00 tới 06:59 giờ VN thì ngày UTC lệch một ngày ⇒ hạn hụt.
+const GIO_CO_DINH = Date.parse('2026-10-14T05:00:00Z')
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(GIO_CO_DINH)
+  xoaDemCaBaoVe()
+})
+afterEach(() => vi.useRealTimers())
 
 describe('Đảo báo nhầm "ca kiểm tra" — nguyên nhân (a): ca đóng chưa công bố', () => {
   it('câu còn lại nằm trong ca đóng chưa công bố ⇒ không lộ câu, không kẹt rương: thể lực trừ câu tạm hoãn, rương mở, lời báo nói đúng ca', async () => {
@@ -131,7 +140,9 @@ describe('Đảo báo nhầm "ca kiểm tra" — nguyên nhân (c): câu rút kh
     await giao(env)
     const nay = Date.now()
     const bon = await conLai(env, (ds) => ds.slice(-4), nay)
-    for (const q of bon) d.sql.prepare('DELETE FROM game_v2_question WHERE qid=?').run(q)
+    // 02/11: cập nhật theo b6026cc61 (máy chủ nhớ 60 giây SELECT bảng dùng chung, chỉ xoá khi lệnh ghi đi qua lớp `gopDocD1`) ⇒ rút câu khỏi kho
+    // đi qua lớp ấy như máy chủ thật, không ghi thẳng `d.sql` (cách sửa của tests/cau-hong-giua-ngay-3009.test.ts).
+    for (const q of bon) await gopDocD1(d.env.DB as never).prepare('DELETE FROM game_v2_question WHERE qid=?').bind(q).run()
     const dao = await startDao2(env, 'S1', nay)
     expect(String(dao.message ?? '')).not.toContain(LOI_CA)
     const thay = qidsCua(dao)

@@ -1,4 +1,4 @@
-// CẤM RÚT CÂU TỰ LUẬN — `src/lib/cau-tu-luan.ts` (Code 1, 21/09/2026). Đề bài: `prompt-cam-rut-tu-luan.md`.
+// CẤM RÚT CÂU TỰ LUẬN — `src/lib/cau-tu-luan.ts` (Code 1, 21/09/2026). Đề bài: `docs/dac-ta-cu/prompt-cam-rut-tu-luan.md`.
 // BẢNG GIÁ TRỊ: mỗi khuôn câu (tờ kho thô, đề thầy, phiếu CauLuyen, câu game/ôn lại công khai) × mỗi phần × từng luật. Câu saccharose trong ảnh thầy được dựng lại đúng chữ đề.
 // (Kho thật nằm ở R2, không có trong kho mã; bảng dưới dựng theo ĐÚNG hình dạng các tệp kho — `de/pa/y/dap_an` — và theo `PrivateQuestion`/`CauLuyen`/`TeacherExamSource` của mã nguồn.)
 import { describe, expect, it } from 'vitest'

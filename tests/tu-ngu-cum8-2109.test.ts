@@ -10,7 +10,8 @@ import { describe, expect, it } from 'vitest'
 const doc = (t: string) => readFileSync(resolve(__dirname, '..', t), 'utf8')
 const CAP: [string, string, string][] = [
   ['src/screens/PhieuScreen.tsx', 'Đúng bộ câu Thầy Đỗ Đại Học đã gán riêng cho', 'Đúng bộ câu máy đã gán riêng cho'],
-  ['src/screens/StudentPortalScreen.tsx', 'để A.I Đỗ Đại Học chấm điểm ngay', 'để máy chấm điểm ngay'],
+  // 02/11: bỏ dòng StudentPortalScreen — 234f90782 (23/09) gỡ hẳn khối lời nhắc phiếu HTML chứa câu này (không còn chữ để khoá);
+  // luật "Máy không làm chủ ngữ" ở tệp ấy vẫn canh bằng phép kiểm phủ định bên dưới.
   ['src/components/KhoiBaiLuyen.tsx', 'Thầy Đỗ Đại Học rút đúng chuyên đề em vừa mất điểm', 'Máy rút đúng chuyên đề em vừa mất điểm'],
   // 06/10 gọn mã lần 2 (docs/gon-ma-0610-lan-2.md): bỏ dòng của KhungLoiGiaiGame.tsx (game Thần thú v1, đã xoá).
 ]
@@ -22,4 +23,7 @@ describe('cụm 8 · "Máy" làm chủ ngữ tự động ⇒ "A.I Đỗ Đại 
       expect(s).not.toContain(cu)
     })
   }
+  it('src/screens/StudentPortalScreen.tsx: không quay lại "để máy chấm điểm ngay"', () => {
+    expect(doc('src/screens/StudentPortalScreen.tsx')).not.toContain('để máy chấm điểm ngay')
+  })
 })

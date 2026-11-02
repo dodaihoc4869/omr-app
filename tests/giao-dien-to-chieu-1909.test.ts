@@ -119,12 +119,14 @@ describe('thẻ tên: "thú · cấp · lần lên bảng thứ N", nhãn vùng 
   })
 
   it('nhãn vùng làm bài lấy TÊN GỌI (từ cuối họ tên) và được thoát dấu; có ở cả ô nửa bảng lẫn cột làm bài của đợt đơn', () => {
+    // 02/11: cập nhật theo 60985a9e (P0 không lộ tên trước khi hiện thẻ tên: `data-nhan` in sẵn là nhãn KHÔNG tên, tên gọi để ở `data-nhan-em`, script đổi sang khi thẻ hiện)
     const h = taoHtmlMayChieu([o('A', 'Nguyễn Văn Minh'), o('B', 'Trần Thu "Hà"')], {})
-    expect(h).toContain('data-nhan="Phần làm bài của Minh"')
-    expect(h).toContain('data-nhan="Phần làm bài của &quot;Hà&quot;"')
+    expect(h).toContain('data-nhan-em="Phần làm bài của Minh"')
+    expect(h).toContain('data-nhan-em="Phần làm bài của &quot;Hà&quot;"')
+    expect(h).not.toMatch(/data-nhan="Phần làm bài của (?:Minh|&quot;Hà)/) // nhãn in sẵn không có tên
     const don = taoHtmlMayChieu([o('A', 'Lê Hoàng Nam', { cau: cauI('d', 'từ '.repeat(400)), bacUoc: 2 })], {})
-    expect(don.match(/data-nhan="Phần làm bài của Nam"/g)).toHaveLength(2) // `.mc-trang` (ẩn ở đợt đơn) + `.mc-cot-lam-bai`
-    expect(don).toMatch(/class="mc-cot-lam-bai"[^>]*data-nhan="Phần làm bài của Nam"/)
+    expect(don.match(/data-nhan-em="Phần làm bài của Nam"/g)).toHaveLength(2) // `.mc-trang` (ẩn ở đợt đơn) + `.mc-cot-lam-bai`
+    expect(don).toMatch(/class="mc-cot-lam-bai"[^>]*data-nhan-em="Phần làm bài của Nam"/)
   })
 
   it('🔴 thầy lệnh 25/09: KHÔNG in nhãn "Phần làm bài của …" ở CẢ hai chế độ — CSS không còn `content:attr(data-nhan)`', () => {
@@ -374,14 +376,36 @@ describe('ăn mừng khi Đạt (chỉ Đạt)', () => {
   const tuCha = (t: ReturnType<typeof moTo>, data: unknown) =>
     t.w.dispatchEvent(new (t.dom.window as unknown as { MessageEvent: typeof MessageEvent }).MessageEvent('message', { data, origin: GOC, source: t.cha as unknown as MessageEventSource }))
 
-  it('DA_GHI kèm dat:true ⇒ thẻ tên xanh "Làm tốt lắm" + thần thú nhảy đúng 1,5 s rồi đứng yên (thẻ VẪN xanh)', () => {
+  // 02/11: cập nhật theo d4a0d3f5 (thầy 24/09 «add full screen celebration»): ảnh thần thú đã tải ⇒ màn ăn mừng toàn màn hình rồi thu về thẻ;
+  // ảnh CHƯA tải ⇒ giữ đường cũ (thần thú nhảy 1,5 s). Ca cũ chuyển sang `anh: false`, thêm ca ảnh đã tải.
+  it('DA_GHI kèm dat:true, ảnh thú đã tải ⇒ thẻ tên xanh "Làm tốt lắm" + màn ăn mừng toàn màn hình rồi thu về (thẻ VẪN xanh); ô thứ hai không ăn mừng', () => {
     const t = cauNoi()
     tuCha(t, { type: TIN_TO_CHIEU.KET_NOI, maPhien: MA })
     const khoa = t.doc.querySelector('.mc-cham')!.getAttribute('data-khoa')!
     tuCha(t, { type: TIN_TO_CHIEU.DA_GHI, maPhien: MA, khoa, dat: true })
     const the = t.doc.querySelector('.mc-nua .mc-em')!
     expect(the.classList.contains('mc-em-dat')).toBe(true)
+    expect(the.querySelector('.mc-lam-tot')!.textContent).toBe('Làm tốt lắm')
+    const man = t.doc.querySelector('.mc-mung-overlay')!
+    expect(man.querySelector('.mc-mung-card p')!.textContent).toBe('Làm tốt lắm! +1 sao')
+    expect(t.doc.querySelectorAll('.mc-nua')[1].querySelector('.mc-em')!.classList.contains('mc-em-dat')).toBe(false)
+    t.chay(3500)
+    expect(man.classList.contains('mc-shrink')).toBe(true)
+    t.chay(GIAO_DIEN_TO_CHIEU.BAY_VE_THE_MS + 60)
+    expect(t.doc.querySelector('.mc-mung-overlay')).toBeNull()
+    expect(the.classList.contains('mc-em-dat')).toBe(true)
+    expect(the.querySelectorAll('.mc-lam-tot')).toHaveLength(1)
+  })
+
+  it('DA_GHI kèm dat:true, ảnh thú CHƯA tải ⇒ thẻ tên xanh "Làm tốt lắm" + thần thú nhảy đúng 1,5 s rồi đứng yên (thẻ VẪN xanh)', () => {
+    const t = moTo([o('A', 'An', { thanThu: thu('Lửa') }), o('B', 'Bình', { thanThu: thu('Nước') })], { tuyChon: { cauNoi: { maPhien: MA } }, coCha: true, anh: false })
+    tuCha(t, { type: TIN_TO_CHIEU.KET_NOI, maPhien: MA })
+    const khoa = t.doc.querySelector('.mc-cham')!.getAttribute('data-khoa')!
+    tuCha(t, { type: TIN_TO_CHIEU.DA_GHI, maPhien: MA, khoa, dat: true })
+    const the = t.doc.querySelector('.mc-nua .mc-em')!
+    expect(the.classList.contains('mc-em-dat')).toBe(true)
     expect(the.classList.contains('mc-mung')).toBe(true)
+    expect(t.doc.querySelector('.mc-mung-overlay')).toBeNull()
     expect(the.querySelector('.mc-lam-tot')!.textContent).toBe('Làm tốt lắm')
     // ô thứ hai KHÔNG bị ăn mừng theo
     expect(t.doc.querySelectorAll('.mc-nua')[1].querySelector('.mc-em')!.classList.contains('mc-em-dat')).toBe(false)

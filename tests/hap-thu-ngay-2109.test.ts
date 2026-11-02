@@ -1,4 +1,4 @@
-// HẤP THỤ THEO NGÀY + ĐƯỜNG CẤP MỚI + CHUYỂN ĐỔI HỒ SƠ (Code 1, 21/09/2026; thầy chốt 13:36; Điều 1 + 2 + 9 + 10 của `DE-XUAT-THAN-THU-MOI-NGAY-2109.md`).
+// HẤP THỤ THEO NGÀY + ĐƯỜNG CẤP MỚI + CHUYỂN ĐỔI HỒ SƠ (Code 1, 21/09/2026; thầy chốt 13:36; Điều 1 + 2 + 9 + 10 của `docs/dac-ta-cu/DE-XUAT-THAN-THU-MOI-NGAY-2109.md`).
 // Nghiệm thu (Boss): tổng bảng 238 200 · 9 số đầu 2 400 · không giảm · với MỌI chuỗi nạp hợp lệ (ngẫu nhiên 2 000 chuỗi) SỚM NHẤT tới cấp 10 là ngày 12 và tới cấp 120 là ngày 1 191 ·
 // chuyển đổi bảo toàn tổng EXP (sau định giá lại thưởng nấc + bù bảng giá), idempotent, không em nào tăng cấp · ví dụ thật: cấp 7 dư 98 EXP, ống 0, 1 ngày có học ⇒ cấp 2 + 40/200, ống = T − 200.
 import { describe, expect, it } from 'vitest'

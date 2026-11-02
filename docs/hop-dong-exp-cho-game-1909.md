@@ -1,6 +1,6 @@
 # Hợp đồng EXP → game "Đoàn Hộ Tống" (Code 5 đọc)
 
-Người viết: Code 3 (máy chủ). Đặc tả EXP: `DE-XUAT-EXP-MANH-KHIEN-1909.md`. Mã: `server/src/exp-d1.ts`. Game KHÔNG tự ghi sổ EXP: game GỌI hai hàm dưới, trong cùng Worker (import trực tiếp, không qua HTTP), sau khi game tự xác thực em (`gameIdentity`).
+Người viết: Code 3 (máy chủ). Đặc tả EXP: `docs/dac-ta-cu/DE-XUAT-EXP-MANH-KHIEN-1909.md`. Mã: `server/src/exp-d1.ts`. Game KHÔNG tự ghi sổ EXP: game GỌI hai hàm dưới, trong cùng Worker (import trực tiếp, không qua HTTP), sau khi game tự xác thực em (`gameIdentity`).
 
 Cờ: cả hai hàm chỉ làm việc với em đã bật EXP mới (`cau_hinh.exp_moi`). Em chưa bật → `bat:false`, KHÔNG ghi gì, game xử như chưa có EXP học tập mới.
 

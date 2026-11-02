@@ -90,7 +90,9 @@ describe('LỖI 2 — máy học sinh không có kho đề', () => {
   it('modal mặc định vào chế độ 1, chỉ nâng lên 2 khi kho thật sự có đề', () => {
     // 15/09 thêm chế độ 4 (Luyện dạng bài) nên kiểu nới thành 1|2|3|4. Điều
     // phép kiểm này giữ KHÔNG ĐỔI: mặc định vẫn phải là chế độ 1.
-    expect(modal).toContain('useState<1 | 2 | 3 | 4>(1)')
+    // 02/11: cập nhật theo b52706159 (mặc định = chế độ thầy truyền vào; không có thì 1 khi em có câu sai, 3 «Luyện dạng bài»
+    // — không cần kho câu-sai — khi em chưa sai câu nào). Điều canh giữ nguyên: KHÔNG BAO GIỜ mặc định vào chế độ 2.
+    expect(modal).toContain('useState<1 | 2 | 3 | 4>(cheDoMacDinh ?? (dsCauSai.length ? 1 : 3))')
     expect(modal).not.toContain('useState<1 | 2 | 3 | 4>(2)')
     expect(modal).not.toContain('useState<1 | 2 | 3 | 4>(3)')
     expect(modal).not.toContain('useState<1 | 2 | 3 | 4>(4)')
@@ -100,7 +102,9 @@ describe('LỖI 2 — máy học sinh không có kho đề', () => {
   it('khoá thẻ 2 và thẻ 3 khi kho rỗng và nói rõ vì sao', () => {
     expect(modal).toContain('const coKhoDe = khoDe.length > 0')
     expect(modal).toContain('onClick={() => coKhoDe && setCheDo(2)}')
-    expect(modal).toContain('onClick={() => coKhoDe && setCheDo(3)}')
+    // 02/11: cập nhật theo 5afe2badc (thẻ chế độ 3 nay là «Luyện dạng bài», lấy đề từ danh mục dạng trên máy chủ ⇒ CỐ Ý không khoá theo coKhoDe)
+    expect(modal).toContain('onClick={() => setCheDo(3)}')
+    expect(modal).not.toContain('onClick={() => coKhoDe && setCheDo(3)}')
     expect(modal).toContain('KHONG_CO_KHO')
   })
 

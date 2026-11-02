@@ -9,7 +9,10 @@ import { gio } from './_btvn-nang-do-mau'
 afterEach(() => vi.useRealTimers())
 const tien = readFileSync('server/dat-2109-bang-tin-tu.sql', 'utf-8')
 const lui = readFileSync('server/dat-2109-bang-tin-tu-lui.sql', 'utf-8')
-const cauHinh = (d: D1That) => d.sql.prepare('SELECT khoa, gia_tri FROM cau_hinh ORDER BY khoa').all()
+const cauHinh = (d: D1That) => d.sql.prepare('SELECT khoa, gia_tri FROM cau_hinh ORDER BY khoa').all() as { khoa: string; gia_tri: string }[]
+// 02/11: cập nhật theo ce842a241 (migration-2610-thuong-phat gieo sẵn khoá `thuong_moc` khi dựng D1) — so với ẢNH CHỤP
+// cau_hinh trước khi chạy tệp, thay vì giả định bảng chỉ có khoá do test chèn. Vẫn canh: mọi khoá khác y nguyên.
+const theoKhoa = (ds: { khoa: string; gia_tri: string }[]) => [...ds].sort((a, b) => (a.khoa < b.khoa ? -1 : a.khoa > b.khoa ? 1 : 0))
 const bangTin = (d: D1That) => goiWorker(worker, d.env, '/gv/bang-tin', {}, true)
 
 describe('mốc bảng tin: tệp ghi + lùi', () => {
@@ -17,9 +20,11 @@ describe('mốc bảng tin: tệp ghi + lùi', () => {
     gio(new Date('2026-09-21T13:00:00+07:00'))
     const d = taoD1That()
     d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('khoa_khac','giu-nguyen','x')").run()
+    const truoc = cauHinh(d)
+    expect(truoc).toContainEqual({ khoa: 'khoa_khac', gia_tri: 'giu-nguyen' })
     d.sql.exec(tien)
     expect(d.sql.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa = 'bang_tin_tu'").get()).toEqual({ gia_tri: '2026-09-21T05:00:00.000Z' })
-    expect(cauHinh(d)).toEqual([{ khoa: 'bang_tin_tu', gia_tri: '2026-09-21T05:00:00.000Z' }, { khoa: 'khoa_khac', gia_tri: 'giu-nguyen' }])
+    expect(cauHinh(d)).toEqual(theoKhoa([...truoc, { khoa: 'bang_tin_tu', gia_tri: '2026-09-21T05:00:00.000Z' }]))
     d.sql.exec(tien)
     expect((d.sql.prepare("SELECT COUNT(*) AS n FROM cau_hinh WHERE khoa = 'bang_tin_tu'").get() as { n: number }).n).toBe(1)
     expect(await bangTin(d)).toMatchObject({ ok: true, tuDangAp: true, tu: '2026-09-21T05:00:00.000Z', tuHomNay: '2026-09-21T05:00:00.000Z' })
@@ -28,10 +33,12 @@ describe('mốc bảng tin: tệp ghi + lùi', () => {
     gio(new Date('2026-09-21T13:00:00+07:00'))
     const d = taoD1That()
     d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('bang_tin_tu','2026-01-01T00:00:00.000Z','x'),('khoa_khac','giu-nguyen','x')").run()
+    const khacTruoc = cauHinh(d).filter((r) => r.khoa !== 'bang_tin_tu')
+    expect(khacTruoc).toContainEqual({ khoa: 'khoa_khac', gia_tri: 'giu-nguyen' })
     d.sql.exec(tien)
     expect(d.sql.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa = 'bang_tin_tu'").get()).toEqual({ gia_tri: '2026-09-21T05:00:00.000Z' })
     d.sql.exec(lui)
-    expect(cauHinh(d)).toEqual([{ khoa: 'khoa_khac', gia_tri: 'giu-nguyen' }])
+    expect(cauHinh(d)).toEqual(khacTruoc)
     expect(await bangTin(d)).toMatchObject({ tuDangAp: false, tuHomNay: '2026-09-20T17:00:00.000Z' })
     d.sql.exec(lui) // lùi lần hai không lỗi
   })

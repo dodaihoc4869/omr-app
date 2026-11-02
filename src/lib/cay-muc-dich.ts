@@ -1,4 +1,4 @@
-// HAI THƯ MỤC MỤC ĐÍCH CỦA KHO (OMNI 3, thầy chốt 05/10 — DAC-TA-BUILD-OMNI-3-0510.md mục 2, prompt-tick-bai-tu-giao.md mục E):
+// HAI THƯ MỤC MỤC ĐÍCH CỦA KHO (OMNI 3, thầy chốt 05/10 — docs/dac-ta-cu/DAC-TA-BUILD-OMNI-3-0510.md mục 2, docs/dac-ta-cu/prompt-tick-bai-tu-giao.md mục E):
 //   · DẠY HỌC  = tờ có thư mục "DẠY HỌC" trong `nhom`, HOẶC mã bắt đầu bằng "DH-" — nguồn của tick bài, game, Thử sức thêm, vé, Trạm hồi phục.
 //   · TU LUYỆN = MỌI tờ còn lại — thư mục ẢO suy từ `nhom` (không ghi đè `nhom`, không di chuyển dữ liệu); chỉ Tu luyện và ca kiểm tra.
 // `dungCayTheoMucDich` dựng cây chọn đề hai nhánh: "DẠY HỌC" (đúng cây DẠY HỌC của `dungCay`) và "TU LUYỆN" (mọi nhánh khác — cây con y hệt

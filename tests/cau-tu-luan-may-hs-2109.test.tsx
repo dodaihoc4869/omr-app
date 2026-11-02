@@ -1,4 +1,4 @@
-// CẤM RÚT CÂU TỰ LUẬN · LỚP PHÒNG THỦ CUỐI Ở MÁY HỌC SINH / PHỤ HUYNH (thầy lệnh 21/09; đề bài prompt-cam-rut-tu-luan.md, phần Code 2).
+// CẤM RÚT CÂU TỰ LUẬN · LỚP PHÒNG THỦ CUỐI Ở MÁY HỌC SINH / PHỤ HUYNH (thầy lệnh 21/09; đề bài docs/dac-ta-cu/prompt-cam-rut-tu-luan.md, phần Code 2).
 // Định nghĩa "tự luận" nằm ở src/lib/cau-tu-luan.ts (Code 1). Ở đây khoá: nhận phải câu tự luận thì BỎ QUA (không dựng ô nhập), ghi console.warn,
 // ở MỌI kênh máy em: game Đảo thần thú / Võ đài (cùng cổng `request` của Game.tsx), Đoàn Hộ Tống, ôn lại (/hs/cau-theo-qid), bộ lọc rút của phiếu (`hopLeDeRut`).
 // Gọi lên bảng của thầy KHÔNG nằm trong src của em và không dùng lớp này (khoá bằng test nguồn cuối tệp).

@@ -214,7 +214,9 @@ describe('thầy tự chọn bài thì CHỈ chữa bài đó', () => {
     const ma = (await import('../src/screens/GoiLenBangScreen.tsx?raw')).default
     // v4 thêm chế độ thứ ba "theo dạng câu cả lớp sai", rồi "chữa BTVN đã phân gần nhất" — cũng chỉ lấy câu do
     // cổng chọn, không chen câu của ca. Luật cũ giữ nguyên, chỉ dài thêm vế (21/09: thêm `btvn_gan_nhat`).
-    expect(ma).toContain("if (cachLayCau === 'tu_chon' || cachLayCau === 'theo_dang' || cachLayCau === 'btvn_gan_nhat') return cauTuBanDe(bankThem)")
+    // 02/11: cập nhật theo a15f5d274 (ngoài Dạy học, bộ câu thầy chọn đi qua loc ⇒ boTuLuanKhoiBanDe bỏ câu tự luận; luật «chỉ câu thầy chọn» giữ nguyên)
+    expect(ma).toContain("if (cachLayCau === 'tu_chon' || cachLayCau === 'theo_dang' || cachLayCau === 'btvn_gan_nhat') return cauTuBanDe(loc(bankThem))")
+    expect(ma).toContain('(dayHoc ? b : boTuLuanKhoiBanDe(b))')
   })
 
   it('danh sách chữa chỉ còn chuyên đề của bài đã tích', () => {

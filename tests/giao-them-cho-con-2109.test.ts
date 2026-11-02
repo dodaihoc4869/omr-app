@@ -1,4 +1,4 @@
-// GIAO THÊM BÀI CHO CON — hàm THUẦN `src/lib/giao-them-cho-con.ts` (Code 1, 21/09/2026; đề bài `prompt-ph-giao-them-bai-2109.md`).
+// GIAO THÊM BÀI CHO CON — hàm THUẦN `src/lib/giao-them-cho-con.ts` (Code 1, 21/09/2026; đề bài `docs/dac-ta-cu/prompt-ph-giao-them-bai-2109.md`).
 // Nghiệm thu: không bao giờ vượt trần (10 · 6 · 4 · sau 21:30 ≤ 4 · tổng ngày ≤ 16) · liều ĐƠN ĐIỆU không tăng theo lượt / giờ / số câu đã giao · từ chối ĐÚNG ca (còn việc bắt buộc, gói trước chưa xong, hết lượt, hết trần, hết câu)
 // và KHÔNG có soCau · thứ tự ưu tiên (ôn lại → dạng vấp → câu sai → thử sức) · thử sức chỉ khi đúng ≥ 80 % (≥ 5 câu), tối đa MỘT, không dạng yếu, không vượt bậc + 1 · không đòi quá số câu khả dụng · lời không nhắc game.
 import { describe, expect, it } from 'vitest'

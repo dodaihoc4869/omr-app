@@ -262,7 +262,7 @@
 .xd-tot li span, .xd-them li span { display: block; font-size: var(--bnv-cx-1); font-weight: 500; opacity: 0.85; }
 .xd-nut-hang { display: grid; gap: 8px; justify-items: stretch; }
 
-/* ── PH · THẺ "CA KIỂM TRA GẦN NHẤT CỦA CON" + TRANG "TẤT CẢ VỀ CON" (bản vẽ 21/09, thầy lệnh; prompt-ph-giao-them-bai-2109.md mục D) ──
+/* ── PH · THẺ "CA KIỂM TRA GẦN NHẤT CỦA CON" + TRANG "TẤT CẢ VỀ CON" (bản vẽ 21/09, thầy lệnh; docs/dac-ta-cu/prompt-ph-giao-them-bai-2109.md mục D) ──
  * Ghép từ bộ xd-* đã chốt; chỉ thêm các khối riêng của phụ huynh. Không game, không xếp hạng, không so con với bạn. */
 a.xd-tcg, button.xd-tcg, div.xd-tcg { display: grid; gap: 14px; width: 100%; padding: 18px 18px 0; color: inherit; cursor: pointer; text-align: left; }
 div.xd-tcg { padding-bottom: 18px; cursor: default; }

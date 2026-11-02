@@ -24,6 +24,9 @@ async function mo(giay: number) {
     : { ok: true, kiemTra: tomTat(), revision: 0, hanChang: han, daChot: false, questions: [cau], tra: { q1: '' } })
   await act(async () => { render(<ManKiemTra token="token" sbd="S1" id="kt1" onVe={noop} onCapNhat={noop} />) })
   await act(async () => { fireEvent.click(screen.getByRole('button', { name: 'Làm chặng 1' })) })
+  // 02/11: chờ các mảnh nạp lười (công thức hoá, hiệu ứng) nạp XONG rồi mới lấy mốc đếm lần dựng câu — mảnh nạp xong giữa 5 nhịp giờ
+  // làm câu dựng lại một lần (đỏ chập chờn theo tốc độ máy), không phải do đồng hồ.
+  await act(async () => { await vi.dynamicImportSettled() })
 }
 it('5 nhịp giờ đổi chữ và vòng đồng hồ nhưng không dựng lại cây câu hoặc gọi máy chủ', async () => {
   await mo(600)

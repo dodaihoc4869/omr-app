@@ -18,7 +18,8 @@
 // thêm dòng vào đây phải kèm lý do vì sao chỗ đó an toàn.
 import { execFileSync } from 'node:child_process'
 import { resolve } from 'node:path'
-import { describe, expect, it } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { beforeAll, describe, expect, it } from 'vitest'
 
 const GOC = resolve(__dirname, '..')
 
@@ -68,8 +69,13 @@ function viPham(): { tep: string; ten: string }[] {
 }
 
 describe('Không đọc biến trước khi khai báo', () => {
+  // 02/11: chạy oxlint MỘT lần cho cả nhóm (mỗi lượt ~vài giây, chạy hai lượt từng làm phép kiểm thứ ba quá hạn 5 s).
+  let DANG: { tep: string; ten: string }[] = []
+  beforeAll(() => {
+    DANG = viPham()
+  }, 120_000)
+
   it('luật đã bật trong .oxlintrc.json, và bật cho BIẾN chứ không phải hàm', async () => {
-    const { readFileSync } = await import('node:fs')
     const c = JSON.parse(readFileSync(resolve(GOC, '.oxlintrc.json'), 'utf8')) as {
       rules: Record<string, unknown>
     }
@@ -81,15 +87,22 @@ describe('Không đọc biến trước khi khai báo', () => {
   })
 
   it('KHÔNG có chỗ vi phạm nào ngoài danh sách đã rà soát', () => {
-    const la = viPham().filter((v) => !(DA_RA_SOAT[v.tep] ?? []).includes(v.ten))
+    // 02/11: cập nhật theo 39f1f873c (thầy 02/11, cổng lint «CHỈ HẠ»): ~255 chỗ có sẵn khắp repo (phần lớn biến dùng trong
+    // closure) được chốt bằng MỐC SỐ `docs/moc-lint.json` thay vì liệt kê từng tên. Phép kiểm giữ hai tầng:
+    //  (1) CHẶT theo tên ở các tệp đã rà (màn thi `ExamTakeScreen` — nơi lỗi 06/09 làm đứng cả ca thi): không thêm tên nào;
+    //  (2) toàn repo: tổng số lỗi luật này KHÔNG vượt mốc chỉ-hạ.
+    const la = DANG.filter((v) => v.tep in DA_RA_SOAT && !DA_RA_SOAT[v.tep].includes(v.ten))
     // In ra đủ để người sửa biết phải nhìn vào đâu.
     expect(la.map((v) => `${v.tep}: ${v.ten}`)).toEqual([])
+    const moc = (JSON.parse(readFileSync(resolve(GOC, 'docs/moc-lint.json'), 'utf8')) as { loi: Record<string, number> }).loi['eslint(no-use-before-define)']
+    expect(typeof moc).toBe('number')
+    expect(DANG.length).toBeLessThanOrEqual(moc)
   })
 
   it('danh sách đã rà soát KHÔNG phình ra: mỗi tên trong đó phải thật sự còn vi phạm', () => {
     // Sửa xong một chỗ mà quên xoá khỏi danh sách thì lần sau nó lại che mất
     // một lỗi mới trùng tên. Đòi danh sách luôn khớp thực tế.
-    const dang = viPham()
+    const dang = DANG
     const thua: string[] = []
     for (const tep of Object.keys(DA_RA_SOAT)) {
       for (const ten of DA_RA_SOAT[tep]) {

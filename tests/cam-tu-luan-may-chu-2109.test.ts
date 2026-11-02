@@ -2,7 +2,7 @@
 // 14/10: gỡ Bi-a / Đoàn / cửa hàng / võ đài phía máy chủ — bỏ khối "B · Đoàn Hộ Tống" (3 ca: câu cá nhân, câu chung trùm, phòng cũ ghim tự luận).
 // 14/10: gỡ lệnh chết /kho/rut-cau — bỏ ca chỉ mục rút câu của lệnh ấy.
 // LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chỉ phát câu ĐÚNG khối em; em/câu KHÔNG RÕ khối ⇒ chặn ⇒ em giả ghi lớp 12, câu giả ghi khối `lop` 12 (như `de_kho.lop`).
-// CẤM RÚT CÂU TỰ LUẬN — MÁY CHỦ (Code 3, 21/09/2026). Đề bài: prompt-cam-rut-tu-luan.md.
+// CẤM RÚT CÂU TỰ LUẬN — MÁY CHỦ (Code 3, 21/09/2026). Đề bài: docs/dac-ta-cu/prompt-cam-rut-tu-luan.md.
 // Thầy: "Tuyệt đối không rút câu tự luận, chỉ được rút câu trắc nghiệm, đúng sai, trả lời ngắn — ở mọi chỗ rút đề, TRỪ màn Gọi lên bảng".
 //
 // Một kho mẫu DUY NHẤT (tờ `DE-K`) có 4 câu rút được + 4 câu tự luận, dựng đúng khuôn THẬT của kho (pa {A..D} và y {a..d} là ĐỐI TƯỢNG; câu saccharose trong ảnh của thầy).

@@ -1,4 +1,4 @@
-// "CẢNH BÁO CỦA THẦY" — bộ đọc + câu chữ cho thẻ nhắc chưa nộp Bài tập về nhà (học sinh + phụ huynh). Đề bài `prompt-hom-nay-gv-v2.md` (phần Code 2).
+// "CẢNH BÁO CỦA THẦY" — bộ đọc + câu chữ cho thẻ nhắc chưa nộp Bài tập về nhà (học sinh + phụ huynh). Đề bài `docs/dac-ta-cu/prompt-hom-nay-gv-v2.md` (phần Code 2).
 // Máy chủ (Code 3, đã chốt 21/09): khoá `canhBaoThay` ở `POST /hs/ke-hoach-ngay` (lời cho EM, cửa sổ 48 giờ) và ở `POST /ph/ke-hoach {pass}`
 // (lời cho PHỤ HUYNH, cửa sổ 72 giờ) — ≤ 3, mới nhất trước, CHỈ bài chưa nộp; khoá vắng khi không có. Chỉ thầy bấm mới gửi.
 //   { id, maBtvn, tenBtvn, guiLuc, hanNop, loi, trangThaiEm:'chua_mo'|'do_chang'|'qua_han', chang?:{hienTai,tong}, daXem }

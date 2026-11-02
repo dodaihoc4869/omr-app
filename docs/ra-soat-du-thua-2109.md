@@ -29,7 +29,7 @@ Báo cáo này KHÔNG sửa gì. Boss duyệt ⇒ phiên chủ làn sửa theo l
 | G14 | GV · Ngân hàng đề · `NganHangDeScreen.tsx:601,617,622` | Chữ kỹ thuật trên màn: "Apps Script", "MA_BI_MAT", "IndexedDB", `kho-de/moi/`, "Cowork" | C1, A1.4 | ĐỔI CHỮ đời thường; chi tiết kỹ thuật vào dòng phụ/gập | — |
 | G15 | GV + PH · vỏ · `App.tsx:336`, `App.tsx:257` | Chờ nạp màn = dòng chữ "Đang mở…"; chờ cổng phụ huynh = màn trống | C10, C7 | THÊM khung xương dùng chung | — |
 | G16 | GV · Mở ca · `ExamSetupScreen.tsx:510,642` | Chú thích 11 px ("Chọn nhanh hoặc nhập tên lớp", "Quy định quyền truy cập") — dòng sau không mang thông tin | C9, C3 | BỎ dòng 642; nâng cỡ chữ dòng 510 | luồng mở ca ⇒ Boss soát |
-| G17 | GV · Hôm nay · `HomNayScreen.tsx`, `src/components/bang-tin/*` | CHỈ GHI NHẬN: đang thiết kế lại theo `prompt-bang-tin-thay-v3.md`; `bang-tin/TamBen.tsx`, `bang-tin/cac-khoi.tsx` chưa ai nhập = đang xây, KHÔNG phải mã chết | — | — | — |
+| G17 | GV · Hôm nay · `HomNayScreen.tsx`, `src/components/bang-tin/*` | CHỈ GHI NHẬN: đang thiết kế lại theo `docs/dac-ta-cu/prompt-bang-tin-thay-v3.md`; `bang-tin/TamBen.tsx`, `bang-tin/cac-khoi.tsx` chưa ai nhập = đang xây, KHÔNG phải mã chết | — | — | — |
 
 Theo dõi ca (`ExamMonitorScreen`) và Gọi lên bảng: gần như mọi khối có chú thích "thầy chốt <ngày>" ⇒ không đề nghị bỏ khối nào; chỉ có G3, G5.
 

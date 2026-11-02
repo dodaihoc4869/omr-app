@@ -869,11 +869,17 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   const dangSang = useRef(-1)
   const tiep = () => {
     // TỨC THÌ 100%: kết quả còn TẠM (bản đầy đủ đang về nền) ⇒ tách rời lượt ghi chạy tiếp nền, sang câu mới hoặc kết thúc chặng TỨC THÌ 0ms, không đứng đợi mạng!
-    if (gui.current && k?.tam && q) {
+    if (gui.current && k?.tam && viTri + 1 < cau.length && q) {
       tachRoi.current.add(q.qid)
       gui.current = false
       setNop(false)
       setCham(false)
+    } else if (gui.current && k?.tam) {
+      // 02/11 (khôi phục luật 28/10 bị bỏ ở 58dd56aa): câu CUỐI còn kết quả tạm ⇒ chờ bản đầy đủ rồi mới kết chặng — `ketThuc` tính Lửa từ
+      // `ket[].thuong` và nạp lại Sảnh; chạy trước khi câu cuối ghi xong thì thiếu chính câu ấy. Nút giữ dáng lún, bản đầy đủ về là tự đi tiếp.
+      tiepCho.current = true
+      nutTiepRef.current?.setAttribute('data-lun', '')
+      return
     }
     if (gui.current || dangSang.current === viTri) return
     setLoi('')

@@ -1,5 +1,5 @@
 // @vitest-environment node
-// Thuật toán 2.0 (Game Hóa 2.0) — mỗi luật mục B của prompt-game-hoa-2-0.md có ít nhất một test.
+// Thuật toán 2.0 (Game Hóa 2.0) — mỗi luật mục B của docs/dac-ta-cu/prompt-game-hoa-2-0.md có ít nhất một test.
 import { describe, expect, it } from 'vitest'
 import {
   bam, canGoiY, chonPhuongAnGach, congNgay, duocThuongCauThu, henOnSau, khoiLuongCan, lapKeHoachNgay, moDuocRuong,

@@ -1,4 +1,4 @@
-// BTVN "NÂNG ĐỠ" — LỊCH CHẶNG THEO GIỜ + SỨC CHỨA (hàm THUẦN, Code 1, 21/09/2026). Đặc tả: `prompt-btvn-nang-do.md` CẬP NHẬT 2.
+// BTVN "NÂNG ĐỠ" — LỊCH CHẶNG THEO GIỜ + SỨC CHỨA (hàm THUẦN, Code 1, 21/09/2026). Đặc tả: `docs/dac-ta-cu/prompt-btvn-nang-do.md` CẬP NHẬT 2.
 //
 // Chặng xếp theo PHIÊN HỌC chứ không cứng theo ngày. Mọi giờ tính theo giờ Việt Nam (UTC+7, không có giờ mùa hè) BẰNG SỐ HỌC: không Intl, không đồng hồ, không ngẫu nhiên ⇒ cùng đầu vào, cùng lịch.
 //   • HẠN DÀI (tải mỗi ngày ≤ ngân sách × 1,3 và hạn > 48 giờ): một chặng mỗi BUỔI TỐI; chặng 0 mở lúc chốt, chặng k mở 00:00 giờ VN của ngày thứ k (Y HỆT `moLucChang` cũ khi hạn 23:59); "đúng nhịp" = xong trước 23:59 của ngày đó.

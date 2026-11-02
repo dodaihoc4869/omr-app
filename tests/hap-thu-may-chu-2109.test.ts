@@ -1,5 +1,5 @@
 // @vitest-environment node
-// ĐỢT 1 "THẦN THÚ MỖI NGÀY" — MÁY CHỦ (thầy chốt 21/09 13:36; DE-XUAT-THAN-THU-MOI-NGAY-2109.md Điều 1, 2, 9): MỘT cổng hấp thụ `invest` (200 khi đạt nhiệm vụ ngày · 120 khi có học · 0 khi chưa học),
+// ĐỢT 1 "THẦN THÚ MỖI NGÀY" — MÁY CHỦ (thầy chốt 21/09 13:36; docs/dac-ta-cu/DE-XUAT-THAN-THU-MOI-NGAY-2109.md Điều 1, 2, 9): MỘT cổng hấp thụ `invest` (200 khi đạt nhiệm vụ ngày · 120 khi có học · 0 khi chưa học),
 // EXP học tập vào ỐNG NGHIỆM, chuyển đổi hồ sơ lười + cron (CAS theo revision, tin một lần), trần 120 EXP/ngày cho EXP sinh trong game (một cửa ở `answer`).
 // Chạy trên SQLite thật (tests/_d1-that.ts). Số viết thẳng, không import hằng luật.
 import { afterEach, describe, expect, it, vi } from 'vitest'

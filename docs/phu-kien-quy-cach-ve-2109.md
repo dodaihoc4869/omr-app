@@ -1,6 +1,6 @@
 # Phụ kiện thần thú — quy cách vẽ ĐỢT 1 + ĐỢT 2 (Code 4, làn mỹ thuật; M1 + M2 + M3 21/09 — ĐỦ 40 món có hình / kiểu)
 
-Đề xuất gốc: `DE-XUAT-SHOP-PHU-KIEN-2109.md` mục 3 (bảng món) + 6 (mỹ thuật). Thành phần: `src/game/than-thu-v2/phu-kien/ThuMacDo.tsx` (bọc `ThuHinh`). Xem thử (dev): `npm run dev` ⇒ `/src/components/xem-thu/phu-kien.html?gd=toi&mon=HQ-03,KT-08&tinh=1&cap=100` (mỗi món × 8 loài) hoặc `?tong=1&thu=5` (BẢNG TỔNG 24 món trên một loài) · `?thu=N` (một loài, to) · `?trai=1` (thú nhìn trái).
+Đề xuất gốc: `docs/dac-ta-cu/DE-XUAT-SHOP-PHU-KIEN-2109.md` mục 3 (bảng món) + 6 (mỹ thuật). Thành phần: `src/game/than-thu-v2/phu-kien/ThuMacDo.tsx` (bọc `ThuHinh`). Xem thử (dev): `npm run dev` ⇒ `/src/components/xem-thu/phu-kien.html?gd=toi&mon=HQ-03,KT-08&tinh=1&cap=100` (mỗi món × 8 loài) hoặc `?tong=1&thu=5` (BẢNG TỔNG 24 món trên một loài) · `?thu=N` (một loài, to) · `?trai=1` (thú nhìn trái).
 
 ## Ba lớp, không cần neo theo loài
 | Ô (khoá `dangMac`) | Mã | Lớp | Vị trí | Hình |

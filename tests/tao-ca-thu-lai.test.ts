@@ -17,7 +17,11 @@ it('lỗi tạm thời: gửi lại đúng mã và nguyên gói đề',async()=>
 it('lỗi xác thực không bị đổi thành lỗi mạng và không gửi lại',async()=>{
  vi.stubGlobal('location', { origin: 'https://omr-app-b3u.pages.dev' } as any)
  const f=vi.fn().mockResolvedValue(res({ok:false},403));vi.stubGlobal('fetch',f)
- await expect(taoCaDaXacNhan({ ...ch, URL: 'https://omr.ttadodaihoc.workers.dev' },'bad',ca,{})).rejects.toThrow('Mã xác thực');expect(f).toHaveBeenCalledTimes(1)
+ await expect(taoCaDaXacNhan({ ...ch, URL: 'https://omr.ttadodaihoc.workers.dev' },'bad',ca,{})).rejects.toThrow('Mã xác thực')
+ // 02/11: cập nhật theo 200539500 (gửi ca SONG SONG đường thẳng + proxy, mỗi đường một hạn riêng — sửa lỗi nút mở ca đứng im 23/09).
+ // Một lượt song song = mỗi địa chỉ đúng MỘT lần; lỗi xác thực ⇒ dừng hẳn: không lượt gửi lại, không hỏi xác nhận.
+ expect(f).toHaveBeenCalledTimes(2)
+ expect(f.mock.calls.map(c=>c[0]).sort()).toEqual(['https://omr-app-b3u.pages.dev/api/ca/day','https://omr.ttadodaihoc.workers.dev/ca/day'])
 })
 it('gói quá lớn báo rõ và không tải lại vô ích',async()=>{
  const f=vi.fn().mockResolvedValueOnce(res({},413)).mockResolvedValueOnce(res({daLuu:false}));vi.stubGlobal('fetch',f)
@@ -76,14 +80,17 @@ it('gọi THẲNG máy chủ trước; proxy Pages chỉ là đường lui',asyn
  expect(f.mock.calls[0][0]).toBe('https://omr.ttadodaihoc.workers.dev/ca/day')
  expect(f.mock.calls[1][0]).toBe('https://omr-app-b3u.pages.dev/api/ca/day')
 })
-it('máy chủ thẳng chạy được thì KHÔNG đụng tới proxy (bỏ hẳn chặng thừa)',async()=>{
+it('đường thẳng gửi TRƯỚC, đường nào lưu được trước thì huỷ đường kia, không lượt gửi thứ hai',async()=>{
+ // 02/11: cập nhật theo 200539500 — bản cũ «thẳng chạy được thì không đụng proxy» (gửi lần lượt) đã thay bằng gửi song song.
  vi.stubGlobal('location', { origin: 'https://omr-app-b3u.pages.dev' } as any)
  const chProxy = { BAT: true, URL: 'https://omr.ttadodaihoc.workers.dev' }
  const f = vi.fn().mockResolvedValue(res({ ok: true }, 200))
  vi.stubGlobal('fetch', f)
  expect(await taoCaDaXacNhan(chProxy, 'test', ca, {})).toBe(true)
- expect(f).toHaveBeenCalledTimes(1)
+ expect(f).toHaveBeenCalledTimes(2)
  expect(f.mock.calls[0][0]).toBe('https://omr.ttadodaihoc.workers.dev/ca/day')
+ expect(f.mock.calls[1][0]).toBe('https://omr-app-b3u.pages.dev/api/ca/day')
+ expect(f.mock.calls.filter(c => (c[1] as RequestInit).signal?.aborted).length).toBe(1)
 })
 it('máy chủ thẳng TREO tới hạn: vẫn còn nguyên lượt thử của proxy',async()=>{
  vi.useFakeTimers()

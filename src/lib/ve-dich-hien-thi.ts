@@ -1,4 +1,4 @@
-// THẺ "ĐƯỜNG VỀ ĐÍCH" (Dồn về đích; thầy chốt mẫu 21/09; DE-XUAT-DON-VE-DICH-2109.md Điều 3): ĐỌC CHẶT hai khối của `/hs/ke-hoach-ngay` (máy chủ Code 3/Code 4 — server/src/ve-dich-d1.ts) và làm các phép CHỮ/GIỜ thuần.
+// THẺ "ĐƯỜNG VỀ ĐÍCH" (Dồn về đích; thầy chốt mẫu 21/09; docs/dac-ta-cu/DE-XUAT-DON-VE-DICH-2109.md Điều 3): ĐỌC CHẶT hai khối của `/hs/ke-hoach-ngay` (máy chủ Code 3/Code 4 — server/src/ve-dich-d1.ts) và làm các phép CHỮ/GIỜ thuần.
 //   no: { theoNgay: MonNo[{ngay, loai, ten, soCau, phut, maBtvn?, chiSo?}], tongCau, tongPhut }
 //   veDich: [{ maBtvn, ten, hanNop, gioConLai, quaHan, chang[{chiSo, trangThai:'xong'|'no'|'hom_nay'|'sap_toi', ngay}], toiNay{soChang, soCau, phut, batDauMuonNhat}|null, cacBuoiSau[], kip, canRutPhanLamThem, daRutPhanLamThem }]
 // Máy em KHÔNG tính lại luật (số nợ, kế hoạch, giờ muộn nhất là của máy chủ/hàm thuần `ve-dich.ts`): chỉ HIỂN THỊ số máy chủ trả; đồng hồ đếm ngược chạy ở máy từ `hanNop` + giờ máy.

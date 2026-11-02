@@ -1,6 +1,6 @@
 // @vitest-environment node
 // BẢNG NHỊP TỰ GỌI (sự cố D1 21/09 ~20:30) — khoá hai điều:
-// (1) mọi tệp còn `setInterval(` trong src đều đã được XẾP LOẠI trong bảng dưới (= bảng ở SO-VIEC-GIAO-DIEN.md): thêm một vòng mới mà quên xếp loại ⇒ đỏ,
+// (1) mọi tệp còn `setInterval(` trong src đều đã được XẾP LOẠI trong bảng dưới (= bảng ở docs/so-viec/SO-VIEC-GIAO-DIEN.md): thêm một vòng mới mà quên xếp loại ⇒ đỏ,
 //     buộc người thêm tự hỏi "vòng này có gọi máy chủ không? nếu có thì phải qua nhip-ben-vung.ts";
 // (2) mọi vòng GỌI MÁY CHỦ của app HS/PH/game đi qua `nhip-ben-vung.ts` (nền 180 s ± 30 s / trực tiếp nối tiếp, không gọi chồng, lùi dần khi lỗi).
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -69,7 +69,7 @@ const quet = (thuMuc: string, ra: Record<string, number> = {}): Record<string, n
 
 describe('khoá bảng: mọi tệp còn setInterval đều đã được xếp loại', () => {
   const co = quet('src')
-  it('không có tệp lạ (thêm vòng mới ⇒ xếp loại vào bảng + SO-VIEC-GIAO-DIEN.md)', () => {
+  it('không có tệp lạ (thêm vòng mới ⇒ xếp loại vào bảng + docs/so-viec/SO-VIEC-GIAO-DIEN.md)', () => {
     const biet = new Set([...Object.keys(KHONG_GOI_MAY_CHU), ...CHI_TEP_TINH, ...Object.keys(NGOAI_LENH), ...LAN_APP_THAY])
     const la = Object.keys(co).filter((f) => !biet.has(f))
     expect(la, `tệp có setInterval chưa xếp loại: ${la.join(', ')}`).toEqual([])

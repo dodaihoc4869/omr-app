@@ -1,4 +1,4 @@
-// BẢNG TIN CỦA THẦY BẢN 3 (thầy chốt bản vẽ 21/09; đề bài prompt-bang-tin-thay-v3.md; hợp đồng docs/hop-dong-bang-tin-v3-2109.md).
+// BẢNG TIN CỦA THẦY BẢN 3 (thầy chốt bản vẽ 21/09; đề bài docs/dac-ta-cu/prompt-bang-tin-thay-v3.md; hợp đồng docs/hop-dong-bang-tin-v3-2109.md).
 // Thầy chỉ ĐỌC: không nút hành động; số nào cũng có nhãn; khoá vắng ⇒ nói thật, KHÔNG số 0 giả; "A.I Đỗ Đại Học" làm chủ ngữ việc tự động (bảng A2); một khung nhìn không cuộn (đo bằng Chromium — số ghi ở Nhật ký; ở đây khoá nguồn CSS).
 import fs from 'node:fs'
 import path from 'node:path'

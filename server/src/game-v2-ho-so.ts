@@ -1,4 +1,4 @@
-// KÊNH 4 (thần thú) — ĐỌC HỒ SƠ CHO GAME V2 (GĐ 5, DE-XUAT-CA-NHAN-HOA-1909.md mục 2 "Kênh 4"). Mọi hàm ở đây CHỈ ĐỌC và không bao giờ ném lỗi:
+// KÊNH 4 (thần thú) — ĐỌC HỒ SƠ CHO GAME V2 (GĐ 5, docs/dac-ta-cu/DE-XUAT-CA-NHAN-HOA-1909.md mục 2 "Kênh 4"). Mọi hàm ở đây CHỈ ĐỌC và không bao giờ ném lỗi:
 // thiếu bảng (fixture cũ, migration chưa chạy) thì trả đúng thứ đầu vào, game chạy như trước.
 //
 // Không đụng `advance` (khoá thưởng 20/40/40), không đụng hồ sơ game đã lưu: `masteryTheoHoSo` trả BẢN SAO chỉ để truyền cho `chooseSession`.

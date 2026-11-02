@@ -1,4 +1,4 @@
-// MỘT định nghĩa "câu đã làm hôm nay" — PHẦN MÀN (Code 2; Boss 21/09, đề bài prompt-mot-dinh-nghia-cau-da-lam-2109.md: thầy thấy thẻ Hôm nay "93 câu" cạnh ô Thi đua "78 câu" của cùng một em).
+// MỘT định nghĩa "câu đã làm hôm nay" — PHẦN MÀN (Code 2; Boss 21/09, đề bài docs/dac-ta-cu/prompt-mot-dinh-nghia-cau-da-lam-2109.md: thầy thấy thẻ Hôm nay "93 câu" cạnh ô Thi đua "78 câu" của cùng một em).
 // Máy chủ (Code 3/4) gửi: học sinh `/hs/ke-hoach-ngay` + `/hs/on-lai/nop` → `tienBo.soCauHienThi`; phụ huynh `/ph/tat-ca-ve-con` → `tongQuan.soCau` (GỒM câu che) + `soDung` + `soCauCoKetQua` (mẫu số, chỉ câu không che).
 // Màn: CHỈ hiện các số ấy; máy chủ cũ chưa có trường ⇒ rơi về số cũ (không vỡ); KHÔNG đổi luật đạt/chưa đạt.
 // 27/10: màn `ph-moi/ManChinh`, khối `ph-moi/bang/TongQuan` + `Vong3` và lớp đọc `lib/thi-dua` đã gỡ khỏi src/ vì không màn nào dùng ⇒ các phép kiểm vẽ vòng / chữ giải vòng / so hôm qua bỏ theo.

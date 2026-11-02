@@ -13,7 +13,13 @@ afterEach(() => { cleanup(); try { sessionStorage.clear() } catch { /* */ } })
 function De({ text, stt = 1 }: { text: string; stt?: number }) {
   return <p className="de"><b>Câu {stt}.</b> <ChemText text={text} /><img alt="hình đề" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" /></p>
 }
-const cho = async (chu: string) => { const el = await screen.findByText(chu, { selector: '.gyc-v' }, { timeout: 4000 }); return el as HTMLElement } // lần đầu nạp lười ruột (lạnh) có khi > 1 giây
+// 02/11: cập nhật theo 4b37778f (MƯỢT: dò + bọc chữ đề chạy ở khung kế tiếp — rAF + setTimeout — rồi mới setBoc ⇒ chữ đã bọc có trong DOM TRƯỚC khi React
+// gắn bộ nghe chạm) — chờ React vẽ xong lượt setBoc rồi mới chạm, như em chạm sau khi chữ tô màu hiện.
+const cho = async (chu: string) => {
+  const el = await screen.findByText(chu, { selector: '.gyc-v' }, { timeout: 4000 }) // lần đầu nạp lười ruột (lạnh) có khi > 1 giây
+  await act(async () => { await new Promise((r) => setTimeout(r, 0)) })
+  return el as HTMLElement
+}
 
 describe('tô màu sẵn + giữ cấu trúc đề', () => {
   it('đề cho / chất / từ then chốt có lớp riêng; chữ đề và thẻ <img> giữ nguyên', async () => {
@@ -216,7 +222,7 @@ describe('lõi THẬT của làn A (không truyền tuDien)', () => {
     render(<VungChamDe q={{ qid: 'that' }}><De text={DE_ESTER} /></VungChamDe>)
     const m = await screen.findByText('1,5 M', { selector: '.gyc-v' }, { timeout: 4000 })
     expect(m.classList).toContain('gyc-cho')
-    fireEvent.click(await screen.findByText('NaOH', { selector: '.gyc-v' }))
+    fireEvent.click(await cho('NaOH'))
     const the = await screen.findByRole('dialog')
     expect(the.textContent).toContain('sodium hydroxide')
     expect(the.textContent).toContain('M = 40 g/mol')
@@ -224,13 +230,13 @@ describe('lõi THẬT của làn A (không truyền tuDien)', () => {
 
   it('nguyên tử khối đề cho ở ĐOẠN KHÁC vẫn được dùng để tính M (Na = 24 ⇒ NaOH 41)', async () => {
     render(<VungChamDe q={{ qid: 'ntk' }}><div><p><ChemText text="Cho 4 gam NaOH vào nước được 100 mL dung dịch. Tính nồng độ mol." /></p><p><ChemText text="Cho nguyên tử khối: Na = 24; O = 16; H = 1." /></p></div></VungChamDe>)
-    fireEvent.click(await screen.findByText('NaOH', { selector: '.gyc-v' }, { timeout: 4000 }))
+    fireEvent.click(await cho('NaOH'))
     expect((await screen.findByRole('dialog')).textContent).toContain('M = 41 g/mol')
   })
 
   it('ảnh thầy 27/10 (đề ethylamine, câu LÝ THUYẾT): «Ethylamine» chạm được, thẻ chỉ C₂H₅NH₂ + M = 45, không «khử», không «bậc»', async () => {
     const { container } = render(<VungChamDe q={{ qid: 'eth' }}><p><ChemText text="Ethylamine thể hiện tính khử khi tác dụng với dung dịch chất nào sau đây ở nhiệt độ thường?" /></p></VungChamDe>)
-    const v = await screen.findByText('Ethylamine', { selector: '.gyc-v' }, { timeout: 4000 })
+    const v = await cho('Ethylamine')
     expect(v.classList).toContain('gyc-cham')
     expect([...container.querySelectorAll('.gyc-v')].map((s) => s.textContent)).toEqual(['Ethylamine']) // không tô «dịch chất nào sau đây», «nhiệt độ thường»
     fireEvent.click(v)

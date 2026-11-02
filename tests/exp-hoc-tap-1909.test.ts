@@ -1,5 +1,5 @@
 // @vitest-environment node
-// EXP HỌC TẬP + MẢNH KHIÊN — hàm thuần (DE-XUAT-EXP-MANH-KHIEN-1909.md): bảng giá trị, trần mềm, khoá idempotent, mảnh khiên, "một ngày mẫu".
+// EXP HỌC TẬP + MẢNH KHIÊN — hàm thuần (docs/dac-ta-cu/DE-XUAT-EXP-MANH-KHIEN-1909.md): bảng giá trị, trần mềm, khoá idempotent, mảnh khiên, "một ngày mẫu".
 import { describe, it, expect } from 'vitest'
 import { congManh, expMotCau, tinhExp, type KhoanExp, type SuKienExp, type VaoTinhExp } from '../server/src/exp-hoc-tap'
 import * as CH from '../server/src/exp-cau-hinh'

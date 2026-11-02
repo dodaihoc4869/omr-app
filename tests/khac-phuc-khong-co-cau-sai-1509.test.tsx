@@ -41,8 +41,11 @@ const BC_HS = nguonBaoCaoEmMoi() // 28/09: báo cáo em bản mới (modal cũ �
 
 // ---------------------------------------------------------------------------
 
+// 02/11: cập nhật theo b52706159 (17/09, tab khắc phục mới): 0 câu sai KHÔNG còn màn rỗng riêng — modal mở thẳng
+// chế độ «Luyện dạng bài» (cheDo 3). Ý canh giữ nguyên: không mời "Làm lại các câu sai (0 câu)", không phiếu trắng
+// (nút "Bắt đầu làm bài" TẮT khi chưa có câu để rút), không đổ lỗi cho kho đề của máy.
 describe('0 câu sai — modal nói thẳng là rỗng, không có nút nào bấm được', () => {
-  it('không vẽ thẻ "Làm lại các câu sai" và không có nút "Bắt đầu làm bài"', () => {
+  it('không vẽ thẻ "Làm lại các câu sai" và nút "Bắt đầu làm bài" không bấm được khi chưa có câu để rút', () => {
     render(
       <ModalKhacPhucCauSai
         isOpen
@@ -53,7 +56,9 @@ describe('0 câu sai — modal nói thẳng là rỗng, không có nút nào b�
         tieuDeCa="Test7"
       />,
     )
-    expect(screen.queryByText(/Bắt đầu làm bài/)).toBeNull()
+    const nut = screen.getByText(/Bắt đầu làm bài/).closest('button')
+    expect(nut).not.toBeNull()
+    expect((nut as HTMLButtonElement).disabled).toBe(true)
     expect(screen.queryByText(/Làm lại các câu sai/)).toBeNull()
     expect(screen.queryByText(/Xem trước đề/)).toBeNull()
   })
@@ -69,8 +74,9 @@ describe('0 câu sai — modal nói thẳng là rỗng, không có nút nào b�
         tieuDeCa="Test7"
       />,
     )
-    expect(container.querySelector('[data-man="khac-phuc-khong-co-cau-sai"]')).not.toBeNull()
-    expect(screen.getByText(/Không có câu nào cần khắc phục/)).toBeTruthy()
+    // 02/11: theo b52706159 — tiêu đề nói thẳng số câu sai là 0 (màn rỗng riêng đã bỏ).
+    expect(container.textContent || '').toContain('Test7 · 0 câu làm sai')
+    expect(container.textContent || '').not.toContain('(0 câu)')
     expect(container.textContent || '').not.toContain('chưa có kho đề của thầy')
   })
 
@@ -78,7 +84,9 @@ describe('0 câu sai — modal nói thẳng là rỗng, không có nút nào b�
     render(
       <ModalKhacPhucCauSai isOpen onClose={() => {}} dsCauSai={[]} hoTen="A" sbd="000001" />,
     )
-    expect(screen.getByText('Đóng')).toBeTruthy()
+    // 02/11: theo b52706159 — nút Đóng là nút X có nhãn (aria-label), kèm nút "Huỷ" ở chân.
+    expect(screen.getAllByLabelText('Đóng')).toHaveLength(1)
+    expect(screen.getByText('Huỷ').closest('button')).not.toBeNull()
   })
 })
 
@@ -94,7 +102,8 @@ describe('Cổng chặn nút "Bắt đầu làm bài" phủ CẢ BA chế độ'
     // Chế độ 1 lấy đúng số câu sai; chế độ 2 và 3 bị chặn trên bởi trần thật.
     expect(MODAL).toMatch(/soCauSeRut\s*=\s*\n?\s*cheDo === 1/)
     expect(MODAL).toContain('Math.min(soCauCheDo2, tongToiDaCheDo2)')
-    expect(MODAL).toContain('Math.min(soCauCheDo3, tongToiDaCheDo3)')
+    // 02/11: theo b52706159 — chế độ 3 nay là «Luyện dạng bài», trần là số câu của dạng (soCauCheDo4/tongToiDaCheDo4).
+    expect(MODAL).toMatch(/cheDo === 3\s*\?\s*Math\.min\(soCauCheDo4, tongToiDaCheDo4\)/)
     const soLanChan = MODAL.split('disabled={dangTao || soCauSeRut <= 0}').length - 1
     expect(soLanChan).toBe(2)
   })

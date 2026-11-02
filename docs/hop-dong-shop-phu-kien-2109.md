@@ -1,6 +1,6 @@
 # Hợp đồng máy chủ · Cửa hàng phụ kiện thần thú (Code 3 ↔ Code 2, Code 4, Boss) — 21/09/2026
 
-Nguồn: `DE-XUAT-SHOP-PHU-KIEN-2109.md` mục 2, 5, 7, 8 (giá và luật Boss đã KHOÁ 21/09 sau S0: ống nghiệm p90 337, cao nhất 649) + chữ chốt ở commit 7655c2c (mục 3 và 9). Tài liệu này chỉ chốt phần MÁY CHỦ; những chỗ đề xuất để ngỏ được quyết ở đây và đánh dấu **[chốt]**. Trạng thái: hợp đồng + danh mục viết trước, mã máy chủ làm sau; CHƯA có gì trên Worker/D1 thật; cờ mặc định TẮT.
+Nguồn: `docs/dac-ta-cu/DE-XUAT-SHOP-PHU-KIEN-2109.md` mục 2, 5, 7, 8 (giá và luật Boss đã KHOÁ 21/09 sau S0: ống nghiệm p90 337, cao nhất 649) + chữ chốt ở commit 7655c2c (mục 3 và 9). Tài liệu này chỉ chốt phần MÁY CHỦ; những chỗ đề xuất để ngỏ được quyết ở đây và đánh dấu **[chốt]**. Trạng thái: hợp đồng + danh mục viết trước, mã máy chủ làm sau; CHƯA có gì trên Worker/D1 thật; cờ mặc định TẮT.
 
 ## 1. Danh mục món (nguồn duy nhất, TRONG MÃ)
 `src/lib/phu-kien-danh-muc.ts` (Code 3 giữ, KHÔNG dùng `window`/`localStorage`; máy chủ và giao diện cùng nhập):

@@ -1,6 +1,6 @@
 // Bộ chuyển DUY NHẤT giữa dữ liệu nhiệm vụ và màn "Bảng nhiệm vụ".
 // Hai nguồn — `tongHopKeHoachTroLy` (đang chạy) và `/hs/ke-hoach-ngay` (GĐ 2 của
-// DE-XUAT-CA-NHAN-HOA-1909.md) — ra CÙNG một cấu trúc `DuLieuBangNhiemVu`.
+// docs/dac-ta-cu/DE-XUAT-CA-NHAN-HOA-1909.md) — ra CÙNG một cấu trúc `DuLieuBangNhiemVu`.
 // Hàm thuần: không đọc giờ, không gọi mạng, KHÔNG xếp lại thứ tự — thứ tự là
 // của dữ liệu; ở đây chỉ gán bậc, tính cổng và chọn thẻ "Làm ngay".
 import { docCanhBaoThay, type CanhBaoThay } from './canh-bao-thay-hien-thi'
@@ -775,7 +775,7 @@ export function dungBangNhiemVu(input: {
   return tuKeHoachTroLy(input.keHoachTroLy, { dsMomGiao: input.dsMomGiao, now: input.now })
 }
 
-// ─── APP PHỤ HUYNH KHÔNG CÒN GÌ CỦA GAME (thầy lệnh 21/09; `prompt-ph-giao-them-bai-2109.md` mục B) ─────────────────────────────
+// ─── APP PHỤ HUYNH KHÔNG CÒN GÌ CỦA GAME (thầy lệnh 21/09; `docs/dac-ta-cu/prompt-ph-giao-them-bai-2109.md` mục B) ─────────────────────────────
 // Phụ huynh chỉ thấy việc HỌC: điểm, số câu, lên bậc, dạng con vấp, lịch ôn, bài tập về nhà, hạn nộp. Không thần thú, EXP, mảnh khiên/khiên, Đoàn Hộ Tống,
 // Đảo thần thú, Võ đài, đường vào game. Ba lớp: (1) máy chủ không gửi (Code 3) · (2) hàm này gỡ ở DỮ LIỆU trước khi vẽ · (3) màn phụ huynh cũng không vẽ (BangNhiemVu/
 // DauTrang/TheVinhDanh/BangTinPhuHuynh có chốt `laPh`) — test chốt chặn quét chữ hiển thị của cả cây.

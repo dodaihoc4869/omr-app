@@ -186,8 +186,9 @@ describe('oGiaiHtml — lời giải gộp một chỗ', () => {
       { khoa: 'A', dung: false, ly: 'sai vì x' },
       { khoa: 'B', dung: true, ly: 'đúng vì y' },
     ] }))
-    expect(h).toContain('<strong>A.</strong> ✗ sai vì x')
-    expect(h).toContain('<strong>B.</strong> ✓ đúng vì y')
+    // 02/11: cập nhật theo 0b9eaefdd (đồng bộ CSS sol-box với KhoiCauSai: dấu ✓/✗ và lý do nằm trong thẻ riêng).
+    expect(h).toContain('<div class="sol-pa"><strong>A.</strong><span class="sol-dau sai">✗</span><span class="sol-ly">sai vì x</span></div>')
+    expect(h).toContain('<div class="sol-pa chon"><strong>B.</strong><span class="sol-dau dung">✓</span><span class="sol-ly">đúng vì y</span></div>')
     expect(h).toContain('Vì sao chọn / không chọn từng phương án')
   })
 
@@ -205,8 +206,9 @@ describe('oGiaiHtml — lời giải gộp một chỗ', () => {
     ] })
     const h = oGiaiHtml(c)
     expect(h).toContain('Đ S S Đ')
-    expect(h).toContain('<strong>a.</strong> ✓ la')
-    expect(h).toContain('<strong>b.</strong> ✗ lb')
+    // 02/11: cập nhật theo 0b9eaefdd (dấu ✓/✗ và lý do nằm trong thẻ riêng).
+    expect(h).toContain('<div class="sol-pa chon"><strong>a.</strong><span class="sol-dau dung">✓</span><span class="sol-ly">la</span></div>')
+    expect(h).toContain('<div class="sol-pa"><strong>b.</strong><span class="sol-dau sai">✗</span><span class="sol-ly">lb</span></div>')
     expect(h).toContain('Vì sao từng ý')
   })
 })

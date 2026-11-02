@@ -1,4 +1,4 @@
-// NHỊP TỰ GỌI MÁY CHỦ CỦA APP THẦY (Code 4, 21/09/2026 — kế hoạch KE-HOACH-MAY-CHU-GIO-CAO-DIEM-2109.md, mục Code 4 (3)). Sau sự cố D1 20:30: D1 chỉ MỘT luồng, mọi vòng tự hỏi nền của mọi máy đè lên nhau.
+// NHỊP TỰ GỌI MÁY CHỦ CỦA APP THẦY (Code 4, 21/09/2026 — kế hoạch docs/dac-ta-cu/KE-HOACH-MAY-CHU-GIO-CAO-DIEM-2109.md, mục Code 4 (3)). Sau sự cố D1 20:30: D1 chỉ MỘT luồng, mọi vòng tự hỏi nền của mọi máy đè lên nhau.
 // LUẬT cho MỌI vòng tự gọi máy chủ ở app thầy (`/`, `/gv`): (1) nhịp lấy từ BẢNG dưới đây (một nơi, có lý do); (2) TAB ẩn thì không gọi (hẹn lại), tab hiện / có mạng lại thì gọi nhưng chặn dội (≥ min(nhịp, 20 s)
 // kể từ lần bắt đầu trước); (3) KHÔNG GỌI CHỒNG — lần trước chưa xong thì không gọi lần nữa (`setInterval` trần không đợi, một lệnh chậm 20 s dồn ba lượt); (4) LỖI / hết giờ ⇒ LÙI DẦN theo BẢNG LÙI (mặc định
 // 30 → 60 → 120 s; Theo dõi ca của thầy đang coi ca thi thật chỉ 30 → 40 s — Boss 21/09), không bao giờ NHANH hơn nhịp thường, thành công thì về nhịp thường. Đó chính là `batNhipBenVung` của app học sinh (src/lib/nhip-ben-vung.ts) — ở đây chỉ bọc cho React + đặt bảng nhịp thầy.

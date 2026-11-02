@@ -1,4 +1,4 @@
-// Bộ chuyển nhiệm vụ cho màn "Bảng nhiệm vụ" (prompt-giao-dien-nhiem-vu-hoc-sinh-phu-huynh.md):
+// Bộ chuyển nhiệm vụ cho màn "Bảng nhiệm vụ" (docs/dac-ta-cu/prompt-giao-dien-nhiem-vu-hoc-sinh-phu-huynh.md):
 // hai nguồn ra CÙNG cấu trúc, 4 bậc đúng 4 vai trò màu, cổng đúng, trống thì không bịa.
 import { describe, expect, it } from 'vitest'
 import { tongHopKeHoachTroLy } from '../src/lib/tro-ly-ca-nhan'

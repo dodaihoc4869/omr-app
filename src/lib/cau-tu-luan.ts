@@ -1,4 +1,4 @@
-// CẤM RÚT CÂU TỰ LUẬN — MỘT ĐỊNH NGHĨA DÙNG CHUNG (Code 1, 21/09/2026). Đề bài: `prompt-cam-rut-tu-luan.md` (thầy lệnh: "tuyệt đối không rút câu tự luận, chỉ rút trắc nghiệm,
+// CẤM RÚT CÂU TỰ LUẬN — MỘT ĐỊNH NGHĨA DÙNG CHUNG (Code 1, 21/09/2026). Đề bài: `docs/dac-ta-cu/prompt-cam-rut-tu-luan.md` (thầy lệnh: "tuyệt đối không rút câu tự luận, chỉ rút trắc nghiệm,
 // đúng sai, trả lời ngắn — ở mọi chỗ rút đề của cả 3 app, TRỪ màn Gọi lên bảng").
 //
 // THUẦN: không IO, không import, không đồng hồ, không ngẫu nhiên — máy chủ, máy thầy, máy học sinh/phụ huynh cùng import.

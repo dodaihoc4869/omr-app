@@ -1,6 +1,6 @@
 # Hợp đồng `/gv/bang-tin` — BẢNG TIN CỦA THẦY bản 3 (Code 3 → Code 4), 21/09/2026
 
-Đề bài: `prompt-bang-tin-thay-v3.md` mục 1. MỘT lệnh **ĐỌC-CHỈ** cho cả màn Hôm nay: `POST /gv/bang-tin {}` (sau cổng mã thầy, header `x-ma-bi-mat`), **≤ 12 truy vấn D1**, không ghi một byte, không gọi AI. Chưa có lệnh (404) / lỗi ⇒ màn rơi về các lệnh cũ, không báo đỏ.
+Đề bài: `docs/dac-ta-cu/prompt-bang-tin-thay-v3.md` mục 1. MỘT lệnh **ĐỌC-CHỈ** cho cả màn Hôm nay: `POST /gv/bang-tin {}` (sau cổng mã thầy, header `x-ma-bi-mat`), **≤ 12 truy vấn D1**, không ghi một byte, không gọi AI. Chưa có lệnh (404) / lỗi ⇒ màn rơi về các lệnh cũ, không báo đỏ.
 
 ## Mốc dữ liệu
 - Khoá cấu hình `cau_hinh.bang_tin_tu` (ISO). Giá trị đầu `2026-09-21T05:00:00.000Z` (= 12:00 trưa 21/09 giờ VN). Mốc **CHỈ LỌC HIỂN THỊ**: không xoá/sửa dòng nào; thuật toán cá nhân hoá vẫn dùng toàn bộ lịch sử.

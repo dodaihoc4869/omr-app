@@ -163,7 +163,8 @@ describe('Modal khắc phục nối đúng đường', () => {
     // 15/09: chế độ 4 (Luyện dạng bài) KHÔNG lấy gì từ kho câu-sai, nên kho
     // rỗng không phải lý do để nó hiện lời cảnh báo ấy. Điều phép kiểm giữ
     // nguyên với ba chế độ cũ.
-    expect(than).toContain('{!dangTaiKho && (loiRut || (!coKhoDe && cheDo !== 4)) && (')
+    // 02/11: cập nhật theo b52706159 (modal đổi bố cục; cảnh báo kho rỗng nay chỉ hiện ở chế độ 2, vẫn ẩn khi đang xin kho).
+    expect(than).toContain('{!dangTaiKho && (loiRut || (!coKhoDe && cheDo === 2)) && (')
   })
 })
 

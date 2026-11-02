@@ -1,5 +1,5 @@
 // @vitest-environment node
-// APP PHỤ HUYNH KHÔNG CÒN GÌ CỦA GAME (thầy lệnh 21/09, prompt-ph-giao-them-bai-2109.md mục B — phần MÁY CHỦ): mọi chữ dành cho phụ huynh do máy chủ sinh KHÔNG nhắc thần thú, EXP, khiên, mảnh khiên,
+// APP PHỤ HUYNH KHÔNG CÒN GÌ CỦA GAME (thầy lệnh 21/09, docs/dac-ta-cu/prompt-ph-giao-them-bai-2109.md mục B — phần MÁY CHỦ): mọi chữ dành cho phụ huynh do máy chủ sinh KHÔNG nhắc thần thú, EXP, khiên, mảnh khiên,
 // game, Đoàn Hộ Tống, Đảo thần thú, Võ đài. Quét: mẫu nhắc nộp cho phụ huynh, cảnh báo của thầy (lời mặc định), bài tin hằng ngày, và lời Bộ não A.I cho phụ huynh (lớp phòng thủ ở bo-nao-doc).
 import { describe, expect, it } from 'vitest'
 import { chuGameTrong, coChuGame } from '../server/src/chu-game'

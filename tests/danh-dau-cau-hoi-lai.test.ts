@@ -102,7 +102,8 @@ describe('gói hai bản đồ trong một ô', () => {
     // máy chủ cũ ghi xuống thứ nó không hiểu ⇒ em nhận đề cắt theo luật hash,
     // lệch hẳn bảng chấm của thầy mà không có dấu hiệu gì.
     const api = doc('src/lib/exam-api.ts')
-    expect(api).toContain("postJson(scriptUrl, { action: 'batDauThi', secret, maCa, boTheoEm, lapTheoEm, demSaiTheoEm, bienBan })")
+    // 02/11: cập nhật theo cad720a6c (đường dự phòng gửi thêm cờ dongBoGio; hai bản đồ VẪN ở hai trường riêng).
+    expect(api).toContain("postJson(scriptUrl, { action: 'batDauThi', secret, maCa, boTheoEm, lapTheoEm, demSaiTheoEm, bienBan, dongBoGio })")
     // Việc gói lại là việc của MÁY CHỦ, làm sau khi đã nhận đủ hai trường.
     expect(GS).toContain("lap: body.lapTheoEm && typeof body.lapTheoEm === 'object' ? body.lapTheoEm : {},")
   })

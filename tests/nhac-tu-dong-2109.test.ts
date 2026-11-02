@@ -1,5 +1,5 @@
 // @vitest-environment node
-// NHẮC TỰ ĐỘNG bài tập về nhà (luật Boss 21/09, prompt-hom-nay-gv-v2.md phần A): cron 30 phút, khung 07:00–21:30 giờ VN, 4 mốc M1–M4 theo MẪU có số thật, trần, gộp tin phụ huynh, idempotent, cờ.
+// NHẮC TỰ ĐỘNG bài tập về nhà (luật Boss 21/09, docs/dac-ta-cu/prompt-hom-nay-gv-v2.md phần A): cron 30 phút, khung 07:00–21:30 giờ VN, 4 mốc M1–M4 theo MẪU có số thật, trần, gộp tin phụ huynh, idempotent, cờ.
 // KHÔNG dùng AI. Thầy không bấm gì: máy chủ tự gửi vào `canh_bao_thay` (em xem ở khoá `canhBaoThay`, phụ huynh ở `/ph/ke-hoach`), thầy chỉ xem ở `/gv/chua-nop`.
 import { readFileSync } from 'node:fs'
 import { afterEach, describe, expect, it, vi } from 'vitest'

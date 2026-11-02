@@ -31,13 +31,18 @@ describe('chỉ mục game_v2_attempt(session, sbd)', () => {
     vi.setSystemTime(Date.parse('2026-09-30T10:00:00+07:00')) // ngoài khung cao điểm 20h–24h (khung ấy cron không chạy DDL — test dưới)
     const d1 = taoD1That()
     d1.sql.exec('DROP INDEX IF EXISTS game_v2_attempt_session')
+    // 02/11: cập nhật theo ce842a241 (cron thêm lượt đọc công tắc thưởng — batch MỘT câu SELECT cau_hinh — nên đếm «mọi batch một câu»
+    // không còn đo đúng). Nay đếm ĐÚNG câu DDL dựng chỉ mục game_v2_attempt_session.
     let lanBatch = 0
+    const cauCua = new WeakMap<object, string>()
     const batchGoc = d1.env.DB.batch.bind(d1.env.DB)
-    const env: any = { ...d1.env, DB: { ...d1.env.DB, prepare: d1.env.DB.prepare, batch: (ds: any[]) => { if (ds.length === 1) lanBatch++; return batchGoc(ds) } } }
+    const prepGoc = d1.env.DB.prepare.bind(d1.env.DB)
+    const env: any = { ...d1.env, DB: { ...d1.env.DB, prepare: (q: string) => { const st = prepGoc(q); cauCua.set(st, q); return st }, batch: (ds: any[]) => { if (ds.some((st) => /CREATE INDEX[^;]*game_v2_attempt_session/i.test(cauCua.get(st) ?? ''))) lanBatch++; return batchGoc(ds) } } }
     await worker.fetch(new Request('https://x.dev/khoe'), env)
     expect(keHoach(d1.sql, Q_PHIEN)).not.toContain('game_v2_attempt_session') // fetch không đụng DDL
     await worker.scheduled({ cron: '* * * * *' } as any, env).catch(() => undefined)
     expect(keHoach(d1.sql, Q_PHIEN)).toContain('game_v2_attempt_session')
+    expect(lanBatch).toBe(1) // cron lượt 1 dựng đúng một lần
     const truoc = lanBatch
     await worker.scheduled({ cron: '* * * * *' } as any, env).catch(() => undefined)
     expect(lanBatch).toBeLessThanOrEqual(truoc) // không tạo lại (không thêm batch chỉ mục)

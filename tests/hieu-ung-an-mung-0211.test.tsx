@@ -138,7 +138,8 @@ describe('bộ chạy hiệu ứng', () => {
   it('tự gỡ khi xong (không chạm gì): lớp phủ + hạt biến mất sau ~1,7 s; hạt là phần tử Web Animations (không canvas)', async () => {
     document.body.innerHTML = '<div class="ruong"></div>'
     anMung('ruong', { goc: document.querySelector('.ruong') })
-    await new Promise((r) => setTimeout(r, 500))
+    // 02/11: cập nhật theo d626ecaf4 (rương v2 LẮC 520 ms rồi mới bung hạt — `ruong.ts` `lay`) ⇒ đợi qua nhịp lắc mới đếm hạt.
+    await new Promise((r) => setTimeout(r, 800))
     const soHatDom = lop()!.querySelectorAll('i').length
     expect(soHatDom).toBeGreaterThan(0); expect(soHatDom).toBeLessThanOrEqual(18) // trần 18 hạt bay cùng lúc ở bản đầy đủ (rương xin 43); máy kiểm thử chậm ⇒ tự hạ gọn (10)
     expect(lop()!.querySelector('canvas')).toBeNull()

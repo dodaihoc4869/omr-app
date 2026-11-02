@@ -1,4 +1,4 @@
-// BTVN "NÂNG ĐỠ" — LỊCH CHẶNG THEO GIỜ + SỨC CHỨA (`src/lib/btvn-nang-do-lich.ts`, Code 1, 21/09/2026). Đặc tả: `prompt-btvn-nang-do.md` CẬP NHẬT 2.
+// BTVN "NÂNG ĐỠ" — LỊCH CHẶNG THEO GIỜ + SỨC CHỨA (`src/lib/btvn-nang-do-lich.ts`, Code 1, 21/09/2026). Đặc tả: `docs/dac-ta-cu/prompt-btvn-nang-do.md` CẬP NHẬT 2.
 // Test TÍNH CHẤT trên hàng trăm tình huống ngẫu nhiên (hạt giống cố định): mọi mốc mở < hạn · chặng cuối đủ thời gian · giãn cách ≥ 40 phút khi còn dư giờ ·
 // hạn dài ⇒ đúng một chặng/ngày mở 00:00 (y hệt `moLucChang` cũ) · không chặng nào mở 00:00–05:59 (trừ chặng mở ngay lúc chốt) · tất định.
 import { describe, expect, it } from 'vitest'

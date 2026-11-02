@@ -1,4 +1,4 @@
-// CẤM RÚT CÂU TỰ LUẬN — phía MÁY CHỦ (Code 3, 21/09/2026). Đề bài: `prompt-cam-rut-tu-luan.md`.
+// CẤM RÚT CÂU TỰ LUẬN — phía MÁY CHỦ (Code 3, 21/09/2026). Đề bài: `docs/dac-ta-cu/prompt-cam-rut-tu-luan.md`.
 // Thầy: "tuyệt đối không rút câu tự luận, chỉ được rút câu trắc nghiệm, đúng sai, trả lời ngắn — ở mọi chỗ rút đề của cả 3 app, TRỪ màn Gọi lên bảng".
 //
 // MỘT định nghĩa duy nhất: `src/lib/cau-tu-luan.ts` (Code 1, hàm thuần). File này chỉ là lớp mỏng cho máy chủ: cùng MỘT chỗ để (a) hỏi "câu này có phải tự luận", (b) đọc câu

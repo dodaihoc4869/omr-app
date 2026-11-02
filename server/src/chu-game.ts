@@ -1,4 +1,4 @@
-// APP PHỤ HUYNH KHÔNG CÒN GÌ CỦA GAME (thầy lệnh 21/09, prompt-ph-giao-them-bai-2109.md mục B): tin/thư cho phụ huynh do MÁY CHỦ sinh (bài tin `parent-news`, nhắc nộp, thông báo, lời Bộ não A.I cho phụ huynh
+// APP PHỤ HUYNH KHÔNG CÒN GÌ CỦA GAME (thầy lệnh 21/09, docs/dac-ta-cu/prompt-ph-giao-them-bai-2109.md mục B): tin/thư cho phụ huynh do MÁY CHỦ sinh (bài tin `parent-news`, nhắc nộp, thông báo, lời Bộ não A.I cho phụ huynh
 // và thư tuần) CẤM nhắc thần thú, EXP, khiên, mảnh khiên, game, Đoàn Hộ Tống, Đảo thần thú, Võ đài. Đây là LỚP PHÒNG THỦ ở máy chủ (khuôn của Code 1 cũng chặn từ cấm lúc nộp); test quét mọi mẫu chữ.
 // Điều KHÔNG cấm (giữ): điểm, số câu, lên bậc, dạng con vấp, lịch ôn, bài tập về nhà, hạn nộp, "Vinh danh hôm nay".
 const MAU: readonly RegExp[] = [

@@ -112,7 +112,7 @@ export async function dungPhieuBtvn(
     } catch {}
   }
 
-  // LỊCH LÔ (thay Vòng 1/2/3 — mục 3 SO-VIEC.md 19/09): tính lại ngay tại đây
+  // LỊCH LÔ (thay Vòng 1/2/3 — mục 3 docs/so-viec/SO-VIEC.md 19/09): tính lại ngay tại đây
   // từ giaoLuc/hanNop/soCau + `loDaXong` máy chủ đã ghi, MỘT nguồn duy nhất
   // cho mọi màn mở phiếu (trợ lý bảng tin lẫn tab "Bài tập" bấm thẳng) — không
   // còn 3 màn Vòng 1/2/3 chọn `soCauSang` khác nhau nên không cần công thức cố

@@ -1,4 +1,4 @@
-// GIAO THÊM BÀI CHO CON — hàm THUẦN cho nút "Giao thêm bài cho con" của app phụ huynh (thầy lệnh 21/09/2026; đề bài `prompt-ph-giao-them-bai-2109.md`, Code 1). Hợp đồng vào/ra: `docs/hop-dong-ph-giao-them-2109.md`.
+// GIAO THÊM BÀI CHO CON — hàm THUẦN cho nút "Giao thêm bài cho con" của app phụ huynh (thầy lệnh 21/09/2026; đề bài `docs/dac-ta-cu/prompt-ph-giao-them-bai-2109.md`, Code 1). Hợp đồng vào/ra: `docs/hop-dong-ph-giao-them-2109.md`.
 // Phụ huynh chỉ bấm MỘT nút; hàm này quyết định giao nhiều hay ít, hay TỪ CHỐI (nâng đỡ, không dồn ép). Hàm chỉ ra CƠ CẤU (loại + dạng + số câu): MÁY CHỦ chọn qid cụ thể (không tự luận, không câu trong bài tập về nhà chưa nộp,
 // không câu con làm trong 14 ngày trừ câu đến lịch ôn, không vượt bậc + 1) và ĐẾM các con số "khả dụng" đưa vào đây — hàm không bao giờ đòi nhiều hơn số câu khả dụng.
 // Không đồng hồ, không ngẫu nhiên, không đọc D1 ⇒ cùng đầu vào cho cùng kết quả (test khoá). Chữ trong `lyDo` dành cho PHỤ HUYNH: có số thật, KHÔNG nhắc thần thú / EXP / khiên / game.

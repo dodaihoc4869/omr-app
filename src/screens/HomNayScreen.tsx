@@ -1,4 +1,4 @@
-// MÀN HÔM NAY của thầy — BẢN 3 = BẢNG TIN (thầy chốt bản vẽ 21/09; đề bài prompt-bang-tin-thay-v3.md; bản vẽ docs/ban-ve-bang-tin-v3-2109/).
+// MÀN HÔM NAY của thầy — BẢN 3 = BẢNG TIN (thầy chốt bản vẽ 21/09; đề bài docs/dac-ta-cu/prompt-bang-tin-thay-v3.md; bản vẽ docs/ban-ve-bang-tin-v3-2109/).
 // Thầy chỉ ĐỌC: một lệnh chỉ-đọc `/gv/bang-tin` (hợp đồng docs/hop-dong-bang-tin-v3-2109.md) trả đủ cho cả màn; tự làm mới mỗi 60 giây (dừng khi tab ẩn).
 // Máy chủ CHƯA có lệnh (404) hoặc chưa từng đọc được ⇒ rơi về bản 2 (HomNayCu) qua các lệnh cũ — không báo lỗi đỏ. Đang chờ lần đầu ⇒ khung xương (không màn trắng).
 import { useCallback, useEffect, useMemo, useState } from 'react'

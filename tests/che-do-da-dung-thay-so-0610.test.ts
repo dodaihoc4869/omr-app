@@ -3,7 +3,7 @@
 // ở…). Các câu lý thuyết thì … theo cách thay thế câu lý thuyết và cũng ghi rõ".
 //   · lõi thuần (src/lib/rut-de-da-dung.ts): nhãn câu thay, áp bản thay vào bộ câu, thống kê, bản thay lấy từ kho ca;
 //   · máy chủ THẬT trên D1 sqlite qua Worker thật (server/src/cau-thay-so.ts): song sinh · biến thể bằng mã · câu anh em · công tắc · em vào muộn (/vao-thi).
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import worker from '../server/src/index'
 import { goiWorker, taoD1That, type D1That } from './_d1-that'
 import { xoaDemCaBaoVe } from '../server/src/game-v2-bank'
@@ -296,11 +296,17 @@ describe('/ca/cau-thay-so — câu LÝ THUYẾT, Phần II, câu chưa có bản
     expect(r.dem).toEqual({ ss: 0, bt: 0, ae: 1, giu: 0 })
   })
   it('em ĐÃ gặp câu anh em ⇒ không chọn lại (hết câu chưa gặp thì thôi, không lặp)', async () => {
+    // 02/11 (loại D — đồng hồ trôi, không phải mã đổi; khẳng định giữ nguyên): ghim đồng hồ về MOC (06/10) — máy chủ đo "đã gặp" theo giờ thật (`nowMs`, luật NGAY_GAP_LAI = 14 ngày); để giờ
+    // thật trôi thì lượt gặp 05/10 thành "gặp lâu rồi" và AE1 được chọn lại hợp lệ ⇒ test mục theo lịch, không phải mã đổi.
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(MOC)
+    try {
     const { d, env } = dung(KHO)
     ghi(d, 'AE1', 1, '2026-10-05')
     const r = await thayGoi(env, { sbd: ['S1'], cau: { S1: [LTQ] } })
     expect(r.em.S1.LT1?.id).not.toBe('AE1')
     for (const sai of ['AE_NHOM', 'AE_K10', 'AE_K12', 'AE_PHAN', 'AE_TL', 'LT1']) expect(r.em.S1.LT1?.id).not.toBe(sai)
+    } finally { vi.useRealTimers() }
   })
   it('câu anh em không trùng một câu khác ĐÃ có trong đề của em (kể cả câu bù)', async () => {
     const { env } = dung(KHO)

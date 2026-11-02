@@ -1,7 +1,7 @@
 // @vitest-environment node
 // 14/10: gỡ Bi-a / Đoàn / cửa hàng / võ đài phía máy chủ — bỏ ý "câu ôn Phần I nằm ở Đoàn"; 5 ca Đoàn dựng lại qua Đảo (em chỉ chơi Đảo ⇒ câu ôn Phần I/III vào Đảo).
 // LÀM LẠI CÂU SAI BẰNG BẢN KHÁC (thầy 05/10) — nghiệm thu trên D1 THẬT (node:sqlite, đủ migration), mọi lệnh của em/thầy đi qua đúng đường
-// Worker thật (`server/src/index.ts`). Đặc tả: DE-XUAT-LAM-LAI-CAU-SAI-0510.md mục 3 (7 tiêu chí); tệp thuần: lam-lai-cau-sai-0510-thuan.test.ts.
+// Worker thật (`server/src/index.ts`). Đặc tả: docs/dac-ta-cu/DE-XUAT-LAM-LAI-CAU-SAI-0510.md mục 3 (7 tiêu chí); tệp thuần: lam-lai-cau-sai-0510-thuan.test.ts.
 // Kho thử: tờ khối 11 (của em), tờ khối 10, tờ khối 12, tờ không rõ khối — CÙNG dạng, cùng mức, chưa gặp, nằm TRONG phạm vi đã dạy của lớp
 // (một bài tick gồm cả bốn tờ) ⇒ chỉ có luật khối chặn được câu khác khối.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'

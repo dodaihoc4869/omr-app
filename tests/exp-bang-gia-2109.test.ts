@@ -1,5 +1,5 @@
 // @vitest-environment node
-// ĐIỀU 10 — BẢNG GIÁ EXP HỌC TẬP ĐỔI THEO NGÀY VN (thầy lệnh 21/09/2026 13:47; prompt-than-thu-moi-ngay-2109.md): từ 22/09 đạt ngày 80 · lô đúng nhịp 20 · lô trễ 8 · nộp BTVN đúng hạn 30,
+// ĐIỀU 10 — BẢNG GIÁ EXP HỌC TẬP ĐỔI THEO NGÀY VN (thầy lệnh 21/09/2026 13:47; docs/dac-ta-cu/prompt-than-thu-moi-ngay-2109.md): từ 22/09 đạt ngày 80 · lô đúng nhịp 20 · lô trễ 8 · nộp BTVN đúng hạn 30,
 // thêm `dau_ngay` +10 (câu đúng đầu tiên trong ngày, MỌI nguồn kể cả game) và `tro_lai` +30 (ngày đầu học lại sau ≥ 3 ngày vắng, ≤ 1 lần/14 ngày, chưa từng học ⇒ không). Ngày < 22/09 giữ bảng cũ.
 // Số dưới đây VIẾT THẲNG (không import hằng) để đổi hằng mà không sửa test là đỏ.
 import { describe, expect, it } from 'vitest'

@@ -1,5 +1,5 @@
 // OMNI 3 — LỚP D1: công tắc, bảng đệm, đọc sổ → hồ sơ OMNI (phát lại tất định), ma trận Q, β câu, chứng chỉ, vé, nhật ký, phần thêm cho Sảnh/PH, việc đêm.
-// Đặc tả: DAC-TA-BUILD-OMNI-3-0510.md mục 0, 1, 3, 4, 5, 9 · Hợp đồng: docs/hop-dong-omni-3.md · Kiểu: omni-kieu.ts · Chữ: src/lib/omni-chu.ts.
+// Đặc tả: docs/dac-ta-cu/DAC-TA-BUILD-OMNI-3-0510.md mục 0, 1, 3, 4, 5, 9 · Hợp đồng: docs/hop-dong-omni-3.md · Kiểu: omni-kieu.ts · Chữ: src/lib/omni-chu.ts.
 //
 // NGUỒN SỰ THẬT = `su_kien_hoc` (+ `omni_xac_nhan` thầy xác nhận, `omni_q`/`omni_vkn` ma trận Q thầy duyệt, `omni_ca_chot`, điểm `luot`).
 // Bảng ĐỆM (`omni_em`, `omni_p_vkn`, `omni_beta_cau`) xoá đi dựng lại 100 % từ sổ:

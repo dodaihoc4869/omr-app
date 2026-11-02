@@ -346,4 +346,20 @@ export async function baoThieuNhan(env: Env, sbd: string, cau: readonly CauXetDu
   return { tong: cau.length, lyDo: tomTatLyDo(loai), kyNangThieu: [...kyNangThieu].sort(), cauThieuNhan }
 }
 
-export function scopeQuestion(_json: any): any { return {}; }
+/**
+ * Nhãn xét phạm vi của MỘT câu kho (JSON dòng `game_v2_question`) — CÙNG ánh xạ tạm với `game-v2-bank.ts` (rút câu chơi):
+ * `kienThuc`→skillIds, `reviewed`→approved, `prerequisite_ids` chưa có nhãn trong kho nên rỗng.
+ * 02/11: thay bản giả `return {}` (610f5cd45 «mock missing exports») — bản giả làm cờ `pham_vi_hoc` BẬT thì kế hoạch ngày loại MỌI câu.
+ */
+export function scopeQuestion(json: unknown, du?: { qid?: unknown; version?: unknown; contentGroup?: unknown }): CauXetDuyet {
+  const q = (json && typeof json === 'object' ? json : {}) as Record<string, unknown>
+  const chu = (v: unknown) => (v === undefined || v === null ? '' : String(v))
+  return {
+    qid: chu(q.qid ?? du?.qid),
+    version: chu(q.version ?? du?.version),
+    contentGroup: chu(q.group ?? du?.contentGroup),
+    skillIds: Array.isArray(q.kienThuc) ? q.kienThuc.map(String) : [],
+    prerequisiteIds: [],
+    qualityStatus: q.reviewed ? 'approved' : 'chua_duyet',
+  }
+}

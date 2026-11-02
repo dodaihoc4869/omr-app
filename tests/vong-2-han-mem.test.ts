@@ -1,4 +1,4 @@
-// LÔ BTVN THEO NGÀY/GIỜ — thay Vòng 1/Vòng 2 (mục 3 SO-VIEC.md 19/09).
+// LÔ BTVN THEO NGÀY/GIỜ — thay Vòng 1/Vòng 2 (mục 3 docs/so-viec/SO-VIEC.md 19/09).
 //
 // File này THAY THẾ bản cũ (đặc tả KIEM-TRA-VONG-2.md, cơ chế Vòng 1/Vòng 2
 // theo % câu + hạn mềm 24h cố định) — thầy chốt 19/09: "bỏ vòng 1 và vòng 2

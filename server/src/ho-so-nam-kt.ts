@@ -1,4 +1,4 @@
-// HỒ SƠ NẮM KIẾN THỨC — GĐ 1 (DE-XUAT-CA-NHAN-HOA-1909.md mục 1.2).
+// HỒ SƠ NẮM KIẾN THỨC — GĐ 1 (docs/dac-ta-cu/DE-XUAT-CA-NHAN-HOA-1909.md mục 1.2).
 //
 // `phatLaiSuKien` là HÀM THUẦN: đọc sổ `su_kien_hoc` của một hay nhiều em, phát lại
 // theo thứ tự (giờ, khoá) và ra trạng thái từng câu (`nam_kt_cau`) + từng dạng

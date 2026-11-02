@@ -1,6 +1,6 @@
 # Hợp đồng `POST /gv/lich-su-cau-cua-em` — "em đã làm câu này chưa" trên thẻ tên Gọi lên bảng
 
-Bản nháp của Code 1 (màn) ngày 21/09/2026, theo `prompt-len-bang-da-lam-chua-2109.md` mục B. **Code 3 (máy chủ) bổ sung** ba mục cuối (số truy vấn, ước lượng dòng đọc, kênh đã / chưa phủ) khi làm xong lệnh; đổi tên trường thì báo Code 1 trước.
+Bản nháp của Code 1 (màn) ngày 21/09/2026, theo `docs/dac-ta-cu/prompt-len-bang-da-lam-chua-2109.md` mục B. **Code 3 (máy chủ) bổ sung** ba mục cuối (số truy vấn, ước lượng dòng đọc, kênh đã / chưa phủ) khi làm xong lệnh; đổi tên trường thì báo Code 1 trước.
 
 ## Vào
 Cổng mã bí mật như mọi lệnh `/gv/*` (header `x-ma-bi-mat`; sai ⇒ từ chối như các lệnh kia).

@@ -1,4 +1,4 @@
-// BÀI HÔM NAY (OMNI 3 · tick bài đã dạy — DAC-TA-BUILD-OMNI-3-0510.md mục 1 bước 1, prompt-tick-bai-tu-giao.md mục A) — phần THUẦN của bước
+// BÀI HÔM NAY (OMNI 3 · tick bài đã dạy — docs/dac-ta-cu/DAC-TA-BUILD-OMNI-3-0510.md mục 1 bước 1, docs/dac-ta-cu/prompt-tick-bai-tu-giao.md mục A) — phần THUẦN của bước
 // "Bài hôm nay" trong bảng Dạy học: lấy danh sách bài của MỘT khối từ cây DẠY HỌC (`dungCay` trên `locDeDayHoc` — thứ tự cây = thứ tự SGK),
 // khoá bài ổn định, tờ TỰ GIAO (thầy 05/10: "Khi tích chọn bạn chỉ lấy 3 phần trắc nghiệm, đúng sai trả lời ngắn làm tự động giao bỏ phần ví dụ
 // minh họa và các dạng trọng tâm nhé." ⇒ CHỈ tờ phần Trắc nghiệm / Đúng sai / Trả lời ngắn, không ô tích), phạm vi = mọi bài đứng TRƯỚC (cùng luật tờ),
