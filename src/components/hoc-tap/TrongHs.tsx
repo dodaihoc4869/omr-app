@@ -386,21 +386,32 @@ function TheNut({ id, sac, pop, mo, onDong }: { id: string; sac: string; pop: Po
   </div>, document.body)
 }
 /** RƯƠNG HÔM NAY (giữ từ con đường cũ: sáng khi xong cả các chặng, chạm ⇒ mở rương — anMung) thành THẺ KÍNH riêng dưới danh sách như bản vẽ. */
+// Thầy 02/11 tối («Rương xong cho mở luôn tại màn này nhé»): rương ĐÃ SÁNG ⇒ chạm là mở NGAY trong thẻ (nắp bật + pháo sáng của bộ ăn mừng), không bảng
+// chữ, không mũi tên; nắp giữ mở cả ngày (nhớ trên máy theo ngày VN). Chưa sáng ⇒ chạm hiện bảng nhắc còn mấy chặng như cũ.
+const khoaRuong = () => `ddh.ruong-mo.${new Date(Date.now() + 7 * 3_600_000).toISOString().slice(0, 10)}`
 function TheRuong({ ds }: { ds: Nut[] }) {
   const chang = ds.filter((n) => n.k.startsWith('c')), soChang = chang.length, soXong = chang.filter((n) => n.tt === 'xong').length, duR = soChang > 0 && soXong === soChang
   const [mo, setMo] = useState<HTMLElement | null>(null)
+  const [daMo, setDaMo] = useState(() => { try { return localStorage.getItem(khoaRuong()) === '1' } catch { return false } })
   const dong = useRef((traFocus: boolean) => setMo((m) => { if (traFocus) m?.focus(); return null })).current
   if (soChang < 2) return null
-  const phu = duR ? `Em đã xong cả ${soChang} chặng hôm nay, rương đã sáng!` : `Rương sáng lên khi em xong cả ${soChang} chặng hôm nay · còn ${soChang - soXong} chặng`
-  return <><button type="button" className="kb-the-ruong da-ruong-nut" data-mo={duR || undefined} aria-label="Rương hôm nay" aria-haspopup="dialog" aria-expanded={!!mo}
-    aria-controls={mo ? 'da-pop-ruong' : undefined}
-    onClick={(e) => { const nut = e.currentTarget, dangMo = !!mo; cham(); setMo(dangMo ? null : nut); if (!dangMo && kichRuong({ duMo: duR, cham: true })) anMung('ruong', { goc: nut, nap: nut.querySelector('.rg-nap'), rung: true }) }}>
+  const phu = duR ? (daMo ? `Đã mở rương · xong cả ${soChang} chặng` : 'Rương đã sáng · chạm để mở!') : `Rương sáng lên khi em xong cả ${soChang} chặng hôm nay · còn ${soChang - soXong} chặng`
+  const cham1 = (nut: HTMLButtonElement) => {
+    cham()
+    if (!duR) { setMo(mo ? null : nut); return }
+    if (kichRuong({ duMo: true, cham: true })) anMung('ruong', { goc: nut.querySelector('.kb-ruong') ?? nut, nap: nut.querySelector('.rg-nap'), rung: true })
+    if (!daMo) { setDaMo(true); try { localStorage.setItem(khoaRuong(), '1') } catch { /* máy chặn ⇒ chỉ nhớ trong phiên */ } }
+  }
+  return <><button type="button" className="kb-the-ruong da-ruong-nut" data-mo={duR || undefined} data-da-mo={(duR && daMo) || undefined}
+    aria-label={duR ? (daMo ? 'Rương hôm nay đã mở' : 'Mở rương hôm nay') : 'Rương hôm nay'} {...(duR ? {} : { 'aria-haspopup': 'dialog' as const, 'aria-expanded': !!mo, 'aria-controls': mo ? 'da-pop-ruong' : undefined })}
+    onClick={(e) => cham1(e.currentTarget)}>
     <span className="kb-ruong" aria-hidden="true"><Ruong /></span>
-    <span className="kb-giua"><b>Rương hôm nay</b><span className="kb-phu">{duR ? `Em đã xong cả ${soChang} chặng hôm nay, rương đã sáng!` : `Rương sáng lên khi em xong cả ${soChang} chặng hôm nay · còn ${soChang - soXong} chặng`}</span></span>
-    <ChevronRight size={20} aria-hidden="true" />
+    <span className="kb-giua"><b>Rương hôm nay</b><span className="kb-phu">{phu}</span></span>
+    {duR ? (!daMo && <span className="kb-mo-ruong" aria-hidden="true">Mở</span>) : <ChevronRight size={20} aria-hidden="true" />}
   </button>
-  {mo && <TheNut id="da-pop-ruong" sac="sao" mo={mo} onDong={dong} pop={{ tieu: 'Rương hôm nay', phu }} />}</>
+  {mo && !duR && <TheNut id="da-pop-ruong" sac="sao" mo={mo} onDong={dong} pop={{ tieu: 'Rương hôm nay', phu }} />}</>
 }
+
 /** màu THẺ BẬT RA giữ đúng như con đường cũ (thầy 05/10 «giữ nguyên mọi màu sắc»): chặng xanh · kiểm tra lam · sửa đỏ · bài tập vàng */
 const SAC_THE: Record<Nut['loai'], string> = { hoc: 'dung', kiem: 'tin', sua: 'sai', bt: 'chu-y' }
 function DanhSachViec({ ds, moKhoa, moDi }: { ds: Nut[]; moKhoa?: 'kt' | 'sua'; moDi?: boolean }) {

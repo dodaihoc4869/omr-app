@@ -45,7 +45,7 @@ python3 docs/ban-ve-dau-ion-v2-0211/ghep.py
   - **Thầy bấm Bắt đầu:** game dừng ngay và vào bài ngay.
   - **Máy yếu:** tự hạ chất lượng như hiện nay.
 - **Màu 5 cấp súng giữ như v1** (`--dn-capm-1…5`: xám → lục → cam → chàm → vàng): tô chấm số cấp trên nhãn tên. Số vòng electron là thêm, không thay màu cấp.
-- **Sân giữ đúng toạ độ trong `src/lib/dau-ion/loi.ts`:** `VAT_CAN` (bình cầu giữa, 4 bình nón, 2 giá ống, 4 cốc), `BE_PHE` (3 bệ mỗi phe), `CHO_XT`, `CHO_KH`. Bản vẽ dùng đúng các số này, chỉ thay «da».
+- **Sân:** ~~giữ `VAT_CAN` cũ~~ — thầy 02/11 tối bỏ hết chướng ngại, thay bằng tháp + tường (mục THÁP + TƯỜNG). Giữ `CHO_XT` / `CHO_KH` (dời vào giữa sân), bệ hồi sinh dời ra sau tháp.
 
 ## 2. Bố cục 3 khổ
 
@@ -54,7 +54,7 @@ python3 docs/ban-ve-dau-ion-v2-0211/ghep.py
 | Phần | Mới |
 |---|---|
 | Sàn | Kính mờ, lưới lục giác rất nhạt. Nửa sân mỗi phe loang màu giấy quỳ; vạch giữa nét đứt. |
-| Vật chắn | Dụng cụ vẽ bằng nét (không thêm tệp ảnh): <br>• bình cầu giữa chứa dung dịch xanh lục, nhãn «pH 7» (dung dịch trung tính) <br>• bình nón tím / lục <br>• cốc có mỏ và vạch chia, dung dịch vàng <br>• giá 5 ống nghiệm màu trung tính (dọc màn hình thì giá nằm ngang) <br>Không dùng màu đỏ / xanh để khỏi lẫn với hai phe. |
+| Vật chắn | **Bỏ** (thầy 02/11 tối). Thay bằng tháp chưng cất màu phe (đế kính, bầu dung dịch, nòng xoay theo mục tiêu, vòng máu) và tường kính 3 mảnh quanh tinh thể (nứt < 60 %, vỡ thành mảnh vụn). |
 | Nguyên tử | Quả cầu bóng màu phe, ký hiệu nguyên tố chữ tối ở giữa. **Số vòng electron quay quanh = cấp súng (1–5)**, nhìn là biết bạn mạnh cỡ nào. <br>Em có vòng trắng. Nhãn tên kèm số cấp; thanh máu nhỏ dưới bạn khác, chuyển đỏ khi < 35 %. |
 | Đạn | Hạt màu phe, vệt ngắn mờ dần, tia loé khi trúng. Đường ngắm nét đứt từ em tới mục tiêu, kèm dấu ngắm 4 cung (giữ như cũ). |
 | Vật phẩm | Xúc tác: lục giác vàng, tia sét. Khiên: lục giác tím (`--tr-hs`), không trùng màu phe. Electron: chấm xanh lục có quầng. |
@@ -171,15 +171,49 @@ Sân thu nhỏ ở sảnh là ảnh tĩnh vẽ tại máy, không nối mạng, 
 
 | Điểm | Đề xuất |
 |---|---|
-| Vị trí | Mỗi phe một tinh thể ở đầu sân của mình, sau tường giá ống (Bazơ (46, 260), Axit (994, 260) — đối xứng gương như mọi thứ trên sân). Bệ giữa dời ra trước (102 / 938). Bắn từ giữa sân thẳng vào bị giá ống chắn ⇒ phải vòng hai cánh mới bắn được. |
-| Máu | Tinh thể 60 máu; mỗi viên đạn phe bạn trúng −1; vòng máu quanh tinh thể + thanh trên cùng (thay thang pH). Dưới 60 % hiện vết nứt. Tinh thể không tự hồi. |
-| Thắng / thua | Tinh thể phe nào vỡ trước ⇒ phe kia thắng ngay. Hết giờ mà chưa vỡ ⇒ phe còn nhiều máu tinh thể hơn thắng; bằng ⇒ hoà. Ván dài **90 giây** (60 giây ít khi kịp phá tinh thể). |
+| Vị trí | Mỗi phe một tinh thể ở cuối sân của mình (Bazơ (44, 260), Axit (996, 260)), có tường kính 3 mảnh — xem mục THÁP + TƯỜNG bên dưới (thay bản trước: giá ống chắn). |
+| Máu | Tinh thể 40 máu (thêm tường 3 × 12 phía trước — xem mục THÁP + TƯỜNG); mỗi viên đạn phe bạn trúng −1; vòng máu quanh tinh thể + thanh trên cùng (thay thang pH). Dưới 60 % hiện vết nứt. Tinh thể không tự hồi. |
+| Thắng / thua | Tinh thể phe nào vỡ trước ⇒ phe kia thắng ngay. Hết giờ mà chưa vỡ ⇒ phe còn nhiều máu tinh thể hơn thắng; bằng ⇒ hoà. Ván dài **2 phút** (tính ở mục THÁP + TƯỜNG). |
 | Súng tự ngắm | Ưu tiên bạn phe kia trong tầm (giữ như cũ); không có ai ⇒ tự bắn tinh thể phe kia nếu trong tầm ⇒ em chỉ cần chạy tới gần là bắn tinh thể. |
 | Bảo vệ | Tinh thể phe em bị bắn ⇒ dải kính đỏ «Tinh thể phe em đang bị bắn! · còn 38 %» 2 giây + viền màn đỏ mềm (máy yếu: viền mảnh, không loé) — ảnh `bao-*`. |
 | A.I | 1 A.I mỗi phe ở lại giữ tinh thể, các A.I khác đi phá tinh thể phe kia (A.I vẫn bắn chậm hơn 25 %). |
 | Huy hiệu | Thêm «Phá tinh thể» (bắn trúng tinh thể nhiều nhất) và «Hộ vệ» (hạ / chặn nhiều nhất gần tinh thể phe mình); bỏ «Nhặt electron giỏi». |
 | Hết ván | Tiêu đề «Phe Bazơ phá vỡ tinh thể Axit!», hai ô «Tinh thể Bazơ còn 64 %» · «Tinh thể Axit đã vỡ» thay thang pH lớn. |
 | Kỹ thuật | Lõi `loi.ts` thêm hai tinh thể (vòng va chạm r 22, đạn chạm ⇒ trừ máu), sự kiện `{t:'tt', phe, mau}` + `{t:'vo', phe}`; phòng (Durable Object) kết thúc ván khi vỡ; gói tin thêm 2 số máu; `PHIEN_BAN` 4 (gộp cùng lượt bỏ electron). Vẫn 0 lệnh D1. |
+
+## THÁP + TƯỜNG, BỎ HẾT CHƯỚNG NGẠI (thầy 02/11 tối: «Mấy cái chướng ngại vật biến thành tháp bảo vệ tinh thể, nó tự bắn khi bị xâm phạm lãnh thổ … bỏ hết chướng ngại, mỗi bên bạn tính toán xem bao nhiêu tháp để vừa vui vừa hay vừa đủ khó … tinh thể có lớp tường chắn nhưng tường này có thể bị phá») — CẦN THẦY GẬT CÙNG LÚC DUYỆT ẢNH
+
+**Bố cục mỗi phe** (Bazơ trái, Axit đối xứng tâm): tinh thể (44, 260) · tường kính 3 mảnh hình cung bán kính 68 trước tinh thể (lưng tựa mép sân) · **tháp lớn** giữ cửa (210, 260) · **2 tháp cánh** (330, 120) và (330, 400) · 3 bệ hồi sinh sau tháp. Giữa sân: 2 Xúc tác (520, 110 / 410) + 1 Khiên (520, 260). Không còn bình / cốc / giá ống.
+
+**Con số (tính từ thông số thật của lõi: máu nguyên tử 10, hồi 2 máu/giây sau 2,5 giây không bị trúng, đạn trừ 1, chạy 225 đơn vị/giây; tỉ lệ trúng ước 70 %):**
+
+| Thứ | Máu | Vùng tự bắn | Nhịp bắn | Ghi chú |
+|---|---|---|---|---|
+| Tháp cánh | 30 | 180 | 1 viên / 0,6 s (đạn chậm 360/s — né được) | ≈ 1,7 sát thương/giây ⇒ đứng yên 6 giây là bị hạ |
+| Tháp lớn | 45 | 205 | 1 viên / 0,45 s | ≈ 2,2 sát thương/giây; giữ cửa giữa |
+| Tường | 3 mảnh × 12 | — | — | đạn trúng tường mất vào tường; vỡ 1 mảnh là hở cửa bắn vào tinh thể |
+| Tinh thể | 40 | — | — | chỉ trúng được qua chỗ tường vỡ |
+
+Vì sao **3 tháp mỗi phe** (vừa đủ khó):
+- Một em **cấp 1** (≈ 2 sát thương/giây) đi một mình phải bắn 15 giây mới đổ tháp cánh, nhưng tháp hạ em sau 6–9 giây ⇒ **không phá một mình được**, phải rủ bạn hoặc lên cấp trước.
+- Một em **cấp 3** (≈ 5,8/giây): 5,2 giây < 6 giây ⇒ phá được một mình nếu biết né ⇒ thưởng cho người lên cấp giỏi.
+- **Hai em cấp 2** cùng đánh (≈ 8,2/giây): 3,7 giây ⇒ phối hợp là phá nhanh ⇒ thưởng đồng đội.
+- Đường ngắn nhất tới tinh thể: 1 tháp cánh (30) + 1 mảnh tường cạnh (12) + tinh thể (40) = **82 máu**. Phe 3 người, sau khi trừ thời gian chạy, đánh nhau, hồi sinh (ước ~35 % thời gian thực sự bắn vào mục tiêu) ⇒ ~5 sát thương/giây ⇒ ván thường kết thúc ở **70–110 giây** ⇒ đặt **ván 2 phút** (hết giờ chưa vỡ: phe còn nhiều máu tinh thể hơn thắng; bằng ⇒ hoà).
+- 2 tháp ⇒ tinh thể vỡ quá sớm (~40 giây, ít đánh nhau); 4+ tháp ⇒ sân chật, ván quá 2 phút, phòng chờ không đủ thời gian. **3 tháp = mỗi người phe kia có một tháp để lo**, hai cánh + một cửa.
+
+Chiến thuật học sinh sẽ tự tìm ra (để «say mê»):
+- **Đánh cánh:** phá tháp cánh rồi bắn mảnh tường bên cạnh từ góc chéo — nằm NGOÀI vùng tháp lớn ⇒ đường an toàn nhưng xa.
+- **Đánh cửa:** bắn mảnh tường giữa — nhanh nhưng phải đứng trong vùng tháp lớn.
+- **Giữ nhà:** hồi sinh ngay sau tháp lớn ⇒ phe phòng thủ có lợi thế gần nhà; phe thua có cơ hội lật ván.
+- **Phá tháp: cả phe +1 cấp súng** (thưởng nhóm, thấy ngay vòng electron tăng).
+
+Luật kèm theo (bắt buộc khi bỏ chướng ngại):
+- **Tầm ngắm 420 đơn vị** (≈ 40 % sân; nay là cả sân): sân trống mà ai cũng bắn xuyên sân thì rối và không có chỗ nấp; tầm ngắn ⇒ đánh nhau quanh tháp, chạy lên mới bắn được.
+- **Tháp chỉ bắn khi có người phe kia trong vùng**; vùng chỉ HIỆN (vòng nét đứt + loé màu phe) lúc đang bị lấn ⇒ sân không rối mắt. Tháp ngắm người gần tháp nhất; người vừa bắn tháp bị ưu tiên.
+- Tháp và tường **chắn đạn và chắn đường đi** (thay vai chướng ngại cũ). Tháp vỡ thành đống mảnh kính (đi qua được), không mọc lại trong ván.
+- **A.I:** mỗi phe 1 A.I giữ nhà; A.I cấp 1 không vào vùng tháp một mình.
+- HUD: thêm 3 ô nhỏ «còn mấy tháp» cạnh thanh máu tinh thể mỗi phe (khổ dọc ẩn cho gọn).
+- Kỹ thuật: lõi `loi.ts` bỏ `VAT_CAN`, thêm `THAP`/`TUONG` (máu, vùng, nhịp, đạn tháp), sự kiện `thap`/`tuong`/`vo`; Durable Object chạy tháp (thêm ~6 vật bắn — vẫn < 1 ms CPU/giây trận); gói tin thêm máu 6 tháp + 6 mảnh tường (~12 byte); `PHIEN_BAN` 4.
 
 ## Luật lên cấp khi bỏ electron — CẦN THẦY GẬT CÙNG LÚC DUYỆT ẢNH
 Em đề xuất: **mỗi lần đạn em trúng đối thủ = +1**; đủ 3 / 5 / 7 / 9 lần (đúng ngưỡng `CAN_E` cũ) thì lên Cấp 2 / 3 / 4 / 5. Bị hạ: giữ cấp, bộ đếm về 0 (như electron cũ).
