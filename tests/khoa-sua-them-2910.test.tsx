@@ -70,11 +70,11 @@ describe('xong hết việc hôm nay ⇒ không cho sửa thêm', () => {
 })
 
 describe('chưa xong hết ⇒ y như cũ', () => {
-  it('danh sách đầy đủ gập lại vẫn có; nút «Sửa tiếp»; mở thẳng câu bất kỳ được', async () => {
+  it('không còn danh sách «Tất cả câu cần sửa» (thầy 02/11 tối «Câu ngoài phần hôm nay chọn bỏ»); nút «Sửa tiếp»; mở thẳng câu bất kỳ được', async () => {
     api.apiDanhSachTuChua.mockResolvedValue(bat(DS))
     const { container, unmount } = render(<ManTuChua token="tk" onVe={() => {}} />)
     await screen.findByRole('heading', { name: 'Việc hôm nay: 12 câu' })
-    expect(container.querySelector('details.vh-gap summary')!.textContent).toContain('Tất cả câu cần sửa')
+    expect(container.textContent).not.toContain('Tất cả câu cần sửa')
     expect(screen.getByRole('button', { name: /Bắt đầu sửa/ })).toBeTruthy()
     unmount()
     render(<ManTuChua token="tk" qid="m20" onVe={() => {}} />)

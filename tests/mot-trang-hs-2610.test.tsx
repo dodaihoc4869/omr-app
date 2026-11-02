@@ -115,11 +115,12 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
     fireEvent.click(within(the).getByRole('button', { name: 'Sửa ngay' }))
     expect(onChua).toHaveBeenCalledOnce()
     expect(screen.queryByRole('dialog')).toBeNull()
-    // rương: nói điều kiện sáng; chạm ra ngoài ⇒ đóng
-    fireEvent.click(screen.getByRole('button', { name: 'Rương hôm nay' }))
-    expect(screen.getByRole('dialog', { name: 'Rương hôm nay' })).toBeTruthy()
-    fireEvent.pointerDown(document.body)
+    // rương đã sáng (xong hết chặng): thầy 02/11 tối «Rương xong cho mở luôn tại màn này» ⇒ chạm là mở ngay trong thẻ, không bảng chữ; nắp giữ mở
+    fireEvent.click(screen.getByRole('button', { name: 'Mở rương hôm nay' }))
     expect(screen.queryByRole('dialog')).toBeNull()
+    const ruong = screen.getByRole('button', { name: 'Rương hôm nay đã mở' })
+    expect(ruong.hasAttribute('data-da-mo')).toBe(true)
+    expect(ruong.textContent).toContain('Đã mở rương')
   })
   it('lời Bi NHẮC MỘT LẦN mỗi ngày (thầy 27/10): giữ ~4 s rồi thu gọn và gỡ; mở lại trong ngày ⇒ không hiện; nội dung đổi hẳn (đủ mức) ⇒ hiện lại một lần', () => {
     vi.useFakeTimers()
@@ -159,7 +160,7 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
     // thầy 27/10: Kiểm tra ôn tập LUÔN đầu đường; Tự sửa lỗi chèn GIỮA hành trình (sau chặng mới thứ 2 kể từ chỗ đang học)
     expect(ds.map((n) => n.getAttribute('aria-label'))).toEqual(['Kiểm tra ôn tập: Thứ Tư 28/10 · còn 2 ngày', 'Chặng 1: đã xong', 'Chặng 2: đã xong', 'Học tiếp · 18 câu',
       'Chặng 4: chưa mở', KHOA_SUA, 'Chặng 5: chưa mở'])
-    expect(screen.getByRole('button', { name: 'Rương hôm nay' })).toBeTruthy() // Rương: thẻ riêng dưới danh sách
+    expect(screen.getByRole('button', { name: /Rương hôm nay/ })).toBeTruthy() // Rương: thẻ riêng dưới danh sách
     fireEvent.click(screen.getByRole('button', { name: 'Học tiếp · 18 câu' }))
     fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Bắt đầu' }))
     expect(onHoc).toHaveBeenCalledOnce()
