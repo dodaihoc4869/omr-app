@@ -94,12 +94,16 @@ html:root[data-trong='hs'] .da-tren .tp-tr-o[data-k='nt'] { color: var(--tr-nguy
 html.may-yeu:root[data-trong='hs'] { --kinh-ve: var(--tr-mat); --kinh-mo-ve: none; --kinh-mat: var(--tr-mat); --kinh-mat-dam: var(--tr-mat); --kinh-nen: var(--tr-nen); --kinh-mo: none; }
 /* NỀN LOANG (Liquid Glass): lớp cố định sau mọi nội dung — chỉ dải màu CSS, không ảnh; vẽ một lần (không hoạt ảnh) ⇒ máy yếu như nhau. */
 html[data-trong='hs'] body { background-color: var(--tr-nen); }
-html[data-trong='hs'] body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none; transform: translateZ(0); /* lớp riêng: bấm / đổi câu không vẽ lại nền */
-  background:
+html[data-trong='hs'] { --kinh-loang:
     radial-gradient(70% 38% at 8% 4%, color-mix(in oklab, var(--tr-hs) 42%, transparent), transparent 72%),
     radial-gradient(55% 32% at 98% 22%, color-mix(in oklab, var(--tr-tin) 34%, transparent), transparent 72%),
     radial-gradient(70% 36% at 80% 100%, color-mix(in oklab, var(--tr-tim) 30%, transparent), transparent 72%),
     radial-gradient(50% 30% at 0% 70%, color-mix(in oklab, var(--tr-sao) 18%, transparent), transparent 72%); }
+html[data-trong='hs'] body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none; transform: translateZ(0); /* lớp riêng: bấm / đổi câu không vẽ lại nền */
+  background: var(--kinh-loang); }
+/* MÀN CON PHỦ KÍN (làm chặng, kiểm tra ôn tập, tự sửa… — khung `fixed inset-0` của cổng): nền ĐẶC + đúng dải loang ⇒ nhìn y như kính, và
+   src/lib/an-khi-bi-che.ts nhận ra «đã che kín» ⇒ ẩn Hôm nay phía sau (content-visibility) — thiếu nền đặc thì mỗi lần bấm phải tính kiểu cả Hôm nay. */
+html[data-trong='hs'] div.fixed.inset-0.overflow-y-auto:not([class*='bg-']) { background-color: var(--tr-nen); background-image: var(--kinh-loang); }
 
 /* HỆ KÍNH: nút chính toàn app học sinh = chàm ĐẬM như bản vẽ (chữ trắng 5,0:1 thay 3,4:1 của chàm nhạt) — mọi màn dùng --tr-chinh-nut đổi theo một lượt */
 :root[data-trong='hs'] { --tr-chinh-nut: var(--tr-hs-day); }
