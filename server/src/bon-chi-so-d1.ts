@@ -11,8 +11,8 @@ import type { Env } from './kieu'
 import { docDanhSachEm, docNgayCacEm, type EmGoc } from './bai-hang-ngay'
 import { docNgayVao, ngayDuocTinh } from './nhip-hoc'
 import { cuaSoTinh, sqlChuyenDeKho, sqlQidGoc, SQL_LUOT_LAM, tinhLoEm } from './danh-gia-hoc-that-d1'
-import { BAN_BON, tinhBon, trungVi, vaoBang, type KetQuaBon, type SoLieuBon, type TheTho } from './bon-chi-so'
-import { SO_NGAY_CA, type CauCaThi, type LuotBang, type LuyenCuDv } from './bon-ca-thi'
+import { BAN_BON, tinhBon, trungVi, vaoBang, type DauVaoBon, type KetQuaBon, type SoLieuBon, type TheTho } from './bon-chi-so'
+import { NGAY_LUYEN_TOI_DA, SO_NGAY_CA, type CauCaThi, type LuotBang, type LuyenCuDv } from './bon-ca-thi'
 import { congNgay7 } from './goi-bai-7-loi'
 import { THU_TU_BANG, type DiemBon, type DongBang, type LoiBon, type MaBang, type TheBangChung, type TraLoiBangChung, type TraLoiBonBang } from '../../src/lib/bon-bang-kieu'
 
@@ -67,15 +67,22 @@ const cdThat = (x: unknown): string => { const s = str(x); return s === 'Hoá h�
 
 /** Tính MỘT lô em (cùng cửa sổ 14 ngày trọn tới hôm qua; ca thi + lên bảng 60 ngày). Không ghi. */
 export async function tinhLoBon(env: Env, em: readonly EmGoc[], nowMs: number): Promise<{ sbd: string; kq: KetQuaBon }[]> {
+  return (await docDauVaoBon(env, em, nowMs)).map(({ sbd, dv }) => ({ sbd, kq: tinhBon(dv) }))
+}
+
+/** ĐỌC đầu vào của MỘT lô em (mọi lượt đọc song song, không ghi). Tách khỏi `tinhLoBon` (02/11) để chẩn đoán trên dữ liệu thật dùng ĐÚNG đường đọc này.
+ *  `chiDoc` ⇒ bộ Học thật không tạo bảng (đo trên D1 thật chỉ đọc). */
+export async function docDauVaoBon(env: Env, em: readonly EmGoc[], nowMs: number, tuy: { chiDoc?: boolean } = {}): Promise<{ sbd: string; dv: DauVaoBon }[]> {
   if (!em.length) return []
   const w = cuaSoTinh(nowMs)
   const sbds = em.map((e) => e.sbd)
-  // 60 ngày trọn tới hôm qua; luyện tập cũ = phần TRƯỚC cửa sổ 14 ngày (phần trong 14 ngày đã có từng lượt từ bộ Học thật).
-  const tuCa = congNgay7(w.cuoi, -(SO_NGAY_CA - 1)), truocTu = congNgay7(w.tu, -1)
+  // 60 ngày trọn tới hôm qua; luyện tập cũ = phần TRƯỚC cửa sổ 14 ngày (phần trong 14 ngày đã có từng lượt từ bộ Học thật), lùi thêm NGAY_LUYEN_TOI_DA ngày
+  // trước đầu cửa sổ ca thi (ca đầu cửa sổ vẫn có đủ luyện tập trước nó).
+  const tuCa = congNgay7(w.cuoi, -(SO_NGAY_CA - 1)), truocTu = congNgay7(w.tu, -1), tuCu = congNgay7(tuCa, -NGAY_LUYEN_TOI_DA)
   const tuCaIso = new Date(Date.parse(tuCa + 'T00:00:00Z') - 7 * 3600_000).toISOString()
   const ds = JSON.stringify(sbds)
   const [dg, ngayEm, vao, cuoi, rHoi, rCa, rCu, doKho] = await Promise.all([
-    tinhLoEm(env, sbds, nowMs, { giuDauVao: true }).catch(() => null),
+    tinhLoEm(env, sbds, nowMs, { giuDauVao: true, chiDoc: tuy.chiDoc }).catch(() => null),
     docNgayCacEm(env, em, w.tu, w.cuoi, w.homNay, []),
     docNgayVao(env, em, w.tu),
     hoi(env, 'SELECT sbd, MAX(ngay_vn) AS n FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?1)) AND ket_qua IS NOT NULL GROUP BY sbd', JSON.stringify(sbds)).catch(() => [] as Row[]),
@@ -85,7 +92,7 @@ export async function tinhLoBon(env: Env, em: readonly EmGoc[], nowMs: number): 
         UNION ALL SELECT sbd, COUNT(*) AS n FROM hoi_tro_ly WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay_vn BETWEEN ?2 AND ?3 GROUP BY sbd) GROUP BY sbd`,
       JSON.stringify(sbds), w.tu, w.cuoi).catch(() => [] as Row[]),
     hoi(env, SQL_CA_BANG, ds, tuCa, w.cuoi).catch(() => [] as Row[]),
-    truocTu >= tuCa ? hoi(env, SQL_LUYEN_CU, ds, tuCa, truocTu).catch(() => [] as Row[]) : Promise.resolve([] as Row[]),
+    truocTu >= tuCu ? hoi(env, SQL_LUYEN_CU, ds, tuCu, truocTu).catch(() => [] as Row[]) : Promise.resolve([] as Row[]),
     docDoKhoCa(env, tuCaIso, nowMs),
   ])
   const lanCuoi = new Map(cuoi.map((x) => [str(x.sbd), str(x.n)]))
@@ -111,8 +118,8 @@ export async function tinhLoBon(env: Env, em: readonly EmGoc[], nowMs: number): 
     const d = dg?.find((x) => x.sbd === e.sbd)
     const ngay = ngayDuocTinh(ngayEm.get(e.sbd) ?? [], vao.get(e.sbd) ?? w.tu).filter((n) => n.ngay <= w.cuoi)
     const dauVao = d?.dauVao ? { ...d.dauVao, luot: d.dauVao.luot.map((l) => (l.dv || !l.dg || !cauNoi.has(l.dg) ? l : { ...l, dv: cauNoi.get(l.dg)! })) } : null
-    return { sbd: e.sbd, kq: tinhBon({ dg: d && dauVao ? { kq: d.kq, dauVao } : null, ngay, lanCuoiHoc: lanCuoi.get(e.sbd) ?? '', den: w.cuoi, hoi: soHoi.get(e.sbd) ?? 0,
-      caThi: caTheo.get(e.sbd) ?? [], lenBang: bangTheo.get(e.sbd) ?? [], luyenCu: cuTheo.get(e.sbd) ?? [] }) }
+    return { sbd: e.sbd, dv: { dg: d && dauVao ? { kq: d.kq, dauVao } : null, ngay, lanCuoiHoc: lanCuoi.get(e.sbd) ?? '', den: w.cuoi, hoi: soHoi.get(e.sbd) ?? 0,
+      caThi: caTheo.get(e.sbd) ?? [], lenBang: bangTheo.get(e.sbd) ?? [], luyenCu: cuTheo.get(e.sbd) ?? [] } }
   })
 }
 

@@ -99,6 +99,10 @@ export interface SoLieuBon {
   /** v3: vào bảng NHỜ ca thi / lên bảng — 2 = không có hai yếu tố này thì KHÔNG vào · 1 = có làm bằng chứng nhưng vẫn vào · 0 = không dùng;
    *  `htRa` / `dpRa` = 1 khi hai yếu tố này đưa em RA khỏi bảng (bản không có chúng thì vào). Để đếm trên dữ liệu thật. */
   nho?: { ht: number; dp: number; htRa: number; dpRa: number }
+  /** v3c (02/11): KHOẢNG CÁCH TỚI NGƯỠNG của từng trục — để đo «sát ngưỡng / dễ lật nhãn» và làm vùng trễ. `cl` = tổng sức họ Đối phó − ngưỡng (≥ 0 ⇒ phía
+   *  Đối phó theo luật tổng; null = chưa có bằng chứng chất lượng); `chac` = Đối phó chắc / có treo máy (lật ngay). Trục công sức: tỉ lệ ngày đủ 75% mức, tỉ lệ lượt
+   *  làm cho có, tỉ lệ ngày dồn hạn (0–1; null = chưa có ngày phải làm). */
+  bien?: { cl: number | null; chac: boolean; du75: number | null; choCo: number; donHan: number }
 }
 
 export interface KetQuaBon {
@@ -167,9 +171,11 @@ function suaCauSai(lam: readonly LuotDanhGia[], den: string): { tong: number; su
 /** Một em ⇒ 4 điểm + số đo + bằng chứng. Thuần. */
 /** Dòng sổ KHÔNG phải luyện tập (v3): ca thi, lên bảng, kiểm tra đầu giờ — đo riêng ở `bon-ca-thi.ts`. */
 const NGUON_KIEM = new Set(['thi', 'len_bang', 'dau_gio'])
+/** Lượt LUYỆN TẬP của em (bỏ dòng ca thi / lên bảng / kiểm tra đầu giờ, bỏ lượt chưa chấm). Thuần. */
+export const luotLuyenBon = (v: DauVaoBon): LuotDanhGia[] => (v.dg?.dauVao.luot ?? []).filter((l) => l.dung !== null && !NGUON_KIEM.has(l.nguon ?? ''))
 
 export function tinhBon(v: DauVaoBon): KetQuaBon {
-  const lam = (v.dg?.dauVao.luot ?? []).filter((l) => l.dung !== null && !NGUON_KIEM.has(l.nguon ?? ''))
+  const lam = luotLuyenBon(v)
   // ═════ v3: HAI YẾU TỐ CHÍNH — ca thi thật theo đơn vị kiến thức + lên bảng (bon-ca-thi.ts). Rỗng ⇒ mọi số 0 / null ⇒ luật v2.
   const coCaBang = (v.caThi?.length ?? 0) + (v.lenBang?.length ?? 0) > 0
   const ca = tinhCaThi({ luyen: lam, luyenCu: v.luyenCu ?? [], caThi: v.caThi ?? [], lenBang: v.lenBang ?? [] })
@@ -359,6 +365,7 @@ export function tinhBon(v: DauVaoBon): KetQuaBon {
     caCau: ca.caCau, caGhep: ca.N, caThi: ca.N >= 4 ? pt(ca.K, ca.N) : null, caKyVong: ca.N >= 4 ? pt(Math.round(ca.E), ca.N) : null, luyenDv: pt(ca.kL, ca.nL),
     dvKhop: ca.dvKhop, dvLech: ca.dvLech, caLech: ca.caLech,
     lenBang: pt(ca.bang.dat, ca.bang.tong), bangTong: ca.bang.tong, bangDat: ca.bang.dat, bangChuaLq: ca.bang.chuaLq,
+    bien: { cl: coBangChungCl ? manh - nguongManh : null, chac: dpChac || !!ho.treo, du75: n > 0 ? du75 / n : null, choCo: choCoTL, donHan: donHanTL },
   })
   // v3: bản KHÔNG có ca thi / lên bảng (đúng luật v2 trên cùng em) ⇒ đếm «vào nhờ» / «ra nhờ» hai yếu tố này. Không đệ quy thêm (bản ấy rỗng ca thi).
   if (coCaBang) {

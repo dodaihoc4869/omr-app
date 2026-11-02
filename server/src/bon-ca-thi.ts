@@ -31,6 +31,8 @@ import { canDuoiWilson, type LuotDanhGia } from './danh-gia-hoc-that'
 export const SO_NGAY_CA = 60
 /** Luyện tập được so với một ca: trong ngần này ngày TRƯỚC giờ nộp ca. */
 export const NGAY_LUYEN_TRUOC = 35
+/** Luyện tập đọc lùi tối đa ngần này ngày trước đầu cửa sổ ca thi (luyện CŨ, gộp theo ngày × đơn vị). */
+export const NGAY_LUYEN_TOI_DA = 60
 /** Lượt luyện tối thiểu ở một đơn vị mới so (dưới ⇒ «đơn vị chưa luyện»). */
 export const LUYEN_TOI_THIEU_DV = 6
 
@@ -117,30 +119,67 @@ export function luotLuyenSo(luyen: readonly LuotDanhGia[]): MucLuyen[] {
   return ra
 }
 
-/** So luyện tập ↔ ca thi theo đơn vị + lên bảng. Thuần. */
-export function tinhCaThi(v: DauVaoCaThi): KetQuaCaThi {
+/** Bảng tra luyện tập theo đơn vị (dùng chung cho phép so và chẩn đoán độ ghép). Thuần. */
+function taoTraLuyen(v: DauVaoCaThi) {
   const luyen = luotLuyenSo(v.luyen)
-  const ten = new Map<string, string>()
-  const datTen = (s: string | null) => { const k = khoaDv(s); if (k && !ten.has(k)) ten.set(k, (s ?? '').replace(/\s+/g, ' ').trim()) }
-  for (const c of v.caThi) datTen(c.dv)
-  for (const l of v.luyen) datTen(l.dv ?? null)
-  for (const c of v.luyenCu) datTen(c.dv)
   const cuTheo = new Map<string, LuyenCuDv[]>()
   for (const c of v.luyenCu) { const k = khoaDv(c.dv); if (k) cuTheo.set(k, [...(cuTheo.get(k) ?? []), c]) }
   const luyenTheo = new Map<string, MucLuyen[]>()
   for (const l of luyen) luyenTheo.set(l.k, [...(luyenTheo.get(l.k) ?? []), l])
-  /** Luyện ở đơn vị `k` trước mốc (luc, ngay), trong NGAY_LUYEN_TRUOC ngày. */
-  const luyenTruoc = (k: string, luc: string, ngay: string) => {
-    const tu = truNgay(ngay, NGAY_LUYEN_TRUOC)
+  /** Luyện ở đơn vị `k` trước mốc (luc, ngay), trong `soNgay` ngày (mặc định NGAY_LUYEN_TRUOC). */
+  const luyenTruoc = (k: string, luc: string, ngay: string, soNgay = NGAY_LUYEN_TRUOC) => {
+    const tu = truNgay(ngay, soNgay)
     const moi = (luyenTheo.get(k) ?? []).filter((l) => l.luc < luc && l.ngay >= tu)
     const cu = (cuTheo.get(k) ?? []).filter((c) => c.ngay < ngay && c.ngay >= tu)
     const pl = moi.map((l) => l.pLop).filter((x): x is number => typeof x === 'number')
     return { n: moi.length + cu.reduce((s, c) => s + c.n, 0), d: moi.filter((l) => l.dung).length + cu.reduce((s, c) => s + c.d, 0), qBar: pl.length >= 3 ? pl.reduce((s, x) => s + x, 0) / pl.length : 0.6 }
   }
+  /** Luyện ở đơn vị `k` SAU mốc (để chẩn đoán «chỉ luyện sau ca»). */
+  const luyenSau = (k: string, luc: string, ngay: string) => (luyenTheo.get(k) ?? []).filter((l) => l.luc > luc).length + (cuTheo.get(k) ?? []).filter((c) => c.ngay > ngay).reduce((s, c) => s + c.n, 0)
+  return { luyenTruoc, luyenSau, luyenTheo, cuTheo }
+}
+/** Nhóm câu ca thi theo cặp (ca × đơn vị); câu không có đơn vị bỏ ra ngoài. Thuần. */
+function nhomCaDv(caThi: readonly CauCaThi[]): Map<string, CauCaThi[]> {
+  const nhom = new Map<string, CauCaThi[]>()
+  for (const c of caThi) { const k = khoaDv(c.dv); if (k) nhom.set(`${c.ma}\u0000${k}`, [...(nhom.get(`${c.ma}\u0000${k}`) ?? []), c]) }
+  return nhom
+}
+
+/** Lý do một câu ca thi KHÔNG ghép được (chẩn đoán 02/11, chỉ số đếm). */
+export type LyDoGhep = 'ghep' | 'thieuDv' | 'dvChuaLuyen' | 'chiLuyenSauCa' | 'luyenNgoai35' | 'du6Neu60' | 'locLanDau' | 'luyenIt'
+/** CHẨN ĐOÁN ĐỘ GHÉP: mỗi câu ca thi ⇒ đúng MỘT lý do (ưu tiên theo thứ tự `LyDoGhep`), cùng luật cặp của `tinhCaThi`. Thuần — chỉ trả số đếm. */
+export function chanDoanGhep(v: DauVaoCaThi): Record<LyDoGhep, number> {
+  const ra: Record<LyDoGhep, number> = { ghep: 0, thieuDv: 0, dvChuaLuyen: 0, chiLuyenSauCa: 0, luyenNgoai35: 0, du6Neu60: 0, locLanDau: 0, luyenIt: 0 }
+  const { luyenTruoc, luyenSau, cuTheo } = taoTraLuyen(v)
+  ra.thieuDv = v.caThi.filter((c) => !khoaDv(c.dv)).length
+  for (const [khoa, ds] of nhomCaDv(v.caThi)) {
+    const k = khoa.split('\u0000')[1]!
+    const luc = ds.map((c) => c.luc).sort()[0]!, ngay = ds.map((c) => c.ngay).sort()[0]!
+    const l35 = luyenTruoc(k, luc, ngay)
+    if (l35.n >= LUYEN_TOI_THIEU_DV) { ra.ghep += ds.length; continue }
+    const l60 = luyenTruoc(k, luc, ngay, 60), truocHet = luyenTruoc(k, luc, ngay, 3650).n, sau = luyenSau(k, luc, ngay)
+    // lượt THÔ (kể cả làm lại / song sinh / có gợi ý) trong 35 ngày: đo phần luật «lần đầu gặp câu gốc» lọc mất
+    const tu = truNgay(ngay, NGAY_LUYEN_TRUOC)
+    const tho = v.luyen.filter((l) => l.dung !== null && khoaDv(l.dv ?? null) === k && l.luc < luc && l.ngay >= tu).length
+      + (cuTheo.get(k) ?? []).filter((c) => c.ngay < ngay && c.ngay >= tu).reduce((s, c) => s + c.n, 0)
+    const ly: LyDoGhep = truocHet === 0 && sau === 0 && tho === 0 ? 'dvChuaLuyen' : truocHet === 0 && tho === 0 ? 'chiLuyenSauCa' : l35.n === 0 && l60.n > 0 ? 'luyenNgoai35'
+      : l60.n >= LUYEN_TOI_THIEU_DV ? 'du6Neu60' : tho >= LUYEN_TOI_THIEU_DV ? 'locLanDau' : 'luyenIt'
+    ra[ly] += ds.length
+  }
+  return ra
+}
+
+/** So luyện tập ↔ ca thi theo đơn vị + lên bảng. Thuần. */
+export function tinhCaThi(v: DauVaoCaThi): KetQuaCaThi {
+  const ten = new Map<string, string>()
+  const datTen = (s: string | null) => { const k = khoaDv(s); if (k && !ten.has(k)) ten.set(k, (s ?? '').replace(/\s+/g, ' ').trim()) }
+  for (const c of v.caThi) datTen(c.dv)
+  for (const l of v.luyen) datTen(l.dv ?? null)
+  for (const c of v.luyenCu) datTen(c.dv)
+  const { luyenTruoc } = taoTraLuyen(v)
 
   // ── Cặp (ca, đơn vị)
-  const nhom = new Map<string, CauCaThi[]>()
-  for (const c of v.caThi) { const k = khoaDv(c.dv); if (k) nhom.set(`${c.ma}\u0000${k}`, [...(nhom.get(`${c.ma}\u0000${k}`) ?? []), c]) }
+  const nhom = nhomCaDv(v.caThi)
   interface Cap { ma: string; k: string; luc: string; kT: number; nT: number; e: number; vT: number; dE: number; nL: number; kL: number; p: number }
   const cap: Cap[] = []
   for (const [khoa, ds] of nhom) {

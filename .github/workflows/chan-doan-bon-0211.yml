@@ -1,0 +1,38 @@
+# CHẨN ĐOÁN 4 BẢNG TRÊN DỮ LIỆU THẬT (CHỈ ĐỌC, 02/11 — thầy: «Bạn thiết lập mọi thông số đo chuẩn xác đi. Tuần này tôi cho kiểm tra rồi đo lại mỗi ngày»).
+# Chạy ĐÚNG đường đọc + lõi máy chủ (`docDauVaoBon` → `tinhBon`) trên D1 thật qua API HTTP, bọc CHỈ ĐỌC (scripts/chan-doan-bon-0211.ts): lệnh ghi bị chặn,
+# D1 báo có ghi ⇒ dừng. In SỐ ĐẾM GỘP vào Job Summary — không SBD, không tên, không mã câu (repo công khai). Không chạy giờ cao điểm 18:00–23:30.
+# Đo lại: đẩy nhánh claude/chan-doan-bon-0211 (đổi tệp này / tệp script) hoặc bấm Run workflow.
+name: Chẩn đoán 4 bảng trên dữ liệu thật (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/chan-doan-bon-0211]
+    paths: ['.github/workflows/chan-doan-bon-0211.yml', 'scripts/chan-doan-bon-0211.ts', 'server/src/bon-*.ts']
+permissions:
+  contents: read
+concurrency:
+  group: chan-doan-bon
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Đóng gói script chẩn đoán
+        run: npx esbuild scripts/chan-doan-bon-0211.ts --bundle --platform=node --format=esm --target=node22 --outfile=/tmp/chan-doan-bon.mjs --log-level=error
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Chẩn đoán (chỉ đọc, số đếm gộp)
+        env:
+          CF_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CF_ACC: ${{ env.CF_ACC_SACH }}
+        run: node /tmp/chan-doan-bon.mjs
