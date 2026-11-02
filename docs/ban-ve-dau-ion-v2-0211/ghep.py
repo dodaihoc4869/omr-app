@@ -59,4 +59,5 @@ bang('bang-3-het-van.jpg', '3 · HẾT VÁN — cũ và mới', [
 bang('bang-4-goi-y-vao-thay.jpg', '4 · GỢI Ý LẦN ĐẦU (3 giây) · BẠN VÀO THAY A.I', [
     (330, [('CŨ · gợi ý', CU, 'goi-y-dau-844-sang.jpg'), ('MỚI · gợi ý', MOI, 'goiy-844-sang.jpg')]),
     (330, [('CŨ · vào thay', CU, 'vao-thay-844-sang.jpg'), ('MỚI · vào thay · tối', MOI, 'vaothay-844-toi.jpg')]),
+    (330, [('MỚI · tinh thể phe em bị bắn', MOI, 'bao-844-sang.jpg')]),
 ])

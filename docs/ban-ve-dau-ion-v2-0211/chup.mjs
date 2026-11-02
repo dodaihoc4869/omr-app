@@ -21,7 +21,7 @@ const KHO = { 390: [390, 844], 844: [844, 390], 1440: [1440, 900] }
 const CANH = [
   ['sanh', 390, 'light'], ['sanh', 390, 'dark'], ['sanh', 844, 'light'], ['sanh', 1440, 'light'], ['sanh', 1440, 'dark'],
   ['tran', 844, 'light'], ['tran', 844, 'dark'], ['tran', 390, 'light'], ['tran', 390, 'dark'], ['tran', 1440, 'light'], ['tran', 1440, 'dark'],
-  ['goiy', 844, 'light'], ['vaothay', 844, 'dark'], ['vaothay', 390, 'light'],
+  ['goiy', 844, 'light'], ['bao', 844, 'light'], ['bao', 390, 'dark'], ['vaothay', 844, 'dark'], ['vaothay', 390, 'light'],
   ['het', 390, 'light'], ['het', 844, 'light'], ['het', 844, 'dark'], ['het', 1440, 'light'],
   ['tran', 844, 'light', 1],
 ]

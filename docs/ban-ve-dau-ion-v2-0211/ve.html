@@ -42,6 +42,18 @@ b, strong, h1, h2, button { font-weight: 800; }
   background: linear-gradient(90deg, var(--tr-hs), var(--tr-tin), var(--tr-dung), var(--tr-sao), var(--tr-chu-y), var(--tr-sai)); }
 .ph .kim { position: absolute; top: 6px; width: 6px; height: 18px; border-radius: 3px; background: var(--tr-trang); box-shadow: 0 0 0 2px var(--tr-chu), 0 2px 6px var(--tr-phu); }
 .ph .gio { position: relative; font-size: 11px; font-weight: 800; padding: 1px 7px; border-radius: 8px; background: var(--tr-chu); color: var(--tr-trang); top: -15px; }
+.tt-thanh { position: relative; width: 104px; height: 10px; border-radius: 5px; background: color-mix(in oklab, var(--tr-chu) 12%, transparent); overflow: hidden; display: flex; }
+.tt-thanh[data-phe='1'] { justify-content: flex-end; }
+.tt-thanh i { display: block; height: 100%; border-radius: 5px; background: var(--tr-tin); padding: 0 !important; }
+.tt-thanh[data-phe='1'] i { background: var(--tr-sai); }
+.ti .pt { font-size: 15px; font-weight: 800; min-width: 38px; text-align: center; font-variant-numeric: tabular-nums; }
+.gio2 { font-size: 13px; font-weight: 800; padding: 3px 9px; border-radius: 10px; background: var(--tr-chu); color: var(--tr-trang); font-variant-numeric: tabular-nums; }
+.doc .ti svg { display: none; } .doc .ti { gap: 4px; padding: 5px 6px; } .doc .ti .phe { gap: 4px; }
+.doc .tt-thanh { width: auto; flex: 1; min-width: 40px; } .doc .ti .phe { flex: 1; } .doc .ti .pt { min-width: 32px; font-size: 13px; }
+.bao-tt { position: fixed; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 18px; font-weight: 800; font-size: 13px; color: var(--tr-sai-chu); box-shadow: inset 0 0 0 2px var(--tr-sai), 0 10px 24px -14px var(--tr-sai); white-space: nowrap; }
+.toi .bao-tt { color: var(--tr-sai); }
+.vien-do { position: fixed; inset: 0; pointer-events: none; box-shadow: inset 0 0 60px -10px color-mix(in oklab, var(--tr-sai) 55%, transparent); }
+.yeu .vien-do { box-shadow: inset 0 0 0 3px color-mix(in oklab, var(--tr-sai) 60%, transparent); }
 .em { display: flex; align-items: center; gap: 8px; padding: 5px 12px 5px 6px; border-radius: 22px; flex: none; }
 .em .mau { width: 74px; height: 7px; border-radius: 4px; background: color-mix(in oklab, var(--tr-chu) 12%, transparent); overflow: hidden; }
 .em .mau i { display: block; height: 100%; width: 72%; border-radius: 4px; background: linear-gradient(90deg, var(--tr-dung-nut), var(--tr-dung)); }
@@ -102,7 +114,12 @@ b, strong, h1, h2, button { font-weight: 800; }
 .thap .phu { align-items: start; padding-top: 8px; } .thap .ket { gap: 6px; padding: 10px 14px; } .thap .ket h2 { font-size: 22px; } .thap .ket .phu-dong { margin-top: -4px; font-size: 12px; }
 .thap .ket .ph-lon { height: 26px; } .thap .ket .ph-lon .n { display: none; } .thap .ket .ph-lon .vach { top: 9px; } .thap .ket .ph-lon .kim { top: 0; }
 .thap .doi-the { padding: 6px; gap: 3px; } .thap .hang { padding: 2px 8px; } .thap .hang small { display: inline; margin-left: 6px; white-space: nowrap; } .thap .hang .ten { display: inline; white-space: nowrap; } .thap .doi-dau .tong { font-size: 20px; }
-.thap .day-ket .pu { padding: 5px 10px; font-size: 12px; } .thap .ve-phong { padding: 7px 14px; } .thap .day-dong { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.thap .day-ket .pu { padding: 5px 10px; font-size: 12px; } .thap .ve-phong { padding: 7px 14px; } .thap .kq-tt { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.kq-tt > span { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 18px; font-size: 12px; font-weight: 700; color: var(--tr-chu-2); }
+.kq-tt > span > span { display: flex; flex-direction: column; } .kq-tt b { font-size: 16px; color: var(--tr-chu); }
+.kq-tt [data-phe='0'] { box-shadow: inset 0 0 0 2px var(--tr-tin); } .kq-tt [data-phe='1'] { box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--tr-sai) 50%, transparent); }
+.thap .kq-tt > span { padding: 4px 10px; } .thap .kq-tt b { font-size: 14px; }
+.day-dong { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 .doi-the { border-radius: 22px; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
 .doi-the[data-phe='0'] { background: color-mix(in oklab, var(--p0-nhat) 75%, transparent); box-shadow: inset 0 0 0 2px var(--p0); }
 .doi-the[data-phe='1'] { background: color-mix(in oklab, var(--p1-nhat) 75%, transparent); box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--p1) 55%, transparent); }
@@ -141,6 +158,7 @@ function defs() {
     <linearGradient id="v0" x1="1" x2="0"><stop offset="0" stop-color="${p0}"/><stop offset="1" stop-color="${p0}" stop-opacity="0"/></linearGradient>
     <linearGradient id="v1" x1="1" x2="0"><stop offset="0" stop-color="${p1}"/><stop offset="1" stop-color="${p1}" stop-opacity="0"/></linearGradient>
     <linearGradient id="nuoc" x1="0" x2="1"><stop offset="0" stop-color="${p0}"/><stop offset=".5" stop-color="${v('--tr-dung')}"/><stop offset="1" stop-color="${p1}"/></linearGradient>
+    <linearGradient id="t0" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${tr}"/><stop offset=".35" stop-color="${p0}"/><stop offset="1" stop-color="${v('--tr-tin-day')}"/></linearGradient><linearGradient id="t1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${tr}"/><stop offset=".35" stop-color="${p1}"/><stop offset="1" stop-color="${v('--tr-sai-day')}"/></linearGradient>
     <pattern id="luc" width="34" height="58.9" patternUnits="userSpaceOnUse" patternTransform="scale(.9)"><path d="M17 0l17 9.8v19.6L17 39.3 0 29.4V9.8zM17 39.3v19.6" fill="none" stroke="${v('--tr-chu')}" stroke-opacity="${TOI ? .07 : .06}" stroke-width="1.2"/></pattern>
     <filter id="mo" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5"/></filter></defs>`
 }
@@ -174,7 +192,9 @@ const VAT_CAN = [
   { k: 'cn', x: 136, y: 200, w: 22, h: 120, ve: 'gia-ong' }, { k: 'cn', x: 882, y: 200, w: 22, h: 120, ve: 'gia-ong' },
   { k: 'cn', x: 278, y: 74, w: 44, h: 44, ve: 'coc', mau: 5 }, { k: 'cn', x: 278, y: 402, w: 44, h: 44, ve: 'coc', mau: 5 },
   { k: 'cn', x: 718, y: 74, w: 44, h: 44, ve: 'coc', mau: 5 }, { k: 'cn', x: 718, y: 402, w: 44, h: 44, ve: 'coc', mau: 5 }]
-const BE_PHE = [[[76, 96], [62, 260], [76, 424]], [[964, 424], [978, 260], [964, 96]]]
+const BE_PHE = [[[76, 96], [102, 260], [76, 424]], [[964, 424], [938, 260], [964, 96]]]
+// TINH THỂ (thầy 02/11 tối «Cho mỗi bên một tinh thể, bên nào tinh thể bị bắn vỡ trước là thua»): mỗi phe một tinh thể sau tường giá ống của căn cứ
+const TINH_THE = [[46, 260], [994, 260]]
 const CHO_XT = [[520, 58], [520, 462]], CHO_KH = [[200, 260], [840, 260]]
 const thuy = () => `fill="${v('--tr-mat')}" fill-opacity="${TOI ? .13 : .72}" stroke="${v('--tr-chu')}" stroke-opacity="${TOI ? .42 : .34}" stroke-width="2"`
 const loe = (r) => YEU ? '' : `<path d="M${-r * .55} ${-r * .15} q${r * .1} ${-r * .45} ${r * .45} ${-r * .55}" fill="none" stroke="${v('--tr-trang')}" stroke-opacity=".7" stroke-width="2.4" stroke-linecap="round"/>`
@@ -197,6 +217,17 @@ function coc(X, Y, a, mau) { // cốc có mỏ, vạch chia
   const h = a / 2, dd = v(MAU_DD[mau])
   return `<g transform="translate(${X} ${Y})"><path d="M${-h} ${-h}h${a}l-3 ${a - 6}q-1 6 -7 6h${-(a - 20)}q-6 0 -7 -6z" ${thuy()}/><path d="M${-h} ${-h}l-5 -3" stroke="${v('--tr-chu')}" stroke-opacity=".34" stroke-width="2" stroke-linecap="round"/>
   <path d="M${-h + 3} 2h${a - 6}l-2 ${h - 8}q-1 4 -5 4h${-(a - 20)}q-4 0 -5 -4z" fill="${dd}" opacity=".75"/>${[-10, -2, 6].map((y) => `<line x1="${h - 12}" x2="${h - 5}" y1="${y}" y2="${y}" stroke="${v('--tr-chu')}" stroke-opacity=".35" stroke-width="1.5"/>`).join('')}${loe(h)}</g>` }
+function tinhThe(X, Y, p, mau, bi) { // lăng trụ lục giác (tinh thể) màu phe + vòng máu; < 60 % nứt; bị bắn: loé
+  const m = v(p ? '--tr-sai' : '--tr-tin'), d = v(p ? '--tr-sai-day' : '--tr-tin-day'), tr = v('--tr-trang'), R = 40, cv = 2 * Math.PI * R
+  let s = `<g transform="translate(${X} ${Y})">`
+  if (!YEU) s += `<circle r="${bi ? 46 : 40}" fill="${m}" opacity="${bi ? .34 : .22}" filter="url(#mo)"/>`
+  s += `<circle r="${R}" fill="none" stroke="${v('--tr-chu')}" stroke-opacity=".12" stroke-width="5"/><circle r="${R}" fill="none" stroke="${mau < .35 ? v('--tr-sai') : m}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${(cv * mau).toFixed(1)} ${cv.toFixed(1)}" transform="rotate(-90)"/>`
+  s += `<path d="M0 -34L20 -16V16L0 34L-20 16V-16Z" fill="${YEU ? m : `url(#t${p})`}" stroke="${d}" stroke-width="2"/>`
+  if (!YEU) s += `<path d="M0 -34L-20 -16L-6 -6L0 -34Z" fill="${tr}" opacity=".55"/><path d="M0 -34V34M-20 -16L0 -4L20 -16M-20 16L0 4L20 16" fill="none" stroke="${tr}" stroke-opacity=".35" stroke-width="1.2"/>`
+  if (mau < .6) s += `<path d="M-14 -12l9 7-5 6 8 6-3 9M12 -20l-6 10 7 5-5 8" fill="none" stroke="${tr}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>`
+  if (bi && !YEU) s += [0, 60, 120, 180, 240, 300].map((a) => `<line x1="0" y1="50" x2="0" y2="60" transform="rotate(${a})" stroke="${m}" stroke-width="3" stroke-linecap="round"/>`).join('')
+  return s + '</g>'
+}
 const vatPham = (x, y, k) => k === 'xt'
   ? `<g transform="translate(${x} ${y})">${YEU ? '' : `<circle r="22" fill="${v('--tr-sao')}" opacity=".18" filter="url(#mo)"/>`}<path d="M0-15l13 7.5v15L0 15-13 7.5v-15z" fill="${v('--tr-sao-nhat')}" stroke="${v('--tr-sao-day')}" stroke-width="2"/><path d="M2-9l-7 10h5l-2 8 7-10h-5z" fill="${v('--tr-sao-day')}"/></g>`
   : `<g transform="translate(${x} ${y})">${YEU ? '' : `<circle r="22" fill="${v('--tr-hs')}" opacity=".16" filter="url(#mo)"/>`}<path d="M0-15l13 7.5v15L0 15-13 7.5v-15z" fill="${v('--tr-hs-nhat')}" stroke="${v('--tr-hs-day')}" stroke-width="2"/><path d="M0-8l7 3v4q0 6-7 9q-7-3-7-9v-4z" fill="${v('--tr-hs-day')}"/></g>`
@@ -206,10 +237,10 @@ const dan = (x, y, goc, p, dai = 34) => YEU
 const tia = (x, y, p) => YEU ? '' : `<g transform="translate(${x} ${y})" stroke="${v(p ? '--tr-sai' : '--tr-tin')}" stroke-width="3" stroke-linecap="round">${[0, 60, 120, 180, 240, 300].map((a) => `<line x1="0" y1="9" x2="0" y2="17" transform="rotate(${a})"/>`).join('')}</g>`
 // ─── SÂN 1040 × 520 (phe Bazơ trái, Axit phải); dọc ⇒ quay toạ độ (phe em xuống dưới), chữ vẫn đứng
 const DS_MAC = [
-  { x: 330, y: 185, phe: 0, nt: 'Cl', cap: 3, em: 1 }, { x: 215, y: 345, phe: 0, nt: 'N', cap: 2, ten: 'Thu Hà', mau: .55 },
+  { x: 330, y: 185, phe: 0, nt: 'Cl', cap: 3, em: 1 }, { x: 836, y: 424, phe: 0, nt: 'N', cap: 2, ten: 'Thu Hà', mau: .55 },
   { x: 400, y: 470, phe: 0, nt: 'S', cap: 2, ten: 'A.I Sulfur', ai: 1, mau: .9 },
   { x: 700, y: 185, phe: 1, nt: 'O', cap: 1, ten: 'Quốc Bảo', mau: .3 }, { x: 650, y: 350, phe: 1, nt: 'Fe', cap: 4, ten: 'Ngọc Trâm', mau: .8 },
-  { x: 830, y: 450, phe: 1, nt: 'Ne', cap: 1, ten: 'A.I Neon', ai: 1, mau: .6 }]
+  { x: 900, y: 128, phe: 1, nt: 'Ne', cap: 1, ten: 'A.I Neon', ai: 1, mau: .6 }]
 function san(sw, sh, o = {}) {
   const doc = sh > sw, k = doc ? Math.min(sw / 520, sh / 1040) : Math.min(sw / 1040, sh / 520)
   const P = (x, y) => (doc ? [y, 1040 - x] : [x, y]), FW = doc ? 520 : 1040, FH = doc ? 1040 : 520
@@ -222,8 +253,9 @@ function san(sw, sh, o = {}) {
   const [cx, cy] = P(520, 260)
   s += doc ? `<line x1="0" y1="${cy}" x2="${FW}" y2="${cy}" stroke="${v('--tr-chu')}" stroke-opacity=".12" stroke-width="2" stroke-dasharray="8 8"/>` : `<line x1="${cx}" y1="0" x2="${cx}" y2="${FH}" stroke="${v('--tr-chu')}" stroke-opacity=".12" stroke-width="2" stroke-dasharray="8 8"/>`
   // ba bệ xuất phát mỗi phe (BE_PHE)
-  BE_PHE.forEach((ds, p) => ds.forEach(([x, y], i) => { const [X, Y] = P(x, y), m = v(p ? '--tr-sai' : '--tr-tin')
+  BE_PHE.forEach((ds, p) => ds.forEach(([x, y], i) => { if (i === 1) return; const [X, Y] = P(x, y), m = v(p ? '--tr-sai' : '--tr-tin')
     s += `<g transform="translate(${X} ${Y})"><circle r="24" fill="${m}" opacity=".12"/><circle r="24" fill="none" stroke="${m}" stroke-opacity=".5" stroke-width="2" stroke-dasharray="4 5"/>${i === 1 ? `<text y="4.5" text-anchor="middle" font-size="12" font-weight="800" fill="${v(p ? '--tr-sai-chu' : '--tr-tin-chu')}">${p ? 'H⁺' : 'OH⁻'}</text>` : ''}</g>` }))
+  TINH_THE.forEach(([x, y], p) => { const [X, Y] = P(x, y); s += tinhThe(X, Y, p, (o.tt ?? [.72, .45])[p], (o.biBan ?? -1) === p) })
   for (const c of VAT_CAN) {
     if (c.k === 'tron') { const [X, Y] = P(c.x, c.y); s += c.ve === 'binh-cau' ? binhCau(X, Y, c.r, c.mau) : binhNon(X, Y, c.r, c.mau); continue }
     const [X, Y] = P(c.x + c.w / 2, c.y + c.h / 2); s += c.ve === 'gia-ong' ? giaOng(X, Y, c.w, c.h, doc) : coc(X, Y, c.w, c.mau)
@@ -236,8 +268,11 @@ function san(sw, sh, o = {}) {
   s += `<line x1="${A[0]}" y1="${A[1]}" x2="${B[0]}" y2="${B[1]}" stroke="${v('--tr-tin')}" stroke-width="2" stroke-dasharray="3 7" opacity=".7"/>`
   const gocAB = Math.atan2(B[1] - A[1], B[0] - A[0]) * 180 / Math.PI
   for (const t of [.26, .52, .78]) s += dan(A[0] + (B[0] - A[0]) * t, A[1] + (B[1] - A[1]) * t, gocAB, 0)
-  const C = P(650, 350), D = P(215, 345), gocCD = Math.atan2(D[1] - C[1], D[0] - C[0]) * 180 / Math.PI
-  for (const t of [.3, .62]) s += dan(C[0] + (D[0] - C[0]) * t, C[1] + (D[1] - C[1]) * t, gocCD, 1)
+  // loạt bắn phụ: [từ, tới, phe] — mặc định: Ngọc Trâm bắn Thu Hà, Thu Hà bắn tinh thể Axit
+  for (const [a0, b0, ph, ts] of (o.loat || [[[650, 350], [836, 424], 1, [.35, .7]], [[836, 424], [994, 260], 0, [.3, .62]]])) {
+    const C = P(...a0), D = P(...b0), g = Math.atan2(D[1] - C[1], D[0] - C[0]) * 180 / Math.PI
+    for (const t of ts) s += dan(C[0] + (D[0] - C[0]) * t, C[1] + (D[1] - C[1]) * t, g, ph)
+  }
   s += tia(B[0], B[1], 0)
   s += `<g transform="translate(${B[0]} ${B[1]})" stroke="${v('--tr-tin')}" stroke-width="3" fill="none" stroke-linecap="round">${[0, 90, 180, 270].map((a) => `<path d="M-30 -9 A31 31 0 0 1 -9 -30" transform="rotate(${a})"/>`).join('')}</g>`
   for (const a of (o.ds || DS_MAC)) { const [X, Y] = P(a.x, a.y); s += nguyenTu(X, Y, a) }
@@ -245,12 +280,13 @@ function san(sw, sh, o = {}) {
   return s + '</svg>'
 }
 const roi = `<span class="roi kinh"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${v('--tr-chu')}" stroke-width="2.6" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg>Rời sân</span>`
-function tiSo(a = 7, b = 5, gio = '0:42') {
-  // pH = 7 + 7·(OH⁻ − H⁺)/(OH⁻ + H⁺); em phe Bazơ (trái, đầu thang = 14) ⇒ vị trí kim từ trái = (14 − pH)/14, kẹp 4–96 %
-  const ph = 7 + 7 * (a - b) / ((a + b) || 1), vt = 100 - Math.max(4, Math.min(96, (14 - ph) / 14 * 100))
-  return `<div class="ti kinh"><span class="phe" style="color:${v(TOI ? '--tr-tin' : '--tr-tin-chu')}"><i style="background:${v('--tr-tin-day')}">OH⁻</i><span class="ten">Bazơ</span><span class="so">${a}</span></span>
-    <span class="ph"><span class="vach"></span><span class="kim" style="left:calc(${100 - vt}% - 3px)"></span><span class="gio">${gio}</span></span>
-    <span class="phe" style="color:${v(TOI ? '--tr-sai' : '--tr-sai-chu')}"><span class="so">${b}</span><span class="ten">Axit</span><i style="background:${v('--tr-sai-day')}">H⁺</i></span></div>`
+function tiSo(a = .72, b = .45, gio = '1:12') {
+  // TINH THỂ (thầy 02/11 tối): thanh máu hai tinh thể thay thang pH — mục tiêu ván là giữ tinh thể phe mình, bắn vỡ tinh thể phe bạn
+  const gem = (p) => `<svg width="18" height="22" viewBox="-11 -14 22 28"><path d="M0 -13L10 -6V6L0 13L-10 6V-6Z" fill="${v(p ? '--tr-sai' : '--tr-tin')}" stroke="${v(p ? '--tr-sai-day' : '--tr-tin-day')}" stroke-width="1.5"/></svg>`
+  const thanh = (p, m) => `<span class="tt-thanh" data-phe="${p}"><i style="width:${Math.round(m * 100)}%"></i></span>`
+  return `<div class="ti kinh"><span class="phe" style="color:${v(TOI ? '--tr-tin' : '--tr-tin-chu')}"><i style="background:${v('--tr-tin-day')}">OH⁻</i>${gem(0)}${thanh(0, a)}<span class="pt">${Math.round(a * 100)}%</span></span>
+    <span class="gio2">${gio}</span>
+    <span class="phe" style="color:${v(TOI ? '--tr-sai' : '--tr-sai-chu')}"><span class="pt">${Math.round(b * 100)}%</span>${thanh(1, b)}${gem(1)}<i style="background:${v('--tr-sai-day')}">H⁺</i></span></div>`
 }
 const emO = `<div class="em kinh"><svg width="34" height="34" viewBox="-20 -20 40 40">${defs()}<circle r="15" fill="${YEU ? v('--tr-tin') : 'url(#c0)'}" stroke="${v('--tr-tin-day')}"/><text y="5" text-anchor="middle" font-size="12" font-weight="800" fill="${CHU_NT}">Cl</text></svg>
   <div><div style="display:flex;gap:6px;align-items:center"><b style="font-size:12px">Em</b><span class="cap">Cấp 3</span></div><div class="mau"><i></i></div><small>⚡ trúng 3/5 lên Cấp 4 · hạ 3</small></div></div>`
@@ -259,13 +295,19 @@ function veTran(o = {}) {
   const doc = DOC, padT = doc ? 64 : 52, padB = doc ? 74 : 8
   const sw = W - (doc ? 16 : 20), sh = H - padT - padB
   document.body.insertAdjacentHTML('beforeend', `<div class="tran" style="padding:${padT}px 0 ${padB}px">${san(sw, sh, o)}</div>
-  <div class="hud"><div class="tren">${roi}${tiSo()}${doc ? '' : emO}</div>
+  <div class="hud"><div class="tren">${roi}${tiSo(...(o.tt || [.72, .45]))}${doc ? '' : emO}</div>
   ${doc ? `<div style="position:absolute;left:10px;right:10px;bottom:12px;display:flex;justify-content:center">${emO}</div><div class="xoay kinh" style="top:${padT + 6}px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="7" width="18" height="11" rx="2.5"/><path d="M17 3l2 2-2 2"/></svg>Xoay ngang điện thoại để chơi to hơn</div>` : ''}
-  <div class="tin" style="${doc ? `left:12px;bottom:${padB + 6}px;align-items:flex-start` : 'right:14px;bottom:12px'}">${o.khongTin ? '' : tinHa}</div></div>`)
+  <div class="tin" style="${doc ? `left:12px;bottom:${padB + 118}px;align-items:flex-start` : 'right:14px;bottom:12px'}">${o.khongTin ? '' : doc ? tinHa.split('</span>')[0] + '</span>' : tinHa}</div></div>`)
 }
 // ─── CẢNH
 if (CANH === 'tran') veTran()
-if (CANH === 'goiy') { veTran({ khongTin: 1 }); document.body.insertAdjacentHTML('beforeend', `<div class="goiy kinh"><svg width="44" height="30" viewBox="0 0 44 30"><path d="M4 22 Q22 2 40 18" fill="none" stroke="${v('--tr-hs')}" stroke-width="3" stroke-dasharray="4 5" stroke-linecap="round"/><circle cx="40" cy="18" r="6" fill="${v('--tr-hs')}"/></svg>Kéo để chạy · súng tự ngắm, tự bắn</div>`) }
+if (CANH === 'bao') { // tinh thể phe em đang bị bắn: viền đỏ mềm + dải cảnh báo + tinh thể loé
+  veTran({ khongTin: 1, tt: [.38, .66], biBan: 0, ds: [DS_MAC[0], { x: 190, y: 380, phe: 0, nt: 'N', cap: 2, ten: 'Thu Hà', mau: .4 }, DS_MAC[2], DS_MAC[3],
+    { x: 236, y: 440, phe: 1, nt: 'Fe', cap: 4, ten: 'Ngọc Trâm', mau: .8 }, { x: 214, y: 100, phe: 1, nt: 'Ne', cap: 1, ten: 'A.I Neon', ai: 1, mau: .6 }],
+    loat: [[[236, 440], [46, 260], 1, [.3, .62]], [[214, 100], [46, 260], 1, [.4, .75]], [[190, 380], [236, 440], 0, [.5]]] })
+  document.body.insertAdjacentHTML('beforeend', `<div class="vien-do"></div><div class="bao-tt kinh" style="top:${DOC ? 70 : 58}px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/></svg>Tinh thể phe em đang bị bắn! · còn 38%</div>`)
+}
+if (CANH === 'goiy') { veTran({ khongTin: 1 }); document.body.insertAdjacentHTML('beforeend', `<div class="goiy kinh"><svg width="44" height="30" viewBox="0 0 44 30"><path d="M4 22 Q22 2 40 18" fill="none" stroke="${v('--tr-hs')}" stroke-width="3" stroke-dasharray="4 5" stroke-linecap="round"/><circle cx="40" cy="18" r="6" fill="${v('--tr-hs')}"/></svg><span style="display:flex;flex-direction:column;line-height:1.35">Kéo để chạy · súng tự ngắm, tự bắn<small style="font-size:13px;font-weight:700;color:var(--tr-chu-2)">Giữ tinh thể phe em · bắn vỡ tinh thể phe bạn</small></span></div>`) }
 if (CANH === 'vaothay') {
   veTran({ khongTin: 1, ds: [DS_MAC[0], DS_MAC[1], { x: 62, y: 260, phe: 0, nt: 'Na', cap: 1, ten: 'Gia Huy', mau: 1, khien: 1 }, DS_MAC[3], DS_MAC[4], DS_MAC[5]],
     them: (P) => { const [X, Y] = P(400, 470); return YEU ? '' : `<g transform="translate(${X} ${Y})" fill="${v('--tr-tin')}" opacity=".55">${[[0, 0, 16], [-20, -10, 6], [18, -14, 5], [-8, 20, 4], [22, 12, 7]].map(([a, b, r]) => `<circle cx="${a}" cy="${b}" r="${r}" fill-opacity=".35" stroke="${v('--tr-tin')}" stroke-width="1.5"/>`).join('')}</g>` } })
@@ -275,11 +317,11 @@ if (CANH === 'het') {
   veTran({ khongTin: 1 })
   const hang = (ten, nt, p, st, hh, em) => `<div class="hang" ${em ? 'data-em' : ''}><svg width="30" height="30" viewBox="-17 -17 34 34">${defs()}<circle r="13" fill="${YEU ? v(p ? '--tr-sai' : '--tr-tin') : `url(#c${p})`}" stroke="${v(p ? '--tr-sai-day' : '--tr-tin-day')}"/><text y="4.5" text-anchor="middle" font-size="${nt.length > 1 ? 10 : 12}" font-weight="800" fill="${CHU_NT}">${nt}</text></svg><span><span class="ten">${ten}</span><small>${st}</small></span><span class="hh"><svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="${v('--tr-sao')}"/><path d="M12 6l1.8 3.8 4.2.5-3.1 2.9.8 4.1L12 15.3 8.3 17.3l.8-4.1L6 10.3l4.2-.5z" fill="${v('--tr-trang')}"/></svg>${hh}</span></div>`
   document.body.insertAdjacentHTML('beforeend', `<div class="phu"><div class="ket kinh">
-    <h2 style="color:${v(TOI ? '--tr-tin' : '--tr-tin-chu')}">Phe Bazơ thắng!</h2>
-    <div class="phu-dong">Phe em thắng · em nhận huy hiệu <b>Bền bỉ</b></div>
-    <div class="ph-lon"><span class="vach"></span><span class="kim" style="left:43%">pH 8 · Bazơ 12 – 9 Axit</span><span class="n" style="left:0">14 · bazơ</span><span class="n" style="left:46%">7 · trung hoà</span><span class="n" style="right:0">0 · axit</span></div>
+    <h2 style="color:${v(TOI ? '--tr-tin' : '--tr-tin-chu')}">Phe Bazơ phá vỡ tinh thể Axit!</h2>
+    <div class="phu-dong">Phe em thắng sớm (còn 1:12) · em nhận huy hiệu <b>Phá tinh thể</b></div>
+    <div class="kq-tt"><span class="kinh" data-phe="0"><svg width="26" height="32" viewBox="-13 -16 26 32"><path d="M0 -15L12 -7V7L0 15L-12 7V-7Z" fill="${v('--tr-tin')}" stroke="${v('--tr-tin-day')}" stroke-width="1.5" /></svg><span>Tinh thể Bazơ<b>còn 64%</b></span></span><span class="kinh" data-phe="1"><svg width="26" height="32" viewBox="-13 -16 26 32"><path d="M0 -15L12 -7V7L0 15L-12 7V-7Z" fill="${v('--tr-sai')}" stroke="${v('--tr-sai-day')}" stroke-width="1.5" opacity=".45"/><path d="M-6 -9l5 6-3 4 5 5-2 6M6 -12l-3 7 4 3-3 6" fill="none" stroke="${v('--tr-chu')}" stroke-width="1.6" stroke-linecap="round"/></svg><span>Tinh thể Axit<b>đã vỡ</b></span></span></div>
     <div class="cot2"><div class="doi-the" data-phe="0"><div class="doi-dau"><span class="cap" style="background:${v('--tr-tin-day')};color:${v('--tr-trang')}">OH⁻</span>Phe Bazơ<span class="tong">12</span></div>
-      ${hang('Em', 'Cl', 0, 'trụ liền 24 giây', 'Bền bỉ', 1)}${hang('Thu Hà', 'N', 0, 'hạ 5 lần', 'Xạ thủ')}${hang('Gia Huy', 'Na', 0, 'lên Cấp 4 đầu tiên', 'Lên cấp nhanh')}</div>
+      ${hang('Em', 'Cl', 0, 'bắn trúng tinh thể 18 lần', 'Phá tinh thể', 1)}${hang('Thu Hà', 'N', 0, 'hạ 5 lần', 'Xạ thủ')}${hang('Gia Huy', 'Na', 0, 'chặn 4 lần gần tinh thể', 'Hộ vệ')}</div>
     <div class="doi-the" data-phe="1"><div class="doi-dau"><span class="cap" style="background:${v('--tr-sai-day')};color:${v('--tr-trang')}">H⁺</span>Phe Axit<span class="tong">9</span></div>
       ${hang('Quốc Bảo', 'O', 1, 'trúng 26 viên', 'Bắn trúng nhiều')}${hang('Ngọc Trâm', 'Fe', 1, 'góp sức 4 lần hạ', 'Đồng đội cứu nguy')}${hang('A.I Neon', 'Ne', 1, 'lấp ghế', 'Lấp ghế')}</div></div>
     <div class="day-dong"><div class="day-ket"><span class="pu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></svg>Hay đấy!</span><span class="pu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 14q4 4 8 0M9 9.5h.01M15 9.5h.01"/></svg>Suýt nữa!</span><span class="pu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c4 0 7-2.7 7-6.6 0-4.4-4-6.4-4.6-10.4C11 6 9.6 8.6 9.6 11 8 10.6 7 9 7 9c-1.3 1.8-2 3.6-2 5.4C5 18.3 8 21 12 21z"/></svg>Đấu lại nhé</span><span class="pu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Chơi đẹp</span></div>
@@ -293,8 +335,8 @@ if (CANH === 'sanh') {
   const oGhe = (nt, p, ten, mo) => `<span class="o-ghe" style="opacity:${mo ? .55 : 1}"><svg width="40" height="40" viewBox="-21 -21 42 42">${defs()}<circle r="15" fill="${YEU ? v(p ? '--tr-sai' : '--tr-tin') : `url(#c${p})`}" stroke="${v(p ? '--tr-sai-day' : '--tr-tin-day')}"/>${ten === 'Em' ? `<circle r="18" fill="none" stroke="${v('--tr-tin')}" stroke-width="2.5"/>` : ''}<text y="5" text-anchor="middle" font-size="${nt.length > 1 ? 11 : 13}" font-weight="800" fill="${CHU_NT}">${nt}</text></svg>${ten}</span>`
   const xem = `<div class="xem kinh">${san(rong ? Math.min(620, W * .46) : W - 64, rong ? (H < 500 ? H - 120 : 330) : 170)}</div>`
   const dieuKhien = `<div class="ghe"><span class="doi">${oGhe('Cl', 0, 'Em')}${oGhe('S', 0, 'A.I', 1)}${oGhe('N', 0, 'A.I', 1)}</span><span class="vs">3 đấu 3</span><span class="doi">${oGhe('O', 1, 'A.I', 1)}${oGhe('Fe', 1, 'A.I', 1)}${oGhe('Ne', 1, 'A.I', 1)}</span></div>
-    <button class="nut-dau"><svg width="28" height="28" viewBox="-14 -14 28 28" fill="none" stroke="${v('--tr-hs-tren')}" stroke-width="2"><circle r="4" fill="${v('--tr-hs-tren')}"/><ellipse rx="12" ry="4.5"/><ellipse rx="12" ry="4.5" transform="rotate(60)"/><ellipse rx="12" ry="4.5" transform="rotate(120)"/></svg><span style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.15">Đấu<small>vào sân ngay · ván 60 giây</small></span></button>
-    <div class="luat">Thiếu bạn thì <b>A.I</b> vào thay · bạn vào là A.I nhường chỗ.<br>Súng tự ngắm, tự bắn — em chỉ việc <b>kéo để chạy</b>.</div>
+    <button class="nut-dau"><svg width="28" height="28" viewBox="-14 -14 28 28" fill="none" stroke="${v('--tr-hs-tren')}" stroke-width="2"><circle r="4" fill="${v('--tr-hs-tren')}"/><ellipse rx="12" ry="4.5"/><ellipse rx="12" ry="4.5" transform="rotate(60)"/><ellipse rx="12" ry="4.5" transform="rotate(120)"/></svg><span style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.15">Đấu<small>vào sân ngay · ván 90 giây</small></span></button>
+    <div class="luat"><b>Bắn vỡ tinh thể phe bạn trước là thắng</b> — nhớ giữ tinh thể phe em.<br>Thiếu bạn thì A.I vào thay · Súng tự ngắm, tự bắn — em chỉ việc <b>kéo để chạy</b>.</div>
     <div><div class="the-dau" style="margin-bottom:6px"><small>Nguyên tử của em</small><small style="text-transform:none;letter-spacing:0">Ẩn tên ○</small></div>
     <div class="nt">${nts.map((n) => `<span class="o-nt" ${n === 'Cl' ? 'data-chon' : ''}><span style="text-align:left">${Z[n]}</span><b>${n}</b><span>${NT[n]}</span></span>`).join('')}</div>${rong ? '' : '<div class="nt-ten">Em đang là <b>Clo · Cl</b> — chạm ô khác để đổi</div>'}</div>`
   document.body.insertAdjacentHTML('beforeend', `<div class="trang" style="${rong ? 'max-width:1040px;margin:0 auto;justify-content:center' : ''}">

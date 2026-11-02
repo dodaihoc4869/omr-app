@@ -18,7 +18,7 @@ Mọi thứ đổi luật chơi đều nằm ở mục «Đề xuất — cần 
 | `bang-1-tran.jpg` | Trận đấu: cũ và mới; ngang sáng / tối, máy yếu, dọc 390, máy tính 1440 |
 | `bang-2-sanh.jpg` | Phòng chờ của game (sảnh): 390 sáng / tối, ngang 844, 1440 |
 | `bang-3-het-van.jpg` | Hết ván: 844 sáng / tối, 390 |
-| `bang-4-goi-y-vao-thay.jpg` | Gợi ý lần đầu 3 giây; bạn vào thay A.I |
+| `bang-4-goi-y-vao-thay.jpg` | Gợi ý lần đầu 3 giây; bạn vào thay A.I; tinh thể phe em bị bắn |
 
 Ảnh lẻ nằm trong `anh/`. Chụp lại bằng hai lệnh:
 
@@ -166,6 +166,20 @@ Sân thu nhỏ ở sảnh là ảnh tĩnh vẽ tại máy, không nối mạng, 
   - máy yếu: 1 vòng, không vệt.
 - **Ảnh app thật sau build:** 3 khổ × sáng / tối. Yêu cầu: 0 lỗi trang, 0 tràn, đích bấm ≥ 44 px, không lộ số báo danh.
 - **Sau gộp:** chạy tác tử `toc-do` (luật 27/10).
+
+## LUẬT TINH THỂ (thầy 02/11 tối: «Cho mỗi bên một tinh thể, bên nào tinh thể bị bắn vỡ trước là thua, vừa phải chiến đấu bảo vệ tinh thể vừa phải bắn vỡ tinh thể đối phương») — CẦN THẦY GẬT CÙNG LÚC DUYỆT ẢNH
+
+| Điểm | Đề xuất |
+|---|---|
+| Vị trí | Mỗi phe một tinh thể ở đầu sân của mình, sau tường giá ống (Bazơ (46, 260), Axit (994, 260) — đối xứng gương như mọi thứ trên sân). Bệ giữa dời ra trước (102 / 938). Bắn từ giữa sân thẳng vào bị giá ống chắn ⇒ phải vòng hai cánh mới bắn được. |
+| Máu | Tinh thể 60 máu; mỗi viên đạn phe bạn trúng −1; vòng máu quanh tinh thể + thanh trên cùng (thay thang pH). Dưới 60 % hiện vết nứt. Tinh thể không tự hồi. |
+| Thắng / thua | Tinh thể phe nào vỡ trước ⇒ phe kia thắng ngay. Hết giờ mà chưa vỡ ⇒ phe còn nhiều máu tinh thể hơn thắng; bằng ⇒ hoà. Ván dài **90 giây** (60 giây ít khi kịp phá tinh thể). |
+| Súng tự ngắm | Ưu tiên bạn phe kia trong tầm (giữ như cũ); không có ai ⇒ tự bắn tinh thể phe kia nếu trong tầm ⇒ em chỉ cần chạy tới gần là bắn tinh thể. |
+| Bảo vệ | Tinh thể phe em bị bắn ⇒ dải kính đỏ «Tinh thể phe em đang bị bắn! · còn 38 %» 2 giây + viền màn đỏ mềm (máy yếu: viền mảnh, không loé) — ảnh `bao-*`. |
+| A.I | 1 A.I mỗi phe ở lại giữ tinh thể, các A.I khác đi phá tinh thể phe kia (A.I vẫn bắn chậm hơn 25 %). |
+| Huy hiệu | Thêm «Phá tinh thể» (bắn trúng tinh thể nhiều nhất) và «Hộ vệ» (hạ / chặn nhiều nhất gần tinh thể phe mình); bỏ «Nhặt electron giỏi». |
+| Hết ván | Tiêu đề «Phe Bazơ phá vỡ tinh thể Axit!», hai ô «Tinh thể Bazơ còn 64 %» · «Tinh thể Axit đã vỡ» thay thang pH lớn. |
+| Kỹ thuật | Lõi `loi.ts` thêm hai tinh thể (vòng va chạm r 22, đạn chạm ⇒ trừ máu), sự kiện `{t:'tt', phe, mau}` + `{t:'vo', phe}`; phòng (Durable Object) kết thúc ván khi vỡ; gói tin thêm 2 số máu; `PHIEN_BAN` 4 (gộp cùng lượt bỏ electron). Vẫn 0 lệnh D1. |
 
 ## Luật lên cấp khi bỏ electron — CẦN THẦY GẬT CÙNG LÚC DUYỆT ẢNH
 Em đề xuất: **mỗi lần đạn em trúng đối thủ = +1**; đủ 3 / 5 / 7 / 9 lần (đúng ngưỡng `CAN_E` cũ) thì lên Cấp 2 / 3 / 4 / 5. Bị hạ: giữ cấp, bộ đếm về 0 (như electron cũ).
