@@ -49,9 +49,9 @@ function boDemDot(goc: Env['DB']) {
     for (;;) {
       await raNgoai()
       if (xong) break
-      // 02/11: chờ hàng đứng yên 5 ms rồi mới thả — lệnh D1 của nhánh song song còn đợi việc KHÔNG phải D1 (crypto kiểm token chạy luồng nền) không bị tính
+      // 02/11: chờ hàng đứng yên 20 ms rồi mới thả (vẫn ≪ ~170 ms một đợt D1 thật) — lệnh D1 của nhánh song song còn đợi việc KHÔNG phải D1 (crypto kiểm token chạy luồng nền) không bị tính
       // thành đợt riêng khi máy bận (đỏ chập chờn nopNguoi 5/4). Không gộp được lệnh PHỤ THUỘC: lệnh sau chỉ sinh ra khi lệnh trước đã được thả.
-      if (hang.length) { for (let n = -1; n !== hang.length && !xong;) { n = hang.length; await new Promise((r) => setTimeout(r, 5)) } dot++; for (const f of hang.splice(0)) f() }
+      if (hang.length) { for (let n = -1; n !== hang.length && !xong;) { n = hang.length; await new Promise((r) => setTimeout(r, 20)) } dot++; for (const f of hang.splice(0)) f() }
     }
     const lenh = lan - lan0 - hang.length
     let phuXong = false
