@@ -57,14 +57,16 @@ function xinGom(qid: string): Promise<void> {
   hangCho.add(qid)
   return henGom!
 }
-const daXin = new Set<string>()
+// Câu đã xin mà máy chủ chưa có bản (máy soạn chưa tới / ca còn bảo vệ): xin lại sau 10 phút, không xin dồn mỗi lần mở.
+const XIN_LAI_MS = 10 * 60_000
+const daXin = new Map<string, number>()
 
 /** Mở gói Kính của câu (bản THÔ còn `_goc` — nơi vẽ sắp theo câu đã phát bằng `xepTheoCauPhat`). Chưa có ⇒ xin máy chủ một lần (gom). Không có / hỏng ⇒ null. */
 export async function banKinhCua(qid: string): Promise<unknown | null> {
   const g = kho()[qid]
   if (!g) {
     await dangTai.get(qid)
-    if (!kho()[qid] && !daXin.has(qid)) { daXin.add(qid); await xinGom(qid) }
+    if (!kho()[qid] && Date.now() - (daXin.get(qid) ?? 0) > XIN_LAI_MS) { daXin.set(qid, Date.now()); await xinGom(qid) }
     if (!kho()[qid]) return null
   }
   const dm = kho()[qid]!.dm
