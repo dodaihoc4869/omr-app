@@ -15,7 +15,7 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { kiemBanKinh, kiemCong, THAN_CHU } from './kiem-kinh.bundle.mjs'
+import { THAN_CHU } from './kiem-kinh.bundle.mjs'
 
 const DAY = path.dirname(fileURLToPath(import.meta.url))
 const GOC = path.resolve(DAY, '../..')
@@ -76,7 +76,23 @@ function chonMuc(v, toiDa = 6) {
 }
 
 // ---------------------------------------------------------------- dựng lô
-const dapAnChu = (v) => v.phan === 'III' ? String(v.dapAn?.kq ?? '') : v.phan === 'I' ? (Object.entries(v.dapAn || {}).find(([, d]) => d === 'D')?.[0] ?? '') : ['a', 'b', 'c', 'd'].map((k) => v.dapAn?.[k] ?? '?').join('')
+const BO_KIEM_LO = `import fs from 'node:fs'
+import { THAN_CHU } from './kiem-kinh.bundle.mjs'
+let dat = 0, tong = 0
+for (const f of fs.readdirSync('vao').filter((x) => x.endsWith('.json') && !x.endsWith('.muc.json')).sort()) {
+  tong++
+  const v = JSON.parse(fs.readFileSync('vao/' + f, 'utf8')), muc = JSON.parse(fs.readFileSync('vao/' + f.replace(/\\.json$/, '.muc.json'), 'utf8'))
+  if (!fs.existsSync('ra/' + f)) { console.log(f + ': CHƯA CÓ ra/' + f); continue }
+  let ban = null; try { ban = JSON.parse(fs.readFileSync('ra/' + f, 'utf8')) } catch (e) { console.log(f + ': TRƯỢT · JSON hỏng ' + e.message); continue }
+  const dapAn = v.phan === 'III' ? String(v.dapAn?.kq ?? '') : v.phan === 'I' ? (Object.entries(v.dapAn || {}).find(([, d]) => d === 'D')?.[0] ?? '') : ['a','b','c','d'].map((k) => v.dapAn?.[k] ?? '?').join('')
+  const luaChon = v.phan === 'I' ? Object.fromEntries((v.y || []).map((y) => [y.id, String(y.t || '').replace(/<[^>]*>/g, ' ')])) : undefined
+  const kiemSo = ({ soDo, buoc, ketQua }) => { const k = kiemCong({ qid: v.qid, phienBan: 1, deNoiGi: '', ...(soDo ? { soDo } : {}), buoc, ...(ketQua ? { ketQua } : {}) }, { phan: v.phan, dapAn, ...(luaChon ? { luaChon } : {}) }); return { ok: k.ket === 'dat' || k.ket === 'lo_dap_an', lyDo: k.lyDo } }
+  const k = kiemBanKinh(ban, { phan: v.phan, dapAn, qid: v.qid, kiemSo, nguon: { thanChu: THAN_CHU.map((t) => t.chu), thayNoi: muc.flatMap((m) => m.noi), meo: muc.map((m) => m.meo).filter(Boolean) } })
+  if (k.ket === 'dat') dat++
+  console.log(f + ': ' + (k.ket === 'dat' ? 'ĐẠT' : k.ket.toUpperCase() + ' · ' + k.lyDo) + (k.boKhoi.length ? '\\n   ! bỏ khối: ' + k.boKhoi.join('; ') : ''))
+}
+console.log('TỔNG: ' + dat + '/' + tong + ' đạt')
+`
 function dungLo(lo, luong) {
   const dir = path.join(THU_MUC_LAM, new Date().toISOString().slice(0, 10), `${luong}-${lo.bo || 'X'}-${lo.maLuot.slice(0, 8)}`)
   fs.mkdirSync(path.join(dir, 'vao/img'), { recursive: true }); fs.mkdirSync(path.join(dir, 'ra'), { recursive: true })
@@ -101,23 +117,6 @@ function dungLo(lo, luong) {
   fs.writeFileSync(path.join(dir, 'kiem.mjs'), BO_KIEM_LO)
   return { dir, tep }
 }
-const BO_KIEM_LO = `import fs from 'node:fs'
-import { kiemBanKinh, kiemCong, THAN_CHU } from './kiem-kinh.bundle.mjs'
-let dat = 0, tong = 0
-for (const f of fs.readdirSync('vao').filter((x) => x.endsWith('.json') && !x.endsWith('.muc.json')).sort()) {
-  tong++
-  const v = JSON.parse(fs.readFileSync('vao/' + f, 'utf8')), muc = JSON.parse(fs.readFileSync('vao/' + f.replace(/\\.json$/, '.muc.json'), 'utf8'))
-  if (!fs.existsSync('ra/' + f)) { console.log(f + ': CHƯA CÓ ra/' + f); continue }
-  let ban = null; try { ban = JSON.parse(fs.readFileSync('ra/' + f, 'utf8')) } catch (e) { console.log(f + ': TRƯỢT · JSON hỏng ' + e.message); continue }
-  const dapAn = v.phan === 'III' ? String(v.dapAn?.kq ?? '') : v.phan === 'I' ? (Object.entries(v.dapAn || {}).find(([, d]) => d === 'D')?.[0] ?? '') : ['a','b','c','d'].map((k) => v.dapAn?.[k] ?? '?').join('')
-  const luaChon = v.phan === 'I' ? Object.fromEntries((v.y || []).map((y) => [y.id, String(y.t || '').replace(/<[^>]*>/g, ' ')])) : undefined
-  const kiemSo = ({ soDo, buoc, ketQua }) => { const k = kiemCong({ qid: v.qid, phienBan: 1, deNoiGi: '', ...(soDo ? { soDo } : {}), buoc, ...(ketQua ? { ketQua } : {}) }, { phan: v.phan, dapAn, ...(luaChon ? { luaChon } : {}) }); return { ok: k.ket === 'dat' || k.ket === 'lo_dap_an', lyDo: k.lyDo } }
-  const k = kiemBanKinh(ban, { phan: v.phan, dapAn, qid: v.qid, kiemSo, nguon: { thanChu: THAN_CHU.map((t) => t.chu), thayNoi: muc.flatMap((m) => m.noi), meo: muc.map((m) => m.meo).filter(Boolean) } })
-  if (k.ket === 'dat') dat++
-  console.log(f + ': ' + (k.ket === 'dat' ? 'ĐẠT' : k.ket.toUpperCase() + ' · ' + k.lyDo) + (k.boKhoi.length ? '\\n   ! bỏ khối: ' + k.boKhoi.join('; ') : ''))
-}
-console.log('TỔNG: ' + dat + '/' + tong + ' đạt')
-`
 function moiTruongPhienSoan() {
   const env = { ...process.env, OMR_MA_BI_MAT: '' }
   for (const k of Object.keys(env)) if (/^(CLAUDECODE|SESSION_INGRESS_URL|CLAUDE_CODE_(SESSION_ID|REMOTE_SESSION_ID|CHILD_SESSION|SYNC_SESSION_REFS|POST_FOR_SESSION_INGRESS_V2|MESSAGING_\w+))$/.test(k)) delete env[k]

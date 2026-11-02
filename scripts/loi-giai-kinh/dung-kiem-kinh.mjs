@@ -10,7 +10,7 @@ export async function dungKiemKinh() {
   const r = await build({
     stdin: { contents: "export * from './src/lib/loi-giai-kinh/kiem'; export { kiemCong } from './server/src/so-do-cong'; export { THAN_CHU } from './server/src/kinh-than-chu'", resolveDir: GOC, loader: 'ts', sourcefile: 'kiem-kinh-vao.ts' },
     bundle: true, format: 'esm', platform: 'node', target: 'node18', write: false, legalComments: 'none', charset: 'utf8',
-    banner: { js: '// TỆP SINH TỰ ĐỘNG — đừng sửa tay. Dựng: node scripts/loi-giai-kinh/dung-kiem-kinh.mjs' },
+    banner: { js: '/* eslint-disable */\n// TỆP SINH TỰ ĐỘNG — đừng sửa tay. Dựng: node scripts/loi-giai-kinh/dung-kiem-kinh.mjs' },
   })
   return r.outputFiles[0].text
 }

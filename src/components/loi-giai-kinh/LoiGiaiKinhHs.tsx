@@ -21,13 +21,15 @@ export interface LoiGiaiKinhHsProps {
 }
 
 export default function LoiGiaiKinhHs({ qid, phan, choices, ideas, dapAn, em, duPhong, children }: LoiGiaiKinhHsProps) {
-  const [ban, setBan] = useState<BanKinh | null | undefined>(undefined)
+  // Kết quả gắn với câu đã mở: đổi câu ⇒ chưa có kết quả (undefined) tới khi gói của câu mới mở xong — không setState đồng bộ trong effect.
+  const khoa = `${qid}|${dapAn}`
+  const [kq, setKq] = useState<{ khoa: string; ban: BanKinh | null } | null>(null)
   useEffect(() => {
     let con = true
-    setBan(undefined)
-    banKinhCua(qid).then((tho) => { if (con) setBan(tho ? xepTheoCauPhat(tho, { phan, choices, ideas, correct: dapAn }) : null) }, () => { if (con) setBan(null) })
+    banKinhCua(qid).then((tho) => { if (con) setKq({ khoa, ban: tho ? xepTheoCauPhat(tho, { phan, choices, ideas, correct: dapAn }) : null }) }, () => { if (con) setKq({ khoa, ban: null }) })
     return () => { con = false }
-  }, [qid, phan, choices, ideas, dapAn])
+  }, [khoa, qid, phan, choices, ideas, dapAn])
+  const ban = kq && kq.khoa === khoa ? kq.ban : undefined
   if (ban === undefined) return <div className="lgk-cho" aria-busy="true" style={{ minHeight: 120 }} />
   if (!ban) return <>{duPhong}</>
   const luaChon = phan === 'I' ? choices : phan === 'II' ? ideas : undefined

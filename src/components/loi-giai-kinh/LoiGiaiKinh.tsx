@@ -3,7 +3,7 @@
 // → sơ đồ + MỘT phép tính bấm từng số → thầy giảng (thần chú · thầy nói · mẹo) → vì sao từng phương án / ý → chỗ hay nhầm (đoán rồi lật) → tự trả lời trước
 // → thẻ nhớ (tự vào hộp thẻ 5 ngăn). Bố cục theo BỀ RỘNG KHUNG CHỨA (container query): hẹp một cột, rộng hai cột (tấm lời giải ở cột phải khi xoay ngang
 // vẫn một cột; trang rộng / Fold mở / máy tính hai cột). Chuyển động chỉ transform / opacity ≤ 280 ms, một lượt; máy yếu / giảm chuyển động chỉ hiện dần.
-import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { Fragment, useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { BanKinh, CanhKinh, PhanKinh } from '../../lib/loi-giai-kinh/kieu'
 import { ChuTron, CongThuc } from '../goi-y-cham/so-do-thay'
 import { themTheNho } from '../../lib/loi-giai-kinh/the-nho'
@@ -108,13 +108,13 @@ function Hinh({ ten }: { ten?: string }) {
 function useChayMotLuot(n: number, t = 3400, batDau = 1) {
   const [buoc, setBuoc] = useState(batDau)
   const [chay, setChay] = useState(false)
-  const goc = useRef<HTMLElement | null>(null)
+  const [goc, datGoc] = useState<HTMLElement | null>(null)
   useEffect(() => {
-    if (batDau === 0 || typeof IntersectionObserver === 'undefined' || !goc.current) return
+    if (batDau === 0 || typeof IntersectionObserver === 'undefined' || !goc) return
     const io = new IntersectionObserver((ds) => { if (ds[0]?.isIntersecting) { io.disconnect(); setBuoc(1); setChay(true) } }, { threshold: 0.5 })
-    io.observe(goc.current)
+    io.observe(goc)
     return () => io.disconnect()
-  }, [batDau])
+  }, [batDau, goc])
   useEffect(() => {
     if (!chay) return
     const an = () => { if (document.hidden) setChay(false) }
@@ -124,7 +124,7 @@ function useChayMotLuot(n: number, t = 3400, batDau = 1) {
   }, [chay, buoc, n, t])
   const den = (k: number, choi = false) => { setBuoc(k); setChay(choi) }
   const nut = () => (chay ? setChay(false) : den(buoc >= n ? 1 : Math.max(1, buoc), true))
-  return { buoc, chay, den, nut, goc, t }
+  return { buoc, chay, den, nut, datGoc, t }
 }
 function Vach({ n, buoc, chay, den, t, nhan }: { n: number; buoc: number; chay: boolean; den: (k: number) => void; t: number; nhan: string }) {
   return (
@@ -146,9 +146,9 @@ function NutChay({ chay, buoc, n, onClick, chuDau = 'Chạy tiếp' }: { chay: b
 }
 function Phim({ ban }: { ban: BanKinh }) {
   const n = ban.phim.length
-  const p = useChayMotLuot(n)
+  const { datGoc, ...p } = useChayMotLuot(n)
   return (
-    <section className="lgk-the lgk-phim" ref={(e) => { p.goc.current = e }} aria-label="Thầy dẫn từng bước">
+    <section className="lgk-the lgk-phim" ref={datGoc} aria-label="Thầy dẫn từng bước">
       <div className="lgk-dau"><span className="lgk-nhan">Thầy dẫn từng bước</span><span className="lgk-dem">Bước {p.buoc}/{n}</span></div>
       <Vach n={n} buoc={p.buoc} chay={p.chay} den={(k) => p.den(k)} t={p.t} nhan="Bước" />
       <div className="lgk-phim-san">
@@ -173,11 +173,11 @@ function Canh({ canh }: { canh: CanhKinh }) {
 }
 function CanhCanBang({ canh }: { canh: Extract<CanhKinh, { loai: 'can-bang' }> }) {
   const n = canh.tacDong.length
-  const p = useChayMotLuot(n, 3600)
+  const { datGoc, ...p } = useChayMotLuot(n, 3600)
   const td = canh.tacDong[p.buoc - 1]
   const x = td?.chieu === 'thuan' ? 1 : td?.chieu === 'nghich' ? -1 : 0
   return (
-    <section className="lgk-the lgk-canh" ref={(e) => { p.goc.current = e }} aria-label="Bấm tác động, xem cân bằng chuyển dịch">
+    <section className="lgk-the lgk-canh" ref={datGoc} aria-label="Bấm tác động, xem cân bằng chuyển dịch">
       <div className="lgk-dau"><span className="lgk-nhan">Bấm tác động</span><span className="lgk-dem">{p.buoc}/{n}</span></div>
       <div className="lgk-cb" data-chieu={td?.chieu}>
         <div className="lgk-cb-ve" data-sang={x < 0 ? '' : undefined}><b><CongThuc chu={canh.trai} /></b>{canh.nhanTrai && <span>{canh.nhanTrai}</span>}</div>
@@ -193,10 +193,10 @@ function CanhCanBang({ canh }: { canh: Extract<CanhKinh, { loai: 'can-bang' }> }
 const MAU_LOP: Record<string, string> = { trong: 'trong', xanh: 'xanh', cam: 'cam', vang: 'vang', hong: 'hong', tim: 'tim', nau: 'nau', 'trang-duc': 'trang-duc' }
 function CanhOngNghiem({ canh }: { canh: Extract<CanhKinh, { loai: 'ong-nghiem' }> }) {
   const n = canh.buoc.length
-  const p = useChayMotLuot(n, 3600)
+  const { datGoc, ...p } = useChayMotLuot(n, 3600)
   const b = canh.buoc[p.buoc - 1]!
   return (
-    <section className="lgk-the lgk-canh" ref={(e) => { p.goc.current = e }} aria-label="Thí nghiệm">
+    <section className="lgk-the lgk-canh" ref={datGoc} aria-label="Thí nghiệm">
       <div className="lgk-dau"><span className="lgk-nhan">Thí nghiệm</span><span className="lgk-dem">Bước {p.buoc}/{n}</span></div>
       <Vach n={n} buoc={p.buoc} chay={p.chay} den={(k) => p.den(k)} t={p.t} nhan="Bước thí nghiệm" />
       <div className="lgk-on">
