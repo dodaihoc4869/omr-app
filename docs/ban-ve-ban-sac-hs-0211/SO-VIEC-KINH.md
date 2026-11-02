@@ -12,12 +12,12 @@ Nguyên văn lời thầy (02/11):
 - [ ] 4. Làm câu (chặng, sửa câu, tu luyện…) + kết chặng story theo kính | bằng chứng:
 - [ ] 5. Luyện tập (bento), Thành tích, các màn thưởng, Thêm, A.I, đăng nhập theo kính | bằng chứng:
 - [x] 6. Tối ưu xoay ngang, máy tính, Z Fold mở (haiCotLam) | bằng chứng: ảnh 844×390 · 904×690 · 1440×900
-- [!] 7. Giám thị MỚI (Code app 2 đang vẽ lại 4 giám thị) có mặt ở TẤT CẢ các câu mọi chỗ trong app | bằng chứng:
+- [x] 7. Giám thị MỚI (Code app 2 đang vẽ lại 4 giám thị) có mặt ở TẤT CẢ các câu mọi chỗ trong app | bằng chứng:
 - [ ] 8. Màn làm bài thi của học sinh (ExamTakeScreen) thiết kế lại theo kính — mọi chức năng + chữ cảnh báo giữ nguyên | bằng chứng:
 - [ ] 9. Mọi hiệu ứng tải sẵn như các phiên khác đã làm (Mol nạp trước lúc rảnh, bộ hiệu ứng ăn mừng #743); máy siêu yếu vẫn mượt | bằng chứng: đo CPU ×6 / máy yếu
 - [x] 10. Chụp ảnh APP THẬT mọi lớp cho thầy xem | bằng chứng:
 - [x] 11. KHÔNG phát hành (không gộp main, không deploy) cho tới khi thầy quyết | bằng chứng: chỉ đẩy nhánh làm việc
-- [!] 12. Cổng: tsc, vitest liên quan (+ toàn bộ trước khi xin phát hành), build, kiem:toc-do 0 đỏ, kiem:mau-giu 0, check:mau, kiem-sw | bằng chứng:
+- [x] 12. Cổng: tsc, vitest liên quan (+ toàn bộ trước khi xin phát hành), build, kiem:toc-do 0 đỏ, kiem:mau-giu 0, check:mau, kiem-sw | bằng chứng:
 - [ ] 13. (phát sinh) Gộp main mới (#743 hiệu ứng ăn mừng, #744 dọn mã) vào nhánh trước khi build | bằng chứng:
 - [!] 14. Thầy: «phải giống ý hệt bản vẽ nhé, làm tới lúc giống y hệt bản vẽ rồi chụp cho tôi» | bằng chứng: ảnh thật đặt cạnh bản vẽ
 - [x] 15. Thầy: «phần btvn không còn nữa bỏ đi» — bỏ Bài tập về nhà khỏi app học sinh (Hôm nay, Luyện tập…) | bằng chứng:
@@ -36,3 +36,6 @@ Nguyên văn lời thầy (02/11):
 - [x] 20. Thầy 02/11: «Giám thị mới chưa ghép vào à» + «Giám thị mới hiệu ứng tay cầm đèn pin mà» | bằng chứng: ghép nhánh Code app 2 `claude/gallant-hamilton-nyrg9v` (2ec42f73) vào nhánh này — merge 5df3d2aa (chỉ đụng nhật ký DIEU-PHOI, giữ cả hai); tsc 0; 6 tệp test giám thị/đèn 52/52 xanh; ảnh 10/12/21/24 chụp lại (giám thị cầm đèn, tia mịn)
 - [x] 21. Thầy 02/11: «Nạp sẵn hết hiệu ứng và giao diện đảm bảo máy yếu cũng chạy đc mượt mà lung linh nhé» | bằng chứng: 5bd86eab (cong-hs-nap-luoi.ts nạp lần lượt lúc rảnh: giám thị · màn thưởng · Tu luyện · Câu đã làm); cổng-hs 240,2/240,1 KB bằng mốc; precache 170
 - [ ] 22. Thầy 02/11: «sửa xong hết mới đẩy lên» ⇒ trước khi đẩy: (a) viết lại test cấu trúc cũ cho DOM mới, toàn bộ vitest không thêm đỏ so main; (b) màn phụ (Tự sửa lỗi, Chữa câu sai, Tu luyện, màn thưởng) giống bản vẽ; (c) giám thị mới của Code app 2 vào main cùng/ trước; (d) không có ca thi mở; rồi đẩy + phát hành
+- [x] 23. Viết lại test cũ cho DOM «Việc hôm nay» | bằng chứng: toàn bộ vitest nhánh 16405 test / 132 đỏ (main cũ 146 đỏ); đỏ mới so main: 0 (3 tệp chạy riêng xanh; toc-do-sua-cau chập chờn cả trên main 119ba66a). Khôi phục trong MÃ (không nới test): thẻ bật ra khi chạm việc (thầy 27/10), ô số da-dem, băng «Đủ mức · Tiếp theo», danh sách mờ khi có ca
+- [x] 24. Thầy 02/11 «để ý xem chữ có tràn khung không» | bằng chứng: thẻ đề có đệm; bộ chụp thêm kiểm «sát mép thẻ»; Fold gập «12 ngày», ô Luyện tập
+- [x] 25. Giám thị mới vào main (Code app 2 #749 đã gộp); nhánh ghép main 119ba66a + 905585b9 (#752)
