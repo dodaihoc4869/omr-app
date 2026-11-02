@@ -142,6 +142,21 @@ describe('Code2 delta B: normal homework validates before final/progress/events/
     expect(s.reads()).toBe(2) // one per request despite three paper-part references
   })
 
+  // 02/11 KHOÁ LẠC QUAN: hai lượt nộp CÙNG LÚC (bấm đúp / mạng chập gửi lại) không được cùng ghi lượt 1 ⇒ sổ sự kiện, EXP ghi đôi.
+  it('hai lượt nộp đầu cùng lúc, cùng bài: một lượt ghi, lượt kia nhận «đã nhận» — sổ sự kiện chỉ 3 dòng, lanThu 1', async () => {
+    const s = setup()
+    const [a, b] = await Promise.all([s.post('/btvn/nop', answers), s.post('/btvn/nop', answers)])
+    expect(a.body.ok).toBe(true); expect(b.body.ok).toBe(true)
+    expect(s.d.dem('su_kien_hoc')).toBe(3)
+    expect(s.row().so_lan_lam).toBe(1)
+  })
+  it('hai lượt nộp đầu cùng lúc, KHÁC bài: chỉ một lượt được tính, lượt kia báo tải lại — không vượt trần lượt', async () => {
+    const s = setup()
+    const kq = await Promise.all([s.post('/btvn/nop', answers), s.post('/btvn/nop', { ...answers, [Q]: '13' })])
+    expect(kq.filter(r => r.body.ok).length).toBe(1)
+    expect(s.d.dem('su_kien_hoc')).toBe(3)
+    expect(s.row().so_lan_lam).toBe(1)
+  })
   it('malformed retry does not consume a full-submit attempt; valid retry limits stay four total', async () => {
     const s = setup()
     expect((await s.post('/btvn/nop', answers)).body.lanThu).toBe(1)
