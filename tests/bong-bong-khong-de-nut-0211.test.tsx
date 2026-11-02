@@ -108,34 +108,27 @@ afterEach(() => {
 })
 
 describe('Lộ trình dựng thật — dữ liệu giống ảnh thầy 02/11', () => {
-  it('bong bóng «Hôm nay có Kiểm tra ôn tập…» KHÔNG đè nút KT ôn tập: chọn chỗ dưới Mol, bong bóng không chạm nút / vòng / nhãn / rương', () => {
+  it('bong bóng «Hôm nay có Kiểm tra ôn tập…» KHÔNG đè nút KT ôn tập: hệ Kính — lời ở thẻ lời riêng, nằm NGOÀI danh sách việc (không chồng lên dòng nào)', () => {
+    // hệ Kính 02/11 (bản vẽ v2 thầy duyệt): con đường + Mol đứng cạnh đường đã bỏ ⇒ lời Mol ở THẺ LỜI riêng phía trên «Việc hôm nay» — không thể đè nút nào,
+    // nên logic né nút / thu thành «Mol nhắn» của chỗ neo trên đầu Mol không còn dùng. Kiểm hành vi của thẻ lời thay cho chỗ neo.
     vi.useFakeTimers(); vi.setSystemTime(mo + 3600_000)
-    giaKhung('anh')
     const { container } = render(<MotTrangHs {...p()} />)
-    const neo = container.querySelector<HTMLElement>('.da-lv-loi-o')!
-    expect(neo.querySelector('.bi-loi-bong')!.textContent).toContain('Kiểm tra ôn tập')
-    expect(neo.dataset.cho).toBe('duoi')
-    const so = (k: string) => parseFloat(neo.style.getPropertyValue(k))
-    const w = parseFloat(neo.querySelector<HTMLElement>('.bi-loi-bong')!.style.width), h = kho(Math.max(w, 140)).h
-    const top = NEO.y + so('--tren') + 9, left = NEO.x + so('--trai')
-    expect(khongDe(H(left, top, left + w, top + h), VAT)).toBe(true)
-    expect(container.querySelector('.da-lv-chip')).toBeNull() // còn chỗ trống ⇒ không thu thành nút nhỏ
-  })
-  it('đường kín hết ⇒ nút nhỏ «Mol nhắn» (chạm để đọc, bong bóng ẩn, không tự mờ); chạm ⇒ đọc rồi tự mờ', () => {
-    vi.useFakeTimers(); vi.setSystemTime(mo + 3600_000)
-    giaKhung('kin')
-    const { container } = render(<MotTrangHs {...p()} />)
-    const neo = container.querySelector<HTMLElement>('.da-lv-loi-o')!
-    expect(neo.dataset.cho).toBe('gon')
-    const chip = container.querySelector<HTMLButtonElement>('.da-lv-chip')!
-    expect(chip.getAttribute('aria-label')).toMatch(/^Mol nhắn: .*Kiểm tra ôn tập/)
-    act(() => { vi.advanceTimersByTime(8000) })
-    expect(container.querySelector('.da-lv-chip')).not.toBeNull() // nút nhỏ chờ em chạm, không tự mờ
-    fireEvent.click(chip)
-    expect(neo.dataset.cho).not.toBe('gon') // đang đọc: bong bóng hiện
+    expect(container.querySelector('.da-lv-loi-o')).toBeNull()
+    const bong = container.querySelector<HTMLElement>('.bi-loi-bong')!
+    expect(bong.textContent).toContain('Kiểm tra ôn tập')
+    expect(bong.closest('.kb-viec-ds')).toBeNull()
+    expect(bong.closest('.kb-dong, .kb-the-ruong, button')).toBeNull()
     expect(container.querySelector('.da-lv-chip')).toBeNull()
-    act(() => { vi.advanceTimersByTime(6500) })
-    expect(neo.querySelector('.bi-loi-boc')).toBeNull() // đọc xong tự mờ như thường
+  })
+  it('hệ Kính: không còn «đường kín hết» ⇒ không thu thành nút nhỏ «Mol nhắn»; lời đọc được ngay rồi tự thu như thẻ lời', () => {
+    // hệ Kính 02/11 (bản vẽ v2 thầy duyệt): con đường + Mol đứng cạnh đường đã bỏ ⇒ lời Mol ở THẺ LỜI riêng phía trên «Việc hôm nay» — không thể đè nút nào,
+    // nên logic né nút / thu thành «Mol nhắn» của chỗ neo trên đầu Mol không còn dùng. Kiểm hành vi của thẻ lời thay cho chỗ neo.
+    vi.useFakeTimers(); vi.setSystemTime(mo + 3600_000)
+    const { container } = render(<MotTrangHs {...p()} />)
+    expect(container.querySelector('.da-lv-chip')).toBeNull()
+    expect(container.querySelector('.bi-loi-bong')!.textContent).toContain('Kiểm tra ôn tập')
+    act(() => { vi.advanceTimersByTime(5300) })
+    expect(container.querySelector('.bi-loi-boc')).toBeNull() // nhắc một lần rồi tự gỡ
   })
   it('né MỌI thứ bấm được / nhãn / vòng trên đường đi, đo lại khi bố cục đổi (ResizeObserver · MutationObserver · xoay · cuộn xong · phông chữ)', () => {
     const tsx = readFileSync('src/components/hoc-tap/TrongHs.tsx', 'utf8')
