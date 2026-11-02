@@ -211,3 +211,22 @@ export async function hsGoiKinh(env: Env, b: Obj) {
   }))
   return { ok: true, ban: ra }
 }
+
+/** BÙ `_goc` (chữ phương án / ý lúc soạn) cho bản nộp trước khi đợt 2 lên (03/11) — chỉ sửa bảng Kính của chính máy soạn, theo lô 40, gọi lặp tới `con = 0`. */
+export async function buGocKinh(env: Env) {
+  await damBaoBangKinh(env)
+  const r = await env.DB.prepare(`SELECT bam, qid_mau, ban_json FROM loi_giai_kinh WHERE ban_json NOT LIKE '%"_goc"%' LIMIT 40`).all<Obj>()
+  const ds = r.results ?? []
+  const boNho = new Map<string, unknown>()
+  let daBu = 0
+  for (const x of ds) {
+    const ht = await cauHienTai(env, str(x.qid_mau), undefined, boNho).catch(() => null)
+    let ban: Obj
+    try { ban = JSON.parse(str(x.ban_json)) as Obj } catch { continue }
+    const goc = ht && ht.bam === str(x.bam) ? { pa: ht.c.pa ?? null, y: ht.c.y ?? null } : { pa: null, y: null }
+    await env.DB.prepare('UPDATE loi_giai_kinh SET ban_json = ? WHERE bam = ?').bind(JSON.stringify({ ...ban, _goc: goc }), str(x.bam)).run()
+    daBu++
+  }
+  const con = await env.DB.prepare(`SELECT COUNT(*) AS n FROM loi_giai_kinh WHERE ban_json NOT LIKE '%"_goc"%'`).first<Obj>()
+  return { ok: true, daBu, con: Number(con?.n ?? 0) }
+}

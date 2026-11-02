@@ -5,6 +5,7 @@
 //   node scripts/loi-giai-kinh/may-soan-kinh.mjs --nap-hang        # xếp cả kho vào hàng (gọi lại được)
 //   node scripts/loi-giai-kinh/may-soan-kinh.mjs --tong            # số phủ: đạt / tổng
 //   node scripts/loi-giai-kinh/may-soan-kinh.mjs                   # 4 luồng, chạy tới hết hàng (hết thì 10 phút hỏi lại, có việc trả lại là làm tiếp)
+//   node scripts/loi-giai-kinh/may-soan-kinh.mjs --bu-goc         # bù chữ phương án gốc cho bản nộp trước 03/11 (gọi lại được)
 //   node scripts/loi-giai-kinh/may-soan-kinh.mjs --thu             # 1 lô 3 câu, KHÔNG nộp (soát chất lượng)
 //   Tuỳ chọn: --luong 4 · --so 10 · --mot-lan (hết hàng thì dừng) · --model <tên> · --bo ESTER
 //
@@ -166,6 +167,10 @@ async function motLuong(luong) {
   }
 }
 
+if (co('--bu-goc')) {
+  for (let i = 0; i < 500; i++) { const r = await goi('/kho/loi-giai-kinh/bu-goc', {}); console.log(JSON.stringify(r)); if (!r.ok || !r.con) break }
+  process.exit(0)
+}
 if (co('--nap-hang')) { console.log(JSON.stringify(await goi('/kho/loi-giai-kinh/nap-hang', {}))); process.exit(0) }
 if (co('--tong')) {
   const t = await goi('/kho/loi-giai-kinh/tong', {})
