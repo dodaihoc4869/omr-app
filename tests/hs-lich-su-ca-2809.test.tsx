@@ -172,7 +172,7 @@ describe('BaoCaoChiTiet chế độ em (bản mới)', () => {
     const { container } = ve([])
     expect(container.textContent).not.toContain('Theo mức độ nhận thức')
   })
-  it('bấm câu cần chữa ⇒ đề + lời giải bằng TheCau (khuôn Câu đã làm): chỉ số dưới <sub>, Kiến thức cốt lõi', () => {
+  it('bấm câu cần chữa ⇒ đề + lời giải bằng TheCau (khuôn Câu đã làm): chỉ số dưới <sub>, Kiến thức cốt lõi', async () => {
     const { container } = ve()
     const mo = container.querySelectorAll('details.ct-xl-mo')
     expect(mo).toHaveLength(2)
@@ -180,7 +180,8 @@ describe('BaoCaoChiTiet chế độ em (bản mới)', () => {
     ;(mo[0] as HTMLDetailsElement).open = true
     const giai = mo[0]!.querySelector('.ct-xl-giai')!
     expect(giai.querySelector('.h2-the-cau')).not.toBeNull()
-    expect(giai.textContent).toMatch(/KIẾN THỨC CỐT LÕI/i)
+    // thầy 03/11: lời giải cũ không hiện trước khi mảnh Kính trả lời (câu không có bản Kính ⇒ lời giải cũ hiện sau một nhịp)
+    await waitFor(() => expect(giai.textContent).toMatch(/KIẾN THỨC CỐT LÕI/i))
     expect(giai.querySelector('sub')).not.toBeNull()
     expect(giai.textContent).not.toContain('₄')
   })
