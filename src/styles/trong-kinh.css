@@ -91,11 +91,11 @@ html[data-trong='hs'] .kb-o[data-hu='xong'] .kb-tich { animation: kb-loang 700ms
 html[data-trong='hs'] .kb-o[data-hu='mo'] .kb-dong { animation: kb-mo 520ms ease-out var(--tre, 0ms) both; }
 @keyframes kb-loang { 0% { transform: scale(.6); } 60% { transform: scale(1.18); } 100% { transform: scale(1); } }
 @keyframes kb-mo { 0% { opacity: .4; transform: translateY(6px); } 100% { opacity: 1; transform: none; } }
-@media (prefers-reduced-motion: reduce) { html[data-trong='hs'] .kb-o[data-hu] :is(.kb-tich, .kb-dong) { animation: none; } }
-html.may-yeu[data-trong='hs'] .kb-o[data-hu] :is(.kb-tich, .kb-dong) { animation: none; }
+@media (prefers-reduced-motion: reduce) { html[data-trong='hs'] .kb-o[data-hu] .kb-tich, html[data-trong='hs'] .kb-o[data-hu] .kb-dong { animation: none; } }
+html.may-yeu[data-trong='hs'] .kb-o[data-hu] .kb-tich, html.may-yeu[data-trong='hs'] .kb-o[data-hu] .kb-dong { animation: none; }
 
 /* ── Thẻ & băng cũ của trang chính mặc kính ── */
-html[data-trong='hs'] :is(.da-bang, .dm-the, .tr-dd, .ban-lt, .da-dai) { border-radius: 26px; background: var(--kinh-mat); box-shadow: inset 0 1px 0 var(--kinh-vien), inset 0 0 0 1px var(--kinh-vien-2), var(--kinh-bong); }
+html[data-trong='hs'] .da-bang, html[data-trong='hs'] .dm-the, html[data-trong='hs'] .tr-dd, html[data-trong='hs'] .ban-lt, html[data-trong='hs'] .da-dai { border-radius: 26px; background: var(--kinh-mat); box-shadow: inset 0 1px 0 var(--kinh-vien), inset 0 0 0 1px var(--kinh-vien-2), var(--kinh-bong); }
 html[data-trong='hs'] .da-bang[data-sac='tin'] { background: color-mix(in oklab, var(--tr-tin-nhat) 86%, transparent); box-shadow: inset 0 0 0 2px var(--tr-tin-day), var(--kinh-bong); }
 html[data-trong='hs'] .da-bang[data-sac='dung'] { background: color-mix(in oklab, var(--tr-dung-nhat) 86%, transparent); box-shadow: inset 0 0 0 2px var(--tr-dung-nut), var(--kinh-bong); }
 html[data-trong='hs'] .da-bang .nut-to { border-radius: 999px; box-shadow: 0 12px 24px -14px var(--tr-phu); }
@@ -161,7 +161,7 @@ html[data-trong='hs'] .tr-menu-phu { background: color-mix(in oklab, var(--tr-ch
   html[data-trong='hs'] .kb-so { font-size: 52px; }
 }
 /* máy yếu: không làm mờ (kính thành mặt đặc) */
-html.may-yeu[data-trong='hs'] :is(.kb-thanh-ds, .kb-thanh-ai, .tr-menu) { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--tr-mat); }
+html.may-yeu[data-trong='hs'] .kb-thanh-ds, html.may-yeu[data-trong='hs'] .kb-thanh-ai, html.may-yeu[data-trong='hs'] .tr-menu { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--tr-mat); }
 /* chữ phụ nút chính theo màu nút (luật .kb-phu chung là chữ mờ của danh sách) */
 html[data-trong='hs'] .kb-cta .kb-giua .kb-phu { color: inherit; opacity: 1; }
 /* vòng đoạn của chặng đang học ôm sát ô tích (luật vòng cũ của nút tròn to không áp) */
@@ -171,9 +171,9 @@ html[data-trong='hs'] .kb-o-ruong:not([data-mo]) .kb-ruong { filter: saturate(.7
 
 /* ═══ KHỚP BẢN VẼ v2 (thầy 02/11 «phải giống ý hệt bản vẽ») ═══ */
 /* kính của bản vẽ: mặt 62% + làm mờ 26 px (chỉ các khối lớn của Hôm nay; thẻ khác giữ mặt bán trong không mờ cho nhẹ máy) */
-html[data-trong='hs'] :is(.kb-hero, .kb-viec, .bi-loi-bong, .da-ban, .kb-the-ruong) { background: var(--kinh-ve); -webkit-backdrop-filter: var(--kinh-mo-ve); backdrop-filter: var(--kinh-mo-ve);
+html[data-trong='hs'] .kb-hero, html[data-trong='hs'] .kb-viec, html[data-trong='hs'] .bi-loi-bong, html[data-trong='hs'] .da-ban, html[data-trong='hs'] .kb-the-ruong { background: var(--kinh-ve); -webkit-backdrop-filter: var(--kinh-mo-ve); backdrop-filter: var(--kinh-mo-ve);
   box-shadow: inset 0 1px 0 var(--kinh-vien), inset 0 0 0 1px var(--kinh-vien-2), var(--kinh-bong); border: 0; }
-html.may-yeu[data-trong='hs'] :is(.kb-hero, .kb-viec, .bi-loi-bong, .da-ban, .kb-the-ruong) { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--tr-mat); }
+html.may-yeu[data-trong='hs'] .kb-hero, html.may-yeu[data-trong='hs'] .kb-viec, html.may-yeu[data-trong='hs'] .bi-loi-bong, html.may-yeu[data-trong='hs'] .da-ban, html.may-yeu[data-trong='hs'] .kb-the-ruong { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--tr-mat); }
 /* đầu trang: ảnh bánh quy 12 múi + ngày · lớp + «Chào …» + chuông thật (nút tròn kính) */
 html[data-trong='hs'] .kb-dau { display: flex; align-items: center; gap: 12px; padding: 4px 2px 0; }
 html[data-trong='hs'] .kb-dau-giua { flex: 1; min-width: 0; }
@@ -229,7 +229,7 @@ html[data-trong='hs'] .kb-the-ruong > svg:last-child { color: var(--tr-chu-3); f
 html[data-trong='hs'] .kb-thanh .kb-thanh-ai svg { width: 26px; height: 26px; }
 /* rộng: cột phải = việc + gõ cửa + rương */
 @media (orientation: landscape) and (min-width: 640px), (min-width: 700px) and (min-aspect-ratio: 10/13) {
-  html[data-trong='hs'] .dm-khung .da-vo:has(> .kb-viec) > :is(.kb-viec, .da-ban, .kb-the-ruong, .mot-lien-ket) { grid-column: 2; }
+  html[data-trong='hs'] .dm-khung .da-vo:has(> .kb-viec) > .kb-viec, html[data-trong='hs'] .dm-khung .da-vo:has(> .kb-viec) > .da-ban, html[data-trong='hs'] .dm-khung .da-vo:has(> .kb-viec) > .kb-the-ruong, html[data-trong='hs'] .dm-khung .da-vo:has(> .kb-viec) > .mot-lien-ket { grid-column: 2; }
   html[data-trong='hs'] .dm-khung .da-vo:has(> .kb-viec) > .kb-viec { grid-row: 1 / span 6; }
 }
 
@@ -281,7 +281,7 @@ html[data-trong='hs'] .da-o .so { font-size: 30px; font-weight: 800; letter-spac
 html[data-trong='hs'] .da-o .so .so-dv { font-size: 14px; font-weight: 750; margin-left: 2px; letter-spacing: 0; }
 /* bento 2 cột: ô đầu (Tự sửa lỗi) trải ngang, nổi viền hồng như bản vẽ */
 html[data-trong='hs'] .dm-khung[data-muc='luyen'] .da-vo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-content: start; }
-html[data-trong='hs'] .dm-khung[data-muc='luyen'] .da-vo > :is(.kb-dau, h1, h2) { grid-column: 1 / -1; }
+html[data-trong='hs'] .dm-khung[data-muc='luyen'] .da-vo > .kb-dau, html[data-trong='hs'] .dm-khung[data-muc='luyen'] .da-vo > h1, html[data-trong='hs'] .dm-khung[data-muc='luyen'] .da-vo > h2 { grid-column: 1 / -1; }
 html[data-trong='hs'] .dm-khung[data-muc='luyen'] .da-o { position: relative; display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto 1fr; align-items: start; gap: 4px 6px; min-height: 150px; padding: 16px; text-align: left; }
 html[data-trong='hs'] .dm-khung[data-muc='luyen'] .da-o > .h { grid-row: 1; grid-column: 1; margin-bottom: 34px; }
 html[data-trong='hs'] .dm-khung[data-muc='luyen'] .da-o > .so { grid-row: 1; grid-column: 2; }
@@ -336,16 +336,16 @@ html[data-trong='hs'] .kb-chip svg { width: 18px; height: 18px; flex: none; }
   html:root[data-trong='hs'] .ht2[data-mot] .dm-khung[data-muc='luyen'] .da-vo, html:root[data-trong='hs'] .ht2[data-mot] .dm-khung[data-muc='thanh-tich'] .da-vo { max-width: 760px; margin: 0 auto; width: 100%; }
 }
 /* HAI CỘT của Hôm nay: điện thoại dọc = một cột (contents); rộng (luật haiCotLam, máy tính) = trái: chào · thẻ mức · Mol · nút chính / phải: việc · Gõ cửa · Rương */
-html[data-trong='hs'] :is(.kb-cot-trai, .kb-cot-phai) { display: contents; }
+html[data-trong='hs'] .kb-cot-trai, html[data-trong='hs'] .kb-cot-phai { display: contents; }
 html[data-trong='hs'] .dm-ben { display: none; } /* tóm tắt bên (trùng thẻ mức, tab Luyện tập / Thành tích) — bản vẽ không có */
 @media (orientation: landscape) and (min-width: 640px), (min-width: 700px) and (min-aspect-ratio: 10/13) {
   html[data-trong='hs'] .dm-khung .da-vo:has(> .kb-cot-phai) { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: start; gap: 16px 22px; max-width: 1040px; width: 100%; margin: 0 auto; }
-  html[data-trong='hs'] :is(.kb-cot-trai, .kb-cot-phai) { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  html[data-trong='hs'] .kb-cot-trai, html[data-trong='hs'] .kb-cot-phai { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
   html[data-trong='hs'] .dm-khung:has(.kb-cot-phai) { grid-template-columns: minmax(0, 1fr); }
 }
 @media (orientation: landscape) and (max-height: 500px) {
   html[data-trong='hs'] .kb-dau-giua h1 { font-size: 24px; }
-  html[data-trong='hs'] :is(.kb-cot-trai, .kb-cot-phai) { gap: 12px; }
+  html[data-trong='hs'] .kb-cot-trai, html[data-trong='hs'] .kb-cot-phai { gap: 12px; }
 }
 /* thắng luật bố cục cũ của trong-hs-ngang.css (máy gập mở / ngang / máy tính: «:root … .ht2[data-mot] …») */
 html:root[data-trong='hs'] .ht2[data-mot] .dm-ben { display: none; }
@@ -357,5 +357,5 @@ html:root[data-trong='hs'] .ht2[data-mot] .dm-ben { display: none; }
 html[data-trong='hs'] .dm-khung[data-muc] .da-vo > .kb-dau { grid-column: 1 / -1; }
 /* Tấm «Thêm»: chữ tiêu đề nằm hàng đầu (ô «dau» cũ đang ẩn); cột «Số của em» chưa có số nào ⇒ trả bề ngang cho danh sách */
 html[data-trong='hs'] .tr-menu > .kb-them-tieu { grid-row: 1; }
-html[data-trong='hs'] .tr-menu:has(> .tr-menu-dem .tp-tr:empty) > :is(.tr-menu-ds, .tr-menu-cai) { grid-column: ds-start / -1; }
+html[data-trong='hs'] .tr-menu:has(> .tr-menu-dem .tp-tr:empty) > .tr-menu-ds, html[data-trong='hs'] .tr-menu:has(> .tr-menu-dem .tp-tr:empty) > .tr-menu-cai { grid-column: ds-start / -1; }
 html[data-trong='hs'] .tr-menu > .tr-menu-dem:has(.tp-tr:empty) { display: none; }
