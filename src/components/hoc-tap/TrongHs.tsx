@@ -38,6 +38,7 @@ import { useTongQuan } from '../thuong/dung-thuong'
 import { napSanThanhTich } from '../../lib/thuong-api'
 import { laSamsungInternet } from '../../lib/nhac-samsung'
 import { giuToanManHs } from '../../lib/toan-man-hs'
+import { ganNghieng } from '../../lib/binh-nghieng'
 import { anhSvg, baoLoTrinh, goKhungTinh, henChupKhungTinhHs, sbdPhien } from '../../lib/khung-tinh-hs'
 import type { TenManThuong } from '../thuong/ManThuong'
 const ManThuong = lazy(() => import('../thuong/ManThuong'))
@@ -304,32 +305,58 @@ const phuDong = (n: Nut) => {
 }
 
 /** BÌNH TAM GIÁC «MỨC HÔM NAY» (hệ Kính, thầy chốt 02/11 — docs/ban-ve-ban-sac-hs-0211/v2): dung dịch dâng theo câu đã làm; vạch chia = ranh chặng,
- *  vạch đứt = mức; tới mức ⇒ hồng (phenolphtalein tới điểm tương đương). SVG TĨNH (không hoạt ảnh vô hạn) — máy yếu như nhau; màu chỉ biến --tr-*. */
+ *  vạch đứt = mức; tới mức ⇒ hồng (phenolphtalein tới điểm tương đương). Màu chỉ biến --tr-*.
+ *  SINH ĐỘNG (thầy 02/11 tối, docs/ban-ve-binh-0211): nghiêng máy ⇒ dung dịch nghiêng theo (src/lib/binh-nghieng.ts, nạp lúc rảnh, vòng vẽ tự dừng);
+ *  đổi hồng ⇒ HÀO QUANG hồng dịu nở một lần mỗi ngày (CSS, chạy hữu hạn) rồi giữ quầng dịu + 3 sao nhỏ. Không hoạt ảnh vô hạn. */
+const KHOA_BINH_HONG = 'ddh.binh-hong'
 export function BinhHomNay({ da, muc, ranh }: { da: number; muc: number; ranh: number[] }) {
   const u = useId().replace(/[^a-zA-Z0-9]/g, ''), du = muc > 0 && da >= muc
   const DAY = 214, MUC = 98, y = muc > 0 ? DAY - (Math.min(da, muc * 1.3) / muc) * (DAY - MUC) : DAY
   const xP = (v: number) => 118 + Math.max(0, v - 74) * (56 / 122), xT = (v: number) => 82 - Math.max(0, v - 74) * (56 / 122)
   const vo = 'M84 18V74L28 190Q20 208 36 214Q44 217 54 217H146Q156 217 164 214Q180 208 172 190L116 74V18Z'
   const f = (n: number) => n.toFixed(1)
-  return <svg className="kb-binh" data-du={du || undefined} viewBox="0 0 200 236" aria-hidden="true">
+  const dd = useRef<SVGGElement>(null), mucY = useRef(y), binh = useRef<SVGSVGElement>(null)
+  useEffect(() => { mucY.current = y }, [y])
+  // hào quang nở MỘT lần mỗi ngày (nhớ trong máy; gắn data-no thẳng lên SVG — không vẽ lại React); lần sau trong ngày chỉ hiện quầng dịu tĩnh
+  useEffect(() => {
+    if (!du) return
+    try { const h = new Date().toDateString(); if (localStorage.getItem(KHOA_BINH_HONG) !== h) { localStorage.setItem(KHOA_BINH_HONG, h); binh.current?.setAttribute('data-no', '') } } catch { /* không có bộ nhớ: không nở */ }
+  }, [du])
+  // nghiêng theo máy: mã cảm biến nằm trong mảnh Hôm nay (đã nạp lười, không thêm tệp precache — trần 170); bật lúc rảnh, sau lần vẽ đầu
+  useEffect(() => {
+    const g = dd.current
+    if (!g || typeof window === 'undefined' || !('DeviceOrientationEvent' in window)) return
+    let go: (() => void) | undefined
+    const ri = (window as Window & { requestIdleCallback?: (f: () => void) => number; cancelIdleCallback?: (h: number) => void })
+    const bat = () => { go = ganNghieng(g, () => [100, mucY.current], { tatDan: document.documentElement.classList.contains('may-yeu') || !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches }) }
+    const h = ri.requestIdleCallback ? ri.requestIdleCallback(bat) : window.setTimeout(bat, 1200)
+    return () => { if (ri.cancelIdleCallback) ri.cancelIdleCallback(h); else window.clearTimeout(h); go?.() }
+  }, [])
+  return <svg ref={binh} className="kb-binh" data-du={du || undefined} viewBox="0 0 200 236" aria-hidden="true">
     <defs>
       <clipPath id={`${u}c`}><path d={vo} /></clipPath>
       <linearGradient id={`${u}k`} x1="0" x2="1"><stop offset="0" className="kb-k0" /><stop offset=".45" className="kb-k1" /><stop offset="1" className="kb-k2" /></linearGradient>
       <linearGradient id={`${u}l`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" className="kb-l0" /><stop offset="1" className="kb-l1" /></linearGradient>
       <radialGradient id={`${u}b`} cx=".35" cy=".35" r=".7"><stop offset="0" className="kb-b0" /><stop offset="1" className="kb-b1" /></radialGradient>
+      <radialGradient id={`${u}q`} cy=".58"><stop offset="0" className="kb-q" stopOpacity=".4" /><stop offset=".55" className="kb-q" stopOpacity=".12" /><stop offset="1" className="kb-q" stopOpacity="0" /></radialGradient>
+      <radialGradient id={`${u}v`}><stop offset=".55" className="kb-q" stopOpacity="0" /><stop offset=".8" className="kb-q" stopOpacity=".18" /><stop offset="1" className="kb-q" stopOpacity="0" /></radialGradient>
     </defs>
+    {du && <g className="kb-hao"><ellipse cx="100" cy="150" rx="100" ry="90" fill={`url(#${u}q)`} /><circle className="kb-vanh" cx="100" cy="146" r="92" fill={`url(#${u}v)`} /></g>}
     <ellipse className="kb-bong" cx="100" cy="226" rx="74" ry="7" />
     <path d={vo} fill={`url(#${u}k)`} />
     <g clipPath={`url(#${u}c)`}>
-      <rect x="0" y={f(y)} width="200" height={f(240 - y)} fill={`url(#${u}l)`} />
-      <ellipse className="kb-khum" cx="100" cy={f(y)} rx={f((xP(y) - xT(y)) / 2)} ry="4.5" />
-      {[[70, 200, 6], [118, 190, 4], [138, 204, 5], [92, 178, 3], [108, 206, 2.5], [150, 186, 2.5]].map(([bx, by, r]) => by! > y + 9 ? <circle key={bx} cx={bx} cy={by} r={r} fill={`url(#${u}b)`} /> : null)}
+      <g ref={dd}>
+        <rect x="-120" y={f(y)} width="440" height="260" fill={`url(#${u}l)`} />
+        <ellipse className="kb-khum" cx="100" cy={f(y)} rx={f((xP(y) - xT(y)) / 2 + 30)} ry="4.5" />
+        {[[70, 200, 6], [118, 190, 4], [138, 204, 5], [92, 178, 3], [108, 206, 2.5], [150, 186, 2.5]].map(([bx, by, r]) => by! > y + 9 ? <circle key={bx} cx={bx} cy={by} r={r} fill={`url(#${u}b)`} /> : null)}
+      </g>
     </g>
     {muc > 0 && ranh.filter((n) => n > 0 && n < muc).map((n) => { const v = DAY - (n / muc) * (DAY - MUC); return <line key={n} className="kb-vach" x1={f(xP(v) - 18)} x2={f(xP(v) - 5)} y1={f(v)} y2={f(v)} /> })}
     <line className="kb-muc" x1={f(xT(MUC) + 5)} x2={f(xP(MUC) - 5)} y1={MUC} y2={MUC} />
     <path className="kb-vo" d={vo} />
     <rect className="kb-mieng" x="78" y="10" width="44" height="11" rx="5.5" />
     <path className="kb-loe" d="M91 28V76M76 104L46 168M42 182L39 189" />
+    {du && <g className="kb-sao">{[[166, 64, .8], [32, 100, .55], [176, 150, .45]].map(([x, yy, c]) => <path key={x} transform={`translate(${x} ${yy}) scale(${c})`} d="M0-8C1-2 2-1 8 0C2 1 1 2 0 8C-1 2-2 1-8 0C-2-1-1-2 0-8Z" />)}</g>}
   </svg>
 }
 

@@ -704,12 +704,14 @@ const MT_KIEM = { id: 'kt1', ngay: mtNgay, moLuc: mtMo, hanLuc: mtMo + 86400_000
   // `&kt=lam` (28/10, ảnh thầy): đang làm dở — 3/5 chặng đã chốt, 18/28 câu đã trả lời ⇒ vòng nút kiểm tra tô 3/5 đoạn
   ...(MT_KT === 'xong' ? { trangThai: 'da_nop', daTra: 28, con: 0, diem: 8.5, nopLuc: now - 60_000 } : MT_KT === 'lam' ? { soChang: 5, daTra: 18, con: 10, changChot: 3 } : MT_KT === 'khoa' ? {}
     : { ngay: new Date(mtMo + 86400_000 + 7 * 3600_000).toISOString().slice(0, 10), moLuc: mtMo + 86400_000, hanLuc: mtMo + 2 * 86400_000, trangThai: 'sap_den', homNay: false }) }
-const mtLam = MT_TT === 'du' ? 30 : 12
+// 02/11 `&tt=xong`: như `du` nhưng 5 câu sửa đã xong ⇒ «Xong hết hôm nay», bình hồng + hào quang (docs/ban-ve-binh-0211)
+const MT_XONG = MT_TT === 'xong'
+const mtLam = MT_TT === 'du' || MT_XONG ? 30 : 12
 const SANH_MT = MT_ANH
   ? { ...SANH_MOI, chienDich: { id: 'cd1', ten: 'Bài 9. Amino acid (P1)' }, hanhTrinh: { ...SANH_MOI.hanhTrinh, tang: 1, toiThieu: 12, daLam: 17, daXep: 18, soChang: 2, changHienTai: 2 },
     theLuc: { con: 1, tong: 18 }, ruong: { ...SANH_MOI.ruong, daLam: 17, tong: 12 }, tamGiuCa: 0, kiemTraCaNhan: MT_KIEM }
-  : { ...SANH_MOI, chienDich: { id: 'cd1', ten: 'Ester – Lipid' }, hanhTrinh: { ...SANH_MOI.hanhTrinh, tang: 2, toiThieu: 30, daLam: mtLam, daXep: 30, soChang: 5, changHienTai: MT_TT === 'du' ? 5 : 3 },
-  theLuc: MT_TT === 'du' ? { con: 6, tong: 36 } : { con: 18, tong: 30 }, ruong: { ...SANH_MOI.ruong, daLam: mtLam, tong: 30 }, tamGiuCa: 0, kiemTraCaNhan: MT_KIEM }
+  : { ...SANH_MOI, chienDich: { id: 'cd1', ten: 'Ester – Lipid' }, hanhTrinh: { ...SANH_MOI.hanhTrinh, tang: 2, toiThieu: 30, daLam: mtLam, daXep: 30, soChang: 5, changHienTai: MT_TT === 'du' || MT_XONG ? 5 : 3 },
+  theLuc: MT_TT === 'du' || MT_XONG ? { con: 6, tong: 36 } : { con: 18, tong: 30 }, ruong: { ...SANH_MOI.ruong, daLam: mtLam, tong: 30 }, tamGiuCa: 0, kiemTraCaNhan: MT_KIEM }
 if (man === 'hs-mot') {
   try { localStorage.setItem('omr-ai-ddh-co', JSON.stringify({ sbd: '12121212', bat: true, luc: Date.now() })) } catch { /* bỏ qua */ }
   // 28/10 `&moc=N`: nút Tự sửa lỗi đứng sau chặng N (mốc trong ngày đã nhớ) — cảnh «em tới nút Sửa lỗi»: chặng hiện tại nằm SAU nút ⇒ khoá tới khi sửa xong
@@ -723,7 +725,7 @@ if (man === 'hs-mot') {
     if (duong.endsWith('/hs/buoi-hoc')) return tra(MT_DD === 'khong' ? { ok: true, buoi: null } : { ok: true, buoi: { ...buoi, daDiemDanh: MT_DD === 'xong' } })
     if (duong.endsWith('/hs/diem-danh')) return tra({ ok: true, buoi: { ...buoi, daDiemDanh: true } })
     if (duong.endsWith('/hs/chua-cau-sai/co')) return tra({ ok: true })
-    if (duong.endsWith('/hs/chua-cau-sai/danh-sach')) return tra(SUA_GIA ? danhSachSuaGia() : { ok: true, ds: [], dem: { tong: 5, can: 5, cho: 0, xong: 0 } })
+    if (duong.endsWith('/hs/chua-cau-sai/danh-sach')) return tra(SUA_GIA ? danhSachSuaGia() : (MT_XONG ? { ok: true, ds: [], dem: { tong: 5, can: 0, cho: 0, xong: 5 } } : { ok: true, ds: [], dem: { tong: 5, can: 5, cho: 0, xong: 0 } }))
     if (duong.endsWith('/hs/chua-cau-sai/viec-ngay')) return tra({ ok: true })
     if (duong.endsWith('/hs/nhip-hoc')) return tra(nhipEmGia('cham'))
     if (duong.endsWith('/notifications/list')) return tra({ ok: true, publicKey: '', items: [
@@ -760,7 +762,7 @@ if (man === 'hs-ng') {
     const tra = (o: unknown) => new Response(JSON.stringify(o), { status: 200, headers: { 'content-type': 'application/json' } })
     if (duong.endsWith('/hs/buoi-hoc')) return tra(thamSo.get('dd') === 'mo' ? { ok: true, buoi: { ...buoiNg, daDiemDanh: false } } : { ok: true, buoi: null })
     if (duong.endsWith('/hs/chua-cau-sai/co')) return tra({ ok: true })
-    if (duong.endsWith('/hs/chua-cau-sai/danh-sach')) return tra({ ok: true, ds: [], dem: { tong: 5, can: 5, cho: 0, xong: 0 } })
+    if (duong.endsWith('/hs/chua-cau-sai/danh-sach')) return tra((MT_XONG ? { ok: true, ds: [], dem: { tong: 5, can: 0, cho: 0, xong: 5 } } : { ok: true, ds: [], dem: { tong: 5, can: 5, cho: 0, xong: 0 } }))
     if (duong.endsWith('/hs/chua-cau-sai/mo-dot')) return tra({ ok: true, dotId: 'd-ng', trangThai: 'dang_chua_buoc', coHocLieu: false })
     if (duong.endsWith('/hs/chua-cau-sai/gon-mo')) return tra({ ok: true, dotId: 'd-ng', lan: 1, ban: 'ban-1', tuSuaNeuDung: true, de: { qid: 'DH-12-C1-B4-9', phan: 'I', tenDang: 'Đồng phân alcohol',
       text: 'Cho bốn chất hữu cơ có công thức cấu tạo như hình dưới. Số chất thuộc loại alcohol bậc một là',
@@ -826,7 +828,7 @@ if (DUO_SUA) {
     try { b = init?.body ? JSON.parse(String(init.body)) : {} } catch { /* bỏ qua */ }
     if (duong.endsWith('/hs/buoi-hoc')) return tra({ ok: true, buoi: null })
     if (duong.endsWith('/hs/chua-cau-sai/co')) return tra({ ok: true })
-    if (duong.endsWith('/hs/chua-cau-sai/danh-sach')) return tra({ ok: true, ds: [], dem: { tong: 5, can: 5, cho: 0, xong: 0 } })
+    if (duong.endsWith('/hs/chua-cau-sai/danh-sach')) return tra((MT_XONG ? { ok: true, ds: [], dem: { tong: 5, can: 0, cho: 0, xong: 5 } } : { ok: true, ds: [], dem: { tong: 5, can: 5, cho: 0, xong: 0 } }))
     if (duong.endsWith('/hs/chua-cau-sai/mo-dot')) return tra({ ok: true, dotId: 'd-sua', trangThai: 'dang_chua_buoc', coHocLieu: false })
     if (duong.endsWith('/hs/chua-cau-sai/gon-mo')) {
       if (MO === 'loi') return tra({ ok: false, ma: 'KHONG_MO_DUOC_CAU', mo: 'Câu này đang được thầy cập nhật nội dung. Em sang câu khác, lát nữa quay lại nhé.' })
