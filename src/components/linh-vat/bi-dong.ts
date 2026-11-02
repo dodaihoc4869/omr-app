@@ -446,6 +446,8 @@ export function taoBi(noiGan: HTMLElement, tc: { trangThai?: TrangThaiBi | strin
     const ky = [...chu]
     let i = 0
     if (loi) { loi.textContent = ''; loi.classList.add('hien') }
+    // vừa mở / tải lại trang (<html data-vua-mo>, TrongHs.tsx): hiện trọn lời ngay, không gõ từng chữ, không nhún đầu (thầy 02/11 «Bấm f5 … hiệu ứng chèn vào»)
+    if (document.documentElement.hasAttribute('data-vua-mo')) { if (loi) loi.textContent = chu; datMieng(TTS[ten].mieng); hen(xong, 0); return }
     const buoc = () => {
       if (i >= ky.length) { datMieng(TTS[ten].mieng); xong(); return }
       const c = ky[i++]!

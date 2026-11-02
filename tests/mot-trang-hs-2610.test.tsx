@@ -73,7 +73,7 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
     expect(thePop.queryByRole('button', { name: 'Sửa thêm' })).toBeNull()
     expect(thePop.getByText('Hôm nay em đã sửa đủ phần của mình. Những câu còn lại để ngày mai nhé.')).toBeTruthy()
   })
-  it('bấm nút Lộ trình KHÔNG vào thẳng: thẻ bật ra (role dialog) đúng màu nút, focus vào nút chính, Esc đóng + trả focus; một thẻ một lúc; chạm ngoài đóng (thầy 27/10)', () => {
+  it('bấm nút Lộ trình KHÔNG vào thẳng: thẻ bật ra (role dialog) đúng màu nút, focus vào nút chính, Esc đóng + trả focus; một thẻ một lúc; chạm ngoài đóng (thầy 27/10)', async () => {
     const onHoc = vi.fn(), onChua = vi.fn()
     render(<MotTrangHs {...goc({ onHoc, onChua, hs: HS })} />)
     const hoc = screen.getByRole('button', { name: 'Học tiếp · 18 câu' })
@@ -118,9 +118,11 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
     // rương đã sáng (xong hết chặng): thầy 02/11 tối «Rương xong cho mở luôn tại màn này» ⇒ chạm là mở ngay trong thẻ, không bảng chữ; nắp giữ mở
     fireEvent.click(screen.getByRole('button', { name: 'Mở rương hôm nay' }))
     expect(screen.queryByRole('dialog')).toBeNull()
-    const ruong = screen.getByRole('button', { name: 'Rương hôm nay đã mở' })
+    // thầy 02/11 khuya «mở rồi thì không còn hiệu ứng khi bấm vào nữa»: hiệu ứng xong ⇒ thẻ TĨNH (không còn là nút), chữ «Rương đã mở»
+    const ruong = await waitFor(() => screen.getByLabelText('Rương hôm nay đã mở'), { timeout: 4000 })
+    expect(ruong.tagName).toBe('SECTION')
     expect(ruong.hasAttribute('data-da-mo')).toBe(true)
-    expect(ruong.textContent).toContain('Đã mở rương')
+    expect(ruong.textContent).toContain('Rương đã mở')
   })
   it('lời Bi NHẮC MỘT LẦN mỗi ngày (thầy 27/10): giữ ~4 s rồi thu gọn và gỡ; mở lại trong ngày ⇒ không hiện; nội dung đổi hẳn (đủ mức) ⇒ hiện lại một lần', () => {
     vi.useFakeTimers()

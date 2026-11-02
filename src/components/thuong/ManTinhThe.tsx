@@ -2,16 +2,15 @@
 // Tinh thể = MỘT đồng tiền (gộp «vàng» cũ, LUAT «Ghép với hiện trạng» mục 2). Số đọc từ /hs/thuong; thiếu trường ⇒ khối ẩn, không bịa số.
 // Hiệu ứng: D1 tinh thể bay theo đường cong tới bộ đếm · D2 rương lắc 3 nhịp, bật nắp, tinh thể phun ra · H1 tinh thể mờ dần bốc hơi, bộ đếm giảm,
 // Bi «ngu» thức dậy rồi buồn · H4 đồng xu tinh thể nứt đôi. Công tắc «thăng hoa» tắt ⇒ khối / màn thăng hoa ẩn.
-import { useRef, useState, type CSSProperties } from 'react'
+import { useRef, type CSSProperties } from 'react'
 import { BookOpen, Check, ChevronRight, Clock, FlaskConical, Lock, Sparkles, Target, Wrench, Zap } from 'lucide-react'
 import { Bi } from '../linh-vat/Bi'
 import { bayToi, bungHat, demSo, hoatAnh, phanHoiThuong } from '../../lib/hieu-ung-thuong'
-import { anMung } from '../../lib/hieu-ung'
-import { chuDaCoBinhTuan, chuGiaBinh, giaBinh, moRuong, vongMucTieu, type NhiemVu, type ThongBao, type TongQuanThuong } from '../../lib/thuong-api'
-import { Binh, IcTinhThe, Ruong } from './hinh'
+import { chuDaCoBinhTuan, chuGiaBinh, giaBinh, vongMucTieu, type NhiemVu, type ThongBao, type TongQuanThuong } from '../../lib/thuong-api'
+import { Binh, IcTinhThe } from './hinh'
 import { SoDem } from './SoDem'
-import { capNhatTongQuan, useTongQuan } from './dung-thuong'
-import { Cho, DemTT, Loi, ManToan, NutDay, chuGioPhut, oTinhThe, phutToiNuaDem, useHieuUng, useToast } from './chung'
+import { useTongQuan } from './dung-thuong'
+import { Cho, DemTT, Loi, ManToan, NutDay, chuGioPhut, oTinhThe, phutToiNuaDem, useHieuUng } from './chung'
 import { DauVe, TheCuoc, useMuaThuong } from './ManChuoi'
 
 const MUC_TIEU_TT = 5
@@ -40,42 +39,16 @@ export function DongNhiemVu({ nv, id }: { nv: NhiemVu; id?: string }) {
 /** Màn Nhiệm vụ hôm nay (tp-9). */
 export function ManNhiemVu({ token, onVe, hieuUng }: { token?: string; onVe?: () => void; hieuUng?: 'ruong' }) {
   const { du: tq, tai, loi, thuLai } = useTongQuan(token)
-  const [dangMo, setDangMo] = useState(false)
-  const [moXong, setMoXong] = useState(false)
-  const [toast, bao] = useToast()
-  const ruong = useRef<HTMLSpanElement>(null)
-  const chayRuong = async () => {
-    const r = ruong.current
-    phanHoiThuong('ruong')
-    hoatAnh(r, [{ transform: 'rotate(0)' }, { transform: 'rotate(-9deg)' }, { transform: 'rotate(8deg)' }, { transform: 'rotate(-8deg)' }, { transform: 'rotate(7deg)' }, { transform: 'rotate(-5deg)' }, { transform: 'rotate(0)' }], 600)
-    hoatAnh(r?.querySelector('.tp-ruong-nap'), [{ transform: 'none' }, { transform: 'none', offset: 0.55 }, { transform: 'translate(0px,-20px) rotate(-24deg)', offset: 0.8 }, { transform: 'translate(0px,-14px) rotate(-16deg)' }], 1000, { e: 'ease-out' })
-    hoatAnh(r?.querySelector('.tp-ruong-trong'), [{ opacity: 0 }, { opacity: 0, offset: 0.6 }, { opacity: 1 }], 1000)
-    // 🎁 bùng lúc nắp bật (bộ hiệu ứng ăn mừng, thầy chốt 02/11): tia sáng toả + loé vàng + quầng + tia lửa + lấp lánh — thay hạt bung cũ (rương đã tự lắc, nắp
-    // đã tự bật ở trên ⇒ chỉ phần bùng). Máy yếu: bản gọn.
-    setTimeout(() => anMung('ruong', { goc: r, lac: false }), 550)
-    await new Promise((x) => setTimeout(x, 950))
-    await bayToi(r, oTinhThe(), { n: 8, d: 700 })
-  }
-  useHieuUng(() => { if (hieuUng === 'ruong') void chayRuong() }, [hieuUng])
+  // hieuUng 'ruong' (thông báo cũ): rương đã ra màn Hôm nay ⇒ không còn rương ở đây để chạy hiệu ứng
+  void hieuUng
   if (!tq) return <div className="tp-goc tp-vo"><DauVe onVe={onVe} />{tai ? <Cho /> : <Loi chu={loi || 'Chưa xem được nhiệm vụ.'} onThuLai={thuLai} />}</div>
   const nv = tq.nhiemVu ?? []
   const soXong = nv.filter((x) => x.xong).length
   const r = tq.ruong, mt = vongMucTieu(tq.mucTieu)
-  const mo = !!r?.mo || moXong
-  const duMo = nv.length > 0 && soXong === nv.length
+  const mo = !!r?.mo
   const datMt = !!mt?.dat
   const daNhan = nv.filter((x) => x.xong).reduce((s, x) => s + x.thuong, 0) + (datMt ? MUC_TIEU_TT : 0) + (mo && r ? r.thuong : 0)
   const conLai = nv.filter((x) => !x.xong).reduce((s, x) => s + x.thuong, 0) + (mt && !datMt ? MUC_TIEU_TT : 0) + (!mo && r ? r.thuong : 0)
-  const moRuongNgay = async () => {
-    if (!token || dangMo) return
-    setDangMo(true)
-    const kq = await moRuong(token)
-    setDangMo(false)
-    if (!kq.ok) return bao(kq.chu)
-    setMoXong(true)
-    await chayRuong()
-    void capNhatTongQuan(token)
-  }
   return <div className="tp-goc tp-vo" data-man="nhiem-vu">
     <DauVe onVe={onVe} />
     {loi && <Loi chu={loi} onThuLai={thuLai} />}
@@ -84,15 +57,7 @@ export function ManNhiemVu({ token, onVe, hieuUng }: { token?: string; onVe?: ()
         <div className="tp-dau"><h1 className="tp-tieu">Nhiệm vụ hôm nay</h1><span className="day tp-mo">nhiệm vụ mới sau {chuGioPhut(phutToiNuaDem())}</span></div>
         {nv.length === 0 ? <div className="tp-trong"><b>Nhiệm vụ hôm nay đang được chuẩn bị</b><span>Em cứ học bài, nhiệm vụ sẽ hiện ở đây.</span></div>
           : nv.map((x, i) => <DongNhiemVu key={x.ma} nv={x} id={`tp-nv-${i}`} />)}
-        {r && nv.length > 0 && <section className="tp-the" aria-label="Rương ngày">
-          <div className="tp-ruong-the"><span ref={ruong}><Ruong mo={mo} /></span>
-            <div className="giua">
-              {mo ? <><b style={{ color: 'var(--tp-tt-chu)' }}>Rương đã mở · +{r.thuong} <IcTinhThe /></b><span className="tp-mo">Hẹn em mai với {nv.length} nhiệm vụ mới.</span></>
-                : <><b>Rương ngày</b><span className="tp-mo">Xong cả {nv.length} nhiệm vụ để mở rương{'\u00a0'}· +{r.thuong}{'\u00a0'}<IcTinhThe /></span></>}
-              <div className="tp-ba-cham" role="img" aria-label={`Đã xong ${soXong}/${nv.length} nhiệm vụ`}>{nv.map((x) => <i key={x.ma} data-x={x.xong || undefined} />)}</div>
-              {!mo && duMo && token && <button type="button" className="tp-nut" data-sac="tt" disabled={dangMo} onClick={() => void moRuongNgay()}>Mở rương · +{r.thuong} <IcTinhThe /></button>}
-            </div></div>
-        </section>}
+        {/* Rương ngày: chuyển ra màn Hôm nay (thầy 02/11 khuya «để rương ở ngoài thôi, rương bên trong bỏ đi») — TrongHs.tsx TheRuong mở rương thật */}
       </div>
       <div className="c">
         <section className="tp-the" aria-label="Tinh thể hôm nay">
@@ -111,7 +76,6 @@ export function ManNhiemVu({ token, onVe, hieuUng }: { token?: string; onVe?: ()
         </section>
       </div>
     </div>
-    {toast}
   </div>
 }
 
