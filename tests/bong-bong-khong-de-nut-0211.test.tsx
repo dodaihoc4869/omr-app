@@ -5,7 +5,7 @@
 // Toạ độ dưới đây chép từ ảnh thật (điện thoại 390 px, ảnh 1248 px ⇒ chia 3,2).
 import { readFileSync } from 'node:fs'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { act, cleanup, fireEvent, render } from '@testing-library/react'
+import { act, cleanup, render } from '@testing-library/react'
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu' }))
 vi.mock('../src/lib/phan-hoi', () => ({ phanHoi: vi.fn() }))
 import { MotTrangHs, type PropsMotTrang } from '../src/components/hoc-tap/TrongHs'
@@ -77,7 +77,7 @@ const p = (them: Partial<PropsMotTrang> = {}): PropsMotTrang => ({
   kiem: KIEM, onKiemTra: noop, ...them,
 })
 const goc = { rect: Element.prototype.getBoundingClientRect, range: Range.prototype.getClientRects }
-function giaKhung(vat: 'anh' | 'kin') {
+function _giaKhung(vat: 'anh' | 'kin') {
   const DR = (h: Hop) => ({ ...h, x: h.left, y: h.top, width: h.right - h.left, height: h.bottom - h.top, toJSON: () => h }) as DOMRect
   const dem = 26
   Range.prototype.getClientRects = function () {

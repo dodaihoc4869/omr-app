@@ -2,7 +2,7 @@
 // chạm Mol ⇒ hiện lại lời gần nhất, né nút chặng / nhãn (thu hẹp hoặc nâng lên), giảm chuyển động ⇒ không hiệu ứng.
 import { readFileSync } from 'node:fs'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { act, cleanup, fireEvent, render } from '@testing-library/react'
+import { act, cleanup, render } from '@testing-library/react'
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu' }))
 vi.mock('../src/lib/phan-hoi', () => ({ phanHoi: vi.fn() }))
 import { MotTrangHs, type PropsMotTrang } from '../src/components/hoc-tap/TrongHs'
