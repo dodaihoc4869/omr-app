@@ -1167,7 +1167,9 @@ html[data-trong='hs'] .duo-ket .duo-nut[data-sac=do] { border-radius: 30px; back
 html[data-trong='hs'] .duo-ket .duo-nut[data-sac=lam] { border-radius: 30px; background: var(--tr-tin-chu); color: var(--tr-trang); box-shadow: 0 14px 26px -14px var(--tr-tin-day); }
 html[data-trong='hs'] .duo-nut[data-sac=vang] { border-radius: 30px; box-shadow: inset 0 0 0 1.5px var(--tr-sao), 0 10px 22px -14px var(--tr-phu); }
 html[data-trong='hs'] .duo-ket :is(.duo-lien, .duo-hang-nut > a, .duo-hang-nut > button:not(.duo-nut)) { border-radius: 30px; }
-html.may-yeu[data-trong='hs'] :is(.duo-dong, .duo .ht2-lam-de, .duo-kt-thi .ht2-lam-de, .duo-gt-bong, .duo-day.duo-ket) { -webkit-backdrop-filter: none; backdrop-filter: none; }
+/* TỐC ĐỘ (đo CPU ×4: bấm phương án / Kiểm tra / Tiếp tục chậm hơn bản cũ): sau các mặt kính màn làm câu chỉ là nền chuyển màu mịn — làm mờ không đổi hình
+   mà mỗi lần bấm phải vẽ lại ⇒ bỏ làm mờ ở MỌI máy, giữ màu kính. */
+html[data-trong='hs'] :is(.duo-dong, .duo-kt-tren > button:first-child, .duo .ht2-lam-de, .duo-kt-thi .ht2-lam-de, .duo-gt-bong, .duo-day.duo-ket) { -webkit-backdrop-filter: none; backdrop-filter: none; }
 /* MÀN THI + KIỂM TRA ÔN TẬP (khung KhungKiemTra): cùng ngôn ngữ kính */
 html[data-trong='hs'] :is(.duo-kt-trang, .duo-kt-thi) { background: transparent; }
 html[data-trong='hs'] :is(.duo-kt-nut-luoi, .duo-kt-gio) { border: 0; border-radius: 22px; background: var(--kinh-ve); box-shadow: inset 0 1px 0 var(--kinh-vien), inset 0 0 0 1px var(--kinh-vien-2), var(--kinh-bong); }

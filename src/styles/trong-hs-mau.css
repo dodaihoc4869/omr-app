@@ -94,7 +94,7 @@ html:root[data-trong='hs'] .da-tren .tp-tr-o[data-k='nt'] { color: var(--tr-nguy
 html.may-yeu:root[data-trong='hs'] { --kinh-ve: var(--tr-mat); --kinh-mo-ve: none; --kinh-mat: var(--tr-mat); --kinh-mat-dam: var(--tr-mat); --kinh-nen: var(--tr-nen); --kinh-mo: none; }
 /* NỀN LOANG (Liquid Glass): lớp cố định sau mọi nội dung — chỉ dải màu CSS, không ảnh; vẽ một lần (không hoạt ảnh) ⇒ máy yếu như nhau. */
 html[data-trong='hs'] body { background-color: var(--tr-nen); }
-html[data-trong='hs'] body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+html[data-trong='hs'] body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none; transform: translateZ(0); /* lớp riêng: bấm / đổi câu không vẽ lại nền */
   background:
     radial-gradient(70% 38% at 8% 4%, color-mix(in oklab, var(--tr-hs) 42%, transparent), transparent 72%),
     radial-gradient(55% 32% at 98% 22%, color-mix(in oklab, var(--tr-tin) 34%, transparent), transparent 72%),
