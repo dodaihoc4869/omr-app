@@ -54,7 +54,7 @@ export function quenDiaChiMayChu(): void {
 /**
  * Địa chỉ máy chủ cho MỌI lượt gọi của học sinh và phụ huynh.
  *
- * Thứ tự: cấu hình trong máy → gợi ý chỗ gọi đưa vào → chờ lượt nạp lúc khởi
+ * Thứ tự (27788740a): gợi ý chỗ gọi đưa vào (hợp lệ thì thắng) → địa chỉ đã nhớ → cấu hình trong máy → chờ lượt nạp lúc khởi
  * động → tải thẳng `cau-hinh.json`. Bốn đường cùng chỉ về một địa chỉ; đường
  * nào ra trước thì lấy.
  *

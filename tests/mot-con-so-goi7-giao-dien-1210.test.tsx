@@ -38,7 +38,8 @@ it('ảnh thầy sau sửa: đã làm 2/32 · còn 30 câu (= 32 − 2) · dòng
 it('đạt mục tiêu khi đã làm ≥ M — đúng "đủ mức" phía thầy; câu mới theo lịch chưa gặp hết KHÔNG chặn chữ đạt (trước 12/10 thì chặn)', () => {
   const { container } = ve(goi({ toiThieu: 24, daLamHomNay: 24, tuLamCon: 0 }, { quota: 3, gapHomNay: 2 }), 0)
   expect(container.querySelector('.ht2-hn-so')!.textContent).toBe('Đủ mức hôm nay')
-  expect(container.querySelector('.ht2-hn-da')!.textContent).toContain('Đã làm 24/24 câu hôm nay · em có thể nghỉ.')
+  // 02/11: cập nhật theo ce842a241 (dấu cách trước "·" thành cách không ngắt &nbsp; để chấm không rơi xuống đầu dòng).
+  expect(container.querySelector('.ht2-hn-da')!.textContent).toContain('Đã làm 24/24 câu hôm nay\u00a0· em có thể nghỉ.')
   expect(screen.getByText('Câu mới hôm nay: 2/3 (nằm trong 24 câu của ngày). Còn 156 câu trong bài.')).toBeTruthy()
 })
 

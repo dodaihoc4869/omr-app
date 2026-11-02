@@ -59,8 +59,10 @@ describe('MỘT DÒNG, VUỐT NGANG', () => {
 })
 
 describe('DÙNG CHUNG HAI MÀN', () => {
-  it('cả Mở ca và Phân công đều dùng đúng hàng này', () => {
-    for (const [ten, mh] of [['Mở ca', MO_CA], ['Phân công', PC]] as const) {
+  // 02/11: cập nhật theo cf1384ed6 (màn Phân công bỏ hẳn bộ lọc nhóm đề khi đổi cách giao BTVN) — chỉ còn Mở ca dùng hàng này;
+  // phép kiểm dưới vẫn canh Phân công không tự vẽ lại hàng chip riêng.
+  it('Mở ca dùng đúng hàng này', () => {
+    for (const [ten, mh] of [['Mở ca', MO_CA]] as const) {
       expect(mh, ten).toContain('<HangNhomDe ds={dsNhom} chon={nhomLoc} onChon={setNhomLoc} />')
       expect(mh, ten).toContain("import HangNhomDe from '../components/HangNhomDe'")
     }

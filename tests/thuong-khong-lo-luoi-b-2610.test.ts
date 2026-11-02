@@ -33,6 +33,24 @@ function sach(nhan: string, v: unknown) {
   for (const s of ['LUOI1', 'LUOI2', 'BAN01', 'BAN02']) expect(json, `${nhan}: lộ SBD ${s}`).not.toContain(`"${s}"`)
 }
 
+/** 02/11: cập nhật theo bf7b489b9 (thầy 27/10: dòng CHÍNH em tuần bị xếp đối phó hiện «0» + «chưa tính hạng», chạm ⇒ nguyên tử
+ *  chưa tính + lý do bản xếp). Ngoại lệ DUY NHẤT: khối `chuaTinh {nguyenTu, lyDo}` trên dòng `laEm` của chính em. Canh: dòng bạn khác
+ *  KHÔNG có khối ấy, khối đúng hai khoá; bóc khối ra rồi phần còn lại vẫn phải sạch như luật 26/10. */
+function bocChuaTinhCuaEm(giai: Record<string, any>): Record<string, any> {
+  const nhom = (giai.nhom ?? []) as Record<string, any>[]
+  for (const x of nhom) if (!x.laEm) expect(x.chuaTinh, `dòng bạn khác không được mang chuaTinh: ${x.ten}`).toBeUndefined()
+  return {
+    ...giai,
+    nhom: nhom.map((x) => {
+      if (!x.laEm || x.chuaTinh === undefined) return x
+      expect(Object.keys(x.chuaTinh).sort()).toEqual(['lyDo', 'nguyenTu'])
+      expect(Array.isArray(x.chuaTinh.lyDo)).toBe(true)
+      const { chuaTinh: _bo, ...con } = x
+      return con
+    }),
+  }
+}
+
 describe('phần B không lộ hệ lười ở /hs', () => {
   it('em bị xếp Đối phó / ĐUỔI: mọi phản hồi /hs của giải + học cùng bạn và mọi thông báo B ghi đều sạch', async () => {
     xoaNhoGiai(); xoaNhoBanBe()
@@ -50,7 +68,10 @@ describe('phần B không lộ hệ lười ở /hs', () => {
 
     const giai = (await hsGiai(d.env, { token: t1 }, NOW)) as Record<string, any>
     expect(giai.nhom.find((x: any) => x.laEm).nguyenTu).toBe(0) // bị loại khỏi bảng mà không có lý do nào
-    sach('/hs/giai', giai)
+    expect(giai.nhom.find((x: any) => x.laEm).chuaTinh).toBeDefined() // 02/11: theo bf7b489b9 — chính em thấy vì sao chưa tính
+    for (const sb of ['LUOI1', 'LUOI2', 'BAN01', 'BAN02']) expect(JSON.stringify(giai), `/hs/giai (đủ): lộ SBD ${sb}`).not.toContain(`"${sb}"`)
+    expect(JSON.stringify(giai), '/hs/giai (đủ): khoá sbd').not.toMatch(/"(sbd|em_a|em_b)"/)
+    sach('/hs/giai', bocChuaTinhCuaEm(giai))
     sach('tomTatGiaiEm', await tomTatGiaiEm(d.env, 'LUOI1', NOW))
 
     sach('/hs/ban/tim', await hsBanTim(d.env, { token: t1, q: 'van' }))
