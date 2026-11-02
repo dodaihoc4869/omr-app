@@ -43,6 +43,7 @@ export const CANH = [
   ['lam-7-tln', 'man=lam13&lam=duo', `${DQ4} » phim:8,2`, false],
   ['lam-8-xong', 'man=lam13&lam=duo', `${DQ4} » phim:8,2 » nut:^Kiểm tra$ » nut:^Tiếp tục » tn:^B » nut:^Kiểm tra$ » nut:^Tiếp tục`, false],
   ['tu-sua-loi', 'man=hs12-tu-chua', '', true],
+  ['tu-sua-viec', 'man=hs12-tu-chua&sua=nay', 'cho:900', true], // Tự sửa lỗi CÓ «Việc hôm nay» (như bản sống của thầy 02/11)
   ['chua-cau-sai', 'man=duo-sua&de=1', 'cho:900', false], // luồng sửa câu app ĐANG DÙNG (ChuaGonDuo) — luồng «Đường tự gỡ» cũ không còn là lối vào
   ['tu-luyen', 'man=hs12-tu-luyen', '', true],
   ['tu-luyen-lam', 'man=hs12-tu-luyen-lam', '', false],
