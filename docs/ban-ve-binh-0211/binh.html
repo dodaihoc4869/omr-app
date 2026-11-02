@@ -21,24 +21,25 @@ body { font-family: 'DDH Rounded', sans-serif; background: var(--tr-nen) var(--k
 .the span { font-size: 26px; font-weight: 800; color: var(--tr-chu-3); }
 .the p { margin: 10px 0 0; font-size: 14px; font-weight: 600; color: var(--tr-chu-2); line-height: 1.35; }
 svg.binh { width: 150px; height: auto; overflow: visible; }
+body.to .the { width: auto; grid-template-columns: 460px; padding: 40px; } body.to .the > div { display: none; } body.to svg.binh { width: 460px; }
 /* ── màu dung dịch: chàm (đang làm) → hồng (đủ) ── */
 .binh { --pha: var(--tr-mat); --dd0: color-mix(in oklab, var(--tr-hs) 50%, var(--pha)); --dd1: var(--tr-hs); --sang: var(--tr-hs); }
 .du .binh { --dd0: color-mix(in oklab, var(--tr-tim) 55%, var(--pha)); --dd1: var(--tr-tim); --sang: var(--tr-tim); }
-@media (prefers-color-scheme: dark) { .binh { --pha: var(--tr-chu); } .du .binh { --dd0: color-mix(in oklab, var(--tr-tim) 72%, var(--pha)); } }
+@media (prefers-color-scheme: dark) { .binh { --pha: var(--tr-chu); } svg.binh .g0 { stop-opacity: .2; } svg.binh .g1 { stop-opacity: .03; } svg.binh .g2 { stop-opacity: .12; } .du .binh { --dd0: color-mix(in oklab, var(--tr-tim) 72%, var(--pha)); } }
 .binh .l0 { stop-color: var(--dd0); } .binh .l1 { stop-color: var(--dd1); }
-.binh .g0 { stop-color: var(--tr-mat); stop-opacity: .7; } .binh .g1 { stop-color: var(--tr-mat); stop-opacity: .08; } .binh .g2 { stop-color: var(--tr-mat); stop-opacity: .45; }
+.binh .g0 { stop-color: var(--pha); stop-opacity: .7; } .binh .g1 { stop-color: var(--pha); stop-opacity: .08; } .binh .g2 { stop-color: var(--pha); stop-opacity: .45; }
 .binh .vo { fill: none; stroke: color-mix(in oklab, var(--tr-chu) 55%, transparent); stroke-width: 3; stroke-linejoin: round; }
-.binh .vo2 { fill: none; stroke: color-mix(in oklab, var(--tr-mat) 85%, transparent); stroke-width: 1.4; stroke-linejoin: round; opacity: .8; }
-.binh .mieng { fill: color-mix(in oklab, var(--tr-mat) 80%, transparent); stroke: color-mix(in oklab, var(--tr-chu) 55%, transparent); stroke-width: 2.6; }
-.binh .loe { fill: none; stroke: var(--tr-mat); stroke-linecap: round; }
-.binh .khum { fill: color-mix(in oklab, var(--dd0) 70%, var(--tr-mat)); }
-.binh .song { fill: none; stroke: color-mix(in oklab, var(--tr-mat) 80%, transparent); stroke-width: 1.6; stroke-linecap: round; opacity: .8; }
+.binh .vo2 { fill: none; stroke: color-mix(in oklab, var(--pha) 85%, transparent); stroke-width: 1.4; stroke-linejoin: round; opacity: .8; }
+.binh .mieng { fill: color-mix(in oklab, var(--pha) 80%, transparent); stroke: color-mix(in oklab, var(--tr-chu) 55%, transparent); stroke-width: 2.6; }
+.binh .loe { fill: none; stroke: var(--pha); stroke-linecap: round; }
+.binh .khum { fill: color-mix(in oklab, var(--dd0) 70%, var(--pha)); }
+.binh .song { fill: none; stroke: color-mix(in oklab, var(--pha) 80%, transparent); stroke-width: 1.6; stroke-linecap: round; opacity: .8; }
 .binh .vach { stroke: color-mix(in oklab, var(--tr-chu) 40%, transparent); stroke-width: 2; stroke-linecap: round; }
 .binh .muc { stroke: var(--tr-tim-chu); stroke-width: 2.2; stroke-dasharray: 5 5; stroke-linecap: round; }
 .binh .bot { fill: var(--pha); opacity: .6; }
 .binh .bong { fill: var(--tr-phu); opacity: .3; }
 .binh .quang { stop-color: var(--sang); }
-.binh .tia { stroke: var(--tr-tim); stroke-linecap: round; }
+.binh .sao { fill: var(--tr-tim); }
 </style></head>
 <body>
 <div class="the"><div><small id="nhan">Tổng câu hôm nay</small><b id="so">34<span>/63 câu</span></b><p id="phu">Còn 29 câu nữa là dung dịch đổi màu.</p></div>
@@ -47,16 +48,18 @@ svg.binh { width: 150px; height: auto; overflow: visible; }
     <clipPath id="trong"><path id="voP" d="M86 22V76L30 190Q22 208 38 214Q46 217 56 217H144Q154 217 162 214Q178 208 170 190L114 76V22Z"/></clipPath>
     <linearGradient id="kinh" x1="0" x2="1"><stop offset="0" class="g0"/><stop offset=".45" class="g1"/><stop offset="1" class="g2"/></linearGradient>
     <linearGradient id="ddl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="l0"/><stop offset="1" class="l1"/></linearGradient>
-    <radialGradient id="qg" cx=".5" cy=".62" r=".5"><stop offset="0" class="quang" stop-opacity=".55"/><stop offset=".55" class="quang" stop-opacity=".18"/><stop offset="1" class="quang" stop-opacity="0"/></radialGradient>
-    <linearGradient id="phan" x1="0" x2="1"><stop offset="0" stop-color="white" stop-opacity="0"/><stop offset=".5" stop-color="white" stop-opacity=".55"/><stop offset="1" stop-color="white" stop-opacity="0"/></linearGradient>
+    <radialGradient id="qg" cx=".5" cy=".62" r=".5"><stop offset="0" class="quang" stop-opacity=".4"/><stop offset=".55" class="quang" stop-opacity=".12"/><stop offset="1" class="quang" stop-opacity="0"/></radialGradient>
+    <radialGradient id="vong" r=".5"><stop offset=".55" class="quang" stop-opacity="0"/><stop offset=".8" class="quang" stop-opacity=".16"/><stop offset="1" class="quang" stop-opacity="0"/></radialGradient>
+    <radialGradient id="vong2" r=".5"><stop offset=".8" class="quang" stop-opacity="0"/><stop offset=".92" class="quang" stop-opacity=".2"/><stop offset="1" class="quang" stop-opacity="0"/></radialGradient>
+    <path id="sao" d="M0 -8C1 -2 2 -1 8 0C2 1 1 2 0 8C-1 2 -2 1 -8 0C-2 -1 -1 -2 0 -8Z"/>
   </defs>
   <ellipse id="quangNen" cx="100" cy="160" rx="128" ry="110" fill="url(#qg)" opacity="0"/>
+  <g id="hao" opacity="0"><circle cx="100" cy="148" r="118" fill="url(#vong)"/></g>
   <ellipse class="bong" cx="100" cy="228" rx="76" ry="7"/>
   <use href="#voP" fill="url(#kinh)"/>
   <g clip-path="url(#trong)">
     <g id="dd"><rect id="ddR" x="-120" y="140" width="440" height="260" fill="url(#ddl)"/><path id="khum" class="khum"/><path id="songP" class="song"/></g>
     <g id="bots"></g>
-    <rect id="phanQ" x="-60" y="0" width="60" height="240" fill="url(#phan)" opacity="0" transform="skewX(-18)"/>
   </g>
   <g id="vachs"></g>
   <line class="muc" x1="74" x2="126" y1="100" y2="100"/>
@@ -65,10 +68,11 @@ svg.binh { width: 150px; height: auto; overflow: visible; }
   <rect class="mieng" x="79" y="12" width="42" height="11" rx="5.5"/>
   <path class="loe" stroke-width="5" opacity=".85" d="M93 30V78M78 104L50 162"/>
   <path class="loe" stroke-width="3" opacity=".6" d="M44 176L40 186"/>
-  <g id="tias" opacity="0"></g>
+  <g id="saos" opacity="0"></g>
 </svg></div>
 <script>
 const q = new URLSearchParams(location.search)
+if (q.get('to') === '1') document.body.classList.add('to')
 const S = { goc: +(q.get('goc') ?? 0), muc: +(q.get('muc') ?? .54), du: q.get('du') === '1', pha: q.get('pha') === null ? -1 : +q.get('pha') }
 const DAY = 214, MUC = 100, f = (n) => n.toFixed(2)
 const xP = (v) => 114 + Math.max(0, v - 76) * (56 / 114), xT = (v) => 86 - Math.max(0, v - 76) * (56 / 114)
@@ -89,15 +93,16 @@ function ve(t, goc, muc, du, pha) {
   document.getElementById('songP').setAttribute('d', d)
   document.getElementById('khum').setAttribute('d', d + `L${cx + w} ${f(y + 9)}L${cx - w} ${f(y + 9)}Z`)
   document.getElementById('bots').innerHTML = BOT.map(([bx, r, p]) => { const k = ((t / 4200 + p) % 1), by = DAY - 6 - k * (DAY - y - 10); return by > y + 6 ? `<circle class="bot" cx="${f(bx + Math.sin(t / 700 + p * 9) * 2.5)}" cy="${f(by)}" r="${r * (0.7 + k * .5)}"/>` : '' }).join('')
-  // ĐỔI MÀU: quầng hồng nở một lần (pha 0→1) rồi giữ sáng dịu; vệt sáng quét qua bình; 8 tia nhỏ
-  const qn = document.getElementById('quangNen'), ph = document.getElementById('phanQ'), tias = document.getElementById('tias')
-  if (pha >= 0) {
-    const e = Math.sin(Math.min(1, pha) * Math.PI)
-    qn.setAttribute('opacity', f(.35 + e * .65)); qn.setAttribute('transform', `translate(100 160) scale(${f(.8 + e * .35)}) translate(-100 -160)`)
-    ph.setAttribute('opacity', f(e)); ph.setAttribute('x', f(-60 + pha * 260))
-    tias.setAttribute('opacity', f(e))
-    tias.innerHTML = Array.from({ length: 8 }, (_, i) => { const g = i * Math.PI / 4 + .3, r0 = 96 + pha * 26, r1 = r0 + 10 * e; return `<line class="tia" stroke-width="2.4" x1="${f(100 + Math.cos(g) * r0)}" y1="${f(150 + Math.sin(g) * r0 * .9)}" x2="${f(100 + Math.cos(g) * r1)}" y2="${f(150 + Math.sin(g) * r1 * .9)}"/>` }).join('')
-  } else { qn.setAttribute('opacity', du ? '.35' : '0'); qn.removeAttribute('transform'); ph.setAttribute('opacity', '0'); tias.setAttribute('opacity', '0') }
+  // ĐỔI MÀU: HÀO QUANG — quầng hồng dịu + vành sáng mảnh nở chậm từ trong ra (pha 0→1), rồi «thở» rất nhẹ; 3 sao nhỏ lấp lánh. Không tia, không vệt.
+  const qn = document.getElementById('quangNen'), hao = document.getElementById('hao'), saos = document.getElementById('saos')
+  const SAO = [[160, 70, .8, 0], [36, 104, .55, .4], [168, 156, .45, .75]]
+  if (du) {
+    const k = pha >= 0 ? 1 - Math.pow(1 - Math.min(1, pha), 3) : 1, tho = pha >= 0 && pha < 1 ? 0 : Math.sin(t / 1300) * .12
+    qn.setAttribute('opacity', f(k * .45 + tho * .5)); qn.removeAttribute('transform')
+    hao.setAttribute('opacity', f(k * (.85 + tho))); hao.setAttribute('transform', `translate(100 148) scale(${f(.78 + k * .22)}) translate(-100 -148)`)
+    saos.setAttribute('opacity', f(k))
+    saos.innerHTML = SAO.map(([x, y, c, ph]) => { const n = .55 + .45 * Math.sin(t / 900 + ph * 6.28); return `<use href="#sao" class="sao" opacity="${f(n)}" transform="translate(${x} ${y}) scale(${f(c * (.8 + n * .3))})"/>` }).join('')
+  } else { qn.setAttribute('opacity', '0'); hao.setAttribute('opacity', '0'); saos.setAttribute('opacity', '0') }
   const so = Math.round(muc * 63)
   document.getElementById('so').innerHTML = `${Math.min(so, 63)}<span>/63 câu</span>`
   document.getElementById('nhan').textContent = du ? 'Xong hết hôm nay' : 'Tổng câu hôm nay'
@@ -110,8 +115,8 @@ if (q.get('chay') === '1') {
     const dich = t < 4 ? Math.sin(t * 1.6) * 20 : t < 5 ? 0 : 0
     vGoc += ((dich - gocNgang) * 40 - vGoc * 7) / 60; gocNgang += vGoc / 60
     const muc = t < 4 ? .55 : Math.min(1, .55 + (t - 4) * .45)
-    const du = muc >= 1, pha = du ? Math.min(1, (t - 5.05) / 1.4) : -1
-    ve(now - t0, gocNgang, muc, du, du ? pha : -1)
+    const du = muc >= 1, pha = du ? Math.min(1, (t - 5.05) / 2.2) : -1
+    ve(now - t0, gocNgang, muc, du, du && pha < 1 ? pha : -1)
     requestAnimationFrame(lap)
   }
   requestAnimationFrame(lap)
