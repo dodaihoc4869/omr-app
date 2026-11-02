@@ -49,7 +49,7 @@ describe('Lộ trình: bong bóng co theo chữ', () => {
     } as PropsMotTrang
     const { container } = render(<MotTrangHs {...p} />)
     expect(container.querySelector('.da-lv-loi-o')).toBeNull()
-    const bb = container.querySelector<HTMLElement>('.bi-loi .bi-loi-bong')!
+    const bb = container.querySelector<HTMLElement>('.kb-hero .kb-mol .bi-loi-bong')! // thầy 03/11 chốt: Mol + bong bóng ở góc trái thẻ đầu
     expect(bb).not.toBeNull()
     expect(bb.style.width).toBe('') // không ép bề rộng bằng số đo: CSS max-content ôm chữ
     vi.useRealTimers()

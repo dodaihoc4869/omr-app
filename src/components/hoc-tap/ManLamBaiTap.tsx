@@ -70,8 +70,6 @@ const KetBaiThuong = lazy(() => import('../thuong/KetBaiThuong'))
 const TamHuongDan = lazy(() => import('../thuong/ManThuong').then((m) => ({ default: m.TamHuongDan })))
 // Giám thị theo mức câu (thầy chốt 27/10): mảnh lười + tờ riêng; ở đây chỉ phần chọn mức (nhỏ).
 const GiamThiCau = lazy(() => import('../giam-thi/GiamThi'))
-/** Thầy 02/11 khuya: «Ẩn hết nút lời giải từng bước». */
-const AN_LOI_GIAI_TUNG_BUOC = true
 import { mucGiamThi } from '../giam-thi/muc-giam-thi'
 /** Trùng tên với TrongHs.SU_KIEN_MO_CHUOI (không nhập TrongHs vào mảnh màn làm bài). */
 const SU_KIEN_MO_CHUOI = 'ddh-thuong-mo-chuoi'
@@ -1173,8 +1171,9 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     const ketGt = !k ? null : khongTinh ? 'chua-tinh' as const : tt === 'trung' ? 'trung' as const : tt === 'sai' ? 'sai' as const : chuoi >= 3 && !laLamLai ? 'combo' as const : 'dung' as const
     // thầy 27/10 «Lời giải từng bước cho lên hàng chưa đúng, làm nhỏ lại»: nút nhỏ ở BÊN PHẢI hàng tiêu đề dải (kiểu icon cờ Duolingo), mọi dải đúng / sai /
     // chưa tính; khổ hẹp + tiêu đề dài ⇒ chỉ còn icon sách (tên đọc màn hình giữ «Lời giải từng bước»).
-    // thầy 02/11 khuya «Ẩn hết nút lời giải từng bước» ⇒ không hiện nút (giữ mã khung lời giải, bật lại: bỏ `AN_LOI_GIAI_TUNG_BUOC &&`)
-    const nutLg = !AN_LOI_GIAI_TUNG_BUOC && q && k && !k.choThay ? <button type="button" className="duo-ct-lg" aria-label="Lời giải từng bước" onClick={() => setMoLoiGiai(true)}><BookOpen size={18} aria-hidden="true" /><span>Lời giải</span></button> : null
+    // thầy 03/11 «Làm chặng đang bị mất nút lời giải» ⇒ GIỮ nút «Lời giải» của màn làm chặng (mở lời giải Kính); lệnh 02/11 «ẩn nút lời giải từng bước» chỉ áp cho
+    // nút viên «Lời giải từng bước» cạnh Hỏi thầy (NutHoiThay) và thẻ A.I
+    const nutLg = q && k && !k.choThay ? <button type="button" className="duo-ct-lg" aria-label="Lời giải" onClick={() => setMoLoiGiai(true)}><BookOpen size={18} aria-hidden="true" /><span>Lời giải</span></button> : null
     const dauDai = (tieu: ReactNode, chu: string) => <div className="duo-ct-dau" data-dai={chu.length > 12 || undefined}>{tieu}{nutLg}</div>
 
     const day = tai ? null

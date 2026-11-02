@@ -12,6 +12,22 @@
 // động ⇒ dáng đổi tức thì theo cảm xúc, không vòng lò xo, không động tác đứng chờ, chớp mắt bằng hẹn giờ (đổi mắt nhắm / mở, không rAF).
 import type { MucGT, TrangThaiGT } from './giam-thi-ve'
 import { MAT_X, MAT_Y, NV_GT4, TL, VB, veNguoi, type NhanRoi, type NvGT4 } from './giam-thi-hinh'
+
+/** Bong bóng CO VỪA CHỮ (thầy 03/11 «Bong bóng của giám thị khung phải tự động vừa với chữ nhé»): `width: max-content` kẹp ở bề ngang tối đa ⇒ chữ xuống dòng
+ *  (cân dòng) vẫn để khung rộng hết cỡ, thừa khoảng trống bên phải. Đo dòng chữ DÀI NHẤT (Range) rồi đặt bề rộng khung đúng bằng nó (+ đệm). Một lần đo mỗi lời. */
+function coVuaChu(el: HTMLElement): void {
+  try {
+    const r = document.createRange(); r.selectNodeContents(el)
+    const ds = [...r.getClientRects()]
+    if (ds.length < 2) return // một dòng: max-content đã vừa
+    const dong = new Map<number, [number, number]>()
+    for (const d of ds) { if (!d.width) continue; const k = Math.round(d.top); const c = dong.get(k); dong.set(k, c ? [Math.min(c[0], d.left), Math.max(c[1], d.right)] : [d.left, d.right]) }
+    let rong = 0
+    for (const [a, b] of dong.values()) rong = Math.max(rong, b - a)
+    const cs = getComputedStyle(el), dem = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + parseFloat(cs.borderLeftWidth) + parseFloat(cs.borderRightWidth)
+    if (rong > 0 && rong + dem + 1 < el.getBoundingClientRect().width) el.style.width = `${Math.ceil(rong + dem + 1)}px`
+  } catch { /* trình duyệt cũ: giữ như cũ */ }
+}
 import { rung } from '../../lib/rung'
 
 export type PhanUngGT = 'chon' | 'nop' | 'voi' | 'dung' | 'dungLien' | 'sai' | 'saiLien' | 'choc' | 'roi'
@@ -706,6 +722,7 @@ export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; 
       vao.appendChild(el)
       const goChu = !p.tinh && !p.giam && !p.dung
       if (goChu) con.textContent = chu; else da.textContent = chu
+      coVuaChu(el) // khung vừa dòng chữ dài nhất (đo lúc đủ chữ — phần gõ dần giữ chỗ bằng chữ ẩn)
       if (p.tinh) return gt
       if (typeof el.animate === 'function') el.animate([{ opacity: 0, transform: 'scale(.6)' }, { opacity: 1, transform: 'scale(1.05)', offset: 0.65 }, { opacity: 1, transform: 'scale(1)' }], { duration: 320, easing: 'cubic-bezier(.34,1.56,.64,1)' })
       if (goChu) { // gõ từng chữ (giữ chỗ bằng phần chữ ẩn ⇒ bong bóng không đổi cỡ khi gõ)
