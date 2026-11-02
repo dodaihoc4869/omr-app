@@ -12,7 +12,7 @@ os.makedirs(f'{D}/bang', exist_ok=True)
 NHOM = [('Hôm nay|hom-nay', ['hom-nay', 'hom-nay-du', 'hom-nay-kt', 'hom-nay-ca', 'thong-bao']),
         ('Học một chặng|hoc-chang', ['lam-moi', 'lam-chon', 'lam-ban-phim', 'lam-ds', 'lam-tln', 'hoc-cach-giai', 'ket-chang']),
         ('Luyện tập|luyen-tap', ['luyen-tap', 'tu-sua-loi', 'chua-cau-sai', 'cau-da-lam', 'tu-luyen', 'bai-tap']),
-        ('Thành tích|thanh-tich', ['thanh-tich', 'chuoi-ngay', 'giai-tuan', 'cua-hang', 'hoc-cung-ban', 'kim-cuong', 'ket-qua']),
+        ('Thành tích|thanh-tich', ['thanh-tich', 'nhiem-vu', 'chuoi-ngay', 'giai-tuan', 'cua-hang', 'hoc-cung-ban', 'kim-cuong', 'ket-qua']),
         ('Thêm · A.I · Đăng nhập|them-ai-dang-nhap', ['them', 'ai', 'dang-nhap', 'tam-dong'])]
 for so, (tt, ds) in enumerate(NHOM, 1):
     ten, slug = tt.split('|')

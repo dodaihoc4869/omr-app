@@ -29,6 +29,7 @@ const hero = ({ da, muc, chang, du, lua = 5, nhan, dong: dg }) => `<section clas
 const nutLon = (icon, tieu, phu, sac = '') => `<button class="nut-lon"${sac ? ` data-sac="${sac}"` : ''}><span class="banh-o" data-hinh="banh">${i(icon)}</span><span class="giua"><b>${tieu}</b><span class="phu">${phu}</span></span>${i('phai')}</button>`
 const molNoi = (m, loi) => `<div class="mol-noi"><span class="m">${mol(m)}</span><p class="kinh">${loi}</p></div>`
 const goCua = `<section class="kinh hang" style="border-radius:26px;padding:10px 10px 10px 14px" aria-label="Bạn học cùng"><span class="ava" data-hinh="co" style="width:44px;height:44px"><b style="color:var(--tr-sao-chu)">GB</b></span><span class="giua"><b style="font-size:15px">Trần Gia Bảo chưa đủ mức hôm nay</b><span class="mo">Lửa đôi 3 ngày</span></span><button class="chip" style="height:44px;color:var(--tr-hs-chu)">${i('tay')}Gõ cửa</button></section>`
+const RUONG = `<svg viewBox="0 0 92 80" aria-hidden="true"><ellipse cx="46" cy="75" rx="36" ry="4.5" style="fill:var(--tr-phu);opacity:.3"/><rect x="8" y="34" width="76" height="38" rx="11" style="fill:var(--tr-sao)"/><path d="M8 38 Q8 12 32 12 H60 Q84 12 84 38 Z" style="fill:var(--tr-sao-day)"/><path d="M14 30 Q18 18 32 17 H44" style="fill:none;stroke:var(--tr-mat);stroke-width:4;stroke-linecap:round;opacity:.55"/><rect x="40" y="12" width="12" height="60" style="fill:var(--tr-hs-day)"/><path d="M46 27 L56 33 V45 L46 51 L36 45 V33 Z" style="fill:var(--tr-mat)"/><circle cx="46" cy="39" r="4" style="fill:var(--tr-hs-day)"/></svg>`
 const P = {}
 
 // ═════ HÔM NAY ═════
@@ -47,6 +48,7 @@ P['hom-nay'] = trang('Hôm nay · đang học', `<div class="rong"><main class="
     ${hang('khoa', 'Chặng 4', 'Hoàn thành các chặng trước để mở khoá', loai('hoc'))}
     ${hang('', 'Bài tập về nhà', '1 bài thầy đang giao', loai('bt'))}
   </section>
+  <button class="kinh hang" style="border-radius:26px;padding:12px 14px" aria-label="Nhiệm vụ hôm nay: 2/3, rương ngày mở khi xong 3 nhiệm vụ"><span style="width:52px;flex:none" class="mh">${RUONG}</span><span class="giua"><b>Nhiệm vụ hôm nay · 2/3</b><span class="mo">Xong 3 nhiệm vụ là mở Rương ngày</span></span><span class="chev">${i('phai')}</span></button>
   ${goCua}
 </aside></div>`, { nav: 1 })
 
@@ -56,10 +58,11 @@ P['hom-nay-du'] = trang('Hôm nay · đủ mức, dung dịch đổi hồng', `<
   ${molNoi('khen', 'Đủ mức rồi! Giờ đến Bài tập về nhà nhé.')}
   ${nutLon('pen', 'Làm Bài tập về nhà', '1 bài thầy đang giao', 'bt')}
 </main><aside class="trang" aria-label="Việc hôm nay">
-  <section class="kinh viec"><h2>Việc hôm nay <span>4/5 xong</span></h2>
+  <section class="kinh viec"><h2>Việc hôm nay <span>5/6 xong</span></h2>
     ${hang('xong', 'Kiểm tra ôn tập', 'Đã nộp · điểm 8,5/10', loai('kiem'))}
     ${hang('xong', 'Chặng 1', '6 câu', loai('hoc'))}
-    ${hang('xong', 'Chặng 2', '11 câu', loai('hoc'))}
+    ${hang('xong', 'Chặng 2', '6 câu', loai('hoc'))}
+    ${hang('xong', 'Học thêm', '5 câu mới', loai('hoc'))}
     ${hang('xong', 'Tự sửa lỗi', 'Hôm nay đã sửa xong', loai('sua'))}
     ${hang('dang', 'Bài tập về nhà', '1 bài thầy đang giao', '<span class="phai" style="color:var(--tr-chu-y-chu)">Làm bài</span>')}
   </section>
@@ -119,7 +122,7 @@ P['lam-ds'] = trang('Làm câu · Đúng–sai, kết quả chưa đúng', `<div
 P['lam-tln'] = trang('Làm câu · Trả lời ngắn, kết quả đúng', `<div class="lam">${lamTren(['x', 'h', 'x', 's', 'dang', ''], 5)}
 <div class="lam-than" data-hai><div class="cot"><section class="kinh de"><div class="nhan-de"><span class="chip" data-sac="hs" data-nho>Chặng 3</span><span class="chip" data-nho>Trả lời ngắn</span></div>Cho 0,1 mol glycine tác dụng vừa đủ với dung dịch HCl. Khối lượng muối thu được là bao nhiêu gam? <span class="mo">(làm tròn đến hàng phần trăm)</span></section></div>
 <div class="cot"><div class="kinh o-so" data-kq="dung" aria-label="Đáp án em nhập">11,15</div>
-<section class="kq" data-tt="dung" role="status"><div class="dau-kq">${oi('check', 'dung', 'to')}<div><h2>Chính xác!</h2><p>Tự làm đúng · bình hôm nay 15/24 câu</p></div></div><div class="loi-giai"><b>Cách nghĩ</b>n<sub>muối</sub> = n<sub>glycine</sub> = 0,1 ⇒ m = 0,1 × 111,5 = 11,15 g</div><button class="nut" data-l="dung" data-rong>Câu tiếp theo</button></section></div></div></div>`, { thanh: false, mot: true })
+<section class="kq" data-tt="dung" role="status"><div class="dau-kq">${oi('check', 'dung', 'to')}<div><h2>Chính xác!</h2><p>Tự làm đúng · bình hôm nay 17/24 câu</p></div></div><div class="loi-giai"><b>Cách nghĩ</b>n<sub>muối</sub> = n<sub>glycine</sub> = 0,1 ⇒ m = 0,1 × 111,5 = 11,15 g</div><button class="nut" data-l="dung" data-rong>Câu tiếp theo</button></section></div></div></div>`, { thanh: false, mot: true })
 P['lam-ban-phim'] = trang('Làm câu · Trả lời ngắn, đang nhập', `<div class="lam">${lamTren(['x', 'h', 'x', 's', 'dang', ''], 5)}
 <div class="lam-than" data-hai><div class="cot"><section class="kinh de"><div class="nhan-de"><span class="chip" data-sac="hs" data-nho>Chặng 3</span><span class="chip" data-nho>Trả lời ngắn</span></div>Cho 0,1 mol glycine tác dụng vừa đủ với dung dịch HCl. Khối lượng muối thu được là bao nhiêu gam? <span class="mo">(làm tròn đến hàng phần trăm)</span></section></div>
 <div class="cot"><div class="kinh o-so" aria-label="Đáp án em nhập">11,1<span style="width:3px;height:34px;border-radius:2px;background:var(--tr-hs-day);margin-left:3px"></span></div>
@@ -235,21 +238,22 @@ P['bai-tap'] = trang('Bài tập về nhà · danh sách và hạn nộp', `<mai
 </main>`, { nav: 2 })
 
 // ═════ THÀNH TÍCH ═════
-const doThi = () => { const v = [12, 24, 26, 18, 24, 0, 24, 30, 24, 25, 24, 28, 24, 14], W = 320, H = 120, x = (n) => 8 + (n * (W - 16)) / 13, y = (c) => H - 14 - (c / 32) * (H - 30)
+const doThi = () => { const v = [24, 26, 12, 24, 25, 24, 28, 18, 24, 30, 24, 25, 26, 14], W = 320, H = 120, x = (n) => 8 + (n * (W - 16)) / 13, y = (c) => H - 14 - (c / 32) * (H - 30)
   let d = `M${x(0)} ${y(v[0])}`; for (let n = 1; n < 14; n++) { const cx = (x(n - 1) + x(n)) / 2; d += ` C${cx} ${y(v[n - 1])} ${cx} ${y(v[n])} ${x(n)} ${y(v[n])}` }
   return `<div class="do-thi"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Số câu mỗi ngày trong 14 ngày, mức 24"><path class="vung-t" d="${d} L${x(13)} ${H - 14} L${x(0)} ${H - 14} Z"/><line class="muc-t" x1="0" x2="${W}" y1="${y(24)}" y2="${y(24)}"/><text class="nhan-muc" x="${W}" y="${y(24) - 6}" text-anchor="end">mức 24</text><path class="duong-t" d="${d}"/><circle class="cham-t" cx="${x(13)}" cy="${y(14)}" r="5"/><text x="${x(0)}" y="${H}">20/10</text><text x="${x(13)}" y="${H}" text-anchor="end">Hôm nay</text></svg></div>` }
 P['thanh-tich'] = trang('Thành tích · chuỗi, biểu đồ 14 ngày, huy hiệu', `<main class="trang" data-rong-1>
   ${TIEU('Thành tích')}
   <section class="kinh the-p" style="display:grid;grid-template-columns:1fr 104px;align-items:center;gap:6px">
-    <div><span style="font-size:14px;font-weight:800;color:var(--tr-chu-3)">CHUỖI NGÀY</span><div class="so-lon" style="color:var(--tr-sao-chu)">12<small>ngày</small></div><p class="mo" style="margin-top:6px">Mỗi ngày đủ mức giữ chuỗi · dài nhất 21 ngày</p></div>
+    <div><span style="font-size:14px;font-weight:800;color:var(--tr-chu-3)">CHUỖI NGÀY</span><div class="so-lon" style="color:var(--tr-sao-chu)">5<small>ngày</small></div><p class="mo" style="margin-top:6px">Mỗi ngày đủ mức giữ chuỗi · dài nhất 21 ngày</p></div>
     <span>${mol('vui')}</span>
   </section>
-  <section class="kinh the-p"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px"><b>14 ngày gần nhất</b><span class="mo">12/14 ngày đủ mức</span></div>${doThi()}</section>
+  <section class="kinh the-p"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px"><b>14 ngày gần nhất</b><span class="mo">11/13 ngày đủ mức · hôm nay chưa đủ</span></div>${doThi()}</section>
   <h2 class="tieu-nho">Huy hiệu <span>7/18</span></h2>
   <section class="kinh the-p"><div class="huy">${[['banh', 'flame', 'sao', '7 ngày liền', 'Đã có'], ['hoa', 'target', 'tin', 'Kiểm tra 8,5', 'Đã có'], ['co', 'check', 'dung', 'Đủ mức hôm nay', 'Đã có'], ['luc', 'atom', 'hs', '1 000 nguyên tử', '128 nữa'], ['song', 'wrench', 'sai', 'Sửa 50 lỗi', '12/50'], ['vien', 'trophy', '', '30 ngày liền', 'Còn 18 ngày']].map(([h, ic, c, t, p]) => `<figure${c ? '' : ' data-khoa'}><span class="hk" data-hinh="${h}"${c ? ` style="--c:var(--tr-${c === 'hs' ? 'hs-day' : c === 'sai' ? 'sai' : c === 'dung' ? 'dung-nut' : c + '-day'})"` : ''}>${i(c ? ic : 'lock')}</span><figcaption>${t}<small>${p}</small></figcaption></figure>`).join('')}</div></section>
   <section class="kinh ds">
-    ${dong(oi('route', 'tin', 'nho'), 'Giải tuần', 'Hạng 4 trong nhóm')}
+    ${dong(oi('route', 'tin', 'nho'), 'Giải tuần', 'Giải Bạc · hạng 4 trong nhóm')}
     ${dong(oi('users', 'dung', 'nho'), 'Học cùng bạn', 'Lửa đôi với Gia Bảo 3 ngày')}
+    ${dong(oi('target', 'sao', 'nho'), 'Nhiệm vụ hôm nay', '2/3 · Rương ngày')}
     ${dong(oi('award', 'tin', 'nho'), 'Thử thách Kim cương', '10 câu khó của chuyên đề em đã vững')}
     ${dong(oi('gem', 'tim', 'nho'), 'Cửa hàng', 'Tinh thể và bình giữ chuỗi', '<span class="chip" data-k="tt" style="height:30px">' + i('gem') + '42</span>')}
   </section>
@@ -262,22 +266,22 @@ P['thanh-tich'] = trang('Thành tích · chuỗi, biểu đồ 14 ngày, huy hi�
 
 P['chuoi-ngay'] = trang('Chuỗi ngày · lịch tháng và bình giữ chuỗi', `<main class="trang" data-rong-1>
   ${CON('Chuỗi ngày')}
-  <section class="kinh the-p" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px"><span style="width:96px">${mol('vui')}</span><div class="so-lon" style="color:var(--tr-sao-chu)">12<small>ngày</small></div><span class="mo">Chuỗi dài nhất 21 ngày</span></section>
+  <section class="kinh the-p" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px"><span style="width:96px">${mol('vui')}</span><div class="so-lon" style="color:var(--tr-sao-chu)">5<small>ngày</small></div><span class="mo">Chuỗi dài nhất 21 ngày</span></section>
   <section class="kinh the-p"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><b>Tháng 11</b><span class="mo">${i('flame')}</span></div>
-    <div class="lich">${['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'].map((t) => `<span class="t">${t}</span>`).join('')}${[27, 28, 29, 30, 31].map((n) => `<i data-d>${n}</i>`).join('')}<i data-d>1</i><i data-nay>2</i>${Array.from({ length: 28 }, (_, n) => `<i>${n + 3}</i>`).join('')}</div>
+    <div class="lich">${['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'].map((t) => `<span class="t">${t}</span>`).join('')}<i>27</i>${[28, 29, 30, 31].map((n) => `<i data-d>${n}</i>`).join('')}<i data-d>1</i><i data-nay>2</i>${Array.from({ length: 28 }, (_, n) => `<i>${n + 3}</i>`).join('')}</div>
     <div style="display:flex;gap:14px;margin-top:12px;font-size:13px;font-weight:700;color:var(--tr-chu-3)"><span><i style="display:inline-block;width:12px;height:12px;border-radius:6px;background:var(--tr-sao-nhat);box-shadow:inset 0 0 0 2px var(--tr-sao);vertical-align:-1px"></i> đủ mức</span><span><i style="display:inline-block;width:12px;height:12px;border-radius:6px;box-shadow:inset 0 0 0 2px var(--tr-tin-day);vertical-align:-1px"></i> dùng bình giữ chuỗi</span></div></section>
   <section class="kinh hang" style="border-radius:26px;padding:14px">${oi('khien', 'tin', 'to')}<span class="giua"><b>Bình giữ chuỗi · 1</b><span class="mo">Tự dùng khi em lỡ một ngày</span></span><button class="nut" data-l="kinh" style="min-height:44px;font-size:15px">Mua thêm</button></section>
 </main>`, { nav: 3 })
 
 P['giai-tuan'] = trang('Giải tuần · bảng nhóm', `<main class="trang" data-rong-1>
   ${CON('Giải tuần')}
-  <section class="kinh the-p" style="display:flex;align-items:center;gap:14px">${oi('trophy', 'sao', 'to')}<div style="flex:1"><b style="font-size:18px;display:block">Nhóm Bạc · tuần 45</b><span class="mo">Còn 4 ngày · top 5 lên nhóm Vàng</span></div></section>
+  <section class="kinh the-p" style="display:flex;align-items:center;gap:14px">${oi('trophy', 'sao', 'to')}<div style="flex:1"><b style="font-size:18px;display:block">Giải Bạc · tuần này</b><span class="mo">Top 5 lên Giải Vàng · 4 bạn cuối xuống Giải Đồng</span></div></section>
   <section class="kinh ds xh">
     ${[['1', 'MT', 'Mai Thu', '512', 'sao'], ['2', 'QH', 'Quang Huy', '488', 'tin'], ['3', 'LP', 'Lan Phương', '430', 'dung'], ['4', 'AN', 'Hoài An (em)', '312', 'hs'], ['5', 'GB', 'Gia Bảo', '296', 'chu-y']].map(([h, v, t, d, c], n) => `<button class="hang"${n === 3 ? ' data-em' : ''}><span class="h">${h}</span><span class="ava-n" style="background:var(--tr-${c}-nhat);color:var(--tr-${c}-chu)">${v}</span><span class="giua"><b>${t}</b></span><span class="so-p">${d}</span></button>`).join('')}
-    <div class="vung" data-k="len">Vùng lên nhóm</div>
+    <div class="vung" data-k="len">Vùng lên hạng · 5 bạn</div>
     ${[['6', 'TN', 'Thảo Nhi', '270', 'tim'], ['7', 'ĐK', 'Đăng Khoa', '244', 'tin']].map(([h, v, t, d, c]) => `<button class="hang"><span class="h">${h}</span><span class="ava-n" style="background:var(--tr-${c === 'tim' ? 'hs' : c}-nhat);color:var(--tr-${c === 'tim' ? 'tim' : c}-chu)">${v}</span><span class="giua"><b>${t}</b></span><span class="so-p">${d}</span></button>`).join('')}
-    <div class="vung" data-k="xuong">Vùng xuống nhóm</div>
-    <button class="hang"><span class="h">12</span><span class="ava-n" style="background:var(--tr-mat-2);color:var(--tr-chu-2)">PL</span><span class="giua"><b>Phương Linh</b></span><span class="so-p">61</span></button>
+    <div class="vung" data-k="xuong">Vùng rơi hạng · 4 bạn</div>
+    <button class="hang"><span class="h">17</span><span class="ava-n" style="background:var(--tr-mat-2);color:var(--tr-chu-2)">PL</span><span class="giua"><b>Phương Linh</b></span><span class="so-p">61</span></button>
   </section>
 </main>`, { nav: 3 })
 
@@ -316,12 +320,26 @@ P['kim-cuong'] = trang('Thử thách Kim cương', `<main class="trang" data-ron
 P['ket-qua'] = trang('Kết quả ca kiểm tra đã công bố', `<main class="trang" data-rong-1>
   ${CON('Kết quả ca kiểm tra')}
   <section class="kinh the-p" style="display:flex;flex-direction:column;gap:14px">
-    <div style="display:flex;justify-content:space-between;align-items:end"><div><span class="mo">Ca 28/10 · Amino acid và peptide</span><div class="so-lon">8,25<small>/10</small></div></div><span style="width:84px">${mol('khen')}</span></div>
-    ${[['Phần I · Trắc nghiệm', 15, 18, 'x'], ['Phần II · Đúng–sai', 13, 16, 'd'], ['Phần III · Trả lời ngắn', 4, 6, 'h']].map(([t, a, b, k]) => `<div><div style="display:flex;justify-content:space-between;font-size:15px;font-weight:750"><span>${t}</span><span>${a}/${b}</span></div><div class="vach-t" style="margin-top:6px">${`<i data-${k}></i>`.repeat(a)}${'<i></i>'.repeat(b - a)}</div></div>`).join('')}
+    <div style="display:flex;justify-content:space-between;align-items:end"><div><span class="mo">Ca 28/10 · Amino acid và peptide</span><div class="so-lon">8,0<small>/10</small></div></div><span style="width:84px">${mol('khen')}</span></div>
+    ${[['Phần I · Trắc nghiệm', 16, 18, 'x', '4,0/4,5 điểm · 16/18 câu'], ['Phần II · Đúng–sai', 14, 16, 'd', '3,0/4,0 điểm · 14/16 ý'], ['Phần III · Trả lời ngắn', 4, 6, 'h', '1,0/1,5 điểm · 4/6 câu']].map(([t, a, b, k, g]) => `<div><div style="display:flex;justify-content:space-between;font-size:15px;font-weight:750;gap:8px"><span>${t}</span><span>${g}</span></div><div class="vach-t" style="margin-top:6px">${`<i data-${k}></i>`.repeat(a)}${'<i></i>'.repeat(b - a)}</div></div>`).join('')}
   </section>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><button class="nut" data-l="chinh">Xem đề &amp; lời giải</button><button class="nut" data-l="kinh">Hỏi thầy</button></div>
   <h2 class="tieu-nho">Các ca trước</h2>
   <section class="kinh ds">${dong(oi('chart', 'tin', 'nho'), 'Ca 21/10 · Carbohydrate', '7,50 điểm', chev)}${dong(oi('chart', 'tin', 'nho'), 'Ca 14/10 · Ester – Lipid', '6,75 điểm', chev)}</section>
+</main>`, { nav: 3 })
+
+
+P['nhiem-vu'] = trang('Nhiệm vụ hôm nay · Rương ngày', `<main class="trang" data-rong-1>
+  ${CON('Nhiệm vụ hôm nay')}
+  <section class="kinh the-p" style="display:grid;grid-template-columns:1fr 120px;align-items:center;gap:8px">
+    <div><b style="font-size:20px;display:block">Rương ngày</b><span class="mo">Xong cả 3 nhiệm vụ là mở rương</span><div class="vach-t" style="margin-top:12px;max-width:180px"><i data-x></i><i data-x></i><i></i></div></div>
+    <span class="mh">${RUONG}</span>
+  </section>
+  <section class="kinh ds">
+    ${[['check', 'dung', 'Làm đúng 10 câu', '10/10', 1], ['sach', 'hs', 'Học xong 2 chặng', '2/2', 1], ['wrench', 'sai', 'Sửa 3 câu sai', '0/3', 0]].map(([k, c, t, p, x]) => `<div class="hang">${oi(k, c, 'nho')}<span class="giua"><b>${t}</b><span class="vach-t" style="margin-top:6px">${p.split('/').map(Number).reduce((a, b) => '<i data-x></i>'.repeat(a) + '<i></i>'.repeat(b - a))}</span></span><span class="phai">${x ? '<span class="chip" data-sac="dung" data-nho>Đã đạt</span>' : `<span class="chip" data-k="tt" data-nho>${i('gem')}+5</span>`}</span></div>`).join('')}
+  </section>
+  <section class="kinh hang" style="border-radius:26px;padding:14px">${oi('gem', 'tim')}<span class="giua"><b>Tinh thể hôm nay</b><span class="mo">Đã nhận 10 · còn có thể nhận 15</span></span></section>
+  <p class="mo" style="text-align:center">Mỗi ngày rút 3 trong 6 kiểu</p>
 </main>`, { nav: 3 })
 
 // ═════ THÊM, THÔNG BÁO, A.I, ĐĂNG NHẬP, TẠM ĐÓNG ═════
@@ -358,7 +376,7 @@ P['thong-bao'] = trang('Thông báo · tấm trượt', `<main class="trang">${D
 <section class="kinh tam" aria-label="Thông báo" style="background:var(--kinh-dam)"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b style="font-size:22px">Thông báo</b><button class="nut" data-l="chu" style="min-height:44px;font-size:15px">Đọc hết</button></div>
   <div class="ds" style="padding:0">
     ${dong(oi('pen', 'chu-y', 'nho'), 'Thầy giao Bài tập về nhà mới', 'BTVN Amino acid · đề 2 · hạn 05/11 · 1 giờ trước', '<span class="cham" style="position:static;min-width:10px;height:10px;padding:0"></span>')}
-    ${dong(oi('chart', 'tin', 'nho'), 'Đã có điểm ca 28/10', '8,25 điểm · hôm qua', '<span class="cham" style="position:static;min-width:10px;height:10px;padding:0"></span>')}
+    ${dong(oi('chart', 'tin', 'nho'), 'Đã có điểm ca 28/10', '8,0 điểm · hôm qua', '<span class="cham" style="position:static;min-width:10px;height:10px;padding:0"></span>')}
     ${dong(oi('tay', 'sao', 'nho'), 'Quang Huy gõ cửa em', 'Học cho đủ mức để giữ lửa đôi · 2 ngày trước', '')}
   </div></section>`, { thanh: false })
 

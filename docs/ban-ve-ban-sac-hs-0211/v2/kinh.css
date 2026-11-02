@@ -146,7 +146,7 @@ svg.i { width: 22px; height: 22px; flex: none; fill: none; stroke: currentColor;
   .thanh { left: 10px; top: 50%; bottom: auto; transform: translateY(-50%); flex-direction: column; gap: 6px; }
   .thanh nav { flex-direction: column; padding: 4px; } .thanh nav a { width: 60px; height: 48px; font-size: 0; }
   .thanh .ai { width: 52px; height: 52px; }
-  .trang { padding-left: 96px; padding-bottom: 24px; max-width: 760px; }
+  body:has(.thanh) .trang { padding-left: 96px; padding-bottom: 24px; max-width: 760px; }
 }
 
 /* ═══════════ THÀNH PHẦN DÙNG CHUNG (bộ sinh tao.mjs) ═══════════ */

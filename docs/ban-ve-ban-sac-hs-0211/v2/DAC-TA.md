@@ -14,7 +14,7 @@
 | Đang chạy → v1 → v2 | `bang/00-truoc-sau.jpg` |
 | 5 tấm theo nhóm màn | `bang/01-…05-…jpg` |
 | Từng màn, 4 khổ | `bang/man-<màn>.jpg` (máy tính sáng · ngang tối · điện thoại sáng · điện thoại tối) |
-| Ảnh gốc | `anh/` — 29 màn × 3 khổ × sáng/tối = 174 ảnh |
+| Ảnh gốc | `anh/` — 30 màn × 3 khổ × sáng/tối = 180 ảnh |
 | Mã vẽ | `tao.mjs` (bộ sinh), `kinh.css` (hệ), `binh.js` (bình tam giác), `kve.js` (hình khối) |
 
 Chạy lại: `node tao.mjs && node chup.cjs <màn>… && python3 ghep.py`
@@ -62,21 +62,31 @@ Ghi chú về số liệu Material 3 Expressive: Google nói đã làm 46 nghiê
 
 - **Màu: giữ 100% biến `--tr-*`** (bảng chất chỉ thị thầy chốt 27/10).
   - Nền loang chỉ là 4 dải `radial-gradient` pha từ chàm, ngọc lam, hồng, vàng. Không ảnh, không mã màu mới.
-  - Chữ nhỏ trên mặt tô đậm dùng biến đậm hơn (`--tr-hs-day`, `--tr-*-chu`) để đạt ≥ 4,5:1. Máy đo của `chup.cjs` kiểm từng chữ.
+  - Chữ nhỏ trên mặt tô đậm dùng biến đậm hơn (`--tr-hs-day`, `--tr-*-chu`) để đạt ≥ 4,5:1.
+  - Máy đo của `chup.cjs` kiểm từng chữ trên **nền đặc** (`--tr-nen`). Nó chưa tính các vệt màu loang và lớp mờ của kính. Vì vậy khi build, máy yếu và chế độ «giảm trong suốt» sẽ dùng mặt đặc. Bản thật sẽ đo lại trên điểm ảnh của ảnh chụp.
 - **Phông:** giữ ĐĐH Rounded. Số lớn đậm 800, chữ thường, không IN HOA trên nút.
 - **Kính:** `--kinh` = mặt thẻ 62% + `backdrop-filter: blur(26px) saturate(170%)` + viền sáng mép trên.
   - Máy yếu / giảm hiệu ứng: bỏ blur, kính thành mặt đặc `--kinh-dam` (không mất chữ, không mất nút).
 - **Vector:** mọi hình đều là SVG vẽ bằng mã hoặc CSS: bình tam giác (dải phản quang, mặt khum, bọt, vạch chia), hình khối, biểu đồ, kim cương, nhãn dán. Mol là SVG thật của app. Không thêm ảnh PNG/JPG nào vào đường tải.
 
-## 4. Màn đã vẽ (29) — tính năng giữ nguyên, chữ lấy từ app thật
+## 4. Màn đã vẽ (30) — tính năng giữ nguyên, chữ lấy từ app thật
 
 | Nhóm | Màn |
 |---|---|
 | Hôm nay | đang học · đủ mức (đổi hồng) · ngày có Kiểm tra ôn tập + điểm danh · ca kiểm tra đang mở · tấm Thông báo |
 | Học một chặng | câu mới (Tự làm / Học cách giải) · trắc nghiệm + phương trình dài + Gợi ý · bàn phím số · Đúng–sai (chưa đúng) · Trả lời ngắn (đúng, «Cách nghĩ») · Học cách giải (sơ đồ cột dọc) · Kết chặng (story) |
 | Luyện tập | bento 6 việc · Tự sửa lỗi · Chữa câu sai (đường tự gỡ 4 bước) · Câu đã làm (lọc + lịch ôn) · Tu luyện (4 chế độ + bộ lọc) · Bài tập về nhà |
-| Thành tích | tổng quan (chuỗi, biểu đồ 14 ngày, huy hiệu hình khối) · Chuỗi ngày (lịch, bình giữ chuỗi) · Giải tuần · Cửa hàng · Học cùng bạn · Thử thách Kim cương · Kết quả ca kiểm tra |
+| Thành tích | tổng quan (chuỗi, biểu đồ 14 ngày, huy hiệu hình khối) · Nhiệm vụ hôm nay + Rương ngày · Chuỗi ngày (lịch, bình giữ chuỗi) · Giải tuần · Cửa hàng · Học cùng bạn · Thử thách Kim cương · Kết quả ca kiểm tra |
 | Khác | Thêm (điểm danh 6 ô mã, ca kiểm tra, A.I, thông báo, cài đặt, của em) · A.I Đỗ Đại Học · Đăng nhập · Thầy tạm đóng app |
+
+**Chưa vẽ trong lượt này** (sẽ mặc cùng hệ, vẽ sau khi thầy chốt hướng)
+- Bài gia đình giao (đồng hồ 120 phút).
+- Luyện lại từ bài kiểm tra / Khắc phục lỗi sai.
+- Luyện đề cấu trúc, Tu luyện › Tổng hợp.
+- Vào ca kiểm tra (nhập mã + mật khẩu ca).
+- Đặt mật khẩu lần đầu.
+- Chi tiết một huy hiệu, mời bạn học cùng.
+- Màn cuối tuần của Giải tuần, tấm thưởng (thăng hoa, mốc chuỗi…).
 
 **Không vẽ lại**
 - Màn thi thật (`ExamTakeScreen`): luật C-RÀO.
@@ -92,12 +102,16 @@ Ghi chú về số liệu Material 3 Expressive: Google nói đã làm 46 nghiê
    - «Câu này mới với em…», «Cách nghĩ»;
    - phần chữ của Kết chặng dạng story;
    - Cửa hàng: tên các món ngoài bình giữ chuỗi chỉ là ví dụ minh hoạ — **món thật lấy từ máy chủ**;
-   - Giải tuần: «Vùng lên nhóm / Vùng xuống nhóm», «Nhóm Bạc · tuần 45»;
+   - Nhiệm vụ hôm nay: tên 3 nhiệm vụ trên ảnh chỉ là ví dụ — nhiệm vụ thật do máy chủ rút (3 trong 6 kiểu);
    - Tạm đóng: «Em nghỉ một chút nhé…».
 
 ## 6. Dữ liệu · máy chủ · tốc độ
 
-- **Không thêm lệnh máy chủ.** Mọi số lấy từ nguồn đang có (`TrongHs.tsx`, `ThanhThuong`, `ManLamBaiTap`, `ManTuChua`, các màn thưởng phạt).
+- **Không thêm lệnh máy chủ.** Số trên ảnh là dữ liệu giả nhưng **khớp nhau**:
+  - chuỗi 5 ngày ↔ biểu đồ 14 ngày ↔ lịch tháng;
+  - bình 14 → 17 → 18/24 theo từng câu của chặng 3;
+  - điểm ca 8,0 = 4,0 + 3,0 + 1,0 theo thang 2025: Phần I 0,25/câu; Phần II 0,1/0,25/0,5/1 theo số ý đúng; Phần III 0,25/câu.
+- Mọi số lấy từ nguồn đang có (`TrongHs.tsx`, `ThanhThuong`, `ManLamBaiTap`, `ManTuChua`, các màn thưởng phạt).
 - Hai chỗ cần kiểm khi build (nếu chưa có thì ghi thành việc máy chủ riêng):
   - biểu đồ 14 ngày dùng `nhip.ngay` (đang có cho 7 ngày);
   - «Bài tập về nhà» 3 ô (Chặng đang mở / Chặng sau / Nộp bài) lấy đúng từ màn BTVN cũ.
@@ -111,7 +125,7 @@ Ghi chú về số liệu Material 3 Expressive: Google nói đã làm 46 nghiê
 
 ## 7. Nghiệm thu bằng máy
 
-- **Bản vẽ (đã đạt):** 174 ảnh. Kết quả dòng TỔNG của `chup.cjs`: 0 lỗi trang, 0 tràn ngang, 0 đích bấm < 44 px, 0 chữ cắt, 0 cặp chữ/nền dưới ngưỡng tương phản.
+- **Bản vẽ (đã đạt):** 180 ảnh. Kết quả dòng TỔNG của `chup.cjs`: 0 lỗi trang, 0 tràn ngang, 0 đích bấm < 44 px, 0 chữ cắt, 0 cặp chữ/nền dưới ngưỡng tương phản (đo trên nền đặc).
 - **Khi build:**
   - `tsc` + vitest liên quan + test mới cho bình (số câu → mức dung dịch, đổi hồng khi đủ mức, vượt mức) và danh sách việc (thứ tự, khoá);
   - `npm run build && npm run kiem:toc-do` 0 đỏ;
