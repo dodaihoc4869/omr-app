@@ -406,6 +406,8 @@ var CUM_HOI_MO = ["theo em", "vì sao", "tại sao", "phương pháp nào", "cá
 var DONG_TU_HOI_MO = /(?:^|[.?!:;]\s*|(?:^|[^\p{L}])hãy\s+)(?:giải thích|trình bày|mô tả|nêu|so sánh|nhận xét|đề xuất)(?![\p{L}])/iu;
 var DONG_TU_LAM_CHU = /(?:^|[.?!:;,]\s*|(?:^|[^\p{L}])hãy\s+)(?:xác định (?:công thức|cấu tạo|tên)|viết (?:công thức|phương trình|các phương trình|cấu tạo|sơ đồ|tên)|lập (?:công thức|phương trình|sơ đồ)|vẽ|chứng minh)(?![\p{L}])/iu;
 var HOI_DAI_LUONG = /bao nhiêu|số thứ tự|dãy số|bộ số|liệt kê|giá trị|tổng (?:hệ số|số)|là mấy|làm tròn|phần trăm|hiệu suất|khối lượng|thể tích|nồng độ|số mol|(?:^|[^\p{L}])tính(?![\p{L}])/iu;
+var YC = new RegExp("^(?:hãy )?(?:viết|xác định|tính(?! (?:chất|khử|oxi|acid|axit|base|tan|dẫn|dẻo))|giải thích|trình bày|nêu|so sánh|nhận xét|đề xuất|cho biết|tìm|(?:tại|vì) sao)(?!\\p{L})", "iu");
+var soYConYeuCau = (t) => t.split(/(?:^|[\s.:;?!])\(?[a-e]\)\s*/iu).slice(1).filter((d) => d.includes("?") || YC.test(d.trim())).length;
 var hoiMo = (text) => {
   const t = text.toLowerCase();
   return CUM_HOI_MO.some((m) => t.includes(m)) || DONG_TU_HOI_MO.test(t) || DONG_TU_LAM_CHU.test(t) && !HOI_DAI_LUONG.test(t);
@@ -438,10 +440,10 @@ function lyDoTuLuan(c, phanMacDinh) {
   if (!laDoiTuong(c)) return "không phải câu hỏi";
   const kieu = chuoi(lay(c, "kieu", "loai", "type", "loaiCau"));
   if (kieu && KIEU_TU_LUAN.test(kieu)) return "câu gắn nhãn tự luận";
-  if (c.tuLuan === true || c.tu_luan === true) return "câu gắn cờ tự luận (kho)";
-  if (laMaDeTuLuan(chuoi(lay(c, "maDe", "ma_de"))) || laMaDeTuLuan(chuoi(lay(c, "qid", "id")))) return "mã đề thuộc mục dạy học / tự luận (-VD, -DT, -TL)";
+  if (c.tuLuan === true || c.tu_luan === true) return "cờ tự luận";
+  if (laMaDeTuLuan(chuoi(lay(c, "maDe", "ma_de"))) || laMaDeTuLuan(chuoi(lay(c, "qid", "id")))) return "mã đề -VD/-DT/-TL";
   const phan = phanCua(c, phanMacDinh);
-  if (phan === "khac") return "phần của câu không phải I, II, III (tự luận)";
+  if (phan === "khac") return "phần không phải I, II, III";
   const text = chuoi(lay(c, "text", "de", "cauHoi", "noiDung"));
   const daRaw = lay(c, "correct", "dapAn", "dap_an", "dapAnDung");
   const chuaCoDapAn = c.chuaCoDapAn === true || laDoiTuong(c.caNhan) && c.caNhan.chuaCoDapAn === true;
@@ -450,21 +452,22 @@ function lyDoTuLuan(c, phanMacDinh) {
   if (phan === "I") {
     const pa = lay(c, "choices", "pa", "luaChon", "phuongAn", "options");
     const coPa = c.choices !== void 0 || c.pa !== void 0 || c.luaChon !== void 0 || c.phuongAn !== void 0 || c.options !== void 0;
-    if (coPa && demCoNoiDung(pa, lay(c, "choiceImgs", "anhLuaChon"), lay(c, "hinh", "hinhAnh"), "sau_pa_") < 4) return "phần I thiếu phương án (không đủ 4)";
+    if (coPa && demCoNoiDung(pa, lay(c, "choiceImgs", "anhLuaChon"), lay(c, "hinh", "hinhAnh"), "sau_pa_") < 4) return "phần I thiếu phương án";
     if (coDapAn && !/^[A-D]$/i.test(da.replace(/[.)\s]+$/, "").trim())) return "phần I không có đáp án A–D";
   } else if (phan === "II") {
     const y = lay(c, "ideas", "y", "cacY", "statements");
     const coY = c.ideas !== void 0 || c.y !== void 0 || c.cacY !== void 0 || c.statements !== void 0;
-    if (coY && demCoNoiDung(y, lay(c, "ideaImgs", "anhY"), lay(c, "hinh", "hinhAnh"), "sau_y_") < 4) return "phần II thiếu ý (không đủ 4)";
-    if (coDapAn && da.replace(/[^DSĐdsđ]/g, "").length !== 4) return "phần II không có đáp án đúng/sai đủ 4 ý";
+    if (coY && demCoNoiDung(y, lay(c, "ideaImgs", "anhY"), lay(c, "hinh", "hinhAnh"), "sau_y_") < 4) return "phần II thiếu ý";
+    if (coDapAn && da.replace(/[^DSĐdsđ]/g, "").length !== 4) return "phần II không đủ 4 ý Đ/S";
   } else if (phan === "III") {
+    if (text && (soYConYeuCau(text) > 1 || /cho biết[^.?!\n]{0,120}\shay\s/iu.test(text))) return "phần III nhiều ý";
     if (coDapAn) {
-      if (!da) return "phần III không có đáp án để chấm tự động";
-      if (da.length > 20 && /\s/.test(da) || /[\n;→⇌:]/.test(da)) return "phần III đáp án dài / nhiều dòng (tự luận)";
-      if (laChuNhieuTu(da)) return "phần III đáp án là chữ nhiều từ (không phải số hay mã ngắn)";
-      if (!laMotSoPhanIII(da)) return "phần III đáp án không phải một số (công thức / chữ / nhiều số) — không chấm tự động";
+      if (!da) return "phần III không có đáp án";
+      if (da.length > 20 && /\s/.test(da) || /[\n;→⇌:]/.test(da)) return "phần III đáp án dài";
+      if (laChuNhieuTu(da)) return "phần III đáp án chữ nhiều từ";
+      if (!laMotSoPhanIII(da)) return "phần III đáp án không phải một số";
     }
-    if (text && !(coDapAn && laMotSoPhanIII(da)) && hoiMo(text)) return "phần III hỏi mở (theo em / phương pháp nào / giải thích / viết công thức …)";
+    if (text && !(coDapAn && laMotSoPhanIII(da)) && hoiMo(text)) return "phần III hỏi mở";
   }
   return null;
 }

@@ -1,0 +1,88 @@
+[
+ {
+  "_ghiChu": "BẢN MẪU 1 — Phần I lý thuyết (đúng câu thầy chốt bản vẽ 02/11). Đáp án kho A.",
+  "cotLoi": { "chu": "Ester no, đơn chức, mạch hở có công thức chung **C_nH_{2n}O_2**, với n ≥ 2.", "congThuc": "C_nH_{2n}O_2 (n ≥ 2)", "chip": [ { "nhan": "No", "chu": "gốc không có π" }, { "nhan": "Đơn chức", "chu": "một nhóm COO: 2 O, 1 π" } ] },
+  "phim": [
+   { "chu": "Các em tách ester thành hai phần: **gốc** và **chức**.", "phu": "Gốc acid R, nhóm chức COO, gốc alcohol R'.", "hinh": "phan-tu" },
+   { "chu": "**No** là gốc không chứa π.", "phu": "Chỉ nói về gốc, chứ không phải cả phân tử.", "hinh": "kinh-lup" },
+   { "chu": "**Đơn chức** là một nhóm COO: hai O và một π.", "phu": "Nhóm COO vẫn có π dù ester no.", "hinh": "lien-ket" },
+   { "chu": "Lấy alkane C_nH_{2n+2}, mất một H2 tạo một π ⇒ **C_nH_{2n}O_2**.", "hinh": "cong-thuc" },
+   { "chu": "Gốc acid nhỏ nhất là H, gốc alcohol ít nhất 1 C ⇒ **HCOOCH3, n ≥ 2**.", "hinh": "phan-tu" }
+  ],
+  "thanChu": [],
+  "thayNoi": "Cứ mất đi 1 H2 thì hình thành lên 1 pi.",
+  "meo": "Cứ mất đi 1 H2 thì hình thành lên 1 pi.",
+  "lyDo": [
+   { "khoa": "A", "dung": true, "chu": "Alkane mất đúng một H2 cho một π của nhóm COO." },
+   { "khoa": "B", "dung": false, "chu": "Mất hai H2 là hai π: một π ở chức, một π ở gốc ⇒ gốc không no, chứ không phải no." },
+   { "khoa": "C", "dung": false, "chu": "Chưa mất H2 nào ⇒ 0 π, nhưng nhóm COO luôn có một π." },
+   { "khoa": "D", "dung": false, "chu": "Chỉ một O, mà nhóm COO cần hai O." }
+  ],
+  "hayNham": [ { "nghi": "**No** là cả phân tử không có π.", "dung": "**No** chỉ nói phần gốc. Nhóm COO vẫn có một π." } ],
+  "tuHoi": { "hoi": "Vì sao n nhỏ nhất là 2, không phải 1?", "tra": "n = 1 là HCOOH: gốc R' bằng 0 C nên là acid, chứ không phải ester. Ester nhỏ nhất HCOOCH3 có 2 C." },
+  "theNho": [ { "truoc": "Ester no, đơn chức, mạch hở có công thức chung nào?", "sau": "**C_nH_{2n}O_2**, n ≥ 2", "viSao": "Gốc no 0 π, nhóm COO 1 π: alkane mất một H2." } ]
+ },
+ {
+  "_ghiChu": "BẢN MẪU 2 — Phần II (Đúng/Sai). Đáp án kho SDSD. Thần chú đúng chữ bảng thần chú; câu thầy nói đúng chữ mục kiến thức.",
+  "cotLoi": { "chu": "Cân bằng chuyển dịch theo chiều **chống lại sự thay đổi đó**.", "chip": [ { "nhan": "3 yếu tố", "chu": "nhiệt độ · nồng độ · áp suất" }, { "nhan": "ΔrH < 0", "chu": "chiều thuận toả nhiệt" } ] },
+  "phim": [
+   { "chu": "ΔrH < 0 nên chiều thuận **toả nhiệt**, chiều nghịch thu nhiệt.", "hinh": "nhiet" },
+   { "chu": "Tăng nhiệt độ ⇒ chạy theo **chiều thu nhiệt** là chiều nghịch.", "hinh": "nhiet" },
+   { "chu": "Trái 4 mol khí, phải 2 mol khí. Tăng áp suất ⇒ **phía ít mol khí** là chiều thuận.", "hinh": "ap-suat" },
+   { "chu": "Xúc tác không nằm trong 3 yếu tố: nhanh đạt cân bằng, **không chuyển dịch**.", "hinh": "xuc-tac" },
+   { "chu": "Lấy bớt NH3 ⇒ cân bằng chạy **chiều tạo thêm NH3** là chiều thuận.", "hinh": "mui-ten" }
+  ],
+  "canh": { "loai": "can-bang", "trai": "N2 + 3H2", "phai": "2NH3", "nhanTrai": "4 mol khí", "nhanPhai": "2 mol khí", "tacDong": [
+   { "nut": "Tăng nhiệt độ", "chieu": "nghich", "chu": "Tăng nhiệt độ ⇒ chiều thu nhiệt (nghịch)" },
+   { "nut": "Tăng áp suất", "chieu": "thuan", "chu": "Tăng áp suất ⇒ phía ít mol khí (thuận)" },
+   { "nut": "Thêm xúc tác Fe", "chieu": "khong", "chu": "Xúc tác ⇒ không chuyển dịch" },
+   { "nut": "Lấy bớt NH3", "chieu": "thuan", "chu": "Lấy bớt NH3 ⇒ chiều tạo NH3 (thuận)" } ] },
+  "thanChu": [ "Tăng thu, giảm toả", "Tăng áp suất chọn phía ít mol khí, giảm áp suất chọn phía nhiều mol khí", "Bình thông nhau" ],
+  "thayNoi": "Có đúng ba yếu tố này thôi nhá: nhiệt độ, nồng độ và áp suất.",
+  "lyDo": [
+   { "khoa": "a", "dung": false, "chu": "Tăng thu: chiều thu nhiệt là chiều nghịch, chứ không phải chiều thuận." },
+   { "khoa": "b", "dung": true, "chu": "4 mol khí → 2 mol khí: tăng áp suất chọn phía ít mol khí." },
+   { "khoa": "c", "dung": false, "chu": "Xúc tác chỉ làm nhanh đạt cân bằng, không làm cân bằng chuyển dịch." },
+   { "khoa": "d", "dung": true, "chu": "Giảm NH3 thì cân bằng chạy chiều tạo thêm NH3." }
+  ],
+  "hayNham": [ { "nghi": "ΔrH < 0 là chiều thuận thu nhiệt.", "dung": "ΔrH < 0 là chiều thuận **toả nhiệt**, chiều nghịch thu nhiệt." } ],
+  "tuHoi": { "hoi": "Cân bằng H2(g) + I2(g) ⇌ 2HI(g): tăng áp suất thì sao?", "tra": "Hai vế đều 2 mol khí ⇒ tăng hay giảm áp suất, cân bằng không chuyển dịch." },
+  "theNho": [
+   { "truoc": "Tăng nhiệt độ, cân bằng chuyển dịch theo chiều nào?", "sau": "Theo chiều **thu nhiệt**", "viSao": "Cân bằng chống lại sự thay đổi: tăng nhiệt độ thì chạy chiều hấp thụ bớt nhiệt." },
+   { "truoc": "Xúc tác có làm cân bằng chuyển dịch không?", "sau": "**Không**. Chỉ làm nhanh đạt cân bằng." }
+  ]
+ },
+ {
+  "_ghiChu": "BẢN MẪU 3 — Phần III (tính toán). Đáp án kho 13,2. Sơ đồ cột dọc + MỘT phép tính, mỗi thừa số có nghĩa (em chạm số nào hiện nghĩa số đó).",
+  "cotLoi": { "chu": "1 acid + 1 alcohol → 1 ester. Tính theo chất **hết trước**, tính xuôi **× H/100**.", "chip": [ { "nhan": "M", "chu": "CH3COOH 60 · C2H5OH 46 · ester 88" } ] },
+  "phim": [
+   { "chu": "Cho acetic acid, ethanol và vài giọt H2SO4 đặc vào ống nghiệm.", "hinh": "ong-nghiem" },
+   { "chu": "Lắc đều, **đun cách thuỷ**.", "phu": "Phản ứng ester hoá là phản ứng thuận nghịch.", "hinh": "dun" },
+   { "chu": "Thêm dung dịch NaCl bão hoà: ester nhẹ, không tan, **nổi lớp trên**, có mùi thơm.", "hinh": "chiet" },
+   { "chu": "Thuận nghịch nên acid không chuyển hết thành ester ⇒ **H < 100%**, đề cho H = 75%.", "hinh": "do-thi" }
+  ],
+  "canh": { "loai": "ong-nghiem", "buoc": [
+   { "chu": "Acid + ethanol + vài giọt H2SO4 đặc", "lop": [ { "mau": "cam", "nhan": "hỗn hợp" } ] },
+   { "chu": "Đun cách thuỷ", "lop": [ { "mau": "cam", "nhan": "hỗn hợp" } ], "dun": true },
+   { "chu": "Thêm NaCl bão hoà: ester nổi lên trên", "lop": [ { "mau": "vang", "nhan": "lớp ester" }, { "mau": "xanh", "nhan": "nước + NaCl" } ] } ] },
+  "thanChu": [],
+  "thayNoi": "Tính xuôi thì các em phải nhân thêm với hiệu suất chia 100.",
+  "lyDo": [],
+  "soDo": { "nut": [ { "chat": "CH_3COOH", "soLieu": [ "12 g", "M = 60" ] }, { "chat": "CH_3COOC_2H_5", "soLieu": [ "m = ?", "M = 88" ] } ], "muiTen": [ { "H": 75 } ], "chieu": "xuoi" },
+  "buoc": [ { "ten": "m_ester", "thuaSo": [
+   { "so": "12", "nghia": "**Khối lượng acetic acid đề cho.** Đề cho số liệu ở chất nào thì bắt đầu từ chất đó.", "denDay": "12 g acid" },
+   { "so": "1/60", "nghia": "**Chia M = 60 để ra số mol acid.** M của CH3COOH = 2·12 + 4·1 + 2·16 = 60.", "denDay": "0,2 mol acid" },
+   { "so": "1", "nghia": "**1 acid ra 1 ester.** Bảo toàn gốc acid: mỗi CH3COOH cho đúng một CH3COOC2H5.", "denDay": "0,2 mol ester nếu phản ứng hết" },
+   { "so": "88", "nghia": "**Nhân M = 88 để ra khối lượng ester.** M của C4H8O2 = 4·12 + 8·1 + 2·16 = 88.", "denDay": "17,6 g nếu phản ứng hết" },
+   { "so": "75/100", "nghia": "**Tính xuôi nên nhân H/100.** Đi từ acid sang ester là trái sang phải: chỉ 75% acid thành ester.", "denDay": "13,2 g ester" } ],
+   "ketQua": "13,2", "donVi": "g" } ],
+  "ketQua": "13,2",
+  "kiemLai": "Chất hết trước: 12/60 = 0,2 < 13,8/46 = 0,3 ⇒ tính theo acid. Kiểm: lý thuyết 0,2 · 88 = 17,6 g; thực tế 17,6 · 75/100 = 13,2 g.",
+  "hayNham": [
+   { "nghi": "Đáp số 17,6 g.", "dung": "Đó là khối lượng nếu phản ứng hết: còn phải **nhân H/100**." },
+   { "nghi": "Tính theo ethanol 0,3 mol ra 19,8 g.", "dung": "Ethanol dư. Tính theo chất **hết trước** là acid." }
+  ],
+  "tuHoi": { "hoi": "Muốn thu 13,2 g ester với H = 75% thì cần bao nhiêu gam acid?", "tra": "Tính ngược × 100/H: 13,2 · 1/88 · 1 · 60 · 100/75 = **12 g**." },
+  "theNho": [ { "truoc": "Ester hoá: tính theo chất nào, nhân hiệu suất thế nào?", "sau": "Theo chất **hết trước**; tính xuôi **× H/100**, tính ngược × 100/H." } ]
+ }
+]
