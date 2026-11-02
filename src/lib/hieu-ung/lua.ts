@@ -1,8 +1,8 @@
 // 🔥 LỬA CHUỖI NGÀY (bản trình diễn 02/11): ngọn lửa co lại lấy đà 200 ms rồi bùng lò xo quá đà; quầng cam, sóng xung, ~40 tàn lửa bay lên đung đưa
-// (vàng · cam · đỏ, lõi sáng). Lật số do màn Chuỗi ngày lo (latSo, sẵn có). Gọn: 10 tàn lửa trên canvas nhỏ quanh ngọn lửa, 30 khung/giây. Tĩnh: nảy nhẹ.
+// (vàng · cam · đỏ, lõi sáng). Lật số do màn Chuỗi ngày lo (latSo, sẵn có). Gọn: 10 tàn lửa, 30 khung/giây. Tĩnh: nảy nhẹ.
 import type { DatLua } from './kieu'
 import { soHat, thoiGian } from './dieu-kien'
-import { bangMau, canvasSan, chon, heSoCo, khung, quang, rnd, rungMay, themHat, type Phien } from './bo-chay'
+import { bangMau, chon, heSoCo, khung, quang, rnd, rungMay, type Phien } from './bo-chay'
 import { not, on_ } from './am-thanh-an-mung'
 
 export function lua(ph: Phien, d: DatLua): void {
@@ -25,11 +25,10 @@ export function lua(ph: Phien, d: DatLua): void {
     quang(ph, fx, fy - 20 * s, 260 * s, M.cam, 750, 0.6)
     on_(0, 0.3, { loc: 'lowpass', hz: 1100, v: 0.4 }); not(120, 0, 0.3, { toi: 55, v: 0.32 })
     not(523, 0.2, 0.2, { kieu: 'triangle', v: 0.13 }); not(784, 0.27, 0.32, { kieu: 'triangle', v: 0.13 })
-    if (!canvasSan(che, { x: fx - 150 * s, y: fy - 330 * s, w: 300 * s, h: 420 * s }, M.phu)) return
-    themHat({ kieu: 'vong', x: fx, y: fy, r0: 24 * s, r1: 125 * s, net: 6 * s, tho: 0.5, mau: M.cam })
+    ph.hat({ kieu: 'vong', x: fx, y: fy, r0: 24 * s, r1: 125 * s, net: 6 * s, tho: 0.5, mau: M.cam })
     const mau = [M.sao, M.cam, M.sai]
-    for (let i = 0, n = soHat(40, che); i < n; i++) themHat({ kieu: 'than', x: fx + rnd(-38, 38) * s, y: fy + rnd(-50, 10) * s, vx: rnd(-80, 80) * s, vy: rnd(-420, -170) * s, g: 90 * s, can: 0.975,
+    for (let i = 0, n = soHat(40, che); i < n; i++) ph.hat({ kieu: 'than', x: fx + rnd(-38, 38) * s, y: fy + rnd(-50, 10) * s, vx: rnd(-80, 80) * s, vy: rnd(-420, -170) * s, g: 90 * s, can: 0.975,
       dua: rnd(40, 90) * s, pha: rnd(0, 9), co: rnd(2.2, 4.4) * s, mau: chon(mau), loi: M.trang, tho: rnd(0.5, 0.85), cho: rnd(0, 0.28) })
   })
-  ph.dong(T(1300))
+  ph.dong(T(1450))
 }

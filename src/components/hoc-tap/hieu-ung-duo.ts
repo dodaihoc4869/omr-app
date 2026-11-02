@@ -45,8 +45,9 @@ type Dat = {
   /** cộng `them` vào số trên bộ đếm (một lần, lúc viên bật) */ onSo: (them: number) => void
 }
 
-/** Chạy hiệu ứng; trả hàm huỷ. `yen` (giảm chuyển động) ⇒ đổi số ngay, không chuyển động (rung / tiếng mốc vẫn giữ). */
-export function chayThuong(d: Dat, yen: boolean): () => void {
+/** Chạy hiệu ứng; trả hàm huỷ. `yen` (giảm chuyển động) ⇒ đổi số ngay, không chuyển động (rung / tiếng mốc vẫn giữ). `gon` (máy yếu) ⇒ sét / nguyên tử
+ *  bản gọn của bộ chung, KHÔNG có Bi bay vào gom hạt (như trước: máy yếu chưa bao giờ chạy phần Bi — đo CPU ×6 02/11). */
+export function chayThuong(d: Dat, yen: boolean, gon = false): () => void {
   const hoat: Animation[] = [], hen: number[] = [], nut: Element[] = [], huyAm: (() => void)[] = []
   const sau = (ms: number, f: () => void) => { hen.push(window.setTimeout(f, ms)) }
   const ve = (e: Element | null | undefined, k: Keyframe[], o: KeyframeAnimationOptions) => { if (!e?.animate) return null; const a = e.animate(k, o); hoat.push(a); return a }
@@ -90,7 +91,7 @@ export function chayThuong(d: Dat, yen: boolean): () => void {
 
   // ── Bi bay vào, gom hạt ⚛ quanh người, ném lên bộ đếm ──
   const hinh = d.dem?.querySelector('svg')
-  if (!d.bi || d.N <= 0 || !hinh || !d.dem) { sau(420, bat); return huy }
+  if (gon || !d.bi || d.N <= 0 || !hinh || !d.dem) { sau(420, bat); return huy }
   ve(d.bi, [{ transform: 'translateX(24px) scale(.35) rotate(24deg)', opacity: 0 }, { transform: 'translateX(-8px) scale(1.06) rotate(-6deg)', opacity: 1, offset: 0.75 }, { transform: 'none', opacity: 1 }],
     { duration: 260, delay: 100, easing: 'ease-out', fill: 'both' })
   const so = nhe ? 3 : d.moc === 10 ? 6 : d.moc === 5 ? 5 : 4

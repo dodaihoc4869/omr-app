@@ -1,9 +1,9 @@
 // 🎁 MỞ RƯƠNG (bản trình diễn 02/11): rung lắc tăng dần + nén lấy đà (380 ms, tiếng lách cách) → bật: rương giãn lò xo, nắp bật, 12 tia sáng toả xoay,
 // loé vàng, quầng, sóng xung, ~26 tia lửa bắn lên → lấp lánh quanh rương. Tia sáng là vành (giữa trong suốt) ⇒ nằm trên lớp phủ mà không che rương.
-// Gọn (máy yếu): lắc ngắn, 8 tia sáng không xoay, không loé, 6 tia lửa + 4 lấp lánh trên canvas nhỏ, 30 khung/giây. Tĩnh: rương nảy nhẹ.
+// Gọn (máy yếu): lắc ngắn, 8 tia sáng không xoay, không loé, 6 tia lửa + 4 lấp lánh, 30 khung/giây. Tĩnh: rương nảy nhẹ.
 import type { DatRuong } from './kieu'
 import { soHat, thoiGian } from './dieu-kien'
-import { bangMau, canvasSan, chon, heSoCo, khung, loe, quang, rnd, rungMay, themHat, type Phien } from './bo-chay'
+import { bangMau, chon, heSoCo, khung, loe, quang, rnd, rungMay, type Phien } from './bo-chay'
 import { not, on_ } from './am-thanh-an-mung'
 
 const NS = 'http://www.w3.org/2000/svg'
@@ -57,13 +57,12 @@ export function ruong(ph: Phien, d: DatRuong): void {
     if (d.rung) rungMay(40)
     not(200, 0, 0.16, { toi: 900, kieu: 'triangle', v: 0.25 }); on_(0, 0.12, { loc: 'highpass', hz: 1800, v: 0.3 })
     ;[1568, 2093, 2637, 3136].forEach((f, i) => not(f, 0.05 + i * 0.06, 0.5, { v: 0.06 }))
-    if (!canvasSan(che, { x: mx - 170 * s, y: my - 300 * s, w: 340 * s, h: 380 * s }, M.phu)) return
-    themHat({ kieu: 'vong', x: mx, y: my, r0: 20 * s, r1: 150 * s, net: 7 * s, tho: 0.5, mau: M.sao })
+    ph.hat({ kieu: 'vong', x: mx, y: my, r0: 20 * s, r1: 150 * s, net: 7 * s, tho: 0.5, mau: M.sao })
     for (let i = 0, n = soHat(26, che); i < n; i++) {
       const a = -Math.PI / 2 + rnd(-1.15, 1.15), v = rnd(300, 680) * s
-      themHat({ kieu: 'tia', x: mx + rnd(-30, 30) * s, y: my, vx: Math.cos(a) * v, vy: Math.sin(a) * v, g: 1200 * s, can: 0.94, co: rnd(1.8, 3.4) * s, mau: chon([M.sao, M.trang, M.cam]), loi: M.trang, tho: rnd(0.4, 0.7) })
+      ph.hat({ kieu: 'tia', x: mx + rnd(-30, 30) * s, y: my, vx: Math.cos(a) * v, vy: Math.sin(a) * v, g: 1200 * s, can: 0.94, co: rnd(1.8, 3.4) * s, mau: chon([M.sao, M.trang, M.cam]), loi: M.trang, tho: rnd(0.4, 0.7) })
     }
-    for (let i = 0, n = soHat(16, che); i < n; i++) themHat({ kieu: 'sao', x: mx + rnd(-58, 58) * s, y: my - rnd(0, 90) * s, co: rnd(4, 9) * s, mau: chon([M.sao, M.trang, M.tin]), tho: rnd(0.35, 0.55), cho: 0.16 + rnd(0, 0.4), xoay: rnd(0, 0.8) })
+    for (let i = 0, n = soHat(16, che); i < n; i++) ph.hat({ kieu: 'sao', x: mx + rnd(-58, 58) * s, y: my - rnd(0, 90) * s, co: rnd(4, 9) * s, mau: chon([M.sao, M.trang, M.tin]), tho: rnd(0.35, 0.55), cho: 0.16 + rnd(0, 0.4), xoay: rnd(0, 0.8) })
   })
   ph.dong(lay + T(1300))
 }

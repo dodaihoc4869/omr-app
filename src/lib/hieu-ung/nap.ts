@@ -1,4 +1,4 @@
-// BỘ NẠP hiệu ứng ăn mừng — phần NHỎ nằm cùng mảnh `hieu-ung` (đã có sẵn ở các màn «Trong»). Mã vẽ (canvas, SVG, Web Audio) ở mảnh NẠP LƯỜI riêng
+// BỘ NẠP hiệu ứng ăn mừng — phần NHỎ nằm cùng mảnh `hieu-ung` (đã có sẵn ở các màn «Trong»). Mã vẽ (hạt, SVG, Web Audio) ở mảnh NẠP LƯỜI riêng
 // `hieu-ung-an-mung-*.js`: không cộng một byte nào vào lượt mở app (scripts/kiem-toc-do-tai.mjs), nằm ở kho chạy-lúc của service worker (globIgnores
 // `hieu-ung-*`, precache giữ ≤ 170) và được NẠP TRƯỚC khi app rảnh (Lộ trình hiện xong ⇒ requestIdleCallback) hoặc ngay khi vào màn làm câu ⇒ lúc cần là
 // chạy tức thì, kể cả máy yếu. Chưa nạp xong mà đã cần ⇒ nạp rồi chạy nếu kịp (≤ 0,7 s), quá thì bỏ (hiệu ứng trễ còn tệ hơn không có).
@@ -12,7 +12,14 @@ let hua: Promise<Mod | null> | null = null
 /** Nạp mảnh hiệu ứng (một lần; lỗi mạng ⇒ lần sau thử lại). */
 export function napAnMung(): Promise<Mod | null> {
   if (mod) return Promise.resolve(mod)
-  if (!hua) hua = import('./hieu-ung-an-mung').then((m) => (mod = m), () => { hua = null; return null })
+  if (!hua) hua = import('./hieu-ung-an-mung').then((m) => {
+    mod = m
+    // hâm nóng lúc máy rảnh (dịch sẵn mã, cất sẵn phần tử) ⇒ lần ăn mừng đầu tiên cũng mượt
+    const w = window as Window & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }
+    const lam = () => { try { m.hamNong() } catch { /* bỏ qua */ } }
+    if (typeof w.requestIdleCallback === 'function') w.requestIdleCallback(lam, { timeout: 3000 }); else window.setTimeout(lam, 300)
+    return m
+  }, () => { hua = null; return null })
   return hua
 }
 

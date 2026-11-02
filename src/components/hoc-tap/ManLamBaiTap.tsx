@@ -27,7 +27,7 @@ import { chuDanhSachCau, coChuSo, cuonDeThayO, soHomNayGoi7 } from './lam-bai-ma
 import NutHoiThay from '../loi-giai/NutHoiThay'
 import { phanHoi } from '../../lib/phan-hoi'
 import { Bi } from '../linh-vat/Bi'
-import { anMung, banHat, cheDoMayNay, kieuThe, napTruocAnMung, truotRa, useDemSo, yenLang } from '../../lib/hieu-ung'
+import { anMung, anMungSanSang, banHat, cheDoMayNay, kieuThe, napTruocAnMung, truotRa, useDemSo, yenLang } from '../../lib/hieu-ung'
 import { hamNongTuDien } from '../goi-y-cham/tu-dien'
 import { batAnKhiBiChe } from '../../lib/an-khi-bi-che'
 import { VungChamDe } from '../goi-y-cham/VungChamDe'
@@ -1051,17 +1051,20 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     if (!luot) return
     let tre = luot.N > 0 ? ntBaiNay() - luot.N : null
     daCong.current.delete(luot.id)
-    const g = gocRef.current
+    const g = gocRef.current, cheDo = cheDoMayNay()
     // thẻ vừa đúng: sét đánh vào đó, nguyên tử bay ra từ đó (đúng–sai nhiều ý ⇒ cả khối ý; trả lời ngắn ⇒ hàng ô)
     const tu = g?.querySelector('.ht2-lam-pa[data-ket=dung], .ht2-lam-o-hang[data-ket=dung], .ht2-lam-ds') ?? null
     const huy = chayThuong({ goc: g?.querySelector('.duo-than') ?? null, day: g?.querySelector('.duo-ket') ?? null, dem: demRef.current, bi: biGomRef.current, tu, chu: g?.querySelector('.duo-moc') ?? null,
-      N: luot.N, phu: luot.phu, moc: luot.moc, chuoi: luot.chuoi, onSo: (them) => { daCong.current.add(luot.id); if (tre === null) return; tre += them; setNtTre(tre) } }, cheDoMayNay() === 'tinh') // máy yếu chạy bản GỌN, chỉ giảm chuyển động mới yên
+      N: luot.N, phu: luot.phu, moc: luot.moc, chuoi: luot.chuoi, onSo: (them) => { daCong.current.add(luot.id); if (tre === null) return; tre += them; setNtTre(tre) } }, cheDo === 'tinh', cheDo === 'gon') // máy yếu chạy bản GỌN, chỉ giảm chuyển động mới yên
     return () => { huy(); setNtTre(null) }
   }, [luot]) // eslint-disable-line react-hooks/exhaustive-deps
   // Kết bài thưởng phạt: câu cuối có `ketBai` (vòng làm lại thì lấy bản MỚI NHẤT). Xong ⇒ đọc lại tổng quan (thanh trên Lộ trình đổi số).
   const ketBaiGoc = (() => { for (let i = cau.length - 1; i >= 0; i--) { const x = ket[cau[i]!.qid]?.ketBai; if (x) return x } return undefined })()
   const ketBaiTp = duo && xong && ketBaiGoc ? docKetBai(ketBaiGoc) : null
   useEffect(() => { if (ketBaiTp) void capNhatTongQuan(token) }, [!!ketBaiTp]) // eslint-disable-line react-hooks/exhaustive-deps
+  // 🎆 XONG CHẶNG ở màn xong chặng cũ (máy chủ không gửi kết bài thưởng phạt): bộ hiệu ứng ăn mừng (pháo giấy hai góc, quầng; máy yếu bản gọn) thay hoa giấy CSS
+  // `.duo-hoa` (mảnh hiệu ứng chưa nạp được mới giữ hoa giấy cũ — không chạy hai lớp giấy chồng nhau). Có kết bài ⇒ KetBaiThuong tự chạy, không chạy ở đây.
+  useEffect(() => { if (duo && xong && !ketBaiTp) return anMung('chang', { goc: gocRef.current?.querySelector('.duo-xong h1') }) }, [xong, !!ketBaiTp]) // eslint-disable-line react-hooks/exhaustive-deps
   phimDuo.current = (e) => {
     if (e.ctrlKey || e.metaKey || e.altKey || e.repeat || !q || moLoiGiai || gui.current || document.documentElement.hasAttribute('data-gyc-cot-phai')) return
     const t = e.target instanceof HTMLElement ? e.target : null
@@ -1240,7 +1243,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
       <main className="duo-than" data-de-dai={deDai || undefined} aria-live={xong ? 'polite' : undefined}>
         {tai ? <div className="ht2-lam-the m3-xuong" style={{ minHeight: 168 }} role="status" aria-busy="true" aria-label="Chặng học của em" />
         : xong ? <section className="duo-xong" data-hoan-hao={hoanHao || undefined} aria-label="Kết quả chặng">
-            <div className="duo-hoa" aria-hidden="true">{Array.from({ length: 14 }, (_, i) => <i key={i} style={{ '--i': i } as CSSProperties} />)}</div>
+            {!anMungSanSang() && <div className="duo-hoa" aria-hidden="true">{Array.from({ length: 14 }, (_, i) => <i key={i} style={{ '--i': i } as CSSProperties} />)}</div>}
             {/* B2 — chặng hoàn hảo (tự làm đúng cả chặng): tinh thể kim cương kết tinh từ tâm sau lưng Bi, tia sáng xoay chậm; B3 — Bi mừng nhảy, hoa giấy lục giác. */}
             <div className="duo-xong-bi">{hoanHao && <span className="duo-tinh" aria-hidden="true"><i /><svg viewBox="0 0 100 100"><path d="M50 4 86 36 50 96 14 36Z" /><path className="mat" d="M14 36H86M50 4 34 36 50 96 66 36Z" /></svg></span>}<Bi cam="mung" size={135} /></div>
             <h1>{chang ? `Xong chặng ${chang}!` : 'Xong chặng học!'}</h1>

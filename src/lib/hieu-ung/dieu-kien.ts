@@ -15,22 +15,20 @@ export function cheDoAnMung(o: { mayYeu: boolean; giamChuyenDong: boolean }): Ch
 export interface ThongSoAnMung {
   /** Nhân số hạt (gọn ≤ 1/4, tĩnh 0). */
   heSoHat: number
-  /** Được dùng MỘT canvas phủ toàn màn (gọn: canvas nhỏ quanh chỗ nổ, hoặc không canvas). */
-  canvasToanMan: boolean
+  /** Được bắn hạt khắp màn (pháo giấy từ hai góc dưới + mưa giấy). Gọn: không — chỉ quanh chỗ nổ. */
+  toanMan: boolean
   /** Loé màn / tối màn / rung màn (gọn, tĩnh: không). */
   loeRungMan: boolean
-  /** Khoảng tối thiểu giữa hai lần vẽ (ms): 0 = theo màn (60 khung/s); gọn = 33 ms (30 khung/s). */
+  /** Khoảng giữa hai mẫu khung hình của hạt (ms): 0 = nội suy mượt theo màn; gọn = 33 ms giữ nguyên giữa hai mẫu (30 khung/giây thật). */
   khungMs: number
   /** Nhân thời lượng (gọn ngắn hơn). */
   heSoThoiGian: number
-  /** Trần điểm ảnh thật / điểm CSS của canvas. */
-  dprToiDa: number
 }
 
 const THONG_SO: Record<CheDoAnMung, ThongSoAnMung> = {
-  'day-du': { heSoHat: 1, canvasToanMan: true, loeRungMan: true, khungMs: 0, heSoThoiGian: 1, dprToiDa: 2 },
-  gon: { heSoHat: 0.25, canvasToanMan: false, loeRungMan: false, khungMs: 1000 / 30, heSoThoiGian: 0.7, dprToiDa: 1 },
-  tinh: { heSoHat: 0, canvasToanMan: false, loeRungMan: false, khungMs: 0, heSoThoiGian: 0.5, dprToiDa: 1 },
+  'day-du': { heSoHat: 1, toanMan: true, loeRungMan: true, khungMs: 0, heSoThoiGian: 1 },
+  gon: { heSoHat: 0.25, toanMan: false, loeRungMan: false, khungMs: 1000 / 30, heSoThoiGian: 0.7 },
+  tinh: { heSoHat: 0, toanMan: false, loeRungMan: false, khungMs: 0, heSoThoiGian: 0.5 },
 }
 export const thongSo = (che: CheDoAnMung): ThongSoAnMung => THONG_SO[che]
 
@@ -65,10 +63,10 @@ export const mucSet = (chuoi: number): 1 | 2 | 3 => (chuoi >= 15 ? 3 : chuoi >= 
 /** +NGUYÊN TỬ bay vào bộ đếm: câu được tính và máy chủ cộng N > 0 (số lấy NGUYÊN từ máy chủ, máy em không tự tính). */
 export const kichNguyenTu = (N: number | null | undefined): boolean => typeof N === 'number' && Number.isFinite(N) && N > 0
 
-/** Số nguyên tử bay theo N và chế độ: 6–10 hạt (bản đầy đủ), gọn ⇒ ≤ 1/4. */
+/** Số nguyên tử bay theo N và chế độ: ~N/2, trong 3–8 hạt (bản đầy đủ: +2 ⇒ 3, +12 ⇒ 6, +20 ⇒ 8), gọn ⇒ ≤ 1/4. */
 export function soNguyenTuBay(N: number, che: CheDoAnMung): number {
   if (!kichNguyenTu(N)) return 0
-  return soHat(Math.max(6, Math.min(10, Math.round(N / 2))), che)
+  return soHat(Math.max(3, Math.min(8, Math.round(N / 2))), che)
 }
 
 /** Hiệu ứng thẻ đáp án sau khi chấm: em đúng ⇒ «đúng» trên thẻ đúng; em sai ⇒ «sai» trên thẻ em chọn; câu nhờ hỗ trợ (chờ thầy / học cách giải) ⇒ không. */

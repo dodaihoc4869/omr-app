@@ -3,7 +3,8 @@
 // Một cửa `chay(loai, dat)`: chọn chế độ của máy (đầy đủ / gọn / tĩnh), mở một phiên trên lớp phủ dùng chung, chạy hiệu ứng, trả hàm huỷ.
 import type { DatAnMung, LoaiAnMung } from './kieu'
 import { cheDoMayNay } from './nap'
-import { moPhien, type Phien } from './bo-chay'
+import { hamNong, moPhien, type Phien } from './bo-chay'
+export { hamNong }
 import { set } from './set'
 import { dung, sai } from './dung-sai'
 import { nguyenTu } from './nguyen-tu'

@@ -1,18 +1,17 @@
 // LÕI CHẠY CHUNG của bộ hiệu ứng ăn mừng (bản trình diễn thầy duyệt 02/11 — scratchpad hieu-ung/hieu-ung.html, phần CORE + FX):
 //  · MỘT lớp phủ `position: fixed` (pointer-events: none, contain: strict) dùng lại cho mọi hiệu ứng, TỰ GỠ khi không còn hiệu ứng nào;
-//  · MỘT canvas hạt (một vòng rAF, tự dừng + gỡ canvas khi hết hạt). Bản đầy đủ: canvas phủ khung nhìn (dpr ≤ 2). Bản gọn (máy yếu): canvas NHỎ quanh
-//    chỗ nổ (dpr 1), 30 khung/giây, hạt ≤ 1/4;
-//  · lò xo tắt dần → khung hình Web Animations (transform / opacity — chạy ở luồng vẽ, không giữ luồng chính);
+//  · HẠT là phần tử nhỏ trong lớp phủ, quỹ đạo mô phỏng MỘT LẦN lúc bắn rồi giao Web Animations (chỉ transform / opacity ⇒ luồng vẽ). Bản trình diễn vẽ hạt
+//    trên một canvas; đo CPU ×6 (02/11) thấy canvas giữ luồng chính mỗi khung (khung p95 33 → 50–83 ms lúc sét / nguyên tử) nên đổi cách vẽ, giữ hình.
+//    Bản gọn (máy yếu): hạt ≤ 1/4, khung hình lấy mẫu 30 lần/giây (30 khung/giây thật), không pháo toàn màn;
+//  · lò xo tắt dần → khung hình Web Animations;
 //  · KHÔNG BAO GIỜ làm rớt khung khi em bấm: chạm xuống (pointerdown) lúc hiệu ứng đang chạy ⇒ kết thúc ngay mọi hiệu ứng (về trạng thái cuối);
-//    khung nào > 50 ms ⇒ bỏ bớt nửa số hạt.
+//    lượt bắn lớn chia nhiều khung; khung trước > 50 ms ⇒ bỏ nửa số hạt còn chờ; tối đa 40 hạt bay cùng lúc (gọn: 10).
 // Màu: chỉ biến màu sẵn có của app học sinh (--tr-*), đọc lúc chạy.
 import { thongSo, type CheDoAnMung, type ThongSoAnMung } from './dieu-kien'
 import { duocPhanHoi } from '../rung'
 
-export type Hop = { x: number; y: number; w: number; h: number }
-
 // ───────────────────────────── màu (biến --tr-* của app; không mã màu thô)
-export interface BangMau { hs: string; tin: string; sao: string; cam: string; sai: string; dung: string; nt: string; trang: string; phu: string; toi: boolean
+export interface BangMau { hs: string; tin: string; sao: string; cam: string; sai: string; dung: string; nt: string; trang: string; toi: boolean
   /** biến CSS cho SVG / lớp phủ (đổi theo sáng / tối) */ trangVar: string }
 export function bangMau(): BangMau {
   const cs = getComputedStyle(document.documentElement)
@@ -21,20 +20,12 @@ export function bangMau(): BangMau {
   let toi = false
   try { toi = window.matchMedia('(prefers-color-scheme: dark)').matches } catch { /* sáng */ }
   return { hs: v('--tr-hs'), tin: v('--tr-tin'), sao: v('--tr-sao'), cam: v('--tr-chu-y'), sai: v('--tr-sai'), dung: v('--tr-dung'), nt: v('--tr-nguyen-tu'),
-    trang: v(toi ? '--tr-chu' : '--tr-mat'), phu: v('--tr-phu'), toi, trangVar: toi ? 'var(--tr-chu)' : 'var(--tr-mat)' }
+    trang: v(toi ? '--tr-chu' : '--tr-mat'), toi, trangVar: toi ? 'var(--tr-chu)' : 'var(--tr-mat)' }
 }
-function kenh(m: string): [number, number, number] | null {
-  const s = m.trim()
-  const h = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(s)
-  if (h) { let x = h[1]!; if (x.length === 3) x = [...x].map((c) => c + c).join(''); const n = parseInt(x, 16); return [n >> 16, (n >> 8) & 255, n & 255] }
-  const r = /rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)/i.exec(s)
-  return r ? [Number(r[1]), Number(r[2]), Number(r[3])] : null
-}
-/** Màu `m` (biến đã đọc) với độ trong `a`. */
-export const pha = (m: string, a: number): string => { const c = kenh(m); return c ? `rgba(${c[0]},${c[1]},${c[2]},${a})` : m }
 
 export const rnd = (a: number, b: number) => a + Math.random() * (b - a)
 export const chon = <T,>(a: readonly T[]): T => a[(Math.random() * a.length) | 0]!
+const f1 = (n: number) => n.toFixed(1)
 
 // ───────────────────────────── lò xo tắt dần
 export interface LoXo { tu?: number; den?: number; k?: number; c?: number; v?: number; eps?: number }
@@ -51,6 +42,103 @@ export function loXo(o: LoXo, yen = false): number[] {
   }
   ra[ra.length - 1] = den
   return ra
+}
+
+// ───────────────────────────── hạt: phần tử DOM + Web Animations dựng sẵn từ mô phỏng vật lý
+export type KieuHat = 'tia' | 'vong' | 'giay' | 'than' | 'sao'
+export interface Hat {
+  kieu: KieuHat
+  x: number; y: number; vx?: number; vy?: number
+  /** trọng lực px/s² */ g?: number
+  /** cản (nhân vận tốc mỗi khung 60 Hz) */ can?: number
+  /** thọ / chờ (giây) */ tho: number; cho?: number
+  co?: number; mau: string; loi?: string
+  r0?: number; r1?: number; net?: number; anh?: number
+  w?: number; h?: number; tron?: boolean; xoay?: number; vXoay?: number; lat?: number; vLat?: number
+  dua?: number; pha?: number
+}
+const kho: HTMLElement[] = []
+/** Hạt đang bay (mọi hiệu ứng cộng lại) — trần TRAN_HAT: nhiều hiệu ứng chồng nhau (sét + Bi + dải kết quả) không đẻ quá nhiều lớp vẽ cùng lúc. */
+const song = new Set<HTMLElement>()
+const TRAN_HAT = { 'day-du': 40, gon: 10, tinh: 0 } as const
+function traNut(e: HTMLElement) {
+  try { for (const a of e.getAnimations?.() ?? []) a.cancel() } catch { /* trình duyệt cũ */ }
+  e.remove()
+  if (song.delete(e) && kho.length < 160) kho.push(e)
+}
+const SAO = 'polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%)'
+
+/** Mô phỏng một hạt (60 Hz) ⇒ kích thước, kiểu tĩnh và khung hình lấy mẫu 30 lần/giây (gọn: giữ nguyên giữa hai mẫu ⇒ đúng 30 khung/giây). */
+export function dungHat(p: Hat, gon: boolean): { w: number; h: number; css: string; kf: Keyframe[] } {
+  let x = p.x, y = p.y, vx = p.vx ?? 0, vy = p.vy ?? 0, xoay = p.xoay ?? 0, lat = p.lat ?? 0
+  const co = p.co ?? 3, buoc = Math.max(2, Math.round(p.tho * 60)), kf: Keyframe[] = []
+  const L0 = Math.max(5, Math.hypot(vx, vy) * 0.028)
+  let w = co, h = co, css = ''
+  switch (p.kieu) {
+    case 'tia': w = L0; h = co; css = `border-radius:${f1(co)}px;transform-origin:0 0;background:linear-gradient(to left, ${p.loi ?? p.mau}, ${p.mau} 40%, transparent)`; break
+    case 'vong': w = h = 2 * (p.r1 ?? 60); css = `border-radius:50%;box-sizing:border-box;border:${f1(Math.max(1.5, (p.net ?? 4) * 0.6))}px solid ${p.mau}`; break
+    case 'giay': w = p.w ?? 7; h = p.h ?? 12; css = `background:${p.mau};border-radius:${p.tron ? '50%' : '1.5px'}`; break
+    case 'than': w = h = co * 5.2; css = `border-radius:50%;background:radial-gradient(circle, ${p.loi ?? p.mau} 0 18%, ${p.mau} 30%, transparent 70%)`; break
+    case 'sao': w = h = 2 * co; css = `background:${p.mau};clip-path:${SAO};-webkit-clip-path:${SAO}`; break
+  }
+  const dr = p.can ?? 1, dt = 1 / 60
+  for (let f = 0; f <= buoc; f++) {
+    const t = f * dt, u = Math.min(1, t / p.tho)
+    if (f % 2 === 0 || f === buoc) {
+      let k: Keyframe
+      switch (p.kieu) {
+        case 'tia': { const L = Math.max(1, Math.hypot(vx, vy) * 0.028); k = { transform: `translate(${f1(x)}px,${f1(y)}px) rotate(${Math.atan2(vy, vx).toFixed(3)}rad) scaleX(${(L / L0).toFixed(3)}) translate(-100%,-50%)`, opacity: +(1 - u * u).toFixed(3) }; break }
+        case 'vong': { const r1 = p.r1 ?? 60, r0 = p.r0 ?? 4, e = 1 - Math.pow(1 - u, 3); k = { transform: `translate(${f1(x - r1)}px,${f1(y - r1)}px) scale(${((r0 + (r1 - r0) * e) / r1).toFixed(3)})`, opacity: +((1 - u) * (p.anh ?? 1)).toFixed(3) }; break }
+        case 'giay': k = { transform: `translate(${f1(x - w / 2)}px,${f1(y - h / 2)}px) rotate(${xoay.toFixed(3)}rad) scaleY(${Math.cos(lat).toFixed(3)})`, opacity: u > 0.7 ? +((1 - u) / 0.3).toFixed(3) : 1 }; break
+        case 'than': k = { transform: `translate(${f1(x - w / 2)}px,${f1(y - h / 2)}px) scale(${(1 - u * 0.6).toFixed(3)})`, opacity: +Math.max(0, (1 - u) * (0.65 + 0.35 * Math.sin(t * 28 + (p.pha ?? 0)))).toFixed(3) }; break
+        default: k = { transform: `translate(${f1(x - co)}px,${f1(y - co)}px) rotate(${xoay.toFixed(3)}rad) scale(${Math.max(0.001, Math.sin(Math.PI * Math.min(1, u * 1.15))).toFixed(3)})`, opacity: 1 }
+      }
+      k.offset = +(f / buoc).toFixed(4)
+      if (gon) k.easing = 'step-end'
+      kf.push(k)
+    }
+    vx *= dr; vy = vy * dr + (p.g ?? 0) * dt
+    x += vx * dt; y += vy * dt
+    if (p.vXoay) xoay += p.vXoay * dt
+    if (p.kieu === 'giay') lat += (p.vLat ?? 8) * 0.016
+    if (p.dua) x += Math.sin(t * 7 + (p.pha ?? 0)) * p.dua * dt
+  }
+  return { w, h, css, kf }
+}
+
+const MOT_LUOT = 28
+type Cho = { p: Hat; t0: number }
+/** Dựng các hạt đang chờ — tối đa MOT_LUOT mỗi khung (lượt bắn lớn chia nhiều khung, không thành một tác vụ dài); khung trước chậm > 50 ms ⇒ bỏ nửa số còn chờ. */
+function boBan(hang: Cho[], gon: boolean, them: (e: HTMLElement) => void, conSong: () => boolean): void {
+  const tran = TRAN_HAT[gon ? 'gon' : 'day-du']
+  let truoc = 0
+  const xa = (now?: number) => {
+    if (!conSong() || !hang.length) return
+    if (truoc && now && now - truoc > 50 && hang.length > 8) hang.splice(0, hang.length, ...hang.filter((_, i) => i % 2 === 0))
+    truoc = now ?? performance.now()
+    const cha = layLop(), luc = performance.now()
+    for (const { p, t0 } of hang.splice(0, MOT_LUOT)) {
+      if (song.size >= tran) { hang.length = 0; break } // quá trần ⇒ bỏ phần còn lại (hạt đến muộn còn tệ hơn thiếu hạt)
+      const { w, h, css, kf } = dungHat(p, gon)
+      const e = kho.pop() ?? document.createElement('i')
+      e.style.cssText = `position:absolute;left:0;top:0;width:${f1(w)}px;height:${f1(h)}px;opacity:0;will-change:transform,opacity;${css}`
+      cha.appendChild(e); them(e); song.add(e)
+      try {
+        const a = e.animate(kf, { duration: p.tho * 1000, delay: Math.max(0, (p.cho ?? 0) * 1000 - (luc - t0)), easing: 'linear', fill: 'none' })
+        a.onfinish = () => traNut(e)
+      } catch { traNut(e) }
+    }
+    if (hang.length) requestAnimationFrame(xa)
+  }
+  queueMicrotask(() => xa())
+}
+
+/** Hâm nóng lúc nạp trước (máy rảnh): dịch sẵn mã dựng hạt, cất sẵn phần tử hạt + lớp phủ ⇒ hiệu ứng ĐẦU TIÊN không chậm hơn các lần sau (đo CPU ×6: câu
+ *  đầu chặng chậm hơn các câu sau một-hai khung). Không gắn gì vào trang. */
+export function hamNong(): void {
+  for (const kieu of ['tia', 'vong', 'giay', 'than', 'sao'] as const) dungHat({ kieu, x: 0, y: 0, vx: 100, vy: -100, g: 900, can: 0.95, tho: 0.3, mau: '' }, false)
+  while (kho.length < 48) kho.push(document.createElement('i'))
+  layLop().remove()
 }
 
 // ───────────────────────────── lớp phủ + phiên
@@ -74,24 +162,25 @@ export interface Phien {
   /** Web Animations có theo dõi */ ve(el: Element | null | undefined, kf: Keyframe[], o: KeyframeAnimationOptions): Animation | null
   /** lò xo → hoạt ảnh */ nay(el: Element | null | undefined, map: (v: number) => Keyframe, o: LoXo & { tre?: number }): Animation | null
   /** phần tử tạm trong lớp phủ (gỡ khi phiên kết thúc) */ them<T extends Element>(e: T, cha?: Element): T
+  /** bắn một hạt (chế độ tĩnh: bỏ qua) */ hat(p: Hat): void
   /** việc chắc chắn chạy một lần lúc kết thúc (hết giờ hoặc bị huỷ) */ khiXong(f: () => void): void
   /** kết thúc sau `ms` */ dong(ms: number): void
   huy(): void
 }
 const dangChay = new Set<Phien>()
-const chamXuong = () => { for (const p of [...dangChay]) p.huy(); dungCanvas() }
+const chamXuong = () => { for (const p of [...dangChay]) p.huy() }
 function theoDoiCham(bat: boolean) {
   if (bat) window.addEventListener('pointerdown', chamXuong, { capture: true, passive: true })
   else window.removeEventListener('pointerdown', chamXuong, { capture: true })
 }
 function donLop() {
-  if (dangChay.size || C.ds.length) return
+  if (dangChay.size) return
   theoDoiCham(false)
   if (lop && !lop.childElementCount) lop.remove()
 }
 
 export function moPhien(che: CheDoAnMung): Phien {
-  const hen: number[] = [], hoat: Animation[] = [], nut: Element[] = [], ket: (() => void)[] = []
+  const hen: number[] = [], hoat: Animation[] = [], nut: Element[] = [], ket: (() => void)[] = [], nutHat: HTMLElement[] = [], hang: Cho[] = []
   let xong = false
   const yen = che === 'tinh'
   const p: Phien = {
@@ -107,6 +196,11 @@ export function moPhien(che: CheDoAnMung): Phien {
       return p.ve(el, ds.map(map), { duration: ((ds.length - 1) * 1000) / 60, delay: o.tre ?? 0, easing: 'linear', fill: 'backwards' })
     },
     them(e, cha) { (cha ?? layLop()).appendChild(e); nut.push(e); return e },
+    hat(h) {
+      if (xong || p.ts.heSoHat <= 0 || typeof Element.prototype.animate !== 'function') return
+      if (!hang.length) boBan(hang, che === 'gon', (e) => nutHat.push(e), () => !xong)
+      hang.push({ p: h, t0: performance.now() })
+    },
     khiXong(f) { ket.push(f) },
     dong(ms) { p.sau(ms, () => p.huy()) },
     huy() {
@@ -116,6 +210,8 @@ export function moPhien(che: CheDoAnMung): Phien {
       for (const t of hen) t < 0 ? cancelAnimationFrame(-t) : window.clearTimeout(t)
       for (const a of hoat) { try { a.cancel() } catch { /* đã xong */ } }
       for (const n of nut) n.remove()
+      hang.length = 0
+      for (const e of nutHat) traNut(e)
       for (const f of ket) { try { f() } catch { /* bỏ qua */ } }
       donLop()
     },
@@ -125,177 +221,35 @@ export function moPhien(che: CheDoAnMung): Phien {
   return p
 }
 
-// ───────────────────────────── canvas hạt dùng chung
-export type KieuHat = 'tia' | 'vong' | 'giay' | 'than' | 'sao' | 'rieng'
-export interface Hat {
-  kieu: KieuHat
-  x: number; y: number; vx?: number; vy?: number
-  /** trọng lực px/s² */ g?: number
-  /** cản (mỗi khung 60 Hz) */ can?: number
-  /** tuổi hiện tại (âm = đang chờ) / thọ (giây) / chờ (giây) */ tuoi?: number; tho: number; cho?: number
-  co?: number; mau: string; loi?: string
-  r0?: number; r1?: number; net?: number; anh?: number
-  w?: number; h?: number; tron?: boolean; xoay?: number; vXoay?: number; lat?: number; vLat?: number
-  dua?: number; pha?: number
-  cap?: (p: Hat, dt: number) => void
-  ve?: (c: CanvasRenderingContext2D, p: Hat, u: number) => void
-  chet?: boolean
-  [k: string]: unknown
-}
-const C = { cv: null as HTMLCanvasElement | null, c: null as CanvasRenderingContext2D | null, ds: [] as Hat[], raf: 0, truoc: 0, veLuc: 0,
-  dpr: 1, hop: { x: 0, y: 0, w: 0, h: 0 } as Hop, ts: thongSo('day-du'), toiDa: 260, mauPhu: '' }
-
-function khungNhin(): Hop { return { x: 0, y: 0, w: window.innerWidth, h: window.innerHeight } }
-function gop(a: Hop, b: Hop): Hop { const x = Math.min(a.x, b.x), y = Math.min(a.y, b.y); return { x, y, w: Math.max(a.x + a.w, b.x + b.w) - x, h: Math.max(a.y + a.h, b.y + b.h) - y } }
-function cat(h: Hop): Hop { const k = khungNhin(), x = Math.max(0, h.x), y = Math.max(0, h.y); return { x, y, w: Math.max(1, Math.min(k.w, h.x + h.w) - x), h: Math.max(1, Math.min(k.h, h.y + h.h) - y) } }
-
-/** Chuẩn bị canvas cho chế độ `che`. Gọn ⇒ chỉ phủ `vung` (gộp với vùng đang có). Tĩnh / không vẽ được ⇒ false (bỏ hạt). */
-export function canvasSan(che: CheDoAnMung, vung?: Hop, mauPhu = ''): boolean {
-  const ts = thongSo(che)
-  if (ts.heSoHat <= 0) return false
-  const can = ts.canvasToanMan ? khungNhin() : vung ? cat(vung) : null
-  if (!can) return false
-  if (!C.cv) {
-    const cv = document.createElement('canvas')
-    cv.style.cssText = 'position:absolute;left:0;top:0;pointer-events:none'
-    const c = cv.getContext('2d')
-    if (!c) return false
-    C.cv = cv; C.c = c
-  }
-  const hop = C.ds.length && !ts.canvasToanMan ? cat(gop(C.hop, can)) : can
-  const dpr = Math.min(ts.dprToiDa, window.devicePixelRatio || 1)
-  if (C.ts !== ts || hop.x !== C.hop.x || hop.y !== C.hop.y || hop.w !== C.hop.w || hop.h !== C.hop.h || dpr !== C.dpr || !C.cv.isConnected) {
-    C.ts = ts; C.hop = hop; C.dpr = dpr; C.toiDa = ts.canvasToanMan ? 260 : 60
-    C.cv.width = Math.round(hop.w * dpr); C.cv.height = Math.round(hop.h * dpr)
-    C.cv.style.transform = `translate(${hop.x}px,${hop.y}px)`; C.cv.style.width = `${hop.w}px`; C.cv.style.height = `${hop.h}px`
-    if (!C.cv.isConnected) layLop().appendChild(C.cv)
-  }
-  if (mauPhu) C.mauPhu = mauPhu
-  return true
-}
-
-export function themHat(p: Hat): void {
-  if (!C.c || C.ds.length >= C.toiDa) return
-  p.tuoi = -(p.cho ?? 0); p.vx ??= 0; p.vy ??= 0
-  C.ds.push(p)
-  if (!C.raf) { C.truoc = C.veLuc = performance.now(); C.raf = requestAnimationFrame(nhip) }
-}
-
-function nhip(now: number) {
-  C.raf = 0
-  const c = C.c, cv = C.cv
-  if (!c || !cv) return
-  // 30 khung/giây ở bản gọn: lượt rAF giữa hai lần vẽ không làm gì
-  if (C.ts.khungMs && now - C.veLuc < C.ts.khungMs - 2) { C.raf = requestAnimationFrame(nhip); return }
-  const gap = now - C.truoc
-  const dt = Math.min(0.05, gap / 1000)
-  C.truoc = C.veLuc = now
-  // khung vừa rồi quá chậm (máy bận, em đang thao tác) ⇒ bớt nửa số hạt
-  if (gap > 50 && C.ds.length > 8) C.ds = C.ds.filter((_, i) => i % 2 === 0)
-  c.setTransform(C.dpr, 0, 0, C.dpr, -C.hop.x * C.dpr, -C.hop.y * C.dpr)
-  c.clearRect(C.hop.x, C.hop.y, C.hop.w, C.hop.h)
-  const L = C.ds
-  for (let i = L.length - 1; i >= 0; i--) {
-    const p = L[i]!
-    p.tuoi! += dt
-    if (p.tuoi! < 0) continue
-    if (p.tuoi! >= p.tho || p.chet) { L.splice(i, 1); continue }
-    if (p.cap) p.cap(p, dt)
-    else {
-      const dr = Math.pow(p.can ?? 1, dt * 60)
-      p.vx! *= dr; p.vy = p.vy! * dr + (p.g ?? 0) * dt
-      p.x += p.vx! * dt; p.y += p.vy * dt
-      if (p.vXoay) p.xoay = (p.xoay ?? 0) + p.vXoay * dt
-      if (p.dua) p.x += Math.sin(p.tuoi! * 7 + (p.pha ?? 0)) * p.dua * dt
-    }
-    veHat(c, p, p.tuoi! / p.tho)
-  }
-  c.globalAlpha = 1
-  if (L.length) C.raf = requestAnimationFrame(nhip)
-  else dungCanvas()
-}
-
-/** Dừng vòng vẽ, gỡ canvas (giải phóng bộ nhớ đệm hình). */
-export function dungCanvas(): void {
-  if (C.raf) cancelAnimationFrame(C.raf)
-  C.raf = 0; C.ds = []
-  if (C.cv) { C.cv.width = C.cv.height = 0; C.cv.remove(); C.hop = { x: 0, y: 0, w: 0, h: 0 } }
-  donLop()
-}
-
-const TAU = Math.PI * 2
-function veHat(c: CanvasRenderingContext2D, p: Hat, u: number) {
-  c.globalAlpha = 1
-  switch (p.kieu) {
-    case 'tia': { // tia lửa có đuôi
-      const k = 0.028
-      c.globalAlpha = 1 - u * u; c.lineCap = 'round'
-      c.strokeStyle = p.mau; c.lineWidth = p.co ?? 2
-      c.beginPath(); c.moveTo(p.x, p.y); c.lineTo(p.x - p.vx! * k, p.y - p.vy! * k); c.stroke()
-      if (p.loi) { c.strokeStyle = p.loi; c.lineWidth = (p.co ?? 2) * 0.45; c.stroke() }
-      break
-    }
-    case 'vong': { // sóng xung
-      const e = 1 - Math.pow(1 - u, 3)
-      c.globalAlpha = (1 - u) * (p.anh ?? 1)
-      c.strokeStyle = p.mau; c.lineWidth = (p.net ?? 4) * (1 - u) + 0.5
-      c.beginPath(); c.arc(p.x, p.y, (p.r0 ?? 4) + ((p.r1 ?? 60) - (p.r0 ?? 4)) * e, 0, TAU); c.stroke()
-      break
-    }
-    case 'giay': { // pháo giấy lật hai mặt
-      p.lat = (p.lat ?? 0) + (p.vLat ?? 8) * 0.016
-      const s = Math.cos(p.lat), w = p.w ?? 7, h = p.h ?? 12
-      c.globalAlpha = u > 0.7 ? (1 - u) / 0.3 : 1
-      c.save(); c.translate(p.x, p.y); c.rotate(p.xoay ?? 0); c.scale(1, s)
-      c.fillStyle = p.mau
-      if (p.tron) { c.beginPath(); c.arc(0, 0, w * 0.5, 0, TAU); c.fill() } else c.fillRect(-w / 2, -h / 2, w, h)
-      if (s < 0 && C.mauPhu) { c.globalAlpha *= 0.45; c.fillStyle = C.mauPhu; c.fillRect(-w / 2, -h / 2, w, h) }
-      c.restore()
-      break
-    }
-    case 'than': { // tàn lửa có quầng
-      const r = (p.co ?? 3) * (1 - u * 0.6), fl = 0.65 + 0.35 * Math.sin(p.tuoi! * 28 + (p.pha ?? 0))
-      c.globalAlpha = (1 - u) * fl * 0.35; c.fillStyle = p.mau
-      c.beginPath(); c.arc(p.x, p.y, r * 2.6, 0, TAU); c.fill()
-      c.globalAlpha = (1 - u) * fl; c.fillStyle = p.loi ?? p.mau
-      c.beginPath(); c.arc(p.x, p.y, r, 0, TAU); c.fill()
-      break
-    }
-    case 'sao': { // lấp lánh bốn cánh
-      const r = (p.co ?? 6) * Math.sin(Math.PI * Math.min(1, u * 1.15))
-      if (r <= 0) break
-      c.fillStyle = p.mau
-      c.save(); c.translate(p.x, p.y); c.rotate(p.xoay ?? 0)
-      c.beginPath(); c.moveTo(0, -r); c.quadraticCurveTo(0, 0, r, 0); c.quadraticCurveTo(0, 0, 0, r); c.quadraticCurveTo(0, 0, -r, 0); c.quadraticCurveTo(0, 0, 0, -r); c.fill()
-      c.restore()
-      break
-    }
-    case 'rieng': p.ve?.(c, p, u); break
-  }
-}
-
-// ───────────────────────────── lớp hiệu ứng DOM nhỏ (quầng sáng, loé, tối màn, rung màn)
+// ───────────────────────────── lớp hiệu ứng DOM nhỏ (quầng sáng, loé, tối màn, vành, rung màn)
 /** Quầng sáng tròn mờ (một div, chỉ opacity / transform). */
 export function quang(ph: Phien, x: number, y: number, co: number, mau: string, ms = 600, dinh = 0.7): void {
   if (ph.che === 'tinh') return
   const g = ph.them(document.createElement('div'))
-  g.style.cssText = `position:absolute;left:${x - co / 2}px;top:${y - co / 2}px;width:${co}px;height:${co}px;border-radius:50%;background:radial-gradient(closest-side, ${mau}, transparent)`
-  ph.ve(g, [{ opacity: 0, transform: 'scale(.3)' }, { opacity: dinh, transform: 'scale(1)', offset: 0.25 }, { opacity: 0, transform: 'scale(1.15)' }], { duration: ms, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'both' })
+  g.style.cssText = `position:absolute;left:${f1(x - co / 2)}px;top:${f1(y - co / 2)}px;width:${f1(co)}px;height:${f1(co)}px;border-radius:50%;opacity:0;background:radial-gradient(closest-side, ${mau}, transparent)`
+  ph.ve(g, [{ opacity: 0, transform: 'scale(.3)' }, { opacity: dinh, transform: 'scale(1)', offset: 0.25 }, { opacity: 0, transform: 'scale(1.15)' }], { duration: ms, easing: 'cubic-bezier(.2,.7,.3,1)' })
 }
 /** Loé cả màn một khung (chỉ bản đầy đủ). `nen` = biến CSS. */
 export function loe(ph: Phien, dinh: number, ms: number, nen: string): void {
   if (!ph.ts.loeRungMan) return
   const f = ph.them(document.createElement('div'))
   f.style.cssText = `position:absolute;inset:0;opacity:0;background:${nen}`
-  ph.ve(f, [{ opacity: 0 }, { opacity: dinh, offset: 0.2 }, { opacity: 0 }], { duration: ms, easing: 'ease-out', fill: 'both' })
+  ph.ve(f, [{ opacity: 0 }, { opacity: dinh, offset: 0.2 }, { opacity: 0 }], { duration: ms, easing: 'ease-out' })
 }
 /** Tối màn (trừ dải dưới cao `chuaDuoi` px — nút «Tiếp tục» luôn sáng). Trả hàm sáng lại. */
 export function toiMan(ph: Phien, dinh: number, ms: number, chuaDuoi = 0): (ms: number) => void {
   if (!ph.ts.loeRungMan) return () => {}
   const d = ph.them(document.createElement('div'))
   d.style.cssText = `position:absolute;left:0;right:0;top:0;bottom:${Math.max(0, chuaDuoi)}px;opacity:0;background:var(--tr-phu)`
-  ph.ve(d, [{ opacity: 0 }, { opacity: dinh }], { duration: ms, easing: 'cubic-bezier(.3,0,.2,1)', fill: 'forwards' })
-  return (ms2) => { ph.ve(d, [{ opacity: dinh }, { opacity: 0 }], { duration: ms2, easing: 'cubic-bezier(.3,0,.2,1)', fill: 'forwards' }) }
+  const vao = ph.ve(d, [{ opacity: 0 }, { opacity: dinh }], { duration: ms, easing: 'cubic-bezier(.3,0,.2,1)', fill: 'forwards' })
+  return (ms2) => { vao?.cancel(); ph.ve(d, [{ opacity: dinh }, { opacity: 0 }], { duration: ms2, easing: 'cubic-bezier(.3,0,.2,1)' }) }
+}
+/** Vành sáng lan ra quanh thẻ (thay quầng box-shadow: chỉ transform / opacity ⇒ luồng vẽ, không vẽ lại thẻ mỗi khung). `mau` = biến CSS. */
+export function vanhThe(ph: Phien, R: { x: number; y: number; w: number; h: number }, mau: string, bo: number, xa: number, ms = 520): void {
+  if (!R.w || !R.h) return
+  const v = ph.them(document.createElement('div'))
+  v.style.cssText = `position:absolute;left:${f1(R.x)}px;top:${f1(R.y)}px;width:${f1(R.w)}px;height:${f1(R.h)}px;box-sizing:border-box;border-radius:${f1(bo)}px;border:3px solid ${mau};opacity:0`
+  ph.ve(v, [{ transform: 'scale(1)', opacity: 0.75 }, { transform: `scale(${(1 + (2 * xa) / R.w).toFixed(4)},${(1 + (2 * xa) / R.h).toFixed(4)})`, opacity: 0 }], { duration: ms, easing: 'ease-out' })
 }
 /** Rung khung nội dung tắt dần (chỉ bản đầy đủ). */
 export function rungMan(ph: Phien, el: Element | null | undefined, bien: number, ms = 300): void {

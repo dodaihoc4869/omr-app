@@ -19,13 +19,13 @@ describe('chọn chế độ theo máy', () => {
     expect(cheDoAnMung({ mayYeu: true, giamChuyenDong: true })).toBe('tinh')
     expect(cheDoAnMung({ mayYeu: false, giamChuyenDong: true })).toBe('tinh')
   })
-  it('bản gọn: hạt ≤ 1/4, không canvas toàn màn, không loé / rung màn, 30 khung/giây, ngắn hơn, dpr 1; tĩnh: không hạt', () => {
+  it('bản gọn: hạt ≤ 1/4, không pháo toàn màn, không loé / rung màn, 30 khung/giây, ngắn hơn; tĩnh: không hạt', () => {
     const g = thongSo('gon'), d = thongSo('day-du'), t = thongSo('tinh')
     expect(g.heSoHat).toBeLessThanOrEqual(0.25)
-    expect(g.canvasToanMan).toBe(false); expect(g.loeRungMan).toBe(false)
+    expect(g.toanMan).toBe(false); expect(g.loeRungMan).toBe(false)
     expect(Math.round(1000 / g.khungMs)).toBe(30)
-    expect(g.heSoThoiGian).toBeLessThan(1); expect(g.dprToiDa).toBe(1)
-    expect(d.canvasToanMan && d.loeRungMan).toBe(true)
+    expect(g.heSoThoiGian).toBeLessThan(1)
+    expect(d.toanMan && d.loeRungMan).toBe(true)
     expect(t.heSoHat).toBe(0)
     for (const n of [40, 48, 26, 12, 9]) {
       expect(soHat(n, 'day-du')).toBe(n)
@@ -59,10 +59,11 @@ describe('điều kiện kích từng hiệu ứng', () => {
     expect(kieuThe({ coKetQua: true, dung: true, hoTro: true })).toBeNull()
     expect(kieuThe({ coKetQua: false, dung: true, hoTro: false })).toBeNull()
   })
-  it('nguyên tử chỉ khi máy chủ cộng N > 0; 6–10 hạt, gọn ≤ 1/4', () => {
+  it('nguyên tử chỉ khi máy chủ cộng N > 0; 3–8 hạt theo N, gọn ≤ 1/4', () => {
     expect([kichNguyenTu(0), kichNguyenTu(-2), kichNguyenTu(Number.NaN), kichNguyenTu(undefined), kichNguyenTu(12)]).toEqual([false, false, false, false, true])
     expect(soNguyenTuBay(12, 'day-du')).toBe(6)
-    expect(soNguyenTuBay(40, 'day-du')).toBe(10)
+    expect(soNguyenTuBay(2, 'day-du')).toBe(3)
+    expect(soNguyenTuBay(40, 'day-du')).toBe(8)
     expect(soNguyenTuBay(40, 'gon')).toBeLessThanOrEqual(2)
     expect(soNguyenTuBay(0, 'day-du')).toBe(0)
   })
@@ -134,15 +135,16 @@ describe('bộ chạy hiệu ứng', () => {
     expect(onXong).toHaveBeenCalledTimes(1) // bị cắt giữa chừng vẫn cộng số đúng một lần
   })
 
-  it('tự gỡ khi xong (không chạm gì): lớp phủ + canvas biến mất sau ~1,7 s', async () => {
+  it('tự gỡ khi xong (không chạm gì): lớp phủ + hạt biến mất sau ~1,7 s; hạt là phần tử Web Animations (không canvas)', async () => {
     document.body.innerHTML = '<div class="ruong"></div>'
     anMung('ruong', { goc: document.querySelector('.ruong') })
     await new Promise((r) => setTimeout(r, 500))
-    expect(lop()?.querySelector('canvas')).toBeTruthy()
+    expect(lop()!.querySelectorAll('i').length).toBeGreaterThan(20) // 26 tia lửa + 16 lấp lánh + sóng xung (bản đầy đủ)
+    expect(lop()!.querySelector('canvas')).toBeNull()
     await waitFor(() => expect(lop()).toBeNull(), { timeout: 3500 })
   })
 
-  it('máy yếu (lớp may-yeu) ⇒ bản gọn: canvas nhỏ quanh chỗ nổ (không phủ toàn màn), nguyên tử bay bằng phần tử DOM', async () => {
+  it('máy yếu (lớp may-yeu) ⇒ bản gọn: hạt ≤ 1/4, không tối / loé màn, 2 nguyên tử', async () => {
     document.documentElement.classList.add('may-yeu')
     expect(cheDoMayNay()).toBe('gon')
     document.body.innerHTML = '<div class="the" data-ket="dung"></div><button class="dem"><svg></svg></button>'
@@ -150,10 +152,11 @@ describe('bộ chạy hiệu ứng', () => {
     const onXong = vi.fn()
     anMung('nguyen-tu', { tu: document.querySelector('.the'), dich: document.querySelector('.dem'), N: 40, onXong })
     await new Promise((r) => setTimeout(r, 450))
-    const cv = lop()?.querySelector('canvas') as HTMLCanvasElement | null
-    expect(cv).not.toBeNull()
-    expect(parseFloat(cv!.style.width)).toBeLessThan(window.innerWidth)
-    expect(lop()!.querySelectorAll('span svg').length).toBeLessThanOrEqual(2) // ≤ 1/4 của 10 hạt
+    const l = lop()!
+    expect(l.querySelectorAll('i').length).toBeGreaterThan(0)
+    expect(l.querySelectorAll('i').length).toBeLessThanOrEqual(11) // ⌊26/4⌋ tia lửa + ⌊16/4⌋ lấp lánh + 1 sóng xung (đầy đủ: 43)
+    expect([...l.children].some((e) => (e as HTMLElement).style.inset === '0px' || (e as HTMLElement).style.background === 'var(--tr-phu)')).toBe(false) // không loé / tối màn
+    expect(l.querySelectorAll('span svg').length).toBeLessThanOrEqual(2) // ≤ 1/4 của 8 nguyên tử
   })
 })
 
