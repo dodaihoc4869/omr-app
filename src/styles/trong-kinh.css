@@ -147,7 +147,7 @@ html[data-trong='hs'] .tr-menu-phu { background: color-mix(in oklab, var(--tr-ch
   @keyframes kb-tam-vao { from { transform: translateX(-16px); opacity: .6; } }
   /* Hôm nay hai cột: trái = thẻ mức + Mol + nút chính; phải = Việc hôm nay */
   html[data-trong='hs'] .dm-khung .da-vo:has(> .kb-viec) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; column-gap: 20px; }
-  html[data-trong='hs'] .dm-khung .da-vo:has(> .kb-viec) > * { grid-column: 1; }
+  /* (bỏ «… :has(> .kb-viec) > * { grid-column: 1 }» — tests/muot-has-2710: .kb-viec đặt chỗ tường minh cột 2 hàng 1–20 nên lưới tự xếp mọi thẻ khác vào cột 1) */
   html[data-trong='hs'] .dm-khung .da-vo:has(> .kb-viec) > .kb-viec { grid-column: 2; grid-row: 1 / span 20; }
 }
 /* ngang thấp (điện thoại xoay ngang ≤ 500 cao): ray gọn, chỉ biểu tượng */

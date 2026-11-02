@@ -17,6 +17,7 @@ import './kiem-tra-ca-nhan.css'
 import { phanHoi } from '../../lib/phan-hoi'
 import { CHU_MAY_CHU_BAN_EM, choLuiDanMs, chuCuaLoi, laLoiMayChuBan, laLoiTamThoi } from '../../lib/loi-may-chu'
 import { batCheDoThi } from '../../lib/am-thanh'
+import { anMung, napTruocAnMung } from '../../lib/hieu-ung'
 import { ChonDungSai, ChonTracNghiem, DeCau, HinhCuoiCau, OTraLoiNgan, BanPhimSo, ThanhCuon } from './LamCau'
 import { nhanPhim, phimTuBanPhim, type PhimSo } from './lam-bai'
 import { soOCuaCau } from '../../lib/so-o-tra-loi-ngan'
@@ -101,6 +102,11 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:
  const huyHenThuLai=()=>{if(henThuLai.current)clearTimeout(henThuLai.current);henThuLai.current=undefined;choThuLai.current=false}
  const key=`ktcn:nhap:${sbd}:${id}:${stt}`
  const khung=useRef<HTMLDivElement>(null)
+ // XONG CHẶNG / NỘP BÀI (thầy 02/11 «hiệu ứng kết thúc chặng … kiểm tra ôn tập thay hiệu ứng mới»): em tự nộp chặng hoặc nộp bài xong ⇒ pháo giấy hai góc
+ // + quầng của bộ ăn mừng quanh khối đầu màn (máy yếu bản gọn). Hết giờ tự chốt / mở lại kết quả cũ / nộp bài điểm < 5 («Cùng Mol ôn lại nhé!»): không bắn. Mảnh hiệu ứng nạp sẵn lúc rảnh khi mở màn.
+ const [mung,setMung]=useState(0)
+ useEffect(()=>{napTruocAnMung()},[])
+ useEffect(()=>{if(!mung)return;const d=ttRef.current?.diem;if(ket&&typeof d==='number'&&d<5)return;let huy=()=>{};const t=window.setTimeout(()=>{huy=anMung('chang',{goc:khung.current?.querySelector('.duo-kt-ket-bi, .ktcn-ket-dau, .ktcn-dau, h2')})},180);return()=>{window.clearTimeout(t);huy()}},[mung])
  useEffect(()=>{if(stt!==null)khung.current?.scrollIntoView?.({block:'start'})},[stt])
  const ttRef=useRef(tt),ra=()=>{onCapNhat();const t=ttRef.current;if(t)onVa?.(vaKt(t))}
  const nhan=(r:Record<string,unknown>)=>{const t=docKiemTra(r.kiemTra);if(!t)throw new Error('Số liệu bài kiểm tra chưa đầy đủ. Em tải lại nhé.');setTt(t);ttRef.current=t;setOffset(t.serverNow-Date.now());if(typeof r.revision==='number')revision.current=r.revision;return t}
@@ -157,7 +163,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:
   else if(!auto){const trong=cs.flatMap((c,i)=>daTraDu(c,traRef.current[c.qid])?[]:[i+1]);if(trong.length&&!await hoiXacNhan({tieuDe:`Nộp chặng ${stt+1}?`,noiDung:`Chặng này còn ${trong.length} câu chưa trả lời (câu ${trong.join(', ')}). Nộp chặng sẽ chốt các câu đã lưu, không sửa lại được.`,nhanDongY:`Nộp chặng ${stt+1}`,nhanKhong:'Làm tiếp',vo:'m3'}))return;if(tuNop.current)return}
   if(!conPhien(lan))return
   huyHenThuLai();tuNop.current=true;setBusy(true);setLoi('')
-  try{await save(true);if(!conPhien(lan))return;try{localStorage.removeItem(`ktcn:vt:${sbd}:${id}:${stt}`)}catch{/* */};xoaKtcnDangLam(sbd);setCs([]);setStt(null);await tai();if(conPhien(lan))ra()}
+  try{await save(true);if(!conPhien(lan))return;try{localStorage.removeItem(`ktcn:vt:${sbd}:${id}:${stt}`)}catch{/* */};xoaKtcnDangLam(sbd);setCs([]);setStt(null);await tai();if(conPhien(lan)){ra();if(!auto)setMung(n=>n+1)}}
   catch(e){
    if(!conPhien(lan))return
    tuNop.current=false
@@ -204,7 +210,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:
  // Câu đang làm cũng nhớ trên máy: mở lại chặng về đúng câu ấy (kể cả sau khi bản nháp đã đồng bộ lên máy chủ).
  useEffect(()=>{if(stt!==null&&han)try{localStorage.setItem(`ktcn:vt:${sbd}:${id}:${stt}`,String(viTri));const raw=localStorage.getItem(key);if(raw){const o=JSON.parse(raw);if(o&&o.han===han&&o.viTri!==viTri)localStorage.setItem(key,JSON.stringify({...o,viTri}))}}catch{/* không cản làm bài */}},[viTri,stt,han])
  const ve=async()=>{xoaKtcnDangLam(sbd);if(stt!==null){setBusy(true);try{await save();onVe();ra()}catch(e){if(laLoiTamThoi(e)){onVe();ra()}else setLoi(chuCuaLoi(e,'Chưa lưu được bài.'))}finally{setBusy(false)}}else{onVe();ra()}}
- const nop=async()=>{if(tt&&tt.daTra<tt.tong&&!await hoiXacNhan({tieuDe:'Nộp bài kiểm tra?',noiDung:`Còn ${tt.con} câu chưa trả lời. Nộp bài sẽ chốt kết quả hiện tại.`,nhanDongY:'Nộp bài',nhanKhong:'Làm tiếp',vo:'m3'}))return;setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-nop',token,{id,...thanGoiKt(sbd,id)});nhan(r);setKet(await ketTu(r));ra()}catch(e){setLoi(chuCuaLoi(e,'Chưa nộp được bài.'))}finally{setBusy(false)}}
+ const nop=async()=>{if(tt&&tt.daTra<tt.tong&&!await hoiXacNhan({tieuDe:'Nộp bài kiểm tra?',noiDung:`Còn ${tt.con} câu chưa trả lời. Nộp bài sẽ chốt kết quả hiện tại.`,nhanDongY:'Nộp bài',nhanKhong:'Làm tiếp',vo:'m3'}))return;setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-nop',token,{id,...thanGoiKt(sbd,id)});nhan(r);setKet(await ketTu(r));ra();setMung(n=>n+1)}catch(e){setLoi(chuCuaLoi(e,'Chưa nộp được bài.'))}finally{setBusy(false)}}
  const [loc,setLoc]=useState<Loc>('tat-ca')
  // Tấm hỏi nộp đang mở mà chặng đã đóng / hết giờ (lượt tự chốt đi trước) ⇒ trả «không» và đóng tấm.
  useEffect(()=>{if(hoiNop&&(stt===null||hetGio)){hoiNop(false);setHoiNop(null)}},[stt,hetGio,hoiNop])

@@ -18,7 +18,7 @@ import { TroGiupDuo } from '../hoc-tap/TroGiupDuo'
 import NutHoiThay from '../loi-giai/NutHoiThay'
 import { loiGiaiChuanTuKho } from '../loi-giai/KhoiLoiGiaiChuan'
 import { Bi } from '../linh-vat/Bi'
-import { anMung } from '../../lib/hieu-ung'
+import { anMung, anMungSanSang, napTruocAnMung } from '../../lib/hieu-ung'
 import { BungDung } from '../hoc-tap/BungDung'
 import { phanHoi } from '../../lib/phan-hoi'
 import { napSanGiuChan, TamGiuChanLuoi, useGiuChan } from '../hoc-tap/GiuChan'
@@ -100,7 +100,17 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
     // ĐÚNG / SAI TRÊN THẺ ĐÁP ÁN (bộ hiệu ứng ăn mừng, thầy chốt 02/11 — thay 8 hạt lục giác): đúng ⇒ thẻ nảy + viền sáng chạy + lấp lánh; sai ⇒ thẻ lắc giảm chấn
     if (tt === 'dung' || tt === 'sai') anMung(tt, { the: goc.current?.querySelector(`.ht2-lam-pa[data-ket=${tt}], .ht2-lam-o-hang[data-ket=${tt}]`) })
   }, [!!kq, kq?.ket, kq?.lan]) // eslint-disable-line react-hooks/exhaustive-deps -- kết quả TẠM (dòng tam) rồi bản đầy đủ cùng kết quả ⇒ không bung hạt / cuộn lần hai
-  useEffect(() => { if (xongChang) phanHoi('xong') }, [xongChang])
+  // XONG CHẶNG SỬA LỖI (thầy 02/11 «hiệu ứng kết thúc chặng sửa lỗi … thay hiệu ứng mới»): pháo giấy hai góc + quầng của bộ ăn mừng (như màn xong chặng
+  // học) thay hoa giấy CSS cũ; máy yếu bản gọn quanh tiêu đề. Rung / tiếng «xong» vẫn ở phanHoi (bộ ăn mừng không rung lần hai).
+  const tieuXong = useRef<HTMLHeadingElement>(null)
+  useEffect(() => { napTruocAnMung() }, []) // nạp sẵn mảnh hiệu ứng lúc rảnh ⇒ xong chặng chạy pháo giấy ngay
+  useEffect(() => {
+    if (!xongChang) return
+    phanHoi('xong')
+    let huy = () => {}
+    const t = window.setTimeout(() => { huy = anMung('chang', { goc: tieuXong.current }) }, 150)
+    return () => { window.clearTimeout(t); huy() }
+  }, [xongChang])
 
   const tiepTuc = () => {
     phanHoi('chon')
@@ -157,9 +167,9 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
           {tienDo.conSau && <div className="duo-bo"><button type="button" className="duo-lien" onClick={p.onVe}>Nghỉ, về Tự sửa lỗi</button></div>}
         </div></div>}>
         <section className="duo-xong" aria-label="Kết quả chặng sửa lỗi">
-          <div className="duo-hoa" aria-hidden="true">{Array.from({ length: 14 }, (_, i) => <i key={i} style={{ '--i': i } as CSSProperties} />)}</div>
           <div className="duo-xong-bi"><Bi cam="mung" size={148} /></div>
-          <h1>{tienDo.conSau ? `Xong chặng sửa ${tienDo.so}!` : 'Xong phần sửa hôm nay!'}</h1>
+          {!anMungSanSang() && <div className="duo-hoa" aria-hidden="true">{Array.from({ length: 14 }, (_, i) => <i key={i} style={{ '--i': i } as CSSProperties} />)}</div>}{/* mảnh hiệu ứng chưa nạp ⇒ giữ hoa giấy cũ (như màn xong chặng học) */}
+          <h1 ref={tieuXong}>{tienDo.conSau ? `Xong chặng sửa ${tienDo.so}!` : 'Xong phần sửa hôm nay!'}</h1>
           <p className="duo-xong-phu">Em đã sửa {tong} câu của chặng này.</p>
           <div className="duo-3">
             <div data-sac="dung" style={{ '--i': 0 } as CSSProperties}><p>Câu đã sửa</p><b>{tong}/{tong}</b></div>
