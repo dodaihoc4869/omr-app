@@ -275,10 +275,14 @@
 
 /* Khung + thở (lớp HTML, transform — GPU). Nghỉ / tĩnh / máy yếu / giảm chuyển động ⇒ đứng yên. Xám (mốc Lộ trình chưa tới) như bản cũ. */
 .gtm { position: relative; aspect-ratio: 220 / 254; height: auto; }
-.gtm-tho { position: absolute; inset: 0; transform-origin: 50% 94%; animation: gtm-tho var(--tho, 4s) ease-in-out var(--tre, 0s) infinite; }
+/* lớp vẽ RIÊNG (như .gt-tho-o bản cũ): ô đáp án / đề vẽ lại không phải vẽ lại giám thị + chùm đèn đè lên chúng (đo màn thi 02/11) */
+.gtm-tho { position: absolute; inset: 0; transform-origin: 50% 94%; animation: gtm-tho var(--tho, 4s) ease-in-out var(--tre, 0s) infinite; will-change: transform; }
 @keyframes gtm-tho { 0%, 100% { transform: scale(1, 1); } 48% { transform: scale(.996, 1.013); } }
 .gtm[data-nghi] .gtm-tho, .gt-dung .gtm-tho { animation-play-state: paused; }
+/* lúc thi (cầm đèn, ngồi cả ca): KHÔNG thở — hoạt ảnh vô hạn trên lớp hình lớn làm phần vẽ sau mỗi lần chạm ô dài thêm ~15 ms (đo màn thi CPU ×4, 02/11) */
+.gtm[data-thi] .gtm-tho { animation: none; }
 .gt-tinh .gtm-tho, [data-trong].may-yeu .gtm-tho { animation: none; }
+.gt-tinh .gtm-tho { will-change: auto; }
 @media (prefers-reduced-motion: reduce) { .gtm-tho { animation: none; } }
 .gt-xam .gtm { filter: grayscale(1); }
 .gtm .gtm-tho svg { cursor: default; }
