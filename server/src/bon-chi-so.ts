@@ -106,7 +106,7 @@ export interface SoLieuBon {
   kiem?: { cl: 'da' | 'tam' | null; cach: 'lop' | 'hanhVi' | null }
   /** Hướng B: kiểm định tuần tự trên lớp — tổng LLR (dương = Đối phó), số buổi có tin / nghiêng Đối phó / nghiêng Học thật, nhãn trên lớp (null = chưa đủ). */
   lop?: { llr: number; soBuoi: number; buoiDp: number; buoiHt: number; nhan: 'ht' | 'dp' | null }
-  /** Hướng B — KIỂM ĐỊNH NGƯỢC trên số liệu thật: nhãn NIÊM PHONG từ các buổi trước buổi gần nhất + kết quả buổi gần nhất (chưa dùng khi niêm phong). */
+  /** Hướng B — KIỂM ĐỊNH NGƯỢC trên số liệu thật: nhãn NIÊM PHONG từ các buổi trước 2 buổi gần nhất + nhãn 2 buổi ấy tự chốt (ngược = sai). */
   nguoc?: KetQuaTrenLop['nguoc']
 }
 

@@ -18,7 +18,7 @@
 // Đơn vị so: DẠNG (`ma_dang`) khi đủ 6 lượt, thiếu thì CHUYÊN ĐỀ — em giỏi «este» mà hỏng «đốt cháy este» không bị trộn.
 // Lên bảng / đầu giờ: em từng làm ĐÚNG chính câu ấy ở nhà ⇒ H0 kỳ vọng ≥ 0,8 (đã tính quên); không thì theo đơn vị như câu thi.
 //
-// KIỂM ĐỊNH NGƯỢC (để đo «99% trên số liệu thật»): nhãn được NIÊM PHONG chỉ từ các buổi TRƯỚC buổi gần nhất, rồi so với chính buổi gần nhất (dữ liệu chưa dùng).
+// KIỂM ĐỊNH NGƯỢC (để đo «99% trên số liệu thật»): nhãn NIÊM PHONG chỉ từ các buổi TRƯỚC 2 buổi gần nhất; 2 buổi ấy (dữ liệu chưa dùng) tự chốt — ngược là SAI.
 import { khoaDv, qidGoc, doKhoMucDo, NGAY_LUYEN_TRUOC, LUYEN_TOI_THIEU_DV, type CauCaThi, type LuotBang, type LuyenCuDv } from './bon-ca-thi'
 import type { LuotDanhGia } from './danh-gia-hoc-that'
 
@@ -57,8 +57,10 @@ export interface KetQuaTrenLop {
   buoiHt: number
   /** Nhãn ĐÃ KIỂM TRÊN LỚP; null = chưa đủ chắc (nhãn tạm theo hành vi ở nhà). */
   nhan: NhanLop | null
-  /** Kiểm định ngược: nhãn niêm phong từ các buổi TRƯỚC buổi gần nhất + LLR của chính buổi gần nhất (chưa dùng để chốt nhãn niêm phong). */
-  nguoc: { nhan: NhanLop | null; llrSau: number; e0Sau: number; kSau: number; nSau: number } | null
+  /** KIỂM ĐỊNH NGƯỢC: nhãn NIÊM PHONG từ các buổi TRƯỚC 2 buổi gần nhất · `sau` = 2 buổi gần nhất TỰ chốt (cùng luật, chỉ dữ liệu chưa dùng khi niêm phong):
+   *  trùng nhãn niêm phong = xác nhận, NGƯỢC = SAI (đúng mô hình thì ≤ 1%), null = 2 buổi ấy chưa đủ chắc. Giữ HAI buổi vì một buổi (trần ±2,3) không bao giờ
+   *  tự chốt được (ngưỡng 4,6) ⇒ thước một buổi luôn ra «0 lật», không đo được gì (soát 02/11). Cần ≥ 4 buổi có tin. */
+  nguoc: { nhan: NhanLop | null; sau: NhanLop | null; llrSau: number; e0Sau: number; kSau: number; nSau: number } | null
 }
 
 const kep = (x: number, a: number, b: number) => Math.max(a, Math.min(b, x))
@@ -203,9 +205,9 @@ export function tinhTrenLop(v: DauVaoTrenLop): KetQuaTrenLop {
   const buoi = gomBuoi(cauCoTin(v))
   const llr = buoi.reduce((s, b) => s + b.llr, 0)
   let nguoc: KetQuaTrenLop['nguoc'] = null
-  if (buoi.length >= 2) {
-    const sau = buoi[buoi.length - 1]!
-    nguoc = { nhan: chotNhan(buoi.slice(0, -1)), llrSau: sau.llrTho, e0Sau: sau.e0, kSau: sau.k, nSau: sau.n }
+  if (buoi.length >= 4) {
+    const truoc = buoi.slice(0, -2), sau = buoi.slice(-2)
+    nguoc = { nhan: chotNhan(truoc), sau: chotNhan(sau), llrSau: sau.reduce((s, b) => s + b.llrTho, 0), e0Sau: sau.reduce((s, b) => s + b.e0, 0), kSau: sau.reduce((s, b) => s + b.k, 0), nSau: sau.reduce((s, b) => s + b.n, 0) }
   }
   return {
     llr, buoi, soBuoi: buoi.length, buoiDp: buoi.filter((b) => b.llr > 0.5).length, buoiHt: buoi.filter((b) => b.llr < -0.5).length,

@@ -70,12 +70,21 @@ describe('kiểm định tuần tự trên lớp', () => {
     expect(kq.nhan).toBe('ht')
   })
 
-  it('kiểm định ngược: nhãn niêm phong CHỈ từ các buổi trước buổi gần nhất; buổi gần nhất là dữ liệu chưa dùng', () => {
-    const kq = tinhTrenLop({ luyen: [...luyen('Este', 30, 0.9), ...luyen('Amin', 30, 0.9, '2026-10-12'), ...luyen('Peptit', 30, 0.9, '2026-10-13')], luyenCu: [],
-      caThi: [...ca('C1', '2026-10-20', 'Este', 10, 2), ...ca('C2', '2026-10-27', 'Amin', 10, 2), ...ca('C3', '2026-10-30', 'Peptit', 10, 2)], lenBang: [] })
-    expect(kq.nguoc?.nhan).toBe('dp')
-    expect(kq.nguoc!.llrSau).toBeGreaterThan(0)
-    expect(kq.nguoc!.nSau).toBe(10)
+  it('kiểm định ngược: niêm phong từ các buổi TRƯỚC 2 buổi cuối; 2 buổi cuối (dữ liệu chưa dùng) tự chốt — MỘT buổi ngược không lật được, HAI buổi ngược thì lật', () => {
+    const l = ['Este', 'Amin', 'Peptit', 'Polime', 'Sắt'].flatMap((dv, i) => luyen(dv, 30, 0.9, `2026-10-1${i}`))
+    const thap = (ma: string, ngay: string, dv: string) => ca(ma, ngay, dv, 10, 2)
+    // câu độ khó trung bình (lớp đúng 60%) — đúng hết câu QUÁ DỄ chỉ là bằng chứng yếu, 2 buổi chưa đủ chốt Học thật (đúng thiết kế)
+    const cao = (ma: string, ngay: string, dv: string) => ca(ma, ngay, dv, 10, 10)
+    // 3 buổi thấp (niêm phong Đối phó) + 1 buổi cao + 1 buổi thấp ⇒ 2 buổi sau không cùng chiều ⇒ chưa phân xử (không phải lật)
+    const mot = tinhTrenLop({ luyen: l, luyenCu: [], caThi: [...thap('C1', '2026-10-20', 'Este'), ...thap('C2', '2026-10-22', 'Amin'), ...thap('C3', '2026-10-24', 'Peptit'), ...cao('C4', '2026-10-27', 'Polime'), ...thap('C5', '2026-10-30', 'Sắt')], lenBang: [] })
+    expect(mot.nguoc?.nhan).toBe('dp')
+    expect(mot.nguoc?.sau).toBeNull()
+    // 3 buổi thấp + 2 buổi cao khớp ⇒ 2 buổi sau tự chốt Học thật ⇒ LẬT (sai)
+    const hai = tinhTrenLop({ luyen: l, luyenCu: [], caThi: [...thap('C1', '2026-10-20', 'Este'), ...thap('C2', '2026-10-22', 'Amin'), ...thap('C3', '2026-10-24', 'Peptit'), ...cao('C4', '2026-10-27', 'Polime'), ...cao('C5', '2026-10-30', 'Sắt')], lenBang: [] })
+    expect(hai.nguoc?.nhan).toBe('dp')
+    expect(hai.nguoc?.sau).toBe('ht')
+    // < 4 buổi ⇒ chưa kiểm định ngược được
+    expect(tinhTrenLop({ luyen: l, luyenCu: [], caThi: [...thap('C1', '2026-10-20', 'Este'), ...thap('C2', '2026-10-22', 'Amin'), ...thap('C3', '2026-10-24', 'Peptit')], lenBang: [] }).nguoc).toBeNull()
   })
 
   it('chotNhan: tổng đủ nhưng dồn vào MỘT buổi ⇒ không chốt; hai buổi đều ⇒ chốt', () => {
@@ -98,15 +107,15 @@ describe('lên bảng ghi đôi (02/11: 158/159 lượt thật có hai dòng cá
 })
 
 describe('tự đo độ chính xác trên số liệu thật — /gv/bon-bang → kiemDinh (chỉ đếm gộp)', () => {
-  it('đếm nhãn đã kiểm / tạm; nhãn niêm phong: buổi gần nhất cùng chiều · bị chốt ngược (lật = sai)', () => {
-    const r = (vao: object, kiem: string | null, lop: string | null, ng: string | null, llr: number | null) =>
-      ({ vao: JSON.stringify(vao), kiem_cl: kiem, lop_nhan: lop, ng_nhan: ng, ng_llr: llr })
+  it('đếm nhãn đã kiểm / tạm; nhãn niêm phong: 2 buổi sau tự chốt trùng (xác nhận) · ngược (lật = sai) · chưa chắc (không tính)', () => {
+    const r = (vao: object, kiem: string | null, ng: string | null, sau: string | null) =>
+      ({ vao: JSON.stringify(vao), kiem_cl: kiem, ng_nhan: ng, ng_sau: sau, ng_llr: null })
     const kd = kiemDinhBon([
-      r({ dp: true, ht: false }, 'da', 'dp', 'dp', 1.2),
-      r({ dp: true, ht: false }, 'da', 'dp', 'dp', -0.4),
-      r({ dp: false, ht: true }, 'da', 'ht', 'ht', -2),
-      r({ dp: false, ht: true }, 'tam', null, null, null),
-      r({ dp: false, ht: true }, 'da', 'ht', 'dp', -1.5),
+      r({ dp: true, ht: false }, 'da', 'dp', 'dp'),
+      r({ dp: true, ht: false }, 'da', 'dp', null),
+      r({ dp: false, ht: true }, 'da', 'ht', 'ht'),
+      r({ dp: false, ht: true }, 'tam', null, null),
+      r({ dp: false, ht: true }, 'da', 'dp', 'ht'),
     ])
     expect(kd.daKiem).toEqual({ ht: 2, dp: 2 })
     expect(kd.tam).toEqual({ ht: 1, dp: 0 })
@@ -116,7 +125,7 @@ describe('tự đo độ chính xác trên số liệu thật — /gv/bon-bang �
     expect(kd.chinhXac).toEqual({ ht: null, dp: null })
   })
   it('≥ 30 nhãn niêm phong ⇒ có độ chính xác + cận dưới Wilson; 1 lật / 300 ⇒ cận dưới < 99% vẫn phải hiện đúng', () => {
-    const ds = Array.from({ length: 300 }, (_, i) => ({ vao: JSON.stringify({ dp: true }), kiem_cl: 'da', lop_nhan: i === 0 ? 'ht' : 'dp', ng_nhan: 'dp', ng_llr: 1 }))
+    const ds = Array.from({ length: 300 }, (_, i) => ({ vao: JSON.stringify({ dp: true }), kiem_cl: 'da', ng_sau: i === 0 ? 'ht' : 'dp', ng_nhan: 'dp', ng_llr: 1 }))
     const kd = kiemDinhBon(ds)
     expect(kd.chinhXac!.dp!.ti).toBeCloseTo(299 / 300, 6)
     expect(kd.chinhXac!.dp!.canDuoi).toBeLessThan(kd.chinhXac!.dp!.ti)
@@ -133,6 +142,11 @@ describe('phụ huynh chỉ thấy số đo Đối phó khi nhãn ĐÃ KIỂM', 
     expect(t.diem.dp).toBeNull()
     expect(t.bangChung.dp).toEqual([])
     expect(t.diem.ht).toBe(40)
+  })
+  it('Đối phó đã kiểm CHỈ bằng hành vi ở nhà (chưa có trên lớp) ⇒ phụ huynh vẫn «chưa có» — chốt cuối là trên lớp', () => {
+    const t = banPhuHuynh({ ...hang('da'), kiem_cach: 'hanhVi' })
+    if (!t.ok || !t.co) throw new Error('phải có')
+    expect(t.diem.dp).toBeNull()
   })
   it('đã kiểm ⇒ như trước; hàng cũ (chưa có mức chắc) ⇒ như trước', () => {
     for (const k of ['da', null]) {

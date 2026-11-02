@@ -73,7 +73,8 @@ export function bangChungPh(ma: MaSoDo, ds: readonly TheTho[]): BangChungPh[] {
 /** Hàng `bon_chi_so_em` ⇒ câu trả lời cho phụ huynh (thuần). Không có hàng ⇒ `co:false` (cron chưa tính — màn nói «có từ sáng mai»). */
 export function banPhuHuynh(r: Row | undefined): TraLoiBonSoDo {
   if (!r) return { ok: true, co: false }
-  const tamCl = String(r.kiem_cl ?? '') === 'tam'
+  // Đối phó chỉ hiện cho phụ huynh khi đã kiểm TRÊN LỚP (thầy: «chốt cuối cùng là bài kiểm tra trên lớp»); nhãn tạm hoặc chỉ do hành vi ở nhà ⇒ «chưa có».
+  const tamCl = String(r.kiem_cl ?? '') === 'tam' || (String(r.kiem_cl ?? '') === 'da' && String(r.kiem_cach ?? '') === 'hanhVi')
   const the = json<Partial<Record<MaSoDo, TheTho[]>>>(r.the_json, {})
   const ngay = json<{ ngay?: string; muc?: number; ky?: number; voi?: number }[]>(r.ngay_json, [])
     .filter((n) => typeof n?.ngay === 'string')
@@ -97,6 +98,6 @@ export function banPhuHuynh(r: Row | undefined): TraLoiBonSoDo {
 export async function phBonSoDo(env: Env, b: Row, envDoc: Env = env, ctx?: ExecutionContext): Promise<TraLoiBonSoDo | { ok: false; error: string }> {
   const { sbd } = await sbdCuaPhuHuynh(envDoc, b, 'ph-bon-so-do', { chiToken: CHI_NHAN_TOKEN, envGhi: env, ctx })
   // Một câu theo khoá chính. Bảng chưa có (máy chủ mới, cron chưa chạy lần nào) ⇒ như chưa tính.
-  const r = await envDoc.DB.prepare("SELECT ngay, tinh_luc, ht, dp, ch, lu, so_luot, the_json, ngay_json, CASE WHEN json_valid(so_lieu_json) THEN json_extract(so_lieu_json, '$.kiem.cl') END AS kiem_cl FROM bon_chi_so_em WHERE sbd = ?1").bind(sbd).first<Row>().catch(() => null)
+  const r = await envDoc.DB.prepare("SELECT ngay, tinh_luc, ht, dp, ch, lu, so_luot, the_json, ngay_json, CASE WHEN json_valid(so_lieu_json) THEN json_extract(so_lieu_json, '$.kiem.cl') END AS kiem_cl, CASE WHEN json_valid(so_lieu_json) THEN json_extract(so_lieu_json, '$.kiem.cach') END AS kiem_cach FROM bon_chi_so_em WHERE sbd = ?1").bind(sbd).first<Row>().catch(() => null)
   return banPhuHuynh(r ?? undefined)
 }

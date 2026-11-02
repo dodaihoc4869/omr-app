@@ -50,13 +50,13 @@ export interface TraLoiBonBang {
   /** v2 (01/11): em có dấu hiệu nhưng CHƯA đủ chắc để xếp. v3b (02/11): ĐÃ BỎ — máy chủ mới luôn trả rỗng; giữ khoá cho máy chủ cũ (app không còn vẽ). */
   theoDoi?: DongBang[]
   /** HƯỚNG B (02/11): TỰ ĐO ĐỘ CHÍNH XÁC TRÊN SỐ LIỆU THẬT — chỉ số đếm gộp, không tên. `daKiem` / `tam`: số em theo nhãn và mức chắc.
-   *  `niemPhong`: nhãn ĐÃ KIỂM niêm phong từ các buổi TRƯỚC buổi trên lớp gần nhất ⇒ `cung` = buổi gần nhất cùng chiều · `lat` = dữ liệu mới nhất đã chốt
-   *  NGƯỢC nhãn (đây là «sai» — lời hứa ≤ 1%). Máy chủ cũ không có ⇒ vắng. */
+   *  `niemPhong`: nhãn niêm phong từ các buổi TRƯỚC 2 buổi trên lớp gần nhất; 2 buổi ấy tự chốt ⇒ `cung` = trùng (xác nhận) · `lat` = NGƯỢC (SAI —
+   *  lời hứa ≤ 1%) · còn lại chưa đủ chắc. Máy chủ cũ không có ⇒ vắng. */
   kiemDinh?: {
     daKiem: { ht: number; dp: number }
     tam: { ht: number; dp: number }
     niemPhong: Record<'ht' | 'dp', { tong: number; cung: number; lat: number }>
-    /** Độ chính xác nhãn ĐÃ KIỂM trên số liệu thật = 1 − lật / niêm phong, kèm cận dưới Wilson 95% một phía. CHỈ có khi ≥ 30 nhãn niêm phong;
+    /** Độ chính xác trên số liệu thật = cung / (cung + lat), kèm cận dưới Wilson 95% một phía. CHỈ có khi ≥ 30 lần 2 buổi sau đã tự chốt;
      *  null = «chưa đủ mẫu» (không in con số). Lời hứa 99%: cận dưới ≥ 0,99. */
     chinhXac?: Record<'ht' | 'dp', { ti: number; canDuoi: number } | null>
   }

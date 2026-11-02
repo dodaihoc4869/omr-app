@@ -171,7 +171,7 @@ export async function gvBonBang(env: Env, _b: Row, nowMs = Date.now()): Promise<
   await damBaoBangBon(env)
   const w = cuaSoTinh(nowMs)
   const [em, rows] = await Promise.all([docDanhSachEm(env, []), hoi(env, "SELECT sbd, ngay, tinh_luc, ht, dp, ch, lu, bc_json, CASE WHEN json_valid(so_lieu_json) THEN json_extract(so_lieu_json, '$.vao') END AS vao, "
-    + "CASE WHEN json_valid(so_lieu_json) THEN json_extract(so_lieu_json, '$.kiem.cl') END AS kiem_cl, CASE WHEN json_valid(so_lieu_json) THEN json_extract(so_lieu_json, '$.lop.nhan') END AS lop_nhan, "
+    + "CASE WHEN json_valid(so_lieu_json) THEN json_extract(so_lieu_json, '$.kiem.cl') END AS kiem_cl, CASE WHEN json_valid(so_lieu_json) THEN json_extract(so_lieu_json, '$.nguoc.sau') END AS ng_sau, "
     + "CASE WHEN json_valid(so_lieu_json) THEN json_extract(so_lieu_json, '$.nguoc.nhan') END AS ng_nhan, CASE WHEN json_valid(so_lieu_json) THEN json_extract(so_lieu_json, '$.nguoc.llrSau') END AS ng_llr FROM bon_chi_so_em")])
   if (!em) return { ok: false, error: 'Không đọc được danh sách học sinh.' }
   const emTheo = new Map(em.map((e) => [e.sbd, e]))
@@ -191,8 +191,9 @@ export async function gvBonBang(env: Env, _b: Row, nowMs = Date.now()): Promise<
 /** Số nhãn niêm phong tối thiểu mỗi nhãn để báo độ chính xác trên số liệu thật. */
 export const MAU_TOI_THIEU_KD = 30
 
-/** HƯỚNG B — tự đo độ chính xác trên số liệu thật (thuần, chỉ đếm gộp). Nhãn niêm phong từ các buổi TRƯỚC buổi trên lớp gần nhất (`nguoc.nhan`) so với:
- *  (a) chính buổi gần nhất — cùng chiều hay không (một buổi còn nhiễu, chỉ để xem xu hướng); (b) toàn bộ dữ liệu mới nhất (`lop.nhan`) — chốt NGƯỢC là SAI. */
+/** HƯỚNG B — tự đo độ chính xác trên số liệu thật (thuần, chỉ đếm gộp). Nhãn NIÊM PHONG từ các buổi TRƯỚC 2 buổi trên lớp gần nhất (`nguoc.nhan`);
+ *  2 buổi ấy TỰ chốt (`nguoc.sau`, dữ liệu chưa dùng khi niêm phong): trùng = `cung` (xác nhận) · ngược = `lat` (SAI) · chưa đủ chắc = không tính.
+ *  Độ chính xác = cung / (cung + lat), chỉ báo khi ≥ 30 lần 2 buổi sau đã tự chốt. */
 export function kiemDinhBon(rows: readonly Row[]): NonNullable<TraLoiBonBang['kiemDinh']> {
   const kd: NonNullable<TraLoiBonBang['kiemDinh']> = { daKiem: { ht: 0, dp: 0 }, tam: { ht: 0, dp: 0 }, niemPhong: { ht: { tong: 0, cung: 0, lat: 0 }, dp: { tong: 0, cung: 0, lat: 0 } } }
   for (const r of rows) {
@@ -205,14 +206,13 @@ export function kiemDinhBon(rows: readonly Row[]): NonNullable<TraLoiBonBang['ki
     if (ng === 'ht' || ng === 'dp') {
       const x = kd.niemPhong[ng]
       x.tong++
-      const llr = Number(r.ng_llr)
-      if (Number.isFinite(llr) && (ng === 'dp' ? llr > 0 : llr < 0)) x.cung++
-      const moi = str(r.lop_nhan)
-      if ((moi === 'ht' || moi === 'dp') && moi !== ng) x.lat++
+      const sau = str(r.ng_sau)
+      if (sau === ng) x.cung++
+      else if (sau === 'ht' || sau === 'dp') x.lat++
     }
   }
-  // Chưa đủ 30 nhãn niêm phong ⇒ «chưa đủ mẫu» (null) — không in con số khi mẫu còn nhỏ.
-  const cx = (x: { tong: number; lat: number }) => (x.tong >= MAU_TOI_THIEU_KD ? { ti: (x.tong - x.lat) / x.tong, canDuoi: canDuoiWilson(x.tong - x.lat, x.tong) } : null)
+  // Chưa đủ 30 lần «2 buổi sau tự chốt» ⇒ «chưa đủ mẫu» (null) — không in con số khi mẫu còn nhỏ.
+  const cx = (x: { cung: number; lat: number }) => { const n = x.cung + x.lat; return n >= MAU_TOI_THIEU_KD ? { ti: x.cung / n, canDuoi: canDuoiWilson(x.cung, n) } : null }
   kd.chinhXac = { ht: cx(kd.niemPhong.ht), dp: cx(kd.niemPhong.dp) }
   return kd
 }
