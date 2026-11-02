@@ -7,6 +7,7 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import TheCau from '../TheCau'
+import { bocKinh } from '../loi-giai-kinh/boc-kinh'
 import { hoiXacNhan } from '../hop-thoai'
 import { useGiayConLai, type KhoGio } from '../../lib/dong-ho-thi'
 import { demDaLam, useLuyenDe, type DieuKienLuyenDe, type LuotLuyenDe, type PaperLuyenDe } from '../luyen-de/dung-luyen-de'
@@ -582,7 +583,7 @@ function ManKetQua({ ld, paper }: { ld: LD; paper: PaperLuyenDe }) {
 }
 
 function CauXem({ domId, q, phan, stt, diem, giaTri, sol }: { domId?: string; q: CauDe; phan: Phan; stt: number; diem: number | null; giaTri: string; sol: ReturnType<LD['getSolution']> }) {
-  const chung = { ...q, cheDo: 'xem_lai' as const, stt, explanation: sol?.explanation, loiGiai: sol?.loiGiai, hoiThay: { qid: q.id, nguon: 'luyen_de', gon: true } }
+  const chung = { ...q, cheDo: 'xem_lai' as const, stt, explanation: sol?.explanation, loiGiai: sol?.loiGiai, hoiThay: { qid: q.id, nguon: 'luyen_de', gon: true }, bocLoiGiai: bocKinh(q.id) }
   const dungHet = diem !== null && diem >= (phan === 'II' ? 1 : 0.25)
   const yDung = phan === 'II' && diem !== null ? [0, 0.1, 0.25, 0.5, 1].indexOf(diem) : -1
   let the

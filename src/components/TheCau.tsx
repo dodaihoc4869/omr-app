@@ -71,6 +71,9 @@ interface BaseProps {
    * chế độ `thi` (em chưa trả lời) ⇒ chỉ Hỏi thầy, Thầy gợi hướng không đáp án. "Lời giải từng bước" chỉ ở chế độ xem lại khi câu có lời giải
    * (lệnh 30/09). KHÔNG truyền trong màn thi, Gọi lên bảng, lúc làm bài kiểm tra cá nhân. */
   hoiThay?: { qid?: string | null; nguon: string; onHoi?: () => void; gon?: boolean; luotId?: string }
+  /** LỜI GIẢI KÍNH (thầy 02/11, chỉ app HỌC SINH): hàm bọc khối lời giải xem lại — màn HS truyền `bocKinh(qid)` (loi-giai-kinh/boc-kinh.tsx);
+   * app thầy / phụ huynh không truyền. Là HÀM để TheCau (lượt mở app) không nhập thêm gì (luật tốc độ). */
+  bocLoiGiai?: (loiGiai: React.ReactNode, the: TheCauProps) => React.ReactNode
 }
 
 interface McqProps extends BaseProps {
@@ -243,6 +246,8 @@ function LoiGiai({ props, nhan }: { props: TheCauProps; nhan?: TrangThaiLoiGiai 
     </div>
   )
 }
+
+const dungNguyen = (lg: React.ReactNode) => lg
 
 export default function TheCau(props: TheCauProps) {
   const { cheDo, stt, tieuDe, id, text, thanCauImg, table, imageDataUrl, hinhAnh, onZoom } = props
@@ -487,7 +492,7 @@ export default function TheCau(props: TheCauProps) {
             luotId={props.hoiThay.luotId} soCau={props.hoiThay.luotId ? stt : undefined}
             dangLam={!xemLai} chi={xemLai && coLoiGiai(props) ? undefined : 'hoi'} />
         )}
-        {xemLai && <LoiGiai props={props} nhan={props.nhanLoiGiai} />}
+        {xemLai && (props.bocLoiGiai ?? dungNguyen)(<LoiGiai props={props} nhan={props.nhanLoiGiai} />, props)}
       </div>
     </TheNoiDung>
   )

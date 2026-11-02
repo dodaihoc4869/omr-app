@@ -370,6 +370,9 @@ export default defineConfig({
           // Lời giải Kính (thầy chốt 02/11): khung + bộ tải sẵn chỉ app học sinh dùng ⇒ kho chạy-lúc + kho tải ngầm học sinh (KHO_HS_GOC), precache giữ 170.
           '**/LoiGiaiKinhHs-*.{js,css}',
           '**/tai-san-*.js',
+          // ChonEmGiao (02/11): chỉ hai màn thầy nhập tĩnh (DayHocLenBang, SuaEmNhanBai) — cả hai đã ở kho chạy-lúc ⇒ cất trong precache là thừa;
+          // nhường chỗ cho mảnh kinh-hs (hàm bọc Kính + giải mã gói mà màn làm chặng dùng), precache giữ 170.
+          '**/ChonEmGiao-*.js',
           // Bi chuyển động (27/10) chỉ là trang trí: nạp lười, kho chạy-lúc; mất mạng ⇒ giữ Bi tĩnh.
           '**/bi-dong-*.{js,css}',
           // Gói tờ đáp án ca kiểm tra đã khoá (31/10): exam-api nạp lười ở giây 20 của ca (đang có mạng vì vừa vào thi) ⇒ kho chạy-lúc; hỏng ⇒ nộp đi đường cũ.
@@ -667,6 +670,8 @@ export default defineConfig({
             { name: 'app-nho', test: /src[\\/](?:store[\\/]appStore|lib[\\/](?:classlist-db|exam-api|ten-ca|de-rieng-goi|gui-ca-trinh-duyet|anh-len-may-chu|day-ca-may-chu-moi|phieu-may-chu-moi|don-moc-reset-giao-vien|man-ca-may-chu-moi|cau-hinh-de-rieng|cau-goc))\.tsx?$|node_modules[\\/]zustand[\\/]/, includeDependenciesRecursively: false },
             // 26/10 «Chạm để hiểu đề»: gom ruột (components/goi-y-cham, trừ vỏ VungChamDe + cầu nối thay-bang-so-do — hai tệp nhỏ ấy ở mảnh nơi gọi) + api thành MỘT mảnh, từ điển làn A (lib/goi-y-cham) một mảnh —
             // không kéo theo chem-format / hoa2-api ra khỏi mảnh cũ (includeDependenciesRecursively: false) ⇒ các đường khác không đổi byte.
+            // LỜI GIẢI KÍNH màn học sinh (02/11): hàm bọc TheCau (boc-kinh) + giải mã gói (dap-an-may — ManLamBaiTap và tai-san cùng dùng) chung MỘT mảnh có precache.
+            { name: 'kinh-hs', test: /src[\\/](?:components[\\/]loi-giai-kinh[\\/]boc-kinh|lib[\\/]dap-an-may)\.ts$/, includeDependenciesRecursively: false },
             { name: 'goi-y-cham', test: /src[\\/](?:components[\\/]goi-y-cham[\\/](?!VungChamDe\.tsx|thay-bang-so-do\.tsx)[^\\/]+|lib[\\/]goi-y-cham[\\/]api\.ts)$/, includeDependenciesRecursively: false },
             { name: 'tu-dien-cham', test: /src[\\/]lib[\\/]goi-y-cham[\\/](?!api\.ts|kieu\.ts)[^\\/]+$/, includeDependenciesRecursively: false },
             // 21/10 (màn Phiếu nạp muộn): năm mô-đun nhỏ dùng chung của lời giải / thí nghiệm mà cổng học sinh vẫn cần bị Rolldown tách thành năm tệp riêng

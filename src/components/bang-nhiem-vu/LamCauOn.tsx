@@ -2,7 +2,7 @@
 // Luật máy chủ (docs/ke-hoach-ngay-api-1909.md): đáp án chỉ về SAU khi ghi sổ; câu CHƯA TRẢ LỜI không ghi sổ, không khoá, không có
 // lời giải (nằm trong `chuaLam`) ⇒ giao diện nói rõ "chưa được tính, em làm nốt" chứ KHÔNG coi là sai; nộp lại cùng câu cùng ngày giữ
 // kết quả lần đầu ⇒ câu đã chấm KHOÁ ô đáp án. Màu chỉ đọc biến --m3-* (lam-cau-on.css), không mã màu cứng.
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Check, CircleAlert, RefreshCw, X } from 'lucide-react'
 import '../m3'
 import './lam-cau-on.css'
@@ -19,6 +19,8 @@ import { CHU_DA_LUU_MAY, SU_KIEN_HANG_DOI_XONG, khoaOnCau } from '../../lib/hang
 import { SoExpCau, ThanhExpNho, useCheDoHieuUng } from '../exp-cau/ExpCau'
 import { expTheoCau, type AnhThuNhan, type CheDoHieuUng } from '../../lib/hieu-ung-exp-cau'
 import { CHU_SOAT_LAI, GOI_Y_SOAT_LAI } from '../../lib/omni-chu'
+// LỜI GIẢI KÍNH (thầy 02/11) — nạp lười, chỉ khi em đã nộp câu.
+const LoiGiaiKinhHs = lazy(() => import('../loi-giai-kinh/LoiGiaiKinhHs'))
 
 const KY_TU = ['A', 'B', 'C', 'D', 'E', 'F']
 const NHAN_PHAN: Record<CauOn['phan'], string> = { I: 'Phần I · Trắc nghiệm', II: 'Phần II · Đúng / Sai', III: 'Phần III · Trả lời ngắn' }
@@ -591,7 +593,13 @@ function TheCauOn({
               Đáp án đúng: <b>{ketQua!.dapAnDung}</b>
             </p>
           )}
-          <LoiGiaiCauSai hoaHoc c={{ text: c.text, phan: c.phan, dapAnDung: ketQua!.dapAnDung, loiGiai: ketQua!.loiGiai } as any} qid={c.qid} nguon="on_lai" />
+          {/* LỜI GIẢI KÍNH (thầy 02/11): câu có bản Kính ⇒ vẽ Kính (+ Hỏi thầy bên trong), chưa có ⇒ hộp lời giải cũ. */}
+          <Suspense fallback={<LoiGiaiCauSai hoaHoc c={{ text: c.text, phan: c.phan, dapAnDung: ketQua!.dapAnDung, loiGiai: ketQua!.loiGiai } as any} qid={c.qid} nguon="on_lai" />}>
+            <LoiGiaiKinhHs qid={c.qid} phan={c.phan as 'I' | 'II' | 'III'} choices={c.phan === 'I' ? c.choices : undefined} ideas={c.phan === 'II' ? c.ideas || c.choices : undefined} dapAn={dungChuoi} em={dapAn || undefined}
+              duPhong={<LoiGiaiCauSai hoaHoc c={{ text: c.text, phan: c.phan, dapAnDung: ketQua!.dapAnDung, loiGiai: ketQua!.loiGiai } as any} qid={c.qid} nguon="on_lai" />}>
+              <NutHoiThay qid={c.qid} nguon="on_lai" gon />
+            </LoiGiaiKinhHs>
+          </Suspense>
           <HinhTaiViTri hinhAnh={anhLoi as any} viTri="sau_loi_giai" nhan="lời giải" />
         </div>
       )}
