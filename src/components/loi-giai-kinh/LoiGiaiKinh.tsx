@@ -7,6 +7,7 @@ import { Fragment, useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { BanKinh, CanhKinh, PhanKinh } from '../../lib/loi-giai-kinh/kieu'
 import { ChuTron, CongThuc } from '../goi-y-cham/so-do-thay'
 import { themTheNho } from '../../lib/loi-giai-kinh/the-nho'
+import { chuSgk } from '../../lib/loi-giai-kinh/kiem'
 import './loi-giai-kinh.css'
 
 /** Chữ có **in đậm** + công thức (ChemText / chỉ số `_`). */
@@ -278,8 +279,8 @@ function ThayGiang({ ban }: { ban: BanKinh }) {
     <section className="lgk-the" aria-label="Thầy giảng dạng này">
       <span className="lgk-nhan">Thầy giảng dạng này</span>
       {ban.thanChu.length > 0 && <div className="lgk-tc-hang">{ban.thanChu.map((t, i) => <div key={i} className="lgk-tc"><small>Thần chú của thầy</small><b>{t}</b></div>)}</div>}
-      {ban.thayNoi && <div className="lgk-thay-noi"><span className="lgk-av" aria-hidden="true">Đ</span><div className="lgk-bong"><small>Thầy nói</small><Chu chu={ban.thayNoi} /></div></div>}
-      {ban.meo && ban.meo !== ban.thayNoi && <div className="lgk-meo"><small>Mẹo của thầy</small><Chu chu={ban.meo} /></div>}
+      {ban.thayNoi && <div className="lgk-thay-noi"><span className="lgk-av" aria-hidden="true">Đ</span><div className="lgk-bong"><small>Thầy nói</small><Chu chu={chuSgk(ban.thayNoi)} /></div></div>}
+      {ban.meo && ban.meo !== ban.thayNoi && <div className="lgk-meo"><small>Mẹo của thầy</small><Chu chu={chuSgk(ban.meo)} /></div>}
     </section>
   )
 }

@@ -11,8 +11,13 @@ const laObj = (x: unknown): x is Obj => x !== null && typeof x === 'object' && !
 const s = (v: unknown, tran = 600): string => (typeof v === 'string' || typeof v === 'number' ? String(v).normalize('NFC').replace(/\s+/g, ' ').trim().slice(0, tran) : '')
 const mang = (v: unknown): unknown[] => (Array.isArray(v) ? v : [])
 
+/** Thuật ngữ SGK 2018 cho chữ thầy nói (phụ đề tự động ghi chữ cũ). Không dùng nhìn-lùi (Safari < 16.4). */
+const SGK: Record<string, string> = { axit: 'acid', 'bazơ': 'base', oxit: 'oxide', este: 'ester', ancol: 'alcohol', amin: 'amine', 'anđehit': 'aldehyde', 'andehit': 'aldehyde', xeton: 'ketone', lipit: 'lipid', polyme: 'polymer' }
+const RE_SGK = new RegExp(`(^|[^\\p{L}])(${Object.keys(SGK).join('|')})(?=[^\\p{L}]|$)`, 'giu')
+export const chuSgk = (t: string): string => t.replace(RE_SGK, (_m, a: string, w: string) => a + (w[0] === w[0]!.toUpperCase() ? SGK[w.toLowerCase()]!.replace(/^./, (c) => c.toUpperCase()) : SGK[w.toLowerCase()]!))
+
 /** Chuẩn hoá để đối chiếu chữ nguồn (bỏ dấu câu cuối, khoảng trắng, hoa thường). */
-export const chuanDoiChieu = (t: string): string => t.normalize('NFC').toLowerCase().replace(/[«»"“”'‘’]/g, '').replace(/[.!?…\s]+$/u, '').replace(/\s+/g, ' ').trim()
+export const chuanDoiChieu = (t: string): string => chuSgk(t.normalize('NFC')).toLowerCase().replace(/[«»"“”'‘’]/g, '').replace(/[.!?…\s]+$/u, '').replace(/\s+/g, ' ').trim()
 
 /** Chữ CẤM trên màn học sinh: dấu «» (thầy 02/11: in đậm thay), ẩn dụ tiền nhà (thầy 26/10 bỏ), độ bất bão hoà k (ngoài SGK KNTT), chữ AI. */
 const RE_CAM: readonly [RegExp, string][] = [
@@ -168,11 +173,13 @@ export function kiemBanKinh(tho: unknown, ctx: NguCanhKinh): KetQuaKiemKinh {
   if (mang(tho.thanChu).length > thanChu.length) boKhoi.push('thần chú không có trong bảng của thầy')
   const noiNguon = new Map(ctx.nguon.thayNoi.map((t) => [chuanDoiChieu(t), t]))
   const thayNoiTho = s(tho.thayNoi, 300)
-  const thayNoi = thayNoiTho ? noiNguon.get(chuanDoiChieu(thayNoiTho)) : undefined
+  const thayNoiGoc = thayNoiTho ? noiNguon.get(chuanDoiChieu(thayNoiTho)) : undefined
+  const thayNoi = thayNoiGoc ? chuSgk(thayNoiGoc) : undefined
   if (thayNoiTho && !thayNoi) boKhoi.push('câu thầy nói không có trong mục kiến thức')
   const meoNguon = new Map(ctx.nguon.meo.map((t) => [chuanDoiChieu(t), t]))
   const meoTho = s(tho.meo, 300)
-  const meo = meoTho ? meoNguon.get(chuanDoiChieu(meoTho)) : undefined
+  const meoGoc = meoTho ? meoNguon.get(chuanDoiChieu(meoTho)) : undefined
+  const meo = meoGoc ? chuSgk(meoGoc) : undefined
   if (meoTho && !meo) boKhoi.push('mẹo không có trong mục kiến thức')
   const canhTho = tho.canh
   const canh = canhTho === undefined || canhTho === null ? null : docCanh(canhTho)
