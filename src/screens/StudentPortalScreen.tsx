@@ -16,7 +16,6 @@ import { useGioHocTap } from '../hooks/useGioHocTap'
 import ThongBaoHocSinh,{noticeApi} from '../components/ThongBaoHocSinh'
 import {MomQuestionStem,MomOption} from '../components/MomQuestionMedia'
 import {momApi, momReviewHtml} from '../lib/mom-api'
-import PhongVaoThi from '../components/PhongVaoThi'
 // Gói C 15/10: KhoiKhacPhuc3CheDo nay nạp lười (mảnh khối phụ, dưới) — nhưng thẻ câu GIỮ trong mảnh mở cổng như trước: các màn lười của em
 // (Ôn câu, Làm bài tập, Câu đã làm…) vẫn dựa vào tờ kiểu đi cùng nó (m3/the-cau.css: `.m3 .loi-giai`, `.m3 .the-cau`). Bỏ dòng này là đổi màu.
 import '../components/TheCau'
@@ -25,7 +24,6 @@ import NutQuayLai from '../components/NutQuayLai'
 import { dungM3, ThanhTren } from '../components/m3'
 import TheCanhBaoThay from '../components/bang-nhiem-vu/TheCanhBaoThay'
 import { useHopThoai } from '../components/HopThoaiCong'
-import VaoThiForm from '../components/bang-nhiem-vu/VaoThiForm'
 import type { BaiMomM3 } from '../components/bang-nhiem-vu/MomM3'
 import '../components/bang-nhiem-vu/sheet-m3.css'
 // Tạm dừng hoạt ảnh Sảnh khi bị màn toàn màn hình che (lớp `sanh-bi-che`, xem hiệu ứng ngay dưới `cheDo2`).
@@ -115,7 +113,7 @@ const ModalKhacPhucCauSai = lazy(() => napKhoiPhu().then((m) => ({ default: m.Mo
 // mã ba khối ấy cùng cửa nạp kho đề, thuật toán rút câu sai, phiếu luyện mà chỉ chúng dùng). Mảnh được nạp trước lúc rảnh ở Hôm nay (cùng nhịp nạp trước màn thi, dưới) ⇒ lúc em bấm, khối đã có thì VẼ THẲNG (veNgayKhiCo,
 // không treo Suspense, không màn chờ); chưa có (2G / tiết kiệm dữ liệu / bấm quá sớm) ⇒ React.lazy, chỗ chờ giữ khung như các khối lười khác.
 type KhoiPhu = typeof import('../components/cong-hs-nap-luoi')
-function khoiPhu<K extends 'KhoiKhacPhuc3CheDo' | 'BtvnM3' | 'MomDanhSachM3' | 'MomLamBaiM3' | 'LichSuCaM3' | 'KhungXemPhieu'>(ten: K) {
+function khoiPhu<K extends 'KhoiKhacPhuc3CheDo' | 'BtvnM3' | 'MomDanhSachM3' | 'MomLamBaiM3' | 'LichSuCaM3' | 'KhungXemPhieu' | 'PhongVaoThi' | 'VaoThiForm'>(ten: K) {
   const bo: BoNap<{ default: KhoiPhu[K] }> = Object.assign(() => napKhoiPhu().then((m) => ({ default: m[ten] })), {
     san: () => {
       const m = napKhoiPhu.san()
@@ -132,6 +130,9 @@ const LichSuCaM3 = khoiPhu('LichSuCaM3') // tab «Xem điểm» (25/10: nạp l�
 // 02/11 (tác tử tốc độ): khung xem phiếu chỉ hiện khi em BẤM mở phiếu / đề kèm lỗi sai ⇒ vào mảnh trên (mảnh ấy đã chứa nó qua hộp Khắc phục) — lượt mở /hs
 // bớt ~2,5 KB nén; mảnh đã nạp trước lúc rảnh ⇒ lúc bấm vẽ ngay, không treo Suspense.
 const KhungXemPhieu = khoiPhu('KhungXemPhieu')
+// 02/11 (tác tử tốc độ, lần 2): tấm «Vào phòng thi» + form chỉ hiện khi em BẤM Vào ca kiểm tra ⇒ cùng mảnh trên (nạp trước lúc rảnh, bấm là vẽ ngay).
+const PhongVaoThi = khoiPhu('PhongVaoThi')
+const VaoThiForm = khoiPhu('VaoThiForm')
 // Bong bóng A.I Đỗ Đại Học (thầy 24/10): kênh hỏi bài của văn phòng; chỉ ở Hôm nay; mảnh riêng ngoài precache, cửa nạp qua cong-hs-nap-luoi.
 const BongBongAiDdh = lazy(() => napKhoiPhu().then((m) => m.napBong()))
 import { baoDaXemHocSinh } from '../lib/canh-bao-thay-may-chu'
@@ -1875,6 +1876,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
 
         {/* TAB 4: VÀO PHÒNG THI */}
         {tab === 'vaothi' && !manThi && (
+          <Suspense fallback={<ChoKhoiPhu />}>
           <PhongVaoThi onClose={() => setTab(cheDo2 ? null : 'diem')}>
           {vaoM3 && (
             <VaoThiForm maCa={maCaVaoThi} onMaCa={setMaCaVaoThi} matKhau={matKhauCaVaoThi} onMatKhau={setMatKhauCaVaoThi} loi={loiVaoThi} onSubmit={vaoThi} sbd={auth.sbd} hoTen={auth.hoTen} />
@@ -1947,6 +1949,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
             </div>
           </div>}
           </PhongVaoThi>
+          </Suspense>
         )}
 
           </main>
