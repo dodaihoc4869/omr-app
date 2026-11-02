@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { taoHtmlMayChieu, laCauDai, type OBang } from '../src/lib/html-may-chieu'
-import type { CauLuyen } from '../src/lib/types'
+import type { CauLuyen } from '../src/lib/bai-tap-pdf'
 
 function taoCau(opts: Partial<CauLuyen> = {}): CauLuyen {
   return {

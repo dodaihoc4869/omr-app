@@ -1,0 +1,35 @@
+# CỔNG CHẤT LƯỢNG MÃ (dọn mã 02/11) — chạy mỗi PR và mỗi push lên main, SONG SONG deploy, KHÔNG chặn phát hành (như toc-do-sau-gop).
+# Ba phép, mỗi phép ~1 phút: (1) kiểu chặt app + máy chủ (tsc) · (2) không tệp / gói thừa (knip, knip.json) · (3) lint chỉ hạ (docs/moc-lint.json).
+# Đỏ ⇒ phiên vừa đẩy sửa ngay (mã mới không được thêm tệp chết, gói thừa, lỗi kiểu hay lỗi lint). Chạy tại máy: `npm run kiem:chat-luong`.
+name: Chất lượng mã
+on:
+  pull_request:
+    paths: ['src/**', 'server/**', 'scripts/**', 'tests/**', 'package.json', 'package-lock.json', 'knip.json', '.oxlintrc.json', 'docs/moc-lint.json', 'tsconfig*.json', '.github/workflows/chat-luong.yml']
+  push:
+    branches: [main]
+    paths: ['src/**', 'server/**', 'scripts/**', 'tests/**', 'package.json', 'package-lock.json', 'knip.json', '.oxlintrc.json', 'docs/moc-lint.json', 'tsconfig*.json', '.github/workflows/chat-luong.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: chat-luong-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  kiem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Kiểu chặt — app
+        run: npx tsc -p tsconfig.app.json --noEmit
+      - name: Kiểu chặt — máy chủ
+        run: npx tsc -p server/tsconfig.json --noEmit
+      - name: Không tệp / gói thừa (knip)
+        run: npm run kiem:ma-chet
+      - name: Lint chỉ hạ
+        run: npm run kiem:lint
