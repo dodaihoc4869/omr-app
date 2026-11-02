@@ -8,12 +8,11 @@
 //   /kho/loi-giai-kinh/nop      ⇒ dựng lại câu từ kho, băm phải khớp, `kiemBanKinh` (đủ khối bản mẫu · khớp đáp án kho · tính lại số · thần chú thuộc
 //                                  bảng thầy · câu thầy nói thuộc mục kiến thức đã gửi) ⇒ bảng CHỈ-THÊM `loi_giai_kinh` (bản `dat` không bị bản kém ghi đè)
 //   /kho/loi-giai-kinh/tong     ⇒ số đếm phủ (đạt / tổng theo phần) — log công khai chỉ in số.
-//   Máy soạn nghi đáp án kho sai ⇒ KHÔNG tự sửa kho: câu vào diện nghi (`ghiNghiTuXu`, đã có), bản không hiện, báo thầy bằng số đếm.
+//   Máy soạn nghi đáp án kho sai ⇒ KHÔNG tự sửa kho; bản VẪN hiện và câu VẪN ở kênh rút (thầy 03/11), cột `nghi` chỉ để đếm.
 // ĐỌC (học sinh): `docBanKinh(env, qids)` — chỉ bản `dat`, không nghi, phiên bản hiện hành, băm = băm câu hiện tại. Luật xem (sau nộp / công bố /
 // tự làm ở chỗ luyện) do nơi gọi giữ: `answer` (sau nộp), `/hs/loi-giai` (đã có luật), gói `dm` luyện tập (đã niêm phong).
 import type { Env } from './kieu'
 import { cauHienTai, damBaoBangLoiGiai } from './loi-giai'
-import { ghiNghiTuXu } from './hoc-lieu-may-soan'
 import { kiemCong } from './so-do-cong'
 import { THAN_CHU } from './kinh-than-chu'
 import { dauVao, lopCua } from '../../src/lib/loi-giai-kiem'
@@ -135,7 +134,7 @@ export async function nopBanKinh(env: Env, b: Obj) {
       `UPDATE loi_giai_kinh_viec SET trang_thai = CASE WHEN ? = 'dat' THEN 'xong' WHEN so_lan >= ? THEN 'truot' ELSE 'cho' END, ma_luot = NULL, loi = ? WHERE bam = ?`,
     ).bind(kq.ket, SO_LAN_TOI_DA_KINH, kq.ket === 'dat' ? (nghi ? 'nghi đáp án' : null) : kq.lyDo.slice(0, 500), bam),
   ])
-  if (nghi && kq.ket === 'dat') await ghiNghiTuXu(env, bam, qid, `máy soạn Lời giải Kính nghi đáp án kho: ${nghi.slice(0, 300)} — bản ẩn`).catch(() => 0)
+  // Thầy 03/11 «Cho trở lại kênh rút tự động nhé»: câu máy nghi đáp án KHÔNG còn vào diện nghi (không bị loại khỏi kênh rút) — chỉ đếm ở cột `nghi`.
   return { ok: true, ket: kq.ket, lyDo: kq.lyDo, boKhoi: kq.boKhoi, ...(nghi ? { nghiDapAn: true } : {}) }
 }
 
@@ -238,4 +237,12 @@ export async function buGocKinh(env: Env) {
   }
   const con = await env.DB.prepare(`SELECT COUNT(*) AS n FROM loi_giai_kinh WHERE ban_json NOT LIKE '%"_goc"%'`).first<Obj>()
   return { ok: true, daBu, con: Number(con?.n ?? 0) }
+}
+
+/** Thầy 03/11 «Cho trở lại kênh rút tự động nhé»: câu máy soạn Kính đã ghi vào diện nghi (`cau_nghi_dap_an`, ghi chú «Lời giải Kính») ⇒ trạng thái
+ *  'tra_ve' — mọi kênh rút chỉ bỏ câu 'nghi' nên câu trở lại kênh. Không đụng dòng nghi do nguồn khác ghi (tỉ lệ sai, máy soạn lời giải từng bước). */
+export async function traVeKenhKinh(env: Env) {
+  const r = await env.DB.prepare(`UPDATE cau_nghi_dap_an SET trang_thai = 'tra_ve', ghi_chu = substr(COALESCE(ghi_chu, '') || ' · thầy cho trở lại kênh 03/11', 1, 600)
+    WHERE trang_thai = 'nghi' AND ghi_chu LIKE '%Lời giải Kính%'`).run().catch(() => null)
+  return { ok: true, traVe: Number(r?.meta?.changes ?? 0) }
 }
