@@ -137,7 +137,7 @@ const KhungXemPhieu = khoiPhu('KhungXemPhieu')
 // 02/11 (tác tử tốc độ, lần 2): tấm «Vào phòng thi» + form chỉ hiện khi em BẤM Vào ca kiểm tra ⇒ cùng mảnh trên (nạp trước lúc rảnh, bấm là vẽ ngay).
 const PhongVaoThi = khoiPhu('PhongVaoThi')
 const VaoThiForm = khoiPhu('VaoThiForm')
-// 02/11 (tác tử tốc độ sau #759): nhãn hạn nộp chỉ vẽ ở danh sách Bài tập về nhà kiểu CŨ (nhánh không-M3) ⇒ cùng mảnh trên; chỉ cổng học sinh nhập nó
+// 02/11 (tác tử tốc độ sau PR 759): nhãn hạn nộp chỉ vẽ ở danh sách Bài tập về nhà kiểu CŨ (nhánh không-M3) ⇒ cùng mảnh trên; chỉ cổng học sinh nhập nó
 // ⇒ vào thẳng mảnh ấy, không sinh mảnh mới (precache giữ ≤ 170 tệp). Lượt mở /hs bớt mã của nó.
 const NhanHanBaiTap = khoiPhu('NhanHanBaiTap')
 // Bong bóng A.I Đỗ Đại Học (thầy 24/10): kênh hỏi bài của văn phòng; chỉ ở Hôm nay; mảnh riêng ngoài precache, cửa nạp qua cong-hs-nap-luoi.
