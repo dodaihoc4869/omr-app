@@ -1,0 +1,152 @@
+{
+ "x6-thuong-goc": {
+  "lan": 3,
+  "p95TheoCau": [
+   50,
+   33,
+   67,
+   33,
+   50,
+   17
+  ],
+  "maxP95": 67,
+  "jsMoiKhung": {
+   "dung": 1.88,
+   "set": 2.64,
+   "sai": 1.7
+  },
+  "khungTren50": {
+   "dung": 0,
+   "set": 1,
+   "sai": 0
+  },
+  "kiemInp": 120,
+  "tiepInp": 72,
+  "chuyenCau": 291
+ },
+ "x6-thuong-moi": {
+  "lan": 3,
+  "p95TheoCau": [
+   50,
+   33,
+   67,
+   50,
+   50,
+   33
+  ],
+  "maxP95": 67,
+  "jsMoiKhung": {
+   "dung": 2.88,
+   "set": 3.87,
+   "sai": 1.63
+  },
+  "khungTren50": {
+   "dung": 1,
+   "set": 6,
+   "sai": 0
+  },
+  "kiemInp": 128,
+  "tiepInp": 80,
+  "chuyenCau": 355
+ },
+ "x6-mayYeu-goc": {
+  "lan": 2,
+  "p95TheoCau": [
+   17,
+   17,
+   17,
+   17,
+   17,
+   17
+  ],
+  "maxP95": 17,
+  "jsMoiKhung": {
+   "dung": 0.23,
+   "set": 0.32,
+   "sai": 0.35
+  },
+  "khungTren50": {
+   "dung": 0,
+   "set": 0,
+   "sai": 0
+  },
+  "kiemInp": 88,
+  "tiepInp": 152,
+  "chuyenCau": 172
+ },
+ "x6-mayYeu-moi": {
+  "lan": 2,
+  "p95TheoCau": [
+   17,
+   17,
+   17,
+   17,
+   17,
+   17
+  ],
+  "maxP95": 17,
+  "jsMoiKhung": {
+   "dung": 0.49,
+   "set": 1.09,
+   "sai": 0.56
+  },
+  "khungTren50": {
+   "dung": 0,
+   "set": 0,
+   "sai": 0
+  },
+  "kiemInp": 88,
+  "tiepInp": 168,
+  "chuyenCau": 182
+ },
+ "x4-thuong-goc": {
+  "lan": 3,
+  "p95TheoCau": [
+   33,
+   17,
+   33,
+   17,
+   33,
+   17
+  ],
+  "maxP95": 33,
+  "jsMoiKhung": {
+   "dung": 1.21,
+   "set": 1.63,
+   "sai": 1.37
+  },
+  "khungTren50": {
+   "dung": 0,
+   "set": 0,
+   "sai": 0
+  },
+  "kiemInp": 80,
+  "tiepInp": 56,
+  "chuyenCau": 201
+ },
+ "x4-thuong-moi": {
+  "lan": 3,
+  "p95TheoCau": [
+   33,
+   17,
+   33,
+   17,
+   33,
+   17
+  ],
+  "maxP95": 33,
+  "jsMoiKhung": {
+   "dung": 1.36,
+   "set": 1.23,
+   "sai": 1.46
+  },
+  "khungTren50": {
+   "dung": 0,
+   "set": 1,
+   "sai": 0
+  },
+  "kiemInp": 80,
+  "tiepInp": 56,
+  "chuyenCau": 196
+ }
+}
