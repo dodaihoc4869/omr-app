@@ -849,10 +849,20 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
   useEffect(() => {
     if (typeof window === 'undefined' || !auth?.token || dangMoManCon || !nenNapTruoc()) return
     let huy = false
-    const cb = () => { if (!huy) void Promise.all([napManLamBaiTap(), napManTuChua(), napManKiemTra(), napManCauDaLam(), napManTuLuyen()]).then(() => boNapExam()).then(() => { if (!huy) return napKhoiPhu() }).catch(() => {}) }
-    const hen = ('requestIdleCallback' in window
+    // TỨC THÌ sau PR 756 (02/11): năm mảnh màn con nạp CÙNG LÚC ở lượt rảnh đầu ⇒ năm lượt tải giành mạng + năm lượt dịch mô-đun liền nhau ngay sau khi
+    // Hôm nay hiện (máy yếu: luồng chính bận đúng lúc em chạm đầu tiên). Nay LẦN LƯỢT: mỗi mảnh một lượt rảnh, mảnh trước về xong mới hẹn mảnh sau; em mở màn con ⇒ dừng
+    // (huy). Thứ tự: ba màn con chính (vào tức thì) → màn thi → Câu đã làm, Tu luyện (đánh dấu `.san()` cho veNgayKhiCo) → khối phụ.
+    const hang: (() => Promise<unknown>)[] = [napManLamBaiTap, napManTuChua, napManKiemTra, boNapExam, napManCauDaLam, napManTuLuyen, napKhoiPhu]
+    const henRanh = ('requestIdleCallback' in window
       ? (window as Window & { requestIdleCallback: (fn: () => void) => number }).requestIdleCallback
-      : (fn: () => void) => setTimeout(fn, 1200))(cb)
+      : (fn: () => void) => setTimeout(fn, 1200))
+    let hen = 0
+    const tiep = (): void => {
+      const nap = hang.shift()
+      if (huy || !nap) return
+      hen = henRanh(() => { if (!huy) nap().then(tiep, () => {}) })
+    }
+    tiep()
     return () => {
       huy = true
       if ('cancelIdleCallback' in window) {
