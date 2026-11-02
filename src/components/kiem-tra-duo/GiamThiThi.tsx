@@ -122,16 +122,12 @@ export default function GiamThiThi({ phan, cauHien, roi, goc }: {
       const g = gt.current, lop = lopRef.current, kinh = g?.svg.querySelector('.gt-den-kinh')
       const dich = oSoi(o)
       if (!g || !lop || !kinh || !dich || host.current?.hidden) return
-      g.soiVao(dich) // tay quay đèn về ô em chạm (lò xo ~0,3 s) ⇒ đo kính đèn khi tay đã tới rồi mới bật tia
-      clearTimeout(henTia)
-      henTia = window.setTimeout(() => {
-        if (gt.current !== g || host.current?.hidden) return
-        g.svg.querySelector('.gt-den')?.setAttribute('data-bat', '')
-        const rl = lop.getBoundingClientRect(), rk = kinh.getBoundingClientRect(), rd = dich.getBoundingClientRect()
-        den.current?.soi({ x: rk.left + rk.width / 2 - rl.left, y: rk.top + rk.height / 2 - rl.top }, { x: rd.left - rl.left, y: rd.top - rl.top, w: rd.width, h: rd.height })
-      }, 300)
+      // tay quay đèn về ô em chạm (~0,3 s); tia bắt đầu từ kính đèn ở dáng ĐÍCH (máy tính sẵn) ⇒ tia luôn dính đèn, không đo lúc tay đang quay
+      const k = g.soiVao(dich)
+      g.svg.querySelector('.gt-den')?.setAttribute('data-bat', '')
+      const rl = lop.getBoundingClientRect(), rk = k ?? (() => { const r = kinh.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 } })(), rd = dich.getBoundingClientRect()
+      den.current?.soi({ x: rk.x - rl.left, y: rk.y - rl.top }, { x: rd.left - rl.left, y: rd.top - rl.top, w: rd.width, h: rd.height })
     }
-    let henTia = 0
     const henSoi = (o: Element) => { huySoi?.(); huySoi = sauKhungDau(() => soi(o)) }
     const thucDay = () => {
       const t = gt.current?.trangThai()
@@ -161,13 +157,13 @@ export default function GiamThiThi({ phan, cauHien, roi, goc }: {
     const an = () => { gt.current?.tamDung(document.hidden); if (document.hidden) { den.current?.tat(true); clearTimeout(henCho.current) } else datCho() }
     document.addEventListener('visibilitychange', an)
     return () => {
-      huySoi?.(); clearTimeout(henCho.current); clearTimeout(henTia)
+      huySoi?.(); clearTimeout(henCho.current)
       g0.removeEventListener('pointerover', re); g0.removeEventListener('click', cham); g0.removeEventListener('keydown', go); g0.removeEventListener('input', go)
       window.removeEventListener('resize', doiKho); document.removeEventListener('visibilitychange', an)
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Rời màn (màn thi đã tính): đợi em quay lại hẳn (tab hiện) rồi hạ đèn về phía em + MỘT câu của thầy.
+  // Rời màn (màn thi đã tính): đợi em quay lại hẳn (tab hiện + có tiêu điểm) rồi hạ đèn về phía em + MỘT câu của thầy.
   useEffect(() => {
     if (!roi) return
     let huy: (() => void) | null = null
@@ -180,9 +176,10 @@ export default function GiamThiThi({ phan, cauHien, roi, goc }: {
         if (c) g.noi(c.chu, { cam: c.cam, giu: 4200 })
       })
     }
-    const hien = () => { if (!document.hidden) { document.removeEventListener('visibilitychange', hien); chay() } }
-    if (document.hidden) document.addEventListener('visibilitychange', hien); else chay()
-    return () => { huy?.(); document.removeEventListener('visibilitychange', hien) }
+    const ve = () => !document.hidden && (typeof document.hasFocus !== 'function' || document.hasFocus())
+    const hien = () => { if (ve()) { document.removeEventListener('visibilitychange', hien); window.removeEventListener('focus', hien); chay() } }
+    if (ve()) chay(); else { document.addEventListener('visibilitychange', hien); window.addEventListener('focus', hien) }
+    return () => { huy?.(); document.removeEventListener('visibilitychange', hien); window.removeEventListener('focus', hien) }
   }, [roi]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (

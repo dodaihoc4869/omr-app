@@ -30,8 +30,8 @@ export interface GiamThi {
   phanUng(loai: PhanUngGT, o?: { diem?: { x: number; y: number } }): GiamThi
   /** Lúc thi: cầm đèn pha quét chậm (bật) / trả về dáng thường (tắt). */
   datThi(bat: boolean): GiamThi
-  /** Lúc thi: quay đèn soi đúng ô `el` em vừa chạm. */
-  soiVao(el: Element | null | undefined): GiamThi
+  /** Lúc thi: quay đèn soi đúng ô `el` em vừa chạm. Trả về tâm kính đèn (toạ độ màn, px) ở dáng ĐÍCH — tia của màn thi bắt đầu từ đó. */
+  soiVao(el: Element | null | undefined): { x: number; y: number } | null
   tamDung(dung: boolean): void
   /** Chuyển giám thị (giữ nguyên hình đã dựng + tư thế đang có) sang khung chứa mới — câu mới dùng lại, không dựng lại hình. */
   doiCho(khung: HTMLElement, loiVao?: HTMLElement | null): void
@@ -591,12 +591,17 @@ async function khen(this: Nguoi, lien: boolean): Promise<void> {
   await this.ngu(200)
 }
 // lúc thi: em chạm ô ⇒ đèn quay sang soi đúng ô ấy (không bàn về câu). Tia trong hình tắt lúc soi — màn thi vẽ tia chính xác tới ô (den-soi.ts).
+/** Góc tay đèn để soi điểm `d` + tâm kính đèn ở góc ấy (toạ độ màn). Vai phải (33, −92), kính cách vai 25 + 27 + 21,4 theo tay (a2P = 0). */
+function gocSoi(p: Nguoi, d: { x: number; y: number }): { th: number; kinh: { x: number; y: number } } {
+  const r = p.svg.getBoundingClientRect(), sc = r.width / VB.w
+  const vx = r.left + (33 * TL - VB.x) * sc, vy = r.top + (-92 * TL - VB.y) * sc
+  const th = kep((Math.atan2(d.x - vx, d.y - vy) * 180) / Math.PI, 8, 125), L = 73.4 * TL * sc, a = (th * Math.PI) / 180
+  return { th, kinh: { x: vx + L * Math.sin(a), y: vy + L * Math.cos(a) } }
+}
 async function soi(this: Nguoi, d: { x: number; y: number }): Promise<void> {
   this.khoaMat = true
-  const r = this.svg.getBoundingClientRect(), sc = r.width / VB.w
-  const vx = r.left + (33 * TL - VB.x) * sc, vy = r.top + (-92 * TL - VB.y) * sc
-  const th = kep((Math.atan2(d.x - vx, d.y - vy) * 180) / Math.PI, 8, 125)
-  this.dat({ a1P: th, a2P: 0, tia: 0 }, 70, 0.85)
+  const { th } = gocSoi(this, d)
+  this.dat({ a1P: th, a2P: 0, tia: 0 }, 220, 0.9) // tay tới đích ~0,3 s (tia của màn thi vươn 260 ms từ kính ở dáng đích)
   const g = this.huong(d.x, d.y, 110)
   this.dat({ gx: g.gx, gy: g.gy }, 200, 0.8)
   await this.ngu(420)
@@ -653,11 +658,11 @@ export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; 
     },
     datThi(bat) { p.batThi(bat); return gt },
     soiVao(el) {
-      if (!el || !p.thi || p.tinh) return gt
-      const d = tamCua(el)
-      if (!p.song) return gt
-      void p.lam('soi', function () { return soi.call(this, d) })
-      return gt
+      if (!el || !p.thi || p.tinh) return null
+      const d = tamCua(el), dich = gocSoi(p, d)
+      if (p.song) void p.lam('soi', function () { return soi.call(this, d) })
+      else { p.dat({ a1P: dich.th, a2P: 0 }); p.datBan('den') }
+      return dich.kinh
     },
     noi(chu, oo = {}) {
       p.xoaLoi()

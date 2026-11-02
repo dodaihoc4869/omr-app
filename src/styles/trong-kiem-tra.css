@@ -284,8 +284,13 @@
   content: ''; position: absolute; right: -8px; top: calc(var(--kt-gt-w) * .38 - 7px); width: 14px; height: 14px; background: var(--tr-mat);
   border-left: 2px solid var(--tr-vien); border-bottom: 2px solid var(--tr-vien); border-bottom-left-radius: 4px; transform: rotate(45deg);
 }
-/* bong bóng càu nhàu (một lời nhắc lúc sắp hết giờ) không rộng quá khối câu */
+/* bong bóng lời giám thị không rộng quá khối câu. 02/11: lời DUY NHẤT lúc thi là lúc em rời màn rồi quay lại — đặt CẠNH đầu giám thị (đè lên đề vài giây,
+   mũi nhọn chĩa sang trái vào giám thị) thay vì trên đầu: trên đầu là chỗ dải cảnh báo rời màn (dính, lớp cao hơn khối câu) hiện cùng lúc ⇒ bị che. */
 [data-trong='hs'] .duo-kt-than > .kt-gt .gt-loi { max-width: min(300px, calc(100vw - 40px)); }
+[data-trong='hs'] .duo-kt-than > .kt-gt .gt-loi[data-cam] { left: calc(100% + 4px); bottom: auto; top: calc(var(--kt-gt-w) * .12); width: max-content; max-width: min(260px, calc(100vw - var(--kt-gt-w) - 56px)); }
+[data-trong='hs'] .duo-kt-than > .kt-gt .gt-loi[data-cam]::after,
+[data-trong='hs'] .duo-kt-than > .kt-gt .gt-loi[data-cam]::before { left: -11px; top: 14px; width: 11px; height: 14px; clip-path: path('M11 0 V14 L1.8 8.4 Q0 7 1.8 5.6 Z'); }
+[data-trong='hs'] .duo-kt-than > .kt-gt .gt-loi[data-cam]::after { left: -9px; }
 
 /* 5c. ĐÈN PHA (den-soi.ts): lớp phủ khối câu, không nhận chạm, `contain: strict`. Tia = nêm conic-gradient (vẽ một lần), vũng = bầu dục
  * radial-gradient phóng theo ô; màu nắng vàng --tr-sao pha trong suốt (sáng: đậm hơn chút để thấy trên nền trắng). will-change chỉ lúc sáng. */

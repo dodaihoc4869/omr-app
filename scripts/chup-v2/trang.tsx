@@ -551,7 +551,8 @@ if (LA_LAM13 && thamSo.get('gtloi') === '1') Math.random = () => 0
 // 28/10 Cú Ngọc: thêm window.__taoLua ⇒ máy quay dựng Lửa cỡ lớn trên sân khấu (mọi biểu cảm, đứng nghiêng) từ bản build thật.
 if (thamSo.get('luadien') === '1') void import('../../src/components/linh-vat/lua-dong').then((m) => { Object.assign(window, { __lua: m.LUA_DANG_SONG, __taoLua: m.taoLua }) })
 // GIÁM THỊ NGƯỜI 27/10: `&gtdien=1` ⇒ lộ các giám thị đang sống ra window.__gt để máy quay điều khiển trạng thái (video quay từ bản build thật).
-if (LA_LAM13 && thamSo.get('gtdien') === '1') void import('../../src/components/giam-thi/giam-thi-nguoi').then((m) => { (window as unknown as { __gt: unknown }).__gt = m.GT_DANG_SONG })
+// 02/11: mở cho cả màn kiểm tra kiểu Duo (`duo-kt`) — chụp lúc giám thị nhắc khi em rời màn.
+if ((LA_LAM13 || man === 'duo-kt') && thamSo.get('gtdien') === '1') void import('../../src/components/giam-thi/giam-thi-nguoi').then((m) => { (window as unknown as { __gt: unknown }).__gt = m.GT_DANG_SONG })
 if (LA_LAM13 && thamSo.get('lam') === 'duo-xau') try { localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tk', sbd: '12121212' })) } catch { /* bỏ qua */ }
 // ═══ hết KIỂM GD MỚI 26/10
 if (LA_LAM13 && ['duo', 'duo-nc', 'duo-bang', 'duo-pt', 'duo-tn', 'chang-ngang'].includes(thamSo.get('lam') ?? '')) try { localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tk', sbd: '12121212' })) } catch { /* bỏ qua */ }
