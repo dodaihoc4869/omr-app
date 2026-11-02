@@ -35,11 +35,11 @@ export const NGAY_LUYEN_TRUOC = 35
 export const LUYEN_TOI_THIEU_DV = 6
 
 /** Một câu của ca thi thật (sổ `su_kien_hoc`, nguon = 'thi'; bỏ trống = sai). `pLop` = tỉ lệ đúng cả lớp của câu TRONG CA (null khi < 5 em). */
-export interface CauCaThi { ma: string; qid: string; ngay: string; luc: string; dv: string | null; mucDo: string; dung: boolean; pLop: number | null }
+export interface CauCaThi { ma: string; qid: string; ngay: string; luc: string; dv: string | null; mucDo: string; dung: boolean; pLop: number | null; /** CHỈ THÊM 02/11 (hướng B): mã dạng — so mịn hơn chuyên đề. */ dg?: string | null }
 /** Một lần lên bảng: `len_bang` (thầy gọi lên bảng) hoặc `dau_gio` (Kiểm tra đầu giờ: hỏi lại câu em đã làm đúng). */
-export interface LuotBang { qid: string; ngay: string; luc: string; dv: string | null; dat: boolean; loai: 'len_bang' | 'dau_gio' }
+export interface LuotBang { qid: string; ngay: string; luc: string; dv: string | null; dat: boolean; loai: 'len_bang' | 'dau_gio'; dg?: string | null }
 /** Luyện tập CŨ hơn cửa sổ 14 ngày, gộp theo (ngày, đơn vị): lần đầu gặp câu / song sinh, không hỗ trợ. */
-export interface LuyenCuDv { ngay: string; dv: string; n: number; d: number }
+export interface LuyenCuDv { ngay: string; dv: string; n: number; d: number; dg?: string | null }
 
 export interface DauVaoCaThi { luyen: readonly LuotDanhGia[]; luyenCu: readonly LuyenCuDv[]; caThi: readonly CauCaThi[]; lenBang: readonly LuotBang[] }
 
