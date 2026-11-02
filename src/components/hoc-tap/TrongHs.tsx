@@ -315,13 +315,12 @@ export function BinhHomNay({ da, muc, ranh }: { da: number; muc: number; ranh: n
   const xP = (v: number) => 118 + Math.max(0, v - 74) * (56 / 122), xT = (v: number) => 82 - Math.max(0, v - 74) * (56 / 122)
   const vo = 'M84 18V74L28 190Q20 208 36 214Q44 217 54 217H146Q156 217 164 214Q180 208 172 190L116 74V18Z'
   const f = (n: number) => n.toFixed(1)
-  const dd = useRef<SVGGElement>(null), mucY = useRef(y)
-  mucY.current = y
-  // hào quang nở MỘT lần mỗi ngày (nhớ trong máy); lần sau trong ngày chỉ hiện quầng dịu tĩnh
-  const [no, setNo] = useState(false)
+  const dd = useRef<SVGGElement>(null), mucY = useRef(y), binh = useRef<SVGSVGElement>(null)
+  useEffect(() => { mucY.current = y }, [y])
+  // hào quang nở MỘT lần mỗi ngày (nhớ trong máy; gắn data-no thẳng lên SVG — không vẽ lại React); lần sau trong ngày chỉ hiện quầng dịu tĩnh
   useEffect(() => {
     if (!du) return
-    try { const h = new Date().toDateString(); if (localStorage.getItem(KHOA_BINH_HONG) !== h) { localStorage.setItem(KHOA_BINH_HONG, h); setNo(true) } } catch { /* không có bộ nhớ: không nở */ }
+    try { const h = new Date().toDateString(); if (localStorage.getItem(KHOA_BINH_HONG) !== h) { localStorage.setItem(KHOA_BINH_HONG, h); binh.current?.setAttribute('data-no', '') } } catch { /* không có bộ nhớ: không nở */ }
   }, [du])
   // nghiêng theo máy: mã cảm biến nằm trong mảnh Hôm nay (đã nạp lười, không thêm tệp precache — trần 170); bật lúc rảnh, sau lần vẽ đầu
   useEffect(() => {
@@ -333,7 +332,7 @@ export function BinhHomNay({ da, muc, ranh }: { da: number; muc: number; ranh: n
     const h = ri.requestIdleCallback ? ri.requestIdleCallback(bat) : window.setTimeout(bat, 1200)
     return () => { if (ri.cancelIdleCallback) ri.cancelIdleCallback(h); else window.clearTimeout(h); go?.() }
   }, [])
-  return <svg className="kb-binh" data-du={du || undefined} data-no={(du && no) || undefined} viewBox="0 0 200 236" aria-hidden="true">
+  return <svg ref={binh} className="kb-binh" data-du={du || undefined} viewBox="0 0 200 236" aria-hidden="true">
     <defs>
       <clipPath id={`${u}c`}><path d={vo} /></clipPath>
       <linearGradient id={`${u}k`} x1="0" x2="1"><stop offset="0" className="kb-k0" /><stop offset=".45" className="kb-k1" /><stop offset="1" className="kb-k2" /></linearGradient>
