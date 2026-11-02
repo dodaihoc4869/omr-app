@@ -66,6 +66,7 @@ export const CANH = [
   ['tp-huy-hieu', 'man=tp&v=huy-hieu', '', true],
   ['tp-ban', 'man=tp&v=ban', '', true],
   ['tp-ket', 'man=tp&v=ket', '', true],
+  ['khac-phuc', 'man=hs-sheet&tam=khac-phuc', 'cho:900', false], // tấm phủ kín «Luyện lại từ bài kiểm tra» (lớp sau không được lộ qua)
   ['dang-nhap', 'man=hs-dang-nhap', '', false],
   ['ai', 'man=hs-ng&v=ai', 'cho:600', false],
 ]

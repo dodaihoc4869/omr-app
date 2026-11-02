@@ -13,11 +13,12 @@ const THU_MUC = resolve(GOC, 'src/styles/phong-ddh')
 const mat = [...HS.matchAll(/@font-face \{([^}]*)\}/g)].map((m) => m[1])
 
 describe('phông riêng ĐĐH Rounded app học sinh 27/10', () => {
-  it('bốn mặt DDH Rounded: Đề 100–549 / Đậm 550–1000 × latin/vietnamese, swap, có unicode-range', () => {
+  // 02/11 (video thầy «vuốt xuống để load app nháy khá khó chịu»): swap ⇒ đổi phông giữa chừng, cả trang nhảy dòng ⇒ optional (không đổi phông giữa chừng)
+  it('bốn mặt DDH Rounded: Đề 100–549 / Đậm 550–1000 × latin/vietnamese, optional, có unicode-range', () => {
     expect(mat).toHaveLength(4)
     for (const m of mat) {
       expect(m).toContain("font-family: 'DDH Rounded'")
-      expect(m).toContain('font-display: swap')
+      expect(m).toContain('font-display: optional')
       expect(m).toMatch(/unicode-range: U\+/)
       expect(m).toMatch(/url\('\.\/phong-ddh\/ddh-rounded-(de|dam)-(latin|vietnamese)\.woff2'\)/)
     }
