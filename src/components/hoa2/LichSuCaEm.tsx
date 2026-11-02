@@ -11,7 +11,7 @@ import './cau-da-lam.css'
 import './lich-su-ca-em.css'
 
 // Tên trang chính trên nút «về» (Boss 27/10): giao diện Trong ⇒ «Lộ trình»; giao diện cũ ⇒ «Hôm nay». Viết tại chỗ: nhập mô-đun dùng chung sẽ đẻ mảnh tải riêng (+1 tệp mở app).
-const tenTrangChinh = (): string => (typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Lộ trình' : 'Hôm nay')
+const tenTrangChinh = (): string => (typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Hôm nay' : 'Hôm nay')
 
 const BaoCaoCaCuaEm = lazy(() => import('../ca-thi/BaoCaoCaCuaEm'))
 

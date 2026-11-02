@@ -232,3 +232,17 @@ html.may-yeu[data-trong] .lg-hh-nen { backdrop-filter: none; -webkit-backdrop-fi
 /* nhãn «Tự làm đúng x/y lần» cùng tông khi câu vừa đúng / sai */
 [data-trong] .lg-hh-nen[data-tong=dung] .lg-ev-tom { background: var(--tr-dung-nhat); color: var(--tr-dung-chu); }
 [data-trong] .lg-hh-nen[data-tong=sai] .lg-ev-tom { background: var(--tr-sai-nhat); color: var(--tr-sai-chu); }
+/* ═══ HỆ KÍNH — TỰ SINH bởi scripts/tao-kinh-css.py (thầy chốt 02/11). Đừng sửa tay: sửa bộ sinh rồi chạy lại. ═══ */
+[data-trong='hs'] .lg-hh { background: var(--kinh-mat); }
+[data-trong='hs'] .lg-de-pa > li { background: var(--kinh-mat); }
+[data-trong='hs'] :is(.lg-ev-cau, .lg-ev-ds li) { background: var(--kinh-mat); }
+[data-trong='hs'] .lg-ht--hop .lg-ht-thay, [data-trong='hs'] .lg-ht-thay { background: var(--kinh-mat); }
+[data-trong='hs'] .lg-nac > li { background: var(--kinh-mat); }
+[data-trong='hs'] .lg-y4 > li { background: var(--kinh-mat); }
+[data-trong='hs'] .lg-y4 > li[data-em-sai] .lg-y4-nhan span:not([data-kq]) { background: var(--kinh-mat); }
+[data-trong='hs'] :is(.lg-chua button, .lg-ev-hoi button) { background: var(--kinh-mat); }
+[data-trong='hs'] .lg-tl-hoi button { background: var(--kinh-mat); }
+[data-trong='hs'] .lg-ht--hop .lg-nh { background: var(--kinh-mat); }
+[data-trong='hs'] .lg-nh-khung::before { background: var(--kinh-mat); }
+[data-trong='hs'] .lg-hh-nen[data-tong] .lg-nh-gui:not(:disabled) { box-shadow: inset 0 -3px 0 color-mix(in srgb, var(--tr-chinh-nut) 72%, var(--tr-chu)), 0 10px 24px -16px var(--tr-phu); }
+/* ═══ HẾT HỆ KÍNH TỰ SINH ═══ */

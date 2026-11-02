@@ -120,7 +120,7 @@ export function ManKimCuong({ token, chuyenDe, tenChuyenDe, onDong, onOnLai, bat
     const lai = Date.now() + 24 * 3600e3
     const lam = viTri + 1
     return <ManToan nhan="Chưa qua thử thách" onDong={onDong}
-      day={<>{onOnLai ? <NutDay chu="Ôn lại câu sai" onClick={onOnLai} /> : <NutDay chu="Về Lộ trình" onClick={onDong} />}{onOnLai && <NutDay chu="Về Lộ trình" phu onClick={onDong} />}</>}>
+      day={<>{onOnLai ? <NutDay chu="Ôn lại câu sai" onClick={onOnLai} /> : <NutDay chu="Về Hôm nay" onClick={onDong} />}{onOnLai && <NutDay chu="Về Hôm nay" phu onClick={onDong} />}</>}>
       <main className="tp-man" data-hai="">
         <div className="cot-a">
           <div className="tp-hinh tp-hinh-to"><div className="hh-to"><HuyHieuKimLoai hang="kimcuong" khoa an /></div><div ref={bi} className="bi-o"><Bi cam="sai" size={100} /></div></div>
@@ -150,7 +150,7 @@ export function ManKimCuong({ token, chuyenDe, tenChuyenDe, onDong, onOnLai, bat
         <div className="cot-b">
           <section className="tp-the" aria-label="Thưởng">
             <div className="tp-dong"><span className="tp-o" data-sac="tt" id="tp-kc-tt"><IcTinhThe /></span><div className="giua"><b>+40 tinh thể</b><span>thưởng Thử thách Kim cương</span></div></div>
-            <div className="tp-dong"><span className="tp-nut-kc" aria-hidden="true"><Check /></span><div className="giua"><b>Nút chặng {tenChuyenDe} đã đổi sang lục giác kim cương</b><span>xem trên Lộ trình</span></div></div>
+            <div className="tp-dong"><span className="tp-nut-kc" aria-hidden="true"><Check /></span><div className="giua"><b>Nút chặng {tenChuyenDe} đã đổi sang lục giác kim cương</b><span>xem ở màn Hôm nay</span></div></div>
           </section>
         </div>
       </main>
@@ -176,7 +176,7 @@ export function ManKimCuong({ token, chuyenDe, tenChuyenDe, onDong, onOnLai, bat
         <section className="tp-the" aria-label="Thưởng khi đạt">
           <h2>Thưởng khi đạt</h2>
           <div className="tp-dong"><span className="tp-o" data-sac="tt"><IcTinhThe /></span><div className="giua"><b>+40 tinh thể</b></div></div>
-          <div className="tp-dong"><span className="tp-nut-kc" aria-hidden="true"><Trophy /></span><div className="giua"><b>Huy hiệu Kim cương · {tenChuyenDe}</b><span>nút chặng trên Lộ trình đổi sang lục giác kim cương</span></div></div>
+          <div className="tp-dong"><span className="tp-nut-kc" aria-hidden="true"><Trophy /></span><div className="giua"><b>Huy hiệu Kim cương · {tenChuyenDe}</b><span>chặng ở màn Hôm nay đổi sang lục giác kim cương</span></div></div>
         </section>
       </div>
     </main>
@@ -201,9 +201,9 @@ export function ManKimCuongDs({ token, onVe }: { token?: string; onVe?: () => vo
     <DauVe onVe={onVe} />
     {loi && <Loi chu={loi} onThuLai={thuLai} />}
     <div><h1 className="tp-tieu">Thử thách Kim cương</h1>
-      <p className="tp-phu" style={{ marginTop: 4 }}>Mở khi em vững một chuyên đề trên Lộ trình. Đạt lần đầu: +40 tinh thể và huy hiệu Kim cương.</p></div>
+      <p className="tp-phu" style={{ marginTop: 4 }}>Mở khi em vững một chuyên đề mỗi ngày. Đạt lần đầu: +40 tinh thể và huy hiệu Kim cương.</p></div>
     {du.ds.length === 0 ? <div className="tp-trong"><Bi cam="chao" size={72} /><b>Chưa có chuyên đề nào mở thử thách</b>
-      <span>Học đều trên Lộ trình. Khi em vững một chuyên đề, thử thách của chuyên đề đó sẽ hiện ở đây.</span></div>
+      <span>Học đều mỗi ngày. Khi em vững một chuyên đề, thử thách của chuyên đề đó sẽ hiện ở đây.</span></div>
       : <section className="tp-the" aria-label="Chuyên đề">{du.ds.map((m) => <div key={m.ma} className="tp-dong tp-kc-muc" data-tt={m.tt}>
         <span className="tp-kc-hh" aria-hidden="true"><HuyHieuKimLoai hang="kimcuong" khoa={!m.daDat} an /></span>
         <div className="giua"><b>{m.ten}</b><span>{chuTt(m)}</span></div>

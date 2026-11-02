@@ -12,7 +12,7 @@ import { chamTaiMay, moDm } from '../../lib/dap-an-may' // ĐÁP ÁN TRÊN MÁY 
 import { chotHanhVi, ghiAn, ghiChon, ghiHien, maMayNgan, taoDem, type DemLuot } from '../../lib/doi-dap-an' // đợt 2 đánh giá 99% (01/11): đổi / dò đáp án, rời app ngay trước khi chọn, mã máy
 import { boChangMoTruoc, boGoiNgay, CAU_MOI_CHANG_GOI, docChangDangLam, ghiCauXong, GIAY_CHO_MO_CHANG, layChangGoi, layChangMoTruoc, layChangMoTruocNgay, luuChangDangLam, moChangTruoc, napGoiNgay, nghePhanAnRoiApp, xoaChangDangLam } from './mo-chang-truoc'
 // Tên trang chính trên nút «về» (Boss 27/10): giao diện Trong ⇒ «Lộ trình»; giao diện cũ ⇒ «Hôm nay». Viết tại chỗ: nhập mô-đun dùng chung sẽ đẻ mảnh tải riêng (+1 tệp mở app).
-const tenTrangChinh = (): string => (typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Lộ trình' : 'Hôm nay')
+const tenTrangChinh = (): string => (typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Hôm nay' : 'Hôm nay') // hệ Kính 02/11: trang chính đổi tên «Lộ trình» → «Hôm nay»
 
 // Hôm nay nạp ĐỘNG đúng mảnh này để mở chặng trước (không sinh thêm tệp nạp / precache; mảnh màn làm bài được nạp sẵn luôn).
 export { moChangTruoc, napGoiNgay } from './mo-chang-truoc'

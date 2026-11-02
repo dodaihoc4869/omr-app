@@ -423,3 +423,28 @@
 }
 [data-trong='hs'].may-yeu .duo-kt-thi[data-tap-trung] > .duo-kt-tren.duo-tren { transition: none; }
 [data-trong='hs'].may-yeu .duo-kt-bao-vien { animation-name: duo-kt-bao-mo; }
+/* ═══ HỆ KÍNH — TỰ SINH bởi scripts/tao-kinh-css.py (thầy chốt 02/11). Đừng sửa tay: sửa bộ sinh rồi chạy lại. ═══ */
+[data-trong='hs'] .duo-kt-tren.duo-tren { background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-nut-luoi { border-bottom-width: 2px; background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-truoc { border-bottom-width: 2px; background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-tam { background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-chu-giai i { background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-o { border-bottom-width: 2px; background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-tam-nop { background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-nop-ds button { border-bottom-width: 2px; background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-nut-phu { border-bottom-width: 2px; background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-trang { background: var(--kinh-mat) !important; }
+[data-trong='hs'] .duo-kt-thi { background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-thi > .sticky { background: var(--kinh-mat); }
+[data-trong='hs'] .m3.duo-kt-trang .duo-kt-thi .the-cau .pa-hang { border-bottom-width: 2px !important; background: var(--kinh-mat) !important; }
+[data-trong='hs'] .m3.duo-kt-trang .duo-kt-thi .the-cau .y-hang { background: var(--kinh-mat) !important; }
+[data-trong='hs'] .m3.duo-kt-trang .duo-kt-thi .the-cau .y-nut button:is(:first-of-type, :nth-of-type(2)) { border-bottom-width: 2px !important; background: var(--kinh-mat) !important; }
+[data-trong='hs'] .duo-kt-thi .bns-o { border-bottom-width: 2px; background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-thi .bns-phim button { border-bottom-width: 2px; background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-than[data-gt] .the-cau .cau-de { background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-than[data-gt] .the-cau .cau-de::before { background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-than > .kt-gt[data-l] { background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-than > .kt-gt[data-l]::after { background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-bao-vien { background: var(--kinh-mat); }
+@media (orientation: landscape) and (max-height: 500px) { [data-trong='hs'] .duo-kt-thi > .duo-day .duo-kt-hang { background: var(--kinh-mat); } }
+/* ═══ HẾT HỆ KÍNH TỰ SINH ═══ */

@@ -70,3 +70,34 @@ html:root[data-trong='hs'] .tp-dv-nt ellipse { stroke: var(--tr-nguyen-tu); }
 html:root[data-trong='hs'] .tp-dv-nt circle { fill: var(--tr-nguyen-tu); }
 html:root[data-trong='hs'] .duo-chuoi[data-co]:has(.tp-dv-nt) { color: var(--tr-nguyen-tu-so); }
 html:root[data-trong='hs'] .da-tren .tp-tr-o[data-k='nt'] { color: var(--tr-nguyen-tu-so); }
+
+/* ═══ HỆ KÍNH — TOKEN (thầy chốt 02/11, bản vẽ docs/ban-ve-ban-sac-hs-0211/v2): mặt kính bán trong, viền sáng mép trên, bóng mềm thay gờ đáy 3D,
+   nền loang 4 màu bảng chất chỉ thị. Tờ này nạp ở MỌI màn học sinh (Hôm nay qua trong-hs.css, làm bài / thi qua trong-lam-bai.css) ⇒ token ở đây.
+   --tr-bong-1/2/3 (gờ đáy Duolingo «0 4px 0 viền») ĐỔI thành bóng mềm ⇒ ~60 thẻ dùng chúng đổi theo một lượt. Máy yếu: mặt đặc, không làm mờ. */
+:root[data-trong='hs'] {
+  --kinh-mat: color-mix(in oklab, var(--tr-mat) 76%, transparent);
+  --kinh-mat-dam: color-mix(in oklab, var(--tr-mat) 88%, transparent);
+  --kinh-nen: color-mix(in oklab, var(--tr-nen) 62%, transparent);
+  --kinh-vien: color-mix(in oklab, var(--tr-mat) 85%, transparent);
+  --kinh-vien-2: color-mix(in oklab, var(--tr-vien) 55%, transparent);
+  --kinh-mo: blur(22px) saturate(165%);
+  --kinh-ve: color-mix(in oklab, var(--tr-mat) 62%, transparent); /* kính đúng bản vẽ v2 (khối lớn Hôm nay) */
+  --kinh-mo-ve: blur(26px) saturate(170%);
+  --kinh-bong: 0 18px 40px -28px var(--tr-phu), 0 2px 6px -4px var(--tr-phu);
+  --tr-bong-1: 0 1px 2px -1px var(--tr-phu);
+  --tr-bong-2: 0 10px 24px -18px var(--tr-phu);
+  --tr-bong-3: 0 18px 38px -20px var(--tr-phu);
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-trong='hs'] { --kinh-ve: color-mix(in oklab, var(--tr-mat) 58%, transparent); --kinh-mat: color-mix(in oklab, var(--tr-mat) 72%, transparent); --kinh-mat-dam: color-mix(in oklab, var(--tr-mat) 86%, transparent); --kinh-vien: color-mix(in oklab, var(--tr-chu) 14%, transparent); --kinh-vien-2: color-mix(in oklab, var(--tr-chu) 10%, transparent); }
+}
+html.may-yeu:root[data-trong='hs'] { --kinh-ve: var(--tr-mat); --kinh-mo-ve: none; --kinh-mat: var(--tr-mat); --kinh-mat-dam: var(--tr-mat); --kinh-nen: var(--tr-nen); --kinh-mo: none; }
+/* NỀN LOANG (Liquid Glass): lớp cố định sau mọi nội dung — chỉ dải màu CSS, không ảnh; vẽ một lần (không hoạt ảnh) ⇒ máy yếu như nhau. */
+html[data-trong='hs'] body { background-color: var(--tr-nen); }
+html[data-trong='hs'] body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(70% 38% at 8% 4%, color-mix(in oklab, var(--tr-hs) 42%, transparent), transparent 72%),
+    radial-gradient(55% 32% at 98% 22%, color-mix(in oklab, var(--tr-tin) 34%, transparent), transparent 72%),
+    radial-gradient(70% 36% at 80% 100%, color-mix(in oklab, var(--tr-tim) 30%, transparent), transparent 72%),
+    radial-gradient(50% 30% at 0% 70%, color-mix(in oklab, var(--tr-sao) 18%, transparent), transparent 72%); }
+

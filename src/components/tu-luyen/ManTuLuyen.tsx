@@ -7,7 +7,7 @@
 // "Chấm từng câu" (nhớ theo máy) ⇒ mỗi câu bấm Kiểm tra, máy chủ chấm + khoá câu, hiện đúng/sai + lời giải + nút Câu tiếp.
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 // Tên trang chính trên nút «về» (Boss 27/10): giao diện Trong ⇒ «Lộ trình»; giao diện cũ ⇒ «Hôm nay». Viết tại chỗ: nhập mô-đun dùng chung sẽ đẻ mảnh tải riêng (+1 tệp mở app).
-const tenTrangChinh = (): string => (typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Lộ trình' : 'Hôm nay')
+const tenTrangChinh = (): string => (typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Hôm nay' : 'Hôm nay') // hệ Kính 02/11: trang chính đổi tên «Lộ trình» → «Hôm nay»
 
 const ManChuaCauSai = lazy(() => import('../chua-cau-sai/ManChuaCauSai'))
 import { apiCoChua } from '../../lib/chua-cau-sai-api'
