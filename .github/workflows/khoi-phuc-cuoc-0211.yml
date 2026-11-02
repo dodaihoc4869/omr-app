@@ -1,0 +1,79 @@
+# HOÀN TINH THỂ CƯỢC CHUỖI THUA OAN (02/11 — thầy: «Khôi phục lại tinh thể đã cược cho học sinh nhé. Vì chuỗi đã khôi phục rồi») — scripts/khoi-phuc-cuoc-0211.sql.
+#   · Đẩy nhánh claude/stoic-mayer-94kfxw (đổi tệp SQL / tệp này): CHỈ ĐẾM (DEM_BOI_CANH, DEM_TRUOC — SELECT).
+#   · GHI khi có tệp scripts/khoi-phuc-cuoc-0211.ghi chứa đúng «KHOI PHUC»: dừng nếu có ca thi mở → bảng chỉ-thêm cuoc_hoan_0211 → cộng lại tinh thể đã cược
+#     (khoá `tt|cuoc|<id>|hoan`, INSERT OR IGNORE ⇒ chạy lại không cộng đôi) → đếm sau → đếm lại (phải rỗng).
+# Log chỉ in ngày + SỐ ĐẾM (repo công khai): không SBD, không tên. Không `wrangler d1 export`, không `--file` (dùng --command từng câu).
+name: Hoàn tinh thể cược chuỗi thua oan
+on:
+  push:
+    branches: [claude/stoic-mayer-94kfxw]
+    paths: ['.github/workflows/khoi-phuc-cuoc-0211.yml', 'scripts/khoi-phuc-cuoc-0211.sql', 'scripts/khoi-phuc-cuoc-0211.ghi']
+permissions:
+  contents: read
+concurrency:
+  group: khoi-phuc-cuoc-0211
+  cancel-in-progress: false
+jobs:
+  chay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Tách khối SQL + soát lệnh
+        run: |
+          mkdir -p /tmp/kp
+          node -e '
+            const fs = require("fs"), tep = fs.readFileSync("scripts/khoi-phuc-cuoc-0211.sql", "utf8")
+            const khoi = (ten) => { const m = tep.split(/^-- @@ /m).find((x) => x.startsWith(ten + " ")); if (!m) throw new Error("thiếu khối " + ten)
+              return m.split("\n").slice(1).filter((d) => !/^\s*--/.test(d)).join(" ").replace(/\s+/g, " ").trim() }
+            const mau = { DEM_BOI_CANH: /^SELECT /, DEM_TRUOC: /^SELECT /, DEM_SAU: /^SELECT /, GHI_1: /^CREATE TABLE IF NOT EXISTS cuoc_hoan_0211 /,
+              GHI_2: /^INSERT OR IGNORE INTO cuoc_hoan_0211 /, GHI_3: /^INSERT OR IGNORE INTO vang_so \(sbd, loai, so_vang, exp_tru, ma_mon, khoa_yeu_cau, luc\) SELECT h\.em, .doi., h\.dat, 0, .tt-cuoc-hoan., / }
+            for (const [ten, re] of Object.entries(mau)) {
+              const s = khoi(ten), bo = s.replace(/'"'"'[^'"'"']*'"'"'/g, "")
+              if (!re.test(s)) throw new Error(ten + ": không đúng dạng cho phép")
+              if (/;\s*\S/.test(bo) || /\b(DELETE|DROP|ALTER|REPLACE|PRAGMA|ATTACH|UPDATE)\b/i.test(bo)) throw new Error(ten + ": có lệnh ngoài phạm vi")
+              fs.writeFileSync("/tmp/kp/" + ten + ".sql", s.replace(/;$/, ""))
+            }
+            console.log("OK: DEM_* là SELECT; GHI chỉ tạo bảng chỉ-thêm, chép vào bảng ấy, cộng tinh thể khoá duy nhất — không UPDATE / DELETE")'
+          if [ -f scripts/khoi-phuc-cuoc-0211.ghi ] && [ "$(tr -d '\r\n' < scripts/khoi-phuc-cuoc-0211.ghi)" = "KHOI PHUC" ]; then echo "GHI=co" >> "$GITHUB_ENV"; echo "Chế độ: GHI"; else echo "GHI=khong" >> "$GITHUB_ENV"; echo "Chế độ: CHỈ ĐẾM"; fi
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm trước (chỉ đọc)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$(cat /tmp/kp/$2.sql)" | jq -c '.[0].results'; }
+          q "Mọi cược THUA từ 28/10 theo ngày chốt (so_thua · so_em · thua_oan · co_ngay_oan_khac)" DEM_BOI_CANH
+          q "Cược thua oan CHƯA hoàn theo ngày làm thua (so_cuoc · so_em · tinh_the_hoan)" DEM_TRUOC
+      - name: GHI — hoàn tinh thể đã cược
+        if: env.GHI == 'co'
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          MO=$(npx -y wrangler@4 d1 execute omr --remote --json --command "SELECT COUNT(*) AS n FROM ca WHERE trang_thai = 'mo'" | jq '.[0].results[0].n')
+          if [ "$MO" != "0" ]; then echo "::error::Đang có $MO ca thi mở — dừng, chạy lại sau."; exit 1; fi
+          for k in GHI_1 GHI_2 GHI_3; do
+            npx -y wrangler@4 d1 execute omr --remote --json --command "$(cat /tmp/kp/$k.sql)" > /tmp/kp/$k.json
+            echo "$k: $(jq '.[0].meta.changes' /tmp/kp/$k.json) dòng thay đổi"
+          done
+      - name: Đếm sau (chỉ đọc)
+        if: env.GHI == 'co'
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          echo "Đã hoàn theo ngày làm thua (so_cuoc · da_cong · tinh_the):"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "$(cat /tmp/kp/DEM_SAU.sql)" | jq -c '.[0].results'
+          echo "Còn cược thua oan chưa hoàn (phải rỗng):"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "$(cat /tmp/kp/DEM_TRUOC.sql)" | jq -c '.[0].results'
