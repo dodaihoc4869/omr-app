@@ -77,7 +77,9 @@ function ngheChung(): void {
   if (daNghe || typeof window === 'undefined' || typeof window.addEventListener !== 'function') return
   daNghe = true
   const reTay = (e: PointerEvent) => { tayX = e.clientX; tayY = e.clientY; tayLuc = performance.now(); for (const g of DS) g.chay() }
-  window.addEventListener('pointerdown', (e) => { const t = performance.now(); nhuongDen = t + 320; lanBam = t; reTay(e) }, { capture: true, passive: true })
+  // 02/11 MƯỢT (hồ sơ «Tiếp tục» CPU ×4): mắt dõi CHUỘT (máy tính); chạm cảm ứng không dõi — trang cuộn về đầu câu mới làm mất đệm khung SVG ⇒ dõi ngón
+  // sau chạm = đo lại bố cục mỗi khung giữa lượt dựng câu. Chạm đã có phản ứng «liếc ô em chọn».
+  window.addEventListener('pointerdown', (e) => { const t = performance.now(); nhuongDen = t + 320; lanBam = t; if (e.pointerType === 'mouse') reTay(e) }, { capture: true, passive: true })
   window.addEventListener('keydown', () => { const t = performance.now(); nhuongDen = t + 320; lanBam = t }, { capture: true, passive: true })
   window.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') reTay(e) }, { passive: true })
   const boHop = () => { for (const g of DS) g.hop = null }
@@ -129,6 +131,7 @@ class Nguoi {
   hNR = 0
   hC = 0
   hLoi: number[] = []
+  hNhuong = 0
 
   readonly muc: MucGT
 
@@ -210,7 +213,9 @@ class Nguoi {
   khungVe = (now: number): void => {
     this.raf = 0
     if (!this.song || this.dung) return
-    if (now < nhuongDen) { this.raf = requestAnimationFrame(this.khungVe); return } // em vừa chạm: nhường khung cho phản hồi nút
+    if (now < nhuongDen) { // em vừa chạm: nhường khung cho phản hồi nút / chuyển câu — ngủ MỘT hẹn giờ tới hết lượt nhường (không thức mỗi khung)
+      this.raf = -1; this.hNhuong = window.setTimeout(() => { this.raf = 0; this.last = performance.now(); this.chay() }, nhuongDen - now + 1); return
+    }
     const tay = now - tayLuc < 1400 && !this.khoaMat && this.hien && !this.thi
     const chop = now - this.chopTu < 180
     // ~30 khung/giây (28/10 MƯỢT: 60 khung/giây giữ luồng chính bận gần trọn mỗi khung ở CPU ×4); lò xo vẫn tích phân bước nhỏ theo thời gian thật.
@@ -310,7 +315,7 @@ class Nguoi {
     this.song = b
     this.vo.toggleAttribute('data-nghi', !b)
     if (b) { this.henChop(); if (this.thi) void this.lam('thi', vongThi); else if (!this.dangLam) this.henNhanRoi() }
-    else { this.huyLam(); clearTimeout(this.hNR); clearTimeout(this.hC); if (this.raf) cancelAnimationFrame(this.raf); this.raf = 0; this.dangLam = null; this.khoaMat = false }
+    else { this.huyLam(); clearTimeout(this.hNR); clearTimeout(this.hC); clearTimeout(this.hNhuong); if (this.raf > 0) cancelAnimationFrame(this.raf); this.raf = 0; this.dangLam = null; this.khoaMat = false }
   }
   henChop(): void {
     clearTimeout(this.hC); if (!this.song) return
@@ -711,7 +716,7 @@ export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; 
     huy() {
       p.dung = true; p.capNhatSong()
       p.huyLam(); clearTimeout(p.hNR); clearTimeout(p.hC)
-      if (p.raf) cancelAnimationFrame(p.raf); p.raf = 0
+      clearTimeout(p.hNhuong); if (p.raf > 0) cancelAnimationFrame(p.raf); p.raf = 0
       quan?.unobserve(p.vo); DS.delete(p)
       p.vo.removeEventListener('click', p.choc)
       p.xoaLoi()
