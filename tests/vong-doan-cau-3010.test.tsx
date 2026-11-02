@@ -17,7 +17,7 @@ const goc = (so: PropsMotTrang['so']): PropsMotTrang => ({
   ngayKiem: false, soBaiTap: 0, coBaiTap: false, onBaiTap: noop, ghi: [],
 })
 const so = (daLam: number, chang: number) => ({ daLam, muc: 30, chang, soChang: 5 }) as PropsMotTrang['so']
-const nutDang = () => within(screen.getByRole('list', { name: 'Lộ trình hôm nay' })).getAllByRole('listitem').map((li) => li.firstElementChild as HTMLElement)
+const nutDang = () => within(screen.getByRole('list', { name: 'Việc hôm nay' })).getAllByRole('listitem').map((li) => li.firstElementChild as HTMLElement)
   .find((n) => n.getAttribute('data-loai') === 'hoc' && n.getAttribute('data-tt') === 'dang')!
 const doan = () => [...nutDang().querySelectorAll('.da-vong[data-doan] circle')]
 afterEach(() => { cleanup(); batGoiNgay(false); try { localStorage.clear(); sessionStorage.clear() } catch { /* bỏ qua */ } })
@@ -71,7 +71,9 @@ describe('vòng tiến độ chia theo câu', () => {
     // 24 câu đã làm (xong 4 chặng), mức 24, bài 8 chặng ⇒ chặng 1-4 xong (4/8 chặng), chặng 5 là chặng đang học
     const so8 = { daLam: 24, muc: 24, chang: 5, soChang: 8 } as PropsMotTrang['so']
     render(<MotTrangHs {...goc(so8)} />)
-    expect(screen.getByText('4/8 chặng')).toBeTruthy()
+    const dong = within(screen.getByRole('list', { name: 'Việc hôm nay' })).getAllByRole('listitem').map((li) => li.firstElementChild as HTMLElement).filter((n) => n.getAttribute('data-loai') === 'hoc')
+    expect(dong).toHaveLength(8) // hệ Kính: 8 dòng chặng, 4 dòng ✓ (thay chữ «4/8 chặng» của thẻ bài cũ)
+    expect(dong.filter((n) => n.getAttribute('data-tt') === 'xong')).toHaveLength(4)
     expect(doan()).toHaveLength(6) // Đủ 6 câu chuẩn, không bị bóp thành 2 câu
     expect(doan().filter((c) => c.getAttribute('class') === 'chay')).toHaveLength(0) // 0 đoạn tô màu khi chưa làm
   })
