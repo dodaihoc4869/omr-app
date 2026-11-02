@@ -235,15 +235,15 @@ describe('các màn (đúng số bản vẽ)', () => {
     c = ve(<ManCuoiTuan tb={tb(M.TB.cuoiTuanRoi)} tq={t} onDong={() => {}} />)
     expect(screen.getByRole('heading', { name: 'Xuống Giải Đồng' })).toBeTruthy(); expect(c.textContent).toMatch(/18\/20/)
   })
-  it('nhiệm vụ (tp-9): 3 ô 3/4 · 5/5 · 1/2, đã nhận +5, còn +40, rương khoá 1/3; đủ 3 ô ⇒ nút mở rương', () => {
+  it('nhiệm vụ (tp-9): 3 ô 3/4 · 5/5 · 1/2, đã nhận +5, còn +40; rương KHÔNG còn ở màn này (thầy 02/11 khuya «để rương ở ngoài thôi, rương bên trong bỏ đi»)', () => {
     let c = ve(<ManNhiemVu token={TK} />)
     expect([...c.querySelectorAll('.tp-nv small')].map((x) => x.textContent)).toEqual(['3/4', '5/5', '1/2'])
     expect(c.querySelector('.tp-tong-nv')?.textContent).toMatch(/Đã nhận\+5 · còn có thể nhận\+40/)
-    expect(screen.getByRole('img', { name: 'Đã xong 1/3 nhiệm vụ' })).toBeTruthy()
-    expect(screen.queryByRole('button', { name: /Mở rương/ })).toBeNull()
+    expect(c.querySelector('[aria-label="Rương ngày"]')).toBeNull()
     cleanup(); datMayChu(M.tongQuanGia({ nhiemVu: M.NHIEM_VU_XONG }))
     c = ve(<ManNhiemVu token={TK} />)
-    expect(screen.getByRole('button', { name: /Mở rương · \+15/ })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: /Mở rương/ })).toBeNull()
+    expect(c.querySelector('.tp-ruong')).toBeNull()
   })
   it('cửa hàng (tp-10): 245 tinh thể, mua bình 150, cược ngày 3/7, thăng hoa + cách kiếm; công tắc tắt ⇒ ẩn khối', () => {
     let c = ve(<ManCuaHang token={TK} />)
