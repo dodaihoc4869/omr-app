@@ -252,7 +252,7 @@ html[data-trong='hs'] .kb-the-ruong .rg-ngoc-sang { fill: var(--tr-hs-nhat); }
 html[data-trong='hs'] .kb-the-ruong .rg-ngoc-dam { fill: var(--tr-hs-chu); }
 
 /* TẤM «THÊM» như trang Thêm của bản vẽ: tiêu đề lớn, ba mục chính đã có trên thanh nổi ⇒ ẩn ở tấm, logo ẩn (chuông đã ra đầu trang) */
-html[data-trong='hs'] .kb-them-tieu { display: block; padding: 4px 6px 4px; font-size: 32px; font-weight: 800; letter-spacing: -.02em; color: var(--tr-chu); }
+html[data-trong='hs'] .kb-them-tieu { display: block; grid-column: 1 / -1; justify-self: start; white-space: nowrap; padding: 4px 6px 4px; font-size: 32px; font-weight: 800; letter-spacing: -.02em; color: var(--tr-chu); }
 html[data-trong='hs'] .tr-menu .tr-menu-dau { display: none; }
 html[data-trong='hs'] .tr-menu .tr-menu-dau:has(.tr-menu-tb) { display: flex; }
 html[data-trong='hs'] .tr-menu-ds > .tr-menu-muc:nth-child(-n + 3) { display: none; }
@@ -352,3 +352,10 @@ html:root[data-trong='hs'] .ht2[data-mot] .dm-ben { display: none; }
 @media (orientation: landscape) and (min-width: 640px), (min-width: 700px) and (min-aspect-ratio: 10/13) {
   html:root[data-trong='hs'] .ht2[data-mot] .dm-khung:has(.kb-cot-phai) { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* Thành tích / Luyện tập ở khổ rộng: đầu trang kính (.kb-dau thay .da-tieu cũ) chiếm cả hàng ⇒ thẻ chuỗi ngày cột trái, danh sách cột phải như bố cục cũ */
+html[data-trong='hs'] .dm-khung[data-muc] .da-vo > .kb-dau { grid-column: 1 / -1; }
+/* Tấm «Thêm»: chữ tiêu đề nằm hàng đầu (ô «dau» cũ đang ẩn); cột «Số của em» chưa có số nào ⇒ trả bề ngang cho danh sách */
+html[data-trong='hs'] .tr-menu > .kb-them-tieu { grid-row: 1; }
+html[data-trong='hs'] .tr-menu:has(> .tr-menu-dem .tp-tr:empty) > :is(.tr-menu-ds, .tr-menu-cai) { grid-column: ds-start / -1; }
+html[data-trong='hs'] .tr-menu > .tr-menu-dem:has(.tp-tr:empty) { display: none; }
