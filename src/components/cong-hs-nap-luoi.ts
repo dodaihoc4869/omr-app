@@ -12,6 +12,9 @@ export { MomDanhSachM3, MomLamBaiM3 } from './bang-nhiem-vu/MomM3'
 export { default as LichSuCaM3 } from './bang-nhiem-vu/LichSuCaM3'
 // 02/11: khung xem phiếu (StudentPortalScreen chỉ vẽ khi em bấm mở phiếu) — mảnh này đã chứa nó (hộp Khắc phục dùng chung) ⇒ không thêm tệp.
 export { default as KhungXemPhieu } from './KhungXemPhieu'
+// 02/11 (lần 2): tấm «Vào phòng thi» + form vào ca (chỉ hiện khi em bấm Vào ca kiểm tra) — lượt mở /hs bớt mã + tờ kiểu của hai khối này.
+export { default as PhongVaoThi } from './PhongVaoThi'
+export { default as VaoThiForm } from './bang-nhiem-vu/VaoThiForm'
 // Bong bóng A.I Đỗ Đại Học (24/10): cửa nạp nằm Ở ĐÂY (không ở StudentPortalScreen) ⇒ danh sách mảnh kèm của import() không vào lượt mở /hs; bong bóng vẫn là mảnh riêng ngoài precache.
 export const napBong = () => import('./ai-ddh/BongBongAiDdh')
 
