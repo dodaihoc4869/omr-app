@@ -10,13 +10,14 @@ const giay = (d: D1That) => (d.sql.prepare('SELECT giay_thuc AS g FROM len_bang 
 describe('POST /len-bang đọc giayThuc', () => {
   it('không gửi ⇒ NULL, ghi thành công; gửi 95.5 ⇒ 95.5; biên 20 và 1800 hợp lệ', async () => {
     const d = taoD1That()
-    for (const o of [{}, { giayThuc: 95.5 }, { giayThuc: 20 }, { giayThuc: 1800 }]) expect(await ghi(d, o)).toMatchObject({ ok: true })
+    // mỗi lần một câu khác (02/11: cùng em · câu · kết quả trong 10 giây = một lần gọi, máy chủ chống ghi đôi)
+    for (const [i, o] of [{}, { giayThuc: 95.5 }, { giayThuc: 20 }, { giayThuc: 1800 }].entries()) expect(await ghi(d, { ...o, qid: `Q${i}` })).toMatchObject({ ok: true })
     expect(giay(d)).toEqual([null, 95.5, 20, 1800])
   })
   it('19, 1801, chuỗi "90", null, true, mảng, đối tượng, số âm, 0 ⇒ NULL và VẪN ghi thành công (kết quả Đạt/Chưa đạt quan trọng hơn số đo)', async () => {
     const d = taoD1That()
     const xau = [19, 1801, '90', null, true, [], {}, -5, 0, 19.99, 1800.01]
-    for (const v of xau) expect(await ghi(d, { giayThuc: v }), JSON.stringify(v)).toMatchObject({ ok: true })
+    for (const [i, v] of xau.entries()) expect(await ghi(d, { giayThuc: v, qid: `Q${i}` }), JSON.stringify(v)).toMatchObject({ ok: true })
     expect(giay(d)).toEqual(xau.map(() => null))
     expect(d.sql.prepare('SELECT COUNT(*) AS n FROM len_bang WHERE dat = 1').get()).toEqual({ n: xau.length })
   })
