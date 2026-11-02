@@ -3,8 +3,9 @@
 // chữ nút, cùng lệnh với bản cũ — chỉ đổi trình bày. Kiểu ở styles/trong-hs.css (nạp cùng mảnh này ⇒ vẽ là đã có kiểu).
 import { lazy, Suspense, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
 import { createPortal } from 'react-dom'
-import { Atom, Award, Check, CheckCircle2, ChevronRight, ClipboardCheck, FlaskConical, Flame, Gem, GraduationCap, History, Layers, LineChart, Lock, MessageCircleMore, PenLine, Play, QrCode, RefreshCw, Route, Sparkles, Target, Trophy, Wrench, type LucideIcon } from 'lucide-react'
+import { Award, Check, CheckCircle2, ChevronRight, ClipboardCheck, FlaskConical, Flame, GraduationCap, History, Layers, LineChart, Lock, PenLine, Play, QrCode, RefreshCw, Route, Sparkles, Target, Trophy, Wrench, type LucideIcon } from 'lucide-react'
 import { chuCauMuc, soChangXong, vuotMuc, type SoHomNay } from './lam-bai'
+import { chuViecBai } from './chu-viec-bai'
 import { chiaChang, chuNutHoc, useNhipHocEm } from './nhip-hom-nay'
 import { chuViecTiepHs, nhipTheoSanh } from '../../lib/nhip-hoc-em'
 import type { TomTatKiemTra } from '../../lib/kiem-tra-ca-nhan'
@@ -30,6 +31,7 @@ import '../../styles/trong-kinh.css' // HỆ KÍNH 02/11: Hôm nay + thanh nổi
 // THƯỞNG PHẠT (gộp đợt 3, 26/10 — src/components/thuong/CAM-VAO.md): thanh trên ThanhThuong vẽ NGAY từ bản lưu máy (nhỏ, cùng mảnh «Trong»); mọi màn
 // thưởng phạt + thẻ bên là MỘT mảnh nạp lười (ManThuong). Học sinh không thấy nhãn nhịp học / bậc.
 import { ThanhThuong } from '../thuong/ThanhThuong'
+import { IcNguyenTu, IcTinhThe } from '../thuong/hinh' // biểu tượng nguyên tử / tinh thể ĐÚNG như bộ đếm thưởng (không thêm biểu tượng thư viện)
 import { TheBanLoTrinh } from '../thuong/TheBanLoTrinh' // lối vào Học cùng bạn trên Lộ trình (27/10)
 import { useTongQuan } from '../thuong/dung-thuong'
 import { napSanThanhTich } from '../../lib/thuong-api'
@@ -659,6 +661,14 @@ export function MotTrangHs(p: PropsMotTrang) {
   // thanh trên; cờ tắt (chuoiNgay vắng) ⇒ chuỗi «đủ mức» cũ. Máy chủ chưa có lệnh (404) / lỗi mà chưa có bản lưu ⇒ thanh trên cũ.
   const tqTai = useTongQuan(p.token)
   const tq = tqTai.du
+  // TẢI SẴN GIÁM THỊ (thầy 02/11 «mọi hiệu ứng tải sẵn giống theo những gì phiên khác đã làm»): Hôm nay mở xong và rảnh ⇒ nạp trước mảnh giám thị (đứng cạnh MỌI câu)
+  // ⇒ câu đầu của chặng / kiểm tra / thi không chờ mảnh. Như nạp trước Mol (cong-hs-nap-luoi.ts): sau 6 s + lúc rảnh, một lần mỗi lần mở; tải hỏng ⇒ bỏ qua.
+  useEffect(() => {
+    const w = window as Window & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }
+    const nap = () => { void import('../giam-thi/GiamThi').catch(() => {}) }
+    const h = window.setTimeout(() => (w.requestIdleCallback ? w.requestIdleCallback(nap, { timeout: 5000 }) : nap()), 6000)
+    return () => window.clearTimeout(h)
+  }, [])
   // HỆ KÍNH (bản vẽ v2): đầu trang = ảnh đại diện bánh quy 12 múi (Hôm nay) + tiêu đề + CHUÔNG THÔNG BÁO THẬT (ThongBaoHocSinh — đúng một bản, chuyển từ menu)
   const dauKinh = (giua: ReactNode, coAnh = false) => <header className="kb-dau" data-chinh={coAnh || undefined}>
     {coAnh && <span className="kb-ava" aria-hidden="true"><svg viewBox="0 0 100 100"><path d={BANH_12} /></svg><b>{chuCaiTen(p.ten)}</b></span>}
@@ -958,17 +968,17 @@ export function MotTrangHs(p: PropsMotTrang) {
           ⇒ nút chặng / linh vật trượt khuất gọn dưới dải. Dải nằm trong khối cao 0 ⇒ không chiếm chỗ. */}
       {dauKinh(<><p>{ngayTuan()}{hs?.lop ? ` · ${hs.lop}` : ''}</p><h1>Chào {p.ten || 'em'}</h1></>, true)}
       {/* HỆ KÍNH (thầy chốt 02/11): thẻ «Mức hôm nay» — số lớn + bình tam giác (thay thẻ bài). Tên bài + việc + chặng giữ nguyên nguồn cũ. */}
-      <section className="kb-hero" data-du={du || undefined} aria-label={du ? 'Đủ mức hôm nay' : 'Mức hôm nay'} aria-busy={!so && p.dangTai}>
+      <section className="kb-hero" data-du={du || undefined} aria-label={`${du ? 'Đủ mức hôm nay' : 'Mức hôm nay'}${p.viec ? ` · ${chuViecBai(p.viec, so)}` : ''}`} aria-busy={!so && p.dangTai}>
         <div className="kb-hero-chu">
           <span className="kb-nhan">{du ? 'Đủ mức hôm nay' : p.ngayKiem ? 'Ngày Kiểm tra ôn tập' : 'Mức hôm nay'}</span>
           {so ? <div className="kb-so">{du && vuotMuc(so) ? <>{so.daLam}<small> câu</small></> : <>{so.daLam}<small>/{so.muc} câu</small></>}</div> : <span className="mot-xuong" aria-hidden="true" />}
-          <p className="kb-dong-hero">{!so ? (p.dangTai ? 'Đang tải bài học hôm nay…' : '') : du ? `Mức ${so.muc} — tới điểm tương đương, dung dịch đã hồng!` : p.ngayKiem || khoaKt ? 'Hôm nay làm Kiểm tra ôn tập trước, rồi mới học chặng.' : `Còn ${con} câu nữa là dung dịch đổi màu.`}</p>
+          <p className="kb-dong-hero" role={!so && p.dangTai ? 'status' : undefined}>{!so ? (p.dangTai ? 'Đang tải bài học hôm nay…' : '') : du ? `Mức ${so.muc} — tới điểm tương đương, dung dịch đã hồng!` : p.ngayKiem || khoaKt ? 'Hôm nay làm Kiểm tra ôn tập trước, rồi mới học chặng.' : `Còn ${con} câu nữa là dung dịch đổi màu.`}</p>
         </div>
         <BinhHomNay da={so?.daLam ?? 0} muc={so?.muc ?? 0} ranh={chang.reduce<number[]>((a, c) => [...a, (a[a.length - 1] ?? 0) + c.co], [])} />
         {coThuong && tq && <div className="kb-chip-h">
           <button type="button" className="kb-chip" data-k="lua" onClick={() => moTp('chuoi')} aria-label={`Chuỗi ${chuoi} ngày`}><span><Flame size={18} aria-hidden="true" />{chuoi} ngày</span></button>
-          {tq.nguyenTuHomNay !== undefined && <button type="button" className="kb-chip" data-k="nt" onClick={() => moTp('nhiem-vu')} aria-label={`${tq.nguyenTuHomNay} nguyên tử hôm nay`}><span><Atom size={18} aria-hidden="true" />{tq.nguyenTuHomNay}</span></button>}
-          {tq.tinhThe !== undefined && <button type="button" className="kb-chip" data-k="tt" onClick={() => moTp('cua-hang')} aria-label={`${tq.tinhThe} tinh thể`}><span><Gem size={18} aria-hidden="true" />{tq.tinhThe}</span></button>}
+          {tq.nguyenTuHomNay !== undefined && <button type="button" className="kb-chip" data-k="nt" onClick={() => moTp('nhiem-vu')} aria-label={`${tq.nguyenTuHomNay} nguyên tử hôm nay`}><span><IcNguyenTu />{tq.nguyenTuHomNay}</span></button>}
+          {tq.tinhThe !== undefined && <button type="button" className="kb-chip" data-k="tt" onClick={() => moTp('cua-hang')} aria-label={`${tq.tinhThe} tinh thể`}><span><IcTinhThe />{tq.tinhThe}</span></button>}
         </div>}
       </section>
       {!p.ngayKiem && <i ref={datMocBai} className="da-bai-moc" aria-hidden="true" />}
@@ -1152,7 +1162,7 @@ export function MenuDocTrong(p: {
           <i /><s /><Luoi4 size={22} /><span aria-hidden="true">Thêm</span>{ddMo && <em aria-hidden="true"><QrCode size={14} />Điểm danh</em>}
         </button>
       </div>
-      <button type="button" className="tr-ray-muc tr-ray-ai kb-thanh-ai" onClick={chon(() => window.dispatchEvent(new Event('ddh:mo-ai')))} aria-label="Hỏi A.I Đỗ Đại Học" title="Hỏi A.I Đỗ Đại Học"><MessageCircleMore size={26} aria-hidden="true" /></button>
+      <button type="button" className="tr-ray-muc tr-ray-ai kb-thanh-ai" onClick={chon(() => window.dispatchEvent(new Event('ddh:mo-ai')))} aria-label="Hỏi A.I Đỗ Đại Học" title="Hỏi A.I Đỗ Đại Học"><IconNet size={26} d={['M7.9 20A9 9 0 1 0 4 16.1L2 22Z', 'M8 12h.01M12 12h.01M16 12h.01']} /></button>
     </div>
     {mo && <div className="tr-menu-phu" onClick={() => dong(true)} aria-hidden="true" />}
     <nav ref={the} id="tr-menu" className="tr-menu" data-mo={mo || undefined} data-dd={coDd ? '' : undefined} aria-label="Điều hướng học sinh">

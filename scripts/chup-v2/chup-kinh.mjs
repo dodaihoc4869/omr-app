@@ -22,14 +22,44 @@ const may = createServer((req, res) => {
 const goc = `http://127.0.0.1:${may.address().port}/scripts/chup-v2/trang.html`
 const KHO = [['doc', 390, 844], ['ngang', 844, 390], ['fold', 904, 690], ['fold-gap', 360, 800], ['may-tinh', 1440, 900]]
 const chonKho = (process.env.KHO ?? '').split(',').filter(Boolean), chonNen = (process.env.NEN ?? 'sang,toi').split(',')
-// [tên, tham số trang, việc trước khi chụp: 'bam:<css>' | 'cho:<ms>' (nối bằng |), dài (chụp cả trang)]
+// [tên, tham số trang, các bước (ngăn bằng « » »): tn:<regex> chọn phương án · nut:<regex> bấm nút · ds:a=Đúng,b=Sai · phim:<kí tự> · bam:<css> · cho:<ms>, dài (chụp cả trang)]
+const DQ1 = 'tn:^D » nut:^Kiểm tra$ » nut:^Tiếp tục', DQ3 = `${DQ1} » tn:^A » nut:^Kiểm tra$ » nut:^Tiếp tục`, DQ4 = `${DQ3} » ds:a=Đúng,b=Đúng,c=Đúng,d=Đúng » nut:^Kiểm tra$ » nut:^Tiếp tục`
+const DK_LUOI = 'bam:.duo-kt-luoi-nut, [aria-label*="Danh sách câu"]'
 export const CANH = [
   ['hom-nay', 'man=hs-mot&dd=khong', '', true],
   ['hom-nay-diem-danh', 'man=hs-mot&dd=mo', '', true],
   ['hom-nay-du', 'man=hs-mot&tt=du&dd=khong', '', true],
   ['hom-nay-ca', 'man=hs-mot&tt=ca&dd=khong', '', true],
   ['hom-nay-kiem-tra', 'man=hs-mot&kt=khoa&dd=khong', '', true],
-  ['them', 'man=hs-mot&dd=mo', 'bam:.kb-thanh .tr-menu-cham|cho:400', false],
+  ['them', 'man=hs-mot&dd=mo', 'bam:.kb-thanh .tr-menu-cham » cho:400', false],
+  ['luyen-tap', 'man=hs-mot&dd=khong', 'nut:^Luyện tập$', true],
+  ['thanh-tich', 'man=hs-mot&tp=1&dd=khong', 'nut:^Thành tích$', true],
+  ['lam-1-cau', 'man=lam13&lam=duo', 'cho:900', false],
+  ['lam-2-chon', 'man=lam13&lam=duo', 'tn:^D', false],
+  ['lam-3-dung', 'man=lam13&lam=duo', 'tn:^D » nut:^Kiểm tra$', false],
+  ['lam-4-sai', 'man=lam13&lam=duo', 'tn:^B » nut:^Kiểm tra$', false],
+  ['lam-5-loi-giai', 'man=lam13&lam=duo', 'tn:^B » nut:^Kiểm tra$ » nut:^Lời giải từng bước', false],
+  ['lam-6-dung-sai', 'man=lam13&lam=duo', `${DQ3} » ds:a=Đúng,b=Đúng,c=Đúng,d=Đúng » nut:^Kiểm tra$`, false],
+  ['lam-7-tln', 'man=lam13&lam=duo', `${DQ4} » phim:8,2`, false],
+  ['lam-8-xong', 'man=lam13&lam=duo', `${DQ4} » phim:8,2 » nut:^Kiểm tra$ » nut:^Tiếp tục » tn:^B » nut:^Kiểm tra$ » nut:^Tiếp tục`, false],
+  ['tu-sua-loi', 'man=hs12-tu-chua', '', true],
+  ['chua-cau-sai', 'man=hs12-chua-truc-tiep', '', true],
+  ['tu-luyen', 'man=hs12-tu-luyen', '', true],
+  ['tu-luyen-lam', 'man=hs12-tu-luyen-lam', '', false],
+  ['ktcn-cau', 'man=duo-kt&v=ktcn', 'nut:^Làm tiếp chặng 2', false],
+  ['ktcn-ket', 'man=duo-kt&v=ket', '', true],
+  ['thi-cau', 'man=duo-kt&v=thi&vai=hocsinh', 'cho:600', false],
+  ['thi-chon', 'man=duo-kt&v=thi&vai=hocsinh', 'nut:^B\\.', false],
+  ['thi-kq', 'man=duo-kt&v=kq&vai=hocsinh', '', true],
+  ['tp-chuoi', 'man=tp&v=chuoi', '', true],
+  ['tp-giai', 'man=tp&v=giai', '', true],
+  ['tp-nhiem-vu', 'man=tp&v=nv', '', true],
+  ['tp-cua-hang', 'man=tp&v=cua-hang', '', true],
+  ['tp-huy-hieu', 'man=tp&v=huy-hieu', '', true],
+  ['tp-ban', 'man=tp&v=ban', '', true],
+  ['tp-ket', 'man=tp&v=ket', '', true],
+  ['dang-nhap', 'man=hs-dang-nhap', '', false],
+  ['ai', 'man=hs-ng&v=ai', 'cho:600', false],
 ]
 const exe = existsSync('/opt/pw-browsers/chromium') ? '/opt/pw-browsers/chromium' : undefined
 const trinh = await chromium.launch({ executablePath: exe })
@@ -46,10 +76,17 @@ for (const [ten, ts, viec, dai] of CANH) {
       await p.route(/^https?:\/\/(?!127\.0\.0\.1)/, (r) => r.abort())
       await p.goto(`${goc}?${ts}`)
       await p.waitForTimeout(1600)
-      for (const b of viec.split('|').filter(Boolean)) {
-        const [lenh, ...x] = b.split(':'), v = x.join(':')
-        if (lenh === 'bam') await p.locator(v).first().click({ timeout: 3000 }).catch((e) => loi.push('bấm hỏng ' + v + ' ' + String(e).slice(0, 60)))
-        if (lenh === 'cho') await p.waitForTimeout(Number(v))
+      for (const buoc of viec.split(' » ').filter(Boolean)) {
+        const [lenh, ...x] = buoc.split(':'), v = x.join(':')
+        try {
+          if (lenh === 'tn') await p.getByRole('radio', { name: new RegExp(v) }).first().click({ timeout: 6000 })
+          else if (lenh === 'nut') await p.getByRole('button', { name: new RegExp(v) }).first().click({ timeout: 6000 })
+          else if (lenh === 'ds') for (const cap of v.split(',')) { const [y, gt] = cap.split('='); await p.getByRole('group', { name: `Chọn cho ý ${y}` }).getByRole('button', { name: gt, exact: true }).click({ timeout: 6000 }) }
+          else if (lenh === 'phim') for (const c of v) await p.keyboard.press(c)
+          else if (lenh === 'bam') await p.locator(v).first().click({ timeout: 6000 })
+          else if (lenh === 'cho') await p.waitForTimeout(Number(v))
+        } catch (e) { loi.push(`bước hỏng «${buoc}» ${String(e).slice(0, 50)}`) }
+        await p.waitForTimeout(250)
       }
       await p.waitForTimeout(500)
       const kq = await p.evaluate(() => {

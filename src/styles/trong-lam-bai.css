@@ -1114,3 +1114,82 @@
 @media (min-width: 880px) { [data-trong='hs'] .m3 .thi-luoi-dinh { background: var(--kinh-mat); } }
 @media (max-width: 700px) { [data-trong='hs']:root body .ccs .ccs-day { background: var(--kinh-mat); } }
 /* ═══ HẾT HỆ KÍNH TỰ SINH ═══ */
+/* ═══ HỆ KÍNH — VIẾT TAY · màn làm câu (chặng, sửa câu, tu luyện, Kiểm tra ôn tập) + MÀN THI (thầy chốt 02/11 «Trong màn làm bài thi … thiết kế lại theo kính,
+   mọi chức năng thì giữ nguyên»). CHỈ trình bày: không đổi DOM / luồng thi (toàn màn, rời màn, khoá, vân tay, giữ-để-đọc, nộp), chữ cảnh báo giữ nguyên.
+   Bản vẽ docs/ban-ve-ban-sac-hs-0211/v2 (lam-*): nền loang lộ qua, nút X kính tròn, tiến độ từng đoạn theo câu, đề trong thẻ kính bo 30,
+   phương án viên thuốc kính có ô chữ cái tròn, nút chính viên thuốc chàm đậm, kết quả = THẺ KÍNH NỔI (không còn dải màu chạy hết đáy), chữ thường. ═══ */
+html[data-trong='hs'] .ht-app.ht2-lam.duo, html[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang] { background: transparent; }
+html[data-trong='hs'] :is(.duo-tren, .duo-kt-tren) { background: transparent; border: 0; box-shadow: none; }
+html[data-trong='hs'] :is(.duo-dong, .duo-kt-tren > button:first-child) { width: 48px; height: 48px; border-radius: 24px; border: 0; color: var(--tr-chu-2);
+  background: var(--kinh-ve); -webkit-backdrop-filter: var(--kinh-mo-ve); backdrop-filter: var(--kinh-mo-ve); box-shadow: inset 0 1px 0 var(--kinh-vien), inset 0 0 0 1px var(--kinh-vien-2), var(--kinh-bong); }
+/* tiến độ: mỗi câu một đoạn */
+html[data-trong='hs'] .duo-tren .duo-thanh:has(> .duo-doan) { display: flex; gap: 6px; height: auto; padding: 0; border: 0; background: none; box-shadow: none; overflow: visible; }
+html[data-trong='hs'] .duo-doan { position: relative; flex: 1; height: 10px; border-radius: 5px; background: color-mix(in oklab, var(--tr-mat-3) 80%, transparent); overflow: hidden; }
+html[data-trong='hs'] .duo-doan[data-t='x'] { background: var(--tr-hs); } html[data-trong='hs'] .duo-doan[data-t='h'] { background: var(--tr-sao); } html[data-trong='hs'] .duo-doan[data-t='s'] { background: var(--tr-sai); }
+html[data-trong='hs'] .duo-doan[data-t='dang'] { background: linear-gradient(90deg, var(--tr-hs) 0 30%, color-mix(in oklab, var(--tr-mat-3) 80%, transparent) 30%); box-shadow: 0 0 0 2px var(--tr-hs-nhat); overflow: visible; }
+/* nhãn & nút: chữ thường như bản vẽ */
+html[data-trong='hs'] :is(.duo-nhan, .duo-nhan p, .duo-nut, .duo-kt-nhan p, .duo-kt-nhom-ten, .duo-kt-nut-phu, .duo-kt-nop-nut, .duo-combo-nhan, .duo-lien) { text-transform: none; letter-spacing: 0; }
+html[data-trong='hs'] .duo-nhan { gap: 6px; }
+/* ĐỀ trong thẻ kính */
+html[data-trong='hs'] :is(.duo .ht2-lam-de, .duo-kt-thi .ht2-lam-de, .duo-gt-bong) { border: 0; border-radius: 30px; background: var(--kinh-ve); -webkit-backdrop-filter: var(--kinh-mo-ve); backdrop-filter: var(--kinh-mo-ve);
+  box-shadow: inset 0 1px 0 var(--kinh-vien), inset 0 0 0 1px var(--kinh-vien-2), var(--kinh-bong); }
+html[data-trong='hs'] .duo-gt-bong .ht2-lam-de { background: transparent; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+/* PHƯƠNG ÁN: viên thuốc kính + ô chữ cái tròn */
+html[data-trong='hs'] :is(.duo .ht2-lam-pa, .duo-kt-thi .ht2-lam-pa) { min-height: 62px; border: 0; border-radius: 31px; padding: 8px 16px 8px 9px; background: var(--kinh-ve);
+  box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--tr-vien-2) 80%, transparent), var(--kinh-bong); }
+html[data-trong='hs'] :is(.duo .ht2-lam-pa-ma, .duo-kt-thi .ht2-lam-pa-ma) { width: 44px; height: 44px; border: 0; border-radius: 22px; background: var(--tr-mat-2); color: var(--tr-chu-2); box-shadow: none; }
+html[data-trong='hs'] :is(.duo .ht2-lam-pa, .duo-kt-thi .ht2-lam-pa)[aria-checked='true']:not([data-ket]) { background: var(--kinh-mat-dam); box-shadow: inset 0 0 0 2.5px var(--tr-hs-day), var(--kinh-bong); color: var(--tr-hs-chu); }
+html[data-trong='hs'] :is(.duo .ht2-lam-pa, .duo-kt-thi .ht2-lam-pa)[aria-checked='true']:not([data-ket]) .ht2-lam-pa-ma { background: var(--tr-hs-day); color: var(--tr-hs-tren); }
+html[data-trong='hs'] .duo .ht2-lam-pa[data-ket=dung] { background: color-mix(in oklab, var(--tr-dung-nhat) 85%, transparent); box-shadow: inset 0 0 0 2.5px var(--tr-dung-nut), var(--kinh-bong); color: var(--tr-dung-chu); }
+html[data-trong='hs'] .duo .ht2-lam-pa[data-ket=dung] .ht2-lam-pa-ma { background: var(--tr-dung-chu); color: var(--tr-trang); }
+html[data-trong='hs'] .duo .ht2-lam-pa[data-ket=sai] { background: color-mix(in oklab, var(--tr-sai-nhat) 85%, transparent); box-shadow: inset 0 0 0 2.5px var(--tr-sai), var(--kinh-bong); color: var(--tr-sai-chu); }
+html[data-trong='hs'] .duo .ht2-lam-pa[data-ket=sai] .ht2-lam-pa-ma { background: var(--tr-sai-chu); color: var(--tr-trang); }
+html[data-trong='hs'] .duo .ht2-lam-pa[data-ket=mo] { opacity: 1; background: color-mix(in oklab, var(--tr-mat) 45%, transparent); box-shadow: inset 0 0 0 1.5px var(--kinh-vien-2); color: var(--tr-chu-3); }
+html[data-trong='hs'] .duo .ht2-lam-pa[data-ket=mo] .ht2-lam-pa-ma { color: var(--tr-chu-3); }
+/* ô số trả lời ngắn + bàn phím: viên kính */
+html[data-trong='hs'] :is(.duo .ht2-lam-o, .duo-kt-thi .bns-o) { border: 0; border-radius: 34px; background: var(--kinh-mat-dam); box-shadow: inset 0 0 0 2.5px var(--tr-hs-day), var(--kinh-bong); }
+html[data-trong='hs'] :is(.duo .ht2-lam-phim button, .duo-kt-thi .bns-phim button) { border: 0; border-radius: 20px; background: var(--kinh-ve); box-shadow: inset 0 0 0 1px var(--kinh-vien-2), 0 6px 14px -10px var(--tr-phu); }
+/* ĐÁY: không còn dải đặc — nút chính nổi trên nền */
+html[data-trong='hs'] .duo-day:not(.duo-ket) { border-top: 0; background: linear-gradient(to top, color-mix(in oklab, var(--tr-nen) 92%, transparent) 55%, transparent); }
+html[data-trong='hs'] .duo-nut:not([data-sac]):not(:disabled) { min-height: 60px; border: 0; border-radius: 30px; background: var(--tr-hs-day); color: var(--tr-hs-tren); font-size: 17.5px; font-weight: 800; box-shadow: 0 14px 26px -14px var(--tr-hs-day); }
+html[data-trong='hs'] .duo-nut { border-radius: 30px; text-transform: none; letter-spacing: 0; }
+html[data-trong='hs'] .duo-nut:disabled { border-radius: 30px; box-shadow: none; }
+/* KẾT QUẢ: thẻ kính nổi bo 32, nhuộm theo đúng / sai (bản vẽ lam-ds / lam-tln) */
+html[data-trong='hs'] .duo-day.duo-ket { margin: 0 12px max(12px, env(safe-area-inset-bottom)); padding: 16px 18px; border: 0; border-radius: 32px; -webkit-backdrop-filter: var(--kinh-mo-ve); backdrop-filter: var(--kinh-mo-ve); }
+html[data-trong='hs'] .duo-day.duo-ket[data-tt=dung] { background: color-mix(in oklab, var(--tr-dung-nhat) 88%, transparent); box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--tr-dung) 50%, transparent), var(--kinh-bong); }
+html[data-trong='hs'] .duo-day.duo-ket[data-tt=sai] { background: color-mix(in oklab, var(--tr-sai-nhat) 90%, transparent); box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--tr-sai) 45%, transparent), var(--kinh-bong); }
+html[data-trong='hs'] .duo-day.duo-ket:is([data-tt=trung], [data-tt=cho]) { background: var(--kinh-mat-dam); box-shadow: inset 0 0 0 1.5px var(--kinh-vien-2), var(--kinh-bong); }
+html[data-trong='hs'] .duo-ket .duo-kq-o { width: 48px; height: 48px; border-radius: 16px; }
+html[data-trong='hs'] .duo-ket .duo-kq-chu b, html[data-trong='hs'] .duo-ket h2 { font-size: 22px; font-weight: 800; }
+html[data-trong='hs'] .duo-ket[data-tt=dung] .duo-nut:not([data-sac]) { background: var(--tr-dung-chu); color: var(--tr-trang); box-shadow: 0 14px 26px -14px var(--tr-dung-day); }
+html[data-trong='hs'] .duo-ket[data-tt=sai] .duo-nut:not([data-sac]) { background: var(--tr-sai-chu); color: var(--tr-trang); box-shadow: 0 14px 26px -14px var(--tr-sai-day); }
+html[data-trong='hs'] .duo-ket .duo-nut[data-sac=do] { border-radius: 30px; background: var(--tr-sai-chu); color: var(--tr-trang); box-shadow: 0 14px 26px -14px var(--tr-sai-day); }
+html[data-trong='hs'] .duo-ket .duo-nut[data-sac=lam] { border-radius: 30px; background: var(--tr-tin-chu); color: var(--tr-trang); box-shadow: 0 14px 26px -14px var(--tr-tin-day); }
+html[data-trong='hs'] .duo-nut[data-sac=vang] { border-radius: 30px; box-shadow: inset 0 0 0 1.5px var(--tr-sao), 0 10px 22px -14px var(--tr-phu); }
+html[data-trong='hs'] .duo-ket :is(.duo-lien, .duo-hang-nut > a, .duo-hang-nut > button:not(.duo-nut)) { border-radius: 30px; }
+html.may-yeu[data-trong='hs'] :is(.duo-dong, .duo .ht2-lam-de, .duo-kt-thi .ht2-lam-de, .duo-gt-bong, .duo-day.duo-ket) { -webkit-backdrop-filter: none; backdrop-filter: none; }
+/* MÀN THI + KIỂM TRA ÔN TẬP (khung KhungKiemTra): cùng ngôn ngữ kính */
+html[data-trong='hs'] :is(.duo-kt-trang, .duo-kt-thi) { background: transparent; }
+html[data-trong='hs'] :is(.duo-kt-nut-luoi, .duo-kt-gio) { border: 0; border-radius: 22px; background: var(--kinh-ve); box-shadow: inset 0 1px 0 var(--kinh-vien), inset 0 0 0 1px var(--kinh-vien-2), var(--kinh-bong); }
+html[data-trong='hs'] :is(.duo-kt-nop-nut, .duo-kt-nut-phu) { border-radius: 30px; }
+html[data-trong='hs'] :is(.duo-kt-tam, .duo-kt-nop-khoi) { border: 0; border-radius: 32px; background: var(--kinh-mat-dam); -webkit-backdrop-filter: var(--kinh-mo); backdrop-filter: var(--kinh-mo); box-shadow: inset 0 1px 0 var(--kinh-vien), inset 0 0 0 1px var(--kinh-vien-2), var(--kinh-bong); }
+/* KẾT CHẶNG dạng STORY (bản vẽ v2 ket-chang): chữ rất to căn trái, Mol bên phải, mỗi số một dòng, nền chàm loang trên đầu */
+html[data-trong='hs'] .ht-app.ht2-lam.duo[data-xong] { background: radial-gradient(90% 50% at 50% 0%, color-mix(in oklab, var(--tr-hs) 40%, transparent), transparent 75%); }
+html[data-trong='hs'] .duo-xong { display: grid; grid-template-columns: minmax(0, 1fr) 132px; align-items: end; gap: 0 8px; text-align: left; padding: 18px 18px 8px; max-width: 560px; margin: 0 auto; }
+html[data-trong='hs'] .duo-xong > * { grid-column: 1 / -1; }
+html[data-trong='hs'] .duo-xong .duo-xong-bi { grid-column: 2; grid-row: 1 / span 2; justify-self: end; }
+html[data-trong='hs'] .duo-xong .duo-xong-bi .bi { width: 120px; height: auto; }
+html[data-trong='hs'] .duo-xong h1 { grid-column: 1; grid-row: 1; margin: 0; font-size: 46px; font-weight: 800; line-height: 1; letter-spacing: -.03em; color: var(--tr-chu); text-align: left; }
+html[data-trong='hs'] .duo-xong :is(.duo-xong-phu, .duo-hoan-hao) { grid-column: 1; text-align: left; margin: 8px 0 0; font-size: 15px; font-weight: 700; color: var(--tr-hs-chu); }
+html[data-trong='hs'] .duo-xong .duo-3 { display: flex; flex-direction: column; gap: 0; margin-top: 14px; }
+html[data-trong='hs'] .duo-xong .duo-3 > div { display: flex; flex-direction: row-reverse; justify-content: flex-end; align-items: baseline; gap: 12px; padding: 14px 0; border: 0; border-radius: 0; background: none; box-shadow: none;
+  border-top: 1px solid color-mix(in oklab, var(--tr-vien-2) 60%, transparent); }
+html[data-trong='hs'] .duo-xong .duo-3 > div p { padding: 0; border: 0; background: none; box-shadow: none; margin: 0; font-size: 18px; font-weight: 700; color: var(--tr-chu-2); text-transform: none; letter-spacing: 0; }
+html[data-trong='hs'] .duo-xong .duo-3 > div b { min-width: 64px; font-size: 40px; font-weight: 800; letter-spacing: -.03em; line-height: 1; }
+html[data-trong='hs'] .duo-xong .duo-3 > div b svg { display: none; }
+html[data-trong='hs'] .duo-xong .duo-3 > div[data-sac='dung'] b { color: var(--tr-hs-chu); } html[data-trong='hs'] .duo-xong .duo-3 > div[data-sac='tin'] b { color: var(--tr-chu); } html[data-trong='hs'] .duo-xong .duo-3 > div[data-sac='sao'] b { color: var(--tr-sao-chu); }
+html[data-trong='hs'] .duo-xong .duo-3 > div b .duo-so-dv { font-size: 16px; }
+html[data-trong='hs'] .duo-xong .duo-ghi { margin: 12px 0 0; font-size: 14.5px; font-weight: 600; color: var(--tr-chu-2); text-align: left; }
+html[data-trong='hs'] .duo-day[data-xong] { background: transparent; border: 0; }
+html[data-trong='hs'] .duo-day[data-xong] .duo-nut[data-sac], html[data-trong='hs'] .duo-day[data-xong] .duo-lien { border-radius: 30px; background: none; box-shadow: none; color: var(--tr-hs-chu); }
+html[data-trong='hs'] .duo-xong .duo-3 > div b { padding: 0; background: none; box-shadow: none; }
