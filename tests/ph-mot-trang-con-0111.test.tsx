@@ -58,6 +58,16 @@ describe('/ph/bon-so-do — máy chủ', () => {
     expect(banPhuHuynh(undefined)).toEqual({ ok: true, co: false })
     expect(bangChungPh('ht', Array.from({ length: 6 }, (_, i) => ({ ma: 'sua', lon: `${i}/9` })))).toHaveLength(3)
   })
+  it('v3 (02/11): thẻ ca thi / lên bảng / làm cho có có lời phụ huynh (nhãn ngắn ≤ 24 ký tự), không lộ chữ của thầy', () => {
+    const cap: [('ht' | 'dp' | 'lu'), string, string][] = [['ht', 'caThi', '8/9'], ['ht', 'lenBang', '3/4'], ['dp', 'lechCa', '90% → 2/6'], ['dp', 'bangChua', '2/3'], ['lu', 'choCo', '120/400'], ['lu', 'donHan', '9/12']]
+    for (const [m, ma, lon] of cap) {
+      const [b] = bangChungPh(m, [{ ma, lon, tieu: 'chữ của thầy' }])
+      expect(b, `${m}:${ma}`).toBeDefined()
+      expect(b!.so).toBe(lon)
+      expect(b!.ngan.length).toBeLessThanOrEqual(24)
+      expect(b!.chu).not.toContain('chữ của thầy')
+    }
+  })
   it('lệnh: MỘT câu đọc theo khoá chính của đúng con (SBD lấy từ xác thực)', async () => {
     const sql: string[] = []
     const ban: unknown[][] = []

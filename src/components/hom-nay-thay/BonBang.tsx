@@ -6,6 +6,7 @@
 //     · «Xem đủ N em» mở rộng tại chỗ. Lọc Khối + ô tìm tên lọc cả 4 bảng ở máy (không gọi lại máy chủ).
 //   · Số CHỈ từ `/gv/bon-bang` (src/lib/bon-bang-api.ts). Bản lần trước vẽ NGAY, bản mới thay vào khi về; lỗi ⇒ giữ bản cũ + «cập nhật lúc hh:mm».
 //   · Bấm một em ⇒ trang bằng chứng (`BangChungBon`, NẠP KHI BẤM); đóng ⇒ tiêu điểm về đúng dòng.
+//   · v3b (thầy 02/11 «không còn theo dõi nữa»): bỏ khối «Đang theo dõi» — mỗi em có MỘT bảng trên mỗi trục, dòng của em kèm lý do (`bc`).
 // Màu: chỉ biến «Trong» --tr-* (bon-bang.css, dưới [data-trong='gv']).
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Award, ChevronDown, ChevronRight, Flame, Pause, RefreshCw, Search, TriangleAlert } from 'lucide-react'
@@ -20,10 +21,10 @@ export const SO_EM_THE = 6
 const KHOI = ['10', '11', '12'] as const
 
 const MO_TA: Readonly<Record<MaBang, string>> = {
-  ht: 'Sửa câu sai đến khi đúng · đọc kỹ đề · kiểm tra khớp luyện tập',
-  dp: 'Chọn khi chưa đọc hết đề · bấm lặp một chữ · luyện cao mà kiểm tra thấp',
+  ht: 'Ca thi khớp luyện tập theo từng chuyên đề · lên bảng đạt · không có dấu hiệu đối phó',
+  dp: 'Luyện cao mà ca thi thấp cùng chuyên đề · lên bảng chưa đạt · chọn vội, bấm lặp, treo máy',
   ch: 'Làm đủ mức gần như mọi ngày, câu nào cũng làm thật',
-  lu: 'Bỏ ngày, thiếu câu được giao, để câu sai không sửa',
+  lu: 'Bỏ ngày, làm cho có hoặc dồn sát giờ chốt',
 }
 const ICON: Readonly<Record<MaBang, typeof Award>> = { ht: Award, dp: TriangleAlert, ch: Flame, lu: Pause }
 const TEN_NGAN: Readonly<Record<MaBang, string>> = { ht: 'Học thật', dp: 'Đối phó', ch: 'Chăm', lu: 'Lười' }
@@ -72,37 +73,6 @@ function DongEm({ d, thu, bang, onMo }: { d: DongBang; thu: number; bang: MaBang
         </span>
       </button>
     </li>
-  )
-}
-
-/** «Đang theo dõi» (đánh giá v2, 01/11): em có dấu hiệu nhưng CHƯA đủ chắc để xếp — không vào bảng nào (thà theo dõi thêm còn hơn xếp sai). Gọn, mặc định thu. */
-function TheTheoDoi({ ds }: { ds: readonly DongBang[] }) {
-  const [mo, setMo] = useState(false)
-  if (!ds.length) return null
-  return (
-    <section className="bb-the bb-td" aria-labelledby="bb-tieu-td">
-      <div className="bb-dau">
-        <span className="bb-o" aria-hidden="true"><Search size={20} /></span>
-        <div className="bb-dau-chu">
-          <h2 id="bb-tieu-td">Đang theo dõi <span className="bb-chip gvv2-so">{ds.length} em</span></h2>
-          <p>Có dấu hiệu nhưng chưa đủ bằng chứng để xếp bảng — máy theo dõi thêm, đủ chắc mới xếp.</p>
-        </div>
-        <button type="button" className="gvv2-nut-chu tt-nhan bb-xem" aria-expanded={mo} onClick={() => setMo((x) => !x)}>
-          {mo ? 'Thu gọn' : 'Xem'}
-          <ChevronDown size={16} aria-hidden="true" style={{ transform: mo ? 'rotate(180deg)' : undefined }} />
-        </button>
-      </div>
-      {mo && (
-        <ul className="bb-td-ds">
-          {ds.map((d) => (
-            <li key={d.sbd}>
-              <b>{d.hoTen}</b> <small>{d.lop}</small>
-              <span>{d.bc}</span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
   )
 }
 
@@ -275,7 +245,6 @@ export default function BonBang({ onTai }: { onTai?: (du: TraLoiBonBang, luc: nu
           <TheBang key={`${k}-${khoiChon}-${tim}`} bang={k} ds={loc[k]} tong={du.tong} onMo={onMo} />
         ))}
       </div>
-      {du.theoDoi && du.theoDoi.length > 0 && <TheTheoDoi ds={locBang(du.theoDoi, khoiChon, tim)} />}
       {mo && (
         <Suspense fallback={<div className="bbc-che" role="status" aria-label="Đang mở bằng chứng" />}>
           <BangChungBon sbd={mo.sbd} hoTen={mo.hoTen} lop={mo.lop} bang={mo.bang} onDong={onDong} />

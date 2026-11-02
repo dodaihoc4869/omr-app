@@ -81,12 +81,17 @@ describe('Học thật', () => {
     expect(k.the.ht.find((t) => t.ma === 'khop')!.hai![1]!.so).toBe('8,3/10')
     expect(k.ketLuan.ht).toMatch(/^Em học thật:\n\*\*\d+\/\d+ câu\*\* từng sai đã sửa đến khi đúng\n/) // mỗi lý do một dòng, số có đơn vị đứng đầu
   })
-  it('dưới 40 lượt đo thật ⇒ Học thật / Đối phó chưa xếp (null)', () => {
+  it('v3b (02/11 «không còn theo dõi»): dưới 40 lượt đo thật vẫn XẾP trục chất lượng — không dấu hiệu đối phó ⇒ Học thật, có điểm để xếp hạng', () => {
     const luot = NGAY.slice(0, 3).flatMap((n) => Array.from({ length: 10 }, () => L({ ngay: n })))
     const k = tinhBon({ dg: dg(luot), ngay: ngayDu(), lanCuoiHoc: DEN, den: DEN })
-    expect(k.diem.ht).toBeNull()
-    expect(k.diem.dp).toBeNull()
-    expect(vaoBang(k.diem, 'ht') || vaoBang(k.diem, 'dp')).toBe(false)
+    expect(k.soLieu.vao).toMatchObject({ ht: true, dp: false })
+    expect(k.diem.ht).not.toBeNull()
+    expect(k.soLieu.theoDoi).toBeNull()
+    expect(k.bc.ht).toMatch(/Không có dấu hiệu đối phó/)
+  })
+  it('v3b: chưa có bằng chứng nào (không lượt, không thi, không kiểm tra) ⇒ không xếp trục chất lượng, vẫn xếp Lười', () => {
+    const k = tinhBon({ dg: dg([]), ngay: ngayDu(36, 0), lanCuoiHoc: '', den: DEN })
+    expect(k.soLieu.vao).toEqual({ ht: false, dp: false, ch: false, lu: true })
   })
 })
 
@@ -130,9 +135,11 @@ describe('Chăm / Lười', () => {
     const k = tinhBon({ dg: dg(luot), ngay: ngayDu(36, 10), lanCuoiHoc: DEN, den: DEN })
     expect(k.ketLuan.dp).toMatch(/^Em làm cho có:\n\*\*\d+%\*\* số câu/)
   })
-  it('dưới 3 ngày phải làm ⇒ Chăm / Lười null', () => {
-    const k = tinhBon({ dg: dg([]), ngay: ngayDu().slice(0, 2), lanCuoiHoc: '', den: DEN })
-    expect(k.diem.ch).toBeNull()
-    expect(k.diem.lu).toBeNull()
+  it('v3b: dưới 3 ngày phải làm vẫn xếp công sức theo những ngày đã có (không bỏ ngỏ)', () => {
+    const du = tinhBon({ dg: dg([]), ngay: ngayDu().slice(0, 2), lanCuoiHoc: '', den: DEN })
+    expect(du.soLieu.vao).toMatchObject({ ch: true, lu: false }) // 2/2 ngày làm đủ mức
+    const bo = tinhBon({ dg: dg([]), ngay: ngayDu(36, 0).slice(0, 2), lanCuoiHoc: '', den: DEN })
+    expect(bo.soLieu.vao).toMatchObject({ ch: false, lu: true })
+    expect(bo.diem.lu).toBe(100)
   })
 })
