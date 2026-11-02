@@ -1,0 +1,47 @@
+# QUÉT BỘ ĐO 4 BẢNG (CHỈ ĐỌC, 02/11 — thầy: «quét bộ đo học thật, chăm, lười đối phó … đề xuất để biết chính xác học sinh thuộc nhóm nào»).
+# CHỈ SELECT gộp trên bảng NHỎ (`bon_chi_so_em`, `ca`, `luot`, `len_bang`, `dau_gio_hoi`) — KHÔNG quét `su_kien_hoc` (bài học khoá D1 28/10).
+# In SỐ ĐẾM, không mã em, không tên (repo công khai).
+name: Quét bộ đo 4 bảng (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/stoic-mayer-94kfxw]
+    paths: ['.github/workflows/do-bon-bang-0211.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-bon-bang-0211
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm (chỉ SELECT gộp)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results' || echo "(lỗi)"; }
+          TU=$(date -u -d '60 days ago' +%Y-%m-%d)
+          SL="CASE WHEN json_valid(so_lieu_json) THEN so_lieu_json END"
+          q "1 Bản tính: số em · ngày mới nhất · phiên bản" "SELECT COUNT(*) n, MAX(ngay) ngay, json_extract($SL, '\$.ban') ban, SUM(ngay = (SELECT MAX(ngay) FROM bon_chi_so_em)) hom_nay FROM bon_chi_so_em GROUP BY ban"
+          q "2 Số em mỗi bảng" "SELECT SUM(json_extract($SL,'\$.vao.ht')=1) ht, SUM(json_extract($SL,'\$.vao.dp')=1) dp, SUM(json_extract($SL,'\$.vao.ch')=1) ch, SUM(json_extract($SL,'\$.vao.lu')=1) lu, SUM(COALESCE(json_extract($SL,'\$.vao.ht'),0)=0 AND COALESCE(json_extract($SL,'\$.vao.dp'),0)=0) khong_truc_cl FROM bon_chi_so_em"
+          q "3 Đối phó: có bằng chứng TRÊN LỚP (lechCa/bangChua) hay chỉ hành vi" "SELECT SUM(COALESCE(json_extract($SL,'\$.ho.lechCa'),0)>0 OR COALESCE(json_extract($SL,'\$.ho.bangChua'),0)>0) co_tren_lop, SUM(COALESCE(json_extract($SL,'\$.ho.lechCa'),0)=0 AND COALESCE(json_extract($SL,'\$.ho.bangChua'),0)=0) chi_hanh_vi, COUNT(*) tong FROM bon_chi_so_em WHERE json_extract($SL,'\$.vao.dp')=1"
+          q "4 Họ Đối phó bật (trong số em Đối phó): họ · số em · tổng sức" "SELECT h.key ho, COUNT(*) n, SUM(h.value) suc FROM bon_chi_so_em b, json_each(json_extract(CASE WHEN json_valid(b.so_lieu_json) THEN b.so_lieu_json END,'\$.ho')) h WHERE json_extract(b.so_lieu_json,'\$.vao.dp')=1 GROUP BY 1 ORDER BY n DESC"
+          q "5 Đối phó chỉ do MỘT họ (theo họ)" "SELECT h.key ho, COUNT(*) n FROM bon_chi_so_em b, json_each(json_extract(CASE WHEN json_valid(b.so_lieu_json) THEN b.so_lieu_json END,'\$.ho')) h WHERE json_extract(b.so_lieu_json,'\$.vao.dp')=1 AND (SELECT COUNT(*) FROM json_each(json_extract(b.so_lieu_json,'\$.ho')))=1 GROUP BY 1 ORDER BY n DESC"
+          q "6 Học thật: có xác nhận trên lớp (ca thi khớp ≥2 đơn vị / lên bảng đạt) hay không" "SELECT SUM(COALESCE(json_extract($SL,'\$.dvKhop'),0)>=2) ca_khop, SUM(COALESCE(json_extract($SL,'\$.bangDat'),0)>=2) bang_dat2, SUM(COALESCE(json_extract($SL,'\$.dvKhop'),0)<2 AND COALESCE(json_extract($SL,'\$.bangDat'),0)<2) khong_xac_nhan, SUM(COALESCE(json_extract($SL,'\$.soLuot'),0)<40) it_luot, COUNT(*) tong FROM bon_chi_so_em WHERE json_extract($SL,'\$.vao.ht')=1"
+          q "7 Phủ dữ liệu trên lớp (mọi em): có ca thi · câu ghép ≥6 · có lên bảng · lên bảng ≥3" "SELECT SUM(COALESCE(json_extract($SL,'\$.caCau'),0)>0) co_ca, SUM(COALESCE(json_extract($SL,'\$.caGhep'),0)>=6) ghep6, SUM(COALESCE(json_extract($SL,'\$.bangTong'),0)>0) co_bang, SUM(COALESCE(json_extract($SL,'\$.bangTong'),0)>=3) bang3, ROUND(AVG(COALESCE(json_extract($SL,'\$.caCau'),0)),1) tb_cau_thi, COUNT(*) tong FROM bon_chi_so_em"
+          q "8 Nhờ / ra vì ca thi + lên bảng" "SELECT SUM(json_extract($SL,'\$.nho.ht')=2) ht_nho, SUM(json_extract($SL,'\$.nho.dp')=2) dp_nho, SUM(json_extract($SL,'\$.nho.htRa')=1) ht_ra, SUM(json_extract($SL,'\$.nho.dpRa')=1) dp_ra FROM bon_chi_so_em"
+          q "9 Ca 60 ngày theo loại × phòng chờ × đồng bộ giờ × thầy bấm bắt đầu: số ca · số lượt · số em" "SELECT COALESCE(c.loai,'?') loai, c.phong_cho pc, c.dong_bo_gio dbg, (COALESCE(c.bat_dau_thi_luc,'')<>'') bat_dau, COUNT(DISTINCT c.ma_ca) so_ca, COUNT(l.khoa) so_luot, COUNT(DISTINCT l.sbd) so_em FROM ca c LEFT JOIN luot l ON l.ma_ca = c.ma_ca WHERE c.cap_nhat_luc >= '$TU' AND COALESCE(c.trang_thai,'') <> 'da_xoa' GROUP BY 1,2,3,4 ORDER BY so_luot DESC"
+          q "10 Giờ VN vào thi (ca thi, 60 ngày): giờ · số lượt" "SELECT CAST(strftime('%H', l.vao_luc, '+7 hours') AS INTEGER) gio, COUNT(*) n FROM luot l JOIN ca c ON c.ma_ca = l.ma_ca WHERE l.vao_luc >= '$TU' AND COALESCE(c.loai,'') <> 'baitap' GROUP BY 1 ORDER BY 1"
+          q "11 Lên bảng 60 ngày: lượt · em · đạt · có chuyên đề" "SELECT COUNT(*) n, COUNT(DISTINCT sbd) em, SUM(dat=1) dat, SUM(COALESCE(chuyen_de,'')<>'') co_cd, MIN(luc) tu, MAX(luc) den FROM len_bang WHERE luc >= '$TU'"
+          q "12 Lên bảng theo số lần mỗi em" "SELECT n lan, COUNT(*) so_em FROM (SELECT sbd, COUNT(*) n FROM len_bang WHERE luc >= '$TU' GROUP BY sbd) GROUP BY n ORDER BY n"
+          q "13 Kiểm tra đầu giờ: trạng thái · số câu · số em" "SELECT trang_thai, COUNT(*) n, COUNT(DISTINCT sbd) em FROM dau_gio_hoi WHERE hoi_luc >= '$TU' GROUP BY 1"
