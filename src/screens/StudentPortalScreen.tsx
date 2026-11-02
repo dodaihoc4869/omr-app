@@ -10,7 +10,6 @@ import { useBanNho, useCaDangMo, useKeHoachNgay, useLamMoiKhiDong } from '../com
 import { nopOnLai, type CauOn, type MucTraLoi } from '../components/bang-nhiem-vu/cau-on-api'
 import { dungBangNhiemVu, soThuSucCua } from '../lib/nhiem-vu-adapter'
 import { tongHopKeHoachTroLy } from '../lib/tro-ly-ca-nhan'
-import NhanHanBaiTap from '../components/NhanHanBaiTap'
 import { mocThoiGian } from '../lib/han-bai-tap'
 import { useGioHocTap } from '../hooks/useGioHocTap'
 import ThongBaoHocSinh,{noticeApi} from '../components/ThongBaoHocSinh'
@@ -118,7 +117,7 @@ const ModalKhacPhucCauSai = lazy(() => napKhoiPhu().then((m) => ({ default: m.Mo
 // mã ba khối ấy cùng cửa nạp kho đề, thuật toán rút câu sai, phiếu luyện mà chỉ chúng dùng). Mảnh được nạp trước lúc rảnh ở Hôm nay (cùng nhịp nạp trước màn thi, dưới) ⇒ lúc em bấm, khối đã có thì VẼ THẲNG (veNgayKhiCo,
 // không treo Suspense, không màn chờ); chưa có (2G / tiết kiệm dữ liệu / bấm quá sớm) ⇒ React.lazy, chỗ chờ giữ khung như các khối lười khác.
 type KhoiPhu = typeof import('../components/cong-hs-nap-luoi')
-function khoiPhu<K extends 'KhoiKhacPhuc3CheDo' | 'BtvnM3' | 'MomDanhSachM3' | 'MomLamBaiM3' | 'LichSuCaM3' | 'KhungXemPhieu' | 'PhongVaoThi' | 'VaoThiForm'>(ten: K) {
+function khoiPhu<K extends 'KhoiKhacPhuc3CheDo' | 'BtvnM3' | 'MomDanhSachM3' | 'MomLamBaiM3' | 'LichSuCaM3' | 'KhungXemPhieu' | 'PhongVaoThi' | 'VaoThiForm' | 'NhanHanBaiTap'>(ten: K) {
   const bo: BoNap<{ default: KhoiPhu[K] }> = Object.assign(() => napKhoiPhu().then((m) => ({ default: m[ten] })), {
     san: () => {
       const m = napKhoiPhu.san()
@@ -138,6 +137,9 @@ const KhungXemPhieu = khoiPhu('KhungXemPhieu')
 // 02/11 (tác tử tốc độ, lần 2): tấm «Vào phòng thi» + form chỉ hiện khi em BẤM Vào ca kiểm tra ⇒ cùng mảnh trên (nạp trước lúc rảnh, bấm là vẽ ngay).
 const PhongVaoThi = khoiPhu('PhongVaoThi')
 const VaoThiForm = khoiPhu('VaoThiForm')
+// 02/11 (tác tử tốc độ sau PR 759): nhãn hạn nộp chỉ vẽ ở danh sách Bài tập về nhà kiểu CŨ (nhánh không-M3) ⇒ cùng mảnh trên; chỉ cổng học sinh nhập nó
+// ⇒ vào thẳng mảnh ấy, không sinh mảnh mới (precache giữ ≤ 170 tệp). Lượt mở /hs bớt mã của nó.
+const NhanHanBaiTap = khoiPhu('NhanHanBaiTap')
 // Bong bóng A.I Đỗ Đại Học (thầy 24/10): kênh hỏi bài của văn phòng; chỉ ở Hôm nay; mảnh riêng ngoài precache, cửa nạp qua cong-hs-nap-luoi.
 const BongBongAiDdh = lazy(() => napKhoiPhu().then((m) => m.napBong()))
 import { baoDaXemHocSinh } from '../lib/canh-bao-thay-may-chu'
@@ -1431,7 +1433,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
                           bt.soCau > 0 && <span>Số câu: <strong>{bt.soCau}</strong></span>
                         )}
                         {bt.hanNop && (
-                          <NhanHanBaiTap han={bt.hanNop} now={nowHocTap} daNop={!!bt.daNop} dayDu />
+                          <Suspense fallback={null}><NhanHanBaiTap han={bt.hanNop} now={nowHocTap} daNop={!!bt.daNop} dayDu /></Suspense>
                         )}
                         {bt.nopLuc && (
                           <span>Nộp lúc: {dinhDangNgayGio(bt.nopLuc)}</span>

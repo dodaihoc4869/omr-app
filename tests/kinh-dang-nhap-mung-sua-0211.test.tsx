@@ -41,8 +41,10 @@ describe('hiệu ứng kết thúc chặng mới (bộ ăn mừng «chang»)', (
   it('Kiểm tra ôn tập: em tự nộp chặng / nộp bài ⇒ bắn; hết giờ tự chốt thì không', () => {
     const s = doc('src/components/hoc-tap/ManKiemTraCaNhan.tsx')
     expect(s).toMatch(/anMung\('chang',\{goc:/)
-    expect(s).toMatch(/if\(conPhien\(lan\)\)\{ra\(\);if\(!auto\)setMung\(n=>n\+1\)\}/)
-    expect(s).toMatch(/setKet\(await ketTu\(r\)\);ra\(\);setMung\(n=>n\+1\)/)
+    // Nộp chặng: `tai` thấy bài đã chốt / hết hạn và điểm < 5 ⇒ không bắn (như khi nộp bài).
+    expect(s).toMatch(/if\(conPhien\(lan\)\)\{ra\(\);const tn=ttRef\.current;if\(!auto&&!\(tn&&\(tn\.nopLuc!==null\|\|tn\.trangThai==='het_han'\)&&typeof tn\.diem==='number'&&tn\.diem<5\)\)setMung\(n=>n\+1\)\}/)
+    // Nộp bài điểm < 5 («Cùng Mol ôn lại nhé!») ⇒ không bắn: quyết ngay ở `nop` (02/11, sau PR 759: hiệu ứng không đọc `ket` ⇒ hết cảnh báo phụ thuộc).
+    expect(s).toMatch(/const t=nhan\(r\);setKet\(await ketTu\(r\)\);ra\(\);if\(!\(typeof t\.diem==='number'&&t\.diem<5\)\)setMung\(n=>n\+1\)/)
   })
 })
 

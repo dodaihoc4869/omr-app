@@ -33,6 +33,8 @@ export const CANH = [
   ['hom-nay-ca', 'man=hs-mot&tt=ca&dd=khong', '', true],
   ['hom-nay-kiem-tra', 'man=hs-mot&kt=khoa&dd=khong', '', true],
   ['them', 'man=hs-mot&dd=mo', 'bam:.kb-thanh .tr-menu-cham » cho:400', false],
+  ['them-so', 'man=hs-mot&dd=khong&tp=1', 'bam:.kb-thanh .tr-menu-cham » cho:600', false],
+  ['them-cai', 'man=hs-mot&dd=khong&tp=1', 'bam:.kb-thanh .tr-menu-cham » cho:500 » bam:#tr-menu .tr-menu-ds > .tr-menu-muc:last-child » cho:300', false],
   ['luyen-tap', 'man=hs-mot&dd=khong', 'nut:^Luyện tập$', true],
   ['thanh-tich', 'man=hs-mot&tp=1&dd=khong', 'nut:^Thành tích$', true],
   ['lam-1-cau', 'man=lam13&lam=duo', 'cho:900', false],
