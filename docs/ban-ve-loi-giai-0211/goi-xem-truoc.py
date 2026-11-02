@@ -41,7 +41,7 @@ a.nut{text-decoration:none}
 """
 JS=''.join(doc(p)+';\n' for p in [R+'ban-ve-ban-sac-hs-0211/ve.js',R+'ban-ve-ban-sac-hs-0211/v2/kve.js'])
 JS2=doc(B+'lg.js')+';\n'+doc(B+'mo-hinh.js')+';'
-LINK={'Bài 1.C1 · Ester':'https://www.youtube.com/watch?v=OAV45qDm6vs','Bài 1.C1 · Cân bằng hoá học':'https://www.youtube.com/watch?v=INJFF24ePfU','BG4 · Ester, lipid':'https://www.youtube.com/watch?v=lQj_WWics4Q'}
+LINK={'Bài 1.C1 · Ester':'https://www.youtube.com/watch?v=OAV45qDm6vs','Bài 1.C1 · Cân bằng hoá học':'https://www.youtube.com/watch?v=INJFF24ePfU','Kĩ thuật giải bài toán sulfur':'https://www.youtube.com/watch?v=5aBoCq5Q6tk'}
 def than(p,ten):
     s=doc(B+p)
     a=s.index('<div class="lam">'); b=s.index('<script')

@@ -11,7 +11,8 @@
 @media (max-height: 440px) and (min-width: 700px) {
   .lam { height: 100dvh; }
   .lg-than[data-hai] { height: 100%; min-height: 0; overflow: hidden; padding: 4px 20px 0; gap: 16px; }
-  .lg-than[data-hai] > .cot { height: 100%; overflow: auto; padding-bottom: 10px; scrollbar-width: thin; }
+  .lg-than[data-hai] > .cot { height: 100%; overflow: auto; padding-bottom: 10px; scrollbar-width: thin; overscroll-behavior: contain; }
+  .lg-than[data-hai] > .cot > * { flex-shrink: 0; }
   .lg-than[data-hai] .chan { position: sticky; bottom: 0; padding: 8px 0 6px; }
   .lam-tren { padding: 6px 12px; }
 }
@@ -229,7 +230,7 @@ html.may-yeu .san [data-tu], html.may-yeu .san [data-chi], html.may-yeu .loi-nhi
 .mo-hinh text { font-family: inherit; font-weight: 800; font-size: 13px; }
 .mo-hinh .tc { fill: var(--tr-mat); } .mo-hinh .th { fill: var(--tr-chu-2); }
 .mo-hinh .vung-g { fill: color-mix(in oklab, var(--tr-tin) 18%, transparent); } .mo-hinh .vung-c { fill: color-mix(in oklab, var(--tr-hs) 22%, transparent); }
-.mo-hinh .nhan-v { font-size: 12.5px; fill: var(--tr-chu-2); }
+.mo-hinh .nhan-v { font-size: 14px; fill: var(--tr-chu-2); }
 .mo-hinh g.nut-a { transition: transform .26s cubic-bezier(.2, .8, .2, 1), opacity .26s; }
 .keo-kq { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
 .keo-kq b { font-size: 24px; font-weight: 800; color: var(--tr-chu); }

@@ -83,7 +83,7 @@ Thêm, không đường mới:
   - `thiNghiem`: `{ canh, buoc[] }`, chỉ khi có thí nghiệm SGK đúng chuyện.
   - `bamThu`: thanh kéo / nút tác động, chỉ khi hợp.
   - `thanChu[]`: chỉ lấy từ bảng thần chú skill lý thuyết, kèm mục gốc.
-  - `thayNoi`: một câu nguyên văn + mã bài + mã video + mốc phút khi có.
+  - `thayNoi`: một câu nguyên văn + mã bài + mã video + mốc phút khi có. Mã video PHẢI là video của đúng mục kiến thức chép câu đó (cùng chủ đề chưa đủ); máy chủ đối chiếu cặp câu ↔ mục ↔ video với bảng của skill lý thuyết, lệch ⇒ bỏ khối Thầy nói.
   - `lyDo[]` như cũ.
   - `hayNham[]`: mặt «nhiều em nghĩ» / «đúng là».
   - `tuHoi`: câu hỏi + trả lời.
@@ -140,4 +140,6 @@ Thêm, không đường mới:
 - Chỉ đổi app học sinh. Phụ huynh / giáo viên / game giữ khối lời giải chuẩn hiện tại.
 - Câu mẫu trong bản vẽ là dữ liệu giả sát thực tế (em tự tính: 12/60 = 0,2; 13,8/46 = 0,3; 0,2 · 88 · 0,75 = 13,2; 0,3 · 88 · 0,75 = 19,8; 17,6 · 100/75 ≈ 23,47; 13,2/88 · 60 · 100/75 = 12).
 - Thí nghiệm ống NO₂ (2NO₂ ⇌ N₂O₄, Δ<sub>r</sub>H < 0) và điều chế ethyl acetate là thí nghiệm SGK KNTT. Bản vẽ không ghi nhiệt độ đun cách thuỷ cụ thể vì chưa đối chiếu được trang SGK.
-- Thầy nói trong bản vẽ chép nguyên văn từ dòng «Thầy nói» của skill lý thuyết (1.C1 Ester, 1.C1 Cân bằng) và câu trích trong skill giải bài. Nút Xem thầy giảng ở bản vẽ chưa có mốc phút.
+- Thầy nói trong bản vẽ chép nguyên văn từ dòng «Thầy nói» của skill lý thuyết, đúng mục và đúng video: P1 «Nhẩm số liên kết pi» (1.C1 Ester `OAV45qDm6vs`), P2 «nguyên lý Lơ Sa-tơ-li-ê…» (1.C1 Cân bằng `INJFF24ePfU`), P3 «hiệu suất khi tính xuôi và tính ngược» (2008 Kĩ thuật giải bài toán sulfur `5aBoCq5Q6tk`).
+- Chữ trong hình (SVG) ≥ 14 px; bộ chụp chưa đo tương phản chữ trong SVG (đã dùng đúng biến màu chữ --tr-*-chu của app).
+- Phần I không có thí nghiệm vì không có thí nghiệm SGK đúng chuyện công thức chung; thay bằng mô hình kéo n. Nút Xem thầy giảng ở bản vẽ chưa có mốc phút.
