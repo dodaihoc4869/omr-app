@@ -124,23 +124,17 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
     expect(ruong.hasAttribute('data-da-mo')).toBe(true)
     expect(ruong.textContent).toContain('Rương đã mở')
   })
-  it('lời Bi NHẮC MỘT LẦN mỗi ngày (thầy 27/10): giữ ~4 s rồi thu gọn và gỡ; mở lại trong ngày ⇒ không hiện; nội dung đổi hẳn (đủ mức) ⇒ hiện lại một lần', () => {
+  it('thầy 03/11 chốt: Mol nói ở góc trái thẻ đầu — bong bóng ở trong thẻ (không che nút) nên GIỮ HIỆN, không tự thu; lời theo đúng tình huống (đủ mức ⇒ lời vui)', () => {
     vi.useFakeTimers()
     vi.setSystemTime(Date.UTC(2026, 9, 31, 3, 0)) // 10:00 giờ VN (không phụ thuộc giờ chạy)
     try {
       const a = render(<MotTrangHs {...goc()} />)
-      expect(a.container.querySelector('.bi-loi')).not.toBeNull()
-      // hệ Kính 02/11: không còn Mol đứng cạnh đường ⇒ lời ở thẻ Mol trên danh sách, tự thu sau ~4,7 s (mốc thẻ trên cùng cũ)
-      act(() => { vi.advanceTimersByTime(4800) })
-      expect(a.container.querySelector('.bi-loi-boc[data-thu]')).not.toBeNull()
-      act(() => { vi.advanceTimersByTime(500) })
-      expect(a.container.querySelector('.bi-loi')).toBeNull()
+      expect(a.container.querySelector('.kb-hero > .kb-mol')).not.toBeNull()
+      act(() => { vi.advanceTimersByTime(6000) })
+      expect(a.container.querySelector('.kb-hero > .kb-mol .bi-loi-bong')).not.toBeNull()
       a.unmount()
-      const b = render(<MotTrangHs {...goc({ so: { daLam: 14, muc: 30, chang: 3, soChang: 5 } as PropsMotTrang['so'] })} />)
-      expect(b.container.querySelector('.bi-loi')).toBeNull() // số câu còn lại đổi KHÔNG phải nội dung mới
-      b.unmount()
       const c = render(<MotTrangHs {...goc({ so: { daLam: 30, muc: 30, chang: 5, soChang: 5 } as PropsMotTrang['so'] })} />)
-      expect(c.container.querySelector('.bi-loi-bong .ht2-an')!.textContent).toMatch(/^(?:Đủ mức rồi!|«)/) // lời vui; 1/3 lượt vui là chân ngôn «…» (thầy 01/11 tối)
+      expect(c.container.querySelector('.kb-mol .bi-loi-bong .ht2-an')!.textContent).toMatch(/^(?:Đủ mức rồi!|«)/) // lời vui; 1/3 lượt vui là chân ngôn «…» (thầy 01/11 tối)
     } finally { vi.useRealTimers() }
   })
   it('lời Bi trọn câu (soát 27/10: ảnh chụp lúc đang gõ trông «cụt» ở chữ «là»): câu đủ ý và gõ xong trong ≤ 0,7 s', () => {
