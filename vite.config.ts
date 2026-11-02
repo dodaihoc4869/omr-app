@@ -667,9 +667,9 @@ export default defineConfig({
             { name: 'app-nho', test: /src[\\/](?:store[\\/]appStore|lib[\\/](?:classlist-db|exam-api|ten-ca|de-rieng-goi|gui-ca-trinh-duyet|anh-len-may-chu|day-ca-may-chu-moi|phieu-may-chu-moi|don-moc-reset-giao-vien|man-ca-may-chu-moi|cau-hinh-de-rieng|cau-goc))\.tsx?$|node_modules[\\/]zustand[\\/]/, includeDependenciesRecursively: false },
             // 26/10 «Chạm để hiểu đề»: gom ruột (components/goi-y-cham, trừ vỏ VungChamDe + cầu nối thay-bang-so-do — hai tệp nhỏ ấy ở mảnh nơi gọi) + api thành MỘT mảnh, từ điển làn A (lib/goi-y-cham) một mảnh —
             // không kéo theo chem-format / hoa2-api ra khỏi mảnh cũ (includeDependenciesRecursively: false) ⇒ các đường khác không đổi byte.
-            // LỜI GIẢI KÍNH ở màn học sinh (02/11): hàm bọc + tải gói + giải mã chung MỘT mảnh — tách ba mảnh nhỏ thì tên từng mảnh vào danh sách nạp trước của App / cổng HS (+66 B nén, đo 02/11).
-            { name: 'kinh-hs', test: /src[\\/](?:components[\\/]loi-giai-kinh[\\/]boc-kinh|lib[\\/](?:dap-an-may|loi-giai-kinh[\\/]tai-san))\.ts$/, includeDependenciesRecursively: false },
-            { name: 'goi-y-cham', test: /src[\\/](?:components[\\/]goi-y-cham[\\/](?!VungChamDe\.tsx|thay-bang-so-do\.tsx)[^\\/]+|lib[\\/]goi-y-cham[\\/]api\.ts)$/, includeDependenciesRecursively: false },
+            // + LỜI GIẢI KÍNH màn học sinh (02/11): hàm bọc TheCau (boc-kinh) + giải mã gói (dap-an-may — ManLamBaiTap, tai-san cùng dùng) đi CHUNG mảnh này
+            //   (mọi màn có lời giải đã nạp nó): tách riêng thì +1 tệp precache (trần 170) và thêm tên mảnh vào danh sách nạp trước của App / cổng HS.
+            { name: 'goi-y-cham', test: /src[\\/](?:components[\\/]goi-y-cham[\\/](?!VungChamDe\.tsx|thay-bang-so-do\.tsx)[^\\/]+|lib[\\/]goi-y-cham[\\/]api\.ts|components[\\/]loi-giai-kinh[\\/]boc-kinh\.ts|lib[\\/]dap-an-may\.ts)$/, includeDependenciesRecursively: false },
             { name: 'tu-dien-cham', test: /src[\\/]lib[\\/]goi-y-cham[\\/](?!api\.ts|kieu\.ts)[^\\/]+$/, includeDependenciesRecursively: false },
             // 21/10 (màn Phiếu nạp muộn): năm mô-đun nhỏ dùng chung của lời giải / thí nghiệm mà cổng học sinh vẫn cần bị Rolldown tách thành năm tệp riêng
             // (+2,4 KB nén cho app học sinh vì mỗi tệp nén riêng) ⇒ gom lại vào CÙNG mảnh DesignSystem (học sinh / thầy đều nạp sẵn).

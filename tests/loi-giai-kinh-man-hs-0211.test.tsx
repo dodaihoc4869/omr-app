@@ -1,6 +1,6 @@
 // Thầy 02/11: «Thay thế toàn bộ 100% lời giải trong app học sinh bằng lời giải kiểu Kính».
 // (1) Phép đổi thứ tự GỐC của TheCau ⇒ thứ tự HIỆN cho Kính (phương án / ý bị xáo).
-// (2) `banKinhCua` tự tải theo lô khi màn không tải sẵn; nhớ câu không có bản; ca kiểm tra đóng ⇒ không nhớ.
+// (2) `banKinhCua` tự tải theo lô khi màn không tải sẵn (#774), màn mới gắn dựa vào đó; câu không có bản ⇒ không hỏi lại.
 // (3) Màn học sinh gắn Kính; TheCau không nhập thêm gì (luật tốc độ); app thầy / phụ huynh không gắn.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, render } from '@testing-library/react'
@@ -34,7 +34,7 @@ describe('kinhTheoHien — đổi thứ tự gốc ⇒ thứ tự hiện', () =>
 
 describe('banKinhCua — tự tải khi chưa có gói', () => {
   beforeEach(() => { vi.resetModules(); localStorage.clear(); localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tk' })) })
-  afterEach(() => { vi.doUnmock('../src/lib/loi-giai-api'); vi.useRealTimers() })
+  afterEach(() => { vi.doUnmock('../src/lib/loi-giai-api') })
 
   it('gom các câu cùng lượt vẽ thành MỘT lệnh; câu máy chủ báo không có bản ⇒ không hỏi lại', async () => {
     const goi = vi.fn(async () => ({ ok: true, ban: {} }))
@@ -46,23 +46,17 @@ describe('banKinhCua — tự tải khi chưa có gói', () => {
     expect(await banKinhCua('q1')).toBeNull()
     expect(goi).toHaveBeenCalledTimes(1)
   })
+})
 
-  it('máy chủ đóng (đang kiểm tra cá nhân) ⇒ KHÔNG nhớ «không có», lần sau hỏi lại', async () => {
-    const goi = vi.fn(async () => ({ ok: true, ban: {}, dong: true }))
-    vi.doMock('../src/lib/loi-giai-api', () => ({ goiHs: goi, docTokenHs: () => 'tk' }))
-    const { banKinhCua } = await import('../src/lib/loi-giai-kinh/tai-san')
-    expect(await banKinhCua('q9')).toBeNull()
-    expect(await banKinhCua('q9')).toBeNull()
-    expect(goi).toHaveBeenCalledTimes(2)
-  })
-
-  it('mạng treo ⇒ sau 3 giây trả null (về lời giải cũ), không chờ mãi', async () => {
-    vi.useFakeTimers()
+describe('LoiGiaiKinhHs — gói chưa có trên máy', () => {
+  afterEach(() => { cleanup(); vi.doUnmock('../src/lib/loi-giai-api'); vi.resetModules() })
+  it('đang tải qua mạng ⇒ hiện NGAY lời giải cũ (không ô trống chờ)', async () => {
+    vi.resetModules(); localStorage.clear()
     vi.doMock('../src/lib/loi-giai-api', () => ({ goiHs: () => new Promise(() => {}), docTokenHs: () => 'tk' }))
-    const { banKinhCua } = await import('../src/lib/loi-giai-kinh/tai-san')
-    const p = banKinhCua('q7')
-    await vi.advanceTimersByTimeAsync(3100)
-    expect(await p).toBeNull()
+    const { default: LoiGiaiKinhHs } = await import('../src/components/loi-giai-kinh/LoiGiaiKinhHs')
+    const { container } = render(<LoiGiaiKinhHs qid="qx" phan="III" dapAn="1" duPhong={<p data-cu="1">cũ</p>} />)
+    expect(container.querySelector('[data-cu="1"]')).not.toBeNull()
+    expect(container.querySelector('.lgk-cho')).toBeNull()
   })
 })
 

@@ -4,13 +4,13 @@
 import { createElement, lazy, Suspense, type ReactNode } from 'react'
 import type { TheCauProps } from '../TheCau'
 import { docTokenHs } from '../../lib/loi-giai-api'
-import { taiSanKinh } from '../../lib/loi-giai-kinh/tai-san'
 
 const KinhTheCau = lazy(() => import('./LoiGiaiKinhHs').then((m) => ({ default: m.KinhTheCau })))
 
 /** Tải NỀN gói Kính cho danh sách câu em đã được xem lời giải (vd «Câu đã làm»: thẻ mở từng cái, khỏi chờ mạng mỗi lần mở). Lỗi im lặng. */
 export function taiKinhNen(qids: readonly string[]): void {
-  for (let i = 0; i < qids.length; i += 80) void taiSanKinh(docTokenHs(), qids.slice(i, i + 80))
+  // tai-san ở kho chạy-lúc (#774) ⇒ nạp động, không để màn có precache phụ thuộc tĩnh vào nó.
+  void import('../../lib/loi-giai-kinh/tai-san').then((m) => { for (let i = 0; i < qids.length; i += 80) void m.taiSanKinh(docTokenHs(), qids.slice(i, i + 80)) }, () => {})
 }
 
 export function bocKinh(qid: string | null | undefined): TheCauProps['bocLoiGiai'] {
