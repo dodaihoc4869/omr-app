@@ -359,8 +359,9 @@ export class Ve {
       case 'tat': if (!this.yeu) pu({ k: 'puff', x: su.x, y: su.y, mau: b.phe[(su.phe ?? 0) & 1] }); break
       case 'ha': {
         const c = mauCua(su.ai)
-        pu({ k: 'bong', x: su.x, y: su.y, mau: c, goc: Math.random() * PI2 })
-        pu({ k: 'vong', x: su.x, y: su.y, mau: c, r0: 10, r1: 60, w: 4, dur: 460 })
+        // Lần hạ không liên quan em: bong bóng GỌN (6 hạt, w = 6) — v4 có tháp nên hạ nhiều hơn hẳn.
+        pu({ k: 'bong', x: su.x, y: su.y, mau: c, goc: Math.random() * PI2, w: coEm ? 11 : 6 })
+        if (coEm) pu({ k: 'vong', x: su.x, y: su.y, mau: c, r0: 10, r1: 60, w: 4, dur: 460 })
         // Chữ «Hạ!» (chữ có viền — tốn vẽ) chỉ khi EM hạ / em bị hạ; v4 có tháp nên số lần hạ nhiều hơn hẳn (đo do-muot 02/11).
         if (coEm) pu({ k: 'so', x: su.x, y: su.y - 8, chu: 'Hạ!', co: su.boi === emId ? 20 : 14, mau: su.boi === emId ? b.sao : b.the, vien: su.boi === emId ? den(0.55) : rgba(b.chu, 0.6), dur: su.boi === emId ? 900 : 600 })
         if (coEm) this.rung = { t0: nay, dur: 200, m: su.boi === emId ? 3 : 2.5 }
@@ -561,7 +562,7 @@ export class Ve {
         x.fillStyle = rgba(b.trang, e * 0.7); x.beginPath(); x.arc(h.x, h.y, 7 * e, 0, PI2); x.fill(); break
       case 'so': { const n = t < 0.15 ? 0.7 + t * 2.4 : 1.06 - (t - 0.15) * 0.07; x.globalAlpha = t > 0.7 ? (1 - t) / 0.3 : 1; this.chu(x, h.x, h.y - t * 26, h.chu!, h.co! * n, rgba(cl), h.vien || rgba(b.the, 0.9)); x.globalAlpha = 1; break }
       case 'bong':
-        for (let j = 0; j < 11; j++) {
+        for (let j = 0, n = h.w ?? 11; j < n; j++) {
           const a = goc + j * 2.39, sp = (26 + (j % 4) * 13) * Math.sqrt(t) * 1.6, rr = 3 + (j % 3) * 2.6 + t * 4, px = h.x + Math.cos(a) * sp, py = h.y + Math.sin(a) * sp - t * 10
           x.strokeStyle = rgba(cl, e); x.lineWidth = 2.2; x.beginPath(); x.arc(px, py, rr, 0, PI2); x.stroke()
           if (j % 3 === 0) { x.fillStyle = rgba(b.trang, e * 0.7); x.beginPath(); x.arc(px - rr * 0.3, py - rr * 0.3, rr * 0.3, 0, PI2); x.fill() }
