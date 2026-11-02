@@ -6,6 +6,8 @@
 //   · Phải: «4 chỉ số của em» (vạch xám = giữa lớp; chưa đủ dữ liệu ⇒ «—») · «14 ngày của em» (cột chồng câu làm kỹ / câu chọn khi chưa đọc hết đề, ngày
 //     không làm tô đỏ, vạch đứt = mức ngày).
 //   · Số CHỈ từ `/gv/bon-bang/em` (src/lib/bon-bang-api.ts). Esc / «Hôm nay» đóng.
+//   · v3 (02/11): thẻ CA THI / LÊN BẢNG dùng ĐÚNG khuôn thẻ sẵn có — «Ca thi khớp luyện tập» / «Luyện cao, ca thi thấp» (hai ô so sánh luyện tập ↔ ca thi
+//     thật 60 ngày, ví dụ mỗi dòng MỘT chuyên đề: «Amin · luyện 90% (18/20) → thi 2/6»), «Lên bảng» / «Lên bảng chưa đạt…» (ví dụ có giờ, Đạt / Chưa đạt).
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ArrowLeft, RefreshCw } from 'lucide-react'
@@ -230,7 +232,7 @@ export default function BangChungBon({ sbd, hoTen, lop, bang, onDong }: { sbd: s
                     <h3 id="bbc-bc-tieu">Bằng chứng</h3>
                     <span>xếp từ mạnh tới nhẹ</span>
                   </div>
-                  {du.the.length === 0 ? <p className="bb-trong">Chưa có bằng chứng nào trong 14 ngày.</p> : du.the.map((t, i) => <The key={t.ma + i} t={t} thu={i + 1} />)}
+                  {du.the.length === 0 ? <p className="bb-trong">Chưa có bằng chứng nào trong 14 ngày (ca thi, lên bảng: 60 ngày).</p> : du.the.map((t, i) => <The key={t.ma + i} t={t} thu={i + 1} />)}
                 </section>
               </div>
               <div className="bbc-cot-phu">

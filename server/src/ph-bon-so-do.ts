@@ -24,11 +24,16 @@ const LOI: Record<string, readonly [string, string]> = {
   'dp:goiY': ['lượt con mở lời giải trước khi tự làm', 'lượt xem lời giải trước'],
   'dp:songSinh': ['câu đổi số liệu con làm đúng: thấp là con đang học thuộc đáp án', 'đúng khi đổi số liệu'],
   'dp:thi': ['bài con rời màn hình khi làm kiểm tra', 'bài rời màn khi thi'],
+  // v3 (02/11): ca thi thật + lên bảng theo từng chuyên đề — lời tế nhị, nói việc, không gán nhãn con.
+  'dp:lechCa': ['lúc luyện con đúng nhiều, nhưng vào ca thi ở cùng phần ấy con làm được ít hơn hẳn', 'luyện cao, thi thấp'],
+  'dp:bangChua': ['lần con lên bảng chưa làm lại được câu con từng làm đúng lúc luyện', 'lên bảng chưa đạt'],
   'ht:sua': ['câu từng sai con đã tự sửa đúng', 'câu sai đã tự sửa'],
   'ht:songSinh': ['câu cùng dạng, khác số liệu con làm đúng', 'đúng câu đổi số liệu'],
   'ht:ky': ['câu con đọc đủ thời gian rồi mới chọn', 'câu đọc kỹ'],
   'ht:khop': ['đúng lúc luyện → điểm kiểm tra cá nhân', 'luyện → kiểm tra'],
   'ht:dungMoi': ['câu mới con tự làm đúng ngay lần đầu', 'câu mới tự làm đúng'],
+  'ht:caThi': ['câu thi con làm đúng ở các phần đã luyện — ca thi khớp lúc luyện', 'ca thi khớp luyện'],
+  'ht:lenBang': ['lần con lên bảng làm đạt', 'lên bảng đạt'],
   'ch:ngayDu': ['ngày con làm đủ mức', 'ngày đủ mức'],
   'ch:cauLam': ['câu thầy giao con đã làm', 'câu giao đã làm'],
   'ch:ky': ['câu con làm thật, không chọn vội', 'câu làm thật'],
@@ -37,6 +42,9 @@ const LOI: Record<string, readonly [string, string]> = {
   'lu:lanCuoi': ['lần cuối con học', 'lần cuối học'],
   'lu:cauLam': ['câu thầy giao con chưa làm', 'câu giao chưa làm'],
   'lu:boMac': ['câu sai con chưa sửa', 'câu sai chưa sửa'],
+  // v3b (02/11): Lười vì làm cho có / dồn sát giờ chốt (có làm đủ ngày).
+  'lu:choCo': ['lượt con làm cho có (chọn vội mà sai, để máy đứng) — không tính là đã làm', 'lượt làm cho có'],
+  'lu:donHan': ['ngày con dồn hết bài sau 23 giờ, sát giờ chốt', 'ngày dồn sát giờ'],
 }
 
 type TheTho = { ma?: string; tieu?: string; lon?: string; nhoSo?: string; w?: number; viDu?: { luc?: string; phu?: string; kq?: string; dung?: boolean | null }[] }

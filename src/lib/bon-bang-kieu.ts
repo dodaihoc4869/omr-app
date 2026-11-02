@@ -47,7 +47,7 @@ export interface TraLoiBonBang {
   bang: Record<MaBang, DongBang[]>
   /** Trung vị cả lớp (mọi em đủ dữ liệu) từng điểm — vạch xám ở trang bằng chứng. */
   trungVi: DiemBon
-  /** v2 (01/11): em có dấu hiệu nhưng CHƯA đủ chắc để xếp bảng nào (`bc` = lý do). Không có ⇒ máy chủ cũ. */
+  /** v2 (01/11): em có dấu hiệu nhưng CHƯA đủ chắc để xếp. v3b (02/11): ĐÃ BỎ — máy chủ mới luôn trả rỗng; giữ khoá cho máy chủ cũ (app không còn vẽ). */
   theoDoi?: DongBang[]
 }
 

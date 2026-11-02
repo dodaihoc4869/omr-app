@@ -31,6 +31,8 @@ import {
 type Row = Record<string, unknown>
 const str = (x: unknown): string => (x === null || x === undefined ? '' : String(x)).trim()
 const num = (x: unknown): number => (typeof x === 'number' ? x : Number(x)) || 0
+/** Chuyên đề ghi trên dòng sổ; «Hoá học» chung chung = không có (đúng luật `chuyenDeThat` của su-kien-hoc.ts). */
+const cdThat = (x: unknown): string => { const s = str(x); return s === 'Hoá học' || s === 'Hóa học' ? '' : s }
 const json = <T>(x: unknown, macDinh: T): T => { try { return x ? (JSON.parse(String(x)) as T) : macDinh } catch { return macDinh } }
 /** Hành vi của lượt (01/11, đánh giá 99% đợt 2): chỉ trường máy em ĐÃ đo (`raw_json.doc.dd/dq/ar/rn`); vắng ⇒ không thêm khoá (lõi dùng luật cũ). Thuần. */
 const hanhViLuot = (d: DoMucLuot | null | undefined): Pick<LuotDanhGia, 'dd' | 'dq' | 'ar' | 'rn'> => {
@@ -45,8 +47,15 @@ export const SO_NGAY_CUA_SO = 14
 export const LO_EM = 25
 /** Em được xếp: mọi em trừ tài khoản khoá và em ĐÃ NGHỈ (thôi học thì không xếp Đối phó vì «không làm»). */
 const SQL_EM_XEP = "COALESCE(trang_thai, '') NOT IN ('khoa', 'da_nghi')"
+/** 4 bảng v3 (02/11): qid GỐC của dòng sổ `a` (bỏ hậu tố song sinh `~ss3` / lượt lặp `#2`) — biểu thức SQL. */
+export const sqlQidGoc = (a: string): string =>
+  `(CASE WHEN instr(${a}.qid, '~') > 0 THEN substr(${a}.qid, 1, instr(${a}.qid, '~') - 1) WHEN instr(${a}.qid, '#') > 0 THEN substr(${a}.qid, 1, instr(${a}.qid, '#') - 1) ELSE ${a}.qid END)`
+/** 4 bảng v3 (02/11): CHUYÊN ĐỀ của câu theo chỉ mục kho `cau_meta` (tra qid gốc, đi chỉ mục `cau_meta_qid`) — khoá đơn vị kiến thức chung cho luyện tập,
+ *  ca thi, lên bảng. Biểu thức vô hướng (một dòng mỗi lượt, không nhân bản dòng khi một câu nằm ở nhiều tờ). */
+export const sqlChuyenDeKho = (a: string): string =>
+  `(SELECT m.chuyen_de FROM cau_meta m WHERE m.qid = ${sqlQidGoc(a)} AND COALESCE(m.chuyen_de, '') <> '' LIMIT 1)`
 /** Lượt tính là một lần làm (như sổ Mức làm): bỏ dòng đọc lời giải, lướt, chẩn đoán, chữa bước, dòng bị giữ kín. */
-const SQL_LUOT_LAM = "ket_qua IS NOT NULL AND COALESCE(purpose, '') NOT IN ('xem_loi_giai', 'luot', 'chan_doan', 'chua_buoc') AND COALESCE(visibility, '') <> 'embargoed'"
+export const SQL_LUOT_LAM ="ket_qua IS NOT NULL AND COALESCE(purpose, '') NOT IN ('xem_loi_giai', 'luot', 'chan_doan', 'chua_buoc') AND COALESCE(visibility, '') <> 'embargoed'"
 
 const BANG = [
   `CREATE TABLE IF NOT EXISTS danh_gia_em_tuan (sbd TEXT NOT NULL, tuan TEXT NOT NULL, diem REAL NOT NULL, bac_tuan INTEGER NOT NULL, bac INTEGER NOT NULL,
@@ -122,13 +131,19 @@ export async function tinhLoEm(env: Env, sbds: readonly string[], nowMs: number,
   const { tu, cuoi, tuan, tuIso, denIso } = cuaSoTinh(nowMs, soNgay, tuy.denHomNay === true)
   const nowIso = new Date(nowMs).toISOString()
   const ds = JSON.stringify(sbds)
-  const [rSo, rKt, rThi, rHs, rLs, rCt, rCauTuan] = await Promise.all([
-    hoi(env, `SELECT s.sbd, s.qid, s.nguon, s.ma_nguon, s.ket_qua, s.giay, s.luc, s.muc_do, s.ngay_vn, s.assistance, s.purpose,
+  // 4 bảng v3 (02/11, `giuDauVao`): kèm ĐƠN VỊ KIẾN THỨC của lượt — chuyên đề tra theo qid gốc trong `cau_meta` (khoá chính phụ `cau_meta_qid`), chuyên đề ghi
+  // trên dòng, mã dạng. Cùng MỘT câu đọc (không thêm vòng chờ); D1 thiếu bảng `cau_meta` ⇒ đọc lại không kèm đơn vị (không làm hỏng bộ xếp).
+  const sqlSo = (dv: boolean) => `SELECT s.sbd, s.qid, s.nguon, s.ma_nguon, s.ket_qua, s.giay, s.luc, s.muc_do, s.ngay_vn, s.assistance, s.purpose,
         CASE WHEN json_valid(s.raw_json) THEN json_extract(s.raw_json, '$.ms') END AS ms,
         CASE WHEN json_valid(s.raw_json) THEN json_extract(s.raw_json, '$.tc') END AS tc,
         CASE WHEN json_valid(s.raw_json) THEN json_extract(s.raw_json, '$.doc') END AS doc,
         CASE WHEN json_valid(s.raw_json) THEN UPPER(TRIM(CAST(COALESCE(json_extract(s.raw_json, '$.chon'), json_extract(s.raw_json, '$.traLoi')) AS TEXT))) END AS chon
-      FROM su_kien_hoc s WHERE s.sbd IN (SELECT value FROM json_each(?1)) AND s.ngay_vn BETWEEN ?2 AND ?3 AND ${SQL_LUOT_LAM}`, ds, tu, cuoi),
+        ${dv ? `, s.chuyen_de AS cd_dong, s.ma_dang AS dg, ${sqlChuyenDeKho('s')} AS cd_kho` : ''}
+      FROM su_kien_hoc s WHERE s.sbd IN (SELECT value FROM json_each(?1)) AND s.ngay_vn BETWEEN ?2 AND ?3 AND ${SQL_LUOT_LAM}`
+  const docSo = (): Promise<Row[]> => !tuy.giuDauVao ? hoi(env, sqlSo(false), ds, tu, cuoi)
+    : hoi(env, sqlSo(true), ds, tu, cuoi).catch((e: unknown) => { if (/no such (table|column)/i.test(String(e))) return hoi(env, sqlSo(false), ds, tu, cuoi); throw e })
+  const [rSo, rKt, rThi, rHs, rLs, rCt, rCauTuan] = await Promise.all([
+    docSo(),
     // Bỏ KTCN = bài HẾT HẠN mà em trả lời chưa tới nửa số câu (đếm câu đã trả lời trong `tra_json`, chỉ cho bài hết hạn).
     hoi(env, `SELECT k.sbd, k.trang_thai, k.diem, k.ngay,
         CASE WHEN k.trang_thai = 'het_han' AND json_valid(k.tra_json) THEN (SELECT COUNT(*) FROM json_each(k.tra_json) a WHERE a.type = 'text' AND length(trim(a.value)) > 0) END AS da_tra,
@@ -141,7 +156,7 @@ export async function tinhLoEm(env: Env, sbds: readonly string[], nowMs: number,
     hoi(env, 'SELECT MAX(tuan) AS t FROM danh_gia_cau_tuan WHERE tuan <= ?1', tuan).catch(() => [] as Row[]),
   ])
   // Lượt → Mức làm (CÙNG đường với Lịch sử làm câu / bảng điểm danh: hệ số lặp, τ riêng, β, đo lại lượt cũ).
-  const dong: (DongMucSo & { chon: string; coGoiY: boolean })[] = rSo.map((x) => {
+  const dong: (DongMucSo & { chon: string; coGoiY: boolean; dv?: string | null; dg?: string | null })[] = rSo.map((x) => {
     const qid = str(x.qid), tc = str(x.tc)
     const kq = x.ket_qua === null || x.ket_qua === undefined || x.ket_qua === '' ? null : Number(x.ket_qua)
     return {
@@ -151,6 +166,7 @@ export async function tinhLoEm(env: Env, sbds: readonly string[], nowMs: number,
       doMuc: docDoMuc({ doc: json<Row | null>(x.doc, null) }), qid, tc, chon: str(x.chon),
       // Gợi ý EM TỰ MỞ: luyện câu nền (`luyen_nen`, luôn ghi «có hỗ trợ») và làm lại sau khi hỏi thầy là việc học, không phải đối phó.
       coGoiY: str(x.assistance) === 'assisted' && str(x.purpose) !== 'luyen_nen' && str(x.nguon) !== 'nen' && !str(x.ma_nguon).startsWith('hoi_thay_kiem:'),
+      ...(tuy.giuDauVao ? { dv: str(x.cd_kho) || cdThat(x.cd_dong) || null, dg: str(x.dg) || null } : {}),
     }
   })
   const doThat = doThatCacDong(dong)
@@ -198,7 +214,8 @@ export async function tinhLoEm(env: Env, sbds: readonly string[], nowMs: number,
         songSinh: !!x.d.tc || tachSongSinh(x.d.qid ?? '').songSinh !== null,
         ngay: x.d.ngay ?? '',
         luc: x.d.luc,
-        ...(tuy.giuDauVao ? { giay: m && !m.uocTinh ? m.giay : null, giayDoc: m && m.giayDoc > 0 ? m.giayDoc : null, qid: x.d.qid ?? x.d.goc, an: x.d.doMuc?.treo?.a ?? null, ...hanhViLuot(x.d.doMuc) } : {}),
+        ...(tuy.giuDauVao ? { giay: m && !m.uocTinh ? m.giay : null, giayDoc: m && m.giayDoc > 0 ? m.giayDoc : null, qid: x.d.qid ?? x.d.goc, an: x.d.doMuc?.treo?.a ?? null, ...hanhViLuot(x.d.doMuc),
+          nguon: x.d.nguon, dv: x.d.dv ?? null, dg: x.d.dg ?? null } : {}),
       }
     })
     const kt = rKt.filter((x) => str(x.sbd) === sbd)

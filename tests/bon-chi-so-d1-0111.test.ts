@@ -67,7 +67,10 @@ describe('/gv/bon-bang + /gv/bon-bang/em', () => {
     const b = await M.gvBonBang(env, {}, NOW)
     if (!b.ok) throw new Error(b.error)
     expect(b).toMatchObject({ tu: '2026-10-18', den: '2026-10-31', daTinh: 15, tong: 15 })
-    expect(b.bang.lu.map((x) => x.sbd)).toEqual(['S01', 'S04', 'S07', 'S10', 'S13'])
+    // v3b (02/11): hai trục, mỗi em một nhãn mỗi trục — em đối phó chọn vội mà sai 20/36 câu mỗi ngày là LÀM CHO CÓ ⇒ Lười (lý do riêng), xếp sau em bỏ hẳn ngày
+    expect(b.bang.lu.map((x) => x.sbd).slice(0, 5)).toEqual(['S01', 'S04', 'S07', 'S10', 'S13'])
+    expect(b.bang.lu.map((x) => x.sbd).sort()).toEqual(['S01', 'S03', 'S04', 'S06', 'S07', 'S09', 'S10', 'S12', 'S13', 'S15'])
+    expect(b.bang.lu.find((x) => x.sbd === 'S03')!.bc).toMatch(/lượt làm cho có$/)
     // ngày bảo trì (ngay-bao-tri.ts) em chưa đủ mức KHÔNG tính là ngày không làm (luật Nhịp học) ⇒ mẫu n/n, n ≤ 14
     expect(b.bang.lu[0]!.bc).toMatch(/^\*\*(\d+)\/\1\*\* ngày không làm$/)
     expect(b.bang.dp.map((x) => x.sbd).sort()).toEqual(['S03', 'S06', 'S09', 'S12', 'S15'])
@@ -75,7 +78,10 @@ describe('/gv/bon-bang + /gv/bon-bang/em', () => {
     expect(b.bang.ch.length).toBeGreaterThanOrEqual(5)
     for (const k of ['ht', 'dp', 'ch', 'lu'] as const) for (let i = 1; i < b.bang[k].length; i++) expect(b.bang[k][i - 1]!.diem).toBeGreaterThanOrEqual(b.bang[k][i]!.diem)
     expect(b.trungVi.lu).not.toBeNull()
-    expect(Array.isArray(b.theoDoi)).toBe(true) // v2: «Đang theo dõi» (có dấu hiệu, chưa đủ chắc)
+    expect(b.theoDoi).toEqual([]) // v3b: bỏ «Đang theo dõi» — giữ khoá cho app cũ, luôn rỗng
+    // mọi em đều có bảng: em lười không làm gì chỉ có trục công sức; còn lại đủ hai trục
+    const coBang = new Set((['ht', 'dp', 'ch', 'lu'] as const).flatMap((k) => b.bang[k].map((x) => x.sbd)))
+    expect(coBang.size).toBe(15)
 
     const e = await M.gvBonBangEm(env, { sbd: 'S03', bang: 'dp' }, NOW)
     if (!e.ok) throw new Error(e.error)
@@ -105,6 +111,35 @@ describe('/gv/bon-bang + /gv/bon-bang/em', () => {
     expect(e.ketLuan.split('\n').length).toBeGreaterThanOrEqual(2)
     expect(e.ketLuan.split('\n')[1]).toMatch(/^\*\*\d+%\*\* số câu chọn đáp án khi chưa kịp đọc hết đề — sai \d+\/\d+ câu$/)
     expect(JSON.parse((d.sql.prepare("SELECT ket_json j FROM bon_chi_so_em WHERE sbd = 'S03'").get() as { j: string }).j).v).toBe(2)
+  })
+  it('v3 (02/11): đọc ca thi thật + lên bảng + luyện tập cũ trên D1 thật — đơn vị kiến thức tra từ `cau_meta`, thẻ «Ca thi khớp luyện tập» / «Lên bảng»', async () => {
+    const { d, env } = moi()
+    const sk = d.sql.prepare('INSERT INTO su_kien_hoc (khoa, sbd, qid, nguon, ma_nguon, lan, ket_qua, giay, luc, ngay_vn, ma_dang, chuyen_de, muc_do) VALUES (?,?,?,?,?,1,?,NULL,?,?,NULL,?,?)')
+    const meta = d.sql.prepare('INSERT INTO cau_meta (ma_de, qid, thu_tu, chuyen_de) VALUES (?,?,?,?)')
+    // luyện tập CŨ hơn 14 ngày (01–10/10): 20 câu chặng học, 16 đúng — dòng sổ KHÔNG ghi chuyên đề, chuyên đề tra theo qid trong chỉ mục kho
+    for (let i = 0; i < 20; i++) {
+      const ngay = `2026-10-${String(1 + (i % 10)).padStart(2, '0')}`
+      sk.run(`luyen|m|S02|P${i}|1`, 'S02', `P${i}`, 'luyen', 'm', i < 16 ? 1 : 0, `${ngay}T10:00:00.000Z`, ngay, null, '')
+      meta.run('DH-12-ESTE', `P${i}`, i, 'Este')
+    }
+    meta.run('DH-12-ESTE', 'P0~ss1', 99, 'Không dùng') // qid ảo song sinh không bao giờ ghép (qid gốc)
+    // ca thi thật 12/10: 6 câu Este (5 đúng) + 1 câu bỏ trống (= sai); ca chưa công bố (che) không đọc
+    for (let i = 0; i < 7; i++) sk.run(`thi|CA1|S02|T${i}|1`, 'S02', `T${i}`, 'thi', 'CA1', i < 5 ? 1 : i === 5 ? 0 : null, '2026-10-12T12:00:00.000Z', '2026-10-12', 'Este', 'hieu')
+    sk.run('thi|CA2|S02|U0|1', 'S02', 'U0', 'thi', 'CA2', 0, '2026-10-13T12:00:00.000Z', '2026-10-13', 'Este', 'hieu')
+    d.sql.prepare("UPDATE su_kien_hoc SET visibility = 'embargoed' WHERE ma_nguon = 'CA2'").run()
+    // lên bảng + kiểm tra đầu giờ: 3 lần, đạt 2
+    sk.run('len_bang|lb|S02|P1|1', 'S02', 'P1', 'len_bang', 'lb', 1, '2026-10-20T09:00:00.000Z', '2026-10-20', 'Este', '')
+    sk.run('len_bang|lb|S02|P2|2', 'S02', 'P2', 'len_bang', 'lb', 1, '2026-10-22T09:00:00.000Z', '2026-10-22', 'Este', '')
+    sk.run('dau_gio|b1|S02|P3|1', 'S02', 'P3', 'dau_gio', 'b1', 0, '2026-10-24T09:00:00.000Z', '2026-10-24', 'Este', '')
+    const e = await M.gvBonBangEm(env, { sbd: 'S02', bang: 'ht' }, NOW)
+    if (!e.ok) throw new Error(e.error)
+    const ca = e.the.find((t) => t.ma === 'caThi')!
+    expect(ca).toMatchObject({ tieu: 'Ca thi khớp luyện tập', lon: '5/7' })
+    expect(ca.hai![0]).toMatchObject({ nhan: 'Luyện tập · cùng đơn vị', so: '80%', phu: '16/20 lượt đúng' })
+    expect(ca.viDu![0]).toMatchObject({ cau: 'Este', phu: 'luyện 16/20', kq: 'thi 5/7' })
+    expect(e.the.find((t) => t.ma === 'lenBang')).toMatchObject({ lon: '2/3', nhoSo: 'lần đạt · chưa đạt 1' })
+    const sl = JSON.parse((d.sql.prepare("SELECT so_lieu_json j FROM bon_chi_so_em WHERE sbd = 'S02'").get() as { j: string }).j)
+    expect(sl).toMatchObject({ ban: 4, caCau: 7, caGhep: 7, bangTong: 3, bangDat: 2, theoDoi: null })
   })
   it('tên câu ngắn: «Bài N · đầu đề…»', () => {
     expect(M.tenCauNgan('Bài 10. Quy tắc octet', 'Nguyên tử   Na có cấu hình')).toBe('Bài 10 · Nguyên tử Na có cấu hình')

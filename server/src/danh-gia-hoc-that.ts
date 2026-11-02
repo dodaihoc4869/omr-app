@@ -98,6 +98,11 @@ export interface LuotDanhGia {
   dq?: number
   ar?: number
   rn?: number
+  /** CHỈ THÊM 02/11 (4 bảng v3 — ca thi + lên bảng, `bon-ca-thi.ts`): nguồn của dòng sổ (`thi` / `len_bang` / `dau_gio` KHÔNG phải luyện tập) · đơn vị
+   *  kiến thức (chuyên đề, tra theo qid gốc trong `cau_meta`, thiếu ⇒ chuyên đề ghi trên dòng) · mã dạng của dòng (cầu nối dạng → chuyên đề). Vắng ⇒ như cũ. */
+  nguon?: string
+  dv?: string | null
+  dg?: string | null
 }
 
 export interface DauVaoDanhGia {

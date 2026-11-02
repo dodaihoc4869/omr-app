@@ -191,3 +191,45 @@ Năm câu ở mục 6 chọn theo đề xuất: có «Đang theo dõi», có mã
 - **0 em nằm ở hai bảng trái nhau.**
 - Họ Đối phó bật nhiều nhất: bỏ mặc câu sai (53), thuộc đáp án (31), chọn vội (26).
 - Sau #722, Học thật sẽ chặt hơn. Cần đếm lại sau lượt tính đêm 01/11.
+
+---
+
+## 8. v3 ca thi + lên bảng (02/11) — thầy: «Làm luôn với ca thi thật rồi đếm lại, lấy yếu tố đó làm chính, tính từng câu từng đơn vị kiến thức … thêm phần lên bảng đạt và chưa đạt … Làm chính xác 99% nhé» · v3b: «phải đánh giá trọn vẹn và chính xác hết mọi học sinh 99%, không còn theo dõi nữa nhé»
+
+### Nguồn dữ liệu (chỉ đọc, song song trong cron — không thêm vòng chờ nối tiếp, không đổi lược đồ)
+- **Ca thi thật:** sổ `su_kien_hoc` dòng `nguon = 'thi'` (mỗi câu một dòng, `ma_nguon` = mã ca, ghi từ `chi_tiet_cau` lúc chấm). Bỏ ca loại «bài tập» (`ca.loai = 'baitap'`) và dòng còn CHE (ca chưa công bố). Câu bỏ trống = sai. Cửa sổ **60 ngày** trọn tới hôm qua.
+- **Độ khó từng câu trong ca:** tỉ lệ đúng cả lớp của câu đó trong ca (≥ 5 em; đệm 3 giờ); thiếu ⇒ theo mức độ (biết 0,8 · hiểu 0,65 · VD 0,45 · VDC 0,3).
+- **Lên bảng:** `nguon = 'len_bang'` (thầy gọi lên bảng, Đạt 1 / Chưa đạt 0 — bảng `len_bang`) và `nguon = 'dau_gio'` (Kiểm tra đầu giờ: thầy hỏi lại câu em ĐÃ làm đúng).
+- **Luyện tập:** 14 ngày gần nhất từng lượt (bộ Học thật) + 46 ngày trước đó gộp theo (ngày × đơn vị) bằng một câu SQL.
+
+### Đơn vị kiến thức = CHUYÊN ĐỀ
+Khoá: `cau_meta.chuyen_de` tra theo **qid gốc** (bỏ `~ss3`, `#2`) ⇒ thiếu thì `su_kien_hoc.chuyen_de` của dòng (ca thi / lên bảng có sẵn) ⇒ thiếu nữa thì cầu nối mã dạng → chuyên đề (dạng của câu khác trong lô đã tra được) ⇒ vẫn thiếu: không ghép (không đoán). So khớp bỏ hoa/thường, thống nhất gạch nối.
+
+### Luật (lõi thuần `server/src/bon-ca-thi.ts`, ghép vào `server/src/bon-chi-so.ts`, BAN_BON = 4)
+- **So từng cặp (ca × đơn vị)** với luyện tập ở đúng đơn vị đó trong **35 ngày TRƯỚC giờ nộp ca** (luyện sau ca có thể là học từ lỗi — không tính). Lượt luyện tính: không mở gợi ý / lời giải, không treo máy, chỉ LẦN ĐẦU gặp câu gốc (làm lại câu đã thấy đáp án, câu song sinh sau khi xem lời giải ⇒ bỏ). Dưới 6 lượt ⇒ «đơn vị chưa luyện», không phạt.
+- **Hiệu chỉnh độ khó (Rasch):** kỳ vọng đúng câu thi i = σ(logit(p̂ luyện) − logit(độ khó TB câu luyện) + logit(q_i)); z = (kỳ vọng − đúng) / √(phương sai câu thi + sai số của p̂).
+- **Đơn vị lệch:** ≥ 3 câu thi, z ≥ 1,96, thấp hơn kỳ vọng ≥ 20 điểm %, luyện ≥ 60%. **Lệch gộp bền:** z gộp ≥ 2,33, ≥ 15 điểm %, VẪN đúng khi bỏ ca kém nhất (một ngày ốm / run không gánh nổi kết luận).
+- **Họ Đối phó `lechCa`:** 3 = ≥ 2 đơn vị lệch + ≥ 2 ca lệch + lệch gộp bền · 2 = ≥ 1 đơn vị lệch + ≥ 2 ca + bền · 1 = ≥ 2 đơn vị lệch / lệch gộp / 1 đơn vị lệch với z gộp ≥ 1,645. `lechCa` = 3 và thấp hơn kỳ vọng ≥ 25 điểm % ⇒ **tự đủ vào Đối phó** (yếu tố chính).
+- **Họ `bangChua`:** lên bảng Chưa đạt ở phần em đã luyện đúng nhiều (Kiểm tra đầu giờ luôn tính; Lên bảng khi luyện đơn vị ≥ 6 lượt và ≥ 70%, hoặc đã làm đúng chính câu ấy): 2 = ≥ 3 lần và cận dưới Wilson ≥ 0,4; 1 = ≥ 2 lần và ≥ một nửa. Chưa đạt MỘT lần ⇒ không tính.
+- **Học thật:** nhóm `ca` (≥ 6 câu ghép, ≥ 2 đơn vị khớp, 0 đơn vị lệch, z gộp ≤ 1,28) và `bang` (Đạt ≥ 2, cận dưới Wilson ≥ 0,4) — trọng số lớn nhất trong điểm (35% + 15%). Ca thi khớp VÀ đúng ≥ 60% ⇒ «đã xác nhận năng lực» (như kiểm tra ôn tập ≥ 6 điểm): «đúng nhanh câu khó», «rời app rồi đúng», «dò đáp án» hạ về nhẹ. Ca thi đúng HƠN HẲN luyện tập (z ≤ −1,96) ⇒ chọn vội mà sai là làm cho có ⇒ «chọn vội» lên mạnh. Kiểm tra ôn tập (KTCN) giữ làm yếu tố phụ.
+- **v3b — HAI TRỤC, MỖI EM MỘT NHÃN MỖI TRỤC, bỏ «Đang theo dõi»:**
+  - *Chất lượng* (có bất kỳ bằng chứng: lượt luyện / ca thi / lên bảng / kiểm tra ôn tập): Đối phó ⇔ (chắc: ≥ 2 họ, tổng ≥ ngưỡng; hoặc `lechCa` = 3 như trên) hoặc có họ «treo máy» hoặc tổng sức các họ ≥ ngưỡng; ngưỡng = 4 khi ca thi khớp luyện tập mà chỉ có họ nhẹ, không chọn vội / treo máy, còn lại 3. Không thì Học thật. Em chưa làm gì cả (không lượt, không thi, không kiểm tra) ⇒ chỉ xếp trục công sức.
+  - *Công sức:* Chăm ⇔ ≥ 70% số ngày phải làm có câu làm THẬT ≥ 75% mức, câu làm cho có (chọn vội mà sai — trừ em đọc nhanh mà câu nhanh đúng ≥ 70% — + treo máy) ≤ 10% số lượt, không dồn sát giờ chốt (< 50% số ngày). Không thì Lười, kèm lý do: bỏ ngày / làm cho có / dồn hạn.
+  - **Bỏ hai luật loại trừ chéo cũ** (Học thật ⇏ Lười, Đối phó ⇏ Chăm): chính chúng để em lửng lơ; «học thật nhưng học ít» (thi tốt, ít luyện) và «chăm làm nhưng đối phó» (biết trước đáp án, làm đủ hằng ngày) là kiểu có thật.
+
+### Đo độ chính xác (tests/danh-gia-99-mo-phong.test.ts — 25 kiểu × 70 em = 1.750 em mỗi hạt, đáp án TỪNG EM trên hai trục)
+Mô phỏng có thêm: 12 chuyên đề theo lịch dạy, năng lực riêng từng đơn vị, 0–6 ca thi / 60 ngày (mỗi ca 3–4 đơn vị × 4–8 câu, độ khó + mức độ), lên bảng / kiểm tra đầu giờ, luyện tập cũ; NHIỄU THẬT cho mọi kiểu (phong độ từng ca ±6 điểm %, quên tới 9 điểm %). Kiểu khó mới: `dp_thuoc` (biết trước đáp án — luật v2 bắt 0%), `thi_tot_it_luyen`, `ht_run` (lên bảng chưa đạt một lần), `ht_dv_moi` (ca thi có đơn vị chưa luyện), `ht_om_thi` (một ca kém hẳn); RANH GIỚI: `moi_vao`, `vang_dai`, `it_du_lieu`, `lan_lon`, `khong_lam`.
+
+| Hạt | Học thật | Đối phó | Chăm | Lười | Chưa xếp |
+|---|---|---|---|---|---|
+| 101 | 1260/1261 = 99,9% | 419/419 = 100% | 1052/1052 = 100% | 698/698 = 100% | 0 |
+| 202 | 1260/1261 = 99,9% | 419/419 = 100% | 1050/1050 = 100% | 700/700 = 100% | 0 |
+| 303 | 1260/1260 = 100% | 420/420 = 100% | 1045/1045 = 100% | 705/705 = 100% | 0 |
+| 404–909 (thêm 6 hạt) | 99,7–100% | 99,8–100% | 100% | 100% | 0 |
+
+- Độ phủ = 100%: mọi em có nhãn công sức; mọi em có bằng chứng có nhãn chất lượng; 0 em vừa Học thật vừa Đối phó; 0 em «Đang theo dõi».
+- Nhờ ca thi / lên bảng: ~70 em / 1.750 vào Đối phó mà luật không có hai yếu tố này để lọt (toàn bộ `dp_thuoc`); ~70 em rời Học thật.
+- Sai còn lại (≤ 4 em / 1.750): em đối phó nhẹ không có ca thi lệch (thành Học thật) và em ranh giới có ba dấu hiệu hành vi nhẹ.
+
+### Đếm lại trên dữ liệu thật
+Câu đếm `scripts/do-bon-bang-0111.sql` (nhánh `claude/do-bon-bang-0111`, commit sẵn, CHƯA đẩy): `ban = 4`, số em có ca thi / lên bảng, số em vào bảng nhờ hai yếu tố (`nho`), **số em chưa được xếp (phải = 0)**. Cron `cronBonChiSo` mỗi phút ngoài 18:00–23:30, ngày 12 em / lượt, đêm (00:00–06:00) 25 em ⇒ tính lại ~272 em ≈ 23 phút ban ngày, ≈ 11 phút ban đêm (dưới 30 phút ⇒ không cần đường kích tay).

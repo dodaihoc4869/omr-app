@@ -4,12 +4,16 @@
 //     và Nhịp học (`docNgayCacEm` + `docNgayVao` + `ngayDuocTinh`: mức ngày / đã làm, ngày vào app, ngày bảo trì).
 //   · `/gv/bon-bang`: MỘT lượt đọc bảng + danh sách em ⇒ 4 bảng đã xếp + trung vị cả lớp.
 //   · `/gv/bon-bang/em`: bản tính của một em (chưa có ⇒ tính ngay rồi lưu) + hạng + «cả lớp» từng thẻ + tên bài / đầu đề của các ví dụ.
+//   · v3 (02/11): đọc thêm SONG SONG ca thi thật + lên bảng + kiểm tra đầu giờ (60 ngày), luyện tập cũ gộp theo đơn vị kiến thức, độ khó từng câu trong ca
+//     (đệm 3 giờ) ⇒ `bon-ca-thi.ts`. v3b: hai trục, mọi em đều có bảng (không còn «Đang theo dõi»).
 // Không gửi gì cho học sinh / phụ huynh; không đụng bảng nào khác.
 import type { Env } from './kieu'
 import { docDanhSachEm, docNgayCacEm, type EmGoc } from './bai-hang-ngay'
 import { docNgayVao, ngayDuocTinh } from './nhip-hoc'
-import { cuaSoTinh, tinhLoEm } from './danh-gia-hoc-that-d1'
+import { cuaSoTinh, sqlChuyenDeKho, sqlQidGoc, SQL_LUOT_LAM, tinhLoEm } from './danh-gia-hoc-that-d1'
 import { BAN_BON, tinhBon, trungVi, vaoBang, type KetQuaBon, type SoLieuBon, type TheTho } from './bon-chi-so'
+import { SO_NGAY_CA, type CauCaThi, type LuotBang, type LuyenCuDv } from './bon-ca-thi'
+import { congNgay7 } from './goi-bai-7-loi'
 import { THU_TU_BANG, type DiemBon, type DongBang, type LoiBon, type MaBang, type TheBangChung, type TraLoiBangChung, type TraLoiBonBang } from '../../src/lib/bon-bang-kieu'
 
 type Row = Record<string, unknown>
@@ -32,12 +36,45 @@ export async function damBaoBangBon(env: Env): Promise<void> {
 /** Cho test: quên cờ đã tạo bảng (D1 giả mới). */
 export function xoaDemBon(): void { daTaoBang = false }
 
-/** Tính MỘT lô em (cùng cửa sổ 14 ngày trọn tới hôm qua). Không ghi. */
+// ───── v3 (02/11): CA THI THẬT + LÊN BẢNG + luyện tập cũ theo đơn vị kiến thức — đọc SONG SONG với các đường cũ (không thêm vòng chờ nối tiếp).
+/** Câu ca thi + lên bảng + kiểm tra đầu giờ của lô em trong 60 ngày (sổ `su_kien_hoc`, đi chỉ mục (sbd, ngay_vn)). Ca loại «bài tập» không tính là thi;
+ *  dòng còn CHE (ca chưa công bố) không đọc. Câu thi bỏ trống (ket_qua NULL) = sai. */
+const SQL_CA_BANG = `SELECT s.sbd, s.qid, s.nguon, s.ma_nguon, s.ket_qua, s.luc, s.ngay_vn, s.muc_do, s.chuyen_de AS cd_dong, s.ma_dang AS dg, ${sqlChuyenDeKho('s')} AS cd_kho
+  FROM su_kien_hoc s WHERE s.sbd IN (SELECT value FROM json_each(?1)) AND s.ngay_vn BETWEEN ?2 AND ?3 AND s.nguon IN ('thi', 'len_bang', 'dau_gio')
+    AND (s.ket_qua IS NOT NULL OR s.nguon = 'thi') AND COALESCE(s.visibility, '') <> 'embargoed' AND COALESCE(s.purpose, '') NOT IN ('xem_loi_giai', 'luot', 'chan_doan', 'chua_buoc')
+    AND (s.nguon <> 'thi' OR NOT EXISTS (SELECT 1 FROM ca c WHERE c.ma_ca = s.ma_nguon AND c.loai = 'baitap'))`
+/** Luyện tập CŨ hơn cửa sổ 14 ngày (tới đầu cửa sổ ca thi), gộp theo (em, ngày, chuyên đề, dạng): lượt thật, không hỗ trợ, LẦN ĐẦU gặp câu gốc (không song
+ *  sinh `~ss`/`~bt`/`~yd`, không lượt lặp) — cùng luật lượt luyện của `bon-ca-thi.ts`. */
+const SQL_LUYEN_CU = `SELECT sbd, ngay, cd, dg, COUNT(*) AS n, SUM(kq = 1) AS d FROM (
+    SELECT s.sbd, s.ngay_vn AS ngay, s.ket_qua AS kq, s.ma_dang AS dg, COALESCE(${sqlChuyenDeKho('s')}, NULLIF(TRIM(s.chuyen_de), '')) AS cd,
+      ROW_NUMBER() OVER (PARTITION BY s.sbd, ${sqlQidGoc('s')} ORDER BY s.luc) AS rn
+    FROM su_kien_hoc s WHERE s.sbd IN (SELECT value FROM json_each(?1)) AND s.ngay_vn BETWEEN ?2 AND ?3 AND s.nguon NOT IN ('thi', 'len_bang', 'dau_gio') AND instr(s.qid, '~') = 0
+      AND ${SQL_LUOT_LAM} AND COALESCE(s.assistance, '') <> 'assisted')
+  WHERE rn = 1 GROUP BY sbd, ngay, cd, dg`
+/** Tỉ lệ đúng CẢ LỚP từng câu trong từng ca của 60 ngày (≥ 5 em) — hiệu chỉnh độ khó. Ca lấy từ bảng lượt thi (nhỏ) theo giờ vào. */
+const SQL_DO_KHO_CA = `SELECT ma_nguon AS ma, qid, COUNT(*) AS n, SUM(COALESCE(ket_qua, 0) = 1) AS d FROM su_kien_hoc
+  WHERE nguon = 'thi' AND ma_nguon IN (SELECT DISTINCT ma_ca FROM luot WHERE vao_luc >= ?1) GROUP BY ma_nguon, qid HAVING COUNT(*) >= 5`
+/** Đệm độ khó ca theo cửa sổ (đổi chậm: chỉ khi có ca mới) — cron mỗi phút không đọc lại cả khối câu thi mỗi lô. */
+let demDoKho: { db: unknown; khoa: string; het: number; p: Map<string, number> } | null = null
+async function docDoKhoCa(env: Env, tuIso: string, nowMs: number): Promise<Map<string, number>> {
+  if (demDoKho && demDoKho.db === env.DB && demDoKho.khoa === tuIso && demDoKho.het > nowMs) return demDoKho.p
+  const r = await hoi(env, SQL_DO_KHO_CA, tuIso).catch(() => [] as Row[])
+  const p = new Map(r.map((x) => [`${str(x.ma)}|${str(x.qid)}`, Number(x.d) / Math.max(1, Number(x.n))]))
+  demDoKho = { db: env.DB, khoa: tuIso, het: nowMs + 3 * 3_600_000, p }
+  return p
+}
+const cdThat = (x: unknown): string => { const s = str(x); return s === 'Hoá học' || s === 'Hóa học' ? '' : s }
+
+/** Tính MỘT lô em (cùng cửa sổ 14 ngày trọn tới hôm qua; ca thi + lên bảng 60 ngày). Không ghi. */
 export async function tinhLoBon(env: Env, em: readonly EmGoc[], nowMs: number): Promise<{ sbd: string; kq: KetQuaBon }[]> {
   if (!em.length) return []
   const w = cuaSoTinh(nowMs)
   const sbds = em.map((e) => e.sbd)
-  const [dg, ngayEm, vao, cuoi, rHoi] = await Promise.all([
+  // 60 ngày trọn tới hôm qua; luyện tập cũ = phần TRƯỚC cửa sổ 14 ngày (phần trong 14 ngày đã có từng lượt từ bộ Học thật).
+  const tuCa = congNgay7(w.cuoi, -(SO_NGAY_CA - 1)), truocTu = congNgay7(w.tu, -1)
+  const tuCaIso = new Date(Date.parse(tuCa + 'T00:00:00Z') - 7 * 3600_000).toISOString()
+  const ds = JSON.stringify(sbds)
+  const [dg, ngayEm, vao, cuoi, rHoi, rCa, rCu, doKho] = await Promise.all([
     tinhLoEm(env, sbds, nowMs, { giuDauVao: true }).catch(() => null),
     docNgayCacEm(env, em, w.tu, w.cuoi, w.homNay, []),
     docNgayVao(env, em, w.tu),
@@ -47,13 +84,35 @@ export async function tinhLoBon(env: Env, em: readonly EmGoc[], nowMs: number): 
         SELECT sbd, COUNT(*) AS n FROM loi_giai_hoi WHERE sbd IN (SELECT value FROM json_each(?1)) AND substr(luc, 1, 10) BETWEEN ?2 AND ?3 GROUP BY sbd
         UNION ALL SELECT sbd, COUNT(*) AS n FROM hoi_tro_ly WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay_vn BETWEEN ?2 AND ?3 GROUP BY sbd) GROUP BY sbd`,
       JSON.stringify(sbds), w.tu, w.cuoi).catch(() => [] as Row[]),
+    hoi(env, SQL_CA_BANG, ds, tuCa, w.cuoi).catch(() => [] as Row[]),
+    truocTu >= tuCa ? hoi(env, SQL_LUYEN_CU, ds, tuCa, truocTu).catch(() => [] as Row[]) : Promise.resolve([] as Row[]),
+    docDoKhoCa(env, tuCaIso, nowMs),
   ])
   const lanCuoi = new Map(cuoi.map((x) => [str(x.sbd), str(x.n)]))
   const soHoi = new Map(rHoi.map((x) => [str(x.sbd), Number(x.n) || 0]))
+  // Cầu nối DẠNG → CHUYÊN ĐỀ (dòng có cả hai trong lô): lượt chặng học ghi mã dạng mà câu chưa có trong chỉ mục kho vẫn ghép được đơn vị.
+  const demCau = new Map<string, Map<string, number>>()
+  const noi = (dgx: unknown, cd: unknown) => { const a = str(dgx), b = cdThat(cd); if (!a || !b) return; const m = demCau.get(a) ?? new Map<string, number>(); m.set(b, (m.get(b) ?? 0) + 1); demCau.set(a, m) }
+  for (const x of dg ?? []) for (const l of x.dauVao?.luot ?? []) noi(l.dg, l.dv)
+  for (const x of rCu) noi(x.dg, x.cd)
+  for (const x of rCa) noi(x.dg, str(x.cd_kho) || x.cd_dong)
+  const cauNoi = new Map([...demCau].map(([a, m]) => [a, [...m].sort((p, q) => q[1] - p[1])[0]![0]]))
+  const dvCua = (cdKho: unknown, cdDong: unknown, dgx: unknown): string | null => str(cdKho) || cdThat(cdDong) || cauNoi.get(str(dgx)) || null
+  const caTheo = new Map<string, CauCaThi[]>(), bangTheo = new Map<string, LuotBang[]>(), cuTheo = new Map<string, LuyenCuDv[]>()
+  const them = <T>(m: Map<string, T[]>, k: string, x: T) => { const a = m.get(k); if (a) a.push(x); else m.set(k, [x]) }
+  for (const x of rCa) {
+    const sbd = str(x.sbd), dv = dvCua(x.cd_kho, x.cd_dong, x.dg), nguon = str(x.nguon)
+    const chung = { qid: str(x.qid), ngay: str(x.ngay_vn), luc: str(x.luc), dv }
+    if (nguon === 'thi') them(caTheo, sbd, { ...chung, ma: str(x.ma_nguon), mucDo: str(x.muc_do), dung: Number(x.ket_qua) === 1, pLop: doKho.get(`${str(x.ma_nguon)}|${str(x.qid)}`) ?? null })
+    else them(bangTheo, sbd, { ...chung, dat: Number(x.ket_qua) === 1, loai: nguon === 'dau_gio' ? 'dau_gio' : 'len_bang' })
+  }
+  for (const x of rCu) { const dv = dvCua(null, x.cd, x.dg); if (dv) them(cuTheo, str(x.sbd), { ngay: str(x.ngay), dv, n: Number(x.n) || 0, d: Number(x.d) || 0 }) }
   return em.map((e) => {
     const d = dg?.find((x) => x.sbd === e.sbd)
     const ngay = ngayDuocTinh(ngayEm.get(e.sbd) ?? [], vao.get(e.sbd) ?? w.tu).filter((n) => n.ngay <= w.cuoi)
-    return { sbd: e.sbd, kq: tinhBon({ dg: d && d.dauVao ? { kq: d.kq, dauVao: d.dauVao } : null, ngay, lanCuoiHoc: lanCuoi.get(e.sbd) ?? '', den: w.cuoi, hoi: soHoi.get(e.sbd) ?? 0 }) }
+    const dauVao = d?.dauVao ? { ...d.dauVao, luot: d.dauVao.luot.map((l) => (l.dv || !l.dg || !cauNoi.has(l.dg) ? l : { ...l, dv: cauNoi.get(l.dg)! })) } : null
+    return { sbd: e.sbd, kq: tinhBon({ dg: d && dauVao ? { kq: d.kq, dauVao } : null, ngay, lanCuoiHoc: lanCuoi.get(e.sbd) ?? '', den: w.cuoi, hoi: soHoi.get(e.sbd) ?? 0,
+      caThi: caTheo.get(e.sbd) ?? [], lenBang: bangTheo.get(e.sbd) ?? [], luyenCu: cuTheo.get(e.sbd) ?? [] }) }
   })
 }
 
@@ -99,14 +158,15 @@ function xepBang(rows: readonly Row[], emTheo: ReadonlyMap<string, EmGoc>, b: Ma
     .map((r) => ({ r, d: diemCua(r), e: emTheo.get(str(r.sbd)), vao: json<Partial<Record<MaBang, boolean>> | null>(r.vao, null) }))
     // v2: quyết định «chắc mới xếp» lưu sẵn trong số đo; bản cũ (chưa tính lại) dùng ngưỡng điểm như trước.
     .filter((x) => x.e && (x.vao ? x.vao[b] === true : vaoBang(x.d, b)))
-    .map((x) => ({ sbd: x.e!.sbd, hoTen: x.e!.hoTen, lop: x.e!.lop, khoi: x.e!.khoi, diem: x.d[b] as number, bc: json<Record<string, string>>(x.r.bc_json, {})[b] ?? '' }))
+    // v3b: em được xếp mà điểm trục ấy chưa có (bản cũ) ⇒ 0 để xếp hạng không vỡ.
+    .map((x) => ({ sbd: x.e!.sbd, hoTen: x.e!.hoTen, lop: x.e!.lop, khoi: x.e!.khoi, diem: x.d[b] ?? 0, bc: json<Record<string, string>>(x.r.bc_json, {})[b] ?? '' }))
     .sort((a, c) => c.diem - a.diem || a.hoTen.localeCompare(c.hoTen, 'vi'))
 }
 
 export async function gvBonBang(env: Env, _b: Row, nowMs = Date.now()): Promise<TraLoiBonBang | LoiBon> {
   await damBaoBangBon(env)
   const w = cuaSoTinh(nowMs)
-  const [em, rows] = await Promise.all([docDanhSachEm(env, []), hoi(env, "SELECT sbd, ngay, tinh_luc, ht, dp, ch, lu, bc_json, CASE WHEN json_valid(so_lieu_json) THEN json_extract(so_lieu_json, '$.vao') END AS vao, CASE WHEN json_valid(so_lieu_json) THEN json_extract(so_lieu_json, '$.theoDoi') END AS theo_doi FROM bon_chi_so_em")])
+  const [em, rows] = await Promise.all([docDanhSachEm(env, []), hoi(env, "SELECT sbd, ngay, tinh_luc, ht, dp, ch, lu, bc_json, CASE WHEN json_valid(so_lieu_json) THEN json_extract(so_lieu_json, '$.vao') END AS vao FROM bon_chi_so_em")])
   if (!em) return { ok: false, error: 'Không đọc được danh sách học sinh.' }
   const emTheo = new Map(em.map((e) => [e.sbd, e]))
   const cua = rows.filter((r) => emTheo.has(str(r.sbd)))
@@ -116,10 +176,8 @@ export async function gvBonBang(env: Env, _b: Row, nowMs = Date.now()): Promise<
     tinhLuc: cua.reduce((m, r) => (str(r.tinh_luc) > m ? str(r.tinh_luc) : m), ''),
     daTinh: cua.filter((r) => str(r.ngay) === w.homNay).length, tong: em.length,
     bang, trungVi: trungViCaLop(cua),
-    // v2: em CÓ dấu hiệu nhưng CHƯA đủ chắc để xếp — không vào bảng nào (thà theo dõi thêm còn hơn xếp sai).
-    theoDoi: cua.filter((r) => str(r.theo_doi) && emTheo.has(str(r.sbd)))
-      .map((r) => { const e = emTheo.get(str(r.sbd))!; return { sbd: e.sbd, hoTen: e.hoTen, lop: e.lop, khoi: e.khoi, diem: 0, bc: str(r.theo_doi) } })
-      .sort((a, c) => a.hoTen.localeCompare(c.hoTen, 'vi')),
+    // v3b (thầy 02/11 «không còn theo dõi nữa»): mọi em đều ở bảng của mình kèm lý do ⇒ khoá giữ cho app cũ, luôn rỗng.
+    theoDoi: [],
   }
 }
 
@@ -170,7 +228,8 @@ export async function gvBonBangEm(env: Env, b: Row, nowMs = Date.now()): Promise
   const the: TheBangChung[] = theTho.map(({ viDu, ...t }) => ({
     ...t,
     ...(typeof t.so === 'number' ? { lop: lopCua(t.ma) } : {}),
-    ...(viDu ? { viDu: viDu.map(({ qid, ...v }) => ({ ...v, cau: ten.get(qid) ?? 'Câu luyện tập' })) } : {}),
+    // v3: ví dụ theo ĐƠN VỊ (ca thi khớp / lệch) mang sẵn tên chuyên đề ở `cau`, không có qid.
+    ...(viDu ? { viDu: viDu.map(({ qid, ...v }) => ({ ...v, cau: (qid && ten.get(qid)) || v.cau || 'Câu luyện tập' })) } : {}),
   }))
   return {
     ok: true,
