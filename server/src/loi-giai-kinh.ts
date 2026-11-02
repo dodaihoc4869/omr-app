@@ -15,7 +15,8 @@ import type { Env } from './kieu'
 import { cauHienTai, damBaoBangLoiGiai } from './loi-giai'
 import { kiemCong } from './so-do-cong'
 import { THAN_CHU } from './kinh-than-chu'
-import { dauVao, lopCua } from '../../src/lib/loi-giai-kiem'
+import { cauTrongGoi, dauVao, loaiCau, lopCua } from '../../src/lib/loi-giai-kiem'
+import { laCauTuLuan, laMaDeTuLuan } from '../../src/lib/cau-tu-luan'
 import { kiemBanKinh } from '../../src/lib/loi-giai-kinh/kiem'
 import { PHIEN_BAN_KINH, type BanKinh, type PhanKinh } from '../../src/lib/loi-giai-kinh/kieu'
 
@@ -34,6 +35,9 @@ export const SQL_BANG_KINH: readonly string[] = [
   `CREATE TABLE IF NOT EXISTS loi_giai_kinh_viec (bam TEXT PRIMARY KEY, qid TEXT NOT NULL, ma_de TEXT NOT NULL, bo TEXT, lop TEXT, phan TEXT,
     uu_tien INTEGER NOT NULL DEFAULT 0, trang_thai TEXT NOT NULL, ma_luot TEXT, nhan_luc TEXT, so_lan INTEGER NOT NULL DEFAULT 0, loi TEXT, tao_luc TEXT NOT NULL)`,
   'CREATE INDEX IF NOT EXISTS loi_giai_kinh_viec_cho ON loi_giai_kinh_viec(trang_thai, bo, uu_tien)',
+  // SOÁT KIẾN THỨC (thầy 03/11): mỗi bản đạt được máy soát đối chiếu bài giảng của thầy đúng dạng bài — giu / sua (đã nộp bản mới) / loi.
+  `CREATE TABLE IF NOT EXISTS loi_giai_kinh_soat (bam TEXT PRIMARY KEY, bo TEXT, trang_thai TEXT NOT NULL, ma_luot TEXT, nhan_luc TEXT, ghi TEXT, luc TEXT)`,
+  'CREATE INDEX IF NOT EXISTS loi_giai_kinh_soat_tt ON loi_giai_kinh_soat(trang_thai, ma_luot)',
 ]
 let daTaoBang: Promise<void> | null = null
 export function damBaoBangKinh(env: Env): Promise<void> {
@@ -245,4 +249,104 @@ export async function traVeKenhKinh(env: Env) {
   const r = await env.DB.prepare(`UPDATE cau_nghi_dap_an SET trang_thai = 'tra_ve', ghi_chu = substr(COALESCE(ghi_chu, '') || ' · thầy cho trở lại kênh 03/11', 1, 600)
     WHERE trang_thai = 'nghi' AND ghi_chu LIKE '%Lời giải Kính%'`).run().catch(() => null)
   return { ok: true, traVe: Number(r?.meta?.changes ?? 0) }
+}
+
+// ---------------------------------------------------------------- SOÁT KIẾN THỨC (thầy 03/11)
+// «Tôi thấy có câu xác định nhóm trong bảng tuần hoàn ko đưa kiến thức này vào. Bạn soát lại kĩ một lượt xem có phần nào mà chưa giải theo kiến thức thầy
+// dạy tương ứng thì thêm vào đủ nhé.» Máy soát nhận lô bản ĐẠT (cùng chương), đọc mục lục bài giảng của thầy, tự tra đủ mục đúng dạng bài; bản thiếu / lệch
+// ⇒ soạn lại và nộp qua `/kho/loi-giai-kinh/nop` (máy chủ kiểm lại như mọi bản); rồi ghi kết quả soát ở đây. Bảng CHỈ-THÊM, không đụng dữ liệu học sinh.
+
+/** Nhận một lô bản đạt chưa soát (giữ 45 phút). `uuTien`: danh sách chương soát trước (vd BANG_TUAN_HOAN, NGUYEN_TU). */
+export async function soatViecKinh(env: Env, b: Obj) {
+  await damBaoBangKinh(env)
+  const nay = Date.now()
+  const so = Math.min(20, Math.max(1, Number(b.so ?? 10) || 10))
+  const han = new Date(nay - PHUT_GIU_VIEC_KINH * 60_000).toISOString()
+  const uuTien = mangChu(b.uuTien, 30)
+  const chiBo = mangChu(b.chiBo, 30)
+  const locBo = chiBo.length ? ` AND COALESCE(k.bo, '') IN (SELECT value FROM json_each(?))` : ''
+  const conSoat = `k.cong = 'dat' AND (s.bam IS NULL OR (s.trang_thai = 'dang' AND s.nhan_luc < ?))${locBo}`
+  const thamLoc = chiBo.length ? [JSON.stringify(chiBo)] : []
+  const dau = await env.DB.prepare(
+    `SELECT COALESCE(k.bo, '') AS bo FROM loi_giai_kinh k LEFT JOIN loi_giai_kinh_soat s ON s.bam = k.bam WHERE ${conSoat}
+     ORDER BY CASE WHEN COALESCE(k.bo, '') IN (SELECT value FROM json_each(?)) THEN 0 ELSE 1 END, k.bo LIMIT 1`,
+  ).bind(han, ...thamLoc, JSON.stringify(uuTien)).first<Obj>()
+  if (!dau) return { ok: true, het: true, viec: [] }
+  const bo = str(dau.bo), maLuot = crypto.randomUUID(), nhanLuc = new Date(nay).toISOString()
+  await env.DB.prepare(
+    `INSERT INTO loi_giai_kinh_soat (bam, bo, trang_thai, ma_luot, nhan_luc)
+     SELECT k.bam, k.bo, 'dang', ?, ? FROM loi_giai_kinh k LEFT JOIN loi_giai_kinh_soat s ON s.bam = k.bam WHERE ${conSoat} AND COALESCE(k.bo, '') = ?
+     ORDER BY k.qid_mau LIMIT ?
+     ON CONFLICT(bam) DO UPDATE SET trang_thai = 'dang', ma_luot = excluded.ma_luot, nhan_luc = excluded.nhan_luc
+       WHERE loi_giai_kinh_soat.trang_thai = 'dang' AND loi_giai_kinh_soat.nhan_luc < ?`,
+  ).bind(maLuot, nhanLuc, han, ...thamLoc, bo, so, han).run()
+  const nhan = (await env.DB.prepare(
+    'SELECT s.bam, k.qid_mau, k.ban_json FROM loi_giai_kinh_soat s JOIN loi_giai_kinh k ON k.bam = s.bam WHERE s.ma_luot = ? ORDER BY k.qid_mau',
+  ).bind(maLuot).all<Obj>()).results ?? []
+  const boNho = new Map<string, unknown>()
+  const viec: Obj[] = []
+  for (const x of nhan) {
+    const qid = str(x.qid_mau), bam = str(x.bam)
+    const ht = await cauHienTai(env, qid, undefined, boNho).catch(() => null)
+    const vao = ht && ht.bam === bam ? dauVao(ht.c, bam) : null
+    let ban: Obj | null = null
+    try { ban = JSON.parse(str(x.ban_json)) as Obj } catch { /* bỏ */ }
+    if (!ht || !vao || !ban) {
+      await env.DB.prepare("UPDATE loi_giai_kinh_soat SET trang_thai = 'bo', ghi = ?, luc = ? WHERE bam = ?").bind(!ht || ht.bam !== bam ? 'đề đã đổi' : 'không dựng được đầu vào', nhanLuc, bam).run()
+      continue
+    }
+    const { _goc: _bo, ...banHienTai } = ban
+    viec.push({ ...vao, phan: ht.c.phan, deTho: ht.c.de, ...(ht.c.bang ? { bang: ht.c.bang } : {}), kieuKho: ht.c.kieu ?? '', chuong: ht.c.chuong, banHienTai })
+  }
+  if (!viec.length && nhan.length) return soatViecKinh(env, b)
+  return { ok: true, het: false, maLuot, bo, viec }
+}
+
+/** Ghi kết quả soát một bản: giu (đã đúng bài giảng) · sua (đã nộp bản mới đạt) · loi (soạn lại chưa đạt — bản cũ vẫn hiện). */
+export async function soatNopKinh(env: Env, b: Obj) {
+  await damBaoBangKinh(env)
+  const bam = str(b.bam), ket = str(b.ket)
+  if (!bam || !['giu', 'sua', 'loi'].includes(ket)) return { ok: false, error: 'Thiếu bam / ket (giu|sua|loi)' }
+  const r = await env.DB.prepare("UPDATE loi_giai_kinh_soat SET trang_thai = ?, ghi = ?, luc = ? WHERE bam = ? AND (ma_luot = ? OR ? = '')")
+    .bind(ket, str(b.ghi).slice(0, 600), new Date().toISOString(), bam, str(b.maLuot), str(b.maLuot)).run()
+  return { ok: true, ghi: Number(r.meta?.changes ?? 0) }
+}
+
+/** Số đếm soát theo chương + vài ghi chú bản đã sửa (chỉ chữ máy soát viết, không chữ câu). */
+export async function soatTongKinh(env: Env) {
+  await damBaoBangKinh(env)
+  const [tong, theoBo, mau] = await Promise.all([
+    env.DB.prepare("SELECT (SELECT COUNT(*) FROM loi_giai_kinh WHERE cong = 'dat') AS dat, (SELECT COUNT(*) FROM loi_giai_kinh_soat) AS da_nhan").first<Obj>(),
+    env.DB.prepare('SELECT COALESCE(bo, ?) AS bo, trang_thai, COUNT(*) AS n FROM loi_giai_kinh_soat GROUP BY 1, 2 ORDER BY 1').bind('?').all<Obj>(),
+    env.DB.prepare("SELECT bo, ghi FROM loi_giai_kinh_soat WHERE trang_thai = 'sua' ORDER BY luc DESC LIMIT 12").all<Obj>(),
+  ])
+  return { ok: true, tong, theoBo: theoBo.results ?? [], suaGanDay: mau.results ?? [] }
+}
+
+/** Vì sao câu kho đang dùng CHƯA vào chỉ mục lời giải (thầy 03/11 «Kho có hơn 15000 câu…»): đọc gói đề của từng câu thiếu, phân loại lý do. Chỉ đọc. */
+export async function thieuChiTietKinh(env: Env) {
+  const r = await env.DB.prepare(`SELECT q.qid, q.ma_de FROM game_v2_question q JOIN de_kho d ON d.ma_de = q.ma_de JOIN game_v2_index g ON g.ma_de = d.ma_de AND g.source_version = d.cap_nhat_luc
+    WHERE COALESCE(d.da_xoa, 0) = 0 AND q.qid NOT IN (SELECT qid FROM loi_giai_cau) LIMIT 1200`).all<Obj>()
+  const theoDe = new Map<string, string[]>()
+  for (const x of r.results ?? []) { const m = str(x.ma_de); theoDe.set(m, [...(theoDe.get(m) ?? []), str(x.qid)]) }
+  const lyDo: Record<string, number> = {}
+  const viDu: Record<string, string[]> = {}
+  const dem = (k: string, qid: string) => { lyDo[k] = (lyDo[k] ?? 0) + 1; if ((viDu[k] ??= []).length < 6) viDu[k]!.push(qid) }
+  for (const [maDe, qids] of theoDe) {
+    if (laMaDeTuLuan(maDe)) { for (const q of qids) dem('tờ tự luận', q); continue }
+    const o = await env.DE.get(`kho/${maDe}.json`).catch(() => null)
+    const goi = o ? await new Response(o.body).json().catch(() => null) : null
+    const cau = new Map(cauTrongGoi(maDe, goi).map((c) => [c.qid, c]))
+    for (const q of qids) {
+      const c = cau.get(q)
+      if (!c) { dem(goi ? 'không đọc được câu trong gói (thiếu đề / sai khuôn)' : 'không có gói đề', q); continue }
+      if (loaiCau(c)) { dem('đủ điều kiện — chưa nạp (nạp lại tờ)', q); continue }
+      const tho = { kieu: c.kieu, phan: c.phan, de: c.de, pa: c.pa ? Object.values(c.pa) : undefined, y: c.y ? Object.values(c.y) : undefined, dap_an: c.dapAn, hinh: c.hinh.map((h) => ({ viTri: h.viTri, src: h.duLieu })) }
+      if (laCauTuLuan(tho, c.phan)) dem('câu tự luận', q)
+      else if (c.phan === 'I') dem(!c.pa || Object.keys(c.pa).length !== 4 ? 'Phần I không đủ 4 phương án' : 'Phần I thiếu / sai đáp án A–D', q)
+      else if (c.phan === 'II') dem(!c.y || Object.keys(c.y).length !== 4 ? 'Phần II không đủ 4 ý' : 'Phần II thiếu / sai đáp án Đ/S', q)
+      else dem(!c.dapAn ? 'Phần III thiếu đáp án' : 'Phần III đáp án dài quá 8 kí tự', q)
+    }
+  }
+  return { ok: true, tong: (r.results ?? []).length, lyDo, viDu }
 }

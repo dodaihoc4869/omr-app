@@ -68,6 +68,7 @@ export interface PropsChuaGonDuo {
 export default function ChuaGonDuo(p: PropsChuaGonDuo) {
   const { qid, mo, kq, tra, ban, loi, ct, tienDo } = p
   const [moGiai, setMoGiai] = useState(false)
+  const [kheLg, setKheLg] = useState<HTMLElement | null>(null) // chỗ nút «Lời giải thu gọn» trên thanh hộp Lời giải (thầy 03/11)
   const [xongChang, setXongChang] = useState(false)
   const goc = useRef<HTMLDivElement>(null)
   const nutChinh = useRef<HTMLButtonElement>(null)
@@ -284,8 +285,8 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
         </section>}
       {moGiai && ct && qKet && <div className="duo-lg" role="dialog" aria-modal="true" aria-label="Lời giải">
         <div className="duo-lg-the">
-          <header className="duo-lg-dau"><b>Lời giải</b><button type="button" className="duo-dong" aria-label="Đóng lời giải" onClick={() => { setMoGiai(false); nutChinh.current?.focus({ preventScroll: true }) }}><XIcon size={24} aria-hidden="true" /></button></header>
-          <Suspense fallback={<LoiGiaiCau q={qKet} solution={ct.loiGiai} dapAn={ct.dapAn} />}><LoiGiaiKinhHs qid={qid} phan={qKet.phan} choices={qKet.choices} ideas={qKet.ideas} dapAn={ct.dapAn} em={tra || undefined} duPhong={<LoiGiaiCau q={qKet} solution={ct.loiGiai} dapAn={ct.dapAn} />} /></Suspense>
+          <header className="duo-lg-dau"><b>Lời giải</b><span className="duo-lg-khe" ref={setKheLg} /><button type="button" className="duo-dong" aria-label="Đóng lời giải" onClick={() => { setMoGiai(false); nutChinh.current?.focus({ preventScroll: true }) }}><XIcon size={24} aria-hidden="true" /></button></header>
+          <Suspense fallback={<div aria-busy="true" style={{ minHeight: 160 }} />}><LoiGiaiKinhHs qid={qid} kheNut={kheLg} phan={qKet.phan} choices={qKet.choices} ideas={qKet.ideas} dapAn={ct.dapAn} em={tra || undefined} duPhong={<LoiGiaiCau q={qKet} solution={ct.loiGiai} dapAn={ct.dapAn} />} /></Suspense>
           <NutHoiThay gon chi="giai" qid={qid} nguon="tu_chua" dapAnEm={tra || undefined} />
         </div>
       </div>}

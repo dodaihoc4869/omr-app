@@ -214,3 +214,45 @@ html.may-yeu .lgk-nhip[data-bat] .lgk-hinh, html.may-yeu .lgk-on-khi i { animati
   .lgk-nhip { transform: none; } .lgk-nhip[data-bat] .lgk-hinh, .lgk-on-khi i, .lgk-vach button[data-chay] i { animation: none; }
   .lgk-vach button[data-chay] i { transform: scaleX(1); }
 }
+
+/* Thầy 03/11: lời giải cũ ẩn về nút «Lời giải thu gọn» trên đầu bản Kính + khung chờ khi mở gói (không hiện lời giải cũ trước rồi mới chuyển). */
+.lgk-boc { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.lgk-tg { border-radius: 24px; background: var(--kinh-mat); -webkit-backdrop-filter: var(--kinh-mo); backdrop-filter: var(--kinh-mo);
+  box-shadow: inset 0 1px 0 var(--kinh-vien), inset 0 0 0 1px var(--kinh-vien-2), var(--kinh-bong); overflow: hidden; }
+.lgk-tg-nut { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; padding: 8px 14px 8px 10px; border: 0; background: none; font: inherit; color: var(--tr-chu);
+  text-align: start; cursor: pointer; touch-action: manipulation; border-radius: 24px; }
+.lgk-tg-nut:focus-visible { outline: 3px solid var(--tr-hs); outline-offset: -3px; }
+.lgk-tg-oi { flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; color: var(--tr-hs-chu); background: var(--kinh-mat-dam);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--tr-vien) 70%, transparent); }
+.lgk-tg-oi svg, .lgk-tg-mui { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.lgk-tg-chu { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; line-height: 1.3; }
+.lgk-tg-chu b { font-size: 15.5px; font-weight: 800; }
+.lgk-tg-chu span { font-size: 13.5px; font-weight: 650; color: var(--tr-chu-3); }
+.lgk-tg-mui { flex: none; color: var(--tr-chu-3); transition: transform .22s ease; }
+.lgk-tg[data-mo] .lgk-tg-mui { transform: rotate(180deg); }
+.lgk-tg[data-mo] .lgk-tg-nut { box-shadow: inset 0 -1px 0 color-mix(in oklab, var(--tr-vien) 60%, transparent); border-radius: 24px 24px 0 0; }
+.lgk-tg-than { padding: 12px 14px 14px; animation: lgk-tg-hien .22s ease both; }
+@keyframes lgk-tg-hien { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.lgk-cho { display: flex; flex-direction: column; gap: 12px; }
+.lgk-cho i { display: block; height: 132px; border-radius: 26px; background: var(--kinh-mat); box-shadow: inset 0 1px 0 var(--kinh-vien), inset 0 0 0 1px var(--kinh-vien-2), var(--kinh-bong); opacity: .7; }
+.lgk-cho i + i { height: 220px; opacity: .5; }
+html.may-yeu .lgk-tg { -webkit-backdrop-filter: none; backdrop-filter: none; }
+html.may-yeu .lgk-tg-than { animation: none; }
+@media (prefers-reduced-motion: reduce) { .lgk-tg-than { animation: none; } .lgk-tg-mui { transition: none; } }
+/* viên «Lời giải thu gọn» trên thanh tiêu đề hộp Lời giải — đẩy sang phải, sát nút đóng */
+.duo-lg-khe { display: flex; align-items: center; margin-left: auto; margin-right: -6px; min-width: 0; }
+.lgk-tg-vien { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 10px 0 12px; border: 0; border-radius: 22px; font: inherit; font-size: 14px; font-weight: 800;
+  white-space: nowrap; color: var(--tr-hs-chu); background: var(--kinh-mat-dam); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--tr-vien) 70%, transparent);
+  cursor: pointer; touch-action: manipulation; transition: background-color .2s, box-shadow .2s; }
+.lgk-tg-vien > svg { width: 17px; height: 17px; flex: none; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.lgk-tg-vien[aria-expanded='true'] { background: color-mix(in oklab, var(--tr-hs) 24%, var(--kinh-mat-dam)); box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--tr-hs) 60%, transparent); }
+.lgk-tg-vien[aria-expanded='true'] .lgk-tg-mui { transform: rotate(180deg); }
+.lgk-tg-vien:focus-visible { outline: 3px solid var(--tr-hs); outline-offset: 2px; }
+.lgk-tg-vien { flex: none; position: relative; }
+.lgk-tg-vien::before { content: ''; position: absolute; inset: -2px 0; } /* đích chạm 48 px, viên nhìn 44 px cho thanh gọn */
+.duo-lg-dau:has(.lgk-tg-vien) > b { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 429px) {
+  .lgk-tg-vien > svg:first-child { display: none; }
+  .lgk-tg-vien { gap: 4px; padding: 0 8px 0 12px; font-size: 12.5px; line-height: 1.15; }
+  .lgk-tg-dai > span { display: block; }
+}

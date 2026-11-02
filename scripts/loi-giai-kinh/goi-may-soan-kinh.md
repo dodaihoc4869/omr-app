@@ -11,9 +11,22 @@ Chuẩn chất lượng = 3 bản mẫu thầy đã duyệt trong `vi-du-kinh.js
   đã qua máy kiểm số — dùng lại cho `soDo` / `buoc`, viết lại `nghia` cho dễ hiểu hơn nếu cần), `loiLanTruoc` (lý do lần trước bị trả — PHẢI sửa đúng chỗ đó).
 - `vao/<tên>.muc.json`: các MỤC KIẾN THỨC của skill lý thuyết của thầy gần câu này nhất (mỗi mục: `bai`, `ten`, `buoc` = thứ tự thầy dẫn, `meo`, `nham` = hay nhầm,
   `noi` = câu thầy nói NGUYÊN VĂN). Đây là nguồn giọng thầy duy nhất.
+- `muc-luc.txt`: MỤC LỤC TOÀN BỘ bài giảng của thầy (1 370 mục, mỗi dòng `mã · bài · tên mục`). `.muc.json` chỉ là 6 mục gần nhất theo chữ — HAY SÓT mục đúng dạng bài.
+- `lay-muc.mjs`: `node lay-muc.mjs <tên tệp câu> <mã> [mã…]` chép đủ mục vào `vao/<tên>.muc.json` và in nội dung ra. Câu thầy nói / mẹo chỉ được dùng khi mục đã nằm trong tệp đó.
 - `than-chu.json`: BẢNG THẦN CHÚ của thầy (soát tay). `chu` là chữ thần chú, `dung` là lúc dùng.
 - `vi-du-kinh.json`: 3 bản mẫu. `tu-duy-day-hoa.md`: tư duy dạy bài tính của thầy (bắt buộc cho câu tính).
 - `kiem.mjs`: bộ kiểm, ĐÚNG hàm máy chủ dùng khi nhận bản.
+
+## TRA BÀI GIẢNG CỦA THẦY — BẮT BUỘC trước khi soạn mỗi câu (thầy 03/11)
+Thầy: «có câu xác định nhóm trong bảng tuần hoàn ko đưa kiến thức này vào… phần nào chưa giải theo kiến thức thầy dạy tương ứng thì thêm vào đủ».
+1. Gọi tên DẠNG BÀI của câu (vd: xác định vị trí nguyên tố trong bảng tuần hoàn từ cấu hình electron; so sánh tính base; thuỷ phân ester trong NaOH; chuyển dịch cân bằng).
+2. Dùng Grep trên `muc-luc.txt` với ÍT NHẤT 2 cụm từ khoá khác nhau của dạng bài (chữ cũ và chữ SGK mới: este/ester, axit/acid, ancol/alcohol, nhóm/chu kì, cấu hình…).
+   Thầy giảng một dạng ở nhiều bài (bài lớp 10–12 và bản 2007 / 2008 / [2009]) — lấy CẢ các bài đó.
+3. `node lay-muc.mjs <tên tệp> <mã…>` lấy MỌI mục quy định CÁCH LÀM của dạng bài (thường 2–6 mục). Đọc `buoc` (thứ tự thầy dẫn), `meo`, `nham`, `noi`.
+4. Lời giải PHẢI đi đúng cách thầy dạy trong các mục đó: `cotLoi` nêu đúng quy tắc của thầy (vd nhóm A = tổng electron lớp ngoài cùng; nhóm B tính a + b của (n−1)dᵃnsᵇ:
+   3–7 ⇒ nhóm a + b, 8–10 ⇒ nhóm VIIIB, 11–12 ⇒ nhóm (a + b − 10)); `phim` đi ĐÚNG thứ tự `buoc`; `hayNham` lấy từ `nham`.
+5. Lời thầy nói đúng trong PHẠM VI bài giảng của nó; câu chữ trong lời giải phải đúng SGK Kết nối tri thức. Ví dụ: «electron độc thân chính là electron hoá trị» là ý của bài
+   liên kết — KHÔNG dùng để đếm số electron hoá trị; «a + b = 8, 9, 10» dùng để XẾP NHÓM VIIIB. Mâu thuẫn thì theo SGK, lời thầy chỉ dùng đúng phạm vi.
 
 ## Đầu ra: `ra/<cùng tên tệp đầu vào>.json` — một đối tượng JSON với các trường
 - `cotLoi`: `{ "chu": câu chốt kiến thức (nói trước, đúng bản chất, ≤ 220 ký tự), "congThuc"?: công thức lớn nếu câu xoay quanh một công thức, "chip": 1–3 `{ "nhan", "chu" }` ý chốt ngắn }`.
@@ -54,7 +67,7 @@ Chuẩn chất lượng = 3 bản mẫu thầy đã duyệt trong `vi-du-kinh.js
 
 ## Cách làm cả lô
 1. Đọc `vi-du-kinh.json`, `than-chu.json`, `tu-duy-day-hoa.md` một lần.
-2. Từng câu: đọc `vao/<tên>.json` + `vao/<tên>.muc.json` (+ ảnh). TỰ GIẢI TRƯỚC, đối chiếu `dapAn` kho, rồi mới viết `ra/<tên>.json` bằng công cụ Write.
-   KHÔNG viết script sinh tệp: Bash chỉ chạy được `node kiem.mjs`.
+2. Từng câu: đọc `vao/<tên>.json` + `vao/<tên>.muc.json` (+ ảnh). TRA BÀI GIẢNG (mục trên) bằng Grep `muc-luc.txt` + `node lay-muc.mjs`. TỰ GIẢI TRƯỚC theo cách thầy,
+   đối chiếu `dapAn` kho, rồi mới viết `ra/<tên>.json` bằng công cụ Write. KHÔNG viết script sinh tệp: Bash chỉ chạy được `node kiem.mjs` và `node lay-muc.mjs`.
 3. Chạy `node kiem.mjs`. Sửa mọi dòng TRƯỢT / THIẾU / LỆCH rồi chạy lại (tối đa 3 vòng mỗi tệp). Dòng "bỏ khối" nghĩa là thần chú / câu thầy nói / mẹo không khớp nguồn: chép lại đúng chữ nguồn hoặc bỏ trường.
 4. Trả lời cuối đúng 1 dòng: số câu ĐẠT / tổng, số câu `nghiDapAn`.

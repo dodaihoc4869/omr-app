@@ -594,7 +594,7 @@ function TheCauOn({
             </p>
           )}
           {/* LỜI GIẢI KÍNH (thầy 02/11): câu có bản Kính ⇒ vẽ Kính (+ Hỏi thầy bên trong), chưa có ⇒ hộp lời giải cũ. */}
-          <Suspense fallback={<LoiGiaiCauSai hoaHoc c={{ text: c.text, phan: c.phan, dapAnDung: ketQua!.dapAnDung, loiGiai: ketQua!.loiGiai } as any} qid={c.qid} nguon="on_lai" />}>
+          <Suspense fallback={<div aria-busy="true" style={{ minHeight: 160 }} />}>
             <LoiGiaiKinhHs qid={c.qid} phan={c.phan as 'I' | 'II' | 'III'} choices={c.phan === 'I' ? c.choices : undefined} ideas={c.phan === 'II' ? c.ideas || c.choices : undefined} dapAn={dungChuoi} em={dapAn || undefined}
               duPhong={<LoiGiaiCauSai hoaHoc c={{ text: c.text, phan: c.phan, dapAnDung: ketQua!.dapAnDung, loiGiai: ketQua!.loiGiai } as any} qid={c.qid} nguon="on_lai" />}>
               <NutHoiThay qid={c.qid} nguon="on_lai" gon />
