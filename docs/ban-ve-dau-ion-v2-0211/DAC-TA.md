@@ -9,6 +9,27 @@ gói tin ⇒ `PHIEN_BAN` 3 → 4 (máy cũ được báo tải lại như cơ ch
 Chỉ đổi lớp vẽ, lớp phủ và sảnh: `src/components/phong-cho/dau-ion-ve.ts`, `DauIon.tsx`, `dau-ion.css`.
 Mọi thứ đổi luật chơi đều nằm ở mục «Đề xuất — cần thầy chốt» cuối tệp. Thầy không chốt thì không làm.
 
+## BẢNG SỐ CHỐT KHI BUILD (02/11 tối, thầy «Chốt hết build đi») — nguồn sự thật duy nhất; các mục bên dưới có số khác là bản đề xuất trước, đã thay
+
+| Thứ | Số build | Ghi chú |
+|---|---|---|
+| Sân | 1040 × 520, KHÔNG chướng ngại | tháp + tường thay vật che |
+| Tháp cánh (2 / phe) | máu 20, vùng 180, 1 viên / 0,6 s, đạn 360 / s | (330, 120) · (330, 400) phe Bazơ; Axit đối xứng tâm |
+| Tháp lớn (1 / phe) | máu 30, vùng 205, 1 viên / 0,45 s | (210, 260) |
+| Tường kính | 3 mảnh × 8 máu, cung bán kính 68 quanh tinh thể, −125°…125°, liền nhau (không khe), ôm tới mép sân | tường còn nguyên ⇒ không điểm nào thấy tinh thể (test lưới bước 10) |
+| Tinh thể | máu 24 | (44, 260) / (996, 260) |
+| BẢO HỘ | tường cánh: sau khi vỡ tháp cánh cùng cánh · tường giữa: sau tháp lớn · tháp lớn: sau khi vỡ ≥ 1 tháp cánh | đạn vào khối đang bảo hộ ⇒ «chặn», báo «Phá tháp trước đã» |
+| Tầm ngắm | nguyên tử 420 · khối 150 (150 + bán kính tháp < vùng tháp ⇒ muốn bắn tháp phải đứng trong vùng tháp) | đạn bay tối đa 460 |
+| Bệ hồi sinh | (110, 140) · (140, 260) · (110, 380) — trong vùng tháp lớn, ngoài tường | |
+| Ván | 2 phút; vỡ tinh thể ⇒ thua NGAY; hết giờ ⇒ phe còn nhiều máu tinh thể hơn thắng, bằng ⇒ hoà | |
+| Lên cấp | bỏ electron; bắn trúng 3 / 5 / 7 / 9 lần lên Cấp 2…5; hạ thêm +2; phá tháp ⇒ cả phe +1 cấp; Xúc tác +1 cấp | |
+| Trung hoà | hai viên khác phe chạm nhau giữa đường ⇒ cùng mất (vòng giọt nước) | |
+| Huy hiệu | thêm Phá tinh thể · Phá tháp · Hộ vệ; bỏ Nhặt electron giỏi | |
+| Mô phỏng 60 ván 6 A.I (tests/dau-ion-v4-tinh-the-0211) | trung vị 89 s · p25 58 s · 40/60 ván vỡ tinh thể · Bazơ 21 / Axit 26 / hoà 13 | |
+| Giao thức | v4 (`PHIEN_BAN` 4): đầu ảnh +14 byte máu khối, ghế 11 byte; ảnh trung bình ~103 B (dưới trần 125 B cũ) | |
+| Hai cột phe máy tính | đã có sẵn từ v1 (`.dn-doi`) | đề xuất 3 cũ: đã đáp ứng |
+| Số pH trên kim | không còn thanh pH (thay bằng máu hai tinh thể) | đề xuất 2 cũ: không còn áp dụng |
+
 ## Ảnh duyệt
 
 Ảnh là Chromium thật, chụp bằng `chup.mjs` từ `ve.html`, theo khổ 390 / 844 / 1440, sáng / tối.

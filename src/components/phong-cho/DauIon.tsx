@@ -1,6 +1,6 @@
 // «ĐẤU NGUYÊN TỬ» — game bắn nhau của phòng chờ thi. 3 ĐẤU 3 (thầy 01/11 tối, duyệt bản vẽ docs/ban-ve-dau-ion-3v3-0111/DAC-TA.md):
 //  · Sảnh là thẻ trong phòng chờ, MỘT nút lớn «Đấu» (0 kết nối tới khi bấm). Bấm ⇒ vào ngay sân đang chạy còn ghế A.I (em thế chỗ A.I) hoặc sân mới
-//    1 em + 5 A.I; ván 60 giây nối ván liên tục. Hai phe Bazơ (xanh) / Axit (đỏ); phe em luôn ở TRÁI (ngang) hoặc DƯỚI (dọc).
+//    1 em + 5 A.I; ván 2 phút nối ván liên tục (v4 02/11: tháp · tường · tinh thể). Hai phe Bazơ (xanh) / Axit (đỏ); phe em luôn ở TRÁI (ngang) hoặc DƯỚI (dọc).
 //  · Trận TRÀN MÀN: sân chữ nhật ngang 2 : 1 vừa khít điện thoại xoay ngang; điện thoại xin toàn màn + khoá ngang khi máy cho (iOS không khoá được ⇒
 //    lời nhắc nhỏ «Xoay ngang…»). Tỉ số / đồng hồ / Máu / cấp súng là lớp phủ mỏng ở góc, không chiếm chỗ sân. Tôn trọng tai thỏ (safe-area).
 //  · Thân thiện trước giờ thi: lần đầu vào sân có gợi ý 3 giây «Kéo để chạy · súng tự bắn»; thắng thua theo PHE, hết ván KHÔNG xếp hạng ai cuối —
@@ -12,7 +12,7 @@ import { createPortal } from 'react-dom'
 import './dau-ion.css'
 import { dprToiDa, giamHieuUng } from '../../lib/may-yeu'
 import { layCauHinhMayChu } from '../../lib/may-chu-moi'
-import { CAN_E, ION_PHE, MAU_MAX, NGAN_CAP, NGUYEN_TO, PHE, TEN_NGUYEN_TO, huyHieu } from '../../lib/dau-ion/loi'
+import { CAN_E, ION_PHE, KHOI, MAU_MAX, NGAN_CAP, NGUYEN_TO, PHE, TEN_NGUYEN_TO, TT_CUA, huyHieu } from '../../lib/dau-ion/loi'
 import { PHIEN_BAN } from '../../lib/dau-ion/goi'
 import { Ve, docBang } from './dau-ion-ve'
 import { TranAI, TranMang, type BoChay, type DongBang } from './dau-ion-tran'
@@ -162,7 +162,7 @@ export default function DauIon({ maCa, veDau, batDau, onBatDau }: DauIonProps) {
     : mang === 'may-khac' ? 'Em đang mở Đấu Nguyên Tử ở máy hoặc tab khác.'
     : mang === 'day' ? 'Sân đấu đang kín. Bấm «Đấu» để chơi với A.I trong lúc chờ nhé.'
     : sanh && sanh.that ? `Đang đấu: ${sanh.that} bạn + ${Math.max(0, 6 - sanh.that)} A.I · bấm là vào ngay`
-    : 'Bấm là vào trận ngay · ván 60 giây nối liền'
+    : 'Bấm là vào trận ngay · ván 2 phút nối liền'
 
   return <section className="dn-the" aria-label="Mini-game Đấu Nguyên Tử">
     <div className="dn-dau"><div><div className="dn-mat">CHƠI MỘT CHÚT TRONG LÚC CHỜ</div><h2>Đấu Nguyên Tử</h2></div><div className="dn-thang"><span>Phe em thắng hôm nay</span><b className="so">{thang}</b></div></div>
@@ -179,7 +179,7 @@ export default function DauIon({ maCa, veDau, batDau, onBatDau }: DauIonProps) {
       <p className="dn-phu" role="status">{mang === 'noi' || (mang === 'mat' && lanMat < 5) ? <i className="dn-cham" aria-hidden="true" /> : null}{phu}</p>
       {tin && <p className="dn-phu" role="status">{tin}</p>}
     </div>
-    <p className="dn-luat">Súng <b>tự ngắm đối thủ gần nhất, tự bắn</b>. Em chỉ việc <b>kéo để chạy</b>, nấp sau dụng cụ thí nghiệm, nhặt electron để súng lên tới Cấp 5.</p>
+    <p className="dn-luat"><b>Bắn vỡ tinh thể phe bạn trước là thắng</b>, nhớ giữ tinh thể phe em. Mỗi phe 3 tháp tự bắn ai lấn vào; phá tháp cánh mới bắn được tường bên đó, vỡ tường mới tới tinh thể. Súng <b>tự ngắm, tự bắn</b> — em chỉ việc <b>kéo để chạy</b>; bắn trúng nhiều để súng lên tới Cấp 5.</p>
     <div className="dn-cai">
       <span className="dn-nhan">Ký hiệu trên nguyên tử của em</span>
       <div className="dn-chon" role="radiogroup" aria-label="Nguyên tố của em">
@@ -215,7 +215,7 @@ interface ManTranProps {
   goiY: boolean; onDaXemGoiY: () => void
   onRoi: () => void; onXong: (ti: [number, number], pheEm: number) => void; onPu?: (i: number) => void
 }
-interface Hud { mau: number; cap: number; e: number; ha: number; nt: number; phe: number; con: number; ts: [number, number] }
+interface Hud { mau: number; cap: number; e: number; ha: number; nt: number; phe: number; con: number; ts: [number, number]; km: number[] }
 interface Tin { id: number; chu: string; k: string; cap?: number; phe?: number; t: number }
 const RK = 54
 
@@ -340,7 +340,7 @@ function ManTran({ bo, huyVong, pu, matMang, goiY, onDaXemGoiY, onRoi, onXong, o
     }
 
     // ── Vòng vẽ ──
-    let raf = 0, truoc = 0, khoaHud = '', khoaXh = '', daKet = false, dem = -1, idTin = 0
+    let raf = 0, truoc = 0, khoaHud = '', khoaXh = '', daKet = false, dem = -1, idTin = 0, baoTT = -1e9
     let tins: Tin[] = []
     const doHa = { t0: 0, n: 0, xong: haCaPhien || yeu }
     const themTin = (chu: string, k: string, nay: number, them?: { cap?: number; phe?: number }) => { tins = [...tins, { id: ++idTin, chu, k, ...them, t: nay }].slice(-2); setTinDs(tins) }
@@ -364,20 +364,26 @@ function ManTran({ bo, huyVong, pu, matMang, goiY, onDaXemGoiY, onRoi, onXong, o
         ve?.them(xoaySu(s, xoay), nay, bo.emId, sc)
         if (s.t === 'ha') {
           if (s.boi === bo.emId) themTin(`Em hạ ${bo.ten(s.ai)}!${s.chuoi >= 2 ? ` · Hạ liền ${s.chuoi}` : ''}`, 'ha', nay)
-          else if (s.ai === bo.emId) themTin(`${s.boi ? bo.ten(s.boi) : 'Bạn'} hạ em · về bệ sau 1 giây, súng giữ Cấp ${s.capCu}`, 'bi', nay)
+          else if (s.ai === bo.emId) themTin(`${s.boi ? bo.ten(s.boi) : 'Tháp phe bạn'} hạ em · về bệ sau 1 giây, súng giữ Cấp ${s.capCu}`, 'bi', nay)
         } else if (s.t === 'len' && s.ai === bo.emId) themTin(`${s.xt ? 'Xúc tác! ' : ''}Lên Cấp ${s.cap} · ${NGAN_CAP[s.cap]}`, 'len', nay, { cap: s.cap })
         else if (s.t === 'nhat' && s.ai === bo.emId && s.k === 'kh') themTin('Khiên: chặn 3 viên đạn kế tiếp', '', nay)
         else if (s.t === 'thay' && s.moi !== undefined) { const ph = bo.pheCua(s.moi); themTin(s.laAI ? `A.I vào thay ${s.tenCu ?? 'bạn'} · Phe ${PHE[ph]}` : `${bo.ten(s.moi)} vào thay A.I · Phe ${PHE[ph]}`, 'thay', nay, { phe: ph }) }
         else if (s.t === 'trung' && s.ai === bo.emId && !yeu) { try { navigator.vibrate?.(10) } catch { /* không rung được */ } }
+        // v4: tinh thể phe em bị bắn (≤ 1 lần / 2,5 giây) · tháp vỡ · tinh thể vỡ
+        else if (s.t === 'kh' && !s.chan && KHOI[s.k]?.k === 'tt' && KHOI[s.k].phe === pheEm && nay - baoTT > 2500) { baoTT = nay; themTin(`Tinh thể phe em đang bị bắn! · còn ${Math.round((100 * Math.max(0, s.mau)) / KHOI[s.k].max)}%`, 'bi', nay) }
+        else if (s.t === 'vo' && KHOI[s.k] && KHOI[s.k].k !== 'tuong') themTin(KHOI[s.k].k === 'tt' ? (KHOI[s.k].phe === pheEm ? 'Tinh thể phe em đã vỡ' : 'Phe em phá vỡ tinh thể!') : KHOI[s.k].phe === pheEm ? 'Tháp phe em bị phá · phe bạn lên 1 cấp' : 'Phe em phá tháp! Cả phe lên 1 cấp', KHOI[s.k].phe === pheEm ? 'bi' : 'ha', nay)
       }
       if (ve) { if (diToi) { const [x, y] = ra(diToi.x, diToi.y, xoay); ve.diToi = { x, y } } else ve.diToi = null; ve.ve(sc, bo.emId, nay, (id) => bo.ten(id)) }
       if (tins.length && nay - tins[0].t > 2200) { tins = tins.filter((x) => nay - x.t <= 2200); setTinDs(tins) }
       const em = bo.em(), con = Math.ceil(bo.con()), ts = bo.tiSo()
-      if (em) { const k = `${em.mau}|${em.cap}|${em.e}|${em.ha}|${em.nt}|${em.phe}|${con}|${ts}`; if (k !== khoaHud) { khoaHud = k; setHud({ ...em, con, ts }) } }
+      // Khoá HUD theo SỐ HIỆN TRÊN MÀN (% hai tinh thể + số tháp còn) — không theo từng viên trúng khối (mỗi viên dựng lại HUD ⇒ đo do-muot 02/11).
+      const km = bo.km(), pt = (p: number) => Math.round((100 * km[TT_CUA[p]]) / KHOI[TT_CUA[p]].max), tc = (p: number) => (km[p * 7] > 0 ? 1 : 0) + (km[p * 7 + 1] > 0 ? 1 : 0) + (km[p * 7 + 2] > 0 ? 1 : 0)
+      if (em) { const k = `${em.mau}|${em.cap}|${em.e}|${em.ha}|${em.nt}|${em.phe}|${con}|${ts}|${pt(0)}.${pt(1)}.${tc(0)}.${tc(1)}`; if (k !== khoaHud) { khoaHud = k; setHud({ ...em, con, ts, km: [...km] }) } }
       const ds = bo.xep(), k2 = ds.map((d) => `${d.id}.${d.phe}.${d.ha}.${d.cap}`).join(',')
       if (k2 !== khoaXh) { khoaXh = k2; setXh(ds) }
       const kq = bo.ket()
-      if (kq && !daKet) { daKet = true; setKet(kq); cb.current.onXong(bo.tiSo(), pheEm) }
+      // Phe thắng theo TINH THỂ (v4): báo lên như tỉ số [1, 0] / [0, 1] / [0, 0] (hoà) để «Phe em thắng hôm nay» đếm đúng.
+      if (kq && !daKet) { daKet = true; setKet(kq); const kv = bo.ketVan(); cb.current.onXong(kv?.thang === 0 ? [1, 0] : kv?.thang === 1 ? [0, 1] : [0, 0], pheEm) }
       else if (!kq && daKet) { daKet = false; setKet(null); dem = -1 }
       if (kq) {
         const n = bo.conNghi(nay), s = Math.ceil(n)
@@ -398,11 +404,16 @@ function ManTran({ bo, huyVong, pu, matMang, goiY, onDaXemGoiY, onRoi, onXong, o
 
   const ten = (id: number) => (id === bo.emId ? 'Em' : bo.ten(id))
   const pheEm = hud?.phe ?? bo.pheCua(bo.emId), pheKia = 1 - pheEm
-  const ts = hud?.ts ?? [0, 0]
   const giay = Math.max(0, hud?.con ?? 60)
   const can = hud && hud.cap < 5 ? CAN_E[hud.cap] : 0
   const tsKet = ket ? bo.tiSo() : [0, 0]
-  const pheThang: number = tsKet[0] === tsKet[1] ? -1 : tsKet[0] > tsKet[1] ? 0 : 1
+  const kv = ket ? bo.ketVan() : null
+  const pheThang: number = kv ? (kv.thang === 0 || kv.thang === 1 ? kv.thang : -1) : -1
+  /** Máu tinh thể (0…1) của phe; tháp còn đứng của phe. */
+  const kmNay = kv?.km ?? hud?.km
+  const ttPhan = (p: number) => (kmNay ? kmNay[TT_CUA[p]] / KHOI[TT_CUA[p]].max : 1)
+  const thapCon = (p: number) => (kmNay ? [0, 1, 2].filter((j) => kmNay[p * 7 + j] > 0).length : 3)
+  const phanTram = (p: number) => Math.round(ttPhan(p) * 100)
   const hh = ket ? huyHieu(ket) : null
   const hhEm = hh?.get(bo.emId)
   /** Cột phe: em trước, rồi bạn thật, rồi A.I (KHÔNG theo điểm — không bêu ai đứng chót). */
@@ -416,10 +427,14 @@ function ManTran({ bo, huyVong, pu, matMang, goiY, onDaXemGoiY, onRoi, onXong, o
     {/* Lớp phủ mỏng ở góc: Rời sân · tỉ số + đồng hồ · ô của em. */}
     <div className="dn-tren">
       <button type="button" className="dn-nut dn-nut-roi" onClick={onRoi} aria-label="Rời sân, về phòng chờ"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>Rời sân</button>
-      <div className="dn-ti-so" role="status" aria-label={`Phe ${PHE[pheEm]} ${ts[pheEm]}, Phe ${PHE[pheKia]} ${ts[pheKia]}, còn ${gio(giay)}`}>
-        <span className={`dn-ts dn-phe-${pheEm}`}><i aria-hidden="true">{ION_PHE[pheEm]}</i>Phe {PHE[pheEm]}<b className="so">{ts[pheEm]}</b></span>
-        <span className="dn-ts-gach" aria-hidden="true">–</span>
-        <span className={`dn-ts dn-phe-${pheKia}`}><b className="so">{ts[pheKia]}</b>Phe {PHE[pheKia]}<i aria-hidden="true">{ION_PHE[pheKia]}</i></span>
+      {/* Thanh máu HAI TINH THỂ (v4, thầy 02/11 tối): giữ tinh thể phe em · bắn vỡ tinh thể phe bạn; ô nhỏ = tháp còn đứng. */}
+      <div className="dn-ti-so dn-tt-so" role="status" aria-label={`Tinh thể Phe ${PHE[pheEm]} còn ${phanTram(pheEm)}%, ${thapCon(pheEm)} tháp; tinh thể Phe ${PHE[pheKia]} còn ${phanTram(pheKia)}%, ${thapCon(pheKia)} tháp; còn ${gio(giay)}`}>
+        {[pheEm, pheKia].map((p, k) => <span key={p} className={`dn-ts dn-phe-${p}`} data-ben={k ? 'kia' : 'em'}>
+          <i aria-hidden="true">{ION_PHE[p]}</i>
+          <span className="dn-tt-thanh" aria-hidden="true"><s style={{ transform: `scaleX(${ttPhan(p)})` }} data-it={ttPhan(p) < 0.35 ? '' : undefined} /></span>
+          <b className="so">{phanTram(p)}%</b>
+          <span className="dn-thap-con" aria-hidden="true">{[0, 1, 2].map((j) => <u key={j} data-co={j < thapCon(p) ? '' : undefined} />)}</span>
+        </span>)}
         <span className="dn-ts-gio so">{gio(giay)}</span>
       </div>
     </div>
@@ -427,12 +442,12 @@ function ManTran({ bo, huyVong, pu, matMang, goiY, onDaXemGoiY, onRoi, onXong, o
       <Hat nt={hud.nt} phe={hud.phe} />
       <div className="dn-em-d1"><b>Em</b><span className="dn-mau" data-it={hud.mau <= 3 ? '' : undefined} aria-hidden="true"><i style={{ transform: `scaleX(${hud.mau / MAU_MAX})` }} /></span><span className="so">Máu {hud.mau}</span></div>
       <div className="dn-em-d2"><em className={`dn-c${hud.cap}`}>Cấp {hud.cap}</em>
-        {hud.cap >= 5 ? <span>cao nhất</span> : <span className="dn-e" aria-label={`Electron ${hud.e}/${can}`}>{Array.from({ length: can }, (_, k) => <i key={k} data-co={k < hud.e ? '' : undefined} />)}</span>}
+        {hud.cap >= 5 ? <span>cao nhất</span> : <span className="dn-e" aria-label={`Bắn trúng ${hud.e}/${can} lần nữa lên Cấp ${hud.cap + 1}`}>{Array.from({ length: can }, (_, k) => <i key={k} data-co={k < hud.e ? '' : undefined} />)}<span>trúng</span></span>}
         <span className="so dn-em-ha">Hạ {hud.ha}</span></div>
     </div>}
     <div className="dn-tin" aria-live="polite">{tinDs.map((x) => <div key={x.id} data-k={x.k} className={x.cap ? `dn-c${x.cap}` : x.phe !== undefined ? `dn-phe-${x.phe}` : undefined}>{x.chu}</div>)}</div>
     {matMang >= 0 && <p className="dn-mat-mang" role="status"><i className="dn-cham" aria-hidden="true" />Mất kết nối sân đấu — đang thử lại (lần {matMang + 1})…</p>}
-    {hienGoiY && !ket && <div className="dn-goi-y-dau" role="status"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11V5.5a1.5 1.5 0 013 0V11m0-1.5a1.5 1.5 0 013 0V11m0-.5a1.5 1.5 0 013 0V15a6 6 0 01-6 6h-1a6 6 0 01-5-2.7L4 14.5a1.5 1.5 0 012.4-1.8L9 15" /></svg><b>Kéo để chạy</b><span>súng tự ngắm, tự bắn</span></div>}
+    {hienGoiY && !ket && <div className="dn-goi-y-dau" role="status"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11V5.5a1.5 1.5 0 013 0V11m0-1.5a1.5 1.5 0 013 0V11m0-.5a1.5 1.5 0 013 0V15a6 6 0 01-6 6h-1a6 6 0 01-5-2.7L4 14.5a1.5 1.5 0 012.4-1.8L9 15" /></svg><b>Kéo để chạy</b><span>súng tự ngắm, tự bắn · bắn vỡ tinh thể phe bạn, giữ tinh thể phe em</span></div>}
     {nhacXoay && !ket && <p className="dn-nhac-xoay" role="status"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2" /><path d="M20 9a8 8 0 01-3 8.5M20 9l1.8 2.2M20 9l-2.4 1" /></svg>Xoay ngang điện thoại để chơi to hơn</p>}
     {/* Máy tính (dư chỗ dưới sân): hai cột phe — tên, cấp, số hạ; không đánh số thứ hạng. */}
     <div className="dn-doi" aria-label="Hai phe">
@@ -442,8 +457,9 @@ function ManTran({ bo, huyVong, pu, matMang, goiY, onDaXemGoiY, onRoi, onXong, o
     </div>
     {ket && <><div className="dn-mo" aria-hidden="true" />
       <div className="dn-ket" role="dialog" aria-labelledby="dn-ket-tieu-de">
-        <h2 id="dn-ket-tieu-de" className={pheThang >= 0 ? `dn-phe-${pheThang}` : undefined}>{pheThang >= 0 ? <>Phe {PHE[pheThang]} thắng <span className="so">{tsKet[pheThang]} – {tsKet[1 - pheThang]}</span></> : <>Hai phe hoà <span className="so">{tsKet[0]} – {tsKet[1]}</span></>}</h2>
-        <p className="dn-ket-em">{pheThang === pheEm ? 'Phe em thắng!' : pheThang < 0 ? 'Hoà — ván sau phân thắng bại nhé.' : 'Sát nút! Ván sau gỡ lại nhé.'}{hhEm ? <> · Em nhận <b>{hhEm.ten}</b></> : null}</p>
+        <h2 id="dn-ket-tieu-de" className={pheThang >= 0 ? `dn-phe-${pheThang}` : undefined}>{pheThang >= 0 ? (kv?.ly === 'vo' ? <>Phe {PHE[pheThang]} phá vỡ tinh thể Phe {PHE[1 - pheThang]}!</> : <>Phe {PHE[pheThang]} thắng</>) : <>Hai phe hoà</>}</h2>
+        <p className="dn-ket-em">{pheThang === pheEm ? (kv?.ly === 'vo' ? `Phe em thắng sớm${kv.con > 0 ? ` (còn ${gio(kv.con)})` : ''}!` : 'Phe em thắng — tinh thể còn nhiều máu hơn!') : pheThang < 0 ? 'Hoà — tinh thể hai phe bằng nhau.' : 'Sát nút! Ván sau gỡ lại nhé.'}{hhEm ? <> · Em nhận <b>{hhEm.ten}</b></> : null}</p>
+        <div className="dn-ket-tt">{[pheEm, pheKia].map((p) => <span key={p} className={`dn-phe-${p}`} data-vo={phanTram(p) <= 0 ? '' : undefined}><svg viewBox="-12 -15 24 30" aria-hidden="true"><path d="M0 -14L11 -6V6L0 14L-11 6V-6Z" /></svg><span>Tinh thể {PHE[p]}<b className="so">{phanTram(p) <= 0 ? 'đã vỡ' : `còn ${phanTram(p)}%`}</b></span></span>)}</div>
         <div className="dn-ket-cot">
           {[pheEm, pheKia].map((p) => <section key={p} className={`dn-cot dn-phe-${p}`} aria-label={`Phe ${PHE[p]}`}>
             <h3><i aria-hidden="true">{ION_PHE[p]}</i>Phe {PHE[p]}<b className="so">{tsKet[p]}</b></h3>

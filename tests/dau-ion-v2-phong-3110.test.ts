@@ -29,7 +29,9 @@ function phong(soPhong = 0) {
   const p = new PhongDau(() => nay, () => 0.5, soPhong)
   /** Tiến đồng hồ + chạy nhịp phòng; mọi máy trong `songs` gửi hướng đi mỗi nhịp (không thành «vắng»). */
   const chay = (giay: number, songs: KnGia[] = []) => { for (let t = 0; t < giay - 1e-9; t += BUOC) { nay += BUOC * 1000; for (const k of songs) p.nhan(k, maYDinh(0, 0, 0)); p.buoc(BUOC) } }
-  return { p, chay, tien: (ms: number) => { nay += ms } }
+  /** v4: ván có thể hết SỚM (tinh thể vỡ) ⇒ chạy tới khi em đầu tiên nhận thêm gói `t` (tối đa `giay`). */
+  const chayToi = (t: string, songs: KnGia[], giay = GIAY_VAN + GIAY_NGHI + 1) => { const truoc = songs[0].tin.filter((m) => m.t === t).length; for (let n = 0; n < giay / BUOC && songs[0].tin.filter((m) => m.t === t).length === truoc; n++) chay(BUOC, songs) }
+  return { p, chay, chayToi, tien: (ms: number) => { nay += ms } }
 }
 const vaoSan = (p: PhongDau, s: string, nt = 0, t?: string) => { const k = kn(); p.vao(k, ve(s, t), nt, false); p.nhan(k, JSON.stringify({ t: 'vao-san' })); return k }
 type Dong = [number, string, number, number, number]
@@ -38,12 +40,12 @@ const toi = (k: KnGia) => cuoi(k, 'san')!.toi as number
 const pheCua = (k: KnGia, id = toi(k)) => ghe(k).find((g) => g[0] === id)![4]
 
 describe('Ghép phe 3 đấu 3 — bấm «Đấu» là chơi, không bao giờ chờ', () => {
-  it('vào phòng: chào có giao thức 3, CHƯA vào sân (0 sân) ⇒ sảnh báo «Sân 1»', () => {
+  it('vào phòng: chào có giao thức 4 (v4), CHƯA vào sân (0 sân) ⇒ sảnh báo «Sân 1»', () => {
     const { p } = phong()
     const a = kn()
     p.vao(a, ve('11111', 'Minh Anh'), 2, false)
     expect(cuoi(a, 'chao')).toMatchObject({ v: PHIEN_BAN, toi: 1, ten: 'Minh Anh' })
-    expect(PHIEN_BAN).toBe(3)
+    expect(PHIEN_BAN).toBe(4)
     expect(cuoi(a, 'sanh')).toEqual({ t: 'sanh', so: 1, that: 0 })
     expect(p.soSan).toBe(0)
     expect(a.kem).toMatchObject({ v: PHIEN_BAN, id: 1, s: '11111' })
@@ -124,11 +126,11 @@ describe('Ghép phe 3 đấu 3 — bấm «Đấu» là chơi, không bao giờ 
   })
 
   it('ván nối ván KHÔNG cần bấm; ván mới CHIA LẠI PHE: người thật xen kẽ (lệch ≤ 1), A.I lấp đủ 3 đấu 3', () => {
-    const { p, chay } = phong()
+    const { p, chayToi } = phong()
     const ks = ['1', '2', '3', '4'].map((s) => vaoSan(p, s))
-    chay(GIAY_VAN + 0.2, ks)
+    chayToi('ket', ks)
     expect(cuoi(ks[0], 'ket')).toMatchObject({ nghi: GIAY_NGHI })
-    chay(GIAY_NGHI + 0.2, ks)
+    chayToi('van', ks)
     const van = cuoi(ks[0], 'van')!
     expect(van).toMatchObject({ con: GIAY_VAN })
     const g = van.ghe as Dong[]
@@ -248,15 +250,18 @@ describe('Phòng quyết mọi thứ: tự ngắm, bắn, cấp súng, nhịp đ
     expect(a.dongMa).toBe(MA_DONG.thayMay)
   })
 
-  it('ván 60 giây ⇒ bảng kết quả 9 cột (đủ số liệu huy hiệu) + tỉ số phe; nghỉ 6 giây rồi ván mới tự chạy', () => {
-    const { p, chay } = phong()
+  it('v4: hết ván (tinh thể vỡ hoặc hết 2 phút) ⇒ bảng kết quả 11 cột (đủ số liệu huy hiệu, thêm phá tháp / hộ vệ) + tỉ số + phe thắng + lý do + máu khối; nghỉ 6 giây rồi ván mới tự chạy', () => {
+    const { p, chay, chayToi } = phong()
     const a = vaoSan(p, '1'), b = vaoSan(p, '2')
-    chay(GIAY_VAN + 0.2, [a, b])
+    chayToi('ket', [a, b])
     const ket = cuoi(a, 'ket')!
     expect(ket.nghi).toBe(GIAY_NGHI)
     expect(ket.bang as number[][]).toHaveLength(6)
-    expect((ket.bang as number[][])[0]).toHaveLength(9)
+    expect((ket.bang as number[][])[0]).toHaveLength(11)
     expect(ket.ti).toHaveLength(2)
+    expect([0, 1, 2]).toContain(ket.thang)
+    expect(['vo', 'gio']).toContain(ket.ly)
+    expect(ket.km).toHaveLength(14)
     const soVan = a.tin.filter((m) => m.t === 'van').length
     chay(GIAY_NGHI + 0.2, [a, b])
     expect(a.tin.filter((m) => m.t === 'van')).toHaveLength(soVan + 1)
