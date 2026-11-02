@@ -1,6 +1,6 @@
 # HỢP ĐỒNG — MÀN "HÔM NAY" CỦA THẦY, BẢN 2 · máy chủ ↔ app thầy (Code 4) ↔ app học sinh + phụ huynh (Code 2)
 
-Người viết: Code 3 (máy chủ), 21/09/2026. Đề bài: `prompt-hom-nay-gv-v2.md`. Mã: `server/src/gv-hom-nay-v2.ts` (6 lệnh thầy) + `server/src/canh-bao-thay.ts` (phía em/phụ huynh). Migration chỉ-thêm: `server/migration-2109-canh-bao-thay.sql`. Chưa đẩy Worker khi Boss chưa soát.
+Người viết: Code 3 (máy chủ), 21/09/2026. Đề bài: `docs/dac-ta-cu/prompt-hom-nay-gv-v2.md`. Mã: `server/src/gv-hom-nay-v2.ts` (6 lệnh thầy) + `server/src/canh-bao-thay.ts` (phía em/phụ huynh). Migration chỉ-thêm: `server/migration-2109-canh-bao-thay.sql`. Chưa đẩy Worker khi Boss chưa soát.
 **Hình dạng dưới đây là CHỐT** (Code 4 chốt phía thầy, Code 2 chốt phía em/phụ huynh; Code 3 khớp). Trường có dấu `?` là tuỳ chọn: thiếu thì app ẩn, KHÔNG bịa.
 
 ## 0 · Nguyên tắc chung

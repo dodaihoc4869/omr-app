@@ -1,5 +1,5 @@
 // @vitest-environment node
-// BTVN "NÂNG ĐỠ" · BẢN 1.2 phía MÁY CHỦ (prompt-btvn-nang-do.md CẬP NHẬT 3; lõi thuần của Code 1: `thuSucThem`).
+// BTVN "NÂNG ĐỠ" · BẢN 1.2 phía MÁY CHỦ (docs/dac-ta-cu/prompt-btvn-nang-do.md CẬP NHẬT 3; lõi thuần của Code 1: `thuSucThem`).
 // Em yếu: lõi BẮT BUỘC chỉ gồm câu ≤ bậc đích + 1; lõi cao hơn ⇒ nhóm "THỬ SỨC THÊM · không bắt buộc": lưu `btvn_em_cau.chang = -1`, mở CÙNG chặng cuối, nộp CÙNG lượt nộp chặng cuối,
 // KHÔNG tính vào xong chặng / xong bài / ngân sách / điểm mẫu; đúng thì cộng (không vượt mẫu), sai/bỏ trống không trừ, không vào sổ (không hẹn ôn); thích nghi không đụng nhóm; bài đã chốt giữ nguyên.
 import { afterEach, describe, expect, it, vi } from 'vitest'

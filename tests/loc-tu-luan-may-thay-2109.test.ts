@@ -1,4 +1,4 @@
-// CẤM RÚT CÂU TỰ LUẬN ở MÁY THẦY (Code 1, 21/09/2026; `prompt-cam-rut-tu-luan.md`): bộ lọc màn Mở ca (`loc-tu-luan-mo-ca.ts`), kho rộng đề riêng (`de-rieng-blueprint.ts`), mã trận 2026
+// CẤM RÚT CÂU TỰ LUẬN ở MÁY THẦY (Code 1, 21/09/2026; `docs/dac-ta-cu/prompt-cam-rut-tu-luan.md`): bộ lọc màn Mở ca (`loc-tu-luan-mo-ca.ts`), kho rộng đề riêng (`de-rieng-blueprint.ts`), mã trận 2026
 // (`ma-tran-hoa-2026.ts`), bù kho (`de-rieng-nguon.ts chonCauBuKho`), giao BTVN nâng đỡ (`btvn-nang-do-thay.ts taoCauGiao`). Các chỗ rút đi qua `hopLeDeRut` (Code 2) đã lọc từ `77b40a8`.
 // Khoá: câu tự luận KHÔNG vào bộ; đề thầy tự chọn nguyên tờ (không bị cắt) giữ nguyên; Gọi lên bảng không đi qua các hàm này.
 import { describe, expect, it } from 'vitest'

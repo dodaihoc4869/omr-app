@@ -495,15 +495,17 @@ describe('chuMoLuc — chặng kế mở lúc nào (lịch theo giờ, bản 1.1
 })
 
 describe('hanChu / dongPhuChang — hạn bằng ngày giờ thật (thầy 21/09)', () => {
+  // 02/11: cập nhật theo 381ca7471 (hạn hiện theo GIỜ VIỆT NAM qua gioDayDu, không theo múi giờ máy) ⇒ mốc dựng bằng +07:00
+  const vnIso = (d: number, h: number, m: number) => `2026-09-${String(d).padStart(2, '0')}T${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00+07:00`
   it('hanChu: "23:59 · Thứ Năm 24/09/2026"; hỏng ⇒ chuỗi rỗng', () => {
-    expect(hanChu(new Date(2026, 8, 24, 23, 59).toISOString())).toBe('23:59 · Thứ Năm 24/09/2026')
-    expect(hanChu(new Date(2026, 8, 21, 0, 5).toISOString())).toBe('00:05 · Thứ Hai 21/09/2026')
-    expect(hanChu(new Date(2026, 8, 27, 20, 0).toISOString())).toBe('20:00 · Chủ nhật 27/09/2026')
+    expect(hanChu(vnIso(24, 23, 59))).toBe('23:59 · Thứ Năm 24/09/2026')
+    expect(hanChu(vnIso(21, 0, 5))).toBe('00:05 · Thứ Hai 21/09/2026')
+    expect(hanChu(vnIso(27, 20, 0))).toBe('20:00 · Chủ nhật 27/09/2026')
     for (const x of ['', '  ', 'không phải ngày', null, undefined, 5, {}]) expect(hanChu(x)).toBe('')
   })
   it('dongPhuChang: hạn chặng ≠ hạn bài ⇒ hai dòng; bằng nhau ⇒ MỘT dòng "bằng hạn nộp cả bài"; chỉ có một hạn ⇒ một dòng, không bịa', () => {
-    const c = new Date(2026, 8, 21, 23, 59).toISOString()
-    const b = new Date(2026, 8, 24, 23, 59).toISOString()
+    const c = vnIso(21, 23, 59)
+    const b = vnIso(24, 23, 59)
     expect(dongPhuChang({ chiSo: 0, tongChang: 7, hanChang: c, hanBai: b })).toEqual(['Chặng 1 trong 7 chặng', 'Hạn chặng này: 23:59 · Thứ Hai 21/09/2026', 'Hạn nộp cả bài: 23:59 · Thứ Năm 24/09/2026'])
     expect(dongPhuChang({ chiSo: 0, tongChang: 7, hanChang: b, hanBai: b })).toEqual(['Chặng 1 trong 7 chặng', 'Hạn chặng này: 23:59 · Thứ Năm 24/09/2026 · bằng hạn nộp cả bài'])
     expect(dongPhuChang({ chiSo: 0, tongChang: 7, hanChang: c })).toEqual(['Chặng 1 trong 7 chặng', 'Hạn chặng này: 23:59 · Thứ Hai 21/09/2026'])

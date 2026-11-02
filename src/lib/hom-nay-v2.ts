@@ -1,4 +1,4 @@
-/** MÀN "HÔM NAY" BẢN 2 của thầy — phần THUẦN + lớp nối máy chủ (đề bài `prompt-hom-nay-gv-v2.md`, bản vẽ `docs/ban-ve-hom-nay-v2-2109/`, chuẩn chữ `docs/CHUAN-TU-NGU-VA-GIAO-DIEN.md`).
+/** MÀN "HÔM NAY" BẢN 2 của thầy — phần THUẦN + lớp nối máy chủ (đề bài `docs/dac-ta-cu/prompt-hom-nay-gv-v2.md`, bản vẽ `docs/ban-ve-hom-nay-v2-2109/`, chuẩn chữ `docs/CHUAN-TU-NGU-VA-GIAO-DIEN.md`).
  *
  *  Nói thật: mọi con số hiện trên màn đến từ dữ liệu thật của máy chủ; chưa có lệnh ⇒ MỘT câu nói thật, KHÔNG giả số, KHÔNG giả "đã gửi". Không kết luận năng lực từ điểm. */
 import { goiLenh, type KetQuaLenh } from './goi-lenh-thay'

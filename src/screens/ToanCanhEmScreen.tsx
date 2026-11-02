@@ -1,4 +1,4 @@
-// TOÀN CẢNH MỘT EM — trang riêng của thầy (Hôm nay v2, bước 5; đề bài prompt-hom-nay-gv-v2.md, bản vẽ docs/ban-ve-hom-nay-v2-2109/3-toan-canh-mot-em-1440.jpg).
+// TOÀN CẢNH MỘT EM — trang riêng của thầy (Hôm nay v2, bước 5; đề bài docs/dac-ta-cu/prompt-hom-nay-gv-v2.md, bản vẽ docs/ban-ve-hom-nay-v2-2109/3-toan-canh-mot-em-1440.jpg).
 // Mở từ ô tra cứu / bấm tên em ở các ô của màn Hôm nay. Nguồn: lệnh thầy CHỈ ĐỌC `/gv/em-toan-canh` (Code 3) qua `lib/em-toan-canh.ts`. Thiếu trường ⇒ ẩn, KHÔNG bịa; chưa có lệnh ⇒ nói thật
 // và vẫn hiện tên em từ danh sách lớp + các nút dùng được. Chữ theo docs/CHUAN-TU-NGU-VA-GIAO-DIEN.md.
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'

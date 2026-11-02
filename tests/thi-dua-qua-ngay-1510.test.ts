@@ -131,7 +131,8 @@ describe('B5 · Thi đua: ngày đã qua dò "có học", cùng số với câu 
     const d = lop()
     const ke = (d.sql.prepare(`EXPLAIN QUERY PLAN ${SQL_SO_CAU_LOP}`).all('["L00","L01"]', '2026-10-15', MOC.iso, JSON.stringify(ngayTruocCuaChuoi('2026-10-15'))) as { detail: string }[]).map((x) => x.detail)
     const noi = ke.join('\n')
-    expect(noi).toMatch(/SEARCH s USING (COVERING )?INDEX idx_skh_em_ngay\w* \(sbd=\? AND ngay_vn=\?\)/)
+    // 02/11: SQLite 3.53 (node:sqlite của Node 22.23) in thêm chữ «EXISTS» cho truy vấn con EXISTS: «SEARCH s EXISTS USING INDEX …» — vẫn dò đúng chỉ mục
+    expect(noi).toMatch(/SEARCH s (EXISTS )?USING (COVERING )?INDEX idx_skh_em_ngay\w* \(sbd=\? AND ngay_vn=\?\)/)
     expect(noi).not.toMatch(/idx_skh_luc/)
     expect(noi).not.toMatch(/SCAN (su_kien_hoc|s)\b/)
     expect(ngayTruocCuaChuoi('2026-10-15')).toHaveLength(SO_NGAY_DOC_CHUOI - 1)

@@ -53,6 +53,7 @@ beforeEach(() => {
 })
 afterEach(() => {
   cleanup()
+  vi.useRealTimers()
   vi.unstubAllGlobals()
   nap.hom = null
   nap.cau = null
@@ -146,6 +147,9 @@ describe('HomNayCu = màn Hôm nay BẢN 2, nay là bản DỰ PHÒNG khi máy c
   })
 
   it('CÓ DỮ LIỆU: mỗi số trên thẻ truy được về một trường của lệnh; danh sách em, dạng yếu, Đoàn Hộ Tống; chữ theo CHUẨN TỪ NGỮ', async () => {
+    // 02/11: dòng ngày đầu màn đọc ĐỒNG HỒ MÁY (ngayDai(new Date()), từ b9e3d684c) ⇒ ghim đồng hồ về 21/09/2026 cho đúng mẫu, test không đỏ theo ngày chạy
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date(2026, 8, 21, 9, 0))
     nap.hom = MAU
     nap.cau = { qidToiHan: 1179, qidPhucVuDuoc: 939 }
     const { container } = render(<HomNayCu />)

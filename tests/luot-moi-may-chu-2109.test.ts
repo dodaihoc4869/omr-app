@@ -1,6 +1,6 @@
 // @vitest-environment node
 // LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
-// ĐỢT 2 "THẦN THÚ MỖI NGÀY" — MÁY CHỦ (prompt-than-thu-moi-ngay-2109.md; Điều 3, 4, 5): kho rút = phần LỚP đã học (bảng đệm lop_da_hoc), quota lượt/ngày (3 sẵn + mở thêm) ở máy chủ, trần 60 câu, chặn câu bài tập về nhà
+// ĐỢT 2 "THẦN THÚ MỖI NGÀY" — MÁY CHỦ (docs/dac-ta-cu/prompt-than-thu-moi-ngay-2109.md; Điều 3, 4, 5): kho rút = phần LỚP đã học (bảng đệm lop_da_hoc), quota lượt/ngày (3 sẵn + mở thêm) ở máy chủ, trần 60 câu, chặn câu bài tập về nhà
 // CHƯA nộp, EXP câu thử thách/Lượt trùm, `maiCho`, cờ lùi `cau_hinh.game_luot_moi = 'tat'`. SQLite thật (tests/_d1-that.ts); số viết thẳng.
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { gameV2 } from '../server/src/game-v2'

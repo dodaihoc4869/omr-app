@@ -1,7 +1,7 @@
 // Lớp gọi máy chủ của Bảng nhiệm vụ: /hs/ke-hoach-ngay + /hs/ca-dang-mo, các hook, và nối dây vào
 // StudentPortalScreen THẬT (kế hoạch máy chủ hiện lên; Vào thi đổi tertiary khi ca đang mở; lỗi → trợ lý).
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { act, cleanup, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, renderHook, screen, waitFor, within } from '@testing-library/react'
 import StudentPortalScreen from '../src/screens/StudentPortalScreen'
 import { dongGoiBanNho, tuKeHoachNgay } from '../src/lib/nhiem-vu-adapter'
 import { PETS } from '../src/game/than-thu-v2/core'
@@ -213,5 +213,7 @@ describe('cổng học tập đọc kế hoạch cũ khi cờ 2.0 tắt',()=>{
  beforeEach(()=>{localStorage.setItem('omr_student_portal_auth',JSON.stringify({sbd:'test',hoTen:'Em thử',token:'test-token'}));tra['/game-v2/hoc-tap-sanh']={body:{ok:true,cheDo2:false}}})
  // SỬA CÓ CHỦ ĐÍCH 12/10 (thầy 12/10: "gộp hai phần làm một"): <progress> ẩn của vòng tròn cũ ⇒ vạch chặng role="progressbar" của thẻ "Hôm nay của em" (aria-valuenow / aria-valuemax).
  it('tiến độ đúng nguồn máy chủ, không hiện thần thú từ kế hoạch cũ',async()=>{tra['/hs/ke-hoach-ngay']={body:KE_HOACH};render(<StudentPortalScreen/>);await waitFor(()=>expect(screen.getByRole('progressbar').getAttribute('aria-valuenow')).toBe('2'));expect(screen.getByRole('progressbar').getAttribute('aria-valuemax')).toBe('12');expect(screen.queryByRole('button',{name:/Thần thú|Chưa chọn thần thú/})).toBeNull();expect(goiTheo('/hs/ke-hoach-ngay')[0].body).toEqual({token:'test-token'})})
- it('ca mở có lối vào kiểm tra, không có ca vẫn nhập mã được từ Của em',async()=>{tra['/hs/ca-dang-mo']={body:{ok:true,coCaMo:true}};render(<StudentPortalScreen/>);expect(await screen.findByRole('button',{name:'Vào kiểm tra'})).toBeTruthy();fireEvent.click(screen.getByRole('button',{name:'Vào kiểm tra'}));expect(await screen.findByRole('dialog',{name:'Vào phòng thi'})).toBeTruthy()})
+ // 02/11: cập nhật theo eed66e0b7 (11/10, trùng tu app HS theo bản vẽ thầy duyệt) — nhãn nút là «Vào ca kiểm tra» (từ chuẩn cụm 4); ca mở thì có dải «Ca kiểm tra đang mở».
+ // và 5b6cb224f (02/11): tấm «Vào phòng thi» nạp lười ⇒ chờ mảnh nạp tới 10 s.
+ it('ca mở có lối vào kiểm tra, không có ca vẫn nhập mã được từ Của em',async()=>{tra['/hs/ca-dang-mo']={body:{ok:true,coCaMo:true}};render(<StudentPortalScreen/>);const dai=await screen.findByRole('region',{name:'Ca kiểm tra đang mở'});const nut=within(dai).getByRole('button',{name:/^Vào ca kiểm tra/});fireEvent.click(nut);expect(await screen.findByRole('dialog',{name:'Vào phòng thi'},{timeout:10_000})).toBeTruthy()},20_000)
 })

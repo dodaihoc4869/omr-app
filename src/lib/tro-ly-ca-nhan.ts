@@ -331,7 +331,7 @@ export function tongHopKeHoachTroLy(input: {
     })
   }
 
-  // B. Candidate: BTVN Thầy giao — LÔ THEO NGÀY/GIỜ (mục 3 SO-VIEC.md 19/09,
+  // B. Candidate: BTVN Thầy giao — LÔ THEO NGÀY/GIỜ (mục 3 docs/so-viec/SO-VIEC.md 19/09,
   // thay Vòng 1/Vòng 2). Lịch tính THUẦN từ giaoLuc/hanNop/soCau + tải các
   // nhiệm vụ khác (`lich-lo-btvn.ts`), không lưu gì ngoài `bt.loDaXong` (số lô
   // đã xong, máy chủ ghi qua `/btvn/xong-lo`).

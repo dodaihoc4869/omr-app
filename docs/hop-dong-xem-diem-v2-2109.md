@@ -1,6 +1,6 @@
 # Hợp đồng MÁY CHỦ cho "Xem điểm sau kiểm tra + báo cáo chi tiết" bản 2 (Code 3 → Code 2, Code 4 · 21/09/2026)
 
-Đề bài: `prompt-xem-diem-bao-cao-v2.md` (mục 2, 4 và phần "THẦY ĐÃ CHỐT"); bản vẽ: `docs/ban-ve-xem-diem-2109/`. Mọi thứ dưới đây **chỉ-thêm**, **đọc-chỉ**, **không AI**, **không đổi luật chấm / luật công bố / luật vào thi**.
+Đề bài: `docs/dac-ta-cu/prompt-xem-diem-bao-cao-v2.md` (mục 2, 4 và phần "THẦY ĐÃ CHỐT"); bản vẽ: `docs/ban-ve-xem-diem-2109/`. Mọi thứ dưới đây **chỉ-thêm**, **đọc-chỉ**, **không AI**, **không đổi luật chấm / luật công bố / luật vào thi**.
 Trường nào máy chủ không có số thật thì **VẮNG** (không số 0 giả, không bịa) — màn ẩn khối ấy.
 
 ## 0 · Luật công bố đứng đầu (đã chặn ở `536f7db`, xem `server/src/cong-bo-diem.ts`)
@@ -67,7 +67,7 @@ Một lệnh báo cáo ≤ 8 truy vấn D1 (`chi_tiet_cau` của em+ca, `luot` c
 ## 5 · Mốc và test
 Test khoá (đột biến): chưa công bố ⇒ không một trường số/đáp án nào (kể cả `JSON.stringify` không chứa dấu bí mật), ba trạng thái; ba lệnh cùng bộ dựng (HS/PH cùng dữ liệu); `bacTruoc/bacSau` khớp phát lại sổ; số câu theo dạng cộng ≤ tổng câu; `tbGiay` chỉ khi ≥ 5 em; không tự luận; vắng đúng chỗ thiếu; ≤ 8 truy vấn. Build máy chủ sau khi Code 2/4 gật đầu thân trả (sửa tên trường ở đây TRƯỚC khi tôi viết mã).
 
-## 6 · Lệnh MỚI cho phụ huynh: `/ph/tat-ca-ve-con` (thẻ "Ca kiểm tra gần nhất của con" + trang "Tất cả về con", mục D của `prompt-ph-giao-them-bai-2109.md`)
+## 6 · Lệnh MỚI cho phụ huynh: `/ph/tat-ca-ve-con` (thẻ "Ca kiểm tra gần nhất của con" + trang "Tất cả về con", mục D của `docs/dac-ta-cu/prompt-ph-giao-them-bai-2109.md`)
 Đọc-chỉ, xác thực `pass` như `/ph/ke-hoach`, **≤ 12 truy vấn** (+ 3 của `doCham` + 5 của `no` — Dồn về đích, W3b), không ghi, không AI, **KHÔNG trường nào của game** (không thần thú, EXP, khiên, chuỗi game), không xếp hạng, không so với bạn. Chung luật công bố (mục 0). Nguyên báo cáo ca gần nhất = gọi song song `/ph/bao-cao-ca {maCa: caGanNhat.maCa}` (mục 2) — lệnh này chỉ trả thẻ gọn để thẻ đầu Bảng nhiệm vụ nhẹ.
 ```jsonc
 { "ok": true, "serverNow": 0, "hoTen": "…",

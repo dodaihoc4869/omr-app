@@ -1,4 +1,4 @@
-// MỤC "BÀI TẬP VỀ NHÀ ĐÃ GIAO" — thiết kế lại theo mẫu phác thầy chốt 21/09 18:1x (đề prompt-btvn-da-giao-thiet-ke-lai-2109.md, mẫu docs/ban-ve-btvn-da-giao-2109/mau-phac.html).
+// MỤC "BÀI TẬP VỀ NHÀ ĐÃ GIAO" — thiết kế lại theo mẫu phác thầy chốt 21/09 18:1x (đề docs/dac-ta-cu/prompt-btvn-da-giao-thiet-ke-lai-2109.md, mẫu docs/ban-ve-btvn-da-giao-2109/mau-phac.html).
 // CHỈ ĐỔI PHẦN NHÌN: luật hạn nộp / nộp trễ / thu hồi / giao bài và lệnh `/btvn/sua`, `/btvn/giao` do nơi gọi giữ nguyên (callback). Màn KHÔNG tự tính nhóm em — chỉ đọc số máy chủ.
 // Tiền tố lớp CSS `btg-`. Nhớ thẻ mở / thu trong phiên bằng sessionStorage (không có ⇒ trong bộ nhớ).
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'

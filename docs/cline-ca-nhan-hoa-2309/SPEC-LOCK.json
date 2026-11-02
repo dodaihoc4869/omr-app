@@ -2,7 +2,7 @@
   "specVersion": "CNH-1.0",
   "purpose": "Phát hiện thay đổi đặc tả/danh mục vô ý; không là bảo đảm tính đúng code.",
   "files": {
-    "CLINE-BAT-DAU-CA-NHAN-HOA-2309.md": "1736597aa5d3df38148c758304b91bc90b3528a8403632c508b8da5ff0624a03",
+    "docs/dac-ta-cu/CLINE-BAT-DAU-CA-NHAN-HOA-2309.md": "1736597aa5d3df38148c758304b91bc90b3528a8403632c508b8da5ff0624a03",
     ".clinerules/omr-cnh-1.md": "58c2897cd08142326b2a6df946c2821be67c0b960b5e5e8a00e8f2ee46df8730",
     "docs/cline-ca-nhan-hoa-2309/00-HUONG-DAN.md": "218bc93f3971aa229a46b590e54f78c6a4e15d105d9631b55cfaca5424cd9a58",
     "docs/cline-ca-nhan-hoa-2309/01-QUYET-DINH-DA-CHOT.md": "6d448371718c8c56d9067a082d8585d11b713b0b3f6b3e42fd5ef5daabfaabbf",

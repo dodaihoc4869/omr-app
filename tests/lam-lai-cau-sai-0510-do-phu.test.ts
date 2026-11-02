@@ -1,5 +1,5 @@
 // @vitest-environment node
-// BÁO CÁO ĐỘ PHỦ "làm lại câu sai bằng bản khác" (tiêu chí 7, DE-XUAT-LAM-LAI-CAU-SAI-0510.md) — scripts/do-phu-lam-lai.mjs chạy CHỈ ĐỌC trên
+// BÁO CÁO ĐỘ PHỦ "làm lại câu sai bằng bản khác" (tiêu chí 7, docs/dac-ta-cu/DE-XUAT-LAM-LAI-CAU-SAI-0510.md) — scripts/do-phu-lam-lai.mjs chạy CHỈ ĐỌC trên
 // D1 test (node:sqlite, lược đồ thật). Kho thật: CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… node scripts/do-phu-lam-lai.mjs (không chạy ở đây).
 import { describe, expect, it } from 'vitest'
 import { taoD1That } from './_d1-that'

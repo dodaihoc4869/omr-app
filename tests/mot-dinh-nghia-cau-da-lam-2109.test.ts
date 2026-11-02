@@ -1,5 +1,5 @@
 // @vitest-environment node
-// BẤT BIẾN "MỘT ĐỊNH NGHĨA CÂU ĐÃ LÀM" (prompt-mot-dinh-nghia-cau-da-lam-2109.md §4): cùng một sổ học ⇒ thẻ Hôm nay = ô Thi đua = phụ huynh = ô nhiệt Bảng tin sống = Bảng tin (Σ) cho CÙNG một em.
+// BẤT BIẾN "MỘT ĐỊNH NGHĨA CÂU ĐÃ LÀM" (docs/dac-ta-cu/prompt-mot-dinh-nghia-cau-da-lam-2109.md §4): cùng một sổ học ⇒ thẻ Hôm nay = ô Thi đua = phụ huynh = ô nhiệt Bảng tin sống = Bảng tin (Σ) cho CÙNG một em.
 // Một bộ dữ liệu, mỗi ca khó một dòng: câu TRƯỚC mốc, câu BỎ TRỐNG, câu LÀM LẠI 3 lần (kể cả khác nguồn / khác mã dạng), câu của HÔM QUA, hai em cùng một câu. Câu BỊ CHE ở phụ huynh: phần của Code 4 (ph-tat-ca-ve-con.ts) —
 // bộ dữ liệu này KHÔNG có câu che; khi Code 4 đổi phụ huynh sang "gồm cả câu che" thì thêm ca che vào đây.
 import { beforeEach, describe, expect, it, vi } from 'vitest'

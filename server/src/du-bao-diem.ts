@@ -9,7 +9,7 @@ import { pAnd, vknCaCau, vknCuaY } from './omni-p-vkn'
 export const BUOC_DIEM = 0.05
 
 /**
- * Ba con đường tới 8,0 (bảng 3.2 của NGHIEN-CUU-THAU-HIEU-VA-CHAC-8-0510.md) — xác suất đúng trung bình mỗi phần cần đạt (Phần II: mỗi Ý):
+ * Ba con đường tới 8,0 (bảng 3.2 của docs/dac-ta-cu/NGHIEN-CUU-THAU-HIEU-VA-CHAC-8-0510.md) — xác suất đúng trung bình mỗi phần cần đạt (Phần II: mỗi Ý):
  * A cân bằng (I 90 % · ý 0,90 · III 3/6) · B mạnh Phần I (I 95 % · ý 0,85 · III 4/6) · C mạnh Phần II (I 85 % · ý 0,95 · III 3/6).
  * (Hằng số của con đường, chưa có trong THAM_SO_OMNI — phiên điều phối có thể chuyển vào omni-kieu.ts.)
  */

@@ -69,5 +69,6 @@ describe('khoá nguồn — nối dây /hs và /ph, không thêm lệnh D1 khi c
     expect(ph).toMatch(/if \(chuoiBai\.so > 0\) tongQuan\.chuoiNgayHoc = chuoiBai\.so/)
     expect(kh).toMatch(/\.\.\.\(chuoiBai \? \{ chuoiNgay: chuoiBai \} : \{\}\)/)
   })
-  it('cờ duolingo_bai nằm trong nhóm cờ đọc kèm của đệm cấu hình', () => { expect(dem).toMatch(/'kiem_tra_ca_nhan_v1', 'duolingo_bai'\]/) })
+  // 02/11: cập nhật theo 1edbd20a (thêm cờ 'dap_an_tren_may' vào cuối NHOM_CO — duolingo_bai vẫn trong nhóm, không còn đứng cuối)
+  it('cờ duolingo_bai nằm trong nhóm cờ đọc kèm của đệm cấu hình', () => { expect(dem).toMatch(/const NHOM_CO: readonly string\[\] = \[[^\]]*'kiem_tra_ca_nhan_v1', 'duolingo_bai'[,\]]/) })
 })

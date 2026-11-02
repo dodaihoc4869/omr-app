@@ -145,7 +145,7 @@ export async function locPhamViChoKeHoach(
         if (nhan.has(qid)) continue
         const json = danhTinhChiMucKhop(x.json, x.qid, x.version, x.content_group)
         if (!json) continue
-        nhan.set(qid, scopeQuestion(json))
+        nhan.set(qid, scopeQuestion(json, { qid: x.qid, version: x.version, contentGroup: x.content_group }))
       }
     }
     const loai = new Set<string>()

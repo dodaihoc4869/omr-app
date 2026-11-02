@@ -1,6 +1,6 @@
 # Hợp đồng `POST /btvn/theo-doi` — bản 2 (CHỈ-THÊM) cho mục "Bài tập về nhà đã giao" thiết kế lại
 
-Bản nháp của Code 1 (màn `src/screens/PhanCongScreen.tsx` + `src/components/btvn-da-giao/`) ngày 21/09/2026, theo `prompt-btvn-da-giao-thiet-ke-lai-2109.md` §2–§3. **Code 3 (máy chủ) bổ sung mục cuối** (số truy vấn ≤ 5 term/UNION, rows_read đo trên D1 thật, ước lượng dòng đọc/ngày, kết quả gọi thử D1 thật). Đổi tên trường thì báo Code 1 trước.
+Bản nháp của Code 1 (màn `src/screens/PhanCongScreen.tsx` + `src/components/btvn-da-giao/`) ngày 21/09/2026, theo `docs/dac-ta-cu/prompt-btvn-da-giao-thiet-ke-lai-2109.md` §2–§3. **Code 3 (máy chủ) bổ sung mục cuối** (số truy vấn ≤ 5 term/UNION, rows_read đo trên D1 thật, ước lượng dòng đọc/ngày, kết quả gọi thử D1 thật). Đổi tên trường thì báo Code 1 trước.
 
 ## Nguyên tắc
 - **CHỈ THÊM khoá**; mọi khoá cũ (`ds[].maBtvn/maCa/maDe/soCau/giaoLuc/hanNop/quaHan/tong/daNop/caNhan/soLoi/hocSinh[]/chuaNop[]`) giữ nguyên từng byte — màn cũ và máy cũ vẫn chạy.

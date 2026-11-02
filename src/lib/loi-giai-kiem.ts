@@ -1,5 +1,5 @@
 // LỜI GIẢI TỪNG BƯỚC — LÕI THUẦN (phương án A, thầy chốt 29/09/2026: "chọn cách 2, chạy 4 phiên khối 12 trước").
-// Thiết kế: DE-XUAT-LOI-GIAI-A-2909.md. Một khung trình bày cố định + mỗi câu một HỒ SƠ DỮ LIỆU (JSON) do máy soạn.
+// Thiết kế: docs/dac-ta-cu/DE-XUAT-LOI-GIAI-A-2909.md. Một khung trình bày cố định + mỗi câu một HỒ SƠ DỮ LIỆU (JSON) do máy soạn.
 //
 // THUẦN: không IO, không đồng hồ, không ngẫu nhiên — máy chủ (kiểm lại lúc nộp), máy soạn của thầy và app cùng import.
 // Máy chủ Worker CẤM `eval`/`new Function` nên con số được tính lại bằng bộ đọc biểu thức tự viết (`tinhBieuThuc`).

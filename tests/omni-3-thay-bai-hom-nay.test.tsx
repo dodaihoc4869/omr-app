@@ -377,11 +377,13 @@ describe('màn: bước Bài hôm nay', () => {
     await screen.findByText('Câu rút được')
     fireEvent.click(screen.getByRole('button', { name: 'Sửa hạn nộp hoặc số lượt/ngày' }))
     fireEvent.change(screen.getByLabelText(/Số lượt câu mỗi ngày/), { target: { value: '50' } })
-    fireEvent.change(screen.getByLabelText(/Hạn nộp \(hết lúc 23:59\)/), { target: { value: '2026-10-14' } })
-    await waitFor(() => expect(lenh('xem-truoc').at(-1)).toMatchObject({ theLucNgay: 50, hanNop: '2026-10-14' }))
+    // 02/11: test hẹn giờ — màn chặn hạn đã qua (hanSua >= hôm nay theo đồng hồ THẬT) nên mốc cố định 14/10 nay bị bỏ; dùng hạn 10 ngày sau hôm nay (giờ VN)
+    const han = new Date(Date.now() + 10 * 86_400_000 + 7 * 3_600_000).toISOString().slice(0, 10)
+    fireEvent.change(screen.getByLabelText(/Hạn nộp \(hết lúc 23:59\)/), { target: { value: han } })
+    await waitFor(() => expect(lenh('xem-truoc').at(-1)).toMatchObject({ theLucNgay: 50, hanNop: han }))
     await waitFor(() => expect((screen.getByRole('button', { name: 'Giao Bài 3 cho 12A1' }) as HTMLButtonElement).disabled).toBe(false))
     fireEvent.click(screen.getByRole('button', { name: 'Giao Bài 3 cho 12A1' }))
-    await waitFor(() => expect(lenh('tick').at(-1)).toMatchObject({ theLucNgay: 50, hanNop: '2026-10-14' }))
+    await waitFor(() => expect(lenh('tick').at(-1)).toMatchObject({ theLucNgay: 50, hanNop: han }))
   })
 
   it('chưa có P (duDiem8 null) ⇒ ẩn ô "Đủ lượt để ca chốt ≥ 8", còn 5 ô; không quá tải ⇒ không cảnh báo', async () => {

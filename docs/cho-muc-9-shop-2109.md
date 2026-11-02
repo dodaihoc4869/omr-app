@@ -1,6 +1,6 @@
 # Cửa hàng phụ kiện — chuỗi chữ mục 9 còn thiếu: ĐÃ DUYỆT (21/09 đêm)
 
-Boss duyệt 11 chuỗi máy em còn thiếu; đã chép vào `DE-XUAT-SHOP-PHU-KIEN-2109.md` mục 9.3 (nhóm **[A1–A10]**) và thay ở `src/game/than-thu-v2/shop/chu-shop.ts` trong cùng commit. Mục 9 lại là nguồn duy nhất; không còn dòng `// CHỜ MỤC 9`.
+Boss duyệt 11 chuỗi máy em còn thiếu; đã chép vào `docs/dac-ta-cu/DE-XUAT-SHOP-PHU-KIEN-2109.md` mục 9.3 (nhóm **[A1–A10]**) và thay ở `src/game/than-thu-v2/shop/chu-shop.ts` trong cùng commit. Mục 9 lại là nguồn duy nhất; không còn dòng `// CHỜ MỤC 9`.
 
 | Mã | Hằng | Chữ chốt |
 |---|---|---|

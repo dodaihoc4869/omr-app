@@ -1,0 +1,12 @@
+{
+  "ghiChu": "Nền test đỏ (scripts/kiem-test-do.mjs, workflow test-do-sau-gop.yml, 02/11). CHỈ HẠ: tên test đỏ không có ở đây ⇒ cổng đỏ. Test đã xanh ⇒ chạy `--ha`. Không bao giờ thêm tay. Chốt 02/11 sau dọn 133→4 test đỏ: 4 test chon-luot chờ thầy quyết luật nới chọn lượt (15ecdef8 bỏ bậc 3–4); 3 tệp trình duyệt chỉ đỏ ở máy thiếu Chromium headless-shell đúng bản (CI có cài).",
+  "ten": [
+    "tests/bang-tin-san-chong-chu-trinh-duyet-2109.test.ts > (lỗi nạp tệp)",
+    "tests/chon-luot-2109.test.ts > MÔ PHỎNG 60 em giả × 7 ngày × 3–6 lượt: không lượt rỗng, tỉ lệ câu lặp thấp, không lặp trong ngày > kho 330 câu: mọi lượt đủ 6 câu; câu lặp trong 7 ngày < 30 % (kho giả nhỏ); không nhóm nào lặp trong cùng một ngày; câu sai hôm nay không quay lại hôm nay",
+    "tests/chon-luot-2109.test.ts > MỐC 4 — KHÔNG LƯỢT RỖNG khi kho còn câu; thang nới > kho NHỎ (7–20 câu) và em đã làm gần hết: vẫn trả đủ min(6, kho) câu, KHÔNG rỗng (thang nới: bậc + 1 → câu sai hôm nay cũng được lấy lại khi hết câu khác)",
+    "tests/chon-luot-2109.test.ts > ĐOÀN HỘ TỐNG dùng CÙNG bộ chọn với Đảo Đợt 2 (thầy 21/09 tối: \"đúng luật cá nhân hoá, nâng đỡ, chặn lặp\") > KHÔNG lượt rỗng khi kho Đoàn thu hẹp còn ít câu (7–20 câu Phần I/III): trả đủ min(6, số câu ĐỦ BẬC) — Đoàn chỉ báo \"chưa có câu vừa sức\" khi kho thật sự chỉ còn câu quá bậc",
+    "tests/chon-luot-2109.test.ts > ĐOÀN HỘ TỐNG dùng CÙNG bộ chọn với Đảo Đợt 2 (thầy 21/09 tối: \"đúng luật cá nhân hoá, nâng đỡ, chặn lặp\") > loại \"khoi_dong\": 30 em × 7 ngày × 4 chặng — mỗi chặng đủ 6 câu, KHÔNG Phần II, không nhóm nào lặp trong ngày, bậc ≤ bậc em + 1, câu chưa gặp ≥ 3 khi kho còn nhiều, chỉ Phần I",
+    "tests/o-nhap-dap-so-cac-noi-2109.test.tsx > (lỗi nạp tệp)",
+    "tests/phieu-tuong-phan-trinh-duyet.test.ts > (lỗi nạp tệp)"
+  ]
+}

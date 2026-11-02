@@ -8,14 +8,15 @@
 // SAU SỬA (một chỗ dùng chung `MetaCau.tuLuan` + `lyDoKhongPhucVu`): câu không phục vụ được (tự luận / rút khỏi kho / JSON không nạp được) bị bỏ khỏi
 // kế hoạch và tong; nếu luật ngày còn cho phép thì THAY bằng câu hợp lệ khác (cơ chế lập lại kế hoạch sẵn có); Đảo/Đoàn nói đúng lý do; lỗi tải thật ghi nhật ký máy.
 // Mỗi giả thuyết của bản chẩn đoán một test: (1) tự luận ← gốc · (2) Bi-a giữ · (3) rút kho · (3b) JSON lệch · (4) ca bảo vệ · (5) D1 lỗi khi nạp lô.
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { taoD1That } from './_d1-that'
 import { gvChienDich } from '../server/src/srs2-gv'
-import { layKeHoachHomNay, qidGoc, sanh2 } from '../server/src/srs2-d1'
+import { layKeHoachHomNay, qidGoc, sanh2, xoaDemChienDich } from '../server/src/srs2-d1'
 import { hoa2Action, startDao2 } from '../server/src/srs2-game'
 import { xoaDemCaBaoVe } from '../server/src/game-v2-bank'
-import { ghiSuKien, type SuKien } from '../server/src/su-kien-hoc'
+import { ghiSuKien, ngayVn, type SuKien } from '../server/src/su-kien-hoc'
 import type { Env } from '../server/src/kieu'
+import { gopDocD1 } from '../server/src/doc-d1-theo-luot'
 
 const NGAY = 86_400_000
 const LOI_CHUA_NAP = 'Chưa tải được câu hôm nay'
@@ -46,7 +47,7 @@ type D = ReturnType<typeof fixture>['d']
 /** Giao chiến dịch tạo 3 ngày trước, hạn `soNgayHan` ngày sau hôm nay (D = soNgayHan + 1). Rải đều mặc định BẬT (thầy 30/09), trừ khi `raiDeu: false`. */
 async function giao(env: Env, o: { theLucNgay?: number; soNgayHan?: number; raiDeu?: boolean } = {}) {
   const nay = Date.now()
-  const r = await gvChienDich(env, { action: 'tao', ten: 'Ester – Lipid', lop: '12A1', maDe: ['DE1'], hanNop: new Date(nay + (o.soNgayHan ?? 5) * NGAY).toISOString().slice(0, 10), ...(o.theLucNgay ? { theLucNgay: o.theLucNgay } : {}), ...(o.raiDeu === false ? { raiDeu: false } : {}) }, nay - 3 * NGAY)
+  const r = await gvChienDich(env, { action: 'tao', ten: 'Ester – Lipid', lop: '12A1', maDe: ['DE1'], hanNop: ngayVn(nay + (o.soNgayHan ?? 5) * NGAY), ...(o.theLucNgay ? { theLucNgay: o.theLucNgay } : {}), ...(o.raiDeu === false ? { raiDeu: false } : {}) }, nay - 3 * NGAY)
   expect(r.ok).toBe(true)
 }
 const suKien = (qid: string, msLuc: number, dung: boolean): SuKien => ({ nguon: 'game', maNguon: `phien-${qid}-${msLuc}`, sbd: 'S1', qid, lan: 1, ketQua: dung ? 1 : 0, luc: new Date(msLuc).toISOString() })
@@ -60,11 +61,17 @@ async function conLai(env: Env, soGiu: number, nay: number): Promise<{ giu: stri
   await lamXong(env, ds.filter((q) => !giu.includes(q)), nay)
   return { giu, tong: kh.tong }
 }
+/**
+ * 02/11: cập nhật theo b6026cc61 (máy chủ nhớ 60 giây kết quả SELECT của bảng dùng chung `game_v2_question`…, chỉ xoá khi lệnh ghi ĐI QUA lớp D1
+ * `gopDocD1`) — cùng cách sửa đã áp cho tests/cau-hong-giua-ngay-3009.test.ts (34d922f6d): sửa kho giữa test đi qua lớp ấy như lập lại chỉ mục thật,
+ * không ghi thẳng `d.sql`. Không đổi điều canh: câu tự luận / rút kho vẫn phải bị bỏ khỏi kế hoạch hoặc được thay.
+ */
+const suaKho = (d: D, sql: string, ...thamSo: unknown[]) => gopDocD1(d.env.DB as never).prepare(sql).bind(...thamSo).run()
 /** Sau khi lập lại chỉ mục với #107: câu mang nhãn kho `kieu: 'tu_luan'` được gắn cờ `tuLuan` — version KHÔNG đổi (versionCau bỏ cờ này). */
-const gatCoTuLuan = (d: D, qid: string) => d.sql.prepare("UPDATE game_v2_question SET json = json_set(json, '$.tuLuan', json('true')) WHERE qid = ?").run(qid)
+const gatCoTuLuan = (d: D, qid: string) => suaKho(d, "UPDATE game_v2_question SET json = json_set(json, '$.tuLuan', json('true')) WHERE qid = ?", qid)
 /** Luật mới #107: Phần III đáp án không đọc được thành MỘT số (công thức) ⇒ tự luận. Đổi cả cột version lẫn JSON như lập lại chỉ mục thật (chỉ mục CŨ: không có cờ `tuLuan`). */
 const thanhPhanIIICongThuc = (d: D, qid: string) =>
-  d.sql.prepare("UPDATE game_v2_question SET version = 'v2', json = json_set(json, '$.version', 'v2', '$.phan', 'III', '$.choices', json('[]'), '$.ideas', json('[]'), '$.correct', 'Fe3O4') WHERE qid = ?").run(qid)
+  suaKho(d, "UPDATE game_v2_question SET version = 'v2', json = json_set(json, '$.version', 'v2', '$.phan', 'III', '$.choices', json('[]'), '$.ideas', json('[]'), '$.correct', 'Fe3O4') WHERE qid = ?", qid)
 const qidsCua = (r: Record<string, unknown>) => ((r.questions as { qid: string }[]) ?? []).map((q) => q.qid)
 const ruong = (s: Record<string, unknown>) => s.ruong as { daLam: number; tong: number; moDuoc: boolean }
 
@@ -101,7 +108,16 @@ async function kyVongBoLang(env: Env, nay: number, tongCu: number) {
   expect(mo.ok).toBe(true)
 }
 
-beforeEach(() => xoaDemCaBaoVe())
+// 02/11: cùng cách sửa của tests/cau-hong-giua-ngay-3009.test.ts — hạn nộp tính theo ngày VN (`ngayVn`, trên) + ĐỒNG HỒ CỐ ĐỊNH 12:00 VN
+// (chỉ giả `Date`), nếu không chạy từ 00:00 tới 06:59 giờ VN thì hạn hụt một ngày theo UTC ⇒ quota khác.
+const GIO_CO_DINH = Date.parse('2026-10-14T05:00:00Z')
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(GIO_CO_DINH)
+  xoaDemCaBaoVe()
+  xoaDemChienDich()
+})
+afterEach(() => vi.useRealTimers())
 
 describe('(1) NGUYÊN NHÂN GỐC: câu cuối kế hoạch bị luật tự luận #107 loại ở napCau, kế hoạch đã chốt vẫn đếm', () => {
   it('còn câu mới hợp lệ: câu 49 mang cờ tuLuan ⇒ thay bằng câu khác theo quota, không báo "chưa tải được", rương mở khi làm nốt câu thay', async () => {
@@ -109,7 +125,7 @@ describe('(1) NGUYÊN NHÂN GỐC: câu cuối kế hoạch bị luật tự lu�
     await giao(env)
     const nay = Date.now()
     const { giu, tong } = await conLai(env, 1, nay)
-    gatCoTuLuan(d, giu[0]!)
+    await gatCoTuLuan(d, giu[0]!)
     await kyVongDuocThay(env, nay, tong, giu[0]!)
   })
 
@@ -119,7 +135,7 @@ describe('(1) NGUYÊN NHÂN GỐC: câu cuối kế hoạch bị luật tự lu�
     const nay = Date.now()
     const { giu, tong } = await conLai(env, 1, nay)
     expect(tong).toBe(30)
-    gatCoTuLuan(d, giu[0]!)
+    await gatCoTuLuan(d, giu[0]!)
     await kyVongBoLang(env, nay, tong)
   })
 
@@ -128,15 +144,15 @@ describe('(1) NGUYÊN NHÂN GỐC: câu cuối kế hoạch bị luật tự lu�
     await giao(env)
     const nay = Date.now()
     const { giu, tong } = await conLai(env, 1, nay)
-    thanhPhanIIICongThuc(d, giu[0]!)
+    await thanhPhanIIICongThuc(d, giu[0]!)
     await kyVongDuocThay(env, nay, tong, giu[0]!)
   })
 
   it('kế hoạch LẬP MỚI hôm nay không đếm câu tự luận vào tong (không vào dao/doan); chan-doan-em báo số câu tự luận bị bỏ', async () => {
     const { d, env } = fixture()
     await giao(env)
-    gatCoTuLuan(d, 'Q7')
-    thanhPhanIIICongThuc(d, 'Q8')
+    await gatCoTuLuan(d, 'Q7')
+    await thanhPhanIIICongThuc(d, 'Q8')
     const { kh } = await layKeHoachHomNay(env, 'S1', Date.now())
     const khoa = [...kh.dao, ...kh.doan].map(qidGoc)
     expect(khoa).not.toContain('Q7')
@@ -154,7 +170,7 @@ describe('(1) NGUYÊN NHÂN GỐC: câu cuối kế hoạch bị luật tự lu�
     const { kh: truoc } = await layKeHoachHomNay(env, 'S1', nay)
     expect(truoc.tong).toBe(40)
     const cuoi = qidGoc(truoc.conDao[truoc.conDao.length - 1]!)
-    gatCoTuLuan(d, cuoi)
+    await gatCoTuLuan(d, cuoi)
     const { kh: sau } = await layKeHoachHomNay(env, 'S1', nay)
     expect([...sau.dao, ...sau.doan].map(qidGoc)).not.toContain(cuoi)
     expect(sau.tong).toBe(40)
@@ -167,7 +183,7 @@ describe('(1) NGUYÊN NHÂN GỐC: câu cuối kế hoạch bị luật tự lu�
     const nay = Date.now()
     const { giu, tong } = await conLai(env, 1, nay)
     expect(tong).toBe(12)
-    gatCoTuLuan(d, giu[0]!)
+    await gatCoTuLuan(d, giu[0]!)
     const { kh: sau } = await layKeHoachHomNay(env, 'S1', nay)
     expect([...sau.dao, ...sau.doan].map(qidGoc)).not.toContain(giu[0])
     expect(sau.tong).toBe(12)
@@ -182,7 +198,7 @@ describe('(1) NGUYÊN NHÂN GỐC: câu cuối kế hoạch bị luật tự lu�
     await ghiSuKien(env, ['Q1'].map((q) => suKien(q, nay - NGAY, false))) // sai hôm qua ⇒ câu ôn Đoàn
     const { kh } = await layKeHoachHomNay(env, 'S1', nay)
     expect(kh.conDoan.map(qidGoc)).toEqual(['Q1'])
-    gatCoTuLuan(d, 'Q1')
+    await gatCoTuLuan(d, 'Q1')
     const doan = await startDao2(env, 'S1', nay, true) // chặng học (hoc-tap-start) phát câu ôn thay Đoàn đã gỡ
     expect(doan.lyDo).not.toBe('chua_nap_duoc')
     expect(String(doan.message ?? '')).not.toContain(LOI_CHUA_NAP)
@@ -198,7 +214,7 @@ describe('(3) LOẠI TRỪ: câu rút khỏi kho / JSON không nạp được �
     await giao(env)
     const nay = Date.now()
     const { giu, tong } = await conLai(env, 1, nay)
-    d.sql.prepare('DELETE FROM game_v2_question WHERE qid=?').run(giu[0]!)
+    await suaKho(d, 'DELETE FROM game_v2_question WHERE qid=?', giu[0]!)
     await kyVongDuocThay(env, nay, tong, giu[0]!)
   })
 
@@ -207,7 +223,7 @@ describe('(3) LOẠI TRỪ: câu rút khỏi kho / JSON không nạp được �
     await giao(env)
     const nay = Date.now()
     const { giu, tong } = await conLai(env, 1, nay)
-    d.sql.prepare("UPDATE game_v2_question SET json = '{}' WHERE qid = ?").run(giu[0]!)
+    await suaKho(d, "UPDATE game_v2_question SET json = '{}' WHERE qid = ?", giu[0]!)
     await kyVongDuocThay(env, nay, tong, giu[0]!)
   })
 
@@ -216,7 +232,7 @@ describe('(3) LOẠI TRỪ: câu rút khỏi kho / JSON không nạp được �
     await giao(env)
     const nay = Date.now()
     const { giu, tong } = await conLai(env, 1, nay)
-    d.sql.prepare("UPDATE game_v2_question SET json = '{hỏng' WHERE qid = ?").run(giu[0]!)
+    await suaKho(d, "UPDATE game_v2_question SET json = '{hỏng' WHERE qid = ?", giu[0]!)
     await kyVongDuocThay(env, nay, tong, giu[0]!)
   })
 })

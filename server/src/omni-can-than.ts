@@ -1,4 +1,4 @@
-// OMNI 3 · CHƯƠNG TRÌNH "CẨN THẬN" — đặc tả DAC-TA-BUILD-OMNI-3-0510.md mục 4.6 (thầy 05/10 "làm tất nhé, tôi ko duyệt gì cả" + 06/10 "Làm nốt đi tất cả").
+// OMNI 3 · CHƯƠNG TRÌNH "CẨN THẬN" — đặc tả docs/dac-ta-cu/DAC-TA-BUILD-OMNI-3-0510.md mục 4.6 (thầy 05/10 "làm tất nhé, tôi ko duyệt gì cả" + 06/10 "Làm nốt đi tất cả").
 // Khi Sơ ý S_em > 0,07 (đúng số em thấy ở Sảnh — đủ dữ liệu mới có) có ba việc tự động, CHỈ cho em máy chủ báo `canThan = true`:
 //   (a) câu đã vững vẫn quay lại ôn duy trì dày hơn: mốc kiểm duy trì 14/30 ngày × 0,7 (`nhanMocDuyTri`, móc ở `docHoSo2` — lúc LẬP kế hoạch ngày);
 //   (b) trước khi nộp câu Phần III hiện ô "Soát lại đơn vị và số liệu" (một chạm, KHÔNG bắt buộc) — phía máy em (Đảo 2.0, Đoàn, Làm câu ôn);

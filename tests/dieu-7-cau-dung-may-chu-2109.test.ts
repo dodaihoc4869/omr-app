@@ -72,7 +72,9 @@ describe('EXP thời gian thực (capNhatExp): đạt ngày chỉ trao khi đủ
 describe('kế hoạch ngày: `tienBo.thieuDat` (chỉ khi thiếu câu ĐÚNG, từ 22/09)', () => {
   const kh = (d: D1That) => goiWorker(worker, d.env, '/hs/ke-hoach-ngay', { sbd: 'S1' }) as Promise<{ tienBo: { toiThieuCau: number; thieuDat?: { soCauDung: number; chu: string } } }>
   it('22/09: chưa đúng câu nào ⇒ soCauDung = ceil(tối thiểu/2) kèm câu chữ có số thật; đúng đủ ⇒ trường biến mất', async () => {
-    gio('2026-09-22T10:00:00')
+    // 02/11: cập nhật theo 0e177c60b + 747fc3c60 (kế hoạch ngày CHỈ đếm sự kiện đã xảy ra, `luc ≤ bây giờ`): `lam()` ghi câu lúc 12:0x giờ VN,
+    // nên đồng hồ đặt SAU đó (trước là 10:00 ⇒ ba câu nằm «tương lai», không được đếm).
+    gio('2026-09-22T12:30:00')
     const d = dung()
     const a = await kh(d)
     expect(a.tienBo.toiThieuCau).toBe(6)

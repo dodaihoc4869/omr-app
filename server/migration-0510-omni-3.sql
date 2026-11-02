@@ -1,5 +1,5 @@
 -- OMNI 3 (05/10/2026) — migration CHỈ-THÊM. Không sửa, không xoá bảng nào đang có; KHÔNG ALTER bảng cũ.
--- Máy chủ cũng tự tạo các bảng này lần đầu dùng (CI không chạy migration). Đặc tả: DAC-TA-BUILD-OMNI-3-0510.md mục 3.
+-- Máy chủ cũng tự tạo các bảng này lần đầu dùng (CI không chạy migration). Đặc tả: docs/dac-ta-cu/DAC-TA-BUILD-OMNI-3-0510.md mục 3.
 -- Lùi: DROP TABLE các bảng dưới đây; DELETE FROM cau_hinh WHERE khoa IN ('omni','the_luc_lop','ma_tran_thi_2026','omni_tham_so');
 --
 -- Thời lượng làm câu, tự tin, nhãn tốc độ: ghi trong su_kien_hoc.raw_json ({chon, ms, tt, td}); lướt: purpose = 'luot', ket_qua = NULL.

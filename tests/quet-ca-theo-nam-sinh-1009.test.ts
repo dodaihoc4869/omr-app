@@ -43,14 +43,22 @@ describe('3. "Ba ca" phải là ba ca CỦA CHÍNH EM, không phải ba ca bốc
     { maCa: 'ca6', daLamCua: { A: ['q6'] }, saiCua: { A: ['q6'] } },
   ]
 
-  it('gom đúng 3 ca đầu tiên em CÓ NỘP, bỏ qua ca em vắng', () => {
+  // 02/11: cập nhật theo 08d443b6a (02/10, thầy «làm nốt»): "3 ca ngẫu nhiên" GỘP vào "Ca gần nhất" — cấu hình cất 'ba_ca'
+  // đọc thành 'gan_nhat'. Ý canh giữ: chỉ lấy ca CỦA CHÍNH EM (ca em có nộp), bỏ qua ca em vắng, không gom bừa ca khác.
+  it('cấu hình cũ "ba_ca" đọc thành "gan_nhat": lấy đúng ca gần nhất em CÓ NỘP, bỏ qua ca em vắng', () => {
+    expect(ch.PHAM_VI_HOI_LAI).toBe('gan_nhat')
     const r = chonCauLapChoEm('A', dsCa, 40, {}, ch)
-    expect(r.tuCa).toBe('ca1 + ca3 + ca5')
-    expect(r.soSaiCaTruoc).toBe(3)
+    expect(r.tuCa).toBe('ca1')
+    expect(r.soSaiCaTruoc).toBe(1)
+    // ca gần nhất em VẮNG (ca2) ⇒ nhảy tới ca em có nộp (ca3), không lấy ca của em khác
+    const r2 = chonCauLapChoEm('A', dsCa.slice(1), 40, {}, ch)
+    expect(r2.tuCa).toBe('ca3')
+    expect(r2.soSaiCaTruoc).toBe(1)
   })
 
-  it('ca thứ tư em có nộp KHÔNG được lấy — trần là 3 ca mỗi em', () => {
+  it('không gom thêm ca nào khác — một ca mỗi em', () => {
     const r = chonCauLapChoEm('A', dsCa, 40, {}, ch)
+    expect(r.tuCa).not.toContain('+')
     expect(r.tuCa).not.toContain('ca6')
   })
 

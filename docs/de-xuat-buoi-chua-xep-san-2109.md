@@ -1,6 +1,6 @@
 # Đề xuất B6 — "Buổi chữa tối nay" xếp sẵn (Code 1 → Boss duyệt TRƯỚC khi sửa màn Gọi lên bảng · 21/09/2026)
 
-**Đích** (`DE-XUAT-TU-DONG-HOA-2109.md` mục B6): mỗi chiều màn Gọi lên bảng đã có sẵn "Buổi chữa tối nay: N em · M câu · P phút"; thầy chỉ bấm **Mở** (hoặc tự chọn như cũ). Máy chỉ CHUẨN BỊ, thầy vẫn quyết (mục C của bản đồ).
+**Đích** (`docs/dac-ta-cu/DE-XUAT-TU-DONG-HOA-2109.md` mục B6): mỗi chiều màn Gọi lên bảng đã có sẵn "Buổi chữa tối nay: N em · M câu · P phút"; thầy chỉ bấm **Mở** (hoặc tự chọn như cũ). Máy chỉ CHUẨN BỊ, thầy vẫn quyết (mục C của bản đồ).
 
 ## Đã có sẵn (khảo sát 21/09, không viết lại)
 - Màn `GoiLenBangScreen.tsx` (2334 dòng): mục 2 có 4 chip lấy câu (`theo_dang` · `san` · `tu_chon` mặc định · `btvn_gan_nhat`); nút "Xếp giờ & phân công" chạy `xepBuoiChua`/`xepGioLenBang` (ngân sách 90 phút, lane L0–L3). **"P phút" đã có**: `DongChua.giay` từ `thoi-gian-len-bang.ts`.

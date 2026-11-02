@@ -954,12 +954,19 @@ export async function nopBtvnQuaPhieu(
   }
 
   const saved=await env.DB.prepare(
-    `UPDATE btvn_em SET nop_luc = ?, so_dung = ?, so_cau = ?, dap_an_json = ?, so_lan_lam = ? WHERE khoa = ? AND thu_hoi=0`,
+    // 02/11 KHOÁ LẠC QUAN: chỉ ghi khi dòng còn ĐÚNG như lúc đọc (`nop_luc`, `so_lan_lam`). Thiếu điều kiện này, hai lượt nộp chạy song song
+    // (em bấm đúp, mạng chập gửi lại) cùng đọc «chưa nộp» ⇒ cả hai ghi lượt 1 ⇒ sổ sự kiện + EXP ghi HAI lần, hoặc vượt trần 3 lượt làm lại.
+    `UPDATE btvn_em SET nop_luc = ?, so_dung = ?, so_cau = ?, dap_an_json = ?, so_lan_lam = ? WHERE khoa = ? AND thu_hoi=0 AND nop_luc IS ? AND COALESCE(so_lan_lam, 1) = ?`,
   )
-    .bind(nay, soDung, soCau, JSON.stringify(lam), lanMoi, khoa)
+    .bind(nay, soDung, soCau, JSON.stringify(lam), lanMoi, khoa, cu.nop_luc ?? null, Number(cu.so_lan_lam) || 1)
     .run()
 
-  if(!saved.meta.changes)return {ok:false,error:'Bài vừa được cập nhật từ một lần nộp khác. Em tải lại để xem kết quả.'}
+  if(!saved.meta.changes){
+    // Lượt kia vừa ghi đúng bài này ⇒ coi như đã nhận (không báo lỗi giả cho em); khác bài ⇒ báo tải lại như cũ.
+    const moi = await env.DB.prepare('SELECT dap_an_json, nop_luc, COALESCE(so_lan_lam, 1) AS so_lan_lam FROM btvn_em WHERE khoa = ? AND thu_hoi=0').bind(khoa).first<Record<string, unknown>>()
+    if(moi?.nop_luc&&String(moi.dap_an_json)===JSON.stringify(lam))return {ok:true,lanThu:Number(moi.so_lan_lam),soCau,soDung,qidSai,nopLuc:moi.nop_luc,daNhan:true}
+    return {ok:false,error:'Bài vừa được cập nhật từ một lần nộp khác. Em tải lại để xem kết quả.'}
+  }
   if (lanMoi === 1) await ghiNopTre(env, khoa, nay, han, Date.now()) // nộp lần đầu SAU hạn ⇒ nộp trễ
   // SỔ SỰ KIỆN HỌC (GĐ 0): mỗi câu của tờ là một sự kiện `btvn`, lan = lượt làm, dựng từ CHÍNH kết quả
   // `gradeHomework` vừa chấm (không đọc lại R2). Lượt 1 bỏ qua câu đã ghi qua lô (`btvn_lo`) để nộp cả

@@ -1,6 +1,6 @@
 # Nhịp tự gọi máy chủ của app thầy (`/`, `/gv`) — bảng soát 21/09/2026
 
-Kế hoạch: `KE-HOACH-MAY-CHU-GIO-CAO-DIEM-2109.md` (mục Code 4, việc (3): "rà MỌI vòng tự gọi của app thầy: bảng nhịp + tab ẩn thì dừng + không gọi chồng"). Bối cảnh: sự cố D1 20:30–21:00 ngày 21/09 — D1 chỉ MỘT luồng, mọi vòng hỏi nền đè nhau.
+Kế hoạch: `docs/dac-ta-cu/KE-HOACH-MAY-CHU-GIO-CAO-DIEM-2109.md` (mục Code 4, việc (3): "rà MỌI vòng tự gọi của app thầy: bảng nhịp + tab ẩn thì dừng + không gọi chồng"). Bối cảnh: sự cố D1 20:30–21:00 ngày 21/09 — D1 chỉ MỘT luồng, mọi vòng hỏi nền đè nhau.
 
 **Luật chung (mọi vòng tự gọi máy chủ):** nhịp lấy từ BẢNG dưới đây (`BANG_NHIP_THAY` trong `src/lib/nhip-may-thay.ts`) · tab ẩn thì KHÔNG gọi · không gọi chồng (lượt trước chưa xong thì thôi) · lỗi / hết giờ ⇒ lùi dần theo BẢNG LÙI (mặc định 30 → 60 → 120 s — KHÔNG theo bảng 300 s của app học sinh; Theo dõi ca chỉ 30 → 40 s), không bao giờ nhanh hơn nhịp thường · tab hiện / có mạng lại thì gọi nhưng chặn dội (≥ min(nhịp, 20 s) kể từ lượt trước). Cách làm: `useNhipThay(chay, coSoMs, bat)` = vỏ React của `batNhipBenVung` (`src/lib/nhip-ben-vung.ts` của app học sinh). `chay` báo LỖI bằng `false` hoặc ném lỗi. Thêm vòng mới ⇒ thêm dòng vào bảng + vào `BANG_NHIP_THAY`; test `tests/nhip-may-thay-2109.test.tsx` chặn `setInterval` lạ.
 

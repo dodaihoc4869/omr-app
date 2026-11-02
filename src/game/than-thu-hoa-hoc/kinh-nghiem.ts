@@ -26,7 +26,7 @@
  */
 /*
  * ĐƯỜNG CẤP v4 (thầy chốt 29/09/2026, `docs/DE-XUAT-EXP-2909.md`): NẠP TỰ DO — xem khối "ĐƯỜNG CẤP v4" bên dưới. Đoạn sau là LỊCH SỬ của v3.
- * (v3) ĐƯỜNG CẤP (thầy chốt 21/09/2026 13:36, Điều 1 của `DE-XUAT-THAN-THU-MOI-NGAY-2109.md`): lên cấp theo NGÀY HỌC ĐỀU.
+ * (v3) ĐƯỜNG CẤP (thầy chốt 21/09/2026 13:36, Điều 1 của `docs/dac-ta-cu/DE-XUAT-THAN-THU-MOI-NGAY-2109.md`): lên cấp theo NGÀY HỌC ĐỀU.
  * Mỗi ngày thần thú hấp thụ tối đa 200 EXP (khi em đạt nhiệm vụ ngày; 120 khi chỉ có học; 0 khi không học — xem `src/lib/hap-thu-ngay.ts`), nên đường 238 200 EXP
  * = 1 191 ngày × 200: SỚM NHẤT cấp 10 là ngày 12 (2 400 EXP) và cấp 120 là ngày 1 191 (238 200 EXP), dù em kiếm EXP nhanh cỡ nào.
  * `thanhExp` tra BẢNG 119 số viết thẳng (không tính mũ) để máy chủ và máy em ra CÙNG một số, không lệch làm tròn. Chín thanh đầu: 120 · 150 · 180 · 220 · 260 ·

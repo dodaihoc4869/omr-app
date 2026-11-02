@@ -1,6 +1,6 @@
 # Hợp đồng: GIÂY THẬT của lượt lên bảng (`len_bang.giay_thuc`)
 
-Bên CUNG CẤP hợp đồng (chủ tệp): **Code 1** (app giáo viên). Bên THỰC HIỆN phía máy chủ: **Code 3**. Lập 21/09/2026 (M6 "tự hiệu chỉnh từ giây thật", `prompt-man-chieu-len-bang.md`).
+Bên CUNG CẤP hợp đồng (chủ tệp): **Code 1** (app giáo viên). Bên THỰC HIỆN phía máy chủ: **Code 3**. Lập 21/09/2026 (M6 "tự hiệu chỉnh từ giây thật", `docs/dac-ta-cu/prompt-man-chieu-len-bang.md`).
 
 ## Vì sao có
 Mô hình giờ lên bảng (`thoi-gian-len-bang.ts`, `T = T_đọc + T_làm + T_chữa`) là ước tính. Mỗi lần thầy bấm Đạt / Chưa đạt trên tờ chiếu, tờ đo được số giây THẬT của đợt; app dùng để hiệu chỉnh mô hình theo (phần, sao). App **giữ mẫu trên máy thầy (IndexedDB) và tự hiệu chỉnh từ đó — KHÔNG phụ thuộc máy chủ**. Cột này để máy chủ giữ bản gốc phòng đổi máy / mất bộ nhớ trình duyệt, và để sau này tổng hợp.

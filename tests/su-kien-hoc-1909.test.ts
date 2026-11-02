@@ -1,6 +1,6 @@
 // @vitest-environment node
 // LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chỉ phát câu ĐÚNG khối em; em/câu KHÔNG RÕ khối ⇒ chặn ⇒ em giả ghi lớp 12, câu giả ghi khối `lop` 12 (như `de_kho.lop`).
-// GĐ 0 — SỔ SỰ KIỆN HỌC (DE-XUAT-CA-NHAN-HOA-1909.md mục 1.1, nghiệm thu GĐ 0).
+// GĐ 0 — SỔ SỰ KIỆN HỌC (docs/dac-ta-cu/DE-XUAT-CA-NHAN-HOA-1909.md mục 1.1, nghiệm thu GĐ 0).
 //
 // Chạy trên SQLite THẬT với lược đồ THẬT (xem `_d1-that.ts`): câu SQL `json_each`,
 // `ON CONFLICT`, `date(..,'+7 hours')` được chạy chứ không đoán.

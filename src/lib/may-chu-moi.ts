@@ -14,6 +14,7 @@
 import { chuanHoaMayChu, type CauHinhMayChu } from './cau-hinh-may-chu'
 import { loadCauHinhMayChu, loadDiaChiMayChuMoiChoEm, saveCauHinhMayChu } from './exam-db'
 import { voiHanCho } from './han-cho'
+import { tangTheHeCauHinh } from './the-he-cau-hinh'
 
 // ---------------------------------------------------------------------------
 // CẦU DAO: CA NÀO MÁY CHỦ MỚI KHÔNG GIỮ THÌ THÔI GỌI CHO CẢ CA
@@ -148,6 +149,7 @@ export async function layCauHinhMayChu(): Promise<CauHinhMayChu> {
 /** Gọi sau khi thầy đổi cấu hình trong màn Cài đặt — bỏ bộ nhớ tạm. */
 export function quenCauHinhMayChu(): void {
   nhoCauHinh = null
+  tangTheHeCauHinh() // địa chỉ đã nhớ ở `dia-chi-may-chu.ts` thuộc cấu hình cũ ⇒ lượt sau đọc lại (cấu hình mới thắng).
   caChuaLenMayChu.clear()
 }
 

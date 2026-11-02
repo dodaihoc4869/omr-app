@@ -1,5 +1,5 @@
 // @vitest-environment node
-// MỘT ĐỊNH NGHĨA "câu đã làm hôm nay" (server/src/cau-da-lam.ts; đề bài prompt-mot-dinh-nghia-cau-da-lam-2109.md): DISTINCT qid, đã trả lời (ket_qua NOT NULL), mọi nguồn, luc ≥ MAX(mốc, 00:00 hôm nay VN).
+// MỘT ĐỊNH NGHĨA "câu đã làm hôm nay" (server/src/cau-da-lam.ts; đề bài docs/dac-ta-cu/prompt-mot-dinh-nghia-cau-da-lam-2109.md): DISTINCT qid, đã trả lời (ket_qua NOT NULL), mọi nguồn, luc ≥ MAX(mốc, 00:00 hôm nay VN).
 // Khoá: hàm cận dưới, số theo em + cả lớp + bản thuần cho ra CÙNG con số trên một bộ dữ liệu có đủ các ca khó (câu trước mốc, bỏ trống, làm lại 3 lần, hôm qua, hai em cùng câu); `soCauDung` = qid có ≥ 1 lần đúng;
 // `/hs/ke-hoach-ngay` thêm `tienBo.soCauHienThi` mà `daLamCau` (luật đạt ngày/EXP/khiên) KHÔNG đổi; kế hoạch vẫn dựng khi đọc lỗi; chỉ mục idx_skh_luc; không UNION. SQLite thật.
 import { describe, expect, it } from 'vitest'
@@ -96,7 +96,9 @@ describe('/hs/ke-hoach-ngay: thêm soCauHienThi, giữ daLamCau (luật)', () =>
     // truy vấn hỏng thì CẢ HAI về mặc định an toàn (0 / vắng khoá) — kế hoạch vẫn dựng, không ném lỗi ra ngoài.
     const d = await dung()
     const goc = d.env.DB.prepare.bind(d.env.DB)
-    d.env.DB.prepare = ((q: string) => { if (q === TONG_HOP_EM_NGAY) throw new Error('hỏng'); return goc(q) }) as typeof d.env.DB.prepare
+    // 02/11: cập nhật theo 0e177c60 (docTongHop chèn thêm điều kiện «chỉ sự kiện đã xảy ra» trước GROUP BY ⇒ câu SQL không còn y hệt hằng) — bắt theo phần đầu của hằng
+    const dauTongHop = TONG_HOP_EM_NGAY.split(' GROUP BY e.sbd')[0]
+    d.env.DB.prepare = ((q: string) => { if (q.startsWith(dauTongHop)) throw new Error('hỏng'); return goc(q) }) as typeof d.env.DB.prepare
     const tb = (await lapVaLuuKeHoach(d.env, ['S1'], NOW)).get('S1')!.tienBo
     expect(tb.daLamCau).toBe(0)
     expect(tb).not.toHaveProperty('soCauHienThi')

@@ -1,4 +1,4 @@
-// "DỒN VỀ ĐÍCH" — hàm THUẦN (Code 1, 21/09/2026; thầy chốt 14:13 "Chốt B và chốt hết build"; `DE-XUAT-DON-VE-DICH-2109.md`, `prompt-don-ve-dich-2109.md`).
+// "DỒN VỀ ĐÍCH" — hàm THUẦN (Code 1, 21/09/2026; thầy chốt 14:13 "Chốt B và chốt hết build"; `docs/dac-ta-cu/DE-XUAT-DON-VE-DICH-2109.md`, `docs/dac-ta-cu/prompt-don-ve-dich-2109.md`).
 //
 // Việc BẮT BUỘC ngày nào chưa xong thì hôm sau hiện đủ, tính lại theo GIỜ, xong TRƯỚC hạn nộp. Ba hàm:
 //   • `soNo`            — sổ nợ theo NGÀY VN (chặng bài tập về nhà lỡ, câu ôn quá lịch, gói gia đình giao chưa xong).

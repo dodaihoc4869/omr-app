@@ -26,21 +26,22 @@ const thuatToan = doc('src/lib/thuat-toan-rut-cau-sai.ts') + '\n' + doc('src/lib
 const api = doc('src/lib/exam-api.ts')
 const mayChu = doc('server/src/goi-cu.ts')
 const congChu = doc('server/src/index.ts')
-const manPh = doc('src/screens/ParentPortalScreen.tsx')
+// 02/11: cập nhật theo b52706159 (thẻ chọn chế độ rời khỏi modal sang khối Khắc phục 2 cột; "Dạng bài" là nút 3 ở đó).
+const khoiKhacPhuc = doc('src/components/KhoiKhacPhuc3CheDo.tsx')
 
 describe('Mục 4 — Luyện dạng bài trên màn hình', () => {
-  it('có đủ bốn chế độ, mặc định vẫn là chế độ 1', () => {
-    expect(modal).toContain('useState<1 | 2 | 3 | 4>(1)')
+  it('có đủ bốn chế độ, mặc định vẫn là chế độ 1 (khi em có câu sai)', () => {
+    // 02/11: cập nhật theo b52706159 (nơi gọi truyền chế độ mặc định; không có câu sai ⇒ mở thẳng chế độ 3, không khoá).
+    expect(modal).toContain('useState<1 | 2 | 3 | 4>(cheDoMacDinh ?? (dsCauSai.length ? 1 : 3))')
     expect(modal).toContain('4. Luyện dạng bài')
   })
 
   it('thẻ 4 KHÔNG khoá theo kho câu-sai — em không sai câu nào vẫn luyện được', () => {
     // Đây là chốt số 3. Chép nhầm `coKhoDe &&` từ thẻ 2/3 sang là hỏng ngay.
-    expect(modal).toContain('onClick={() => dmDangBai.length > 0 && setCheDo(4)}')
+    // 02/11: cập nhật theo b52706159 (thẻ chọn chế độ nay ở KhoiKhacPhuc3CheDo: "3. Dạng bài"; modal nhận chế độ từ nơi gọi).
+    expect(khoiKhacPhuc).toMatch(/onClick=\{\(\) => \{\s*setCheDo\(3\)\s*setLoi\(''\)\s*\}\}[\s\S]{0,400}?3\. Dạng bài/)
+    expect(khoiKhacPhuc).not.toMatch(/coKhoDe\s*&&\s*setCheDo\(/)
     expect(modal).not.toContain('onClick={() => coKhoDe && setCheDo(4)}')
-    // Lối vào khi ca không có câu nào sai
-    expect(modal).toContain('const [moThangDangBai, setMoThangDangBai] = useState(false)')
-    expect(modal).toContain('if (dsCauSai.length === 0 && !moThangDangBai) {')
   })
 
   it('điều hướng đúng bốn bước: lớp → tên bài SGK → dạng → số câu', () => {
@@ -59,13 +60,16 @@ describe('Mục 4 — Luyện dạng bài trên màn hình', () => {
   })
 
   it('kho rỗng KHÔNG còn là lý do cảnh báo của chế độ 4', () => {
-    expect(modal).toContain('{!dangTaiKho && (loiRut || (!coKhoDe && cheDo !== 4)) && (')
+    // 02/11: cập nhật theo b52706159 (chặt hơn: kho câu-sai rỗng chỉ cảnh báo ở chế độ 2 — chế độ cần kho ấy).
+    expect(modal).toContain('{!dangTaiKho && (loiRut || (!coKhoDe && cheDo === 2)) && (')
   })
 
   it('số câu trên thanh trượt đếm SAU cửa nạp, không lấy so_cau trong gói', () => {
     expect(thuatToan).toContain('export function demCauDangBai(')
     expect(thuatToan).toContain('return cauLuyenTuNguon(khoDangBai).length')
-    expect(modal).toContain('const tongToiDaCheDo4 = useMemo(() => demCauDangBai(khoDangBai)')
+    // 02/11: cập nhật theo b52706159 (đếm thêm theo bộ lọc tự do, vẫn qua demCauDangBai).
+    expect(modal).toContain('const tongToiDaCheDo4 = useMemo(() => demCauDangBai(khoDangBai, boLocTuDo)')
+    expect(khoiKhacPhuc).toContain('const tongToiDaCheDo3 = useMemo(() => demCauDangBai(khoDangBai), [khoDangBai])')
   })
 
   it('rút xong trộn thứ tự, không phát lại đúng 20 câu đầu mỗi lượt', () => {
@@ -142,12 +146,6 @@ describe('Mục 4 — tờ dạng bài không được đếm hai lần', () => 
 })
 
 describe('Mục 4 — đồng bộ mọi chỗ mô tả các chế độ', () => {
-  it('cổng phụ huynh nói 4 phương pháp, không còn 3', () => {
-    expect(manPh).toContain('4 phương pháp khắc phục câu sai tối ưu cho con:')
-    expect(manPh).not.toContain('3 phương pháp khắc phục câu sai tối ưu cho con:')
-    expect(manPh).toContain('<b>4. Luyện dạng bài</b>')
-  })
-
   it('hai tệp gốc của thuật toán và modal đều ghi đủ 4 mục ở đầu tệp', () => {
     expect(thuatToan.slice(0, 900)).toContain('4. Luyện dạng bài')
     expect(modal.slice(0, 900)).toContain('4. Luyện dạng bài')

@@ -1,0 +1,34 @@
+# CỔNG «TEST ĐỎ CHỈ HẠ, SO THEO TÊN» (dọn mã 02/11) — chạy TOÀN BỘ vitest sau mỗi push lên main, SONG SONG deploy, KHÔNG chặn phát hành (như toc-do-sau-gop).
+# Test đỏ có tên chưa nằm trong docs/nen-vitest-do.json (sau một lượt chạy lại riêng tệp để loại chập chờn) ⇒ job đỏ: phiên vừa gộp sửa ngay.
+# Test trong nền đã xanh ⇒ phiên kế tiếp chạy `node scripts/kiem-test-do.mjs <vitest.json> --ha` để hạ nền. Chạy tại máy:
+#   npx vitest run --reporter=json --outputFile=/tmp/v.json; node scripts/kiem-test-do.mjs /tmp/v.json --chay-lai
+name: Test đỏ sau gộp
+on:
+  push:
+    branches: [main]
+    paths: ['src/**', 'server/**', 'tests/**', 'scripts/**', 'package.json', 'package-lock.json', 'vite.config.*', 'vitest.config.*', 'docs/nen-vitest-do.json', '.github/workflows/test-do-sau-gop.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: test-do-sau-gop
+  cancel-in-progress: true
+jobs:
+  kiem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Trình duyệt cho test chụp / đo trên Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Toàn bộ vitest (ghi JSON)
+        run: npx vitest run --reporter=json --outputFile=vitest.json > /dev/null 2>&1 || true
+      - name: So tên test đỏ với nền (chỉ hạ)
+        shell: bash
+        run: |
+          node scripts/kiem-test-do.mjs vitest.json --chay-lai 2>&1 | tee -a "$GITHUB_STEP_SUMMARY"

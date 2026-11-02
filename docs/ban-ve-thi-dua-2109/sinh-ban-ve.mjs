@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// SINH BẢN VẼ ô "THI ĐUA HÔM NAY" — phương án 8A (thầy chốt 21/09 13:36; đề DE-XUAT-THAN-THU-MOI-NGAY-2109.md ĐIỀU 8). Code 2.
+// SINH BẢN VẼ ô "THI ĐUA HÔM NAY" — phương án 8A (thầy chốt 21/09 13:36; đề docs/dac-ta-cu/DE-XUAT-THAN-THU-MOI-NGAY-2109.md ĐIỀU 8). Code 2.
 //   node docs/ban-ve-thi-dua-2109/sinh-ban-ve.mjs          ghi HTML tĩnh tự chứa vào thư mục này
 //   node docs/ban-ve-thi-dua-2109/sinh-ban-ve.mjs --anh    thêm: chụp Chromium 390 sáng+tối (mọi trạng thái) + 1 ảnh 1440, JPG ≤ 150 KB vào ./anh/
 // Dữ liệu và tên là GIẢ. Màu đọc từ tokens.css + m3-theme.css của app. Xếp theo SỰ CHĂM (số câu → đạt nhiệm vụ ngày → chuỗi), không theo điểm; theo lớp.

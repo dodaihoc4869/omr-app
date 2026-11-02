@@ -184,7 +184,7 @@ export function advance(old:Mastery|undefined,a:Attempt):{mastery:Mastery;reward
 }
 
 /* ══════════════════════════ BỘ CHỌN LƯỢT MỚI — ĐỢT 2 (thầy chốt 21/09/2026) ══════════════════════════
- * Thuần, tất định, KHÔNG đổi `chooseSession*` cũ (máy chủ cũ vẫn chạy). Điều 3–5 của `DE-XUAT-THAN-THU-MOI-NGAY-2109.md`:
+ * Thuần, tất định, KHÔNG đổi `chooseSession*` cũ (máy chủ cũ vẫn chạy). Điều 3–5 của `docs/dac-ta-cu/DE-XUAT-THAN-THU-MOI-NGAY-2109.md`:
  *  • KHO = phần LỚP đã học (máy chủ đưa vào `pool`): bỏ điều kiện "chính em phải có bằng chứng cùng dạng"; vẫn chặn `blocked`, không tự luận (máy chủ lọc trước, hàm còn kiểm `phan`),
  *    bậc ≤ bậc của em ở dạng đó (+1 CHỈ cho suất thử thách và Lượt trùm); dạng em chưa có bằng chứng ⇒ bậc Biết (`targetLevel`).
  *  • CHỐNG LẶP: mỗi lượt ≥ 3 (thực tế ≥ 4) câu em CHƯA TỪNG gặp khi kho còn, ≤ 2 câu cũ; câu SAI quay lại sớm nhất NGÀY VN hôm sau; đã sai ≥ 3 lần ⇒ đổi sang câu KHÁC cùng dạng;

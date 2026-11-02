@@ -1,4 +1,4 @@
-// OMNI 3 · làn A2 — CHỐT HÀNH VI CŨ của `lapKeHoachNgay` (đặc tả DAC-TA-BUILD-OMNI-3-0510.md mục 4.9 + cổng GĐ A (4)).
+// OMNI 3 · làn A2 — CHỐT HÀNH VI CŨ của `lapKeHoachNgay` (đặc tả docs/dac-ta-cu/DAC-TA-BUILD-OMNI-3-0510.md mục 4.9 + cổng GĐ A (4)).
 // 30 kịch bản TẤT ĐỊNH (PRNG mulberry32, không Math.random) khác nhau về số câu mới / nợ / củng cố / duy trì / cắt tỉa, D, rải đều bật/tắt,
 // hạng theo dạng, Huyết Chiến, nhịp riêng (tiLeNo), kênh riêng (onVaoDao), lập lại giữa ngày (daLamHomNay, moiDaLamHomNay).
 // Giá trị kỳ vọng = JSON đầu ra của `lapKeHoachNgay` TRƯỚC khi mở rộng OMNI 3 (sinh ngày 05/10 trên commit f189d2b, chưa sửa srs2-loi.ts).

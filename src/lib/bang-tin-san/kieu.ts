@@ -1,4 +1,4 @@
-// BẢNG TIN KIỂU SÀN GIAO DỊCH — hợp đồng dữ liệu của màn (thầy chốt mẫu 21/09; đề bài prompt-bang-tin-san-2109.md).
+// BẢNG TIN KIỂU SÀN GIAO DỊCH — hợp đồng dữ liệu của màn (thầy chốt mẫu 21/09; đề bài docs/dac-ta-cu/prompt-bang-tin-san-2109.md).
 // MỘT nguồn trạng thái: mọi khối đọc từ `DuLieuSan`; số của các khối phải KHỚP nhau (xem `chotSo` ở trang-thai.ts). Khối thiếu (null) ⇒ ẩn, không bịa.
 import type { BangTin } from '../bang-tin-thay'
 

@@ -149,7 +149,8 @@ describe('nối vào màn thi (khoá nguồn)', () => {
   })
 
   it('KHÔNG đụng chốt an toàn: vẫn còn nguyên VanTay, ManGiuDeDoc, ManChan, hạn tự nộp theo mốc `het` (còn ≤ 0 giây, kho giờ 28/09), luật 1 phút cuối', () => {
-    for (const s of ['<VanTay sbd={attempt.sbd}', '<ManGiuDeDoc />', '<ManChan lyDo={lyDoChe}', "if (mocGio === 'het') void doSubmit(attempt, true)", "a.chiNop3PhutCuoi && typeof remaining === 'number' && remaining > 60"]) expect(man, s).toContain(s)
+    // 02/11: cập nhật theo 3af7e67f6 (tự nộp khi hết giờ gửi bản lượt MỚI NHẤT `attemptRef.current ?? attempt` — vẫn tự nộp theo mốc `het`).
+    for (const s of ['<VanTay sbd={attempt.sbd}', '<ManGiuDeDoc />', '<ManChan lyDo={lyDoChe}', "if (mocGio === 'het') void doSubmit(attemptRef.current ?? attempt, true)", "a.chiNop3PhutCuoi && typeof remaining === 'number' && remaining > 60"]) expect(man, s).toContain(s)
   })
 
   it('CSS dòng báo: token M3, không hex, mọi luật dưới `.m3`', () => {

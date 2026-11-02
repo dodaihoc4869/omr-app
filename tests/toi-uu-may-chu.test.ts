@@ -292,7 +292,8 @@ describe('bỏ nhịp khi không có gì đổi', () => {
     expect(ma).toContain('if (!cong.nenGui(van)) return')
     // nhịp cuối lúc rời màn gọi không tham số ⇒ chiKhiDoi = false ⇒ gửi vô điều kiện
     expect(ma).toContain('const luu = (chiKhiDoi = false) => {')
-    expect(ma).toMatch(/clearInterval\(id\)[\s\S]{0,200}luu\(\)/)
+    // 02/11: cập nhật theo c80c2551 (dọn effect thêm khối xả lưu IndexedDB trước nhịp cuối ⇒ khoảng cách > 200 ký tự); vẫn ghim `luu()` không tham số là lệnh CUỐI của hàm dọn
+    expect(ma).toMatch(/clearInterval\(id\)[\s\S]{0,600}\n\s*luu\(\)\n\s*\}\n/)
   })
 
   it('trạng thái vẫn BÁO SỐNG dù không đổi — thầy phải phân biệt "đang nghĩ" với "tắt máy"', async () => {

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// SINH BẢN VẼ thẻ "ĐƯỜNG VỀ ĐÍCH" — DE-XUAT-DON-VE-DICH-2109.md (Điều 2 + Điều 3). CHỈ LÀ MẪU VẼ: không đụng mã chạy thật.
+// SINH BẢN VẼ thẻ "ĐƯỜNG VỀ ĐÍCH" — docs/dac-ta-cu/DE-XUAT-DON-VE-DICH-2109.md (Điều 2 + Điều 3). CHỈ LÀ MẪU VẼ: không đụng mã chạy thật.
 //   node docs/ban-ve-don-ve-dich-2109/sinh-ban-ve.mjs          ghi HTML tĩnh tự chứa vào thư mục này
 //   node docs/ban-ve-don-ve-dich-2109/sinh-ban-ve.mjs --anh    thêm: chụp Chromium (cách chụp lấy từ docs/ban-ve-thi-dua-2109/sinh-ban-ve.mjs) — mỗi trạng thái 390 sáng;
 //                                                              trạng thái 1, 2 thêm 390 tối; trạng thái 1 thêm 1440 sáng. JPG ≤ 150 KB vào ./anh/. Tự đo: tràn ngang, đích chạm < 48, tương phản < 4,5:1, chiều cao thẻ.

@@ -1797,7 +1797,7 @@ describe('luật che THEO CÂU — mọi kênh; danh sách ⇔ chi tiết', () =
   })
 })
 
-// ── MỘT ĐỊNH NGHĨA "câu đã làm" (thầy 21/09: thẻ Hôm nay 93 ≠ Thi đua 78, cùng một em) — đề bài prompt-mot-dinh-nghia-cau-da-lam-2109.md ──
+// ── MỘT ĐỊNH NGHĨA "câu đã làm" (thầy 21/09: thẻ Hôm nay 93 ≠ Thi đua 78, cùng một em) — đề bài docs/dac-ta-cu/prompt-mot-dinh-nghia-cau-da-lam-2109.md ──
 describe('ĐỊNH NGHĨA CHUẨN "câu đã làm hôm nay" = số câu KHÁC NHAU đã trả lời, mọi nguồn, từ MAX(mốc, 00:00 hôm nay), GỒM câu bị che', () => {
   const MOC_THAT = '2026-09-21T05:00:00.000Z' // mốc hiển thị mặc định 12:00 VN 21/09
   const hoi = async (d: D1That) => (await phTatCaVeCon(d.env, { sbd: 'S1' }, NOW)) as Record<string, any>

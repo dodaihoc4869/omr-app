@@ -11,7 +11,7 @@ import {
   CAP_TOI_DA, layHinhThai, demTinhNang,
 } from '../src/game/than-thu-hoa-hoc/hinh-thai'
 import {
-  EXP_BAN_DAU, thanhExp, thanhExpCu, nhanExp, tongExpToiDinh, NGUON_EXP, BANG_NGUON_EXP,
+  EXP_BAN_DAU, thanhExp, thanhExpCu, nhanExp, tongExpToiDinh, NGUON_EXP, BANG_NGUON_EXP, tinhExpLuyenThu,
 } from '../src/game/than-thu-hoa-hoc/kinh-nghiem'
 import { TRAN_EXP_GAME_NGAY } from '../src/lib/hap-thu-ngay'
 
@@ -185,10 +185,18 @@ describe('kinh nghiệm', () => {
   it('BẢNG NGUỒN EXP phải khớp đúng con số trong mã — không hứa suông', () => {
     // Sáu dòng từ 15-09: tách "tầng MỚI" và "leo lại tầng cũ" thành hai dòng,
     // vì hai mức thưởng khác nhau tám lần — gộp một dòng là nói dối em.
-    expect(BANG_NGUON_EXP.length).toBe(6)
+    // 02/11: cập nhật theo 3dad7cc7 (bảng thêm 3 dòng luyện thú: sao, dạng yếu, combo; bỏ dòng «leo lại tầng cũ») và 97b17e4d (MOM ⇒ «bài gia đình giao»)
+    expect(BANG_NGUON_EXP.length).toBe(8)
     expect(NGUON_EXP.nopMom(0)).toBe(150)
     expect(NGUON_EXP.nopMom(10)).toBe(400)
-    expect(BANG_NGUON_EXP.find((n) => n.viec.includes('MOM'))?.thuong).toBe('150 + 25 × điểm')
+    expect(BANG_NGUON_EXP.find((n) => n.viec.includes('gia đình giao'))?.thuong).toBe('150 + 25 × điểm')
+    // ba dòng luyện thú phải khớp hàm tính thật
+    expect([0, 1, 2].map((sao) => tinhExpLuyenThu({ sao }).exp)).toEqual([20, 45, 90])
+    expect(BANG_NGUON_EXP.find((n) => n.viec.includes('sao'))?.thuong).toBe('20 ★0 · 45 ★1 · 90 ★2')
+    expect(tinhExpLuyenThu({ sao: 0, laDangYeu: true }).heSoLoHong).toBe(1.5)
+    expect(BANG_NGUON_EXP.find((n) => n.viec.includes('đang yếu'))?.thuong).toBe('Thưởng thêm x1.5 EXP')
+    expect([3, 5, 10].map((c) => tinhExpLuyenThu({ comboDungLienTiep: c }).heSoCombo)).toEqual([1.15, 1.3, 1.5])
+    expect(BANG_NGUON_EXP.find((n) => n.viec.includes('Combo'))?.thuong).toBe('Chuỗi 3, 5, 10 thưởng tới +50%')
     expect(NGUON_EXP.suaCauSai()).toBe(100)
     expect(BANG_NGUON_EXP.find((n) => n.viec.includes('câu sai'))?.thuong).toBe('100 EXP')
     expect(NGUON_EXP.nopBtvn()).toBe(200)

@@ -1,4 +1,4 @@
-// CẤM RÚT CÂU TỰ LUẬN — BỘ LỌC Ở MÀN MỞ CA (máy thầy; Code 1, 21/09/2026). Đề bài `prompt-cam-rut-tu-luan.md`.
+// CẤM RÚT CÂU TỰ LUẬN — BỘ LỌC Ở MÀN MỞ CA (máy thầy; Code 1, 21/09/2026). Đề bài `docs/dac-ta-cu/prompt-cam-rut-tu-luan.md`.
 //
 // Chỉ đụng bước RÚT TỰ ĐỘNG. Ở màn Mở ca có hai chỗ app tự chọn câu thay thầy:
 //   • `luon`     — kho rộng để app rút bộ câu cho TỪNG EM (đề riêng, ca có phòng chờ, mã trận 2026…): câu tự luận KHÔNG BAO GIỜ vào kho ấy.

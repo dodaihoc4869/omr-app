@@ -1,4 +1,4 @@
-// BTVN "NÂNG ĐỠ" — BẢN 1.2 (Code 1, 21/09/2026; `prompt-btvn-nang-do.md` CẬP NHẬT 3). Bài học từ BÀI THẬT ĐẦU TIÊN: bài 29 dạng ⇒ lõi 29 câu; em yếu (5 câu/ngày × 4 ngày = 20 < 29) nhận ĐÚNG 29 câu lõi,
+// BTVN "NÂNG ĐỠ" — BẢN 1.2 (Code 1, 21/09/2026; `docs/dac-ta-cu/prompt-btvn-nang-do.md` CẬP NHẬT 3). Bài học từ BÀI THẬT ĐẦU TIÊN: bài 29 dạng ⇒ lõi 29 câu; em yếu (5 câu/ngày × 4 ngày = 20 < 29) nhận ĐÚNG 29 câu lõi,
 // phần riêng 0, 14/29 câu quá sức (`loi_cao`) — trái hai lời dặn của thầy ("mọi em làm đủ câu cốt lõi" + "em yếu không phân câu khó").
 // SỬA LUẬT: lõi BẮT BUỘC của em = câu lõi mức ≤ bậc đích + 1 (hoặc câu GHIM); lõi cao hơn ⇒ `thuSucThem[]` (KHÔNG bắt buộc, ngoài `chang`, ngoài ngân sách); ngân sách so với LÕI BẮT BUỘC.
 // Cùng khoá: DEADLINE THẮNG MỌI NÚM (số chặng ≤ số ngày, lõi bắt buộc nằm trong chặng, núm không kéo lõi ra), em khá y như trước.

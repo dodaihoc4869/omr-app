@@ -5,7 +5,7 @@ import { laHanhTrinh } from './hanh-trinh-hop-nhat'
 import { xepDeV6,maTranV6 } from './hanh-trinh-v6-de-thu'
 import { ghiDeThuDo,maTranDo,chotDiemDau } from './hanh-trinh-do-luong'
 // OMNI 3 — LÀN B3: ĐƯỜNG TRẢ LỜI + GAME (Đảo/Đoàn · lướt · chắc-mà-sai · Trạm hồi phục · vé thử thách · đề thử nửa).
-// Đặc tả: DAC-TA-BUILD-OMNI-3-0510.md (mục 1 bước 4–8, 4.2–4.7, 5) · hợp đồng API: docs/hop-dong-omni-3.md mục A ·
+// Đặc tả: docs/dac-ta-cu/DAC-TA-BUILD-OMNI-3-0510.md (mục 1 bước 4–8, 4.2–4.7, 5) · hợp đồng API: docs/hop-dong-omni-3.md mục A ·
 // kiểu: server/src/omni-kieu.ts · chữ hiển thị: src/lib/omni-chu.ts (chủ ngữ "A.I Đỗ Đại Học").
 // CÔNG TẮC: chỉ chạy khi phiên Hoá 2.0 (`hoa2 === 1`) VÀ `omniBat(env, sbd)`. Cờ tắt ⇒ nơi gọi (game-v2.ts / srs2-game.ts) KHÔNG dùng kết quả
 // của tệp này ⇒ `answer`, `start`, `doan-*`, `hoa2-*` y hệt hôm nay. Mọi đọc OMNI lỗi ⇒ bỏ phần OMNI, KHÔNG làm hỏng lượt trả lời.
@@ -649,7 +649,7 @@ async function timCauThapHon(env: Env, sbd: string, s: PhienOmni, cu: RefOmni, n
   return { q: thang.q, m: thang.m, moi: !bc.daLam.has(thang.m.qid), ...(thang.lamLai ? { lamLai: thang.lamLai } : {}) }
 }
 /**
- * THANG làm lại cho câu thay ải sau Trạm (đặc tả DE-XUAT-LAM-LAI-CAU-SAI-0510.md mục 2; hàm thang `apLamLaiKhac` của cau-anh-em.ts, KHÔNG viết lại luật ở đây).
+ * THANG làm lại cho câu thay ải sau Trạm (đặc tả docs/dac-ta-cu/DE-XUAT-LAM-LAI-CAU-SAI-0510.md mục 2; hàm thang `apLamLaiKhac` của cau-anh-em.ts, KHÔNG viết lại luật ở đây).
  * Câu không phải lỗi / khoá `lam_lai_khac` tắt ⇒ trả y nguyên. Câu thay (câu anh em, bản song sinh, bản xáo) QUA LẠI cổng khối chung `chanKhacKhoiEm` (kênh
  * `omni_tram_thang`) — bị chặn ⇒ giữ câu cũ (đã qua cổng `omni_tram`), không bao giờ phát câu khác khối. Lỗi đọc thang ⇒ câu cũ (đường hôm nay), không làm hỏng Trạm.
  * Mục đích của Trạm là ĐỔI ẢI DỄ HƠN: câu anh em mức KHÔNG thấp hơn ải bị thay (`bacCu`) bị bỏ — dùng bản xáo của chính câu lỗi (bậc 3; không xáo được ⇒ nguyên văn có đếm).

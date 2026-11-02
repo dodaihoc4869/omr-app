@@ -1,4 +1,4 @@
-// BẢN KHÁC "ẢO" CHO CÂU SAI — HAI BẬC MỚI của thang làm lại (06/10, làn A đợt 2; thang 4 bậc: cau-anh-em.ts; đề xuất: DE-XUAT-LAM-LAI-CAU-SAI-0510.md).
+// BẢN KHÁC "ẢO" CHO CÂU SAI — HAI BẬC MỚI của thang làm lại (06/10, làn A đợt 2; thang 4 bậc: cau-anh-em.ts; đề xuất: docs/dac-ta-cu/DE-XUAT-LAM-LAI-CAU-SAI-0510.md).
 // Thầy 05/10: "thay vì lặp lại câu sai bạn hãy tìm cách để học sinh vẫn hoàn thành được câu sai đó nhưng không học thuộc đáp án được" + "tôi ko duyệt gì cả".
 //
 //   · `<Q>~bt<k>` BIẾN THỂ BẰNG MÃ (Phần I / III có bộ sinh theo dạng — bien-the-sinh.ts `apBienThe`, đáp án TÍNH BẰNG MÃ, kiểm chéo ở test):

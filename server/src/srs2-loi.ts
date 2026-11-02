@@ -1,5 +1,5 @@
 // THUẬT TOÁN 2.0 (Game Hóa 2.0, thầy chốt 27/09/2026) — LÕI THUẦN, không đụng D1.
-// Đặc tả: prompt-game-hoa-2-0.md mục B. Trạng thái từng câu KHÔNG lưu riêng: suy lại từ sổ `su_kien_hoc`
+// Đặc tả: docs/dac-ta-cu/prompt-game-hoa-2-0.md mục B. Trạng thái từng câu KHÔNG lưu riêng: suy lại từ sổ `su_kien_hoc`
 // (mọi nguồn: ca kiểm tra, game, lên bảng) bằng `phatLaiCau` — một nguồn sự thật, xoá đệm dựng lại vẫn ra y hệt.
 //
 // Bản tối ưu so với đặc tả gốc (đã trình thầy): so lịch theo NGÀY giờ VN; chuỗi đúng = 1 cũng hẹn lại;
@@ -7,7 +7,7 @@
 // hằng ngày sát hạn; cắt tỉa = rời hẳn kế hoạch sang "Cần thầy dạy lại"; câu mới giữ chỗ để phủ 100% trước hạn 3 ngày;
 // Huyết Chiến đếm theo LƯỢT cần (không đếm câu) và có trần 80.
 //
-// OMNI 3 (05/10, đặc tả DAC-TA-BUILD-OMNI-3-0510.md mục 1 bước 3 + 11, mục 4.9): `lapKeHoachNgay` nhận thêm TUỲ CHỌN nhiều bài song song (`chienDich`),
+// OMNI 3 (05/10, đặc tả docs/dac-ta-cu/DAC-TA-BUILD-OMNI-3-0510.md mục 1 bước 3 + 11, mục 4.9): `lapKeHoachNgay` nhận thêm TUỲ CHỌN nhiều bài song song (`chienDich`),
 // trọng số câu (`trongSoCau`), dạng đã vững (`dangVung`), ôn bài cũ (`onBaiCu`, `tiLeOnBaiCu`), chế độ chờ bài mới (`cheDoCho`). Vắng mọi trường mới ⇒ JSON
 // kế hoạch Y HỆT bản trước (khoá bằng tests/omni-3-ke-hoach-chot-cu.test.ts, 30 kịch bản).
 import { THAM_SO_OMNI } from './omni-kieu'

@@ -1,4 +1,4 @@
-// CỘNG EXP + MẢNH KHIÊN VÀO HỒ SƠ GAME — HÀM THUẦN (DE-XUAT-EXP-MANH-KHIEN-1909.md mục 4 và "Thiết kế máy chủ").
+// CỘNG EXP + MẢNH KHIÊN VÀO HỒ SƠ GAME — HÀM THUẦN (docs/dac-ta-cu/DE-XUAT-EXP-MANH-KHIEN-1909.md mục 4 và "Thiết kế máy chủ").
 //
 // Hồ sơ giữ TỔNG LUỸ KẾ đã cộng (`expMoi.daCong`, `expMoi.manhDaTinh`), mỗi lần chỉ cộng phần chênh `tổng sổ − đã cộng`. Nơi gọi (`exp-d1.ts`) ghi hồ sơ
 // bằng CAS theo `revision`, nên gọi lại bao nhiêu lần, hai lượt nộp chạy chồng nhau, hay em chưa có hồ sơ lúc khoản phát sinh, đều không cộng trùng

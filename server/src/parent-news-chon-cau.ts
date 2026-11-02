@@ -1,4 +1,4 @@
-// KÊNH 5 (phụ huynh giao bài hằng ngày) — PHẦN THUẦN, GĐ 5 (DE-XUAT-CA-NHAN-HOA-1909.md mục 2, "Kênh 5").
+// KÊNH 5 (phụ huynh giao bài hằng ngày) — PHẦN THUẦN, GĐ 5 (docs/dac-ta-cu/DE-XUAT-CA-NHAN-HOA-1909.md mục 2, "Kênh 5").
 //
 // Hai việc, cả hai không đọc đồng hồ và không Math.random (phá thế cân bằng bằng `hashSeed`):
 //   1. `tomTatKeHoach` / `soCauPhanDu`: số câu phụ huynh được giao = PHẦN DƯ của ngân sách ngày trong kế hoạch ngày.

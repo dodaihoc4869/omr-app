@@ -2,7 +2,7 @@
 // 14/10: gỡ Bi-a / Đoàn / cửa hàng / võ đài phía máy chủ — bỏ ca "Đoàn: chặng Phần III ~bt0" (Đảo đã khoá cùng ý); 4 ca A3 dựng lại qua Đảo (em chỉ chơi Đảo).
 // LÀM LẠI CÂU SAI — ĐỢT 2 (06/10, làn A): thang MỚI = song sinh → BIẾN THỂ BẰNG MÃ (`~bt`, Phần I/III có bộ sinh) | Ý ĐÚNG–SAI MỚI (`~yd`, Phần II) →
 // câu anh em (DẠY HỌC rồi TU LUYỆN) → bản xáo → nguyên văn; và câu NGHI sai đáp án bị loại ở cổng cuối của em. Nghiệm thu trên D1 THẬT (node:sqlite, đủ migration),
-// mọi lệnh của em đi qua đúng đường Worker thật (`server/src/index.ts`). Đặc tả: DE-XUAT-LAM-LAI-CAU-SAI-0510.md; tệp đợt 1: lam-lai-cau-sai-0510-d1.test.ts.
+// mọi lệnh của em đi qua đúng đường Worker thật (`server/src/index.ts`). Đặc tả: docs/dac-ta-cu/DE-XUAT-LAM-LAI-CAU-SAI-0510.md; tệp đợt 1: lam-lai-cau-sai-0510-d1.test.ts.
 // Kho thử: tờ khối 11 (của em), tờ khối 10 / 12, kho TU LUYỆN (mã `DB-…` ⇒ luật lùi TU_LUYEN) — CÙNG dạng, cùng mức, chưa gặp ⇒ chỉ luật khối chặn được câu khác khối.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import worker from '../server/src/index'

@@ -232,12 +232,19 @@ describe('phép thuần', () => {
     expect(chuDuMucEm({ ...NHIP_EM_CHAM, soNgayQua: 0, soNgayDu: 0 })).toBe('Bắt đầu đếm từ hôm nay 12/10')
   })
 
-  it('chiaChang: 32 câu ⇒ 6 chặng (6·5 + 2), chặng đang làm tô theo câu đã làm trong chặng; soHomNay lấy số chặng CÙNG nguồn với M (Gói 7 ⇒ ceil(M/6))', () => {
+  it('chiaChang: 32 câu ⇒ 6 chặng chuẩn 6 câu, chặng đang làm dở tô theo câu đã làm trong chặng; soHomNay lấy số chặng CÙNG nguồn với M (Gói 7 ⇒ ceil(M/6))', () => {
+    // 02/11: cập nhật theo 58dd56aa7 (30/10 «chia chặng chuẩn 6 câu, không tràn tiến độ chặng mới»): mọi chặng 6 câu (chặng cuối
+    // lấy phần dư khi tổng > soChang·6), và chặng 'dang' CHỈ tô khi biết em đang làm dở đúng chặng ấy (`changDangDo`).
     const c = chiaChang({ daLam: 7, muc: 32, chang: 2, soChang: 6 })
-    expect(c.map((x) => x.co)).toEqual([6, 6, 6, 6, 6, 2])
+    expect(c.map((x) => x.co)).toEqual([6, 6, 6, 6, 6, 6])
     expect(c.map((x) => x.tt)).toEqual(['xong', 'dang', 'cho', 'cho', 'cho', 'cho'])
-    expect(c[1]!.phan).toBe(17)
-    expect(chiaChang({ daLam: 32, muc: 32, chang: 6, soChang: 6 }).every((x) => x.tt === 'xong')).toBe(true)
+    expect(c[1]!.phan).toBe(0) // chưa mở chặng 2 ⇒ vòng không tràn tiến độ sang chặng mới
+    const dd = chiaChang({ daLam: 7, muc: 32, chang: 2, soChang: 6, changDangDo: 2 })
+    expect(dd[1]!.phan).toBe(17)
+    expect(chiaChang({ daLam: 0, muc: 40, chang: 1, soChang: 6 }).map((x) => x.co)).toEqual([6, 6, 6, 6, 6, 10])
+    // 58dd56aa7: ranh chặng cuối = max(M, soChang·6) ⇒ đủ mức hôm nay được báo bằng `duNgay` (HocTapHomNay đặt khi daLam ≥ M và hết việc)
+    expect(chiaChang({ daLam: 32, muc: 32, chang: 6, soChang: 6, duNgay: true }).every((x) => x.tt === 'xong')).toBe(true)
+    expect(chiaChang({ daLam: 36, muc: 32, chang: 6, soChang: 6 }).every((x) => x.tt === 'xong')).toBe(true)
     const kq = docSanh({ cheDo2: true, theLuc: { con: 25, tong: 32 }, goi7: goi({}), hanhTrinh: { tang: 2, toiThieu: 30, daLam: 12, daXep: 30, conThieu: 0, soChang: 5, changHienTai: 3, cauTrongChang: 6 } })
     expect(soHomNay(kq)).toEqual({ daLam: 7, muc: 32, chang: 2, soChang: 6 })
   })

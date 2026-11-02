@@ -1,5 +1,5 @@
 // Hồ sơ em (màn thầy) — dòng "Đã làm N câu hôm nay" ở kế hoạch của em đọc MỘT định nghĩa câu đã làm (`soCauDaLamHienThi`, src/lib/so-cau-hien-thi.ts; Boss 21/09, đề bài
-// prompt-mot-dinh-nghia-cau-da-lam-2109.md): cùng con số với ô Thi đua và thẻ Hôm nay của em. Máy chủ cũ (chưa có soCauHienThi) ⇒ rơi về daLamCau như trước.
+// docs/dac-ta-cu/prompt-mot-dinh-nghia-cau-da-lam-2109.md): cùng con số với ô Thi đua và thẻ Hôm nay của em. Máy chủ cũ (chưa có soCauHienThi) ⇒ rơi về daLamCau như trước.
 import { describe, expect, it } from 'vitest'
 import { tomTatKeHoach, type KeHoachEm } from '../src/lib/ho-so-em-thay'
 

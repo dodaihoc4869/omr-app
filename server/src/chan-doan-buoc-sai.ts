@@ -1,4 +1,4 @@
-// CHẨN ĐOÁN BƯỚC SAI TRƯỚC KHI LÀM LẠI (06/10, lệnh thầy "Làm chuẩn đoán bước sai") — SO-VIEC-OMNI-3.md dòng 43 (1), 46, 155; đặc tả DAC-TA-BUILD-OMNI-3-0510.md
+// CHẨN ĐOÁN BƯỚC SAI TRƯỚC KHI LÀM LẠI (06/10, lệnh thầy "Làm chuẩn đoán bước sai") — docs/so-viec/SO-VIEC-OMNI-3.md dòng 43 (1), 46, 155; đặc tả docs/dac-ta-cu/DAC-TA-BUILD-OMNI-3-0510.md
 // mục 1 bước 5–6; ghi chú thiết kế (vị trí chèn, ghi sổ, công tắc): docs/chan-doan-buoc-sai-0610.md.
 //
 // KHI NÀO: chuyến Đảo / chặng Đoàn (kế hoạch ngày: srs2-game `napLuot` → cau-anh-em `apLamLaiKhac`) sắp phát LƯỢT LÀM LẠI ĐẦU TIÊN của câu lỗi Q trong cửa sổ lỗi

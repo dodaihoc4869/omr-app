@@ -1,5 +1,5 @@
 // @vitest-environment node
-// GĐ 1 — HỒ SƠ NẮM KIẾN THỨC (DE-XUAT-CA-NHAN-HOA-1909.md mục 1.2, nghiệm thu GĐ 1).
+// GĐ 1 — HỒ SƠ NẮM KIẾN THỨC (docs/dac-ta-cu/DE-XUAT-CA-NHAN-HOA-1909.md mục 1.2, nghiệm thu GĐ 1).
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import worker from '../server/src/index'

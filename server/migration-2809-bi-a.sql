@@ -1,4 +1,4 @@
--- BI-A PHẢN ỨNG (đặc tả DAC-TA-BI-A-PHAN-UNG-2809.md mục 9.3) — migration CHỈ-THÊM: chỉ CREATE ... IF NOT EXISTS, không đụng bảng có sẵn.
+-- BI-A PHẢN ỨNG (đặc tả docs/dac-ta-cu/DAC-TA-BI-A-PHAN-UNG-2809.md mục 9.3) — migration CHỈ-THÊM: chỉ CREATE ... IF NOT EXISTS, không đụng bảng có sẵn.
 -- Chạy lại nhiều lần vô hại. Không có bản lùi phá dữ liệu: muốn tắt Bi-a thì tắt cờ `cau_hinh.bi_a`, bảng để nguyên.
 
 -- Một ván Bi-a (đấu đơn 2 ghế hoặc đánh đôi 4 ghế).

@@ -62,14 +62,23 @@ it('6 câu chặng (1 lướt) + 2 câu làm lại cuối chặng ⇒ ĐÃ LÀM 
   expect(lap.plan.viec.filter((v) => [...chang, ...lamLai].includes(v.qid))).toEqual([])
 })
 
-it('lượt vừa trả lời mà sổ chưa kịp ghi: câu làm lại (có hỗ trợ) không cộng; câu thường cộng', async () => {
+it('lượt vừa trả lời mà sổ chưa kịp ghi: câu làm lại cuối chặng không cộng; câu thường (kể cả có hỗ trợ) cộng', async () => {
   const k = await kho()
   const ke = (await lapGoi7(k.env, 'S1', NOW))!.plan.viec.map((v) => v.qid)
   const st = k.d.sql.prepare('INSERT INTO game_v2_attempt(id,sbd,session,qid,content_group,json,created_at) VALUES(?,?,?,?,?,?,?)')
   const luc = new Date(NOW - 30_000).toISOString()
+  // 02/11: cập nhật theo b0840bf5c (30/10): lượt chờ sổ nhận «làm lại cuối chặng» theo cờ `lamLaiCuoi` của câu trong PHIÊN (khớp `raw.ll` của sổ),
+  // không theo `assisted` nữa — câu tiếp cận có gợi ý/hỗ trợ (assisted, không phải làm lại) nay ĐƯỢC cộng ngay.
+  k.d.sql.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)')
+    .run('p', 'S1', JSON.stringify({ questions: [{ qid: ke[0] }, { qid: ke[1], lamLaiCuoi: 1 }, { qid: ke[2] }] }), luc)
   st.run('p|a', 'S1', 'p', ke[0]!, `g-${ke[0]}`, JSON.stringify({ attempt: { assisted: false } }), luc)
-  st.run('p|b', 'S1', 'p', ke[1]!, `g-${ke[1]}`, JSON.stringify({ attempt: { assisted: true } }), luc) // làm lại cuối chặng luôn có hỗ trợ
+  st.run('p|b', 'S1', 'p', ke[1]!, `g-${ke[1]}`, JSON.stringify({ attempt: { assisted: true } }), luc) // làm lại cuối chặng (cờ phiên) — có hỗ trợ
   const lap = (await lapGoi7(k.env, 'S1', NOW))!
   expect(lap.daLamNgay).toBe(1)
   expect(lap.daLamTap.has(ke[1]!)).toBe(true)
+  // câu có hỗ trợ nhưng KHÔNG phải làm lại ⇒ cộng
+  st.run('p|c', 'S1', 'p', ke[2]!, `g-${ke[2]}`, JSON.stringify({ attempt: { assisted: true } }), luc)
+  const lap2 = (await lapGoi7(k.env, 'S1', NOW))!
+  expect(lap2.daLamNgay).toBe(2)
+  expect(lap2.daLamTap.has(ke[1]!)).toBe(true)
 })

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// SINH BẢN VẼ GIÁO VIÊN cho "XEM ĐIỂM + BÁO CÁO CHI TIẾT" bản 2 (Code 4, 21/09/2026) — đề bài `prompt-xem-diem-bao-cao-v2.md` mục 3: GV-1 chi tiết ca · GV-2 báo cáo một em trong ca · GV-3 lịch sử ca.
+// SINH BẢN VẼ GIÁO VIÊN cho "XEM ĐIỂM + BÁO CÁO CHI TIẾT" bản 2 (Code 4, 21/09/2026) — đề bài `docs/dac-ta-cu/prompt-xem-diem-bao-cao-v2.md` mục 3: GV-1 chi tiết ca · GV-2 báo cáo một em trong ca · GV-3 lịch sử ca.
 //   node docs/ban-ve-xem-diem-2109/sinh-ban-ve-gv.mjs          ghi 3 trang HTML tĩnh tự chứa vào thư mục này
 //   node docs/ban-ve-xem-diem-2109/sinh-ban-ve-gv.mjs --anh    thêm: chụp Chromium 390 + 1440, sáng + tối, JPG ≤ 150 KB vào ./anh/
 // DÙNG LẠI ĐÚNG bộ thành phần chung của Code 2 (`sinh-ban-ve.mjs`: C.ketQua, C.phan, C.dang, C.cau, C.bieuDo, C.tienBo, C.thanhTren, C.mucLuc, C.hop…) — không vẽ bản thứ hai:

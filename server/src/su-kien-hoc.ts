@@ -1,4 +1,4 @@
-// SỔ SỰ KIỆN HỌC — GĐ 0 của "tiến bộ từng ngày" (DE-XUAT-CA-NHAN-HOA-1909.md mục 1.1).
+// SỔ SỰ KIỆN HỌC — GĐ 0 của "tiến bộ từng ngày" (docs/dac-ta-cu/DE-XUAT-CA-NHAN-HOA-1909.md mục 1.1).
 //
 // MỘT hàm ghi duy nhất (`ghiSuKien`) cho cả bảy nguồn kết quả. Bảy chỗ chấm bài
 // đã cầm sẵn đáp án trong tay; chỉ thiếu một dòng gọi hàm này. Kênh nào chấm thì

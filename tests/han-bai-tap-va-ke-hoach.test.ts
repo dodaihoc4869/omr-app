@@ -28,7 +28,7 @@ describe('Hạn bài và ngày học Việt Nam', () => {
     expect(p.top3[0].hanhDong.payload?.bt.maBtvn).toBe('soon')
     const ids = p.top3.filter(t => t.hanhDong.loai === 'mo_btvn').map(t => t.hanhDong.payload?.bt.maBtvn)
     expect(new Set(ids).size).toBe(ids.length)
-    // Không còn payload.soCau/vong (thay Vòng 1/2 — mục 3 SO-VIEC.md 19/09):
+    // Không còn payload.soCau/vong (thay Vòng 1/2 — mục 3 docs/so-viec/SO-VIEC.md 19/09):
     // số câu của LÔ đang chờ nay là trường `soCau` cấp cao nhất của nhiệm vụ,
     // và phiếu tự tính lại lịch lô từ `bt` gốc trong payload.
     expect(p.top3[0].soCau).toBeGreaterThan(0)

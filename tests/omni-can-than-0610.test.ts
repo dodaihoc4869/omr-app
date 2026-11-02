@@ -1,5 +1,5 @@
 // @vitest-environment node
-// OMNI 3 · CHƯƠNG TRÌNH "CẨN THẬN" (đặc tả DAC-TA-BUILD-OMNI-3-0510.md mục 4.6; thầy 05–06/10 "Làm nốt đi tất cả") — LÀN B, đợt 2 sáng 06/10.
+// OMNI 3 · CHƯƠNG TRÌNH "CẨN THẬN" (đặc tả docs/dac-ta-cu/DAC-TA-BUILD-OMNI-3-0510.md mục 4.6; thầy 05–06/10 "Làm nốt đi tất cả") — LÀN B, đợt 2 sáng 06/10.
 // Phần máy chủ: (a) mốc kiểm duy trì 14/30 ngày × 0,7 khi OMNI bật ∧ Sơ ý > 0,07 · cờ `canThan` · lựa chọn thẻ "Sai vì bước nào?" · ghi sổ riêng `omni_buoc_sai`.
 // D1 THẬT (node:sqlite, lược đồ đủ migration). `omniBat` / `hoSoOmniEm` của lớp omni-d1 là GIẢ tất định (cùng cách tests/omni-3-ke-hoach-d1.test.ts) để đặt Sơ ý tuỳ ý.
 import { beforeEach, describe, expect, it, vi } from 'vitest'

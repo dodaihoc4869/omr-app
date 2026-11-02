@@ -1,4 +1,4 @@
-// HẤP THỤ THEO NGÀY — hàm THUẦN (Code 1, 21/09/2026; thầy chốt 13:36 "CHỐT HẾT BUILD ĐI"; Điều 1 + 2 + 9 của `DE-XUAT-THAN-THU-MOI-NGAY-2109.md`).
+// HẤP THỤ THEO NGÀY — hàm THUẦN (Code 1, 21/09/2026; thầy chốt 13:36 "CHỐT HẾT BUILD ĐI"; Điều 1 + 2 + 9 của `docs/dac-ta-cu/DE-XUAT-THAN-THU-MOI-NGAY-2109.md`).
 //
 // Thần thú lên cấp theo NGÀY HỌC ĐỀU, không theo lượng EXP kiếm được: mỗi ngày (giờ Việt Nam) thần thú HẤP THỤ tối đa
 //   200 EXP khi em ĐẠT nhiệm vụ ngày · 120 EXP khi em có học nhưng chưa đạt · 0 khi em không học.

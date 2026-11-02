@@ -14,6 +14,7 @@ import { OngNghiem, TamThuong } from './TamThuong'
 import { capNhatTongQuan, useTai, useTongQuan } from './dung-thuong'
 import { Cho, Loi, ManToan, NutDay, gioVn, oTinhThe, thuNgayVn, useHieuUng } from './chung'
 import { DauVe } from './ManChuoi'
+import OSoTraLoi from '../OSoTraLoi'
 
 type Buoc = 'moi' | 'lam' | 'truot' | 'dat'
 export interface PropsKimCuong {
@@ -109,7 +110,8 @@ export function ManKimCuong({ token, chuyenDe, tenChuyenDe, onDong, onOnLai, bat
         {q.phan === 'II' && <div className="tp-ds">{q.ideas.map((y, i) => <div key={i}><span><b>{'abcd'[i]})</b> <ChemText text={y} /></span>
           <span className="tp-hai-nut" role="group" aria-label={`Chọn cho ý ${'abcd'[i]}`}>{(['D', 'S'] as const).map((v) => <button key={v} type="button" className="tp-nut" aria-pressed={tra[i] === v} data-sac={tra[i] === v ? 'chinh' : undefined} disabled={!!kq}
             onClick={() => { const a = tra.padEnd(4, '-').split(''); a[i] = v; chon(a.join('')) }}>{v === 'D' ? 'Đúng' : 'Sai'}</button>)}</span></div>)}</div>}
-        {q.phan === 'III' && <label className="tp-ds"><span className="tp-mo">Đáp số</span><input className="tp-o-so" inputMode="decimal" autoComplete="off" value={tra} disabled={!!kq} onChange={(e) => chon(e.target.value.replace(/[^\d,.-]/g, '').slice(0, 8))} /></label>}
+        {/* 02/11: ô đáp số dùng chung OSoTraLoi (bàn phím số iPhone không có dấu «−» ⇒ cần nút «±» trong ô; luật 30/09). */}
+        {q.phan === 'III' && <div className="tp-ds"><span className="tp-mo">Đáp số</span><OSoTraLoi inputClassName="tp-o-so" ariaLabel="Đáp số" maxLength={8} value={tra} disabled={!!kq} onChange={(v) => chon(v.replace(/[^\d,.-]/g, '').slice(0, 8))} /></div>}
         {kq && <div className="tp-kq-kc" data-kq={kq.dung ? 'dung' : 'sai'} role="status">{kq.dung ? 'Chính xác!' : `Chưa đúng · vỡ 1 ống nghiệm${ongCon > 0 ? ` · còn ${ongCon} ống` : ''}`}</div>}
         {kq?.thuong && <TamThuong thuong={kq.thuong} />}
         {loi && <Loi chu={loi} />}

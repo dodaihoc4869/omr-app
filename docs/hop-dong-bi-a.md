@@ -1,6 +1,6 @@
 # Hợp đồng API · Bi-a Phản Ứng (GĐ1, 28/09/2026)
 
-Mã máy chủ: `server/src/bi-a.ts` · máy khách: `src/game/bi-a/api.ts` · đặc tả: `DAC-TA-BI-A-PHAN-UNG-2809.md` (mục 4, 9).
+Mã máy chủ: `server/src/bi-a.ts` · máy khách: `src/game/bi-a/api.ts` · đặc tả: `docs/dac-ta-cu/DAC-TA-BI-A-PHAN-UNG-2809.md` (mục 4, 9).
 Mọi lệnh đi `POST /game-v2` với `{ token, action, ... }` (máy khách gọi qua `goiHoa2(lenh, token, du)`). Máy chủ KHÔNG chấm riêng: chấm, ghi sổ, Thể lực, EXP, lịch ôn đều qua lệnh `answer` chung.
 
 ## Chặn chung (mọi lệnh `bia-*`, xét trước)

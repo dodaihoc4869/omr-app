@@ -965,6 +965,13 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
     setManThi(true)
   }
 
+  // 02/11: hai hook này phải nằm TRƯỚC nhánh chưa đăng nhập (luật hook React) — đặt sau `return` thì đăng nhập / đăng xuất ngay trong màn làm đổi số hook ⇒ React báo lỗi, sập màn.
+  const daAnLoTrinh = useRef(false)
+  useEffect(() => {
+    if (tab === null && daAnLoTrinh.current) window.dispatchEvent(new Event(SU_KIEN_VE_LO_TRINH))
+    daAnLoTrinh.current = tab !== null
+  }, [tab])
+
   // NẾU CHƯA ĐĂNG NHẬP — màn đăng nhập (cây JSX chép nguyên văn sang DangNhapHocSinh.tsx 05/10; vỏ app học sinh dựng nó trước cổng).
   if (!auth) {
     return <DangNhapHocSinh api={API_DANG_NHAP} onDangNhap={daDangNhap} logo={<LogoDoc vai="hs" size={48} />} />
@@ -1001,11 +1008,6 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
     else if (man === 'btvn') void napLaiBtvn()
   }
 
-  const daAnLoTrinh = useRef(false)
-  useEffect(() => {
-    if (tab === null && daAnLoTrinh.current) window.dispatchEvent(new Event(SU_KIEN_VE_LO_TRINH))
-    daAnLoTrinh.current = tab !== null
-  }, [tab])
   // KHI ĐÃ ĐĂNG NHẬP THÀNH CÔNG — MỘT màn "Bảng nhiệm vụ"; mọi màn cũ mở dạng sheet toàn màn.
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col">

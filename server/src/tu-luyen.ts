@@ -119,7 +119,7 @@ async function emCua(env: Env, b: Obj): Promise<string> {
 }
 
 // ------------------------------------------------------------------ OMNI 3: câu MỚI chỉ từ tờ TU LUYỆN (kho-thu-muc.ts)
-// Luật kho (DAC-TA-BUILD-OMNI-3-0510.md mục 2): khi OMNI bật cho em, câu mới / câu rút thêm / câu bù kho của MỌI chế độ chỉ lấy từ tờ thư mục
+// Luật kho (docs/dac-ta-cu/DAC-TA-BUILD-OMNI-3-0510.md mục 2): khi OMNI bật cho em, câu mới / câu rút thêm / câu bù kho của MỌI chế độ chỉ lấy từ tờ thư mục
 // TU LUYỆN (tờ DẠY HỌC dành cho tick bài và game); kho CÂU SAI của em giữ nguyên mọi nguồn (chế độ 1 và câu sai làm "mồi" ở chế độ 2, 4).
 // Cờ tắt (hoặc đọc cờ lỗi) ⇒ không một truy vấn nào thêm, Tu luyện y hệt cũ.
 

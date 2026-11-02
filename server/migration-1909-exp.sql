@@ -1,4 +1,4 @@
--- CHỈ THÊM (19/09/2026): SỔ EXP HỌC TẬP + SỔ MẢNH KHIÊN (DE-XUAT-EXP-MANH-KHIEN-1909.md, thầy chốt "Chốt. Quá thông minh").
+-- CHỈ THÊM (19/09/2026): SỔ EXP HỌC TẬP + SỔ MẢNH KHIÊN (docs/dac-ta-cu/DE-XUAT-EXP-MANH-KHIEN-1909.md, thầy chốt "Chốt. Quá thông minh").
 --
 -- Hai bảng này là SỔ CỘNG DỒN, chỉ thêm dòng, không sửa/xoá. Mọi khoản EXP/mảnh do MÁY CHỦ tính từ sổ `su_kien_hoc` và các bảng phụ
 -- (hàm thuần `exp-hoc-tap.ts`), KHÔNG có khoản nào do máy em khai. Không đụng bảng/cột đang chạy. Mã máy chủ có phòng vệ nếu quên chạy

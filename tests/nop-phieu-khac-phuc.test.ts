@@ -137,7 +137,8 @@ describe('trang phiếu', () => {
   it('CHỌN DỞ RỒI ĐÓNG MÁY vẫn còn — lưu theo mã phiếu KÈM vân tay bộ câu', () => {
     expect(JS_PHIEU).toContain("var KHOA_CU = 'ddh.lam.' + du.ma")
     expect(JS_PHIEU).toContain("var KHOA_LUU = KHOA_CU + '.' + vanTayBo()")
-    expect(JS_PHIEU).toContain('function vanTayBo()')
+    // 02/11: cập nhật theo b52706159 (vanTayBo nhận thêm danh sách mã câu cũ để đọc bài lưu theo khoá đời trước).
+    expect(JS_PHIEU).toContain('function vanTayBo(ids)')
     expect(JS_PHIEU).toContain('function luuLam()')
   })
 
@@ -266,7 +267,10 @@ describe('nộp xong mới hiện lời giải (thầy chốt 08/09)', () => {
   it('ĐANG CHỌN thì nhìn thấy được, và đã chấm rồi thì khoá tay', () => {
     const html = dungPhieu(tt, [cau('q1')], { nop: { ma: 'abcd1234', sbd: '12121212', url: 'https://x' } })
     // Ô đang chọn phải đổi nền, không chỉ đổi viền mờ.
-    expect(html).toContain('.q-opt.lam-o[aria-checked="true"] { background: #eef2f6; border-color: #2f3e46; }')
+    // 02/11: cập nhật theo cad720a6c (màu ô đang chọn thành biến --chon-nen/--chon-vien để có bản tối; bản sáng giữ đúng hai màu cũ).
+    expect(html).toContain('.q-opt.lam-o[aria-checked="true"] { background: var(--chon-nen); border-color: var(--chon-vien); }')
+    expect(html).toContain('--chon-nen: #eef2f6;')
+    expect(html).toContain('--chon-vien: #2f3e46;')
     expect(html).toContain('.tf-badge.lam-o[aria-checked="true"] { background: #2f3e46; border-color: #2f3e46; color: #ffffff; }')
     // Bàn phím vẫn thấy ô đang trỏ.
     expect(html).toContain('.lam-o:focus-visible {')

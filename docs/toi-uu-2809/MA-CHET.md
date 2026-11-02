@@ -16,8 +16,8 @@ Nguồn: knip (`toi-uu/knip2.txt`, `chi-test.txt`) + grep lại từng tệp tro
 | `src/components/xem-thu/btvn-da-giao.tsx` | trang xem thử dev, nạp từ `.html` cạnh nó; scripts/soi-btvn-da-giao.mjs, kiem-tran-giao-dien-2309.mjs mở | GIỮ |
 | `src/components/xem-thu/phu-kien.tsx` | trang xem thử dev (nạp từ .html) | GIỮ |
 | `src/components/xem-thu/the-cuoi-chang.tsx` | trang xem thử dev (SO-VIEC-GIAO-DIEN ghi đường dẫn) | GIỮ |
-| `src/game/bi-a/xem-thu.tsx` | trang thử Bi-a (BI-A-build-status.md) | GIỮ |
-| `src/game/than-thu-v2/dao/xem-thu.tsx` | trang xem thử Đảo (SO-VIEC-DAO.md) | GIỮ |
+| `src/game/bi-a/xem-thu.tsx` | trang thử Bi-a (docs/so-viec/BI-A-build-status.md) | GIỮ |
+| `src/game/than-thu-v2/dao/xem-thu.tsx` | trang xem thử Đảo (docs/so-viec/SO-VIEC-DAO.md) | GIỮ |
 | `src/game/than-thu-v2/dao2/xem-thu-chuong.tsx` | trang xem thử (nạp từ .html) | GIỮ |
 | `src/game/than-thu-v2/dao2/xem-thu.tsx` | trang xem thử (nạp từ .html) | GIỮ |
 | `src/game/than-thu-v2/doan-xem-thu.tsx` | trang xem thử Đoàn (nạp từ .html) | GIỮ |

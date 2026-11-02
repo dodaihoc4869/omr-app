@@ -42,9 +42,12 @@ import { layCauHinhMayChu, xongNapDiaChi } from './may-chu-moi'
 import { loadDiaChiMayChuMoiChoEm } from './exam-db'
 import { diaChiMayChuHopLe as don } from './cau-hinh-may-chu'
 import { ghiDiaChiDaDung } from './hoi-som'
+import { theHeCauHinh } from './the-he-cau-hinh'
 
 /** Nhớ địa chỉ ĐÃ RA ĐƯỢC. Không bao giờ nhớ chuỗi rỗng (luật 2). */
 let daBiet = ''
+/** Thế hệ cấu hình lúc nhớ `daBiet` — thầy đổi cấu hình (`quenCauHinhMayChu`) ⇒ bỏ địa chỉ cũ, cấu hình mới thắng. */
+let theHeDaBiet = theHeCauHinh()
 
 /** Chỉ dùng cho phép kiểm. */
 export function quenDiaChiMayChu(): void {
@@ -54,7 +57,7 @@ export function quenDiaChiMayChu(): void {
 /**
  * Địa chỉ máy chủ cho MỌI lượt gọi của học sinh và phụ huynh.
  *
- * Thứ tự: cấu hình trong máy → gợi ý chỗ gọi đưa vào → chờ lượt nạp lúc khởi
+ * Thứ tự (27788740a): gợi ý chỗ gọi đưa vào (hợp lệ thì thắng) → địa chỉ đã nhớ → cấu hình trong máy → chờ lượt nạp lúc khởi
  * động → tải thẳng `cau-hinh.json`. Bốn đường cùng chỉ về một địa chỉ; đường
  * nào ra trước thì lấy.
  *
@@ -62,6 +65,7 @@ export function quenDiaChiMayChu(): void {
  *             không sao — đó chính là điểm của tệp này.
  */
 export async function layDiaChiMayChu(goiY = ''): Promise<string> {
+  if (theHeDaBiet !== theHeCauHinh()) { daBiet = ''; theHeDaBiet = theHeCauHinh() }
   if (daBiet && !goiY) return daBiet
   const u = await timDiaChiMayChu(goiY)
   // HỎI SỚM (05/10, src/lib/hoi-som.ts): nhớ địa chỉ vừa dùng — lệnh Sảnh gửi sớm chỉ được nhận khi đi đúng máy chủ này.

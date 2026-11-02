@@ -1,4 +1,4 @@
-/* BẢN VẼ thẻ "ĐƯỜNG VỀ ĐÍCH" (DE-XUAT-DON-VE-DICH-2109.md · Điều 2 + Điều 3) — 21/09/2026. CHỈ LÀ MẪU VẼ, chưa build.
+/* BẢN VẼ thẻ "ĐƯỜNG VỀ ĐÍCH" (docs/dac-ta-cu/DE-XUAT-DON-VE-DICH-2109.md · Điều 2 + Điều 3) — 21/09/2026. CHỈ LÀ MẪU VẼ, chưa build.
  * Đọc biến của app (src/styles/tokens.css + src/components/bang-nhiem-vu/m3-theme.css); sáng/tối theo máy. Không có mã màu thô: mọi màu là token. */
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }

@@ -1,6 +1,6 @@
 # Hợp đồng API — OMNI 3 (05/10/2026)
 
-Kiểu dữ liệu: `server/src/omni-kieu.ts` (HỢP ĐỒNG). Chữ hiển thị: `src/lib/omni-chu.ts` (một nguồn cho máy chủ và ba app). Đặc tả: `DAC-TA-BUILD-OMNI-3-0510.md`.
+Kiểu dữ liệu: `server/src/omni-kieu.ts` (HỢP ĐỒNG). Chữ hiển thị: `src/lib/omni-chu.ts` (một nguồn cho máy chủ và ba app). Đặc tả: `docs/dac-ta-cu/DAC-TA-BUILD-OMNI-3-0510.md`.
 
 **Luật chung:** mọi phần OMNI chỉ xuất hiện khi công tắc `cau_hinh.omni` áp cho em (và Hoá 2.0 đang bật cho em). Công tắc tắt ⇒ mọi lệnh trả y hệt hôm nay (trường mới vắng). Đáp án/lời giải không xuống máy em trước khi em nộp câu đó. Giao diện giữ nguyên: mọi trường mới là DÒNG THÊM vào thẻ/khung sẵn có.
 
