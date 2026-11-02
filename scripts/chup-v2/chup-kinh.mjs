@@ -24,7 +24,7 @@ const KHO = [['doc', 390, 844], ['ngang', 844, 390], ['fold', 904, 690], ['fold-
 const chonKho = (process.env.KHO ?? '').split(',').filter(Boolean), chonNen = (process.env.NEN ?? 'sang,toi').split(',')
 // [tên, tham số trang, các bước (ngăn bằng « » »): tn:<regex> chọn phương án · nut:<regex> bấm nút · ds:a=Đúng,b=Sai · phim:<kí tự> · bam:<css> · cho:<ms>, dài (chụp cả trang)]
 const DQ1 = 'tn:^D » nut:^Kiểm tra$ » nut:^Tiếp tục', DQ3 = `${DQ1} » tn:^A » nut:^Kiểm tra$ » nut:^Tiếp tục`, DQ4 = `${DQ3} » ds:a=Đúng,b=Đúng,c=Đúng,d=Đúng » nut:^Kiểm tra$ » nut:^Tiếp tục`
-const DK_LUOI = 'bam:.duo-kt-luoi-nut, [aria-label*="Danh sách câu"]'
+const _DK_LUOI = 'bam:.duo-kt-luoi-nut, [aria-label*="Danh sách câu"]'
 export const CANH = [
   ['hom-nay', 'man=hs-mot&dd=khong', '', true],
   ['hom-nay-diem-danh', 'man=hs-mot&dd=mo', '', true],
@@ -66,6 +66,7 @@ export const CANH = [
   ['tp-huy-hieu', 'man=tp&v=huy-hieu', '', true],
   ['tp-ban', 'man=tp&v=ban', '', true],
   ['tp-ket', 'man=tp&v=ket', '', true],
+  ['khac-phuc', 'man=hs-sheet&tam=khac-phuc', 'cho:900', false], // tấm phủ kín «Luyện lại từ bài kiểm tra» (lớp sau không được lộ qua)
   ['dang-nhap', 'man=hs-dang-nhap', '', false],
   ['ai', 'man=hs-ng&v=ai', 'cho:600', false],
 ]
