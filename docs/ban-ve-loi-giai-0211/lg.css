@@ -246,9 +246,29 @@ html.may-yeu .san [data-tu], html.may-yeu .san [data-chi], html.may-yeu .loi-nhi
 .hat i { aspect-ratio: 1; border-radius: 50%; background: var(--tr-chu-y-nut); transition: background-color .26s, opacity .26s, transform .26s; }
 .hat-nhan { display: flex; justify-content: space-between; gap: 8px; padding: 0 12px 10px; font-size: 14px; font-weight: 800; color: var(--tr-chu-2); }
 .hat-nhan b { color: var(--tr-chu); }
-.chieu:is([data-nhip='1']) .hat i { opacity: .25; }
+
 .chieu:is([data-nhip='3'], [data-nhip='4'], [data-nhip='5']) .hat i { background: var(--tr-hs-day); }
 .chieu[data-nhip='5'] .hat i:nth-child(n+16) { background: transparent; box-shadow: inset 0 0 0 2px var(--tr-vien-2); transform: scale(.8); }
 @media (prefers-reduced-motion: reduce) { .hat i { transition: none; } }
 .chong { display: grid; justify-items: end; text-align: right; } .chong > * { grid-area: 1 / 1; }
 .chieu .dem { white-space: nowrap; font-size: 14px; font-weight: 800; color: var(--tr-chu-3); }
+
+/* ── PHÉP TÍNH BẤM TỪNG SỐ: chạm số nào hiện ý nghĩa số đó + kết quả tới đó ── */
+.phep-bam { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 4px; padding: 10px 12px; border-radius: 20px; background: var(--kinh-dam); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--tr-vien) 60%, transparent); font-size: 20px; font-weight: 800; color: var(--tr-chu-2); }
+.phep-bam .chu-m { margin-right: 2px; color: var(--tr-chu); }
+.phep-bam .nhan { color: var(--tr-chu-3); }
+.so-bam { min-width: 44px; min-height: 44px; padding: 0 10px; border-radius: 14px; font-size: 20px; font-weight: 800; color: var(--tr-hs-chu); background: var(--tr-hs-nhat); box-shadow: inset 0 -2px 0 color-mix(in oklab, var(--tr-hs-day) 45%, transparent); text-align: center; transition: transform .15s, background-color .2s; }
+.so-bam:active { transform: scale(.96); }
+.so-bam[aria-pressed='true'] { background: var(--tr-hs-day); color: var(--tr-hs-tren); box-shadow: 0 8px 16px -10px var(--tr-hs-day); }
+.so-bam:focus-visible { outline: 3px solid var(--tr-hs); outline-offset: 2px; }
+.phep-bam .ket-bam { margin-left: 2px; padding: 6px 10px; border-radius: 14px; background: var(--tr-dung-nhat); color: var(--tr-dung-chu); white-space: nowrap; }
+.giai-so { min-height: 0; }
+.giai-so > div { padding: 12px 14px; border-radius: 20px; background: var(--tr-hs-nhat); align-items: flex-start; }
+.giai-so > div[data-n='0'] { background: var(--kinh-dam); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--tr-vien) 60%, transparent); }
+.giai-so .so-to { flex: none; min-width: 64px; padding: 6px 10px; border-radius: 14px; background: var(--tr-hs-day); color: var(--tr-hs-tren); font-size: 18px; font-weight: 800; text-align: center; white-space: nowrap; }
+.giai-so .tay { flex: none; width: 36px; height: 36px; display: grid; place-items: center; font-size: 22px; color: var(--tr-hs-chu); }
+.giai-so p { font-size: 16px; font-weight: 600; line-height: 1.45; color: var(--tr-chu-2); }
+.giai-so p > b { color: var(--tr-chu); }
+.giai-so .dang-co { display: block; margin-top: 6px; padding: 6px 10px; border-radius: 12px; background: var(--tr-mat); font-size: 15.5px; font-weight: 700; color: var(--tr-chu-2); }
+.giai-so .dang-co b { color: var(--tr-dung-chu); }
+.chieu[data-nhip='0'] .hat i { opacity: 1; }

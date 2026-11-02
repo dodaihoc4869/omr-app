@@ -7,9 +7,9 @@ Nguồn nội dung (BẮT BUỘC, không lấy chỗ khác): skill `ly-thuyet-th
 ## Bản vẽ (ảnh Chromium thật ở `anh/`, 3 khổ 390×844 · 844×390 · 1440×900, sáng + tối)
 | Trang | Nội dung |
 |---|---|
-| `p1-ester` | Phần I, đúng câu thầy gửi ảnh. Kết quả em → Kiến thức cốt lõi (công thức lớn) → **phim thầy dẫn 5 bước** (tách gốc/chức → no là gốc 0 π → COO 2 O 1 π → alkane mất 1 H₂ → n ≥ 2) → **kéo n thử** (mô hình que–bóng, kéo về n = 1 thấy HCOOH là acid) → Thầy nói nguyên văn + nút xem video bài 1.C1 → vì sao A đúng / B C D sai (đánh dấu ý em chọn) → thẻ bẫy hay nhầm lật dọc → em tự trả lời trước → thẻ nhớ đã thêm → Câu tiếp theo |
+| `p1-ester` | Phần I, đúng câu thầy gửi ảnh. Kết quả em → Kiến thức cốt lõi (công thức lớn) → **phim thầy dẫn 5 bước** (tách gốc/chức → no là gốc 0 π → COO 2 O 1 π → alkane mất 1 H₂ → n ≥ 2) → **kéo n thử** (mô hình que–bóng, kéo về n = 1 thấy HCOOH là acid) → Thầy nói nguyên văn → vì sao A đúng / B C D sai (đánh dấu ý em chọn) → thẻ bẫy hay nhầm lật dọc → em tự trả lời trước → thẻ nhớ đã thêm → Câu tiếp theo |
 | `p2-can-bang` | Phần II. Ba **thần chú thật** vuốt ngang (Tăng thu, giảm toả · Tăng áp suất chọn phía ít mol khí · Bình thông nhau) → **phòng thí nghiệm bấm tác động** (4 nút, bi trượt về chiều chuyển dịch, phân tử N₂/H₂/NH₃) → **thí nghiệm ống NO₂ trong nước đá / nước nóng** (nhạt màu / nâu đậm) → từng ý a–d (em chọn gì, đáp án) → Thầy nói → hay nhầm → câu tự hỏi H₂ + I₂ |
-| `p3-hieu-suat` | Phần III. **Thí nghiệm điều chế ethyl acetate** 4 bước (cho chất → đun cách thuỷ → NaCl bão hoà, ester nổi lên trên, mùi thơm → thuận nghịch nên H < 100%) → **sơ đồ cột dọc + MỘT phép tính** m = 12 · 1/60 · 1 · 88 · 75/100 = 13,2 g: từng thừa số sáng lần lượt kèm lời nói của nó, **20 hạt mol** đổi màu theo (0,2 mol → 20 ester nếu phản ứng hết → 15 hạt thật) → kiểm bằng cách khác → hay nhầm sát bài (17,6 em ở đây · 19,8 · 23,47) → câu tự hỏi tính ngược |
+| `p3-hieu-suat` | Phần III. **Thí nghiệm điều chế ethyl acetate** 4 bước (cho chất → đun cách thuỷ → NaCl bão hoà, ester nổi lên trên, mùi thơm → thuận nghịch nên H < 100%) → **sơ đồ cột dọc + MỘT phép tính** m = 12 · 1/60 · 1 · 88 · 75/100 = 13,2 g: **em chạm số nào thì hiện ý nghĩa số đó** (là gì, vì sao, M tính ra sao) kèm kết quả tính tới đó; có nút Chạy cả phép tính, **20 hạt mol** đổi màu theo (0,2 mol → 20 ester nếu phản ứng hết → 15 hạt thật) → kiểm bằng cách khác → hay nhầm sát bài (17,6 em ở đây · 19,8 · 23,47) → câu tự hỏi tính ngược |
 | `the-nho`, `the-nho-lat` | Hộp thẻ nhớ 5 ngăn (Leitner 1 → 3 → 7 → 14 ngày → đã thuộc). Mặt trước câu hỏi, mặt sau đáp + thần chú + vì sao. Hai nút Chưa nhớ / Nhớ rồi nói rõ ngày gặp lại |
 | `trang-thai` | Câu chưa giải lại (hiện lời giải cũ trong khung Kính) · đang mở (khung giữ chỗ) · câu kiểm tra khi mất mạng · máy yếu |
 | `phan-canh-1…4` | Bảng phân cảnh: từng bước của 4 phim đứng yên (ảnh tĩnh không thấy chuyển động; mở tệp `.html` trên trình duyệt để xem chạy) |
@@ -83,12 +83,12 @@ Thêm, không đường mới:
   - `thiNghiem`: `{ canh, buoc[] }`, chỉ khi có thí nghiệm SGK đúng chuyện.
   - `bamThu`: thanh kéo / nút tác động, chỉ khi hợp.
   - `thanChu[]`: chỉ lấy từ bảng thần chú skill lý thuyết, kèm mục gốc.
-  - `thayNoi`: một câu nguyên văn + mã bài + mã video + mốc phút khi có. Mã video PHẢI là video của đúng mục kiến thức chép câu đó (cùng chủ đề chưa đủ); máy chủ đối chiếu cặp câu ↔ mục ↔ video với bảng của skill lý thuyết, lệch ⇒ bỏ khối Thầy nói.
+  - `thayNoi`: một câu nguyên văn + mục kiến thức gốc (chỉ để máy chủ đối chiếu với skill lý thuyết, lệch ⇒ bỏ khối). KHÔNG hiện trích dẫn video trên màn (thầy 02/11).
   - `lyDo[]` như cũ.
   - `hayNham[]`: mặt «nhiều em nghĩ» / «đúng là».
   - `tuHoi`: câu hỏi + trả lời.
   - `theNho[]`: mặt trước là câu hỏi, mặt sau 1–2 dòng + vì sao.
-  - Phần III thêm `soDo` (các cột chất) + `phepTinh[]` (thừa số + lời nói + bước) + `kiemLai`.
+  - Phần III thêm `soDo` (các cột chất) + `phepTinh[]`: mỗi thừa số `{ so, nghia, viSao, dangCo }` (em chạm số nào hiện đúng ý nghĩa số đó và kết quả tính tới đó) + `kiemLai`.
 - **Máy chủ kiểm lại mọi bản 2** như bản 1, thêm các khoá:
   - đáp án trong `phepTinh` / `lyDo` khớp đáp án kho;
   - thần chú thuộc bảng thần chú;
@@ -97,12 +97,11 @@ Thêm, không đường mới:
   - không câu tự luận (`src/lib/cau-tu-luan.ts`).
 - **Giải lại cả kho:**
   - Đẩy hàng việc `loi_giai_viec` cho mọi băm (bảng CHỈ-THÊM, thêm cột `ban`). Kho ngày 14/09 có 7.934 câu: Phần I 4.841, Phần II 1.293, Phần III 1.800 (số đếm ghi đầu `src/lib/chuan-hoa-loi-giai.ts`).
-  - Chạy ở **máy soạn trên Mac thầy**, vì nguyên văn lời giảng + mốc phút nằm ở đó (`txt/<mã video>.txt`). Phiên đám mây không có.
+  - Chạy ở **máy soạn trên Mac thầy**, vì nguyên văn lời giảng nằm ở đó (`txt/<mã video>.txt`). Phiên đám mây không có.
   - **KHÔNG ghi đè lời giải cũ.** Câu máy tính ra khác đáp án kho ⇒ vào `cau_nghi_dap_an` (đã có), không tự sửa kho.
 - **Hộp thẻ nhớ:**
   - Lưu trên máy em (IndexedDB, bọc try/catch), gộp đồng bộ vào lệnh nộp câu đang có (không thêm lệnh, không thêm vòng chờ).
   - Thẻ sinh từ `theNho` của câu em sai hoặc «chưa chắc».
-- Video thầy: nút Xem thầy giảng mở YouTube đúng mã video, có mốc phút khi máy soạn lấy được.
 
 ## 5. Ngoại lệ
 - **Đáp án chưa nộp:**
@@ -140,6 +139,7 @@ Thêm, không đường mới:
 - Chỉ đổi app học sinh. Phụ huynh / giáo viên / game giữ khối lời giải chuẩn hiện tại.
 - Câu mẫu trong bản vẽ là dữ liệu giả sát thực tế (em tự tính: 12/60 = 0,2; 13,8/46 = 0,3; 0,2 · 88 · 0,75 = 13,2; 0,3 · 88 · 0,75 = 19,8; 17,6 · 100/75 ≈ 23,47; 13,2/88 · 60 · 100/75 = 12).
 - Thí nghiệm ống NO₂ (2NO₂ ⇌ N₂O₄, Δ<sub>r</sub>H < 0) và điều chế ethyl acetate là thí nghiệm SGK KNTT. Bản vẽ không ghi nhiệt độ đun cách thuỷ cụ thể vì chưa đối chiếu được trang SGK.
-- Thầy nói trong bản vẽ chép nguyên văn từ dòng «Thầy nói» của skill lý thuyết, đúng mục và đúng video: P1 «Nhẩm số liên kết pi» (1.C1 Ester `OAV45qDm6vs`), P2 «nguyên lý Lơ Sa-tơ-li-ê…» (1.C1 Cân bằng `INJFF24ePfU`), P3 «hiệu suất khi tính xuôi và tính ngược» (2008 Kĩ thuật giải bài toán sulfur `5aBoCq5Q6tk`).
+- Thầy nói trong bản vẽ chép nguyên văn từ dòng «Thầy nói» của skill lý thuyết, đúng mục kiến thức: P1 «Nhẩm số liên kết pi» (1.C1 Ester `OAV45qDm6vs`), P2 «nguyên lý Lơ Sa-tơ-li-ê…» (1.C1 Cân bằng `INJFF24ePfU`), P3 «hiệu suất khi tính xuôi và tính ngược» (2008 Kĩ thuật giải bài toán sulfur `5aBoCq5Q6tk`).
 - Chữ trong hình (SVG) ≥ 14 px; bộ chụp chưa đo tương phản chữ trong SVG (đã dùng đúng biến màu chữ --tr-*-chu của app).
-- Phần I không có thí nghiệm vì không có thí nghiệm SGK đúng chuyện công thức chung; thay bằng mô hình kéo n. Nút Xem thầy giảng ở bản vẽ chưa có mốc phút.
+- Phần I không có thí nghiệm vì không có thí nghiệm SGK đúng chuyện công thức chung; thay bằng mô hình kéo n.
+- Thầy 02/11 sau bản vẽ 1: «Không cần trích dẫn video», «một phép tính cho hs bấm vào số nào thì hiện ra ý nghĩa của đoạn phép tính đó» ⇒ bỏ thẻ nguồn video; phép tính thành nút bấm từng số.

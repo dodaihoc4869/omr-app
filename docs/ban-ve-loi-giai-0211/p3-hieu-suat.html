@@ -51,38 +51,39 @@
   <section class="kinh the" aria-label="Thầy giảng dạng này">
     <span class="nhan-k">Thầy giảng dạng này</span>
     <div class="thay-noi"><span class="av" data-hinh="banh"><b>Đ</b></span><div class="bong"><small>Thầy nói</small>Tính xuôi thì các em phải nhân thêm với hiệu suất chia 100.</div></div>
-    <div class="nguon"><span class="oi" data-sac="sai" data-co="nho"><span data-i="phai"></span></span><span class="giua"><b>Kĩ thuật giải bài toán sulfur</b><span class="mo">Hiệu suất khi tính xuôi và tính ngược</span></span><button class="nut" data-l="kinh" type="button">Xem thầy giảng</button></div>
   </section>
 </div>
 
 <div class="cot">
-  <section class="kinh the chieu" data-so-nhip="5" data-t="3200" data-chup="5" aria-label="Sơ đồ và một phép tính">
+  <section class="kinh the chieu" data-so-nhip="5" data-t="3600" data-bat-dau="0" data-chup="2" aria-label="Sơ đồ và một phép tính">
     <div class="dong-dau"><span class="nhan-k">Sơ đồ + một phép tính</span><span class="dem"></span></div>
-    <div class="vach"></div>
     <div class="so-do">
       <div class="chat"><span class="ten">CH<sub>3</sub>COOH</span><span class="so-l">12 g</span><span class="mo">M = 60</span></div>
       <div class="mui"><span>H = 75%</span><svg viewBox="0 0 56 16" aria-hidden="true"><path d="M2 8h50M44 2l8 6-8 6"/></svg><span>tính xuôi</span></div>
       <div class="chat" data-hoi><span class="ten">CH<sub>3</sub>COOC<sub>2</sub>H<sub>5</sub></span><span class="so-l">m = ?</span><span class="mo">M = 88</span></div>
       <p class="phu">So nhanh chất hết trước: 12/60 = <b>0,2</b> &lt; 13,8/46 = <b>0,3</b> ⇒ ethanol dư, <b>tính theo acid</b>.</p>
     </div>
+    <div class="phep-bam" role="group" aria-label="Phép tính, chạm từng số để xem ý nghĩa">
+      <span class="chu-m">m =</span>
+      <button type="button" class="so-bam" data-den="1" data-buoc="1">12</button><span class="nhan">·</span>
+      <button type="button" class="so-bam" data-den="2" data-buoc="2">1/60</button><span class="nhan">·</span>
+      <button type="button" class="so-bam" data-den="3" data-buoc="3">1</button><span class="nhan">·</span>
+      <button type="button" class="so-bam" data-den="4" data-buoc="4">88</button><span class="nhan">·</span>
+      <button type="button" class="so-bam" data-den="5" data-buoc="5">75/100</button>
+      <span class="ket-bam">= 13,2 g</span>
+    </div>
+    <div class="loi-nhip giai-so">
+      <div data-n="0"><span class="tay" aria-hidden="true">☝</span><p>Chạm vào từng số trong phép tính để xem số đó nghĩa là gì.<span class="mo">Cả bài chỉ một phép tính, đi từ chất đề cho tới chất cần tìm.</span></p></div>
+      <div data-n="1"><span class="so-to">12</span><p><b>Khối lượng acetic acid đề cho.</b> Đề cho số liệu ở chất nào thì bắt đầu từ chất đó.<span class="dang-co">Đang có: <b>12 g acid</b></span></p></div>
+      <div data-n="2"><span class="so-to">· 1/60</span><p><b>Chia M = 60 để ra số mol acid.</b> M của CH<sub>3</sub>COOH = 2·12 + 4·1 + 2·16 = 60.<span class="dang-co">12 · 1/60 = <b>0,2 mol acid</b> (20 hạt)</span></p></div>
+      <div data-n="3"><span class="so-to">· 1</span><p><b>1 acid ra 1 ester.</b> Bảo toàn gốc acid: mỗi CH<sub>3</sub>COOH cho đúng một CH<sub>3</sub>COOC<sub>2</sub>H<sub>5</sub>.<span class="dang-co">= <b>0,2 mol ester</b> nếu phản ứng hết</span></p></div>
+      <div data-n="4"><span class="so-to">· 88</span><p><b>Nhân M = 88 để ra khối lượng ester.</b> M của C<sub>4</sub>H<sub>8</sub>O<sub>2</sub> = 4·12 + 8·1 + 2·16 = 88.<span class="dang-co">0,2 · 88 = <b>17,6 g</b> nếu phản ứng hết</span></p></div>
+      <div data-n="5"><span class="so-to">· 75/100</span><p><b>Tính xuôi nên nhân H/100.</b> Đi từ acid sang ester là trái sang phải: chỉ 75% acid thành ester.<span class="dang-co">17,6 · 75/100 = <b>13,2 g ester</b> (15 hạt)</span></p></div>
+    </div>
     <div class="san"><div class="hat" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-      <div class="hat-nhan"><span>1 hạt = 0,01 mol</span><span class="chong"><b data-chi="1 2">20 hạt acid</b><b data-chi="3 4">20 hạt ester nếu phản ứng hết</b><b data-chi="5">15 hạt ester thật</b></span></div></div>
-    <div class="phep-dong" aria-label="m = 12 nhân 1/60 nhân 1 nhân 88 nhân 75/100 = 13,2 gam">m = <span data-buoc="1">12</span> · <span data-buoc="2">1/60</span> · <span data-buoc="3">1</span> · <span data-buoc="4">88</span> · <span data-buoc="5">75/100</span> = <span class="ket" data-buoc="5">13,2 g</span></div>
-    <div class="phep" data-dang aria-hidden="true">
-      <div class="t" data-buoc="1"><span>12</span><small>khối lượng acid đề cho</small></div>
-      <div class="t" data-buoc="2"><span>· 1/60</span><small>chia M = 60 ra <b>số mol</b> acid</small></div>
-      <div class="t" data-buoc="3"><span>· 1</span><small>bảo toàn gốc acid: <b>1 acid ra 1 ester</b></small></div>
-      <div class="t" data-buoc="4"><span>· 88</span><small>nhân M = 88 ra <b>khối lượng</b> ester</small></div>
-      <div class="t" data-buoc="5"><span>· 75/100</span><small>tính xuôi <b>× H/100</b></small></div>
-    </div>
-    <div class="loi-nhip">
-      <div data-n="1"><span class="so">1</span><p>Đề cho số liệu ở acid: bắt đầu từ <b>12 g</b>.</p></div>
-      <div data-n="2"><span class="so">2</span><p>Chia M = 60 ra <b>số mol acid</b>: 20 hạt, tức 0,2 mol.</p></div>
-      <div data-n="3"><span class="so">3</span><p>Bảo toàn gốc acid: <b>1 acid ra 1 ester</b>, nhân 1.</p></div>
-      <div data-n="4"><span class="so">4</span><p>Nhân M = 88 ra <b>khối lượng</b> ester nếu phản ứng hết: 17,6 g.</p></div>
-      <div data-n="5"><span class="so">5</span><p>Tính xuôi nên <b>nhân H/100</b>: còn 15/20 hạt ⇒ <b>13,2 g</b>.</p></div>
-    </div>
-    <div class="dk"><button class="nut phat" data-l="kinh" type="button"></button></div>
+      <div class="hat-nhan"><span>1 hạt = 0,01 mol</span><span class="chong"><b data-chi="0 1 2">20 hạt acid</b><b data-chi="3 4">20 hạt ester nếu phản ứng hết</b><b data-chi="5">15 hạt ester thật</b></span></div></div>
+    <div class="vach"></div>
+    <div class="dk"><button class="nut phat" data-l="kinh" type="button"></button><span class="mo" style="font-size:14px">hoặc chạm từng số</span></div>
   </section>
 
   <div class="kiem"><span class="oi" data-sac="dung" data-co="nho"><span data-i="check"></span></span><p>Kiểm bằng cách khác: lý thuyết 0,2 · 88 = 17,6 g; thực tế 17,6 · 75/100 = <b>13,2 g</b>. Khớp.</p></div>

@@ -17,7 +17,7 @@
     vach.innerHTML = Array.from({ length: N }, (_, i) => `<button type="button" aria-label="Nhịp ${i + 1} trên ${N}"><i></i></button>`).join('')
     vach.style.setProperty('--t', T + 'ms')
     const vb = [...vach.children]
-    let n = 1, chay = false, hen = 0, dung = false
+    let n = +(r.dataset.batDau ?? 1), chay = false, hen = 0, dung = false
     const ve = () => {
       vb.forEach((b, i) => { b.toggleAttribute('data-xong', i + 1 < n || (dung && i + 1 === n)); if (i + 1 === n) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); b.removeAttribute('data-chay') })
       for (const e of r.querySelectorAll('[data-tu]')) e.classList.toggle('bat', n >= +e.dataset.tu)
@@ -27,13 +27,13 @@
       for (const e of r.querySelectorAll('.bi[data-x]')) e.style.transform = `translateX(${e.dataset.x.split(' ')[n - 1] || 0}px)`
       for (const e of r.querySelectorAll('[data-den]')) e.setAttribute('aria-pressed', String(+e.dataset.den === n))
       r.dataset.nhip = n
-      if (dem) dem.textContent = `Bước ${n}/${N}`
-      if (phat) phat.innerHTML = chay ? IC.dung + 'Dừng' : n === N ? IC.lai + 'Xem lại' : IC.phat + 'Chạy tiếp'
+      if (dem) dem.textContent = n ? `Bước ${n}/${N}` : `${N} số`
+      if (phat) phat.innerHTML = chay ? IC.dung + 'Dừng' : n === N ? IC.lai + 'Xem lại' : n === 0 ? IC.phat + 'Chạy cả phép tính' : IC.phat + 'Chạy tiếp'
     }
     const toi = () => {
       clearTimeout(hen); ve()
       if (!chay) return
-      requestAnimationFrame(() => requestAnimationFrame(() => vb[n - 1].setAttribute('data-chay', '')))
+      if (n) requestAnimationFrame(() => requestAnimationFrame(() => vb[n - 1].setAttribute('data-chay', '')))
       hen = setTimeout(() => { if (n < N) { n++; toi() } else { chay = false; ve() } }, giam ? T + 800 : T)
     }
     const den = (k, choi) => { n = k; chay = choi; toi() }
@@ -43,6 +43,7 @@
     const coDinh = r.dataset.coDinh || (tinh ? r.dataset.chup || String(N) : '')
     if (coDinh) { n = +coDinh; dung = true; ve(); continue }
     ve()
+    if (r.dataset.batDau === '0') continue
     const io = new IntersectionObserver((ds) => { if (ds[0].isIntersecting) { io.disconnect(); den(1, true) } }, { threshold: 0.5 })
     io.observe(r)
   }
