@@ -3,7 +3,7 @@
 // thích nghi sau chặng chạy trước khi mở. Luật thuần: src/lib/mo-som-chang.ts (Code 1). SQLite thật.
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { BAY_GIO, DAP_AN_DUNG, boCuaEm, dung, giao, gio, mo, nopChang } from './_btvn-nang-do-mau'
-import type { D1That } from './_d1-que'
+import type { D1That } from './_d1-that'
 
 afterEach(() => vi.useRealTimers())
 const lichCua = (d: D1That) => JSON.parse((d.sql.prepare("SELECT chang_mo_json FROM btvn_em WHERE sbd='S1'").get() as { chang_mo_json: string }).chang_mo_json) as { chang: { moLuc: string; dungNhipTruoc?: string }[]; moSom?: { chiSo: number; luc: string }[] }

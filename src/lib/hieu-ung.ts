@@ -4,6 +4,12 @@
 // xoay ngang, cột phải máy tính). Giảm chuyển động / máy yếu (<html class="may-yeu">) ⇒ không bắn hạt, số hiện ngay giá trị cuối.
 // Chỉ các mảnh NẠP LƯỜI của app học sinh «Trong» dùng (làm chặng, Lộ trình) — không vào nhóm mở app; mảnh riêng ở kho chạy-lúc (globIgnores).
 import { useEffect, useState } from 'react'
+// BỘ HIỆU ỨNG ĂN MỪNG (thầy chốt 02/11): mọi nơi gọi đi qua ĐÚNG cửa này ⇒ bộ nạp + điều kiện thuần nằm chung mảnh `hieu-ung` (không đẻ tệp precache
+// mới); mã vẽ là mảnh nạp lười `hieu-ung-an-mung` (src/lib/hieu-ung/).
+export { anMung, anMungSanSang, cheDoMayNay, napAnMung, napTruocAnMung } from './hieu-ung/nap'
+export { amAnMungBat, cheDoAnMung, chuoiSauCau, demChuoiDung, kichDuMuc, kichLuaChuoi, kichNguyenTu, kichRuong, kichSet, kichXongChang, kieuThe, KHOA_AM_AN_MUNG, mucSet, soHat, soNguyenTuBay, thongSo } from './hieu-ung/dieu-kien'
+export type { CheDoAnMung } from './hieu-ung/dieu-kien'
+export type { DatAnMung, LoaiAnMung } from './hieu-ung/kieu'
 
 /** Không chuyển động: em bật giảm chuyển động, máy yếu, hoặc môi trường không có matchMedia / animate (máy kiểm thử). */
 export function yenLang(): boolean {

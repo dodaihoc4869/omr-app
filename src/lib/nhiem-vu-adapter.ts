@@ -22,6 +22,10 @@ export interface HanhDongLamCauOn {
   payload: { viecId: string; qid: string[]; soCau: number; tieuDe: string }
   nhanNut: string
 }
+/** Dữ liệu thô (JSON máy chủ / bản nhớ máy em) chưa soát kiểu — đọc trường bằng `laTho` rồi kiểm từng trường, không dùng `any`. */
+type Tho = Record<string, unknown>
+const laTho = (v: unknown): Tho | null => (v && typeof v === 'object' ? (v as Tho) : null)
+
 export type HanhDongNhiemVu = NhiemVuTroLy['hanhDong'] | HanhDongLamCauOn
 
 export const THU_TU_BAC: readonly BacNhiemVu[] = ['khan', 'bat_buoc', 'nen_lam', 'tuy_chon']
@@ -149,7 +153,7 @@ export function docThanThu(raw: unknown): TrangThaiThanThu {
   if (raw === undefined) return { kieu: 'chua_biet' }
   if (raw === null) return { kieu: 'chua_chon' }
   if (typeof raw !== 'object') return { kieu: 'chua_biet' }
-  const t = raw as any
+  const t = raw as Tho
   const pet = typeof t.pet === 'string' ? t.pet.trim() : ''
   if (!pet) return { kieu: 'chua_chon' }
   const ten = typeof t.nickname === 'string' && t.nickname.trim() ? t.nickname.trim() : undefined
@@ -469,8 +473,9 @@ function docExp(k: KeHoachNgayMayChu): Pick<DuLieuBangNhiemVu, 'exp' | 'expNhan'
 
 /** Chốt kiểu: JSON máy chủ trả về có đủ phần giao diện cần không (lỗi/HTML/`{ok:true,items:[]}` ⇒ false). */
 export function laKeHoachNgayHopLe(x: unknown): x is KeHoachNgayMayChu {
-  const k = x as any
-  return !!k && k.ok !== false && Array.isArray(k.viec) && k.viec.every((x: any) => !!x && typeof x.id === 'string' && typeof x.loai === 'string') && !!k.nganSach && Number.isFinite(Number(k.nganSach.mucTieuCau)) && !!k.tienBo && Number.isFinite(Number(k.tienBo.daLamCau))
+  const k = laTho(x)
+  const nganSach = laTho(k?.nganSach)
+  return !!k && k.ok !== false && Array.isArray(k.viec) && k.viec.every((v: unknown) => { const o = laTho(v); return !!o && typeof o.id === 'string' && typeof o.loai === 'string' }) && !!nganSach && Number.isFinite(Number(nganSach.mucTieuCau)) && !!k.tienBo && Number.isFinite(Number(laTho(k.tienBo)?.daLamCau))
 }
 
 /** Dữ liệu thô của màn (danh sách bài) — chỉ để lấy TÊN bài và đúng payload {bt}/{id,bai} khi bấm. */
@@ -834,19 +839,22 @@ export function dongGoiBanNho(duLieu: DuLieuBangNhiemVu, now: number): BanNhoBan
   return ngay ? { ngay, luuLuc: now, duLieu: { ...duLieu, expNhan: [], manhNhan: [], veDich: null } } : null
 }
 
-function docExpDaLuu(x: any): DuLieuExp | null {
-  if (!x || typeof x !== 'object' || !Number.isFinite(x.homNay)) return null
-  const mk = x.manhKhien
+function docExpDaLuu(raw: unknown): DuLieuExp | null {
+  const x = laTho(raw)
+  if (!x || !Number.isFinite(x.homNay)) return null
+  const mk = laTho(x.manhKhien)
   return {
-    homNay: x.homNay,
-    chiTiet: (Array.isArray(x.chiTiet) ? x.chiTiet : []).filter((c: any) => c && typeof c.ghiChu === 'string' && c.ghiChu).map((c: any) => ({ loai: String(c.loai ?? ''), exp: Number(c.exp) || 0, ghiChu: c.ghiChu })),
-    manhKhien: mk && Number.isFinite(mk.manh) ? { manh: mk.manh, moiKhien: Number(mk.moiKhien) || 12, khienConLai: Number(mk.khienConLai) || 0 } : null,
+    homNay: x.homNay as number,
+    chiTiet: (Array.isArray(x.chiTiet) ? x.chiTiet : []).map(laTho).filter((c): c is Tho & { ghiChu: string } => !!c && typeof c.ghiChu === 'string' && !!c.ghiChu).map((c) => ({ loai: String(c.loai ?? ''), exp: Number(c.exp) || 0, ghiChu: c.ghiChu })),
+    manhKhien: mk && Number.isFinite(mk.manh) ? { manh: mk.manh as number, moiKhien: Number(mk.moiKhien) || 12, khienConLai: Number(mk.khienConLai) || 0 } : null,
   }
 }
 
 const laMang = Array.isArray
-const laThe = (v: any): v is TheNhiemVu =>
-  !!v && typeof v.id === 'string' && typeof v.tieuDe === 'string' && !!v.hanhDong && typeof v.hanhDong.loai === 'string' && typeof v.biCong === 'boolean'
+const laThe = (raw: unknown): raw is TheNhiemVu => {
+  const v = laTho(raw)
+  return !!v && typeof v.id === 'string' && typeof v.tieuDe === 'string' && typeof laTho(v.hanhDong)?.loai === 'string' && typeof v.biCong === 'boolean'
+}
 
 function lamMoiThe(v: TheNhiemVu, now: number): TheNhiemVu {
   const moc = msIso(v.hanNop)
@@ -868,29 +876,30 @@ export function phucHoiBanNho(x: unknown, now: number): DuLieuBangNhiemVu | null
   if (d.lamNgay !== null && !laThe(d.lamNgay)) return null
   if (!d.cacBac.every((g, i) => g && g.bac === THU_TU_BAC[i] && laMang(g.viec) && g.viec.every(laThe))) return null
   const gioLuu = d.capNhatLuc ? gioVietNam(d.capNhatLuc) : ''
-  const tt: any = (d as any).thanThu
+  const dt = d as unknown as Tho // bản nhớ cũ có thể thiếu / sai trường — đọc như dữ liệu thô rồi soát
+  const tt = laTho(dt.thanThu)
   const thanThu: TrangThaiThanThu =
     tt && tt.kieu === 'co' && typeof tt.pet === 'string' && tt.pet && Number.isFinite(tt.cap)
-      ? { kieu: 'co', pet: tt.pet, cap: Math.max(1, Math.floor(tt.cap)), ten: typeof tt.ten === 'string' ? tt.ten : undefined }
+      ? { kieu: 'co', pet: tt.pet, cap: Math.max(1, Math.floor(tt.cap as number)), ten: typeof tt.ten === 'string' ? tt.ten : undefined }
       : tt && tt.kieu === 'chua_chon'
         ? { kieu: 'chua_chon' }
         : { kieu: 'chua_biet' }
-  const tc: any = (d as any).tonCu
+  const tc = laTho(dt.tonCu)
   const tonCu: TonCu =
-    tc && Number.isFinite(tc.soBai) && Number.isFinite(tc.soCau) && Array.isArray(tc.bai) && tc.bai.every((b: any) => b && typeof b.id === 'string' && b.hanhDong && typeof b.hanhDong.loai === 'string')
-      ? tc
+    tc && Number.isFinite(tc.soBai) && Number.isFinite(tc.soCau) && Array.isArray(tc.bai) && tc.bai.every((raw: unknown) => { const b = laTho(raw); return !!b && typeof b.id === 'string' && typeof laTho(b.hanhDong)?.loai === 'string' })
+      ? (tc as unknown as TonCu)
       : { soBai: 0, soCau: 0, bai: [] }
-  const xh: any = (d as any).daXongHomNay
-  const daXongHomNay = xh && Number.isFinite(xh.daLamCau) && Number.isFinite(xh.lenBac) ? { daLamCau: xh.daLamCau, lenBac: xh.lenBac } : null
+  const xh = laTho(dt.daXongHomNay)
+  const daXongHomNay = xh && Number.isFinite(xh.daLamCau) && Number.isFinite(xh.lenBac) ? { daLamCau: xh.daLamCau as number, lenBac: xh.lenBac as number } : null
   return {
     ...d,
     thanThu,
     tonCu,
     daXongHomNay,
-    exp: docExpDaLuu((d as any).exp),
+    exp: docExpDaLuu(dt.exp),
     expNhan: [],
     manhNhan: [],
-    doanMo: (d as any).doanMo === true,
+    doanMo: dt.doanMo === true,
     canhBaoThay: [],
     lamNgay: d.lamNgay ? lamMoiThe(d.lamNgay, now) : null,
     cacBac: d.cacBac.map((g) => ({ ...g, viec: g.viec.map((v) => lamMoiThe(v, now)) })),

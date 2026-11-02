@@ -7,6 +7,7 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { ArrowLeft, Check, Flame } from 'lucide-react'
 import { Bi } from '../linh-vat/Bi'
 import { bayToi, bungHat, hoatAnh, latSo, phanHoiThuong } from '../../lib/hieu-ung-thuong'
+import { anMung } from '../../lib/hieu-ung'
 import { DAT_CUOC, chuDaCoBinhTuan, DUONG, MOC_CHUOI, chuGiaBinh, datCuoc, giaBinh, layDsBan, muaBinh, ngayVn, type ChuoiNgay, type ThongBao, type TongQuanThuong } from '../../lib/thuong-api'
 import { Binh, HuyHieuMau, IcLua, IcTinhThe, Tia } from './hinh'
 import { capNhatTongQuan, useTai, useTongQuan } from './dung-thuong'
@@ -169,10 +170,12 @@ export function ManChuoiNgay({ token, onVe, onHoc, onCuu, hieuUng, onBan }: Prop
     if (hieuUng === 'chuoi') {
       phanHoiThuong('chuoi')
       latSo(document.getElementById('tp-so-chuoi'), String(Math.max(0, c.so - 1)), String(c.so), 560)
-      hoatAnh(lua.current, [{ transform: 'scale(.6)', opacity: 0.1 }, { transform: 'scale(1.7)', opacity: 0.5, offset: 0.35 }, { transform: 'scale(.95)', opacity: 0.2, offset: 0.7 }, { transform: 'scale(1)', opacity: 0.18 }], 1400)
+      // 🔥 LỬA CHUỖI (bộ hiệu ứng ăn mừng, thầy chốt 02/11): lửa co lấy đà rồi bùng lò xo + quầng cam + sóng xung + tàn lửa bay (máy yếu: bản gọn) — thay phần
+      // phóng to cũ (chỉ giữ độ sáng) và hạt bung ở Bi (không chạy hai lớp hạt chồng nhau). Rung / tiếng vẫn ở phanHoiThuong('chuoi').
+      hoatAnh(lua.current, [{ opacity: 0.1 }, { opacity: 0.5, offset: 0.35 }, { opacity: 0.2, offset: 0.7 }, { opacity: 0.18 }], 1400)
+      anMung('lua', { goc: lua.current })
       hoatAnh(the.current, [{ transform: 'scale(1)' }, { transform: 'scale(1.03)', offset: 0.3 }, { transform: 'scale(1)' }], 700, { tre: 150 })
       hoatAnh(bi.current, [{ transform: 'translateY(0)' }, { transform: 'translateY(-22px) rotate(-6deg)' }, { transform: 'translateY(0)' }, { transform: 'translateY(-10px) rotate(4deg)' }, { transform: 'translateY(0)' }], 900, { tre: 300 })
-      h.sau(350, () => bungHat(bi.current, { n: 10, r: 70, mau: ['sao', 'lua', 'trang'] }))
       hoatAnh(document.querySelector('.tp-tuan7 [data-nay] .lan, .tp-lich30 [data-nay] .lan'), [{ transform: 'scale(0)' }, { transform: 'scale(1.25)', offset: 0.7 }, { transform: 'scale(1)' }], 600, { tre: 700 })
     } else if (hieuUng === 'binh') {
       phanHoiThuong('binh')

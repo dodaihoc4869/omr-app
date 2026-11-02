@@ -6,6 +6,7 @@ import { useRef, useState, type CSSProperties } from 'react'
 import { BookOpen, Check, ChevronRight, Clock, FlaskConical, Lock, Sparkles, Target, Wrench, Zap } from 'lucide-react'
 import { Bi } from '../linh-vat/Bi'
 import { bayToi, bungHat, demSo, hoatAnh, phanHoiThuong } from '../../lib/hieu-ung-thuong'
+import { anMung } from '../../lib/hieu-ung'
 import { chuDaCoBinhTuan, chuGiaBinh, giaBinh, moRuong, vongMucTieu, type NhiemVu, type ThongBao, type TongQuanThuong } from '../../lib/thuong-api'
 import { Binh, IcTinhThe, Ruong } from './hinh'
 import { SoDem } from './SoDem'
@@ -49,7 +50,9 @@ export function ManNhiemVu({ token, onVe, hieuUng }: { token?: string; onVe?: ()
     hoatAnh(r, [{ transform: 'rotate(0)' }, { transform: 'rotate(-9deg)' }, { transform: 'rotate(8deg)' }, { transform: 'rotate(-8deg)' }, { transform: 'rotate(7deg)' }, { transform: 'rotate(-5deg)' }, { transform: 'rotate(0)' }], 600)
     hoatAnh(r?.querySelector('.tp-ruong-nap'), [{ transform: 'none' }, { transform: 'none', offset: 0.55 }, { transform: 'translate(0px,-20px) rotate(-24deg)', offset: 0.8 }, { transform: 'translate(0px,-14px) rotate(-16deg)' }], 1000, { e: 'ease-out' })
     hoatAnh(r?.querySelector('.tp-ruong-trong'), [{ opacity: 0 }, { opacity: 0, offset: 0.6 }, { opacity: 1 }], 1000)
-    setTimeout(() => bungHat(r, { n: 16, r: 90, roi: -20, mau: ['tt', 'sao', 'trang'] }), 650)
+    // 🎁 bùng lúc nắp bật (bộ hiệu ứng ăn mừng, thầy chốt 02/11): tia sáng toả + loé vàng + quầng + tia lửa + lấp lánh — thay hạt bung cũ (rương đã tự lắc, nắp
+    // đã tự bật ở trên ⇒ chỉ phần bùng). Máy yếu: bản gọn.
+    setTimeout(() => anMung('ruong', { goc: r, lac: false }), 550)
     await new Promise((x) => setTimeout(x, 950))
     await bayToi(r, oTinhThe(), { n: 8, d: 700 })
   }
