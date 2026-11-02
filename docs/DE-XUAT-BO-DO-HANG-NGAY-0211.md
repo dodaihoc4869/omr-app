@@ -2,7 +2,7 @@
 
 **02/11/2026.** Thầy: «quét bộ đo học thật, chăm, lười đối phó. Sau đó đề xuất để biết được chính xác học sinh thuộc nhóm nào. Sử dụng mọi dữ liệu, bài kiểm tra trực tiếp tôi mở trên lớp và đạt hay không đạt khi gọi lên bảng làm căn cứ. Tạo bộ đo cập nhật hàng ngày … học sinh đối phó phải có bộ đo chính xác 100%.» · «tham khảo mọi phương pháp tốt nhất thế giới» · «đề xuất cho tôi trước khi build».
 
-Nguồn số: workflow chỉ-đọc `.github/workflows/do-bon-bang-0211.yml` (run 41394902869, 41395086695, 02/11 12:35 VN) — chỉ đếm gộp trên bảng nhỏ, không mã em, không tên, không quét `su_kien_hoc`.
+Nguồn số: workflow chỉ-đọc `.github/workflows/do-bon-bang-0211.yml` (run 41394902869, 41395086695, 41395568181 — 02/11 12:35–12:43 VN) — chỉ đếm gộp trên bảng nhỏ, không mã em, không tên, không quét `su_kien_hoc`.
 
 ---
 
@@ -10,22 +10,24 @@ Nguồn số: workflow chỉ-đọc `.github/workflows/do-bon-bang-0211.yml` (ru
 
 | Bảng | Số em | Ghi chú |
 |---|---|---|
-| Học thật | **240** (89%) | 114 em KHÔNG có xác nhận trên lớp nào (ca thi khớp ≥ 2 đơn vị hoặc lên bảng đạt ≥ 2) |
-| Đối phó | **30** | 21 em có bằng chứng trên lớp · **9 em chỉ do hành vi ở nhà** · 4 em chỉ vì một họ «treo máy» |
+| Học thật | **240** (89%) | ít nhất 114 em KHÔNG có xác nhận trên lớp nào (ca thi khớp ≥ 2 đơn vị hoặc lên bảng đạt ≥ 2) — con số thật còn cao hơn vì «đạt ≥ 2» bị ghi đôi thổi lên |
+| Đối phó | **30** | tối đa 21 em có bằng chứng trên lớp (lệch ca thi mức 3: 2 em · mức 2: 9 · mức 1: 10 — mức 1 có thể chỉ từ MỘT buổi) · **9 em chỉ do hành vi ở nhà** · 4 em chỉ vì một họ «treo máy» |
 | Chăm | 230 | |
 | Lười | 42 | |
 
 Họ Đối phó đang bật (trong 30 em): lệch ca thi 21 · chọn vội 15 · bỏ mặc câu sai 11 · treo máy 10 · thuộc đáp án 8 · lên bảng chưa đạt 7 · bấm lặp 2.
 
 Dữ liệu trên lớp:
-- **Ca thi: 20/20 ca trong 60 ngày đều có phòng chờ + thầy bấm «Bắt đầu» (đồng bộ giờ)** ⇒ đúng là bài thầy mở trên lớp, dùng làm thước được. 246/272 em có ca thi, 195 em có ≥ 6 câu thi ghép được với luyện tập, trung bình 84 câu thi/em.
-- **Lên bảng: 317 dòng nhưng 316 nhóm là CẶP TRÙNG** (cùng em, cùng câu, cùng kết quả, cách nhau trung bình 0,85 giây). Thật ra chỉ có **159 lượt** lên bảng, 122 em: 91 em lên 1 câu, 25 em 2 câu, 6 em 3 câu.
+- **Ca thi: 20/20 ca trong 60 ngày đều có phòng chờ + thầy bấm «Bắt đầu» (đồng bộ giờ)** ⇒ mọi ca đều do thầy mở và bấm bắt đầu cùng lúc (số liệu không chứng minh em ngồi tại lớp, nhưng đúng là bài thi thầy tổ chức), dùng làm thước được. 246/272 em có ca thi, 195 em có ≥ 6 câu thi ghép được với luyện tập, trung bình 84 câu thi/em.
+- **Lên bảng: 317 dòng = 158 lượt bị GHI HAI DÒNG + 1 lượt một dòng** (cùng em, cùng câu, cùng kết quả, hai dòng cách nhau trung bình 0,85 giây). Thật ra chỉ có **159 lượt** lên bảng, 122 em: 91 em lên 1 câu, 25 em 2 câu, 6 em 3 câu. Nhịp: 159 lượt trong 13 buổi (nhiều nhất 33 lượt ngày 01/11).
+- **66 em có ≥ 2 ca thi thấp hơn hẳn kỳ vọng từ luyện tập** (thấp ≥ 1 câu, ≥ 20%, z ≥ 1,645 mỗi ca), nhưng chỉ **15** em trong số đó đang ở Đối phó. Phần còn lại có thể là em yếu thật (luyện < 60%), quên, hoặc ĐỐI PHÓ BỊ BỎ SÓT — luật mới phải soi đúng nhóm này.
+- Lúc quét: 0 ca đang mở.
 - Kiểm tra đầu giờ: 52 câu (33 đạt, 1 chưa đạt, 18 chưa chấm).
 
 ## 2. Chỗ sai và chỗ hở
 
 1. **Lỗi ghi đôi lên bảng (lỗi thật, ảnh hưởng ngay).** `ghiLenBang` ở app thầy (`src/lib/exam-api.ts:2577`) gửi lệnh cũ `action: ghiLenBang` — mà địa chỉ «Apps Script» nay CHÍNH là Worker (`server/src/index.ts:3404` xử lý lệnh cũ ⇒ ghi) — rồi lại «soi sang máy chủ mới» `/len-bang` ⇒ ghi lần hai. Hệ quả:
-   - Luật «chưa đạt MỘT lần ⇒ không tính» bị phá: 1 lần chưa đạt thành 2 ⇒ bật họ `bangChua` ⇒ có em bị đẩy về Đối phó oan.
+   - Luật «chưa đạt MỘT lần ⇒ không tính» bị phá: 1 lần chưa đạt thành 2 ⇒ bật họ `bangChua` (7 em). Đếm lại: 0 em đang ở Đối phó CHỈ nhờ `bangChua` ⇒ hôm nay chưa ai bị xếp oan vì lỗi này, nhưng sức Đối phó của 7 em bị cộng thừa.
    - «Lên bảng đạt ≥ 2» (101 em Học thật) phần lớn là MỘT lần đạt bị nhân đôi.
    - EXP lên bảng của em bị cộng gấp đôi; hồ sơ lên bảng, bảng mạnh–yếu đếm gấp đôi.
 2. **Học thật là nhãn «mặc định khi không bị bắt».** `vaoHt = có bằng chứng && !vaoDp` (`server/src/bon-chi-so.ts`) ⇒ em chỉ cần có lượt làm là Học thật. 89% trung tâm Học thật là quá lỏng.
@@ -51,7 +53,7 @@ Không phương pháp thống kê nào chứng minh được 100% khi chỉ suy 
 |---|---|
 | **Đối phó (đã kiểm trên lớp)** | như mục 3 |
 | **Học thật (đã kiểm trên lớp)** | ≥ 2 buổi trên lớp mà kết quả khớp hoặc cao hơn kỳ vọng từ luyện tập (ca thi khớp ≥ 2 dạng, hoặc lên bảng / đầu giờ đạt ≥ 2 câu khác nhau), 0 sự kiện lệch |
-| **Cần kiểm trên lớp** | chưa đủ sự kiện trên lớp. KHÔNG phải «theo dõi» thụ động: mỗi ngày app đưa thầy **danh sách gọi lên bảng / đầu giờ**, mỗi em 2–3 câu em đã làm đúng ở nhà, ở dạng ca thi chưa phủ; em nghi đối phó (hành vi) xếp trước. Chốt nhãn trong ≤ 2 buổi |
+| **Cần kiểm trên lớp** | chưa đủ sự kiện trên lớp. KHÔNG phải «theo dõi» thụ động: mỗi ngày app đưa thầy **danh sách gọi lên bảng / đầu giờ**, mỗi em 2–3 câu em đã làm đúng ở nhà, ở dạng ca thi chưa phủ; em nghi đối phó (hành vi) xếp trước; kèm đề xuất dạng cho ca thi kế tiếp để phủ nhiều em nhất |
 
 ### 4.2 Phương pháp (chuẩn thế giới) → luật cụ thể
 
@@ -77,8 +79,8 @@ Giữ luật v3b (ngày đủ mức bằng câu làm thật, làm cho có ≤ 10
 
 ## 5. Kế hoạch build
 
+0. **Đã làm (sửa lỗi, không đổi bộ đo):** máy chủ chống ghi đôi lên bảng — cùng em · câu · chuyên đề · kết quả trong 10 giây = một lần (`ghiLenBangMoi`, `server/src/index.ts`; test `tests/len-bang-chong-ghi-doi-0211.test.ts`). Không sửa app thầy (máy còn trỏ Apps Script thật vẫn cần đường soi). Có hiệu lực khi gộp main.
 1. **Đợt 1 — máy chủ, không đổi giao diện (làm ngay khi thầy chốt):**
-   - Sửa ghi đôi lên bảng (app thầy chỉ gửi MỘT đường + máy chủ chống trùng theo em·câu·kết quả trong 10 giây).
    - Dữ liệu cũ: KHÔNG xoá dòng nào; khi đọc thì gộp cặp trùng ≤ 2 giây (cả bộ đo, EXP, hồ sơ).
    - Luật Đối phó / Học thật theo mục 3–4, đơn vị theo dạng, độ bám, nhật ký đổi nhãn, kiểm định ngược.
    - Test mô phỏng giữ nguyên + test sự kiện trên lớp; đếm lại bằng workflow chỉ-đọc trước/sau.
@@ -88,6 +90,8 @@ Giữ luật v3b (ngày đủ mức bằng câu làm thật, làm cho có ≤ 10
 ## 6. Thầy cần quyết một việc
 
 - **A (khuyên dùng):** ba nhãn chất lượng như 4.1. Đối phó và Học thật đều 100% có sự kiện trên lớp làm chứng. Em chưa đủ sự kiện nằm ở «Cần kiểm trên lớp» kèm danh sách câu để gọi — trái với lệnh 02/11 «không còn theo dõi nữa», nhưng là cách DUY NHẤT để Đối phó đúng 100%.
+  - **Giá phải trả (ước theo số đo hôm nay, xấp xỉ bằng trường đã lưu):** Học thật chắc ≈ 11 em (≥ 2 đơn vị khớp, 0 lệch, 0 ca lệch) + tối đa 31 em có lên bảng đạt ≥ 2 câu khác nhau; Đối phó chắc nằm giữa 11 em (lệch ca thi mức 2–3) và 66 em (≥ 2 ca lệch, còn phải lọc luyện ≥ 60% và đúng dạng); **≈ 195/272 em vào «Cần kiểm trên lớp» ngày đầu.**
+  - Lên bảng chỉ ~12 lượt/buổi ⇒ không gỡ nổi 195 em. Đòn bẩy chính là **ca thi** (mỗi ca ~240 em): app đề xuất dạng cho ca thi kế tiếp sao cho phủ nhiều em «Cần kiểm» nhất, lên bảng / đầu giờ chỉ gỡ phần sót. Với nhịp 20 ca/60 ngày, ước 2–3 ca (khoảng 1–2 tuần) để phần lớn em có nhãn chắc — số này sẽ đo lại sau khi build, không hứa trước.
 - **B:** giữ hai nhãn như v3b (mọi em đều có nhãn). Em thiếu sự kiện trên lớp xếp theo hành vi, ghi thêm «(chưa kiểm trên lớp)». Khi đó nhóm Đối phó KHÔNG còn 100%.
 
 Mọi thứ khác (ngưỡng, trọng số, chỗ đặt) em tự quyết khi build.
