@@ -167,6 +167,7 @@ async function motLuong(luong) {
   }
 }
 
+if (co('--tra-ve-kenh')) { console.log(JSON.stringify(await goi('/kho/loi-giai-kinh/tra-ve-kenh', {}))); process.exit(0) }
 if (co('--bu-goc')) {
   for (let i = 0; i < 500; i++) { const r = await goi('/kho/loi-giai-kinh/bu-goc', {}); console.log(JSON.stringify(r)); if (!r.ok || !r.con) break }
   process.exit(0)
