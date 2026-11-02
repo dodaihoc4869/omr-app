@@ -4,6 +4,9 @@
 //   20 giây không thao tác ⇒ chờ (gõ tay / chân) · quá giờ theo mức ⇒ xem đồng hồ · bấm Kiểm tra trong 4 giây đầu ⇒ liếc nghi ngờ, còn lại ⇒ cúi nhìn ·
 //   đúng ⇒ mừng theo tính cách (đúng liền ≥ 3 ⇒ combo) · sai ⇒ xị mặt · câu chưa tính ⇒ lắc ngón tay · học có hỗ trợ / chờ thầy ⇒ đứng coi.
 // Lời càu nhàu (loi-giam-thi.ts) theo nhịp chung cả phiên, tối đa 1 lần mỗi 2–3 câu. Tab ẩn ⇒ dừng hết (hoạt ảnh + hẹn giờ).
+// 02/11 GIÁM THỊ «SỐNG ĐỘNG» (thầy duyệt bản vẽ docs/ban-ve-giam-thi-moi-0211): em chọn ⇒ liếc ô em chọn · đúng ⇒ gật đầu, giơ ngón cái · sai ⇒ nhíu mày,
+// chỉ vào đề · đứng chờ ⇒ động tác ngẫu nhiên (hình tự làm) · lâu không thao tác ⇒ ngáp. Lời theo tình huống bằng câu của thầy, bong bóng màu theo tình huống;
+// bỏ lời «ngẫu nhiên» / «quá giờ» (thầy chỉ ghép câu cho các tình huống trên).
 import { useEffect, useLayoutEffect, useRef, type CSSProperties } from 'react'
 import { duongL, khuyetL, type MucGT, type TrangThaiGT } from './giam-thi-ve'
 import { taoGiamThi, type GiamThi } from './giam-thi-nguoi' // 4 giám thị HÌNH NGƯỜI v3 (thầy chốt 27/10), cùng API bản cũ
@@ -46,7 +49,7 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
   coKet.current = !!ket
   const datHen = (k: string, ms: number, f: () => void) => { clearTimeout(hen.current[k]); hen.current[k] = window.setTimeout(f, ms) }
   const huyHen = (...ks: string[]) => { for (const k of ks.length ? ks : Object.keys(hen.current)) { clearTimeout(hen.current[k]); delete hen.current[k] } }
-  const noi = (k: NguCanhLoi) => { const c = suLoi(nhip, muc, k, bay()); if (c) gt.current?.noi(c) }
+  const noi = (k: NguCanhLoi) => { const c = suLoi(nhip, muc, k, bay()); if (c) gt.current?.noi(c.chu, { cam: c.cam }) }
   const datTT = (t: TrangThaiGT) => gt.current?.datTrangThai(t)
   const henCho = () => datHen('cho', NGUONG.cho, () => { if (!coKet.current && !document.hidden) { datTT('cho'); noi('cho') } })
 
@@ -74,9 +77,9 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
     let raf = 0, sauVe = 0
     if (!ket) raf = requestAnimationFrame(() => { sauVe = window.setTimeout(() => {
       if (gt.current !== g || coKet.current) return
-      g.datTrangThai('doc', { xong: () => { if (coKet.current) return; const chon = vung()?.querySelector(`.duo-tra ${CHON}`); chon ? g.nhinVao(chon) : g.nhin(0.5, 0.45); datHen('loi', 1200, () => { if (!coKet.current) noi('ngauNhien') }) } })
+      g.datTrangThai('doc', { xong: () => { if (coKet.current) return; const chon = vung()?.querySelector(`.duo-tra ${CHON}`); chon ? g.nhinVao(chon) : g.nhin(0.5, 0.45) } })
       henCho()
-      datHen('dh', DONG_HO_GT[muc], () => { if (!coKet.current && !document.hidden) { datTT('dong-ho'); noi('dongHo') } })
+      datHen('dh', DONG_HO_GT[muc], () => { if (!coKet.current && !document.hidden) datTT('dong-ho') })
     }, 0) })
     return () => { cancelAnimationFrame(raf); clearTimeout(sauVe); quanRong?.disconnect(); huyHen(); gui(g); gt.current = null }
   }, [muc, qid]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -128,7 +131,7 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
     const goc = vung()
     if (!goc) return
     const oTra = (e: Event) => (e.target as Element | null)?.closest?.('.duo-tra button, .duo-tra [role="radio"], .ht2-lam-ban-phim button')
-    const nhinChon = () => { const c = goc.querySelector(`.duo-tra ${CHON}`); c ? gt.current?.nhinVao(c) : gt.current?.nhin(0.5, 0.45) }
+    const nhinChon = () => { const c = goc.querySelector(`.duo-tra ${CHON}`); if (c) gt.current?.nhinVao(c); else gt.current?.nhin(0.5, 0.45) }
     const re = (e: Event) => { if (coKet.current) return; const b = oTra(e); if (b) gt.current?.nhinVao(b) }
     const roi = (e: PointerEvent) => { if (coKet.current) return; if (oTra(e) && !(e.relatedTarget as Element | null)?.closest?.('.duo-tra')) nhinChon() }
     const cham = (e: Event) => {
@@ -137,11 +140,16 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
       huyHen('loi'); henCho()
       const t = gt.current?.trangThai()
       if (t === 'cho' || t === 'soi' || t === 'dong-ho') datTT('yen')
-      if (oTra(e) || e.type === 'keydown') requestAnimationFrame(() => {
+      const laO = !!oTra(e)
+      // 02/11 MƯỢT (đo CPU ×6 máy yếu: giám thị đổi dáng NGAY trong khung vẽ phản hồi chạm ⇒ «vẽ sau chạm» dài thêm): phản ứng SAU khung đầu (rAF → setTimeout)
+      // — ô được chọn vẽ trước, giám thị liếc ngay khung sau.
+      if (laO || e.type === 'keydown') requestAnimationFrame(() => window.setTimeout(() => {
         if (coKet.current) return
-        nhinChon()
+        const c = goc.querySelector(`.duo-tra ${CHON}`)
+        if (laO && c && gt.current) { const r = c.getBoundingClientRect(); gt.current.phanUng('chon', { diem: { x: r.left + r.width / 2, y: r.top + r.height / 2 } }) } // em chọn ⇒ liếc ô em chọn
+        else nhinChon()
         if (goc.querySelector(`.duo-tra ${CHON}`)) datHen('soi', NGUONG.soi, () => { if (!coKet.current && !daNop.current && !document.hidden) datTT('soi') })
-      })
+      }, 0))
     }
     goc.addEventListener('pointerover', re)
     goc.addEventListener('pointerout', roi)
@@ -175,10 +183,9 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
     huyHen()
     henSauVe(() => {
       if (ket === 'trung') { datTT('yen'); return }
-      datTT(ket)
-      if (ket === 'dung' || ket === 'combo') { nhip.saiLien = 0; noi(ket); return }
+      if (ket === 'dung' || ket === 'combo') { nhip.saiLien = 0; datTT(ket); noi(ket === 'combo' ? 'dungLien' : 'dung'); return }
       nhip.saiLien++
-      if (nhip.saiLien >= 2) { nhip.saiLien = 0; noi('sai2') } else if (ket === 'sai') noi('sai')
+      if (nhip.saiLien >= 2) { nhip.saiLien = 0; gt.current?.datTrangThai('sai', { lien: true }); noi('saiLien') } else { datTT(ket); if (ket === 'sai') noi('sai') }
     })
   }, [ket]) // eslint-disable-line react-hooks/exhaustive-deps
 

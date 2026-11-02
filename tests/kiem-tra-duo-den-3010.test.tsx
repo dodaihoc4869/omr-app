@@ -5,7 +5,8 @@ import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { render } from '@testing-library/react'
 import { hinhTia, taoDenSoi, MS_GIU_DEN } from '../src/components/kiem-tra-duo/den-soi'
-import { GT_THEO_PHAN, LOI_SAP_HET_GIO } from '../src/components/kiem-tra-duo/GiamThiThi'
+import { GT_THEO_PHAN } from '../src/components/kiem-tra-duo/GiamThiThi'
+import { GAN_LOI, LUON_NOI } from '../src/components/giam-thi/loi-giam-thi'
 import ThiDuo from '../src/components/kiem-tra-duo/ThiDuo'
 
 const soTrongTf = (tf: string) => (tf.match(/-?\d+(?:\.\d+)?/g) ?? []).map(Number)
@@ -64,9 +65,12 @@ describe('giám thị ở màn kiểm tra — luật thi', () => {
   it('người coi theo phần: I Tí · II Cô Cốc · III Chú Tam', () => {
     expect(GT_THEO_PHAN).toEqual({ I: 'nb', II: 'th', III: 'vd' })
   })
-  it('lời nhắc duy nhất: ≤ 42 kí tự, không bàn về câu / đáp án', () => {
-    expect(LOI_SAP_HET_GIO.length).toBeLessThanOrEqual(42)
-    expect(LOI_SAP_HET_GIO).not.toMatch(/đúng|sai|dễ|khó|đáp án/i)
+  it('lúc thi im lặng: chỉ nói khi em rời màn (câu của thầy, luôn nói), không bàn về câu / đáp án (thầy 02/11)', () => {
+    const ma = readFileSync('src/components/kiem-tra-duo/GiamThiThi.tsx', 'utf8').replace(/\/\/.*$/gm, '')
+    expect([...ma.matchAll(/suLoi\([^)]*'(\w+)'/g)].map((m) => m[1])).toEqual(['thiRoi'])
+    expect(ma).not.toMatch(/datTrangThai\('(dung|sai|combo|chua-tinh|nghi-ngo)'/)
+    expect(LUON_NOI.has('thiRoi')).toBe(true)
+    for (const c of GAN_LOI.thiRoi.thay) expect(c).not.toMatch(/đúng|sai|dễ|khó|đáp án/i)
   })
   it('đèn + giám thị KHÔNG đọc đáp án, không gọi máy chủ (khoá mã nguồn)', () => {
     for (const tep of ['src/components/kiem-tra-duo/den-soi.ts', 'src/components/kiem-tra-duo/GiamThiThi.tsx']) {

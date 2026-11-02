@@ -240,7 +240,7 @@ export function moPhien(che: CheDoAnMung): Phien {
       if (xong) return
       xong = true
       dangChay.delete(p)
-      for (const t of hen) t < 0 ? cancelAnimationFrame(-t) : window.clearTimeout(t)
+      for (const t of hen) { if (t < 0) cancelAnimationFrame(-t); else window.clearTimeout(t) }
       for (const a of hoat) { try { a.cancel() } catch { /* đã xong */ } }
       for (const n of nut) n.remove()
       hang.length = 0

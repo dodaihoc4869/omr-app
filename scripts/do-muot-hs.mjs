@@ -50,8 +50,7 @@ function timChromium() {
   const goc = '/opt/pw-browsers'
   if (!existsSync(goc)) return undefined
   for (const d of readdirSync(goc).filter((x) => /^chromium-\d+$/.test(x)).sort().reverse()) {
-    const p = join(goc, d, 'chrome-linux', 'chrome')
-    if (existsSync(p)) return p
+    for (const s of ['chrome-linux', 'chrome-linux64']) { const p = join(goc, d, s, 'chrome'); if (existsSync(p)) return p } // Playwright ≥ 1.5x đổi tên thư mục thành chrome-linux64
   }
 }
 
