@@ -2,18 +2,20 @@
 // «ĐẤU NGUYÊN TỬ» 3 ĐẤU 3 · GÓI NHỊ PHÂN (src/lib/dau-ion/goi.ts): GIAO THỨC 3 — ý định 8 byte CHỈ hướng đi; ảnh trận MÃ 4 (bản cũ mã 3 không đọc lẫn):
 // đầu 10 byte có BƯỚC TRẬN (mốc thời gian của phòng, uint16) + tỉ số hai phe; toạ độ × 50 (sân 1040 × 520 vừa 16 bit); sân 6 ghế chơi 60 giây
 // ⇒ gói trung bình ≤ 125 byte.
+// v4 (thầy 02/11 tối «Chốt hết build đi»): GIAO THỨC 4 — đầu ảnh thêm 14 byte máu tháp / tường / tinh thể, ghế 11 byte (thêm khối đang ngắm), sự kiện kh / vo / tb / th
+// ⇒ trần gói trung bình GIỮ 125 byte (đo 02/11: ~103 B — đầu + ghế +20 B nhưng hết sự kiện electron).
 import { describe, expect, it } from 'vitest'
 import { GOI_ANH, PHIEN_BAN, datAck, docAnh, docYDinh, maAnh, maYDinh } from '../src/lib/dau-ion/goi'
 import { SAN_H, SAN_W, aiDi, buocTran, laySuKien, taoTran, type SuKien } from '../src/lib/dau-ion/loi'
 
 describe('Gói ý định', () => {
-  it('8 byte, chỉ seq + dx + dy (byte ngắm / bắn để trống); giao thức 3', () => {
+  it('8 byte, chỉ seq + dx + dy (byte ngắm / bắn để trống); giao thức 4 (v4)', () => {
     const b = maYDinh(300, 0.5, -1.4)
     expect(b.length).toBe(8)
     expect([...b.slice(4)]).toEqual([0, 0, 0, 0])
     expect(docYDinh(b)).toEqual({ seq: 300 & 0xff, dx: 0.5, dy: -1 })
     expect(docYDinh(new Uint8Array(7))).toBeNull()
-    expect(PHIEN_BAN).toBe(3)
+    expect(PHIEN_BAN).toBe(4)
     expect(GOI_ANH).toBe(4)
   })
 })
@@ -38,15 +40,22 @@ describe('Ảnh trận mã 4', () => {
       { t: 'tat', x: 1, y: 2, nt: 0 },
       { t: 'cham', ai: 2, boi: 1, x: 3, y: 4 },
     ]
-    const b = datAck(maAnh(9, 41.2, tr.ghe, su, 65535 + 7, [12, 9]), 33)
+    su.push({ t: 'kh', k: 3, mau: 7, chan: true, x: 100, y: 200 }, { t: 'vo', k: 13 }, { t: 'tb', k: 2, ngam: 2.5 }, { t: 'th', x: 600, y: 300 })
+    const km = tr.km.map((m, i) => (i % 3 ? m : 0))
+    const b = datAck(maAnh(9, 41.2, tr.ghe, su, 65535 + 7, [12, 9], km), 33)
     expect(b[0]).toBe(GOI_ANH)
     const a = docAnh(b)!
     expect(a).toMatchObject({ tick: 9, ack: 33, con: 42, buoc: 6, ti: [12, 9] })
     expect(a.ghe).toHaveLength(6)
-    expect(a.ghe[0]).toEqual({ id: 1, x: 123.46, y: 443.22, muc: 2, mau: 7, cap: 4, cho: false, che: false, khien: 2, vang: false, ha: 3, e: 5 })
+    expect(a.ghe[0]).toEqual({ id: 1, x: 123.46, y: 443.22, muc: 2, mau: 7, cap: 4, cho: false, che: false, khien: 2, vang: false, ha: 3, e: 5, mucK: 0 })
+    expect(a.km).toEqual(km)
     expect(a.ghe[1]).toMatchObject({ cho: true, vang: true, cap: 5, mau: 10 })
     expect(a.ghe[2]).toMatchObject({ x: SAN_W, y: SAN_H })
-    expect(a.su.map((s) => s.t)).toEqual(['ban', 'trung', 'chan', 'ha', 'hoi', 'vp', 'nhat', 'len', 'xich', 'no']) // `tat`, `cham` chỉ ở máy em
+    expect(a.su.map((s) => s.t)).toEqual(['ban', 'trung', 'chan', 'ha', 'hoi', 'vp', 'nhat', 'len', 'xich', 'no', 'kh', 'vo', 'tb', 'th']) // `tat`, `cham` chỉ ở máy em
+    expect(a.su[10]).toEqual({ t: 'kh', k: 3, mau: 7, chan: true, x: 100, y: 200 })
+    expect(a.su[11]).toEqual({ t: 'vo', k: 13 })
+    expect((a.su[12] as { ngam: number }).ngam).toBeCloseTo(2.5, 3)
+    expect(a.su[13]).toEqual({ t: 'th', x: 600, y: 300 })
     expect((a.su[0] as { ngam: number }).ngam).toBeCloseTo(1.25, 3)
     expect(a.su[1]).toEqual({ t: 'trung', ai: 2, boi: 1, x: 30, y: 40, mau: 6, phu: 1 })
     expect(a.su[3]).toEqual({ t: 'ha', ai: 2, boi: 1, x: 50, y: 60, capCu: 5, chuoi: 3 })
@@ -59,16 +68,16 @@ describe('Ảnh trận mã 4', () => {
     const b = maAnh(1, 60, tr.ghe, [{ t: 'ban', chu: 1, cap: 1, x: 1, y: 1, ngam: 0 }])
     expect(docAnh(b.slice(0, b.length - 2))).toBeNull()
   })
-  it('sân 6 ghế 3 đấu 3 chơi 60 giây ở 20 ảnh/giây ⇒ gói trung bình ≤ 125 byte', () => {
+  it('v4: sân 6 ghế 3 đấu 3 chơi trọn ván (≤ 2 phút) ở 20 ảnh/giây ⇒ gói trung bình ≤ 125 byte', () => {
     const tr = taoTran(Array.from({ length: 6 }, (_, i) => ({ id: i + 1, nt: i, ai: true, phe: i < 3 ? 0 : 1 })), 11)
     let tong = 0, n = 0
     while (!tr.xong) {
       for (const g of tr.ghe) g.yd = aiDi(tr, g, 0.05)
       buocTran(tr, 0.05)
-      tong += maAnh(n, tr.con, tr.ghe, laySuKien(tr), n, tr.ti).length; n++
+      tong += maAnh(n, tr.con, tr.ghe, laySuKien(tr), n, tr.ti, tr.km).length; n++
     }
     const tb = tong / n
-    expect(Math.abs(n - 1200)).toBeLessThanOrEqual(1)
+    expect(n).toBeLessThanOrEqual(2401)
     console.log(`[dau-ion-3v3] ảnh trận trung bình ${tb.toFixed(1)} B · ${((tb * 20) / 1024).toFixed(2)} KB/giây mỗi em`)
     expect(tb).toBeLessThanOrEqual(125)
   })
