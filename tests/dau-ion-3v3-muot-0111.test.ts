@@ -7,8 +7,7 @@ import { describe, expect, it } from 'vitest'
 import { maAnh, docAnh } from '../src/lib/dau-ion/goi'
 import { BUOC, CAP, SAN_H, SAN_W, taoTran } from '../src/lib/dau-ion/loi'
 import { DEM_MAX, DEM_MIN, NGOAI_SUY, TranMang } from '../src/components/phong-cho/dau-ion-tran'
-import { coSan, diemVao, gocRa, huongRa, huongVao, ra, type Xoay } from '../src/components/phong-cho/dau-ion-xoay'
-import { KHOI, TT_CUA } from '../src/lib/dau-ion/loi'
+import { coSan, diemVao, gocRa, huongRa, huongVao, ra, vatRa, type Xoay } from '../src/components/phong-cho/dau-ion-xoay'
 
 const KHUNG: Xoay[] = [{ doc: false, lat: false }, { doc: false, lat: true }, { doc: true, lat: false }, { doc: true, lat: true }]
 
@@ -31,7 +30,7 @@ describe('Xoay sân khi vẽ (phe em trái / dưới)', () => {
       }
     }
   })
-  it('phe em (Bazơ trái / Axit phải trên sân) luôn hiện ở TRÁI khi ngang, DƯỚI khi dọc; v4: TINH THỂ phe em (thay tường giá ống cũ) cũng ở trái / dưới', () => {
+  it('phe em (Bazơ trái / Axit phải trên sân) luôn hiện ở TRÁI khi ngang, DƯỚI khi dọc; tường chắn của phe em đánh dấu `cuaEm`', () => {
     const beBazo: [number, number] = [62, 260], beAxit: [number, number] = [978, 260]
     expect(ra(...beBazo, { doc: false, lat: false })[0]).toBeLessThan(SAN_W / 2)
     expect(ra(...beAxit, { doc: false, lat: true })[0]).toBeLessThan(SAN_W / 2)
@@ -39,8 +38,10 @@ describe('Xoay sân khi vẽ (phe em trái / dưới)', () => {
     expect(ra(...beAxit, { doc: true, lat: true })[1]).toBeGreaterThan(SAN_W / 2)
     for (const k of KHUNG) {
       const pheEm = k.lat ? 1 : 0, w = coSan(k)
-      const tt = KHOI[TT_CUA[pheEm]], [x, y] = ra(tt.x, tt.y, k)
-      if (k.doc) expect(y).toBeGreaterThan(w.h / 2); else expect(x).toBeLessThan(w.w / 2)
+      const tuong = vatRa(k, pheEm).filter((v) => v.k === 'cn' && v.ve === 'gia-ong')
+      const cuaEm = tuong.find((v) => v.cuaEm)!
+      if (cuaEm.k !== 'cn') throw new Error('giá ống')
+      if (k.doc) expect(cuaEm.y + cuaEm.h / 2).toBeGreaterThan(w.h / 2); else expect(cuaEm.x + cuaEm.w / 2).toBeLessThan(w.w / 2)
     }
   })
 })

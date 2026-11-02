@@ -9,19 +9,12 @@
 //    đối thủ ⇒ nháy ngay (`cham`), «−1» chờ phòng xác nhận. Loạt phòng gửi về cho em mà máy em đã vẽ ⇒ bỏ, không vẽ đôi.
 //  · Khớp vị trí em: sai lệch kéo dần theo hàm mũ (không giật theo nhịp gói); lệch quá 80 đơn vị mới nhảy.
 // Toạ độ ở đây là toạ độ SÂN (Bazơ trái, Axit phải); xoay về khung vẽ ở dau-ion-xoay.ts.
-import { BUOC, CAP, GIAY_NGHI, GIAY_VAN, KHOI, MAU_KHOI_DAU, MAU_MAX, R, R_DAN, SAN_H, SAN_W, SO_KHOI, TAM_DAN, TAM_X, TAM_Y, TEN_NGUYEN_TO, TOC_DAN, TOC_DAN_THAP, aiDi, buocDi, buocTran, chamKhoi, chonKhoi, chonMuc, diemKhoi, doiTheo, laySuKien, taoTran, vanMoi, xepBang, type LoaiVp, type SuKien, type Tran } from '../../lib/dau-ion/loi'
+import { BUOC, CAP, GIAY_NGHI, GIAY_VAN, MAU_MAX, R, R_DAN, SAN_H, SAN_W, TAM_DAN, TAM_X, TAM_Y, TEN_NGUYEN_TO, TOC_DAN, aiDi, buocDi, buocTran, chonMuc, doiTheo, dungVatCan, laySuKien, taoTran, vanMoi, xepBang, type LoaiVp, type SuKien, type Tran } from '../../lib/dau-ion/loi'
 import { maYDinh, type Anh, type GheAnh } from '../../lib/dau-ion/goi'
 import type { Canh, DanVe, GheVe, VpVe } from './dau-ion-ve'
 
 /** Một dòng bảng hết ván (đủ để chọn huy hiệu — xem `huyHieu` ở lõi). */
-export interface DongBang { id: number; phe: number; ai: boolean; nt: number; ha: number; biHa: number; capMax: number; chuoiMax: number; cap: number; danhKhoi: number; hoTro: number; trung: number; songMax: number; phaThap: number; hoVe: number }
-/** Kết quả ván (v4): phe thắng (0 / 1; 2 = hoà), lý do ('vo' tinh thể vỡ / 'gio' hết giờ), máu khối lúc hết, giây còn lại lúc hết. */
-export interface KetVan { thang: number; ly: '' | 'vo' | 'gio'; km: number[]; con: number }
-/** Khối phe KIA chạm điểm (đạn phe `phe`): chỉ số hoặc -1 (đạn phe mình bay xuyên khối phe mình). */
-export function khoiCham(km: readonly number[], phe: number, x: number, y: number): number {
-  for (let j = 0; j < SO_KHOI; j++) if (km[j] > 0 && KHOI[j].phe !== phe && chamKhoi(j, x, y, R_DAN - 1)) return j
-  return -1
-}
+export interface DongBang { id: number; phe: number; ai: boolean; nt: number; ha: number; biHa: number; capMax: number; chuoiMax: number; cap: number; nhatE: number; hoTro: number; trung: number; songMax: number }
 export interface TrangEm { mau: number; cap: number; e: number; ha: number; nt: number; phe: number; cho: boolean }
 export interface BoChay {
   readonly emId: number
@@ -42,10 +35,6 @@ export interface BoChay {
   xep(): { id: number; phe: number; ha: number; cap: number }[]
   /** Kết quả ván vừa hết (đang nghỉ 6 giây), null khi đang chơi. */
   ket(): DongBang[] | null
-  /** Phe thắng / lý do của ván vừa hết (null khi đang chơi). */
-  ketVan(): KetVan | null
-  /** Máu 14 khối hiện tại (tháp · tường · tinh thể). */
-  km(): readonly number[]
   conNghi(nay: number): number
   vanMoi(): void
   phu(): string
@@ -85,8 +74,6 @@ export class TranAI implements BoChay {
     }
     if (this.tr.xong) { this.bang = xepBang(this.tr); this.nghiDen = nay + GIAY_NGHI * 1000 }
   }
-  ketVan(): KetVan | null { return this.bang ? { thang: this.tr.thang, ly: this.tr.lyDo, km: [...this.tr.km], con: this.tr.con } : null }
-  km(): readonly number[] { return this.tr.km }
   canh(): Canh { return this.tr }
   laySu(): SuKien[] { const s = this.su; this.su = []; return s }
   em(): TrangEm | null { const g = this.tr.ghe[0]; return { mau: g.mau, cap: g.cap, e: g.e, ha: g.ha, nt: g.nt, phe: g.phe, cho: g.cho > 0 } }
@@ -102,7 +89,7 @@ export class TranAI implements BoChay {
 
 /** Ảnh trận đặt lên dòng thời gian của phòng: T = bước trận (đã mở vòng) × 50 ms. */
 interface AnhCo { T: number; a: Anh }
-interface DanMang extends DanVe { chu: number; con: number; toc?: number }
+interface DanMang extends DanVe { chu: number; con: number }
 interface ThongTin { ten: string; nt: number; ai: boolean; phe: number; xoaLuc?: number }
 
 const MS_BUOC = BUOC * 1000
@@ -136,8 +123,6 @@ export class TranMang implements BoChay {
   private su: SuKien[] = []
   private ds = new Map<number, ThongTin>()
   private bang: DongBang[] | null = null
-  private kv: KetVan | null = null
-  private kmNay: number[] = [...MAU_KHOI_DAU]
   private tiKet: [number, number] = [0, 0]
   private nghiDen = 0
   private conGiay = GIAY_VAN
@@ -155,9 +140,7 @@ export class TranMang implements BoChay {
     this.conGiay = Number(j.con) || GIAY_VAN
     this.datGhe(j.ghe, nay)
     this.datVp(j.vp, nay)
-    this.datKm(j.km)
   }
-  private datKm(km: unknown): void { if (Array.isArray(km) && km.length === SO_KHOI) this.kmNay = km.map((v) => Number(v) || 0) }
   /** Dòng ghế: [id, tên, nguyên tố, là A.I (0/1), phe]. Ghế vừa rời giữ thêm 3 giây (để vẽ bong bóng / tên ở tin). */
   private datGhe(ghe: unknown, nay: number): void {
     const co = new Set<number>()
@@ -184,19 +167,16 @@ export class TranMang implements BoChay {
       const c = this.ds.get(cu); if (c && cu !== moi) c.xoaLuc = nay + 3000
       this.su.push({ t: 'thay', ai: cu, moi, laAI, tenCu })
     } else if (j.t === 'ket') {
-      // Dòng (v4): [id, hạ, bị hạ, cấp cao nhất, chuỗi hạ, bắn trúng khối, góp sức, trúng, giây trụ liền, tháp phá, hộ vệ].
+      // Dòng: [id, hạ, bị hạ, cấp cao nhất, chuỗi hạ, electron đã nhặt, góp sức, trúng, giây trụ liền].
       this.bang = ((j.bang as number[][]) ?? []).map((d) => {
         const t = this.ds.get(d[0])
-        return { id: d[0], phe: t?.phe ?? 0, ai: !!t?.ai, nt: t?.nt ?? 0, ha: d[1], biHa: d[2], capMax: d[3], chuoiMax: d[4], cap: d[3], danhKhoi: d[5] ?? 0, hoTro: d[6] ?? 0, trung: d[7] ?? 0, songMax: d[8] ?? 0, phaThap: d[9] ?? 0, hoVe: d[10] ?? 0 }
+        return { id: d[0], phe: t?.phe ?? 0, ai: !!t?.ai, nt: t?.nt ?? 0, ha: d[1], biHa: d[2], capMax: d[3], chuoiMax: d[4], cap: d[3], nhatE: d[5] ?? 0, hoTro: d[6] ?? 0, trung: d[7] ?? 0, songMax: d[8] ?? 0 }
       })
-      this.datKm(j.km)
-      const th = Number(j.thang)
-      this.kv = { thang: th === 0 || th === 1 || th === 2 ? th : 2, ly: j.ly === 'vo' || j.ly === 'gio' ? j.ly : '', km: [...this.kmNay], con: Number(j.con) || 0 }
       const ti = j.ti as number[] | undefined
       this.tiKet = ti ? [Number(ti[0]) || 0, Number(ti[1]) || 0] : [0, 1].map((p) => this.bang!.filter((d) => d.phe === p).reduce((s, d) => s + d.ha, 0)) as [number, number]
       this.nghiDen = nay + (Number(j.nghi) || GIAY_NGHI) * 1000; this.dan = []
     } else if (j.t === 'van') {
-      this.bang = null; this.kv = null; this.kmNay = [...MAU_KHOI_DAU]; this.conGiay = Number(j.con) || GIAY_VAN; if (j.ghe) this.datGhe(j.ghe, nay); this.datVp(j.vp, nay)
+      this.bang = null; this.conGiay = Number(j.con) || GIAY_VAN; if (j.ghe) this.datGhe(j.ghe, nay); this.datVp(j.vp, nay)
       this.anh = []; this.viTri.co = false; this.sai = { x: 0, y: 0 }; this.dan = []; this.suTre = []; this.napEm = 0.6; this.canhNho = null
     }
   }
@@ -228,7 +208,6 @@ export class TranMang implements BoChay {
     this.datDongHo(nay - T)
     this.anh.push({ T, a }); if (this.anh.length > 12) this.anh.shift()
     this.conGiay = a.con
-    if (a.km?.length === SO_KHOI) this.kmNay = a.km
     for (const s of a.su) {
       // Loạt của CHÍNH em: máy em đã bắn tại máy ⇒ bỏ (không vẽ đôi); máy em chưa bắn (khác tầm nhìn) ⇒ vẽ ngay.
       if (s.t === 'ban' && s.chu === this.emId) { const nhip = (CAP[s.cap]?.nhip ?? 0.4) * 1000; if (nay - this.banEmLuc > nhip * 1.5) { this.apSu(s, nay); this.napEm = nhip / 1000 } continue }
@@ -243,7 +222,7 @@ export class TranMang implements BoChay {
     const v = this.viTri
     if (g.cho || !v.co) { v.x = g.x; v.y = g.y; v.vx = v.vy = 0; v.co = !g.cho; this.sai = { x: 0, y: 0 }; return }
     const p = { x: g.x, y: g.y, vx: v.vx, vy: v.vy }
-    for (const c of this.choGui) buocDi(p, c.dx, c.dy, c.dt, this.kmNay)
+    for (const c of this.choGui) buocDi(p, c.dx, c.dy, c.dt)
     const ex = p.x - v.x, ey = p.y - v.y
     if (ex * ex + ey * ey > 80 * 80) { v.x = p.x; v.y = p.y; this.sai = { x: 0, y: 0 } } else this.sai = { x: ex, y: ey }
   }
@@ -251,18 +230,7 @@ export class TranMang implements BoChay {
   private apSu(s: SuKien, nay: number): void {
     const t = nay / 1000
     if (s.t === 'ban') this.sinhDan(s.chu, s.cap, s.x, s.y, s.ngam)
-    else if (s.t === 'tb') { // tháp bắn: một viên chậm từ đầu tháp
-      const k = KHOI[s.k]
-      if (k?.vung) this.dan.push({ chu: 0, nt: -1, phe: k.phe, cap: 1, x: k.x + Math.cos(s.ngam) * (k.r + 6), y: k.y + Math.sin(s.ngam) * (k.r + 6), vx: Math.cos(s.ngam) * TOC_DAN_THAP, vy: Math.sin(s.ngam) * TOC_DAN_THAP, con: k.vung + 40, toc: TOC_DAN_THAP })
-    } else if (s.t === 'kh') { // viên trúng khối: bỏ viên phe kia gần chỗ trúng nhất
-      const phe = KHOI[s.k]?.phe, sx = s.x, sy = s.y
-      let tot = -1, gan = 50
-      this.dan.forEach((d, i) => { const l = Math.hypot(d.x - sx, d.y - sy); if (d.phe !== phe && l < gan) { gan = l; tot = i } })
-      if (tot >= 0) this.dan.splice(tot, 1)
-    } else if (s.t === 'th') { // trung hoà: bỏ hai viên khác phe gần chỗ chạm
-      const sx = s.x, sy = s.y
-      for (const phe of [0, 1]) { let tot = -1, gan = 40; this.dan.forEach((d, i) => { const l = Math.hypot(d.x - sx, d.y - sy); if (d.phe === phe && l < gan) { gan = l; tot = i } }); if (tot >= 0) this.dan.splice(tot, 1) }
-    } else if (s.t === 'trung' || s.t === 'chan') {
+    else if (s.t === 'trung' || s.t === 'chan') {
       // Viên đã trúng: bỏ viên gần nhất của người bắn quanh mục tiêu.
       const { ai, boi } = s, g = this.canh(nay).ghe.find((k) => k.id === ai)
       let tot = -1, gan = 60
@@ -287,11 +255,11 @@ export class TranMang implements BoChay {
     const c = this.canh(nay), em = c.ghe.find((g) => g.id === this.emId)
     // Súng CỦA EM: bắn tại máy theo nhịp cấp súng khi có đối thủ lộ (chỉ là hình — phòng quyết trúng / hạ).
     this.napEm -= dt
-    if (em && !em.cho && !em.che && !em.vang && !this.bang && (em.muc || em.mucK)) {
+    if (em && !em.cho && !em.che && !em.vang && !this.bang && em.muc) {
       if (this.napEm <= 0) {
-        const m = em.muc ? c.ghe.find((g) => g.id === em.muc) : null, dk = !m && em.mucK ? diemKhoi(em.mucK - 1) : null
-        if (m || dk) {
-          const ngam = m ? Math.atan2(m.y - em.y, m.x - em.x) : Math.atan2(dk![1] - em.y, dk![0] - em.x), cap = Math.max(1, Math.min(5, em.cap))
+        const m = c.ghe.find((g) => g.id === em.muc)
+        if (m) {
+          const ngam = Math.atan2(m.y - em.y, m.x - em.x), cap = Math.max(1, Math.min(5, em.cap))
           const x = em.x + Math.cos(ngam) * (R + 12), y = em.y + Math.sin(ngam) * (R + 12)
           this.sinhDan(this.emId, cap, x, y, ngam)
           this.su.push({ t: 'ban', chu: this.emId, cap, x, y, ngam })
@@ -304,9 +272,9 @@ export class TranMang implements BoChay {
     if (this.dan.length) {
       for (let i = this.dan.length - 1; i >= 0; i--) {
         const d = this.dan[i]
-        d.x += d.vx * dt; d.y += d.vy * dt; d.con -= (d.toc ?? TOC_DAN) * dt
+        d.x += d.vx * dt; d.y += d.vy * dt; d.con -= TOC_DAN * dt
         let mat = d.con <= 0
-        if (!mat && (d.x < 0 || d.y < 0 || d.x > SAN_W || d.y > SAN_H || khoiCham(this.kmNay, d.phe, d.x, d.y) >= 0)) { mat = true; this.su.push({ t: 'tat', x: d.x, y: d.y, nt: d.nt, phe: d.phe }) }
+        if (!mat && (d.x < 0 || d.y < 0 || d.x > SAN_W || d.y > SAN_H || dungVatCan(d.x, d.y, R_DAN - 1))) { mat = true; this.su.push({ t: 'tat', x: d.x, y: d.y, nt: d.nt, phe: d.phe }) }
         if (!mat) for (const g of c.ghe) if (g.id !== d.chu && g.phe !== d.phe && g.cho <= 0 && (g.x - d.x) ** 2 + (g.y - d.y) ** 2 < (R + R_DAN) ** 2) { mat = true; if (d.chu === this.emId && !g.che) this.su.push({ t: 'cham', ai: g.id, boi: this.emId, x: d.x, y: d.y }); break }
         if (mat) this.dan.splice(i, 1)
       }
@@ -315,7 +283,7 @@ export class TranMang implements BoChay {
     if (this.bang) dx = dy = 0
     const v = this.viTri, cuoi = this.anh[this.anh.length - 1]?.a.ghe.find((x) => x.id === this.emId)
     if (v.co && cuoi && !cuoi.cho && !this.bang) {
-      buocDi(v, dx, dy, dt, this.kmNay)
+      buocDi(v, dx, dy, dt)
       // Khớp êm: kéo dần sai lệch (hàm mũ ~100 ms), bỏ qua lệch < 1 đơn vị.
       const k = 1 - Math.exp(-dt * 10)
       if (Math.abs(this.sai.x) + Math.abs(this.sai.y) > 1) { v.x += this.sai.x * k; v.y += this.sai.y * k; this.sai.x -= this.sai.x * k; this.sai.y -= this.sai.y * k }
@@ -356,22 +324,16 @@ export class TranMang implements BoChay {
         if (p0 && !p0.cho && !g.cho && dtA > 0 && Math.hypot(g.x - p0.x, g.y - p0.y) < 60) { x = p0.x + (g.x - p0.x) * k; y = p0.y + (g.y - p0.y) * k; vx = (g.x - p0.x) / dtA; vy = (g.y - p0.y) / dtA }
       }
       const cu = Math.hypot(vx, vy) > 40 ? Math.atan2(vy, vx) : this.gocCu.get(g.id) ?? Math.atan2(TAM_Y - y, TAM_X - x)
-      ghe.push({ id: g.id, nt: this.ntCua(g.id), phe: this.pheCua(g.id), ai: this.laAI(g.id), x, y, ngam: cu, mau: g.mau, cap: g.cap, cho: g.cho ? 1 : 0, che: g.che ? 1 : 0, khien: g.khien, muc: g.muc, mucK: g.mucK, ha: g.ha, vang: g.vang })
+      ghe.push({ id: g.id, nt: this.ntCua(g.id), phe: this.pheCua(g.id), ai: this.laAI(g.id), x, y, ngam: cu, mau: g.mau, cap: g.cap, cho: g.cho ? 1 : 0, che: g.che ? 1 : 0, khien: g.khien, muc: g.muc, ha: g.ha, vang: g.vang })
     }
     // Nòng quay về mục tiêu; không có ai lộ ⇒ dõi đối thủ gần nhất (không bắn). Em tự ngắm ngay tại máy (cùng hàm của lõi), không chờ mạng.
     for (const g of ghe) {
-      if (g.id === this.emId && !g.cho) {
-        const k0 = g.vang ? -1 : chonKhoi(this.kmNay, g), uuTT = k0 >= 0 && KHOI[k0].k === 'tt'
-        const m = g.vang || uuTT ? null : chonMuc(ghe, g, this.kmNay)
-        g.muc = m ? m.id : 0; g.mucK = m ? 0 : k0 + 1
-      }
-      const m = g.muc ? ghe.find((q) => q.id === g.muc) : null
+      if (g.id === this.emId && !g.cho) { const m = g.vang ? null : chonMuc(ghe, g); g.muc = m ? m.id : 0 }
+      const m = g.muc ? ghe.find((q) => q.id === g.muc) : doiTheo(ghe, g)
       if (m) g.ngam = Math.atan2(m.y - g.y, m.x - g.x)
-      else if (g.mucK) { const [x, y] = diemKhoi(g.mucK - 1); g.ngam = Math.atan2(y - g.y, x - g.x) }
-      else { const d = doiTheo(ghe, g); if (d) g.ngam = Math.atan2(d.y - g.y, d.x - g.x) }
       this.gocCu.set(g.id, g.ngam)
     }
-    const c = { t: nay / 1000, ghe, dan: this.dan, vp: [...this.vp.values()], km: this.kmNay }
+    const c = { t: nay / 1000, ghe, dan: this.dan, vp: [...this.vp.values()] }
     this.canhNho = { nay, c }
     return c
   }
@@ -384,8 +346,6 @@ export class TranMang implements BoChay {
   tiSo(): [number, number] { if (this.bang) return this.tiKet; const a = this.anh[this.anh.length - 1]?.a; return a ? [a.ti[0], a.ti[1]] : [0, 0] }
   xep() { return (this.anh[this.anh.length - 1]?.a.ghe ?? []).map((g) => ({ id: g.id, phe: this.pheCua(g.id), ha: g.ha, cap: g.cap })) }
   ket(): DongBang[] | null { return this.bang }
-  ketVan(): KetVan | null { return this.bang ? this.kv : null }
-  km(): readonly number[] { return this.kmNay }
   conNghi(nay: number): number { return Math.max(0, (this.nghiDen - nay) / 1000) }
   /** Ván mới tự chạy sau 6 giây nghỉ (không cần bấm). */
   vanMoi(): void { /* phòng tự xoay ván */ }

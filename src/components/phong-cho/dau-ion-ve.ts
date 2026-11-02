@@ -5,15 +5,15 @@
 // BẢN VẼ 3 ĐẤU 3 (01/11, docs/ban-ve-dau-ion-3v3-0111): vẽ trong KHUNG ĐÃ XOAY (dau-ion-xoay.ts — phe em ở trái / dưới); cả quả nguyên tử tô MÀU PHE
 // (Bazơ xanh --dn-phe-0, Axit đỏ --dn-phe-1), ký hiệu nguyên tố ở giữa; vòng viền + thanh Máu màu phe; em có vòng trắng ngoài + nhãn «Em»;
 // tên đồng đội / đối thủ chữ màu phe; đối thủ em đang ngắm có dấu ngắm nhỏ; đối thủ đang ngắm EM có vạch mờ báo. Hiệu ứng dịu (thầy: «vui nhưng dịu mắt»).
-import { BE_PHE, CAP, KHOI, MAU_KHOI_DAU, MAU_MAX, NGUYEN_TO, R, SO_KHOI, TT_CUA, TUONG_DAY, danhDuoc, type LoaiVp, type SuKien } from '../../lib/dau-ion/loi'
-import { KHONG_XOAY, coSan, ra, type Xoay } from './dau-ion-xoay'
+import { BE_PHE, CAP, MAU_MAX, NGUYEN_TO, R, type LoaiVp, type SuKien } from '../../lib/dau-ion/loi'
+import { KHONG_XOAY, coSan, ra, vatRa, type VatVe, type Xoay } from './dau-ion-xoay'
 
 type Rgb = readonly [number, number, number]
-export interface GheVe { id: number; nt: number; phe: number; ai?: boolean; x: number; y: number; ngam: number; mau: number; cap: number; cho: number; che: number; khien: number; muc: number; mucK?: number; ha: number; vang?: boolean }
+export interface GheVe { id: number; nt: number; phe: number; ai?: boolean; x: number; y: number; ngam: number; mau: number; cap: number; cho: number; che: number; khien: number; muc: number; ha: number; vang?: boolean }
 export interface DanVe { nt: number; phe: number; cap: number; x: number; y: number; vx: number; vy: number }
 export interface VpVe { id: number; k: LoaiVp; x: number; y: number; t0: number }
 /** Cảnh để vẽ một khung (trận tại máy dùng thẳng Tran của lõi; trận mạng dựng từ ảnh trận). `t` = giây của trận. */
-export interface Canh { t: number; ghe: GheVe[]; dan: DanVe[]; vp: VpVe[]; /** Máu 14 khối (thiếu ⇒ nguyên vẹn). */ km?: readonly number[] }
+export interface Canh { t: number; ghe: GheVe[]; dan: DanVe[]; vp: VpVe[] }
 export interface Bang {
   toi: boolean; nt: Rgb[]; cap: Rgb[]
   /** Màu hai phe [Bazơ, Axit] và chữ màu phe (đậm hơn, đọc được trên thẻ). */
@@ -90,21 +90,13 @@ export class Ve {
   private soLuc = new Map<number, number>()
   /** Lúc đạn CỦA EM chạm (tại máy) từng đối thủ — để «trung» của phòng không nháy lần hai. */
   private chamLuc = new Map<number, number>()
-  private chanLuc = -1e9
   private nayCu = 0
   /** Khung xoay + phe em (phe em ở trái / dưới khung vẽ). */
   private xoay: Xoay = KHONG_XOAY
   private pheEm = 0
   private vw: number
   private vh: number
-  /** Tháp: góc đầu (khung vẽ), góc mục tiêu + lúc bắn gần nhất; khối: lúc trúng gần nhất (loé). */
-  private thapGoc = new Map<number, number>()
-  private thapDich = new Map<number, number>()
-  private thapBanLuc = new Map<number, number>()
-  private khLuc = new Map<number, number>()
-  /** Nền gộp (sàn + khối đứng yên) + khoá trạng thái tĩnh lúc dựng. */
-  private nenGop: HTMLCanvasElement | null = null
-  private khoaGop = ''
+  private vat: VatVe[] = vatRa(KHONG_XOAY, 0)
   /** Điểm đến (chạm một điểm / rê chuột) — vòng nét đứt (toạ độ vẽ). */
   diToi: { x: number; y: number } | null = null
 
@@ -120,17 +112,17 @@ export class Ve {
   datSan(xoay: Xoay, pheEm: number): { w: number; h: number } {
     const c = coSan(xoay)
     if (xoay.doc !== this.xoay.doc || xoay.lat !== this.xoay.lat || pheEm !== this.pheEm) {
-      this.xoay = xoay; this.pheEm = pheEm; this.vw = c.w; this.vh = c.h; this.nen = null; this.khoaGop = ''; this.goc.clear(); this.thapGoc.clear()
+      this.xoay = xoay; this.pheEm = pheEm; this.vw = c.w; this.vh = c.h; this.vat = vatRa(xoay, pheEm); this.nen = null; this.goc.clear()
     }
     return c
   }
   datCo(w: number, h: number, dpr: number, view?: View): void {
     this.view = view || { x0: 0, y0: 0, w: this.vw, h: this.vh }; this.dpr = dpr
     this.cv.width = Math.round(w * dpr); this.cv.height = Math.round(h * dpr); this.s = (w / this.view.w) * dpr
-    this.rongTen.clear(); this.qs.clear(); this.taoHat(); this.nen = null; this.khoaGop = ''
+    this.rongTen.clear(); this.qs.clear(); this.taoHat(); this.nen = null
     if (!view) this.taoNen()
   }
-  datBang(b: Bang): void { this.b = b; this.rongTen.clear(); this.qs.clear(); this.taoHat(); this.khoaGop = ''; if (this.nen) this.taoNen() }
+  datBang(b: Bang): void { this.b = b; this.rongTen.clear(); this.qs.clear(); this.taoHat(); if (this.nen) this.taoNen() }
   private px(n: number): number { return (n * this.dpr) / this.s }
   private taoNen(): void {
     const c = document.createElement('canvas'); c.width = this.cv.width; c.height = this.cv.height
@@ -139,7 +131,7 @@ export class Ve {
     x.setTransform(this.s, 0, 0, this.s, 0, 0); this.veSan(x); this.nen = c
   }
 
-  private veSan(x: CanvasRenderingContext2D): void {
+  private veSan(x: CanvasRenderingContext2D, coVat = true): void {
     const b = this.b, W = this.vw, H = this.vh, doc = this.xoay.doc
     const pheEm = this.pheEm, pheKia = 1 - pheEm
     x.save()
@@ -172,133 +164,52 @@ export class Ve {
     }
     x.setLineDash([])
     x.restore()
+    if (coVat) for (const v of this.vat) this.veVat(x, v)
     x.strokeStyle = rgba(b.luoiDam, b.toi ? 0.45 : 0.35); x.lineWidth = 3; x.beginPath(); x.roundRect(1.5, 1.5, W - 3, H - 3, 27); x.stroke()
   }
 
-  /** THÁP · TƯỜNG · TINH THỂ (v4, thầy 02/11 tối). Vẽ bằng nét mỗi khung (14 khối, không gradient tạo mới — quầng dùng ảnh đệm). Toạ độ: khung vẽ.
-   *  Tháp nhìn từ trên: đế lục giác màu phe + cột kính tròn + ĐẦU TINH THỂ NHỌN HƯỚNG VỀ ĐỐI THỦ (thầy «Cho đầu tháp hướng về phía đối thủ»): đang bắn
-   *  ⇒ xoay theo người bị bắn; rảnh ⇒ chĩa về tinh thể phe kia. Vùng tự bắn chỉ hiện khi phe kia lấn vào. */
-  private veKhoi(x: CanvasRenderingContext2D, c: Canh, nay: number, dtVe: number): void {
-    const km = c.km ?? MAU_KHOI_DAU
-    // Phần đứng yên của khối nằm trong NỀN GỘP (vẽ ở `ve`, chỉ dựng lại khi khối vỡ / bắt đầu nứt); không có nền (ảnh bìa) ⇒ vẽ thẳng.
-    if (!this.nen) this.veKhoiTinh(x, km)
-    this.veKhoiDong(x, c, nay, dtVe, km)
-  }
-  /** Khoá phần tĩnh: mỗi khối còn / vỡ / nứt (< 60 %) / bảo hộ — đổi vài lần mỗi ván (máu từng viên vẽ ở phần động). */
-  private khoaTinh(km: readonly number[]): string { let s = ''; for (let i = 0; i < SO_KHOI; i++) s += km[i] <= 0 ? '0' : km[i] / KHOI[i].max < 0.6 ? 'n' : danhDuoc(km, i) ? 'd' : 'c'; return s }
-  /** Phần ĐỨNG YÊN của khối (theo máu): tường, tinh thể (vòng máu, vết nứt), thân tháp, thanh máu, quầng. `chi` = chỉ vẽ khối đó. */
-  private veKhoiTinh(x: CanvasRenderingContext2D, km: readonly number[], chi = -1): void {
-    const b = this.b, k = this.xoay
-    // Tường + tinh thể trước (thấp), tháp sau.
-    for (let i = 0; i < SO_KHOI; i++) {
-      if (chi >= 0 && i !== chi) continue
-      const kh = KHOI[i], m = b.phe[kh.phe & 1], dam = tron(m, b.den, 0.3), mau = km[i] / kh.max
-      if (kh.k === 'tuong') {
-        const diem: [number, number][] = []
-        for (let j = 0; j <= 10; j++) { const a = kh.a0! + ((kh.a1! - kh.a0!) * j) / 10; diem.push(ra(kh.x + Math.cos(a) * kh.r, kh.y + Math.sin(a) * kh.r, k)) }
-        const duong = () => { x.beginPath(); diem.forEach(([px, py], j) => (j ? x.lineTo(px, py) : x.moveTo(px, py))) }
-        if (km[i] <= 0) { // vỡ: mảnh vụn rải trên cung
-          x.fillStyle = rgba(m, 0.45)
-          for (let j = 1; j < diem.length; j += 2) { const [px, py] = diem[j]; x.save(); x.translate(px, py); x.rotate(j * 0.8); x.fillRect(-5, -2, 10, 4); x.restore() }
-          continue
-        }
-        const chan = !danhDuoc(km, i)
-        x.lineCap = 'round'; x.lineJoin = 'round'
-        x.strokeStyle = rgba(m, b.toi ? 0.62 : 0.5); x.lineWidth = TUONG_DAY * 2; duong(); x.stroke()
-        x.strokeStyle = rgba(b.trang, chan ? 0.7 : 0.45); x.lineWidth = 2.2; duong(); x.stroke()
-        if (mau < 0.6) { x.strokeStyle = rgba(b.trang, 0.9); x.lineWidth = 2; x.setLineDash([3, 9, 6, 7]); duong(); x.stroke(); x.setLineDash([]) }
-      } else if (kh.k === 'tt') {
-        const [cx, cy] = ra(kh.x, kh.y, k)
-        if (km[i] <= 0) { x.fillStyle = rgba(m, 0.4); for (let j = 0; j < 7; j++) { x.save(); x.translate(cx + Math.cos(j * 0.9) * 14, cy + Math.sin(j * 0.9) * 14); x.rotate(j); x.fillRect(-6, -2.5, 12, 5); x.restore() } continue }
-        if (!this.yeu) this.quang(x, m, cx, cy, 46, b.toi ? 0.7 : 0.45)
-        // vòng máu
-        x.lineCap = 'round'; x.strokeStyle = rgba(b.chu, 0.14); x.lineWidth = 5; x.beginPath(); x.arc(cx, cy, 36, 0, PI2); x.stroke()
-        // lăng trụ lục giác
-        x.fillStyle = rgba(m); x.strokeStyle = rgba(dam); x.lineWidth = 2
-        x.beginPath(); x.moveTo(cx, cy - 26); x.lineTo(cx + 16, cy - 12); x.lineTo(cx + 16, cy + 12); x.lineTo(cx, cy + 26); x.lineTo(cx - 16, cy + 12); x.lineTo(cx - 16, cy - 12); x.closePath(); x.fill(); x.stroke()
-        x.fillStyle = rgba(b.trang, 0.55); x.beginPath(); x.moveTo(cx, cy - 26); x.lineTo(cx - 16, cy - 12); x.lineTo(cx - 5, cy - 4); x.closePath(); x.fill()
-        x.strokeStyle = rgba(b.trang, 0.35); x.lineWidth = 1.2; x.beginPath(); x.moveTo(cx, cy - 26); x.lineTo(cx, cy + 26); x.moveTo(cx - 16, cy - 12); x.lineTo(cx, cy - 3); x.lineTo(cx + 16, cy - 12); x.stroke()
-        if (mau < 0.6) { x.strokeStyle = rgba(b.trang, 0.95); x.lineWidth = 2; x.beginPath(); x.moveTo(cx - 10, cy - 8); x.lineTo(cx - 3, cy - 2); x.lineTo(cx - 7, cy + 4); x.lineTo(cx - 1, cy + 10); x.moveTo(cx + 9, cy - 15); x.lineTo(cx + 4, cy - 6); x.lineTo(cx + 9, cy - 1); x.stroke() }
-      }
-    }
-    for (let i = 0; i < SO_KHOI; i++) {
-      if (chi >= 0 && i !== chi) continue
-      const kh = KHOI[i]
-      if (kh.k !== 'thap' && kh.k !== 'thap-lon') continue
-      const [cx, cy] = ra(kh.x, kh.y, k), m = b.phe[kh.phe & 1], dam = tron(m, b.den, 0.32), r = kh.r
-      if (km[i] <= 0) { // tháp vỡ: đế nứt xám + mảnh kính
-        x.fillStyle = rgba(b.chu, b.toi ? 0.25 : 0.12); this.lucGiac(x, cx, cy, r); x.fill()
-        x.fillStyle = rgba(b.kinhVien, 0.6); for (let j = 0; j < 5; j++) { x.save(); x.translate(cx + Math.cos(j * 1.3) * r * 0.55, cy + Math.sin(j * 1.3) * r * 0.55); x.rotate(j * 0.7); x.fillRect(-5, -1.6, 10, 3.2); x.restore() }
-        continue
-      }
-      if (!this.yeu) this.quang(x, m, cx, cy, r + 16, 0.4)
-      // bóng + đế lục giác 2 lớp
-      x.fillStyle = rgba(b.chu, b.toi ? 0.35 : 0.14); this.lucGiac(x, cx + 2, cy + 5, r); x.fill()
-      x.fillStyle = rgba(dam); this.lucGiac(x, cx, cy + 3, r); x.fill()
-      x.fillStyle = rgba(m); this.lucGiac(x, cx, cy, r); x.fill()
-      x.fillStyle = rgba(b.trang, 0.28); this.lucGiac(x, cx, cy, r * 0.62); x.fill()
-      // cột kính + dung dịch
-      x.fillStyle = rgba(b.kinh, 0.95); x.strokeStyle = rgba(b.kinhVien, 0.9); x.lineWidth = 2; x.beginPath(); x.arc(cx, cy, r * 0.5, 0, PI2); x.fill(); x.stroke()
-      x.fillStyle = rgba(m); x.beginPath(); x.arc(cx, cy, r * 0.34, 0, PI2); x.fill()
-      x.fillStyle = rgba(b.trang, 0.75); x.beginPath(); x.arc(cx - r * 0.14, cy - r * 0.14, r * 0.1, 0, PI2); x.fill()
-      if (kh.k === 'thap-lon') { x.strokeStyle = rgba(dam); x.lineWidth = 2.4; x.beginPath(); x.arc(cx, cy, r * 0.62, 0, PI2); x.stroke() }
-      // rãnh thanh máu (phần màu vẽ ở phần động)
-      const w = r * 1.7, yb = cy + r + 6
-      x.fillStyle = rgba(b.chu, b.toi ? 0.5 : 0.2); x.beginPath(); x.roundRect(cx - w / 2, yb, w, 5, 2.5); x.fill()
-    }
-  }
-  /** Phần ĐỘNG mỗi khung: vùng tháp đang bị lấn, đầu tháp xoay về đối thủ / người bị bắn, loé đầu khi bắn, loé khi khối trúng. */
-  private veKhoiDong(x: CanvasRenderingContext2D, c: Canh, nay: number, dtVe: number, km: readonly number[]): void {
-    const b = this.b, k = this.xoay
-    for (const p of [0, 1]) { // cung máu tinh thể
-      const i = TT_CUA[p], kh = KHOI[i], mau = km[i] / kh.max
-      if (mau <= 0) continue
-      const [cx, cy] = ra(kh.x, kh.y, k)
-      x.lineCap = 'round'; x.lineWidth = 5; x.strokeStyle = rgba(mau < 0.35 ? b.sai : b.phe[p]); x.beginPath(); x.arc(cx, cy, 36, -Math.PI / 2, -Math.PI / 2 + PI2 * mau); x.stroke()
-    }
-    for (const [i, t0] of this.khLuc) {
-      const loe = (nay - t0) / 200
-      if (loe >= 1 || loe < 0) { this.khLuc.delete(i); continue }
-      const kh = KHOI[i]
-      if (km[i] <= 0) continue
-      x.fillStyle = rgba(b.trang, 0.6 * (1 - loe))
-      if (kh.k === 'tuong') { const a = (kh.a0! + kh.a1!) / 2, [px, py] = ra(kh.x + Math.cos(a) * kh.r, kh.y + Math.sin(a) * kh.r, k); x.beginPath(); x.arc(px, py, 16, 0, PI2); x.fill() }
-      else { const [px, py] = ra(kh.x, kh.y, k); x.beginPath(); x.arc(px, py, kh.k === 'tt' ? 24 : kh.r, 0, PI2); x.fill() }
-    }
-    for (let i = 0; i < SO_KHOI; i++) {
-      const kh = KHOI[i]
-      if ((kh.k !== 'thap' && kh.k !== 'thap-lon') || km[i] <= 0) continue
-      const [cx, cy] = ra(kh.x, kh.y, k), m = b.phe[kh.phe & 1], dam = tron(m, b.den, 0.32), r = kh.r
-      { const w = r * 1.7, mau = km[i] / kh.max; x.fillStyle = rgba(mau < 0.35 ? b.sai : m); x.beginPath(); x.roundRect(cx - w / 2, cy + r + 6, w * mau, 5, 2.5); x.fill() }
-      // Vùng tự bắn: chỉ khi có người phe kia trong vùng (đang bị lấn).
-      let lan = false
-      for (const g of c.ghe) if (g.cho <= 0 && (g.phe & 1) !== kh.phe && (g.x - cx) ** 2 + (g.y - cy) ** 2 < kh.vung! ** 2) { lan = true; break }
-      if (lan) { // chỉ VIỀN LIỀN mảnh (tô kín / nét đứt vòng 180–205 mỗi khung đều tốn — đo do-muot CPU ×4 02/11)
-        x.strokeStyle = rgba(m, 0.55); x.lineWidth = this.px(2); x.beginPath(); x.arc(cx, cy, kh.vung!, 0, PI2); x.stroke()
-      }
-      // Hướng đầu tháp: theo phát bắn gần nhất (≤ 1,2 s), không thì chĩa về tinh thể phe kia; quay mềm.
-      const [tx, ty] = ra(KHOI[TT_CUA[1 - kh.phe]].x, KHOI[TT_CUA[1 - kh.phe]].y, k)
-      const banLuc = this.thapBanLuc.get(i) ?? -1e9, dich = nay - banLuc < 1200 ? this.thapDich.get(i) ?? Math.atan2(ty - cy, tx - cx) : Math.atan2(ty - cy, tx - cx)
-      let g0 = this.thapGoc.get(i) ?? dich, dd = dich - g0
-      while (dd > Math.PI) dd -= PI2
-      while (dd < -Math.PI) dd += PI2
-      g0 += dd * Math.min(1, dtVe * 10); this.thapGoc.set(i, g0)
-      if (lan && b.toi && !this.yeu) this.quang(x, m, cx, cy, r + 26, 0.5)
-      // ĐẦU TINH THỂ nhọn hướng về đối thủ (giật lùi nhẹ khi bắn)
-      const giat = (nay - banLuc) / 120
-      x.save(); x.translate(cx, cy); x.rotate(g0); if (giat >= 0 && giat < 1) x.translate(-(1 - giat) * 3, 0)
-      const L = kh.k === 'thap-lon' ? r * 1.25 : r * 1.15, W = kh.k === 'thap-lon' ? 9 : 7.5
-      x.fillStyle = rgba(m); x.strokeStyle = rgba(dam); x.lineWidth = 1.8
-      x.beginPath(); x.moveTo(r * 0.3, 0); x.lineTo(r * 0.55, -W); x.lineTo(L, 0); x.lineTo(r * 0.55, W); x.closePath(); x.fill(); x.stroke()
-      x.fillStyle = rgba(b.trang, 0.6); x.beginPath(); x.moveTo(r * 0.55, -W); x.lineTo(L, 0); x.lineTo(r * 0.6, -W * 0.2); x.closePath(); x.fill()
-      if (giat >= 0 && giat < 1 && !this.yeu) { x.fillStyle = rgba(b.trang, 0.8 * (1 - giat)); x.beginPath(); x.arc(L + 2, 0, 5 * (1 - giat) + 2, 0, PI2); x.fill() }
-      x.restore()
-    }
-  }
-  private lucGiac(x: CanvasRenderingContext2D, cx: number, cy: number, r: number): void {
+  private veVat(x: CanvasRenderingContext2D, v: VatVe): void {
+    const b = this.b, liq = v.mau !== undefined ? b.nt[v.mau] : b.e
+    x.save(); x.lineJoin = 'round'
+    x.fillStyle = rgba(b.chu, b.toi ? 0.4 : 0.12)
     x.beginPath()
-    for (let k = 0; k < 6; k++) { const a = (k * Math.PI) / 3 + Math.PI / 6; if (k) x.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r); else x.moveTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r) }
-    x.closePath()
+    if (v.k === 'tron') x.ellipse(v.x + 4, v.y + 7, v.r, v.r * 0.92, 0, 0, PI2); else x.roundRect(v.x + 4, v.y + 6, v.w, v.h, 10)
+    x.fill()
+    x.lineWidth = 2.5; x.strokeStyle = rgba(b.kinhVien, 0.9); x.fillStyle = rgba(b.kinh, 0.95)
+    if (v.k === 'tron') {
+      x.beginPath(); x.arc(v.x, v.y, v.r, 0, PI2); x.fill(); x.stroke()
+      x.save(); x.beginPath(); x.arc(v.x, v.y, v.r - 4, 0, PI2); x.clip()
+      const muc = v.ve === 'binh-cau' ? v.y - 4 : v.y - v.r * 0.2
+      const g = x.createLinearGradient(0, muc, 0, v.y + v.r); g.addColorStop(0, rgba(tron(liq, b.trang, 0.3))); g.addColorStop(1, rgba(liq))
+      x.fillStyle = g; x.beginPath(); x.moveTo(v.x - v.r, muc)
+      for (let i = 0; i <= 8; i++) x.lineTo(v.x - v.r + (i * v.r) / 4, muc + Math.sin(i * 1.3) * 3)
+      x.lineTo(v.x + v.r, v.y + v.r); x.lineTo(v.x - v.r, v.y + v.r); x.fill()
+      x.fillStyle = rgba(b.trang, 0.65)
+      for (const [bx, by, br] of [[-0.3, 0.35, 0.1], [0.2, 0.55, 0.07], [0.4, 0.2, 0.06], [-0.1, 0.7, 0.05]]) { x.beginPath(); x.arc(v.x + bx * v.r, v.y + by * v.r, br * v.r + 1, 0, PI2); x.fill() }
+      x.restore()
+      x.fillStyle = rgba(b.kinh); x.strokeStyle = rgba(b.kinhVien, 0.9); x.lineWidth = 2.5
+      const co = v.ve === 'binh-cau' ? 13 : 8
+      x.beginPath(); x.arc(v.x, v.y, co, 0, PI2); x.fill(); x.stroke()
+      x.fillStyle = rgba(liq, 0.55); x.beginPath(); x.arc(v.x, v.y, co * 0.55, 0, PI2); x.fill()
+      x.strokeStyle = rgba(b.trang, 0.85); x.lineWidth = v.r > 30 ? 4 : 3; x.lineCap = 'round'; x.beginPath(); x.arc(v.x, v.y, v.r - (v.r > 30 ? 9 : 6), Math.PI * 1.08, Math.PI * 1.42); x.stroke()
+    } else if (v.ve === 'gia-ong') {
+      // Giá ống nghiệm = tường chắn căn cứ: ống chứa dung dịch MÀU PHE của căn cứ đó.
+      const c = b.phe[v.cuaEm ? this.pheEm : 1 - this.pheEm], dung = v.h > v.w, dai = dung ? v.h : v.w
+      x.beginPath(); x.roundRect(v.x, v.y, v.w, v.h, 10); x.fill(); x.stroke()
+      for (let i = 0; i < 5; i++) {
+        const t = 16 + (i * (dai - 32)) / 4, cx = dung ? v.x + v.w / 2 : v.x + t, cy = dung ? v.y + t : v.y + v.h / 2
+        x.fillStyle = rgba(b.kinh); x.strokeStyle = rgba(b.kinhVien, 0.9); x.lineWidth = 2; x.beginPath(); x.arc(cx, cy, 9, 0, PI2); x.fill(); x.stroke()
+        x.fillStyle = rgba(c); x.beginPath(); x.arc(cx, cy, 5.5, 0, PI2); x.fill()
+        x.fillStyle = rgba(b.trang, 0.8); x.beginPath(); x.arc(cx - 1.8, cy - 1.8, 1.6, 0, PI2); x.fill()
+      }
+    } else {
+      x.beginPath(); x.roundRect(v.x, v.y, v.w, v.h, 12); x.fill(); x.stroke()
+      const g = x.createLinearGradient(0, v.y + 8, 0, v.y + v.h); g.addColorStop(0, rgba(tron(liq, b.trang, 0.3))); g.addColorStop(1, rgba(liq))
+      x.fillStyle = g; x.beginPath(); x.roundRect(v.x + 6, v.y + 12, v.w - 12, v.h - 18, 7); x.fill()
+      x.strokeStyle = rgba(b.kinhVien, 0.75); x.lineWidth = 2
+      for (let i = 0; i < 3; i++) { x.beginPath(); x.moveTo(v.x + 6, v.y + 10 + i * 8); x.lineTo(v.x + 15, v.y + 10 + i * 8); x.stroke() }
+    }
+    x.restore()
   }
 
   /** Nguyên tử vẽ sẵn theo (phe, nguyên tố): cầu bóng MÀU PHE + ký hiệu nguyên tố — mỗi khung chỉ còn drawImage. */
@@ -359,11 +270,9 @@ export class Ve {
       case 'tat': if (!this.yeu) pu({ k: 'puff', x: su.x, y: su.y, mau: b.phe[(su.phe ?? 0) & 1] }); break
       case 'ha': {
         const c = mauCua(su.ai)
-        // Lần hạ không liên quan em: bong bóng GỌN (6 hạt, w = 6) — v4 có tháp nên hạ nhiều hơn hẳn.
-        pu({ k: 'bong', x: su.x, y: su.y, mau: c, goc: Math.random() * PI2, w: coEm ? 11 : 6 })
-        if (coEm) pu({ k: 'vong', x: su.x, y: su.y, mau: c, r0: 10, r1: 60, w: 4, dur: 460 })
-        // Chữ «Hạ!» (chữ có viền — tốn vẽ) chỉ khi EM hạ / em bị hạ; v4 có tháp nên số lần hạ nhiều hơn hẳn (đo do-muot 02/11).
-        if (coEm) pu({ k: 'so', x: su.x, y: su.y - 8, chu: 'Hạ!', co: su.boi === emId ? 20 : 14, mau: su.boi === emId ? b.sao : b.the, vien: su.boi === emId ? den(0.55) : rgba(b.chu, 0.6), dur: su.boi === emId ? 900 : 600 })
+        pu({ k: 'bong', x: su.x, y: su.y, mau: c, goc: Math.random() * PI2 })
+        pu({ k: 'vong', x: su.x, y: su.y, mau: c, r0: 10, r1: 60, w: 4, dur: 460 })
+        pu({ k: 'so', x: su.x, y: su.y - 8, chu: 'Hạ!', co: su.boi === emId ? 20 : 14, mau: su.boi === emId ? b.sao : b.the, vien: su.boi === emId ? den(0.55) : rgba(b.chu, 0.6), dur: su.boi === emId ? 900 : 600 })
         if (coEm) this.rung = { t0: nay, dur: 200, m: su.boi === emId ? 3 : 2.5 }
         break
       }
@@ -400,30 +309,6 @@ export class Ve {
         break
       }
       case 'no': pu({ k: 'no', x: su.x, y: su.y, mau: b.cap[5], goc: Math.random() * PI2 }); break
-      // Tháp bắn: đầu tháp xoay theo người bị bắn + loé đầu nhọn.
-      case 'tb': this.thapDich.set(su.k, su.ngam); this.thapBanLuc.set(su.k, nay); break
-      // Khối trúng: loé; đang bảo hộ ⇒ vòng khiên nhỏ «Chưa phá được» (lần đầu mỗi giây).
-      case 'kh': {
-        this.khLuc.set(su.k, nay)
-        if (su.chan) { pu({ k: 'vong', x: su.x, y: su.y, mau: b.kh, r0: 4, r1: 18, w: 3, dur: 300 }); if (nay - this.chanLuc > 1500) { this.chanLuc = nay; pu({ k: 'so', x: su.x, y: su.y - 22, chu: KHOI[su.k].k === 'tuong' ? 'Phá tháp trước đã' : 'Phá tháp cánh trước', co: 12, mau: b.kh, vien: rgba(b.the, 0.9), dur: 900 }) } }
-        else if (!this.yeu) pu({ k: 'puff', x: su.x, y: su.y, mau: b.phe[1 - KHOI[su.k].phe] })
-        break
-      }
-      // Khối vỡ: nổ mảnh kính màu phe + chữ to.
-      case 'vo': {
-        const kh = KHOI[su.k], [cx, cy] = kh.k === 'tuong' ? ra(kh.x + Math.cos((kh.a0! + kh.a1!) / 2) * kh.r, kh.y + Math.sin((kh.a0! + kh.a1!) / 2) * kh.r, this.xoay) : ra(kh.x, kh.y, this.xoay)
-        const c = b.phe[kh.phe & 1]
-        pu({ k: 'bong', x: cx, y: cy, mau: c, goc: Math.random() * PI2, dur: 900 })
-        pu({ k: 'vong', x: cx, y: cy, mau: c, r0: 12, r1: kh.k === 'tt' ? 140 : 80, w: 6, dur: 620 })
-        pu({ k: 'sao', x: cx, y: cy, mau: b.sao, goc: Math.random() * PI2 })
-        const chu = kh.k === 'tt' ? 'Tinh thể vỡ!' : kh.k === 'tuong' ? 'Tường vỡ!' : 'Phá tháp! +1 cấp'
-        pu({ k: 'so', x: cx, y: cy - 34, chu, co: kh.k === 'tt' ? 22 : 16, mau: kh.phe === this.pheEm ? b.sai : b.sao, vien: den(0.6), dur: 1300 })
-        this.rung = { t0: nay, dur: 260, m: kh.k === 'tt' ? 4 : 2.5 }
-        break
-      }
-      // Trung hoà: hai viên khác phe chạm nhau ⇒ giọt nước + «H₂O».
-      // (chữ «H₂O» bay theo mỗi lần trung hoà tốn vẽ chữ mỗi khung — đo do-muot; chỉ giữ vòng giọt nước)
-      case 'th': pu({ k: 'vong', x: su.x, y: su.y, mau: b.kh, r0: 3, r1: 16, w: 3, dur: 320 }); break
     }
   }
 
@@ -435,21 +320,9 @@ export class Ve {
     x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, this.cv.width, this.cv.height)
     let ox = 0, oy = 0
     if (this.rung && !this.yeu) { const t = (nay - this.rung.t0) / this.rung.dur; if (t >= 0 && t < 1) { const m = this.rung.m * (1 - t); ox = Math.sin(nay * 0.13) * m; oy = Math.cos(nay * 0.17) * m } else if (t >= 1) this.rung = null }
-    if (this.nen) {
-      // NỀN GỘP = sàn + phần đứng yên của tháp / tường / tinh thể: dựng lại chỉ khi một khối vỡ / bắt đầu nứt / hết bảo hộ (đo do-muot CPU ×4).
-      const kmV = c.km ?? MAU_KHOI_DAU, khoa = this.khoaTinh(kmV)
-      if (!this.nenGop || khoa !== this.khoaGop) {
-        const g = this.nenGop ?? document.createElement('canvas')
-        g.width = this.nen.width; g.height = this.nen.height
-        const y = g.getContext('2d')
-        if (y) { y.setTransform(1, 0, 0, 1, 0, 0); y.clearRect(0, 0, g.width, g.height); y.drawImage(this.nen, 0, 0); y.setTransform(s, 0, 0, s, 0, 0); this.veKhoiTinh(y, kmV) }
-        this.nenGop = g; this.khoaGop = khoa
-      }
-      x.drawImage(this.nenGop, ox * s, oy * s)
-    }
+    if (this.nen) x.drawImage(this.nen, ox * s, oy * s)
     x.setTransform(s, 0, 0, s, (ox - v.x0) * s, (oy - v.y0) * s)
-    if (!this.nen) this.veSan(x)
-    this.veKhoi(x, c, nay, dtVe)
+    if (!this.nen) this.veSan(x, false)
     const em = gId(emId)
     const pheEm = em ? em.phe & 1 : this.pheEm
     // Điểm đến khi chạm một chỗ / rê chuột.
@@ -492,14 +365,6 @@ export class Ve {
     x.setLineDash([]); x.lineDashOffset = 0
     // Đạn (màu phe người bắn).
     for (const d of c.dan) {
-      if (d.nt === -1) { // đạn tháp: cầu sáng màu phe tháp, chậm (né được)
-        const cl = b.phe[d.phe & 1]
-        if (!this.yeu && b.toi) this.quang(x, cl, d.x, d.y, 18, 0.9) // như đạn người: quầng chỉ ở nền tối
-        x.fillStyle = rgba(cl); x.beginPath(); x.arc(d.x, d.y, 7, 0, PI2); x.fill()
-        x.strokeStyle = rgba(tron(cl, b.den, 0.35)); x.lineWidth = 1.5; x.stroke()
-        x.fillStyle = rgba(b.trang, 0.9); x.beginPath(); x.arc(d.x - 1.5, d.y - 1.5, 2.6, 0, PI2); x.fill()
-        continue
-      }
       const cl = b.phe[d.phe & 1], sp = Math.hypot(d.vx, d.vy) || 1, ux = d.vx / sp, uy = d.vy / sp, r = d.cap >= 5 ? 7.5 : d.cap >= 3 ? 6.4 : 6
       if (!this.yeu) {
         const dai = d.cap >= 5 ? 38 : d.cap >= 3 ? 28 : 24
@@ -562,7 +427,7 @@ export class Ve {
         x.fillStyle = rgba(b.trang, e * 0.7); x.beginPath(); x.arc(h.x, h.y, 7 * e, 0, PI2); x.fill(); break
       case 'so': { const n = t < 0.15 ? 0.7 + t * 2.4 : 1.06 - (t - 0.15) * 0.07; x.globalAlpha = t > 0.7 ? (1 - t) / 0.3 : 1; this.chu(x, h.x, h.y - t * 26, h.chu!, h.co! * n, rgba(cl), h.vien || rgba(b.the, 0.9)); x.globalAlpha = 1; break }
       case 'bong':
-        for (let j = 0, n = h.w ?? 11; j < n; j++) {
+        for (let j = 0; j < 11; j++) {
           const a = goc + j * 2.39, sp = (26 + (j % 4) * 13) * Math.sqrt(t) * 1.6, rr = 3 + (j % 3) * 2.6 + t * 4, px = h.x + Math.cos(a) * sp, py = h.y + Math.sin(a) * sp - t * 10
           x.strokeStyle = rgba(cl, e); x.lineWidth = 2.2; x.beginPath(); x.arc(px, py, rr, 0, PI2); x.stroke()
           if (j % 3 === 0) { x.fillStyle = rgba(b.trang, e * 0.7); x.beginPath(); x.arc(px - rr * 0.3, py - rr * 0.3, rr * 0.3, 0, PI2); x.fill() }
@@ -692,7 +557,7 @@ export class Ve {
       const cs = Math.cos(k.ngam), sn = Math.sin(k.ngam)
       for (const vi of CAP[k.cap].vien) { const an = k.ngam + vi.g, dd = R + 18 + n * 40; dan.push({ nt: k.nt, phe: k.phe, cap: k.cap, x: k.x + Math.cos(an) * dd - sn * vi.l, y: k.y + Math.sin(an) * dd + cs * vi.l, vx: Math.cos(an), vy: Math.sin(an) }) }
     }
-    const vp: VpVe[] = [{ id: 1, k: 'xt', x: 520, y: 150, t0: -1 }]
+    const vp: VpVe[] = [[452, 248], [470, 380], [596, 300]].map(([x, y], i) => ({ id: i + 1, k: 'e' as const, x, y, t0: -1 }))
     v.ve({ t: 2, ghe, dan, vp }, 1, 2000, (id) => (['', 'Em', 'A.I Sulfur', 'Quốc Bảo', 'Ngọc Trâm'][id] ?? ''), { tinh: true })
   }
 }
