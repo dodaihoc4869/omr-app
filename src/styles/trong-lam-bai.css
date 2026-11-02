@@ -1193,5 +1193,10 @@ html[data-trong='hs'] .duo-xong .duo-ghi { margin: 12px 0 0; font-size: 14.5px; 
 html[data-trong='hs'] .duo-day[data-xong] { background: transparent; border: 0; }
 html[data-trong='hs'] .duo-day[data-xong] .duo-nut[data-sac], html[data-trong='hs'] .duo-day[data-xong] .duo-lien { border-radius: 30px; background: none; box-shadow: none; color: var(--tr-hs-chu); }
 html[data-trong='hs'] .duo-xong .duo-3 > div b { padding: 0; background: none; box-shadow: none; }
+/* xoay ngang / Fold / máy tính: luật cũ «Bi trái, chữ phải» (0,4,0) đẩy tiêu đề vào cột 132px của Mol ⇒ giữ bố cục story ở mọi khổ */
+html[data-trong='hs'] .duo-xong.duo-xong.duo-xong { grid-template-columns: minmax(0, 1fr) 132px; column-gap: 8px; row-gap: 0; align-items: end; justify-items: stretch; max-width: 560px; }
+html[data-trong='hs'] .duo-xong.duo-xong.duo-xong > :not(.duo-xong-bi):not(.duo-hoa) { grid-column: 1 / -1; }
+html[data-trong='hs'] .duo-xong.duo-xong.duo-xong > :is(h1, .duo-xong-phu, .duo-hoan-hao):not(.duo-xong-bi):not(.duo-hoa) { grid-column: 1; }
+html[data-trong='hs'] .duo-xong.duo-xong.duo-xong > .duo-xong-bi { grid-column: 2; grid-row: 1 / span 2; }
 html[data-trong='hs'] .duo .ht2-lam-pa[data-ket=dung] :is(.ht2-lam-pa-ma, .ht2-lam-pa-nhan) { background: var(--tr-dung-chu); color: var(--tr-trang); }
 html[data-trong='hs'] .duo .ht2-lam-pa[data-ket=sai] :is(.ht2-lam-pa-ma, .ht2-lam-pa-nhan) { background: var(--tr-sai-chu); color: var(--tr-trang); }
