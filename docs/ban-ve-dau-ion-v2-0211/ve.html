@@ -151,7 +151,7 @@ function nguyenTu(x, y, o) {
   // vòng electron = cấp súng (máy yếu: một vòng tĩnh)
   const n = YEU ? Math.min(1, o.cap) : o.cap
   for (let i = 0; i < n; i++) { const R = r + 7 + i * 4.5, goc = (i * 62 + 18) % 180
-    s += `<g transform="rotate(${goc})"><ellipse rx="${R}" ry="${R * .36}" fill="none" stroke="${mau}" stroke-opacity="${.55 - i * .06}" stroke-width="1.6"/><circle cx="${R}" r="2.6" fill="${v('--tr-dung')}"/></g>` }
+    s += `<g transform="rotate(${goc})"><ellipse rx="${R}" ry="${R * .36}" fill="none" stroke="${mau}" stroke-opacity="${.55 - i * .06}" stroke-width="1.6"/><circle cx="${R}" r="2.6" fill="${mau}"/></g>` }
   if (o.em) s += `<circle r="${r + 4}" fill="none" stroke="${v('--tr-trang')}" stroke-width="3.2"/><circle r="${r + 5.8}" fill="none" stroke="${v('--tr-chu')}" stroke-opacity=".5" stroke-width=".8"/>`
   s += `<circle r="${r}" fill="${YEU ? mau : `url(#c${p})`}" stroke="${v(p ? '--tr-sai-day' : '--tr-tin-day')}" stroke-width="1.6"/>`
   if (!YEU) s += `<ellipse cx="${-r * .32}" cy="${-r * .4}" rx="${r * .38}" ry="${r * .22}" fill="${v('--tr-trang')}" opacity=".55"/>`
@@ -230,7 +230,7 @@ function san(sw, sh, o = {}) {
   }
   for (const [x, y] of CHO_XT) { const [X, Y] = P(x, y); s += vatPham(X, Y, 'xt') }
   for (const [x, y] of CHO_KH) { const [X, Y] = P(x, y); s += vatPham(X, Y, 'kh') }
-  for (const [x, y] of [[250, 120], [430, 340], [600, 190], [770, 300], [470, 480], [600, 40], [330, 290], [860, 370], [130, 170], [910, 150]]) { const [X, Y] = P(x, y); s += `<circle cx="${X}" cy="${Y}" r="4" fill="${v('--tr-dung')}"/>${YEU ? '' : `<circle cx="${X}" cy="${Y}" r="8" fill="${v('--tr-dung')}" opacity=".2"/>`}` }
+  // (02/11 thầy «Bỏ mấy cái chấm xanh … cho đỡ rối mắt» — chọn: bỏ electron rải trên sân; súng lên cấp theo số lần trúng, xem DAC-TA)
   // đường ngắm em → mục tiêu, đạn, tia trúng
   const A = P(330, 185), B = P(700, 185)
   s += `<line x1="${A[0]}" y1="${A[1]}" x2="${B[0]}" y2="${B[1]}" stroke="${v('--tr-tin')}" stroke-width="2" stroke-dasharray="3 7" opacity=".7"/>`
@@ -253,7 +253,7 @@ function tiSo(a = 7, b = 5, gio = '0:42') {
     <span class="phe" style="color:${v(TOI ? '--tr-sai' : '--tr-sai-chu')}"><span class="so">${b}</span><span class="ten">Axit</span><i style="background:${v('--tr-sai-day')}">H⁺</i></span></div>`
 }
 const emO = `<div class="em kinh"><svg width="34" height="34" viewBox="-20 -20 40 40">${defs()}<circle r="15" fill="${YEU ? v('--tr-tin') : 'url(#c0)'}" stroke="${v('--tr-tin-day')}"/><text y="5" text-anchor="middle" font-size="12" font-weight="800" fill="${CHU_NT}">Cl</text></svg>
-  <div><div style="display:flex;gap:6px;align-items:center"><b style="font-size:12px">Em</b><span class="cap">Cấp 3</span></div><div class="mau"><i></i></div><small>⚡ 3/5 electron · hạ 3</small></div></div>`
+  <div><div style="display:flex;gap:6px;align-items:center"><b style="font-size:12px">Em</b><span class="cap">Cấp 3</span></div><div class="mau"><i></i></div><small>⚡ trúng 3/5 lên Cấp 4 · hạ 3</small></div></div>`
 const tinHa = `<span class="kinh"><b class="p0">Thu Hà</b>hạ<b class="p1">A.I Neon</b></span><span class="kinh"><b class="p0">Em</b>trúng<b class="p1">Quốc Bảo</b> · chuỗi 2</span>`
 function veTran(o = {}) {
   const doc = DOC, padT = doc ? 64 : 52, padB = doc ? 74 : 8
@@ -279,7 +279,7 @@ if (CANH === 'het') {
     <div class="phu-dong">Phe em thắng · em nhận huy hiệu <b>Bền bỉ</b></div>
     <div class="ph-lon"><span class="vach"></span><span class="kim" style="left:43%">pH 8 · Bazơ 12 – 9 Axit</span><span class="n" style="left:0">14 · bazơ</span><span class="n" style="left:46%">7 · trung hoà</span><span class="n" style="right:0">0 · axit</span></div>
     <div class="cot2"><div class="doi-the" data-phe="0"><div class="doi-dau"><span class="cap" style="background:${v('--tr-tin-day')};color:${v('--tr-trang')}">OH⁻</span>Phe Bazơ<span class="tong">12</span></div>
-      ${hang('Em', 'Cl', 0, 'trụ liền 24 giây', 'Bền bỉ', 1)}${hang('Thu Hà', 'N', 0, 'hạ 5 lần', 'Xạ thủ')}${hang('Gia Huy', 'Na', 0, 'nhặt 14 electron', 'Nhặt giỏi')}</div>
+      ${hang('Em', 'Cl', 0, 'trụ liền 24 giây', 'Bền bỉ', 1)}${hang('Thu Hà', 'N', 0, 'hạ 5 lần', 'Xạ thủ')}${hang('Gia Huy', 'Na', 0, 'lên Cấp 4 đầu tiên', 'Lên cấp nhanh')}</div>
     <div class="doi-the" data-phe="1"><div class="doi-dau"><span class="cap" style="background:${v('--tr-sai-day')};color:${v('--tr-trang')}">H⁺</span>Phe Axit<span class="tong">9</span></div>
       ${hang('Quốc Bảo', 'O', 1, 'trúng 26 viên', 'Bắn trúng nhiều')}${hang('Ngọc Trâm', 'Fe', 1, 'góp sức 4 lần hạ', 'Đồng đội cứu nguy')}${hang('A.I Neon', 'Ne', 1, 'lấp ghế', 'Lấp ghế')}</div></div>
     <div class="day-dong"><div class="day-ket"><span class="pu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></svg>Hay đấy!</span><span class="pu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 14q4 4 8 0M9 9.5h.01M15 9.5h.01"/></svg>Suýt nữa!</span><span class="pu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c4 0 7-2.7 7-6.6 0-4.4-4-6.4-4.6-10.4C11 6 9.6 8.6 9.6 11 8 10.6 7 9 7 9c-1.3 1.8-2 3.6-2 5.4C5 18.3 8 21 12 21z"/></svg>Đấu lại nhé</span><span class="pu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Chơi đẹp</span></div>

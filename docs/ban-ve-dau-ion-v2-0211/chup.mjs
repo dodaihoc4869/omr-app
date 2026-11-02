@@ -6,7 +6,8 @@ import path from 'node:path'
 import { chromium } from 'playwright'
 
 const GOC = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..')
-const RA = path.join(GOC, 'docs/ban-ve-dau-ion-v2-0211/anh')
+const NET = process.argv.includes('--net') // ảnh siêu nét: PNG, mật độ điểm ×3 (thầy 02/11 «Vẽ lại bằng vector siêu nét»)
+const RA = path.join(GOC, 'docs/ban-ve-dau-ion-v2-0211', NET ? 'anh-net' : 'anh')
 fs.mkdirSync(RA, { recursive: true })
 const LOAI = { '.html': 'text/html', '.css': 'text/css', '.woff2': 'font/woff2', '.js': 'text/javascript' }
 const may = http.createServer((q, r) => {
@@ -27,7 +28,7 @@ const CANH = [
 const tr = await chromium.launch({ executablePath: process.env.PW_CHROMIUM || undefined })
 for (const [canh, kho, sac, yeu] of CANH) {
   const [w, h] = KHO[kho]
-  const ctx = await tr.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: kho === 1440 ? 1 : 2, colorScheme: sac })
+  const ctx = await tr.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: NET ? (kho === 1440 ? 2 : 3) : kho === 1440 ? 1 : 2, colorScheme: sac })
   const tg = await ctx.newPage()
   const loi = []
   tg.on('pageerror', (e) => loi.push(e.message)); tg.on('console', (m) => m.type() === 'error' && loi.push(m.text()))
@@ -37,8 +38,8 @@ for (const [canh, kho, sac, yeu] of CANH) {
   const tran = await tg.evaluate(() => [...document.querySelectorAll('.hud *, .trang *, .ket *, .goiy, .bang-vao')].filter((e) => {
     const b = e.getBoundingClientRect(); return b.width && (b.right > innerWidth + 1 || b.left < -1 || e.scrollWidth > e.clientWidth + 1 && getComputedStyle(e).overflow !== 'visible')
   }).map((e) => e.className || e.tagName).slice(0, 5))
-  const ten = `${canh}-${kho}-${sac === 'dark' ? 'toi' : 'sang'}${yeu ? '-yeu' : ''}.jpg`
-  await tg.screenshot({ path: path.join(RA, ten), type: 'jpeg', quality: 82 })
+  const ten = `${canh}-${kho}-${sac === 'dark' ? 'toi' : 'sang'}${yeu ? '-yeu' : ''}.${NET ? 'png' : 'jpg'}`
+  await tg.screenshot({ path: path.join(RA, ten), ...(NET ? { type: 'png' } : { type: 'jpeg', quality: 82 }) })
   console.log(ten, loi.length ? 'LỖI ' + loi.join(' | ') : 'ok', tran.length ? 'TRÀN ' + tran.join(',') : '')
   await ctx.close()
 }

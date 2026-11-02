@@ -3,7 +3,9 @@
 Thầy 02/11: «Làm game 3 đấu 3 phòng chờ thi xuất sắc hơn nữa, đẹp hơn nữa. Vẽ tôi duyệt rồi build».
 Nền: bản 3 đấu 3 thầy đã duyệt và đã chạy thật (`docs/ban-ve-dau-ion-3v3-0111/DAC-TA.md`, 01/11).
 
-**Phạm vi tầng 1 (chỉ hình):** luật chơi, mạng, máy chủ và gói tin GIỮ NGUYÊN (`PHIEN_BAN` 3 không đổi, 0 dòng `server/`).
+**Phạm vi:** phần hình (lớp vẽ, lớp phủ, sảnh) + MỘT đổi luật thầy đã chọn 02/11 tối: **bỏ electron rải trên sân** («Bỏ mấy cái chấm xanh … cho đỡ rối mắt»).
+Bỏ electron chạm lõi `src/lib/dau-ion/loi.ts` (bỏ rải / nhặt electron, súng lên cấp theo số lần trúng), phòng đấu chạy trong Durable Object (`server/`) và
+gói tin ⇒ `PHIEN_BAN` 3 → 4 (máy cũ được báo tải lại như cơ chế sẵn có); test rải electron đối xứng đổi thành test lên cấp theo lần trúng. Còn lại giữ nguyên.
 Chỉ đổi lớp vẽ, lớp phủ và sảnh: `src/components/phong-cho/dau-ion-ve.ts`, `DauIon.tsx`, `dau-ion.css`.
 Mọi thứ đổi luật chơi đều nằm ở mục «Đề xuất — cần thầy chốt» cuối tệp. Thầy không chốt thì không làm.
 
@@ -117,7 +119,7 @@ Thang pH: đầu thang phía phe em là màu của phe em (em Bazơ ⇒ trái = 
 | Số pH + vị trí kim | pH = 7 + 7·(OH⁻ − H⁺)/(OH⁻ + H⁺) (0 – 0 ⇒ 7); 12 – 9 ⇒ pH 8, 7 – 5 ⇒ 8,2. Hiện số làm tròn. Vị trí kim tính từ đầu thang phía phe em: em Bazơ ⇒ (14 − pH)/14; em Axit ⇒ pH/14; kẹp 4–96 %. |
 | Số vòng electron | `cap` của từng nguyên tử (đã có trong ảnh trận) |
 | Thanh máu | `mau` |
-| «3/5 electron · hạ 3» | `em()`: `e`, `CAN_E[cap]`, số lần hạ |
+| «trúng 3/5 lên Cấp 4 · hạ 3» | `em()`: bộ đếm trúng (thay `e`), `CAN_E[cap]`, số lần hạ |
 | Tin «X hạ Y» | sự kiện `{ t: 'ha', ai, boi, chuoi }` đã có |
 | Huy hiệu, số liệu hết ván | `ket()` (giữ như cũ) |
 | Ô bảng tuần hoàn | danh sách `NT` 7 nguyên tố sẵn có; số hiệu là hằng tại máy |
@@ -134,7 +136,7 @@ Thang pH: đầu thang phía phe em là màu của phe em (em Bazơ ⇒ trái = 
 
 ## 6. Chi phí máy chủ
 
-**0 thay đổi máy chủ:** 0 lệnh D1, gói tin như cũ, Durable Object như cũ.
+**0 lệnh D1** (như nay). Durable Object chạy lõi mới (bỏ electron ⇒ mỗi bước lõi NHẸ hơn: không rải / không xét nhặt); gói tin bỏ mảng electron ⇒ ảnh trận nhỏ hơn.
 Sân thu nhỏ ở sảnh là ảnh tĩnh vẽ tại máy, không nối mạng, không chạy lõi.
 
 ## 7. Nghiệm thu đo bằng máy
@@ -153,6 +155,7 @@ Sân thu nhỏ ở sảnh là ảnh tĩnh vẽ tại máy, không nối mạng, 
   - quả cầu và bộ vòng electron theo từng cấp vẽ sẵn thành ảnh nhỏ, mỗi khung chỉ `drawImage` và xoay;
   - không `shadowBlur`, không tạo gradient trong vòng vẽ;
   - vệt đạn tối đa 6 đoạn mỗi viên; hạt hiệu ứng có trần như v1.
+- **Nét căng mọi màn hình (thầy 02/11 «vẽ bằng vector siêu nét»):** mọi thứ vẽ bằng nét vector (canvas path), ảnh vẽ sẵn của nguyên tử / vòng / dụng cụ dựng đúng mật độ điểm của máy (`devicePixelRatio`, tối đa 3) và dựng lại khi đổi màn hình / thu phóng; máy yếu vẫn tự hạ về mật độ 1 như nay.
 - **Không thêm tệp ảnh:** precache giữ 170 / 170. Kiểm bằng `node scripts/kiem-sw.mjs`.
 - **Tốc độ tải:** `npm run build && npm run kiem:toc-do` 0 đỏ. Game nạp lười nên đường mở app học sinh không đổi byte.
 - **Màu:** `npm run check:mau` và `npm run kiem:mau-giu` 0 vi phạm. Chỉ thêm biến `--dn-*` trỏ vào token `--tr-*` có sẵn.
@@ -163,6 +166,10 @@ Sân thu nhỏ ở sảnh là ảnh tĩnh vẽ tại máy, không nối mạng, 
   - máy yếu: 1 vòng, không vệt.
 - **Ảnh app thật sau build:** 3 khổ × sáng / tối. Yêu cầu: 0 lỗi trang, 0 tràn, đích bấm ≥ 44 px, không lộ số báo danh.
 - **Sau gộp:** chạy tác tử `toc-do` (luật 27/10).
+
+## Luật lên cấp khi bỏ electron — CẦN THẦY GẬT CÙNG LÚC DUYỆT ẢNH
+Em đề xuất: **mỗi lần đạn em trúng đối thủ = +1**; đủ 3 / 5 / 7 / 9 lần (đúng ngưỡng `CAN_E` cũ) thì lên Cấp 2 / 3 / 4 / 5. Bị hạ: giữ cấp, bộ đếm về 0 (như electron cũ).
+Xúc tác giữ nguyên (nhặt ⇒ lên một cấp ngay). Huy hiệu «Nhặt electron giỏi» đổi thành «Lên cấp nhanh» (lên Cấp 4 sớm nhất). Thẻ của em ghi «trúng 3/5 lên Cấp 4».
 
 ## Đề xuất — cần thầy chốt (KHÔNG nằm trong tầng 1, chưa vẽ thành luật)
 
