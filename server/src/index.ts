@@ -2960,24 +2960,28 @@ async function ghiLenBangMoi(env: Env, b: Record<string, unknown>): Promise<Resp
   // `action: ghiLenBang` — địa chỉ «Apps Script» nay chính là Worker ⇒ ghi — rồi «soi» sang `/len-bang` ⇒ ghi lần hai: EXP lên bảng nhân đôi, «chưa đạt
   // một lần» thành hai lần trong bộ đo 4 bảng. Không sửa máy thầy (máy còn trỏ Apps Script thật vẫn cần đường soi): cùng em · câu · chuyên đề · kết quả
   // trong 10 giây = MỘT lần gọi lên bảng ⇒ trả ok, không ghi gì thêm. Dữ liệu cũ giữ nguyên.
+  // TỐC ĐỘ (tác tử tốc độ 02/11): phép soi trùng nằm NGAY TRONG lô ghi (INSERT … WHERE NOT EXISTS), không còn một câu SELECT chờ riêng trước lô ⇒ đường
+  // ghi lên bảng về lại 3 đợt chờ D1 như trước #750 (bản #750: 4; lượt trùng: 1). Các câu sau trong lô chỉ chạy khi chính lệnh này vừa ghi dòng `len_bang` (khớp đúng `luc = nay` của
+  // lệnh) — không dựa `changes()` / `last_insert_rowid()` (trạng thái kết nối). Lô là giao dịch nên soi + ghi là một khối.
   const truoc = new Date(Date.parse(nay) - 10_000).toISOString()
-  const trung = await env.DB.prepare('SELECT 1 AS c FROM len_bang WHERE sbd = ? AND luc >= ? AND COALESCE(qid, \'\') = ? AND COALESCE(chuyen_de, \'\') = ? AND dat = ? LIMIT 1')
-    .bind(sbd, truoc, qid, chuyenDe, dat ? 1 : 0).first().catch(() => null)
-  if (trung) return ra({ ok: true })
+  const KHONG_TRUNG = 'WHERE NOT EXISTS (SELECT 1 FROM len_bang WHERE sbd = ? AND luc >= ? AND COALESCE(qid, \'\') = ? AND COALESCE(chuyen_de, \'\') = ? AND dat = ?)'
+  const soiTrung = [sbd, truoc, qid, chuyenDe, dat ? 1 : 0] as const
+  const VUA_GHI = 'EXISTS (SELECT 1 FROM len_bang WHERE sbd = ? AND luc = ? AND qid = ? AND chuyen_de = ? AND dat = ?)'
+  const vuaGhi = [sbd, nay, qid, chuyenDe, dat ? 1 : 0] as const
   const cau: D1PreparedStatement[] = [
-    env.DB.prepare('INSERT INTO len_bang (sbd, chuyen_de, qid, dat, luc, giay_thuc) VALUES (?,?,?,?,?,?)').bind(sbd, chuyenDe, qid, dat ? 1 : 0, nay, giayThuc),
+    env.DB.prepare(`INSERT INTO len_bang (sbd, chuyen_de, qid, dat, luc, giay_thuc) SELECT ?,?,?,?,?,? ${KHONG_TRUNG}`).bind(sbd, chuyenDe, qid, dat ? 1 : 0, nay, giayThuc, ...soiTrung),
     // KHÔNG còn cộng thẳng vào `tien_do_hs` (thầy chốt 19/09, câu 11): `chamDiem` xoá rồi dựng lại bảng ấy từ `chi_tiet_cau` mỗi lần chấm lại một ca,
     // nên phần lên bảng đã cộng bị mất. Nguồn sự thật nay là sổ `su_kien_hoc` (ghi ngay dưới, nguon='len_bang'); hồ sơ nắm dựng từ sổ.
   ]
   if (qid) {
     cau.push(
       env.DB.prepare(
-        `INSERT INTO qid_da_lam (khoa, sbd, qid, lan_dau, so_lan) VALUES (?,?,?,?,1)
+        `INSERT INTO qid_da_lam (khoa, sbd, qid, lan_dau, so_lan) SELECT ?,?,?,?,1 WHERE ${VUA_GHI}
          ON CONFLICT(khoa) DO UPDATE SET so_lan = qid_da_lam.so_lan + 1`,
-      ).bind(`${sbd}|${qid}`, sbd, qid, nay),
+      ).bind(`${sbd}|${qid}`, sbd, qid, nay, ...vuaGhi),
     )
     // Chữa đúng câu đã sai ⇒ đánh dấu đã chữa.
-    if (dat) cau.push(env.DB.prepare('UPDATE ban_do_sai SET da_chua = 1, chua_luc = ? WHERE sbd = ? AND qid = ?').bind(nay, sbd, qid))
+    if (dat) cau.push(env.DB.prepare(`UPDATE ban_do_sai SET da_chua = 1, chua_luc = ? WHERE sbd = ? AND qid = ? AND ${VUA_GHI}`).bind(nay, sbd, qid, ...vuaGhi))
   }
   let kq: Awaited<ReturnType<Env['DB']['batch']>>
   try {
@@ -2985,9 +2989,11 @@ async function ghiLenBangMoi(env: Env, b: Record<string, unknown>): Promise<Resp
   } catch (e) {
     // Chưa chạy migration-1909-len-bang-giay-thuc.sql (cột `giay_thuc` chưa có): ghi như cũ, bỏ số đo. Batch là giao dịch nên thử lại không ghi đôi.
     if (!/no such column|has no column named/i.test(e instanceof Error ? e.message : String(e))) throw e
-    cau[0] = env.DB.prepare('INSERT INTO len_bang (sbd, chuyen_de, qid, dat, luc) VALUES (?,?,?,?,?)').bind(sbd, chuyenDe, qid, dat ? 1 : 0, nay)
+    cau[0] = env.DB.prepare(`INSERT INTO len_bang (sbd, chuyen_de, qid, dat, luc) SELECT ?,?,?,?,? ${KHONG_TRUNG}`).bind(sbd, chuyenDe, qid, dat ? 1 : 0, nay, ...soiTrung)
     kq = await env.DB.batch(cau)
   }
+  // Trùng một lượt vừa ghi (≤ 10 giây) ⇒ lô không ghi gì ⇒ trả ok, không ghi sổ.
+  if (!(Number(kq?.[0]?.meta?.changes) > 0)) return ra({ ok: true })
   // SỔ SỰ KIỆN HỌC (GĐ 0): mỗi lượt gọi bảng là một sự kiện, khoá theo id dòng `len_bang`
   // (giống hệt đường nạp lại). Không có qid thì không có bằng chứng về câu nào — không ghi.
   if (qid) {
