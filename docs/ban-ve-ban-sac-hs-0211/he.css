@@ -289,3 +289,24 @@ h1, h2, h3, p { margin: 0; }
 .mol-hang .mol-n { width: 70px; flex: none; }
 .mol-hang .loi { position: relative; max-width: none; flex: 1; margin-bottom: 18px; }
 .mol-hang .loi::after { left: -5px; bottom: 16px; transform: rotate(135deg); }
+
+/* ── TƯƠNG PHẢN (đo bằng chup.cjs, ngưỡng CHUẨN B4): chữ nhỏ KHÔNG đặt trên mặt tô đậm ở bản sáng (trắng / chàm chỉ 3,4:1) ⇒
+   thẻ bật ra, điểm danh, lối «Tự làm», ô số bài, bong bóng chữ của em dùng nền nhạt + chữ đậm cùng họ (≥ 4,5:1 cả sáng lẫn tối). */
+.so-o { opacity: 1; }
+.ten-m { padding: 2px 8px; border-radius: 8px; background: var(--tr-nen); }
+.bat { background: var(--tr-mat); color: var(--tr-chu); box-shadow: inset 0 0 0 2px var(--tr-hs-nut), 0 18px 30px -18px var(--tr-phu); }
+.bat::before { background: var(--tr-mat); box-shadow: -2px -2px 0 0 var(--tr-hs-nut); }
+.bat b { color: var(--tr-hs-chu); } .bat span { opacity: 1; color: var(--tr-chu-2); }
+.bat .nut { background: var(--tr-hs-nut); color: var(--tr-hs-tren); }
+.bat[data-sac='tin'] { box-shadow: inset 0 0 0 2px var(--tr-tin-day), 0 18px 30px -18px var(--tr-phu); } .bat[data-sac='tin']::before { box-shadow: -2px -2px 0 0 var(--tr-tin-day); }
+.bat[data-sac='tin'] b { color: var(--tr-tin-chu); } .bat[data-sac='tin'] .nut { background: var(--tr-tin-day); color: var(--tr-trang); }
+.dd, .dd-gon { background: var(--tr-hs-nhat); color: var(--tr-hs-chu); box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--tr-hs) 55%, transparent); }
+.dd p, .dd-gon small { opacity: 1; color: var(--tr-chu-2); }
+.dd-dau .o, .dd-gon .o { background: var(--tr-hs-nut); color: var(--tr-hs-tren); }
+.dd .nut, .dd-gon .nut { background: var(--tr-hs-nut); color: var(--tr-hs-tren); }
+.dd .nut[disabled] { background: var(--tr-mat-3); color: var(--tr-chu-3); }
+.dd-o span { box-shadow: inset 0 0 0 1.5px var(--tr-vien-2); }
+.bai .o[data-nhat] small { opacity: 1; }
+.mt-nho .nhan { fill: var(--tr-hs-nhat); } .mt-nho text { fill: var(--tr-hs-chu); }
+.nguyen-tu .nhan { fill: var(--tr-hs-nhat); stroke: var(--tr-hs); stroke-width: 2.5; } .nguyen-tu .so, .nguyen-tu .dv { fill: var(--tr-hs-chu); }
+.nguyen-tu[data-du] .nhan { fill: var(--tr-dung-nhat); stroke: var(--tr-dung); } .nguyen-tu[data-du] .so, .nguyen-tu[data-du] .dv { fill: var(--tr-dung-chu); }

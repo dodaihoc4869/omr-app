@@ -18,7 +18,7 @@ for t in TRANG:
     d.text((P, 28), f'Học sinh · {tieu(t)}', fill=CHU, font=font(30))
     d.text((P, 66), 'máy tính sáng · ngang tối (844×390) · điện thoại sáng · điện thoại tối', fill=(90, 88, 125), font=font(17))
     b.paste(mt, (P, 96)); b.paste(ng, (P, 96 + mt.height + 24)); b.paste(ds, (P + 960 + 28, 96)); b.paste(dt, (P + 960 + 28 + 380, 96))
-    b.save(f'{D}/bang/{t}.jpg', quality=70, optimize=True)
+    b.save(f'{D}/bang/{t}.jpg', quality=58, optimize=True)
 # tổng quan
 th = [mo(f'{D}/anh/{t}-doc-sang.jpg', 300, 650) for t in TRANG]
 cot = 7; P = 30; W = P * 2 + cot * 300 + (cot - 1) * 18; H = 100 + 2 * (650 + 64) + P
@@ -27,7 +27,7 @@ d.text((P, 30), 'App học sinh · hệ «Ô nguyên tố» — 14 màn, điện
 for k, (t, i) in enumerate(zip(TRANG, th)):
     x = P + (k % cot) * 318; y = 100 + (k // cot) * 714
     b.paste(i, (x, y)); d.text((x, y + 656), tieu(t).split(' · ')[0] + (' · ' + tieu(t).split(' · ')[1][:22] if ' · ' in tieu(t) else ''), fill=CHU, font=font(15))
-b.save(f'{D}/bang/00-tong-quan.jpg', quality=72, optimize=True)
+b.save(f'{D}/bang/00-tong-quan.jpg', quality=60, optimize=True)
 # trước / sau
 truoc = mo(f'{D}/../anh-lo-trinh-bong-bong-0211/sau-doc-sang.jpg', 390); sau = mo(f'{D}/anh/lo-trinh-doc-sang.jpg', 390, truoc.height)
 P = 36; b = Image.new('RGB', (P * 2 + 390 * 2 + 40, 110 + truoc.height + P), NEN); d = ImageDraw.Draw(b)

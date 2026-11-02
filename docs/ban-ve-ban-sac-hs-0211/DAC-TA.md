@@ -127,9 +127,43 @@ Các trạng thái giữ hành vi cũ, chỉ mặc theo hệ mới khi build: đ
   - Mục tiêu: byte mở app HS và cổng HS đã đăng nhập ≤ mốc trong `docs/moc-toc-do.json` (mốc chỉ hạ).
 - **Phương án đổi phông (KHÔNG có trong bản vẽ):** nếu thầy muốn khác hẳn chữ Duolingo, có thể dùng Inter (đã có trong repo cho app phụ huynh). Thêm khoảng 58 KB (Inter latin 48 KB + tiếng Việt 10 KB), nạp lười sau khi vẽ xong. Em không khuyên làm: chữ tròn thân thiện với học sinh hơn, và vi phạm mốc tốc độ nếu nạp sớm.
 
+## Chưa vẽ trong lượt này (lượt 2, sau khi thầy chốt ngôn ngữ hình)
+
+Lượt này vẽ 14 màn em mở hằng ngày để thầy duyệt **ngôn ngữ hình**. Các màn dưới đây sẽ mặc cùng hệ (ô nguyên tố, thẻ, nút phẳng, mạch nhỏ, nền ô ly) và vẽ ở lượt 2:
+
+| Màn | Sẽ thừa hưởng |
+|---|---|
+| Tự sửa lỗi (`ManTuChua`), Chữa câu sai (`ManChuaCauSai`) | Số lớn kiểu ô nguyên tố. «Đường tự gỡ» vẽ như mạch nhỏ (mỗi bước một ô) |
+| Học cách giải (từng bước), tấm «Xem lời giải đầy đủ» | Thẻ «Cách nghĩ» như màn Trả lời ngắn. Sơ đồ cột dọc theo `tu-duy-day-hoa-thay-2610.md` |
+| Tu luyện, Câu đã làm, Bài tập về nhà, Bài gia đình giao | Ô lớn + dòng hành động như Luyện tập / Thêm |
+| Huy hiệu, Giải tuần, Cửa hàng, lịch Chuỗi ngày, Học cùng bạn, Thử thách Kim cương | Lưới ô nguyên tố. Huy hiệu là ô có số |
+| Kết quả sau nộp, lịch sử ca, tấm Thông báo, phủ «tạm đóng app» | Thẻ + chip theo hệ. Chữ của luồng thi giữ nguyên văn |
+| Màn thi thật (`ExamTakeScreen`) | **Không đổi** (C-RÀO) |
+| Kiểm tra ôn tập (`ManKiemTraCaNhan`) | Làn Codex. Giao sau khi thầy chốt |
+
+## Chữ mới đề xuất (chưa có trong app — thầy duyệt cùng ảnh)
+
+| Chỗ | Chữ mới | Ghi chú |
+|---|---|---|
+| Thanh dưới | **Thêm** | Ô chứa Điểm danh, Ca kiểm tra, Hỏi A.I, Thông báo, Cài đặt, Của em |
+| Câu mới, lối Tự làm | «Làm đúng ngay được tính tự làm đúng» | Dòng phụ. App hiện chỉ có tên nút |
+| Câu mới, lối Học cách giải | «Xem từng bước rồi làm lại câu tương tự» | Dòng phụ |
+| Câu mới, dòng hỏi | «Câu này mới với em. Em muốn bắt đầu thế nào?» | |
+| Thẻ kết quả (trả lời đúng) | Khối «Cách nghĩ» (một phép tính) | Lời giải ngắn ngay trên thẻ |
+| Kết chặng | «tự làm đúng · có hỗ trợ · cần sửa» | Dùng đúng tên trạng thái câu đang có |
+| Thêm | «Nhập mã ca thầy cho để vào làm» · «Chụp đề, hỏi bài, tâm sự» · «Tải bài mới thầy vừa giao» | Dòng phụ |
+| Nguyên tử mục tiêu | «Mỗi câu làm xong thắp một electron» | Chỉ ở cột «Hôm nay» trên màn rộng |
+
+Mọi chữ khác lấy đúng từ app thật:
+- `TrongHs.tsx`: «Học tiếp», «Bắt đầu», «Đủ mức hôm nay! Đã làm 17 câu (mức 12)», «Tiếp theo: …», lời Mol, «Lửa đôi 3 ngày», «Gõ cửa», «20 câu · khoảng 30 phút · hạn nộp 21:00», «Thứ Năm 06/11 · còn 4 ngày», 6 ô Luyện tập, các ô Thành tích, «Điểm thầy đã công bố».
+- `ManLamBaiTap.tsx`: «Học cách giải», «Tự làm câu này», «Gợi ý», «Kiểm tra», «Câu tiếp theo», «Xem lời giải đầy đủ».
+- Màn đăng nhập và A.I: theo kiểm kê + bảng từ chuẩn. A.I xưng «tôi», gọi «bạn».
+
 ## 7. Nghiệm thu đo bằng máy
 
-- **Ảnh bản vẽ (đã đạt):** 84 ảnh Chromium, 0 lỗi trang, 0 tràn ngang, 0 đích bấm < 44 px, 0 chữ bị cắt (`node chup.cjs …` in TỔNG).
+- **Ảnh bản vẽ (đã đạt):** 84 ảnh Chromium, 0 lỗi trang, 0 tràn ngang, 0 đích bấm < 44 px, 0 chữ bị cắt, **0 cặp chữ/nền dưới ngưỡng tương phản** (`node chup.cjs …` in TỔNG).
+  - Cách đo tương phản: tính màu chữ thật so với nền thật của từng chữ, cả sáng lẫn tối. Ngưỡng giống `scripts/do-tuong-phan-hs.mjs`: chữ thường ≥ 4,5:1; chữ to và chữ đậm trên nút / huy hiệu ≥ 3:1.
+  - Hệ quả: chữ nhỏ không đặt trên mặt tô đậm ở bản sáng, vì trắng trên chàm chỉ đạt 3,4:1. Thẻ bật ra, Điểm danh, lối «Tự làm câu này», ô số bài, bong bóng tin nhắn của em và nhân nguyên tử mục tiêu đều dùng nền nhạt + chữ đậm cùng họ màu.
 - **Khi build:**
   - `tsc`;
   - vitest các tệp Lộ trình / Mol / bong bóng / chặng ngang / `ktcn-ngang-0211` / `bo-cuc-lam`;

@@ -93,3 +93,7 @@
   .o-so { min-height: 52px; font-size: 24px; }
   .kq { padding: 12px; gap: 8px; } .kq-dau .o { width: 40px; height: 40px; }
 }
+/* tương phản: lối chính «Tự làm» = nền chàm nhạt, viền chàm, chữ chàm đậm (chữ nhỏ trắng trên chàm chỉ 3,4:1) */
+.loi-vao[data-chinh] { background: var(--tr-hs-nhat); color: var(--tr-hs-chu); box-shadow: inset 0 0 0 2.5px var(--tr-hs-nut), 0 12px 24px -16px var(--tr-hs-day); }
+.loi-vao[data-chinh] span { color: var(--tr-chu-2); opacity: 1; }
+.loi-vao[data-chinh] .o { background: var(--tr-hs-nut); color: var(--tr-hs-tren); }
