@@ -28,7 +28,7 @@ export function veNguoi(k: MucGT, u: string): string {
   const n = NV_GT4[k]
   const giay = (s: number) => `<g transform="translate(${s * 11.5} 0) scale(${s} 1)"><path d="M-9,-11.5 C-3,-13 6,-11.5 10.5,-6.5 C13,-3.5 12.5,0 9.5,0 L-9,0 C-11.5,0 -12.5,-2 -12.5,-4.8 C-12.5,-8.4 -11.3,-10.8 -9,-11.5Z" class="gf-giay"/><path d="M-12.5,-3.4 L12.6,-3.4 C12.3,-1.2 11.2,0 9.5,0 L-9,0 C-11.2,0 -12.4,-1.2 -12.5,-3.4Z" class="gf-giay-s"/><ellipse cx="2" cy="-9" rx="4" ry="1.6" class="gf-trang" opacity=".45"/></g>`
   const ao = (hem: number) => `
-    <path d="M-25,-104 C-34,-104 -39,-98 -40,-89 L-45,${hem - 9} C-46,${hem - 3} -42,${hem} -35,${hem} L35,${hem} C42,${hem} 46,${hem - 3} 45,${hem - 9} L40,-89 C39,-98 34,-104 25,-104Z" fill="url(#${u}ao)"/>
+    <path d="M-25,-104 C-34,-104 -39,-98 -40,-89 L-45,${hem - 9} C-46,${hem - 3} -42,${hem} -35,${hem} L35,${hem} C42,${hem} 46,${hem - 3} 45,${hem - 9} L40,-89 C39,-98 34,-104 25,-104Z" fill="url(#${u}ao)" class="gg-ao"/>
     <path d="M27,-103 C35,-102 39,-97 40,-89 L45,${hem - 9} C46,${hem - 3} 42,${hem} 35,${hem} L30,${hem} L33.5,-88 C33.5,-96 31,-101 27,-103Z" class="gf-ao-s" opacity=".5"/>`
   const ve = (hem: number) => `
     <path d="M-12.5,-105 L0,-79 L12.5,-105Z" class="gf-ao2"/>
@@ -41,7 +41,7 @@ export function veNguoi(k: MucGT, u: string): string {
   let than = '', tocSau = '', toc = '', kinh = '', ria = '', vat = '', them = ''
   if (k === 'nb') {
     than = ao(-21) + ve(-21)
-    toc = `<path d="M-62,-146 C-67,-190 -37,-214 2,-214 C42,-214 67,-191 62,-148 C59,-160 52,-168 42,-172 C30,-180 12,-176 -2,-180 C-18,-184 -40,-178 -52,-163 C-57,-158 -60,-152 -62,-146Z" fill="url(#${u}toc)"/>
+    toc = `<path d="M-62,-146 C-67,-190 -37,-214 2,-214 C42,-214 67,-191 62,-148 C59,-160 52,-168 42,-172 C30,-180 12,-176 -2,-180 C-18,-184 -40,-178 -52,-163 C-57,-158 -60,-152 -62,-146Z" fill="url(#${u}toc)" class="gg-toc"/>
       <path d="M-6,-211 C-3,-229 18,-238 35,-228 C27,-226 23,-222 21,-216 C31,-220 42,-215 46,-206 C30,-210 14,-209 -6,-211Z" class="gf-toc"/>
       <path d="M-40,-196 Q-25,-207 -8,-208" class="gn gn-toc-l" stroke-width="4" opacity=".8"/>`
     kinh = `<path d="M-61,-178 Q0,-200 61,-178" class="gn gn-quai" stroke-width="7"/>
@@ -55,9 +55,9 @@ export function veNguoi(k: MucGT, u: string): string {
     them = `<clipPath id="${u}vat"><path d="M-5,-12 L-5,2 L-19.5,25 C-21.5,29 -18.5,33 -14,33 L14,33 C18.5,33 21.5,29 19.5,25 L5,2 L5,-12Z"/></clipPath>`
   } else if (k === 'th') {
     than = ao(-14) + ve(-14)
-    tocSau = `<circle cx="0" cy="-219" r="21" fill="url(#${u}toc)"/><path d="M-11,-230 Q-4,-236 5,-235" class="gn gn-toc-l" stroke-width="3.4" opacity=".9"/>
+    tocSau = `<circle cx="0" cy="-219" r="21" fill="url(#${u}toc)" class="gg-toc"/><path d="M-11,-230 Q-4,-236 5,-235" class="gn gn-toc-l" stroke-width="3.4" opacity=".9"/>
       <rect x="-16" y="-204" width="32" height="9" rx="4.5" class="gf-bang"/><rect x="-11" y="-202.5" width="12" height="2.6" rx="1.3" class="gf-trang" opacity=".5"/>`
-    toc = `<path d="M-63,-144 C-67,-192 -35,-212 0,-212 C35,-212 67,-192 63,-144 C59,-160 51,-170 40,-175 C29,-182 12,-184 0,-180 C-12,-184 -29,-182 -40,-175 C-51,-170 -59,-160 -63,-144Z" fill="url(#${u}toc)"/>
+    toc = `<path d="M-63,-144 C-67,-192 -35,-212 0,-212 C35,-212 67,-192 63,-144 C59,-160 51,-170 40,-175 C29,-182 12,-184 0,-180 C-12,-184 -29,-182 -40,-175 C-51,-170 -59,-160 -63,-144Z" fill="url(#${u}toc)" class="gg-toc"/>
       <path d="M-38,-197 Q-24,-206 -8,-207" class="gn gn-toc-l" stroke-width="3.6" opacity=".9"/>
       <circle cx="-59" cy="-128" r="3.2" class="gf-vang"/><circle cx="59" cy="-128" r="3.2" class="gf-vang"/>`
     kinh = `<path d="M-40.5,-150 L-57,-154 M40.5,-150 L57,-154" class="gn gn-gong" stroke-width="3"/>
@@ -79,7 +79,7 @@ export function veNguoi(k: MucGT, u: string): string {
       <rect x="-36" y="-56" width="72" height="5" rx="2.5" class="gf-tap-s"/>
       <rect x="-3" y="-80" width="3.4" height="11" rx="1.7" class="gf-but-1"/><rect x="2" y="-78" width="3.4" height="9" rx="1.7" class="gf-but-2"/>
       <rect x="-11" y="-72" width="22" height="12" rx="4" class="gf-tap-l"/>`
-    toc = `<path d="M-61,-148 C-63,-184 -52,-206 -30,-209 L30,-209 C52,-206 63,-184 61,-148 C58,-161 54,-170 47,-176 L-47,-176 C-54,-170 -58,-161 -61,-148Z" fill="url(#${u}toc)"/>
+    toc = `<path d="M-61,-148 C-63,-184 -52,-206 -30,-209 L30,-209 C52,-206 63,-184 61,-148 C58,-161 54,-170 47,-176 L-47,-176 C-54,-170 -58,-161 -61,-148Z" fill="url(#${u}toc)" class="gg-toc"/>
       <path d="M-61,-148 C-62,-160 -60,-170 -56,-176 L-48,-176 L-50,-150Z" class="gf-bac"/><path d="M61,-148 C62,-160 60,-170 56,-176 L48,-176 L50,-150Z" class="gf-bac"/>
       <path d="M-30,-203 L22,-203" class="gn gn-toc-l" stroke-width="4" opacity=".8"/>`
     kinh = `<rect x="-62" y="-153" width="18" height="8" rx="4" class="gf-quai"/><rect x="44" y="-153" width="18" height="8" rx="4" class="gf-quai"/>
@@ -94,10 +94,10 @@ export function veNguoi(k: MucGT, u: string): string {
       <rect x="6" y="-28" width="14" height="8" rx="3" class="gf-den"/><rect x="10" y="-30" width="6" height="4" rx="2" class="gf-den-s"/>`
   } else {
     than = ao(-19) + ve(-19) + `<path d="M-15,-106 C-10,-98 -4,-95 0,-95 C4,-95 10,-98 15,-106 L12,-90 C8,-87 4,-86 0,-86 C-4,-86 -8,-87 -12,-90Z" class="gf-trang"/><circle cx="0" cy="-88" r="3.6" class="gf-vang"/>`
-    tocSau = `<path d="M-67,-120 C-75,-162 -62,-206 0,-208 C62,-206 75,-162 67,-120 C64,-108 55,-104 49,-108 L-49,-108 C-55,-104 -64,-108 -67,-120Z" fill="url(#${u}toc)"/>
+    tocSau = `<path d="M-67,-120 C-75,-162 -62,-206 0,-208 C62,-206 75,-162 67,-120 C64,-108 55,-104 49,-108 L-49,-108 C-55,-104 -64,-108 -67,-120Z" fill="url(#${u}toc)" class="gg-toc"/>
       <g transform="rotate(30 0 -216)"><rect x="-3.6" y="-252" width="7.2" height="38" rx="3.6" class="gf-vang"/><path d="M-3.6,-252 L0,-261 L3.6,-252Z" class="gtay-but-g"/><path d="M-1.2,-258 L0,-261 L1.2,-258Z" class="gf-net"/><rect x="-3.6" y="-219" width="7.2" height="6" rx="2.4" class="gtay-tay"/></g>
       <circle cx="0" cy="-216" r="19" class="gf-toc gn-toc-s" stroke-width="2.4"/><path d="M-10,-212 Q-6,-226 6,-226 Q12,-222 9,-214" class="gn gn-toc-s" stroke-width="2.6" opacity=".8"/>`
-    toc = `<path d="M-63,-146 C-67,-193 -31,-214 4,-212 C41,-210 67,-191 63,-150 C57,-166 45,-177 27,-180 C13,-172 -9,-171 -26,-177 C-41,-173 -55,-163 -63,-146Z" fill="url(#${u}toc)"/>
+    toc = `<path d="M-63,-146 C-67,-193 -31,-214 4,-212 C41,-210 67,-191 63,-150 C57,-166 45,-177 27,-180 C13,-172 -9,-171 -26,-177 C-41,-173 -55,-163 -63,-146Z" fill="url(#${u}toc)" class="gg-toc"/>
       <path d="M-40,-196 Q-22,-207 -2,-207" class="gn gn-trang" stroke-width="4" opacity=".75"/>`
     kinh = `<path d="M-39,-139 H-3 A18,13 0 0 1 -39,-139Z" class="gf-trang" fill-opacity=".34"/><path d="M3,-139 H39 A18,13 0 0 1 3,-139Z" class="gf-trang" fill-opacity=".34"/>
       <path d="M-39,-139 H-3 A18,13 0 0 1 -39,-139Z M3,-139 H39 A18,13 0 0 1 3,-139Z" class="gn gn-gong" stroke-width="3.2"/>
@@ -133,7 +133,7 @@ export function veNguoi(k: MucGT, u: string): string {
     <clipPath id="${u}e"><ellipse rx="14.5" ry="16.5"/></clipPath>${them}
   </defs>
   <g transform="scale(${TL})">
-  <ellipse data-k="bong" cx="0" cy="0" rx="52" ry="9" fill="url(#${u}bong)"/>
+  <ellipse data-k="bong" cx="0" cy="0" rx="52" ry="9" fill="url(#${u}bong)" class="gg-bong"/>
   <g data-k="goc">
     <g><rect x="-16.5" y="-31" width="11" height="26" rx="5.5" class="gf-quan"/><rect x="5.5" y="-31" width="11" height="26" rx="5.5" class="gf-quan"/>${giay(-1)}${giay(1)}</g>
     <g data-k="than">
@@ -141,9 +141,9 @@ export function veNguoi(k: MucGT, u: string): string {
       <g data-k="dau">
         ${tocSau}
         <g data-k="tai"><ellipse cx="-59" cy="-143" rx="8" ry="10.5" class="gf-da"/><ellipse cx="-59.5" cy="-143" rx="3.6" ry="6" class="gf-da-s"/><ellipse cx="59" cy="-143" rx="8" ry="10.5" class="gf-da"/><ellipse cx="59.5" cy="-143" rx="3.6" ry="6" class="gf-da-s"/></g>
-        <path d="${DAU}" fill="url(#${u}da)"/>
+        <path d="${DAU}" fill="url(#${u}da)" class="gg-da"/>
         <g data-k="mat">
-          <g data-k="ma"><ellipse cx="-37" cy="-126" rx="10.5" ry="6.5" fill="url(#${u}ma)"/><ellipse cx="37" cy="-126" rx="10.5" ry="6.5" fill="url(#${u}ma)"/></g>
+          <g data-k="ma"><ellipse cx="-37" cy="-126" rx="10.5" ry="6.5" fill="url(#${u}ma)" class="gg-ma"/><ellipse cx="37" cy="-126" rx="10.5" ry="6.5" fill="url(#${u}ma)" class="gg-ma"/></g>
           ${mat1(-1, 'T')}${mat1(1, 'P')}
           <g data-k="mayT"><path d="M-8.5,1.6 Q0,-3 8.5,1.6" class="gn gn-may" stroke-width="4.4"/></g>
           <g data-k="mayP"><path d="M-8.5,1.6 Q0,-3 8.5,1.6" class="gn gn-may" stroke-width="4.4"/></g>
@@ -178,7 +178,7 @@ function banPhai(u: string): string {
   <g data-b="chi"><rect x="-2.9" y="2" width="5.8" height="15.5" rx="2.9" class="gf-tay"/><circle r="8" class="gf-tay"/><ellipse cx="-6.4" cy="1" rx="3.2" ry="4.2" class="gf-tay"/><path d="M-4,-2 Q0,0 4,-2" class="gn gn-tay-s" stroke-width="1.4"/></g>
   <g data-b="cai"><rect x="-3.7" y="3" width="7.4" height="13" rx="3.7" class="gf-tay"/><circle r="8.5" class="gf-tay"/><path d="M-5.6,-3 H4 M-5.6,1 H4 M-5,-7 H3" class="gn gn-tay-s" stroke-width="1.5"/></g>
   <g data-b="but"><g transform="rotate(-90)"><rect x="-1.9" y="-12" width="3.8" height="30" rx="1.9" class="gf-but"/><path d="M-1.9,17.5 L0,23 L1.9,17.5Z" class="gf-net"/><rect x="-1.9" y="-12" width="3.8" height="6" rx="1.9" class="gf-but-d"/></g><circle r="8" class="gf-tay"/><path d="M-5,-1 Q-1,1.2 3,-1" class="gn gn-tay-s" stroke-width="1.4"/></g>
-  <g data-b="den" class="gt-den"><g data-k="tia" opacity="0"><path d="M-6.5,23 L-66,300 L66,300 L6.5,23Z" fill="url(#${u}tia)"/><ellipse cx="0" cy="24" rx="14" ry="6.5" class="gf-tia" opacity=".7"/></g>
+  <g data-b="den" class="gt-den"><g data-k="tia" opacity="0"><path d="M-6.5,23 L-66,300 L66,300 L6.5,23Z" fill="url(#${u}tia)" class="gg-tia"/><ellipse cx="0" cy="24" rx="14" ry="6.5" class="gf-tia" opacity=".7"/></g>
     <rect x="-5.5" y="-9" width="11" height="23" rx="3" class="gf-den"/><path d="M-5.5,12 L-8.2,21 L8.2,21 L5.5,12Z" class="gf-den-s"/><ellipse cx="0" cy="21.4" rx="8.2" ry="2.8" class="gf-vang gt-den-kinh"/>
     <circle r="8.3" class="gf-tay"/><path d="M-5,-1 Q-1,1.2 3,-1" class="gn gn-tay-s" stroke-width="1.4"/></g>`
 }

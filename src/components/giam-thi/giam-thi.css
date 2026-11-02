@@ -294,3 +294,12 @@
 .gt-loi[data-cam='doi'] { --gt-loi-nen: var(--tr-sai-nhat); --gt-loi-day: var(--tr-sai); --gt-loi-chu: var(--tr-sai-chu); }
 .gt-loi[data-cam='gian'] { --gt-loi-nen: color-mix(in srgb, var(--tr-sai-day) 80%, var(--gt-toi)); --gt-loi-day: color-mix(in srgb, var(--tr-sai-day) 55%, var(--gt-toi)); --gt-loi-chu: var(--gt-trang); }
 .gt-loi[data-cam='nghi'] { --gt-loi-nen: var(--tr-tin-nhat); --gt-loi-day: var(--tr-tin); --gt-loi-chu: var(--tr-tin-chu); }
+
+/* MÁY YẾU (02/11, như Mol): TÔ PHẲNG — 6 dải màu chuyển (áo, da, tóc, má, bóng chân, tia đèn) thành màu đặc cùng sắc (thuộc tính CSS `fill` đè `fill="url(…)"`)
+   ⇒ mỗi lần giám thị đổi dáng / chuyển câu vẽ lại rẻ hơn. Máy thường giữ bóng mềm của bản vẽ. */
+[data-trong].may-yeu .gtm .gg-ao { fill: var(--gm-ao); }
+[data-trong].may-yeu .gtm .gg-da { fill: var(--gm-da); }
+[data-trong].may-yeu .gtm .gg-toc { fill: var(--gm-toc); }
+[data-trong].may-yeu .gtm .gg-ma { fill: var(--gm-ma); fill-opacity: .45; }
+[data-trong].may-yeu .gtm .gg-bong { fill: var(--gm-bong); }
+[data-trong].may-yeu .gtm .gg-tia { fill: var(--gm-tia); fill-opacity: .35; }
