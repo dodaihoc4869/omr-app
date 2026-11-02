@@ -3,7 +3,7 @@
 //  · điện thoại / máy tính NGANG: phe em luôn ở BÊN TRÁI (em phe Axit ⇒ xoay 180°);
 //  · điện thoại DỌC: sân xoay 90° cho dài theo chiều cao, phe em luôn ở DƯỚI.
 // Bốn phép đều là PHÉP QUAY (không lật gương) nên chữ, nguyên tử, nòng súng không bị ngược. Hướng kéo / điểm chạm của em đổi ngược lại trước khi gửi.
-import { SAN_H, SAN_W, VAT_CAN, type SuKien, type VatCan } from '../../lib/dau-ion/loi'
+import { SAN_H, SAN_W, type SuKien } from '../../lib/dau-ion/loi'
 import type { Canh } from './dau-ion-ve'
 
 export interface Xoay {
@@ -40,17 +40,6 @@ export function diemVao(X: number, Y: number, k: Xoay): [number, number] {
   return k.lat ? [SAN_W - x, SAN_H - y] : [x, y]
 }
 
-/** Vật che theo khung vẽ (hình chữ nhật xoay 90° đổi rộng ↔ cao). `cuaEm`: giá ống chắn căn cứ của phe em. */
-export type VatVe = VatCan & { cuaEm?: boolean }
-export function vatRa(k: Xoay, pheEm: number): VatVe[] {
-  return VAT_CAN.map((v) => {
-    const cuaEm = v.k === 'cn' && v.phe !== undefined ? v.phe === pheEm : undefined
-    if (v.k === 'tron') { const [x, y] = ra(v.x, v.y, k); return { ...v, x, y, cuaEm } }
-    const [ax, ay] = ra(v.x, v.y, k), [bx, by] = ra(v.x + v.w, v.y + v.h, k)
-    return { ...v, x: Math.min(ax, bx), y: Math.min(ay, by), w: Math.abs(bx - ax), h: Math.abs(by - ay), cuaEm }
-  })
-}
-
 /** Cảnh sân ⇒ cảnh vẽ (bản sao; không đổi cảnh gốc của bộ chạy). */
 export function xoayCanh(c: Canh, k: Xoay): Canh {
   if (!k.doc && !k.lat) return c
@@ -59,11 +48,14 @@ export function xoayCanh(c: Canh, k: Xoay): Canh {
     ghe: c.ghe.map((g) => { const [x, y] = ra(g.x, g.y, k); return { ...g, x, y, ngam: gocRa(g.ngam, k) } }),
     dan: c.dan.map((d) => { const [x, y] = ra(d.x, d.y, k), [vx, vy] = huongRa(d.vx, d.vy, k); return { ...d, x, y, vx, vy } }),
     vp: c.vp.map((v) => { const [x, y] = ra(v.x, v.y, k); return { ...v, x, y } }),
+    km: c.km,
   }
 }
 /** Sự kiện sân ⇒ sự kiện vẽ (chỉ đổi toạ độ / góc). */
 export function xoaySu(s: SuKien, k: Xoay): SuKien {
-  if ((!k.doc && !k.lat) || !('x' in s)) return s
+  if (!k.doc && !k.lat) return s
+  if (s.t === 'tb') return { ...s, ngam: gocRa(s.ngam, k) }
+  if (!('x' in s)) return s
   const [x, y] = ra(s.x, s.y, k)
   return s.t === 'ban' ? { ...s, x, y, ngam: gocRa(s.ngam, k) } : { ...s, x, y }
 }

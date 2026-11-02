@@ -214,6 +214,8 @@ const MAU_CU_THAY_RA_LENH = LENH_2110.cu // khoá → số lần khai báo đư�
 // 26/10: gỡ CSS CHẾT (luật mà mọi bộ chọn trỏ tới lớp không còn mã nào dùng) để giao diện «Trong» không làm app nặng hơn — danh sách đóng ở
 // docs/css-chet-2610.json (khoá → số lần, đúng lúc gỡ). Cộng vào MAU_CU_THAY_RA_LENH; giảm thêm ngoài danh sách vẫn là vi phạm.
 for (const [k, n] of Object.entries(JSON.parse(readFileSync(new URL('../docs/css-chet-2610.json', import.meta.url), 'utf8')).cu)) MAU_CU_THAY_RA_LENH[k] = (MAU_CU_THAY_RA_LENH[k] ?? 0) + n
+// 02/11 khuya thầy: «để rương ở ngoài thôi, rương bên trong bỏ đi» ⇒ gỡ thẻ Rương ngày ở màn Nhiệm vụ (rương ra màn Hôm nay): đúng 1 khai báo, đúng tệp.
+for (const k of ['color: var(--tp-tt-chu)', "color: 'var(--tp-tt-chu)'"]) MAU_CU_THAY_RA_LENH[`src/components/thuong/ManTinhThe.tsx · ${k}`] = (MAU_CU_THAY_RA_LENH[`src/components/thuong/ManTinhThe.tsx · ${k}`] ?? 0) + 1
 // 27/10 tối thầy: «Giám thị cho to hơn, cho khung bao tối đa bao xung quanh giám thị, đẹp, khung giống Duolingo» (Boss chuyển: viền 2 px màu viền NHẠT
 // --tr-vien) ⇒ bong bóng đề của giám thị đổi --tr-vien-2 → --tr-vien (đúng 3 khai báo, mỗi khai báo một lần).
 // 27/10 tối thầy (ảnh Giáo sư Kíp): «Phần chữ “Làm nên trò trống gì không” hơi khít, tôi muốn nền con giám thị nhắn đúng màu với nó» ⇒ bong bóng càu nhàu

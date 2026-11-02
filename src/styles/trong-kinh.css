@@ -253,6 +253,26 @@ html[data-trong='hs'] .kb-the-ruong[data-mo]:not([data-da-mo]) .kb-ruong { anima
 html[data-trong='hs'] .kb-the-ruong[data-da-mo] .rg-nap { transform-box: fill-box; transform-origin: 0% 100%; transform: translate(-4px, -10px) rotate(-24deg); }
 html.may-yeu[data-trong='hs'] .kb-the-ruong .kb-mo-ruong, html.may-yeu[data-trong='hs'] .kb-the-ruong .kb-ruong { animation: none; }
 @media (prefers-reduced-motion: reduce) { html[data-trong='hs'] .kb-the-ruong .kb-mo-ruong, html[data-trong='hs'] .kb-the-ruong .kb-ruong { animation: none; } }
+/* RƯƠNG VÀNG (thầy 02/11 khuya «sửa thành rương màu vàng như thế này nhé, vẽ lại cho đẹp hơn»): một rương duy nhất ở Hôm nay, to như thẻ rương ngày cũ;
+   đã mở ⇒ thẻ tĩnh, tiêu đề hồng tinh thể + 3 vạch nhiệm vụ. Lớp .rv-* mới (màu rương cũ .rg-* giữ nguyên khai báo). */
+html[data-trong='hs'] .kb-the-ruong { --rv-sang: var(--tr-mat); }
+@media (prefers-color-scheme: dark) { html[data-trong='hs'] .kb-the-ruong { --rv-sang: var(--tr-chu); } }
+html[data-trong='hs'] .kb-the-ruong .kb-ruong:has(> .rv) { width: 78px; }
+html[data-trong='hs'] .kb-the-ruong .kb-ruong .rv { display: block; width: 78px; height: auto; overflow: visible; }
+html[data-trong='hs'] .kb-the-ruong[data-da-mo] .kb-giua > b { color: var(--tr-tim-chu); }
+html[data-trong='hs'] .kb-the-ruong .kb-giua > b svg { width: 1.05em; height: 1.05em; vertical-align: -.15em; }
+html[data-trong='hs'] .kb-ba-cham { display: flex; gap: 8px; margin-top: 6px; }
+html[data-trong='hs'] .kb-ba-cham i { width: 30px; height: 10px; border-radius: 999px; background: var(--tr-mat-3); }
+html[data-trong='hs'] .kb-ba-cham i[data-x] { background: var(--tr-dung); }
+.rv .rv-t0 { stop-color: color-mix(in oklab, var(--tr-sao) 70%, var(--tr-chu-y)); } .rv .rv-t1 { stop-color: var(--tr-chu-y); }
+.rv .rv-n0 { stop-color: var(--tr-sao); } .rv .rv-n1 { stop-color: color-mix(in oklab, var(--tr-sao) 45%, var(--tr-chu-y)); }
+.rv .rv-mieng { fill: var(--tr-chu-y-day); opacity: .55; }
+.rv .rv-vien { fill: none; stroke: var(--tr-chu-y-day); stroke-width: 3; stroke-linejoin: round; }
+.rv .rv-dai { fill: var(--tr-sao); } .rv .rv-anh { fill: var(--rv-sang); opacity: .45; }
+.rv .rv-vet { fill: none; stroke: var(--rv-sang); stroke-width: 3.2; stroke-linecap: round; opacity: .6; }
+.rv .rv-khoa { fill: var(--tr-sao-day); } .rv .rv-ngoc { fill: var(--tr-tim); }
+.rv .rv-tt path { fill: var(--tr-tim); } .rv .rv-tt-sang { fill: var(--rv-sang); opacity: .45; }
+.rv .rv-q { stop-color: var(--tr-sao); } .rv .rv-bong { fill: var(--tr-phu); opacity: .25; }
 /* nút A.I tròn: màu tím của bản vẽ */
 html[data-trong='hs'] .kb-thanh .kb-thanh-ai svg { width: 26px; height: 26px; }
 /* rộng: cột phải = việc + gõ cửa + rương */
@@ -549,3 +569,8 @@ html[data-trong='hs'] .kb-thanh .kb-thanh-muc.tr-menu-cham[aria-expanded='true']
 @media (min-width: 1024px) and (min-height: 600px) {
   html:root[data-trong='hs'] .ht2[data-mot] .tr-menu.tr-menu { inset: 0 auto 0 112px; margin-block: auto; width: min(380px, calc(100vw - 140px)); height: max-content; max-height: calc(100dvh - 24px); padding: 14px 12px 12px; }
 }
+
+/* TẢI LẠI KHÔNG CÓ HIỆU ỨNG CHÈN VÀO (thầy 02/11 khuya «Bấm f5 vẫn có những hiệu ứng gì đó chèn vào sửa triệt để đi»): 2,5 giây đầu sau khi mở trang
+   (<html data-vua-mo>, gắn ở TrongHs.tsx) — hoạt ảnh vào màn (menu trượt, ô tích, rương thở…) nhảy thẳng tới trạng thái cuối nhờ trễ âm; hoạt ảnh lặp vẫn chạy
+   (chỉ lệch pha); không chuyển tiếp (màu dung dịch, nút). */
+html[data-vua-mo] *, html[data-vua-mo] *::before, html[data-vua-mo] *::after { animation-delay: -30s !important; transition-duration: 0s !important; transition-delay: 0s !important; }
