@@ -1,6 +1,6 @@
 import { execSync } from 'node:child_process'
-import { readFileSync, writeFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { join, resolve } from 'node:path'
 import react from '@vitejs/plugin-react'
 import { defineConfig, minifySync, type Plugin } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -54,10 +54,12 @@ const KHO_HS_BO = /^assets\/(?:ban-do-3d-three|jspdf|html2canvas|purify|index\.e
 // Gốc chọn tay: mảnh nạp lười CHỈ app học sinh dùng (đồ thị từ vỏ học sinh lan sang cả màn thầy qua mảnh chung ⇒ không lấy trọn). Mỗi gốc kéo theo mảnh nó nạp TĨNH + CSS.
 const KHO_HS_GOC = /^assets\/(?:TrongHs|ManLamBaiTap|hieu-ung|hieu-ung-an-mung|mol-dong|lua-dong|lua-gian|bi-dong|Bi|GiamThi|giam-thi|ManThuong|KetBaiThuong|thuong-gon|thuong-chung|trong-lam-bai|ChuaGonDuo|duo-sua|TamGiuChan|giu-chan|KhungKiemTra|ThiDuo|BiNop|KetQuaSauNop|ManKiemTraCaNhan|TheKiemTraCaNhan|TheKiemTraCon|BangKiemTraCaNhan|kiem-tra-ca-nhan|LuyenDeChuan|LuyenDeCauTruc|ManTuLuyen|ManTuChua|ManChuaCauSai|ManTienBo|ManDiemSo|LichSuCaEm|CauDaLam|HopHoiThay|BongBongAiDdh|LamCauOn|TheBaiHangNgay|TheBaiDaDay|KhungLoiGiai|ThanhSoCauChua|HoSoCuaEmHs|HoSoHocThatEm|BaoCaoCaCuaEm|NhacSamsung|kenh-day|DauIon|PhongChoGame|TheDiemDanhHs|DiemDanhBuoi)-[\w-]{8}\.(?:js|css)$/
 function khoNapTruocHs(): Plugin {
+  let dsCho: string[] = []
   return {
     name: 'kho-nap-truoc-hs',
     apply: 'build',
     generateBundle(_o, goi) {
+      dsCho = []
       type Manh = { type: 'chunk'; fileName: string; imports: string[]; dynamicImports: string[]; facadeModuleId: string | null; isDynamicEntry: boolean; viteMetadata?: { importedCss: Set<string> } }
       const manh = Object.values(goi).filter((x) => x.type === 'chunk') as unknown as Manh[]
       const theoTen = new Map(manh.map((m) => [m.fileName, m]))
@@ -84,8 +86,14 @@ function khoNapTruocHs(): Plugin {
         for (const con of m.imports) keo(con)
       }
       for (const t of thay) if (KHO_HS_GOC.test(t)) keo(t)
-      const ds = [...lay].filter((t) => !KHO_HS_BO.test(t)).sort()
-      this.emitFile({ type: 'asset', fileName: 'kho-hs.json', source: JSON.stringify({ ds }) })
+      dsCho = [...lay].filter((t) => !KHO_HS_BO.test(t)).sort()
+    },
+    // TỐC ĐỘ (02/11, sau #752): Vite bỏ mảnh JS RỖNG của mảnh chỉ-CSS SAU generateBundle ⇒ ghi danh sách lúc này, chỉ giữ tệp có thật trong gói cuối
+    // (trước: 9 mục ma ⇒ Pages trả index.html 7 KB, không vào kho ⇒ mỗi lượt mở tải lại 9 lần, mãi mãi).
+    writeBundle(o, goiCuoi) {
+      const dir = o.dir ?? 'dist'
+      const ds = dsCho.filter((t) => t in goiCuoi && existsSync(join(dir, t)))
+      writeFileSync(join(dir, 'kho-hs.json'), JSON.stringify({ ds }))
     },
   }
 }
