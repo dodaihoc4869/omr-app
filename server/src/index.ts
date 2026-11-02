@@ -2956,6 +2956,14 @@ async function ghiLenBangMoi(env: Env, b: Record<string, unknown>): Promise<Resp
   // `giayThuc` (tuỳ chọn, hợp đồng docs/hop-dong-giay-thuc-len-bang-1909.md): số hữu hạn 20..1800 thì ghi, còn lại ghi NULL. KHÔNG BAO GIỜ từ chối lệnh ghi vì trường này.
   const giayTho = b.giayThuc
   const giayThuc = typeof giayTho === 'number' && Number.isFinite(giayTho) && giayTho >= 20 && giayTho <= 1800 ? giayTho : null
+  // CHỐNG GHI ĐÔI (02/11, số thật: 158/159 lượt lên bảng có HAI dòng cách nhau ~0,85 giây). App thầy (`ghiLenBang`, src/lib/exam-api.ts) gửi lệnh cũ
+  // `action: ghiLenBang` — địa chỉ «Apps Script» nay chính là Worker ⇒ ghi — rồi «soi» sang `/len-bang` ⇒ ghi lần hai: EXP lên bảng nhân đôi, «chưa đạt
+  // một lần» thành hai lần trong bộ đo 4 bảng. Không sửa máy thầy (máy còn trỏ Apps Script thật vẫn cần đường soi): cùng em · câu · chuyên đề · kết quả
+  // trong 10 giây = MỘT lần gọi lên bảng ⇒ trả ok, không ghi gì thêm. Dữ liệu cũ giữ nguyên.
+  const truoc = new Date(Date.parse(nay) - 10_000).toISOString()
+  const trung = await env.DB.prepare('SELECT 1 AS c FROM len_bang WHERE sbd = ? AND luc >= ? AND COALESCE(qid, \'\') = ? AND COALESCE(chuyen_de, \'\') = ? AND dat = ? LIMIT 1')
+    .bind(sbd, truoc, qid, chuyenDe, dat ? 1 : 0).first().catch(() => null)
+  if (trung) return ra({ ok: true })
   const cau: D1PreparedStatement[] = [
     env.DB.prepare('INSERT INTO len_bang (sbd, chuyen_de, qid, dat, luc, giay_thuc) VALUES (?,?,?,?,?,?)').bind(sbd, chuyenDe, qid, dat ? 1 : 0, nay, giayThuc),
     // KHÔNG còn cộng thẳng vào `tien_do_hs` (thầy chốt 19/09, câu 11): `chamDiem` xoá rồi dựng lại bảng ấy từ `chi_tiet_cau` mỗi lần chấm lại một ca,
