@@ -661,14 +661,7 @@ export function MotTrangHs(p: PropsMotTrang) {
   // thanh trên; cờ tắt (chuoiNgay vắng) ⇒ chuỗi «đủ mức» cũ. Máy chủ chưa có lệnh (404) / lỗi mà chưa có bản lưu ⇒ thanh trên cũ.
   const tqTai = useTongQuan(p.token)
   const tq = tqTai.du
-  // TẢI SẴN GIÁM THỊ (thầy 02/11 «mọi hiệu ứng tải sẵn giống theo những gì phiên khác đã làm»): Hôm nay mở xong và rảnh ⇒ nạp trước mảnh giám thị (đứng cạnh MỌI câu)
-  // ⇒ câu đầu của chặng / kiểm tra / thi không chờ mảnh. Như nạp trước Mol (cong-hs-nap-luoi.ts): sau 6 s + lúc rảnh, một lần mỗi lần mở; tải hỏng ⇒ bỏ qua.
-  useEffect(() => {
-    const w = window as Window & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }
-    const nap = () => { void import('../giam-thi/GiamThi').catch(() => {}) }
-    const h = window.setTimeout(() => (w.requestIdleCallback ? w.requestIdleCallback(nap, { timeout: 5000 }) : nap()), 6000)
-    return () => window.clearTimeout(h)
-  }, [])
+  // NẠP SẴN giám thị, màn thưởng, Tu luyện, Câu đã làm lúc rảnh: ở cong-hs-nap-luoi.ts (mảnh nạp lúc rảnh — không cộng byte lượt mở /hs).
   // HỆ KÍNH (bản vẽ v2): đầu trang = ảnh đại diện bánh quy 12 múi (Hôm nay) + tiêu đề + CHUÔNG THÔNG BÁO THẬT (ThongBaoHocSinh — đúng một bản, chuyển từ menu)
   const dauKinh = (giua: ReactNode, coAnh = false) => <header className="kb-dau" data-chinh={coAnh || undefined}>
     {coAnh && <span className="kb-ava" aria-hidden="true"><svg viewBox="0 0 100 100"><path d={BANH_12} /></svg><b>{chuCaiTen(p.ten)}</b></span>}
