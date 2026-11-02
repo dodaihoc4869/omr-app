@@ -79,3 +79,5 @@
 [data-trong='hs'] .giu-tam { background: var(--kinh-mat); }
 [data-trong='hs'] .giu-dong-vien { background: var(--kinh-mat); }
 /* ═══ HẾT HỆ KÍNH TỰ SINH ═══ */
+/* thầy 03/11 (ảnh tấm «Đừng đi mà…»): «Chỗ này kính vẫn bị trong quá» — chữ đề / phương án lộ qua tấm ⇒ nền gần như đặc (97 % mặt thẻ), vẫn giữ viền sáng kính. */
+html[data-trong='hs'] .giu-tam { background: color-mix(in oklab, var(--tr-mat) 97%, transparent); }
