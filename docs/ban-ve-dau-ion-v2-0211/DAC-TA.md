@@ -54,7 +54,7 @@ python3 docs/ban-ve-dau-ion-v2-0211/ghep.py
 | Phần | Mới |
 |---|---|
 | Sàn | Kính mờ, lưới lục giác rất nhạt. Nửa sân mỗi phe loang màu giấy quỳ; vạch giữa nét đứt. |
-| Vật chắn | **Bỏ** (thầy 02/11 tối). Thay bằng tháp chưng cất màu phe (đế kính, bầu dung dịch, nòng xoay theo mục tiêu, vòng máu) và tường kính 3 mảnh quanh tinh thể (nứt < 60 %, vỡ thành mảnh vụn). |
+| Vật chắn | **Bỏ** (thầy 02/11 tối). Thay bằng **tháp đứng** (thầy «Tháp thiết kế hình dạng khác đi»): đế lục giác màu phe có độ dày, cột kính đứng chứa dung dịch màu phe sủi bọt, tinh thể nhỏ phát tia trên đỉnh (tháp lớn: cột to + 2 vòng cuộn); đang bắn ⇒ tinh thể đỉnh sáng + tia nét đứt tới mục tiêu; máu là thanh dưới đế; vỡ ⇒ gốc cột gãy + mảnh kính và tường kính 3 mảnh quanh tinh thể (nứt < 60 %, vỡ thành mảnh vụn). |
 | Nguyên tử | Quả cầu bóng màu phe, ký hiệu nguyên tố chữ tối ở giữa. **Số vòng electron quay quanh = cấp súng (1–5)**, nhìn là biết bạn mạnh cỡ nào. <br>Em có vòng trắng. Nhãn tên kèm số cấp; thanh máu nhỏ dưới bạn khác, chuyển đỏ khi < 35 %. |
 | Đạn | Hạt màu phe, vệt ngắn mờ dần, tia loé khi trúng. Đường ngắm nét đứt từ em tới mục tiêu, kèm dấu ngắm 4 cung (giữ như cũ). |
 | Vật phẩm | Xúc tác: lục giác vàng, tia sét. Khiên: lục giác tím (`--tr-hs`), không trùng màu phe. Electron: chấm xanh lục có quầng. |

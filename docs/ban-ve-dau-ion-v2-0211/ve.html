@@ -235,24 +235,39 @@ function tinhThe(X, Y, p, mau, bi) { // lăng trụ lục giác (tinh thể) mà
   if (bi && !YEU) s += [0, 60, 120, 180, 240, 300].map((a) => `<line x1="0" y1="50" x2="0" y2="60" transform="rotate(${a})" stroke="${m}" stroke-width="3" stroke-linecap="round"/>`).join('')
   return s + '</g>'
 }
-function thap(X, Y, t, st = {}, P) { // tháp chưng cất: đế kính + cột + bầu dung dịch màu phe + nòng xoay theo mục tiêu; vòng máu; vùng nét đứt (sáng lên khi bị lấn)
-  const p = t.p, m = v(p ? '--tr-sai' : '--tr-tin'), d = v(p ? '--tr-sai-day' : '--tr-tin-day'), tr = v('--tr-trang'), r = t.lon ? 25 : 20, vung = TAM_THAP[t.lon ? 1 : 0]
+function thap(X, Y, t, st = {}, P) { // THÁP (thầy 02/11 tối «Tháp thiết kế hình dạng khác đi»): đế lục giác kính + cột kính đứng chứa dung dịch màu phe sủi bọt
+  // + tinh thể phát tia trên đỉnh (tháp lớn: cột to hơn, 2 vòng cuộn); bắn = tia từ tinh thể đỉnh. Vòng va chạm = đế (r 20 / 25). Máu = thanh dưới đế.
+  const p = t.p, m = v(p ? '--tr-sai' : '--tr-tin'), d = v(p ? '--tr-sai-day' : '--tr-tin-day'), tr = v('--tr-trang'), ch = v('--tr-chu'), L = !!t.lon
+  const r = L ? 25 : 20, vung = TAM_THAP[L ? 1 : 0], cw = L ? 18 : 13, chh = L ? 40 : 30, dinh = -r * .35 - chh
+  const hex = (rr, dy = 0) => [0, 60, 120, 180, 240, 300].map((a) => { const g = (a + 30) * Math.PI / 180; return `${(rr * Math.cos(g)).toFixed(1)},${(rr * Math.sin(g) * .55 + dy).toFixed(1)}` }).join(' ')
   let s = `<g transform="translate(${X} ${Y})">`
-  if (st.huy) { // tháp đã vỡ: đống mảnh kính xám, không vùng
-    s += `<circle r="${r}" fill="${v('--tr-chu')}" opacity=".06"/>` + [[-10, 6, 20], [6, -4, -30], [10, 10, 55], [-4, -12, 80], [-14, -4, -60]].map(([a, b, g]) => `<rect x="${a - 5}" y="${b - 2}" width="11" height="4" rx="1.5" transform="rotate(${g} ${a} ${b})" fill="${v('--tr-chu-3')}" opacity=".55"/>`).join('')
-    return s + '</g>'
+  if (st.huy) { // tháp đã vỡ: đế nứt + gốc cột gãy + mảnh kính
+    s += '<g transform="scale(1.3)">'
+    s += `<polygon points="${hex(r, 4)}" fill="${ch}" opacity=".08"/><polygon points="${hex(r)}" fill="${v('--tr-mat')}" fill-opacity="${TOI ? .15 : .6}" stroke="${ch}" stroke-opacity=".3" stroke-width="1.5"/>`
+    s += `<path d="M${-cw / 2} ${-r * .3}V${-r * .3 - 9}l4 -5 3 6 4 -7 ${cw - 11} 4V${-r * .3}z" fill="${v('--tr-mat')}" fill-opacity="${TOI ? .2 : .7}" stroke="${ch}" stroke-opacity=".35"/>`
+    s += [[-14, 2, 30], [12, -2, -40], [6, 8, 70], [-6, 9, -15]].map(([a, b, g]) => `<rect x="${a - 4}" y="${b - 1.5}" width="8" height="3" rx="1" transform="rotate(${g} ${a} ${b})" fill="${v('--tr-chu-3')}" opacity=".5"/>`).join('')
+    return s + '</g></g>'
   }
-  // vùng tháp CHỈ hiện khi có bạn phe kia lấn vào (đỡ rối mắt); bình thường chỉ một vạch mờ sát đế
   if (st.vung) s += `<circle r="${vung}" fill="${m}" fill-opacity="${TOI ? .12 : .1}" stroke="${m}" stroke-opacity=".7" stroke-width="2.5" stroke-dasharray="6 7"/>`
-  if (!YEU && st.vung) s += `<circle r="${r + 12}" fill="${m}" opacity=".25" filter="url(#mo)"/>`
-  const cv = 2 * Math.PI * (r + 7), mau = st.mau ?? 1
-  s += `<circle r="${r + 7}" fill="none" stroke="${v('--tr-chu')}" stroke-opacity=".12" stroke-width="4"/><circle r="${r + 7}" fill="none" stroke="${mau < .35 ? v('--tr-sai') : m}" stroke-width="4" stroke-linecap="round" stroke-dasharray="${(cv * mau).toFixed(1)} ${cv.toFixed(1)}" transform="rotate(-90)"/>`
-  s += `<circle r="${r}" ${thuy()}/><circle r="${r * .62}" fill="${YEU ? m : `url(#c${p})`}" stroke="${d}" stroke-width="1.5"/>`
-  if (st.ngam && P) { const [tx, ty] = P(...st.ngam), g = Math.atan2(ty - Y, tx - X) * 180 / Math.PI; s += `<g transform="rotate(${g.toFixed(1)})"><rect x="${r * .3}" y="-4.5" width="${r * .95}" height="9" rx="4.5" fill="${d}"/></g>` }
-  else s += `<rect x="-4.5" y="${-r * 1.25}" width="9" height="${r * .95}" rx="4.5" fill="${d}"/>`
-  if (!YEU) s += `<ellipse cx="${-r * .22}" cy="${-r * .26}" rx="${r * .2}" ry="${r * .12}" fill="${tr}" opacity=".6"/>`
-  if (t.lon) s += `<circle r="${r * .62 + 4}" fill="none" stroke="${tr}" stroke-opacity=".7" stroke-width="1.5"/>`
-  return s + '</g>'
+  s += '<g transform="scale(1.3)">' // phóng hình tháp (vòng va chạm vẫn là đế r 20 / 25 đơn vị sân)
+  // đế lục giác (hai lớp ⇒ có độ dày)
+  s += `<polygon points="${hex(r, 5)}" fill="${d}"/><polygon points="${hex(r)}" fill="${YEU ? m : `url(#c${p})`}" stroke="${d}" stroke-width="1.5"/>`
+  if (!YEU) s += `<polygon points="${hex(r * .62)}" fill="${tr}" opacity=".35"/>`
+  // cột kính + dung dịch + bọt
+  const y0 = -r * .3, top = y0 - chh
+  s += `<rect x="${-cw / 2}" y="${top}" width="${cw}" height="${chh}" rx="${cw / 2}" fill="${v('--tr-mat')}" fill-opacity="${TOI ? .25 : .8}" stroke="${ch}" stroke-opacity=".35" stroke-width="1.5"/>`
+  s += `<rect x="${-cw / 2 + 2.5}" y="${top + chh * .3}" width="${cw - 5}" height="${chh * .7 - 2}" rx="${(cw - 5) / 2}" fill="${m}" opacity=".85"/>`
+  if (!YEU) s += `<circle cx="-1.5" cy="${top + chh * .55}" r="1.8" fill="${tr}" opacity=".8"/><circle cx="2" cy="${top + chh * .75}" r="1.3" fill="${tr}" opacity=".7"/><rect x="${-cw / 2 + 2}" y="${top + 3}" width="2.2" height="${chh * .5}" rx="1.1" fill="${tr}" opacity=".6"/>`
+  if (L) s += [.35, .62].map((k) => `<ellipse cx="0" cy="${top + chh * k}" rx="${cw / 2 + 5}" ry="3.2" fill="none" stroke="${d}" stroke-width="2.4"/>`).join('')
+  // tinh thể phát tia trên đỉnh
+  const cr = L ? 9 : 7, cy = top - cr * .6
+  if (!YEU) s += `<circle cy="${cy}" r="${cr * (st.vung ? 2.4 : 1.7)}" fill="${m}" opacity="${st.vung ? .5 : .28}" filter="url(#mo)"/>`
+  s += `<path d="M0 ${cy - cr}L${cr * .7} ${cy}L0 ${cy + cr}L${-cr * .7} ${cy}Z" fill="${YEU ? m : `url(#t${p})`}" stroke="${d}" stroke-width="1.3"/>`
+  if (st.ngam && P && st.vung) { const [tx, ty] = P(...st.ngam); s += `<line x1="0" y1="${cy}" x2="${((tx - X) / 1.3).toFixed(1)}" y2="${((ty - Y) / 1.3).toFixed(1)}" stroke="${m}" stroke-width="2" stroke-dasharray="2 6" opacity=".75"/>` }
+  // thanh máu dưới đế
+  const mau = st.mau ?? 1, w = L ? 44 : 36
+  s += `<rect x="${-w / 2}" y="${r * .55 + 9}" width="${w}" height="5" rx="2.5" fill="${ch}" opacity=".14"/><rect x="${-w / 2}" y="${r * .55 + 9}" width="${(w * mau).toFixed(1)}" height="5" rx="2.5" fill="${mau < .35 ? v('--tr-sai') : m}"/>`
+  return s + '</g></g>'
 }
 function tuong(p, mau3, P) { // tường kính 3 mảnh hình cung trước tinh thể; < 60 % nứt; 0 = vỡ (chỉ còn mảnh vụn) ⇒ hở cửa bắn vào tinh thể
   const [cx, cy] = TINH_THE[p], m = v(p ? '--tr-sai' : '--tr-tin'), tr = v('--tr-trang')
