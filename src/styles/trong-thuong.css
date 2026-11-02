@@ -667,7 +667,7 @@
   [data-trong='hs'] .tp-ket .tp-man[data-hai] > .cot-a:has(> .tp-hinh) { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; column-gap: 14px; row-gap: 6px; text-align: left; }
   [data-trong='hs'] .tp-ket .tp-man[data-hai] > .cot-a:has(> .tp-hinh) > .tp-hinh { grid-row: 1 / span 2; width: 92px; height: 84px; }
   [data-trong='hs'] .tp-ket .tp-man[data-hai] > .cot-a:has(> .tp-hinh) > .tp-hinh > div:not(.bi-o) > .bi { width: 72px; height: auto; }
-  [data-trong='hs'] .tp-ket .tp-man[data-hai] > .cot-a:has(> .tp-hinh) > :not(.tp-hinh, .tp-3o) { grid-column: 2; margin: 0; }
+  [data-trong='hs'] .tp-ket .tp-man[data-hai] > .cot-a:has(> .tp-hinh) > h1, [data-trong='hs'] .tp-ket .tp-man[data-hai] > .cot-a:has(> .tp-hinh) > p { grid-column: 2; margin: 0; }
   [data-trong='hs'] .tp-ket .tp-man[data-hai] > .cot-a:has(> .tp-hinh) > .tp-3o { grid-column: 1 / -1; }
   [data-trong='hs'] .tp-ket .tp-man[data-hai] h1 { font-size: 22px; }
 }

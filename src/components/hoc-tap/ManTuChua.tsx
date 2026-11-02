@@ -425,9 +425,11 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
               {(['can', 'cho', 'xong'] as Nhom[]).map((n) => {
                 const ds = dong.filter((d) => d.nhom === n)
                 if (!ds.length || (daDuHomNay && n !== 'xong')) return null // đã sửa đủ hôm nay: ẩn các câu còn lại (không cho sửa thêm)
+                // thầy 02/11 tối («Câu ngoài phần hôm nay chọn bỏ»): có phần hôm nay ⇒ KHÔNG còn danh sách «Tất cả câu cần sửa» — em chỉ sửa đúng phần hôm nay (đã tải sẵn, vào ngay)
+                if (n === 'can' && viec && viec.tong > 0) return null
                 // Có việc hôm nay ⇒ danh sách đầy đủ gập lại (em không phải nhìn cả trăm câu một lúc).
                 return viec && viec.tong > 0
-                  ? <details className="vh-gap" key={n} onToggle={n === 'can' ? (e) => { if (e.currentTarget.open) for (const d of ds.slice(0, 3)) napTruocCauSua(token, d.m.qid) } : undefined}><summary><b>{n === 'can' ? 'Tất cả câu cần sửa' : TEN_NHOM[n]}</b><span>{dem?.[n] ?? ds.length} câu</span></summary><DanhSach nhom={n} ds={ds} tong={dem?.[n]} onChon={moCau} onCham={chamCau} /></details>
+                  ? <details className="vh-gap" key={n}><summary><b>{n === 'can' ? 'Tất cả câu cần sửa' : TEN_NHOM[n]}</b><span>{dem?.[n] ?? ds.length} câu</span></summary><DanhSach nhom={n} ds={ds} tong={dem?.[n]} onChon={moCau} onCham={chamCau} /></details>
                   : <DanhSach key={n} nhom={n} ds={ds} tong={dem?.[n]} onChon={moCau} onCham={chamCau} />
               })}
             </div>

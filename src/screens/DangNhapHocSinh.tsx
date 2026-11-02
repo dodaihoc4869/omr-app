@@ -4,9 +4,8 @@
 // GIỮ NGUYÊN như bản trong StudentPortalScreen (cây JSX chép nguyên văn); cổng vẫn dùng chính màn này khi em đăng xuất.
 // Lệnh máy chủ được TRAO VÀO (`api`): cổng truyền đúng hàm nó nhập từ exam-api (phép kiểm giả lập ở đó), vỏ nhẹ truyền thẳng từ
 // hs-dang-nhap-api.ts — cùng một hàm (exam-api xuất lại), không phải tải exam-api trước khi hiện màn.
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
 import { AlertCircle, Eye, EyeOff, Lock, LogIn, RefreshCw, Sparkles } from 'lucide-react'
-import { LoiChao } from '../components/bat-linh/LoiChao'
 import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
 import { voiHanCho } from '../lib/han-cho'
 import type { hsDangNhapApi, hsDatMatKhauApi } from '../lib/hs-dang-nhap-api'
@@ -17,6 +16,11 @@ import cssTrong from '../styles/trong-hs-dang-nhap.css?inline'
 // Giao diện «Trong» (thầy chốt 26/10): kiểu riêng màn đăng nhập NHÚNG vào mảnh này (không thêm tệp tải / tệp cất sẵn); mọi luật dưới [data-trong='hs']
 // ⇒ giao diện cũ (ddh.trong = 'tat') không đổi gì.
 if (typeof document !== 'undefined' && !document.getElementById('trong-hs-dn')) document.head.append(Object.assign(document.createElement('style'), { id: 'trong-hs-dn', textContent: cssTrong }))
+
+// Lời chào + ảnh thần thú: chỉ giao diện cũ (ddh.trong = 'tat') còn hiện ⇒ nạp lười đúng lúc ấy. Giao diện Trong / Kính không dựng (trước: dựng rồi ẩn bằng CSS
+// nhưng thẻ <img> vẫn tải ảnh) — bớt mã + một ảnh ở màn đầu tiên, bù chỗ cho kiểu kính (thầy 02/11 «Màn đăng nhập làm kính nhé»).
+const LoiChaoCu = lazy(() => import('../components/bat-linh/LoiChao').then((m) => ({ default: m.LoiChao })))
+const coTrong = () => typeof document !== 'undefined' && !!document.documentElement.dataset.trong
 
 export interface ApiDangNhapHs {
   dangNhap: typeof hsDangNhapApi
@@ -150,7 +154,7 @@ export default function DangNhapHocSinh({ api, onDangNhap, logo }: { api: ApiDan
     <div className="bl-login"><section className="gd-cong-gioi-thieu"><h1>Hành trình giỏi Hóa</h1></section>
       <div className="bl-login__card">
         <div className="bl-login__brand">{logo}</div>
-        <LoiChao vai="hs" />
+        {!coTrong() && <Suspense fallback={null}><LoiChaoCu vai="hs" /></Suspense>}
 
         {chuaCoMatKhau ? (
           <form onSubmit={xuLyDatMatKhau} className="space-y-4">

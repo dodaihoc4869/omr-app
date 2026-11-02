@@ -1,0 +1,350 @@
+<!doctype html>
+<!-- BẢN VẼ «Đấu Nguyên Tử v2 — Phòng thí nghiệm kính» (02/11, thầy: «Làm game 3 đấu 3 phòng chờ thi xuất sắc hơn nữa, đẹp hơn nữa. Vẽ tôi duyệt rồi build»).
+     Trang tĩnh HTML/SVG — CHỈ để thầy duyệt hình; màu lấy đúng token của app (tokens.css + trong-hs-mau.css), phông ĐĐH Rounded của app học sinh.
+     ?canh=sanh|tran|goiy|vaothay|het  &yeu=1 (máy yếu). Khổ do cửa sổ chụp quyết định (chup.mjs). -->
+<html lang="vi" data-trong="hs">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="../../src/styles/tokens.css">
+<link rel="stylesheet" href="../../src/styles/trong-hs-mau.css">
+<style>
+@font-face { font-family: 'DDH Rounded'; font-weight: 100 549; src: url('../../src/styles/phong-ddh/ddh-rounded-de-vietnamese.woff2') format('woff2'); unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB; }
+@font-face { font-family: 'DDH Rounded'; font-weight: 100 549; src: url('../../src/styles/phong-ddh/ddh-rounded-de-latin.woff2') format('woff2'); }
+@font-face { font-family: 'DDH Rounded'; font-weight: 550 1000; src: url('../../src/styles/phong-ddh/ddh-rounded-dam-vietnamese.woff2') format('woff2'); unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB; }
+@font-face { font-family: 'DDH Rounded'; font-weight: 550 1000; src: url('../../src/styles/phong-ddh/ddh-rounded-dam-latin.woff2') format('woff2'); }
+:root { --p0: var(--tr-tin); --p0-chu: var(--tr-tin-chu); --p0-nhat: var(--tr-tin-nhat); --p0-day: var(--tr-tin-day);
+  --p1: var(--tr-sai); --p1-chu: var(--tr-sai-chu); --p1-nhat: var(--tr-sai-nhat); --p1-day: var(--tr-sai-day);
+  --e: var(--tr-dung); --vang: var(--tr-sao); --san: color-mix(in oklab, var(--tr-nen) 88%, var(--tr-hs));
+  --kinh: color-mix(in oklab, var(--tr-mat) 70%, transparent); --vien-k: color-mix(in oklab, var(--tr-trang) 70%, transparent); }
+@media (prefers-color-scheme: dark) { :root { --san: color-mix(in oklab, var(--tr-nen) 90%, var(--tr-hs-day)); --kinh: color-mix(in oklab, var(--tr-mat) 62%, transparent);
+  --vien-k: color-mix(in oklab, var(--tr-chu) 14%, transparent); --p0-nhat: color-mix(in oklab, var(--tr-tin) 22%, var(--tr-mat)); --p1-nhat: color-mix(in oklab, var(--tr-sai) 22%, var(--tr-mat)); } }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { font-family: 'DDH Rounded', 'Noto Sans', sans-serif; font-weight: 500; color: var(--tr-chu); background: var(--tr-nen) var(--kinh-loang); overflow: hidden; }
+b, strong, h1, h2, button { font-weight: 800; }
+.kinh { background: var(--kinh); border-radius: 22px; box-shadow: inset 0 1px 0 var(--vien-k), inset 0 0 0 1px color-mix(in oklab, var(--tr-chu) 8%, transparent), 0 14px 32px -20px var(--tr-phu); }
+.yeu .kinh { background: var(--tr-mat); }
+/* ── TRẬN */
+.tran { position: fixed; inset: 0; display: grid; place-items: center; }
+.tran svg.san { display: block; }
+.hud { position: fixed; inset: 0; pointer-events: none; font-size: 13px; }
+.hud .tren { position: absolute; top: max(8px, env(safe-area-inset-top)); left: 10px; right: 10px; display: flex; align-items: center; gap: 10px; }
+.roi { height: 40px; border-radius: 20px; display: flex; align-items: center; gap: 2px; padding: 0 12px 0 8px; flex: none; font-weight: 800; font-size: 13px; }
+.doc .roi { padding: 0 10px 0 6px; font-size: 12px; }
+.xoay { position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 14px; font-size: 11.5px; font-weight: 700; color: var(--tr-chu-2); white-space: nowrap; }
+.ti { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 22px; margin: 0 auto; min-width: 0; }
+.doc .ti { flex: 1; gap: 6px; } .doc .ti .phe .ten { display: none; } .doc .ph { flex: 1; width: auto; min-width: 70px; } .doc .hud .tren { top: max(20px, env(safe-area-inset-top)); }
+.ti .phe { display: flex; align-items: center; gap: 6px; font-weight: 800; }
+.ti .phe i { font-style: normal; font-size: 11px; font-weight: 800; padding: 2px 6px; border-radius: 9px; color: var(--tr-trang); }
+.ti .so { font-size: 22px; font-weight: 800; min-width: 26px; text-align: center; font-variant-numeric: tabular-nums; }
+.ph { position: relative; width: 132px; height: 30px; display: grid; place-items: center; }
+.ph .vach { position: absolute; left: 0; right: 0; top: 11px; height: 8px; border-radius: 4px;
+  background: linear-gradient(90deg, var(--tr-hs), var(--tr-tin), var(--tr-dung), var(--tr-sao), var(--tr-chu-y), var(--tr-sai)); }
+.ph .kim { position: absolute; top: 6px; width: 6px; height: 18px; border-radius: 3px; background: var(--tr-trang); box-shadow: 0 0 0 2px var(--tr-chu), 0 2px 6px var(--tr-phu); }
+.ph .gio { position: relative; font-size: 11px; font-weight: 800; padding: 1px 7px; border-radius: 8px; background: var(--tr-chu); color: var(--tr-trang); top: -15px; }
+.tt-thanh { position: relative; width: 104px; height: 10px; border-radius: 5px; background: color-mix(in oklab, var(--tr-chu) 12%, transparent); overflow: hidden; display: flex; }
+.tt-thanh[data-phe='1'] { justify-content: flex-end; }
+.tt-thanh i { display: block; height: 100%; border-radius: 5px; background: var(--tr-tin); padding: 0 !important; }
+.tt-thanh[data-phe='1'] i { background: var(--tr-sai); }
+.ti .pt { font-size: 15px; font-weight: 800; min-width: 38px; text-align: center; font-variant-numeric: tabular-nums; }
+.gio2 { font-size: 13px; font-weight: 800; padding: 3px 9px; border-radius: 10px; background: var(--tr-chu); color: var(--tr-trang); font-variant-numeric: tabular-nums; }
+.doc .ti svg { display: none; } .doc .ti { gap: 4px; padding: 5px 6px; } .doc .ti .phe { gap: 4px; }
+.doc .tt-thanh { width: auto; flex: 1; min-width: 40px; } .doc .ti .phe { flex: 1; } .doc .ti .pt { min-width: 32px; font-size: 13px; }
+.bao-tt { position: fixed; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 18px; font-weight: 800; font-size: 13px; color: var(--tr-sai-chu); box-shadow: inset 0 0 0 2px var(--tr-sai), 0 10px 24px -14px var(--tr-sai); white-space: nowrap; }
+.toi .bao-tt { color: var(--tr-sai); }
+.vien-do { position: fixed; inset: 0; pointer-events: none; box-shadow: inset 0 0 60px -10px color-mix(in oklab, var(--tr-sai) 55%, transparent); }
+.yeu .vien-do { box-shadow: inset 0 0 0 3px color-mix(in oklab, var(--tr-sai) 60%, transparent); }
+.em { display: flex; align-items: center; gap: 8px; padding: 5px 12px 5px 6px; border-radius: 22px; flex: none; }
+.em .mau { width: 74px; height: 7px; border-radius: 4px; background: color-mix(in oklab, var(--tr-chu) 12%, transparent); overflow: hidden; }
+.em .mau i { display: block; height: 100%; width: 72%; border-radius: 4px; background: linear-gradient(90deg, var(--tr-dung-nut), var(--tr-dung)); }
+.em small { font-size: 11px; color: var(--tr-chu-2); font-weight: 700; }
+.cap { font-size: 11px; font-weight: 800; padding: 2px 7px; border-radius: 9px; background: color-mix(in oklab, var(--tr-dung) 25%, var(--tr-mat)); color: var(--tr-dung-chu); }
+.tin { position: absolute; display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+.tin span { padding: 3px 10px; border-radius: 14px; font-size: 11.5px; font-weight: 700; display: flex; gap: 6px; align-items: center; }
+.tin span b.p0 { color: var(--p0-chu); } .tin span b.p1 { color: var(--p1-chu); }
+.toi .tin span b.p0 { color: var(--p0); } .toi .tin span b.p1 { color: var(--p1); }
+@media (min-width: 1200px) { .hud { zoom: 1.3; } }
+.goiy { position: fixed; left: 50%; top: 58%; transform: translate(-50%, -50%); padding: 12px 20px; border-radius: 26px; font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 12px; }
+.bang-vao { position: fixed; left: 50%; top: 56px; transform: translateX(-50%); padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 13px; display: flex; gap: 8px; align-items: center; }
+/* ── SẢNH */
+.trang { height: 100%; overflow: hidden; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.ca { font-size: 12.5px; color: var(--tr-chu-3); text-align: center; line-height: 1.5; }
+.the { padding: 16px; display: flex; flex-direction: column; gap: 12px; border-radius: 28px; }
+.the-dau { display: flex; align-items: flex-end; justify-content: space-between; gap: 6px 10px; flex-wrap: wrap; }
+.the-dau small { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--tr-chu-3); font-weight: 800; }
+.the-dau h1 { margin: 2px 0 0; font-size: 27px; letter-spacing: -.02em; white-space: nowrap; }
+.cup { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 16px; font-size: 12px; font-weight: 800; color: var(--tr-sao-chu); background: var(--tr-sao-nhat); }
+.toi .cup { color: var(--tr-sao); background: color-mix(in oklab, var(--tr-sao) 18%, var(--tr-mat)); }
+.xem { border-radius: 20px; overflow: hidden; position: relative; }
+.xem svg.san { width: 100%; height: auto; }
+.ghe { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; }
+.ghe .doi { display: flex; justify-content: center; gap: 2px; min-width: 0; }
+.ghe .vs { font-weight: 800; font-size: 13px; color: var(--tr-chu-3); white-space: nowrap; }
+.o-ghe { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10.5px; font-weight: 700; color: var(--tr-chu-2); flex: 1 1 0; min-width: 0; max-width: 56px; }
+.nut-dau { position: relative; height: 62px; border: 0; border-radius: 31px; font: inherit; font-size: 21px; font-weight: 800; color: var(--tr-hs-tren);
+  background: linear-gradient(135deg, var(--tr-hs), var(--tr-hs-nut)); box-shadow: 0 12px 26px -12px var(--tr-hs-day), inset 0 1px 0 color-mix(in oklab, var(--tr-trang) 40%, transparent);
+  display: flex; align-items: center; justify-content: center; gap: 10px; }
+.nut-dau small { font-size: 12px; font-weight: 700; opacity: .9; }
+.nt { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; }
+@media (max-width: 520px) { .o-nt span:last-child { display: none; } .o-nt b { font-size: 17px; } .o-nt { aspect-ratio: 1 / 1.05; } }
+.nt-ten { font-size: 12px; color: var(--tr-chu-2); margin-top: 6px; text-align: center; } .nt-ten b { color: var(--tr-chu); }
+.o-nt { min-width: 0; aspect-ratio: 1 / 1.12; border-radius: 12px; padding: 4px 5px; display: flex; flex-direction: column; justify-content: space-between; font-size: 9px; font-weight: 700; color: var(--tr-chu-3); background: var(--tr-mat); box-shadow: inset 0 0 0 1px var(--tr-vien); }
+.o-nt b { font-size: 19px; color: var(--tr-chu); text-align: center; line-height: 1; }
+.o-nt span { text-align: center; font-size: 8.5px; white-space: nowrap; overflow: hidden; }
+.o-nt[data-chon] { box-shadow: inset 0 0 0 2.5px var(--tr-hs-day), 0 8px 18px -10px var(--tr-hs-day); background: var(--tr-hs-nhat); }
+.toi .o-nt[data-chon] { background: color-mix(in oklab, var(--tr-hs) 26%, var(--tr-mat)); }
+.luat { font-size: 12.5px; color: var(--tr-chu-2); line-height: 1.5; text-align: center; }
+.hai-cot { display: grid; grid-template-columns: 1.15fr 1fr; gap: 16px; align-items: start; }
+.thap .trang { padding: 8px 16px; gap: 6px; } .thap .ca { display: none; } .thap .the { padding: 12px 16px; gap: 8px; border-radius: 24px; }
+.thap .the-dau h1 { font-size: 22px; } .thap .nut-dau { height: 50px; font-size: 18px; } .thap .o-nt { aspect-ratio: 1 / .78; } .thap .o-nt span:last-child { display: none; }
+.thap .hai-cot { gap: 12px; } .thap .luat { font-size: 11.5px; } .thap .o-ghe svg { width: 32px; height: 32px; }
+/* ── HẾT VÁN */
+.phu { position: fixed; inset: 0; display: grid; place-items: center; background: color-mix(in oklab, var(--tr-nen) 55%, transparent); }
+.yeu .phu { background: color-mix(in oklab, var(--tr-nen) 85%, transparent); }
+.ket { width: min(720px, calc(100vw - 24px)); padding: 16px; border-radius: 30px; display: flex; flex-direction: column; gap: 12px; background: color-mix(in oklab, var(--tr-mat) 90%, transparent); }
+.ket h2 { margin: 0; text-align: center; font-size: 28px; letter-spacing: -.02em; }
+.ket .phu-dong { text-align: center; font-size: 13px; color: var(--tr-chu-2); margin-top: -6px; }
+.ket .ph-lon { position: relative; height: 34px; margin: 0 20px; }
+.ket .ph-lon .vach { position: absolute; left: 0; right: 0; top: 13px; height: 10px; border-radius: 5px; background: linear-gradient(90deg, var(--tr-hs), var(--tr-tin), var(--tr-dung), var(--tr-sao), var(--tr-chu-y), var(--tr-sai)); }
+.ket .ph-lon .kim { position: absolute; top: 2px; transform: translateX(-50%); padding: 1px 8px; border-radius: 10px; background: var(--tr-chu); color: var(--tr-trang); font-size: 11px; font-weight: 800; white-space: nowrap; }
+.ket .ph-lon .n { position: absolute; top: 25px; font-size: 10px; font-weight: 800; color: var(--tr-chu-3); }
+.cot2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 600px) { .cot2 { grid-template-columns: 1fr; gap: 8px; } .doi-the { padding: 8px; gap: 4px; } .hang { padding: 4px 8px; } .doi-dau .tong { font-size: 22px; } .ket { gap: 10px; padding: 14px 12px; } .ket h2 { font-size: 25px; } }
+.hang > span:nth-child(2) { min-width: 0; }
+.thap .phu { align-items: start; padding-top: 8px; } .thap .ket { gap: 6px; padding: 10px 14px; } .thap .ket h2 { font-size: 22px; } .thap .ket .phu-dong { margin-top: -4px; font-size: 12px; }
+.thap .ket .ph-lon { height: 26px; } .thap .ket .ph-lon .n { display: none; } .thap .ket .ph-lon .vach { top: 9px; } .thap .ket .ph-lon .kim { top: 0; }
+.thap .doi-the { padding: 6px; gap: 3px; } .thap .hang { padding: 2px 8px; } .thap .hang small { display: inline; margin-left: 6px; white-space: nowrap; } .thap .hang .ten { display: inline; white-space: nowrap; } .thap .doi-dau .tong { font-size: 20px; }
+.thap .day-ket .pu { padding: 5px 10px; font-size: 12px; } .thap .ve-phong { padding: 7px 14px; } .thap .kq-tt { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.kq-tt > span { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 18px; font-size: 12px; font-weight: 700; color: var(--tr-chu-2); }
+.kq-tt > span > span { display: flex; flex-direction: column; } .kq-tt b { font-size: 16px; color: var(--tr-chu); }
+.kq-tt [data-phe='0'] { box-shadow: inset 0 0 0 2px var(--tr-tin); } .kq-tt [data-phe='1'] { box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--tr-sai) 50%, transparent); }
+.thap .kq-tt > span { padding: 4px 10px; } .thap .kq-tt b { font-size: 14px; }
+.day-dong { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.doi-the { border-radius: 22px; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+.doi-the[data-phe='0'] { background: color-mix(in oklab, var(--p0-nhat) 75%, transparent); box-shadow: inset 0 0 0 2px var(--p0); }
+.doi-the[data-phe='1'] { background: color-mix(in oklab, var(--p1-nhat) 75%, transparent); box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--p1) 55%, transparent); }
+.doi-dau { display: flex; align-items: center; gap: 8px; font-weight: 800; }
+.doi-dau .tong { margin-left: auto; font-size: 26px; }
+.hang { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 14px; background: color-mix(in oklab, var(--tr-mat) 72%, transparent); }
+.hang[data-em] { box-shadow: inset 0 0 0 2px var(--p0); }
+.hang .ten { font-weight: 800; font-size: 13px; line-height: 1.2; } .hang small { display: block; font-size: 10.5px; color: var(--tr-chu-3); font-weight: 600; }
+.hh { margin-left: auto; display: flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 800; padding: 3px 8px 3px 4px; border-radius: 12px; background: var(--tr-sao-nhat); color: var(--tr-sao-chu); white-space: nowrap; }
+.toi .hh { background: color-mix(in oklab, var(--tr-sao) 20%, var(--tr-mat)); color: var(--tr-sao); }
+.day-dong { display: flex; flex-direction: column; gap: 12px; }
+.day-ket { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.pu { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 18px; font-weight: 800; font-size: 13px; background: var(--tr-mat); box-shadow: inset 0 0 0 1px var(--tr-vien); }
+.vong-dem { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--tr-chu-2); font-weight: 700; }
+.ve-phong { padding: 10px 18px; border-radius: 20px; font-weight: 800; color: var(--tr-hs-tren); background: var(--tr-hs-nut); }
+</style>
+</head>
+<body>
+<script>
+const q = new URLSearchParams(location.search), CANH = q.get('canh') || 'tran', YEU = q.get('yeu') === '1'
+const TOI = matchMedia('(prefers-color-scheme: dark)').matches
+document.body.classList.toggle('toi', TOI); document.body.classList.toggle('yeu', YEU); document.body.classList.toggle('doc', innerHeight > innerWidth); document.body.classList.toggle('thap', innerHeight < 500)
+const W = innerWidth, H = innerHeight, DOC = H > W
+const cs = getComputedStyle(document.documentElement), v0 = (n) => cs.getPropertyValue(n).trim()
+const v = (n) => v0(n === '--tr-trang' && TOI ? '--tr-chu' : n)
+const CAPM = ['', TOI ? '--tr-chu-3' : '--tr-vien-2', '--tr-dung', '--tr-chu-y', '--tr-hs', '--tr-sao'] // màu 5 cấp súng giữ như v1 (--dn-capm-1…5)
+const CHU_NT = v0(TOI ? '--tr-nen' : '--tr-chu') // ký hiệu trên quả cầu sáng: luôn chữ tối // tối: --tr-trang là nền tối ⇒ điểm sáng dùng --tr-chu
+// ─── NGUYÊN TỬ: quả cầu bóng màu phe + VÒNG ELECTRON = cấp súng (1–5) + ký hiệu + nhãn tên; máy yếu: hình phẳng, 1 vòng tĩnh
+const NT = { Na: 'Natri', O: 'Oxi', N: 'Nitơ', Cl: 'Clo', S: 'Lưu huỳnh', Fe: 'Sắt', Ne: 'Neon' }
+function defs() {
+  const g = (id, a, b, c) => `<radialGradient id="${id}" cx=".34" cy=".3" r=".78"><stop offset="0" stop-color="${a}"/><stop offset=".42" stop-color="${b}"/><stop offset="1" stop-color="${c}"/></radialGradient>`
+  const vang = v('--tr-sao'), p0 = v('--tr-tin'), p1 = v('--tr-sai'), tr = v('--tr-trang')
+  return `<defs>${g('c0', tr, p0, v('--tr-tin-day'))}${g('c1', tr, p1, v('--tr-sai-day'))}
+    <radialGradient id="z0" cx="0" cy=".5" r=".75"><stop offset="0" stop-color="${p0}" stop-opacity="${TOI ? .32 : .22}"/><stop offset="1" stop-color="${p0}" stop-opacity="0"/></radialGradient>
+    <radialGradient id="z1" cx="1" cy=".5" r=".75"><stop offset="0" stop-color="${p1}" stop-opacity="${TOI ? .3 : .2}"/><stop offset="1" stop-color="${p1}" stop-opacity="0"/></radialGradient>
+    <linearGradient id="v0" x1="1" x2="0"><stop offset="0" stop-color="${p0}"/><stop offset="1" stop-color="${p0}" stop-opacity="0"/></linearGradient>
+    <linearGradient id="v1" x1="1" x2="0"><stop offset="0" stop-color="${p1}"/><stop offset="1" stop-color="${p1}" stop-opacity="0"/></linearGradient>
+    <linearGradient id="nuoc" x1="0" x2="1"><stop offset="0" stop-color="${p0}"/><stop offset=".5" stop-color="${v('--tr-dung')}"/><stop offset="1" stop-color="${p1}"/></linearGradient>
+    <linearGradient id="t0" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${tr}"/><stop offset=".35" stop-color="${p0}"/><stop offset="1" stop-color="${v('--tr-tin-day')}"/></linearGradient><linearGradient id="t1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${tr}"/><stop offset=".35" stop-color="${p1}"/><stop offset="1" stop-color="${v('--tr-sai-day')}"/></linearGradient>
+    <pattern id="luc" width="34" height="58.9" patternUnits="userSpaceOnUse" patternTransform="scale(.9)"><path d="M17 0l17 9.8v19.6L17 39.3 0 29.4V9.8zM17 39.3v19.6" fill="none" stroke="${v('--tr-chu')}" stroke-opacity="${TOI ? .07 : .06}" stroke-width="1.2"/></pattern>
+    <filter id="mo" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5"/></filter></defs>`
+}
+function nguyenTu(x, y, o) {
+  const r = o.r || 21, p = o.phe, mau = v(p ? '--tr-sai' : '--tr-tin'), chu = v(p ? '--tr-sai-chu' : '--tr-tin-chu'), nhat = v(p ? '--tr-sai-nhat' : '--tr-tin-nhat')
+  let s = `<g transform="translate(${x} ${y})">`
+  if (!YEU) s += `<circle r="${r + 10}" fill="${mau}" opacity=".18" filter="url(#mo)"/>`
+  // vòng electron = cấp súng (máy yếu: một vòng tĩnh)
+  const n = YEU ? Math.min(1, o.cap) : o.cap
+  for (let i = 0; i < n; i++) { const R = r + 7 + i * 4.5, goc = (i * 62 + 18) % 180
+    s += `<g transform="rotate(${goc})"><ellipse rx="${R}" ry="${R * .36}" fill="none" stroke="${mau}" stroke-opacity="${.55 - i * .06}" stroke-width="1.6"/><circle cx="${R}" r="2.6" fill="${mau}"/></g>` }
+  if (o.em) s += `<circle r="${r + 4}" fill="none" stroke="${v('--tr-trang')}" stroke-width="3.2"/><circle r="${r + 5.8}" fill="none" stroke="${v('--tr-chu')}" stroke-opacity=".5" stroke-width=".8"/>`
+  s += `<circle r="${r}" fill="${YEU ? mau : `url(#c${p})`}" stroke="${v(p ? '--tr-sai-day' : '--tr-tin-day')}" stroke-width="1.6"/>`
+  if (!YEU) s += `<ellipse cx="${-r * .32}" cy="${-r * .4}" rx="${r * .38}" ry="${r * .22}" fill="${v('--tr-trang')}" opacity=".55"/>`
+  s += `<text y="${o.nt.length > 1 ? 5 : 6}" text-anchor="middle" font-size="${o.nt.length > 1 ? 14 : 16}" font-weight="800" fill="${CHU_NT}">${o.nt}</text>`
+  if (o.khien) s += `<circle r="${r + 13}" fill="none" stroke="${v('--tr-tin')}" stroke-width="2.5" stroke-dasharray="6 4" opacity=".9"/>`
+  // thanh máu nhỏ dưới (không phải em) + nhãn tên trên
+  if (!o.em) { const w = 34; s += `<rect x="${-w / 2}" y="${r + 7}" width="${w}" height="4.5" rx="2.2" fill="${v('--tr-chu')}" opacity=".14"/><rect x="${-w / 2}" y="${r + 7}" width="${w * (o.mau ?? 1)}" height="4.5" rx="2.2" fill="${(o.mau ?? 1) < .35 ? v('--tr-sai') : v('--tr-dung')}"/>` }
+  const ten = o.em ? 'Em' : o.ten, tw = ten.length * 6.6 + (o.ai ? 0 : 0) + 22
+  s += `<g transform="translate(0 ${-r - 19})"><rect x="${-tw / 2}" y="-10" width="${tw}" height="20" rx="10" fill="${o.em ? mau : (TOI ? v('--tr-mat') : nhat)}" stroke="${mau}" stroke-opacity="${o.em ? 0 : .6}"/>`
+  s += `<circle cx="${-tw / 2 + 10}" cy="0" r="6.5" fill="${v(CAPM[o.cap])}" stroke="${v('--tr-trang')}"/><text x="${-tw / 2 + 10}" y="3.2" text-anchor="middle" font-size="8.5" font-weight="800" fill="${CHU_NT}">${o.cap}</text>`
+  s += `<text x="${8}" y="4" text-anchor="middle" font-size="11" font-weight="800" fill="${o.em ? v('--tr-trang') : (TOI ? mau : chu)}">${ten}</text></g>`
+  return s + '</g>'
+}
+// ─── DỤNG CỤ THÍ NGHIỆM — ĐÚNG VAT_CAN của src/lib/dau-ion/loi.ts (vị trí + hình va chạm giữ nguyên, chỉ đổi da). Dung dịch màu trung tính.
+const MAU_DD = { 0: '--tr-dung', 3: '--tr-dung', 4: '--tr-tim', 5: '--tr-sao' }
+const VAT_CAN = [
+  { k: 'tron', x: 520, y: 260, r: 46, ve: 'binh-cau', mau: 3 }, { k: 'tron', x: 520, y: 135, r: 22, ve: 'binh-non', mau: 4 },
+  { k: 'tron', x: 520, y: 385, r: 22, ve: 'binh-non', mau: 4 }, { k: 'tron', x: 400, y: 260, r: 20, ve: 'binh-non', mau: 0 },
+  { k: 'tron', x: 640, y: 260, r: 20, ve: 'binh-non', mau: 0 },
+  { k: 'cn', x: 136, y: 200, w: 22, h: 120, ve: 'gia-ong' }, { k: 'cn', x: 882, y: 200, w: 22, h: 120, ve: 'gia-ong' },
+  { k: 'cn', x: 278, y: 74, w: 44, h: 44, ve: 'coc', mau: 5 }, { k: 'cn', x: 278, y: 402, w: 44, h: 44, ve: 'coc', mau: 5 },
+  { k: 'cn', x: 718, y: 74, w: 44, h: 44, ve: 'coc', mau: 5 }, { k: 'cn', x: 718, y: 402, w: 44, h: 44, ve: 'coc', mau: 5 }]
+const BE_PHE = [[[76, 96], [102, 260], [76, 424]], [[964, 424], [938, 260], [964, 96]]]
+// TINH THỂ (thầy 02/11 tối «Cho mỗi bên một tinh thể, bên nào tinh thể bị bắn vỡ trước là thua»): mỗi phe một tinh thể sau tường giá ống của căn cứ
+const TINH_THE = [[46, 260], [994, 260]]
+const CHO_XT = [[520, 58], [520, 462]], CHO_KH = [[200, 260], [840, 260]]
+const thuy = () => `fill="${v('--tr-mat')}" fill-opacity="${TOI ? .13 : .72}" stroke="${v('--tr-chu')}" stroke-opacity="${TOI ? .42 : .34}" stroke-width="2"`
+const loe = (r) => YEU ? '' : `<path d="M${-r * .55} ${-r * .15} q${r * .1} ${-r * .45} ${r * .45} ${-r * .55}" fill="none" stroke="${v('--tr-trang')}" stroke-opacity=".7" stroke-width="2.4" stroke-linecap="round"/>`
+function binhCau(X, Y, r, mau) { // bình cầu đáy tròn: thân = vòng va chạm; cổ trang trí phía trên
+  const dd = v(MAU_DD[mau])
+  return `<g transform="translate(${X} ${Y})"><rect x="-9" y="${-r - 10}" width="18" height="16" rx="4" ${thuy()}/><circle r="${r}" ${thuy()}/>
+  <clipPath id="tc"><circle r="${r - 3}"/></clipPath><g clip-path="url(#tc)"><rect x="${-r}" y="${r * .08}" width="${r * 2}" height="${r}" fill="${dd}" opacity=".7"/>${YEU ? '' : `<path d="M${-r} ${r * .08} q${r / 2} -6 ${r} 0 t${r} 0" fill="none" stroke="${v('--tr-trang')}" stroke-opacity=".6" stroke-width="2"/><circle cx="-12" cy="${r * .5}" r="3.5" fill="${v('--tr-trang')}" opacity=".6"/><circle cx="10" cy="${r * .62}" r="2.6" fill="${v('--tr-trang')}" opacity=".5"/>`}</g>
+  ${loe(r)}<text y="${-r * .28}" text-anchor="middle" font-size="12" font-weight="800" fill="${v('--tr-chu-2')}">pH 7</text></g>` }
+function binhNon(X, Y, r, mau) { // bình nón nội tiếp vòng va chạm
+  const dd = v(MAU_DD[mau]), c = r * .26, f = (n) => (n * r).toFixed(1), xl = c + .652 * (.85 * r - c)
+  return `<g transform="translate(${X} ${Y})"><path d="M${f(-.26)} ${f(-1)}H${f(.26)}V${f(-.4)}L${f(.85)} ${f(.72)}Q${f(.92)} ${f(.92)} ${f(.68)} ${f(.92)}H${f(-.68)}Q${f(-.92)} ${f(.92)} ${f(-.85)} ${f(.72)}L${f(-.26)} ${f(-.4)}Z" ${thuy()}/>
+  <path d="M${(-xl).toFixed(1)} ${f(.35)}H${xl.toFixed(1)}L${f(.8)} ${f(.72)}Q${f(.85)} ${f(.86)} ${f(.66)} ${f(.86)}H${f(-.66)}Q${f(-.85)} ${f(.86)} ${f(-.8)} ${f(.72)}Z" fill="${dd}" opacity=".78"/>${YEU ? '' : `<path d="M${f(-.1)} ${f(-.3)}L${f(-.42)} ${f(.4)}" stroke="${v('--tr-trang')}" stroke-opacity=".7" stroke-width="2.2" stroke-linecap="round"/>`}</g>` }
+function giaOng(X, Y, w, h, ngang) { // giá ống nghiệm (tường chắn căn cứ); dọc màn hình ⇒ giá nằm ngang
+  const W = ngang ? h : w, H = ngang ? w : h, n = 5, m = ['--tr-dung', '--tr-sao', '--tr-tim', '--tr-chu-y', '--tr-dung']
+  let s = `<g transform="translate(${X} ${Y})"><rect x="${-W / 2}" y="${-H / 2}" width="${W}" height="${H}" rx="8" ${thuy()}/>`
+  for (let i = 0; i < n; i++) { const t = -0.5 + (i + .5) / n
+    s += ngang ? `<rect x="${t * W - 6}" y="${-H / 2 + 4}" width="12" height="${H - 8}" rx="6" fill="${v(m[i])}" opacity=".78"/>` : `<rect x="${-W / 2 + 4}" y="${t * H - 6}" width="${W - 8}" height="12" rx="6" fill="${v(m[i])}" opacity=".78"/>` }
+  return s + '</g>' }
+function coc(X, Y, a, mau) { // cốc có mỏ, vạch chia
+  const h = a / 2, dd = v(MAU_DD[mau])
+  return `<g transform="translate(${X} ${Y})"><path d="M${-h} ${-h}h${a}l-3 ${a - 6}q-1 6 -7 6h${-(a - 20)}q-6 0 -7 -6z" ${thuy()}/><path d="M${-h} ${-h}l-5 -3" stroke="${v('--tr-chu')}" stroke-opacity=".34" stroke-width="2" stroke-linecap="round"/>
+  <path d="M${-h + 3} 2h${a - 6}l-2 ${h - 8}q-1 4 -5 4h${-(a - 20)}q-4 0 -5 -4z" fill="${dd}" opacity=".75"/>${[-10, -2, 6].map((y) => `<line x1="${h - 12}" x2="${h - 5}" y1="${y}" y2="${y}" stroke="${v('--tr-chu')}" stroke-opacity=".35" stroke-width="1.5"/>`).join('')}${loe(h)}</g>` }
+function tinhThe(X, Y, p, mau, bi) { // lăng trụ lục giác (tinh thể) màu phe + vòng máu; < 60 % nứt; bị bắn: loé
+  const m = v(p ? '--tr-sai' : '--tr-tin'), d = v(p ? '--tr-sai-day' : '--tr-tin-day'), tr = v('--tr-trang'), R = 40, cv = 2 * Math.PI * R
+  let s = `<g transform="translate(${X} ${Y})">`
+  if (!YEU) s += `<circle r="${bi ? 46 : 40}" fill="${m}" opacity="${bi ? .34 : .22}" filter="url(#mo)"/>`
+  s += `<circle r="${R}" fill="none" stroke="${v('--tr-chu')}" stroke-opacity=".12" stroke-width="5"/><circle r="${R}" fill="none" stroke="${mau < .35 ? v('--tr-sai') : m}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${(cv * mau).toFixed(1)} ${cv.toFixed(1)}" transform="rotate(-90)"/>`
+  s += `<path d="M0 -34L20 -16V16L0 34L-20 16V-16Z" fill="${YEU ? m : `url(#t${p})`}" stroke="${d}" stroke-width="2"/>`
+  if (!YEU) s += `<path d="M0 -34L-20 -16L-6 -6L0 -34Z" fill="${tr}" opacity=".55"/><path d="M0 -34V34M-20 -16L0 -4L20 -16M-20 16L0 4L20 16" fill="none" stroke="${tr}" stroke-opacity=".35" stroke-width="1.2"/>`
+  if (mau < .6) s += `<path d="M-14 -12l9 7-5 6 8 6-3 9M12 -20l-6 10 7 5-5 8" fill="none" stroke="${tr}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>`
+  if (bi && !YEU) s += [0, 60, 120, 180, 240, 300].map((a) => `<line x1="0" y1="50" x2="0" y2="60" transform="rotate(${a})" stroke="${m}" stroke-width="3" stroke-linecap="round"/>`).join('')
+  return s + '</g>'
+}
+const vatPham = (x, y, k) => k === 'xt'
+  ? `<g transform="translate(${x} ${y})">${YEU ? '' : `<circle r="22" fill="${v('--tr-sao')}" opacity=".18" filter="url(#mo)"/>`}<path d="M0-15l13 7.5v15L0 15-13 7.5v-15z" fill="${v('--tr-sao-nhat')}" stroke="${v('--tr-sao-day')}" stroke-width="2"/><path d="M2-9l-7 10h5l-2 8 7-10h-5z" fill="${v('--tr-sao-day')}"/></g>`
+  : `<g transform="translate(${x} ${y})">${YEU ? '' : `<circle r="22" fill="${v('--tr-hs')}" opacity=".16" filter="url(#mo)"/>`}<path d="M0-15l13 7.5v15L0 15-13 7.5v-15z" fill="${v('--tr-hs-nhat')}" stroke="${v('--tr-hs-day')}" stroke-width="2"/><path d="M0-8l7 3v4q0 6-7 9q-7-3-7-9v-4z" fill="${v('--tr-hs-day')}"/></g>`
+const dan = (x, y, goc, p, dai = 34) => YEU
+  ? `<circle cx="${x}" cy="${y}" r="5" fill="${v(p ? '--tr-sai' : '--tr-tin')}" stroke="${v('--tr-trang')}" stroke-width="1.5"/>`
+  : `<g transform="translate(${x} ${y}) rotate(${goc})"><rect x="${-dai}" y="-3" width="${dai}" height="6" rx="3" fill="url(#v${p})" opacity=".85"/><circle r="6" fill="${v(p ? '--tr-sai' : '--tr-tin')}" stroke="${v('--tr-trang')}" stroke-width="2"/></g>`
+const tia = (x, y, p) => YEU ? '' : `<g transform="translate(${x} ${y})" stroke="${v(p ? '--tr-sai' : '--tr-tin')}" stroke-width="3" stroke-linecap="round">${[0, 60, 120, 180, 240, 300].map((a) => `<line x1="0" y1="9" x2="0" y2="17" transform="rotate(${a})"/>`).join('')}</g>`
+// ─── SÂN 1040 × 520 (phe Bazơ trái, Axit phải); dọc ⇒ quay toạ độ (phe em xuống dưới), chữ vẫn đứng
+const DS_MAC = [
+  { x: 330, y: 185, phe: 0, nt: 'Cl', cap: 3, em: 1 }, { x: 836, y: 424, phe: 0, nt: 'N', cap: 2, ten: 'Thu Hà', mau: .55 },
+  { x: 400, y: 470, phe: 0, nt: 'S', cap: 2, ten: 'A.I Sulfur', ai: 1, mau: .9 },
+  { x: 700, y: 185, phe: 1, nt: 'O', cap: 1, ten: 'Quốc Bảo', mau: .3 }, { x: 650, y: 350, phe: 1, nt: 'Fe', cap: 4, ten: 'Ngọc Trâm', mau: .8 },
+  { x: 900, y: 128, phe: 1, nt: 'Ne', cap: 1, ten: 'A.I Neon', ai: 1, mau: .6 }]
+function san(sw, sh, o = {}) {
+  const doc = sh > sw, k = doc ? Math.min(sw / 520, sh / 1040) : Math.min(sw / 1040, sh / 520)
+  const P = (x, y) => (doc ? [y, 1040 - x] : [x, y]), FW = doc ? 520 : 1040, FH = doc ? 1040 : 520
+  let s = `<svg class="san" width="${FW * k}" height="${FH * k}" viewBox="-6 -6 ${FW + 12} ${FH + 12}">${defs()}`
+  s += `<rect x="0" y="0" width="${FW}" height="${FH}" rx="30" fill="${v('--tr-mat')}" fill-opacity="${TOI ? .07 : .55}" stroke="${v('--tr-chu')}" stroke-opacity=".14" stroke-width="2"/>`
+  if (!YEU) s += `<rect x="0" y="0" width="${FW}" height="${FH}" rx="30" fill="url(#luc)"/>`
+  // nửa sân toả màu giấy quỳ
+  if (doc) s += `<rect x="0" y="${FH / 2}" width="${FW}" height="${FH / 2}" rx="30" fill="${v('--tr-tin')}" opacity="${TOI ? .1 : .08}"/><rect x="0" y="0" width="${FW}" height="${FH / 2}" rx="30" fill="${v('--tr-sai')}" opacity="${TOI ? .09 : .07}"/>`
+  else s += `<rect x="0" y="0" width="${FW / 2}" height="${FH}" rx="30" fill="url(#z0)"/><rect x="${FW / 2}" y="0" width="${FW / 2}" height="${FH}" rx="30" fill="url(#z1)"/>`
+  const [cx, cy] = P(520, 260)
+  s += doc ? `<line x1="0" y1="${cy}" x2="${FW}" y2="${cy}" stroke="${v('--tr-chu')}" stroke-opacity=".12" stroke-width="2" stroke-dasharray="8 8"/>` : `<line x1="${cx}" y1="0" x2="${cx}" y2="${FH}" stroke="${v('--tr-chu')}" stroke-opacity=".12" stroke-width="2" stroke-dasharray="8 8"/>`
+  // ba bệ xuất phát mỗi phe (BE_PHE)
+  BE_PHE.forEach((ds, p) => ds.forEach(([x, y], i) => { if (i === 1) return; const [X, Y] = P(x, y), m = v(p ? '--tr-sai' : '--tr-tin')
+    s += `<g transform="translate(${X} ${Y})"><circle r="24" fill="${m}" opacity=".12"/><circle r="24" fill="none" stroke="${m}" stroke-opacity=".5" stroke-width="2" stroke-dasharray="4 5"/>${i === 1 ? `<text y="4.5" text-anchor="middle" font-size="12" font-weight="800" fill="${v(p ? '--tr-sai-chu' : '--tr-tin-chu')}">${p ? 'H⁺' : 'OH⁻'}</text>` : ''}</g>` }))
+  TINH_THE.forEach(([x, y], p) => { const [X, Y] = P(x, y); s += tinhThe(X, Y, p, (o.tt ?? [.72, .45])[p], (o.biBan ?? -1) === p) })
+  for (const c of VAT_CAN) {
+    if (c.k === 'tron') { const [X, Y] = P(c.x, c.y); s += c.ve === 'binh-cau' ? binhCau(X, Y, c.r, c.mau) : binhNon(X, Y, c.r, c.mau); continue }
+    const [X, Y] = P(c.x + c.w / 2, c.y + c.h / 2); s += c.ve === 'gia-ong' ? giaOng(X, Y, c.w, c.h, doc) : coc(X, Y, c.w, c.mau)
+  }
+  for (const [x, y] of CHO_XT) { const [X, Y] = P(x, y); s += vatPham(X, Y, 'xt') }
+  for (const [x, y] of CHO_KH) { const [X, Y] = P(x, y); s += vatPham(X, Y, 'kh') }
+  // (02/11 thầy «Bỏ mấy cái chấm xanh … cho đỡ rối mắt» — chọn: bỏ electron rải trên sân; súng lên cấp theo số lần trúng, xem DAC-TA)
+  // đường ngắm em → mục tiêu, đạn, tia trúng
+  const A = P(330, 185), B = P(700, 185)
+  s += `<line x1="${A[0]}" y1="${A[1]}" x2="${B[0]}" y2="${B[1]}" stroke="${v('--tr-tin')}" stroke-width="2" stroke-dasharray="3 7" opacity=".7"/>`
+  const gocAB = Math.atan2(B[1] - A[1], B[0] - A[0]) * 180 / Math.PI
+  for (const t of [.26, .52, .78]) s += dan(A[0] + (B[0] - A[0]) * t, A[1] + (B[1] - A[1]) * t, gocAB, 0)
+  // loạt bắn phụ: [từ, tới, phe] — mặc định: Ngọc Trâm bắn Thu Hà, Thu Hà bắn tinh thể Axit
+  for (const [a0, b0, ph, ts] of (o.loat || [[[650, 350], [836, 424], 1, [.35, .7]], [[836, 424], [994, 260], 0, [.3, .62]]])) {
+    const C = P(...a0), D = P(...b0), g = Math.atan2(D[1] - C[1], D[0] - C[0]) * 180 / Math.PI
+    for (const t of ts) s += dan(C[0] + (D[0] - C[0]) * t, C[1] + (D[1] - C[1]) * t, g, ph)
+  }
+  s += tia(B[0], B[1], 0)
+  s += `<g transform="translate(${B[0]} ${B[1]})" stroke="${v('--tr-tin')}" stroke-width="3" fill="none" stroke-linecap="round">${[0, 90, 180, 270].map((a) => `<path d="M-30 -9 A31 31 0 0 1 -9 -30" transform="rotate(${a})"/>`).join('')}</g>`
+  for (const a of (o.ds || DS_MAC)) { const [X, Y] = P(a.x, a.y); s += nguyenTu(X, Y, a) }
+  if (o.them) s += o.them(P)
+  return s + '</svg>'
+}
+const roi = `<span class="roi kinh"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${v('--tr-chu')}" stroke-width="2.6" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg>Rời sân</span>`
+function tiSo(a = .72, b = .45, gio = '1:12') {
+  // TINH THỂ (thầy 02/11 tối): thanh máu hai tinh thể thay thang pH — mục tiêu ván là giữ tinh thể phe mình, bắn vỡ tinh thể phe bạn
+  const gem = (p) => `<svg width="18" height="22" viewBox="-11 -14 22 28"><path d="M0 -13L10 -6V6L0 13L-10 6V-6Z" fill="${v(p ? '--tr-sai' : '--tr-tin')}" stroke="${v(p ? '--tr-sai-day' : '--tr-tin-day')}" stroke-width="1.5"/></svg>`
+  const thanh = (p, m) => `<span class="tt-thanh" data-phe="${p}"><i style="width:${Math.round(m * 100)}%"></i></span>`
+  return `<div class="ti kinh"><span class="phe" style="color:${v(TOI ? '--tr-tin' : '--tr-tin-chu')}"><i style="background:${v('--tr-tin-day')}">OH⁻</i>${gem(0)}${thanh(0, a)}<span class="pt">${Math.round(a * 100)}%</span></span>
+    <span class="gio2">${gio}</span>
+    <span class="phe" style="color:${v(TOI ? '--tr-sai' : '--tr-sai-chu')}"><span class="pt">${Math.round(b * 100)}%</span>${thanh(1, b)}${gem(1)}<i style="background:${v('--tr-sai-day')}">H⁺</i></span></div>`
+}
+const emO = `<div class="em kinh"><svg width="34" height="34" viewBox="-20 -20 40 40">${defs()}<circle r="15" fill="${YEU ? v('--tr-tin') : 'url(#c0)'}" stroke="${v('--tr-tin-day')}"/><text y="5" text-anchor="middle" font-size="12" font-weight="800" fill="${CHU_NT}">Cl</text></svg>
+  <div><div style="display:flex;gap:6px;align-items:center"><b style="font-size:12px">Em</b><span class="cap">Cấp 3</span></div><div class="mau"><i></i></div><small>⚡ trúng 3/5 lên Cấp 4 · hạ 3</small></div></div>`
+const tinHa = `<span class="kinh"><b class="p0">Thu Hà</b>hạ<b class="p1">A.I Neon</b></span><span class="kinh"><b class="p0">Em</b>trúng<b class="p1">Quốc Bảo</b> · chuỗi 2</span>`
+function veTran(o = {}) {
+  const doc = DOC, padT = doc ? 64 : 52, padB = doc ? 74 : 8
+  const sw = W - (doc ? 16 : 20), sh = H - padT - padB
+  document.body.insertAdjacentHTML('beforeend', `<div class="tran" style="padding:${padT}px 0 ${padB}px">${san(sw, sh, o)}</div>
+  <div class="hud"><div class="tren">${roi}${tiSo(...(o.tt || [.72, .45]))}${doc ? '' : emO}</div>
+  ${doc ? `<div style="position:absolute;left:10px;right:10px;bottom:12px;display:flex;justify-content:center">${emO}</div><div class="xoay kinh" style="top:${padT + 6}px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="7" width="18" height="11" rx="2.5"/><path d="M17 3l2 2-2 2"/></svg>Xoay ngang điện thoại để chơi to hơn</div>` : ''}
+  <div class="tin" style="${doc ? `left:12px;bottom:${padB + 118}px;align-items:flex-start` : 'right:14px;bottom:12px'}">${o.khongTin ? '' : doc ? tinHa.split('</span>')[0] + '</span>' : tinHa}</div></div>`)
+}
+// ─── CẢNH
+if (CANH === 'tran') veTran()
+if (CANH === 'bao') { // tinh thể phe em đang bị bắn: viền đỏ mềm + dải cảnh báo + tinh thể loé
+  veTran({ khongTin: 1, tt: [.38, .66], biBan: 0, ds: [DS_MAC[0], { x: 190, y: 380, phe: 0, nt: 'N', cap: 2, ten: 'Thu Hà', mau: .4 }, DS_MAC[2], DS_MAC[3],
+    { x: 236, y: 440, phe: 1, nt: 'Fe', cap: 4, ten: 'Ngọc Trâm', mau: .8 }, { x: 214, y: 100, phe: 1, nt: 'Ne', cap: 1, ten: 'A.I Neon', ai: 1, mau: .6 }],
+    loat: [[[236, 440], [46, 260], 1, [.3, .62]], [[214, 100], [46, 260], 1, [.4, .75]], [[190, 380], [236, 440], 0, [.5]]] })
+  document.body.insertAdjacentHTML('beforeend', `<div class="vien-do"></div><div class="bao-tt kinh" style="top:${DOC ? 70 : 58}px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/></svg>Tinh thể phe em đang bị bắn! · còn 38%</div>`)
+}
+if (CANH === 'goiy') { veTran({ khongTin: 1 }); document.body.insertAdjacentHTML('beforeend', `<div class="goiy kinh"><svg width="44" height="30" viewBox="0 0 44 30"><path d="M4 22 Q22 2 40 18" fill="none" stroke="${v('--tr-hs')}" stroke-width="3" stroke-dasharray="4 5" stroke-linecap="round"/><circle cx="40" cy="18" r="6" fill="${v('--tr-hs')}"/></svg><span style="display:flex;flex-direction:column;line-height:1.35">Kéo để chạy · súng tự ngắm, tự bắn<small style="font-size:13px;font-weight:700;color:var(--tr-chu-2)">Giữ tinh thể phe em · bắn vỡ tinh thể phe bạn</small></span></div>`) }
+if (CANH === 'vaothay') {
+  veTran({ khongTin: 1, ds: [DS_MAC[0], DS_MAC[1], { x: 62, y: 260, phe: 0, nt: 'Na', cap: 1, ten: 'Gia Huy', mau: 1, khien: 1 }, DS_MAC[3], DS_MAC[4], DS_MAC[5]],
+    them: (P) => { const [X, Y] = P(400, 470); return YEU ? '' : `<g transform="translate(${X} ${Y})" fill="${v('--tr-tin')}" opacity=".55">${[[0, 0, 16], [-20, -10, 6], [18, -14, 5], [-8, 20, 4], [22, 12, 7]].map(([a, b, r]) => `<circle cx="${a}" cy="${b}" r="${r}" fill-opacity=".35" stroke="${v('--tr-tin')}" stroke-width="1.5"/>`).join('')}</g>` } })
+  document.body.insertAdjacentHTML('beforeend', `<div class="bang-vao kinh" style="top:${DOC ? 70 : 58}px"><b style="color:${v(TOI ? '--tr-tin' : '--tr-tin-chu')}">Gia Huy</b> vào thay A.I Sulfur · Phe Bazơ</div>`)
+}
+if (CANH === 'het') {
+  veTran({ khongTin: 1 })
+  const hang = (ten, nt, p, st, hh, em) => `<div class="hang" ${em ? 'data-em' : ''}><svg width="30" height="30" viewBox="-17 -17 34 34">${defs()}<circle r="13" fill="${YEU ? v(p ? '--tr-sai' : '--tr-tin') : `url(#c${p})`}" stroke="${v(p ? '--tr-sai-day' : '--tr-tin-day')}"/><text y="4.5" text-anchor="middle" font-size="${nt.length > 1 ? 10 : 12}" font-weight="800" fill="${CHU_NT}">${nt}</text></svg><span><span class="ten">${ten}</span><small>${st}</small></span><span class="hh"><svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="${v('--tr-sao')}"/><path d="M12 6l1.8 3.8 4.2.5-3.1 2.9.8 4.1L12 15.3 8.3 17.3l.8-4.1L6 10.3l4.2-.5z" fill="${v('--tr-trang')}"/></svg>${hh}</span></div>`
+  document.body.insertAdjacentHTML('beforeend', `<div class="phu"><div class="ket kinh">
+    <h2 style="color:${v(TOI ? '--tr-tin' : '--tr-tin-chu')}">Phe Bazơ phá vỡ tinh thể Axit!</h2>
+    <div class="phu-dong">Phe em thắng sớm (còn 1:12) · em nhận huy hiệu <b>Phá tinh thể</b></div>
+    <div class="kq-tt"><span class="kinh" data-phe="0"><svg width="26" height="32" viewBox="-13 -16 26 32"><path d="M0 -15L12 -7V7L0 15L-12 7V-7Z" fill="${v('--tr-tin')}" stroke="${v('--tr-tin-day')}" stroke-width="1.5" /></svg><span>Tinh thể Bazơ<b>còn 64%</b></span></span><span class="kinh" data-phe="1"><svg width="26" height="32" viewBox="-13 -16 26 32"><path d="M0 -15L12 -7V7L0 15L-12 7V-7Z" fill="${v('--tr-sai')}" stroke="${v('--tr-sai-day')}" stroke-width="1.5" opacity=".45"/><path d="M-6 -9l5 6-3 4 5 5-2 6M6 -12l-3 7 4 3-3 6" fill="none" stroke="${v('--tr-chu')}" stroke-width="1.6" stroke-linecap="round"/></svg><span>Tinh thể Axit<b>đã vỡ</b></span></span></div>
+    <div class="cot2"><div class="doi-the" data-phe="0"><div class="doi-dau"><span class="cap" style="background:${v('--tr-tin-day')};color:${v('--tr-trang')}">OH⁻</span>Phe Bazơ<span class="tong">12</span></div>
+      ${hang('Em', 'Cl', 0, 'bắn trúng tinh thể 18 lần', 'Phá tinh thể', 1)}${hang('Thu Hà', 'N', 0, 'hạ 5 lần', 'Xạ thủ')}${hang('Gia Huy', 'Na', 0, 'chặn 4 lần gần tinh thể', 'Hộ vệ')}</div>
+    <div class="doi-the" data-phe="1"><div class="doi-dau"><span class="cap" style="background:${v('--tr-sai-day')};color:${v('--tr-trang')}">H⁺</span>Phe Axit<span class="tong">9</span></div>
+      ${hang('Quốc Bảo', 'O', 1, 'trúng 26 viên', 'Bắn trúng nhiều')}${hang('Ngọc Trâm', 'Fe', 1, 'góp sức 4 lần hạ', 'Đồng đội cứu nguy')}${hang('A.I Neon', 'Ne', 1, 'lấp ghế', 'Lấp ghế')}</div></div>
+    <div class="day-dong"><div class="day-ket"><span class="pu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></svg>Hay đấy!</span><span class="pu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 14q4 4 8 0M9 9.5h.01M15 9.5h.01"/></svg>Suýt nữa!</span><span class="pu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c4 0 7-2.7 7-6.6 0-4.4-4-6.4-4.6-10.4C11 6 9.6 8.6 9.6 11 8 10.6 7 9 7 9c-1.3 1.8-2 3.6-2 5.4C5 18.3 8 21 12 21z"/></svg>Đấu lại nhé</span><span class="pu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Chơi đẹp</span></div>
+    <div class="day-ket" style="justify-content:space-between"><span class="vong-dem"><svg width="30" height="30" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" fill="none" stroke="${v('--tr-chu')}" stroke-opacity=".12" stroke-width="4"/><circle cx="18" cy="18" r="15" fill="none" stroke="${v('--tr-hs')}" stroke-width="4" stroke-dasharray="94" stroke-dashoffset="38" transform="rotate(-90 18 18)" stroke-linecap="round"/><text x="18" y="23" text-anchor="middle" font-size="13" font-weight="800" fill="${v('--tr-chu')}">5</text></svg>Ván mới · máy chia lại phe cho đều</span><span class="ve-phong">Về phòng chờ</span></div></div>
+    <div class="ca" style="margin-top:-4px">Chỉ để vui, không lưu vào điểm. Ra vào lúc nào cũng được.</div>
+  </div></div>`)
+}
+if (CANH === 'sanh') {
+  const rong = W >= 760
+  const nts = ['Na', 'O', 'N', 'Cl', 'S', 'Fe', 'Ne'], Z = { Na: 11, O: 8, N: 7, Cl: 17, S: 16, Fe: 26, Ne: 10 }
+  const oGhe = (nt, p, ten, mo) => `<span class="o-ghe" style="opacity:${mo ? .55 : 1}"><svg width="40" height="40" viewBox="-21 -21 42 42">${defs()}<circle r="15" fill="${YEU ? v(p ? '--tr-sai' : '--tr-tin') : `url(#c${p})`}" stroke="${v(p ? '--tr-sai-day' : '--tr-tin-day')}"/>${ten === 'Em' ? `<circle r="18" fill="none" stroke="${v('--tr-tin')}" stroke-width="2.5"/>` : ''}<text y="5" text-anchor="middle" font-size="${nt.length > 1 ? 11 : 13}" font-weight="800" fill="${CHU_NT}">${nt}</text></svg>${ten}</span>`
+  const xem = `<div class="xem kinh">${san(rong ? Math.min(620, W * .46) : W - 64, rong ? (H < 500 ? H - 120 : 330) : 170)}</div>`
+  const dieuKhien = `<div class="ghe"><span class="doi">${oGhe('Cl', 0, 'Em')}${oGhe('S', 0, 'A.I', 1)}${oGhe('N', 0, 'A.I', 1)}</span><span class="vs">3 đấu 3</span><span class="doi">${oGhe('O', 1, 'A.I', 1)}${oGhe('Fe', 1, 'A.I', 1)}${oGhe('Ne', 1, 'A.I', 1)}</span></div>
+    <button class="nut-dau"><svg width="28" height="28" viewBox="-14 -14 28 28" fill="none" stroke="${v('--tr-hs-tren')}" stroke-width="2"><circle r="4" fill="${v('--tr-hs-tren')}"/><ellipse rx="12" ry="4.5"/><ellipse rx="12" ry="4.5" transform="rotate(60)"/><ellipse rx="12" ry="4.5" transform="rotate(120)"/></svg><span style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.15">Đấu<small>vào sân ngay · ván 90 giây</small></span></button>
+    <div class="luat"><b>Bắn vỡ tinh thể phe bạn trước là thắng</b> — nhớ giữ tinh thể phe em.<br>Thiếu bạn thì A.I vào thay · Súng tự ngắm, tự bắn — em chỉ việc <b>kéo để chạy</b>.</div>
+    <div><div class="the-dau" style="margin-bottom:6px"><small>Nguyên tử của em</small><small style="text-transform:none;letter-spacing:0">Ẩn tên ○</small></div>
+    <div class="nt">${nts.map((n) => `<span class="o-nt" ${n === 'Cl' ? 'data-chon' : ''}><span style="text-align:left">${Z[n]}</span><b>${n}</b><span>${NT[n]}</span></span>`).join('')}</div>${rong ? '' : '<div class="nt-ten">Em đang là <b>Clo · Cl</b> — chạm ô khác để đổi</div>'}</div>`
+  document.body.insertAdjacentHTML('beforeend', `<div class="trang" style="${rong ? 'max-width:1040px;margin:0 auto;justify-content:center' : ''}">
+    <div class="ca">Ca kiểm tra: Kiểm tra 15 phút · Ester<br>Bài làm trong 15 phút, đồng hồ chạy từ lúc đó.</div>
+    <div class="the kinh"><div class="the-dau"><div><small>Chơi một chút trong lúc chờ</small><h1>Đấu Nguyên Tử</h1></div><span class="cup"><svg width="16" height="16" viewBox="0 0 24 24" fill="${v('--tr-sao-day')}"><path d="M7 3h10v3h3v3a4 4 0 0 1-4 4h-.5A5 5 0 0 1 13 15.9V18h3v3H8v-3h3v-2.1A5 5 0 0 1 8.5 13H8a4 4 0 0 1-4-4V6h3z"/></svg>Phe em thắng hôm nay · 2</span></div>
+    ${rong ? `<div class="hai-cot">${xem}<div style="display:flex;flex-direction:column;gap:12px">${dieuKhien}</div></div>` : xem + dieuKhien}</div>
+    <div class="ca">Điểm chơi chỉ để vui trong lúc chờ · thầy bấm Bắt đầu là vào bài ngay.</div></div>`)
+}
+</script>
+</body>
+</html>
