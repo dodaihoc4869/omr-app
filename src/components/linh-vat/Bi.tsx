@@ -3,9 +3,13 @@
 // GIỮ NGUYÊN API <Bi cam size className nhip noi> nên người gọi không đổi; thêm `goc` (tuỳ chọn) để đứng nghiêng.
 // Hình + chuyển động ở mảnh NẠP LƯỜI ./mol-dong (SVG + CSS) (không vào nhóm mở app); trong lúc chờ mảnh về: khung giữ chỗ đúng tỉ lệ 200 : 230 (không xô bố cục).
 // Mol giữ màu xanh dương của app ở mọi cảm xúc (giận ⇒ dung dịch trong bình hoá đỏ, dâng lên, sôi): cảm xúc đọc bằng mắt, mày, miệng.
-// Giảm chuyển động / máy yếu ⇒ Mol đứng TĨNH ở tư thế của cảm xúc. Chỉ dùng trong app học sinh «Trong». aria-hidden: chữ đi kèm đã đủ nghĩa.
+// 02/11 MOL SỐNG ĐỘNG (thầy «Chốt Mol sống động và hiệu ứng gắn luôn vào app, đảm bảo máy siêu yếu cũng hoạt động được»): mol-dong.ts nhận CHẾ ĐỘ —
+//   máy thường 'day-du' · máy yếu 'gon' (30 khung/giây, ít hạt, không kéo, không gradient) · giảm chuyển động 'tinh' (chỉ chuyển mặt) · cỡ < 64 px 'nho'
+//   (mặt tĩnh + chớp CSS, không vòng JS). Mol đứng nghiêng cạnh đường (có `goc` — Mol to ở Lộ trình) mới KÉO được. Không thêm prop, mọi chỗ gọi giữ nguyên.
+// Chỉ dùng trong app học sinh «Trong». aria-hidden: chữ đi kèm đã đủ nghĩa.
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import type { GocLua, Lua, TrangThaiLua, TuyChonLua } from './lua-dong'
+import type { CheDoMol } from './mol-lo-xo'
 import '../../styles/bi.css' // khung bong bóng «Học tiếp nhé» (.bi-loi) vẫn ở tệp này
 import { gioMayChu } from '../../lib/gio-may-chu'
 import { boMauMol } from '../../lib/mau-mol-ngay'
@@ -26,10 +30,16 @@ export function ttTheoCam(cam: CamBi, nhip?: PropsBi['nhip']): [TrangThaiLua, Tu
   if (cam === 'mung') return ['combo', { sau: 3600, ve: 'vui' }] // nhảy mừng một hồi rồi vui
   return [TT_THEO_CAM[cam], {}]
 }
-/** Lửa đứng tĩnh (không vòng hoạt ảnh): giảm chuyển động, máy yếu, hoặc môi trường không có requestAnimationFrame. */
+/** Mol đứng tĩnh (chỉ chuyển mặt): xin giảm chuyển động, hoặc môi trường không có requestAnimationFrame. 02/11: máy yếu KHÔNG còn tĩnh — chạy chế độ gọn. */
 export function biDungYen(): boolean {
   if (typeof window === 'undefined' || typeof window.requestAnimationFrame !== 'function') return true
-  return document.documentElement.classList.contains('may-yeu') || !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  return !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+}
+/** Chế độ của Mol (mol-lo-xo.ts cheDoMol, viết lại tại chỗ để mảnh Bi không kéo mã của mảnh lười): cỡ < 64 px ⇒ 'nho'; tĩnh ⇒ 'tinh'; máy yếu ⇒ 'gon'. */
+export function cheDoBi(size: number): CheDoMol {
+  if (size < 64) return 'nho'
+  if (biDungYen()) return 'tinh'
+  return document.documentElement.classList.contains('may-yeu') ? 'gon' : 'day-du'
 }
 let moDong: typeof import('./mol-dong') | null = null
 /** LỬA ĐỔI CẢM XÚC (thầy chốt 31/10): cấp giận ⇒ dáng có sẵn — 2 Sốt ruột: dỗi khoanh tay · 3 Bực: càu nhàu · 4 Giận / 5 Siêu cáu: tức giận. Cấp 0–1 theo `cam` như cũ. */
@@ -108,7 +118,7 @@ export function Bi({ cam = 'chao', size = 96, className, nhip, noi, goc, cap: ca
     if (!co || !moDong || !o.current) return
     const [trangThai, tuyChon] = ttTheoCap(cam, nhip, cap)
     o.current.querySelector(':scope > .bi-tinh')?.remove()
-    const l = moDong.taoLua(o.current, { trangThai, tuyChon, tinh: biDungYen(), goc })
+    const l = moDong.taoLua(o.current, { trangThai, tuyChon, cheDo: cheDoBi(size), goc, keo: !!goc })
     if (noi) l.noi(noi, 40)
     lua.current = l
     apCap(l, cap, () => lua.current === l)
@@ -124,5 +134,9 @@ export function Bi({ cam = 'chao', size = 96, className, nhip, noi, goc, cap: ca
   }, [cam, nhip, noi, cap])
   return <span ref={o} className={`bi lua${className ? ` ${className}` : ''}`} data-cam={camKhoa} data-cap={cap || undefined} data-goc={goc} data-khung={khung} data-nho={size < 64 ? '' : undefined} aria-hidden="true" style={{ '--lv-w': `${size}px` } as CSSProperties} />
 }
+
+/** NẠP TRƯỚC mảnh Mol (thầy 02/11 «tải luôn hiệu ứng sẵn cho máy yếu»): cổng học sinh gọi lúc rảnh ⇒ lần Mol hiện đầu không phải chờ mảnh. Cửa nạp ở ĐÂY
+ *  (mảnh Bi) ⇒ đồ thị mảnh không đổi (mol-dong vẫn chỉ được nạp từ Bi / Lộ trình, không tách thêm mảnh precache). */
+export function napTruocMol(): void { if (!moDong) void import('./mol-dong').then((m) => { moDong = m }, () => {}) }
 
 export default Bi

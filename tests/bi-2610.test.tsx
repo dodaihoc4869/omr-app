@@ -6,7 +6,7 @@
 import { readFileSync } from 'node:fs'
 import { render, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { Bi, CAM_BI, TT_THEO_CAM, TEN_LINH_VAT, biDungYen, ttTheoCam } from '../src/components/linh-vat/Bi'
+import { Bi, CAM_BI, TT_THEO_CAM, TEN_LINH_VAT, biDungYen, cheDoBi, ttTheoCam } from '../src/components/linh-vat/Bi'
 import { CAM_XUC_LUA, TRANG_THAI_LUA, taoLua } from '../src/components/linh-vat/lua-dong'
 
 afterEach(() => { vi.useRealTimers(); document.documentElement.classList.remove('may-yeu') })
@@ -39,12 +39,13 @@ describe('Lửa thay Bi', () => {
     rerender(<Bi cam="sai" size={64} />)
     expect(span.getAttribute('data-cam')).toBe('sai')
   })
-  it('tĩnh khi giảm chuyển động / máy yếu; bộ máy chạy mọi trạng thái, chạm ⇒ bị chọc rồi về; huỷ ⇒ gỡ sạch', () => {
+  it('tĩnh khi giảm chuyển động; 02/11 máy yếu KHÔNG tĩnh mà chạy chế độ gọn; cỡ < 64 px ⇒ nhỏ (không vòng JS); bộ máy Cú Ngọc giữ nguyên', () => {
     window.matchMedia = ((q: string) => ({ matches: q.includes('reduce') })) as unknown as typeof window.matchMedia
-    expect(biDungYen()).toBe(true)
+    expect(biDungYen()).toBe(true); expect(cheDoBi(104)).toBe('tinh'); expect(cheDoBi(34)).toBe('nho')
     window.matchMedia = (() => ({ matches: false })) as unknown as typeof window.matchMedia
-    expect(biDungYen()).toBe(false)
-    document.documentElement.classList.add('may-yeu'); expect(biDungYen()).toBe(true)
+    expect(biDungYen()).toBe(false); expect(cheDoBi(104)).toBe('day-du'); expect(cheDoBi(63)).toBe('nho'); expect(cheDoBi(64)).toBe('day-du')
+    document.documentElement.classList.add('may-yeu'); expect(biDungYen()).toBe(false); expect(cheDoBi(104)).toBe('gon')
+    expect(readFileSync('src/components/linh-vat/Bi.tsx', 'utf8')).toContain('cheDo: cheDoBi(size), goc, keo: !!goc') // chỉ Mol đứng nghiêng cạnh đường (Lộ trình) kéo được
     const o = document.createElement('span'); document.body.appendChild(o)
     const l = taoLua(o, { trangThai: 'yen', tay: true })
     for (const t of TRANG_THAI_LUA) { l.datTrangThai(t); l.buoc(500); expect(l.trangThai).toBe(t) }

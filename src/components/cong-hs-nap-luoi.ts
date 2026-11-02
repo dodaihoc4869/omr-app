@@ -24,3 +24,11 @@ import { hamNongTuDien } from './goi-y-cham/tu-dien'
 // Bắt đầu sau 8 s: sau khung đo nhịp của henDoNhipKhung ở trên (không làm khung đo chậm đi, kẻo bật nhầm chế độ máy yếu) và sau lúc Lộ trình vừa mở
 // xong (không chen tác vụ vào lúc em vừa mở app). Em bấm học sớm hơn ⇒ màn làm chặng tự hâm nóng lúc rảnh.
 if (typeof document !== 'undefined' && document.documentElement.dataset.trong === 'hs') window.setTimeout(hamNongTuDien, 8000)
+
+// 02/11 MOL SỐNG ĐỘNG (thầy «tải luôn hiệu ứng sẵn cho máy yếu nhé»): app mở xong và rảnh (sau khung đo nhịp ở trên) ⇒ NẠP TRƯỚC mảnh Mol (mol-dong,
+// kho chạy-lúc của service worker, không vào precache) ⇒ lần Mol hiện đầu ở màn khác (kết chặng, kiểm tra, thưởng) không phải chờ mảnh. Đã nạp ⇒ không làm gì.
+if (typeof document !== 'undefined' && document.documentElement.dataset.trong === 'hs') {
+  const napMol = () => { void import('./linh-vat/Bi').then((m) => m.napTruocMol(), () => {}) }
+  const ric = (window as Window & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }).requestIdleCallback
+  window.setTimeout(() => (ric ? ric(napMol, { timeout: 5000 }) : napMol()), 4000)
+}

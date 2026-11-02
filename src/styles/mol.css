@@ -4,7 +4,10 @@
    gradient tròn sáng trên-trái --tr-hs pha trắng → tối nhẹ dưới-phải --tr-hs-day), dung dịch NGỌC LAM --tr-tin, mũi cam --tr-chu-y, má hồng phấn --tr-tim,
    nút bấc vàng nâu (--tr-sao pha --tr-chu-y-day). Không mã thô: chỉ token có sẵn + trắng / mực CỐ ĐỊNH --btg-chu-doan-dam / --btg-chu-doan.
    Giận: nhóm .mol-g4 / .mol-g5 đặt lại biến ⇒ cả bình đổi sắc đỏ sẫm (stop gradient kế thừa); .mol-g2 / .mol-g3 chỉ ửng má.
-   Nền tối: token --tr-* tự sáng lên ⇒ Mol sáng hơn, vẫn tách khỏi nền chàm đậm. */
+   Nền tối: token --tr-* tự sáng lên ⇒ Mol sáng hơn, vẫn tách khỏi nền chàm đậm.
+   02/11 MOL SỐNG ĐỘNG (thầy «Chốt Mol sống động và hiệu ứng gắn luôn vào app»; mol-dong.ts): GIỮ NGUYÊN mọi màu trên; thêm (chỉ token / biến Mol sẵn có):
+   nét mí (.m-mi), viền miệng nội suy (.m-mieng-n), chữ «hì» (.m-hi); giận ⇒ dung dịch dùng biến sôi / đỏ có sẵn; màu giận CHUYỂN DẦN nhờ @property;
+   máy yếu (data-che-do='gon') ⇒ tô phẳng thay gradient. */
 .mol-svg {
   --mol-x: var(--tr-hs-nut);
   --mol-x-sang: color-mix(in oklab, var(--tr-hs) 52%, var(--btg-chu-doan-dam));
@@ -71,6 +74,9 @@
   --mol-vien: color-mix(in oklab, var(--tr-sai-day) 40%, var(--btg-chu-doan));
   --mol-trong: color-mix(in oklab, var(--tr-sai) 22%, var(--btg-chu-doan-dam));
   --mol-ma: var(--tr-sai);
+  --mol-nuoc: var(--mol-soi);
+  --mol-nuoc-sang: var(--mol-soi-sang);
+  --mol-nuoc-toi: var(--mol-soi-toi);
 }
 .mol-svg .mol-g5 {
   --mol-x: color-mix(in oklab, color-mix(in oklab, var(--tr-sai) 74%, var(--tr-hs-day)) 80%, var(--btg-chu-doan));
@@ -80,6 +86,9 @@
   --mol-vien: color-mix(in oklab, var(--tr-sai-day) 30%, var(--btg-chu-doan));
   --mol-trong: color-mix(in oklab, var(--tr-sai) 40%, var(--btg-chu-doan-dam));
   --mol-ma: var(--tr-sai-day);
+  --mol-nuoc: var(--mol-do);
+  --mol-nuoc-sang: var(--mol-do-sang);
+  --mol-nuoc-toi: var(--mol-do-toi);
 }
 .mol-svg .s-sang { stop-color: var(--mol-x-sang); }
 .mol-svg .s-x { stop-color: var(--mol-x); }
@@ -140,34 +149,123 @@
 /* Chữ 6,022·10²³ ở bụng chỉ hiện từ 64 px (Bi.tsx gắn data-nho khi nhỏ hơn; thử 48 px: chữ cao ~3,5 px, không đọc được). */
 .bi[data-nho] .mol-svg .mol-khac { display: none; }
 
-/* ── Chuyển động (CSS; giảm chuyển động / máy yếu / Mol tĩnh ⇒ tắt) ── */
-.mol-svg .mol-than { transform-box: view-box; transform-origin: 100px 196px; animation: mol-tho 3.6s ease-in-out infinite; }
-.mol-svg .mol-mat { transform-box: fill-box; transform-origin: center; animation: mol-chop 4.8s infinite; }
-.mol-svg .mol-bot { animation: mol-bot 2.8s ease-in infinite; }
-.mol-svg .mol-bot.b2 { animation-delay: 0.9s; }
-.mol-svg .mol-bot.b3 { animation-delay: 1.7s; }
-.mol-svg .mol-lua { transform-box: view-box; transform-origin: 100px 18px; animation: mol-lua 0.9s ease-in-out infinite alternate; }
-.mol-svg .mol-lua-to { animation-duration: 0.45s; }
-.mol-svg :is(.mol-g4, .mol-g5) .mol-nut { transform-box: fill-box; transform-origin: center; animation: mol-nut 0.9s ease-in-out infinite alternate; }
-.mol-svg .mol-g5 .mol-nut { animation-duration: 0.45s; }
-.mol-svg[data-mat='cau'] .mol-bot { animation-duration: 1.6s; }
-.mol-svg[data-mat='ratCau'] .mol-bot { animation-duration: 0.9s; }
-.mol-svg.mol-noi .mol-mieng { transform-box: fill-box; transform-origin: center top; animation: mol-noi 0.24s ease-in-out infinite alternate; }
-.mol-svg[data-dong='nhun'] .mol-than { animation: mol-nhun 0.7s cubic-bezier(0.3, 1.6, 0.5, 1) 3; }
-.mol-svg[data-dong='lac'] .mol-than { animation: mol-lac 1.4s ease-in-out 2; }
-.mol-svg[data-dong='chung'] .mol-than { animation: mol-chung 0.6s ease-out 1 forwards; }
-.mol-svg[data-dong='giat'] .mol-than { animation: mol-giat 0.5s ease-in-out infinite; }
-.mol-svg[data-dong='run'] .mol-than { animation: mol-run 0.16s linear infinite; }
+/* ── 02/11 MOL SỐNG ĐỘNG: màu thêm (chỉ biến Mol / token sẵn có) ── */
+.mol-svg .m-mi { fill: var(--mol-x); stroke: var(--mol-vien); stroke-linejoin: round; }
+.mol-svg .m-mieng-n { stroke: var(--mol-vien); stroke-linecap: round; stroke-linejoin: round; }
+.mol-svg .m-hi { fill: var(--mol-not); font-family: inherit; font-weight: 800; }
+/* Màu giận chuyển dần (cáu ⇄ rất cáu ⇄ vui) thay vì cắt cảnh: biến màu đăng ký kiểu <color> ⇒ chuyển tiếp được; trình duyệt chưa có @property ⇒ đổi ngay như cũ. */
+@property --mol-x { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --mol-x-sang { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --mol-x-toi { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --mol-vanh { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --mol-vien { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --mol-trong { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --mol-ma { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --mol-nuoc { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --mol-nuoc-sang { syntax: '<color>'; inherits: true; initial-value: transparent; }
+@property --mol-nuoc-toi { syntax: '<color>'; inherits: true; initial-value: transparent; }
+.mol-svg [data-k='nhom'] {
+  transition: --mol-x 0.7s ease, --mol-x-sang 0.7s ease, --mol-x-toi 0.7s ease, --mol-vanh 0.7s ease, --mol-vien 0.7s ease, --mol-trong 0.7s ease,
+    --mol-ma 0.5s ease, --mol-nuoc 0.9s ease, --mol-nuoc-sang 0.9s ease, --mol-nuoc-toi 0.9s ease;
+}
+/* Máy yếu: tô phẳng (không gradient tròn / vệt bóng / má mờ dần) — ít việc vẽ nhất, giữ đúng bảng màu. */
+.mol-svg[data-che-do='gon'] :is(.mol-cau, .mol-co) { fill: var(--mol-x); }
+.mol-svg[data-che-do='gon'] .mol-nuoc-l { fill: var(--mol-nuoc); }
+.mol-svg[data-che-do='gon'] .mol-kinh { fill: var(--mol-t); fill-opacity: 0.32; }
+.mol-svg[data-che-do='gon'] .mol-ma { fill: var(--mol-ma); fill-opacity: 0.55; }
+.mol-svg[data-che-do='gon'] .mol-glow { fill: var(--mol-do); fill-opacity: 0.3; }
+
+/* ── Chuyển động ──
+   VÒNG JS (mol-dong.ts) chỉ chạy lúc đổi mặt / chạm / kéo / dõi tay / hạt bay; lúc đó Mol mang [data-song] ⇒ tắt các nhịp CSS mà JS đang tự lái (thân lắc,
+   chớp, đảo mắt; sóng nền thì trượt suốt, JS chỉ đổi hình). Lò xo lắng ⇒ JS bỏ [data-song], CSS chạy tiếp từ tư thế đứng (khung hình đầu / cuối của mọi nhịp = tư thế đứng ⇒ không giật).
+   NHÀN RỖI chỉ máy thường (data-che-do='day-du'): thở · chớp · đảo mắt · sóng dung dịch · bọt · nhịp riêng từng mặt · hiệu ứng (sao, tim, nốt nhạc, z, lệ, lửa,
+   nút bấc) — chỉ transform / opacity. Cỡ nhỏ (data-che-do='nho'): chỉ chớp. Máy yếu / tĩnh: không hoạt ảnh vô hạn nào (máy yếu chớp mắt bằng hẹn giờ:
+   [data-chop]). Khuất khỏi màn ([data-khuat]) ⇒ tạm dừng. Giảm chuyển động / html.may-yeu ⇒ tắt hết. */
+.mol-svg :is(.mol-dong, .mol-tho) { transform-box: view-box; transform-origin: 100px 196px; }
+.mol-svg .mol-chop { transform-box: view-box; }
+.mol-svg .mol-chop-L { transform-origin: 73px 98px; }
+.mol-svg .mol-chop-R { transform-origin: 127px 98px; }
+.mol-svg[data-chop] .mol-chop { transform: scaleY(0.1); }
+.mol-svg .mol-song { transform-box: view-box; }
+/* Mol to kéo được (Lộ trình): vuốt DỌC vẫn cuộn trang (trình duyệt nhận), kéo ngang / chéo mới là kéo Mol ⇒ không chặn cuộn khi ngón tay chạm trúng Mol. */
+.mol-svg[data-keo] { touch-action: pan-y; }
+.mol-svg[data-keo] .mol-than { cursor: grab; }
+.mol-svg[data-che-do='nho'] .mol-chop { animation: mol-chop 4.8s infinite; }
+.mol-svg[data-che-do='day-du']:not([data-song]) .mol-chop { animation: mol-chop 4.8s infinite; }
+.mol-svg[data-che-do='day-du']:not([data-song])[data-dao='du'] .mol-dao { animation: mol-dao 9s ease-in-out infinite; }
+.mol-svg[data-che-do='day-du']:not([data-song])[data-dao='nua'] .mol-dao { animation: mol-dao-nua 9s ease-in-out infinite; }
+.mol-svg[data-che-do='day-du'] .mol-song { animation: mol-song 3s linear infinite; } /* trượt suốt (cả lúc vòng JS chạy — JS chỉ đổi hình); thời lượng theo mặt: mol-dong.ts đặt trên phần tử */
+.mol-svg[data-che-do='day-du'] .mol-bot { transform-box: fill-box; animation: mol-bot 2.8s ease-in infinite; }
+.mol-svg[data-che-do='day-du'] .mol-bot.b2 { animation-delay: 0.9s; }
+.mol-svg[data-che-do='day-du'] .mol-bot.b3 { animation-delay: 1.7s; }
+.mol-svg[data-che-do='day-du'][data-mat='cau'] .mol-bot { animation-duration: 1.6s; }
+.mol-svg[data-che-do='day-du'][data-mat='ratCau'] .mol-bot { animation-duration: 0.9s; }
+/* THỞ (nhóm .mol-tho, cả lúc vòng JS chạy) theo BẬC (steps): biên độ ~1 px nên 7 bậc mỗi nửa nhịp mắt không thấy khác, mà trình duyệt chỉ dựng lại hình ~4 lần/giây
+   thay vì 60 (đo CPU ×6, Mol 240 px đứng yên: bố cục 502 → 107 ms / 4,5 s; Mol cũ 425). */
+.mol-svg[data-che-do='day-du'] .mol-tho { animation: mol-tho 3.6s steps(7) infinite; }
+.mol-svg[data-che-do='day-du'][data-mat='ngu'] .mol-tho { animation: mol-tho-ngu 4.9s steps(9) infinite; }
+/* nhịp riêng của thân theo mặt (nhóm .mol-dong, chỉ lúc nhàn rỗi; khung đầu / cuối = tư thế đứng) */
+.mol-svg[data-che-do='day-du']:not([data-song])[data-mat='khen'] .mol-dong { animation: mol-nhun 0.7s cubic-bezier(0.3, 1.6, 0.5, 1) 3; }
+.mol-svg[data-che-do='day-du']:not([data-song])[data-mat='nhay'] .mol-dong { animation: mol-nhay 0.5s ease-in-out infinite; }
+.mol-svg[data-che-do='day-du']:not([data-song])[data-mat='chao'] .mol-dong { animation: mol-lac 1.3s ease-in-out 2; }
+.mol-svg[data-che-do='day-du']:not([data-song])[data-mat='nghi'] .mol-dong { animation: mol-lu 4.5s ease-in-out infinite; }
+.mol-svg[data-che-do='day-du']:not([data-song])[data-mat='doi'] .mol-dong { animation: mol-lu 3.1s ease-in-out infinite; }
+.mol-svg[data-che-do='day-du']:not([data-song])[data-mat='buc'] .mol-dong { animation: mol-dam 1.5s ease-out infinite; }
+.mol-svg[data-che-do='day-du']:not([data-song])[data-mat='cau'] .mol-dong { animation: mol-giat 0.5s ease-in-out infinite; }
+.mol-svg[data-che-do='day-du']:not([data-song])[data-mat='ratCau'] .mol-dong { animation: mol-run 0.16s linear infinite; }
+.mol-svg[data-che-do='day-du']:not([data-song])[data-mat='me'] .mol-dong { animation: mol-du 3.7s ease-in-out infinite; }
+.mol-svg[data-che-do='day-du']:not([data-song])[data-mat='nguong'] .mol-dong { animation: mol-ngai 2.9s ease-in-out infinite; }
+/* hiệu ứng theo mặt (chạy cả lúc vòng JS chạy — JS chỉ phóng / thu theo trọng số) */
+.mol-svg[data-che-do='day-du'] :is(.mol-lap, .mol-dap, .mol-hoi, .mol-ngac, .mol-z, .mol-le, .mol-phi, .mol-not-nhay) { transform-box: fill-box; transform-origin: center; }
+.mol-svg[data-che-do='day-du'] .mol-lap { animation: mol-lap 2.2s ease-in-out infinite; }
+.mol-svg[data-che-do='day-du'] .mol-lap.l1 { animation-delay: -0.7s; }
+.mol-svg[data-che-do='day-du'] .mol-lap.l2 { animation-delay: -1.4s; }
+.mol-svg[data-che-do='day-du'] .mol-dap { animation: mol-dap 1.1s ease-in-out infinite; }
+.mol-svg[data-che-do='day-du'] .mol-dap.l1 { animation-delay: -0.15s; }
+.mol-svg[data-che-do='day-du'] .mol-dap.l2 { animation-delay: -0.3s; }
+.mol-svg[data-che-do='day-du'] .mol-not-nhay { animation: mol-not 1s ease-in-out infinite; }
+.mol-svg[data-che-do='day-du'] .mol-not-nhay.l1 { animation-delay: -0.25s; }
+.mol-svg[data-che-do='day-du'] .mol-hoi { transform-origin: center bottom; animation: mol-hoi 3s ease-in-out infinite; }
+.mol-svg[data-che-do='day-du'] .mol-ngac { animation: mol-ngac 0.9s ease-in-out infinite; }
+.mol-svg[data-che-do='day-du'] .mol-nhiet { animation: mol-nhiet 0.6s ease-in-out infinite alternate; }
+.mol-svg[data-che-do='day-du'] .mol-z { animation: mol-z 2.8s ease-out infinite; }
+.mol-svg[data-che-do='day-du'] .mol-z.z2 { animation-delay: -1.4s; }
+.mol-svg[data-che-do='day-du'] .mol-le { animation: mol-le 1.8s ease-in infinite; }
+.mol-svg[data-che-do='day-du'] .mol-phi { animation: mol-phi 2.6s ease-in-out infinite; }
+.mol-svg[data-che-do='day-du'] .mol-lua-c { transform-box: view-box; transform-origin: 0 2px; animation: mol-lua 0.9s ease-in-out infinite alternate; }
+.mol-svg[data-che-do='day-du'] .mol-g5 .mol-lua-c { animation-duration: 0.45s; }
+.mol-svg[data-che-do='day-du'] :is(.mol-g4, .mol-g5) .mol-nut { transform-box: fill-box; transform-origin: center; animation: mol-nut 0.9s ease-in-out infinite alternate; }
+.mol-svg[data-che-do='day-du'] .mol-g5 .mol-nut { animation: mol-nut-quay 1.2s linear infinite; }
+.mol-svg.mol-noi:not([data-che-do='tinh']) .mol-mieng { transform-box: fill-box; transform-origin: center top; animation: mol-noi 0.24s ease-in-out infinite alternate; }
 @keyframes mol-tho { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.012, 0.988); } }
+@keyframes mol-tho-ngu { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.02, 0.966); } }
 @keyframes mol-chop { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+@keyframes mol-dao { 0%, 18%, 50%, 66%, 100% { transform: translate(0, 0); } 24%, 40% { transform: translate(-5px, -2px); } 72%, 88% { transform: translate(5px, 1.5px); } }
+@keyframes mol-dao-nua { 0%, 18%, 50%, 66%, 100% { transform: translate(0, 0); } 24%, 40% { transform: translate(-2.5px, -1px); } 72%, 88% { transform: translate(2.5px, 0.8px); } }
+@keyframes mol-song { from { transform: translateX(0); } to { transform: translateX(-83.776px); } }
 @keyframes mol-bot { 0% { transform: translateY(0); opacity: 0.6; } 100% { transform: translateY(-30px); opacity: 0; } }
+@keyframes mol-nhun { 0%, 100% { transform: translateY(0) scale(1, 1); } 40% { transform: translateY(-14px) scale(0.97, 1.04); } 70% { transform: translateY(0) scale(1.04, 0.96); } }
+@keyframes mol-nhay { 0%, 100% { transform: translateY(0) scale(1, 1) rotate(0); } 12% { transform: translateY(0) scale(1.06, 0.93) rotate(0); } 40% { transform: translateY(-13px) scale(0.98, 1.03) rotate(5deg); } 75% { transform: translateY(-6px) scale(0.99, 1.02) rotate(-3deg); } }
+@keyframes mol-lac { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-6deg); } 75% { transform: rotate(6deg); } }
+@keyframes mol-lu { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-1.4deg); } 75% { transform: rotate(1.4deg); } }
+@keyframes mol-dam { 0%, 34%, 100% { transform: translate(0, 0); } 7% { transform: translate(0, -5px); } 14% { transform: translate(0, 0); } 18% { transform: translate(-1.4px, 0); } 22% { transform: translate(1.4px, 0); } 26% { transform: translate(-1px, 0); } 30% { transform: translate(0.8px, 0); } }
+@keyframes mol-giat { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-2.3deg); } 75% { transform: rotate(2.3deg); } }
+@keyframes mol-run { 0%, 100% { transform: translate(0, 0); } 25% { transform: translate(-2px, 1px); } 50% { transform: translate(2px, -1px); } 75% { transform: translate(-1px, -1px); } }
+@keyframes mol-du { 0%, 50%, 100% { transform: translateY(0) rotate(0); } 25% { transform: translateY(-3px) rotate(4deg); } 75% { transform: translateY(-3px) rotate(-4deg); } }
+@keyframes mol-ngai { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(3deg); } 75% { transform: rotate(-3deg); } }
+@keyframes mol-lap { 0%, 100% { transform: rotate(0) scale(0.8); } 50% { transform: rotate(40deg) scale(1); } }
+@keyframes mol-dap { 0%, 30%, 100% { transform: scale(1); } 10% { transform: scale(1.14); } 20% { transform: scale(1.04); } }
+@keyframes mol-not { 0%, 100% { transform: translateY(0) rotate(0); } 25% { transform: translateY(-4px) rotate(12deg); } 75% { transform: translateY(-4px) rotate(-12deg); } }
+@keyframes mol-hoi { 0%, 100% { transform: translateY(0) rotate(0); } 25% { transform: translateY(-4px) rotate(10deg); } 75% { transform: translateY(-2px) rotate(-8deg); } }
+@keyframes mol-ngac { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+@keyframes mol-nhiet { from { opacity: 0.35; } to { opacity: 1; } }
+@keyframes mol-z { 0% { transform: translate(0, 8px) scale(0.5); opacity: 0; } 25% { opacity: 1; } 70% { opacity: 0.8; } 100% { transform: translate(14px, -24px) scale(1.2); opacity: 0; } }
+@keyframes mol-le { 0%, 25% { transform: translateY(0) scale(0.75, 0.8); opacity: 0; } 35% { opacity: 1; } 100% { transform: translateY(40px) scale(0.9, 1.2); opacity: 0; } }
+@keyframes mol-phi { 0%, 100% { transform: scale(0.8); } 50% { transform: scale(1.5); } }
 @keyframes mol-lua { from { transform: scale(1, 0.9) skewX(-4deg); } to { transform: scale(0.96, 1.06) skewX(4deg); } }
 @keyframes mol-nut { from { transform: translateY(0) rotate(-3deg); } to { transform: translateY(-3px) rotate(3deg); } }
+@keyframes mol-nut-quay { from { transform: translateY(0) rotate(0); } 50% { transform: translateY(-3px) rotate(180deg); } to { transform: translateY(0) rotate(360deg); } }
 @keyframes mol-noi { from { transform: scaleY(1); } to { transform: scaleY(0.55); } }
-@keyframes mol-nhun { 0%, 100% { transform: translateY(0) scale(1, 1); } 40% { transform: translateY(-14px) scale(0.97, 1.04); } 70% { transform: translateY(0) scale(1.04, 0.96); } }
-@keyframes mol-lac { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-6deg); } 75% { transform: rotate(6deg); } }
-@keyframes mol-chung { 0% { transform: translateY(0); } 100% { transform: translateY(4px) scale(1.01, 0.98); } }
-@keyframes mol-giat { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-2deg); } 75% { transform: rotate(2deg); } }
-@keyframes mol-run { 0% { transform: translate(0, 0); } 25% { transform: translate(-2px, 1px); } 50% { transform: translate(2px, -1px); } 75% { transform: translate(-1px, -1px); } 100% { transform: translate(1px, 1px); } }
-.mol-svg[data-tinh] *, html.may-yeu .mol-svg * { animation: none !important; }
-@media (prefers-reduced-motion: reduce) { .mol-svg * { animation: none !important; } }
+.mol-svg[data-khuat], .mol-svg[data-khuat] * { animation-play-state: paused !important; }
+.mol-svg[data-tinh], .mol-svg[data-tinh] *, html.may-yeu .mol-svg, html.may-yeu .mol-svg * { animation: none !important; }
+@media (prefers-reduced-motion: reduce) { .mol-svg, .mol-svg * { animation: none !important; } .mol-svg [data-k='nhom'] { transition-duration: 0.01s; } }
