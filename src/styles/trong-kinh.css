@@ -375,3 +375,40 @@ html[data-trong='hs'] .dm-khung[data-muc='thuong'] .tp-vo[data-man='nhiem-vu'] >
 html[data-trong='hs'] .dm-khung[data-muc='thuong'] .tp-vo[data-man='kim-cuong-ds'] > div:first-child::after { content: 'Thử thách Kim cương'; }
 html[data-trong='hs'] .dm-khung[data-muc='thuong'] .tp-vo:is([data-man='ban'], [data-man='nhiem-vu'], [data-man='kim-cuong-ds']) .tp-tieu {
   position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+/* TỰ SỬA LỖI (ManTuChua — bản vẽ tu-sua-loi): đầu trang = nút kính tròn + tiêu đề lớn; thẻ «cần sửa» kính bo 30, số to; nút chính viên thuốc cao 60
+   (giữ màu nút chính sẵn có); từng câu = thẻ kính, ô biểu tượng dải hồng (màu nhóm Tự sửa). Chỉ CSS, giữ DOM / chức năng. */
+html[data-trong='hs'] .tcl-man .tcl-dau-trang { background: transparent; border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; gap: 14px; }
+html[data-trong='hs'] .tcl-man .tcl-dau-trang > .ht-nut-phu { width: 48px; min-width: 48px; height: 48px; padding: 0; border: 0; border-radius: 24px; font-size: 0; gap: 0;
+  color: var(--tr-chu); background: var(--kinh-ve); box-shadow: inset 0 1px 0 var(--kinh-vien), inset 0 0 0 1px var(--kinh-vien-2), var(--kinh-bong); }
+html[data-trong='hs'] .tcl-man .tcl-dau-trang > .ht-nut-phu > svg { width: 22px; height: 22px; }
+html[data-trong='hs'] .tcl-man .tcl-dau-trang-ten { font-size: 26px; font-weight: 800; letter-spacing: -.02em; color: var(--tr-chu); }
+html[data-trong='hs'] .tcl-man .tcl-tong { border: 0; border-radius: 30px; background: var(--kinh-mat); box-shadow: inset 0 1px 0 var(--kinh-vien), inset 0 0 0 1px var(--kinh-vien-2), var(--kinh-bong); }
+html[data-trong='hs'] .tcl-man .tcl-so b { font-size: 64px; font-weight: 800; line-height: .95; letter-spacing: -.04em; color: var(--tr-sai-chu); }
+html[data-trong='hs'] .tcl-man .tcl-so small { font-size: 14px; font-weight: 700; color: var(--tr-chu-2); }
+html[data-trong='hs'] .tcl-man .tcl-nut-chinh { min-height: 60px; border: 0; border-radius: 30px; font-size: 17.5px; font-weight: 800; }
+html[data-trong='hs'] .tcl-man .tcl-the { border: 0; border-radius: 26px; background: var(--kinh-mat); box-shadow: inset 0 1px 0 var(--kinh-vien), inset 0 0 0 1px var(--kinh-vien-2), 0 10px 24px -16px var(--tr-phu); }
+html[data-trong='hs'] .tcl-man .tcl-the > .ht2-dong-bt { width: 44px; height: 44px; border-radius: 14px; color: var(--tr-trang);
+  background: linear-gradient(145deg, color-mix(in oklab, var(--tr-sai) 78%, var(--tr-trang)), var(--tr-sai-chu)); box-shadow: 0 6px 14px -8px var(--tr-sai-chu); }
+html[data-trong='hs'] .tcl-man .tcl-nhom-dau h2 { font-size: 17px; font-weight: 800; color: var(--tr-chu); }
+/* Gốc màn con Tự sửa lỗi / Tu luyện: trong suốt ⇒ thấy dải loang của khung màn con (khung `fixed inset-0` đã có nền đặc + dải loang — trong-hs-mau.css) */
+html[data-trong='hs'] .ht-app.ht2.tcl-man, html[data-trong='hs'] .ht-app.tlu, html[data-trong='hs'] .tlu { background: transparent; }
+/* TU LUYỆN (ManTuLuyen — bản vẽ tu-luyen): nút kính tròn + tiêu đề lớn; ba tab = thanh viên kính, tab đang chọn nổi; «Chọn cách luyện» = LƯỚI HAI CỘT thẻ kính,
+   ô biểu tượng dải màu theo cách luyện (sửa câu sai hồng · dạng câu sai tím · dạng bài chàm · tự do vàng · tổng hợp lam). Số / thanh khắc phục giữ nguyên trong thẻ. */
+html[data-trong='hs'] .tlu .tlu-ve { width: 48px; min-width: 48px; height: 48px; border: 0; border-radius: 24px; color: var(--tr-chu); background: var(--kinh-ve);
+  box-shadow: inset 0 1px 0 var(--kinh-vien), inset 0 0 0 1px var(--kinh-vien-2), var(--kinh-bong); }
+html[data-trong='hs'] .tlu .tlu-tieu { font-size: 26px; font-weight: 800; letter-spacing: -.02em; }
+html[data-trong='hs'] .tlu .tlu-the-phu { padding: 4px; border: 0; border-radius: 26px; background: var(--kinh-ve); box-shadow: inset 0 1px 0 var(--kinh-vien), inset 0 0 0 1px var(--kinh-vien-2); }
+html[data-trong='hs'] .tlu .tlu-the-phu-nut { border: 0; border-radius: 22px; }
+html[data-trong='hs'] .tlu .tlu-the-phu-nut[aria-selected='true'] { background: var(--kinh-mat-dam); color: var(--tr-hs-chu); box-shadow: 0 6px 16px -10px var(--tr-phu); }
+html[data-trong='hs'] .tlu .tlu-luoi-the { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+html[data-trong='hs'] .tlu .tlu-the-che-do { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; min-width: 0; padding: 16px; text-align: left; border: 0; border-radius: 26px;
+  background: var(--kinh-mat); box-shadow: inset 0 1px 0 var(--kinh-vien), inset 0 0 0 1px var(--kinh-vien-2), 0 10px 24px -16px var(--tr-phu); }
+html[data-trong='hs'] .tlu .tlu-the-che-do[aria-checked='true'] { box-shadow: inset 0 0 0 2.5px var(--tr-hs-day), 0 10px 24px -16px var(--tr-phu); }
+html[data-trong='hs'] .tlu .tlu-the-che-do > :is(.tlu-the-che-do-chu, .tlu-dem-kp, .tlu-the-so) { width: 100%; min-width: 0; }
+html[data-trong='hs'] .tlu .tlu-the-che-do-ten { font-size: 16px; font-weight: 800; }
+html[data-trong='hs'] .tlu .tlu-the-che-do-icon { width: 44px; height: 44px; border-radius: 14px; color: var(--tr-trang); background: linear-gradient(145deg, color-mix(in oklab, var(--tr-hs) 70%, var(--tr-trang)), var(--tr-hs-day)); }
+html[data-trong='hs'] .tlu .tlu-the-che-do[data-che-do='1'] .tlu-the-che-do-icon { background: linear-gradient(145deg, color-mix(in oklab, var(--tr-sai) 78%, var(--tr-trang)), var(--tr-sai-chu)); }
+html[data-trong='hs'] .tlu .tlu-the-che-do[data-che-do='2'] .tlu-the-che-do-icon { background: linear-gradient(145deg, color-mix(in oklab, var(--tr-tim) 75%, var(--tr-trang)), var(--tr-tim-chu)); }
+html[data-trong='hs'] .tlu .tlu-the-che-do[data-che-do='4'] .tlu-the-che-do-icon { background: linear-gradient(145deg, color-mix(in oklab, var(--tr-sao) 80%, var(--tr-trang)), var(--tr-sao-chu)); }
+html[data-trong='hs'] .tlu .tlu-the-che-do[data-che-do='5'] .tlu-the-che-do-icon { background: linear-gradient(145deg, color-mix(in oklab, var(--tr-tin) 75%, var(--tr-trang)), var(--tr-tin-chu)); }
+@media (min-width: 900px) { html[data-trong='hs'] .tlu .tlu-luoi-the { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
