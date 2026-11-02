@@ -93,3 +93,17 @@ describe('xepTheoCauPhat — phương án / ý bị xáo khi phát', () => {
     expect(xepTheoCauPhat({ qid: 'q', lyDo: [], ketQua: '13,2' }, { phan: 'III', correct: '17,6' })).toBeNull()
   })
 })
+
+describe('chữ thầy nói theo thuật ngữ SGK', () => {
+  it('axit → acid, este → ester (giữ hoa đầu câu), không đụng chữ dài hơn', async () => {
+    const { chuSgk, kiemBanKinh } = await import('../src/lib/loi-giai-kinh/kiem')
+    expect(chuSgk('Xà phòng là muối của axit béo.')).toBe('Xà phòng là muối của acid béo.')
+    expect(chuSgk('Este no, đơn chức; ancol bền.')).toBe('Ester no, đơn chức; alcohol bền.')
+    expect(chuSgk('aminoaxit và amin')).toBe('aminoaxit và amine')
+    const ban = { cotLoi: { chu: 'x', chip: [] }, phim: [{ chu: 'a' }, { chu: 'b' }, { chu: 'c' }], thanChu: [], thayNoi: 'Xà phòng là muối của acid béo', lyDo: [],
+      hayNham: [{ nghi: 'a', dung: 'b' }], tuHoi: { hoi: 'h', tra: 't' }, theNho: [{ truoc: 'a', sau: 'b' }], phepTinh: [{ ten: 'x', bieuThuc: '1+1', ketQua: '2', laDapSo: true }] }
+    const k = kiemBanKinh(ban, { phan: 'III', dapAn: '2', qid: 'q', nguon: { thanChu: [], thayNoi: ['Xà phòng là muối của axit béo.'], meo: [] } })
+    expect(k.ket).toBe('dat')
+    expect(k.ban!.thayNoi).toBe('Xà phòng là muối của acid béo.')
+  })
+})

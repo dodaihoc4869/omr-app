@@ -572,7 +572,10 @@ function tinhBieuThuc(bt) {
 var laObj = (x) => x !== null && typeof x === "object" && !Array.isArray(x);
 var s = (v, tran = 600) => typeof v === "string" || typeof v === "number" ? String(v).normalize("NFC").replace(/\s+/g, " ").trim().slice(0, tran) : "";
 var mang = (v) => Array.isArray(v) ? v : [];
-var chuanDoiChieu = (t) => t.normalize("NFC").toLowerCase().replace(/[«»"“”'‘’]/g, "").replace(/[.!?…\s]+$/u, "").replace(/\s+/g, " ").trim();
+var SGK = { axit: "acid", "bazơ": "base", oxit: "oxide", este: "ester", ancol: "alcohol", amin: "amine", "anđehit": "aldehyde", "andehit": "aldehyde", xeton: "ketone", lipit: "lipid", polyme: "polymer" };
+var RE_SGK = new RegExp(`(^|[^\\p{L}])(${Object.keys(SGK).join("|")})(?=[^\\p{L}]|$)`, "giu");
+var chuSgk = (t) => t.replace(RE_SGK, (_m, a, w) => a + (w[0] === w[0].toUpperCase() ? SGK[w.toLowerCase()].replace(/^./, (c) => c.toUpperCase()) : SGK[w.toLowerCase()]));
+var chuanDoiChieu = (t) => chuSgk(t.normalize("NFC")).toLowerCase().replace(/[«»"“”'‘’]/g, "").replace(/[.!?…\s]+$/u, "").replace(/\s+/g, " ").trim();
 var RE_CAM = [
   [/[«»]/u, "có dấu «» (thầy: bỏ, in đậm thay)"],
   [/tiền(?! chất)|giàu|nghèo|thuế|nhà (?:thằng|bạn|giàu|nghèo)/iu, "dùng ẩn dụ tiền / nhà (thầy đã bỏ)"],
@@ -694,11 +697,13 @@ function kiemBanKinh(tho, ctx) {
   if (mang(tho.thanChu).length > thanChu.length) boKhoi.push("thần chú không có trong bảng của thầy");
   const noiNguon = new Map(ctx.nguon.thayNoi.map((t) => [chuanDoiChieu(t), t]));
   const thayNoiTho = s(tho.thayNoi, 300);
-  const thayNoi = thayNoiTho ? noiNguon.get(chuanDoiChieu(thayNoiTho)) : void 0;
+  const thayNoiGoc = thayNoiTho ? noiNguon.get(chuanDoiChieu(thayNoiTho)) : void 0;
+  const thayNoi = thayNoiGoc ? chuSgk(thayNoiGoc) : void 0;
   if (thayNoiTho && !thayNoi) boKhoi.push("câu thầy nói không có trong mục kiến thức");
   const meoNguon = new Map(ctx.nguon.meo.map((t) => [chuanDoiChieu(t), t]));
   const meoTho = s(tho.meo, 300);
-  const meo = meoTho ? meoNguon.get(chuanDoiChieu(meoTho)) : void 0;
+  const meoGoc = meoTho ? meoNguon.get(chuanDoiChieu(meoTho)) : void 0;
+  const meo = meoGoc ? chuSgk(meoGoc) : void 0;
   if (meoTho && !meo) boKhoi.push("mẹo không có trong mục kiến thức");
   const canhTho = tho.canh;
   const canh = canhTho === void 0 || canhTho === null ? null : docCanh(canhTho);
@@ -1208,6 +1213,7 @@ export {
   THAN_CHU,
   banKinhDungDuoc,
   chuCam,
+  chuSgk,
   chuanDoiChieu,
   docSoViet,
   khopLamTron,

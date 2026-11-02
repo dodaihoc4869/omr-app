@@ -2,7 +2,7 @@
 // Vừa mở chặng / màn có câu ⇒ `taiSanKinh(token, qids)` gọi MỘT lệnh nền `/hs/loi-giai-kinh` (máy chủ lọc phạm vi như gói đáp án dm), giữ gói «khoá.gói»
 // AES-GCM trên máy (bộ nhớ + localStorage, bọc try/catch; gói hết hạn theo ngày VN như dm). Bấm «Kiểm tra» xong ⇒ `banKinhCua(qid)` mở gói NGAY tại máy.
 // Không có mạng / lệnh lỗi ⇒ không có bản, màn giữ lời giải đang có. Không vào lệnh nóng nào, không chặn vẽ.
-import { goiHs } from '../loi-giai-api'
+import { docTokenHs, goiHs } from '../loi-giai-api'
 import { giaiChuoi } from '../dap-an-may'
 
 const KHOA_LUU = 'ddh.kinh.v1'
@@ -46,10 +46,27 @@ export function taiSanKinh(token: string, qids: readonly string[]): Promise<void
 /** Có gói Kính của câu trên máy chưa (không mở gói). */
 export const coGoiKinh = (qid: string): boolean => !!kho()[qid]
 
-/** Mở gói Kính của câu (bản THÔ còn `_goc` — nơi vẽ sắp theo câu đã phát bằng `xepTheoCauPhat`). Không có / hỏng ⇒ null. */
+// Màn nào cần bản mà máy chưa có (Câu đã làm, Chữa câu sai…): gom mọi câu xin trong cùng ~40 ms thành MỘT lệnh, token lấy từ phiên học sinh đã lưu.
+let hangCho: Set<string> | null = null
+let henGom: Promise<void> | null = null
+function xinGom(qid: string): Promise<void> {
+  if (!hangCho) {
+    hangCho = new Set()
+    henGom = new Promise((ok) => setTimeout(() => { const ds = [...(hangCho ?? [])]; hangCho = null; void taiSanKinh(docTokenHs(), ds).finally(ok) }, 40))
+  }
+  hangCho.add(qid)
+  return henGom!
+}
+const daXin = new Set<string>()
+
+/** Mở gói Kính của câu (bản THÔ còn `_goc` — nơi vẽ sắp theo câu đã phát bằng `xepTheoCauPhat`). Chưa có ⇒ xin máy chủ một lần (gom). Không có / hỏng ⇒ null. */
 export async function banKinhCua(qid: string): Promise<unknown | null> {
   const g = kho()[qid]
-  if (!g) { await dangTai.get(qid); if (!kho()[qid]) return null }
+  if (!g) {
+    await dangTai.get(qid)
+    if (!kho()[qid] && !daXin.has(qid)) { daXin.add(qid); await xinGom(qid) }
+    if (!kho()[qid]) return null
+  }
   const dm = kho()[qid]!.dm
   const i = dm.indexOf('.')
   const chu = i > 0 ? await giaiChuoi(dm.slice(0, i), `kinh|${qid}`, dm.slice(i + 1)) : null
