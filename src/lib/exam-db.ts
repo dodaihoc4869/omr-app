@@ -10,6 +10,11 @@ import { chuanHoaMayChu, diaChiMayChuHopLe, type CauHinhMayChu } from './cau-hin
 import type { SoSuaDang } from './sua-dang'
 import { themMau, type MauGiayThuc } from './hieu-chinh-giay-thuc'
 import { voiHanCho } from './han-cho'
+// 02/11 (tác tử tốc độ, issue số 778): nhập TĨNH — hai tệp dưới nằm CÙNG mảnh `bieu-tuong` với tệp này (vite.config.ts nhóm mảnh), nên `import()` động
+// không tách được gì mà còn buộc trình đóng gói dựng đối tượng không gian tên giữ MỌI hàm xuất (kể cả hàm chỉ test dùng) + vỏ nạp trước ⇒ thêm byte tải mở.
+// Vòng nhập exam-db ⇄ may-chu-moi / dia-chi-may-chu vô hại: chỉ gọi nhau BÊN TRONG hàm, không mã cấp đầu tệp nào dùng chéo.
+import { quenCauHinhMayChu } from './may-chu-moi'
+import { layDiaChiMayChu } from './dia-chi-may-chu'
 
 export interface AnswerRecord {
   phanI: Record<string, 'A' | 'B' | 'C' | 'D'> // qid -> lựa chọn (đã quy về chữ cái GỐC, chưa xáo)
@@ -372,7 +377,6 @@ export async function saveScriptUrl(url: string): Promise<void> {
   if (diaChi) {
     const cu = chuanHoaMayChu((await db.get(STORE_SETTINGS, 'mayChuMoi')) as Partial<CauHinhMayChu> | undefined)
     await db.put(STORE_SETTINGS, chuanHoaMayChu({ ...cu, URL: diaChi }), 'mayChuMoi')
-    const { quenCauHinhMayChu } = await import('./may-chu-moi')
     quenCauHinhMayChu()
   }
 }
@@ -420,7 +424,6 @@ export async function loadScriptUrl(): Promise<string> {
     // Máy sạch/IndexedDB hỏng vẫn có cấu hình công khai.
   }
   try {
-    const { layDiaChiMayChu } = await import('./dia-chi-may-chu')
     return await layDiaChiMayChu()
   } catch {
     return ''
@@ -481,7 +484,6 @@ export async function loadScriptUrlHoacMacDinh(): Promise<string> {
   const daLuu = await loadScriptUrl()
   if (daLuu) return daLuu
   try {
-    const { layDiaChiMayChu } = await import('./dia-chi-may-chu')
     return await layDiaChiMayChu()
   } catch {
     return ''
