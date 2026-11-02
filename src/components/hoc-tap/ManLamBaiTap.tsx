@@ -246,6 +246,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   const [phien, setPhien] = useState(dang0?.phien ?? mo0?.id ?? ''), [cau, setCau] = useState<Cau[]>(dau0?.ds ?? []), [viTri, setViTri] = useState(viTri0)
   const [tra, setTra] = useState(tra0), [ket, setKet] = useState<Record<string, Ket>>((dang0?.ket as Record<string, Ket> | undefined) ?? {}), [tai, setTai] = useState(!dau0), [nop, setNop] = useState(false), [loi, setLoi] = useState(''), [hetCau, setHetCau] = useState(''), [lan, setLan] = useState(0), [xong, setXong] = useState(false), [goiY, setGoiY] = useState(!!dang0?.goiY)
   const [tuLam, setTuLam] = useState(dang0 ? (!!dang0.tuLam || !!tra0) : !!tra0), [moLoiGiai, setMoLoiGiai] = useState(!!dang0?.moLoiGiai), [msCau, setMsCau] = useState<Record<string, number>>(dang0?.msCau ?? {})
+  const [kheLg, setKheLg] = useState<HTMLElement | null>(null) // chỗ nút «Lời giải thu gọn» trên thanh hộp Lời giải (thầy 03/11)
   const [goi7, setGoi7] = useState<TomTatGoi7 | undefined>(dau0?.g7), [chang, setChang] = useState<number | null>(dang0?.chang ?? null)
   // «Làm chặng kiểu Duolingo» (thầy chốt bản vẽ docs/ban-ve-duo-2610, 26/10): CHỈ khi <html data-trong> — cùng state, cùng lệnh, cùng luồng chấm/lưu/đo giây;
   // chỉ dựng cây trình bày khác (nhánh `if (duo)` cuối hàm). Tắt «Trong» ⇒ màn y cũ.
@@ -1314,8 +1315,8 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
       {luot?.moc && luot.N > 0 ? <span ref={biGomRef} key={`b${luot.id}`} className="duo-bi-gom" aria-hidden="true"><Bi cam="mung" size={92} /></span> : null}
       {moLoiGiai && q && k && !k.choThay && <div className="duo-lg" role="dialog" aria-modal="true" aria-label="Lời giải từng bước">
         <div className="duo-lg-the">
-          <header className="duo-lg-dau"><b>Lời giải · Câu {stt}</b><button type="button" className="duo-dong" aria-label="Đóng lời giải" onClick={() => { setMoLoiGiai(false); nutTiepRef.current?.focus({ preventScroll: true }) }}><XIcon size={24} aria-hidden="true" /></button></header>
-          <Suspense fallback={<LoiGiaiCau q={q} solution={k.solution} dapAn={k.answer} hinhLoiGiai={k.solutionImages} />}><LoiGiaiKinhHs qid={q.qid} phan={q.phan} choices={q.choices} ideas={q.ideas} dapAn={k.answer} em={traHien} duPhong={<LoiGiaiCauCoSoDo q={q} solution={k.solution} dapAn={k.answer} hinhLoiGiai={k.solutionImages} soDo={k.soDo} />} /></Suspense>
+          <header className="duo-lg-dau"><b>Lời giải · Câu {stt}</b><span className="duo-lg-khe" ref={setKheLg} /><button type="button" className="duo-dong" aria-label="Đóng lời giải" onClick={() => { setMoLoiGiai(false); nutTiepRef.current?.focus({ preventScroll: true }) }}><XIcon size={24} aria-hidden="true" /></button></header>
+          <Suspense fallback={<div aria-busy="true" style={{ minHeight: 160 }} />}><LoiGiaiKinhHs qid={q.qid} kheNut={kheLg} phan={q.phan} choices={q.choices} ideas={q.ideas} dapAn={k.answer} em={traHien} duPhong={<LoiGiaiCauCoSoDo q={q} solution={k.solution} dapAn={k.answer} hinhLoiGiai={k.solutionImages} soDo={k.soDo} />} /></Suspense>
           <NutHoiThay gon chi="giai" qid={q.qid} nguon="bai_hang_ngay" dapAnEm={traHien} />
         </div>
       </div>}
@@ -1368,7 +1369,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
           {!traLoiPhai && khoiTraLoi}
           {(dangTraLoi || k) && <HinhCuoiCau q={q} stt={stt} />}
           {k && !k.choThay && (q.phan !== 'II' || moLoiGiai
-            ? <Suspense fallback={<LoiGiaiCau q={q} solution={k.solution} dapAn={k.answer} hinhLoiGiai={k.solutionImages} />}><LoiGiaiKinhHs qid={q.qid} phan={q.phan} choices={q.choices} ideas={q.ideas} dapAn={k.answer} em={traHien} duPhong={<LoiGiaiCau q={q} solution={k.solution} dapAn={k.answer} hinhLoiGiai={k.solutionImages} />} /></Suspense>
+            ? <Suspense fallback={<div aria-busy="true" style={{ minHeight: 160 }} />}><LoiGiaiKinhHs qid={q.qid} phan={q.phan} choices={q.choices} ideas={q.ideas} dapAn={k.answer} em={traHien} duPhong={<LoiGiaiCau q={q} solution={k.solution} dapAn={k.answer} hinhLoiGiai={k.solutionImages} />} /></Suspense>
             : <button type="button" className="ht2-lam-nut ht2-lam-nut-mo" aria-expanded={false} onClick={() => setMoLoiGiai(true)}><ChevronDown size={18} aria-hidden="true" />{coLyDoY ? 'Xem lời giải đầy đủ cả 4 ý' : 'Xem lời giải đầy đủ'}</button>)}
           {/* Thầy 13/10 "nút hỏi bài ở tất cả các câu… hỏi bài thầy mọi lúc": đang làm ⇒ Hỏi thầy (gợi hướng, không đáp án); có kết quả ⇒ thêm Lời giải từng bước. */}
           {dangTraLoi && <NutHoiThay gon dangLam qid={q.qid} nguon="bai_hang_ngay" onHoi={() => { daHoiThay.current = q.qid }} />}

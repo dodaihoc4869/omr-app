@@ -3,7 +3,7 @@
 // (2) `banKinhCua` tự tải theo lô khi màn không tải sẵn (#774), màn mới gắn dựa vào đó; câu không có bản ⇒ không hỏi lại.
 // (3) Màn học sinh gắn Kính; TheCau không nhập thêm gì (luật tốc độ); app thầy / phụ huynh không gắn.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, render } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
 import { kinhTheoHien } from '../src/lib/loi-giai-kinh/the-cau-hien'
@@ -50,13 +50,31 @@ describe('banKinhCua — tự tải khi chưa có gói', () => {
 
 describe('LoiGiaiKinhHs — gói chưa có trên máy', () => {
   afterEach(() => { cleanup(); vi.doUnmock('../src/lib/loi-giai-api'); vi.resetModules() })
-  it('đang tải qua mạng ⇒ hiện NGAY lời giải cũ (không ô trống chờ)', async () => {
+  it('thầy 03/11: đang tải qua mạng ⇒ KHÔNG hiện lời giải cũ trước; lời giải cũ nằm sau nút «Lời giải thu gọn», bấm mới hiện', async () => {
     vi.resetModules(); localStorage.clear()
     vi.doMock('../src/lib/loi-giai-api', () => ({ goiHs: () => new Promise(() => {}), docTokenHs: () => 'tk' }))
     const { default: LoiGiaiKinhHs } = await import('../src/components/loi-giai-kinh/LoiGiaiKinhHs')
     const { container } = render(<LoiGiaiKinhHs qid="qx" phan="III" dapAn="1" duPhong={<p data-cu="1">cũ</p>} />)
+    expect(container.querySelector('[data-cu="1"]')).toBeNull()
+    expect(container.querySelector('.lgk-cho')).not.toBeNull()
+    const nut = screen.getByRole('button', { name: /Lời giải thu gọn/ })
+    expect(nut.getAttribute('aria-expanded')).toBe('false')
+    fireEvent.click(nut)
     expect(container.querySelector('[data-cu="1"]')).not.toBeNull()
-    expect(container.querySelector('.lgk-cho')).toBeNull()
+    expect(nut.getAttribute('aria-expanded')).toBe('true')
+  })
+  it('có chỗ trên thanh hộp Lời giải (kheNut) ⇒ nút nằm trên thanh, lời giải cũ mở ở đầu thân', async () => {
+    vi.resetModules(); localStorage.clear()
+    vi.doMock('../src/lib/loi-giai-api', () => ({ goiHs: () => new Promise(() => {}), docTokenHs: () => 'tk' }))
+    const { default: LoiGiaiKinhHs } = await import('../src/components/loi-giai-kinh/LoiGiaiKinhHs')
+    const khe = document.createElement('span'); khe.className = 'khe'; document.body.appendChild(khe)
+    const { container } = render(<LoiGiaiKinhHs qid="qy" phan="III" dapAn="1" kheNut={khe} duPhong={<p data-cu="1">cũ</p>} />)
+    const nut = khe.querySelector('button')!
+    expect(nut.className).toBe('lgk-tg-vien')
+    expect(container.querySelector('button.lgk-tg-vien')).toBeNull()
+    fireEvent.click(nut)
+    expect(container.querySelector('[data-cu="1"]')).not.toBeNull()
+    khe.remove()
   })
 })
 

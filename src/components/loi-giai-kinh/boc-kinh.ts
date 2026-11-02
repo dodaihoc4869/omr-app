@@ -1,5 +1,6 @@
 // HÀM BỌC LỜI GIẢI KÍNH cho `TheCau` xem lại ở app HỌC SINH (thầy 02/11): `<TheCau … bocLoiGiai={bocKinh(qid)} />`.
 // Câu có bản Kính ⇒ vẽ Kính (KinhTheCau trong LoiGiaiKinhHs.tsx, nạp lười); chưa có / nhãn nghi đáp án / câu tự luận ⇒ giữ lời giải cũ. App thầy / phụ huynh KHÔNG dùng.
+// Lúc nạp mảnh: KHÔNG hiện lời giải cũ trước rồi mới chuyển (thầy 03/11) — mảnh nằm trong kho tải nền nên chỉ chớp một nhịp; tệp này ở khối mở app nên giữ gọn.
 // Tệp .ts (createElement): chỉ xuất hàm, không xuất thành phần.
 import { createElement, lazy, Suspense, type ReactNode } from 'react'
 import type { TheCauProps } from '../TheCau'
@@ -16,5 +17,5 @@ export function taiKinhNen(qids: readonly string[]): void {
 export function bocKinh(qid: string | null | undefined): TheCauProps['bocLoiGiai'] {
   if (!qid) return undefined
   return (cu: ReactNode, the: TheCauProps) =>
-    the.nhanLoiGiai || (the.phan === 'III' && the.tuLuan) ? cu : createElement(Suspense, { fallback: cu }, createElement(KinhTheCau, { qid, the, duPhong: cu }))
+    the.nhanLoiGiai || (the.phan === 'III' && the.tuLuan) ? cu : createElement(Suspense, { fallback: null }, createElement(KinhTheCau, { qid, the, duPhong: cu }))
 }

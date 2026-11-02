@@ -177,7 +177,8 @@ describe('nộp', () => {
     expect(within(the(0)).getByText('Chưa đúng')).toBeTruthy()
     expect(within(the(0)).getByText('Đáp án đúng')).toBeTruthy()
     expect(within(the(0)).getByText('Em chọn')).toBeTruthy()
-    expect(within(the(0)).getByText('Kiến thức cốt lõi')).toBeTruthy()
+    // thầy 03/11: lời giải cũ không hiện trước khi biết câu có bản Kính — chờ mảnh Kính trả «không có bản» rồi mới hiện lời giải cũ
+    expect(await within(the(0)).findByText('Kiến thức cốt lõi')).toBeTruthy()
     // ô đáp án của câu đã chấm KHOÁ (nộp lại giữ kết quả lần đầu)
     for (const r of within(the(0)).getAllByRole('radio')) expect((r as HTMLInputElement).disabled).toBe(true)
     // câu chưa trả lời: "chưa được tính", KHÔNG phải sai, vẫn sửa được
