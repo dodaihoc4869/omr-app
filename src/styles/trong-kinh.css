@@ -317,6 +317,9 @@ html[data-trong='hs'] .kb-chip svg { width: 18px; height: 18px; flex: none; }
   html[data-trong='hs'] .kb-thanh .kb-thanh-muc.kb-thanh-muc { width: 64px; }
   html[data-trong='hs'] .kb-thanh .kb-thanh-ai.kb-thanh-ai { width: 60px; height: 60px; }
   html[data-trong='hs'] .tr-menu-ray.kb-thanh { gap: 8px; }
+  /* Fold gập 360px: «12/30 câu» không chui dưới bình */
+  html[data-trong='hs'] .kb-hero { grid-template-columns: minmax(0, 1fr) 100px; padding-right: 12px; }
+  html[data-trong='hs'] .kb-so { font-size: 50px; }
 }
 /* MÁY TÍNH (≥ 1024 × 600): bản vẽ = ray kính nổi bên trái + nội dung hai cột ở giữa; menu cũ thôi làm thanh bên cố định, trở về tấm «Thêm» bật ra;
    cột tóm tắt bên phải (Hôm nay · Giải tuần · Nhiệm vụ · lối tắt Luyện tập — đều có ở thẻ mức / tab Luyện tập / Thành tích) ẩn như bản vẽ. */
