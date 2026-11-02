@@ -1,6 +1,6 @@
 # Hợp đồng THỬ THÁCH RIÊNG HÔM NAY (Bộ não A.I Nấc 1 · V1 + V2) — Code 3 → Code 1 · Code 2 · Code 4, 21/09/2026
 
-Nguồn: `DE-XUAT-BO-NAO-VAI-TRO-MOI-2109.md` (thầy đã chốt 11:31: "Chốt hết, triển luôn để tối nay chạy thật"). Mục tiêu: mỗi em mở app tối nay thấy MỘT thẻ do Bộ não A.I viết riêng cho em — gắn thần thú bằng SỐ THẬT, kèm đúng mấy câu nên làm hôm nay — còn bài tập về nhà, hạn nộp, điểm y nguyên.
+Nguồn: `docs/dac-ta-cu/DE-XUAT-BO-NAO-VAI-TRO-MOI-2109.md` (thầy đã chốt 11:31: "Chốt hết, triển luôn để tối nay chạy thật"). Mục tiêu: mỗi em mở app tối nay thấy MỘT thẻ do Bộ não A.I viết riêng cho em — gắn thần thú bằng SỐ THẬT, kèm đúng mấy câu nên làm hôm nay — còn bài tập về nhà, hạn nộp, điểm y nguyên.
 
 ## Luật cứng (không ai được đổi)
 Thử thách **KHÔNG bắt buộc, không hạn, không tính vào bài tập về nhà**, không đổi hạn nộp/điểm/ca kiểm tra · Bộ não **KHÔNG chọn mã câu** — máy chủ chọn · câu **không tự luận**, **chưa làm trong 14 ngày**, **không vượt bậc + 1**, không thuộc đề thi đang bảo vệ · KHÔNG gửi đáp án xuống máy em trước khi nộp · chấm + ghi sổ + EXP đi **đường có sẵn** của ôn lại (nguồn sổ mới `thu_thach_rieng`), KHÔNG loại thưởng mới · câu sai vào lịch ôn như mọi câu · lời mời chỉ hứa điều chắc chắn, có ≥ 1 số thật trong thẻ, không so em với em, không nhãn năng lực, không doạ, không tên em (bí danh) · dữ liệu cho A.I ẩn danh · trần em ≤ 2 lời Bộ não/ngày (`loiNhanChoEm` sáng + `loiMoi` tối) · cờ tắt `cau_hinh.bo_nao.thuThach` (mặc định BẬT khi chế độ hiệu lực của lớp em là `that`).

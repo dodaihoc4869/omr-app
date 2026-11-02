@@ -1,4 +1,4 @@
-# Hợp đồng "Giao thêm bài cho con" (app phụ huynh) — 21/09/2026 · đề bài `prompt-ph-giao-them-bai-2109.md`
+# Hợp đồng "Giao thêm bài cho con" (app phụ huynh) — 21/09/2026 · đề bài `docs/dac-ta-cu/prompt-ph-giao-them-bai-2109.md`
 Phần **Code 1** (hàm thuần, ĐÃ XONG, đột biến 19/19) ở đây; phần **Code 3** (lệnh `POST /ph/giao-them`, chọn qid, đếm lượt, mom_bai, mayDaLam) viết tiếp ở mục 5; phần **Code 2** (màn) ở mục 6.
 
 ## 1 · Hàm thuần `tinhGiaoThem(vao): KetQuaGiaoThem` — `src/lib/giao-them-cho-con.ts`

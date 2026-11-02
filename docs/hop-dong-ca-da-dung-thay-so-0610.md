@@ -2,7 +2,7 @@
 
 Thầy 06/10: *"Tôi muốn mở ca thi chọn câu đúng được thay bằng câu thay số của câu đúng đó (ghi rõ câu này thay số của câu em đã đúng ở…). Các câu lý thuyết thì bạn xử lý theo cách thay thế câu lý thuyết và cũng ghi rõ nhé."*
 
-Giả định đã dùng (thầy không nói khác thì làm theo đây): "ca thi chọn câu đúng" = chế độ đề **Kiểm chứng câu đã đúng** (`pham_vi_hoi_lai = 'da_dung'`, PR #133); "cách thay thế câu lý thuyết" = **câu anh em** của thang làm lại câu sai (cùng dạng, cùng phần, cùng mức hoặc kề, KHÁC nhóm nội dung, đúng khối, em chưa gặp — `DE-XUAT-LAM-LAI-CAU-SAI-0510.md` bậc 2).
+Giả định đã dùng (thầy không nói khác thì làm theo đây): "ca thi chọn câu đúng" = chế độ đề **Kiểm chứng câu đã đúng** (`pham_vi_hoi_lai = 'da_dung'`, PR #133); "cách thay thế câu lý thuyết" = **câu anh em** của thang làm lại câu sai (cùng dạng, cùng phần, cùng mức hoặc kề, KHÁC nhóm nội dung, đúng khối, em chưa gặp — `docs/dac-ta-cu/DE-XUAT-LAM-LAI-CAU-SAI-0510.md` bậc 2).
 
 ## 1. Luật thay (mỗi câu em đã đúng trong bộ câu)
 

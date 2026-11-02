@@ -1,4 +1,4 @@
-// MỘT ĐỊNH NGHĨA "CÂU ĐÃ LÀM HÔM NAY" cho HIỂN THỊ ở cả ba app (Boss 21/09 — thầy thấy cùng một em "Đã làm 93 câu" ở thẻ Hôm nay, "78 câu" ở ô Thi đua; đề bài prompt-mot-dinh-nghia-cau-da-lam-2109.md).
+// MỘT ĐỊNH NGHĨA "CÂU ĐÃ LÀM HÔM NAY" cho HIỂN THỊ ở cả ba app (Boss 21/09 — thầy thấy cùng một em "Đã làm 93 câu" ở thẻ Hôm nay, "78 câu" ở ô Thi đua; đề bài docs/dac-ta-cu/prompt-mot-dinh-nghia-cau-da-lam-2109.md).
 //
 //   "Câu đã làm hôm nay" = số câu KHÁC NHAU (DISTINCT qid) em ĐÃ TRẢ LỜI (`ket_qua IS NOT NULL`), MỌI nguồn, có `luc >= MAX(mốc hiển thị, 00:00 hôm nay giờ VN)` và `ngay_vn = hôm nay`.
 //   "Câu đúng" cùng khuôn = số qid khác nhau có ÍT NHẤT MỘT lần đúng (đúng cột `dung` của `TIEN_BO_NGAY`, nên `soCauDung ≤ soCau`).

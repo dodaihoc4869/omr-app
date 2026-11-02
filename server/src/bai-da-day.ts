@@ -1,5 +1,5 @@
 // OMNI 3 — TICK BÀI ĐÃ DẠY (phạm vi đã dạy của lớp) → TỰ TẠO CHIẾN DỊCH THEO BÀI. Lệnh thầy `POST /gv/bai-da-day` (sau cổng `laThay`).
-// Đặc tả: DAC-TA-BUILD-OMNI-3-0510.md mục 1 bước 1, 2, 3 (bai_da_day, pham_vi_lop); prompt-tick-bai-tu-giao.md mục A–B; hợp đồng docs/hop-dong-omni-3.md mục B.
+// Đặc tả: docs/dac-ta-cu/DAC-TA-BUILD-OMNI-3-0510.md mục 1 bước 1, 2, 3 (bai_da_day, pham_vi_lop); docs/dac-ta-cu/prompt-tick-bai-tu-giao.md mục A–B; hợp đồng docs/hop-dong-omni-3.md mục B.
 // Bảng CHỈ-THÊM, tạo lúc chạy (CI không chạy migration; bản SQL ở server/migration-0510-omni-3.sql — câu tạo ở đây y hệt, test khoá):
 //   bai_da_day  (id, lop, khoa_bai, ten_bai, vi_tri, ma_to_json, tick_luc, nguoi, chien_dich_id, bo_tick_luc)
 //   pham_vi_lop (lop, khoa_bai, ten_bai, vi_tri, ma_de_json, nguon 'tick'|'truoc', cap_nhat_luc) PK (lop, khoa_bai)

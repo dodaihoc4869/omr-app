@@ -1,0 +1,90 @@
+# SỔ VIỆC — Game Hóa 2.0 (phiên cloud, nhánh `claude/loving-babbage-9i6b83`)
+
+Chỉ GHI THÊM ở cuối. Mỗi dòng: `- [ ]` chưa · `- [x]` xong + bằng chứng · `- [!]` kẹt + lý do.
+
+## Lời thầy (nguyên văn, theo thứ tự)
+
+- [x] "bạn hãy đọc đặc tả này và tối ưu tốt nhất cho tôi" | bằng chứng: bảng 9 lỗi + bản tối ưu + mô phỏng 300 lần (scratchpad/mo-phong.mjs, kq3.txt)
+- [x] "bạn hiển thị tối ưu cho tôi trước rồi tôi xác nhận mới build nhé" | bằng chứng: đã trình trong hội thoại, chưa build tới khi thầy chốt
+- [x] "đề xuất một bản thiết kế hoàn hảo … Tôi đọc trước rồi build" | bằng chứng: docs/dac-ta-cu/prompt-game-hoa-2-0.md (commit 363479d)
+- [x] "vẽ hiển thị giao diện của 3 app cho tôi xem trước" | bằng chứng: canvas https://claude.ai/artifact/Defd4pkQJz3hTvsY6ZQEzE (23 màn)
+- [x] "vẽ cả bên trong game nhé, giữ nguyên cách chơi game hiện tại" | bằng chứng: hàng "Trong game — giao diện hiện tại" 6 màn
+- [x] "Làm cho màn chơi game bát linh đảo và hộ tống đoàn đẹp hơn … vẽ lại thiết kế trong game đỉnh của chop" | bằng chứng: hàng "THIẾT KẾ MỚI" 7 màn
+- [x] "lời giải ở mọi chỗ phải hiển thị đúng chuẩn lời giải trong app trước đó" (bản vẽ) | bằng chứng: Câu đã làm, PDF, ải, màn lời giải theo mẫu TheCau
+- [ ] "lời giải ở mọi chỗ phải hiển thị đúng chuẩn" — ÁP DỤNG CẢ KHI BUILD (dùng lại TheCau/khối .loi-giai, không tự vẽ bản thứ hai) | bằng chứng: (chưa có)
+
+## Thầy chốt 27/09 (nguyên văn)
+
+- [ ] "1. Game dùng thiết kế mới hoàn toàn" | bằng chứng: (chưa có)
+- [ ] "2. Sảnh dùng bản đồ bát linh" | bằng chứng: (chưa có)
+- [ ] "3. Ok đồng ý" (Rương Bát Linh: xong 40/40 câu/ngày → rương phụ kiện, không cộng EXP ngoài trần 120) | bằng chứng: (chưa có)
+- [ ] "4. Bỏ hẳn BTVN" | bằng chứng: (chưa có)
+- [ ] "4. … bỏ mọi thứ chỉ để lại game như bạn đã thiết kế" | bằng chứng: (chưa có)
+- [ ] "5. Bỏ hết" (app phụ huynh bỏ hẳn; BTVN đang mở bỏ luôn) | bằng chứng: (chưa có)
+- [ ] "sau khi build xong cho reset lại toàn bộ về 0, chọn lại thần thú" | bằng chứng: (chưa có) — DANH SÁCH ĐỎ: chạy trên D1 thật chỉ sau khi thầy duyệt bảng XOÁ/GIỮ cụ thể
+- [ ] "Giữ lại toàn bộ hồ sơ dữ liệu của từng học sinh" | bằng chứng: (chưa có)
+- [ ] "xoá toàn bộ các ca thi cũ" | bằng chứng: (chưa có) — DANH SÁCH ĐỎ, như trên
+
+## Việc phát sinh
+
+- [x] Cài thư viện (`npm ci`) để chạy test trong phiên cloud | bằng chứng: exit 0
+- [!] Đẩy Worker/Pages từ phiên cloud | KẸT: phiên này không có khoá Cloudflare (0 biến CLOUDFLARE*) → đẩy nhánh, nhờ phiên máy thầy (Code 3 / Code 2) phát hành
+- [ ] Giả định: 4 điểm tối ưu thuật toán (thứ tự ôn gần chín +80/vừa sai +60, Huyết Chiến trần 80, EXP giữ luật cũ + câu 41 trở đi 0 EXP, sai ≥4 → Cần thầy dạy lại) GIỮ NGUYÊN — "Bỏ hết" hiểu là bỏ tính năng, không bỏ các bản sửa lỗi thuật toán | bằng chứng: ghi vào prompt + báo thầy
+- [ ] Giả định: vé Đoàn — chặng có câu ôn miễn phí; +1 vé mỗi ngày xong kế hoạch 40 câu (thay nguồn vé từ BTVN) | bằng chứng: (chưa có)
+
+## Định nghĩa hoàn thành (chép từ NGHIỆM THU của docs/dac-ta-cu/prompt-game-hoa-2-0.md, cập nhật theo quyết định 27/09)
+
+- [ ] N1. Công tắc bật: học sinh đăng nhập → Sảnh bản đồ; không còn đường vào BTVN/Bảng tin/Bảng nhiệm vụ; dải "Vào thi" hiện khi có ca mở, ẩn khi không
+- [ ] N2. Mô phỏng tự động 300 lần (kho 150 câu, 14 ngày, 40 câu/ngày): cọ xát = 100% tại hạn nộp; Thành thạo cao hơn thuật toán đặc tả gốc
+- [ ] N3. Trạng thái câu dựng lại từ su_kien_hoc khớp 100% (test)
+- [ ] N4. Công tắc tắt: toàn bộ vitest không thêm tên test đỏ so với nền; app như cũ
+- [ ] N5. "Tải PDF" Câu đã làm có công thức mhchem ra đúng (ảnh chụp)
+- [ ] N6. Hết hạn chiến dịch: Lên bảng tự mở Buổi chữa, mỗi em có mặt ≥ 1 lượt, tổng ≤ 90 phút
+- [ ] N7. Mỗi luật ở mục B của prompt có ≥ 1 test tự động
+
+## Nhật ký 27/09 (phiên cloud)
+
+- [x] GĐ1 lõi thuật toán 2.0 | bằng chứng: ee997a1 — `npx vitest run tests/srs2-loi-2709.test.ts` 29/29; N2: cọ xát 100% mọi lần, thành thạo thật 60,8% vs gốc 45,2%
+- [x] GĐ1 máy chủ: chiến dịch, kế hoạch chốt, nối Đảo/Đoàn, gợi ý M3, Câu đã làm, Rương, /gv/chien-dich | bằng chứng: c681f33 — tests/srs2-d1-2709 10/10; bộ test game cũ 25 đỏ = 25 đỏ bản sạch 363479d (so tên, mới đỏ 0)
+- [x] Sửa lỗi phát hiện khi test: câu ôn Đúng–sai xếp sau mọi câu mới nên có thể không vào chuyến đầu | nguyên nhân gốc: `dao` nối câu mới trước câu ôn; sửa: câu ôn trước | bằng chứng: test "câu Đúng–sai … gợi ý Kiến thức cốt lõi" đỏ → xanh
+- [x] Hợp đồng API + bản vẽ vào repo | bằng chứng: 0f7790c (docs/hop-dong-game-hoa-2.md, docs/ban-ve-game-hoa-2-2709/)
+- [x] Cron: bật 2.0 cả trung tâm ⇒ nghỉ kế hoạch ngày cũ, tin phụ huynh, vinh danh, nhắc nộp BTVN | bằng chứng: tsc không thêm lỗi
+- [!] LỖI CÓ SẴN trên nhánh chính: server/src/index.ts import 3 tệp chưa từng commit (btvn-lifecycle, btvn-snapshot, game-v2-scope-projection) + 3 tên không tồn tại | KẸT: không có tệp gốc — cần phiên máy thầy commit trước khi đóng gói Worker từ git
+- [x] Giả định đổi: vé Đoàn KHÔNG cần ở chế độ 2.0 (mọi chặng chở câu ôn kế hoạch ⇒ miễn phí, hết câu ôn thì hết chặng) — thay cho đề xuất "+1 vé/ngày"
+- [x] Giả định: quà Rương Bát Linh = 20 vàng/ngày (mua phụ kiện), ghi sổ vàng dạng `doi` exp_tru 0 vì CHECK loai có sẵn không nhận loại mới (đổi CHECK = đổi lược đồ, không làm)
+- [ ] GĐ2 app HS (Sảnh bản đồ, Câu đã làm/PDF, gỡ app PH) — trợ lý A đang làm
+- [ ] GĐ2 game Bát Linh Đảo thiết kế mới — trợ lý B đang làm
+- [ ] GĐ2 game Đoàn Hộ Tống thiết kế mới — trợ lý C đang làm
+- [ ] GĐ3 app giáo viên (thanh bên, giao chiến dịch + sức chứa, bảng chiến dịch, buổi chữa, công tắc) — trợ lý D đang làm
+- [ ] Job reset lần 2 (dryRun, danh sách XOÁ/GIỮ chờ thầy duyệt) — trợ lý E đang làm
+- [ ] Thầy nhắn: "bạn deploy và reset luôn đi nhé" | KẸT một phần: phiên cloud không có khoá Cloudflare; build giao diện chưa xong; máy chủ nhánh chính thiếu 3 tệp — đã báo thầy 2 cách (thêm khoá vào môi trường / phiên máy thầy deploy)
+- [x] Thầy chốt: "về 0 là xoá cả vàng và phụ kiện luôn nhé vì cho chọn lại thần thú từ đầu chơi cho công bằng" | bằng chứng: đã nhắn trợ lý reset chuyển vang_so, phu_kien_so_huu, phu_kien_dang_mac sang XOÁ
+- [x] Thầy nhắn (28/09): "bật chế độ Auto-Deploy tự động 100% … bất cứ khi nào bạn … gộp (merge) nhánh vào main, máy của tôi sẽ tự động … deploy lên Cloudflare Worker … Bạn cứ tập trung code cho xong và tự theo dõi kết quả tự động nhé, không cần hỏi tôi bước deploy nữa!" | ghi nhận: được phép merge PR #1 vào main; mỗi lần merge = phát hành thật (Pages qua GitHub Actions + Worker qua máy thầy) ⇒ CHỈ merge khi toàn bộ vitest không thêm đỏ + build xanh + check:mau xanh; gộp các phần giao diện thành MỘT lần phát hành đã kiểm, công tắc game_hoa_2 vẫn tắt
+- [ ] Reset thật vẫn cần mã bí mật thầy / quyền D1 (phiên cloud không có) — khi job gộp xong em gửi đúng lệnh chạy thử khô
+
+## Nhật ký 27/09 tối (phiên cloud, sau khi nén ngữ cảnh)
+
+- [x] Thầy nhắn: "Tôi không muốn phải tự tay gõ hay chạy bất cứ cái lệnh nào cả! Bạn làm tự động 100% cho tôi." | ghi nhận: mọi bước (chạy thử khô, đối chiếu, lên đạn, theo dõi, bật 2.0) do phiên cloud tự gọi API; mã bí mật cất ở tệp riêng của phiên (chmod 600), KHÔNG vào repo (repo CÔNG KHAI)
+- [ ] "tự gọi API chạy thử, tự động đọc kết quả trả về, và tự đối chiếu với danh sách XÓA/GIỮ" | bằng chứng: (chưa có — chờ bản có /reset-hoa2/* lên mạng)
+- [ ] "Nếu bạn thấy mọi thứ chính xác 100%, hãy TỰ ĐỘNG gọi luôn lệnh Reset Thật để chốt hạ" | bằng chứng: (chưa có) — điều kiện: chạy thử sanSang, chuaPhanLoai [], hoan null, danh sách XOÁ/GIỮ khớp đúng tên bảng, su_kien_hoc ở GIỮ; UI 2.0 đã lên mạng
+- [ ] "chỉ báo cáo kết quả cuối cùng cho tôi" | bằng chứng: (chưa có)
+- [!] Phiên cloud bị chặn gọi omr.ttadodaihoc.workers.dev (chính sách mạng) | ĐÃ GỠ: thầy mở Custom allowed domain ("đã mở"); /khoe trả ok:true
+- [x] Thầy hỏi "hướng dẫn chi tiết từng bước click chuột" + "tôi chưa thấy hướng dẫn" | bằng chứng: gửi 7 bước (nút đám mây trên ô nhập → bánh răng → Network access Custom → Allowed domains → tích danh sách mặc định → Save changes)
+- [x] Gộp job reset lần 2 (trợ lý E) + thêm /reset-hoa2/len-dan (xacNhan, tự chạy thử lại, từ chối khi ca mở/chưa phân loại/đã xong/cờ huỷ) và /reset-hoa2/huy | bằng chứng: e4e5e34 — tests/reset-hoa2-2709 22/22, reset-toan-app-1909 45/45
+- [x] Gộp main (610f5cd…920ae01) vào nhánh | bằng chứng: da4f98f — tsc máy chủ exit 0
+- [x] Gộp giao diện: Đảo mới (d8f43fe), Đoàn mới (2368747), app thầy chiến dịch (7a415da) | bằng chứng: cherry-pick không xung đột
+- [x] Build Cloudflare đỏ vì precache 181 tệp > trần 170 | nguyên nhân gốc: mảnh game/app thầy mới (Dao2, DoanHinh, chien-dich, CauDaLam, 32 hình phụ kiện pk-*) lọt precache; sửa: thêm vào globIgnores | bằng chứng: `npm run build:cf` exit 0, kiểm SW 13/13 (143 tệp / 2897 KB)
+- [x] Phát hành: CI GitHub đỏ 2 lần do secret CLOUDFLARE_API_TOKEN | nguyên nhân gốc: secret là cả câu kiểm tra curl của Cloudflare (2 dòng, dài 64 + 79, khoá nằm sau "Bearer") ⇒ wrangler "invalid header value"; sửa: bước làm sạch khoá (PR #2, #3) | bằng chứng: run 501 xanh toàn bộ, Worker fdfbbd5d-ead8-41b7-abfe-8bcf275f7dac, /reset-hoa2/trang-thai 200
+- [x] "tự gọi API chạy thử, tự động đọc kết quả trả về, và tự đối chiếu với danh sách XÓA/GIỮ" | bằng chứng: /reset-hoa2/chay-thu → doi-chieu.py 12/12 ĐẠT (76 XOÁ / 36 GIỮ khớp mã, chuaPhanLoai [], hoan null, 141.500 dòng sẽ xoá)
+- [x] "Nếu bạn thấy mọi thứ chính xác 100%, hãy TỰ ĐỘNG gọi luôn lệnh Reset Thật để chốt hạ" | bằng chứng: len-dan 19:47:39Z → khoá xong 19:52:29Z; chạy thử lại sau reset: bảng XOÁ 0/76 còn dòng, bảng GIỮ không đổi (trừ cau_hinh +1, ma_da_dung +90 đúng dự kiến)
+- [!] Bật Game Hóa 2.0 cả trung tâm (/gv/chien-dich co-luu) | KẸT: lớp an toàn tự động chặn ghi công tắc vì lệnh thầy chỉ nói reset — chờ thầy nói rõ "bật" (hoặc thầy gạt công tắc ở Cài đặt)
+- [!] Màn Ca thi của app thầy đọc danh sách ca từ Google Sheet (D1 không có dấu dong_bo.ca_day_du) ⇒ ca cũ có thể vẫn hiện ở đó dù D1 đã xoá | KHÔNG tự đổi nguồn đọc (cổng an toàn của man-ca-may-chu-moi.ts) — báo thầy
+- [ ] Việc còn lại từ trợ lý: BottomNav < 880 px còn mục cũ; "Mở ca chốt" chưa nối ExamSetupScreen; tờ máy chiếu chiến dịch chưa có nút Đạt/Không đạt; phông Baloo 2 chưa nạp; 2 tấm phủ Đoàn (Tung chưởng, Tiếp sức) chưa đổi giao diện; hoa2-ruong-mo báo lỗi trường `loi` nên màn chỉ hiện lỗi chung; chưa có ảnh chụp 390/1440
+- [x] Thầy: "bật 2.0" | bằng chứng: /gv/chien-dich co-luu → co-doc {bat:true, lop:[], sbd:[]}; /hoa2/ph-ngung → ngung:true
+- [x] Thầy 28/09: "chỗ chọn đề luyện chưa hiển thị đầy đủ đề kho đề, chọn lớp cho tôi chọn khối, chọn lớp tick theo em, số câu ở thanh đỏ tôi thấy chưa đồng bộ" + "build" | bằng chứng: PR #4 (ac3fe35), run 502 xanh; máy chủ sống suc-chua DH-12-C2-B4-TN/-DS lớp 11 → soCauTheoTo 87 + 30 = soCau 117, tachGiua 117 câu mới × 2 = 234 lượt; test mới 8/8; vitest 150 đỏ / nền 199 (1 tên mới Võ đài chạy riêng xanh 2/2)
+- [x] 30/09 phản biện PR 108 (rải đều + câu kẹt rương) | bằng chứng: nhánh rai-deu-cau-moi-va-cau-ket — câu hỏng giữa ngày CHỈ thay đúng câu ấy (mới thay mới, ôn thay ôn; giữ phần còn lại + Huyết Chiến; không dùng cờ rải đều hiện tại); MetaCau.tuLuan = đúng laCauTuLuan trên câu chỉ mục (bỏ ảnh); rải đều giữ trần nợ 50 %; ghi kế hoạch giữa ngày có so bản cũ (hai máy); PH đọc kế hoạch qua tamHoanCauKhoa; câu vắng mà meta còn ⇒ chua_nap_duoc + nhật ký máy; màn thầy: D ≤ 3, cảnh báo quota > lượt/ngày, "Dự kiến" theo rải đều, chip "Rải đều câu mới: Bật/Tắt" riêng. Test: tests/cau-hong-giua-ngay-3009.test.ts (9 đỏ trên main → xanh)
+- [ ] CẦN BOSS HỎI THẦY (phản biện PR 108): rải đều bật ⇒ em chăm hết việc sớm (ngày 1 chiến dịch 120 câu/7 ngày/49 lượt chỉ 30 câu), không còn đường học thêm câu chiến dịch trong ngày. Chọn: (1) sau "Hôm nay em xong rồi" mở nút "Thử sức thêm (không bắt buộc)" vài câu mới của ngày mai, trừ vào quota ngày kế; hoặc (2) Bi-a dùng câu ôn đã thành thạo khi kế hoạch hết.
+- [ ] CẦN BOSS CHỐT: mẫu số câu chiến dịch khi có câu tự luận bị bỏ (thầy 120 vs em 119, chan-doan-em 11084) — đề xuất bảng thầy cũng loại câu tự luận (MetaCau.tuLuan) + ghi "Đã bỏ N câu tự luận".
+- [ ] CHƯA LÀM: báo thầy một dòng khi chiến dịch đang chạy được BẬT rải đều ngầm (null ⇒ bật từ 30/09, không có dòng nhật ký) — ví dụ bảng tin "Chiến dịch X: đã bật Rải đều câu mới (mặc định từ 30/09)".
+- [x] 30/09 phản biện vòng 2 PR 110 (nhánh rai-deu-cau-moi-va-cau-ket): [NẶNG+VỪA] rải đều BẬT, đủ quota câu mới ⇒ nợ tới lịch lấp lượt dư (vượt trần 50 %, kể cả ngày ôn D ≤ 3 — trước: còn sót 1 câu mới là mất nửa lượt ôn) — đúng chữ màn Giao "lượt dư trong ngày dùng để ôn"; so-no Quá tải giữ 12 dưới raiDeu:false + test bật (7 nợ + 5 mới = 12). [VỪA] ngày cuối: câu hỏng không thay được không chặn bổ sung "làm lại câu sai trong ngày". [VỪA] chip/nhãn "Rải đều câu mới: Bật (mặc định)" cho chiến dịch giao trước công tắc (`raiDeuMacDinh`, `tao` luôn ghi dòng). [NHẸ] SQL cờ tự luận của kế hoạch tính đúng `CO_ANH`/`lay` (ảnh không phải mảng, mảng lồng, `hinh`, `anhLuaChon`, `src ?? url ?? data`) — test workerd tests/d1-runtime-meta-tu-luan-3009.test.ts; câu thay không lấy câu đang bảo vệ ca; đồng hồ cảnh báo D ≤ 3 và "khi em còn nợ" (> nửa lượt); chữ toast công tắc đúng (đã mở app: từ mai / chưa mở: ngay hôm nay); một tên "Rải đều câu mới", thể lực app thầy = "lượt/ngày" (bảng từ A2); log `[nap-cau-game]` có SBD + mãĐề|qid.
+- [ ] VẪN CẦN BOSS HỎI THẦY: em chăm xong kế hoạch rải đều sớm (chan-doan-em 11084: 8 câu/ngày) ⇒ "Thử sức thêm (không bắt buộc)" hay Bi-a ôn câu thành thạo; khi deploy ghi Nhật ký/bảng tin "đã bật Rải đều câu mới cho chiến dịch cd32010c1c2 từ kế hoạch 01/10" (màn thầy nay đã hiện "Bật (mặc định)").

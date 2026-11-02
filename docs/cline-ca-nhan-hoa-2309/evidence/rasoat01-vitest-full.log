@@ -6850,7 +6850,7 @@ Received: [31m"[7m2011· 1 ca· 0 đã chọn2011 - Lớp 1[27m2009· 1 ca· 
 [31m+   return ra(await G.nopBtvnQuaPhieu(env,bt,sbd,(b.dapAn||{}) as Record<string,unknown>))[39m
 [31m+ }[39m
 [31m+[39m
-[31m+ /** EM BÁO XONG MỘT LÔ BTVN (thay Vòng 1/2 — mục 3 SO-VIEC.md 19/09, lịch lô[39m
+[31m+ /** EM BÁO XONG MỘT LÔ BTVN (thay Vòng 1/2 — mục 3 docs/so-viec/SO-VIEC.md 19/09, lịch lô[39m
 [31m+  * tính thuần ở `src/lib/lich-lo-btvn.ts`). Đường công khai, như `/btvn/nop`.[39m
 [31m+  *[39m
 [31m+  * CHỈ TĂNG, KHÔNG BAO GIỜ GIẢM — `MAX(lo_da_xong, ?)`. Gọi lại nhiều lần (mất[39m
@@ -7020,7 +7020,7 @@ Received: [31m"[7m2011· 1 ca· 0 đã chọn2011 - Lớp 1[27m2009· 1 ca· 
 [31m+   return ra(await G.nopBtvnQuaPhieu(env,bt,sbd,(b.dapAn||{}) as Record<string,unknown>))[39m
 [31m+ }[39m
 [31m+[39m
-[31m+ /** EM BÁO XONG MỘT LÔ BTVN (thay Vòng 1/2 — mục 3 SO-VIEC.md 19/09, lịch lô[39m
+[31m+ /** EM BÁO XONG MỘT LÔ BTVN (thay Vòng 1/2 — mục 3 docs/so-viec/SO-VIEC.md 19/09, lịch lô[39m
 [31m+  * tính thuần ở `src/lib/lich-lo-btvn.ts`). Đường công khai, như `/btvn/nop`.[39m
 [31m+  *[39m
 [31m+  * CHỈ TĂNG, KHÔNG BAO GIỜ GIẢM — `MAX(lo_da_xong, ?)`. Gọi lại nhiều lần (mất[39m
@@ -15754,7 +15754,7 @@ Received: [31m"[7m2011· 1 ca· 0 đã chọn2011 - Lớp 1[27m2009· 1 ca· 
 [31m+  if(!r?.ok)throw new Error(r?.error||'Chưa cập nhật được bài tập. Thầy thử lại.')[39m
 [31m+ }[39m
 [31m+[39m
-[31m+ /** EM BÁO XONG MỘT LÔ BTVN (thay Vòng 1/2 — mục 3 SO-VIEC.md 19/09, xem[39m
+[31m+ /** EM BÁO XONG MỘT LÔ BTVN (thay Vòng 1/2 — mục 3 docs/so-viec/SO-VIEC.md 19/09, xem[39m
 [31m+  * `lich-lo-btvn.ts`) — đường CÔNG KHAI như `btvnCuaEm`. An toàn gọi lại nhiều[39m
 [31m+  * lần: máy chủ chỉ TĂNG tiến độ (MAX), nên phiếu mở lại hay mất mạng giữa[39m
 [31m+  * chừng gọi lại cũng không lùi mốc đã có. */[39m
@@ -15911,7 +15911,7 @@ Received: [31m"[7m2011· 1 ca· 0 đã chọn2011 - Lớp 1[27m2009· 1 ca· 
 [31m+     } catch {}[39m
 [31m+   }[39m
 [31m+[39m
-[31m+   // LỊCH LÔ (thay Vòng 1/2/3 — mục 3 SO-VIEC.md 19/09): tính lại ngay tại đây[39m
+[31m+   // LỊCH LÔ (thay Vòng 1/2/3 — mục 3 docs/so-viec/SO-VIEC.md 19/09): tính lại ngay tại đây[39m
 [31m+   // từ giaoLuc/hanNop/soCau + `loDaXong` máy chủ đã ghi, MỘT nguồn duy nhất[39m
 [31m+   // cho mọi màn mở phiếu (trợ lý bảng tin lẫn tab "Bài tập" bấm thẳng) — không[39m
 [31m+   // còn 3 màn Vòng 1/2/3 chọn `soCauSang` khác nhau nên không cần công thức cố[39m
@@ -25467,7 +25467,7 @@ Ignored nodes: comments, script, style
 [31m+ Received[39m
 
 [32m- 4 phương pháp khắc phục câu sai tối ưu cho con:[39m
-[31m+ // APP PHỤ HUYNH MỚI (thầy chốt mẫu 21/09; docs/ban-ve-ph-moi-thu-ve-con-2109/; đề bài prompt-ph-moi-thu-ve-con-2109.md): đăng nhập bằng SBD/liên kết riêng của con → MÀN CHÍNH (lời chào, "Hôm nay của con", "Ca kiểm tra gần nhất",[39m
+[31m+ // APP PHỤ HUYNH MỚI (thầy chốt mẫu 21/09; docs/ban-ve-ph-moi-thu-ve-con-2109/; đề bài docs/dac-ta-cu/prompt-ph-moi-thu-ve-con-2109.md): đăng nhập bằng SBD/liên kết riêng của con → MÀN CHÍNH (lời chào, "Hôm nay của con", "Ca kiểm tra gần nhất",[39m
 [31m+ // dải cảnh báo của thầy, MỘT nút "Giao thêm bài cho con" dính đáy, chân "Đổi số báo danh") → bảng "MỌI THỨ VỀ CON" (gói tải lười). Dữ liệu: hai lệnh /ph/tat-ca-ve-con + /ph/chi-tiet-cau-ve-con (src/lib/ph-moi/) + /ph/giao-them.[39m
 [31m+ // Không menu, không tab, không thần thú/EXP/game. Danh sách đã gỡ ở lượt trước: docs/ph-toi-gian-2109.md.[39m
 [31m+ import { Suspense, lazy, useEffect, useState } from 'react'[39m

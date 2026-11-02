@@ -1,4 +1,4 @@
-// `POST /gv/bang-tin-song` — BẢNG TIN KIỂU "SÀN GIAO DỊCH" của thầy (prompt-bang-tin-san-2109.md mục CODE 3; hợp đồng hai bên docs/hop-dong-bang-tin-song-2109.md — Code 4 ⇄ Code 3; màn đọc bằng `docSan`).
+// `POST /gv/bang-tin-song` — BẢNG TIN KIỂU "SÀN GIAO DỊCH" của thầy (docs/dac-ta-cu/prompt-bang-tin-san-2109.md mục CODE 3; hợp đồng hai bên docs/hop-dong-bang-tin-song-2109.md — Code 4 ⇄ Code 3; màn đọc bằng `docSan`).
 // ĐỌC-CHỈ, mã bí mật của thầy như `/gv/bang-tin`. Trả `{ ok, serverNow, ...MỌI khoá của /gv/bang-tin (gọi chung `gvBangTin`), song:{ tongEm, dungNhip, tia60, nen, theoLop, nhiet, suKienMoi, danDau } }`.
 // MỘT ĐỊNH NGHĨA "câu" (`cau-da-lam.ts`, Boss 21/09): mọi số CÂU ở đây = câu KHÁC NHAU em đã trả lời hôm nay (làm lại một câu = một câu; bỏ trống không tính), `soCauDung` = câu có ≥ 1 lần đúng; chỉ GIÁ nến A(t), `nen[].soLuot` và dòng tin "lượt sai" của dạng đếm LƯỢT.
 // MỘT nguồn số: tổng câu / câu đúng / em đã học / theo lớp / ô nhiệt / nến / tia đều tính từ CÙNG danh sách sự kiện hôm nay ⇒ khớp nhau (luật khớp của hợp đồng); `nhip.soCau|soCauDung|soEmHoc|tiLeDung` của bản 3 được GHI ĐÈ bằng số này

@@ -1,4 +1,4 @@
-// SỨC KHOẺ MÁY CHỦ đo TRONG BỘ NHỚ (kế hoạch KE-HOACH-MAY-CHU-GIO-CAO-DIEM-2109.md, M3): thời gian trả lời từng lệnh trong cửa sổ 2 phút ⇒ p50/p95 ⇒ mức tốt / bận / nghẽn ⇒ HỆ SỐ NHỊP mà máy khách nhân vào nhịp hỏi nền của mình.
+// SỨC KHOẺ MÁY CHỦ đo TRONG BỘ NHỚ (kế hoạch docs/dac-ta-cu/KE-HOACH-MAY-CHU-GIO-CAO-DIEM-2109.md, M3): thời gian trả lời từng lệnh trong cửa sổ 2 phút ⇒ p50/p95 ⇒ mức tốt / bận / nghẽn ⇒ HỆ SỐ NHỊP mà máy khách nhân vào nhịp hỏi nền của mình.
 // KHÔNG chạm D1, không tốn truy vấn nào. Mỗi isolate của Worker có một bộ đo riêng (số đo của chính isolate đang trả lời) — máy khách nên lấy MAX của vài phản hồi gần nhất. Hợp đồng: docs/hop-dong-suc-khoe-may-chu-2109.md.
 export type MucMay = 'tot' | 'ban' | 'nghen'
 export interface DoLenh { duong: string; soLuot: number; p50Ms: number; p95Ms: number }

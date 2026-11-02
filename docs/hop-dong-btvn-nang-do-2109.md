@@ -1,6 +1,6 @@
 # HỢP ĐỒNG — BTVN "NÂNG ĐỠ": máy chủ ↔ app thầy (Code 4) ↔ app học sinh + phụ huynh (Code 2)
 
-Người viết: Code 3 (máy chủ), 21/09/2026 (bản 4: khớp mã đã viết — `server/src/btvn-nang-do-d1.ts`, `btvn-nang-do-chang.ts`). Thiết kế: `DE-XUAT-BTVN-NANG-DO-2109.md`; đề bài: `prompt-btvn-nang-do.md`; lõi thuần: `src/lib/btvn-nang-do.ts` (Code 1, máy chủ import như `doan-core`; kiểu `CauGiao`, `HoSoEmRut`, `NganSachBai`, `BoCuaEm`, `TomTatBo`, `NhanCau` (có `loi_cao`), `TienBo` dùng nguyên văn).
+Người viết: Code 3 (máy chủ), 21/09/2026 (bản 4: khớp mã đã viết — `server/src/btvn-nang-do-d1.ts`, `btvn-nang-do-chang.ts`). Thiết kế: `docs/dac-ta-cu/DE-XUAT-BTVN-NANG-DO-2109.md`; đề bài: `docs/dac-ta-cu/prompt-btvn-nang-do.md`; lõi thuần: `src/lib/btvn-nang-do.ts` (Code 1, máy chủ import như `doan-core`; kiểu `CauGiao`, `HoSoEmRut`, `NganSachBai`, `BoCuaEm`, `TomTatBo`, `NhanCau` (có `loi_cao`), `TienBo` dùng nguyên văn).
 **ĐỔI LUẬT CHẤM BTVN (thầy duyệt 21/09): điểm tính trên SỐ CÂU CỦA TỪNG EM.** Bài `ca_nhan = 0` và mọi bài đang chạy: chạy Y NHƯ CŨ, từng byte phản hồi. Chưa đẩy Worker khi Boss chưa soát.
 
 ## 0 · Hiện trạng đã dò (để khỏi dò lại)

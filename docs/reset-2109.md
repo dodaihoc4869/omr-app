@@ -69,7 +69,7 @@ Trạng thái khoá: `dang_chay` (nhịp tim cũ quá 3 phút = chết, lượt 
 mkdir -p "/Volumes/SSD NGOÀI/omr-saoluu"
 cd server && npx wrangler d1 export omr --remote --output="/Volumes/SSD NGOÀI/omr-saoluu/omr-d1-<ngày>-<giờ>.sql"
 ```
-Kiểm đếm dòng từng bảng khớp dryRun và ghi vào SO-VIEC.md. Export mất khoảng 15 giây và khoá D1 trong chốc lát: làm lúc không có ca thi mở.
+Kiểm đếm dòng từng bảng khớp dryRun và ghi vào docs/so-viec/SO-VIEC.md. Export mất khoảng 15 giây và khoá D1 trong chốc lát: làm lúc không có ca thi mở.
 
 **(b) Trong job**: khoá ghi `batDauLuc` và `demTruoc`; D1 Time Travel giữ lịch sử 30 ngày. Lấy bookmark ngay trước khi lên đạn: `cd server && npx wrangler d1 time-travel info omr`, ghi vào sổ.
 

@@ -1,5 +1,5 @@
 // OMNI 3 — KIỂU + HẰNG SỐ DÙNG CHUNG (HỢP ĐỒNG giữa lõi thuần, lớp D1, đường trả lời và ba app).
-// Đặc tả: DAC-TA-BUILD-OMNI-3-0510.md · Hợp đồng API: docs/hop-dong-omni-3.md.
+// Đặc tả: docs/dac-ta-cu/DAC-TA-BUILD-OMNI-3-0510.md · Hợp đồng API: docs/hop-dong-omni-3.md.
 // Tệp này là HỢP ĐỒNG: đổi chữ ký / nghĩa một trường ở đây phải báo phiên điều phối (không tự đổi trong làn riêng).
 // Mọi hằng số con số của OMNI nằm ở `THAM_SO_OMNI` — cấm rải số ra tệp khác.
 // KHÔNG import tệp nào khác của máy chủ (tránh vòng phụ thuộc): lõi thuần, D1, game đều import từ đây.

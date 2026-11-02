@@ -1,5 +1,5 @@
 // @vitest-environment node
-// THẦY LỆNH 21/09/2026: "Siết độ khó lấy khiên: ít nhất học đều 21 ngày mới lấy được khiên đầu tiên." (DE-XUAT-EXP-MANH-KHIEN-1909.md mục 4.)
+// THẦY LỆNH 21/09/2026: "Siết độ khó lấy khiên: ít nhất học đều 21 ngày mới lấy được khiên đầu tiên." (docs/dac-ta-cu/DE-XUAT-EXP-MANH-KHIEN-1909.md mục 4.)
 // Tính chất: em ĐẠT MỌI NGÀY, hưởng MỌI thưởng mảnh cũ (chuỗi bội 7, dạng rời yếu MỖI ngày) ⇒ khiên RÈN đầu tiên KHÔNG sớm hơn ngày thứ 21.
 import { describe, expect, it } from 'vitest'
 import { congManh, tinhExp, type KhienRen, type VaoTinhExp } from '../server/src/exp-hoc-tap'

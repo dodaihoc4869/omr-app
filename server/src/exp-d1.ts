@@ -1,4 +1,4 @@
-// LỚP D1 CỦA EXP HỌC TẬP + MẢNH KHIÊN (DE-XUAT-EXP-MANH-KHIEN-1909.md, thầy chốt "Chốt. Quá thông minh").
+// LỚP D1 CỦA EXP HỌC TẬP + MẢNH KHIÊN (docs/dac-ta-cu/DE-XUAT-EXP-MANH-KHIEN-1909.md, thầy chốt "Chốt. Quá thông minh").
 //
 // MỘT hàm gốc, `capNhatExp(env, sbd, now, tuyChon)`: đọc sổ `su_kien_hoc` + các bảng phụ, gọi hàm THUẦN `tinhExp`, ghi khoản MỚI vào `exp_so`/
 // `manh_khien_so` (idempotent bằng khoá chính), rồi cộng phần chênh vào hồ sơ game bằng CAS. Không có đường EXP thứ hai: mọi nơi ghi sổ chỉ việc gọi

@@ -1,4 +1,4 @@
-// KHO MỎNG → RÚT LẶP THÔNG MINH — mục 2, SO-VIEC.md 19/09.
+// KHO MỎNG → RÚT LẶP THÔNG MINH — mục 2, docs/so-viec/SO-VIEC.md 19/09.
 //
 // Bối cảnh thật: sau vá "rút đề lẫn chương" (chặn bù kho lấy nhầm chuyên đề),
 // ca nào kho ĐÚNG chuyên đề quá mỏng thì phần "câu mới" của `dungDeRieng`

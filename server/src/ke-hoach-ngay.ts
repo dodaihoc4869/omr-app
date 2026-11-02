@@ -1,4 +1,4 @@
-// BỘ ĐIỀU PHỐI NGÀY — GĐ 2 (DE-XUAT-CA-NHAN-HOA-1909.md mục 1.3).
+// BỘ ĐIỀU PHỐI NGÀY — GĐ 2 (docs/dac-ta-cu/DE-XUAT-CA-NHAN-HOA-1909.md mục 1.3).
 //
 // `lapKeHoachNgay` là HÀM THUẦN: cùng đầu vào → cùng JSON, từng chữ. Không đọc đồng hồ (`now` truyền vào),
 // không Math.random (mọi phá thế cân bằng dùng `hashSeed(sbd|ngày|phiên bản|qid)`).

@@ -1,4 +1,4 @@
-// NHỊP TỰ GỌI MÁY CHỦ CỦA APP THẦY — kế hoạch KE-HOACH-MAY-CHU-GIO-CAO-DIEM-2109.md, mục Code 4 (3). Sự cố D1 21/09 20:30: mọi vòng tự hỏi nền đè lên D1 (chỉ MỘT luồng).
+// NHỊP TỰ GỌI MÁY CHỦ CỦA APP THẦY — kế hoạch docs/dac-ta-cu/KE-HOACH-MAY-CHU-GIO-CAO-DIEM-2109.md, mục Code 4 (3). Sự cố D1 21/09 20:30: mọi vòng tự hỏi nền đè lên D1 (chỉ MỘT luồng).
 // Luật: nhịp lấy từ BẢNG (BANG_NHIP_THAY); tab ẩn thì dừng; không gọi chồng; lỗi ⇒ lùi dần 30 → 60 → 120 s (không nhanh hơn nhịp thường). Trước đây: `setInterval` trần ở Theo dõi ca (20 s, không đợi lượt trước xong,
 // lỗi cũng cứ 20 s một lần) và `useTuLamMoi` của Bảng tin bản 3 (không chống chồng, không lùi).
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'

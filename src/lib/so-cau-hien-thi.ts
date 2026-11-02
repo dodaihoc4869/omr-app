@@ -1,4 +1,4 @@
-// MỘT định nghĩa "câu đã làm hôm nay" ở MÀN HỌC SINH (Boss 21/09, đề bài `prompt-mot-dinh-nghia-cau-da-lam-2109.md`; thầy thấy thẻ Hôm nay "93 câu" cạnh ô Thi đua "78 câu" của cùng một em).
+// MỘT định nghĩa "câu đã làm hôm nay" ở MÀN HỌC SINH (Boss 21/09, đề bài `docs/dac-ta-cu/prompt-mot-dinh-nghia-cau-da-lam-2109.md`; thầy thấy thẻ Hôm nay "93 câu" cạnh ô Thi đua "78 câu" của cùng một em).
 // Máy chủ tính MỘT con số HIỂN THỊ (`tienBo.soCauHienThi` = số câu KHÁC NHAU em ĐÃ TRẢ LỜI, mọi nguồn, từ MAX(mốc hiển thị, 00:00 hôm nay) — đúng định nghĩa của ô Thi đua). Màn CHỈ hiện số ấy.
 // `tienBo.daLamCau` (rộng hơn: cả câu bỏ trống, cả ngày) vẫn nuôi LUẬT đạt nhiệm vụ / EXP / khiên ở máy chủ — màn KHÔNG dùng nó để nói "đã làm" khi máy chủ đã có số hiển thị; luật đạt/chưa đạt không đổi.
 // THUẦN: không React, không mạng.

@@ -1,6 +1,6 @@
 // OMNI 3 — P VI KỸ NĂNG (BKT hội qua cổng AND có nhiễu) + SƠ Ý RIÊNG + TỐC ĐỘ RIÊNG + KHUNG GIỜ + SPRT. LÕI THUẦN.
 // Không đọc D1, không đọc đồng hồ, không Math.random: cùng tập sự kiện (mọi thứ tự) ⇒ cùng hồ sơ (deep-equal).
-// Đặc tả: DAC-TA-BUILD-OMNI-3-0510.md mục 4.1–4.4; công thức đã chạy trong docs/omni-0510/mo-phong-chac-8.mjs (hàm capNhat).
+// Đặc tả: docs/dac-ta-cu/DAC-TA-BUILD-OMNI-3-0510.md mục 4.1–4.4; công thức đã chạy trong docs/omni-0510/mo-phong-chac-8.mjs (hàm capNhat).
 import { CAC_KHUNG_GIO, MUC_DICH_LUOT, PHIEN_BAN_OMNI, THAM_SO_OMNI, khungGioCua, type HoSoOmniEm, type HoSoVkn, type KhungGio, type Phan, type QCau, type SuKienOmni, type ThamSoOmni, type XacNhanThay } from './omni-kieu'
 import { buocSprtPhatLai, nguongSprt, trangThaiSprt } from './omni-sprt'
 import { TIEN_TO_NEN } from './omni-q'

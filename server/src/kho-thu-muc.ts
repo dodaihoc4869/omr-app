@@ -1,5 +1,5 @@
 // OMNI 3 — HAI THƯ MỤC MỤC ĐÍCH CỦA KHO: DẠY HỌC (tick bài, game) · TU LUYỆN (mọi tờ còn lại: chỉ Tu luyện + ca kiểm tra).
-// Đặc tả: DAC-TA-BUILD-OMNI-3-0510.md mục 2 · prompt-tick-bai-tu-giao.md mục E · hợp đồng docs/hop-dong-omni-3.md mục B.
+// Đặc tả: docs/dac-ta-cu/DAC-TA-BUILD-OMNI-3-0510.md mục 2 · docs/dac-ta-cu/prompt-tick-bai-tu-giao.md mục E · hợp đồng docs/hop-dong-omni-3.md mục B.
 // Bảng CHỈ-THÊM `de_kho_thu_muc (ma_de PK, thu_muc 'DAY_HOC'|'TU_LUYEN', cap_nhat_luc)` — tạo lúc chạy (CI không chạy migration),
 // câu tạo y hệt server/migration-0510-omni-3.sql. Hai đường ghi:
 //   · app thầy đồng bộ `POST /kho/thu-muc` (≤ 1 lần/ngày, ≤ 400 mã/lệnh) — `gvKhoThuMuc`;

@@ -33,6 +33,6 @@ Skill này đóng gói những gì chắt được từ **323 video / 158 giờ*
 
 ## Dữ liệu và việc lặp lại
 - Kho chữ tìm kiếm: `/Volumes/SSD NGOÀI/Javis-DDH/state/bai-giang/corpus.sqlite3` (SQLite FTS5, 7.952 mảnh); chỉ mục kĩ thuật: `.../phuong-phap.json`.
-- Gốc: `/Volumes/SSD NGOÀI/hoc_tu_youtube/kenh-thay-do-dai-hoc/` (SO-VIEC.md, GITHUB-QUET.md, cong-cu/*). Video mới: `cong-cu/tai-phu-de.sh` → `dung_corpus.py` → `chat_day_du.py` (python của app, nguyên văn từng video, chạy lại được) → `gom_phuong_phap.py` → `dung_phong_cach.py` → `xuat_skill.py`. Chạy nhẹ, chạy lại được.
+- Gốc: `/Volumes/SSD NGOÀI/hoc_tu_youtube/kenh-thay-do-dai-hoc/` (docs/so-viec/SO-VIEC.md, GITHUB-QUET.md, cong-cu/*). Video mới: `cong-cu/tai-phu-de.sh` → `dung_corpus.py` → `chat_day_du.py` (python của app, nguyên văn từng video, chạy lại được) → `gom_phuong_phap.py` → `dung_phong_cach.py` → `xuat_skill.py`. Chạy nhẹ, chạy lại được.
 - Văn phòng nạp trong `app/ddh_office/tro_giang/bai_giang.py` + `giai_bai.py` (lời dặn phong cách + khối "Thầy đã giảng dạng này" cho lượt giải chính, không cho lượt kiểm độc lập).
 - Nguồn GitHub đã soát: `references/nguon-github.md`.

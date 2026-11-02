@@ -24,8 +24,8 @@ Hai mốc KHÔNG phải cùng phiên bản — mọi kết luận cũ phải ch�
 
 ```text
  M src/lib/day-ca-may-chu-moi.ts          (đã sửa, chưa commit — GIỮ NGUYÊN)
-?? .claude/  ?? .clinerules/  ?? .dist-old-1789778214/  ?? CLINE-BAT-DAU-CA-NHAN-HOA-2309.md
-?? DE-XUAT-CA-NHAN-HOA-RUT-CAU-EXP-TUNG-BUOC-2309.md  ?? chu-hien.txt
+?? .claude/  ?? .clinerules/  ?? .dist-old-1789778214/  ?? docs/dac-ta-cu/CLINE-BAT-DAU-CA-NHAN-HOA-2309.md
+?? docs/dac-ta-cu/DE-XUAT-CA-NHAN-HOA-RUT-CAU-EXP-TUNG-BUOC-2309.md  ?? chu-hien.txt
 ?? docs/cline-ca-nhan-hoa-2309/  ?? docs/kiem-toan-ca-nhan-hoa-2309/
 ?? ket-qua.json  ?? scripts/kiem-toan-ca-nhan-hoa-2309.mjs  ?? src/lib/gui-ca-trinh-duyet.ts
 ```

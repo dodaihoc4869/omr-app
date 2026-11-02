@@ -1,5 +1,5 @@
 -- CHỈ THÊM (21/09/2026): GÓI KHIÊN — thầy lệnh "lên độ khó của khiên, RESET lại hết mảnh khiên và mốc ban đầu cho công bằng" + "mất chuỗi bao nhiêu ngày sẽ bị mất 1 khiên".
--- Tài liệu: DE-XUAT-EXP-MANH-KHIEN-1909.md mục 4; thứ tự chạy: docs/chay-that-2109-khien-thu-tu.md. Lùi: DROP TABLE khien_mat_so; DROP TABLE khien_truoc_reset_2109 (chỉ sau khi đã chạy tệp lùi dữ liệu).
+-- Tài liệu: docs/dac-ta-cu/DE-XUAT-EXP-MANH-KHIEN-1909.md mục 4; thứ tự chạy: docs/chay-that-2109-khien-thu-tu.md. Lùi: DROP TABLE khien_mat_so; DROP TABLE khien_truoc_reset_2109 (chỉ sau khi đã chạy tệp lùi dữ liệu).
 -- `khien_truoc_reset_2109`: BẢN CHÉP hồ sơ khiên của từng em TRƯỚC khi đặt lại (để lùi được). Mỗi em một dòng (INSERT OR IGNORE: chạy lại KHÔNG ghi đè bản gốc).
 CREATE TABLE IF NOT EXISTS khien_truoc_reset_2109 (
   sbd               TEXT PRIMARY KEY,

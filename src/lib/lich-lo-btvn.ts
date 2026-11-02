@@ -1,6 +1,6 @@
 // LỊCH LÔ BTVN — thay "3 Vòng Phân Tầng" bằng dãn câu theo ngày/giờ tính từ hạn.
 //
-// Yêu cầu gốc (19/09, mục 3 SO-VIEC.md): "bỏ vòng 1 và vòng 2 đi... tính toán
+// Yêu cầu gốc (19/09, mục 3 docs/so-viec/SO-VIEC.md): "bỏ vòng 1 và vòng 2 đi... tính toán
 // theo thời gian deadline tách luôn câu hiển thị lên bảng tin theo ngày hoặc
 // theo giờ dãn cách thông minh hiệu quả cùng với các nhiệm vụ khác để học
 // sinh không bị quá tải mà vẫn hoàn thành deadline hiệu quả, nếu chưa hoàn

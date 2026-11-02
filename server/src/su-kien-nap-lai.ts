@@ -1,4 +1,4 @@
-// NẠP LẠI SỔ TỪ DỮ LIỆU CŨ + ĐẾM KIỂM CHÉO — GĐ 0 (DE-XUAT-CA-NHAN-HOA-1909.md mục 1.1).
+// NẠP LẠI SỔ TỪ DỮ LIỆU CŨ + ĐẾM KIỂM CHÉO — GĐ 0 (docs/dac-ta-cu/DE-XUAT-CA-NHAN-HOA-1909.md mục 1.1).
 //
 // Lệnh của thầy (đòi mã bí mật), ≤ 20 em mỗi lượt. CHỈ ĐỌC các bảng cũ và CHỈ
 // THÊM vào `su_kien_hoc`: không sửa, không xoá dòng nào của bảng nào.

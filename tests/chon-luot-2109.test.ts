@@ -1,4 +1,4 @@
-// BỘ CHỌN LƯỢT MỚI + SỐ LƯỢT MỖI NGÀY (Code 1, 21/09/2026; thầy chốt 13:36; Điều 3–5 của `DE-XUAT-THAN-THU-MOI-NGAY-2109.md`).
+// BỘ CHỌN LƯỢT MỚI + SỐ LƯỢT MỖI NGÀY (Code 1, 21/09/2026; thầy chốt 13:36; Điều 3–5 của `docs/dac-ta-cu/DE-XUAT-THAN-THU-MOI-NGAY-2109.md`).
 // Nghiệm thu (Boss, ưu tiên khoá MỐC): KHÔNG lượt rỗng khi kho còn câu · KHÔNG vượt bậc + 1 · KHÔNG tự luận · KHÔNG câu bị chặn · chống lặp (≥ 3 câu mới, ≤ 2 câu cũ, sai quay lại sớm nhất hôm sau,
 // sai 3 lần đổi câu, đúng nghỉ 30 ngày) · loại lượt (khởi động chỉ Phần I; khám phá 1 câu dài / thưởng 2; trùm 6 câu bậc + 1, ≥ 3 câu dài) · trần câu dài theo cấp thú · lượt/ngày 3 + chặng + đạt + trùm, trần 6.
 import { describe, expect, it } from 'vitest'

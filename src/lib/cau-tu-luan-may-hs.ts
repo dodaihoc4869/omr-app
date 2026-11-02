@@ -1,5 +1,5 @@
 // LỚP PHÒNG THỦ CUỐI CHỐNG CÂU TỰ LUẬN — MÁY HỌC SINH / PHỤ HUYNH (thầy lệnh 21/09: "tuyệt đối không rút câu tự luận,
-// chỉ rút trắc nghiệm, đúng sai, trả lời ngắn — TRỪ màn Gọi lên bảng"; đề bài `prompt-cam-rut-tu-luan.md`, phần Code 2).
+// chỉ rút trắc nghiệm, đúng sai, trả lời ngắn — TRỪ màn Gọi lên bảng"; đề bài `docs/dac-ta-cu/prompt-cam-rut-tu-luan.md`, phần Code 2).
 // Máy chủ (Code 3) và máy thầy (Code 1) đã lọc ở NGUỒN; đây là chốt chặn cuối: nhận phải câu `laCauTuLuan` thì BỎ QUA câu đó
 // (không dựng ô nhập đáp án ngắn cho nó, không tính vào chuỗi đúng/sai) và ghi MỘT dòng console.warn.
 //

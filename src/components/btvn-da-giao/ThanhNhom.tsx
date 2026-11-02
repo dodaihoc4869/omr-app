@@ -1,4 +1,4 @@
-// THANH NHÓM cả lớp của một bài (đề prompt-btvn-da-giao-thiet-ke-lai-2109.md §1.C). ĐỌC số máy chủ (`nhom`); màn không tự cộng trừ nhóm.
+// THANH NHÓM cả lớp của một bài (đề docs/dac-ta-cu/prompt-btvn-da-giao-thiet-ke-lai-2109.md §1.C). ĐỌC số máy chủ (`nhom`); màn không tự cộng trừ nhóm.
 // Số nằm TRONG đoạn khi đoạn đủ rộng, đoạn quá hẹp thì số ra chú giải. Bấm một đoạn (hoặc một mục chú giải) ⇒ mở ngăn danh sách ĐÚNG nhóm đó.
 import { NHOM_EM, thanhNhom, type NhomBai, type NhomEm } from '../../lib/btvn-da-giao'
 import './btg.css'

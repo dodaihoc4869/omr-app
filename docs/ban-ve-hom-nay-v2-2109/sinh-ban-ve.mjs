@@ -1,4 +1,4 @@
-// BẢN VẼ MẪU (Code 4) — MÀN "HÔM NAY" CỦA THẦY, BẢN 2 (đề bài prompt-hom-nay-gv-v2.md, thầy lệnh 21/09): (1) Hôm nay 1440 · (2) Hôm nay 390 · (3) Toàn cảnh MỘT em 1440.
+// BẢN VẼ MẪU (Code 4) — MÀN "HÔM NAY" CỦA THẦY, BẢN 2 (đề bài docs/dac-ta-cu/prompt-hom-nay-gv-v2.md, thầy lệnh 21/09): (1) Hôm nay 1440 · (2) Hôm nay 390 · (3) Toàn cảnh MỘT em 1440.
 // Chạy: node docs/ban-ve-hom-nay-v2-2109/sinh-ban-ve.mjs → 3 JPG cùng thư mục (mỗi tệp ≤150 KB). Số liệu là MẪU minh hoạ (không phải dữ liệu thật); giờ 24 giờ, hạn "HH:mm · Thứ … dd/mm/yyyy".
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'

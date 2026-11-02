@@ -1,7 +1,7 @@
 # HỢP ĐỒNG MÁY THẦY ↔ MÁY CHỦ — lệnh `hoSoOnCa` (hồ sơ ôn cho RÚT ĐỀ RIÊNG, Kênh 1)
 
 Soạn 19/09/2026 bởi phiên **Rút đề riêng** (worktree `busy-austin-a4ab8b`, làn giáo viên) cho **phiên máy chủ**.
-Nguồn thiết kế: `DE-XUAT-CA-NHAN-HOA-1909.md` mục 1.1–1.2 và mục 2 "Kênh 1 — Rút đề thi".
+Nguồn thiết kế: `docs/dac-ta-cu/DE-XUAT-CA-NHAN-HOA-1909.md` mục 1.1–1.2 và mục 2 "Kênh 1 — Rút đề thi".
 Phần máy thầy (đã xong, có test, chờ máy chủ): `src/lib/exam-api.ts` (`hoSoOnCa`), `src/lib/de-rieng-nguon.ts`
 (`docHoSoOnCa`, `dungDeRiengChoCa`), `src/lib/de-rieng.ts` (`chonCauLapChoEm`, `dungDeRieng`),
 `src/lib/de-rieng-tran-trung.ts` (tập cấm theo từng em). Test: `tests/de-rieng-ho-so-1909.test.ts`.
@@ -131,7 +131,7 @@ Mã ca đã lấy nguồn. Em chưa nộp ca nào ⇒ `""`. Chỉ để ghi biê
 ## 5. Giới hạn chi phí + gợi ý cài đặt (phiên máy chủ quyết, đây chỉ là điểm vào)
 
 **≤ 3 truy vấn D1 cho MỘT lượt gọi** (≤ 20 em). 60 em = 3 lượt = ≤ 9 truy vấn. Mỗi truy vấn MỘT tham số `json_each(?)` cho danh sách
-(bẫy D1: ≤ 100 tham số, UNION ≤ ~5 vế — mục BÀN GIAO của `SO-VIEC.md`).
+(bẫy D1: ≤ 100 tham số, UNION ≤ ~5 vế — mục BÀN GIAO của `docs/so-viec/SO-VIEC.md`).
 
 1. **Ca gần nhất từng em** — một truy vấn gộp, chọn trong JS:
    `SELECT t.sbd, t.ma_ca, c.mo_luc FROM (SELECT DISTINCT sbd, ma_ca FROM chi_tiet_cau WHERE sbd IN (SELECT value FROM json_each(?1)) AND ma_ca <> ?2 AND qid <> '') t JOIN ca c ON c.ma_ca = t.ma_ca WHERE <c là ca thi, chưa xoá> ORDER BY c.mo_luc DESC`

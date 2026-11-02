@@ -1,4 +1,4 @@
--- GĐ 2 — KẾ HOẠCH NGÀY (DE-XUAT-CA-NHAN-HOA-1909.md mục 1.3).
+-- GĐ 2 — KẾ HOẠCH NGÀY (docs/dac-ta-cu/DE-XUAT-CA-NHAN-HOA-1909.md mục 1.3).
 --
 -- Mỗi (em, ngày VN) một dòng: mục tiêu câu, việc đã xếp, cảnh báo, và — khi ngày đã chốt — kết quả để tính chuỗi
 -- ngày tiến bộ. Chỉ THÊM bảng; không đụng bảng nào đang chạy. Kế hoạch tính THUẦN từ dữ liệu có sẵn nên mất bảng

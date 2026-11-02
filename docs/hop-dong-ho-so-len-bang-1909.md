@@ -1,7 +1,7 @@
 # HỢP ĐỒNG MÁY THẦY ↔ MÁY CHỦ — hồ sơ nắm kiến thức cho buổi chữa (Gọi lên bảng)
 
 Soạn 19/09/2026 bởi **Code 1** (làn giáo viên) cho **Code 3** (phiên máy chủ duy nhất).
-Nguồn thiết kế: `DE-XUAT-CA-NHAN-HOA-1909.md` mục 1.2 và mục 2 "Kênh 3 — Gọi lên bảng".
+Nguồn thiết kế: `docs/dac-ta-cu/DE-XUAT-CA-NHAN-HOA-1909.md` mục 1.2 và mục 2 "Kênh 3 — Gọi lên bảng".
 Phần máy thầy (đã xong, chờ máy chủ): `src/lib/ho-so-lop.ts` (`gopNamKt`, `diemHopCau`, `lyDoChanCau`, `canDayLaiCau`),
 `src/lib/xep-buoi-chua.ts`, `src/lib/exam-api.ts` (`goiHoSoLopLenBang`, `NamKtCauMayChu`), `src/screens/GoiLenBangScreen.tsx`.
 
@@ -99,7 +99,7 @@ Mọi trường cũ (`chuyenDe`, `qidSai`, `qidDaLam`, `lenBang`, `btvn`) **gi�
 
 ## 4. Gợi ý cài đặt (Code 3 quyết, đây chỉ là điểm vào)
 
-Không đổi 5 truy vấn hiện có; thêm **tối đa 3 truy vấn**, mỗi cái MỘT tham số `json_each(?)` (bẫy D1 ghi ở mục BÀN GIAO của `SO-VIEC.md`: ≤ 100 tham số, UNION ≤ ~5 vế):
+Không đổi 5 truy vấn hiện có; thêm **tối đa 3 truy vấn**, mỗi cái MỘT tham số `json_each(?)` (bẫy D1 ghi ở mục BÀN GIAO của `docs/so-viec/SO-VIEC.md`: ≤ 100 tham số, UNION ≤ ~5 vế):
 
 1. `SELECT sbd, qid, ma_dang, lan_sai, trang_thai, can_day_lai FROM nam_kt_cau WHERE sbd IN (…) AND qid IN (SELECT value FROM json_each(?))`
 2. `SELECT qid, dang FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?))` — tra `maDang` cho câu em chưa gặp (độ phủ đo 19/09: 99,9%).

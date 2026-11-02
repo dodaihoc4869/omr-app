@@ -1,4 +1,4 @@
-// LỊCH LÔ BTVN — thay Vòng 1/2/3 (mục 3 SO-VIEC.md 19/09).
+// LỊCH LÔ BTVN — thay Vòng 1/2/3 (mục 3 docs/so-viec/SO-VIEC.md 19/09).
 import { describe, expect, it } from 'vitest'
 import { loDangCho, tinhLichLoBtvn, tongCauDenLo, SO_CAU_MOI_LO_TOI_THIEU, type LichLoBtvn } from '../src/lib/lich-lo-btvn'
 

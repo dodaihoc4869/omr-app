@@ -1,4 +1,4 @@
-// HẰNG SỐ EXP HỌC TẬP + MẢNH KHIÊN — MỘT NGUỒN (DE-XUAT-EXP-MANH-KHIEN-1909.md, thầy chốt 19/09 "Chốt. Quá thông minh").
+// HẰNG SỐ EXP HỌC TẬP + MẢNH KHIÊN — MỘT NGUỒN (docs/dac-ta-cu/DE-XUAT-EXP-MANH-KHIEN-1909.md, thầy chốt 19/09 "Chốt. Quá thông minh").
 // Cấm rải các con số này ra chỗ khác. Đổi luật thưởng = đổi ĐÚNG tệp này (và test bảng giá trị `tests/exp-hoc-tap-1909.test.ts`).
 import { BANG_NGAY_CAP, MANH_REN_KHIEN, KHIEN_REN_GIU_TOI_DA } from '../../src/lib/kinh-te-game'
 // Luật v5 (THẦY ĐÃ CHỐT 29/09 chiều, docs/DE-XUAT-EXP-V5-2909.md): bảng ngày đạt/EXP theo cấp, EXP tràn → vàng/mảnh, giá rèn khiên — MỘT nguồn ở src/lib/kinh-te-game.ts (máy em cũng đọc).

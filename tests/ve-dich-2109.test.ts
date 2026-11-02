@@ -1,4 +1,4 @@
-// "DỒN VỀ ĐÍCH" — `src/lib/ve-dich.ts` (Code 1, 21/09/2026; thầy chốt 14:13; `DE-XUAT-DON-VE-DICH-2109.md`).
+// "DỒN VỀ ĐÍCH" — `src/lib/ve-dich.ts` (Code 1, 21/09/2026; thầy chốt 14:13; `docs/dac-ta-cu/DE-XUAT-DON-VE-DICH-2109.md`).
 // Nghiệm thu (Boss): mọi việc bắt buộc được xếp TRƯỚC hạn HOẶC `kip = false` (không bao giờ im lặng bỏ) · không buổi nào vượt trần (2 chặng / 30 câu / 60 phút; chặng đơn lớn hơn trần đứng một mình, có cờ) ·
 // không xếp sau 22:30, sau hạn, vào ca kiểm tra · buổi sáng ngày hạn dùng được khi hạn rơi trưa · đơn điệu theo thời gian (muộn hơn không kịp hơn, không nhận nhiều câu hơn) · đủ giờ thì không rút phần làm thêm ·
 // ôn quá lịch rải ≤ 3 ngày, trần 40 % / 60 %.

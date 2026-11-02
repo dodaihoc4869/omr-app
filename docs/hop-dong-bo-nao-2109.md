@@ -1,6 +1,6 @@
 # Hợp đồng BỘ NÃO — các lệnh `/ai/*` (máy chủ ↔ app thầy ↔ hai mã lệnh)
 
-Bên CUNG CẤP (chủ tệp): **Code 1** (`src/lib/bo-nao-*.ts`, `server/src/bo-nao.ts`, `scripts/bo-nao/*`). Bên NỐI route + chạy migration + đẩy Worker: **Code 3** (`server/src/index.ts`). Bên DÙNG: **Code 4** (app thầy). Lập 21/09/2026 theo `prompt-bo-nao.md`, `DE-XUAT-BO-NAO-AI-2109.md`, cẩm nang `bo-nao/HUONG-DAN-BO-NAO.md` (KHUÔN đầu ra).
+Bên CUNG CẤP (chủ tệp): **Code 1** (`src/lib/bo-nao-*.ts`, `server/src/bo-nao.ts`, `scripts/bo-nao/*`). Bên NỐI route + chạy migration + đẩy Worker: **Code 3** (`server/src/index.ts`). Bên DÙNG: **Code 4** (app thầy). Lập 21/09/2026 theo `docs/dac-ta-cu/prompt-bo-nao.md`, `docs/dac-ta-cu/DE-XUAT-BO-NAO-AI-2109.md`, cẩm nang `bo-nao/HUONG-DAN-BO-NAO.md` (KHUÔN đầu ra).
 Kiểu dùng chung: `src/lib/bo-nao-khuon.ts` (`DauRaEm`, `DongBanTin`, `kiemKhuon`, `kiemBanTin`, `HAN_MUC_BO_NAO`) và `src/lib/btvn-nang-do.ts` (`DieuChinhEm`).
 
 ## Nguyên tắc

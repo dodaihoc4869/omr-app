@@ -1,4 +1,4 @@
-// BẢNG TIN KIỂU SÀN GIAO DỊCH · cụm (a): khung + bốn ô số + băng chạy (Boss giao 21/09; đề bài prompt-bang-tin-san-2109.md).
+// BẢNG TIN KIỂU SÀN GIAO DỊCH · cụm (a): khung + bốn ô số + băng chạy (Boss giao 21/09; đề bài docs/dac-ta-cu/prompt-bang-tin-san-2109.md).
 // Khoá: MỘT nguồn trạng thái (số các khối KHỚP nhau) · khối thiếu ⇒ ẩn · số lăn kiểu công-tơ · chip chênh 10 phút · băng chạy chỉ nhận tin thật, không bịa · nút Sáng/Tối dùng cơ chế sẵn có ·
 // mọi lớp `bts-` có định nghĩa CSS, màu chỉ qua token (sáng + tối), chữ ≥ 12 px.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'

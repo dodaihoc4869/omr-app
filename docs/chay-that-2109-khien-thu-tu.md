@@ -1,7 +1,7 @@
 # GÓI KHIÊN — thứ tự chạy THẬT (Code 3, 21/09/2026) · chờ Boss soát + thầy bấm quyền
 
 Việc: thầy lệnh (1) "ít nhất học đều 36 ngày mới lấy được khiên đầu tiên", (2) "RESET lại hết mảnh khiên và mốc ban đầu cho công bằng", (3) "mất chuỗi bao nhiêu ngày sẽ bị mất 1 khiên" (Boss chốt 7 ngày).
-Mã: `44be961` (36 mảnh) + gói này. Đặc tả: `DE-XUAT-EXP-MANH-KHIEN-1909.md` mục 4. Tất cả ở D1 THẬT phải qua Boss soát và lời thầy trong khung chat; sao lưu TRƯỚC.
+Mã: `44be961` (36 mảnh) + gói này. Đặc tả: `docs/dac-ta-cu/DE-XUAT-EXP-MANH-KHIEN-1909.md` mục 4. Tất cả ở D1 THẬT phải qua Boss soát và lời thầy trong khung chat; sao lưu TRƯỚC.
 
 ## Số liệu thật lúc chuẩn bị (đọc chỉ-đọc 21/09 ~13:15)
 94 hồ sơ game · 38 em có `khienRen` (đều có mảnh > 0) · tổng mảnh 174 · khiên rèn đã rèn 17 (đều CHƯA dùng) · khiên đã dùng 0 · cấp cao nhất 7 (chưa ai tới mốc quà cấp 10) · `manh_khien_so` 207 dòng, TẤT CẢ ngày 21/09: 36 dòng `dat` (36 em, +1) và 171 dòng `dang` (29 em, +2 = 342 mảnh). **Vì vậy khi có mốc, máy chủ chỉ đếm dòng `loai = 'dat'`** (nếu không, 342 mảnh `dang` của hôm nay sẽ được cộng lại ngay sau reset).

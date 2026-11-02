@@ -1,4 +1,4 @@
-// MÀN HÔM NAY BẢN 2 — nay là bản DỰ PHÒNG: HomNayScreen (bản 3 = Bảng tin, thầy chốt 21/09) rơi về đây khi máy chủ CHƯA có lệnh `/gv/bang-tin` (hoặc chưa từng đọc được). Bản 2 gốc: thầy lệnh 21/09; đề bài prompt-hom-nay-gv-v2.md; bản vẽ docs/ban-ve-hom-nay-v2-2109/. Chỉ hiện số do máy chủ trả; khối nào chưa có ⇒ nói thật "đang chờ máy chủ", KHÔNG bịa số.
+// MÀN HÔM NAY BẢN 2 — nay là bản DỰ PHÒNG: HomNayScreen (bản 3 = Bảng tin, thầy chốt 21/09) rơi về đây khi máy chủ CHƯA có lệnh `/gv/bang-tin` (hoặc chưa từng đọc được). Bản 2 gốc: thầy lệnh 21/09; đề bài docs/dac-ta-cu/prompt-hom-nay-gv-v2.md; bản vẽ docs/ban-ve-hom-nay-v2-2109/. Chỉ hiện số do máy chủ trả; khối nào chưa có ⇒ nói thật "đang chờ máy chủ", KHÔNG bịa số.
 // Bỏ hẳn: khối "Việc cần theo dõi hôm nay", "Bảng tin của thầy" + ô ngày kiểu máy, "Hoạt động dạy học trong ngày", "Bài đã giao" (gộp vào ô Việc gấp). Chữ theo docs/CHUAN-TU-NGU-VA-GIAO-DIEN.md.
 import { useEffect, useMemo, useState } from 'react'
 import { useAppStore } from '../store/appStore'

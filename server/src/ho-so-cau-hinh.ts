@@ -1,4 +1,4 @@
-// HẰNG SỐ CỦA HỒ SƠ NẮM KIẾN THỨC — MỘT NGUỒN (DE-XUAT-CA-NHAN-HOA-1909.md mục 1.2).
+// HẰNG SỐ CỦA HỒ SƠ NẮM KIẾN THỨC — MỘT NGUỒN (docs/dac-ta-cu/DE-XUAT-CA-NHAN-HOA-1909.md mục 1.2).
 //
 // Cấm rải các con số này ra chỗ khác. Ba hằng số có bản song song ở nơi khác và
 // được `tests/ho-so-nam-kt-1909.test.ts` soi để hai bản không bao giờ lệch nhau:

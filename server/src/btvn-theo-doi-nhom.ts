@@ -1,4 +1,4 @@
-// `/btvn/theo-doi` BẢN 2 — phần BỔ SUNG CHỈ-THÊM cho mục "Bài tập về nhà đã giao" thiết kế lại (Boss 21/09 18:10; đề prompt-btvn-da-giao-thiet-ke-lai-2109.md §2–§3; hợp đồng docs/hop-dong-btvn-theo-doi-v2-2109.md — Code 1 màn ⇄ Code 3 máy chủ).
+// `/btvn/theo-doi` BẢN 2 — phần BỔ SUNG CHỈ-THÊM cho mục "Bài tập về nhà đã giao" thiết kế lại (Boss 21/09 18:10; đề docs/dac-ta-cu/prompt-btvn-da-giao-thiet-ke-lai-2109.md §2–§3; hợp đồng docs/hop-dong-btvn-theo-doi-v2-2109.md — Code 1 màn ⇄ Code 3 máy chủ).
 // Mỗi bài thêm `ten` · `tenLop` · `soCauLoi` · `chang[{so, ngay, laHomNay}]` · `nhom{chuaMo, dungNhip, chamNhip, xongHomNay, daNop, nopTre}`; mỗi em thêm `nhom` · `changHienTai` · `soCauDaLam` · `soCauCuaEm` · `hocGanNhat` · `nopTreGio?`.
 // KHÔNG đổi một khoá cũ. Màn KHÔNG tự tính nhóm: MỘT nguồn ở đây, cùng luật với Bảng tin thầy (`emChamNhip`, `trangThaiNopBai`, `baiTuNgayMoc`) và thẻ "Đường về đích" của em (mốc GỐC `truoc` của chặng mở sớm).
 //

@@ -2115,7 +2115,7 @@ async function nopBtvn(env: Env, b: Record<string, unknown>): Promise<Response> 
   return ra(await G.nopBtvnQuaPhieu(env,bt,sbd,(b.dapAn||{}) as Record<string,unknown>))
 }
 
-/** EM BÁO XONG MỘT LÔ BTVN (thay Vòng 1/2 — mục 3 SO-VIEC.md 19/09, lịch lô
+/** EM BÁO XONG MỘT LÔ BTVN (thay Vòng 1/2 — mục 3 docs/so-viec/SO-VIEC.md 19/09, lịch lô
  * tính thuần ở `src/lib/lich-lo-btvn.ts`). Đường công khai, như `/btvn/nop`.
  *
  * CHỈ TĂNG, KHÔNG BAO GIỜ GIẢM — `MAX(lo_da_xong, ?)`. Gọi lại nhiều lần (mất

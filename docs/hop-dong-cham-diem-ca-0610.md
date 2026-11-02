@@ -1,6 +1,6 @@
 # HỢP ĐỒNG — chấm điểm ca thi chính xác tuyệt đối (thầy 06/10: "không được phép chấm sai cho bất kì bài kiểm tra nào")
 
-Phạm vi: đường chấm điểm lúc học sinh nộp bài ở ca thi và mọi nơi dựng lại điểm / "câu sai" từ bài làm đã nộp. Mã: `src/lib/bo-cau-chuan.ts`, `src/lib/loai-cau-chua-dung.ts`, `server/src/cham-lai-ca.ts`, `server/src/kiem-cham.ts`, `server/src/key-bank-hop-nhat.ts`. Số liệu đo và lỗi đã sửa: `OMNI-3-build-status.md` §16.
+Phạm vi: đường chấm điểm lúc học sinh nộp bài ở ca thi và mọi nơi dựng lại điểm / "câu sai" từ bài làm đã nộp. Mã: `src/lib/bo-cau-chuan.ts`, `src/lib/loai-cau-chua-dung.ts`, `server/src/cham-lai-ca.ts`, `server/src/kiem-cham.ts`, `server/src/key-bank-hop-nhat.ts`. Số liệu đo và lỗi đã sửa: `docs/so-viec/OMNI-3-build-status.md` §16.
 
 ## 1. Một lõi chấm, một bộ câu chuẩn
 - **Bộ câu của một em** do MỘT hàm quyết: `giaiBoCauEm(kho, maCa, sbd, { dapAn, giayCau }, boGhi?) → { qids | null, nguon: 'da_ghi' | 'bai_lam' | 'hash', canhBao[], loi | null }`.

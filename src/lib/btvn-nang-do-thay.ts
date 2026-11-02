@@ -1,4 +1,4 @@
-/** BTVN "NÂNG ĐỠ" — LỚP NỐI của app thầy (Code 4, đề bài `prompt-btvn-nang-do.md`, thiết kế `DE-XUAT-BTVN-NANG-DO-2109.md`, bản vẽ `docs/ban-ve-btvn-nang-do-2109/`).
+/** BTVN "NÂNG ĐỠ" — LỚP NỐI của app thầy (Code 4, đề bài `docs/dac-ta-cu/prompt-btvn-nang-do.md`, thiết kế `docs/dac-ta-cu/DE-XUAT-BTVN-NANG-DO-2109.md`, bản vẽ `docs/ban-ve-btvn-nang-do-2109/`).
  *
  *  Mọi thứ dính tới hợp đồng máy chủ (tên trường, đường, hình dạng phản hồi) nằm ở ĐÂY và ở `giaoBtvn` — màn hình chỉ đọc các kiểu bên dưới. Hợp đồng chính thức
  *  `docs/hop-dong-btvn-nang-do-2109.md` (Code 3) đổi thì đổi tại đây, màn không vỡ. KIỂU dùng chung với lõi thuần của Code 1 (`btvn-nang-do.ts`, chỉ import KIỂU).

@@ -1,4 +1,4 @@
-// "DỒN VỀ ĐÍCH" — PHẦN ĐỌC-CHỈ CỦA MÁY CHỦ (Code 4 viết giúp Code 3 theo lệnh Boss, 21/09/2026; thầy chốt 14:13 "Chốt B và chốt hết build"; `DE-XUAT-DON-VE-DICH-2109.md`, `prompt-don-ve-dich-2109.md` mục "CODE 3 — máy chủ").
+// "DỒN VỀ ĐÍCH" — PHẦN ĐỌC-CHỈ CỦA MÁY CHỦ (Code 4 viết giúp Code 3 theo lệnh Boss, 21/09/2026; thầy chốt 14:13 "Chốt B và chốt hết build"; `docs/dac-ta-cu/DE-XUAT-DON-VE-DICH-2109.md`, `docs/dac-ta-cu/prompt-don-ve-dich-2109.md` mục "CODE 3 — máy chủ").
 //
 // `docVeDichCuaEm(env, sbd, nowMs)` DỰNG đầu vào từ D1 rồi giao cho hàm thuần của Code 1 (`src/lib/ve-dich.ts`: `soNo`, `keHoachVeDich`) — không tự tính lại luật nào của hàm thuần:
 //   { no: { theoNgay: MonNo[], tongCau, tongPhut }, veDich: [ { maBtvn, ten, hanNop, gioConLai, quaHan, chang[{chiSo, trangThai, ngay}], toiNay, cacBuoiSau, kip, canRutPhanLamThem, daRutPhanLamThem } ] }

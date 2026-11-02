@@ -1,4 +1,4 @@
-// "THỬ THÁCH RIÊNG HÔM NAY" — lời mời riêng của Bộ não A.I cho từng em (thầy chốt 21/09; đề `DE-XUAT-BO-NAO-VAI-TRO-MOI-2109.md` V1 + V2).
+// "THỬ THÁCH RIÊNG HÔM NAY" — lời mời riêng của Bộ não A.I cho từng em (thầy chốt 21/09; đề `docs/dac-ta-cu/DE-XUAT-BO-NAO-VAI-TRO-MOI-2109.md` V1 + V2).
 // Hợp đồng máy chủ (Code 3): `docs/hop-dong-thu-thach-rieng-2109.md` mục 3–4 — `POST /hs/thu-thach-hom-nay {}` trả `{ok, co, loiMoi, soCau, dang, bac, trangThai,
 // soDaLam, thanThu, cau[công khai, KHÔNG đáp án], daNop, thieu?}`; nộp `POST /hs/thu-thach-hom-nay/nop` (trả y hệt `/hs/on-lai/nop`). Bộ não chỉ chọn dạng + số câu + bậc và
 // viết `loiMoi`; MÁY CHỦ chọn và CHỐT câu (không tự luận, chưa làm trong 14 ngày, không vượt bậc + 1).

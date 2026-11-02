@@ -1,6 +1,6 @@
 // RÚT ĐỀ RIÊNG ĐỌC HỒ SƠ NẮM KIẾN THỨC — GĐ 6, Kênh 1 (19/09).
 //
-// Đề xuất: DE-XUAT-CA-NHAN-HOA-1909.md mục 2 "Kênh 1". Hợp đồng máy chủ:
+// Đề xuất: docs/dac-ta-cu/DE-XUAT-CA-NHAN-HOA-1909.md mục 2 "Kênh 1". Hợp đồng máy chủ:
 // docs/hop-dong-ho-so-on-ca-1909.md (lệnh `hoSoOnCa`).
 //
 // BẢY Ý PHẢI ĐÚNG:

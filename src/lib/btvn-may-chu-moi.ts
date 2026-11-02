@@ -182,7 +182,7 @@ export async function suaGiaoBtvn(ch:CauHinhMayChu,mat:string,maBtvn:string,opti
  if(!r?.ok)throw new Error(r?.error||'Chưa cập nhật được bài tập. Thầy thử lại.')
 }
 
-/** EM BÁO XONG MỘT LÔ BTVN (thay Vòng 1/2 — mục 3 SO-VIEC.md 19/09, xem
+/** EM BÁO XONG MỘT LÔ BTVN (thay Vòng 1/2 — mục 3 docs/so-viec/SO-VIEC.md 19/09, xem
  * `lich-lo-btvn.ts`) — đường CÔNG KHAI như `btvnCuaEm`. An toàn gọi lại nhiều
  * lần: máy chủ chỉ TĂNG tiến độ (MAX), nên phiếu mở lại hay mất mạng giữa
  * chừng gọi lại cũng không lùi mốc đã có. */

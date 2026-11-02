@@ -1,4 +1,4 @@
-// BTVN "NÂNG ĐỠ" — LÕI THUẦN `src/lib/btvn-nang-do.ts` (Code 1, 21/09/2026). Đề bài `prompt-btvn-nang-do.md`, thiết kế `DE-XUAT-BTVN-NANG-DO-2109.md`;
+// BTVN "NÂNG ĐỠ" — LÕI THUẦN `src/lib/btvn-nang-do.ts` (Code 1, 21/09/2026). Đề bài `docs/dac-ta-cu/prompt-btvn-nang-do.md`, thiết kế `docs/dac-ta-cu/DE-XUAT-BTVN-NANG-DO-2109.md`;
 // Boss duyệt thêm: lõi lấy mức THẤP NHẤT của dạng; câu lõi cao hơn bậc đích + 1 mang nhãn `loi_cao` (cuối chặng, ≤ 2 mỗi chặng, không bao giờ mở chặng);
 // ghim là TUỲ CHỌN (`[]` và ≤ 10).
 //

@@ -1,4 +1,4 @@
-// NHẮC TỰ ĐỘNG bài tập về nhà — Code 3, 21/09/2026. Luật do Boss chốt (prompt-hom-nay-gv-v2.md, CẬP NHẬT 21/09 phần A): thầy KHÔNG bấm gì, chỉ xem; KHÔNG dùng AI, lời theo MẪU có số thật.
+// NHẮC TỰ ĐỘNG bài tập về nhà — Code 3, 21/09/2026. Luật do Boss chốt (docs/dac-ta-cu/prompt-hom-nay-gv-v2.md, CẬP NHẬT 21/09 phần A): thầy KHÔNG bấm gì, chỉ xem; KHÔNG dùng AI, lời theo MẪU có số thật.
 //
 // Cron mỗi phút gọi `nhacTuDong` nhưng CHỈ chạy MỘT lần mỗi 30 phút (chiếm lượt bằng `cau_hinh.nhac_tu_dong_lan`) và CHỈ trong khung `gioTu`–`gioDen` (mặc định 07:00–21:30 giờ VN).
 // Bốn mốc cho mỗi em CHƯA nộp của mỗi bài đang chạy (bài thường lẫn cá nhân hoá):

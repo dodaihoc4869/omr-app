@@ -2,7 +2,7 @@
 
 Chỉ áp dụng khi người dùng giao triển khai hoặc tiếp tục CNH-1.0. Không áp dụng vào việc chỉ hỏi tiến độ, đọc/rà soát tài liệu, soạn prompt hoặc làm một việc khác. Không tự khởi động triển khai từ việc file này xuất hiện.
 
-Đọc `CLINE-CHAY-LIEN-TUC-CNH-2309.md` khi nhận lệnh tiếp tục. Giữ `.clinerules/omr-cnh-1.md`, đặc tả nghiệp vụ, SPEC-LOCK và tiêu chí nghiệm thu hiện có; file này chỉ bổ sung cách duy trì thực thi.
+Đọc `docs/dac-ta-cu/CLINE-CHAY-LIEN-TUC-CNH-2309.md` khi nhận lệnh tiếp tục. Giữ `.clinerules/omr-cnh-1.md`, đặc tả nghiệp vụ, SPEC-LOCK và tiêu chí nghiệm thu hiện có; file này chỉ bổ sung cách duy trì thực thi.
 
 - Phạm vi là toàn bộ phần còn lại đã được giao, không tự thu thành một lát cắt/một commit/một lượt trả lời.
 - Làm tuần tự từng phần có thể kiểm chứng: sửa → kiểm → đọc diff → lưu checkpoint → gọi công cụ làm phần tiếp theo ngay. Checkpoint không phải điểm kết thúc nhiệm vụ.

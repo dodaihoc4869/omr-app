@@ -1,6 +1,6 @@
 // HỌC LIỆU MÁY SOẠN (05/10) — LÕI THUẦN. Thầy 05/10: "thay vì lặp lại câu sai bạn hãy tìm cách để học sinh vẫn hoàn thành được câu sai đó
 // nhưng không học thuộc đáp án được" + "làm tất nhé, tôi ko duyệt gì cả, tôi chỉ chữa câu học sinh cần chữa thôi nhé".
-// Đặc tả chung: DE-XUAT-LAM-LAI-CAU-SAI-0510.md (bậc 1 "song sinh" nâng trần 2 → 4 + hàng soạn ưu tiên câu em đã sai).
+// Đặc tả chung: docs/dac-ta-cu/DE-XUAT-LAM-LAI-CAU-SAI-0510.md (bậc 1 "song sinh" nâng trần 2 → 4 + hàng soạn ưu tiên câu em đã sai).
 //
 // Ngoài hồ sơ lời giải, máy soạn (scripts/loi-giai/may-soan.mjs, `claude -p` trên máy thầy) soạn THÊM cho mỗi câu theo `can` máy chủ giao:
 //   · BẢN KHÁC (tối đa 4 / câu Phần I và III) — lưu vào `cau_bo_tro.song_sinh_json` (cùng chỗ song sinh của kho ⇒ game phủ như song sinh):

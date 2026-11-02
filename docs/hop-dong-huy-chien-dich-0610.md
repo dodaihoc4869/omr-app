@@ -60,4 +60,4 @@ Bấm tay trong Actions (nhánh bất kỳ; tệp ở `.github/workflows/` + `sc
 | `kiem-ke-hoach-huy-0610` | kế hoạch ngày của em trong từng chiến dịch đã huỷ: còn ghi mã chiến dịch huỷ không, còn bao nhiêu câu của nó (Đảo / Đoàn), bảng phụ OMNI còn nhắc không |
 | `kiem-sql-thu-hoi-0610` | cú pháp D1 của các câu thu hồi + số chiến dịch huỷ / JSON hỏng / lượt đã có cờ |
 
-Đo ngày 06/10 (xem `OMNI-3-build-status.md` §13c): rò thật chỉ thấy ở chiến dịch huỷ 29/09 (4 câu/ngày trong kế hoạch 04–05/10, trước bản vá); chiến dịch amine huỷ 06/10: 0 câu; câu em đang làm là của một chiến dịch Chương 1–2 khác còn chạy.
+Đo ngày 06/10 (xem `docs/so-viec/OMNI-3-build-status.md` §13c): rò thật chỉ thấy ở chiến dịch huỷ 29/09 (4 câu/ngày trong kế hoạch 04–05/10, trước bản vá); chiến dịch amine huỷ 06/10: 0 câu; câu em đang làm là của một chiến dịch Chương 1–2 khác còn chạy.

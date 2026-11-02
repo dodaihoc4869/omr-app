@@ -1,5 +1,5 @@
 // @vitest-environment node
-// GĐ 2 — KẾ HOẠCH NGÀY (DE-XUAT-CA-NHAN-HOA-1909.md mục 1.3, nghiệm thu GĐ 2).
+// GĐ 2 — KẾ HOẠCH NGÀY (docs/dac-ta-cu/DE-XUAT-CA-NHAN-HOA-1909.md mục 1.3, nghiệm thu GĐ 2).
 // 14/10: gỡ lệnh chết /hs/thoi-gian-hoc — bỏ ca em tự đặt số phút/ngày.
 import { describe, it, expect } from 'vitest'
 import worker from '../server/src/index'

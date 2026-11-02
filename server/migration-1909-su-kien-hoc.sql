@@ -1,4 +1,4 @@
--- GĐ 0 — SỔ SỰ KIỆN HỌC (DE-XUAT-CA-NHAN-HOA-1909.md mục 1.1).
+-- GĐ 0 — SỔ SỰ KIỆN HỌC (docs/dac-ta-cu/DE-XUAT-CA-NHAN-HOA-1909.md mục 1.1).
 --
 -- Mỗi dòng = MỘT lần em làm MỘT câu, ở bất kỳ nguồn nào (ca thi, BTVN, khắc
 -- phục, bài Mom, lên bảng, game, luyện đề). Chỉ THÊM, không bao giờ sửa/xoá

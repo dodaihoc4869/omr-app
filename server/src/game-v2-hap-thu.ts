@@ -1,4 +1,4 @@
-// CỔNG HẤP THỤ + CHUYỂN ĐỔI HỒ SƠ — máy chủ của Đợt 1 "Thần thú mỗi ngày" (DE-XUAT-THAN-THU-MOI-NGAY-2109.md Điều 1, 2, 9; prompt-than-thu-moi-ngay-2109.md).
+// CỔNG HẤP THỤ + CHUYỂN ĐỔI HỒ SƠ — máy chủ của Đợt 1 "Thần thú mỗi ngày" (docs/dac-ta-cu/DE-XUAT-THAN-THU-MOI-NGAY-2109.md Điều 1, 2, 9; docs/dac-ta-cu/prompt-than-thu-moi-ngay-2109.md).
 // Luật (hàm thuần của Code 1: src/lib/hap-thu-ngay.ts): thần thú hấp thụ tối đa 200 EXP/ngày khi em ĐẠT nhiệm vụ ngày, 120 khi có học chưa đạt, 0 khi không học; EXP dư nằm ở ống nghiệm (`wallet`).
 // MỌI lên cấp đi qua `invest` → `hapThu`. Máy chủ chỉ ĐỌC hôm nay em đạt/có học chưa (từ `exp_so`, `game_v2_attempt`) rồi gọi hàm thuần; máy em chỉ hiển thị kết quả.
 // Chuyển đổi hồ sơ đã chơi (luatCap ≠ LUAT_CAP_MOI) là LƯỜI (khi mở hồ sơ) + cron quét từng lô; luôn ghi bằng CAS theo `revision` (thua CAS = em đang chơi ⇒ KHÔNG đè, lần sau làm lại).

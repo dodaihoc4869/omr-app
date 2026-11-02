@@ -70,7 +70,7 @@ Vòng đầy đủ của việc `on_lai`: (1) `POST /hs/cau-theo-qid` lấy Đ�
 - **EXP**: chưa bật EXP mới cho em → đường cũ `creditAcademic` (khoá `practice:<qid>`, 2 EXP/câu ĐÚNG, mỗi câu một lần cả đời, trần 100/ngày), `exp` là số EXP cộng lần này và KHÔNG có `expNhan`. ĐÃ bật (xem mục "EXP học tập mới" ở dưới) → `exp` = tổng EXP của các khoản vừa ghi, kèm `expNhan[]` và `manhNhan[]`. Chỉ cộng vào hồ sơ game khi em đã có hồ sơ; lỗi EXP không làm hỏng lượt nộp.
 - Chi phí: ≈ 3 truy vấn lấy câu + 1 ghi sổ + 1 đọc lại + dựng lại hồ sơ + 1 truy vấn tiến bộ (+ EXP nếu có câu đúng).
 
-## EXP học tập mới + mảnh khiên (đặc tả thầy chốt: `DE-XUAT-EXP-MANH-KHIEN-1909.md`)
+## EXP học tập mới + mảnh khiên (đặc tả thầy chốt: `docs/dac-ta-cu/DE-XUAT-EXP-MANH-KHIEN-1909.md`)
 
 **Cờ.** Chỉ chạy với em được bật (`cau_hinh.exp_moi`); chưa bật thì MỌI phản hồi dưới đây KHÔNG có các trường mới (giao diện: thấy thiếu `exp` thì ẩn hết phần EXP, không bịa số). Mọi EXP do máy chủ tính từ sổ, KHÔNG có EXP nào do máy em khai.
 

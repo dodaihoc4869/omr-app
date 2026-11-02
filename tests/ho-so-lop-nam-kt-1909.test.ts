@@ -1,4 +1,4 @@
-// GỌI LÊN BẢNG ĐỌC HỒ SƠ NẮM KIẾN THỨC — GĐ 6, KÊNH 3 (DE-XUAT-CA-NHAN-HOA-1909.md mục 2).
+// GỌI LÊN BẢNG ĐỌC HỒ SƠ NẮM KIẾN THỨC — GĐ 6, KÊNH 3 (docs/dac-ta-cu/DE-XUAT-CA-NHAN-HOA-1909.md mục 2).
 //
 // Phiên Code 1 (làn giáo viên), 19/09/2026, theo lệnh 0.Planer:
 //   · `pSai = min(1, lan_sai/2)` từ hồ sơ THẬT (`ban_do_sai.so_lan_sai` không bao giờ > 1 nên bản cũ kẹt 0,5)

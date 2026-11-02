@@ -9,7 +9,7 @@ import { chuMoSomChang } from './mo-som-chang'
 // `btvn-ca-nhan-em.ts` (tái xuất tệp này). Có test khoá (tests/btvn-ca-nhan-kieu-2109.test.ts).
 // Đọc phản hồi máy chủ thành kiểu chặt, chia câu theo chặng, đặt tên nhãn, ghép kết quả chặng vào câu thô.
 //
-// LUẬT CỨNG (đề bài prompt-btvn-nang-do.md, Boss 21/09):
+// LUẬT CỨNG (đề bài docs/dac-ta-cu/prompt-btvn-nang-do.md, Boss 21/09):
 //  · Bài `caNhan` KHÔNG có đáp án/lời giải trong `de.cau` (`khongDapAn:true`) — máy em
 //    KHÔNG chấm tại chỗ. Đáp án đúng + lời giải chỉ về sau khi nộp chặng thành công.
 //  · Không lộ số câu của bạn khác, không xếp hạng em với em.

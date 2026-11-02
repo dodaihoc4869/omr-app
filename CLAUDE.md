@@ -28,7 +28,7 @@ Ba app cho trung tâm luyện thi Hoá của thầy Đỗ Đại Học: giáo vi
 
 ## TIẾT KIỆM NGỮ CẢNH (thầy yêu cầu 21/09)
 - KHÔNG đọc/ls sâu: `node_modules/`, `dist/`, `.dist-old-*/`, `src/graphify-out/`, `public/than-thu-v2/*.png` (ảnh 3 MB), `docs/anh-*/`, `docs/ban-ve-*/*.jpg` (chỉ mở ảnh khi việc cần nhìn).
-- Tìm bằng Grep/Glob có mục tiêu; tệp > 600 dòng đọc theo KHOẢNG DÒNG (`offset/limit`), không đọc cả tệp. Sổ việc (`SO-VIEC*.md`, có tệp 150 KB): chỉ đọc 80 dòng cuối, chỉ GHI THÊM ở cuối.
+- Tìm bằng Grep/Glob có mục tiêu; tệp > 600 dòng đọc theo KHOẢNG DÒNG (`offset/limit`), không đọc cả tệp. Sổ việc (`docs/so-viec/SO-VIEC*.md`, có tệp 150 KB): chỉ đọc 80 dòng cuối, chỉ GHI THÊM ở cuối.
 - Quét rộng nhiều tệp → giao tác tử `search` (bản đồ) hoặc `grep` (chỗ gọi) rồi lấy kết luận, đừng tự đọc từng tệp.
 - Test: chạy tệp liên quan `npx vitest run tests/<tệp> --reporter=dot`. TOÀN BỘ vitest (~10 phút, ~6000 test) chỉ chạy khi: sắp đẩy Pages/Worker, gộp nhánh, hoặc vừa đổi tệp dùng chung. Nền đỏ có sẵn: 97 test / 42 tệp (`docs/nen-vitest-do-1909.txt`) — so TÊN test, đừng dán log dài vào hội thoại (ghi ra tệp rồi `grep`).
 - Lệnh có đầu ra dài: luôn `| tail -n 30` hoặc ghi ra tệp. Không in JSON/HTML lớn ra hội thoại.
@@ -45,5 +45,5 @@ Ba app cho trung tâm luyện thi Hoá của thầy Đỗ Đại Học: giáo vi
 - Bảng nhiệm vụ HS/PH: `src/components/bang-nhiem-vu/`, `src/lib/nhiem-vu-adapter.ts`. M3 dùng chung: `src/components/m3/`. Phiếu HTML: `src/lib/html-phieu.ts`. Màn thi: `src/screens/ExamTakeScreen.tsx`. App thầy: `src/screens/*Screen.tsx`, khung `src/App.tsx`, `src/components/ThanhBenTrai.tsx`.
 - Game: `src/game/than-thu-v2/` (Đảo thần thú `Game.tsx`, Đoàn Hộ Tống `Doan*.tsx`, lõi `doan-core.ts`), máy chủ `server/src/game-v2*.ts`.
 - Máy chủ: định tuyến `server/src/index.ts`, lệnh cũ `goi-cu.ts`, kế hoạch ngày `ke-hoach-ngay.ts`, sổ/hồ sơ `su-kien-hoc.ts` `ho-so-nam-kt.ts`, EXP `exp-*.ts`, reset `reset-toan-app.ts`. Hợp đồng API: `docs/*hop-dong*`, `docs/ke-hoach-ngay-api-1909.md`.
-- Thiết kế đã chốt: `DE-XUAT-*.md`, `prompt-*.md`, bản vẽ `docs/ban-ve-*`, logo `docs/logo-1909/`.
+- Thiết kế đã chốt: `docs/dac-ta-cu/` (`DE-XUAT-*.md`, `prompt-*.md`, đặc tả cũ — chuyển khỏi gốc repo 02/11; gốc chỉ còn README, CLAUDE, AGENTS, DIEU-PHOI), bản vẽ `docs/ban-ve-*`, logo `docs/logo-1909/`.
 - Kiểm màu: `npm run check:mau` (cấm hex thô trong `src/`). Build: `npm run build`. Bản sống: Pages `omr-app-b3u.pages.dev`, Worker `omr.ttadodaihoc.workers.dev`.
