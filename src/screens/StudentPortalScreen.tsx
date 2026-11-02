@@ -13,7 +13,6 @@ import { tongHopKeHoachTroLy } from '../lib/tro-ly-ca-nhan'
 import { mocThoiGian } from '../lib/han-bai-tap'
 import { useGioHocTap } from '../hooks/useGioHocTap'
 import ThongBaoHocSinh,{noticeApi} from '../components/ThongBaoHocSinh'
-import {MomQuestionStem,MomOption} from '../components/MomQuestionMedia'
 import {momApi, momReviewHtml} from '../lib/mom-api'
 // Gói C 15/10: KhoiKhacPhuc3CheDo nay nạp lười (mảnh khối phụ, dưới) — nhưng thẻ câu GIỮ trong mảnh mở cổng như trước: các màn lười của em
 // (Ôn câu, Làm bài tập, Câu đã làm…) vẫn dựa vào tờ kiểu đi cùng nó (m3/the-cau.css: `.m3 .loi-giai`, `.m3 .the-cau`). Bỏ dòng này là đổi màu.
@@ -106,7 +105,6 @@ import type { TuCongHocSinh } from './ExamTakeScreen'
 // Màn làm bài nạp trễ nhưng nạp trước lúc rảnh / lúc bấm cửa: khi học sinh bấm "Vào thi" thì màn mở ngay lập tức trong 0ms.
 export const boNapExam = boNap(() => import('./ExamTakeScreen'))
 const ManLamBai = veNgayKhiCo(lazy(boNapExam), boNapExam)
-const LamCauOn = lazy(() => import('../components/bang-nhiem-vu/LamCauOn'))
 const TheCuoiChang = lazy(() => import('../components/bang-nhiem-vu/TheCuoiChang'))
 // MÁY YẾU (29/09): Bảng tin + hộp Khắc phục câu sai chỉ hiện khi em BẤM mở — nạp lười (một mảnh chung, xem cong-hs-nap-luoi.ts)
 // để lượt mở /hs đầu tiên không phải tải + dịch ≈ 55 KB mã chưa dùng. Tên biến giữ nguyên để JSX không đổi.
@@ -117,7 +115,7 @@ const ModalKhacPhucCauSai = lazy(() => napKhoiPhu().then((m) => ({ default: m.Mo
 // mã ba khối ấy cùng cửa nạp kho đề, thuật toán rút câu sai, phiếu luyện mà chỉ chúng dùng). Mảnh được nạp trước lúc rảnh ở Hôm nay (cùng nhịp nạp trước màn thi, dưới) ⇒ lúc em bấm, khối đã có thì VẼ THẲNG (veNgayKhiCo,
 // không treo Suspense, không màn chờ); chưa có (2G / tiết kiệm dữ liệu / bấm quá sớm) ⇒ React.lazy, chỗ chờ giữ khung như các khối lười khác.
 type KhoiPhu = typeof import('../components/cong-hs-nap-luoi')
-function khoiPhu<K extends 'KhoiKhacPhuc3CheDo' | 'BtvnM3' | 'MomDanhSachM3' | 'MomLamBaiM3' | 'LichSuCaM3' | 'KhungXemPhieu' | 'PhongVaoThi' | 'VaoThiForm' | 'NhanHanBaiTap'>(ten: K) {
+function khoiPhu<K extends 'KhoiKhacPhuc3CheDo' | 'BtvnM3' | 'MomDanhSachM3' | 'MomLamBaiM3' | 'LichSuCaM3' | 'KhungXemPhieu' | 'PhongVaoThi' | 'VaoThiForm' | 'NhanHanBaiTap' | 'MomQuestionStem' | 'MomOption' | 'LamCauOn'>(ten: K) {
   const bo: BoNap<{ default: KhoiPhu[K] }> = Object.assign(() => napKhoiPhu().then((m) => ({ default: m[ten] })), {
     san: () => {
       const m = napKhoiPhu.san()
@@ -140,6 +138,12 @@ const VaoThiForm = khoiPhu('VaoThiForm')
 // 02/11 (tác tử tốc độ sau PR 759): nhãn hạn nộp chỉ vẽ ở danh sách Bài tập về nhà kiểu CŨ (nhánh không-M3) ⇒ cùng mảnh trên; chỉ cổng học sinh nhập nó
 // ⇒ vào thẳng mảnh ấy, không sinh mảnh mới (precache giữ ≤ 170 tệp). Lượt mở /hs bớt mã của nó.
 const NhanHanBaiTap = khoiPhu('NhanHanBaiTap')
+// 02/11 (tác tử tốc độ sau PR 786): đề + phương án của màn làm Bài gia đình giao kiểu CŨ (nhánh không-M3) — chỉ vẽ sau khi em bấm vào tab ấy (mảnh trên đã nạp
+// cùng lúc) ⇒ cùng mảnh trên; lượt mở /hs bớt mã MomQuestionMedia. Bọc Suspense riêng quanh danh sách câu ⇒ mảnh chưa về cũng không treo cả cổng.
+// Màn Ôn câu (LamCauOn, dùng chung MomQuestionMedia) cũng vào mảnh trên ⇒ không sinh mảnh chung mới (precache bớt 2 tệp); mảnh đã nạp lúc rảnh ⇒ bấm là vẽ ngay.
+const MomQuestionStem = khoiPhu('MomQuestionStem')
+const MomOption = khoiPhu('MomOption')
+const LamCauOn = khoiPhu('LamCauOn')
 // Bong bóng A.I Đỗ Đại Học (thầy 24/10): kênh hỏi bài của văn phòng; chỉ ở Hôm nay; mảnh riêng ngoài precache, cửa nạp qua cong-hs-nap-luoi.
 const BongBongAiDdh = lazy(() => napKhoiPhu().then((m) => m.napBong()))
 import { baoDaXemHocSinh } from '../lib/canh-bao-thay-may-chu'
@@ -1632,7 +1636,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
                 </div>
 
                 {/* Danh sách các câu hỏi của bài */}
-                <div className="space-y-4">
+                <Suspense fallback={null}><div className="space-y-4">
                   {(dangLamMom.dsCau || dangLamMom.cau || []).map((cau: any, idx: number) => {
                     const daChon = cauTraLoiMom[cau.id]
                     return (
@@ -1705,7 +1709,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
                       </div>
                     )
                   })}
-                </div>
+                </div></Suspense>
 
                 {loiMom && <div role="alert" className="p-4 rounded-2xl bg-amber-50 text-amber-900">{loiMom}</div>}
                 {/* Nút nộp bài dưới cùng */}
