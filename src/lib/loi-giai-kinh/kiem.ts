@@ -228,3 +228,36 @@ export function banKinhDungDuoc(x: unknown, phan: PhanKinh, dapAn: string): BanK
   const k = kiemBanKinh(x, { phan, dapAn, qid: x.qid, nguon: { thanChu: mang(x.thanChu).map((t) => s(t, 160)), thayNoi: x.thayNoi ? [s(x.thayNoi, 300)] : [], meo: x.meo ? [s(x.meo, 300)] : [] } })
   return k.ket === 'dat' ? k.ban : null
 }
+
+/** Chữ so khớp phương án / ý: bỏ thẻ, thực thể, khoảng trắng, hoa thường. */
+const soKhop = (t: unknown) => String(t ?? '').replace(/<[^>]*>/g, ' ').replace(/&[a-z#0-9]+;/gi, ' ').normalize('NFC').toLowerCase().replace(/[\s ]+/g, '').replace(/[.。]+$/, '')
+
+/**
+ * Bản (khoá theo CHỮ GỐC của kho, kèm `_goc` chữ phương án / ý lúc soạn) ⇒ bản theo ĐÚNG câu đã phát cho em (phương án / ý có thể bị xáo).
+ * Không ghép được (chữ phương án đã đổi) hoặc lệch đáp án đang chấm ⇒ null (không hiện bản sai thứ tự).
+ */
+export function xepTheoCauPhat(tho: unknown, q: { phan: PhanKinh; choices?: readonly string[]; ideas?: readonly string[]; correct: string }): BanKinh | null {
+  if (!laObj(tho)) return null
+  const { _goc, ...ban } = tho as Obj & { _goc?: { pa?: Record<string, string> | null; y?: Record<string, string> | null } }
+  const b = ban as unknown as BanKinh
+  if (!Array.isArray(b.lyDo)) return null
+  if (q.phan === 'III') {
+    if (b.ketQua && !khopLamTron(docSoViet(b.ketQua) ?? NaN, q.correct)) return null
+    return b
+  }
+  const khoa = q.phan === 'I' ? KHOA_I : KHOA_II
+  const hien = (q.phan === 'I' ? q.choices : q.ideas) ?? []
+  const goc = (q.phan === 'I' ? _goc?.pa : _goc?.y) ?? null
+  const theoGoc = new Map(b.lyDo.map((l) => [l.khoa, l]))
+  let lyDo: LyDoKinh[]
+  if (goc && hien.length === 4) {
+    const chuGoc = new Map(Object.entries(goc).map(([k, v]) => [soKhop(v), k]))
+    const ghep = hien.map((t) => chuGoc.get(soKhop(t)))
+    if (ghep.some((k) => !k) || new Set(ghep).size !== 4) return null
+    lyDo = ghep.map((k, i) => ({ ...theoGoc.get(k!)!, khoa: khoa[i]! }))
+  } else lyDo = khoa.map((k) => theoGoc.get(k)!).filter(Boolean)
+  if (lyDo.length !== 4) return null
+  const d = dungTheoKho(q.phan, q.correct)
+  if (!d || lyDo.some((l) => l.dung !== d.get(l.khoa))) return null
+  return { ...b, lyDo }
+}

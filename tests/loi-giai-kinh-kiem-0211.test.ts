@@ -75,3 +75,21 @@ describe('phép tính có tên (bài không xích được)', () => {
     expect(kiemPhepTinh([{ ten: 'x', bieuThuc: '12/60', ketQua: '0,3' }], 'I', 'A')).toMatch(/tính lại/)
   })
 })
+
+describe('xepTheoCauPhat — phương án / ý bị xáo khi phát', () => {
+  it('Phần I: sắp lý do theo chữ phương án đã phát; lệch đáp án đang chấm ⇒ null', async () => {
+    const { xepTheoCauPhat } = await import('../src/lib/loi-giai-kinh/kiem')
+    const ban = { qid: 'q', phan: 'I', lyDo: [{ khoa: 'A', dung: true, chu: 'lý A' }, { khoa: 'B', dung: false, chu: 'lý B' }, { khoa: 'C', dung: false, chu: 'lý C' }, { khoa: 'D', dung: false, chu: 'lý D' }],
+      _goc: { pa: { A: 'CnH2nO2', B: 'CnH2n-2O2', C: 'CnH2n+2O2', D: 'CnH2nO' } } }
+    const x = xepTheoCauPhat(ban, { phan: 'I', choices: ['CnH2n-2O2', 'CnH2nO', 'CnH2nO2', 'CnH2n+2O2'], correct: 'C' })!
+    expect(x.lyDo.map((l) => `${l.khoa}:${l.chu}:${l.dung}`)).toEqual(['A:lý B:false', 'B:lý D:false', 'C:lý A:true', 'D:lý C:false'])
+    expect('_goc' in x).toBe(false)
+    expect(xepTheoCauPhat(ban, { phan: 'I', choices: ['CnH2n-2O2', 'CnH2nO', 'CnH2nO2', 'CnH2n+2O2'], correct: 'A' })).toBeNull()
+    expect(xepTheoCauPhat(ban, { phan: 'I', choices: ['khác', 'CnH2nO', 'CnH2nO2', 'CnH2n+2O2'], correct: 'C' })).toBeNull()
+  })
+  it('Phần III: kết quả bản phải khớp đáp án đang chấm', async () => {
+    const { xepTheoCauPhat } = await import('../src/lib/loi-giai-kinh/kiem')
+    expect(xepTheoCauPhat({ qid: 'q', lyDo: [], ketQua: '13,2' }, { phan: 'III', correct: '13,2' })).not.toBeNull()
+    expect(xepTheoCauPhat({ qid: 'q', lyDo: [], ketQua: '13,2' }, { phan: 'III', correct: '17,6' })).toBeNull()
+  })
+})

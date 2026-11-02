@@ -33,6 +33,8 @@ import { batAnKhiBiChe } from '../../lib/an-khi-bi-che'
 import { VungChamDe } from '../goi-y-cham/VungChamDe'
 // Lời giải kiểu sơ đồ (hợp đồng chạm để hiểu đề, chỗ 3): chỉ cần khi em mở «Lời giải từng bước» ⇒ nạp LƯỜI, lúc chờ vẽ lời giải cũ (không chớp trống).
 const LoiGiaiCauCoSoDo = lazy(() => import('../goi-y-cham/LoiGiaiCauCoSoDo'))
+// LỜI GIẢI KÍNH (thầy chốt 02/11): mảnh nạp lười; câu chưa có bản Kính ⇒ lời giải đang có (sơ đồ / chữ).
+const LoiGiaiKinhHs = lazy(() => import('../loi-giai-kinh/LoiGiaiKinhHs'))
 // NÂNG CẤP 27/10 (bản vẽ ve-moi/nang-cap): tranh Hoá học (cảnh phản ứng dưới đề · phân tử trong ô phương án). Nằm CHUNG mảnh màn làm bài (mảnh này đã
 // nạp lười, ngoài lượt mở app) — không tách mảnh riêng để precache không thêm tệp; chỉ vẽ khi chữ đề / phương án có dáng chất (lọc rẻ ngay đây).
 import { IcLapLanh, IcMayTinh, MinhHoaDe, TranhPa } from './minh-hoa-hoa'
@@ -318,6 +320,13 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   const phienCho = useRef<Promise<{ id: string; sk: Record<string, unknown>; qids: Set<string> }> | null>(null)
   const gocRef = useRef<HTMLDivElement>(null), nutTiepRef = useRef<HTMLButtonElement>(null)
   const q = cau[viTri], k = q ? ket[q.qid] : undefined
+  // Tải sẵn bản Kính (mã hoá) của MỌI câu trong chặng ngay khi có danh sách câu — một lệnh nền, không chặn vẽ (src/lib/loi-giai-kinh/tai-san.ts).
+  const dsQidKinh = cau.map((c) => c.qid).join('|')
+  useEffect(() => {
+    if (!dsQidKinh || !token) return
+    const h = window.setTimeout(() => { void import('../../lib/loi-giai-kinh/tai-san').then((m) => m.taiSanKinh(token, dsQidKinh.split('|'))).catch(() => {}) }, 1200)
+    return () => window.clearTimeout(h)
+  }, [dsQidKinh, token])
   // 20/10 đo giây (thầy: mọi câu đều đo được): giây câu đang hiện, CHỈ cộng khi tab đang hiện và em còn chạm màn trong 180 giây; trần 900; gửi cùng lượt nộp
   // (`doGiay: {g}`; số từ/hình/phần do máy chủ tự đo). `msLam` cũ giữ nguyên cho OMNI. Viết nội tuyến (không tệp chung): thêm một tệp dùng chung làm tăng
   // tải mở cả ba app (cổng `kiem:toc-do`) hoặc thêm một chunk (cổng `kiem-sw` đang 170/170). Cùng định nghĩa với màn ôn lại (LamCauOn).
@@ -1297,7 +1306,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
       {moLoiGiai && q && k && !k.choThay && <div className="duo-lg" role="dialog" aria-modal="true" aria-label="Lời giải từng bước">
         <div className="duo-lg-the">
           <header className="duo-lg-dau"><b>Lời giải · Câu {stt}</b><button type="button" className="duo-dong" aria-label="Đóng lời giải" onClick={() => { setMoLoiGiai(false); nutTiepRef.current?.focus({ preventScroll: true }) }}><XIcon size={24} aria-hidden="true" /></button></header>
-          <Suspense fallback={<LoiGiaiCau q={q} solution={k.solution} dapAn={k.answer} hinhLoiGiai={k.solutionImages} />}><LoiGiaiCauCoSoDo q={q} solution={k.solution} dapAn={k.answer} hinhLoiGiai={k.solutionImages} soDo={k.soDo} /></Suspense>
+          <Suspense fallback={<LoiGiaiCau q={q} solution={k.solution} dapAn={k.answer} hinhLoiGiai={k.solutionImages} />}><LoiGiaiKinhHs qid={q.qid} phan={q.phan} choices={q.choices} ideas={q.ideas} dapAn={k.answer} em={traHien} duPhong={<LoiGiaiCauCoSoDo q={q} solution={k.solution} dapAn={k.answer} hinhLoiGiai={k.solutionImages} soDo={k.soDo} />} /></Suspense>
           <NutHoiThay gon chi="giai" qid={q.qid} nguon="bai_hang_ngay" dapAnEm={traHien} />
         </div>
       </div>}

@@ -129,7 +129,7 @@ export async function nopBanKinh(env: Env, b: Obj) {
          cong = excluded.cong, ly_do = excluded.ly_do, nghi = excluded.nghi, nguon = excluded.nguon, phien_ban = excluded.phien_ban,
          so_lan = loi_giai_kinh.so_lan + 1, cap_nhat_luc = excluded.cap_nhat_luc
        WHERE excluded.cong = 'dat' OR loi_giai_kinh.cong <> 'dat' OR loi_giai_kinh.phien_ban < excluded.phien_ban`,
-    ).bind(bam, qid, phan, vao.bo, lopCua(ht.c.maDe), JSON.stringify(ban), kq.ket, kq.lyDo.slice(0, 500), nghi ? 1 : 0,
+    ).bind(bam, qid, phan, vao.bo, lopCua(ht.c.maDe), JSON.stringify({ ...ban, _goc: { pa: ht.c.pa ?? null, y: ht.c.y ?? null } }), kq.ket, kq.lyDo.slice(0, 500), nghi ? 1 : 0,
       str(b.nguonMay).slice(0, 20) || 'claude', PHIEN_BAN_KINH, nay, nay),
     env.DB.prepare(
       `UPDATE loi_giai_kinh_viec SET trang_thai = CASE WHEN ? = 'dat' THEN 'xong' WHEN so_lan >= ? THEN 'truot' ELSE 'cho' END, ma_luot = NULL, loi = ? WHERE bam = ?`,
@@ -156,13 +156,58 @@ export function sqlBanKinhTheoQid(env: Env, qids: readonly string[]) {
      WHERE q.qid IN (SELECT value FROM json_each(?)) AND k.cong = 'dat' AND k.nghi = 0 AND k.phien_ban >= ?`,
   ).bind(JSON.stringify(qids.slice(0, 200)), PHIEN_BAN_KINH)
 }
-export function banTuDong(rows: readonly Obj[] | undefined): Map<string, BanKinh> {
-  const ra = new Map<string, BanKinh>()
-  for (const x of rows ?? []) { try { ra.set(str(x.qid), { ...(JSON.parse(str(x.ban_json)) as BanKinh), qid: str(x.qid) }) } catch { /* bỏ */ } }
+/** Dòng ⇒ bản THÔ (còn `_goc` để `xepTheoCauPhat` sắp theo câu đã phát). */
+export function banTuDong(rows: readonly Obj[] | undefined): Map<string, Obj> {
+  const ra = new Map<string, Obj>()
+  for (const x of rows ?? []) { try { ra.set(str(x.qid), { ...(JSON.parse(str(x.ban_json)) as Obj), qid: str(x.qid) }) } catch { /* bỏ */ } }
   return ra
 }
-export async function docBanKinh(env: Env, qids: readonly string[]): Promise<Map<string, BanKinh>> {
+export async function docBanKinh(env: Env, qids: readonly string[]): Promise<Map<string, Obj>> {
   if (!qids.length) return new Map()
   const r = await sqlBanKinhTheoQid(env, qids).all<Obj>().catch(() => ({ results: [] as Obj[] }))
   return banTuDong(r.results)
+}
+
+
+/**
+ * `/hs/loi-giai-kinh {token, qids}` — TẢI SẴN bản Kính cho các câu em đang có trên máy (chặng vừa mở, câu đã làm) để lời giải hiện TỨC THÌ sau khi em bấm «Kiểm tra».
+ * Cùng luật phạm vi với gói đáp án `dm` (dap-an-may.ts, thầy duyệt 31/10): TẮT HẲN khi em đang có ca kiểm tra mở / chặng kiểm tra cá nhân; câu (qid hoặc nhóm
+ * nội dung) đang nằm trong ca chưa công bố / còn làm được / bài tập về nhà chấm điểm (`protectedQuestions`) ⇒ bỏ; câu tự luận không bao giờ có bản.
+ * Mỗi bản đi dạng «khoá.gói» AES-GCM gắn chặt mã câu (khoá ngày của em) — máy em chỉ mở ra vẽ SAU khi đã có kết quả câu.
+ * MỘT ĐỢT D1: xác thực · bản đạt · nhóm nội dung · trạng thái kiểm tra · tập bảo vệ chạy song song.
+ */
+export async function hsGoiKinh(env: Env, b: Obj) {
+  const { gameIdentityHaiBuoc } = await import('./game-v2-auth')
+  const { protectedQuestions } = await import('./game-v2-bank')
+  const { trangThaiHoiThay } = await import('./hoi-thay-ca-nhan')
+  const { TU_CHI_MUC_GAME } = await import('./cau-theo-qid')
+  const { qidTraSoDo } = await import('./loi-giai-so-do')
+  const { dmChuoi } = await import('./dap-an-may')
+  const { sbd, xong } = await gameIdentityHaiBuoc(env, b)
+  const vao = [...new Set((Array.isArray(b.qids) ? b.qids : []).map((x) => str(x).slice(0, 200)).filter(Boolean))].slice(0, 80)
+  if (!vao.length) { await xong; return { ok: true, ban: {} } }
+  const tra = new Map(vao.map((q) => [q, qidTraSoDo(q)]))
+  const tatCa = [...new Set([...tra.values()].flat())]
+  const nay = Date.now()
+  const [, rows, nhomRows, tt, baoVe] = await Promise.all([
+    xong,
+    sqlBanKinhTheoQid(env, tatCa).all<Obj>().then((r) => r.results ?? [], () => [] as Obj[]),
+    env.DB.prepare(`SELECT q.qid, q.content_group AS nhom ${TU_CHI_MUC_GAME}`).bind(JSON.stringify(tatCa)).all<Obj>().then((r) => r.results ?? [], () => null),
+    trangThaiHoiThay(env, sbd, vao[0]!, nay).catch(() => null),
+    protectedQuestions(env).catch(() => null),
+  ])
+  // Không kiểm được trạng thái / tập bảo vệ ⇒ đóng (thà chờ máy chủ còn hơn lộ trong ca kiểm tra).
+  if (!tt || tt.dangKiemTra || !baoVe || nhomRows === null) return { ok: true, ban: {}, dong: true }
+  const nhom = new Map(nhomRows.map((r) => [str(r.qid), str(r.nhom)]))
+  const banGoc = banTuDong(rows)
+  const ra: Record<string, string> = {}
+  await Promise.all(vao.map(async (q) => {
+    const ds = tra.get(q) ?? [q]
+    if (ds.some((x) => baoVe.has(x) || (nhom.get(x) && baoVe.has(nhom.get(x)!)))) return
+    const ban = ds.map((x) => banGoc.get(x)).find(Boolean)
+    if (!ban) return
+    const dm = await dmChuoi(env, sbd, `kinh|${q}`, JSON.stringify(ban), nay)
+    if (dm) ra[q] = dm
+  }))
+  return { ok: true, ban: ra }
 }
