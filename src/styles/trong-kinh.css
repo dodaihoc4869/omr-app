@@ -33,6 +33,27 @@ html[data-trong='hs'] .kb-binh { display: block; width: 100%; height: auto; over
 .kb-binh .kb-vo { fill: none; stroke: color-mix(in oklab, var(--tr-chu) 62%, transparent); stroke-width: 3.2; stroke-linejoin: round; }
 .kb-binh .kb-mieng { fill: color-mix(in oklab, var(--tr-mat) 70%, transparent); stroke: color-mix(in oklab, var(--tr-chu) 62%, transparent); stroke-width: 3; }
 .kb-binh .kb-loe { fill: none; stroke: var(--tr-mat); stroke-width: 5.5; stroke-linecap: round; opacity: .9; }
+/* BÌNH SINH ĐỘNG (thầy 02/11 tối, docs/ban-ve-binh-0211): đổi màu mượt; HÀO QUANG hồng dịu nở MỘT lần (data-no, 2,2 s) rồi giữ quầng tĩnh; 3 sao nhỏ lấp lánh 3 lượt.
+   Không hoạt ảnh vô hạn. Máy yếu / giảm chuyển động: quầng chỉ hiện dần, sao đứng yên. Nền tối: thuỷ tinh trong hơn, ánh phản chiếu sáng (lớp chồng, màu cũ giữ nguyên). */
+.kb-binh .kb-l0, .kb-binh .kb-l1 { transition: stop-color .9s ease; } .kb-binh .kb-khum { transition: fill .9s ease; }
+.kb-binh .kb-q { stop-color: var(--tr-tim); }
+.kb-binh .kb-hao { opacity: .85; transform-box: view-box; transform-origin: 100px 146px; }
+.kb-binh .kb-sao path { fill: var(--tr-tim); opacity: .8; transform-box: fill-box; transform-origin: center; }
+.kb-binh[data-no] .kb-hao { animation: kb-hao-no 2.2s cubic-bezier(.2, .7, .3, 1) both; }
+.kb-binh[data-no] .kb-sao path { animation: kb-sao-lap 1.8s ease-in-out 3 both; }
+.kb-binh[data-no] .kb-sao path:nth-child(2) { animation-delay: .5s; } .kb-binh[data-no] .kb-sao path:nth-child(3) { animation-delay: 1s; }
+@keyframes kb-hao-no { from { opacity: 0; transform: scale(.78); } to { opacity: .85; transform: scale(1); } }
+@keyframes kb-sao-lap { 0%, 100% { opacity: .8; transform: scale(1); } 50% { opacity: .3; transform: scale(.7); } }
+@keyframes kb-hao-hien { from { opacity: 0; } to { opacity: .85; } }
+html.may-yeu .kb-binh[data-no] .kb-hao { animation: kb-hao-hien 1.2s ease both; } html.may-yeu .kb-binh[data-no] .kb-sao path { animation: none; }
+@media (prefers-reduced-motion: reduce) { .kb-binh[data-no] .kb-hao { animation: kb-hao-hien 1.2s ease both; } .kb-binh[data-no] .kb-sao path { animation: none; } .kb-binh .kb-l0, .kb-binh .kb-l1, .kb-binh .kb-khum { transition: none; } }
+@media (prefers-color-scheme: dark) {
+  :root[data-trong='hs'] .kb-binh .kb-k0 { stop-color: var(--tr-chu); stop-opacity: .2; } :root[data-trong='hs'] .kb-binh .kb-k1 { stop-color: var(--tr-chu); stop-opacity: .03; } :root[data-trong='hs'] .kb-binh .kb-k2 { stop-color: var(--tr-chu); stop-opacity: .12; }
+  :root[data-trong='hs'] .kb-binh .kb-loe { stroke: var(--tr-chu); opacity: .55; } :root[data-trong='hs'] .kb-binh .kb-b0 { stop-color: var(--tr-chu); } :root[data-trong='hs'] .kb-binh .kb-b1 { stop-color: var(--tr-chu); }
+  :root[data-trong='hs'] .kb-binh .kb-l0 { stop-color: color-mix(in oklab, var(--tr-hs) 50%, var(--tr-chu)); } :root[data-trong='hs'] .kb-binh[data-du] .kb-l0 { stop-color: color-mix(in oklab, var(--tr-tim) 72%, var(--tr-chu)); }
+  :root[data-trong='hs'] .kb-binh .kb-khum { fill: color-mix(in oklab, var(--tr-hs) 40%, var(--tr-chu)); } :root[data-trong='hs'] .kb-binh[data-du] .kb-khum { fill: color-mix(in oklab, var(--tr-tim) 45%, var(--tr-chu)); }
+  :root[data-trong='hs'] .kb-binh .kb-l1 { stop-color: var(--tr-hs); } :root[data-trong='hs'] .kb-binh[data-du] .kb-l1 { stop-color: var(--tr-tim); }
+}
 
 /* ── NÚT CHÍNH: viên thuốc lớn + ô bánh quy 12 múi ── */
 html[data-trong='hs'] .kb-cta { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 72px; padding: 10px 20px 10px 12px; border: 0; border-radius: 36px; cursor: pointer;
