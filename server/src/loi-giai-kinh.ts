@@ -149,11 +149,11 @@ export async function tongKinh(env: Env) {
   return { ok: true, phienBan: PHIEN_BAN_KINH, hang: hang.results ?? [], ban: ban.results ?? [] }
 }
 
-/** BẢN ĐẠT cho danh sách qid (băm hiện tại trong `loi_giai_cau`; không nghi; phiên bản hiện hành). Một câu D1, dùng trong đợt đọc sẵn của nơi gọi. */
+/** BẢN ĐẠT cho danh sách qid (băm hiện tại trong `loi_giai_cau`; phiên bản hiện hành). Câu máy nghi đáp án VẪN hiện (thầy 03/11: «Câu nào nghi đáp án thì lấy luôn lời giải mới nhé ko cần tôi duyệt») — cột `nghi` chỉ còn để đếm. Một câu D1, dùng trong đợt đọc sẵn của nơi gọi. */
 export function sqlBanKinhTheoQid(env: Env, qids: readonly string[]) {
   return env.DB.prepare(
     `SELECT q.qid, k.ban_json FROM loi_giai_cau q JOIN loi_giai_kinh k ON k.bam = q.bam
-     WHERE q.qid IN (SELECT value FROM json_each(?)) AND k.cong = 'dat' AND k.nghi = 0 AND k.phien_ban >= ?`,
+     WHERE q.qid IN (SELECT value FROM json_each(?)) AND k.cong = 'dat' AND k.phien_ban >= ?`,
   ).bind(JSON.stringify(qids.slice(0, 200)), PHIEN_BAN_KINH)
 }
 /** Dòng ⇒ bản THÔ (còn `_goc` để `xepTheoCauPhat` sắp theo câu đã phát). */
