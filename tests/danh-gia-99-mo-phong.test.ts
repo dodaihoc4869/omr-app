@@ -20,6 +20,10 @@ export function doMotHat(hat: number, moiKieu: number) {
   const saiTheoKieu: Record<string, number> = {}
   const dungKieu: Record<string, { dung: number; tong: number }> = {}
   const nho = { ht: 0, dp: 0, htRa: 0, dpRa: 0, coCa: 0, khongCa: 0 }
+  // Hướng B: độ chính xác RIÊNG nhãn ĐÃ KIỂM (trên lớp / làm cho có đo trực tiếp) · số em đã kiểm · kiểm định ngược (nhãn niêm phong trước buổi cuối ↔ buổi cuối)
+  const daKiem = { ht: { dung: 0, sai: 0 }, dp: { dung: 0, sai: 0 } }
+  let soDaKiem = 0, soCoCl = 0
+  const nguoc = { ht: { cung: 0, nguoc: 0, lat: 0 }, dp: { cung: 0, nguoc: 0, lat: 0 } }
   let tong = 0, khongBang = 0, thieuCl = 0, thieuCs = 0, hai = 0, theoDoi = 0, khongClDung = 0
   for (const k of CAC_KIEU) for (let i = 0; i < moiKieu; i++) {
     const em = taoEm(k, r, `${k}${i}`)
@@ -41,7 +45,7 @@ export function doMotHat(hat: number, moiKieu: number) {
     let dungHet = true
     for (const b of BANG) {
       if (!v[b]) continue
-      const dung = b === 'ht' || b === 'dp' ? em.dapAn.cl === b : em.dapAn.cs === b
+      const dung = b === 'ht' || b === 'dp' ? em.dapAn.cl === b || (em.dapAn.clKhac?.cl === b && !!v[em.dapAn.clKhac.khiCs]) : em.dapAn.cs === b
       if (dung) vao[b].dung++
       else {
         dungHet = false
@@ -51,8 +55,22 @@ export function doMotHat(hat: number, moiKieu: number) {
       }
     }
     if (dungHet) dk.dung++
+    if (em.dapAn.cl !== null) soCoCl++
+    const kiem = kq.soLieu.kiem
+    if (kiem?.cl === 'da') {
+      soDaKiem++
+      const b = v.dp ? 'dp' : 'ht'
+      const dungB = em.dapAn.cl === b || (em.dapAn.clKhac?.cl === b && !!v[em.dapAn.clKhac.khiCs])
+      daKiem[b][dungB ? 'dung' : 'sai']++
+    }
+    const ng = kq.soLieu.nguoc
+    if (ng?.nhan) {
+      nguoc[ng.nhan][(ng.nhan === 'dp' ? ng.llrSau > 0 : ng.llrSau < 0) ? 'cung' : 'nguoc']++
+      const moi = kq.soLieu.lop?.nhan
+      if (moi && moi !== ng.nhan) nguoc[ng.nhan].lat++
+    }
   }
-  return { vao, saiTheoKieu, dungKieu, tong, khongBang, thieuCl, thieuCs, hai, theoDoi, khongClDung, nho }
+  return { vao, saiTheoKieu, dungKieu, tong, khongBang, thieuCl, thieuCs, hai, theoDoi, khongClDung, nho, daKiem, soDaKiem, soCoCl, nguoc }
 }
 const pc = (d: number, n: number) => (n ? (100 * d) / n : 100)
 const HAT = (process.env.MO_PHONG_HAT ?? '101,202,303').split(',').map(Number).filter((x) => Number.isFinite(x) && x > 0)
@@ -65,7 +83,15 @@ describe('đánh giá 4 bảng v3b — hai trục, xếp TRỌN mọi em, tự �
       const kieu = Object.entries(kq.dungKieu).map(([k, x]) => `${k} ${pc(x.dung, x.tong).toFixed(0)}%`)
       console.log(`[hạt ${hat}] ${kq.tong} em · chưa xếp ${kq.khongBang} · ${dong.join(' · ')}\n  đúng trọn từng kiểu: ${kieu.join(' · ')}\n  sai: ${JSON.stringify(kq.saiTheoKieu)}`
         + `\n  v3: ${kq.nho.coCa} em có ca thi / lên bảng, ${kq.nho.khongCa} em không · vào NHỜ hai yếu tố: Học thật ${kq.nho.ht}, Đối phó ${kq.nho.dp} · đổi trục chất lượng nhờ hai yếu tố: rời Học thật ${kq.nho.htRa}, rời Đối phó ${kq.nho.dpRa}`)
+      const dk = (b: 'ht' | 'dp') => `${kq.daKiem[b].dung}/${kq.daKiem[b].dung + kq.daKiem[b].sai} = ${pc(kq.daKiem[b].dung, kq.daKiem[b].dung + kq.daKiem[b].sai).toFixed(1)}%`
+      console.log(`  hướng B: ĐÃ KIỂM ${kq.soDaKiem}/${kq.soCoCl} em có bằng chứng · Đối phó đã kiểm ${dk('dp')} · Học thật đã kiểm ${dk('ht')}`
+        + ` · kiểm định ngược (buổi cuối cùng chiều nhãn niêm phong): Đối phó ${kq.nguoc.dp.cung}/${kq.nguoc.dp.cung + kq.nguoc.dp.nguoc} · Học thật ${kq.nguoc.ht.cung}/${kq.nguoc.ht.cung + kq.nguoc.ht.nguoc} · LẬT (thêm buổi cuối chốt ngược nhãn niêm phong): Đối phó ${kq.nguoc.dp.lat} · Học thật ${kq.nguoc.ht.lat}`)
       for (const b of BANG) expect(pc(kq.vao[b].dung, kq.vao[b].dung + kq.vao[b].sai), `độ chính xác bảng ${b}`).toBeGreaterThanOrEqual(99)
+      // HƯỚNG B — lời hứa 99% áp cho nhãn ĐÃ KIỂM: phải ≥ 99% ở cả hai nhãn; Đối phó đã kiểm (nhãn làm oan em khi sai) phải 100% trên mô phỏng.
+      expect(pc(kq.daKiem.dp.dung, kq.daKiem.dp.dung + kq.daKiem.dp.sai), 'Đối phó đã kiểm').toBe(100)
+      expect(pc(kq.daKiem.ht.dung, kq.daKiem.ht.dung + kq.daKiem.ht.sai), 'Học thật đã kiểm').toBeGreaterThanOrEqual(99)
+      // Kiểm định ngược: nhãn niêm phong bị buổi sau chốt NGƯỢC ≤ 1% (đúng thước sẽ đo trên số liệu thật ở /gv/bon-bang → kiemDinh).
+      for (const b of ['ht', 'dp'] as const) { const t = kq.nguoc[b].cung + kq.nguoc[b].nguoc; expect(t ? (100 * kq.nguoc[b].lat) / t : 0, `nhãn ${b} niêm phong bị lật`).toBeLessThanOrEqual(1) }
       // ĐỘ PHỦ 100%: không em nào bỏ ngỏ, mỗi trục đúng một nhãn
       expect(kq.khongBang, 'em chưa được xếp vào bảng nào').toBe(0)
       expect(kq.theoDoi, 'em «Đang theo dõi»').toBe(0)

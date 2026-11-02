@@ -87,7 +87,8 @@ describe('/ph/bon-so-do — máy chủ', () => {
     const kq = await phBonSoDo(env, { sbd: 'S1' }, env, { waitUntil: () => {}, passThroughOnException: () => {} } as never)
     expect(kq.ok && 'co' in kq && kq.co).toBe(true)
     const doc = sql.filter((s) => s.includes('bon_chi_so_em'))
-    expect(doc).toEqual(['SELECT ngay, tinh_luc, ht, dp, ch, lu, so_luot, the_json, ngay_json FROM bon_chi_so_em WHERE sbd = ?1'])
+    // Hướng B (02/11): đọc thêm mức chắc nhãn chất lượng (`kiem.cl`) trong cùng một câu theo khoá chính.
+    expect(doc).toEqual(["SELECT ngay, tinh_luc, ht, dp, ch, lu, so_luot, the_json, ngay_json, CASE WHEN json_valid(so_lieu_json) THEN json_extract(so_lieu_json, '$.kiem.cl') END AS kiem_cl FROM bon_chi_so_em WHERE sbd = ?1"])
     expect(ban[sql.indexOf(doc[0]!)]).toEqual(['S1'])
   })
   it('định tuyến có /ph/bon-so-do (nạp lười)', () => {

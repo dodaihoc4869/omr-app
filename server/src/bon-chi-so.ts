@@ -25,6 +25,8 @@ import { LUOT_TOI_THIEU_BON, NGUONG_BANG, type DiemBon, type MaBang, type NgayBo
 import { SO_NGAY_CA, tinhCaThi, type CauCaThi, type LuotBang, type LuyenCuDv } from './bon-ca-thi'
 
 /** Ví dụ thô: `qid` để lệnh thầy tra tên bài + đầu đề lúc trả lời. */
+import { tinhTrenLop, boTrungBang, type KetQuaTrenLop } from './bon-tren-lop'
+
 export type ViDuTho = Omit<ViDuBon, 'cau'> & { qid: string; cau?: string }
 export type TheTho = Omit<TheBangChung, 'viDu'> & { viDu?: ViDuTho[] }
 
@@ -99,6 +101,13 @@ export interface SoLieuBon {
   /** v3: vào bảng NHỜ ca thi / lên bảng — 2 = không có hai yếu tố này thì KHÔNG vào · 1 = có làm bằng chứng nhưng vẫn vào · 0 = không dùng;
    *  `htRa` / `dpRa` = 1 khi hai yếu tố này đưa em RA khỏi bảng (bản không có chúng thì vào). Để đếm trên dữ liệu thật. */
   nho?: { ht: number; dp: number; htRa: number; dpRa: number }
+  /** Hướng B (02/11): mức chắc nhãn chất lượng — `da` = đã kiểm (trên lớp chốt, hoặc «làm cho có» đo trực tiếp mức mạnh) · `tam` = theo bài làm ở nhà, CHƯA
+   *  kiểm trên lớp · null = chưa có bằng chứng. `cach` = căn cứ của nhãn đã kiểm: `lop` (trên lớp) · `hanhVi` (làm cho có đo trực tiếp). */
+  kiem?: { cl: 'da' | 'tam' | null; cach: 'lop' | 'hanhVi' | null }
+  /** Hướng B: kiểm định tuần tự trên lớp — tổng LLR (dương = Đối phó), số buổi có tin / nghiêng Đối phó / nghiêng Học thật, nhãn trên lớp (null = chưa đủ). */
+  lop?: { llr: number; soBuoi: number; buoiDp: number; buoiHt: number; nhan: 'ht' | 'dp' | null }
+  /** Hướng B — KIỂM ĐỊNH NGƯỢC trên số liệu thật: nhãn NIÊM PHONG từ các buổi trước buổi gần nhất + kết quả buổi gần nhất (chưa dùng khi niêm phong). */
+  nguoc?: KetQuaTrenLop['nguoc']
 }
 
 export interface KetQuaBon {
@@ -172,7 +181,11 @@ export function tinhBon(v: DauVaoBon): KetQuaBon {
   const lam = (v.dg?.dauVao.luot ?? []).filter((l) => l.dung !== null && !NGUON_KIEM.has(l.nguon ?? ''))
   // ═════ v3: HAI YẾU TỐ CHÍNH — ca thi thật theo đơn vị kiến thức + lên bảng (bon-ca-thi.ts). Rỗng ⇒ mọi số 0 / null ⇒ luật v2.
   const coCaBang = (v.caThi?.length ?? 0) + (v.lenBang?.length ?? 0) > 0
-  const ca = tinhCaThi({ luyen: lam, luyenCu: v.luyenCu ?? [], caThi: v.caThi ?? [], lenBang: v.lenBang ?? [] })
+  // Hướng B (02/11): lên bảng ghi đôi cũ (158 dòng trước PR #750) gộp khi ĐỌC — cùng câu · kết quả trong 10 giây = một lần. Không xoá dữ liệu.
+  const lenBang = boTrungBang(v.lenBang ?? [])
+  const ca = tinhCaThi({ luyen: lam, luyenCu: v.luyenCu ?? [], caThi: v.caThi ?? [], lenBang })
+  // Hướng B — CHỐT CUỐI BẰNG TRÊN LỚP (bon-tren-lop.ts, kiểm định tuần tự Wald, sai ≤ 1% mỗi phía, ≥ 2 buổi, bỏ buổi nặng nhất vẫn đủ).
+  const tl = tinhTrenLop({ luyen: lam, luyenCu: v.luyenCu ?? [], caThi: v.caThi ?? [], lenBang })
   const doLuot = lam.filter((l) => l.ma !== null && !l.treo)
   const treo = lam.filter((l) => l.treo)
   const voi = doLuot.filter((l) => l.ma === 1)
@@ -274,7 +287,8 @@ export function tinhBon(v: DauVaoBon): KetQuaBon {
   // Luyện tập cao hơn kiểm tra cá nhân: luật cũ (luyện ≥ 70%, kiểm tra ≤ 5) = mạnh; chênh từ 2,5 điểm trở lên mà kiểm tra ≤ 6 = nhẹ.
   if (lechKt) ho.lech = 2
   else if (ktTB !== null && dungLuyen !== null && ktTB <= 6 && ktTB / 10 <= dungLuyen - 0.25) ho.lech = 1
-  if (sc.tong >= 8 && boMacTiLe >= 0.6) ho.boMac = 1
+  // Hướng B: «câu sai để đó không sửa» KHÔNG còn là họ Đối phó (không phải thổi phồng điểm, không phải làm cho có) và cũng KHÔNG tự thành Lười (mô phỏng:
+  // em chăm mà yếu sửa không kịp ⇒ xếp oan ~20/210). Chỉ hiện làm thẻ bằng chứng.
   // Kiểm tra khớp ⇒ «đúng nhanh câu khó» là GIỎI THẬT (không tính); «rời app rồi đúng» hạ còn nhẹ (có thể do thông báo, năng lực đã xác nhận).
   if (!xacNhan && nhanhLa.length >= 3 && nhanhLa.length >= 0.15 * khoDung.length) ho.nhanh = nhanhLa.length >= 5 && nhanhLa.length >= 0.3 * khoDung.length ? 2 : 1
   if (traNgoai.length >= 3 && traNgoai.length >= 0.1 * dungHet.length) ho.tra = !xacNhan && traNgoai.length >= 6 && traNgoai.length >= 0.2 * dungHet.length ? 2 : 1
@@ -299,7 +313,18 @@ export function tinhBon(v: DauVaoBon): KetQuaBon {
   const coBangChungCl = lam.length > 0 || ca.caCau > 0 || ca.bang.tong > 0 || ktcnSo > 0
   const nguongManh = ca.caKhop && Object.values(ho).every((x) => x <= 1) && !ho.voi && !ho.treo ? 4 : 3
   const dpChac = duDuLieu && ((soHo >= 2 && manh >= nguongManh) || (ho.lechCa === 3 && ca.N > 0 && ca.E - ca.K >= 0.25 * ca.N))
-  const vaoDp = coBangChungCl && (dpChac || !!ho.treo || manh >= nguongManh)
+  const vaoDpTam = coBangChungCl && (dpChac || ho.treo === 2 || manh >= nguongManh)
+  // Hướng B — QUYẾT ĐỊNH CUỐI trục chất lượng:
+  //   · Trên lớp chốt Đối phó (điểm nhà cao hơn hẳn khi tự làm có giám sát) ⇒ Đối phó ĐÃ KIỂM.
+  //   · «Làm cho có» đo TRỰC TIẾP từng lượt (chọn vội mà sai · bấm lặp · treo máy · dò đáp án: một họ mức mạnh, hoặc ≥ 2 họ) ⇒ Đối phó ĐÃ KIỂM bằng hành vi:
+  //     mỗi lượt có giờ · câu · giây, không phải suy đoán; trên lớp «khớp» không gỡ được (em làm cho có thì trên lớp cũng chỉ ở mức ấy).
+  //   · Trên lớp chốt Học thật và không có «làm cho có» mức mạnh ⇒ Học thật ĐÃ KIỂM (dấu hiệu nhẹ ở nhà không lật được kết quả trên lớp).
+  //   · Còn lại ⇒ nhãn TẠM theo bài làm ở nhà (luật v3b), ghi rõ «chưa kiểm trên lớp».
+  // Chỉ bốn họ ĐO TRỰC TIẾP (mỗi lượt có giờ · câu · giây). «Đúng nhanh câu khó», «rời app rồi đúng» là SUY ĐOÁN thổi phồng điểm ⇒ để trên lớp phán xử.
+  // Mô phỏng: tính «đúng nhanh» kèm bấm lặp ⇒ 1–3 em trung bình bị xếp oan Đối phó / 1.750 em.
+  const truc = [ho.voi ?? 0, ho.lap ?? 0, ho.treo ?? 0, ho.do ?? 0]
+  const choCoManh = truc.some((x) => x >= 2) || truc.filter((x) => x >= 1).length >= 2
+  const vaoDp = coBangChungCl && (tl.nhan === 'dp' || choCoManh || (tl.nhan !== 'ht' && vaoDpTam))
   const dp2 = coBangChungCl ? tron(kep(0.6 * dpTho + 10 * manh)) : null
 
   // ── Học thật «rõ» (dùng cho lời giải thích, thứ hạng): 5 nhóm + hai nhóm chính ca thi / lên bảng.
@@ -320,6 +345,22 @@ export function tinhBon(v: DauVaoBon): KetQuaBon {
   const nguocCa = !!ho.lechCa || !!ho.bangChua
   const htRo = duDuLieu && !nguocCa && (nhom.ca || nhom.bang || nhom.sua || nhom.kt) && soNhom >= 3 && !vaoDp && manh <= 1 && ht !== null && ht >= NGUONG_BANG.ht
   const vaoHt = coBangChungCl && !vaoDp
+  // ── HỌC THẬT «VINH DANH» (thầy 02/11: «học thật cũng phải làm kĩ để vinh danh học sinh thực sự»): nhãn Học thật ĐÃ KIỂM chỉ khi ĐỦ CẢ BA —
+  //   1. TRÊN LỚP: kiểm định tuần tự chốt Học thật (≥ 2 buổi tự làm có giám sát khớp mức luyện ở nhà, sai ≤ 1%);
+  //   2. CÓ BẰNG CHỨNG HỌC THẬT SỰ (không chỉ «không gian lận»): sửa đúng câu từng sai · đúng câu song sinh đổi số liệu · lên bảng đạt ≥ 2 lần · kiểm tra cá
+  //      nhân khớp luyện tập (≥ 6 điểm) — ít nhất MỘT;
+  //   3. SẠCH: không một dấu hiệu làm cho có nào (chọn vội mà sai · bấm lặp · treo máy · dò đáp án), không họ suy đoán thổi phồng mức mạnh.
+  //   Thiếu một ⇒ vẫn ở trục Học thật (không gian lận) nhưng là nhãn TẠM, kèm lý do còn thiếu gì — không được vinh danh.
+  const hocThatSu = nhom.sua || nhom.chu || nhom.bang || nhom.kt
+  const sach = truc.every((x) => x === 0) && (ho.nhanh ?? 0) < 2 && (ho.tra ?? 0) < 2
+  const htVinhDanh = vaoHt && tl.nhan === 'ht' && hocThatSu && sach
+  const kiemCl: 'da' | 'tam' | null = !coBangChungCl ? null : vaoDp ? (tl.nhan === 'dp' || choCoManh ? 'da' : 'tam') : htVinhDanh ? 'da' : 'tam'
+  /** Nhãn Học thật tạm còn thiếu gì: chưa kiểm trên lớp · chưa có bằng chứng học thật sự · còn dấu hiệu làm cho có. */
+  const thieuHt: string[] = vaoHt && !htVinhDanh ? [
+    tl.nhan !== 'ht' ? 'chưa đủ 2 buổi trên lớp khớp mức luyện' : '',
+    !hocThatSu ? 'chưa có bằng chứng học thật sự (sửa đúng câu sai, đúng câu đổi số liệu, lên bảng đạt, kiểm tra khớp)' : '',
+    !sach ? 'còn dấu hiệu làm cho có' : '',
+  ].filter(Boolean) : []
 
   // ── TRỤC CÔNG SỨC (Chăm ⇄ Lười) — mọi em: Chăm ⇔ ≥ 70% số ngày phải làm có câu làm THẬT ≥ 75% mức, câu làm cho có (chọn vội mà sai — trừ em đọc nhanh mà câu
   // nhanh đúng ≥ 70% — + treo máy) ≤ 10% số lượt,
@@ -335,7 +376,7 @@ export function tinhBon(v: DauVaoBon): KetQuaBon {
   const docNhanh = nhanhDung + voi.length > 0 && nhanhDung / (nhanhDung + voi.length) >= 0.7
   const choCo = (docNhanh ? 0 : voiSai.length) + treo.length
   const choCoTL = lam.length ? choCo / lam.length : 0
-  const vaoCh = n > 0 ? du75 >= 0.7 * n && choCoTL <= 0.1 && donHanTL < 0.5 : lam.length > 0 || !!v.lanCuoiHoc
+  const vaoCh = (n > 0 ? du75 >= 0.7 * n && choCoTL <= 0.1 && donHanTL < 0.5 : lam.length > 0 || !!v.lanCuoiHoc)
   // Lý do Lười (lời cho thầy): bỏ ngày (< 70% số ngày có làm) ⇒ «ngày»; có làm mà làm cho có ⇒ «làm cho có»; làm thiếu mức ⇒ «ngày»; còn lại dồn sát giờ chốt.
   const lyDoLu: 'ngay' | 'choCo' | 'donHan' | null = vaoCh ? null : n > 0 && coLam < 0.7 * n ? 'ngay' : choCoTL > 0.1 ? 'choCo' : n > 0 && du75 < 0.7 * n ? 'ngay' : donHanTL >= 0.5 ? 'donHan' : 'ngay'
   const ch2 = n >= 3 ? tron(100 * (0.5 * (duThat / n) + 0.2 * Math.min(1, daLamThat / Math.max(1, giao)) + 0.15 * Math.min(1, chuoiThat / 7) + 0.15 * (1 - donHanTL)))
@@ -356,6 +397,9 @@ export function tinhBon(v: DauVaoBon): KetQuaBon {
   Object.assign(soLieu, {
     nhanhLa: pt(nhanhLa.length, khoDung.length), traNgoai: pt(traNgoai.length, dungHet.length), do: pt(doDa.length, coDq.length), donHan: ngayDem.length ? tron(100 * donHanTL) : null,
     photLo: v.dg && n ? pt(photLo, n) : null, hoi, ban: BAN_BON, vao, theoDoi, ho,
+    kiem: { cl: kiemCl, cach: kiemCl === 'da' ? (tl.nhan ? 'lop' : 'hanhVi') : null },
+    lop: { llr: Math.round(tl.llr * 100) / 100, soBuoi: tl.soBuoi, buoiDp: tl.buoiDp, buoiHt: tl.buoiHt, nhan: tl.nhan },
+    nguoc: tl.nguoc ? { ...tl.nguoc, llrSau: Math.round(tl.nguoc.llrSau * 100) / 100, e0Sau: Math.round(tl.nguoc.e0Sau * 10) / 10 } : null,
     caCau: ca.caCau, caGhep: ca.N, caThi: ca.N >= 4 ? pt(ca.K, ca.N) : null, caKyVong: ca.N >= 4 ? pt(Math.round(ca.E), ca.N) : null, luyenDv: pt(ca.kL, ca.nL),
     dvKhop: ca.dvKhop, dvLech: ca.dvLech, caLech: ca.caLech,
     lenBang: pt(ca.bang.dat, ca.bang.tong), bangTong: ca.bang.tong, bangDat: ca.bang.dat, bangChuaLq: ca.bang.chuaLq,
@@ -463,11 +507,19 @@ export function tinhBon(v: DauVaoBon): KetQuaBon {
   // ───── Một dòng + kết luận
   const nhan = (x: string) => `**${x}**`
   const bcDp = theDp[0] ? (theDp[0].ma === 'lechCa' ? `Luyện ${pL}% · ca thi ${nhan(`${ca.K}/${ca.N}`)}` : theDp[0].ma === 'bangChua' ? `Lên bảng chưa đạt ${nhan(`${ca.bang.chuaLq}/${ca.bang.lq}`)}` : theDp[0].ma === 'voi' ? `${nhan(`${soLieu.voi}%`)} câu chọn khi chưa đọc hết đề` : theDp[0].ma === 'lap' ? `Chọn ${nhan(lap.dai[0]!.chon ?? '')} liền ${nhan(`${lap.dai.length} câu`)}` : theDp[0].ma === 'lech' ? `Luyện đúng ${tron((dungLuyen ?? 0) * 100)}% · kiểm tra ${nhan(so1(ktTB ?? 0))}` : theDp[0].ma === 'boMac' ? `${nhan(`${sc.tong - sc.sua}/${sc.tong}`)} câu sai để đó không sửa` : theDp[0].ma === 'do' ? `${nhan(`${doDa.length} lượt`)} dò đáp án` : `${theDp[0].tieu}: ${nhan(theDp[0].lon)}`) : ''
+  // Hướng B: dòng một / kết luận nói rõ MỨC CHẮC — đã kiểm trên lớp (bao nhiêu buổi) hay nhãn tạm «chưa kiểm trên lớp».
+  const soBuoiLop = tl.nhan === 'dp' ? tl.buoiDp : tl.nhan === 'ht' ? tl.buoiHt : 0
+  const duoiTam = kiemCl === 'tam' ? ' · chưa kiểm trên lớp' : ''
+  const duoiTamHt = kiemCl === 'tam' ? (tl.nhan === 'ht' ? ' · chưa đủ tiêu chí vinh danh' : ' · chưa kiểm trên lớp') : ''
+  const buoiLech = tl.buoi.filter((b) => b.llr > 0.5).slice(-3).reverse()
+  const buoiKhop = tl.buoi.filter((b) => b.llr < -0.5).slice(-3).reverse()
+  const tenBuoi = (b: KetQuaTrenLop['buoi'][number]) => `${b.loai === 'thi' ? 'Ca thi' : 'Lên bảng'} ${ngayNgan(b.ngay)}`
+  const dongBuoi = (b: KetQuaTrenLop['buoi'][number]) => `${nhan(`${b.k}/${b.n} câu`)} đúng ở ${tenBuoi(b)} — theo mức luyện ở nhà phải đúng khoảng ${tron(b.e0)} câu${b.dvLech.length ? ` (sai ở: ${b.dvLech.join(', ')})` : ''}`
   const bc: Record<MaBang, string> = {
-    ht: ca.caKhop ? `Ca thi đúng ${nhan(`${ca.K}/${ca.N}`)} câu — khớp luyện tập` : ca.bangDat ? `Lên bảng đạt ${nhan(`${ca.bang.dat}/${ca.bang.tong}`)}`
-      : htRo && sc.tong >= 3 ? `Sửa đúng ${nhan(`${sc.sua}/${sc.tong}`)} câu từng sai`
-      : `Không có dấu hiệu đối phó${ca.N >= 4 ? ` · ca thi ${nhan(`${ca.K}/${ca.N}`)} câu` : soLieu.ky !== null ? ` · đọc kỹ ${nhan(`${soLieu.ky}%`)} lượt` : ' · ít dữ liệu'}`,
-    dp: bcDp || 'Có dấu hiệu đối phó',
+    ht: htVinhDanh ? `Vinh danh · đã kiểm trên lớp ${nhan(`${soBuoiLop} buổi`)}${sc.tong >= 3 ? ` · sửa đúng ${nhan(`${sc.sua}/${sc.tong}`)} câu sai` : ''}` : ca.caKhop ? `Ca thi đúng ${nhan(`${ca.K}/${ca.N}`)} câu — khớp luyện tập${duoiTamHt}` : ca.bangDat ? `Lên bảng đạt ${nhan(`${ca.bang.dat}/${ca.bang.tong}`)}${duoiTamHt}`
+      : htRo && sc.tong >= 3 ? `Sửa đúng ${nhan(`${sc.sua}/${sc.tong}`)} câu từng sai${duoiTamHt}`
+      : `Không có dấu hiệu đối phó${ca.N >= 4 ? ` · ca thi ${nhan(`${ca.K}/${ca.N}`)} câu` : soLieu.ky !== null ? ` · đọc kỹ ${nhan(`${soLieu.ky}%`)} lượt` : ' · ít dữ liệu'}${duoiTamHt}`,
+    dp: tl.nhan === 'dp' ? `Đã kiểm trên lớp ${nhan(`${soBuoiLop} buổi`)} — thấp hơn hẳn luyện tập` : (bcDp || 'Có dấu hiệu đối phó') + duoiTam,
     ch: `Đủ mức ${nhan(`${du}/${ngay.length}`)} ngày${daLam ? ` · ${daLam} câu` : ''}`,
     lu: lyDoLu === 'choCo' ? `${nhan(`${pt(choCo, lam.length)}%`)} lượt làm cho có` : lyDoLu === 'donHan' ? `Dồn sát giờ chốt ${nhan(`${ngayDon}/${ngayDem.length}`)} ngày`
       : khong >= ngay.length && ngay.length ? `${nhan(`${khong}/${ngay.length}`)} ngày không làm${lanCuoi ? ` · lần cuối ${ngayNgan(lanCuoi)}` : ''}` : khong ? `${nhan(`${khong}/${ngay.length}`)} ngày không làm` : `Làm ${nhan(`${daLam}/${giao}`)} câu được giao`,
@@ -493,14 +545,24 @@ export function tinhBon(v: DauVaoBon): KetQuaBon {
   }
   const kl: Record<MaBang, string> = {
     // v3: Đối phó vì ca thi / lên bảng ⇒ nói đúng việc (điểm luyện không giữ được khi tự làm), không gọi là «làm cho có».
-    dp: dong(theDp[0] && (theDp[0].ma === 'lechCa' || theDp[0].ma === 'bangChua') ? 'Điểm luyện tập chưa thật — tự làm ở ca thi / trên bảng không giữ được:'
-      : du ? `Em làm ${du}/${ngay.length} ngày đủ mức nhưng làm cho có:` : 'Em làm cho có:', ...theDp.slice(0, 3).map(lyDoDp)),
-    ht: dong(htRo ? 'Em học thật:' : 'Em học thật (không có dấu hiệu đối phó):',
+    dp: tl.nhan === 'dp'
+      ? dong(`Đã kiểm trên lớp ở ${soBuoiLop} buổi — điểm luyện ở nhà cao hơn hẳn khi tự làm có giám sát (đã tính câu trên lớp khó hơn, bỏ buổi kém nhất vẫn đủ):`, ...buoiLech.map(dongBuoi))
+      : dong((theDp[0] && (theDp[0].ma === 'lechCa' || theDp[0].ma === 'bangChua') ? 'Điểm luyện tập chưa thật — tự làm ở ca thi / trên bảng không giữ được:'
+        : du ? `Em làm ${du}/${ngay.length} ngày đủ mức nhưng làm cho có:` : 'Em làm cho có:'), ...theDp.slice(0, 3).map(lyDoDp),
+        kiemCl === 'tam' ? 'Chưa kiểm trên lớp — nhãn tạm theo bài làm ở nhà; ca thi / lên bảng tới sẽ chốt' : ''),
+    ht: htVinhDanh
+      ? dong(`Học thật — đủ tiêu chí vinh danh (đã kiểm trên lớp ở ${soBuoiLop} buổi, không một dấu hiệu làm cho có):`, ...buoiKhop.slice(0, 2).map(dongBuoi),
+        nhom.sua ? `${nhan(`${sc.sua}/${sc.tong} câu`)} từng sai đã tự sửa đến khi đúng` : '',
+        nhom.chu ? `${nhan(`${ssDung}/${ss.length} câu`)} đổi số liệu làm đúng — hiểu bài, không thuộc đáp án` : '',
+        nhom.bang ? `${nhan(`${ca.bang.dat}/${ca.bang.tong} lần`)} lên bảng đạt` : '',
+        nhom.kt && ktTB !== null ? `${nhan(`${so1(ktTB)} điểm`)} kiểm tra cá nhân — khớp mức luyện tập` : '')
+      : dong(htRo ? 'Em học thật:' : 'Em học thật (không có dấu hiệu đối phó):',
       ca.caKhop ? `${nhan(`${ca.K}/${ca.N} câu`)} ca thi đúng — khớp mức luyện tập ${pL}% ở ${ca.dvKhop} đơn vị kiến thức` : '',
       ca.bangDat ? `${nhan(`${ca.bang.dat}/${ca.bang.tong} lần`)} lên bảng đạt` : '',
       sc.tong >= 3 ? `${nhan(`${sc.sua}/${sc.tong} câu`)} từng sai đã sửa đến khi đúng` : '',
       soLieu.ky !== null ? `${nhan(`${soLieu.ky}%`)} lượt đọc đủ thời gian trước khi chọn` : '',
-      ktTB !== null && !lechKt ? `${nhan(`${so1(ktTB)} điểm`)} kiểm tra cá nhân — khớp mức luyện tập ${tron((dungLuyen ?? 0) * 100)}%` : ''),
+      ktTB !== null && !lechKt ? `${nhan(`${so1(ktTB)} điểm`)} kiểm tra cá nhân — khớp mức luyện tập ${tron((dungLuyen ?? 0) * 100)}%` : '',
+      thieuHt.length ? `Chưa vinh danh: ${thieuHt.join('; ')}` : ''),
     ch: dong('Em chăm:',
       `${nhan(`${du}/${ngay.length} ngày`)} đủ mức`,
       `${nhan(`${daLam} câu`)} đã làm (mức giao ${giao})`,
@@ -529,8 +591,9 @@ export function tinhBon(v: DauVaoBon): KetQuaBon {
 }
 
 /** Phiên bản bộ máy 4 bảng: 2 = v2 «chắc mới xếp» (01/11 chiều); 3 = bỏ «chủ động hỏi» khỏi nhóm Học thật (dữ liệu thật: 264/272 em có ⇒ không phân biệt);
- *  4 = v3 ca thi thật + lên bảng theo đơn vị kiến thức (02/11). Đổi số ⇒ cron tính lại mọi em. */
-export const BAN_BON = 4
+ *  4 = v3 ca thi thật + lên bảng theo đơn vị kiến thức (02/11); 5 = hướng B — chốt cuối bằng trên lớp (kiểm định tuần tự), nhãn đã kiểm / tạm, bỏ mặc câu sai
+ *  sang Lười, gộp lên bảng ghi đôi khi đọc (02/11 chiều). Đổi số ⇒ cron tính lại mọi em. */
+export const BAN_BON = 5
 
 /** Em có vào bảng không (ngưỡng hợp đồng). Thuần. */
 export function vaoBang(d: DiemBon, b: MaBang): boolean {

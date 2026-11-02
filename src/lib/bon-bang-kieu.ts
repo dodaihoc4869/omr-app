@@ -49,6 +49,14 @@ export interface TraLoiBonBang {
   trungVi: DiemBon
   /** v2 (01/11): em có dấu hiệu nhưng CHƯA đủ chắc để xếp. v3b (02/11): ĐÃ BỎ — máy chủ mới luôn trả rỗng; giữ khoá cho máy chủ cũ (app không còn vẽ). */
   theoDoi?: DongBang[]
+  /** HƯỚNG B (02/11): TỰ ĐO ĐỘ CHÍNH XÁC TRÊN SỐ LIỆU THẬT — chỉ số đếm gộp, không tên. `daKiem` / `tam`: số em theo nhãn và mức chắc.
+   *  `niemPhong`: nhãn ĐÃ KIỂM niêm phong từ các buổi TRƯỚC buổi trên lớp gần nhất ⇒ `cung` = buổi gần nhất cùng chiều · `lat` = dữ liệu mới nhất đã chốt
+   *  NGƯỢC nhãn (đây là «sai» — lời hứa ≤ 1%). Máy chủ cũ không có ⇒ vắng. */
+  kiemDinh?: {
+    daKiem: { ht: number; dp: number }
+    tam: { ht: number; dp: number }
+    niemPhong: Record<'ht' | 'dp', { tong: number; cung: number; lat: number }>
+  }
 }
 
 /** Một ví dụ cụ thể có ngày giờ (bằng chứng «tâm phục khẩu phục»). */
