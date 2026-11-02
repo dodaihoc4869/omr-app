@@ -30,3 +30,6 @@ Nguyên văn lời thầy (02/11):
 - [!] 1/14: màn chính (Hôm nay, Thêm, Luyện tập, Thành tích, làm câu, kết chặng, màn thi) khớp bản vẽ; màn phụ (Tự sửa lỗi, Chữa câu sai, Tu luyện, các tấm thưởng) mới phủ kính, bố cục còn theo app cũ — chưa «y hệt».
 - [!] 7: giám thị mới của Code app 2 chưa gộp main ⇒ mới XEM TRƯỚC (`anh-that/35-giam-thi-moi-xem-truoc.jpg`, worktree gộp thử, lỗi 0); chưa gắn vào tu luyện / chữa câu sai / KTCN.
 - [!] 12: tsc sạch · kiem:mau-giu 0 · check:mau sạch · SW 13/13 precache 170 · byte tải mở ≤ bản trước. Vitest: ~45 test cấu trúc cũ (DOM «Lộ trình») đỏ — phải viết lại cho DOM mới trước khi phát hành.
+- [x] 17. Thầy 02/11: «Chỉnh cái hiệu ứng soi đèn cho mượt mà tinh tế, hiện tại nhìn bị giả khi soi vào đáp án» | bằng chứng: accba6dd (trong-kiem-tra.css 5c+: tia nhạt tan dần, mép mềm, vũng sáng trên ô, nền tối cộng sáng); ảnh thi-chon sáng/tối
+- [ ] 18. (phát sinh) Luật tốc độ: bấm phương án / vào chặng ở CPU ×4 phải bằng hoặc nhanh hơn bản cũ | đã sửa 3 nguyên nhân: bỏ làm mờ màn làm câu (24e16d69), nền đặc cho khung màn con ⇒ an-khi-bi-che ẩn lại Hôm nay (6f241859), tách luật đuôi :is (1b2f70cb); đang đo A/B
+- [ ] 19. Thầy 02/11: «Không tải sẵn về máy hs à mà bấm chậm thế» — đã trả lời: có tải sẵn, độ trễ là vẽ lại trên máy, đang gỡ
