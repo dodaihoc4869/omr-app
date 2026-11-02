@@ -311,6 +311,28 @@
 [data-trong='hs'] .kt-den-vung { width: 100px; height: 100px; transform-origin: 0 0; border-radius: 50%; background: radial-gradient(closest-side, var(--kt-den-vung) 0%, var(--kt-den-vung) 42%, transparent 100%); }
 [data-trong='hs'] .kt-den-goc { width: 48px; height: 48px; border-radius: 50%; background: radial-gradient(closest-side, var(--kt-den-goc) 0%, transparent 100%); }
 
+/* 5c+ ĐÈN PHA MỊN (thầy 02/11: «chỉnh hiệu ứng soi đèn cho mượt mà tinh tế, hiện tại nhìn bị giả khi soi vào đáp án»): tia cũ là nêm vàng
+ * đặc, mép cứng, đậm đều tới tận giữa ô ⇒ như miếng giấy dán. Đèn thật: tia trong không khí RẤT nhạt, sáng nhất sát kính đèn, tan dần theo chiều dài
+ * và mép ngang mềm; ánh sáng dồn vào VŨNG trên ô được soi, loang ra viền. Chỉ đè lớp vẽ (den-soi.ts giữ nguyên: transform + opacity). */
+[data-trong='hs'] .kt-den {
+  --kt-den-tia: color-mix(in srgb, var(--tr-sao) 22%, transparent); --kt-den-loi: color-mix(in srgb, var(--tr-sao) 38%, transparent);
+  --kt-den-vien: color-mix(in srgb, var(--tr-sao) 7%, transparent); --kt-den-vung: color-mix(in srgb, var(--tr-sao) 30%, transparent);
+}
+[data-trong='hs'] .kt-den-tia {
+  background: conic-gradient(from 63.4deg at 0 50%, transparent 0deg, var(--kt-den-vien) 7deg, var(--kt-den-tia) 15deg, var(--kt-den-loi) 26.6deg,
+    var(--kt-den-tia) 38deg, var(--kt-den-vien) 46deg, transparent 53.2deg, transparent 360deg);
+  -webkit-mask-image: linear-gradient(90deg, var(--tr-chu) 0%, color-mix(in srgb, var(--tr-chu) 82%, transparent) 30%, color-mix(in srgb, var(--tr-chu) 48%, transparent) 72%, color-mix(in srgb, var(--tr-chu) 22%, transparent) 100%);
+  mask-image: linear-gradient(90deg, var(--tr-chu) 0%, color-mix(in srgb, var(--tr-chu) 82%, transparent) 30%, color-mix(in srgb, var(--tr-chu) 48%, transparent) 72%, color-mix(in srgb, var(--tr-chu) 22%, transparent) 100%);
+}
+[data-trong='hs'] .kt-den-vung { background: radial-gradient(closest-side, var(--kt-den-vung) 0%, var(--kt-den-vung) 38%, var(--kt-den-tia) 66%, var(--kt-den-vien) 84%, transparent 100%); }
+[data-trong='hs'] .kt-den-goc { background: radial-gradient(closest-side, var(--kt-den-goc) 0%, var(--kt-den-loi) 38%, var(--kt-den-vien) 70%, transparent 100%); }
+@media (prefers-color-scheme: dark) {
+  /* nền tối: ánh sáng CỘNG vào mặt ô (screen) ⇒ sáng lên như đèn thật, không phủ một lớp vàng đục */
+  [data-trong='hs'] .duo-kt-than > .kt-den { mix-blend-mode: screen; }
+  [data-trong='hs'] .kt-den { --kt-den-tia: color-mix(in srgb, var(--tr-sao) 18%, transparent); --kt-den-loi: color-mix(in srgb, var(--tr-sao) 32%, transparent);
+    --kt-den-vien: color-mix(in srgb, var(--tr-sao) 5%, transparent); --kt-den-vung: color-mix(in srgb, var(--tr-sao) 28%, transparent); }
+}
+
 /* 5d. Tấm «Nộp bài?»: Giáo sư Kíp thay Bi (đèn bật). */
 [data-trong='hs'] .duo-kt-nop-bi[data-gt] { width: 104px; line-height: 0; }
 
