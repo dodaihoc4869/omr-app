@@ -57,7 +57,8 @@ function TinVanPhong({ t }: { t: TinAiDdh }) {
           )}
         </div>
       )}
-      {t.trangUrl && !t.boDe && (
+      {/* thầy 02/11 khuya «Ẩn hết nút lời giải từng bước» ⇒ không hiện thẻ mở lời giải từng bước */}
+      {false && t.trangUrl && !t.boDe && (
         <a className="aid-trang" href={t.trangUrl} target="_blank" rel="noopener noreferrer">
           <span className="aid-trang-anh"><BookOpen size={26} /></span>
           <span><b>Lời giải từng bước</b><small>Thử chọn đáp án trước, rồi bấm «Bước tiếp» xem từng bước và mẹo của Thầy.</small></span>

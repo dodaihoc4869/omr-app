@@ -212,14 +212,22 @@ function trongCung(a: number, a0: number, a1: number): boolean {
   w -= Math.floor(w / PI2) * PI2
   return d <= w
 }
+/** Hai đầu mỗi tường [x0, y0, x1, y1] (tính một lần). */
+const DAU_TUONG: (readonly [number, number, number, number] | null)[] = KHOI.map((k) => (k.k === 'tuong' ? [k.x + Math.cos(k.a0!) * k.r, k.y + Math.sin(k.a0!) * k.r, k.x + Math.cos(k.a1!) * k.r, k.y + Math.sin(k.a1!) * k.r] as const : null))
+/** Bán kính bao của khối quanh tâm (x, y) của nó: tháp / tinh thể = r; tường = r + dày. */
+const BAO_KHOI = KHOI.map((k) => (k.k === 'tuong' ? k.r + TUONG_DAY : k.r))
+/** Chỉ số khối gần đường ngắm (dùng lại, không cấp mảng mỗi lần). */
+const GAN: number[] = []
 /** Điểm (x, y) bán kính r chạm khối `i` không (tường: dải cung dày 2·TUONG_DAY + hai đầu tròn). */
 export function chamKhoi(i: number, x: number, y: number, r: number): boolean {
   const k = KHOI[i]
   if (k.k !== 'tuong') return (x - k.x) ** 2 + (y - k.y) ** 2 < (k.r + r) ** 2
-  const dx = x - k.x, dy = y - k.y, d = Math.hypot(dx, dy)
-  if (Math.abs(d - k.r) < TUONG_DAY + r && trongCung(Math.atan2(dy, dx), k.a0!, k.a1!)) return true
-  for (const a of [k.a0!, k.a1!]) { const ex = k.x + Math.cos(a) * k.r, ey = k.y + Math.sin(a) * k.r; if ((x - ex) ** 2 + (y - ey) ** 2 < (TUONG_DAY + r) ** 2) return true }
-  return false
+  const dx = x - k.x, dy = y - k.y, d = Math.hypot(dx, dy), m = TUONG_DAY + r
+  // loại nhanh (đo CPU ×6 02/11: tầm nhìn gọi hàm này hàng nghìn lần mỗi nhịp): hai đầu tường cũng cách tâm đúng k.r ⇒ |d − k.r| ≥ m thì không chạm gì
+  if (Math.abs(d - k.r) >= m) return false
+  if (trongCung(Math.atan2(dy, dx), k.a0!, k.a1!)) return true
+  const e = DAU_TUONG[i]! // hai đầu tường tính sẵn (không sin/cos, không tạo mảng mỗi lần)
+  return (x - e[0]) ** 2 + (y - e[1]) ** 2 < m * m || (x - e[2]) ** 2 + (y - e[3]) ** 2 < m * m
 }
 /** Điểm (x, y) bán kính r có lấn khối nào còn đứng không (mọi phe — va chạm đi lại / tầm nhìn). `bo` = chỉ số khối bỏ qua. */
 export function dungVatCan(x: number, y: number, r: number, km?: readonly number[], bo = -1): boolean {
@@ -253,8 +261,21 @@ export function dayRa(p: { x: number; y: number }, r: number, km?: readonly numb
 
 /** Đường bắn giữa hai điểm có bị khối còn đứng chắn không (`bo` = khối đích, không tính là vật chắn). */
 export function thayNhau(ax: number, ay: number, bx: number, by: number, km?: readonly number[], bo = -1): boolean {
-  const n = Math.ceil(xa(ax, ay, bx, by) / 10)
-  for (let i = 1; i < n; i++) if (dungVatCan(ax + ((bx - ax) * i) / n, ay + ((by - ay) * i) / n, R_DAN - 2, km, bo)) return false
+  const n = Math.ceil(xa(ax, ay, bx, by) / 10), r = R_DAN - 2
+  // Chỉ thử các khối mà ĐOẠN thẳng đi gần (khoảng cách tâm khối → đoạn < bán kính bao + r) — khối xa không thể chạm điểm nào trên đoạn ⇒ cùng kết quả,
+  // bớt ~14 × n lần thử (đo CPU ×6 02/11: tầm nhìn là phần mã v4 tốn hơn bản trước).
+  const vx = bx - ax, vy = by - ay, L2 = vx * vx + vy * vy
+  let gan = 0, dem = 0
+  for (let i = 0; i < SO_KHOI; i++) {
+    if (i === bo || !con(km, i)) continue
+    const k = KHOI[i], t = L2 > 0 ? Math.max(0, Math.min(1, ((k.x - ax) * vx + (k.y - ay) * vy) / L2)) : 0, qx = ax + vx * t - k.x, qy = ay + vy * t - k.y, m = BAO_KHOI[i] + r
+    if (qx * qx + qy * qy < m * m) { GAN[dem++] = i; gan = 1 }
+  }
+  if (!gan) return true
+  for (let j = 1; j < n; j++) {
+    const px = ax + (vx * j) / n, py = ay + (vy * j) / n
+    for (let q = 0; q < dem; q++) if (chamKhoi(GAN[q], px, py, r)) return false
+  }
   return true
 }
 

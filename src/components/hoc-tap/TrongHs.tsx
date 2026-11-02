@@ -1331,7 +1331,10 @@ export function MenuDocTrong(p: {
         luật cũ `.tr-menu-cham s` (đọc số chưa đọc của chuông thật). */}
     <div className="tr-menu-ray kb-thanh">
       <div className="kb-thanh-ds">
-        {MENU_DUO.map(({ id, ten, icon: Icon }) => <button key={id} type="button" className="tr-ray-muc kb-thanh-muc" onClick={chon(() => p.onMuc(id))} aria-current={p.muc === id ? 'page' : undefined} aria-label={ten}><Icon size={22} aria-hidden="true" /><span aria-hidden="true">{ten}</span></button>)}
+        {/* thầy 02/11 khuya «Đổi vị trí Luyện tập bằng Kiểm tra»: thanh nổi = Hôm nay · Kiểm tra (vào ca kiểm tra) · Thành tích · Thêm; Luyện tập vào tấm Thêm */}
+        {MENU_DUO.map(({ id, ten, icon: Icon }) => id === 'on-lai'
+          ? <button key="kiem-tra" type="button" className="tr-ray-muc kb-thanh-muc" onClick={chon(() => p.onThi())} aria-label="Kiểm tra"><ClipboardCheck size={22} aria-hidden="true" /><span aria-hidden="true">Kiểm tra</span></button>
+          : <button key={id} type="button" className="tr-ray-muc kb-thanh-muc" onClick={chon(() => p.onMuc(id))} aria-current={p.muc === id ? 'page' : undefined} aria-label={ten}><Icon size={22} aria-hidden="true" /><span aria-hidden="true">{ten}</span></button>)}
         <button ref={nut} type="button" className="tr-menu-cham kb-thanh-muc" data-dd={ddMo || undefined} aria-label={ddMo ? 'Thêm · Buổi học đang mở điểm danh' : 'Thêm'} aria-expanded={mo} aria-controls="tr-menu" onClick={() => { if (mo) dong(false); else setMo(true) }}>
           <i /><s /><Luoi4 size={22} /><span aria-hidden="true">Thêm</span>{ddMo && <em aria-hidden="true"><QrCode size={14} />Điểm danh</em>}
         </button>
@@ -1352,9 +1355,9 @@ export function MenuDocTrong(p: {
           đây (useChoSo); chưa có số ⇒ rỗng, menu giữ một cột như cũ */}
       <div ref={oSo} id="tr-menu-dem" className="tr-menu-dem" />
       <div className="tr-menu-ds" hidden={cai}>
-        {MENU_DUO.map(({ id, ten, icon: Icon, sac }) => <button key={id} type="button" className="tr-menu-muc" onClick={chon(() => { p.onMuc(id); dong(true) })} aria-current={p.muc === id ? 'page' : undefined}><span className="tr-menu-o" data-sac={sac} aria-hidden="true"><Icon size={20} /></span>{ten}</button>)}
-        {!p.coCa && <button type="button" className="tr-menu-muc" onClick={chon(() => { dong(true); p.onThi() })}><span className="tr-menu-o" data-sac="tin" aria-hidden="true"><ClipboardCheck size={20} /></span>Ca kiểm tra</button>}
-        <button type="button" className="tr-menu-muc tr-menu-ai" onClick={chon(() => { dong(false); window.dispatchEvent(new Event('ddh:mo-ai')) })}><span className="tr-menu-o tr-o-ai" aria-hidden="true"><Sparkles size={20} /></span>Hỏi A.I Đỗ Đại Học</button>
+        {MENU_DUO.map(({ id, ten, icon: Icon, sac }) => <button key={id} type="button" className="tr-menu-muc" data-hien={id === 'on-lai' || undefined} onClick={chon(() => { p.onMuc(id); dong(true) })} aria-current={p.muc === id ? 'page' : undefined}><span className="tr-menu-o" data-sac={sac} aria-hidden="true"><Icon size={20} /></span>{ten}</button>)}
+        {/* thầy 02/11 khuya: Kiểm tra lên thanh nổi ⇒ tấm Thêm hiện Luyện tập (dòng MENU_DUO «on-lai», data-hien — trong-kinh.css), bỏ Ca kiểm tra; bỏ
+            «Hỏi A.I Đỗ Đại Học» (đã có nút A.I riêng ngoài thanh) */}
         <button ref={nutCai} type="button" className="tr-menu-muc" onClick={chon(() => setCai(true))} aria-expanded={cai} aria-controls="tr-menu-cai"><span className="tr-menu-o" data-sac="xam" aria-hidden="true"><BanhRang size={20} /></span>Cài đặt<ChevronRight size={20} aria-hidden="true" className="tr-menu-mui" /></button>
       </div>
       <div id="tr-menu-cai" className="tr-menu-cai" role="group" aria-labelledby="tr-menu-cai-ten" hidden={!cai}>
