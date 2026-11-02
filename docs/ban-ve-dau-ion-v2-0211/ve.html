@@ -42,6 +42,8 @@ b, strong, h1, h2, button { font-weight: 800; }
   background: linear-gradient(90deg, var(--tr-hs), var(--tr-tin), var(--tr-dung), var(--tr-sao), var(--tr-chu-y), var(--tr-sai)); }
 .ph .kim { position: absolute; top: 6px; width: 6px; height: 18px; border-radius: 3px; background: var(--tr-trang); box-shadow: 0 0 0 2px var(--tr-chu), 0 2px 6px var(--tr-phu); }
 .ph .gio { position: relative; font-size: 11px; font-weight: 800; padding: 1px 7px; border-radius: 8px; background: var(--tr-chu); color: var(--tr-trang); top: -15px; }
+.pip { display: flex; flex-direction: column; gap: 2px; } .pip b { display: block; width: 7px; height: 7px; border-radius: 2px; border: 1.5px solid; }
+.doc .pip { display: none; }
 .tt-thanh { position: relative; width: 104px; height: 10px; border-radius: 5px; background: color-mix(in oklab, var(--tr-chu) 12%, transparent); overflow: hidden; display: flex; }
 .tt-thanh[data-phe='1'] { justify-content: flex-end; }
 .tt-thanh i { display: block; height: 100%; border-radius: 5px; background: var(--tr-tin); padding: 0 !important; }
@@ -192,10 +194,15 @@ const VAT_CAN = [
   { k: 'cn', x: 136, y: 200, w: 22, h: 120, ve: 'gia-ong' }, { k: 'cn', x: 882, y: 200, w: 22, h: 120, ve: 'gia-ong' },
   { k: 'cn', x: 278, y: 74, w: 44, h: 44, ve: 'coc', mau: 5 }, { k: 'cn', x: 278, y: 402, w: 44, h: 44, ve: 'coc', mau: 5 },
   { k: 'cn', x: 718, y: 74, w: 44, h: 44, ve: 'coc', mau: 5 }, { k: 'cn', x: 718, y: 402, w: 44, h: 44, ve: 'coc', mau: 5 }]
-const BE_PHE = [[[76, 96], [102, 260], [76, 424]], [[964, 424], [938, 260], [964, 96]]]
+const BE_PHE = [[[70, 70], [140, 260], [70, 450]], [[970, 450], [900, 260], [970, 70]]]
 // TINH THỂ (thầy 02/11 tối «Cho mỗi bên một tinh thể, bên nào tinh thể bị bắn vỡ trước là thua»): mỗi phe một tinh thể sau tường giá ống của căn cứ
-const TINH_THE = [[46, 260], [994, 260]]
-const CHO_XT = [[520, 58], [520, 462]], CHO_KH = [[200, 260], [840, 260]]
+const TINH_THE = [[44, 260], [996, 260]]
+// THÁP + TƯỜNG (thầy 02/11 tối «Mấy cái chướng ngại vật biến thành tháp bảo vệ tinh thể, nó tự bắn khi bị xâm phạm lãnh thổ … bỏ hết chướng ngại … tinh thể có lớp
+// tường chắn nhưng tường này có thể bị phá»): mỗi phe 3 tháp — 2 tháp cánh (trên / dưới) + 1 tháp lớn giữ cửa tinh thể; tường kính 3 mảnh hình cung trước tinh thể.
+const THAP = [{ p: 0, x: 330, y: 120 }, { p: 0, x: 330, y: 400 }, { p: 0, x: 210, y: 260, lon: 1 }, { p: 1, x: 710, y: 400 }, { p: 1, x: 710, y: 120 }, { p: 1, x: 830, y: 260, lon: 1 }]
+const TAM_THAP = [180, 205] // vùng tháp nhỏ / tháp lớn (đơn vị sân)
+const TUONG_R = 68, TUONG_GOC = [[-82, -30], [-22, 22], [30, 82]] // cung tường quanh tinh thể (độ, 0 = hướng vào giữa sân)
+const CHO_XT = [[520, 110], [520, 410]], CHO_KH = [[520, 260]]
 const thuy = () => `fill="${v('--tr-mat')}" fill-opacity="${TOI ? .13 : .72}" stroke="${v('--tr-chu')}" stroke-opacity="${TOI ? .42 : .34}" stroke-width="2"`
 const loe = (r) => YEU ? '' : `<path d="M${-r * .55} ${-r * .15} q${r * .1} ${-r * .45} ${r * .45} ${-r * .55}" fill="none" stroke="${v('--tr-trang')}" stroke-opacity=".7" stroke-width="2.4" stroke-linecap="round"/>`
 function binhCau(X, Y, r, mau) { // bình cầu đáy tròn: thân = vòng va chạm; cổ trang trí phía trên
@@ -228,6 +235,38 @@ function tinhThe(X, Y, p, mau, bi) { // lăng trụ lục giác (tinh thể) mà
   if (bi && !YEU) s += [0, 60, 120, 180, 240, 300].map((a) => `<line x1="0" y1="50" x2="0" y2="60" transform="rotate(${a})" stroke="${m}" stroke-width="3" stroke-linecap="round"/>`).join('')
   return s + '</g>'
 }
+function thap(X, Y, t, st = {}, P) { // tháp chưng cất: đế kính + cột + bầu dung dịch màu phe + nòng xoay theo mục tiêu; vòng máu; vùng nét đứt (sáng lên khi bị lấn)
+  const p = t.p, m = v(p ? '--tr-sai' : '--tr-tin'), d = v(p ? '--tr-sai-day' : '--tr-tin-day'), tr = v('--tr-trang'), r = t.lon ? 25 : 20, vung = TAM_THAP[t.lon ? 1 : 0]
+  let s = `<g transform="translate(${X} ${Y})">`
+  if (st.huy) { // tháp đã vỡ: đống mảnh kính xám, không vùng
+    s += `<circle r="${r}" fill="${v('--tr-chu')}" opacity=".06"/>` + [[-10, 6, 20], [6, -4, -30], [10, 10, 55], [-4, -12, 80], [-14, -4, -60]].map(([a, b, g]) => `<rect x="${a - 5}" y="${b - 2}" width="11" height="4" rx="1.5" transform="rotate(${g} ${a} ${b})" fill="${v('--tr-chu-3')}" opacity=".55"/>`).join('')
+    return s + '</g>'
+  }
+  // vùng tháp CHỈ hiện khi có bạn phe kia lấn vào (đỡ rối mắt); bình thường chỉ một vạch mờ sát đế
+  if (st.vung) s += `<circle r="${vung}" fill="${m}" fill-opacity="${TOI ? .12 : .1}" stroke="${m}" stroke-opacity=".7" stroke-width="2.5" stroke-dasharray="6 7"/>`
+  if (!YEU && st.vung) s += `<circle r="${r + 12}" fill="${m}" opacity=".25" filter="url(#mo)"/>`
+  const cv = 2 * Math.PI * (r + 7), mau = st.mau ?? 1
+  s += `<circle r="${r + 7}" fill="none" stroke="${v('--tr-chu')}" stroke-opacity=".12" stroke-width="4"/><circle r="${r + 7}" fill="none" stroke="${mau < .35 ? v('--tr-sai') : m}" stroke-width="4" stroke-linecap="round" stroke-dasharray="${(cv * mau).toFixed(1)} ${cv.toFixed(1)}" transform="rotate(-90)"/>`
+  s += `<circle r="${r}" ${thuy()}/><circle r="${r * .62}" fill="${YEU ? m : `url(#c${p})`}" stroke="${d}" stroke-width="1.5"/>`
+  if (st.ngam && P) { const [tx, ty] = P(...st.ngam), g = Math.atan2(ty - Y, tx - X) * 180 / Math.PI; s += `<g transform="rotate(${g.toFixed(1)})"><rect x="${r * .3}" y="-4.5" width="${r * .95}" height="9" rx="4.5" fill="${d}"/></g>` }
+  else s += `<rect x="-4.5" y="${-r * 1.25}" width="9" height="${r * .95}" rx="4.5" fill="${d}"/>`
+  if (!YEU) s += `<ellipse cx="${-r * .22}" cy="${-r * .26}" rx="${r * .2}" ry="${r * .12}" fill="${tr}" opacity=".6"/>`
+  if (t.lon) s += `<circle r="${r * .62 + 4}" fill="none" stroke="${tr}" stroke-opacity=".7" stroke-width="1.5"/>`
+  return s + '</g>'
+}
+function tuong(p, mau3, P) { // tường kính 3 mảnh hình cung trước tinh thể; < 60 % nứt; 0 = vỡ (chỉ còn mảnh vụn) ⇒ hở cửa bắn vào tinh thể
+  const [cx, cy] = TINH_THE[p], m = v(p ? '--tr-sai' : '--tr-tin'), tr = v('--tr-trang')
+  let s = ''
+  TUONG_GOC.forEach(([a0, a1], i) => {
+    const mau = mau3[i], diem = []
+    for (let k = 0; k <= 8; k++) { const a = (a0 + (a1 - a0) * k / 8) * Math.PI / 180, g = p ? Math.PI - a : a; diem.push(P(cx + TUONG_R * Math.cos(g), cy + TUONG_R * Math.sin(g))) }
+    const dd = 'M' + diem.map(([x, y]) => `${x.toFixed(1)} ${y.toFixed(1)}`).join('L')
+    if (mau <= 0) { s += diem.filter((_, k) => k % 2 === 0).map(([x, y], k) => `<rect x="${x - 5}" y="${y - 2}" width="10" height="4" rx="1.5" transform="rotate(${k * 47} ${x} ${y})" fill="${m}" opacity=".45"/>`).join(''); return }
+    s += `<path d="${dd}" fill="none" stroke="${m}" stroke-opacity="${TOI ? .55 : .45}" stroke-width="13" stroke-linecap="round"/><path d="${dd}" fill="none" stroke="${tr}" stroke-opacity=".55" stroke-width="3" stroke-linecap="round" transform="translate(0 -2)"/>`
+    if (mau < .6) s += `<path d="${dd}" fill="none" stroke="${tr}" stroke-width="2.4" stroke-dasharray="3 9 6 7" stroke-linecap="round"/>`
+  })
+  return s
+}
 const vatPham = (x, y, k) => k === 'xt'
   ? `<g transform="translate(${x} ${y})">${YEU ? '' : `<circle r="22" fill="${v('--tr-sao')}" opacity=".18" filter="url(#mo)"/>`}<path d="M0-15l13 7.5v15L0 15-13 7.5v-15z" fill="${v('--tr-sao-nhat')}" stroke="${v('--tr-sao-day')}" stroke-width="2"/><path d="M2-9l-7 10h5l-2 8 7-10h-5z" fill="${v('--tr-sao-day')}"/></g>`
   : `<g transform="translate(${x} ${y})">${YEU ? '' : `<circle r="22" fill="${v('--tr-hs')}" opacity=".16" filter="url(#mo)"/>`}<path d="M0-15l13 7.5v15L0 15-13 7.5v-15z" fill="${v('--tr-hs-nhat')}" stroke="${v('--tr-hs-day')}" stroke-width="2"/><path d="M0-8l7 3v4q0 6-7 9q-7-3-7-9v-4z" fill="${v('--tr-hs-day')}"/></g>`
@@ -237,10 +276,10 @@ const dan = (x, y, goc, p, dai = 34) => YEU
 const tia = (x, y, p) => YEU ? '' : `<g transform="translate(${x} ${y})" stroke="${v(p ? '--tr-sai' : '--tr-tin')}" stroke-width="3" stroke-linecap="round">${[0, 60, 120, 180, 240, 300].map((a) => `<line x1="0" y1="9" x2="0" y2="17" transform="rotate(${a})"/>`).join('')}</g>`
 // ─── SÂN 1040 × 520 (phe Bazơ trái, Axit phải); dọc ⇒ quay toạ độ (phe em xuống dưới), chữ vẫn đứng
 const DS_MAC = [
-  { x: 330, y: 185, phe: 0, nt: 'Cl', cap: 3, em: 1 }, { x: 836, y: 424, phe: 0, nt: 'N', cap: 2, ten: 'Thu Hà', mau: .55 },
-  { x: 400, y: 470, phe: 0, nt: 'S', cap: 2, ten: 'A.I Sulfur', ai: 1, mau: .9 },
-  { x: 700, y: 185, phe: 1, nt: 'O', cap: 1, ten: 'Quốc Bảo', mau: .3 }, { x: 650, y: 350, phe: 1, nt: 'Fe', cap: 4, ten: 'Ngọc Trâm', mau: .8 },
-  { x: 900, y: 128, phe: 1, nt: 'Ne', cap: 1, ten: 'A.I Neon', ai: 1, mau: .6 }]
+  { x: 400, y: 190, phe: 0, nt: 'Cl', cap: 3, em: 1 }, { x: 590, y: 440, phe: 0, nt: 'N', cap: 2, ten: 'Thu Hà', mau: .55 },
+  { x: 450, y: 330, phe: 0, nt: 'S', cap: 2, ten: 'A.I Sulfur', ai: 1, mau: .9 },
+  { x: 640, y: 190, phe: 1, nt: 'O', cap: 1, ten: 'Quốc Bảo', mau: .3 }, { x: 770, y: 310, phe: 1, nt: 'Fe', cap: 4, ten: 'Ngọc Trâm', mau: .8 },
+  { x: 920, y: 150, phe: 1, nt: 'Ne', cap: 1, ten: 'A.I Neon', ai: 1, mau: .6 }]
 function san(sw, sh, o = {}) {
   const doc = sh > sw, k = doc ? Math.min(sw / 520, sh / 1040) : Math.min(sw / 1040, sh / 520)
   const P = (x, y) => (doc ? [y, 1040 - x] : [x, y]), FW = doc ? 520 : 1040, FH = doc ? 1040 : 520
@@ -253,23 +292,24 @@ function san(sw, sh, o = {}) {
   const [cx, cy] = P(520, 260)
   s += doc ? `<line x1="0" y1="${cy}" x2="${FW}" y2="${cy}" stroke="${v('--tr-chu')}" stroke-opacity=".12" stroke-width="2" stroke-dasharray="8 8"/>` : `<line x1="${cx}" y1="0" x2="${cx}" y2="${FH}" stroke="${v('--tr-chu')}" stroke-opacity=".12" stroke-width="2" stroke-dasharray="8 8"/>`
   // ba bệ xuất phát mỗi phe (BE_PHE)
-  BE_PHE.forEach((ds, p) => ds.forEach(([x, y], i) => { if (i === 1) return; const [X, Y] = P(x, y), m = v(p ? '--tr-sai' : '--tr-tin')
+  BE_PHE.forEach((ds, p) => ds.forEach(([x, y], i) => { const [X, Y] = P(x, y), m = v(p ? '--tr-sai' : '--tr-tin')
     s += `<g transform="translate(${X} ${Y})"><circle r="24" fill="${m}" opacity=".12"/><circle r="24" fill="none" stroke="${m}" stroke-opacity=".5" stroke-width="2" stroke-dasharray="4 5"/>${i === 1 ? `<text y="4.5" text-anchor="middle" font-size="12" font-weight="800" fill="${v(p ? '--tr-sai-chu' : '--tr-tin-chu')}">${p ? 'H⁺' : 'OH⁻'}</text>` : ''}</g>` }))
-  TINH_THE.forEach(([x, y], p) => { const [X, Y] = P(x, y); s += tinhThe(X, Y, p, (o.tt ?? [.72, .45])[p], (o.biBan ?? -1) === p) })
-  for (const c of VAT_CAN) {
-    if (c.k === 'tron') { const [X, Y] = P(c.x, c.y); s += c.ve === 'binh-cau' ? binhCau(X, Y, c.r, c.mau) : binhNon(X, Y, c.r, c.mau); continue }
-    const [X, Y] = P(c.x + c.w / 2, c.y + c.h / 2); s += c.ve === 'gia-ong' ? giaOng(X, Y, c.w, c.h, doc) : coc(X, Y, c.w, c.mau)
-  }
+  TINH_THE.forEach(([x, y], p) => { const [X, Y] = P(x, y); s += tinhThe(X, Y, p, (o.tt ?? [.9, .85])[p], (o.biBan ?? -1) === p) })
+  // (bỏ hết chướng ngại vật — thầy 02/11 tối) ⇒ tháp + tường
+  const stThap = o.thap || { 0: { huy: 1 }, 3: { mau: .4, vung: 1, ngam: [590, 440] }, 4: { ngam: [640, 190] } }
+  THAP.forEach((t, i) => { const [X, Y] = P(t.x, t.y); s += thap(X, Y, t, stThap[i], P) })
+  const stTuong = o.tuong || [[1, 1, 1], [.5, 1, 1]]
+  s += tuong(0, stTuong[0], P) + tuong(1, stTuong[1], P)
   for (const [x, y] of CHO_XT) { const [X, Y] = P(x, y); s += vatPham(X, Y, 'xt') }
   for (const [x, y] of CHO_KH) { const [X, Y] = P(x, y); s += vatPham(X, Y, 'kh') }
   // (02/11 thầy «Bỏ mấy cái chấm xanh … cho đỡ rối mắt» — chọn: bỏ electron rải trên sân; súng lên cấp theo số lần trúng, xem DAC-TA)
   // đường ngắm em → mục tiêu, đạn, tia trúng
-  const A = P(330, 185), B = P(700, 185)
+  const A = P(...(o.em || [400, 190])), B = P(...(o.dich || [640, 190]))
   s += `<line x1="${A[0]}" y1="${A[1]}" x2="${B[0]}" y2="${B[1]}" stroke="${v('--tr-tin')}" stroke-width="2" stroke-dasharray="3 7" opacity=".7"/>`
   const gocAB = Math.atan2(B[1] - A[1], B[0] - A[0]) * 180 / Math.PI
   for (const t of [.26, .52, .78]) s += dan(A[0] + (B[0] - A[0]) * t, A[1] + (B[1] - A[1]) * t, gocAB, 0)
   // loạt bắn phụ: [từ, tới, phe] — mặc định: Ngọc Trâm bắn Thu Hà, Thu Hà bắn tinh thể Axit
-  for (const [a0, b0, ph, ts] of (o.loat || [[[650, 350], [836, 424], 1, [.35, .7]], [[836, 424], [994, 260], 0, [.3, .62]]])) {
+  for (const [a0, b0, ph, ts] of (o.loat || [[[770, 310], [590, 440], 1, [.4, .72]], [[710, 400], [590, 440], 1, [.5]], [[590, 440], [710, 400], 0, [.35, .7]]])) {
     const C = P(...a0), D = P(...b0), g = Math.atan2(D[1] - C[1], D[0] - C[0]) * 180 / Math.PI
     for (const t of ts) s += dan(C[0] + (D[0] - C[0]) * t, C[1] + (D[1] - C[1]) * t, g, ph)
   }
@@ -280,13 +320,14 @@ function san(sw, sh, o = {}) {
   return s + '</svg>'
 }
 const roi = `<span class="roi kinh"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${v('--tr-chu')}" stroke-width="2.6" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg>Rời sân</span>`
-function tiSo(a = .72, b = .45, gio = '1:12') {
+function tiSo(a = .9, b = .85, gio = '1:12', con = [2, 3]) {
   // TINH THỂ (thầy 02/11 tối): thanh máu hai tinh thể thay thang pH — mục tiêu ván là giữ tinh thể phe mình, bắn vỡ tinh thể phe bạn
   const gem = (p) => `<svg width="18" height="22" viewBox="-11 -14 22 28"><path d="M0 -13L10 -6V6L0 13L-10 6V-6Z" fill="${v(p ? '--tr-sai' : '--tr-tin')}" stroke="${v(p ? '--tr-sai-day' : '--tr-tin-day')}" stroke-width="1.5"/></svg>`
+  const thapCon = (p) => `<span class="pip" aria-label="Còn ${con[p]} tháp">${[0, 1, 2].map((i) => `<b style="background:${i < con[p] ? v(p ? '--tr-sai' : '--tr-tin') : 'transparent'};border-color:${v(p ? '--tr-sai' : '--tr-tin')}"></b>`).join('')}</span>`
   const thanh = (p, m) => `<span class="tt-thanh" data-phe="${p}"><i style="width:${Math.round(m * 100)}%"></i></span>`
-  return `<div class="ti kinh"><span class="phe" style="color:${v(TOI ? '--tr-tin' : '--tr-tin-chu')}"><i style="background:${v('--tr-tin-day')}">OH⁻</i>${gem(0)}${thanh(0, a)}<span class="pt">${Math.round(a * 100)}%</span></span>
+  return `<div class="ti kinh"><span class="phe" style="color:${v(TOI ? '--tr-tin' : '--tr-tin-chu')}"><i style="background:${v('--tr-tin-day')}">OH⁻</i>${gem(0)}${thanh(0, a)}<span class="pt">${Math.round(a * 100)}%</span>${thapCon(0)}</span>
     <span class="gio2">${gio}</span>
-    <span class="phe" style="color:${v(TOI ? '--tr-sai' : '--tr-sai-chu')}"><span class="pt">${Math.round(b * 100)}%</span>${thanh(1, b)}${gem(1)}<i style="background:${v('--tr-sai-day')}">H⁺</i></span></div>`
+    <span class="phe" style="color:${v(TOI ? '--tr-sai' : '--tr-sai-chu')}">${thapCon(1)}<span class="pt">${Math.round(b * 100)}%</span>${thanh(1, b)}${gem(1)}<i style="background:${v('--tr-sai-day')}">H⁺</i></span></div>`
 }
 const emO = `<div class="em kinh"><svg width="34" height="34" viewBox="-20 -20 40 40">${defs()}<circle r="15" fill="${YEU ? v('--tr-tin') : 'url(#c0)'}" stroke="${v('--tr-tin-day')}"/><text y="5" text-anchor="middle" font-size="12" font-weight="800" fill="${CHU_NT}">Cl</text></svg>
   <div><div style="display:flex;gap:6px;align-items:center"><b style="font-size:12px">Em</b><span class="cap">Cấp 3</span></div><div class="mau"><i></i></div><small>⚡ trúng 3/5 lên Cấp 4 · hạ 3</small></div></div>`
@@ -295,22 +336,24 @@ function veTran(o = {}) {
   const doc = DOC, padT = doc ? 64 : 52, padB = doc ? 74 : 8
   const sw = W - (doc ? 16 : 20), sh = H - padT - padB
   document.body.insertAdjacentHTML('beforeend', `<div class="tran" style="padding:${padT}px 0 ${padB}px">${san(sw, sh, o)}</div>
-  <div class="hud"><div class="tren">${roi}${tiSo(...(o.tt || [.72, .45]))}${doc ? '' : emO}</div>
+  <div class="hud"><div class="tren">${roi}${tiSo(...(o.tt || [.9, .85]), '1:12', o.conThap || [2, 3])}${doc ? '' : emO}</div>
   ${doc ? `<div style="position:absolute;left:10px;right:10px;bottom:12px;display:flex;justify-content:center">${emO}</div><div class="xoay kinh" style="top:${padT + 6}px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="7" width="18" height="11" rx="2.5"/><path d="M17 3l2 2-2 2"/></svg>Xoay ngang điện thoại để chơi to hơn</div>` : ''}
   <div class="tin" style="${doc ? `left:12px;bottom:${padB + 118}px;align-items:flex-start` : 'right:14px;bottom:12px'}">${o.khongTin ? '' : doc ? tinHa.split('</span>')[0] + '</span>' : tinHa}</div></div>`)
 }
 // ─── CẢNH
 if (CANH === 'tran') veTran()
 if (CANH === 'bao') { // tinh thể phe em đang bị bắn: viền đỏ mềm + dải cảnh báo + tinh thể loé
-  veTran({ khongTin: 1, tt: [.38, .66], biBan: 0, ds: [DS_MAC[0], { x: 190, y: 380, phe: 0, nt: 'N', cap: 2, ten: 'Thu Hà', mau: .4 }, DS_MAC[2], DS_MAC[3],
-    { x: 236, y: 440, phe: 1, nt: 'Fe', cap: 4, ten: 'Ngọc Trâm', mau: .8 }, { x: 214, y: 100, phe: 1, nt: 'Ne', cap: 1, ten: 'A.I Neon', ai: 1, mau: .6 }],
-    loat: [[[236, 440], [46, 260], 1, [.3, .62]], [[214, 100], [46, 260], 1, [.4, .75]], [[190, 380], [236, 440], 0, [.5]]] })
+  veTran({ khongTin: 1, tt: [.38, .8], conThap: [2, 3], biBan: 0, em: [400, 190], dich: [290, 195], tuong: [[1, 0, .45], [1, 1, 1]],
+    thap: { 0: { huy: 1 }, 1: { mau: .6 }, 2: { mau: .7, vung: 1, ngam: [300, 320] }, 4: {} },
+    ds: [DS_MAC[0], { x: 160, y: 395, phe: 0, nt: 'N', cap: 2, ten: 'Thu Hà', mau: .4 }, DS_MAC[2], DS_MAC[3],
+    { x: 300, y: 320, phe: 1, nt: 'Fe', cap: 4, ten: 'Ngọc Trâm', mau: .5 }, { x: 290, y: 195, phe: 1, nt: 'Ne', cap: 1, ten: 'A.I Neon', ai: 1, mau: .6 }],
+    loat: [[[300, 320], [44, 260], 1, [.35, .66]], [[290, 195], [44, 260], 1, [.45, .78]], [[210, 260], [300, 320], 0, [.55]], [[160, 395], [300, 320], 0, [.5]]] })
   document.body.insertAdjacentHTML('beforeend', `<div class="vien-do"></div><div class="bao-tt kinh" style="top:${DOC ? 70 : 58}px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/></svg>Tinh thể phe em đang bị bắn! · còn 38%</div>`)
 }
-if (CANH === 'goiy') { veTran({ khongTin: 1 }); document.body.insertAdjacentHTML('beforeend', `<div class="goiy kinh"><svg width="44" height="30" viewBox="0 0 44 30"><path d="M4 22 Q22 2 40 18" fill="none" stroke="${v('--tr-hs')}" stroke-width="3" stroke-dasharray="4 5" stroke-linecap="round"/><circle cx="40" cy="18" r="6" fill="${v('--tr-hs')}"/></svg><span style="display:flex;flex-direction:column;line-height:1.35">Kéo để chạy · súng tự ngắm, tự bắn<small style="font-size:13px;font-weight:700;color:var(--tr-chu-2)">Giữ tinh thể phe em · bắn vỡ tinh thể phe bạn</small></span></div>`) }
+if (CANH === 'goiy') { veTran({ khongTin: 1 }); document.body.insertAdjacentHTML('beforeend', `<div class="goiy kinh"><svg width="44" height="30" viewBox="0 0 44 30"><path d="M4 22 Q22 2 40 18" fill="none" stroke="${v('--tr-hs')}" stroke-width="3" stroke-dasharray="4 5" stroke-linecap="round"/><circle cx="40" cy="18" r="6" fill="${v('--tr-hs')}"/></svg><span style="display:flex;flex-direction:column;line-height:1.35">Kéo để chạy · súng tự ngắm, tự bắn<small style="font-size:13px;font-weight:700;color:var(--tr-chu-2)">Phá tháp, phá tường, bắn vỡ tinh thể phe bạn</small></span></div>`) }
 if (CANH === 'vaothay') {
-  veTran({ khongTin: 1, ds: [DS_MAC[0], DS_MAC[1], { x: 62, y: 260, phe: 0, nt: 'Na', cap: 1, ten: 'Gia Huy', mau: 1, khien: 1 }, DS_MAC[3], DS_MAC[4], DS_MAC[5]],
-    them: (P) => { const [X, Y] = P(400, 470); return YEU ? '' : `<g transform="translate(${X} ${Y})" fill="${v('--tr-tin')}" opacity=".55">${[[0, 0, 16], [-20, -10, 6], [18, -14, 5], [-8, 20, 4], [22, 12, 7]].map(([a, b, r]) => `<circle cx="${a}" cy="${b}" r="${r}" fill-opacity=".35" stroke="${v('--tr-tin')}" stroke-width="1.5"/>`).join('')}</g>` } })
+  veTran({ khongTin: 1, ds: [DS_MAC[0], DS_MAC[1], { x: 140, y: 260, phe: 0, nt: 'Na', cap: 1, ten: 'Gia Huy', mau: 1, khien: 1 }, DS_MAC[3], DS_MAC[4], DS_MAC[5]],
+    them: (P) => { const [X, Y] = P(450, 330); return YEU ? '' : `<g transform="translate(${X} ${Y})" fill="${v('--tr-tin')}" opacity=".55">${[[0, 0, 16], [-20, -10, 6], [18, -14, 5], [-8, 20, 4], [22, 12, 7]].map(([a, b, r]) => `<circle cx="${a}" cy="${b}" r="${r}" fill-opacity=".35" stroke="${v('--tr-tin')}" stroke-width="1.5"/>`).join('')}</g>` } })
   document.body.insertAdjacentHTML('beforeend', `<div class="bang-vao kinh" style="top:${DOC ? 70 : 58}px"><b style="color:${v(TOI ? '--tr-tin' : '--tr-tin-chu')}">Gia Huy</b> vào thay A.I Sulfur · Phe Bazơ</div>`)
 }
 if (CANH === 'het') {
@@ -321,7 +364,7 @@ if (CANH === 'het') {
     <div class="phu-dong">Phe em thắng sớm (còn 1:12) · em nhận huy hiệu <b>Phá tinh thể</b></div>
     <div class="kq-tt"><span class="kinh" data-phe="0"><svg width="26" height="32" viewBox="-13 -16 26 32"><path d="M0 -15L12 -7V7L0 15L-12 7V-7Z" fill="${v('--tr-tin')}" stroke="${v('--tr-tin-day')}" stroke-width="1.5" /></svg><span>Tinh thể Bazơ<b>còn 64%</b></span></span><span class="kinh" data-phe="1"><svg width="26" height="32" viewBox="-13 -16 26 32"><path d="M0 -15L12 -7V7L0 15L-12 7V-7Z" fill="${v('--tr-sai')}" stroke="${v('--tr-sai-day')}" stroke-width="1.5" opacity=".45"/><path d="M-6 -9l5 6-3 4 5 5-2 6M6 -12l-3 7 4 3-3 6" fill="none" stroke="${v('--tr-chu')}" stroke-width="1.6" stroke-linecap="round"/></svg><span>Tinh thể Axit<b>đã vỡ</b></span></span></div>
     <div class="cot2"><div class="doi-the" data-phe="0"><div class="doi-dau"><span class="cap" style="background:${v('--tr-tin-day')};color:${v('--tr-trang')}">OH⁻</span>Phe Bazơ<span class="tong">12</span></div>
-      ${hang('Em', 'Cl', 0, 'bắn trúng tinh thể 18 lần', 'Phá tinh thể', 1)}${hang('Thu Hà', 'N', 0, 'hạ 5 lần', 'Xạ thủ')}${hang('Gia Huy', 'Na', 0, 'chặn 4 lần gần tinh thể', 'Hộ vệ')}</div>
+      ${hang('Em', 'Cl', 0, 'bắn trúng tinh thể 18 lần', 'Phá tinh thể', 1)}${hang('Thu Hà', 'N', 0, 'phá 2 tháp', 'Phá tháp')}${hang('Gia Huy', 'Na', 0, 'chặn 4 lần gần tinh thể', 'Hộ vệ')}</div>
     <div class="doi-the" data-phe="1"><div class="doi-dau"><span class="cap" style="background:${v('--tr-sai-day')};color:${v('--tr-trang')}">H⁺</span>Phe Axit<span class="tong">9</span></div>
       ${hang('Quốc Bảo', 'O', 1, 'trúng 26 viên', 'Bắn trúng nhiều')}${hang('Ngọc Trâm', 'Fe', 1, 'góp sức 4 lần hạ', 'Đồng đội cứu nguy')}${hang('A.I Neon', 'Ne', 1, 'lấp ghế', 'Lấp ghế')}</div></div>
     <div class="day-dong"><div class="day-ket"><span class="pu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></svg>Hay đấy!</span><span class="pu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 14q4 4 8 0M9 9.5h.01M15 9.5h.01"/></svg>Suýt nữa!</span><span class="pu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c4 0 7-2.7 7-6.6 0-4.4-4-6.4-4.6-10.4C11 6 9.6 8.6 9.6 11 8 10.6 7 9 7 9c-1.3 1.8-2 3.6-2 5.4C5 18.3 8 21 12 21z"/></svg>Đấu lại nhé</span><span class="pu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Chơi đẹp</span></div>
@@ -335,8 +378,8 @@ if (CANH === 'sanh') {
   const oGhe = (nt, p, ten, mo) => `<span class="o-ghe" style="opacity:${mo ? .55 : 1}"><svg width="40" height="40" viewBox="-21 -21 42 42">${defs()}<circle r="15" fill="${YEU ? v(p ? '--tr-sai' : '--tr-tin') : `url(#c${p})`}" stroke="${v(p ? '--tr-sai-day' : '--tr-tin-day')}"/>${ten === 'Em' ? `<circle r="18" fill="none" stroke="${v('--tr-tin')}" stroke-width="2.5"/>` : ''}<text y="5" text-anchor="middle" font-size="${nt.length > 1 ? 11 : 13}" font-weight="800" fill="${CHU_NT}">${nt}</text></svg>${ten}</span>`
   const xem = `<div class="xem kinh">${san(rong ? Math.min(620, W * .46) : W - 64, rong ? (H < 500 ? H - 120 : 330) : 170)}</div>`
   const dieuKhien = `<div class="ghe"><span class="doi">${oGhe('Cl', 0, 'Em')}${oGhe('S', 0, 'A.I', 1)}${oGhe('N', 0, 'A.I', 1)}</span><span class="vs">3 đấu 3</span><span class="doi">${oGhe('O', 1, 'A.I', 1)}${oGhe('Fe', 1, 'A.I', 1)}${oGhe('Ne', 1, 'A.I', 1)}</span></div>
-    <button class="nut-dau"><svg width="28" height="28" viewBox="-14 -14 28 28" fill="none" stroke="${v('--tr-hs-tren')}" stroke-width="2"><circle r="4" fill="${v('--tr-hs-tren')}"/><ellipse rx="12" ry="4.5"/><ellipse rx="12" ry="4.5" transform="rotate(60)"/><ellipse rx="12" ry="4.5" transform="rotate(120)"/></svg><span style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.15">Đấu<small>vào sân ngay · ván 90 giây</small></span></button>
-    <div class="luat"><b>Bắn vỡ tinh thể phe bạn trước là thắng</b> — nhớ giữ tinh thể phe em.<br>Thiếu bạn thì A.I vào thay · Súng tự ngắm, tự bắn — em chỉ việc <b>kéo để chạy</b>.</div>
+    <button class="nut-dau"><svg width="28" height="28" viewBox="-14 -14 28 28" fill="none" stroke="${v('--tr-hs-tren')}" stroke-width="2"><circle r="4" fill="${v('--tr-hs-tren')}"/><ellipse rx="12" ry="4.5"/><ellipse rx="12" ry="4.5" transform="rotate(60)"/><ellipse rx="12" ry="4.5" transform="rotate(120)"/></svg><span style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.15">Đấu<small>vào sân ngay · ván 2 phút</small></span></button>
+    <div class="luat"><b>Bắn vỡ tinh thể phe bạn trước là thắng</b>. Mỗi phe 3 tháp tự bắn ai lấn vào; tinh thể có tường kính, bắn vỡ tường mới tới được tinh thể.<br>Thiếu bạn thì A.I vào thay · Súng tự ngắm, tự bắn — em chỉ việc <b>kéo để chạy</b>.</div>
     <div><div class="the-dau" style="margin-bottom:6px"><small>Nguyên tử của em</small><small style="text-transform:none;letter-spacing:0">Ẩn tên ○</small></div>
     <div class="nt">${nts.map((n) => `<span class="o-nt" ${n === 'Cl' ? 'data-chon' : ''}><span style="text-align:left">${Z[n]}</span><b>${n}</b><span>${NT[n]}</span></span>`).join('')}</div>${rong ? '' : '<div class="nt-ten">Em đang là <b>Clo · Cl</b> — chạm ô khác để đổi</div>'}</div>`
   document.body.insertAdjacentHTML('beforeend', `<div class="trang" style="${rong ? 'max-width:1040px;margin:0 auto;justify-content:center' : ''}">
