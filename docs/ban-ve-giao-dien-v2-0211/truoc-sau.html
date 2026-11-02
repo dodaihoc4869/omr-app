@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trước và sau</title>
+<link rel="stylesheet" href="v2.css">
+<style>
+  /* GHÉP ẢNH «TRƯỚC | SAU» 390 × 844 — chup.mjs đặt hai ảnh vào tam/ (truoc.png: app hiện tại · sau.png: bản vẽ v2), cùng câu, cùng trạng thái. */
+  body { background: var(--tr-nen); }
+  .ghep { width: 860px; padding: 18px 20px 20px; display: grid; grid-template-columns: 390px 390px; gap: 0 40px; }
+  .ghep h1 { grid-column: 1 / -1; margin: 0 0 12px; font: 800 22px/1.25 var(--v2-f-tron); color: var(--tr-chu); }
+  .ghep h1 small { font: 400 14px var(--v2-f-de); color: var(--tr-chu-3); margin-left: 8px; }
+  figure { margin: 0; display: grid; gap: 10px; align-content: start; }
+  figcaption { display: flex; align-items: center; gap: 8px; font: 800 15px var(--v2-f-tron); color: var(--tr-chu-2); }
+  figcaption .v2-chip { font-size: 13px; }
+  img { width: 390px; height: 844px; display: block; border-radius: 22px; border: 2px solid var(--tr-vien); background: var(--tr-mat); }
+  ul { margin: 12px 0 0; padding-left: 18px; font: 400 13.5px/1.5 var(--v2-f-de); color: var(--tr-chu-2); }
+  li b { color: var(--tr-chu); font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="ghep">
+  <h1>Màn làm câu · trước | sau <small>cùng câu amine, cùng lúc đã chọn phương án C, 390 × 844</small></h1>
+  <figure><figcaption><span class="v2-chip">Hiện tại</span>app đang chạy (02/11)</figcaption><img src="tam/truoc.png" alt="Màn làm câu hiện tại">
+    <ul><li>Nhân vật minh hoạ cạnh bóng lời; dải trống thừa trên đề</li><li>Một phông ĐĐH Rounded cho mọi chữ; nửa đề tô đậm ngọc lam</li><li>Thẻ đang chọn màu ngọc lam, khác màu nút chính</li></ul></figure>
+  <figure><figcaption><span class="v2-chip" data-sac="hs">Mới · v2</span>bản vẽ hệ thiết kế</figcaption><img src="tam/sau.png" alt="Màn làm câu v2">
+    <ul><li><b>Mol</b> (mã thật) cạnh đề, đổi mặt theo kết quả</li><li>Thẻ chọn <b>cùng màu chàm</b> với nút chính; gờ 4 px, lún khi bấm</li><li><b>Nunito</b> tiêu đề, nút, số · <b>Be Vietnam Pro</b> đề · biểu tượng <b>Phosphor</b></li></ul></figure>
+</div>
+</body>
+</html>

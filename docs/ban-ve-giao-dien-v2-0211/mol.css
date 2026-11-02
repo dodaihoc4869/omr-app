@@ -1,0 +1,173 @@
+/* LINH VẬT «MOL» — mặt bình cầu (src/components/linh-vat/mol-dong.ts; thầy chốt 01/11) — nạp LƯỜI cùng mảnh mol-dong.
+   01/11 tối thầy: «Giữ nguyên hình cầu đi, điều chỉnh lại cảm xúc cho dễ thương, thêm 6,022, phối màu lại cho đẹp mịn siêu dễ thương» (bản vẽ docs/ban-ve-mol-v2-0111)
+   ⇒ BẢNG MÀU MỚI (thầy ra lệnh đổi màu Mol — ngoại lệ đóng ghi ở scripts/kiem-mau-giu-nguyen.mjs): thân CHÀM SÁNG của app học sinh (--tr-hs-nut,
+   gradient tròn sáng trên-trái --tr-hs pha trắng → tối nhẹ dưới-phải --tr-hs-day), dung dịch NGỌC LAM --tr-tin, mũi cam --tr-chu-y, má hồng phấn --tr-tim,
+   nút bấc vàng nâu (--tr-sao pha --tr-chu-y-day). Không mã thô: chỉ token có sẵn + trắng / mực CỐ ĐỊNH --btg-chu-doan-dam / --btg-chu-doan.
+   Giận: nhóm .mol-g4 / .mol-g5 đặt lại biến ⇒ cả bình đổi sắc đỏ sẫm (stop gradient kế thừa); .mol-g2 / .mol-g3 chỉ ửng má.
+   Nền tối: token --tr-* tự sáng lên ⇒ Mol sáng hơn, vẫn tách khỏi nền chàm đậm. */
+.mol-svg {
+  --mol-x: var(--tr-hs-nut);
+  --mol-x-sang: color-mix(in oklab, var(--tr-hs) 52%, var(--btg-chu-doan-dam));
+  --mol-x-toi: color-mix(in oklab, var(--tr-hs-nut) 60%, var(--tr-hs-day));
+  --mol-vanh: color-mix(in oklab, var(--tr-hs-day) 72%, var(--btg-chu-doan));
+  --mol-vien: color-mix(in oklab, var(--tr-hs-day) 56%, var(--btg-chu-doan));
+  --mol-t: var(--btg-chu-doan-dam);
+  --mol-trong: var(--btg-chu-doan-dam);
+  --mol-muc: color-mix(in oklab, var(--tr-hs-day) 24%, var(--btg-chu-doan));
+  --mol-cam: var(--tr-chu-y);
+  --mol-camS: color-mix(in srgb, var(--tr-chu-y) 40%, var(--btg-chu-doan-dam));
+  --mol-luoi: color-mix(in srgb, var(--tr-sai) 62%, var(--btg-chu-doan-dam));
+  --mol-ma: color-mix(in srgb, var(--tr-tim) 72%, var(--btg-chu-doan-dam));
+  --mol-nuoc: var(--tr-tin);
+  --mol-nuoc-sang: color-mix(in oklab, var(--tr-tin) 48%, var(--btg-chu-doan-dam));
+  --mol-nuoc-toi: var(--tr-tin-day);
+  --mol-nuoc-mat: color-mix(in oklab, var(--tr-tin) 55%, var(--btg-chu-doan-dam));
+  --mol-soi: color-mix(in oklab, var(--tr-sai) 58%, var(--tr-chu-y));
+  --mol-soi-sang: color-mix(in oklab, var(--tr-sao) 45%, var(--tr-chu-y));
+  --mol-soi-toi: var(--tr-sai);
+  --mol-do: var(--tr-sai);
+  --mol-do-sang: color-mix(in oklab, var(--tr-sai) 50%, var(--tr-chu-y));
+  --mol-do-toi: var(--tr-sai-day);
+  --mol-nut: color-mix(in oklab, var(--tr-sao) 52%, var(--tr-chu-y-day));
+  --mol-nut-sang: color-mix(in oklab, var(--tr-sao) 55%, var(--btg-chu-doan-dam));
+  --mol-nut-toi: color-mix(in oklab, var(--tr-chu-y-day) 70%, var(--btg-chu-doan));
+  --mol-lua1: color-mix(in oklab, var(--tr-sai) 55%, var(--tr-chu-y));
+  --mol-lua2: color-mix(in oklab, var(--tr-sao) 60%, var(--tr-chu-y));
+  --mol-bong: color-mix(in srgb, var(--tr-hs-day) 24%, transparent);
+  --mol-khac-bong: color-mix(in oklab, var(--tr-hs-day) 45%, var(--btg-chu-doan));
+  --mol-sao: var(--tr-sao);
+  --mol-tim: var(--tr-sai);
+  --mol-not: var(--tr-tim);
+  overflow: visible;
+}
+/* BA BỘ MÀU ĐỔI MỖI NGÀY (thầy 01/11 tối «chọn cả 3 bộ màu thay đổi mỗi ngày»; src/lib/mau-mol-ngay.ts chọn theo ngày VN): 0 = bộ mặc định ở trên
+   (chàm sáng + ngọc lam) · 1 ngọc lam --tr-tin + dung dịch hồng --tr-tim · 2 chàm nhạt --tr-hs + dung dịch cam --tr-chu-y. Má hồng, giận đỏ sẫm dùng chung. */
+.mol-svg[data-mol-mau='1'] {
+  --mol-x: var(--tr-tin);
+  --mol-x-sang: color-mix(in oklab, var(--tr-tin) 45%, var(--btg-chu-doan-dam));
+  --mol-x-toi: var(--tr-tin-day);
+  --mol-vanh: color-mix(in oklab, var(--tr-tin-day) 62%, var(--btg-chu-doan));
+  --mol-vien: color-mix(in oklab, var(--tr-tin-day) 45%, var(--btg-chu-doan));
+  --mol-nuoc: var(--tr-tim);
+  --mol-nuoc-sang: color-mix(in oklab, var(--tr-tim) 50%, var(--btg-chu-doan-dam));
+  --mol-nuoc-toi: var(--tr-tim-day);
+}
+.mol-svg[data-mol-mau='2'] {
+  --mol-x: var(--tr-hs);
+  --mol-x-sang: color-mix(in oklab, var(--tr-hs) 42%, var(--btg-chu-doan-dam));
+  --mol-x-toi: var(--tr-hs-nut);
+  --mol-nuoc: var(--tr-chu-y);
+  --mol-nuoc-sang: color-mix(in oklab, var(--tr-sao) 50%, var(--tr-chu-y));
+  --mol-nuoc-toi: var(--tr-chu-y-day);
+}
+/* Giận: dỗi / bực chỉ ửng má; cáu sẫm vừa (tím đỏ), rất cáu sẫm hẳn (đỏ rực) — tròng hồng đỏ, mí trên màu thân sẫm. */
+.mol-svg .mol-g2 { --mol-ma: color-mix(in srgb, var(--tr-sai) 48%, var(--btg-chu-doan-dam)); }
+.mol-svg .mol-g3 { --mol-ma: color-mix(in srgb, var(--tr-sai) 66%, var(--btg-chu-doan-dam)); }
+.mol-svg .mol-g4 {
+  --mol-x: color-mix(in oklab, var(--tr-sai) 58%, var(--tr-hs-day));
+  --mol-x-sang: color-mix(in oklab, var(--tr-sai) 55%, var(--tr-hs));
+  --mol-x-toi: color-mix(in oklab, color-mix(in oklab, var(--tr-sai) 50%, var(--tr-hs-day)) 66%, var(--btg-chu-doan));
+  --mol-vanh: color-mix(in oklab, color-mix(in oklab, var(--tr-sai) 45%, var(--tr-hs-day)) 55%, var(--btg-chu-doan));
+  --mol-vien: color-mix(in oklab, var(--tr-sai-day) 40%, var(--btg-chu-doan));
+  --mol-trong: color-mix(in oklab, var(--tr-sai) 22%, var(--btg-chu-doan-dam));
+  --mol-ma: var(--tr-sai);
+}
+.mol-svg .mol-g5 {
+  --mol-x: color-mix(in oklab, color-mix(in oklab, var(--tr-sai) 74%, var(--tr-hs-day)) 80%, var(--btg-chu-doan));
+  --mol-x-sang: color-mix(in oklab, var(--tr-sai) 80%, var(--tr-hs-day));
+  --mol-x-toi: color-mix(in oklab, color-mix(in oklab, var(--tr-sai) 64%, var(--tr-hs-day)) 50%, var(--btg-chu-doan));
+  --mol-vanh: color-mix(in oklab, color-mix(in oklab, var(--tr-sai) 60%, var(--tr-hs-day)) 45%, var(--btg-chu-doan));
+  --mol-vien: color-mix(in oklab, var(--tr-sai-day) 30%, var(--btg-chu-doan));
+  --mol-trong: color-mix(in oklab, var(--tr-sai) 40%, var(--btg-chu-doan-dam));
+  --mol-ma: var(--tr-sai-day);
+}
+.mol-svg .s-sang { stop-color: var(--mol-x-sang); }
+.mol-svg .s-x { stop-color: var(--mol-x); }
+.mol-svg .s-toi { stop-color: var(--mol-x-toi); }
+.mol-svg .s-nuoc-sang { stop-color: var(--mol-nuoc-sang); }
+.mol-svg .s-nuoc { stop-color: var(--mol-nuoc); }
+.mol-svg .s-nuoc-toi { stop-color: var(--mol-nuoc-toi); }
+.mol-svg .s-soi-sang { stop-color: var(--mol-soi-sang); }
+.mol-svg .s-soi { stop-color: var(--mol-soi); }
+.mol-svg .s-soi-toi { stop-color: var(--mol-soi-toi); }
+.mol-svg .s-do-sang { stop-color: var(--mol-do-sang); }
+.mol-svg .s-do { stop-color: var(--mol-do); }
+.mol-svg .s-do-toi { stop-color: var(--mol-do-toi); }
+.mol-svg .s-bong-sang { stop-color: var(--mol-t); stop-opacity: 0.75; }
+.mol-svg .s-bong-sang0 { stop-color: var(--mol-t); stop-opacity: 0; }
+.mol-svg .s-ma { stop-color: var(--mol-ma); stop-opacity: 0.9; }
+.mol-svg .s-ma0 { stop-color: var(--mol-ma); stop-opacity: 0; }
+.mol-svg .s-anh { stop-color: var(--tr-sai); stop-opacity: 0.55; }
+.mol-svg .s-anh0 { stop-color: var(--tr-sai); stop-opacity: 0; }
+.mol-svg .m-x { fill: var(--mol-x); }
+.mol-svg .m-vanh { fill: var(--mol-vanh); }
+.mol-svg .m-vien { fill: var(--mol-vien); }
+.mol-svg .m-t { fill: var(--mol-t); }
+.mol-svg .m-trong { fill: var(--mol-trong); }
+.mol-svg .m-muc { fill: var(--mol-muc); }
+.mol-svg .m-mieng { fill: var(--mol-muc); }
+.mol-svg .m-cam { fill: var(--mol-cam); }
+.mol-svg .m-camS { fill: var(--mol-camS); }
+.mol-svg .m-luoi { fill: var(--mol-luoi); }
+.mol-svg .m-nuoc { fill: var(--mol-nuoc-mat); }
+.mol-svg .m-bot { fill: var(--mol-t); opacity: 0.55; }
+.mol-svg .m-sang { fill: var(--mol-t); opacity: 0.6; }
+.mol-svg .m-bong { fill: var(--mol-bong); }
+.mol-svg .m-hoi { fill: var(--mol-t); stroke: var(--mol-vien); stroke-width: 1.6; }
+.mol-svg .m-nut { fill: var(--mol-nut); }
+.mol-svg .m-nut-sang { fill: var(--mol-nut-sang); opacity: 0.7; }
+.mol-svg .m-nut-toi { fill: var(--mol-nut-toi); }
+.mol-svg .m-lua1 { fill: var(--mol-lua1); }
+.mol-svg .m-lua2 { fill: var(--mol-lua2); }
+.mol-svg .m-tim { fill: var(--mol-tim); }
+.mol-svg .m-sao { fill: var(--mol-sao); }
+.mol-svg .m-not { fill: var(--mol-not); }
+.mol-svg .m-vien-n { stroke: var(--mol-vien); stroke-width: 2.4; }
+.mol-svg .m-net { fill: none; stroke: var(--mol-vien); stroke-linecap: round; stroke-linejoin: round; }
+.mol-svg .m-net-cam { fill: none; stroke: var(--mol-cam); stroke-linecap: round; }
+.mol-svg .m-net-do { fill: none; stroke: var(--mol-do); stroke-linecap: round; opacity: 0.75; }
+.mol-svg .m-net-ma { fill: none; stroke: var(--mol-ma); stroke-linecap: round; }
+.mol-svg .m-net-not { fill: none; stroke: var(--mol-not); stroke-linecap: round; }
+.mol-svg .m-mat-nuoc { fill: none; stroke: var(--mol-t); opacity: 0.5; stroke-linecap: round; }
+.mol-svg .m-anh-vien { fill: none; stroke: var(--mol-x-sang); opacity: 0.4; stroke-linecap: round; }
+.mol-svg .m-khac { fill: var(--mol-t); opacity: 0.88; font-family: inherit; font-weight: 800; letter-spacing: 0.4px; }
+.mol-svg .m-khac-bong { fill: var(--mol-khac-bong); opacity: 0.5; font-family: inherit; font-weight: 800; letter-spacing: 0.4px; }
+.mol-svg .mol-chu { font-family: inherit; font-weight: 800; }
+/* KHUNG TRÒN (vòng Mục tiêu góc phải; Bi khung="tron" + viewBox cắt sát CỤM MẶT VIEWBOX_MOL_TRON): khung vuông bo tròn, mắt mũi miệng đầy khung,
+   thân cầu chỉ là nền màu quanh mặt (không cổ / nút bấc / lửa); vòng tiến độ bên ngoài giữ nguyên; cảm xúc + bộ màu theo ngày như mọi chỗ. */
+.bi.lua[data-khung='tron'] { aspect-ratio: 1; border-radius: 50%; overflow: hidden; background: var(--tr-mat-2); }
+.bi.lua[data-khung='tron'] > .mol-svg { overflow: hidden; }
+/* Chữ 6,022·10²³ ở bụng chỉ hiện từ 64 px (Bi.tsx gắn data-nho khi nhỏ hơn; thử 48 px: chữ cao ~3,5 px, không đọc được). */
+.bi[data-nho] .mol-svg .mol-khac { display: none; }
+
+/* ── Chuyển động (CSS; giảm chuyển động / máy yếu / Mol tĩnh ⇒ tắt) ── */
+.mol-svg .mol-than { transform-box: view-box; transform-origin: 100px 196px; animation: mol-tho 3.6s ease-in-out infinite; }
+.mol-svg .mol-mat { transform-box: fill-box; transform-origin: center; animation: mol-chop 4.8s infinite; }
+.mol-svg .mol-bot { animation: mol-bot 2.8s ease-in infinite; }
+.mol-svg .mol-bot.b2 { animation-delay: 0.9s; }
+.mol-svg .mol-bot.b3 { animation-delay: 1.7s; }
+.mol-svg .mol-lua { transform-box: view-box; transform-origin: 100px 18px; animation: mol-lua 0.9s ease-in-out infinite alternate; }
+.mol-svg .mol-lua-to { animation-duration: 0.45s; }
+.mol-svg :is(.mol-g4, .mol-g5) .mol-nut { transform-box: fill-box; transform-origin: center; animation: mol-nut 0.9s ease-in-out infinite alternate; }
+.mol-svg .mol-g5 .mol-nut { animation-duration: 0.45s; }
+.mol-svg[data-mat='cau'] .mol-bot { animation-duration: 1.6s; }
+.mol-svg[data-mat='ratCau'] .mol-bot { animation-duration: 0.9s; }
+.mol-svg.mol-noi .mol-mieng { transform-box: fill-box; transform-origin: center top; animation: mol-noi 0.24s ease-in-out infinite alternate; }
+.mol-svg[data-dong='nhun'] .mol-than { animation: mol-nhun 0.7s cubic-bezier(0.3, 1.6, 0.5, 1) 3; }
+.mol-svg[data-dong='lac'] .mol-than { animation: mol-lac 1.4s ease-in-out 2; }
+.mol-svg[data-dong='chung'] .mol-than { animation: mol-chung 0.6s ease-out 1 forwards; }
+.mol-svg[data-dong='giat'] .mol-than { animation: mol-giat 0.5s ease-in-out infinite; }
+.mol-svg[data-dong='run'] .mol-than { animation: mol-run 0.16s linear infinite; }
+@keyframes mol-tho { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.012, 0.988); } }
+@keyframes mol-chop { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+@keyframes mol-bot { 0% { transform: translateY(0); opacity: 0.6; } 100% { transform: translateY(-30px); opacity: 0; } }
+@keyframes mol-lua { from { transform: scale(1, 0.9) skewX(-4deg); } to { transform: scale(0.96, 1.06) skewX(4deg); } }
+@keyframes mol-nut { from { transform: translateY(0) rotate(-3deg); } to { transform: translateY(-3px) rotate(3deg); } }
+@keyframes mol-noi { from { transform: scaleY(1); } to { transform: scaleY(0.55); } }
+@keyframes mol-nhun { 0%, 100% { transform: translateY(0) scale(1, 1); } 40% { transform: translateY(-14px) scale(0.97, 1.04); } 70% { transform: translateY(0) scale(1.04, 0.96); } }
+@keyframes mol-lac { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-6deg); } 75% { transform: rotate(6deg); } }
+@keyframes mol-chung { 0% { transform: translateY(0); } 100% { transform: translateY(4px) scale(1.01, 0.98); } }
+@keyframes mol-giat { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-2deg); } 75% { transform: rotate(2deg); } }
+@keyframes mol-run { 0% { transform: translate(0, 0); } 25% { transform: translate(-2px, 1px); } 50% { transform: translate(2px, -1px); } 75% { transform: translate(-1px, -1px); } 100% { transform: translate(1px, 1px); } }
+.mol-svg[data-tinh] *, html.may-yeu .mol-svg * { animation: none !important; }
+@media (prefers-reduced-motion: reduce) { .mol-svg * { animation: none !important; } }

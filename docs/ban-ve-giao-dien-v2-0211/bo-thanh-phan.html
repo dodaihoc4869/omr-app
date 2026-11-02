@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bộ thành phần v2</title>
+<link rel="stylesheet" href="mol.css">
+<link rel="stylesheet" href="v2.css">
+<style>
+  /* BẢNG HỆ THIẾT KẾ «Hoá Trong v2» — mọi mẫu dưới đây dùng ĐÚNG lớp của v2.css (không vẽ riêng). */
+  body { background: var(--tr-nen); }
+  .bang { width: 1200px; margin: 0 auto; padding: 18px 20px 22px; display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; }
+  .o { background: var(--tr-mat); border: 2px solid var(--tr-vien); border-radius: 20px; padding: 12px 14px 14px; min-width: 0; }
+  .o h2 { margin: 0 0 10px; font-family: var(--v2-f-tron); font-weight: 800; font-size: 17px; color: var(--tr-chu); display: flex; align-items: baseline; gap: 10px; }
+  .o h2 small { font-family: var(--v2-f-de); font-weight: 400; font-size: 13px; color: var(--tr-chu-3); }
+  .dau { grid-column: 1 / -1; display: flex; align-items: center; gap: 16px; padding: 4px 4px 2px; }
+  .dau h1 { margin: 0; font-family: var(--v2-f-tron); font-weight: 800; font-size: 30px; color: var(--tr-chu); }
+  .dau p { margin: 2px 0 0; font-size: 14px; color: var(--tr-chu-2); }
+  .dau .v2-mol { --mol-w: 64px; }
+  .c4 { grid-column: span 4; } .c5 { grid-column: span 5; } .c6 { grid-column: span 6; } .c7 { grid-column: span 7; } .c8 { grid-column: span 8; } .c12 { grid-column: 1 / -1; }
+  .mau-nhom { display: grid; grid-template-columns: 62px repeat(5, 1fr); gap: 5px 6px; align-items: center; }
+  .mau-nhom > b { font-family: var(--v2-f-tron); font-weight: 800; font-size: 13px; color: var(--tr-chu-2); }
+  .mau { border-radius: 10px; overflow: hidden; border: 1px solid var(--tr-vien); font-size: 11.5px; line-height: 1.25; }
+  .mau i { display: block; height: 20px; background: var(--c); position: relative; }
+  .mau i::after { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 28%; background: var(--d); }
+  .mau span { display: block; padding: 3px 5px 4px; background: var(--tr-mat); color: var(--tr-chu-2); font-family: ui-monospace, monospace; font-size: 10.5px; white-space: nowrap; overflow: hidden; letter-spacing: -0.02em; }
+  .mau span b { font-family: var(--v2-f-tron); font-size: 12px; color: var(--tr-chu); display: block; letter-spacing: 0; }
+  .ghi { margin: 10px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--tr-chu-3); }
+  .chu-mau { display: grid; gap: 7px; }
+  .chu-mau > div { display: grid; grid-template-columns: 96px 1fr; gap: 8px; align-items: baseline; }
+  .chu-mau small { font-family: var(--v2-f-de); font-size: 11.5px; color: var(--tr-chu-3); line-height: 1.3; }
+  .hang { display: flex; flex-wrap: wrap; gap: 14px 12px; align-items: flex-start; }
+  .nhan-duoi { display: grid; justify-items: center; gap: 4px; font-size: 12px; color: var(--tr-chu-3); font-family: var(--v2-f-tron); font-weight: 800; }
+  .pa-luoi { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 10px; }
+  .pa-luoi .v2-pa { font-size: 16px; min-height: 54px; padding: 8px 10px; gap: 9px; }
+  .pa-luoi figure { margin: 0; display: grid; gap: 2px; }
+  .pa-luoi figcaption { font-size: 12px; color: var(--tr-chu-3); font-family: var(--v2-f-tron); font-weight: 800; padding-left: 4px; }
+  .tien-ds { display: grid; gap: 12px; }
+  .tien-ds > div { display: grid; grid-template-columns: 1fr 64px; gap: 10px; align-items: center; font-family: var(--v2-f-tron); font-weight: 800; font-size: 13px; color: var(--tr-chu-3); }
+  .ic-luoi { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; }
+  .ic-luoi div { display: grid; justify-items: center; gap: 4px; padding: 8px 2px 6px; border-radius: 12px; background: var(--tr-mat-2); font-size: 10.5px; color: var(--tr-chu-3); text-align: center; line-height: 1.2; }
+  .ic-luoi .i { font-size: 28px; color: var(--c, var(--tr-hs-nut)); }
+  .mol-luoi { display: grid; grid-template-columns: repeat(11, 1fr); gap: 6px; }
+  .mol-luoi figure { margin: 0; display: grid; justify-items: center; gap: 2px; }
+  .mol-luoi .v2-mol { --mol-w: 62px; }
+  .mol-luoi figcaption { font-family: var(--v2-f-tron); font-weight: 800; font-size: 12.5px; color: var(--tr-chu); text-align: center; line-height: 1.2; }
+  .mol-luoi figcaption small { display: block; font-family: var(--v2-f-de); font-weight: 400; font-size: 11px; color: var(--tr-chu-3); }
+  .thuoc { display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; }
+  .thuoc div { display: grid; justify-items: center; gap: 4px; font-size: 11.5px; color: var(--tr-chu-3); font-family: ui-monospace, monospace; }
+  .thuoc i { display: block; background: var(--tr-hs-nhat); border: 2px solid var(--tr-hs); }
+  .so-sanh { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .so-sanh > div { border-radius: 14px; background: var(--tr-mat); border: 2px solid var(--tr-vien); padding: 8px 12px; }
+  .so-sanh p { margin: 0; }
+  /* mẫu NỀN TỐI: dựng lại bảng --tr-* tối trong một khung (cùng giá trị khối @media tối của v2.css) */
+  .toi { --tr-nen: #1a1a29; --tr-mat: #262738; --tr-mat-2: #2c2d40; --tr-mat-3: #414157; --tr-vien: #414157; --tr-vien-2: #52536a;
+    --tr-chu: #f1f0ff; --tr-chu-2: #cdceeb; --tr-chu-3: #acaece; --tr-trang: #1a1a29;
+    --tr-dung: #00d497; --tr-dung-nhat: #18382a; --tr-dung-chu: #00df9f; --tr-dung-nut: #00d497; --tr-dung-day: #00aa76;
+    --tr-sai: #f7498f; --tr-sai-nhat: #43272f; --tr-sai-chu: #ff9bba; --tr-sai-day: #cc146f;
+    --tr-tin: #00bfd4; --tr-tin-nhat: #0e373d; --tr-tin-chu: #00d5ed; --tr-sao: #ffc735; --tr-sao-day: #d8a100; --tr-chu-y: #ff9447; --tr-chu-y-nhat: #422a1a; --tr-chu-y-chu: #ffa569;
+    --tr-hs: #a8adff; --tr-hs-nut: #a8adff; --tr-hs-day: #7e80ff; --tr-hs-nhat: #2c2e47; --tr-hs-chu: #b1b6ff; --tr-hs-tren: #1a1a29;
+    --v2-nen: var(--tr-nen); --v2-mat: var(--tr-nen); --v2-chu: var(--tr-chu); --v2-chu-2: var(--tr-chu-2); --v2-chu-3: var(--tr-chu-3); --v2-vien: var(--tr-vien); --v2-vien-2: var(--tr-vien-2);
+    --v2-khoa: var(--tr-mat-3); --v2-khoa-chu: color-mix(in oklab, var(--tr-chu-3) 82%, var(--tr-mat-3));
+    background: var(--tr-nen); color: var(--tr-chu); border-color: var(--tr-vien); }
+  .toi h2 { color: var(--tr-chu); }
+  .toi .v2-nut[data-sac='dung'], .toi .v2-nut[data-sac='sai'] { --n-chu: var(--tr-hs-tren); }
+</style>
+</head>
+<body>
+<div class="bang" id="bang"></div>
+<script src="tai-san.js"></script>
+<script>
+const ic = (t) => `<svg class="i" viewBox="0 0 256 256" aria-hidden="true">${BIEU_TUONG[t]}</svg>`
+let soMol = 0
+const mol = (mat, dong) => `<div class="v2-mol"><svg class="lua-svg mol-svg" viewBox="${MOL_VIEWBOX}" data-mat="${mat}" data-mol-mau="0" data-tinh aria-hidden="true">${MOL_MAT[mat].replace(/molb\d+/g, `b${++soMol}m`)}</svg></div>`
+const cs = (s) => s.replace(/[^\s<>]*[₀-₉⁰-⁹⁺⁻][^\s<>]*/g, (t) => `<span class="cs">${t.replace(/[₀-₉]+/g, (d) => `<sub>${[...d].map((c) => c.charCodeAt(0) - 8320).join('')}</sub>`)
+  .replace(/[⁰¹²³⁴-⁹⁺⁻]+/g, (d) => `<sup>${[...d].map((c) => '0123456789+−'['⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻'.indexOf(c)]).join('')}</sup>`)}</span>`).replace(/ → /g, ' <span class="v2-mt"></span> ')
+// [nhóm, [token, sáng, tối]…] — giá trị y trong-hs-mau.css
+const MAU = [
+  ['Chính · chàm', [['--tr-hs', '#8f9bff', '#a8adff'], ['--tr-hs-nut', '#767eff', '#a8adff'], ['--tr-hs-day', '#5e64cd', '#7e80ff'], ['--tr-hs-nhat', '#eeeeff', '#2c2e47'], ['--tr-hs-chu', '#565bbd', '#b1b6ff']]],
+  ['Đúng · lục ngọc', [['--tr-dung', '#00d396', '#00d497'], ['--tr-dung-nut', '#00a87b', '#00d497'], ['--tr-dung-day', '#008d66', '#00aa76'], ['--tr-dung-nhat', '#c5ffe8', '#18382a'], ['--tr-dung-chu', '#007c58', '#00df9f']]],
+  ['Sai · hồng lựu', [['--tr-sai', '#f4417c', '#f7498f'], ['--tr-sai-day', '#e5266d', '#cc146f'], ['--tr-sai-nhat', '#fddfe9', '#43272f'], ['--tr-sai-chu', '#c70b5b', '#ff9bba'], ['--tr-tim', '#f373ce', '#e17beb']]],
+  ['Nhấn phụ', [['--tr-tin', '#00bed8', '#00bfd4'], ['--tr-tin-chu', '#007889', '#00d5ed'], ['--tr-sao', '#ffbf35', '#ffc735'], ['--tr-chu-y', '#ff8c51', '#ff9447'], ['--tr-chu-y-chu', '#b24f19', '#ffa569']]],
+  ['Nền · viền', [['--tr-mat', '#ffffff', '#262738'], ['--tr-nen', '#f6f6fc', '#1a1a29'], ['--tr-mat-2', '#f0f0fa', '#2c2d40'], ['--tr-mat-3', '#e1e1f1', '#414157'], ['--tr-vien', '#e2e2f0', '#414157']]],
+  ['Chữ', [['--tr-chu', '#1b1938', '#f1f0ff'], ['--tr-chu-2', '#454367', '#cdceeb'], ['--tr-chu-3', '#5a587d', '#acaece'], ['--tr-vien-2', '#cbcbe3', '#52536a'], ['--tr-trang', '#ffffff', '#1a1a29']]],
+]
+const oMau = ([t, s, d]) => `<div class="mau"><i style="--c:${s};--d:${d}"></i><span><b>${t.replace('--tr-', '')}</b>${s} · ${d.slice(1)}</span></div>`
+const pa = (chu, the, kq) => `<button class="v2-pa" type="button" role="radio" aria-checked="${kq === 'chon'}"${kq && kq !== 'chon' ? ` data-kq="${kq}"` : ''}${kq === 'mo' ? ' data-mo' : ''} style="animation:none"><span class="v2-pa-o">${kq === 'dung' ? ic('check-bold') : kq === 'sai' ? ic('x-bold') : the}</span><span>${cs(chu)}</span></button>`
+const MOL = [['chao', 'chào', 'mở chặng'], ['vui', 'vui', 'đang làm'], ['nghi', 'nghĩ', 'trả lời ngắn'], ['khen', 'khen', 'câu đúng'], ['buon', 'buồn', 'câu sai'], ['ngac', 'ngạc nhiên', 'chạm Mol'], ['ngu', 'ngủ', 'lâu không bấm'],
+  ['doi', 'dỗi', 'giận cấp 2'], ['buc', 'bực', 'giận cấp 3'], ['cau', 'cáu', 'giận cấp 4'], ['ratCau', 'rất cáu', 'giận cấp 5']]
+const ICON = [['x-bold', 'Đóng'], ['atom-duotone', 'Nguyên tử', 'tin'], ['fire-fill', 'Đúng liền', 'chu-y'], ['lightbulb-fill', 'Gợi ý', 'sao-day'], ['check-circle-fill', 'Đúng', 'dung-nut'], ['x-circle-fill', 'Sai', 'sai'],
+  ['check-bold', 'Dấu đúng', 'dung-nut'], ['book-open-duotone', 'Lời giải'], ['chat-circle-dots-duotone', 'Hỏi thầy'], ['backspace-fill', 'Xoá kí tự', 'sai'], ['flask-duotone', 'Bài học'], ['list-checks-duotone', 'Trắc nghiệm'],
+  ['calculator-duotone', 'Trả lời ngắn'], ['calendar-check-duotone', 'Lịch ôn'], ['sparkle-fill', 'Khen', 'sao'], ['lightning-fill', 'EXP', 'sao-day'], ['target-duotone', 'Mục tiêu', 'sai'], ['flag-duotone', 'Báo lỗi câu', 'chu-3'],
+  ['trophy-duotone', 'Xong chặng', 'sao-day'], ['star-fill', 'Hoàn hảo', 'sao'], ['lock-simple-fill', 'Chưa mở', 'chu-3'], ['speaker-high-fill', 'Đọc đề', 'tin'], ['arrow-right-bold', 'Tiếp'], ['x-bold', '']].filter((x) => x[1])
+
+document.getElementById('bang').innerHTML = `
+<header class="dau">${mol('chao')}<div><h1>Hoá Trong v2 · bộ thành phần</h1><p>Bản vẽ 02/11 · màn làm câu · màu = <b>--tr-*</b> app học sinh (giữ nguyên)<br>phông tự chứa (tập con) · biểu tượng Phosphor (MIT) · Mol = mã thật</p></div>
+<div class="so-sanh" style="margin-left:auto;width:500px;flex:none">
+    <div><p style="font:800 13px var(--v2-f-tron);color:var(--tr-dung-chu)">CHỌN · Nunito · 18,4 KB</p><p style="font:800 22px/1.3 'Nunito'">Giỏi quá! Xuất sắc!</p><p style="font:800 15px/1.3 'Nunito';letter-spacing:.035em">KIỂM TRA · 50,16%</p></div>
+    <div><p style="font:800 13px var(--v2-f-tron);color:var(--tr-chu-3)">PHƯƠNG ÁN · Baloo 2 · 20,2 KB</p><p style="font:800 22px/1.3 'Baloo 2'">Giỏi quá! Xuất sắc!</p><p style="font:800 15px/1.3 'Baloo 2';letter-spacing:.035em">KIỂM TRA · 50,16%</p></div>
+  </div>
+</header>
+
+<section class="o c7"><h2>Màu <small>ô = sáng, dải phải = tối · dưới: mã sáng · mã tối</small></h2>
+  <div class="mau-nhom">${MAU.map(([n, ds]) => `<b>${n}</b>${ds.map(oMau).join('')}`).join('')}</div>
+  <p class="ghi"><b>Đề xuất mới (chỉ pha từ token, không mã thô):</b> chữ nút khoá = chu-3 pha 18 % mat-3 · vệt sáng nút / thanh tiến độ = trắng 42 % · bóng tấm kết quả = chữ đậm 28 % mờ 24 px. Màu chỉ mang nghĩa: <b>chàm</b> = việc chính, <b>lục ngọc</b> = đúng, <b>hồng lựu</b> = sai, <b>ngọc lam</b> = nguyên tử, <b>cam</b> = chuỗi đúng liền.</p>
+</section>
+
+<section class="o c5"><h2>Chữ <small>2 phông · 4 cỡ chính</small></h2>
+  <div class="chu-mau">
+    <div><small>Nunito 800 · 24 · lệnh, tiêu đề</small><span style="font:800 24px/1.25 var(--v2-f-tron)">Chọn đáp án đúng</span></div>
+    <div><small>Nunito 800 · 19 · nút</small><span style="font:800 19px/1.25 var(--v2-f-tron);letter-spacing:.035em;color:var(--tr-hs-chu)">KIỂM TRA · TIẾP TỤC</span></div>
+    <div><small>Nunito 800 · 14 · nhãn, chip</small><span style="font:800 14px/1.3 var(--v2-f-tron);color:var(--tr-chu-2)">Trắc nghiệm · Bài 7 · Amine · +2 nguyên tử</span></div>
+    <div><small>Be Vietnam Pro 400 · 17 · đề</small><span style="font:400 17px/1.6 var(--v2-f-de)">Xà phòng hoá 8,8 gam <b class="v2-tu">ethyl acetate</b> bằng NaOH dư.</span></div>
+    <div><small>Be Vietnam Pro 600 · 17 · phương án</small><span style="font:600 17px/1.4 var(--v2-f-de)">${cs('C₂H₅OH · Fe₂(SO₄)₃ · Fe³⁺ · SO₄²⁻')}</span></div>
+    <div><small>Dấu chồng đủ, không đè</small><span style="font:800 20px/1.35 var(--v2-f-tron)">HỌC CÁCH GIẢI · XUẤT SẮC<br><span style="font:400 17px/1.5 var(--v2-f-de)">Thuỷ phân ester · ẵ ặ ẩ ễ ệ ổ ợ ữ ự</span></span></div>
+    <div><small>Phương trình · mũi tên vẽ CSS</small><span class="v2-pt" style="margin:0;font-size:15px">${cs('Fe + CuSO₄ → FeSO₄ + Cu')}</span></div>
+  </div>
+</section>
+
+<section class="o c6"><h2>Nút dày <small>gờ 4 px · bấm = lún hết gờ (90 ms)</small></h2>
+  <div class="hang">
+    <div class="nhan-duoi"><button class="v2-nut" type="button">Kiểm tra</button>chính</div>
+    <div class="nhan-duoi"><button class="v2-nut" type="button" data-lun>Kiểm tra</button>đang bấm (lún)</div>
+    <div class="nhan-duoi"><button class="v2-nut" type="button" disabled>Kiểm tra</button>khoá</div>
+    <div class="nhan-duoi"><button class="v2-nut-o" type="button" aria-label="Gợi ý"><span class="i-chong">${ic('lightbulb-fill')}${ic('lightbulb-bold')}</span></button>ô</div>
+    <div class="nhan-duoi"><button class="v2-nut" data-sac="dung" type="button">Tiếp tục</button>sau đúng</div>
+    <div class="nhan-duoi"><button class="v2-nut" data-sac="sai" type="button">Tiếp tục</button>sau sai</div>
+    <div class="nhan-duoi"><button class="v2-nut v2-nut-vua" data-sac="phu" type="button" style="padding:0 14px">${ic('chat-circle-dots-duotone')}Hỏi thầy</button>phụ</div>
+  </div>
+</section>
+
+<section class="o c6"><h2>Thẻ phương án <small>gờ 4 px · chọn = chàm · đúng nảy · sai rung</small></h2>
+  <div class="pa-luoi">
+    <figure>${pa('C₂H₅OH', 'A')}<figcaption>thường</figcaption></figure>
+    <figure>${pa('CH₃COOCH₃', 'B', 'chon')}<figcaption>đang chọn</figcaption></figure>
+    <figure>${pa('CH₃COOH', 'C', 'mo')}<figcaption>mờ (đã chấm)</figcaption></figure>
+    <figure>${pa('CH₃COOCH₃', 'B', 'dung')}<figcaption>đúng (nảy 300 ms)</figcaption></figure>
+    <figure>${pa('C₂H₅OH', 'C', 'sai')}<figcaption>sai (rung 300 ms)</figcaption></figure>
+    <figure>${pa('CH₃COOCH₃', 'B', 'la-dap-an')}<figcaption>đáp án đúng (khi em sai)</figcaption></figure>
+  </div>
+</section>
+
+<section class="o c4"><h2>Thanh tiến độ · chip</h2>
+  <div class="tien-ds">
+    ${[17, 50, 83].map((p) => `<div><div class="v2-tien"><div class="v2-tien-chay" style="--p:${p}"></div></div><span>${Math.round(p * 6 / 100)}/6 câu</span></div>`).join('')}
+  </div>
+  <div class="hang" style="margin-top:14px;gap:8px">
+    <span class="v2-dem">${ic('atom-duotone')}12</span>
+    <span class="v2-chip" data-sac="tin">${ic('atom-duotone')}+2 nguyên tử</span>
+    <span class="v2-chip" data-sac="lua">${ic('fire-fill')}3 câu đúng liền</span>
+    <span class="v2-chip">${ic('calendar-check-duotone')}Vào lịch ôn 1 · 3 · 7 ngày</span>
+    <span class="v2-chip">${ic('flask-duotone')}Bài 1 · Ester – Lipid</span>
+    <span class="v2-chip" data-sac="hs">Làm lại · câu 1/2</span>
+  </div>
+  <p class="ghi">Thanh chạy 300 ms (lò xo nhẹ), sáng lên khi đúng; tối thiểu 18 px để luôn thấy vệt.</p>
+</section>
+
+<section class="o c4"><h2>Ô số · bàn phím dày</h2>
+  <div class="v2-o-ds" style="justify-content:flex-start;gap:8px;transform:scale(.86);transform-origin:left top;margin-bottom:-6px"><span class="v2-o" data-co>8</span><span class="v2-o" data-co>,</span><span class="v2-o" data-co>2</span><span class="v2-o"></span></div>
+  <div class="v2-phim-ds" style="gap:8px">${['1', '2', '3'].map((k) => `<button class="v2-phim" type="button">${k}</button>`).join('')}<button class="v2-phim" data-loai="xoa" type="button" aria-label="Xoá">${ic('backspace-fill')}</button>
+    <button class="v2-phim" data-lun type="button">4</button><button class="v2-phim" type="button">5</button><button class="v2-phim" type="button">6</button><button class="v2-phim" data-loai="dau" type="button">,</button></div>
+  <p class="ghi">Phím cao 56 px, cách 10 px; phím «4» đang bấm. Dấu phẩy, trừ: nền phụ; xoá: hồng nhạt.</p>
+</section>
+
+<section class="o c4"><h2>Bo góc · gờ · khoảng cách</h2>
+  <div class="thuoc">${[[8, 'chip ô'], [12, 'khối'], [16, 'nút, thẻ'], [20, 'bóng lời'], [999, 'viên']].map(([r, n]) => `<div><i style="width:44px;height:44px;border-radius:${Math.min(r, 22)}px"></i>${r === 999 ? 'tròn' : r}<br>${n}</div>`).join('')}</div>
+  <div class="thuoc" style="margin-top:12px">${[4, 8, 12, 16, 24, 32].map((k) => `<div><i style="width:${k}px;height:28px;border-radius:3px;background:var(--tr-hs);border:0"></i>${k}</div>`).join('')}<div style="font-family:var(--v2-f-de)">thang<br>khoảng cách</div></div>
+  <p class="ghi">Không bóng mờ cho nút / thẻ: chiều sâu = gờ đặc 4 px cùng họ màu. Bóng mềm duy nhất: tấm kết quả. Chuyển động chỉ transform / opacity; giảm chuyển động ⇒ tắt sạch.</p>
+</section>
+
+<section class="o c8"><h2>Biểu tượng <small>một bộ Phosphor · Fill cho nút / trạng thái · Duotone cho nhãn · Bold cho dấu</small></h2>
+  <div class="ic-luoi">${ICON.map(([t, n, c]) => `<div style="${c ? `--c:var(--tr-${c})` : ''}">${ic(t)}${n}</div>`).join('')}</div>
+</section>
+
+<section class="o c4 toi"><h2>Nền tối <small>cùng thành phần, bảng --tr-* tối</small></h2>
+  <div style="display:grid;gap:10px">
+    ${pa('CH₃COOCH₃', 'B', 'chon')}
+    <div class="hang" style="gap:10px"><button class="v2-nut" type="button" style="flex:1">Kiểm tra</button><button class="v2-nut" type="button" disabled style="flex:1">Kiểm tra</button></div>
+    <div class="hang" style="gap:10px"><button class="v2-nut" data-sac="dung" type="button" style="flex:1">Tiếp tục</button><button class="v2-nut" data-sac="sai" type="button" style="flex:1">Tiếp tục</button></div>
+  </div>
+</section>
+
+<section class="o c12"><h2>Mol · các cảm xúc <small>mã thật (svgMol) · 62 px · đứng yên ở đây; trên màn có thở, chớp mắt, nhún khi khen, chùng khi buồn</small></h2>
+  <div class="mol-luoi">${MOL.map(([m, n, d]) => `<figure>${mol(m)}<figcaption>${n}<small>${d}</small></figcaption></figure>`).join('')}</div>
+</section>`
+</script>
+</body>
+</html>
