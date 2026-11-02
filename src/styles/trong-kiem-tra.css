@@ -475,3 +475,8 @@
 [data-trong='hs'] .duo-kt-bao-vien { background: var(--kinh-mat); }
 @media (orientation: landscape) and (max-height: 500px) { [data-trong='hs'] .duo-kt-thi > .duo-day .duo-kt-hang { background: var(--kinh-mat); } }
 /* ═══ HẾT HỆ KÍNH TỰ SINH ═══ */
+
+/* RÀ SOÁT 02/11 (thầy «nút quá dài không tinh tế»): màn thi / Kiểm tra ôn tập khổ rộng — «Câu tiếp» thôi kéo dài cả hàng (652 px ở Z Fold mở) */
+@media (orientation: landscape) and (min-width: 640px), (min-width: 700px) and (min-aspect-ratio: 10/13) {
+  html[data-trong='hs'] .duo-kt-hang > .duo-nut { flex: 0 1 340px; margin-left: auto; }
+}

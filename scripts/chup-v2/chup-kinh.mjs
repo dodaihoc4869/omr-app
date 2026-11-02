@@ -138,7 +138,15 @@ async function mot({ ten, ts, viec, dai, k, w, h, nen }) {
       for (const r of rg.getClientRects()) if (r.width > 2 && (r.left < rt.left + 6 || r.right > rt.right + 0.5 - 6)) { sat.push(`${n.textContent.trim().slice(0, 18)}|${(String(the.className.baseVal ?? the.className)).split(' ')[0]}`); break }
       if (sat.length > 12) break
     }
-    return { tran, nho, kem, sat, cao: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight) }
+    // NÚT DÀI (thầy 02/11 «nút quá dài không tinh tế»): nút hành động rộng > 440 px khi khung nhìn ≥ 800 px
+    const dai = innerWidth >= 800 ? [...document.querySelectorAll('.duo-nut, .ht-nut-chinh, .ht-nut-phu, .ht2-nut-lon, .tp-nut, .tp-nut-lon, .m3-nut-chinh, .m3-nut-tonal, .m3-nut-vien, .btn-google-primary, .kb-cta')]
+      .filter((e) => hien(e) && !e.closest('[aria-hidden=true],[inert]') && e.getBoundingClientRect().width > 440).map((e) => `${(e.textContent || '').trim().slice(0, 20)}=${Math.round(e.getBoundingClientRect().width)}`) : []
+    // NỀN TRẮNG (thầy 02/11 «còn nền trắng mờ»): khối nền gần trắng, đặc (≥ 0,9), rộng > 60 % khung nhìn — lạc giữa hệ kính (trừ khung màn con cố định)
+    const trang = [...document.querySelectorAll('body *')].filter((e) => { if (!hien(e) || e.closest('[aria-hidden=true],[inert]') || e.matches('.fixed.inset-0')) return false
+      const r = e.getBoundingClientRect(); if (r.width < innerWidth * 0.6 || r.height < 40 || r.top > innerHeight * 2) return false
+      const c = rgba(getComputedStyle(e).backgroundColor); return c[3] >= 0.9 && c[0] > 235 && c[1] > 235 && c[2] > 235 })
+      .map((e) => `${e.tagName}.${String(e.className).split(' ')[0]}`).slice(0, 4)
+    return { tran, nho, kem, sat, dai, trang, cao: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight) }
   })
   // chụp cả trang trên khổ dọc: thanh nổi (fixed) chuyển xuống ĐÁY trang để không nằm giữa ảnh; khổ rộng chụp đúng khung nhìn (ray trái cố định)
   const dai2 = dai && w < 700
@@ -148,9 +156,11 @@ async function mot({ ten, ts, viec, dai, k, w, h, nen }) {
   const chup = () => p.screenshot({ path: ra, type: 'jpeg', quality: q, fullPage: dai2 })
   await chup()
   while (statSync(ra).size > 150 * 1024 && q > 34) { q -= 8; await chup() }
-  tong.anh++; tong.loi += loi.length; tong.tran += kq.tran > 1 ? 1 : 0; tong.nho += kq.nho.length; tong.kem += kq.kem.length; tong.sat = (tong.sat ?? 0) + kq.sat.length
+  tong.anh++; tong.loi += loi.length; tong.tran += kq.tran > 1 ? 1 : 0; tong.nho += kq.nho.length; tong.kem += kq.kem.length; tong.sat = (tong.sat ?? 0) + kq.sat.length; tong.dai = (tong.dai ?? 0) + kq.dai.length; tong.trang = (tong.trang ?? 0) + kq.trang.length
   const ok = !loi.length && kq.tran <= 1 && !kq.nho.length && !kq.kem.length && !kq.sat.length
   console.log(`${ok ? '✓' : '✗'} ${ten}-${k}-${nen} · lỗi ${loi.length}${loi.length ? ' ' + loi[0] : ''} · tràn ${kq.tran} · nhỏ ${kq.nho.length}${kq.nho.length ? ' ' + JSON.stringify(kq.nho.slice(0, 3)) : ''} · kém ${kq.kem.length}${kq.kem.length ? ' ' + JSON.stringify(kq.kem.slice(0, 3)) : ''} · ${Math.round(statSync(ra).size / 1024)} KB`)
+  if (kq.dai.length) console.log(`    nút dài ${kq.dai.length}: ${JSON.stringify(kq.dai.slice(0, 4))}`)
+  if (kq.trang.length) console.log(`    nền trắng: ${JSON.stringify(kq.trang)}`)
   if (kq.sat.length) console.log(`    sát mép thẻ ${kq.sat.length}: ${JSON.stringify(kq.sat.slice(0, 4))}`)
   await p.close()
 }
