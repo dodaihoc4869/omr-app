@@ -24,7 +24,8 @@
     "test:d1": "vitest run --config vitest.config.d1.ts",
     "kiem:ma-chet": "npx -y knip@5.88.1 --no-progress --include files,dependencies",
     "kiem:lint": "node scripts/kiem-moc-lint.mjs",
-    "kiem:chat-luong": "tsc -p tsconfig.app.json --noEmit && tsc -p server/tsconfig.json --noEmit && npm run kiem:ma-chet && npm run kiem:lint"
+    "kiem:co-tep": "node scripts/kiem-co-tep.mjs",
+    "kiem:chat-luong": "tsc -p tsconfig.app.json --noEmit && tsc -p server/tsconfig.json --noEmit && npm run kiem:ma-chet && npm run kiem:lint && npm run kiem:co-tep"
   },
   "dependencies": {
     "@block65/webcrypto-web-push": "^2.0.0",
