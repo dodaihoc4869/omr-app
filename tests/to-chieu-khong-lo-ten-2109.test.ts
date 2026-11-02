@@ -127,12 +127,16 @@ describe('tờ máy chiếu · chế độ thường (không dạy học)', () =
     const html = taoHtmlMayChieu([HUY, LAN], {})
     expect(html).toContain(`<div class="mc-trang" aria-hidden="true" data-nhan="${NHAN_LAM_BAI_KHONG_TEN}" data-nhan-em="Phần làm bài của Huy"></div>`)
     expect(html).toContain(`<div class="mc-trang" aria-hidden="true" data-nhan="${NHAN_LAM_BAI_KHONG_TEN}" data-nhan-em="Phần làm bài của Lan"></div>`)
-    const doc = new JSDOM(html).window.document // KHÔNG chạy script
+    const dom = new JSDOM(html) // KHÔNG chạy script
+    const doc = dom.window.document
+    for (const x of CAC_CHUOI_LO) expect(chuNhinThay(dom), x).not.toContain(x) // chữ nhìn thấy không lộ tên / SBD
     const nhanTinh = [...doc.querySelectorAll('[data-nhan]')].map((e) => e.getAttribute('data-nhan'))
     expect(nhanTinh.length).toBeGreaterThan(0)
     expect(nhanTinh.every((x) => x === NHAN_LAM_BAI_KHONG_TEN)).toBe(true)
+    // thẻ tên của em mang id="em-…"; header .mc-em không id là tiêu đề trang «Đáp án các câu còn lại» (không tên em)
     const theTen = [...doc.querySelectorAll<HTMLElement>('header.mc-em[id^="em-"]')]
     expect(theTen.length).toBe(2)
+    expect([...doc.querySelectorAll<HTMLElement>('header.mc-em:not([id^="em-"])')].every((h) => !CAC_CHUOI_LO.some((x) => (h.textContent ?? '').includes(x)))).toBe(true)
     expect(theTen.every((e) => e.hidden)).toBe(true)
     // tên thật ở thuộc tính phụ CHỈ trên ô làm bài (.mc-trang / .mc-cot-lam-bai), không nơi nào khác
     expect([...doc.querySelectorAll('[data-nhan-em]')].every((e) => e.matches('.mc-trang, .mc-cot-lam-bai'))).toBe(true)

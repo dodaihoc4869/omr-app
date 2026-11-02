@@ -206,7 +206,7 @@ describe('Kênh 5 trên D1 thật: chọn câu cho bài hằng ngày', () => {
     expect(r.ok).toBe(true)
     const qid = (await docBaiMom(d, 'S2', r.id)).map((c) => c.qid)
     expect(qid.length).toBe(r.questionCount)
-    expect(qid.length).toBeGreaterThan(1)
+    expect(qid.length).toBeGreaterThanOrEqual(4) // kho phải đọc được: ngoài L11-b còn ≥ 3 câu ES.A.X lớp 11 (d/f/h/j)
     expect(qid.every((q) => q.startsWith('L11-'))).toBe(true)
     expect(qid.every((q) => ['L11-b', 'L11-d', 'L11-f', 'L11-h', 'L11-j'].includes(q))).toBe(true) // chỉ dạng ES.A.X em đã học
   })

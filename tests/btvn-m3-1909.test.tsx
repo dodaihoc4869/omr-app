@@ -85,7 +85,8 @@ describe('C3 · tab BTVN ở cổng học sinh (/hs)', () => {
     const { container } = render(<StudentPortalScreen />)
     await moTab()
     // SỬA CÓ CHỦ Ý — đợt 18 (thầy 13/10: "Bỏ hết các gợi ý hướng dẫn"): khối "Cách làm bài tập về nhà" (ba ô chặng) đã gỡ; nhãn chặng trên từng bài giữ.
-    await screen.findByRole('region', { name: 'Bài tập về nhà' })
+    // 02/11: cập nhật theo 331df118 (BtvnM3 vào mảnh nạp lười cong-hs-nap-luoi): ca ĐẦU TIÊN dựng cổng HS trong tệp gánh lượt nạp lạnh mảnh ấy (> 1 s mặc định của findBy)
+    await screen.findByRole('region', { name: 'Bài tập về nhà' }, { timeout: 8000 })
     const chu = container.ownerDocument.body.textContent!
     for (const t of ['Cách làm bài tập về nhà', 'CHẶNG ĐANG MỞ', 'CHẶNG SAU', 'Xong chặng đang mở, chặng sau mở đúng nhịp']) expect(chu).not.toContain(t)
     expect(chu).toContain('Chia chặng theo ngày/giờ')

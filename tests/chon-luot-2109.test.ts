@@ -159,13 +159,19 @@ describe('MỐC 2 — chống lặp', () => {
   it('CỜ VÒNG BÙ (25/09, `boQuaDung30`): câu VỪA ĐÚNG 5 ngày bị chặn ở lượt thường NHƯNG vòng bù LẤY được; chặn `sai3` VẪN GIỮ', () => {
     // Lý do có cờ: "Đoàn chỉ 1 câu rồi lặp" — em đã làm gần hết kho, câu cũ toàn "vừa đúng chưa tới 30 ngày" nên
     // vòng bù trả 0 ⇒ phiên Đoàn chỉ còn 1 câu mới. Vòng bù được nới `dung30` (KHÔNG nới `sai3`).
+    // 02/11: test sai từ lúc viết (5cea38d8, đỏ ngay tại commit ấy): kho cũ còn 17 câu Phần I CHƯA gặp ⇒ lượt 6 câu luôn lấy câu mới trước, q0 không bao giờ
+    // được chọn dù có cờ. Dựng đúng tình huống vòng bù mô tả ở 5cea38d8: em đã làm gần hết kho, câu cũ toàn «vừa đúng chưa tới 30 ngày»; q0 là câu lâu nhất.
     const q0 = POOL[5]!
-    const kho = POOL.filter((q) => q.mucDo === 'biet').slice(0, 30)
+    const kho = POOL.filter((q) => q.mucDo === 'biet' && q.phan === 'I').slice(0, 11)
     expect(kho.some((q) => q.qid === q0.qid)).toBe(true)
-    const lichSu = [att(q0, true, NOW - 5 * DAY)] // 5 < NGAY_NGHI_CAU_DUNG ⇒ `dung30` = true
-    expect(chooseLuotMoi(kho, [], lichSu, [], opt('khoi_dong')).some((x) => x.q.group === q0.group)).toBe(false) // mặc định: NGHỈ
+    const moi = kho[10]! // MỘT câu chưa gặp ⇒ lượt thường không rỗng (phép «không có q0» không đúng suông)
+    const khac = kho.filter((q) => q.qid !== q0.qid && q.qid !== moi.qid).map((q, i) => att(q, true, NOW - (1 + (i % 3)) * DAY)) // đúng 1–3 ngày trước
+    const lichSu = [att(q0, true, NOW - 5 * DAY), ...khac] // 5 < NGAY_NGHI_CAU_DUNG ⇒ `dung30` = true
+    const thuong = chooseLuotMoi(kho, [], lichSu, [], opt('khoi_dong'))
+    expect(thuong.map((x) => x.q.qid)).toContain(moi.qid)
+    expect(thuong.some((x) => x.q.group === q0.group)).toBe(false) // mặc định: NGHỈ
     expect(chooseLuotMoi(kho, [], lichSu, [], opt('khoi_dong', { boQuaDung30: true })).some((x) => x.q.group === q0.group)).toBe(true) // vòng bù: LẤY
-    const sai3 = [10, 9, 8].map((d) => att(q0, false, NOW - d * DAY))
+    const sai3 = [...[10, 9, 8].map((d) => att(q0, false, NOW - d * DAY)), ...khac]
     expect(chooseLuotMoi(kho, [], sai3, [], opt('khoi_dong', { boQuaDung30: true })).some((x) => x.q.group === q0.group)).toBe(false) // `sai3` không bị bỏ
   })
 })
