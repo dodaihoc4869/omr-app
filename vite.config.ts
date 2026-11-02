@@ -45,6 +45,51 @@ ghiSwVersion()
 // NẠP TRƯỚC MẢNH MÀN EM TỪ HTML (máy yếu 29/09) — xem src/lib/nap-truoc-man-em.ts. Lúc build, tra trong gói ra tên tệp THẬT
 // (có mã băm) của mảnh ExamTakeScreen / StudentPortalScreen / ParentPortalScreen + mọi mảnh con tĩnh + CSS của chúng, bỏ những tệp index.html đã
 // tự nạp, rồi chèn đoạn mã chọn-theo-đường-dẫn lên TRƯỚC các thẻ Vite chèn. Chỉ thêm gợi ý tải sớm — không đổi mảnh nào, không đổi precache.
+// KHO NẠP TRƯỚC APP HỌC SINH (02/11, thầy: «Hiệu ứng ko tải sẵn xuống máy hs à mà chậm»): mọi mảnh NẠP LƯỜI app học sinh dùng tới (hiệu ứng ăn mừng,
+// Mol, giám thị, «Trong», thưởng phạt, màn làm bài / sửa câu / kiểm tra…) nằm ở kho chạy-lúc (precache giữ 170) ⇒ sau MỖI lần phát hành tên tệp đổi, máy em
+// chỉ tải từng mảnh ĐÚNG LÚC mở màn ⇒ chậm. Plugin này đi đồ thị nạp (tĩnh + động) từ vỏ `AppHocSinh`, ghi danh sách `kho-hs.json` (KHÔNG vào precache:
+// globPatterns không có json); cổng học sinh lúc rảnh đọc danh sách và tải ngầm mảnh nào máy chưa có (src/lib/nap-truoc-kho-hs.ts) ⇒ cần là có ngay.
+// Bỏ thư viện lớn chỉ dùng khi bấm (xuất PDF / ảnh, bản đồ 3D) — tải khi cần như cũ.
+const KHO_HS_BO = /^assets\/(?:ban-do-3d-three|jspdf|html2canvas|purify|index\.es|fflate)/
+// Gốc chọn tay: mảnh nạp lười CHỈ app học sinh dùng (đồ thị từ vỏ học sinh lan sang cả màn thầy qua mảnh chung ⇒ không lấy trọn). Mỗi gốc kéo theo mảnh nó nạp TĨNH + CSS.
+const KHO_HS_GOC = /^assets\/(?:TrongHs|ManLamBaiTap|hieu-ung|hieu-ung-an-mung|mol-dong|lua-dong|lua-gian|bi-dong|Bi|GiamThi|giam-thi|ManThuong|KetBaiThuong|thuong-gon|thuong-chung|trong-lam-bai|ChuaGonDuo|duo-sua|TamGiuChan|giu-chan|KhungKiemTra|ThiDuo|BiNop|KetQuaSauNop|ManKiemTraCaNhan|TheKiemTraCaNhan|TheKiemTraCon|BangKiemTraCaNhan|kiem-tra-ca-nhan|LuyenDeChuan|LuyenDeCauTruc|ManTuLuyen|ManTuChua|ManChuaCauSai|ManTienBo|ManDiemSo|LichSuCaEm|CauDaLam|HopHoiThay|BongBongAiDdh|LamCauOn|TheBaiHangNgay|TheBaiDaDay|KhungLoiGiai|ThanhSoCauChua|HoSoCuaEmHs|HoSoHocThatEm|BaoCaoCaCuaEm|NhacSamsung|kenh-day|DauIon|PhongChoGame|TheDiemDanhHs|DiemDanhBuoi)-[\w-]{8}\.(?:js|css)$/
+function khoNapTruocHs(): Plugin {
+  return {
+    name: 'kho-nap-truoc-hs',
+    apply: 'build',
+    generateBundle(_o, goi) {
+      type Manh = { type: 'chunk'; fileName: string; imports: string[]; dynamicImports: string[]; facadeModuleId: string | null; isDynamicEntry: boolean; viteMetadata?: { importedCss: Set<string> } }
+      const manh = Object.values(goi).filter((x) => x.type === 'chunk') as unknown as Manh[]
+      const theoTen = new Map(manh.map((m) => [m.fileName, m]))
+      const vo = manh.find((m) => (m.facadeModuleId || '').split('\\').join('/').endsWith('/src/AppHocSinh.tsx'))
+      if (!vo) return
+      const thay = new Set<string>()
+      const di = (ten: string) => {
+        if (thay.has(ten)) return
+        thay.add(ten)
+        const m = theoTen.get(ten)
+        if (!m) return
+        for (const c of m.viteMetadata?.importedCss ?? []) thay.add(c)
+        for (const con of [...m.imports, ...m.dynamicImports]) di(con)
+      }
+      di(vo.fileName)
+      // trong đồ thị học sinh: lấy các gốc chọn tay + mảnh chúng nạp TĨNH + CSS
+      const lay = new Set<string>()
+      const keo = (ten: string) => {
+        if (lay.has(ten)) return
+        lay.add(ten)
+        const m = theoTen.get(ten)
+        if (!m) return
+        for (const c of m.viteMetadata?.importedCss ?? []) lay.add(c)
+        for (const con of m.imports) keo(con)
+      }
+      for (const t of thay) if (KHO_HS_GOC.test(t)) keo(t)
+      const ds = [...lay].filter((t) => !KHO_HS_BO.test(t)).sort()
+      this.emitFile({ type: 'asset', fileName: 'kho-hs.json', source: JSON.stringify({ ds }) })
+    },
+  }
+}
+
 function napTruocManEm(): Plugin {
   let goc = '/'
   let khungCss: string[] = []
@@ -245,6 +290,7 @@ export default defineConfig({
     giuGoiVuaDung(),
     bieuTuongVo(),
     boGhiChuHtml(),
+    khoNapTruocHs(),
     VitePWA({
       // SERVICE WORKER VIẾT TAY (`src/sw.ts`), KHÔNG dùng bản tự sinh nữa.
       //
