@@ -347,3 +347,22 @@
 @keyframes dn-so { 30%, 100% { opacity: 1; color: var(--tr-hs-chu, var(--lg-nhan)); } }
 @keyframes dn-sap { 0%, 85% { opacity: 1; } 100% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .dn-sap-thi, .dn-sap-thi b { animation: none; opacity: 1; } }
+
+/* ── v4 TINH THỂ (thầy 02/11 tối «Chốt hết build đi»): thanh máu hai tinh thể thay tỉ số số lần hạ; ô nhỏ = tháp còn đứng; kết ván theo tinh thể. ── */
+.dn-tt-so .dn-ts { gap: 5px; padding: 3px 7px 3px 4px; }
+.dn-tt-so .dn-ts[data-ben='kia'] { flex-direction: row-reverse; padding: 3px 4px 3px 7px; }
+.dn-tt-thanh { position: relative; width: 74px; height: 8px; border-radius: 4px; background: color-mix(in oklab, var(--dn-chu) 12%, transparent); overflow: hidden; }
+.dn-tt-thanh s { position: absolute; inset: 0; border-radius: 4px; background: var(--p); transform-origin: left center; } /* không transition: HUD không vẽ lại mỗi khung */
+.dn-ts[data-ben='kia'] .dn-tt-thanh s { transform-origin: right center; }
+.dn-tt-thanh s[data-it] { background: var(--dn-sai); }
+.dn-tt-so .dn-ts b { min-width: 38px; font-size: 15px; }
+.dn-thap-con { display: inline-flex; flex-direction: column; gap: 2px; }
+.dn-thap-con u { display: block; width: 6px; height: 6px; border-radius: 2px; border: 1.5px solid var(--p); }
+.dn-thap-con u[data-co] { background: var(--p); }
+.dn-ket-tt { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 2px 0 6px; }
+.dn-ket-tt > span { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 14px; font-size: 12px; font-weight: 700; color: var(--dn-chu-2); background: var(--p-nhat); border: 1.5px solid var(--p); }
+.dn-ket-tt svg { width: 20px; height: 24px; flex: none; fill: var(--p); }
+.dn-ket-tt > span[data-vo] svg { opacity: .45; }
+.dn-ket-tt > span > span { display: flex; flex-direction: column; line-height: 1.25; }
+.dn-ket-tt b { font-size: 15px; color: var(--dn-chu); }
+@media (max-width: 480px), (orientation: portrait) { .dn-tt-thanh { width: 44px; } .dn-thap-con { display: none; } .dn-tt-so .dn-ts b { min-width: 32px; font-size: 13px; } }

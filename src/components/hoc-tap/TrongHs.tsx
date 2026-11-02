@@ -24,6 +24,14 @@ import { docNhoTuSua, ngheTuSua } from '../../lib/tu-sua-loi'
 // Việc hôm nay NẠP ĐỘNG qua mảnh ManTuChua (đã là điểm nạp lười, có trong precache, Lộ trình nạp sẵn lúc rảnh): nhập tĩnh / nạp thẳng tu-sua-viec-hom-nay làm
 // Rolldown tách chua-truc-tiep thành tệp riêng (+1 tệp precache, trần 170).
 type ModViec = Pick<typeof import('./ManTuChua'), 'baoKhoaSua' | 'conSuaHomNay' | 'conSuaPhanNgay' | 'docSbdHs' | 'dungViecHomNay' | 'luuViecHomNay' | 'ngheXongSua' | 'napTruocCauSua' | 'napTruocSuaNgay' | 'napGoiSuaDem' | 'guiLaiSuaCho'>
+// TẢI LẠI KHÔNG CÓ HIỆU ỨNG CHÈN VÀO (thầy 02/11 khuya «Bấm f5 vẫn có những hiệu ứng gì đó chèn vào sửa triệt để đi»): mảnh này nạp ngay khi mở trang
+// (napTrongHs) ⇒ trong 2,5 giây đầu gắn <html data-vua-mo>: hoạt ảnh CSS vào màn nhảy thẳng tới cuối, không chuyển tiếp màu (trong-kinh.css), Mol hiện
+// trọn lời không gõ từng chữ (bi-dong.ts). Mở mảnh muộn (sau đăng nhập, > 6 giây) ⇒ không gắn.
+if (typeof document !== 'undefined' && typeof performance !== 'undefined' && performance.now() < 6000) {
+  const h = document.documentElement
+  h.setAttribute('data-vua-mo', '')
+  window.setTimeout(() => h.removeAttribute('data-vua-mo'), 2500)
+}
 const SO_CAU_MOI_NGAY = 12 // = SO_CAU_MOI_NGAY của tu-sua-viec-hom-nay (chỉ dùng khi mảnh chưa nạp)
 import type { KetQuaDanhSachChua } from '../../lib/chua-cau-sai-api'
 import '../../styles/trong-hs.css'
@@ -34,10 +42,11 @@ import '../../styles/trong-kinh.css' // HỆ KÍNH 02/11: Hôm nay + thanh nổi
 import { ThanhThuong } from '../thuong/ThanhThuong'
 import { IcNguyenTu, IcTinhThe } from '../thuong/hinh' // biểu tượng nguyên tử / tinh thể ĐÚNG như bộ đếm thưởng (không thêm biểu tượng thư viện)
 import { TheBanLoTrinh } from '../thuong/TheBanLoTrinh' // lối vào Học cùng bạn trên Lộ trình (27/10)
-import { useTongQuan } from '../thuong/dung-thuong'
-import { napSanThanhTich } from '../../lib/thuong-api'
+import { capNhatTongQuan, useTongQuan } from '../thuong/dung-thuong'
+import { moRuong, napSanThanhTich, type TongQuanThuong } from '../../lib/thuong-api'
 import { laSamsungInternet } from '../../lib/nhac-samsung'
 import { giuToanManHs } from '../../lib/toan-man-hs'
+import { ganNghieng } from '../../lib/binh-nghieng'
 import { anhSvg, baoLoTrinh, goKhungTinh, henChupKhungTinhHs, sbdPhien } from '../../lib/khung-tinh-hs'
 import type { TenManThuong } from '../thuong/ManThuong'
 const ManThuong = lazy(() => import('../thuong/ManThuong'))
@@ -161,7 +170,8 @@ function useConSuaHomNay(token: string | undefined, bat: boolean, nho: number[] 
   const tiepNap = r?.viec?.tiep?.m.qid
   useEffect(() => {
     if (!mod || !token || !tiepNap) return
-    const h = setTimeout(() => mod.napTruocCauSua?.(token, tiepNap), 2500)
+    // 02/11 khuya (thầy «chỗ đó bấm vào phải tức thì» — lần bấm đầu sau khi mở app còn chờ): 2,5 s → 0,6 s, em bấm ngay vẫn có câu đầu sẵn
+    const h = setTimeout(() => mod.napTruocCauSua?.(token, tiepNap), 600)
     return () => clearTimeout(h)
   }, [mod, token, tiepNap])
   // 31/10 (thầy «làm cả cho tự sửa lỗi»): Lộ trình yên ⇒ TẢI SẴN cả phần Sửa lỗi hôm nay chưa xong (một lượt) + gửi lại lần nộp chờ từ lúc mất mạng.
@@ -235,14 +245,33 @@ function changVuaXong(xong: number, tong: number): number | null {
 /** CON ĐƯỜNG CHẶNG (bản vẽ dm-1/2/3, thầy chốt 26/10): nút lục giác nổi khối, nối bằng đường chấm mềm (vẽ theo vị trí thật của nút).
  *  Hiệu ứng (HIEU-UNG.md F): F1 nút hiện tại phồng thở + bong bóng nhún (CSS) · F2 chặng vừa xong: vòng lan + sao bay · F3 chặng mới mở: khoá tinh thể vỡ
  *  · F4 tự cuộn mượt tới nút hiện tại khi nút nằm ngoài khung nhìn. */
-/** Rương tinh thể giữa đường (bản vẽ nâng cấp 27/10) — tranh trang trí; sáng màu khi xong hết chặng hôm nay, trước đó mờ. */
-function Ruong() {
-  return <svg className="da-ruong-hinh" viewBox="0 0 96 84" width="88" height="77" aria-hidden="true">
-    <ellipse className="rg-bong" cx="48" cy="80" rx="40" ry="4" />
-    <rect className="rg-day" x="8" y="34" width="80" height="44" rx="8" /><rect className="rg-than" x="8" y="34" width="80" height="38" rx="8" />
-    <path className="rg-nap" d="M12 34a14 14 0 0 1 14-16h44a14 14 0 0 1 14 16z" /><path className="rg-day" d="M12 34h72v8H12z" />
-    <rect className="rg-dai" x="20" y="18" width="10" height="56" rx="3" /><rect className="rg-dai" x="66" y="18" width="10" height="56" rx="3" />
-    <path className="rg-ngoc" d="M48 30l12 10-12 18-12-18z" /><path className="rg-ngoc-sang" d="M48 30l12 10H36z" /><path className="rg-ngoc-dam" d="M48 58l-12-18h12z" />
+/** RƯƠNG VÀNG (thầy 02/11 khuya: «sửa thành rương màu vàng như thế này nhé, vẽ lại cho đẹp hơn» — mẫu = rương ngày cũ của màn Nhiệm vụ).
+ *  Thân vàng cam đổ bóng, đai vàng giữa có ánh, viền đồng, nắp vòm có vệt sáng, ổ khoá ngọc; mở ⇒ nắp bật nghiêng (lớp .rg-nap — bộ ăn mừng xoay đúng lớp này),
+ *  lộ quầng vàng + 3 tinh thể lục giác. Màu chỉ biến --tr-*. */
+function Ruong({ mo }: { mo?: boolean }) {
+  const u = useId().replace(/[^a-zA-Z0-9]/g, '')
+  // khung cắt sát rương ĐÓNG (y 14–100) ⇒ rương nằm chính giữa thẻ (thầy 02/11 «Rương nằm chưa chính giữa»); nắp mở tràn lên trên (overflow: visible)
+  return <svg className="rv" viewBox="0 14 120 86" aria-hidden="true">
+    <defs>
+      <linearGradient id={`${u}t`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" className="rv-t0" /><stop offset="1" className="rv-t1" /></linearGradient>
+      <linearGradient id={`${u}n`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" className="rv-n0" /><stop offset="1" className="rv-n1" /></linearGradient>
+      <radialGradient id={`${u}q`} cy=".7"><stop offset="0" className="rv-q" stopOpacity=".9" /><stop offset="1" className="rv-q" stopOpacity="0" /></radialGradient>
+    </defs>
+    <ellipse className="rv-bong" cx="60" cy="94" rx="46" ry="5" />
+    {mo && <><ellipse cx="60" cy="40" rx="40" ry="26" fill={`url(#${u}q)`} />
+      <g className="rv-tt"><path d="M60 22l9 5v10l-9 5-9-5V27z" /><path d="M41 32l6 3.5v7L41 46l-6-3.5v-7z" opacity=".85" /><path d="M79 32l6 3.5v7L79 46l-6-3.5v-7z" opacity=".85" /></g>
+      <path className="rv-tt-sang" d="M60 22l9 5-9 5-9-5z" /></>}
+    <rect x="14" y="44" width="92" height="46" rx="9" fill={`url(#${u}t)`} />
+    <rect x="14" y="44" width="92" height="10" className="rv-mieng" />
+    <rect x="52" y="44" width="16" height="46" className="rv-dai" /><rect x="54" y="47" width="4" height="40" rx="2" className="rv-anh" />
+    <rect x="14" y="44" width="92" height="46" rx="9" className="rv-vien" />
+    {!mo && <g transform="translate(60 63)"><rect x="-9" y="-10" width="18" height="18" rx="4" className="rv-khoa" /><path d="M0-5l4 3.5L0 4l-4-6.5z" className="rv-ngoc" /></g>}
+    <g className="rg-nap">
+      <path d="M14 44V32a14 14 0 0 1 14-14h64a14 14 0 0 1 14 14v12z" fill={`url(#${u}n)`} />
+      <rect x="52" y="18" width="16" height="26" className="rv-dai" />
+      <path d="M14 44V32a14 14 0 0 1 14-14h64a14 14 0 0 1 14 14v12z" className="rv-vien" />
+      <path d="M26 27h20" className="rv-vet" />
+    </g>
   </svg>
 }
 /** Vòng tiến độ quanh nút HIỆN TẠI (thầy 27/10, ảnh Duolingo; «làm sát lại, tinh tế hơn»): bốn đoạn đầu tròn, khe nhỏ, ôm sát nút, nền xám
@@ -304,32 +333,58 @@ const phuDong = (n: Nut) => {
 }
 
 /** BÌNH TAM GIÁC «MỨC HÔM NAY» (hệ Kính, thầy chốt 02/11 — docs/ban-ve-ban-sac-hs-0211/v2): dung dịch dâng theo câu đã làm; vạch chia = ranh chặng,
- *  vạch đứt = mức; tới mức ⇒ hồng (phenolphtalein tới điểm tương đương). SVG TĨNH (không hoạt ảnh vô hạn) — máy yếu như nhau; màu chỉ biến --tr-*. */
+ *  vạch đứt = mức; tới mức ⇒ hồng (phenolphtalein tới điểm tương đương). Màu chỉ biến --tr-*.
+ *  SINH ĐỘNG (thầy 02/11 tối, docs/ban-ve-binh-0211): nghiêng máy ⇒ dung dịch nghiêng theo (src/lib/binh-nghieng.ts, nạp lúc rảnh, vòng vẽ tự dừng);
+ *  đổi hồng ⇒ HÀO QUANG hồng dịu nở một lần mỗi ngày (CSS, chạy hữu hạn) rồi giữ quầng dịu + 3 sao nhỏ. Không hoạt ảnh vô hạn. */
+const KHOA_BINH_HONG = 'ddh.binh-hong'
 export function BinhHomNay({ da, muc, ranh }: { da: number; muc: number; ranh: number[] }) {
   const u = useId().replace(/[^a-zA-Z0-9]/g, ''), du = muc > 0 && da >= muc
   const DAY = 214, MUC = 98, y = muc > 0 ? DAY - (Math.min(da, muc * 1.3) / muc) * (DAY - MUC) : DAY
   const xP = (v: number) => 118 + Math.max(0, v - 74) * (56 / 122), xT = (v: number) => 82 - Math.max(0, v - 74) * (56 / 122)
   const vo = 'M84 18V74L28 190Q20 208 36 214Q44 217 54 217H146Q156 217 164 214Q180 208 172 190L116 74V18Z'
   const f = (n: number) => n.toFixed(1)
-  return <svg className="kb-binh" data-du={du || undefined} viewBox="0 0 200 236" aria-hidden="true">
+  const dd = useRef<SVGGElement>(null), mucY = useRef(y), binh = useRef<SVGSVGElement>(null)
+  useEffect(() => { mucY.current = y }, [y])
+  // hào quang nở MỘT lần mỗi ngày (nhớ trong máy; gắn data-no thẳng lên SVG — không vẽ lại React); lần sau trong ngày chỉ hiện quầng dịu tĩnh
+  useEffect(() => {
+    if (!du) return
+    try { const h = new Date().toDateString(); if (localStorage.getItem(KHOA_BINH_HONG) !== h) { localStorage.setItem(KHOA_BINH_HONG, h); binh.current?.setAttribute('data-no', '') } } catch { /* không có bộ nhớ: không nở */ }
+  }, [du])
+  // nghiêng theo máy: mã cảm biến nằm trong mảnh Hôm nay (đã nạp lười, không thêm tệp precache — trần 170); bật lúc rảnh, sau lần vẽ đầu
+  useEffect(() => {
+    const g = dd.current
+    if (!g || typeof window === 'undefined' || !('DeviceOrientationEvent' in window)) return
+    let go: (() => void) | undefined
+    const ri = (window as Window & { requestIdleCallback?: (f: () => void) => number; cancelIdleCallback?: (h: number) => void })
+    const bat = () => { go = ganNghieng(g, () => [100, mucY.current], { tatDan: document.documentElement.classList.contains('may-yeu') || !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches }) }
+    const h = ri.requestIdleCallback ? ri.requestIdleCallback(bat) : window.setTimeout(bat, 1200)
+    return () => { if (ri.cancelIdleCallback) ri.cancelIdleCallback(h); else window.clearTimeout(h); go?.() }
+  }, [])
+  return <svg ref={binh} className="kb-binh" data-du={du || undefined} viewBox="0 0 200 236" aria-hidden="true">
     <defs>
       <clipPath id={`${u}c`}><path d={vo} /></clipPath>
       <linearGradient id={`${u}k`} x1="0" x2="1"><stop offset="0" className="kb-k0" /><stop offset=".45" className="kb-k1" /><stop offset="1" className="kb-k2" /></linearGradient>
       <linearGradient id={`${u}l`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" className="kb-l0" /><stop offset="1" className="kb-l1" /></linearGradient>
       <radialGradient id={`${u}b`} cx=".35" cy=".35" r=".7"><stop offset="0" className="kb-b0" /><stop offset="1" className="kb-b1" /></radialGradient>
+      <radialGradient id={`${u}q`} cy=".58"><stop offset="0" className="kb-q" stopOpacity=".4" /><stop offset=".55" className="kb-q" stopOpacity=".12" /><stop offset="1" className="kb-q" stopOpacity="0" /></radialGradient>
+      <radialGradient id={`${u}v`}><stop offset=".55" className="kb-q" stopOpacity="0" /><stop offset=".8" className="kb-q" stopOpacity=".18" /><stop offset="1" className="kb-q" stopOpacity="0" /></radialGradient>
     </defs>
+    {du && <g className="kb-hao"><ellipse cx="100" cy="150" rx="100" ry="90" fill={`url(#${u}q)`} /><circle className="kb-vanh" cx="100" cy="146" r="92" fill={`url(#${u}v)`} /></g>}
     <ellipse className="kb-bong" cx="100" cy="226" rx="74" ry="7" />
     <path d={vo} fill={`url(#${u}k)`} />
     <g clipPath={`url(#${u}c)`}>
-      <rect x="0" y={f(y)} width="200" height={f(240 - y)} fill={`url(#${u}l)`} />
-      <ellipse className="kb-khum" cx="100" cy={f(y)} rx={f((xP(y) - xT(y)) / 2)} ry="4.5" />
-      {[[70, 200, 6], [118, 190, 4], [138, 204, 5], [92, 178, 3], [108, 206, 2.5], [150, 186, 2.5]].map(([bx, by, r]) => by! > y + 9 ? <circle key={bx} cx={bx} cy={by} r={r} fill={`url(#${u}b)`} /> : null)}
+      <g ref={dd}>
+        <rect x="-120" y={f(y)} width="440" height="260" fill={`url(#${u}l)`} />
+        <ellipse className="kb-khum" cx="100" cy={f(y)} rx={f((xP(y) - xT(y)) / 2 + 30)} ry="4.5" />
+        {[[70, 200, 6], [118, 190, 4], [138, 204, 5], [92, 178, 3], [108, 206, 2.5], [150, 186, 2.5]].map(([bx, by, r]) => by! > y + 9 ? <circle key={bx} cx={bx} cy={by} r={r} fill={`url(#${u}b)`} /> : null)}
+      </g>
     </g>
     {muc > 0 && ranh.filter((n) => n > 0 && n < muc).map((n) => { const v = DAY - (n / muc) * (DAY - MUC); return <line key={n} className="kb-vach" x1={f(xP(v) - 18)} x2={f(xP(v) - 5)} y1={f(v)} y2={f(v)} /> })}
     <line className="kb-muc" x1={f(xT(MUC) + 5)} x2={f(xP(MUC) - 5)} y1={MUC} y2={MUC} />
     <path className="kb-vo" d={vo} />
     <rect className="kb-mieng" x="78" y="10" width="44" height="11" rx="5.5" />
     <path className="kb-loe" d="M91 28V76M76 104L46 168M42 182L39 189" />
+    {du && <g className="kb-sao">{[[166, 64, .8], [32, 100, .55], [176, 150, .45]].map(([x, yy, c]) => <path key={x} transform={`translate(${x} ${yy}) scale(${c})`} d="M0-8C1-2 2-1 8 0C2 1 1 2 0 8C-1 2-2 1-8 0C-2-1-1-2 0-8Z" />)}</g>}
   </svg>
 }
 
@@ -385,31 +440,64 @@ function TheNut({ id, sac, pop, mo, onDong }: { id: string; sac: string; pop: Po
     {n && <button type="button" className="da-pop-nut" disabled={n.tat || !n.onClick} onClick={() => { onDong(false); n.onClick?.() }}>{n.chu}</button>}
   </div>, document.body)
 }
-/** RƯƠNG HÔM NAY (giữ từ con đường cũ: sáng khi xong cả các chặng, chạm ⇒ mở rương — anMung) thành THẺ KÍNH riêng dưới danh sách như bản vẽ. */
-// Thầy 02/11 tối («Rương xong cho mở luôn tại màn này nhé»): rương ĐÃ SÁNG ⇒ chạm là mở NGAY trong thẻ (nắp bật + pháo sáng của bộ ăn mừng), không bảng
-// chữ, không mũi tên; nắp giữ mở cả ngày (nhớ trên máy theo ngày VN). Chưa sáng ⇒ chạm hiện bảng nhắc còn mấy chặng như cũ.
+/** RƯƠNG HÔM NAY — MỘT rương duy nhất (thầy 02/11 khuya: «để rương ở ngoài thôi, rương bên trong bỏ đi»): có hệ thưởng ⇒ đây là RƯƠNG NGÀY thật (xong cả
+ *  nhiệm vụ hôm nay ⇒ chạm mở, máy chủ cộng tinh thể — /hs/thuong/mo-ruong), chữ như thẻ cũ của màn Nhiệm vụ; không có hệ thưởng ⇒ rương trang trí theo chặng như cũ.
+ *  Rương ĐÃ MỞ: thẻ tĩnh, chạm không chạy hiệu ứng nữa (thầy «mở rồi thì không còn hiệu ứng khi bấm vào nữa»). Chưa sáng ⇒ chạm hiện bảng nhắc. */
 const khoaRuong = () => `ddh.ruong-mo.${new Date(Date.now() + 7 * 3_600_000).toISOString().slice(0, 10)}`
-function TheRuong({ ds }: { ds: Nut[] }) {
-  const chang = ds.filter((n) => n.k.startsWith('c')), soChang = chang.length, soXong = chang.filter((n) => n.tt === 'xong').length, duR = soChang > 0 && soXong === soChang
+export function TheRuong({ ds, token, tq, onNhiemVu }: { ds: Nut[]; token?: string; tq?: TongQuanThuong | null; onNhiemVu?: () => void }) {
+  const chang = ds.filter((n) => n.k.startsWith('c')), soChang = chang.length, soXongC = chang.filter((n) => n.tt === 'xong').length
   const [mo, setMo] = useState<HTMLElement | null>(null)
-  const [daMo, setDaMo] = useState(() => { try { return localStorage.getItem(khoaRuong()) === '1' } catch { return false } })
+  const [daMoNho, setDaMoNho] = useState(() => { try { return localStorage.getItem(khoaRuong()) === '1' } catch { return false } })
+  const [dangMo, setDangMo] = useState(false)
+  const [loi, setLoi] = useState('')
   const dong = useRef((traFocus: boolean) => setMo((m) => { if (traFocus) m?.focus(); return null })).current
-  if (soChang < 2) return null
-  const phu = duR ? (daMo ? `Đã mở rương · xong cả ${soChang} chặng` : 'Rương đã sáng · chạm để mở!') : `Rương sáng lên khi em xong cả ${soChang} chặng hôm nay · còn ${soChang - soXong} chặng`
-  const cham1 = (nut: HTMLButtonElement) => {
-    cham()
-    if (!duR) { setMo(mo ? null : nut); return }
-    if (kichRuong({ duMo: true, cham: true })) anMung('ruong', { goc: nut.querySelector('.kb-ruong') ?? nut, nap: nut.querySelector('.rg-nap'), rung: true })
-    if (!daMo) { setDaMo(true); try { localStorage.setItem(khoaRuong(), '1') } catch { /* máy chặn ⇒ chỉ nhớ trong phiên */ } }
+  const dangBung = useRef(false)
+  const nv = tq?.nhiemVu ?? [], r = tq?.ruong, thuong = !!(token && r && nv.length)
+  const soXongNv = nv.filter((x) => x.xong).length
+  const sang = thuong ? soXongNv === nv.length : soChang > 0 && soXongC === soChang
+  const daMo = thuong ? !!r!.mo || daMoNho : sang && daMoNho
+  if (!thuong && soChang < 2) return null
+  const tt = <>{'\u00a0'}·{'\u00a0'}+{r?.thuong}{'\u00a0'}<IcTinhThe /></>
+  const tieu = daMo ? (thuong ? <>Rương đã mở{tt}</> : 'Rương đã mở') : 'Rương hôm nay'
+  const phu = loi || (thuong
+    ? (daMo ? `Hẹn em mai với ${nv.length} nhiệm vụ mới.` : sang ? 'Rương đã sáng · chạm để mở!' : `Xong cả ${nv.length} nhiệm vụ để mở rương · còn ${nv.length - soXongNv}`)
+    : (daMo ? `Xong cả ${soChang} chặng hôm nay` : sang ? 'Rương đã sáng · chạm để mở!' : `Rương sáng lên khi em xong cả ${soChang} chặng hôm nay · còn ${soChang - soXongC} chặng`))
+  const ghiNho = () => { setDaMoNho(true); try { localStorage.setItem(khoaRuong(), '1') } catch { /* máy chặn ⇒ chỉ nhớ trong phiên */ } }
+  // Hiệu ứng chạy TRÊN NÚT ĐANG CÓ: chỉ chuyển sang thẻ tĩnh (đổi phần tử) khi hiệu ứng đã xong — đổi ngay thì nút bị gỡ, hiệu ứng đo vị trí phần tử đã gỡ
+  // ⇒ nổ ở góc màn (lỗi bắt được ở ảnh chụp 02/11). Đang nổ ⇒ chạm thêm không chạy lại.
+  const bung = (nut: HTMLElement, sau: () => void) => {
+    if (dangBung.current) return
+    dangBung.current = true
+    const co = kichRuong({ duMo: true, cham: true })
+    if (co) anMung('ruong', { goc: nut.querySelector('.kb-ruong') ?? nut, nap: nut.querySelector('.rg-nap'), rung: true })
+    window.setTimeout(sau, co ? 2400 : 0)
   }
-  return <><button type="button" className="kb-the-ruong da-ruong-nut" data-mo={duR || undefined} data-da-mo={(duR && daMo) || undefined}
-    aria-label={duR ? (daMo ? 'Rương hôm nay đã mở' : 'Mở rương hôm nay') : 'Rương hôm nay'} {...(duR ? {} : { 'aria-haspopup': 'dialog' as const, 'aria-expanded': !!mo, 'aria-controls': mo ? 'da-pop-ruong' : undefined })}
-    onClick={(e) => cham1(e.currentTarget)}>
-    <span className="kb-ruong" aria-hidden="true"><Ruong /></span>
-    <span className="kb-giua"><b>Rương hôm nay</b><span className="kb-phu">{phu}</span></span>
-    {duR ? (!daMo && <span className="kb-mo-ruong" aria-hidden="true">Mở</span>) : <ChevronRight size={20} aria-hidden="true" />}
+  const cham1 = async (nut: HTMLButtonElement) => {
+    if (dangBung.current) return
+    cham()
+    if (!sang) { setMo(mo ? null : nut); return }
+    if (!thuong) { bung(nut, ghiNho); return }
+    if (dangMo) return
+    setDangMo(true); setLoi('')
+    const kq = await moRuong(token!)
+    setDangMo(false)
+    if (!kq.ok) { setLoi(kq.chu || 'Chưa mở được rương, em thử lại nhé.'); return }
+    bung(nut, () => { ghiNho(); void capNhatTongQuan(token!) })
+  }
+  const ba = thuong && <span className="kb-ba-cham" role="img" aria-label={`Đã xong ${soXongNv}/${nv.length} nhiệm vụ`}>{nv.map((x) => <i key={x.ma} data-x={x.xong || undefined} />)}</span>
+  const ruot = <>
+    <span className="kb-ruong" aria-hidden="true"><Ruong mo={daMo} /></span>
+    <span className="kb-giua"><b>{tieu}</b><span className="kb-phu">{phu}</span>{ba}</span>
+  </>
+  // đã mở ⇒ thẻ tĩnh (không phải nút): chạm không làm gì
+  if (daMo) return <section className="kb-the-ruong" data-mo="" data-da-mo="" aria-label={thuong ? `Rương đã mở, cộng ${r!.thuong} tinh thể` : 'Rương hôm nay đã mở'}>{ruot}</section>
+  return <><button type="button" className="kb-the-ruong da-ruong-nut" data-mo={sang || undefined} disabled={dangMo}
+    aria-label={sang ? 'Mở rương hôm nay' : 'Rương hôm nay'} {...(sang ? {} : { 'aria-haspopup': 'dialog' as const, 'aria-expanded': !!mo, 'aria-controls': mo ? 'da-pop-ruong' : undefined })}
+    onClick={(e) => void cham1(e.currentTarget)}>
+    {ruot}
+    {sang ? <span className="kb-mo-ruong" aria-hidden="true">{dangMo ? '…' : 'Mở'}</span> : <ChevronRight size={20} aria-hidden="true" />}
   </button>
-  {mo && !duR && <TheNut id="da-pop-ruong" sac="sao" mo={mo} onDong={dong} pop={{ tieu: 'Rương hôm nay', phu }} />}</>
+  {mo && !sang && <TheNut id="da-pop-ruong" sac="sao" mo={mo} onDong={dong} pop={{ tieu: 'Rương hôm nay', phu, nut: thuong && onNhiemVu ? { chu: 'Xem nhiệm vụ', onClick: onNhiemVu } : undefined }} />}</>
 }
 
 /** màu THẺ BẬT RA giữ đúng như con đường cũ (thầy 05/10 «giữ nguyên mọi màu sắc»): chặng xanh · kiểm tra lam · sửa đỏ · bài tập vàng */
@@ -501,7 +589,8 @@ function LoiBi({ cam, loi, coBi = true, khoa, cap = 0, ben, chanNgon: laChanNgon
   }, [ben]) // eslint-disable-line react-hooks/exhaustive-deps
   const [n, setN] = useState(loi.length)
   useEffect(() => {
-    const yen = document.documentElement.classList.contains('may-yeu') || !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    // vừa mở / tải lại trang (data-vua-mo) ⇒ hiện trọn câu, không gõ (thầy 02/11 «Bấm f5 … hiệu ứng chèn vào»)
+    const yen = document.documentElement.classList.contains('may-yeu') || document.documentElement.hasAttribute('data-vua-mo') || !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
     if (yen) { setN(loi.length); return }
     setN(0)
     let t = 0, i = 0
@@ -1086,7 +1175,7 @@ export function MotTrangHs(p: PropsMotTrang) {
       {!so && p.dangTai && !p.ngayKiem ? null : nut.length > 0 && <section className="kb-viec" aria-label="Việc hôm nay"><h2>Việc hôm nay<span>{nut.filter((n) => n.tt === 'xong').length}/{nut.length} xong</span></h2>
         <DanhSachViec ds={nut} moDi={chinh === 'ca'} moKhoa={moKt ? 'kt' : moSua ? 'sua' : undefined} /></section>}
       {coThuong && <TheBanLoTrinh token={p.token} bat={tq?.bat.banBe} onMo={() => moTp('ban')} />}
-      {!(!so && p.dangTai) && <TheRuong ds={nut} />}
+      {!(!so && p.dangTai) && <TheRuong ds={nut} token={p.token} tq={tq} onNhiemVu={() => moTp('nhiem-vu')} />}
       {hocThem && <button type="button" className="mot-lien-ket" onClick={p.onHoc}>Học thêm câu mới<ChevronRight size={18} aria-hidden="true" /></button>}
     </div>
     </main>
@@ -1243,7 +1332,7 @@ export function MenuDocTrong(p: {
     <div className="tr-menu-ray kb-thanh">
       <div className="kb-thanh-ds">
         {MENU_DUO.map(({ id, ten, icon: Icon }) => <button key={id} type="button" className="tr-ray-muc kb-thanh-muc" onClick={chon(() => p.onMuc(id))} aria-current={p.muc === id ? 'page' : undefined} aria-label={ten}><Icon size={22} aria-hidden="true" /><span aria-hidden="true">{ten}</span></button>)}
-        <button ref={nut} type="button" className="tr-menu-cham kb-thanh-muc" data-dd={ddMo || undefined} aria-label={ddMo ? 'Thêm · Buổi học đang mở điểm danh' : 'Thêm'} aria-expanded={mo} aria-controls="tr-menu" onClick={() => setMo(true)}>
+        <button ref={nut} type="button" className="tr-menu-cham kb-thanh-muc" data-dd={ddMo || undefined} aria-label={ddMo ? 'Thêm · Buổi học đang mở điểm danh' : 'Thêm'} aria-expanded={mo} aria-controls="tr-menu" onClick={() => { if (mo) dong(false); else setMo(true) }}>
           <i /><s /><Luoi4 size={22} /><span aria-hidden="true">Thêm</span>{ddMo && <em aria-hidden="true"><QrCode size={14} />Điểm danh</em>}
         </button>
       </div>

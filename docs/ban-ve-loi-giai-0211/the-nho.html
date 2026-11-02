@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="vi" data-trong="hs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Thẻ nhớ hôm nay · mặt trước</title>
+<link rel="stylesheet" href="lg.css">
+</head><body>
+<div class="lam">
+<header class="lam-tren"><button class="nut-tron kinh" aria-label="Quay lại"><span data-i="trai"></span></button><b style="flex:1;font-size:18px">Thẻ nhớ hôm nay</b><span class="chip" data-sac="tim" data-nho style="color:var(--tr-tim-chu);background:var(--kinh-dam)">Thẻ 3/8</span></header>
+<div class="lg-than" data-hai>
+<div class="cot">
+  <section class="kinh the" aria-label="Hộp thẻ nhớ 5 ngăn">
+    <div class="dong-dau"><span class="nhan-k">Hộp thẻ nhớ của em · 36 thẻ</span></div>
+    <div class="hop">
+      <div data-nay><b>6</b><span>Ngăn 1<br>mỗi ngày</span></div>
+      <div><b>4</b><span>Ngăn 2<br>3 ngày</span></div>
+      <div><b>9</b><span>Ngăn 3<br>7 ngày</span></div>
+      <div><b>5</b><span>Ngăn 4<br>14 ngày</span></div>
+      <div><b>12</b><span>Ngăn 5<br>đã thuộc</span></div>
+    </div>
+    <p class="mo">Nhớ đúng: thẻ lên ngăn sau, lâu hơn mới gặp lại. Chưa nhớ: thẻ về ngăn 1.</p>
+  </section>
+  <section class="kinh the" aria-label="Thẻ này từ câu nào">
+    <div class="nguon"><span class="oi" data-sac="xam" data-co="nho"><span data-i="sach"></span></span><span class="giua"><b>Từ câu 2 · Cân bằng hoá học</b><span class="mo">Em sai ý a ngày 02/11</span></span><button class="nut" data-l="kinh" type="button">Xem lời giải</button></div>
+  </section>
+</div>
+<div class="cot">
+  <div class="the-lat"><div class="lat">
+    <div class="m t"><small>Câu hỏi</small><p class="hoi-t">Tăng nhiệt độ, cân bằng chuyển dịch theo chiều nào?</p><span class="cham-lat">Nhớ trong đầu trước, rồi chạm để lật</span></div>
+    <div class="m s"><small>Đáp</small><p class="tra-t">Theo chiều <b style="color:var(--tr-hs-chu)">thu nhiệt</b></p>
+      <div class="than-chu" style="text-align:left"><small>Thần chú của thầy</small><b>Tăng thu, giảm toả</b></div>
+      <p class="vi-sao">Vì sao: cân bằng chống lại sự thay đổi. Tăng nhiệt độ thì chạy chiều hấp thụ bớt nhiệt.</p></div>
+  </div><button class="lat-the" type="button" aria-label="Lật thẻ" aria-expanded="false"></button></div>
+  <div class="chan"><button class="nut" data-l="chinh" data-rong style="min-height:60px">Lật thẻ</button></div>
+</div>
+</div></div>
+<script src="../ban-ve-ban-sac-hs-0211/ve.js"></script><script src="../ban-ve-ban-sac-hs-0211/v2/kve.js"></script><script src="lg.js"></script>
+<script>/* thẻ tự nới cao theo mặt dài hơn */ for (const t of document.querySelectorAll('.the-lat')) { const ms = [...t.querySelectorAll('.m')]; const h = Math.max(...ms.map((m) => m.scrollHeight)); ms.forEach((m) => (m.style.minHeight = h + 'px')) }</script>
+</body></html>

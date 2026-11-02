@@ -3,7 +3,7 @@
 // Dòng tách nguyên tử lấy ĐÚNG nhãn máy chủ gửi (không tự tính lại). Thiếu `mucTieu` / `giai` ⇒ thẻ đó ẩn; công tắc giải tắt ⇒ ẩn thẻ giải.
 // Hiệu ứng: B1 ba thẻ bật lần lượt + số đếm · B2 bài hoàn hảo: tinh thể kết tinh + tia xoay · B3 Bi mừng + pháo giấy hai góc (bộ hiệu ứng ăn mừng 02/11) · B4 vòng mục tiêu tô dần, đầy thì nổ hạt.
 // NẠP LƯỜI (host: lazy(() => import('./thuong/KetBaiThuong'))). Bấm «Tiếp tục» giữa hiệu ứng ⇒ nhảy tới trạng thái cuối.
-import { useEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { Clock, Target } from 'lucide-react'
 import { Bi } from '../linh-vat/Bi'
 import { bungHat, demSo, hoatAnh, phanHoiThuong, xongHieuUng } from '../../lib/hieu-ung-thuong'
@@ -37,6 +37,15 @@ export default function KetBaiThuong({ ketBai: k, phu, hang, bat, onTiep, chuNut
   const ba = useRef<HTMLDivElement>(null), bi = useRef<HTMLDivElement>(null), kt = useRef<HTMLDivElement>(null), vong = useRef<HTMLDivElement>(null), chip = useRef<HTMLSpanElement>(null)
   const tieu = useRef<HTMLHeadingElement>(null), huyMung = useRef<() => void>(() => {})
   useEffect(() => () => huyMung.current(), [])
+  // TỨC THÌ sau PR 761 (02/11): nền trong suốt của khung làm câu khi hiện màn kết bài trước đây bằng `.ht-app:has(.tp-goc.tp-ket)` ⇒ gốc màn làm câu bị
+  // «Affected by :has()»: mỗi lần thêm / gỡ nút trong câu (hạt hiệu ứng, dải kết quả) Chrome soát lại cả cây con (vết CPU ×6: 60 lượt tính lại kiểu khi
+  // bấm Kiểm tra). Nay màn kết bài tự gắn `data-ket-bai` lên các khung .ht-app chứa nó TRƯỚC khi vẽ (layout effect) ⇒ nhìn y cũ, không còn :has().
+  const goc = useRef<HTMLDivElement>(null)
+  useLayoutEffect(() => {
+    const ds: Element[] = []
+    for (let e = goc.current?.parentElement?.closest('.ht-app'); e; e = e.parentElement?.closest('.ht-app')) { e.setAttribute('data-ket-bai', ''); ds.push(e) }
+    return () => ds.forEach((e) => e.removeAttribute('data-ket-bai'))
+  }, [])
   useHieuUng((h) => {
     // 🎆 XONG CHẶNG (bộ hiệu ứng ăn mừng, thầy chốt 02/11): pháo giấy hai góc + quầng + sóng xung quanh tiêu đề (máy yếu: bản gọn quanh tiêu đề). Rung / tiếng
     // «xong» vẫn ở phanHoiThuong dưới (không rung hai lần). Thay hoa giấy cũ của bài hoàn hảo — không chạy hai lớp giấy chồng nhau.
@@ -74,7 +83,7 @@ export default function KetBaiThuong({ ketBai: k, phu, hang, bat, onTiep, chuNut
     }
   }, [])
   const dong = k.dong.length ? k.dong : [{ nhan: 'Nguyên tử của chặng', so: k.tong }]
-  return <div className="tp-goc tp-ket" data-hh={hh || undefined}>
+  return <div ref={goc} className="tp-goc tp-ket" data-hh={hh || undefined}>
     <main className="tp-man" data-hai="">
       <div className="cot-a">
         {hh ? <div className="tp-ket-hinh"><Tia className="quay" /><div ref={kt} className="kt-o"><HuyHieuKimLoai hang="kimcuong" an /></div><div ref={bi} className="bi-o"><Bi cam="mung" size={80} /></div></div>

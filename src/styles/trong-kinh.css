@@ -33,6 +33,27 @@ html[data-trong='hs'] .kb-binh { display: block; width: 100%; height: auto; over
 .kb-binh .kb-vo { fill: none; stroke: color-mix(in oklab, var(--tr-chu) 62%, transparent); stroke-width: 3.2; stroke-linejoin: round; }
 .kb-binh .kb-mieng { fill: color-mix(in oklab, var(--tr-mat) 70%, transparent); stroke: color-mix(in oklab, var(--tr-chu) 62%, transparent); stroke-width: 3; }
 .kb-binh .kb-loe { fill: none; stroke: var(--tr-mat); stroke-width: 5.5; stroke-linecap: round; opacity: .9; }
+/* BÌNH SINH ĐỘNG (thầy 02/11 tối, docs/ban-ve-binh-0211): đổi màu mượt; HÀO QUANG hồng dịu nở MỘT lần (data-no, 2,2 s) rồi giữ quầng tĩnh; 3 sao nhỏ lấp lánh 3 lượt.
+   Không hoạt ảnh vô hạn. Máy yếu / giảm chuyển động: quầng chỉ hiện dần, sao đứng yên. Nền tối: thuỷ tinh trong hơn, ánh phản chiếu sáng (lớp chồng, màu cũ giữ nguyên). */
+.kb-binh .kb-l0, .kb-binh .kb-l1 { transition: stop-color .9s ease; } .kb-binh .kb-khum { transition: fill .9s ease; }
+.kb-binh .kb-q { stop-color: var(--tr-tim); }
+.kb-binh .kb-hao { opacity: .85; transform-box: view-box; transform-origin: 100px 146px; }
+.kb-binh .kb-sao path { fill: var(--tr-tim); opacity: .8; transform-box: fill-box; transform-origin: center; }
+.kb-binh[data-no] .kb-hao { animation: kb-hao-no 2.2s cubic-bezier(.2, .7, .3, 1) both; }
+.kb-binh[data-no] .kb-sao path { animation: kb-sao-lap 1.8s ease-in-out 3 both; }
+.kb-binh[data-no] .kb-sao path:nth-child(2) { animation-delay: .5s; } .kb-binh[data-no] .kb-sao path:nth-child(3) { animation-delay: 1s; }
+@keyframes kb-hao-no { from { opacity: 0; transform: scale(.78); } to { opacity: .85; transform: scale(1); } }
+@keyframes kb-sao-lap { 0%, 100% { opacity: .8; transform: scale(1); } 50% { opacity: .3; transform: scale(.7); } }
+@keyframes kb-hao-hien { from { opacity: 0; } to { opacity: .85; } }
+html.may-yeu .kb-binh[data-no] .kb-hao { animation: kb-hao-hien 1.2s ease both; } html.may-yeu .kb-binh[data-no] .kb-sao path { animation: none; }
+@media (prefers-reduced-motion: reduce) { .kb-binh[data-no] .kb-hao { animation: kb-hao-hien 1.2s ease both; } .kb-binh[data-no] .kb-sao path { animation: none; } .kb-binh .kb-l0, .kb-binh .kb-l1, .kb-binh .kb-khum { transition: none; } }
+@media (prefers-color-scheme: dark) {
+  :root[data-trong='hs'] .kb-binh .kb-k0 { stop-color: var(--tr-chu); stop-opacity: .2; } :root[data-trong='hs'] .kb-binh .kb-k1 { stop-color: var(--tr-chu); stop-opacity: .03; } :root[data-trong='hs'] .kb-binh .kb-k2 { stop-color: var(--tr-chu); stop-opacity: .12; }
+  :root[data-trong='hs'] .kb-binh .kb-loe { stroke: var(--tr-chu); opacity: .55; } :root[data-trong='hs'] .kb-binh .kb-b0 { stop-color: var(--tr-chu); } :root[data-trong='hs'] .kb-binh .kb-b1 { stop-color: var(--tr-chu); }
+  :root[data-trong='hs'] .kb-binh .kb-l0 { stop-color: color-mix(in oklab, var(--tr-hs) 50%, var(--tr-chu)); } :root[data-trong='hs'] .kb-binh[data-du] .kb-l0 { stop-color: color-mix(in oklab, var(--tr-tim) 72%, var(--tr-chu)); }
+  :root[data-trong='hs'] .kb-binh .kb-khum { fill: color-mix(in oklab, var(--tr-hs) 40%, var(--tr-chu)); } :root[data-trong='hs'] .kb-binh[data-du] .kb-khum { fill: color-mix(in oklab, var(--tr-tim) 45%, var(--tr-chu)); }
+  :root[data-trong='hs'] .kb-binh .kb-l1 { stop-color: var(--tr-hs); } :root[data-trong='hs'] .kb-binh[data-du] .kb-l1 { stop-color: var(--tr-tim); }
+}
 
 /* ── NÚT CHÍNH: viên thuốc lớn + ô bánh quy 12 múi ── */
 html[data-trong='hs'] .kb-cta { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 72px; padding: 10px 20px 10px 12px; border: 0; border-radius: 36px; cursor: pointer;
@@ -232,6 +253,26 @@ html[data-trong='hs'] .kb-the-ruong[data-mo]:not([data-da-mo]) .kb-ruong { anima
 html[data-trong='hs'] .kb-the-ruong[data-da-mo] .rg-nap { transform-box: fill-box; transform-origin: 0% 100%; transform: translate(-4px, -10px) rotate(-24deg); }
 html.may-yeu[data-trong='hs'] .kb-the-ruong .kb-mo-ruong, html.may-yeu[data-trong='hs'] .kb-the-ruong .kb-ruong { animation: none; }
 @media (prefers-reduced-motion: reduce) { html[data-trong='hs'] .kb-the-ruong .kb-mo-ruong, html[data-trong='hs'] .kb-the-ruong .kb-ruong { animation: none; } }
+/* RƯƠNG VÀNG (thầy 02/11 khuya «sửa thành rương màu vàng như thế này nhé, vẽ lại cho đẹp hơn»): một rương duy nhất ở Hôm nay, to như thẻ rương ngày cũ;
+   đã mở ⇒ thẻ tĩnh, tiêu đề hồng tinh thể + 3 vạch nhiệm vụ. Lớp .rv-* mới (màu rương cũ .rg-* giữ nguyên khai báo). */
+html[data-trong='hs'] .kb-the-ruong { --rv-sang: var(--tr-mat); }
+@media (prefers-color-scheme: dark) { html[data-trong='hs'] .kb-the-ruong { --rv-sang: var(--tr-chu); } }
+html[data-trong='hs'] .kb-the-ruong .kb-ruong:has(> .rv) { width: 78px; }
+html[data-trong='hs'] .kb-the-ruong .kb-ruong .rv { display: block; width: 78px; height: auto; overflow: visible; }
+html[data-trong='hs'] .kb-the-ruong[data-da-mo] .kb-giua > b { color: var(--tr-tim-chu); }
+html[data-trong='hs'] .kb-the-ruong .kb-giua > b svg { width: 1.05em; height: 1.05em; vertical-align: -.15em; }
+html[data-trong='hs'] .kb-ba-cham { display: flex; gap: 8px; margin-top: 6px; }
+html[data-trong='hs'] .kb-ba-cham i { width: 30px; height: 10px; border-radius: 999px; background: var(--tr-mat-3); }
+html[data-trong='hs'] .kb-ba-cham i[data-x] { background: var(--tr-dung); }
+.rv .rv-t0 { stop-color: color-mix(in oklab, var(--tr-sao) 70%, var(--tr-chu-y)); } .rv .rv-t1 { stop-color: var(--tr-chu-y); }
+.rv .rv-n0 { stop-color: var(--tr-sao); } .rv .rv-n1 { stop-color: color-mix(in oklab, var(--tr-sao) 45%, var(--tr-chu-y)); }
+.rv .rv-mieng { fill: var(--tr-chu-y-day); opacity: .55; }
+.rv .rv-vien { fill: none; stroke: var(--tr-chu-y-day); stroke-width: 3; stroke-linejoin: round; }
+.rv .rv-dai { fill: var(--tr-sao); } .rv .rv-anh { fill: var(--rv-sang); opacity: .45; }
+.rv .rv-vet { fill: none; stroke: var(--rv-sang); stroke-width: 3.2; stroke-linecap: round; opacity: .6; }
+.rv .rv-khoa { fill: var(--tr-sao-day); } .rv .rv-ngoc { fill: var(--tr-tim); }
+.rv .rv-tt path { fill: var(--tr-tim); } .rv .rv-tt-sang { fill: var(--rv-sang); opacity: .45; }
+.rv .rv-q { stop-color: var(--tr-sao); } .rv .rv-bong { fill: var(--tr-phu); opacity: .25; }
 /* nút A.I tròn: màu tím của bản vẽ */
 html[data-trong='hs'] .kb-thanh .kb-thanh-ai svg { width: 26px; height: 26px; }
 /* rộng: cột phải = việc + gõ cửa + rương */
@@ -455,7 +496,8 @@ html[data-trong='hs'] .tr-menu .tr-dd { background: var(--kinh-mat-dam); }
 html[data-trong='hs'] .aid-bt { background: var(--kinh-mat-dam); }
 html[data-trong='hs'] .ktcn-thanh, html[data-trong='hs'] .xd-tren { background: transparent; box-shadow: none; }
 html[data-trong='hs'] .ktcn-ket-dau, html[data-trong='hs'] .ktcn-bai-o, html[data-trong='hs'] .kq-the { background: var(--kinh-mat-dam); }
-html[data-trong='hs'] .ht-app.duo:has(> .tp-ket), html[data-trong='hs'] .ht-app:has(.tp-goc.tp-ket) { background: transparent; }
+/* khung chứa màn kết bài: `data-ket-bai` do KetBaiThuong gắn (thay `:has(.tp-goc.tp-ket)` — gốc màn làm câu không còn bị soát :has() mỗi lần đổi nút); [x][x] giữ độ ưu tiên cũ */
+html[data-trong='hs'] .ht-app[data-ket-bai][data-ket-bai] { background: transparent; }
 /* nút dài ở khổ rộng ⇒ viên thuốc tối đa 360 px, giữa (điện thoại giữ nút rộng cho dễ bấm) */
 @media (orientation: landscape) and (min-width: 640px), (min-width: 700px) and (min-aspect-ratio: 10/13) {
   html[data-trong='hs'] .tp-goc .tp-nut-lon { width: min(100%, 360px); margin-inline: auto; }
@@ -527,3 +569,8 @@ html[data-trong='hs'] .kb-thanh .kb-thanh-muc.tr-menu-cham[aria-expanded='true']
 @media (min-width: 1024px) and (min-height: 600px) {
   html:root[data-trong='hs'] .ht2[data-mot] .tr-menu.tr-menu { inset: 0 auto 0 112px; margin-block: auto; width: min(380px, calc(100vw - 140px)); height: max-content; max-height: calc(100dvh - 24px); padding: 14px 12px 12px; }
 }
+
+/* TẢI LẠI KHÔNG CÓ HIỆU ỨNG CHÈN VÀO (thầy 02/11 khuya «Bấm f5 vẫn có những hiệu ứng gì đó chèn vào sửa triệt để đi»): 2,5 giây đầu sau khi mở trang
+   (<html data-vua-mo>, gắn ở TrongHs.tsx) — hoạt ảnh vào màn (menu trượt, ô tích, rương thở…) nhảy thẳng tới trạng thái cuối nhờ trễ âm; hoạt ảnh lặp vẫn chạy
+   (chỉ lệch pha); không chuyển tiếp (màu dung dịch, nút). */
+html[data-vua-mo] *, html[data-vua-mo] *::before, html[data-vua-mo] *::after { animation-delay: -30s !important; transition-duration: 0s !important; transition-delay: 0s !important; }

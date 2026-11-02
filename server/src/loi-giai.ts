@@ -147,7 +147,7 @@ async function docGoi(env: Env, maDe: string): Promise<unknown | null> {
   return o ? await new Response(o.body).json() : null
 }
 /** Câu HIỆN TẠI trong kho theo qid (đọc gói R2 của đề ghi trong loi_giai_cau), kèm băm tính lại ngay. */
-async function cauHienTai(env: Env, qid: string, maDeGoiY?: string, boNho?: Map<string, unknown>): Promise<{ c: CauKho; bam: string } | null> {
+export async function cauHienTai(env: Env, qid: string, maDeGoiY?: string, boNho?: Map<string, unknown>): Promise<{ c: CauKho; bam: string } | null> {
   const maDe = maDeGoiY || str((await env.DB.prepare('SELECT ma_de FROM loi_giai_cau WHERE qid = ?').bind(qid).first<Obj>())?.ma_de)
     || (/^(.+)-(?:III|II|I)-\d+$/.exec(qid)?.[1] ?? '')
   if (!maDe) return null

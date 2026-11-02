@@ -29,6 +29,7 @@ export const CANH = [
   ['hom-nay', 'man=hs-mot&dd=khong', '', true],
   ['hom-nay-diem-danh', 'man=hs-mot&dd=mo', '', true],
   ['hom-nay-du', 'man=hs-mot&tt=du&dd=khong', '', true],
+  ['hom-nay-xong', 'man=hs-mot&tt=xong&dd=khong', 'cho:2600', true],
   ['hom-nay-ruong-mo', 'man=hs-mot&tt=du&dd=khong', 'bam:.kb-the-ruong » cho:1500', true],
   ['hom-nay-ca', 'man=hs-mot&tt=ca&dd=khong', '', true],
   ['hom-nay-kiem-tra', 'man=hs-mot&kt=khoa&dd=khong', '', true],
