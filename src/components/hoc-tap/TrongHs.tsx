@@ -170,7 +170,8 @@ function useConSuaHomNay(token: string | undefined, bat: boolean, nho: number[] 
   const tiepNap = r?.viec?.tiep?.m.qid
   useEffect(() => {
     if (!mod || !token || !tiepNap) return
-    const h = setTimeout(() => mod.napTruocCauSua?.(token, tiepNap), 2500)
+    // 02/11 khuya (thầy «chỗ đó bấm vào phải tức thì» — lần bấm đầu sau khi mở app còn chờ): 2,5 s → 0,6 s, em bấm ngay vẫn có câu đầu sẵn
+    const h = setTimeout(() => mod.napTruocCauSua?.(token, tiepNap), 600)
     return () => clearTimeout(h)
   }, [mod, token, tiepNap])
   // 31/10 (thầy «làm cả cho tự sửa lỗi»): Lộ trình yên ⇒ TẢI SẴN cả phần Sửa lỗi hôm nay chưa xong (một lượt) + gửi lại lần nộp chờ từ lúc mất mạng.
