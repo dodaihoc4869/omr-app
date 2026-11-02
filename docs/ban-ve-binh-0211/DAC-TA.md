@@ -12,3 +12,9 @@ Lời thầy: «Cái bình này màu hồng tôi muốn nó vector sinh động,
 7. **Nghiệm thu:** `npm run kiem:toc-do` 0 đỏ, `kiem:mau-giu` 0, `check:mau` 0; test nghiêng/đổi màu; tác tử `toc-do` đo trước/sau.
 
 Ảnh: `bang-binh.jpg` (hàng 1–2 tối, 3–4 sáng: thẳng · nghiêng trái 20° · nghiêng phải 20° · khoảnh khắc đổi màu · đã hồng · hồng nghiêng). Cận cảnh bình cỡ lớn: `can-canh.jpg`. Tệp vector gốc (mở phóng to bao nhiêu cũng nét): `binh-cham.svg`, `binh-hong.svg`. Video 10 giây: `video-sang.mp4`, `video-toi.mp4`.
+
+## Đã build (02/11 tối, thầy «Ok chốt build»)
+- `src/components/hoc-tap/TrongHs.tsx` (BinhHomNay) · `src/lib/binh-nghieng.ts` (góc màn từ beta/gamma, lò xo tự dừng, lọc rung + vùng chết 0,8°) · `src/styles/trong-kinh.css` (khối «BÌNH SINH ĐỘNG», chỉ thêm lớp chồng) · test `tests/binh-sinh-dong-0211.test.tsx`.
+- Mã cảm biến nằm trong mảnh Hôm nay (nạp lười) — tách tệp riêng làm precache 171 > trần 170 nên gộp lại.
+- Giới hạn: xoay ngang ⇒ dung dịch đứng yên (chỉ nghiêng khi cầm dọc). Máy tính không có cảm biến ⇒ đứng yên.
+- Ảnh app thật: `anh-that/hom-nay-xong-*` (bộ chụp `scripts/chup-v2`, cảnh `tt=xong`).
