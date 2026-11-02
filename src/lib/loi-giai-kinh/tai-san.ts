@@ -31,7 +31,9 @@ const dangTai = new Map<string, Promise<void>>()
 export function taiSanKinh(token: string, qids: readonly string[]): Promise<void> {
   if (!token) return Promise.resolve()
   const k = kho()
-  const can = [...new Set(qids.filter((q) => q && !k[q] && !dangTai.has(q)))].slice(0, 80)
+  const tat = [...new Set(qids.filter((q) => q && !k[q] && !dangTai.has(q)))]
+  if (tat.length > 80) return Promise.all(Array.from({ length: Math.ceil(tat.length / 80) }, (_, i) => taiSanKinh(token, tat.slice(i * 80, i * 80 + 80)))).then(() => undefined)
+  const can = tat
   if (!can.length) return Promise.all(qids.map((q) => dangTai.get(q)).filter(Boolean)).then(() => undefined)
   const p = goiHs('/hs/loi-giai-kinh', { token, qids: can }).then((r) => {
     const ban = r && r.ok === true && r.ban && typeof r.ban === 'object' ? (r.ban as Record<string, unknown>) : {}
@@ -52,7 +54,12 @@ let henGom: Promise<void> | null = null
 function xinGom(qid: string): Promise<void> {
   if (!hangCho) {
     hangCho = new Set()
-    henGom = new Promise((ok) => setTimeout(() => { const ds = [...(hangCho ?? [])]; hangCho = null; void taiSanKinh(docTokenHs(), ds).finally(ok) }, 40))
+    // Máy chủ nhận tối đa 80 câu một lệnh ⇒ chia lô 80 (trước 03/11 câu thứ 81 trở đi của màn danh sách dài không bao giờ được xin ⇒ «một số câu không hiện lời giải mới»).
+    henGom = new Promise((ok) => setTimeout(() => {
+      const ds = [...(hangCho ?? [])]; hangCho = null
+      const tk = docTokenHs()
+      void Promise.all(Array.from({ length: Math.ceil(ds.length / 80) }, (_, i) => taiSanKinh(tk, ds.slice(i * 80, i * 80 + 80)))).finally(ok)
+    }, 40))
   }
   hangCho.add(qid)
   return henGom!
