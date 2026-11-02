@@ -141,13 +141,15 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
       const t = gt.current?.trangThai()
       if (t === 'cho' || t === 'soi' || t === 'dong-ho') datTT('yen')
       const laO = !!oTra(e)
-      if (laO || e.type === 'keydown') requestAnimationFrame(() => {
+      // 02/11 MƯỢT (đo CPU ×6 máy yếu: giám thị đổi dáng NGAY trong khung vẽ phản hồi chạm ⇒ «vẽ sau chạm» dài thêm): phản ứng SAU khung đầu (rAF → setTimeout)
+      // — ô được chọn vẽ trước, giám thị liếc ngay khung sau.
+      if (laO || e.type === 'keydown') requestAnimationFrame(() => window.setTimeout(() => {
         if (coKet.current) return
         const c = goc.querySelector(`.duo-tra ${CHON}`)
         if (laO && c && gt.current) { const r = c.getBoundingClientRect(); gt.current.phanUng('chon', { diem: { x: r.left + r.width / 2, y: r.top + r.height / 2 } }) } // em chọn ⇒ liếc ô em chọn
         else nhinChon()
         if (goc.querySelector(`.duo-tra ${CHON}`)) datHen('soi', NGUONG.soi, () => { if (!coKet.current && !daNop.current && !document.hidden) datTT('soi') })
-      })
+      }, 0))
     }
     goc.addEventListener('pointerover', re)
     goc.addEventListener('pointerout', roi)

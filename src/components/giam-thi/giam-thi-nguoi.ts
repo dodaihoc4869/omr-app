@@ -69,7 +69,7 @@ type Mat = 'mo' | 'cong' | 'nham'
 const DS = new Set<Nguoi>()
 let tayX = 0, tayY = 0, tayLuc = -1e9, lanBam = typeof performance !== 'undefined' ? performance.now() : 0
 // NHƯỜNG KHUNG CHO LƯỢT CHẠM (27/10 MƯỢT, đo scripts/do-muot-hs.mjs): một khung giám thị chen giữa lượt chạm và lần vẽ phản hồi (nút lún, ô được chọn)
-// là phản hồi chậm thêm một khung ⇒ em vừa chạm / gõ phím: giám thị nghỉ 140 ms (đồng hồ lò xo vẫn tính, chạy tiếp mượt).
+// là phản hồi chậm thêm một khung ⇒ em vừa chạm / gõ phím: giám thị nghỉ 320 ms (02/11: phủ trọn lượt chuyển câu ~170–190 ms ở CPU ×4; trước 140 ms).
 let nhuongDen = 0
 let quan: IntersectionObserver | null = null
 let daNghe = false
@@ -77,8 +77,8 @@ function ngheChung(): void {
   if (daNghe || typeof window === 'undefined' || typeof window.addEventListener !== 'function') return
   daNghe = true
   const reTay = (e: PointerEvent) => { tayX = e.clientX; tayY = e.clientY; tayLuc = performance.now(); for (const g of DS) g.chay() }
-  window.addEventListener('pointerdown', (e) => { const t = performance.now(); nhuongDen = t + 140; lanBam = t; reTay(e) }, { capture: true, passive: true })
-  window.addEventListener('keydown', () => { const t = performance.now(); nhuongDen = t + 140; lanBam = t }, { capture: true, passive: true })
+  window.addEventListener('pointerdown', (e) => { const t = performance.now(); nhuongDen = t + 320; lanBam = t; reTay(e) }, { capture: true, passive: true })
+  window.addEventListener('keydown', () => { const t = performance.now(); nhuongDen = t + 320; lanBam = t }, { capture: true, passive: true })
   window.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') reTay(e) }, { passive: true })
   const boHop = () => { for (const g of DS) g.hop = null }
   window.addEventListener('scroll', boHop, { capture: true, passive: true })
