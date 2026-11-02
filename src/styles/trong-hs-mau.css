@@ -101,3 +101,5 @@ html[data-trong='hs'] body::before { content: ''; position: fixed; inset: 0; z-i
     radial-gradient(70% 36% at 80% 100%, color-mix(in oklab, var(--tr-tim) 30%, transparent), transparent 72%),
     radial-gradient(50% 30% at 0% 70%, color-mix(in oklab, var(--tr-sao) 18%, transparent), transparent 72%); }
 
+/* HỆ KÍNH: nút chính toàn app học sinh = chàm ĐẬM như bản vẽ (chữ trắng 5,0:1 thay 3,4:1 của chàm nhạt) — mọi màn dùng --tr-chinh-nut đổi theo một lượt */
+:root[data-trong='hs'] { --tr-chinh-nut: var(--tr-hs-day); }

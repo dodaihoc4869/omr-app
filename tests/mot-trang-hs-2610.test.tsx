@@ -382,14 +382,14 @@ describe('Menu dọc «Một trang» — MENU 6 MỤC (thầy 27/10): Điểm da
     })
     vi.stubGlobal('fetch', f)
     menu()
-    fireEvent.click(await screen.findByRole('button', { name: 'Mở menu · Buổi học đang mở điểm danh' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Thêm · Buổi học đang mở điểm danh' }))
     const khoi = screen.getByRole('form', { name: 'Điểm danh buổi học' })
     expect(within(khoi).getByText('Buổi 26/10')).toBeTruthy()
     fireEvent.change(within(khoi).getByLabelText('Mã 6 số trên máy chiếu'), { target: { value: '482 915' } })
     fireEvent.click(within(khoi).getByRole('button', { name: 'Điểm danh' }))
     expect(await screen.findByText('Đã điểm danh')).toBeTruthy()
     expect(screen.getByText('Buổi 26/10 · 12A1')).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Mở menu' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Thêm' })).toBeTruthy()
   })
 
   it('không có buổi ⇒ KHÔNG có khối Điểm danh; QR ?diem-danh= vẫn tự gửi một lần và mở menu', async () => {
@@ -408,7 +408,7 @@ describe('Menu dọc «Một trang» — MENU 6 MỤC (thầy 27/10): Điểm da
     expect(screen.queryByLabelText('Điểm danh buổi học')).toBeNull()
     expect(screen.queryByText(/Chưa có buổi học/)).toBeNull()
     expect(nav().hasAttribute('data-dd')).toBe(false)
-    expect(screen.getByRole('button', { name: 'Mở menu' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Thêm' })).toBeTruthy()
   })
 
   it('đúng 6 mục theo thứ tự, mỗi mục một ô biểu tượng; chuông ở đầu menu; Ca kiểm tra gọi onThi (ẩn khi ca đang mở); chạm mục ⇒ phanHoi(chon)', async () => {
@@ -417,9 +417,9 @@ describe('Menu dọc «Một trang» — MENU 6 MỤC (thầy 27/10): Điểm da
     const onThi = vi.fn(), onMuc = vi.fn()
     const { unmount } = menu({ moDiemDanh: false, onThi, onMuc })
     const muc = () => within(nav()).getAllByRole('button').filter((b) => b.classList.contains('tr-menu-muc'))
-    expect(muc().map((b) => b.textContent)).toEqual(['Lộ trình', 'Luyện tập', 'Thành tích', 'Ca kiểm tra', 'Hỏi A.I Đỗ Đại Học', 'Cài đặt'])
+    expect(muc().map((b) => b.textContent)).toEqual(['Hôm nay', 'Luyện tập', 'Thành tích', 'Ca kiểm tra', 'Hỏi A.I Đỗ Đại Học', 'Cài đặt']) // hệ Kính 02/11: «Lộ trình» đổi tên «Hôm nay» (thầy chốt)
     expect(muc().every((b) => b.querySelector('.tr-menu-o'))).toBe(true)
-    expect(within(nav()).getByRole('button', { name: 'Lộ trình' }).getAttribute('aria-current')).toBe('page')
+    expect(within(nav()).getByRole('button', { name: 'Hôm nay' }).getAttribute('aria-current')).toBe('page')
     expect(nav().querySelector('.tr-menu-ds hr')).toBeNull() // không vạch ngăn giữa 6 mục
     // chuông THẬT nằm ở hàng đầu menu, cạnh «Đỗ Đại Học»
     expect(nav().querySelector('.tr-menu-dau .tr-menu-tb .m3-tb-chuong')).not.toBeNull()
@@ -439,13 +439,13 @@ describe('Menu dọc «Một trang» — MENU 6 MỤC (thầy 27/10): Điểm da
     vi.stubGlobal('fetch', vi.fn(async () => traLoi({ ok: true, buoi: null })))
     const onTaiLai = vi.fn(), onCuaEm = vi.fn()
     menu({ moDiemDanh: false, onTaiLai, onCuaEm })
-    fireEvent.click(screen.getByRole('button', { name: 'Mở menu' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Thêm' }))
     expect(screen.queryByRole('switch', { name: /Âm thanh/ })).toBeNull() // tấm con chưa mở ⇒ công tắc ẩn
     const cai = within(nav()).getByRole('button', { name: 'Cài đặt' })
     expect(cai.getAttribute('aria-expanded')).toBe('false')
     fireEvent.click(cai)
     const tam = screen.getByRole('group', { name: 'Cài đặt' })
-    expect(within(nav()).queryByRole('button', { name: 'Lộ trình' })).toBeNull()
+    expect(within(nav()).queryByRole('button', { name: 'Hôm nay' })).toBeNull()
     await waitFor(() => expect(document.activeElement).toBe(within(tam).getByRole('button', { name: 'Quay lại menu' })))
     expect(within(tam).getByRole('button', { name: 'Cập nhật bài học' })).toBeTruthy()
     expect(within(tam).getByRole('button', { name: 'Của em' }).getAttribute('aria-haspopup')).toBe('dialog')
@@ -463,16 +463,16 @@ describe('Menu dọc «Một trang» — MENU 6 MỤC (thầy 27/10): Điểm da
     await waitFor(() => expect(document.activeElement).toBe(within(nav()).getByRole('button', { name: 'Cài đặt' })))
     fireEvent.click(within(nav()).getByRole('button', { name: 'Cài đặt' }))
     fireEvent.click(screen.getByRole('button', { name: 'Quay lại menu' }))
-    expect(within(nav()).getByRole('button', { name: 'Lộ trình' })).toBeTruthy()
+    expect(within(nav()).getByRole('button', { name: 'Hôm nay' })).toBeTruthy()
     fireEvent.keyDown(window, { key: 'Escape' })
     expect(nav().hasAttribute('data-mo')).toBe(false)
     // Cập nhật bài học / Của em giữ nguyên hành vi
-    fireEvent.click(screen.getByRole('button', { name: 'Mở menu' }))
-    expect(within(nav()).getByRole('button', { name: 'Lộ trình' })).toBeTruthy() // mở lại ⇒ luôn về 6 mục
+    fireEvent.click(screen.getByRole('button', { name: 'Thêm' }))
+    expect(within(nav()).getByRole('button', { name: 'Hôm nay' })).toBeTruthy() // mở lại ⇒ luôn về 6 mục
     fireEvent.click(within(nav()).getByRole('button', { name: 'Cài đặt' }))
     fireEvent.click(screen.getByRole('button', { name: 'Cập nhật bài học' }))
     expect(onTaiLai).toHaveBeenCalledOnce()
-    fireEvent.click(screen.getByRole('button', { name: 'Mở menu' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Thêm' }))
     fireEvent.click(within(nav()).getByRole('button', { name: 'Cài đặt' }))
     fireEvent.click(screen.getByRole('button', { name: 'Của em' }))
     expect(onCuaEm).toHaveBeenCalledOnce()
@@ -489,7 +489,7 @@ describe('Menu dọc «Một trang» — MENU 6 MỤC (thầy 27/10): Điểm da
     fireEvent.click(document.querySelector('.tr-menu-ray .tr-ray-ai')!)
     window.removeEventListener('ddh:mo-ai', nghe)
     expect(nghe).toHaveBeenCalledTimes(2)
-    expect([...document.querySelectorAll('.tr-menu-ray .tr-ray-muc')].map((b) => b.getAttribute('aria-label'))).toEqual(['Lộ trình', 'Luyện tập', 'Thành tích', 'A.I Đỗ Đại Học'])
+    expect([...document.querySelectorAll('.tr-menu-ray .tr-ray-muc')].map((b) => b.getAttribute('aria-label'))).toEqual(['Hôm nay', 'Luyện tập', 'Thành tích', 'Hỏi A.I Đỗ Đại Học']) // hệ Kính: thanh nổi 3 mục + nút A.I tròn
     expect(document.querySelector('.tr-menu-ray .tr-menu-cham')).not.toBeNull()
   })
 })

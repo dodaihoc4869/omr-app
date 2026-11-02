@@ -64,70 +64,74 @@ export const CANH = [
 const exe = existsSync('/opt/pw-browsers/chromium') ? '/opt/pw-browsers/chromium' : undefined
 const trinh = await chromium.launch({ executablePath: exe })
 const tong = { loi: 0, tran: 0, nho: 0, kem: 0, anh: 0 }
+const viecCan = []
 for (const [ten, ts, viec, dai] of CANH) {
-  if (LOC.length && !LOC.some((l) => ten.startsWith(l))) continue
+  if (LOC.length && !LOC.some((l) => ten === l || ten.startsWith(l + '-') || ten.startsWith(l))) continue
   for (const [k, w, h] of KHO) {
     if (chonKho.length && !chonKho.includes(k)) continue
-    for (const nen of ['sang', 'toi']) {
-      if (!chonNen.includes(nen)) continue
-      const p = await trinh.newPage({ viewport: { width: w, height: h }, deviceScaleFactor: w > 1000 ? 1 : 2, colorScheme: nen === 'toi' ? 'dark' : 'light' })
-      const loi = []
-      p.on('pageerror', (e) => loi.push(String(e).slice(0, 120)))
-      await p.route(/^https?:\/\/(?!127\.0\.0\.1)/, (r) => r.abort())
-      await p.goto(`${goc}?${ts}`)
-      await p.waitForTimeout(1600)
-      for (const buoc of viec.split(' » ').filter(Boolean)) {
-        const [lenh, ...x] = buoc.split(':'), v = x.join(':')
-        try {
-          if (lenh === 'tn') await p.getByRole('radio', { name: new RegExp(v) }).first().click({ timeout: 6000 })
-          else if (lenh === 'nut') await p.getByRole('button', { name: new RegExp(v) }).first().click({ timeout: 6000 })
-          else if (lenh === 'ds') for (const cap of v.split(',')) { const [y, gt] = cap.split('='); await p.getByRole('group', { name: `Chọn cho ý ${y}` }).getByRole('button', { name: gt, exact: true }).click({ timeout: 6000 }) }
-          else if (lenh === 'phim') for (const c of v) await p.keyboard.press(c)
-          else if (lenh === 'bam') await p.locator(v).first().click({ timeout: 6000 })
-          else if (lenh === 'cho') await p.waitForTimeout(Number(v))
-        } catch (e) { loi.push(`bước hỏng «${buoc}» ${String(e).slice(0, 50)}`) }
-        await p.waitForTimeout(250)
-      }
-      await p.waitForTimeout(500)
-      const kq = await p.evaluate(() => {
-        const hien = (e) => { const r = e.getBoundingClientRect(), s = getComputedStyle(e); return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none' && +s.opacity > 0.05 }
-        const tran = document.documentElement.scrollWidth - document.documentElement.clientWidth
-        const nho = [...document.querySelectorAll('button, a[href], [role=button], [role=switch], input:not([type=hidden])')]
-          .filter((e) => hien(e) && !e.closest('[aria-hidden=true],[inert]') && (e.getBoundingClientRect().height < 43.5 || e.getBoundingClientRect().width < 43.5))
-          .map((e) => (e.getAttribute('aria-label') || e.textContent || e.className).trim().slice(0, 28))
-        const cv = document.createElement('canvas'); cv.width = cv.height = 1; const cx = cv.getContext('2d', { willReadFrequently: true })
-        const rgba = (c) => { cx.clearRect(0, 0, 1, 1); cx.fillStyle = 'rgba(0,0,0,0)'; cx.fillStyle = c; cx.fillRect(0, 0, 1, 1); const d = cx.getImageData(0, 0, 1, 1).data; return [d[0], d[1], d[2], d[3] / 255] }
-        const tron = (a, b) => [0, 1, 2].map((i) => a[i] * a[3] + b[i] * (1 - a[3])).concat(1)
-        const nen = (e) => { const ds = []; for (let x = e; x; x = x.parentElement) { const c = rgba(getComputedStyle(x).backgroundColor); if (c[3] > 0) ds.push(c); if (c[3] >= 0.99) break }
-          let n = ds.length && ds[ds.length - 1][3] >= 0.99 ? ds.pop() : rgba(getComputedStyle(document.body).backgroundColor); for (let i = ds.length - 1; i >= 0; i--) n = tron(ds[i], n); return n }
-        const lin = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4 }, L = (c) => 0.2126 * lin(c[0]) + 0.7152 * lin(c[1]) + 0.0722 * lin(c[2])
-        const tp = (a, b) => { const x = L(a), y = L(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05) }
-        const mo = (e) => { let o = 1; for (let x = e; x; x = x.parentElement) o *= +getComputedStyle(x).opacity; return o }
-        const kem = []
-        for (const e of document.querySelectorAll('body *')) {
-          if (!hien(e) || e.closest('svg, [aria-hidden=true], [disabled], .sr-only, [inert]') || ![...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) continue
-          const r = e.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight * 3) continue
-          const cs = getComputedStyle(e), b = nen(e), c = rgba(cs.color); c[3] *= mo(e)
-          const px = parseFloat(cs.fontSize), dam = +cs.fontWeight >= 700, to = px >= 24 || (px >= 18.66 && dam) || (!!e.closest('button, [role=button], .chip, [class*=dem], [class*=cham]') && dam)
-          const t = tp(tron(c, b), b)
-          if (t < (to ? 3 : 4.5) - 0.01) kem.push(`${e.textContent.trim().slice(0, 22)}=${t.toFixed(2)}`)
-        }
-        return { tran, nho, kem, cao: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight) }
-      })
-      // chụp cả trang trên khổ dọc: thanh nổi (fixed) chuyển xuống ĐÁY trang để không nằm giữa ảnh; khổ rộng chụp đúng khung nhìn (ray trái cố định)
-      const dai2 = dai && w < 700
-      if (dai2) await p.addStyleTag({ content: 'body{position:relative} html[data-trong] .tr-menu-ray.kb-thanh{position:absolute!important;bottom:14px!important;top:auto!important}' })
-      const ra = join(RA, `${ten}-${k}-${nen}.jpg`)
-      let q = 72
-      const chup = () => p.screenshot({ path: ra, type: 'jpeg', quality: q, fullPage: dai2 })
-      await chup()
-      while (statSync(ra).size > 150 * 1024 && q > 34) { q -= 8; await chup() }
-      tong.anh++; tong.loi += loi.length; tong.tran += kq.tran > 1 ? 1 : 0; tong.nho += kq.nho.length; tong.kem += kq.kem.length
-      const ok = !loi.length && kq.tran <= 1 && !kq.nho.length && !kq.kem.length
-      console.log(`${ok ? '✓' : '✗'} ${ten}-${k}-${nen} · lỗi ${loi.length}${loi.length ? ' ' + loi[0] : ''} · tràn ${kq.tran} · nhỏ ${kq.nho.length}${kq.nho.length ? ' ' + JSON.stringify(kq.nho.slice(0, 3)) : ''} · kém ${kq.kem.length}${kq.kem.length ? ' ' + JSON.stringify(kq.kem.slice(0, 3)) : ''} · ${Math.round(statSync(ra).size / 1024)} KB`)
-      await p.close()
-    }
+    for (const nen of ['sang', 'toi']) if (chonNen.includes(nen)) viecCan.push({ ten, ts, viec, dai, k, w, h, nen })
   }
 }
+const SONG = Number(process.env.SONG ?? 6)
+let tro = 0
+async function mot({ ten, ts, viec, dai, k, w, h, nen }) {
+      const p = await trinh.newPage({ viewport: { width: w, height: h }, deviceScaleFactor: w > 1000 ? 1 : 2, colorScheme: nen === 'toi' ? 'dark' : 'light' })
+  const loi = []
+  p.on('pageerror', (e) => loi.push(String(e).slice(0, 120)))
+  await p.route(/^https?:\/\/(?!127\.0\.0\.1)/, (r) => r.abort())
+  await p.goto(`${goc}?${ts}`)
+  await p.waitForTimeout(1600)
+  for (const buoc of viec.split(' » ').filter(Boolean)) {
+    const [lenh, ...x] = buoc.split(':'), v = x.join(':')
+    try {
+      if (lenh === 'tn') await p.getByRole('radio', { name: new RegExp(v) }).first().click({ timeout: 6000 })
+      else if (lenh === 'nut') await p.getByRole('button', { name: new RegExp(v) }).first().click({ timeout: 6000 })
+      else if (lenh === 'ds') for (const cap of v.split(',')) { const [y, gt] = cap.split('='); await p.getByRole('group', { name: `Chọn cho ý ${y}` }).getByRole('button', { name: gt, exact: true }).click({ timeout: 6000 }) }
+      else if (lenh === 'phim') for (const c of v) await p.keyboard.press(c)
+      else if (lenh === 'bam') await p.locator(v).first().click({ timeout: 6000 })
+      else if (lenh === 'cho') await p.waitForTimeout(Number(v))
+    } catch (e) { loi.push(`bước hỏng «${buoc}» ${String(e).slice(0, 50)}`) }
+    await p.waitForTimeout(250)
+  }
+  await p.waitForTimeout(500)
+  const kq = await p.evaluate(() => {
+    const hien = (e) => { const r = e.getBoundingClientRect(), s = getComputedStyle(e); return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none' && +s.opacity > 0.05 }
+    const tran = document.documentElement.scrollWidth - document.documentElement.clientWidth
+    const nho = [...document.querySelectorAll('button, a[href], [role=button], [role=switch], input:not([type=hidden])')]
+      .filter((e) => hien(e) && !e.closest('[aria-hidden=true],[inert]') && (e.getBoundingClientRect().height < 43.5 || e.getBoundingClientRect().width < 43.5))
+      .map((e) => (e.getAttribute('aria-label') || e.textContent || e.className).trim().slice(0, 28))
+    const cv = document.createElement('canvas'); cv.width = cv.height = 1; const cx = cv.getContext('2d', { willReadFrequently: true })
+    const rgba = (c) => { cx.clearRect(0, 0, 1, 1); cx.fillStyle = 'rgba(0,0,0,0)'; cx.fillStyle = c; cx.fillRect(0, 0, 1, 1); const d = cx.getImageData(0, 0, 1, 1).data; return [d[0], d[1], d[2], d[3] / 255] }
+    const tron = (a, b) => [0, 1, 2].map((i) => a[i] * a[3] + b[i] * (1 - a[3])).concat(1)
+    const nen = (e) => { const ds = []; for (let x = e; x; x = x.parentElement) { const c = rgba(getComputedStyle(x).backgroundColor); if (c[3] > 0) ds.push(c); if (c[3] >= 0.99) break }
+      let n = ds.length && ds[ds.length - 1][3] >= 0.99 ? ds.pop() : rgba(getComputedStyle(document.body).backgroundColor); for (let i = ds.length - 1; i >= 0; i--) n = tron(ds[i], n); return n }
+    const lin = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4 }, L = (c) => 0.2126 * lin(c[0]) + 0.7152 * lin(c[1]) + 0.0722 * lin(c[2])
+    const tp = (a, b) => { const x = L(a), y = L(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05) }
+    const mo = (e) => { let o = 1; for (let x = e; x; x = x.parentElement) o *= +getComputedStyle(x).opacity; return o }
+    const kem = []
+    for (const e of document.querySelectorAll('body *')) {
+      if (!hien(e) || e.closest('svg, [aria-hidden=true], [disabled], .sr-only, [inert]') || ![...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) continue
+      const r = e.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight * 3) continue
+      const cs = getComputedStyle(e), b = nen(e), c = rgba(cs.color); c[3] *= mo(e)
+      const px = parseFloat(cs.fontSize), dam = +cs.fontWeight >= 700, to = px >= 24 || (px >= 18.66 && dam) || (!!e.closest('button, [role=button], .chip, [class*=dem], [class*=cham]') && dam)
+      const t = tp(tron(c, b), b)
+      if (t < (to ? 3 : 4.5) - 0.01) kem.push(`${e.textContent.trim().slice(0, 22)}=${t.toFixed(2)}`)
+    }
+    return { tran, nho, kem, cao: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight) }
+  })
+  // chụp cả trang trên khổ dọc: thanh nổi (fixed) chuyển xuống ĐÁY trang để không nằm giữa ảnh; khổ rộng chụp đúng khung nhìn (ray trái cố định)
+  const dai2 = dai && w < 700
+  if (dai2) await p.addStyleTag({ content: 'body{position:relative} html[data-trong] .tr-menu-ray.kb-thanh{position:absolute!important;bottom:14px!important;top:auto!important}' })
+  const ra = join(RA, `${ten}-${k}-${nen}.jpg`)
+  let q = 72
+  const chup = () => p.screenshot({ path: ra, type: 'jpeg', quality: q, fullPage: dai2 })
+  await chup()
+  while (statSync(ra).size > 150 * 1024 && q > 34) { q -= 8; await chup() }
+  tong.anh++; tong.loi += loi.length; tong.tran += kq.tran > 1 ? 1 : 0; tong.nho += kq.nho.length; tong.kem += kq.kem.length
+  const ok = !loi.length && kq.tran <= 1 && !kq.nho.length && !kq.kem.length
+  console.log(`${ok ? '✓' : '✗'} ${ten}-${k}-${nen} · lỗi ${loi.length}${loi.length ? ' ' + loi[0] : ''} · tràn ${kq.tran} · nhỏ ${kq.nho.length}${kq.nho.length ? ' ' + JSON.stringify(kq.nho.slice(0, 3)) : ''} · kém ${kq.kem.length}${kq.kem.length ? ' ' + JSON.stringify(kq.kem.slice(0, 3)) : ''} · ${Math.round(statSync(ra).size / 1024)} KB`)
+  await p.close()
+}
+await Promise.all(Array.from({ length: SONG }, async () => { while (tro < viecCan.length) { const v = viecCan[tro++]; try { await mot(v) } catch (e) { console.log(`✗ ${v.ten}-${v.k}-${v.nen} · HỎNG ${String(e).slice(0, 80)}`); tong.loi++ } } }))
 console.log('TỔNG', JSON.stringify(tong))
 await trinh.close(); may.close()
