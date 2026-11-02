@@ -3,7 +3,7 @@
 // Kiểm: trường mới `mucLam6` (7 ngày, theo ngày, đúng/sai lượt treo, bằng chứng Mức 6 CHỈ thầy) · `mucLam` cũ giữ nguyên cho máy PWA cũ ·
 // học sinh/phụ huynh không bao giờ thấy 'co_tinh' · lượt vừa treo vừa đúng vẫn là "Máy để treo" · phụ huynh không có số phút treo ·
 // hồ sơ thái độ: giây trung bình / phân bố giây bỏ lượt treo, số lượt và tín hiệu giữ nguyên.
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { taoD1That } from './_d1-that'
 import type { Env } from '../server/src/kieu'
 import type { KetQuaLichSuLamCau } from '../server/src/lich-su-lam-cau-kieu'
@@ -72,7 +72,16 @@ describe('mucLam6 — thầy', () => {
 
 describe('học sinh / phụ huynh — không bao giờ có Mức 6; phụ huynh không có số phút treo', () => {
   it('học sinh: Mức 6 hạ về 5 khắp nơi; lượt vừa treo vừa ĐÚNG ở Mức 1 vẫn mang "treo"; không bằng chứng', async () => {
-    const r = (await lichSuLamCauBanHocSinh(duLieu().env as unknown as Env, 'S1', undefined)) as KetQuaLichSuLamCau
+    // 02/11: bản học sinh (lichSuLamCauBanHocSinh) tính khung 7 ngày theo Date.now() — không nhận mốc giờ ⇒ ghim đồng hồ về NOW (21/10),
+    // nếu không khung 7 ngày trôi theo ngày chạy test và bỏ mất các lượt 20–21/10 của mẫu.
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(NOW)
+    let r: KetQuaLichSuLamCau
+    try {
+      r = (await lichSuLamCauBanHocSinh(duLieu().env as unknown as Env, 'S1', undefined)) as KetQuaLichSuLamCau
+    } finally {
+      vi.useRealTimers()
+    }
     expect(JSON.stringify(r)).not.toContain('co_tinh')
     expect(r.mucLam6!.ngayCoTinh).toBeUndefined()
     expect(r.mucLam6!.bay).toMatchObject({ soTreo: 4, soCoTinh: 0 })

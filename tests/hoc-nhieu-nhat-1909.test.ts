@@ -12,7 +12,7 @@ import { readFileSync } from 'node:fs'
 import { HOC_NHIEU, CAU_HINH_LEN_BANG_MAC_DINH, nganSachGiay } from '../src/lib/len-bang-cau-hinh'
 import { thoiGianCau, type NoiDungCau } from '../src/lib/thoi-gian-len-bang'
 import { BTVN_RONG, emYeuDang, type HoSoEmDayDu, type NamKtCauEm } from '../src/lib/ho-so-lop'
-import { bangChuBuoiChua, chuSoGiaTri, xepBuoiChua, type CauVaoXep } from '../src/lib/xep-buoi-chua'
+import { bangChuBuoiChua, chuSoGiaTri, xepBuoiChua, TRAN_LUOT_MOI_EM, type CauVaoXep } from '../src/lib/xep-buoi-chua'
 import type { CauChua } from '../src/lib/phan-cong'
 import type { BacBoCuc } from '../src/lib/bo-cuc-to-chieu'
 
@@ -127,16 +127,19 @@ describe('GIÁ TRỊ + RÀNG BUỘC PHỦ DẠNG', () => {
   })
 
   it('MẤT MẶT một dạng lớp yếu (hết em để gọi): nói TÊN dạng chưa phủ trong cảnh báo và trong số đo, không lặng lẽ bỏ', () => {
-    // 3 em ⇒ 3 lượt; 4 dạng lớp yếu ⇒ một dạng phải nằm ngoài
-    const ds = ['A', 'B', 'C', 'D'].map((d, i) => vao(`${d}1`, i + 1, 1, 0.9 - i * 0.1))
-    const theo = Object.fromEntries(['A', 'B', 'C', 'D'].map((d) => [`${d}1`, [d, YEU]])) as Record<string, [string, Dang | null]>
+    // 02/11: cập nhật theo 3e42c6554 (thầy 25/09: có LƯỢT THÊM, mỗi em tới TRAN_LUOT_MOI_EM lượt) — 3 em không còn là
+    // 3 lượt mà 3 × trần = 9 lượt; nên dựng 10 dạng lớp yếu ⇒ một dạng (J) vẫn phải nằm ngoài.
+    expect(TRAN_LUOT_MOI_EM).toBe(3)
+    const DANG = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+    const ds = DANG.map((d, i) => vao(`${d}1`, i + 1, 1, 0.95 - i * 0.05))
+    const theo = Object.fromEntries(DANG.map((d) => [`${d}1`, [d, YEU]])) as Record<string, [string, Dang | null]>
     const kq = xepBuoiChua(ds, lop(3, theo))
     expect(kq.soEmLenBang).toBe(3)
-    expect(kq.hocNhieu.soDangYeu).toBe(4)
-    expect(kq.hocNhieu.soDangYeuDaPhu).toBe(3)
-    expect(kq.hocNhieu.dangYeuChuaPhu).toEqual(['D'])
+    expect(kq.hocNhieu.soDangYeu).toBe(10)
+    expect(kq.hocNhieu.soDangYeuDaPhu).toBe(3 * TRAN_LUOT_MOI_EM)
+    expect(kq.hocNhieu.dangYeuChuaPhu).toEqual(['J'])
     expect(kq.hocNhieu.soCauDoiBuoiSau).toBe(1)
-    expect(kq.canhBao.some((c) => c.includes('1 dạng lớp yếu chưa có câu nào được chữa') && c.includes('D'))).toBe(true)
+    expect(kq.canhBao.some((c) => c.includes('1 dạng lớp yếu chưa có câu nào được chữa') && c.includes('J'))).toBe(true)
   })
 })
 
@@ -222,10 +225,20 @@ describe('SỐ ĐO cho thầy + tất định', () => {
   const dsCau = [vao('A1', 1, 1, 0.8), vao('A2', 2, 1, 0.8), vao('A3', 3, 1, 0.7), vao('B1', 4, 1, 0.4), vao('C1', 5, 1, 0.3), vao('C2', 6, 1, 0.2), vao('C3', 7, 1, 0.1)]
 
   it('dòng tóm tắt ghép ĐÚNG các số đo (giá trị · dạng phủ · em · câu dời) và không có chữ "nắm chắc"', () => {
+    // 02/11: cập nhật theo 3e42c6554 (lượt thêm): 6 em chữa đủ 7 câu (một em lượt thứ hai) ⇒ 0 câu dời.
+    // Để dòng tóm tắt còn canh trường «câu dời», lấy lớp 2 em (trần 3 lượt ⇒ 6 lượt < 7 câu) ⇒ 1 câu dời.
     const kq = xepBuoiChua(dsCau, lop(6, THEO_CAU))
     expect(kq.soEmLenBang).toBe(6)
-    expect(kq.hocNhieu.soCauDoiBuoiSau).toBe(1)
-    expect(kq.hocNhieu.tomTat).toBe(`giá trị chữa ${chuSoGiaTri(kq.hocNhieu.tongGiaTri)} · phủ 2/2 dạng lớp yếu · 6 em lên bảng · 1 câu dời buổi sau`)
+    expect(kq.hocNhieu.soCauDoiBuoiSau).toBe(0)
+    expect(kq.hocNhieu.tomTat).toBe(`giá trị chữa ${chuSoGiaTri(kq.hocNhieu.tongGiaTri)} · phủ 2/2 dạng lớp yếu · 6 em lên bảng · 0 câu dời buổi sau`)
+    const it2 = xepBuoiChua(dsCau, lop(2, THEO_CAU))
+    expect(it2.soEmLenBang).toBe(2)
+    expect(it2.hocNhieu.soCauDoiBuoiSau).toBe(1)
+    // (dưới 3 em có số liệu thì không có «dạng lớp yếu» ⇒ dòng tóm tắt không có mục «phủ»)
+    expect(it2.hocNhieu.soDangYeu).toBe(0)
+    expect(it2.hocNhieu.tomTat).toBe(`giá trị chữa ${chuSoGiaTri(it2.hocNhieu.tongGiaTri)} · 2 em lên bảng · 1 câu dời buổi sau`)
+    expect(it2.hocNhieu.tomTat).not.toMatch(/nắm chắc/i)
+    expect(bangChuBuoiChua(it2)).toContain(it2.hocNhieu.tomTat)
     expect(kq.hocNhieu.tomTat).not.toMatch(/nắm chắc/i)
     // bản in cho thầy mang cùng dòng
     expect(bangChuBuoiChua(kq)).toContain(kq.hocNhieu.tomTat)

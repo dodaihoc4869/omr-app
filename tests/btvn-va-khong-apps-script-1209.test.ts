@@ -15,6 +15,12 @@ const WK = doc('server/src/index.ts')
 const API = doc('src/lib/exam-api.ts')
 const BTVN = doc('src/lib/btvn-may-chu-moi.ts')
 const SQL = doc('server/migration-1209-toan-bo.sql')
+// 02/11: cập nhật theo f8cb79175/4356cf495/0ad819c5a — đọc kho đề dời sang `homeworkQuestions` (btvn-grading.ts),
+// chấm + ghi lượt nộp dời sang `nopBtvnQuaPhieu` (goi-cu.ts); canh đúng chỗ đang làm việc.
+const GRADING = doc('server/src/btvn-grading.ts')
+const GOI_CU = doc('server/src/goi-cu.ts')
+const HQ = GRADING.slice(GRADING.indexOf('export async function homeworkQuestions('), GRADING.indexOf('export function homeworkKeys('))
+const NOP_PHIEU = GOI_CU.slice(GOI_CU.indexOf('export async function nopBtvnQuaPhieu('), GOI_CU.indexOf('function goPhanMa('))
 
 describe('BTVN — ba luật chốt cứng ở MÁY CHỦ', () => {
   const GIAO = WK.slice(WK.indexOf('async function giaoBtvn('), WK.indexOf('async function btvnCuaEm('))
@@ -44,12 +50,17 @@ describe('BTVN — ba luật chốt cứng ở MÁY CHỦ', () => {
     // Từ 12/09 một lượt giao gồm NHIỀU tờ đề (`ma_de` là danh sách nối bằng
     // dấu phẩy), nên gói được GỘP — nhưng luật không đổi: đúng thứ tự thầy
     // tick, đúng thứ tự câu trong từng tờ.
-    expect(CUA_EM).toContain('`kho/${goc}.json`')
-    expect(CUA_EM).toContain('docCauTuGoiDe(')
-    // Lọc DUY NHẤT được phép: lấy đúng phần thầy đã tick (TN · ĐS · TLN).
-    expect(CUA_EM).toContain("cau.filter((x) => String(x.phan ?? '') === phan)")
-    for (const cam of ['sort(', 'shuffle', 'slice(0,', 'Math.random']) {
-      expect(CUA_EM, cam).not.toContain(cam)
+    // 02/11: cập nhật theo f8cb79175 (gói đề đọc qua `homeworkQuestions` dùng chung cho mở bài và chấm).
+    expect(CUA_EM).toContain('homeworkQuestions(env,String(bt.ma_de))')
+    expect(HQ).toContain('`kho/${goc}.json`')
+    // Lọc DUY NHẤT được phép: lấy đúng phần thầy đã tick (TN · ĐS · TLN) (+ bỏ câu tự luận, luật chung).
+    expect(HQ).toContain('if (phan && c.phan !== phan) continue')
+    for (const vung of [CUA_EM, HQ]) {
+      for (const cam of ['sort(', 'shuffle', 'Math.random']) {
+        expect(vung, cam).not.toContain(cam)
+      }
+      // không cắt bớt số câu (`slice(0, -hậu tố)` trên MÃ ĐỀ thì được)
+      expect(vung).not.toMatch(/\.slice\(0,\s*\d/)
     }
   })
 
@@ -62,14 +73,22 @@ describe('BTVN — ba luật chốt cứng ở MÁY CHỦ', () => {
 
   it('CHẶN QUÁ HẠN Ở MÁY CHỦ — cả lúc mở lẫn lúc nộp', () => {
     // Giờ trên máy em chỉnh được, nên ẩn nút thôi là không chặn được gì.
+    // 02/11: cập nhật theo 4356cf495 + 01b633724 — `nopBtvn` giao cho `nopBtvnQuaPhieu` (goi-cu.ts); ĐIỀU 4 = B:
+    // qua hạn vẫn nộp LẦN ĐẦU (nộp trễ), nộp LẠI sau hạn vẫn chặn; cờ lùi `btvn_nop_tre='tat'` trả luật cũ.
     expect(CUA_EM).toContain("lyDo: 'qua_han'")
-    expect(NOP).toContain("lyDo: 'qua_han'")
-    expect(NOP).toContain("Bạn đã quá hạn nộp BTVN")
+    expect(NOP).toContain('G.nopBtvnQuaPhieu(')
+    expect(NOP_PHIEU).toContain("if (quaHan && !(await btvnNopTreBat(env, bt.giao_luc))) return { ok: false, lyDo: 'qua_han'")
+    expect(NOP_PHIEU).toContain("if (quaHan && cu.nop_luc) return { ok: false, lyDo: 'qua_han'")
+    expect(NOP_PHIEU).toContain("Bạn đã quá hạn nộp BTVN")
   })
 
   it('nộp rồi thì nộp lại KHÔNG ghi đè — khoá nằm trong WHERE', () => {
-    expect(NOP).toContain('WHERE khoa = ? AND nop_luc IS NULL')
-    expect(NOP).toContain('daNhan: true')
+    // 02/11: cập nhật theo 4356cf495 (thầy cho làm lại tối đa 3 lần): `nop_luc IS NULL` trong WHERE bỏ có chủ đích.
+    // Còn canh: gửi lại ĐÚNG bài cũ ⇒ trả `daNhan` không ghi; hết 3 lượt làm lại ⇒ chặn; bài bị thu hồi ⇒ không ghi.
+    expect(NOP_PHIEU).toContain('if(cu.nop_luc&&String(cu.dap_an_json)===JSON.stringify(lam))return {')
+    expect(NOP_PHIEU).toContain('daNhan:true')
+    expect(NOP_PHIEU).toContain('if (daLam >= 4) {')
+    expect(NOP_PHIEU).toContain('WHERE khoa = ? AND thu_hoi=0')
   })
 
   it('đường của EM là công khai, đường của THẦY đòi mã bí mật', () => {
@@ -82,7 +101,8 @@ describe('BTVN — ba luật chốt cứng ở MÁY CHỦ', () => {
 
   it('theo dõi kê TÊN em chưa nộp, không chỉ đếm số', () => {
     const TD = WK.slice(WK.indexOf('async function theoDoiBtvn('), WK.indexOf('// ==========', WK.indexOf('async function theoDoiBtvn(')))
-    expect(TD).toContain('chuaNop: dsEm.filter((x) => !x.nop_luc)')
+    // 02/11: cập nhật theo 0ad819c5a (bỏ em đã thu hồi khỏi danh sách chưa nộp); vẫn kê TÊN.
+    expect(TD).toContain("chuaNop: dsEm.filter((x) => !x.nop_luc && !x.thu_hoi).map((x) => ({ sbd: String(x.sbd ?? ''), hoTen: String(x.ho_ten ?? '') }))")
   })
 
   it('danh sách em chốt NGAY LÚC GIAO, không tính lại về sau', () => {
@@ -103,9 +123,11 @@ describe('0% APPS SCRIPT — chốt cứng, không để trôi lại', () => {
     // Đây là lượt gọi cuối cùng còn sót trong đường của em: bài đã cất vào D1
     // xong mà vẫn phải gọi sang bên kia chỉ để lấy `keyBank` và cờ `congBo`.
     const i = API.indexOf('export async function submitAnswers(')
-    const than = API.slice(i, i + 3000)
+    const than = API.slice(i, API.indexOf('\n}\n', i)) // 02/11: cả thân hàm (chú thích dài thêm, cửa 3000 ký tự không còn đủ)
     expect(than).toContain("if (cb === 'khong' || cb === 'ca_lop_xong') return { keyBank: null, congBo: cb as CongBoDiem }")
-    expect(than).toContain("if (cb === 'ngay' && daCat.keyBank) return { keyBank: daCat.keyBank as KeyBank, congBo: 'ngay' }")
+    // 02/11: cập nhật theo 9656633a9 (tờ đáp án tải sẵn đã khoá, máy chủ chỉ trao chìa) — vẫn CHỈ khi công bố 'ngay'.
+    expect(than).toContain("const kb = cb === 'ngay' && (daCat.keyBank")
+    expect(than).toContain("if (kb) return { keyBank: kb as KeyBank, congBo: 'ngay' }")
   })
 
   it('ngân hàng CÓ đáp án được cất lúc mở ca, sau khoá RIÊNG', () => {

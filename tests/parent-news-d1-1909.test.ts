@@ -125,9 +125,13 @@ describe('Kênh 5 trên D1 thật: chọn câu cho bài hằng ngày', () => {
 
     const r = (await parentNews(d.env, 'assign', { sbd: 'S1' })) as Record<string, any>
     expect(r.ok).toBe(true)
-    expect(r.questionCount).toBe(soCan)
+    // 02/11: cập nhật theo 862f2e59 (readScope: chỉ bù trong dạng CHÍNH em đã học; thiếu câu thì GIẢM số lượng, không lấy câu ngoài phạm vi)
+    // ⇒ em chỉ học dạng ES.A.X: bài = 3 câu tới hạn + N1, N2 (5 câu ≤ số dự kiến), KHÔNG câu dạng ES.B.Y / GL.C.Z em chưa học.
+    expect(r.questionCount).toBeLessThanOrEqual(soCan)
     const cau = await docBaiMom(d, 'S1', r.id)
     const qid = cau.map((c) => c.qid)
+    expect(qid.length).toBe(r.questionCount)
+    expect(new Set(qid)).toEqual(new Set(['T1', 'T2', 'T3', 'N1', 'N2']))
     // 3 câu tới hạn (sai 3 ngày trước) là ba câu đầu; cùng mốc, cùng số lần sai nên thứ tự theo seed, nên so theo tập.
     expect(new Set(qid.slice(0, 3))).toEqual(new Set(['T1', 'T2', 'T3']))
     expect(new Set(qid).size).toBe(qid.length)
@@ -187,17 +191,24 @@ describe('Kênh 5 trên D1 thật: chọn câu cho bài hằng ngày', () => {
     expect(qid).toEqual(expect.arrayContaining(['T1', 'T2', 'T3']))
   })
 
-  it('em mới chưa có hồ sơ: bài vẫn đủ câu từ kho, chỉ đúng lớp của em (lỗi cũ: kho luôn rỗng vì đọc sai tên trường)', async () => {
+  // 02/11: cập nhật theo 862f2e59 (readScope — «dữ liệu thiếu không được tự mở rộng cả chương/cả lớp; thiếu câu thì giảm số lượng»): em mới CHƯA có
+  // bằng chứng học ⇒ không rút câu từ kho lớp (báo lỗi rõ, không tạo bài); có bằng chứng ⇒ kho đọc đúng (lỗi cũ: kho luôn rỗng vì đọc sai tên trường), chỉ đúng lớp của em.
+  it('em mới chưa có hồ sơ: không giao câu ngoài phạm vi; có bằng chứng học thì kho đọc được, chỉ đúng lớp và dạng của em', async () => {
     const d = taoD1That()
     themHs(d, 'S2', '11')
     themCau(d, 'DE12', '12', ['a', 'b', 'c', 'd', 'e', 'f'].map((k) => cauKho(`L12-${k}`, 'ES.A.X', 'biet')))
     themCau(d, 'DE11', '11', ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'].map((k, i) => cauKho(`L11-${k}`, i % 2 ? 'ES.A.X' : 'GL.B.Y', 'biet')))
+    await expect(parentNews(d.env, 'assign', { sbd: 'S2' })).rejects.toThrow('Chưa tìm được câu phù hợp')
+    expect(d.dem('mom_bai')).toBe(0)
+    // Em đã làm (sai) một câu dạng ES.A.X lớp 11 cách đây 5 ngày ⇒ có bằng chứng dạng ES.A.X.
+    await ghi(d, 'S2', [{ qid: 'L11-b', kq: 0, gio: -120 }])
     const r = (await parentNews(d.env, 'assign', { sbd: 'S2' })) as Record<string, any>
     expect(r.ok).toBe(true)
     const qid = (await docBaiMom(d, 'S2', r.id)).map((c) => c.qid)
     expect(qid.length).toBe(r.questionCount)
-    expect(qid.length).toBeGreaterThanOrEqual(8)
+    expect(qid.length).toBeGreaterThan(1)
     expect(qid.every((q) => q.startsWith('L11-'))).toBe(true)
+    expect(qid.every((q) => ['L11-b', 'L11-d', 'L11-f', 'L11-h', 'L11-j'].includes(q))).toBe(true) // chỉ dạng ES.A.X em đã học
   })
 
   it('kho không có câu nào dùng được: báo lỗi rõ, KHÔNG tạo bài rỗng', async () => {

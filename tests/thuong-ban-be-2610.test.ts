@@ -2,13 +2,14 @@
 // HỌC CÙNG BẠN (thưởng phạt phần B, thầy chốt 26/10): tối đa 3 bạn, phải đồng ý, tìm theo tên/SBD ≤ 10 (không lộ SBD), chuỗi đôi tăng khi CẢ HAI xong ≥ 1 bài
 // (luật B3: ≥ 6 câu khác nhau hoặc tự sửa xong), bình giữ chuỗi / vắng có phép đỡ cho bạn đó, mốc 7/30/100 ⇒ tinh thể cả hai (khoá chống lặp),
 // gõ cửa 1 lần/ngày/bạn, không trả điểm/nguyên tử/nhãn của bạn. D1 = SQLite trong bộ nhớ trên lược đồ thật.
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { taoD1That, type D1That } from './_d1-that'
 import { gameToken } from '../server/src/game-v2-auth'
 import {
   buocChuoiDoi, cronChuoiDoi, homNayDoi, hsBan, hsBanGoCua, hsBanMoi, hsBanThoi, hsBanTim, hsBanTraLoi, mocMoiDat, xoaNhoBanBe,
 } from '../server/src/thuong-ban-be'
 import { ngayCoHoc } from '../server/src/thuong-ngay-hoc'
+import { datNgayBaoTriChoTest } from '../server/src/ngay-bao-tri'
 
 const VN = (s: string): number => Date.parse(`${s}+07:00`)
 const NOW = VN('2026-10-28T10:00:00') // thứ Tư
@@ -168,6 +169,10 @@ describe('/hs/ban + gõ cửa', () => {
 })
 
 describe('cron chuỗi đôi (00:10 VN)', () => {
+  // 02/11: cập nhật theo 9125daf75 + e86d3c7fc (thầy 30/10: 28–30/10 là NGÀY BẢO TRÌ ⇒ ngày ấy thành 'phep', không tiêu bình).
+  // Phép thử dùng ngày mẫu 26–30/10 để canh LUẬT bình / chuỗi đôi ⇒ ghim lịch bảo trì rỗng (hàm dành cho test), xong trả lịch thật.
+  beforeEach(() => datNgayBaoTriChoTest([]))
+  afterEach(() => datNgayBaoTriChoTest())
   it('cả hai học ⇒ +1 mỗi ngày; bình giữ chuỗi của bạn nào đỡ bạn ấy; hết bình mà lỡ ⇒ về 0', async () => {
     const d = taoD1That(); bangPhanA(d); themEm(d, 'A', 'An'); themEm(d, 'B', 'Bình')
     await ketBan(d, 'A', 'B') // thứ Hai 26/10 ⇒ chuỗi đôi tính từ 26

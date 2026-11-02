@@ -346,7 +346,10 @@ describe('CHẶN CỨNG: em bậc "biết" ở dạng ấy không nhận câu 2 
 
 describe('CÂU CẦN DẠY LẠI → BẮT BUỘC lên bảng', () => {
   const cauDayLai = 'Q9'
-  const cfg2 = { ...CAU_HINH_LEN_BANG_MAC_DINH, SO_EM_LEN_BANG_TOI_THIEU: 2, SO_EM_LEN_BANG_TOI_DA: 2 }
+  // 02/11: cập nhật theo 3e42c6554 (vòng 3 «lấp câu còn lại» không còn chặn theo trần số em — chỉ ngân sách giờ chặn) ⇒ «giờ chật» nay phải
+  // tạo bằng NGÂN SÁCH: vừa đủ 3 câu 2 sao (3 × 300 s) + hao phí mở/chốt + 60 s dư (đủ đọc đáp án Q9, không đủ nâng Q9 lên bảng 120 s) = 24 phút.
+  const cfg2 = { ...CAU_HINH_LEN_BANG_MAC_DINH, SO_EM_LEN_BANG_TOI_THIEU: 2, SO_EM_LEN_BANG_TOI_DA: 2,
+    NGAN_SACH_PHUT: (CAU_HINH_LEN_BANG_MAC_DINH.HAO_PHI_MO_DAU_GIAY + CAU_HINH_LEN_BANG_MAC_DINH.HAO_PHI_CHOT_CUOI_GIAY + 3 * CAU_HINH_LEN_BANG_MAC_DINH.GIAY_LEN_BANG_THEO_SAO[2] + 60) / 60 }
 
   it('canDayLaiCau đọc cờ từ hồ sơ', () => {
     expect(canDayLaiCau(emTrang(1, { namKt: namKt('Q9', { canDayLai: true }) }), 'Q9')).toBe(true)
@@ -363,7 +366,8 @@ describe('CÂU CẦN DẠY LẠI → BẮT BUỘC lên bảng', () => {
   })
 
   it('câu 0 sao thường xếp cuối, nhưng CÓ em cần dạy lại thì được gọi lên dù giờ chật', () => {
-    // 3 câu 2 sao lấp đầy 2 chỗ nếu không có "dạy lại"; câu Q9 (0 sao) chỉ được đọc đáp án.
+    // 3 câu 2 sao lấp đầy ngân sách nếu không có "dạy lại"; câu Q9 (0 sao) chỉ được đọc đáp án.
+    expect(cfg2.NGAN_SACH_PHUT).toBe(24)
     const ds = [vaoXep(1, 2), vaoXep(2, 2), vaoXep(3, 2), vaoXep(9, 0)]
     const lop = [1, 2, 3, 4].map((i) => emTrang(i))
     const truoc = xepBuoiChua(ds, lop, { cauHinh: cfg2 })

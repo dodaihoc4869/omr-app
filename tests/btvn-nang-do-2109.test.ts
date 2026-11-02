@@ -968,6 +968,11 @@ describe('khoá nguồn', () => {
     for (const cam of ['Math.random', 'Date.now', 'new Date', 'performance.now', 'fetch(', 'localStorage', 'indexedDB', "from 'react'", 'console.']) expect(nguon, cam).not.toContain(cam)
     expect(nguon.toLowerCase(), 'chữ hiển thị cho em/thầy (không tính chú thích)').not.toMatch(/nắm chắc/)
     // chỉ import hashSeed từ exam-shuffle (thuần) — máy chủ import được
-    expect([...readFileSync('src/lib/btvn-nang-do.ts', 'utf8').matchAll(/^import .* from '([^']+)'/gm)].map((m) => m[1])).toEqual(['./exam-shuffle'])
+    // 02/11: cập nhật theo aa08c7473 (xếp hạng theo nhãn kho dùng chung `uu-tien-nhan-kho`) — tệp ấy cũng phải THUẦN, không import gì.
+    expect([...readFileSync('src/lib/btvn-nang-do.ts', 'utf8').matchAll(/^import .* from '([^']+)'/gm)].map((m) => m[1])).toEqual(['./exam-shuffle', './uu-tien-nhan-kho'])
+    const nhan = readFileSync('src/lib/uu-tien-nhan-kho.ts', 'utf8')
+    expect([...nhan.matchAll(/^import .* from '([^']+)'/gm)]).toEqual([])
+    const nhanMa = nhan.replace(/\/\/[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '')
+    for (const cam of ['Math.random', 'Date.now', 'new Date', 'performance.now', 'fetch(', 'localStorage', 'indexedDB', "from 'react'", 'console.']) expect(nhanMa, `uu-tien-nhan-kho: ${cam}`).not.toContain(cam)
   })
 })

@@ -78,10 +78,13 @@ describe('K4.1 readScope: bằng chứng từ hồ sơ (nguồn ≠ thi, ≠ gam
     expect(pool.map((q) => q.qid)).toEqual(expect.arrayContaining(['B1', 'M1', 'K1'])) // K1: cùng dạng ES.A.X, em chưa gặp
   })
 
-  it('chưa có bảng hồ sơ / sổ (fixture cũ, migration chưa chạy): không ném lỗi, evidence như trước', async () => {
+  // 02/11: cập nhật theo 862f2e59 (readScope mục (c): bảng hồ sơ chưa dựng ⇒ lấy bằng chứng từ sổ gốc `su_kien_hoc`, vẫn bỏ nguồn thi/game và em khác)
+  it('chưa có bảng hồ sơ / sổ (fixture cũ, migration chưa chạy): không ném lỗi; thiếu hồ sơ thì lấy từ sổ, thiếu cả sổ thì evidence rỗng', async () => {
     const d = await dungBoiCanh()
     d.sql.exec('DROP TABLE nam_kt_cau')
-    await expect(readScope(d.env, 'S1')).resolves.toMatchObject({ evidence: [] })
+    const { evidence } = await readScope(d.env, 'S1')
+    expect(evidence.map((e) => e.qid).sort()).toEqual(['B1', 'M1', 'X1']) // T1 (chỉ thi), G1 (chỉ game), Y1 (em khác) không lọt
+    expect(evidence.every((e) => e.ca === 'su_kien_hoc')).toBe(true)
     d.sql.exec('DROP TABLE su_kien_hoc')
     await expect(readScope(d.env, 'S1')).resolves.toMatchObject({ evidence: [] })
   })

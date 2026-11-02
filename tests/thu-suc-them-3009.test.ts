@@ -10,6 +10,7 @@ import { layKeHoachHomNay, qidGoc, sanh2, thuSucThem, tranKeHoachHomNay, xoaDemC
 import { coLoThuSucThem, quotaCauMoi } from '../server/src/srs2-loi'
 import { hoa2Action, startDao2 } from '../server/src/srs2-game'
 import { xoaDemCaBaoVe } from '../server/src/game-v2-bank'
+import { xoaMoiDem } from '../server/src/dem-chung'
 import { ghiSuKien } from '../server/src/su-kien-hoc'
 import type { Env } from '../server/src/kieu'
 
@@ -178,6 +179,8 @@ describe('bộ lọc câu', () => {
     d.sql.prepare(`INSERT INTO ca(ma_ca,ten_ca,trang_thai,bat_dau,het_han_vao,thoi_gian_phut,loai,cong_bo,bank_r2,cap_nhat_luc) VALUES('CA-MO','Ca giữa kỳ','mo',?,?,45,'thi','ca_lop_xong','de/CA-MO.json',?)`)
       .run(new Date(Date.now() - 60_000).toISOString(), new Date(Date.now() + 30 * 60_000).toISOString(), new Date(Date.now()).toISOString())
     xoaDemCaBaoVe()
+    // 02/11: cập nhật theo b6026cc6 (đệm chung 60 giây các bảng kho câu giữa các lượt đọc; ghi qua Worker tự xoá) — test sửa kho bằng SQL thẳng ⇒ xoá đệm như lệnh lập chỉ mục thật
+    xoaMoiDem()
     // Mới còn (đúng tập ngày mai thấy) = 45 − 15 tự luận − 5 rút = 25 ⇒ quota mai ceil(25/3) = 9; lấy được ngay chỉ 5 (20 câu đang bảo vệ) ⇒ lô 5.
     expect(await tss(env, T0)).toEqual({ duoc: true, soCau: 5 })
     const truoc = khoaCua(d)

@@ -158,7 +158,9 @@ describe('Màn Gọi lên bảng', () => {
     expect(ma).toContain('Tìm theo tên hoặc số báo danh')
     // câu hiện bằng ĐÚNG thẻ của màn xem lại, không vẽ kiểu hiển thị thứ hai
     expect(ma).toContain('cheDo="xem_lai"')
-    expect(ma).toContain('loiGiai={day.q.loiGiai}')
+    // 02/11: cập nhật theo f7eb23216 (lời giải lấy `day.q.loiGiai`, thiếu thì lùi về kiến thức cốt lõi — biến `lg`)
+    expect(ma).toContain("const lg = day.q.loiGiai || ((day.q as any).kienThucCotLoi ? { chot: (day.q as any).kienThucCotLoi } : undefined)")
+    expect(ma).toContain('loiGiai={lg}')
   })
 
   it('khối GIẢNG CẢ LỚP đứng TRƯỚC các lượt gọi', async () => {

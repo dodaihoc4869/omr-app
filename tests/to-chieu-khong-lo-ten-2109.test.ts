@@ -121,12 +121,22 @@ describe('tờ máy chiếu · sau khi hiện thẻ tên', () => {
 })
 
 describe('tờ máy chiếu · chế độ thường (không dạy học)', () => {
-  it('thẻ tên hiện sẵn ⇒ nhãn CÓ tên như trước, không thuộc tính mới, không luật giấu thẻ', () => {
+  // 02/11: cập nhật theo d4a0d3f5b (thẻ tên `.mc-em` nay ẨN SẴN ở MỌI chế độ, chờ thầy bấm hiện ⇒ chế độ thường cũng dùng nhãn KHÔNG tên
+  // như chế độ dạy học; tên thật chỉ nằm ở data-nhan-em để script đổi sang khi thẻ hiện). Điều canh: không lộ tên trước khi thẻ hiện.
+  it('thẻ tên ẩn sẵn ⇒ nhãn tĩnh KHÔNG tên; tên thật chỉ ở data-nhan-em của đúng ô làm bài', () => {
     const html = taoHtmlMayChieu([HUY, LAN], {})
-    expect(html).toContain('<div class="mc-trang" aria-hidden="true" data-nhan="Phần làm bài của Huy"></div>')
-    expect(html).toContain('<div class="mc-trang" aria-hidden="true" data-nhan="Phần làm bài của Lan"></div>')
-    expect(new JSDOM(html).window.document.querySelectorAll('[data-nhan-em]').length).toBe(0) // không phần tử nào mang tên thật ở thuộc tính phụ
+    expect(html).toContain(`<div class="mc-trang" aria-hidden="true" data-nhan="${NHAN_LAM_BAI_KHONG_TEN}" data-nhan-em="Phần làm bài của Huy"></div>`)
+    expect(html).toContain(`<div class="mc-trang" aria-hidden="true" data-nhan="${NHAN_LAM_BAI_KHONG_TEN}" data-nhan-em="Phần làm bài của Lan"></div>`)
+    const doc = new JSDOM(html).window.document // KHÔNG chạy script
+    const nhanTinh = [...doc.querySelectorAll('[data-nhan]')].map((e) => e.getAttribute('data-nhan'))
+    expect(nhanTinh.length).toBeGreaterThan(0)
+    expect(nhanTinh.every((x) => x === NHAN_LAM_BAI_KHONG_TEN)).toBe(true)
+    const theTen = [...doc.querySelectorAll<HTMLElement>('header.mc-em[id^="em-"]')]
+    expect(theTen.length).toBe(2)
+    expect(theTen.every((e) => e.hidden)).toBe(true)
+    // tên thật ở thuộc tính phụ CHỈ trên ô làm bài (.mc-trang / .mc-cot-lam-bai), không nơi nào khác
+    expect([...doc.querySelectorAll('[data-nhan-em]')].every((e) => e.matches('.mc-trang, .mc-cot-lam-bai'))).toBe(true)
     const don = taoHtmlMayChieu([HUY_DAI], {})
-    expect(don).toContain('<section class="mc-cot-lam-bai" aria-label="Bảng để học sinh lên làm" data-nhan="Phần làm bài của Huy"></section>')
+    expect(don).toContain(`<section class="mc-cot-lam-bai" aria-label="Bảng để học sinh lên làm" data-nhan="${NHAN_LAM_BAI_KHONG_TEN}" data-nhan-em="Phần làm bài của Huy"></section>`)
   })
 })

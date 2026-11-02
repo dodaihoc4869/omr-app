@@ -28,13 +28,24 @@ describe('cắt Google khỏi app', () => {
     expect(API).not.toContain('fetch(url)')
   })
 
-  it('postJson gửi vào cổng /goi của máy chủ mới, không nhận địa chỉ từ chỗ gọi', () => {
+  // 02/11: cập nhật theo 234f90782 (postJson tìm địa chỉ qua layDiaChiMayChu — địa chỉ chỗ gọi chỉ là GỢI Ý,
+  // phải qua bộ lọc diaChiMayChuHopLe: chặn Google/localhost/không https) thay cho đọc thẳng layCauHinhMayChu().
+  it('postJson gửi vào cổng /goi của máy chủ mới; địa chỉ chỗ gọi chỉ được dùng khi qua bộ lọc (không bao giờ Google)', async () => {
     const i = API.indexOf('async function postJson(')
     expect(i).toBeGreaterThan(0)
     const than = API.slice(i, API.indexOf('\n}', i))
     expect(than).toContain('_scriptUrl')
-    expect(than).toContain('layCauHinhMayChu()')
+    expect(than).toContain('layDiaChiMayChu(_scriptUrl)')
     expect(than).toContain('/goi`')
+    // Bộ tìm địa chỉ lọc gợi ý của chỗ gọi bằng diaChiMayChuHopLe, và bộ lọc ấy bịt cứng đường về Apps Script.
+    const TIM = doc('src/lib/dia-chi-may-chu.ts')
+    expect(TIM).toContain('diaChiMayChuHopLe as don')
+    expect(TIM).toContain('const g = don(goiY)')
+    const { diaChiMayChuHopLe } = await import('../src/lib/cau-hinh-may-chu')
+    expect(diaChiMayChuHopLe('https://script.google.com/macros/s/abc/exec')).toBe('')
+    expect(diaChiMayChuHopLe('https://x.googleusercontent.com')).toBe('')
+    expect(diaChiMayChuHopLe('http://omr.ttadodaihoc.workers.dev')).toBe('')
+    expect(diaChiMayChuHopLe('https://omr.ttadodaihoc.workers.dev/')).toBe('https://omr.ttadodaihoc.workers.dev')
     // Thiếu địa chỉ thì BÁO, không âm thầm quay về đường cũ.
     expect(than).toContain('Chưa có địa chỉ máy chủ mới')
   })

@@ -95,6 +95,9 @@ describe('đệm phần chung (isolate, 5 phút)', () => {
 
   it('thầy đổi cấu hình: dấu đổi chậm nhất sau hạn đệm (5 phút); tắt đệm (test) ⇒ đổi ngay', async () => {
     const d = await taoKho()
+    // 02/11: test hẹn giờ — migration-2610-thuong-phat chèn khoá 'thuong_moc' với datetime('now') (giờ THẬT, không theo đồng hồ giả) ⇒ MAX(cap_nhat_luc)
+    // lớn hơn mọi mốc 28/10 của test từ sau ngày viết test. Đưa dòng ấy về trước NOW để mốc thầy sửa bên dưới là mốc mới nhất như trên bản thật.
+    d.sql.exec("UPDATE cau_hinh SET cap_nhat_luc='2026-10-28T00:00:00Z' WHERE khoa='thuong_moc'")
     batDemDauChung(true)
     const a = await dauSanSang(d.env, 'E1', NOW)
     d.sql.exec("INSERT INTO cau_hinh(khoa, gia_tri, cap_nhat_luc) VALUES('thu-dau-2810','1','2026-10-28T12:01:00Z')")

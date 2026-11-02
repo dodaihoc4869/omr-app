@@ -3,7 +3,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('idb', () => ({ openDB: () => new Promise(() => {}) }))
-import { khongTreo, loadCauHinhMayChu } from '../src/lib/exam-db'
+import { loadCauHinhMayChu } from '../src/lib/exam-db'
+// 02/11: cập nhật theo bf286423 (khongTreo bỏ, thay bằng voiHanCho + .catch(fallback) như màn đăng nhập HS)
+import { voiHanCho } from '../src/lib/han-cho'
+
+/** Cách đăng nhập HS dùng hiện nay: hạn chờ rồi rơi về giá trị dự phòng, không treo. */
+const khongTreo = <T,>(p: Promise<T>, ms: number, duPhong: T): Promise<T> => voiHanCho(p, ms, 'het-han').catch(() => duPhong)
 
 describe('getDb — có hạn chờ (IndexedDB treo)', () => {
   afterEach(() => { vi.restoreAllMocks(); vi.useRealTimers() })
@@ -17,7 +22,7 @@ describe('getDb — có hạn chờ (IndexedDB treo)', () => {
   })
 })
 
-describe('khongTreo — trả fallback khi treo/lỗi', () => {
+describe('voiHanCho + dự phòng — trả fallback khi treo/lỗi', () => {
   it('promise treo vĩnh viễn ⇒ trả fallback sau hạn, KHÔNG treo', async () => {
     vi.useFakeTimers()
     const p = khongTreo(new Promise(() => {}), 5_000, 'du-phong')

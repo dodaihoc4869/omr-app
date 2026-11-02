@@ -76,7 +76,16 @@ describe('hàm thuần: việc ôn lại không trùng câu với bài Mom chưa
   it('tất định và không đổi khi đảo thứ tự qid/câu tới hạn', () => {
     const d = dv({ cauToiHan: cau, mom: [{ id: 'M', soCau: 3, taoLuc: iso(-1), batDauLuc: null, qid: ['Q3', 'Q1', 'Q2'] }] })
     const dao = dv({ cauToiHan: [...cau].reverse(), mom: [{ id: 'M', soCau: 3, taoLuc: iso(-1), batDauLuc: null, qid: ['Q2', 'Q3', 'Q1'] }] })
-    expect(JSON.stringify(lapKeHoachNgay(d))).toBe(JSON.stringify(lapKeHoachNgay(dao)))
+    // 02/11: cập nhật theo f3d6fcc75 (việc `mom` mang `chiTiet.qid` = mã câu CỦA BÀI cho coverage, giữ đúng thứ tự câu trong bài):
+    // danh sách ấy là dữ liệu bài, đảo đầu vào thì nó đảo theo — so nó như TẬP; mọi phần còn lại phải giống hệt từng byte.
+    expect(JSON.stringify(lapKeHoachNgay(d))).toBe(JSON.stringify(lapKeHoachNgay(d)))
+    const chuan = (kh: ReturnType<typeof lapKeHoachNgay>) => JSON.stringify({
+      ...kh,
+      viec: kh.viec.map((v) => (v.loai === 'mom' && Array.isArray(v.chiTiet.qid) ? { ...v, chiTiet: { ...v.chiTiet, qid: [...(v.chiTiet.qid as string[])].sort() } } : v)),
+    })
+    const a = lapKeHoachNgay(d), b = lapKeHoachNgay(dao)
+    expect(a.viec.find((v) => v.loai === 'mom')?.chiTiet.qid).toEqual(['Q3', 'Q1', 'Q2'])
+    expect(chuan(a)).toBe(chuan(b))
   })
 })
 
