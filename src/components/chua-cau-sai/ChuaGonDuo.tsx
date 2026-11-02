@@ -18,7 +18,7 @@ import { TroGiupDuo } from '../hoc-tap/TroGiupDuo'
 import NutHoiThay from '../loi-giai/NutHoiThay'
 import { loiGiaiChuanTuKho } from '../loi-giai/KhoiLoiGiaiChuan'
 import { Bi } from '../linh-vat/Bi'
-import { banHat } from '../../lib/hieu-ung'
+import { anMung } from '../../lib/hieu-ung'
 import { BungDung } from '../hoc-tap/BungDung'
 import { phanHoi } from '../../lib/phan-hoi'
 import { napSanGiuChan, TamGiuChanLuoi, useGiuChan } from '../hoc-tap/GiuChan'
@@ -93,7 +93,8 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
       o.scrollIntoView?.({ block: 'nearest' })
     })
     nutChinh.current?.focus({ preventScroll: true })
-    if (tt === 'dung') banHat(goc.current?.querySelector('.ht2-lam-pa[data-ket=dung], .ht2-lam-o-hang[data-ket=dung]') ?? goc.current?.querySelector('.duo-kq-bi'), { so: 8, xa: 72 })
+    // ĐÚNG / SAI TRÊN THẺ ĐÁP ÁN (bộ hiệu ứng ăn mừng, thầy chốt 02/11 — thay 8 hạt lục giác): đúng ⇒ thẻ nảy + viền sáng chạy + lấp lánh; sai ⇒ thẻ lắc giảm chấn
+    if (tt === 'dung' || tt === 'sai') anMung(tt, { the: goc.current?.querySelector(`.ht2-lam-pa[data-ket=${tt}], .ht2-lam-o-hang[data-ket=${tt}]`) })
   }, [!!kq, kq?.ket, kq?.lan]) // eslint-disable-line react-hooks/exhaustive-deps -- kết quả TẠM (dòng tam) rồi bản đầy đủ cùng kết quả ⇒ không bung hạt / cuộn lần hai
   useEffect(() => { if (xongChang) phanHoi('xong') }, [xongChang])
 

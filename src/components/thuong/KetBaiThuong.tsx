@@ -1,13 +1,14 @@
 // MÀN KẾT BÀI (bản vẽ tp-3, thầy chốt 26/10) — một màn trả lời đủ 3 câu của em: được bao nhiêu nguyên tử (và vì sao) · hôm nay còn mấy bài · đứng thứ
 // mấy trong giải. Đọc trường `ketBai` của phản hồi `answer` câu cuối (hợp đồng 4.1): {tong, dong[], soDung, soCau, chinhXac, giay, hoanHao, mucTieu?, giai?}.
 // Dòng tách nguyên tử lấy ĐÚNG nhãn máy chủ gửi (không tự tính lại). Thiếu `mucTieu` / `giai` ⇒ thẻ đó ẩn; công tắc giải tắt ⇒ ẩn thẻ giải.
-// Hiệu ứng: B1 ba thẻ bật lần lượt + số đếm · B2 bài hoàn hảo: tinh thể kết tinh + tia xoay · B3 Bi mừng + hoa giấy · B4 vòng mục tiêu tô dần, đầy thì nổ hạt.
+// Hiệu ứng: B1 ba thẻ bật lần lượt + số đếm · B2 bài hoàn hảo: tinh thể kết tinh + tia xoay · B3 Bi mừng + pháo giấy hai góc (bộ hiệu ứng ăn mừng 02/11) · B4 vòng mục tiêu tô dần, đầy thì nổ hạt.
 // NẠP LƯỜI (host: lazy(() => import('./thuong/KetBaiThuong'))). Bấm «Tiếp tục» giữa hiệu ứng ⇒ nhảy tới trạng thái cuối.
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { Clock, Target } from 'lucide-react'
 import { Bi } from '../linh-vat/Bi'
-import { bungHat, demSo, hoaGiay, hoatAnh, phanHoiThuong, xongHieuUng } from '../../lib/hieu-ung-thuong'
+import { bungHat, demSo, hoatAnh, phanHoiThuong, xongHieuUng } from '../../lib/hieu-ung-thuong'
 import { phatThuong } from '../../lib/am-thanh-thuong'
+import { anMung } from '../../lib/hieu-ung'
 import { hangSau, vongMucTieu, type CongTac, type HangGiai, type KetBai } from '../../lib/thuong-api'
 import { HuyHieuKimLoai, IcNguyenTu, IcTinhThe, TEN_HANG, Tia } from './hinh'
 import { useHieuUng } from './chung'
@@ -34,7 +35,12 @@ export default function KetBaiThuong({ ketBai: k, phu, hang, bat, onTiep, chuNut
   const mt = vongMucTieu(cauHomNay && cauHomNay.muc > 0 ? { daXong: 0, can: 1, cau: cauHomNay.muc, cauDaLam: cauHomNay.daLam } : k.mucTieu), dat = !!mt && mt.dat
   const g = bat?.giai === false ? undefined : k.giai
   const ba = useRef<HTMLDivElement>(null), bi = useRef<HTMLDivElement>(null), kt = useRef<HTMLDivElement>(null), vong = useRef<HTMLDivElement>(null), chip = useRef<HTMLSpanElement>(null)
+  const tieu = useRef<HTMLHeadingElement>(null), huyMung = useRef<() => void>(() => {})
+  useEffect(() => () => huyMung.current(), [])
   useHieuUng((h) => {
+    // 🎆 XONG CHẶNG (bộ hiệu ứng ăn mừng, thầy chốt 02/11): pháo giấy hai góc + quầng + sóng xung quanh tiêu đề (máy yếu: bản gọn quanh tiêu đề). Rung / tiếng
+    // «xong» vẫn ở phanHoiThuong dưới (không rung hai lần). Thay hoa giấy cũ của bài hoàn hảo — không chạy hai lớp giấy chồng nhau.
+    h.sau(150, () => { huyMung.current = anMung('chang', { goc: tieu.current }) })
     ba.current?.querySelectorAll(':scope > div').forEach((d, i) => hoatAnh(d, [{ transform: 'translateY(16px) scale(.85)', opacity: 0 }, { transform: 'scale(1.05)', opacity: 1, offset: 0.6 }, { transform: 'none', opacity: 1 }], 420, { tre: 200 + i * 120 }))
     // 27/10 (thầy «làm lại cho ngon như Duolingo»): ba thẻ số đếm lên ease-out 900 ms, «tích» nhẹ khi số tăng (màn kiểm tra tự im — cờ dangCheDoThi),
     // thẻ TỔNG nảy khi đếm xong. Số lấy nguyên từ máy chủ (ketBai). Giảm chuyển động ⇒ demSo hiện ngay số cuối.
@@ -53,7 +59,7 @@ export default function KetBaiThuong({ ketBai: k, phu, hang, bat, onTiep, chuNut
       hoatAnh(kt.current, [{ transform: 'scale(0) rotate(-30deg)', opacity: 0 }, { transform: 'scale(.4) rotate(-10deg)', opacity: 1, offset: 0.3 }, { transform: 'scale(1.12) rotate(4deg)', opacity: 1, offset: 0.8 }, { transform: 'none', opacity: 1 }], 1200)
       hoatAnh(document.querySelector('.tp-ket-hinh .tp-tia'), [{ opacity: 0, transform: 'scale(.4)' }, { opacity: 1, transform: 'none' }], 900, { tre: 300 })
       hoatAnh(bi.current, [{ transform: 'translateY(0)' }, { transform: 'translateY(-26px)' }, { transform: 'translateY(0)' }, { transform: 'translateY(-14px)' }, { transform: 'translateY(0)' }], 1000, { tre: 400 })
-      h.sau(650, () => { bungHat(kt.current, { n: 12, r: 120, mau: ['kc', 'tt', 'sao'] }); hoaGiay(30, 1200) })
+      h.sau(650, () => bungHat(kt.current, { n: 12, r: 120, mau: ['kc', 'tt', 'sao'] }))
     } else {
       phanHoiThuong('xong')
       hoatAnh(bi.current, [{ transform: 'translateY(0)' }, { transform: 'translateY(-18px)' }, { transform: 'translateY(0)' }], 500, { tre: 200 })
@@ -73,7 +79,7 @@ export default function KetBaiThuong({ ketBai: k, phu, hang, bat, onTiep, chuNut
       <div className="cot-a">
         {hh ? <div className="tp-ket-hinh"><Tia className="quay" /><div ref={kt} className="kt-o"><HuyHieuKimLoai hang="kimcuong" an /></div><div ref={bi} className="bi-o"><Bi cam="mung" size={80} /></div></div>
           : <div className="tp-hinh"><div ref={bi}><Bi cam="vui" size={120} /></div></div>}
-        <h1 style={hh ? { color: 'var(--tr-sao-chu)' } : undefined}>{hh ? 'Hoàn hảo!' : 'Xong chặng!'}</h1>
+        <h1 ref={tieu} style={hh ? { color: 'var(--tr-sao-chu)' } : undefined}>{hh ? 'Hoàn hảo!' : 'Xong chặng!'}</h1>
         {(phu || hh) && <p className="tp-phu">{hh ? `${k.soCau}/${k.soCau} câu đúng, tự làm${phu ? ` · ${phu}` : ''}` : phu}</p>}
         <div ref={ba} className="tp-3o">
           {/* thẻ kiểu Duolingo «Lesson complete»: viền màu + tiêu đề nhỏ in hoa — TỔNG NGUYÊN TỬ vàng · CHÍNH XÁC xanh lá · THỜI GIAN xanh dương */}

@@ -18,7 +18,7 @@ import { chanNgon, loiLua, mocDoiLua, soLuot, xetLua, type CapLua, type VaoLua }
 import { chonChoBong, rongOmChu, type Hop } from '../../lib/bong-bong-mol'
 import { docLuaThat } from '../../lib/lua-that'
 import { gioMayChu } from '../../lib/gio-may-chu'
-import { banHat, yenLang } from '../../lib/hieu-ung'
+import { anMung, banHat, KHOA_AM_AN_MUNG, kichRuong, napAnMung, napTruocAnMung, yenLang } from '../../lib/hieu-ung'
 import { docNhoTuSua, ngheTuSua } from '../../lib/tu-sua-loi'
 // Việc hôm nay NẠP ĐỘNG qua mảnh ManTuChua (đã là điểm nạp lười, có trong precache, Lộ trình nạp sẵn lúc rảnh): nhập tĩnh / nạp thẳng tu-sua-viec-hom-nay làm
 // Rolldown tách chua-truc-tiep thành tệp riêng (+1 tệp precache, trần 170).
@@ -428,7 +428,12 @@ function DuongChang({ ds, moDi, cam, moKhoa, cap = 0, onLuaO }: { ds: Nut[]; moD
       const moR = moThe?.k === 'ruong', duR = soXong === soChang
       return i === giua ? [o, <li key="ruong" className="da-ruong" data-mo={duR || undefined} style={{ '--x': `${LECH[(i + 1) % LECH.length]! <= 0 ? -56 : 56}px` } as CSSProperties}>
         <button type="button" className="da-ruong-nut" aria-label="Rương hôm nay" aria-haspopup="dialog" aria-expanded={moR} aria-controls={moR ? 'da-pop-ruong' : undefined}
-          onClick={(e) => bam('ruong', e.currentTarget)}><Ruong /></button>
+          onClick={(e) => {
+            const nut = e.currentTarget
+            bam('ruong', nut)
+            // 🎁 MỞ RƯƠNG (bộ hiệu ứng ăn mừng, thầy chốt 02/11): rương đã sáng (xong cả các chặng hôm nay) + em chạm ⇒ lắc lấy đà, nắp bật, tia sáng, tia lửa (máy yếu: bản gọn)
+            if (!moR && kichRuong({ duMo: duR, cham: true })) anMung('ruong', { goc: nut, nap: nut.querySelector('.rg-nap'), rung: true })
+          }}><Ruong /></button>
         {moR && <TheNut id="da-pop-ruong" sac="sao" mo={moThe!.el} onDong={dongThe} pop={{ tieu: 'Rương hôm nay',
           phu: duR ? `Em đã xong cả ${soChang} chặng hôm nay, rương đã sáng!` : `Rương sáng lên khi em xong cả ${soChang} chặng hôm nay · còn ${soChang - soXong} chặng` }} />}
       </li>] : o
@@ -747,6 +752,9 @@ export function MotTrangHs(p: PropsMotTrang) {
     window.addEventListener(SU_KIEN_MO_CHUOI, mo)
     return () => window.removeEventListener(SU_KIEN_MO_CHUOI, mo)
   }, [])
+  // TẢI SẴN bộ hiệu ứng ăn mừng (thầy 02/11 «tải luôn hiệu ứng sẵn cho máy yếu»): Lộ trình đã hiện ⇒ nạp mảnh hiệu ứng lúc trình duyệt rảnh (kho chạy-lúc,
+  // không cộng byte lượt mở) ⇒ vào làm câu / mở rương là chạy tức thì.
+  useEffect(() => { napTruocAnMung() }, [])
   // Thành tích mở ⇒ gọi sẵn giải + bạn + huy hiệu (song song) để bấm ô là có số.
   useEffect(() => { if (p.muc === 'ket-qua' && p.token) napSanThanhTich(p.token) }, [p.muc, p.token])
   const moTp = (man: TenManThuong) => setTp({ man })
@@ -1092,12 +1100,15 @@ const cham = () => { void import('../../lib/phan-hoi').then((m) => m.phanHoi('ch
 
 /** Công tắc phản hồi ở menu (thầy 26/10): «Âm thanh» / «Rung» Bật–Tắt — chỉ đọc/ghi localStorage ('ddh.am' / 'ddh.rung' = 'tat' khi tắt); tiếng và rung
  *  ở mảnh màn luyện tự đọc khoá này (không kéo am-thanh / rung vào nhóm mở app). Mặc định bật. */
-function CongTac({ khoa, ten, Icon, sac }: { khoa: 'ddh.am' | 'ddh.rung'; ten: string; Icon: (p: { size?: number }) => ReactNode; sac: string }) {
-  const [bat, setBat] = useState(() => { try { return localStorage.getItem(khoa) !== 'tat' } catch { return true } })
+function CongTac({ khoa, ten, Icon, sac }: { khoa: 'ddh.am' | 'ddh.rung' | typeof KHOA_AM_AN_MUNG; ten: string; Icon: (p: { size?: number }) => ReactNode; sac: string }) {
+  // «Tiếng ăn mừng» (bộ hiệu ứng ăn mừng 02/11): MẶC ĐỊNH TẮT — chỉ 'bat' mới kêu; hai công tắc cũ mặc định bật ('tat' khi tắt).
+  const tatSan = khoa === KHOA_AM_AN_MUNG
+  const [bat, setBat] = useState(() => { try { return tatSan ? localStorage.getItem(khoa) === 'bat' : localStorage.getItem(khoa) !== 'tat' } catch { return !tatSan } })
   return <button type="button" role="switch" aria-checked={bat} className="tr-menu-muc tr-menu-cong" onClick={() => {
     const v = !bat
     setBat(v)
-    try { if (v) localStorage.removeItem(khoa); else localStorage.setItem(khoa, 'tat') } catch { /* máy chặn lưu: chỉ đổi trong phiên này */ }
+    try { if (tatSan) { if (v) localStorage.setItem(khoa, 'bat'); else localStorage.removeItem(khoa) } else if (v) localStorage.removeItem(khoa); else localStorage.setItem(khoa, 'tat') } catch { /* máy chặn lưu: chỉ đổi trong phiên này */ }
+    if (v && tatSan) void napAnMung().then((m) => m?.thuTieng(), () => {}) // kêu thử một tiếng chuông ngắn
     // 27/10: bật «Rung» ⇒ rung thử ngay một nhịp để em (và thầy) biết máy rung được.
     if (v && khoa === 'ddh.rung') try { (navigator as Navigator & { vibrate?: (m: number) => boolean }).vibrate?.(80) } catch { /* máy không rung được */ }
     // bật «Âm thanh» ⇒ kêu thử tiếng chọn (rung không gọi: phanHoi nạp lười sẽ đè nhịp rung thử ở trên).
@@ -1200,6 +1211,7 @@ export function MenuDocTrong(p: {
         <div className="tr-menu-cai-dau"><button ref={nutLui} type="button" className="tr-menu-lui" onClick={chon(() => setCai(false))} aria-label="Quay lại menu"><MuiTrai size={22} /></button><b id="tr-menu-cai-ten">Cài đặt</b></div>
         <CongTac khoa="ddh.am" ten="Âm thanh" Icon={Volume2} sac="tin" />
         <CongTac khoa="ddh.rung" ten="Rung" Icon={Vibrate} sac="chu-y" />
+        <CongTac khoa={KHOA_AM_AN_MUNG} ten="Tiếng ăn mừng" Icon={Sparkles} sac="sao" />
         <hr className="tr-menu-vach" />
         <button type="button" className="tr-menu-muc" onClick={chon(() => { dong(true); p.onTaiLai() })} disabled={p.dangTai}><span className="tr-menu-o" data-sac="chinh" aria-hidden="true"><RefreshCw size={20} /></span>Cập nhật bài học</button>
         <button ref={p.nutCuaEm} type="button" className="tr-menu-muc" onClick={chon(() => { dong(false); p.onCuaEm() })} aria-haspopup="dialog" aria-expanded={p.moCuaEm}><span className="tr-menu-o tr-menu-anh" aria-hidden="true">{p.chuDau}</span>Của em</button>
