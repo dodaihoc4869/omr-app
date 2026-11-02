@@ -95,3 +95,5 @@ Giữ luật v3b (ngày đủ mức bằng câu làm thật, làm cho có ≤ 10
 - **B:** giữ hai nhãn như v3b (mọi em đều có nhãn). Em thiếu sự kiện trên lớp xếp theo hành vi, ghi thêm «(chưa kiểm trên lớp)». Khi đó nhóm Đối phó KHÔNG còn 100%.
 
 Mọi thứ khác (ngưỡng, trọng số, chỗ đặt) em tự quyết khi build.
+
+> **Cập nhật 14:55.** Phiên Code app 1 chuyển lời thầy (14:50): «sử dụng toàn bộ số đo có sẵn ở mọi chỗ mọi lớp … bắt buộc xếp hs vào 4 nhóm … chính xác tới 99%» ⇒ nghiêng về **B** (em nào cũng có nhãn). Nếu chọn B, bộ đo vẫn làm phần cốt lõi của A: Đối phó ưu tiên sự kiện trên lớp, kèm ghi rõ em nào «chưa kiểm trên lớp». Bộ đo thêm các số đo đang có mà chưa dùng: điểm danh `buoi_hoc_diem_danh`, bài về nhà `btvn_em` (đúng hạn / trễ / không nộp), kiểm tra ôn tập nộp/hạn, tự luyện bỏ dở, mã máy `doc.tb`. Đếm lúc 14:54: 271/272 em đang học đã có bản tính hôm nay (sót 1 em), không lớp nào bị bỏ.
