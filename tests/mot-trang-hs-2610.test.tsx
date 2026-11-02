@@ -134,7 +134,9 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
       expect(a.container.querySelector('.kb-hero > .kb-mol .bi-loi-bong')).not.toBeNull()
       a.unmount()
       const c = render(<MotTrangHs {...goc({ so: { daLam: 30, muc: 30, chang: 5, soChang: 5 } as PropsMotTrang['so'] })} />)
-      expect(c.container.querySelector('.kb-mol .bi-loi-bong .ht2-an')!.textContent).toMatch(/^(?:Đủ mức rồi!|«)/) // lời vui; 1/3 lượt vui là chân ngôn «…» (thầy 01/11 tối)
+      const bb = c.container.querySelector<HTMLElement>('.kb-mol .bi-loi-bong')!, chu = bb.querySelector('.ht2-an')!.textContent!
+      expect(chu.startsWith('Đủ mức rồi!') || bb.hasAttribute('data-chan-ngon')).toBe(true) // lời vui; 1/3 lượt vui là chân ngôn (chữ nghiêng)
+      expect(chu).not.toMatch(/^«|»$/) // thầy 03/11 «Bỏ dấu << ở hai đầu bong bóng của mol»
     } finally { vi.useRealTimers() }
   })
   it('lời Bi trọn câu (soát 27/10: ảnh chụp lúc đang gõ trông «cụt» ở chữ «là»): câu đủ ý và gõ xong trong ≤ 0,7 s', () => {

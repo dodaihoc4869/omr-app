@@ -1121,7 +1121,8 @@ export function MotTrangHs(p: PropsMotTrang) {
   const loiLuaBi0: [CamBi, string, string] | null = loiCap && kLua ? [kLua.cap === 0 ? 'vui' : loiBi?.[0] ?? 'chao', loiCap, `lua${kLua.cap}-${kLua.lyDo}`] : loiBi
   // CHÂN NGÔN (thầy 01/11 tối «lúc nào vui vẻ thêm các câu chân ngôn chân lý»): lời VUI (vui · mừng) ⇒ 1/3 lượt thay bằng chân ngôn nguyên văn, đặt trong «»
   const cn = loiLuaBi0 && (loiLuaBi0[0] === 'vui' || loiLuaBi0[0] === 'mung') && so ? chanNgon(soLuot(so.daLam, tLua)) : null
-  const loiLuaBi: [CamBi, string, string] | null = cn && loiLuaBi0 ? [loiLuaBi0[0], `«${cn}»`, `${loiLuaBi0[2]}-cn`] : loiLuaBi0
+  // thầy 03/11 «Bỏ dấu << ở hai đầu bong bóng của mol đi nhé»: chân ngôn không còn «…» (vẫn nghiêng — data-chan-ngon)
+  const loiLuaBi: [CamBi, string, string] | null = cn && loiLuaBi0 ? [loiLuaBi0[0], cn, `${loiLuaBi0[2]}-cn`] : loiLuaBi0
 
   // Bi đứng cạnh đường (bản vẽ nâng cấp 27/10) khi đường có ≥ 2 chặng ⇒ lời Bi phía trên chỉ còn bong bóng (không hai Bi).
   // 01/11 tối (thầy «chữ hiện bong bóng trên đầu Mol»): có Mol cạnh đường + lời theo cấp ⇒ bong bóng TRÊN ĐẦU Mol ở mọi hướng màn (thay thẻ riêng ở trên)
