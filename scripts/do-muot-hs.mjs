@@ -10,6 +10,8 @@
 //   5. Làm 7 câu (--so-cau): bấm phương án (phản hồi = Event Timing: từ chạm tới khung vẽ kế), «Kiểm tra» → dải kết quả, «Tiếp tục» → câu kế (chuyển câu);
 //      khung trong 1,5 s hiệu ứng thưởng; tác vụ dài > 100 ms khi bấm.
 //   node scripts/do-muot-hs.mjs --dist=dist [--cpu=6] [--mang=fast3g|slow3g] [--may-chu-ms=60] [--yeu=1|0] [--ra=kq.json]
+//   --sw=1 (02/11): BẬT service worker, giả mạng ở máy chủ (đường truyền chung) ⇒ đo tải ngầm kho mảnh học sinh (lib/nap-truoc-kho-hs.ts): băng thông 30 s đầu,
+//   số mảnh cùng tải, kho chạy-lúc có đủ mảnh chưa. Chẩn đoán thêm: --an-gt=1 (ẩn hình giám thị) · --them-css=<luật> · --chup=<ảnh.jpg> (màn câu đầu).
 // Chẩn đoán: --ho-so=bamPa|kiem|tiep (CPU profile câu 2: hàm tốn nhất + ai gọi getBoundingClientRect/removeChild/setAttribute) · --vet-tl=1|2|3 (3 = kèm ngăn xếp lời gọi ép tính kiểu; vết Chrome:
 //   tính kiểu / bố cục lớn + lý do mất hiệu lực kiểu) · --ghi-vet=<tệp.json> · --chon-loc=1 (thống kê bộ chọn CSS) · --thu-css=1 (một lượt tính kiểu
 //   cả trang tốn bao nhiêu, bỏ từng tờ CSS / ẩn giám thị / ẩn Lộ trình) · --kham=1 (ai gọi rAF) · --vet=1 (in từng yêu cầu) · --chup-loi=<ảnh.jpg>.
@@ -30,20 +32,37 @@ const arg = (ten, mac) => process.argv.find((a) => a.startsWith(`--${ten}=`))?.s
 const DIST = resolve(arg('dist', 'dist'))
 const CPU = Number(arg('cpu', '6'))
 const MANG = arg('mang', 'fast3g')
+// --sw=1 (02/11, đo tải ngầm #752): BẬT service worker. DevTools giả mạng (CDP) chỉ áp cho TRANG, không áp cho yêu cầu service worker tự đi ⇒ ở chế độ này
+// giả mạng ở MÁY CHỦ: mọi phản hồi (trang tĩnh + máy chủ app) chờ RTT rồi CHIA ĐỀU một đường truyền chung (Fast 3G / Slow 3G) ⇒ tải ngầm giành băng thông thật.
+const SW = arg('sw', '') === '1'
 const YEU = arg('yeu', CPU >= 6 ? '1' : '0') === '1'
 const RA = arg('ra', '')
 const MAY_CHU_MS = Number(arg('may-chu-ms', '60'))
 // Luồng NDJSON (chấm nhanh «Kiểm tra» 28/10): dòng 1 đi sau DONG1_MS, dòng cuối sau MAY_CHU_MS (máy chủ giả: dòng 1 = chấm từ bộ nhớ, dòng cuối = sau các đợt D1).
 const DONG1_MS = Number(arg('dong1-ms', '10'))
 const MAN = { width: 360, height: 740 }
-const MANG_GIA = {
+const MANG_GIA_DS = {
   // DevTools «Fast 3G» (= «Slow 4G» của Lighthouse): 562,5 ms RTT, 1,44 Mb/s xuống.
   fast3g: { offline: false, latency: 562.5, downloadThroughput: (1.6 * 1024 * 1024 * 0.9) / 8, uploadThroughput: (750 * 1024 * 0.9) / 8 },
   // DevTools «Slow 3G»: 2 000 ms RTT, 400 kb/s xuống.
   slow3g: { offline: false, latency: 2000, downloadThroughput: (500 * 1024 * 0.8) / 8, uploadThroughput: (500 * 1024 * 0.8) / 8 },
   // Không giả mạng (đo phần MÁY CHỦ + MÁY: DevTools giả mạng giữ thân phản hồi theo luồng tới khi đủ khối ⇒ không đo được dòng 1 của NDJSON).
   khong: { offline: false, latency: 0, downloadThroughput: -1, uploadThroughput: -1 },
-}[MANG]
+}
+const MANG_GIA = SW ? MANG_GIA_DS.khong : MANG_GIA_DS[MANG]
+const DUONG = MANG_GIA_DS[MANG]
+// Đường truyền chung (chỉ khi --sw=1): mỗi phản hồi chờ RTT rồi vào hàng; mỗi 10 ms chia đều băng thông cho các phản hồi đang truyền.
+const NHAT_KY_MANG = []
+const dangTruyen = new Set()
+setInterval(() => {
+  if (!dangTruyen.size) return
+  const phan = (DUONG.downloadThroughput * 0.01) / dangTruyen.size
+  for (const x of [...dangTruyen]) { x.con -= phan; if (x.con <= 0) { dangTruyen.delete(x); NHAT_KY_MANG.push({ t: Date.now(), bd: x.bd, duong: x.duong, n: x.n }); x.xong() } }
+}, 10).unref()
+function guiQuaDuong(duong, n, gui) {
+  if (!SW || DUONG.downloadThroughput < 0) { NHAT_KY_MANG.push({ t: Date.now(), duong, n }); return gui() }
+  setTimeout(() => dangTruyen.add({ duong, n, bd: Date.now(), con: Math.max(1, n), xong: gui }), DUONG.latency)
+}
 
 function timChromium() {
   if (process.env.PW_CHROMIUM) return process.env.PW_CHROMIUM
@@ -90,8 +109,7 @@ const may = createSecureServer({ ...chungChi(), allowHTTP1: true }, async (req, 
     }
     const than = laLuong ? tl.__ndjson.map((x) => JSON.stringify(x)).join('\n') + '\n' : JSON.stringify(tl)
     await new Promise((ok) => setTimeout(ok, MAY_CHU_MS))
-    res.writeHead(200, { ...cors, 'content-type': laLuong ? 'application/x-ndjson' : 'application/json' })
-    return res.end(than)
+    return guiQuaDuong('api' + u.pathname, Buffer.byteLength(than), () => { res.writeHead(200, { ...cors, 'content-type': laLuong ? 'application/x-ndjson' : 'application/json' }); res.end(than) })
   }
   res.writeHead(404); res.end()
 }).listen(0, '127.0.0.1')
@@ -103,7 +121,8 @@ const mayTinh = createServer((req, res) => {
   let b = dem.get(p)
   if (!b) dem.set(p, (b = { tho: readFileSync(p), gz: NEN.has(ext) ? gzipSync(readFileSync(p), { level: 9 }) : null }))
   const h = { 'content-type': LOAI[ext] || 'application/octet-stream', 'cache-control': u.pathname.startsWith('/assets/') ? 'public, max-age=31536000, immutable' : 'no-cache' }
-  if (b.gz && /gzip/.test(req.headers['accept-encoding'] || '')) { res.writeHead(200, { ...h, 'content-encoding': 'gzip' }); res.end(b.gz) } else { res.writeHead(200, h); res.end(b.tho) }
+  const nen = b.gz && /gzip/.test(req.headers['accept-encoding'] || '')
+  guiQuaDuong(u.pathname, (nen ? b.gz : b.tho).length, () => { if (nen) { res.writeHead(200, { ...h, 'content-encoding': 'gzip' }); res.end(b.gz) } else { res.writeHead(200, h); res.end(b.tho) } })
 }).listen(0, '127.0.0.1')
 await new Promise((ok) => may.once('listening', ok))
 if (!mayTinh.listening) await new Promise((ok) => mayTinh.once('listening', ok))
@@ -272,7 +291,7 @@ async function cuon(p, cdp, ms = 4000, y = MAN.height / 2) {
 }
 
 async function moMay(trinh, { yeu }) {
-  const ctx = await trinh.newContext({ viewport: MAN, screen: MAN, deviceScaleFactor: 2, isMobile: true, hasTouch: true, serviceWorkers: 'block', ignoreHTTPSErrors: true, locale: 'vi-VN', timezoneId: 'Asia/Ho_Chi_Minh',
+  const ctx = await trinh.newContext({ viewport: MAN, screen: MAN, deviceScaleFactor: 2, isMobile: true, hasTouch: true, serviceWorkers: SW ? 'allow' : 'block', ignoreHTTPSErrors: true, locale: 'vi-VN', timezoneId: 'Asia/Ho_Chi_Minh',
     userAgent: 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36' })
   await ctx.addInitScript(DO_TRONG_TRANG)
   // --theo-css=1: ghi mốc chèn / nạp xong từng tờ CSS (mỗi tờ mới = một lượt tính kiểu cả trang)
@@ -283,6 +302,12 @@ async function moMay(trinh, { yeu }) {
       n.addEventListener?.('load', () => { r[2] = Math.round(performance.now()) })
     } }).observe(document, { childList: true, subtree: true })
   })
+  // --sw=1: mạng giả ở máy chủ ⇒ navigator.connection của trình duyệt không biết ⇒ báo «3g» (máy em 3G vẫn tải ngầm — trường hợp xấu nhất).
+  if (SW) await ctx.addInitScript(() => { try { Object.defineProperty(NetworkInformation.prototype, 'effectiveType', { get: () => '3g', configurable: true }) } catch {} })
+  // --an-gt=1 (chẩn đoán): ẩn hình giám thị (bộ máy vẫn chạy) ⇒ tách phần vẽ giám thị khỏi phần còn lại.
+  if (arg('an-gt', '')) await ctx.addInitScript(() => { const st = document.createElement('style'); st.textContent = '.gtm, .gtv { display: none !important; }'; (document.head || document.documentElement).appendChild(st) })
+  // --them-css=<luật> (chẩn đoán): chèn thêm CSS vào mọi trang ⇒ thử một cách vẽ khác mà không dựng lại bản build.
+  if (arg('them-css', '')) await ctx.addInitScript((css) => { const st = document.createElement('style'); st.textContent = css; const g = () => (document.head || document.documentElement).appendChild(st); if (document.head) g(); else document.addEventListener('DOMContentLoaded', g) }, arg('them-css', ''))
   await ctx.addInitScript((yeu) => {
     Object.defineProperty(Navigator.prototype, 'deviceMemory', { get: () => (yeu ? 2 : 8), configurable: true })
     Object.defineProperty(Navigator.prototype, 'hardwareConcurrency', { get: () => (yeu ? 4 : 8), configurable: true })
@@ -327,6 +352,7 @@ try {
     await cham(p, 're=^Đăng nhập$')
     const tLt = await choThay(p, LO_TRINH)
     await p.waitForTimeout(6000)
+    if (SW) { const t = Date.now(); await p.evaluate(() => navigator.serviceWorker.ready.then(() => 1)); kq.swSanSangMs = Date.now() - t + 6000; await p.waitForTimeout(1000) }
     const d = await layDo(p)
     kq.moDau = { fcp: d.fcp, dangNhapHien: Math.round(tDn), taiToiDangNhap: taiDn, bamDangNhapToiLoTrinh: Math.round(tLt - t0), ttiSauDangNhap: Math.round(tti(d.dai, tLt) - t0), taiTong: await taiTheoLoai(p) }
     await p.close()
@@ -334,6 +360,7 @@ try {
   buoc('mo-lai')
   // 2. Mở lại (đã đăng nhập, đệm HTTP ấm)
   const { p, cdp } = await trangMoi(ctx, loi)
+  const tMoLai = Date.now()
   {
     await batHoSo(cdp, 'molai')
     await p.goto(goc + '/hs', { waitUntil: 'commit' })
@@ -375,6 +402,7 @@ try {
     kq.vaoChang = { theChangMs: theMs, chuyenMs: Math.round(t1 - tBam), inp: inpTu(d.sk, t0), taskMax: daiNhat(d.dai, t0) }
   }
   // 5. Làm câu
+  if (arg('chup', '')) await p.screenshot({ path: arg('chup', ''), type: 'jpeg', quality: 45 })
   kq.lamCau = { ...(await dungYen(p)) }
   // --heap=1: bộ nhớ JS + số nút DOM / trình nghe (CDP) — máy yếu RAM ít ⇒ đống lớn = dọn rác lớn giữa lượt chạm
   const doHeap = async (ten) => { if (!arg('heap', '')) return; const h = await cdp.send('Runtime.getHeapUsage'); const d = await cdp.send('Memory.getDOMCounters').catch(() => ({}));
@@ -467,12 +495,41 @@ try {
   const lon = (f) => Math.max(...cau.map(f))
   const giua = (f) => { const s = cau.map(f).sort((a, b) => a - b); return s[Math.floor(s.length / 2)] }
   await doHeap('sau các câu')
+  if (SW) {
+    // Băng thông 30 s đầu sau khi mở lại: tổng / phần tải ngầm (mảnh trong kho-hs.json mà trang không tự xin) — đếm ở máy chủ.
+    // Bản chưa có tải ngầm (không kho-hs.json): soát cùng nhóm mảnh hiệu ứng / giám thị / Mol trong dist/assets.
+    const coKho = existsSync(join(DIST, 'kho-hs.json'))
+    const kho = coKho ? JSON.parse(readFileSync(join(DIST, 'kho-hs.json'), 'utf8')).ds || [] : readdirSync(join(DIST, 'assets')).filter((x) => /^(hieu-ung|GiamThi|giam-thi|mol-dong)/.test(x)).map((x) => 'assets/' + x)
+    const trongKho = new Set(kho.map((x) => '/' + x))
+    const cua = (a, b) => NHAT_KY_MANG.filter((x) => x.t >= tMoLai + a && x.t < tMoLai + b)
+    const tong = (ds) => Math.round(ds.reduce((s, x) => s + x.n, 0) / 1024)
+    kq.taiNgam = { tong30sKB: tong(cua(0, 30000)), kho30sKB: tong(cua(0, 30000).filter((x) => trongKho.has(x.duong))), tep30s: cua(0, 30000).length, kho30sTep: cua(0, 30000).filter((x) => trongKho.has(x.duong)).length,
+      tong5_30sKB: tong(cua(5000, 30000)), khoTong: kho.length,
+      // tải ngầm có thật «mỗi lần một mảnh»? số mảnh kho cùng đang truyền lớn nhất (theo mốc bắt đầu / xong ở đường truyền giả)
+      // phía trang: các lệnh fetch (bộ tải ngầm; mảnh app tự nạp là script/link) tới mảnh trong kho — chồng lấn [bắt đầu, nhận xong] lớn nhất
+      khoCungLucTrang: await p.evaluate((kho) => { const k = new Set(kho); const ds = performance.getEntriesByType('resource').filter((e) => e.initiatorType === 'fetch' && k.has(new URL(e.name).pathname)).map((e) => [e.startTime, e.responseEnd]); let m = 0; for (const [a] of ds) m = Math.max(m, ds.filter(([b, c]) => b <= a && c > a).length); return { soFetch: ds.length, max: m } }, [...trongKho]),
+      khoCungLucMayChu: (() => { const ds = NHAT_KY_MANG.filter((x) => x.bd >= tMoLai + 5000 && trongKho.has(x.duong)); let m = 0; for (const a of ds) m = Math.max(m, ds.filter((b) => b.bd <= a.bd && b.t > a.bd).length); return m })(), controller: await p.evaluate(() => !!navigator.serviceWorker.controller) }
+    // Chờ tải ngầm xong (≤ 120 s), rồi soát kho chạy-lúc: mảnh hiệu ứng / giám thị / Mol có sẵn chưa.
+    const soat = () => p.evaluate(async (kho) => {
+      const co = new Set()
+      for (const ten of await caches.keys()) for (const r of await (await caches.open(ten)).keys()) co.add(new URL(r.url).pathname.replace(/^\//, ''))
+      const thieu = kho.filter((x) => !co.has(x))
+      const nhom = (re) => { const ds = kho.filter((x) => re.test(x)); return `${ds.filter((x) => co.has(x)).length}/${ds.length}` }
+      const chayLan = (await (await caches.open('omr-manh-chay-lan')).keys()).length
+      return { coTrongKho: kho.length - thieu.length, thieu: thieu.length, mauThieu: thieu.slice(0, 6), chayLan, hieuUng: nhom(/assets\/hieu-ung/), giamThi: nhom(/assets\/(GiamThi|giam-thi)/), mol: nhom(/assets\/mol-dong/) }
+    }, kho)
+    const tCho = Date.now(); let s = await soat()
+    while (coKho && s.thieu > 0 && Date.now() - tCho < 120000) { await p.waitForTimeout(5000); s = await soat() }
+    kq.taiNgam.kho = { ...s, choThemMs: Date.now() - tCho }
+    kq.taiNgam.tongToiXongKB = tong(NHAT_KY_MANG.filter((x) => x.t >= tMoLai))
+  }
   kq.tom = {
     moLaiChamDuoc: kq.moLai.chamDuoc, moLaiNoiDung: kq.moLai.noiDung, moDauTaiKB: kq.moDau.taiTong,
     loTrinhCuonP95: kq.loTrinh.cuon.p95, loTrinhCuonTren50: kq.loTrinh.cuon.tren50, loTrinhYenP95: kq.loTrinh.khungYen.p95, rafNen: kq.loTrinh.rafGiay, nutDom: kq.loTrinh.nutDom, voHan: kq.loTrinh.voHan,
     lamCauYenP95: kq.lamCau.khungYen.p95, lamCauCuonP95: kq.lamCau.cuon.p95, lamCauRaf: kq.lamCau.rafGiay, lamCauNutDom: kq.lamCau.nutDom,
     bamPaInpMax: lon((m) => m.bamPa.inp), bamPaXuLyMax: lon((m) => m.bamPa.xuLy), tiepXuLyMax: lon((m) => m.tiep.xuLy), kiemXuLyMax: lon((m) => m.kiemTra.xuLy), bamPaInpGiua: giua((m) => m.bamPa.inp), kiemInpMax: lon((m) => m.kiemTra.inp), tiepInpMax: lon((m) => m.tiep.inp),
     chuyenCauGiua: giua((m) => m.tiep.chuyenCau), chuyenMan: kq.vaoChang.chuyenMs, hieuUngP95Max: lon((m) => m.kiemTra.khungHieuUng.p95),
+    ...(kq.taiNgam ? { taiNgam30sKB: kq.taiNgam.kho30sKB, tong30sKB: kq.taiNgam.tong30sKB, khoCo: `${kq.taiNgam.kho.coTrongKho}/${kq.taiNgam.khoTong}` } : {}),
     taskBamMax: Math.max(lon((m) => m.bamPa.taskMax), lon((m) => m.tiep.taskMax), lon((m) => m.kiemTra.taskMax), kq.vaoChang.taskMax),
   }
   await ctx.close()

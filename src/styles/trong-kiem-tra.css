@@ -316,6 +316,28 @@
 [data-trong='hs'] .kt-den-vung { width: 100px; height: 100px; transform-origin: 0 0; border-radius: 50%; background: radial-gradient(closest-side, var(--kt-den-vung) 0%, var(--kt-den-vung) 42%, transparent 100%); }
 [data-trong='hs'] .kt-den-goc { width: 48px; height: 48px; border-radius: 50%; background: radial-gradient(closest-side, var(--kt-den-goc) 0%, transparent 100%); }
 
+/* 5c+ ĐÈN PHA MỊN (thầy 02/11: «chỉnh hiệu ứng soi đèn cho mượt mà tinh tế, hiện tại nhìn bị giả khi soi vào đáp án»): tia cũ là nêm vàng
+ * đặc, mép cứng, đậm đều tới tận giữa ô ⇒ như miếng giấy dán. Đèn thật: tia trong không khí RẤT nhạt, sáng nhất sát kính đèn, tan dần theo chiều dài
+ * và mép ngang mềm; ánh sáng dồn vào VŨNG trên ô được soi, loang ra viền. Chỉ đè lớp vẽ (den-soi.ts giữ nguyên: transform + opacity). */
+[data-trong='hs'] .kt-den {
+  --kt-den-tia: color-mix(in srgb, var(--tr-sao) 22%, transparent); --kt-den-loi: color-mix(in srgb, var(--tr-sao) 38%, transparent);
+  --kt-den-vien: color-mix(in srgb, var(--tr-sao) 7%, transparent); --kt-den-vung: color-mix(in srgb, var(--tr-sao) 30%, transparent);
+}
+[data-trong='hs'] .kt-den-tia {
+  background: conic-gradient(from 63.4deg at 0 50%, transparent 0deg, var(--kt-den-vien) 7deg, var(--kt-den-tia) 15deg, var(--kt-den-loi) 26.6deg,
+    var(--kt-den-tia) 38deg, var(--kt-den-vien) 46deg, transparent 53.2deg, transparent 360deg);
+  -webkit-mask-image: linear-gradient(90deg, var(--tr-chu) 0%, color-mix(in srgb, var(--tr-chu) 82%, transparent) 30%, color-mix(in srgb, var(--tr-chu) 48%, transparent) 72%, color-mix(in srgb, var(--tr-chu) 22%, transparent) 100%);
+  mask-image: linear-gradient(90deg, var(--tr-chu) 0%, color-mix(in srgb, var(--tr-chu) 82%, transparent) 30%, color-mix(in srgb, var(--tr-chu) 48%, transparent) 72%, color-mix(in srgb, var(--tr-chu) 22%, transparent) 100%);
+}
+[data-trong='hs'] .kt-den-vung { background: radial-gradient(closest-side, var(--kt-den-vung) 0%, var(--kt-den-vung) 38%, var(--kt-den-tia) 66%, var(--kt-den-vien) 84%, transparent 100%); }
+[data-trong='hs'] .kt-den-goc { background: radial-gradient(closest-side, var(--kt-den-goc) 0%, var(--kt-den-loi) 38%, var(--kt-den-vien) 70%, transparent 100%); }
+@media (prefers-color-scheme: dark) {
+  /* nền tối: ánh sáng CỘNG vào mặt ô (screen) ⇒ sáng lên như đèn thật, không phủ một lớp vàng đục */
+  [data-trong='hs'] .duo-kt-than > .kt-den { mix-blend-mode: screen; }
+  [data-trong='hs'] .kt-den { --kt-den-tia: color-mix(in srgb, var(--tr-sao) 18%, transparent); --kt-den-loi: color-mix(in srgb, var(--tr-sao) 32%, transparent);
+    --kt-den-vien: color-mix(in srgb, var(--tr-sao) 5%, transparent); --kt-den-vung: color-mix(in srgb, var(--tr-sao) 28%, transparent); }
+}
+
 /* 5d. Tấm «Nộp bài?»: Giáo sư Kíp thay Bi (đèn bật). */
 [data-trong='hs'] .duo-kt-nop-bi[data-gt] { width: 104px; line-height: 0; }
 
@@ -428,3 +450,33 @@
 }
 [data-trong='hs'].may-yeu .duo-kt-thi[data-tap-trung] > .duo-kt-tren.duo-tren { transition: none; }
 [data-trong='hs'].may-yeu .duo-kt-bao-vien { animation-name: duo-kt-bao-mo; }
+/* ═══ HỆ KÍNH — TỰ SINH bởi scripts/tao-kinh-css.py (thầy chốt 02/11). Đừng sửa tay: sửa bộ sinh rồi chạy lại. ═══ */
+[data-trong='hs'] .duo-kt-tren.duo-tren { background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-nut-luoi { border-bottom-width: 2px; background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-truoc { border-bottom-width: 2px; background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-tam { background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-chu-giai i { background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-o { border-bottom-width: 2px; background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-tam-nop { background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-nop-ds button { border-bottom-width: 2px; background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-nut-phu { border-bottom-width: 2px; background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-trang { background: var(--kinh-mat) !important; }
+[data-trong='hs'] .duo-kt-thi { background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-thi > .sticky { background: var(--kinh-mat); }
+[data-trong='hs'] .m3.duo-kt-trang .duo-kt-thi .the-cau .pa-hang { border-bottom-width: 2px !important; background: var(--kinh-mat) !important; }
+[data-trong='hs'] .m3.duo-kt-trang .duo-kt-thi .the-cau .y-hang { background: var(--kinh-mat) !important; }
+[data-trong='hs'] .m3.duo-kt-trang .duo-kt-thi .the-cau .y-nut button:is(:first-of-type, :nth-of-type(2)) { border-bottom-width: 2px !important; background: var(--kinh-mat) !important; }
+[data-trong='hs'] .duo-kt-thi .bns-o { border-bottom-width: 2px; background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-thi .bns-phim button { border-bottom-width: 2px; background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-than[data-gt] .the-cau .cau-de { background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-than[data-gt] .the-cau .cau-de::before { background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-than > .kt-gt[data-l] { background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-than > .kt-gt[data-l]::after { background: var(--kinh-mat); }
+[data-trong='hs'] .duo-kt-bao-vien { background: var(--kinh-mat); }
+@media (orientation: landscape) and (max-height: 500px) { [data-trong='hs'] .duo-kt-thi > .duo-day .duo-kt-hang { background: var(--kinh-mat); } }
+/* ═══ HẾT HỆ KÍNH TỰ SINH ═══ */
+
+/* RÀ SOÁT 02/11 (thầy «nút quá dài không tinh tế»): màn thi / Kiểm tra ôn tập khổ rộng — «Câu tiếp» thôi kéo dài cả hàng (652 px ở Z Fold mở) */
+@media (orientation: landscape) and (min-width: 640px), (min-width: 700px) and (min-aspect-ratio: 10/13) {
+  html[data-trong='hs'] .duo-kt-hang > .duo-nut { flex: 0 1 340px; margin-left: auto; }
+}

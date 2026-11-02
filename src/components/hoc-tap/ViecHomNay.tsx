@@ -10,7 +10,7 @@ import './viec-hom-nay.css'
 // Logic ở src/lib/tu-sua-viec-hom-nay.ts (thuần, có test). Màn này nạp lười cùng ManTuChua.
 
 // Tên trang chính trên nút «về» (Boss 27/10): giao diện Trong ⇒ «Lộ trình»; giao diện cũ ⇒ «Hôm nay». Viết tại chỗ: nhập mô-đun dùng chung sẽ đẻ mảnh tải riêng (+1 tệp mở app).
-const tenTrangChinh = (): string => (typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Lộ trình' : 'Hôm nay')
+const tenTrangChinh = (): string => (typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Hôm nay' : 'Hôm nay')
 
 export interface ThongTinDong { ten: string; phu: string; trangThai: string }
 interface Props {

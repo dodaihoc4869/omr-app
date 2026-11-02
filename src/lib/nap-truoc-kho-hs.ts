@@ -43,7 +43,11 @@ export function napTruocKhoHs(): void {
       try {
         if (await caches.match(url)) continue
         await hien(); await ranh(2000)
-        await fetch(url, { priority: 'low' } as RequestInit)
+        const r = await fetch(url, { priority: 'low' } as RequestInit)
+        // Danh sách lệch bản đang phục vụ (máy chủ trả trang HTML) ⇒ dừng, không tải phí.
+        if (/text\/html/i.test(r.headers.get('content-type') || '')) { void r.body?.cancel(); return }
+        // Đọc HẾT thân rồi mới sang mảnh kế ⇒ thật sự mỗi lần MỘT mảnh (fetch xong ở phần đầu, thân còn đang tải) — nhường băng thông cho thao tác của em.
+        await r.blob()
       } catch { /* mất mạng / lỗi: bỏ qua, lần sau thử lại */ }
     }
   })()

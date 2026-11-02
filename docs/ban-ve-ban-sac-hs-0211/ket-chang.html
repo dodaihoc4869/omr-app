@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="vi" data-trong="hs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kết chặng · xong chặng 3</title>
+<link rel="stylesheet" href="he.css"><link rel="stylesheet" href="lam.css">
+<style>
+  .ket { min-height: 100dvh; display: grid; grid-template-columns: minmax(0, 1fr); align-content: center; justify-items: center; gap: 18px; padding: 24px 16px; max-width: 520px; margin: 0 auto; }
+  .ket .mol-to { width: 150px; }
+  .ket h1 { font-size: 30px; font-weight: 800; text-align: center; line-height: 1.15; }
+  .ket .mo { text-align: center; }
+  .tk { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; }
+  .tk .o { width: 100%; height: auto; aspect-ratio: 1 / 1; border-radius: 22px; flex-direction: column; gap: 2px; padding-top: 6px; }
+  .tk .o b { font-size: 32px; font-weight: 800; line-height: 1; }
+  .tk .o span:last-child { font-size: 13px; font-weight: 700; text-align: center; line-height: 1.2; padding: 0 6px; }
+  .mach-ket { width: 100%; padding: 4px 6px; }
+  .mt-ket { display: flex; align-items: center; gap: 14px; width: 100%; }
+  .mt-ket > div:first-child { width: 112px; flex: none; }
+  .mt-ket b { font-size: 17px; font-weight: 800; display: block; }
+  .nut-ket { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+  @media (min-width: 700px) and (max-height: 600px) {
+    .ket { max-width: 900px; grid-template-columns: 220px minmax(0, 1fr); align-items: center; gap: 8px 28px; padding: 14px 24px; }
+    .ket .dau { grid-row: 1 / span 4; display: grid; justify-items: center; gap: 8px; }
+    .ket .mol-to { width: 120px; } .ket h1 { font-size: 24px; }
+    .tk .o { aspect-ratio: auto; height: 84px; } .tk .o b { font-size: 26px; }
+    .mt-ket > div:first-child { width: 84px; }
+    .nut-ket { flex-direction: row-reverse; } .nut-ket .nut { flex: 1; }
+  }
+  @media (min-width: 700px) and (min-height: 601px) { .ket { max-width: 560px; } }
+</style>
+</head><body data-mot-man>
+<main class="ket">
+  <div class="dau" style="display:grid;justify-items:center;gap:8px">
+    <div class="mol-to" data-mol="khen"></div>
+    <h1>Xong chặng 3!</h1>
+    <p class="mo">Amino acid (P1) · 6 câu trong 7 phút</p>
+  </div>
+  <div class="mach-ket mach-nho" role="img" aria-label="6 câu của chặng: 4 tự làm đúng, 1 có hỗ trợ, 1 sai"><i data-x></i><b data-x></b><i data-x="ho-tro"></i><b data-x></b><i data-x></i><b data-x></b><i data-x="sai"></i><b data-x></b><i data-x></i><b data-x></b><i data-x></i></div>
+  <div class="tk">
+    <span class="o" data-sac="hs" data-nhat><b>4</b><span>tự làm đúng</span></span>
+    <span class="o" data-sac="sao" data-nhat><b>1</b><span>có hỗ trợ</span></span>
+    <span class="o" data-sac="sai" data-nhat><b>1</b><span>cần sửa</span></span>
+  </div>
+  <section class="the mt-ket">
+    <div data-nguyen-tu data-da="18" data-muc="24"></div>
+    <div><b>Hôm nay 18/24 câu</b><span class="mo">Còn 6 câu nữa là đủ mức hôm nay.</span></div>
+  </section>
+  <div class="nut-ket">
+    <button class="nut" data-loai="chinh" data-rong>Học tiếp chặng 4</button>
+    <button class="nut" data-loai="chu" data-rong>Nghỉ và về Lộ trình</button>
+  </div>
+</main>
+<script src="ve.js"></script>
+</body></html>

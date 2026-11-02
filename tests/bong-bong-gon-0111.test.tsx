@@ -37,28 +37,22 @@ describe('hình học thuần', () => {
 })
 
 describe('Lộ trình: bong bóng co theo chữ', () => {
-  it('đo dòng dài nhất (Range) ⇒ đặt bề rộng ôm chữ, vị trí + đuôi theo bề rộng thật', () => {
-    // jsdom không dàn trang: giả hai dòng chữ dài 80 và 64 px
-    const goc = Range.prototype.getClientRects
-    Range.prototype.getClientRects = function () { return [{ left: 0, right: 80 }, { left: 0, right: 64 }] as unknown as DOMRectList }
-    try {
-      vi.useFakeTimers()
-      vi.setSystemTime(Date.UTC(2026, 9, 31, 3, 0))
-      const noop = () => {}
-      const p = {
-        so: { daLam: 12, muc: 30, chang: 3, soChang: 5 } as PropsMotTrang['so'], dangTai: false, tenBai: 'Ester – Lipid', viec: 'Hiểu · Chặng 3/5',
-        onHoc: noop, khoaHoc: false, hetCau: false, coCa: false, onThi: noop, soSua: 5, onChua: noop, ngayKiem: false, soBaiTap: 1, coBaiTap: true, onBaiTap: noop, ghi: [],
-      } as PropsMotTrang
-      const { container } = render(<MotTrangHs {...p} />)
-      const neo = container.querySelector<HTMLElement>('.da-lv-loi-o')!, bb = neo.querySelector<HTMLElement>('.bi-loi-bong')!
-      const cs = getComputedStyle(bb), dem = ['paddingLeft', 'paddingRight', 'borderLeftWidth', 'borderRightWidth'].reduce((t, k) => t + (parseFloat(cs[k as 'paddingLeft']) || 0), 0)
-      const w = Math.min(150, 80 + dem + 1) // dòng dài nhất 80 + đệm + viền (+1 px an toàn), tối đa bề rộng cho phép
-      expect(bb.style.width).toBe(`${w}px`)
-      expect(w).toBeLessThan(150) // ôm chữ, KHÔNG giãn hết bề rộng tối đa
-      const trai = parseFloat(neo.style.getPropertyValue('--trai')), duoi = parseFloat(neo.style.getPropertyValue('--duoi'))
-      expect(duoi).toBeGreaterThanOrEqual(DUOI_BIEN); expect(duoi).toBeLessThanOrEqual(w - DUOI_BIEN)
-      expect(Number.isFinite(trai)).toBe(true)
-    } finally { Range.prototype.getClientRects = goc }
+  it('hệ Kính: lời Mol ở thẻ lời (không chỗ neo trên đầu Mol) ⇒ không đặt bề rộng / vị trí đo tay; bong bóng co theo chữ bằng CSS (test CSS bên dưới)', () => {
+    // hệ Kính 02/11 (bản vẽ v2 thầy duyệt): con đường + Mol đứng cạnh đường đã bỏ ⇒ lời Mol ở THẺ LỜI riêng phía trên «Việc hôm nay» — không thể đè nút nào,
+    // nên logic né nút / thu thành «Mol nhắn» của chỗ neo trên đầu Mol không còn dùng. Kiểm hành vi của thẻ lời thay cho chỗ neo.
+    vi.useFakeTimers()
+    vi.setSystemTime(Date.UTC(2026, 9, 31, 3, 0))
+    const noop = () => {}
+    const p = {
+      so: { daLam: 12, muc: 30, chang: 3, soChang: 5 } as PropsMotTrang['so'], dangTai: false, tenBai: 'Ester – Lipid', viec: 'Hiểu · Chặng 3/5',
+      onHoc: noop, khoaHoc: false, hetCau: false, coCa: false, onThi: noop, soSua: 5, onChua: noop, ngayKiem: false, soBaiTap: 1, coBaiTap: true, onBaiTap: noop, ghi: [],
+    } as PropsMotTrang
+    const { container } = render(<MotTrangHs {...p} />)
+    expect(container.querySelector('.da-lv-loi-o')).toBeNull()
+    const bb = container.querySelector<HTMLElement>('.bi-loi .bi-loi-bong')!
+    expect(bb).not.toBeNull()
+    expect(bb.style.width).toBe('') // không ép bề rộng bằng số đo: CSS max-content ôm chữ
+    vi.useRealTimers()
   })
   it('CSS: khung bong bóng co theo nội dung (max-content, tối đa --rong), chữ cân dòng; đệm ngang 13 px, dọc 9 px', () => {
     const css = readFileSync('src/styles/trong-hs.css', 'utf8')

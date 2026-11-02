@@ -671,3 +671,30 @@
   [data-trong='hs'] .tp-ket .tp-man[data-hai] > .cot-a:has(> .tp-hinh) > .tp-3o { grid-column: 1 / -1; }
   [data-trong='hs'] .tp-ket .tp-man[data-hai] h1 { font-size: 22px; }
 }
+/* ═══ HỆ KÍNH — TỰ SINH bởi scripts/tao-kinh-css.py (thầy chốt 02/11). Đừng sửa tay: sửa bộ sinh rồi chạy lại. ═══ */
+[data-trong='hs'] .tp-toan { background: var(--kinh-mat); }
+[data-trong='hs'] .tp-day { background: var(--kinh-mat); }
+[data-trong='hs'] .tp-nut-lon { box-shadow: inset 0 -4px 0 color-mix(in srgb, var(--tr-chu) 18%, transparent), 0 10px 24px -16px var(--tr-phu); }
+[data-trong='hs'] .tp-nut { background: var(--kinh-mat); box-shadow: 0 10px 24px -16px var(--tr-phu); }
+[data-trong='hs'] .tp-nut[data-sac='tt'] { box-shadow: inset 0 -4px 0 color-mix(in srgb, var(--tp-den) 18%, transparent), 0 10px 24px -16px var(--tr-phu); }
+[data-trong='hs'] .tp-nut[data-sac='chinh'] { box-shadow: inset 0 -4px 0 color-mix(in srgb, var(--tp-den) 18%, transparent), 0 10px 24px -16px var(--tr-phu); }
+[data-trong='hs'] .tp-the { background: var(--kinh-mat); }
+[data-trong='hs'] .tp-o { box-shadow: inset 0 -4px 0 color-mix(in srgb, var(--tp-den) 16%, transparent), 0 10px 24px -16px var(--tr-phu); }
+[data-trong='hs'] .tp-3o > div { background: var(--kinh-mat); }
+[data-trong='hs'] .tp-tuan7 .n[data-k='phep'] { background: var(--kinh-mat); }
+[data-trong='hs'] .tp-tuan7 .n[data-nay]:not([data-k]) { background: var(--kinh-mat); }
+[data-trong='hs'] .tp-lich30 .n[data-k='phep'] { background: var(--kinh-mat); }
+[data-trong='hs'] .tp-lich30 .n[data-nay]:not([data-k]) { background: var(--kinh-mat); }
+[data-trong='hs'] .tp-xem2 button[aria-pressed='true'] { background: var(--kinh-mat); }
+[data-trong='hs'] .tp-bxh { background: var(--kinh-mat); }
+[data-trong='hs'] .tp-bxh .r { background: var(--kinh-mat); }
+[data-trong='hs'] .tp-pa button { border-bottom-width: 2px; background: var(--kinh-mat); }
+[data-trong='hs'] .tp-o-so { background: var(--kinh-mat); }
+[data-trong='hs'] .tp-nv { background: var(--kinh-mat); }
+[data-trong='hs'] .tp-tong4 > div { background: var(--kinh-mat); }
+[data-trong='hs'] .tp-o-tim { background: var(--kinh-mat); }
+[data-trong='hs'] .tp-hai-bi .ten-b { background: var(--kinh-mat); }
+[data-trong='hs'] .tp-nut[data-sac='kc'] { box-shadow: inset 0 -4px 0 color-mix(in srgb, var(--tp-den) 18%, transparent), 0 10px 24px -16px var(--tr-phu); }
+[data-trong='hs'] .tp-hd-tam { background: var(--kinh-mat); }
+[data-trong='hs'] .tp-hd-nut { background: var(--kinh-mat); }
+/* ═══ HẾT HỆ KÍNH TỰ SINH ═══ */

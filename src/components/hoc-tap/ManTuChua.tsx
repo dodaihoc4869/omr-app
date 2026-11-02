@@ -38,7 +38,7 @@ import './tu-chua.css'
 // «Trong» 26/10 (nhóm 2): tờ trình bày styles/trong-lam-bai.css nạp RIÊNG, chỉ khi <html data-trong> (main.tsx gắn trước khi nạp màn) — không cộng byte lượt mở app.
 if (typeof document !== 'undefined' && document.documentElement.dataset.trong) void import('../../styles/trong-lam-bai.css').catch(() => {})
 // Tên trang chính trên nút «về» (Boss 27/10): giao diện Trong ⇒ «Lộ trình»; giao diện cũ ⇒ «Hôm nay». Viết tại chỗ: nhập mô-đun dùng chung sẽ đẻ mảnh tải riêng (+1 tệp mở app).
-const tenTrangChinh = (): string => (typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Lộ trình' : 'Hôm nay')
+const tenTrangChinh = (): string => (typeof document !== 'undefined' && document.documentElement.dataset.trong ? 'Hôm nay' : 'Hôm nay')
 
 const ManChua = lazy(() => import('../chua-cau-sai/ManChuaCauSai'))
 const KiemHoiThay = lazy(() => import('../loi-giai/HoiThayKiemChung'))
@@ -276,6 +276,9 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
     setBao(null)
     setChon({ qid: d.m.qid, kiemHoiThay: d.m.kiemHoiThay })
   }
+  // VÀO TỨC THÌ (thầy 02/11): ngón tay vừa CHẠM dòng câu cần sửa ⇒ máy bắt đầu mở câu ngay (nạp trước an toàn — đề công khai, không chấm / không ghi tiến độ),
+  // lúc nhấc tay màn sửa câu nhận kết quả đã bay sẵn (ManChuaCauSai dùng layNapTruocCauSua). Câu phần hôm nay đã tải sẵn từ trước ⇒ vào thẳng.
+  const chamCau = (d: DongChua) => { if (d.nhom === 'can' && !d.m.kiemHoiThay && !daDuHomNay) napTruocCauSua(token, d.m.qid) }
   const moKiemLai = (m: LichKiemLaiHoiThay) => {
     viTri.current = { top: khungCuon(gocRef.current)?.scrollTop ?? 0, khoa: `kiem-hoi-${m.qid}` }
     setBao(null); setChon({ qid: m.qid, ten: m.ten, kiemHoiThay: true })
@@ -424,8 +427,8 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
                 if (!ds.length || (daDuHomNay && n !== 'xong')) return null // đã sửa đủ hôm nay: ẩn các câu còn lại (không cho sửa thêm)
                 // Có việc hôm nay ⇒ danh sách đầy đủ gập lại (em không phải nhìn cả trăm câu một lúc).
                 return viec && viec.tong > 0
-                  ? <details className="vh-gap" key={n}><summary><b>{n === 'can' ? 'Tất cả câu cần sửa' : TEN_NHOM[n]}</b><span>{dem?.[n] ?? ds.length} câu</span></summary><DanhSach nhom={n} ds={ds} tong={dem?.[n]} onChon={moCau} /></details>
-                  : <DanhSach key={n} nhom={n} ds={ds} tong={dem?.[n]} onChon={moCau} />
+                  ? <details className="vh-gap" key={n} onToggle={n === 'can' ? (e) => { if (e.currentTarget.open) for (const d of ds.slice(0, 3)) napTruocCauSua(token, d.m.qid) } : undefined}><summary><b>{n === 'can' ? 'Tất cả câu cần sửa' : TEN_NHOM[n]}</b><span>{dem?.[n] ?? ds.length} câu</span></summary><DanhSach nhom={n} ds={ds} tong={dem?.[n]} onChon={moCau} onCham={chamCau} /></details>
+                  : <DanhSach key={n} nhom={n} ds={ds} tong={dem?.[n]} onChon={moCau} onCham={chamCau} />
               })}
             </div>
           </div>
@@ -493,7 +496,7 @@ function TheTong({ can, soCan, soCho, soXong, tong, onChon, onVe, onTaiThem, dan
   )
 }
 
-function DanhSach({ nhom, ds, tong, onChon }: { nhom: Nhom; ds: DongChua[]; tong?: number; onChon: (d: DongChua) => void }) {
+function DanhSach({ nhom, ds, tong, onChon, onCham }: { nhom: Nhom; ds: DongChua[]; tong?: number; onChon: (d: DongChua) => void; onCham?: (d: DongChua) => void }) {
   const cua = ds.filter((d) => d.nhom === nhom)
   const ten = TEN_NHOM[nhom]
   return (
@@ -503,7 +506,7 @@ function DanhSach({ nhom, ds, tong, onChon }: { nhom: Nhom; ds: DongChua[]; tong
         <span className="tcl-dem">{tong ?? cua.length} câu</span>
       </div>
       {cua.map((d) => (
-        <button type="button" className="tcl-the" key={d.m.dotId ?? d.m.qid} data-khoa={d.m.dotId ?? d.m.qid} data-nhom={d.nhom} onClick={() => onChon(d)}>
+        <button type="button" className="tcl-the" key={d.m.dotId ?? d.m.qid} data-khoa={d.m.dotId ?? d.m.qid} data-nhom={d.nhom} onPointerDown={onCham ? () => onCham(d) : undefined} onClick={() => onChon(d)}>
           <BieuTuong d={d} />
           <span className="tcl-the-chu">
             <strong className="tcl-the-ten">{d.ten}</strong>

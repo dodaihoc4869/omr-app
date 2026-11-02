@@ -51,9 +51,9 @@ describe('bộ màu theo ngày Việt Nam', () => {
 
 describe('bong bóng lời trên đầu Mol (Lộ trình)', () => {
   const tsx = readFileSync('src/components/hoc-tap/TrongHs.tsx', 'utf8'), css = readFileSync('src/styles/trong-hs.css', 'utf8')
-  it('mọi hướng màn: có Mol cạnh đường + có lời ⇒ bong bóng trên đầu Mol (không còn điều kiện điện thoại ngang thấp)', () => {
-    expect(tsx).toContain('const benLua = coBiBen && loiLuaBi ? luaO : null')
-    expect(tsx).toContain('onLuaO={datLuaO}')
+  it('mọi hướng màn: lời Mol cùng MỘT chỗ (không còn điều kiện điện thoại ngang thấp) — hệ Kính 02/11: không còn Mol cạnh đường, lời ở thẻ Mol trên «Việc hôm nay»', () => {
+    expect(tsx).toContain('const coBiBen = false')
+    expect(tsx).toContain('const benLua = null')
     expect(tsx).not.toMatch(/thapNgang/)
   })
   it('tự căn không tràn mép (rộng ≤ 280, --trai / --duoi đo một lần), màu theo cảm xúc qua data-cx, chân ngôn data-chan-ngon', () => {

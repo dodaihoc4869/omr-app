@@ -91,6 +91,15 @@ for (const ten of ['App', 'AppHocSinh', 'StudentPortalScreen', 'ParentPortalScre
   }
 }
 
+// KHO TẢI NGẦM APP HỌC SINH (02/11, sau #752): mọi mục trong kho-hs.json phải là tệp có thật ở dist/ (không có tệp ⇒ bản này chưa có tải ngầm, bỏ qua).
+const KHO_HS = resolve(dirname(SW), 'kho-hs.json')
+const khoHs = { tong: 0, ma: [] }
+if (existsSync(KHO_HS)) {
+  const ds = JSON.parse(readFileSync(KHO_HS, 'utf8')).ds || []
+  khoHs.tong = ds.length
+  khoHs.ma = ds.filter((t) => !existsSync(resolve(dirname(SW), t)))
+}
+
 const phep = [
   [
     'danh sách tệp đã được chèn và đủ đóng khởi động ba cổng',
@@ -162,6 +171,11 @@ const phep = [
     'kho chạy-lúc KHÔNG cất trang HTML dưới tên mảnh',
     /text\\\/html/.test(s),
     'máy chủ trả index.html (200) cho mảnh đã bị xoá khi phát hành; cất nó dưới tên .js là đầu độc kho (lỗi MIME mãi tới khi xoá dữ liệu trang)',
+  ],
+  [
+    `kho tải ngầm học sinh chỉ ghi tệp có thật (${khoHs.tong} mục${khoHs.ma.length ? `, ma: ${khoHs.ma.slice(0, 3).join(' ')}` : ''})`,
+    khoHs.ma.length === 0,
+    'kho-hs.json ghi mảnh không có trong dist/ (mảnh JS rỗng của mảnh chỉ-CSS bị Vite bỏ sau generateBundle) ⇒ Pages trả index.html, không vào kho ⇒ mỗi lượt mở tải phí lại mãi',
   ],
   [
     'có chốt tự sửa khi app trắng màn',

@@ -14,7 +14,7 @@ const goc = (them: Partial<PropsMotTrang> = {}): PropsMotTrang => ({
   onHoc: noop, khoaHoc: false, hetCau: false, coCa: false, onThi: noop, soSua: 8, onChua: noop, ngayKiem: false, soBaiTap: 1, coBaiTap: true, onBaiTap: noop, ghi: [], ...them,
 })
 const so = (daLam: number, chang: number) => ({ daLam, muc: 30, chang, soChang: 5 }) as PropsMotTrang['so']
-const nut = () => within(screen.getByRole('list', { name: 'Lộ trình hôm nay' })).getAllByRole('listitem').map((li) => li.firstElementChild as HTMLElement)
+const nut = () => within(screen.getByRole('list', { name: 'Việc hôm nay' } /* hệ Kính 02/11: con đường thành danh sách «Việc hôm nay» */)).getAllByRole('listitem').map((li) => li.firstElementChild as HTMLElement)
 const sua = () => nut().find((n) => n.getAttribute('data-loai') === 'sua')!
 afterEach(() => { cleanup(); batGoiNgay(false); try { localStorage.clear() } catch { /* bỏ qua */ } })
 
@@ -24,7 +24,7 @@ describe('Lộ trình tuần tự', () => {
     expect(sua().getAttribute('data-tt')).toBe('khoa')
     expect(sua().getAttribute('aria-label')).toBe('Tự sửa lỗi: làm xong các chặng phía trên để mở khoá')
     expect(sua().querySelector('.da-dem')).toBeNull()
-    expect(sua().querySelector('.da-bong')).toBeNull()
+    expect(sua().querySelector('.kb-viec')).toBeNull()
     expect(nut().filter((n) => n.getAttribute('data-loai') === 'hoc' && n.getAttribute('data-tt') === 'khoa').length).toBeGreaterThan(0)
   })
   it('đang giữa chặng 3 (còn chặng trước mốc chưa xong) ⇒ vẫn khoá; làm xong các chặng trước mốc ⇒ MỞ và là việc hiện tại', () => {
@@ -41,8 +41,8 @@ describe('Lộ trình tuần tự', () => {
     expect(sua().getAttribute('data-tt')).toBe('dang')
     cleanup()
     render(<MotTrangHs {...goc({ so: so(0, 1) })} />)
-    const bt = nut().find((n) => n.getAttribute('data-loai') === 'bt')!
-    expect(bt.getAttribute('data-tt')).not.toBe('khoa')
+    // Bài tập về nhà đã bỏ khỏi app học sinh (thầy 02/11 «phần btvn không còn nữa bỏ đi») ⇒ không còn dòng bài tập nào
+    expect(nut().some((n) => n.getAttribute('data-loai') === 'bt')).toBe(false)
   })
   it('Tự sửa lỗi đã xong hôm nay ⇒ vẫn ✓ (không bị khoá lại)', () => {
     render(<MotTrangHs {...goc({ so: so(0, 1), soSua: 0 })} />)
@@ -82,7 +82,7 @@ describe('Lộ trình tuần tự', () => {
     })
     render(<MotTrangHs {...goc({ so: so(18, 4) })} />)
     const cacChang2 = nut().filter((n) => n.getAttribute('data-loai') === 'hoc')
-    expect(screen.getByText('2/5 chặng')).toBeTruthy() // Chặng 3 chưa qua màn hoàn thành ⇒ mới tính 2/5 chặng xong
+    expect(nut().filter((n) => n.getAttribute('data-loai') === 'hoc' && n.getAttribute('data-tt') === 'xong')).toHaveLength(2) // hệ Kính: 2 dòng chặng ✓ (thay chữ «2/5 chặng» của thẻ bài cũ) // Chặng 3 chưa qua màn hoàn thành ⇒ mới tính 2/5 chặng xong
     expect(cacChang2[2]!.getAttribute('data-tt')).toBe('dang') // Chặng 3 vẫn đang dở («HỌC TIẾP»), chưa có dấu tích ✓
     fireEvent.click(cacChang2[2]!)
     expect(screen.getByText('Chặng 3 / 5 · 1 câu')).toBeTruthy() // Còn bước hoàn thành chặng
@@ -93,7 +93,7 @@ describe('Lộ trình tuần tự', () => {
     xoaChangDangLam('s1')
     render(<MotTrangHs {...goc({ so: so(18, 4) })} />)
     const cacChang3 = nut().filter((n) => n.getAttribute('data-loai') === 'hoc')
-    expect(screen.getByText('3/5 chặng')).toBeTruthy()
+    expect(nut().filter((n) => n.getAttribute('data-loai') === 'hoc' && n.getAttribute('data-tt') === 'xong')).toHaveLength(3)
     expect(cacChang3[2]!.getAttribute('data-tt')).toBe('xong')
     expect(cacChang3[3]!.getAttribute('data-tt')).toBe('dang')
   })

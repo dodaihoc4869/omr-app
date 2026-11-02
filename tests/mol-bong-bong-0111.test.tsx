@@ -15,22 +15,25 @@ const goc = (them: Partial<PropsMotTrang> = {}): PropsMotTrang => ({
 afterEach(() => { cleanup(); vi.useRealTimers(); localStorage.clear() })
 
 describe('bong bóng trên đầu Mol (Lộ trình)', () => {
-  it('lời hiện TRÊN ĐẦU MOL (trong chỗ neo cạnh Mol), không còn thẻ riêng ở trên; tự mờ sau ~6 s; chạm Mol ⇒ hiện lại', () => {
+  it('lời Mol ở MỘT thẻ lời (có Mol) phía trên «Việc hôm nay», không nằm trong danh sách; nhắc một lần rồi tự thu (~4,7 s) và gỡ', () => {
+    // hệ Kính 02/11 (bản vẽ v2 thầy duyệt): con đường + Mol đứng cạnh đường đã bỏ ⇒ lời Mol ở THẺ LỜI riêng phía trên «Việc hôm nay» — không thể đè nút nào,
+    // nên logic né nút / thu thành «Mol nhắn» của chỗ neo trên đầu Mol không còn dùng. Kiểm hành vi của thẻ lời thay cho chỗ neo.
     vi.useFakeTimers()
     vi.setSystemTime(Date.UTC(2026, 9, 31, 3, 0)) // 10:00 giờ VN
     const { container } = render(<MotTrangHs {...goc()} />)
-    const neo = container.querySelector('.da-lv-loi-o')!
-    expect(neo).not.toBeNull()
-    expect(neo.querySelector('.bi-loi-boc[data-ben] .bi-loi-bong')).not.toBeNull() // bong bóng nằm ở chỗ neo trên đầu Mol
-    expect(container.querySelectorAll('.bi-loi-bong').length).toBe(1) // không có thẻ lời thứ hai ở trên
-    act(() => { vi.advanceTimersByTime(5500) })
-    expect(neo.querySelector('.bi-loi-boc')).not.toBeNull() // chưa tới 6 s: vẫn hiện
-    act(() => { vi.advanceTimersByTime(1000) })
-    expect(neo.querySelector('.bi-loi-boc')).toBeNull() // ~6 s: đã mờ hẳn
-    fireEvent.click(container.querySelector('.da-linh-vat[data-lv="bi"]')!)
-    expect(neo.querySelector('.bi-loi-boc .bi-loi-bong')!.textContent).toContain('Học tiếp nhé!') // chạm Mol ⇒ hiện lại lời gần nhất
-    act(() => { vi.advanceTimersByTime(6500) })
-    expect(neo.querySelector('.bi-loi-boc')).toBeNull() // rồi lại tự ẩn
+    expect(container.querySelector('.da-lv-loi-o')).toBeNull()
+    expect(container.querySelectorAll('.bi-loi-bong').length).toBe(1) // đúng một bong bóng lời
+    const boc = container.querySelector('.bi-loi-boc')!
+    expect(boc.querySelector('.bi-loi .bi')).not.toBeNull() // Mol đứng trong thẻ lời
+    expect(boc.closest('.kb-viec-ds')).toBeNull() // không chen vào danh sách việc
+    expect(boc.querySelector('.bi-loi-bong')!.textContent).toContain('Học tiếp nhé!')
+    act(() => { vi.advanceTimersByTime(4600) })
+    expect(container.querySelector('.bi-loi-boc:not([data-thu])')).not.toBeNull() // chưa tới 4,7 s: vẫn hiện
+    act(() => { vi.advanceTimersByTime(200) })
+    expect(container.querySelector('.bi-loi-boc[data-thu]')).not.toBeNull() // thu gọn
+    act(() => { vi.advanceTimersByTime(500) })
+    expect(container.querySelector('.bi-loi-boc')).toBeNull() // gỡ hẳn
+    vi.useRealTimers()
   })
   it('không chặn chạm: chỗ neo + mọi con pointer-events none; Mol (không giám thị) chạm được', () => {
     const css = readFileSync('src/styles/trong-hs.css', 'utf8')

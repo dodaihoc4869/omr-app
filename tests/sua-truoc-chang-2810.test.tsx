@@ -18,7 +18,8 @@ const goc = (them: Partial<PropsMotTrang> = {}): PropsMotTrang => ({
   onHoc: noop, khoaHoc: false, hetCau: false, coCa: false, onThi: noop, soSua: 20, onChua: noop, ngayKiem: false, soBaiTap: 0, coBaiTap: false, onBaiTap: noop, ghi: [], ...them,
 })
 const ngay = new Date(Date.now() + 7 * 3600_000).toISOString().slice(0, 10)
-const nhan = () => within(screen.getByRole('list', { name: 'Lộ trình hôm nay' })).getAllByRole('listitem').map((li) => li.firstElementChild!.getAttribute('aria-label'))
+// hệ Kính 02/11: Rương là thẻ riêng dưới danh sách «Việc hôm nay» ⇒ không còn trong thứ tự dòng
+const nhan = () => within(screen.getByRole('list', { name: 'Việc hôm nay' })).getAllByRole('listitem').map((li) => li.firstElementChild!.getAttribute('aria-label'))
 const KHOA = 'Chặng 5: khoá đến khi sửa xong lỗi hôm nay'
 /** Còn chặng phía trên chưa xong ⇒ Tự sửa lỗi khoá (thầy 29/10 «làm tuần tự từ trên xuống dưới»). */
 const KHOA_SUA_TREN = 'Tự sửa lỗi: làm xong các chặng phía trên để mở khoá'
@@ -28,7 +29,7 @@ describe('Lộ trình: khoá chặng sau nút Tự sửa lỗi', () => {
   it('phần ngày còn 8 câu ⇒ chặng NẰM SAU nút Sửa lỗi khoá xám (thẻ «Sửa xong 8 lỗi hôm nay…»); chặng trước nút vẫn học được; chưa tới nút ⇒ chưa báo máy chủ', async () => {
     render(<MotTrangHs {...goc()} />)
     await waitFor(() => expect(nhan()).toContain(KHOA))
-    expect(nhan()).toEqual(['Chặng 1: đã xong', 'Chặng 2: đã xong', 'Học tiếp · 18 câu', 'Rương hôm nay', 'Chặng 4: chưa mở', KHOA_SUA_TREN, KHOA])
+    expect(nhan()).toEqual(['Chặng 1: đã xong', 'Chặng 2: đã xong', 'Học tiếp · 18 câu', 'Chặng 4: chưa mở', KHOA_SUA_TREN, KHOA])
     fireEvent.click(screen.getByRole('button', { name: KHOA }))
     const the = screen.getByRole('dialog')
     expect(the.getAttribute('data-sac')).toBe('khoa')
@@ -45,19 +46,19 @@ describe('Lộ trình: khoá chặng sau nút Tự sửa lỗi', () => {
     onTestFinished(() => { Element.prototype.animate = animCu })
     const { rerender, container } = render(<MotTrangHs {...goc()} />)
     await waitFor(() => expect(SO.bao).toHaveBeenCalled())
-    expect(nhan()).toEqual(['Chặng 1: đã xong', 'Chặng 2: đã xong', 'Tự sửa lỗi: hôm nay còn 8 câu', 'Chặng 3: khoá đến khi sửa xong lỗi hôm nay', 'Rương hôm nay',
+    expect(nhan()).toEqual(['Chặng 1: đã xong', 'Chặng 2: đã xong', 'Tự sửa lỗi: hôm nay còn 8 câu', 'Chặng 3: khoá đến khi sửa xong lỗi hôm nay',
       'Chặng 4: khoá đến khi sửa xong lỗi hôm nay', KHOA])
     const sua = screen.getByRole('button', { name: 'Tự sửa lỗi: hôm nay còn 8 câu' })
     expect(sua.getAttribute('data-tt')).toBe('dang')
-    expect(sua.querySelector('.da-bong')!.textContent).toBe('Sửa lỗi')
-    expect(container.querySelectorAll('.da-bong')).toHaveLength(1)
+    expect(sua.querySelector('.kb-viec')!.textContent).toBe('Sửa lỗi') // hệ Kính: nhãn việc hiện tại (bong bóng trên nút cũ) ở mép phải dòng
+    expect(container.querySelectorAll('.kb-dong .kb-viec')).toHaveLength(1) // chỉ dòng việc hiện tại có nhãn việc
     expect(localStorage.getItem('ddh.sua-khoa')).toBe(ngay)
     // sửa xong phần ngày ⇒ mở, nút ✓, chặng 3 (vừa mở) vỡ khoá
     SO.con = 0; SO.phan = 0
     rerender(<MotTrangHs {...goc({ ghi: ['x'] })} />)
     await waitFor(() => expect(screen.getByRole('button', { name: 'Học tiếp · 18 câu' }).getAttribute('data-tt')).toBe('dang'))
     expect(screen.getByRole('button', { name: 'Tự sửa lỗi: hôm nay đã sửa xong' }).getAttribute('data-tt')).toBe('xong')
-    await waitFor(() => expect(container.querySelectorAll('.da-vo-khoa')).toHaveLength(1))
+    await waitFor(() => expect(container.querySelectorAll('.kb-o[data-hu="mo"]')).toHaveLength(1))
     expect(localStorage.getItem('ddh.sua-khoa')).toBeNull()
   })
 
@@ -88,7 +89,7 @@ describe('Sảnh chưa về (ảnh thầy 28/10 giờ cao điểm: Lộ trình c
   it('đang tải, chưa có số ⇒ báo «Đang tải bài học hôm nay…», CHƯA vẽ đường (không chỉ còn nút Sửa lỗi); có số ⇒ đường như cũ', async () => {
     const { rerender } = render(<MotTrangHs {...goc({ so: null, dangTai: true })} />)
     expect(screen.getByRole('status').textContent).toBe('Đang tải bài học hôm nay…')
-    expect(screen.queryByRole('list', { name: 'Lộ trình hôm nay' })).toBeNull()
+    expect(screen.queryByRole('list', { name: 'Việc hôm nay' })).toBeNull()
     rerender(<MotTrangHs {...goc()} />)
     await waitFor(() => expect(nhan()).toContain(KHOA_SUA_TREN))
     expect(screen.queryByText('Đang tải bài học hôm nay…')).toBeNull()
