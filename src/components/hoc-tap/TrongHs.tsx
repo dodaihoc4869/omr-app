@@ -51,6 +51,8 @@ const PhuTamDong = lazy(() => import('../thuong/ManThuong').then((m) => ({ defau
 giuToanManHs()
 /** Sự kiện màn làm chặng phát khi xong bài ĐẦU TIÊN trong ngày ⇒ Lộ trình mở «Chuỗi ngày» với hiệu ứng lửa bùng (C1). */
 export const SU_KIEN_MO_CHUOI = 'ddh-thuong-mo-chuoi'
+/** Chạm mục menu ⇒ phanHoi('chon') (rung + tiếng, tự theo công tắc). Nạp LƯỜI: không kéo am-thanh / rung vào nhóm mở app (luật tốc độ). — khai báo TRƯỚC mọi chỗ dùng (lint no-use-before-define). */
+const cham = () => { void import('../../lib/phan-hoi').then((m) => m.phanHoi('chon'), () => {}) }
 /** Cột bên (thẻ Giải tuần + Nhiệm vụ) chỉ hiện ở máy tính / điện thoại ngang (cùng điều kiện CSS `.dm-ben`) ⇒ điện thoại dọc không nạp mảnh màn thưởng. */
 const MQ_BEN = '(min-width: 1000px), (max-height: 520px) and (min-width: 600px)'
 function useMq(q: string): boolean {
@@ -1139,8 +1141,6 @@ const Vibrate = ({ size }: { size?: number }) => <IconNet size={size} d={['m2 8 
 const Luoi4 = ({ size }: { size?: number }) => <IconNet size={size} d={['M4 4h6v6H4z', 'M14 4h6v6h-6z', 'M14 14h6v6h-6z', 'M4 14h6v6H4z']} />
 const BanhRang = ({ size }: { size?: number }) => <IconNet size={size} d={['M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z', 'M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0']} />
 const MuiTrai = ({ size }: { size?: number }) => <IconNet size={size} d={['m15 18-6-6 6-6']} />
-/** Chạm mục menu ⇒ phanHoi('chon') (rung + tiếng, tự theo công tắc). Nạp LƯỜI: không kéo am-thanh / rung vào nhóm mở app (luật tốc độ). */
-const cham = () => { void import('../../lib/phan-hoi').then((m) => m.phanHoi('chon'), () => {}) }
 
 /** Công tắc phản hồi ở menu (thầy 26/10): «Âm thanh» / «Rung» Bật–Tắt — chỉ đọc/ghi localStorage ('ddh.am' / 'ddh.rung' = 'tat' khi tắt); tiếng và rung
  *  ở mảnh màn luyện tự đọc khoá này (không kéo am-thanh / rung vào nhóm mở app). Mặc định bật. */

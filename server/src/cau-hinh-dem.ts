@@ -31,7 +31,7 @@ function bangDem(db: object): Map<string, O> {
 /**
  * NHÓM CỜ đọc qua đệm này (tối ưu 05/10): một khoá trong nhóm lạnh ⇒ câu đọc của nó KÈM mọi khoá lạnh khác của nhóm (trước: mỗi cờ một lượt D1 riêng —
  * Sảnh/answer hỏi cờ Hoá 2.0, Bi-a, OMNI, cửa P08 ở các đợt khác nhau). Khoá KÈM chỉ được ghi vào đệm khi câu đọc về (cùng hạn DEM_CO_MS tính từ lúc
- * bắt đầu đọc, như khoá chính); trong lúc chờ, ai hỏi khoá kèm vẫn tự đọc như cũ (không phải chờ ai). Lỗi ⇒ không đệm gì. Khoá ngoài nhóm ⇒ y như cũ.
+ * bắt đầu đọc, như khoá chính); trong lúc chờ, ai hỏi khoá kèm thì CHỜ câu nhóm về (02/11, xem `docCauHinhDem`) rồi dùng đệm — câu nhóm lỗi thì tự đọc như cũ. Lỗi ⇒ không đệm gì. Khoá ngoài nhóm ⇒ y như cũ.
  */
 // 06/10: thêm hai khoá ÔN BÀI CŨ (`on_bai_cu_deu` công tắc chia đều, `on_bai_cu_ti_le` tỉ lệ theo lớp — omni-on-bai-cu.ts) để đọc KÈM, không thêm vòng D1 ở Sảnh / kế hoạch ngày.
 // 26/10: `duolingo_bai` (cờ học kiểu Duolingo, duolingo-bai-co.ts) đọc KÈM cờ Gói 7 ⇒ Sảnh / mở chặng / phụ huynh không thêm lệnh D1.
@@ -50,6 +50,11 @@ export async function docCauHinhDem(env: Env, khoa: string, nowMs: number = Date
   // Workerd gắn I/O với request: chỉ chờ bằng timer của chính lượt gọi này. 28/10 (thử tải 270 em): trước tối đa 240 ms — D1 chậm hơn thế ⇒ MỌI lượt đồng thời
   // tự đọc lại (đàn đọc dồn, D1 càng chậm) ⇒ nay chờ tới 3 s (lượt đang đọc luôn tự gỡ cờ ở `finally`).
   for (let n = 0; o?.dangDoc && m.get(khoa) === o && n < 190; n++) await new Promise<void>(xong => setTimeout(xong, 16))
+  // 02/11 (cổng tốc độ nop-cau đỏ chập chờn 10 lệnh / mốc 9): khoá đang được ĐỌC KÈM trong câu nhóm của lượt khác ⇒ chờ câu ấy về (timer riêng, nhịp 1 ms,
+  // tối đa ~3 s như trên) thay vì tự đọc riêng một lệnh D1 nữa. Nhịp 1 ms (không phải 16 ms) để lượt chờ dậy ngay khi câu nhóm về, kịp gom chung đợt kế
+  // tiếp với các lệnh khác — nhịp 16 ms bớt được lệnh nhưng lỡ đợt gom ⇒ thêm một đợt chờ nối tiếp (đo: nộp câu 7 đợt / 9 lệnh; nhịp 1 ms: 6 đợt / 9 lệnh).
+  const dangKemNay = dangKemTheoDb.get(dbGoc(env.DB as unknown as object))
+  for (let n = 0; dangKemNay?.has(khoa) && n < 3000; n++) await new Promise<void>(xong => setTimeout(xong, 1))
   o = m.get(khoa)
   if (o && !o.dangDoc && o.het > nowMs) return o.v
   const moi: O = { het: nowMs + DEM_CO_MS, v: null, dangDoc: true }
