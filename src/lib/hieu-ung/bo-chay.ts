@@ -109,8 +109,8 @@ export function dungHat(p: Hat, gon: boolean): { w: number; h: number; css: stri
 const MOT_LUOT = 28
 type Cho = { p: Hat; t0: number }
 /** Dựng các hạt đang chờ — tối đa MOT_LUOT mỗi khung (lượt bắn lớn chia nhiều khung, không thành một tác vụ dài); khung trước chậm > 50 ms ⇒ bỏ nửa số còn chờ. */
-function boBan(hang: Cho[], gon: boolean, them: (e: HTMLElement) => void, conSong: () => boolean): void {
-  const tran = TRAN_HAT[gon ? 'gon' : 'day-du']
+function boBan(hang: Cho[], gon: boolean, them: (e: HTMLElement) => void, conSong: () => boolean, tranRieng?: number): void {
+  const tran = tranRieng ?? TRAN_HAT[gon ? 'gon' : 'day-du']
   let truoc = 0
   const xa = (now?: number) => {
     if (!conSong() || !hang.length) return
@@ -163,6 +163,7 @@ export interface Phien {
   /** lò xo → hoạt ảnh */ nay(el: Element | null | undefined, map: (v: number) => Keyframe, o: LoXo & { tre?: number }): Animation | null
   /** phần tử tạm trong lớp phủ (gỡ khi phiên kết thúc) */ them<T extends Element>(e: T, cha?: Element): T
   /** bắn một hạt (chế độ tĩnh: bỏ qua) */ hat(p: Hat): void
+  /** trần hạt riêng của hiệu ứng này (màn tĩnh như kết chặng được nhiều hạt hơn màn làm câu) */ tranHat?: number
   /** việc chắc chắn chạy một lần lúc kết thúc (hết giờ hoặc bị huỷ) */ khiXong(f: () => void): void
   /** kết thúc sau `ms` */ dong(ms: number): void
   huy(): void
@@ -198,7 +199,7 @@ export function moPhien(che: CheDoAnMung): Phien {
     them(e, cha) { (cha ?? layLop()).appendChild(e); nut.push(e); return e },
     hat(h) {
       if (xong || p.ts.heSoHat <= 0 || typeof Element.prototype.animate !== 'function') return
-      if (!hang.length) boBan(hang, che === 'gon', (e) => nutHat.push(e), () => !xong)
+      if (!hang.length) boBan(hang, che === 'gon', (e) => nutHat.push(e), () => !xong, p.tranHat)
       hang.push({ p: h, t0: performance.now() })
     },
     khiXong(f) { ket.push(f) },
