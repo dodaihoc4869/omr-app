@@ -332,6 +332,24 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
     expect(screen.getByRole('button', { name: /^Kiểm tra ôn tập: Đã lỡ/ })).toBeTruthy()
   })
 
+  // thầy 02/11 (ảnh bản sống «8/12» mà còn 5 câu cần sửa + chặng 2): thẻ mức báo TỔNG câu mọi việc hôm nay; đủ hết mới đổi màu dung dịch
+  it('thẻ mức = TỔNG câu hôm nay: câu học (đến mức) + câu Tự sửa lỗi phần hôm nay + câu Kiểm tra ôn tập hôm nay; xong hết mới đổi màu', () => {
+    const ngay = new Date(Date.now() + 7 * 3600_000).toISOString().slice(0, 10)
+    localStorage.setItem('ddh.sua-nho', JSON.stringify({ t: 'tk', n: ngay, s: [40, 5, 5, 1] })) // còn 5 câu sửa hôm nay, đã sửa 1
+    const r = render(<MotTrangHs {...goc({ token: 'tk', soSua: 40, so: { daLam: 8, muc: 12, chang: 2, soChang: 2 } as PropsMotTrang['so'],
+      kiem: { ...KIEM, trangThai: 'da_nop' as TomTatKiemTra['trangThai'], nopLuc: mo + 7200_000, diem: 1.85 }, onKiemTra: noop })} />)
+    const the = screen.getByRole('region', { name: /^Tổng câu hôm nay/ })
+    // 8/12 câu học + 1/6 câu sửa + 28/28 câu kiểm tra đã nộp = 37/46
+    expect(the.querySelector('.kb-so')!.textContent).toBe('37/46 câu')
+    expect(the.textContent).toContain('Còn 9 câu nữa là dung dịch đổi màu.')
+    expect(the.hasAttribute('data-du')).toBe(false)
+    r.unmount(); localStorage.clear()
+    localStorage.setItem('ddh.sua-nho', JSON.stringify({ t: 'tk', n: ngay, s: [40, 0, 0, 6] })) // đã sửa xong 6 câu phần hôm nay
+    render(<MotTrangHs {...goc({ token: 'tk', soSua: 40, so: { daLam: 14, muc: 12, chang: 2, soChang: 2 } as PropsMotTrang['so'] })} />)
+    const xong = screen.getByRole('region', { name: /^Tổng câu hôm nay/ })
+    expect(xong.querySelector('.kb-so')!.textContent).toBe('18/18 câu') // vượt mức câu học không cộng thêm
+    expect(xong.hasAttribute('data-du')).toBe(true) // xong hết ⇒ dung dịch đổi màu
+  })
   it('ngày chỉ có Kiểm tra ôn tập ⇒ đường chỉ một nút kiểm tra, không băng bài', () => {
     render(<MotTrangHs {...goc({ kiem: { ...KIEM, baiNgayToiThieu: undefined }, ngayKiem: true, onKiemTra: noop })} />)
     expect(nut()).toHaveLength(1)
@@ -365,7 +383,7 @@ describe('Hệ lười chỉ thầy / phụ huynh xem (thầy 26/10)', () => {
       if (muc === 'ket-qua') {
         const the = await screen.findByText(/^Việc tiếp:/)
         expect(the.closest('.dm-the')!.querySelector('h3')!.textContent).toMatch(/^Chuỗi \d+ ngày$/)
-      } else await screen.findByRole('region', { name: /^Mức hôm nay/ }) // hệ Kính: thẻ mức hôm nay thay thẻ «Bài học hôm nay»
+      } else await screen.findByRole('region', { name: /^Tổng câu hôm nay/ }) // hệ Kính: thẻ tổng câu hôm nay thay thẻ «Bài học hôm nay»
       expect(container.textContent).not.toMatch(/lười|chăm|chưa đều|bậc|đối phó|học thật|bấm vội|treo|quá nhanh/i)
       expect(container.innerHTML).not.toMatch(/data-nhom|da-12|da-bac/)
       unmount()

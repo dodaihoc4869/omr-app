@@ -67,7 +67,10 @@ import { useTuDangXuatKhiPhienHong } from '../lib/phien-hong'
 import { boNap, nenNapTruoc, veNgayKhiCo, type BoNap } from '../components/hoa2/nap-truoc-man'
 import { napManCauDaLam, napManTuLuyen } from '../components/hoa2/man-sanh-luoi'
 // Màn làm bài, chữa và xem lại chỉ tải khi em mở.
-const ManLamBaiTap = lazy(() => import('../components/hoc-tap/ManLamBaiTap'))
+// VÀO TỨC THÌ (thầy 02/11 «tải sẵn rồi thì phải tức thì vào màn khi bấm luôn»): ba màn con chính qua bộ nạp nhớ ⇒ mảnh đã về (nạp sẵn lúc rảnh ở Hôm nay) thì vẽ
+// thẳng, không treo Suspense / không màn chờ «Đang mở bài học…»; chưa về ⇒ đúng lazy cũ.
+const napManLamBaiTap = boNap(() => import('../components/hoc-tap/ManLamBaiTap'))
+const ManLamBaiTap = veNgayKhiCo(lazy(napManLamBaiTap), napManLamBaiTap)
 /** Màn phủ đang làm bài (xem `data-dang-lam-bai`). */
 const TAB_LAM_BAI: ReadonlySet<string> = new Set(['hoctap', 'kiemtra', 'vaothi', 'tuluyen', 'btvn', 'mom', 'cauon', 'khacphuc'])
 // Thẻ điểm danh nổi của giao diện CŨ (không «Trong») — nạp lười (30/10): «Trong» dùng khối điểm danh trong menu (TrongHs, diem-danh-hs.ts).
@@ -77,10 +80,12 @@ const TheDiemDanhHs = lazy(() => import('../components/diem-danh/TheDiemDanhHs')
 const DungKhiAn = memo(function DungKhiAn({ children }: { an: boolean; children: ReactNode }) { return <>{children}</> }, (_truoc, sau) => sau.an)
 /** Sự kiện «em vừa về Lộ trình» (Lộ trình đứng yên lúc ẩn nên không tự biết) — thẻ điểm danh nghe để hỏi lại buổi học như trước. */
 const SU_KIEN_VE_LO_TRINH = 'ddh-ve-lo-trinh'
-const ManKiemTraCaNhan = lazy(() => import('../components/hoc-tap/ManKiemTraCaNhan'))
+const napManKiemTra = boNap(() => import('../components/hoc-tap/ManKiemTraCaNhan'))
+const ManKiemTraCaNhan = veNgayKhiCo(lazy(napManKiemTra), napManKiemTra)
 // Hồ sơ làm bài của em (thầy 12/10: "Cho hs bấm vào bảng lười chăm. Khi bấm vào hiển thị đủ hồ sơ như trong nhịp học nhé") — nạp lười, ngoài precache.
 const HoSoCuaEmHs = lazy(() => import('../components/hoc-tap/HoSoCuaEmHs'))
-const ManTuChua = lazy(() => import('../components/hoc-tap/ManTuChua'))
+const napManTuChua = boNap(() => import('../components/hoc-tap/ManTuChua'))
+const ManTuChua = veNgayKhiCo(lazy(napManTuChua), napManTuChua)
 
 const CauDaLam = lazy(() => import('../components/hoa2/CauDaLam'))
 // TU LUYỆN (29/09): màn riêng, nạp lười — máy yếu không tải khi chưa bấm cửa.
@@ -230,16 +235,11 @@ function mauDiem(diem: number | null): string {
 
 type TabType = 'lichsuca' | 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'thanthu' | 'bantin' | 'cauon' | 'caudalam' | 'bia' | 'tuluyen' | 'hoctap' | 'tuchua' | 'kiemtra'
 
-/** Giữ khung bài học trong lúc mảnh mã đang về, tránh giật trang và khoảng trắng. Chữ chờ chỉ hiện khi quá ~800ms (thầy 26/10: tải nhanh không chớp chữ). */
+/** Giữ khung bài học trong lúc mảnh mã đang về, tránh giật trang và khoảng trắng. 02/11 (thầy «bỏ hết các màn đang mở câu» · «tải sẵn rồi thì phải tức thì
+ *  vào màn khi bấm luôn»): màn con nạp sẵn lúc rảnh ⇒ vẽ thẳng qua veNgayKhiCo, không qua đây; hiếm khi mảnh chưa về ⇒ chỉ giữ chỗ (nền kính của khung màn
+ *  con), KHÔNG còn chữ «Đang mở bài học…». */
 function ChoNapGame() {
-  return (
-    <div
-      className="flex items-center justify-center"
-      style={{ minHeight: '60vh', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--nhat)' }}
-    >
-      <span className="chu-cho-tre">Đang mở bài học…</span>
-    </div>
-  )
+  return <div style={{ minHeight: '60vh', color: 'var(--nhat)' }} />
 }
 
 /** Chỗ giữ MÀN CON của học sinh (Câu đã làm, Tu luyện, Lịch sử ca) trong lúc mảnh mã về — trung tu 09/10: chữ chờ chung "Đang mở…"
@@ -849,7 +849,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
   useEffect(() => {
     if (typeof window === 'undefined' || !auth?.token || dangMoManCon || !nenNapTruoc()) return
     let huy = false
-    const cb = () => { if (!huy) void boNapExam().then(() => { if (!huy) return napKhoiPhu() }).catch(() => {}) }
+    const cb = () => { if (!huy) void Promise.all([napManLamBaiTap(), napManTuChua(), napManKiemTra(), napManCauDaLam(), napManTuLuyen()]).then(() => boNapExam()).then(() => { if (!huy) return napKhoiPhu() }).catch(() => {}) }
     const hen = ('requestIdleCallback' in window
       ? (window as Window & { requestIdleCallback: (fn: () => void) => number }).requestIdleCallback
       : (fn: () => void) => setTimeout(fn, 1200))(cb)

@@ -991,6 +991,15 @@ export function MotTrangHs(p: PropsMotTrang) {
     Object.assign(nutSua, { tt: 'khoa', dem: undefined, bong: undefined, ten: 'Tự sửa lỗi: làm xong các chặng phía trên để mở khoá', pop: { tieu: 'Tự sửa lỗi', phu: 'Em làm xong các chặng phía trên thì Tự sửa lỗi mở khoá nhé.' } })
   if (coBt && !p.ngayKiem) nut.push({ k: 'bt', loai: 'bt', tt: chinh === 'bt' ? 'dang' : 'mo', dem: p.soBaiTap || undefined, bong: chinh === 'bt' ? 'Làm bài' : undefined, ten: 'Bài tập về nhà',
     pop: { tieu: 'Bài tập về nhà', phu: p.soBaiTap ? `${p.soBaiTap} bài thầy đang giao` : 'Xem lại bài đã nộp', nut: { chu: p.soBaiTap ? 'Làm bài' : 'Xem bài', onClick: p.onBaiTap } } })
+  // TỔNG CÂU HÔM NAY trên thẻ mức (thầy 02/11: «Còn 5 câu cần sửa và chặng 2 nhưng trên kia lại báo 8/12. Tôi muốn báo tổng số câu của tất cả ngày. Đủ thì
+  // dung dịch đổi màu»): cộng MỌI việc hôm nay — câu học (đến mức, phần vượt mức không cộng) + câu Tự sửa lỗi phần hôm nay (đã sửa + còn lại) + câu Kiểm tra
+  // ôn tập của hôm nay (chưa quá hạn; đã nộp ⇒ tính đủ). Chỉ để HIỆN số + đổi màu dung dịch — thứ tự / khoá việc vẫn theo `du` (đủ mức câu học) như cũ.
+  const ktNgay = !!kiem && kiem.homNay && (kiem.trangThai === 'can_lam' || kiem.trangThai === 'da_nop')
+  const tongSuaNay = typeof conSua === 'number' && typeof daSuaNay === 'number' ? conSua + daSuaNay : 0
+  const tongNgay = (so && !p.ngayKiem ? so.muc : 0) + tongSuaNay + (ktNgay ? kiem!.tong : 0)
+  const daNgay = (so && !p.ngayKiem ? Math.min(so.daLam, so.muc) : 0) + (tongSuaNay ? daSuaNay! : 0) + (ktNgay ? (kiem!.nopLuc !== null ? kiem!.tong : kiem!.daTra) : 0)
+  const coTong = tongNgay > 0 && (!!so || !!p.ngayKiem)
+  const duNgay = coTong && daNgay >= tongNgay
   const tiepTheo = [kiemLam && 'Kiểm tra ôn tập', coSua && !xongSuaNay && 'Tự sửa lỗi', coBt && !!p.soBaiTap && 'Bài tập về nhà'].filter(Boolean) as string[]
   const hocThem = ((chinh === 'sua' && du) || chinh === 'bt' || (chinh === 'kiem' && !p.ngayKiem)) && !p.khoaHoc && !khoaKt
   // Bi nói việc chính của hôm nay (cùng thứ tự `chinh`); xong hết ⇒ Bi mừng. Chưa có số (đang tải) ⇒ chưa hiện, không đoán.
@@ -1028,13 +1037,14 @@ export function MotTrangHs(p: PropsMotTrang) {
           ⇒ nút chặng / linh vật trượt khuất gọn dưới dải. Dải nằm trong khối cao 0 ⇒ không chiếm chỗ. */}
       {dauKinh(<><p>{ngayTuan()}{hs?.lop ? ` · ${hs.lop}` : ''}</p><h1>Chào {p.ten || 'em'}</h1></>, true)}
       {/* HỆ KÍNH (thầy chốt 02/11): thẻ «Mức hôm nay» — số lớn + bình tam giác (thay thẻ bài). Tên bài + việc + chặng giữ nguyên nguồn cũ. */}
-      <section className="kb-hero" data-du={du || undefined} aria-label={`Mức hôm nay${du ? ' · đã đủ' : ''}${p.viec ? ` · ${chuViecBai(p.viec, so)}` : ''}`} aria-busy={!so && p.dangTai}>
+      <section className="kb-hero" data-du={duNgay || undefined} aria-label={`Tổng câu hôm nay${coTong ? `: ${daNgay}/${tongNgay}` : ''}${duNgay ? ' · đã xong' : ''}${p.viec ? ` · ${chuViecBai(p.viec, so)}` : ''}`} aria-busy={!coTong && p.dangTai}>
         <div className="kb-hero-chu">
-          <span className="kb-nhan">{du ? 'Đủ mức hôm nay' : p.ngayKiem ? 'Ngày Kiểm tra ôn tập' : 'Mức hôm nay'}</span>
-          {so ? <div className="kb-so">{du && vuotMuc(so) ? <>{so.daLam}<small> câu</small></> : <>{so.daLam}<small>/{so.muc} câu</small></>}</div> : <span className="mot-xuong" aria-hidden="true" />}
-          <p className="kb-dong-hero" role={!so && p.dangTai ? 'status' : undefined}>{!so ? (p.dangTai ? 'Đang tải bài học hôm nay…' : '') : du ? `Mức ${so.muc} — tới điểm tương đương, dung dịch đã hồng!` : p.ngayKiem || khoaKt ? 'Hôm nay làm Kiểm tra ôn tập trước, rồi mới học chặng.' : `Còn ${con} câu nữa là dung dịch đổi màu.`}</p>
+          <span className="kb-nhan">{duNgay ? 'Xong hết hôm nay' : p.ngayKiem ? 'Ngày Kiểm tra ôn tập' : 'Tổng câu hôm nay'}</span>
+          {coTong ? <div className="kb-so">{daNgay}<small>/{tongNgay} câu</small></div> : <span className="mot-xuong" aria-hidden="true" />}
+          <p className="kb-dong-hero" role={!coTong && p.dangTai ? 'status' : undefined}>{!coTong ? (p.dangTai ? 'Đang tải bài học hôm nay…' : '') : duNgay ? 'Xong hết việc hôm nay — tới điểm tương đương, dung dịch đã hồng!' : p.ngayKiem || khoaKt ? `Còn ${tongNgay - daNgay} câu · làm Kiểm tra ôn tập trước, rồi mới học chặng.` : `Còn ${tongNgay - daNgay} câu nữa là dung dịch đổi màu.`}</p>
         </div>
-        <BinhHomNay da={so?.daLam ?? 0} muc={so?.muc ?? 0} ranh={chang.reduce<number[]>((a, c) => [...a, (a[a.length - 1] ?? 0) + c.co], [])} />
+        {/* vạch trên bình = ranh từng việc theo thứ tự: Kiểm tra ôn tập · từng chặng · Tự sửa lỗi */}
+        <BinhHomNay da={daNgay} muc={tongNgay} ranh={chang.reduce<number[]>((a, c) => [...a, (a[a.length - 1] ?? 0) + c.co], ktNgay && !p.ngayKiem ? [kiem!.tong] : [])} />
         {coThuong && tq && <div className="kb-chip-h">
           <button type="button" className="kb-chip" data-k="lua" onClick={() => moTp('chuoi')} aria-label={`Chuỗi ${chuoi} ngày`}><span><Flame size={18} aria-hidden="true" />{chuoi} ngày</span></button>
           {tq.nguyenTuHomNay !== undefined && <button type="button" className="kb-chip" data-k="nt" onClick={() => moTp('nhiem-vu')} aria-label={`${tq.nguyenTuHomNay} nguyên tử hôm nay`}><span><IcNguyenTu />{tq.nguyenTuHomNay}</span></button>}

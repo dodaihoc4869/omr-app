@@ -459,3 +459,14 @@ html[data-trong='hs'] .ht-app.duo:has(> .tp-ket), html[data-trong='hs'] .ht-app:
   html[data-trong='hs'] .dm-khung[data-muc='luyen'] .da-o { padding-inline: 12px; }
   html[data-trong='hs'] .dm-khung[data-muc='luyen'] .da-o .giua b { font-size: 15.5px; }
 }
+/* Ô SỐ của dòng việc (Tự sửa lỗi «còn N câu»): neo NGAY TRONG DÒNG, sát chữ việc mép phải — luật .da-dem cũ đặt tuyệt đối theo nút tròn nên trôi
+   lên góc khung «Việc hôm nay» (ảnh thầy 02/11). Chấm đỏ nhỏ như huy hiệu, không viền nền. */
+html[data-trong='hs'] .kb-dong > .da-dem.kb-dem { position: static; flex: none; order: 3; margin-left: 2px; box-shadow: none; }
+html[data-trong='hs'] .kb-dong { position: relative; }
+/* THẺ CÂN GIỮA (thầy 02/11 «Các thẻ cân đối chính giữa»): khung trang còn chừa 46 px mép phải cho thanh menu mép phải CŨ (nay là thanh nổi dưới đáy) ⇒
+   thẻ lệch trái. Điện thoại dọc / Fold gập: lề hai bên bằng nhau 16 px (khổ rộng giữ bố cục ray trái). */
+@media (max-width: 639px), (orientation: portrait) and (max-width: 699px) {
+  html[data-trong='hs'] .dm-khung { padding-right: 16px; }
+}
+/* LỜI MOL gọn theo độ dài chữ (thầy 02/11 «chỗ câu của mol thẻ phải gọn lại theo độ dài chữ»): bong bóng ôm chữ, không kéo hết bề ngang */
+html[data-trong='hs'] .da-vo .bi-loi > .bi-loi-bong { flex: 0 1 auto; width: fit-content; max-width: 100%; }
