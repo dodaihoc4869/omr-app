@@ -470,3 +470,8 @@ html[data-trong='hs'] .kb-dong { position: relative; }
 }
 /* LỜI MOL gọn theo độ dài chữ (thầy 02/11 «chỗ câu của mol thẻ phải gọn lại theo độ dài chữ»): bong bóng ôm chữ, không kéo hết bề ngang */
 html[data-trong='hs'] .da-vo .bi-loi > .bi-loi-bong { flex: 0 1 auto; width: fit-content; max-width: 100%; }
+/* NỀN MÀN TOÀN MÀN HÌNH ĐẶC (thầy 02/11, ảnh «Luyện lại từ bài kiểm tra»: «vẫn có hiệu ứng kính nhưng lớp sau không chồng lên như thế này»): bộ sinh kính
+   đổi nền các màn phủ kín sang --kinh-nen (62 %) ⇒ trang phía sau lộ qua. Màn phủ kín = nền ĐẶC + đúng dải loang (y như nền trang) — thẻ bên trong vẫn kính. */
+html:root[data-trong='hs'] body .m3-sheet, html:root[data-trong='hs'] body .m3-phong, html:root[data-trong='hs'] body .h2-cdl, html:root[data-trong='hs'] body .hs-ho-so-em .gvv2-hs,
+html:root[data-trong='hs'] body .aid-tam, html:root[data-trong='hs'] body .m3.kq-kinh, html:root[data-trong='hs'] body .ccs, html:root[data-trong='hs'] body .ktcn-man {
+  background-color: var(--tr-nen); background-image: var(--kinh-loang); }
