@@ -103,13 +103,15 @@ const vongThi: Fn = async function () {
     this.datBan('den'); this.datMieng('phang')
     this.dat({ a1P: 58, a2P: -4, tia: 1, lid: n.lid + 0.08, maT: n.ma0 + 4, maP: n.ma0 + 4, myT: 0, myP: 0, ma: 0.6, sao: 0 }, 140, 0.8)
     await this.ngu(700)
-  } else this.dat({ tia: 1 }, 140, 0.8)
-  if (this.giam) return // máy yếu / giảm chuyển động: cầm đèn đứng yên
+  } else { await this.ngu(rand(1200, 2000)); this.dat({ tia: 1, lid: n.lid + 0.08, maT: n.ma0 + 4, maP: n.ma0 + 4 }, 140, 0.8) } // sau lượt soi: đứng thêm rồi mới bật lại chùm sáng
+  if (this.giam) { this.dat({ tia: 0 }); return } // máy yếu / giảm chuyển động: cầm đèn đứng yên, không chùm sáng tĩnh (tia soi khi chạm vẫn có — den-soi.ts)
   let phai = Math.random() < 0.5
   for (;;) {
     phai = !phai
-    this.dat({ a1P: phai ? rand(80, 104) : rand(26, 48), a2P: rand(-8, 6) }, rand(3.2, 5.5), 1)
-    await this.ngu(rand(1700, 2800))
+    // 02/11 MƯỢT (đo màn thi CPU ×4: quét liên tục ⇒ phần vẽ sau mỗi lần chạm ô dài thêm ~15 ms): quay đèn gọn ~0,7 s rồi GIỮ yên 2,2–3,6 s
+    // (không vẽ khung nào lúc giữ) — vẫn là soi đèn đi lại, nhưng số khung vẽ lại giảm ~¾.
+    this.dat({ a1P: phai ? rand(80, 104) : rand(26, 48), a2P: rand(-8, 6) }, 36, 0.95)
+    await this.ngu(rand(2900, 4300))
     if (Math.random() < 0.32) {
       this.dat({ lid: n.lid + 0.42, maT: n.ma0 + 10, maP: n.ma0 + 10, myT: 2, myP: 2 }, 260, 0.7); this.datMieng(this.muc === 'nb' ? 'hmm' : 'phang')
       await this.ngu(rand(650, 1100))
@@ -346,16 +348,12 @@ function gocSoi(p: Nguoi, d: { x: number; y: number }): { th: number; kinh: { x:
   return { th, kinh: { x: vx + L * Math.sin(a), y: vy + L * Math.cos(a) } }
 }
 async function soi(this: Nguoi, d: { x: number; y: number }): Promise<void> {
+  // 02/11 MƯỢT (đo màn thi CPU ×4: chuỗi quay tay rồi nheo mắt 2 nhịp ~1,7 s chồng lên lần chạm ô kế ⇒ phần vẽ sau chạm dài thêm ~15 ms): MỘT lượt —
+  // tay + mắt + nheo cùng lúc (lò xo cứng, lắng ~0,3 s) rồi đứng yên.
   this.khoaMat = true
-  const { th } = gocSoi(this, d)
-  this.dat({ a1P: th, a2P: 0, tia: 0 }, 220, 0.9) // tay tới đích ~0,3 s (tia của màn thi vươn 260 ms từ kính ở dáng đích)
-  const g = this.huong(d.x, d.y, 110)
-  this.dat({ gx: g.gx, gy: g.gy }, 200, 0.8)
-  await this.ngu(420)
-  this.dat({ lid: this.n.lid + 0.34, maT: this.n.ma0 + 8, maP: this.n.ma0 + 8 }, 260, 0.7)
-  await this.ngu(rand(900, 1200))
-  this.dat({ lid: this.n.lid + 0.08, maT: this.n.ma0 + 4, maP: this.n.ma0 + 4 }, 200, 0.7)
-  await this.ngu(400)
+  const { th } = gocSoi(this, d), g = this.huong(d.x, d.y, 110)
+  this.dat({ a1P: th, a2P: 0, tia: 0, gx: g.gx, gy: g.gy, lid: this.n.lid + 0.3, maT: this.n.ma0 + 8, maP: this.n.ma0 + 8 }, 220, 0.9) // tia màn thi vươn 260 ms từ kính ở dáng đích
+  await this.ngu(rand(2200, 2800))
 }
 
 // MÁY YẾU / GIẢM CHUYỂN ĐỘNG (02/11, đo CPU ×6: chuỗi bước của phản ứng — mỗi bước vẽ lại cả hình — trùng lúc hiệu ứng ăn mừng ⇒ «Tiếp tục» / khung
@@ -501,7 +499,12 @@ class Nguoi {
     const tay = now - tayLuc < 1400 && !this.khoaMat && this.hien && !this.thi
     const chop = now - this.chopTu < 180
     // ~30 khung/giây (28/10 MƯỢT: 60 khung/giây giữ luồng chính bận gần trọn mỗi khung ở CPU ×4); lò xo vẫn tích phân bước nhỏ theo thời gian thật.
-    if (now - this.ve30 < 30 && this.ve30) { this.raf = requestAnimationFrame(this.khungVe); return }
+    // lúc thi đèn quét chậm (lò xo mềm) ⇒ ~15 khung/giây là đủ mượt; em làm bài cả ca nên bớt nửa số lần vẽ (02/11, đo màn thi CPU ×4)
+    const cach = this.thi && !this.khoaMat && this.dangLam === 'thi' ? 66 : 30
+    if (now - this.ve30 < cach && this.ve30) {
+      if (cach > 30) { this.raf = -1; this.hNhuong = window.setTimeout(() => { this.raf = this.song && !this.dung ? requestAnimationFrame(this.khungVe) : 0 }, cach - (now - this.ve30) - 8); return } // ngủ tới khung kế, không thức mỗi khung
+      this.raf = requestAnimationFrame(this.khungVe); return
+    }
     const dt = Math.min(0.1, Math.max(0.001, (now - this.last) / 1000)); this.last = now; this.ve30 = now
     if (tay) this.theoTay()
     if (this.thi && !this.khoaMat) {
@@ -627,6 +630,7 @@ class Nguoi {
   batThi(bat: boolean): void {
     if (bat === this.thi) return
     this.thi = bat
+    this.vo.toggleAttribute('data-thi', bat)
     if (bat) { if (this.tinh) { this.datBan('den'); this.dat({ a1P: 58, a2P: -4, tia: 1, lid: this.n.lid + 0.08, maT: this.n.ma0 + 4, maP: this.n.ma0 + 4, ma: 0.6 }); this.datMieng('phang'); return } void this.lam('thi', vongThi) }
     else { this.huyLam(); this.dangLam = null; this.dat({ tia: 0 }, 200, 0.9); this.veGoc(); this.henNhanRoi() }
   }
@@ -684,8 +688,9 @@ export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; 
     soiVao(el) {
       if (!el || !p.thi || p.tinh) return null
       const d = tamCua(el), dich = gocSoi(p, d)
-      if (p.song) void p.lam('soi', function () { return soi.call(this, d) })
-      else { p.dat({ a1P: dich.th, a2P: 0 }); p.datBan('den') }
+      // máy yếu (02/11, đo màn thi CPU ×6: chuỗi 5 bước quay đèn chồng lên lần chạm kế ⇒ chạm / «Câu tiếp» chậm hơn bản cũ): quay đèn MỘT bước, giữ hướng
+      if (p.song && !p.giam) void p.lam('soi', function () { return soi.call(this, d) })
+      else { p.huyLam(); p.dangLam = null; p.datBan('den'); p.dat({ a1P: dich.th, a2P: 0, tia: 0 }) }
       return dich.kinh
     },
     noi(chu, oo = {}) {

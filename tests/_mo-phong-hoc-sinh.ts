@@ -44,7 +44,14 @@ const tamDv = (k: number) => 5 * k + 4
 const dvDangHoc = (g: number) => DON_VI.map((_, k) => k).filter((k) => Math.abs(g - tamDv(k)) <= 8)
 const SO_NGAY_CU = NGAY_CU.length
 /** Đáp án của một em mô phỏng: trục chất lượng (null = em không có bằng chứng nào: chưa làm gì) · trục công sức. */
-export interface DapAn { cl: 'ht' | 'dp' | null; cs: 'ch' | 'lu' }
+export interface DapAn {
+  cl: 'ht' | 'dp' | null; cs: 'ch' | 'lu'
+  /** HƯỚNG B (thầy 02/11: «chốt cuối cùng là bài kiểm tra trên lớp và gọi lên bảng»): nhãn chất lượng CŨNG ĐÚNG khi em ở bảng công sức `khiCs`.
+   *  dp_voi / dp_treo = «làm cho có» — phần kiến thức em làm được ở nhà là THẬT (ca thi khớp mức luyện, vì mô phỏng sinh ca thi theo đúng năng lực ấy), cái
+   *  sai là CÔNG SỨC. Hướng B: trên lớp khớp + chỉ MỘT dấu hiệu làm cho có mức nhẹ ⇒ «Học thật (đã kiểm trên lớp)» + «Lười (làm cho có)» là đúng; Học thật
+   *  mà Chăm thì vẫn SAI. Dấu hiệu mạnh / ≥ 2 họ ⇒ Đối phó (đáp án chính) vẫn đúng. */
+  clKhac?: { cl: 'ht'; khiCs: 'lu' }
+}
 
 export type Kieu =
   | 'ht' | 'ht_yeu' | 'ht_it_ngay' | 'gioi_nhanh' | 'ht_thong_bao'
@@ -272,6 +279,7 @@ export function taoEm(k: Kieu, r: Rng, ma = 'X'): DauVaoBon & { dapAn: DapAn } {
   const coBangChung = luot.length > 0 || caThi.length > 0 || lenBang.length > 0 || KT.length > 0 || dauVao.ktcn.boHan > 0
   const dapAn: DapAn = {
     cl: !coBangChung ? null : k.startsWith('dp_') ? 'dp' : 'ht',
+    ...(k === 'dp_voi' || k === 'dp_treo' ? { clKhac: { cl: 'ht' as const, khiCs: 'lu' as const } } : {}),
     cs: ngayDuThat >= 0.7 * ngayPhai.length && lamChoCo <= 0.1 && !t.donHan ? 'ch' : 'lu',
   }
   return { dg: { kq: danhGiaEm(dauVao), dauVao }, ngay, lanCuoiHoc: [...ngayLam].sort().pop() ?? '', den: DEN, hoi: t.hoi, caThi, lenBang, luyenCu, dapAn }

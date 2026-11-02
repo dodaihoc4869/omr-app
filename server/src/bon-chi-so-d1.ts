@@ -14,6 +14,7 @@ import { cuaSoTinh, sqlChuyenDeKho, sqlQidGoc, SQL_LUOT_LAM, tinhLoEm } from './
 import { BAN_BON, tinhBon, trungVi, vaoBang, type KetQuaBon, type SoLieuBon, type TheTho } from './bon-chi-so'
 import { SO_NGAY_CA, type CauCaThi, type LuotBang, type LuyenCuDv } from './bon-ca-thi'
 import { congNgay7 } from './goi-bai-7-loi'
+import { canDuoiWilson } from './danh-gia-hoc-that'
 import { THU_TU_BANG, type DiemBon, type DongBang, type LoiBon, type MaBang, type TheBangChung, type TraLoiBangChung, type TraLoiBonBang } from '../../src/lib/bon-bang-kieu'
 
 type Row = Record<string, unknown>
@@ -76,6 +77,7 @@ export async function tinhLoBon(env: Env, em: readonly EmGoc[], nowMs: number): 
   const ds = JSON.stringify(sbds)
   const [dg, ngayEm, vao, cuoi, rHoi, rCa, rCu, doKho] = await Promise.all([
     tinhLoEm(env, sbds, nowMs, { giuDauVao: true }).catch(() => null),
+    // KHÔNG nuốt lỗi ở đây (soát 02/11): rỗng ⇒ cả lô thành «chưa có ngày phải làm» ⇒ hàng loạt Chăm sai. Lỗi ⇒ lô không ghi, phút sau tính lại.
     docNgayCacEm(env, em, w.tu, w.cuoi, w.homNay, []),
     docNgayVao(env, em, w.tu),
     hoi(env, 'SELECT sbd, MAX(ngay_vn) AS n FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?1)) AND ket_qua IS NOT NULL GROUP BY sbd', JSON.stringify(sbds)).catch(() => [] as Row[]),
@@ -102,11 +104,11 @@ export async function tinhLoBon(env: Env, em: readonly EmGoc[], nowMs: number): 
   const them = <T>(m: Map<string, T[]>, k: string, x: T) => { const a = m.get(k); if (a) a.push(x); else m.set(k, [x]) }
   for (const x of rCa) {
     const sbd = str(x.sbd), dv = dvCua(x.cd_kho, x.cd_dong, x.dg), nguon = str(x.nguon)
-    const chung = { qid: str(x.qid), ngay: str(x.ngay_vn), luc: str(x.luc), dv }
+    const chung = { qid: str(x.qid), ngay: str(x.ngay_vn), luc: str(x.luc), dv, dg: str(x.dg) || null }
     if (nguon === 'thi') them(caTheo, sbd, { ...chung, ma: str(x.ma_nguon), mucDo: str(x.muc_do), dung: Number(x.ket_qua) === 1, pLop: doKho.get(`${str(x.ma_nguon)}|${str(x.qid)}`) ?? null })
     else them(bangTheo, sbd, { ...chung, dat: Number(x.ket_qua) === 1, loai: nguon === 'dau_gio' ? 'dau_gio' : 'len_bang' })
   }
-  for (const x of rCu) { const dv = dvCua(null, x.cd, x.dg); if (dv) them(cuTheo, str(x.sbd), { ngay: str(x.ngay), dv, n: Number(x.n) || 0, d: Number(x.d) || 0 }) }
+  for (const x of rCu) { const dv = dvCua(null, x.cd, x.dg); if (dv) them(cuTheo, str(x.sbd), { ngay: str(x.ngay), dv, dg: str(x.dg) || null, n: Number(x.n) || 0, d: Number(x.d) || 0 }) }
   return em.map((e) => {
     const d = dg?.find((x) => x.sbd === e.sbd)
     const ngay = ngayDuocTinh(ngayEm.get(e.sbd) ?? [], vao.get(e.sbd) ?? w.tu).filter((n) => n.ngay <= w.cuoi)
@@ -159,14 +161,18 @@ function xepBang(rows: readonly Row[], emTheo: ReadonlyMap<string, EmGoc>, b: Ma
     // v2: quyết định «chắc mới xếp» lưu sẵn trong số đo; bản cũ (chưa tính lại) dùng ngưỡng điểm như trước.
     .filter((x) => x.e && (x.vao ? x.vao[b] === true : vaoBang(x.d, b)))
     // v3b: em được xếp mà điểm trục ấy chưa có (bản cũ) ⇒ 0 để xếp hạng không vỡ.
-    .map((x) => ({ sbd: x.e!.sbd, hoTen: x.e!.hoTen, lop: x.e!.lop, khoi: x.e!.khoi, diem: x.d[b] ?? 0, bc: json<Record<string, string>>(x.r.bc_json, {})[b] ?? '' }))
-    .sort((a, c) => c.diem - a.diem || a.hoTen.localeCompare(c.hoTen, 'vi'))
+    // Hướng B: ở bảng Học thật / Đối phó, em ĐÃ KIỂM (vinh danh / đã chốt trên lớp) đứng trước em nhãn tạm; trong mỗi nhóm theo điểm như cũ.
+    .map((x) => ({ k: (b === 'ht' || b === 'dp') && str(x.r.kiem_cl) === 'da' ? 1 : 0, dong: { sbd: x.e!.sbd, hoTen: x.e!.hoTen, lop: x.e!.lop, khoi: x.e!.khoi, diem: x.d[b] ?? 0, bc: json<Record<string, string>>(x.r.bc_json, {})[b] ?? '' } }))
+    .sort((a, c) => c.k - a.k || c.dong.diem - a.dong.diem || a.dong.hoTen.localeCompare(c.dong.hoTen, 'vi'))
+    .map((x) => x.dong)
 }
 
 export async function gvBonBang(env: Env, _b: Row, nowMs = Date.now()): Promise<TraLoiBonBang | LoiBon> {
   await damBaoBangBon(env)
   const w = cuaSoTinh(nowMs)
-  const [em, rows] = await Promise.all([docDanhSachEm(env, []), hoi(env, "SELECT sbd, ngay, tinh_luc, ht, dp, ch, lu, bc_json, CASE WHEN json_valid(so_lieu_json) THEN json_extract(so_lieu_json, '$.vao') END AS vao FROM bon_chi_so_em")])
+  const [em, rows] = await Promise.all([docDanhSachEm(env, []), hoi(env, "SELECT sbd, ngay, tinh_luc, ht, dp, ch, lu, bc_json, CASE WHEN json_valid(so_lieu_json) THEN json_extract(so_lieu_json, '$.vao') END AS vao, "
+    + "CASE WHEN json_valid(so_lieu_json) THEN json_extract(so_lieu_json, '$.kiem.cl') END AS kiem_cl, CASE WHEN json_valid(so_lieu_json) THEN json_extract(so_lieu_json, '$.nguoc.sau') END AS ng_sau, "
+    + "CASE WHEN json_valid(so_lieu_json) THEN json_extract(so_lieu_json, '$.nguoc.nhan') END AS ng_nhan, CASE WHEN json_valid(so_lieu_json) THEN json_extract(so_lieu_json, '$.nguoc.llrSau') END AS ng_llr FROM bon_chi_so_em")])
   if (!em) return { ok: false, error: 'Không đọc được danh sách học sinh.' }
   const emTheo = new Map(em.map((e) => [e.sbd, e]))
   const cua = rows.filter((r) => emTheo.has(str(r.sbd)))
@@ -178,7 +184,37 @@ export async function gvBonBang(env: Env, _b: Row, nowMs = Date.now()): Promise<
     bang, trungVi: trungViCaLop(cua),
     // v3b (thầy 02/11 «không còn theo dõi nữa»): mọi em đều ở bảng của mình kèm lý do ⇒ khoá giữ cho app cũ, luôn rỗng.
     theoDoi: [],
+    kiemDinh: kiemDinhBon(cua),
   }
+}
+
+/** Số nhãn niêm phong tối thiểu mỗi nhãn để báo độ chính xác trên số liệu thật. */
+export const MAU_TOI_THIEU_KD = 30
+
+/** HƯỚNG B — tự đo độ chính xác trên số liệu thật (thuần, chỉ đếm gộp). Nhãn NIÊM PHONG từ các buổi TRƯỚC 2 buổi trên lớp gần nhất (`nguoc.nhan`);
+ *  2 buổi ấy TỰ chốt (`nguoc.sau`, dữ liệu chưa dùng khi niêm phong): trùng = `cung` (xác nhận) · ngược = `lat` (SAI) · chưa đủ chắc = không tính.
+ *  Độ chính xác = cung / (cung + lat), chỉ báo khi ≥ 30 lần 2 buổi sau đã tự chốt. */
+export function kiemDinhBon(rows: readonly Row[]): NonNullable<TraLoiBonBang['kiemDinh']> {
+  const kd: NonNullable<TraLoiBonBang['kiemDinh']> = { daKiem: { ht: 0, dp: 0 }, tam: { ht: 0, dp: 0 }, niemPhong: { ht: { tong: 0, cung: 0, lat: 0 }, dp: { tong: 0, cung: 0, lat: 0 } } }
+  for (const r of rows) {
+    const vao = (() => { try { return typeof r.vao === 'string' ? JSON.parse(r.vao) as Record<string, boolean> : null } catch { return null } })()
+    const nhan = vao?.dp ? 'dp' : vao?.ht ? 'ht' : null
+    const k = str(r.kiem_cl)
+    if (nhan && k === 'da') kd.daKiem[nhan]++
+    else if (nhan && k === 'tam') kd.tam[nhan]++
+    const ng = str(r.ng_nhan)
+    if (ng === 'ht' || ng === 'dp') {
+      const x = kd.niemPhong[ng]
+      x.tong++
+      const sau = str(r.ng_sau)
+      if (sau === ng) x.cung++
+      else if (sau === 'ht' || sau === 'dp') x.lat++
+    }
+  }
+  // Chưa đủ 30 lần «2 buổi sau tự chốt» ⇒ «chưa đủ mẫu» (null) — không in con số khi mẫu còn nhỏ.
+  const cx = (x: { cung: number; lat: number }) => { const n = x.cung + x.lat; return n >= MAU_TOI_THIEU_KD ? { ti: x.cung / n, canDuoi: canDuoiWilson(x.cung, n) } : null }
+  kd.chinhXac = { ht: cx(kd.niemPhong.ht), dp: cx(kd.niemPhong.dp) }
+  return kd
 }
 
 /** «Bài 7 · Fe và Cu tác dụng với HCl…» từ tên tờ + đầu đề. Thuần. */

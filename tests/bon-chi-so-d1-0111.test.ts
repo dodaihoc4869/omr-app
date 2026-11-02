@@ -139,7 +139,7 @@ describe('/gv/bon-bang + /gv/bon-bang/em', () => {
     expect(ca.viDu![0]).toMatchObject({ cau: 'Este', phu: 'luyện 16/20', kq: 'thi 5/7' })
     expect(e.the.find((t) => t.ma === 'lenBang')).toMatchObject({ lon: '2/3', nhoSo: 'lần đạt · chưa đạt 1' })
     const sl = JSON.parse((d.sql.prepare("SELECT so_lieu_json j FROM bon_chi_so_em WHERE sbd = 'S02'").get() as { j: string }).j)
-    expect(sl).toMatchObject({ ban: 4, caCau: 7, caGhep: 7, bangTong: 3, bangDat: 2, theoDoi: null })
+    expect(sl).toMatchObject({ ban: 5, caCau: 7, caGhep: 7, bangTong: 3, bangDat: 2, theoDoi: null })
   })
   it('tên câu ngắn: «Bài N · đầu đề…»', () => {
     expect(M.tenCauNgan('Bài 10. Quy tắc octet', 'Nguyên tử   Na có cấu hình')).toBe('Bài 10 · Nguyên tử Na có cấu hình')

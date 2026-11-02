@@ -49,6 +49,17 @@ export interface TraLoiBonBang {
   trungVi: DiemBon
   /** v2 (01/11): em có dấu hiệu nhưng CHƯA đủ chắc để xếp. v3b (02/11): ĐÃ BỎ — máy chủ mới luôn trả rỗng; giữ khoá cho máy chủ cũ (app không còn vẽ). */
   theoDoi?: DongBang[]
+  /** HƯỚNG B (02/11): TỰ ĐO ĐỘ CHÍNH XÁC TRÊN SỐ LIỆU THẬT — chỉ số đếm gộp, không tên. `daKiem` / `tam`: số em theo nhãn và mức chắc.
+   *  `niemPhong`: nhãn niêm phong từ các buổi TRƯỚC 2 buổi trên lớp gần nhất; 2 buổi ấy tự chốt ⇒ `cung` = trùng (xác nhận) · `lat` = NGƯỢC (SAI —
+   *  lời hứa ≤ 1%) · còn lại chưa đủ chắc. Máy chủ cũ không có ⇒ vắng. */
+  kiemDinh?: {
+    daKiem: { ht: number; dp: number }
+    tam: { ht: number; dp: number }
+    niemPhong: Record<'ht' | 'dp', { tong: number; cung: number; lat: number }>
+    /** Độ chính xác trên số liệu thật = cung / (cung + lat), kèm cận dưới Wilson 95% một phía. CHỈ có khi ≥ 30 lần 2 buổi sau đã tự chốt;
+     *  null = «chưa đủ mẫu» (không in con số). Lời hứa 99%: cận dưới ≥ 0,99. */
+    chinhXac?: Record<'ht' | 'dp', { ti: number; canDuoi: number } | null>
+  }
 }
 
 /** Một ví dụ cụ thể có ngày giờ (bằng chứng «tâm phục khẩu phục»). */
