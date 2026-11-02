@@ -10,6 +10,7 @@
 import ChuTheLoc, { tenTheLoc } from '../ChuTheLoc'
 import { startTransition, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import TheCau from '../TheCau'
+import { bocKinh, taiKinhNen } from '../loi-giai-kinh/boc-kinh'
 import KhungXemPhieu from '../KhungXemPhieu'
 import { ChemText } from '../../lib/chem-format'
 import '../m3'
@@ -222,6 +223,13 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
     [token],
   )
 
+  // LỜI GIẢI KÍNH (thầy 02/11): câu đang hiện là câu em ĐÃ làm ⇒ tải nền gói Kính một lệnh, mở thẻ là có ngay (không chờ mạng từng thẻ).
+  const dsQidKinh = dsHien.map((c) => c.qid).join('|')
+  useEffect(() => {
+    if (!dsQidKinh) return
+    const h = window.setTimeout(() => taiKinhNen(dsQidKinh.split('|')), 800)
+    return () => window.clearTimeout(h)
+  }, [dsQidKinh])
   // Thẻ đóng cần một dòng đề + đáp án (bản vẽ) ⇒ lấy chi tiết cho các câu ĐANG HIỆN (trang hiện tại của bộ lọc) chưa có.
   useEffect(() => {
     napChiTiet(dsHien.map((c) => c.qid).filter((q) => !daXin.current.has(q)))
@@ -569,7 +577,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
         ) : (
           <div className="m3 h2-the-cau">
             {/* Hỏi thầy nằm trong khối lời giải (thầy lệnh 30/09): chỉ hiện khi lời giải đã tải và đang hiện. Máy chủ tự khoá câu đang thi. */}
-            <TheCau {...propsTheCau(tt.ct, c.stt)} hoiThay={{ qid: c.qid, nguon: 'cau_da_lam' }} />
+            <TheCau {...propsTheCau(tt.ct, c.stt)} hoiThay={{ qid: c.qid, nguon: 'cau_da_lam' }} bocLoiGiai={bocKinh(c.qid)} />
           </div>
         )}
         {c.lichSu.length > 0 && (
