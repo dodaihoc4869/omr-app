@@ -476,7 +476,8 @@ html[data-trong='hs'] .tr-menu .tr-dd { background: var(--kinh-mat-dam); }
 html[data-trong='hs'] .aid-bt { background: var(--kinh-mat-dam); }
 html[data-trong='hs'] .ktcn-thanh, html[data-trong='hs'] .xd-tren { background: transparent; box-shadow: none; }
 html[data-trong='hs'] .ktcn-ket-dau, html[data-trong='hs'] .ktcn-bai-o, html[data-trong='hs'] .kq-the { background: var(--kinh-mat-dam); }
-html[data-trong='hs'] .ht-app.duo:has(> .tp-ket), html[data-trong='hs'] .ht-app:has(.tp-goc.tp-ket) { background: transparent; }
+/* khung chứa màn kết bài: `data-ket-bai` do KetBaiThuong gắn (thay `:has(.tp-goc.tp-ket)` — gốc màn làm câu không còn bị soát :has() mỗi lần đổi nút); [x][x] giữ độ ưu tiên cũ */
+html[data-trong='hs'] .ht-app[data-ket-bai][data-ket-bai] { background: transparent; }
 /* nút dài ở khổ rộng ⇒ viên thuốc tối đa 360 px, giữa (điện thoại giữ nút rộng cho dễ bấm) */
 @media (orientation: landscape) and (min-width: 640px), (min-width: 700px) and (min-aspect-ratio: 10/13) {
   html[data-trong='hs'] .tp-goc .tp-nut-lon { width: min(100%, 360px); margin-inline: auto; }
