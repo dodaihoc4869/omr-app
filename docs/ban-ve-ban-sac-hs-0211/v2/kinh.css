@@ -353,3 +353,15 @@ svg.i { width: 22px; height: 22px; flex: none; fill: none; stroke: currentColor;
 .bb[data-ai] { align-self: flex-start; border-bottom-left-radius: 8px; }
 .bb[data-em] { align-self: flex-end; border-bottom-right-radius: 8px; background: var(--tr-hs-day); color: var(--tr-hs-tren); }
 @media (min-width: 900px) { .trang[data-rong-1] { max-width: 760px; padding-left: 140px; padding-right: 24px; } }
+/* ngang thấp: hai cột cuộn riêng, nút chính dính đáy cột phải (luật haiCotLam) */
+@media (max-height: 440px) and (min-width: 700px) {
+  .lam { height: 100dvh; min-height: 0; }
+  .lam-than[data-hai] { height: 100%; min-height: 0; overflow: hidden; }
+  .lam-than[data-hai] > .cot { height: 100%; overflow: auto; padding-bottom: 4px; scrollbar-width: thin; }
+  .lam-than[data-hai] .chan { position: sticky; bottom: 0; padding-bottom: 6px; }
+}
+@media (max-height: 440px) and (min-width: 700px) {
+  .lam-than[data-hai] .kq { position: sticky; bottom: 6px; z-index: 5; gap: 8px; padding: 12px 14px; -webkit-backdrop-filter: var(--mo); backdrop-filter: var(--mo); }
+  .lam-than[data-hai] .kq h2 { font-size: 19px; } .lam-than[data-hai] .kq p { font-size: 14px; } .lam-than[data-hai] .kq .oi[data-co='to'] { width: 44px; height: 44px; }
+  .lam-than[data-hai] .kq .loi-giai { padding: 8px 12px; font-size: 14.5px; } .lam-than[data-hai] .kq .nut { min-height: 46px; }
+}
