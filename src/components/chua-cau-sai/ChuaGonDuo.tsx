@@ -4,7 +4,7 @@
 //   thanh trên (X · MỘT thanh tiến độ của chặng sửa hôm nay) → nhãn ngắn + đề chữ to + ô phương án 3D → ĐÁY GHIM «Kiểm tra» (+ Hỏi thầy dạng viên)
 //   ⇒ tấm kết quả trượt lên (xanh / đỏ, có Bi) + «Lời giải» / «Hỏi thầy» dạng viên + «Tiếp tục» ⇒ hết chặng: màn xong có Bi mừng.
 // Đáp án vẫn chỉ về SAU khi nộp (gon-mo chỉ có đề công khai; đáp án + lời giải đi cùng kết quả gon-nop) — tệp này không đọc gì khác ChuaGon.
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { BookOpen, Lightbulb, X as XIcon } from 'lucide-react'
 import { ChemText } from '../../lib/chem-format'
 import type { Question } from '../../game/than-thu-v2/core'
@@ -27,6 +27,10 @@ import '../hoc-tap/hoc-tap.css'
 import { KhungDuoSua, type TienDoSua } from './KhungDuoSua'
 export type { TienDoSua }
 import './duo-sua.css'
+// GIÁM THỊ MỚI ở màn sửa câu (thầy 02/11 «Cho cả giám thị mới … vào tất cả các câu mọi chỗ trong app đã có»): cùng mảnh nạp lười + cùng khung `.duo-gt-san`
+// như màn làm chặng. Đề gọn của máy chủ không có mức độ ⇒ người coi theo PHẦN câu như màn thi (GT_THEO_PHAN: I nb · II th · III vd).
+const GiamThiCau = lazy(() => import('../giam-thi/GiamThi'))
+const GT_PHAN = { I: 'nb', II: 'th', III: 'vd' } as const
 
 /** Đề gọn của máy chủ ⇒ câu cho các ô Duo (LamCau). Chỉ đề công khai — không đáp án. */
 export function cauTuDeGon(de: DeGon): Question {
@@ -241,7 +245,13 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
           {/* thầy 27/10: trợ giúp gom vào bóng đèn góc phải (như màn làm chặng) — thanh đáy chỉ còn KIỂM TRA */}
           {dangLam && <div className="duo-lenh" data-chi-den=""><TroGiupDuo key={`${q.qid}${lan}`}>{linkHoi(true)}</TroGiupDuo></div>}
           {lan === 1 && dangLam && <p className="duo-mo-ghi">{mo.tuSuaNeuDung ? LUAT_BAN_MOI : 'Em vừa sai câu này hôm nay: làm đúng bây giờ tính xong phần hôm nay. Ngày khác tự làm đúng mới tính là đã tự sửa.'}</p>}
-          <DeCau q={q} stt={1} />
+          {GT_PHAN[q.phan as 'I' | 'II' | 'III'] ? <div className="duo-gt-san">
+              <div className="duo-gt-loi-o" />
+              <div className="duo-gt-nv"><Suspense fallback={null}><GiamThiCau muc={GT_PHAN[q.phan as 'I' | 'II' | 'III']} qid={`${q.qid}·${lan}`} phien={`sua-${qid}`} nop={ban || !!kq}
+                ket={!kq ? null : tt === 'dung' ? 'dung' : tt === 'sai' ? 'sai' : 'trung'} vung={() => goc.current} /></Suspense></div>
+              <div className="duo-gt-bong"><svg className="duo-gt-vien" aria-hidden="true"><path /></svg><span className="duo-gt-cho" aria-hidden="true" /><DeCau q={q} stt={1} /></div>
+            </div>
+            : <DeCau q={q} stt={1} />}
         </div>
         <ThanhCuon key={`cd${q.qid}${lan}`} cot="de" />
         <div key={`t${q.qid}${lan}`} className="duo-cot-tra">

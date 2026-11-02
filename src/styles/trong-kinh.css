@@ -412,3 +412,14 @@ html[data-trong='hs'] .tlu .tlu-the-che-do[data-che-do='2'] .tlu-the-che-do-icon
 html[data-trong='hs'] .tlu .tlu-the-che-do[data-che-do='4'] .tlu-the-che-do-icon { background: linear-gradient(145deg, color-mix(in oklab, var(--tr-sao) 80%, var(--tr-trang)), var(--tr-sao-chu)); }
 html[data-trong='hs'] .tlu .tlu-the-che-do[data-che-do='5'] .tlu-the-che-do-icon { background: linear-gradient(145deg, color-mix(in oklab, var(--tr-tin) 75%, var(--tr-trang)), var(--tr-tin-chu)); }
 @media (min-width: 900px) { html[data-trong='hs'] .tlu .tlu-luoi-the { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+/* CHỮ KHÔNG TRÀN MÉP THẺ (thầy 02/11 «để ý xem chữ có tràn khung không» — đo bằng scripts/chup-v2/chup-kinh.mjs «sát mép thẻ»):
+   Fold gập 360 px: «12 ngày» 56 px rộng hơn chỗ trống bên trái Mol ⇒ trào ra mép trái; ô Luyện tập hai cột hẹp: «0/28câu» chạm mép phải. */
+@media (max-width: 400px) {
+  html[data-trong='hs'] .dm-khung[data-muc='thanh-tich'] .da-lua b { font-size: 46px; }
+  html[data-trong='hs'] .dm-khung[data-muc='thanh-tich'] .da-lua { gap: 8px; }
+}
+@media (max-width: 440px) {
+  html[data-trong='hs'] .dm-khung[data-muc='luyen'] .da-o .so { font-size: 26px; }
+  html[data-trong='hs'] .dm-khung[data-muc='luyen'] .da-o .so .so-dv { font-size: 12.5px; }
+}
+html[data-trong='hs'] .da-lua > :not(.bi):not(svg) { min-width: 0; }

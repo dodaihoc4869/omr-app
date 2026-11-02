@@ -43,7 +43,7 @@ export const CANH = [
   ['lam-7-tln', 'man=lam13&lam=duo', `${DQ4} » phim:8,2`, false],
   ['lam-8-xong', 'man=lam13&lam=duo', `${DQ4} » phim:8,2 » nut:^Kiểm tra$ » nut:^Tiếp tục » tn:^B » nut:^Kiểm tra$ » nut:^Tiếp tục`, false],
   ['tu-sua-loi', 'man=hs12-tu-chua', '', true],
-  ['chua-cau-sai', 'man=hs12-chua-truc-tiep', '', true],
+  ['chua-cau-sai', 'man=duo-sua&de=1', 'cho:900', false], // luồng sửa câu app ĐANG DÙNG (ChuaGonDuo) — luồng «Đường tự gỡ» cũ không còn là lối vào
   ['tu-luyen', 'man=hs12-tu-luyen', '', true],
   ['tu-luyen-lam', 'man=hs12-tu-luyen-lam', '', false],
   ['ktcn-cau', 'man=duo-kt&v=ktcn', 'nut:^Làm tiếp chặng 2', false],
@@ -124,7 +124,20 @@ async function mot({ ten, ts, viec, dai, k, w, h, nen }) {
       const t = tp(tron(c, b), b)
       if (t < (to ? 3 : 4.5) - 0.01) kem.push(`${e.textContent.trim().slice(0, 22)}=${t.toFixed(2)}`)
     }
-    return { tran, nho, kem, cao: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight) }
+    // CHỮ CHẠM / TRÀN MÉP THẺ (thầy 02/11 «để ý xem chữ có tràn khung không»): mỗi dòng chữ so với thẻ gần nhất (nền ≥ 30 % + bo ≥ 12 px, hẹp hơn khung nhìn)
+    const sat = [], laThe = (x) => { const c = getComputedStyle(x), a = rgba(c.backgroundColor)[3]; const r = x.getBoundingClientRect()
+      return (a >= 0.3 || c.backgroundImage !== 'none') && parseFloat(c.borderTopLeftRadius) >= 12 && r.width < innerWidth - 4 && r.width > 60 }
+    const tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
+    for (let n = tw.nextNode(); n; n = tw.nextNode()) {
+      const e = n.parentElement; if (!n.textContent.trim() || !e || !hien(e) || e.closest('svg, [aria-hidden=true], .sr-only, .ht2-an, [inert], input, textarea')) continue
+      { const c = getComputedStyle(e); if (c.clip !== 'auto' || c.clipPath !== 'none' || c.textOverflow === 'ellipsis') continue } // chữ ẩn cho trình đọc màn hình / cắt «…» có chủ ý
+      let the = e; while (the && the !== document.body && !laThe(the)) the = the.parentElement
+      if (!the || the === document.body) continue
+      const rt = the.getBoundingClientRect(), rg = document.createRange(); rg.selectNodeContents(n)
+      for (const r of rg.getClientRects()) if (r.width > 2 && (r.left < rt.left + 6 || r.right > rt.right + 0.5 - 6)) { sat.push(`${n.textContent.trim().slice(0, 18)}|${(String(the.className.baseVal ?? the.className)).split(' ')[0]}`); break }
+      if (sat.length > 12) break
+    }
+    return { tran, nho, kem, sat, cao: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight) }
   })
   // chụp cả trang trên khổ dọc: thanh nổi (fixed) chuyển xuống ĐÁY trang để không nằm giữa ảnh; khổ rộng chụp đúng khung nhìn (ray trái cố định)
   const dai2 = dai && w < 700
@@ -134,9 +147,10 @@ async function mot({ ten, ts, viec, dai, k, w, h, nen }) {
   const chup = () => p.screenshot({ path: ra, type: 'jpeg', quality: q, fullPage: dai2 })
   await chup()
   while (statSync(ra).size > 150 * 1024 && q > 34) { q -= 8; await chup() }
-  tong.anh++; tong.loi += loi.length; tong.tran += kq.tran > 1 ? 1 : 0; tong.nho += kq.nho.length; tong.kem += kq.kem.length
-  const ok = !loi.length && kq.tran <= 1 && !kq.nho.length && !kq.kem.length
+  tong.anh++; tong.loi += loi.length; tong.tran += kq.tran > 1 ? 1 : 0; tong.nho += kq.nho.length; tong.kem += kq.kem.length; tong.sat = (tong.sat ?? 0) + kq.sat.length
+  const ok = !loi.length && kq.tran <= 1 && !kq.nho.length && !kq.kem.length && !kq.sat.length
   console.log(`${ok ? '✓' : '✗'} ${ten}-${k}-${nen} · lỗi ${loi.length}${loi.length ? ' ' + loi[0] : ''} · tràn ${kq.tran} · nhỏ ${kq.nho.length}${kq.nho.length ? ' ' + JSON.stringify(kq.nho.slice(0, 3)) : ''} · kém ${kq.kem.length}${kq.kem.length ? ' ' + JSON.stringify(kq.kem.slice(0, 3)) : ''} · ${Math.round(statSync(ra).size / 1024)} KB`)
+  if (kq.sat.length) console.log(`    sát mép thẻ ${kq.sat.length}: ${JSON.stringify(kq.sat.slice(0, 4))}`)
   await p.close()
 }
 await Promise.all(Array.from({ length: SONG }, async () => { while (tro < viecCan.length) { const v = viecCan[tro++]; try { await mot(v) } catch (e) { console.log(`✗ ${v.ten}-${v.k}-${v.nen} · HỎNG ${String(e).slice(0, 80)}`); tong.loi++ } } }))
