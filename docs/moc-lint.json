@@ -1,0 +1,8 @@
+{
+  "ghiChu": "Mốc lint CHỈ HẠ (scripts/kiem-moc-lint.mjs, dọn mã 02/11). Lỗi so từng luật, cảnh báo so tổng. Sửa bớt ⇒ chạy `node scripts/kiem-moc-lint.mjs --ha`. Không bao giờ nâng tay.",
+  "loi": {
+    "eslint(no-use-before-define)": 256,
+    "react-hooks(rules-of-hooks)": 2
+  },
+  "canhBao": 1223
+}

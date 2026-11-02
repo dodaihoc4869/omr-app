@@ -21,12 +21,15 @@
     "kiem:mau-giu": "node scripts/kiem-mau-giu-nguyen.mjs",
     "kiem:kho-so-o": "esbuild scripts/kiem-kho-so-o.ts --bundle --platform=node --format=esm --target=node22 --outfile=/tmp/kiem-kho-so-o.mjs --log-level=warning && node /tmp/kiem-kho-so-o.mjs",
     "kiem:toc-do": "node scripts/kiem-toc-do-tai.mjs && vitest run tests/toc-do-may-chu-lenh-nong-1310.test.ts tests/toc-do-may-chu-ph-2110.test.ts tests/toc-do-may-chu-nop-2710.test.ts tests/san-sang-2710.test.ts --reporter=dot",
-    "test:d1": "vitest run --config vitest.config.d1.ts"
+    "test:d1": "vitest run --config vitest.config.d1.ts",
+    "kiem:ma-chet": "npx -y knip@5.88.1 --no-progress --include files,dependencies",
+    "kiem:lint": "node scripts/kiem-moc-lint.mjs",
+    "kiem:chat-luong": "tsc -p tsconfig.app.json --noEmit && tsc -p server/tsconfig.json --noEmit && npm run kiem:ma-chet && npm run kiem:lint"
   },
   "dependencies": {
     "@block65/webcrypto-web-push": "^2.0.0",
-    "@fontsource/baloo-2": "^5.3.0",
     "@types/three": "^0.186.0",
+    "fflate": "^0.8.3",
     "html2canvas-pro": "^2.4.5",
     "idb": "^8.0.3",
     "jspdf": "^4.2.1",
@@ -36,7 +39,6 @@
     "react-dom": "^19.2.8",
     "three": "^0.186.0",
     "ts-fsrs": "5.4.2",
-    "xlsx": "^0.18.5",
     "zustand": "^5.0.15"
   },
   "optionalDependencies": {
@@ -53,6 +55,7 @@
     "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "^6.1.0",
     "autoprefixer": "^10.5.4",
+    "esbuild": "^0.28.1",
     "jsdom": "^30.0.1",
     "oxlint": "^1.79.0",
     "playwright": "^1.62.1",

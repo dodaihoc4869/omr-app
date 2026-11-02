@@ -251,9 +251,11 @@ const CV = 2 * Math.PI * 54, KHE = 9
  *  tế hơn») ⇒ vòng ĐOẠN: `so` đoạn = số câu, `da` đoạn đầu tô trọn; đoạn VỪA xong kể từ lần vẽ trước (nhớ theo `khoa` trong phiên trình duyệt) vẽ dần + sáng
  *  nhẹ, đoạn cũ hiện ngay. */
 function VongChang({ pt, so = 4, da, khoa }: { pt?: number; so?: number; da?: number; khoa?: string }) {
+  // useId TRƯỚC lệnh return sớm (dọn mã 02/11, luật rules-of-hooks): `da` đổi từ vắng → có trên cùng một vòng thì số hook giữa hai lần vẽ lệch ⇒ React sập màn.
+  const maId = useId()
   if (da !== undefined) return <VongDoan so={so} da={da} khoa={khoa} />
   const L = Math.max(0, Math.min(100, pt ?? 0)) / 100 * CV, DOAN = CV / Math.max(2, Math.min(8, so))
-  const id = `da-vm${useId().replace(/[^a-zA-Z0-9]/g, '')}`
+  const id = `da-vm${maId.replace(/[^a-zA-Z0-9]/g, '')}`
   const doan = { cx: 58, cy: 58, r: 54, strokeDasharray: `${DOAN - KHE} ${KHE}`, strokeDashoffset: DOAN - KHE / 2 }
   return <svg className="da-vong" viewBox="0 0 116 116" aria-hidden="true">
     {L > 0 && <mask id={id}><circle className="mo" cx="58" cy="58" r="54" strokeDasharray={`${L} ${CV}`} style={{ '--L': `${L}` } as CSSProperties} /></mask>}
