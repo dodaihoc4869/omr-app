@@ -10,6 +10,11 @@ import { chuanHoaMayChu, diaChiMayChuHopLe, type CauHinhMayChu } from './cau-hin
 import type { SoSuaDang } from './sua-dang'
 import { themMau, type MauGiayThuc } from './hieu-chinh-giay-thuc'
 import { voiHanCho } from './han-cho'
+// 02/11 (tác tử tốc độ, issue số 778): nhập TĨNH may-chu-moi — tệp ấy nằm CÙNG mảnh `bieu-tuong` với tệp này (vite.config.ts nhóm mảnh), nên `import()` động
+// không tách được gì mà còn thêm một vỏ nạp trước (`__vitePreload`) ⇒ thêm byte tải mở. Vòng nhập exam-db ⇄ may-chu-moi vô hại: chỉ gọi nhau BÊN TRONG hàm.
+// `dia-chi-may-chu` vẫn `import()` động: nhập tĩnh làm vòng exam-db → dia-chi-may-chu → may-chu-moi, khiến `vi.doMock(may-chu-moi, importOriginal)` của
+// tests/vao-thi-may-chu-moi-1109.test.ts trao bản GỐC cho dia-chi-may-chu (13 test đỏ) — muốn bỏ nốt thì sửa cách giả mô-đun của test ấy trước.
+import { quenCauHinhMayChu } from './may-chu-moi'
 
 export interface AnswerRecord {
   phanI: Record<string, 'A' | 'B' | 'C' | 'D'> // qid -> lựa chọn (đã quy về chữ cái GỐC, chưa xáo)
@@ -372,7 +377,6 @@ export async function saveScriptUrl(url: string): Promise<void> {
   if (diaChi) {
     const cu = chuanHoaMayChu((await db.get(STORE_SETTINGS, 'mayChuMoi')) as Partial<CauHinhMayChu> | undefined)
     await db.put(STORE_SETTINGS, chuanHoaMayChu({ ...cu, URL: diaChi }), 'mayChuMoi')
-    const { quenCauHinhMayChu } = await import('./may-chu-moi')
     quenCauHinhMayChu()
   }
 }
