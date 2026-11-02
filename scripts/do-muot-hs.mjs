@@ -170,7 +170,7 @@ const choThay = async (p, chon, han = 120000) => (await p.waitForFunction(({ cho
 const bayGio = (p) => p.evaluate(() => performance.now())
 const layDo = (p) => p.evaluate(() => ({ dai: window.__do.dai.slice(), sk: window.__do.sk.slice(), fcp: window.__do.fcp }))
 const daiNhat = (dai, tu = 0, den = Infinity) => dai.filter(([t]) => t >= tu && t <= den).reduce((m, [, d]) => Math.max(m, d), 0)
-const soDai = (dai, nguong, tu = 0, den = Infinity) => dai.filter(([t, d]) => t >= tu && t <= den && d > nguong).length
+const _soDai = (dai, nguong, tu = 0, den = Infinity) => dai.filter(([t, d]) => t >= tu && t <= den && d > nguong).length
 function tti(dai, tu) {
   let moc = tu
   for (const [t, d] of dai.filter(([t, d]) => t + d >= tu).sort((a, b) => a[0] - b[0])) { if (t > moc + 3000) break; moc = Math.max(moc, t + d) }
