@@ -108,7 +108,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:
  useEffect(()=>{if(stt!==null)khung.current?.scrollIntoView?.({block:'start'})},[stt])
  const ttRef=useRef(tt),ra=()=>{onCapNhat();const t=ttRef.current;if(t)onVa?.(vaKt(t))}
  useEffect(()=>{napTruocAnMung()},[])
- // Điểm < 5 khi nộp bài ⇒ nơi gọi không tăng `mung` (quyết ở `nop`, không đọc `ket` trong hiệu ứng). Huỷ hẹn giờ qua ô `h` (không gán lại biến của hiệu ứng).
+ // Điểm < 5 khi đã có kết quả (nộp bài; hoặc nộp chặng xong mà `tai` thấy bài đã chốt / hết hạn) ⇒ nơi gọi không tăng `mung` (quyết ở `nop` và ở nộp chặng — cùng điều kiện `tai` dựng kết quả; không đọc `ket` trong hiệu ứng). Huỷ hẹn giờ qua ô `h` (không gán lại biến của hiệu ứng).
  useEffect(()=>{if(!mung)return;const h={huy:()=>{}};const t=window.setTimeout(()=>{h.huy=anMung('chang',{goc:khung.current?.querySelector('.duo-kt-ket-bi, .ktcn-ket-dau, .ktcn-dau, h2')})},180);return()=>{window.clearTimeout(t);h.huy()}},[mung])
  const nhan=(r:Record<string,unknown>)=>{const t=docKiemTra(r.kiemTra);if(!t)throw new Error('Số liệu bài kiểm tra chưa đầy đủ. Em tải lại nhé.');setTt(t);ttRef.current=t;setOffset(t.serverNow-Date.now());if(typeof r.revision==='number')revision.current=r.revision;return t}
  /** Bản nháp trên máy của chặng i: câu trả lời + mốc trả lời từng câu + câu đang làm. Hỏng / không có ⇒ null. */
@@ -164,7 +164,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:
   else if(!auto){const trong=cs.flatMap((c,i)=>daTraDu(c,traRef.current[c.qid])?[]:[i+1]);if(trong.length&&!await hoiXacNhan({tieuDe:`Nộp chặng ${stt+1}?`,noiDung:`Chặng này còn ${trong.length} câu chưa trả lời (câu ${trong.join(', ')}). Nộp chặng sẽ chốt các câu đã lưu, không sửa lại được.`,nhanDongY:`Nộp chặng ${stt+1}`,nhanKhong:'Làm tiếp',vo:'m3'}))return;if(tuNop.current)return}
   if(!conPhien(lan))return
   huyHenThuLai();tuNop.current=true;setBusy(true);setLoi('')
-  try{await save(true);if(!conPhien(lan))return;try{localStorage.removeItem(`ktcn:vt:${sbd}:${id}:${stt}`)}catch{/* */};xoaKtcnDangLam(sbd);setCs([]);setStt(null);await tai();if(conPhien(lan)){ra();if(!auto)setMung(n=>n+1)}}
+  try{await save(true);if(!conPhien(lan))return;try{localStorage.removeItem(`ktcn:vt:${sbd}:${id}:${stt}`)}catch{/* */};xoaKtcnDangLam(sbd);setCs([]);setStt(null);await tai();if(conPhien(lan)){ra();const tn=ttRef.current;if(!auto&&!(tn&&(tn.nopLuc!==null||tn.trangThai==='het_han')&&typeof tn.diem==='number'&&tn.diem<5))setMung(n=>n+1)}}
   catch(e){
    if(!conPhien(lan))return
    tuNop.current=false
