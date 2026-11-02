@@ -42,6 +42,7 @@ python3 docs/ban-ve-dau-ion-v2-0211/ghep.py
     - Ván mới chia lại phe.
   - **Thầy bấm Bắt đầu:** game dừng ngay và vào bài ngay.
   - **Máy yếu:** tự hạ chất lượng như hiện nay.
+- **Màu 5 cấp súng giữ như v1** (`--dn-capm-1…5`: xám → lục → cam → chàm → vàng): tô chấm số cấp trên nhãn tên. Số vòng electron là thêm, không thay màu cấp.
 - **Sân giữ đúng toạ độ trong `src/lib/dau-ion/loi.ts`:** `VAT_CAN` (bình cầu giữa, 4 bình nón, 2 giá ống, 4 cốc), `BE_PHE` (3 bệ mỗi phe), `CHO_XT`, `CHO_KH`. Bản vẽ dùng đúng các số này, chỉ thay «da».
 
 ## 2. Bố cục 3 khổ
@@ -65,7 +66,7 @@ python3 docs/ban-ve-dau-ion-v2-0211/ghep.py
 | Dọc 390 × 844 | Trên: «Rời sân» + thanh pH; tên phe ẩn, giữ nhãn OH⁻ / H⁺. Dưới: thẻ của em. <br>Tin nằm góc dưới trái. Lời nhắc xoay hiện trên mép sân. |
 | Máy tính 1440 × 900 | Như khổ ngang; lớp phủ phóng 1,3 lần. |
 
-Kim pH: phe em dẫn thì kim lệch về phía bazơ (tím-xanh), phe bạn dẫn thì lệch về phía axit (đỏ). Mỗi điểm cách biệt lệch 6 %, kim không ra khỏi 4–96 %.
+Thang pH: đầu thang phía phe em là màu của phe em (em Bazơ ⇒ trái = 14 · bazơ tím-xanh, phải = 0 · axit đỏ; em Axit ⇒ ngược lại), khớp nhãn OH⁻ / H⁺ đứng cạnh. Kim theo HOÁ HỌC, không theo «em»: Bazơ dẫn ⇒ pH > 7 ⇒ kim lệch về đầu bazơ, dù em ở phe nào. Hết ván dùng cùng hướng thang.
 
 ### Phòng chờ của game (sảnh)
 
@@ -112,7 +113,8 @@ Kim pH: phe em dẫn thì kim lệch về phía bazơ (tím-xanh), phe bạn d�
 
 | Hiện | Lấy từ |
 |---|---|
-| Kim pH, tỉ số | `BoChay.tiSo()` |
+| Tỉ số | `BoChay.tiSo()` → OH⁻ (Bazơ), H⁺ (Axit) |
+| Số pH + vị trí kim | pH = 7 + 7·(OH⁻ − H⁺)/(OH⁻ + H⁺) (0 – 0 ⇒ 7); 12 – 9 ⇒ pH 8, 7 – 5 ⇒ 8,2. Hiện số làm tròn. Vị trí kim tính từ đầu thang phía phe em: em Bazơ ⇒ (14 − pH)/14; em Axit ⇒ pH/14; kẹp 4–96 %. |
 | Số vòng electron | `cap` của từng nguyên tử (đã có trong ảnh trận) |
 | Thanh máu | `mau` |
 | «3/5 electron · hạ 3» | `em()`: `e`, `CAN_E[cap]`, số lần hạ |
