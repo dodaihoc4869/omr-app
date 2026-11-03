@@ -8,6 +8,11 @@ const root = '/tmp/hinh-kho-0311'
 mkdirSync(root + '/anh', { recursive: true })
 const api = `https://api.cloudflare.com/client/v4/accounts/${account}`
 const headers = { Authorization: `Bearer ${token}` }
+async function readObject(key) {
+  const r = await fetch('http://127.0.0.1:8788/?key=' + encodeURIComponent(key), { signal: AbortSignal.timeout(45000) })
+  if (!r.ok) throw Error(`Không đọc được R2: HTTP ${r.status}`)
+  return r
+}
 async function request(url, options = {}) {
   for (let i = 0; i < 3; i++) {
     const r = await fetch(url, { ...options, headers: { ...headers, ...options.headers }, signal: AbortSignal.timeout(45000) })
@@ -33,7 +38,7 @@ async function image(src, refs, where) {
     const m = /^(?:https:\/\/omr\.ttadodaihoc\.workers\.dev)?\/anh\/([0-9a-f]{64})(?:\.[a-z]+)?$/i.exec(src)
     if (!m) { if (/^(data:image|https?:|\/anh\/)/.test(src)) errors.push({ where, reason: 'Định dạng ảnh cần kiểm tra' }); return }
     sourceHash = m[1]
-    const r = await request(`${api}/r2/buckets/omr-de/objects/${encodeURIComponent('anh/' + sourceHash)}`)
+    const r = await readObject('anh/' + sourceHash)
     bytes = Buffer.from(await r.arrayBuffer()); mime = r.headers.get('content-type')?.split(';')[0] ?? 'image/png'
   }
   if (!bytes.length) throw Error('Ảnh rỗng')
@@ -60,7 +65,7 @@ for (let i = 0; i < exams.length; i += 4) {
   await Promise.all(exams.slice(i, i + 4).map(async exam => {
     try {
       const key = exam.r2_khoa || `kho/${exam.ma_de}.json`
-      const r = await request(`${api}/r2/buckets/omr-de/objects/${encodeURIComponent(key)}`)
+      const r = await readObject(key)
       const raw = await r.json()
       const list = Array.isArray(raw.cau) ? raw.cau : ['I', 'II', 'III'].flatMap(p => (raw['phan' + p] ?? []).map(c => ({ ...c, phan: p })))
       if (!list.length && exam.so_cau > 0) throw Error('Không nhận dạng được khuôn gói đề')

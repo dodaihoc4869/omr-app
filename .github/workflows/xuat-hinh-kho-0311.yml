@@ -5,7 +5,7 @@ on:
     branches: [codex/ve-lai-hinh-kho-0311]
     paths: ['scripts/xuat-hinh-kho-0311.mjs', '.github/workflows/xuat-hinh-kho-0311.yml']
 permissions:
-  contents: read
+  contents: write
 concurrency:
   group: xuat-hinh-kho-0311
   cancel-in-progress: false
@@ -23,6 +23,23 @@ jobs:
           T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Mở binding R2 chỉ đọc trên runner, không phát hành Worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          cat > scripts/wrangler-doc-hinh.toml <<'TOML'
+          name = "omr-doc-hinh-cuc-bo"
+          main = "doc-r2-hinh-0311.mjs"
+          compatibility_date = "2026-09-11"
+          [[r2_buckets]]
+          binding = "DE"
+          bucket_name = "omr-de"
+          remote = true
+          TOML
+          nohup npx -y wrangler@4 dev -c scripts/wrangler-doc-hinh.toml --ip 127.0.0.1 --port 8788 > /tmp/doc-r2.log 2>&1 &
+          for i in $(seq 1 60); do curl -s -o /dev/null http://127.0.0.1:8788/ && break; sleep 2; done
+          curl -fsS -o /dev/null 'http://127.0.0.1:8788/?key=kho/DH-10-C1-B1.json' || true
       - name: Chỉ SELECT D1 và GET R2, không ghi kho
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
@@ -34,3 +51,13 @@ jobs:
           name: hinh-kho-0311
           path: /tmp/hinh-kho-0311
           retention-days: 3
+      - name: Lưu nguồn hình để đối chiếu theo mã câu (không có đáp án)
+        if: success()
+        run: |
+          mkdir -p docs/hinh-vector-0311/nguon
+          cp -R /tmp/hinh-kho-0311/. docs/hinh-vector-0311/nguon/
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- docs/hinh-vector-0311/nguon
+          git diff --cached --quiet || git commit -m "Lưu hình nguồn toàn kho để đối chiếu vector, không có đáp án"
+          git push origin HEAD:codex/ve-lai-hinh-kho-0311
