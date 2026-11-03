@@ -1,0 +1,1524 @@
+[
+  {
+    "hash": "9a7db2630e9d23f7ce9d40311c4923a7cbb68ef4dac758baa6acef3bcf2a28e2",
+    "file": "anh/9a7db2630e9d23f7ce9d40311c4923a7cbb68ef4dac758baa6acef3bcf2a28e2.png",
+    "mime": "image/png",
+    "bytes": 4874,
+    "i": 836,
+    "refs": [
+      {
+        "qid": "12-C1-B2-I-37",
+        "de": "Cấu trúc phân tử sodium palmitate (C₁₅H₃₁COONa) có thể được minh họa như sau:\nKhi hòa tan vào nước, các phân tử sodium palmitate sẽ hình thành nên cấu trúc nào dưới đây?",
+        "refs": [
+          {
+            "hash": "9a7db2630e9d23f7ce9d40311c4923a7cbb68ef4dac758baa6acef3bcf2a28e2",
+            "where": "12-C1-B2-I-37.hinh.1.du_lieu",
+            "hashDataUrl": "5a768fb8b2a196fc7fcb925175531f4bb28fab88071e771588be8188ecc200fc",
+            "position": {
+              "where": "12-C1-B2-I-37.hinh.1.du_lieu",
+              "hashDataUrl": "5a768fb8b2a196fc7fcb925175531f4bb28fab88071e771588be8188ecc200fc",
+              "viTri": "sau_pa_A",
+              "truong": "hinh",
+              "congKhaiTruocNop": true
+            }
+          }
+        ]
+      }
+    ],
+    "fileNguon": "anh/9a7db2630e9d23f7ce9d40311c4923a7cbb68ef4dac758baa6acef3bcf2a28e2.png",
+    "geometry": {
+      "layout": "Tám phân tử dạng nan hoa; cả8head đặc ở vòng ngoài,8tail lượn sóng hướng vào gần tâm. Giữa tâm để các đầu tail tự do, không thêm nút/vòng/liênkết nối chung.",
+      "headCount": 8,
+      "tailCount": 8,
+      "caption": [
+        "A."
+      ],
+      "captionEvidence": "Chữ A. sát/cắt mép trái dưới, phần chữ/dấu chấm còn thấy; publicref=sau_pa_A. Phải giữ nhãn cótrongảnh.",
+      "orientations": [
+        "N headngoài→tailvàotâm",
+        "NE headngoài→tailvàotâm",
+        "E headngoài→tailvàotâm",
+        "SE headngoài→tailvàotâm",
+        "S headngoài→tailvàotâm",
+        "SW headngoài→tailvàotâm",
+        "W headngoài→tailvàotâm",
+        "NW headngoài→tailvàotâm"
+      ]
+    },
+    "nguoiDocNguon": "soat_nguon_2",
+    "trangThai": "Đã mở PNG native/full và đọc stem/refs; chỉ dữ liệu dựng, chưa duyệt SVG",
+    "luuY": "Giữ nguyên bố trí các phương án, không chuẩn hóa thành micelle đúng; không thêm dấu điện tích, công thức hoặc câu giải thích không có trong hình.",
+    "pixelHeadCenters": {
+      "i": 836,
+      "size": [
+        285,
+        285
+      ],
+      "heads": [
+        {
+          "center": [
+            148.4,
+            41.5
+          ],
+          "erodedBounds": [
+            141,
+            34,
+            156,
+            50
+          ],
+          "erodedPixels": 212
+        },
+        {
+          "center": [
+            77.2,
+            71.4
+          ],
+          "erodedBounds": [
+            70,
+            64,
+            84,
+            79
+          ],
+          "erodedPixels": 199
+        },
+        {
+          "center": [
+            212.5,
+            79.2
+          ],
+          "erodedBounds": [
+            205,
+            72,
+            220,
+            87
+          ],
+          "erodedPixels": 205
+        },
+        {
+          "center": [
+            46.4,
+            138.6
+          ],
+          "erodedBounds": [
+            38,
+            131,
+            56,
+            146
+          ],
+          "erodedPixels": 223
+        },
+        {
+          "center": [
+            240.6,
+            147.9
+          ],
+          "erodedBounds": [
+            232,
+            140,
+            249,
+            155
+          ],
+          "erodedPixels": 212
+        },
+        {
+          "center": [
+            70.4,
+            214.6
+          ],
+          "erodedBounds": [
+            64,
+            207,
+            78,
+            222
+          ],
+          "erodedPixels": 191
+        },
+        {
+          "center": [
+            209.6,
+            218.3
+          ],
+          "erodedBounds": [
+            202,
+            211,
+            217,
+            226
+          ],
+          "erodedPixels": 210
+        },
+        {
+          "center": [
+            139.7,
+            241.5
+          ],
+          "erodedBounds": [
+            132,
+            232,
+            147,
+            249
+          ],
+          "erodedPixels": 221
+        }
+      ]
+    },
+    "pixelHeadCentersMethod": "ThresholdL<128,erosion2pixel,component>60pixel,centroidước lượngheadđặc;đãđốichiếubằngmắttừngnative. Erodedbounds khôngphải fullcirclebounds;khôngdùng erosionđểtựduyệtnộidung.",
+    "nativeSize": [
+      285,
+      285
+    ]
+  },
+  {
+    "hash": "c6a110666ed7737fae5896fa74579b06c44ad5264e1481e8e2951a7e43371fb8",
+    "file": "anh/c6a110666ed7737fae5896fa74579b06c44ad5264e1481e8e2951a7e43371fb8.png",
+    "mime": "image/png",
+    "bytes": 6302,
+    "i": 1103,
+    "refs": [
+      {
+        "qid": "12-C1-B2-I-37",
+        "de": "Cấu trúc phân tử sodium palmitate (C₁₅H₃₁COONa) có thể được minh họa như sau:\nKhi hòa tan vào nước, các phân tử sodium palmitate sẽ hình thành nên cấu trúc nào dưới đây?",
+        "refs": [
+          {
+            "hash": "c6a110666ed7737fae5896fa74579b06c44ad5264e1481e8e2951a7e43371fb8",
+            "where": "12-C1-B2-I-37.hinh.2.du_lieu",
+            "hashDataUrl": "0c657471fb8363953e24ae623bb915cc28b8708ad917a53f6a7c903add186fba",
+            "position": {
+              "where": "12-C1-B2-I-37.hinh.2.du_lieu",
+              "hashDataUrl": "0c657471fb8363953e24ae623bb915cc28b8708ad917a53f6a7c903add186fba",
+              "viTri": "sau_pa_B",
+              "truong": "hinh",
+              "congKhaiTruocNop": true
+            }
+          }
+        ]
+      }
+    ],
+    "fileNguon": "anh/c6a110666ed7737fae5896fa74579b06c44ad5264e1481e8e2951a7e43371fb8.png",
+    "geometry": {
+      "layout": "4hàng×2cột,8phân tử rời. Các tail nằm ngang lượn sóng,khôngnhậpvớimoleculekếbên.",
+      "headCount": 8,
+      "tailCount": 8,
+      "caption": [
+        "B."
+      ],
+      "captionEvidence": "Chữ B. sát/cắt mép trái dưới,khớp publicref=sau_pa_B;giữ nhãn nguồn.",
+      "rows": [
+        {
+          "row": 1,
+          "left": {
+            "head": [
+              44.3,
+              55.2
+            ],
+            "tailDirection": "sangphải",
+            "tailFreeEndApprox": [
+              153,
+              62
+            ]
+          },
+          "right": {
+            "head": [
+              289.6,
+              53.8
+            ],
+            "tailDirection": "sangtrái",
+            "tailFreeEndApprox": [
+              181,
+              48
+            ]
+          }
+        },
+        {
+          "row": 2,
+          "left": {
+            "head": [
+              141.6,
+              91.9
+            ],
+            "tailDirection": "sangtrái",
+            "tailFreeEndApprox": [
+              32,
+              86
+            ]
+          },
+          "right": {
+            "head": [
+              192.2,
+              91.7
+            ],
+            "tailDirection": "sangphải",
+            "tailFreeEndApprox": [
+              302,
+              100
+            ]
+          }
+        },
+        {
+          "row": 3,
+          "left": {
+            "head": [
+              44.5,
+              131.4
+            ],
+            "tailDirection": "sangphải",
+            "tailFreeEndApprox": [
+              154,
+              140
+            ]
+          },
+          "right": {
+            "head": [
+              289.9,
+              130.3
+            ],
+            "tailDirection": "sangtrái",
+            "tailFreeEndApprox": [
+              182,
+              125
+            ]
+          }
+        },
+        {
+          "row": 4,
+          "left": {
+            "head": [
+              145.3,
+              170.1
+            ],
+            "tailDirection": "sangtrái",
+            "tailFreeEndApprox": [
+              37,
+              166
+            ]
+          },
+          "right": {
+            "head": [
+              195.9,
+              169.6
+            ],
+            "tailDirection": "sangphải",
+            "tailFreeEndApprox": [
+              306,
+              178
+            ]
+          }
+        }
+      ]
+    },
+    "nguoiDocNguon": "soat_nguon_2",
+    "trangThai": "Đã mở PNG native/full và đọc stem/refs; chỉ dữ liệu dựng, chưa duyệt SVG",
+    "luuY": "Giữ nguyên bố trí các phương án, không chuẩn hóa thành micelle đúng; không thêm dấu điện tích, công thức hoặc câu giải thích không có trong hình.",
+    "pixelHeadCenters": {
+      "i": 1103,
+      "size": [
+        341,
+        200
+      ],
+      "heads": [
+        {
+          "center": [
+            289.6,
+            53.8
+          ],
+          "erodedBounds": [
+            278,
+            43,
+            300,
+            65
+          ],
+          "erodedPixels": 378
+        },
+        {
+          "center": [
+            44.3,
+            55.2
+          ],
+          "erodedBounds": [
+            34,
+            45,
+            56,
+            66
+          ],
+          "erodedPixels": 377
+        },
+        {
+          "center": [
+            192.2,
+            91.7
+          ],
+          "erodedBounds": [
+            183,
+            81,
+            203,
+            102
+          ],
+          "erodedPixels": 364
+        },
+        {
+          "center": [
+            141.6,
+            91.9
+          ],
+          "erodedBounds": [
+            131,
+            81,
+            151,
+            102
+          ],
+          "erodedPixels": 374
+        },
+        {
+          "center": [
+            289.9,
+            130.3
+          ],
+          "erodedBounds": [
+            279,
+            119,
+            300,
+            141
+          ],
+          "erodedPixels": 378
+        },
+        {
+          "center": [
+            44.5,
+            131.4
+          ],
+          "erodedBounds": [
+            34,
+            120,
+            56,
+            142
+          ],
+          "erodedPixels": 386
+        },
+        {
+          "center": [
+            195.9,
+            169.6
+          ],
+          "erodedBounds": [
+            186,
+            159,
+            207,
+            180
+          ],
+          "erodedPixels": 369
+        },
+        {
+          "center": [
+            145.3,
+            170.1
+          ],
+          "erodedBounds": [
+            134,
+            159,
+            155,
+            181
+          ],
+          "erodedPixels": 380
+        }
+      ]
+    },
+    "pixelHeadCentersMethod": "ThresholdL<128,erosion2pixel,component>60pixel,centroidước lượngheadđặc;đãđốichiếubằngmắttừngnative. Erodedbounds khôngphải fullcirclebounds;khôngdùng erosionđểtựduyệtnộidung.",
+    "nativeSize": [
+      341,
+      200
+    ]
+  },
+  {
+    "hash": "35e64befc51150d5655a25626b1ad7d084ccc463efc396f9deb26bab0858d9dd",
+    "file": "anh/35e64befc51150d5655a25626b1ad7d084ccc463efc396f9deb26bab0858d9dd.png",
+    "mime": "image/png",
+    "bytes": 4938,
+    "i": 312,
+    "refs": [
+      {
+        "qid": "12-C1-B2-I-37",
+        "de": "Cấu trúc phân tử sodium palmitate (C₁₅H₃₁COONa) có thể được minh họa như sau:\nKhi hòa tan vào nước, các phân tử sodium palmitate sẽ hình thành nên cấu trúc nào dưới đây?",
+        "refs": [
+          {
+            "hash": "35e64befc51150d5655a25626b1ad7d084ccc463efc396f9deb26bab0858d9dd",
+            "where": "12-C1-B2-I-37.hinh.3.du_lieu",
+            "hashDataUrl": "3ce319694a452c884d8d19b8a3e5ed5da9bef79e610926fb90213eba22c5a6c2",
+            "position": {
+              "where": "12-C1-B2-I-37.hinh.3.du_lieu",
+              "hashDataUrl": "3ce319694a452c884d8d19b8a3e5ed5da9bef79e610926fb90213eba22c5a6c2",
+              "viTri": "sau_pa_C",
+              "truong": "hinh",
+              "congKhaiTruocNop": true
+            }
+          }
+        ]
+      }
+    ],
+    "fileNguon": "anh/35e64befc51150d5655a25626b1ad7d084ccc463efc396f9deb26bab0858d9dd.png",
+    "geometry": {
+      "layout": "8phân tử nanhoa XENKẼCHIỀU:4head ngoài ở4đườngchéo,tailhướngvàogầntâm;4head gần tâm ởN/E/S/W,tailhướngra4phía. Không chuyển toàn8headvàotrong hoặc rangoài.",
+      "headCount": 8,
+      "tailCount": 8,
+      "caption": [
+        "C."
+      ],
+      "captionEvidence": "Chữ C. sát/cắt méptrái dưới,khớp publicref=sau_pa_C;giữ nhãn nguồn.",
+      "innerHeads": [
+        {
+          "dir": "N",
+          "center": [
+            144.1,
+            122.3
+          ],
+          "tail": "ra trên"
+        },
+        {
+          "dir": "E",
+          "center": [
+            162.2,
+            150.8
+          ],
+          "tail": "ra phải"
+        },
+        {
+          "dir": "S",
+          "center": [
+            140.1,
+            165.9
+          ],
+          "tail": "ra dưới"
+        },
+        {
+          "dir": "W",
+          "center": [
+            124.2,
+            147.2
+          ],
+          "tail": "ra trái"
+        }
+      ],
+      "outerHeads": [
+        {
+          "dir": "NW",
+          "center": [
+            73.4,
+            67.7
+          ],
+          "tail": "vào giữa"
+        },
+        {
+          "dir": "NE",
+          "center": [
+            218.7,
+            75.9
+          ],
+          "tail": "vào giữa"
+        },
+        {
+          "dir": "SE",
+          "center": [
+            212.6,
+            228.9
+          ],
+          "tail": "vào giữa"
+        },
+        {
+          "dir": "SW",
+          "center": [
+            62.1,
+            223.3
+          ],
+          "tail": "vào giữa"
+        }
+      ]
+    },
+    "nguoiDocNguon": "soat_nguon_2",
+    "trangThai": "Đã mở PNG native/full và đọc stem/refs; chỉ dữ liệu dựng, chưa duyệt SVG",
+    "luuY": "Giữ nguyên bố trí các phương án, không chuẩn hóa thành micelle đúng; không thêm dấu điện tích, công thức hoặc câu giải thích không có trong hình.",
+    "pixelHeadCenters": {
+      "i": 312,
+      "size": [
+        286,
+        286
+      ],
+      "heads": [
+        {
+          "center": [
+            73.4,
+            67.7
+          ],
+          "erodedBounds": [
+            66,
+            60,
+            81,
+            75
+          ],
+          "erodedPixels": 208
+        },
+        {
+          "center": [
+            218.7,
+            75.9
+          ],
+          "erodedBounds": [
+            211,
+            68,
+            226,
+            84
+          ],
+          "erodedPixels": 222
+        },
+        {
+          "center": [
+            144.1,
+            122.3
+          ],
+          "erodedBounds": [
+            136,
+            114,
+            152,
+            130
+          ],
+          "erodedPixels": 229
+        },
+        {
+          "center": [
+            124.2,
+            147.2
+          ],
+          "erodedBounds": [
+            115,
+            140,
+            132,
+            155
+          ],
+          "erodedPixels": 226
+        },
+        {
+          "center": [
+            162.2,
+            150.8
+          ],
+          "erodedBounds": [
+            155,
+            143,
+            170,
+            159
+          ],
+          "erodedPixels": 209
+        },
+        {
+          "center": [
+            140.1,
+            165.9
+          ],
+          "erodedBounds": [
+            131,
+            158,
+            148,
+            175
+          ],
+          "erodedPixels": 231
+        },
+        {
+          "center": [
+            62.1,
+            223.3
+          ],
+          "erodedBounds": [
+            55,
+            216,
+            69,
+            231
+          ],
+          "erodedPixels": 205
+        },
+        {
+          "center": [
+            212.6,
+            228.9
+          ],
+          "erodedBounds": [
+            205,
+            221,
+            220,
+            237
+          ],
+          "erodedPixels": 219
+        }
+      ]
+    },
+    "pixelHeadCentersMethod": "ThresholdL<128,erosion2pixel,component>60pixel,centroidước lượngheadđặc;đãđốichiếubằngmắttừngnative. Erodedbounds khôngphải fullcirclebounds;khôngdùng erosionđểtựduyệtnộidung.",
+    "nativeSize": [
+      286,
+      286
+    ]
+  },
+  {
+    "hash": "beb9c0f7677ed118bedf10042a9cdd0037b494269fc13544e4e5e971430ce6a8",
+    "file": "anh/beb9c0f7677ed118bedf10042a9cdd0037b494269fc13544e4e5e971430ce6a8.png",
+    "mime": "image/png",
+    "bytes": 5499,
+    "i": 1055,
+    "refs": [
+      {
+        "qid": "12-C1-B2-I-37",
+        "de": "Cấu trúc phân tử sodium palmitate (C₁₅H₃₁COONa) có thể được minh họa như sau:\nKhi hòa tan vào nước, các phân tử sodium palmitate sẽ hình thành nên cấu trúc nào dưới đây?",
+        "refs": [
+          {
+            "hash": "beb9c0f7677ed118bedf10042a9cdd0037b494269fc13544e4e5e971430ce6a8",
+            "where": "12-C1-B2-I-37.hinh.4.du_lieu",
+            "hashDataUrl": "36ff435ff2630df39f06ca913cada5d52fc32b5c5a7c198bb30a5f5d1f8ffd53",
+            "position": {
+              "where": "12-C1-B2-I-37.hinh.4.du_lieu",
+              "hashDataUrl": "36ff435ff2630df39f06ca913cada5d52fc32b5c5a7c198bb30a5f5d1f8ffd53",
+              "viTri": "sau_pa_D",
+              "truong": "hinh",
+              "congKhaiTruocNop": true
+            }
+          }
+        ]
+      }
+    ],
+    "fileNguon": "anh/beb9c0f7677ed118bedf10042a9cdd0037b494269fc13544e4e5e971430ce6a8.png",
+    "geometry": {
+      "layout": "8head đặc xếp vòng nhỏ rỗng ởgiữa,8taillượnsóng hướng RA ngoài theoN/NE/E/SE/S/SW/W/NW. Vùng tâm trống;khôngthêmvòngbao/đầuvàogiữa.",
+      "headCount": 8,
+      "tailCount": 8,
+      "caption": [
+        "D."
+      ],
+      "captionEvidence": "Chữ D. lớn sát/cắt méptráibêndưới,phầnD/dấuchấm cònthấy;publicref=sau_pa_D. Cóvếtmựcnhỏrờix≈67,y≈266khôngphảimolecule/nhãn mới.",
+      "tailEndApproxByDir": {
+        "N": [
+          165,
+          14
+        ],
+        "NE": [
+          259,
+          51
+        ],
+        "E": [
+          292,
+          140
+        ],
+        "SE": [
+          251,
+          229
+        ],
+        "S": [
+          159,
+          265
+        ],
+        "SW": [
+          69,
+          228
+        ],
+        "W": [
+          30,
+          132
+        ],
+        "NW": [
+          75,
+          45
+        ]
+      }
+    },
+    "nguoiDocNguon": "soat_nguon_2",
+    "trangThai": "Đã mở PNG native/full và đọc stem/refs; chỉ dữ liệu dựng, chưa duyệt SVG",
+    "luuY": "Giữ nguyên bố trí các phương án, không chuẩn hóa thành micelle đúng; không thêm dấu điện tích, công thức hoặc câu giải thích không có trong hình.",
+    "pixelHeadCenters": {
+      "i": 1055,
+      "size": [
+        341,
+        297
+      ],
+      "heads": [
+        {
+          "center": [
+            161.6,
+            105.1
+          ],
+          "erodedBounds": [
+            153,
+            95,
+            170,
+            114
+          ],
+          "erodedPixels": 260
+        },
+        {
+          "center": [
+            184.3,
+            112.3
+          ],
+          "erodedBounds": [
+            176,
+            104,
+            192,
+            121
+          ],
+          "erodedPixels": 248
+        },
+        {
+          "center": [
+            137.9,
+            112.6
+          ],
+          "erodedBounds": [
+            130,
+            104,
+            146,
+            121
+          ],
+          "erodedPixels": 261
+        },
+        {
+          "center": [
+            193.4,
+            135.2
+          ],
+          "erodedBounds": [
+            185,
+            127,
+            203,
+            143
+          ],
+          "erodedPixels": 258
+        },
+        {
+          "center": [
+            128.7,
+            135.8
+          ],
+          "erodedBounds": [
+            119,
+            128,
+            137,
+            144
+          ],
+          "erodedPixels": 250
+        },
+        {
+          "center": [
+            184.3,
+            158.8
+          ],
+          "erodedBounds": [
+            176,
+            150,
+            192,
+            167
+          ],
+          "erodedPixels": 249
+        },
+        {
+          "center": [
+            138.3,
+            159.2
+          ],
+          "erodedBounds": [
+            130,
+            151,
+            147,
+            168
+          ],
+          "erodedPixels": 259
+        },
+        {
+          "center": [
+            160.3,
+            170.6
+          ],
+          "erodedBounds": [
+            152,
+            162,
+            168,
+            180
+          ],
+          "erodedPixels": 248
+        }
+      ]
+    },
+    "pixelHeadCentersMethod": "ThresholdL<128,erosion2pixel,component>60pixel,centroidước lượngheadđặc;đãđốichiếubằngmắttừngnative. Erodedbounds khôngphải fullcirclebounds;khôngdùng erosionđểtựduyệtnộidung.",
+    "nativeSize": [
+      341,
+      297
+    ]
+  },
+  {
+    "hash": "a37f46b0536a4f05e4b72f9815f3d6fbd73a2eed7c06d424fc5c681dfd50972b",
+    "file": "anh/a37f46b0536a4f05e4b72f9815f3d6fbd73a2eed7c06d424fc5c681dfd50972b.png",
+    "mime": "image/png",
+    "bytes": 4672,
+    "i": 891,
+    "refs": [
+      {
+        "qid": "12-KT-C1-D3-I-17",
+        "de": "Cấu trúc phân tử sodium palmitate (C₁₅H₃₁COONa) có thể được minh họa như sau: Khi hòa tan vào nước, các phân tử sodium palmitate sẽ hình thành nên cấu trúc nào dưới đây?",
+        "refs": [
+          {
+            "hash": "a37f46b0536a4f05e4b72f9815f3d6fbd73a2eed7c06d424fc5c681dfd50972b",
+            "where": "12-KT-C1-D3-I-17.hinh.3.du_lieu",
+            "hashDataUrl": "1b0798941c369eb5dd47040caa0bfd0e878655c31da0d19cf4a594793670e6a3",
+            "position": {
+              "where": "12-KT-C1-D3-I-17.hinh.3.du_lieu",
+              "hashDataUrl": "1b0798941c369eb5dd47040caa0bfd0e878655c31da0d19cf4a594793670e6a3",
+              "viTri": "sau_pa_C",
+              "truong": "hinh",
+              "congKhaiTruocNop": true
+            }
+          }
+        ]
+      }
+    ],
+    "fileNguon": "anh/a37f46b0536a4f05e4b72f9815f3d6fbd73a2eed7c06d424fc5c681dfd50972b.png",
+    "geometry": {
+      "layout": "Giốngkiểuhình312 nhưngnative891KHÔNGcócaptionC.:4headngoàiởđườngchéo→tailvàotâm,4headtrongởN/E/S/W→tailra;8moleculerời.",
+      "headCount": 8,
+      "tailCount": 8,
+      "caption": [],
+      "captionEvidence": "Không chữ C. trongPNG;Cchỉlàpublic vịtríapp sau_pa_C,khôngtựthêmvàoSVG.",
+      "innerHeads": [
+        {
+          "dir": "N",
+          "center": [
+            146.1,
+            124.3
+          ],
+          "tail": "ra trên"
+        },
+        {
+          "dir": "E",
+          "center": [
+            164.2,
+            152.8
+          ],
+          "tail": "ra phải"
+        },
+        {
+          "dir": "S",
+          "center": [
+            142.1,
+            167.9
+          ],
+          "tail": "ra dưới"
+        },
+        {
+          "dir": "W",
+          "center": [
+            126.2,
+            149.2
+          ],
+          "tail": "ra trái"
+        }
+      ],
+      "outerHeads": [
+        {
+          "dir": "NW",
+          "center": [
+            75.4,
+            69.7
+          ],
+          "tail": "vào giữa"
+        },
+        {
+          "dir": "NE",
+          "center": [
+            220.7,
+            77.9
+          ],
+          "tail": "vào giữa"
+        },
+        {
+          "dir": "SE",
+          "center": [
+            214.6,
+            230.9
+          ],
+          "tail": "vào giữa"
+        },
+        {
+          "dir": "SW",
+          "center": [
+            64.1,
+            225.3
+          ],
+          "tail": "vào giữa"
+        }
+      ]
+    },
+    "nguoiDocNguon": "soat_nguon_2",
+    "trangThai": "Đã mở PNG native/full và đọc stem/refs; chỉ dữ liệu dựng, chưa duyệt SVG",
+    "luuY": "Giữ nguyên bố trí các phương án, không chuẩn hóa thành micelle đúng; không thêm dấu điện tích, công thức hoặc câu giải thích không có trong hình.",
+    "pixelHeadCenters": {
+      "i": 891,
+      "size": [
+        287,
+        287
+      ],
+      "heads": [
+        {
+          "center": [
+            75.4,
+            69.7
+          ],
+          "erodedBounds": [
+            68,
+            62,
+            83,
+            77
+          ],
+          "erodedPixels": 208
+        },
+        {
+          "center": [
+            220.7,
+            77.9
+          ],
+          "erodedBounds": [
+            213,
+            70,
+            228,
+            86
+          ],
+          "erodedPixels": 222
+        },
+        {
+          "center": [
+            146.1,
+            124.3
+          ],
+          "erodedBounds": [
+            138,
+            116,
+            154,
+            132
+          ],
+          "erodedPixels": 229
+        },
+        {
+          "center": [
+            126.2,
+            149.2
+          ],
+          "erodedBounds": [
+            117,
+            142,
+            134,
+            157
+          ],
+          "erodedPixels": 226
+        },
+        {
+          "center": [
+            164.2,
+            152.8
+          ],
+          "erodedBounds": [
+            157,
+            145,
+            172,
+            161
+          ],
+          "erodedPixels": 209
+        },
+        {
+          "center": [
+            142.1,
+            167.9
+          ],
+          "erodedBounds": [
+            133,
+            160,
+            150,
+            177
+          ],
+          "erodedPixels": 231
+        },
+        {
+          "center": [
+            64.1,
+            225.3
+          ],
+          "erodedBounds": [
+            57,
+            218,
+            71,
+            233
+          ],
+          "erodedPixels": 205
+        },
+        {
+          "center": [
+            214.6,
+            230.9
+          ],
+          "erodedBounds": [
+            207,
+            223,
+            222,
+            239
+          ],
+          "erodedPixels": 219
+        }
+      ]
+    },
+    "pixelHeadCentersMethod": "ThresholdL<128,erosion2pixel,component>60pixel,centroidước lượngheadđặc;đãđốichiếubằngmắttừngnative. Erodedbounds khôngphải fullcirclebounds;khôngdùng erosionđểtựduyệtnộidung.",
+    "nativeSize": [
+      287,
+      287
+    ]
+  },
+  {
+    "hash": "396bd80c4b3afd67de69cbad87dd3a6c90f265bdc681907b0ddf7eed925c3c8a",
+    "file": "anh/396bd80c4b3afd67de69cbad87dd3a6c90f265bdc681907b0ddf7eed925c3c8a.png",
+    "mime": "image/png",
+    "bytes": 4908,
+    "i": 329,
+    "refs": [
+      {
+        "qid": "12-KT-C1-D3-I-17",
+        "de": "Cấu trúc phân tử sodium palmitate (C₁₅H₃₁COONa) có thể được minh họa như sau: Khi hòa tan vào nước, các phân tử sodium palmitate sẽ hình thành nên cấu trúc nào dưới đây?",
+        "refs": [
+          {
+            "hash": "396bd80c4b3afd67de69cbad87dd3a6c90f265bdc681907b0ddf7eed925c3c8a",
+            "where": "12-KT-C1-D3-I-17.hinh.4.du_lieu",
+            "hashDataUrl": "691c05e83a2b6955cb46a793a1184eb6cb10a4e5c3abb12a5e6df34b4959f3c0",
+            "position": {
+              "where": "12-KT-C1-D3-I-17.hinh.4.du_lieu",
+              "hashDataUrl": "691c05e83a2b6955cb46a793a1184eb6cb10a4e5c3abb12a5e6df34b4959f3c0",
+              "viTri": "sau_pa_D",
+              "truong": "hinh",
+              "congKhaiTruocNop": true
+            }
+          }
+        ]
+      }
+    ],
+    "fileNguon": "anh/396bd80c4b3afd67de69cbad87dd3a6c90f265bdc681907b0ddf7eed925c3c8a.png",
+    "geometry": {
+      "layout": "8head đặc vòng trong/tâmrỗng,8tail lượnsóng hướngra8phía như1055 nhưngKHÔNGcaptionD. Khôngđổichiềutail.",
+      "headCount": 8,
+      "tailCount": 8,
+      "caption": [],
+      "captionEvidence": "Không chữ D. đọcđượctrongPNG;chỉvếtmựcnhỏrờidướitráix≈67,y≈270,khôngphảinhãnD. KhôngthêmD từ vịtríapp."
+    },
+    "nguoiDocNguon": "soat_nguon_2",
+    "trangThai": "Đã mở PNG native/full và đọc stem/refs; chỉ dữ liệu dựng, chưa duyệt SVG",
+    "luuY": "Giữ nguyên bố trí các phương án, không chuẩn hóa thành micelle đúng; không thêm dấu điện tích, công thức hoặc câu giải thích không có trong hình.",
+    "pixelHeadCenters": {
+      "i": 329,
+      "size": [
+        331,
+        298
+      ],
+      "heads": [
+        {
+          "center": [
+            161.6,
+            108.7
+          ],
+          "erodedBounds": [
+            153,
+            99,
+            170,
+            118
+          ],
+          "erodedPixels": 260
+        },
+        {
+          "center": [
+            184.1,
+            115.9
+          ],
+          "erodedBounds": [
+            176,
+            108,
+            192,
+            124
+          ],
+          "erodedPixels": 245
+        },
+        {
+          "center": [
+            137.9,
+            116.2
+          ],
+          "erodedBounds": [
+            130,
+            108,
+            146,
+            124
+          ],
+          "erodedPixels": 256
+        },
+        {
+          "center": [
+            193.4,
+            138.8
+          ],
+          "erodedBounds": [
+            185,
+            130,
+            203,
+            147
+          ],
+          "erodedPixels": 270
+        },
+        {
+          "center": [
+            128.6,
+            139.4
+          ],
+          "erodedBounds": [
+            119,
+            131,
+            137,
+            148
+          ],
+          "erodedPixels": 254
+        },
+        {
+          "center": [
+            184.3,
+            162.2
+          ],
+          "erodedBounds": [
+            176,
+            153,
+            192,
+            170
+          ],
+          "erodedPixels": 246
+        },
+        {
+          "center": [
+            138.4,
+            162.7
+          ],
+          "erodedBounds": [
+            130,
+            155,
+            147,
+            171
+          ],
+          "erodedPixels": 252
+        },
+        {
+          "center": [
+            160.4,
+            174.0
+          ],
+          "erodedBounds": [
+            152,
+            165,
+            169,
+            184
+          ],
+          "erodedPixels": 259
+        }
+      ]
+    },
+    "pixelHeadCentersMethod": "ThresholdL<128,erosion2pixel,component>60pixel,centroidước lượngheadđặc;đãđốichiếubằngmắttừngnative. Erodedbounds khôngphải fullcirclebounds;khôngdùng erosionđểtựduyệtnộidung.",
+    "nativeSize": [
+      331,
+      298
+    ]
+  },
+  {
+    "hash": "82a77c13a83883fa12464686b321a449ca17f12ab83e888cbcf6a73e3456b3a0",
+    "file": "anh/82a77c13a83883fa12464686b321a449ca17f12ab83e888cbcf6a73e3456b3a0.png",
+    "mime": "image/png",
+    "bytes": 2753,
+    "i": 701,
+    "refs": [
+      {
+        "qid": "DH-12-C1-B2-I-26",
+        "de": "Cấu trúc phân tử sodium palmitate (C₁₅H₃₁COONa) có thể được minh họa như sau: Khi hòa tan vào nước, các phân tử sodium palmitate sẽ hình thành nên cấu trúc nào dưới đây?",
+        "refs": [
+          {
+            "hash": "82a77c13a83883fa12464686b321a449ca17f12ab83e888cbcf6a73e3456b3a0",
+            "where": "DH-12-C1-B2-I-26.hinh.4.du_lieu",
+            "hashDataUrl": "801010859597c0759328c974b51fff874a162a25de8af16fecba0578b06ed10f",
+            "position": {
+              "where": "DH-12-C1-B2-I-26.hinh.4.du_lieu",
+              "hashDataUrl": "801010859597c0759328c974b51fff874a162a25de8af16fecba0578b06ed10f",
+              "viTri": "sau_pa_D",
+              "truong": "hinh",
+              "congKhaiTruocNop": true
+            }
+          }
+        ]
+      }
+    ],
+    "fileNguon": "anh/82a77c13a83883fa12464686b321a449ca17f12ab83e888cbcf6a73e3456b3a0.png",
+    "geometry": {
+      "layout": "8head đặc vòng trong/tâmrỗng,8tail lượnsóng hướngra8phía;phiênbảnnhỏ217×207,KHÔNGcaptionD.",
+      "headCount": 8,
+      "tailCount": 8,
+      "caption": [],
+      "captionEvidence": "Không chữD. trongPNG;vếtmựctíx≈30,y≈205làrác,khôngđọcđượcnhãn. KhôngthêmD từ vịtríapp."
+    },
+    "nguoiDocNguon": "soat_nguon_2",
+    "trangThai": "Đã mở PNG native/full và đọc stem/refs; chỉ dữ liệu dựng, chưa duyệt SVG",
+    "luuY": "Giữ nguyên bố trí các phương án, không chuẩn hóa thành micelle đúng; không thêm dấu điện tích, công thức hoặc câu giải thích không có trong hình.",
+    "pixelHeadCenters": {
+      "i": 701,
+      "size": [
+        217,
+        207
+      ],
+      "heads": [
+        {
+          "center": [
+            104.0,
+            78.3
+          ],
+          "erodedBounds": [
+            98,
+            71,
+            110,
+            85
+          ],
+          "erodedPixels": 140
+        },
+        {
+          "center": [
+            121.8,
+            84.0
+          ],
+          "erodedBounds": [
+            116,
+            78,
+            127,
+            90
+          ],
+          "erodedPixels": 133
+        },
+        {
+          "center": [
+            85.5,
+            84.2
+          ],
+          "erodedBounds": [
+            80,
+            78,
+            91,
+            90
+          ],
+          "erodedPixels": 136
+        },
+        {
+          "center": [
+            129.0,
+            102.2
+          ],
+          "erodedBounds": [
+            123,
+            96,
+            136,
+            108
+          ],
+          "erodedPixels": 142
+        },
+        {
+          "center": [
+            78.5,
+            102.5
+          ],
+          "erodedBounds": [
+            72,
+            97,
+            85,
+            108
+          ],
+          "erodedPixels": 136
+        },
+        {
+          "center": [
+            121.8,
+            120.3
+          ],
+          "erodedBounds": [
+            116,
+            114,
+            127,
+            126
+          ],
+          "erodedPixels": 129
+        },
+        {
+          "center": [
+            85.9,
+            120.8
+          ],
+          "erodedBounds": [
+            80,
+            115,
+            92,
+            127
+          ],
+          "erodedPixels": 136
+        },
+        {
+          "center": [
+            103.1,
+            129.8
+          ],
+          "erodedBounds": [
+            97,
+            123,
+            109,
+            137
+          ],
+          "erodedPixels": 142
+        }
+      ]
+    },
+    "pixelHeadCentersMethod": "ThresholdL<128,erosion2pixel,component>60pixel,centroidước lượngheadđặc;đãđốichiếubằngmắttừngnative. Erodedbounds khôngphải fullcirclebounds;khôngdùng erosionđểtựduyệtnộidung.",
+    "nativeSize": [
+      217,
+      207
+    ]
+  },
+  {
+    "hash": "bbbe56e8a33225bb49067f2b1512e5404f5941cbd9b04bb0c716da62255bc8ac",
+    "file": "anh/bbbe56e8a33225bb49067f2b1512e5404f5941cbd9b04bb0c716da62255bc8ac.png",
+    "mime": "image/png",
+    "bytes": 36256,
+    "i": 1042,
+    "refs": [
+      {
+        "qid": "VIP27-CDK-ESTER-TN-II-11",
+        "de": "Chất hoạt động bề mặt là thành phần chính trong chất tẩy rửa, cấu trúc gồm hai phần:\n(1) Đuôi kỵ nước là các gốc hydrocarbon mạch dài, thường từ 8 – 22 nguyên tử carbon.\n(2) Đầu ưa nước thường là các nhóm chức phân cực như –OH, –COOH, –NH₂, –COO⁻, –NH₃⁺…\nChất hoạt động bề mặt được phân thành bốn loại:\n– Chất hoạt động bề mặt anion: có nhóm chức phân cực mang điện tích âm.\n– Chất hoạt động bề mặt cation: có nhóm chức phân cực mang điện tích dương.\n– Chất hoạt động bề mặt không ion: có nhóm chức phân cực không mang điện.\n– Chất hoạt động bề mặt lưỡng tính: có nhóm chức phân cực mang điện tích âm và nhóm chức mang điện tích dương.\nPhân tử chất hoạt động bề mặt thường được biểu diễn như hình thứ nhất. Khi tan trong nước, các phân tử chất hoạt động bề mặt có xu hướng tập trung tại bề mặt phân cách giữa nước và không khí. Phần đầu ưa nước của phân tử sẽ phân bố trong nước, phần đuôi kỵ nước sẽ phân bố trong không khí (hình thứ hai).",
+        "refs": [
+          {
+            "hash": "bbbe56e8a33225bb49067f2b1512e5404f5941cbd9b04bb0c716da62255bc8ac",
+            "where": "VIP27-CDK-ESTER-TN-II-11.hinh.1.du_lieu",
+            "hashDataUrl": "c77e4e6915c5676b383b6fb111639ad6c3d11a1623dcca73d8d3a9a69def7750",
+            "position": {
+              "where": "VIP27-CDK-ESTER-TN-II-11.hinh.1.du_lieu",
+              "hashDataUrl": "c77e4e6915c5676b383b6fb111639ad6c3d11a1623dcca73d8d3a9a69def7750",
+              "viTri": "sau_de",
+              "truong": "hinh",
+              "congKhaiTruocNop": true
+            }
+          }
+        ]
+      }
+    ],
+    "fileNguon": "anh/bbbe56e8a33225bb49067f2b1512e5404f5941cbd9b04bb0c716da62255bc8ac.png",
+    "geometry": {
+      "layout": "Hình mặt phânchia KHÔNGphảimicelle:3đầutrònRỖNGởphíadưới,3đuôiTHẲNGđứngởphíatrên,đầutailchạmđỉnhvòngtạimặtphânchia ngang.",
+      "headCount": 3,
+      "tailCount": 3,
+      "caption": [
+        "Không khí",
+        "Bề mặt phân chia",
+        "Nước"
+      ],
+      "circleHeads": "Vòngtròn khôngtô,viềnmảnh;nộithấttrắng.",
+      "geometryPixel": {
+        "native": [
+          622,
+          147
+        ],
+        "surfaceLine": {
+          "start": [
+            6,
+            80
+          ],
+          "end": [
+            390,
+            80
+          ]
+        },
+        "heads": [
+          {
+            "center": [
+              106.5,
+              102
+            ],
+            "radiusApprox": 22
+          },
+          {
+            "center": [
+              201.5,
+              102
+            ],
+            "radiusApprox": 22
+          },
+          {
+            "center": [
+              297.5,
+              102
+            ],
+            "radiusApprox": 22
+          }
+        ],
+        "tails": [
+          {
+            "start": [
+              105,
+              6
+            ],
+            "end": [
+              106,
+              80
+            ]
+          },
+          {
+            "start": [
+              200,
+              6
+            ],
+            "end": [
+              201,
+              80
+            ]
+          },
+          {
+            "start": [
+              297,
+              6
+            ],
+            "end": [
+              298,
+              80
+            ]
+          }
+        ],
+        "textPositionsApprox": [
+          {
+            "text": "Không khí",
+            "x": 337,
+            "y": 16
+          },
+          {
+            "text": "Bề mặt phân chia",
+            "x": 456,
+            "y": 62
+          },
+          {
+            "text": "Nước",
+            "x": 343,
+            "y": 121
+          }
+        ]
+      },
+      "captionEvidence": "Ba nhãn cótrongảnh nguyênvăn,khôngcó(1)/(2)/head/tail hayA-D. KHÔNGcómũitên từnhãnBề mặt phânchia;đườngngangdừngx390cáchtráinhãn.",
+      "traps": [
+        "Giữ3headrỗng,khôngthànhtôđen.",
+        "Giữtailthẳng,khôngthànhsóng.",
+        "ChỉphầntrênlàKhôngkhí/phầndướilàNước;khôngđảohướngvìđoánkếtquả."
+      ]
+    },
+    "nguoiDocNguon": "soat_nguon_2",
+    "trangThai": "Đã mở PNG native/full và đọc stem/refs; chỉ dữ liệu dựng, chưa duyệt SVG",
+    "luuY": "Giữ nguyên bố trí các phương án, không chuẩn hóa thành micelle đúng; không thêm dấu điện tích, công thức hoặc câu giải thích không có trong hình.",
+    "nativeSize": [
+      622,
+      147
+    ]
+  }
+]
