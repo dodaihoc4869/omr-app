@@ -132,7 +132,7 @@ function docBuoc(x: unknown): BuocTinh[] | undefined {
 
 /** Đọc số kiểu Việt («13,2», «1.000,5», «2,5.10^-3») ⇒ number; không đọc được ⇒ null. */
 export function docSoViet(raw: string): number | null {
-  const t = raw.replace(/\s+/g, '').replace(/[×x·]10\^?\(?(-?\d+)\)?/u, 'e$1').replace(/\.(?=\d{3}(?!\d))/g, '').replace(',', '.')
+  const t = raw.replace(/\s+/g, '').replace(/^\+(?=\d)/, '').replace(/[×x·]10\^?\(?(-?\d+)\)?/u, 'e$1').replace(/\.(?=\d{3}(?!\d))/g, '').replace(',', '.')
   const m = t.match(/^-?\d+(?:\.\d+)?(?:e-?\d+)?/)
   return m ? Number(m[0]) : null
 }
@@ -265,6 +265,8 @@ export function banKinhDungDuoc(x: unknown, phan: PhanKinh, dapAn: string): BanK
 
 /** Chữ so khớp phương án / ý: bỏ thẻ, thực thể, khoảng trắng, hoa thường. */
 const soKhop = (t: unknown) => String(t ?? '').replace(/<[^>]*>/g, ' ').replace(/&[a-z#0-9]+;/gi, ' ').normalize('NFC').toLowerCase().replace(/[\s ]+/g, '').replace(/[.。]+$/, '')
+/** Khớp lỏng: như soKhop nhưng bỏ mọi dấu câu (giữ chữ, số, + −, ngoặc không giữ). */
+const soLong = (t: unknown) => soKhop(t).replace(/\.{2,}|…/g, '').replace(/[^\p{L}\p{N}+\-−]/gu, '')
 
 /**
  * Bản (khoá theo CHỮ GỐC của kho, kèm `_goc` chữ phương án / ý lúc soạn) ⇒ bản theo ĐÚNG câu đã phát cho em (phương án / ý có thể bị xáo).
@@ -284,14 +286,28 @@ export function xepTheoCauPhat(tho: unknown, q: { phan: PhanKinh; choices?: read
   const goc = (q.phan === 'I' ? _goc?.pa : _goc?.y) ?? null
   const theoGoc = new Map(b.lyDo.map((l) => [l.khoa, l]))
   let lyDo: LyDoKinh[]
+  let anLyDo = false
   if (goc && hien.length === 4) {
-    const chuGoc = new Map(Object.entries(goc).map(([k, v]) => [soKhop(v), k]))
-    const ghep = hien.map((t) => chuGoc.get(soKhop(t)))
-    if (ghep.some((k) => !k) || new Set(ghep).size !== 4) return null
-    lyDo = ghep.map((k, i) => ({ ...theoGoc.get(k!)!, khoa: khoa[i]! }))
+    // Ghép theo chữ: 1) khớp sát (bỏ thẻ, khoảng trắng); 2) khớp lỏng (bỏ cả dấu câu — máy em nhận chữ đã gọt «,», «,...», «.»: 03/11 quét ra 8 câu).
+    const ghepTheo = (f: (t: unknown) => string) => {
+      const ds = Object.entries(goc).map(([k, v]) => [f(v), k] as const)
+      if (new Set(ds.map(([t]) => t)).size !== ds.length) return null
+      const m = new Map(ds), g = hien.map((t) => m.get(f(t)))
+      return g.some((k) => !k) || new Set(g).size !== 4 ? null : (g as string[])
+    }
+    const ghep = ghepTheo(soKhop) ?? ghepTheo(soLong)
+    if (ghep) lyDo = ghep.map((k, i) => ({ ...theoGoc.get(k)!, khoa: khoa[i]! }))
+    else {
+      // Phương án trùng chữ (vd cả bốn «(xem hình)» — phương án là ảnh): không biết thứ tự đã xáo ⇒ chỉ nhận khi chữ hiện y hệt chữ gốc theo thứ tự
+      // VÀ đáp án đang chấm khớp (kiểm ở dưới); khối «vì sao từng phương án» ẨN cho khỏi gắn nhầm lý do sang phương án khác.
+      const gocTheoThuTu = khoa.map((k) => soLong(goc[k]))
+      if (hien.some((t, i) => soLong(t) !== gocTheoThuTu[i])) return null
+      lyDo = khoa.map((k) => theoGoc.get(k)!).filter(Boolean)
+      anLyDo = true
+    }
   } else lyDo = khoa.map((k) => theoGoc.get(k)!).filter(Boolean)
   if (lyDo.length !== 4) return null
   const d = dungTheoKho(q.phan, q.correct)
   if (!d || lyDo.some((l) => l.dung !== d.get(l.khoa))) return null
-  return { ...b, lyDo }
+  return { ...b, lyDo: anLyDo ? [] : lyDo }
 }
