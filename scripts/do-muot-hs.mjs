@@ -291,7 +291,7 @@ async function cuon(p, cdp, ms = 4000, y = MAN.height / 2) {
 }
 
 async function moMay(trinh, { yeu }) {
-  const ctx = await trinh.newContext({ viewport: MAN, screen: MAN, deviceScaleFactor: 2, isMobile: true, hasTouch: true, serviceWorkers: SW ? 'allow' : 'block', ignoreHTTPSErrors: true, locale: 'vi-VN', timezoneId: 'Asia/Ho_Chi_Minh',
+  const ctx = await trinh.newContext({ viewport: MAN, screen: MAN, deviceScaleFactor: 2, isMobile: true, hasTouch: true, serviceWorkers: SW ? 'allow' : 'block', ignoreHTTPSErrors: true, locale: 'vi-VN', colorScheme: arg('nen', 'light') === 'toi' ? 'dark' : 'light', timezoneId: 'Asia/Ho_Chi_Minh',
     userAgent: 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36' })
   await ctx.addInitScript(DO_TRONG_TRANG)
   // --theo-css=1: ghi mốc chèn / nạp xong từng tờ CSS (mỗi tờ mới = một lượt tính kiểu cả trang)
@@ -370,6 +370,32 @@ try {
     const d = await layDo(p)
     if (arg('theo-css', '')) console.error('CSS mở lại:', JSON.stringify(await p.evaluate(() => window.__css)))
     kq.moLai = { fcp: d.fcp, noiDung: Math.round(tLt), chamDuoc: tti(d.dai, tLt), taskMax: daiNhat(d.dai), quaMang: await taiTheoLoai(p), dai: d.dai.filter(([t]) => t >= tLt - 500).map(([t, du]) => `${t}+${du}`) }
+  }
+  // --quay=<thư mục> (03/11, thầy «load lại app hiện hình chớp, đo khung hình rồi loại bỏ đi triệt để»): bấm TẢI LẠI (F5) trên tab đã đăng nhập, quay TỪNG KHUNG
+  // (CDP screencast) 4 giây ⇒ k000.jpg… + khung.json [{i, t (ms từ lúc bấm)}]; xong thì thoát (không đo phần sau).
+  const QUAY = arg('quay', '')
+  if (QUAY) {
+    const { mkdirSync } = await import('node:fs')
+    mkdirSync(QUAY, { recursive: true })
+    // --quay-f5=N: tải lại N lần trước khi quay (lần mở đầu phông chưa về ⇒ ảnh tĩnh chưa giống lúc em F5 thật)
+    for (let i = 0, n = Number(arg('quay-f5', '0')) || 0; i < n; i++) { await p.reload({ waitUntil: 'load' }); await p.waitForTimeout(6000) }
+    const ds = []; let t0 = 0
+    cdp.on('Page.screencastFrame', async (f) => { ds.push({ i: ds.length, t: Math.round(f.metadata.timestamp * 1000 - t0) }); writeFileSync(join(QUAY, `k${String(ds.length - 1).padStart(3, '0')}.jpg`), Buffer.from(f.data, 'base64')); try { await cdp.send('Page.screencastFrameAck', { sessionId: f.sessionId }) } catch { /* đã dừng */ } })
+    await cdp.send('Page.startScreencast', { format: 'jpeg', quality: 70, everyNthFrame: 1 })
+    await p.waitForTimeout(400)
+    t0 = (await p.evaluate(() => performance.timeOrigin + performance.now()))
+    await p.reload({ waitUntil: 'commit' })
+    const vet = []
+    const xem = () => p.evaluate(() => { const e = document.elementFromPoint(60, 16); const c = []; for (let x = e; x && c.length < 6; x = x.parentElement) c.push((x.className && typeof x.className === 'string' ? x.className : x.tagName).slice(0, 60)); return { t: Math.round(performance.now()), c: c.join(' < '), top: Math.round(document.querySelector('.kb-hero')?.getBoundingClientRect().top ?? -1) } }).catch(() => null)
+    const soi = arg('quay-soi', '') // --quay-soi=<css>: in nền / lớp <html> của phần tử ấy trong ảnh tĩnh và app thật theo thời gian (tìm chỗ lệch màu)
+    const xemSoi = () => p.evaluate((q) => { const f = (e) => { if (!e) return '-'; const r = []; for (let x = e; x && x !== document.documentElement; x = x.parentElement) { const c = getComputedStyle(x); if (c.opacity !== '1' || c.filter !== 'none' || c.mixBlendMode !== 'normal' || (c.backgroundColor !== 'rgba(0, 0, 0, 0)')) r.push(String(x.className || x.tagName).slice(0, 24) + ':' + c.backgroundColor + '/' + c.opacity + '/' + c.filter + '/' + c.mixBlendMode) } return r.join(' > ') }; return document.documentElement.className + ' tinh=' + f(document.querySelector('#khung-tinh-hs ' + q)) + ' that=' + f(document.querySelector('#root ' + q)) }, soi).catch(() => null)
+    for (let i = 0; i < 40; i++) { const v = await xem(); if (v) vet.push(v); if (soi) { const s = await xemSoi(); if (s && s !== vet.soiCu) { console.log('SOI', i * 80, s); vet.soiCu = s } } await p.waitForTimeout(80) }
+    console.log(JSON.stringify(vet.filter((v, i, a) => !i || v.c !== a[i - 1].c || v.top !== a[i - 1].top)))
+    await p.waitForTimeout(800)
+    await cdp.send('Page.stopScreencast')
+    writeFileSync(join(QUAY, 'khung.json'), JSON.stringify(ds))
+    console.log('QUAY', ds.length, 'khung ⇒', QUAY)
+    await trinh.close(); process.exit(0)
   }
   buoc('lo-trinh')
   // 3. Lộ trình đứng yên + cuộn

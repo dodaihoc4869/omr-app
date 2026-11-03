@@ -109,7 +109,7 @@ describe('Mol — màu, nạp lười, tên', () => {
     expect(css).toContain('.bi[data-nho] .mol-svg .mol-khac { display: none; }') // chữ 6,022·10²³ ẩn khi Bi < 64 px
     expect(readFileSync('src/components/linh-vat/Bi.tsx', 'utf8')).toContain("data-nho={size < 64 ? '' : undefined}")
     expect(css).toMatch(/prefers-reduced-motion: reduce\) \{ \.mol-svg, \.mol-svg \* \{ animation: none !important; \}/)
-    expect(css).toMatch(/html\.may-yeu \.mol-svg \* \{ animation: none !important; \}/)
+    expect(css).toMatch(/html\.may-yeu \.mol-svg :not\(\.mol-mieng\) \{ animation: none !important; \}/) // 03/11: máy yếu vẫn mấp máy miệng lúc nói
   })
   it('Bi.tsx nạp Mol bằng import() (mảnh lười, kho chạy-lúc); tên «Mol» ở lời nói + nút', () => {
     expect(readFileSync('src/components/linh-vat/Bi.tsx', 'utf8')).toMatch(/import\('\.\/mol-dong'\)/)
