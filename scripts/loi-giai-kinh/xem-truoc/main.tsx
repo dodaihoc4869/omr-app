@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import '../../../src/index.css'
 import '../../../src/styles/trong-hs.css'
 import '../../../src/styles/trong-hs-mau.css'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import '../../../src/styles/trong-lam-bai.css'
 import '../../../src/styles/trong-chang-ngang.css'
 import LoiGiaiKinh from '../../../src/components/loi-giai-kinh/LoiGiaiKinh'
@@ -44,8 +44,26 @@ function Hop() {
     </div>
   )
 }
+// ?chieu=N: TỜ CHIẾU thật (taoHtmlMayChieu) với bản Kính mẫu N — xem lời giải mới trên máy chiếu (thầy 03/11), bấm sẵn «Hiện lời giải».
+function Chieu() {
+  const [html, setHtml] = useState('')
+  useEffect(() => { void (async () => {
+    const { taoHtmlMayChieu } = await import('../../../src/lib/html-may-chieu')
+    const { xepTheoCauPhat } = await import('../../../src/lib/loi-giai-kinh/kiem')
+    const n = Number(new URLSearchParams(location.search).get('chieu')) || 1
+    const dd = ds[Math.min(2, n - 1)]!
+    const tho = { ...(mau as unknown[])[Math.min(2, n - 1)] as object, ...(n === 4 ? DP : {}), qid: 'q', phienBan: 1, phan: dd.phan, _goc: null }
+    const luaChon = 'luaChon' in dd ? [...dd.luaChon] : null
+    const dapAn = dd.phan === 'I' ? 'A' : dd.dapAn
+    const kinh = xepTheoCauPhat(tho, { phan: dd.phan, choices: dd.phan === 'I' ? luaChon ?? undefined : undefined, ideas: dd.phan === 'II' ? luaChon ?? undefined : undefined, correct: dapAn })!
+    const cau = { id: 'X-I-1', phan: dd.phan, maDe: 'X', chuyenDe: '', dang: 'chua_ro', sao: 0, mucDo: '', text: dd.de, luaChon, dapAn, chot: '', lyDo: null, buoc: null, ketQua: '', kinh }
+    setHtml(taoHtmlMayChieu([{ sbd: '', hoTen: 'Cả lớp', soCau: 1, cau } as never], { tenBuoi: 'Dạy học', ngay: new Date() }))
+  })() }, [])
+  return html ? <iframe title="Tờ chiếu" srcDoc={html} style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', border: 0 }} /> : null
+}
+const chieu = new URLSearchParams(location.search).get('chieu')
 const hop = new URLSearchParams(location.search).get('hop') === '1'
-createRoot(document.getElementById('goc')!).render(hop ? <Hop /> :
+createRoot(document.getElementById('goc')!).render(chieu ? <Chieu /> : hop ? <Hop /> :
   <main style={{ maxWidth: 1240, margin: '0 auto', padding: '16px max(16px, env(safe-area-inset-left)) 32px' }}>
     <LoiGiaiKinh ban={ban} dapAn={d.dapAn} emTraLoi={d.em} luaChon={'luaChon' in d ? d.luaChon : undefined} de={d.de} />
   </main>,

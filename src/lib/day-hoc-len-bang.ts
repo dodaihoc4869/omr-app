@@ -205,7 +205,9 @@ export async function dungToChieuDayHoc(
       cau,
     }
   })
-  const html = taoHtmlMayChieu(dsO, {
+  // Lời giải Kính trên màn chiếu (thầy 03/11) — một lệnh cho cả tờ; lỗi ⇒ tờ như cũ.
+  const dsOKinh = await (await import('./loi-giai-kinh/kinh-chieu-gan')).ganKinhChoBang(dsO).catch(() => dsO)
+  const html = taoHtmlMayChieu(dsOKinh, {
     tenBuoi,
     ngay: new Date(),
     nganSachPhut: CAU_HINH_LEN_BANG_MAC_DINH.NGAN_SACH_PHUT,

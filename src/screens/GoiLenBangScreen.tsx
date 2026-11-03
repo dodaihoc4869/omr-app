@@ -1261,7 +1261,9 @@ function GoiLenBangCu() {
       const emTheoCau=new Map(dsO.map(o=>[o.qid,{sbd:o.sbd,hoTen:o.hoTen}]))
       setKq(cu=>cu?{...cu,phanCong:cu.phanCong.map(p=>({...p,...emTheoCau.get(p.cau.id)}))}:cu)
       setKqBuoi(cu=>cu?{...cu,dong:cu.dong.map(d=>d.em&&emTheoCau.has(d.cau.id)?{...d,em:{...d.em,...emTheoCau.get(d.cau.id)}}:d)}:cu)
-      const html = taoHtmlMayChieu(dsO, {
+      // Lời giải Kính trên màn chiếu (thầy 03/11) — một lệnh cho cả tờ; lỗi ⇒ tờ như cũ.
+      const dsOKinh = await (await import('../lib/loi-giai-kinh/kinh-chieu-gan')).ganKinhChoBang(dsO).catch(() => dsO)
+      const html = taoHtmlMayChieu(dsOKinh, {
         dayHoc,
         tenBuoi: dayHoc ? 'Dạy học · Gọi lên bảng' : du ? `Chữa bài ca ${du.maCa}` : 'Gọi lên bảng',
         ngay: new Date(),

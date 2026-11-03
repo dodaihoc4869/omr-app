@@ -46,3 +46,8 @@ export const gvXemLoiGiai = (qid: string) => goiThay('/gv/loi-giai/xem', { qid }
 export const gvDuyetLoiGiai = (b: { quyet: 'duyet' | 'tra_lai'; bam?: string[]; maDe?: string; caLoSach?: boolean; ghiChu?: string }) =>
   goiThay('/gv/loi-giai/duyet', b) as Promise<{ ok: boolean; error?: string; soCau?: number }>
 export const gvSoanGap = (maDe: string) => goiThay('/gv/loi-giai/soan-gap', { maDe }) as Promise<{ ok: boolean; error?: string; soCau?: number }>
+
+/** Bản Kính cho tờ chiếu / app thầy (thầy 03/11 «Hiển thị lời giải mới cho tất cả phần chiếu lên bảng»): { ok, ban: { qid: bản thô còn `_goc` } }. */
+export function docKinhChieu(qids: readonly string[]): Promise<any> { // eslint-disable-line @typescript-eslint/no-explicit-any
+  return goiThay('/gv/loi-giai-kinh', { qids: [...qids].slice(0, 200) })
+}

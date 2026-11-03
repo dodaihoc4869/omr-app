@@ -22,6 +22,7 @@ import { chuPhuongAn } from './anh-phuong-an'
 import type { CauLuyen } from './bai-tap-pdf'
 import { CSS_PHIEU, anhHtml, bangHtml, chuHtml, dapAnChu, hinhTaiViTri, oGiaiHtml, thoat } from './html-phieu'
 import { noiDungTuCauLuyen, thoiGianCau } from './thoi-gian-len-bang'
+import { KINH_CHIEU_CSS, kinhChieuHtml } from './loi-giai-kinh/kinh-chieu'
 import { CSS_BO_CUC, jsBoCuc } from './bo-cuc-to-chieu'
 import { CSS_GIAO_DIEN_NUT_CHAM, CSS_GIAO_DIEN_TO_CHIEU, GIAO_DIEN_TO_CHIEU, mauHaoQuang } from './giao-dien-to-chieu'
 import type { NhanLichSuCau } from './lich-su-cau-len-bang'
@@ -366,7 +367,7 @@ function dotMotEmHtml(o: OBang, soDot: number, tuyChon: TuyChonMayChieu): string
   <section class="mc-nua mc-don"${tuyChon.dayHoc ? ` data-giay="${thoiGianDayHoc(o)}"` : ''} data-lam="${gio.lam}" data-chua="${gio.chua}" data-lam0="${gio.lam0}" data-chua0="${gio.chua0}">
     ${o.chuaCuoi ? '' : `<button type="button" class="mc-nut-hien-em mc-nut-giai" aria-expanded="false" aria-controls="em-${ma}">Hiện học sinh và thần thú →</button>${headerEmHtml(o, ma)}`}
     <div class="mc-vung-de">${thongKeHtml(o.thongKe)}${dauDeHtml(o)}<div class="mc-than">${o.chuaCuoi ? `<p class="mc-de">${chuDeChieu(o.chuaCuoi)}</p>` : ''}${thanCauHtml(o.cau,Boolean(o.chuaCuoi))}</div>
-      <div class="mc-giai" id="${ma}" hidden>${oGiaiHtml(o.cau)}</div>
+      <div class="mc-giai" id="${ma}" hidden>${o.cau.kinh ? kinhChieuHtml(o.cau.kinh, o.cau) : oGiaiHtml(o.cau)}</div>
     </div>
     <div class="mc-giai-vung">
       <button type="button" class="mc-nut-giai" aria-expanded="false" aria-controls="${ma}">
@@ -1160,7 +1161,7 @@ ${tuyChon.chuaBai ? `    ${NUT_THU_GON}\n` : ''}    <button type="button" class=
   return `<!DOCTYPE html>
 <html lang="vi" data-projector="matte-light" data-sang><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${thoat(tuyChon.tenBuoi || 'Gọi lên bảng')} — tờ máy chiếu</title>
-<style>${CSS_PHIEU}</style><style>${CSS_MAY_CHIEU}</style><style>${CSS_BO_CUC}</style><style>${CSS_GIAO_DIEN_TO_CHIEU}</style><style>${CSS_LEN_BANG_MOI}</style>${tuyChon.chuaBai ? `<style>${CSS_CHUA_BAI}</style>` : ''}${maPhien ? `<style>${CSS_CAU_NOI_TO_CHIEU}</style><style>${CSS_GIAO_DIEN_NUT_CHAM}</style>` : ''}</head>
+<style>${CSS_PHIEU}</style><style>${CSS_MAY_CHIEU}</style><style>${CSS_BO_CUC}</style><style>${CSS_GIAO_DIEN_TO_CHIEU}</style><style>${CSS_LEN_BANG_MOI}</style>${dsO.some((o) => o.cau.kinh) ? `<style>${KINH_CHIEU_CSS}</style>` : ''}${tuyChon.chuaBai ? `<style>${CSS_CHUA_BAI}</style>` : ''}${maPhien ? `<style>${CSS_CAU_NOI_TO_CHIEU}</style><style>${CSS_GIAO_DIEN_NUT_CHAM}</style>` : ''}</head>
 <body class="mc${tuyChon.dayHoc ? ' mc-day-hoc' : ''}"${tuyChon.chuaBai ? ' data-chua-bai' : ''}${maPhien ? ` data-cau-noi="${maPhien}"` : ''}${nganSach > 0 ? ` data-ngan-sach="${nganSach}"` : ''}>${than}
 <script>${JS_MAY_CHIEU}</script><script>${jsBoCuc()}</script>${maPhien ? `<script>${jsCauNoiToChieu()}</script>` : ''}<script>${jsLenBangMoi({ cauNoi: Boolean(maPhien) })}</script>${tuyChon.chuaBai ? `<script>${JS_CHUA_BAI}</script>` : ''}</body></html>`
 }
