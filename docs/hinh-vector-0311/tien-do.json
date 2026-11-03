@@ -79,14 +79,14 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 449,
-    "soSvgRieng": 313,
-    "soCauDungHinh": 549,
-    "soCauDuMoiHinh": 548,
+    "soAnhNguon": 529,
+    "soSvgRieng": 340,
+    "soCauDungHinh": 669,
+    "soCauDuMoiHinh": 668,
     "soCauMoiXongMotPhan": 1,
-    "byteSvg": 4119895,
-    "byteGzip": 847323,
-    "soAnhNguonConLai": 979,
+    "byteSvg": 4963620,
+    "byteGzip": 997038,
+    "soAnhNguonConLai": 899,
     "daTichHop": false
   },
   "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.",
@@ -106,14 +106,16 @@
     "daChuyenHetBoDaVe": true
   },
   "daDatPhongApp": {
-    "soNguon": 449,
-    "soCauDuHinhVaPhong": 548,
+    "soNguon": 529,
+    "soCauDuHinhVaPhong": 668,
     "ghiChu": "Các số tổngDaDoiChieu vẫn mô tả nội dung đã kiểm; bản cũ chưa đổi phông không được coi đạt yêu cầu phông mới."
   },
   "loMoiNhat": {
-    "lo": "39–56",
-    "ketQua": "548 câu đủ mọi hình+DDH;449nguồn→313SVG. Toàn bộ20nguồn doc-molecule-20-lo-44.json đã dựng/soát; giữ từngHexplicit/caption/nhómcondensed/stereo,cleanupnhãnPDFcóbằngchứngriêng.",
-    "tiepTheo": "Tác tửcau_truc_5 đang đọc20nguồnmới lô57: /workspace/scratch/doc-molecule-lo-57.json. Tiếp tục dựng và soát độc lập từngnguồn.1198làảnhhoa thật giữnguyên,khôngcộngsốvẽ.",
-    "gioiHan": "Chưa tích hợp/chưa reloadofflineapp/chưa phát hành. Main93b88d37 chưa gộp, phải kiểm lại trước triển khai."
+    "lo": "57–75",
+    "ketQua": "668 câu đủ hình+DDH;529nguồn→340SVG. Hai nhóm20molecule và10đồthị/bảng đãhoànthiện;20alias67+18alias71 đều mở từngnguồn/base/SVGvàsoátđộclậphash.",
+    "suaLoi": "53/366 thêm5tickY,1267 khôngthêm.791soátpixelđộclập xácnhậncóguide80,giữnguyên.1153phục hồi panel3butan2amine từnguồn60 rõ,khôngalias256arylamine.1006giữ(a)theoglyphvà2stem.",
+    "phong": "DDH thường và đậm từ2cặpWOFF2app;thường giữ nguyên byte/hash. Khôngfaux-bold/fontfallback. WOFF2khôngkhácorigin/main93b88d37.",
+    "tiepTheo": "Tiếp tục nguồn chưa xử lý;khôngrơi lại các hold791/1153/Fischer đã giải quyết.1198ảnhhoa thật giữnguyên,khôngcộngsốvẽ. Bảnđồđiểmnốiapp/offlineởkiem/diem-noi-vector-offline.json.",
+    "gioiHan": "Chưa tích hợp hình/chưa reloadofflineapp/chưa phát hành. Main93b88d37 chưa gộp,phải kiểm đầyđủ lại trước triểnkhai. Bộdònéttựđộngchỉứngviên."
   }
 }

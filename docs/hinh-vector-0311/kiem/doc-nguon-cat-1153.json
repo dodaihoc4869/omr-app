@@ -1,0 +1,295 @@
+{
+  "nguonCanGiaiQuyet": 1153,
+  "ketLuan": "Khôi phục được nhánh trên panel3 bằng nguồn60 cùng bộ6, không suy từ tên/đáp án. Panel3 NH₂–CH(CH₃)–CH₂–CH₃, SMILES CC(N)CC, không nêm/stereo. Nguồn60 nhánh lên chỉ1đoạn và thấy rõ điểm cuối tựdo, nên methyl,không phảiethyl/mạchdài.",
+  "bo6": [
+    {
+      "index": 1,
+      "smiles": "CCCN"
+    },
+    {
+      "index": 2,
+      "smiles": "CCCCN"
+    },
+    {
+      "index": 3,
+      "smiles": "CC(N)CC"
+    },
+    {
+      "index": 4,
+      "smiles": "NC1CCCCC1"
+    },
+    {
+      "index": 5,
+      "smiles": "CCNCC",
+      "explicitH": "H dướiN"
+    },
+    {
+      "index": 6,
+      "smiles": "CCN(C)CC"
+    }
+  ],
+  "sources": [
+    {
+      "i": 1153,
+      "hash": "d1012113fe6dda6d8c6f3a9c315dfebc5523b88fbb61e18521a18fa089428899",
+      "fileNguon": "anh/d1012113fe6dda6d8c6f3a9c315dfebc5523b88fbb61e18521a18fa089428899.png",
+      "daMoNative": true,
+      "bangChung": "Ảnhđích2hàng3cột,nhánhtrênpanel3bịcắt tại méptrên;không thấyđiểmcuốinhánhởnguồnđích.",
+      "questions": [
+        {
+          "qid": "DB-12-B8-D1-III-410",
+          "de": "Cho các amine có công thức cấu tạo dưới đây: Có bao nhiêu amine bậc một trong dãy các amine trên?",
+          "refs": [
+            {
+              "where": "DB-12-B8-D1-III-410.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        },
+        {
+          "qid": "DH-12-C3-B8-III-6",
+          "de": "Cho các amine có công thức cấu tạo dưới đây: Có bao nhiêu amine bậc một trong dãy các amine trên?",
+          "refs": [
+            {
+              "where": "DH-12-C3-B8-III-6.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "i": 60,
+      "hash": "0bc800ce21c3523dae2f6be493321ef438a09577ec64cd88a8c3124ef386ba60",
+      "fileNguon": "anh/0bc800ce21c3523dae2f6be493321ef438a09577ec64cd88a8c3124ef386ba60.png",
+      "daMoNative": true,
+      "bangChung": "CÙNGbộ6 đầyđủ:panel3NH₂ ởtráiCH giữa;CH nối methyl lên (endpoint tựdo y35),CH₂xuốngphải rồiCH₃lênphải.5panel còn lạiđúngcùngnộidung/nhãn.",
+      "questions": [
+        {
+          "qid": "12-C3-B8-D2-III-37",
+          "de": "Cho các amine có công thức cấu tạo dưới đây: Trong số các amine trên, có bao nhiêu amine bậc I ?",
+          "refs": [
+            {
+              "where": "12-C3-B8-D2-III-37.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        },
+        {
+          "qid": "DB-12-B8-D1-III-187",
+          "de": "Cho các amine có công thức cấu tạo dưới đây: Trong số các amine trên, có bao nhiêu amine bậc I ?",
+          "refs": [
+            {
+              "where": "DB-12-B8-D1-III-187.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "i": 256,
+      "hash": "2c0a4082de9d8b5bb77cc09e8f85eef59bd161fa30218711e0e83d410fb02bb5",
+      "fileNguon": "anh/2c0a4082de9d8b5bb77cc09e8f85eef59bd161fa30218711e0e83d410fb02bb5.png",
+      "daMoNative": true,
+      "bangChung": "KHÁCbộ:5panel1,2,4,5,6cùngconnectivity;panel3 làN-methylanilineNH–CH₃gắnvòng,khôngđượcalias.",
+      "questions": [
+        {
+          "qid": "DB-12-B8-D1-III-415",
+          "de": "Cho các amine có công thức cấu tạo dưới đây: Có bao nhiêu chất thuộc loại arylamine?",
+          "refs": [
+            {
+              "where": "DB-12-B8-D1-III-415.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        },
+        {
+          "qid": "DH-12-C3-B8-III-12",
+          "de": "Cho các amine có công thức cấu tạo dưới đây: Có bao nhiêu chất thuộc loại arylamine?",
+          "refs": [
+            {
+              "where": "DH-12-C3-B8-III-12.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "i": 832,
+      "hash": "99dbe1448acae9457e382bb939e2433ba36a12824e67bfb556bc124c73d2ac21",
+      "fileNguon": "anh/99dbe1448acae9457e382bb939e2433ba36a12824e67bfb556bc124c73d2ac21.png",
+      "daMoNative": true,
+      "bangChung": "KHÁC:5arylamine/cyclohexylamine,khôngcùngbộ6.",
+      "questions": [
+        {
+          "qid": "12-C3-B8-D2-III-36",
+          "de": "Cho các amine có công thức cấu tạo dưới đây: Trong số các amine trên, có bao nhiêu arylamine?",
+          "refs": [
+            {
+              "where": "12-C3-B8-D2-III-36.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        },
+        {
+          "qid": "DB-12-B8-D1-III-186",
+          "de": "Cho các amine có công thức cấu tạo dưới đây: Trong số các amine trên, có bao nhiêu arylamine?",
+          "refs": [
+            {
+              "where": "DB-12-B8-D1-III-186.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "i": 1126,
+      "hash": "ca94a9951d9998279e90f8cad3459d74b94c4abd4ac1ca8dae08da7412bb01cd",
+      "fileNguon": "anh/ca94a9951d9998279e90f8cad3459d74b94c4abd4ac1ca8dae08da7412bb01cd.png",
+      "daMoNative": true,
+      "bangChung": "KHÁC:5côngthứcamine,cónhãnsốlặp6,khôngcùngbộ6.",
+      "questions": [
+        {
+          "qid": "DB-12-B8-D1-III-414",
+          "de": "Cho các amine có công thức cấu tạo dưới đây: Có bao nhiêu chất thuộc loại alkylamine?",
+          "refs": [
+            {
+              "where": "DB-12-B8-D1-III-414.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        },
+        {
+          "qid": "DH-12-C3-B8-III-11",
+          "de": "Cho các amine có công thức cấu tạo dưới đây: Có bao nhiêu chất thuộc loại alkylamine?",
+          "refs": [
+            {
+              "where": "DH-12-C3-B8-III-11.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "i": 523,
+      "hash": "621691d297a3501f9e9fb5cb7f44d6d3b94f8bcfb8c504bde0f309bafb228a46",
+      "fileNguon": "anh/621691d297a3501f9e9fb5cb7f44d6d3b94f8bcfb8c504bde0f309bafb228a46.png",
+      "daMoNative": true,
+      "bangChung": "KHÁC:4arylamine,khôngcùngbộ6.",
+      "questions": [
+        {
+          "qid": "DB-12-B8-D1-I-307",
+          "de": "Cho các amine có công thức cấu tạo dưới đây: Trong các hợp chất trên, hợp chất nào thuộc loại arylamine bậc I?",
+          "refs": [
+            {
+              "where": "DB-12-B8-D1-I-307.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        },
+        {
+          "qid": "DH-12-C3-B8-I-4",
+          "de": "Cho các amine có công thức cấu tạo dưới đây: Trong các hợp chất trên, hợp chất nào thuộc loại arylamine bậc I?",
+          "refs": [
+            {
+              "where": "DH-12-C3-B8-I-4.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "i": 140,
+      "hash": "18dc9c2cb7da356866a860d0785f0844845ffc01cb8b5653c30e6127c146c24b",
+      "fileNguon": "anh/18dc9c2cb7da356866a860d0785f0844845ffc01cb8b5653c30e6127c146c24b.png",
+      "daMoNative": true,
+      "bangChung": "KHÁC:4hợpchất,khôngcùngbộ6.",
+      "questions": [
+        {
+          "qid": "DB-12-B8-D1-I-306",
+          "de": "Cho các chất có công thức cấu tạo sau: Chất thuộc loại alkylamine là",
+          "refs": [
+            {
+              "where": "DB-12-B8-D1-I-306.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        },
+        {
+          "qid": "DH-12-C3-B8-I-3",
+          "de": "Cho các chất có công thức cấu tạo sau: Chất thuộc loại alkylamine là",
+          "refs": [
+            {
+              "where": "DH-12-C3-B8-I-3.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "i": 280,
+      "hash": "2f4b605287ea0bbe117ae9f90ce9f9793f44d8d9891d1cc50437d6ca861d7a67",
+      "fileNguon": "anh/2f4b605287ea0bbe117ae9f90ce9f9793f44d8d9891d1cc50437d6ca861d7a67.png",
+      "daMoNative": true,
+      "bangChung": "Đãmởnative;khôngcùngbộ6với1153.",
+      "questions": [
+        {
+          "qid": "12-KT-C1234-D2-I-5",
+          "de": "Amine là dẫn xuất của ammonia, trong đó nguyên tử hydrogen trong phân tử ammonia được thay thế bằng gốc hydrocarbon.\nCho các amine có công thức cấu tạo ở hình dưới.\nTrong các amine trên, amine nào là amine bậc ba?",
+          "refs": [
+            {
+              "where": "12-KT-C1234-D2-I-5.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        },
+        {
+          "qid": "DB-12-B8-D1-I-247",
+          "de": "Amine là dẫn xuất của ammonia, trong đó nguyên tử hydrogen trong phân tử ammonia được thay thế bằng gốc hydrocarbon.\nCho các amine có công thức cấu tạo ở hình dưới.\nTrong các amine trên, amine nào là amine bậc ba?",
+          "refs": [
+            {
+              "where": "DB-12-B8-D1-I-247.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "i": 532,
+      "hash": "64a0b2b7bdb7d66da71bdc3ce830e51e38bd4b137977b16e761f9b593b324cd3",
+      "fileNguon": "anh/64a0b2b7bdb7d66da71bdc3ce830e51e38bd4b137977b16e761f9b593b324cd3.png",
+      "daMoNative": true,
+      "bangChung": "Đãmởnative;khôngcùngbộ6với1153.",
+      "questions": [
+        {
+          "qid": "12-KT-C3-D2-I-2",
+          "de": "Cho các amine có công thức cấu tạo trong hình dưới đây.\nTrong số các amine trên, có bao nhiêu arylamine?",
+          "refs": [
+            {
+              "where": "12-KT-C3-D2-I-2.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        },
+        {
+          "qid": "DB-12-B8-D1-I-257",
+          "de": "Cho các amine có công thức cấu tạo trong hình dưới đây.\nTrong số các amine trên, có bao nhiêu arylamine?",
+          "refs": [
+            {
+              "where": "DB-12-B8-D1-I-257.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "phamViTim": "Tìm trongkiểm-kê1428assets bằngpublicde của toànkho với từamine,công thức cấu tạo,dãy,bậcmột; mởnative1153,60,256,832,1126,523,140,280,532. Khôngkhẳngđịnhđãvisual toàn1428ảnh."
+}

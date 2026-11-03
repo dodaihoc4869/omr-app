@@ -1,0 +1,157 @@
+[
+  {
+    "i": 28,
+    "hash": "063cf2885c96848e88be3c7cc19b1700087115a16152d02edfcc81c7ce02a10c",
+    "fileNguon": "anh/063cf2885c96848e88be3c7cc19b1700087115a16152d02edfcc81c7ce02a10c.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "NC(CCC(=O)O)C(=O)O",
+    "notes": "HOOC trái–CH₂–CH₂–CH(NH₂)–COOH phải. AlphaNH₂ nêm đặc xuống (đầu nhỏ tại alphaC, đầu rộng tại NH₂), alphaC nối CH₂ bên trái-trên và COOH phải-trên; H ẩn. Không gán CIP khi chưa kiểm renderer. Cả2C=O lên. Không caption/circle/charges.",
+    "questions": [
+      {
+        "qid": "DB-12-B9-P1-D2-II-109",
+        "de": "Glutamic acid có vai trò quan trọng trong quá trình xây dựng cấu trúc tế bào của con người. Ngoài ra, muối monosodium glutamate còn được dùng chế biến gia vị thức ăn (bột ngọt hay mì chính).\nGlutamic acid có cấu trúc như hình vẽ bên dưới và có điểm đẳng điện pI=3,2 (pI là giá trị pH mà khi đó amino acid có nồng độ ion lưỡng cực là cực đại. Khi pH<pI thì amino acid đó tồn tại chủ yếu ở dạng cation, còn khi pH>pI thì amino acid đó tồn tại chủ yếu ở dạng anion). HOOC−CH₂−CH₂−CH(NH₂)−COOH.",
+        "refs": [
+          {
+            "where": "DB-12-B9-P1-D2-II-109.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B9-P1-II-22",
+        "de": "Glutamic acid có vai trò quan trọng trong quá trình xây dựng cấu trúc tế bào của con người. Ngoài ra, muối monosodium glutamate còn được dùng chế biến gia vị thức ăn (bột ngọt hay mì chính).\nGlutamic acid có cấu trúc như hình vẽ bên dưới và có điểm đẳng điện pI=3,2 (pI là giá trị pH mà khi đó amino acid có nồng độ ion lưỡng cực là cực đại. Khi pH<pI thì amino acid đó tồn tại chủ yếu ở dạng cation, còn khi pH>pI thì amino acid đó tồn tại chủ yếu ở dạng anion). HOOC−CH₂−CH₂−CH(NH₂)−COOH.",
+        "refs": [
+          {
+            "where": "DH-12-C3-B9-P1-II-22.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 286,
+    "hash": "309b98b043551cb20b9126285b3699dd83e02d6fff3288c9337e3c81db9ddd8e",
+    "fileNguon": "anh/309b98b043551cb20b9126285b3699dd83e02d6fff3288c9337e3c81db9ddd8e.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "NCCCCC(N)C(=O)O",
+    "notes": "H₂N trái–(CH₂)₄–CH(NH₂)–COOH phải. Alpha NH₂ nêm đặc xuống, đầu nhỏ alphaC, rộng NH₂; mạch CH₂ trái-trên, COOH phải-trên,Hẩn. Đúng4CH₂ giữa đầu NH₂ và alphaC. Không caption/charges/circle.",
+    "questions": [
+      {
+        "qid": "DH-12-C3-B11-D1-II-2",
+        "de": "Lysine là một thành phần quan trọng của tất cả các protein trong cơ thể. Nó đóng vai trò quan trọng trong việc hấp thu calcium, tạo cơ bắp, phục hồi sau chấn thương hay sau phẫu thuật, sự tổng hợp các hormone, enzyme, và các kháng thể. Lysine có công thức cấu tạo như sau:",
+        "refs": [
+          {
+            "where": "DH-12-C3-B11-D1-II-2.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B9-P1-II-18",
+        "de": "Lysine là một thành phần quan trọng của tất cả các protein trong cơ thể. Nó đóng vai trò quan trọng trong việc hấp thu canxi, tạo cơ bắp, phục hồi sau chấn thương hay sau phẫu thuật, sự tổng hợp các hormone, enzyme, và các kháng thể. Lysine có công thức cấu tạo như sau:",
+        "refs": [
+          {
+            "where": "DH-12-C3-B9-P1-II-18.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1114,
+    "hash": "c89880dbaf6b5be869cf3154def78ccccd442d6a07273a88ca04dcbc199badc0",
+    "fileNguon": "anh/c89880dbaf6b5be869cf3154def78ccccd442d6a07273a88ca04dcbc199badc0.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "NC(CCC(=O)O)C(=O)O",
+    "notes": "Cùng nội dung28: HOOC trái–2CH₂–alphaC(NH₂)–COOH phải. NH₂ nêm đặc xuống; alphaC nối mạch trái-trên, COOH phải-trên,Hẩn. Không caption/circle/charges.",
+    "questions": [
+      {
+        "qid": "12-C3-B9-D1-I-85",
+        "de": "Glutamic acid là một amino acid thiết yếu của cơ thể, có công thức cấu tạo như sau:\nMuối monosodium glutamate (MSG), thường được dùng để chế biến bột ngọt hoặc mì chính. Pha dung dịch X gồm glutamic acid và NaOH theo tỉ lệ mol 1 : 1 thu được chất hữu cơ Y. Khi đặt trong điện trường, chất Y",
+        "refs": [
+          {
+            "where": "12-C3-B9-D1-I-85.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P1-D1-I-55",
+        "de": "Glutamic acid là một amino acid thiết yếu của cơ thể, có công thức cấu tạo như sau:\nMuối monosodium glutamate (MSG), thường được dùng để chế biến bột ngọt hoặc mì chính. Pha dung dịch X gồm glutamic acid và NaOH theo tỉ lệ mol 1 : 1 thu được chất hữu cơ Y. Khi đặt trong điện trường, chất Y",
+        "refs": [
+          {
+            "where": "DB-12-B9-P1-D1-I-55.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1125,
+    "hash": "ca93b34a36f26ae7c29d1afee7d46ec9d97daa8775a7c6a792f689829f2ca754",
+    "fileNguon": "anh/ca93b34a36f26ae7c29d1afee7d46ec9d97daa8775a7c6a792f689829f2ca754.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "[Na+].CCCCCCCCCCCCc1ccc(S(=O)(=O)[O-])cc1",
+    "notes": "12C alkyl thẳng trái, nối benzene tại trái; sulfonate para phải: S có2O đôi trên/dưới và nhánh ONa phải. Giữ ONa gộp như nguồn, không thêm dấu ion hiển thị. Vòng3đôi khôngcircle. Không caption/stereo.",
+    "questions": [
+      {
+        "qid": "12-C1-B2-II-15",
+        "de": "Hợp chất hữu cơ X có công thức cấu tạo như sau:",
+        "refs": [
+          {
+            "where": "12-C1-B2-II-15.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B2-D1-II-64",
+        "de": "Hợp chất hữu cơ X có công thức cấu tạo như sau:",
+        "refs": [
+          {
+            "where": "DB-12-B2-D1-II-64.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1274,
+    "hash": "e7a0d2905d09fd8d538d510cb50e6334a30515ea98a7cf6bbd6a9092c5e24eb5",
+    "fileNguon": "anh/e7a0d2905d09fd8d538d510cb50e6334a30515ea98a7cf6bbd6a9092c5e24eb5.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "CC(C)C(N)C(=O)NCC(=O)NC(C)C(=O)O",
+    "notes": "Val–Gly–Ala, H₂N đầu trái,2NH peptide mỗiNH hiệnH trên,COOH cuối phải. Val alphaH dưới; nhánh CH(CH₃)₂ lên, CH nhánh hiệnH trên. Gly CH₂ hiệnH trên/dưới. Ala alphaH dưới,CH₃ trên. Khôngnêm/stereo/caption/circle/charges.",
+    "questions": [
+      {
+        "qid": "DB-12-B9-P2-D1-I-165",
+        "de": "Cho peptide Y có công thức cấu tạo sau: Tên viết tắt của Y là",
+        "refs": [
+          {
+            "where": "DB-12-B9-P2-D1-I-165.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B9-P2-I-18",
+        "de": "Cho peptide Y có công thức cấu tạo sau: Tên viết tắt của Y là",
+        "refs": [
+          {
+            "where": "DH-12-C3-B9-P2-I-18.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  }
+]

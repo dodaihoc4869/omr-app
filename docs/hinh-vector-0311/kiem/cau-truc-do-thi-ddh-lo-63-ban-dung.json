@@ -1,0 +1,251 @@
+[
+  {
+    "hash": "0cfd73b72f0975f9c99da573505c4c75dc0c64479e80b2e34e6c198e94bf2963",
+    "file": "anh/0cfd73b72f0975f9c99da573505c4c75dc0c64479e80b2e34e6c198e94bf2963.png",
+    "mime": "image/png",
+    "bytes": 19986,
+    "i": 68,
+    "refs": [
+      {
+        "qid": "12-C3-B10-D2-II-12",
+        "de": "Enzyme amylase là một protein có khả năng xúc tác cho phản ứng thủy phân tinh bột. Hoạt tính xúc tác của enzyme càng cao thì phản ứng thủy phân tinh bột diễn ra càng nhanh.\nHoạt tính xúc tác của enzyme phụ thuộc vào các yếu tố như nhiệt độ, pH,... Một nhóm học sinh dự đoán \"pH càng tăng thì hoạt tính xúc tác của enzyme amylase càng cao\". Từ đó, học sinh tiến hành thí nghiệm ở nhiệt độ không đổi nhưng thay đổi pH của môi trường để kiểm tra dự đoán trên như sau:\nBước 1: Thêm 2,0 mL dung dịch một loại enzyme amylase vào một ống nghiệm chứa 5,0 mL dung dịch có vai trò duy trì ổn định pH bằng 5.\nBước 2: Thêm tiếp 2,0 mL dung dịch tinh bột vào ống nghiệm trên, lắc đều.\nBước 3: Sau khoảng mỗi 10 giây, dùng ống hút lấy 1 – 2 giọt hỗn hợp phản ứng trong ống nghiệm và cho vào đĩa sứ chứa sẵn dung dịch iodine, quan sát để từ đó xác định thời gian tinh bột thủy phân hết.\nLặp lại thí nghiệm theo ba bước trên, chỉ thay đổi pH dung dịch trong Bước 1 lần lượt là pH = 5, 6, 7, 8, 9. Nhóm học sinh ghi lại kết quả thời gian t (giây) mà tinh bột thủy phân hết trong môi trường pH = 5, 6, 7, 8, 9 và vẽ đồ thị như hình bên.",
+        "where": [
+          "12-C3-B10-D2-II-12.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/0cfd73b72f0975f9c99da573505c4c75dc0c64479e80b2e34e6c198e94bf2963.png",
+    "soQids": 1,
+    "docNguon": {
+      "axes": {
+        "x": "pH",
+        "xticks": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "y": "t (giây)",
+        "yticks": [
+          20,
+          40,
+          60,
+          80,
+          100,
+          120,
+          140,
+          160,
+          180,
+          200
+        ],
+        "arrows": "đầu phải trục x và đầu trên trục y"
+      },
+      "lines": [
+        {
+          "type": "đường liền nối 5 điểm tròn tô đen",
+          "points": [
+            [
+              5,
+              140
+            ],
+            [
+              6,
+              80
+            ],
+            [
+              7,
+              60
+            ],
+            [
+              8,
+              100
+            ],
+            [
+              9,
+              180
+            ]
+          ]
+        }
+      ],
+      "dashes": "Từ mỗi điểm, chiếu ngang tới trục y và chiếu dọc tới trục x; phần ngang/dọc trùng đường khác chỉ vẽ một nét.",
+      "caption": [],
+      "traps": [
+        "Gốc hình tại x4,y20, không thêm0.",
+        "Giữ đơn vị giây; đây là thời gian chứ không phải hoạt tính."
+      ]
+    },
+    "trangThai": "da-soat-doc-lap",
+    "svg": "do-thi-ddh-651fa08a6013179859407b22035afd377be0cf0dbf4d5a05d11e2b9be432643b.svg",
+    "hashSvg": "651fa08a6013179859407b22035afd377be0cf0dbf4d5a05d11e2b9be432643b",
+    "byteSvg": 24286,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashSvgDaSoat": "651fa08a6013179859407b22035afd377be0cf0dbf4d5a05d11e2b9be432643b",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "hash": "25c1132dfcd7a654ca52bc37bb2faf1a6ffe156fa9879466d98184cfa3b1b108",
+    "file": "anh/25c1132dfcd7a654ca52bc37bb2faf1a6ffe156fa9879466d98184cfa3b1b108.png",
+    "mime": "image/png",
+    "bytes": 14546,
+    "i": 220,
+    "refs": [
+      {
+        "qid": "DB-12-B9-P2-D1-I-140",
+        "de": "Enzyme protease là một protein có khả năng xúc tác phân giải protein thành các peptide và amino acid. Enzyme này được sử dụng rộng rãi trong ngành công nghiệp thực phẩm, ví dụ như sản xuất nước mắm, ủ bia, hoặc làm mềm thịt.\nMột nhóm học sinh muốn nghiên cứu ảnh hưởng của nồng độ enzyme protease lên quá trình làm mềm thịt. Giả thuyết của nhóm là: “Nồng độ enzyme protease càng cao thì thời gian làm mềm thịt càng ngắn” Thí nghiệm thực hiện như sau:\nBước 1: Chuẩn bị 4 miếng thịt có khối lượng bằng nhau, được cắt từ cùng một loại thịt.\nBước 2: Ngâm từng miếng thịt vào 100 mL dung dịch enzyme protease có nồng độ khác nhau lần lượt là 0%, 0,5%, 1,0%, 1,5%.\nBước 3: Đặt các cốc thịt vào bể điều nhiệt ở 37°C để giữ điều kiện ổn định.\nBước 4: Sau mỗi 30 phút, kiểm tra độ mềm của thịt bằng cách đo lực cần thiết để cắt qua miếng thịt (dụng cụ đo lực).\nNhóm học sinh ghi lại thời gian cần thiết để làm mềm hoàn toàn miếng thịt trong từng dung dịch và vẽ đồ thị biểu diễn mối quan hệ giữa nồng độ enzyme protease và thời gian làm mềm thịt.\nPhát biểu nào sau đây là sai?",
+        "where": [
+          "DB-12-B9-P2-D1-I-140.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B10-I-62",
+        "de": "Enzyme protease là một protein có khả năng xúc tác phân giải protein thành các peptide và amino acid. Enzyme này được sử dụng rộng rãi trong ngành công nghiệp thực phẩm, ví dụ như sản xuất nước mắm, ủ bia, hoặc làm mềm thịt.\nMột nhóm học sinh muốn nghiên cứu ảnh hưởng của nồng độ enzyme protease lên quá trình làm mềm thịt. Giả thuyết của nhóm là: “Nồng độ enzyme protease càng cao thì thời gian làm mềm thịt càng ngắn” Thí nghiệm thực hiện như sau:\nBước 1: Chuẩn bị 4 miếng thịt có khối lượng bằng nhau, được cắt từ cùng một loại thịt.\nBước 2: Ngâm từng miếng thịt vào 100 mL dung dịch enzyme protease có nồng độ khác nhau lần lượt là 0%, 0,5%, 1,0%, 1,5%.\nBước 3: Đặt các cốc thịt vào bể điều nhiệt ở 37°C để giữ điều kiện ổn định.\nBước 4: Sau mỗi 30 phút, kiểm tra độ mềm của thịt bằng cách đo lực cần thiết để cắt qua miếng thịt (dụng cụ đo lực).\nNhóm học sinh ghi lại thời gian cần thiết để làm mềm hoàn toàn miếng thịt trong từng dung dịch và vẽ đồ thị biểu diễn mối quan hệ giữa nồng độ enzyme protease và thời gian làm mềm thịt.\nPhát biểu nào sau đây là sai?",
+        "where": [
+          "DH-12-C3-B10-I-62.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/25c1132dfcd7a654ca52bc37bb2faf1a6ffe156fa9879466d98184cfa3b1b108.png",
+    "soQids": 2,
+    "docNguon": {
+      "axes": {
+        "x": "Nồng độ enzyme protease (%)",
+        "xticks": [
+          "0",
+          "0.25",
+          "0.5",
+          "0.75",
+          "1",
+          "1.25",
+          "1.5"
+        ],
+        "y": "Thời gian làm mềm thịt (phút)",
+        "yticks": [
+          0,
+          20,
+          40,
+          60,
+          80,
+          100,
+          120,
+          140,
+          160,
+          180,
+          200
+        ],
+        "arrows": "Không mũitên;khungchữnhật/gridxám"
+      },
+      "lines": [
+        {
+          "type": "đoạnthẳng nối4điểm tròn tôxám viềnđậm",
+          "points": [
+            [
+              0,
+              180
+            ],
+            [
+              0.5,
+              120
+            ],
+            [
+              1,
+              60
+            ],
+            [
+              1.5,
+              30
+            ]
+          ],
+          "breaks": "Đoạn0→1 làthẳngđồngdốcđiqua0.5;gãyđổidốctại1,60."
+        }
+      ],
+      "dashes": "Không nétđứt;toànbộ lướichínhxámliền.",
+      "caption": [],
+      "traps": [
+        "Giữ dấu CHẤM thậpphân đúnghìnhnative;đơnvị% vàphút.",
+        "Khôngsửađiểm1.5,30thành0 để đườngthẳng;khôngthêmtênđồthị."
+      ]
+    },
+    "trangThai": "da-soat-doc-lap",
+    "svg": "do-thi-ddh-94e9e95f07ce03da7dd657e5651339eef383dd2998dd3666b23c053e0bf4176e.svg",
+    "hashSvg": "94e9e95f07ce03da7dd657e5651339eef383dd2998dd3666b23c053e0bf4176e",
+    "byteSvg": 47540,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashSvgDaSoat": "94e9e95f07ce03da7dd657e5651339eef383dd2998dd3666b23c053e0bf4176e",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "hash": "349c91905470414eda5746d75938429a345eb8fbeb71b170f7babd495bbb9f45",
+    "file": "anh/349c91905470414eda5746d75938429a345eb8fbeb71b170f7babd495bbb9f45.png",
+    "mime": "image/png",
+    "bytes": 48097,
+    "i": 307,
+    "refs": [
+      {
+        "qid": "DB-12-B4-D2-II-107",
+        "de": "Lên men 250 gam glucose trong phòng thí nghiệm. Phân tích lượng ethyl alcohol theo thời gian, ta được đồ thị sau: Kết quả nghiên cứu nhận thấy:\n- Trong thời gian đầu, tốc độ phản ứng tăng lên, dung dịch trở nên đặc và ấm hơn.\n- Từ ngày thứ 10 phản ứng hầu như dừng lại dù trong dung dịch vẫn còn glucose.",
+        "where": [
+          "DB-12-B4-D2-II-107.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-II-25",
+        "de": "Lên men 250 gam glucose trong phòng thí nghiệm. Phân tích lượng ethyl alcohol theo thời gian, ta được đồ thị sau: Kết quả nghiên cứu nhận thấy:\n- Trong thời gian đầu, tốc độ phản ứng tăng lên, dung dịch trở nên đặc và ấm hơn.\n- Từ ngày thứ 10 phản ứng hầu như dừng lại dù trong dung dịch vẫn còn glucose.",
+        "where": [
+          "DH-12-C2-B4-II-25.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/349c91905470414eda5746d75938429a345eb8fbeb71b170f7babd495bbb9f45.png",
+    "soQids": 2,
+    "docNguon": {
+      "axes": {
+        "x": "Ngày",
+        "xticks": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14
+        ],
+        "y": "Số mol ethyl alcohol",
+        "yticks": [
+          "0",
+          "0,5",
+          "1",
+          "1,5",
+          "2"
+        ],
+        "arrows": "Không mũitên,khungtrêngrid"
+      },
+      "lines": [
+        {
+          "type": "mộtđườngđậmnốicácđoạnthẳng,tăngrồiđạtplateau",
+          "geometryPixel": "Native790x374;gốc(117,276),dướimốc2(117,25);đường(117,276)→(191,201)→(339,137)→(412,87)→(487,25)→(634,25). TọađộPIXEL đọc nguồn; tương ứngđiểmgãyngày2,6,8,10;chỉplateau2mol từ10..14đượcxácđịnhvớimốcsốrõ."
+        }
+      ],
+      "grid": "Lưới nhỏ liền xám; ô lớn theo ngày2/mol0,5. Trong khoảng ngày2 có4ônhỏ (bướcngày0,5); trong khoảng0,5mol có5ônhỏ (bướcmol0,1). Đây là thanglưới của ảnh, không phải bổ sung dữ liệu đo.",
+      "caption": [],
+      "traps": [
+        "Không thêmđiểmtròn/nétđứt;khônglàmtrơnmấtcácđiểmgãy.",
+        "Mứctạingày2/6 chỉđọcquaôlưới/pixel≈0,6/1,1;khôngphảisốliệubảngthínghiệmmới.",
+        "Giữplateauy2chạmđườngkhungtrên từ10tới14."
+      ]
+    },
+    "trangThai": "da-soat-doc-lap",
+    "svg": "do-thi-ddh-15363921e30bb0d5a74bb68562578cbbb40862e449e84e7c8058184134323d82.svg",
+    "hashSvg": "15363921e30bb0d5a74bb68562578cbbb40862e449e84e7c8058184134323d82",
+    "byteSvg": 24270,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashSvgDaSoat": "15363921e30bb0d5a74bb68562578cbbb40862e449e84e7c8058184134323d82",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

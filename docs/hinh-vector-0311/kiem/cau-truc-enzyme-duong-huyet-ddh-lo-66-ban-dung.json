@@ -1,0 +1,275 @@
+[
+  {
+    "hash": "1b189161b82c399be4bb62c21e07b5aafee4038b0d20d6e049d48625e71892dc",
+    "file": "anh/1b189161b82c399be4bb62c21e07b5aafee4038b0d20d6e049d48625e71892dc.png",
+    "mime": "image/png",
+    "bytes": 12647,
+    "i": 157,
+    "refs": [
+      {
+        "qid": "DH-12-C3-B10-II-20",
+        "de": "Hoạt tính xúc tác của enzyme càng cao, tốc độ thủy phân protein càng lớn. Hoạt tính enzyme phụ thuộc vào các yếu tố như nhiệt độ, pH,... Một nhóm học sinh đã khảo sát ảnh hưởng của pH đến hoạt tính của enzyme tiêu hoá protein ở người.\nNhóm tiến hành thí nghiệm thuỷ phân albumin (protein có trong lòng trắng trứng) bằng enzyme pepsin ở nhiệt độ không đổi nhưng thay đổi pH của môi trường. Kết quả thu được như bảng sau.\nSau đó, nhóm học sinh tiến hành thí nghiệm tương tự với enzyme chymotrypsin, thu được đồ thị như hình bên.\nTừ kết quả thí nghiệm, nhóm học sinh đã đưa ra các nhận định sau:",
+        "where": [
+          "DH-12-C3-B10-II-20.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/1b189161b82c399be4bb62c21e07b5aafee4038b0d20d6e049d48625e71892dc.png",
+    "soQids": 1,
+    "docNguon": {
+      "axes": {
+        "x": "pH",
+        "xticks": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "y": "Tốc độ phản ứng",
+        "yticks": [],
+        "arrows": "2trục xám có mũitên"
+      },
+      "lines": [
+        {
+          "label": "Pepsin",
+          "type": "liền",
+          "geometry": "native449x324; đườngtừ(36,168),đỉnh(71,50),xuống(122,248);đỉnh nằmtrênpH2"
+        },
+        {
+          "label": "Chymotrypsin",
+          "type": "chấm đen",
+          "geometry": "từ(182,234),đỉnh(252,43),xuống(324,234);đỉnhgiữa7và8,khôngtick/nhãn7,5"
+        }
+      ],
+      "dashes": "Một đườngchiếu dọc rấtmảnh từđỉnhPepsin x≈71 xuốngtrụcx. Không có đườngchiếu ởChymotrypsin.",
+      "caption": [],
+      "traps": [
+        "Đây là2đường (Pepsin liền,Chymotrypsin chấm), không dùng nétliềnchocả2.",
+        "Đỉnhgiữa7..8 là vịtríảnh,khôngthêmnhãn7,5; khôngcóyticks."
+      ]
+    },
+    "trangThai": "da-soat-doc-lap",
+    "svg": "do-thi-ddh-a4df679ec69e0c5feb14543ae9d1c20439d7441e5cbde7d0de3ad8a21d654db1.svg",
+    "hashSvg": "a4df679ec69e0c5feb14543ae9d1c20439d7441e5cbde7d0de3ad8a21d654db1",
+    "byteSvg": 25114,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashSvgDaSoat": "a4df679ec69e0c5feb14543ae9d1c20439d7441e5cbde7d0de3ad8a21d654db1",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "hash": "22d3d709d89d5d7cfbebad56afabd9160774cad674c7d60622cfc4decdd6d93a",
+    "file": "anh/22d3d709d89d5d7cfbebad56afabd9160774cad674c7d60622cfc4decdd6d93a.png",
+    "mime": "image/png",
+    "bytes": 17774,
+    "i": 207,
+    "refs": [
+      {
+        "qid": "12-C3-B10-D2-I-23",
+        "de": "Mỗi enzyme có một khoảng pH tối ưu. Môi trường pH quá cao hoặc quá thấp sẽ ảnh hưởng đến hoạt tính của enzyme.\nGiá trị pH mà tại đó enzyme hoạt động mạnh nhất được gọi là giá trị pH tối ưu.\nGiá trị pH tối ưu của pepsin và trypsin lần lượt là",
+        "where": [
+          "12-C3-B10-D2-I-23.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/22d3d709d89d5d7cfbebad56afabd9160774cad674c7d60622cfc4decdd6d93a.png",
+    "soQids": 1,
+    "docNguon": {
+      "axes": {
+        "x": "pH",
+        "xticks": [
+          2,
+          4,
+          6,
+          8,
+          10
+        ],
+        "y": "Độ hoạt động của enzyme",
+        "yticks": [],
+        "arrows": "Không mũitên"
+      },
+      "lines": [
+        {
+          "label": "pepsin",
+          "type": "liền, một đỉnh trái"
+        },
+        {
+          "label": "amylase",
+          "type": "liền, đỉnh giữa cao nhất,hẹp,lệchtrái trypsin"
+        },
+        {
+          "label": "trypsin",
+          "type": "liền,đỉnh phải thấp hơnamylase,rộnghơn"
+        }
+      ],
+      "geometryPixel": "Native776x512;gốc(84,398);xticksx187,295,403,511,619;pepsinđỉnh≈(195,211),amylase≈(460,124),trypsin≈(526,197). TọađộPIXEL;không tựchuyển thành giátrị pH đỉnh chínhxác khôngghi.",
+      "caption": [
+        "Biểu đồ hoạt động của một số enzyme tiêu hoá trong cơ thể người"
+      ],
+      "traps": [
+        "Không thêm nhãn sốđỉnh hayyticks/0; khôngtrảlời câu hỏi.",
+        "Cả3đườngliền;có2giaodườnggiữaamylase/trypsin? Nguồn chỉ1giao nhìnthấyởx≈479 trênnhánhrơiamylase, giữhìnhnative.",
+        "Cả3đườngliền;amylase/trypsin giao nhau trên nhánh rơi của amylase ở pixelx≈479; giữ nguyên hình native."
+      ]
+    },
+    "trangThai": "da-soat-doc-lap",
+    "svg": "do-thi-ddh-18ea960d0ddd302c498aa10dcaa354e403fc733193b8d13251b04c64df7b4da3.svg",
+    "hashSvg": "18ea960d0ddd302c498aa10dcaa354e403fc733193b8d13251b04c64df7b4da3",
+    "byteSvg": 54426,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashSvgDaSoat": "18ea960d0ddd302c498aa10dcaa354e403fc733193b8d13251b04c64df7b4da3",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "hash": "257158215aef4e4377c6e6c546ceb0f257a5a1ebe4fb982afe9601cdaec29584",
+    "file": "anh/257158215aef4e4377c6e6c546ceb0f257a5a1ebe4fb982afe9601cdaec29584.png",
+    "mime": "image/png",
+    "bytes": 9244,
+    "i": 216,
+    "refs": [
+      {
+        "qid": "DH-12-C3-B10-I-48",
+        "de": "Mỗi enzyme có một khoảng pH tối ưu. Môi trường pH quá cao hoặc quá thấp sẽ ảnh hưởng đến hoạt tính của enzyme.\nGiá trị pH mà tại đó enzyme hoạt động mạnh nhất được gọi là giá trị pH tối ưu.\nGiá trị pH tối ưu của pepsin và trypsin lần lượt là",
+        "where": [
+          "DH-12-C3-B10-I-48.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/257158215aef4e4377c6e6c546ceb0f257a5a1ebe4fb982afe9601cdaec29584.png",
+    "soQids": 1,
+    "docNguon": {
+      "axes": {
+        "x": "pH",
+        "xticks": [
+          2,
+          4,
+          6,
+          8,
+          10
+        ],
+        "y": "Độ hoạt động của enzyme",
+        "yticks": [],
+        "arrows": "Không mũitên"
+      },
+      "lines": [
+        {
+          "label": "pepsin",
+          "type": "liền,đỉnh trái"
+        },
+        {
+          "label": "amylase",
+          "type": "liền,đỉnh giữa cao nhất,hẹp"
+        },
+        {
+          "label": "trypsin",
+          "type": "liền,đỉnhphảirộng,thấphơnamylase"
+        }
+      ],
+      "geometryPixel": "Native489x308;gốc(36,251);xticksx107,181,255,329,403;đỉnhpepsin≈(111,123),amylase≈(291,64),trypsin≈(337,114). TọađộPIXELkhôngphảisốđopHchínhxác.",
+      "caption": [
+        "Biểu đồ hoạt động của một số enzyme tiêu hoá trong cơ thể người"
+      ],
+      "traps": [
+        "Cùngloại207nhưnghash/hìnhkhác,tọađộđỉnh/nhãnkháckhôngdùngbừaảnhalias.",
+        "Khôngthêm0/yticks/giátrịđỉnhchưacónhãn."
+      ]
+    },
+    "trangThai": "da-soat-doc-lap",
+    "svg": "do-thi-ddh-c5c61f07ef896f709d17599efbb10040d2f196aa3976612e88f6d0eaead59b4d.svg",
+    "hashSvg": "c5c61f07ef896f709d17599efbb10040d2f196aa3976612e88f6d0eaead59b4d",
+    "byteSvg": 54386,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashSvgDaSoat": "c5c61f07ef896f709d17599efbb10040d2f196aa3976612e88f6d0eaead59b4d",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "hash": "1349637253f51a2e702a0212bad8c87b39419b3de52bb42a7fbf7bb4e7050eff",
+    "file": "anh/1349637253f51a2e702a0212bad8c87b39419b3de52bb42a7fbf7bb4e7050eff.png",
+    "mime": "image/png",
+    "bytes": 22975,
+    "i": 96,
+    "refs": [
+      {
+        "qid": "DB-12-B4-D3-II-222",
+        "de": "Biểu đồ dưới đây biểu diễn lượng đường huyết trước, trong và sau quá trình tập thể dục của một người khoẻ mạnh, không mắc bệnh đái tháo đường. Biểu đồ đường huyết theo thời gian (phần tô màu là thời gian tập thể dục 15’ - 85’)",
+        "where": [
+          "DB-12-B4-D3-II-222.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-II-22",
+        "de": "Biểu đồ dưới đây biểu diễn lượng đường huyết trước, trong và sau quá trình tập thể dục của một người khoẻ mạnh, không mắc bệnh đái tháo đường. Biểu đồ đường huyết theo thời gian (phần tô màu là thời gian tập thể dục 15’ - 85’)",
+        "where": [
+          "DH-12-C2-B4-II-22.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/1349637253f51a2e702a0212bad8c87b39419b3de52bb42a7fbf7bb4e7050eff.png",
+    "soQids": 2,
+    "docNguon": {
+      "axes": {
+        "x": "phút",
+        "xticks": [
+          0,
+          20,
+          40,
+          60,
+          80,
+          100,
+          120
+        ],
+        "y": "Đường huyết (lượng glucose trong máu)",
+        "unitY": "mg/dL",
+        "yticks": [
+          40,
+          60,
+          80,
+          100,
+          120,
+          140
+        ],
+        "arrows": "x phải/y trên"
+      },
+      "lines": [
+        {
+          "type": "một đường liền trơn",
+          "geometry": "Native905x498; từ pixel(139,218) hơi nhô tới(190,215),qua(246,220),đáy(330,293),lên đỉnh(517,182),giảm đáy(648,215),nhô(717,202),cuối(792,219). Đây là tọa độ PIXEL để giữ hình dạng, không phải số đo chính xác."
+        }
+      ],
+      "shading": "Hình chữ nhật xám pixelx299..517,y71..408, tương ứng x≈30..70 trên thang phút; không phủ toàn chiều cao trục.",
+      "annotations": [
+        {
+          "text": "Sau khi tập 20’",
+          "position": "dưới biên trái vùng tô; chân đường kéo dài tới dưới trục x"
+        },
+        {
+          "text": "Sau khi tập 55’",
+          "position": "dưới biên phải vùng tô; chân đường kéo dài tới dưới trục x"
+        }
+      ],
+      "caption": [],
+      "traps": [
+        "Câu dẫn ghi thời gian tập15’–85’ nhưng native vùng tô≈30..70 trên thang phút và nhãn20’/55’. Không tự sửa hình theo câu dẫn.",
+        "Không thêm điểm tròn, nétđứt hoặc giá trị đỉnh/đáy mới."
+      ]
+    },
+    "trangThai": "da-soat-doc-lap",
+    "svg": "do-thi-ddh-bce1335c3a10ed347a642a3460e9ffe85f7f9081e8e3cbf132a4af8d34644c91.svg",
+    "hashSvg": "bce1335c3a10ed347a642a3460e9ffe85f7f9081e8e3cbf132a4af8d34644c91",
+    "byteSvg": 49805,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashSvgDaSoat": "bce1335c3a10ed347a642a3460e9ffe85f7f9081e8e3cbf132a4af8d34644c91",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

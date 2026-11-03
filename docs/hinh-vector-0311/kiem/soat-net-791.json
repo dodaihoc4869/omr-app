@@ -1,0 +1,80 @@
+{
+  "i": 791,
+  "hashNguon": "936532a77710c9ce4480908c47bc871be308f87a67b9f5a14bc569f195c958e6",
+  "nguoiSoat": "cau_truc_6",
+  "daMoPNGNative": true,
+  "daMoZoom": true,
+  "daMo813NativeVaBaseSVGRender": true,
+  "sourceSize": [
+    579,
+    485
+  ],
+  "ketLuan": "CÓ nét chiếu ngang đứt mức80 từ trụcY tới điểm(6;80). Không được xóa nét này. Nguồn791 và813 đều có nét ngang80, baseSVG cũng giữ chính xác sự hiện diện nét này.",
+  "bangChungNative": "TrụcY x≈112; điểm(6;80) x≈241,y≈284; nét chiếu đứt nằm hàng y287–288 từ ngay phải trụcY tới sát điểm. Sai lệch2–3pixel do nét/chất lượng scan, không phải nét ở mức khác.",
+  "pixelMethod": "PIL RGB, tìm pixel dark nếu max(R,G,B)<140; xét x116..234 để loại trụcY và chấm điểm6. Tọa độ ảnh native gốc, không resize.",
+  "runsY287": [
+    [
+      118,
+      128
+    ],
+    [
+      137,
+      146
+    ],
+    [
+      153,
+      162
+    ],
+    [
+      169,
+      178
+    ],
+    [
+      187,
+      196
+    ],
+    [
+      203,
+      212
+    ],
+    [
+      219,
+      228
+    ]
+  ],
+  "runsY288": [
+    [
+      118,
+      128
+    ],
+    [
+      137,
+      146
+    ],
+    [
+      153,
+      162
+    ],
+    [
+      169,
+      178
+    ],
+    [
+      187,
+      196
+    ],
+    [
+      203,
+      212
+    ],
+    [
+      219,
+      228
+    ]
+  ],
+  "zoomFile": "/workspace/scratch/791-muc80-zoom.png",
+  "baseSVG": "do-thi-ddh-651fa08a6013179859407b22035afd377be0cf0dbf4d5a05d11e2b9be432643b.svg",
+  "hashSvgThuc": "651fa08a6013179859407b22035afd377be0cf0dbf4d5a05d11e2b9be432643b",
+  "basePath80": "M110 353.333L340 353.333; stroke-dasharray=7 6",
+  "luuY": "Đây chỉ xác minh sự có mặt nét ngang80; không thay thế soát đầy đủ toàn biểu đồ khi mapping791 vàoSVG."
+}

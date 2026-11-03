@@ -1,0 +1,185 @@
+[
+  {
+    "hash": "17954ca0f16630d19aaa412dc333e35a685bdc8c1306373b47fa80c5bfc4368e",
+    "file": "anh/17954ca0f16630d19aaa412dc333e35a685bdc8c1306373b47fa80c5bfc4368e.png",
+    "mime": "image/png",
+    "bytes": 34392,
+    "i": 128,
+    "refs": [
+      {
+        "qid": "11-C1-B1-III-19",
+        "de": "Cho 5 mmol H₂ và 5 mmol I₂ vào bình kín dung tích 1 lít và nung nóng đến 227 °C.\nĐồ thị biểu diễn sự thay đổi nồng độ các chất theo thời gian được cho trong hình sau.\nNồng độ của HI ở trạng thái cân bằng là bao nhiêu (đơn vị 10⁻³ mol/L)? (Kết quả làm tròn đến hàng phần mười.)",
+        "where": [
+          "11-C1-B1-III-19.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DB-11-B1-D1-III-101",
+        "de": "Cho 5 mmol H₂ và 5 mmol I₂ vào bình kín dung tích 1 lít và nung nóng đến 227 °C.\nĐồ thị biểu diễn sự thay đổi nồng độ các chất theo thời gian được cho trong hình sau.\nNồng độ của HI ở trạng thái cân bằng là bao nhiêu (đơn vị 10⁻³ mol/L)?",
+        "where": [
+          "DB-11-B1-D1-III-101.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/17954ca0f16630d19aaa412dc333e35a685bdc8c1306373b47fa80c5bfc4368e.png",
+    "soQids": 2,
+    "docNguon": {
+      "axes": {
+        "x": "Thời gian",
+        "xticks": [],
+        "y": "Nồng độ của chất phản ứng (10⁻³ M)",
+        "yticks": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10
+        ],
+        "arrows": "x phải/y trên"
+      },
+      "lines": [
+        {
+          "type": "liền tăng lõm xuống",
+          "geometry": "từ0 tới plateau có nhãn8,64; đoạn nằm ngang hữu hạn sau khi đạt cân bằng"
+        },
+        {
+          "type": "liền giảm lõm lên",
+          "geometry": "từ x0,y khoảng5.2 theo pixel tới plateau0,68; điểm đầu không có nhãn riêng nên không khẳng định chính xác5"
+        }
+      ],
+      "dashes": "2nét đứt ngang từ trục y qua mức8,64/0,68 đến nhãn bên phải; đường trơn trùng nét đứt ởplateau.",
+      "annotations": [
+        "Trạng thái cân bằng",
+        "8,64",
+        "0,68"
+      ],
+      "caption": [],
+      "traps": [
+        "Chỉ2đường, không thêm tên HI/H2/I2 vào hình.",
+        "Không suy đáp án từ câu dẫn; không thêm xticks/đơnvịthờigian."
+      ]
+    },
+    "trangThai": "da-soat-doc-lap",
+    "svg": "do-thi-ddh-b1bad2dff223ca27d3347c4349ee712d07f2fc104eb7c78c13c1eff13a0bfbe2.svg",
+    "hashSvg": "b1bad2dff223ca27d3347c4349ee712d07f2fc104eb7c78c13c1eff13a0bfbe2",
+    "byteSvg": 37306,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashSvgDaSoat": "b1bad2dff223ca27d3347c4349ee712d07f2fc104eb7c78c13c1eff13a0bfbe2",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "hash": "196ed7caa503adad268f2d8729ed02f6ba0d81e0c780a3b031f59ba040f1727c",
+    "file": "anh/196ed7caa503adad268f2d8729ed02f6ba0d81e0c780a3b031f59ba040f1727c.png",
+    "mime": "image/png",
+    "bytes": 73380,
+    "i": 144,
+    "refs": [
+      {
+        "qid": "VIP27-C1-B1-ESTER-III-3",
+        "de": "Thực hiện phản ứng ester hoá 0,1 mol acetic acid và 0,1 mol isoamyl alcohol (có $\\ce{H2SO4}$ đặc, xúc tác) để điều chế isoamyl acetate (còn gọi là dầu chuối) theo phản ứng hoá học sau:\n$\\ce{CH3COOH + (CH3)2CHCH2CH2OH <=>[H2SO4, t^o] CH3COOCH2CH2CH(CH3)2 + H2O}$\nTrong các đồ thị được đánh số từ 1 đến 4 dưới đây, đồ thị nào biểu diễn sự thay đổi số mol (n) isoamyl acetate theo thời gian (t)?",
+        "where": [
+          "VIP27-C1-B1-ESTER-III-3.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/196ed7caa503adad268f2d8729ed02f6ba0d81e0c780a3b031f59ba040f1727c.png",
+    "soQids": 1,
+    "docNguon": {
+      "axes": {
+        "common": "4panel ngang, mỗi panel trục y n/trục x t,0 ở gốc,ytick0,1; cả2trục có đầu mũi tên",
+        "xticks": [],
+        "yticks": [
+          "0",
+          "0,1"
+        ]
+      },
+      "panels": [
+        {
+          "caption": "(1)",
+          "line": "từ0 cong tăng lõm xuống tới plateau DƯỚI0,1; nétđứt ngang trùng mứcplateau kéo từtrụcy; khôngghi giátrịplateau"
+        },
+        {
+          "caption": "(2)",
+          "line": "từ0 cong tăng lõm xuống tới plateau0,1; nétđứt ngang từmốc0,1 tới trướcđoạnnằmngang"
+        },
+        {
+          "caption": "(3)",
+          "line": "từ0 đườngthẳng tăng tới0,1 rồi gãy sangnằmngang hữu hạn; nétđứt ngang từmốc0,1 tớiđiểmgãy"
+        },
+        {
+          "caption": "(4)",
+          "line": "bắtđầu0,1 cong giảm lõm lên tới plateau dương nhỏ hơn0,1; nétđứt ngang ởplateau từtrụcy; khôngghi giátrịplateau"
+        }
+      ],
+      "traps": [
+        "Giữ đủ4panel/thứtự/nhãn; đây là lựa chọn, không sửa các phương án sai.",
+        "Không thêm nồngđộ/đơnvị mol hoặc các giá trịplateau không có nguồn."
+      ]
+    },
+    "trangThai": "da-soat-doc-lap",
+    "svg": "do-thi-ddh-33f04ac59e942c2c18043a5ac77b1ad7cf3857a44a3cd74e9b9c9c5330bd8bb5.svg",
+    "hashSvg": "33f04ac59e942c2c18043a5ac77b1ad7cf3857a44a3cd74e9b9c9c5330bd8bb5",
+    "byteSvg": 17022,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashSvgDaSoat": "33f04ac59e942c2c18043a5ac77b1ad7cf3857a44a3cd74e9b9c9c5330bd8bb5",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "hash": "1ab55ed2b772f74694abc362784807d921fb6ac6d0dcbcec7696bc76613c7320",
+    "file": "anh/1ab55ed2b772f74694abc362784807d921fb6ac6d0dcbcec7696bc76613c7320.png",
+    "mime": "image/png",
+    "bytes": 24083,
+    "i": 153,
+    "refs": [
+      {
+        "qid": "10-C6-B19-I-5",
+        "de": "Đồ thị dưới đây biểu diễn đường cong động học của phản ứng giữa oxygen và hydrogen tạo thành nước:\nO₂(g) + 2H₂(g) → 2H₂O(g).\nĐường cong nào là của hydrogen?",
+        "where": [
+          "10-C6-B19-I-5.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/1ab55ed2b772f74694abc362784807d921fb6ac6d0dcbcec7696bc76613c7320.png",
+    "soQids": 1,
+    "docNguon": {
+      "axes": {
+        "x": "Thời gian",
+        "y": "Nồng độ",
+        "xticks": [],
+        "yticks": [],
+        "arrows": "KHÔNG đầu mũi tên;2trục đậm liền"
+      },
+      "lines": [
+        {
+          "label": "(1)",
+          "type": "nét đứt cong tăng từ gốc, dần thoải tới mức cao nhất ởbênphải"
+        },
+        {
+          "label": "(2)",
+          "type": "liền giảm từmức cao tại trái tới mức dương giữa; tiếp cận plateau hữu hạn"
+        },
+        {
+          "label": "(3)",
+          "type": "liền giảm mạnh hơn(2),từcùngvùngmứccao tại trái tới plateau dương sát trục x, khôngchạm0"
+        }
+      ],
+      "dashes": "Chính đường(1) lànétđứt;không thêm các đườngchiếu.",
+      "caption": [],
+      "traps": [
+        "Không thêm0/tick/số/names O2,H2,H2O. Không kếtluận phươngán.",
+        "Giữ giao(1)-(3) sớm hơn giao(1)-(2), (2) luôn trên(3) sau gốc."
+      ]
+    },
+    "trangThai": "da-soat-doc-lap",
+    "svg": "do-thi-ddh-a9c0dab89724c453413766fdce65904f08c183f717dd75bfc02755e4709c4aa7.svg",
+    "hashSvg": "a9c0dab89724c453413766fdce65904f08c183f717dd75bfc02755e4709c4aa7",
+    "byteSvg": 11599,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashSvgDaSoat": "a9c0dab89724c453413766fdce65904f08c183f717dd75bfc02755e4709c4aa7",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

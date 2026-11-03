@@ -49,7 +49,7 @@ def special(kind):
 def compose_grid(r):
  ns='http://www.w3.org/2000/svg';ET.register_namespace('',ns)
  panels=r['panels'];columns=min(2,max(1,int(r.get('columns',len(panels)))));rows=math.ceil(len(panels)/columns)
- bodyW=360;bodyH=120 if r.get('compact')else 220;gap=24;captionRows=max([len(p.get('caption',[]))for p in panels]+[1]);cellH=bodyH+captionRows*28+16
+ bodyW=int(r.get('panelWidth',360));bodyH=int(r.get('panelHeight',120 if r.get('compact') else 220));gap=24;captionRows=max([len(p.get('caption',[]))for p in panels]+[1]);cellH=bodyH+captionRows*28+16
  width=columns*bodyW+(columns+1)*gap;height=rows*cellH+(rows+1)*gap
  root=ET.Element('{'+ns+'}svg',{'width':str(width),'height':str(height),'viewBox':f'0 0 {width} {height}','role':'img'})
  ET.SubElement(root,'{'+ns+'}title').text='Các cấu trúc theo hình nguồn';rendered=[]
@@ -58,7 +58,7 @@ def compose_grid(r):
   if r.get('phongApp'):child['phongApp']=True
   if 'text'in p:child['textNguyenVan']=p['text']
   else:child['smiles']=p['smiles']
-  for old,new in [('circle','vongThomDangTron'),('explicitH','giuHTuongMinh'),('terminalONa','terminalONa'),('terminalCationText','terminalCationText'),('nhanNguyenTu','nhanNguyenTu')]:
+  for old,new in [('circle','vongThomDangTron'),('explicitH','giuHTuongMinh'),('terminalONa','terminalONa'),('terminalCationText','terminalCationText'),('nhanNguyenTu','nhanNguyenTu'),('methylTuongMinh','methylTuongMinh')]:
    if p.get(old):child[new]=p[old]
   item=build([child])[0]
   if item.get('trangThai')!='cho-soat-doc-lap':raise ValueError('Lỗi dựng panel '+str(i+1)+': '+item.get('loi',''))

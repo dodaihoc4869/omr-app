@@ -1,0 +1,146 @@
+[
+  {
+    "i": 707,
+    "hashSvg": "97617f0b29bedcd56ac09750c7a203a697c47cf61ad33e46370c3509eea21423",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã đối chiếu riêng PNG nguồn, PNG base và render thật của đúng SVG/hash này; giữ đủ nội dung, nhãn, H, điện tích, lập thể. Đã mở PNG707, PNG8 và SVG render thật. Cùng đồ thị n/t, 0/0,1, đường tăng cong từ0 đạt0,1 rồi có đoạn nằm ngang hữu hạn; cùng đường chấm ngang và hai mũi tên.",
+    "hash": "8355d9e2da80e9881a743f82f987bc3b97f008fb47123cfe4b5c7df40988c036",
+    "hashSvgDaSoat": "97617f0b29bedcd56ac09750c7a203a697c47cf61ad33e46370c3509eea21423"
+  },
+  {
+    "i": 409,
+    "hashSvg": "4ebdd1b401a2b6175bb78131745c131312f8997827830ca9d4f9f1102c3ec3b9",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã đối chiếu riêng PNG nguồn, PNG base và render thật của đúng SVG/hash này; giữ đủ nội dung, nhãn, H, điện tích, lập thể. Đã mở PNG409, PNG150 và SVG render thật. Cùng hai đường liền:HI giảm từ mức cao tới plateau cao;H2+I2 tăng từ gốc tới plateau thấp; trụcNồng độ/Thời gian và hai mũi tên, khôngticks/số/nétđứt.",
+    "hash": "481dcc94a70f3f92d4fc0467fb7b493cc9f7ec81733d0ed2468d183df5043844",
+    "hashSvgDaSoat": "4ebdd1b401a2b6175bb78131745c131312f8997827830ca9d4f9f1102c3ec3b9"
+  },
+  {
+    "i": 1232,
+    "hashSvg": "1e02356d541eef05973c6bdd7667cf644fbd2ad75af1271d1f1c7293c13f100f",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã đối chiếu riêng PNG nguồn, PNG base và render thật của đúng SVG/hash này; giữ đủ nội dung, nhãn, H, điện tích, lập thể. Đã mở PNG1232, PNG415 và SVG render thật. Cùng một orbit với hai electron xanh đối diện trên-trái/dưới-phải; hạt nhân hai hạt cam mỗi hạt có+,hai hạt vàng không dấu. Không thêm tên hạt/điện tích tổng.",
+    "hash": "df6f09629e0ee4540e55c237d53201ab7faa1b2474b71d6bd84e946b200642c7",
+    "hashSvgDaSoat": "1e02356d541eef05973c6bdd7667cf644fbd2ad75af1271d1f1c7293c13f100f"
+  },
+  {
+    "i": 1240,
+    "hashSvg": "66e18baf05c3cd4658c1c4ffe8c885284702b98d6fbd3e876293684540e7c21c",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã đối chiếu riêng PNG nguồn, PNG base và render thật của đúng SVG/hash này; giữ đủ nội dung, nhãn, H, điện tích, lập thể. Đã mở PNG1240, PNG949 và SVG render thật. Cùng hai ellipse,hai electron lớp trong trên/dưới,năm electron lớp ngoài đúng vị trí tương đối;hạt nhân+7. Không khác nhãn hay thêm dấuâm.",
+    "hash": "e0c5cf86b0bdfe6ab2fa78c44b0d1ecdc336a110e94cfffab31bb8464e0dd8b1",
+    "hashSvgDaSoat": "66e18baf05c3cd4658c1c4ffe8c885284702b98d6fbd3e876293684540e7c21c"
+  },
+  {
+    "i": 741,
+    "hashSvg": "e49455810e6ad431f373c3c4e1d1fae7069e2871991aa93ebf48e0acbe82bca8",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã đối chiếu riêng PNG nguồn, PNG base và render thật của đúng SVG/hash này; giữ đủ nội dung, nhãn, H, điện tích, lập thể. Đã mở PNG741, PNG316 và SVG render thật. Cùng bốn dạng glutamic acid,Dạng(I)/(II)/(III)/(IV),pH1,50/3,22/6,96/11,5; haiCH2sidechain. Lần lượt2COOH/NH3+;COOHsidechain vàCOO−alpha/NH3+;2COO−/NH3+;2COO−/NH2. Render2cột giữ đúngnhãn gắn từng dạng.",
+    "hash": "8a76048796e6730ca1098179b721dec908bf4a86d8fe2569995d827a34d3f63f",
+    "hashSvgDaSoat": "e49455810e6ad431f373c3c4e1d1fae7069e2871991aa93ebf48e0acbe82bca8"
+  },
+  {
+    "i": 1124,
+    "hashSvg": "e170082582bf47e02f59c90ea40f4e8fd4b97f8a75f88007ea6e2bf4b5d21b41",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã đối chiếu riêng PNG nguồn, PNG base và render thật của đúng SVG/hash này; giữ đủ nội dung, nhãn, H, điện tích, lập thể. Đã mở PNG1124, PNG1286 và SVG render thật. Cùng n/t,0/0,1; đường cong giảm từ0,1 tới plateau dương trên trụcx,có đường chấm ngang ở plateau không ghi số;không khác nhãn.",
+    "hash": "ca8389ecc76721df6c97d70d9cce57a20528df2295e3037a9950088833f645b3",
+    "hashSvgDaSoat": "e170082582bf47e02f59c90ea40f4e8fd4b97f8a75f88007ea6e2bf4b5d21b41"
+  },
+  {
+    "i": 1092,
+    "hashSvg": "192d532b59992aab16bf6f8734e8fc5fbeaeb9a3aedc3780ff248fd97ecd012f",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã đối chiếu riêng PNG nguồn, PNG base và render thật của đúng SVG/hash này; giữ đủ nội dung, nhãn, H, điện tích, lập thể. Đã mở PNG1092, PNG1223 và SVG render thật. Cùng peptide6residue Lys–Ala–Gly–Ala–Gly–Glu,5liên kết peptide,4CH2 trong nhánh Lys/2CH2 trong nhánh Glu;đủNH2tự do ởLys và2COOHGlu. Không nêm/stereo/charge/caption khác.",
+    "hash": "c46d17d024b9c7e2a40d34ba497bd968c0e6212a7d8f6cf59b08bc8f781f011e",
+    "hashSvgDaSoat": "192d532b59992aab16bf6f8734e8fc5fbeaeb9a3aedc3780ff248fd97ecd012f"
+  },
+  {
+    "i": 1149,
+    "hashSvg": "f17456c80791cf6740eadaad0cf503f1107ca5ead779f0b9818beeb5053ea811",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã đối chiếu riêng PNG nguồn, PNG base và render thật của đúng SVG/hash này; giữ đủ nội dung, nhãn, H, điện tích, lập thể. Đã mở PNG1149, PNG459 và SVG render thật. Cùng bốn panel(1)2-aminobutanoic acid;(2)alanine;(3)CH3–CH(OH)–C(O)–NH2;(4)H3N+–CH2–COO−. Giữ (1)..(4),OH/NH2 đúng vị trí và charge panel4. Mép phải PNG1149 sát COO− nhưng dấuâm nhìn thấy;không biến(3)thành amino acid.",
+    "hash": "cf891f852912ff4df1b608c3f328b377675b3e94b490ff7524edb78b34ca2ca5",
+    "hashSvgDaSoat": "f17456c80791cf6740eadaad0cf503f1107ca5ead779f0b9818beeb5053ea811"
+  },
+  {
+    "i": 392,
+    "hashSvg": "a4df679ec69e0c5feb14543ae9d1c20439d7441e5cbde7d0de3ad8a21d654db1",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã đối chiếu riêng PNG nguồn, PNG base và render thật của đúng SVG/hash này; giữ đủ nội dung, nhãn, H, điện tích, lập thể. Đã mở PNG392, PNG157 và SVG render thật. Cùng Pepsin nétliền có đỉnhpH2 và đường chiếu dọc mảnh;Chymotrypsin nétchấm có đỉnh giữa7..8;trục pH1..12/Tốc độ phản ứng khôngytick. Không khác nhãn/kiểu nét.",
+    "hash": "4597313c406a734b7d7220f98085e8821ffc1df69e1854341f61e9589096b9f4",
+    "hashSvgDaSoat": "a4df679ec69e0c5feb14543ae9d1c20439d7441e5cbde7d0de3ad8a21d654db1"
+  },
+  {
+    "i": 818,
+    "hashSvg": "9d58400ad6030b1a8a7a1900e11d7b3393da52b4a2408dc8c536f47801856747",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã đối chiếu riêng PNG nguồn, PNG base và render thật của đúng SVG/hash này; giữ đủ nội dung, nhãn, H, điện tích, lập thể. Đã mở PNG818, PNG298 và SVG render thật. Cùng n/t,0/0,1;đường giảm cong từ0,1chạm0rồinằmngang trùngtrụcx. Không nhầm với plateau dương của1124/1286;khôngnhãnkhác.",
+    "hash": "97ad5e140eca8300f3aa2706f73f887b5c99fe058eed5b07273284071a456010",
+    "hashSvgDaSoat": "9d58400ad6030b1a8a7a1900e11d7b3393da52b4a2408dc8c536f47801856747"
+  },
+  {
+    "i": 873,
+    "hashSvg": "5ad6831be500aaebf1ff253fe74714939c37715f4a6170caf67f61bb2a62a393",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã đối chiếu riêng PNG nguồn, PNG base và render thật của đúng SVG/hash này; giữ đủ nội dung, nhãn, H, điện tích, lập thể. Đã mở PNG873, PNG1324 và SVG render thật. Cùng bốn panel a)..d):a)mạch12C–OSO3Na;b)mạchcarboxylate16C tổng–COONa;c)mạchcarboxylate16C tổng–COOK;d)CH3CH2COONa3C tổng. Đủthứtự/nhãn/12C/16C/16C/3C;không stereo/vòng/chargekhác;SVG khai triển nhómchức giữNa/K.",
+    "hash": "9f020d42cc7547f960e022f0ee0abc1b055d72c6a75f41f3f171617c3b95cb86",
+    "hashSvgDaSoat": "5ad6831be500aaebf1ff253fe74714939c37715f4a6170caf67f61bb2a62a393"
+  },
+  {
+    "i": 1371,
+    "hashSvg": "b1bad2dff223ca27d3347c4349ee712d07f2fc104eb7c78c13c1eff13a0bfbe2",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã đối chiếu riêng PNG nguồn, PNG base và render thật của đúng SVG/hash này; giữ đủ nội dung, nhãn, H, điện tích, lập thể. Đã mở PNG1371, PNG128 và SVG render thật. Cùng hai đường cân bằng tăngtừ0→8,64 và giảmtừmức khoảng5→0,68;hai đường ngangnétđứt8,64/0,68;Nồng độ của chất phản ứng(10⁻³M),Thời gian,yticks0,2,4,6,8,10;Trạng thái cân bằng. Không thêm tên chất/giátrị banđầu không ghi.",
+    "hash": "f80fcf3c39321a8e340e7bbb4a1f6714f847141c1c70f42c4d675c40890e8f37",
+    "hashSvgDaSoat": "b1bad2dff223ca27d3347c4349ee712d07f2fc104eb7c78c13c1eff13a0bfbe2"
+  },
+  {
+    "i": 274,
+    "hashSvg": "08e0ab7ab3b24b474c502f4b10845bd9e099ca36821ac087381b15709b0e7d4a",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã đối chiếu riêng PNG nguồn, PNG base và render thật của đúng SVG/hash này; giữ đủ nội dung, nhãn, H, điện tích, lập thể. Đã mở PNG274, PNG1188 và SVG render thật. Cùng sơđồ Tinh bột→Dextrin→Maltose→Glucose rồi tách hai nhánh:trênCO2+H2O,dướiGlycogen→Glucose. Đúngα-amylase/(1),β-amylase/(2),enzyme/(3..6),chiều6mũitên vànhãn6bước. Khôngkhácnộidung.",
+    "hash": "2e7f3ac2d47ec67e7c14e3090a73ecc402a975664b1ae250e633ddc1963740d1",
+    "hashSvgDaSoat": "08e0ab7ab3b24b474c502f4b10845bd9e099ca36821ac087381b15709b0e7d4a"
+  },
+  {
+    "i": 389,
+    "hashSvg": "08e0ab7ab3b24b474c502f4b10845bd9e099ca36821ac087381b15709b0e7d4a",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã đối chiếu riêng PNG nguồn, PNG base và render thật của đúng SVG/hash này; giữ đủ nội dung, nhãn, H, điện tích, lập thể. Đã mở PNG389, PNG1188 và SVG render thật. Cùng sơđồ6bước nhưbase:α-amylase,β-amylase,enzyme;đủTinh bột,Dextrin,Maltose,Glucose,CO2+H2O,Glycogen,Glucose và(1)..(6). Nguồn389 tôcác ô nhiều màu,basexám/SVGmàutím thốngnhất;khácphongcách nền,không khác nhãn/hóa học/chiều nhánh.",
+    "hash": "4544d74518ef2dc833dae9808cff41ad39446c1425e0f80c0eda6258b9a8ffdc",
+    "hashSvgDaSoat": "08e0ab7ab3b24b474c502f4b10845bd9e099ca36821ac087381b15709b0e7d4a"
+  },
+  {
+    "i": 1194,
+    "hashSvg": "b459f822b12e990b2ad874bb6123ded99a0da115703d921d30ee038e6e7a579d",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã đối chiếu riêng PNG nguồn, PNG base và render thật của đúng SVG/hash này; giữ đủ nội dung, nhãn, H, điện tích, lập thể. Đã mở PNG1194, PNG817 và SVG render thật. Cùng gamma-Glu–Cys–Gly:HOOC–CH(NH2)–CH2–CH2–C(O)–NH–CH(CH2SH)–C(O)–NH–CH2–COOH. Đủ2CH2nhánhGlu,CH2SH,haiNHamide,haiCOOH;khôngstereo/charge/caption. SVGxoaylạigiữtoànnộidung.",
+    "hash": "d7cea1102b868c0de0d8e9c317e8f37fd59b6a80730aaa784d3c19fe30ad40a4",
+    "hashSvgDaSoat": "b459f822b12e990b2ad874bb6123ded99a0da115703d921d30ee038e6e7a579d"
+  },
+  {
+    "i": 735,
+    "hashSvg": "15363921e30bb0d5a74bb68562578cbbb40862e449e84e7c8058184134323d82",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã đối chiếu riêng PNG nguồn, PNG base và render thật của đúng SVG/hash này; giữ đủ nội dung, nhãn, H, điện tích, lập thể. Đã mở PNG735, PNG307 và SVG render thật. Cùng trụcNgày0..14bước2/Số mol ethyl alcohol0..2bước0,5;đườnggãy tại ngày2,6,8,10,từ10..14plateau2. Giữlưới:4ônhỏmỗikhoảng2ngày/5ônhỏmỗikhoảng0,5mol;khôngmarker/arrow/captionkhác.",
+    "hash": "895ed2e46ee7de6dc07b3db408a14d1f8e18a1b776946f84f7ac4ceb59e1ea65",
+    "hashSvgDaSoat": "15363921e30bb0d5a74bb68562578cbbb40862e449e84e7c8058184134323d82"
+  },
+  {
+    "i": 380,
+    "hashSvg": "97d0d2929ea6f005684e1c66ced5b10f7b8ab1dee3b73a9343c9f67e72756a1d",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã đối chiếu riêng PNG nguồn, PNG base và render thật của đúng SVG/hash này; giữ đủ nội dung, nhãn, H, điện tích, lập thể. Đã mở PNG380, PNG108 và SVG render thật. Cùng Pepsin liền đỉnh2/đườngchiếudọc;Chymotrypsin chấm đỉnhgiữa7..8;pH1..12/Tốc độ phản ứng;haiarrowhead ởtrục. Khôngkhácnhãn/nét;khôngthêmgiátrị7,5.",
+    "hash": "445ff345393538a839c70fca5593d518d13c0821b2f63a831747923b3441ee36",
+    "hashSvgDaSoat": "97d0d2929ea6f005684e1c66ced5b10f7b8ab1dee3b73a9343c9f67e72756a1d"
+  },
+  {
+    "i": 1306,
+    "hashSvg": "fdc70e0f34c3f810b66b13fca470d787d4a6c4037e2527c85d42b2d066333b44",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã đối chiếu riêng PNG nguồn, PNG base và render thật của đúng SVG/hash này; giữ đủ nội dung, nhãn, H, điện tích, lập thể. Đã mở PNG1306, PNG1150 và SVG render thật. Cùng acidmạch18C gồmcarbonylCOOH;haiC=Cở9/12 tínhtừCOOH,cảhaiZ theo hai nhánh cùngphía trênhìnhnguồn. Khôngcaption/circle/charge/Haldehyde;SVGgiữC18và9Z,12Z.",
+    "hash": "ec7f9a5cb46207f424c5b09ba9a67c23c5bb748564acd1eadd86f1e6074ca8d2",
+    "hashSvgDaSoat": "fdc70e0f34c3f810b66b13fca470d787d4a6c4037e2527c85d42b2d066333b44"
+  }
+]

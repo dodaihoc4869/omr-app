@@ -1,0 +1,26 @@
+[
+  {
+    "i": 144,
+    "hashSvg": "33f04ac59e942c2c18043a5ac77b1ad7cf3857a44a3cd74e9b9c9c5330bd8bb5",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNGnguồn+renderSVGthật. Đủ4panel/nhãn(1)..(4)/thứtự: tăngplateau<0,1;tăngplateau0,1;tăngTHẲNGđến0,1;giảmđếnplateaudương. Giữn/t/0/0,1/mũitên/guides,khônggántrịsốplateaukhôngin. DDHpath-only/khôngchạm/cắt/tràn/SHA256khớp.",
+    "hash": "196ed7caa503adad268f2d8729ed02f6ba0d81e0c780a3b031f59ba040f1727c",
+    "hashSvgDaSoat": "33f04ac59e942c2c18043a5ac77b1ad7cf3857a44a3cd74e9b9c9c5330bd8bb5"
+  },
+  {
+    "i": 153,
+    "hashSvg": "a9c0dab89724c453413766fdce65904f08c183f717dd75bfc02755e4709c4aa7",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNGnguồn+renderSVGthật. (1)nétđứttăngtừgốc;(2)(3)liềngiảmđếnplateaudương,giao1-3sớm1-2;nhãn(1)/(2)/(3),Nồngđộ/Thờigian;khôngthêmmũitên/ticks/0. DDHpath-only/khôngchạm/cắt/tràn/SHA256khớp.",
+    "hash": "1ab55ed2b772f74694abc362784807d921fb6ac6d0dcbcec7696bc76613c7320",
+    "hashSvgDaSoat": "a9c0dab89724c453413766fdce65904f08c183f717dd75bfc02755e4709c4aa7"
+  },
+  {
+    "i": 128,
+    "hashSvg": "b1bad2dff223ca27d3347c4349ee712d07f2fc104eb7c78c13c1eff13a0bfbe2",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở lại nguồn+renderSVGbảnsửa;2đườngliền cùngkếtthúcx780 đúngquan hệnguồn,2guidesđếngiátrị8,64/0,68. Đủ0/2/4/6/8/10,trụcNồng độ của chất phản ứng(10⁻³ M)/Thời gian,Trạng thái cân bằng;2curve/guides/mũitên đúng,khôngtênchất/xticks. DDHpath-only/khôngchạm/cắt/tràn/SHA256khớp.",
+    "hash": "17954ca0f16630d19aaa412dc333e35a685bdc8c1306373b47fa80c5bfc4368e",
+    "hashSvgDaSoat": "b1bad2dff223ca27d3347c4349ee712d07f2fc104eb7c78c13c1eff13a0bfbe2"
+  }
+]

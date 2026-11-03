@@ -1,0 +1,637 @@
+[
+  {
+    "hash": "0cfd73b72f0975f9c99da573505c4c75dc0c64479e80b2e34e6c198e94bf2963",
+    "file": "anh/0cfd73b72f0975f9c99da573505c4c75dc0c64479e80b2e34e6c198e94bf2963.png",
+    "mime": "image/png",
+    "bytes": 19986,
+    "i": 68,
+    "refs": [
+      {
+        "qid": "12-C3-B10-D2-II-12",
+        "de": "Enzyme amylase là một protein có khả năng xúc tác cho phản ứng thủy phân tinh bột. Hoạt tính xúc tác của enzyme càng cao thì phản ứng thủy phân tinh bột diễn ra càng nhanh.\nHoạt tính xúc tác của enzyme phụ thuộc vào các yếu tố như nhiệt độ, pH,... Một nhóm học sinh dự đoán \"pH càng tăng thì hoạt tính xúc tác của enzyme amylase càng cao\". Từ đó, học sinh tiến hành thí nghiệm ở nhiệt độ không đổi nhưng thay đổi pH của môi trường để kiểm tra dự đoán trên như sau:\nBước 1: Thêm 2,0 mL dung dịch một loại enzyme amylase vào một ống nghiệm chứa 5,0 mL dung dịch có vai trò duy trì ổn định pH bằng 5.\nBước 2: Thêm tiếp 2,0 mL dung dịch tinh bột vào ống nghiệm trên, lắc đều.\nBước 3: Sau khoảng mỗi 10 giây, dùng ống hút lấy 1 – 2 giọt hỗn hợp phản ứng trong ống nghiệm và cho vào đĩa sứ chứa sẵn dung dịch iodine, quan sát để từ đó xác định thời gian tinh bột thủy phân hết.\nLặp lại thí nghiệm theo ba bước trên, chỉ thay đổi pH dung dịch trong Bước 1 lần lượt là pH = 5, 6, 7, 8, 9. Nhóm học sinh ghi lại kết quả thời gian t (giây) mà tinh bột thủy phân hết trong môi trường pH = 5, 6, 7, 8, 9 và vẽ đồ thị như hình bên.",
+        "where": [
+          "12-C3-B10-D2-II-12.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/0cfd73b72f0975f9c99da573505c4c75dc0c64479e80b2e34e6c198e94bf2963.png",
+    "soQids": 1,
+    "docNguon": {
+      "axes": {
+        "x": "pH",
+        "xticks": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "y": "t (giây)",
+        "yticks": [
+          20,
+          40,
+          60,
+          80,
+          100,
+          120,
+          140,
+          160,
+          180,
+          200
+        ],
+        "arrows": "đầu phải trục x và đầu trên trục y"
+      },
+      "lines": [
+        {
+          "type": "đường liền nối 5 điểm tròn tô đen",
+          "points": [
+            [
+              5,
+              140
+            ],
+            [
+              6,
+              80
+            ],
+            [
+              7,
+              60
+            ],
+            [
+              8,
+              100
+            ],
+            [
+              9,
+              180
+            ]
+          ]
+        }
+      ],
+      "dashes": "Từ mỗi điểm, chiếu ngang tới trục y và chiếu dọc tới trục x; phần ngang/dọc trùng đường khác chỉ vẽ một nét.",
+      "caption": [],
+      "traps": [
+        "Gốc hình tại x4,y20, không thêm0.",
+        "Giữ đơn vị giây; đây là thời gian chứ không phải hoạt tính."
+      ]
+    },
+    "trangThai": "Đã mở PNG native và đọc câu dẫn; chưa duyệt bản dựng"
+  },
+  {
+    "hash": "1349637253f51a2e702a0212bad8c87b39419b3de52bb42a7fbf7bb4e7050eff",
+    "file": "anh/1349637253f51a2e702a0212bad8c87b39419b3de52bb42a7fbf7bb4e7050eff.png",
+    "mime": "image/png",
+    "bytes": 22975,
+    "i": 96,
+    "refs": [
+      {
+        "qid": "DB-12-B4-D3-II-222",
+        "de": "Biểu đồ dưới đây biểu diễn lượng đường huyết trước, trong và sau quá trình tập thể dục của một người khoẻ mạnh, không mắc bệnh đái tháo đường. Biểu đồ đường huyết theo thời gian (phần tô màu là thời gian tập thể dục 15’ - 85’)",
+        "where": [
+          "DB-12-B4-D3-II-222.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-II-22",
+        "de": "Biểu đồ dưới đây biểu diễn lượng đường huyết trước, trong và sau quá trình tập thể dục của một người khoẻ mạnh, không mắc bệnh đái tháo đường. Biểu đồ đường huyết theo thời gian (phần tô màu là thời gian tập thể dục 15’ - 85’)",
+        "where": [
+          "DH-12-C2-B4-II-22.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/1349637253f51a2e702a0212bad8c87b39419b3de52bb42a7fbf7bb4e7050eff.png",
+    "soQids": 2,
+    "docNguon": {
+      "axes": {
+        "x": "phút",
+        "xticks": [
+          0,
+          20,
+          40,
+          60,
+          80,
+          100,
+          120
+        ],
+        "y": "Đường huyết (lượng glucose trong máu)",
+        "unitY": "mg/dL",
+        "yticks": [
+          40,
+          60,
+          80,
+          100,
+          120,
+          140
+        ],
+        "arrows": "x phải/y trên"
+      },
+      "lines": [
+        {
+          "type": "một đường liền trơn",
+          "geometry": "Native905x498; từ pixel(139,218) hơi nhô tới(190,215),qua(246,220),đáy(330,293),lên đỉnh(517,182),giảm đáy(648,215),nhô(717,202),cuối(792,219). Đây là tọa độ PIXEL để giữ hình dạng, không phải số đo chính xác."
+        }
+      ],
+      "shading": "Hình chữ nhật xám pixelx299..517,y71..408, tương ứng x≈30..70 trên thang phút; không phủ toàn chiều cao trục.",
+      "annotations": [
+        {
+          "text": "Sau khi tập 20’",
+          "position": "dưới biên trái vùng tô; chân đường kéo dài tới dưới trục x"
+        },
+        {
+          "text": "Sau khi tập 55’",
+          "position": "dưới biên phải vùng tô; chân đường kéo dài tới dưới trục x"
+        }
+      ],
+      "caption": [],
+      "traps": [
+        "Câu dẫn ghi thời gian tập15’–85’ nhưng native vùng tô≈30..70 trên thang phút và nhãn20’/55’. Không tự sửa hình theo câu dẫn.",
+        "Không thêm điểm tròn, nétđứt hoặc giá trị đỉnh/đáy mới."
+      ]
+    },
+    "trangThai": "Đã mở PNG native và đọc câu dẫn; chưa duyệt bản dựng"
+  },
+  {
+    "hash": "17954ca0f16630d19aaa412dc333e35a685bdc8c1306373b47fa80c5bfc4368e",
+    "file": "anh/17954ca0f16630d19aaa412dc333e35a685bdc8c1306373b47fa80c5bfc4368e.png",
+    "mime": "image/png",
+    "bytes": 34392,
+    "i": 128,
+    "refs": [
+      {
+        "qid": "11-C1-B1-III-19",
+        "de": "Cho 5 mmol H₂ và 5 mmol I₂ vào bình kín dung tích 1 lít và nung nóng đến 227 °C.\nĐồ thị biểu diễn sự thay đổi nồng độ các chất theo thời gian được cho trong hình sau.\nNồng độ của HI ở trạng thái cân bằng là bao nhiêu (đơn vị 10⁻³ mol/L)? (Kết quả làm tròn đến hàng phần mười.)",
+        "where": [
+          "11-C1-B1-III-19.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DB-11-B1-D1-III-101",
+        "de": "Cho 5 mmol H₂ và 5 mmol I₂ vào bình kín dung tích 1 lít và nung nóng đến 227 °C.\nĐồ thị biểu diễn sự thay đổi nồng độ các chất theo thời gian được cho trong hình sau.\nNồng độ của HI ở trạng thái cân bằng là bao nhiêu (đơn vị 10⁻³ mol/L)?",
+        "where": [
+          "DB-11-B1-D1-III-101.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/17954ca0f16630d19aaa412dc333e35a685bdc8c1306373b47fa80c5bfc4368e.png",
+    "soQids": 2,
+    "docNguon": {
+      "axes": {
+        "x": "Thời gian",
+        "xticks": [],
+        "y": "Nồng độ của chất phản ứng (10⁻³ M)",
+        "yticks": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10
+        ],
+        "arrows": "x phải/y trên"
+      },
+      "lines": [
+        {
+          "type": "liền tăng lõm xuống",
+          "geometry": "từ0 tới plateau có nhãn8,64; đoạn nằm ngang hữu hạn sau khi đạt cân bằng"
+        },
+        {
+          "type": "liền giảm lõm lên",
+          "geometry": "từ x0,y khoảng5.2 theo pixel tới plateau0,68; điểm đầu không có nhãn riêng nên không khẳng định chính xác5"
+        }
+      ],
+      "dashes": "2nét đứt ngang từ trục y qua mức8,64/0,68 đến nhãn bên phải; đường trơn trùng nét đứt ởplateau.",
+      "annotations": [
+        "Trạng thái cân bằng",
+        "8,64",
+        "0,68"
+      ],
+      "caption": [],
+      "traps": [
+        "Chỉ2đường, không thêm tên HI/H2/I2 vào hình.",
+        "Không suy đáp án từ câu dẫn; không thêm xticks/đơnvịthờigian."
+      ]
+    },
+    "trangThai": "Đã mở PNG native và đọc câu dẫn; chưa duyệt bản dựng"
+  },
+  {
+    "hash": "196ed7caa503adad268f2d8729ed02f6ba0d81e0c780a3b031f59ba040f1727c",
+    "file": "anh/196ed7caa503adad268f2d8729ed02f6ba0d81e0c780a3b031f59ba040f1727c.png",
+    "mime": "image/png",
+    "bytes": 73380,
+    "i": 144,
+    "refs": [
+      {
+        "qid": "VIP27-C1-B1-ESTER-III-3",
+        "de": "Thực hiện phản ứng ester hoá 0,1 mol acetic acid và 0,1 mol isoamyl alcohol (có $\\ce{H2SO4}$ đặc, xúc tác) để điều chế isoamyl acetate (còn gọi là dầu chuối) theo phản ứng hoá học sau:\n$\\ce{CH3COOH + (CH3)2CHCH2CH2OH <=>[H2SO4, t^o] CH3COOCH2CH2CH(CH3)2 + H2O}$\nTrong các đồ thị được đánh số từ 1 đến 4 dưới đây, đồ thị nào biểu diễn sự thay đổi số mol (n) isoamyl acetate theo thời gian (t)?",
+        "where": [
+          "VIP27-C1-B1-ESTER-III-3.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/196ed7caa503adad268f2d8729ed02f6ba0d81e0c780a3b031f59ba040f1727c.png",
+    "soQids": 1,
+    "docNguon": {
+      "axes": {
+        "common": "4panel ngang, mỗi panel trục y n/trục x t,0 ở gốc,ytick0,1; cả2trục có đầu mũi tên",
+        "xticks": [],
+        "yticks": [
+          "0",
+          "0,1"
+        ]
+      },
+      "panels": [
+        {
+          "caption": "(1)",
+          "line": "từ0 cong tăng lõm xuống tới plateau DƯỚI0,1; nétđứt ngang trùng mứcplateau kéo từtrụcy; khôngghi giátrịplateau"
+        },
+        {
+          "caption": "(2)",
+          "line": "từ0 cong tăng lõm xuống tới plateau0,1; nétđứt ngang từmốc0,1 tới trướcđoạnnằmngang"
+        },
+        {
+          "caption": "(3)",
+          "line": "từ0 đườngthẳng tăng tới0,1 rồi gãy sangnằmngang hữu hạn; nétđứt ngang từmốc0,1 tớiđiểmgãy"
+        },
+        {
+          "caption": "(4)",
+          "line": "bắtđầu0,1 cong giảm lõm lên tới plateau dương nhỏ hơn0,1; nétđứt ngang ởplateau từtrụcy; khôngghi giátrịplateau"
+        }
+      ],
+      "traps": [
+        "Giữ đủ4panel/thứtự/nhãn; đây là lựa chọn, không sửa các phương án sai.",
+        "Không thêm nồngđộ/đơnvị mol hoặc các giá trịplateau không có nguồn."
+      ]
+    },
+    "trangThai": "Đã mở PNG native và đọc câu dẫn; chưa duyệt bản dựng"
+  },
+  {
+    "hash": "1ab55ed2b772f74694abc362784807d921fb6ac6d0dcbcec7696bc76613c7320",
+    "file": "anh/1ab55ed2b772f74694abc362784807d921fb6ac6d0dcbcec7696bc76613c7320.png",
+    "mime": "image/png",
+    "bytes": 24083,
+    "i": 153,
+    "refs": [
+      {
+        "qid": "10-C6-B19-I-5",
+        "de": "Đồ thị dưới đây biểu diễn đường cong động học của phản ứng giữa oxygen và hydrogen tạo thành nước:\nO₂(g) + 2H₂(g) → 2H₂O(g).\nĐường cong nào là của hydrogen?",
+        "where": [
+          "10-C6-B19-I-5.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/1ab55ed2b772f74694abc362784807d921fb6ac6d0dcbcec7696bc76613c7320.png",
+    "soQids": 1,
+    "docNguon": {
+      "axes": {
+        "x": "Thời gian",
+        "y": "Nồng độ",
+        "xticks": [],
+        "yticks": [],
+        "arrows": "KHÔNG đầu mũi tên;2trục đậm liền"
+      },
+      "lines": [
+        {
+          "label": "(1)",
+          "type": "nét đứt cong tăng từ gốc, dần thoải tới mức cao nhất ởbênphải"
+        },
+        {
+          "label": "(2)",
+          "type": "liền giảm từmức cao tại trái tới mức dương giữa; tiếp cận plateau hữu hạn"
+        },
+        {
+          "label": "(3)",
+          "type": "liền giảm mạnh hơn(2),từcùngvùngmứccao tại trái tới plateau dương sát trục x, khôngchạm0"
+        }
+      ],
+      "dashes": "Chính đường(1) lànétđứt;không thêm các đườngchiếu.",
+      "caption": [],
+      "traps": [
+        "Không thêm0/tick/số/names O2,H2,H2O. Không kếtluận phươngán.",
+        "Giữ giao(1)-(3) sớm hơn giao(1)-(2), (2) luôn trên(3) sau gốc."
+      ]
+    },
+    "trangThai": "Đã mở PNG native và đọc câu dẫn; chưa duyệt bản dựng"
+  },
+  {
+    "hash": "1b189161b82c399be4bb62c21e07b5aafee4038b0d20d6e049d48625e71892dc",
+    "file": "anh/1b189161b82c399be4bb62c21e07b5aafee4038b0d20d6e049d48625e71892dc.png",
+    "mime": "image/png",
+    "bytes": 12647,
+    "i": 157,
+    "refs": [
+      {
+        "qid": "DH-12-C3-B10-II-20",
+        "de": "Hoạt tính xúc tác của enzyme càng cao, tốc độ thủy phân protein càng lớn. Hoạt tính enzyme phụ thuộc vào các yếu tố như nhiệt độ, pH,... Một nhóm học sinh đã khảo sát ảnh hưởng của pH đến hoạt tính của enzyme tiêu hoá protein ở người.\nNhóm tiến hành thí nghiệm thuỷ phân albumin (protein có trong lòng trắng trứng) bằng enzyme pepsin ở nhiệt độ không đổi nhưng thay đổi pH của môi trường. Kết quả thu được như bảng sau.\nSau đó, nhóm học sinh tiến hành thí nghiệm tương tự với enzyme chymotrypsin, thu được đồ thị như hình bên.\nTừ kết quả thí nghiệm, nhóm học sinh đã đưa ra các nhận định sau:",
+        "where": [
+          "DH-12-C3-B10-II-20.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/1b189161b82c399be4bb62c21e07b5aafee4038b0d20d6e049d48625e71892dc.png",
+    "soQids": 1,
+    "docNguon": {
+      "axes": {
+        "x": "pH",
+        "xticks": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "y": "Tốc độ phản ứng",
+        "yticks": [],
+        "arrows": "2trục xám có mũitên"
+      },
+      "lines": [
+        {
+          "label": "Pepsin",
+          "type": "liền",
+          "geometry": "native449x324; đườngtừ(36,168),đỉnh(71,50),xuống(122,248);đỉnh nằmtrênpH2"
+        },
+        {
+          "label": "Chymotrypsin",
+          "type": "chấm đen",
+          "geometry": "từ(182,234),đỉnh(252,43),xuống(324,234);đỉnhgiữa7và8,khôngtick/nhãn7,5"
+        }
+      ],
+      "dashes": "Một đườngchiếu dọc rấtmảnh từđỉnhPepsin x≈71 xuốngtrụcx. Không có đườngchiếu ởChymotrypsin.",
+      "caption": [],
+      "traps": [
+        "Đây là2đường (Pepsin liền,Chymotrypsin chấm), không dùng nétliềnchocả2.",
+        "Đỉnhgiữa7..8 là vịtríảnh,khôngthêmnhãn7,5; khôngcóyticks."
+      ]
+    },
+    "trangThai": "Đã mở PNG native và đọc câu dẫn; chưa duyệt bản dựng"
+  },
+  {
+    "hash": "22d3d709d89d5d7cfbebad56afabd9160774cad674c7d60622cfc4decdd6d93a",
+    "file": "anh/22d3d709d89d5d7cfbebad56afabd9160774cad674c7d60622cfc4decdd6d93a.png",
+    "mime": "image/png",
+    "bytes": 17774,
+    "i": 207,
+    "refs": [
+      {
+        "qid": "12-C3-B10-D2-I-23",
+        "de": "Mỗi enzyme có một khoảng pH tối ưu. Môi trường pH quá cao hoặc quá thấp sẽ ảnh hưởng đến hoạt tính của enzyme.\nGiá trị pH mà tại đó enzyme hoạt động mạnh nhất được gọi là giá trị pH tối ưu.\nGiá trị pH tối ưu của pepsin và trypsin lần lượt là",
+        "where": [
+          "12-C3-B10-D2-I-23.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/22d3d709d89d5d7cfbebad56afabd9160774cad674c7d60622cfc4decdd6d93a.png",
+    "soQids": 1,
+    "docNguon": {
+      "axes": {
+        "x": "pH",
+        "xticks": [
+          2,
+          4,
+          6,
+          8,
+          10
+        ],
+        "y": "Độ hoạt động của enzyme",
+        "yticks": [],
+        "arrows": "Không mũitên"
+      },
+      "lines": [
+        {
+          "label": "pepsin",
+          "type": "liền, một đỉnh trái"
+        },
+        {
+          "label": "amylase",
+          "type": "liền, đỉnh giữa cao nhất,hẹp,lệchtrái trypsin"
+        },
+        {
+          "label": "trypsin",
+          "type": "liền,đỉnh phải thấp hơnamylase,rộnghơn"
+        }
+      ],
+      "geometryPixel": "Native776x512;gốc(84,398);xticksx187,295,403,511,619;pepsinđỉnh≈(195,211),amylase≈(460,124),trypsin≈(526,197). TọađộPIXEL;không tựchuyển thành giátrị pH đỉnh chínhxác khôngghi.",
+      "caption": [
+        "Biểu đồ hoạt động của một số enzyme tiêu hoá trong cơ thể người"
+      ],
+      "traps": [
+        "Không thêm nhãn sốđỉnh hayyticks/0; khôngtrảlời câu hỏi.",
+        "Cả3đườngliền;có2giaodườnggiữaamylase/trypsin? Nguồn chỉ1giao nhìnthấyởx≈479 trênnhánhrơiamylase, giữhìnhnative.",
+        "Cả3đườngliền;amylase/trypsin giao nhau trên nhánh rơi của amylase ở pixelx≈479; giữ nguyên hình native."
+      ]
+    },
+    "trangThai": "Đã mở PNG native và đọc câu dẫn; chưa duyệt bản dựng"
+  },
+  {
+    "hash": "257158215aef4e4377c6e6c546ceb0f257a5a1ebe4fb982afe9601cdaec29584",
+    "file": "anh/257158215aef4e4377c6e6c546ceb0f257a5a1ebe4fb982afe9601cdaec29584.png",
+    "mime": "image/png",
+    "bytes": 9244,
+    "i": 216,
+    "refs": [
+      {
+        "qid": "DH-12-C3-B10-I-48",
+        "de": "Mỗi enzyme có một khoảng pH tối ưu. Môi trường pH quá cao hoặc quá thấp sẽ ảnh hưởng đến hoạt tính của enzyme.\nGiá trị pH mà tại đó enzyme hoạt động mạnh nhất được gọi là giá trị pH tối ưu.\nGiá trị pH tối ưu của pepsin và trypsin lần lượt là",
+        "where": [
+          "DH-12-C3-B10-I-48.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/257158215aef4e4377c6e6c546ceb0f257a5a1ebe4fb982afe9601cdaec29584.png",
+    "soQids": 1,
+    "docNguon": {
+      "axes": {
+        "x": "pH",
+        "xticks": [
+          2,
+          4,
+          6,
+          8,
+          10
+        ],
+        "y": "Độ hoạt động của enzyme",
+        "yticks": [],
+        "arrows": "Không mũitên"
+      },
+      "lines": [
+        {
+          "label": "pepsin",
+          "type": "liền,đỉnh trái"
+        },
+        {
+          "label": "amylase",
+          "type": "liền,đỉnh giữa cao nhất,hẹp"
+        },
+        {
+          "label": "trypsin",
+          "type": "liền,đỉnhphảirộng,thấphơnamylase"
+        }
+      ],
+      "geometryPixel": "Native489x308;gốc(36,251);xticksx107,181,255,329,403;đỉnhpepsin≈(111,123),amylase≈(291,64),trypsin≈(337,114). TọađộPIXELkhôngphảisốđopHchínhxác.",
+      "caption": [
+        "Biểu đồ hoạt động của một số enzyme tiêu hoá trong cơ thể người"
+      ],
+      "traps": [
+        "Cùngloại207nhưnghash/hìnhkhác,tọađộđỉnh/nhãnkháckhôngdùngbừaảnhalias.",
+        "Khôngthêm0/yticks/giátrịđỉnhchưacónhãn."
+      ]
+    },
+    "trangThai": "Đã mở PNG native và đọc câu dẫn; chưa duyệt bản dựng"
+  },
+  {
+    "hash": "25c1132dfcd7a654ca52bc37bb2faf1a6ffe156fa9879466d98184cfa3b1b108",
+    "file": "anh/25c1132dfcd7a654ca52bc37bb2faf1a6ffe156fa9879466d98184cfa3b1b108.png",
+    "mime": "image/png",
+    "bytes": 14546,
+    "i": 220,
+    "refs": [
+      {
+        "qid": "DB-12-B9-P2-D1-I-140",
+        "de": "Enzyme protease là một protein có khả năng xúc tác phân giải protein thành các peptide và amino acid. Enzyme này được sử dụng rộng rãi trong ngành công nghiệp thực phẩm, ví dụ như sản xuất nước mắm, ủ bia, hoặc làm mềm thịt.\nMột nhóm học sinh muốn nghiên cứu ảnh hưởng của nồng độ enzyme protease lên quá trình làm mềm thịt. Giả thuyết của nhóm là: “Nồng độ enzyme protease càng cao thì thời gian làm mềm thịt càng ngắn” Thí nghiệm thực hiện như sau:\nBước 1: Chuẩn bị 4 miếng thịt có khối lượng bằng nhau, được cắt từ cùng một loại thịt.\nBước 2: Ngâm từng miếng thịt vào 100 mL dung dịch enzyme protease có nồng độ khác nhau lần lượt là 0%, 0,5%, 1,0%, 1,5%.\nBước 3: Đặt các cốc thịt vào bể điều nhiệt ở 37°C để giữ điều kiện ổn định.\nBước 4: Sau mỗi 30 phút, kiểm tra độ mềm của thịt bằng cách đo lực cần thiết để cắt qua miếng thịt (dụng cụ đo lực).\nNhóm học sinh ghi lại thời gian cần thiết để làm mềm hoàn toàn miếng thịt trong từng dung dịch và vẽ đồ thị biểu diễn mối quan hệ giữa nồng độ enzyme protease và thời gian làm mềm thịt.\nPhát biểu nào sau đây là sai?",
+        "where": [
+          "DB-12-B9-P2-D1-I-140.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B10-I-62",
+        "de": "Enzyme protease là một protein có khả năng xúc tác phân giải protein thành các peptide và amino acid. Enzyme này được sử dụng rộng rãi trong ngành công nghiệp thực phẩm, ví dụ như sản xuất nước mắm, ủ bia, hoặc làm mềm thịt.\nMột nhóm học sinh muốn nghiên cứu ảnh hưởng của nồng độ enzyme protease lên quá trình làm mềm thịt. Giả thuyết của nhóm là: “Nồng độ enzyme protease càng cao thì thời gian làm mềm thịt càng ngắn” Thí nghiệm thực hiện như sau:\nBước 1: Chuẩn bị 4 miếng thịt có khối lượng bằng nhau, được cắt từ cùng một loại thịt.\nBước 2: Ngâm từng miếng thịt vào 100 mL dung dịch enzyme protease có nồng độ khác nhau lần lượt là 0%, 0,5%, 1,0%, 1,5%.\nBước 3: Đặt các cốc thịt vào bể điều nhiệt ở 37°C để giữ điều kiện ổn định.\nBước 4: Sau mỗi 30 phút, kiểm tra độ mềm của thịt bằng cách đo lực cần thiết để cắt qua miếng thịt (dụng cụ đo lực).\nNhóm học sinh ghi lại thời gian cần thiết để làm mềm hoàn toàn miếng thịt trong từng dung dịch và vẽ đồ thị biểu diễn mối quan hệ giữa nồng độ enzyme protease và thời gian làm mềm thịt.\nPhát biểu nào sau đây là sai?",
+        "where": [
+          "DH-12-C3-B10-I-62.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/25c1132dfcd7a654ca52bc37bb2faf1a6ffe156fa9879466d98184cfa3b1b108.png",
+    "soQids": 2,
+    "docNguon": {
+      "axes": {
+        "x": "Nồng độ enzyme protease (%)",
+        "xticks": [
+          "0",
+          "0.25",
+          "0.5",
+          "0.75",
+          "1",
+          "1.25",
+          "1.5"
+        ],
+        "y": "Thời gian làm mềm thịt (phút)",
+        "yticks": [
+          0,
+          20,
+          40,
+          60,
+          80,
+          100,
+          120,
+          140,
+          160,
+          180,
+          200
+        ],
+        "arrows": "Không mũitên;khungchữnhật/gridxám"
+      },
+      "lines": [
+        {
+          "type": "đoạnthẳng nối4điểm tròn tôxám viềnđậm",
+          "points": [
+            [
+              0,
+              180
+            ],
+            [
+              0.5,
+              120
+            ],
+            [
+              1,
+              60
+            ],
+            [
+              1.5,
+              30
+            ]
+          ],
+          "breaks": "Đoạn0→1 làthẳngđồngdốcđiqua0.5;gãyđổidốctại1,60."
+        }
+      ],
+      "dashes": "Không nétđứt;toànbộ lướichínhxámliền.",
+      "caption": [],
+      "traps": [
+        "Giữ dấu CHẤM thậpphân đúnghìnhnative;đơnvị% vàphút.",
+        "Khôngsửađiểm1.5,30thành0 để đườngthẳng;khôngthêmtênđồthị."
+      ]
+    },
+    "trangThai": "Đã mở PNG native và đọc câu dẫn; chưa duyệt bản dựng"
+  },
+  {
+    "hash": "349c91905470414eda5746d75938429a345eb8fbeb71b170f7babd495bbb9f45",
+    "file": "anh/349c91905470414eda5746d75938429a345eb8fbeb71b170f7babd495bbb9f45.png",
+    "mime": "image/png",
+    "bytes": 48097,
+    "i": 307,
+    "refs": [
+      {
+        "qid": "DB-12-B4-D2-II-107",
+        "de": "Lên men 250 gam glucose trong phòng thí nghiệm. Phân tích lượng ethyl alcohol theo thời gian, ta được đồ thị sau: Kết quả nghiên cứu nhận thấy:\n- Trong thời gian đầu, tốc độ phản ứng tăng lên, dung dịch trở nên đặc và ấm hơn.\n- Từ ngày thứ 10 phản ứng hầu như dừng lại dù trong dung dịch vẫn còn glucose.",
+        "where": [
+          "DB-12-B4-D2-II-107.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-II-25",
+        "de": "Lên men 250 gam glucose trong phòng thí nghiệm. Phân tích lượng ethyl alcohol theo thời gian, ta được đồ thị sau: Kết quả nghiên cứu nhận thấy:\n- Trong thời gian đầu, tốc độ phản ứng tăng lên, dung dịch trở nên đặc và ấm hơn.\n- Từ ngày thứ 10 phản ứng hầu như dừng lại dù trong dung dịch vẫn còn glucose.",
+        "where": [
+          "DH-12-C2-B4-II-25.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/349c91905470414eda5746d75938429a345eb8fbeb71b170f7babd495bbb9f45.png",
+    "soQids": 2,
+    "docNguon": {
+      "axes": {
+        "x": "Ngày",
+        "xticks": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14
+        ],
+        "y": "Số mol ethyl alcohol",
+        "yticks": [
+          "0",
+          "0,5",
+          "1",
+          "1,5",
+          "2"
+        ],
+        "arrows": "Không mũitên,khungtrêngrid"
+      },
+      "lines": [
+        {
+          "type": "mộtđườngđậmnốicácđoạnthẳng,tăngrồiđạtplateau",
+          "geometryPixel": "Native790x374;gốc(117,276),dướimốc2(117,25);đường(117,276)→(191,201)→(339,137)→(412,87)→(487,25)→(634,25). TọađộPIXEL đọc nguồn; tương ứngđiểmgãyngày2,6,8,10;chỉplateau2mol từ10..14đượcxácđịnhvớimốcsốrõ."
+        }
+      ],
+      "grid": "Lưới nhỏ liền xám; ô lớn theo ngày2/mol0,5. Trong khoảng ngày2 có4ônhỏ (bướcngày0,5); trong khoảng0,5mol có5ônhỏ (bướcmol0,1). Đây là thanglưới của ảnh, không phải bổ sung dữ liệu đo.",
+      "caption": [],
+      "traps": [
+        "Không thêmđiểmtròn/nétđứt;khônglàmtrơnmấtcácđiểmgãy.",
+        "Mứctạingày2/6 chỉđọcquaôlưới/pixel≈0,6/1,1;khôngphảisốliệubảngthínghiệmmới.",
+        "Giữplateauy2chạmđườngkhungtrên từ10tới14."
+      ]
+    },
+    "trangThai": "Đã mở PNG native và đọc câu dẫn; chưa duyệt bản dựng"
+  }
+]

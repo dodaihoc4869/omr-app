@@ -1,0 +1,50 @@
+[
+  {
+    "i": 805,
+    "hashSvg": "a794b6dc35e031ecc12c2374e8378d853332a79d6a713cece08a6240420c7f4d",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNGnguồn+renderSVGthật. ĐúngVal–Gly–Ser–Ala,3NH-Hamide,Ser1CH2OH,Valisopropyl/AlaMe/NH2đầu/COOHcuối,4carbonyl. Từngatom/bond/H đúngnguồn,DDH cảthân/caption thànhpath,khôngchạm/cắt/tràn,SHA256khớp.",
+    "hash": "95951e9776e620bdf3632f35034c106df2be44e88d3d783848d0a9cbec46b193",
+    "hashSvgDaSoat": "a794b6dc35e031ecc12c2374e8378d853332a79d6a713cece08a6240420c7f4d"
+  },
+  {
+    "i": 814,
+    "hashSvg": "0d44a134f2e9e2f8f367769d9f08eaf74dc0e7a6f218bac07503288bab368d50",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNGnguồn+renderSVGthật. Đủ4panel/nhãn(1)..(4)/thứtự:(1)Ala-Gly,(2)Ala-Ala,(3)ESTER OkhôngNH,(4)betaAla-Gly với2CH2trướcCO;3panelđầu giữCH3explicit,panel2cả2Meexplicit;khôngcaptiontênmới. Từngatom/bond/H đúngnguồn,DDH cảthân/caption thànhpath,khôngchạm/cắt/tràn,SHA256khớp.",
+    "hash": "969dc1ed72ac05e46c6fe936c5fe3ed20a92a1cb19742dbd9599a676c2c22a07",
+    "hashSvgDaSoat": "0d44a134f2e9e2f8f367769d9f08eaf74dc0e7a6f218bac07503288bab368d50"
+  },
+  {
+    "i": 1039,
+    "hashSvg": "c23d600d6a7e63106ac7c55ac289bdf20ca538d19ce322bd69dfabb1d4c4e9c7",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNGnguồn+renderSVGthật. ĐúngGly–Lys–Glu,Lys4CH2NH2,Glu2CH2COOH,2NH-Hamide/2NH2/2COOH/4carbonyl đủ. Từngatom/bond/H đúngnguồn,DDH cảthân/caption thànhpath,khôngchạm/cắt/tràn,SHA256khớp.",
+    "hash": "bb54837bc4e497e34d71629d974b7f3de8135bee2dd4d3287a5d94990c9403a5",
+    "hashSvgDaSoat": "c23d600d6a7e63106ac7c55ac289bdf20ca538d19ce322bd69dfabb1d4c4e9c7"
+  },
+  {
+    "i": 256,
+    "hashSvg": "6cf79847fc9cfe6fafe446edd882dbba0a85fcf176a8f22258872559ba45fb3a",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở riêng PNG nguồn và SVG render thật. Sáu panel đúng thứ tự (1)–(6): propylamine 3C, butylamine 4C, vòng phenyl–NH–CH3 giữ CH3 tường minh và H trên N; cyclohexyl–NH2; diethylamine có NH; N-methyldiethylamine đúng hai ethyl và một methyl. Đủ sáu nhãn; reflow hai cột không đổi thứ tự. DDH thân/caption dạng path, không text/image/fallback; không chạm/cắt/tràn.",
+    "hash": "2c0a4082de9d8b5bb77cc09e8f85eef59bd161fa30218711e0e83d410fb02bb5",
+    "hashSvgDaSoat": "6cf79847fc9cfe6fafe446edd882dbba0a85fcf176a8f22258872559ba45fb3a"
+  },
+  {
+    "i": 263,
+    "hashSvg": "abf2fc1ad960dd0a2f71c51a4c8b82e92ae18953a14ffed7dd1e8292dc2bbfef",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở riêng PNG nguồn và SVG render thật. (1) pent-2-ene 5C giữ hai nhánh carbon cùng phía nối đôi (Z); (2) ortho-xylene hai methyl kề nhau, ba nối đôi vòng; (3) pentane 5C; (4) pent-2-yne 5C, liên kết ba đúng vị trí. Giữ đủ (1)–(4), thứ tự đọc không đổi. DDH path, không text/image/fallback; không chạm/cắt/tràn.",
+    "hash": "2ce2344041df072a2c7bdb2ce8fa2da1231c7434b5d6cf24e1aa8268d676ca53",
+    "hashSvgDaSoat": "abf2fc1ad960dd0a2f71c51a4c8b82e92ae18953a14ffed7dd1e8292dc2bbfef"
+  },
+  {
+    "i": 442,
+    "hashSvg": "68bccb074aca276e0522a8362b9cfed4deeacfbb2ce8a7cffc4af951d3032f37",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở riêng PNG nguồn và SVG render thật. Panel trái sodium palmitate đếm 16C gồm carbonyl, C=O và ONa, không thêm điện tích. Panel phải sodium lauryl sulfate 12C thẳng, giữ O giữa alkyl và S, hai S=O và ONa (tổng 4O), không đổi thành sulfonate. Hai caption đúng chất và thứ tự nguồn. DDH thân/caption dạng path, không text/image/fallback; không chạm/cắt/tràn.",
+    "hash": "4f9a194a91bfe6d792c41fd3f5e53c09ac8cedd0f19f344e1b3e0e212f3a8cab",
+    "hashSvgDaSoat": "68bccb074aca276e0522a8362b9cfed4deeacfbb2ce8a7cffc4af951d3032f37"
+  }
+]

@@ -1,0 +1,10 @@
+[
+  {
+    "i": 791,
+    "hashSvg": "651fa08a6013179859407b22035afd377be0cf0dbf4d5a05d11e2b9be432643b",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Đã mở lại PNG nguồn791 native và SVG render thật, đối chiếu toàn bộ hình. Đúng 5 điểm đặc (5;140),(6;80),(7;60),(8;100),(9;180); đường liền đi giảm qua5,6 tới cực tiểu7 rồi tăng qua8,9, không thêm điểm. Trục ngang pH ticks4,5,6,7,8,9,10, gốc ngang4; trục dọc t (giây) ticks20..200 bước20, gốc dọc20; mũi tên pH sang phải/t lên trên. Đủ 5 đường chiếu dọc xuống trục ngang và 5 đường chiếu ngang 140/80/60/100/180 tới từng điểm; nét80 thật đã xác minh độc lập native+zoom/pixel, không được bỏ. Không grid phụ/caption mới/đơn vị mới. Font DDH thân/chữ/dấu tiếng Việt khớp app, toàn bộ chữ thành path,0text/0href; SHA thực khớp metadata; không chạm/cắt/tràn.",
+    "hash": "936532a77710c9ce4480908c47bc871be308f87a67b9f5a14bc569f195c958e6",
+    "hashSvgDaSoat": "651fa08a6013179859407b22035afd377be0cf0dbf4d5a05d11e2b9be432643b"
+  }
+]

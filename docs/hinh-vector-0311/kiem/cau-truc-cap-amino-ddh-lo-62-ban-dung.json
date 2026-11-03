@@ -1,0 +1,60 @@
+[
+  {
+    "i": 212,
+    "hash": "2385301a87f412eefce208bd23f840aa8af20a38ddec90e7dd1bff72734210c1",
+    "fileNguon": "anh/2385301a87f412eefce208bd23f840aa8af20a38ddec90e7dd1bff72734210c1.png",
+    "daMoPNG": true,
+    "caption": [],
+    "columns": 2,
+    "panels": [
+      {
+        "smiles": "NCCCC[C@H](N)C(=O)O",
+        "caption": [
+          "Lysine"
+        ],
+        "notes": "4CH₂;alphaNH₂ nêm đặc xuống, CH₂ trái-trên/COOH phải-trên,Hẩn."
+      },
+      {
+        "smiles": "N[C@@H](CCC(=O)O)C(=O)O",
+        "caption": [
+          "Glutamic acid"
+        ],
+        "notes": "2CH₂;alphaNH₂ nêm đặc xuống,CH₂ trái-trên/COOH phải-trên,Hẩn."
+      }
+    ],
+    "notes": "GiữthứtựLysine trái/Glu phải và2caption thật. Khôngcircle/charges.",
+    "questions": [
+      {
+        "qid": "12-KT-C3-D4-II-2",
+        "de": "Trong dung dịch, dạng tồn tại của mỗi amino acid tuỳ thuộc vào giá trị pH của dung dịch đó. Giá trị pH mà khi đó amino acid tồn tại chủ yếu ở dạng ion lưỡng cực được gọi là điểm đẳng điện (pI).\nKhi pH > pI thì amino acid tồn tại chủ yếu ở dạng anion, pH < pI thì amino acid tồn tại chủ yếu ở dạng cation.\nKhi đặt dung dịch amino acid trong một điện trường thì dạng lưỡng cực không di chuyển về phía điện cực nào cả, dạng anion sẽ di chuyển về phía cực dương còn dạng cation sẽ di chuyển về phía cực âm. Cho hai amino acid trong hình dưới đây.\nMột nhóm học sinh nghiên cứu về tính điện di của glutamic acid (pI = 3,2) và lysine (pI = 9,7) rồi đưa ra kết luận:",
+        "refs": [
+          {
+            "where": "12-KT-C3-D4-II-2.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P1-D2-II-78",
+        "de": "Trong dung dịch, dạng tồn tại của mỗi amino acid tuỳ thuộc vào giá trị pH của dung dịch đó. Giá trị pH mà khi đó amino acid tồn tại chủ yếu ở dạng ion lưỡng cực được gọi là điểm đẳng điện (pI).\nKhi pH > pI thì amino acid tồn tại chủ yếu ở dạng anion, pH < pI thì amino acid tồn tại chủ yếu ở dạng cation.\nKhi đặt dung dịch amino acid trong một điện trường thì dạng lưỡng cực không di chuyển về phía điện cực nào cả, dạng anion sẽ di chuyển về phía cực dương còn dạng cation sẽ di chuyển về phía cực âm. Cho hai amino acid trong hình dưới đây.\nMột nhóm học sinh nghiên cứu về tính điện di của glutamic acid (pI = 3,2) và lysine (pI = 9,7) rồi đưa ra kết luận:",
+        "refs": [
+          {
+            "where": "DB-12-B9-P1-D2-II-78.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "Cả2alpha S từnêm thật,phải giữnêm.",
+    "svg": "cap-amino-ddh-d673684fd5fa43b30944494d46e711018e5245c177b75d54a00f3f02c4b0569f.svg",
+    "hashSvg": "d673684fd5fa43b30944494d46e711018e5245c177b75d54a00f3f02c4b0569f",
+    "byteSvg": 17908,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "hashSvgDaSoat": "d673684fd5fa43b30944494d46e711018e5245c177b75d54a00f3f02c4b0569f",
+    "nguoiSoat": "cau_truc_6"
+  }
+]

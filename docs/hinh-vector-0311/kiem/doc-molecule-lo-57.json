@@ -1,0 +1,775 @@
+[
+  {
+    "i": 28,
+    "hash": "063cf2885c96848e88be3c7cc19b1700087115a16152d02edfcc81c7ce02a10c",
+    "fileNguon": "anh/063cf2885c96848e88be3c7cc19b1700087115a16152d02edfcc81c7ce02a10c.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "N[C@@H](CCC(=O)O)C(=O)O",
+    "notes": "HOOC trái–CH₂–CH₂–CH(NH₂)–COOH phải. AlphaNH₂ nêm đặc xuống (đầu nhỏ tại alphaC, đầu rộng tại NH₂), alphaC nối CH₂ bên trái-trên và COOH phải-trên; H ẩn. Không gán CIP khi chưa kiểm renderer. Cả2C=O lên. Không caption/circle/charges.",
+    "questions": [
+      {
+        "qid": "DB-12-B9-P1-D2-II-109",
+        "de": "Glutamic acid có vai trò quan trọng trong quá trình xây dựng cấu trúc tế bào của con người. Ngoài ra, muối monosodium glutamate còn được dùng chế biến gia vị thức ăn (bột ngọt hay mì chính).\nGlutamic acid có cấu trúc như hình vẽ bên dưới và có điểm đẳng điện pI=3,2 (pI là giá trị pH mà khi đó amino acid có nồng độ ion lưỡng cực là cực đại. Khi pH<pI thì amino acid đó tồn tại chủ yếu ở dạng cation, còn khi pH>pI thì amino acid đó tồn tại chủ yếu ở dạng anion). HOOC−CH₂−CH₂−CH(NH₂)−COOH.",
+        "refs": [
+          {
+            "where": "DB-12-B9-P1-D2-II-109.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B9-P1-II-22",
+        "de": "Glutamic acid có vai trò quan trọng trong quá trình xây dựng cấu trúc tế bào của con người. Ngoài ra, muối monosodium glutamate còn được dùng chế biến gia vị thức ăn (bột ngọt hay mì chính).\nGlutamic acid có cấu trúc như hình vẽ bên dưới và có điểm đẳng điện pI=3,2 (pI là giá trị pH mà khi đó amino acid có nồng độ ion lưỡng cực là cực đại. Khi pH<pI thì amino acid đó tồn tại chủ yếu ở dạng cation, còn khi pH>pI thì amino acid đó tồn tại chủ yếu ở dạng anion). HOOC−CH₂−CH₂−CH(NH₂)−COOH.",
+        "refs": [
+          {
+            "where": "DH-12-C3-B9-P1-II-22.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "S; suy trực tiếp từ nêmNH₂ ra trước phía dưới; COOH trên-phải,mạchCH₂ trên-trái,Hẩn phía sau; kiểm RDKit CIP S."
+  },
+  {
+    "i": 286,
+    "hash": "309b98b043551cb20b9126285b3699dd83e02d6fff3288c9337e3c81db9ddd8e",
+    "fileNguon": "anh/309b98b043551cb20b9126285b3699dd83e02d6fff3288c9337e3c81db9ddd8e.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "NCCCC[C@H](N)C(=O)O",
+    "notes": "H₂N trái–(CH₂)₄–CH(NH₂)–COOH phải. Alpha NH₂ nêm đặc xuống, đầu nhỏ alphaC, rộng NH₂; mạch CH₂ trái-trên, COOH phải-trên,Hẩn. Đúng4CH₂ giữa đầu NH₂ và alphaC. Không caption/charges/circle.",
+    "questions": [
+      {
+        "qid": "DH-12-C3-B11-D1-II-2",
+        "de": "Lysine là một thành phần quan trọng của tất cả các protein trong cơ thể. Nó đóng vai trò quan trọng trong việc hấp thu calcium, tạo cơ bắp, phục hồi sau chấn thương hay sau phẫu thuật, sự tổng hợp các hormone, enzyme, và các kháng thể. Lysine có công thức cấu tạo như sau:",
+        "refs": [
+          {
+            "where": "DH-12-C3-B11-D1-II-2.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B9-P1-II-18",
+        "de": "Lysine là một thành phần quan trọng của tất cả các protein trong cơ thể. Nó đóng vai trò quan trọng trong việc hấp thu canxi, tạo cơ bắp, phục hồi sau chấn thương hay sau phẫu thuật, sự tổng hợp các hormone, enzyme, và các kháng thể. Lysine có công thức cấu tạo như sau:",
+        "refs": [
+          {
+            "where": "DH-12-C3-B9-P1-II-18.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "S; nêmNH₂ xuống ra trước,COOH trên-phải,mạchCH₂ trên-trái,Hẩn sau; RDKit CIP S."
+  },
+  {
+    "i": 1114,
+    "hash": "c89880dbaf6b5be869cf3154def78ccccd442d6a07273a88ca04dcbc199badc0",
+    "fileNguon": "anh/c89880dbaf6b5be869cf3154def78ccccd442d6a07273a88ca04dcbc199badc0.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "N[C@@H](CCC(=O)O)C(=O)O",
+    "notes": "Cùng nội dung28: HOOC trái–2CH₂–alphaC(NH₂)–COOH phải. NH₂ nêm đặc xuống; alphaC nối mạch trái-trên, COOH phải-trên,Hẩn. Không caption/circle/charges.",
+    "questions": [
+      {
+        "qid": "12-C3-B9-D1-I-85",
+        "de": "Glutamic acid là một amino acid thiết yếu của cơ thể, có công thức cấu tạo như sau:\nMuối monosodium glutamate (MSG), thường được dùng để chế biến bột ngọt hoặc mì chính. Pha dung dịch X gồm glutamic acid và NaOH theo tỉ lệ mol 1 : 1 thu được chất hữu cơ Y. Khi đặt trong điện trường, chất Y",
+        "refs": [
+          {
+            "where": "12-C3-B9-D1-I-85.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P1-D1-I-55",
+        "de": "Glutamic acid là một amino acid thiết yếu của cơ thể, có công thức cấu tạo như sau:\nMuối monosodium glutamate (MSG), thường được dùng để chế biến bột ngọt hoặc mì chính. Pha dung dịch X gồm glutamic acid và NaOH theo tỉ lệ mol 1 : 1 thu được chất hữu cơ Y. Khi đặt trong điện trường, chất Y",
+        "refs": [
+          {
+            "where": "DB-12-B9-P1-D1-I-55.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "S; suy trực tiếp từ nêmNH₂ ra trước phía dưới; COOH trên-phải,mạchCH₂ trên-trái,Hẩn phía sau; kiểm RDKit CIP S."
+  },
+  {
+    "i": 1125,
+    "hash": "ca93b34a36f26ae7c29d1afee7d46ec9d97daa8775a7c6a792f689829f2ca754",
+    "fileNguon": "anh/ca93b34a36f26ae7c29d1afee7d46ec9d97daa8775a7c6a792f689829f2ca754.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "[Na+].CCCCCCCCCCCCc1ccc(S(=O)(=O)[O-])cc1",
+    "notes": "12C alkyl thẳng trái, nối benzene tại trái; sulfonate para phải: S có2O đôi trên/dưới và nhánh ONa phải. Giữ ONa gộp như nguồn, không thêm dấu ion hiển thị. Vòng3đôi khôngcircle. Không caption/stereo.",
+    "questions": [
+      {
+        "qid": "12-C1-B2-II-15",
+        "de": "Hợp chất hữu cơ X có công thức cấu tạo như sau:",
+        "refs": [
+          {
+            "where": "12-C1-B2-II-15.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B2-D1-II-64",
+        "de": "Hợp chất hữu cơ X có công thức cấu tạo như sau:",
+        "refs": [
+          {
+            "where": "DB-12-B2-D1-II-64.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "Không nêm/stereo nguồn."
+  },
+  {
+    "i": 1274,
+    "hash": "e7a0d2905d09fd8d538d510cb50e6334a30515ea98a7cf6bbd6a9092c5e24eb5",
+    "fileNguon": "anh/e7a0d2905d09fd8d538d510cb50e6334a30515ea98a7cf6bbd6a9092c5e24eb5.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "CC(C)C(N)C(=O)NCC(=O)NC(C)C(=O)O",
+    "notes": "Val–Gly–Ala, H₂N đầu trái,2NH peptide mỗiNH hiệnH trên,COOH cuối phải. Val alphaH dưới; nhánh CH(CH₃)₂ lên, CH nhánh hiệnH trên. Gly CH₂ hiệnH trên/dưới. Ala alphaH dưới,CH₃ trên. Khôngnêm/stereo/caption/circle/charges.",
+    "questions": [
+      {
+        "qid": "DB-12-B9-P2-D1-I-165",
+        "de": "Cho peptide Y có công thức cấu tạo sau: Tên viết tắt của Y là",
+        "refs": [
+          {
+            "where": "DB-12-B9-P2-D1-I-165.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B9-P2-I-18",
+        "de": "Cho peptide Y có công thức cấu tạo sau: Tên viết tắt của Y là",
+        "refs": [
+          {
+            "where": "DH-12-C3-B9-P2-I-18.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "Không nêm/stereo nguồn."
+  },
+  {
+    "i": 360,
+    "hash": "3fc7e1acf89e00354d33d8e6c23eb4289ae6e80102a3fb9941e92a6f5aaa85a5",
+    "fileNguon": "anh/3fc7e1acf89e00354d33d8e6c23eb4289ae6e80102a3fb9941e92a6f5aaa85a5.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "NCCCC[C@H](N)C(=O)O",
+    "notes": "Lysine: H₂N trái–(CH₂)₄–CH(NH₂)–COOH phải. AlphaNH₂ nêm đặc xuống, đầu nhỏ tạiC/rộng tạiN; alphaC nối CH₂ trái-trên và COOH phải-trên,Hẩn. Đúng4CH₂. Khôngcaption/circle/charges. Giữ nêm như286, không lấy SMILES khôngstereo để bỏnêm.",
+    "questions": [
+      {
+        "qid": "12-C3-B10-D2-II-23",
+        "de": "Lysine là một thành phần quan trọng của tất cả các protein trong cơ thể. Nó đóng vai trò quan trọng trong việc hấp thu calcium, tạo cơ bắp, phục hồi sau chấn thương hay sau phẫu thuật, sự tổng hợp các hormone, enzyme, và các kháng thể. Lysine có công thức cấu tạo: H₂N-[CH₂]₄-CH(NH₂)-COOH.",
+        "refs": [
+          {
+            "where": "12-C3-B10-D2-II-23.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "S; nêmNH₂ xuống ra trước,COOH trên-phải,mạchCH₂ trên-trái,Hẩn sau; RDKit CIP S."
+  },
+  {
+    "i": 373,
+    "hash": "41ddd6fdeae67469aa3e365cc237769e22e196f12b78a925b96dcc4ae0db49a9",
+    "fileNguon": "anh/41ddd6fdeae67469aa3e365cc237769e22e196f12b78a925b96dcc4ae0db49a9.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "NCCCC[C@H](N)C(=O)O",
+    "notes": "Lysine: H₂N trái–(CH₂)₄–CH(NH₂)–COOH phải. AlphaNH₂ nêm đặc xuống, đầu nhỏ tạiC/rộng tạiN; alphaC nối CH₂ trái-trên và COOH phải-trên,Hẩn. Đúng4CH₂. Khôngcaption/circle/charges. Giữ nêm như286, không lấy SMILES khôngstereo để bỏnêm.",
+    "questions": [
+      {
+        "qid": "12-C3-B9-D1-I-86",
+        "de": "Lysine (Lys) có công thức cấu tạo như sau:\nThêm dung dịch acid HCl (dư) vào ống nghiệm đựng dung dịch Lys, sau đó đặt ống nghiệm vào trong điện trường. Khi đó, Lys",
+        "refs": [
+          {
+            "where": "12-C3-B9-D1-I-86.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P1-D1-I-56",
+        "de": "Lysine (Lys) có công thức cấu tạo như sau:\nThêm dung dịch acid HCl (dư) vào ống nghiệm đựng dung dịch Lys, sau đó đặt ống nghiệm vào trong điện trường. Khi đó, Lys",
+        "refs": [
+          {
+            "where": "DB-12-B9-P1-D1-I-56.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "S; nêmNH₂ xuống ra trước,COOH trên-phải,mạchCH₂ trên-trái,Hẩn sau; RDKit CIP S."
+  },
+  {
+    "i": 763,
+    "hash": "8de429a9492a32393708df8f1918199435d96482e9dff79d6eee7e4f4ba06d8d",
+    "fileNguon": "anh/8de429a9492a32393708df8f1918199435d96482e9dff79d6eee7e4f4ba06d8d.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "NCCCC[C@H](N)C(=O)O",
+    "notes": "Lysine: H₂N trái–(CH₂)₄–CH(NH₂)–COOH phải. AlphaNH₂ nêm đặc xuống, đầu nhỏ tạiC/rộng tạiN; alphaC nối CH₂ trái-trên và COOH phải-trên,Hẩn. Đúng4CH₂. Khôngcaption/circle/charges. Giữ nêm như286, không lấy SMILES khôngstereo để bỏnêm.",
+    "questions": [
+      {
+        "qid": "12-C3-B10-D2-II-31",
+        "de": "Lysine là một thành phần quan trọng của tất cả các protein trong cơ thể. Nó đóng vai trò quan trọng trong việc hấp thu canxi, tạo cơ bắp, phục hồi sau chấn thương hay sau phẫu thuật, sự tổng hợp các hormone, enzyme, và các kháng thể. Lysine có công thức cấu tạo như sau:",
+        "refs": [
+          {
+            "where": "12-C3-B10-D2-II-31.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "S; nêmNH₂ xuống ra trước,COOH trên-phải,mạchCH₂ trên-trái,Hẩn sau; RDKit CIP S."
+  },
+  {
+    "i": 475,
+    "hash": "5750bd0d1b006e8628596146430bff10bcb08e72cd0420ba6506feab5227ac3a",
+    "fileNguon": "anh/5750bd0d1b006e8628596146430bff10bcb08e72cd0420ba6506feab5227ac3a.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "[Na+].CCCCCCCCCCCCc1ccc(S(=O)(=O)[O-])cc1",
+    "notes": "12C alkyl thẳng nối bên trái benzene; para SO₂ONa phải. Vòng3đôi khôngcircle. ONa gộp, khôngdấuion riêng nguồn. Khôngcaption/stereo. Cùng connectivity1125, được đếm độc lập nguồn.",
+    "questions": [
+      {
+        "qid": "DB-12-B2-D1-I-174",
+        "de": "Hợp chất hữu cơ X có công thức cấu tạo như sau: Phát biểu nào sau đây không đúng?",
+        "refs": [
+          {
+            "where": "DB-12-B2-D1-I-174.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B2-I-43",
+        "de": "Hợp chất hữu cơ X có công thức cấu tạo như sau: Phát biểu nào sau đây không đúng?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B2-I-43.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "Không nêm/stereo nguồn."
+  },
+  {
+    "i": 953,
+    "hash": "ac748cf9bdd6054bb9d4cadf658b50bf6e9d6e6eb46dfe79971d8d686eb97389",
+    "fileNguon": "anh/ac748cf9bdd6054bb9d4cadf658b50bf6e9d6e6eb46dfe79971d8d686eb97389.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "[Na+].CCCCCCCCCCCCc1ccc(S(=O)(=O)[O-])cc1",
+    "notes": "12C alkyl thẳng nối bên trái benzene; para SO₂ONa phải. Vòng3đôi khôngcircle. ONa gộp, khôngdấuion riêng nguồn. Khôngcaption/stereo. Cùng connectivity1125, được đếm độc lập nguồn.",
+    "questions": [
+      {
+        "qid": "12-C1-B2-I-76",
+        "de": "Hợp chất hữu cơ X có công thức cấu tạo như hình dưới. Phát biểu nào sau đây không đúng?",
+        "refs": [
+          {
+            "where": "12-C1-B2-I-76.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B2-D1-I-48",
+        "de": "Hợp chất hữu cơ X có công thức cấu tạo như hình dưới. Phát biểu nào sau đây không đúng?",
+        "refs": [
+          {
+            "where": "DB-12-B2-D1-I-48.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "Không nêm/stereo nguồn."
+  },
+  {
+    "i": 995,
+    "hash": "b29b5f947f3091aced8b29ef80d47bcfafdb1e12b3c78ee86a4797316500c57c",
+    "fileNguon": "anh/b29b5f947f3091aced8b29ef80d47bcfafdb1e12b3c78ee86a4797316500c57c.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "[Na+].CCCCCCCCCCCCc1ccc(S(=O)(=O)[O-])cc1",
+    "notes": "12C alkyl thẳng nối bên trái benzene; para SO₂ONa phải. Vòng3đôi khôngcircle. ONa gộp, khôngdấuion riêng nguồn. Khôngcaption/stereo. Cùng connectivity1125, được đếm độc lập nguồn.",
+    "questions": [
+      {
+        "qid": "DB-12-B2-D1-II-195",
+        "de": "Hợp chất hữu cơ X có công thức cấu tạo như sau:",
+        "refs": [
+          {
+            "where": "DB-12-B2-D1-II-195.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B2-II-13",
+        "de": "Hợp chất hữu cơ X có công thức cấu tạo như sau:",
+        "refs": [
+          {
+            "where": "DH-12-C1-B2-II-13.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "Không nêm/stereo nguồn."
+  },
+  {
+    "i": 438,
+    "hash": "4f4e92280f560ada8352cdec5eca4d54755cf9c774f4f05480be2cc408dde94a",
+    "fileNguon": "anh/4f4e92280f560ada8352cdec5eca4d54755cf9c774f4f05480be2cc408dde94a.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "[Na+].CCCCCCCCCCCCc1ccc(S(=O)(=O)[O-])cc1",
+    "notes": "Nguồn viết CH₃(CH₂)₁₀CH₂–benzene–SO₂ONa para. Phải GIỮ sốlặp10 và nhóm cuốiCH₂ (tổng12C), không chỉ khai triển xương làm mất số10. Vòng3đôi,khôngcircle;2S=O trên/dưới;ONa phải;khôngcaption/stereo/ion sign.",
+    "questions": [
+      {
+        "qid": "12-KT-C12-D2-III-4",
+        "de": "Sodium dodecylbenzenesulfonate (SDBS) là một loại chất hoạt động bề mặt đa năng có nhiều ứng dụng trong chất giặt rửa tổng hợp, sản phẩm làm sạch và nhiều quy trình công nghiệp khác nhau.\nCông thức cấu tạo của SDBS ở hình dưới.\nCho các nhận định sau:\n(1) SDBS có thể dùng giặt rửa trong nước cứng.\n(2) SDBS có đầu ưa nước là Na⁺.\n(3) SDBS được sản xuất từ dầu mỏ qua nhiều giai đoạn.\n(4) SDBS có giá thành thấp, không gây ô nhiễm môi trường.\nLiệt kê các nhận định đúng theo số thứ tự tăng dần (ví dụ 1234,24 và tương tự).",
+        "refs": [
+          {
+            "where": "12-KT-C12-D2-III-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B2-D1-III-134",
+        "de": "Sodium dodecylbenzenesulfonate (SDBS) là một loại chất hoạt động bề mặt đa năng có nhiều ứng dụng trong chất giặt rửa tổng hợp, sản phẩm làm sạch và nhiều quy trình công nghiệp khác nhau.\nCông thức cấu tạo của SDBS ở hình dưới.\nCho các nhận định sau:\n(1) SDBS có thể dùng giặt rửa trong nước cứng.\n(2) SDBS có đầu ưa nước là Na⁺.\n(3) SDBS được sản xuất từ dầu mỏ qua nhiều giai đoạn.\n(4) SDBS có giá thành thấp, không gây ô nhiễm môi trường.\nLiệt kê các nhận định đúng theo số thứ tự tăng dần (ví dụ 1234,24 và tương tự).",
+        "refs": [
+          {
+            "where": "DB-12-B2-D1-III-134.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "Không nêm/stereo nguồn."
+  },
+  {
+    "i": 495,
+    "hash": "5b91e3e7da60ad66c0751a2ed6c0bba85da37a7fdeacb538b2839b8604d7c9c2",
+    "fileNguon": "anh/5b91e3e7da60ad66c0751a2ed6c0bba85da37a7fdeacb538b2839b8604d7c9c2.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "CC(N)C(=O)NC(CCC(=O)O)C(=O)NCC(=O)NC(C)C(=O)NC(C(C)C)C(=O)O",
+    "notes": "Ala–Glu–Gly–Ala–Val,4NH peptide đều hiệnH. Glu nhánh2CH₂COOH xuống;Val isopropyl lên;Gly1CH₂. Khôngnêm/circle/caption/charges. NhómCOOH nhánh gộp phải giữ.",
+    "questions": [
+      {
+        "qid": "DB-12-B9-P2-D1-III-217",
+        "de": "Cho peptide X có công thức cấu tạo sau: 1 mol X phản ứng tối đa với bao nhiêu mol KOH trong dung dịch?",
+        "refs": [
+          {
+            "where": "DB-12-B9-P2-D1-III-217.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B9-P2-III-21",
+        "de": "Cho peptide X có công thức cấu tạo sau: 1 mol X phản ứng tối đa với bao nhiêu mol KOH trong dung dịch?",
+        "refs": [
+          {
+            "where": "DH-12-C3-B9-P2-III-21.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "Không nêm/stereo nguồn."
+  },
+  {
+    "i": 805,
+    "hash": "95951e9776e620bdf3632f35034c106df2be44e88d3d783848d0a9cbec46b193",
+    "fileNguon": "anh/95951e9776e620bdf3632f35034c106df2be44e88d3d783848d0a9cbec46b193.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "CC(C)C(N)C(=O)NCC(=O)NC(CO)C(=O)NC(C)C(=O)O",
+    "notes": "Val–Gly–Ser–Ala;3NH peptide đều hiệnH. Ser nhánh CH₂OH xuống CHỈ1CH₂. Val isopropyl xuống;Ala methyl lên. Khôngnêm/stereo/caption/circle/charges.",
+    "questions": [
+      {
+        "qid": "12-C3-B9-D2-I-17",
+        "de": "Cho peptide Z có công thức cấu tạo: H₂N-CH[CH(CH₃)₂]-CO-NH-CH₂-CO-NH-CH(CH₂OH)-CO-NH-CH(CH₃)-COOH (Val-Gly-Ser-Ala).\nTrong peptide Z, amino acid đầu N là",
+        "refs": [
+          {
+            "where": "12-C3-B9-D2-I-17.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P2-D1-I-38",
+        "de": "Cho peptide Z có công thức cấu tạo: H₂N-CH[CH(CH₃)₂]-CO-NH-CH₂-CO-NH-CH(CH₂OH)-CO-NH-CH(CH₃)-COOH (Val-Gly-Ser-Ala).\nTrong peptide Z, amino acid đầu N là",
+        "refs": [
+          {
+            "where": "DB-12-B9-P2-D1-I-38.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "Không nêm/stereo nguồn."
+  },
+  {
+    "i": 814,
+    "hash": "969dc1ed72ac05e46c6fe936c5fe3ed20a92a1cb19742dbd9599a676c2c22a07",
+    "fileNguon": "anh/969dc1ed72ac05e46c6fe936c5fe3ed20a92a1cb19742dbd9599a676c2c22a07.png",
+    "daMoPNG": true,
+    "caption": [],
+    "columns": 2,
+    "panels": [
+      {
+        "smiles": "CC(N)C(=O)NCC(=O)O",
+        "caption": [
+          "(1)"
+        ],
+        "notes": "Ala–Gly;1NH peptide;Ala methyl xuống."
+      },
+      {
+        "smiles": "CC(N)C(=O)NC(C)C(=O)O",
+        "caption": [
+          "(2)"
+        ],
+        "notes": "Ala–Ala;1NH;hai methyl đầu xuống/cuối lên."
+      },
+      {
+        "smiles": "CC(N)C(=O)OCC(=O)O",
+        "caption": [
+          "(3)"
+        ],
+        "notes": "Ala ester với HOCH₂COOH;O nối hai phần, KHÔNG NH peptide."
+      },
+      {
+        "smiles": "NCCC(=O)NCC(=O)O",
+        "caption": [
+          "(4)"
+        ],
+        "notes": "beta-Ala–Gly:2CH₂ trướcC=O đầu,1NH peptide."
+      }
+    ],
+    "notes": "4panel trái→phải;nguồn có chữ vụn cắt trên mép không thành nhãn,không phục dựng. Khôngstereo/circle/charges.",
+    "questions": [
+      {
+        "qid": "VIP27-C3-B11-D1-I-7",
+        "de": "Cho các chất có công thức cấu tạo sau:\nTrong các hợp chất trên, những hợp chất nào thuộc loại dipeptide?",
+        "refs": [
+          {
+            "where": "VIP27-C3-B11-D1-I-7.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "Không nêm/stereo nguồn."
+  },
+  {
+    "i": 1039,
+    "hash": "bb54837bc4e497e34d71629d974b7f3de8135bee2dd4d3287a5d94990c9403a5",
+    "fileNguon": "anh/bb54837bc4e497e34d71629d974b7f3de8135bee2dd4d3287a5d94990c9403a5.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "NCC(=O)NC(CCCCN)C(=O)NC(CCC(=O)O)C(=O)O",
+    "notes": "Gly–Lys–Glu. Lys nhánh4CH₂–NH₂ lên; Glu alphaCOOH xuống và nhánh2CH₂COOH sang phải. 2NH peptide hiệnH,2NH₂ tựdo. Khôngnêm/caption/circle/charges.",
+    "questions": [
+      {
+        "qid": "DB-12-B9-P2-D2-III-104",
+        "de": "Cho peptide X có cấu tạo như sau: Khi thủy phân hoàn toàn X thu được bao nhiêu amino acid?",
+        "refs": [
+          {
+            "where": "DB-12-B9-P2-D2-III-104.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B11-D2-III-1",
+        "de": "Cho peptide X có cấu tạo như sau: Khi thủy phân hoàn toàn X thu được bao nhiêu amino acid?",
+        "refs": [
+          {
+            "where": "DH-12-C3-B11-D2-III-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "Không nêm/stereo nguồn."
+  },
+  {
+    "i": 212,
+    "hash": "2385301a87f412eefce208bd23f840aa8af20a38ddec90e7dd1bff72734210c1",
+    "fileNguon": "anh/2385301a87f412eefce208bd23f840aa8af20a38ddec90e7dd1bff72734210c1.png",
+    "daMoPNG": true,
+    "caption": [],
+    "columns": 2,
+    "panels": [
+      {
+        "smiles": "NCCCC[C@H](N)C(=O)O",
+        "caption": [
+          "Lysine"
+        ],
+        "notes": "4CH₂;alphaNH₂ nêm đặc xuống, CH₂ trái-trên/COOH phải-trên,Hẩn."
+      },
+      {
+        "smiles": "N[C@@H](CCC(=O)O)C(=O)O",
+        "caption": [
+          "Glutamic acid"
+        ],
+        "notes": "2CH₂;alphaNH₂ nêm đặc xuống,CH₂ trái-trên/COOH phải-trên,Hẩn."
+      }
+    ],
+    "notes": "GiữthứtựLysine trái/Glu phải và2caption thật. Khôngcircle/charges.",
+    "questions": [
+      {
+        "qid": "12-KT-C3-D4-II-2",
+        "de": "Trong dung dịch, dạng tồn tại của mỗi amino acid tuỳ thuộc vào giá trị pH của dung dịch đó. Giá trị pH mà khi đó amino acid tồn tại chủ yếu ở dạng ion lưỡng cực được gọi là điểm đẳng điện (pI).\nKhi pH > pI thì amino acid tồn tại chủ yếu ở dạng anion, pH < pI thì amino acid tồn tại chủ yếu ở dạng cation.\nKhi đặt dung dịch amino acid trong một điện trường thì dạng lưỡng cực không di chuyển về phía điện cực nào cả, dạng anion sẽ di chuyển về phía cực dương còn dạng cation sẽ di chuyển về phía cực âm. Cho hai amino acid trong hình dưới đây.\nMột nhóm học sinh nghiên cứu về tính điện di của glutamic acid (pI = 3,2) và lysine (pI = 9,7) rồi đưa ra kết luận:",
+        "refs": [
+          {
+            "where": "12-KT-C3-D4-II-2.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P1-D2-II-78",
+        "de": "Trong dung dịch, dạng tồn tại của mỗi amino acid tuỳ thuộc vào giá trị pH của dung dịch đó. Giá trị pH mà khi đó amino acid tồn tại chủ yếu ở dạng ion lưỡng cực được gọi là điểm đẳng điện (pI).\nKhi pH > pI thì amino acid tồn tại chủ yếu ở dạng anion, pH < pI thì amino acid tồn tại chủ yếu ở dạng cation.\nKhi đặt dung dịch amino acid trong một điện trường thì dạng lưỡng cực không di chuyển về phía điện cực nào cả, dạng anion sẽ di chuyển về phía cực dương còn dạng cation sẽ di chuyển về phía cực âm. Cho hai amino acid trong hình dưới đây.\nMột nhóm học sinh nghiên cứu về tính điện di của glutamic acid (pI = 3,2) và lysine (pI = 9,7) rồi đưa ra kết luận:",
+        "refs": [
+          {
+            "where": "DB-12-B9-P1-D2-II-78.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "Cả2alpha S từnêm thật,phải giữnêm."
+  },
+  {
+    "i": 256,
+    "hash": "2c0a4082de9d8b5bb77cc09e8f85eef59bd161fa30218711e0e83d410fb02bb5",
+    "fileNguon": "anh/2c0a4082de9d8b5bb77cc09e8f85eef59bd161fa30218711e0e83d410fb02bb5.png",
+    "daMoPNG": true,
+    "caption": [],
+    "columns": 2,
+    "panels": [
+      {
+        "smiles": "CCCN",
+        "caption": [
+          "(1)"
+        ]
+      },
+      {
+        "smiles": "CCCCN",
+        "caption": [
+          "(2)"
+        ]
+      },
+      {
+        "smiles": "CNc1ccccc1",
+        "caption": [
+          "(3)"
+        ],
+        "notes": "N-methylaniline,NH rõ;vòng3đôi khôngcircle."
+      },
+      {
+        "smiles": "NC1CCCCC1",
+        "caption": [
+          "(4)"
+        ]
+      },
+      {
+        "smiles": "CCNCC",
+        "caption": [
+          "(5)"
+        ],
+        "notes": "Diethylamine,NH explicitH dưới."
+      },
+      {
+        "smiles": "CCN(C)CC",
+        "caption": [
+          "(6)"
+        ],
+        "notes": "Diethylmethylamine,nhánhN xuống1C,khôngHtrênN."
+      }
+    ],
+    "notes": "6chất nguồn2hàng3cột đọc1..6;reflow2cộtgiữnhãn. Khôngcharges/stereo.",
+    "questions": [
+      {
+        "qid": "DB-12-B8-D1-III-415",
+        "de": "Cho các amine có công thức cấu tạo dưới đây: Có bao nhiêu chất thuộc loại arylamine?",
+        "refs": [
+          {
+            "where": "DB-12-B8-D1-III-415.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B8-III-12",
+        "de": "Cho các amine có công thức cấu tạo dưới đây: Có bao nhiêu chất thuộc loại arylamine?",
+        "refs": [
+          {
+            "where": "DH-12-C3-B8-III-12.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "Không nêm/stereo nguồn."
+  },
+  {
+    "i": 263,
+    "hash": "2ce2344041df072a2c7bdb2ce8fa2da1231c7434b5d6cf24e1aa8268d676ca53",
+    "fileNguon": "anh/2ce2344041df072a2c7bdb2ce8fa2da1231c7434b5d6cf24e1aa8268d676ca53.png",
+    "daMoPNG": true,
+    "caption": [],
+    "columns": 2,
+    "panels": [
+      {
+        "smiles": "CC/C=C\\C",
+        "caption": [
+          "(1)"
+        ],
+        "notes": "pent-2-ene Z:hai nhánh carbon phíaTRÊN C=C trongnguồn."
+      },
+      {
+        "smiles": "Cc1ccccc1C",
+        "caption": [
+          "(2)"
+        ],
+        "notes": "ortho-xylene,3đôi,khôngcircle."
+      },
+      {
+        "smiles": "CCCCC",
+        "caption": [
+          "(3)"
+        ],
+        "notes": "pentane5C."
+      },
+      {
+        "smiles": "CC#CCC",
+        "caption": [
+          "(4)"
+        ],
+        "notes": "pent-2-yne5C;đầu tráiCH₃→C≡C→CH₂→CH₃."
+      }
+    ],
+    "notes": "4paneltheothứtự1..4,khôngcharge/captiontên. GiữZpanel1.",
+    "questions": [
+      {
+        "qid": "11-C4-B17-I-3",
+        "de": "Cho bốn hydrocarbon có công thức cấu tạo như hình dưới.\nTên nào không đúng với một trong các hydrocarbon trên?",
+        "refs": [
+          {
+            "where": "11-C4-B17-I-3.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "Không nêm/CIP nguồn; giữ EZ khi panel263(1) Z."
+  },
+  {
+    "i": 442,
+    "hash": "4f9a194a91bfe6d792c41fd3f5e53c09ac8cedd0f19f344e1b3e0e212f3a8cab",
+    "fileNguon": "anh/4f9a194a91bfe6d792c41fd3f5e53c09ac8cedd0f19f344e1b3e0e212f3a8cab.png",
+    "daMoPNG": true,
+    "caption": [],
+    "columns": 2,
+    "panels": [
+      {
+        "smiles": "[Na+].CCCCCCCCCCCCCCCC(=O)[O-]",
+        "caption": [
+          "sodium palmitate"
+        ],
+        "notes": "16Ctổng gồmcarbonyl,nguồngiữONa gộp."
+      },
+      {
+        "smiles": "[Na+].CCCCCCCCCCCCOS(=O)(=O)[O-]",
+        "caption": [
+          "sodium lauryl sulfate"
+        ],
+        "notes": "12Calkyl,PHẢIOtrướcS;2S=O,ONa gộp."
+      }
+    ],
+    "notes": "Hai panel trái/phải,khôngstereo/circle/iondấuriêng. Khôngsửathànhsulfonate.",
+    "questions": [
+      {
+        "qid": "DB-12-B2-D1-II-188",
+        "de": "Cho các chất có công thức cấu tạo và tên gọi sau:",
+        "refs": [
+          {
+            "where": "DB-12-B2-D1-II-188.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B2-II-6",
+        "de": "Cho các chất có công thức cấu tạo và tên gọi sau:",
+        "refs": [
+          {
+            "where": "DH-12-C1-B2-II-6.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "Không nêm/stereo nguồn."
+  }
+]

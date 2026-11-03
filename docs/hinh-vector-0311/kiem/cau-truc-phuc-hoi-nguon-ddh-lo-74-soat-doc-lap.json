@@ -1,0 +1,10 @@
+[
+  {
+    "i": 1153,
+    "hashSvg": "9c6a8e6b395cd0f1a86e0f2af5bfa46d3887c7682bf610a90095dcda17327f3e",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Đã mở riêng PNG1153, nguồn60 native toàn vẹn và SVG mới gán render thật; đồng thời mở256 để loại nhầm. Nguồn60 có cùng6panel và nhãn(1)–(6);5panel không bị cắt của1153 khớp, panel3 phần thân NH2–CH–CH2–CH3 khớp, nhánh trên ở60 có1đoạn với endpoint rõ nên phục hồi CH3 có căn cứ từ nguồn, không dựa tên/đáp án. Panel3 là CC(N)CC, không stereo;256 là N-methylaniline ởpanel3, đã loại. Đúng panel1 propylamine3C,2 butylamine4C,4 cyclohexylamine6C vòng bão hòa/NH2,5 diethylamine2ethyl và H dướiN,6 N-methyldiethylamine2ethyl+1methyl khôngNH. Thứ tự/nhãn đủ dù reflow2cột. Đã đọc de/refs công khai doc-nguon-cat-1153.json: tất cả sau_de, không lấy đáp án. DDH thân/caption/chỉ số2 path-only,0text/0href, hashfont thật khớp app; không chạm/cắt/tràn. SHA thực khớp metadata.",
+    "hash": "d1012113fe6dda6d8c6f3a9c315dfebc5523b88fbb61e18521a18fa089428899",
+    "hashSvgDaSoat": "9c6a8e6b395cd0f1a86e0f2af5bfa46d3887c7682bf610a90095dcda17327f3e"
+  }
+]

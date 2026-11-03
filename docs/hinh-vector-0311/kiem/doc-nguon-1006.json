@@ -1,0 +1,54 @@
+{
+  "i": 1006,
+  "hash": "b4dd6f5cf1c17fd321bcea2a6663d5903bae8ddbedab1b64794f4d45f2515a2d",
+  "fileNguon": "anh/b4dd6f5cf1c17fd321bcea2a6663d5903bae8ddbedab1b64794f4d45f2515a2d.png",
+  "daMoNativeVaZoom": true,
+  "doiChieu1160": {
+    "i": 1160,
+    "hash": "d2840011c327d935fd2830a5669b5f13646e1a11a33b2f6efdfffa72ebc88b72",
+    "ketLuan": "Chartbody cùng nội dung:HI tăng từ gốc đến plateau cao,H2+I2 giảm từ cao đến plateau thấp,Nồng độ/Thời gian/2trụcmũitên,khôngticks/sốdata. GiữH2/I2 chỉsố2. Nguồn1006 cócaption(a) dưới trục,1160khôngcaption;khôngđượcdùngSVG1160nguyênxi làm mất(a)."
+  },
+  "caption": {
+    "nguyenVan": "(a)",
+    "viTri": "Native537x415;giữagiữađáy khoảngx269,y400..415,chữ/ngoặc bịcắtchân bởi mépảnh.",
+    "quyetDinh": "GIỮ và dựng lại(a) đầyđủ;glyphnative+zoom đủnhận diện(a),đây khôiphục glyphđọcthấy khôngsuyđoán nhãn.",
+    "lyDo": "Cả2stem ghi rõ Quan sát hình dưới đây và chọn phát biểu đúng. (a) (b). Vì nhãn hình đượcgọi trong thâncâu,không cócăn cứ bỏ nhưnhãn phươngánPDF;khôngđổi(a)thành(b) theoindex1."
+  },
+  "refs": [
+    {
+      "qid": "11-C1-B1-I-36",
+      "maDe": "11-C1-B1",
+      "de": "Quan sát hình dưới đây và chọn phát biểu đúng. (a) (b)",
+      "hinh": [
+        {
+          "hash": "481dcc94a70f3f92d4fc0467fb7b493cc9f7ec81733d0ed2468d183df5043844",
+          "where": "11-C1-B1-I-36.hinh.0.du_lieu",
+          "hashDataUrl": "d96839bf7a361e5f753130403b122ff52d93cc9c2a8a117bb5bad09119626c4d"
+        },
+        {
+          "hash": "b4dd6f5cf1c17fd321bcea2a6663d5903bae8ddbedab1b64794f4d45f2515a2d",
+          "where": "11-C1-B1-I-36.hinh.1.du_lieu",
+          "hashDataUrl": "08fa1ef2eb6ad93f0f8ff8e5bee971022ffdc21444f97aca59c986c63f202140"
+        }
+      ]
+    },
+    {
+      "qid": "DB-11-B1-D1-I-36",
+      "maDe": "DB-11-B1-D1",
+      "de": "Quan sát hình dưới đây và chọn phát biểu đúng. (a) (b)",
+      "hinh": [
+        {
+          "hash": "481dcc94a70f3f92d4fc0467fb7b493cc9f7ec81733d0ed2468d183df5043844",
+          "where": "DB-11-B1-D1-I-36.hinh.0.du_lieu",
+          "hashDataUrl": "d96839bf7a361e5f753130403b122ff52d93cc9c2a8a117bb5bad09119626c4d"
+        },
+        {
+          "hash": "b4dd6f5cf1c17fd321bcea2a6663d5903bae8ddbedab1b64794f4d45f2515a2d",
+          "where": "DB-11-B1-D1-I-36.hinh.1.du_lieu",
+          "hashDataUrl": "08fa1ef2eb6ad93f0f8ff8e5bee971022ffdc21444f97aca59c986c63f202140"
+        }
+      ]
+    }
+  ],
+  "nguoiDoc": "cau_truc_4"
+}

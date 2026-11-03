@@ -1,0 +1,44 @@
+[
+  {
+    "i": 495,
+    "hash": "5b91e3e7da60ad66c0751a2ed6c0bba85da37a7fdeacb538b2839b8604d7c9c2",
+    "fileNguon": "anh/5b91e3e7da60ad66c0751a2ed6c0bba85da37a7fdeacb538b2839b8604d7c9c2.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "CC(N)C(=O)NC(CCC(=O)O)C(=O)NCC(=O)NC(C)C(=O)NC(C(C)C)C(=O)O",
+    "notes": "Ala–Glu–Gly–Ala–Val,4NH peptide đều hiệnH. Glu nhánh2CH₂COOH xuống;Val isopropyl lên;Gly1CH₂. Khôngnêm/circle/caption/charges. NhómCOOH nhánh gộp phải giữ.",
+    "questions": [
+      {
+        "qid": "DB-12-B9-P2-D1-III-217",
+        "de": "Cho peptide X có công thức cấu tạo sau: 1 mol X phản ứng tối đa với bao nhiêu mol KOH trong dung dịch?",
+        "refs": [
+          {
+            "where": "DB-12-B9-P2-D1-III-217.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B9-P2-III-21",
+        "de": "Cho peptide X có công thức cấu tạo sau: 1 mol X phản ứng tối đa với bao nhiêu mol KOH trong dung dịch?",
+        "refs": [
+          {
+            "where": "DH-12-C3-B9-P2-III-21.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "Không nêm/stereo nguồn.",
+    "svg": "peptide-ddh-9a0b47836356ca5a84264a54db38941d2a64c7a8e86045fd4b574a97944fe1ec.svg",
+    "hashSvg": "9a0b47836356ca5a84264a54db38941d2a64c7a8e86045fd4b574a97944fe1ec",
+    "byteSvg": 12338,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "hashSvgDaSoat": "9a0b47836356ca5a84264a54db38941d2a64c7a8e86045fd4b574a97944fe1ec",
+    "nguoiSoat": "cau_truc_6"
+  }
+]

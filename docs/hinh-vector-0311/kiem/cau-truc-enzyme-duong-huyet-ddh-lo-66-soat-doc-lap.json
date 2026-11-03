@@ -1,0 +1,34 @@
+[
+  {
+    "i": 157,
+    "hashSvg": "a4df679ec69e0c5feb14543ae9d1c20439d7441e5cbde7d0de3ad8a21d654db1",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở riêng từng PNGnguồn+renderSVGthật. Pepsin LIỀN đỉnhpH2/guideđứng,Chymotrypsin CHẤM đỉnhgiữa7..8khôngthêm7,5;tick1..12,pH/Tốc độ phản ứng,2arrow/khôngyticks. DDHpath-only/label/bố cục khôngchạm/cắt/tràn,SHA256khớp.",
+    "hash": "1b189161b82c399be4bb62c21e07b5aafee4038b0d20d6e049d48625e71892dc",
+    "hashSvgDaSoat": "a4df679ec69e0c5feb14543ae9d1c20439d7441e5cbde7d0de3ad8a21d654db1"
+  },
+  {
+    "i": 96,
+    "hashSvg": "bce1335c3a10ed347a642a3460e9ffe85f7f9081e8e3cbf132a4af8d34644c91",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở riêng từng PNGnguồn+renderSVGthật. Đúngmg/dL,Đường huyết(lượng glucose trong máu),y40/60/80/100/120/140,x0..120bước20/phút. Giữvùngtôphạmvinative x299..517 vàcalloutSau khi tập20’/55’,khôngsửatheo15’–85’củastem;đườngtrơn/độrộngvùngtô/2guidecallout đúngnguồn,khôngmarker/sốđỉnhmới. DDHpath-only/label/bố cục khôngchạm/cắt/tràn,SHA256khớp.",
+    "hash": "1349637253f51a2e702a0212bad8c87b39419b3de52bb42a7fbf7bb4e7050eff",
+    "hashSvgDaSoat": "bce1335c3a10ed347a642a3460e9ffe85f7f9081e8e3cbf132a4af8d34644c91"
+  },
+  {
+    "i": 207,
+    "hashSvg": "18ea960d0ddd302c498aa10dcaa354e403fc733193b8d13251b04c64df7b4da3",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở riêng PNG nguồn native và SVG render thật, không duyệt theo alias. Ba curve liền pepsin/amylase/trypsin giữ hình dáng và vị trí đỉnh theo nguồn riêng; amylase cao và hẹp hơn trypsin, chỉ một giao trên nhánh rơi amylase. Y-title đủ hai dòng “Độ hoạt động”/“của enzyme”; ticks 2/4/6/8/10, pH và caption “Biểu đồ hoạt động của một số enzyme tiêu hoá trong cơ thể người” đúng nguồn. Không thêm 0, y-ticks, số đỉnh hay mũi tên. DDH thân/caption dạng path, không text/image/fallback; không cắt/chạm/tràn.",
+    "hash": "22d3d709d89d5d7cfbebad56afabd9160774cad674c7d60622cfc4decdd6d93a",
+    "hashSvgDaSoat": "18ea960d0ddd302c498aa10dcaa354e403fc733193b8d13251b04c64df7b4da3"
+  },
+  {
+    "i": 216,
+    "hashSvg": "c5c61f07ef896f709d17599efbb10040d2f196aa3976612e88f6d0eaead59b4d",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở riêng PNG nguồn native và SVG render thật, không duyệt theo alias. Ba curve liền pepsin/amylase/trypsin giữ hình dáng và vị trí đỉnh theo nguồn riêng; amylase cao và hẹp hơn trypsin, chỉ một giao trên nhánh rơi amylase. Y-title đủ hai dòng “Độ hoạt động”/“của enzyme”; ticks 2/4/6/8/10, pH và caption “Biểu đồ hoạt động của một số enzyme tiêu hoá trong cơ thể người” đúng nguồn. Không thêm 0, y-ticks, số đỉnh hay mũi tên. DDH thân/caption dạng path, không text/image/fallback; không cắt/chạm/tràn.",
+    "hash": "257158215aef4e4377c6e6c546ceb0f257a5a1ebe4fb982afe9601cdaec29584",
+    "hashSvgDaSoat": "c5c61f07ef896f709d17599efbb10040d2f196aa3976612e88f6d0eaead59b4d"
+  }
+]

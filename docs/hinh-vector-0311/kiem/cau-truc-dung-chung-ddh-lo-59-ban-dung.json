@@ -1,0 +1,240 @@
+[
+  {
+    "i": 360,
+    "hash": "3fc7e1acf89e00354d33d8e6c23eb4289ae6e80102a3fb9941e92a6f5aaa85a5",
+    "fileNguon": "anh/3fc7e1acf89e00354d33d8e6c23eb4289ae6e80102a3fb9941e92a6f5aaa85a5.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "NCCCC[C@H](N)C(=O)O",
+    "notes": "Lysine: H₂N trái–(CH₂)₄–CH(NH₂)–COOH phải. AlphaNH₂ nêm đặc xuống, đầu nhỏ tạiC/rộng tạiN; alphaC nối CH₂ trái-trên và COOH phải-trên,Hẩn. Đúng4CH₂. Khôngcaption/circle/charges. Giữ nêm như286, không lấy SMILES khôngstereo để bỏnêm.",
+    "questions": [
+      {
+        "qid": "12-C3-B10-D2-II-23",
+        "de": "Lysine là một thành phần quan trọng của tất cả các protein trong cơ thể. Nó đóng vai trò quan trọng trong việc hấp thu calcium, tạo cơ bắp, phục hồi sau chấn thương hay sau phẫu thuật, sự tổng hợp các hormone, enzyme, và các kháng thể. Lysine có công thức cấu tạo: H₂N-[CH₂]₄-CH(NH₂)-COOH.",
+        "refs": [
+          {
+            "where": "12-C3-B10-D2-II-23.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "S; nêmNH₂ xuống ra trước,COOH trên-phải,mạchCH₂ trên-trái,Hẩn sau; RDKit CIP S.",
+    "svg": "hinh-ddh-094d39ec0cbcde84a2f6ebc484c17e08136eaf30982b5d3dac63a1109de16b3e.svg",
+    "hashSvg": "094d39ec0cbcde84a2f6ebc484c17e08136eaf30982b5d3dac63a1109de16b3e",
+    "byteSvg": 4593,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDungChung": "Dùng cùng render theo cấu trúc, nhưng phải mở từng nguồn và soát độc lập trước ghi đạt.",
+    "hashSvgDaSoat": "094d39ec0cbcde84a2f6ebc484c17e08136eaf30982b5d3dac63a1109de16b3e",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 373,
+    "hash": "41ddd6fdeae67469aa3e365cc237769e22e196f12b78a925b96dcc4ae0db49a9",
+    "fileNguon": "anh/41ddd6fdeae67469aa3e365cc237769e22e196f12b78a925b96dcc4ae0db49a9.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "NCCCC[C@H](N)C(=O)O",
+    "notes": "Lysine: H₂N trái–(CH₂)₄–CH(NH₂)–COOH phải. AlphaNH₂ nêm đặc xuống, đầu nhỏ tạiC/rộng tạiN; alphaC nối CH₂ trái-trên và COOH phải-trên,Hẩn. Đúng4CH₂. Khôngcaption/circle/charges. Giữ nêm như286, không lấy SMILES khôngstereo để bỏnêm.",
+    "questions": [
+      {
+        "qid": "12-C3-B9-D1-I-86",
+        "de": "Lysine (Lys) có công thức cấu tạo như sau:\nThêm dung dịch acid HCl (dư) vào ống nghiệm đựng dung dịch Lys, sau đó đặt ống nghiệm vào trong điện trường. Khi đó, Lys",
+        "refs": [
+          {
+            "where": "12-C3-B9-D1-I-86.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P1-D1-I-56",
+        "de": "Lysine (Lys) có công thức cấu tạo như sau:\nThêm dung dịch acid HCl (dư) vào ống nghiệm đựng dung dịch Lys, sau đó đặt ống nghiệm vào trong điện trường. Khi đó, Lys",
+        "refs": [
+          {
+            "where": "DB-12-B9-P1-D1-I-56.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "S; nêmNH₂ xuống ra trước,COOH trên-phải,mạchCH₂ trên-trái,Hẩn sau; RDKit CIP S.",
+    "svg": "hinh-ddh-094d39ec0cbcde84a2f6ebc484c17e08136eaf30982b5d3dac63a1109de16b3e.svg",
+    "hashSvg": "094d39ec0cbcde84a2f6ebc484c17e08136eaf30982b5d3dac63a1109de16b3e",
+    "byteSvg": 4593,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDungChung": "Dùng cùng render theo cấu trúc, nhưng phải mở từng nguồn và soát độc lập trước ghi đạt.",
+    "hashSvgDaSoat": "094d39ec0cbcde84a2f6ebc484c17e08136eaf30982b5d3dac63a1109de16b3e",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 763,
+    "hash": "8de429a9492a32393708df8f1918199435d96482e9dff79d6eee7e4f4ba06d8d",
+    "fileNguon": "anh/8de429a9492a32393708df8f1918199435d96482e9dff79d6eee7e4f4ba06d8d.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "NCCCC[C@H](N)C(=O)O",
+    "notes": "Lysine: H₂N trái–(CH₂)₄–CH(NH₂)–COOH phải. AlphaNH₂ nêm đặc xuống, đầu nhỏ tạiC/rộng tạiN; alphaC nối CH₂ trái-trên và COOH phải-trên,Hẩn. Đúng4CH₂. Khôngcaption/circle/charges. Giữ nêm như286, không lấy SMILES khôngstereo để bỏnêm.",
+    "questions": [
+      {
+        "qid": "12-C3-B10-D2-II-31",
+        "de": "Lysine là một thành phần quan trọng của tất cả các protein trong cơ thể. Nó đóng vai trò quan trọng trong việc hấp thu canxi, tạo cơ bắp, phục hồi sau chấn thương hay sau phẫu thuật, sự tổng hợp các hormone, enzyme, và các kháng thể. Lysine có công thức cấu tạo như sau:",
+        "refs": [
+          {
+            "where": "12-C3-B10-D2-II-31.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "S; nêmNH₂ xuống ra trước,COOH trên-phải,mạchCH₂ trên-trái,Hẩn sau; RDKit CIP S.",
+    "svg": "hinh-ddh-094d39ec0cbcde84a2f6ebc484c17e08136eaf30982b5d3dac63a1109de16b3e.svg",
+    "hashSvg": "094d39ec0cbcde84a2f6ebc484c17e08136eaf30982b5d3dac63a1109de16b3e",
+    "byteSvg": 4593,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDungChung": "Dùng cùng render theo cấu trúc, nhưng phải mở từng nguồn và soát độc lập trước ghi đạt.",
+    "hashSvgDaSoat": "094d39ec0cbcde84a2f6ebc484c17e08136eaf30982b5d3dac63a1109de16b3e",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 475,
+    "hash": "5750bd0d1b006e8628596146430bff10bcb08e72cd0420ba6506feab5227ac3a",
+    "fileNguon": "anh/5750bd0d1b006e8628596146430bff10bcb08e72cd0420ba6506feab5227ac3a.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "[Na+].CCCCCCCCCCCCc1ccc(S(=O)(=O)[O-])cc1",
+    "notes": "12C alkyl thẳng nối bên trái benzene; para SO₂ONa phải. Vòng3đôi khôngcircle. ONa gộp, khôngdấuion riêng nguồn. Khôngcaption/stereo. Cùng connectivity1125, được đếm độc lập nguồn.",
+    "questions": [
+      {
+        "qid": "DB-12-B2-D1-I-174",
+        "de": "Hợp chất hữu cơ X có công thức cấu tạo như sau: Phát biểu nào sau đây không đúng?",
+        "refs": [
+          {
+            "where": "DB-12-B2-D1-I-174.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B2-I-43",
+        "de": "Hợp chất hữu cơ X có công thức cấu tạo như sau: Phát biểu nào sau đây không đúng?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B2-I-43.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "Không nêm/stereo nguồn.",
+    "svg": "cau-truc-f007de27c8bc29a69efb2d38ec1297eb6702711c4687cc7cbf5d2b8e3e847c00.svg",
+    "hashSvg": "f007de27c8bc29a69efb2d38ec1297eb6702711c4687cc7cbf5d2b8e3e847c00",
+    "byteSvg": 12417,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDungChung": "Dùng cùng render theo cấu trúc, nhưng phải mở từng nguồn và soát độc lập trước ghi đạt.",
+    "hashSvgDaSoat": "f007de27c8bc29a69efb2d38ec1297eb6702711c4687cc7cbf5d2b8e3e847c00",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 953,
+    "hash": "ac748cf9bdd6054bb9d4cadf658b50bf6e9d6e6eb46dfe79971d8d686eb97389",
+    "fileNguon": "anh/ac748cf9bdd6054bb9d4cadf658b50bf6e9d6e6eb46dfe79971d8d686eb97389.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "[Na+].CCCCCCCCCCCCc1ccc(S(=O)(=O)[O-])cc1",
+    "notes": "12C alkyl thẳng nối bên trái benzene; para SO₂ONa phải. Vòng3đôi khôngcircle. ONa gộp, khôngdấuion riêng nguồn. Khôngcaption/stereo. Cùng connectivity1125, được đếm độc lập nguồn.",
+    "questions": [
+      {
+        "qid": "12-C1-B2-I-76",
+        "de": "Hợp chất hữu cơ X có công thức cấu tạo như hình dưới. Phát biểu nào sau đây không đúng?",
+        "refs": [
+          {
+            "where": "12-C1-B2-I-76.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B2-D1-I-48",
+        "de": "Hợp chất hữu cơ X có công thức cấu tạo như hình dưới. Phát biểu nào sau đây không đúng?",
+        "refs": [
+          {
+            "where": "DB-12-B2-D1-I-48.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "Không nêm/stereo nguồn.",
+    "svg": "cau-truc-f007de27c8bc29a69efb2d38ec1297eb6702711c4687cc7cbf5d2b8e3e847c00.svg",
+    "hashSvg": "f007de27c8bc29a69efb2d38ec1297eb6702711c4687cc7cbf5d2b8e3e847c00",
+    "byteSvg": 12417,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDungChung": "Dùng cùng render theo cấu trúc, nhưng phải mở từng nguồn và soát độc lập trước ghi đạt.",
+    "hashSvgDaSoat": "f007de27c8bc29a69efb2d38ec1297eb6702711c4687cc7cbf5d2b8e3e847c00",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 995,
+    "hash": "b29b5f947f3091aced8b29ef80d47bcfafdb1e12b3c78ee86a4797316500c57c",
+    "fileNguon": "anh/b29b5f947f3091aced8b29ef80d47bcfafdb1e12b3c78ee86a4797316500c57c.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "[Na+].CCCCCCCCCCCCc1ccc(S(=O)(=O)[O-])cc1",
+    "notes": "12C alkyl thẳng nối bên trái benzene; para SO₂ONa phải. Vòng3đôi khôngcircle. ONa gộp, khôngdấuion riêng nguồn. Khôngcaption/stereo. Cùng connectivity1125, được đếm độc lập nguồn.",
+    "questions": [
+      {
+        "qid": "DB-12-B2-D1-II-195",
+        "de": "Hợp chất hữu cơ X có công thức cấu tạo như sau:",
+        "refs": [
+          {
+            "where": "DB-12-B2-D1-II-195.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B2-II-13",
+        "de": "Hợp chất hữu cơ X có công thức cấu tạo như sau:",
+        "refs": [
+          {
+            "where": "DH-12-C1-B2-II-13.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "Không nêm/stereo nguồn.",
+    "svg": "cau-truc-f007de27c8bc29a69efb2d38ec1297eb6702711c4687cc7cbf5d2b8e3e847c00.svg",
+    "hashSvg": "f007de27c8bc29a69efb2d38ec1297eb6702711c4687cc7cbf5d2b8e3e847c00",
+    "byteSvg": 12417,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDungChung": "Dùng cùng render theo cấu trúc, nhưng phải mở từng nguồn và soát độc lập trước ghi đạt.",
+    "hashSvgDaSoat": "f007de27c8bc29a69efb2d38ec1297eb6702711c4687cc7cbf5d2b8e3e847c00",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

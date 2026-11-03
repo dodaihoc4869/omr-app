@@ -1,0 +1,10 @@
+[
+  {
+    "i": 212,
+    "hashSvg": "d673684fd5fa43b30944494d46e711018e5245c177b75d54a00f3f02c4b0569f",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Đã mở PNG nguồn native và SVG render thật. Lysine trái có đúng 4CH2 từ NH2 đầu đến C-alpha, NH2 alpha nêm đặc xuống; COOH phải. Glutamic acid phải có đúng 2CH2, hai COOH, NH2 alpha nêm đặc xuống. Cả hai giữ cấu hình S: N ưu tiên1, COOH2, mạch trái3, H ẩn4 sau mặt phẳng. Không thêm H/CIP/charges. Caption nguyên văn Lysine và Glutamic acid đúng thứ tự. DDH thân/caption thành path, hash font khớp app, 0text/0href, không chạm/cắt/tràn.",
+    "hash": "2385301a87f412eefce208bd23f840aa8af20a38ddec90e7dd1bff72734210c1",
+    "hashSvgDaSoat": "d673684fd5fa43b30944494d46e711018e5245c177b75d54a00f3f02c4b0569f"
+  }
+]

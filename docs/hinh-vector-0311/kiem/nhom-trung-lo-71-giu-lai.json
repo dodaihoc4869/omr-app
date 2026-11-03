@@ -1,0 +1,71 @@
+[
+  {
+    "i": 791,
+    "hash": "936532a77710c9ce4480908c47bc871be308f87a67b9f5a14bc569f195c958e6",
+    "file": "anh/936532a77710c9ce4480908c47bc871be308f87a67b9f5a14bc569f195c958e6.png",
+    "baseI": 813,
+    "baseHash": "969179cd4f54af607ab66a9e6c79e6ddd89797c9d7c9e02ec15854567133d8d0",
+    "baseFile": "anh/969179cd4f54af607ab66a9e6c79e6ddd89797c9d7c9e02ec15854567133d8d0.png",
+    "baseSvg": "do-thi-ddh-651fa08a6013179859407b22035afd377be0cf0dbf4d5a05d11e2b9be432643b.svg",
+    "baseHashSvg": "651fa08a6013179859407b22035afd377be0cf0dbf4d5a05d11e2b9be432643b",
+    "score": 2.003,
+    "ph": 2,
+    "dh": 0,
+    "ratio": 0,
+    "refs": 1,
+    "tepSVG": "do-thi-ddh-651fa08a6013179859407b22035afd377be0cf0dbf4d5a05d11e2b9be432643b.svg",
+    "hashSvgDaMo": "651fa08a6013179859407b22035afd377be0cf0dbf4d5a05d11e2b9be432643b",
+    "nguoiSoat": "soat_nguon_2",
+    "phuongPhap": "Fingerprint chỉ chọn ứng viên; đã mở từng PNG ứng viên, PNG base và SVG render thật.",
+    "refsQid": [
+      "12-KT-C123-D1-II-3"
+    ],
+    "baseSvgRenderDaXem": "/workspace/scratch/trung-lo71/791-base-svg.png",
+    "lichSuNhanDinhBanDau": {
+      "ketLuan": "Khác chi tiết; phải dựng biến thể, không alias",
+      "khacBietCanDungLai": [
+        "Bỏ đường chiếu ngang nét đứt mức80 từtrụcy tớiđiểm(6,80); giữ các guidekhác."
+      ],
+      "bangChung": "Đã mở PNG791, PNG813 và SVG render thật. Cùng điểm/trục, nhưng PNG791 chỉ có đường chiếu ngang ở180/140/100/60, KHÔNG có đường chiếu ngang mức80 tới điểm(6,80). Base813 vàSVG có nét này. Phải bỏ riêng nétđứt80 trước khi dùng, không alias nguyên byte."
+    },
+    "trangThai": "da-giai-quyet-soat-lai-lo-73",
+    "ketLuan": "Đạt: nét chiếu80 có thật; không bỏ nét. Đã soát lại toàn bộ nguồn và SVG cùng hash.",
+    "bangChungMoi": "soat-net-791.json",
+    "proofMoi": "cau-truc-doi-chieu-lai-ddh-lo-73-soat-doc-lap.json"
+  },
+  {
+    "i": 1153,
+    "hash": "d1012113fe6dda6d8c6f3a9c315dfebc5523b88fbb61e18521a18fa089428899",
+    "file": "anh/d1012113fe6dda6d8c6f3a9c315dfebc5523b88fbb61e18521a18fa089428899.png",
+    "baseI": 256,
+    "baseHash": "2c0a4082de9d8b5bb77cc09e8f85eef59bd161fa30218711e0e83d410fb02bb5",
+    "baseFile": "anh/2c0a4082de9d8b5bb77cc09e8f85eef59bd161fa30218711e0e83d410fb02bb5.png",
+    "baseSvg": "cau-truc-ddh-6cf79847fc9cfe6fafe446edd882dbba0a85fcf176a8f22258872559ba45fb3a.svg",
+    "baseHashSvg": "6cf79847fc9cfe6fafe446edd882dbba0a85fcf176a8f22258872559ba45fb3a",
+    "score": 6.786,
+    "ph": 4,
+    "dh": 5,
+    "ratio": 0.024,
+    "refs": 2,
+    "tepSVG": "cau-truc-ddh-6cf79847fc9cfe6fafe446edd882dbba0a85fcf176a8f22258872559ba45fb3a.svg",
+    "hashSvgDaMo": "6cf79847fc9cfe6fafe446edd882dbba0a85fcf176a8f22258872559ba45fb3a",
+    "nguoiSoat": "soat_nguon_2",
+    "phuongPhap": "Fingerprint chỉ chọn ứng viên; đã mở riêng từng PNG ứng viên, PNG base và SVG render thật.",
+    "refsQid": [
+      "DB-12-B8-D1-III-410",
+      "DH-12-C3-B8-III-6"
+    ],
+    "baseSvgRenderDaXem": "/workspace/scratch/trung-lo71/1153-base-svg.png",
+    "lichSuNhanDinhBanDau": {
+      "ketLuan": "Khác cấu trúc; không alias, cần đọc/phục hồi nguồn trước khi dựng",
+      "khacBietCanDungLai": [
+        "Panel(3) nguồn làamine mạchhở khácN-methylaniline củabase;nhánh lên sát/cắt méptrên chưađủchắc đểphục hồi."
+      ],
+      "bangChung": "Đã mở PNG1153, PNG256 và SVG render thật. KHÁC panel(3):nguồn1153 làamine mạchhở H2N–CH(–nhánh lên chạm/cắt mép trên)–CH2–CH3;nguồn256/SVG làC6H5–NH–CH3. Nhánh lên PNG1153 bịcắt/sát mép nên không tựsuy chiều dài nhánh. Panel1/2/4/5/6cùngloại;toànảnhkhôngaliasđược. Câu dẫn chỉhỏi sốaminebậcmột,không nêu tên/chuỗi(3)đểphục hồi."
+    },
+    "trangThai": "da-giai-quyet-nguon60-lo-74",
+    "ketLuan": "Đạt: phục hồi bằng nguồn60 cùng6panel,giữbutan2amineở(3),khôngaliasvới256arylamine.",
+    "bangChungMoi": "doc-nguon-cat-1153.json",
+    "proofMoi": "cau-truc-phuc-hoi-nguon-ddh-lo-74-soat-doc-lap.json"
+  }
+]

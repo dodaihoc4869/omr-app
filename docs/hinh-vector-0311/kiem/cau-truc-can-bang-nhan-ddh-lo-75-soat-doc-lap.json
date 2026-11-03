@@ -1,0 +1,10 @@
+[
+  {
+    "i": 1006,
+    "hashSvg": "2a300bdccc682af34db88e7222acfff93f5762eccf92b9975bdfb07133c82d5e",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Đã mở PNG native1006 và SVG render thật. HI tăng từ gốc đến plateau cao hữu hạn, H2+I2 giảm từ trên xuống plateau thấp dương hữu hạn, hai đường cắt nhau1lần; giữ đúng NHÃN HI/H₂+I₂ và chỉ số2. Trục Nồng độ đứng/Thời gian ngang, hai mũi tên lên/phải, không ticks hay số mới. Giữ nguyên caption(a) đầy đủ ở đáy, không đổi thành(b) theo imageindex1. Nguồn thấy rõ phần ngoặc và a dù cắt chân; đã đọc doc-nguon-1006.json và kiểm trực tiếp2stem công khai11-C1-B1-I-36/DB-11-B1-D1-I-36 đều gọi(a)(b), nên không được bỏ nhãn như PDF option. DDH thân/caption/chỉ số path-only,0text/0href, hashfont app khớp, không chạm/cắt/tràn; SHA thực khớp.",
+    "hash": "b4dd6f5cf1c17fd321bcea2a6663d5903bae8ddbedab1b64794f4d45f2515a2d",
+    "hashSvgDaSoat": "2a300bdccc682af34db88e7222acfff93f5762eccf92b9975bdfb07133c82d5e"
+  }
+]

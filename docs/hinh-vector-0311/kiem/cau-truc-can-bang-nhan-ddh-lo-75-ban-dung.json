@@ -1,0 +1,21 @@
+[
+  {
+    "i": 1006,
+    "hash": "b4dd6f5cf1c17fd321bcea2a6663d5903bae8ddbedab1b64794f4d45f2515a2d",
+    "fileNguon": "anh/b4dd6f5cf1c17fd321bcea2a6663d5903bae8ddbedab1b64794f4d45f2515a2d.png",
+    "svg": "can-bang-nhan-ddh-2a300bdccc682af34db88e7222acfff93f5762eccf92b9975bdfb07133c82d5e.svg",
+    "hashSvg": "2a300bdccc682af34db88e7222acfff93f5762eccf92b9975bdfb07133c82d5e",
+    "byteSvg": 12509,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "baseI": 1160,
+    "bangChungNhan": "doc-nguon-1006.json",
+    "caption": [
+      "(a)"
+    ],
+    "ghiChu": "Chartbodycùng1160,giữcaption(a)phục hồi từglyphthật/2câudẫncôngkhai;khôngđổitheoindex1,khôngbỏnhãn.",
+    "hashSvgDaSoat": "2a300bdccc682af34db88e7222acfff93f5762eccf92b9975bdfb07133c82d5e",
+    "nguoiSoat": "cau_truc_6"
+  }
+]

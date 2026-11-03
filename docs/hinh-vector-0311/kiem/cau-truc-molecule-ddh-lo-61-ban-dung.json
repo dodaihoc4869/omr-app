@@ -1,0 +1,569 @@
+[
+  {
+    "i": 805,
+    "hash": "95951e9776e620bdf3632f35034c106df2be44e88d3d783848d0a9cbec46b193",
+    "fileNguon": "anh/95951e9776e620bdf3632f35034c106df2be44e88d3d783848d0a9cbec46b193.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "CC(C)C(N)C(=O)NCC(=O)NC(CO)C(=O)NC(C)C(=O)O",
+    "notes": "Val–Gly–Ser–Ala;3NH peptide đều hiệnH. Ser nhánh CH₂OH xuống CHỈ1CH₂. Val isopropyl xuống;Ala methyl lên. Khôngnêm/stereo/caption/circle/charges.",
+    "questions": [
+      {
+        "qid": "12-C3-B9-D2-I-17",
+        "de": "Cho peptide Z có công thức cấu tạo: H₂N-CH[CH(CH₃)₂]-CO-NH-CH₂-CO-NH-CH(CH₂OH)-CO-NH-CH(CH₃)-COOH (Val-Gly-Ser-Ala).\nTrong peptide Z, amino acid đầu N là",
+        "refs": [
+          {
+            "where": "12-C3-B9-D2-I-17.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P2-D1-I-38",
+        "de": "Cho peptide Z có công thức cấu tạo: H₂N-CH[CH(CH₃)₂]-CO-NH-CH₂-CO-NH-CH(CH₂OH)-CO-NH-CH(CH₃)-COOH (Val-Gly-Ser-Ala).\nTrong peptide Z, amino acid đầu N là",
+        "refs": [
+          {
+            "where": "DB-12-B9-P2-D1-I-38.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "Không nêm/stereo nguồn.",
+    "phongApp": true,
+    "canvasWidth": 1100,
+    "canvasHeight": 440,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "svg": "cau-truc-ddh-a794b6dc35e031ecc12c2374e8378d853332a79d6a713cece08a6240420c7f4d.svg",
+    "hashSvg": "a794b6dc35e031ecc12c2374e8378d853332a79d6a713cece08a6240420c7f4d",
+    "byteSvg": 16961,
+    "smilesChuan": "CC(NC(=O)C(CO)NC(=O)CNC(=O)C(N)C(C)C)C(=O)O",
+    "congThuc": "C13H24N4O6",
+    "soNguyenTuNang": 23,
+    "rdkit": "2026.09.1",
+    "trangThai": "da-soat-doc-lap",
+    "hashSvgDaSoat": "a794b6dc35e031ecc12c2374e8378d853332a79d6a713cece08a6240420c7f4d",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 814,
+    "hash": "969dc1ed72ac05e46c6fe936c5fe3ed20a92a1cb19742dbd9599a676c2c22a07",
+    "fileNguon": "anh/969dc1ed72ac05e46c6fe936c5fe3ed20a92a1cb19742dbd9599a676c2c22a07.png",
+    "daMoPNG": true,
+    "caption": [],
+    "columns": 2,
+    "panels": [
+      {
+        "smiles": "CC(N)C(=O)NCC(=O)O",
+        "caption": [
+          "(1)"
+        ],
+        "notes": "Ala–Gly;1NH peptide;Ala methyl xuống.",
+        "methylTuongMinh": true
+      },
+      {
+        "smiles": "CC(N)C(=O)NC(C)C(=O)O",
+        "caption": [
+          "(2)"
+        ],
+        "notes": "Ala–Ala;1NH;hai methyl đầu xuống/cuối lên.",
+        "methylTuongMinh": true
+      },
+      {
+        "smiles": "CC(N)C(=O)OCC(=O)O",
+        "caption": [
+          "(3)"
+        ],
+        "notes": "Ala ester với HOCH₂COOH;O nối hai phần, KHÔNG NH peptide.",
+        "methylTuongMinh": true
+      },
+      {
+        "smiles": "NCCC(=O)NCC(=O)O",
+        "caption": [
+          "(4)"
+        ],
+        "notes": "beta-Ala–Gly:2CH₂ trướcC=O đầu,1NH peptide."
+      }
+    ],
+    "notes": "4panel trái→phải;nguồn có chữ vụn cắt trên mép không thành nhãn,không phục dựng. Khôngstereo/circle/charges.",
+    "questions": [
+      {
+        "qid": "VIP27-C3-B11-D1-I-7",
+        "de": "Cho các chất có công thức cấu tạo sau:\nTrong các hợp chất trên, những hợp chất nào thuộc loại dipeptide?",
+        "refs": [
+          {
+            "where": "VIP27-C3-B11-D1-I-7.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "Không nêm/stereo nguồn.",
+    "phongApp": true,
+    "kind": "grid",
+    "svg": "cau-truc-ddh-0d44a134f2e9e2f8f367769d9f08eaf74dc0e7a6f218bac07503288bab368d50.svg",
+    "hashSvg": "0d44a134f2e9e2f8f367769d9f08eaf74dc0e7a6f218bac07503288bab368d50",
+    "byteSvg": 45264,
+    "panelsRendered": [
+      {
+        "panel": 1,
+        "smiles": "CC(N)C(=O)NCC(=O)O",
+        "text": null,
+        "caption": [
+          "(1)"
+        ],
+        "hashSvg": "4ff04965acd68deebb46102298088d151de50ed5727c88bf9a8c3fb10d765240",
+        "svg": "cau-truc-4ff04965acd68deebb46102298088d151de50ed5727c88bf9a8c3fb10d765240.svg",
+        "congThuc": "C5H10N2O3"
+      },
+      {
+        "panel": 2,
+        "smiles": "CC(N)C(=O)NC(C)C(=O)O",
+        "text": null,
+        "caption": [
+          "(2)"
+        ],
+        "hashSvg": "ec98ec1b341f52369008895afe65069402f599f92ed0763df49e6855020ff3ed",
+        "svg": "cau-truc-ec98ec1b341f52369008895afe65069402f599f92ed0763df49e6855020ff3ed.svg",
+        "congThuc": "C6H12N2O3"
+      },
+      {
+        "panel": 3,
+        "smiles": "CC(N)C(=O)OCC(=O)O",
+        "text": null,
+        "caption": [
+          "(3)"
+        ],
+        "hashSvg": "a2240d90bdd32f8c668fc2dbc2d1895dccd847a0b219e5f69e6385f2a7455666",
+        "svg": "cau-truc-a2240d90bdd32f8c668fc2dbc2d1895dccd847a0b219e5f69e6385f2a7455666.svg",
+        "congThuc": "C5H9NO4"
+      },
+      {
+        "panel": 4,
+        "smiles": "NCCC(=O)NCC(=O)O",
+        "text": null,
+        "caption": [
+          "(4)"
+        ],
+        "hashSvg": "f54005919480a1223cf3dd9c1bcf6eb6a1bf32319324fd21162bb4fcfcc7a82b",
+        "svg": "cau-truc-f54005919480a1223cf3dd9c1bcf6eb6a1bf32319324fd21162bb4fcfcc7a82b.svg",
+        "congThuc": "C5H10N2O3"
+      }
+    ],
+    "trangThai": "da-soat-doc-lap",
+    "boCuc": "Giữ thứ tự và nhãn nguồn, tối đa2cột để rõ trên màn hình hẹp.",
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashSvgDaSoat": "0d44a134f2e9e2f8f367769d9f08eaf74dc0e7a6f218bac07503288bab368d50",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 1039,
+    "hash": "bb54837bc4e497e34d71629d974b7f3de8135bee2dd4d3287a5d94990c9403a5",
+    "fileNguon": "anh/bb54837bc4e497e34d71629d974b7f3de8135bee2dd4d3287a5d94990c9403a5.png",
+    "daMoPNG": true,
+    "caption": [],
+    "smiles": "NCC(=O)NC(CCCCN)C(=O)NC(CCC(=O)O)C(=O)O",
+    "notes": "Gly–Lys–Glu. Lys nhánh4CH₂–NH₂ lên; Glu alphaCOOH xuống và nhánh2CH₂COOH sang phải. 2NH peptide hiệnH,2NH₂ tựdo. Khôngnêm/caption/circle/charges.",
+    "questions": [
+      {
+        "qid": "DB-12-B9-P2-D2-III-104",
+        "de": "Cho peptide X có cấu tạo như sau: Khi thủy phân hoàn toàn X thu được bao nhiêu amino acid?",
+        "refs": [
+          {
+            "where": "DB-12-B9-P2-D2-III-104.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B11-D2-III-1",
+        "de": "Cho peptide X có cấu tạo như sau: Khi thủy phân hoàn toàn X thu được bao nhiêu amino acid?",
+        "refs": [
+          {
+            "where": "DH-12-C3-B11-D2-III-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "Không nêm/stereo nguồn.",
+    "phongApp": true,
+    "canvasWidth": 1100,
+    "canvasHeight": 440,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "svg": "cau-truc-ddh-c23d600d6a7e63106ac7c55ac289bdf20ca538d19ce322bd69dfabb1d4c4e9c7.svg",
+    "hashSvg": "c23d600d6a7e63106ac7c55ac289bdf20ca538d19ce322bd69dfabb1d4c4e9c7",
+    "byteSvg": 18420,
+    "smilesChuan": "NCCCCC(NC(=O)CN)C(=O)NC(CCC(=O)O)C(=O)O",
+    "congThuc": "C13H24N4O6",
+    "soNguyenTuNang": 23,
+    "rdkit": "2026.09.1",
+    "trangThai": "da-soat-doc-lap",
+    "hashSvgDaSoat": "c23d600d6a7e63106ac7c55ac289bdf20ca538d19ce322bd69dfabb1d4c4e9c7",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 256,
+    "hash": "2c0a4082de9d8b5bb77cc09e8f85eef59bd161fa30218711e0e83d410fb02bb5",
+    "fileNguon": "anh/2c0a4082de9d8b5bb77cc09e8f85eef59bd161fa30218711e0e83d410fb02bb5.png",
+    "daMoPNG": true,
+    "caption": [],
+    "columns": 2,
+    "panels": [
+      {
+        "smiles": "CCCN",
+        "caption": [
+          "(1)"
+        ]
+      },
+      {
+        "smiles": "CCCCN",
+        "caption": [
+          "(2)"
+        ]
+      },
+      {
+        "smiles": "CNc1ccccc1",
+        "caption": [
+          "(3)"
+        ],
+        "notes": "N-methylaniline,NH rõ;vòng3đôi khôngcircle.",
+        "methylTuongMinh": true
+      },
+      {
+        "smiles": "NC1CCCCC1",
+        "caption": [
+          "(4)"
+        ]
+      },
+      {
+        "smiles": "CCNCC",
+        "caption": [
+          "(5)"
+        ],
+        "notes": "Diethylamine,NH explicitH dưới."
+      },
+      {
+        "smiles": "CCN(C)CC",
+        "caption": [
+          "(6)"
+        ],
+        "notes": "Diethylmethylamine,nhánhN xuống1C,khôngHtrênN."
+      }
+    ],
+    "notes": "6chất nguồn2hàng3cột đọc1..6;reflow2cộtgiữnhãn. Khôngcharges/stereo.",
+    "questions": [
+      {
+        "qid": "DB-12-B8-D1-III-415",
+        "de": "Cho các amine có công thức cấu tạo dưới đây: Có bao nhiêu chất thuộc loại arylamine?",
+        "refs": [
+          {
+            "where": "DB-12-B8-D1-III-415.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B8-III-12",
+        "de": "Cho các amine có công thức cấu tạo dưới đây: Có bao nhiêu chất thuộc loại arylamine?",
+        "refs": [
+          {
+            "where": "DH-12-C3-B8-III-12.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "Không nêm/stereo nguồn.",
+    "phongApp": true,
+    "kind": "grid",
+    "svg": "cau-truc-ddh-6cf79847fc9cfe6fafe446edd882dbba0a85fcf176a8f22258872559ba45fb3a.svg",
+    "hashSvg": "6cf79847fc9cfe6fafe446edd882dbba0a85fcf176a8f22258872559ba45fb3a",
+    "byteSvg": 29705,
+    "panelsRendered": [
+      {
+        "panel": 1,
+        "smiles": "CCCN",
+        "text": null,
+        "caption": [
+          "(1)"
+        ],
+        "hashSvg": "966258727ae881d6efcf816b44629eaf8907e917b0c473383e0441445de4c633",
+        "svg": "cau-truc-966258727ae881d6efcf816b44629eaf8907e917b0c473383e0441445de4c633.svg",
+        "congThuc": "C3H9N"
+      },
+      {
+        "panel": 2,
+        "smiles": "CCCCN",
+        "text": null,
+        "caption": [
+          "(2)"
+        ],
+        "hashSvg": "bd1f6a28763752d506bba2440ecff7e4dc16ca36f0c475b74984723387b6ebac",
+        "svg": "cau-truc-bd1f6a28763752d506bba2440ecff7e4dc16ca36f0c475b74984723387b6ebac.svg",
+        "congThuc": "C4H11N"
+      },
+      {
+        "panel": 3,
+        "smiles": "CNc1ccccc1",
+        "text": null,
+        "caption": [
+          "(3)"
+        ],
+        "hashSvg": "71b4eade18843670d0c00f4e94b536c652a3de8cc3a8a4e2773dc28e9c44872f",
+        "svg": "cau-truc-71b4eade18843670d0c00f4e94b536c652a3de8cc3a8a4e2773dc28e9c44872f.svg",
+        "congThuc": "C7H9N"
+      },
+      {
+        "panel": 4,
+        "smiles": "NC1CCCCC1",
+        "text": null,
+        "caption": [
+          "(4)"
+        ],
+        "hashSvg": "0b235ace36b5e3ce3ba0cf1b9df3be1a61cc575bce8e47493ed48d9ddf2d4876",
+        "svg": "cau-truc-0b235ace36b5e3ce3ba0cf1b9df3be1a61cc575bce8e47493ed48d9ddf2d4876.svg",
+        "congThuc": "C6H13N"
+      },
+      {
+        "panel": 5,
+        "smiles": "CCNCC",
+        "text": null,
+        "caption": [
+          "(5)"
+        ],
+        "hashSvg": "8a58280b5f82e9f68dcdac66e13b593d94a5fad0c636c62efed17debecff2b2b",
+        "svg": "cau-truc-8a58280b5f82e9f68dcdac66e13b593d94a5fad0c636c62efed17debecff2b2b.svg",
+        "congThuc": "C4H11N"
+      },
+      {
+        "panel": 6,
+        "smiles": "CCN(C)CC",
+        "text": null,
+        "caption": [
+          "(6)"
+        ],
+        "hashSvg": "54142d22c57e8af8e414e8e34fd552fb000b489e20bba5600e3bd05cb0c22ec1",
+        "svg": "cau-truc-54142d22c57e8af8e414e8e34fd552fb000b489e20bba5600e3bd05cb0c22ec1.svg",
+        "congThuc": "C5H13N"
+      }
+    ],
+    "trangThai": "da-soat-doc-lap",
+    "boCuc": "Giữ thứ tự và nhãn nguồn, tối đa2cột để rõ trên màn hình hẹp.",
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashSvgDaSoat": "6cf79847fc9cfe6fafe446edd882dbba0a85fcf176a8f22258872559ba45fb3a",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 263,
+    "hash": "2ce2344041df072a2c7bdb2ce8fa2da1231c7434b5d6cf24e1aa8268d676ca53",
+    "fileNguon": "anh/2ce2344041df072a2c7bdb2ce8fa2da1231c7434b5d6cf24e1aa8268d676ca53.png",
+    "daMoPNG": true,
+    "caption": [],
+    "columns": 2,
+    "panels": [
+      {
+        "smiles": "CC/C=C\\C",
+        "caption": [
+          "(1)"
+        ],
+        "notes": "pent-2-ene Z:hai nhánh carbon phíaTRÊN C=C trongnguồn."
+      },
+      {
+        "smiles": "Cc1ccccc1C",
+        "caption": [
+          "(2)"
+        ],
+        "notes": "ortho-xylene,3đôi,khôngcircle."
+      },
+      {
+        "smiles": "CCCCC",
+        "caption": [
+          "(3)"
+        ],
+        "notes": "pentane5C."
+      },
+      {
+        "smiles": "CC#CCC",
+        "caption": [
+          "(4)"
+        ],
+        "notes": "pent-2-yne5C;đầu tráiCH₃→C≡C→CH₂→CH₃."
+      }
+    ],
+    "notes": "4paneltheothứtự1..4,khôngcharge/captiontên. GiữZpanel1.",
+    "questions": [
+      {
+        "qid": "11-C4-B17-I-3",
+        "de": "Cho bốn hydrocarbon có công thức cấu tạo như hình dưới.\nTên nào không đúng với một trong các hydrocarbon trên?",
+        "refs": [
+          {
+            "where": "11-C4-B17-I-3.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "Không nêm/CIP nguồn; giữ EZ khi panel263(1) Z.",
+    "phongApp": true,
+    "kind": "grid",
+    "svg": "cau-truc-ddh-abf2fc1ad960dd0a2f71c51a4c8b82e92ae18953a14ffed7dd1e8292dc2bbfef.svg",
+    "hashSvg": "abf2fc1ad960dd0a2f71c51a4c8b82e92ae18953a14ffed7dd1e8292dc2bbfef",
+    "byteSvg": 12975,
+    "panelsRendered": [
+      {
+        "panel": 1,
+        "smiles": "CC/C=C\\C",
+        "text": null,
+        "caption": [
+          "(1)"
+        ],
+        "hashSvg": "1c6655a8e5b236e8d72fd5c41402809e994a1d4fe6c59c09027dd72ba076b9d2",
+        "svg": "cau-truc-1c6655a8e5b236e8d72fd5c41402809e994a1d4fe6c59c09027dd72ba076b9d2.svg",
+        "congThuc": "C5H10"
+      },
+      {
+        "panel": 2,
+        "smiles": "Cc1ccccc1C",
+        "text": null,
+        "caption": [
+          "(2)"
+        ],
+        "hashSvg": "88f722bdf639db840e09da912cde877f5a1da1965b1e334560dd8b18b1cd8d19",
+        "svg": "cau-truc-88f722bdf639db840e09da912cde877f5a1da1965b1e334560dd8b18b1cd8d19.svg",
+        "congThuc": "C8H10"
+      },
+      {
+        "panel": 3,
+        "smiles": "CCCCC",
+        "text": null,
+        "caption": [
+          "(3)"
+        ],
+        "hashSvg": "487a35ef20aa299b223fbcbe38d663900116bc56b3e5569a7c5c7789fdec786b",
+        "svg": "cau-truc-487a35ef20aa299b223fbcbe38d663900116bc56b3e5569a7c5c7789fdec786b.svg",
+        "congThuc": "C5H12"
+      },
+      {
+        "panel": 4,
+        "smiles": "CC#CCC",
+        "text": null,
+        "caption": [
+          "(4)"
+        ],
+        "hashSvg": "147682fc666249d4a5b147c7a8c51b6f059a04a7e623526085875bd3c026049c",
+        "svg": "cau-truc-147682fc666249d4a5b147c7a8c51b6f059a04a7e623526085875bd3c026049c.svg",
+        "congThuc": "C5H8"
+      }
+    ],
+    "trangThai": "da-soat-doc-lap",
+    "boCuc": "Giữ thứ tự và nhãn nguồn, tối đa2cột để rõ trên màn hình hẹp.",
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashSvgDaSoat": "abf2fc1ad960dd0a2f71c51a4c8b82e92ae18953a14ffed7dd1e8292dc2bbfef",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 442,
+    "hash": "4f9a194a91bfe6d792c41fd3f5e53c09ac8cedd0f19f344e1b3e0e212f3a8cab",
+    "fileNguon": "anh/4f9a194a91bfe6d792c41fd3f5e53c09ac8cedd0f19f344e1b3e0e212f3a8cab.png",
+    "daMoPNG": true,
+    "caption": [],
+    "columns": 2,
+    "panels": [
+      {
+        "smiles": "[Na+].CCCCCCCCCCCCCCCC(=O)[O-]",
+        "caption": [
+          "sodium palmitate"
+        ],
+        "notes": "16Ctổng gồmcarbonyl,nguồngiữONa gộp.",
+        "terminalONa": true
+      },
+      {
+        "smiles": "[Na+].CCCCCCCCCCCCOS(=O)(=O)[O-]",
+        "caption": [
+          "sodium lauryl sulfate"
+        ],
+        "notes": "12Calkyl,PHẢIOtrướcS;2S=O,ONa gộp.",
+        "terminalONa": true
+      }
+    ],
+    "notes": "Hai panel trái/phải,khôngstereo/circle/iondấuriêng. Khôngsửathànhsulfonate.",
+    "questions": [
+      {
+        "qid": "DB-12-B2-D1-II-188",
+        "de": "Cho các chất có công thức cấu tạo và tên gọi sau:",
+        "refs": [
+          {
+            "where": "DB-12-B2-D1-II-188.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B2-II-6",
+        "de": "Cho các chất có công thức cấu tạo và tên gọi sau:",
+        "refs": [
+          {
+            "where": "DH-12-C1-B2-II-6.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "circle": false,
+    "explicitH": "Theo notes: giữ H trên NH amide và H alpha được viết ở1274; không thêm H nguồn khônghiện.",
+    "stereo": "Không nêm/stereo nguồn.",
+    "phongApp": true,
+    "kind": "grid",
+    "panelWidth": 640,
+    "panelHeight": 240,
+    "svg": "cau-truc-ddh-68bccb074aca276e0522a8362b9cfed4deeacfbb2ce8a7cffc4af951d3032f37.svg",
+    "hashSvg": "68bccb074aca276e0522a8362b9cfed4deeacfbb2ce8a7cffc4af951d3032f37",
+    "byteSvg": 35489,
+    "panelsRendered": [
+      {
+        "panel": 1,
+        "smiles": "[Na+].CCCCCCCCCCCCCCCC(=O)[O-]",
+        "text": null,
+        "caption": [
+          "sodium palmitate"
+        ],
+        "hashSvg": "2228a6a654f59bfdc4e74a48416dce85819342554215cc3049814da27d83b7b3",
+        "svg": "cau-truc-2228a6a654f59bfdc4e74a48416dce85819342554215cc3049814da27d83b7b3.svg",
+        "congThuc": "C16H31NaO2"
+      },
+      {
+        "panel": 2,
+        "smiles": "[Na+].CCCCCCCCCCCCOS(=O)(=O)[O-]",
+        "text": null,
+        "caption": [
+          "sodium lauryl sulfate"
+        ],
+        "hashSvg": "06bd35d49869fffc09920dc9ec2857ff13783911bc797f108a500e8fff10c5b9",
+        "svg": "cau-truc-06bd35d49869fffc09920dc9ec2857ff13783911bc797f108a500e8fff10c5b9.svg",
+        "congThuc": "C12H25NaO4S"
+      }
+    ],
+    "trangThai": "da-soat-doc-lap",
+    "boCuc": "Giữ thứ tự và nhãn nguồn, tối đa2cột để rõ trên màn hình hẹp.",
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashSvgDaSoat": "68bccb074aca276e0522a8362b9cfed4deeacfbb2ce8a7cffc4af951d3032f37",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

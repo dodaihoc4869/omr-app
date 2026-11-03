@@ -1,0 +1,116 @@
+{
+  "nguoiTraCuu": "soat_nguon_3",
+  "phamVi": "Chỉ đọc mã; đã đọc AGENTS.md và CLAUDE.md; không sửa repository",
+  "chuaBatHinh": true,
+  "chuaPhatHanh": true,
+  "render": [
+    {
+      "ref": "src/components/QuestionMedia.tsx:15",
+      "noiDung": "ZoomableImage/ManHinhAnh/CauHinh/HinhTaiViTri dùng src trực tiếp; CauHinh có data-vt, lazy/async; zoom phải dùng cùng URL đã giải quyết và fallback."
+    },
+    {
+      "ref": "src/components/TheCau.tsx:262",
+      "noiDung": "Phương án xáo dùng origIdx; choiceImgs ở284 max-h-14 (56px), grouped sau_pa ở285 maxHeight112 là img trực tiếp, không qua CauHinh. thanCauImg475, imageDataUrl486, cuoi_cau489 cũng cần nối."
+    },
+    {
+      "ref": "src/components/hoc-tap/LamCau.tsx:179",
+      "noiDung": "Ảnh grouped phương án196 nằm trong nút chọn đáp án; không lồng nút zoom hoặc để click zoom chọn đáp án. NoiDung114, feedback429, solution459 cũng có đường ảnh riêng."
+    },
+    {
+      "ref": "src/components/hoc-tap/hoc-tap.css:148",
+      "noiDung": "Ảnh nhỏ max-height112px; grid vector dài sẽ khó đọc. Cần kiểm360px và cung cấp zoom ở mọi đường img."
+    },
+    {
+      "ref": "src/index.css:183",
+      "noiDung": "cau-hinh img có background var(--giay), width giới hạn100%; vector canNenSang cần nền sáng thật ở dark mode, không suy từ chú thích CSS."
+    },
+    {
+      "ref": "src/lib/html-phieu.ts:198",
+      "noiDung": "HTML xuất dùng img trực tiếp; vốn dataURL tự chứa. URL vector đòi hỏi chuẩn bị bản tự chứa khi xuất offline."
+    },
+    {
+      "ref": "src/components/hoa2/pdf-cau-da-lam.ts:97",
+      "noiDung": "PDF có img crossorigin anonymous, nhiều đường body/choice/idea;332–344 đợi ảnh Promise.all tối đa8s trước html2canvas. Chuẩn bị URL cùng origin/cache trước xuất."
+    }
+  ],
+  "dinhDanh": [
+    {
+      "ref": "src/data/examContent.ts:22",
+      "noiDung": "HinhAnh src/viTri/alt; vị trí sau_de/sau_pa_A-D/sau_y_a-d/cuoi_cau/sau_loi_giai. Thứ tự ảnh và chữ phương án gốc có nghĩa."
+    },
+    {
+      "ref": "src/lib/exam-kho-de-import.ts:400",
+      "noiDung": "hinh[].du_lieu/vi_tri chuyển sang hinhAnh[].src/viTri giữ thứ tự."
+    },
+    {
+      "ref": "server/src/game-v2-bank.ts:43",
+      "noiDung": "contentGroup62 băm cả nguồn ảnh/nhóm ảnh (trừ sau_loi_giai), versionCau67 băm group+correct. Không thay src trong kho/index trước phép băm."
+    },
+    {
+      "ref": "server/src/cau-theo-qid.ts:135",
+      "noiDung": "Whitelist public loại ảnh sau_loi_giai trước nộp. Manifest công khai không được mang đáp án/lời giải."
+    },
+    {
+      "ref": "server/src/kho-anh.ts:18",
+      "noiDung": "/anh/<hash> immutable1năm; hash26 là SHA256 toàn chuỗi dataURL, không phải bytehash. Giữ nguyên URL và object cũ, không ghi SVG đè PNG."
+    },
+    {
+      "ref": "src/lib/anh-len-may-chu.ts:15",
+      "noiDung": "Hash toàn chuỗi, dedup Set dataURL; tải lên băm64 Promise.all, hỏi thiếu<=1000,3lô song song1.5MB. taiSanAnhDe94 chỉ6 new Image song song làm ấm HTTPcache, không bảo đảm offline."
+    },
+    {
+      "ref": "scripts/xuat-hinh-kho-0311.mjs:37",
+      "noiDung": "hash nguồn = SHA256 bytes giải mã. hashDataUrl với input dataURL là SHA256 chuỗi dataURL; với input R2 URL lại là SHA256 chuỗi URL. sourceHash là hash trong URL R2; phải phân biệt alias. where chỉ đường thuộc tính/index, không chứa giá trị viTri."
+    },
+    {
+      "ref": "docs/hinh-vector-0311/kiem/danh-muc-da-kiem.json",
+      "noiDung": "theoHashNguon dùng SHA256 bytes gốc; hashSvg dùng bytes SVG. Chỉ ánh xạ nguồn đúng hash đã đạt."
+    }
+  ],
+  "offline": [
+    {
+      "ref": "src/sw.ts:134",
+      "noiDung": "Chỉ nhận200 khôngHTML. Route assets141 CacheFirst320/30ngày; ảnh149 same-origin SWR60/30ngày. Worker /anh cross-origin không thuộc route này;60ảnh không giữ toàn kho."
+    },
+    {
+      "ref": "vite.config.ts:369",
+      "noiDung": "globPatterns bao gồmSVG/ảnh; cần loại prefix kho vector khỏi precache và dùng cache riêng."
+    },
+    {
+      "ref": "scripts/kiem-sw.mjs:60",
+      "noiDung": "Gate precache170file/3000KB; không nhét toàn kho vào shell precache."
+    },
+    {
+      "ref": "src/lib/nap-truoc-kho-hs.ts:21",
+      "noiDung": "Loader5s+idle yêu cầu CacheAPI/SWcontroller, tránh saveData/2G, chỉ JS/CSS manifest; fetch tuần tự lowpriority, pause hidden, rejectHTML. Không phải preload vector."
+    },
+    {
+      "ref": "src/lib/hinh-ve/tai.ts:8",
+      "noiDung": "Pipeline scene qid khác: localStorage ddh.hv.v1,max300scene,TTL6h/negative30min, batch40ms/chunk60. Không đủ lưu toàn kho ảnh tĩnh."
+    },
+    {
+      "ref": "src/components/hinh-ve/HinhVeLaiCuaCau.tsx:6",
+      "noiDung": "Đếm scene đủ ảnh body/end rồi hv-thay; CSS hinh-ve.css69 ẩn nguồn theo số lượng. Không dùng số lượng này để xác nhận nguồn bytehash khớp/coverage mới."
+    },
+    {
+      "ref": "src/lib/hinh-ve/kieu.ts:14",
+      "noiDung": "CanhSvg scene qua sanitizer subset/color tokens. Không nhét path-only asset vào đây nếu chưa kiểm giữ nguyên transform/fill/glyph."
+    },
+    {
+      "ref": "src/components/ExperimentDemo.tsx:20",
+      "noiDung": "ExperimentOriginal có thể bọc/ẩn hình nhận diện thí nghiệm; cần tránh hiển thị trùng hoặc ẩn nhầm vector."
+    },
+    {
+      "noiDung": "Tra cứu src/server chưa thấy quản lý quota/persist dành cho tải toàn kho vector. HTTP Image.onload không đồng nghĩa CacheStorage hoàn tất."
+    }
+  ],
+  "diemNoiDeXuat": [
+    "Một resolver src dùng chung chỉ ở lớp trình bày, bao phủ CauHinh và tất cả img trực tiếp/zoom/HTML/PDF; giữ object nguồn, content_group/version, answers, thứ tự/viTri và origIdx.",
+    "Sinh manifest nhỏ ở build từ inventory refs + catalog đạt: canonical bytehash→hashSvg; alias R2sourceHash→SVG URL tra đồng bộ; alias dataURLstringHash→SVG URL. Với URL input không nhầm hashDataUrl thành hash dataURI. qid+vịtrí+ordinal chỉ hỗ trợ kiểm coverage, không thay kiểm nội dung.",
+    "SVG dùng URL cùng origin mới /hinh-vector/<hashSvg>.svg, giữ immutableURL /anh cũ. Manifest load1 sharedPromise; digest dataURI chỉ1lần/chuỗi duy nhất bằng memo và in-flightPromise. Chuẩn bị theo batch khi nhận câu/idle, không hash base64 toàn kho lúc mở app, không await nối tiếp từng ảnh.",
+    "Fallback nguyên src khi chưa đạt/không có alias/lỗi tải; zoom dùng cùng kết quả. Không đánh dấu hoàn tất hay ẩn ảnh cũ chỉ bằng số lượng scene.",
+    "CacheFirst prefix vector riêng trước generic image route; kiểm status/MIME để chặn HTMLfallback. Dedup theo hashSvg,2–4 tải đồng thời, ưu tiên câu hiện tại rồi idle cả kho; không new Image decode toàn kho.",
+    "Manifest có tổng byte/hashes; tiến độ resumable dựa CacheStorage thật. storage.estimate nếu có; bắt quotaerror, không xóa cache app khác. persist tùy hỗ trợ, không hứa chống OS eviction. Chỉ dọn phiên cũ sau khi manifest mới hoàn tất; giữ fallback offline.",
+    "Trước tích hợp cần kiểm group/version không đổi; alias 3 loại hash; xáo phương án/viTri; không lộ solution trước nộp; dark/light360px và zoom; HTML/PDF; offline reload/SW mới/quota tải dở; gate precache170/3000KB."
+  ]
+}

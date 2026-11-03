@@ -1,0 +1,42 @@
+[
+  {
+    "i": 28,
+    "hashSvg": "c4b6aad1ba50df02073f7ea508c79caf675908dc2cffeeafe33d9bf094de0437",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở riêng từng PNGnguồn+renderSVGthật,không duyệt chỉ theo template. Glutamic đủ2CH2 giữa2COOH/2carbonylup,khôngnhãn(1)(2). NH2alpha nêmđặc xuống/đầu nhỏCalpha,chuỗitrêntrái/COOHtrênphải giữstereo vàHẩnnguồn;khôngcharge/nhãn thêm. Bond/vertexCẩn/glyphDDH đúng,khôngchạm/cắt/tràn,path-only/SHA256khớp.",
+    "hash": "063cf2885c96848e88be3c7cc19b1700087115a16152d02edfcc81c7ce02a10c",
+    "hashSvgDaSoat": "c4b6aad1ba50df02073f7ea508c79caf675908dc2cffeeafe33d9bf094de0437"
+  },
+  {
+    "i": 286,
+    "hashSvg": "094d39ec0cbcde84a2f6ebc484c17e08136eaf30982b5d3dac63a1109de16b3e",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở riêng từng PNGnguồn+renderSVGthật,không duyệt chỉ theo template. Lysine đủ4CH2 giữaNterminal vàCalpha,COOHphải/carbonylup. NH2alpha nêmđặc xuống/đầu nhỏCalpha,chuỗitrêntrái/COOHtrênphải giữstereo vàHẩnnguồn;khôngcharge/nhãn thêm. Bond/vertexCẩn/glyphDDH đúng,khôngchạm/cắt/tràn,path-only/SHA256khớp.",
+    "hash": "309b98b043551cb20b9126285b3699dd83e02d6fff3288c9337e3c81db9ddd8e",
+    "hashSvgDaSoat": "094d39ec0cbcde84a2f6ebc484c17e08136eaf30982b5d3dac63a1109de16b3e"
+  },
+  {
+    "i": 1114,
+    "hashSvg": "c4b6aad1ba50df02073f7ea508c79caf675908dc2cffeeafe33d9bf094de0437",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở riêng từng PNGnguồn+renderSVGthật,không duyệt chỉ theo template. Glutamic đủ2CH2 giữa2COOH/2carbonylup,khôngnhãn(1)(2). NH2alpha nêmđặc xuống/đầu nhỏCalpha,chuỗitrêntrái/COOHtrênphải giữstereo vàHẩnnguồn;khôngcharge/nhãn thêm. Bond/vertexCẩn/glyphDDH đúng,khôngchạm/cắt/tràn,path-only/SHA256khớp.",
+    "hash": "c89880dbaf6b5be869cf3154def78ccccd442d6a07273a88ca04dcbc199badc0",
+    "hashSvgDaSoat": "c4b6aad1ba50df02073f7ea508c79caf675908dc2cffeeafe33d9bf094de0437"
+  },
+  {
+    "i": 1125,
+    "hashSvg": "f007de27c8bc29a69efb2d38ec1297eb6702711c4687cc7cbf5d2b8e3e847c00",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đãso riêngPNGnguồn+SVG renderthật,đếmtừng12Calkyl+6Cvòng,benzenepara3đôivòng,S(=O)2ONaexpandedđủ3O/2S=O/ONa,khôngthêmcharge/H/caption. Khôngduyệttừtemplate;mọiglyphbondnốiđúngatom,O/N/H/chỉsốDDHpathrõ,khôngchạm/cắt/tràn.",
+    "hash": "ca93b34a36f26ae7c29d1afee7d46ec9d97daa8775a7c6a792f689829f2ca754",
+    "hashSvgDaSoat": "f007de27c8bc29a69efb2d38ec1297eb6702711c4687cc7cbf5d2b8e3e847c00"
+  },
+  {
+    "i": 1274,
+    "hashSvg": "13945a8905a3d2fcc517e7ceee6e62ba5279c9a4e374138afd8a58b1dca30cde",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đãso riêngPNGnguồn+SVG renderthật:Val–Gly–Ala10C/3N/4O,3C=O vàOHcuối;ValCalphaHdown/nhánhCexplicitHupvà2CH3;GlyCalpha2Hup/down;AlaCalphaHdown/CH3up;giữ2NpeptidevớiHupvàH2Nđầu,khôngnêm/charge/captionmới. Khôngduyệttừtemplate;mọiglyphbondnốiđúngatom,O/N/H/chỉsốDDHpathrõ,khôngchạm/cắt/tràn.",
+    "hash": "e7a0d2905d09fd8d538d510cb50e6334a30515ea98a7cf6bbd6a9092c5e24eb5",
+    "hashSvgDaSoat": "13945a8905a3d2fcc517e7ceee6e62ba5279c9a4e374138afd8a58b1dca30cde"
+  }
+]

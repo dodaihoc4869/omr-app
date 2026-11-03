@@ -1,0 +1,42 @@
+[
+  {
+    "i": 791,
+    "hash": "936532a77710c9ce4480908c47bc871be308f87a67b9f5a14bc569f195c958e6",
+    "file": "anh/936532a77710c9ce4480908c47bc871be308f87a67b9f5a14bc569f195c958e6.png",
+    "baseI": 813,
+    "baseHash": "969179cd4f54af607ab66a9e6c79e6ddd89797c9d7c9e02ec15854567133d8d0",
+    "baseFile": "anh/969179cd4f54af607ab66a9e6c79e6ddd89797c9d7c9e02ec15854567133d8d0.png",
+    "baseSvg": "do-thi-ddh-651fa08a6013179859407b22035afd377be0cf0dbf4d5a05d11e2b9be432643b.svg",
+    "baseHashSvg": "651fa08a6013179859407b22035afd377be0cf0dbf4d5a05d11e2b9be432643b",
+    "score": 2.003,
+    "ph": 2,
+    "dh": 0,
+    "ratio": 0,
+    "refs": 1,
+    "tepSVG": "do-thi-ddh-651fa08a6013179859407b22035afd377be0cf0dbf4d5a05d11e2b9be432643b.svg",
+    "hashSvgDaMo": "651fa08a6013179859407b22035afd377be0cf0dbf4d5a05d11e2b9be432643b",
+    "phuongPhap": "Fingerprint chỉ chọn ứng viên; đã mở từng PNG ứng viên, PNG base và SVG render thật.",
+    "refsQid": [
+      "12-KT-C123-D1-II-3"
+    ],
+    "baseSvgRenderDaXem": "/workspace/scratch/trung-lo71/791-base-svg.png",
+    "lichSuNhanDinhCu": {
+      "ketLuan": "Khác chi tiết; phải dựng biến thể, không alias",
+      "khacBietCanDungLai": [
+        "Bỏ đường chiếu ngang nét đứt mức80 từtrụcy tớiđiểm(6,80); giữ các guidekhác."
+      ],
+      "bangChung": "Đã mở PNG791, PNG813 và SVG render thật. Cùng điểm/trục, nhưng PNG791 chỉ có đường chiếu ngang ở180/140/100/60, KHÔNG có đường chiếu ngang mức80 tới điểm(6,80). Base813 vàSVG có nét này. Phải bỏ riêng nétđứt80 trước khi dùng, không alias nguyên byte."
+    },
+    "nguoiDocNguon": "soat_nguon_2",
+    "fileNguon": "anh/936532a77710c9ce4480908c47bc871be308f87a67b9f5a14bc569f195c958e6.png",
+    "svg": "do-thi-ddh-651fa08a6013179859407b22035afd377be0cf0dbf4d5a05d11e2b9be432643b.svg",
+    "hashSvg": "651fa08a6013179859407b22035afd377be0cf0dbf4d5a05d11e2b9be432643b",
+    "byteSvg": 24286,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChu": "Không bỏ guide80: bằng chứng pixel độc lập c6 xác nhận nét có thật. Chờ soát toàn bộ hình/hash trước ghi đạt.",
+    "hashSvgDaSoat": "651fa08a6013179859407b22035afd377be0cf0dbf4d5a05d11e2b9be432643b",
+    "nguoiSoat": "cau_truc_6"
+  }
+]

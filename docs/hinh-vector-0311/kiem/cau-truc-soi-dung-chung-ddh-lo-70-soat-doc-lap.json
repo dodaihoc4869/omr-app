@@ -1,0 +1,26 @@
+[
+  {
+    "i": 53,
+    "hashSvg": "3f19c5ad80f68c9c476bb3e0ed98fc431f8ba655cdd92c5b277283e073f0cf4b",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Đã mở lại riêng PNG nguồn và render SVG mới sau sửa. Đã có đủ 5 vạch tick nhô trái tại 0/20/40/60/80, không thêm grid ngang. Đúng 5 công thức CH3CH2NH2/CH3CHO/HCOOCH3/CH3CH2CH2NH2/CH3OH và 17/21/32/48/65 tương ứng, chiều cao tuyến tính0–80; khung4cạnh/nềnchấm/°C. DDH thân và chỉ số path-only, hash font khớp app; không chạm/cắt/tràn/mũi tên/caption mới.",
+    "hash": "0ae245a6e168e171106672de1423c292a43ba0bab1dfdf79948509ce152ec132",
+    "hashSvgDaSoat": "3f19c5ad80f68c9c476bb3e0ed98fc431f8ba655cdd92c5b277283e073f0cf4b"
+  },
+  {
+    "i": 366,
+    "hashSvg": "3f19c5ad80f68c9c476bb3e0ed98fc431f8ba655cdd92c5b277283e073f0cf4b",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Đã mở lại riêng PNG nguồn và render SVG mới sau sửa. Đã có đủ 5 vạch tick nhô trái tại 0/20/40/60/80, không thêm grid ngang. Đúng 5 công thức CH3CH2NH2/CH3CHO/HCOOCH3/CH3CH2CH2NH2/CH3OH và 17/21/32/48/65 tương ứng, chiều cao tuyến tính0–80; khung4cạnh/nềnchấm/°C. DDH thân và chỉ số path-only, hash font khớp app; không chạm/cắt/tràn/mũi tên/caption mới.",
+    "hash": "40a55b5df61abd555ff1903059749bbe99a4625dde7f211d667664898070180a",
+    "hashSvgDaSoat": "3f19c5ad80f68c9c476bb3e0ed98fc431f8ba655cdd92c5b277283e073f0cf4b"
+  },
+  {
+    "i": 1267,
+    "hashSvg": "d1a88ece6af784f7df5ccb98c86c45ab87ec5a72bae6cdf7d3b42a432f1fb527",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Nguồn này không có vạch tick nhô trái, SVG hiện khớp. Đã mở riêng PNG native và SVG render thật. Đúng 5 cột lần lượt CH3CH2NH2=17, CH3CHO=21, HCOOCH3=32, CH3CH2CH2NH2=48, CH3OH=65; chiều cao tuyến tính0–80. Đủ nhãn Nhiệt độ sôi (°C), khung4cạnh, nền chấm trong cột; không grid ngang/mũi tên/caption mới. DDH thân/chỉ số path-only, hash font khớp app, không chạm/cắt/tràn.",
+    "hash": "e5c153de395223d00a7d7bcbe0e9e06c72cb37a8e4c9a61304cdd4f0799b6423",
+    "hashSvgDaSoat": "d1a88ece6af784f7df5ccb98c86c45ab87ec5a72bae6cdf7d3b42a432f1fb527"
+  }
+]

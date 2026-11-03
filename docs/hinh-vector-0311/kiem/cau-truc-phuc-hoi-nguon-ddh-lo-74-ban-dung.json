@@ -1,0 +1,70 @@
+[
+  {
+    "i": 1153,
+    "hash": "d1012113fe6dda6d8c6f3a9c315dfebc5523b88fbb61e18521a18fa089428899",
+    "fileNguon": "anh/d1012113fe6dda6d8c6f3a9c315dfebc5523b88fbb61e18521a18fa089428899.png",
+    "daMoNative": true,
+    "bangChung": "Ảnhđích2hàng3cột,nhánhtrênpanel3bịcắt tại méptrên;không thấyđiểmcuốinhánhởnguồnđích.",
+    "questions": [
+      {
+        "qid": "DB-12-B8-D1-III-410",
+        "de": "Cho các amine có công thức cấu tạo dưới đây: Có bao nhiêu amine bậc một trong dãy các amine trên?",
+        "refs": [
+          {
+            "where": "DB-12-B8-D1-III-410.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B8-III-6",
+        "de": "Cho các amine có công thức cấu tạo dưới đây: Có bao nhiêu amine bậc một trong dãy các amine trên?",
+        "refs": [
+          {
+            "where": "DH-12-C3-B8-III-6.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "cau-truc-ddh-9c6a8e6b395cd0f1a86e0f2af5bfa46d3887c7682bf610a90095dcda17327f3e.svg",
+    "hashSvg": "9c6a8e6b395cd0f1a86e0f2af5bfa46d3887c7682bf610a90095dcda17327f3e",
+    "byteSvg": 26489,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "baseI": 60,
+    "baseHash": "0bc800ce21c3523dae2f6be493321ef438a09577ec64cd88a8c3124ef386ba60",
+    "bangChungKhoiPhuc": "doc-nguon-cat-1153.json",
+    "panels": [
+      {
+        "index": 1,
+        "smiles": "CCCN"
+      },
+      {
+        "index": 2,
+        "smiles": "CCCCN"
+      },
+      {
+        "index": 3,
+        "smiles": "CC(N)CC"
+      },
+      {
+        "index": 4,
+        "smiles": "NC1CCCCC1"
+      },
+      {
+        "index": 5,
+        "smiles": "CCNCC",
+        "explicitH": "H dướiN"
+      },
+      {
+        "index": 6,
+        "smiles": "CCN(C)CC"
+      }
+    ],
+    "ghiChu": "Cùngbộ6vớinguồn60rõtoànvẹn;panel3CC(N)CCkhôngstereo,khôngdùngSVG256cóarylamine. ChờsoátđộclậpSVGthậtvàcả2nguồn.",
+    "hashSvgDaSoat": "9c6a8e6b395cd0f1a86e0f2af5bfa46d3887c7682bf610a90095dcda17327f3e",
+    "nguoiSoat": "cau_truc_6"
+  }
+]
