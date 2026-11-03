@@ -19,6 +19,8 @@ Mỗi bản trong lô ĐÃ qua máy kiểm (đủ khối, khớp đáp án kho, 
    8–10 ⇒ VIIIB; 11–12 ⇒ a + b − 10); chu kì = số lớp; ô = Z. Bản chỉ nói «thuộc nhóm VIB» mà không dạy cách ra ⇒ THIẾU.
    Dạng DANH PHÁP / gọi tên: phải có công thức thầy (nhánh + mạch chính + liên kết + chức; đánh số chức → π → nhánh; đơn chức bỏ e) trong `cotLoi`,
    `phim` đi đúng Ba bước, và có `canh` `danh-phap` (xem `goi-may-soan-kinh.md`). Thiếu một trong ba ⇒ SỬA.
+   Dạng ĐIỆN DI và ĐỘ TAN: soát theo mục 6 và 7 phần TRA BÀI GIẢNG của `goi-may-soan-kinh.md` (chuỗi pH ↔ pI → nhận / nhường H⁺ → cộng điện tích → cực;
+   độ tan: hàng chuẩn 100 g nước, bảo toàn chất tan + nước). Thiếu chuỗi ⇒ SỬA.
 4. Soát phát biểu khoa học: câu nào sai SGK Kết nối tri thức (kể cả câu chép từ lời thầy nhưng dùng sai phạm vi — xem mục 5 TRA BÀI GIẢNG) ⇒ SAI.
 5. Kết luận:
    - **giu**: MỌI mục chủ đạo đã áp dụng và không có phát biểu sai. Đừng giữ cho nhanh: thiếu một quy tắc thầy dạy là phải sửa.
