@@ -142,3 +142,25 @@ describe('câu tự luận (thầy 03/11: giải luôn để chiếu lên bảng
     expect(kiemBanKinh(sai, { phan: 'III', dapAn: '', qid: 'q', nguon: NGUON, tuLuan: true }).ket).toBe('lech')
   })
 })
+
+describe('xepTheoCauPhat — 40 câu quét ra 03/11', () => {
+  const ly = [{ khoa: 'A', dung: false, chu: 'lý A' }, { khoa: 'B', dung: false, chu: 'lý B' }, { khoa: 'C', dung: true, chu: 'lý C' }, { khoa: 'D', dung: false, chu: 'lý D' }]
+  it('chữ phương án máy em nhận đã gọt dấu câu ⇒ vẫn ghép được', async () => {
+    const { xepTheoCauPhat } = await import('../src/lib/loi-giai-kinh/kiem')
+    const ban = { qid: 'q', lyDo: ly, _goc: { pa: { A: 'số lượng, thành phần, trật tự.', B: 'PE, PP,... là chất dẻo', C: 'peptide.', D: 'khác' } } }
+    const x = xepTheoCauPhat(ban, { phan: 'I', choices: ['peptide', 'số lượng thành phần trật tự', 'khác', 'PE PP là chất dẻo'], correct: 'A' })!
+    expect(x.lyDo.map((l) => l.chu)).toEqual(['lý C', 'lý A', 'lý D', 'lý B'])
+  })
+  it('phương án là ảnh (bốn chữ trùng) ⇒ hiện bản nhưng ẩn lý do từng phương án; đáp án lệch ⇒ null', async () => {
+    const { xepTheoCauPhat } = await import('../src/lib/loi-giai-kinh/kiem')
+    const h = '(xem hình)'
+    const ban = { qid: 'q', lyDo: ly, _goc: { pa: { A: h, B: h, C: h, D: h } } }
+    expect(xepTheoCauPhat(ban, { phan: 'I', choices: [h, h, h, h], correct: 'C' })!.lyDo).toEqual([])
+    expect(xepTheoCauPhat(ban, { phan: 'I', choices: [h, h, h, h], correct: 'A' })).toBeNull()
+  })
+  it('Phần III đáp án có dấu +', async () => {
+    const { xepTheoCauPhat, docSoViet } = await import('../src/lib/loi-giai-kinh/kiem')
+    expect(docSoViet('+8')).toBe(8)
+    expect(xepTheoCauPhat({ qid: 'q', lyDo: [], ketQua: '+8' }, { phan: 'III', correct: '+8' })).not.toBeNull()
+  })
+})
