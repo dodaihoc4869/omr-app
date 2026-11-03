@@ -81,4 +81,4 @@ for (let i = 0; i < exams.length; i += 4) {
 const report = { luc: new Date().toISOString(), chiDoc: true, soDe: exams.length, soCau: total, soCauCoHinh: questions.length, soAnhRieng: assets.size, errors, assets: [...assets.values()], questions }
 writeFileSync(root + '/kiem-ke.json', JSON.stringify(report, null, 2))
 console.log(JSON.stringify({ soDe: report.soDe, soCau: total, soCauCoHinh: questions.length, soAnhRieng: assets.size, soLoi: errors.length }))
-if (errors.length) process.exitCode = 1
+if (errors.length) { console.log('Lỗi nguồn mẫu:', JSON.stringify(errors.slice(0, 3))); process.exitCode = 1 }
