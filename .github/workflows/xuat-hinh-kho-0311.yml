@@ -1,0 +1,36 @@
+name: Đọc hình toàn kho để vẽ vector (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/ve-lai-hinh-kho-0311]
+    paths: ['scripts/xuat-hinh-kho-0311.mjs', '.github/workflows/xuat-hinh-kho-0311.yml']
+permissions:
+  contents: read
+concurrency:
+  group: xuat-hinh-kho-0311
+  cancel-in-progress: false
+jobs:
+  doc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Chuẩn hoá cấu hình đọc Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Chỉ SELECT D1 và GET R2, không ghi kho
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: node scripts/xuat-hinh-kho-0311.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hinh-kho-0311
+          path: /tmp/hinh-kho-0311
+          retention-days: 3
