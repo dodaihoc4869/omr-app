@@ -60,8 +60,8 @@
       "Toàn kho còn chưa hoàn tất, app chưa thay hình; không báo đã xong hoặc đã triển khai."
     ],
     "danhMucDaKiem": "docs/hinh-vector-0311/kiem/danh-muc-da-kiem.json",
-    "loVuaXong": "Lô101–105đạt;765câu đủhình+DDH/2partial,618nguồn→409SVG;810nguồncònlại.",
-    "viecNenLamTiep": "20nguồnmới106đãđọc/copy ởkiem/doc-molecule-lo-106.json,chưadựng. Ưutiên637/1095/1330graph,1162periodic/1396flow hoặcBohr816/1411/456/1326,cẩnthậnmọinhãn/ticks/electron.2partialchỉảnhhoa1403/1198thậtgiữnguyênkhôngcộngsốvẽ.",
+    "loVuaXong": "785 câu đủ mọi hình+DDH/4 một phần;629nguồn→416SVG;5.849.898byte/gzip1.174.219;799nguồn còn lại.11/20nguồnnhóm106 đãdựng/soátđộclập RIÊNGtừngPNG+SVG renderthật/hash.",
+    "viecNenLamTiep": "Ưutiên593/1279khép2partialAO,soat_nguon_2đangđọc scratch/doc-khep-ao-lo-109.json. Nhóm106còn9chưadựng637/1095/1330/1162/1187/1246/766/1110/1202,đọckiem/doc-molecule-lo-106.json. cau_truc_5đangbổsunganchors6graphs ởscratch/doc-graph-chi-tiet-lo-109.json (637đãcó). Khôngdựnglại11sourceđãđạt.2partialphoto1403/1198giữnguyênkhôngcộngsốvẽ.",
     "canhBaoCheckpoint": "Checkpointmớiđượcghi/sẽpushsaukiểm;ưu tiêncommit/worktree localmớinhất. Khôngcheckoutremote cũ đè. Khônghạgate,khôngbáotíchhợp/pháthànhkhibộchưađủ. Mainorigin7dff17afchưagộp."
   },
   "tuDongTiepTuc": {
@@ -79,14 +79,14 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 618,
-    "soSvgRieng": 409,
-    "soCauDungHinh": 767,
-    "soCauDuMoiHinh": 765,
-    "soCauMoiXongMotPhan": 2,
-    "byteSvg": 5757070,
-    "byteGzip": 1157878,
-    "soAnhNguonConLai": 810,
+    "soAnhNguon": 629,
+    "soSvgRieng": 416,
+    "soCauDungHinh": 789,
+    "soCauDuMoiHinh": 785,
+    "soCauMoiXongMotPhan": 4,
+    "byteSvg": 5849898,
+    "byteGzip": 1174219,
+    "soAnhNguonConLai": 799,
     "daTichHop": false
   },
   "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.",
@@ -106,15 +106,15 @@
     "daChuyenHetBoDaVe": true
   },
   "daDatPhongApp": {
-    "soNguon": 618,
-    "soCauDuHinhVaPhong": 765,
+    "soNguon": 629,
+    "soCauDuHinhVaPhong": 785,
     "ghiChu": "Các số tổngDaDoiChieu vẫn mô tả nội dung đã kiểm; bản cũ chưa đổi phông không được coi đạt yêu cầu phông mới."
   },
   "loMoiNhat": {
-    "lo": "101–105",
-    "ketQua": "765 câu đủ mọi hình+DDH/2 một phần;618 nguồn→409SVG;5.757.070byte/gzip1.157.878;810nguồn còn lại.20/20nguồnnhóm101đãxongqua101–104,lô105thêm8nguồnkhép4partial,đều mởtừngPNG+SVG renderthật vàsoátđộclậpexacthash.",
-    "suaLoi": "Giữtailđen/xám/rỗng;tailxámđãsửaphađầulên,bảncũ4chu kỳđúngchỉsai pha. 836/1103/312/1055giữA/B/C/D từglyph/fullset/stem;891/329/701khôngcaption.10423headrỗngdướibiên/3tailthẳngtrên/3nhãnnguồn.891dùngchungbyteSVG242đãsoátđộc lập,khôngnhânfiletrùnghash.",
-    "tiepTheo": "20nguồnmới106đãđọc/copy ởkiem/doc-molecule-lo-106.json,chưadựng. Ưutiên637/1095/1330graph,1162periodic/1396flow hoặcBohr816/1411/456/1326,cẩnthậnmọinhãn/ticks/electron.2partialchỉảnhhoa1403/1198thậtgiữnguyênkhôngcộngsốvẽ.",
-    "gioiHan": "Chưa tíchhợp hình/chưa reloadofflineapp/chưa phát hành. Build/tốcđộđãchạylạilô104đạt/precache170/2613KB. Vừafetch origin/main7dff17af,chưagộp;WOFF2khôngdiffvớimainmới. Phải cậpnhật/so testtheotên/kiểm cathi trước triểnkhai."
+    "lo": "106–108",
+    "ketQua": "785 câu đủ mọi hình+DDH/4 một phần;629nguồn→416SVG;5.849.898byte/gzip1.174.219;799nguồn còn lại.11/20nguồnnhóm106 đãdựng/soátđộclập RIÊNGtừngPNG+SVG renderthật/hash.",
+    "suaLoi": "BohrP2/8/5và+15,Al2/8/3hạt nhânkhôngchữ;4Hydrogenđủcaption/2model,AO284chetrục/xchéo/yngang/noarrow,1265trụctrướccầu/xngang/ychéo/3arrow.284zđãsửacắt/lềvàfreshreviewhashmới.1396oleumgiữnbiến/dấuchấm/+O2/t°/+H2SO4/+H2O/(1)..(4).",
+    "tiepTheo": "Ưutiên593/1279khép2partialAO,soat_nguon_2đangđọc scratch/doc-khep-ao-lo-109.json. Nhóm106còn9chưadựng637/1095/1330/1162/1187/1246/766/1110/1202,đọckiem/doc-molecule-lo-106.json. cau_truc_5đangbổsunganchors6graphs ởscratch/doc-graph-chi-tiet-lo-109.json (637đãcó). Khôngdựnglại11sourceđãđạt.2partialphoto1403/1198giữnguyênkhôngcộngsốvẽ.",
+    "gioiHan": "Chưa tíchhợp hình/chưa reloadofflineapp/chưa phát hành. Build/tốcđộlô108đạt/precache170/2613KB. Origin/main7dff17afchưagộp;phảicậpnhậtmainmớinhất/sotesttheotên/kiểm cathi trước triểnkhai."
   }
 }

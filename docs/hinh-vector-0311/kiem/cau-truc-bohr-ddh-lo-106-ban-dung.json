@@ -1,0 +1,196 @@
+[
+  {
+    "i": 816,
+    "hash": "975704ea8678719198e1643afd8be5befff21d436d4bb70bea7db90cbc2726ef",
+    "fileNguon": "anh/975704ea8678719198e1643afd8be5befff21d436d4bb70bea7db90cbc2726ef.png",
+    "canvas": [
+      1023,
+      977
+    ],
+    "daMoNative": true,
+    "kind": "bohr-atom-P",
+    "nucleus": "+15",
+    "shellCounts": [
+      2,
+      8,
+      5
+    ],
+    "notes": "3vòngtrònđồngtâmđenmảnh,nucleuscầuxámnộidung+15giữa. Electronchấmđenđặctổng15:inner2ởN/S;middle8ở8hướngN,NE,E,SE,S,SW,W,NW;outer5ở~NW(-115°),NE(-58°),ESE(15°),SW(112°),W(180°)theotọađộyxuống. Giữ2/8/5đúngkhôngthêmP/sốshell. Khôngcaption/chargekhác. 816và1411cùngnộidung,scalevàđộdàynétkhác.",
+    "questions": [
+      {
+        "qid": "DB-10-B1-D1-II-204",
+        "de": "Cho sơ đồ nguyên tử của nguyên tố X như sau:",
+        "refs": [
+          {
+            "where": "DB-10-B1-D1-II-204.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B3-II-12",
+        "de": "Cho sơ đồ nguyên tử của nguyên tố X như sau:",
+        "refs": [
+          {
+            "where": "DH-10-C1-B3-II-12.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "bohr-ddh-d4efd24a01a2330d2dad807fe9a5d7d33706bbe0b16c475dc85e7d955425553c.svg",
+    "hashSvg": "d4efd24a01a2330d2dad807fe9a5d7d33706bbe0b16c475dc85e7d955425553c",
+    "byteSvg": 3266,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "P2/8/5+nucleus+15;Al2/8/3+nucleusKHÔNGchữ,khôngtựthêmAl/+13/sốhạt;mọichấmđượcđếmtừngshell.",
+    "hashSvgDaSoat": "d4efd24a01a2330d2dad807fe9a5d7d33706bbe0b16c475dc85e7d955425553c",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 1411,
+    "hash": "fdc9663e53f83b729055816852faae9d8af0b5ff93fdb7df471168906064d765",
+    "fileNguon": "anh/fdc9663e53f83b729055816852faae9d8af0b5ff93fdb7df471168906064d765.png",
+    "canvas": [
+      351,
+      330
+    ],
+    "daMoNative": true,
+    "kind": "bohr-atom-P",
+    "nucleus": "+15",
+    "shellCounts": [
+      2,
+      8,
+      5
+    ],
+    "notes": "3vòngtrònđồngtâmđenmảnh,nucleuscầuxámnộidung+15giữa. Electronchấmđenđặctổng15:inner2ởN/S;middle8ở8hướngN,NE,E,SE,S,SW,W,NW;outer5ở~NW(-115°),NE(-58°),ESE(15°),SW(112°),W(180°)theotọađộyxuống. Giữ2/8/5đúngkhôngthêmP/sốshell. Khôngcaption/chargekhác. 816và1411cùngnộidung,scalevàđộdàynétkhác.",
+    "questions": [
+      {
+        "qid": "10-C1-B3-D2-II-11",
+        "de": "Cho sơ đồ nguyên tử của nguyên tố X như sau:",
+        "refs": [
+          {
+            "where": "10-C1-B3-D2-II-11.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-10-B1-D1-II-101",
+        "de": "Cho sơ đồ nguyên tử của nguyên tố X như sau:",
+        "refs": [
+          {
+            "where": "DB-10-B1-D1-II-101.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "bohr-ddh-d4efd24a01a2330d2dad807fe9a5d7d33706bbe0b16c475dc85e7d955425553c.svg",
+    "hashSvg": "d4efd24a01a2330d2dad807fe9a5d7d33706bbe0b16c475dc85e7d955425553c",
+    "byteSvg": 3266,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "P2/8/5+nucleus+15;Al2/8/3+nucleusKHÔNGchữ,khôngtựthêmAl/+13/sốhạt;mọichấmđượcđếmtừngshell.",
+    "hashSvgDaSoat": "d4efd24a01a2330d2dad807fe9a5d7d33706bbe0b16c475dc85e7d955425553c",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 456,
+    "hash": "52b6cc1cc6c356fb64b9470c0298aa6f24188fb4341198de56e4daa865bb1bf8",
+    "fileNguon": "anh/52b6cc1cc6c356fb64b9470c0298aa6f24188fb4341198de56e4daa865bb1bf8.png",
+    "canvas": [
+      452,
+      458
+    ],
+    "daMoNative": true,
+    "kind": "bohr-atom-Al",
+    "shellCounts": [
+      2,
+      8,
+      3
+    ],
+    "notes": "3shellvòngđenđồngtâm,nucleusquảcầuxámKHÔNGchữ. Inner2electronởNE(~−58°)/SW(~122°);middle8ở8hướngN,NE,E,SE,S,SW,W,NW;outer3ởNW(~−138°),NE(~−42°),S(~90°). Tổng13electron. Nativecầuxámnhiễuhạtphảicải thiệnvectornétmịn,khôngtựthêm13p/14n/Al/+13vìnucleuskhangkhôngtext. Khôngcaption.",
+    "questions": [
+      {
+        "qid": "DB-10-B1-D1-I-223",
+        "de": "Cho mô hình các lớp electron của nhôm (Al) như Hình 1.4. Phân lớp electron có mức năng lượng thấp nhất của nguyên tử nhôm là Hình 1.4. Mô hình các lớp electron của nhôm",
+        "refs": [
+          {
+            "where": "DB-10-B1-D1-I-223.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B4-D2-I-10",
+        "de": "Cho mô hình các lớp electron của nhôm (Al) như Hình 1.4. Phân lớp electron có mức năng lượng thấp nhất của nguyên tử nhôm là Hình 1.4. Mô hình các lớp electron của nhôm",
+        "refs": [
+          {
+            "where": "DH-10-C1-B4-D2-I-10.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "bohr-ddh-2cbf654ef0de8b0b3a53768ec8ce13fb24a1e41f8f522ed9e25865262bdbd781.svg",
+    "hashSvg": "2cbf654ef0de8b0b3a53768ec8ce13fb24a1e41f8f522ed9e25865262bdbd781",
+    "byteSvg": 1701,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "P2/8/5+nucleus+15;Al2/8/3+nucleusKHÔNGchữ,khôngtựthêmAl/+13/sốhạt;mọichấmđượcđếmtừngshell.",
+    "hashSvgDaSoat": "2cbf654ef0de8b0b3a53768ec8ce13fb24a1e41f8f522ed9e25865262bdbd781",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 1326,
+    "hash": "f03a81a9f2f6b35f5d2097c33af20cfdb737f201e9ee1a8c69a581c5b7dd1143",
+    "fileNguon": "anh/f03a81a9f2f6b35f5d2097c33af20cfdb737f201e9ee1a8c69a581c5b7dd1143.png",
+    "canvas": [
+      321,
+      301
+    ],
+    "daMoNative": true,
+    "kind": "bohr-atom-Al",
+    "shellCounts": [
+      2,
+      8,
+      3
+    ],
+    "notes": "3shellvòngđenđồngtâm,nucleusquảcầuxámKHÔNGchữ. Inner2electronởNE(~−58°)/SW(~122°);middle8ở8hướngN,NE,E,SE,S,SW,W,NW;outer3ởNW(~−138°),NE(~−42°),S(~90°). Tổng13electron. Nativecầuxámnhiễuhạtphảicải thiệnvectornétmịn,khôngtựthêm13p/14n/Al/+13vìnucleuskhangkhôngtext. Khôngcaption.",
+    "questions": [
+      {
+        "qid": "10-C1-B3-D2-I-8",
+        "de": "Cho mô hình các lớp electron của nhôm (Al) như hình dưới đây.\nPhân lớp electron có mức năng lượng thấp nhất của nguyên tử nhôm là",
+        "refs": [
+          {
+            "where": "10-C1-B3-D2-I-8.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-10-B1-D1-I-95",
+        "de": "Cho mô hình các lớp electron của nhôm (Al) như hình dưới đây.\nPhân lớp electron có mức năng lượng thấp nhất của nguyên tử nhôm là",
+        "refs": [
+          {
+            "where": "DB-10-B1-D1-I-95.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "bohr-ddh-2cbf654ef0de8b0b3a53768ec8ce13fb24a1e41f8f522ed9e25865262bdbd781.svg",
+    "hashSvg": "2cbf654ef0de8b0b3a53768ec8ce13fb24a1e41f8f522ed9e25865262bdbd781",
+    "byteSvg": 1701,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "P2/8/5+nucleus+15;Al2/8/3+nucleusKHÔNGchữ,khôngtựthêmAl/+13/sốhạt;mọichấmđượcđếmtừngshell.",
+    "hashSvgDaSoat": "2cbf654ef0de8b0b3a53768ec8ce13fb24a1e41f8f522ed9e25865262bdbd781",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

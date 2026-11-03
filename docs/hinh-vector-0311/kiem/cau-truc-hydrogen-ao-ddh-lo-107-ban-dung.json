@@ -1,0 +1,310 @@
+[
+  {
+    "i": 645,
+    "hash": "784bac099d2d4e216e74869ab0ff36db626d12f77feb0c87778b1339e69079f2",
+    "fileNguon": "anh/784bac099d2d4e216e74869ab0ff36db626d12f77feb0c87778b1339e69079f2.png",
+    "canvas": [
+      741,
+      297
+    ],
+    "daMoNative": true,
+    "kind": "hydrogen-two-models",
+    "captions": [
+      [
+        "Mô hình (1)",
+        "của nguyên tử hydrogen"
+      ],
+      [
+        "Mô hình (2)",
+        "của nguyên tử hydrogen"
+      ]
+    ],
+    "notes": "Hai panelngangtrái/phải. Trái:mộtquỹđạotrònnétxám,mộtnucleusquảcầuxámgiữa,mộtelectrontrênvòngởphíatrên-trái(khoảng10giờ). Phải:mộtnucleuscầuxámnhỏgiữa vàđámmâyelectrontrònxámđậmgiữa/nhạtdầnrangoài,KHÔNGchấmtrackelectronhayđườngquỹđạorõ. Giữđủ2dòngcaptionmỗipanelvà(1)/(2),khôngđặttênRutherford/Bohr/hiệnđại vàoảnh. Nềnmâyradialgradientvectorcóthểtốiuumịn,khôngsuybánkínhvậtlýtừscale.",
+    "questions": [
+      {
+        "qid": "DB-10-B1-D1-II-201",
+        "de": "Trong lịch sử các thuyết về mô hình nguyên tử có mô hình hành tinh nguyên tử (mô hình Rutherford - Bohr) và mô hình hiện đại của nguyên tử.",
+        "refs": [
+          {
+            "where": "DB-10-B1-D1-II-201.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B3-II-3",
+        "de": "Trong lịch sử các thuyết về mô hình nguyên tử có mô hình hành tinh nguyên tử (mô hình Rutherford - Bohr) và mô hình hiện đại của nguyên tử.",
+        "refs": [
+          {
+            "where": "DH-10-C1-B3-II-3.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "hydrogen-ao-ddh-85a05350c44168321793efc63fa31ace3c091ba09c57f32482eaa2b124d661fc.svg",
+    "hashSvg": "85a05350c44168321793efc63fa31ace3c091ba09c57f32482eaa2b124d661fc",
+    "byteSvg": 28723,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Hydrogenđủ2model/4dòngcaption;model2khôngtrackelectron/quỹđạo.284giữxchéo/yngang,trụcSAUcầu/khôngarrow;1265giữxngang/ychéo,trụcTRƯỚCcầu/3arrow.",
+    "hashSvgDaSoat": "85a05350c44168321793efc63fa31ace3c091ba09c57f32482eaa2b124d661fc",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 754,
+    "hash": "8c86ae7bc1f650c0f0dfea065cec88831d11475ccbb5bbb5e6394df4f56009f1",
+    "fileNguon": "anh/8c86ae7bc1f650c0f0dfea065cec88831d11475ccbb5bbb5e6394df4f56009f1.png",
+    "canvas": [
+      730,
+      327
+    ],
+    "daMoNative": true,
+    "kind": "hydrogen-two-models",
+    "captions": [
+      [
+        "Mô hình (1)",
+        "của nguyên tử hydrogen"
+      ],
+      [
+        "Mô hình (2)",
+        "của nguyên tử hydrogen"
+      ]
+    ],
+    "notes": "Hai panelngangtrái/phải. Trái:mộtquỹđạotrònnétxám,mộtnucleusquảcầuxámgiữa,mộtelectrontrênvòngởphíatrên-trái(khoảng10giờ). Phải:mộtnucleuscầuxámnhỏgiữa vàđámmâyelectrontrònxámđậmgiữa/nhạtdầnrangoài,KHÔNGchấmtrackelectronhayđườngquỹđạorõ. Giữđủ2dòngcaptionmỗipanelvà(1)/(2),khôngđặttênRutherford/Bohr/hiệnđại vàoảnh. Nềnmâyradialgradientvectorcóthểtốiuumịn,khôngsuybánkínhvậtlýtừscale.",
+    "questions": [
+      {
+        "qid": "10-C1-B3-D2-II-3",
+        "de": "Trong lịch sử các thuyết về mô hình nguyên tử có mô hình hành tinh nguyên tử (mô hình Rutherford - Bohr) và mô hình hiện đại của nguyên tử.",
+        "refs": [
+          {
+            "where": "10-C1-B3-D2-II-3.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-10-B1-D1-II-99",
+        "de": "Trong lịch sử các thuyết về mô hình nguyên tử có mô hình hành tinh nguyên tử (mô hình Rutherford - Bohr) và mô hình hiện đại của nguyên tử.",
+        "refs": [
+          {
+            "where": "DB-10-B1-D1-II-99.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "hydrogen-ao-ddh-85a05350c44168321793efc63fa31ace3c091ba09c57f32482eaa2b124d661fc.svg",
+    "hashSvg": "85a05350c44168321793efc63fa31ace3c091ba09c57f32482eaa2b124d661fc",
+    "byteSvg": 28723,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Hydrogenđủ2model/4dòngcaption;model2khôngtrackelectron/quỹđạo.284giữxchéo/yngang,trụcSAUcầu/khôngarrow;1265giữxngang/ychéo,trụcTRƯỚCcầu/3arrow.",
+    "hashSvgDaSoat": "85a05350c44168321793efc63fa31ace3c091ba09c57f32482eaa2b124d661fc",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 1008,
+    "hash": "b507280bf75ce333feff6bae3c392c309169e6c01d0f8752d2c66154cc7f9adb",
+    "fileNguon": "anh/b507280bf75ce333feff6bae3c392c309169e6c01d0f8752d2c66154cc7f9adb.png",
+    "canvas": [
+      698,
+      315
+    ],
+    "daMoNative": true,
+    "kind": "hydrogen-two-models",
+    "captions": [
+      [
+        "Mô hình (1)",
+        "của nguyên tử hydrogen"
+      ],
+      [
+        "Mô hình (2)",
+        "của nguyên tử hydrogen"
+      ]
+    ],
+    "notes": "Hai panelngangtrái/phải. Trái:mộtquỹđạotrònnétxám,mộtnucleusquảcầuxámgiữa,mộtelectrontrênvòngởphíatrên-trái(khoảng10giờ). Phải:mộtnucleuscầuxámnhỏgiữa vàđámmâyelectrontrònxámđậmgiữa/nhạtdầnrangoài,KHÔNGchấmtrackelectronhayđườngquỹđạorõ. Giữđủ2dòngcaptionmỗipanelvà(1)/(2),khôngđặttênRutherford/Bohr/hiệnđại vàoảnh. Nềnmâyradialgradientvectorcóthểtốiuumịn,khôngsuybánkínhvậtlýtừscale.",
+    "questions": [
+      {
+        "qid": "10-C1-B3-D2-II-27",
+        "de": "Trong lịch sử các thuyết về mô hình nguyên tử có mô hình hành tinh nguyên tử (mô hình Rutherford - Bohr) và mô hình hiện đại của nguyên tử. Cho hai mô hình (1) và (2) như hình dưới đây.",
+        "refs": [
+          {
+            "where": "10-C1-B3-D2-II-27.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-10-B1-D1-II-103",
+        "de": "Trong lịch sử các thuyết về mô hình nguyên tử có mô hình hành tinh nguyên tử (mô hình Rutherford - Bohr) và mô hình hiện đại của nguyên tử. Cho hai mô hình (1) và (2) như hình dưới đây.",
+        "refs": [
+          {
+            "where": "DB-10-B1-D1-II-103.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "hydrogen-ao-ddh-6a11a919518f4b428de1f05cc26802b9372a67480564174c24af440d8d1a4625.svg",
+    "hashSvg": "6a11a919518f4b428de1f05cc26802b9372a67480564174c24af440d8d1a4625",
+    "byteSvg": 28723,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Hydrogenđủ2model/4dòngcaption;model2khôngtrackelectron/quỹđạo.284giữxchéo/yngang,trụcSAUcầu/khôngarrow;1265giữxngang/ychéo,trụcTRƯỚCcầu/3arrow.",
+    "hashSvgDaSoat": "6a11a919518f4b428de1f05cc26802b9372a67480564174c24af440d8d1a4625",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 1067,
+    "hash": "c096feb39d61841cad6323daddafcb84d7f451be38e4cf9e129b9383688b2ab8",
+    "fileNguon": "anh/c096feb39d61841cad6323daddafcb84d7f451be38e4cf9e129b9383688b2ab8.png",
+    "canvas": [
+      1024,
+      413
+    ],
+    "daMoNative": true,
+    "kind": "hydrogen-two-models",
+    "captions": [
+      [
+        "Mô hình (1)",
+        "của nguyên tử hydrogen"
+      ],
+      [
+        "Mô hình (2)",
+        "của nguyên tử hydrogen"
+      ]
+    ],
+    "notes": "Hai panelngangtrái/phải. Trái:mộtquỹđạotrònnétxám,mộtnucleusquảcầuxámgiữa,mộtelectrontrênvòngởphíatrên-trái(khoảng10giờ). Phải:mộtnucleuscầuxámnhỏgiữa vàđámmâyelectrontrònxámđậmgiữa/nhạtdầnrangoài,KHÔNGchấmtrackelectronhayđườngquỹđạorõ. Giữđủ2dòngcaptionmỗipanelvà(1)/(2),khôngđặttênRutherford/Bohr/hiệnđại vàoảnh. Nềnmâyradialgradientvectorcóthểtốiuumịn,khôngsuybánkínhvậtlýtừscale.",
+    "questions": [
+      {
+        "qid": "DB-10-B1-D1-II-215",
+        "de": "Trong lịch sử các thuyết về mô hình nguyên tử có mô hình hành tinh nguyên tử (mô hình Rutherford - Bohr) và mô hình hiện đại của nguyên tử.",
+        "refs": [
+          {
+            "where": "DB-10-B1-D1-II-215.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B4-D1-II-1",
+        "de": "Trong lịch sử các thuyết về mô hình nguyên tử có mô hình hành tinh nguyên tử (mô hình Rutherford - Bohr) và mô hình hiện đại của nguyên tử.",
+        "refs": [
+          {
+            "where": "DH-10-C1-B4-D1-II-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "hydrogen-ao-ddh-6a11a919518f4b428de1f05cc26802b9372a67480564174c24af440d8d1a4625.svg",
+    "hashSvg": "6a11a919518f4b428de1f05cc26802b9372a67480564174c24af440d8d1a4625",
+    "byteSvg": 28723,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Hydrogenđủ2model/4dòngcaption;model2khôngtrackelectron/quỹđạo.284giữxchéo/yngang,trụcSAUcầu/khôngarrow;1265giữxngang/ychéo,trụcTRƯỚCcầu/3arrow.",
+    "hashSvgDaSoat": "6a11a919518f4b428de1f05cc26802b9372a67480564174c24af440d8d1a4625",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 284,
+    "hash": "3048016e5c208606b5ac161968cbfd7b91fd7fc801d809b73ca99b22371197e9",
+    "fileNguon": "anh/3048016e5c208606b5ac161968cbfd7b91fd7fc801d809b73ca99b22371197e9.png",
+    "canvas": [
+      380,
+      248
+    ],
+    "daMoNative": true,
+    "kind": "orbital-s-sphere",
+    "labels": [
+      "x",
+      "y",
+      "z"
+    ],
+    "notes": "1quảcầuxanhlamgiữa3trục tímnétthường. ztrụcđứngchữzởđầutrên;ytrụcngangchữyđầuphải;xtrụcchéolênphải/xlabelởđầudướitrái. KHÔNGmũitêntrụcởnative. Phầntrụcđiquacầubịcầuche,khôngvẽđườngxuyêncầu. Cầuphủgradientxanhđậmrìa/sángtráigiữa. Khôngcaptiona)/s/hayAOtrongảnh.",
+    "questions": [
+      {
+        "qid": "DB-10-B3-D1-I-283",
+        "de": "Hình vẽ dưới đây mô tả 3 dạng orbital: a) | b) | c) Các orbital tương ứng với các hình a), b) và c) là",
+        "refs": [
+          {
+            "where": "DB-10-B3-D1-I-283.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B4-D1-I-5",
+        "de": "Hình vẽ dưới đây mô tả 3 dạng orbital: a) | b) | c) Các orbital tương ứng với các hình a), b) và c) là",
+        "refs": [
+          {
+            "where": "DH-10-C1-B4-D1-I-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "hydrogen-ao-ddh-4d35422424e621ca21356b16ae984df51fe6a0274a51537b27a0d5c5edc0a55e.svg",
+    "hashSvg": "4d35422424e621ca21356b16ae984df51fe6a0274a51537b27a0d5c5edc0a55e",
+    "byteSvg": 1969,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Hydrogenđủ2model/4dòngcaption;model2khôngtrackelectron/quỹđạo.284giữxchéo/yngang,trụcSAUcầu/khôngarrow;1265giữxngang/ychéo,trụcTRƯỚCcầu/3arrow.",
+    "hashSvgDaSoat": "4d35422424e621ca21356b16ae984df51fe6a0274a51537b27a0d5c5edc0a55e",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 1265,
+    "hash": "e55b068376d3b178837e27a06e5d216ed5ec605c565fb4a102306720710beac7",
+    "fileNguon": "anh/e55b068376d3b178837e27a06e5d216ed5ec605c565fb4a102306720710beac7.png",
+    "canvas": [
+      295,
+      279
+    ],
+    "daMoNative": true,
+    "kind": "orbital-s-sphere-grey",
+    "labels": [
+      "x",
+      "y",
+      "z"
+    ],
+    "notes": "1quảcầuxámởgiữa,3trụcđenNẰMTRƯỚCcầuthấyxuyênqua. zđứngmũitênlênlabelztrênphải;xngangmũitênphảilabelxphảidưới;ytrụcchéotừtrênphảixuốngdướitrái,cómũitênởđầudướitráivàylabel. KhôngnhãnAO/s/pa. Khác284:vịtríx/yhoánđổi vàcáchchekhuấttrụckhácnênKHÔNGdùngchungtemplatekhôngđiềuchỉnh.",
+    "questions": [
+      {
+        "qid": "10-C1-B3-D2-I-22",
+        "de": "Hình sau biểu diễn hình dạng orbital nguyên tử (AO) nào sau đây?",
+        "refs": [
+          {
+            "where": "10-C1-B3-D2-I-22.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-10-B1-D1-I-96",
+        "de": "Hình sau biểu diễn hình dạng orbital nguyên tử (AO) nào sau đây?",
+        "refs": [
+          {
+            "where": "DB-10-B1-D1-I-96.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "hydrogen-ao-ddh-de03a0752d568dee0a10e9f6b03184ef7f3d4c2e48752dfb195b36b188d43485.svg",
+    "hashSvg": "de03a0752d568dee0a10e9f6b03184ef7f3d4c2e48752dfb195b36b188d43485",
+    "byteSvg": 2058,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Hydrogenđủ2model/4dòngcaption;model2khôngtrackelectron/quỹđạo.284giữxchéo/yngang,trụcSAUcầu/khôngarrow;1265giữxngang/ychéo,trụcTRƯỚCcầu/3arrow.",
+    "hashSvgDaSoat": "de03a0752d568dee0a10e9f6b03184ef7f3d4c2e48752dfb195b36b188d43485",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

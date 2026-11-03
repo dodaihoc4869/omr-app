@@ -1,0 +1,34 @@
+[
+  {
+    "i": 816,
+    "hashSvg": "d4efd24a01a2330d2dad807fe9a5d7d33706bbe0b16c475dc85e7d955425553c",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG native và SVG render thật của nguồn này, không duyệt theo alias. Ba shell2/8/5 electron: trong trên/dưới; giữa8 vị trí vòng đều; ngoài5 vị trí trái, trái-trên, phải-trên, phải-dưới nhẹ, trái-dưới đúng nguồn riêng. Nucleus xám có +15 đúng DDH. Đếm từng chấm không mất/trùng; electron nằm trên đúng shell, ba vòng tách rõ và tròn khép kín. SVG tự chứa path/shape không text/image/fallback; không cắt/chạm/tràn. Hash byte thực khớp metadata.",
+    "hash": "975704ea8678719198e1643afd8be5befff21d436d4bb70bea7db90cbc2726ef",
+    "hashSvgDaSoat": "d4efd24a01a2330d2dad807fe9a5d7d33706bbe0b16c475dc85e7d955425553c"
+  },
+  {
+    "i": 1411,
+    "hashSvg": "d4efd24a01a2330d2dad807fe9a5d7d33706bbe0b16c475dc85e7d955425553c",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG native và SVG render thật của nguồn này, không duyệt theo alias. Ba shell2/8/5 electron: trong trên/dưới; giữa8 vị trí vòng đều; ngoài5 vị trí trái, trái-trên, phải-trên, phải-dưới nhẹ, trái-dưới đúng nguồn riêng. Nucleus xám có +15 đúng DDH. Đếm từng chấm không mất/trùng; electron nằm trên đúng shell, ba vòng tách rõ và tròn khép kín. SVG tự chứa path/shape không text/image/fallback; không cắt/chạm/tràn. Hash byte thực khớp metadata.",
+    "hash": "fdc9663e53f83b729055816852faae9d8af0b5ff93fdb7df471168906064d765",
+    "hashSvgDaSoat": "d4efd24a01a2330d2dad807fe9a5d7d33706bbe0b16c475dc85e7d955425553c"
+  },
+  {
+    "i": 456,
+    "hashSvg": "2cbf654ef0de8b0b3a53768ec8ce13fb24a1e41f8f522ed9e25865262bdbd781",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG native và SVG render thật của nguồn này, không duyệt theo alias. Ba shell2/8/3 electron: trong phải-trên/trái-dưới; giữa8 vị trí; ngoài trái-trên/phải-trên/dưới đúng nguồn riêng. Nucleus xám không chữ, không tự thêm Al/+13; electron xám có viền giữ nguồn. Đếm từng chấm không mất/trùng; electron nằm trên đúng shell, ba vòng tách rõ và tròn khép kín. SVG tự chứa path/shape không text/image/fallback; không cắt/chạm/tràn. Hash byte thực khớp metadata.",
+    "hash": "52b6cc1cc6c356fb64b9470c0298aa6f24188fb4341198de56e4daa865bb1bf8",
+    "hashSvgDaSoat": "2cbf654ef0de8b0b3a53768ec8ce13fb24a1e41f8f522ed9e25865262bdbd781"
+  },
+  {
+    "i": 1326,
+    "hashSvg": "2cbf654ef0de8b0b3a53768ec8ce13fb24a1e41f8f522ed9e25865262bdbd781",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG native và SVG render thật của nguồn này, không duyệt theo alias. Ba shell2/8/3 electron: trong phải-trên/trái-dưới; giữa8 vị trí; ngoài trái-trên/phải-trên/dưới đúng nguồn riêng. Nucleus xám không chữ, không tự thêm Al/+13; electron xám có viền giữ nguồn. Đếm từng chấm không mất/trùng; electron nằm trên đúng shell, ba vòng tách rõ và tròn khép kín. SVG tự chứa path/shape không text/image/fallback; không cắt/chạm/tràn. Hash byte thực khớp metadata.",
+    "hash": "f03a81a9f2f6b35f5d2097c33af20cfdb737f201e9ee1a8c69a581c5b7dd1143",
+    "hashSvgDaSoat": "2cbf654ef0de8b0b3a53768ec8ce13fb24a1e41f8f522ed9e25865262bdbd781"
+  }
+]

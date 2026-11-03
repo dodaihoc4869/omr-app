@@ -1,0 +1,70 @@
+[
+  {
+    "i": 1396,
+    "hash": "fb961753129ddaf4cabd8607bfe111fecafdcf90ac1e06e1f863877f1fc702de",
+    "fileNguon": "anh/fb961753129ddaf4cabd8607bfe111fecafdcf90ac1e06e1f863877f1fc702de.png",
+    "canvas": [
+      977,
+      60
+    ],
+    "daMoNative": true,
+    "kind": "reaction-flow",
+    "nodes": [
+      "FeS₂",
+      "SO₂",
+      "SO₃",
+      "H₂SO₄.nSO₃",
+      "H₂SO₄"
+    ],
+    "arrows": [
+      {
+        "over": "+O₂/t°",
+        "under": "(1)"
+      },
+      {
+        "over": "+O₂/t°",
+        "under": "(2)"
+      },
+      {
+        "over": "+H₂SO₄",
+        "under": "(3)"
+      },
+      {
+        "over": "+H₂O",
+        "under": "(4)"
+      }
+    ],
+    "notes": "5nodengang,4mũitênphải. Dấu./ndướiđúngH₂SO₄.nSO₃: dấu chấm nối giữaH₂SO₄vànSO₃,nlàbiếnkhôngsubscript. Điều kiện2mũitênđầu là+O₂/t°dùngdấugạchchéo /,khôngtựthêmV₂O₅/450°C/hệsốphươngtrình. Giữlabels(1)..(4)dướimũitên.",
+    "questions": [
+      {
+        "qid": "100-III-3",
+        "de": "Sulfuric acid có thể được điều chế từ quặng pyrite theo sơ đồ sau (hình).\nBiết hiệu suất của cả quá trình là 90%, các tạp chất trong quặng không chứa sulfur.\nTính thể tích dung dịch H₂SO₄ 95% (D = 1,82 g/mL) theo đơn vị m³ thu được từ 10 tấn quặng pyrite (chứa 80% FeS₂ về khối lượng). (Kết quả làm tròn đến hàng phần mười.)",
+        "refs": [
+          {
+            "where": "100-III-3.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "12-C6-B20-III-1",
+        "de": "Sulfuric acid có thể được điều chế từ quặng pyrite theo sơ đồ sau (hình).\nBiết hiệu suất của cả quá trình là 90%, các tạp chất trong quặng không chứa sulfur.\nTính thể tích dung dịch H₂SO₄ 95% (D = 1,82 g/mL) theo đơn vị m³ thu được từ 10 tấn quặng pyrite (chứa 80% FeS₂ về khối lượng). (Kết quả làm tròn đến hàng phần mười.)",
+        "refs": [
+          {
+            "where": "12-C6-B20-III-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "so-do-acid-ddh-9da19b5c6f5fa25d9355f49e8cf4bc2fe5f5f8ec00d7d9304772751c680e86b4.svg",
+    "hashSvg": "9da19b5c6f5fa25d9355f49e8cf4bc2fe5f5f8ec00d7d9304772751c680e86b4",
+    "byteSvg": 26388,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "GiữH2SO4.nSO3nbiến/dấuchấm/+O2/t°2mũitênđầu/+H2SO4/+H2O/(1)..(4).KhôngthêmV2O5/hệsố/nhiệtđộkhôngnguồn.",
+    "hashSvgDaSoat": "9da19b5c6f5fa25d9355f49e8cf4bc2fe5f5f8ec00d7d9304772751c680e86b4",
+    "nguoiSoat": "cau_truc_6"
+  }
+]
