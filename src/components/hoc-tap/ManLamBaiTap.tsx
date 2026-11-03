@@ -1,5 +1,6 @@
 import { chuCuaLoi, guiLaiBenVung } from '../../lib/loi-may-chu'
 import { lazy, startTransition, Suspense, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { TheChonCach } from './TheChonCach'
 import { ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, Clock, Flame, Info, Lightbulb, PenLine, RefreshCw, Target, X as XIcon } from 'lucide-react'
 import { ChemText } from '../../lib/chem-format'
 import '../../lib/chem-trinh-bay' // thầy 27/10: phương trình rõ ràng (khoảng hẹp quanh toán tử, ⇌ cỡ chữ, «l» có đuôi) — chỉ app học sinh
@@ -1298,7 +1299,8 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
           </div>
           <ThanhCuon key="cd" cot="de" />
           <div key={`t${q.qid}`} className="duo-cot-tra">
-          {/* Thầy 27/10 (ảnh): ẩn khung «Câu này em chọn làm thế nào?» ở màn Duo — hai nút đáy «Học cách giải» / «Tự làm câu này» đã nói đủ. */}
+          {/* Thầy 27/10: điện thoại ẩn khung chọn cách (hai nút đáy đủ). 03/11 khổ rộng: thẻ «Chọn cách làm» thay dải hai nút (TheChonCach.tsx) */}
+          {choChonCach && <TheChonCach chua={q.vaiGoi7 === 'chua'} khoa={nop} onHoc={() => { phanHoi('chon'); void hocHuongDan() }} onTuLam={() => { phanHoi('chon'); setTuLam(true) }} />}
           <div className="duo-tra" data-luoi={luoi || undefined} data-pa={doDaiPa} data-so={soPa || undefined}>{khoiTraLoi}</div>
           {dangTraLoi && q.phan === 'III' && <BanPhimSo value={tra} khoa={nop} soO={soO} onPhim={(p: PhimSo) => doiTra(nhanPhim(tra, p, soO))} />}
           {(dangTraLoi || k) && <HinhCuoiCau q={q} stt={stt} />}
