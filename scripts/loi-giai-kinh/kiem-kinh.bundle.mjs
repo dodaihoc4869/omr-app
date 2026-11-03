@@ -753,11 +753,24 @@ function kiemBanKinh(tho, ctx) {
   if (!hayNham.length) thieu.push("chỗ hay nhầm");
   if (!tuHoi.hoi || !tuHoi.tra) thieu.push("câu tự trả lời");
   if (!theNho.length) thieu.push("thẻ nhớ");
-  if (ctx.phan === "III" && !buoc && !phepTinh) thieu.push("phép tính có nghĩa từng số");
+  if (ctx.phan === "III" && !ctx.tuLuan && !buoc && !phepTinh) thieu.push("phép tính có nghĩa từng số");
+  if (ctx.tuLuan) {
+    delete ban.buoc;
+    delete ban.soDo;
+    ban.lyDo = [];
+    ban.tuLuan = true;
+  }
   const cam = chuCam(ban);
   if (cam) return { ket: "thieu", lyDo: cam, ban, boKhoi };
   if (thieu.length) return { ket: "thieu", lyDo: `thiếu: ${thieu.join(", ")}`, ban, boKhoi };
   const theoKho = dungTheoKho(ctx.phan, ctx.dapAn);
+  if (ctx.tuLuan) {
+    if (phepTinh) {
+      const loi = kiemPhepTinh(phepTinh, ctx.dapAn && phepTinh.some((p) => p.laDapSo) ? "III" : "I", ctx.dapAn);
+      if (loi) return { ket: "lech", lyDo: loi, ban, boKhoi };
+    }
+    return { ket: "dat", lyDo: "", ban, boKhoi };
+  }
   if (ctx.phan === "I" || ctx.phan === "II") {
     if (!theoKho) return { ket: "khong_kiem_duoc", lyDo: "đáp án kho không đọc được", ban, boKhoi };
     const khoa = ctx.phan === "I" ? KHOA_I : KHOA_II;
@@ -793,8 +806,8 @@ function xepTheoCauPhat(tho, q) {
   const { _goc, ...ban } = tho;
   const b = ban;
   if (!Array.isArray(b.lyDo)) return null;
-  if (q.phan === "III") {
-    if (b.ketQua && !khopLamTron(docSoViet(b.ketQua) ?? NaN, q.correct)) return null;
+  if (q.phan === "III" || b.tuLuan) {
+    if (!b.tuLuan && b.ketQua && !khopLamTron(docSoViet(b.ketQua) ?? NaN, q.correct)) return null;
     return b;
   }
   const khoa = q.phan === "I" ? KHOA_I : KHOA_II;

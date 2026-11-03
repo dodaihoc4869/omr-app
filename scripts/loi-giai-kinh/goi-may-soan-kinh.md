@@ -32,6 +32,12 @@ Thầy: «có câu xác định nhóm trong bảng tuần hoàn ko đưa kiến 
 6. Lời thầy nói đúng trong PHẠM VI bài giảng của nó; câu chữ trong lời giải phải đúng SGK Kết nối tri thức. Ví dụ: «electron độc thân chính là electron hoá trị» là ý của bài
    liên kết — KHÔNG dùng để đếm số electron hoá trị; «a + b = 8, 9, 10» dùng để XẾP NHÓM VIIIB. Mâu thuẫn thì theo SGK, lời thầy chỉ dùng đúng phạm vi.
 
+## CÂU TỰ LUẬN (`vao.tuLuan = true`, thầy 03/11 «Câu tự luận giải luôn để lời giải hiện trên máy chiếu lúc dạy học»)
+- Không có phương án / ý để chấm: `lyDo: []`. `dapAn.tl` = đáp án / hướng dẫn chữ của kho; `dapAn.kq` = đáp số tham chiếu (một số) hoặc rỗng; `loiGiaiCo` = lời giải kho.
+- TỰ GIẢI đầy đủ theo cách thầy, đối chiếu `dapAn.tl` / `loiGiaiCo`: kết luận phải KHỚP kho. Kho mơ hồ hoặc bạn ra khác ⇒ ghi `nghiDapAn` (vẫn viết theo kho).
+- Câu có tính toán: dùng `phepTinh` (KHÔNG dùng `buoc` / `soDo`), mục cuối `laDapSo: true`; có `dapAn.kq` thì `ketQua` mục đó phải khớp. `ketQua` của bản = kết luận ngắn.
+- Vẫn đủ khối: cotLoi, phim ≥ 3 nhịp (trình bày như thầy chữa trên bảng), hayNham, tuHoi, theNho. Câu gọi tên ⇒ cảnh `danh-phap`.
+
 ## Đầu ra: `ra/<cùng tên tệp đầu vào>.json` — một đối tượng JSON với các trường
 - `cotLoi`: `{ "chu": câu chốt kiến thức (nói trước, đúng bản chất, ≤ 220 ký tự), "congThuc"?: công thức lớn nếu câu xoay quanh một công thức, "chip": 1–3 `{ "nhan", "chu" }` ý chốt ngắn }`.
 - `phim`: 3–6 nhịp `{ "chu", "phu"?, "hinh"? }` — thầy dẫn TỪNG BƯỚC, một ý một nhịp, ĐÚNG THỨ TỰ các bước (`buoc`) của mục kiến thức hợp nhất; đi từ điều nhìn thấy
