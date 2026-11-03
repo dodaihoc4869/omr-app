@@ -573,7 +573,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     // 06/10: câu CHẨN ĐOÁN bước sai (chan-doan-buoc-sai.ts) đứng thay chỗ một câu lỗi ĐÃ qua phạm vi lúc phát — không xét lại dạng (câu nền không mang dạng của kho).
     const laCD=laQidChanDoan(qid)
     if(control.types.length&&!laCD&&(!q.dang||!control.types.includes(q.dang)))throw new Error('Thầy vừa đổi phạm vi luyện. Em mở lượt mới.')
-    if(blocked.has(q.qid)||blocked.has(q.group))throw new Error('Câu đang được dùng cho ca thi. Em mở lượt học khác; câu này không bị tính sai.')
+    if(blocked.has(q.qid)||blocked.has(q.group))throw new Error('Câu này vừa được giữ cho ca kiểm tra. Em bấm Tải lại để làm tiếp các câu còn lại; câu này không bị tính sai.')
     // Hậu xử lý có thể chạy lại từ receipt nếu lần nộp trước dừng giữa chừng.
     // Gói R 15/10: sổ học là VIỆC PHỤ sau phản hồi (`ctx.waitUntil`) ⇒ ghi THẲNG D1 gốc (vẫn qua rào cổng đóng băng `RAO_GHI` như mọi lệnh ghi của lượt), không
     // xếp hàng chung với đường trả lời — trước: lệnh ghi sổ vào hàng ghi của bản gộp đọc ⇒ lượt đọc EXP còn lại của phản hồi phải chờ nó (một đợt D1). Phần còn lại
