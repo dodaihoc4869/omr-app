@@ -128,3 +128,17 @@ describe('cảnh gọi tên danh-phap (thầy 03/11: công thức nhánh + mạc
     expect(k.ban!.canh).toMatchObject({ loai: 'danh-phap', ten: 'ethyl acetate' })
   })
 })
+
+describe('câu tự luận (thầy 03/11: giải luôn để chiếu lên bảng)', () => {
+  const tl = () => ({ ...mauII(), lyDo: [], phepTinh: [{ ten: 'n acid', bieuThuc: '12/60', ketQua: '0,2' }, { ten: 'm ester', bieuThuc: '12/60*88*75/100', ketQua: '13,2', laDapSo: true }] })
+  it('không cần lý do phương án; phép tính tính lại; có đáp số tham chiếu ⇒ phải khớp', () => {
+    const k = kiemBanKinh(tl(), { phan: 'III', dapAn: '13,2', qid: 'q', nguon: NGUON, tuLuan: true })
+    expect(k.ket).toBe('dat'); expect(k.ban!.tuLuan).toBe(true); expect(k.ban!.lyDo).toEqual([])
+    expect(kiemBanKinh(tl(), { phan: 'III', dapAn: '17,6', qid: 'q', nguon: NGUON, tuLuan: true }).ket).toBe('lech')
+  })
+  it('không có đáp số tham chiếu ⇒ chỉ tính lại; phép tính sai ⇒ lech', () => {
+    expect(kiemBanKinh(tl(), { phan: 'III', dapAn: '', qid: 'q', nguon: NGUON, tuLuan: true }).ket).toBe('dat')
+    const sai = { ...tl(), phepTinh: [{ ten: 'x', bieuThuc: '12/60', ketQua: '0,3' }] }
+    expect(kiemBanKinh(sai, { phan: 'III', dapAn: '', qid: 'q', nguon: NGUON, tuLuan: true }).ket).toBe('lech')
+  })
+})

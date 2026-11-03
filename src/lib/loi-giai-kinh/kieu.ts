@@ -75,6 +75,8 @@ export interface BanKinh {
   qid: string
   phienBan: number
   phan: PhanKinh
+  /** câu tự luận (thầy 03/11): không có phương án / ý; chiếu lên bảng lúc dạy học */
+  tuLuan?: true
   /** KIẾN THỨC CỐT LÕI: câu chốt + (tuỳ chọn) công thức lớn + 1–3 chip ý chốt */
   cotLoi: { chu: string; congThuc?: string; chip: { nhan: string; chu: string }[] }
   /** phim thầy dẫn: 3–6 nhịp */

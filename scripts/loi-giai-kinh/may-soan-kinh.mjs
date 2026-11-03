@@ -4,6 +4,7 @@
 //
 //   node scripts/loi-giai-kinh/may-soan-kinh.mjs --nap-hang        # xếp cả kho vào hàng (gọi lại được)
 //   node scripts/loi-giai-kinh/may-soan-kinh.mjs --tong            # số phủ: đạt / tổng
+//   node scripts/loi-giai-kinh/may-soan-kinh.mjs --nap-hang-ngoai  # câu tờ dạy học (-VD/-DT/-TL) + câu tự luận vào hàng (thầy 03/11: hiện trên máy chiếu)
 //   node scripts/loi-giai-kinh/may-soan-kinh.mjs                   # 4 luồng, chạy tới hết hàng (hết thì 10 phút hỏi lại, có việc trả lại là làm tiếp)
 //   node scripts/loi-giai-kinh/may-soan-kinh.mjs --bu-goc         # bù chữ phương án gốc cho bản nộp trước 03/11 (gọi lại được)
 //   node scripts/loi-giai-kinh/may-soan-kinh.mjs --thu             # 1 lô 3 câu, KHÔNG nộp (soát chất lượng)
@@ -95,7 +96,8 @@ for (const f of fs.readdirSync('vao').filter((x) => x.endsWith('.json') && !x.en
   const dapAn = v.phan === 'III' ? String(v.dapAn?.kq ?? '') : v.phan === 'I' ? (Object.entries(v.dapAn || {}).find(([, d]) => d === 'D')?.[0] ?? '') : ['a','b','c','d'].map((k) => v.dapAn?.[k] ?? '?').join('')
   const luaChon = v.phan === 'I' ? Object.fromEntries((v.y || []).map((y) => [y.id, String(y.t || '').replace(/<[^>]*>/g, ' ')])) : undefined
   const kiemSo = ({ soDo, buoc, ketQua }) => { const k = kiemCong({ qid: v.qid, phienBan: 1, deNoiGi: '', ...(soDo ? { soDo } : {}), buoc, ...(ketQua ? { ketQua } : {}) }, { phan: v.phan, dapAn, ...(luaChon ? { luaChon } : {}) }); return { ok: k.ket === 'dat' || k.ket === 'lo_dap_an', lyDo: k.lyDo } }
-  const k = kiemBanKinh(ban, { phan: v.phan, dapAn, qid: v.qid, kiemSo, nguon: { thanChu: THAN_CHU.map((t) => t.chu), thayNoi: muc.flatMap((m) => m.noi), meo: muc.map((m) => m.meo).filter(Boolean) } })
+  const nguon = { thanChu: THAN_CHU.map((t) => t.chu), thayNoi: muc.flatMap((m) => m.noi || []), meo: muc.map((m) => m.meo).filter(Boolean) }
+  const k = v.tuLuan ? kiemBanKinh(ban, { phan: 'III', dapAn: String(v.dapAn?.kq ?? ''), qid: v.qid, nguon, tuLuan: true }) : kiemBanKinh(ban, { phan: v.phan, dapAn, qid: v.qid, kiemSo, nguon })
   if (k.ket === 'dat') dat++
   console.log(f + ': ' + (k.ket === 'dat' ? 'ĐẠT' : k.ket.toUpperCase() + ' · ' + k.lyDo) + (k.boKhoi.length ? '\\n   ! bỏ khối: ' + k.boKhoi.join('; ') : ''))
 }
@@ -258,6 +260,7 @@ if (co('--soat')) {
   console.log(`[${gio()}] Xong soát: ${JSON.stringify(demSoat)}`)
   process.exit(0)
 }
+if (co('--nap-hang-ngoai')) { console.log(JSON.stringify(await goi('/kho/loi-giai-kinh/nap-hang-ngoai', {}))); process.exit(0) }
 if (co('--nap-hang')) { console.log(JSON.stringify(await goi('/kho/loi-giai-kinh/nap-hang', {}))); process.exit(0) }
 if (co('--tong')) {
   const t = await goi('/kho/loi-giai-kinh/tong', {})

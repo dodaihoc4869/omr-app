@@ -50,6 +50,9 @@ export interface NguCanhKinh {
   nguon: NguonKinh
   /** kiểm chuỗi phép tính (máy chủ cắm `kiemCong` của so-do-cong.ts); vắng ⇒ không kiểm số (app) */
   kiemSo?: (x: { soDo?: SoDo; buoc: BuocTinh[]; ketQua?: string }) => { ok: boolean; lyDo?: string }
+  /** CÂU TỰ LUẬN (thầy 03/11 «câu tự luận giải luôn để lời giải hiện trên máy chiếu»): không có phương án / ý để khớp; `dapAn` = đáp số THAM CHIẾU của kho
+   *  (đáp án / kết quả lời giải kho nếu là một số) hoặc rỗng. Mọi phép tính vẫn tính lại; có đáp số tham chiếu ⇒ mục `laDapSo` phải khớp. */
+  tuLuan?: boolean
 }
 
 export interface KetQuaKiemKinh { ket: CongKinh; lyDo: string; ban: BanKinh | null; boKhoi: string[] }
@@ -216,12 +219,20 @@ export function kiemBanKinh(tho: unknown, ctx: NguCanhKinh): KetQuaKiemKinh {
   if (!hayNham.length) thieu.push('chỗ hay nhầm')
   if (!tuHoi.hoi || !tuHoi.tra) thieu.push('câu tự trả lời')
   if (!theNho.length) thieu.push('thẻ nhớ')
-  if (ctx.phan === 'III' && !buoc && !phepTinh) thieu.push('phép tính có nghĩa từng số')
+  if (ctx.phan === 'III' && !ctx.tuLuan && !buoc && !phepTinh) thieu.push('phép tính có nghĩa từng số')
+  if (ctx.tuLuan) { delete ban.buoc; delete ban.soDo; ban.lyDo = []; ban.tuLuan = true } // tự luận: chỉ phép tính có tên (tính lại được), không chuỗi khớp đáp án
   const cam = chuCam(ban)
   if (cam) return { ket: 'thieu', lyDo: cam, ban, boKhoi }
   if (thieu.length) return { ket: 'thieu', lyDo: `thiếu: ${thieu.join(', ')}`, ban, boKhoi }
   // ---- khớp đáp án kho
   const theoKho = dungTheoKho(ctx.phan, ctx.dapAn)
+  if (ctx.tuLuan) {
+    if (phepTinh) {
+      const loi = kiemPhepTinh(phepTinh, ctx.dapAn && phepTinh.some((p) => p.laDapSo) ? 'III' : 'I', ctx.dapAn)
+      if (loi) return { ket: 'lech', lyDo: loi, ban, boKhoi }
+    }
+    return { ket: 'dat', lyDo: '', ban, boKhoi }
+  }
   if (ctx.phan === 'I' || ctx.phan === 'II') {
     if (!theoKho) return { ket: 'khong_kiem_duoc', lyDo: 'đáp án kho không đọc được', ban, boKhoi }
     const khoa = ctx.phan === 'I' ? KHOA_I : KHOA_II
@@ -264,8 +275,8 @@ export function xepTheoCauPhat(tho: unknown, q: { phan: PhanKinh; choices?: read
   const { _goc, ...ban } = tho as Obj & { _goc?: { pa?: Record<string, string> | null; y?: Record<string, string> | null } }
   const b = ban as unknown as BanKinh
   if (!Array.isArray(b.lyDo)) return null
-  if (q.phan === 'III') {
-    if (b.ketQua && !khopLamTron(docSoViet(b.ketQua) ?? NaN, q.correct)) return null
+  if (q.phan === 'III' || b.tuLuan) {
+    if (!b.tuLuan && b.ketQua && !khopLamTron(docSoViet(b.ketQua) ?? NaN, q.correct)) return null
     return b
   }
   const khoa = q.phan === 'I' ? KHOA_I : KHOA_II
