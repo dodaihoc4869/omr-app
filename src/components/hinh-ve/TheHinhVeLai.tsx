@@ -1,7 +1,7 @@
 // THẺ «HÌNH CỦA ĐỀ · VẼ LẠI» (thầy 03/11): cảnh vector do máy vẽ điền, app vẽ bằng SVG; hoạt hoạ chạy MỘT lượt (nhịp), máy yếu / giảm chuyển động ⇒ tĩnh.
 // Mảnh nạp lười — nơi gọi dùng `React.lazy`. Màu CHỈ biến --tr-* của app học sinh. Chữ KHÔNG đè hình: toạ độ chọn sẵn + xếp nhãn tự nhích (xepNhan).
 import { useEffect, useState } from 'react'
-import type { CanhDoThi, CanhFischer, CanhSoDo, CanhThiNghiem, HinhVeLai } from '../../lib/hinh-ve/kieu'
+import type { CanhDoThi, CanhFischer, CanhSoDo, CanhSvg, CanhThiNghiem, HinhVeLai } from '../../lib/hinh-ve/kieu'
 import './hinh-ve.css'
 
 type SoDo = CanhSoDo
@@ -136,6 +136,11 @@ function VeFischer({ v }: { v: Fischer }) {
   )
 }
 
+/** Khuôn vẽ tự do: `svg` đã qua `lamSachSvg` (dựng lại từ thẻ / thuộc tính cho phép, màu chỉ qua lớp bảng màu) nên đặt thẳng vào <svg>. */
+function VeSvg({ v, ten }: { v: CanhSvg; ten: string }) {
+  return <svg viewBox={`0 0 ${v.rong} ${v.cao}`} className="hv-svg hv-tu-do" role="img" aria-label={ten} dangerouslySetInnerHTML={{ __html: v.svg }} />
+}
+
 export default function TheHinhVeLai({ hinh }: { hinh: HinhVeLai }) {
   const v = hinh.canh
   return (
@@ -143,7 +148,7 @@ export default function TheHinhVeLai({ hinh }: { hinh: HinhVeLai }) {
       <span className="hv-nhan-the">Hình của đề · vẽ lại</span>
       <b className="hv-tieu-de">{hinh.tieuDe}</b>
       <div className="hv-san">
-        {v.loai === 'so-do' ? <VeSoDo v={v} /> : v.loai === 'do-thi' ? <VeDoThi v={v} /> : v.loai === 'fischer' ? <VeFischer v={v} /> : <VeChungCat v={v} />}
+        {v.loai === 'so-do' ? <VeSoDo v={v} /> : v.loai === 'do-thi' ? <VeDoThi v={v} /> : v.loai === 'fischer' ? <VeFischer v={v} /> : v.loai === 'svg' ? <VeSvg v={v} ten={hinh.tieuDe} /> : <VeChungCat v={v} />}
       </div>
     </section>
   )

@@ -51,3 +51,17 @@ html.may-yeu .hv-the { -webkit-backdrop-filter: none; backdrop-filter: none; bac
 .hv-chu-giai text { fill: var(--tr-chu); font-size: 12px; font-weight: 800; }
 html.may-yeu .hv-svg * { animation: none !important; transition: none !important; }
 @media (prefers-reduced-motion: reduce) { .hv-xp { transition: none; } .hv-lua, .hv-bot, .hv-hoi, .hv-giot { animation: none; } .hv-noi path, .hv-que rect { transition: none; } }
+
+/* ── Khuôn vẽ tự do (svg): máy vẽ chỉ gọi LỚP, màu lấy từ biến bảng màu app ── */
+.hv-tu-do .f-khong { fill: none; } .hv-tu-do .f-nen { fill: var(--tr-mat); } .hv-tu-do .f-chu { fill: var(--tr-chu); } .hv-tu-do .f-xam { fill: color-mix(in oklab, var(--tr-chu) 30%, var(--tr-mat)); }
+.hv-tu-do .f-hs { fill: var(--tr-hs-day); } .hv-tu-do .f-hs-nhat { fill: color-mix(in oklab, var(--tr-hs-day) 28%, var(--tr-mat)); }
+.hv-tu-do .f-tin { fill: var(--tr-tin-day); } .hv-tu-do .f-tin-nhat { fill: color-mix(in oklab, var(--tr-tin) 32%, var(--tr-mat)); }
+.hv-tu-do .f-sao { fill: var(--tr-sao-day); } .hv-tu-do .f-sao-nhat { fill: color-mix(in oklab, var(--tr-sao) 38%, var(--tr-mat)); }
+.hv-tu-do .f-sai { fill: var(--tr-sai); } .hv-tu-do .f-sai-nhat { fill: color-mix(in oklab, var(--tr-sai) 28%, var(--tr-mat)); }
+.hv-tu-do .f-dung { fill: var(--tr-tin); } .hv-tu-do .f-dung-nhat { fill: color-mix(in oklab, var(--tr-tin) 22%, var(--tr-mat)); }
+.hv-tu-do .f-tim { fill: var(--tr-tim); } .hv-tu-do .f-tim-nhat { fill: color-mix(in oklab, var(--tr-tim) 28%, var(--tr-mat)); }
+.hv-tu-do .s-chu { stroke: var(--tr-chu); } .hv-tu-do .s-chu-2 { stroke: var(--tr-chu-2); } .hv-tu-do .s-mo { stroke: color-mix(in oklab, var(--tr-chu) 25%, transparent); } .hv-tu-do .s-nen { stroke: var(--tr-mat); }
+.hv-tu-do .s-hs { stroke: var(--tr-hs-day); } .hv-tu-do .s-tin { stroke: var(--tr-tin-day); } .hv-tu-do .s-sao { stroke: var(--tr-sao-day); } .hv-tu-do .s-sai { stroke: var(--tr-sai); } .hv-tu-do .s-dung { stroke: var(--tr-tin); } .hv-tu-do .s-tim { stroke: var(--tr-tim); }
+.hv-tu-do [class*="s-"] { fill-opacity: 1; } .hv-tu-do line, .hv-tu-do path, .hv-tu-do polyline { stroke-linecap: round; stroke-linejoin: round; } .hv-tu-do .nc { stroke-width: 2; } .hv-tu-do .net-dut { stroke-dasharray: 5 4; }
+.hv-tu-do text { font-size: 13px; font-weight: 700; fill: var(--tr-chu); } .hv-tu-do .t-chu { fill: var(--tr-chu); } .hv-tu-do .t-chu-2 { fill: var(--tr-chu-2); } .hv-tu-do .t-hs { fill: var(--tr-hs-chu); } .hv-tu-do .t-tin { fill: var(--tr-tin-day); } .hv-tu-do .t-sao { fill: var(--tr-sao-day); } .hv-tu-do .t-sai { fill: var(--tr-sai-chu); } .hv-tu-do .t-dung { fill: var(--tr-tin-day); } .hv-tu-do .t-tim { fill: var(--tr-tim); }
+.hv-tu-do .t-dam { font-weight: 800; } .hv-tu-do .t-nho { font-size: 11px; } .hv-tu-do .t-lon { font-size: 16px; font-weight: 800; }

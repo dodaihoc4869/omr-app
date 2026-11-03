@@ -3,11 +3,11 @@
 
 // src/lib/hinh-ve/kieu.ts
 var PHIEN_BAN_HINH = 1;
-var CAC_KHUON_HINH = ["so-do", "do-thi", "thi-nghiem", "fischer"];
-var TIEU_DE_CHUNG = { "so-do": "Sơ đồ chuyển hoá", "do-thi": "Đồ thị", "thi-nghiem": "Bộ dụng cụ chưng cất", fischer: "Công thức chiếu Fischer" };
+var CAC_KHUON_HINH = ["so-do", "do-thi", "thi-nghiem", "fischer", "svg"];
+var TIEU_DE_CHUNG = { "so-do": "Sơ đồ chuyển hoá", "do-thi": "Đồ thị", "thi-nghiem": "Bộ dụng cụ chưng cất", fischer: "Công thức chiếu Fischer", svg: "Hình minh hoạ" };
 var laObj = (v) => !!v && typeof v === "object" && !Array.isArray(v);
 var mang = (v) => Array.isArray(v) ? v : [];
-var chu = (v, tran) => typeof v === "string" ? v.replace(/[\u0000-\u001f]/g, " ").trim().slice(0, tran) : "";
+var chu = (v, tran) => typeof v === "string" ? v.replace(new RegExp("\\p{Cc}", "gu"), " ").trim().slice(0, tran) : "";
 var so = (v) => typeof v === "number" && Number.isFinite(v) ? v : typeof v === "string" && v.trim() !== "" && Number.isFinite(Number(v.replace(",", "."))) ? Number(v.replace(",", ".")) : null;
 var SUB = "₀₁₂₃₄₅₆₇₈₉";
 var SUP = "⁰¹²³⁴⁵⁶⁷⁸⁹";
@@ -26,10 +26,118 @@ function phienAmKhop(a, b) {
 function trongKhung(v, lo = 0, hi = 100) {
   return v >= lo && v <= hi;
 }
+var LOP_SVG = /* @__PURE__ */ new Set([
+  "f-khong",
+  "f-nen",
+  "f-chu",
+  "f-xam",
+  "f-hs",
+  "f-hs-nhat",
+  "f-tin",
+  "f-tin-nhat",
+  "f-sao",
+  "f-sao-nhat",
+  "f-sai",
+  "f-sai-nhat",
+  "f-dung",
+  "f-dung-nhat",
+  "f-tim",
+  "f-tim-nhat",
+  "s-chu",
+  "s-chu-2",
+  "s-mo",
+  "s-hs",
+  "s-tin",
+  "s-sao",
+  "s-sai",
+  "s-dung",
+  "s-tim",
+  "s-nen",
+  "nc",
+  "net-dut",
+  "t-chu",
+  "t-chu-2",
+  "t-hs",
+  "t-tin",
+  "t-sao",
+  "t-sai",
+  "t-dung",
+  "t-tim",
+  "t-dam",
+  "t-nho",
+  "t-lon"
+]);
+var THE_SVG = /* @__PURE__ */ new Set(["g", "path", "line", "rect", "circle", "ellipse", "polygon", "polyline", "text", "tspan"]);
+var SO_SVG = /* @__PURE__ */ new Set(["x", "y", "x1", "y1", "x2", "y2", "cx", "cy", "r", "rx", "ry", "width", "height", "stroke-width", "opacity", "font-size"]);
+var RE_SO = /^-?\d{1,4}(?:\.\d{1,3})?$/;
+var decodeSvg = (t) => t.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+var maHoaSvg = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+function lamSachSvg(tho, rong, cao) {
+  const t = typeof tho === "string" ? tho.trim() : "";
+  if (!t || t.length > 24e3) return { ok: false, lyDo: "svg rỗng hoặc quá dài (> 24 KB)" };
+  const ra = [], chu2 = [], mo = [];
+  let vt = 0, soThe = 0, trongText = 0;
+  const re = /<(\/?)([a-zA-Z][a-zA-Z0-9]*)((?:\s+[a-zA-Z-]+="[^"<>]*")*)\s*(\/?)>|([^<]+)/g;
+  let m;
+  while (m = re.exec(t)) {
+    if (m.index !== vt) return { ok: false, lyDo: "svg có kí tự / thẻ ngoài khuôn" };
+    vt = re.lastIndex;
+    if (m[5] !== void 0) {
+      const van = m[5];
+      if (!van.trim()) {
+        ra.push(van.replace(/\s+/g, " "));
+        continue;
+      }
+      if (!trongText) return { ok: false, lyDo: "chữ nằm ngoài thẻ text" };
+      if (/&(?!amp;|lt;|gt;)/.test(van) || van.length > 80) return { ok: false, lyDo: "chữ trong svg sai khuôn" };
+      chu2.push(decodeSvg(van).trim());
+      ra.push(maHoaSvg(decodeSvg(van)));
+      continue;
+    }
+    const dong = m[1] === "/", ten = m[2].toLowerCase(), tuDong = m[4] === "/";
+    if (!THE_SVG.has(ten)) return { ok: false, lyDo: `thẻ <${ten}> không được phép` };
+    if (dong) {
+      if (mo.pop() !== ten) return { ok: false, lyDo: "thẻ đóng / mở lệch" };
+      if (ten === "text" || ten === "tspan") trongText--;
+      ra.push(`</${ten}>`);
+      continue;
+    }
+    if (++soThe > 400) return { ok: false, lyDo: "svg quá nhiều thẻ (> 400)" };
+    const thuoc = [];
+    const rea = /\s+([a-zA-Z-]+)="([^"<>]*)"/g;
+    let a;
+    while (a = rea.exec(m[3] ?? "")) {
+      const k = a[1].toLowerCase(), v = a[2].trim();
+      let ok = false;
+      if (SO_SVG.has(k)) ok = RE_SO.test(v) && (k === "font-size" ? Number(v) >= 6 && Number(v) <= 60 : k.startsWith("stroke") || k === "opacity" || Math.abs(Number(v)) <= 900);
+      else if (k === "d") ok = /^[MmLlHhVvCcSsQqTtAaZz0-9eE.,\s-]{1,2400}$/.test(v);
+      else if (k === "points") ok = /^[0-9.,\s-]{1,900}$/.test(v);
+      else if (k === "transform") ok = /^(?:(?:translate|rotate|scale)\(\s*-?\d{1,4}(?:\.\d{1,3})?(?:[\s,]+-?\d{1,4}(?:\.\d{1,3})?){0,2}\s*\)\s*){1,3}$/.test(v);
+      else if (k === "class") ok = v.split(/\s+/).every((c) => LOP_SVG.has(c));
+      else if (k === "text-anchor") ok = v === "start" || v === "middle" || v === "end";
+      else if (k === "stroke-dasharray") ok = /^[0-9.\s,]{1,24}$/.test(v);
+      if (!ok) return { ok: false, lyDo: `thuộc tính ${k}="${v.slice(0, 20)}" không được phép` };
+      thuoc.push(`${k}="${v}"`);
+    }
+    if (ten === "text" || ten === "tspan") trongText++;
+    ra.push(`<${ten}${thuoc.length ? " " + thuoc.join(" ") : ""}${tuDong ? "/" : ""}>`);
+    if (tuDong) {
+      if (ten === "text" || ten === "tspan") trongText--;
+    } else mo.push(ten);
+  }
+  if (vt !== t.length || mo.length) return { ok: false, lyDo: "thẻ svg chưa đóng" };
+  if (chu2.length > 60) return { ok: false, lyDo: "svg quá nhiều nhãn chữ (> 60)" };
+  if (!(rong >= 100 && rong <= 800 && cao >= 60 && cao <= 800)) return { ok: false, lyDo: "khung svg sai cỡ" };
+  return { ok: true, svg: ra.join(""), chu: chu2 };
+}
 function chuTrongCanh(c) {
   if (c.loai === "so-do") return [...c.o.map((b) => b.chu), ...c.noi.flatMap((n) => [n.nhan ?? "", n.so ?? ""])];
   if (c.loai === "do-thi") return [c.truc.x, c.truc.y, ...c.truc.xVach.map(String), ...c.truc.yVach.map(String), ...c.que.map((q) => q.nhan ?? "")];
   if (c.loai === "thi-nghiem") return Object.values(c.nhan);
+  if (c.loai === "svg") {
+    const k = lamSachSvg(c.svg, c.rong, c.cao);
+    return k.ok ? k.chu : [];
+  }
   return [c.dau, c.cuoi, ...c.hang.flat()];
 }
 function kiemCanhHinh(tho, phienAm) {
@@ -53,6 +161,12 @@ function kiemCanhHinh(tho, phienAm) {
     const n = x.nhan, ks = ["binh", "luoi", "sinhHan", "vao", "ra", "hung"];
     if (ks.some((k) => !chu(n[k], 30))) return { ok: false, lyDo: "dụng cụ: thiếu nhãn" };
     canh = { loai: "thi-nghiem", khuon: "chung-cat", nhan: Object.fromEntries(ks.map((k) => [k, chu(n[k], 30)])) };
+  } else if (x.loai === "svg") {
+    const rong = so(x.rong), cao = so(x.cao);
+    if (rong === null || cao === null) return { ok: false, lyDo: "svg: thiếu rong / cao" };
+    const k = lamSachSvg(x.svg, rong, cao);
+    if (!k.ok) return { ok: false, lyDo: `svg: ${k.lyDo}` };
+    canh = { loai: "svg", rong, cao, svg: k.svg };
   } else if (x.loai === "fischer") {
     const hang = mang(x.hang).map((h) => Array.isArray(h) && h.length === 2 && chu(h[0], 6) && chu(h[1], 6) ? [chu(h[0], 6), chu(h[1], 6)] : null);
     if (!chu(x.dau, 10) || !chu(x.cuoi, 10) || hang.length < 2 || hang.length > 6 || hang.some((h) => !h)) return { ok: false, lyDo: "Fischer sai khuôn" };
@@ -84,11 +198,13 @@ function chuTrongCanhTho(c) {
 }
 export {
   CAC_KHUON_HINH,
+  LOP_SVG,
   PHIEN_BAN_HINH,
   TIEU_DE_CHUNG,
   chuTrongCanh,
   chuanChuHinh,
   hinhVeDungDuoc,
   kiemCanhHinh,
+  lamSachSvg,
   phienAmKhop
 };
