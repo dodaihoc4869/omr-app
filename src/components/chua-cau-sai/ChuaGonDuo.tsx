@@ -267,7 +267,7 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
               <div className="duo-gt-bong"><svg className="duo-gt-vien" aria-hidden="true"><path /></svg><span className="duo-gt-cho" aria-hidden="true" /><DeCau q={q} stt={1} /></div>
             </div>
             : <DeCau q={q} stt={1} />}
-          {coHinhDe(q.hinhAnh) && <Suspense key={`hv${q.qid}`} fallback={null}><HinhVeLaiCuaCau qid={q.qid} /></Suspense>}{/* thầy 03/11: hình của đề vẽ lại = thẻ riêng ở dưới */}
+          {coHinhDe(q.hinhAnh) && <Suspense key={`hv${q.qid}`} fallback={null}><HinhVeLaiCuaCau qid={q.qid} hinh={q.hinhAnh} /></Suspense>}{/* thầy 03/11: hình của đề vẽ lại = thẻ riêng ở dưới */}
         </div>
         <ThanhCuon key={`cd${q.qid}${lan}`} cot="de" />
         <div key={`t${q.qid}${lan}`} className="duo-cot-tra">

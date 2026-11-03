@@ -65,3 +65,6 @@ html.may-yeu .hv-svg * { animation: none !important; transition: none !important
 .hv-tu-do [class*="s-"] { fill-opacity: 1; } .hv-tu-do line, .hv-tu-do path, .hv-tu-do polyline { stroke-linecap: round; stroke-linejoin: round; } .hv-tu-do .nc { stroke-width: 2; } .hv-tu-do .net-dut { stroke-dasharray: 5 4; }
 .hv-tu-do text { font-size: 15px; font-weight: 700; fill: var(--tr-chu); } .hv-tu-do .t-chu { fill: var(--tr-chu); } .hv-tu-do .t-chu-2 { fill: var(--tr-chu-2); } .hv-tu-do .t-hs { fill: var(--tr-hs-chu); } .hv-tu-do .t-tin { fill: var(--tr-tin-day); } .hv-tu-do .t-sao { fill: var(--tr-sao-day); } .hv-tu-do .t-sai { fill: var(--tr-sai-chu); } .hv-tu-do .t-dung { fill: var(--tr-tin-day); } .hv-tu-do .t-tim { fill: var(--tr-tim); }
 .hv-tu-do .t-dam { font-weight: 800; } .hv-tu-do .t-nho { font-size: 13px; } .hv-tu-do .t-lon { font-size: 17px; font-weight: 800; }
+
+/* Đã vẽ lại đủ hình của đề ⇒ ẩn ảnh gốc ở cùng khối (dấu .hv-thay do HinhVeLaiCuaCau đặt). */
+div:has(> .hv-thay) [data-hinh-de] { display: none; }
