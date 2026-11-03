@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg version='1.1' baseProfile='full'
+              xmlns='http://www.w3.org/2000/svg'
+                      xmlns:rdkit='http://www.rdkit.org/xml'
+                      xmlns:xlink='http://www.w3.org/1999/xlink'
+                  xml:space='preserve'
+width='360px' height='220px' viewBox='0 0 360 220'><title>Công thức cấu tạo theo hình nguồn</title>
+<!-- END OF HEADER -->
+<path class='bond-0 atom-0 atom-1' d='M 83.3,193.4 L 168.0,144.5' style='fill:none;fill-rule:evenodd;stroke:#252440;stroke-width:2.5px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-1 atom-1 atom-2' d='M 191.4,144.5 L 276.1,193.4' style='fill:none;fill-rule:evenodd;stroke:#252440;stroke-width:2.5px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-2 atom-1 atom-3' d='M 179.7,123.1 L 179.7,26.4' style='fill:none;fill-rule:evenodd;stroke:#252440;stroke-width:2.5px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='atom-1' d='M 173.8 148.5
+Q 173.4 148.8, 172.9 148.8
+Q 172.4 148.8, 172.0 148.5
+Q 171.6 148.1, 171.6 147.6
+L 171.6 128.1
+Q 171.6 127.5, 172.0 127.1
+Q 172.4 126.7, 173.0 126.7
+Q 174.3 126.7, 175.0 127.8
+L 185.3 144.8
+Q 185.3 144.7, 185.2 144.7
+Q 185.2 144.7, 185.2 144.8
+L 185.2 128.0
+Q 185.2 127.5, 185.5 127.1
+Q 185.9 126.7, 186.4 126.7
+Q 187.0 126.7, 187.4 127.1
+Q 187.8 127.5, 187.8 128.0
+L 187.8 147.5
+Q 187.8 148.0, 187.3 148.4
+Q 186.9 148.8, 186.4 148.8
+Q 185.1 148.8, 184.4 147.7
+L 174.1 130.8
+Q 174.1 130.8, 174.2 130.8
+Q 174.2 130.8, 174.2 130.8
+L 174.2 147.6
+Q 174.2 148.1, 173.8 148.5
+' fill='#252440'/>
+</svg>

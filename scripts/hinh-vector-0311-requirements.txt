@@ -5,6 +5,6 @@ vtracer==0.6.15
 cairosvg==2.8.2
 rdkit==2026.9.1
 
-fonttools
-brotli
-uharfbuzz
+fonttools==4.61.1
+brotli==1.2.1
+uharfbuzz==0.57.0

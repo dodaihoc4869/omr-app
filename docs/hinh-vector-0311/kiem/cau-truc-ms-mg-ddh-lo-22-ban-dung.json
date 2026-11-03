@@ -1,0 +1,47 @@
+[
+  {
+    "i": 602,
+    "hash": "6fb6966f4587ee297155482ca1dfbf94aabe806a0fb7eef98d246982113f4056",
+    "fileNguon": "anh/6fb6966f4587ee297155482ca1dfbf94aabe806a0fb7eef98d246982113f4056.png",
+    "svg": "ms-mg-ddh-d3395689bb80fbf30106169af58ae25569b125eb2152d991b2567771356b8ad0.svg",
+    "hashSvg": "d3395689bb80fbf30106169af58ae25569b125eb2152d991b2567771356b8ad0",
+    "byteSvg": 33725,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "points": [
+      [
+        12,
+        78.99,
+        "24",
+        "78,99%"
+      ],
+      [
+        12.5,
+        10,
+        "25",
+        "10%"
+      ],
+      [
+        13,
+        11.01,
+        "26",
+        "11,01%"
+      ]
+    ],
+    "xTicks": [
+      "12",
+      "12,5",
+      "13"
+    ],
+    "yTicks": [
+      20,
+      40,
+      60,
+      80
+    ],
+    "ghiChu": "Nguồn là Mg, không thay theo stem nhắc Cu; giữ số khối phía trên tráiMg, không tự thêm2+ hoặc gấp đôi m/z.",
+    "hashSvgDaSoat": "d3395689bb80fbf30106169af58ae25569b125eb2152d991b2567771356b8ad0",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

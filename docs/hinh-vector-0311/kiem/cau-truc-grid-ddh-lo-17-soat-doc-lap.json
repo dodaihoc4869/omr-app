@@ -1,0 +1,482 @@
+[
+  {
+    "i": 315,
+    "hashSvg": "a52b5639021977aab4d5f898c53be5ef1d929422ac84f1f4c3a782f9fbb95bac",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: mở PNG nguồn và render SVG thật; đủ3panel đúng thứ tự Glu/Gly/Arg, Glu5C/Gly2C/Arg6C, đủ NH/NH2 và liên kết C=NH; không tự thêm điện tích. Nhãn giữ pH_I với I viết hoa dưới chân, đúng3,1/6,0/10,8. Toàn bộ chữ DDH thành path, không fallback/text/tspan, không chạm/cắt/tràn.",
+    "hash": "36392b8cdc063d25d6ec82278074e597a7be4ca2304a1c6eefc78c00c7abb28e",
+    "hashSvgDaSoat": "a52b5639021977aab4d5f898c53be5ef1d929422ac84f1f4c3a782f9fbb95bac"
+  },
+  {
+    "i": 0,
+    "hashSvg": "abf2fc1ad960dd0a2f71c51a4c8b82e92ae18953a14ffed7dd1e8292dc2bbfef",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "001dd9e2e6acf6a16af95efa67caed5ecd6b39b319960476fb26132218ac765d",
+    "hashSvgDaSoat": "abf2fc1ad960dd0a2f71c51a4c8b82e92ae18953a14ffed7dd1e8292dc2bbfef"
+  },
+  {
+    "i": 140,
+    "hashSvg": "f6d608ec5b9fc4d18fbd67702b68836bf5066c00112e7bc5e8e7ffe87caf630f",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "18dc9c2cb7da356866a860d0785f0844845ffc01cb8b5653c30e6127c146c24b",
+    "hashSvgDaSoat": "f6d608ec5b9fc4d18fbd67702b68836bf5066c00112e7bc5e8e7ffe87caf630f"
+  },
+  {
+    "i": 154,
+    "hashSvg": "b6d00eded3632c0c2763521ac656c9027ab39e09da9a7e608a7a4a8f46b91624",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "1abc15472e085941b56a965267dba71ed3975cdd12f7688c66906bc137e5ee2c",
+    "hashSvgDaSoat": "b6d00eded3632c0c2763521ac656c9027ab39e09da9a7e608a7a4a8f46b91624"
+  },
+  {
+    "i": 171,
+    "hashSvg": "b0d40a5b7c5d3c872e90f13b767c669442fb4b7dfc8f6c71e57a21e193db6889",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "1d640478ca3b1474a8b23f384e919bf0ec48f9303a7cba97c9b7bccb8bbd0d94",
+    "hashSvgDaSoat": "b0d40a5b7c5d3c872e90f13b767c669442fb4b7dfc8f6c71e57a21e193db6889"
+  },
+  {
+    "i": 186,
+    "hashSvg": "0f2659e99afc8a1b9169fe83fdaa1e5a5ac46a3d0726b3b03d3c15b6590935e3",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "1ff018369b65d591472be8b50465be98fa6b65c7e9b885143587e093a4745d10",
+    "hashSvgDaSoat": "0f2659e99afc8a1b9169fe83fdaa1e5a5ac46a3d0726b3b03d3c15b6590935e3"
+  },
+  {
+    "i": 226,
+    "hashSvg": "b59e0b6758690883bfd80327c6872b3ece00b7c2ad088a5babb897af266c6d72",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "26b729c55f01b62ae86d3bef2c796533125a8fafed561438f07f7fcd09324fdf",
+    "hashSvgDaSoat": "b59e0b6758690883bfd80327c6872b3ece00b7c2ad088a5babb897af266c6d72"
+  },
+  {
+    "i": 279,
+    "hashSvg": "b0d40a5b7c5d3c872e90f13b767c669442fb4b7dfc8f6c71e57a21e193db6889",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "2f468c3d84373a4984e4ed60364b409269f6f9639131f392c348188321bd01de",
+    "hashSvgDaSoat": "b0d40a5b7c5d3c872e90f13b767c669442fb4b7dfc8f6c71e57a21e193db6889"
+  },
+  {
+    "i": 280,
+    "hashSvg": "da72d9d01bb8970c8112f8ecbd2bfa422a2448d0b33bed7685d4563fc78888bf",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "2f4b605287ea0bbe117ae9f90ce9f9793f44d8d9891d1cc50437d6ca861d7a67",
+    "hashSvgDaSoat": "da72d9d01bb8970c8112f8ecbd2bfa422a2448d0b33bed7685d4563fc78888bf"
+  },
+  {
+    "i": 281,
+    "hashSvg": "26130568317536105c29c15dcce70209dcdebf09dd0dafbff90f8dbb96539974",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "2f76455207e856f9cccce97b2c074d62824b86693914ce3e688184145f2fe50d",
+    "hashSvgDaSoat": "26130568317536105c29c15dcce70209dcdebf09dd0dafbff90f8dbb96539974"
+  },
+  {
+    "i": 364,
+    "hashSvg": "c48008e92761f63246967de19748101d6967d3b9f5e9f38c1d35f48bda7778b7",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "40996d8a60e4ec611cd28f8787bbafb5ffc58aabb678b9074e3339d614268469",
+    "hashSvgDaSoat": "c48008e92761f63246967de19748101d6967d3b9f5e9f38c1d35f48bda7778b7"
+  },
+  {
+    "i": 417,
+    "hashSvg": "b0d40a5b7c5d3c872e90f13b767c669442fb4b7dfc8f6c71e57a21e193db6889",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "4a8cda10004255905a11ca6564892c8e1c2323ceb827764500ae5f84f6e636b7",
+    "hashSvgDaSoat": "b0d40a5b7c5d3c872e90f13b767c669442fb4b7dfc8f6c71e57a21e193db6889"
+  },
+  {
+    "i": 458,
+    "hashSvg": "6fe2c59513e191d80468f300f4fec170b1c46e1e685defb9e93a968cea9ede9e",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "52d0ee97cec259956854e6455066b0775bd2d7bc7360c6e9f42d07a08af4dff8",
+    "hashSvgDaSoat": "6fe2c59513e191d80468f300f4fec170b1c46e1e685defb9e93a968cea9ede9e"
+  },
+  {
+    "i": 459,
+    "hashSvg": "f17456c80791cf6740eadaad0cf503f1107ca5ead779f0b9818beeb5053ea811",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "53a766466009ac8bf817899ce4d029c2e0f2f87e99d50c5fb4830acd3282addc",
+    "hashSvgDaSoat": "f17456c80791cf6740eadaad0cf503f1107ca5ead779f0b9818beeb5053ea811"
+  },
+  {
+    "i": 480,
+    "hashSvg": "f41c2cc070b12b64b551e220e5fac363b22714da3c7ceb73fb22eca77684ea48",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "58752bbfe20d1ec7e27501f2157daae86ea138acc2c901fb22bafbda08eceec4",
+    "hashSvgDaSoat": "f41c2cc070b12b64b551e220e5fac363b22714da3c7ceb73fb22eca77684ea48"
+  },
+  {
+    "i": 523,
+    "hashSvg": "9339c5a36aa33e25c628e7438120f93eb07eadf3d11876cd3ca29d648be4c73d",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "621691d297a3501f9e9fb5cb7f44d6d3b94f8bcfb8c504bde0f309bafb228a46",
+    "hashSvgDaSoat": "9339c5a36aa33e25c628e7438120f93eb07eadf3d11876cd3ca29d648be4c73d"
+  },
+  {
+    "i": 524,
+    "hashSvg": "f5616edcc116d0295754cf64f65c69db9a52fe2697b75b3bde3a1d21e6a79a23",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "627bfdb99742a58059703a543e432e49613de96a298dddb89371931f382a43d3",
+    "hashSvgDaSoat": "f5616edcc116d0295754cf64f65c69db9a52fe2697b75b3bde3a1d21e6a79a23"
+  },
+  {
+    "i": 539,
+    "hashSvg": "faeec9b1486784070d83c8b0ea24b1caa5efb914081c033eab7a90ee281d6858",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "657ab7a718276783dc5eb138a544a78b18330545a67719e9f7005bbe0112bb2f",
+    "hashSvgDaSoat": "faeec9b1486784070d83c8b0ea24b1caa5efb914081c033eab7a90ee281d6858"
+  },
+  {
+    "i": 564,
+    "hashSvg": "c8c175b9382b27325533729fd323857e770db7d34e22df40ebb90aab16a8d1a3",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "68d793e5a94dda023ea298d37601df62daf51aa811823eea331c1d31557cee6a",
+    "hashSvgDaSoat": "c8c175b9382b27325533729fd323857e770db7d34e22df40ebb90aab16a8d1a3"
+  },
+  {
+    "i": 614,
+    "hashSvg": "d01075683016cef16511a5703c9acdeb48ad8b003f41ae7b1451db078d13bc0f",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "7274ba339bedc36993f8da89e9a5045dcfdfcd2d4e77afe48e67b6e874271318",
+    "hashSvgDaSoat": "d01075683016cef16511a5703c9acdeb48ad8b003f41ae7b1451db078d13bc0f"
+  },
+  {
+    "i": 647,
+    "hashSvg": "6fe2c59513e191d80468f300f4fec170b1c46e1e685defb9e93a968cea9ede9e",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "78a5d13c512171289d9d445b53dca36a1fd2debc833cc6d23f88351d72d6be6a",
+    "hashSvgDaSoat": "6fe2c59513e191d80468f300f4fec170b1c46e1e685defb9e93a968cea9ede9e"
+  },
+  {
+    "i": 680,
+    "hashSvg": "ebcfe15d15e575493b2e91d1e2681d1aa83b2e86acdc7e04c3486fbf8593b8ea",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "7d75b4d25e1a3787cbd9035ccad19647504cf21e0aaf44183a22df683f5d9544",
+    "hashSvgDaSoat": "ebcfe15d15e575493b2e91d1e2681d1aa83b2e86acdc7e04c3486fbf8593b8ea"
+  },
+  {
+    "i": 743,
+    "hashSvg": "66290bd75b3a46b39bb7931d4e79ddd7fbd4b3fdbdbd321b0dd826e02ee341df",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "8b38e1a904f4478fc5367cddc1bd97bba1feef354bf82c5b756b6f63a682c812",
+    "hashSvgDaSoat": "66290bd75b3a46b39bb7931d4e79ddd7fbd4b3fdbdbd321b0dd826e02ee341df"
+  },
+  {
+    "i": 768,
+    "hashSvg": "a45ddfaa6546668d5499abd5a4ba4f7fe6b43117ced93227ffe623ce10677323",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "8f80824eb7a85621132c62f022923bb3d438aac311d3bd4951d6eb1006d20e30",
+    "hashSvgDaSoat": "a45ddfaa6546668d5499abd5a4ba4f7fe6b43117ced93227ffe623ce10677323"
+  },
+  {
+    "i": 830,
+    "hashSvg": "b0d40a5b7c5d3c872e90f13b767c669442fb4b7dfc8f6c71e57a21e193db6889",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "99b05f6e10a7d3c6820b80ffadd017a7d08c1a7e05c14cd2b473ece9bb6a779a",
+    "hashSvgDaSoat": "b0d40a5b7c5d3c872e90f13b767c669442fb4b7dfc8f6c71e57a21e193db6889"
+  },
+  {
+    "i": 895,
+    "hashSvg": "e6a786dfec8777156b08c3f1679bf81b9fef730de8e74a7fb8d8c62353d8e9c1",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "a3da0a5c4aad5ffeb7f5717528cc57cf206f43ca427bbe801a322486a484e856",
+    "hashSvgDaSoat": "e6a786dfec8777156b08c3f1679bf81b9fef730de8e74a7fb8d8c62353d8e9c1"
+  },
+  {
+    "i": 912,
+    "hashSvg": "b492290d7ec217d51ec9236a9d75fde31902eaeb44957af58a5ce8885cb08976",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "a69c61abe64eeae2262bc88323091d63730bf1e9a677b73ea7872f63f9e68a73",
+    "hashSvgDaSoat": "b492290d7ec217d51ec9236a9d75fde31902eaeb44957af58a5ce8885cb08976"
+  },
+  {
+    "i": 916,
+    "hashSvg": "91357ed80f4476f61d78c0ff3291e9e0063fedf169cc727e9ae75d6c808b3e58",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "a74dc324079434dba8997d1ad191fe6320302d7d65a157048d5078cce27e1fd0",
+    "hashSvgDaSoat": "91357ed80f4476f61d78c0ff3291e9e0063fedf169cc727e9ae75d6c808b3e58"
+  },
+  {
+    "i": 965,
+    "hashSvg": "014a93fc97e647b2a97b7b6b5297cb14488111ef69a7a8945a2055fd0c3699d9",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "ad5c85d3643041dd418996f84ecf3c0d4f3535b9635cbaeaa7269a8ff5b3453a",
+    "hashSvgDaSoat": "014a93fc97e647b2a97b7b6b5297cb14488111ef69a7a8945a2055fd0c3699d9"
+  },
+  {
+    "i": 1010,
+    "hashSvg": "26130568317536105c29c15dcce70209dcdebf09dd0dafbff90f8dbb96539974",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; đủ panel/nhãn/thứ tự, đúng nguyên tử/liên kết/NH/nhánh/điện tích/số lặp/stereo nếu có; chữ DDH không chạm/cắt/tràn.",
+    "hash": "b59bcdf82760cb0479f10faa1bea27066311aaefff768323679a7ee968094726",
+    "hashSvgDaSoat": "26130568317536105c29c15dcce70209dcdebf09dd0dafbff90f8dbb96539974"
+  },
+  {
+    "i": 1016,
+    "hashSvg": "f5616edcc116d0295754cf64f65c69db9a52fe2697b75b3bde3a1d21e6a79a23",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Ba amine C3H9N đúng bậc và nhãn X/Y/Z. Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "b65409714f7477d091d4872f473deec2c683163e0187af160de1f0ec291405c3",
+    "hashSvgDaSoat": "f5616edcc116d0295754cf64f65c69db9a52fe2697b75b3bde3a1d21e6a79a23"
+  },
+  {
+    "i": 1040,
+    "hashSvg": "0f2659e99afc8a1b9169fe83fdaa1e5a5ac46a3d0726b3b03d3c15b6590935e3",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Bốn amino acid đúng vị trí NH2 và số C; nhãn (1)–(4). Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "bb645a23017941f068e7da31898c1e5e2411581741e719419c964c2b3eeb2e63",
+    "hashSvgDaSoat": "0f2659e99afc8a1b9169fe83fdaa1e5a5ac46a3d0726b3b03d3c15b6590935e3"
+  },
+  {
+    "i": 1051,
+    "hashSvg": "2a54feeb4b0fb810f6727cc144757fc06e48b53e8ce6bfb3411f567df69e0dc8",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Bốn hợp chất C4 đúng ester/acid/ketone-alcohol và nhánh. Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "be1b9bb1f70bc1cad5a98154734cdc22a32e5b8a97d07a016f289ad56d4db73d",
+    "hashSvgDaSoat": "2a54feeb4b0fb810f6727cc144757fc06e48b53e8ce6bfb3411f567df69e0dc8"
+  },
+  {
+    "i": 1089,
+    "hashSvg": "c48008e92761f63246967de19748101d6967d3b9f5e9f38c1d35f48bda7778b7",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Giữ bốn peptide, đặc biệt (4) Gly3 không thêm NH2 nhánh. Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "c3e3536a3f224e91e6d922f6060ced27e8a267b8367650a6ed619e7754d7b352",
+    "hashSvgDaSoat": "c48008e92761f63246967de19748101d6967d3b9f5e9f38c1d35f48bda7778b7"
+  },
+  {
+    "i": 1164,
+    "hashSvg": "1a9b771c2da3aa71916bf2fe06557347221d9282cdb26def846cd2bfd3bd5c5c",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Bốn cấu trúc đúng chiều dài; (4) giữ H formyl hiện rõ. Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "d2dc70c5255e84adad9775fa614dfafe768a44d6640cc5b1a1ee8d7ba3430ee8",
+    "hashSvgDaSoat": "1a9b771c2da3aa71916bf2fe06557347221d9282cdb26def846cd2bfd3bd5c5c"
+  },
+  {
+    "i": 1165,
+    "hashSvg": "ba57b0f6839f56862076e8a77bc81c15dfa64f67cf107414f114467876596476",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Ba chất đúng para, số lặp 4, dấu chấm phẩy và chữ và. Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "d2f48c91d531306eb059e7d9c5887f7e5d761699c58e07c1ea6664ad3bbb97d2",
+    "hashSvgDaSoat": "ba57b0f6839f56862076e8a77bc81c15dfa64f67cf107414f114467876596476"
+  },
+  {
+    "i": 1302,
+    "hashSvg": "15c8526137fa3527253dfa7957a74ee50da53ac680228b972167bdae891038b8",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Ethylamine, beta-alanine, GlyGly đúng thứ tự không tự thêm nhãn. Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "ebc930a4f2e5da07bd0d0bf415425f4f553dc5aa58bb510e3a90c61ce9b59565",
+    "hashSvgDaSoat": "15c8526137fa3527253dfa7957a74ee50da53ac680228b972167bdae891038b8"
+  },
+  {
+    "i": 1357,
+    "hashSvg": "b6fc5c95e98789c74e8677e37132381d51d97e54bf9faae5b53f78769b3212fa",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Bốn peptide; (4) giữ NH2 nhánh trên carbon alpha đầu. Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "f5b18964a766ac99e70b4900719a3f78c9b33ada29147da8435bcce06e4c4364",
+    "hashSvgDaSoat": "b6fc5c95e98789c74e8677e37132381d51d97e54bf9faae5b53f78769b3212fa"
+  },
+  {
+    "i": 1375,
+    "hashSvg": "56f1dc5d0045e96d5ac478c2971b19e11e1c2a06100d743213011929e98e280b",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Ba chất đúng thứ tự và nhãn (1)–(3). Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "f88f6297418a6cc9da2d5820485623293476e8a2db358d70665031848baae3cd",
+    "hashSvgDaSoat": "56f1dc5d0045e96d5ac478c2971b19e11e1c2a06100d743213011929e98e280b"
+  },
+  {
+    "i": 1324,
+    "hashSvg": "5ad6831be500aaebf1ff253fe74714939c37715f4a6170caf67f61bb2a62a393",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: a) alkyl sulfate C12/ONa; b) palmitate C16/ONa; c) C16/OK; d) propionate/ONa. Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "f00428ad263b27ebbe9bf69482df460112eef1438902c32684be6170672ad73c",
+    "hashSvgDaSoat": "5ad6831be500aaebf1ff253fe74714939c37715f4a6170caf67f61bb2a62a393"
+  },
+  {
+    "i": 60,
+    "hashSvg": "9c6a8e6b395cd0f1a86e0f2af5bfa46d3887c7682bf610a90095dcda17327f3e",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Sáu amine đúng thứ tự, N–H (5), hai ethyl/methyl (6). Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "0bc800ce21c3523dae2f6be493321ef438a09577ec64cd88a8c3124ef386ba60",
+    "hashSvgDaSoat": "9c6a8e6b395cd0f1a86e0f2af5bfa46d3887c7682bf610a90095dcda17327f3e"
+  },
+  {
+    "i": 662,
+    "hashSvg": "bd90f5664d3f2ae28f1f034fc80e91288616aaeb75af09fa0422d7b00dc5aeee",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Ba chất ethylamine/beta-alanine/GlyGly và nhãn đúng. Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "7a95145693c30a69a24fe044e04e8e5d684870c8dac50753dc3b120ef83cced3",
+    "hashSvgDaSoat": "bd90f5664d3f2ae28f1f034fc80e91288616aaeb75af09fa0422d7b00dc5aeee"
+  },
+  {
+    "i": 304,
+    "hashSvg": "1b2a6ebe7782b942732059c3bf1bce73d740f18a1ea58a2480b8dc47ea104602",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Năm peptide đúng: (3),(4) giữ amino trên beta-carbon, methyl nhánh; (5) AlaGlyAlaGly. Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "341406fd71732e095629b445fe0c5a17c75a11e1d891ee98b732338d021b67f9",
+    "hashSvgDaSoat": "1b2a6ebe7782b942732059c3bf1bce73d740f18a1ea58a2480b8dc47ea104602"
+  },
+  {
+    "i": 316,
+    "hashSvg": "e49455810e6ad431f373c3c4e1d1fae7069e2871991aa93ebf48e0acbe82bca8",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Bốn trạng thái glutamate đúng điện tích, Dạng I–IV và pH 1,50/3,22/6,96/11,5. Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "365991501833b22082587d6ab55144e44634fb3b6ea2b97de6b32d667554f87a",
+    "hashSvgDaSoat": "e49455810e6ad431f373c3c4e1d1fae7069e2871991aa93ebf48e0acbe82bca8"
+  },
+  {
+    "i": 331,
+    "hashSvg": "4cd840d9d53c44c6e8d7d0b697ef65e2648417ce44379fc038394ba3bc079856",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Bốn trạng thái glutamate giữ pH, không tự thêm Dạng. Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "39fd0ff9f097d1688a34476945e658946f00f64be9375d5b02a12240fec28c8e",
+    "hashSvgDaSoat": "4cd840d9d53c44c6e8d7d0b697ef65e2648417ce44379fc038394ba3bc079856"
+  },
+  {
+    "i": 832,
+    "hashSvg": "7bbf1928d957c2c553c35b6110cc124d29df3c3bdbc902233dc1553fc43dab6d",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Năm amine vòng đúng cyclohexyl/aniline/diphenyl/benzyl/N-methyl; giữ N–H. Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "99dbe1448acae9457e382bb939e2433ba36a12824e67bfb556bc124c73d2ac21",
+    "hashSvgDaSoat": "7bbf1928d957c2c553c35b6110cc124d29df3c3bdbc902233dc1553fc43dab6d"
+  },
+  {
+    "i": 532,
+    "hashSvg": "7bbf1928d957c2c553c35b6110cc124d29df3c3bdbc902233dc1553fc43dab6d",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Nguồn riêng năm amine vòng khớp đủ nhãn (1)–(5), giữ N–H (3),(5). Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "64a0b2b7bdb7d66da71bdc3ce830e51e38bd4b137977b16e761f9b593b324cd3",
+    "hashSvgDaSoat": "7bbf1928d957c2c553c35b6110cc124d29df3c3bdbc902233dc1553fc43dab6d"
+  },
+  {
+    "i": 538,
+    "hashSvg": "94f438cf143d00b936407d74904e6a8820215f0fd581f8ccf298bbb9728ca711",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Sodium palmitate C16 và sodium laurylsulfate alkyl C12, ONa và hai caption nguyên văn. Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "6554003e42899d41333e8fbcba14cd4eca22d97f71e7fbd7e32fc78a9c9d38ff",
+    "hashSvgDaSoat": "94f438cf143d00b936407d74904e6a8820215f0fd581f8ccf298bbb9728ca711"
+  },
+  {
+    "i": 970,
+    "hashSvg": "9e14456548437c2d4951f915839a3b3476abf0f34e55c9d4abab1562ddd6d822",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Bốn acid citric/oxalic/lactic/malic đúng OH/COOH/nhánh, nhãn và viền nét đứt. Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "ae32a63ff67848fb88278ab2f942d8a02afb79d3cebf61fc75bfbcc740a257c2",
+    "hashSvgDaSoat": "9e14456548437c2d4951f915839a3b3476abf0f34e55c9d4abab1562ddd6d822"
+  },
+  {
+    "i": 1047,
+    "hashSvg": "1517bf13d7a9e971ca02b35fca614718cf65dcabf9a173817f77b2256112303a",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Bốn dạng glutamate đúng tất cả điện tích và pH, không tự thêm Dạng. Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "bcee990cec0cb656a9696a23128b2f10e71e69c605c04c651361b609a47a7465",
+    "hashSvgDaSoat": "1517bf13d7a9e971ca02b35fca614718cf65dcabf9a173817f77b2256112303a"
+  },
+  {
+    "i": 1084,
+    "hashSvg": "640d98e0d7ff1830c071bd81f4c0adac48ef36a728e7a7e0149ab604ada86b07",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: C16 palmitate/C12 laurylsulfate, giữ ONa, caption và (X)/(Y). Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "c36d9e2bc03d0a06ced5e1569f7ec8df26a4cdba4044a661797f5368ca1fa83a",
+    "hashSvgDaSoat": "640d98e0d7ff1830c071bd81f4c0adac48ef36a728e7a7e0149ab604ada86b07"
+  },
+  {
+    "i": 1094,
+    "hashSvg": "342a7e28e565e7c65e335d616264667be1e03267b41ea5b2105f9dc2be1a0865",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: C16 palmitate/C12 laurylsulfate, giữ ONa, không thêm caption. Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "c4ed3560332937ea5e63e012bce94d031d74eb1eb2942413c0d1bfe2e054380a",
+    "hashSvgDaSoat": "342a7e28e565e7c65e335d616264667be1e03267b41ea5b2105f9dc2be1a0865"
+  },
+  {
+    "i": 1126,
+    "hashSvg": "6754a5e97b10ebf783e344cc6c29d3e90834fab1263367f7637e6c96cc0e8147",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Năm amine: số lặp 6; aniline giữ vòng tròn; para methyl ở (4), N–H, (5) propyl và hai methyl. Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "ca94a9951d9998279e90f8cad3459d74b94c4abd4ac1ca8dae08da7412bb01cd",
+    "hashSvgDaSoat": "6754a5e97b10ebf783e344cc6c29d3e90834fab1263367f7637e6c96cc0e8147"
+  },
+  {
+    "i": 1127,
+    "hashSvg": "7621aae7b2cfba786d2b780ab50cd0070f0e1c6d4e44f5f6c0cfac7de9cdd48a",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Bốn chất X/Y/Z/T đúng ester/acid; Y hai formyl H; Z hai CH2; T ba CH2; giữ H formyl và viền nét đứt. Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "caa3af287782315469517eceb4116491d700b7b4d60eab82d22ee36c29b79522",
+    "hashSvgDaSoat": "7621aae7b2cfba786d2b780ab50cd0070f0e1c6d4e44f5f6c0cfac7de9cdd48a"
+  },
+  {
+    "i": 1199,
+    "hashSvg": "b6fc5c95e98789c74e8677e37132381d51d97e54bf9faae5b53f78769b3212fa",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Bốn peptide đúng (4) có NH2 nhánh alpha, nhãn (1)–(4). Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "d906b772d96ae7e468c86f20bddd0ed06aba208e82291bcb0cc06e0f22bf66cc",
+    "hashSvgDaSoat": "b6fc5c95e98789c74e8677e37132381d51d97e54bf9faae5b53f78769b3212fa"
+  },
+  {
+    "i": 395,
+    "hashSvg": "faeec9b1486784070d83c8b0ea24b1caa5efb914081c033eab7a90ee281d6858",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Bốn amino acid Gly/Ala/Val/Phe đúng nhánh, Phe có CH2 giữa alpha và phenyl; caption giữ đủ. Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "460613b41bef159198c4761a4ca6e4b39a92a765bae179bcefdad32052a041fa",
+    "hashSvgDaSoat": "faeec9b1486784070d83c8b0ea24b1caa5efb914081c033eab7a90ee281d6858"
+  },
+  {
+    "i": 431,
+    "hashSvg": "b124ee83f29ea5c2c0e8230b5c6bcd7fd552e1fa2978628e54519b8295b2bd9a",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Propan-1-ol/acetic acid/ethylenediamine/isopropanol đúng, nhãn (1)–(4). Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "4d8ac4ad6bc0112e71dd61168eaa9aa88177568a848cea55561f6f386068d65a",
+    "hashSvgDaSoat": "b124ee83f29ea5c2c0e8230b5c6bcd7fd552e1fa2978628e54519b8295b2bd9a"
+  },
+  {
+    "i": 454,
+    "hashSvg": "4cd840d9d53c44c6e8d7d0b697ef65e2648417ce44379fc038394ba3bc079856",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Bốn dạng glutamate chính xác proton/charges/pH; không thêm Dạng hoặc mũi tên. Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "523db0327209a065d66ba302c589237f2f9e751af7b1157351d4edfb2d697c8d",
+    "hashSvgDaSoat": "4cd840d9d53c44c6e8d7d0b697ef65e2648417ce44379fc038394ba3bc079856"
+  },
+  {
+    "i": 464,
+    "hashSvg": "4cd840d9d53c44c6e8d7d0b697ef65e2648417ce44379fc038394ba3bc079856",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Nguồn riêng bốn dạng glutamate đúng điện tích và pH 1,50/3,22/6,96/11,5. Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "54457846807fd830443977f8212b6ee84aa0b30dd17cfe1a07850d80e11380af",
+    "hashSvgDaSoat": "4cd840d9d53c44c6e8d7d0b697ef65e2648417ce44379fc038394ba3bc079856"
+  },
+  {
+    "i": 477,
+    "hashSvg": "4cd840d9d53c44c6e8d7d0b697ef65e2648417ce44379fc038394ba3bc079856",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Nguồn riêng bốn dạng glutamate đúng điện tích và pH 1,50/3,22/6,96/11,5. Đã mở nguồn PNG và SVG render thật; DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "57c9abb88b59257645340e99f96b79aee817c428da4c5361fefa4d75c060bc9a",
+    "hashSvgDaSoat": "4cd840d9d53c44c6e8d7d0b697ef65e2648417ce44379fc038394ba3bc079856"
+  }
+]

@@ -55,6 +55,7 @@ def compose_grid(r):
  ET.SubElement(root,'{'+ns+'}title').text='Các cấu trúc theo hình nguồn';rendered=[]
  for i,p in enumerate(panels):
   child={'hash':r['hash'],'i':r['i'],'caption':[],'canvasWidth':bodyW,'canvasHeight':bodyH}
+  if r.get('phongApp'):child['phongApp']=True
   if 'text'in p:child['textNguyenVan']=p['text']
   else:child['smiles']=p['smiles']
   for old,new in [('circle','vongThomDangTron'),('explicitH','giuHTuongMinh'),('terminalONa','terminalONa'),('terminalCationText','terminalCationText'),('nhanNguyenTu','nhanNguyenTu')]:
@@ -100,6 +101,12 @@ def build(source):
    params=Chem.SmilesParserParams();params.removeHs=not r.get('giuHTuongMinh',False)
    mol=Chem.MolFromSmiles(r['smiles'],params)
    if mol is None:raise ValueError('Cấu trúc không qua kiểm hóa trị của RDKit')
+   if r.get('nhanNguyenTuTheoMap'):
+    for key,labelText in r['nhanNguyenTuTheoMap'].items():
+     atoms=[a for a in mol.GetAtoms()if a.GetAtomMapNum()==int(key)]
+     if len(atoms)!=1:raise ValueError('Nhãn atom-map không xác định duy nhất')
+     atoms[0].SetProp('atomNote',labelText)
+    for a in mol.GetAtoms():a.SetAtomMapNum(0)
    for label,aromatic in [('aromaticN',True),('aliphaticN',False)]:
     if label not in r.get('nhanNguyenTu',{}):continue
     atoms=[a for a in mol.GetAtoms()if a.GetAtomicNum()==7 and a.GetIsAromatic()==aromatic]

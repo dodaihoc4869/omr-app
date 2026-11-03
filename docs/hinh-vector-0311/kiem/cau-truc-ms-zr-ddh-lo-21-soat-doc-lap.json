@@ -1,0 +1,18 @@
+[
+  {
+    "i": 773,
+    "hashSvg": "c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: đã mở riêng PNG nguồn và PNG tự render SVG, SHA256 khớp. Đủ 5 cột m/z 90:51,45%; 91:11,22%; 92:17,15%; 94:17,38%; 96:2,80%, đúng tỷ lệ chiều cao. Không có cột 93/95/97; đủ ticks x90..97 và y10..60. Trục m/z và Phần trăm số nguyên tử đồng vị (%) nguyên văn; không thêm nhãn0/mũi tên. Chữ DDH thành path, không fallback/chạm/cắt/tràn.",
+    "hash": "909083af717d21138719c2c4997d2122058612492f534cd2dd3fdbd34b660ccd",
+    "hashSvgDaSoat": "c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2"
+  },
+  {
+    "i": 1345,
+    "hashSvg": "c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: đã mở riêng PNG nguồn và PNG tự render SVG, SHA256 khớp. Đủ 5 cột m/z 90:51,45%; 91:11,22%; 92:17,15%; 94:17,38%; 96:2,80%, đúng tỷ lệ chiều cao. Không có cột 93/95/97; đủ ticks x90..97 và y10..60. Trục m/z và Phần trăm số nguyên tử đồng vị (%) nguyên văn; không thêm nhãn0/mũi tên. Chữ DDH thành path, không fallback/chạm/cắt/tràn.",
+    "hash": "f37e8d26d14a318007760e8f3f88663326a25d7343e9205b191cfc52a237b61a",
+    "hashSvgDaSoat": "c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2"
+  }
+]

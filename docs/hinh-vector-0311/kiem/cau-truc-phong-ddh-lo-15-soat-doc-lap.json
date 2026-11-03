@@ -1,0 +1,1658 @@
+[
+  {
+    "i": 11,
+    "hashSvg": "85595762f77ea005ad883a1d126779a2d23d3c9b08ee7898fa8aed98b0cb95a2",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: COOH/methyl ortho. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "018738bbd18f948b835e6303bbe325f9835a7d1d36b6bd1032353e874511bbd6",
+    "hashSvgDaSoat": "85595762f77ea005ad883a1d126779a2d23d3c9b08ee7898fa8aed98b0cb95a2"
+  },
+  {
+    "i": 41,
+    "hashSvg": "1ee1f99d93642ead996dab4c5738f784d6c7116733b184ea379ea8e1ae8fd646",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Propyl + ethyl, N–H tường minh. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "0845516e2eb19608d800f3becc4200f44d6003d616814451a234eaf1ba988190",
+    "hashSvgDaSoat": "1ee1f99d93642ead996dab4c5738f784d6c7116733b184ea379ea8e1ae8fd646"
+  },
+  {
+    "i": 51,
+    "hashSvg": "c9194ed0f460a58d544c8c00fe3fad0854248f5a17f1a4469eec311466cb0278",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: HO–CH2–NH2 đúng 1C. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "0a5ce183e02160ea9ecf72de5e0afbdda74a4124021460efba3d64330d3b1c0e",
+    "hashSvgDaSoat": "c9194ed0f460a58d544c8c00fe3fad0854248f5a17f1a4469eec311466cb0278"
+  },
+  {
+    "i": 54,
+    "hashSvg": "bf64223cb30382a483dea12ebc2df2a8881a569f6d54aae96be208b061ebabde",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Hai ethyl ester ortho. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "0b1381109e515bb78efd30741666f67844d911c84f0e3f01e7dfc70d293b4289",
+    "hashSvgDaSoat": "bf64223cb30382a483dea12ebc2df2a8881a569f6d54aae96be208b061ebabde"
+  },
+  {
+    "i": 97,
+    "hashSvg": "b307f8bdcc97171b16efb2d941a0248bd76c836255843e2bb86872d078d0ae08",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Hai COOH ortho, vòng tròn và C.. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "135229a9d7b1e3a443e9ef14fd150d842f3ea44afb802a58a1a536f0433e03f3",
+    "hashSvgDaSoat": "b307f8bdcc97171b16efb2d941a0248bd76c836255843e2bb86872d078d0ae08"
+  },
+  {
+    "i": 102,
+    "hashSvg": "47deab7eb582bac6892bff598085a0fe4fcb4bd3744c11305ea477940c0cdecc",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Hai S=O, hai S–OH. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "13dcad14d954789eb11b53db08e4b7bee960300d18c8ef9f2d919ba17a222b82",
+    "hashSvgDaSoat": "47deab7eb582bac6892bff598085a0fe4fcb4bd3744c11305ea477940c0cdecc"
+  },
+  {
+    "i": 116,
+    "hashSvg": "0a579aebb6d4192c02d38702a3de96f3cfef9defb5e86c933f80e24d364b9e8c",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Hai COOH ortho, vòng tròn. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "161ac1f297662da9966cfa3fb3aa8a811cd2d238b1b1caaf1a7a779995292489",
+    "hashSvgDaSoat": "0a579aebb6d4192c02d38702a3de96f3cfef9defb5e86c933f80e24d364b9e8c"
+  },
+  {
+    "i": 143,
+    "hashSvg": "7efb0f46477727071a45df7a76a9503558aee3404e928659002f66a2cf61d2e4",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: NH3+/COO−. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "193cb2a75b3208f347cd8c3fac58be3a97c97d28238858209703d8002bf95b23",
+    "hashSvgDaSoat": "7efb0f46477727071a45df7a76a9503558aee3404e928659002f66a2cf61d2e4"
+  },
+  {
+    "i": 159,
+    "hashSvg": "d85ebcd78a4d7dbaf3757e33ae13091361fa84f0046a82222bac102c66e8860d",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Methyl ester/OH ortho, đúng caption. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "1b441c6ea9ca5735f1747f6e167b3078d2275161f49691366347592ae9234c5e",
+    "hashSvgDaSoat": "d85ebcd78a4d7dbaf3757e33ae13091361fa84f0046a82222bac102c66e8860d"
+  },
+  {
+    "i": 174,
+    "hashSvg": "98597629255205dc016b6df71b83338263d22a06718397229e6c394f21af9bc2",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: NH3+/COOH. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "1e21069a323a9986a5f43abd79e4716c63cf852e5db8314059c0fbe4649127d1",
+    "hashSvgDaSoat": "98597629255205dc016b6df71b83338263d22a06718397229e6c394f21af9bc2"
+  },
+  {
+    "i": 175,
+    "hashSvg": "641e564b1f9968eebf875e690d54d1ed3b75f9c8bd920249cbe27436ecd3c778",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: H–O–H đủ hai H tường minh. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "1e2fef5f1ff0a3488e009b84cd87092c94f1c17994e2753f4ce588b9dca24e1e",
+    "hashSvgDaSoat": "641e564b1f9968eebf875e690d54d1ed3b75f9c8bd920249cbe27436ecd3c778"
+  },
+  {
+    "i": 181,
+    "hashSvg": "421a3d55d436710c1dcf074bfde477ed5749f958ca8feef9107d7493b3f3d9fe",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Phenyl–CH2–OH. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "1f58c4125f513cd9e720e5f79917dc0578eb663b41588d9209c471ba985a951a",
+    "hashSvgDaSoat": "421a3d55d436710c1dcf074bfde477ed5749f958ca8feef9107d7493b3f3d9fe"
+  },
+  {
+    "i": 191,
+    "hashSvg": "a2be4ef94308af3fa32e6a5a594f0e9c85ca83aa0168b0589a1730d840a07f7f",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Catechol và nhánh ethylamine đúng vị trí. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "20f123942042500247feec496744f55e9a0ff6073ce2bcc78c5dd2e1ae89cca5",
+    "hashSvgDaSoat": "a2be4ef94308af3fa32e6a5a594f0e9c85ca83aa0168b0589a1730d840a07f7f"
+  },
+  {
+    "i": 206,
+    "hashSvg": "f06fc723e64d58125549651f9b23aea0f4052c6913e166bf1a1e152b00bdee84",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: OH/COOH ortho, giữ vòng tròn. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "22b0d909196f122f1d50e485eeab5dbfb2ff2608113f2bd83222896b5ebd1500",
+    "hashSvgDaSoat": "f06fc723e64d58125549651f9b23aea0f4052c6913e166bf1a1e152b00bdee84"
+  },
+  {
+    "i": 223,
+    "hashSvg": "708c35a365ecd28995d64a83fe9b0a70b2e6fb06c1c4e6632a9afaaab74e9e3a",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: OH/methyl ortho. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "265c75c039455c64d9df049f17af73289c102e07065d8d134dd47a6eabfe33d8",
+    "hashSvgDaSoat": "708c35a365ecd28995d64a83fe9b0a70b2e6fb06c1c4e6632a9afaaab74e9e3a"
+  },
+  {
+    "i": 30,
+    "hashSvg": "3a7113c66575700857e07678194b2c8e2d1363974540690d28df366e6040caf6",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Gly–Ala–Glu, hai N–H, nhánh Glu hai CH2 và hai COOH. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "0660ed74a645e9138569e2d4be0047478ad42b270da784324b94a8b6e85bb74d",
+    "hashSvgDaSoat": "3a7113c66575700857e07678194b2c8e2d1363974540690d28df366e6040caf6"
+  },
+  {
+    "i": 34,
+    "hashSvg": "fbbb603e4c482545abcda22b269fbe972cd91a9c648ec1d5b3a72f22a8c1f53f",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Thioether CH3–S–CH2–CH2–CH(NH2)–COOH. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "06c6e117c3855a96f67f0d0bb5d4a55db32fcf25d6218c94ac1a39788185192e",
+    "hashSvgDaSoat": "fbbb603e4c482545abcda22b269fbe972cd91a9c648ec1d5b3a72f22a8c1f53f"
+  },
+  {
+    "i": 69,
+    "hashSvg": "c9194ed0f460a58d544c8c00fe3fad0854248f5a17f1a4469eec311466cb0278",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: HO–CH2–NH2 đúng 1C. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "0d8f1c7c5cd9675a39c06dd4e0ebe46d1ba9d4dd0916c601d9574d274f9f65a3",
+    "hashSvgDaSoat": "c9194ed0f460a58d544c8c00fe3fad0854248f5a17f1a4469eec311466cb0278"
+  },
+  {
+    "i": 72,
+    "hashSvg": "f6ffd67189bdbe2c8c10e5adf0216615faf58681b9da14b2d7db9ee7bd62c1ac",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Carbonyl vòng 6C, iPr kề carbonyl và methyl đúng vị trí. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "0e6cb750132a7194290dae3f43879a9066df525efe87b084493dd7c22d4305c5",
+    "hashSvgDaSoat": "f6ffd67189bdbe2c8c10e5adf0216615faf58681b9da14b2d7db9ee7bd62c1ac"
+  },
+  {
+    "i": 81,
+    "hashSvg": "b486ebb7a5c8ba670a657a3d1f33c516212eac1d23322bf44da38b574a92aa7d",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Gly–Ala–Ala, hai N–H/hai methyl. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "10495f657bd2bab95d1f1504968f36d02b071d5b8a24a8175857dddd0c106e90",
+    "hashSvgDaSoat": "b486ebb7a5c8ba670a657a3d1f33c516212eac1d23322bf44da38b574a92aa7d"
+  },
+  {
+    "i": 84,
+    "hashSvg": "bc178126e34f3baa0bd07eb98bf94e0a4ec463ed47a54d52f253a2c227090637",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Acetoxy/COOH ortho, giữ vòng tròn thơm. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "1129a53f1ea80c6fe013e03c1d056c8d19b21a45e1b881ee6cb0c2f1543d7d7a",
+    "hashSvgDaSoat": "bc178126e34f3baa0bd07eb98bf94e0a4ec463ed47a54d52f253a2c227090637"
+  },
+  {
+    "i": 90,
+    "hashSvg": "6c8ad21724f663036932aef18275a57b56aa9d4d0b0a6f9c9c358353f4f9304b",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Acetoxy/COOH ortho, ba nối đôi vòng. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "11d6ce819ccede51975906c48fe49597d1d71bb331f820a46dbe5f498724cdd5",
+    "hashSvgDaSoat": "6c8ad21724f663036932aef18275a57b56aa9d4d0b0a6f9c9c358353f4f9304b"
+  },
+  {
+    "i": 120,
+    "hashSvg": "c65b217cb1bc2b09e9118712f59cf929577dcee5cd687fa1019ae6c61a55581a",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Glu–Gly–Ala, nhánh Glu hai CH2, hai N–H. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "16e2fb032f0e9fd539ddedc6c061ff7164cb1eb313ec1a91605ee66cfe7ea9b1",
+    "hashSvgDaSoat": "c65b217cb1bc2b09e9118712f59cf929577dcee5cd687fa1019ae6c61a55581a"
+  },
+  {
+    "i": 123,
+    "hashSvg": "00fe3a6f87f6c4bfdad8b97f97fb83d45aa668f8255d97b693c3bfda17271dcf",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: CH2OH/phenol đúng vị trí, CH(OH)–CH2–NH–tBu, không thêm stereo. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "17202720fd5cd153dc0eaabab56671aa3286e9a0b5af90c3b414500ce3bf4dca",
+    "hashSvgDaSoat": "00fe3a6f87f6c4bfdad8b97f97fb83d45aa668f8255d97b693c3bfda17271dcf"
+  },
+  {
+    "i": 185,
+    "hashSvg": "c65b217cb1bc2b09e9118712f59cf929577dcee5cd687fa1019ae6c61a55581a",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Glu–Gly–Ala, hai N–H. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "1fd00d861817ba90b5ae76f7bc89c745cc86efb9c5a8cc77be5f2004bf9c4241",
+    "hashSvgDaSoat": "c65b217cb1bc2b09e9118712f59cf929577dcee5cd687fa1019ae6c61a55581a"
+  },
+  {
+    "i": 193,
+    "hashSvg": "daf5b3b6e29f063a571e22abddbaa09f2e6154c96c19666f9c78714eaf074bc8",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Alkyl 12C, sulfonate para, giữ Na. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "21222e384c091e3787a1fabeb762eaf941d6b4b117877c35c0e7226ae2677699",
+    "hashSvgDaSoat": "daf5b3b6e29f063a571e22abddbaa09f2e6154c96c19666f9c78714eaf074bc8"
+  },
+  {
+    "i": 219,
+    "hashSvg": "bcac8fa5663e50c8b96b5088c08af97fc6e1d2317c5603ffbd2e12a8fce7c0dc",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đúng một C=C vòng chứa C gắn iPr, methyl đối diện. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "25b8fa67f311fe8efc2b3980a8b2e73581ab45869b6ee959cd8e564dd282eae6",
+    "hashSvgDaSoat": "bcac8fa5663e50c8b96b5088c08af97fc6e1d2317c5603ffbd2e12a8fce7c0dc"
+  },
+  {
+    "i": 221,
+    "hashSvg": "9d3f3e317b30c8df692f16788fbe5abd3b57848e75c649ad3cb3c163febb9c68",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Alanine NH3+/COO−. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "25c72a06472cfe1c9b67b9433be0f7841b55341e2d4e079c8e1f3f191799e6e2",
+    "hashSvgDaSoat": "9d3f3e317b30c8df692f16788fbe5abd3b57848e75c649ad3cb3c163febb9c68"
+  },
+  {
+    "i": 224,
+    "hashSvg": "93b77b5b0f907b15792e39aa1945f697ac9c30d22a14061667f00d0050e0a80b",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Ba N vòng/ba NH2, đúng Melamine. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "266affde84230b086a83494abcfe3b18f2a617c2c5c62b7b25c0a9657289282d",
+    "hashSvgDaSoat": "93b77b5b0f907b15792e39aa1945f697ac9c30d22a14061667f00d0050e0a80b"
+  },
+  {
+    "i": 227,
+    "hashSvg": "77c7dc04c2f1ae78377da9e0932078b94d3e3c718a46023b9d6726a1c8f2d18c",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: N gắn ethyl, methyl và sec-butyl; không thêm stereo. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "27268298e03e0277e1e1388c352f72657bde10314e075021cdc8407ca16c3954",
+    "hashSvgDaSoat": "77c7dc04c2f1ae78377da9e0932078b94d3e3c718a46023b9d6726a1c8f2d18c"
+  },
+  {
+    "i": 237,
+    "hashSvg": "d799232690ae4061736991f93cabe3ff31a0fcf556d4340ecc6d5e75d2de9b7f",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Ala–Gly, N–H tường minh, đúng methyl/NH2/COOH. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "295adc33f760d2d9052ae0d52efe6fb92b785cc01cc000889d84e35254cbf256",
+    "hashSvgDaSoat": "d799232690ae4061736991f93cabe3ff31a0fcf556d4340ecc6d5e75d2de9b7f"
+  },
+  {
+    "i": 62,
+    "hashSvg": "2cd049b5ee0ed7e87d62f662b8c31b177c5545434572ca2824c74c4a0cbecf5e",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Giữ [CH2]4, NH3+ đầu mạch, NH2 alpha và COO−; công thức thu gọn tương đương nguồn. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "0c37509b29a97c6dab138f152e4344bdc660d9aa778ec23508d121036268c9c9",
+    "hashSvgDaSoat": "2cd049b5ee0ed7e87d62f662b8c31b177c5545434572ca2824c74c4a0cbecf5e"
+  },
+  {
+    "i": 63,
+    "hashSvg": "12487fd6b326bc8ab5d942c88bcde14d8bf58e0f5b39be22724ceb4f35fe22c7",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Alkyl 12C: alpha gắn n-butyl và (CH2)4–CH(CH3)2; sulfonate para, giữ Na. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "0c5e4fb1b34778dae7a8b70edac05d85989c1c84d24bb88dd41af6f3931bda50",
+    "hashSvgDaSoat": "12487fd6b326bc8ab5d942c88bcde14d8bf58e0f5b39be22724ceb4f35fe22c7"
+  },
+  {
+    "i": 112,
+    "hashSvg": "92c967a23b3b095f24ae176c288160dc1e3d11426bb65422368cf14f7ff96b66",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: N-methylpyrrolidine/3-pyridyl, nhãn (1) đúng bên trong vòng 5 cạnh. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "15451f2f266f370905c71d44e8ca2c7b64d3d53d03a1638e42b614f124de123a",
+    "hashSvgDaSoat": "92c967a23b3b095f24ae176c288160dc1e3d11426bb65422368cf14f7ff96b66"
+  },
+  {
+    "i": 114,
+    "hashSvg": "49ec15bd8e56a26ec5c910edc85a815819ebc2136eb713237aaba727e4a66d7d",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Val–Gly–Ser–Ala, ba N–H; giữ iPr, CH2OH và methyl. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "156a6916b1f53e6a39a95f4a22f5345df6a28a08fabcd6e14291f2808593e7b0",
+    "hashSvgDaSoat": "49ec15bd8e56a26ec5c910edc85a815819ebc2136eb713237aaba727e4a66d7d"
+  },
+  {
+    "i": 155,
+    "hashSvg": "2b203d1373774d64c7f00076ad6a018513d534f8d17783dbfbff09a00c38102a",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: E ở C=C gần CH2OAc; đầu =C(CH3)2 không E/Z; đúng nhánh và số C. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "1ae35a988392e280237d91af8b9abb3eb3458d565994d816523412a466b570d0",
+    "hashSvgDaSoat": "2b203d1373774d64c7f00076ad6a018513d534f8d17783dbfbff09a00c38102a"
+  },
+  {
+    "i": 205,
+    "hashSvg": "bcf86852579c1943341b745c86b7e35ee53b4ad22ccf1ba08929abc6b44214ba",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Alkyl 12C: alpha gắn CH3 và (CH2)6–C(CH3)3; sulfonate para và Na. Đã mở riêng nguồn và PNG tự render; không cắt/tràn/chữ chạm liên kết.",
+    "hash": "227c753d7f6eeeef985640be66e194daef21baa64e3eff574c2df0ffaebe3bee",
+    "hashSvgDaSoat": "bcf86852579c1943341b745c86b7e35ee53b4ad22ccf1ba08929abc6b44214ba"
+  },
+  {
+    "i": 1215,
+    "hashSvg": "128f81cb0feead9907ff196dd14439a32065801a8735c07dc78dc63cd240cb9d",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Diethyl phthalate: 2 nhánh ethyl ester ortho, caption đúng; DDH rõ, không chồng/cắt.",
+    "hash": "dc5cf4557c4e26c5639fff7d085e57e17a2308d3600b76b885fe5ef90fbd91fe",
+    "hashSvgDaSoat": "128f81cb0feead9907ff196dd14439a32065801a8735c07dc78dc63cd240cb9d"
+  },
+  {
+    "i": 1218,
+    "hashSvg": "eb4909cd00634a78f2375eaa0ff91e472b2f4cc2275f902430acee02d7661d2c",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Ethyl-NH-sec-butyl, đủ6C và N-H; DDH rõ, không chồng/cắt.",
+    "hash": "dd22d2774639653f7d0408095e925ba2a6bdabc37d7f2828c4eb331b81ea96e0",
+    "hashSvgDaSoat": "eb4909cd00634a78f2375eaa0ff91e472b2f4cc2275f902430acee02d7661d2c"
+  },
+  {
+    "i": 1223,
+    "hashSvg": "192d532b59992aab16bf6f8734e8fc5fbeaeb9a3aedc3780ff248fd97ecd012f",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Lys-Ala-Gly-Ala-Gly-Glu: 21C,5NH peptide,2COOH, Lys4CH2/Glu2CH2; DDH rõ khi phóng to, không chồng/cắt.",
+    "hash": "de21b411d704396f11f6b56b8142e6c8615b9a37c4733c1390443af8f424df8b",
+    "hashSvgDaSoat": "192d532b59992aab16bf6f8734e8fc5fbeaeb9a3aedc3780ff248fd97ecd012f"
+  },
+  {
+    "i": 1233,
+    "hashSvg": "115f6f94de935c73a8c31c65f207c80d889c1008b96dfd7bd292c38f34061a29",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Phenyl-CH2-CH(NH2)-CH3 đúng kết nối; DDH rõ.",
+    "hash": "df82e6b53009b2b5da1b793ead27e78bb9ab504bc5da9f3bd9efd479204a3642",
+    "hashSvgDaSoat": "115f6f94de935c73a8c31c65f207c80d889c1008b96dfd7bd292c38f34061a29"
+  },
+  {
+    "i": 1236,
+    "hashSvg": "d2a4ecbedd11343eeb7fd0ed28138a320a16ee78d1206f313c1f15958d4b767c",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Phenyl-CH2-Br, giữ carbon methylene; DDH rõ.",
+    "hash": "dfcc1e0350705023e7ee0cb7f37fd2fdc2ad3eb500cc2a710b955f02d81f47d6",
+    "hashSvgDaSoat": "d2a4ecbedd11343eeb7fd0ed28138a320a16ee78d1206f313c1f15958d4b767c"
+  },
+  {
+    "i": 1237,
+    "hashSvg": "7cfb723acafe6727b927e287c2b7f7c2cbe5375b737fb69cfb77f28c7c923db7",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Valine lưỡng cực: iPr, NH3+ và COO- đúng; DDH rõ.",
+    "hash": "e07a18927006814a1b0628ae2fe5a8363035a40ce60e6f54d2a185152ebc8e2f",
+    "hashSvgDaSoat": "7cfb723acafe6727b927e287c2b7f7c2cbe5375b737fb69cfb77f28c7c923db7"
+  },
+  {
+    "i": 1241,
+    "hashSvg": "a2b37d3e6fbbbbb6a4944f14b055540aa15c0848ce736acacc6971ea495977bd",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Arginine: NH=C(NH2)-NH và3CH2 trước C-alpha đúng; DDH rõ.",
+    "hash": "e14f551077b22653dd392b160ac81a9fd01c863c9a6e46c72638b4e9d4daab8f",
+    "hashSvgDaSoat": "a2b37d3e6fbbbbb6a4944f14b055540aa15c0848ce736acacc6971ea495977bd"
+  },
+  {
+    "i": 1242,
+    "hashSvg": "ec786444d42569245e755c03c96f23e48e9674a7a96ccb5947a68e70ba4e3925",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Phenyl propionate: ethyl-carbonyl-O-phenyl và vòng tròn thơm giữ; DDH rõ.",
+    "hash": "e1693e17038131a9a5013b814920e2fa887a10deb92f3becd6b97b7e6211e640",
+    "hashSvgDaSoat": "ec786444d42569245e755c03c96f23e48e9674a7a96ccb5947a68e70ba4e3925"
+  },
+  {
+    "i": 1245,
+    "hashSvg": "f06fc723e64d58125549651f9b23aea0f4052c6913e166bf1a1e152b00bdee84",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Salicylic acid: OH/COOH ortho và vòng tròn thơm giữ; DDH rõ.",
+    "hash": "e1dfc20394758fb2c9ca83dc00d2da1cdf792097a73abf49787f5eb8ce2ebdcc",
+    "hashSvgDaSoat": "f06fc723e64d58125549651f9b23aea0f4052c6913e166bf1a1e152b00bdee84"
+  },
+  {
+    "i": 1262,
+    "hashSvg": "51b988f458c3af4fdd7b00b45f43619871391abbfe670463fdc244adb77f906a",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Lysine6C,4CH2 nhánh,NH2 nêm đặc xuống đúngS; DDH rõ.",
+    "hash": "e4fd30d8f94eb36724e36350803fecc451eb8e13bc31c288dcc61b742943a131",
+    "hashSvgDaSoat": "51b988f458c3af4fdd7b00b45f43619871391abbfe670463fdc244adb77f906a"
+  },
+  {
+    "i": 1263,
+    "hashSvg": "e9f0ee7941d0fb00727260390e099868464b3cc52b2e1aaa6ff067830e6cc67f",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Propene3C, nối đôi tận cùng đúng; không có chữ cần fallback.",
+    "hash": "e5243a849b2eced0b0ef0062bc6ce9004f1c4b20dc14876327f68fb064a7163e",
+    "hashSvgDaSoat": "e9f0ee7941d0fb00727260390e099868464b3cc52b2e1aaa6ff067830e6cc67f"
+  },
+  {
+    "i": 1282,
+    "hashSvg": "7069f76ca447e89b5bd1d84aaf55f70e0d4c7fed2dc811f603571fc04f960ef9",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Glutamic acid5C,2COOH,2CH2 và nêmS giữ; DDH rõ.",
+    "hash": "e8bd99cd5d3d04c97e30490e3c609324c5a2ff80c09f221334419b8a16804b94",
+    "hashSvgDaSoat": "7069f76ca447e89b5bd1d84aaf55f70e0d4c7fed2dc811f603571fc04f960ef9"
+  },
+  {
+    "i": 1283,
+    "hashSvg": "36acf16797a0e57bf28cce312198f4352d7bb4d60c65cd468034c0c7f17cab18",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Gly-Ala-Gly, đủ2NH peptide/3carbonyl/NH2/COOH; DDH rõ.",
+    "hash": "e8f8e7cd6ab7c259c7db4abb1aac16597b2181a54269851d3fac6acaa8842957",
+    "hashSvgDaSoat": "36acf16797a0e57bf28cce312198f4352d7bb4d60c65cd468034c0c7f17cab18"
+  },
+  {
+    "i": 1287,
+    "hashSvg": "bc178126e34f3baa0bd07eb98bf94e0a4ec463ed47a54d52f253a2c227090637",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Aspirin: acetoxy/COOH ortho, vòng tròn thơm giữ; DDH rõ.",
+    "hash": "ea2add043b8d740cbff997369e5d77d990362d6a06d88932bb5a44f9966ffad4",
+    "hashSvgDaSoat": "bc178126e34f3baa0bd07eb98bf94e0a4ec463ed47a54d52f253a2c227090637"
+  },
+  {
+    "i": 1289,
+    "hashSvg": "7efb0f46477727071a45df7a76a9503558aee3404e928659002f66a2cf61d2e4",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Glycine NH3+/COO- giữ hai điện tích; DDH rõ.",
+    "hash": "ea78de8d546bcc8dd6f66c63cc434020359463312372d8d8db9e237da208449e",
+    "hashSvgDaSoat": "7efb0f46477727071a45df7a76a9503558aee3404e928659002f66a2cf61d2e4"
+  },
+  {
+    "i": 1293,
+    "hashSvg": "063468e7a2f747e3499cbe8a3be970a7036c05b836aa77e402c7f9f1b1c57736",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Catechol:2OH ortho, vòng tròn thơm giữ; DDH rõ.",
+    "hash": "eabb75c4c40efdb4a257822d6c81dbff28b9029c7ddc91e08437dfbea0a82d4e",
+    "hashSvgDaSoat": "063468e7a2f747e3499cbe8a3be970a7036c05b836aa77e402c7f9f1b1c57736"
+  },
+  {
+    "i": 1295,
+    "hashSvg": "e3a8ee862ce6dbfb58f2ad7f80e1c0e2166fd9e5e4f8f98e5e3a55dc4b7443cc",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: H3N+-CH(NH2)-CH2-COO-: đúng3C/2N và hai điện tích; DDH rõ.",
+    "hash": "eacd7cd139aabd9775a532e8705152049005ca125cf499f7634d5dd3ff4f0365",
+    "hashSvgDaSoat": "e3a8ee862ce6dbfb58f2ad7f80e1c0e2166fd9e5e4f8f98e5e3a55dc4b7443cc"
+  },
+  {
+    "i": 1307,
+    "hashSvg": "714edf9db1b802f75bf3a23b420689c2f67aa21088d6068f79954155e7b36d58",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Melamine:3N vòng/3NH2/3nối đôi; DDH rõ.",
+    "hash": "eca13bc0f9e972c15b6115d4fc2df4fb2a0a11b3f0ce2551da285570045ef7c0",
+    "hashSvgDaSoat": "714edf9db1b802f75bf3a23b420689c2f67aa21088d6068f79954155e7b36d58"
+  },
+  {
+    "i": 1315,
+    "hashSvg": "7069f76ca447e89b5bd1d84aaf55f70e0d4c7fed2dc811f603571fc04f960ef9",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Glutamic acid5C,2COOH,2CH2 và nêmS giữ; DDH rõ.",
+    "hash": "ee6c0c3ab4ce8aca148183b65dc8ec43f0e7c707007632a1d951ad0e23d351ba",
+    "hashSvgDaSoat": "7069f76ca447e89b5bd1d84aaf55f70e0d4c7fed2dc811f603571fc04f960ef9"
+  },
+  {
+    "i": 1317,
+    "hashSvg": "5f97b15b6cb2d30f5b0e8a32b6a3a7857f78facdc1e54bed7a5b50f6ef0acaf8",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Nicotine: pyridin3yl-pyrrolidin2yl,N-methyl đúng; không thêm stereo/caption; DDH rõ.",
+    "hash": "eec781a462cb9ac5f4f66cf84c4c23bce0e033bcc3b961bb2a762cd5fad3240a",
+    "hashSvgDaSoat": "5f97b15b6cb2d30f5b0e8a32b6a3a7857f78facdc1e54bed7a5b50f6ef0acaf8"
+  },
+  {
+    "i": 1321,
+    "hashSvg": "6c8ad21724f663036932aef18275a57b56aa9d4d0b0a6f9c9c358353f4f9304b",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Aspirin: acetoxy/COOH ortho,3nối đôi giữ; DDH rõ.",
+    "hash": "ef3a632c000bb3d9d8d5af28bdd8c77bb67256b55b17d15b102ba1156745476d",
+    "hashSvgDaSoat": "6c8ad21724f663036932aef18275a57b56aa9d4d0b0a6f9c9c358353f4f9304b"
+  },
+  {
+    "i": 1334,
+    "hashSvg": "414effe1f5dd4125e5ca191f9187006ec51c2175c25cb7a136a67a59c0c4c7f2",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Glycine trung hoà2C,NH2/COOH đúng; DDH rõ.",
+    "hash": "f1fa9cbcadf37acaf50b169e0a59945abc9707973dbe831046c2339b2151d7a2",
+    "hashSvgDaSoat": "414effe1f5dd4125e5ca191f9187006ec51c2175c25cb7a136a67a59c0c4c7f2"
+  },
+  {
+    "i": 1336,
+    "hashSvg": "328673bb9d3387ded76c183fd2d836c1217232b2e27b42b1d0afa352fdbd7b36",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Ethanol2C vàOH,không mất carbon; DDH rõ.",
+    "hash": "f22875b2920b55376d5045cd787c353553dce1279874490f966ca48a0044e7ff",
+    "hashSvgDaSoat": "328673bb9d3387ded76c183fd2d836c1217232b2e27b42b1d0afa352fdbd7b36"
+  },
+  {
+    "i": 1346,
+    "hashSvg": "2c854ca16cc19d2515b0c2c587d6a0ae24d52800c9d6e01bc247f990b72829b4",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Ala-Gly-Glu-Val-Lys:21C,4NH,2COOH,Lys4CH2/Glu2CH2/ValiPr; DDH rõ khi phóng to,không cắt/chồng.",
+    "hash": "f3c29e20a488fa3b05f46610eaa279091ea7329a17f0269888be7d25a8cb61e5",
+    "hashSvgDaSoat": "2c854ca16cc19d2515b0c2c587d6a0ae24d52800c9d6e01bc247f990b72829b4"
+  },
+  {
+    "i": 1347,
+    "hashSvg": "115f6f94de935c73a8c31c65f207c80d889c1008b96dfd7bd292c38f34061a29",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Phenyl-CH2-CH(NH2)-CH3 đúng,không thêm stereo; DDH rõ.",
+    "hash": "f3f6a910d977b78470e1d028bae650c6ef285ae3c54d3d8d1a03bb8112008a46",
+    "hashSvgDaSoat": "115f6f94de935c73a8c31c65f207c80d889c1008b96dfd7bd292c38f34061a29"
+  },
+  {
+    "i": 1349,
+    "hashSvg": "daf5b3b6e29f063a571e22abddbaa09f2e6154c96c19666f9c78714eaf074bc8",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: 12C alkyl thẳng,SO3Na para,giữONa như nguồn; DDH rõ.",
+    "hash": "f4a4fa8b945ea2aacfb323a89c279decde4e849acdcd80d5f2b487d75c9a39ff",
+    "hashSvgDaSoat": "daf5b3b6e29f063a571e22abddbaa09f2e6154c96c19666f9c78714eaf074bc8"
+  },
+  {
+    "i": 1367,
+    "hashSvg": "ec84658eb1d93a3e06e56fa566b7119a59b7a37636d7a2e2a600e1102450f87a",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: GiữCH3[CH2]11 đầy đủ số lặp11,SO3H para,2S=O/1S-OH; DDH rõ.",
+    "hash": "f71ee0b4b71105ec001d18a36bafeba252ccc092d5cf90692abd06deaf70d0a8",
+    "hashSvgDaSoat": "ec84658eb1d93a3e06e56fa566b7119a59b7a37636d7a2e2a600e1102450f87a"
+  },
+  {
+    "i": 1380,
+    "hashSvg": "30b7b84ea07e09093172e2f11e49b0f4686016e9346b552f197bf7bc8a500484",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Asp-Phe methylester giữ14C,2N,5O,NH vàCIP(S,S); đãsohướngnêm với nguồn; DDH rõ.",
+    "hash": "f91756dde0c101a9d803836e55f18ae3db7d5a31590a78852763e594383c48f2",
+    "hashSvgDaSoat": "30b7b84ea07e09093172e2f11e49b0f4686016e9346b552f197bf7bc8a500484"
+  },
+  {
+    "i": 1381,
+    "hashSvg": "77c7dc04c2f1ae78377da9e0932078b94d3e3c718a46023b9d6726a1c8f2d18c",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: N-methyl/N-ethyl/sec-butyl7C,khôngN-H; DDH rõ.",
+    "hash": "f92e2bd8215b258ea21fa6f591069729aa4841f92c60c69e2fe4847093f5d173",
+    "hashSvgDaSoat": "77c7dc04c2f1ae78377da9e0932078b94d3e3c718a46023b9d6726a1c8f2d18c"
+  },
+  {
+    "i": 1387,
+    "hashSvg": "7069f76ca447e89b5bd1d84aaf55f70e0d4c7fed2dc811f603571fc04f960ef9",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Glu5C,2COOH/2CH2,nêmS giữ; DDH rõ.",
+    "hash": "f9f4f187af832fb7f602079ab87c792a2fb6496b099fe3563dd2d1d4c6b193c7",
+    "hashSvgDaSoat": "7069f76ca447e89b5bd1d84aaf55f70e0d4c7fed2dc811f603571fc04f960ef9"
+  },
+  {
+    "i": 1394,
+    "hashSvg": "49ec15bd8e56a26ec5c910edc85a815819ebc2136eb713237aaba727e4a66d7d",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Val-Gly-Ser-Ala13C,3NH peptide,CH2OH serine/COOH cuối đúng; DDH rõ,không chồng/cắt.",
+    "hash": "fb09b593b0c271c065a25c19482b41763c8d307118964452d4ef6d33286de0ec",
+    "hashSvgDaSoat": "49ec15bd8e56a26ec5c910edc85a815819ebc2136eb713237aaba727e4a66d7d"
+  },
+  {
+    "i": 1398,
+    "hashSvg": "7dd8b254217c9712c0345840fbcf8a8daa3a8dbc195edc48420fc8c8dd0cd884",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Lysine6C,4CH2 trướcNH2,không nêm như nguồn; DDH rõ.",
+    "hash": "fc0157d2b4ea2c28dd6a4f9394f902918aaa6c85c46bf8a942fbf17ce40ea9f1",
+    "hashSvgDaSoat": "7dd8b254217c9712c0345840fbcf8a8daa3a8dbc195edc48420fc8c8dd0cd884"
+  },
+  {
+    "i": 1400,
+    "hashSvg": "972e3fd3abd1cb9ba96dae73075df260d888a505122d963b9381ffb37dcb8ce1",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Ethyl propionate5C,nhãnA. giữ; DDH rõ.",
+    "hash": "fc0e949d17ce4584a23199e078ca08d14d5f633c8a43299bdae4b4702477dcc5",
+    "hashSvgDaSoat": "972e3fd3abd1cb9ba96dae73075df260d888a505122d963b9381ffb37dcb8ce1"
+  },
+  {
+    "i": 1408,
+    "hashSvg": "497daaa0f257522b2aac5b14ebb99810e191781d3e2bcb1cf8757cfe82a1ad4f",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Gamma-Glu-Cys-Gly10C,2NH,2COOH,CH2SH và nối gamma carbonyl đúng; DDH rõ.",
+    "hash": "fd0b306c63b468ad2e94123b5e7fc6e726022786827ff80abc4e4a570cb088a5",
+    "hashSvgDaSoat": "497daaa0f257522b2aac5b14ebb99810e191781d3e2bcb1cf8757cfe82a1ad4f"
+  },
+  {
+    "i": 1412,
+    "hashSvg": "341cc6dd807f5bbee6d3b093e1693c845618624780817ac0b80435c918dbb638",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Ala-Glu-Gly:giữ đủCH/CH2/CH3,2NH,2carbonyl peptide,COOH cuối/nhánhCH2CH2COOH; DDH path rõ,không chạm/cắt.",
+    "hash": "fddef0c6eb627a709bf93ac9c48d909f275a71c14b2d8e6737e6a2af1ab18521",
+    "hashSvgDaSoat": "341cc6dd807f5bbee6d3b093e1693c845618624780817ac0b80435c918dbb638"
+  },
+  {
+    "i": 1427,
+    "hashSvg": "76fa2e925d0147ac5f697afb2ffff952e28ed7865dca5829ea336c1c8361edcb",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Benzoic acid và vòng tròn thơm giữ; DDH rõ.",
+    "hash": "fff624c799aea2a5b897b7863cb3055c4b7150f020d47e8571fc37ef96031257",
+    "hashSvgDaSoat": "76fa2e925d0147ac5f697afb2ffff952e28ed7865dca5829ea336c1c8361edcb"
+  },
+  {
+    "i": 252,
+    "hashSvg": "421a3d55d436710c1dcf074bfde477ed5749f958ca8feef9107d7493b3f3d9fe",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Benzyl alcohol: đủ CH2OH, vòng thơm. Đã mở nguồn và renderSVG thật; DDH đúng, khôngchạm/cắt/tràn.",
+    "hash": "2b38202da5dd3ca38ef0179c29e00cb13d6c605163fe66aa720086efa9877693",
+    "hashSvgDaSoat": "421a3d55d436710c1dcf074bfde477ed5749f958ca8feef9107d7493b3f3d9fe"
+  },
+  {
+    "i": 293,
+    "hashSvg": "5e59b68618aa35a2491ffc3dfecd2b205547cd9404a7282f5e84266f19d01a23",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: N đủ ethyl/methyl/butyl. Đã mở nguồn và renderSVG thật; DDH đúng, khôngchạm/cắt/tràn.",
+    "hash": "31b93db515aefd78ba42814c1d3723633c8e6c124dac256c0d6d9bce65584bfc",
+    "hashSvgDaSoat": "5e59b68618aa35a2491ffc3dfecd2b205547cd9404a7282f5e84266f19d01a23"
+  },
+  {
+    "i": 310,
+    "hashSvg": "557f8df670d76528b615449f49350ccaffac7f2807b2d1a476bb3106d3513b9c",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Giữ vòng tròn thơm, COOH, B. Đã mở nguồn và renderSVG thật; DDH đúng, khôngchạm/cắt/tràn.",
+    "hash": "35a2b82f684d8db64ceecf388b332a4e9a09ab07a92628a6a87c14a65a300247",
+    "hashSvgDaSoat": "557f8df670d76528b615449f49350ccaffac7f2807b2d1a476bb3106d3513b9c"
+  },
+  {
+    "i": 325,
+    "hashSvg": "714edf9db1b802f75bf3a23b420689c2f67aa21088d6068f79954155e7b36d58",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Melamine đủ3N vòng và3NH2. Đã mở nguồn và renderSVG thật; DDH đúng, khôngchạm/cắt/tràn.",
+    "hash": "386549f0044c4f58a92fa16f43fcf7587f636524246fec118a410500d78560b3",
+    "hashSvgDaSoat": "714edf9db1b802f75bf3a23b420689c2f67aa21088d6068f79954155e7b36d58"
+  },
+  {
+    "i": 339,
+    "hashSvg": "85595762f77ea005ad883a1d126779a2d23d3c9b08ee7898fa8aed98b0cb95a2",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Methyl orthoCOOH. Đã mở nguồn và renderSVG thật; DDH đúng, khôngchạm/cắt/tràn.",
+    "hash": "3bc0c28d45f5e614c2ce360de20c1061f757cc458416dce6b2195ee5ea8c664f",
+    "hashSvgDaSoat": "85595762f77ea005ad883a1d126779a2d23d3c9b08ee7898fa8aed98b0cb95a2"
+  },
+  {
+    "i": 348,
+    "hashSvg": "9d3f3e317b30c8df692f16788fbe5abd3b57848e75c649ad3cb3c163febb9c68",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: NH3+ vàCOO− đúng. Đã mở nguồn và renderSVG thật; DDH đúng, khôngchạm/cắt/tràn.",
+    "hash": "3dcfd2d33986549f289bf72049d10e499041127b83b4bc20c5ccc07b2388e1e1",
+    "hashSvgDaSoat": "9d3f3e317b30c8df692f16788fbe5abd3b57848e75c649ad3cb3c163febb9c68"
+  },
+  {
+    "i": 351,
+    "hashSvg": "98597629255205dc016b6df71b83338263d22a06718397229e6c394f21af9bc2",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: NH3+ vàCOOH đúng. Đã mở nguồn và renderSVG thật; DDH đúng, khôngchạm/cắt/tràn.",
+    "hash": "3e261eebbb82bc7f14c14f7df9fc4cd3d5881235ebf9507525b78a7c49a57d82",
+    "hashSvgDaSoat": "98597629255205dc016b6df71b83338263d22a06718397229e6c394f21af9bc2"
+  },
+  {
+    "i": 355,
+    "hashSvg": "9d3f3e317b30c8df692f16788fbe5abd3b57848e75c649ad3cb3c163febb9c68",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: NH3+ vàCOO− đúng. Đã mở nguồn và renderSVG thật; DDH đúng, khôngchạm/cắt/tràn.",
+    "hash": "3ebda56bdb2423cb1fb775b5d3b4573e38c467328865f9dcdf883f5f74f9624b",
+    "hashSvgDaSoat": "9d3f3e317b30c8df692f16788fbe5abd3b57848e75c649ad3cb3c163febb9c68"
+  },
+  {
+    "i": 371,
+    "hashSvg": "5ccc271fc998adae4ea8ca90e3d51fb3e298eb8fcde0518ae2be44209817eebe",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Ethyl acetate đúng4C. Đã mở nguồn và renderSVG thật; DDH đúng, khôngchạm/cắt/tràn.",
+    "hash": "41c52dfb7a8053382deb93cbed6ea31ba01a67d7274121ef023e8a6fd2682a63",
+    "hashSvgDaSoat": "5ccc271fc998adae4ea8ca90e3d51fb3e298eb8fcde0518ae2be44209817eebe"
+  },
+  {
+    "i": 398,
+    "hashSvg": "4c6be38374d931788366e585675007b3a2a245b0b1b816dc9b67795dc4b34cea",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Dopamine đúng2OH vàCH2CH2NH2, caption. Đã mở nguồn và renderSVG thật; DDH đúng, khôngchạm/cắt/tràn.",
+    "hash": "465512c035fb3eaa64e2cc0a5b8b24ad96681ae0ad8fdc99008b03e885d55795",
+    "hashSvgDaSoat": "4c6be38374d931788366e585675007b3a2a245b0b1b816dc9b67795dc4b34cea"
+  },
+  {
+    "i": 416,
+    "hashSvg": "5517c93f621d6a83eb2349735895eb7fa899e12987778c4f6afdd7f3f21d8a2f",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Gốc2-methylbutyl đủ5C, không mấtCH2. Đã mở nguồn và renderSVG thật; DDH đúng, khôngchạm/cắt/tràn.",
+    "hash": "4a4102d00414e6be853f1a2586f402157795edcb6dfc3c3f8bcc34e1c37c2c28",
+    "hashSvgDaSoat": "5517c93f621d6a83eb2349735895eb7fa899e12987778c4f6afdd7f3f21d8a2f"
+  },
+  {
+    "i": 430,
+    "hashSvg": "1b61aa3f44c077bc8c0be9914a822d442ec68d0889673cb424da4f03470afc06",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Citric acid đủ3COOH vàOH giữa. Đã mở nguồn và renderSVG thật; DDH đúng, khôngchạm/cắt/tràn.",
+    "hash": "4d8538b37ae2d0500b27326ef7f4192f27dca141669146a7d2768623fd894a91",
+    "hashSvgDaSoat": "1b61aa3f44c077bc8c0be9914a822d442ec68d0889673cb424da4f03470afc06"
+  },
+  {
+    "i": 436,
+    "hashSvg": "274d1bbfdc4d7c6c75afbfe5f3515c0f0269158dee466b77476fdcf7aceafe39",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: CH3CH2CH(CH3)CH2NH2 đúng. Đã mở nguồn và renderSVG thật; DDH đúng, khôngchạm/cắt/tràn.",
+    "hash": "4eb7e2b3101d770c67e1053cf8c1abff62c91199fdc03d95fa0c97e846685fa3",
+    "hashSvgDaSoat": "274d1bbfdc4d7c6c75afbfe5f3515c0f0269158dee466b77476fdcf7aceafe39"
+  },
+  {
+    "i": 443,
+    "hashSvg": "6c8ad21724f663036932aef18275a57b56aa9d4d0b0a6f9c9c358353f4f9304b",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Aspirin orthoCOOH/OCOCH3. Đã mở nguồn và renderSVG thật; DDH đúng, khôngchạm/cắt/tràn.",
+    "hash": "4ff886065ab4dab4c66f0b4559aa4166e0aac94f91eb987f5c6bbe3e2856ded0",
+    "hashSvgDaSoat": "6c8ad21724f663036932aef18275a57b56aa9d4d0b0a6f9c9c358353f4f9304b"
+  },
+  {
+    "i": 450,
+    "hashSvg": "70f08a6163f5ae346f12b72267643ce1044ff9f3abe25d3a3fe98f7100be6f0b",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Vòng tròn thơm, haiCH2OH ortho. Đã mở nguồn và renderSVG thật; DDH đúng, khôngchạm/cắt/tràn.",
+    "hash": "520d114131e4a0b1411bcef1d75d35644019b099e524118b1d506d511cfb586c",
+    "hashSvgDaSoat": "70f08a6163f5ae346f12b72267643ce1044ff9f3abe25d3a3fe98f7100be6f0b"
+  },
+  {
+    "i": 248,
+    "hashSvg": "ec84658eb1d93a3e06e56fa566b7119a59b7a37636d7a2e2a600e1102450f87a",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Giữ CH3[CH2]11, paraSO3H, đủ2S=O vàOH. Đã mở nguồn và renderSVG thật; DDH đúng, khôngchạm/cắt/tràn.",
+    "hash": "2a77638bdaf4cfea45f7fee2e812a230ec04f8a5f7267d97257cf4bc6dfa5fb9",
+    "hashSvgDaSoat": "ec84658eb1d93a3e06e56fa566b7119a59b7a37636d7a2e2a600e1102450f87a"
+  },
+  {
+    "i": 260,
+    "hashSvg": "bf64223cb30382a483dea12ebc2df2a8881a569f6d54aae96be208b061ebabde",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Hai esterETHYL ortho, đủCH2CH3 mỗi phía. Đã mở nguồn và renderSVG thật; DDH đúng, khôngchạm/cắt/tràn.",
+    "hash": "2ca80f2499faebbf846f7d5aa826a1e9e223a5c0c7108849d58ed8178c6ce20a",
+    "hashSvgDaSoat": "bf64223cb30382a483dea12ebc2df2a8881a569f6d54aae96be208b061ebabde"
+  },
+  {
+    "i": 261,
+    "hashSvg": "da870ffd62bdf88f203cad8fd07355eb146ff7f855a4adf1bd90fa63cc8497c1",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Nicotine đúng2N, N-methyl, vịtrí3-pyridyl, caption. Đã mở nguồn và renderSVG thật; DDH đúng, khôngchạm/cắt/tràn.",
+    "hash": "2ca8e36df811bcda279d8725d58176c28660fd83f32719eb6f987ef827a0b213",
+    "hashSvgDaSoat": "da870ffd62bdf88f203cad8fd07355eb146ff7f855a4adf1bd90fa63cc8497c1"
+  },
+  {
+    "i": 288,
+    "hashSvg": "98597629255205dc016b6df71b83338263d22a06718397229e6c394f21af9bc2",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Alanine NH3+/COOH đúng. Đã mở nguồn và renderSVG thật; DDH đúng, khôngchạm/cắt/tràn.",
+    "hash": "30e3adecdf9587f80b2411fbd21457e9ca78b59ee7d119f45084db0ec4f37a83",
+    "hashSvgDaSoat": "98597629255205dc016b6df71b83338263d22a06718397229e6c394f21af9bc2"
+  },
+  {
+    "i": 309,
+    "hashSvg": "65f74144bd8e23c3fb54d93a6c75680553ec5d548e8bc2f87a6532da0db2fca4",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Menthol đúngOH/isopropyl/methyl, không thêmstereo. Đã mở nguồn và renderSVG thật; DDH đúng, khôngchạm/cắt/tràn.",
+    "hash": "358bd29c823d559e069bd270d0b8487b2a42397b072809cc3675448725bc67ce",
+    "hashSvgDaSoat": "65f74144bd8e23c3fb54d93a6c75680553ec5d548e8bc2f87a6532da0db2fca4"
+  },
+  {
+    "i": 345,
+    "hashSvg": "db476bd715d97a0be9da92bbafbef261b1870dd516c3fb99d87b89e60aa60c95",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Vòngno, methyl và nốiđôi ngoại vòng tớiC(CH3)2 đối nhau đúng. Đãmởnguồn/renderSVGthật;DDHđúng,khôngchạm/cắt/tràn.",
+    "hash": "3d75b40daa94d7c5449694dc95e6586cc137b754a0e4427475f471f5af28eb08",
+    "hashSvgDaSoat": "db476bd715d97a0be9da92bbafbef261b1870dd516c3fb99d87b89e60aa60c95"
+  },
+  {
+    "i": 358,
+    "hashSvg": "6f74551353ba48c92cda3328cb4ee562e98ad44ca55e3f8320e0c38082d4cb57",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Ala–Ala–Gly đủ2NHamide, NH2, COOH và2methyl. Đãmởnguồn/renderSVGthật;DDHđúng,khôngchạm/cắt/tràn.",
+    "hash": "3f6b62883477ff287e8ac6e2ab5dc5007d5d2a6277edfb7f41c3d133c51720c4",
+    "hashSvgDaSoat": "6f74551353ba48c92cda3328cb4ee562e98ad44ca55e3f8320e0c38082d4cb57"
+  },
+  {
+    "i": 367,
+    "hashSvg": "a7e68273fb10afbce4e2a6046b4cf343d2532060aed55d588cbb91ce05023bde",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: OHmetaCOOH, giữvòngtròn thơm. Đãmởnguồn/renderSVGthật;DDHđúng,khôngchạm/cắt/tràn.",
+    "hash": "40d6b76a8b76a379a68e2f2eb52d90f71048aef4081f162ba4b5ecda5bd638e2",
+    "hashSvgDaSoat": "a7e68273fb10afbce4e2a6046b4cf343d2532060aed55d588cbb91ce05023bde"
+  },
+  {
+    "i": 375,
+    "hashSvg": "a7e68273fb10afbce4e2a6046b4cf343d2532060aed55d588cbb91ce05023bde",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: OHmetaCOOH, giữvòngtròn thơm. Đãmởnguồn/renderSVGthật;DDHđúng,khôngchạm/cắt/tràn.",
+    "hash": "42716d3010b27bc87c2e42e90cb693e74c81a3ba8844d6bb8720f92ac157d233",
+    "hashSvgDaSoat": "a7e68273fb10afbce4e2a6046b4cf343d2532060aed55d588cbb91ce05023bde"
+  },
+  {
+    "i": 420,
+    "hashSvg": "dfd039d5750e8637afa0842d0d8920c4d4dda5807cba7a0d8ecc7a08a6926c38",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Gly–Lys–Glu đủ13C, nhánhLys4CH2NH2, Glu2CH2COOH,2NHamide/2COOH. Đãmởnguồn/renderSVGthật;DDHđúng,khôngchạm/cắt/tràn.",
+    "hash": "4ae5ed5eaf92361f9864d9bc2b81364928d738f2da435eabcf908d048f6cb4da",
+    "hashSvgDaSoat": "dfd039d5750e8637afa0842d0d8920c4d4dda5807cba7a0d8ecc7a08a6926c38"
+  },
+  {
+    "i": 441,
+    "hashSvg": "a8e0c93969f95f656a9052e5e8c2b6341e748b4abed66787413313d022efb355",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Giữcôngthức CH3CH2CH(CH3)CH2NH2 đúng5C. Đãmởnguồn/renderSVGthật;DDHđúng,khôngchạm/cắt/tràn.",
+    "hash": "4f959fb9248a436078da80da2fc98065ca36ae042871c416eb39c68b573560c7",
+    "hashSvgDaSoat": "a8e0c93969f95f656a9052e5e8c2b6341e748b4abed66787413313d022efb355"
+  },
+  {
+    "i": 447,
+    "hashSvg": "98597629255205dc016b6df71b83338263d22a06718397229e6c394f21af9bc2",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: AlanineNH3+/COOH đúng. Đãmởnguồn/renderSVGthật;DDHđúng,khôngchạm/cắt/tràn.",
+    "hash": "50baa6981c23b44c78f303fd48fb8012367ee791fad1b20fcbd5c5d2cb08a480",
+    "hashSvgDaSoat": "98597629255205dc016b6df71b83338263d22a06718397229e6c394f21af9bc2"
+  },
+  {
+    "i": 452,
+    "hashSvg": "93b77b5b0f907b15792e39aa1945f697ac9c30d22a14061667f00d0050e0a80b",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Melamine đủ3N vòng+3NH2 vàcaptionMelamine. Đãmởnguồn/renderSVGthật;DDHđúng,khôngchạm/cắt/tràn.",
+    "hash": "52252974dc00873c1ff3ae902da9d2b1d7a397abf61774927adc25e7b1498910",
+    "hashSvgDaSoat": "93b77b5b0f907b15792e39aa1945f697ac9c30d22a14061667f00d0050e0a80b"
+  },
+  {
+    "i": 469,
+    "hashSvg": "10dd582fa30b84492fa0a421122222acf2c0d9db4e51bb4aaa8f6f3c229aa617",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Ala–Gly, giữNHamide vàCOOH. Đãmởnguồn/renderSVGthật;DDHđúng,khôngchạm/cắt/tràn.",
+    "hash": "557bb0928f22d0b009ebb14461035e6397995002025cfb54bc2af0fa9e5a98f7",
+    "hashSvgDaSoat": "10dd582fa30b84492fa0a421122222acf2c0d9db4e51bb4aaa8f6f3c229aa617"
+  },
+  {
+    "i": 478,
+    "hashSvg": "f49cad9d4b57ce270850fb26a2eb75dee143f924589542c1d871496102b7302e",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: HOOC–(CH2)2–CH(NH3+)–COO−, giữsốlặp2 vàđiệntích. Đãmởnguồn/renderSVGthật;DDHđúng,khôngchạm/cắt/tràn.",
+    "hash": "57d97179bd4dc1466102222e9ccbf54f81b2125bf564ea2358f90b5bbb5018c2",
+    "hashSvgDaSoat": "f49cad9d4b57ce270850fb26a2eb75dee143f924589542c1d871496102b7302e"
+  },
+  {
+    "i": 479,
+    "hashSvg": "10dd582fa30b84492fa0a421122222acf2c0d9db4e51bb4aaa8f6f3c229aa617",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Ala–Gly, giữNHamide vàCOOH. Đãmởnguồn/renderSVGthật;DDHđúng,khôngchạm/cắt/tràn.",
+    "hash": "583bf5a06fd2244d419dfcae73921076a54cc0b5171702546296dda4e7c6c396",
+    "hashSvgDaSoat": "10dd582fa30b84492fa0a421122222acf2c0d9db4e51bb4aaa8f6f3c229aa617"
+  },
+  {
+    "i": 243,
+    "hashSvg": "49ec15bd8e56a26ec5c910edc85a815819ebc2136eb713237aaba727e4a66d7d",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Val–Gly–Ser–Ala đủ13C, nhánhVal/Ser/Ala và3NHamide, khôngstereo giả. Đãmởnguồn/renderSVGthật;DDHđúng,khôngchạm/cắt/tràn.",
+    "hash": "2a182ea7eb9a32005c2d1a5222478d7b4a5eb157b8511c984099d9d689876a58",
+    "hashSvgDaSoat": "49ec15bd8e56a26ec5c910edc85a815819ebc2136eb713237aaba727e4a66d7d"
+  },
+  {
+    "i": 370,
+    "hashSvg": "10dd582fa30b84492fa0a421122222acf2c0d9db4e51bb4aaa8f6f3c229aa617",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Ala–Gly, giữNHamide. Đãmởnguồn/renderSVGthật;DDHđúng,khôngchạm/cắt/tràn.",
+    "hash": "41ae85b6d639f76d516308e125b3abd097bf2923fd594737fff1b0a3780c397c",
+    "hashSvgDaSoat": "10dd582fa30b84492fa0a421122222acf2c0d9db4e51bb4aaa8f6f3c229aa617"
+  },
+  {
+    "i": 381,
+    "hashSvg": "62dbe749da442c077e6d1c44f4adab894065f78c5a64235409eeef4045fa22c2",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Styrene giữvòngtrònthơm vàCH=CH2/chấmcuối; bỏđườngkẻthừa méptrang. Đãmởnguồn/renderSVGthật;DDHđúng,khôngchạm/cắt/tràn.",
+    "hash": "4464502250376a72b8f8f8eae9c8961735c562c1de7e4fa426dac364b3e110f3",
+    "hashSvgDaSoat": "62dbe749da442c077e6d1c44f4adab894065f78c5a64235409eeef4045fa22c2"
+  },
+  {
+    "i": 435,
+    "hashSvg": "10089cf8df29c41c5d1008040be1d48bf32582990c9541d515bed808022174a5",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Alliin đủ1S=O, allyl3C,CH2CH(NH2)COOH;khôngstereo giả. Đãmởnguồn/renderSVGthật;DDHđúng,khôngchạm/cắt/tràn.",
+    "hash": "4e8d1979da38be6d03924b4b4c621dbac425644c5f2265e1ecc2706545c55db8",
+    "hashSvgDaSoat": "10089cf8df29c41c5d1008040be1d48bf32582990c9541d515bed808022174a5"
+  },
+  {
+    "i": 462,
+    "hashSvg": "05d84eabb6bf1a2fc470752d0adb9f272621e86247a0b290965c7130e6f15021",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: 2-methylcyclohexan-1-ol đúngvòngno vàhai nhóm kềnhau. Đãmởnguồn/renderSVGthật;DDHđúng,khôngchạm/cắt/tràn.",
+    "hash": "53ec21f1e1cd54ce7570ecc20bec2fe5008ba22c8841d4b5a8a0c14a7ab957ba",
+    "hashSvgDaSoat": "05d84eabb6bf1a2fc470752d0adb9f272621e86247a0b290965c7130e6f15021"
+  },
+  {
+    "i": 432,
+    "hashSvg": "033886297b1ca5f6f578899a5652bc62b6440cf6ad3fb98b34f945004894941f",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Aspartame đúngAspS/PheS; nêmgạchNH2 vànêmđặcbenzyl sauđổi hướng vẫnđúngCIP; đủ2COOH/ester/amide. Đãmởnguồn/renderSVGthật;DDHđúng,khôngchạm/cắt/tràn.",
+    "hash": "4dbc9b5a6b909a0db66e1aa66faccfe9ef888c9f344d3feb3344a74b57109f02",
+    "hashSvgDaSoat": "033886297b1ca5f6f578899a5652bc62b6440cf6ad3fb98b34f945004894941f"
+  },
+  {
+    "i": 393,
+    "hashSvg": "bf64223cb30382a483dea12ebc2df2a8881a569f6d54aae96be208b061ebabde",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Nguồn làDIETHYLphthalate, mớiđúnghaiOCH2CH3ortho, khôngphảidimethyl. Đãmởnguồn/renderSVGthật;DDHđúng,khôngchạm/cắt/tràn.",
+    "hash": "45faf978c04aa7369c9860dd1fbc753f61186b10e432b7fa54339a4b13b4f67e",
+    "hashSvgDaSoat": "bf64223cb30382a483dea12ebc2df2a8881a569f6d54aae96be208b061ebabde"
+  },
+  {
+    "i": 487,
+    "hashSvg": "e6c8a435d7c2d2c22085dad02e26bfb93bffcc4c320b850e5fffaa2cf6871055",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn.",
+    "hash": "5a9480627fd1988cf44e42a1035bebb504b9fd6546583e13b60d79c4d5957eb9",
+    "hashSvgDaSoat": "e6c8a435d7c2d2c22085dad02e26bfb93bffcc4c320b850e5fffaa2cf6871055"
+  },
+  {
+    "i": 519,
+    "hashSvg": "d85ebcd78a4d7dbaf3757e33ae13091361fa84f0046a82222bac102c66e8860d",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn.",
+    "hash": "60f9d4af506aabed98d19579436976d0b6e64694559b383a6cb55081d103fd01",
+    "hashSvgDaSoat": "d85ebcd78a4d7dbaf3757e33ae13091361fa84f0046a82222bac102c66e8860d"
+  },
+  {
+    "i": 558,
+    "hashSvg": "d8c0e8647f28e4be502c378bcf7e98b440ddca38932ac3eb8abb3a6acfdd053a",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn.",
+    "hash": "683250a8dfac876e9a21010c83ae2a95ce4e7b005665747f9a215fc239e49022",
+    "hashSvgDaSoat": "d8c0e8647f28e4be502c378bcf7e98b440ddca38932ac3eb8abb3a6acfdd053a"
+  },
+  {
+    "i": 569,
+    "hashSvg": "e6c8a435d7c2d2c22085dad02e26bfb93bffcc4c320b850e5fffaa2cf6871055",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn.",
+    "hash": "6a0fd45d06c4f03a4eadd29925a9a814c587ccafb5917e0b7798830a24ac57bc",
+    "hashSvgDaSoat": "e6c8a435d7c2d2c22085dad02e26bfb93bffcc4c320b850e5fffaa2cf6871055"
+  },
+  {
+    "i": 573,
+    "hashSvg": "76fa2e925d0147ac5f697afb2ffff952e28ed7865dca5829ea336c1c8361edcb",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn.",
+    "hash": "6b182a8f1343204545c8916b54d7338f22a3ac36b4e1a3b85fb4c28cd8059654",
+    "hashSvgDaSoat": "76fa2e925d0147ac5f697afb2ffff952e28ed7865dca5829ea336c1c8361edcb"
+  },
+  {
+    "i": 599,
+    "hashSvg": "10dd582fa30b84492fa0a421122222acf2c0d9db4e51bb4aaa8f6f3c229aa617",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn.",
+    "hash": "6f202addb88f48f5f6d67d7b2027b169ed4676b80c15cf8c127b4a1fa8f45e24",
+    "hashSvgDaSoat": "10dd582fa30b84492fa0a421122222acf2c0d9db4e51bb4aaa8f6f3c229aa617"
+  },
+  {
+    "i": 615,
+    "hashSvg": "d8c0e8647f28e4be502c378bcf7e98b440ddca38932ac3eb8abb3a6acfdd053a",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn.",
+    "hash": "72760e043abac9e9eec557687499589835c603c5853e123704dfe24c23b2e139",
+    "hashSvgDaSoat": "d8c0e8647f28e4be502c378bcf7e98b440ddca38932ac3eb8abb3a6acfdd053a"
+  },
+  {
+    "i": 681,
+    "hashSvg": "414effe1f5dd4125e5ca191f9187006ec51c2175c25cb7a136a67a59c0c4c7f2",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn.",
+    "hash": "7d861ab93b044363eebf20d84cf0d634cb027e40361b4c92cd89be6edaf85174",
+    "hashSvgDaSoat": "414effe1f5dd4125e5ca191f9187006ec51c2175c25cb7a136a67a59c0c4c7f2"
+  },
+  {
+    "i": 683,
+    "hashSvg": "c740040b20ccc67b52a877900bfe0a63025b430da440ee75a9a2f2363fd7c561",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn.",
+    "hash": "7e7ebcf639c26e13e03c51295fdf6bd1bd11fcc5016786bfaf19d39c626afabb",
+    "hashSvgDaSoat": "c740040b20ccc67b52a877900bfe0a63025b430da440ee75a9a2f2363fd7c561"
+  },
+  {
+    "i": 690,
+    "hashSvg": "05d84eabb6bf1a2fc470752d0adb9f272621e86247a0b290965c7130e6f15021",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn.",
+    "hash": "7fd19567cd3f7a9479bf2ea7e3e811a9381a138380c34f4407408d3827bcdab9",
+    "hashSvgDaSoat": "05d84eabb6bf1a2fc470752d0adb9f272621e86247a0b290965c7130e6f15021"
+  },
+  {
+    "i": 708,
+    "hashSvg": "fbe1726001cbeddc6914a950eaa8c86ceab1e4702ab260df033c350a00636376",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn.",
+    "hash": "8387a040375b43a004f7708ceca40437c086aa52793507e9011a70d21192f32c",
+    "hashSvgDaSoat": "fbe1726001cbeddc6914a950eaa8c86ceab1e4702ab260df033c350a00636376"
+  },
+  {
+    "i": 713,
+    "hashSvg": "abbccf8a0164de48d335fbc95c18decf6d4b09861df02694f3387f8e5271998c",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn.",
+    "hash": "8497afd005063acdf59e1d44fb2b06922735789fdc0e987de51cbd9bcc7ddc3e",
+    "hashSvgDaSoat": "abbccf8a0164de48d335fbc95c18decf6d4b09861df02694f3387f8e5271998c"
+  },
+  {
+    "i": 716,
+    "hashSvg": "5517c93f621d6a83eb2349735895eb7fa899e12987778c4f6afdd7f3f21d8a2f",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn.",
+    "hash": "84e7a32ae1313a753cfe1d3830b33ed2b7b691b437a71abc76560d488e6ebfbe",
+    "hashSvgDaSoat": "5517c93f621d6a83eb2349735895eb7fa899e12987778c4f6afdd7f3f21d8a2f"
+  },
+  {
+    "i": 492,
+    "hashSvg": "10089cf8df29c41c5d1008040be1d48bf32582990c9541d515bed808022174a5",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn.",
+    "hash": "5af8f1500d18281f89b85d3e84bb5fa61088d393932f9e1ee9b3f88f6876d674",
+    "hashSvgDaSoat": "10089cf8df29c41c5d1008040be1d48bf32582990c9541d515bed808022174a5"
+  },
+  {
+    "i": 510,
+    "hashSvg": "4b87261eae1044c51ba9fab796badf710b5577acd85e9126643587307aab4ca5",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn.",
+    "hash": "5ddc2821eedc386a3448c75d2a9da06d1d51093428a77bae1bc3de92928d39d3",
+    "hashSvgDaSoat": "4b87261eae1044c51ba9fab796badf710b5577acd85e9126643587307aab4ca5"
+  },
+  {
+    "i": 531,
+    "hashSvg": "dabf3f516db3488afc75a868ce29a209b0b83b4c3f2bef52c80ee22ca936a7a5",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn.",
+    "hash": "646f1e86dc5f5fc93a5a8a654f5bcd5dc79cbb47f8cd980f52c2a8480241a64d",
+    "hashSvgDaSoat": "dabf3f516db3488afc75a868ce29a209b0b83b4c3f2bef52c80ee22ca936a7a5"
+  },
+  {
+    "i": 559,
+    "hashSvg": "a495e75a4eac28ae2d982cbd60bb3999fde75c22aad9383073a0bce2d873ebb5",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn.",
+    "hash": "683c73d2f139f52ad3f44dd0172ee3371a4814e45972cba36760091132467042",
+    "hashSvgDaSoat": "a495e75a4eac28ae2d982cbd60bb3999fde75c22aad9383073a0bce2d873ebb5"
+  },
+  {
+    "i": 562,
+    "hashSvg": "8a81d1eb8782f4db21bc4fc260f5f282b07bf9c49aa4546bf22cf480e175d1bb",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn.",
+    "hash": "68bb038d726740c077a984de9e175b0d68d462c432006f99dcf5958af7c593e1",
+    "hashSvgDaSoat": "8a81d1eb8782f4db21bc4fc260f5f282b07bf9c49aa4546bf22cf480e175d1bb"
+  },
+  {
+    "i": 607,
+    "hashSvg": "5f215bb0a3868d0a9bc97d91ad37e505d9d4e7f6fdb59f955b304c22bcbd688b",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn.",
+    "hash": "7050eb35afbd68f13765feed6239a973ce39ac7a74ffa930be16fa5be89e36db",
+    "hashSvgDaSoat": "5f215bb0a3868d0a9bc97d91ad37e505d9d4e7f6fdb59f955b304c22bcbd688b"
+  },
+  {
+    "i": 618,
+    "hashSvg": "28b8a7e4bd26ab86aed6d95a6b18554ba15c7c3dbf7973051f3e7f5457bddce1",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn.",
+    "hash": "72c4731cc972c6e37fcf2fdab68bcf51ac4daf393066ccc372693e3b734dd8ba",
+    "hashSvgDaSoat": "28b8a7e4bd26ab86aed6d95a6b18554ba15c7c3dbf7973051f3e7f5457bddce1"
+  },
+  {
+    "i": 655,
+    "hashSvg": "fec2121ec0b47ab1197560f41d2ff9e75e04647d6627291864c9430f95ab3225",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn.",
+    "hash": "7a17b7d859986a13d25c1896ff3e8b129912d411b2fa168e12ff08d6e1938be0",
+    "hashSvgDaSoat": "fec2121ec0b47ab1197560f41d2ff9e75e04647d6627291864c9430f95ab3225"
+  },
+  {
+    "i": 669,
+    "hashSvg": "fa873dff5525a6779c690c1784969b256a0d79f7b1f54bf6154b97c3340b54d1",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn.",
+    "hash": "7c323ff40a7c2e97badf22322fe52280860526c9f8ccba76dcf4c0a94d39c217",
+    "hashSvgDaSoat": "fa873dff5525a6779c690c1784969b256a0d79f7b1f54bf6154b97c3340b54d1"
+  },
+  {
+    "i": 688,
+    "hashSvg": "6c8ad21724f663036932aef18275a57b56aa9d4d0b0a6f9c9c358353f4f9304b",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn.",
+    "hash": "7f85b11f2ddfd7f7c77c654f6f9c7800635ce5a596cdce8b506494452cb5a11f",
+    "hashSvgDaSoat": "6c8ad21724f663036932aef18275a57b56aa9d4d0b0a6f9c9c358353f4f9304b"
+  },
+  {
+    "i": 702,
+    "hashSvg": "4f9f503c07641f1ef2d9aea6d8e4b8e522309741cf84c95d369f681f9b8fcb0c",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn.",
+    "hash": "82a941007a4939f399bde450ad26023a9667e07e8441d7d206c40208eba82615",
+    "hashSvgDaSoat": "4f9f503c07641f1ef2d9aea6d8e4b8e522309741cf84c95d369f681f9b8fcb0c"
+  },
+  {
+    "i": 486,
+    "hashSvg": "2b203d1373774d64c7f00076ad6a018513d534f8d17783dbfbff09a00c38102a",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn. Giữ E trên nối đôi gần nhóm acetate.",
+    "hash": "5a2e6ffbc70b26babd0831f582db31f36ed42e33b81f7159effe1f8bff24376f",
+    "hashSvgDaSoat": "2b203d1373774d64c7f00076ad6a018513d534f8d17783dbfbff09a00c38102a"
+  },
+  {
+    "i": 706,
+    "hashSvg": "b486ebb7a5c8ba670a657a3d1f33c516212eac1d23322bf44da38b574a92aa7d",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn.",
+    "hash": "833b2619fabf9bfe84aba57f69d141a3c0c57fc7b3c5a94a7abda48c234df0ea",
+    "hashSvgDaSoat": "b486ebb7a5c8ba670a657a3d1f33c516212eac1d23322bf44da38b574a92aa7d"
+  },
+  {
+    "i": 585,
+    "hashSvg": "5229c3e6203f530bf70d98f8831c5983df6882ae70e5b348e81de0e4a89717af",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn. Trung thành nguồn H3N–CH2–CH2–COO− không tự thêm dấu+; không chứng nhận hóa học nguồn.",
+    "hash": "6cf438fa9818a2f94e864aa73aeec5725fd5660242f9b30abfa18246a46ec6ef",
+    "hashSvgDaSoat": "5229c3e6203f530bf70d98f8831c5983df6882ae70e5b348e81de0e4a89717af"
+  },
+  {
+    "i": 703,
+    "hashSvg": "a3ca3b48341c797220e8b4ef0fcfd343c4cb2dee360d7059b3ddd746ccb47a33",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn. L-serine giữ cấu hình S: đổi phía nhánh đồng thời đổi nêm đặc sang nêm gạch, không đảo cấu hình.",
+    "hash": "82f94f634b9677cbe29d2f761f5b2478ab226c893f8206695c976003f6160fad",
+    "hashSvgDaSoat": "a3ca3b48341c797220e8b4ef0fcfd343c4cb2dee360d7059b3ddd746ccb47a33"
+  },
+  {
+    "i": 541,
+    "hashSvg": "21c2df7805f121883aecfb5b3e9fe31266c67f5d0ef8172b9c068b15d0d61d3d",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn. Đếm đủ16C và giữ ONa.",
+    "hash": "65d707399e149ff5ef6f57c9255713dddfb5313cd4d7cc08ae311723cba4fd00",
+    "hashSvgDaSoat": "21c2df7805f121883aecfb5b3e9fe31266c67f5d0ef8172b9c068b15d0d61d3d"
+  },
+  {
+    "i": 565,
+    "hashSvg": "c698ee89d7421d21ad7e2af10ea60e9bc13b8f5bb96e75dfc23b8d912809540c",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn. Giữ nguyên CH3(CH2)15CH2–C(=O)–ONa, số lặp15.",
+    "hash": "6906af11562357da39ba4c821a51c3ae0cd9a226ea9170a2ca51d758b86ca1a7",
+    "hashSvgDaSoat": "c698ee89d7421d21ad7e2af10ea60e9bc13b8f5bb96e75dfc23b8d912809540c"
+  },
+  {
+    "i": 714,
+    "hashSvg": "fa0b83616ced0c05aad71bcafb719d212161d6954cc398e726f082f50a6aec24",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn và render SVG thật; đúng nguyên tử/liên kết/nhánh/H/NH/điện tích/caption/vòng tròn nếu có; không chữ chạm/cắt/tràn. Đếm đủ16C và giữ OK.",
+    "hash": "84a81582454d5245c25e704963a56f8736b7da306601d70d3fb4dfab2ac37cc6",
+    "hashSvgDaSoat": "fa0b83616ced0c05aad71bcafb719d212161d6954cc398e726f082f50a6aec24"
+  },
+  {
+    "i": 730,
+    "hashSvg": "fa0b83616ced0c05aad71bcafb719d212161d6954cc398e726f082f50a6aec24",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: K-palmitate16C, giữOK;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "88ca3be21f2f1ea3edd16e69826ab44db0baff8393447ea39a34d55b0668b678",
+    "hashSvgDaSoat": "fa0b83616ced0c05aad71bcafb719d212161d6954cc398e726f082f50a6aec24"
+  },
+  {
+    "i": 760,
+    "hashSvg": "c155d65af52ea7c5820e1e69a3786434ac6309516f32dd480c3404f6137b1701",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: OH/COOHmeta,vòngtròn,A.;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "8d7ddb8212665999cb21b6036d4b67aeeb665da4168f6a102cd7dead961dc140",
+    "hashSvgDaSoat": "c155d65af52ea7c5820e1e69a3786434ac6309516f32dd480c3404f6137b1701"
+  },
+  {
+    "i": 775,
+    "hashSvg": "6c8ad21724f663036932aef18275a57b56aa9d4d0b0a6f9c9c358353f4f9304b",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: Aspirinortho,3C=Cvòng;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "90ac60c83c810f4800df90d5acd9448e6aa83fd367fdf7a9cf631e9a465b384f",
+    "hashSvgDaSoat": "6c8ad21724f663036932aef18275a57b56aa9d4d0b0a6f9c9c358353f4f9304b"
+  },
+  {
+    "i": 781,
+    "hashSvg": "1ee1f99d93642ead996dab4c5738f784d6c7116733b184ea379ea8e1ae8fd646",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: N-propyl/ethyl,đủN-H;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "91eb29148d75b58a8221500550c6bda3ef6f4f30c1a261be22278e2ba37a3f24",
+    "hashSvgDaSoat": "1ee1f99d93642ead996dab4c5738f784d6c7116733b184ea379ea8e1ae8fd646"
+  },
+  {
+    "i": 797,
+    "hashSvg": "f054a4c36c7b07a87bfddf8ff51f9ec75a717e3ac07ac528a6e202c002063d89",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: Ethylbutanoate4Cacid/2Cethyl;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "94731f4110825a123cdf638317a133bf5ca36aaa7f13b38f8a2b68501d9c5376",
+    "hashSvgDaSoat": "f054a4c36c7b07a87bfddf8ff51f9ec75a717e3ac07ac528a6e202c002063d89"
+  },
+  {
+    "i": 803,
+    "hashSvg": "abbccf8a0164de48d335fbc95c18decf6d4b09861df02694f3387f8e5271998c",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: OHparaCOOMe;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "95723814f089f5b4dedfe6b63b4087a4a44ab0a544962e018baf3eaa9c33b59b",
+    "hashSvgDaSoat": "abbccf8a0164de48d335fbc95c18decf6d4b09861df02694f3387f8e5271998c"
+  },
+  {
+    "i": 815,
+    "hashSvg": "eb4909cd00634a78f2375eaa0ff91e472b2f4cc2275f902430acee02d7661d2c",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: Ethyl/secbutyl,N-H;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "96ee6139d4794e19eb3627895e18005d4929489ad7944fe8dccd9a555121ddf4",
+    "hashSvgDaSoat": "eb4909cd00634a78f2375eaa0ff91e472b2f4cc2275f902430acee02d7661d2c"
+  },
+  {
+    "i": 819,
+    "hashSvg": "f06fc723e64d58125549651f9b23aea0f4052c6913e166bf1a1e152b00bdee84",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: Salicylicortho,vòngtròn;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "97b0b40940b6b414ac6cbaa97b1638626fd07d5d86d37ffca420e0406985e0be",
+    "hashSvgDaSoat": "f06fc723e64d58125549651f9b23aea0f4052c6913e166bf1a1e152b00bdee84"
+  },
+  {
+    "i": 821,
+    "hashSvg": "26419f056a93784198eec6dc5e8c2a6e39c4ed88e7b146a3462019b2924cfb31",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: Cyclohexane1,2diol,khônggánstereo;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "984e94ba3e26f0246cf656ba9775d736429f17280ae997ebc1f2143274c21e5e",
+    "hashSvgDaSoat": "26419f056a93784198eec6dc5e8c2a6e39c4ed88e7b146a3462019b2924cfb31"
+  },
+  {
+    "i": 825,
+    "hashSvg": "7e8cedcf6215296dfe5d5bc91d59e965ea20a2f495364117a75cc40ce2e07f8d",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: OHparaCHO/OMemetaCHO,Haldehydeđủ;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "98dc65fbf60fb151ebf61fba99f8c4f4c3b250dec9e1ef14700d84dd4b012128",
+    "hashSvgDaSoat": "7e8cedcf6215296dfe5d5bc91d59e965ea20a2f495364117a75cc40ce2e07f8d"
+  },
+  {
+    "i": 829,
+    "hashSvg": "3923228e00f0a4150087b43b758d42329159b576e146f9d7f6a600b216f23bc8",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: Citricacid3COOH/1OH/caption;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "99843a672c0780c0f2829635bd119c0ee9892b087ec005d23b86414d0f7c86b2",
+    "hashSvgDaSoat": "3923228e00f0a4150087b43b758d42329159b576e146f9d7f6a600b216f23bc8"
+  },
+  {
+    "i": 833,
+    "hashSvg": "bf64223cb30382a483dea12ebc2df2a8881a569f6d54aae96be208b061ebabde",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: Diethylphthalateortho,2nhánhOCH2CH3;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "99f4b91de82b0c113711a1af5e7ac6faec3b4660b43656b915b6804097bef185",
+    "hashSvgDaSoat": "bf64223cb30382a483dea12ebc2df2a8881a569f6d54aae96be208b061ebabde"
+  },
+  {
+    "i": 835,
+    "hashSvg": "3923228e00f0a4150087b43b758d42329159b576e146f9d7f6a600b216f23bc8",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: Citricacidđối chiếunguồnriêng/caption;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "9a7b21f92f9429b3cb901c2712e43098f24483638841a4858465a673f669f277",
+    "hashSvgDaSoat": "3923228e00f0a4150087b43b758d42329159b576e146f9d7f6a600b216f23bc8"
+  },
+  {
+    "i": 844,
+    "hashSvg": "714edf9db1b802f75bf3a23b420689c2f67aa21088d6068f79954155e7b36d58",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: Melamine3Nring/3NH2/3double;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "9b46dd44a8345179b263511cd2ef97152103bbe09b63adfeea359a91a9720e47",
+    "hashSvgDaSoat": "714edf9db1b802f75bf3a23b420689c2f67aa21088d6068f79954155e7b36d58"
+  },
+  {
+    "i": 857,
+    "hashSvg": "2e5c6d6de049d263e1e1887ebec08ed026c8304c5ad0bb08d5aca7a57ff38adf",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: OH/CH2OHortho,vòngtròn,khôngmấtCH2;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "9c9d2bf74ed03f7af8075d444089112073cc03ee7765e69d7524dd665d7ac284",
+    "hashSvgDaSoat": "2e5c6d6de049d263e1e1887ebec08ed026c8304c5ad0bb08d5aca7a57ff38adf"
+  },
+  {
+    "i": 858,
+    "hashSvg": "be155da6c8b37eb14b295ae80f25e92af16c5ee12a40f09bc7b06678f9f07b63",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: Gly-Lys-Glu,sideLys4CH2/sideGlu2CH2,2NHamide/2NH2;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "9cb9433836ef70f8a569e1f36fede41b0a32bbd056f30178cd8f203a825b4cd0",
+    "hashSvgDaSoat": "be155da6c8b37eb14b295ae80f25e92af16c5ee12a40f09bc7b06678f9f07b63"
+  },
+  {
+    "i": 862,
+    "hashSvg": "683fcc2ccf8ac15d5f6e6c09a87033deecc35ba66e5d487511ed866f634db4f0",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: Saccharin:ringfusion/NH/S2oxo/carbonylđúng;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "9d17d5a22cc0d064efa54807880278ebd38ccd7be1ee66b57618c99b8ba8dd44",
+    "hashSvgDaSoat": "683fcc2ccf8ac15d5f6e6c09a87033deecc35ba66e5d487511ed866f634db4f0"
+  },
+  {
+    "i": 868,
+    "hashSvg": "5ae733930f6ae6bb4ce5761c587e0d1dcfbd16605802a1363d0fa57a439ee272",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: HO2C-CH2-CH2-C(NH2)(H)-CO2H,hàngngang/NH2trên/Hdướiđúngnguồn;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "9dde7feed294de34744d5ca3eb97e9fe5cafec60c5df1ffd5f18028f3dfa2579",
+    "hashSvgDaSoat": "5ae733930f6ae6bb4ce5761c587e0d1dcfbd16605802a1363d0fa57a439ee272"
+  },
+  {
+    "i": 871,
+    "hashSvg": "e756ba9bca3505fb3d8844545941886b461a46897f66a41ded4378ca53a32969",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: Glutamicacid5C,khôngthêmnêm;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "9ed910a0e815f97f8732e07b386c76a87ecf44d82f26a15a7a0f7ec94f0e4f05",
+    "hashSvgDaSoat": "e756ba9bca3505fb3d8844545941886b461a46897f66a41ded4378ca53a32969"
+  },
+  {
+    "i": 881,
+    "hashSvg": "fbbb603e4c482545abcda22b269fbe972cd91a9c648ec1d5b3a72f22a8c1f53f",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: MethionineCH3S-CH2-CH2-CH(NH2)-COOH;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "a059ccf61054f1ead9a173fae8d51777fccf82887be2dcf4469d4e2a84a3be69",
+    "hashSvgDaSoat": "fbbb603e4c482545abcda22b269fbe972cd91a9c648ec1d5b3a72f22a8c1f53f"
+  },
+  {
+    "i": 883,
+    "hashSvg": "8c37a9daabd6593b9953ef17017dd4cd476b0acf907871e99827fc6bf0701b7d",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: NH3+/NH2cùngCH,CH2-COO−,khôngsửacấutrúcphươngánsai;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "a0c0e2223a426be4043c53f50247b2f26acf1c2cf0bffa238ab1203d2df188e7",
+    "hashSvgDaSoat": "8c37a9daabd6593b9953ef17017dd4cd476b0acf907871e99827fc6bf0701b7d"
+  },
+  {
+    "i": 890,
+    "hashSvg": "5517c93f621d6a83eb2349735895eb7fa899e12987778c4f6afdd7f3f21d8a2f",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: AcetateOCH2CH(CH3)CH2CH3,khôngđổithànhisoamyl;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "a37ee107da3d7ee27ebfec8a4564399f942c07f74d5fb47bbf00a71289138642",
+    "hashSvgDaSoat": "5517c93f621d6a83eb2349735895eb7fa899e12987778c4f6afdd7f3f21d8a2f"
+  },
+  {
+    "i": 897,
+    "hashSvg": "69dbd5fc89b0e81f840d368e0a5188b2ad84214f28054ee7af2fc61aad996265",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: Ethyl/isobutylNH,khôngđổisecbutyl;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "a46aa65a7f1a24ed66e2522e5e06df29cd509930b8d66c32f1ba57bc8a5b476d",
+    "hashSvgDaSoat": "69dbd5fc89b0e81f840d368e0a5188b2ad84214f28054ee7af2fc61aad996265"
+  },
+  {
+    "i": 902,
+    "hashSvg": "6a1d4955f8b353fba6b356eb1617dc7690464b624a5a950a61696d340c2ce013",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: Benzylformate,Hformylhiệnrõ/1CH2giữaOvòng/vòngtròn;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "a5a93554b9675eb21cea2c731c25786bd98447565a67e4af9a0a0d94cdbccd15",
+    "hashSvgDaSoat": "6a1d4955f8b353fba6b356eb1617dc7690464b624a5a950a61696d340c2ce013"
+  },
+  {
+    "i": 905,
+    "hashSvg": "548081d99f46f39a3087614e40f2cac2a4b1cef81dba418875c3f02743ed39c7",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: Cyclohexene6C,methylởCalkene,isopropylparavòng,khôngthêmstereo;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "a5d7a2315b1a3be00c0474ad25eb6b1563abba53cac4d75da06295f36eacfb38",
+    "hashSvgDaSoat": "548081d99f46f39a3087614e40f2cac2a4b1cef81dba418875c3f02743ed39c7"
+  },
+  {
+    "i": 909,
+    "hashSvg": "730e9e9a27771648813e11c68e17d5282b16fc0010585c5eddffbf3ce6c5e850",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: CHOparaOH/OMemetaCHO,nguồnHaldehydeimplicit;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "a6399b64345057a4d23edd7f70d0d2547b6de3acb48185c9e1ae4b0916e36749",
+    "hashSvgDaSoat": "730e9e9a27771648813e11c68e17d5282b16fc0010585c5eddffbf3ce6c5e850"
+  },
+  {
+    "i": 911,
+    "hashSvg": "bc178126e34f3baa0bd07eb98bf94e0a4ec463ed47a54d52f253a2c227090637",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: Aspirinortho,vòngtròn;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "a68508e2dd70ee51b2c249e6080a2e9df2c0604c978f3ec535f714a2c8beb4e6",
+    "hashSvgDaSoat": "bc178126e34f3baa0bd07eb98bf94e0a4ec463ed47a54d52f253a2c227090637"
+  },
+  {
+    "i": 918,
+    "hashSvg": "7cfb723acafe6727b927e287c2b7f7c2cbe5375b737fb69cfb77f28c7c923db7",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: ValineNH3+/COO−,5C,khôngthêmnêm;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "a753b7f4004531104099bcb558e9577a06cfa9357c4682dca34c779ef35dbd99",
+    "hashSvgDaSoat": "7cfb723acafe6727b927e287c2b7f7c2cbe5375b737fb69cfb77f28c7c923db7"
+  },
+  {
+    "i": 923,
+    "hashSvg": "1414ec7d70a9412a86fb924cf68027929bb27f9a468f00bbef3aaf19fe9a074e",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: MethylformateHformyl/captionC.;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "a7a0f8e5b3d7e1d412d2de351f18fa4195fac55bc3c5aa796afb9c6bfaab6556",
+    "hashSvgDaSoat": "1414ec7d70a9412a86fb924cf68027929bb27f9a468f00bbef3aaf19fe9a074e"
+  },
+  {
+    "i": 937,
+    "hashSvg": "70f8222918bddc1f7429282ad54fce6c914c641a9d0d665ebd07c9440976e5e5",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: Benzylbenzoate,1CH2giữaOvòng/captionđúng;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "a967ec98e8fd4db18b94f647460fde59ed758db676289d633a25802140cf71c6",
+    "hashSvgDaSoat": "70f8222918bddc1f7429282ad54fce6c914c641a9d0d665ebd07c9440976e5e5"
+  },
+  {
+    "i": 950,
+    "hashSvg": "392986b5fc236dfc39bca6410d9f9f37263829931aef22dcad7ac15219483260",
+    "nguoiSoat": "cau_truc_5",
+    "ketQua": "Đạt: B.CH2=CH2giữnhãnB./dấu=/chỉsố2;đãmởnguồn+SVGthật,DDHoutlinekhôngfallback,khôngcắt/chồng",
+    "hash": "ac06d34997bcb7b017b6261aa892958f010d218ba7baf161ba6829ad0df99821",
+    "hashSvgDaSoat": "392986b5fc236dfc39bca6410d9f9f37263829931aef22dcad7ac15219483260"
+  },
+  {
+    "i": 960,
+    "hashSvg": "bf64223cb30382a483dea12ebc2df2a8881a569f6d54aae96be208b061ebabde",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Hai ethyl ester ortho, đủ C, vòng 3 nối đôi; DDH rõ. Đã mở ảnh nguồn và render SVG thực; không thấy chạm/cắt/tràn.",
+    "hash": "accc9b902efd9087ee2d9509fda85dd69c885752e75d189545722f16a8acd47c",
+    "hashSvgDaSoat": "bf64223cb30382a483dea12ebc2df2a8881a569f6d54aae96be208b061ebabde"
+  },
+  {
+    "i": 972,
+    "hashSvg": "c728b9a926c1da0cb0675130b9fb9fd032aaefaeb55a5e1f84080fbd55b2473b",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: H formyl tường minh còn đủ; methyl formate đúng. Đã mở ảnh nguồn và render SVG thực; không thấy chạm/cắt/tràn.",
+    "hash": "ae6e9959e3b77686ff6d0fbd5552ea95d216974062ea4c00bd8b9c0c2a8839d6",
+    "hashSvgDaSoat": "c728b9a926c1da0cb0675130b9fb9fd032aaefaeb55a5e1f84080fbd55b2473b"
+  },
+  {
+    "i": 975,
+    "hashSvg": "601569b46e747091b78e076b5170a1bb98deb837009940a28c92eedca7cbf6db",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Giữ C., [CH2]5, COOH, dấu chấm cuối; chữ DDH không cắt. Đã mở ảnh nguồn và render SVG thực; không thấy chạm/cắt/tràn.",
+    "hash": "aeb7bdc3a8afb03b7397897d173a8584da935d603b64f8ff036e38a163a61803",
+    "hashSvgDaSoat": "601569b46e747091b78e076b5170a1bb98deb837009940a28c92eedca7cbf6db"
+  },
+  {
+    "i": 1003,
+    "hashSvg": "1ee1f99d93642ead996dab4c5738f784d6c7116733b184ea379ea8e1ae8fd646",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: NH gắn ethyl và n-propyl, giữ H trên N. Đã mở ảnh nguồn và render SVG thực; không thấy chạm/cắt/tràn.",
+    "hash": "b4cad548175c863ae8f3cbc6426de7e21a1131a9580d460d9e61b95b47f2b032",
+    "hashSvgDaSoat": "1ee1f99d93642ead996dab4c5738f784d6c7116733b184ea379ea8e1ae8fd646"
+  },
+  {
+    "i": 1034,
+    "hashSvg": "708c35a365ecd28995d64a83fe9b0a70b2e6fb06c1c4e6632a9afaaab74e9e3a",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: o-cresol, CH3/OH ortho; vòng 3 nối đôi. Đã mở ảnh nguồn và render SVG thực; không thấy chạm/cắt/tràn.",
+    "hash": "ba00816e6b6e6aa242023578f53736a91b1fcd75d19b4032d34bb5865a5c6eb3",
+    "hashSvgDaSoat": "708c35a365ecd28995d64a83fe9b0a70b2e6fb06c1c4e6632a9afaaab74e9e3a"
+  },
+  {
+    "i": 1048,
+    "hashSvg": "bc178126e34f3baa0bd07eb98bf94e0a4ec463ed47a54d52f253a2c227090637",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Aspirin ortho, vòng tròn thơm được giữ. Đã mở ảnh nguồn và render SVG thực; không thấy chạm/cắt/tràn.",
+    "hash": "bdb7013590c9caa236cd9b26cd0a3107c14fd5320e2ad5161fe34a1f2e6869fa",
+    "hashSvgDaSoat": "bc178126e34f3baa0bd07eb98bf94e0a4ec463ed47a54d52f253a2c227090637"
+  },
+  {
+    "i": 1057,
+    "hashSvg": "a7e68273fb10afbce4e2a6046b4cf343d2532060aed55d588cbb91ce05023bde",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Hydroxybenzoic acid meta, giữ vòng tròn thơm. Đã mở ảnh nguồn và render SVG thực; không thấy chạm/cắt/tràn.",
+    "hash": "beff75074b7e34cb3c9d5183a2ce8cbff48f06c95094ece987cb18b52691f078",
+    "hashSvgDaSoat": "a7e68273fb10afbce4e2a6046b4cf343d2532060aed55d588cbb91ce05023bde"
+  },
+  {
+    "i": 1066,
+    "hashSvg": "7f3399d2efd3fa28dd598c3eea7d32ba7356879b0f85f1ec0aaae600e229ba81",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Isoamyl acetate, nhánh và hai CH2 giữa O/CH(CH3)2 đúng. Đã mở ảnh nguồn và render SVG thực; không thấy chạm/cắt/tràn.",
+    "hash": "c094346d864d1d062772a53831f8c9ec919c5ad39acaffb7525921e0e84d849a",
+    "hashSvgDaSoat": "7f3399d2efd3fa28dd598c3eea7d32ba7356879b0f85f1ec0aaae600e229ba81"
+  },
+  {
+    "i": 1069,
+    "hashSvg": "e756ba9bca3505fb3d8844545941886b461a46897f66a41ded4378ca53a32969",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Glutamic acid hai CH2 nhánh, hai COOH; không tự thêm nêm. Đã mở ảnh nguồn và render SVG thực; không thấy chạm/cắt/tràn.",
+    "hash": "c0ded70bab3d3738d7f907667b1dd923d0c908242febc56195f03b16675b672b",
+    "hashSvgDaSoat": "e756ba9bca3505fb3d8844545941886b461a46897f66a41ded4378ca53a32969"
+  },
+  {
+    "i": 1087,
+    "hashSvg": "0a96326900010d0fd397fe3d3de0138f3e428f731575da4ba9f7fa01afcb6e43",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Stearic acid đủ18C, caption nguyên văn, DDH rõ. Đã mở ảnh nguồn và render SVG thực; không thấy chạm/cắt/tràn.",
+    "hash": "c3c5f1516dd6dcfe96e72c71597f94861c427fbc5953619357bcc28aaf27deee",
+    "hashSvgDaSoat": "0a96326900010d0fd397fe3d3de0138f3e428f731575da4ba9f7fa01afcb6e43"
+  },
+  {
+    "i": 1093,
+    "hashSvg": "8a2114d6b62ee9b2235148e16266644cebf04bf5555dffe6e15849524586ebdb",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: CH3COCH(CH3)2, ketone đúng nhánh. Đã mở ảnh nguồn và render SVG thực; không thấy chạm/cắt/tràn.",
+    "hash": "c4aca8b914f09d83fcb9af7e3dbbad3a30d100d01a2fca8458077c54db38804a",
+    "hashSvgDaSoat": "8a2114d6b62ee9b2235148e16266644cebf04bf5555dffe6e15849524586ebdb"
+  },
+  {
+    "i": 1102,
+    "hashSvg": "fec2121ec0b47ab1197560f41d2ff9e75e04647d6627291864c9430f95ab3225",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: NH2 trung hòa và COO− đúng, không tự đổi NH3+. Đã mở ảnh nguồn và render SVG thực; không thấy chạm/cắt/tràn.",
+    "hash": "c6789389a306b25fab025d67f2d0c2da62470d91652c77f7bb192216b5e11007",
+    "hashSvgDaSoat": "fec2121ec0b47ab1197560f41d2ff9e75e04647d6627291864c9430f95ab3225"
+  },
+  {
+    "i": 1128,
+    "hashSvg": "c9194ed0f460a58d544c8c00fe3fad0854248f5a17f1a4469eec311466cb0278",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: NH2CH2OH, chỉ một carbon. Đã mở ảnh nguồn và render SVG thực; không thấy chạm/cắt/tràn.",
+    "hash": "cadadf4de59002fcb8328242e3a09d751a0237ac5a5383b962d57dafa4cd4b34",
+    "hashSvgDaSoat": "c9194ed0f460a58d544c8c00fe3fad0854248f5a17f1a4469eec311466cb0278"
+  },
+  {
+    "i": 1146,
+    "hashSvg": "f054a4c36c7b07a87bfddf8ff51f9ec75a717e3ac07ac528a6e202c002063d89",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Ethyl butanoate, acyl4C/ethyl2C đúng. Đã mở ảnh nguồn và render SVG thực; không thấy chạm/cắt/tràn.",
+    "hash": "ceff87b75e9c7446f314a1dc5884836da20008ceb62f73e1ed30b592dbcefe23",
+    "hashSvgDaSoat": "f054a4c36c7b07a87bfddf8ff51f9ec75a717e3ac07ac528a6e202c002063d89"
+  },
+  {
+    "i": 1163,
+    "hashSvg": "47da4d7b1a7aa029da7b383e7ef0fb2b401878304bde6a6ae9367036053714d3",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Benzyl acetate có O–CH2–Ph, vòng tròn thơm giữ đúng. Đã mở ảnh nguồn và render SVG thực; không thấy chạm/cắt/tràn.",
+    "hash": "d2d97c03ba67bb157c507ad9b5a160151bb8187b7c764dcb38250003b80752b2",
+    "hashSvgDaSoat": "47da4d7b1a7aa029da7b383e7ef0fb2b401878304bde6a6ae9367036053714d3"
+  },
+  {
+    "i": 974,
+    "hashSvg": "08aaedde2f2b27a1aad8d2595bebfb86a61f4ed624fcb76f005ee3200163d353",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Ala–Gly–Ala đủ hai NH amide và hai CH3 nhánh. Đã mở ảnh nguồn và render SVG thực; không thấy chạm/cắt/tràn.",
+    "hash": "aeac6bf8b932f5171735376855c06889873bbbdb0f2c08e1660f4eb51225b03a",
+    "hashSvgDaSoat": "08aaedde2f2b27a1aad8d2595bebfb86a61f4ed624fcb76f005ee3200163d353"
+  },
+  {
+    "i": 980,
+    "hashSvg": "e3a8ee862ce6dbfb58f2ad7f80e1c0e2166fd9e5e4f8f98e5e3a55dc4b7443cc",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: NH3+/NH2 trên cùng carbon, CH2COO− đúng và đủ điện tích. Đã mở ảnh nguồn và render SVG thực; không thấy chạm/cắt/tràn.",
+    "hash": "af2145f78ca36edb18152d431f54aeabf19c426b6558862277e73790f5966c47",
+    "hashSvgDaSoat": "e3a8ee862ce6dbfb58f2ad7f80e1c0e2166fd9e5e4f8f98e5e3a55dc4b7443cc"
+  },
+  {
+    "i": 1005,
+    "hashSvg": "78ffdcb094db97aa473df2920ded52d02be9d8cf428660b85c3e9907f3469770",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Ethyl benzoate đủ ethyl2C, giữ vòng tròn thơm. Đã mở ảnh nguồn và render SVG thực; không thấy chạm/cắt/tràn.",
+    "hash": "b4da9937510f4d2ba30e3d5c4e8cf59d9d90589a4de1ee59aa2c1857fc5c8ce1",
+    "hashSvgDaSoat": "78ffdcb094db97aa473df2920ded52d02be9d8cf428660b85c3e9907f3469770"
+  },
+  {
+    "i": 1009,
+    "hashSvg": "155fdb8939e0fe9614544cde801820bf1f780ac7a138e97609fdc111aff254d0",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Linalyl acetate giữ vinyl/acetate/nhánh methyl, caption đủ; không thêm lập thể. Đã mở ảnh nguồn và render SVG thực; không thấy chạm/cắt/tràn.",
+    "hash": "b58f3fce9b166008d47df8f2b28d57c5a79a976e9bdf03b7f6983b9c49fe5ed5",
+    "hashSvgDaSoat": "155fdb8939e0fe9614544cde801820bf1f780ac7a138e97609fdc111aff254d0"
+  },
+  {
+    "i": 1071,
+    "hashSvg": "d88397322e808bd2a2b4ade9d668be8b0df44343b34cdaed1b92e3bbef507ad4",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Propyl tiglate giữ E, propyl3C, methyl nhánh và caption. Đã mở ảnh nguồn và render SVG thực; không thấy chạm/cắt/tràn.",
+    "hash": "c114a716ed1061f914f894101712463e7d6d0b53c5dc894f2ebfa3301d738880",
+    "hashSvgDaSoat": "d88397322e808bd2a2b4ade9d668be8b0df44343b34cdaed1b92e3bbef507ad4"
+  },
+  {
+    "i": 1099,
+    "hashSvg": "5e59b68618aa35a2491ffc3dfecd2b205547cd9404a7282f5e84266f19d01a23",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: N bậc ba giữ methyl, ethyl và n-butyl; không thêm N–H. Đã mở nguồn đầy đủ và render SVG thật; chữ DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "c6350a30f9291cd4b46757106348589a11e651cdef0d0f859caaa4c4e920fc4d",
+    "hashSvgDaSoat": "5e59b68618aa35a2491ffc3dfecd2b205547cd9404a7282f5e84266f19d01a23"
+  },
+  {
+    "i": 1107,
+    "hashSvg": "5229c3e6203f530bf70d98f8831c5983df6882ae70e5b348e81de0e4a89717af",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Giữ nguyên H3N không tự thêm dấu cộng; COO− và hai CH2 như nguồn. Đã mở nguồn đầy đủ và render SVG thật; chữ DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "c6f28ace2b593908c6ae6ec05dda11f4bcf59700e205930e1ee2a8356bf0bf6a",
+    "hashSvgDaSoat": "5229c3e6203f530bf70d98f8831c5983df6882ae70e5b348e81de0e4a89717af"
+  },
+  {
+    "i": 1113,
+    "hashSvg": "eda9a04e940568f3145ed52043aea6abfa9dad282a63e3e44fa257f4fdd8869e",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Dopamine giữ chuỗi ethylamine, hai OH vị trí 3,4 và caption dopamine. Đã mở nguồn đầy đủ và render SVG thật; chữ DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "c85655c01bc56c88100cdbc35c13cc8bf3f22eba38de6ac23bc827bb0a4b924d",
+    "hashSvgDaSoat": "eda9a04e940568f3145ed52043aea6abfa9dad282a63e3e44fa257f4fdd8869e"
+  },
+  {
+    "i": 1121,
+    "hashSvg": "98131fdae8d9b38ee92eb2043800d657784760e8ffb00c5177b60765f600b630",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Methyl cinnamate giữ nối đôi E và ester methyl. Đã mở nguồn đầy đủ và render SVG thật; chữ DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "ca2b15a7fe2245751b60ebaf7bfcfcd06110e99b923327cf395acb2c56ec4f74",
+    "hashSvgDaSoat": "98131fdae8d9b38ee92eb2043800d657784760e8ffb00c5177b60765f600b630"
+  },
+  {
+    "i": 1133,
+    "hashSvg": "0a579aebb6d4192c02d38702a3de96f3cfef9defb5e86c933f80e24d364b9e8c",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Hai COOH ortho, giữ vòng tròn thơm. Đã mở nguồn đầy đủ và render SVG thật; chữ DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "cb93251bb8207a446bbb3b512ee196fb8821576104d199e0e521a1f77a140666",
+    "hashSvgDaSoat": "0a579aebb6d4192c02d38702a3de96f3cfef9defb5e86c933f80e24d364b9e8c"
+  },
+  {
+    "i": 1147,
+    "hashSvg": "4738130183bb80339e6cd6ce56baf984898db8415f4cd4098ec2c2b7b587e9d9",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Giữ nguyên A. CH₂ = CH – Cl. và chỉ số 2. Đã mở nguồn đầy đủ và render SVG thật; chữ DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "cf0e889c69351f9ffee1e0026aafde6cb05df4fc2eb3653788eb9a52b12dfbc7",
+    "hashSvgDaSoat": "4738130183bb80339e6cd6ce56baf984898db8415f4cd4098ec2c2b7b587e9d9"
+  },
+  {
+    "i": 1152,
+    "hashSvg": "9d3f3e317b30c8df692f16788fbe5abd3b57848e75c649ad3cb3c163febb9c68",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Alanine zwitterion, NH3+ và COO− chính xác. Đã mở nguồn đầy đủ và render SVG thật; chữ DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "d0cc13f68defd26ac99c20214363c981cd61270cf799e9507257a7377dba0a57",
+    "hashSvgDaSoat": "9d3f3e317b30c8df692f16788fbe5abd3b57848e75c649ad3cb3c163febb9c68"
+  },
+  {
+    "i": 1170,
+    "hashSvg": "9d3f3e317b30c8df692f16788fbe5abd3b57848e75c649ad3cb3c163febb9c68",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Nguồn riêng alanine zwitterion khớp NH3+/COO−. Đã mở nguồn đầy đủ và render SVG thật; chữ DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "d3535ec3c925dc4a75206701fa618574303c2fc5ad483846575257e498c23a7f",
+    "hashSvgDaSoat": "9d3f3e317b30c8df692f16788fbe5abd3b57848e75c649ad3cb3c163febb9c68"
+  },
+  {
+    "i": 1179,
+    "hashSvg": "dfaa1bfb5571df04d0af1ab6c82e8b4b91ab4f4172a35668ca59c3ea7843649a",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Giữ nguyên CH3(CH2)15CH2–C(=O)–ONa, số lặp 15 và tổng 18C. Đã mở nguồn đầy đủ và render SVG thật; chữ DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "d57db0aa214152bbc883cc33907458ec4641e413fc5431612624218ff64fce5b",
+    "hashSvgDaSoat": "dfaa1bfb5571df04d0af1ab6c82e8b4b91ab4f4172a35668ca59c3ea7843649a"
+  },
+  {
+    "i": 1185,
+    "hashSvg": "c9ffcf29a159ab661108c26f7c38dd4d92f791a7785d2ffcf8ffe4bb0d0ae63e",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Eugenol đúng vị trí OH/OMe/allyl, giữ nối đôi cuối. Đã mở nguồn đầy đủ và render SVG thật; chữ DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "d6efdde8bee6eabd3f41941c46bb08ae6ca5562460b4eddc07914895f182d1dd",
+    "hashSvgDaSoat": "c9ffcf29a159ab661108c26f7c38dd4d92f791a7785d2ffcf8ffe4bb0d0ae63e"
+  },
+  {
+    "i": 985,
+    "hashSvg": "cafdccd4651b1164d6a8e3ec2a6b7d1b63ce53d0d5e3e2eb3723728ec636d8c5",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Linoleic acid 18C, hai nối đôi 9Z/12Z và caption linoleic acid; không đảo hình học. Đã mở nguồn đầy đủ và render SVG thật; chữ DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "b0f28ad467a584e384bebe43ecb184eaad7c58a971a3879a0c843246824846bb",
+    "hashSvgDaSoat": "cafdccd4651b1164d6a8e3ec2a6b7d1b63ce53d0d5e3e2eb3723728ec636d8c5"
+  },
+  {
+    "i": 1150,
+    "hashSvg": "fdc70e0f34c3f810b66b13fca470d787d4a6c4037e2527c85d42b2d066333b44",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Nguồn riêng linoleic acid 18C, hai nối đôi Z, không tự thêm caption. Đã mở nguồn đầy đủ và render SVG thật; chữ DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "cfd644552410357d2d14b998b1363a9fbbfb781a3dc214cb895d221fdf17c399",
+    "hashSvgDaSoat": "fdc70e0f34c3f810b66b13fca470d787d4a6c4037e2527c85d42b2d066333b44"
+  },
+  {
+    "i": 1144,
+    "hashSvg": "b490f65d7b7aa339b5c538c96e44cc749a30f22eb702c2ae52f7858636b7b1cb",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Đúng Ala–Glu–Gly–Ala–Val: bốn NH peptide, nhánh Glu CH2CH2COOH, hai methyl Ala và isopropyl Val; không thêm lập thể. Đã mở nguồn đầy đủ và render SVG thật; chữ DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "cecf74b3cffed1d2381d2938b50352d0f20f4ec5f72c8fcbaa5b4cfe7eec9962",
+    "hashSvgDaSoat": "b490f65d7b7aa339b5c538c96e44cc749a30f22eb702c2ae52f7858636b7b1cb"
+  },
+  {
+    "i": 1169,
+    "hashSvg": "49ec15bd8e56a26ec5c910edc85a815819ebc2136eb713237aaba727e4a66d7d",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Đúng Val–Gly–Ser–Ala: ba NH peptide, nhánh Val isopropyl, Ser CH2OH, Ala methyl; đầu NH2/cuối COOH, không thêm lập thể. Đã mở nguồn đầy đủ và render SVG thật; chữ DDH dạng path, không chạm/cắt/tràn.",
+    "hash": "d340fca5866795895f65c10087ee6f1ee66ee48c7ae313fa6309f7f333112927",
+    "hashSvgDaSoat": "49ec15bd8e56a26ec5c910edc85a815819ebc2136eb713237aaba727e4a66d7d"
+  }
+]

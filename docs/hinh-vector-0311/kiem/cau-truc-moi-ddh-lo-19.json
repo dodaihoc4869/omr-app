@@ -1,0 +1,40 @@
+[
+  {
+    "i": 1086,
+    "hash": "c3c1eae278be56aec62d19d791996e43ccc1b05c74e0045f712c46e9f69cf61b",
+    "fileNguon": "anh/c3c1eae278be56aec62d19d791996e43ccc1b05c74e0045f712c46e9f69cf61b.png",
+    "smiles": "NC(CCC(=O)O)C(=O)NCC(=O)NC(C)C(=O)O",
+    "caption": [],
+    "phongApp": true,
+    "nguoiDocNguon": "cau_truc_5"
+  },
+  {
+    "i": 1363,
+    "hash": "f638010d90b1a7818c38b1d103eac3fd411474c9015869efed0c1a3f5dab1f14",
+    "fileNguon": "anh/f638010d90b1a7818c38b1d103eac3fd411474c9015869efed0c1a3f5dab1f14.png",
+    "smiles": "CC(C)=CCC/C(C)=C/C=O",
+    "caption": [],
+    "phongApp": true,
+    "nguoiDocNguon": "cau_truc_5"
+  },
+  {
+    "i": 1271,
+    "hash": "e66bd6f3eb5b9486fb0cb814dbe7a064c87fa9189ebad37b1616c70542e1b563",
+    "fileNguon": "anh/e66bd6f3eb5b9486fb0cb814dbe7a064c87fa9189ebad37b1616c70542e1b563.png",
+    "smiles": "[Na+].CCCCCCCCCCCCc1ccc(S(=O)(=O)[O-])cc1",
+    "caption": [],
+    "phongApp": true,
+    "nguoiDocNguon": "cau_truc_5",
+    "terminalCationText": "ONa"
+  },
+  {
+    "i": 1414,
+    "hash": "fe32c7e34113734dd6a7e16cb65bf188666f23f33e93493004f30db645f66b7b",
+    "fileNguon": "anh/fe32c7e34113734dd6a7e16cb65bf188666f23f33e93493004f30db645f66b7b.png",
+    "smiles": "[Na+].CCCCCCCCCCCCOS(=O)(=O)[O-]",
+    "caption": [],
+    "phongApp": true,
+    "nguoiDocNguon": "cau_truc_5",
+    "terminalCationText": "ONa"
+  }
+]

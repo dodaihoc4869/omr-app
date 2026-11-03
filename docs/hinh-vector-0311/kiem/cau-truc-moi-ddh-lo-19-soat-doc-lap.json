@@ -1,0 +1,34 @@
+[
+  {
+    "i": 1086,
+    "hashSvg": "9c714a735a34547ec7f0f311a145ef2efc4f022a831a14a7abb0a6052ae597c7",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Glu–Gly–Ala đúng10C/3N,2NHamide,2COOH;nhánhGlu2CH2COOH;khôngstereo giả. Đãmởnguồn/renderSVGthật;glyphDDHđúng,khôngchạm/cắt/tràn.",
+    "hash": "c3c1eae278be56aec62d19d791996e43ccc1b05c74e0045f712c46e9f69cf61b",
+    "hashSvgDaSoat": "9c714a735a34547ec7f0f311a145ef2efc4f022a831a14a7abb0a6052ae597c7"
+  },
+  {
+    "i": 1363,
+    "hashSvg": "d4194f18324c64510656b7480a3d76ef12b25c12a55561a4b8c618557016d5cc",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Đủ10C, nốiđôi gầnCHO giữE;CHOẩnH nhưnguồn;đầuC(CH3)2đúng,khônggánEZthừa. Đãmởnguồn/renderSVGthật;glyphDDHđúng,khôngchạm/cắt/tràn.",
+    "hash": "f638010d90b1a7818c38b1d103eac3fd411474c9015869efed0c1a3f5dab1f14",
+    "hashSvgDaSoat": "d4194f18324c64510656b7480a3d76ef12b25c12a55561a4b8c618557016d5cc"
+  },
+  {
+    "i": 1271,
+    "hashSvg": "27fcd199d5fb4524051ea304a8a72e3c49d6878e03a9c61176bda418803f1948",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Dodecylbenzene sulfonate đủ12Cđuôi,paraSO3Na;C–Snốitrựctiếp,đủ2S=O vàONa. Đãmởnguồn/renderSVGthật;glyphDDHđúng,khôngchạm/cắt/tràn.",
+    "hash": "e66bd6f3eb5b9486fb0cb814dbe7a064c87fa9189ebad37b1616c70542e1b563",
+    "hashSvgDaSoat": "27fcd199d5fb4524051ea304a8a72e3c49d6878e03a9c61176bda418803f1948"
+  },
+  {
+    "i": 1414,
+    "hashSvg": "f6f8c9de24ceb23c168de3714bc0e0d260f710351019d52b771165b3218830d4",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: DodecylSULFATE đủ12Cđuôi,giữOtrướcS (C–O–S),đủ2S=O vàONa;khôngđổi sulfonate. Đãmởnguồn/renderSVGthật;glyphDDHđúng,khôngchạm/cắt/tràn.",
+    "hash": "fe32c7e34113734dd6a7e16cb65bf188666f23f33e93493004f30db645f66b7b",
+    "hashSvgDaSoat": "f6f8c9de24ceb23c168de3714bc0e0d260f710351019d52b771165b3218830d4"
+  }
+]

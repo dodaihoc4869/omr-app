@@ -1,0 +1,56 @@
+[
+  {
+    "i": 269,
+    "hash": "2da6557a0ccbc629e15d8433cc4103bc40e3bf1b814441456812bf7c5f658a86",
+    "fileNguon": "anh/2da6557a0ccbc629e15d8433cc4103bc40e3bf1b814441456812bf7c5f658a86.png",
+    "smiles": "[NH2:3]CCc1[n:1]c[n:2]([H])c1",
+    "caption": [
+      "Histamine"
+    ],
+    "phongApp": true,
+    "giuHTuongMinh": true,
+    "nhanNguyenTuTheoMap": {
+      "1": "(1)",
+      "2": "(2)",
+      "3": "(3)"
+    },
+    "nguoiDocNguon": "cau_truc_5",
+    "ghiChu": "Giữ tautomer/H riêng trên N(2), đánh số đúng ba N; atom-map không hiện trong hình."
+  },
+  {
+    "i": 1294,
+    "hash": "eac33573c565faa67f9810f16f189e80ae9b15dcd6b27bce9a664214347a3ca7",
+    "fileNguon": "anh/eac33573c565faa67f9810f16f189e80ae9b15dcd6b27bce9a664214347a3ca7.png",
+    "smiles": "[NH2:3]CCc1[n:1]c[n:2]([H])c1",
+    "caption": [
+      "Histamine"
+    ],
+    "phongApp": true,
+    "giuHTuongMinh": true,
+    "nhanNguyenTuTheoMap": {
+      "1": "(1)",
+      "2": "(2)",
+      "3": "(3)"
+    },
+    "nguoiDocNguon": "cau_truc_5",
+    "ghiChu": "Giữ tautomer/H riêng trên N(2), đánh số đúng ba N; atom-map không hiện trong hình."
+  },
+  {
+    "i": 1355,
+    "hash": "f573b569ae79b5695d03bde049d75f0b7946611ce53923b3a3311c3ea0640974",
+    "fileNguon": "anh/f573b569ae79b5695d03bde049d75f0b7946611ce53923b3a3311c3ea0640974.png",
+    "smiles": "[NH2:3]CCc1[n:1]c[n:2]([H])c1",
+    "caption": [
+      "Histamine"
+    ],
+    "phongApp": true,
+    "giuHTuongMinh": true,
+    "nhanNguyenTuTheoMap": {
+      "1": "(1)",
+      "2": "(2)",
+      "3": "(3)"
+    },
+    "nguoiDocNguon": "cau_truc_5",
+    "ghiChu": "Giữ tautomer/H riêng trên N(2), đánh số đúng ba N; atom-map không hiện trong hình."
+  }
+]

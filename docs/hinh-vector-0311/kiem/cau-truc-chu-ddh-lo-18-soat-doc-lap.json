@@ -1,0 +1,402 @@
+[
+  {
+    "i": 1410,
+    "hashSvg": "d10f6e532938a44e8fde49e362275075ef26e2e2c851016063c6a5662c49dabb",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: đã xem lại bản sửa; dây vôn kế liên tục ở giữa ống khí tới Pt, ống khí/mũi tên/nhãn giữ đúng; namespace chuẩn render được. Thay hash cũ bị lỗi. Đã mở riêng nguồn và PNG tự render; không chữ chạm/cắt/tràn.",
+    "hash": "fd9dc4ef16a9abd4bb2a16d9f10a9a8650446ba720443d35ed5f2d27a29ae739",
+    "hashSvgDaSoat": "d10f6e532938a44e8fde49e362275075ef26e2e2c851016063c6a5662c49dabb"
+  },
+  {
+    "i": 38,
+    "hashSvg": "921860bc4fe21a19064a86b767886731c42574afb0fa8e4d8bf8b1af3bb6a6c4",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: thứ tự (2),(1),(3), sắc độ khí, hai bể nước đá/nước nóng và nhãn đúng. Đã mở riêng nguồn và PNG tự render; không chữ chạm/cắt/tràn.",
+    "hash": "07407bbff732b964612d21d11c18620133f2e8b86ecc26c34f4db9764847ee8d",
+    "hashSvgDaSoat": "921860bc4fe21a19064a86b767886731c42574afb0fa8e4d8bf8b1af3bb6a6c4"
+  },
+  {
+    "i": 543,
+    "hashSvg": "1b6d36a76653a9cd25bef266ed853d5b2720ae07ba418f4f2ffbef2eb6635aa6",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: hai đường (a)/(b) hội tụ cùng mức rồi có đoạn ngang; trục/nhãn đúng. Đã mở riêng nguồn và PNG tự render; không chữ chạm/cắt/tràn.",
+    "hash": "665cf34d8440e83aa8c3e0a04da87ca0fd0c5bd661d755ef53968e0522986f25",
+    "hashSvgDaSoat": "1b6d36a76653a9cd25bef266ed853d5b2720ae07ba418f4f2ffbef2eb6635aa6"
+  },
+  {
+    "i": 35,
+    "hashSvg": "471548434fdff35ff94ce21715c7898b40fbee9d8ee3f4f6968fd5eab91c22f7",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: 1 ô [↑↓]. Đã mở riêng nguồn và PNG tự render; không chữ chạm/cắt/tràn.",
+    "hash": "06fbb84758192112a98b4959a44b84b9a0e81054fa693f9476a1c012466b438f",
+    "hashSvgDaSoat": "471548434fdff35ff94ce21715c7898b40fbee9d8ee3f4f6968fd5eab91c22f7"
+  },
+  {
+    "i": 98,
+    "hashSvg": "ec4545bf20507fe988fb97f81eff53caeb64b4820543f979d31abde7e1f73f82",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: 1 ô [↓]. Đã mở riêng nguồn và PNG tự render; không chữ chạm/cắt/tràn.",
+    "hash": "1396e5b67abc81bead4e75250dc5d8233260d8b0be26b3fd1132400e47c900d1",
+    "hashSvgDaSoat": "ec4545bf20507fe988fb97f81eff53caeb64b4820543f979d31abde7e1f73f82"
+  },
+  {
+    "i": 103,
+    "hashSvg": "30403bd3160bd24ba9d3478313277ad48a914ac4c5b0023d67b9d26ed1b91d21",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: 1 ô [↑↑], giữ phân bố nguồn. Đã mở riêng nguồn và PNG tự render; không chữ chạm/cắt/tràn.",
+    "hash": "13e4b159f0e3ad0766f07765162e2855c7e3760ccc8a5162c457c90be6938822",
+    "hashSvgDaSoat": "30403bd3160bd24ba9d3478313277ad48a914ac4c5b0023d67b9d26ed1b91d21"
+  },
+  {
+    "i": 218,
+    "hashSvg": "7dbf2383cb7d88ac66152c2f613503a450e67fccf455611e41dbb1ef96006842",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: 3 ô [↑↓][↑↓][↑↓]. Đã mở riêng nguồn và PNG tự render; không chữ chạm/cắt/tràn.",
+    "hash": "25b7eeb9f487204873ef366bf2a3fcdabea2d09e7f2f33a7512bf48c3f779036",
+    "hashSvgDaSoat": "7dbf2383cb7d88ac66152c2f613503a450e67fccf455611e41dbb1ef96006842"
+  },
+  {
+    "i": 291,
+    "hashSvg": "30403bd3160bd24ba9d3478313277ad48a914ac4c5b0023d67b9d26ed1b91d21",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: 1 ô [↑↑]. Đã mở riêng nguồn và PNG tự render; không chữ chạm/cắt/tràn.",
+    "hash": "314b2ba78c6b8ca335aef283f010ea4db4689ccbc975810af9445ad0af97066e",
+    "hashSvgDaSoat": "30403bd3160bd24ba9d3478313277ad48a914ac4c5b0023d67b9d26ed1b91d21"
+  },
+  {
+    "i": 333,
+    "hashSvg": "fdde4dcf057342b8bb9fd31a0d052a04a72339e035e73b72b1f6cc391769e9ef",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: 1 ô [↑]. Đã mở riêng nguồn và PNG tự render; không chữ chạm/cắt/tràn.",
+    "hash": "3a94ee1cc2595f58fec1bb9e9ddc2336f2515dc05e5a907f27d8394a2028a95b",
+    "hashSvgDaSoat": "fdde4dcf057342b8bb9fd31a0d052a04a72339e035e73b72b1f6cc391769e9ef"
+  },
+  {
+    "i": 508,
+    "hashSvg": "e5f90e0a4e81cfa261541c761c6df05e094a2939281fa175b0675b45b6d98653",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: 3 ô [↑][↑][↑]. Đã mở riêng nguồn và PNG tự render; không chữ chạm/cắt/tràn.",
+    "hash": "5dacda07ffc2e3e50a619b0ec78beceb679614951e05084ac5bef3ef48042526",
+    "hashSvgDaSoat": "e5f90e0a4e81cfa261541c761c6df05e094a2939281fa175b0675b45b6d98653"
+  },
+  {
+    "i": 537,
+    "hashSvg": "0d69d52f1ae68282d5e2e0ab3072dea1d6eb5781ac0dd0a03f3ddc489bc514e8",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: 5 ô [↑↓][↑↓][↑↓][↑][↑]. Đã mở riêng nguồn và PNG tự render; không chữ chạm/cắt/tràn.",
+    "hash": "654c1aa11b98addabe096bea1b5e9e0a31052d4bfdd617d7c8e006b026d7582e",
+    "hashSvgDaSoat": "0d69d52f1ae68282d5e2e0ab3072dea1d6eb5781ac0dd0a03f3ddc489bc514e8"
+  },
+  {
+    "i": 626,
+    "hashSvg": "345fa4c6dd2df996190f50eb0e5e6f121b679559edfbe91bc074a1bf934322d6",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: 3 ô [↑↑][↑][↑], không tự sửa phân bố sai. Đã mở riêng nguồn và PNG tự render; không chữ chạm/cắt/tràn.",
+    "hash": "74273141449e16db38457df595b7840b68895b0b685e1ab83eea4611ff7a3792",
+    "hashSvgDaSoat": "345fa4c6dd2df996190f50eb0e5e6f121b679559edfbe91bc074a1bf934322d6"
+  },
+  {
+    "i": 679,
+    "hashSvg": "ec4545bf20507fe988fb97f81eff53caeb64b4820543f979d31abde7e1f73f82",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: 1 ô [↓]. Đã mở riêng nguồn và PNG tự render; không chữ chạm/cắt/tràn.",
+    "hash": "7d220dc95d57ddec2839045f0617c8a4f858a1aef612eed20236cfe46aad0ec5",
+    "hashSvgDaSoat": "ec4545bf20507fe988fb97f81eff53caeb64b4820543f979d31abde7e1f73f82"
+  },
+  {
+    "i": 779,
+    "hashSvg": "3763c0f0fa3427efdc15fc4f0e69b42474f302032dcfe3665a2904ad22a81ff2",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: 4 ô [↑][↑][↑][↑]. Đã mở riêng nguồn và PNG tự render; không chữ chạm/cắt/tràn.",
+    "hash": "91b284acf35068ec73db31f1ab89752ac24b22f1222dd143f29582099cc63d3d",
+    "hashSvgDaSoat": "3763c0f0fa3427efdc15fc4f0e69b42474f302032dcfe3665a2904ad22a81ff2"
+  },
+  {
+    "i": 861,
+    "hashSvg": "fdde4dcf057342b8bb9fd31a0d052a04a72339e035e73b72b1f6cc391769e9ef",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: 1 ô [↑]. Đã mở riêng nguồn và PNG tự render; không chữ chạm/cắt/tràn.",
+    "hash": "9d0bb6b65463ff35620c6101fb0661100ca1b1b8736faf4bcb20491eb66b5403",
+    "hashSvgDaSoat": "fdde4dcf057342b8bb9fd31a0d052a04a72339e035e73b72b1f6cc391769e9ef"
+  },
+  {
+    "i": 929,
+    "hashSvg": "345fa4c6dd2df996190f50eb0e5e6f121b679559edfbe91bc074a1bf934322d6",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: 3 ô [↑↑][↑][↑], giữ nguồn. Đã mở riêng nguồn và PNG tự render; không chữ chạm/cắt/tràn.",
+    "hash": "a84721580968e9648a74caeebe13143e4d4fa42e21c9184285206476d135bb30",
+    "hashSvgDaSoat": "345fa4c6dd2df996190f50eb0e5e6f121b679559edfbe91bc074a1bf934322d6"
+  },
+  {
+    "i": 1059,
+    "hashSvg": "e5f90e0a4e81cfa261541c761c6df05e094a2939281fa175b0675b45b6d98653",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: 3 ô [↑][↑][↑]. Đã mở riêng nguồn và PNG tự render; không chữ chạm/cắt/tràn.",
+    "hash": "bf686264e8a76dd549a6ce6e6f738470a520cfafc54a86a04ec9bd34329f2fca",
+    "hashSvgDaSoat": "e5f90e0a4e81cfa261541c761c6df05e094a2939281fa175b0675b45b6d98653"
+  },
+  {
+    "i": 1097,
+    "hashSvg": "417c26214e17d7c75b9fdfb53444b0fa633b4269ae27e6183659a8d8fe3dda37",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: 3 ô [↑↓][↑][trống]. Đã mở riêng nguồn và PNG tự render; không chữ chạm/cắt/tràn.",
+    "hash": "c5c215f7020d757a1be2b5157da17636f5c30eb903b557943df39ac90181215c",
+    "hashSvgDaSoat": "417c26214e17d7c75b9fdfb53444b0fa633b4269ae27e6183659a8d8fe3dda37"
+  },
+  {
+    "i": 1234,
+    "hashSvg": "30403bd3160bd24ba9d3478313277ad48a914ac4c5b0023d67b9d26ed1b91d21",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: 1 ô [↑↑]. Đã mở riêng nguồn và PNG tự render; không chữ chạm/cắt/tràn.",
+    "hash": "df877d62ec703dd1b8c1b624468e2be79b54b9be0f011cf10f674ec28fcc58d8",
+    "hashSvgDaSoat": "30403bd3160bd24ba9d3478313277ad48a914ac4c5b0023d67b9d26ed1b91d21"
+  },
+  {
+    "i": 1264,
+    "hashSvg": "7dbf2383cb7d88ac66152c2f613503a450e67fccf455611e41dbb1ef96006842",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: 3 ô [↑↓][↑↓][↑↓]. Đã mở riêng nguồn và PNG tự render; không chữ chạm/cắt/tràn.",
+    "hash": "e524d842d7a7f0dea3b8e9e75f612c21cc6cd7fdda52cd94777d2e2ad9c8c54c",
+    "hashSvgDaSoat": "7dbf2383cb7d88ac66152c2f613503a450e67fccf455611e41dbb1ef96006842"
+  },
+  {
+    "i": 1281,
+    "hashSvg": "471548434fdff35ff94ce21715c7898b40fbee9d8ee3f4f6968fd5eab91c22f7",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: 1 ô [↑↓]. Đã mở riêng nguồn và PNG tự render; không chữ chạm/cắt/tràn.",
+    "hash": "e8b8cb05cb9db26a0060b9cd72b37fae16b7435436917d20aa000d41fcb0745d",
+    "hashSvgDaSoat": "471548434fdff35ff94ce21715c7898b40fbee9d8ee3f4f6968fd5eab91c22f7"
+  },
+  {
+    "i": 1314,
+    "hashSvg": "471548434fdff35ff94ce21715c7898b40fbee9d8ee3f4f6968fd5eab91c22f7",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: 1 ô [↑↓]. Đã mở riêng nguồn và PNG tự render; không chữ chạm/cắt/tràn.",
+    "hash": "edebfb0c465fee957210cb693f6d983e04ea065c3cc7f2dcca67540854c1c855",
+    "hashSvgDaSoat": "471548434fdff35ff94ce21715c7898b40fbee9d8ee3f4f6968fd5eab91c22f7"
+  },
+  {
+    "i": 718,
+    "hashSvg": "7aa61f578efd079d2fe234c8af31a1acba46392ead9b313366917e970c216ba7",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: 1s[↑↓], 2s[↑↓], 2p[↑↓][↑][↑]; đủ nhãn. Đã mở riêng nguồn và PNG tự render; không chữ chạm/cắt/tràn.",
+    "hash": "869864ad75107803b245195a4c8ea5d34936052ad1723307c1b2e0638645d360",
+    "hashSvgDaSoat": "7aa61f578efd079d2fe234c8af31a1acba46392ead9b313366917e970c216ba7"
+  },
+  {
+    "i": 793,
+    "hashSvg": "7aa61f578efd079d2fe234c8af31a1acba46392ead9b313366917e970c216ba7",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: 1s[↑↓], 2s[↑↓], 2p[↑↓][↑][↑]; đủ nhãn. Đã mở riêng nguồn và PNG tự render; không chữ chạm/cắt/tràn.",
+    "hash": "94167376a41f35f192cc290be6dd70a5a2015659e2e899376dc3e1d2f62d27cf",
+    "hashSvgDaSoat": "7aa61f578efd079d2fe234c8af31a1acba46392ead9b313366917e970c216ba7"
+  },
+  {
+    "i": 518,
+    "hashSvg": "d58a00cfea96b4201755368a25e30d38e5cf55dd3b6bdc577b20134e93977ad4",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Cột A a)3 ô trống/b)3↑/c)3 cặp↑↓; Cột B giữ đúng 1.bão hòa/2.bán(nửa)bão hòa/3.chứa AO trống. Không tự ghép đáp án. Đã mở riêng nguồn và PNG tự render; không chữ chạm/cắt/tràn.",
+    "hash": "60f6db433623d065c4fd9af057a0844231fe19f1eb9ac5da5d4f9e8eee779da5",
+    "hashSvgDaSoat": "d58a00cfea96b4201755368a25e30d38e5cf55dd3b6bdc577b20134e93977ad4"
+  },
+  {
+    "i": 956,
+    "hashSvg": "d58a00cfea96b4201755368a25e30d38e5cf55dd3b6bdc577b20134e93977ad4",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Bảng2cột giữ nguyên văn tiêu đề/3mục,bảng orbital3ô mỗi hàng:trống/trống/trống;u/u/u;ud/ud/ud. DDH dấu Việt rõ,không cắt/chồng.",
+    "hash": "ac8c966cba95a17fcfb5f4d9c79c42e6ae00f793bff4a13ef709482861d990ed",
+    "hashSvgDaSoat": "d58a00cfea96b4201755368a25e30d38e5cf55dd3b6bdc577b20134e93977ad4"
+  },
+  {
+    "i": 12,
+    "hashSvg": "b5d35439c718b5c7f1a9dea795d6fff637b603c0ead1f3064ab5f28ebc3d2f7b",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: 1ô u vànhãn1) đúng,DDHpath rõ.",
+    "hash": "01a869b52321934726dcb9777127c915978ff361c44b1acd69e1b2418d28dd69",
+    "hashSvgDaSoat": "b5d35439c718b5c7f1a9dea795d6fff637b603c0ead1f3064ab5f28ebc3d2f7b"
+  },
+  {
+    "i": 446,
+    "hashSvg": "ee59baf0003def93283ce8af6c1d310b264f1260324ea9f49c3de85945a9c9c0",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: 1ô ud;khôi phục nhãn3) từ bộ4 nguồn cùng2qid còn đọc trực tiếp1)/2)/4) và thân đềliệtkê1..4;giữmapping.DDHrõ.",
+    "hash": "504a1e006460909eb01594a49c50e00f360551dff05ec4c8115d59fcf49fead3",
+    "hashSvgDaSoat": "ee59baf0003def93283ce8af6c1d310b264f1260324ea9f49c3de85945a9c9c0"
+  },
+  {
+    "i": 721,
+    "hashSvg": "f35d0f746e02dfccc2476c6c814af81b48d42f427d2f8346b4b358d84064e591",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: 5ô ud/ud/ud/u/u;nhãnd) đúng,DDHrõ.",
+    "hash": "8706a4137daeede6855da84562f15fb2f975807229e23a4fdaa86b7bda9b2558",
+    "hashSvgDaSoat": "f35d0f746e02dfccc2476c6c814af81b48d42f427d2f8346b4b358d84064e591"
+  },
+  {
+    "i": 1116,
+    "hashSvg": "e85ebb6e18cdcf5098a50053e5577a4bb79e09aee98a42a44dec41086855e880",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: 1ô uu giữ phương án sai vànhãn4);DDHrõ.",
+    "hash": "c8e6ef2310a22b747668396db0e0987fe818a7b757431a4d1d0dfeecff3fa245",
+    "hashSvgDaSoat": "e85ebb6e18cdcf5098a50053e5577a4bb79e09aee98a42a44dec41086855e880"
+  },
+  {
+    "i": 1192,
+    "hashSvg": "4bf82cb2d90548af1635b8d407831c9a37741cac915fdf8d2be4713b8d94f989",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: 1ô ud,nhãna);DDHrõ.",
+    "hash": "d77d2d9dc1750a7d2645782c6643700304ee044f853b11658c47fd41d993725c",
+    "hashSvgDaSoat": "4bf82cb2d90548af1635b8d407831c9a37741cac915fdf8d2be4713b8d94f989"
+  },
+  {
+    "i": 1201,
+    "hashSvg": "f307befeaabba004eb0f0554f5014548219db5ee396b5f2b88c24d7c6fcb1aab",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: 3ô uu/u/u giữ cáchphânbốsai,nhãnb);DDHrõ.",
+    "hash": "d9426775fcf811e7990d58304bf213b335764529f84b196a2ed4030dd8a2492d",
+    "hashSvgDaSoat": "f307befeaabba004eb0f0554f5014548219db5ee396b5f2b88c24d7c6fcb1aab"
+  },
+  {
+    "i": 1277,
+    "hashSvg": "b54f8f67a967ef5ae2a9a6241440f016b7fd8411b820ee4f867159e1ce3c47ab",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: 1ô d,nhãn2);DDHrõ.",
+    "hash": "e840789dc29c704e63735fe3b234622bc6b2073e79aa8e9bdec7f6646456a489",
+    "hashSvgDaSoat": "b54f8f67a967ef5ae2a9a6241440f016b7fd8411b820ee4f867159e1ce3c47ab"
+  },
+  {
+    "i": 1373,
+    "hashSvg": "ea416733c67f84b32c2f1e6672c971c1f656d08338aee49b63ddd9a97741b845",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: 4ô u/u/u/u,nhãnc);DDHrõ.",
+    "hash": "f81a10368139396e0bf3d6b80ce96ff846398d94f593726bb0c2e3a989a12d7b",
+    "hashSvgDaSoat": "ea416733c67f84b32c2f1e6672c971c1f656d08338aee49b63ddd9a97741b845"
+  },
+  {
+    "i": 42,
+    "hashSvg": "1b6d36a76653a9cd25bef266ed853d5b2720ae07ba418f4f2ffbef2eb6635aa6",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đồ thị định tính tốc độ:nhánha giảm/b tăng gặp chung cân bằng,nửađoạn nằmngang,giữnhãn/trục/mũitên,DDHkhôngcắt/chồng.",
+    "hash": "091df9d88ee7f23d8aad12621c66ddba60b9e4ff4c1e25d88d9a72e22eeeef22",
+    "hashSvgDaSoat": "1b6d36a76653a9cd25bef266ed853d5b2720ae07ba418f4f2ffbef2eb6635aa6"
+  },
+  {
+    "i": 146,
+    "hashSvg": "d10f6e532938a44e8fde49e362275075ef26e2e2c851016063c6a5662c49dabb",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đãrender/xem lại trực tiếp bản mới d10f6e5: mạch Ni–V–Pt nối đủ H648V375 tớiPt,ống khí tách riêng,mũitênH2 vàođúngcửa;KCl/NiSO4/HCl/Ni/Pt/V/H2(1bar)đúng,DDHrõ.",
+    "hash": "19b75a75f57fc9d966b0162d67f029e7034e26b47e3923b86daf97b2dc1a29ad",
+    "hashSvgDaSoat": "d10f6e532938a44e8fde49e362275075ef26e2e2c851016063c6a5662c49dabb"
+  },
+  {
+    "i": 163,
+    "hashSvg": "1b6d36a76653a9cd25bef266ed853d5b2720ae07ba418f4f2ffbef2eb6635aa6",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Hai tốc độ a giảm/b tăng gặp cùngđường cân bằng,giữtrục/nhãn/mũitên;DDHrõ.",
+    "hash": "1c096d626929e2850cde3e2746d34e15b436cc9ab3abc677f57a4202771cf91c",
+    "hashSvgDaSoat": "1b6d36a76653a9cd25bef266ed853d5b2720ae07ba418f4f2ffbef2eb6635aa6"
+  },
+  {
+    "i": 906,
+    "hashSvg": "6712c4c151256d6f29fc8cb82bdd76cf1f06c7853fedb12cd47d996e60806a59",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Phenylalanine đúngvòng–CH2–CH(NH2)–COOH,chưa gánstereo nhưnguồn;DDHrõ.",
+    "hash": "a5dc4895dcfb761867026fabf7a9bf13bcb1ab72732d83d5fcf8e080579a173e",
+    "hashSvgDaSoat": "6712c4c151256d6f29fc8cb82bdd76cf1f06c7853fedb12cd47d996e60806a59"
+  },
+  {
+    "i": 992,
+    "hashSvg": "18d1a6c19cdcc42ed10fab37d7d78842c4efc772b32376cb74621eb1df7874a0",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Melamine đúng3N vòng/3NH2/3nốiđôi;DDHrõ.",
+    "hash": "b1cdcff2372f4b032d9b6bed4a231690772782971ef51745084b1a1e017e2f79",
+    "hashSvgDaSoat": "18d1a6c19cdcc42ed10fab37d7d78842c4efc772b32376cb74621eb1df7874a0"
+  },
+  {
+    "i": 8,
+    "hashSvg": "97617f0b29bedcd56ac09750c7a203a697c47cf61ad33e46370c3509eea21423",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đồthị n theo t tăng từ0 tới0,1,đườnggióng0,1 vàcáctrục đúng;DDHrõ.",
+    "hash": "014a4e7d0e3ef32c1417aae321e22ef8dc1314e08a9b6b43cb0057e25500e6d2",
+    "hashSvgDaSoat": "97617f0b29bedcd56ac09750c7a203a697c47cf61ad33e46370c3509eea21423"
+  },
+  {
+    "i": 70,
+    "hashSvg": "0a3f7625d632d7e5fcbfa9a4ad8ae82606299e24fd9549b83029613dce8c8c50",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Điểm(0;180),(0,5;120),(1;60),(1,5;30),trục%enzymeprotease/phút vàlướitickgiữ;DDHrõ.",
+    "hash": "0da771534797a3499277c352b6c18becffb8ca5d3cb5be87c3cfb47eecbb3ede",
+    "hashSvgDaSoat": "0a3f7625d632d7e5fcbfa9a4ad8ae82606299e24fd9549b83029613dce8c8c50"
+  },
+  {
+    "i": 21,
+    "hashSvg": "d2c1da52c4c531a9b64dfcd835a329d3064b40c3e2a4e48e6cae0deba0da8336",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: NaClngang40,KCltăngtừkhoảng27tớikhoảng58,đơnvịgchấttan/100gH2O và0–100°C giữ;DDHrõ.",
+    "hash": "038bb05ba933e0e06d4468e33ee19657b17a068f8858a9d15924868e7d4afda4",
+    "hashSvgDaSoat": "d2c1da52c4c531a9b64dfcd835a329d3064b40c3e2a4e48e6cae0deba0da8336"
+  },
+  {
+    "i": 108,
+    "hashSvg": "97d0d2929ea6f005684e1c66ced5b10f7b8ab1dee3b73a9343c9f67e72756a1d",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: PepsinliềnđỉnhpH2/ChymotrypsinnétchấmđỉnhpH7,5,trụcpH1–12/nhãn/tickgiữ;DDHrõ.",
+    "hash": "14813abf27905f7360f48b2042845447acb406b0e8655524b4a2e8501ff41f91",
+    "hashSvgDaSoat": "97d0d2929ea6f005684e1c66ced5b10f7b8ab1dee3b73a9343c9f67e72756a1d"
+  },
+  {
+    "i": 115,
+    "hashSvg": "15048e3e6126ac316b174fa27ead3b5129a640ba0783f0db5d5d6a0884ac8bf3",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Nồngđộa giảm/btăng,gặpt1,rồi2mứccânbằngkhácnhau từt2;giữt1,t2,t3,t4,gióng/trục/nhãn;DDHrõ.",
+    "hash": "15a61b4485ab2b5265bd4e589363ec76bb23eef494a68d1198b6d6dc9304ab3d",
+    "hashSvgDaSoat": "15048e3e6126ac316b174fa27ead3b5129a640ba0783f0db5d5d6a0884ac8bf3"
+  },
+  {
+    "i": 150,
+    "hashSvg": "4ebdd1b401a2b6175bb78131745c131312f8997827830ca9d4f9f1102c3ec3b9",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: HIgiảm,H2+I2tăngtừ0về2mứcnồngđộkhácnhau,khônggộptốcđộ;nhãn/chỉsố/trụcđúng,DDHrõ.",
+    "hash": "1a77df87bdb7d931638ed7c121cf33d2fd91781a41dbf731e59afeea462394a5",
+    "hashSvgDaSoat": "4ebdd1b401a2b6175bb78131745c131312f8997827830ca9d4f9f1102c3ec3b9"
+  },
+  {
+    "i": 233,
+    "hashSvg": "3fcbe00aa9ac2527e805052f58d071edc76d0d239d9de7f8ca3f359d2ce13145",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: ThểtíchCO2(mL)/thờigian(s),điểmgióng(75;25),ticks15/5 vàxu hướngconggiữ;DDHrõ.",
+    "hash": "28b713ec25be3a44adbc8d65a31573c691f673a67ba82917ca1062c6134042df",
+    "hashSvgDaSoat": "3fcbe00aa9ac2527e805052f58d071edc76d0d239d9de7f8ca3f359d2ce13145"
+  },
+  {
+    "i": 249,
+    "hashSvg": "00c6905f2f9ee43838aa982af8ae6ce2eb7b53760e409a3420b3956f63ac1871",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đủ7điểm(20;30),(40;55),(60;70),(80;75),(100;65),(120;50),(140;35);giữ°C/%/captionethylacetate;DDHrõ.",
+    "hash": "2a9521502647fe48931635d0eebe574d19b7e5d87145e729da05e5714fe152b4",
+    "hashSvgDaSoat": "00c6905f2f9ee43838aa982af8ae6ce2eb7b53760e409a3420b3956f63ac1871"
+  },
+  {
+    "i": 404,
+    "hashSvg": "a3c6843ca3a9a836d62e40bfa7b313221ce72523e0e8b4def6ef2254e5680c66",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đồthịtốcđộtheonhiệtđộgiữđỉnh37°C/gióng37,ticks0,10,20,30,37,40,50,60vàgiảmvề0tại50°C;DDHrõ,cáclabel37/40khôngchạm.",
+    "hash": "4742d9ecfbbf83bd084bf2c93f267b84f2871d4e347f25246cc021a44505e216",
+    "hashSvgDaSoat": "a3c6843ca3a9a836d62e40bfa7b313221ce72523e0e8b4def6ef2254e5680c66"
+  },
+  {
+    "i": 476,
+    "hashSvg": "d904d8368af109a49febb8f477f941618809ff0c4e9ad71409e7b7d77e5e26f8",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: 6cộtnăm2019/2021/2023/2025/2027/2029vớisố11,61/11,37/11,97/12,67/13,39/14,07;đơnvịtriệutấn/captionphenolgiữ;DDHrõ.",
+    "hash": "577074fcc6c51d58768fc61c1d5b1a9be53277a4e396482f687e9d98091bc451",
+    "hashSvgDaSoat": "d904d8368af109a49febb8f477f941618809ff0c4e9ad71409e7b7d77e5e26f8"
+  },
+  {
+    "i": 19,
+    "hashSvg": "598faf6465b38faba8dd880907705e54b8929cd2883b869ab5b97571d8a0651a",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Giữ3panel a/b/c,sphere/lobe,hướngtrụcxyz,phasetôđậm–trắngtươngứngvànhãn;DDHrõ,khôngcắt/chồng.",
+    "hash": "0361afe28db5cea013014d170fc4e0293031367734af2290328f9dedc2d291e9",
+    "hashSvgDaSoat": "598faf6465b38faba8dd880907705e54b8929cd2883b869ab5b97571d8a0651a"
+  }
+]

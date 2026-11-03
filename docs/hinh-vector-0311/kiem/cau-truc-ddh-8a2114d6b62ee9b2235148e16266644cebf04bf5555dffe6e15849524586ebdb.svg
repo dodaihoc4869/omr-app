@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" baseProfile="full" xml:space="preserve" width="600px" height="340px" viewBox="0 0 600 340"><title>Công thức cấu tạo theo hình nguồn</title>
+
+<path class="bond-0 atom-0 atom-1" d="M 431.9,45.6 L 363.5,164.0" style="fill:none;fill-rule:evenodd;stroke:#252440;stroke-width:2.5px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path class="bond-1 atom-1 atom-2" d="M 351.6,164.0 L 413.9,272.0" style="fill:none;fill-rule:evenodd;stroke:#252440;stroke-width:2.5px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path class="bond-1 atom-1 atom-2" d="M 369.4,153.8 L 431.7,261.7" style="fill:none;fill-rule:evenodd;stroke:#252440;stroke-width:2.5px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path class="bond-2 atom-1 atom-3" d="M 363.5,164.0 L 226.7,164.0" style="fill:none;fill-rule:evenodd;stroke:#252440;stroke-width:2.5px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path class="bond-3 atom-3 atom-4" d="M 226.7,164.0 L 158.2,282.5" style="fill:none;fill-rule:evenodd;stroke:#252440;stroke-width:2.5px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path class="bond-4 atom-3 atom-5" d="M 226.7,164.0 L 158.2,45.6" style="fill:none;fill-rule:evenodd;stroke:#252440;stroke-width:2.5px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path d="M 366.9,158.1 L 363.5,164.0 L 356.6,164.0" style="fill:none;stroke:#252440;stroke-width:2.5px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;" />
+<path class="atom-2" d="M 437.2 275.9 Q 435.4 273.6, 431.9 273.6 Q 428.4 273.6, 426.5 275.9 Q 424.7 278.2, 424.7 282.7 Q 424.7 287.2, 426.5 289.5 Q 428.4 291.9, 431.9 291.9 Q 435.4 291.9, 437.2 289.5 Q 439.1 287.2, 439.1 282.7 Q 439.1 278.2, 437.2 275.9 M 439.1 291.1 Q 436.5 294.0, 431.9 294.0 Q 427.3 294.0, 424.6 291.1 Q 422.0 288.1, 422.0 282.7 Q 422.0 277.3, 424.6 274.4 Q 427.3 271.4, 431.9 271.4 Q 436.5 271.4, 439.1 274.4 Q 441.8 277.3, 441.8 282.7 Q 441.8 288.1, 439.1 291.1 " fill="#252440" />
+</svg>

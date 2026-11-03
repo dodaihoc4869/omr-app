@@ -1,0 +1,120 @@
+[
+  {
+    "i": 773,
+    "hash": "909083af717d21138719c2c4997d2122058612492f534cd2dd3fdbd34b660ccd",
+    "fileNguon": "anh/909083af717d21138719c2c4997d2122058612492f534cd2dd3fdbd34b660ccd.png",
+    "svg": "ms-ddh-c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2.svg",
+    "hashSvg": "c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2",
+    "byteSvg": 43535,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "points": [
+      [
+        90,
+        51.45,
+        "51,45"
+      ],
+      [
+        91,
+        11.22,
+        "11,22"
+      ],
+      [
+        92,
+        17.15,
+        "17,15"
+      ],
+      [
+        94,
+        17.38,
+        "17,38"
+      ],
+      [
+        96,
+        2.8,
+        "2,80"
+      ]
+    ],
+    "xTicks": [
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96,
+      97
+    ],
+    "yTicks": [
+      10,
+      20,
+      30,
+      40,
+      50,
+      60
+    ],
+    "ghiChu": "Không có nhãn0 hoặc mũi tên; khoảng m/z đúng tỷ lệ. Chữ đã thành nét phông app, tự chứa/offline.",
+    "hashSvgDaSoat": "c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2",
+    "nguoiSoat": "soat_nguon_2"
+  },
+  {
+    "i": 1345,
+    "hash": "f37e8d26d14a318007760e8f3f88663326a25d7343e9205b191cfc52a237b61a",
+    "fileNguon": "anh/f37e8d26d14a318007760e8f3f88663326a25d7343e9205b191cfc52a237b61a.png",
+    "svg": "ms-ddh-c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2.svg",
+    "hashSvg": "c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2",
+    "byteSvg": 43535,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "points": [
+      [
+        90,
+        51.45,
+        "51,45"
+      ],
+      [
+        91,
+        11.22,
+        "11,22"
+      ],
+      [
+        92,
+        17.15,
+        "17,15"
+      ],
+      [
+        94,
+        17.38,
+        "17,38"
+      ],
+      [
+        96,
+        2.8,
+        "2,80"
+      ]
+    ],
+    "xTicks": [
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96,
+      97
+    ],
+    "yTicks": [
+      10,
+      20,
+      30,
+      40,
+      50,
+      60
+    ],
+    "ghiChu": "Không có nhãn0 hoặc mũi tên; khoảng m/z đúng tỷ lệ. Chữ đã thành nét phông app, tự chứa/offline.",
+    "hashSvgDaSoat": "c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

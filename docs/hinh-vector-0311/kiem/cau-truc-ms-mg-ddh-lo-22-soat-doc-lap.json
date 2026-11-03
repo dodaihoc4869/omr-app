@@ -1,0 +1,10 @@
+[
+  {
+    "i": 602,
+    "hashSvg": "d3395689bb80fbf30106169af58ae25569b125eb2152d991b2567771356b8ad0",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở PNG nguồn và render SVG thật; giữ Mg với số khối24/25/26 ở trên trái, đủ78,99%/10%/11,01%, m/z12/12,5/13 không gấp đôi; đỉnh cao tương ứng78,99/10/11,01. Đúng trục Tỉ lệ % số nguyên tử và m/z; yticks20/40/60/80, không thêm0/100/mũi tên/2+. Chữ DDH thành path, không fallback/chạm/cắt/tràn. SHA256 khớp.",
+    "hash": "6fb6966f4587ee297155482ca1dfbf94aabe806a0fb7eef98d246982113f4056",
+    "hashSvgDaSoat": "d3395689bb80fbf30106169af58ae25569b125eb2152d991b2567771356b8ad0"
+  }
+]

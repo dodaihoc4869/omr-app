@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" baseProfile="full" xml:space="preserve" width="600px" height="340px" viewBox="0 0 600 340"><title>Công thức cấu tạo theo hình nguồn</title>
+
+<path class="bond-0 atom-0 atom-1" d="M 72.0,218.5 L 300.0,86.9" style="fill:none;fill-rule:evenodd;stroke:#252440;stroke-width:2.5px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path class="bond-1 atom-1 atom-2" d="M 300.0,86.9 L 528.0,218.5" style="fill:none;fill-rule:evenodd;stroke:#252440;stroke-width:2.5px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path class="bond-1 atom-1 atom-2" d="M 300.0,132.5 L 508.3,252.7" style="fill:none;fill-rule:evenodd;stroke:#252440;stroke-width:2.5px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path d="M 288.6,93.5 L 300.0,86.9 L 311.4,93.5" style="fill:none;stroke:#252440;stroke-width:2.5px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;" />
+</svg>

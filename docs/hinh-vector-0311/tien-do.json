@@ -60,8 +60,8 @@
       "Toàn kho còn chưa hoàn tất, app chưa thay hình; không báo đã xong hoặc đã triển khai."
     ],
     "danhMucDaKiem": "docs/hinh-vector-0311/kiem/danh-muc-da-kiem.json",
-    "loVuaXong": "Lô14 26 Fischer đã soát phông DDH độc lập đạt. Lô11/12/13/14 tổng42 nguồn đạt phông mới. Full vitest nhánh/main đều16571 test, không lỗi mới theo tên (12 test đỏ/14 mục đỏ gồm lỗi nạp tệp giống main).",
-    "viecNenLamTiep": "Chuyển các cấu trúc RDKit và hình thủ công còn lại sang đúng phông app, soát từng nguồn và hash mới. Phổ Zr/Mg và bảng tuần hoàn77/1350 có dữ liệu đọc trong thread, chưa dựng.",
+    "loVuaXong": "Lô15/17/18 chuyển phông hoàn tất; lô16/19/20/21/22 dựng mới đạt. Tổng456câu ĐỦ mọi hình và phông,27mộtphần;371nguồn→248SVG. Đã sửa/soát dây Ni tớiPt, giữkhôi phục3) từbộ4hình theo ngữcảnh.",
+    "viecNenLamTiep": "Dựng nguồn mới: sơđồ tinhbột1188/1423 khácchiềuGlycogen; môhìnhnguyêntử1219/949/1368/415 đãđọcnguồn; ưu tiên nhóm dùng chung nhiềuqid. Còn1057nguồn chưađạt,khôngdừngởtrạngthái. Chưa tíchhợp/offlineapp/pháthành.",
     "canhBaoCheckpoint": "Checkpoint mới đã commit cục bộ; chưa đẩy sau lô4/5/6 vì cổng tốc độ cũng đỏ trên main sạch8592da49. Không nâng mốc, không phát hành. Còn tiếp tục vẽ trong worktree hiện tại."
   },
   "tuDongTiepTuc": {
@@ -79,14 +79,14 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 359,
-    "soSvgRieng": 240,
-    "soCauDungHinh": 449,
-    "soCauDuMoiHinh": 422,
+    "soAnhNguon": 371,
+    "soSvgRieng": 248,
+    "soCauDungHinh": 483,
+    "soCauDuMoiHinh": 456,
     "soCauMoiXongMotPhan": 27,
-    "byteSvg": 1965988,
-    "byteGzip": 406360,
-    "soAnhNguonConLai": 1069,
+    "byteSvg": 3319455,
+    "byteGzip": 695262,
+    "soAnhNguonConLai": 1057,
     "daTichHop": false
   },
   "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.",
@@ -100,13 +100,14 @@
     "nguon": "src/styles/phong-ddh",
     "batBuocMoiHinh": true,
     "daHoanTatToanBo": false,
-    "ghiChu": "233 SVG cũ đã kiểm nội dung nhưng cần dựng lại chữ bằng đúng phông app và soát bố cục sau đổi phông; không coi bản cũ đã đạt yêu cầu phông mới.",
+    "ghiChu": "Bộ hình đã vẽ đến lô20 đã chuyển phông và soát từng nguồn; toàn kho còn chưa hoàn tất. Lỗi dây pinNi kếthừa mẫu đã sửa và soát lại cả1410/146. Không phát hành bộ chưa đủ.",
     "loMoi": "Lô11:4nguồn MS dựng chữ thànhpath từWOFF2 DDH củaapp, đangsoát độc lập.",
-    "congCu": "scripts/phong-vector-0311.py"
+    "congCu": "scripts/phong-vector-0311.py",
+    "daChuyenHetBoDaVe": true
   },
   "daDatPhongApp": {
-    "soNguon": 42,
-    "soCauDuHinhVaPhong": 45,
+    "soNguon": 371,
+    "soCauDuHinhVaPhong": 456,
     "ghiChu": "Các số tổngDaDoiChieu vẫn mô tả nội dung đã kiểm; bản cũ chưa đổi phông không được coi đạt yêu cầu phông mới."
   }
 }
