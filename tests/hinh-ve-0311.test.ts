@@ -46,3 +46,31 @@ it('app: cảnh có tiêu đề là chú thích trong ảnh vẫn dùng được
   const k = kiemCanhHinh({ ...soDo(), tieuDe: 'Hợp chất T' }, PHIEN_AM)
   expect(k.ok && hinhVeDungDuoc(k.hinh)).toBeTruthy()
 })
+
+describe('khuôn svg (vẽ tự do, thầy 03/11: hình SGK vẽ lại thoải mái)', () => {
+  const PA = ['Hạt nhân', 'Lớp K', '2e']
+  const svg = (s: string, o: object = {}) => ({ tieuDe: 'Hình minh hoạ', canh: { loai: 'svg', rong: 300, cao: 200, svg: s, ...o } })
+  const TOT = '<g><circle cx="150" cy="100" r="12" class="f-sao s-chu nc"/><circle cx="150" cy="100" r="40" class="f-khong s-mo nc net-dut"/><text x="150" y="30" text-anchor="middle" class="t-chu t-dam">Hạt nhân</text></g>'
+  it('svg sạch + chữ nằm trong ảnh ⇒ đạt, dựng lại đúng', () => {
+    const k = kiemCanhHinh(svg(TOT), PA)
+    expect(k.ok).toBe(true)
+  })
+  it('chữ ngoài ảnh ⇒ bỏ', () => {
+    expect(kiemCanhHinh(svg(TOT.replace('Hạt nhân', 'Proton')), PA).ok).toBe(false)
+  })
+  it.each([
+    ['script', '<script>alert(1)</script>'],
+    ['image', '<image href="x"/>'],
+    ['foreignObject', '<foreignObject/>'],
+    ['onload', '<g onload="x()"/>'],
+    ['style', '<g style="fill:red"/>'],
+    ['fill trực tiếp', '<circle cx="1" cy="1" r="2" fill="#f00"/>'],
+    ['href', '<path d="M0 0" href="javascript:1"/>'],
+    ['lớp lạ', '<g class="evil"/>'],
+    ['chữ ngoài text', 'xin chào'],
+    ['thẻ không đóng', '<g>'],
+    ['transform lạ', '<g transform="matrix(1,0,0,1,0,0)"/>'],
+    ['toạ độ quá lớn', '<circle cx="9999" cy="1" r="2"/>'],
+  ])('chặn %s', (_t, s) => { expect(kiemCanhHinh(svg(s), PA).ok).toBe(false) })
+  it('khung sai cỡ ⇒ bỏ', () => { expect(kiemCanhHinh(svg(TOT, { rong: 5000 }), PA).ok).toBe(false) })
+})

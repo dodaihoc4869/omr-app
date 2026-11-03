@@ -5,15 +5,17 @@
 //   2) ẩn danh chất chưa biết giữ nguyên (X, T, Y… không được máy «đoán» thành tên chất);
 //   3) cảnh sai khuôn / vị trí ngoài khung ⇒ bỏ cảnh (app giữ ảnh gốc, không vẽ gì).
 export const PHIEN_BAN_HINH = 1
-export const CAC_KHUON_HINH = ['so-do', 'do-thi', 'thi-nghiem', 'fischer'] as const
+export const CAC_KHUON_HINH = ['so-do', 'do-thi', 'thi-nghiem', 'fischer', 'svg'] as const
 
 export type CanhSoDo = { loai: 'so-do'; o: { id: string; chu: string; x: number; y: number }[]; noi: { tu: string[]; den: string; nhan?: string; so?: string }[] }
 export type CanhDoThi = { loai: 'do-thi'; truc: { x: string; y: string; xMin: number; xMax: number; yMax: number; xVach: number[]; yVach: number[] }; que: { x: number; y: number; nhan?: string }[] }
 export type CanhThiNghiem = { loai: 'thi-nghiem'; khuon: 'chung-cat'; nhan: { binh: string; luoi: string; sinhHan: string; vao: string; ra: string; hung: string } }
 export type CanhFischer = { loai: 'fischer'; dau: string; cuoi: string; hang: [string, string][] }
-export type CanhHinh = CanhSoDo | CanhDoThi | CanhThiNghiem | CanhFischer
+/** Khuôn VẼ TỰ DO (thầy 03/11 «ảnh có trong sgk vẽ lại đưa lên kho thoải mái»): mô hình nguyên tử, cấu tạo, dụng cụ, hình bất kì — máy vẽ SVG thô, `lamSachSvg` dựng lại CHỈ từ thẻ / thuộc tính an toàn, màu CHỈ qua lớp bảng màu app. */
+export type CanhSvg = { loai: 'svg'; rong: number; cao: number; svg: string }
+export type CanhHinh = CanhSoDo | CanhDoThi | CanhThiNghiem | CanhFischer | CanhSvg
 /** Tiêu đề chung theo khuôn — hoặc chép nguyên văn chú thích có trong ảnh (kiểm ở `kiemCanhHinh`). Máy không được tự đặt tiêu đề nêu thêm thông tin. */
-export const TIEU_DE_CHUNG: Readonly<Record<string, string>> = { 'so-do': 'Sơ đồ chuyển hoá', 'do-thi': 'Đồ thị', 'thi-nghiem': 'Bộ dụng cụ chưng cất', fischer: 'Công thức chiếu Fischer' }
+export const TIEU_DE_CHUNG: Readonly<Record<string, string>> = { 'so-do': 'Sơ đồ chuyển hoá', 'do-thi': 'Đồ thị', 'thi-nghiem': 'Bộ dụng cụ chưng cất', fischer: 'Công thức chiếu Fischer', svg: 'Hình minh hoạ' }
 export interface HinhVeLai { phienBan: number; tieuDe: string; canh: CanhHinh }
 
 const laObj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v)
@@ -38,11 +40,80 @@ export function phienAmKhop(a: readonly string[], b: readonly string[]): boolean
 
 function trongKhung(v: number, lo = 0, hi = 100) { return v >= lo && v <= hi }
 
+
+/** Lớp màu cho khuôn SVG (CSS ở hinh-ve.css, chỉ biến --tr-*): f-* tô · s-* viền · t-* chữ. Máy vẽ KHÔNG được ghi màu trực tiếp. */
+export const LOP_SVG: ReadonlySet<string> = new Set([
+  'f-khong', 'f-nen', 'f-chu', 'f-xam', 'f-hs', 'f-hs-nhat', 'f-tin', 'f-tin-nhat', 'f-sao', 'f-sao-nhat', 'f-sai', 'f-sai-nhat', 'f-dung', 'f-dung-nhat', 'f-tim', 'f-tim-nhat',
+  's-chu', 's-chu-2', 's-mo', 's-hs', 's-tin', 's-sao', 's-sai', 's-dung', 's-tim', 's-nen', 'nc', 'net-dut',
+  't-chu', 't-chu-2', 't-hs', 't-tin', 't-sao', 't-sai', 't-dung', 't-tim', 't-dam', 't-nho', 't-lon',
+])
+const THE_SVG = new Set(['g', 'path', 'line', 'rect', 'circle', 'ellipse', 'polygon', 'polyline', 'text', 'tspan'])
+const SO_SVG = new Set(['x', 'y', 'x1', 'y1', 'x2', 'y2', 'cx', 'cy', 'r', 'rx', 'ry', 'width', 'height', 'stroke-width', 'opacity', 'font-size'])
+const RE_SO = /^-?\d{1,4}(?:\.\d{1,3})?$/
+const decodeSvg = (t: string) => t.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')
+const maHoaSvg = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+
+/**
+ * SVG thô của máy vẽ ⇒ SVG sạch DỰNG LẠI từ thẻ / thuộc tính cho phép, hoặc lý do bỏ. Không script, không href / style / image / foreignObject / use, không màu trực tiếp
+ * (chỉ `class` trong LOP_SVG), `transform` chỉ translate / rotate / scale. `chu` = mọi chữ trong thẻ text (để đối chiếu phiên âm).
+ */
+export function lamSachSvg(tho: unknown, rong: number, cao: number): { ok: true; svg: string; chu: string[] } | { ok: false; lyDo: string } {
+  const t = typeof tho === 'string' ? tho.trim() : ''
+  if (!t || t.length > 24_000) return { ok: false, lyDo: 'svg rỗng hoặc quá dài (> 24 KB)' }
+  const ra: string[] = [], chu: string[] = [], mo: string[] = []
+  let vt = 0, soThe = 0, trongText = 0
+  const re = /<(\/?)([a-zA-Z][a-zA-Z0-9]*)((?:\s+[a-zA-Z-]+="[^"<>]*")*)\s*(\/?)>|([^<]+)/g
+  let m: RegExpExecArray | null
+  while ((m = re.exec(t))) {
+    if (m.index !== vt) return { ok: false, lyDo: 'svg có kí tự / thẻ ngoài khuôn' }
+    vt = re.lastIndex
+    if (m[5] !== undefined) {
+      const van = m[5]
+      if (!van.trim()) { ra.push(van.replace(/\s+/g, ' ')); continue }
+      if (!trongText) return { ok: false, lyDo: 'chữ nằm ngoài thẻ text' }
+      if (/&(?!amp;|lt;|gt;)/.test(van) || van.length > 80) return { ok: false, lyDo: 'chữ trong svg sai khuôn' }
+      chu.push(decodeSvg(van).trim()); ra.push(maHoaSvg(decodeSvg(van))); continue
+    }
+    const dong = m[1] === '/', ten = m[2]!.toLowerCase(), tuDong = m[4] === '/'
+    if (!THE_SVG.has(ten)) return { ok: false, lyDo: `thẻ <${ten}> không được phép` }
+    if (dong) {
+      if (mo.pop() !== ten) return { ok: false, lyDo: 'thẻ đóng / mở lệch' }
+      if (ten === 'text' || ten === 'tspan') trongText--
+      ra.push(`</${ten}>`); continue
+    }
+    if (++soThe > 400) return { ok: false, lyDo: 'svg quá nhiều thẻ (> 400)' }
+    const thuoc: string[] = []
+    const rea = /\s+([a-zA-Z-]+)="([^"<>]*)"/g
+    let a: RegExpExecArray | null
+    while ((a = rea.exec(m[3] ?? ''))) {
+      const k = a[1]!.toLowerCase(), v = a[2]!.trim()
+      let ok = false
+      if (SO_SVG.has(k)) ok = RE_SO.test(v) && (k === 'font-size' ? Number(v) >= 6 && Number(v) <= 60 : k.startsWith('stroke') || k === 'opacity' || Math.abs(Number(v)) <= 900)
+      else if (k === 'd') ok = /^[MmLlHhVvCcSsQqTtAaZz0-9eE.,\s-]{1,2400}$/.test(v)
+      else if (k === 'points') ok = /^[0-9.,\s-]{1,900}$/.test(v)
+      else if (k === 'transform') ok = /^(?:(?:translate|rotate|scale)\(\s*-?\d{1,4}(?:\.\d{1,3})?(?:[\s,]+-?\d{1,4}(?:\.\d{1,3})?){0,2}\s*\)\s*){1,3}$/.test(v)
+      else if (k === 'class') ok = v.split(/\s+/).every((c) => LOP_SVG.has(c))
+      else if (k === 'text-anchor') ok = v === 'start' || v === 'middle' || v === 'end'
+      else if (k === 'stroke-dasharray') ok = /^[0-9.\s,]{1,24}$/.test(v)
+      if (!ok) return { ok: false, lyDo: `thuộc tính ${k}="${v.slice(0, 20)}" không được phép` }
+      thuoc.push(`${k}="${v}"`)
+    }
+    if (ten === 'text' || ten === 'tspan') trongText++
+    ra.push(`<${ten}${thuoc.length ? ' ' + thuoc.join(' ') : ''}${tuDong ? '/' : ''}>`)
+    if (tuDong) { if (ten === 'text' || ten === 'tspan') trongText-- } else mo.push(ten)
+  }
+  if (vt !== t.length || mo.length) return { ok: false, lyDo: 'thẻ svg chưa đóng' }
+  if (chu.length > 60) return { ok: false, lyDo: 'svg quá nhiều nhãn chữ (> 60)' }
+  if (!(rong >= 100 && rong <= 800 && cao >= 60 && cao <= 800)) return { ok: false, lyDo: 'khung svg sai cỡ' }
+  return { ok: true, svg: ra.join(''), chu }
+}
+
 /** Mọi chữ trong cảnh (không kể toạ độ) — để đối chiếu với phiên âm. */
 export function chuTrongCanh(c: CanhHinh): string[] {
   if (c.loai === 'so-do') return [...c.o.map((b) => b.chu), ...c.noi.flatMap((n) => [n.nhan ?? '', n.so ?? ''])]
   if (c.loai === 'do-thi') return [c.truc.x, c.truc.y, ...c.truc.xVach.map(String), ...c.truc.yVach.map(String), ...c.que.map((q) => q.nhan ?? '')]
   if (c.loai === 'thi-nghiem') return Object.values(c.nhan)
+  if (c.loai === 'svg') { const k = lamSachSvg(c.svg, c.rong, c.cao); return k.ok ? k.chu : [] }
   return [c.dau, c.cuoi, ...c.hang.flat()]
 }
 
@@ -73,6 +144,12 @@ export function kiemCanhHinh(tho: unknown, phienAm: readonly string[]): { ok: tr
     const n = x.nhan, ks = ['binh', 'luoi', 'sinhHan', 'vao', 'ra', 'hung'] as const
     if (ks.some((k) => !chu(n[k], 30))) return { ok: false, lyDo: 'dụng cụ: thiếu nhãn' }
     canh = { loai: 'thi-nghiem', khuon: 'chung-cat', nhan: Object.fromEntries(ks.map((k) => [k, chu(n[k], 30)])) as CanhThiNghiem['nhan'] }
+  } else if (x.loai === 'svg') {
+    const rong = so(x.rong), cao = so(x.cao)
+    if (rong === null || cao === null) return { ok: false, lyDo: 'svg: thiếu rong / cao' }
+    const k = lamSachSvg(x.svg, rong, cao)
+    if (!k.ok) return { ok: false, lyDo: `svg: ${k.lyDo}` }
+    canh = { loai: 'svg', rong, cao, svg: k.svg }
   } else if (x.loai === 'fischer') {
     const hang = mang(x.hang).map((h) => (Array.isArray(h) && h.length === 2 && chu(h[0], 6) && chu(h[1], 6) ? [chu(h[0], 6), chu(h[1], 6)] as [string, string] : null))
     if (!chu(x.dau, 10) || !chu(x.cuoi, 10) || hang.length < 2 || hang.length > 6 || hang.some((h) => !h)) return { ok: false, lyDo: 'Fischer sai khuôn' }
