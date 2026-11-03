@@ -79,14 +79,14 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 545,
-    "soSvgRieng": 349,
-    "soCauDungHinh": 694,
-    "soCauDuMoiHinh": 693,
+    "soAnhNguon": 549,
+    "soSvgRieng": 353,
+    "soCauDungHinh": 696,
+    "soCauDuMoiHinh": 695,
     "soCauMoiXongMotPhan": 1,
-    "byteSvg": 5184262,
-    "byteGzip": 1029260,
-    "soAnhNguonConLai": 883,
+    "byteSvg": 5296792,
+    "byteGzip": 1055743,
+    "soAnhNguonConLai": 879,
     "daTichHop": false
   },
   "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.",
@@ -106,16 +106,16 @@
     "daChuyenHetBoDaVe": true
   },
   "daDatPhongApp": {
-    "soNguon": 545,
-    "soCauDuHinhVaPhong": 693,
+    "soNguon": 549,
+    "soCauDuHinhVaPhong": 695,
     "ghiChu": "Các số tổngDaDoiChieu vẫn mô tả nội dung đã kiểm; bản cũ chưa đổi phông không được coi đạt yêu cầu phông mới."
   },
   "loMoiNhat": {
     "lo": "76–86",
-    "ketQua": "693 câu đủ hình+DDH;545 nguồn→349 SVG;5.184.262 byte/gzip1.029.260;883 nguồn còn lại. Lô83/84/86 đã mở riêng từng PNG và SVG render, soát độc lập đúng hash.",
+    "ketQua": "695 câu đủ hình+DDH/1 một phần;549 nguồn→353 SVG;5.296.792 byte/gzip1.055.743;879 nguồn còn lại. Đã hoàn thiện cả4phổ Cu870/634/1297/245 lô85, soát độc lập từngPNG/render/hash.",
     "suaLoi": "404/525 khôi phục6tickX, thu hồi bản404 thiếu tick. Giữ ion O−/Na+317 và C20:4 158; chlorine35/37 trên17. Haworth1036 giữ6sốC/khôngH;268/1351/668/772 giữ từngH/OH và nhãnA–D từglyph/cảbộ/câu dẫn.",
     "phong": "DDH Rounded thường/đậm thực từWOFF2app, tất cả chữ thànhpath tự chứa.",
-    "tiepTheo": "Dựng phổCu870/1297 theo pixelnguồn, không tự thêm63/65/phầntrăm; đọc thêm634/245 cùngbộ. Tiếp tục nguồn chưa xử lý và giữ ảnhhoa1198 thật.",
+    "tiepTheo": "Tiếp tục nhóm molecule mới lô87 đang được đọc ở scratch/doc-molecule-lo-87.json; không vẽ trùng nguồn đã đạt. Giữ ảnhhoa1198 thật.",
     "gioiHan": "Chưa tích hợp hình/chưa reload offlineapp/chưa phát hành. Phải cập nhật main mới nhất, kiểm đủ cổng và ca thi trước triển khai."
   }
 }

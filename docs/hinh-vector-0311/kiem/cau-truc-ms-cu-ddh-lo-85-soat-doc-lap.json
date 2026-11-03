@@ -1,0 +1,34 @@
+[
+  {
+    "i": 870,
+    "hashSvg": "edadd0c0f2254abdda86d1f564ec2861326528380646c0e088f2fed374b88c4e",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở riêng PNG nguồn native và SVG render thật. Giữ đỉnh trái cao, đỉnh phải thấp; vị trí x của cả hai đỉnh đúng pixel nguồn riêng, đều bên phải tick 60, không ép về 60 hay gán thêm 63/65. Chiều cao tương đối và điểm bắt đầu trên trục ngang đúng nguồn. Đủ ticks x 20/40/60/80/100, y 0/20/40/60/80, nhãn m/z và “Phần trăm số nguyên tử đồng vị (%)”; không thêm phần trăm/giá trị trên đỉnh hay mũi tên. DDH tự chứa dạng path, không text/image/fallback; không chạm/cắt/tràn. Hash SVG byte thực khớp metadata.",
+    "hash": "9e853dc325dddbe7c58462e4e89158a25484fe337451e0773c3c52d5818e5375",
+    "hashSvgDaSoat": "edadd0c0f2254abdda86d1f564ec2861326528380646c0e088f2fed374b88c4e"
+  },
+  {
+    "i": 1297,
+    "hashSvg": "2243759688a592347a3a126520e02f31b32322b6e0b34cca7e094fba37793df3",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở riêng PNG nguồn native và SVG render thật. Giữ đỉnh trái thấp, đỉnh phải cao; vị trí x của cả hai đỉnh đúng pixel nguồn riêng, đều bên phải tick 60, không ép về 60 hay gán thêm 63/65. Chiều cao tương đối và điểm bắt đầu trên trục ngang đúng nguồn. Đủ ticks x 20/40/60/80/100, y 0/20/40/60/80, nhãn m/z và “Phần trăm số nguyên tử đồng vị (%)”; không thêm phần trăm/giá trị trên đỉnh hay mũi tên. DDH tự chứa dạng path, không text/image/fallback; không chạm/cắt/tràn. Hash SVG byte thực khớp metadata.",
+    "hash": "eb48fab720e33ee4c342228403d60c1f8478e1842a3be726707a8ccd21ce0ba3",
+    "hashSvgDaSoat": "2243759688a592347a3a126520e02f31b32322b6e0b34cca7e094fba37793df3"
+  },
+  {
+    "i": 634,
+    "hashSvg": "2b49750dc5976cedd3c960b51a6d39e1c3988a6dd109b7308e406514d910dfb5",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở riêng PNG nguồn native và SVG render thật. Hai cột cùng chiều cao, x native 164/169, đỉnh y66, baseline155 đúng nguồn riêng. Các cột đều lệch phải tick60 đúng vị trí nguồn, không thêm nhãn khối lượng/63/65 hay phần trăm trên đỉnh. Đủ ticks x20/40/60/80/100, y0/20/40/60/80, m/z và Phần trăm số nguyên tử đồng vị (%). DDH tự chứa path, không text/image/fallback; không cắt/chạm/tràn. Hash byte thực khớp metadata.",
+    "hash": "7528960cd4e8203592e7f30ab451dc371d554cedc2882528065fa397f910ae00",
+    "hashSvgDaSoat": "2b49750dc5976cedd3c960b51a6d39e1c3988a6dd109b7308e406514d910dfb5"
+  },
+  {
+    "i": 245,
+    "hashSvg": "5d6ae4eb9e6137b7928cedf8e4b0f3f0e7a06c1345a8b4aaab5d68b3c8596e73",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở riêng PNG nguồn native và SVG render thật. Chỉ một cột từ baseline157 đến đỉnh67 ở x161.5 native đúng nguồn. Vết đen rời trái x115..122/y87..104 không nối baseline là nhiễu ảnh; bỏ đúng, không biến thành đỉnh phổ. Các cột đều lệch phải tick60 đúng vị trí nguồn, không thêm nhãn khối lượng/63/65 hay phần trăm trên đỉnh. Đủ ticks x20/40/60/80/100, y0/20/40/60/80, m/z và Phần trăm số nguyên tử đồng vị (%). DDH tự chứa path, không text/image/fallback; không cắt/chạm/tràn. Hash byte thực khớp metadata.",
+    "hash": "2a44325fb5f469f648f700d627479b1dbf33b244a557072e46066aefa6ceaeba",
+    "hashSvgDaSoat": "5d6ae4eb9e6137b7928cedf8e4b0f3f0e7a06c1345a8b4aaab5d68b3c8596e73"
+  }
+]
