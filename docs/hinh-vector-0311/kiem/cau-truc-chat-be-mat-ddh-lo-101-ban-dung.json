@@ -1,0 +1,204 @@
+[
+  {
+    "i": 448,
+    "hash": "50bb63ca96483dd120a42fd031860cf7369bdf25b0eda88ed702e99bb96ba904",
+    "fileNguon": "anh/50bb63ca96483dd120a42fd031860cf7369bdf25b0eda88ed702e99bb96ba904.png",
+    "canvas": [
+      181,
+      47
+    ],
+    "daMoNative": true,
+    "kind": "surfactant-glyph",
+    "notes": "1phântử:đuôilànétđenhìnhsinlượnngangtừtráisangphải,gắnđầutrong1đầutrònĐENđặcphải. Khôngchữ/số/mũitên. Tailkhoảngx12..137,headtâm~152,24radius16;khôngbiếnthànhxươngcôngthứchóahọccócarbon.",
+    "questions": [
+      {
+        "qid": "DH-12-C1-B2-I-26",
+        "de": "Cấu trúc phân tử sodium palmitate (C₁₅H₃₁COONa) có thể được minh họa như sau: Khi hòa tan vào nước, các phân tử sodium palmitate sẽ hình thành nên cấu trúc nào dưới đây?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B2-I-26.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "chat-be-mat-ddh-c05a7bd23c4724027a0e19e88f306a49d9411198047ae7a523db6df14202882f.svg",
+    "hashSvg": "c05a7bd23c4724027a0e19e88f306a49d9411198047ae7a523db6df14202882f",
+    "byteSvg": 373,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Khôngsuycarbon/ion/têngroup. Đầuđenđặc hoặcxámnhạtviềntheotừngnguồn;214đuôithẳngdừngméptráivòngRỖNG,2nhãnnguyênvăn.",
+    "hashSvgDaSoat": "c05a7bd23c4724027a0e19e88f306a49d9411198047ae7a523db6df14202882f",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 165,
+    "hash": "1c893d8712156967d5ec08be862cc9878563b90b58d16ec28f78efed078c499f",
+    "fileNguon": "anh/1c893d8712156967d5ec08be862cc9878563b90b58d16ec28f78efed078c499f.png",
+    "canvas": [
+      347,
+      132
+    ],
+    "daMoNative": true,
+    "kind": "surfactant-glyph",
+    "notes": "1phântử:đuôiđenlượnsinngangtráisangphảigắn1đầutrònĐENđặcphải. Khoảng4,5chu kỳlượn,hìnhđầutrongrộnghơnbiênđộsóng. Khôngchữ/số/mũitên.",
+    "questions": [
+      {
+        "qid": "12-C1-B2-I-37",
+        "de": "Cấu trúc phân tử sodium palmitate (C₁₅H₃₁COONa) có thể được minh họa như sau:\nKhi hòa tan vào nước, các phân tử sodium palmitate sẽ hình thành nên cấu trúc nào dưới đây?",
+        "refs": [
+          {
+            "where": "12-C1-B2-I-37.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "chat-be-mat-ddh-c05a7bd23c4724027a0e19e88f306a49d9411198047ae7a523db6df14202882f.svg",
+    "hashSvg": "c05a7bd23c4724027a0e19e88f306a49d9411198047ae7a523db6df14202882f",
+    "byteSvg": 373,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Khôngsuycarbon/ion/têngroup. Đầuđenđặc hoặcxámnhạtviềntheotừngnguồn;214đuôithẳngdừngméptráivòngRỖNG,2nhãnnguyênvăn.",
+    "hashSvgDaSoat": "c05a7bd23c4724027a0e19e88f306a49d9411198047ae7a523db6df14202882f",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 1083,
+    "hash": "c35dea8b0938617f0b08542011eafd63f1d4d42a01e1c8d5c1b356d2d57f6663",
+    "fileNguon": "anh/c35dea8b0938617f0b08542011eafd63f1d4d42a01e1c8d5c1b356d2d57f6663.png",
+    "canvas": [
+      345,
+      132
+    ],
+    "daMoNative": true,
+    "kind": "surfactant-glyph",
+    "notes": "Nativebodycùng165:1đầutrònĐENđặcphải+đuôilượnđenngangtrái. Khôngchữ/số/mũitên;khôngtựthêmNa⁺/COO⁻/têngroupvànguồn.",
+    "questions": [
+      {
+        "qid": "12-KT-C1-D3-I-17",
+        "de": "Cấu trúc phân tử sodium palmitate (C₁₅H₃₁COONa) có thể được minh họa như sau: Khi hòa tan vào nước, các phân tử sodium palmitate sẽ hình thành nên cấu trúc nào dưới đây?",
+        "refs": [
+          {
+            "where": "12-KT-C1-D3-I-17.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "chat-be-mat-ddh-c05a7bd23c4724027a0e19e88f306a49d9411198047ae7a523db6df14202882f.svg",
+    "hashSvg": "c05a7bd23c4724027a0e19e88f306a49d9411198047ae7a523db6df14202882f",
+    "byteSvg": 373,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Khôngsuycarbon/ion/têngroup. Đầuđenđặc hoặcxámnhạtviềntheotừngnguồn;214đuôithẳngdừngméptráivòngRỖNG,2nhãnnguyênvăn.",
+    "hashSvgDaSoat": "c05a7bd23c4724027a0e19e88f306a49d9411198047ae7a523db6df14202882f",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 931,
+    "hash": "a875f8530e48d17e7a6d174ac59a2a0e369969bed0df460701cf2afac5ac86f2",
+    "fileNguon": "anh/a875f8530e48d17e7a6d174ac59a2a0e369969bed0df460701cf2afac5ac86f2.png",
+    "canvas": [
+      211,
+      60
+    ],
+    "daMoNative": true,
+    "kind": "surfactant-glyph",
+    "notes": "1phântử:đuôihìnhsinngangtráisangphải,gắn1đầutrònnềnXÁMnhạt/viềnmảnhphải. Khôngchữ/số/mũitên. Đầubánkính~26,rõlớnhơnbiênđộsóng. Giữfillxámkhôngđenhayrỗng.",
+    "questions": [
+      {
+        "qid": "DH-12-C1-B2-I-35",
+        "de": "Cho hình vẽ mô tả cấu tạo của phân tử xà phòng như sau: Nhận định nào sau đây về xà phòng không đúng?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B2-I-35.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "chat-be-mat-ddh-2698630849ccce4a99708066a62322fc06815f5034f7d1830aa74b97dbd47e66.svg",
+    "hashSvg": "2698630849ccce4a99708066a62322fc06815f5034f7d1830aa74b97dbd47e66",
+    "byteSvg": 366,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Khôngsuycarbon/ion/têngroup. Đầuđenđặc hoặcxámnhạtviềntheotừngnguồn;214đuôithẳngdừngméptráivòngRỖNG,2nhãnnguyênvăn.",
+    "hashSvgDaSoat": "2698630849ccce4a99708066a62322fc06815f5034f7d1830aa74b97dbd47e66",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 920,
+    "hash": "a77577777b0680ed2746763c5eab9f5c7914ee3dc7d4319a29942785f5c3785d",
+    "fileNguon": "anh/a77577777b0680ed2746763c5eab9f5c7914ee3dc7d4319a29942785f5c3785d.png",
+    "canvas": [
+      473,
+      175
+    ],
+    "daMoNative": true,
+    "kind": "surfactant-glyph",
+    "notes": "1phântử:đuôilượnsinmàuxámđậmtừtráisangphải,gắn1đầutrònXÁMnhạtrộngbênphải. Khôngchữ/số/mũitên. Cùngbody931khácscale,khôngcầngiữnhiễuhạtraster nhưnggiữfillxámvàđầunốithẳngvàođuôi.",
+    "questions": [
+      {
+        "qid": "12-C1-B2-I-46",
+        "de": "Cho hình vẽ mô tả cấu tạo của phân tử xà phòng như sau:\nNhận định nào sau đây về xà phòng không đúng?",
+        "refs": [
+          {
+            "where": "12-C1-B2-I-46.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "chat-be-mat-ddh-2698630849ccce4a99708066a62322fc06815f5034f7d1830aa74b97dbd47e66.svg",
+    "hashSvg": "2698630849ccce4a99708066a62322fc06815f5034f7d1830aa74b97dbd47e66",
+    "byteSvg": 366,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Khôngsuycarbon/ion/têngroup. Đầuđenđặc hoặcxámnhạtviềntheotừngnguồn;214đuôithẳngdừngméptráivòngRỖNG,2nhãnnguyênvăn.",
+    "hashSvgDaSoat": "2698630849ccce4a99708066a62322fc06815f5034f7d1830aa74b97dbd47e66",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 214,
+    "hash": "244e842aea25215a2eabf542474f3e3e95c4ad64a928e412be8d4eb4eb39502d",
+    "fileNguon": "anh/244e842aea25215a2eabf542474f3e3e95c4ad64a928e412be8d4eb4eb39502d.png",
+    "canvas": [
+      472,
+      142
+    ],
+    "daMoNative": true,
+    "kind": "surfactant-labelled",
+    "labels": [
+      "Đuôi kỵ nước",
+      "Đầu ưa nước"
+    ],
+    "notes": "NétthẳngngangđenbêntráikếtthúctạiméptráiđầutrònRỖNGbênphải,khôngchạyxuyênvàogiữađầu. LabelĐuôikỵnướcdướinéttrái;Đầuưanướcdướivòngphải. Khôngmũitên/số/côngthứchóa. Vòngrỗngviềnđen,nềntrongsáng.",
+    "questions": [
+      {
+        "qid": "VIP27-CDK-ESTER-TN-II-11",
+        "de": "Chất hoạt động bề mặt là thành phần chính trong chất tẩy rửa, cấu trúc gồm hai phần:\n(1) Đuôi kỵ nước là các gốc hydrocarbon mạch dài, thường từ 8 – 22 nguyên tử carbon.\n(2) Đầu ưa nước thường là các nhóm chức phân cực như –OH, –COOH, –NH₂, –COO⁻, –NH₃⁺…\nChất hoạt động bề mặt được phân thành bốn loại:\n– Chất hoạt động bề mặt anion: có nhóm chức phân cực mang điện tích âm.\n– Chất hoạt động bề mặt cation: có nhóm chức phân cực mang điện tích dương.\n– Chất hoạt động bề mặt không ion: có nhóm chức phân cực không mang điện.\n– Chất hoạt động bề mặt lưỡng tính: có nhóm chức phân cực mang điện tích âm và nhóm chức mang điện tích dương.\nPhân tử chất hoạt động bề mặt thường được biểu diễn như hình thứ nhất. Khi tan trong nước, các phân tử chất hoạt động bề mặt có xu hướng tập trung tại bề mặt phân cách giữa nước và không khí. Phần đầu ưa nước của phân tử sẽ phân bố trong nước, phần đuôi kỵ nước sẽ phân bố trong không khí (hình thứ hai).",
+        "refs": [
+          {
+            "where": "VIP27-CDK-ESTER-TN-II-11.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "chat-be-mat-ddh-3205692ff6702cb1144f700c284c28e99e2b45053785b9f3d68642ba85cc3968.svg",
+    "hashSvg": "3205692ff6702cb1144f700c284c28e99e2b45053785b9f3d68642ba85cc3968",
+    "byteSvg": 11236,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Khôngsuycarbon/ion/têngroup. Đầuđenđặc hoặcxámnhạtviềntheotừngnguồn;214đuôithẳngdừngméptráivòngRỖNG,2nhãnnguyênvăn.",
+    "hashSvgDaSoat": "3205692ff6702cb1144f700c284c28e99e2b45053785b9f3d68642ba85cc3968",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

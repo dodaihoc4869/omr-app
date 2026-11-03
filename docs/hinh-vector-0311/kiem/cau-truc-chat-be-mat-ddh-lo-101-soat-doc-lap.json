@@ -1,0 +1,50 @@
+[
+  {
+    "i": 448,
+    "hashSvg": "c05a7bd23c4724027a0e19e88f306a49d9411198047ae7a523db6df14202882f",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG source native và SVG render thật của nguồn này. Đầu tròn đặc bên phải, tail sin bên trái khoảng4.5 chu kỳ (4 đỉnh/5 đáy) đúng nguồn, nối đầu kín không hở; không tự suy carbon/charge/nhãn. Không cắt/chạm/tràn. SVG tự chứa path, không text/image/fallback; hash byte thực khớp metadata. Soát lần sửa: byte/hash giữ nguyên so với proof đã mở riêng PNG+render trước, giữ verdict Đạt.",
+    "hash": "50bb63ca96483dd120a42fd031860cf7369bdf25b0eda88ed702e99bb96ba904",
+    "hashSvgDaSoat": "c05a7bd23c4724027a0e19e88f306a49d9411198047ae7a523db6df14202882f"
+  },
+  {
+    "i": 165,
+    "hashSvg": "c05a7bd23c4724027a0e19e88f306a49d9411198047ae7a523db6df14202882f",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG source native và SVG render thật của nguồn này. Đầu tròn đặc bên phải, tail sin bên trái khoảng4.5 chu kỳ (4 đỉnh/5 đáy) đúng nguồn, nối đầu kín không hở; không tự suy carbon/charge/nhãn. Không cắt/chạm/tràn. SVG tự chứa path, không text/image/fallback; hash byte thực khớp metadata. Soát lần sửa: byte/hash giữ nguyên so với proof đã mở riêng PNG+render trước, giữ verdict Đạt.",
+    "hash": "1c893d8712156967d5ec08be862cc9878563b90b58d16ec28f78efed078c499f",
+    "hashSvgDaSoat": "c05a7bd23c4724027a0e19e88f306a49d9411198047ae7a523db6df14202882f"
+  },
+  {
+    "i": 1083,
+    "hashSvg": "c05a7bd23c4724027a0e19e88f306a49d9411198047ae7a523db6df14202882f",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG source native và SVG render thật của nguồn này. Đầu tròn đặc bên phải, tail sin bên trái khoảng4.5 chu kỳ (4 đỉnh/5 đáy) đúng nguồn, nối đầu kín không hở; không tự suy carbon/charge/nhãn. Không cắt/chạm/tràn. SVG tự chứa path, không text/image/fallback; hash byte thực khớp metadata. Soát lần sửa: byte/hash giữ nguyên so với proof đã mở riêng PNG+render trước, giữ verdict Đạt.",
+    "hash": "c35dea8b0938617f0b08542011eafd63f1d4d42a01e1c8d5c1b356d2d57f6663",
+    "hashSvgDaSoat": "c05a7bd23c4724027a0e19e88f306a49d9411198047ae7a523db6df14202882f"
+  },
+  {
+    "i": 931,
+    "hashSvg": "2698630849ccce4a99708066a62322fc06815f5034f7d1830aa74b97dbd47e66",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở lại RIÊNG PNG native và render SVG hiện tại theo exact file metadata. Tail gray đi lên đỉnh trước, 4 đỉnh/4 đáy (8 nửa chu kỳ), cuối đi lên nối mép trái đầu tròn xám có viền; đúng phase nguồn riêng. Xác minh d=M40 80Q55 50 70 80T100 80T130 80T160 80T190 80T220 80T250 80T280 80. Đính chính báo cáo cũ: tail gray cũ đã có4 chu kỳ (8 half), chỉ sai phase; nhận xét cũ4.5 là đếm nhầm, không dùng làm bằng chứng. Không thêm carbon/charge/nhãn; không hở/cắt/chạm/tràn; SVG tự chứa path không text/image/fallback; hash byte thực khớp metadata.",
+    "hash": "a875f8530e48d17e7a6d174ac59a2a0e369969bed0df460701cf2afac5ac86f2",
+    "hashSvgDaSoat": "2698630849ccce4a99708066a62322fc06815f5034f7d1830aa74b97dbd47e66"
+  },
+  {
+    "i": 920,
+    "hashSvg": "2698630849ccce4a99708066a62322fc06815f5034f7d1830aa74b97dbd47e66",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở lại RIÊNG PNG native và render SVG hiện tại theo exact file metadata. Tail gray đi lên đỉnh trước, 4 đỉnh/4 đáy (8 nửa chu kỳ), cuối đi lên nối mép trái đầu tròn xám có viền; đúng phase nguồn riêng. Xác minh d=M40 80Q55 50 70 80T100 80T130 80T160 80T190 80T220 80T250 80T280 80. Đính chính báo cáo cũ: tail gray cũ đã có4 chu kỳ (8 half), chỉ sai phase; nhận xét cũ4.5 là đếm nhầm, không dùng làm bằng chứng. Không thêm carbon/charge/nhãn; không hở/cắt/chạm/tràn; SVG tự chứa path không text/image/fallback; hash byte thực khớp metadata.",
+    "hash": "a77577777b0680ed2746763c5eab9f5c7914ee3dc7d4319a29942785f5c3785d",
+    "hashSvgDaSoat": "2698630849ccce4a99708066a62322fc06815f5034f7d1830aa74b97dbd47e66"
+  },
+  {
+    "i": 214,
+    "hashSvg": "3205692ff6702cb1144f700c284c28e99e2b45053785b9f3d68642ba85cc3968",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG source native và SVG render thật. Tail thẳng ngang dừng đúng mép trái vòng tròn rỗng, không xuyên tâm; hai nhãn Đuôi kỵ nước/Đầu ưa nước đúng DDH path và thứ tự. Không thêm carbon/charge; không chạm/cắt/tràn. SVG tự chứa path, không text/image/fallback; hash byte thực khớp metadata. Soát lần sửa: byte/hash giữ nguyên so với proof đã mở riêng PNG+render trước, giữ verdict Đạt.",
+    "hash": "244e842aea25215a2eabf542474f3e3e95c4ad64a928e412be8d4eb4eb39502d",
+    "hashSvgDaSoat": "3205692ff6702cb1144f700c284c28e99e2b45053785b9f3d68642ba85cc3968"
+  }
+]

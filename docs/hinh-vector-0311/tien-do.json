@@ -79,14 +79,14 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 590,
-    "soSvgRieng": 390,
-    "soCauDungHinh": 750,
-    "soCauDuMoiHinh": 748,
-    "soCauMoiXongMotPhan": 2,
-    "byteSvg": 5631870,
-    "byteGzip": 1134613,
-    "soAnhNguonConLai": 838,
+    "soAnhNguon": 610,
+    "soSvgRieng": 403,
+    "soCauDungHinh": 767,
+    "soCauDuMoiHinh": 761,
+    "soCauMoiXongMotPhan": 6,
+    "byteSvg": 5727906,
+    "byteGzip": 1150189,
+    "soAnhNguonConLai": 818,
     "daTichHop": false
   },
   "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.",
@@ -106,15 +106,15 @@
     "daChuyenHetBoDaVe": true
   },
   "daDatPhongApp": {
-    "soNguon": 590,
-    "soCauDuHinhVaPhong": 748,
+    "soNguon": 610,
+    "soCauDuHinhVaPhong": 761,
     "ghiChu": "Các số tổngDaDoiChieu vẫn mô tả nội dung đã kiểm; bản cũ chưa đổi phông không được coi đạt yêu cầu phông mới."
   },
   "loMoiNhat": {
-    "lo": "95–100",
-    "ketQua": "748 câu đủ mọi hình+DDH/2 một phần;590 nguồn→390SVG;5.631.870byte/gzip1.134.613;838nguồn còn lại.20/20nguồnnhóm95đãdựng/soátđộclập RIÊNGtừngPNG+SVG renderthật/hash.",
-    "suaLoi": "Giữ4graph/phươngán,4ôelementdấu thập phân/cấuhình,nhộng/637mg,3sCHỈ↑,Rkhông4s/Tgiữ1−,6logo1119giữ03.1222giữ18O/HaworthmọiH/OH/x,ybiến.390giữ−92kJvàr/298subscript.231αvàΔlàglyphDDHthật trongfontMERGED,cmapmảnhkhôngđạidiệnfontđủ;khôngfallback.",
-    "tiepTheo": "Nhóm mới101đangđọcbởi cau_truc_5,artifact scratch/doc-molecule-lo-101.json;copyvềkiemvàđốimanifesttrướcdựng.2câumộtphầnchỉảnhhoa1403/1198thậtgiữnguyênkhôngcộngsốvẽ.",
-    "gioiHan": "Chưa tíchhợp hình/chưa reloadofflineapp/chưa phát hành. Build/tốcđộđãchạylạilô98đạt,precache170/2613KB. Mainmớichưagộp,phải cậpnhật/so testtheotên/kiểm cathi trước triểnkhai."
+    "lo": "101–104",
+    "ketQua": "761 câu đủ mọi hình+DDH/6 một phần;610 nguồn→403SVG;5.727.906byte/gzip1.150.189;818nguồn còn lại.20/20nguồnnhóm101đãdựng/soátđộclập từngPNG+SVG renderthật/hash.",
+    "suaLoi": "Giữheadđen/xám/rỗng,cácsơđồ8phântửphươngán2424headtrong/4ngoài;tailxámđãsửaphađầulên. Bảnxámcũđúng4chu kỳnhưngsai pha,reviewerđãđínhchínhkhôngnhầmvớiblack4.5. GiữcỡAl/Al3+/S/S2−,ester2dashkhôngcharge/khôngthêmCH3,glyceroltừngR1R2/3Cdọc;13698C→8C,613H2không4,1362ortho/nhómtext.",
+    "tiepTheo": "Ưutiênkhép4partialmớibởisoat_nguon_2,scratch/doc-khep-cau-lo-105.json. Nhómmới106đangđọcbởi cau_truc_5,scratch/doc-molecule-lo-106.json;copyvềkiem/đốimanifesttrướcdựng.2partialcũchỉảnhhoa1403/1198thậtgiữnguyênkhôngcộngsốvẽ.",
+    "gioiHan": "Chưa tíchhợp hình/chưa reloadofflineapp/chưa phát hành. Build/tốcđộđãchạylạilô104đạt/precache170/2613KB. Mainmớichưagộp,phải cậpnhật/so testtheotên/kiểm cathi trước triểnkhai."
   }
 }

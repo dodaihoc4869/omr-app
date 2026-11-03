@@ -1,0 +1,26 @@
+[
+  {
+    "i": 1369,
+    "hashSvg": "ea7307d5852f321a1797f23edbb9faa95ebf7c609b4aa7360d046409a4a8fb29",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG native và SVG render thật. Mạch trái8C thẳng (8 đỉnh/đầu), phải mạch chính6C có methyl C2 xuống/C5 lên, tổng8C; không thêm chữ nhóm ẩn. Vòng thơm (nếu có) giữ3 nối đôi, không vòng tròn; mũi tên phải và xt, t° đủ, không thêm dữ kiện. DDH path tự chứa, glyph/chỉ số/bond nối đúng, không cắt/chạm/tràn. Hash byte thực khớp metadata.",
+    "hash": "f74189dd416e1d288becaf9b79b48380c3e21f733440191ad38dd7a28b5347ef",
+    "hashSvgDaSoat": "ea7307d5852f321a1797f23edbb9faa95ebf7c609b4aa7360d046409a4a8fb29"
+  },
+  {
+    "i": 613,
+    "hashSvg": "efebe00b2a529d1b54ccfafd4f94df82f2760765cded78f5f71f7b651c681604",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG native và SVG render thật. Giữ literal CH3[CH2]5CH3 đúng chỉ số3/2/5, toluene với CH3 tường minh và + H2 nguyên nguồn; không tự thêm hệ số4 dù phương trình không cân bằng. Vòng thơm (nếu có) giữ3 nối đôi, không vòng tròn; mũi tên phải và xt, t° đủ, không thêm dữ kiện. DDH path tự chứa, glyph/chỉ số/bond nối đúng, không cắt/chạm/tràn. Hash byte thực khớp metadata.",
+    "hash": "718c9e20e74ab927e7189f1a16612d34592c0072f17d53c968dc8a5f93f11032",
+    "hashSvgDaSoat": "efebe00b2a529d1b54ccfafd4f94df82f2760765cded78f5f71f7b651c681604"
+  },
+  {
+    "i": 1362,
+    "hashSvg": "22c218871880988ef1b5efaee65231796060097bb81a82fc6170089553f76d3a",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG native và SVG render thật. Giữ CH2CH3 tường minh trên ethylbenzene trái, sản phẩm hai CH3 tường minh ở hai vị trí ortho trên/phải; không đổi nhóm chữ thành nét ẩn. Vòng thơm (nếu có) giữ3 nối đôi, không vòng tròn; mũi tên phải và xt, t° đủ, không thêm dữ kiện. DDH path tự chứa, glyph/chỉ số/bond nối đúng, không cắt/chạm/tràn. Hash byte thực khớp metadata.",
+    "hash": "f62550d9914ad3ea4b11618c62d4d8ca7c3a6f7f664f2964b321a4fbf0505611",
+    "hashSvgDaSoat": "22c218871880988ef1b5efaee65231796060097bb81a82fc6170089553f76d3a"
+  }
+]

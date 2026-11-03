@@ -1,0 +1,111 @@
+[
+  {
+    "i": 1369,
+    "hash": "f74189dd416e1d288becaf9b79b48380c3e21f733440191ad38dd7a28b5347ef",
+    "fileNguon": "anh/f74189dd416e1d288becaf9b79b48380c3e21f733440191ad38dd7a28b5347ef.png",
+    "canvas": [
+      486,
+      112
+    ],
+    "daMoNative": true,
+    "kind": "reaction-skeletal",
+    "reactantSmiles": "CCCCCCCC",
+    "productSmiles": "CC(C)CCC(C)C",
+    "overArrow": "xt, t°",
+    "notes": "Nguồnreactantmạchthẳng8C:8đỉnh/endpointtổng,không7. Product2,5-dimethylhexane:mainchain6C,nhánhCH₃tạiC2xuốngvàC5lên,tổng8C. Mộtmũitênphảigiữxt,t°trên. Khôngcôngthứccấutrúcchữ/tên/caption/charges/stereo.",
+    "questions": [
+      {
+        "qid": "VIP27-C1-HC11-D2-I-3",
+        "de": "Cho phản ứng như hình. Phản ứng trên thuộc loại phản ứng",
+        "refs": [
+          {
+            "where": "VIP27-C1-HC11-D2-I-3.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "phan-ung-hydrocarbon-ddh-ea7307d5852f321a1797f23edbb9faa95ebf7c609b4aa7360d046409a4a8fb29.svg",
+    "hashSvg": "ea7307d5852f321a1797f23edbb9faa95ebf7c609b4aa7360d046409a4a8fb29",
+    "byteSvg": 3571,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "1369giữ8C→8C/2,5dimethylhexane.613giữ[CH2]5/tolueneCH3/+H2KHÔNG4.1362giữethyltext→ortho2CH3text/khôngphụphẩm.",
+    "hashSvgDaSoat": "ea7307d5852f321a1797f23edbb9faa95ebf7c609b4aa7360d046409a4a8fb29",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 613,
+    "hash": "718c9e20e74ab927e7189f1a16612d34592c0072f17d53c968dc8a5f93f11032",
+    "fileNguon": "anh/718c9e20e74ab927e7189f1a16612d34592c0072f17d53c968dc8a5f93f11032.png",
+    "canvas": [
+      553,
+      146
+    ],
+    "daMoNative": true,
+    "kind": "reaction-literal-aromatic",
+    "reactants": "CH₃[CH₂]₅CH₃",
+    "productSmiles": "Cc1ccccc1",
+    "byproduct": "H₂",
+    "overArrow": "xt, t⁰",
+    "notes": "Reactantliteraln-heptane giữngoặcvuông[CH₂]₅,khôngkhaitriểnmấtsố5. Mũitênphải,toluenevòng3đôi/methylCH₃ởtrên. +H₂phảiKHÔNGtựthêmhệsố4vìnativekhôngcó4. CH₃trênproducthơichạm/cắttrênnhưngđọcrõCH₃,khôngđoántên. Khôngcharges/stereo/circle.",
+    "questions": [
+      {
+        "qid": "VIP27-BDT-L7-0701-I-18",
+        "de": "Reforming là quá trình sắp xếp lại mạch hydrocarbon để tạo ra nhiều hydrocarbon mạch nhánh, làm tăng chỉ số octane của xăng hoặc tạo ra các hợp chất thơm BTX (benzene, toluene, xylene) làm nguyên liệu cho hóa dầu. Phản ứng nào sau đây **không** thuộc loại phản ứng reforming?",
+        "refs": [
+          {
+            "where": "VIP27-BDT-L7-0701-I-18.hinh.0.du_lieu",
+            "viTri": "sau_pa_B"
+          }
+        ]
+      }
+    ],
+    "svg": "phan-ung-hydrocarbon-ddh-efebe00b2a529d1b54ccfafd4f94df82f2760765cded78f5f71f7b651c681604.svg",
+    "hashSvg": "efebe00b2a529d1b54ccfafd4f94df82f2760765cded78f5f71f7b651c681604",
+    "byteSvg": 11540,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "1369giữ8C→8C/2,5dimethylhexane.613giữ[CH2]5/tolueneCH3/+H2KHÔNG4.1362giữethyltext→ortho2CH3text/khôngphụphẩm.",
+    "hashSvgDaSoat": "efebe00b2a529d1b54ccfafd4f94df82f2760765cded78f5f71f7b651c681604",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 1362,
+    "hash": "f62550d9914ad3ea4b11618c62d4d8ca7c3a6f7f664f2964b321a4fbf0505611",
+    "fileNguon": "anh/f62550d9914ad3ea4b11618c62d4d8ca7c3a6f7f664f2964b321a4fbf0505611.png",
+    "canvas": [
+      429,
+      153
+    ],
+    "daMoNative": true,
+    "kind": "reaction-aromatic",
+    "reactantSmiles": "CCc1ccccc1",
+    "productSmiles": "Cc1ccccc1C",
+    "overArrow": "xt, t⁰",
+    "notes": "Ethylbenzenevòngtrái3đôivớiCH₂CH₃textởtrên → ortho-xylenevòngphải3đôi,2CH₃ởtrênvàtrên-phảiliềnkề. GiữCH₂CH₃/CH₃textkhôngchỉendpointẩn. Mũitênphảixt,t⁰. Khôngphụphẩm/charges/circle/stereo.",
+    "questions": [
+      {
+        "qid": "VIP27-BDT-L7-0701-I-18",
+        "de": "Reforming là quá trình sắp xếp lại mạch hydrocarbon để tạo ra nhiều hydrocarbon mạch nhánh, làm tăng chỉ số octane của xăng hoặc tạo ra các hợp chất thơm BTX (benzene, toluene, xylene) làm nguyên liệu cho hóa dầu. Phản ứng nào sau đây **không** thuộc loại phản ứng reforming?",
+        "refs": [
+          {
+            "where": "VIP27-BDT-L7-0701-I-18.hinh.1.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      }
+    ],
+    "svg": "phan-ung-hydrocarbon-ddh-22c218871880988ef1b5efaee65231796060097bb81a82fc6170089553f76d3a.svg",
+    "hashSvg": "22c218871880988ef1b5efaee65231796060097bb81a82fc6170089553f76d3a",
+    "byteSvg": 9717,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "1369giữ8C→8C/2,5dimethylhexane.613giữ[CH2]5/tolueneCH3/+H2KHÔNG4.1362giữethyltext→ortho2CH3text/khôngphụphẩm.",
+    "hashSvgDaSoat": "22c218871880988ef1b5efaee65231796060097bb81a82fc6170089553f76d3a",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
