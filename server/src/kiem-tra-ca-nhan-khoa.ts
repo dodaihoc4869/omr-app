@@ -31,7 +31,9 @@ type KetKt = { cau: { de: { qid: string }; tra: string; dung: boolean }[] } & Re
 export async function ketGonKt(env: Pick<Env, 'MA_BI_MAT'>, id: string, sbd: string, cau: readonly { q: PrivateQuestion }[], ket: KetKt, b: Record<string, unknown>):
   Promise<{ ketQua: unknown; khoaKq?: string; phienKq?: string }> {
   if (!env.MA_BI_MAT || !sbd || typeof b.phienKq !== 'string' || !b.phienKq) return { ketQua: ket }
-  const phien = await phienGoiKt(thoGoiKt(cau))
+  // Phiên bản tính trên ĐÚNG các câu phần chữa được hiện (`ketQuaKt` ẩn câu tạm giữ cho ca thi — 03/11): gói tải sẵn chứa câu đang giữ ⇒ lệch phiên bản ⇒
+  // KHÔNG trao chìa (chìa mở được cả câu đang bảo vệ), đi đường cũ đã lọc.
+  const hien = new Set(ket.cau.map((c) => c.de.qid)), phien = await phienGoiKt(thoGoiKt(cau.filter((c) => hien.has(c.q.qid))))
   if (b.phienKq !== phien) return { ketQua: ket }
   return { ketQua: { ...ket, gon: true, cau: ket.cau.map((c) => ({ qid: c.de.qid, tra: c.tra, dung: c.dung })) }, khoaKq: await chiaKt(env, id, sbd), phienKq: phien }
 }

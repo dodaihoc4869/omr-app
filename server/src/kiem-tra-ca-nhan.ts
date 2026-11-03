@@ -213,13 +213,19 @@ async function docBai(env: Env, sbd: string, id: string) {
   if (!r) throw new Error('Bài kiểm tra này không thuộc lớp hiện tại của em.')
   return r
 }
-async function kiemNguon(env: Env, sbd: string, cs: readonly CauDe[]) {
+/** CÂU TẠM GIỮ của bài (03/11 — em kẹt «Một câu của bài đang đổi nguồn hoặc được giữ cho ca kiểm tra» lúc còn 2 giờ 47 tới hạn 24:00, chặng 5 không mở được):
+ *  trước đây MỘT câu không còn mở được (đang giữ cho ca thi chưa công bố, đổi phiên bản / bỏ khỏi kho, nằm trong BTVN chưa nộp, bị chặn) là KHOÁ CẢ CHẶNG + khoá
+ *  cả phần xem kết quả. Nay trả TẬP câu tạm giữ: câu ấy không gửi xuống máy (không lộ đề / đáp án câu đang bảo vệ), các câu còn lại em làm bình thường; lúc chốt,
+ *  câu tạm giữ mà em CHƯA trả lời không tính vào điểm (cả tử lẫn mẫu). Chỉ «việc học đang tạm dừng» vẫn chặn. */
+async function kiemNguon(env: Env, sbd: string, cs: readonly CauDe[]): Promise<Set<string>> {
   const [baoVe, scope, btvn, khoi] = await Promise.all([protectedQuestions(env),readGameScope(env,sbd),docCauBtvnChuaNop(env,sbd),docKhoiEm(env,sbd)])
   if (!scope.enabled) throw new Error('Việc học đang tạm dừng.')
   // Đề đã lập: câu bị nghi đáp án SAU lúc lập vẫn giữ (`ktcn_cu`), không thì cả chặng chứa câu không mở được (lỗi em báo 19/10 "ko làm đc chặng 4").
   const qua = new Set((await chanKhacKhoiEm(env,'ktcn_cu',{sbd,khoiEm:khoi},cs.map(c=>c.q))).map(q=>q.qid))
   const refs = await Promise.all(cs.map(c=>docCauTheoRef(env,c.q)))
-  for (let i=0;i<cs.length;i++) { const q=cs[i]!.q, current=refs[i]; if (!current?.reviewed || current.version!==q.version || !qua.has(q.qid) || baoVe.has(q.qid) || baoVe.has(q.group) || btvn.has(q.qid) || scope.blocked.includes(q.qid) || scope.types.length && (!q.dang || !scope.types.includes(q.dang))) throw new Error('Một câu của bài đang đổi nguồn hoặc được giữ cho ca kiểm tra. Thầy sẽ xử lý; kết quả đã lưu của em được giữ.') }
+  const giu = new Set<string>()
+  for (let i=0;i<cs.length;i++) { const q=cs[i]!.q, current=refs[i]; if (!current?.reviewed || current.version!==q.version || !qua.has(q.qid) || baoVe.has(q.qid) || baoVe.has(q.group) || btvn.has(q.qid) || scope.blocked.includes(q.qid) || scope.types.length && (!q.dang || !scope.types.includes(q.dang))) giu.add(q.qid) }
+  return giu
 }
 
 const XEM_CHUA_MS = 12 * 3_600_000
@@ -245,8 +251,12 @@ async function trongXemChua12h(env: Env, r: Row, d: ReturnType<typeof de>): Prom
 
 /** Chốt một lần, ghi sổ có receipt ổn định; retry/cron có thể hồi phục sau khi ghi sổ lỗi. */
 export async function chotKtCn(env: Env, r: Row, now: number, hetHan = false) {
+  // câu tạm giữ (kiemNguon) mà em CHƯA trả lời ⇒ không tính điểm (em không được nhận câu ấy). Lỗi đọc ⇒ tính như cũ.
+  // Chỉ soi câu CHƯA trả lời (câu đã trả lời luôn tính) ⇒ nộp đủ câu (thường gặp) không thêm lượt đọc nào.
+  const chuaTra=r.nop_luc?[]:de(r).cau.filter(c=>!duTraKt(c.q.phan,tra(r)[c.q.qid]??''))
+  const giuChot=chuaTra.length?await kiemNguon(env,s(r.sbd),chuaTra).catch(()=>new Set<string>()):new Set<string>()
   for(let lan=0;!r.nop_luc&&lan<4;lan++) {
-    const d=de(r), t=tra(r), diem=diemTo7(d.cau.reduce((n,c)=>n+diemGoi7(c.q.phan,t[c.q.qid]??'',c.q.correct,dungKt(c.q,t[c.q.qid]??'')),0),d.cau.reduce((n,c)=>n+(c.q.phan==='II'?1:0.25),0))
+    const d0=de(r), t=tra(r), d={...d0,cau:d0.cau.filter(c=>!giuChot.has(c.q.qid)||duTraKt(c.q.phan,t[c.q.qid]??''))}, diem=diemTo7(d.cau.reduce((n,c)=>n+diemGoi7(c.q.phan,t[c.q.qid]??'',c.q.correct,dungKt(c.q,t[c.q.qid]??'')),0),d.cau.reduce((n,c)=>n+(c.q.phan==='II'?1:0.25),0))
     // Chốt đúng phiên bản nháp đã chấm; một lượt lưu chen vào phải khiến chấm lại, không lệch điểm với sổ.
     await env.DB.prepare(`UPDATE kiem_tra_ca_nhan SET nop_luc=?,diem=?,trang_thai=?,cap_nhat_luc=? WHERE id=? AND nop_luc IS NULL AND revision=?`).bind(Math.min(now,Number(r.han_luc)),diem,hetHan?'het_han':'da_nop',now,r.id,r.revision).run()
     r=(await env.DB.prepare('SELECT * FROM kiem_tra_ca_nhan WHERE id=?').bind(r.id).first<Row>())!
@@ -306,7 +316,8 @@ export async function ktCnAction(env: Env, sbd: string, action: string, b: Row, 
   const ch=d.chang[stt]!, cs=d.cau.filter(c=>ch.qids.includes(c.q.qid))
   let row=await env.DB.prepare('SELECT * FROM kiem_tra_ca_nhan_chang WHERE bai_id=? AND stt=?').bind(r.id,stt).first<Row>()
   if (action==='hoc-tap-ktcn-start') {
-    await kiemNguon(env,sbd,cs)
+    const giu=await kiemNguon(env,sbd,cs), csMo=cs.filter(c=>!giu.has(c.q.qid))
+    if (!csMo.length) throw new Error('Các câu của chặng này đang được giữ cho ca kiểm tra hoặc đang đổi nguồn. Em làm chặng khác trước; kết quả đã lưu của em được giữ.')
     // KHÔNG KHOÁ CHẶNG VÌ "VỪA XEM PHẦN CHỮA" (lỗi 17–18/10 — thầy 19/10 gửi ảnh "Em vừa xem phần chữa… quay lại sau ít nhất 12 giờ" lúc còn 1 giờ 37 phút tới hạn
     // 24:00, và "Không cho làm chặng 3"): từ 16/10 mỗi câu nộp ở bài thường cũng ghi `loi_giai_hoi` (nguồn 'goi7:sau_nop' — game-v2.ts) ⇒ đề kiểm tra có câu em
     // vừa làm trong 12 giờ là chặng bị khoá, kể cả chặng ĐÃ MỞ, tới hạn thì chốt 0 câu. Nay em luôn mở/làm tiếp được; câu em xem phần chữa trong 12 giờ trước
@@ -315,7 +326,7 @@ export async function ktCnAction(env: Env, sbd: string, action: string, b: Row, 
     row=await env.DB.prepare('SELECT * FROM kiem_tra_ca_nhan_chang WHERE bai_id=? AND stt=?').bind(r.id,stt).first<Row>()
     if (!row) throw new Error('Em hoàn thành chặng đang mở trước nhé.')
     if (now>=Number(row.han)&&!row.chot_luc) { await env.DB.prepare('UPDATE kiem_tra_ca_nhan_chang SET chot_luc=han WHERE bai_id=? AND stt=? AND chot_luc IS NULL').bind(r.id,stt).run(); row.chot_luc=row.han }
-    return {ok:true,kiemTra:tomTatKt(r,now),revision:Number(r.revision),chang:stt,hanChang:Number(row.han),daChot:!!row.chot_luc,questions:cs.map(c=>publicQuestion(c.q)),tra:Object.fromEntries(ch.qids.map(id=>[id,tra(r)[id]??'']))}
+    return {ok:true,kiemTra:tomTatKt(r,now),revision:Number(r.revision),chang:stt,hanChang:Number(row.han),daChot:!!row.chot_luc,questions:csMo.map(c=>publicQuestion(c.q)),tra:Object.fromEntries(csMo.map(c=>[c.q.qid,tra(r)[c.q.qid]??''])),...(giu.size?{soGiu:giu.size}:{})}
   }
   if (!row) throw new Error('Em mở chặng trước khi lưu bài.')
   if (action!=='hoc-tap-ktcn-luu'&&action!=='hoc-tap-ktcn-chot-chang') throw new Error('Lệnh kiểm tra chưa có.')
@@ -349,8 +360,10 @@ export async function ktCnAction(env: Env, sbd: string, action: string, b: Row, 
 }
 
 async function ketQuaKt(env: Env, r: Row, now: number) {
-  const d=de(r), t=tra(r)
-  await kiemNguon(env,s(r.sbd),d.cau)
+  const d0=de(r), t=tra(r)
+  // câu TẠM GIỮ (đang bảo vệ cho ca thi chưa công bố, đổi nguồn…): KHÔNG hiện đề / đáp án / lời giải trong phần chữa — lộ đáp án câu đang bảo vệ là cấm (03/11)
+  const giu=await kiemNguon(env,s(r.sbd),d0.cau)
+  const d={...d0,cau:d0.cau.filter(c=>!giu.has(c.q.qid))}
   // Phần chữa tới SAU receipt nộp: không để hai dấu giờ cùng mili giây phủ nhận lượt tự làm vừa chốt.
   const xemLuc=Math.max(now,Number(r.nop_luc)+1)
   await env.DB.prepare('INSERT OR IGNORE INTO loi_giai_hoi(sbd,qid,luc) SELECT ?,value,? FROM json_each(?)').bind(r.sbd,new Date(xemLuc).toISOString(),JSON.stringify(d.cau.map(c=>c.q.qid))).run()

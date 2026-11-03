@@ -151,7 +151,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:
   });day.current=p
   return p
  }
- const mo=async(i:number)=>{const lan=lanPhien.current;huyHenThuLai();setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-start',token,{id,chang:i});if(!conPhien(lan))return;const t=nhan(r);if(r.daChot){xoaKtcnDangLam(sbd);setCs([]);setStt(null);await guiNhapTre(i,Number(r.hanChang),t.serverNow);await tai();return}const questions=r.questions as Question[];setCs(questions);setStt(i);setTimeout(taiGoi,CHO_GOI_MS);setViTri(0);setHan(Number(r.hanChang));ghiKtcnDangLam(sbd,id,i,Number(r.hanChang));const a=r.tra as Record<string,string>;traRef.current=a;setTra(a);setLuu('Đã tải câu trả lời đã lưu');tuNop.current=false;lanThuLai.current=0
+ const mo=async(i:number)=>{const lan=lanPhien.current;huyHenThuLai();setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-start',token,{id,chang:i});if(!conPhien(lan))return;const t=nhan(r);if(r.daChot){xoaKtcnDangLam(sbd);setCs([]);setStt(null);await guiNhapTre(i,Number(r.hanChang),t.serverNow);await tai();return}const questions=r.questions as Question[];setCs(questions);setStt(i);setTimeout(taiGoi,CHO_GOI_MS);setViTri(0);setHan(Number(r.hanChang));ghiKtcnDangLam(sbd,id,i,Number(r.hanChang));const a=r.tra as Record<string,string>;traRef.current=a;setTra(a);setLuu(Number(r.soGiu)>0?`Đã tải câu trả lời đã lưu · ${Number(r.soGiu)} câu đang được giữ cho ca kiểm tra, không tính điểm`:'Đã tải câu trả lời đã lưu');tuNop.current=false;lanThuLai.current=0
   // Mở lại chặng (kể cả sau khi tắt app): TỰ nạp bản nháp trên máy vào đúng câu em đang làm rồi tự gửi — không còn nút «Khôi phục» (thầy 28/10).
   try{
    const vtLuu=Number(localStorage.getItem(`ktcn:vt:${sbd}:${id}:${i}`))
