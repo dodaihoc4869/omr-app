@@ -77,6 +77,8 @@ export interface CauLuyen {
   /** BTVN "NÂNG ĐỠ" (bài `ca_nhan`) — chỉ có khi phiếu dựng cho bài cá nhân hoá; câu không mang nó
    * ra ĐÚNG như trước, từng byte. `nhan` = nhãn nhẹ trên thẻ; `chuaCoDapAn` = máy chủ chưa gửi đáp án/lời giải
    * (chỉ về sau khi nộp chặng); `daCham` = câu ĐÃ được máy chủ chấm (đáp án em nộp + đúng/sai). */
+  /** LỜI GIẢI KÍNH đã xếp theo câu đang chiếu (gắn bởi loi-giai-kinh/kinh-chieu-gan.ts) — có ⇒ tờ chiếu vẽ bản Kính thay lời giải cũ (thầy 03/11). */
+  kinh?: import('./loi-giai-kinh/kieu').BanKinh
   caNhan?: { nhan?: NhanCauEm; chuaCoDapAn?: true; daCham?: { dung: boolean; chon: string }; thuSuc?: true }
 }
 

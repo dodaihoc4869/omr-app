@@ -64,6 +64,8 @@ export async function dungToChuaCa(ds: readonly CauChuaCa[], nguon: readonly Tea
     const tk = thongKeLopCau(c.phan, c.bai)
     return { sbd: '', hoTen: 'Cả lớp', soCau: c.soCau, ...(c.mucDo ? { mucDo: c.mucDo } : {}), cau, ...(tk ? { thongKe: tk } : {}), chuaDung: theChuaDung(c) }
   })
-  const html = taoHtmlMayChieu(dsO, { tenBuoi, ngay: new Date(), chuaBai: true })
+  // Lời giải Kính trên màn chiếu (thầy 03/11) — một lệnh cho cả tờ; lỗi ⇒ tờ như cũ.
+  const dsOKinh = await (await import('../../lib/loi-giai-kinh/kinh-chieu-gan')).ganKinhChoBang(dsO).catch(() => dsO)
+  const html = taoHtmlMayChieu(dsOKinh, { tenBuoi, ngay: new Date(), chuaBai: true })
   return { html: chenGoiEmKhac(html, dsO.map((o) => (o.chuaDung ? dotGoiEmChuaBai(o.chuaDung) : null))), soThieu }
 }

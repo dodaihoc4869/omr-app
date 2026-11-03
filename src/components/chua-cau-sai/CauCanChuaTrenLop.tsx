@@ -160,7 +160,9 @@ export default function CauCanChuaTrenLop({ gon = false, chonDau }: { gon?: bool
       for(let i=0;i<o.length;i++){const e=uv.get(phien.current[i]!.nhom.qid)?.[0];o[i]!.sbd=e?.sbd??'';o[i]!.hoTen=e?.ten??'Cả lớp';o[i]!.lichSuCau=e?nhanEmChieu(e):undefined;if(e)goiMoi[phien.current[i]!.nhom.id]=e}
       setDaGoi((cu) => ({ ...cu, ...goiMoi }))
       const { taoHtmlMayChieu } = await import('../../lib/html-may-chieu')
-      const h = taoHtmlMayChieu(o, {
+      // Lời giải Kính trên màn chiếu (thầy 03/11) — một lệnh cho cả tờ; lỗi ⇒ tờ như cũ.
+      const oKinh = await (await import('../../lib/loi-giai-kinh/kinh-chieu-gan')).ganKinhChoBang(o).catch(() => o)
+      const h = taoHtmlMayChieu(oKinh, {
         tenBuoi: 'Câu cần chữa · Cùng gỡ bước cuối',
         cauNoi: { maPhien: ma },
         nutAiSai: false,
