@@ -65,11 +65,11 @@
   },
   "tuDongTiepTuc": {
     "id": "6ae96c39083081918a50bc48bc6c8d3e",
-    "trangThai": "tam-dung-lich-khi-phien-dang-lam-lien-tuc",
+    "trangThai": "dang-bat",
     "lich": "moi-gio",
     "mucTieu": "Tự vẽ, soát, sửa, tích hợp và kiểm bản sống đến khi đạt; tự tắt khi hoàn tất",
     "thongBao": "Chỉ khi hoàn tất, có lỗi chặn thực sự hoặc cần hành động của thầy",
-    "lyDo": "Tránh lượt lịch mới ngắt công việc/nhóm tác tử đang chạy; phiên chính đang xử lý trực tiếp theo lệnh thầy, không chờ lịch."
+    "lyDo": "Đã khôi phục lịch tiếp tục và cập nhật prompt theo398 câu/224SVG để không quay về số9cũ; mỗi lượt tiếp tục phải hoàn thiện lô mới, không chỉ kiểm trạng thái."
   },
   "loOrbitalDaSoat": {
     "soAnhNguon": 23,
