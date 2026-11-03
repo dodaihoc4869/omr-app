@@ -61,7 +61,7 @@
     ],
     "danhMucDaKiem": "docs/hinh-vector-0311/kiem/danh-muc-da-kiem.json",
     "loVuaXong": "Lô10: orbital nguồn19 đã soát độc lập, dùng trong 2 câu; tổng408 câu đủ mọi hình,27 một phần;355 nguồn→233SVG.",
-    "viecNenLamTiep": "Đang nhận dạng nhóm nguồn dùng chung nhiều câu để dựng và soát; hoàn tất full vitest hai nhánh và so tên trước khi đẩy checkpoint; chưa tích hợp/phát hành.",
+    "viecNenLamTiep": "Ưu tiên phông DDH Rounded trên toàn bộ SVG: RDKit fontFile bằng TTF dựng từWOFF2app; các text SVG chuyển nét bằng HarfBuzz/fontTools, không chỉ đổi font-family. Soát lại bố cục/hash sau đổi phông. Lô11 4MS đangsoát; tiếp tục nhóm dùng chung.",
     "canhBaoCheckpoint": "Checkpoint mới đã commit cục bộ; chưa đẩy sau lô4/5/6 vì cổng tốc độ cũng đỏ trên main sạch8592da49. Không nâng mốc, không phát hành. Còn tiếp tục vẽ trong worktree hiện tại."
   },
   "tuDongTiepTuc": {
@@ -94,5 +94,14 @@
     "TheCau.tsx: hình sau phương án trong gopAnh đangmaxHeight112 vàkhôngonZoom riêng, cần kiểm khả năng đọc/phóng to trước khi đưa Fischer/peptide vàoapp.",
     "SVG cần nền sáng theo manifest, không đảo màu làm mất nêm/điện tích.",
     "Đồ thị định tính không thêm mốc số; sơ đồ phương án sai giữ nguyên sai, không sửa hóa học."
-  ]
+  ],
+  "yeuCauPhongChu": {
+    "phong": "DDH Rounded",
+    "nguon": "src/styles/phong-ddh",
+    "batBuocMoiHinh": true,
+    "daHoanTatToanBo": false,
+    "ghiChu": "233 SVG cũ đã kiểm nội dung nhưng cần dựng lại chữ bằng đúng phông app và soát bố cục sau đổi phông; không coi bản cũ đã đạt yêu cầu phông mới.",
+    "loMoi": "Lô11:4nguồn MS dựng chữ thànhpath từWOFF2 DDH củaapp, đangsoát độc lập.",
+    "congCu": "scripts/phong-vector-0311.py"
+  }
 }
