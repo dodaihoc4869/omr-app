@@ -1,0 +1,148 @@
+[
+  {
+    "i": 578,
+    "hash": "6bef20f1037c1d21fcaa65970b713db754ff26340af0c71b2db360de8bdb1499",
+    "fileNguon": "anh/6bef20f1037c1d21fcaa65970b713db754ff26340af0c71b2db360de8bdb1499.png",
+    "canvas": [
+      582,
+      537
+    ],
+    "daMoNative": true,
+    "kind": "food-energy-bar",
+    "xLabel": "Thức ăn",
+    "yLabel": "kJ/g",
+    "yTicks": [
+      17,
+      19,
+      38
+    ],
+    "bars": [
+      {
+        "label": "Chất đạm",
+        "height": 19
+      },
+      {
+        "label": "Chất béo",
+        "height": 38
+      },
+      {
+        "label": "Chất bột",
+        "height": 17
+      }
+    ],
+    "notes": "3cộtxámthẳngđứngtrái→phảiđạm/béo/bột;label2dòngtrênmỗicột.3đườngdóngngangđứttại17/19/38từYđếncộtliênquan:19kếtthúctạimépcộtđạm,38đếncộtbéo,17chạyđếncộtbột. KhungchỉtrụcX/Y KHÔNGmũitên,không0/khônggridkhác. Giữtỷlệ19:38:17,kHÔNGgộpđạmvàbộtbằngnhautheokiếnthức4kcal.",
+    "questions": [
+      {
+        "qid": "12-KT-C1234-D1-III-4",
+        "de": "Chất bột, chất béo và chất đạm là nguồn cung cấp năng lượng chính cho cơ thể con người. Năng lượng cung cấp tính bằng kJ từ mỗi gam chất bột, chất béo và chất đạm được cho ở hình dưới. Giả thiết mỗi ngày, một học sinh lớp 12 cần năng lượng 9690 kJ, trong đó chất bột, chất béo và chất đạm lần lượt đóng góp 60%, 20% và 10% nguồn năng lượng đó.\nTheo số liệu trên, mỗi ngày học sinh nên ăn x gam chất bột, y gam chất béo và z gam chất đạm sẽ là phù hợp nhất.\nGiá trị tổng x + y + z bằng bao nhiêu? (Làm tròn kết quả đến phần nguyên).",
+        "refs": [
+          {
+            "where": "12-KT-C1234-D1-III-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "literal-va-cot-ddh-a5fd73b32cd8996e906001d8837fce6e74994d6273708dd26812b56e0b212aae.svg",
+    "hashSvg": "a5fd73b32cd8996e906001d8837fce6e74994d6273708dd26812b56e0b212aae",
+    "byteSvg": 21975,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "578giữ19/38/17khônggộpđạm/bột;125giữOOCCH3chứKHÔNGOCOCH3/ngoặc/n/stubs;1155giữRởnútKHÔNGthêmCHalpha/chargesđúng.",
+    "hashSvgDaSoat": "a5fd73b32cd8996e906001d8837fce6e74994d6273708dd26812b56e0b212aae",
+    "nguoiSoat": "cau_truc_6"
+  },
+  {
+    "i": 125,
+    "hash": "17540046af8c017b4be40fdfd1c4d8a94b5e90f276b7938993fbaf8a1514e94e",
+    "fileNguon": "anh/17540046af8c017b4be40fdfd1c4d8a94b5e90f276b7938993fbaf8a1514e94e.png",
+    "canvas": [
+      1045,
+      164
+    ],
+    "daMoNative": true,
+    "kind": "polymer-hydrolysis-literal",
+    "reactantUnit": {
+      "backbone": "–CH₂–CH–",
+      "branch": "OOCCH₃ xuống ở CH",
+      "brackets": "round parentheses",
+      "repeat": "n lower-right outside",
+      "caption": "polymer X"
+    },
+    "reagent": "nNaOH",
+    "overArrow": "t⁰",
+    "productUnit": {
+      "backbone": "–CH₂–CH–",
+      "branch": "OH xuống ở CH",
+      "brackets": "round parentheses",
+      "repeat": "n lower-right outside"
+    },
+    "byproduct": "nCH₃COONa",
+    "notes": "PHẢIgiữreactantbranch OOCCH₃ đúngtextNATIVE,khôngtựđổithànhOCOCH₃hoặcvẽfinitevinylacetate. Ngoặcbaođủbranchcả2repeatunit,stubhaiđầumạchngangranngoặc,nngoàidướiphải. Dấu+giữapolymer/nNaOHvàpolymer/nCH₃COONa;captionpolymerXchỉdướireactant. Mộtmũitênphảit⁰. KhôngfiniteSMILESthaypolymer.",
+    "questions": [
+      {
+        "qid": "VIP27-C4-B12-I-17",
+        "de": "Quan sát phương trình hoá học của phản ứng sau của polymer X (hình).\nCho các phát biểu sau:\n(1) Tên gọi của X là poly(vinyl acetate).\n(2) Polymer X được điều chế bằng cách trùng hợp methyl acrylate.\n(3) Phản ứng đã nêu thuộc loại phản ứng cắt mạch polymer.\n(4) Polymer X bị thuỷ phân trong môi trường kiềm.\nCác phát biểu **không** đúng là",
+        "refs": [
+          {
+            "where": "VIP27-C4-B12-I-17.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "literal-va-cot-ddh-abe4a1547ca62023f25017c5e00e3f77dd234919c8875b50df17009d28410d9e.svg",
+    "hashSvg": "abe4a1547ca62023f25017c5e00e3f77dd234919c8875b50df17009d28410d9e",
+    "byteSvg": 22717,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "578giữ19/38/17khônggộpđạm/bột;125giữOOCCH3chứKHÔNGOCOCH3/ngoặc/n/stubs;1155giữRởnútKHÔNGthêmCHalpha/chargesđúng.",
+    "hashSvgDaSoat": "abe4a1547ca62023f25017c5e00e3f77dd234919c8875b50df17009d28410d9e",
+    "nguoiSoat": "cau_truc_6"
+  },
+  {
+    "i": 1155,
+    "hash": "d12fffa127a755981fb2842e7a02ec59953696df694b881520a19c381feb6e9e",
+    "fileNguon": "anh/d12fffa127a755981fb2842e7a02ec59953696df694b881520a19c381feb6e9e.png",
+    "canvas": [
+      293,
+      87
+    ],
+    "daMoNative": true,
+    "kind": "amino-acid-zwitterion-literal",
+    "notes": "Hai côngthứcliênhệbằngcặp2mũitêncânbằng. Trái: Rviếtởvịtrínútmạch,trên-tráiH₂NnốivàoR,nốiCcarbonylR–C(=O)–OH. Phải: Rvẫnđúngvịtrínút,trên-tráiH₃N⁺nốivàoR,R–C(=O)–O⁻. GiữRnguyênkýhiệu,KHÔNGtựthêmCHalpha/haynhánhRraxađểsửadiagram. CarbonylOtrên,OHHacidbêntráixuốngphải;COO⁻bênphải. Khôngcaption/nêm/sốpH.",
+    "questions": [
+      {
+        "qid": "DB-12-B9-P1-D1-II-232",
+        "de": "Cho các phát biểu sau về amino acid.",
+        "refs": [
+          {
+            "where": "DB-12-B9-P1-D1-II-232.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B9-P1-II-6",
+        "de": "Cho các phát biểu sau về amino acid.",
+        "refs": [
+          {
+            "where": "DH-12-C3-B9-P1-II-6.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "literal-va-cot-ddh-16ddb3d65d474440420fb3385d92b5ca7d3e6a2171715a168891c291694b5e08.svg",
+    "hashSvg": "16ddb3d65d474440420fb3385d92b5ca7d3e6a2171715a168891c291694b5e08",
+    "byteSvg": 8414,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "578giữ19/38/17khônggộpđạm/bột;125giữOOCCH3chứKHÔNGOCOCH3/ngoặc/n/stubs;1155giữRởnútKHÔNGthêmCHalpha/chargesđúng.",
+    "hashSvgDaSoat": "16ddb3d65d474440420fb3385d92b5ca7d3e6a2171715a168891c291694b5e08",
+    "nguoiSoat": "cau_truc_6"
+  }
+]

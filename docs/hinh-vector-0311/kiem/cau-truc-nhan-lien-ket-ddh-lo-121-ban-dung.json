@@ -1,0 +1,197 @@
+[
+  {
+    "i": 880,
+    "hash": "a0009cc3dab4b85ded1805c3fdb2f65f17541096f6ee4d992d95fb4dd4bdf86a",
+    "fileNguon": "anh/a0009cc3dab4b85ded1805c3fdb2f65f17541096f6ee4d992d95fb4dd4bdf86a.png",
+    "canvas": [
+      272,
+      145
+    ],
+    "daMoNative": true,
+    "kind": "fructofuranose-arrow-labels",
+    "substituents": {
+      "C2": {
+        "up": "CH₂OH",
+        "down": "OH"
+      },
+      "C3": {
+        "up": "HO",
+        "down": "H"
+      },
+      "C4": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C5": {
+        "up": "CH₂OH",
+        "down": "H"
+      }
+    },
+    "arrowLabels": {
+      "1": "OH ởC2 dưới-phải",
+      "2": "Mũitênđứngtừtrêngiữachỉvào BONDchéoO-vòng→C2,khôngtựdờisangOH",
+      "3": "OHởC4dưới-trái",
+      "4": "CH₂OH ởC2trên-phải"
+    },
+    "notes": "5ringOtop,C2right,C3lowerright,C4lowerleft,C5left. ĐầyđủHexplicitC3/C4/C5;C2KHÔNGH. 3cạnhtrướcđậm. Arrow2thậtnativechỉlênbondO–C2(x~165,57ở880),khôngchỉHOcủaC3nằmthấphơn. CẤMtrộnlabel1/4giữa880và838vìĐẢONHAU. Số1..4lànhãnmũitênKHÔNGsốcarbon. Đãzoom3xđọcrõtừngendpoint/text.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D3-I-176",
+        "de": "Trong công thức của fructose ở hình dưới đây: Nhóm-OH hemiketal là nhóm -OH được đánh số",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-176.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-I-26",
+        "de": "Trong công thức của fructose ở hình dưới đây: Nhóm-OH hemiketal là nhóm -OH được đánh số",
+        "refs": [
+          {
+            "where": "DH-12-C2-B4-I-26.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "nhan-lien-ket-ddh-69575d0a9f7d3a6d691d0fb500bc2d9e185edc1f816a8d434d3a34ffdc61ebfe.svg",
+    "hashSvg": "69575d0a9f7d3a6d691d0fb500bc2d9e185edc1f816a8d434d3a34ffdc61ebfe",
+    "byteSvg": 13780,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "880/838giữ1/4ĐẢONHAU,arrow2thậtchỉBOND O-ring–C2(420,210),KHÔNGsửavàoOH.C3HOđúnghướngOattached/Hexplicitđủ.952nhãn(1)..(4)làBONDkhôngcarbonnumber.",
+    "hashSvgDaSoat": "69575d0a9f7d3a6d691d0fb500bc2d9e185edc1f816a8d434d3a34ffdc61ebfe",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 838,
+    "hash": "9abbad80e27c95a4524e46ea4187710f0b4e79118bf4ec2b2aa63552209fe6a5",
+    "fileNguon": "anh/9abbad80e27c95a4524e46ea4187710f0b4e79118bf4ec2b2aa63552209fe6a5.png",
+    "canvas": [
+      391,
+      200
+    ],
+    "daMoNative": true,
+    "kind": "fructofuranose-arrow-labels",
+    "substituents": {
+      "C2": {
+        "up": "CH₂OH",
+        "down": "OH"
+      },
+      "C3": {
+        "up": "HO",
+        "down": "H"
+      },
+      "C4": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C5": {
+        "up": "CH₂OH",
+        "down": "H"
+      }
+    },
+    "arrowLabels": {
+      "1": "CH₂OH ởC2 trên-phải",
+      "2": "Mũitênđứngtừtrêngiữachỉvào BONDchéoO-vòng→C2,khôngtựdờisangOH",
+      "3": "OHởC4dưới-trái",
+      "4": "OHởC2dưới-phải"
+    },
+    "notes": "5ringOtop,C2right,C3lowerright,C4lowerleft,C5left. ĐầyđủHexplicitC3/C4/C5;C2KHÔNGH. 3cạnhtrướcđậm. Arrow2thậtnativechỉlênbondO–C2(x~165,57ở880),khôngchỉHOcủaC3nằmthấphơn. CẤMtrộnlabel1/4giữa880và838vìĐẢONHAU. Số1..4lànhãnmũitênKHÔNGsốcarbon. Đãzoom3xđọcrõtừngendpoint/text.",
+    "questions": [
+      {
+        "qid": "VIP27-C2-B4-I-16",
+        "de": "Trong công thức của fructose ở hình dưới đây:\nNhóm -OH hemiketal là nhóm -OH được đánh số",
+        "refs": [
+          {
+            "where": "VIP27-C2-B4-I-16.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "nhan-lien-ket-ddh-d12ad6cd73b7eb58a5bf0793cacb4d2c903423f978e84441423f832de383fd30.svg",
+    "hashSvg": "d12ad6cd73b7eb58a5bf0793cacb4d2c903423f978e84441423f832de383fd30",
+    "byteSvg": 13780,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "880/838giữ1/4ĐẢONHAU,arrow2thậtchỉBOND O-ring–C2(420,210),KHÔNGsửavàoOH.C3HOđúnghướngOattached/Hexplicitđủ.952nhãn(1)..(4)làBONDkhôngcarbonnumber.",
+    "hashSvgDaSoat": "d12ad6cd73b7eb58a5bf0793cacb4d2c903423f978e84441423f832de383fd30",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 952,
+    "hash": "ac43be636d4dfe4799a00fec5ef8746679cfec5ea7422925525534372bbe9ea8",
+    "fileNguon": "anh/ac43be636d4dfe4799a00fec5ef8746679cfec5ea7422925525534372bbe9ea8.png",
+    "canvas": [
+      287,
+      270
+    ],
+    "daMoNative": true,
+    "kind": "glucopyranose-bond-labels",
+    "substituents": {
+      "C1": {
+        "down": "OH",
+        "up": null
+      },
+      "C2": {
+        "down": "OH",
+        "up": null
+      },
+      "C3": {
+        "up": "OH",
+        "down": null
+      },
+      "C4": {
+        "down": "OH",
+        "up": null
+      },
+      "C5": {
+        "up": "CH₂OH",
+        "down": null
+      }
+    },
+    "bondLabels": {
+      "(1)": "C1–C2cạnhđậméodướiphải",
+      "(2)": "C2–C3cạnhđậmngangdưới",
+      "(3)": "C5–O_vòngngangtrên",
+      "(4)": "O_vòng–C1chéophảitrên"
+    },
+    "notes": "6ringOtopright;Hkhôngexplicit. Giữ4labelngoặcvòng(1)..(4)đặtsátBONDtrongnguồn,KHÔNGcarbonnumber;khôngarrowleaders. C4–C3–C2–C1đậm. Đãzoom3x.",
+    "questions": [
+      {
+        "qid": "12-KT-C123-D1-I-5",
+        "de": "Glucose là carbohydrate đơn giản, tồn tại ở nhiều cấu tạo khác nhau gồm dạng mạch hở và mạch vòng. Một trong các cấu tạo của glucose là dạng mạch vòng 6 cạnh và được biểu diễn như hình dưới.\nKhi mở vòng trên thu được glucose dạng mạch hở.\nHãy cho biết liên kết nào trong vòng sẽ bị phá vỡ khi mở vòng?",
+        "refs": [
+          {
+            "where": "12-KT-C123-D1-I-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-I-140",
+        "de": "Glucose là carbohydrate đơn giản, tồn tại ở nhiều cấu tạo khác nhau gồm dạng mạch hở và mạch vòng. Một trong các cấu tạo của glucose là dạng mạch vòng 6 cạnh và được biểu diễn như hình dưới.\nKhi mở vòng trên thu được glucose dạng mạch hở.\nHãy cho biết liên kết nào trong vòng sẽ bị phá vỡ khi mở vòng?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-140.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "nhan-lien-ket-ddh-1fe609f4f69277c78b0f8c2eb9c79f9427d8db3a47cadeebf7e9c947a9cf62fd.svg",
+    "hashSvg": "1fe609f4f69277c78b0f8c2eb9c79f9427d8db3a47cadeebf7e9c947a9cf62fd",
+    "byteSvg": 12179,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "880/838giữ1/4ĐẢONHAU,arrow2thậtchỉBOND O-ring–C2(420,210),KHÔNGsửavàoOH.C3HOđúnghướngOattached/Hexplicitđủ.952nhãn(1)..(4)làBONDkhôngcarbonnumber.",
+    "hashSvgDaSoat": "1fe609f4f69277c78b0f8c2eb9c79f9427d8db3a47cadeebf7e9c947a9cf62fd",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

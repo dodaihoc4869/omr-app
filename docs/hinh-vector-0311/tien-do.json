@@ -60,8 +60,8 @@
       "Toàn kho còn chưa hoàn tất, app chưa thay hình; không báo đã xong hoặc đã triển khai."
     ],
     "danhMucDaKiem": "docs/hinh-vector-0311/kiem/danh-muc-da-kiem.json",
-    "loVuaXong": "816câu đủ mọi hình+DDH/2mộtphần;642nguồn→429SVG;6.241.667byte/gzip1.271.445;786nguồn còn lại.5nguồnmớiđãmởRIÊNGtừngPNG+SVG renderthật/soátđộclậpexacthash;nhóm106đủ20/20.",
-    "viecNenLamTiep": "Nhóm117đãđọccopy20recordsởkiem/doc-molecule-lo-117.json;5đãmanifest1184/1243/1279/593/304KHÔNGdựngtrùng. Còn15chưadựng935/113/799/880/838/952/627/737/981/1175/1337/1254/125/1155/578. Ưutiênfructofuranose935/113đủsốC/799khôngsố,giữarrow880/838vàlabelbond952nguyênvăn;polymer125branchOOCCH3khôngsửathànhOCOCH3.2partialchỉảnhhoa1403/1198giữnguyênkhôngcộngsốvẽ.",
+    "loVuaXong": "833câu đủ mọi hình+DDH/2mộtphần;651nguồn→437SVG;6.353.453byte/gzip1.293.249;777nguồn còn lại.9nguồnmớiđãmởRIÊNGtừngPNG+SVG renderthật/soátđộclậpexacthash.",
+    "viecNenLamTiep": "Nhóm117còn6CHƯADỰNG627/737/981/1175/1337/1254,đọc dữliệukiem/doc-molecule-lo-117.json.627AO pcaption,737/9814shapeaxes,1175ppsigma4lobe/overlap,1337đủ4captionxenphủ;1254PHẢIgiữcảS-lactic2D+ballstick3C3O6H,soat_nguon_2đangbổsung scratch/doc-lactic-model-1254.json.14/20records117đãmanifest(5cũ+9mớilô119–121),khôngdựngtrùng.2partialchỉảnhhoa1403/1198thậtgiữnguyênkhôngcộngsốvẽ.",
     "canhBaoCheckpoint": "Checkpointmớiđượcghi/sẽpushsaukiểm;ưu tiêncommit/worktree localmớinhất. Khôngcheckoutremote cũ đè. Khônghạgate,khôngbáotíchhợp/pháthànhkhibộchưađủ. Mainorigin7dff17afchưagộp."
   },
   "tuDongTiepTuc": {
@@ -79,14 +79,14 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 642,
-    "soSvgRieng": 429,
-    "soCauDungHinh": 818,
-    "soCauDuMoiHinh": 816,
+    "soAnhNguon": 651,
+    "soSvgRieng": 437,
+    "soCauDungHinh": 835,
+    "soCauDuMoiHinh": 833,
     "soCauMoiXongMotPhan": 2,
-    "byteSvg": 6241667,
-    "byteGzip": 1271445,
-    "soAnhNguonConLai": 786,
+    "byteSvg": 6353453,
+    "byteGzip": 1293249,
+    "soAnhNguonConLai": 777,
     "daTichHop": false
   },
   "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.",
@@ -106,15 +106,15 @@
     "daChuyenHetBoDaVe": true
   },
   "daDatPhongApp": {
-    "soNguon": 642,
-    "soCauDuHinhVaPhong": 816,
+    "soNguon": 651,
+    "soCauDuHinhVaPhong": 833,
     "ghiChu": "Các số tổngDaDoiChieu vẫn mô tả nội dung đã kiểm; bản cũ chưa đổi phông không được coi đạt yêu cầu phông mới."
   },
   "loMoiNhat": {
-    "lo": "115–118",
-    "ketQua": "816câu đủ mọi hình+DDH/2mộtphần;642nguồn→429SVG;6.241.667byte/gzip1.271.445;786nguồn còn lại.5nguồnmớiđãmởRIÊNGtừngPNG+SVG renderthật/soátđộclậpexacthash;nhóm106đủ20/20.",
-    "suaLoi": "1095đủ5curves/circlemở/legend/grid;1330đủ3curve/5guides/t1/labels;1162đủ2/8/8/18ô/10ôd/NaCPNe.1184giữC1OCH3xuống/nhánhC6implicitkhônginCH2/0Hexplicit/khôngsửatheostemfructose.1243giữOH1lên/6sốC/khôngalias1036OH1down.",
-    "tiepTheo": "Nhóm117đãđọccopy20recordsởkiem/doc-molecule-lo-117.json;5đãmanifest1184/1243/1279/593/304KHÔNGdựngtrùng. Còn15chưadựng935/113/799/880/838/952/627/737/981/1175/1337/1254/125/1155/578. Ưutiênfructofuranose935/113đủsốC/799khôngsố,giữarrow880/838vàlabelbond952nguyênvăn;polymer125branchOOCCH3khôngsửathànhOCOCH3.2partialchỉảnhhoa1403/1198giữnguyênkhôngcộngsốvẽ.",
-    "gioiHan": "Chưa tíchhợp hình/chưa reloadofflineapp/chưa phát hành. Build/tốcđộlô116đạt/precache170/2613KB,sauđóchỉassets/scripts. Origin/main7dff17afchưagộp;phảicậpnhậtmainmớinhất/sotesttheotên/kiểm cathi trước triểnkhai."
+    "lo": "119–121",
+    "ketQua": "833câu đủ mọi hình+DDH/2mộtphần;651nguồn→437SVG;6.353.453byte/gzip1.293.249;777nguồn còn lại.9nguồnmớiđãmởRIÊNGtừngPNG+SVG renderthật/soátđộclậpexacthash.",
+    "suaLoi": "935/113vòng5đủ6sốC/2Cngoạivòngimplicitkha triển;7992CH2OHtext/no số.578giữ19/38/17;125giữOOCCH3khôngOCOCH3/ngoặc/n/stub;1155giữRnode/noCHalpha.880/838sửaHup/HOupkhỏitopring,freshreviewhashmới;arrow2giữtargetBOND O-ring–C2,1/4ĐẢONHAUđúngsource.9524BONDlabels/nocarbonnumber.",
+    "tiepTheo": "Nhóm117còn6CHƯADỰNG627/737/981/1175/1337/1254,đọc dữliệukiem/doc-molecule-lo-117.json.627AO pcaption,737/9814shapeaxes,1175ppsigma4lobe/overlap,1337đủ4captionxenphủ;1254PHẢIgiữcảS-lactic2D+ballstick3C3O6H,soat_nguon_2đangbổsung scratch/doc-lactic-model-1254.json.14/20records117đãmanifest(5cũ+9mớilô119–121),khôngdựngtrùng.2partialchỉảnhhoa1403/1198thậtgiữnguyênkhôngcộngsốvẽ.",
+    "gioiHan": "Chưa tíchhợp hình/chưa reloadofflineapp/chưa phát hành. Build/tốcđộlô120đạt/precache170/2613KB,sauđóchỉassets/scripts. Origin/main7dff17afchưagộp;phảicậpnhậtmainmớinhất/sotesttheotên/kiểm cathi trước triểnkhai."
   }
 }

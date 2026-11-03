@@ -1,0 +1,205 @@
+[
+  {
+    "i": 935,
+    "hash": "a927e0455dfa0774a9d1ba69302e83596571805d4a80ade6bdb7497a425a8ee3",
+    "fileNguon": "anh/a927e0455dfa0774a9d1ba69302e83596571805d4a80ade6bdb7497a425a8ee3.png",
+    "canvas": [
+      467,
+      285
+    ],
+    "daMoNative": true,
+    "kind": "haworth-fructofuranose-numbered",
+    "substituents": {
+      "C2": {
+        "up": "OH",
+        "down": "CH₂–OH(expanded), carbon1"
+      },
+      "C3": {
+        "up": "OH",
+        "down": null
+      },
+      "C4": {
+        "down": "OH",
+        "up": null
+      },
+      "C5": {
+        "up": "CH₂–OH(expanded), carbon6",
+        "down": null
+      }
+    },
+    "notes": "Vòng5cạnhOđỉnhtrêngiữa,C2phải,C3dướiphải,C4dướitrái,C5trái. Hkhôngexplicit. C5–C4–C3–C2là3cạnhtrướcđậm. C5branchC6bondđứnglênCH₂rồiOHchéolênphải;C2branchC1bondđứngxuốngCH₂rồiOHchéoxuốngphải. Giữđủsố1..6ởcáccarbon:1branchdướiphải;2rightvertex;3lowerright;4lowerleft;5leftvertex;6branchtrêntrái. KhôngsuyOHhemiketaltừđápán.",
+    "questions": [
+      {
+        "qid": "12-C2-B4-D1-I-63",
+        "de": "Cho công thức cấu tạo dạng mạch vòng β-fructose như sau (xem hình).\nNhóm –OH hemiketal là –OH gắn ở carbon số mấy?",
+        "refs": [
+          {
+            "where": "12-C2-B4-D1-I-63.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "12-C2-B7-D1-I-5",
+        "de": "Cho công thức cấu tạo dạng mạch vòng β-fructose như sau (xem hình).\nNhóm –OH hemiketal là –OH gắn ở carbon số mấy?",
+        "refs": [
+          {
+            "where": "12-C2-B7-D1-I-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-I-39",
+        "de": "Cho công thức cấu tạo dạng mạch vòng β-fructose như sau (xem hình).\nNhóm –OH hemiketal là –OH gắn ở carbon số mấy?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-39.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-I-122",
+        "de": "Cho công thức cấu tạo dạng mạch vòng β-fructose như sau (xem hình).\nNhóm –OH hemiketal là –OH gắn ở carbon số mấy?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-122.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "fructofuranose-ddh-93fefa471605af279dbb701e10d65f422b0e7b5982ceed03829bba2997f66776.svg",
+    "hashSvg": "93fefa471605af279dbb701e10d65f422b0e7b5982ceed03829bba2997f66776",
+    "byteSvg": 9878,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "5ringOtop/C2right/C3lowerright/C4lowerleft/C5left;OH2up/3up/4down;935/113C1vàC6implicitvertexkha triển+đủsố1..6,799giữ2CH2OHtextKHÔNGsố.0Hexplicit/caption/charge.",
+    "hashSvgDaSoat": "93fefa471605af279dbb701e10d65f422b0e7b5982ceed03829bba2997f66776",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 113,
+    "hash": "1567516b3a5746eb039e4d3f3b5fe4014fe2676acf78251199b3bdbc3c8e5e12",
+    "fileNguon": "anh/1567516b3a5746eb039e4d3f3b5fe4014fe2676acf78251199b3bdbc3c8e5e12.png",
+    "canvas": [
+      377,
+      210
+    ],
+    "daMoNative": true,
+    "kind": "haworth-fructofuranose-numbered",
+    "substituents": {
+      "C2": {
+        "up": "OH",
+        "down": "CH₂–OH(expanded), carbon1"
+      },
+      "C3": {
+        "up": "OH",
+        "down": null
+      },
+      "C4": {
+        "down": "OH",
+        "up": null
+      },
+      "C5": {
+        "up": "CH₂–OH(expanded), carbon6",
+        "down": null
+      }
+    },
+    "notes": "Cùngnộidung935đãmởRIÊNGnative:5ringOtop,C2right,C3lowerright,C4lowerleft,C5left. KHÔNGHexplicit. SốC1..6/2branchCH₂OHkha triểnphảigiữ. Khôngcaption/charges/arrow/sốnhómOH.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D3-I-264",
+        "de": "Cho công thức cấu tạo dạng mạch vòng β-fructose như sau: Nhóm –OH hemiketal là –OH gắn ở carbon số mấy?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-264.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B7-D1-I-5",
+        "de": "Cho công thức cấu tạo dạng mạch vòng β-fructose như sau: Nhóm –OH hemiketal là –OH gắn ở carbon số mấy?",
+        "refs": [
+          {
+            "where": "DH-12-C2-B7-D1-I-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "fructofuranose-ddh-93fefa471605af279dbb701e10d65f422b0e7b5982ceed03829bba2997f66776.svg",
+    "hashSvg": "93fefa471605af279dbb701e10d65f422b0e7b5982ceed03829bba2997f66776",
+    "byteSvg": 9878,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "5ringOtop/C2right/C3lowerright/C4lowerleft/C5left;OH2up/3up/4down;935/113C1vàC6implicitvertexkha triển+đủsố1..6,799giữ2CH2OHtextKHÔNGsố.0Hexplicit/caption/charge.",
+    "hashSvgDaSoat": "93fefa471605af279dbb701e10d65f422b0e7b5982ceed03829bba2997f66776",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 799,
+    "hash": "94c8d5e4c80c946d19e8da2eaa35e6446e3c7d02e5002af3cb544ff0629f295b",
+    "fileNguon": "anh/94c8d5e4c80c946d19e8da2eaa35e6446e3c7d02e5002af3cb544ff0629f295b.png",
+    "canvas": [
+      204,
+      126
+    ],
+    "daMoNative": true,
+    "kind": "haworth-fructofuranose",
+    "substituents": {
+      "C2": {
+        "up": "OH",
+        "down": "CH₂OH(text)"
+      },
+      "C3": {
+        "up": "OH",
+        "down": null
+      },
+      "C4": {
+        "down": "OH",
+        "up": null
+      },
+      "C5": {
+        "up": "CH₂OH(text)",
+        "down": null
+      }
+    },
+    "notes": "Cùngbodyfructofuranose935nhưngKHÔNGsốC,cả2branchgiữCH₂OHtextnguồnkhôngkha triển. KHÔNGHexplicit. C5left/C4lowerleft/C3lowerright/C2right/Otop;3cạnhtrướcđậm. Khôngtựthêmsố1..6/caption.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D3-I-189",
+        "de": "Monosaccharide X có công thức cấu tạo như sau: Tên gọi của X là",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-189.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-I-50",
+        "de": "Monosaccharide X có công thức cấu tạo như sau: Tên gọi của X là",
+        "refs": [
+          {
+            "where": "DH-12-C2-B4-I-50.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "fructofuranose-ddh-d400c5c0d0d39fcaa5692d118337c1e0b10a9b918c2173c3401e96dd4ebacc5b.svg",
+    "hashSvg": "d400c5c0d0d39fcaa5692d118337c1e0b10a9b918c2173c3401e96dd4ebacc5b",
+    "byteSvg": 9063,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "5ringOtop/C2right/C3lowerright/C4lowerleft/C5left;OH2up/3up/4down;935/113C1vàC6implicitvertexkha triển+đủsố1..6,799giữ2CH2OHtextKHÔNGsố.0Hexplicit/caption/charge.",
+    "hashSvgDaSoat": "d400c5c0d0d39fcaa5692d118337c1e0b10a9b918c2173c3401e96dd4ebacc5b",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

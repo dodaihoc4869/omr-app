@@ -1,0 +1,26 @@
+[
+  {
+    "i": 935,
+    "hashSvg": "93fefa471605af279dbb701e10d65f422b0e7b5982ceed03829bba2997f66776",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG native và SVG render thật của từng nguồn. Vòng5 gồm O trên/C2 phải/C3 dưới phải/C4 dưới trái/C5 trái; ba cạnh trước đậm đúng nguồn. OH tạiC2 lên/C3 lên/C4 xuống, không mirror/đổi stereo. Hai nhóm ngoại vòng khai triển: C1 xuống từ C2 rồi OH phải dưới, C6 lên từ C5 rồi OH phải trên; thân CH2 implicit không in thêm CH2. Đủ số1..6 đúng carbon, số tách bond. Đủ6C/6O tương ứng, không thêm Hexplicit/charge/caption. DDH path tự chứa, bond-glyph/gaps rõ, không cắt/chạm/tràn; hash byte thực khớp metadata.",
+    "hash": "a927e0455dfa0774a9d1ba69302e83596571805d4a80ade6bdb7497a425a8ee3",
+    "hashSvgDaSoat": "93fefa471605af279dbb701e10d65f422b0e7b5982ceed03829bba2997f66776"
+  },
+  {
+    "i": 113,
+    "hashSvg": "93fefa471605af279dbb701e10d65f422b0e7b5982ceed03829bba2997f66776",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG native và SVG render thật của từng nguồn. Vòng5 gồm O trên/C2 phải/C3 dưới phải/C4 dưới trái/C5 trái; ba cạnh trước đậm đúng nguồn. OH tạiC2 lên/C3 lên/C4 xuống, không mirror/đổi stereo. Hai nhóm ngoại vòng khai triển: C1 xuống từ C2 rồi OH phải dưới, C6 lên từ C5 rồi OH phải trên; thân CH2 implicit không in thêm CH2. Đủ số1..6 đúng carbon, số tách bond. Đủ6C/6O tương ứng, không thêm Hexplicit/charge/caption. DDH path tự chứa, bond-glyph/gaps rõ, không cắt/chạm/tràn; hash byte thực khớp metadata.",
+    "hash": "1567516b3a5746eb039e4d3f3b5fe4014fe2676acf78251199b3bdbc3c8e5e12",
+    "hashSvgDaSoat": "93fefa471605af279dbb701e10d65f422b0e7b5982ceed03829bba2997f66776"
+  },
+  {
+    "i": 799,
+    "hashSvg": "d400c5c0d0d39fcaa5692d118337c1e0b10a9b918c2173c3401e96dd4ebacc5b",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG native và SVG render thật của từng nguồn. Vòng5 gồm O trên/C2 phải/C3 dưới phải/C4 dưới trái/C5 trái; ba cạnh trước đậm đúng nguồn. OH tạiC2 lên/C3 lên/C4 xuống, không mirror/đổi stereo. Giữ hai nhóm CH2OH tường minh: C2 xuống/C5 lên, chỉ số2 đúng; không thêm số carbon. Đủ6C/6O tương ứng, không thêm Hexplicit/charge/caption. DDH path tự chứa, bond-glyph/gaps rõ, không cắt/chạm/tràn; hash byte thực khớp metadata.",
+    "hash": "94c8d5e4c80c946d19e8da2eaa35e6446e3c7d02e5002af3cb544ff0629f295b",
+    "hashSvgDaSoat": "d400c5c0d0d39fcaa5692d118337c1e0b10a9b918c2173c3401e96dd4ebacc5b"
+  }
+]
