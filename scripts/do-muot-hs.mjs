@@ -144,7 +144,7 @@ const DO_TRONG_TRANG = () => {
 }
 
 const TIM = (chon) => {
-  const hien = (e) => !!e && (e.offsetWidth || e.offsetHeight || e.getClientRects().length) && getComputedStyle(e).visibility !== 'hidden'
+  const hien = (e) => !!e && (e.offsetWidth || e.offsetHeight || e.getClientRects().length) && getComputedStyle(e).visibility !== 'hidden' && !e.closest('[inert]')
   if (chon.startsWith('re=')) {
     const re = new RegExp(chon.slice(3))
     return [...document.querySelectorAll('button,[role=button],a')].filter(hien).find((e) => re.test((e.getAttribute('aria-label') || e.textContent).trim())) || null

@@ -71,8 +71,8 @@ export function ganVua(khung: HTMLElement): () => void {
 const timKhung = (goc: ParentNode, ra: Set<HTMLElement>): void => {
   if (goc instanceof HTMLElement && goc.matches('.ht2-lam-tn')) ra.add(goc)
   if (goc instanceof HTMLElement && goc.matches('.pa-hang') && goc.parentElement) ra.add(goc.parentElement)
-  goc.querySelectorAll?.<HTMLElement>('.ht2-lam-tn').forEach((e) => ra.add(e))
-  goc.querySelectorAll?.<HTMLElement>('.pa-hang').forEach((e) => { if (e.parentElement) ra.add(e.parentElement) })
+  // MỘT lượt duyệt cây con cho cả hai loại (trước: hai lượt mỗi nút thêm vào — quan sát thân trang chạy mỗi lần vẽ thêm màn)
+  goc.querySelectorAll?.<HTMLElement>('.ht2-lam-tn, .pa-hang').forEach((e) => { if (e.classList.contains('ht2-lam-tn')) ra.add(e); if (e.classList.contains('pa-hang') && e.parentElement) ra.add(e.parentElement) })
 }
 let daGan = false
 /** TỰ DÒ mọi nhóm phương án trên trang (có sẵn + vẽ thêm về sau) và căn từng nhóm. Gọi từ mảnh NẠP LƯỜI sau khi mở app — src/components/cong-hs-nap-luoi.ts
