@@ -46,4 +46,8 @@ export const THAN_CHU: readonly ThanChu[] = ${JSON.stringify(thanChu, null, 1)}
 `
 fs.writeFileSync(path.join(GOC, 'server/src/kinh-than-chu.ts'), tc)
 fs.writeFileSync(path.join(GOC, 'scripts/loi-giai-kinh/tri-thuc.json'), JSON.stringify({ thanChu, muc: sach }))
+// App học sinh: thần chú kèm «dùng khi» (thầy 03/11 «đẹp như bản mẫu» — hộp thần chú có dòng giải thích dưới chữ thần chú). Nằm trong mảnh nạp lười Lời giải Kính.
+fs.writeFileSync(path.join(GOC, 'src/lib/loi-giai-kinh/than-chu-dung.ts'), `// SINH TỰ ĐỘNG bởi scripts/loi-giai-kinh/dung-tri-thuc.mjs — KHÔNG sửa tay.
+export const THAN_CHU_DUNG: Readonly<Record<string, string>> = ${JSON.stringify(Object.fromEntries(thanChu.map((t) => [t.chu, [t.them, t.dung].filter(Boolean).join(' · ')])), null, 1)}
+`)
 console.log('thần chú', thanChu.length, '· mục', sach.length, '· bài', new Set(sach.map((m) => m.bai)).size)

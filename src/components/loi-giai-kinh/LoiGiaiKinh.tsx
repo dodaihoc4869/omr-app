@@ -8,6 +8,7 @@ import type { BanKinh, CanhKinh, PhanKinh } from '../../lib/loi-giai-kinh/kieu'
 import { ChuTron, CongThuc } from '../goi-y-cham/so-do-thay'
 import { themTheNho } from '../../lib/loi-giai-kinh/the-nho'
 import { chuSgk } from '../../lib/loi-giai-kinh/kiem'
+import { THAN_CHU_DUNG } from '../../lib/loi-giai-kinh/than-chu-dung'
 import './loi-giai-kinh.css'
 
 /** Chữ có **in đậm** + công thức (ChemText / chỉ số `_`). */
@@ -200,14 +201,16 @@ function CanhOngNghiem({ canh }: { canh: Extract<CanhKinh, { loai: 'ong-nghiem' 
     <section className="lgk-the lgk-canh" ref={datGoc} aria-label="Thí nghiệm">
       <div className="lgk-dau"><span className="lgk-nhan">Thí nghiệm</span><span className="lgk-dem">Bước {p.buoc}/{n}</span></div>
       <Vach n={n} buoc={p.buoc} chay={p.chay} den={(k) => p.den(k)} t={p.t} nhan="Bước thí nghiệm" />
+      {/* Ống nghiệm ĐÚNG BẢN MẪU (p3-hieu-suat.html): ống bo tròn hai đầu viền mảnh, lớp chất bo tròn bên trong, nhãn đứng NGANG lớp có vạch chỉ. */}
       <div className="lgk-on">
         <div className="lgk-on-ong" data-dun={b.dun ? '' : undefined}>
-          {b.khi && <span className="lgk-on-khi" aria-hidden="true"><i /><i /><i /></span>}
-          <div className="lgk-on-long">{b.lop.map((l, i) => <div key={i} className="lgk-on-lop" data-mau={MAU_LOP[l.mau]} style={{ flexGrow: b.lop.length === 2 && i === 0 ? 2 : 3 }}>{b.ketTua && i === b.lop.length - 1 && <span className="lgk-on-tua" />}</div>)}</div>
-          {b.dun && <span className="lgk-on-lua" aria-hidden="true" />}
+          {b.khi && <svg className="lgk-on-khi" viewBox="0 0 40 18" aria-hidden="true"><path d="M9 16q5-7 0-14M20 16q5-7 0-14M31 16q5-7 0-14" /></svg>}
+          <div className="lgk-on-long">{b.lop.map((l, i) => <div key={i} className="lgk-on-lop" data-mau={MAU_LOP[l.mau]} style={{ flexGrow: b.lop.length === 2 && i === 0 ? 2 : 3 }}>{b.ketTua && i === b.lop.length - 1 && <span className="lgk-on-tua"><i /><i /><i /></span>}</div>)}</div>
+          {b.dun && <svg className="lgk-on-lua" viewBox="0 0 48 20" aria-hidden="true"><path d="M8 19q6-8 0-17M24 19q6-8 0-17M40 19q6-8 0-17" /></svg>}
         </div>
-        <ul className="lgk-on-nhan">{b.lop.map((l, i) => <li key={i}><i data-mau={MAU_LOP[l.mau]} /><Chu chu={l.nhan} /></li>)}{b.dun && <li><i data-mau="lua" />đun nóng</li>}{b.khi && <li><i data-mau="trong" />có khí thoát ra</li>}{b.ketTua && <li><i data-mau="trang-duc" />có kết tủa</li>}</ul>
+        <ul className="lgk-on-nhan">{b.lop.map((l, i) => <li key={i} data-mau={MAU_LOP[l.mau]} style={{ flexGrow: b.lop.length === 2 && i === 0 ? 2 : 3 }}><span><Chu chu={l.nhan} /></span></li>)}</ul>
       </div>
+      {(b.dun || b.khi || b.ketTua) && <div className="lgk-on-them">{b.khi && <span data-k="khi">có khí thoát ra</span>}{b.ketTua && <span data-k="tua">có kết tủa</span>}{b.dun && <span data-k="dun">đun nóng</span>}</div>}
       <p className="lgk-loi" aria-live="polite"><span className="lgk-so-tron">{p.buoc}</span><Chu chu={b.chu} /></p>
       <div className="lgk-dk"><NutChay chay={p.chay} buoc={p.buoc} n={n} onClick={p.nut} /></div>
     </section>
@@ -224,11 +227,18 @@ function CanhSoSanh({ canh }: { canh: Extract<CanhKinh, { loai: 'so-sanh' }> }) 
 
 // ---------------------------------------------------------------- SƠ ĐỒ + MỘT PHÉP TÍNH: chạm số nào hiện nghĩa số đó + kết quả tới đó
 function PhepTinh({ ban }: { ban: BanKinh }) {
-  const [chon, setChon] = useState<{ b: number; t: number } | null>(null)
   const buoc = ban.buoc ?? []
+  // ĐÚNG BẢN MẪU p3 (thầy 03/11 «kiểm tra sơ đồ 1 phép tính đã làm chuẩn theo mẫu chưa»): phép tính TỰ CHẠY qua từng thừa số (vạch Stories,
+  // «Bước k/n»), số đang nói sáng lên kèm ý nghĩa + phép tính tới đó; em chạm số nào thì dừng ở số đó.
+  const ds = buoc.flatMap((b, bi) => b.thuaSo.map((_, ti) => ({ b: bi, t: ti })))
+  const n = ds.length
+  const { datGoc, ...p } = useChayMotLuot(Math.max(1, n), 3200)
+  const chon = n ? ds[Math.min(n, p.buoc) - 1]! : null
+  const ts = chon ? buoc[chon.b]?.thuaSo[chon.t] : undefined
+  const toiDay = chon ? buoc[chon.b]!.thuaSo.slice(0, chon.t + 1).map((x) => x.so).join(' · ') : ''
   return (
-    <section className="lgk-the lgk-pt" aria-label="Sơ đồ và phép tính">
-      <span className="lgk-nhan">{buoc.length ? 'Sơ đồ + một phép tính' : 'Các phép tính'}</span>
+    <section className="lgk-the lgk-pt" ref={n ? datGoc : undefined} aria-label="Sơ đồ và phép tính">
+      <div className="lgk-dau"><span className="lgk-nhan">{buoc.length ? 'Sơ đồ + một phép tính' : 'Các phép tính'}</span>{n > 0 && <span className="lgk-dem">Bước {Math.min(n, p.buoc)}/{n}</span>}</div>
       {ban.soDo && (
         <div className="lgk-sd" role="img" aria-label={`Sơ đồ: ${ban.soDo.nut.map((x) => [x.tong, x.chat, ...x.soLieu].filter(Boolean).join(' ')).join(' → ')}`}>
           {ban.soDo.nut.map((x, i) => (
@@ -247,24 +257,27 @@ function PhepTinh({ ban }: { ban: BanKinh }) {
         <div key={bi} className="lgk-pt-buoc">
           <div className="lgk-pt-dong" role="group" aria-label={`Phép tính ${b.ten}, chạm từng số để xem ý nghĩa`}>
             <span className="lgk-pt-ten"><ChuTron chu={b.ten} /> =</span>
-            {b.thuaSo.map((t, ti) => (
-              <Fragment key={ti}>
-                {ti > 0 && <span className="lgk-pt-nhan" aria-hidden="true">·</span>}
-                <button type="button" className="lgk-so" aria-pressed={chon?.b === bi && chon.t === ti} onClick={() => setChon(chon?.b === bi && chon.t === ti ? null : { b: bi, t: ti })}><ChuTron chu={t.so} /></button>
-              </Fragment>
-            ))}
+            {b.thuaSo.map((t, ti) => {
+              const k = ds.findIndex((x) => x.b === bi && x.t === ti) + 1
+              return (
+                <Fragment key={ti}>
+                  {ti > 0 && <span className="lgk-pt-nhan" aria-hidden="true">·</span>}
+                  <button type="button" className="lgk-so" aria-pressed={chon?.b === bi && chon.t === ti} onClick={() => p.den(k)}><ChuTron chu={t.so} /></button>
+                </Fragment>
+              )
+            })}
             {b.ketQua && <span className="lgk-pt-kq">= <Chu chu={b.ketQua} />{b.donVi ? ` ${b.donVi}` : ''}</span>}
           </div>
         </div>
       ))}
-      {buoc.length > 0 && (
+      {chon && ts && (
         <div className="lgk-giai-so" aria-live="polite">
-          {chon && buoc[chon.b]?.thuaSo[chon.t] ? (
-            <div><span className="lgk-so-to">{chon.t > 0 ? '· ' : ''}<ChuTron chu={buoc[chon.b]!.thuaSo[chon.t]!.so} /></span>
-              <p><Chu chu={buoc[chon.b]!.thuaSo[chon.t]!.nghia} />{buoc[chon.b]!.thuaSo[chon.t]!.denDay && <span className="lgk-dang-co">Tới đây: <b><Chu chu={buoc[chon.b]!.thuaSo[chon.t]!.denDay!} /></b></span>}</p></div>
-          ) : <div data-goi=""><span className="lgk-tay" aria-hidden="true">☝</span><p>Chạm vào từng số trong phép tính để xem số đó nghĩa là gì.<span className="lgk-phu">Cả bài chỉ một phép tính, đi từ chất đề cho tới chất cần tìm.</span></p></div>}
+          <div key={`${chon.b}-${chon.t}`}><span className="lgk-so-to">{chon.t > 0 ? '· ' : ''}<ChuTron chu={ts.so} /></span>
+            <p><Chu chu={ts.nghia} />{ts.denDay && <span className="lgk-dang-co">{chon.t > 0 && <><ChuTron chu={toiDay} /> = </>}<b><Chu chu={ts.denDay} /></b></span>}</p></div>
         </div>
       )}
+      {n > 1 && <div className="lgk-dk"><Vach n={n} buoc={Math.min(n, p.buoc)} chay={p.chay} den={(k) => p.den(k)} t={p.t} nhan="Số" /></div>}
+      {n > 1 && <div className="lgk-dk"><NutChay chay={p.chay} buoc={p.buoc} n={n} onClick={p.nut} /><span className="lgk-goi">hoặc chạm từng số</span></div>}
       {ban.phepTinh && ban.phepTinh.length > 0 && (
         <ol className="lgk-pt-ds">{ban.phepTinh.map((x, i) => <li key={i} data-dap-so={x.laDapSo ? '' : undefined}><b><ChuTron chu={x.ten} /></b> = <ChuTron chu={x.bieuThuc.replace(/\*/g, ' · ').replace(/\./g, ',')} /> = <b>{x.ketQua}</b>{x.nghia && <span className="lgk-phu"><Chu chu={x.nghia} /></span>}</li>)}</ol>
       )}
@@ -273,13 +286,20 @@ function PhepTinh({ ban }: { ban: BanKinh }) {
 }
 
 // ---------------------------------------------------------------- THẦY GIẢNG
+/** Ô «Đ» hình BÁNH QUY 12 MÚI (logo app học sinh, bản mẫu docs/ban-ve-ban-sac-hs-0211/v2/kve.js `banh(12, 0.075)`) — vẽ bằng mã, tính một lần. */
+const BANH = (() => {
+  let d = ''
+  for (let i = 0; i <= 240; i++) { const t = (i / 240) * 2 * Math.PI, r = 50 * (1 + 0.075 * Math.cos(12 * t)); d += `${i ? 'L' : 'M'}${(50 + r * Math.cos(t) / 1.075).toFixed(1)} ${(50 + r * Math.sin(t) / 1.075).toFixed(1)}` }
+  return d + 'Z'
+})()
+
 function ThayGiang({ ban }: { ban: BanKinh }) {
   if (!ban.thanChu.length && !ban.thayNoi && !ban.meo) return null
   return (
     <section className="lgk-the" aria-label="Thầy giảng dạng này">
       <span className="lgk-nhan">Thầy giảng dạng này</span>
-      {ban.thanChu.length > 0 && <div className="lgk-tc-hang">{ban.thanChu.map((t, i) => <div key={i} className="lgk-tc"><small>Thần chú của thầy</small><b>{t}</b></div>)}</div>}
-      {ban.thayNoi && <div className="lgk-thay-noi"><span className="lgk-av" aria-hidden="true">Đ</span><div className="lgk-bong"><small>Thầy nói</small><Chu chu={chuSgk(ban.thayNoi)} /></div></div>}
+      {ban.thanChu.length > 0 && <div className="lgk-tc-hang">{ban.thanChu.map((t, i) => <div key={i} className="lgk-tc"><small>Thần chú của thầy</small><b>{t}</b>{THAN_CHU_DUNG[t] && <span>Dùng khi: {THAN_CHU_DUNG[t]}</span>}</div>)}</div>}
+      {ban.thayNoi && <div className="lgk-thay-noi"><span className="lgk-av" aria-hidden="true"><svg viewBox="0 0 100 100"><path d={BANH} /></svg><b>Đ</b></span><div className="lgk-bong"><small>Thầy nói</small><Chu chu={chuSgk(ban.thayNoi)} /></div></div>}
       {ban.meo && ban.meo !== ban.thayNoi && <div className="lgk-meo"><small>Mẹo của thầy</small><Chu chu={chuSgk(ban.meo)} /></div>}
     </section>
   )
