@@ -1,0 +1,676 @@
+[
+  {
+    "i": 1110,
+    "hash": "c7640157e5b9dab49b5c721bdfe60880a390cb4bf68f4c5add785e5bcd7b16d3",
+    "fileNguon": "anh/c7640157e5b9dab49b5c721bdfe60880a390cb4bf68f4c5add785e5bcd7b16d3.png",
+    "canvas": [
+      614,
+      438
+    ],
+    "daMoNative": true,
+    "kind": "enzyme-pH-graph",
+    "xLabel": "pH",
+    "yLabel": "Hiệu suất phản ứng",
+    "xTicks": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "labels": [
+      "(1)",
+      "(2)",
+      "(3)"
+    ],
+    "notes": "3curveđenNÉTLIỀN:(1)nhánhtráipeakgầnpH1,8rồiđuôixuống0ởpH4;(2)nhánhgiữabắtđầu~pH4,8,peak~7,1,đuôidướiphảikếtthúc~9,6;(3)nhánhphảibắtđầutừgần0pH5,8,peak~10,rồigiảmtớipH11,6chưavề0. Curve2/3cắtnhau~pH8,3. Giữnhãn(1)trêncurve1,(2)trêncurve2,(3)trêncurve3;khôngtựđặttênenzyme theođápán. Ykhôngtick/số;khôngguide;2trụcmũitên. Cả2nguồnđãmởriêngcùngnộidung.",
+    "questions": [
+      {
+        "qid": "12-C3-B10-D2-III-15",
+        "de": "Enzyme là các protein xúc tác sinh học, giúp tăng tốc độ các phản ứng sinh hoá trong cơ thể như quá trình tiêu hoá, chuyển hoá năng lượng,... Trong cơ thể, trypsin là enzyme được tiết vào ruột non giúp thuỷ phân các peptide thành amino acid và hoạt động thuận lợi ở pH khoảng 7,5 – 8,5; arginase là enzyme xúc tác quá trình thuỷ phân arginine (chủ yếu diễn ra ở gan) thành ornithine và hoạt động tối ưu ở pH khoảng 9,5; pepsin là enzyme có trong dạ dày, xúc tác quá trình phân giải protein thành các peptide ngắn, hoạt động tối ưu ở môi trường acid với pH khoảng 1,5 – 2,0.\nHiệu suất xúc tác của các enzyme trypsin, arginase, pepsin (được đánh số ngẫu nhiên từ 1 đến 3) theo ảnh hưởng pH của môi trường được minh hoạ ở đồ thị sau.\nXác định bộ gồm ba số, lần lượt ứng với pepsin, arginase, trypsin.",
+        "refs": [
+          {
+            "where": "12-C3-B10-D2-III-15.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P2-D2-III-12",
+        "de": "Enzyme là các protein xúc tác sinh học, giúp tăng tốc độ các phản ứng sinh hoá trong cơ thể như quá trình tiêu hoá, chuyển hoá năng lượng,... Trong cơ thể, trypsin là enzyme được tiết vào ruột non giúp thuỷ phân các peptide thành amino acid và hoạt động thuận lợi ở pH khoảng 7,5 – 8,5; arginase là enzyme xúc tác quá trình thuỷ phân arginine (chủ yếu diễn ra ở gan) thành ornithine và hoạt động tối ưu ở pH khoảng 9,5; pepsin là enzyme có trong dạ dày, xúc tác quá trình phân giải protein thành các peptide ngắn, hoạt động tối ưu ở môi trường acid với pH khoảng 1,5 – 2,0.\nHiệu suất xúc tác của các enzyme trypsin, arginase, pepsin (được đánh số ngẫu nhiên từ 1 đến 3) theo ảnh hưởng pH của môi trường được minh hoạ ở đồ thị sau.\nXác định bộ gồm ba số, lần lượt ứng với pepsin, arginase, trypsin.",
+        "refs": [
+          {
+            "where": "DB-12-B9-P2-D2-III-12.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "axes": {
+      "origin": [
+        76,
+        347
+      ],
+      "xArrowHead": [
+        584,
+        347
+      ],
+      "yArrowHead": [
+        76,
+        38
+      ],
+      "xTicks": [
+        [
+          1,
+          80
+        ],
+        [
+          2,
+          120
+        ],
+        [
+          3,
+          164
+        ],
+        [
+          4,
+          208
+        ],
+        [
+          5,
+          252
+        ],
+        [
+          6,
+          295
+        ],
+        [
+          7,
+          340
+        ],
+        [
+          8,
+          383
+        ],
+        [
+          9,
+          426
+        ],
+        [
+          10,
+          470
+        ],
+        [
+          11,
+          514
+        ],
+        [
+          12,
+          558
+        ]
+      ],
+      "xLabelAnchor": [
+        307,
+        396
+      ],
+      "yLabelAnchor": [
+        45,
+        200
+      ],
+      "yTicks": []
+    },
+    "curves": [
+      {
+        "label": "(1)",
+        "peak": [
+          109,
+          65
+        ],
+        "captionAnchor": [
+          103,
+          47
+        ],
+        "samples": [
+          [
+            78,
+            200
+          ],
+          [
+            90,
+            129
+          ],
+          [
+            100,
+            81
+          ],
+          [
+            109,
+            65
+          ],
+          [
+            120,
+            89
+          ],
+          [
+            130,
+            136
+          ],
+          [
+            140,
+            222
+          ],
+          [
+            150,
+            286
+          ],
+          [
+            170,
+            325
+          ],
+          [
+            190,
+            340
+          ],
+          [
+            208,
+            347
+          ]
+        ]
+      },
+      {
+        "label": "(2)",
+        "peak": [
+          344,
+          58
+        ],
+        "captionAnchor": [
+          343,
+          47
+        ],
+        "samples": [
+          [
+            245,
+            310
+          ],
+          [
+            270,
+            245
+          ],
+          [
+            300,
+            159
+          ],
+          [
+            320,
+            99
+          ],
+          [
+            334,
+            66
+          ],
+          [
+            344,
+            58
+          ],
+          [
+            360,
+            82
+          ],
+          [
+            380,
+            128
+          ],
+          [
+            395,
+            164
+          ],
+          [
+            410,
+            203
+          ],
+          [
+            430,
+            259
+          ],
+          [
+            450,
+            320
+          ],
+          [
+            454,
+            328
+          ]
+        ]
+      },
+      {
+        "label": "(3)",
+        "peak": [
+          470,
+          73
+        ],
+        "captionAnchor": [
+          461,
+          51
+        ],
+        "samples": [
+          [
+            283,
+            347
+          ],
+          [
+            300,
+            344
+          ],
+          [
+            320,
+            332
+          ],
+          [
+            345,
+            291
+          ],
+          [
+            360,
+            259
+          ],
+          [
+            380,
+            209
+          ],
+          [
+            395,
+            171
+          ],
+          [
+            410,
+            139
+          ],
+          [
+            430,
+            104
+          ],
+          [
+            450,
+            79
+          ],
+          [
+            470,
+            73
+          ],
+          [
+            490,
+            84
+          ],
+          [
+            510,
+            114
+          ],
+          [
+            533,
+            158
+          ]
+        ]
+      }
+    ],
+    "curveCount": 3,
+    "guides": [],
+    "evidence": "MởRIÊNGnative1110 vàđọcpixelslicesđenđểneo3curve. Curve(1)starttrên0tạiXtrục,kếtthúcởtick4;(2)startX~4,8trên0khôngkéodàiđếngốc,kếtthúc~9,6chưachạmtrục;(3)startgầnX5,8y0,kếtthúc~11,6trên0. Chỉlabel(1)/(2)/(3),khôngtênenzyme. Khôngguide/Yticks. Native1110và1202cùngngữcảnhnhưngbốtrítỉlệXkhácnênchỉsharesemantictemplatephảigiữtick/peakrelative.",
+    "svg": "enzyme-ph-ddh-be6962fca4141300cd3efc3cfb584b64e006f4730a7d7845f5cc1dc75bc1e220.svg",
+    "hashSvg": "be6962fca4141300cd3efc3cfb584b64e006f4730a7d7845f5cc1dc75bc1e220",
+    "byteSvg": 29477,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "MỗiPNGdùnganchorsriêng/PCHIP;giữ3curve/nhãn(1)(2)(3)/label1..12/tickmarks2..12/2arrow,khôngyTicks/guide/tênenzyme.",
+    "hashSvgDaSoat": "be6962fca4141300cd3efc3cfb584b64e006f4730a7d7845f5cc1dc75bc1e220",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 1202,
+    "hash": "d9e513aa2a09659848c4e5f56473efb3186bca2f5aa757fa02b9d00045b6b69d",
+    "fileNguon": "anh/d9e513aa2a09659848c4e5f56473efb3186bca2f5aa757fa02b9d00045b6b69d.png",
+    "canvas": [
+      613,
+      419
+    ],
+    "daMoNative": true,
+    "kind": "enzyme-pH-graph",
+    "xLabel": "pH",
+    "yLabel": "Hiệu suất phản ứng",
+    "xTicks": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "labels": [
+      "(1)",
+      "(2)",
+      "(3)"
+    ],
+    "notes": "3curveđenNÉTLIỀN:(1)nhánhtráipeakgầnpH1,8rồiđuôixuống0ởpH4;(2)nhánhgiữabắtđầu~pH4,8,peak~7,1,đuôidướiphảikếtthúc~9,6;(3)nhánhphảibắtđầutừgần0pH5,8,peak~10,rồigiảmtớipH11,6chưavề0. Curve2/3cắtnhau~pH8,3. Giữnhãn(1)trêncurve1,(2)trêncurve2,(3)trêncurve3;khôngtựđặttênenzyme theođápán. Ykhôngtick/số;khôngguide;2trụcmũitên. Cả2nguồnđãmởriêngcùngnộidung.",
+    "questions": [
+      {
+        "qid": "DB-12-B9-P2-D2-III-100",
+        "de": "Enzyme là các protein xúc tác sinh học, giúp tăng tốc độ các phản ứng sinh hoá trong cơ thể như quá trình tiêu hoá, chuyển hoá năng lượng,.\nTrong cơ thể, trypsin là enzyme được tiết vào ruột non giúp thuỷ phân các peptide thành amino acid và hoạt động thuận lợi ở pH khoảng 7,5 - 8,5; arginase là enzyme xúc tác quá trình thuỷ phân arginine (chủ yếu diễn ra ở gan) thành ornithine và hoạt động tối ưu ở pH khoảng 9,5; pepsin là enzyme có trong dạ dày, xúc tác quá trình phân giải protein thành các peptide ngắn, hoạt động tối ưu ở môi trường acid với pH khoảng 1,5 - 2,0.\nHiệu suất xúc tác của các enzyme trypsin, arginase, pepsin (được đánh số ngẫu nhiên từ 1 đến 3) theo ảnh hưởng pH của môi trường được minh hoạ ở đồ thị sau.\nXác định bộ gồm ba số, lần lượt ứng với pepsin, arginase, trypsin.",
+        "refs": [
+          {
+            "where": "DB-12-B9-P2-D2-III-100.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B10-III-15",
+        "de": "Enzyme là các protein xúc tác sinh học, giúp tăng tốc độ các phản ứng sinh hoá trong cơ thể như quá trình tiêu hoá, chuyển hoá năng lượng,.\nTrong cơ thể, trypsin là enzyme được tiết vào ruột non giúp thuỷ phân các peptide thành amino acid và hoạt động thuận lợi ở pH khoảng 7,5 - 8,5; arginase là enzyme xúc tác quá trình thuỷ phân arginine (chủ yếu diễn ra ở gan) thành ornithine và hoạt động tối ưu ở pH khoảng 9,5; pepsin là enzyme có trong dạ dày, xúc tác quá trình phân giải protein thành các peptide ngắn, hoạt động tối ưu ở môi trường acid với pH khoảng 1,5 - 2,0.\nHiệu suất xúc tác của các enzyme trypsin, arginase, pepsin (được đánh số ngẫu nhiên từ 1 đến 3) theo ảnh hưởng pH của môi trường được minh hoạ ở đồ thị sau.\nXác định bộ gồm ba số, lần lượt ứng với pepsin, arginase, trypsin.",
+        "refs": [
+          {
+            "where": "DH-12-C3-B10-III-15.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "axes": {
+      "origin": [
+        53,
+        349
+      ],
+      "xArrowHead": [
+        609,
+        349
+      ],
+      "yArrowHead": [
+        53,
+        12
+      ],
+      "xTicks": [
+        [
+          1,
+          56
+        ],
+        [
+          2,
+          101
+        ],
+        [
+          3,
+          150
+        ],
+        [
+          4,
+          198
+        ],
+        [
+          5,
+          246
+        ],
+        [
+          6,
+          294
+        ],
+        [
+          7,
+          342
+        ],
+        [
+          8,
+          390
+        ],
+        [
+          9,
+          437
+        ],
+        [
+          10,
+          485
+        ],
+        [
+          11,
+          533
+        ],
+        [
+          12,
+          582
+        ]
+      ],
+      "xLabelAnchor": [
+        306,
+        403
+      ],
+      "yLabelAnchor": [
+        21,
+        192
+      ],
+      "yTicks": []
+    },
+    "curves": [
+      {
+        "label": "(1)",
+        "peak": [
+          89,
+          41
+        ],
+        "captionAnchor": [
+          83,
+          21
+        ],
+        "samples": [
+          [
+            54,
+            191
+          ],
+          [
+            70,
+            99
+          ],
+          [
+            80,
+            54
+          ],
+          [
+            89,
+            41
+          ],
+          [
+            100,
+            63
+          ],
+          [
+            110,
+            108
+          ],
+          [
+            120,
+            183
+          ],
+          [
+            130,
+            264
+          ],
+          [
+            145,
+            310
+          ],
+          [
+            165,
+            333
+          ],
+          [
+            185,
+            344
+          ],
+          [
+            198,
+            349
+          ]
+        ]
+      },
+      {
+        "label": "(2)",
+        "peak": [
+          346,
+          33
+        ],
+        "captionAnchor": [
+          347,
+          22
+        ],
+        "samples": [
+          [
+            238,
+            310
+          ],
+          [
+            270,
+            226
+          ],
+          [
+            300,
+            140
+          ],
+          [
+            325,
+            66
+          ],
+          [
+            338,
+            39
+          ],
+          [
+            346,
+            33
+          ],
+          [
+            355,
+            40
+          ],
+          [
+            365,
+            59
+          ],
+          [
+            390,
+            117
+          ],
+          [
+            405,
+            153
+          ],
+          [
+            425,
+            206
+          ],
+          [
+            445,
+            262
+          ],
+          [
+            465,
+            323
+          ],
+          [
+            467,
+            329
+          ]
+        ]
+      },
+      {
+        "label": "(3)",
+        "peak": [
+          485,
+          48
+        ],
+        "captionAnchor": [
+          476,
+          25
+        ],
+        "samples": [
+          [
+            281,
+            349
+          ],
+          [
+            300,
+            345
+          ],
+          [
+            325,
+            328
+          ],
+          [
+            346,
+            292
+          ],
+          [
+            365,
+            253
+          ],
+          [
+            390,
+            190
+          ],
+          [
+            405,
+            154
+          ],
+          [
+            425,
+            112
+          ],
+          [
+            445,
+            78
+          ],
+          [
+            465,
+            55
+          ],
+          [
+            485,
+            48
+          ],
+          [
+            505,
+            58
+          ],
+          [
+            525,
+            86
+          ],
+          [
+            555,
+            142
+          ]
+        ]
+      }
+    ],
+    "curveCount": 3,
+    "guides": [],
+    "evidence": "MởRIÊNGnative1202 vàđọcpixelslicesđenđểneo3curve. Curve(1)starttrên0tạiXtrục,kếtthúcởtick4;(2)startX~4,8trên0khôngkéodàiđếngốc,kếtthúc~9,6chưachạmtrục;(3)startgầnX5,8y0,kếtthúc~11,6trên0. Chỉlabel(1)/(2)/(3),khôngtênenzyme. Khôngguide/Yticks. Native1110và1202cùngngữcảnhnhưngbốtrítỉlệXkhácnênchỉsharesemantictemplatephảigiữtick/peakrelative.",
+    "svg": "enzyme-ph-ddh-a3b68132b53288bc023ac021aaf58a2353610ba9cfc692fbce8d512d67c7f8b1.svg",
+    "hashSvg": "a3b68132b53288bc023ac021aaf58a2353610ba9cfc692fbce8d512d67c7f8b1",
+    "byteSvg": 30143,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "MỗiPNGdùnganchorsriêng/PCHIP;giữ3curve/nhãn(1)(2)(3)/label1..12/tickmarks2..12/2arrow,khôngyTicks/guide/tênenzyme.",
+    "hashSvgDaSoat": "a3b68132b53288bc023ac021aaf58a2353610ba9cfc692fbce8d512d67c7f8b1",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

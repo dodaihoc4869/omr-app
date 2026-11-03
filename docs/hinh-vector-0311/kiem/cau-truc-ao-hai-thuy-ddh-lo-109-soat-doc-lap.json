@@ -1,0 +1,18 @@
+[
+  {
+    "i": 593,
+    "hashSvg": "8227f5b77f50b1e53ade737241e6926657aef9a2736b6fc6d352fa4c0b691306",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã đọc doc-khep-ao-lo-109.json và mở RIÊNG PNG native + SVG render thật. Hai thùy chéo: trắng phải-trên/xám trái-dưới; trục x chéo có arrow xám trái-dưới, y arrow đen phải, z arrow đen lên. Thùy che đoạn x trong hai thùy và đoạn z gần tâm phía trên, giữ các đoạn trục lộ đúng nguồn. Gradient tô bóng chỉ một thùy xám, không thùy mới; đủ x/y/z DDH path, không thêm phase/caption/tên AO/nét đứt. Gaps và bounds rõ, không cắt/chạm/tràn; tự chứa không text/image/fallback. Hash byte thực khớp metadata.",
+    "hash": "6e37803f3fa72e12ba550e9555282afacefd4420010be79944d87d7e10c3043d",
+    "hashSvgDaSoat": "8227f5b77f50b1e53ade737241e6926657aef9a2736b6fc6d352fa4c0b691306"
+  },
+  {
+    "i": 1279,
+    "hashSvg": "7f358a9a11bff9f35fb4088a0b026ab1c404bb5e9f09e6480ae3cc52640dd52c",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã đọc doc-khep-ao-lo-109.json và mở RIÊNG PNG native + SVG render thật. Hai thùy gần ngang: trắng trái/xám phải; trục x chéo arrow đen trái-dưới, y arrow xám phải, z arrow đen lên. Y bị che trong cả hai thùy, x đoạn gần tâm phía phải bị thùy xám che, đoạn trái-dưới lộ đúng nguồn. Gradient tô bóng chỉ một thùy xám, không thùy mới; đủ x/y/z DDH path, không thêm phase/caption/tên AO/nét đứt. Gaps và bounds rõ, không cắt/chạm/tràn; tự chứa không text/image/fallback. Hash byte thực khớp metadata.",
+    "hash": "e8685f1fb27b587d9e9fd1e4e51d16fd81ea3bcb8977e2fe54f24ce1c40ad00e",
+    "hashSvgDaSoat": "7f358a9a11bff9f35fb4088a0b026ab1c404bb5e9f09e6480ae3cc52640dd52c"
+  }
+]

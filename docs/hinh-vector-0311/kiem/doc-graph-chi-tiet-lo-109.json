@@ -256,5 +256,1839 @@
       88
     ],
     "evidence": "Đãmởnative637+zoom4x,đọcngưỡngpixelđenở16cộtđểxácnhậncurve. Hai plateaukhác1và0,5,guideđúngcùngmức. Giữtăngtiệmcậntrên/giảmtiệmcậndưới,khôngnốivềcùngplateau."
+  },
+  {
+    "i": 1095,
+    "hash": "c57d05735018f4fcb959f5616e1615e832548702fe760b54db0c78a76cf464dd",
+    "fileNguon": "anh/c57d05735018f4fcb959f5616e1615e832548702fe760b54db0c78a76cf464dd.png",
+    "canvas": [
+      429,
+      305
+    ],
+    "daMoNative": true,
+    "kind": "graph-haber-yield",
+    "xLabel": "Áp suất (atm)",
+    "yLabel": "Hiệu suất (%)",
+    "xTicks": [
+      0,
+      100,
+      200,
+      300,
+      400
+    ],
+    "yTicks": [
+      0,
+      10,
+      20,
+      30,
+      40,
+      50,
+      60,
+      70
+    ],
+    "curvesTopToBottom": [
+      "350 °C",
+      "400 °C",
+      "450 °C",
+      "500 °C",
+      "550 °C"
+    ],
+    "notes": "5curveđềuđi từorigin,tăngconglõmxuống,plateauphảikhácnhau.Top350°Ccao~64%,400°C~53%,450°C~43%,500°C~32%,550°C~22% chỉlàđọchìnhKHÔNGnhãnsốthêm. Mỗiđườngphảicóchấmrỗng ởx~450atm (native329) rồinốingangđếnhộpxámlabelnhiệtđộ trắng. Gridchấmx/ytheobước50atm/10%,tickxchỉ0..400. Khôngtựthêm450xtick. Phảibảođảm5labelđúngthứtự/curvenốirõ.",
+    "questions": [
+      {
+        "qid": "DB-11-B5-D1-II-22",
+        "de": "Trong công nghiệp, Ammonia được tổng hợp từ nitrogen và hydrogen theo phương pháp Haber-Bosch. Phản ứng tổng hợp ammonia: N₂ (g) + 3H₂ (g) ⇋ 2NH₃ (g) ΔrH°₂₉₈ = – 91,8kJ Kết quả nghiên cứu sự phụ thuộc của hiệu suất tổng hợp ammonia vào áp suất và nhiệt độ của phản ứng được thể hiện ở giản đồ trong hình dưới đây:",
+        "refs": [
+          {
+            "where": "DB-11-B5-D1-II-22.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-11-B5-D1-II-29",
+        "de": "Trong công nghiệp, ammonia được tổng hợp từ nitrogen và hydrogen theo phương pháp Haber-Bosch:\nN₂(g) + 3H₂(g) ⇌ 2NH₃(g), ΔrH°₂₉₈ = −91,8 kJ\nKết quả nghiên cứu sự phụ thuộc của hiệu suất tổng hợp ammonia vào áp suất và nhiệt độ được thể hiện ở giản đồ trong hình dưới đây.",
+        "refs": [
+          {
+            "where": "DB-11-B5-D1-II-29.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B5-II-18",
+        "de": "Trong công nghiệp, Ammonia được tổng hợp từ nitrogen và hydrogen theo phương pháp Haber-Bosch. Phản ứng tổng hợp ammonia: N₂ (g) + 3H₂ (g) ⇋ 2NH₃ (g) ΔrH°₂₉₈ = – 91,8kJ Kết quả nghiên cứu sự phụ thuộc của hiệu suất tổng hợp ammonia vào áp suất và nhiệt độ của phản ứng được thể hiện ở giản đồ trong hình dưới đây:",
+        "refs": [
+          {
+            "where": "DH-11-C2-B5-II-18.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B9-D1-II-1",
+        "de": "Trong công nghiệp, ammonia được tổng hợp từ nitrogen và hydrogen theo phương pháp Haber-Bosch:\nN₂(g) + 3H₂(g) ⇌ 2NH₃(g), ΔrH°₂₉₈ = −91,8 kJ\nKết quả nghiên cứu sự phụ thuộc của hiệu suất tổng hợp ammonia vào áp suất và nhiệt độ được thể hiện ở giản đồ trong hình dưới đây.",
+        "refs": [
+          {
+            "where": "DH-11-C2-B9-D1-II-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "axes": {
+      "origin": [
+        45,
+        275
+      ],
+      "xArrowHead": [
+        366,
+        275
+      ],
+      "yArrowHead": [
+        45,
+        4
+      ],
+      "xTicks": [
+        [
+          0,
+          45
+        ],
+        [
+          100,
+          108
+        ],
+        [
+          200,
+          171
+        ],
+        [
+          300,
+          234
+        ],
+        [
+          400,
+          297
+        ]
+      ],
+      "yTicks": [
+        [
+          0,
+          275
+        ],
+        [
+          10,
+          239
+        ],
+        [
+          20,
+          204
+        ],
+        [
+          30,
+          169
+        ],
+        [
+          40,
+          134
+        ],
+        [
+          50,
+          100
+        ],
+        [
+          60,
+          65
+        ],
+        [
+          70,
+          30
+        ]
+      ],
+      "xLabelAnchor": [
+        372,
+        291
+      ],
+      "yLabelAnchor": [
+        8,
+        155
+      ]
+    },
+    "grid": {
+      "style": "dotted grey",
+      "verticalXs": [
+        45,
+        77,
+        108,
+        140,
+        171,
+        203,
+        234,
+        266,
+        297,
+        329,
+        360
+      ],
+      "horizontalYs": [
+        30,
+        65,
+        100,
+        134,
+        169,
+        204,
+        239,
+        275
+      ]
+    },
+    "curves": [
+      {
+        "label": "350 °C",
+        "samples": [
+          [
+            45,
+            275
+          ],
+          [
+            60,
+            204
+          ],
+          [
+            80,
+            168
+          ],
+          [
+            100,
+            143
+          ],
+          [
+            140,
+            108
+          ],
+          [
+            180,
+            85
+          ],
+          [
+            220,
+            69
+          ],
+          [
+            260,
+            59
+          ],
+          [
+            300,
+            53
+          ],
+          [
+            329,
+            53
+          ],
+          [
+            359,
+            53
+          ]
+        ],
+        "endOpenCircle": [
+          329,
+          53
+        ],
+        "legendBox": [
+          365,
+          39,
+          420,
+          66
+        ],
+        "legendNotch": [
+          358,
+          53
+        ],
+        "legendTextAnchor": [
+          392,
+          53
+        ]
+      },
+      {
+        "label": "400 °C",
+        "samples": [
+          [
+            45,
+            275
+          ],
+          [
+            60,
+            216
+          ],
+          [
+            80,
+            185
+          ],
+          [
+            100,
+            165
+          ],
+          [
+            140,
+            136
+          ],
+          [
+            180,
+            116
+          ],
+          [
+            220,
+            103
+          ],
+          [
+            260,
+            95
+          ],
+          [
+            300,
+            90
+          ],
+          [
+            329,
+            89
+          ],
+          [
+            359,
+            89
+          ]
+        ],
+        "endOpenCircle": [
+          329,
+          89
+        ],
+        "legendBox": [
+          365,
+          75,
+          420,
+          102
+        ],
+        "legendNotch": [
+          358,
+          89
+        ],
+        "legendTextAnchor": [
+          392,
+          89
+        ]
+      },
+      {
+        "label": "450 °C",
+        "samples": [
+          [
+            45,
+            275
+          ],
+          [
+            60,
+            227
+          ],
+          [
+            80,
+            202
+          ],
+          [
+            100,
+            185
+          ],
+          [
+            140,
+            162
+          ],
+          [
+            180,
+            146
+          ],
+          [
+            220,
+            136
+          ],
+          [
+            260,
+            129
+          ],
+          [
+            300,
+            125
+          ],
+          [
+            329,
+            125
+          ],
+          [
+            359,
+            125
+          ]
+        ],
+        "endOpenCircle": [
+          329,
+          125
+        ],
+        "legendBox": [
+          365,
+          111,
+          420,
+          138
+        ],
+        "legendNotch": [
+          358,
+          125
+        ],
+        "legendTextAnchor": [
+          392,
+          125
+        ]
+      },
+      {
+        "label": "500 °C",
+        "samples": [
+          [
+            45,
+            275
+          ],
+          [
+            60,
+            238
+          ],
+          [
+            80,
+            220
+          ],
+          [
+            100,
+            207
+          ],
+          [
+            140,
+            189
+          ],
+          [
+            180,
+            177
+          ],
+          [
+            220,
+            168
+          ],
+          [
+            260,
+            163
+          ],
+          [
+            300,
+            160
+          ],
+          [
+            329,
+            161
+          ],
+          [
+            359,
+            161
+          ]
+        ],
+        "endOpenCircle": [
+          329,
+          161
+        ],
+        "legendBox": [
+          365,
+          147,
+          420,
+          174
+        ],
+        "legendNotch": [
+          358,
+          161
+        ],
+        "legendTextAnchor": [
+          392,
+          161
+        ]
+      },
+      {
+        "label": "550 °C",
+        "samples": [
+          [
+            45,
+            275
+          ],
+          [
+            60,
+            250
+          ],
+          [
+            80,
+            237
+          ],
+          [
+            100,
+            228
+          ],
+          [
+            140,
+            216
+          ],
+          [
+            180,
+            207
+          ],
+          [
+            220,
+            202
+          ],
+          [
+            260,
+            198
+          ],
+          [
+            300,
+            196
+          ],
+          [
+            329,
+            196
+          ],
+          [
+            359,
+            196
+          ]
+        ],
+        "endOpenCircle": [
+          329,
+          196
+        ],
+        "legendBox": [
+          365,
+          182,
+          420,
+          209
+        ],
+        "legendNotch": [
+          358,
+          196
+        ],
+        "legendTextAnchor": [
+          392,
+          196
+        ]
+      }
+    ],
+    "curveCount": 5,
+    "evidence": "Mởnative1095riêng;đen/xámcurveđượcso16cộtpixelvớigridphânbiệt. Cácsamplelàgeometrypixel,khôngtựin%sốtrêncurve. x329làcirclechấmrỗngcógridđứngcắt,khôngnhầmgridvớipeak."
+  },
+  {
+    "i": 1330,
+    "hash": "f0ff7a9971369d5005a08982236acd16ba6091ca5f61339473ee3ae0950015c4",
+    "fileNguon": "anh/f0ff7a9971369d5005a08982236acd16ba6091ca5f61339473ee3ae0950015c4.png",
+    "canvas": [
+      945,
+      601
+    ],
+    "daMoNative": true,
+    "kind": "graph-three-concentration",
+    "xLabel": "Thời gian phản ứng",
+    "yLabel": "Nồng độ (M)",
+    "yTicks": [
+      "0",
+      "0,5",
+      "1,0",
+      "1,5",
+      "2,0"
+    ],
+    "notes": "Curve(1)đen giảm từ2,0→plateau~1,2;curve(2)xám giảm từ2,0→plateau0,5;curve(3)đen tăng từorigin→plateau1,5. Giữnhãn(1)trênnhánhgiảmđen,(2)trênnhánhgiảmxámgiữa,(3)trênnhánhtăngphải. 4dóngngangđứt y0,5/1,0/1,5/2,0. t₁xtickduynhấtvàđườngdóngdọcđứttừtrụcXđếnngãcurve(2)/(3) khoảngy0,9 (khôngtựépvào1,0). Hai curveđen(1)/(3)cắtnhautạixlớnhơnt₁. Khôngnốinhầm3curve/khôngđổi0,5thành0,68.",
+    "questions": [
+      {
+        "qid": "11-C1-B1-II-18",
+        "de": "Cho phản ứng thuận nghịch sau:\n2NO (g) + O₂ (g) ⇌ 2NO₂ (g) (*).\nCho biết thành phần ban đầu chỉ có NO và O₂. Sự thay đổi nồng độ các chất theo thời gian phản ứng được biểu diễn bởi đồ thị trong Hình 1.2.",
+        "refs": [
+          {
+            "where": "11-C1-B1-II-18.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-11-B1-D1-II-81",
+        "de": "Cho phản ứng thuận nghịch sau:\n2NO (g) + O₂ (g) ⇌ 2NO₂ (g) (*).\nCho biết thành phần ban đầu chỉ có NO và O₂. Sự thay đổi nồng độ các chất theo thời gian phản ứng được biểu diễn bởi đồ thị trong Hình 1.2.",
+        "refs": [
+          {
+            "where": "DB-11-B1-D1-II-81.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "axes": {
+      "origin": [
+        168,
+        450
+      ],
+      "xArrowHead": [
+        779,
+        450
+      ],
+      "yArrowHead": [
+        168,
+        71
+      ],
+      "xTicks": [
+        {
+          "value": "0",
+          "at": [
+            168,
+            450
+          ]
+        },
+        {
+          "value": "t₁",
+          "at": [
+            274,
+            450
+          ]
+        }
+      ],
+      "yTicks": [
+        [
+          "2,0",
+          174
+        ],
+        [
+          "1,5",
+          245
+        ],
+        [
+          "1,0",
+          315
+        ],
+        [
+          "0,5",
+          385
+        ]
+      ],
+      "xLabelAnchor": [
+        616,
+        489
+      ],
+      "yLabelAnchor": [
+        88,
+        293
+      ]
+    },
+    "guides": [
+      {
+        "from": [
+          168,
+          174
+        ],
+        "to": [
+          758,
+          174
+        ],
+        "style": "dashed"
+      },
+      {
+        "from": [
+          168,
+          245
+        ],
+        "to": [
+          758,
+          245
+        ],
+        "style": "dashed"
+      },
+      {
+        "from": [
+          168,
+          315
+        ],
+        "to": [
+          758,
+          315
+        ],
+        "style": "dashed"
+      },
+      {
+        "from": [
+          168,
+          385
+        ],
+        "to": [
+          758,
+          385
+        ],
+        "style": "dashed"
+      },
+      {
+        "from": [
+          274,
+          450
+        ],
+        "to": [
+          274,
+          329
+        ],
+        "style": "dashed"
+      }
+    ],
+    "curves": [
+      {
+        "label": "(1)",
+        "color": "black",
+        "labelAnchor": [
+          248,
+          210
+        ],
+        "samples": [
+          [
+            168,
+            174
+          ],
+          [
+            180,
+            186
+          ],
+          [
+            220,
+            221
+          ],
+          [
+            275,
+            255
+          ],
+          [
+            350,
+            278
+          ],
+          [
+            425,
+            284
+          ],
+          [
+            500,
+            286
+          ],
+          [
+            600,
+            286
+          ],
+          [
+            700,
+            284
+          ],
+          [
+            750,
+            284
+          ]
+        ]
+      },
+      {
+        "label": "(2)",
+        "color": "grey",
+        "labelAnchor": [
+          466,
+          346
+        ],
+        "samples": [
+          [
+            168,
+            174
+          ],
+          [
+            180,
+            204
+          ],
+          [
+            220,
+            271
+          ],
+          [
+            250,
+            306
+          ],
+          [
+            275,
+            330
+          ],
+          [
+            300,
+            342
+          ],
+          [
+            350,
+            355
+          ],
+          [
+            400,
+            360
+          ],
+          [
+            450,
+            366
+          ],
+          [
+            500,
+            370
+          ],
+          [
+            600,
+            376
+          ],
+          [
+            700,
+            380
+          ],
+          [
+            758,
+            381
+          ]
+        ]
+      },
+      {
+        "label": "(3)",
+        "color": "black",
+        "labelAnchor": [
+          686,
+          225
+        ],
+        "samples": [
+          [
+            168,
+            450
+          ],
+          [
+            180,
+            435
+          ],
+          [
+            220,
+            387
+          ],
+          [
+            250,
+            352
+          ],
+          [
+            275,
+            329
+          ],
+          [
+            300,
+            309
+          ],
+          [
+            350,
+            278
+          ],
+          [
+            400,
+            263
+          ],
+          [
+            450,
+            257
+          ],
+          [
+            500,
+            254
+          ],
+          [
+            600,
+            250
+          ],
+          [
+            700,
+            247
+          ],
+          [
+            748,
+            247
+          ]
+        ]
+      }
+    ],
+    "curveCount": 3,
+    "crossings": [
+      [
+        "(2)",
+        "(3)",
+        [
+          275,
+          330
+        ]
+      ],
+      [
+        "(1)",
+        "(3)",
+        [
+          350,
+          278
+        ]
+      ]
+    ],
+    "evidence": "Native1330riêng,kiểmpixelblack/greyđểgiữ3curvephânbiệt;C1C3crosssaut₁khôngtrùngt₁. Curve2làxámđậm,hìnhnguồnyaxisnotperfectlinear;anchorslàpixelkhôngdữliệuhóahọcthêm."
+  },
+  {
+    "i": 766,
+    "hash": "8ee1083bffb46588288c1d0e64fd6e9265db847d86bfb098ac3df1f16ca6969a",
+    "fileNguon": "anh/8ee1083bffb46588288c1d0e64fd6e9265db847d86bfb098ac3df1f16ca6969a.png",
+    "canvas": [
+      623,
+      346
+    ],
+    "daMoNative": true,
+    "kind": "energy-enzyme-graph",
+    "xLabel": "Tiến trình phản ứng",
+    "yLabel": "Năng lượng (kJ/mol)",
+    "yTicks": [
+      10,
+      60,
+      85,
+      110
+    ],
+    "labels": [
+      "[Chất đầu]",
+      "[Sản phẩm]",
+      "[Đỉnh không xúc tác]",
+      "[Đỉnh có enzyme xúc tác]",
+      "(110)",
+      "(85)"
+    ],
+    "notes": "2curvebắtđầuy10vàkếtthúcy60cùngmức;curvekhôngxúctácNÉTLIỀNđỉnh110,curvecóenzymeNÉTĐỨTđỉnh85. YaxisnănglượngkJ/mol,XaxisTiếntrìnhphảnứng,mũitêncả2trục. (110)/(85)đặttráigầnđỉnh;2label[Đỉnh...]cóđườngnốingangnhỏtừđỉnhsangphảilabel,KHÔNGmũitên. KhôngthêmhàngràohoạthóasốhayΔH.",
+    "questions": [
+      {
+        "qid": "VIP27-C3-B10-III-6",
+        "de": "Đồ thị dưới đây so sánh năng lượng của một phản ứng thu nhiệt khi có enzyme xúc tác (đường nét đứt) và không có enzyme xúc tác (đường nét liền):\nKhi sử dụng enzyme xúc tác, năng lượng hoạt hóa của phản ứng thuận đã giảm đi bao nhiêu phần trăm (%) so với khi không sử dụng chất xúc tác?",
+        "refs": [
+          {
+            "where": "VIP27-C3-B10-III-6.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "axes": {
+      "origin": [
+        47,
+        330
+      ],
+      "xArrowHead": [
+        421,
+        330
+      ],
+      "yArrowHead": [
+        47,
+        31
+      ],
+      "yTicks": [
+        [
+          10,
+          281
+        ],
+        [
+          60,
+          209
+        ],
+        [
+          85,
+          136
+        ],
+        [
+          110,
+          64
+        ]
+      ],
+      "xTicks": [],
+      "xLabelAnchor": [
+        525,
+        331
+      ],
+      "yLabelAnchor": [
+        111,
+        14
+      ]
+    },
+    "curves": [
+      {
+        "label": "[Đỉnh không xúc tác]",
+        "style": "solid grey",
+        "peak": [
+          241,
+          63
+        ],
+        "peakValueLabel": {
+          "text": "(110)",
+          "at": [
+            185,
+            63
+          ]
+        },
+        "leader": [
+          [
+            241,
+            63
+          ],
+          [
+            267,
+            63
+          ]
+        ],
+        "captionAnchor": [
+          375,
+          65
+        ],
+        "samples": [
+          [
+            48,
+            281
+          ],
+          [
+            90,
+            281
+          ],
+          [
+            110,
+            280
+          ],
+          [
+            130,
+            272
+          ],
+          [
+            150,
+            245
+          ],
+          [
+            170,
+            195
+          ],
+          [
+            190,
+            139
+          ],
+          [
+            210,
+            93
+          ],
+          [
+            230,
+            67
+          ],
+          [
+            241,
+            63
+          ],
+          [
+            250,
+            65
+          ],
+          [
+            270,
+            89
+          ],
+          [
+            290,
+            127
+          ],
+          [
+            310,
+            164
+          ],
+          [
+            330,
+            189
+          ],
+          [
+            350,
+            202
+          ],
+          [
+            370,
+            209
+          ],
+          [
+            410,
+            209
+          ]
+        ]
+      },
+      {
+        "label": "[Đỉnh có enzyme xúc tác]",
+        "style": "dashed grey",
+        "peak": [
+          246,
+          136
+        ],
+        "peakValueLabel": {
+          "text": "(85)",
+          "at": [
+            237,
+            137
+          ]
+        },
+        "leader": [
+          [
+            268,
+            136
+          ],
+          [
+            335,
+            136
+          ]
+        ],
+        "captionAnchor": [
+          462,
+          137
+        ],
+        "samples": [
+          [
+            48,
+            281
+          ],
+          [
+            90,
+            281
+          ],
+          [
+            110,
+            281
+          ],
+          [
+            130,
+            277
+          ],
+          [
+            150,
+            267
+          ],
+          [
+            170,
+            245
+          ],
+          [
+            190,
+            217
+          ],
+          [
+            210,
+            180
+          ],
+          [
+            230,
+            150
+          ],
+          [
+            246,
+            136
+          ],
+          [
+            270,
+            145
+          ],
+          [
+            290,
+            169
+          ],
+          [
+            310,
+            191
+          ],
+          [
+            330,
+            203
+          ],
+          [
+            350,
+            208
+          ],
+          [
+            370,
+            210
+          ],
+          [
+            410,
+            209
+          ]
+        ]
+      }
+    ],
+    "otherLabels": [
+      {
+        "text": "[Chất đầu]",
+        "at": [
+          105,
+          304
+        ]
+      },
+      {
+        "text": "[Sản phẩm]",
+        "at": [
+          398,
+          234
+        ]
+      }
+    ],
+    "curveCount": 2,
+    "evidence": "Mởnative766riêng;2curve đầu10/cuối60,peakliền110/đứt85. Khôngguidehorizontaly10/60trừcurveđầucuối,hailinecaptionpeakkhôngmũitên. Giữmọidấungoặcvuông/vòng."
+  },
+  {
+    "i": 1110,
+    "hash": "c7640157e5b9dab49b5c721bdfe60880a390cb4bf68f4c5add785e5bcd7b16d3",
+    "fileNguon": "anh/c7640157e5b9dab49b5c721bdfe60880a390cb4bf68f4c5add785e5bcd7b16d3.png",
+    "canvas": [
+      614,
+      438
+    ],
+    "daMoNative": true,
+    "kind": "enzyme-pH-graph",
+    "xLabel": "pH",
+    "yLabel": "Hiệu suất phản ứng",
+    "xTicks": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "labels": [
+      "(1)",
+      "(2)",
+      "(3)"
+    ],
+    "notes": "3curveđenNÉTLIỀN:(1)nhánhtráipeakgầnpH1,8rồiđuôixuống0ởpH4;(2)nhánhgiữabắtđầu~pH4,8,peak~7,1,đuôidướiphảikếtthúc~9,6;(3)nhánhphảibắtđầutừgần0pH5,8,peak~10,rồigiảmtớipH11,6chưavề0. Curve2/3cắtnhau~pH8,3. Giữnhãn(1)trêncurve1,(2)trêncurve2,(3)trêncurve3;khôngtựđặttênenzyme theođápán. Ykhôngtick/số;khôngguide;2trụcmũitên. Cả2nguồnđãmởriêngcùngnộidung.",
+    "questions": [
+      {
+        "qid": "12-C3-B10-D2-III-15",
+        "de": "Enzyme là các protein xúc tác sinh học, giúp tăng tốc độ các phản ứng sinh hoá trong cơ thể như quá trình tiêu hoá, chuyển hoá năng lượng,... Trong cơ thể, trypsin là enzyme được tiết vào ruột non giúp thuỷ phân các peptide thành amino acid và hoạt động thuận lợi ở pH khoảng 7,5 – 8,5; arginase là enzyme xúc tác quá trình thuỷ phân arginine (chủ yếu diễn ra ở gan) thành ornithine và hoạt động tối ưu ở pH khoảng 9,5; pepsin là enzyme có trong dạ dày, xúc tác quá trình phân giải protein thành các peptide ngắn, hoạt động tối ưu ở môi trường acid với pH khoảng 1,5 – 2,0.\nHiệu suất xúc tác của các enzyme trypsin, arginase, pepsin (được đánh số ngẫu nhiên từ 1 đến 3) theo ảnh hưởng pH của môi trường được minh hoạ ở đồ thị sau.\nXác định bộ gồm ba số, lần lượt ứng với pepsin, arginase, trypsin.",
+        "refs": [
+          {
+            "where": "12-C3-B10-D2-III-15.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P2-D2-III-12",
+        "de": "Enzyme là các protein xúc tác sinh học, giúp tăng tốc độ các phản ứng sinh hoá trong cơ thể như quá trình tiêu hoá, chuyển hoá năng lượng,... Trong cơ thể, trypsin là enzyme được tiết vào ruột non giúp thuỷ phân các peptide thành amino acid và hoạt động thuận lợi ở pH khoảng 7,5 – 8,5; arginase là enzyme xúc tác quá trình thuỷ phân arginine (chủ yếu diễn ra ở gan) thành ornithine và hoạt động tối ưu ở pH khoảng 9,5; pepsin là enzyme có trong dạ dày, xúc tác quá trình phân giải protein thành các peptide ngắn, hoạt động tối ưu ở môi trường acid với pH khoảng 1,5 – 2,0.\nHiệu suất xúc tác của các enzyme trypsin, arginase, pepsin (được đánh số ngẫu nhiên từ 1 đến 3) theo ảnh hưởng pH của môi trường được minh hoạ ở đồ thị sau.\nXác định bộ gồm ba số, lần lượt ứng với pepsin, arginase, trypsin.",
+        "refs": [
+          {
+            "where": "DB-12-B9-P2-D2-III-12.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "axes": {
+      "origin": [
+        76,
+        347
+      ],
+      "xArrowHead": [
+        584,
+        347
+      ],
+      "yArrowHead": [
+        76,
+        38
+      ],
+      "xTicks": [
+        [
+          1,
+          80
+        ],
+        [
+          2,
+          120
+        ],
+        [
+          3,
+          164
+        ],
+        [
+          4,
+          208
+        ],
+        [
+          5,
+          252
+        ],
+        [
+          6,
+          295
+        ],
+        [
+          7,
+          340
+        ],
+        [
+          8,
+          383
+        ],
+        [
+          9,
+          426
+        ],
+        [
+          10,
+          470
+        ],
+        [
+          11,
+          514
+        ],
+        [
+          12,
+          558
+        ]
+      ],
+      "xLabelAnchor": [
+        307,
+        396
+      ],
+      "yLabelAnchor": [
+        45,
+        200
+      ],
+      "yTicks": []
+    },
+    "curves": [
+      {
+        "label": "(1)",
+        "peak": [
+          109,
+          65
+        ],
+        "captionAnchor": [
+          103,
+          47
+        ],
+        "samples": [
+          [
+            78,
+            200
+          ],
+          [
+            90,
+            129
+          ],
+          [
+            100,
+            81
+          ],
+          [
+            109,
+            65
+          ],
+          [
+            120,
+            89
+          ],
+          [
+            130,
+            136
+          ],
+          [
+            140,
+            222
+          ],
+          [
+            150,
+            286
+          ],
+          [
+            170,
+            325
+          ],
+          [
+            190,
+            340
+          ],
+          [
+            208,
+            347
+          ]
+        ]
+      },
+      {
+        "label": "(2)",
+        "peak": [
+          344,
+          58
+        ],
+        "captionAnchor": [
+          343,
+          47
+        ],
+        "samples": [
+          [
+            245,
+            310
+          ],
+          [
+            270,
+            245
+          ],
+          [
+            300,
+            159
+          ],
+          [
+            320,
+            99
+          ],
+          [
+            334,
+            66
+          ],
+          [
+            344,
+            58
+          ],
+          [
+            360,
+            82
+          ],
+          [
+            380,
+            128
+          ],
+          [
+            395,
+            164
+          ],
+          [
+            410,
+            203
+          ],
+          [
+            430,
+            259
+          ],
+          [
+            450,
+            320
+          ],
+          [
+            454,
+            328
+          ]
+        ]
+      },
+      {
+        "label": "(3)",
+        "peak": [
+          470,
+          73
+        ],
+        "captionAnchor": [
+          461,
+          51
+        ],
+        "samples": [
+          [
+            283,
+            347
+          ],
+          [
+            300,
+            344
+          ],
+          [
+            320,
+            332
+          ],
+          [
+            345,
+            291
+          ],
+          [
+            360,
+            259
+          ],
+          [
+            380,
+            209
+          ],
+          [
+            395,
+            171
+          ],
+          [
+            410,
+            139
+          ],
+          [
+            430,
+            104
+          ],
+          [
+            450,
+            79
+          ],
+          [
+            470,
+            73
+          ],
+          [
+            490,
+            84
+          ],
+          [
+            510,
+            114
+          ],
+          [
+            533,
+            158
+          ]
+        ]
+      }
+    ],
+    "curveCount": 3,
+    "guides": [],
+    "evidence": "MởRIÊNGnative1110 vàđọcpixelslicesđenđểneo3curve. Curve(1)starttrên0tạiXtrục,kếtthúcởtick4;(2)startX~4,8trên0khôngkéodàiđếngốc,kếtthúc~9,6chưachạmtrục;(3)startgầnX5,8y0,kếtthúc~11,6trên0. Chỉlabel(1)/(2)/(3),khôngtênenzyme. Khôngguide/Yticks. Native1110và1202cùngngữcảnhnhưngbốtrítỉlệXkhácnênchỉsharesemantictemplatephảigiữtick/peakrelative."
+  },
+  {
+    "i": 1202,
+    "hash": "d9e513aa2a09659848c4e5f56473efb3186bca2f5aa757fa02b9d00045b6b69d",
+    "fileNguon": "anh/d9e513aa2a09659848c4e5f56473efb3186bca2f5aa757fa02b9d00045b6b69d.png",
+    "canvas": [
+      613,
+      419
+    ],
+    "daMoNative": true,
+    "kind": "enzyme-pH-graph",
+    "xLabel": "pH",
+    "yLabel": "Hiệu suất phản ứng",
+    "xTicks": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "labels": [
+      "(1)",
+      "(2)",
+      "(3)"
+    ],
+    "notes": "3curveđenNÉTLIỀN:(1)nhánhtráipeakgầnpH1,8rồiđuôixuống0ởpH4;(2)nhánhgiữabắtđầu~pH4,8,peak~7,1,đuôidướiphảikếtthúc~9,6;(3)nhánhphảibắtđầutừgần0pH5,8,peak~10,rồigiảmtớipH11,6chưavề0. Curve2/3cắtnhau~pH8,3. Giữnhãn(1)trêncurve1,(2)trêncurve2,(3)trêncurve3;khôngtựđặttênenzyme theođápán. Ykhôngtick/số;khôngguide;2trụcmũitên. Cả2nguồnđãmởriêngcùngnộidung.",
+    "questions": [
+      {
+        "qid": "DB-12-B9-P2-D2-III-100",
+        "de": "Enzyme là các protein xúc tác sinh học, giúp tăng tốc độ các phản ứng sinh hoá trong cơ thể như quá trình tiêu hoá, chuyển hoá năng lượng,.\nTrong cơ thể, trypsin là enzyme được tiết vào ruột non giúp thuỷ phân các peptide thành amino acid và hoạt động thuận lợi ở pH khoảng 7,5 - 8,5; arginase là enzyme xúc tác quá trình thuỷ phân arginine (chủ yếu diễn ra ở gan) thành ornithine và hoạt động tối ưu ở pH khoảng 9,5; pepsin là enzyme có trong dạ dày, xúc tác quá trình phân giải protein thành các peptide ngắn, hoạt động tối ưu ở môi trường acid với pH khoảng 1,5 - 2,0.\nHiệu suất xúc tác của các enzyme trypsin, arginase, pepsin (được đánh số ngẫu nhiên từ 1 đến 3) theo ảnh hưởng pH của môi trường được minh hoạ ở đồ thị sau.\nXác định bộ gồm ba số, lần lượt ứng với pepsin, arginase, trypsin.",
+        "refs": [
+          {
+            "where": "DB-12-B9-P2-D2-III-100.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B10-III-15",
+        "de": "Enzyme là các protein xúc tác sinh học, giúp tăng tốc độ các phản ứng sinh hoá trong cơ thể như quá trình tiêu hoá, chuyển hoá năng lượng,.\nTrong cơ thể, trypsin là enzyme được tiết vào ruột non giúp thuỷ phân các peptide thành amino acid và hoạt động thuận lợi ở pH khoảng 7,5 - 8,5; arginase là enzyme xúc tác quá trình thuỷ phân arginine (chủ yếu diễn ra ở gan) thành ornithine và hoạt động tối ưu ở pH khoảng 9,5; pepsin là enzyme có trong dạ dày, xúc tác quá trình phân giải protein thành các peptide ngắn, hoạt động tối ưu ở môi trường acid với pH khoảng 1,5 - 2,0.\nHiệu suất xúc tác của các enzyme trypsin, arginase, pepsin (được đánh số ngẫu nhiên từ 1 đến 3) theo ảnh hưởng pH của môi trường được minh hoạ ở đồ thị sau.\nXác định bộ gồm ba số, lần lượt ứng với pepsin, arginase, trypsin.",
+        "refs": [
+          {
+            "where": "DH-12-C3-B10-III-15.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "axes": {
+      "origin": [
+        53,
+        349
+      ],
+      "xArrowHead": [
+        609,
+        349
+      ],
+      "yArrowHead": [
+        53,
+        12
+      ],
+      "xTicks": [
+        [
+          1,
+          56
+        ],
+        [
+          2,
+          101
+        ],
+        [
+          3,
+          150
+        ],
+        [
+          4,
+          198
+        ],
+        [
+          5,
+          246
+        ],
+        [
+          6,
+          294
+        ],
+        [
+          7,
+          342
+        ],
+        [
+          8,
+          390
+        ],
+        [
+          9,
+          437
+        ],
+        [
+          10,
+          485
+        ],
+        [
+          11,
+          533
+        ],
+        [
+          12,
+          582
+        ]
+      ],
+      "xLabelAnchor": [
+        306,
+        403
+      ],
+      "yLabelAnchor": [
+        21,
+        192
+      ],
+      "yTicks": []
+    },
+    "curves": [
+      {
+        "label": "(1)",
+        "peak": [
+          89,
+          41
+        ],
+        "captionAnchor": [
+          83,
+          21
+        ],
+        "samples": [
+          [
+            54,
+            191
+          ],
+          [
+            70,
+            99
+          ],
+          [
+            80,
+            54
+          ],
+          [
+            89,
+            41
+          ],
+          [
+            100,
+            63
+          ],
+          [
+            110,
+            108
+          ],
+          [
+            120,
+            183
+          ],
+          [
+            130,
+            264
+          ],
+          [
+            145,
+            310
+          ],
+          [
+            165,
+            333
+          ],
+          [
+            185,
+            344
+          ],
+          [
+            198,
+            349
+          ]
+        ]
+      },
+      {
+        "label": "(2)",
+        "peak": [
+          346,
+          33
+        ],
+        "captionAnchor": [
+          347,
+          22
+        ],
+        "samples": [
+          [
+            238,
+            310
+          ],
+          [
+            270,
+            226
+          ],
+          [
+            300,
+            140
+          ],
+          [
+            325,
+            66
+          ],
+          [
+            338,
+            39
+          ],
+          [
+            346,
+            33
+          ],
+          [
+            355,
+            40
+          ],
+          [
+            365,
+            59
+          ],
+          [
+            390,
+            117
+          ],
+          [
+            405,
+            153
+          ],
+          [
+            425,
+            206
+          ],
+          [
+            445,
+            262
+          ],
+          [
+            465,
+            323
+          ],
+          [
+            467,
+            329
+          ]
+        ]
+      },
+      {
+        "label": "(3)",
+        "peak": [
+          485,
+          48
+        ],
+        "captionAnchor": [
+          476,
+          25
+        ],
+        "samples": [
+          [
+            281,
+            349
+          ],
+          [
+            300,
+            345
+          ],
+          [
+            325,
+            328
+          ],
+          [
+            346,
+            292
+          ],
+          [
+            365,
+            253
+          ],
+          [
+            390,
+            190
+          ],
+          [
+            405,
+            154
+          ],
+          [
+            425,
+            112
+          ],
+          [
+            445,
+            78
+          ],
+          [
+            465,
+            55
+          ],
+          [
+            485,
+            48
+          ],
+          [
+            505,
+            58
+          ],
+          [
+            525,
+            86
+          ],
+          [
+            555,
+            142
+          ]
+        ]
+      }
+    ],
+    "curveCount": 3,
+    "guides": [],
+    "evidence": "MởRIÊNGnative1202 vàđọcpixelslicesđenđểneo3curve. Curve(1)starttrên0tạiXtrục,kếtthúcởtick4;(2)startX~4,8trên0khôngkéodàiđếngốc,kếtthúc~9,6chưachạmtrục;(3)startgầnX5,8y0,kếtthúc~11,6trên0. Chỉlabel(1)/(2)/(3),khôngtênenzyme. Khôngguide/Yticks. Native1110và1202cùngngữcảnhnhưngbốtrítỉlệXkhácnênchỉsharesemantictemplatephảigiữtick/peakrelative."
   }
 ]

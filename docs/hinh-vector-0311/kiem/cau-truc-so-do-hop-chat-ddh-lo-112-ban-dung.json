@@ -1,0 +1,100 @@
+[
+  {
+    "i": 1246,
+    "hash": "e1e03b037192091b795957f39ea81ff03584db2c7f62b12775777c67036abfb9",
+    "fileNguon": "anh/e1e03b037192091b795957f39ea81ff03584db2c7f62b12775777c67036abfb9.png",
+    "canvas": [
+      805,
+      805
+    ],
+    "daMoNative": true,
+    "kind": "reaction-box-flow",
+    "nodes": [
+      "NH₃(g) + O₂(g)",
+      "X(g)",
+      "Hợp chất T",
+      "Acid (Y)",
+      "N₂(g) + H₂(g)",
+      "Hợp chất Q",
+      "Phân bón Z"
+    ],
+    "edges": [
+      {
+        "from": 0,
+        "to": 1,
+        "number": "(1)",
+        "condition": "t°, Pt(s)"
+      },
+      {
+        "from": 1,
+        "to": 2,
+        "number": "(2)",
+        "condition": "O₂(g)"
+      },
+      {
+        "from": 2,
+        "to": 3,
+        "number": "(3)",
+        "condition": "+ O₂(g) + H₂O(l)"
+      },
+      {
+        "from": 4,
+        "to": 5,
+        "number": "(4)",
+        "condition": "xt, t°, p"
+      },
+      {
+        "from": [
+          3,
+          5
+        ],
+        "to": 6,
+        "number": "(5)",
+        "condition": ""
+      }
+    ],
+    "notes": "Layout2nhánh:trái4boxdọc0→1→2→3;phảibox4nganghàng2,box5nganghàng3;haiđầunhánh3/5đilinegấpvuôngtớinútgiữa rồi1mũitênxuốngbox6.Phân bónZởdướigiữa. Boxnềnvàngnhạtviềnđỏ,nềnngoàixanhlánhạt,mũitênxanhdương,chữđenđậmtrongbox. KhôngtựgiảiX/T/Y/Q/Zthànhcôngthức,tấtcảlàbiếncầngiữ. Giữstatetag(g)/(s)/(l),nhãnsố1..5 vàđiềukiện.",
+    "questions": [
+      {
+        "qid": "DB-11-B6-D2-III-88",
+        "de": "Nước cường toan trong tiếng Anh là Aqua Regia (nghĩa là nước hoàng gia) – là hợp chất có tính ăn mòn mạnh, ở dạng lỏng, có màu vàng và dễ bay hơi, được sử dụng cho 1 số quy trình hóa học phân tích và để tinh chế vàng.\nHãy nêu thành phần của nước cường toan và viết phản ứng của nước cường toan với vàng.",
+        "refs": [
+          {
+            "where": "DB-11-B6-D2-III-88.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B6-III-33",
+        "de": "Nước cường toan trong tiếng Anh là Aqua Regia (nghĩa là nước hoàng gia) – là hợp chất có tính ăn mòn mạnh, ở dạng lỏng, có màu vàng và dễ bay hơi, được sử dụng cho 1 số quy trình hóa học phân tích và để tinh chế vàng.\nHãy nêu thành phần của nước cường toan và viết phản ứng của nước cường toan với vàng.",
+        "refs": [
+          {
+            "where": "DH-11-C2-B6-III-33.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B6-VD-III-3",
+        "de": "Nước cường toan trong tiếng Anh là Aqua Regia (nghĩa là nước hoàng gia) – là hợp chất có tính ăn mòn mạnh, ở dạng lỏng, có màu vàng và dễ bay hơi, được sử dụng cho 1 số quy trình hóa học phân tích và để tinh chế vàng.\nHãy nêu thành phần của nước cường toan và viết phản ứng của nước cường toan với vàng.",
+        "refs": [
+          {
+            "where": "DH-11-C2-B6-VD-III-3.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "so-do-hop-chat-ddh-85905b07c962dd4bf3f9c01f31e3050b90ef66a8ebecc620f27675c0a9ec4258.svg",
+    "hashSvg": "85905b07c962dd4bf3f9c01f31e3050b90ef66a8ebecc620f27675c0a9ec4258",
+    "byteSvg": 49815,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Giữ7box/5arrow/nhánhgấpvuông/haiđầuvàonút5/5label/4điềukiện,tấtcảX/T/Y/Q/Zlàbiếnkhônggiảitên. Giữ(g)/(s)/(l),nềnmàu.",
+    "hashSvgDaSoat": "85905b07c962dd4bf3f9c01f31e3050b90ef66a8ebecc620f27675c0a9ec4258",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

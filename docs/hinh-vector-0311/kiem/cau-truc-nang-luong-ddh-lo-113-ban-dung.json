@@ -1,0 +1,314 @@
+[
+  {
+    "i": 766,
+    "hash": "8ee1083bffb46588288c1d0e64fd6e9265db847d86bfb098ac3df1f16ca6969a",
+    "fileNguon": "anh/8ee1083bffb46588288c1d0e64fd6e9265db847d86bfb098ac3df1f16ca6969a.png",
+    "canvas": [
+      623,
+      346
+    ],
+    "daMoNative": true,
+    "kind": "energy-enzyme-graph",
+    "xLabel": "Tiến trình phản ứng",
+    "yLabel": "Năng lượng (kJ/mol)",
+    "yTicks": [
+      10,
+      60,
+      85,
+      110
+    ],
+    "labels": [
+      "[Chất đầu]",
+      "[Sản phẩm]",
+      "[Đỉnh không xúc tác]",
+      "[Đỉnh có enzyme xúc tác]",
+      "(110)",
+      "(85)"
+    ],
+    "notes": "2curvebắtđầuy10vàkếtthúcy60cùngmức;curvekhôngxúctácNÉTLIỀNđỉnh110,curvecóenzymeNÉTĐỨTđỉnh85. YaxisnănglượngkJ/mol,XaxisTiếntrìnhphảnứng,mũitêncả2trục. (110)/(85)đặttráigầnđỉnh;2label[Đỉnh...]cóđườngnốingangnhỏtừđỉnhsangphảilabel,KHÔNGmũitên. KhôngthêmhàngràohoạthóasốhayΔH.",
+    "questions": [
+      {
+        "qid": "VIP27-C3-B10-III-6",
+        "de": "Đồ thị dưới đây so sánh năng lượng của một phản ứng thu nhiệt khi có enzyme xúc tác (đường nét đứt) và không có enzyme xúc tác (đường nét liền):\nKhi sử dụng enzyme xúc tác, năng lượng hoạt hóa của phản ứng thuận đã giảm đi bao nhiêu phần trăm (%) so với khi không sử dụng chất xúc tác?",
+        "refs": [
+          {
+            "where": "VIP27-C3-B10-III-6.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "axes": {
+      "origin": [
+        47,
+        330
+      ],
+      "xArrowHead": [
+        421,
+        330
+      ],
+      "yArrowHead": [
+        47,
+        31
+      ],
+      "yTicks": [
+        [
+          10,
+          281
+        ],
+        [
+          60,
+          209
+        ],
+        [
+          85,
+          136
+        ],
+        [
+          110,
+          64
+        ]
+      ],
+      "xTicks": [],
+      "xLabelAnchor": [
+        525,
+        331
+      ],
+      "yLabelAnchor": [
+        111,
+        14
+      ]
+    },
+    "curves": [
+      {
+        "label": "[Đỉnh không xúc tác]",
+        "style": "solid grey",
+        "peak": [
+          241,
+          63
+        ],
+        "peakValueLabel": {
+          "text": "(110)",
+          "at": [
+            185,
+            63
+          ]
+        },
+        "leader": [
+          [
+            241,
+            63
+          ],
+          [
+            267,
+            63
+          ]
+        ],
+        "captionAnchor": [
+          375,
+          65
+        ],
+        "samples": [
+          [
+            48,
+            281
+          ],
+          [
+            90,
+            281
+          ],
+          [
+            110,
+            280
+          ],
+          [
+            130,
+            272
+          ],
+          [
+            150,
+            245
+          ],
+          [
+            170,
+            195
+          ],
+          [
+            190,
+            139
+          ],
+          [
+            210,
+            93
+          ],
+          [
+            230,
+            67
+          ],
+          [
+            241,
+            63
+          ],
+          [
+            250,
+            65
+          ],
+          [
+            270,
+            89
+          ],
+          [
+            290,
+            127
+          ],
+          [
+            310,
+            164
+          ],
+          [
+            330,
+            189
+          ],
+          [
+            350,
+            202
+          ],
+          [
+            370,
+            209
+          ],
+          [
+            410,
+            209
+          ]
+        ]
+      },
+      {
+        "label": "[Đỉnh có enzyme xúc tác]",
+        "style": "dashed grey",
+        "peak": [
+          246,
+          136
+        ],
+        "peakValueLabel": {
+          "text": "(85)",
+          "at": [
+            237,
+            137
+          ]
+        },
+        "leader": [
+          [
+            268,
+            136
+          ],
+          [
+            335,
+            136
+          ]
+        ],
+        "captionAnchor": [
+          462,
+          137
+        ],
+        "samples": [
+          [
+            48,
+            281
+          ],
+          [
+            90,
+            281
+          ],
+          [
+            110,
+            281
+          ],
+          [
+            130,
+            277
+          ],
+          [
+            150,
+            267
+          ],
+          [
+            170,
+            245
+          ],
+          [
+            190,
+            217
+          ],
+          [
+            210,
+            180
+          ],
+          [
+            230,
+            150
+          ],
+          [
+            246,
+            136
+          ],
+          [
+            270,
+            145
+          ],
+          [
+            290,
+            169
+          ],
+          [
+            310,
+            191
+          ],
+          [
+            330,
+            203
+          ],
+          [
+            350,
+            208
+          ],
+          [
+            370,
+            210
+          ],
+          [
+            410,
+            209
+          ]
+        ]
+      }
+    ],
+    "otherLabels": [
+      {
+        "text": "[Chất đầu]",
+        "at": [
+          105,
+          304
+        ]
+      },
+      {
+        "text": "[Sản phẩm]",
+        "at": [
+          398,
+          234
+        ]
+      }
+    ],
+    "curveCount": 2,
+    "evidence": "Mởnative766riêng;2curve đầu10/cuối60,peakliền110/đứt85. Khôngguidehorizontaly10/60trừcurveđầucuối,hailinecaptionpeakkhôngmũitên. Giữmọidấungoặcvuông/vòng.",
+    "svg": "nang-luong-ddh-17cabe1b05a63626c6463d716586ef167434e7b4afd36d8782656b68d72fcbb8.svg",
+    "hashSvg": "17cabe1b05a63626c6463d716586ef167434e7b4afd36d8782656b68d72fcbb8",
+    "byteSvg": 63925,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Giữ10→60/peak110liền85đứt/4tickY/2leader/đủnhãnngoặcvuông và(110)(85),khôngtựsửasốhaythêmguide.",
+    "hashSvgDaSoat": "17cabe1b05a63626c6463d716586ef167434e7b4afd36d8782656b68d72fcbb8",
+    "nguoiSoat": "cau_truc_6"
+  }
+]

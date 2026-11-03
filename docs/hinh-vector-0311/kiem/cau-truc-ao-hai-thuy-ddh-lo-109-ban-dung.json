@@ -1,0 +1,590 @@
+[
+  {
+    "hash": "6e37803f3fa72e12ba550e9555282afacefd4420010be79944d87d7e10c3043d",
+    "file": "anh/6e37803f3fa72e12ba550e9555282afacefd4420010be79944d87d7e10c3043d.png",
+    "mime": "image/png",
+    "bytes": 2516,
+    "i": 593,
+    "nativeSize": [
+      274,
+      265
+    ],
+    "refs": [
+      {
+        "qid": "DB-10-B3-D1-I-283",
+        "de": "Hình vẽ dưới đây mô tả 3 dạng orbital: a) | b) | c) Các orbital tương ứng với các hình a), b) và c) là",
+        "refs": [
+          {
+            "hash": "6e37803f3fa72e12ba550e9555282afacefd4420010be79944d87d7e10c3043d",
+            "where": "DB-10-B3-D1-I-283.hinh.1.du_lieu",
+            "hashDataUrl": "4ddce7a52cfe3da6aa975534c28db616e9eac6495e8b991ac51acee7d26684ca",
+            "position": {
+              "where": "DB-10-B3-D1-I-283.hinh.1.du_lieu",
+              "hashDataUrl": "4ddce7a52cfe3da6aa975534c28db616e9eac6495e8b991ac51acee7d26684ca",
+              "viTri": "sau_de",
+              "truong": "hinh",
+              "congKhaiTruocNop": true
+            }
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B4-D1-I-5",
+        "de": "Hình vẽ dưới đây mô tả 3 dạng orbital: a) | b) | c) Các orbital tương ứng với các hình a), b) và c) là",
+        "refs": [
+          {
+            "hash": "6e37803f3fa72e12ba550e9555282afacefd4420010be79944d87d7e10c3043d",
+            "where": "DH-10-C1-B4-D1-I-5.hinh.1.du_lieu",
+            "hashDataUrl": "4ddce7a52cfe3da6aa975534c28db616e9eac6495e8b991ac51acee7d26684ca",
+            "position": {
+              "where": "DH-10-C1-B4-D1-I-5.hinh.1.du_lieu",
+              "hashDataUrl": "4ddce7a52cfe3da6aa975534c28db616e9eac6495e8b991ac51acee7d26684ca",
+              "viTri": "sau_de",
+              "truong": "hinh",
+              "congKhaiTruocNop": true
+            }
+          }
+        ]
+      }
+    ],
+    "fileNguon": "anh/6e37803f3fa72e12ba550e9555282afacefd4420010be79944d87d7e10c3043d.png",
+    "caption": [],
+    "loaiDoc": "Hình hai thùy đối nhau; chỉ mô tả hình học, không suy tên AO/đáp án.",
+    "nguoiDocNguon": "soat_nguon_2",
+    "daMoNativeVaZoom4x": true,
+    "labelTexts": [
+      "x",
+      "y",
+      "z"
+    ],
+    "axisUnits": [],
+    "axisTicks": [],
+    "dashedLines": [],
+    "phaseSymbols": [],
+    "notes": "Các lớp xám trong một thùy là tô bóng/contour, không phải các thùy mới hoặc nét đứt. Không tự thêm dấu+/−,s/p,px/py,nhãn(b)/(c);a)/b)/c) chỉ nằm trong câu dẫn.",
+    "geometry": {
+      "native": [
+        274,
+        265
+      ],
+      "originApprox": [
+        132.5,
+        147
+      ],
+      "axes": {
+        "z": {
+          "label": "z",
+          "upperTip": [
+            133,
+            42
+          ],
+          "lowerEnd": [
+            133,
+            251
+          ],
+          "arrow": "lên,đen",
+          "visible": "Đoạn đứng phía trên thấy tới gần y129; phầnx≈133,y129..147bịthùytrắngche. Đoạnđứngphíadưới từtâm tới251hiện."
+        },
+        "y": {
+          "label": "y",
+          "leftEnd": [
+            28,
+            147
+          ],
+          "rightTip": [
+            236,
+            147
+          ],
+          "arrow": "sangphải,đen",
+          "visible": "Đườngngangthấytrái/phảicủagốctrừđoạngầnchỗthùygặpnhau;khôngvẽchồnglênnộithùytrắng."
+        },
+        "x": {
+          "label": "x",
+          "upperRightEnd": [
+            216,
+            84
+          ],
+          "lowerLeftTip": [
+            50,
+            209
+          ],
+          "arrow": "CHỈđầudướitrái,tôxám;đầutrênphảikhôngarrow",
+          "visible": "Nhãnxởtrênphải.CáctrụcxđoạnđiQUAhai thùybịche:đoạntrênphải chỉthấykhoảng(189,104)→(216,84);đoạndướitrái chỉthấykhoảng(72,191)→(50,209).Khôngvẽtrục xuyên nộithùy."
+        }
+      },
+      "lobes": [
+        {
+          "direction": "trênphải",
+          "phase": "trắng,rỗngtôtrắng,viềnxámđậm",
+          "boundsApprox": [
+            129,
+            92,
+            194,
+            151
+          ],
+          "outlineAnchorsApprox": [
+            [
+              132,
+              147
+            ],
+            [
+              130,
+              139
+            ],
+            [
+              140,
+              117
+            ],
+            [
+              157,
+              97
+            ],
+            [
+              170,
+              93
+            ],
+            [
+              181,
+              96
+            ],
+            [
+              190,
+              107
+            ],
+            [
+              192,
+              118
+            ],
+            [
+              186,
+              129
+            ],
+            [
+              169,
+              139
+            ],
+            [
+              146,
+              148
+            ]
+          ],
+          "occludes": "Trụcxchéovàđoạntrụczgầntâmnằm sau thùy."
+        },
+        {
+          "direction": "dướitrái",
+          "phase": "xámnhiềulớp,viềnđậmgầnđen,đốmsángtrắngởgiữaphíatrêntrái",
+          "boundsApprox": [
+            68,
+            147,
+            131,
+            202
+          ],
+          "outlineAnchorsApprox": [
+            [
+              129,
+              150
+            ],
+            [
+              118,
+              147
+            ],
+            [
+              100,
+              152
+            ],
+            [
+              80,
+              163
+            ],
+            [
+              70,
+              174
+            ],
+            [
+              70,
+              185
+            ],
+            [
+              78,
+              196
+            ],
+            [
+              88,
+              201
+            ],
+            [
+              101,
+              196
+            ],
+            [
+              116,
+              179
+            ],
+            [
+              126,
+              160
+            ]
+          ],
+          "occludes": "Trụcxchéoẩntrongthùy;chỉđầuđoạndướitráilộra."
+        }
+      ],
+      "lobeCount": 2,
+      "lobePairOrientation": "chéodướitrái–trênphải",
+      "hiddenStrokeRule": "Vẽ3trụcởlớpsau rồi thùytôtrắng/xámchetrục;đểgiữcácđoạnchekhuất,khôngđổiẩnthànhnétđứt."
+    },
+    "baseComparison": {
+      "daMoNguon284": true,
+      "daMoNguon1265": true,
+      "aliasPhuHop": false,
+      "why": "284là1cầu,tấtcảtrụcđềukhôngarrow/chebởicầuvàxnhãndướitrái;1265là1cầuxám,xnhãnphảivàynhãndướitrái,trụcxuyêncầuthấy. Cả2kháccặp2thùy/nhãn/arrow/occlusioncủanguồnnày;chỉthamkhảophôngstyle,khôngaliasgeometry."
+    },
+    "pixelInkBounds": {
+      "labels": {
+        "x": [
+          219,
+          73,
+          229,
+          85
+        ],
+        "y": [
+          241,
+          138,
+          251,
+          154
+        ],
+        "z": [
+          129,
+          19,
+          138,
+          30
+        ]
+      },
+      "arrows": {
+        "z": [
+          128,
+          42,
+          137,
+          63
+        ],
+        "y": [
+          216,
+          142,
+          236,
+          151
+        ],
+        "xNegative": [
+          50,
+          192,
+          71,
+          209
+        ]
+      }
+    },
+    "pixelInkBoundsConvention": "Nativepixels,gốctrêntrái(0,0),bboxinclusive[xmin,ymin,xmax,ymax],L<200. LabelsđoROIriêngđãtránhtrục;arrowROIinkcóthểgồmmộtđoạnshaftkềđầu. Outlineanchors/occlusionendpointsđọctừnative+zoom4xLÀƯỚCLƯỢNGpixel,khôngphảisốđokhoahọc.",
+    "svg": "ao-hai-thuy-ddh-8227f5b77f50b1e53ade737241e6926657aef9a2736b6fc6d352fa4c0b691306.svg",
+    "hashSvg": "8227f5b77f50b1e53ade737241e6926657aef9a2736b6fc6d352fa4c0b691306",
+    "byteSvg": 3215,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "2thùytrắng/xámtheođúngviền/hướngsource;3trụclớpsau,bịthùyche,khôngthêmphase+/−/caption/tênAO.",
+    "hashSvgDaSoat": "8227f5b77f50b1e53ade737241e6926657aef9a2736b6fc6d352fa4c0b691306",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "hash": "e8685f1fb27b587d9e9fd1e4e51d16fd81ea3bcb8977e2fe54f24ce1c40ad00e",
+    "file": "anh/e8685f1fb27b587d9e9fd1e4e51d16fd81ea3bcb8977e2fe54f24ce1c40ad00e.png",
+    "mime": "image/png",
+    "bytes": 2616,
+    "i": 1279,
+    "nativeSize": [
+      273,
+      261
+    ],
+    "refs": [
+      {
+        "qid": "DB-10-B3-D1-I-283",
+        "de": "Hình vẽ dưới đây mô tả 3 dạng orbital: a) | b) | c) Các orbital tương ứng với các hình a), b) và c) là",
+        "refs": [
+          {
+            "hash": "e8685f1fb27b587d9e9fd1e4e51d16fd81ea3bcb8977e2fe54f24ce1c40ad00e",
+            "where": "DB-10-B3-D1-I-283.hinh.2.du_lieu",
+            "hashDataUrl": "2af4a1036c9ccaaf9276bf2375e117cef0a35492c4a065a4bbc4d76e8eb7aad0",
+            "position": {
+              "where": "DB-10-B3-D1-I-283.hinh.2.du_lieu",
+              "hashDataUrl": "2af4a1036c9ccaaf9276bf2375e117cef0a35492c4a065a4bbc4d76e8eb7aad0",
+              "viTri": "sau_de",
+              "truong": "hinh",
+              "congKhaiTruocNop": true
+            }
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B4-D1-I-5",
+        "de": "Hình vẽ dưới đây mô tả 3 dạng orbital: a) | b) | c) Các orbital tương ứng với các hình a), b) và c) là",
+        "refs": [
+          {
+            "hash": "e8685f1fb27b587d9e9fd1e4e51d16fd81ea3bcb8977e2fe54f24ce1c40ad00e",
+            "where": "DH-10-C1-B4-D1-I-5.hinh.2.du_lieu",
+            "hashDataUrl": "2af4a1036c9ccaaf9276bf2375e117cef0a35492c4a065a4bbc4d76e8eb7aad0",
+            "position": {
+              "where": "DH-10-C1-B4-D1-I-5.hinh.2.du_lieu",
+              "hashDataUrl": "2af4a1036c9ccaaf9276bf2375e117cef0a35492c4a065a4bbc4d76e8eb7aad0",
+              "viTri": "sau_de",
+              "truong": "hinh",
+              "congKhaiTruocNop": true
+            }
+          }
+        ]
+      }
+    ],
+    "fileNguon": "anh/e8685f1fb27b587d9e9fd1e4e51d16fd81ea3bcb8977e2fe54f24ce1c40ad00e.png",
+    "caption": [],
+    "loaiDoc": "Hình hai thùy đối nhau; chỉ mô tả hình học, không suy tên AO/đáp án.",
+    "nguoiDocNguon": "soat_nguon_2",
+    "daMoNativeVaZoom4x": true,
+    "labelTexts": [
+      "x",
+      "y",
+      "z"
+    ],
+    "axisUnits": [],
+    "axisTicks": [],
+    "dashedLines": [],
+    "phaseSymbols": [],
+    "notes": "Các lớp xám trong một thùy là tô bóng/contour, không phải các thùy mới hoặc nét đứt. Không tự thêm dấu+/−,s/p,px/py,nhãn(b)/(c);a)/b)/c) chỉ nằm trong câu dẫn.",
+    "geometry": {
+      "native": [
+        273,
+        261
+      ],
+      "originApprox": [
+        139,
+        152.5
+      ],
+      "axes": {
+        "z": {
+          "label": "z",
+          "upperTip": [
+            139,
+            49
+          ],
+          "lowerEnd": [
+            139,
+            259
+          ],
+          "arrow": "lên,đen",
+          "visible": "Thẳngđứngquagốc;trụctrên/dướingoàichỗthùychụmlạihiệnliền."
+        },
+        "y": {
+          "label": "y",
+          "leftEnd": [
+            35,
+            153
+          ],
+          "rightTip": [
+            242,
+            153
+          ],
+          "arrow": "sangphải,XÁM",
+          "visible": "Đườngngangtráichỉthấy(35,153)→(68,153),ẩntrongthùytrắng(68..139);đườngngangphảichỉthấy(212,153)→(242,153),ẩntrongthùyxám(139..212)."
+        },
+        "x": {
+          "label": "x",
+          "upperRightEnd": [
+            222,
+            90
+          ],
+          "lowerLeftTip": [
+            56,
+            216
+          ],
+          "arrow": "CHỈđầudướitrái,ĐEN;đầutrênphảikhôngarrow",
+          "visible": "Nhãnxởtrênphải;đoạnchéotrênphải thấy(170,128)→(222,90),đoạngầntâmnằm sau thùyxám.Phíadướitráiđoạn(138,154)→(56,216)hiệnởngoàibêndướithùytrắng;khôngvẽtrụcđèlênnộithùy."
+        }
+      },
+      "lobes": [
+        {
+          "direction": "trái",
+          "phase": "trắng,tôtrắng,viềnxámđậm",
+          "boundsApprox": [
+            67,
+            127,
+            140,
+            172
+          ],
+          "outlineAnchorsApprox": [
+            [
+              139,
+              152
+            ],
+            [
+              130,
+              141
+            ],
+            [
+              109,
+              132
+            ],
+            [
+              89,
+              128
+            ],
+            [
+              77,
+              131
+            ],
+            [
+              70,
+              139
+            ],
+            [
+              68,
+              151
+            ],
+            [
+              70,
+              162
+            ],
+            [
+              78,
+              169
+            ],
+            [
+              93,
+              171
+            ],
+            [
+              114,
+              164
+            ]
+          ],
+          "occludes": "Cheytrụctráitừx≈68tớigốc;khôngđểđườngngangxuyênthùy."
+        },
+        {
+          "direction": "phải",
+          "phase": "xámnhiềulớp,viềnxámđậm,đốmsángtrắngởtrêntrái",
+          "boundsApprox": [
+            139,
+            126,
+            213,
+            168
+          ],
+          "outlineAnchorsApprox": [
+            [
+              140,
+              152
+            ],
+            [
+              149,
+              141
+            ],
+            [
+              166,
+              132
+            ],
+            [
+              184,
+              127
+            ],
+            [
+              201,
+              129
+            ],
+            [
+              208,
+              135
+            ],
+            [
+              211,
+              146
+            ],
+            [
+              209,
+              157
+            ],
+            [
+              201,
+              164
+            ],
+            [
+              187,
+              167
+            ],
+            [
+              168,
+              163
+            ],
+            [
+              150,
+              158
+            ]
+          ],
+          "occludes": "Cheytrụcphảitừgốctớix≈212vàxtrụcchéogầntâm."
+        }
+      ],
+      "lobeCount": 2,
+      "lobePairOrientation": "trái–phải gầnngang",
+      "hiddenStrokeRule": "Vẽtrụcởlớpsau,rồivẽthùytrắng/xámcheđoạntrụcbêntrong;khôngthêmnétđứt."
+    },
+    "baseComparison": {
+      "daMoNguon284": true,
+      "daMoNguon1265": true,
+      "aliasPhuHop": false,
+      "why": "284là1cầu,tấtcảtrụcđềukhôngarrow/chebởicầuvàxnhãndướitrái;1265là1cầuxám,xnhãnphảivàynhãndướitrái,trụcxuyêncầuthấy. Cả2kháccặp2thùy/nhãn/arrow/occlusioncủanguồnnày;chỉthamkhảophôngstyle,khôngaliasgeometry."
+    },
+    "pixelInkBounds": {
+      "labels": {
+        "x": [
+          226,
+          79,
+          236,
+          91
+        ],
+        "y": [
+          247,
+          144,
+          257,
+          160
+        ],
+        "z": [
+          136,
+          25,
+          145,
+          36
+        ]
+      },
+      "arrows": {
+        "z": [
+          135,
+          49,
+          144,
+          71
+        ],
+        "y": [
+          222,
+          148,
+          242,
+          157
+        ],
+        "xNegative": [
+          56,
+          198,
+          78,
+          216
+        ]
+      }
+    },
+    "pixelInkBoundsConvention": "Nativepixels,gốctrêntrái(0,0),bboxinclusive[xmin,ymin,xmax,ymax],L<200. LabelsđoROIriêngđãtránhtrục;arrowROIinkcóthểgồmmộtđoạnshaftkềđầu. Outlineanchors/occlusionendpointsđọctừnative+zoom4xLÀƯỚCLƯỢNGpixel,khôngphảisốđokhoahọc.",
+    "svg": "ao-hai-thuy-ddh-7f358a9a11bff9f35fb4088a0b026ab1c404bb5e9f09e6480ae3cc52640dd52c.svg",
+    "hashSvg": "7f358a9a11bff9f35fb4088a0b026ab1c404bb5e9f09e6480ae3cc52640dd52c",
+    "byteSvg": 3263,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "2thùytrắng/xámtheođúngviền/hướngsource;3trụclớpsau,bịthùyche,khôngthêmphase+/−/caption/tênAO.",
+    "hashSvgDaSoat": "7f358a9a11bff9f35fb4088a0b026ab1c404bb5e9f09e6480ae3cc52640dd52c",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

@@ -1,0 +1,10 @@
+[
+  {
+    "i": 1246,
+    "hashSvg": "85905b07c962dd4bf3f9c01f31e3050b90ef66a8ebecc620f27675c0a9ec4258",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở PNG native và SVG render thật. Đủ7 box: NH3(g)+O2(g),X(g),Hợp chất T,Acid(Y),N2(g)+H2(g),Hợp chất Q,Phân bón Z; giữ biến không giải tên. Đủ5 mũi tên xuống và nhãn(1)..(5); hai nhánh Acid/Q gấp vuông hợp vào đường chung/nút5 rồi xuống Z. Conditions (1)t°,Pt(s);(2)O2(g);(3)+O2(g)+H2O(l);(4)xt,t°,p đầy đủ/chỉ số/trạng thái đúng. Giữ nền xanh nhạt, box vàng/viền đỏ/arrow xanh. Chữ box dùng DDH dam thật, condition/nhãn DDH regular thật theo generator và hashPhongDam; tự chứa path không text/image/fallback. Box-label/arrow/glyph đủ khoảng cách, không chạm/cắt/tràn. Hash byte thực khớp metadata.",
+    "hash": "e1e03b037192091b795957f39ea81ff03584db2c7f62b12775777c67036abfb9",
+    "hashSvgDaSoat": "85905b07c962dd4bf3f9c01f31e3050b90ef66a8ebecc620f27675c0a9ec4258"
+  }
+]

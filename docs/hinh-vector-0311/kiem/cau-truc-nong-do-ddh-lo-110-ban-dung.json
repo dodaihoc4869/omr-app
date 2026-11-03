@@ -1,0 +1,269 @@
+[
+  {
+    "i": 637,
+    "hash": "769181e586141340c81d5d1290ec5ffdd97b81579b743fd3aca476f5397a7f4f",
+    "fileNguon": "anh/769181e586141340c81d5d1290ec5ffdd97b81579b743fd3aca476f5397a7f4f.png",
+    "canvas": [
+      295,
+      171
+    ],
+    "daMoNative": true,
+    "kind": "graph-concentration",
+    "xLabel": "Thời gian phản ứng",
+    "yLabel": "Nồng độ (mol L⁻¹)",
+    "yTicks": [
+      "1",
+      "0,5"
+    ],
+    "notes": "2curveđen:cùnglúcgiảm từY1đếnplateau0,5,tăngtừoriginđếnplateau1. Hai đườngcắt ởnồngđộ~0,63 tạix~98native;2dóngngangđứtY1và0,5. KhôngtickX/nhãncurve/caption. Ytick1kèmđườngy50,0,5kèmđườngy100,origin(50,149). Xarrow(289,149),Yarrow(50,6). Giữđơnvịmol L⁻¹khôngtựM.",
+    "questions": [
+      {
+        "qid": "DB-11-B1-D1-I-220",
+        "de": "Đồ thị trong Hình 1.1 biểu diễn sự biến đổi nồng độ chất X và chất Y trong phản ứng theo thời gian. Biết rằng ban đầu, hệ phản ứng chỉ có chất X, không có chất Y. Hình 1.1. Đồ thị biểu diễn nồng độ các chất theo thời gian Dựa vào đồ thị trên, hãy cho biết phương trình hoá học nào sau đây phù hợp với phản ứng chuyển hoá X thành Y.",
+        "refs": [
+          {
+            "where": "DB-11-B1-D1-I-220.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C1-B3-D2-I-2",
+        "de": "Đồ thị trong Hình 1.1 biểu diễn sự biến đổi nồng độ chất X và chất Y trong phản ứng theo thời gian. Biết rằng ban đầu, hệ phản ứng chỉ có chất X, không có chất Y. Hình 1.1. Đồ thị biểu diễn nồng độ các chất theo thời gian Dựa vào đồ thị trên, hãy cho biết phương trình hoá học nào sau đây phù hợp với phản ứng chuyển hoá X thành Y.",
+        "refs": [
+          {
+            "where": "DH-11-C1-B3-D2-I-2.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "pixelUnits": "Native PNG pixels; không phải số đo hóa học thêm vàoảnh.",
+    "axes": {
+      "origin": [
+        50,
+        149
+      ],
+      "xArrowHead": [
+        289,
+        149
+      ],
+      "yArrowHead": [
+        50,
+        5
+      ],
+      "yTicks": [
+        {
+          "value": "1",
+          "at": [
+            50,
+            50
+          ]
+        },
+        {
+          "value": "0,5",
+          "at": [
+            50,
+            100
+          ]
+        }
+      ],
+      "xTicks": [],
+      "xLabelAnchor": [
+        217,
+        160
+      ],
+      "yLabelAnchor": [
+        19,
+        82
+      ]
+    },
+    "guides": [
+      {
+        "from": [
+          50,
+          50
+        ],
+        "to": [
+          280,
+          50
+        ],
+        "style": "dashed"
+      },
+      {
+        "from": [
+          50,
+          100
+        ],
+        "to": [
+          280,
+          100
+        ],
+        "style": "dashed"
+      }
+    ],
+    "curves": [
+      {
+        "role": "tăng",
+        "stroke": "solid black",
+        "samples": [
+          [
+            50,
+            149
+          ],
+          [
+            60,
+            135
+          ],
+          [
+            70,
+            122
+          ],
+          [
+            80,
+            109
+          ],
+          [
+            90,
+            96
+          ],
+          [
+            98,
+            88
+          ],
+          [
+            110,
+            80
+          ],
+          [
+            120,
+            74
+          ],
+          [
+            140,
+            65
+          ],
+          [
+            160,
+            60
+          ],
+          [
+            180,
+            57
+          ],
+          [
+            200,
+            55
+          ],
+          [
+            220,
+            54
+          ],
+          [
+            240,
+            52
+          ],
+          [
+            260,
+            51
+          ],
+          [
+            279,
+            50
+          ]
+        ]
+      },
+      {
+        "role": "giảm",
+        "stroke": "solid black",
+        "samples": [
+          [
+            50,
+            50
+          ],
+          [
+            60,
+            61
+          ],
+          [
+            70,
+            70
+          ],
+          [
+            80,
+            77
+          ],
+          [
+            90,
+            84
+          ],
+          [
+            98,
+            88
+          ],
+          [
+            110,
+            93
+          ],
+          [
+            120,
+            95
+          ],
+          [
+            140,
+            98
+          ],
+          [
+            160,
+            99
+          ],
+          [
+            180,
+            100
+          ],
+          [
+            200,
+            100
+          ],
+          [
+            220,
+            101
+          ],
+          [
+            240,
+            101
+          ],
+          [
+            260,
+            101
+          ],
+          [
+            280,
+            100
+          ]
+        ]
+      }
+    ],
+    "curveCount": 2,
+    "labelsNotToAdd": [
+      "Không0gốc",
+      "KhôngX/Ytêncurve",
+      "Khôngtickthờigian",
+      "KhôngcaptionHình1.1trongảnhvìđãởstem"
+    ],
+    "crossover": [
+      98,
+      88
+    ],
+    "evidence": "Đãmởnative637+zoom4x,đọcngưỡngpixelđenở16cộtđểxácnhậncurve. Hai plateaukhác1và0,5,guideđúngcùngmức. Giữtăngtiệmcậntrên/giảmtiệmcậndưới,khôngnốivềcùngplateau.",
+    "svg": "nong-do-ddh-fdffcef0f9cdaecd89c1d7229733690ada26275558fddf0c695902b411b68bcb.svg",
+    "hashSvg": "fdffcef0f9cdaecd89c1d7229733690ada26275558fddf0c695902b411b68bcb",
+    "byteSvg": 24210,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "PCHIPquaanchorspixelnguồn,khôngkhớptheothểthứchóahọc/khôngthêmX,Y/0/tickX/captionHình1.1. Hai guides/plateau1và0,5 khácnhau.",
+    "hashSvgDaSoat": "fdffcef0f9cdaecd89c1d7229733690ada26275558fddf0c695902b411b68bcb",
+    "nguoiSoat": "cau_truc_6"
+  }
+]
