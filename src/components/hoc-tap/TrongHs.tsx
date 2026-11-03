@@ -38,6 +38,7 @@ import type { KetQuaDanhSachChua } from '../../lib/chua-cau-sai-api'
 import '../../styles/trong-hs.css'
 import '../../styles/trong-hs-ngang.css' // NGANG + MÁY TÍNH 27/10: chỉ bố cục, nạp SAU trong-hs.css
 import '../../styles/trong-kinh.css' // HỆ KÍNH 02/11: Hôm nay + thanh nổi + tấm Thêm — nạp SAU hai tờ trên (cùng mảnh, không thêm tệp)
+import '../../styles/khong-xuong-hs.css' // thầy 03/11 «màn nào load hiện khung xương … xoá sạch»: khối giữ chỗ lúc tải trong suốt (cùng mảnh, không thêm tệp)
 // THƯỞNG PHẠT (gộp đợt 3, 26/10 — src/components/thuong/CAM-VAO.md): thanh trên ThanhThuong vẽ NGAY từ bản lưu máy (nhỏ, cùng mảnh «Trong»); mọi màn
 // thưởng phạt + thẻ bên là MỘT mảnh nạp lười (ManThuong). Học sinh không thấy nhãn nhịp học / bậc.
 import { ThanhThuong } from '../thuong/ThanhThuong'

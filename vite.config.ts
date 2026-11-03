@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react'
 import { defineConfig, minifySync, type Plugin } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import { taoMaNapTruoc } from './src/lib/nap-truoc-man-em.ts'
-import { KHOA_KHUNG_TINH, moKhungTinh, taoKhungXuong } from './src/lib/khung-tinh-noi-tuyen.ts'
+import { KHOA_KHUNG_TINH, moKhungTinh } from './src/lib/khung-tinh-noi-tuyen.ts'
 
 // Repo name dùng làm base path khi deploy GitHub Pages (project page, không phải user page).
 // Đổi giá trị này đúng bằng tên repo GitHub của thầy trước khi deploy.
@@ -206,7 +206,7 @@ function napTruocManEm(): Plugin {
         // tuỳ chọn ⇒ trình phân tích còn ở <head>, body = null) ⇒ tờ kiểu blocking=render chặn vẽ thật (sau body thì không) — hết khung nền trống lúc F5.
         const gocRoot = '<main id="root"></main>'
         if (khungCss.length && ra.includes(gocRoot))
-          ra = ra.replace(gocRoot, `<script>(${gon(moKhungTinh.toString())})(window,document,${JSON.stringify(khungCss)},${JSON.stringify(taoKhungXuong())},${JSON.stringify(KHOA_KHUNG_TINH)},"omr_student_portal_auth")</script>${gocRoot}`)
+          ra = ra.replace(gocRoot, `<script>(${gon(moKhungTinh.toString())})(window,document,${JSON.stringify(khungCss)},${JSON.stringify(KHOA_KHUNG_TINH)},"omr_student_portal_auth")</script>${gocRoot}`)
         return ra
       },
     },
