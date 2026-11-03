@@ -68,3 +68,22 @@ html.may-yeu .hv-svg * { animation: none !important; transition: none !important
 
 /* Đã vẽ lại đủ hình của đề ⇒ ẩn ảnh gốc ở cùng khối (dấu .hv-thay do HinhVeLaiCuaCau đặt). */
 div:has(> .hv-thay) :is([data-vt="sau_de"], [data-vt="cuoi_cau"]) { display: none; }
+
+/* Hoạt hoạ cho khuôn svg (máy vẽ chỉ gọi LỚP; mỗi chuyển động chạy vài vòng rồi dừng, tắt khi máy yếu / giảm chuyển động) */
+.hv-tu-do [class*="a-"] { transform-box: fill-box; transform-origin: center; }
+.hv-tu-do .a-bay { animation: hv-a-bay 2.2s ease-in 6; } @keyframes hv-a-bay { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-22px); opacity: 0; } }
+.hv-tu-do .a-giot { animation: hv-a-giot 1.6s ease-in 6; } @keyframes hv-a-giot { from { transform: translateY(0); opacity: 1; } to { transform: translateY(26px); opacity: 0; } }
+.hv-tu-do .a-lua { transform-origin: bottom; animation: hv-a-lua .5s ease-in-out 12 alternate; } @keyframes hv-a-lua { from { transform: scale(1, 1); } to { transform: scale(.9, 1.14); } }
+.hv-tu-do .a-nhip { animation: hv-a-nhip 1.2s ease-in-out 5 alternate; } @keyframes hv-a-nhip { from { opacity: 1; } to { opacity: .45; } }
+.hv-tu-do .a-chay { stroke-dasharray: 6 6; animation: hv-a-chay 1s linear 8; } @keyframes hv-a-chay { to { stroke-dashoffset: -24; } }
+.hv-tu-do .a-quay { animation: hv-a-quay 4s linear 3; } .hv-tu-do .a-quay-nguoc { animation: hv-a-quay 4s linear 3 reverse; } @keyframes hv-a-quay { to { transform: rotate(360deg); } }
+.hv-tu-do .a-hien { animation: hv-a-hien .6s ease-out both; } @keyframes hv-a-hien { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: none; } }
+.hv-tu-do .tre-1 { animation-delay: .4s; } .hv-tu-do .tre-2 { animation-delay: .8s; } .hv-tu-do .tre-3 { animation-delay: 1.2s; } .hv-tu-do .tre-4 { animation-delay: 1.6s; }
+@media (prefers-reduced-motion: reduce) { .hv-tu-do * { animation: none !important; } }
+
+/* Bộ «hình mẫu» của thầy (minh-hoa-hoa.tsx mục 17): thuỷ tinh bo tròn, dung dịch, nắp, bóng chân, mũi tên / dấu cộng tím nhạt, thẻ vàng «?» */
+.hv-tu-do .f-kinh { fill: var(--tr-mat-2); } .hv-tu-do .f-nap { fill: var(--tr-vien-2); } .hv-tu-do .f-bong { fill: color-mix(in srgb, var(--tr-phu) 55%, transparent); }
+.hv-tu-do .f-dd1 { fill: var(--tr-dung); } .hv-tu-do .f-dd2 { fill: var(--tr-tin); } .hv-tu-do .f-dd3 { fill: var(--tr-sao); } .hv-tu-do .f-dd4 { fill: var(--tr-sai); }
+.hv-tu-do .f-muoi { fill: var(--tr-mat); } .hv-tu-do .f-the { fill: var(--tr-sao-nhat); }
+.hv-tu-do .s-sang { stroke: var(--tr-mat); opacity: .7; fill: none; } .hv-tu-do .s-mui { stroke: var(--tr-vien-2); fill: none; } .hv-tu-do .s-vien { stroke: var(--tr-vien-2); }
+.hv-tu-do .t-dau { fill: var(--tr-vien-2); font-size: 26px; font-weight: 800; } .hv-tu-do .t-the { fill: var(--tr-sao-chu); font-weight: 800; } .hv-tu-do .t-mui { fill: var(--tr-chu-2); font-weight: 800; }

@@ -10,7 +10,7 @@
 //
 // Mỗi lô: máy chủ phát N ảnh ⇒ HAI phiên âm ĐỘC LẬP (hai phiên claude khác nhau chép chữ trong ảnh) ⇒ phải khớp nhau (≥ 90 % hai chiều) ⇒ phiên thứ ba vẽ cảnh chỉ bằng chữ đã
 // phiên âm ⇒ bộ kiểm trong lô ⇒ nộp. Máy chủ kiểm lại: chữ ngoài ảnh / hai phiên âm lệch / khuôn chưa hỗ trợ ⇒ «giu_goc» (app giữ ảnh gốc, không vẽ).
-import { spawn } from 'node:child_process'
+import { execFileSync, spawn } from 'node:child_process'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
@@ -20,6 +20,7 @@ import { phienAmKhop } from './kiem-hinh.bundle.mjs'
 const DAY = path.dirname(fileURLToPath(import.meta.url))
 const GOC = path.resolve(DAY, '../..')
 const argv = process.argv.slice(2)
+process.env.OMR_GOC = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const co = (k) => argv.includes(k)
 const lay = (k, md) => { const i = argv.indexOf(k); return i >= 0 && argv[i + 1] ? argv[i + 1] : md }
 const MAY_CHU = (process.env.OMR_MAY_CHU || 'https://omr.ttadodaihoc.workers.dev').replace(/\/$/, '')
@@ -81,6 +82,46 @@ const NHAC_PHIEN_AM = (n) => `Đọc goi-phien-am.md trong thư mục hiện t�
 const NHAC_VE = (n) => `Đọc goi-ve-hinh.md trong thư mục hiện tại và làm đúng. Có ${n} ảnh trong vao/img/ (mỗi ảnh kèm vao/<bam>.json có phienAm). Ghi cảnh vào ra/<bam>.json, chạy node kiem.mjs, sửa tới khi ĐẠT. Trả lời cuối đúng 1 dòng.`
 const doc = (dir, bam) => { const j = docJson(path.join(dir, 'ra', `${bam}.json`)); return Array.isArray(j?.phienAm) ? j.phienAm.map(String) : null }
 
+
+const NHAC_SOAT = (n) => `Đọc goi-soat-hinh.md trong thư mục hiện tại và làm đúng. Có ${n} cặp ảnh (vao/img/<bam> là ảnh gốc, ra/<bam>.png là hình đã vẽ lại). Ghi kết luận từng ảnh vào soat/<bam>.json. Trả lời cuối đúng 1 dòng.`
+const TEP_VE = ['goi-ve-hinh.md', 'mau-dung-cu.md', 'vi-du-hinh.json', 'kiem-hinh.bundle.mjs']
+function dungLoVe(ten, viec, phienAm, raCu, loiPhe) {
+  const d = dungThuMuc(ten, viec, phienAm)
+  for (const f of TEP_VE) fs.copyFileSync(path.join(DAY, f), path.join(d, f))
+  fs.copyFileSync(path.join(DAY, 'kiem-lo.mjs'), path.join(d, 'kiem.mjs'))
+  for (const v of viec) {
+    if (raCu) { const f = path.join(raCu, 'ra', `${v.bam}.json`); if (fs.existsSync(f)) fs.copyFileSync(f, path.join(d, 'ra', `${v.bam}.json`)) }
+    if (loiPhe?.get(v.bam)) fs.writeFileSync(path.join(d, 'vao', `${v.bam}.loi.txt`), loiPhe.get(v.bam))
+  }
+  return d
+}
+/** Vẽ + soát tới 3 vòng. Trả Map bam → cảnh ĐÃ QUA SOÁT (cảnh trượt cả 3 vòng không có trong Map ⇒ không nộp). */
+async function veVaSoat(luong, ma, canVe, phienAm) {
+  const qua = new Map()
+  let con = canVe, dCu = null, loiPhe = null
+  for (let vong = 1; vong <= 3 && con.length; vong++) {
+    const dC = dungLoVe(`${luong}-${ma}-ve${vong}`, con, phienAm, dCu, loiPhe)
+    const kC = await chayClaude(dC, NHAC_VE(con.length), con.length, ',Bash(node kiem.mjs),Bash(node kiem.mjs:*)')
+    if (!kC.ok) console.log(`[${gio()}] luồng ${luong}: phiên vẽ lỗi (${kC.giay}s) ${kC.loi.replace(/\d{4,}/g, '…').slice(0, 140)}`)
+    if (kC.hetHan) { console.log(`[${gio()}] luồng ${luong}: có vẻ hết hạn mức Claude — nghỉ 30 phút`); await ngu(1_800_000) }
+    try { execFileSync('node', [path.join(DAY, 've-anh.mjs'), dC], { stdio: 'pipe', timeout: 240_000 }) } catch (e) { console.log(`[${gio()}] luồng ${luong}: dựng ảnh lỗi ${String(e.message).slice(0, 100)}`) }
+    const coAnh = con.filter((v) => fs.existsSync(path.join(dC, 'ra', `${v.bam}.png`)))
+    const dS = dungThuMuc(`${luong}-${ma}-soat${vong}`, coAnh, phienAm)
+    fs.mkdirSync(path.join(dS, 'soat'), { recursive: true }); fs.copyFileSync(path.join(DAY, 'goi-soat-hinh.md'), path.join(dS, 'goi-soat-hinh.md'))
+    for (const v of coAnh) fs.copyFileSync(path.join(dC, 'ra', `${v.bam}.png`), path.join(dS, 'ra', `${v.bam}.png`))
+    if (coAnh.length) { const kS = await chayClaude(dS, NHAC_SOAT(coAnh.length), coAnh.length); if (kS.hetHan) await ngu(1_800_000) }
+    const truot = [], phe = new Map()
+    for (const v of con) {
+      const kq = docJson(path.join(dS, 'soat', `${v.bam}.json`))
+      if (coAnh.includes(v) && kq?.dat === true) { const ra = docJson(path.join(dC, 'ra', `${v.bam}.json`)); if (ra) { qua.set(v.bam, ra); continue } }
+      truot.push(v); phe.set(v.bam, coAnh.includes(v) ? (Array.isArray(kq?.loi) ? kq.loi.join('\n- ') : 'phiên soát không kết luận') : 'cảnh chưa qua bộ kiểm hoặc không dựng được ảnh — làm lại')
+    }
+    console.log(`[${gio()}] luồng ${luong}: vòng ${vong} · qua soát ${qua.size}/${canVe.length} · trượt ${truot.length}`)
+    con = truot; dCu = dC; loiPhe = phe
+  }
+  return qua
+}
+
 const dem = { lo: 0, nop: 0, dat: 0, giuGoc: 0, lech: 0 }
 async function motLuong(luong) {
   for (;;) {
@@ -101,17 +142,9 @@ async function motLuong(luong) {
       khop.set(v.bam, { a, b, ok: !!a && !!b && phienAmKhop(a, b) })
       if (a && b && phienAmKhop(a, b)) phienAm.set(v.bam, a)
     }
-    // 2) vẽ cảnh (chỉ các ảnh có phiên âm khớp và có chữ)
+    // 2) vẽ cảnh → dựng ảnh → phiên SOÁT đối chiếu ảnh gốc (thầy 03/11: «chuẩn thì mới đẩy lên»); trượt thì vẽ lại theo lời phê, tối đa 3 vòng
     const canVe = viec.filter((v) => phienAm.has(v.bam))
-    let dC = null
-    if (canVe.length) {
-      dC = dungThuMuc(`${luong}-${ma}-ve`, canVe, phienAm)
-      for (const f of ['goi-ve-hinh.md', 'vi-du-hinh.json', 'kiem-hinh.bundle.mjs']) fs.copyFileSync(path.join(DAY, f), path.join(dC, f))
-      fs.copyFileSync(path.join(DAY, 'kiem-lo.mjs'), path.join(dC, 'kiem.mjs'))
-      const kC = await chayClaude(dC, NHAC_VE(canVe.length), canVe.length, ',Bash(node kiem.mjs),Bash(node kiem.mjs:*)')
-      if (!kC.ok) console.log(`[${gio()}] luồng ${luong}: phiên vẽ lỗi (${kC.giay}s) ${kC.loi.replace(/\d{4,}/g, '…').slice(0, 140)}`)
-      if (kC.hetHan) { console.log(`[${gio()}] luồng ${luong}: có vẻ hết hạn mức Claude — nghỉ 30 phút`); await ngu(1_800_000) }
-    }
+    const dat = canVe.length ? await veVaSoat(luong, ma, canVe, phienAm) : new Map()
     // 3) nộp
     const dong = { dat: 0, giuGoc: 0, lech: 0 }
     for (const v of viec) {
@@ -120,8 +153,8 @@ async function motLuong(luong) {
       if (!k.a || !k.b) { console.log(`  ${v.bam}: phiên âm thiếu — để máy chủ giữ hàng chờ`); continue }
       if (!k.ok) { console.log(`  ${v.bam}: hai lượt phiên âm lệch — nộp để máy chủ phát lại (không giữ ảnh gốc)`); body = { bam: v.bam, giuGoc: true, lyDo: 'hai lượt phiên âm lệch nhau', phienAm1: k.a, phienAm2: k.b } }
       else {
-        const ra = dC ? docJson(path.join(dC, 'ra', `${v.bam}.json`)) : null
-        if (!ra) { console.log(`  ${v.bam}: chưa có cảnh — để máy chủ giữ hàng chờ`); continue }
+        const ra = dat.get(v.bam)
+        if (!ra) { console.log(`  ${v.bam}: chưa qua soát — để máy chủ phát lại`); continue }
         body = ra.giuGoc === true ? { bam: v.bam, giuGoc: true, lyDo: String(ra.lyDo || 'khuôn chưa hỗ trợ'), phienAm1: k.a, phienAm2: k.b } : { bam: v.bam, canh: ra, phienAm1: k.a, phienAm2: k.b }
       }
       if (co('--thu')) { console.log(`  ${v.bam}: ${body.giuGoc ? 'XIN GIỮ GỐC (sẽ bị phát lại) · ' + body.lyDo : 'có cảnh ' + (body.canh?.canh?.loai || '?')} (chạy thử, không nộp)`); continue }
@@ -146,6 +179,7 @@ if (co('--nap-hang')) {
   }
   console.log(JSON.stringify({ soAnh: tongAnh, vaoHangMoi: tongMoi })); process.exit(0)
 }
+if (co('--lam-lai')) { const r = await goi('/kho/hinh-ve/lam-lai', {}); console.log('Đưa về hàng chờ:', JSON.stringify(r)); process.exit(0) }
 if (co('--tong')) {
   const t = await goi('/kho/hinh-ve/tong', {})
   if (!t.ok) { console.log('Lỗi:', t.error); process.exit(1) }
