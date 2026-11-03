@@ -52,7 +52,7 @@ ghiSwVersion()
 // Bỏ thư viện lớn chỉ dùng khi bấm (xuất PDF / ảnh, bản đồ 3D) — tải khi cần như cũ.
 const KHO_HS_BO = /^assets\/(?:ban-do-3d-three|jspdf|html2canvas|purify|index\.es|fflate)/
 // Gốc chọn tay: mảnh nạp lười CHỈ app học sinh dùng (đồ thị từ vỏ học sinh lan sang cả màn thầy qua mảnh chung ⇒ không lấy trọn). Mỗi gốc kéo theo mảnh nó nạp TĨNH + CSS.
-const KHO_HS_GOC = /^assets\/(?:TrongHs|ManLamBaiTap|LoiGiaiKinhHs|tai-san|hieu-ung|hieu-ung-an-mung|mol-dong|vua-phuong-an|lua-dong|lua-gian|bi-dong|Bi|GiamThi|giam-thi|ManThuong|KetBaiThuong|thuong-gon|thuong-chung|trong-lam-bai|ChuaGonDuo|duo-sua|TamGiuChan|giu-chan|KhungKiemTra|ThiDuo|BiNop|KetQuaSauNop|ManKiemTraCaNhan|TheKiemTraCaNhan|TheKiemTraCon|BangKiemTraCaNhan|kiem-tra-ca-nhan|LuyenDeChuan|LuyenDeCauTruc|ManTuLuyen|ManTuChua|ManChuaCauSai|ManTienBo|ManDiemSo|LichSuCaEm|CauDaLam|HopHoiThay|BongBongAiDdh|LamCauOn|TheBaiHangNgay|TheBaiDaDay|KhungLoiGiai|ThanhSoCauChua|HoSoCuaEmHs|HoSoHocThatEm|BaoCaoCaCuaEm|NhacSamsung|kenh-day|DauIon|PhongChoGame|TheDiemDanhHs|DiemDanhBuoi)-[\w-]{8}\.(?:js|css)$/
+const KHO_HS_GOC = /^assets\/(?:TrongHs|ManLamBaiTap|LoiGiaiKinhHs|tai-san|kinh-kiem|hieu-ung|hieu-ung-an-mung|mol-dong|vua-phuong-an|lua-dong|lua-gian|bi-dong|Bi|GiamThi|giam-thi|ManThuong|KetBaiThuong|thuong-gon|thuong-chung|trong-lam-bai|ChuaGonDuo|duo-sua|TamGiuChan|giu-chan|KhungKiemTra|ThiDuo|BiNop|KetQuaSauNop|ManKiemTraCaNhan|TheKiemTraCaNhan|TheKiemTraCon|BangKiemTraCaNhan|kiem-tra-ca-nhan|LuyenDeChuan|LuyenDeCauTruc|ManTuLuyen|ManTuChua|ManChuaCauSai|ManTienBo|ManDiemSo|LichSuCaEm|CauDaLam|HopHoiThay|BongBongAiDdh|LamCauOn|TheBaiHangNgay|TheBaiDaDay|KhungLoiGiai|ThanhSoCauChua|HoSoCuaEmHs|HoSoHocThatEm|BaoCaoCaCuaEm|NhacSamsung|kenh-day|DauIon|PhongChoGame|TheDiemDanhHs|DiemDanhBuoi)-[\w-]{8}\.(?:js|css)$/
 function khoNapTruocHs(): Plugin {
   let dsCho: string[] = []
   return {
@@ -371,6 +371,10 @@ export default defineConfig({
           // Lời giải Kính (thầy chốt 02/11): khung + bộ tải sẵn chỉ app học sinh dùng ⇒ kho chạy-lúc + kho tải ngầm học sinh (KHO_HS_GOC), precache giữ 170.
           '**/LoiGiaiKinhHs-*.{js,css}',
           '**/tai-san-*.js',
+          // 03/11: bản Kính lên tờ chiếu — chỉ màn thầy (kho chạy-lúc); bộ kiểm dùng chung ở mảnh tên cố định kinh-kiem (học sinh: kho tải ngầm).
+          '**/kinh-chieu-gan-*.js',
+          '**/loi-giai-gv-api-*.js',
+          '**/kinh-kiem-*.js',
           // ChonEmGiao (02/11): chỉ hai màn thầy nhập tĩnh (DayHocLenBang, SuaEmNhanBai) — cả hai đã ở kho chạy-lúc ⇒ cất trong precache là thừa;
           // nhường chỗ cho mảnh kinh-hs (hàm bọc Kính + giải mã gói mà màn làm chặng dùng), precache giữ 170.
           '**/ChonEmGiao-*.js',
@@ -675,6 +679,9 @@ export default defineConfig({
             // không kéo theo chem-format / hoa2-api ra khỏi mảnh cũ (includeDependenciesRecursively: false) ⇒ các đường khác không đổi byte.
             // LỜI GIẢI KÍNH màn học sinh (02/11): hàm bọc TheCau (boc-kinh) + giải mã gói (dap-an-may — ManLamBaiTap và tai-san cùng dùng) chung MỘT mảnh có precache.
             { name: 'kinh-hs', test: /src[\\/](?:components[\\/]loi-giai-kinh[\\/]boc-kinh|lib[\\/]dap-an-may)\.ts$/, includeDependenciesRecursively: false },
+            // 03/11 (lời giải Kính lên màn chiếu): bộ kiểm / xếp bản (kiem + kieu) giờ dùng chung app học sinh (LoiGiaiKinhHs) và tờ chiếu thầy (kinh-chieu-gan)
+            // ⇒ đặt tên mảnh cố định để kho tải ngầm học sinh nhận đúng nó (KHO_HS_GOC) và precache bỏ qua (giữ trần 170).
+            { name: 'kinh-kiem', test: /src[\\/]lib[\\/]loi-giai-kinh[\\/](?:kiem|kieu)\.ts$/, includeDependenciesRecursively: false },
             { name: 'goi-y-cham', test: /src[\\/](?:components[\\/]goi-y-cham[\\/](?!VungChamDe\.tsx|thay-bang-so-do\.tsx)[^\\/]+|lib[\\/]goi-y-cham[\\/]api\.ts)$/, includeDependenciesRecursively: false },
             { name: 'tu-dien-cham', test: /src[\\/]lib[\\/]goi-y-cham[\\/](?!api\.ts|kieu\.ts)[^\\/]+$/, includeDependenciesRecursively: false },
             // 21/10 (màn Phiếu nạp muộn): năm mô-đun nhỏ dùng chung của lời giải / thí nghiệm mà cổng học sinh vẫn cần bị Rolldown tách thành năm tệp riêng

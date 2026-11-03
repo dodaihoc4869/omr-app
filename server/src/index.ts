@@ -4233,6 +4233,7 @@ const boXuLy = {
       if (p === '/kho/loi-giai/tong') return ra(await tongHang(env))
       // LỜI GIẢI KÍNH (thầy chốt 02/11, loi-giai-kinh.ts): máy soạn nhận lô / nộp bản / xem số phủ — cùng cổng mã bí mật ở trên.
       if (p === '/kho/loi-giai-kinh/nap-hang') return ra(await import('./loi-giai-kinh').then((m) => m.napHangKinh(env)))
+      if (p === '/kho/loi-giai-kinh/nap-hang-ngoai') return ra(await import('./loi-giai-kinh').then((m) => m.napHangNgoaiKinh(env)))
       if (p === '/kho/loi-giai-kinh/viec') return ra(await import('./loi-giai-kinh').then((m) => m.layViecKinh(env, b)))
       if (p === '/kho/loi-giai-kinh/nop') return ra(await import('./loi-giai-kinh').then((m) => m.nopBanKinh(env, b)))
       if (p === '/kho/loi-giai-kinh/tong') return ra(await import('./loi-giai-kinh').then((m) => m.tongKinh(env)))
@@ -4241,6 +4242,7 @@ const boXuLy = {
       if (p === '/kho/loi-giai-kinh/soat-viec') return ra(await import('./loi-giai-kinh').then((m) => m.soatViecKinh(env, b)))
       if (p === '/kho/loi-giai-kinh/soat-nop') return ra(await import('./loi-giai-kinh').then((m) => m.soatNopKinh(env, b)))
       if (p === '/kho/loi-giai-kinh/soat-tong') return ra(await import('./loi-giai-kinh').then((m) => m.soatTongKinh(env)))
+      if (p === '/kho/loi-giai-kinh/lam-lai') return ra(await import('./loi-giai-kinh').then((m) => m.lamLaiKinh(env, b)))
       if (p === '/kho/loi-giai-kinh/quet-hien') return ra(await import('./loi-giai-kinh').then((m) => m.quetHienKinh(env, b)))
       if (p === '/kho/xoa-cau-dap-an-dai') return ra(await import('./xoa-cau-kho').then((m) => m.xoaCauKho(env, b)))
       if (p === '/kho/loi-giai-kinh/thieu-chi-tiet') return ra(await import('./loi-giai-kinh').then((m) => m.thieuChiTietKinh(env)))
@@ -4263,6 +4265,8 @@ const boXuLy = {
       if (p === '/gv/cau-nghi/xu-ly') return ra(await gvXuLyCauNghi(env, b))
       if (p === '/ca/cau-nghi-dap-an') return ra(await dsCauNghi(env))
       if (p === '/gv/loi-giai/xem') return ra(await gvXemHoSo(env, b))
+      // LỜI GIẢI KÍNH cho app THẦY / màn chiếu (thầy 03/11 «Hiển thị lời giải mới cho tất cả phần chiếu lên bảng»): sau cổng mã bí mật như mọi /gv/*; MỘT câu D1.
+      if (p === '/gv/loi-giai-kinh') return ra(await import('./loi-giai-kinh').then(async (m) => ({ ok: true, ban: Object.fromEntries(await m.docBanKinh(env, (Array.isArray(b.qids) ? b.qids : []).map(String).slice(0, 200))) })))
       if (p === '/gv/loi-giai/duyet') return ra(await gvDuyet(env, b))
       if (p === '/gv/loi-giai/soan-gap') return ra(await gvSoanGap(env, b))
       if (p === '/gv/loi-giai/sua-kho') return ra(await gvSuaKho(env, b))

@@ -342,7 +342,9 @@ export async function dungToChieu(
       ...(o.lichSu ? { lichSuCau: o.lichSu } : {}),
     }]
   })
-  const html0 = taoHtmlMayChieu(dsO, {
+  // Lời giải Kính trên màn chiếu (thầy 03/11) — một lệnh cho cả tờ; lỗi ⇒ tờ như cũ.
+  const dsOKinh = await (await import('../../lib/loi-giai-kinh/kinh-chieu-gan')).ganKinhChoBang(dsO).catch(() => dsO)
+  const html0 = taoHtmlMayChieu(dsOKinh, {
     tenBuoi,
     ngay: new Date(),
     nganSachPhut: CAU_HINH_LEN_BANG_MAC_DINH.NGAN_SACH_PHUT,

@@ -3,8 +3,9 @@ import { createRoot } from 'react-dom/client'
 import '../../../src/index.css'
 import '../../../src/styles/trong-hs.css'
 import '../../../src/styles/trong-hs-mau.css'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import '../../../src/styles/trong-lam-bai.css'
+import '../../../src/styles/trong-chang-ngang.css'
 import LoiGiaiKinh from '../../../src/components/loi-giai-kinh/LoiGiaiKinh'
 import LoiGiaiKinhHs from '../../../src/components/loi-giai-kinh/LoiGiaiKinhHs'
 import mau from '../vi-du-kinh.json'
@@ -14,25 +15,55 @@ const ds = [
   { phan: 'II', dapAn: 'SDSD', em: 'DDDD', luaChon: ['Tăng nhiệt độ, cân bằng chuyển dịch theo chiều thuận.', 'Tăng áp suất, cân bằng chuyển dịch theo chiều thuận.', 'Thêm bột Fe làm xúc tác, cân bằng chuyển dịch theo chiều thuận.', 'Lấy bớt NH3 ra khỏi hệ, cân bằng chuyển dịch theo chiều thuận.'], de: 'Cho cân bằng N2(g) + 3H2(g) ⇌ 2NH3(g), ΔrH = −92 kJ. Mỗi ý sau đúng hay sai?' },
   { phan: 'III', dapAn: '13,2', em: '17,6', de: 'Đun nóng 12 gam acetic acid với 13,8 gam ethanol (xúc tác H2SO4 đặc), hiệu suất 75%. Khối lượng ethyl acetate thu được là bao nhiêu gam?' },
 ] as const
-const i = Math.max(0, Math.min(2, Number(new URLSearchParams(location.search).get('cau') || '1') - 1))
-const d = ds[i]!
-const ban = { ...(mau as unknown[])[i] as object, qid: `mau-${i + 1}`, phienBan: 1, phan: d.phan } as unknown as BanKinh
+const soCau = Number(new URLSearchParams(location.search).get('cau') || '1')
+const i = Math.max(0, Math.min(2, soCau - 1))
+// ?cau=4: câu GỌI TÊN (lysine) — xem cảnh danh-phap theo ba bước của thầy (03/11)
+const DP = {
+  cotLoi: { chu: 'Gọi tên theo công thức của thầy: **nhánh + mạch chính + liên kết + chức**. Amino acid: COOH là chức chính, C của COOH là số 1, NH₂ là nhánh **amino**.', chip: [{ nhan: 'Đánh số', chu: 'chức → π → nhánh' }, { nhan: 'Đơn chức', chu: 'bỏ e' }] },
+  canh: { loai: 'danh-phap', soC: 6, chuc: { viTri: 1, ten: 'COOH' }, nhanh: [{ viTri: 2, ten: 'NH2' }, { viTri: 6, ten: 'NH2' }], pi: [],
+    manh: [{ loai: 'nhanh', chu: '2,6-diamino', giai: 'Hai nhóm NH₂ ở carbon số 2 và số 6 là **nhánh amino**; có 2 nhánh nên thêm **di**.' }, { loai: 'mach', chu: 'hex', giai: 'Mạch chính 6 C ⇒ **hex**.' },
+      { loai: 'lien-ket', chu: 'an', giai: 'Toàn liên kết đơn ⇒ **an**.' }, { loai: 'chuc', chu: 'oic acid', giai: 'Chức COOH đọc là **oic acid**; đơn chức nên bỏ e (hexane → hexan).' }], ten: '2,6-diaminohexanoic acid' },
+}
+const d = soCau === 4 ? ds[0] : ds[i]!
+const PT = { cotLoi: { congThuc: 'H_2N-CH_2-COOH + C_2H_5OH + HCl → ClH_3N-CH_2-COOC_2H_5 + H_2O', chu: 'COOH của glycine ester hoá với OH của ethyl alcohol, mất một H₂O; có HCl nên nhóm NH₂ **nhận H⁺**.', chip: [{ nhan: 'COOH + OH', chu: 'ester hoá, mất H₂O' }] } }
+const ban = { ...(mau as unknown[])[i] as object, ...(soCau === 4 ? DP : {}), ...(new URLSearchParams(location.search).get('pt') ? PT : {}), qid: `mau-${i + 1}`, phienBan: 1, phan: d.phan } as unknown as BanKinh
 document.body.style.background = 'var(--tr-nen)'
 // ?hop=1: hộp «Lời giải» của màn làm bài (thanh tiêu đề + nút «Lời giải thu gọn» sát nút đóng); ?mo=1 bấm mở sẵn.
 function Hop() {
   const [khe, setKhe] = useState<HTMLElement | null>(null)
   const cu = <section className="ht2-lam-loi-giai" aria-label="Lời giải"><p>n acid = 12/60 = 0,2 mol; n ethanol = 0,3 mol ⇒ acid hết.</p><p>m ester = 0,2 × 88 × 75% = <b>13,2 gam</b>.</p></section>
+  const pt = new URLSearchParams(location.search).get('pt') === '1'
   return (
+    <div className="ht-app ht2-lam duo" data-chang="" data-duo="">
     <div className="duo-lg" role="dialog" aria-modal="true" aria-label="Lời giải">
       <div className="duo-lg-the">
         <header className="duo-lg-dau"><b>Lời giải · Câu 3</b><span className="duo-lg-khe" ref={setKhe} /><button type="button" className="duo-dong" aria-label="Đóng lời giải">✕</button></header>
-        <LoiGiaiKinhHs kheNut={khe} qid="mau-3" phan="III" dapAn="13,2" em="17,6" duPhong={cu} />
+        <LoiGiaiKinhHs kheNut={khe} qid={pt ? 'mau-3-pt' : 'mau-3'} phan="III" dapAn="13,2" em="17,6" duPhong={cu} />
       </div>
+    </div>
     </div>
   )
 }
+// ?chieu=N: TỜ CHIẾU thật (taoHtmlMayChieu) với bản Kính mẫu N — xem lời giải mới trên máy chiếu (thầy 03/11), bấm sẵn «Hiện lời giải».
+function Chieu() {
+  const [html, setHtml] = useState('')
+  useEffect(() => { void (async () => {
+    const { taoHtmlMayChieu } = await import('../../../src/lib/html-may-chieu')
+    const { xepTheoCauPhat } = await import('../../../src/lib/loi-giai-kinh/kiem')
+    const n = Number(new URLSearchParams(location.search).get('chieu')) || 1
+    const dd = ds[Math.min(2, n - 1)]!
+    const tho = { ...(mau as unknown[])[Math.min(2, n - 1)] as object, ...(n === 4 ? DP : {}), qid: 'q', phienBan: 1, phan: dd.phan, _goc: null }
+    const luaChon = 'luaChon' in dd ? [...dd.luaChon] : null
+    const dapAn = dd.phan === 'I' ? 'A' : dd.dapAn
+    const kinh = xepTheoCauPhat(tho, { phan: dd.phan, choices: dd.phan === 'I' ? luaChon ?? undefined : undefined, ideas: dd.phan === 'II' ? luaChon ?? undefined : undefined, correct: dapAn })!
+    const cau = { id: 'X-I-1', phan: dd.phan, maDe: 'X', chuyenDe: '', dang: 'chua_ro', sao: 0, mucDo: '', text: dd.de, luaChon, dapAn, chot: '', lyDo: null, buoc: null, ketQua: '', kinh }
+    setHtml(taoHtmlMayChieu([{ sbd: '', hoTen: 'Cả lớp', soCau: 1, cau } as never], { tenBuoi: 'Dạy học', ngay: new Date() }))
+  })() }, [])
+  return html ? <iframe title="Tờ chiếu" srcDoc={html} style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', border: 0 }} /> : null
+}
+const chieu = new URLSearchParams(location.search).get('chieu')
 const hop = new URLSearchParams(location.search).get('hop') === '1'
-createRoot(document.getElementById('goc')!).render(hop ? <Hop /> :
+createRoot(document.getElementById('goc')!).render(chieu ? <Chieu /> : hop ? <Hop /> :
   <main style={{ maxWidth: 1240, margin: '0 auto', padding: '16px max(16px, env(safe-area-inset-left)) 32px' }}>
     <LoiGiaiKinh ban={ban} dapAn={d.dapAn} emTraLoi={d.em} luaChon={'luaChon' in d ? d.luaChon : undefined} de={d.de} />
   </main>,
