@@ -77,6 +77,13 @@ export async function layKeHoachEm(sbd: string): Promise<KeHoachEm | null> {
   return j ? (j as unknown as KeHoachEm) : null
 }
 
+/** (03/11) Mỗi em trong ca: [số lần từng làm SAI, số lần từng làm ĐÚNG] đúng những câu em có trong ca (trừ chính ca) — lệnh thầy chỉ đọc `/gv/lich-su-ca-em` (mã bí mật),
+ *  MỘT lần mỗi lần mở / làm mới, KHÔNG nằm trên nhịp 20 giây. Lỗi / máy chủ cũ ⇒ null (màn thầy y như cũ). */
+export async function layLichSuCaEm(maCa: string): Promise<Record<string, [number, number]> | null> {
+  const j = await goi('/gv/lich-su-ca-em', { maCa }, true)
+  return j && j.ds && typeof j.ds === 'object' ? (j.ds as Record<string, [number, number]>) : null
+}
+
 /** Ngày Việt Nam (YYYY-MM-DD) của một thời điểm — cùng mốc "ngày" với `ngay_vn` của máy chủ. */
 export function ngayVn(nowMs: number = Date.now()): string {
   return new Date(nowMs + 7 * 3600000).toISOString().slice(0, 10)

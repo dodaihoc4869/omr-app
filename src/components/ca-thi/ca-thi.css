@@ -2009,3 +2009,13 @@ table.ct-bang {
 }
 .ct-vung-dung > .ct-ghi { margin: 0; }
 .ct-cb-tt { font-weight: 600; }
+
+/* NHÃN «SAI N LẦN · ĐÚNG M LẦN» dưới tên em + nút xếp (thầy 03/11, bản vẽ docs/ban-ve-nhan-da-lam-0311.jpg) — chỉ biến màu gv-mau (đỏ = ho, xanh = xl). */
+.ct-ls { display: inline-flex; align-self: flex-start; margin-top: 4px; font-size: 12px; font-weight: 800; line-height: 1.5; }
+.ct-ls i { font-style: normal; padding: 2px 8px; }
+.ct-ls i:first-child { border-radius: 99px 0 0 99px; }
+.ct-ls i:last-child { border-radius: 0 99px 99px 0; }
+.ct-ls i:only-child { border-radius: 99px; }
+.ct-ls .s { background: var(--gvm-ho-nen); color: var(--gvm-ho-dam); }
+.ct-ls .d { background: var(--gvm-xl-nen); color: var(--gvm-xl-dam); }
+.ct-xep-sai { margin: 0 0 10px; min-height: 36px; }

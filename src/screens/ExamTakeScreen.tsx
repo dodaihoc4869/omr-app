@@ -3353,6 +3353,8 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                   ? luoiTungCau(graded.score, graded.studentAnswers) // đúng · sai · đúng một phần · BỎ TRỐNG (đọc từ chính bài làm — ket-qua-sau-nop.ts)
                   : undefined
               }
+              bai={assignment}
+              maCa={attempt?.loai === 'baitap' ? undefined : attempt?.maCa}
               soDaLam={soDaLam}
               tongCau={flat.length}
               lam2={thoiGianLam(attempt?.startedAt, attempt?.submittedAt)}
@@ -4115,6 +4117,9 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       tong: total,
       luu: { nhan: dotLabel, tt: loiKhoNen ? 'loi' : dangLuuNen || saveFlash ? 'dang' : !online ? 'mang' : 'da' },
       cauHien: Math.min(Math.max(1, cauDuo), total),
+      // nhãn «đã làm đúng/sai» (thầy 03/11): ThiDuo / KetQuaSauNop (mảnh nạp lười) tự ghép qid từ đề + mã ca; bài tập về nhà không nhãn
+      bai: assignment,
+      maCa: attempt.maCa,
       onDenCau: (so) => {
         if (so > soTheDung) setTheDaDung({ khoa: assignment, n: Infinity }) // câu chưa dựng (DỰNG ĐỀ DẦN) ⇒ dựng hết cùng lượt vẽ
         setCauDuo(so)

@@ -47,6 +47,7 @@ import ThanhTabCa, { type MucTabCa } from '../components/ThanhTabCa'
 import { demCauDaLam, tongSoCauCa } from '../lib/con-lai-ca'
 import './ca-thi-m3.css'
 // CA THI 28/09 (docs/ban-ve-ca-thi-2809): đầu màn Theo dõi, màn Kết thúc ca, Báo cáo chi tiết — THAY khối gập BaoCaoCaLop + trang BaoCaoMotEm cũ.
+import { layLichSuCaEm } from '../lib/ho-so-em-thay'
 import TheoDoiCa, { type EmTheoDoi } from '../components/ca-thi/TheoDoiCa'
 import { demConTrongGio, xepCauChuaCa } from '../lib/chieu-chua-ca'
 import { dungToChuaCa } from '../components/ca-thi/dung-to-chua-ca'
@@ -1986,6 +1987,7 @@ export default function ExamMonitorScreen() {
             <TheoDoiCa
               tenCa={tenHienCua(chiTiet.ca.tenCa, chiTiet.ca.maCa)}
               maCa={chiTiet.ca.maCa}
+              layLichSu={layLichSuCaEm}
               link={`${location.origin}${import.meta.env.BASE_URL}t/${chiTiet.ca.maCa}`}
               daChepLink={daCopy}
               onChepLink={copyLink}

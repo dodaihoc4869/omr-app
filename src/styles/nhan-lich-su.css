@@ -1,0 +1,22 @@
+/* NHÃN «ĐÃ LÀM ĐÚNG / SAI» (thầy 03/11, src/lib/nhan-lich-su.ts) — chỉ biến màu sẵn có của app học sinh. */
+.duo-kt-ls[hidden], .duo-kt-t4[hidden] { display: none; }
+.duo-kt-ls { margin-left: 8px; vertical-align: middle; white-space: nowrap; font-size: 12px; font-weight: 800; line-height: 1.5; letter-spacing: 0; text-transform: none; }
+.duo-kt-ls.nl { display: inline-flex; }
+.duo-kt-ls.nl i { font-style: normal; padding: 2px 8px; }
+.duo-kt-ls.nl i:first-child { border-radius: 99px 0 0 99px; }
+.duo-kt-ls.nl i:last-child { border-radius: 0 99px 99px 0; }
+.duo-kt-ls.nl i:only-child { border-radius: 99px; }
+.duo-kt-ls.nl .s { background: var(--tr-sai-nhat); color: var(--tr-sai-chu); }
+.duo-kt-ls.nl .d { background: var(--tr-dung-nhat); color: var(--tr-dung-chu); }
+.duo-kt-ls.nm { display: inline-flex; padding: 2px 9px; border-radius: 99px; }
+.duo-kt-ls.nm[data-m='dd'], .duo-kt-ls.nm[data-m='sd'], .duo-kt-t4 .o[data-m='dd'], .duo-kt-t4 .o[data-m='sd'] { background: var(--tr-dung-nhat); color: var(--tr-dung-chu); }
+.duo-kt-ls.nm[data-m='sd'], .duo-kt-t4 .o[data-m='sd'] { box-shadow: inset 0 0 0 1.5px var(--tr-dung); }
+.duo-kt-ls.nm[data-m='ds'], .duo-kt-t4 .o[data-m='ds'] { background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); box-shadow: inset 0 0 0 1.5px var(--tr-chu-y); }
+.duo-kt-ls.nm[data-m='ss'], .duo-kt-t4 .o[data-m='ss'] { background: var(--tr-sai-nhat); color: var(--tr-sai-chu); }
+.duo-kt-t4 { display: block; margin: 14px 0 6px; padding: 14px; border-radius: 22px; background: var(--kinh-ve, var(--tr-mat)); box-shadow: inset 0 0 0 1px var(--tr-vien); }
+.duo-kt-t4 h3 { margin: 0 0 4px; font-size: 16px; font-weight: 800; line-height: 1.3; }
+.duo-kt-t4 p { margin: 0 0 10px; font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--tr-chu-2); }
+.duo-kt-t4 .g { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.duo-kt-t4 .o { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 16px; }
+.duo-kt-t4 .o b { font-size: 24px; font-weight: 800; line-height: 1; }
+.duo-kt-t4 .o span { font-size: 13px; font-weight: 700; line-height: 1.3; }
