@@ -179,7 +179,7 @@ function DaiHoiLai({ soLanSai }: { soLanSai?: number }) {
       }}
     >
       <RotateCcw size={15} aria-hidden />
-      <span>{co ? `Câu em đã sai buổi trước (${n} lần) — đọc kỹ lại từ đầu` : 'Câu em đã sai buổi trước — đọc kỹ lại từ đầu'}</span>
+      <span>{`Ôn lỗi trước${co ? ` (${n} lần sai)` : ''}`}</span>
     </div>
   )
 }
