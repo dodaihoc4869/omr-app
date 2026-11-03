@@ -1,0 +1,77 @@
+[
+  {
+    "i": 1162,
+    "hash": "d2d2d2cc19c2b8cedf890cfd80a884091d35d5ab588d01c4124d68cb7ff58cec",
+    "fileNguon": "anh/d2d2d2cc19c2b8cedf890cfd80a884091d35d5ab588d01c4124d68cb7ff58cec.png",
+    "canvas": [
+      740,
+      159
+    ],
+    "daMoNative": true,
+    "kind": "periodic-schematic",
+    "groups": [
+      "I",
+      "II",
+      "III",
+      "IV",
+      "V",
+      "VI",
+      "VII",
+      "VIII"
+    ],
+    "cells": [
+      {
+        "symbol": "Na",
+        "period": 3,
+        "group": "I"
+      },
+      {
+        "symbol": "C",
+        "period": 2,
+        "group": "IV"
+      },
+      {
+        "symbol": "P",
+        "period": 3,
+        "group": "V"
+      },
+      {
+        "symbol": "Ne",
+        "period": 2,
+        "group": "VIII"
+      }
+    ],
+    "notes": "4hàngchu kỳsơđồ:row1chỉôgroupI,trốngrộng,ôVIII;row2và3có2ôstrái+6ôpphải,cáchgaphugeởgiữa;row4liền18ô(2s+10d+6p). Vịtrícụthểnative:row1y30..61 I x9..53,VIII683..734;row2y61..93 Cởx493..537,Ne683..734;row3y93..124 Na9..53,P537..581;row4y124..156. LabelI/VIIItrêncao;II/III/IV/V/VI/VIItrênrow2. Khungđenmảnhnềntrắng;khôngthêmtênnhóm/tênnguyêntố/hóa trị.",
+    "questions": [
+      {
+        "qid": "DB-10-B8-D2-II-11",
+        "de": "Hình dưới đây mô phỏng vị trí của một số nguyên tố hóa học trong bảng tuần hoàn:",
+        "refs": [
+          {
+            "where": "DB-10-B8-D2-II-11.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C2-B5-II-15",
+        "de": "Hình dưới đây mô phỏng vị trí của một số nguyên tố hóa học trong bảng tuần hoàn:",
+        "refs": [
+          {
+            "where": "DH-10-C2-B5-II-15.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "bang-tuan-hoan-ddh-df0a6e1c2163ec8b3f372f39fdfcefee9834fbbc0bc481894f7a7fae0b85b461.svg",
+    "hashSvg": "df0a6e1c2163ec8b3f372f39fdfcefee9834fbbc0bc481894f7a7fae0b85b461",
+    "byteSvg": 11920,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "4hàng,2ôrow1/8ôrow2/8ôrow3/18ôrow4với10ôdtrống. Na/C/P/Neđúngô,nhómI..VIIIđúngvịtrí,khôngthêmnhãn/hoátrị.",
+    "hashSvgDaSoat": "df0a6e1c2163ec8b3f372f39fdfcefee9834fbbc0bc481894f7a7fae0b85b461",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

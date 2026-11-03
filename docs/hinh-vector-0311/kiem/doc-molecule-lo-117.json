@@ -1,0 +1,964 @@
+[
+  {
+    "i": 1184,
+    "hash": "d6ebd3dd15c9cf145f279e08684a608d60a3be814e5f02bd1eed3f20ddc2c824",
+    "fileNguon": "anh/d6ebd3dd15c9cf145f279e08684a608d60a3be814e5f02bd1eed3f20ddc2c824.png",
+    "canvas": [
+      154,
+      124
+    ],
+    "daMoNative": true,
+    "kind": "haworth-pyranose-glycoside",
+    "substituents": {
+      "C1": {
+        "down": "OCH₃",
+        "up": null
+      },
+      "C2": {
+        "down": "OH",
+        "up": null
+      },
+      "C3": {
+        "up": "OH",
+        "down": null
+      },
+      "C4": {
+        "down": "OH",
+        "up": null
+      },
+      "C5": {
+        "up": "CH₂–OH(expanded)",
+        "down": null
+      }
+    },
+    "notes": "Vòng6cạnhOtrênphải,C1phải,C2dướiphải,C3dướitrái,C4trái,C5trêntrái. KhôngbấtkỳHexplicit/sốC/caption. C1–OCH₃xuốngrõ,kHÔNGthaybằngOHtheostemfructose. CH₂OHởC5kha triển:bondđứnglênCH₂,chéolênphảiđếnOH(textOH). 3cạnhtrướcđậm. Khôngcharge/stereoCIPnêm.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D1-III-157",
+        "de": "Cho 1,8 gam fructose (C₆H₁₂O₆) tác dụng hết với lượng dư dung dịch AgNO₃ trong NH₃, thu được m gam Ag.\nGiá trị của m là bao nhiêu? (Kết quả làm tròn đến hàng phần mười.)",
+        "refs": [
+          {
+            "where": "DB-12-B4-D1-III-157.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D2-III-110",
+        "de": "Ở dạng cấu tạo mạch vòng, nhóm -OH hemiacetal của glucose tác dụng với methanol khi có mặt của HCl khan, tạo thành methyl glucoside có công thức cấu tạo: Methyl α-glucoside Tổng số nguyên tử có trong một phân tử methyl α-glucoside là bao nhiêu?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-III-110.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-DT-III-10",
+        "de": "Cho 1,8 gam fructose (C₆H₁₂O₆) tác dụng hết với0 lượng dư dung dịch AgNO₃ trong NH₃, thu được m gam Ag.\nGiá trị của m là bao nhiêu? (Kết quả làm tròn đến hàng phần mười.)",
+        "refs": [
+          {
+            "where": "DH-12-C2-B4-DT-III-10.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-III-13",
+        "de": "Ở dạng cấu tạo mạch vòng, nhóm -OH hemiacetal của glucose tác dụng với methanol khi có mặt của HCl khan, tạo thành methyl glucoside có công thức cấu tạo: Methyl α-glucoside Tổng số nguyên tử có trong một phân tử methyl α-glucoside là bao nhiêu?",
+        "refs": [
+          {
+            "where": "DH-12-C2-B4-III-13.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-III-46",
+        "de": "Cho 1,8 gam fructose (C₆H₁₂O₆) tác dụng hết với lượng dư dung dịch AgNO₃ trong NH₃, thu được m gam Ag.\nGiá trị của m là bao nhiêu? (Kết quả làm tròn đến hàng phần mười.)",
+        "refs": [
+          {
+            "where": "DH-12-C2-B4-III-46.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-VD-III-1",
+        "de": "Ở dạng cấu tạo mạch vòng, nhóm -OH hemiacetal của glucose tác dụng với methanol khi có mặt của HCl khan, tạo thành methyl glucoside có công thức cấu tạo: Methyl α-glucoside Tổng số nguyên tử có trong một phân tử methyl α-glucoside là bao nhiêu?",
+        "refs": [
+          {
+            "where": "DH-12-C2-B4-VD-III-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 935,
+    "hash": "a927e0455dfa0774a9d1ba69302e83596571805d4a80ade6bdb7497a425a8ee3",
+    "fileNguon": "anh/a927e0455dfa0774a9d1ba69302e83596571805d4a80ade6bdb7497a425a8ee3.png",
+    "canvas": [
+      467,
+      285
+    ],
+    "daMoNative": true,
+    "kind": "haworth-fructofuranose-numbered",
+    "substituents": {
+      "C2": {
+        "up": "OH",
+        "down": "CH₂–OH(expanded), carbon1"
+      },
+      "C3": {
+        "up": "OH",
+        "down": null
+      },
+      "C4": {
+        "down": "OH",
+        "up": null
+      },
+      "C5": {
+        "up": "CH₂–OH(expanded), carbon6",
+        "down": null
+      }
+    },
+    "notes": "Vòng5cạnhOđỉnhtrêngiữa,C2phải,C3dướiphải,C4dướitrái,C5trái. Hkhôngexplicit. C5–C4–C3–C2là3cạnhtrướcđậm. C5branchC6bondđứnglênCH₂rồiOHchéolênphải;C2branchC1bondđứngxuốngCH₂rồiOHchéoxuốngphải. Giữđủsố1..6ởcáccarbon:1branchdướiphải;2rightvertex;3lowerright;4lowerleft;5leftvertex;6branchtrêntrái. KhôngsuyOHhemiketaltừđápán.",
+    "questions": [
+      {
+        "qid": "12-C2-B4-D1-I-63",
+        "de": "Cho công thức cấu tạo dạng mạch vòng β-fructose như sau (xem hình).\nNhóm –OH hemiketal là –OH gắn ở carbon số mấy?",
+        "refs": [
+          {
+            "where": "12-C2-B4-D1-I-63.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "12-C2-B7-D1-I-5",
+        "de": "Cho công thức cấu tạo dạng mạch vòng β-fructose như sau (xem hình).\nNhóm –OH hemiketal là –OH gắn ở carbon số mấy?",
+        "refs": [
+          {
+            "where": "12-C2-B7-D1-I-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-I-39",
+        "de": "Cho công thức cấu tạo dạng mạch vòng β-fructose như sau (xem hình).\nNhóm –OH hemiketal là –OH gắn ở carbon số mấy?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-39.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-I-122",
+        "de": "Cho công thức cấu tạo dạng mạch vòng β-fructose như sau (xem hình).\nNhóm –OH hemiketal là –OH gắn ở carbon số mấy?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-122.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 113,
+    "hash": "1567516b3a5746eb039e4d3f3b5fe4014fe2676acf78251199b3bdbc3c8e5e12",
+    "fileNguon": "anh/1567516b3a5746eb039e4d3f3b5fe4014fe2676acf78251199b3bdbc3c8e5e12.png",
+    "canvas": [
+      377,
+      210
+    ],
+    "daMoNative": true,
+    "kind": "haworth-fructofuranose-numbered",
+    "substituents": {
+      "C2": {
+        "up": "OH",
+        "down": "CH₂–OH(expanded), carbon1"
+      },
+      "C3": {
+        "up": "OH",
+        "down": null
+      },
+      "C4": {
+        "down": "OH",
+        "up": null
+      },
+      "C5": {
+        "up": "CH₂–OH(expanded), carbon6",
+        "down": null
+      }
+    },
+    "notes": "Cùngnộidung935đãmởRIÊNGnative:5ringOtop,C2right,C3lowerright,C4lowerleft,C5left. KHÔNGHexplicit. SốC1..6/2branchCH₂OHkha triểnphảigiữ. Khôngcaption/charges/arrow/sốnhómOH.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D3-I-264",
+        "de": "Cho công thức cấu tạo dạng mạch vòng β-fructose như sau: Nhóm –OH hemiketal là –OH gắn ở carbon số mấy?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-264.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B7-D1-I-5",
+        "de": "Cho công thức cấu tạo dạng mạch vòng β-fructose như sau: Nhóm –OH hemiketal là –OH gắn ở carbon số mấy?",
+        "refs": [
+          {
+            "where": "DH-12-C2-B7-D1-I-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 799,
+    "hash": "94c8d5e4c80c946d19e8da2eaa35e6446e3c7d02e5002af3cb544ff0629f295b",
+    "fileNguon": "anh/94c8d5e4c80c946d19e8da2eaa35e6446e3c7d02e5002af3cb544ff0629f295b.png",
+    "canvas": [
+      204,
+      126
+    ],
+    "daMoNative": true,
+    "kind": "haworth-fructofuranose",
+    "substituents": {
+      "C2": {
+        "up": "OH",
+        "down": "CH₂OH(text)"
+      },
+      "C3": {
+        "up": "OH",
+        "down": null
+      },
+      "C4": {
+        "down": "OH",
+        "up": null
+      },
+      "C5": {
+        "up": "CH₂OH(text)",
+        "down": null
+      }
+    },
+    "notes": "Cùngbodyfructofuranose935nhưngKHÔNGsốC,cả2branchgiữCH₂OHtextnguồnkhôngkha triển. KHÔNGHexplicit. C5left/C4lowerleft/C3lowerright/C2right/Otop;3cạnhtrướcđậm. Khôngtựthêmsố1..6/caption.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D3-I-189",
+        "de": "Monosaccharide X có công thức cấu tạo như sau: Tên gọi của X là",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-189.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-I-50",
+        "de": "Monosaccharide X có công thức cấu tạo như sau: Tên gọi của X là",
+        "refs": [
+          {
+            "where": "DH-12-C2-B4-I-50.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1243,
+    "hash": "e181b193e5ab3b956bcb56b15da32d56e1a88625308bd196d939659c54394a73",
+    "fileNguon": "anh/e181b193e5ab3b956bcb56b15da32d56e1a88625308bd196d939659c54394a73.png",
+    "canvas": [
+      320,
+      262
+    ],
+    "daMoNative": true,
+    "kind": "haworth-pyranose-numbered",
+    "substituents": {
+      "C1": {
+        "up": "OH",
+        "down": null
+      },
+      "C2": {
+        "down": "OH",
+        "up": null
+      },
+      "C3": {
+        "up": "OH",
+        "down": null
+      },
+      "C4": {
+        "down": "OH",
+        "up": null
+      },
+      "C5": {
+        "up": "CH₂OH(text), carbon6",
+        "down": null
+      }
+    },
+    "notes": "Vòng6cạnhOtrênphải,3cạnhtrướcđậm. KHÔNGHexplicit. GiữsốC1..6:1phảidướiC1;2tráidướiC2;3phảidướiC3;4tráitrênC4;5tráiC5;6trênCH₂OH. KHÔNGnhãnCchođỉnh. OH C1lên,khác1036C1xuống,nênkhôngaliasvariant.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D2-I-102",
+        "de": "Phân tử β-glucose có cấu tạo như sau: Trong phân tử β-glucose, nhóm -OH ở vị trí carbon số mấy có khả năng phản ứng với ethanol khi có mặt của HCl khan, tạo thành ethyl glucoside?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-I-102.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-I-63",
+        "de": "Phân tử β-glucose có cấu tạo như sau: Trong phân tử β-glucose, nhóm -OH ở vị trí carbon số mấy có khả năng phản ứng với ethanol khi có mặt của HCl khan, tạo thành ethyl glucoside?",
+        "refs": [
+          {
+            "where": "DH-12-C2-B4-I-63.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 880,
+    "hash": "a0009cc3dab4b85ded1805c3fdb2f65f17541096f6ee4d992d95fb4dd4bdf86a",
+    "fileNguon": "anh/a0009cc3dab4b85ded1805c3fdb2f65f17541096f6ee4d992d95fb4dd4bdf86a.png",
+    "canvas": [
+      272,
+      145
+    ],
+    "daMoNative": true,
+    "kind": "fructofuranose-arrow-labels",
+    "substituents": {
+      "C2": {
+        "up": "CH₂OH",
+        "down": "OH"
+      },
+      "C3": {
+        "up": "HO",
+        "down": "H"
+      },
+      "C4": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C5": {
+        "up": "CH₂OH",
+        "down": "H"
+      }
+    },
+    "arrowLabels": {
+      "1": "OH ởC2 dưới-phải",
+      "2": "Mũitênđứngtừtrêngiữachỉvào BONDchéoO-vòng→C2,khôngtựdờisangOH",
+      "3": "OHởC4dưới-trái",
+      "4": "CH₂OH ởC2trên-phải"
+    },
+    "notes": "5ringOtop,C2right,C3lowerright,C4lowerleft,C5left. ĐầyđủHexplicitC3/C4/C5;C2KHÔNGH. 3cạnhtrướcđậm. Arrow2thậtnativechỉlênbondO–C2(x~165,57ở880),khôngchỉHOcủaC3nằmthấphơn. CẤMtrộnlabel1/4giữa880và838vìĐẢONHAU. Số1..4lànhãnmũitênKHÔNGsốcarbon. Đãzoom3xđọcrõtừngendpoint/text.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D3-I-176",
+        "de": "Trong công thức của fructose ở hình dưới đây: Nhóm-OH hemiketal là nhóm -OH được đánh số",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-176.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-I-26",
+        "de": "Trong công thức của fructose ở hình dưới đây: Nhóm-OH hemiketal là nhóm -OH được đánh số",
+        "refs": [
+          {
+            "where": "DH-12-C2-B4-I-26.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 838,
+    "hash": "9abbad80e27c95a4524e46ea4187710f0b4e79118bf4ec2b2aa63552209fe6a5",
+    "fileNguon": "anh/9abbad80e27c95a4524e46ea4187710f0b4e79118bf4ec2b2aa63552209fe6a5.png",
+    "canvas": [
+      391,
+      200
+    ],
+    "daMoNative": true,
+    "kind": "fructofuranose-arrow-labels",
+    "substituents": {
+      "C2": {
+        "up": "CH₂OH",
+        "down": "OH"
+      },
+      "C3": {
+        "up": "HO",
+        "down": "H"
+      },
+      "C4": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C5": {
+        "up": "CH₂OH",
+        "down": "H"
+      }
+    },
+    "arrowLabels": {
+      "1": "CH₂OH ởC2 trên-phải",
+      "2": "Mũitênđứngtừtrêngiữachỉvào BONDchéoO-vòng→C2,khôngtựdờisangOH",
+      "3": "OHởC4dưới-trái",
+      "4": "OHởC2dưới-phải"
+    },
+    "notes": "5ringOtop,C2right,C3lowerright,C4lowerleft,C5left. ĐầyđủHexplicitC3/C4/C5;C2KHÔNGH. 3cạnhtrướcđậm. Arrow2thậtnativechỉlênbondO–C2(x~165,57ở880),khôngchỉHOcủaC3nằmthấphơn. CẤMtrộnlabel1/4giữa880và838vìĐẢONHAU. Số1..4lànhãnmũitênKHÔNGsốcarbon. Đãzoom3xđọcrõtừngendpoint/text.",
+    "questions": [
+      {
+        "qid": "VIP27-C2-B4-I-16",
+        "de": "Trong công thức của fructose ở hình dưới đây:\nNhóm -OH hemiketal là nhóm -OH được đánh số",
+        "refs": [
+          {
+            "where": "VIP27-C2-B4-I-16.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 952,
+    "hash": "ac43be636d4dfe4799a00fec5ef8746679cfec5ea7422925525534372bbe9ea8",
+    "fileNguon": "anh/ac43be636d4dfe4799a00fec5ef8746679cfec5ea7422925525534372bbe9ea8.png",
+    "canvas": [
+      287,
+      270
+    ],
+    "daMoNative": true,
+    "kind": "glucopyranose-bond-labels",
+    "substituents": {
+      "C1": {
+        "down": "OH",
+        "up": null
+      },
+      "C2": {
+        "down": "OH",
+        "up": null
+      },
+      "C3": {
+        "up": "OH",
+        "down": null
+      },
+      "C4": {
+        "down": "OH",
+        "up": null
+      },
+      "C5": {
+        "up": "CH₂OH",
+        "down": null
+      }
+    },
+    "bondLabels": {
+      "(1)": "C1–C2cạnhđậméodướiphải",
+      "(2)": "C2–C3cạnhđậmngangdưới",
+      "(3)": "C5–O_vòngngangtrên",
+      "(4)": "O_vòng–C1chéophảitrên"
+    },
+    "notes": "6ringOtopright;Hkhôngexplicit. Giữ4labelngoặcvòng(1)..(4)đặtsátBONDtrongnguồn,KHÔNGcarbonnumber;khôngarrowleaders. C4–C3–C2–C1đậm. Đãzoom3x.",
+    "questions": [
+      {
+        "qid": "12-KT-C123-D1-I-5",
+        "de": "Glucose là carbohydrate đơn giản, tồn tại ở nhiều cấu tạo khác nhau gồm dạng mạch hở và mạch vòng. Một trong các cấu tạo của glucose là dạng mạch vòng 6 cạnh và được biểu diễn như hình dưới.\nKhi mở vòng trên thu được glucose dạng mạch hở.\nHãy cho biết liên kết nào trong vòng sẽ bị phá vỡ khi mở vòng?",
+        "refs": [
+          {
+            "where": "12-KT-C123-D1-I-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-I-140",
+        "de": "Glucose là carbohydrate đơn giản, tồn tại ở nhiều cấu tạo khác nhau gồm dạng mạch hở và mạch vòng. Một trong các cấu tạo của glucose là dạng mạch vòng 6 cạnh và được biểu diễn như hình dưới.\nKhi mở vòng trên thu được glucose dạng mạch hở.\nHãy cho biết liên kết nào trong vòng sẽ bị phá vỡ khi mở vòng?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-140.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1279,
+    "hash": "e8685f1fb27b587d9e9fd1e4e51d16fd81ea3bcb8977e2fe54f24ce1c40ad00e",
+    "fileNguon": "anh/e8685f1fb27b587d9e9fd1e4e51d16fd81ea3bcb8977e2fe54f24ce1c40ad00e.png",
+    "canvas": [
+      273,
+      261
+    ],
+    "daMoNative": true,
+    "kind": "orbital-p",
+    "orientation": "horizontal-y",
+    "notes": "Hai lobepnằmNGANGdọcY:lobetráirỗngviềnxám,phảitôxámđậmrìavàsánglõigiữa. 3trục:zđứngarrowlênlabelztrên;Yngangarrowphảilabelyphải;chéoSW↔NElabelxởNEvàmũitênởSWtheoNATIVE(khôngsửathàndirectionlýthuyết). Lobechêtrụcybêntrong,trụcz/chéoquađiểmgiữa. KhôngcaptionAO/name.",
+    "questions": [
+      {
+        "qid": "DB-10-B3-D1-I-283",
+        "de": "Hình vẽ dưới đây mô tả 3 dạng orbital: a) | b) | c) Các orbital tương ứng với các hình a), b) và c) là",
+        "refs": [
+          {
+            "where": "DB-10-B3-D1-I-283.hinh.2.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B4-D1-I-5",
+        "de": "Hình vẽ dưới đây mô tả 3 dạng orbital: a) | b) | c) Các orbital tương ứng với các hình a), b) và c) là",
+        "refs": [
+          {
+            "where": "DH-10-C1-B4-D1-I-5.hinh.2.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 593,
+    "hash": "6e37803f3fa72e12ba550e9555282afacefd4420010be79944d87d7e10c3043d",
+    "fileNguon": "anh/6e37803f3fa72e12ba550e9555282afacefd4420010be79944d87d7e10c3043d.png",
+    "canvas": [
+      274,
+      265
+    ],
+    "daMoNative": true,
+    "kind": "orbital-p",
+    "orientation": "diagonal-x",
+    "notes": "Hai lobepchéoSW↔NE:NErỗngviềnxám,SWtôxámđậmrìa/sánglõi. zđứngarrowlênlabelz;Yngangarrowphảilabely;xchéolabelxởNEvàmũitênởSWtheoNATIVE. KhôngcaptionAO/name. Đừngxoaylobessangngangnhư1279.",
+    "questions": [
+      {
+        "qid": "DB-10-B3-D1-I-283",
+        "de": "Hình vẽ dưới đây mô tả 3 dạng orbital: a) | b) | c) Các orbital tương ứng với các hình a), b) và c) là",
+        "refs": [
+          {
+            "where": "DB-10-B3-D1-I-283.hinh.1.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B4-D1-I-5",
+        "de": "Hình vẽ dưới đây mô tả 3 dạng orbital: a) | b) | c) Các orbital tương ứng với các hình a), b) và c) là",
+        "refs": [
+          {
+            "where": "DH-10-C1-B4-D1-I-5.hinh.1.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 627,
+    "hash": "742f0681bfcbeffd66bca16a6a424a73b00548e25489fdd69606606471d97882",
+    "fileNguon": "anh/742f0681bfcbeffd66bca16a6a424a73b00548e25489fdd69606606471d97882.png",
+    "canvas": [
+      267,
+      250
+    ],
+    "daMoNative": true,
+    "kind": "orbital-p",
+    "orientation": "diagonal-caption",
+    "notes": "Hai lobepchéoSW↔NEđềutôxámvớiđiểmsángdọcgiữa. zarrowlênlabelz,Yarrowphảilabely,xarrowSWvàlabelxSW. Captiondướinguyênvăn AO p. Giữcaption/cáchđặtxkhác593.",
+    "questions": [
+      {
+        "qid": "DB-10-B3-D1-III-251",
+        "de": "Hình ảnh bên mô tả AO px với hai thùy.\nXác suất tìm thấy electron ở mỗi thùy là khoảng bao nhiêu phần trăm?",
+        "refs": [
+          {
+            "where": "DB-10-B3-D1-III-251.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B3-III-1",
+        "de": "Hình ảnh bên mô tả AO px với hai thùy.\nXác suất tìm thấy electron ở mỗi thùy là khoảng bao nhiêu phần trăm?",
+        "refs": [
+          {
+            "where": "DH-10-C1-B3-III-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 737,
+    "hash": "898e524a08bdb99c74b295dad627ef887f915bdbc0c646ccb44ed9b1a8b5c432",
+    "fileNguon": "anh/898e524a08bdb99c74b295dad627ef887f915bdbc0c646ccb44ed9b1a8b5c432.png",
+    "canvas": [
+      1190,
+      315
+    ],
+    "daMoNative": true,
+    "kind": "orbital-grid-4",
+    "panels": [
+      "sphere_s",
+      "p_diagonal_x",
+      "p_horizontal_y",
+      "p_vertical_z"
+    ],
+    "notes": "4panelngangcùng3trục:xchéoSW↔NElabelxởSW,ynganglabelyphải,zđứnglabelztrên. Từngpanel:1quảcầuxámgradientởgốc;2hai lobeSW/NEdọcx;3hai lobetrái/phảidọcy;4hai lobetrên/dướidọcz. Chỉx/y/zlabels,KHÔNGthêm s/pₓ/pᵧ/p_z/(a)..(d) vìnguồnkhôngcó. Giữthứtựsphere,px,py,pz,tonexám+highlights. 2nguồnđãmởriêngcùngnộidungkhácscale.",
+    "questions": [
+      {
+        "qid": "10-C1-B3-D2-II-5",
+        "de": "Orbital nguyên tử có một số hình dạng khác nhau. Hình ảnh dưới đây mô tả hình dạng của một số AO thường gặp.",
+        "refs": [
+          {
+            "where": "10-C1-B3-D2-II-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-10-B3-D1-II-96",
+        "de": "Orbital nguyên tử có một số hình dạng khác nhau. Hình ảnh dưới đây mô tả hình dạng của một số AO thường gặp.",
+        "refs": [
+          {
+            "where": "DB-10-B3-D1-II-96.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 981,
+    "hash": "af672a3e128c141f6f1aa4f14ad3c9c1ed79733f8e76309c0f613c784cb374d3",
+    "fileNguon": "anh/af672a3e128c141f6f1aa4f14ad3c9c1ed79733f8e76309c0f613c784cb374d3.png",
+    "canvas": [
+      633,
+      144
+    ],
+    "daMoNative": true,
+    "kind": "orbital-grid-4",
+    "panels": [
+      "sphere_s",
+      "p_diagonal_x",
+      "p_horizontal_y",
+      "p_vertical_z"
+    ],
+    "notes": "4panelngangcùng3trục:xchéoSW↔NElabelxởSW,ynganglabelyphải,zđứnglabelztrên. Từngpanel:1quảcầuxámgradientởgốc;2hai lobeSW/NEdọcx;3hai lobetrái/phảidọcy;4hai lobetrên/dướidọcz. Chỉx/y/zlabels,KHÔNGthêm s/pₓ/pᵧ/p_z/(a)..(d) vìnguồnkhôngcó. Giữthứtựsphere,px,py,pz,tonexám+highlights. 2nguồnđãmởriêngcùngnộidungkhácscale.",
+    "questions": [
+      {
+        "qid": "DB-10-B3-D1-II-234",
+        "de": "Orbital nguyên tử có một số hình dạng khác nhau. Hình ảnh dưới đây mô tả hình dạng của một số AO thường gặp.",
+        "refs": [
+          {
+            "where": "DB-10-B3-D1-II-234.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B3-II-6",
+        "de": "Orbital nguyên tử có một số hình dạng khác nhau. Hình ảnh dưới đây mô tả hình dạng của một số AO thường gặp.",
+        "refs": [
+          {
+            "where": "DH-10-C1-B3-II-6.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1175,
+    "hash": "d43c75e215cac79028a9da0748791c2992b6e5a753da5290b05e02d81a70e5d6",
+    "fileNguon": "anh/d43c75e215cac79028a9da0748791c2992b6e5a753da5290b05e02d81a70e5d6.png",
+    "canvas": [
+      806,
+      257
+    ],
+    "daMoNative": true,
+    "kind": "orbital-overlap-p-p-sigma",
+    "notes": "Mộtfigurekhôngtext:2AO_pnằmngang,trụcliênkếtngangđenmảnhtừtráisangphải.Khóihình4lobetổng,tạogiao2nútởx~273và~531trêncanvas806x257:lobengoàitráix116..273;AOtráiinnerlobex273..~440;AOphảiinnerlobex~359..531;ngoàiphảix531..685. Haiinnerlobechồngnhauvùnggiữa~359..440đậmxámhìnhovalđứng. Khôngmũitêntrục,khôngσ/textp/điệntích/nucleusdotthêm. Môphỏngvectoropacityđểgiữvùngoverlapđậm.",
+    "questions": [
+      {
+        "qid": "10-C3-B12-I-2",
+        "de": "Khi hai orbital p xen phủ với nhau dọc theo trục liên kết thì tạo thành liên kết σ như hình dưới.\nPhân tử nào sau đây có liên kết tạo thành do sự xen phủ trục của các orbital p với p?",
+        "refs": [
+          {
+            "where": "10-C3-B12-I-2.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1337,
+    "hash": "f24234795a592eb9c137cb3050b00c47a823ac6eea0ab5058712f2b7caf2e40f",
+    "fileNguon": "anh/f24234795a592eb9c137cb3050b00c47a823ac6eea0ab5058712f2b7caf2e40f.png",
+    "canvas": [
+      1391,
+      300
+    ],
+    "daMoNative": true,
+    "kind": "orbital-overlap-grid-4",
+    "captions": [
+      "(a) Xen phủ trục s-s",
+      "(b) Xen phủ trục s-p",
+      "(c) Xen phủ trục p-p",
+      "(d) Xen phủ bên p-p"
+    ],
+    "notes": "4panelngang: a2quảcầuxámchồngrìa,khôngtrục;bspherechồng1lobecủaAO_pngangvớiđầutrụcngangmũitênphải;c2AO_pnganginnerlobeschồnggiữa,trụcngangmũitênphải;d2AO_pĐỨNGsongsongeach2lobes,total4lobes,trụcđứngmỗiorbitalvà1đườngngangqua2node;overlaplobeTRÊN-TRÊNvàDƯỚI-DƯỚI. Giữ4captionđầutheonguồn,kHÔNGtựthêmσ/π.",
+    "questions": [
+      {
+        "qid": "DH-10-C3-B14-D1-I-11",
+        "de": "Cho các hình biểu diễn sự xen phủ orbital nguyên tử để tạo liên kết hóa học như hình: (a) xen phủ trục s-s; (b) xen phủ trục s-p; (c) xen phủ trục p-p; (d) xen phủ bên p-p.\nBiết số hiệu các nguyên tử của H, F và S lần lượt là 1, 9 và 16. Sự tạo liên kết trong các phân tử $\\ce{H2S}$ và $\\ce{F2}$ theo kiểu xen phủ tương ứng là",
+        "refs": [
+          {
+            "where": "DH-10-C3-B14-D1-I-11.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1254,
+    "hash": "e3da7c5a687d311e3b6bbf6ab8eac56984b0a75d2de527c50b1b6ee75baee147",
+    "fileNguon": "anh/e3da7c5a687d311e3b6bbf6ab8eac56984b0a75d2de527c50b1b6ee75baee147.png",
+    "canvas": [
+      585,
+      255
+    ],
+    "daMoNative": true,
+    "kind": "lactic-acid-structure-and-ballstick",
+    "smiles": "C[C@H](O)C(=O)O",
+    "stereo": "S RDKit checked; source solid wedge alphaC→OH down,implicitHback",
+    "notes": "Hai panelngang,khôngcaption.Trái2D3C:CH₃–CH(OH)–COOH;OHalphaNÊMĐẶCxuống (đầunhọnalpha,rộngtớiOH);C=Otrên,acidOHphải. Phảimôhìnhballstick6quảcầunặng(3C+3O)màuxámđậm/đen,6Htrắng:3Hmethyl,1Halpha,1HOHalpha,1HOHacid. Cầukhôngphảiảnhchụp,đượcdựngvector3Dstylegiữconnectivityvàcounts;khôngbỏmôhìnhphải/chèncaptiontên.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D3-III-239",
+        "de": "Lactic acid hay acid sữa là hợp chất hóa học đóng vai trò quan trọng trong nhiều quá trình sinh hóa, lần đầu tiên được phân tách vào năm 1780 bởi nhà hóa học Thụy Điển Carl Wilhelm Scheele. Lactic acid có công thức phân tử C₃H₆O₃.\nKhi vận động mạnh cơ thể không đủ cung cấp oxygen, thì cơ thể sẽ chuyển hóa glucose thành lactic acid từ các tế bào để cung cấp năng lượng cho cơ thể (lactic acid tạo thành từ quá trình này sẽ gây mỏi cơ) theo phương trình sau:\nC₆H₁₂O6 (aq) → 2C₃H₆O3 (aq);\nΔrH = –150 kJ Biết rằng cơ thể chỉ cung cấp 98% năng lượng nhờ oxygen, năng lượng còn lại nhờ vào sự chuyển hóa glucose thành lactic acid.\nGiả sử một người chạy bộ trong một thời gian tiêu tốn 300 kcal.\nTính khối lượng lactic acid tạo ra từ quá trình chuyển hóa đó (biết 1 cal = 4,184 J). (Kết quả làm tròn đến hàng phần mười).",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-III-239.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-DT-III-8",
+        "de": "Lactic acid hay acid sữa là hợp chất hóa học đóng vai trò quan trọng trong nhiều quá trình sinh hóa, lần đầu tiên được phân tách vào năm 1780 bởi nhà hóa học Thụy Điển Carl Wilhelm Scheele. Lactic acid có công thức phân tử C₃H₆O₃.\nKhi vận động mạnh cơ thể không đủ cung cấp oxygen, thì cơ thể sẽ chuyển hóa glucose thành lactic acid từ các tế bào để cung cấp năng lượng cho cơ thể (lactic acid tạo thành từ quá trình này sẽ gây mỏi cơ) theo phương trình sau:\nC₆H₁₂O6 (aq) → 2C₃H₆O3 (aq);\nΔrH = –150 kJ Biết rằng cơ thể chỉ cung cấp 98% năng lượng nhờ oxygen, năng lượng còn lại nhờ vào sự chuyển hóa glucose thành lactic acid.\nGiả sử một người chạy bộ trong một thời gian tiêu tốn 300 kcal.\nTính khối lượng lactic acid tạo ra từ quá trình chuyển hóa đó (biết 1 cal = 4,184 J). (Kết quả làm tròn đến hàng phần mười).",
+        "refs": [
+          {
+            "where": "DH-12-C2-B4-DT-III-8.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-III-44",
+        "de": "Lactic acid hay acid sữa là hợp chất hóa học đóng vai trò quan trọng trong nhiều quá trình sinh hóa, lần đầu tiên được phân tách vào năm 1780 bởi nhà hóa học Thụy Điển Carl Wilhelm Scheele. Lactic acid có công thức phân tử C₃H₆O₃.\nKhi vận động mạnh cơ thể không đủ cung cấp oxygen, thì cơ thể sẽ chuyển hóa glucose thành lactic acid từ các tế bào để cung cấp năng lượng cho cơ thể (lactic acid tạo thành từ quá trình này sẽ gây mỏi cơ) theo phương trình sau:\nC₆H₁₂O6 (aq) → 2C₃H₆O3 (aq);\nΔrH = –150 kJ Biết rằng cơ thể chỉ cung cấp 98% năng lượng nhờ oxygen, năng lượng còn lại nhờ vào sự chuyển hóa glucose thành lactic acid.\nGiả sử một người chạy bộ trong một thời gian tiêu tốn 300 kcal.\nTính khối lượng lactic acid tạo ra từ quá trình chuyển hóa đó (biết 1 cal = 4,184 J). (Kết quả làm tròn đến hàng phần mười).",
+        "refs": [
+          {
+            "where": "DH-12-C2-B4-III-44.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 125,
+    "hash": "17540046af8c017b4be40fdfd1c4d8a94b5e90f276b7938993fbaf8a1514e94e",
+    "fileNguon": "anh/17540046af8c017b4be40fdfd1c4d8a94b5e90f276b7938993fbaf8a1514e94e.png",
+    "canvas": [
+      1045,
+      164
+    ],
+    "daMoNative": true,
+    "kind": "polymer-hydrolysis-literal",
+    "reactantUnit": {
+      "backbone": "–CH₂–CH–",
+      "branch": "OOCCH₃ xuống ở CH",
+      "brackets": "round parentheses",
+      "repeat": "n lower-right outside",
+      "caption": "polymer X"
+    },
+    "reagent": "nNaOH",
+    "overArrow": "t⁰",
+    "productUnit": {
+      "backbone": "–CH₂–CH–",
+      "branch": "OH xuống ở CH",
+      "brackets": "round parentheses",
+      "repeat": "n lower-right outside"
+    },
+    "byproduct": "nCH₃COONa",
+    "notes": "PHẢIgiữreactantbranch OOCCH₃ đúngtextNATIVE,khôngtựđổithànhOCOCH₃hoặcvẽfinitevinylacetate. Ngoặcbaođủbranchcả2repeatunit,stubhaiđầumạchngangranngoặc,nngoàidướiphải. Dấu+giữapolymer/nNaOHvàpolymer/nCH₃COONa;captionpolymerXchỉdướireactant. Mộtmũitênphảit⁰. KhôngfiniteSMILESthaypolymer.",
+    "questions": [
+      {
+        "qid": "VIP27-C4-B12-I-17",
+        "de": "Quan sát phương trình hoá học của phản ứng sau của polymer X (hình).\nCho các phát biểu sau:\n(1) Tên gọi của X là poly(vinyl acetate).\n(2) Polymer X được điều chế bằng cách trùng hợp methyl acrylate.\n(3) Phản ứng đã nêu thuộc loại phản ứng cắt mạch polymer.\n(4) Polymer X bị thuỷ phân trong môi trường kiềm.\nCác phát biểu **không** đúng là",
+        "refs": [
+          {
+            "where": "VIP27-C4-B12-I-17.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 304,
+    "hash": "341406fd71732e095629b445fe0c5a17c75a11e1d891ee98b732338d021b67f9",
+    "fileNguon": "anh/341406fd71732e095629b445fe0c5a17c75a11e1d891ee98b732338d021b67f9.png",
+    "canvas": [
+      1248,
+      418
+    ],
+    "daMoNative": true,
+    "kind": "molecule-grid-5",
+    "columns": 2,
+    "panels": [
+      {
+        "smiles": "CC(N)C(=O)NCC(=O)O",
+        "caption": [
+          "(1)"
+        ],
+        "notes": "Ala–Gly;1NHpeptide."
+      },
+      {
+        "smiles": "CC(N)C(=O)NC(C)C(=O)O",
+        "caption": [
+          "(2)"
+        ],
+        "notes": "Ala–Ala;1NH."
+      },
+      {
+        "smiles": "NCC(C)C(=O)NC(C)C(=O)O",
+        "caption": [
+          "(3)"
+        ],
+        "notes": "H₂N–CH₂–CH(CH₃)–CO–NH–CH(CH₃)–COOH;đầumạchcóTHÊMCH₂giữaNH₂vàalphaCH,KHÔNGAla–Ala."
+      },
+      {
+        "smiles": "NCC(C)C(=O)NCC(=O)NC(C)C(=O)NCC(=O)O",
+        "caption": [
+          "(4)"
+        ],
+        "notes": "H₂N–CH₂–CH(CH₃)–CO–NHCH₂CO–NHCH(CH₃)CO–NHCH₂COOH;3NH;đầuNnonalphaNH₂vìcóCH₂thêm."
+      },
+      {
+        "smiles": "CC(N)C(=O)NCC(=O)NC(C)C(=O)NCC(=O)O",
+        "caption": [
+          "(5)"
+        ],
+        "notes": "Ala–Gly–Ala–Gly;3NH,kHÔNGCH₂thêmởđầuNH₂."
+      }
+    ],
+    "notes": "5panelnguồn3ởhàngtrên2hàngdưới,đọctheothứtự(1)..(5). Cóthểreflow2cộtgiữmọinhãn. MọiNHamidehiệnHexplicit,giữNH₂đầu,COOHcuối;khôngcharge/nêm/circle/stereo. MéptrêncóchữvụnPDFkhôngthànhnhãn,khôngphụchồibịa.",
+    "questions": [
+      {
+        "qid": "12-C3-B9-D3-III-51",
+        "de": "Cho các chất có công thức cấu tạo như sau: Có bao nhiêu chất tham gia phản ứng màu biuret cho màu tím đặc trưng?",
+        "refs": [
+          {
+            "where": "12-C3-B9-D3-III-51.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1155,
+    "hash": "d12fffa127a755981fb2842e7a02ec59953696df694b881520a19c381feb6e9e",
+    "fileNguon": "anh/d12fffa127a755981fb2842e7a02ec59953696df694b881520a19c381feb6e9e.png",
+    "canvas": [
+      293,
+      87
+    ],
+    "daMoNative": true,
+    "kind": "amino-acid-zwitterion-literal",
+    "notes": "Hai côngthứcliênhệbằngcặp2mũitêncânbằng. Trái: Rviếtởvịtrínútmạch,trên-tráiH₂NnốivàoR,nốiCcarbonylR–C(=O)–OH. Phải: Rvẫnđúngvịtrínút,trên-tráiH₃N⁺nốivàoR,R–C(=O)–O⁻. GiữRnguyênkýhiệu,KHÔNGtựthêmCHalpha/haynhánhRraxađểsửadiagram. CarbonylOtrên,OHHacidbêntráixuốngphải;COO⁻bênphải. Khôngcaption/nêm/sốpH.",
+    "questions": [
+      {
+        "qid": "DB-12-B9-P1-D1-II-232",
+        "de": "Cho các phát biểu sau về amino acid.",
+        "refs": [
+          {
+            "where": "DB-12-B9-P1-D1-II-232.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B9-P1-II-6",
+        "de": "Cho các phát biểu sau về amino acid.",
+        "refs": [
+          {
+            "where": "DH-12-C3-B9-P1-II-6.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 578,
+    "hash": "6bef20f1037c1d21fcaa65970b713db754ff26340af0c71b2db360de8bdb1499",
+    "fileNguon": "anh/6bef20f1037c1d21fcaa65970b713db754ff26340af0c71b2db360de8bdb1499.png",
+    "canvas": [
+      582,
+      537
+    ],
+    "daMoNative": true,
+    "kind": "food-energy-bar",
+    "xLabel": "Thức ăn",
+    "yLabel": "kJ/g",
+    "yTicks": [
+      17,
+      19,
+      38
+    ],
+    "bars": [
+      {
+        "label": "Chất đạm",
+        "height": 19
+      },
+      {
+        "label": "Chất béo",
+        "height": 38
+      },
+      {
+        "label": "Chất bột",
+        "height": 17
+      }
+    ],
+    "notes": "3cộtxámthẳngđứngtrái→phảiđạm/béo/bột;label2dòngtrênmỗicột.3đườngdóngngangđứttại17/19/38từYđếncộtliênquan:19kếtthúctạimépcộtđạm,38đếncộtbéo,17chạyđếncộtbột. KhungchỉtrụcX/Y KHÔNGmũitên,không0/khônggridkhác. Giữtỷlệ19:38:17,kHÔNGgộpđạmvàbộtbằngnhautheokiếnthức4kcal.",
+    "questions": [
+      {
+        "qid": "12-KT-C1234-D1-III-4",
+        "de": "Chất bột, chất béo và chất đạm là nguồn cung cấp năng lượng chính cho cơ thể con người. Năng lượng cung cấp tính bằng kJ từ mỗi gam chất bột, chất béo và chất đạm được cho ở hình dưới. Giả thiết mỗi ngày, một học sinh lớp 12 cần năng lượng 9690 kJ, trong đó chất bột, chất béo và chất đạm lần lượt đóng góp 60%, 20% và 10% nguồn năng lượng đó.\nTheo số liệu trên, mỗi ngày học sinh nên ăn x gam chất bột, y gam chất béo và z gam chất đạm sẽ là phù hợp nhất.\nGiá trị tổng x + y + z bằng bao nhiêu? (Làm tròn kết quả đến phần nguyên).",
+        "refs": [
+          {
+            "where": "12-KT-C1234-D1-III-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  }
+]

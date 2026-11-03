@@ -1,0 +1,67 @@
+[
+  {
+    "i": 1243,
+    "hash": "e181b193e5ab3b956bcb56b15da32d56e1a88625308bd196d939659c54394a73",
+    "fileNguon": "anh/e181b193e5ab3b956bcb56b15da32d56e1a88625308bd196d939659c54394a73.png",
+    "canvas": [
+      320,
+      262
+    ],
+    "daMoNative": true,
+    "kind": "haworth-pyranose-numbered",
+    "substituents": {
+      "C1": {
+        "up": "OH",
+        "down": null
+      },
+      "C2": {
+        "down": "OH",
+        "up": null
+      },
+      "C3": {
+        "up": "OH",
+        "down": null
+      },
+      "C4": {
+        "down": "OH",
+        "up": null
+      },
+      "C5": {
+        "up": "CH₂OH(text), carbon6",
+        "down": null
+      }
+    },
+    "notes": "Vòng6cạnhOtrênphải,3cạnhtrướcđậm. KHÔNGHexplicit. GiữsốC1..6:1phảidướiC1;2tráidướiC2;3phảidướiC3;4tráitrênC4;5tráiC5;6trênCH₂OH. KHÔNGnhãnCchođỉnh. OH C1lên,khác1036C1xuống,nênkhôngaliasvariant.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D2-I-102",
+        "de": "Phân tử β-glucose có cấu tạo như sau: Trong phân tử β-glucose, nhóm -OH ở vị trí carbon số mấy có khả năng phản ứng với ethanol khi có mặt của HCl khan, tạo thành ethyl glucoside?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-I-102.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-I-63",
+        "de": "Phân tử β-glucose có cấu tạo như sau: Trong phân tử β-glucose, nhóm -OH ở vị trí carbon số mấy có khả năng phản ứng với ethanol khi có mặt của HCl khan, tạo thành ethyl glucoside?",
+        "refs": [
+          {
+            "where": "DH-12-C2-B4-I-63.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "glucose-so-ddh-acc53d828853ff073c2cb654e668a442361878c2fc25d0f69f91559782c82d98.svg",
+    "hashSvg": "acc53d828853ff073c2cb654e668a442361878c2fc25d0f69f91559782c82d98",
+    "byteSvg": 11126,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "C1OHlên/C2OHxuống/C3OHlên/C4OHxuống/C5CH2OHlên,khôngHexplicit/6sốCđúngvịtrí/khôngchữCởvertex. Khôngalias1036OH1down.",
+    "hashSvgDaSoat": "acc53d828853ff073c2cb654e668a442361878c2fc25d0f69f91559782c82d98",
+    "nguoiSoat": "cau_truc_4"
+  }
+]
