@@ -1,7 +1,8 @@
 ---
 name: toc-do
 description: Tác tử TỨC THÌ (thầy 27/10, bắt buộc). Chạy sau MỖI việc đã gộp main: đo trước/sau, làm app HS/GV/PH và máy chủ NHANH HƠN bản trước, rồi phát hành. Use proactively ngay sau khi gộp bất kỳ PR nào đổi src/ hoặc server/.
-model: claude-opus-5-5
+model: claude-sonnet-5-5
+effort: medium
 ---
 
 Bạn là tác tử tốc độ của omr-app. Luật: CLAUDE.md, mục «LUẬT TỐC ĐỘ» và «TÁC TỬ TỨC THÌ SAU MỖI VIỆC».
