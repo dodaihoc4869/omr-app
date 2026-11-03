@@ -170,7 +170,8 @@ html.may-yeu .lgk, html.may-yeu .lgk-boc { --lgk-kinh: var(--tr-mat); --lgk-dam:
 .lgk-tc small { font-size: 12.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
 .lgk-tc b { font-size: 21px; font-weight: 800; line-height: 1.25; }
 .lgk-tc span { font-size: 14.5px; font-weight: 650; line-height: 1.4; color: var(--tr-chu-2); }
-.lgk-thay-noi { display: flex; gap: 10px; align-items: flex-end; }
+.lgk-thay-noi { display: flex; gap: 10px; align-items: center; } /* thầy 03/11 «cho cái nút này lên giữa cho cân đối»: ô Đ giữa chiều cao bong bóng */
+.lgk-thay-noi .lgk-bong { border-radius: 22px; }
 .lgk-av { position: relative; flex: none; width: 44px; height: 44px; display: grid; place-items: center; font-weight: 800; font-size: 16px; color: var(--tr-hs-tren); }
 .lgk-av svg { position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 6px 8px color-mix(in oklab, var(--tr-hs-day) 45%, transparent)); }
 .lgk-av svg path { fill: var(--tr-hs-day); }
@@ -347,6 +348,13 @@ html.may-yeu .lgk-dp-o[data-sang] { transform: none; }
   }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-lg-the:has(.lgk-boc) > .duo-lg-dau { margin-right: -20px; border-radius: 32px 32px 0 0; }
 }
+/* Thầy 03/11 «phần hiển thị đáp án tách ra cột cuộn một đoạn cho đẹp»: thanh cuộn tấm lời giải thành RÃNH RIÊNG — viên mảnh 6 px bo tròn, cách mép kính 5 px,
+   bắt đầu dưới thanh tiêu đề, dừng trước góc bo; không nền xám (trước: thanh xám mặc định chạy suốt, dính mép kính). Firefox: thanh mảnh cùng màu. */
+[data-trong='hs'] .duo-lg-the:has(.lgk-boc)::-webkit-scrollbar { width: 16px; }
+[data-trong='hs'] .duo-lg-the:has(.lgk-boc)::-webkit-scrollbar-track { background: transparent; margin: 68px 0 26px; }
+[data-trong='hs'] .duo-lg-the:has(.lgk-boc)::-webkit-scrollbar-thumb { border: 5px solid transparent; border-radius: 99px; background: color-mix(in oklab, var(--tr-chu-3) 60%, transparent) padding-box; }
+[data-trong='hs'] .duo-lg-the:has(.lgk-boc)::-webkit-scrollbar-thumb:hover { background-color: var(--tr-chu-3); }
+@supports not selector(::-webkit-scrollbar) { [data-trong='hs'] .duo-lg-the:has(.lgk-boc) { scrollbar-width: thin; scrollbar-color: var(--tr-chu-3) transparent; } }
 /* Công thức lớn dài (phương trình) không tràn khung: chữ co theo độ dài, xuống dòng ở dấu +, → (TSX gắn data-dai). */
 .lgk-ct-to { max-width: 100%; }
 .lgk-ct-to[data-dai='vua'] { font-size: clamp(26px, 6.5cqi, 34px); letter-spacing: -.01em; }
