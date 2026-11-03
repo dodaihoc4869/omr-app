@@ -317,7 +317,6 @@ export async function ktCnAction(env: Env, sbd: string, action: string, b: Row, 
   let row=await env.DB.prepare('SELECT * FROM kiem_tra_ca_nhan_chang WHERE bai_id=? AND stt=?').bind(r.id,stt).first<Row>()
   if (action==='hoc-tap-ktcn-start') {
     const giu=await kiemNguon(env,sbd,cs), csMo=cs.filter(c=>!giu.has(c.q.qid))
-    if (!csMo.length) throw new Error('Các câu của chặng này đang được giữ cho ca kiểm tra hoặc đang đổi nguồn. Em làm chặng khác trước; kết quả đã lưu của em được giữ.')
     // KHÔNG KHOÁ CHẶNG VÌ "VỪA XEM PHẦN CHỮA" (lỗi 17–18/10 — thầy 19/10 gửi ảnh "Em vừa xem phần chữa… quay lại sau ít nhất 12 giờ" lúc còn 1 giờ 37 phút tới hạn
     // 24:00, và "Không cho làm chặng 3"): từ 16/10 mỗi câu nộp ở bài thường cũng ghi `loi_giai_hoi` (nguồn 'goi7:sau_nop' — game-v2.ts) ⇒ đề kiểm tra có câu em
     // vừa làm trong 12 giờ là chặng bị khoá, kể cả chặng ĐÃ MỞ, tới hạn thì chốt 0 câu. Nay em luôn mở/làm tiếp được; câu em xem phần chữa trong 12 giờ trước
@@ -326,6 +325,8 @@ export async function ktCnAction(env: Env, sbd: string, action: string, b: Row, 
     row=await env.DB.prepare('SELECT * FROM kiem_tra_ca_nhan_chang WHERE bai_id=? AND stt=?').bind(r.id,stt).first<Row>()
     if (!row) throw new Error('Em hoàn thành chặng đang mở trước nhé.')
     if (now>=Number(row.han)&&!row.chot_luc) { await env.DB.prepare('UPDATE kiem_tra_ca_nhan_chang SET chot_luc=han WHERE bai_id=? AND stt=? AND chot_luc IS NULL').bind(r.id,stt).run(); row.chot_luc=row.han }
+    // CẢ chặng đều là câu tạm giữ ⇒ KHÔNG báo lỗi (thầy 03/11 «bỏ hẳn lỗi kiểu này»): chặng tự chốt rỗng, em đi tiếp; câu giữ chưa trả lời không tính điểm (chotKtCn).
+    if (!csMo.length&&!row.chot_luc) { const c=Math.min(now,Number(row.han)); await env.DB.prepare('UPDATE kiem_tra_ca_nhan_chang SET chot_luc=? WHERE bai_id=? AND stt=? AND chot_luc IS NULL').bind(c,r.id,stt).run(); row.chot_luc=c }
     return {ok:true,kiemTra:tomTatKt(r,now),revision:Number(r.revision),chang:stt,hanChang:Number(row.han),daChot:!!row.chot_luc,questions:csMo.map(c=>publicQuestion(c.q)),tra:Object.fromEntries(csMo.map(c=>[c.q.qid,tra(r)[c.q.qid]??''])),...(giu.size?{soGiu:giu.size}:{})}
   }
   if (!row) throw new Error('Em mở chặng trước khi lưu bài.')

@@ -61,9 +61,16 @@ it('một câu của chặng đang giữ cho ca thi ⇒ chặng vẫn mở (khô
   expect(cau.map((c) => c.de.qid)).not.toContain(cauGiu)
 })
 
-it('cả chặng đều đang giữ ⇒ báo rõ, em làm chặng khác', async () => {
+it('cả chặng đều đang giữ ⇒ KHÔNG báo lỗi: chặng tự chốt rỗng, em mở được chặng kế tiếp', async () => {
   const k = await kho(); await lapKtCn(k.env, 'S1', NOW, false, false, false)
-  const r = (await docKtCn(k.env, 'S1', NOW))!, id = String(r.id), d = JSON.parse(String(r.json)) as De
+  const r = (await docKtCn(k.env, 'S1', NOW))!, id = String(r.id), d = JSON.parse(String(r.json)) as De, now = Number(r.mo_luc) + 1000
   for (const q of d.chang[0]!.qids) giu.add(q)
-  await expect(ktCnAction(k.env, 'S1', 'hoc-tap-ktcn-start', { id, chang: 0 }, Number(r.mo_luc) + 1000)).rejects.toThrow(/chặng khác/)
+  const mo = await ktCnAction(k.env, 'S1', 'hoc-tap-ktcn-start', { id, chang: 0 }, now)
+  expect(mo.daChot).toBe(true)
+  expect(mo.questions).toEqual([])
+  expect(JSON.stringify(mo)).not.toContain(d.chang[0]!.qids[0]!)
+  if (d.chang.length > 1) {
+    const mo1 = await ktCnAction(k.env, 'S1', 'hoc-tap-ktcn-start', { id, chang: 1 }, now + 1000)
+    expect((mo1.questions as unknown[]).length).toBe(d.chang[1]!.qids.length)
+  }
 })
