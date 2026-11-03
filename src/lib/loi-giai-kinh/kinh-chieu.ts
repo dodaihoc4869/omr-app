@@ -34,6 +34,16 @@ export function kinhChieuHtml(ban: BanKinh, c: Pick<CauLuyen, 'phan' | 'dapAn' |
     k.push(`<div class="sol-label">Thí nghiệm</div>${cn.buoc.map((b, i) => `<div class="sol-step"><b>${i + 1}.</b> ${chuKinhHtml(b.chu)}<span class="mck-phu">${b.lop.map((l) => chuKinhHtml(l.nhan)).join(' · ')}${b.dun ? ' · đun nóng' : ''}${b.khi ? ' · có khí thoát ra' : ''}${b.ketTua ? ' · có kết tủa' : ''}</span></div>`).join('')}`)
   } else if (cn?.loai === 'can-bang') {
     k.push(`<div class="sol-label">Tác động lên cân bằng · ${chuKinhHtml(cn.trai)} ⇌ ${chuKinhHtml(cn.phai)}</div>${cn.tacDong.map((t) => `<div class="sol-step"><b>${chuKinhHtml(t.nut)}</b> ⇒ ${t.chieu === 'thuan' ? 'chiều thuận' : t.chieu === 'nghich' ? 'chiều nghịch' : 'không chuyển dịch'}: ${chuKinhHtml(t.chu)}</div>`).join('')}`)
+  } else if (cn?.loai === 'dien-di') {
+    const dau = (d: number) => (d > 0 ? `+${d}` : d < 0 ? `−${-d}` : '0')
+    k.push(`<div class="sol-label">Điện di · pH = ${thoat(String(cn.pH).replace('.', ','))}</div>${cn.chat.map((c) => {
+      const t = c.nhom.reduce((a, g) => a + g.dien, 0)
+      const so = c.pI === undefined ? '' : `pH ${cn.pH < c.pI ? '<' : cn.pH > c.pI ? '>' : '='} pI ${thoat(String(c.pI).replace('.', ','))} ⇒ ${cn.pH < c.pI ? 'môi trường acid của chất' : cn.pH > c.pI ? 'môi trường base của chất' : 'điểm đẳng điện'}; `
+      return `<div class="sol-step"><b>${chuKinhHtml(c.ten)}</b>: ${so}${c.nhom.map((g) => `${chuKinhHtml(g.ten)} (${dau(g.dien)})`).join(' + ')} = <b>${dau(t)}</b> ⇒ ${t > 0 ? '<b>về cực âm</b>' : t < 0 ? '<b>về cực dương</b>' : '<b>đứng yên</b>'}</div>`
+    }).join('')}`)
+  } else if (cn?.loai === 'do-tan') {
+    const g = (v: number) => thoat(String(+v.toFixed(2)).replace('.', ','))
+    k.push(`<div class="sol-label">Độ tan ${chuKinhHtml(cn.chat)} · hàng chuẩn 100 g nước</div><div class="mck-dt"><span></span><b>chất tan</b><b>nước</b>${cn.S.map((v) => `<span>Chuẩn ${g(v.t)} °C</span><i>${g(v.S)}</i><i>100</i>`).join('')}${cn.hang.map((h) => `<span>${chuKinhHtml(h.nhan)}</span><i>${g(h.ct)}</i><i>${g(h.nuoc)}</i>`).join('')}</div>`)
   } else if (cn?.loai === 'so-sanh') {
     k.push(`<div class="sol-label">Đặt cạnh nhau</div><div class="mck-ss">${[cn.trai, cn.phai].map((v) => `<div><b>${chuKinhHtml(v.ten)}</b>${v.y.map((y) => `<span>${chuKinhHtml(y)}</span>`).join('')}</div>`).join('')}</div>`)
   }
@@ -80,4 +90,5 @@ export const KINH_CHIEU_CSS = `.mck .sol-text,.mck .sol-step,.mck .sol-cot-loi,.
 .mck-tc{margin:.3em 0;padding:.5em .8em;border-radius:.8em;border:2px solid var(--mc-vien)}.mck-tc small,.mck-noi small{display:block;font-size:.75em;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--mc-nhat)}.mck-tc b{font-size:1.3em}
 .mck-noi{margin:.3em 0;padding:.45em .8em;border-left:4px solid var(--mc-xanh)}
 .mck-nham{display:flex;flex-direction:column;gap:.1em}
+.mck-dt{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:.25em .8em;align-items:center;margin:.3em 0}.mck-dt b{color:var(--mc-nhat);font-size:.8em;text-transform:uppercase}.mck-dt i{font-style:normal;font-weight:800;text-align:right;color:var(--mc-muc)}
 .mck-ss{display:grid;grid-template-columns:1fr 1fr;gap:.6em}.mck-ss>div{display:flex;flex-direction:column;gap:.15em;padding:.45em .7em;border-radius:.7em;border:2px solid var(--mc-vien)}.mck-ss b{color:var(--mc-xanh)}`
