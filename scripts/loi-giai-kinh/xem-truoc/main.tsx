@@ -5,6 +5,7 @@ import '../../../src/styles/trong-hs.css'
 import '../../../src/styles/trong-hs-mau.css'
 import { useState } from 'react'
 import '../../../src/styles/trong-lam-bai.css'
+import '../../../src/styles/trong-chang-ngang.css'
 import LoiGiaiKinh from '../../../src/components/loi-giai-kinh/LoiGiaiKinh'
 import LoiGiaiKinhHs from '../../../src/components/loi-giai-kinh/LoiGiaiKinhHs'
 import mau from '../vi-du-kinh.json'
@@ -24,18 +25,22 @@ const DP = {
       { loai: 'lien-ket', chu: 'an', giai: 'Toàn liên kết đơn ⇒ **an**.' }, { loai: 'chuc', chu: 'oic acid', giai: 'Chức COOH đọc là **oic acid**; đơn chức nên bỏ e (hexane → hexan).' }], ten: '2,6-diaminohexanoic acid' },
 }
 const d = soCau === 4 ? ds[0] : ds[i]!
-const ban = { ...(mau as unknown[])[i] as object, ...(soCau === 4 ? DP : {}), qid: `mau-${i + 1}`, phienBan: 1, phan: d.phan } as unknown as BanKinh
+const PT = { cotLoi: { congThuc: 'H_2N-CH_2-COOH + C_2H_5OH + HCl → ClH_3N-CH_2-COOC_2H_5 + H_2O', chu: 'COOH của glycine ester hoá với OH của ethyl alcohol, mất một H₂O; có HCl nên nhóm NH₂ **nhận H⁺**.', chip: [{ nhan: 'COOH + OH', chu: 'ester hoá, mất H₂O' }] } }
+const ban = { ...(mau as unknown[])[i] as object, ...(soCau === 4 ? DP : {}), ...(new URLSearchParams(location.search).get('pt') ? PT : {}), qid: `mau-${i + 1}`, phienBan: 1, phan: d.phan } as unknown as BanKinh
 document.body.style.background = 'var(--tr-nen)'
 // ?hop=1: hộp «Lời giải» của màn làm bài (thanh tiêu đề + nút «Lời giải thu gọn» sát nút đóng); ?mo=1 bấm mở sẵn.
 function Hop() {
   const [khe, setKhe] = useState<HTMLElement | null>(null)
   const cu = <section className="ht2-lam-loi-giai" aria-label="Lời giải"><p>n acid = 12/60 = 0,2 mol; n ethanol = 0,3 mol ⇒ acid hết.</p><p>m ester = 0,2 × 88 × 75% = <b>13,2 gam</b>.</p></section>
+  const pt = new URLSearchParams(location.search).get('pt') === '1'
   return (
+    <div className="ht-app ht2-lam duo" data-chang="" data-duo="">
     <div className="duo-lg" role="dialog" aria-modal="true" aria-label="Lời giải">
       <div className="duo-lg-the">
         <header className="duo-lg-dau"><b>Lời giải · Câu 3</b><span className="duo-lg-khe" ref={setKhe} /><button type="button" className="duo-dong" aria-label="Đóng lời giải">✕</button></header>
-        <LoiGiaiKinhHs kheNut={khe} qid="mau-3" phan="III" dapAn="13,2" em="17,6" duPhong={cu} />
+        <LoiGiaiKinhHs kheNut={khe} qid={pt ? 'mau-3-pt' : 'mau-3'} phan="III" dapAn="13,2" em="17,6" duPhong={cu} />
       </div>
+    </div>
     </div>
   )
 }

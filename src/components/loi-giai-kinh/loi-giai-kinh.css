@@ -336,3 +336,19 @@ html.may-yeu .lgk-giai-so > div { animation: none; }
 .lgk-dp-ten[data-xong] { text-decoration: underline; text-decoration-color: color-mix(in oklab, var(--tr-hs) 55%, transparent); text-decoration-thickness: 3px; text-underline-offset: 6px; }
 @media (prefers-reduced-motion: reduce) { .lgk-dp-o, .lgk-dp-ten span, .lgk-dp-c text.lgk-dp-so, .lgk-dp-c circle { transition: none; } .lgk-dp-o[data-sang] { transform: none; } }
 html.may-yeu .lgk-dp-o[data-sang] { transform: none; }
+
+/* Thầy 03/11 «Chỉnh khung lời giải popup bo tròn hiển thị bên phải đẹp mắt phù hợp với giao diện kính»: xoay ngang / máy tính / Fold, tấm lời giải
+   bên phải thành TẤM KÍNH NỔI — tách mép màn 12 px, bo tròn đủ bốn góc, viền sáng mép trên, bóng sâu (đúng hệ kính v2), thanh tiêu đề bo theo. */
+@media (orientation: landscape) and (min-width: 640px), (min-width: 700px) and (min-aspect-ratio: 10/13) {
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-lg:has(.lgk-boc) { padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) 0; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-lg-the:has(.lgk-boc) {
+    height: 100%; border: 0; border-radius: 32px; padding-right: 20px; padding-bottom: 20px; overflow-x: hidden;
+    box-shadow: inset 0 1px 0 color-mix(in oklab, var(--tr-mat) 85%, transparent), inset 0 0 0 1px color-mix(in oklab, var(--tr-vien) 50%, transparent), 0 30px 60px -30px var(--tr-phu), 0 2px 8px -4px var(--tr-phu);
+  }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-lg-the:has(.lgk-boc) > .duo-lg-dau { margin-right: -20px; border-radius: 32px 32px 0 0; }
+}
+/* Công thức lớn dài (phương trình) không tràn khung: chữ co theo độ dài, xuống dòng ở dấu +, → (TSX gắn data-dai). */
+.lgk-ct-to { max-width: 100%; }
+.lgk-ct-to[data-dai='vua'] { font-size: clamp(26px, 6.5cqi, 34px); letter-spacing: -.01em; }
+.lgk-ct-to[data-dai='dai'] { font-size: clamp(22px, 5.4cqi, 28px); letter-spacing: 0; line-height: 1.3; }
+.lgk-ct-to .lgk-ct-cum { display: inline-block; white-space: nowrap; }
