@@ -19,6 +19,7 @@ import { emLechDiem, loiBaoLechDiem } from '../lib/lech-diem'
 import { dongSoCauHoiLai } from '../lib/dem-cau-hoi-lai'
 import { maCaLay, vaBienBanCu } from '../lib/va-bien-ban-cu'
 import { khoChiVuaMotBo, sinhBoTheoEm, TEN_MUC_PHAN_TANG } from '../lib/de-rieng-blueprint'
+import { layCaNapTruoc } from '../lib/nap-truoc-ca-thay'
 import { docCheDoDeRieng, docDeRiengCa, docSoCauCa, loadScriptUrl, loadSessionTeacherBank, luuDeRiengCa, luuSoCauCa, saveSessionTeacherBank, loadTeacherSecret, type BienBanDeRieng, type DeRiengCaLuu } from '../lib/exam-db'
 import { loiKhongTimThayCa } from '../lib/cau-chu-ca'
 import { CHU_LY_DO_THIEU } from '../lib/de-rieng'
@@ -47,6 +48,7 @@ import ThanhTabCa, { type MucTabCa } from '../components/ThanhTabCa'
 import { demCauDaLam, tongSoCauCa } from '../lib/con-lai-ca'
 import './ca-thi-m3.css'
 // CA THI 28/09 (docs/ban-ve-ca-thi-2809): đầu màn Theo dõi, màn Kết thúc ca, Báo cáo chi tiết — THAY khối gập BaoCaoCaLop + trang BaoCaoMotEm cũ.
+import { layLichSuCaEm } from '../lib/ho-so-em-thay'
 import TheoDoiCa, { type EmTheoDoi } from '../components/ca-thi/TheoDoiCa'
 import { demConTrongGio, xepCauChuaCa } from '../lib/chieu-chua-ca'
 import { dungToChuaCa } from '../components/ca-thi/dung-to-chua-ca'
@@ -424,7 +426,9 @@ export default function ExamMonitorScreen() {
   }, [])
 
   useEffect(() => {
-    if (!chiTiet) {
+    // Danh sách «gợi ý ca» chỉ cần khi KHÔNG đang mở một ca cụ thể (ô nhập mã) hoặc ca vừa báo không tìm thấy — trước đây MỌI lần bấm vào ca đều gọi thêm `danhSachCa`
+    // song song với `chiTietCa` (một lệnh nặng chen vào đúng lúc thầy đang chờ).
+    if (!chiTiet && (!maCaTheoDoi || loi)) {
       Promise.all([loadScriptUrl(), loadTeacherSecret()])
         .then(([u, m]) => {
           if (u.trim() && m.trim()) {
@@ -439,7 +443,7 @@ export default function ExamMonitorScreen() {
         })
         .catch(() => {})
     }
-  }, [chiTiet, scriptUrl, secret])
+  }, [chiTiet, scriptUrl, secret, loi]) // eslint-disable-line react-hooks/exhaustive-deps -- maCaTheoDoi chỉ đọc lúc chạy
 
   /** Đang có một lượt tải chạy (tay hoặc nền): lượt NỀN không chồng lên (kế hoạch giờ cao điểm 21/09 — không gọi chồng). */
   const dangTaiRef = useRef(false)
@@ -463,7 +467,12 @@ export default function ExamMonitorScreen() {
       // không chấm lại, không xuất bảng điểm, không tải phiếu được. Lệnh đã đòi
       // mã bí mật nên không mở rộng quyền cho ai.
       const banksCu = await loadSessionTeacherBank(ma.trim())
-      const ct = await chiTietCa(url, mat, ma.trim(), !banksCu)
+      // TẢI SẴN (src/lib/nap-truoc-ca-thay.ts, thầy 03/11): màn «Ca kiểm tra» đã xin sẵn chi tiết + ngân hàng có đáp án lúc rảnh ⇒ vẽ NGAY bản ấy (≤ 90 s), rồi làm mới
+      // ngầm; dùng được khi máy đã có ngân hàng (cũ hoặc vừa cất) hoặc bản tải sẵn mang `keyBank`.
+      const sanCo = !imLang ? layCaNapTruoc(ma.trim()) : null
+      const dungSan = !!sanCo && (!!banksCu || !!sanCo.ct.keyBank)
+      const ct = dungSan ? sanCo!.ct : await chiTietCa(url, mat, ma.trim(), !banksCu)
+      if (dungSan && sanCo!.tuoiMs > 5_000) setTimeout(() => { void tai(ma, true) }, 0)
       setChiTiet(ct)
       let bank = banksCu
       if (!bank && ct.keyBank && (ct.keyBank.phanI.length || ct.keyBank.phanII.length || ct.keyBank.phanIII.length)) {
@@ -1986,6 +1995,7 @@ export default function ExamMonitorScreen() {
             <TheoDoiCa
               tenCa={tenHienCua(chiTiet.ca.tenCa, chiTiet.ca.maCa)}
               maCa={chiTiet.ca.maCa}
+              layLichSu={layLichSuCaEm}
               link={`${location.origin}${import.meta.env.BASE_URL}t/${chiTiet.ca.maCa}`}
               daChepLink={daCopy}
               onChepLink={copyLink}

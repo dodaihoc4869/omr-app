@@ -22,7 +22,7 @@ describe('TheChonCach', () => {
   })
   it('CSS: điện thoại ẩn thẻ; khổ rộng hiện thẻ, ẩn dải hai nút; chỉ biến màu sẵn có', () => {
     const css = doc('src/styles/trong-chang-ngang.css')
-    expect(css).toMatch(/:root\[data-trong\] \.duo-chon \{ display: none; \}/)
+    expect(doc('src/styles/trong-lam-bai.css')).toMatch(/:root\[data-trong\] \.duo-chon \{ display: none; \}/)
     expect(css).toMatch(/\[data-chon-cach\] > \.duo-day:not\(\.duo-ket\) \{ display: none; \}/)
     const khoi = css.slice(css.indexOf('.duo-chon {'), css.indexOf('.duo-chon-di'))
     expect(khoi).not.toMatch(/#[0-9a-f]{3,8}\b/i)

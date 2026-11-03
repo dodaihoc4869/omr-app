@@ -299,7 +299,7 @@ html.may-yeu[data-trong='hs'] .duo-lg-the:has(.lgk-boc) > .duo-lg-dau { -webkit-
    nền), vẫn dính đầu tấm khi cuộn; chạm xuyên qua phần trống. Tên câu thành VIÊN KÍNH cùng kiểu nút «Lời giải thu gọn» ⇒ đọc rõ khi nội dung cuộn bên dưới. */
 [data-trong='hs'] .duo-lg-the:has(.lgk-boc) > .duo-lg-dau, html.may-yeu[data-trong='hs'] .duo-lg-the:has(.lgk-boc) > .duo-lg-dau {
   background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; border-bottom-color: transparent; box-shadow: none; pointer-events: none; }
-[data-trong='hs'] .duo-lg-the:has(.lgk-boc) > .duo-lg-dau > * { pointer-events: auto; }
+[data-trong='hs'] .duo-lg-the:has(.lgk-boc) > .duo-lg-dau > b, [data-trong='hs'] .duo-lg-the:has(.lgk-boc) > .duo-lg-dau > .duo-lg-khe, [data-trong='hs'] .duo-lg-the:has(.lgk-boc) > .duo-lg-dau > .duo-dong { pointer-events: auto; }
 [data-trong='hs'] .duo-lg-the:has(.lgk-boc) > .duo-lg-dau > b { flex: 0 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height: 44px; padding: 0 16px; border-radius: 22px; }
 [data-trong='hs'] .duo-lg-the:has(.lgk-boc) > .duo-lg-dau > b, [data-trong='hs'] .duo-lg-the:has(.lgk-boc) > .duo-lg-dau > .duo-dong, [data-trong='hs'] .duo-lg-the:has(.lgk-boc) > .duo-lg-dau > .duo-lg-khe .lgk-tg-vien:not([aria-expanded='true']) {
   background: color-mix(in oklab, var(--tr-mat) 94%, transparent); -webkit-backdrop-filter: var(--kinh-mo); backdrop-filter: var(--kinh-mo);
