@@ -1,0 +1,118 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg version='1.1' baseProfile='full'
+              xmlns='http://www.w3.org/2000/svg'
+                      xmlns:rdkit='http://www.rdkit.org/xml'
+                      xmlns:xlink='http://www.w3.org/1999/xlink'
+                  xml:space='preserve'
+width='600px' height='340px' viewBox='0 0 600 340'><title>Công thức cấu tạo theo hình nguồn</title>
+<!-- END OF HEADER -->
+<path class='bond-0 atom-0 atom-1' d='M 150.6,208.9 L 249.9,266.2' style='fill:none;fill-rule:evenodd;stroke:#252440;stroke-width:2.5px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-1 atom-1 atom-2' d='M 249.9,266.2 L 361.4,201.8' style='fill:none;fill-rule:evenodd;stroke:#252440;stroke-width:2.5px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-2 atom-2 atom-3' d='M 371.1,207.4 L 371.1,88.4' style='fill:none;fill-rule:evenodd;stroke:#252440;stroke-width:2.5px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-2 atom-2 atom-3' d='M 351.8,207.4 L 351.8,88.4' style='fill:none;fill-rule:evenodd;stroke:#252440;stroke-width:2.5px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path class='bond-3 atom-2 atom-4' d='M 361.4,201.8 L 459.0,258.2' style='fill:none;fill-rule:evenodd;stroke:#252440;stroke-width:2.5px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1' />
+<path d='M 244.9,263.4 L 249.9,266.2 L 255.5,263.0' style='fill:none;stroke:#252440;stroke-width:2.5px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;' />
+<path d='M 355.9,205.1 L 361.4,201.8 L 366.3,204.7' style='fill:none;stroke:#252440;stroke-width:2.5px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;' />
+<path class='atom-0' d='M 97.3 191.2
+L 100.2 191.2
+L 100.2 200.2
+L 111.1 200.2
+L 111.1 191.2
+L 114.0 191.2
+L 114.0 212.5
+L 111.1 212.5
+L 111.1 202.6
+L 100.2 202.6
+L 100.2 212.5
+L 97.3 212.5
+L 97.3 191.2
+' fill='#252440'/>
+<path class='atom-0' d='M 118.1 211.7
+Q 118.6 210.4, 119.9 209.7
+Q 121.1 208.9, 122.8 208.9
+Q 124.9 208.9, 126.1 210.0
+Q 127.3 211.2, 127.3 213.2
+Q 127.3 215.3, 125.7 217.3
+Q 124.2 219.2, 121.1 221.5
+L 127.5 221.5
+L 127.5 223.1
+L 118.1 223.1
+L 118.1 221.7
+Q 120.7 219.9, 122.2 218.5
+Q 123.8 217.1, 124.6 215.9
+Q 125.3 214.6, 125.3 213.3
+Q 125.3 212.0, 124.6 211.2
+Q 124.0 210.5, 122.8 210.5
+Q 121.7 210.5, 120.9 210.9
+Q 120.2 211.4, 119.6 212.4
+L 118.1 211.7
+' fill='#252440'/>
+<path class='atom-0' d='M 133.6 191.2
+L 140.6 202.5
+Q 141.3 203.6, 142.4 205.6
+Q 143.5 207.6, 143.6 207.7
+L 143.6 191.2
+L 146.4 191.2
+L 146.4 212.5
+L 143.5 212.5
+L 136.0 200.2
+Q 135.1 198.7, 134.2 197.1
+Q 133.3 195.4, 133.0 194.9
+L 133.0 212.5
+L 130.3 212.5
+L 130.3 191.2
+L 133.6 191.2
+' fill='#252440'/>
+<path class='atom-3' d='M 351.7 73.1
+Q 351.7 68.0, 354.2 65.1
+Q 356.7 62.3, 361.4 62.3
+Q 366.1 62.3, 368.7 65.1
+Q 371.2 68.0, 371.2 73.1
+Q 371.2 78.3, 368.6 81.2
+Q 366.1 84.1, 361.4 84.1
+Q 356.8 84.1, 354.2 81.2
+Q 351.7 78.3, 351.7 73.1
+M 361.4 81.7
+Q 364.7 81.7, 366.4 79.5
+Q 368.2 77.4, 368.2 73.1
+Q 368.2 68.9, 366.4 66.8
+Q 364.7 64.7, 361.4 64.7
+Q 358.2 64.7, 356.4 66.8
+Q 354.7 68.9, 354.7 73.1
+Q 354.7 77.4, 356.4 79.5
+Q 358.2 81.7, 361.4 81.7
+' fill='#252440'/>
+<path class='atom-4' d='M 463.2 266.3
+Q 463.2 261.2, 465.7 258.3
+Q 468.3 255.5, 473.0 255.5
+Q 477.7 255.5, 480.2 258.3
+Q 482.7 261.2, 482.7 266.3
+Q 482.7 271.5, 480.2 274.4
+Q 477.6 277.3, 473.0 277.3
+Q 468.3 277.3, 465.7 274.4
+Q 463.2 271.5, 463.2 266.3
+M 473.0 274.9
+Q 476.2 274.9, 478.0 272.7
+Q 479.7 270.6, 479.7 266.3
+Q 479.7 262.1, 478.0 260.0
+Q 476.2 257.9, 473.0 257.9
+Q 469.7 257.9, 468.0 260.0
+Q 466.2 262.1, 466.2 266.3
+Q 466.2 270.6, 468.0 272.7
+Q 469.7 274.9, 473.0 274.9
+' fill='#252440'/>
+<path class='atom-4' d='M 486.0 255.7
+L 488.9 255.7
+L 488.9 264.8
+L 499.8 264.8
+L 499.8 255.7
+L 502.7 255.7
+L 502.7 277.0
+L 499.8 277.0
+L 499.8 267.2
+L 488.9 267.2
+L 488.9 277.0
+L 486.0 277.0
+L 486.0 255.7
+' fill='#252440'/>
+</svg>

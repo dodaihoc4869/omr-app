@@ -1,0 +1,922 @@
+[
+  {
+    "i": 11,
+    "hash": "018738bbd18f948b835e6303bbe325f9835a7d1d36b6bd1032353e874511bbd6",
+    "fileNguon": "anh/018738bbd18f948b835e6303bbe325f9835a7d1d36b6bd1032353e874511bbd6.png",
+    "smiles": "Cc1ccccc1C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "soat_hinh_vector",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 41,
+    "hash": "0845516e2eb19608d800f3becc4200f44d6003d616814451a234eaf1ba988190",
+    "fileNguon": "anh/0845516e2eb19608d800f3becc4200f44d6003d616814451a234eaf1ba988190.png",
+    "smiles": "CCC[NH]CC",
+    "caption": [],
+    "nguoiDocNguon": "soat_hinh_vector",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 51,
+    "hash": "0a5ce183e02160ea9ecf72de5e0afbdda74a4124021460efba3d64330d3b1c0e",
+    "fileNguon": "anh/0a5ce183e02160ea9ecf72de5e0afbdda74a4124021460efba3d64330d3b1c0e.png",
+    "smiles": "NCO",
+    "caption": [],
+    "nguoiDocNguon": "soat_hinh_vector",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 54,
+    "hash": "0b1381109e515bb78efd30741666f67844d911c84f0e3f01e7dfc70d293b4289",
+    "fileNguon": "anh/0b1381109e515bb78efd30741666f67844d911c84f0e3f01e7dfc70d293b4289.png",
+    "smiles": "CCOC(=O)c1ccccc1C(=O)OCC",
+    "caption": [],
+    "nguoiDocNguon": "soat_hinh_vector",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 97,
+    "hash": "135229a9d7b1e3a443e9ef14fd150d842f3ea44afb802a58a1a536f0433e03f3",
+    "fileNguon": "anh/135229a9d7b1e3a443e9ef14fd150d842f3ea44afb802a58a1a536f0433e03f3.png",
+    "smiles": "O=C(O)c1ccccc1C(=O)O",
+    "caption": [
+      "C."
+    ],
+    "nguoiDocNguon": "soat_hinh_vector",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve",
+    "vongThomDangTron": true
+  },
+  {
+    "i": 102,
+    "hash": "13dcad14d954789eb11b53db08e4b7bee960300d18c8ef9f2d919ba17a222b82",
+    "fileNguon": "anh/13dcad14d954789eb11b53db08e4b7bee960300d18c8ef9f2d919ba17a222b82.png",
+    "smiles": "OS(=O)(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "soat_hinh_vector",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 116,
+    "hash": "161ac1f297662da9966cfa3fb3aa8a811cd2d238b1b1caaf1a7a779995292489",
+    "fileNguon": "anh/161ac1f297662da9966cfa3fb3aa8a811cd2d238b1b1caaf1a7a779995292489.png",
+    "smiles": "O=C(O)c1ccccc1C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "soat_hinh_vector",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve",
+    "vongThomDangTron": true
+  },
+  {
+    "i": 143,
+    "hash": "193cb2a75b3208f347cd8c3fac58be3a97c97d28238858209703d8002bf95b23",
+    "fileNguon": "anh/193cb2a75b3208f347cd8c3fac58be3a97c97d28238858209703d8002bf95b23.png",
+    "smiles": "[NH3+]CC(=O)[O-]",
+    "caption": [],
+    "nguoiDocNguon": "soat_hinh_vector",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 159,
+    "hash": "1b441c6ea9ca5735f1747f6e167b3078d2275161f49691366347592ae9234c5e",
+    "fileNguon": "anh/1b441c6ea9ca5735f1747f6e167b3078d2275161f49691366347592ae9234c5e.png",
+    "smiles": "COC(=O)c1ccccc1O",
+    "caption": [
+      "Methyl salicylate"
+    ],
+    "nguoiDocNguon": "soat_hinh_vector",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 174,
+    "hash": "1e21069a323a9986a5f43abd79e4716c63cf852e5db8314059c0fbe4649127d1",
+    "fileNguon": "anh/1e21069a323a9986a5f43abd79e4716c63cf852e5db8314059c0fbe4649127d1.png",
+    "smiles": "CC([NH3+])C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "soat_hinh_vector",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 175,
+    "hash": "1e2fef5f1ff0a3488e009b84cd87092c94f1c17994e2753f4ce588b9dca24e1e",
+    "fileNguon": "anh/1e2fef5f1ff0a3488e009b84cd87092c94f1c17994e2753f4ce588b9dca24e1e.png",
+    "smiles": "[H]O[H]",
+    "caption": [],
+    "nguoiDocNguon": "soat_hinh_vector",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve",
+    "giuHTuongMinh": true
+  },
+  {
+    "i": 181,
+    "hash": "1f58c4125f513cd9e720e5f79917dc0578eb663b41588d9209c471ba985a951a",
+    "fileNguon": "anh/1f58c4125f513cd9e720e5f79917dc0578eb663b41588d9209c471ba985a951a.png",
+    "smiles": "OCc1ccccc1",
+    "caption": [],
+    "nguoiDocNguon": "soat_hinh_vector",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 191,
+    "hash": "20f123942042500247feec496744f55e9a0ff6073ce2bcc78c5dd2e1ae89cca5",
+    "fileNguon": "anh/20f123942042500247feec496744f55e9a0ff6073ce2bcc78c5dd2e1ae89cca5.png",
+    "smiles": "NCCc1cc(O)c(O)cc1",
+    "caption": [],
+    "nguoiDocNguon": "soat_hinh_vector",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 206,
+    "hash": "22b0d909196f122f1d50e485eeab5dbfb2ff2608113f2bd83222896b5ebd1500",
+    "fileNguon": "anh/22b0d909196f122f1d50e485eeab5dbfb2ff2608113f2bd83222896b5ebd1500.png",
+    "smiles": "O=C(O)c1ccccc1O",
+    "caption": [],
+    "nguoiDocNguon": "soat_hinh_vector",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve",
+    "vongThomDangTron": true
+  },
+  {
+    "i": 223,
+    "hash": "265c75c039455c64d9df049f17af73289c102e07065d8d134dd47a6eabfe33d8",
+    "fileNguon": "anh/265c75c039455c64d9df049f17af73289c102e07065d8d134dd47a6eabfe33d8.png",
+    "smiles": "Cc1ccccc1O",
+    "caption": [],
+    "nguoiDocNguon": "soat_hinh_vector",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 252,
+    "hash": "2b38202da5dd3ca38ef0179c29e00cb13d6c605163fe66aa720086efa9877693",
+    "fileNguon": "anh/2b38202da5dd3ca38ef0179c29e00cb13d6c605163fe66aa720086efa9877693.png",
+    "smiles": "OCc1ccccc1",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_2",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 293,
+    "hash": "31b93db515aefd78ba42814c1d3723633c8e6c124dac256c0d6d9bce65584bfc",
+    "fileNguon": "anh/31b93db515aefd78ba42814c1d3723633c8e6c124dac256c0d6d9bce65584bfc.png",
+    "smiles": "CCN(C)CCCC",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_2",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 310,
+    "hash": "35a2b82f684d8db64ceecf388b332a4e9a09ab07a92628a6a87c14a65a300247",
+    "fileNguon": "anh/35a2b82f684d8db64ceecf388b332a4e9a09ab07a92628a6a87c14a65a300247.png",
+    "smiles": "O=C(O)c1ccccc1",
+    "caption": [
+      "B."
+    ],
+    "nguoiDocNguon": "soat_nguon_2",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve",
+    "vongThomDangTron": true
+  },
+  {
+    "i": 325,
+    "hash": "386549f0044c4f58a92fa16f43fcf7587f636524246fec118a410500d78560b3",
+    "fileNguon": "anh/386549f0044c4f58a92fa16f43fcf7587f636524246fec118a410500d78560b3.png",
+    "smiles": "Nc1nc(N)nc(N)n1",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_2",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 339,
+    "hash": "3bc0c28d45f5e614c2ce360de20c1061f757cc458416dce6b2195ee5ea8c664f",
+    "fileNguon": "anh/3bc0c28d45f5e614c2ce360de20c1061f757cc458416dce6b2195ee5ea8c664f.png",
+    "smiles": "Cc1ccccc1C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_2",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 348,
+    "hash": "3dcfd2d33986549f289bf72049d10e499041127b83b4bc20c5ccc07b2388e1e1",
+    "fileNguon": "anh/3dcfd2d33986549f289bf72049d10e499041127b83b4bc20c5ccc07b2388e1e1.png",
+    "smiles": "CC([NH3+])C(=O)[O-]",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_2",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 351,
+    "hash": "3e261eebbb82bc7f14c14f7df9fc4cd3d5881235ebf9507525b78a7c49a57d82",
+    "fileNguon": "anh/3e261eebbb82bc7f14c14f7df9fc4cd3d5881235ebf9507525b78a7c49a57d82.png",
+    "smiles": "CC([NH3+])C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_2",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 355,
+    "hash": "3ebda56bdb2423cb1fb775b5d3b4573e38c467328865f9dcdf883f5f74f9624b",
+    "fileNguon": "anh/3ebda56bdb2423cb1fb775b5d3b4573e38c467328865f9dcdf883f5f74f9624b.png",
+    "smiles": "CC([NH3+])C(=O)[O-]",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_2",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 371,
+    "hash": "41c52dfb7a8053382deb93cbed6ea31ba01a67d7274121ef023e8a6fd2682a63",
+    "fileNguon": "anh/41c52dfb7a8053382deb93cbed6ea31ba01a67d7274121ef023e8a6fd2682a63.png",
+    "smiles": "CC(=O)OCC",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_2",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 398,
+    "hash": "465512c035fb3eaa64e2cc0a5b8b24ad96681ae0ad8fdc99008b03e885d55795",
+    "fileNguon": "anh/465512c035fb3eaa64e2cc0a5b8b24ad96681ae0ad8fdc99008b03e885d55795.png",
+    "smiles": "NCCc1cc(O)c(O)cc1",
+    "caption": [
+      "dopamine"
+    ],
+    "nguoiDocNguon": "soat_nguon_2",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 416,
+    "hash": "4a4102d00414e6be853f1a2586f402157795edcb6dfc3c3f8bcc34e1c37c2c28",
+    "fileNguon": "anh/4a4102d00414e6be853f1a2586f402157795edcb6dfc3c3f8bcc34e1c37c2c28.png",
+    "smiles": "CC(=O)OCC(C)CC",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_2",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve",
+    "suaSauSoat": "Bổ sung CH2 bị thiếu trong lần đọc đầu; đối chiếu ảnh nguồn đầy đủ."
+  },
+  {
+    "i": 430,
+    "hash": "4d8538b37ae2d0500b27326ef7f4192f27dca141669146a7d2768623fd894a91",
+    "fileNguon": "anh/4d8538b37ae2d0500b27326ef7f4192f27dca141669146a7d2768623fd894a91.png",
+    "smiles": "O=C(O)CC(O)(C(=O)O)CC(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_2",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 436,
+    "hash": "4eb7e2b3101d770c67e1053cf8c1abff62c91199fdc03d95fa0c97e846685fa3",
+    "fileNguon": "anh/4eb7e2b3101d770c67e1053cf8c1abff62c91199fdc03d95fa0c97e846685fa3.png",
+    "smiles": "CCC(C)CN",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_2",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 443,
+    "hash": "4ff886065ab4dab4c66f0b4559aa4166e0aac94f91eb987f5c6bbe3e2856ded0",
+    "fileNguon": "anh/4ff886065ab4dab4c66f0b4559aa4166e0aac94f91eb987f5c6bbe3e2856ded0.png",
+    "smiles": "CC(=O)Oc1ccccc1C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_2",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 450,
+    "hash": "520d114131e4a0b1411bcef1d75d35644019b099e524118b1d506d511cfb586c",
+    "fileNguon": "anh/520d114131e4a0b1411bcef1d75d35644019b099e524118b1d506d511cfb586c.png",
+    "smiles": "OCc1ccccc1CO",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_2",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve",
+    "vongThomDangTron": true
+  },
+  {
+    "i": 487,
+    "hash": "5a9480627fd1988cf44e42a1035bebb504b9fd6546583e13b60d79c4d5957eb9",
+    "fileNguon": "anh/5a9480627fd1988cf44e42a1035bebb504b9fd6546583e13b60d79c4d5957eb9.png",
+    "smiles": "NC(Cc1ccccc1)C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_3",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 519,
+    "hash": "60f9d4af506aabed98d19579436976d0b6e64694559b383a6cb55081d103fd01",
+    "fileNguon": "anh/60f9d4af506aabed98d19579436976d0b6e64694559b383a6cb55081d103fd01.png",
+    "smiles": "COC(=O)c1ccccc1O",
+    "caption": [
+      "Methyl salicylate"
+    ],
+    "nguoiDocNguon": "soat_nguon_3",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 558,
+    "hash": "683250a8dfac876e9a21010c83ae2a95ce4e7b005665747f9a215fc239e49022",
+    "fileNguon": "anh/683250a8dfac876e9a21010c83ae2a95ce4e7b005665747f9a215fc239e49022.png",
+    "smiles": "NCC(=O)NCC(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_3",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 569,
+    "hash": "6a0fd45d06c4f03a4eadd29925a9a814c587ccafb5917e0b7798830a24ac57bc",
+    "fileNguon": "anh/6a0fd45d06c4f03a4eadd29925a9a814c587ccafb5917e0b7798830a24ac57bc.png",
+    "smiles": "NC(Cc1ccccc1)C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_3",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 573,
+    "hash": "6b182a8f1343204545c8916b54d7338f22a3ac36b4e1a3b85fb4c28cd8059654",
+    "fileNguon": "anh/6b182a8f1343204545c8916b54d7338f22a3ac36b4e1a3b85fb4c28cd8059654.png",
+    "smiles": "O=C(O)c1ccccc1",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_3",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve",
+    "vongThomDangTron": true
+  },
+  {
+    "i": 599,
+    "hash": "6f202addb88f48f5f6d67d7b2027b169ed4676b80c15cf8c127b4a1fa8f45e24",
+    "fileNguon": "anh/6f202addb88f48f5f6d67d7b2027b169ed4676b80c15cf8c127b4a1fa8f45e24.png",
+    "smiles": "CC(N)C(=O)NCC(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_3",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 615,
+    "hash": "72760e043abac9e9eec557687499589835c603c5853e123704dfe24c23b2e139",
+    "fileNguon": "anh/72760e043abac9e9eec557687499589835c603c5853e123704dfe24c23b2e139.png",
+    "smiles": "NCC(=O)NCC(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_3",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 681,
+    "hash": "7d861ab93b044363eebf20d84cf0d634cb027e40361b4c92cd89be6edaf85174",
+    "fileNguon": "anh/7d861ab93b044363eebf20d84cf0d634cb027e40361b4c92cd89be6edaf85174.png",
+    "smiles": "NCC(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_3",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 683,
+    "hash": "7e7ebcf639c26e13e03c51295fdf6bd1bd11fcc5016786bfaf19d39c626afabb",
+    "fileNguon": "anh/7e7ebcf639c26e13e03c51295fdf6bd1bd11fcc5016786bfaf19d39c626afabb.png",
+    "smiles": "COC(=O)c1ccccc1O",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_3",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve",
+    "vongThomDangTron": true
+  },
+  {
+    "i": 690,
+    "hash": "7fd19567cd3f7a9479bf2ea7e3e811a9381a138380c34f4407408d3827bcdab9",
+    "fileNguon": "anh/7fd19567cd3f7a9479bf2ea7e3e811a9381a138380c34f4407408d3827bcdab9.png",
+    "smiles": "CC1CCCCC1O",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_3",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 708,
+    "hash": "8387a040375b43a004f7708ceca40437c086aa52793507e9011a70d21192f32c",
+    "fileNguon": "anh/8387a040375b43a004f7708ceca40437c086aa52793507e9011a70d21192f32c.png",
+    "smiles": "CC(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_3",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 713,
+    "hash": "8497afd005063acdf59e1d44fb2b06922735789fdc0e987de51cbd9bcc7ddc3e",
+    "fileNguon": "anh/8497afd005063acdf59e1d44fb2b06922735789fdc0e987de51cbd9bcc7ddc3e.png",
+    "smiles": "COC(=O)c1ccc(O)cc1",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_3",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 716,
+    "hash": "84e7a32ae1313a753cfe1d3830b33ed2b7b691b437a71abc76560d488e6ebfbe",
+    "fileNguon": "anh/84e7a32ae1313a753cfe1d3830b33ed2b7b691b437a71abc76560d488e6ebfbe.png",
+    "smiles": "CC(=O)OCC(C)CC",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_3",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 781,
+    "hash": "91eb29148d75b58a8221500550c6bda3ef6f4f30c1a261be22278e2ba37a3f24",
+    "fileNguon": "anh/91eb29148d75b58a8221500550c6bda3ef6f4f30c1a261be22278e2ba37a3f24.png",
+    "smiles": "CCCNCC",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_4",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 797,
+    "hash": "94731f4110825a123cdf638317a133bf5ca36aaa7f13b38f8a2b68501d9c5376",
+    "fileNguon": "anh/94731f4110825a123cdf638317a133bf5ca36aaa7f13b38f8a2b68501d9c5376.png",
+    "smiles": "CCCC(=O)OCC",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_4",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 803,
+    "hash": "95723814f089f5b4dedfe6b63b4087a4a44ab0a544962e018baf3eaa9c33b59b",
+    "fileNguon": "anh/95723814f089f5b4dedfe6b63b4087a4a44ab0a544962e018baf3eaa9c33b59b.png",
+    "smiles": "COC(=O)c1ccc(O)cc1",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_4",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 815,
+    "hash": "96ee6139d4794e19eb3627895e18005d4929489ad7944fe8dccd9a555121ddf4",
+    "fileNguon": "anh/96ee6139d4794e19eb3627895e18005d4929489ad7944fe8dccd9a555121ddf4.png",
+    "smiles": "CCNC(C)CC",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_4",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 819,
+    "hash": "97b0b40940b6b414ac6cbaa97b1638626fd07d5d86d37ffca420e0406985e0be",
+    "fileNguon": "anh/97b0b40940b6b414ac6cbaa97b1638626fd07d5d86d37ffca420e0406985e0be.png",
+    "smiles": "O=C(O)c1ccccc1O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_4",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve",
+    "vongThomDangTron": true
+  },
+  {
+    "i": 821,
+    "hash": "984e94ba3e26f0246cf656ba9775d736429f17280ae997ebc1f2143274c21e5e",
+    "fileNguon": "anh/984e94ba3e26f0246cf656ba9775d736429f17280ae997ebc1f2143274c21e5e.png",
+    "smiles": "OC1CCCCC1O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_4",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 825,
+    "hash": "98dc65fbf60fb151ebf61fba99f8c4f4c3b250dec9e1ef14700d84dd4b012128",
+    "fileNguon": "anh/98dc65fbf60fb151ebf61fba99f8c4f4c3b250dec9e1ef14700d84dd4b012128.png",
+    "smiles": "COc1cc(C([H])=O)ccc1O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_4",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve",
+    "giuHTuongMinh": true
+  },
+  {
+    "i": 829,
+    "hash": "99843a672c0780c0f2829635bd119c0ee9892b087ec005d23b86414d0f7c86b2",
+    "fileNguon": "anh/99843a672c0780c0f2829635bd119c0ee9892b087ec005d23b86414d0f7c86b2.png",
+    "smiles": "O=C(O)CC(O)(CC(=O)O)C(=O)O",
+    "caption": [
+      "citric acid"
+    ],
+    "nguoiDocNguon": "cau_truc_4",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 833,
+    "hash": "99f4b91de82b0c113711a1af5e7ac6faec3b4660b43656b915b6804097bef185",
+    "fileNguon": "anh/99f4b91de82b0c113711a1af5e7ac6faec3b4660b43656b915b6804097bef185.png",
+    "smiles": "CCOC(=O)c1ccccc1C(=O)OCC",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_4",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 835,
+    "hash": "9a7b21f92f9429b3cb901c2712e43098f24483638841a4858465a673f669f277",
+    "fileNguon": "anh/9a7b21f92f9429b3cb901c2712e43098f24483638841a4858465a673f669f277.png",
+    "smiles": "O=C(O)CC(O)(CC(=O)O)C(=O)O",
+    "caption": [
+      "citric acid"
+    ],
+    "nguoiDocNguon": "cau_truc_4",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 844,
+    "hash": "9b46dd44a8345179b263511cd2ef97152103bbe09b63adfeea359a91a9720e47",
+    "fileNguon": "anh/9b46dd44a8345179b263511cd2ef97152103bbe09b63adfeea359a91a9720e47.png",
+    "smiles": "Nc1nc(N)nc(N)n1",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_4",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 857,
+    "hash": "9c9d2bf74ed03f7af8075d444089112073cc03ee7765e69d7524dd665d7ac284",
+    "fileNguon": "anh/9c9d2bf74ed03f7af8075d444089112073cc03ee7765e69d7524dd665d7ac284.png",
+    "smiles": "OCc1ccccc1O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_4",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve",
+    "vongThomDangTron": true
+  },
+  {
+    "i": 868,
+    "hash": "9dde7feed294de34744d5ca3eb97e9fe5cafec60c5df1ffd5f18028f3dfa2579",
+    "fileNguon": "anh/9dde7feed294de34744d5ca3eb97e9fe5cafec60c5df1ffd5f18028f3dfa2579.png",
+    "smiles": "NC(CCC(=O)O)C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_4",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve",
+    "kieuDacBiet": "glutamic-cross"
+  },
+  {
+    "i": 871,
+    "hash": "9ed910a0e815f97f8732e07b386c76a87ecf44d82f26a15a7a0f7ec94f0e4f05",
+    "fileNguon": "anh/9ed910a0e815f97f8732e07b386c76a87ecf44d82f26a15a7a0f7ec94f0e4f05.png",
+    "smiles": "NC(CCC(=O)O)C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_4",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 897,
+    "hash": "a46aa65a7f1a24ed66e2522e5e06df29cd509930b8d66c32f1ba57bc8a5b476d",
+    "fileNguon": "anh/a46aa65a7f1a24ed66e2522e5e06df29cd509930b8d66c32f1ba57bc8a5b476d.png",
+    "smiles": "CCNCC(C)C",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_4",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 960,
+    "hash": "accc9b902efd9087ee2d9509fda85dd69c885752e75d189545722f16a8acd47c",
+    "fileNguon": "anh/accc9b902efd9087ee2d9509fda85dd69c885752e75d189545722f16a8acd47c.png",
+    "smiles": "CCOC(=O)c1ccccc1C(=O)OCC",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_5",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 972,
+    "hash": "ae6e9959e3b77686ff6d0fbd5552ea95d216974062ea4c00bd8b9c0c2a8839d6",
+    "fileNguon": "anh/ae6e9959e3b77686ff6d0fbd5552ea95d216974062ea4c00bd8b9c0c2a8839d6.png",
+    "smiles": "COC([H])=O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_5",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve",
+    "giuHTuongMinh": true
+  },
+  {
+    "i": 975,
+    "hash": "aeb7bdc3a8afb03b7397897d173a8584da935d603b64f8ff036e38a163a61803",
+    "fileNguon": "anh/aeb7bdc3a8afb03b7397897d173a8584da935d603b64f8ff036e38a163a61803.png",
+    "smiles": "NCCCCCC(=O)O",
+    "caption": [
+      "C."
+    ],
+    "nguoiDocNguon": "cau_truc_5",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve",
+    "bieuThucChu": "C. H₂N–[CH₂]₅–COOH."
+  },
+  {
+    "i": 1003,
+    "hash": "b4cad548175c863ae8f3cbc6426de7e21a1131a9580d460d9e61b95b47f2b032",
+    "fileNguon": "anh/b4cad548175c863ae8f3cbc6426de7e21a1131a9580d460d9e61b95b47f2b032.png",
+    "smiles": "CCCNCC",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_5",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1034,
+    "hash": "ba00816e6b6e6aa242023578f53736a91b1fcd75d19b4032d34bb5865a5c6eb3",
+    "fileNguon": "anh/ba00816e6b6e6aa242023578f53736a91b1fcd75d19b4032d34bb5865a5c6eb3.png",
+    "smiles": "Cc1ccccc1O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_5",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1048,
+    "hash": "bdb7013590c9caa236cd9b26cd0a3107c14fd5320e2ad5161fe34a1f2e6869fa",
+    "fileNguon": "anh/bdb7013590c9caa236cd9b26cd0a3107c14fd5320e2ad5161fe34a1f2e6869fa.png",
+    "smiles": "CC(=O)Oc1ccccc1C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_5",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve",
+    "vongThomDangTron": true
+  },
+  {
+    "i": 1057,
+    "hash": "beff75074b7e34cb3c9d5183a2ce8cbff48f06c95094ece987cb18b52691f078",
+    "fileNguon": "anh/beff75074b7e34cb3c9d5183a2ce8cbff48f06c95094ece987cb18b52691f078.png",
+    "smiles": "O=C(O)c1cc(O)ccc1",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_5",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve",
+    "vongThomDangTron": true
+  },
+  {
+    "i": 1066,
+    "hash": "c094346d864d1d062772a53831f8c9ec919c5ad39acaffb7525921e0e84d849a",
+    "fileNguon": "anh/c094346d864d1d062772a53831f8c9ec919c5ad39acaffb7525921e0e84d849a.png",
+    "smiles": "CC(=O)OCCC(C)C",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_5",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1069,
+    "hash": "c0ded70bab3d3738d7f907667b1dd923d0c908242febc56195f03b16675b672b",
+    "fileNguon": "anh/c0ded70bab3d3738d7f907667b1dd923d0c908242febc56195f03b16675b672b.png",
+    "smiles": "NC(CCC(=O)O)C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_5",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1087,
+    "hash": "c3c5f1516dd6dcfe96e72c71597f94861c427fbc5953619357bcc28aaf27deee",
+    "fileNguon": "anh/c3c5f1516dd6dcfe96e72c71597f94861c427fbc5953619357bcc28aaf27deee.png",
+    "smiles": "CCCCCCCCCCCCCCCCCC(=O)O",
+    "caption": [
+      "stearic acid"
+    ],
+    "nguoiDocNguon": "cau_truc_5",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1093,
+    "hash": "c4aca8b914f09d83fcb9af7e3dbbad3a30d100d01a2fca8458077c54db38804a",
+    "fileNguon": "anh/c4aca8b914f09d83fcb9af7e3dbbad3a30d100d01a2fca8458077c54db38804a.png",
+    "smiles": "CC(=O)C(C)C",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_5",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1102,
+    "hash": "c6789389a306b25fab025d67f2d0c2da62470d91652c77f7bb192216b5e11007",
+    "fileNguon": "anh/c6789389a306b25fab025d67f2d0c2da62470d91652c77f7bb192216b5e11007.png",
+    "smiles": "NCC(=O)[O-]",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_5",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1128,
+    "hash": "cadadf4de59002fcb8328242e3a09d751a0237ac5a5383b962d57dafa4cd4b34",
+    "fileNguon": "anh/cadadf4de59002fcb8328242e3a09d751a0237ac5a5383b962d57dafa4cd4b34.png",
+    "smiles": "NCO",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_5",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1146,
+    "hash": "ceff87b75e9c7446f314a1dc5884836da20008ceb62f73e1ed30b592dbcefe23",
+    "fileNguon": "anh/ceff87b75e9c7446f314a1dc5884836da20008ceb62f73e1ed30b592dbcefe23.png",
+    "smiles": "CCCC(=O)OCC",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_5",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1163,
+    "hash": "d2d97c03ba67bb157c507ad9b5a160151bb8187b7c764dcb38250003b80752b2",
+    "fileNguon": "anh/d2d97c03ba67bb157c507ad9b5a160151bb8187b7c764dcb38250003b80752b2.png",
+    "smiles": "CC(=O)OCc1ccccc1",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_5",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve",
+    "vongThomDangTron": true
+  },
+  {
+    "i": 1218,
+    "hash": "dd22d2774639653f7d0408095e925ba2a6bdabc37d7f2828c4eb331b81ea96e0",
+    "fileNguon": "anh/dd22d2774639653f7d0408095e925ba2a6bdabc37d7f2828c4eb331b81ea96e0.png",
+    "smiles": "CCNC(C)CC",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_6",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1233,
+    "hash": "df82e6b53009b2b5da1b793ead27e78bb9ab504bc5da9f3bd9efd479204a3642",
+    "fileNguon": "anh/df82e6b53009b2b5da1b793ead27e78bb9ab504bc5da9f3bd9efd479204a3642.png",
+    "smiles": "CC(N)Cc1ccccc1",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_6",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1236,
+    "hash": "dfcc1e0350705023e7ee0cb7f37fd2fdc2ad3eb500cc2a710b955f02d81f47d6",
+    "fileNguon": "anh/dfcc1e0350705023e7ee0cb7f37fd2fdc2ad3eb500cc2a710b955f02d81f47d6.png",
+    "smiles": "BrCc1ccccc1",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_6",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1245,
+    "hash": "e1dfc20394758fb2c9ca83dc00d2da1cdf792097a73abf49787f5eb8ce2ebdcc",
+    "fileNguon": "anh/e1dfc20394758fb2c9ca83dc00d2da1cdf792097a73abf49787f5eb8ce2ebdcc.png",
+    "smiles": "O=C(O)c1ccccc1O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_6",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve",
+    "vongThomDangTron": true
+  },
+  {
+    "i": 1287,
+    "hash": "ea2add043b8d740cbff997369e5d77d990362d6a06d88932bb5a44f9966ffad4",
+    "fileNguon": "anh/ea2add043b8d740cbff997369e5d77d990362d6a06d88932bb5a44f9966ffad4.png",
+    "smiles": "CC(=O)Oc1ccccc1C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_6",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve",
+    "vongThomDangTron": true
+  },
+  {
+    "i": 1289,
+    "hash": "ea78de8d546bcc8dd6f66c63cc434020359463312372d8d8db9e237da208449e",
+    "fileNguon": "anh/ea78de8d546bcc8dd6f66c63cc434020359463312372d8d8db9e237da208449e.png",
+    "smiles": "[NH3+]CC(=O)[O-]",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_6",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1295,
+    "hash": "eacd7cd139aabd9775a532e8705152049005ca125cf499f7634d5dd3ff4f0365",
+    "fileNguon": "anh/eacd7cd139aabd9775a532e8705152049005ca125cf499f7634d5dd3ff4f0365.png",
+    "smiles": "[NH3+]C(N)CC(=O)[O-]",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_6",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1307,
+    "hash": "eca13bc0f9e972c15b6115d4fc2df4fb2a0a11b3f0ce2551da285570045ef7c0",
+    "fileNguon": "anh/eca13bc0f9e972c15b6115d4fc2df4fb2a0a11b3f0ce2551da285570045ef7c0.png",
+    "smiles": "Nc1nc(N)nc(N)n1",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_6",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1334,
+    "hash": "f1fa9cbcadf37acaf50b169e0a59945abc9707973dbe831046c2339b2151d7a2",
+    "fileNguon": "anh/f1fa9cbcadf37acaf50b169e0a59945abc9707973dbe831046c2339b2151d7a2.png",
+    "smiles": "NCC(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_6",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1336,
+    "hash": "f22875b2920b55376d5045cd787c353553dce1279874490f966ca48a0044e7ff",
+    "fileNguon": "anh/f22875b2920b55376d5045cd787c353553dce1279874490f966ca48a0044e7ff.png",
+    "smiles": "CCO",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_6",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1347,
+    "hash": "f3f6a910d977b78470e1d028bae650c6ef285ae3c54d3d8d1a03bb8112008a46",
+    "fileNguon": "anh/f3f6a910d977b78470e1d028bae650c6ef285ae3c54d3d8d1a03bb8112008a46.png",
+    "smiles": "CC(N)Cc1ccccc1",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_6",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1367,
+    "hash": "f71ee0b4b71105ec001d18a36bafeba252ccc092d5cf90692abd06deaf70d0a8",
+    "fileNguon": "anh/f71ee0b4b71105ec001d18a36bafeba252ccc092d5cf90692abd06deaf70d0a8.png",
+    "smiles": "CCCCCCCCCCCCc1ccc(S(=O)(=O)O)cc1",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_6",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve",
+    "kieuDacBiet": "alkyl12-sulfonic"
+  },
+  {
+    "i": 1381,
+    "hash": "f92e2bd8215b258ea21fa6f591069729aa4841f92c60c69e2fe4847093f5d173",
+    "fileNguon": "anh/f92e2bd8215b258ea21fa6f591069729aa4841f92c60c69e2fe4847093f5d173.png",
+    "smiles": "CCN(C)C(C)CC",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_6",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1398,
+    "hash": "fc0157d2b4ea2c28dd6a4f9394f902918aaa6c85c46bf8a942fbf17ce40ea9f1",
+    "fileNguon": "anh/fc0157d2b4ea2c28dd6a4f9394f902918aaa6c85c46bf8a942fbf17ce40ea9f1.png",
+    "smiles": "NCCCCC(N)C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_6",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1427,
+    "hash": "fff624c799aea2a5b897b7863cb3055c4b7150f020d47e8571fc37ef96031257",
+    "fileNguon": "anh/fff624c799aea2a5b897b7863cb3055c4b7150f020d47e8571fc37ef96031257.png",
+    "smiles": "O=C(O)c1ccccc1",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_6",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve",
+    "vongThomDangTron": true
+  }
+]

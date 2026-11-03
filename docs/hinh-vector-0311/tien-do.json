@@ -59,15 +59,16 @@
       "Toàn kho còn chưa hoàn tất, app chưa thay hình; không báo đã xong hoặc đã triển khai."
     ],
     "danhMucDaKiem": "docs/hinh-vector-0311/kiem/danh-muc-da-kiem.json",
-    "loVuaXong": "23 hình nguồn orbital → 12 SVG riêng; 3 tác tử soát trực tiếp 23/23 đạt.",
+    "loVuaXong": "Lô3 88 cấu trúc đạt sau sửa4lỗi phát hiện qua soát chéo, 8 hình orbital kèm nhãn và10 ảnh tái dùng mẫu đạt sau sửa nhánh khíH2.",
     "viecNenLamTiep": "Hoàn thiện phần còn lại của nhóm orbital: các hình có nhãn cắt ở rìa cần đối chiếu ngữ cảnh đúng từng câu; các hình AO không gian cần giữ trục/nhãn/phân biệt 2 thùy. Hoặc chọn một cụm hình hóa học đơn giản chưa có trong danh-muc-da-kiem, mở nguồn riêng rồi dựng hình học và soát độc lập."
   },
   "tuDongTiepTuc": {
     "id": "6ae96c39083081918a50bc48bc6c8d3e",
-    "trangThai": "da-tao-va-bat",
+    "trangThai": "tam-dung-lich-khi-phien-dang-lam-lien-tuc",
     "lich": "moi-gio",
     "mucTieu": "Tự vẽ, soát, sửa, tích hợp và kiểm bản sống đến khi đạt; tự tắt khi hoàn tất",
-    "thongBao": "Chỉ khi hoàn tất, có lỗi chặn thực sự hoặc cần hành động của thầy"
+    "thongBao": "Chỉ khi hoàn tất, có lỗi chặn thực sự hoặc cần hành động của thầy",
+    "lyDo": "Tránh lượt lịch mới ngắt công việc/nhóm tác tử đang chạy; phiên chính đang xử lý trực tiếp theo lệnh thầy, không chờ lịch."
   },
   "loOrbitalDaSoat": {
     "soAnhNguon": 23,
@@ -76,12 +77,15 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 32,
-    "soSvgRieng": 21,
-    "soCauDungHinh": 32,
-    "byteSvg": 34803,
-    "byteGzip": 9980,
-    "soAnhNguonConLai": 1396,
+    "soAnhNguon": 133,
+    "soSvgRieng": 87,
+    "soCauDungHinh": 144,
+    "soCauDuMoiHinh": 108,
+    "soCauMoiXongMotPhan": 36,
+    "byteSvg": 330778,
+    "byteGzip": 85354,
+    "soAnhNguonConLai": 1295,
     "daTichHop": false
-  }
+  },
+  "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất."
 }

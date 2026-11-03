@@ -1,0 +1,419 @@
+{
+  "ketQua": "Không đổi pixel sau chuẩn hóa khai báo UTF-8",
+  "changes": [
+    {
+      "i": 11,
+      "hashCu": "0fac013b6484ae8deb30516ce72fc7f3a371c88305c6eb9380c0427176a05236",
+      "hashMoi": "dbac168d54714f376ac568e5ee13cbb42b6a3bbd4955fff4cf2eb02fa1b7fed1",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 41,
+      "hashCu": "9a919093de5443e6cbf3c9a448f67a248cbd1ab95f140a64ad742eb161fa5ba5",
+      "hashMoi": "32d7cbdd43224538fbad383b058d30adb907429211ae412eb1503eebb6432aa9",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 51,
+      "hashCu": "1dc931040bde4936389995411caebea253ae346c159b69af69d38249d0fa0d8b",
+      "hashMoi": "fe32892d55f5a086c8532e1656071253e65307ba392b45ebfb7aef598fcfd9f5",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 54,
+      "hashCu": "b29484bcc63484283302074a4bd92de712e404735df8d84eaca113f3d76a219b",
+      "hashMoi": "fc8f239cebd1a9f292878182abbfa6ad97ee833a39a780f1d664ae15ded930ad",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 102,
+      "hashCu": "9c97dca0dcdbf8e2dffafe87af9e93f1be67ed7e791442b87191d6f7a5f4b4e4",
+      "hashMoi": "d1752df88e19fab15e8e54dec74d26acf56e72b2126722c85c32ba3a59b87415",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 143,
+      "hashCu": "dae44731800bcf2a030fd2cebce6800d759bb9138e48b56f584b3ae1d11c5a60",
+      "hashMoi": "9bacdcc3a244e87765785d31d358f312cb391790426be87d13d56e1a9fa92e28",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 159,
+      "hashCu": "b372841bbae92ee0706157d98d9565389a3476e13ad0bcf1df8ce66ec76a71e3",
+      "hashMoi": "99b37f74dddd9f31f3dded4543fe9d53badb289b5609824c79fbc8491d4c7318",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 174,
+      "hashCu": "c2bbd7fe19aa6fe5cbbeec623899ea838cf8aeea80a5c5d5654af0ad22183a35",
+      "hashMoi": "4157b60efdea5a8c44c7ca650c667f3d92525e7a091d8d55d6cbde4725bc9ff2",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 181,
+      "hashCu": "674e5e6d84fbeec0c444179bc47bf7c393546c154909be0d8d8a6939d59c9a4c",
+      "hashMoi": "a6220ff02d681f338a840ec40dedf7de713a5503a79623f8a4787af24577626e",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 191,
+      "hashCu": "c890ef8ea25270ffc536bde78e51d7acc9f79879dd3ff6dd91fdf87799bfe628",
+      "hashMoi": "d1756d3291dee240778c7f62a39b580dfd67bf9bf9ba351478bee6f13fa6896a",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 223,
+      "hashCu": "f4732369fc367b789cdbc397c67720d8a57256bbf6ea1d576242386b913ec552",
+      "hashMoi": "407944bdfd3087962d7ccd67ab0b61a34ee41513c71ee07d0d0466dc411f99a1",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 252,
+      "hashCu": "674e5e6d84fbeec0c444179bc47bf7c393546c154909be0d8d8a6939d59c9a4c",
+      "hashMoi": "a6220ff02d681f338a840ec40dedf7de713a5503a79623f8a4787af24577626e",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 293,
+      "hashCu": "fccc5de4422cc943d3948c9335f8635674367d7dba4fd9dae6ee0f1fa38daa40",
+      "hashMoi": "aa2e6b7a052869ab621260a3f5c3afa67a69eb97d36c91e21f9f081e3cb9152c",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 325,
+      "hashCu": "89f5b943826d2d873c9cacecc689a6638725f63fd1dab55c70f47d036a14186c",
+      "hashMoi": "87a08e5e107d3ae2b940228a8976882f59589a3409abbbbf4e6aa6e66945ae09",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 339,
+      "hashCu": "0fac013b6484ae8deb30516ce72fc7f3a371c88305c6eb9380c0427176a05236",
+      "hashMoi": "dbac168d54714f376ac568e5ee13cbb42b6a3bbd4955fff4cf2eb02fa1b7fed1",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 348,
+      "hashCu": "e01f43457d49c4ed91ca898638e9df8b1a487de87485177d44b144aa98ee6595",
+      "hashMoi": "05c156979895e63e93154e2a023e4322efdaff5d37ebaf720ac5dbac029100b9",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 351,
+      "hashCu": "c2bbd7fe19aa6fe5cbbeec623899ea838cf8aeea80a5c5d5654af0ad22183a35",
+      "hashMoi": "4157b60efdea5a8c44c7ca650c667f3d92525e7a091d8d55d6cbde4725bc9ff2",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 355,
+      "hashCu": "e01f43457d49c4ed91ca898638e9df8b1a487de87485177d44b144aa98ee6595",
+      "hashMoi": "05c156979895e63e93154e2a023e4322efdaff5d37ebaf720ac5dbac029100b9",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 371,
+      "hashCu": "f525e98717466979382f37fff2d760a355291771613144a99d80c25e32c5a4d7",
+      "hashMoi": "4a9590c85678609025b3802dea01177f6144a06058f9b9a01e74fb6a36724dcb",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 398,
+      "hashCu": "646e11eceb5a54054c19bc3d80aa5b3965eb61e81b4fb0a51c996f2bdea57f0d",
+      "hashMoi": "19fd86744854586efb50990c2b5fd2973eb3b2a64b4a7646c6c6bb16c39f2211",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 416,
+      "hashCu": "de28ef196c56d22982c88c5fe71531ae5f7f425755b52aff7a9932ed195912d0",
+      "hashMoi": "bcf5383fa0a20f486cc062a5d55e48f3bc08c323b4adb0961737635daa23c9e6",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 430,
+      "hashCu": "401a2bac791af0c10ecf749e63f999ef0e935527876391d9f7aebcafc32a0e99",
+      "hashMoi": "39871087d6d859099df6f0f7a15fd6d294d13e9dd8d463a61e1f326e77f1ca18",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 436,
+      "hashCu": "4ab7367114bfd64e18913f176c9d3da4422290ccc432a80d3c4ded73549ea7b0",
+      "hashMoi": "b6ff5114a45b6951e4a428ad13bc1feddaec9294ef3f5116f5c795974ba8cc54",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 443,
+      "hashCu": "50817c1d8376cc177b9d160d4f60ecff103e1e0a9c3228a265e14ae76156fbcb",
+      "hashMoi": "3ac393398b2067a98b5817575f69354abe2176fd2d55ecce31a78020b2310cc3",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 487,
+      "hashCu": "3ae72f6499da69a36aee4c907b34b52f515cb1aba346c15ad5abf355ee7e5ed3",
+      "hashMoi": "54066f1d672030193c6e079a91635f269ee747537f07578f7b8a95ea56aee9f3",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 519,
+      "hashCu": "b372841bbae92ee0706157d98d9565389a3476e13ad0bcf1df8ce66ec76a71e3",
+      "hashMoi": "99b37f74dddd9f31f3dded4543fe9d53badb289b5609824c79fbc8491d4c7318",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 558,
+      "hashCu": "cc206052244f02630990eefe5b28ccc540cfcc1a17f0d236b1fbfe2beef0ac95",
+      "hashMoi": "606a40741644ff49161991cc209210aa5cd7cf72bf2e37e72941e48380e81d2d",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 569,
+      "hashCu": "3ae72f6499da69a36aee4c907b34b52f515cb1aba346c15ad5abf355ee7e5ed3",
+      "hashMoi": "54066f1d672030193c6e079a91635f269ee747537f07578f7b8a95ea56aee9f3",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 599,
+      "hashCu": "ec09d3e7d87f6fc260d68fdeebc251b5673b99c39d4bd3e8e2f6b4df0b113daa",
+      "hashMoi": "ba3f680b5632b7583d4bcd461750ad5748fa1db4baf084855dc6734fd84a900d",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 615,
+      "hashCu": "cc206052244f02630990eefe5b28ccc540cfcc1a17f0d236b1fbfe2beef0ac95",
+      "hashMoi": "606a40741644ff49161991cc209210aa5cd7cf72bf2e37e72941e48380e81d2d",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 681,
+      "hashCu": "0e632438132aee74ab14525fa871d0005f0dd131ee09b77a8961975f035b40d4",
+      "hashMoi": "32fb249a775252b28b95c0c779ba30ecb2a8d66d89ad205cc5d461834f1fd9a6",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 690,
+      "hashCu": "7934545523779414b483f20ec5cf81a5eb5bcdb9ea0e048b9d0d4f05921d19d2",
+      "hashMoi": "fc9b8af164f70b28a8322cf641cd61ac866f2f42b13ed00f732c26886051e355",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 708,
+      "hashCu": "3dc8067bb8d8667b912eab4fd3cb6e4dc029769b24fadabed2d1edcb83755f3f",
+      "hashMoi": "a128ea5524045c9833b7b85b140702514d0f2b15defc1086be261e1ea92de5b4",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 713,
+      "hashCu": "8739b386bd1c179dc55462ebde8b231def880dc3ff5b362d6de31fc34a46c602",
+      "hashMoi": "c778a71cdbc6b8b76605933dd0bf8218276890efa767fed40c947c0b70a6abfc",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 716,
+      "hashCu": "de28ef196c56d22982c88c5fe71531ae5f7f425755b52aff7a9932ed195912d0",
+      "hashMoi": "bcf5383fa0a20f486cc062a5d55e48f3bc08c323b4adb0961737635daa23c9e6",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 781,
+      "hashCu": "9a919093de5443e6cbf3c9a448f67a248cbd1ab95f140a64ad742eb161fa5ba5",
+      "hashMoi": "32d7cbdd43224538fbad383b058d30adb907429211ae412eb1503eebb6432aa9",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 797,
+      "hashCu": "4293e2b687c2b123f691ca2dd0058a3bcfcd33180456bb8ba64d9913974516d3",
+      "hashMoi": "63cda737a3a42c0aa266c3237286896bc249d270bf1c525cedc3795c4087c4a1",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 803,
+      "hashCu": "8739b386bd1c179dc55462ebde8b231def880dc3ff5b362d6de31fc34a46c602",
+      "hashMoi": "c778a71cdbc6b8b76605933dd0bf8218276890efa767fed40c947c0b70a6abfc",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 815,
+      "hashCu": "a27e2e4751b5e5b00f2531b57b0d05d0a51d20e9363c8e8dca9780d2db3f9cd9",
+      "hashMoi": "c48b45184210bdb6eab2f6b5bafaf1c322b53f57fccec97f77d3ff90f1d817be",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 821,
+      "hashCu": "bb254b0bb17a583f27878e8aa8d6d96411b5530c137d5f00ba188c8996ef20ab",
+      "hashMoi": "309433a5e173ae8651e0f114acb7982fc29948acd645864ccefa38e4a65b7fbe",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 825,
+      "hashCu": "a8ff0dd71c5db303a60c02f7396707ac85b2170cb06cbe0e2af5b750371d5516",
+      "hashMoi": "aeccba7b692543c85778a28bc344ffaa87a169af2add050a6ec4ea73a55b60e8",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 829,
+      "hashCu": "e6dfca07cffe96c65443cc184233fca22ea3d5b339d29899b01ae01c286f3e42",
+      "hashMoi": "e16700e2b276719d9cac3fedb41f1e5dd22b28fd242c007cceaad3f244e3d096",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 833,
+      "hashCu": "b29484bcc63484283302074a4bd92de712e404735df8d84eaca113f3d76a219b",
+      "hashMoi": "fc8f239cebd1a9f292878182abbfa6ad97ee833a39a780f1d664ae15ded930ad",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 835,
+      "hashCu": "e6dfca07cffe96c65443cc184233fca22ea3d5b339d29899b01ae01c286f3e42",
+      "hashMoi": "e16700e2b276719d9cac3fedb41f1e5dd22b28fd242c007cceaad3f244e3d096",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 844,
+      "hashCu": "89f5b943826d2d873c9cacecc689a6638725f63fd1dab55c70f47d036a14186c",
+      "hashMoi": "87a08e5e107d3ae2b940228a8976882f59589a3409abbbbf4e6aa6e66945ae09",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 871,
+      "hashCu": "cc3330f5f8f7946b4b7856a8147256aaf154011fe7fa2f8d08bbde3479ecc47c",
+      "hashMoi": "244ac1f1efbb364b269c078fcc208284c0360884abd9ced48276f96f453f60e9",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 897,
+      "hashCu": "a317ef79aaedb1f21d30073fbdc5ac47bf3132909bba62ad02cdbf2d4fa82100",
+      "hashMoi": "4fc28bf7c3729de093d569fc59f5b5470c25f7c76fdb827f60db9a787202c621",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 960,
+      "hashCu": "b29484bcc63484283302074a4bd92de712e404735df8d84eaca113f3d76a219b",
+      "hashMoi": "fc8f239cebd1a9f292878182abbfa6ad97ee833a39a780f1d664ae15ded930ad",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 972,
+      "hashCu": "f188167c833b20440340f916d5b0c227d7f16e32a12ab8258fb3878799fb9372",
+      "hashMoi": "8d986d89fad3b3072736871123a0aa8403c04330c8206072d3f42955a38ce6a8",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 1003,
+      "hashCu": "9a919093de5443e6cbf3c9a448f67a248cbd1ab95f140a64ad742eb161fa5ba5",
+      "hashMoi": "32d7cbdd43224538fbad383b058d30adb907429211ae412eb1503eebb6432aa9",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 1034,
+      "hashCu": "f4732369fc367b789cdbc397c67720d8a57256bbf6ea1d576242386b913ec552",
+      "hashMoi": "407944bdfd3087962d7ccd67ab0b61a34ee41513c71ee07d0d0466dc411f99a1",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 1066,
+      "hashCu": "db4d73bcd2f2a3864bc23b62f4bbee31fe29942414ac7385d2a90696256f9d47",
+      "hashMoi": "cb68141618769f32bb3010ca43a72ea6215a943172581214742beb63a6f559e4",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 1069,
+      "hashCu": "cc3330f5f8f7946b4b7856a8147256aaf154011fe7fa2f8d08bbde3479ecc47c",
+      "hashMoi": "244ac1f1efbb364b269c078fcc208284c0360884abd9ced48276f96f453f60e9",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 1087,
+      "hashCu": "1d922c44b044d9fa53e4d76b0830346bc97321bdaa51172f4322d78c44e5b85f",
+      "hashMoi": "1585dc218bb2f3bc6f5a21a5a6516fb6ba662ec27287ce6a6ff814498c6ebea3",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 1093,
+      "hashCu": "77471db523caf012c8a2689e9080eb9831040b9bc7a32bf72ac139bb1774264f",
+      "hashMoi": "c23fb53eddc9b3a044b82373d2037f0620384871e008664053a2ee309fc84ee8",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 1102,
+      "hashCu": "fdd7ab92d21372b7fec9fc43737ef502ce527c34562898b5dcfe333a2b60dbda",
+      "hashMoi": "af70d1c095d3c151f6c062c14a3c34c71d1790797898c5f86ce8f604aed8c886",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 1128,
+      "hashCu": "1dc931040bde4936389995411caebea253ae346c159b69af69d38249d0fa0d8b",
+      "hashMoi": "fe32892d55f5a086c8532e1656071253e65307ba392b45ebfb7aef598fcfd9f5",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 1146,
+      "hashCu": "4293e2b687c2b123f691ca2dd0058a3bcfcd33180456bb8ba64d9913974516d3",
+      "hashMoi": "63cda737a3a42c0aa266c3237286896bc249d270bf1c525cedc3795c4087c4a1",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 1218,
+      "hashCu": "a27e2e4751b5e5b00f2531b57b0d05d0a51d20e9363c8e8dca9780d2db3f9cd9",
+      "hashMoi": "c48b45184210bdb6eab2f6b5bafaf1c322b53f57fccec97f77d3ff90f1d817be",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 1233,
+      "hashCu": "170b59c7eed1b5821f8295112d1e41e1615b900b757176a7a898263b8240f393",
+      "hashMoi": "ff8df241c3b8638c686b4bde63808980f2079728491058df63ab8d72ae1626c5",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 1236,
+      "hashCu": "418ff1a51909539dc8526f9e6c8b52c914c212a750815de6e1cc9b3ca7a9b2de",
+      "hashMoi": "600672e025b1b6a92f035f18a1ab75a59e4626d4c67a2cfdbf9e608b91ae555e",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 1289,
+      "hashCu": "dae44731800bcf2a030fd2cebce6800d759bb9138e48b56f584b3ae1d11c5a60",
+      "hashMoi": "9bacdcc3a244e87765785d31d358f312cb391790426be87d13d56e1a9fa92e28",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 1295,
+      "hashCu": "29f1d84f26674666cffb0cd57a4bce96c04934a14566073ecfcb42d80c1b8750",
+      "hashMoi": "0e36e233f4e1a19e8d0a8fc4c2579fa7688f163b8ae3a3a99fddd49836e0c6ee",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 1307,
+      "hashCu": "89f5b943826d2d873c9cacecc689a6638725f63fd1dab55c70f47d036a14186c",
+      "hashMoi": "87a08e5e107d3ae2b940228a8976882f59589a3409abbbbf4e6aa6e66945ae09",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 1334,
+      "hashCu": "0e632438132aee74ab14525fa871d0005f0dd131ee09b77a8961975f035b40d4",
+      "hashMoi": "32fb249a775252b28b95c0c779ba30ecb2a8d66d89ad205cc5d461834f1fd9a6",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 1336,
+      "hashCu": "53045f9095ac8a3d288ea2dd78f6cbca90eb15321644317877ab5836242a126e",
+      "hashMoi": "c3a94a7739b764b25148b42c7e044b72d891b517ac5a2830ac980334560b3531",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 1347,
+      "hashCu": "170b59c7eed1b5821f8295112d1e41e1615b900b757176a7a898263b8240f393",
+      "hashMoi": "ff8df241c3b8638c686b4bde63808980f2079728491058df63ab8d72ae1626c5",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 1381,
+      "hashCu": "3643fab94b3c5f896d698ea64e89d47a6addd51a31375c803bd4a041a0e2aeae",
+      "hashMoi": "10e9237e3d17915ca79253c65178928515c4423e0cc668d46c3f2011d33e1665",
+      "pixelThayDoi": 0
+    },
+    {
+      "i": 1398,
+      "hashCu": "a333e94b5febcd6a8952360c056c067f4a1f9be015c2119471bee81ff86c7ef5",
+      "hashMoi": "d76aa15db2934ada59e7d10eb8d0c99816b22bbae1d2bd980c1db930b550127b",
+      "pixelThayDoi": 0
+    }
+  ]
+}

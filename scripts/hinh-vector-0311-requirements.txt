@@ -3,3 +3,4 @@ numpy==2.3.5
 scipy==1.17.0
 vtracer==0.6.15
 cairosvg==2.8.2
+rdkit==2026.9.1
