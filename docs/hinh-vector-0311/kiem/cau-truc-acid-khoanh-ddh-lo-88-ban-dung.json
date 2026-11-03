@@ -1,0 +1,142 @@
+[
+  {
+    "i": 208,
+    "hash": "22d57bb59b35f3bcbb4e4aedf018b7a0b36453c96f54fe5de223da9a4f0442c0",
+    "fileNguon": "anh/22d57bb59b35f3bcbb4e4aedf018b7a0b36453c96f54fe5de223da9a4f0442c0.png",
+    "canvas": [
+      309,
+      203
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "smiles": "CC(=O)O",
+    "notes": "AceticacidC trái hiện3H nốiđơn:trên,trái,dưới. Ccarbonylphải,Ođôitrênphải,OHđơnxuốngphảivớiHphảirõ. EllipsechấmxámCHỈquanh O–H (khôngcảCOOH),tâm~225,154,bántrục~55,32 trêncanvas309x203. Khôngcaption/stereo/charge.",
+    "questions": [
+      {
+        "qid": "11-C3-B10-I-5",
+        "de": "Trường hợp nào dưới đây khoanh đúng nhóm chức carboxylic acid của ethanoic acid?",
+        "refs": [
+          {
+            "where": "11-C3-B10-I-5.hinh.1.du_lieu",
+            "viTri": "sau_pa_B"
+          }
+        ]
+      }
+    ],
+    "svg": "acid-khoanh-ddh-745c93429e889a356dbd0189187b944839ebafcf850cac2c384042c898f458e2.svg",
+    "hashSvg": "745c93429e889a356dbd0189187b944839ebafcf850cac2c384042c898f458e2",
+    "byteSvg": 4973,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Đủ3H methyl vàH acid explicit. Giữ vùng khoanh khác nhau từng phương án, không chuẩn hoá thành đáp án. Không thêmA/B/C/D vì nguồn không có và ref đã sau_pa.",
+    "hashSvgDaSoat": "745c93429e889a356dbd0189187b944839ebafcf850cac2c384042c898f458e2",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 95,
+    "hash": "12e04614755bba7cda8a67de13a0b520ea2c7ee2b2355242e97bde0ad18721c7",
+    "fileNguon": "anh/12e04614755bba7cda8a67de13a0b520ea2c7ee2b2355242e97bde0ad18721c7.png",
+    "canvas": [
+      306,
+      206
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "smiles": "CC(=O)O",
+    "notes": "Aceticacid với3H methyl explicit trên/trái/dưới,Hacidphải. Ellipsechấmchéo bao C=O (gồmCcarbonyl,Odouble),KHÔNGbaoOH/methyl;trụcchéolênphải. Giữhighlight,dùngSMILESđơnlẻkhôngđủ. Khôngcaption/charge/stereo.",
+    "questions": [
+      {
+        "qid": "11-C3-B10-I-5",
+        "de": "Trường hợp nào dưới đây khoanh đúng nhóm chức carboxylic acid của ethanoic acid?",
+        "refs": [
+          {
+            "where": "11-C3-B10-I-5.hinh.3.du_lieu",
+            "viTri": "sau_pa_D"
+          }
+        ]
+      }
+    ],
+    "svg": "acid-khoanh-ddh-fe0878e505f4f1f5889e9b08610d358157b350233fe0bb35f0770b404ce262b8.svg",
+    "hashSvg": "fe0878e505f4f1f5889e9b08610d358157b350233fe0bb35f0770b404ce262b8",
+    "byteSvg": 4975,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Đủ3H methyl vàH acid explicit. Giữ vùng khoanh khác nhau từng phương án, không chuẩn hoá thành đáp án. Không thêmA/B/C/D vì nguồn không có và ref đã sau_pa.",
+    "hashSvgDaSoat": "fe0878e505f4f1f5889e9b08610d358157b350233fe0bb35f0770b404ce262b8",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 1052,
+    "hash": "be62c91e626ca1d7c516089294045e145dc97c4a37344f42972b12aadcf7b350",
+    "fileNguon": "anh/be62c91e626ca1d7c516089294045e145dc97c4a37344f42972b12aadcf7b350.png",
+    "canvas": [
+      335,
+      206
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "smiles": "CC(=O)O",
+    "notes": "Aceticacid,3Hmethyl vàHacidexplicit. VòngellipsedottedbaoTOÀNBỘCOOH (Ccarbonyl,Ođôi,OH),khôngmethyl. Khôngcirclethơm/caption/charge/stereo.",
+    "questions": [
+      {
+        "qid": "11-C3-B10-I-5",
+        "de": "Trường hợp nào dưới đây khoanh đúng nhóm chức carboxylic acid của ethanoic acid?",
+        "refs": [
+          {
+            "where": "11-C3-B10-I-5.hinh.2.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      }
+    ],
+    "svg": "acid-khoanh-ddh-02fce660a74de6277045815d46d794bfec252bb56911297e6f38c4351b745487.svg",
+    "hashSvg": "02fce660a74de6277045815d46d794bfec252bb56911297e6f38c4351b745487",
+    "byteSvg": 4974,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Đủ3H methyl vàH acid explicit. Giữ vùng khoanh khác nhau từng phương án, không chuẩn hoá thành đáp án. Không thêmA/B/C/D vì nguồn không có và ref đã sau_pa.",
+    "hashSvgDaSoat": "02fce660a74de6277045815d46d794bfec252bb56911297e6f38c4351b745487",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 1409,
+    "hash": "fd331eb4d7daf1073f2435e80b7ddf7e20f2e0f742fb6f064fdd67c0f4982599",
+    "fileNguon": "anh/fd331eb4d7daf1073f2435e80b7ddf7e20f2e0f742fb6f064fdd67c0f4982599.png",
+    "canvas": [
+      315,
+      229
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "smiles": "CC(=O)O",
+    "notes": "Aceticacid,3Hmethyl vàHacidexplicit. EllipsechấmđứngbaoCH₃trái (Cmethyl+3H),khôngCcarbonyl/O/acidH. Khôngcaption/charge/stereo.",
+    "questions": [
+      {
+        "qid": "11-C3-B10-I-5",
+        "de": "Trường hợp nào dưới đây khoanh đúng nhóm chức carboxylic acid của ethanoic acid?",
+        "refs": [
+          {
+            "where": "11-C3-B10-I-5.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      }
+    ],
+    "svg": "acid-khoanh-ddh-58b0055e0eda80727ed8f170a44fa7bb5d8dfdd552cc60319cc72c4f5ac3f34a.svg",
+    "hashSvg": "58b0055e0eda80727ed8f170a44fa7bb5d8dfdd552cc60319cc72c4f5ac3f34a",
+    "byteSvg": 4974,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Đủ3H methyl vàH acid explicit. Giữ vùng khoanh khác nhau từng phương án, không chuẩn hoá thành đáp án. Không thêmA/B/C/D vì nguồn không có và ref đã sau_pa.",
+    "hashSvgDaSoat": "58b0055e0eda80727ed8f170a44fa7bb5d8dfdd552cc60319cc72c4f5ac3f34a",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

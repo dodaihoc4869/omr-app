@@ -1,0 +1,72 @@
+[
+  {
+    "i": 504,
+    "hash": "5d1aa299d418373acd97b0a88c8f3efe77bb890a89410e6b00e439b46b1a8056",
+    "fileNguon": "anh/5d1aa299d418373acd97b0a88c8f3efe77bb890a89410e6b00e439b46b1a8056.png",
+    "canvas": [
+      413,
+      235
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "smiles": "CC(C)C[C@H](N)C(=O)O",
+    "notes": "LeucineNH₂xuốngthường,COOHtrênphải,isobutyltrêntrái. BondalphaC→CH₂nêmđặcnhọnởalphaC/rộngởCH₂trêntrái (khôngnêmNH₂),HẩnphíasausuyS. Khôngcaption/circle/charges. Giữ2methylisobutyl và1CH₂trướcalpha.",
+    "questions": [
+      {
+        "qid": "12-C3-B10-D2-II-21",
+        "de": "Leucine là một α-amino acid có khả năng điều hoà sự tổng hợp protein của cơ. Leucine có công thức cấu tạo: (CH₃)₂CH-CH₂-CH(NH₂)-COOH.",
+        "refs": [
+          {
+            "where": "12-C3-B10-D2-II-21.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "leucine-nem-ddh-6ef94c4a27f24f8be44f7d4782de4785646f4127179f9aff57677b8d260a48f4.svg",
+    "hashSvg": "6ef94c4a27f24f8be44f7d4782de4785646f4127179f9aff57677b8d260a48f4",
+    "byteSvg": 6574,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Nêm đặc hẹp alphaC ở phải/dưới, rộng ởCH2 trái/trên. NH2bond thường xuống,2methyl cóchữ;OH giữH,khôngthêmHalpha/caption.",
+    "hashSvgDaSoat": "6ef94c4a27f24f8be44f7d4782de4785646f4127179f9aff57677b8d260a48f4",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 1015,
+    "hash": "b64d25fd06998df3a0a65746c58c131177f56b41922a985bd4552f7fb8f843e0",
+    "fileNguon": "anh/b64d25fd06998df3a0a65746c58c131177f56b41922a985bd4552f7fb8f843e0.png",
+    "canvas": [
+      487,
+      244
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "smiles": "CC(C)C[C@H](N)C(=O)O",
+    "notes": "Cùngleucine504;bondalphaC→CH₂lànêmđặcrộngtrái-trênnhọnphảidướiởalphaC;NH₂xuốngthường,COOHtrênphải,Hẩn. Nhánh CH(CH₃)₂ cóH₃CtráivàCH₃dưới;khôngcaption/circle/charges.",
+    "questions": [
+      {
+        "qid": "DH-12-C3-B9-P1-II-11",
+        "de": "Leucine là một α-amino acid có khả năng điều hoà sự tổng hợp protein của cơ. Leucine có công thức cấu tạo như sau:",
+        "refs": [
+          {
+            "where": "DH-12-C3-B9-P1-II-11.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "leucine-nem-ddh-6ef94c4a27f24f8be44f7d4782de4785646f4127179f9aff57677b8d260a48f4.svg",
+    "hashSvg": "6ef94c4a27f24f8be44f7d4782de4785646f4127179f9aff57677b8d260a48f4",
+    "byteSvg": 6574,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Nêm đặc hẹp alphaC ở phải/dưới, rộng ởCH2 trái/trên. NH2bond thường xuống,2methyl cóchữ;OH giữH,khôngthêmHalpha/caption.",
+    "hashSvgDaSoat": "6ef94c4a27f24f8be44f7d4782de4785646f4127179f9aff57677b8d260a48f4",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

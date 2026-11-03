@@ -1,0 +1,31 @@
+[
+  {
+    "i": 445,
+    "hash": "501abd0ce24f6c127f8e1d81b00a5f3d164545a795dc65eb912786d560b93d99",
+    "fileNguon": "anh/501abd0ce24f6c127f8e1d81b00a5f3d164545a795dc65eb912786d560b93d99.png",
+    "canvas": [
+      273,
+      276
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "smiles": "CCC(=O)C(c1ccccc1)(c1ccccc1)CC(C)N(C)C",
+    "notes": "Methadone: CH₃CH₂–C(=O)–C(Ph)₂–CH₂–CH(CH₃)–N(CH₃)₂. HaiPhvòng3đôi,khôngcircle;NtertiarykhôngH;khôngstereo/nêm/charge/caption. CarbonylOtrên,nốiethyltrái;quaternaryCgiữ2Phdưới;khôngbỏCH₂trướcCH(N).",
+    "questions": [
+      {
+        "qid": "11-C3-B12-III-1",
+        "de": "Methadone là một loại thuốc dùng trong cai nghiện ma tuý, thực chất cũng là một chất gây nghiện nhưng nhẹ hơn các loại ma tuý thông thường và dễ kiểm soát hơn.\nCông thức cấu tạo thu gọn cho ở hình dưới.\nTổng số nguyên tử có trong một phân tử của methadone là bao nhiêu?",
+        "refs": [
+          {
+            "where": "11-C3-B12-III-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "phongApp": true,
+    "canvasWidth": 650,
+    "canvasHeight": 650
+  }
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "i": 504,
+    "hashSvg": "6ef94c4a27f24f8be44f7d4782de4785646f4127179f9aff57677b8d260a48f4",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở riêng PNG nguồn native và SVG render thật của nguồn này, không duyệt theo alias. Đủ 6C/1N/2O: hai CH3 tường minh (H₃C trái, CH3 xuống), carbon nhánh CH, CH2, alpha-C và carbonyl COOH. Nêm đặc từ alpha-C phải dưới (đầu nhọn) tới CH2 trái trên (đầu rộng), đúng hướng nguồn; NH2 nối thường xuống, COOH phải trên, C=O lên và OH giữ H. Không thêm charge/H/stereo/caption. DDH tự chứa path, chỉ số2/3 đúng, không text/image/fallback; các bond nối đúng vertex/glyph, không chạm/cắt/tràn. Hash byte thực khớp metadata.",
+    "hash": "5d1aa299d418373acd97b0a88c8f3efe77bb890a89410e6b00e439b46b1a8056",
+    "hashSvgDaSoat": "6ef94c4a27f24f8be44f7d4782de4785646f4127179f9aff57677b8d260a48f4"
+  },
+  {
+    "i": 1015,
+    "hashSvg": "6ef94c4a27f24f8be44f7d4782de4785646f4127179f9aff57677b8d260a48f4",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở riêng PNG nguồn native và SVG render thật của nguồn này, không duyệt theo alias. Đủ 6C/1N/2O: hai CH3 tường minh (H₃C trái, CH3 xuống), carbon nhánh CH, CH2, alpha-C và carbonyl COOH. Nêm đặc từ alpha-C phải dưới (đầu nhọn) tới CH2 trái trên (đầu rộng), đúng hướng nguồn; NH2 nối thường xuống, COOH phải trên, C=O lên và OH giữ H. Không thêm charge/H/stereo/caption. DDH tự chứa path, chỉ số2/3 đúng, không text/image/fallback; các bond nối đúng vertex/glyph, không chạm/cắt/tràn. Hash byte thực khớp metadata.",
+    "hash": "b64d25fd06998df3a0a65746c58c131177f56b41922a985bd4552f7fb8f843e0",
+    "hashSvgDaSoat": "6ef94c4a27f24f8be44f7d4782de4785646f4127179f9aff57677b8d260a48f4"
+  }
+]

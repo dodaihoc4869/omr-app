@@ -1,0 +1,1527 @@
+[
+  {
+    "hash": "7528960cd4e8203592e7f30ab451dc371d554cedc2882528065fa397f910ae00",
+    "file": "anh/7528960cd4e8203592e7f30ab451dc371d554cedc2882528065fa397f910ae00.png",
+    "mime": "image/png",
+    "bytes": 3018,
+    "i": 634,
+    "size": [
+      241,
+      196
+    ],
+    "refs": [
+      {
+        "qid": "DB-10-B2-D2-I-127",
+        "de": "Đồng có hai đồng vị bền trong tự nhiên là ⁶³Cu và ⁶⁵Cu.\nNguyên tử khối trung bình của đồng là 63,55 (điện tích z của các ion đồng vị đồng đều bằng 1+).\nHình vẽ phổ khối nào dưới đây là đúng?",
+        "where": [
+          "DB-10-B2-D2-I-127.hinh.1.du_lieu"
+        ],
+        "publicImageRefs": [
+          {
+            "where": "DB-10-B2-D2-I-127.hinh.1.du_lieu",
+            "hashDataUrl": "0bdc9dca9e07856b762fe14bc18856d273fdf0317194e0bd077e628d117de467",
+            "viTri": "sau_pa_B",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B4-D1-I-8",
+        "de": "Đồng có hai đồng vị bền trong tự nhiên là ⁶³Cu và ⁶⁵Cu.\nNguyên tử khối trung bình của đồng là 63,55 (điện tích z của các ion đồng vị đồng đều bằng 1+).\nHình vẽ phổ khối nào dưới đây là đúng?",
+        "where": [
+          "DH-10-C1-B4-D1-I-8.hinh.1.du_lieu"
+        ],
+        "publicImageRefs": [
+          {
+            "where": "DH-10-C1-B4-D1-I-8.hinh.1.du_lieu",
+            "hashDataUrl": "0bdc9dca9e07856b762fe14bc18856d273fdf0317194e0bd077e628d117de467",
+            "viTri": "sau_pa_B",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        ]
+      }
+    ],
+    "fileNguon": "anh/7528960cd4e8203592e7f30ab451dc371d554cedc2882528065fa397f910ae00.png",
+    "daMoNativeVaZoom4x": true,
+    "xLabel": "m/z",
+    "yLabel": "Phần trăm số nguyên tử đồng vị (%)",
+    "xTicks": [
+      20,
+      40,
+      60,
+      80,
+      100
+    ],
+    "yTicks": [
+      0,
+      20,
+      40,
+      60,
+      80
+    ],
+    "peakLabels": [],
+    "caption": [],
+    "geometryPixel": {
+      "origin": [
+        57,
+        154.5
+      ],
+      "xTickCenters": [
+        {
+          "label": 20,
+          "x": 90,
+          "y": 154.5
+        },
+        {
+          "label": 40,
+          "x": 123,
+          "y": 154.5
+        },
+        {
+          "label": 60,
+          "x": 156.5,
+          "y": 154.5
+        },
+        {
+          "label": 80,
+          "x": 189.5,
+          "y": 154.5
+        },
+        {
+          "label": 100,
+          "x": 223,
+          "y": 154.5
+        }
+      ],
+      "yTickCenters": [
+        {
+          "label": 0,
+          "x": 57,
+          "y": 154.5
+        },
+        {
+          "label": 20,
+          "x": 57,
+          "y": 120
+        },
+        {
+          "label": 40,
+          "x": 57,
+          "y": 85
+        },
+        {
+          "label": 60,
+          "x": 57,
+          "y": 50
+        },
+        {
+          "label": 80,
+          "x": 57,
+          "y": 16
+        }
+      ],
+      "peakCenterlines": [
+        {
+          "x": 164,
+          "topY": 65.5,
+          "baselineY": 154.5
+        },
+        {
+          "x": 169,
+          "topY": 65.5,
+          "baselineY": 154.5
+        }
+      ],
+      "axisLabelInkBounds": {
+        "x": [
+          125,
+          180,
+          149,
+          192
+        ],
+        "y": [
+          5,
+          2,
+          18,
+          178
+        ]
+      }
+    },
+    "pixelBounds": {
+      "128": {
+        "verticalAxis": [
+          56,
+          16,
+          58,
+          154
+        ],
+        "horizontalAxis": [
+          57,
+          154,
+          223,
+          156
+        ],
+        "xTickBounds": [
+          [
+            90,
+            156,
+            90,
+            159
+          ],
+          [
+            123,
+            156,
+            123,
+            159
+          ],
+          [
+            156,
+            156,
+            157,
+            160
+          ],
+          [
+            189,
+            156,
+            190,
+            160
+          ],
+          [
+            223,
+            156,
+            223,
+            160
+          ]
+        ],
+        "yTickBounds": [
+          [
+            51,
+            15,
+            56,
+            16
+          ],
+          [
+            51,
+            50,
+            56,
+            51
+          ],
+          [
+            51,
+            85,
+            56,
+            85
+          ],
+          [
+            51,
+            119,
+            56,
+            120
+          ],
+          [
+            51,
+            154,
+            56,
+            154
+          ]
+        ],
+        "peaks": [
+          [
+            163,
+            66,
+            164,
+            153
+          ],
+          [
+            168,
+            66,
+            170,
+            153
+          ]
+        ]
+      },
+      "200": {
+        "verticalAxis": [
+          56,
+          15,
+          58,
+          155
+        ],
+        "horizontalAxis": [
+          57,
+          154,
+          223,
+          156
+        ],
+        "xTickBounds": [
+          [
+            89,
+            156,
+            91,
+            160
+          ],
+          [
+            122,
+            156,
+            124,
+            160
+          ],
+          [
+            156,
+            156,
+            157,
+            160
+          ],
+          [
+            189,
+            156,
+            190,
+            160
+          ],
+          [
+            222,
+            156,
+            223,
+            160
+          ]
+        ],
+        "yTickBounds": [
+          [
+            51,
+            15,
+            56,
+            17
+          ],
+          [
+            51,
+            48,
+            56,
+            52
+          ],
+          [
+            51,
+            83,
+            56,
+            87
+          ],
+          [
+            51,
+            118,
+            56,
+            122
+          ],
+          [
+            51,
+            153,
+            56,
+            155
+          ]
+        ],
+        "peaks": [
+          [
+            163,
+            65,
+            165,
+            153
+          ],
+          [
+            168,
+            65,
+            170,
+            153
+          ]
+        ]
+      }
+    },
+    "pixelConvention": "Tọa độ native, gốc trên-trái (0,0), x sang phải/y xuống; bbox [xmin,ymin,xmax,ymax] inclusive. threshold128=lõi đậm,threshold200=gồm antialias. Pixelbounds peak là thân phía trên 2pixel sátbaseline để không nhập đường trục; centerline kéo đến baselineY riêng. Tickbounds đo trong ROI nhỏ quanh tick, không phải bbox chữ số.",
+    "actuallyPrintedNumbersOnImage": {
+      "xTickNumbers": [
+        20,
+        40,
+        60,
+        80,
+        100
+      ],
+      "yTickNumbers": [
+        0,
+        20,
+        40,
+        60,
+        80
+      ],
+      "peakMassNumbers": [],
+      "peakPercentNumbers": [],
+      "isotopeLabels": []
+    },
+    "numbersOnlyInStem": [
+      "⁶³Cu",
+      "⁶⁵Cu",
+      "63,55",
+      "1+"
+    ],
+    "doNotInfer": [
+      "Không gắn số63/65 lên các cột vì native không ghi; tọa độx trongảnh không hiệu chuẩn chính xác thành63/65.",
+      "Không suy hoặc thêm phầntrăm cột từ nguyên tử khối trung bình hoặc lýthuyết.",
+      "Không chọn phươngán đúng/không sửa phươngán theo nội dung hóa học.",
+      "Không thêm A/B/C/D vào SVG; vị trí phươngán nằm ở publicImageRefs của app."
+    ],
+    "style": {
+      "arrowheads": false,
+      "grid": false,
+      "dashedGuides": false,
+      "topRightFrame": false,
+      "peakMarkers": false
+    },
+    "sourceInterpretation": "Hai cột cao bằng nhau ởx164/169, đỉnhy65..66. Đây chỉ là hình học pixel; không viết50% vì không có nhãn đó."
+  },
+  {
+    "hash": "2a44325fb5f469f648f700d627479b1dbf33b244a557072e46066aefa6ceaeba",
+    "file": "anh/2a44325fb5f469f648f700d627479b1dbf33b244a557072e46066aefa6ceaeba.png",
+    "mime": "image/png",
+    "bytes": 2929,
+    "i": 245,
+    "size": [
+      237,
+      197
+    ],
+    "refs": [
+      {
+        "qid": "DB-10-B2-D2-I-127",
+        "de": "Đồng có hai đồng vị bền trong tự nhiên là ⁶³Cu và ⁶⁵Cu.\nNguyên tử khối trung bình của đồng là 63,55 (điện tích z của các ion đồng vị đồng đều bằng 1+).\nHình vẽ phổ khối nào dưới đây là đúng?",
+        "where": [
+          "DB-10-B2-D2-I-127.hinh.3.du_lieu"
+        ],
+        "publicImageRefs": [
+          {
+            "where": "DB-10-B2-D2-I-127.hinh.3.du_lieu",
+            "hashDataUrl": "0937bd68999dd77dd535b4695b5a1bf468ba2f61688d4258d16e79cf309e20d1",
+            "viTri": "sau_pa_D",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B4-D1-I-8",
+        "de": "Đồng có hai đồng vị bền trong tự nhiên là ⁶³Cu và ⁶⁵Cu.\nNguyên tử khối trung bình của đồng là 63,55 (điện tích z của các ion đồng vị đồng đều bằng 1+).\nHình vẽ phổ khối nào dưới đây là đúng?",
+        "where": [
+          "DH-10-C1-B4-D1-I-8.hinh.3.du_lieu"
+        ],
+        "publicImageRefs": [
+          {
+            "where": "DH-10-C1-B4-D1-I-8.hinh.3.du_lieu",
+            "hashDataUrl": "0937bd68999dd77dd535b4695b5a1bf468ba2f61688d4258d16e79cf309e20d1",
+            "viTri": "sau_pa_D",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        ]
+      }
+    ],
+    "fileNguon": "anh/2a44325fb5f469f648f700d627479b1dbf33b244a557072e46066aefa6ceaeba.png",
+    "daMoNativeVaZoom4x": true,
+    "xLabel": "m/z",
+    "yLabel": "Phần trăm số nguyên tử đồng vị (%)",
+    "xTicks": [
+      20,
+      40,
+      60,
+      80,
+      100
+    ],
+    "yTicks": [
+      0,
+      20,
+      40,
+      60,
+      80
+    ],
+    "peakLabels": [],
+    "caption": [],
+    "geometryPixel": {
+      "origin": [
+        54.5,
+        156.5
+      ],
+      "xTickCenters": [
+        {
+          "label": 20,
+          "x": 87.5,
+          "y": 156.5
+        },
+        {
+          "label": 40,
+          "x": 120.5,
+          "y": 156.5
+        },
+        {
+          "label": 60,
+          "x": 154,
+          "y": 156.5
+        },
+        {
+          "label": 80,
+          "x": 187.5,
+          "y": 156.5
+        },
+        {
+          "label": 100,
+          "x": 220.5,
+          "y": 156.5
+        }
+      ],
+      "yTickCenters": [
+        {
+          "label": 0,
+          "x": 54.5,
+          "y": 156.5
+        },
+        {
+          "label": 20,
+          "x": 54.5,
+          "y": 121
+        },
+        {
+          "label": 40,
+          "x": 54.5,
+          "y": 87
+        },
+        {
+          "label": 60,
+          "x": 54.5,
+          "y": 52
+        },
+        {
+          "label": 80,
+          "x": 54.5,
+          "y": 17.5
+        }
+      ],
+      "peakCenterlines": [
+        {
+          "x": 161.5,
+          "topY": 67,
+          "baselineY": 156.5
+        }
+      ],
+      "axisLabelInkBounds": {
+        "x": [
+          123,
+          182,
+          147,
+          194
+        ],
+        "y": [
+          2,
+          3,
+          16,
+          180
+        ]
+      }
+    },
+    "pixelBounds": {
+      "128": {
+        "verticalAxis": [
+          54,
+          17,
+          56,
+          156
+        ],
+        "horizontalAxis": [
+          55,
+          156,
+          221,
+          158
+        ],
+        "xTickBounds": [
+          [
+            87,
+            158,
+            88,
+            161
+          ],
+          [
+            120,
+            158,
+            121,
+            161
+          ],
+          [
+            154,
+            158,
+            154,
+            162
+          ],
+          [
+            187,
+            158,
+            188,
+            162
+          ],
+          [
+            220,
+            158,
+            221,
+            162
+          ]
+        ],
+        "yTickBounds": [
+          [
+            49,
+            17,
+            54,
+            19
+          ],
+          [
+            49,
+            50,
+            54,
+            54
+          ],
+          [
+            49,
+            85,
+            54,
+            89
+          ],
+          [
+            49,
+            119,
+            54,
+            123
+          ],
+          [
+            49,
+            155,
+            54,
+            156
+          ]
+        ],
+        "peaks": [
+          [
+            161,
+            67,
+            162,
+            155
+          ]
+        ]
+      },
+      "200": {
+        "verticalAxis": [
+          54,
+          17,
+          56,
+          157
+        ],
+        "horizontalAxis": [
+          55,
+          156,
+          221,
+          158
+        ],
+        "xTickBounds": [
+          [
+            87,
+            158,
+            88,
+            162
+          ],
+          [
+            120,
+            158,
+            121,
+            162
+          ],
+          [
+            153,
+            158,
+            155,
+            162
+          ],
+          [
+            187,
+            158,
+            188,
+            162
+          ],
+          [
+            220,
+            158,
+            221,
+            162
+          ]
+        ],
+        "yTickBounds": [
+          [
+            48,
+            16,
+            54,
+            19
+          ],
+          [
+            48,
+            50,
+            54,
+            54
+          ],
+          [
+            48,
+            85,
+            54,
+            89
+          ],
+          [
+            48,
+            119,
+            54,
+            123
+          ],
+          [
+            48,
+            155,
+            54,
+            157
+          ]
+        ],
+        "peaks": [
+          [
+            160,
+            67,
+            163,
+            155
+          ]
+        ]
+      }
+    },
+    "pixelConvention": "Tọa độ native, gốc trên-trái (0,0), x sang phải/y xuống; bbox [xmin,ymin,xmax,ymax] inclusive. threshold128=lõi đậm,threshold200=gồm antialias. Pixelbounds peak là thân phía trên 2pixel sátbaseline để không nhập đường trục; centerline kéo đến baselineY riêng. Tickbounds đo trong ROI nhỏ quanh tick, không phải bbox chữ số.",
+    "actuallyPrintedNumbersOnImage": {
+      "xTickNumbers": [
+        20,
+        40,
+        60,
+        80,
+        100
+      ],
+      "yTickNumbers": [
+        0,
+        20,
+        40,
+        60,
+        80
+      ],
+      "peakMassNumbers": [],
+      "peakPercentNumbers": [],
+      "isotopeLabels": []
+    },
+    "numbersOnlyInStem": [
+      "⁶³Cu",
+      "⁶⁵Cu",
+      "63,55",
+      "1+"
+    ],
+    "doNotInfer": [
+      "Không gắn số63/65 lên các cột vì native không ghi; tọa độx trongảnh không hiệu chuẩn chính xác thành63/65.",
+      "Không suy hoặc thêm phầntrăm cột từ nguyên tử khối trung bình hoặc lýthuyết.",
+      "Không chọn phươngán đúng/không sửa phươngán theo nội dung hóa học.",
+      "Không thêm A/B/C/D vào SVG; vị trí phươngán nằm ở publicImageRefs của app."
+    ],
+    "style": {
+      "arrowheads": false,
+      "grid": false,
+      "dashedGuides": false,
+      "topRightFrame": false,
+      "peakMarkers": false
+    },
+    "sourceInterpretation": "Chỉ một cột đứng liền, x161..162 lõi, đỉnhy67. Có vết mực rời trái/phải cột, không phải cột phổ khác.",
+    "noiseToDiscard": {
+      "method": "Đã xem native và zoom4x; các cụm rời không nối baseline và không thành đoạn đứng.",
+      "leftInkComponentsThreshold200": [
+        {
+          "bounds": [
+            116,
+            87,
+            122,
+            95
+          ],
+          "darkPixels": 27
+        },
+        {
+          "bounds": [
+            116,
+            98,
+            119,
+            103
+          ],
+          "darkPixels": 15
+        },
+        {
+          "bounds": [
+            85,
+            89,
+            85,
+            90
+          ],
+          "darkPixels": 2
+        }
+      ],
+      "right": "Vài pixel xám rời gầnx166..175,y88..95;khôngphải cột thứhai.",
+      "warning": "Không chép vết rác như một nét có ý nghĩa. Giữ duy nhất cột liên tục tới baseline."
+    }
+  },
+  {
+    "hash": "9e853dc325dddbe7c58462e4e89158a25484fe337451e0773c3c52d5818e5375",
+    "file": "anh/9e853dc325dddbe7c58462e4e89158a25484fe337451e0773c3c52d5818e5375.png",
+    "mime": "image/png",
+    "bytes": 3019,
+    "i": 870,
+    "size": [
+      241,
+      194
+    ],
+    "refs": [
+      {
+        "qid": "DB-10-B2-D2-I-127",
+        "de": "Đồng có hai đồng vị bền trong tự nhiên là ⁶³Cu và ⁶⁵Cu.\nNguyên tử khối trung bình của đồng là 63,55 (điện tích z của các ion đồng vị đồng đều bằng 1+).\nHình vẽ phổ khối nào dưới đây là đúng?",
+        "where": [
+          "DB-10-B2-D2-I-127.hinh.0.du_lieu"
+        ],
+        "publicImageRefs": [
+          {
+            "where": "DB-10-B2-D2-I-127.hinh.0.du_lieu",
+            "hashDataUrl": "13e454fc21af4e0d7f3d6eb3d69ddef1ed0a5a02b79bd807f9b891b0f6b2f9b9",
+            "viTri": "sau_pa_A",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B4-D1-I-8",
+        "de": "Đồng có hai đồng vị bền trong tự nhiên là ⁶³Cu và ⁶⁵Cu.\nNguyên tử khối trung bình của đồng là 63,55 (điện tích z của các ion đồng vị đồng đều bằng 1+).\nHình vẽ phổ khối nào dưới đây là đúng?",
+        "where": [
+          "DH-10-C1-B4-D1-I-8.hinh.0.du_lieu"
+        ],
+        "publicImageRefs": [
+          {
+            "where": "DH-10-C1-B4-D1-I-8.hinh.0.du_lieu",
+            "hashDataUrl": "13e454fc21af4e0d7f3d6eb3d69ddef1ed0a5a02b79bd807f9b891b0f6b2f9b9",
+            "viTri": "sau_pa_A",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        ]
+      }
+    ],
+    "fileNguon": "anh/9e853dc325dddbe7c58462e4e89158a25484fe337451e0773c3c52d5818e5375.png",
+    "daMoNativeVaZoom4x": true,
+    "xLabel": "m/z",
+    "yLabel": "Phần trăm số nguyên tử đồng vị (%)",
+    "xTicks": [
+      20,
+      40,
+      60,
+      80,
+      100
+    ],
+    "yTicks": [
+      0,
+      20,
+      40,
+      60,
+      80
+    ],
+    "peakLabels": [],
+    "caption": [],
+    "geometryPixel": {
+      "origin": [
+        57,
+        153
+      ],
+      "xTickCenters": [
+        {
+          "label": 20,
+          "x": 90.5,
+          "y": 153
+        },
+        {
+          "label": 40,
+          "x": 123.5,
+          "y": 153
+        },
+        {
+          "label": 60,
+          "x": 157,
+          "y": 153
+        },
+        {
+          "label": 80,
+          "x": 190,
+          "y": 153
+        },
+        {
+          "label": 100,
+          "x": 223.5,
+          "y": 153
+        }
+      ],
+      "yTickCenters": [
+        {
+          "label": 0,
+          "x": 57,
+          "y": 153
+        },
+        {
+          "label": 20,
+          "x": 57,
+          "y": 118
+        },
+        {
+          "label": 40,
+          "x": 57,
+          "y": 83.5
+        },
+        {
+          "label": 60,
+          "x": 57,
+          "y": 49
+        },
+        {
+          "label": 80,
+          "x": 57,
+          "y": 14
+        }
+      ],
+      "peakCenterlines": [
+        {
+          "x": 164,
+          "topY": 27.5,
+          "baselineY": 153
+        },
+        {
+          "x": 169,
+          "topY": 105.5,
+          "baselineY": 153
+        }
+      ],
+      "axisLabelInkBounds": {
+        "x": [
+          125,
+          179,
+          149,
+          190
+        ],
+        "y": [
+          6,
+          0,
+          19,
+          177
+        ]
+      }
+    },
+    "pixelBounds": {
+      "128": {
+        "verticalAxis": [
+          56,
+          14,
+          58,
+          153
+        ],
+        "horizontalAxis": [
+          57,
+          152,
+          224,
+          154
+        ],
+        "xTickBounds": [
+          [
+            90,
+            154,
+            90,
+            158
+          ],
+          [
+            123,
+            154,
+            124,
+            158
+          ],
+          [
+            156,
+            154,
+            157,
+            158
+          ],
+          [
+            190,
+            154,
+            190,
+            158
+          ],
+          [
+            223,
+            154,
+            224,
+            158
+          ]
+        ],
+        "yTickBounds": [
+          [
+            52,
+            14,
+            56,
+            14
+          ],
+          [
+            52,
+            48,
+            56,
+            49
+          ],
+          [
+            52,
+            83,
+            56,
+            84
+          ],
+          [
+            52,
+            118,
+            56,
+            118
+          ],
+          [
+            52,
+            152,
+            56,
+            153
+          ]
+        ],
+        "peaks": [
+          [
+            163,
+            28,
+            165,
+            151
+          ],
+          [
+            168,
+            105,
+            170,
+            151
+          ]
+        ]
+      },
+      "200": {
+        "verticalAxis": [
+          56,
+          13,
+          58,
+          153
+        ],
+        "horizontalAxis": [
+          57,
+          152,
+          224,
+          154
+        ],
+        "xTickBounds": [
+          [
+            90,
+            154,
+            91,
+            158
+          ],
+          [
+            123,
+            154,
+            124,
+            158
+          ],
+          [
+            156,
+            154,
+            158,
+            158
+          ],
+          [
+            189,
+            154,
+            191,
+            158
+          ],
+          [
+            222,
+            154,
+            224,
+            158
+          ]
+        ],
+        "yTickBounds": [
+          [
+            51,
+            13,
+            56,
+            15
+          ],
+          [
+            51,
+            48,
+            56,
+            50
+          ],
+          [
+            51,
+            82,
+            56,
+            84
+          ],
+          [
+            51,
+            117,
+            56,
+            119
+          ],
+          [
+            51,
+            151,
+            56,
+            153
+          ]
+        ],
+        "peaks": [
+          [
+            163,
+            27,
+            165,
+            151
+          ],
+          [
+            168,
+            105,
+            170,
+            151
+          ]
+        ]
+      }
+    },
+    "pixelConvention": "Tọa độ native, gốc trên-trái (0,0), x sang phải/y xuống; bbox [xmin,ymin,xmax,ymax] inclusive. threshold128=lõi đậm,threshold200=gồm antialias. Pixelbounds peak là thân phía trên 2pixel sátbaseline để không nhập đường trục; centerline kéo đến baselineY riêng. Tickbounds đo trong ROI nhỏ quanh tick, không phải bbox chữ số.",
+    "actuallyPrintedNumbersOnImage": {
+      "xTickNumbers": [
+        20,
+        40,
+        60,
+        80,
+        100
+      ],
+      "yTickNumbers": [
+        0,
+        20,
+        40,
+        60,
+        80
+      ],
+      "peakMassNumbers": [],
+      "peakPercentNumbers": [],
+      "isotopeLabels": []
+    },
+    "numbersOnlyInStem": [
+      "⁶³Cu",
+      "⁶⁵Cu",
+      "63,55",
+      "1+"
+    ],
+    "doNotInfer": [
+      "Không gắn số63/65 lên các cột vì native không ghi; tọa độx trongảnh không hiệu chuẩn chính xác thành63/65.",
+      "Không suy hoặc thêm phầntrăm cột từ nguyên tử khối trung bình hoặc lýthuyết.",
+      "Không chọn phươngán đúng/không sửa phươngán theo nội dung hóa học.",
+      "Không thêm A/B/C/D vào SVG; vị trí phươngán nằm ở publicImageRefs của app."
+    ],
+    "style": {
+      "arrowheads": false,
+      "grid": false,
+      "dashedGuides": false,
+      "topRightFrame": false,
+      "peakMarkers": false
+    },
+    "sourceInterpretation": "Hai cột: trái cao, phải thấp. Chỉ số hình học pixel, không áp72,5%/27,5%."
+  },
+  {
+    "hash": "eb48fab720e33ee4c342228403d60c1f8478e1842a3be726707a8ccd21ce0ba3",
+    "file": "anh/eb48fab720e33ee4c342228403d60c1f8478e1842a3be726707a8ccd21ce0ba3.png",
+    "mime": "image/png",
+    "bytes": 2940,
+    "i": 1297,
+    "size": [
+      238,
+      199
+    ],
+    "refs": [
+      {
+        "qid": "DB-10-B2-D2-I-127",
+        "de": "Đồng có hai đồng vị bền trong tự nhiên là ⁶³Cu và ⁶⁵Cu.\nNguyên tử khối trung bình của đồng là 63,55 (điện tích z của các ion đồng vị đồng đều bằng 1+).\nHình vẽ phổ khối nào dưới đây là đúng?",
+        "where": [
+          "DB-10-B2-D2-I-127.hinh.2.du_lieu"
+        ],
+        "publicImageRefs": [
+          {
+            "where": "DB-10-B2-D2-I-127.hinh.2.du_lieu",
+            "hashDataUrl": "e0aa31253df550540844dd28af05e5caf458e83e58d8ace71a219dbb1a0d9d14",
+            "viTri": "sau_pa_C",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B4-D1-I-8",
+        "de": "Đồng có hai đồng vị bền trong tự nhiên là ⁶³Cu và ⁶⁵Cu.\nNguyên tử khối trung bình của đồng là 63,55 (điện tích z của các ion đồng vị đồng đều bằng 1+).\nHình vẽ phổ khối nào dưới đây là đúng?",
+        "where": [
+          "DH-10-C1-B4-D1-I-8.hinh.2.du_lieu"
+        ],
+        "publicImageRefs": [
+          {
+            "where": "DH-10-C1-B4-D1-I-8.hinh.2.du_lieu",
+            "hashDataUrl": "e0aa31253df550540844dd28af05e5caf458e83e58d8ace71a219dbb1a0d9d14",
+            "viTri": "sau_pa_C",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        ]
+      }
+    ],
+    "fileNguon": "anh/eb48fab720e33ee4c342228403d60c1f8478e1842a3be726707a8ccd21ce0ba3.png",
+    "daMoNativeVaZoom4x": true,
+    "xLabel": "m/z",
+    "yLabel": "Phần trăm số nguyên tử đồng vị (%)",
+    "xTicks": [
+      20,
+      40,
+      60,
+      80,
+      100
+    ],
+    "yTicks": [
+      0,
+      20,
+      40,
+      60,
+      80
+    ],
+    "peakLabels": [],
+    "caption": [],
+    "geometryPixel": {
+      "origin": [
+        57,
+        156
+      ],
+      "xTickCenters": [
+        {
+          "label": 20,
+          "x": 89.5,
+          "y": 156
+        },
+        {
+          "label": 40,
+          "x": 123,
+          "y": 156
+        },
+        {
+          "label": 60,
+          "x": 156.5,
+          "y": 156
+        },
+        {
+          "label": 80,
+          "x": 189.5,
+          "y": 156
+        },
+        {
+          "label": 100,
+          "x": 223,
+          "y": 156
+        }
+      ],
+      "yTickCenters": [
+        {
+          "label": 0,
+          "x": 57,
+          "y": 156
+        },
+        {
+          "label": 20,
+          "x": 57,
+          "y": 121
+        },
+        {
+          "label": 40,
+          "x": 57,
+          "y": 86.5
+        },
+        {
+          "label": 60,
+          "x": 57,
+          "y": 51
+        },
+        {
+          "label": 80,
+          "x": 57,
+          "y": 17
+        }
+      ],
+      "peakCenterlines": [
+        {
+          "x": 164,
+          "topY": 107,
+          "baselineY": 156
+        },
+        {
+          "x": 169,
+          "topY": 26.5,
+          "baselineY": 156
+        }
+      ],
+      "axisLabelInkBounds": {
+        "x": [
+          125,
+          182,
+          148,
+          193
+        ],
+        "y": [
+          5,
+          3,
+          19,
+          179
+        ]
+      }
+    },
+    "pixelBounds": {
+      "128": {
+        "verticalAxis": [
+          56,
+          16,
+          58,
+          156
+        ],
+        "horizontalAxis": [
+          57,
+          155,
+          223,
+          157
+        ],
+        "xTickBounds": [
+          [
+            89,
+            157,
+            90,
+            161
+          ],
+          [
+            123,
+            157,
+            123,
+            161
+          ],
+          [
+            156,
+            157,
+            157,
+            161
+          ],
+          [
+            189,
+            157,
+            190,
+            161
+          ],
+          [
+            223,
+            157,
+            223,
+            161
+          ]
+        ],
+        "yTickBounds": [
+          [
+            51,
+            16,
+            56,
+            17
+          ],
+          [
+            51,
+            50,
+            56,
+            52
+          ],
+          [
+            51,
+            85,
+            56,
+            87
+          ],
+          [
+            51,
+            120,
+            56,
+            123
+          ],
+          [
+            51,
+            154,
+            56,
+            156
+          ]
+        ],
+        "peaks": [
+          [
+            163,
+            107,
+            164,
+            154
+          ],
+          [
+            168,
+            26,
+            170,
+            154
+          ]
+        ]
+      },
+      "200": {
+        "verticalAxis": [
+          56,
+          16,
+          58,
+          156
+        ],
+        "horizontalAxis": [
+          57,
+          155,
+          223,
+          157
+        ],
+        "xTickBounds": [
+          [
+            89,
+            157,
+            90,
+            161
+          ],
+          [
+            122,
+            157,
+            124,
+            161
+          ],
+          [
+            156,
+            157,
+            157,
+            161
+          ],
+          [
+            189,
+            157,
+            190,
+            161
+          ],
+          [
+            222,
+            157,
+            224,
+            161
+          ]
+        ],
+        "yTickBounds": [
+          [
+            51,
+            16,
+            56,
+            18
+          ],
+          [
+            51,
+            49,
+            56,
+            53
+          ],
+          [
+            51,
+            84,
+            56,
+            88
+          ],
+          [
+            51,
+            119,
+            56,
+            123
+          ],
+          [
+            51,
+            154,
+            56,
+            156
+          ]
+        ],
+        "peaks": [
+          [
+            163,
+            107,
+            165,
+            154
+          ],
+          [
+            168,
+            26,
+            170,
+            154
+          ]
+        ]
+      }
+    },
+    "pixelConvention": "Tọa độ native, gốc trên-trái (0,0), x sang phải/y xuống; bbox [xmin,ymin,xmax,ymax] inclusive. threshold128=lõi đậm,threshold200=gồm antialias. Pixelbounds peak là thân phía trên 2pixel sátbaseline để không nhập đường trục; centerline kéo đến baselineY riêng. Tickbounds đo trong ROI nhỏ quanh tick, không phải bbox chữ số.",
+    "actuallyPrintedNumbersOnImage": {
+      "xTickNumbers": [
+        20,
+        40,
+        60,
+        80,
+        100
+      ],
+      "yTickNumbers": [
+        0,
+        20,
+        40,
+        60,
+        80
+      ],
+      "peakMassNumbers": [],
+      "peakPercentNumbers": [],
+      "isotopeLabels": []
+    },
+    "numbersOnlyInStem": [
+      "⁶³Cu",
+      "⁶⁵Cu",
+      "63,55",
+      "1+"
+    ],
+    "doNotInfer": [
+      "Không gắn số63/65 lên các cột vì native không ghi; tọa độx trongảnh không hiệu chuẩn chính xác thành63/65.",
+      "Không suy hoặc thêm phầntrăm cột từ nguyên tử khối trung bình hoặc lýthuyết.",
+      "Không chọn phươngán đúng/không sửa phươngán theo nội dung hóa học.",
+      "Không thêm A/B/C/D vào SVG; vị trí phươngán nằm ở publicImageRefs của app."
+    ],
+    "style": {
+      "arrowheads": false,
+      "grid": false,
+      "dashedGuides": false,
+      "topRightFrame": false,
+      "peakMarkers": false
+    },
+    "sourceInterpretation": "Hai cột: trái thấp, phải cao. Chỉ số hình học pixel, không áp27,5%/72,5%."
+  }
+]
