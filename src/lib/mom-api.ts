@@ -1,7 +1,4 @@
 import {layDiaChiMayChu} from './dia-chi-may-chu'
-// Phiếu HTML nạp lười (≈ 52 KB gzip): chỉ tải khi em mở kết quả bài, không kéo vào lượt tải đầu.
-import type {ThongTinPhieu} from './html-phieu'
-import type {CauLuyen} from './bai-tap-pdf'
 const saves = new Map<string, Promise<any>>()
 // TOKEN PHỤ HUYNH (giai đoạn mềm, docs/token-phu-huynh-1909.md): có pass thì các lệnh phụ huynh gửi `{pass}` THAY `{sbd}` (máy chủ lấy danh tính từ token).
 // Chỉ bốn đường máy chủ đã nhận pass: /parent-news/*, /mom/parent-list, /mom/create. Không có pass ⇒ như cũ (SBD trần).
@@ -96,66 +93,6 @@ export function chuanHoaBaiMom(b: any): any {
 
 /** Báo cáo dựng từ nội dung và điểm đã lưu trên máy chủ, đồng điệu với tất cả các phiếu HTML trong app. */
 export async function momReviewHtml(b: any): Promise<string> {
-  // 27/10 tốc độ: bộ chuẩn lời giải nạp lười — cổng phụ huynh nhập tệp này (datPassPhuHuynh) mà không cần nó lúc mở.
-  const { chuanHoaLoiGiaiCau } = await import('./chuan-hoa-loi-giai')
-  const dsCauRaw = Array.isArray(b.dsCau) ? b.dsCau : (Array.isArray(b.cau) ? b.cau : [])
-  const dapAnDaNop = b.dapAnDaNop || b.answers || {}
-
-  const cauLuyen: CauLuyen[] = dsCauRaw.map((c: any, i: number) => {
-    const daChon = dapAnDaNop[c.id] || ''
-    const dung = String(c.dapAn || c.dapAnDung || '').trim()
-    const lg = chuanHoaLoiGiaiCau(c.loiGiai, c.phan || 'I', dung)
-    const phan = (c.phan as 'I' | 'II' | 'III') || (/^[DS]{4}$/i.test(dung) ? 'II' : (c.choices?.length || c.luaChon?.length ? 'I' : 'III'))
-
-    return {
-      id: c.id || `cau_${i + 1}`,
-      phan,
-      maDe: c.maDe || 'MOM',
-      chuyenDe: c.chuyenDe || 'Hoá học',
-      dang: 'chua_ro',
-      sao: 1,
-      mucDo: c.mucDo || '',
-      text: c.text || c.noiDung || '',
-      luaChon: c.choices || c.luaChon || null,
-      dapAn: dung,
-      chot: lg.chot,
-      lyDo: lg.lyDo,
-      buoc: lg.buoc,
-      ketQua: lg.ketQua,
-      anhThanCau: c.anhThanCau || c.thanCauImg,
-      anhLuaChon: c.anhLuaChon,
-      chuaCho: {
-        qid: c.id,
-        soCau: i + 1,
-        phan,
-        maDang: '',
-        bac: 1,
-        laDeCuaEm: true,
-        daChon,
-        dapAnDung: dung,
-      },
-    }
-  })
-
-  const thongTin: ThongTinPhieu = {
-    hoTen: b.sbd ? `SBD: ${b.sbd}` : '',
-    sbd: b.sbd || '',
-    ngay: new Date(b.nopLuc || b.taoLuc || Date.now()),
-    tenChuyenDe: b.tieuDe || 'Bài luyện gia đình giao',
-    ketQua: `${b.diem ?? 0} điểm · Đúng ${b.soCauDung ?? 0}/${b.soCau ?? cauLuyen.length} câu`,
-    hienDapAn: true,
-    giaoDienHocSinh: true,
-    nhanBia: 'BÀI GIA ĐÌNH GIAO',
-    oBia: [
-      { nhan: 'Điểm số', gia: `${b.diem ?? 0}/10` },
-      { nhan: 'Kết quả', gia: `${b.soCauDung ?? 0}/${b.soCau ?? cauLuyen.length} câu đúng` },
-      { nhan: 'Thời gian nộp', gia: b.nopLuc ? new Date(b.nopLuc).toLocaleDateString('vi-VN') : 'Đã nộp' },
-    ],
-  }
-
-  const { dungPhieu } = await import('./html-phieu')
-  return dungPhieu(thongTin, cauLuyen, {
-    moSan: true,
-    loiNhac: `Kết quả bài gia đình giao: Đạt ${b.diem ?? 0}/10 điểm (Đúng ${b.soCauDung ?? 0}/${b.soCau ?? cauLuyen.length} câu). Bấm vào từng câu để mở hoặc đóng lời giải chi tiết.`,
-  })
+  const { momReviewHtml: dung } = await import('./html-phieu')
+  return dung(b)
 }

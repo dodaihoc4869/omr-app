@@ -1,0 +1,493 @@
+[
+  {
+    "i": 21,
+    "hash": "038bb05ba933e0e06d4468e33ee19657b17a068f8858a9d15924868e7d4afda4",
+    "fileNguon": "anh/038bb05ba933e0e06d4468e33ee19657b17a068f8858a9d15924868e7d4afda4.png",
+    "svg": "do-thi-8219dacf28890a27b62e67e007acb3f5a0dcdb7aa281da26f1121163940a4727.svg",
+    "hashSvg": "8219dacf28890a27b62e67e007acb3f5a0dcdb7aa281da26f1121163940a4727",
+    "byteSvg": 5884,
+    "trangThai": "da-soat-doc-lap",
+    "nguoiDocNguon": "soat_nguon_3",
+    "xTicks": [
+      0,
+      10,
+      20,
+      30,
+      40,
+      50,
+      60,
+      70,
+      80,
+      90,
+      100
+    ],
+    "yTicks": [
+      0,
+      10,
+      20,
+      30,
+      40,
+      50,
+      60,
+      70
+    ],
+    "traceKClPx": [
+      [
+        120,
+        241
+      ],
+      [
+        558,
+        108
+      ]
+    ],
+    "frameNguonPx": [
+      120,
+      53,
+      558,
+      360
+    ],
+    "NaCl": 40,
+    "ghiChu": "Không gán giá trị nguyên cho đầu/cuối/giao điểm KCl; đường không marker.",
+    "hashSvgDaSoat": "8219dacf28890a27b62e67e007acb3f5a0dcdb7aa281da26f1121163940a4727",
+    "nguoiSoat": "soat_nguon_2"
+  },
+  {
+    "i": 108,
+    "hash": "14813abf27905f7360f48b2042845447acb406b0e8655524b4a2e8501ff41f91",
+    "fileNguon": "anh/14813abf27905f7360f48b2042845447acb406b0e8655524b4a2e8501ff41f91.png",
+    "svg": "do-thi-0e3f6700009a33b63a86fcd232ee858904c55663501bc2d3f2da9f3060761ce4.svg",
+    "hashSvg": "0e3f6700009a33b63a86fcd232ee858904c55663501bc2d3f2da9f3060761ce4",
+    "byteSvg": 3090,
+    "trangThai": "da-soat-doc-lap",
+    "nguoiDocNguon": "soat_nguon_3",
+    "kieu": "dinh-tinh",
+    "xTicks": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "yTicks": [],
+    "ghiChu": "Pepsin đỉnh2, Chymotrypsin đỉnhgiữa7và8 cao hơn; không suy tốc độ hay thêm marker.",
+    "hashSvgDaSoat": "0e3f6700009a33b63a86fcd232ee858904c55663501bc2d3f2da9f3060761ce4",
+    "nguoiSoat": "soat_nguon_2"
+  },
+  {
+    "i": 115,
+    "hash": "15a61b4485ab2b5265bd4e589363ec76bb23eef494a68d1198b6d6dc9304ab3d",
+    "fileNguon": "anh/15a61b4485ab2b5265bd4e589363ec76bb23eef494a68d1198b6d6dc9304ab3d.png",
+    "svg": "do-thi-ee4f197f5d3909650f9211cdc15ca9a9ae8bd26a922abc92ea92619ed9774999.svg",
+    "hashSvg": "ee4f197f5d3909650f9211cdc15ca9a9ae8bd26a922abc92ea92619ed9774999",
+    "byteSvg": 2510,
+    "trangThai": "da-soat-doc-lap",
+    "nguoiDocNguon": "soat_nguon_3",
+    "kieu": "dinh-tinh",
+    "xTicks": [
+      "t₁",
+      "t₂",
+      "t₃",
+      "t₄"
+    ],
+    "ghiChu": "Giữ giao tại t1 và nằm ngang từt2; (a) giảm, plateau thấp; (b) tăng, plateau cao.",
+    "hashSvgDaSoat": "ee4f197f5d3909650f9211cdc15ca9a9ae8bd26a922abc92ea92619ed9774999",
+    "nguoiSoat": "soat_nguon_2"
+  },
+  {
+    "i": 150,
+    "hash": "1a77df87bdb7d931638ed7c121cf33d2fd91781a41dbf731e59afeea462394a5",
+    "fileNguon": "anh/1a77df87bdb7d931638ed7c121cf33d2fd91781a41dbf731e59afeea462394a5.png",
+    "svg": "do-thi-b2e064ec9eeba23f0f2aca73ee9daebdc23f0df0cbe4429f63300862e49094ab.svg",
+    "hashSvg": "b2e064ec9eeba23f0f2aca73ee9daebdc23f0df0cbe4429f63300862e49094ab",
+    "byteSvg": 1380,
+    "trangThai": "da-soat-doc-lap",
+    "nguoiDocNguon": "soat_nguon_3",
+    "kieu": "dinh-tinh",
+    "soDuong": 2,
+    "nhan": [
+      "HI",
+      "H₂ + I₂"
+    ],
+    "ghiChu": "Không tách nhãnH2+I2 thành hai đường, không thêm số liệu.",
+    "hashSvgDaSoat": "b2e064ec9eeba23f0f2aca73ee9daebdc23f0df0cbe4429f63300862e49094ab",
+    "nguoiSoat": "soat_nguon_2"
+  },
+  {
+    "i": 233,
+    "hash": "28b713ec25be3a44adbc8d65a31573c691f673a67ba82917ca1062c6134042df",
+    "fileNguon": "anh/28b713ec25be3a44adbc8d65a31573c691f673a67ba82917ca1062c6134042df.png",
+    "svg": "do-thi-398f8b939c4275db2c22807335cf21a9d6e2c84f0ee316f17861a894b7f9cc05.svg",
+    "hashSvg": "398f8b939c4275db2c22807335cf21a9d6e2c84f0ee316f17861a894b7f9cc05",
+    "byteSvg": 5181,
+    "trangThai": "da-soat-doc-lap",
+    "nguoiDocNguon": "soat_nguon_3",
+    "xTicks": [
+      0,
+      15,
+      30,
+      45,
+      60,
+      75,
+      90
+    ],
+    "yTicks": [
+      0,
+      5,
+      10,
+      15,
+      20,
+      25,
+      30
+    ],
+    "diemCoMocRo": [
+      [
+        0,
+        0
+      ],
+      [
+        75,
+        25
+      ]
+    ],
+    "traceGeometryPx": [
+      [
+        134,
+        357
+      ],
+      [
+        140,
+        336.5
+      ],
+      [
+        160,
+        287
+      ],
+      [
+        180,
+        252
+      ],
+      [
+        200,
+        229.5
+      ],
+      [
+        220,
+        211
+      ],
+      [
+        240,
+        198.5
+      ],
+      [
+        260,
+        189.5
+      ],
+      [
+        280,
+        182.5
+      ],
+      [
+        300,
+        177
+      ],
+      [
+        320,
+        172
+      ],
+      [
+        340,
+        167.5
+      ],
+      [
+        360,
+        163
+      ],
+      [
+        380,
+        159
+      ],
+      [
+        400,
+        155
+      ],
+      [
+        420,
+        150.5
+      ],
+      [
+        439,
+        147
+      ]
+    ],
+    "ghiChu": "Kết thúc(75;25), không kéo đến90; không marker, không công bố mẫu pixel thành dữliệu.",
+    "hashSvgDaSoat": "398f8b939c4275db2c22807335cf21a9d6e2c84f0ee316f17861a894b7f9cc05",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 249,
+    "hash": "2a9521502647fe48931635d0eebe574d19b7e5d87145e729da05e5714fe152b4",
+    "fileNguon": "anh/2a9521502647fe48931635d0eebe574d19b7e5d87145e729da05e5714fe152b4.png",
+    "svg": "do-thi-deccdde8f88e91f2c946990719e58e1879a93af86a1c0d72a440c36f21b93269.svg",
+    "hashSvg": "deccdde8f88e91f2c946990719e58e1879a93af86a1c0d72a440c36f21b93269",
+    "byteSvg": 4709,
+    "trangThai": "da-soat-doc-lap",
+    "nguoiDocNguon": "soat_nguon_3",
+    "xTicks": [
+      20,
+      40,
+      60,
+      80,
+      100,
+      120,
+      140
+    ],
+    "yTicks": [
+      30,
+      40,
+      50,
+      60,
+      70
+    ],
+    "diem": [
+      [
+        20,
+        30
+      ],
+      [
+        40,
+        55
+      ],
+      [
+        60,
+        70
+      ],
+      [
+        80,
+        75
+      ],
+      [
+        100,
+        65
+      ],
+      [
+        120,
+        50
+      ],
+      [
+        140,
+        35
+      ]
+    ],
+    "ghiChu": "Giữ trục cắt ởgần30, không thêm0/80; đơn sắcđổi teal khôngmang dữliệu.",
+    "hashSvgDaSoat": "deccdde8f88e91f2c946990719e58e1879a93af86a1c0d72a440c36f21b93269",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 404,
+    "hash": "4742d9ecfbbf83bd084bf2c93f267b84f2871d4e347f25246cc021a44505e216",
+    "fileNguon": "anh/4742d9ecfbbf83bd084bf2c93f267b84f2871d4e347f25246cc021a44505e216.png",
+    "svg": "do-thi-a4a3a27ab5b6314749ddbf777e21efbcbfc24eae1a3e12c9f9ff6cf9e1c62cd6.svg",
+    "hashSvg": "a4a3a27ab5b6314749ddbf777e21efbcbfc24eae1a3e12c9f9ff6cf9e1c62cd6",
+    "byteSvg": 3410,
+    "trangThai": "da-soat-doc-lap",
+    "nguoiDocNguon": "soat_nguon_3",
+    "traceGeometryPx": [
+      [
+        68,
+        311
+      ],
+      [
+        90,
+        308
+      ],
+      [
+        120,
+        307
+      ],
+      [
+        150,
+        303
+      ],
+      [
+        180,
+        299
+      ],
+      [
+        210,
+        291
+      ],
+      [
+        240,
+        279
+      ],
+      [
+        260,
+        268
+      ],
+      [
+        280,
+        256
+      ],
+      [
+        295,
+        244
+      ],
+      [
+        310,
+        215
+      ],
+      [
+        325,
+        173
+      ],
+      [
+        340,
+        132
+      ],
+      [
+        355,
+        102
+      ],
+      [
+        370,
+        85
+      ],
+      [
+        385,
+        81
+      ],
+      [
+        390,
+        79
+      ],
+      [
+        405,
+        87
+      ],
+      [
+        420,
+        101
+      ],
+      [
+        435,
+        120
+      ],
+      [
+        450,
+        144
+      ],
+      [
+        465,
+        172
+      ],
+      [
+        480,
+        213
+      ],
+      [
+        490,
+        243
+      ],
+      [
+        498,
+        275
+      ],
+      [
+        503,
+        296
+      ],
+      [
+        505,
+        304
+      ],
+      [
+        507,
+        311
+      ]
+    ],
+    "kieu": "dinh-tinh",
+    "xTicks": [
+      0,
+      10,
+      20,
+      30,
+      37,
+      40,
+      50,
+      60
+    ],
+    "yTicks": [],
+    "ghiChu": "Đỉnh37, hết nét50; không gán số tốc độ hoặc kéo đường sau50.",
+    "hashSvgDaSoat": "a4a3a27ab5b6314749ddbf777e21efbcbfc24eae1a3e12c9f9ff6cf9e1c62cd6",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 476,
+    "hash": "577074fcc6c51d58768fc61c1d5b1a9be53277a4e396482f687e9d98091bc451",
+    "fileNguon": "anh/577074fcc6c51d58768fc61c1d5b1a9be53277a4e396482f687e9d98091bc451.png",
+    "svg": "do-thi-3a193e97401d76b8bd85866f6ad15fd5aaf6560a40ec4cf6ebb823b6af9802cb.svg",
+    "hashSvg": "3a193e97401d76b8bd85866f6ad15fd5aaf6560a40ec4cf6ebb823b6af9802cb",
+    "byteSvg": 5033,
+    "trangThai": "da-soat-doc-lap",
+    "nguoiDocNguon": "soat_nguon_3",
+    "xTicks": [
+      2019,
+      2021,
+      2023,
+      2025,
+      2027,
+      2029
+    ],
+    "yTicks": [
+      "2,5",
+      "5",
+      "7,5",
+      "10",
+      "12,5",
+      "15"
+    ],
+    "cot": [
+      {
+        "x": 2019,
+        "y": 11.61,
+        "label": "11,61"
+      },
+      {
+        "x": 2021,
+        "y": 11.37,
+        "label": "11,37"
+      },
+      {
+        "x": 2023,
+        "y": 11.97,
+        "label": "11,97"
+      },
+      {
+        "x": 2025,
+        "y": 12.67,
+        "label": "12,67"
+      },
+      {
+        "x": 2027,
+        "y": 13.39,
+        "label": "13,39"
+      },
+      {
+        "x": 2029,
+        "y": 14.07,
+        "label": "14,07"
+      }
+    ],
+    "ghiChu": "Không thêm số0; đủ6cột,đường15liền,cácđườnglưới còn lại chấm; đơn sắcđổi teal khôngmang dữliệu.",
+    "hashSvgDaSoat": "3a193e97401d76b8bd85866f6ad15fd5aaf6560a40ec4cf6ebb823b6af9802cb",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

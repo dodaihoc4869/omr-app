@@ -22,8 +22,9 @@
     "ghiChu": "Không tự coi qua cổng hình học là đã đúng mẫu hoặc đã xác minh hóa học. Chưa tích hợp ứng viên."
   },
   "ungDung": {
-    "daSuaMa": false,
-    "daPhatHanh": false
+    "daSuaMa": true,
+    "daPhatHanh": false,
+    "ghiChu": "Đã tối ưu tải lười phần dựng phiếu Mom; chưa tích hợp hình vector, chưa phát hành."
   },
   "viecTiepTheo": [
     "Dựng lại theo cụm hình dùng chung, đối chiếu nguyên tử/liên kết/điện tích/trục/số liệu.",
@@ -59,8 +60,8 @@
       "Toàn kho còn chưa hoàn tất, app chưa thay hình; không báo đã xong hoặc đã triển khai."
     ],
     "danhMucDaKiem": "docs/hinh-vector-0311/kiem/danh-muc-da-kiem.json",
-    "loVuaXong": "Lô6:26nguồn đãsoát. Lô7:61/61nguồn soátchéo6tác tử đạt sau sửa393 thiếu2Cethyl. Lô8:2đồthị đạt sau sửa đoạnngang8. Tổng398câu ĐỦ mọi hình/25mộtphần,346nguồn→224SVG.",
-    "viecNenLamTiep": "Tiếp tục nhóm đồthị: soat_nguon_3 đang đọc tốiđa8nguồn0..479; orbital19đã đọcnguồn chưa dựng (bằng chứng trục/phases trong thread). 4Fischer27/928/1407/1123giữ do nhãn bịcắt, khôngđoán. Hoàn thiện lô mới, không dừng ở kiểm trạng thái.",
+    "loVuaXong": "Lô9: 8 đồ thị nguồn đã soát độc lập, sửa dáng404 và nhãn476. Tổng406 câu đủ mọi hình; nguồn19 orbital đã dựng, chờ soát.",
+    "viecNenLamTiep": "Soát độc lập orbital19, tiếp tục lô hình; hoàn tất full vitest hai nhánh, so tên, kiểm cổng trước khi đẩy checkpoint. Hình chưa tích hợp.",
     "canhBaoCheckpoint": "Checkpoint mới đã commit cục bộ; chưa đẩy sau lô4/5/6 vì cổng tốc độ cũng đỏ trên main sạch8592da49. Không nâng mốc, không phát hành. Còn tiếp tục vẽ trong worktree hiện tại."
   },
   "tuDongTiepTuc": {
@@ -78,14 +79,14 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 346,
-    "soSvgRieng": 224,
-    "soCauDungHinh": 423,
-    "soCauDuMoiHinh": 398,
-    "soCauMoiXongMotPhan": 25,
-    "byteSvg": 1723439,
-    "byteGzip": 362807,
-    "soAnhNguonConLai": 1082,
+    "soAnhNguon": 354,
+    "soSvgRieng": 232,
+    "soCauDungHinh": 433,
+    "soCauDuMoiHinh": 406,
+    "soCauMoiXongMotPhan": 27,
+    "byteSvg": 1754636,
+    "byteGzip": 369330,
+    "soAnhNguonConLai": 1074,
     "daTichHop": false
   },
   "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.",

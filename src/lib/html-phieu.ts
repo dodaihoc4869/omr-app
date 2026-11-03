@@ -1,3 +1,4 @@
+import { dungPhieuMom } from './mom-review-html'
 import {experimentHtml,experimentOriginal} from './experiments/render'
 import { NHAN_COT_LOI, NHAN_KET_QUA, NHAN_LOI_GIAI, NHAN_LOI_GIAI_NGAN } from './nhan-loi-giai'
 import { tachDongTheoY } from './tach-dong-cau'
@@ -3922,4 +3923,9 @@ export function thanhNopHtml(soCau: number, nutChu = 'Nộp bài', tat = false):
   <span id="nop-loi" class="nop-loi" hidden></span>
   <button class="nut nop" type="button" id="nut-nop"${tat ? ' disabled' : ''}>${nutChu}</button>
 </div>`
+}
+
+// Cùng mảnh phiếu đã có: không kéo ruột dựng kết quả vào lượt mở app học sinh/phụ huynh.
+export function momReviewHtml(b: any): string {
+  return dungPhieuMom(b, dungPhieu)
 }
