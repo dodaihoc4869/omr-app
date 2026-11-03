@@ -25,7 +25,11 @@ Thầy: «có câu xác định nhóm trong bảng tuần hoàn ko đưa kiến 
 3. `node lay-muc.mjs <tên tệp> <mã…>` lấy MỌI mục quy định CÁCH LÀM của dạng bài (thường 2–6 mục). Đọc `buoc` (thứ tự thầy dẫn), `meo`, `nham`, `noi`.
 4. Lời giải PHẢI đi đúng cách thầy dạy trong các mục đó: `cotLoi` nêu đúng quy tắc của thầy (vd nhóm A = tổng electron lớp ngoài cùng; nhóm B tính a + b của (n−1)dᵃnsᵇ:
    3–7 ⇒ nhóm a + b, 8–10 ⇒ nhóm VIIIB, 11–12 ⇒ nhóm (a + b − 10)); `phim` đi ĐÚNG thứ tự `buoc`; `hayNham` lấy từ `nham`.
-5. Lời thầy nói đúng trong PHẠM VI bài giảng của nó; câu chữ trong lời giải phải đúng SGK Kết nối tri thức. Ví dụ: «electron độc thân chính là electron hoá trị» là ý của bài
+5. DANH PHÁP (thầy 03/11 «đồng bộ với tất cả các bài gọi danh pháp»): MỌI câu gọi tên phải đi đúng công thức thầy — `cotLoi` nêu
+   **Tên = vị trí-tên nhánh + mạch chính + liên kết (an/en/in) + chức**, đánh số ưu tiên **chức → π → nhánh**, đơn chức bỏ e, đa chức giữ e
+   (amino acid: COOH là chức chính, C của COOH là số 1, NH₂ là nhánh «amino»; amine thay thế: chức amine đọc cuối; ester: gốc R′ trước, gốc RCOO sau);
+   `phim` đi Bước 1 chọn mạch chính → Bước 2 đánh số → Bước 3 ghép tên; và có `canh` `danh-phap`.
+6. Lời thầy nói đúng trong PHẠM VI bài giảng của nó; câu chữ trong lời giải phải đúng SGK Kết nối tri thức. Ví dụ: «electron độc thân chính là electron hoá trị» là ý của bài
    liên kết — KHÔNG dùng để đếm số electron hoá trị; «a + b = 8, 9, 10» dùng để XẾP NHÓM VIIIB. Mâu thuẫn thì theo SGK, lời thầy chỉ dùng đúng phạm vi.
 
 ## Đầu ra: `ra/<cùng tên tệp đầu vào>.json` — một đối tượng JSON với các trường
@@ -37,6 +41,16 @@ Thầy: «có câu xác định nhóm trong bảng tuần hoàn ko đưa kiến 
   - `{ "loai": "ong-nghiem", "buoc": 2–5 { "chu", "lop": 1–2 { "mau": trong|xanh|cam|vang|hong|tim|nau|trang-duc, "nhan" }, "dun"?, "khi"?, "ketTua"? } }` — câu có thí nghiệm
     / hiện tượng SGK (điều chế, nhận biết, tách lớp, kết tủa, sủi khí, đổi màu). Màu phải đúng hiện tượng thật (Cu(OH)2 xanh lam, Fe(OH)3 nâu đỏ, AgCl trắng…).
   - `{ "loai": "so-sanh", "trai": { "ten", "y": [...] }, "phai": { "ten", "y": [...] } }` — câu phân biệt hai chất / hai khái niệm.
+  - `{ "loai": "danh-phap", "soC"?, "chuc"?, "nhanh": [...], "pi": [...], "manh": [...], "ten" }` — BẮT BUỘC cho MỌI câu gọi tên / danh pháp hữu cơ (thầy 03/11
+    «mô phỏng chi tiết cực kì dễ hiểu theo cách gọi tên của thầy»). App vẽ mạch carbon, chạy đúng BA BƯỚC của thầy rồi lắp tên từng mảnh.
+    - `soC`: số carbon MẠCH CHÍNH (1–12) — ĐÃ đánh số đúng quy tắc (C1 là đầu ưu tiên). Vắng `soC` ⇒ chỉ lắp mảnh (dùng cho ester, tên gốc–chức).
+    - `chuc`: `{ "viTri": số C, "ten": "COOH" }` (nhóm chức chính, vd COOH, CHO, OH, NH2 của amine). `nhanh`: `[{ "viTri", "ten": "NH2" | "CH3" | "Cl"… }]` theo đúng vị trí.
+    - `pi`: `[{ "viTri": k, "loai": "doi" | "ba" }]` = liên kết bội giữa C(k) và C(k+1); không có thì `[]`.
+    - `manh`: 2–5 mảnh ĐÚNG THỨ TỰ công thức thầy, mỗi mảnh `{ "loai", "chu", "giai" }`:
+      tên thay thế: `nhanh` (vd "2,6-diamino") → `mach` ("hex") → `lien-ket` ("an" / "-2-en" …) → `chuc` ("oic acid", "-1-ol", "al", "amine"…);
+      ester: `goc-ancol` ("ethyl") → `goc-acid` (" acetate"). `giai`: MỘT câu rất dễ hiểu vì sao mảnh này là vậy (vd «2 nhóm NH₂ ở C2 và C6 là nhánh amino, có 2 nhánh nên thêm di»).
+      Mảnh có thể rỗng nghĩa thì bỏ (vd không có nhánh thì không có mảnh `nhanh`).
+    - `ten`: tên đầy đủ = ghép các `chu` (máy so bỏ dấu cách). Phải đúng với đáp án kho.
 - `thanChu`: mảng chữ thần chú — CHỈ chép ĐÚNG CHỮ trường `chu` trong `than-chu.json`, chỉ khi đúng chuyện câu đang hỏi. Không có thì `[]`. Tuyệt đối không tự đặt thần chú.
 - `thayNoi` (tuỳ chọn): MỘT câu chép NGUYÊN VĂN từ `noi` của một mục trong `.muc.json`, hợp ý bài. Không có câu hợp thì bỏ trường. Không sửa chữ (chỉ được sửa axit→acid, bazơ→base, este→ester, ancol→alcohol, oxit→oxide, amin→amine, anđehit→aldehyde). Sửa thuật ngữ thì máy chủ không khớp ⇒ thà chép nguyên.
 - `meo` (tuỳ chọn): chép NGUYÊN VĂN `meo` của mục hợp ý.

@@ -264,9 +264,11 @@ export async function soatViecKinh(env: Env, b: Obj) {
   const han = new Date(nay - PHUT_GIU_VIEC_KINH * 60_000).toISOString()
   const uuTien = mangChu(b.uuTien, 30)
   const chiBo = mangChu(b.chiBo, 30)
-  const locBo = chiBo.length ? ` AND COALESCE(k.bo, '') IN (SELECT value FROM json_each(?))` : ''
+  // `coChu`: chỉ soát bản có một trong các cụm chữ (vd «gọi tên», «danh pháp» — thầy 03/11 «đồng bộ với tất cả các bài gọi danh pháp»).
+  const coChu = mangChu(b.coChu, 10)
+  const locBo = (chiBo.length ? ` AND COALESCE(k.bo, '') IN (SELECT value FROM json_each(?))` : '') + (coChu.length ? ` AND (${coChu.map(() => 'k.ban_json LIKE ?').join(' OR ')})` : '')
   const conSoat = `k.cong = 'dat' AND (s.bam IS NULL OR (s.trang_thai = 'dang' AND s.nhan_luc < ?))${locBo}`
-  const thamLoc = chiBo.length ? [JSON.stringify(chiBo)] : []
+  const thamLoc = [...(chiBo.length ? [JSON.stringify(chiBo)] : []), ...coChu.map((c) => `%${c}%`)]
   const dau = await env.DB.prepare(
     `SELECT COALESCE(k.bo, '') AS bo FROM loi_giai_kinh k LEFT JOIN loi_giai_kinh_soat s ON s.bam = k.bam WHERE ${conSoat}
      ORDER BY CASE WHEN COALESCE(k.bo, '') IN (SELECT value FROM json_each(?)) THEN 0 ELSE 1 END, k.bo LIMIT 1`,

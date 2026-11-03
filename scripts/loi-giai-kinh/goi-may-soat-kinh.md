@@ -17,6 +17,8 @@ Mỗi bản trong lô ĐÃ qua máy kiểm (đủ khối, khớp đáp án kho, 
 3. Với từng mục chủ đạo: bản hiện tại có ÁP DỤNG không (quy tắc / bước của thầy có mặt ở `cotLoi`, `phim`, `lyDo`, `hayNham` hoặc `theNho`, đúng thứ tự `buoc`)?
    Ví dụ dạng xác định vị trí trong bảng tuần hoàn: phải có quy tắc thầy — nhóm A = tổng electron lớp ngoài cùng; nhóm B tính a + b của (n−1)dᵃnsᵇ (3–7 ⇒ a + b;
    8–10 ⇒ VIIIB; 11–12 ⇒ a + b − 10); chu kì = số lớp; ô = Z. Bản chỉ nói «thuộc nhóm VIB» mà không dạy cách ra ⇒ THIẾU.
+   Dạng DANH PHÁP / gọi tên: phải có công thức thầy (nhánh + mạch chính + liên kết + chức; đánh số chức → π → nhánh; đơn chức bỏ e) trong `cotLoi`,
+   `phim` đi đúng Ba bước, và có `canh` `danh-phap` (xem `goi-may-soan-kinh.md`). Thiếu một trong ba ⇒ SỬA.
 4. Soát phát biểu khoa học: câu nào sai SGK Kết nối tri thức (kể cả câu chép từ lời thầy nhưng dùng sai phạm vi — xem mục 5 TRA BÀI GIẢNG) ⇒ SAI.
 5. Kết luận:
    - **giu**: MỌI mục chủ đạo đã áp dụng và không có phát biểu sai. Đừng giữ cho nhanh: thiếu một quy tắc thầy dạy là phải sửa.
