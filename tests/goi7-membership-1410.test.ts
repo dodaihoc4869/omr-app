@@ -241,14 +241,18 @@ it.each(['quota','muc','phien','tu_kiem'] as const)('ảnh đọc cũ trước k
   for(const table of ['goi_bai_7_ngay','goi_bai_7_muc_ngay','game_v2_session','goi_bai_7_kiem'])expect(k.d.sql.prepare(`SELECT COUNT(*) n FROM ${table} WHERE sbd='S2'`).get()).toMatchObject({n:0})
 })
 
-it('bớt em không bỏ cổng phiên tự kiểm: nguồn câu đổi hoặc bị giữ tiếp tục chặn nộp',async()=>{
+// 03/11 (thầy «bỏ hẳn lỗi kiểu này»): câu đổi nguồn / bị giữ giữa lượt KHÔNG còn chặn nộp cả tờ — cổng vẫn áp: câu ấy bị bỏ khỏi bài (không chấm, không hiện đáp án).
+it('bớt em không bỏ cổng phiên tự kiểm: câu đổi nguồn giữa lượt bị bỏ khỏi bài nộp, không chấm',async()=>{
   const k=await kho(),start=await kiemGoi7(k.env,'S2','hoc-tap-kiem-start',{goiId:ID,maDe:'DH-B1'},NOW)
   expect(await sua(k.env,[],['S2'])).toMatchObject({ok:true})
   const qs=start.questions as Row[],tra=Object.fromEntries(qs.map(q=>[String(q.qid),q.phan==='I'?'B':q.phan==='II'?'DSDS':'4']))
   const first=k.qids('DH-B1')[0]!
   k.d.sql.prepare('UPDATE game_v2_question SET version=? WHERE qid=?').run('v2',first)
-  await expect(kiemGoi7(k.env,'S2','hoc-tap-kiem-nop',{goiId:ID,id:start.id,tra},NOW+1000)).rejects.toThrow()
-  expect(k.d.sql.prepare('SELECT nop_luc FROM goi_bai_7_kiem WHERE id=?').get(String(start.id))).toMatchObject({nop_luc:null})
+  const nop=await kiemGoi7(k.env,'S2','hoc-tap-kiem-nop',{goiId:ID,id:start.id,tra},NOW+1000)
+  expect(nop.tong).toBe(qs.length-1)
+  expect((nop.ketQua as Row[]).map(c=>c.qid)).not.toContain(first)
+  const luu=JSON.parse(String((k.d.sql.prepare('SELECT json FROM goi_bai_7_kiem WHERE id=?').get(String(start.id)) as Row).json)) as {tra:Record<string,string>}
+  expect(Object.keys(luu.tra)).not.toContain(first)
 })
 
 it('thống kê nhẹ và chi tiết cùng loại em bị bớt; giữ nguyên sổ sai cũ',async()=>{
