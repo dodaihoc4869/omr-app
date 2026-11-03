@@ -46,6 +46,8 @@ function trongKhung(v: number, lo = 0, hi = 100) { return v >= lo && v <= hi }
 export const LOP_SVG: ReadonlySet<string> = new Set([
   'f-khong', 'f-nen', 'f-chu', 'f-xam', 'f-hs', 'f-hs-nhat', 'f-tin', 'f-tin-nhat', 'f-sao', 'f-sao-nhat', 'f-sai', 'f-sai-nhat', 'f-dung', 'f-dung-nhat', 'f-tim', 'f-tim-nhat',
   's-chu', 's-chu-2', 's-mo', 's-hs', 's-tin', 's-sao', 's-sai', 's-dung', 's-tim', 's-nen', 'nc', 'net-dut',
+  'f-kinh', 'f-nap', 'f-bong', 'f-dd1', 'f-dd2', 'f-dd3', 'f-dd4', 'f-muoi', 'f-the', 's-sang', 's-mui', 's-vien', 't-dau', 't-the', 't-mui',
+  'a-bay', 'a-giot', 'a-lua', 'a-nhip', 'a-chay', 'a-quay', 'a-quay-nguoc', 'a-hien', 'tre-1', 'tre-2', 'tre-3', 'tre-4',
   't-chu', 't-chu-2', 't-hs', 't-tin', 't-sao', 't-sai', 't-dung', 't-tim', 't-dam', 't-nho', 't-lon',
 ])
 const THE_SVG = new Set(['g', 'path', 'line', 'rect', 'circle', 'ellipse', 'polygon', 'polyline', 'text', 'tspan'])

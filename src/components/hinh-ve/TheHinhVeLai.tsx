@@ -1,6 +1,7 @@
 // THẺ «HÌNH CỦA ĐỀ · VẼ LẠI» (thầy 03/11): cảnh vector do máy vẽ điền, app vẽ bằng SVG; hoạt hoạ chạy MỘT lượt (nhịp), máy yếu / giảm chuyển động ⇒ tĩnh.
 // Mảnh nạp lười — nơi gọi dùng `React.lazy`. Màu CHỈ biến --tr-* của app học sinh. Chữ KHÔNG đè hình: toạ độ chọn sẵn + xếp nhãn tự nhích (xepNhan).
 import { useEffect, useState } from 'react'
+import { chiSoChuan } from '../../lib/hinh-ve/chi-so'
 import type { CanhDoThi, CanhFischer, CanhSoDo, CanhSvg, CanhThiNghiem, HinhVeLai } from '../../lib/hinh-ve/kieu'
 import './hinh-ve.css'
 
@@ -138,7 +139,7 @@ function VeFischer({ v }: { v: Fischer }) {
 
 /** Khuôn vẽ tự do: `svg` đã qua `lamSachSvg` (dựng lại từ thẻ / thuộc tính cho phép, màu chỉ qua lớp bảng màu) nên đặt thẳng vào <svg>. */
 function VeSvg({ v, ten }: { v: CanhSvg; ten: string }) {
-  return <svg viewBox={`0 0 ${v.rong} ${v.cao}`} className="hv-svg hv-tu-do" role="img" aria-label={ten} dangerouslySetInnerHTML={{ __html: v.svg }} />
+  return <svg viewBox={`0 0 ${v.rong} ${v.cao}`} className="hv-svg hv-tu-do" role="img" aria-label={ten} dangerouslySetInnerHTML={{ __html: chiSoChuan(v.svg) }} />
 }
 
 export default function TheHinhVeLai({ hinh }: { hinh: HinhVeLai }) {

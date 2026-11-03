@@ -156,6 +156,13 @@ export async function nopHinh(env: Env, b: Obj) {
   return { ok: true, ket: cong, lyDo }
 }
 
+/** Vẽ lại các hình ĐÃ xong (khi lời nhắc máy vẽ nâng chuẩn): đưa về hàng chờ, cảnh cũ vẫn phục vụ tới khi cảnh mới ĐẠT thay thế (lệch ⇒ giữ cảnh cũ). Chỉ-thêm: không xoá bảng nào. */
+export async function lamLaiHinh(env: Env) {
+  await damBaoBangHinh(env)
+  const r = await env.DB.prepare("UPDATE hinh_ve_viec SET trang_thai = 'cho', so_lan = 0 WHERE trang_thai = 'xong'").run()
+  return { ok: true, daDua: r.meta?.changes ?? 0 }
+}
+
 export async function tongHinh(env: Env) {
   await damBaoBangHinh(env)
   const [hang, ban, anh, cau] = await Promise.all([

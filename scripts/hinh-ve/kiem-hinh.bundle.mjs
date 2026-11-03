@@ -56,6 +56,33 @@ var LOP_SVG = /* @__PURE__ */ new Set([
   "s-nen",
   "nc",
   "net-dut",
+  "f-kinh",
+  "f-nap",
+  "f-bong",
+  "f-dd1",
+  "f-dd2",
+  "f-dd3",
+  "f-dd4",
+  "f-muoi",
+  "f-the",
+  "s-sang",
+  "s-mui",
+  "s-vien",
+  "t-dau",
+  "t-the",
+  "t-mui",
+  "a-bay",
+  "a-giot",
+  "a-lua",
+  "a-nhip",
+  "a-chay",
+  "a-quay",
+  "a-quay-nguoc",
+  "a-hien",
+  "tre-1",
+  "tre-2",
+  "tre-3",
+  "tre-4",
   "t-chu",
   "t-chu-2",
   "t-hs",
@@ -197,11 +224,41 @@ function chuTrongCanhTho(c) {
   di(c);
   return ra.join(" ");
 }
+
+// src/lib/hinh-ve/chi-so.ts
+var CHI_SO = { "₀": ["0", 1], "₁": ["1", 1], "₂": ["2", 1], "₃": ["3", 1], "₄": ["4", 1], "₅": ["5", 1], "₆": ["6", 1], "₇": ["7", 1], "₈": ["8", 1], "₉": ["9", 1], "₊": ["+", 1], "₋": ["−", 1], "⁰": ["0", -1], "¹": ["1", -1], "²": ["2", -1], "³": ["3", -1], "⁴": ["4", -1], "⁵": ["5", -1], "⁶": ["6", -1], "⁷": ["7", -1], "⁸": ["8", -1], "⁹": ["9", -1], "⁺": ["+", -1], "⁻": ["−", -1] };
+var RE_CHI_SO = /[₀-₉₊₋⁰¹²³⁴-⁹⁺⁻]+/g;
+function chiSoChuan(svg) {
+  return svg.replace(/>([^<>]+)</g, (_m, t) => {
+    if (!RE_CHI_SO.test(t)) return `>${t}<`;
+    RE_CHI_SO.lastIndex = 0;
+    let ra = "", cuoi = 0, dang = 0;
+    for (const m of t.matchAll(RE_CHI_SO)) {
+      const dau = t.slice(cuoi, m.index);
+      if (dau) ra += dang ? `<tspan dy="${-dang}em">${dau}</tspan>` : dau;
+      dang = 0;
+      let ds = 0;
+      for (const c of m[0]) {
+        const [k, h] = CHI_SO[c];
+        const dich = h > 0 ? 0.2 : -0.4;
+        ra += `<tspan dy="${((dich - ds) / 0.7).toFixed(3)}em" font-size="70%">${k}</tspan>`;
+        ds = dich;
+      }
+      dang = ds;
+      cuoi = m.index + m[0].length;
+    }
+    const duoi = t.slice(cuoi);
+    if (duoi) ra += dang ? `<tspan dy="${-dang}em">${duoi}</tspan>` : duoi;
+    else if (dang) ra += `<tspan dy="${-dang}em"></tspan>`;
+    return `>${ra}<`;
+  });
+}
 export {
   CAC_KHUON_HINH,
   LOP_SVG,
   PHIEN_BAN_HINH,
   TIEU_DE_CHUNG,
+  chiSoChuan,
   chuTrongCanh,
   chuanChuHinh,
   hinhVeDungDuoc,
