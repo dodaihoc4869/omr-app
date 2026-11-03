@@ -1,0 +1,62 @@
+{
+  "ngay": "2026-11-03",
+  "nguon": {
+    "soDe": 321,
+    "soCau": 17042,
+    "soCauCoHinh": 1900,
+    "soAnhRieng": 1428,
+    "byteAnhGoc": 28304700,
+    "loiDocNguon": 0
+  },
+  "daDuyetMau": {
+    "soAnh": 3,
+    "soCauDungHinh": 5
+  },
+  "ungVienDoNet": {
+    "soSvg": 1390,
+    "byteSvg": 308204484,
+    "byteGzip": 44304213,
+    "quaCongHinhHoc": 202,
+    "canSoatNet": 1185,
+    "anhChupAnhGhepCanTach": 38,
+    "ghiChu": "Không tự coi qua cổng hình học là đã đúng mẫu hoặc đã xác minh hóa học. Chưa tích hợp ứng viên."
+  },
+  "ungDung": {
+    "daSuaMa": false,
+    "daPhatHanh": false
+  },
+  "viecTiepTheo": [
+    "Dựng lại theo cụm hình dùng chung, đối chiếu nguyên tử/liên kết/điện tích/trục/số liệu.",
+    "Ảnh chụp giữ ảnh thật; hình ghép tách phần hình vẽ để dựng vector.",
+    "Không dùng bản dò nét hàng loạt chưa kiểm chứng hoặc tăng dung lượng như bộ cuối.",
+    "Sau khi có bộ đạt: manifest hash nguồn→hash SVG, giữ qid/vị trí/thứ tự và ảnh gốc. Không sửa content_group hoặc ghi đè hash immutable.",
+    "Tích hợp tải sẵn riêng, kiểm lưu trữ và reload offline. Chạy cổng AGENTS, so với main mới, kiểm ca thi trước phát hành."
+  ],
+  "coVan": "chưa tham vấn được cố vấn",
+  "veHinhHocThuCongDaSoat": {
+    "soAnh": 6,
+    "soCauDungHinh": 8,
+    "ketQua": "6/6 đạt soát độc lập"
+  },
+  "tiepTuc": {
+    "repo": "dodaihoc4869/omr-app",
+    "nhanh": "codex/ve-lai-hinh-kho-0311",
+    "worktree": "/workspace/omr-vector",
+    "nguon": "docs/hinh-vector-0311/nguon/kiem-ke.json",
+    "anhDaDoiChieu": "docs/hinh-vector-0311/kiem",
+    "thuTuTaiTao": [
+      "python -m pip install -r scripts/hinh-vector-0311-requirements.txt",
+      "python scripts/vector-hoa-hinh-0311.py",
+      "python scripts/raster-vector-0311.py",
+      "python scripts/kiem-net-vector-0311.py"
+    ],
+    "canhBao": [
+      "Không hạ ngưỡng kiểm tra chỉ để báo xanh.",
+      "Không coi 1390 ứng viên dò nét là bộ vẽ lại đạt yêu cầu: 1185 bản còn bị gắn cờ, cả 202 bản qua cổng hình học vẫn cần kiểm nội dung/phong cách.",
+      "Không tự sinh chi tiết không đọc được; tìm hình cùng nội dung tốt hơn trong kho hoặc giữ nguồn và nêu rõ mục chưa đạt.",
+      "Mẫu 3 hình được thầy duyệt; 6 công thức mới đã được agent mở từng nguồn đối chiếu độc lập, 6/6 đạt.",
+      "Thầy đã giao tự sửa và tích hợp khi đạt; không xin thầy duyệt lại từng lô.",
+      "Toàn kho còn chưa hoàn tất, app chưa thay hình; không báo đã xong hoặc đã triển khai."
+    ]
+  }
+}

@@ -1,0 +1,56 @@
+[
+  {
+    "i": 14,
+    "hash": "0221fbc67e2428efcf900364916a9d651a11a869d0ee40e1af07276f0d9f31f8",
+    "svg": "hoa-0221fbc67e2428efcf900364916a9d651a11a869d0ee40e1af07276f0d9f31f8.svg",
+    "ten": "Cấu trúc dopamine",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChu": "Phải đối chiếu liên kết, vị trí thế, số nguyên tử và mọi nhãn với nguồn gốc trước khi tích hợp.",
+    "kiemTra": "Đã mở từng ảnh nguồn và ảnh mới, đối chiếu nguyên tử/nhóm chức/vị trí thế/liên kết/nhãn; 6/6 đạt. Hình 45 đã rút gọn nét phụ liên kết đôi theo góp ý."
+  },
+  {
+    "i": 45,
+    "hash": "0998c4ae2c931e01ad5b3c19128fb0c1c20414836d9d0413ca523ec2a1d70e96",
+    "svg": "hoa-0998c4ae2c931e01ad5b3c19128fb0c1c20414836d9d0413ca523ec2a1d70e96.svg",
+    "ten": "Cấu trúc cinnamaldehyde theo hình nguồn",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChu": "Phải đối chiếu liên kết, vị trí thế, số nguyên tử và mọi nhãn với nguồn gốc trước khi tích hợp.",
+    "kiemTra": "Đã mở từng ảnh nguồn và ảnh mới, đối chiếu nguyên tử/nhóm chức/vị trí thế/liên kết/nhãn; 6/6 đạt. Hình 45 đã rút gọn nét phụ liên kết đôi theo góp ý."
+  },
+  {
+    "i": 560,
+    "hash": "6877f1be391569da3f7c3d244d7940ecb7c3f16221a78b630c87d34acc41ef96",
+    "svg": "hoa-6877f1be391569da3f7c3d244d7940ecb7c3f16221a78b630c87d34acc41ef96.svg",
+    "ten": "Cấu trúc benzoic acid",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChu": "Phải đối chiếu liên kết, vị trí thế, số nguyên tử và mọi nhãn với nguồn gốc trước khi tích hợp.",
+    "kiemTra": "Đã mở từng ảnh nguồn và ảnh mới, đối chiếu nguyên tử/nhóm chức/vị trí thế/liên kết/nhãn; 6/6 đạt. Hình 45 đã rút gọn nét phụ liên kết đôi theo góp ý."
+  },
+  {
+    "i": 577,
+    "hash": "6be1c3244a4ee89e40ecd5ddcb70d95a98b912e2c801bcef8fce2ea15bb91e93",
+    "svg": "hoa-6be1c3244a4ee89e40ecd5ddcb70d95a98b912e2c801bcef8fce2ea15bb91e93.svg",
+    "ten": "Cấu trúc phenylalanine theo hình nguồn",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChu": "Phải đối chiếu liên kết, vị trí thế, số nguyên tử và mọi nhãn với nguồn gốc trước khi tích hợp.",
+    "kiemTra": "Đã mở từng ảnh nguồn và ảnh mới, đối chiếu nguyên tử/nhóm chức/vị trí thế/liên kết/nhãn; 6/6 đạt. Hình 45 đã rút gọn nét phụ liên kết đôi theo góp ý."
+  },
+  {
+    "i": 609,
+    "hash": "70bfd8e31ade588266c3d0c9fd50af5d24e33f7b4a60a80bbf192d68818d07fa",
+    "svg": "hoa-70bfd8e31ade588266c3d0c9fd50af5d24e33f7b4a60a80bbf192d68818d07fa.svg",
+    "ten": "Cấu trúc aspirin theo hình nguồn",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChu": "Phải đối chiếu liên kết, vị trí thế, số nguyên tử và mọi nhãn với nguồn gốc trước khi tích hợp.",
+    "kiemTra": "Đã mở từng ảnh nguồn và ảnh mới, đối chiếu nguyên tử/nhóm chức/vị trí thế/liên kết/nhãn; 6/6 đạt. Hình 45 đã rút gọn nét phụ liên kết đôi theo góp ý."
+  },
+  {
+    "i": 22,
+    "hash": "03aa1f42f69d26fc8100de0f17cda5072d5149c61051aa09a476834f4997a1ac",
+    "svg": "hoa-03aa1f42f69d26fc8100de0f17cda5072d5149c61051aa09a476834f4997a1ac.svg",
+    "ten": "Cấu trúc melamine",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChu": "Phải đối chiếu liên kết, vị trí thế, số nguyên tử và mọi nhãn với nguồn gốc trước khi tích hợp.",
+    "kiemTra": "Đã mở từng ảnh nguồn và ảnh mới, đối chiếu nguyên tử/nhóm chức/vị trí thế/liên kết/nhãn; 6/6 đạt. Hình 45 đã rút gọn nét phụ liên kết đôi theo góp ý."
+  }
+]
