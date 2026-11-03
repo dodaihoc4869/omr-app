@@ -2,19 +2,18 @@
 import { readFileSync } from 'node:fs'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { chupDuoc, lamSachKhung, ngayVn } from '../src/lib/khung-tinh-hs'
-import { ID_KHUNG_TINH, KHOA_KHUNG_TINH, PHIEN_BAN_KHUNG, moKhungTinh, taoKhungXuong } from '../src/lib/khung-tinh-noi-tuyen'
+import { ID_KHUNG_TINH, KHOA_KHUNG_TINH, PHIEN_BAN_KHUNG, moKhungTinh } from '../src/lib/khung-tinh-noi-tuyen'
 import { taoMaNapTruoc } from '../src/lib/nap-truoc-man-em'
 
 const doc = (p: string) => readFileSync(new URL('../' + p, import.meta.url), 'utf8')
 const PHIEN = 'omr_student_portal_auth'
 const CSS = ['/assets/trong-a.css', '/assets/TrongHs-b.css']
-const XUONG = taoKhungXuong()
 
 function dat(duong: string): void {
   window.history.replaceState(null, '', duong)
 }
 function mo(): void {
-  moKhungTinh(window, document, CSS, XUONG, KHOA_KHUNG_TINH, PHIEN)
+  moKhungTinh(window, document, CSS, KHOA_KHUNG_TINH, PHIEN)
 }
 const anh = (them: Record<string, unknown> = {}) => JSON.stringify({ v: PHIEN_BAN_KHUNG, sbd: '99001', ngay: ngayVn(), w: window.innerWidth, html: '<div class="ht-app ht2" data-mot="1"><button>Học tiếp</button></div>', ...them })
 
@@ -50,7 +49,7 @@ describe('đoạn mã nội tuyến: dựng lớp phủ trước mã chính', ()
     expect(document.head.querySelectorAll('link[rel=stylesheet]').length).toBe(2)
     expect(document.documentElement.hasAttribute('data-ht2')).toBe(false) // React chưa dựng .ht2 ⇒ bỏ cờ
   })
-  it('ảnh của NGÀY KHÁC / em khác / phiên bản cũ ⇒ khung xương (không bao giờ hiện số ngày khác)', () => {
+  it('ảnh của NGÀY KHÁC / em khác / phiên bản cũ ⇒ lớp phủ CHỈ NỀN — không khung xương (thầy 03/11 «xoá đi»), không bao giờ hiện số ngày khác', () => {
     dat('/hs')
     localStorage.setItem(PHIEN, JSON.stringify({ sbd: '99001', token: 't' }))
     for (const sai of [{ ngay: '2020-01-01' }, { sbd: '12345' }, { v: 1 }]) {
@@ -58,7 +57,7 @@ describe('đoạn mã nội tuyến: dựng lớp phủ trước mã chính', ()
       mo()
       const o = document.getElementById(ID_KHUNG_TINH)!
       expect(o.textContent).not.toContain('Học tiếp')
-      expect(o.querySelector('[aria-busy="true"]')).toBeTruthy()
+      expect(o.querySelector('div')).toBeNull() // chỉ thẻ <style> tắt hoạt ảnh, không hình gì
       ;(window as unknown as { __ddhGoKhungTinh: () => void }).__ddhGoKhungTinh()
     }
   })
@@ -77,8 +76,9 @@ describe('đoạn mã nội tuyến: dựng lớp phủ trước mã chính', ()
       expect(document.getElementById(ID_KHUNG_TINH)).toBeNull()
     }
   })
-  it('khung xương không có mã màu thô (luật màu)', () => {
-    expect(XUONG).not.toMatch(/#[0-9a-f]{3,8}\b/i)
+  it('đã bỏ khung xương Lộ trình cũ (thầy 03/11): mã nội tuyến không còn hàm dựng khung xương', () => {
+    expect(doc('src/lib/khung-tinh-noi-tuyen.ts')).not.toMatch(/taoKhungXuong|LECH_XUONG/)
+    expect(doc('vite.config.ts')).not.toMatch(/taoKhungXuong/)
   })
 })
 
@@ -145,5 +145,14 @@ describe('nối dây', () => {
   })
   it('lần vẽ đầu của Lộ trình không mờ dần từ trong suốt (chỉ khi đổi mục)', () => {
     expect(doc('src/components/hoc-tap/HocTapHomNay.tsx')).toContain("daDoiMuc.current ? 'ht-noi-dung ht2-noi-dung tt-vao-muc' : 'ht-noi-dung ht2-noi-dung'")
+  })
+})
+
+describe('không khung xương ở app học sinh (thầy 03/11 «màn nào load bị vậy nữa xoá sạch»)', () => {
+  it('mọi lớp khối giữ chỗ lúc tải trong suốt, không nhấp nháy (giữ chỗ, không nhảy bố cục)', () => {
+    const luat = doc('src/styles/khong-xuong-hs.css')
+    expect(doc('src/components/hoc-tap/TrongHs.tsx')).toMatch(/import '\.\.\/\.\.\/styles\/khong-xuong-hs\.css'/)
+    for (const l of ['.m3-xuong', '.tlu-xuong', '.tcl-xuong', '.ktcn-xuong span', '.ht2-hn-xuong > span', '.ht2-hn-chip-xuong', '.ht2-cho-tab', '.xd-xuong']) expect(luat).toContain(l)
+    expect(luat).toMatch(/background: transparent !important;[^}]*animation: none !important/)
   })
 })

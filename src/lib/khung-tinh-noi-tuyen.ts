@@ -7,29 +7,15 @@ export const KHOA_KHUNG_TINH = 'ddh.khung-tinh-hs'
 export const ID_KHUNG_TINH = 'khung-tinh-hs'
 /** Phiên bản dạng ảnh — đổi khi cấu trúc ảnh đổi (ảnh cũ bị bỏ, dùng khung xương). */
 export const PHIEN_BAN_KHUNG = 2
-/** Độ lệch ngang các nút chặng (= LECH của TrongHs `DuongChang`) — khung xương đặt nút đúng chỗ. */
-const LECH_XUONG = [0, -52, -80, -52, 0, 52]
-/**
- * Khung xương Lộ trình (chưa có ảnh): thẻ bài trên cùng + đường chặng uốn lượn — khối xám nhạt pha từ màu chữ (`color-mix`, không mã màu thô; tờ kiểu
- * «Trong» chưa có lúc này).
- * Chuỗi HTML tĩnh, dựng lúc build (vite.config.ts) và nhúng vào index.html.
- */
-export function taoKhungXuong(): string {
-  const nut = LECH_XUONG.map((x) => `<div style="width:64px;height:64px;border-radius:50%;background:color-mix(in srgb,currentColor 9%,transparent);transform:translateX(${x}px)"></div>`).join('')
-  return '<div aria-busy="true"><div style="max-width:560px;margin:0 auto;padding:16px 64px 0 16px">' +
-    '<div style="height:84px;border-radius:16px;background:color-mix(in srgb,currentColor 9%,transparent)"></div>' +
-    `<div style="display:flex;flex-direction:column;align-items:center;gap:24px;margin-top:44px">${nut}</div></div></div>`
-}
-
 /**
  * ĐOẠN MÃ NỘI TUYẾN (index.html, ngay sau `<main id="root">`, trước mã chính): dựng lớp phủ khung tĩnh. TỰ CHỨA, ES5 (chèn nguyên văn bằng
  * `toString()`). `css`: các tờ kiểu của Lộ trình (vỏ HS + cổng + «Trong») ĐÚNG THỨ TỰ trình nạp mảnh của Vite tự chèn khi app chạy (vite.config.ts
  * `cssSauThuTu`) và CÙNG href ⇒ Vite thấy thẻ đã có, không chèn lại: thứ tự tầng kiểu y như trước, không luật nào nạp hai lần (đo 28/10: thử nhúng CSS
  * cốt lõi vào ảnh — 67 KB luật trùng làm React dựng chậm hơn; thử thẻ `#khung` riêng rồi gỡ — luật trùng, tính kiểu gấp đôi). Thẻ giữ lại sau khi gỡ
- * lớp phủ (chính là các tờ app sắp dùng). `blocking=render` ⇒ khung đầu đã có kiểu. Chưa có ảnh ⇒ khung xương (khối xám nhạt theo màu chữ).
+ * lớp phủ (chính là các tờ app sắp dùng). `blocking=render` ⇒ khung đầu đã có kiểu. Chưa có ảnh ⇒ chỉ nền app (03/11 bỏ khung xương).
  * Kèm: app đang toàn màn mà bị Android đóng hộp vùng tai thỏ (dải đen) ⇒ báo lại `viewport-fit=cover` NGAY lúc mở (trước đây chờ mảnh «Trong»).
  */
-export function moKhungTinh(w: any, d: any, css: string[], xuong: string, khoa: string, khoaPhien: string): void {
+export function moKhungTinh(w: any, d: any, css: string[], khoa: string, khoaPhien: string): void {
   try {
     var l = w.location, duong = String(l.pathname || '').toLowerCase(), q = String(l.search || '')
     var laHs = /^\/(?:hs|hoc-sinh|hocsinh)\/?$/.test(duong) || (/^\/?$/.test(duong) && /[?&]vai=hocsinh/.test(q))
@@ -69,7 +55,9 @@ export function moKhungTinh(w: any, d: any, css: string[], xuong: string, khoa: 
     // Khổ màn so bằng media query (đọc innerWidth lúc này ép trình duyệt tính bố cục giữa lúc phân tích HTML — đo CPU ×4: ~11 ms).
     var kho = k && k.w > 0 && w.matchMedia && w.matchMedia('(min-width: ' + (k.w - 47) + 'px) and (max-width: ' + (k.w + 47) + 'px)').matches
     var dung = k && k.v === 2 && k.sbd === String(p.sbd || '').trim() && k.ngay === hom && kho && typeof k.html === 'string'
-    var html = dung ? k.html : xuong
+    // Chưa có ảnh hợp lệ (ngày khác, khổ khác, máy chưa chụp) ⇒ lớp phủ CHỈ NỀN app (thầy 03/11, ảnh F5 ở màn làm bài: «hiện cái này rất nhanh, xoá đi» — khung
+    // xương thanh xám + 6 vòng chặng của Lộ trình cũ loé lên, không giống màn Kính). Tờ kiểu vẫn chặn vẽ ⇒ khung đầu đã đúng nền, rồi app vẽ thẳng.
+    var html = dung ? k.html : ''
     var g = d.documentElement
     g.setAttribute('data-trong', 'hs')
     g.setAttribute('data-ht2', '')

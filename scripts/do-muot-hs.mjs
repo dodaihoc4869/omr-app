@@ -384,6 +384,7 @@ try {
     await cdp.send('Page.startScreencast', { format: 'jpeg', quality: 70, everyNthFrame: 1 })
     await p.waitForTimeout(400)
     t0 = (await p.evaluate(() => performance.timeOrigin + performance.now()))
+    if (arg('quay-xoa', '')) await p.evaluate(() => localStorage.removeItem('ddh.khung-tinh-hs')) // --quay-xoa=1: máy CHƯA có ảnh tĩnh (khác ngày / khác khổ)
     await p.reload({ waitUntil: 'commit' })
     const vet = []
     const xem = () => p.evaluate(() => { const e = document.elementFromPoint(60, 16); const c = []; for (let x = e; x && c.length < 6; x = x.parentElement) c.push((x.className && typeof x.className === 'string' ? x.className : x.tagName).slice(0, 60)); return { t: Math.round(performance.now()), c: c.join(' < '), top: Math.round(document.querySelector('.kb-hero')?.getBoundingClientRect().top ?? -1) } }).catch(() => null)

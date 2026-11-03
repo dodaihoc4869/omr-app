@@ -584,3 +584,4 @@ html[data-trong='hs'] .kb-mol .kb-mol-bong { position: relative; flex: 0 1 auto;
 html[data-trong='hs'] .kb-mol .kb-mol-bong::before { display: block; left: -7px; top: calc(50% - 6px); bottom: auto; width: 12px; height: 12px; transform: rotate(45deg); }
 html[data-trong='hs'] .kb-mol .kb-mol-bong[data-cx], html[data-trong='hs'] .kb-mol .kb-mol-bong[data-cx]::before {
   background: var(--bb-nen, var(--tr-mat)); border-color: var(--bb-vien, var(--tr-vien-2)); color: var(--bb-chu, var(--tr-chu)); transition: background-color .3s, border-color .3s, color .3s; }
+

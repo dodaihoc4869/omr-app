@@ -1,0 +1,4 @@
+/* KHÔNG KHUNG XƯƠNG (thầy 03/11, ảnh F5 màn làm bài: «hiện cái này rất nhanh, xoá đi … màn nào load bị vậy nữa xoá sạch»): mọi khối / thanh / chip xám giữ chỗ
+   lúc đang tải của app học sinh vẫn GIỮ CHỖ (không nhảy bố cục) nhưng TRONG SUỐT, không nhấp nháy ⇒ chỉ thấy nền rồi nội dung hiện ra. */
+html[data-trong='hs'] :is(.m3-xuong, .tlu-xuong, .tcl-xuong, .ktcn-xuong span, .ht2-hn-xuong > span, .ht2-hn-chip-xuong, .ht2-cho-tab, .xd-xuong) {
+  background: transparent !important; border-color: transparent !important; box-shadow: none !important; animation: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }

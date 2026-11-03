@@ -15,6 +15,7 @@
  *   (đề, phương án thu lên trên dải — không bị dải phủ như trước).
  * Hàng lưới: 1 thanh trên · 2 viên chuỗi đúng (thưởng) · 3 cột phải = min(nội dung, chỗ còn lại) · 4 «Kiểm tra» / thẻ kết quả · 5 phần trống. ── */
 :root[data-trong] .duo-cuon { display: none; }
+:root[data-trong] .duo-chon { display: none; } /* điện thoại dọc: thẻ «Chọn cách làm» ẩn, giữ dải hai nút (thầy 27/10) — khổ rộng hiện ở dưới */
 
 @media (orientation: landscape) and (min-width: 640px), (min-width: 700px) and (min-aspect-ratio: 10/13) {
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) {
@@ -61,6 +62,29 @@
   /* CÂU MỚI («Học cách giải» · «Tự làm câu này», chưa có phương án): hai nút xếp dọc, giữa cột phải ngang tầm đề — trước: một cột, nút dính đáy, nửa màn trống */
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong])[data-chon-cach] > .duo-day { grid-row: 3 / -1; align-self: center; }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong])[data-chon-cach] > .duo-day .duo-hai { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  /* 03/11 (thầy «bố cục hợp lý xịn hơn»): thẻ «Chọn cách làm» ở cột phải, canh đầu ngang tầm đề, thay dải hai nút */
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong])[data-chon-cach] > .duo-day:not(.duo-ket) { display: none; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong])[data-chon-cach] .duo-cot-tra { grid-row: 3 / -1; padding-top: 4px; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon {
+    display: flex; flex-direction: column; gap: 12px; padding: 22px 20px 20px; border-radius: 28px; background: var(--kinh-ve, var(--tr-mat));
+    -webkit-backdrop-filter: var(--kinh-mo-ve); backdrop-filter: var(--kinh-mo-ve);
+    box-shadow: inset 0 1px 0 var(--kinh-vien, transparent), inset 0 0 0 1px var(--kinh-vien-2, var(--tr-vien)), var(--kinh-bong, none);
+  }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-nhan { margin: 0; font-size: 12.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--tr-hs-chu); }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-tieu { margin: -4px 0 4px; font-size: 22px; font-weight: 800; line-height: 1.25; color: var(--tr-chu); }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-o {
+    display: flex; align-items: center; gap: 14px; width: 100%; min-height: 76px; padding: 12px 16px 12px 12px; border: 0; border-radius: 22px; text-align: left;
+    font: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform .12s ease, box-shadow .12s ease;
+  }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-o[data-sac='vang'] { background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--tr-chu-y) 45%, transparent), 0 3px 0 color-mix(in oklab, var(--tr-chu-y) 35%, transparent); }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-o[data-sac='chinh'] { background: var(--tr-hs-day); color: var(--tr-hs-tren); box-shadow: 0 4px 0 var(--tr-hs-chu), 0 14px 28px -14px var(--tr-hs-day); }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-o:active { transform: translateY(2px); }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-o:focus-visible { outline: 3px solid var(--tr-chinh); outline-offset: 3px; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-ic { flex: none; display: grid; place-items: center; width: 50px; height: 50px; border-radius: 16px; background: color-mix(in oklab, currentColor 14%, transparent); }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-chu { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-chu b { font-size: 19px; font-weight: 800; line-height: 1.2; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-chu small { font-size: 14px; font-weight: 600; line-height: 1.35; opacity: .86; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-di { flex: none; opacity: .7; }
 
   /* THANH CUỘN VẼ TAY (ThanhCuon.tsx): lớp phủ CÙNG ô lưới với cột, không nằm trong vùng cuộn ⇒ đứng yên; rãnh mảnh + con trượt mép phải, bóng mờ đáy */
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-than > .duo-cuon {
