@@ -74,3 +74,9 @@ describe('khuôn svg (vẽ tự do, thầy 03/11: hình SGK vẽ lại thoải m
   ])('chặn %s', (_t, s) => { expect(kiemCanhHinh(svg(s), PA).ok).toBe(false) })
   it('khung sai cỡ ⇒ bỏ', () => { expect(kiemCanhHinh(svg(TOT, { rong: 5000 }), PA).ok).toBe(false) })
 })
+
+it('ảnh không có chữ: svg không nhãn vẫn đạt, khuôn khác thì không', () => {
+  expect(phienAmKhop([], [])).toBe(true)
+  expect(kiemCanhHinh({ tieuDe: 'Hình minh hoạ', canh: { loai: 'svg', rong: 200, cao: 120, svg: '<circle cx="50" cy="50" r="20" class="f-sao s-chu nc"/>' } }, []).ok).toBe(true)
+  expect(kiemCanhHinh(soDo(), []).ok).toBe(false)
+})

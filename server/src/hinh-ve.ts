@@ -20,6 +20,8 @@ const mangChu = (v: unknown, tran: number, dai = 300) => (Array.isArray(v) ? v :
 
 export const PHUT_GIU_VIEC_HINH = 45
 export const SO_LAN_TOI_DA_HINH = 3
+/** Thầy 03/11: «ko hình nào được dùng hình cũ» — máy KHÔNG tự xin giữ gốc; hàng chờ phát lại tới chừng này lượt rồi dừng để báo thầy xem tay. */
+export const SO_LAN_PHAT_TOI_DA_HINH = 8
 /** Ảnh nhỏ hơn mốc này (ký tự data URL) là icon / gạch trang trí, không vẽ lại. */
 const CO_TOI_THIEU = 2500
 
@@ -105,7 +107,7 @@ export async function layViecHinh(env: Env, b: Obj) {
   const maLuot = crypto.randomUUID(), nhanLuc = new Date(nay).toISOString()
   await env.DB.prepare(
     `UPDATE hinh_ve_viec SET trang_thai = 'dang', ma_luot = ?, nhan_luc = ?, so_lan = so_lan + 1
-     WHERE bam IN (SELECT bam FROM hinh_ve_viec WHERE trang_thai = 'cho' ORDER BY ${b.ngauNhien === true ? 'RANDOM()' : 'ma_de, qid_mau'} LIMIT ?)`,
+     WHERE bam IN (SELECT bam FROM hinh_ve_viec WHERE trang_thai = 'cho' AND so_lan < ${SO_LAN_PHAT_TOI_DA_HINH} ORDER BY ${b.ngauNhien === true ? 'RANDOM()' : 'ma_de, qid_mau'} LIMIT ?)`,
   ).bind(maLuot, nhanLuc, so).run()
   const nhan = (await env.DB.prepare('SELECT * FROM hinh_ve_viec WHERE ma_luot = ? ORDER BY ma_de, qid_mau').bind(maLuot).all<Obj>()).results ?? []
   if (!nhan.length) return { ok: true, het: true, viec: [] }
@@ -131,16 +133,16 @@ export async function nopHinh(env: Env, b: Obj) {
   if (!ton) return { ok: false, error: 'Không có việc này' }
   const a1 = mangChu(b.phienAm1, 80, 120), a2 = mangChu(b.phienAm2, 80, 120)
   let cong = 'dat', lyDo = '', canh: string | null = null
-  if (b.giuGoc === true) { cong = 'giu_goc'; lyDo = str(b.lyDo).slice(0, 200) || 'khuôn chưa hỗ trợ' }
-  else if (!phienAmKhop(a1, a2)) { cong = 'giu_goc'; lyDo = 'hai lượt phiên âm lệch nhau — giữ ảnh gốc' }
+  if (b.giuGoc === true) { cong = 'lech'; lyDo = `máy xin giữ gốc: ${str(b.lyDo).slice(0, 160) || 'không rõ lý do'} — vẽ lại` }
+  else if (!phienAmKhop(a1, a2)) { cong = 'lech'; lyDo = 'hai lượt phiên âm lệch nhau — làm lại' }
   else {
     const k = kiemCanhHinh(b.canh, a1)
     if (k.ok) canh = JSON.stringify(k.hinh)
     else { cong = 'lech'; lyDo = k.lyDo }
   }
   const nay = new Date().toISOString()
-  const heLan = Number(ton.so_lan ?? 0) >= SO_LAN_TOI_DA_HINH
-  if (cong === 'lech' && heLan) { cong = 'giu_goc'; lyDo = `${lyDo} (đủ ${SO_LAN_TOI_DA_HINH} lần)`.slice(0, 220) }
+  const heLan = Number(ton.so_lan ?? 0) >= SO_LAN_PHAT_TOI_DA_HINH
+  if (cong === 'lech' && heLan) { cong = 'giu_goc'; lyDo = `${lyDo} (đủ ${SO_LAN_PHAT_TOI_DA_HINH} lần — cần thầy xem tay)`.slice(0, 220) }
   await env.DB.batch([
     env.DB.prepare(
       `INSERT INTO hinh_ve (bam, canh_json, cong, ly_do, phien_am, phien_ban, so_lan, tao_luc) VALUES (?,?,?,?,?,?,1,?)

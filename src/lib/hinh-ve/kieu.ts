@@ -33,6 +33,7 @@ export function chuanChuHinh(t: unknown): string {
 /** Hai lượt phiên âm độc lập khớp nhau? Mỗi mục lượt này nằm trong chuỗi chuẩn hoá của lượt kia, ≥ 90 % cả hai chiều (ảnh nhiễu cho phép lệch ít). */
 export function phienAmKhop(a: readonly string[], b: readonly string[]): boolean {
   const ca = chuanChuHinh(a.join('')), cb = chuanChuHinh(b.join(''))
+  if (!ca && !cb) return true // ảnh không có chữ: hai lượt cùng thấy trống
   if (!ca || !cb) return false
   const ty = (xs: readonly string[], kho: string) => { const m = xs.map(chuanChuHinh).filter(Boolean); return m.length ? m.filter((x) => kho.includes(x)).length / m.length : 0 }
   return ty(a, cb) >= 0.9 && ty(b, ca) >= 0.9
@@ -157,7 +158,7 @@ export function kiemCanhHinh(tho: unknown, phienAm: readonly string[]): { ok: tr
   }
   if (!canh) return { ok: false, lyDo: 'khuôn cảnh chưa hỗ trợ' }
   const kho = chuanChuHinh(phienAm.join(''))
-  if (!kho) return { ok: false, lyDo: 'thiếu phiên âm ảnh' }
+  if (!kho && canh.loai !== 'svg') return { ok: false, lyDo: 'thiếu phiên âm ảnh' } // ảnh không chữ chỉ vẽ được bằng khuôn svg không nhãn
   if (tieuDe !== TIEU_DE_CHUNG[canh.loai] && !kho.includes(chuanChuHinh(tieuDe))) return { ok: false, lyDo: `tiêu đề «${tieuDe.slice(0, 30)}» phải là «${TIEU_DE_CHUNG[canh.loai]}» hoặc chú thích có trong ảnh` }
   const la = chuTrongCanh(canh).filter((t) => chuanChuHinh(t)).find((t) => !kho.includes(chuanChuHinh(t)))
   if (la !== undefined) return { ok: false, lyDo: `chữ «${la.slice(0, 24)}» không có trong ảnh gốc (không được thêm thông tin)` }

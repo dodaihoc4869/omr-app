@@ -16,6 +16,7 @@ function chuanChuHinh(t) {
 }
 function phienAmKhop(a, b) {
   const ca = chuanChuHinh(a.join("")), cb = chuanChuHinh(b.join(""));
+  if (!ca && !cb) return true;
   if (!ca || !cb) return false;
   const ty = (xs, kho) => {
     const m = xs.map(chuanChuHinh).filter(Boolean);
@@ -174,7 +175,7 @@ function kiemCanhHinh(tho, phienAm) {
   }
   if (!canh) return { ok: false, lyDo: "khuôn cảnh chưa hỗ trợ" };
   const kho = chuanChuHinh(phienAm.join(""));
-  if (!kho) return { ok: false, lyDo: "thiếu phiên âm ảnh" };
+  if (!kho && canh.loai !== "svg") return { ok: false, lyDo: "thiếu phiên âm ảnh" };
   if (tieuDe !== TIEU_DE_CHUNG[canh.loai] && !kho.includes(chuanChuHinh(tieuDe))) return { ok: false, lyDo: `tiêu đề «${tieuDe.slice(0, 30)}» phải là «${TIEU_DE_CHUNG[canh.loai]}» hoặc chú thích có trong ảnh` };
   const la = chuTrongCanh(canh).filter((t) => chuanChuHinh(t)).find((t) => !kho.includes(chuanChuHinh(t)));
   if (la !== void 0) return { ok: false, lyDo: `chữ «${la.slice(0, 24)}» không có trong ảnh gốc (không được thêm thông tin)` };

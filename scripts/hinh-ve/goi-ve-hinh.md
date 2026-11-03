@@ -3,7 +3,7 @@
 Ảnh trong `vao/img/<bam>.png`; `vao/<bam>.json` có `de` (ngữ cảnh), `phienAm` = chữ chép nguyên văn từ ảnh (nguồn chữ DUY NHẤT được dùng).
 Với MỖI ảnh: mở bằng Read, chọn khuôn, ghi `ra/<bam>.json`, rồi chạy `node kiem.mjs` tới khi ĐẠT.
 
-## Năm khuôn (thầy 03/11: hình trong SGK vẽ lại thoải mái — khuôn thứ 5 «svg» nhận MỌI hình còn lại; chỉ khi thật sự không vẽ nổi mới `{ "giuGoc": true, "lyDo": "…" }`)
+## Năm khuôn (thầy 03/11: hình trong SGK vẽ lại thoải mái — khuôn thứ 5 «svg» nhận MỌI hình còn lại; **KHÔNG ĐƯỢC giữ ảnh gốc: thầy yêu cầu «không hình nào được dùng hình cũ». Mọi ảnh đều phải ra cảnh**)
 - **so-do** (sơ đồ khối / chuyển hoá): `{ "tieuDe", "canh": { "loai": "so-do", "o": [{ "id","chu","x","y" }…], "noi": [{ "tu": [id…], "den": id, "nhan"?, "so"? }…] } }`.
   `x`,`y` là % khung 0–100: x trong **[22, 78]** (ô rộng ~38 %), y theo hàng từ trên xuống, cách nhau ≥ 18. `noi.tu` 1–3 ô nguồn (2–3 nguồn = gộp vào một ô đích). `so` = số bước «(1)» viết «1»; `nhan` = điều kiện trên mũi tên.
 - **do-thi** (phổ khối lượng, đồ thị cột / que): `{ "loai": "do-thi", "truc": { "x","y","xMin","xMax","yMax","xVach":[…],"yVach":[…] }, "que": [{ "x","y","nhan"? }…] }`. `xMin/xMax` chừa lề 0,5 đơn vị; `yMax` ≥ mọi que; số trên trục chép đúng như ảnh.
@@ -15,7 +15,7 @@ Với MỖI ảnh: mở bằng Read, chọn khuôn, ghi `ra/<bam>.json`, rồi c
     · Mọi hình khối: `class="f-… s-chu nc"`; đường nối: `class="f-khong s-chu nc"`; chữ: `<text x y text-anchor="middle" class="t-chu t-dam">…</text>`.
   - Mỗi nhãn chữ là MỘT thẻ text; chữ nằm trong `phienAm` (luật 1). Hạt electron / hạt nhân / dấu cộng–trừ vẽ bằng hình (circle, path), KHÔNG tạo chữ mới ngoài ảnh.
   - Tối đa 400 thẻ, 24 KB, 60 nhãn. Vẽ xong HÃY mở lại ảnh gốc đối chiếu: đủ thành phần, đúng số lượng (vd số electron mỗi lớp), đúng vị trí tương đối; thiếu / sai ⇒ sửa.
-Chỉ `giuGoc` với: ảnh chụp thật (ảnh thật có phối cảnh, ánh sáng), bản đồ / tranh phức tạp, bảng nhiều ô chữ dày.
+Ảnh chụp thật / tranh phức tạp / bảng dày chữ: vẽ lại dạng MINH HOẠ ĐƠN GIẢN (nét phẳng) giữ đủ thành phần và nhãn chữ của ảnh. Ảnh KHÔNG có chữ: `svg` không có thẻ text, `tieuDe` = «Hình minh hoạ». Bảng chữ nhiều ô: dựng bảng bằng rect + text (≤ 60 nhãn; quá thì gộp ô bằng cách chia hai hình không được — vẫn vẽ phần quan trọng nhất và các nhãn có trong phiên âm).
 
 ## LUẬT AN TOÀN (máy chủ kiểm — sai là bỏ cảnh)
 1. MỌI chữ / số trong cảnh phải nằm trong `phienAm` của ảnh. KHÔNG thêm thông tin, KHÔNG «đoán» ẩn: X, T, Y, Q, Z giữ nguyên; không viết tên chất mà ảnh không ghi.
@@ -23,4 +23,4 @@ Chỉ `giuGoc` với: ảnh chụp thật (ảnh thật có phối cảnh, ánh 
 3. Số đo (độ cao que, vị trí) đọc từ ảnh cho sát; nhãn số trong ảnh là chuẩn.
 4. Chữ trong cảnh không đè nhau: app tự xếp nhãn, bạn chỉ cần chia ô thưa (khoảng cách hàng ≥ 18 %).
 5. Đọc `vi-du-hinh.json` (4 mẫu thầy duyệt) một lần trước khi làm.
-Chỉ dùng Read, Write, Edit và `node kiem.mjs`. Trả lời cuối đúng 1 dòng: số ảnh ĐẠT / giữ gốc.
+Không dùng `giuGoc` (máy chủ sẽ phát lại ảnh đó). Chỉ dùng Read, Write, Edit và `node kiem.mjs`. Trả lời cuối đúng 1 dòng: số ảnh ĐẠT / giữ gốc.

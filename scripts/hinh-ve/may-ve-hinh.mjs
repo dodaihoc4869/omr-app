@@ -102,7 +102,7 @@ async function motLuong(luong) {
       if (a && b && phienAmKhop(a, b)) phienAm.set(v.bam, a)
     }
     // 2) vẽ cảnh (chỉ các ảnh có phiên âm khớp và có chữ)
-    const canVe = viec.filter((v) => phienAm.get(v.bam)?.length)
+    const canVe = viec.filter((v) => phienAm.has(v.bam))
     let dC = null
     if (canVe.length) {
       dC = dungThuMuc(`${luong}-${ma}-ve`, canVe, phienAm)
@@ -118,14 +118,13 @@ async function motLuong(luong) {
       const k = khop.get(v.bam)
       let body
       if (!k.a || !k.b) { console.log(`  ${v.bam}: phiên âm thiếu — để máy chủ giữ hàng chờ`); continue }
-      if (!k.ok) body = { bam: v.bam, giuGoc: true, lyDo: 'hai lượt phiên âm lệch nhau', phienAm1: k.a, phienAm2: k.b }
-      else if (!k.a.length) body = { bam: v.bam, giuGoc: true, lyDo: 'ảnh không có chữ — giữ ảnh gốc', phienAm1: k.a, phienAm2: k.b }
+      if (!k.ok) { console.log(`  ${v.bam}: hai lượt phiên âm lệch — nộp để máy chủ phát lại (không giữ ảnh gốc)`); body = { bam: v.bam, giuGoc: true, lyDo: 'hai lượt phiên âm lệch nhau', phienAm1: k.a, phienAm2: k.b } }
       else {
         const ra = dC ? docJson(path.join(dC, 'ra', `${v.bam}.json`)) : null
         if (!ra) { console.log(`  ${v.bam}: chưa có cảnh — để máy chủ giữ hàng chờ`); continue }
         body = ra.giuGoc === true ? { bam: v.bam, giuGoc: true, lyDo: String(ra.lyDo || 'khuôn chưa hỗ trợ'), phienAm1: k.a, phienAm2: k.b } : { bam: v.bam, canh: ra, phienAm1: k.a, phienAm2: k.b }
       }
-      if (co('--thu')) { console.log(`  ${v.bam}: ${body.giuGoc ? 'GIỮ GỐC · ' + body.lyDo : 'có cảnh ' + (body.canh?.canh?.loai || '?')} (chạy thử, không nộp)`); continue }
+      if (co('--thu')) { console.log(`  ${v.bam}: ${body.giuGoc ? 'XIN GIỮ GỐC (sẽ bị phát lại) · ' + body.lyDo : 'có cảnh ' + (body.canh?.canh?.loai || '?')} (chạy thử, không nộp)`); continue }
       const r = await goi('/kho/hinh-ve/nop', body)
       dem.nop++
       if (r.ok && r.ket === 'dat') { dem.dat++; dong.dat++ } else if (r.ok && r.ket === 'giu_goc') { dem.giuGoc++; dong.giuGoc++ } else { dem.lech++; dong.lech++; console.log(`  ${v.bam}: ${String(r.lyDo || r.error || '').slice(0, 140)}`) }
