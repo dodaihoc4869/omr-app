@@ -669,9 +669,10 @@
     "byteSvg": 22392,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
-    "trangThai": "da-soat-doc-lap",
+    "trangThai": "can-soat-lai-thieu-tick",
     "hashSvgDaSoat": "a3c6843ca3a9a836d62e40bfa7b313221ce72523e0e8b4def6ef2254e5680c66",
-    "nguoiSoat": "soat_hinh_vector"
+    "nguoiSoat": "soat_hinh_vector",
+    "lyDoThuHoi": "Bản đang chọn thiếu6tickX nhìn thấy ở nguồn404; tạm ngưng mọi biến thể cũ của nguồn này, không fallback khi chờ bản mới."
   },
   {
     "i": 476,

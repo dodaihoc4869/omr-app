@@ -1,0 +1,34 @@
+[
+  {
+    "i": 528,
+    "hashSvg": "641e564b1f9968eebf875e690d54d1ed3b75f9c8bd920249cbe27436ecd3c778",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã mở riêng PNG nguồn, PNG base và render thật của đúng SVG/hash; đối chiếu đủ nhãn/H/charge/stereo/ticks/guide. Cùng H–O–H thẳng,hai liênkếtđơn và haiH tường minh;khôngnhãn/chargekhác. Đã mởsource528/base175/renderSVG.",
+    "hash": "636f342a2b40a8ae498de358247340764ce31174c120c8f0dc455268f2a91fbf",
+    "hashSvgDaSoat": "641e564b1f9968eebf875e690d54d1ed3b75f9c8bd920249cbe27436ecd3c778"
+  },
+  {
+    "i": 124,
+    "hashSvg": "0d44a134f2e9e2f8f367769d9f08eaf74dc0e7a6f218bac07503288bab368d50",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã mở riêng PNG nguồn, PNG base và render thật của đúng SVG/hash; đối chiếu đủ nhãn/H/charge/stereo/ticks/guide. Cùng grid4panel(1)..(4):Ala–Gly;Ala–Ala;H2N–CH(CH3)–CO–O–CH2–COOH;(4)betaAla–Gly với2CH2trướcamide. GiữNH/NH2,esterOở(3),khôngstereo. Đã mởsource124/base814/renderSVG.",
+    "hash": "172229783df2f93d338a745c8aa11a8957e068b0c2c510d456fba5bd61396814",
+    "hashSvgDaSoat": "0d44a134f2e9e2f8f367769d9f08eaf74dc0e7a6f218bac07503288bab368d50"
+  },
+  {
+    "i": 384,
+    "hashSvg": "33f04ac59e942c2c18043a5ac77b1ad7cf3857a44a3cd74e9b9c9c5330bd8bb5",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã mở riêng PNG nguồn, PNG base và render thật của đúng SVG/hash; đối chiếu đủ nhãn/H/charge/stereo/ticks/guide. Cùng4đồthị(1)..(4),trụcn/t/0/0,1,cácnétđứtplateau:(1)congtăngtớimứcdưới0,1;(2)congtăngtới0,1;(3)thẳngtăngtới0,1rồigãyngang;(4)conggiảmtừ0,1tớiplateaudương. Đã mở3ảnh.",
+    "hash": "44b3f6c9c5ada7945e3554b454759c41eda3f50305bd4c0b37f9979dc6437d05",
+    "hashSvgDaSoat": "33f04ac59e942c2c18043a5ac77b1ad7cf3857a44a3cd74e9b9c9c5330bd8bb5"
+  },
+  {
+    "i": 433,
+    "hashSvg": "33f04ac59e942c2c18043a5ac77b1ad7cf3857a44a3cd74e9b9c9c5330bd8bb5",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã mở riêng PNG nguồn, PNG base và render thật của đúng SVG/hash; đối chiếu đủ nhãn/H/charge/stereo/ticks/guide. Cùng4đồthị(1)..(4),đủn/t/0/0,1,mũitên,nétđứtvàđiểmgãy/plateau nhưbase144. Khôngkhácnhãn/phươngán. Đã mở3ảnh.",
+    "hash": "4dde1b5dfb49f3ea33d4c9c547e565a1c90a72c77555f81d499105b6ea9247dd",
+    "hashSvgDaSoat": "33f04ac59e942c2c18043a5ac77b1ad7cf3857a44a3cd74e9b9c9c5330bd8bb5"
+  }
+]

@@ -1,0 +1,33 @@
+[
+  {
+    "i": 1299,
+    "hash": "eb54144153c9d07f903ac258d5b05d61cefdc40e1029145b764411dbd0321918",
+    "file": "anh/eb54144153c9d07f903ac258d5b05d61cefdc40e1029145b764411dbd0321918.png",
+    "baseI": 814,
+    "baseHash": "969dc1ed72ac05e46c6fe936c5fe3ed20a92a1cb19742dbd9599a676c2c22a07",
+    "baseFile": "anh/969dc1ed72ac05e46c6fe936c5fe3ed20a92a1cb19742dbd9599a676c2c22a07.png",
+    "baseSvg": "cau-truc-ddh-0d44a134f2e9e2f8f367769d9f08eaf74dc0e7a6f218bac07503288bab368d50.svg",
+    "baseHashSvg": "0d44a134f2e9e2f8f367769d9f08eaf74dc0e7a6f218bac07503288bab368d50",
+    "score": 11.256,
+    "ph": 10,
+    "dh": 1,
+    "ratio": 0.063,
+    "refs": 2,
+    "tepSVG": "cau-truc-ddh-0d44a134f2e9e2f8f367769d9f08eaf74dc0e7a6f218bac07503288bab368d50.svg",
+    "hashSvgDaMo": "0d44a134f2e9e2f8f367769d9f08eaf74dc0e7a6f218bac07503288bab368d50",
+    "daMoRiengPNGSourceBaseVaSVGRender": true,
+    "ketLuan": "Cùng nội dung; có thể dùng lại SVG đã đạt",
+    "khacBietCanDungLai": [],
+    "bangChung": "Cùng4panel(1)Ala–Gly,(2)Ala–Ala,(3)Ala–O–CH₂COOH ester khôngNH,(4)betaAla–Gly2CH₂ trước carbonyl. MọiC/O/NH/NH₂/nhãn1..4 khớp. Khôngnêm/điệntích/vòng. SVG thật giữđủ từngpanel,2cộtreflow khôngmấtngữcảnh.",
+    "fileNguon": "anh/eb54144153c9d07f903ac258d5b05d61cefdc40e1029145b764411dbd0321918.png",
+    "svg": "cau-truc-ddh-0d44a134f2e9e2f8f367769d9f08eaf74dc0e7a6f218bac07503288bab368d50.svg",
+    "hashSvg": "0d44a134f2e9e2f8f367769d9f08eaf74dc0e7a6f218bac07503288bab368d50",
+    "byteSvg": 45264,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "nguoiDocNguon": "cau_truc_5",
+    "hashSvgDaSoat": "0d44a134f2e9e2f8f367769d9f08eaf74dc0e7a6f218bac07503288bab368d50",
+    "nguoiSoat": "cau_truc_5"
+  }
+]

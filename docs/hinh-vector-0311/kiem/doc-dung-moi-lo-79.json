@@ -1,0 +1,536 @@
+[
+  {
+    "i": 870,
+    "hash": "9e853dc325dddbe7c58462e4e89158a25484fe337451e0773c3c52d5818e5375",
+    "fileNguon": "anh/9e853dc325dddbe7c58462e4e89158a25484fe337451e0773c3c52d5818e5375.png",
+    "questions": [
+      {
+        "qid": "DB-10-B2-D2-I-127",
+        "de": "Đồng có hai đồng vị bền trong tự nhiên là ⁶³Cu và ⁶⁵Cu.\nNguyên tử khối trung bình của đồng là 63,55 (điện tích z của các ion đồng vị đồng đều bằng 1+).\nHình vẽ phổ khối nào dưới đây là đúng?",
+        "refs": [
+          {
+            "where": "DB-10-B2-D2-I-127.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B4-D1-I-8",
+        "de": "Đồng có hai đồng vị bền trong tự nhiên là ⁶³Cu và ⁶⁵Cu.\nNguyên tử khối trung bình của đồng là 63,55 (điện tích z của các ion đồng vị đồng đều bằng 1+).\nHình vẽ phổ khối nào dưới đây là đúng?",
+        "refs": [
+          {
+            "where": "DH-10-C1-B4-D1-I-8.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      }
+    ],
+    "daMoNativeVaZoom4x": true,
+    "xLabel": "m/z",
+    "yLabel": "Phần trăm số nguyên tử đồng vị (%)",
+    "xTicks": [
+      20,
+      40,
+      60,
+      80,
+      100
+    ],
+    "yTicks": [
+      0,
+      20,
+      40,
+      60,
+      80
+    ],
+    "peakLabels": [],
+    "geometryPixel": {
+      "origin": [
+        57,
+        153
+      ],
+      "xTicks": [
+        [
+          90,
+          153
+        ],
+        [
+          123,
+          153
+        ],
+        [
+          157,
+          153
+        ],
+        [
+          190,
+          153
+        ],
+        [
+          223,
+          153
+        ]
+      ],
+      "yTicks": [
+        [
+          57,
+          153
+        ],
+        [
+          57,
+          119
+        ],
+        [
+          57,
+          84
+        ],
+        [
+          57,
+          49
+        ],
+        [
+          57,
+          14
+        ]
+      ],
+      "peaks": [
+        [
+          164,
+          28,
+          153
+        ],
+        [
+          169,
+          106,
+          153
+        ]
+      ]
+    },
+    "notes": "Haiđỉnhđenrấtmảnh;khôngcósốm/z hoặc% viếttrênđỉnh. KHÔNGtựthêm63/65 hoặc72,5/27,5từđềCu. Dựngliteraltheotọađộpixel kèmticks,chỉthayfont/nét;sourcexđỉnhcalibratekhôngchínhxác63/65nênkhôngápgiátrịlýthuyết.870đỉnhtráicao/phảithấp;1297tráithấp/phảicao. Khôngmũitêntrục/khungtrênphải/grid/captionnhãnA/C. CácnhãnA/Cthuộcvịtríapp,nguồnnativekhônghiện."
+  },
+  {
+    "i": 1297,
+    "hash": "eb48fab720e33ee4c342228403d60c1f8478e1842a3be726707a8ccd21ce0ba3",
+    "fileNguon": "anh/eb48fab720e33ee4c342228403d60c1f8478e1842a3be726707a8ccd21ce0ba3.png",
+    "questions": [
+      {
+        "qid": "DB-10-B2-D2-I-127",
+        "de": "Đồng có hai đồng vị bền trong tự nhiên là ⁶³Cu và ⁶⁵Cu.\nNguyên tử khối trung bình của đồng là 63,55 (điện tích z của các ion đồng vị đồng đều bằng 1+).\nHình vẽ phổ khối nào dưới đây là đúng?",
+        "refs": [
+          {
+            "where": "DB-10-B2-D2-I-127.hinh.2.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B4-D1-I-8",
+        "de": "Đồng có hai đồng vị bền trong tự nhiên là ⁶³Cu và ⁶⁵Cu.\nNguyên tử khối trung bình của đồng là 63,55 (điện tích z của các ion đồng vị đồng đều bằng 1+).\nHình vẽ phổ khối nào dưới đây là đúng?",
+        "refs": [
+          {
+            "where": "DH-10-C1-B4-D1-I-8.hinh.2.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      }
+    ],
+    "daMoNativeVaZoom4x": true,
+    "xLabel": "m/z",
+    "yLabel": "Phần trăm số nguyên tử đồng vị (%)",
+    "xTicks": [
+      20,
+      40,
+      60,
+      80,
+      100
+    ],
+    "yTicks": [
+      0,
+      20,
+      40,
+      60,
+      80
+    ],
+    "peakLabels": [],
+    "geometryPixel": {
+      "origin": [
+        56,
+        156
+      ],
+      "xTicks": [
+        [
+          89,
+          156
+        ],
+        [
+          123,
+          156
+        ],
+        [
+          156,
+          156
+        ],
+        [
+          190,
+          156
+        ],
+        [
+          223,
+          156
+        ]
+      ],
+      "yTicks": [
+        [
+          56,
+          156
+        ],
+        [
+          56,
+          121
+        ],
+        [
+          56,
+          87
+        ],
+        [
+          56,
+          52
+        ],
+        [
+          56,
+          17
+        ]
+      ],
+      "peaks": [
+        [
+          164,
+          107,
+          156
+        ],
+        [
+          169,
+          27,
+          156
+        ]
+      ]
+    },
+    "notes": "Haiđỉnhđenrấtmảnh;khôngcósốm/z hoặc% viếttrênđỉnh. KHÔNGtựthêm63/65 hoặc72,5/27,5từđềCu. Dựngliteraltheotọađộpixel kèmticks,chỉthayfont/nét;sourcexđỉnhcalibratekhôngchínhxác63/65nênkhôngápgiátrịlýthuyết.870đỉnhtráicao/phảithấp;1297tráithấp/phảicao. Khôngmũitêntrục/khungtrênphải/grid/captionnhãnA/C. CácnhãnA/Cthuộcvịtríapp,nguồnnativekhônghiện."
+  },
+  {
+    "i": 1068,
+    "hash": "c0a9de3b70290c00ca4bfeb786f60c24a362e634c6d85d7a04d259d2760b91fa",
+    "fileNguon": "anh/c0a9de3b70290c00ca4bfeb786f60c24a362e634c6d85d7a04d259d2760b91fa.png",
+    "questions": [
+      {
+        "qid": "11-C1-B1-I-5",
+        "de": "Cho 5.10⁻³ mol H₂ và 5.10⁻³ mol I₂ vào bình kín dung tích 1 lít và nung nóng đến 227 °C. Đồ thị biểu diễn sự thay đổi nồng độ các chất theo thời gian được cho trong hình sau:\nNồng độ của HI ở trạng thái cân bằng là",
+        "refs": [
+          {
+            "where": "11-C1-B1-I-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-11-B1-D1-I-5",
+        "de": "Cho 5.10⁻³ mol H₂ và 5.10⁻³ mol I₂ vào bình kín dung tích 1 lít và nung nóng đến 227 °C. Đồ thị biểu diễn sự thay đổi nồng độ các chất theo thời gian được cho trong hình sau:\nNồng độ của HI ở trạng thái cân bằng là",
+        "refs": [
+          {
+            "where": "DB-11-B1-D1-I-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daMoNative": true,
+    "canvas": [
+      957,
+      632
+    ],
+    "xLabel": "Thời gian",
+    "yLabel": "Nồng độ của chất phản ứng (10⁻³ M)",
+    "yTicks": [
+      0,
+      2,
+      4,
+      6,
+      8,
+      10
+    ],
+    "xTicks": [],
+    "guideLabels": [
+      "8,64",
+      "0,68"
+    ],
+    "caption": [
+      "Trạng thái cân bằng"
+    ],
+    "annotations": [
+      {
+        "text": [
+          "Nồng độ hydrogen iodide tăng",
+          "đến khi đạt tới trạng thái cân bằng"
+        ],
+        "arrow": {
+          "tail": [
+            404,
+            223
+          ],
+          "head": [
+            318,
+            223
+          ]
+        },
+        "textXY": [
+          408,
+          212
+        ]
+      },
+      {
+        "text": [
+          "Nồng độ hydrogen và iodine giảm",
+          "đến khi đạt tới trạng thái cân bằng"
+        ],
+        "arrow": {
+          "tail": [
+            399,
+            435
+          ],
+          "head": [
+            312,
+            435
+          ]
+        },
+        "textXY": [
+          409,
+          431
+        ]
+      }
+    ],
+    "geometry": {
+      "origin": [
+        141,
+        534
+      ],
+      "xArrowHead": [
+        911,
+        534
+      ],
+      "yArrowHead": [
+        141,
+        35
+      ],
+      "yTickPixel": [
+        [
+          0,
+          534
+        ],
+        [
+          2,
+          440
+        ],
+        [
+          4,
+          360
+        ],
+        [
+          6,
+          277
+        ],
+        [
+          8,
+          192
+        ],
+        [
+          10,
+          85
+        ]
+      ],
+      "guides": [
+        {
+          "y": 148,
+          "x1": 142,
+          "x2": 777,
+          "label": "8,64",
+          "labelXY": [
+            786,
+            152
+          ]
+        },
+        {
+          "y": 498,
+          "x1": 142,
+          "x2": 777,
+          "label": "0,68",
+          "labelXY": [
+            787,
+            501
+          ]
+        }
+      ],
+      "upCurve": "Bắtđầu(141,534),tăng cong lõm xuống,qua~(184,384),~(260,271),~(353,185),đạt(455,148),nằmngangtới~580.",
+      "downCurve": "Bắtđầu(142,315) tươngđương5,giảmconglõmlên,qua~(184,384),~(265,460),~(350,490),đạt(455,498),nằmngangtới~580."
+    },
+    "notes": "Hai mũitênchúthích hướngTRÁI nằmtrongkhoảnggiữa2curve,khôngđầumũitênchạmcurve (giữnhưnguồn). ĐườngdóngđứtnốiYđếnnhãnphải;curvephẳngchỉtớikhoảngx580,còndóngđứttớix777. TrụcYpixelnguồnhơiphi tuyến,giữcácgiátrịnhãn10/8/6/4/2/0 vàgiátrịplateau8,64/0,68;khôngtựsửacâuchữ. KhôngtickX/sốthờigian/nhãnHI/H₂+I₂khác."
+  },
+  {
+    "i": 1036,
+    "hash": "baf052db1cbbfb73a2c37cd22b37fe1f0d23d30ab27989d24f5d820700385d6f",
+    "fileNguon": "anh/baf052db1cbbfb73a2c37cd22b37fe1f0d23d30ab27989d24f5d820700385d6f.png",
+    "questions": [
+      {
+        "qid": "12-C2-B4-D2-I-7",
+        "de": "Phân tử β-glucose có cấu tạo như sau: Trong phân tử β-glucose, nhóm -OH ở vị trí carbon số mấy có khả năng phản ứng với ethanol khi có mặt của HCl khan, tạo thành ethyl glucoside?",
+        "refs": [
+          {
+            "where": "12-C2-B4-D2-I-7.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D2-I-23",
+        "de": "Phân tử β-glucose có cấu tạo như sau: Trong phân tử β-glucose, nhóm -OH ở vị trí carbon số mấy có khả năng phản ứng với ethanol khi có mặt của HCl khan, tạo thành ethyl glucoside?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-I-23.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daMoNative": true,
+    "kind": "haworth-literal-numbered",
+    "canvas": [
+      404,
+      345
+    ],
+    "vertices": {
+      "C1": [
+        333,
+        184
+      ],
+      "C2": [
+        251,
+        244
+      ],
+      "C3": [
+        129,
+        244
+      ],
+      "C4": [
+        52,
+        184
+      ],
+      "C5": [
+        129,
+        123
+      ],
+      "ringO": [
+        252,
+        123
+      ],
+      "C6label": [
+        128,
+        41
+      ]
+    },
+    "substituents": {
+      "C1": {
+        "down": "OH",
+        "up": null,
+        "carbonNumber": "1 đặt phải-trên"
+      },
+      "C2": {
+        "down": "OH",
+        "up": null,
+        "carbonNumber": "2 đặt trái-dướiC2"
+      },
+      "C3": {
+        "up": "OH",
+        "down": null,
+        "carbonNumber": "3 đặt phải-dướiC3"
+      },
+      "C4": {
+        "down": "OH",
+        "up": null,
+        "carbonNumber": "4 đặt trái-trênC4"
+      },
+      "C5": {
+        "up": "CH₂OH",
+        "down": null,
+        "carbonNumber": "5 đặt tráiC5"
+      },
+      "C6": {
+        "text": "CH₂OH",
+        "carbonNumber": "6 phía trên CH₂OH"
+      }
+    },
+    "notes": "KhôngbấtkỳHexplicit,khôngnhãnCởđỉnh,vòng6cạnh5C+1O. CạnhC4–C3,C3–C2,C2–C1đậm;C5–O vàO–C1 thường. CH₂OHlênC5;OH C1xuống,C2xuống,C3lên,C4xuống. Khôngđượcsửatheostemgọiβ:nguồnOH C1xuốngkhácβthường,giữlựachọn/hìnhnguyênvăn. PhảigiữđủsốC1..6;khôngđượcbỏsốhoặcthêmH."
+  },
+  {
+    "i": 772,
+    "hash": "9050cd76d148ad2f92ed83c2c5f84acb422d5407bb8188418ed59fe56d82966d",
+    "fileNguon": "anh/9050cd76d148ad2f92ed83c2c5f84acb422d5407bb8188418ed59fe56d82966d.png",
+    "questions": [
+      {
+        "qid": "12-C2-B4-D1-I-31",
+        "de": "Ở trạng thái rắn, glucose chủ yếu tồn tại ở dạng mạch vòng β-glucose.\nCông thức cấu trúc nào dưới đây là của β-glucose?",
+        "refs": [
+          {
+            "where": "12-C2-B4-D1-I-31.hinh.3.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-I-22",
+        "de": "Ở trạng thái rắn, glucose chủ yếu tồn tại ở dạng mạch vòng β-glucose.\nCông thức cấu trúc nào dưới đây là của β-glucose?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-22.hinh.3.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daMoNative": true,
+    "kind": "haworth-literal-pdf-label",
+    "canvas": [
+      298,
+      234
+    ],
+    "substituents": {
+      "C1": {
+        "up": "OH",
+        "down": "H"
+      },
+      "C2": {
+        "up": "OH",
+        "down": "H"
+      },
+      "C3": {
+        "up": "OH",
+        "down": "H"
+      },
+      "C4": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C5": {
+        "up": "CH₂OH",
+        "down": "H"
+      }
+    },
+    "notes": "VòngpyranoseOtrênphải,cạnhtrướcC4–C3–C2–C1đậm;mọiH/OHexplicit;khôngsốC/charge. Cùngnội dungcấutrúc788nhưngảnh772cónhãncắtD. ởméptráidưới (chỉphầnvòngcungphải+chấmcònthấy). Khôngtựphụchồibêntráibịcắthoặcbỏnhãn.",
+    "pdfLabelInvestigation": {
+      "allRefPositions": [
+        "sau_de",
+        "sau_de"
+      ],
+      "anySauPaD": false,
+      "stemCallsD": false,
+      "allRefsAsHinhIndex": 3,
+      "conclusion": "Cả2qidđềuchứahình3sau_de,chưaánhxạsau_pa_Dcôngkhai. Stemchỉhỏicấutrúcβ-glucose,khônggọiD. Khôngđủđiềukiệnxácnhậnnhãntrùngappđểbỏ. ĐềxuấtgiữriêngphầnnhãnPDFvàrootquyếtđịnhmappingkhiđủbằngchứng;phầncấutrúcdựngtheonotes."
+    }
+  }
+]

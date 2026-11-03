@@ -1,0 +1,18 @@
+[
+  {
+    "i": 404,
+    "hashSvg": "b1e9a586830f79ee9044689b32d1d167e68cfd61bfb598d342c8751d00e7d049",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG nguồn native và SVG render thật mới. Đủ nhãn X0/10/20/30/37/40/50/60; 6 vạch tick ngang10/20/30/40/50/60 đúng vị trí, không thêm ticksY. Đường cong tăng từ gốc đến cực đại37 rồi giảm về trục ở50, không kéo nét cong sang60; guide37 nét đứt thẳng đứng từ đỉnh đến trục. Hai trục mũi tên lên/phải, đúng Tốc độ phản ứng/Nhiệt độ (°C), không sốY/đơn vị mới/caption. Chữ37 và40 gần nhau theo nguồn nhưng không chạm. Font DDH đầy đủ dấu/chỉ số°, path-only0text/0href, hashfont thật khớp app; không cắt/tràn. SHA thực khớpmetadata.",
+    "hash": "4742d9ecfbbf83bd084bf2c93f267b84f2871d4e347f25246cc021a44505e216",
+    "hashSvgDaSoat": "b1e9a586830f79ee9044689b32d1d167e68cfd61bfb598d342c8751d00e7d049"
+  },
+  {
+    "i": 525,
+    "hashSvg": "b1e9a586830f79ee9044689b32d1d167e68cfd61bfb598d342c8751d00e7d049",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG nguồn native và SVG render thật mới. Đủ nhãn X0/10/20/30/37/40/50/60; 6 vạch tick ngang10/20/30/40/50/60 đúng vị trí, không thêm ticksY. Đường cong tăng từ gốc đến cực đại37 rồi giảm về trục ở50, không kéo nét cong sang60; guide37 nét đứt thẳng đứng từ đỉnh đến trục. Hai trục mũi tên lên/phải, đúng Tốc độ phản ứng/Nhiệt độ (°C), không sốY/đơn vị mới/caption. Chữ37 và40 gần nhau theo nguồn nhưng không chạm. Font DDH đầy đủ dấu/chỉ số°, path-only0text/0href, hashfont thật khớp app; không cắt/tràn. SHA thực khớpmetadata.",
+    "hash": "633412e5da7779c95ed978fdae5a5938dee27fa3db44110bb0e698a73000175b",
+    "hashSvgDaSoat": "b1e9a586830f79ee9044689b32d1d167e68cfd61bfb598d342c8751d00e7d049"
+  }
+]

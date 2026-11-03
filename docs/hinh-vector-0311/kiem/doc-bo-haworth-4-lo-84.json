@@ -1,0 +1,226 @@
+[
+  {
+    "i": 268,
+    "hash": "2da1ed17e1b42bcb17f896499b167cbdfa9455e52bf7a541e674c73f2cdf64dd",
+    "fileNguon": "anh/2da1ed17e1b42bcb17f896499b167cbdfa9455e52bf7a541e674c73f2cdf64dd.png",
+    "daMoNative": true,
+    "questions": [
+      {
+        "qid": "12-C2-B4-D1-I-31",
+        "de": "Ở trạng thái rắn, glucose chủ yếu tồn tại ở dạng mạch vòng β-glucose.\nCông thức cấu trúc nào dưới đây là của β-glucose?",
+        "refs": [
+          {
+            "where": "12-C2-B4-D1-I-31.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-I-22",
+        "de": "Ở trạng thái rắn, glucose chủ yếu tồn tại ở dạng mạch vòng β-glucose.\nCông thức cấu trúc nào dưới đây là của β-glucose?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-22.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "caption": [
+      "A."
+    ],
+    "substituents": {
+      "C1": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C2": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C3": {
+        "up": "OH",
+        "down": "H"
+      },
+      "C4": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C5": {
+        "up": "CH₂OH",
+        "down": "H"
+      }
+    },
+    "ringGeometry": "O vòng ởgóc trên-phải;C1phải,C2dưới-phải,C3dưới-trái,C4trái,C5trên-trái. C4–C3–C2–C1 là3cạnhtrướcđậm,nửavòngtrênnétthường. MọiH/OH/CH₂OH phải hiện rõ như liệtkê,khôngsốC trongảnh. Khôngcharges/nêmCIP riêng.",
+    "glyphEvidence": "Nhãn cắt trái; còn nét chân xiên phải của A và phần chân/gạch ngang, cùng dấu chấm bên phải. Hình nghiêng/chéo khác hẳn cung C/D và hai lobe B. Nhìn glyph còn thấy + bộ4 cùngfont để khôi phục A., không chỉ do index0.",
+    "labelHandling": "Phục hồi caption thật tươngứng,giữ trênhình;mọirefs thuộc2qidđều sau_de. Không bỏnhãn hoặc lấybodyvariant khác theo βstem."
+  },
+  {
+    "i": 1351,
+    "hash": "f4f0321bde4eca5f3784e5864f46fb9f271ff32d7838b07d9a50135b6f059482",
+    "fileNguon": "anh/f4f0321bde4eca5f3784e5864f46fb9f271ff32d7838b07d9a50135b6f059482.png",
+    "daMoNative": true,
+    "questions": [
+      {
+        "qid": "12-C2-B4-D1-I-31",
+        "de": "Ở trạng thái rắn, glucose chủ yếu tồn tại ở dạng mạch vòng β-glucose.\nCông thức cấu trúc nào dưới đây là của β-glucose?",
+        "refs": [
+          {
+            "where": "12-C2-B4-D1-I-31.hinh.1.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-I-22",
+        "de": "Ở trạng thái rắn, glucose chủ yếu tồn tại ở dạng mạch vòng β-glucose.\nCông thức cấu trúc nào dưới đây là của β-glucose?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-22.hinh.1.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "caption": [
+      "B."
+    ],
+    "substituents": {
+      "C1": {
+        "up": "OH",
+        "down": "H"
+      },
+      "C2": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C3": {
+        "up": "OH",
+        "down": "H"
+      },
+      "C4": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C5": {
+        "up": "CH₂OH",
+        "down": "H"
+      }
+    },
+    "ringGeometry": "O vòng ởgóc trên-phải;C1phải,C2dưới-phải,C3dưới-trái,C4trái,C5trên-trái. C4–C3–C2–C1 là3cạnhtrướcđậm,nửavòngtrênnétthường. MọiH/OH/CH₂OH phải hiện rõ như liệtkê,khôngsốC trongảnh. Khôngcharges/nêmCIP riêng.",
+    "glyphEvidence": "Nhãn cắt trái; còn hai lobe/bầu phải xếp trên-dưới rõ của B, có eo giữa và chấm riêng. Khôi phục B. từ nét thật.",
+    "labelHandling": "Phục hồi caption thật tươngứng,giữ trênhình;mọirefs thuộc2qidđều sau_de. Không bỏnhãn hoặc lấybodyvariant khác theo βstem."
+  },
+  {
+    "i": 668,
+    "hash": "7be6e79974288c53f8c59ea4e06fb2f570a4438d79b13e252f6f7ab22173b8b4",
+    "fileNguon": "anh/7be6e79974288c53f8c59ea4e06fb2f570a4438d79b13e252f6f7ab22173b8b4.png",
+    "daMoNative": true,
+    "questions": [
+      {
+        "qid": "12-C2-B4-D1-I-31",
+        "de": "Ở trạng thái rắn, glucose chủ yếu tồn tại ở dạng mạch vòng β-glucose.\nCông thức cấu trúc nào dưới đây là của β-glucose?",
+        "refs": [
+          {
+            "where": "12-C2-B4-D1-I-31.hinh.2.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-I-22",
+        "de": "Ở trạng thái rắn, glucose chủ yếu tồn tại ở dạng mạch vòng β-glucose.\nCông thức cấu trúc nào dưới đây là của β-glucose?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-22.hinh.2.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "caption": [
+      "C."
+    ],
+    "substituents": {
+      "C1": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C2": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C3": {
+        "up": "OH",
+        "down": "H"
+      },
+      "C4": {
+        "up": "OH",
+        "down": "H"
+      },
+      "C5": {
+        "up": "CH₂OH",
+        "down": "H"
+      }
+    },
+    "ringGeometry": "O vòng ởgóc trên-phải;C1phải,C2dưới-phải,C3dưới-trái,C4trái,C5trên-trái. C4–C3–C2–C1 là3cạnhtrướcđậm,nửavòngtrênnétthường. MọiH/OH/CH₂OH phải hiện rõ như liệtkê,khôngsốC trongảnh. Khôngcharges/nêmCIP riêng.",
+    "glyphEvidence": "Nhãn cắt trái; còn cung trên/dưới với khe MỞ phải đặc trưng C, có đầu nét/serif và dấu chấm. Khác D có cung phải liên tục/đóng. Khôi phục C. từ glyph còn thấy + bộ4 cùngfont, không chỉ index2.",
+    "labelHandling": "Phục hồi caption thật tươngứng,giữ trênhình;mọirefs thuộc2qidđều sau_de. Không bỏnhãn hoặc lấybodyvariant khác theo βstem."
+  },
+  {
+    "i": 772,
+    "hash": "9050cd76d148ad2f92ed83c2c5f84acb422d5407bb8188418ed59fe56d82966d",
+    "fileNguon": "anh/9050cd76d148ad2f92ed83c2c5f84acb422d5407bb8188418ed59fe56d82966d.png",
+    "daMoNative": true,
+    "questions": [
+      {
+        "qid": "12-C2-B4-D1-I-31",
+        "de": "Ở trạng thái rắn, glucose chủ yếu tồn tại ở dạng mạch vòng β-glucose.\nCông thức cấu trúc nào dưới đây là của β-glucose?",
+        "refs": [
+          {
+            "where": "12-C2-B4-D1-I-31.hinh.3.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-I-22",
+        "de": "Ở trạng thái rắn, glucose chủ yếu tồn tại ở dạng mạch vòng β-glucose.\nCông thức cấu trúc nào dưới đây là của β-glucose?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-22.hinh.3.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "caption": [
+      "D."
+    ],
+    "substituents": {
+      "C1": {
+        "up": "OH",
+        "down": "H"
+      },
+      "C2": {
+        "up": "OH",
+        "down": "H"
+      },
+      "C3": {
+        "up": "OH",
+        "down": "H"
+      },
+      "C4": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C5": {
+        "up": "CH₂OH",
+        "down": "H"
+      }
+    },
+    "ringGeometry": "O vòng ởgóc trên-phải;C1phải,C2dưới-phải,C3dưới-trái,C4trái,C5trên-trái. C4–C3–C2–C1 là3cạnhtrướcđậm,nửavòngtrênnétthường. MọiH/OH/CH₂OH phải hiện rõ như liệtkê,khôngsốC trongảnh. Khôngcharges/nêmCIP riêng.",
+    "glyphEvidence": "Nhãn cắt trái; còn cung phải đơn liên tục đóng trên-dưới và dấu chấm. Không hai lobe kiểuB,khôngkhe hở phải kiểuC. Phối hợp cácglyphA/B/Ctrongcùngbộ đểphục hồiD.;khôngchỉindex3.",
+    "labelHandling": "Phục hồi caption thật tươngứng,giữ trênhình;mọirefs thuộc2qidđều sau_de. Không bỏnhãn hoặc lấybodyvariant khác theo βstem."
+  }
+]

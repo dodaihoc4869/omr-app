@@ -1,0 +1,214 @@
+[
+  {
+    "hash": "371550e7c2a20c8c3cc2ea27b983ab55e54960cda904f585cafb6f3e30dea315",
+    "file": "anh/371550e7c2a20c8c3cc2ea27b983ab55e54960cda904f585cafb6f3e30dea315.png",
+    "mime": "image/png",
+    "bytes": 40764,
+    "i": 317,
+    "refs": [
+      {
+        "qid": "VIP27-BDT-L7-0701-I-3",
+        "de": "Cho xà phòng **X** có cấu tạo như sau. Nhận định nào sau đây là **không** đúng?",
+        "where": [
+          "VIP27-BDT-L7-0701-I-3.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/371550e7c2a20c8c3cc2ea27b983ab55e54960cda904f585cafb6f3e30dea315.png",
+    "loai": "phân tử ion",
+    "smiles": "CCCCCCCCCCCCCCCC(=O)[O-].[Na+]",
+    "caption": [],
+    "circle": false,
+    "explicitH": false,
+    "chiTiet": "16C tổng gồm C carboxylate; CH3–(CH2)14–C(=O)–O−,Na+ ở bên phải tách rời; không có nét nối O–Na. Nhãn O− vàNa+ hiện tường minh, phải giữ đúng. Không X trongảnh,không tự thêm X từcâudẫn.",
+    "stereo": "Không C=C hoặc nêm/lậpthể.",
+    "demCTheoPixel": "Native818x121: từ trái tới carbonyl cácCởx≈7,52,98,144,189,235,281,326,371,417,462,508,553,599,644,689;carbonyl làC16 khiđếm từtrái/C1khiđếmnhómchức.",
+    "luuY": "KHÔNG dùng bảnONacộnghóatrị541. Có thể dựng lại mạch cùng topology bằngRDKit nhưng vẽO−Na+ rõ,Na+khôngnối.",
+    "trangThai": "Đã mở PNG native và đọc câu dẫn; dữ liệu dựng mới, chưa duyệt bản vẽ"
+  },
+  {
+    "hash": "1b42c277d17b212a12a24f99b86babd6cb7e64bf952de94e40cf2d74dbc1b2e7",
+    "file": "anh/1b42c277d17b212a12a24f99b86babd6cb7e64bf952de94e40cf2d74dbc1b2e7.png",
+    "mime": "image/png",
+    "bytes": 3270,
+    "i": 158,
+    "refs": [
+      {
+        "qid": "12-C1-B1-D3-III-13",
+        "de": "Linoleic acid có thể chuyển hoá tạo nhiều acid béo omega-6 khác như arachidonic acid.\nArachidonic acid có cấu tạo như hình dưới.\nTổng số các nguyên tử trong một phân tử arachidonic acid là bao nhiêu?",
+        "where": [
+          "12-C1-B1-D3-III-13.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/1b42c277d17b212a12a24f99b86babd6cb7e64bf952de94e40cf2d74dbc1b2e7.png",
+    "loai": "phân tử",
+    "smiles": "CCCCC/C=C\\C/C=C\\C/C=C\\C/C=C\\CCCC(=O)O",
+    "caption": [],
+    "circle": false,
+    "explicitH": "Chỉ H của nhóm OH trong COOH hiện chữ; không có Hformyl/Hcarbon tường minh.",
+    "chiTiet": "20C tổng gồmcarbonylCOOH; đếm từCOOH: HOOC–CH2–CH2–CH2–CH=CH–CH2–CH=CH–CH2–CH=CH–CH2–CH=CH–CH2–CH2–CH2–CH2–CH3.",
+    "stereo": "BốnC=C tại5=6,8=9,11=12,14=15 tínhtừcarbonylCOOH; cả4đềuZ vìhaibondmạchkề nằm cùng phía so với từngC=C trongảnh. KhôngstereoCtetrahedron/nêm.",
+    "demCTheoPixel": "Native1112x190; từCOOH(C1) vềđầumethyl(C20): x≈972,923,875,827,779,729,678,630,579,530,481,430,382,336,284,235,187,139,92,45. Các đoạn C=C lầnlượt x779–729,x630–579,x481–430,x336–284;nguồnvẽđôinằmngang,nétphụởbêndưới.",
+    "luuY": "Không aliasC18:2. Không thêm tên/caption arachidonic acid chỉvìcâudẫncónêu. SMILESđãparseRDKit,cả4stereođượcđọcZ;không dùng tên đểđoán.",
+    "trangThai": "Đã mở PNG native và đọc câu dẫn; dữ liệu dựng mới, chưa duyệt bản vẽ"
+  },
+  {
+    "hash": "6208627076169c9205ff921f07be1f3f058af7f1b483ada90adc4059250f6b11",
+    "file": "anh/6208627076169c9205ff921f07be1f3f058af7f1b483ada90adc4059250f6b11.png",
+    "mime": "image/png",
+    "bytes": 12113,
+    "i": 522,
+    "refs": [
+      {
+        "qid": "10-C1-B2-III-16",
+        "de": "Từ phổ khối lượng MS của chlorine (Cl) ở hình dưới đây: Hãy cho biết giá trị nguyên tử khối trung bình của chlorine là bao nhiêu? (Kết quả làm tròn kết quả đến hàng phần mười).",
+        "where": [
+          "10-C1-B2-III-16.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DB-10-B2-D2-III-52",
+        "de": "Từ phổ khối lượng MS của chlorine (Cl) ở hình dưới đây: Hãy cho biết giá trị nguyên tử khối trung bình của chlorine là bao nhiêu? (Kết quả làm tròn kết quả đến hàng phần mười).",
+        "where": [
+          "DB-10-B2-D2-III-52.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/6208627076169c9205ff921f07be1f3f058af7f1b483ada90adc4059250f6b11.png",
+    "loai": "phổ khối lượng chlorine",
+    "caption": [
+      "Phổ khối lượng của chlorine"
+    ],
+    "axes": {
+      "x": {
+        "label": "m/z = A",
+        "ticks": [
+          10,
+          20,
+          30,
+          40
+        ],
+        "originLabel": null,
+        "arrow": false
+      },
+      "y": {
+        "label": "Tỉ lệ % số nguyên tử",
+        "ticks": [
+          25,
+          50,
+          75,
+          100
+        ],
+        "originLabel": null,
+        "arrow": false
+      }
+    },
+    "peaks": [
+      {
+        "x": 35,
+        "heightPercent": "75,77",
+        "label": "³⁵₁₇Cl (75,77%)",
+        "massNumber": 35,
+        "atomicNumber": 17
+      },
+      {
+        "x": 37,
+        "heightPercent": "24,23",
+        "label": "³⁷₁₇Cl (24,23%)",
+        "massNumber": 37,
+        "atomicNumber": 17
+      }
+    ],
+    "guides": "Không lưới, không nét đứt/đường chiếu; không markertròn hayarrowhead. Hai cột là nét đứng liền đen, xuất phát cùngtrụcx.",
+    "boTriNhan": "Nhãn isotope35Cl nằm phía trên đỉnhcột35;nhãn37Cl ởtrên/phảicột37 vàbênphảicột35;không để chữchạmcột. Sốkhối35/37 ởtrêntráiCl,sốhiệunguyêntử17 ởdướitráiCl;không viết35/17thànhphânsố,gạchphânsố hay hai sốcùnghàng.",
+    "geometryPixel": "Native765x492:gốc(133,375),trụcykéo lên≈28,trụcxkéođến≈720;ticksx10≈230,20≈330,30≈428,40≈529;ytick100≈69,75≈137,50≈220,25≈296;hai cột tại x≈475/494,đỉnh≈137/302. Pixelthamkhảo,giátrịdựnglấy75,77%/24,23% ĐÚNGnhãn,khôngthayabundancechuẩn.",
+    "khacNguonConLai": "522 và563đãmởcảhai:toànbộnhãn/số/cột/ticks/đơnvị/captiongiốngnhau;kháckíchthướccrop/độphângiải/méptrụcypíatrên. Có thểdựng1SVGmới dùngchocả2saukhi2nguồnđượcsoátvớiSVGthật.",
+    "luuY": [
+      "Không thêm0ởgốc hoặc tick0,không thêmtrục có mũitên.",
+      "Không tựthay75,77/24,23 bằng75,78/24,22hay75/25 từdữliệuchuẩn.",
+      "Giữcaption nguyênvăn,khôngthêm(a)/tênđồngvịkhác/tênnguyêntốvàotrục.",
+      "Khôngghi đápánnguyêntửkhốitrungbình từcâudẫn."
+    ],
+    "trangThai": "Đã mở PNG native và đọc câu dẫn; dữ liệu dựng mới, chưa duyệt bản vẽ"
+  },
+  {
+    "hash": "68c9a255943a62ea2a776ab95fe2d0b262b62d801d49ed688b3b1842e666ad40",
+    "file": "anh/68c9a255943a62ea2a776ab95fe2d0b262b62d801d49ed688b3b1842e666ad40.png",
+    "mime": "image/png",
+    "bytes": 7100,
+    "i": 563,
+    "refs": [
+      {
+        "qid": "DB-10-B2-D2-III-112",
+        "de": "Từ phổ khối lượng MS của chlorine (Cl) ở hình dưới đây: Hãy cho biết giá trị nguyên tử khối trung bình của chlorine là bao nhiêu? (Kết quả làm tròn kết quả đến hàng phần mười).",
+        "where": [
+          "DB-10-B2-D2-III-112.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B2-III-15",
+        "de": "Từ phổ khối lượng MS của chlorine (Cl) ở hình dưới đây: Hãy cho biết giá trị nguyên tử khối trung bình của chlorine là bao nhiêu? (Kết quả làm tròn kết quả đến hàng phần mười).",
+        "where": [
+          "DH-10-C1-B2-III-15.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/68c9a255943a62ea2a776ab95fe2d0b262b62d801d49ed688b3b1842e666ad40.png",
+    "loai": "phổ khối lượng chlorine",
+    "caption": [
+      "Phổ khối lượng của chlorine"
+    ],
+    "axes": {
+      "x": {
+        "label": "m/z = A",
+        "ticks": [
+          10,
+          20,
+          30,
+          40
+        ],
+        "originLabel": null,
+        "arrow": false
+      },
+      "y": {
+        "label": "Tỉ lệ % số nguyên tử",
+        "ticks": [
+          25,
+          50,
+          75,
+          100
+        ],
+        "originLabel": null,
+        "arrow": false
+      }
+    },
+    "peaks": [
+      {
+        "x": 35,
+        "heightPercent": "75,77",
+        "label": "³⁵₁₇Cl (75,77%)",
+        "massNumber": 35,
+        "atomicNumber": 17
+      },
+      {
+        "x": 37,
+        "heightPercent": "24,23",
+        "label": "³⁷₁₇Cl (24,23%)",
+        "massNumber": 37,
+        "atomicNumber": 17
+      }
+    ],
+    "guides": "Không lưới, không nét đứt/đường chiếu; không markertròn hayarrowhead. Hai cột là nét đứng liền đen, xuất phát cùngtrụcx.",
+    "boTriNhan": "Nhãn isotope35Cl nằm phía trên đỉnhcột35;nhãn37Cl ởtrên/phảicột37 vàbênphảicột35;không để chữchạmcột. Sốkhối35/37 ởtrêntráiCl,sốhiệunguyêntử17 ởdướitráiCl;không viết35/17thànhphânsố,gạchphânsố hay hai sốcùnghàng.",
+    "geometryPixel": "Native526x323:gốc(78,257),trụcybịcắt sátméptrên,trụcxđến≈512;ticksx10≈149,20≈224,30≈297,40≈373;ytick100≈31,75≈81,50≈142,25≈199;hai cột x≈332/346,đỉnh≈80/204. Pixelthamkhảo,giátrịdựnglấy75,77%/24,23% ĐÚNGnhãn,khôngthayabundancechuẩn.",
+    "khacNguonConLai": "522 và563đãmởcảhai:toànbộnhãn/số/cột/ticks/đơnvị/captiongiốngnhau;kháckíchthướccrop/độphângiải/méptrụcypíatrên. Có thểdựng1SVGmới dùngchocả2saukhi2nguồnđượcsoátvớiSVGthật.",
+    "luuY": [
+      "Không thêm0ởgốc hoặc tick0,không thêmtrục có mũitên.",
+      "Không tựthay75,77/24,23 bằng75,78/24,22hay75/25 từdữliệuchuẩn.",
+      "Giữcaption nguyênvăn,khôngthêm(a)/tênđồngvịkhác/tênnguyêntốvàotrục.",
+      "Khôngghi đápánnguyêntửkhốitrungbình từcâudẫn."
+    ],
+    "trangThai": "Đã mở PNG native và đọc câu dẫn; dữ liệu dựng mới, chưa duyệt bản vẽ"
+  }
+]

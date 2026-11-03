@@ -79,14 +79,14 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 529,
-    "soSvgRieng": 340,
-    "soCauDungHinh": 669,
-    "soCauDuMoiHinh": 668,
+    "soAnhNguon": 545,
+    "soSvgRieng": 349,
+    "soCauDungHinh": 694,
+    "soCauDuMoiHinh": 693,
     "soCauMoiXongMotPhan": 1,
-    "byteSvg": 4963620,
-    "byteGzip": 997038,
-    "soAnhNguonConLai": 899,
+    "byteSvg": 5184262,
+    "byteGzip": 1029260,
+    "soAnhNguonConLai": 883,
     "daTichHop": false
   },
   "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.",
@@ -106,16 +106,16 @@
     "daChuyenHetBoDaVe": true
   },
   "daDatPhongApp": {
-    "soNguon": 529,
-    "soCauDuHinhVaPhong": 668,
+    "soNguon": 545,
+    "soCauDuHinhVaPhong": 693,
     "ghiChu": "Các số tổngDaDoiChieu vẫn mô tả nội dung đã kiểm; bản cũ chưa đổi phông không được coi đạt yêu cầu phông mới."
   },
   "loMoiNhat": {
-    "lo": "57–75",
-    "ketQua": "668 câu đủ hình+DDH;529nguồn→340SVG. Hai nhóm20molecule và10đồthị/bảng đãhoànthiện;20alias67+18alias71 đều mở từngnguồn/base/SVGvàsoátđộclậphash.",
-    "suaLoi": "53/366 thêm5tickY,1267 khôngthêm.791soátpixelđộclập xácnhậncóguide80,giữnguyên.1153phục hồi panel3butan2amine từnguồn60 rõ,khôngalias256arylamine.1006giữ(a)theoglyphvà2stem.",
-    "phong": "DDH thường và đậm từ2cặpWOFF2app;thường giữ nguyên byte/hash. Khôngfaux-bold/fontfallback. WOFF2khôngkhácorigin/main93b88d37.",
-    "tiepTheo": "Tiếp tục nguồn chưa xử lý;khôngrơi lại các hold791/1153/Fischer đã giải quyết.1198ảnhhoa thật giữnguyên,khôngcộngsốvẽ. Bảnđồđiểmnốiapp/offlineởkiem/diem-noi-vector-offline.json.",
-    "gioiHan": "Chưa tích hợp hình/chưa reloadofflineapp/chưa phát hành. Main93b88d37 chưa gộp,phải kiểm đầyđủ lại trước triểnkhai. Bộdònéttựđộngchỉứngviên."
+    "lo": "76–86",
+    "ketQua": "693 câu đủ hình+DDH;545 nguồn→349 SVG;5.184.262 byte/gzip1.029.260;883 nguồn còn lại. Lô83/84/86 đã mở riêng từng PNG và SVG render, soát độc lập đúng hash.",
+    "suaLoi": "404/525 khôi phục6tickX, thu hồi bản404 thiếu tick. Giữ ion O−/Na+317 và C20:4 158; chlorine35/37 trên17. Haworth1036 giữ6sốC/khôngH;268/1351/668/772 giữ từngH/OH và nhãnA–D từglyph/cảbộ/câu dẫn.",
+    "phong": "DDH Rounded thường/đậm thực từWOFF2app, tất cả chữ thànhpath tự chứa.",
+    "tiepTheo": "Dựng phổCu870/1297 theo pixelnguồn, không tự thêm63/65/phầntrăm; đọc thêm634/245 cùngbộ. Tiếp tục nguồn chưa xử lý và giữ ảnhhoa1198 thật.",
+    "gioiHan": "Chưa tích hợp hình/chưa reload offlineapp/chưa phát hành. Phải cập nhật main mới nhất, kiểm đủ cổng và ca thi trước triển khai."
   }
 }

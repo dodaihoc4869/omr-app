@@ -1,0 +1,16 @@
+[
+  {
+    "tepMetadata": "cau-truc-chu-ddh-lo-18-ban-dung.json",
+    "hashNguon": "4742d9ecfbbf83bd084bf2c93f267b84f2871d4e347f25246cc021a44505e216",
+    "svgCu": "hoa-ddh-a3c6843ca3a9a836d62e40bfa7b313221ce72523e0e8b4def6ef2254e5680c66.svg",
+    "hashSvgCu": "a3c6843ca3a9a836d62e40bfa7b313221ce72523e0e8b4def6ef2254e5680c66",
+    "lyDo": "Bản đang chọn thiếu6tickX nhìn thấy ở nguồn404; tạm ngưng mọi biến thể cũ của nguồn này, không fallback khi chờ bản mới."
+  },
+  {
+    "tepMetadata": "cau-truc-do-thi-lo-9-ban-dung.json",
+    "hashNguon": "4742d9ecfbbf83bd084bf2c93f267b84f2871d4e347f25246cc021a44505e216",
+    "svgCu": "do-thi-a4a3a27ab5b6314749ddbf777e21efbcbfc24eae1a3e12c9f9ff6cf9e1c62cd6.svg",
+    "hashSvgCu": "a4a3a27ab5b6314749ddbf777e21efbcbfc24eae1a3e12c9f9ff6cf9e1c62cd6",
+    "lyDo": "Bản đang chọn thiếu6tickX nhìn thấy ở nguồn404; tạm ngưng mọi biến thể cũ của nguồn này, không fallback khi chờ bản mới."
+  }
+]

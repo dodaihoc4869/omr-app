@@ -1,0 +1,168 @@
+[
+  {
+    "i": 1068,
+    "hash": "c0a9de3b70290c00ca4bfeb786f60c24a362e634c6d85d7a04d259d2760b91fa",
+    "fileNguon": "anh/c0a9de3b70290c00ca4bfeb786f60c24a362e634c6d85d7a04d259d2760b91fa.png",
+    "questions": [
+      {
+        "qid": "11-C1-B1-I-5",
+        "de": "Cho 5.10⁻³ mol H₂ và 5.10⁻³ mol I₂ vào bình kín dung tích 1 lít và nung nóng đến 227 °C. Đồ thị biểu diễn sự thay đổi nồng độ các chất theo thời gian được cho trong hình sau:\nNồng độ của HI ở trạng thái cân bằng là",
+        "refs": [
+          {
+            "where": "11-C1-B1-I-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-11-B1-D1-I-5",
+        "de": "Cho 5.10⁻³ mol H₂ và 5.10⁻³ mol I₂ vào bình kín dung tích 1 lít và nung nóng đến 227 °C. Đồ thị biểu diễn sự thay đổi nồng độ các chất theo thời gian được cho trong hình sau:\nNồng độ của HI ở trạng thái cân bằng là",
+        "refs": [
+          {
+            "where": "DB-11-B1-D1-I-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daMoNative": true,
+    "canvas": [
+      957,
+      632
+    ],
+    "xLabel": "Thời gian",
+    "yLabel": "Nồng độ của chất phản ứng (10⁻³ M)",
+    "yTicks": [
+      0,
+      2,
+      4,
+      6,
+      8,
+      10
+    ],
+    "xTicks": [],
+    "guideLabels": [
+      "8,64",
+      "0,68"
+    ],
+    "caption": [
+      "Trạng thái cân bằng"
+    ],
+    "annotations": [
+      {
+        "text": [
+          "Nồng độ hydrogen iodide tăng",
+          "đến khi đạt tới trạng thái cân bằng"
+        ],
+        "arrow": {
+          "tail": [
+            404,
+            223
+          ],
+          "head": [
+            318,
+            223
+          ]
+        },
+        "textXY": [
+          408,
+          212
+        ]
+      },
+      {
+        "text": [
+          "Nồng độ hydrogen và iodine giảm",
+          "đến khi đạt tới trạng thái cân bằng"
+        ],
+        "arrow": {
+          "tail": [
+            399,
+            435
+          ],
+          "head": [
+            312,
+            435
+          ]
+        },
+        "textXY": [
+          409,
+          431
+        ]
+      }
+    ],
+    "geometry": {
+      "origin": [
+        141,
+        534
+      ],
+      "xArrowHead": [
+        911,
+        534
+      ],
+      "yArrowHead": [
+        141,
+        35
+      ],
+      "yTickPixel": [
+        [
+          0,
+          534
+        ],
+        [
+          2,
+          440
+        ],
+        [
+          4,
+          360
+        ],
+        [
+          6,
+          277
+        ],
+        [
+          8,
+          192
+        ],
+        [
+          10,
+          85
+        ]
+      ],
+      "guides": [
+        {
+          "y": 148,
+          "x1": 142,
+          "x2": 777,
+          "label": "8,64",
+          "labelXY": [
+            786,
+            152
+          ]
+        },
+        {
+          "y": 498,
+          "x1": 142,
+          "x2": 777,
+          "label": "0,68",
+          "labelXY": [
+            787,
+            501
+          ]
+        }
+      ],
+      "upCurve": "Bắtđầu(141,534),tăng cong lõm xuống,qua~(184,384),~(260,271),~(353,185),đạt(455,148),nằmngangtới~580.",
+      "downCurve": "Bắtđầu(142,315) tươngđương5,giảmconglõmlên,qua~(184,384),~(265,460),~(350,490),đạt(455,498),nằmngangtới~580."
+    },
+    "notes": "Hai mũitênchúthích hướngTRÁI nằmtrongkhoảnggiữa2curve,khôngđầumũitênchạmcurve (giữnhưnguồn). ĐườngdóngđứtnốiYđếnnhãnphải;curvephẳngchỉtớikhoảngx580,còndóngđứttớix777. TrụcYpixelnguồnhơiphi tuyến,giữcácgiátrịnhãn10/8/6/4/2/0 vàgiátrịplateau8,64/0,68;khôngtựsửacâuchữ. KhôngtickX/sốthờigian/nhãnHI/H₂+I₂khác.",
+    "svg": "can-bang-chu-thich-ddh-f62e41f11038b8b4fff057faa496d0371f91cd19e68a135d3b20f0bbc7b331f4.svg",
+    "hashSvg": "f62e41f11038b8b4fff057faa496d0371f91cd19e68a135d3b20f0bbc7b331f4",
+    "byteSvg": 97872,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Giữ ytick/guide theo vị trí ảnh nguồn, không nội suy thêm số. Hai mũi tên chỉ trái và4dòng chú thích được giữ đủ; không thêm HI/H2/I2 khác.",
+    "hashSvgDaSoat": "f62e41f11038b8b4fff057faa496d0371f91cd19e68a135d3b20f0bbc7b331f4",
+    "nguoiSoat": "cau_truc_6"
+  }
+]

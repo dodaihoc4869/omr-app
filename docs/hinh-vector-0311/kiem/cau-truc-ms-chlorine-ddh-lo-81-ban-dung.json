@@ -1,0 +1,176 @@
+[
+  {
+    "hash": "6208627076169c9205ff921f07be1f3f058af7f1b483ada90adc4059250f6b11",
+    "file": "anh/6208627076169c9205ff921f07be1f3f058af7f1b483ada90adc4059250f6b11.png",
+    "mime": "image/png",
+    "bytes": 12113,
+    "i": 522,
+    "refs": [
+      {
+        "qid": "10-C1-B2-III-16",
+        "de": "Từ phổ khối lượng MS của chlorine (Cl) ở hình dưới đây: Hãy cho biết giá trị nguyên tử khối trung bình của chlorine là bao nhiêu? (Kết quả làm tròn kết quả đến hàng phần mười).",
+        "where": [
+          "10-C1-B2-III-16.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DB-10-B2-D2-III-52",
+        "de": "Từ phổ khối lượng MS của chlorine (Cl) ở hình dưới đây: Hãy cho biết giá trị nguyên tử khối trung bình của chlorine là bao nhiêu? (Kết quả làm tròn kết quả đến hàng phần mười).",
+        "where": [
+          "DB-10-B2-D2-III-52.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/6208627076169c9205ff921f07be1f3f058af7f1b483ada90adc4059250f6b11.png",
+    "loai": "phổ khối lượng chlorine",
+    "caption": [
+      "Phổ khối lượng của chlorine"
+    ],
+    "axes": {
+      "x": {
+        "label": "m/z = A",
+        "ticks": [
+          10,
+          20,
+          30,
+          40
+        ],
+        "originLabel": null,
+        "arrow": false
+      },
+      "y": {
+        "label": "Tỉ lệ % số nguyên tử",
+        "ticks": [
+          25,
+          50,
+          75,
+          100
+        ],
+        "originLabel": null,
+        "arrow": false
+      }
+    },
+    "peaks": [
+      {
+        "x": 35,
+        "heightPercent": "75,77",
+        "label": "³⁵₁₇Cl (75,77%)",
+        "massNumber": 35,
+        "atomicNumber": 17
+      },
+      {
+        "x": 37,
+        "heightPercent": "24,23",
+        "label": "³⁷₁₇Cl (24,23%)",
+        "massNumber": 37,
+        "atomicNumber": 17
+      }
+    ],
+    "guides": "Không lưới, không nét đứt/đường chiếu; không markertròn hayarrowhead. Hai cột là nét đứng liền đen, xuất phát cùngtrụcx.",
+    "boTriNhan": "Nhãn isotope35Cl nằm phía trên đỉnhcột35;nhãn37Cl ởtrên/phảicột37 vàbênphảicột35;không để chữchạmcột. Sốkhối35/37 ởtrêntráiCl,sốhiệunguyêntử17 ởdướitráiCl;không viết35/17thànhphânsố,gạchphânsố hay hai sốcùnghàng.",
+    "geometryPixel": "Native765x492:gốc(133,375),trụcykéo lên≈28,trụcxkéođến≈720;ticksx10≈230,20≈330,30≈428,40≈529;ytick100≈69,75≈137,50≈220,25≈296;hai cột tại x≈475/494,đỉnh≈137/302. Pixelthamkhảo,giátrịdựnglấy75,77%/24,23% ĐÚNGnhãn,khôngthayabundancechuẩn.",
+    "khacNguonConLai": "522 và563đãmởcảhai:toànbộnhãn/số/cột/ticks/đơnvị/captiongiốngnhau;kháckíchthướccrop/độphângiải/méptrụcypíatrên. Có thểdựng1SVGmới dùngchocả2saukhi2nguồnđượcsoátvớiSVGthật.",
+    "luuY": [
+      "Không thêm0ởgốc hoặc tick0,không thêmtrục có mũitên.",
+      "Không tựthay75,77/24,23 bằng75,78/24,22hay75/25 từdữliệuchuẩn.",
+      "Giữcaption nguyênvăn,khôngthêm(a)/tênđồngvịkhác/tênnguyêntốvàotrục.",
+      "Khôngghi đápánnguyêntửkhốitrungbình từcâudẫn."
+    ],
+    "trangThai": "da-soat-doc-lap",
+    "svg": "ms-ddh-531cc4645c8e64912cae74f25a7947fa52296906eaaa92234852d56920ce974f.svg",
+    "hashSvg": "531cc4645c8e64912cae74f25a7947fa52296906eaaa92234852d56920ce974f",
+    "byteSvg": 43096,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "ghiChuDung": "Hai chữ số khối35/37 đặt trên17 bằng các path DDH xếp tầng; không dùng ký tự Unicode nối ngang sai bố cục. Không thêm0/arrow/grid/đáp án trung bình.",
+    "hashSvgDaSoat": "531cc4645c8e64912cae74f25a7947fa52296906eaaa92234852d56920ce974f",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "hash": "68c9a255943a62ea2a776ab95fe2d0b262b62d801d49ed688b3b1842e666ad40",
+    "file": "anh/68c9a255943a62ea2a776ab95fe2d0b262b62d801d49ed688b3b1842e666ad40.png",
+    "mime": "image/png",
+    "bytes": 7100,
+    "i": 563,
+    "refs": [
+      {
+        "qid": "DB-10-B2-D2-III-112",
+        "de": "Từ phổ khối lượng MS của chlorine (Cl) ở hình dưới đây: Hãy cho biết giá trị nguyên tử khối trung bình của chlorine là bao nhiêu? (Kết quả làm tròn kết quả đến hàng phần mười).",
+        "where": [
+          "DB-10-B2-D2-III-112.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B2-III-15",
+        "de": "Từ phổ khối lượng MS của chlorine (Cl) ở hình dưới đây: Hãy cho biết giá trị nguyên tử khối trung bình của chlorine là bao nhiêu? (Kết quả làm tròn kết quả đến hàng phần mười).",
+        "where": [
+          "DH-10-C1-B2-III-15.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/68c9a255943a62ea2a776ab95fe2d0b262b62d801d49ed688b3b1842e666ad40.png",
+    "loai": "phổ khối lượng chlorine",
+    "caption": [
+      "Phổ khối lượng của chlorine"
+    ],
+    "axes": {
+      "x": {
+        "label": "m/z = A",
+        "ticks": [
+          10,
+          20,
+          30,
+          40
+        ],
+        "originLabel": null,
+        "arrow": false
+      },
+      "y": {
+        "label": "Tỉ lệ % số nguyên tử",
+        "ticks": [
+          25,
+          50,
+          75,
+          100
+        ],
+        "originLabel": null,
+        "arrow": false
+      }
+    },
+    "peaks": [
+      {
+        "x": 35,
+        "heightPercent": "75,77",
+        "label": "³⁵₁₇Cl (75,77%)",
+        "massNumber": 35,
+        "atomicNumber": 17
+      },
+      {
+        "x": 37,
+        "heightPercent": "24,23",
+        "label": "³⁷₁₇Cl (24,23%)",
+        "massNumber": 37,
+        "atomicNumber": 17
+      }
+    ],
+    "guides": "Không lưới, không nét đứt/đường chiếu; không markertròn hayarrowhead. Hai cột là nét đứng liền đen, xuất phát cùngtrụcx.",
+    "boTriNhan": "Nhãn isotope35Cl nằm phía trên đỉnhcột35;nhãn37Cl ởtrên/phảicột37 vàbênphảicột35;không để chữchạmcột. Sốkhối35/37 ởtrêntráiCl,sốhiệunguyêntử17 ởdướitráiCl;không viết35/17thànhphânsố,gạchphânsố hay hai sốcùnghàng.",
+    "geometryPixel": "Native526x323:gốc(78,257),trụcybịcắt sátméptrên,trụcxđến≈512;ticksx10≈149,20≈224,30≈297,40≈373;ytick100≈31,75≈81,50≈142,25≈199;hai cột x≈332/346,đỉnh≈80/204. Pixelthamkhảo,giátrịdựnglấy75,77%/24,23% ĐÚNGnhãn,khôngthayabundancechuẩn.",
+    "khacNguonConLai": "522 và563đãmởcảhai:toànbộnhãn/số/cột/ticks/đơnvị/captiongiốngnhau;kháckíchthướccrop/độphângiải/méptrụcypíatrên. Có thểdựng1SVGmới dùngchocả2saukhi2nguồnđượcsoátvớiSVGthật.",
+    "luuY": [
+      "Không thêm0ởgốc hoặc tick0,không thêmtrục có mũitên.",
+      "Không tựthay75,77/24,23 bằng75,78/24,22hay75/25 từdữliệuchuẩn.",
+      "Giữcaption nguyênvăn,khôngthêm(a)/tênđồngvịkhác/tênnguyêntốvàotrục.",
+      "Khôngghi đápánnguyêntửkhốitrungbình từcâudẫn."
+    ],
+    "trangThai": "da-soat-doc-lap",
+    "svg": "ms-ddh-531cc4645c8e64912cae74f25a7947fa52296906eaaa92234852d56920ce974f.svg",
+    "hashSvg": "531cc4645c8e64912cae74f25a7947fa52296906eaaa92234852d56920ce974f",
+    "byteSvg": 43096,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "ghiChuDung": "Hai chữ số khối35/37 đặt trên17 bằng các path DDH xếp tầng; không dùng ký tự Unicode nối ngang sai bố cục. Không thêm0/arrow/grid/đáp án trung bình.",
+    "hashSvgDaSoat": "531cc4645c8e64912cae74f25a7947fa52296906eaaa92234852d56920ce974f",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

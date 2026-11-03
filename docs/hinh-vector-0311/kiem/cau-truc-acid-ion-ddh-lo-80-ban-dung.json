@@ -1,0 +1,84 @@
+[
+  {
+    "hash": "371550e7c2a20c8c3cc2ea27b983ab55e54960cda904f585cafb6f3e30dea315",
+    "file": "anh/371550e7c2a20c8c3cc2ea27b983ab55e54960cda904f585cafb6f3e30dea315.png",
+    "mime": "image/png",
+    "bytes": 40764,
+    "i": 317,
+    "refs": [
+      {
+        "qid": "VIP27-BDT-L7-0701-I-3",
+        "de": "Cho xà phòng **X** có cấu tạo như sau. Nhận định nào sau đây là **không** đúng?",
+        "where": [
+          "VIP27-BDT-L7-0701-I-3.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/371550e7c2a20c8c3cc2ea27b983ab55e54960cda904f585cafb6f3e30dea315.png",
+    "loai": "phân tử ion",
+    "smiles": "CCCCCCCCCCCCCCCC(=O)[O-].[Na+]",
+    "caption": [],
+    "circle": false,
+    "explicitH": false,
+    "chiTiet": "16C tổng gồm C carboxylate; CH3–(CH2)14–C(=O)–O−,Na+ ở bên phải tách rời; không có nét nối O–Na. Nhãn O− vàNa+ hiện tường minh, phải giữ đúng. Không X trongảnh,không tự thêm X từcâudẫn.",
+    "stereo": "Không C=C hoặc nêm/lậpthể.",
+    "demCTheoPixel": "Native818x121: từ trái tới carbonyl cácCởx≈7,52,98,144,189,235,281,326,371,417,462,508,553,599,644,689;carbonyl làC16 khiđếm từtrái/C1khiđếmnhómchức.",
+    "luuY": "KHÔNG dùng bảnONacộnghóatrị541. Có thể dựng lại mạch cùng topology bằngRDKit nhưng vẽO−Na+ rõ,Na+khôngnối.",
+    "trangThai": "da-soat-doc-lap",
+    "phongApp": true,
+    "canvasWidth": 1100,
+    "canvasHeight": 440,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "svg": "cau-truc-82470f5d6b64123558a574c604f2e6a6d910259b1d533fd8b076eba702411ed7.svg",
+    "hashSvg": "82470f5d6b64123558a574c604f2e6a6d910259b1d533fd8b076eba702411ed7",
+    "byteSvg": 10420,
+    "smilesChuan": "CCCCCCCCCCCCCCCC(=O)[O-].[Na+]",
+    "congThuc": "C16H31NaO2",
+    "soNguyenTuNang": 19,
+    "rdkit": "2026.09.1",
+    "hashSvgDaSoat": "82470f5d6b64123558a574c604f2e6a6d910259b1d533fd8b076eba702411ed7",
+    "nguoiSoat": "cau_truc_6"
+  },
+  {
+    "hash": "1b42c277d17b212a12a24f99b86babd6cb7e64bf952de94e40cf2d74dbc1b2e7",
+    "file": "anh/1b42c277d17b212a12a24f99b86babd6cb7e64bf952de94e40cf2d74dbc1b2e7.png",
+    "mime": "image/png",
+    "bytes": 3270,
+    "i": 158,
+    "refs": [
+      {
+        "qid": "12-C1-B1-D3-III-13",
+        "de": "Linoleic acid có thể chuyển hoá tạo nhiều acid béo omega-6 khác như arachidonic acid.\nArachidonic acid có cấu tạo như hình dưới.\nTổng số các nguyên tử trong một phân tử arachidonic acid là bao nhiêu?",
+        "where": [
+          "12-C1-B1-D3-III-13.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/1b42c277d17b212a12a24f99b86babd6cb7e64bf952de94e40cf2d74dbc1b2e7.png",
+    "loai": "phân tử",
+    "smiles": "CCCCC/C=C\\C/C=C\\C/C=C\\C/C=C\\CCCC(=O)O",
+    "caption": [],
+    "circle": false,
+    "explicitH": "Chỉ H của nhóm OH trong COOH hiện chữ; không có Hformyl/Hcarbon tường minh.",
+    "chiTiet": "20C tổng gồmcarbonylCOOH; đếm từCOOH: HOOC–CH2–CH2–CH2–CH=CH–CH2–CH=CH–CH2–CH=CH–CH2–CH=CH–CH2–CH2–CH2–CH2–CH3.",
+    "stereo": "BốnC=C tại5=6,8=9,11=12,14=15 tínhtừcarbonylCOOH; cả4đềuZ vìhaibondmạchkề nằm cùng phía so với từngC=C trongảnh. KhôngstereoCtetrahedron/nêm.",
+    "demCTheoPixel": "Native1112x190; từCOOH(C1) vềđầumethyl(C20): x≈972,923,875,827,779,729,678,630,579,530,481,430,382,336,284,235,187,139,92,45. Các đoạn C=C lầnlượt x779–729,x630–579,x481–430,x336–284;nguồnvẽđôinằmngang,nétphụởbêndưới.",
+    "luuY": "Không aliasC18:2. Không thêm tên/caption arachidonic acid chỉvìcâudẫncónêu. SMILESđãparseRDKit,cả4stereođượcđọcZ;không dùng tên đểđoán.",
+    "trangThai": "da-soat-doc-lap",
+    "phongApp": true,
+    "canvasWidth": 1100,
+    "canvasHeight": 440,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "svg": "cau-truc-3f5f9ce513f241c55dbf4f1315fe914b2cc027dde3c4f0eb2086fb7d3a838f38.svg",
+    "hashSvg": "3f5f9ce513f241c55dbf4f1315fe914b2cc027dde3c4f0eb2086fb7d3a838f38",
+    "byteSvg": 10939,
+    "smilesChuan": "CCCCC/C=C\\C/C=C\\C/C=C\\C/C=C\\CCCC(=O)O",
+    "congThuc": "C20H32O2",
+    "soNguyenTuNang": 22,
+    "rdkit": "2026.09.1",
+    "hashSvgDaSoat": "3f5f9ce513f241c55dbf4f1315fe914b2cc027dde3c4f0eb2086fb7d3a838f38",
+    "nguoiSoat": "cau_truc_6"
+  }
+]

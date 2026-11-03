@@ -1,0 +1,46 @@
+[
+  {
+    "i": 404,
+    "hash": "4742d9ecfbbf83bd084bf2c93f267b84f2871d4e347f25246cc021a44505e216",
+    "fileNguon": "anh/4742d9ecfbbf83bd084bf2c93f267b84f2871d4e347f25246cc021a44505e216.png",
+    "svg": "do-thi-tick-ddh-b1e9a586830f79ee9044689b32d1d167e68cfd61bfb598d342c8751d00e7d049.svg",
+    "hashSvg": "b1e9a586830f79ee9044689b32d1d167e68cfd61bfb598d342c8751d00e7d049",
+    "byteSvg": 22523,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ticksThem": [
+      10,
+      20,
+      30,
+      40,
+      50,
+      60
+    ],
+    "ghiChu": "Giữ nguyên dữ liệu/curve/đỉnh37/hết50/guide37/chữ; thêm6tickX nhìn thấy trong cả2nguồn. Không ghi đè SVG cũ.",
+    "hashSvgDaSoat": "b1e9a586830f79ee9044689b32d1d167e68cfd61bfb598d342c8751d00e7d049",
+    "nguoiSoat": "cau_truc_6"
+  },
+  {
+    "i": 525,
+    "hash": "633412e5da7779c95ed978fdae5a5938dee27fa3db44110bb0e698a73000175b",
+    "fileNguon": "anh/633412e5da7779c95ed978fdae5a5938dee27fa3db44110bb0e698a73000175b.png",
+    "svg": "do-thi-tick-ddh-b1e9a586830f79ee9044689b32d1d167e68cfd61bfb598d342c8751d00e7d049.svg",
+    "hashSvg": "b1e9a586830f79ee9044689b32d1d167e68cfd61bfb598d342c8751d00e7d049",
+    "byteSvg": 22523,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ticksThem": [
+      10,
+      20,
+      30,
+      40,
+      50,
+      60
+    ],
+    "ghiChu": "Giữ nguyên dữ liệu/curve/đỉnh37/hết50/guide37/chữ; thêm6tickX nhìn thấy trong cả2nguồn. Không ghi đè SVG cũ.",
+    "hashSvgDaSoat": "b1e9a586830f79ee9044689b32d1d167e68cfd61bfb598d342c8751d00e7d049",
+    "nguoiSoat": "cau_truc_6"
+  }
+]

@@ -1,0 +1,105 @@
+[
+  {
+    "i": 1036,
+    "hash": "baf052db1cbbfb73a2c37cd22b37fe1f0d23d30ab27989d24f5d820700385d6f",
+    "fileNguon": "anh/baf052db1cbbfb73a2c37cd22b37fe1f0d23d30ab27989d24f5d820700385d6f.png",
+    "questions": [
+      {
+        "qid": "12-C2-B4-D2-I-7",
+        "de": "Phân tử β-glucose có cấu tạo như sau: Trong phân tử β-glucose, nhóm -OH ở vị trí carbon số mấy có khả năng phản ứng với ethanol khi có mặt của HCl khan, tạo thành ethyl glucoside?",
+        "refs": [
+          {
+            "where": "12-C2-B4-D2-I-7.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D2-I-23",
+        "de": "Phân tử β-glucose có cấu tạo như sau: Trong phân tử β-glucose, nhóm -OH ở vị trí carbon số mấy có khả năng phản ứng với ethanol khi có mặt của HCl khan, tạo thành ethyl glucoside?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-I-23.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daMoNative": true,
+    "kind": "haworth-literal-numbered",
+    "canvas": [
+      404,
+      345
+    ],
+    "vertices": {
+      "C1": [
+        333,
+        184
+      ],
+      "C2": [
+        251,
+        244
+      ],
+      "C3": [
+        129,
+        244
+      ],
+      "C4": [
+        52,
+        184
+      ],
+      "C5": [
+        129,
+        123
+      ],
+      "ringO": [
+        252,
+        123
+      ],
+      "C6label": [
+        128,
+        41
+      ]
+    },
+    "substituents": {
+      "C1": {
+        "down": "OH",
+        "up": null,
+        "carbonNumber": "1 đặt phải-trên"
+      },
+      "C2": {
+        "down": "OH",
+        "up": null,
+        "carbonNumber": "2 đặt trái-dướiC2"
+      },
+      "C3": {
+        "up": "OH",
+        "down": null,
+        "carbonNumber": "3 đặt phải-dướiC3"
+      },
+      "C4": {
+        "down": "OH",
+        "up": null,
+        "carbonNumber": "4 đặt trái-trênC4"
+      },
+      "C5": {
+        "up": "CH₂OH",
+        "down": null,
+        "carbonNumber": "5 đặt tráiC5"
+      },
+      "C6": {
+        "text": "CH₂OH",
+        "carbonNumber": "6 phía trên CH₂OH"
+      }
+    },
+    "notes": "KhôngbấtkỳHexplicit,khôngnhãnCởđỉnh,vòng6cạnh5C+1O. CạnhC4–C3,C3–C2,C2–C1đậm;C5–O vàO–C1 thường. CH₂OHlênC5;OH C1xuống,C2xuống,C3lên,C4xuống. Khôngđượcsửatheostemgọiβ:nguồnOH C1xuốngkhácβthường,giữlựachọn/hìnhnguyênvăn. PhảigiữđủsốC1..6;khôngđượcbỏsốhoặcthêmH.",
+    "svg": "haworth-so-ddh-444921e7940498e28a36a15e0b8d79e0b328accda35ae5ffa4b91c32ff5627df.svg",
+    "hashSvg": "444921e7940498e28a36a15e0b8d79e0b328accda35ae5ffa4b91c32ff5627df",
+    "byteSvg": 11110,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "hashSvgDaSoat": "444921e7940498e28a36a15e0b8d79e0b328accda35ae5ffa4b91c32ff5627df",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

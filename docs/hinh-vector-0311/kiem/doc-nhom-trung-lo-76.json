@@ -1,0 +1,572 @@
+[
+  {
+    "i": 528,
+    "hash": "636f342a2b40a8ae498de358247340764ce31174c120c8f0dc455268f2a91fbf",
+    "file": "anh/636f342a2b40a8ae498de358247340764ce31174c120c8f0dc455268f2a91fbf.png",
+    "baseI": 175,
+    "baseHash": "1e2fef5f1ff0a3488e009b84cd87092c94f1c17994e2753f4ce588b9dca24e1e",
+    "baseFile": "anh/1e2fef5f1ff0a3488e009b84cd87092c94f1c17994e2753f4ce588b9dca24e1e.png",
+    "baseSvg": "cau-truc-ddh-641e564b1f9968eebf875e690d54d1ed3b75f9c8bd920249cbe27436ecd3c778.svg",
+    "baseHashSvg": "641e564b1f9968eebf875e690d54d1ed3b75f9c8bd920249cbe27436ecd3c778",
+    "score": 9.486,
+    "ph": 8,
+    "dh": 1,
+    "ratio": 0.082,
+    "refs": 2,
+    "tepSVG": "cau-truc-ddh-641e564b1f9968eebf875e690d54d1ed3b75f9c8bd920249cbe27436ecd3c778.svg",
+    "hashSvgDaMo": "641e564b1f9968eebf875e690d54d1ed3b75f9c8bd920249cbe27436ecd3c778",
+    "ketLuan": "Cùng nội dung; có thể dùng lại SVG đã đạt",
+    "khacBietCanDungLai": [],
+    "bangChung": "Cùng H–O–H thẳng,hai liênkếtđơn và haiH tường minh;khôngnhãn/chargekhác. Đã mởsource528/base175/renderSVG.",
+    "nguoiSoat": "soat_nguon_2",
+    "refsQid": [
+      "10-C1-B2-III-24",
+      "DB-10-B2-D2-III-59"
+    ],
+    "baseSvgRenderDaXem": "/workspace/scratch/trung-lo76/528-base-svg.png",
+    "phuongPhap": "Pillow crop nền+dHash/pHash chỉ đề cử; đã mở riêng PNGsource,PNGbase,renderSVG thật. Không kết luận từ fingerprint."
+  },
+  {
+    "i": 124,
+    "hash": "172229783df2f93d338a745c8aa11a8957e068b0c2c510d456fba5bd61396814",
+    "file": "anh/172229783df2f93d338a745c8aa11a8957e068b0c2c510d456fba5bd61396814.png",
+    "baseI": 814,
+    "baseHash": "969dc1ed72ac05e46c6fe936c5fe3ed20a92a1cb19742dbd9599a676c2c22a07",
+    "baseFile": "anh/969dc1ed72ac05e46c6fe936c5fe3ed20a92a1cb19742dbd9599a676c2c22a07.png",
+    "baseSvg": "cau-truc-ddh-0d44a134f2e9e2f8f367769d9f08eaf74dc0e7a6f218bac07503288bab368d50.svg",
+    "baseHashSvg": "0d44a134f2e9e2f8f367769d9f08eaf74dc0e7a6f218bac07503288bab368d50",
+    "score": 11.236,
+    "ph": 10,
+    "dh": 1,
+    "ratio": 0.061,
+    "refs": 4,
+    "tepSVG": "cau-truc-ddh-0d44a134f2e9e2f8f367769d9f08eaf74dc0e7a6f218bac07503288bab368d50.svg",
+    "hashSvgDaMo": "0d44a134f2e9e2f8f367769d9f08eaf74dc0e7a6f218bac07503288bab368d50",
+    "ketLuan": "Cùng nội dung; có thể dùng lại SVG đã đạt",
+    "khacBietCanDungLai": [],
+    "bangChung": "Cùng grid4panel(1)..(4):Ala–Gly;Ala–Ala;H2N–CH(CH3)–CO–O–CH2–COOH;(4)betaAla–Gly với2CH2trướcamide. GiữNH/NH2,esterOở(3),khôngstereo. Đã mởsource124/base814/renderSVG.",
+    "nguoiSoat": "soat_nguon_2",
+    "refsQid": [
+      "12-C3-B11-D2-I-7",
+      "12-C3-B9-D1-I-21",
+      "DB-12-B9-P2-D1-I-16",
+      "DB-12-B9-P2-D1-I-111"
+    ],
+    "baseSvgRenderDaXem": "/workspace/scratch/trung-lo76/124-base-svg.png",
+    "phuongPhap": "Pillow crop nền+dHash/pHash chỉ đề cử; đã mở riêng PNGsource,PNGbase,renderSVG thật. Không kết luận từ fingerprint."
+  },
+  {
+    "i": 317,
+    "hash": "371550e7c2a20c8c3cc2ea27b983ab55e54960cda904f585cafb6f3e30dea315",
+    "file": "anh/371550e7c2a20c8c3cc2ea27b983ab55e54960cda904f585cafb6f3e30dea315.png",
+    "baseI": 541,
+    "baseHash": "65d707399e149ff5ef6f57c9255713dddfb5313cd4d7cc08ae311723cba4fd00",
+    "baseFile": "anh/65d707399e149ff5ef6f57c9255713dddfb5313cd4d7cc08ae311723cba4fd00.png",
+    "baseSvg": "cau-truc-ddh-21c2df7805f121883aecfb5b3e9fe31266c67f5d0ef8172b9c068b15d0d61d3d.svg",
+    "baseHashSvg": "21c2df7805f121883aecfb5b3e9fe31266c67f5d0ef8172b9c068b15d0d61d3d",
+    "score": 12.917,
+    "ph": 4,
+    "dh": 12,
+    "ratio": 0.243,
+    "refs": 1,
+    "tepSVG": "cau-truc-ddh-21c2df7805f121883aecfb5b3e9fe31266c67f5d0ef8172b9c068b15d0d61d3d.svg",
+    "hashSvgDaMo": "21c2df7805f121883aecfb5b3e9fe31266c67f5d0ef8172b9c068b15d0d61d3d",
+    "ketLuan": "Khác chi tiết hoặc cấu trúc; giữ lại không alias",
+    "khacBietCanDungLai": [
+      "Source317 có O−/Na+ hiển thị tách rõ; base541/SVG chỉ ONa nối cộnghóa trị. Cùngmạch16C nhưngkhôngcùngkýhiệuđiệntích. Giữlại,dựngbiếnthểcó O−/Na+."
+    ],
+    "bangChung": "Source317 có O−/Na+ hiển thị tách rõ; base541/SVG chỉ ONa nối cộnghóa trị. Cùngmạch16C nhưngkhôngcùngkýhiệuđiệntích. Giữlại,dựngbiếnthểcó O−/Na+.",
+    "nguoiSoat": "soat_nguon_2",
+    "refsQid": [
+      "VIP27-BDT-L7-0701-I-3"
+    ],
+    "baseSvgRenderDaXem": "/workspace/scratch/trung-lo76/317-base-svg.png",
+    "phuongPhap": "Pillow crop nền+dHash/pHash chỉ đề cử; đã mở riêng PNGsource,PNGbase,renderSVG thật. Không kết luận từ fingerprint."
+  },
+  {
+    "i": 384,
+    "hash": "44b3f6c9c5ada7945e3554b454759c41eda3f50305bd4c0b37f9979dc6437d05",
+    "file": "anh/44b3f6c9c5ada7945e3554b454759c41eda3f50305bd4c0b37f9979dc6437d05.png",
+    "baseI": 144,
+    "baseHash": "196ed7caa503adad268f2d8729ed02f6ba0d81e0c780a3b031f59ba040f1727c",
+    "baseFile": "anh/196ed7caa503adad268f2d8729ed02f6ba0d81e0c780a3b031f59ba040f1727c.png",
+    "baseSvg": "do-thi-ddh-33f04ac59e942c2c18043a5ac77b1ad7cf3857a44a3cd74e9b9c9c5330bd8bb5.svg",
+    "baseHashSvg": "33f04ac59e942c2c18043a5ac77b1ad7cf3857a44a3cd74e9b9c9c5330bd8bb5",
+    "score": 14.349,
+    "ph": 8,
+    "dh": 10,
+    "ratio": 0.112,
+    "refs": 2,
+    "tepSVG": "do-thi-ddh-33f04ac59e942c2c18043a5ac77b1ad7cf3857a44a3cd74e9b9c9c5330bd8bb5.svg",
+    "hashSvgDaMo": "33f04ac59e942c2c18043a5ac77b1ad7cf3857a44a3cd74e9b9c9c5330bd8bb5",
+    "ketLuan": "Cùng nội dung; có thể dùng lại SVG đã đạt",
+    "khacBietCanDungLai": [],
+    "bangChung": "Cùng4đồthị(1)..(4),trụcn/t/0/0,1,cácnétđứtplateau:(1)congtăngtớimứcdưới0,1;(2)congtăngtới0,1;(3)thẳngtăngtới0,1rồigãyngang;(4)conggiảmtừ0,1tớiplateaudương. Đã mở3ảnh.",
+    "nguoiSoat": "soat_nguon_2",
+    "refsQid": [
+      "DB-12-B1-P1-D2-III-106",
+      "DH-12-C1-B1-P1-III-20"
+    ],
+    "baseSvgRenderDaXem": "/workspace/scratch/trung-lo76/384-base-svg.png",
+    "phuongPhap": "Pillow crop nền+dHash/pHash chỉ đề cử; đã mở riêng PNGsource,PNGbase,renderSVG thật. Không kết luận từ fingerprint."
+  },
+  {
+    "i": 433,
+    "hash": "4dde1b5dfb49f3ea33d4c9c547e565a1c90a72c77555f81d499105b6ea9247dd",
+    "file": "anh/4dde1b5dfb49f3ea33d4c9c547e565a1c90a72c77555f81d499105b6ea9247dd.png",
+    "baseI": 144,
+    "baseHash": "196ed7caa503adad268f2d8729ed02f6ba0d81e0c780a3b031f59ba040f1727c",
+    "baseFile": "anh/196ed7caa503adad268f2d8729ed02f6ba0d81e0c780a3b031f59ba040f1727c.png",
+    "baseSvg": "do-thi-ddh-33f04ac59e942c2c18043a5ac77b1ad7cf3857a44a3cd74e9b9c9c5330bd8bb5.svg",
+    "baseHashSvg": "33f04ac59e942c2c18043a5ac77b1ad7cf3857a44a3cd74e9b9c9c5330bd8bb5",
+    "score": 14.899,
+    "ph": 8,
+    "dh": 11,
+    "ratio": 0.117,
+    "refs": 2,
+    "tepSVG": "do-thi-ddh-33f04ac59e942c2c18043a5ac77b1ad7cf3857a44a3cd74e9b9c9c5330bd8bb5.svg",
+    "hashSvgDaMo": "33f04ac59e942c2c18043a5ac77b1ad7cf3857a44a3cd74e9b9c9c5330bd8bb5",
+    "ketLuan": "Cùng nội dung; có thể dùng lại SVG đã đạt",
+    "khacBietCanDungLai": [],
+    "bangChung": "Cùng4đồthị(1)..(4),đủn/t/0/0,1,mũitên,nétđứtvàđiểmgãy/plateau nhưbase144. Khôngkhácnhãn/phươngán. Đã mở3ảnh.",
+    "nguoiSoat": "soat_nguon_2",
+    "refsQid": [
+      "12-C1-B1-D2-III-19",
+      "DB-12-B1-P1-D2-III-34"
+    ],
+    "baseSvgRenderDaXem": "/workspace/scratch/trung-lo76/433-base-svg.png",
+    "phuongPhap": "Pillow crop nền+dHash/pHash chỉ đề cử; đã mở riêng PNGsource,PNGbase,renderSVG thật. Không kết luận từ fingerprint."
+  },
+  {
+    "i": 158,
+    "hash": "1b42c277d17b212a12a24f99b86babd6cb7e64bf952de94e40cf2d74dbc1b2e7",
+    "file": "anh/1b42c277d17b212a12a24f99b86babd6cb7e64bf952de94e40cf2d74dbc1b2e7.png",
+    "baseI": 1306,
+    "baseHash": "ec7f9a5cb46207f424c5b09ba9a67c23c5bb748564acd1eadd86f1e6074ca8d2",
+    "baseFile": "anh/ec7f9a5cb46207f424c5b09ba9a67c23c5bb748564acd1eadd86f1e6074ca8d2.png",
+    "baseSvg": "cau-truc-ddh-fdc70e0f34c3f810b66b13fca470d787d4a6c4037e2527c85d42b2d066333b44.svg",
+    "baseHashSvg": "fdc70e0f34c3f810b66b13fca470d787d4a6c4037e2527c85d42b2d066333b44",
+    "score": 16.231,
+    "ph": 10,
+    "dh": 9,
+    "ratio": 0.144,
+    "refs": 1,
+    "tepSVG": "cau-truc-ddh-fdc70e0f34c3f810b66b13fca470d787d4a6c4037e2527c85d42b2d066333b44.svg",
+    "hashSvgDaMo": "fdc70e0f34c3f810b66b13fca470d787d4a6c4037e2527c85d42b2d066333b44",
+    "ketLuan": "Khác chi tiết hoặc cấu trúc; giữ lại không alias",
+    "khacBietCanDungLai": [
+      "KHÁC:source158 có20C,4liênkếtđôi (5Z,8Z,11Z,14Z tínhtừCOOH);base1306/SVG có18C,2liênkếtđôi9Z/12Z. Tuyệtđốikhôngalias."
+    ],
+    "bangChung": "KHÁC:source158 có20C,4liênkếtđôi (5Z,8Z,11Z,14Z tínhtừCOOH);base1306/SVG có18C,2liênkếtđôi9Z/12Z. Tuyệtđốikhôngalias.",
+    "nguoiSoat": "soat_nguon_2",
+    "refsQid": [
+      "12-C1-B1-D3-III-13"
+    ],
+    "baseSvgRenderDaXem": "/workspace/scratch/trung-lo76/158-base-svg.png",
+    "phuongPhap": "Pillow crop nền+dHash/pHash chỉ đề cử; đã mở riêng PNGsource,PNGbase,renderSVG thật. Không kết luận từ fingerprint."
+  },
+  {
+    "i": 525,
+    "hash": "633412e5da7779c95ed978fdae5a5938dee27fa3db44110bb0e698a73000175b",
+    "file": "anh/633412e5da7779c95ed978fdae5a5938dee27fa3db44110bb0e698a73000175b.png",
+    "baseI": 404,
+    "baseHash": "4742d9ecfbbf83bd084bf2c93f267b84f2871d4e347f25246cc021a44505e216",
+    "baseFile": "anh/4742d9ecfbbf83bd084bf2c93f267b84f2871d4e347f25246cc021a44505e216.png",
+    "baseSvg": "hoa-ddh-a3c6843ca3a9a836d62e40bfa7b313221ce72523e0e8b4def6ef2254e5680c66.svg",
+    "baseHashSvg": "a3c6843ca3a9a836d62e40bfa7b313221ce72523e0e8b4def6ef2254e5680c66",
+    "score": 16.716,
+    "ph": 10,
+    "dh": 10,
+    "ratio": 0.143,
+    "refs": 1,
+    "tepSVG": "hoa-ddh-a3c6843ca3a9a836d62e40bfa7b313221ce72523e0e8b4def6ef2254e5680c66.svg",
+    "hashSvgDaMo": "a3c6843ca3a9a836d62e40bfa7b313221ce72523e0e8b4def6ef2254e5680c66",
+    "ketLuan": "Thiếu chi tiết trong SVG base; giữ lại, chưa alias",
+    "khacBietCanDungLai": [
+      "SVG base thiếu vạch tick nhỏ ở x=10/20/30/40/50/60 có trong PNG525 và PNG404; cần bổ sung và soát hash mới."
+    ],
+    "bangChung": "Đã mở riêng PNG525, PNG404 và render SVG. Cùng trục/số/curve/guide37, nhưng soi render và XML path thấy SVG chỉ có hai trục, mũi tên, guide37 và curve; không có tick paths trong khi nguồn có tick nhỏ tại10/20/30/40/50/60. Không chấp thuận dùng lại nguyên SVG này.",
+    "nguoiSoat": "soat_nguon_2",
+    "refsQid": [
+      "12-KT-C3-D2-I-16"
+    ],
+    "baseSvgRenderDaXem": "/workspace/scratch/trung-lo76/525-base-svg.png",
+    "phuongPhap": "Pillow crop nền+dHash/pHash chỉ đề cử; đã mở riêng PNGsource,PNGbase,renderSVG thật. Không kết luận từ fingerprint."
+  },
+  {
+    "i": 639,
+    "hash": "76e37cd89b8788137913b47254721d39ea7070321391141a1986ad721f9b0049",
+    "file": "anh/76e37cd89b8788137913b47254721d39ea7070321391141a1986ad721f9b0049.png",
+    "baseI": 96,
+    "baseHash": "1349637253f51a2e702a0212bad8c87b39419b3de52bb42a7fbf7bb4e7050eff",
+    "baseFile": "anh/1349637253f51a2e702a0212bad8c87b39419b3de52bb42a7fbf7bb4e7050eff.png",
+    "baseSvg": "do-thi-ddh-bce1335c3a10ed347a642a3460e9ffe85f7f9081e8e3cbf132a4af8d34644c91.svg",
+    "baseHashSvg": "bce1335c3a10ed347a642a3460e9ffe85f7f9081e8e3cbf132a4af8d34644c91",
+    "score": 18.559,
+    "ph": 14,
+    "dh": 9,
+    "ratio": 0.005,
+    "refs": 2,
+    "tepSVG": "do-thi-ddh-bce1335c3a10ed347a642a3460e9ffe85f7f9081e8e3cbf132a4af8d34644c91.svg",
+    "hashSvgDaMo": "bce1335c3a10ed347a642a3460e9ffe85f7f9081e8e3cbf132a4af8d34644c91",
+    "ketLuan": "Khác chi tiết hoặc cấu trúc; giữ lại không alias",
+    "khacBietCanDungLai": [
+      "Phầnđồthị cùngbase96,nhưngsource639có thêm dòngvăn bảnởmépdưới bịcắt:đường huyết theo thời gian(phần tô màu là thời gian tập thể dục...). Base/SVGkhôngcódòngnày. Giữlạiđểđốichiếucâudẫn/choquyếtđịnhloạibỏphầnvăn bảnhayphụchồi;chưaaliasnguyênảnh."
+    ],
+    "bangChung": "Phầnđồthị cùngbase96,nhưngsource639có thêm dòngvăn bảnởmépdưới bịcắt:đường huyết theo thời gian(phần tô màu là thời gian tập thể dục...). Base/SVGkhôngcódòngnày. Giữlạiđểđốichiếucâudẫn/choquyếtđịnhloạibỏphầnvăn bảnhayphụchồi;chưaaliasnguyênảnh.",
+    "nguoiSoat": "soat_nguon_2",
+    "refsQid": [
+      "12-C2-B4-D2-II-7",
+      "DB-12-B4-D3-II-52"
+    ],
+    "baseSvgRenderDaXem": "/workspace/scratch/trung-lo76/639-base-svg.png",
+    "phuongPhap": "Pillow crop nền+dHash/pHash chỉ đề cử; đã mở riêng PNGsource,PNGbase,renderSVG thật. Không kết luận từ fingerprint.",
+    "bangChungVanBanCatLaCauDan": "Hai qid12-C2-B4-D2-II-7 vàDB-12-B4-D3-II-52 đều có câu dẫn nguyên văn: Biểu đồ đường huyết theo thời gian (phần tô màu là thời gian tập thể dục15′–85′). DòngcắtmépdướiPNG lặp lại đoạncâu dẫn này;không phải nhãntrục/điểm. Có thểloại junk sau rootxácnhận, chưađưa vào kếtluậnaliasnguyênảnh."
+  },
+  {
+    "i": 437,
+    "hash": "4ecd270f71940e30440aea81a712a6f19c1f6f3a4f3a5a92993a1ebd41e101ce",
+    "file": "anh/4ecd270f71940e30440aea81a712a6f19c1f6f3a4f3a5a92993a1ebd41e101ce.png",
+    "baseI": 307,
+    "baseHash": "349c91905470414eda5746d75938429a345eb8fbeb71b170f7babd495bbb9f45",
+    "baseFile": "anh/349c91905470414eda5746d75938429a345eb8fbeb71b170f7babd495bbb9f45.png",
+    "baseSvg": "do-thi-ddh-15363921e30bb0d5a74bb68562578cbbb40862e449e84e7c8058184134323d82.svg",
+    "baseHashSvg": "15363921e30bb0d5a74bb68562578cbbb40862e449e84e7c8058184134323d82",
+    "score": 19.654,
+    "ph": 10,
+    "dh": 15,
+    "ratio": 0.18,
+    "refs": 1,
+    "tepSVG": "do-thi-ddh-15363921e30bb0d5a74bb68562578cbbb40862e449e84e7c8058184134323d82.svg",
+    "hashSvgDaMo": "15363921e30bb0d5a74bb68562578cbbb40862e449e84e7c8058184134323d82",
+    "ketLuan": "Khác chi tiết hoặc cấu trúc; giữ lại không alias",
+    "khacBietCanDungLai": [
+      "KHÁChoàntoàn:source437làphổMSm/z11..18,yCường độ tương đối(%),5cột12..16;baselàđồthịlênmen moltheongày. Khôngalias."
+    ],
+    "bangChung": "KHÁChoàntoàn:source437làphổMSm/z11..18,yCường độ tương đối(%),5cột12..16;baselàđồthịlênmen moltheongày. Khôngalias.",
+    "nguoiSoat": "soat_nguon_2",
+    "refsQid": [
+      "DH-11-C3-B12-I-33"
+    ],
+    "baseSvgRenderDaXem": "/workspace/scratch/trung-lo76/437-base-svg.png",
+    "phuongPhap": "Pillow crop nền+dHash/pHash chỉ đề cử; đã mở riêng PNGsource,PNGbase,renderSVG thật. Không kết luận từ fingerprint."
+  },
+  {
+    "i": 504,
+    "hash": "5d1aa299d418373acd97b0a88c8f3efe77bb890a89410e6b00e439b46b1a8056",
+    "file": "anh/5d1aa299d418373acd97b0a88c8f3efe77bb890a89410e6b00e439b46b1a8056.png",
+    "baseI": 881,
+    "baseHash": "a059ccf61054f1ead9a173fae8d51777fccf82887be2dcf4469d4e2a84a3be69",
+    "baseFile": "anh/a059ccf61054f1ead9a173fae8d51777fccf82887be2dcf4469d4e2a84a3be69.png",
+    "baseSvg": "cau-truc-ddh-fbbb603e4c482545abcda22b269fbe972cd91a9c648ec1d5b3a72f22a8c1f53f.svg",
+    "baseHashSvg": "fbbb603e4c482545abcda22b269fbe972cd91a9c648ec1d5b3a72f22a8c1f53f",
+    "score": 21.241,
+    "ph": 12,
+    "dh": 17,
+    "ratio": 0.062,
+    "refs": 1,
+    "tepSVG": "cau-truc-ddh-fbbb603e4c482545abcda22b269fbe972cd91a9c648ec1d5b3a72f22a8c1f53f.svg",
+    "hashSvgDaMo": "fbbb603e4c482545abcda22b269fbe972cd91a9c648ec1d5b3a72f22a8c1f53f",
+    "ketLuan": "Khác chi tiết hoặc cấu trúc; giữ lại không alias",
+    "khacBietCanDungLai": [
+      "Khác phân tử:PNG504 làleucine HOOC–CH(NH2)–CH2–CH(CH3)2,khôngS;PNG881/SVG làmethionine cóS–CH3 vàmạchkhác. Source504cónétđậm hìnhnêmởliênkếtCH2 khôngđược tựbỏ;khôngalias."
+    ],
+    "bangChung": "Khác phân tử:PNG504 làleucine HOOC–CH(NH2)–CH2–CH(CH3)2,khôngS;PNG881/SVG làmethionine cóS–CH3 vàmạchkhác. Source504cónétđậm hìnhnêmởliênkếtCH2 khôngđược tựbỏ;khôngalias.",
+    "nguoiSoat": "soat_nguon_2",
+    "refsQid": [
+      "12-C3-B10-D2-II-21"
+    ],
+    "baseSvgRenderDaXem": "/workspace/scratch/trung-lo76/504-base-svg.png",
+    "phuongPhap": "Pillow crop nền+dHash/pHash chỉ đề cử; đã mở riêng PNGsource,PNGbase,renderSVG thật. Không kết luận từ fingerprint."
+  },
+  {
+    "i": 136,
+    "hash": "185eee39919d27e49028347d5eaa07614e1ba050d9dfc370343c076e8626c5e9",
+    "file": "anh/185eee39919d27e49028347d5eaa07614e1ba050d9dfc370343c076e8626c5e9.png",
+    "baseI": 45,
+    "baseHash": "0998c4ae2c931e01ad5b3c19128fb0c1c20414836d9d0413ca523ec2a1d70e96",
+    "baseFile": "anh/0998c4ae2c931e01ad5b3c19128fb0c1c20414836d9d0413ca523ec2a1d70e96.png",
+    "baseSvg": "hoa-ddh-6f845005c6af4551ca2efd837ff060557a784c229d1e333c7b933da3e235c40a.svg",
+    "baseHashSvg": "6f845005c6af4551ca2efd837ff060557a784c229d1e333c7b933da3e235c40a",
+    "score": 21.45,
+    "ph": 18,
+    "dh": 6,
+    "ratio": 0.038,
+    "refs": 1,
+    "tepSVG": "hoa-ddh-6f845005c6af4551ca2efd837ff060557a784c229d1e333c7b933da3e235c40a.svg",
+    "hashSvgDaMo": "6f845005c6af4551ca2efd837ff060557a784c229d1e333c7b933da3e235c40a",
+    "ketLuan": "Khác chi tiết hoặc cấu trúc; giữ lại không alias",
+    "khacBietCanDungLai": [
+      "Khácnhómchức:source136làester Ph–CH2–O–C(=O)–nhánhphảibịsát/cắtmépnguồn;base45/SVG làPh–CH=CH–CHO cóHformyl. Khôngalias/khôngsuy tiếp nhánhngoàiảnh."
+    ],
+    "bangChung": "Khácnhómchức:source136làester Ph–CH2–O–C(=O)–nhánhphảibịsát/cắtmépnguồn;base45/SVG làPh–CH=CH–CHO cóHformyl. Khôngalias/khôngsuy tiếp nhánhngoàiảnh.",
+    "nguoiSoat": "soat_nguon_2",
+    "refsQid": [
+      "DH-12-C1-B1-P1-II-5"
+    ],
+    "baseSvgRenderDaXem": "/workspace/scratch/trung-lo76/136-base-svg.png",
+    "phuongPhap": "Pillow crop nền+dHash/pHash chỉ đề cử; đã mở riêng PNGsource,PNGbase,renderSVG thật. Không kết luận từ fingerprint."
+  },
+  {
+    "i": 535,
+    "hash": "653638eb044b95417dd6a82759c8957852dc277cc6174d285e5d942de28d9e3b",
+    "file": "anh/653638eb044b95417dd6a82759c8957852dc277cc6174d285e5d942de28d9e3b.png",
+    "baseI": 326,
+    "baseHash": "38b14531d7d82327659b685da40e5328a9fba26f954c919fb87b79d03ccbd8fc",
+    "baseFile": "anh/38b14531d7d82327659b685da40e5328a9fba26f954c919fb87b79d03ccbd8fc.png",
+    "baseSvg": "ms-ddh-c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2.svg",
+    "baseHashSvg": "c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2",
+    "score": 24.679,
+    "ph": 14,
+    "dh": 20,
+    "ratio": 0.057,
+    "refs": 2,
+    "tepSVG": "ms-ddh-c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2.svg",
+    "hashSvgDaMo": "c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2",
+    "ketLuan": "Khác chi tiết hoặc cấu trúc; giữ lại không alias",
+    "khacBietCanDungLai": [
+      "Khácphổ:source535chỉ2cột khôngnhãnsốđỉnh,trụcx20..100/y0..80;baselàZr5cột90..96cóphầntrăm. Khôngsuy m/zcột chưa ghi,khôngalias."
+    ],
+    "bangChung": "Khácphổ:source535chỉ2cột khôngnhãnsốđỉnh,trụcx20..100/y0..80;baselàZr5cột90..96cóphầntrăm. Khôngsuy m/zcột chưa ghi,khôngalias.",
+    "nguoiSoat": "soat_nguon_2",
+    "refsQid": [
+      "10-C1-B2-I-58",
+      "DB-10-B2-D2-I-29"
+    ],
+    "baseSvgRenderDaXem": "/workspace/scratch/trung-lo76/535-base-svg.png",
+    "phuongPhap": "Pillow crop nền+dHash/pHash chỉ đề cử; đã mở riêng PNGsource,PNGbase,renderSVG thật. Không kết luận từ fingerprint."
+  },
+  {
+    "i": 322,
+    "hash": "376fe26a3db26928e1fa6a8549aa75382a580da670ab290bfd50a8aa48917197",
+    "file": "anh/376fe26a3db26928e1fa6a8549aa75382a580da670ab290bfd50a8aa48917197.png",
+    "baseI": 42,
+    "baseHash": "091df9d88ee7f23d8aad12621c66ddba60b9e4ff4c1e25d88d9a72e22eeeef22",
+    "baseFile": "anh/091df9d88ee7f23d8aad12621c66ddba60b9e4ff4c1e25d88d9a72e22eeeef22.png",
+    "baseSvg": "hoa-ddh-1b6d36a76653a9cd25bef266ed853d5b2720ae07ba418f4f2ffbef2eb6635aa6.svg",
+    "baseHashSvg": "1b6d36a76653a9cd25bef266ed853d5b2720ae07ba418f4f2ffbef2eb6635aa6",
+    "score": 24.814,
+    "ph": 16,
+    "dh": 17,
+    "ratio": 0.026,
+    "refs": 2,
+    "tepSVG": "hoa-ddh-1b6d36a76653a9cd25bef266ed853d5b2720ae07ba418f4f2ffbef2eb6635aa6.svg",
+    "hashSvgDaMo": "1b6d36a76653a9cd25bef266ed853d5b2720ae07ba418f4f2ffbef2eb6635aa6",
+    "ketLuan": "Khác chi tiết hoặc cấu trúc; giữ lại không alias",
+    "khacBietCanDungLai": [
+      "Phầnđồthị cùngbase42 với(a)giảm/(b)tăngtớiTrạng thái cân bằng,trụcTốc độ phản ứng/Thời gian. Nhưngsource322cóthêmdòngvănbảnnghiêngbịcắtmépdưới:thay đổi tốc độ phản ứng thuận và phản ứng...;base/SVGkhôngcó. GiữlạiđểxácnhậnjunkPDF/câudẫnlặptrướckhibỏ;khôngaliasnguyênảnh."
+    ],
+    "bangChung": "Phầnđồthị cùngbase42 với(a)giảm/(b)tăngtớiTrạng thái cân bằng,trụcTốc độ phản ứng/Thời gian. Nhưngsource322cóthêmdòngvănbảnnghiêngbịcắtmépdưới:thay đổi tốc độ phản ứng thuận và phản ứng...;base/SVGkhôngcó. GiữlạiđểxácnhậnjunkPDF/câudẫnlặptrướckhibỏ;khôngaliasnguyênảnh.",
+    "nguoiSoat": "soat_nguon_2",
+    "refsQid": [
+      "11-C1-B1-I-8",
+      "DB-11-B1-D1-I-8"
+    ],
+    "baseSvgRenderDaXem": "/workspace/scratch/trung-lo76/322-base-svg.png",
+    "phuongPhap": "Pillow crop nền+dHash/pHash chỉ đề cử; đã mở riêng PNGsource,PNGbase,renderSVG thật. Không kết luận từ fingerprint.",
+    "bangChungVanBanCatLaCauDan": "Hai qid11-C1-B1-I-8 vàDB-11-B1-D1-I-8 đều có câu dẫn: Đồ thị dưới đây biểu diễn sự thay đổi tốc độ phản ứng thuận và phản ứng nghịch theo thời gian... DòngcắtmépdướiPNG lặp lại đoạn này;khôngphải nhãnđồthị. Có thểloại junk sau rootxácnhận, chưađưa vào kếtluậnaliasnguyênảnh."
+  },
+  {
+    "i": 314,
+    "hash": "360b679bb1ef4381ca9f5cbe5bc6e57c63f023111fd62827cba4a45eb727bf0f",
+    "file": "anh/360b679bb1ef4381ca9f5cbe5bc6e57c63f023111fd62827cba4a45eb727bf0f.png",
+    "baseI": 326,
+    "baseHash": "38b14531d7d82327659b685da40e5328a9fba26f954c919fb87b79d03ccbd8fc",
+    "baseFile": "anh/38b14531d7d82327659b685da40e5328a9fba26f954c919fb87b79d03ccbd8fc.png",
+    "baseSvg": "ms-ddh-c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2.svg",
+    "baseHashSvg": "c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2",
+    "score": 25.671,
+    "ph": 16,
+    "dh": 18,
+    "ratio": 0.056,
+    "refs": 2,
+    "tepSVG": "ms-ddh-c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2.svg",
+    "hashSvgDaMo": "c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2",
+    "ketLuan": "Khác chi tiết hoặc cấu trúc; giữ lại không alias",
+    "khacBietCanDungLai": [
+      "Khácphổ:source314chỉ1cộtởvùngx60..80cao≈50theotrục,y0..80,x20..100;khôngnhãnm/zđỉnh. Bas326/SVGZr5cộtvớinhãn%khác. Khôngalias."
+    ],
+    "bangChung": "Khácphổ:source314chỉ1cộtởvùngx60..80cao≈50theotrục,y0..80,x20..100;khôngnhãnm/zđỉnh. Bas326/SVGZr5cộtvớinhãn%khác. Khôngalias.",
+    "nguoiSoat": "soat_nguon_2",
+    "refsQid": [
+      "10-C1-B2-I-58",
+      "DB-10-B2-D2-I-29"
+    ],
+    "baseSvgRenderDaXem": "/workspace/scratch/trung-lo76/314-base-svg.png",
+    "phuongPhap": "Pillow crop nền+dHash/pHash chỉ đề cử; đã mở riêng PNGsource,PNGbase,renderSVG thật. Không kết luận từ fingerprint."
+  },
+  {
+    "i": 634,
+    "hash": "7528960cd4e8203592e7f30ab451dc371d554cedc2882528065fa397f910ae00",
+    "file": "anh/7528960cd4e8203592e7f30ab451dc371d554cedc2882528065fa397f910ae00.png",
+    "baseI": 326,
+    "baseHash": "38b14531d7d82327659b685da40e5328a9fba26f954c919fb87b79d03ccbd8fc",
+    "baseFile": "anh/38b14531d7d82327659b685da40e5328a9fba26f954c919fb87b79d03ccbd8fc.png",
+    "baseSvg": "ms-ddh-c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2.svg",
+    "baseHashSvg": "c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2",
+    "score": 25.69,
+    "ph": 16,
+    "dh": 18,
+    "ratio": 0.058,
+    "refs": 2,
+    "tepSVG": "ms-ddh-c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2.svg",
+    "hashSvgDaMo": "c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2",
+    "ketLuan": "Khác chi tiết hoặc cấu trúc; giữ lại không alias",
+    "khacBietCanDungLai": [
+      "Khácphổ:source634có2cộtcao bằngnhau≈50theotrục,trụcx20..100/y0..80;khôngnhãnsốđỉnh. BaseZr5cột90..96 và%khác. Khôngalias."
+    ],
+    "bangChung": "Khácphổ:source634có2cộtcao bằngnhau≈50theotrục,trụcx20..100/y0..80;khôngnhãnsốđỉnh. BaseZr5cột90..96 và%khác. Khôngalias.",
+    "nguoiSoat": "soat_nguon_2",
+    "refsQid": [
+      "DB-10-B2-D2-I-127",
+      "DH-10-C1-B4-D1-I-8"
+    ],
+    "baseSvgRenderDaXem": "/workspace/scratch/trung-lo76/634-base-svg.png",
+    "phuongPhap": "Pillow crop nền+dHash/pHash chỉ đề cử; đã mở riêng PNGsource,PNGbase,renderSVG thật. Không kết luận từ fingerprint."
+  },
+  {
+    "i": 245,
+    "hash": "2a44325fb5f469f648f700d627479b1dbf33b244a557072e46066aefa6ceaeba",
+    "file": "anh/2a44325fb5f469f648f700d627479b1dbf33b244a557072e46066aefa6ceaeba.png",
+    "baseI": 326,
+    "baseHash": "38b14531d7d82327659b685da40e5328a9fba26f954c919fb87b79d03ccbd8fc",
+    "baseFile": "anh/38b14531d7d82327659b685da40e5328a9fba26f954c919fb87b79d03ccbd8fc.png",
+    "baseSvg": "ms-ddh-c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2.svg",
+    "baseHashSvg": "c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2",
+    "score": 25.701,
+    "ph": 16,
+    "dh": 18,
+    "ratio": 0.058,
+    "refs": 2,
+    "tepSVG": "ms-ddh-c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2.svg",
+    "hashSvgDaMo": "c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2",
+    "ketLuan": "Khác chi tiết hoặc cấu trúc; giữ lại không alias",
+    "khacBietCanDungLai": [
+      "Khácphổ:source245có1cộtcao≈50,trụcx20..100/y0..80,vếtđenrờikhôngphảidữliệucột. BaseZr5cột90..96 có%khác. Khôngalias. Cóthểthuộccùnghìnhthểnguồn314nhưngchưaphảibaseđãđạt."
+    ],
+    "bangChung": "Khácphổ:source245có1cộtcao≈50,trụcx20..100/y0..80,vếtđenrờikhôngphảidữliệucột. BaseZr5cột90..96 có%khác. Khôngalias. Cóthểthuộccùnghìnhthểnguồn314nhưngchưaphảibaseđãđạt.",
+    "nguoiSoat": "soat_nguon_2",
+    "refsQid": [
+      "DB-10-B2-D2-I-127",
+      "DH-10-C1-B4-D1-I-8"
+    ],
+    "baseSvgRenderDaXem": "/workspace/scratch/trung-lo76/245-base-svg.png",
+    "phuongPhap": "Pillow crop nền+dHash/pHash chỉ đề cử; đã mở riêng PNGsource,PNGbase,renderSVG thật. Không kết luận từ fingerprint."
+  },
+  {
+    "i": 522,
+    "hash": "6208627076169c9205ff921f07be1f3f058af7f1b483ada90adc4059250f6b11",
+    "file": "anh/6208627076169c9205ff921f07be1f3f058af7f1b483ada90adc4059250f6b11.png",
+    "baseI": 404,
+    "baseHash": "4742d9ecfbbf83bd084bf2c93f267b84f2871d4e347f25246cc021a44505e216",
+    "baseFile": "anh/4742d9ecfbbf83bd084bf2c93f267b84f2871d4e347f25246cc021a44505e216.png",
+    "baseSvg": "hoa-ddh-a3c6843ca3a9a836d62e40bfa7b313221ce72523e0e8b4def6ef2254e5680c66.svg",
+    "baseHashSvg": "a3c6843ca3a9a836d62e40bfa7b313221ce72523e0e8b4def6ef2254e5680c66",
+    "score": 27.089,
+    "ph": 16,
+    "dh": 19,
+    "ratio": 0.132,
+    "refs": 2,
+    "tepSVG": "hoa-ddh-a3c6843ca3a9a836d62e40bfa7b313221ce72523e0e8b4def6ef2254e5680c66.svg",
+    "hashSvgDaMo": "a3c6843ca3a9a836d62e40bfa7b313221ce72523e0e8b4def6ef2254e5680c66",
+    "ketLuan": "Khác chi tiết hoặc cấu trúc; giữ lại không alias",
+    "khacBietCanDungLai": [
+      "Khácnộidung:source522làphổchlorinehaiisotope35/17Cl(75,77%)và37/17Cl(24,23%);trụcTỉ lệ% số nguyên tử,xm/z=A,ticks10/20/30/40,yticks25/50/75/100,captionPhổ khối lượng của chlorine. Base404/SVGlàenzymeTốc độphảnứngtheoNhiệtđộ,khôngalias."
+    ],
+    "bangChung": "Khácnộidung:source522làphổchlorinehaiisotope35/17Cl(75,77%)và37/17Cl(24,23%);trụcTỉ lệ% số nguyên tử,xm/z=A,ticks10/20/30/40,yticks25/50/75/100,captionPhổ khối lượng của chlorine. Base404/SVGlàenzymeTốc độphảnứngtheoNhiệtđộ,khôngalias.",
+    "nguoiSoat": "soat_nguon_2",
+    "refsQid": [
+      "10-C1-B2-III-16",
+      "DB-10-B2-D2-III-52"
+    ],
+    "baseSvgRenderDaXem": "/workspace/scratch/trung-lo76/522-base-svg.png",
+    "phuongPhap": "Pillow crop nền+dHash/pHash chỉ đề cử; đã mở riêng PNGsource,PNGbase,renderSVG thật. Không kết luận từ fingerprint."
+  },
+  {
+    "i": 563,
+    "hash": "68c9a255943a62ea2a776ab95fe2d0b262b62d801d49ed688b3b1842e666ad40",
+    "file": "anh/68c9a255943a62ea2a776ab95fe2d0b262b62d801d49ed688b3b1842e666ad40.png",
+    "baseI": 404,
+    "baseHash": "4742d9ecfbbf83bd084bf2c93f267b84f2871d4e347f25246cc021a44505e216",
+    "baseFile": "anh/4742d9ecfbbf83bd084bf2c93f267b84f2871d4e347f25246cc021a44505e216.png",
+    "baseSvg": "hoa-ddh-a3c6843ca3a9a836d62e40bfa7b313221ce72523e0e8b4def6ef2254e5680c66.svg",
+    "baseHashSvg": "a3c6843ca3a9a836d62e40bfa7b313221ce72523e0e8b4def6ef2254e5680c66",
+    "score": 27.096,
+    "ph": 16,
+    "dh": 19,
+    "ratio": 0.133,
+    "refs": 2,
+    "tepSVG": "hoa-ddh-a3c6843ca3a9a836d62e40bfa7b313221ce72523e0e8b4def6ef2254e5680c66.svg",
+    "hashSvgDaMo": "a3c6843ca3a9a836d62e40bfa7b313221ce72523e0e8b4def6ef2254e5680c66",
+    "ketLuan": "Khác chi tiết hoặc cấu trúc; giữ lại không alias",
+    "khacBietCanDungLai": [
+      "Khácnộidungvớibase404enzyme. Source563làcùngphổchlorinehaiisotope35/17Cl75,77%/37/17Cl24,23%,m/z=A,Tỉ lệ% số nguyên tử,captionPhổ khối lượng của chlorine nhưnguồn522 vừađọc. Cả522/563chưacóbaseđãđạtchoảnhnày;khôngaliasenzyme."
+    ],
+    "bangChung": "Khácnộidungvớibase404enzyme. Source563làcùngphổchlorinehaiisotope35/17Cl75,77%/37/17Cl24,23%,m/z=A,Tỉ lệ% số nguyên tử,captionPhổ khối lượng của chlorine nhưnguồn522 vừađọc. Cả522/563chưacóbaseđãđạtchoảnhnày;khôngaliasenzyme.",
+    "nguoiSoat": "soat_nguon_2",
+    "refsQid": [
+      "DB-10-B2-D2-III-112",
+      "DH-10-C1-B2-III-15"
+    ],
+    "baseSvgRenderDaXem": "/workspace/scratch/trung-lo76/563-base-svg.png",
+    "phuongPhap": "Pillow crop nền+dHash/pHash chỉ đề cử; đã mở riêng PNGsource,PNGbase,renderSVG thật. Không kết luận từ fingerprint."
+  },
+  {
+    "i": 692,
+    "hash": "8039b74dce86a563f589275fd79ccf04bcd29716c3345d7abaf6724585d2c18d",
+    "file": "anh/8039b74dce86a563f589275fd79ccf04bcd29716c3345d7abaf6724585d2c18d.png",
+    "baseI": 326,
+    "baseHash": "38b14531d7d82327659b685da40e5328a9fba26f954c919fb87b79d03ccbd8fc",
+    "baseFile": "anh/38b14531d7d82327659b685da40e5328a9fba26f954c919fb87b79d03ccbd8fc.png",
+    "baseSvg": "ms-ddh-c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2.svg",
+    "baseHashSvg": "c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2",
+    "score": 27.235,
+    "ph": 16,
+    "dh": 21,
+    "ratio": 0.061,
+    "refs": 2,
+    "tepSVG": "ms-ddh-c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2.svg",
+    "hashSvgDaMo": "c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2",
+    "ketLuan": "Khác chi tiết hoặc cấu trúc; giữ lại không alias",
+    "khacBietCanDungLai": [
+      "Khácphổ:source692có2cộtthấp-tráikhoảng28/cao-phảikhoảng75theotrục,trụcx20..100/y0..80,khôngnhãnsốđỉnh. BaseZr5cộtkhácnhãn/cột. Khôngaliasvàkhôngbịa m/zchínhxáctừpixel."
+    ],
+    "bangChung": "Khácphổ:source692có2cộtthấp-tráikhoảng28/cao-phảikhoảng75theotrục,trụcx20..100/y0..80,khôngnhãnsốđỉnh. BaseZr5cộtkhácnhãn/cột. Khôngaliasvàkhôngbịa m/zchínhxáctừpixel.",
+    "nguoiSoat": "soat_nguon_2",
+    "refsQid": [
+      "10-C1-B2-I-58",
+      "DB-10-B2-D2-I-29"
+    ],
+    "baseSvgRenderDaXem": "/workspace/scratch/trung-lo76/692-base-svg.png",
+    "phuongPhap": "Pillow crop nền+dHash/pHash chỉ đề cử; đã mở riêng PNGsource,PNGbase,renderSVG thật. Không kết luận từ fingerprint."
+  },
+  {
+    "i": 231,
+    "hash": "28842185852e83ce6d5a17bb8d4c29b36aa2d77caf107a7da85326d6a92461fb",
+    "file": "anh/28842185852e83ce6d5a17bb8d4c29b36aa2d77caf107a7da85326d6a92461fb.png",
+    "baseI": 1160,
+    "baseHash": "d2840011c327d935fd2830a5669b5f13646e1a11a33b2f6efdfffa72ebc88b72",
+    "baseFile": "anh/d2840011c327d935fd2830a5669b5f13646e1a11a33b2f6efdfffa72ebc88b72.png",
+    "baseSvg": "hinh-ddh-5a20a9617554ee99be56cf660ee135fd5fe154937a686a238fa6f935ea2f7e17.svg",
+    "baseHashSvg": "5a20a9617554ee99be56cf660ee135fd5fe154937a686a238fa6f935ea2f7e17",
+    "score": 27.675,
+    "ph": 16,
+    "dh": 23,
+    "ratio": 0.015,
+    "refs": 2,
+    "tepSVG": "hinh-ddh-5a20a9617554ee99be56cf660ee135fd5fe154937a686a238fa6f935ea2f7e17.svg",
+    "hashSvgDaMo": "5a20a9617554ee99be56cf660ee135fd5fe154937a686a238fa6f935ea2f7e17",
+    "ketLuan": "Khác chi tiết hoặc cấu trúc; giữ lại không alias",
+    "khacBietCanDungLai": [
+      "Kháchoàntoàn:source231chỉkýhiệuαphôngserifnghiêng;base1160/SVGđồthịNồng độ/Thời gian HI/H2+I2. Khôngalias."
+    ],
+    "bangChung": "Kháchoàntoàn:source231chỉkýhiệuαphôngserifnghiêng;base1160/SVGđồthịNồng độ/Thời gian HI/H2+I2. Khôngalias.",
+    "nguoiSoat": "soat_nguon_2",
+    "refsQid": [
+      "DB-12-B9-P2-D1-I-179",
+      "DH-12-C3-B9-P2-I-41"
+    ],
+    "baseSvgRenderDaXem": "/workspace/scratch/trung-lo76/231-base-svg.png",
+    "phuongPhap": "Pillow crop nền+dHash/pHash chỉ đề cử; đã mở riêng PNGsource,PNGbase,renderSVG thật. Không kết luận từ fingerprint."
+  }
+]

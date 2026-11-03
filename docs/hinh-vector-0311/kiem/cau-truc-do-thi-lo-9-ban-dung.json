@@ -297,7 +297,7 @@
     "svg": "do-thi-a4a3a27ab5b6314749ddbf777e21efbcbfc24eae1a3e12c9f9ff6cf9e1c62cd6.svg",
     "hashSvg": "a4a3a27ab5b6314749ddbf777e21efbcbfc24eae1a3e12c9f9ff6cf9e1c62cd6",
     "byteSvg": 3410,
-    "trangThai": "da-soat-doc-lap",
+    "trangThai": "can-soat-lai-thieu-tick",
     "nguoiDocNguon": "soat_nguon_3",
     "traceGeometryPx": [
       [
@@ -427,7 +427,8 @@
     "yTicks": [],
     "ghiChu": "Đỉnh37, hết nét50; không gán số tốc độ hoặc kéo đường sau50.",
     "hashSvgDaSoat": "a4a3a27ab5b6314749ddbf777e21efbcbfc24eae1a3e12c9f9ff6cf9e1c62cd6",
-    "nguoiSoat": "cau_truc_4"
+    "nguoiSoat": "cau_truc_4",
+    "lyDoThuHoi": "Bản đang chọn thiếu6tickX nhìn thấy ở nguồn404; tạm ngưng mọi biến thể cũ của nguồn này, không fallback khi chờ bản mới."
   },
   {
     "i": 476,
