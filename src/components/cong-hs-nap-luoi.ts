@@ -28,8 +28,7 @@ import { henDoNhipKhung } from '../lib/do-nhip-khung'
 import { ganToanTrang } from '../lib/vua-phuong-an'
 if (typeof document !== 'undefined') ganToanTrang()
 // 03/11 NHÃN «ĐÃ LÀM ĐÚNG / SAI» ở màn kiểm tra ôn tập (thầy: «đếm rõ mấy lần, sau ca xem rõ 4 kết quả»): bộ quét chỗ giữ `.duo-kt-ls` (src/lib/nhan-lich-su.ts).
-import { ganNhanLichSu } from '../lib/nhan-lich-su'
-if (typeof document !== 'undefined') ganNhanLichSu()
+if (typeof document !== 'undefined') void import('../lib/nhan-lich-su').then((m) => m.ganNhanLichSu(), () => {}) // nạp lười lồng: không phụ thuộc tĩnh
 if (typeof window !== 'undefined') henDoNhipKhung(window)
 
 // 27/10 MƯỢT: hâm nóng bộ dò «Chạm để hiểu đề» lúc rảnh trên Lộ trình (src/components/goi-y-cham/tu-dien.ts) ⇒ mở câu đầu / sang câu không còn khựng

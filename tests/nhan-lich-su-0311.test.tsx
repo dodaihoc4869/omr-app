@@ -81,10 +81,10 @@ describe('màn giáo viên «Từng em»', () => {
 
 describe('nối vào app', () => {
   it('bộ quét gắn từ mảnh nạp lười; màn chỉ vẽ phần tử rỗng', () => {
-    expect(doc('src/components/cong-hs-nap-luoi.ts')).toMatch(/ganNhanLichSu\(\)/)
+    expect(doc('src/components/cong-hs-nap-luoi.ts')).toMatch(/import\('\.\.\/lib\/nhan-lich-su'\)/)
     expect(doc('src/lib/do-treo-may-thi.ts')).toMatch(/import\('\.\/nhan-lich-su'\)/)
     expect(doc('src/components/hoc-tap/ManKiemTraCaNhan.tsx')).toMatch(/duo-kt-t4/)
-    expect(doc('src/components/xem-diem/KetQuaSauNop.tsx')).toMatch(/coDiem && p\.lichSu/)
+    expect(doc('src/components/xem-diem/KetQuaSauNop.tsx')).toMatch(/coDiem && p\.maCa && p\.bai && p\.cau/)
     expect(doc('src/screens/ExamMonitorScreen.tsx')).toMatch(/layLichSu=\{layLichSuCaEm\}/)
   })
 })

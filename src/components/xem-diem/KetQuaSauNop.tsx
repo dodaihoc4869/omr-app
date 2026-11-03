@@ -50,8 +50,9 @@ export interface KetQuaSauNopProps {
   onVe?: () => void
   /** (ca thi 28/09) Ô từng câu — CHỈ vẽ khi đã công bố. Bấm câu chưa đúng trọn (sai · bỏ trống · đúng một phần) ⇒ `onXemBaoCao` (báo cáo có lời giải của luồng cũ). */
   cau?: OCauKq[]
-  /** (03/11) So với lần làm trước: `tru` = «nguon|maNguon» của ca này, `ds` = «qid:1,qid:0» của các câu em có trả lời (1 đúng trọn / 0 chưa). */
-  lichSu?: { tru: string; ds: string }
+  /** (03/11) So với lần làm trước: đề + mã ca của ca này ⇒ ô tổng hợp 4 kết quả (qid ghép theo thứ tự I, II, III như `cau`). */
+  bai?: { phanI: { qid: string }[]; phanII: { qid: string }[]; phanIII: { qid: string }[] } | null
+  maCa?: string
   /** Chưa công bố: số câu em đã làm / tổng câu (không phải số câu đúng). */
   soDaLam?: number | null
   tongCau?: number
@@ -125,7 +126,7 @@ export default function KetQuaSauNop(p: KetQuaSauNopProps) {
               </section>
             )}
             {/* 03/11 (thầy «sau khi kết thúc ca em xem rõ 4 kết quả đúng sai lại»): CHỈ khi đã công bố điểm; phần vẽ ở mảnh nạp lười src/lib/nhan-lich-su.ts */}
-            {coDiem && p.lichSu && <section className="duo-kt-t4" data-tru={p.lichSu.tru} data-ds={p.lichSu.ds} hidden />}
+            {coDiem && p.maCa && p.bai && p.cau && <section className="duo-kt-t4" data-tru={`thi|${p.maCa}`} hidden data-ds={p.cau.filter((c) => c.kq !== 'trong').map((c) => `${(c.phan === 'I' ? p.bai!.phanI : c.phan === 'II' ? p.bai!.phanII : p.bai!.phanIII)[c.so - 1]?.qid}:${c.kq === 'dung' ? 1 : 0}`).join(',')} />}
             {coDiem && p.cau && demChuaDungTron(p.cau) > 0 && (
               <section className="kq-the" aria-labelledby="kq-h-ai">
                 <h3 id="kq-h-ai">Thầy Đỗ Đại Học đã lo cho em</h3>
