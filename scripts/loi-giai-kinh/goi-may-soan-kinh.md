@@ -29,7 +29,21 @@ Thầy: «có câu xác định nhóm trong bảng tuần hoàn ko đưa kiến 
    **Tên = vị trí-tên nhánh + mạch chính + liên kết (an/en/in) + chức**, đánh số ưu tiên **chức → π → nhánh**, đơn chức bỏ e, đa chức giữ e
    (amino acid: COOH là chức chính, C của COOH là số 1, NH₂ là nhánh «amino»; amine thay thế: chức amine đọc cuối; ester: gốc R′ trước, gốc RCOO sau);
    `phim` đi Bước 1 chọn mạch chính → Bước 2 đánh số → Bước 3 ghép tên; và có `canh` `danh-phap`.
-6. Lời thầy nói đúng trong PHẠM VI bài giảng của nó; câu chữ trong lời giải phải đúng SGK Kết nối tri thức. Ví dụ: «electron độc thân chính là electron hoá trị» là ý của bài
+6. ĐIỆN DI (thầy 03/11 «thêm và thay đổi hết»; skill 10.C3 «Nguyên tắc sự điện di của ion», «Điểm đẳng điện và sự điện di», 2007 Ôn tập ch.3):
+   MỌI câu điện di / điểm đẳng điện phải đi đủ chuỗi thầy — (1) điện di = điện tích DI CHUYỂN trong điện trường (không phải điện li);
+   (2) so **pH với pI**: pH < pI ⇒ coi là môi trường acid của chất ⇒ đầu N nhận H⁺ thành **NH₃⁺**; pH > pI ⇒ môi trường base ⇒ COOH nhường H⁺ thành **COO⁻**;
+   (3) **cộng điện tích hai đầu** ra điện tích tổng (pH = pI chưa chắc đứng yên: Glu dư COO⁻ mang âm, Lys dư NH₃⁺ mang dương);
+   (4) ion dương bị **cực âm** hút, ion âm bị **cực dương** hút, tổng 0 thì đứng yên; điện tích thuần túy chạy nhanh hơn. `phim` đi đúng (1)→(4), `hayNham` lấy
+   «ion dương về cực âm, chứ không phải cực dương». Có câu thầy nói «Sự điện di là điện tích di chuyển trong điện trường».
+7. ĐỘ TAN (thầy 03/11 «thiết kế bài toán độ tan theo skill của thầy khiến học sinh dễ hiểu nhất»):
+   - Định tính (skill 2.C1, 2008 Nền tảng hữu cơ, 2007 Amine, 8.C2 Ammonia): «**Giống nhau thì chơi với nhau**» (phân cực tan phân cực); xét **liên kết hydrogen trước**,
+     rồi **khối lượng phân tử** (độ tan tỉ lệ nghịch), rồi **phân nhánh** (càng phân nhánh càng tan); không tan vào nhau ⇒ tách lớp.
+   - Định lượng (SGK: S = số gam chất tan trong **100 g nước** tạo dung dịch bão hoà ở nhiệt độ xác định): dựng sơ đồ cột dọc ba cột **chất tan | nước | dung dịch**,
+     hàng chuẩn «S | 100 | 100 + S» rồi hàng thật — một phép tính theo tỉ lệ cột (vd m chất tan = m dd · S/(100 + S)). Kết tinh khi hạ nhiệt:
+     **bảo toàn chất tan và bảo toàn nước** giữa ba hàng «trước = tách ra + còn lại»; tinh thể ngậm nước tách phần chất tan (· M muối / M tinh thể) và phần nước (· 18n / M tinh thể);
+     hàng «còn lại» bão hoà ở nhiệt độ mới ⇒ MỘT phương trình một ẩn. `kiemLai`: lấy hàng «còn lại» chia lại ra đúng S mới. KHÔNG nói «C% = S/(100+S)» như công thức học thuộc
+     — luôn dẫn từ hàng chuẩn 100 g nước.
+8. Lời thầy nói đúng trong PHẠM VI bài giảng của nó; câu chữ trong lời giải phải đúng SGK Kết nối tri thức. Ví dụ: «electron độc thân chính là electron hoá trị» là ý của bài
    liên kết — KHÔNG dùng để đếm số electron hoá trị; «a + b = 8, 9, 10» dùng để XẾP NHÓM VIIIB. Mâu thuẫn thì theo SGK, lời thầy chỉ dùng đúng phạm vi.
 
 ## CÂU TỰ LUẬN (`vao.tuLuan = true`, thầy 03/11 «Câu tự luận giải luôn để lời giải hiện trên máy chiếu lúc dạy học»)

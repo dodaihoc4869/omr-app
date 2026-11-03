@@ -332,12 +332,14 @@ export async function soatViecKinh(env: Env, b: Obj) {
   // `coChu`: chỉ soát bản có một trong các cụm chữ (vd «gọi tên», «danh pháp» — thầy 03/11 «đồng bộ với tất cả các bài gọi danh pháp»).
   const coChu = mangChu(b.coChu, 10)
   const locBo = (chiBo.length ? ` AND COALESCE(k.bo, '') IN (SELECT value FROM json_each(?))` : '') + (coChu.length ? ` AND (${coChu.map(() => 'k.ban_json LIKE ?').join(' OR ')})` : '')
-  const conSoat = `k.cong = 'dat' AND (s.bam IS NULL OR (s.trang_thai = 'dang' AND s.nhan_luc < ?))${locBo}`
+  // `soatLaiTruoc` (ISO): soát LẠI cả bản đã «giu» trước mốc đó (luật mới thêm sau khi soát — vd điện di / độ tan 03/11).
+  const lai = str(b.soatLaiTruoc).slice(0, 30)
+  const conSoat = `k.cong = 'dat' AND (s.bam IS NULL OR (s.trang_thai = 'dang' AND s.nhan_luc < ?) OR (? <> '' AND s.trang_thai = 'giu' AND s.luc < ?))${locBo}`
   const thamLoc = [...(chiBo.length ? [JSON.stringify(chiBo)] : []), ...coChu.map((c) => `%${c}%`)]
   const dau = await env.DB.prepare(
     `SELECT COALESCE(k.bo, '') AS bo FROM loi_giai_kinh k LEFT JOIN loi_giai_kinh_soat s ON s.bam = k.bam WHERE ${conSoat}
      ORDER BY CASE WHEN COALESCE(k.bo, '') IN (SELECT value FROM json_each(?)) THEN 0 ELSE 1 END, k.bo LIMIT 1`,
-  ).bind(han, ...thamLoc, JSON.stringify(uuTien)).first<Obj>()
+  ).bind(han, lai, lai, ...thamLoc, JSON.stringify(uuTien)).first<Obj>()
   if (!dau) return { ok: true, het: true, viec: [] }
   const bo = str(dau.bo), maLuot = crypto.randomUUID(), nhanLuc = new Date(nay).toISOString()
   await env.DB.prepare(
@@ -345,8 +347,8 @@ export async function soatViecKinh(env: Env, b: Obj) {
      SELECT k.bam, k.bo, 'dang', ?, ? FROM loi_giai_kinh k LEFT JOIN loi_giai_kinh_soat s ON s.bam = k.bam WHERE ${conSoat} AND COALESCE(k.bo, '') = ?
      ORDER BY k.qid_mau LIMIT ?
      ON CONFLICT(bam) DO UPDATE SET trang_thai = 'dang', ma_luot = excluded.ma_luot, nhan_luc = excluded.nhan_luc
-       WHERE loi_giai_kinh_soat.trang_thai = 'dang' AND loi_giai_kinh_soat.nhan_luc < ?`,
-  ).bind(maLuot, nhanLuc, han, ...thamLoc, bo, so, han).run()
+       WHERE (loi_giai_kinh_soat.trang_thai = 'dang' AND loi_giai_kinh_soat.nhan_luc < ?) OR (? <> '' AND loi_giai_kinh_soat.trang_thai = 'giu' AND loi_giai_kinh_soat.luc < ?)`,
+  ).bind(maLuot, nhanLuc, han, lai, lai, ...thamLoc, bo, so, han, lai, lai).run()
   const nhan = (await env.DB.prepare(
     'SELECT s.bam, k.qid_mau, k.ban_json FROM loi_giai_kinh_soat s JOIN loi_giai_kinh k ON k.bam = s.bam WHERE s.ma_luot = ? ORDER BY k.qid_mau',
   ).bind(maLuot).all<Obj>()).results ?? []
