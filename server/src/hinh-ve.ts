@@ -105,7 +105,7 @@ export async function layViecHinh(env: Env, b: Obj) {
   const maLuot = crypto.randomUUID(), nhanLuc = new Date(nay).toISOString()
   await env.DB.prepare(
     `UPDATE hinh_ve_viec SET trang_thai = 'dang', ma_luot = ?, nhan_luc = ?, so_lan = so_lan + 1
-     WHERE bam IN (SELECT bam FROM hinh_ve_viec WHERE trang_thai = 'cho' ORDER BY ma_de, qid_mau LIMIT ?)`,
+     WHERE bam IN (SELECT bam FROM hinh_ve_viec WHERE trang_thai = 'cho' ORDER BY ${b.ngauNhien === true ? 'RANDOM()' : 'ma_de, qid_mau'} LIMIT ?)`,
   ).bind(maLuot, nhanLuc, so).run()
   const nhan = (await env.DB.prepare('SELECT * FROM hinh_ve_viec WHERE ma_luot = ? ORDER BY ma_de, qid_mau').bind(maLuot).all<Obj>()).results ?? []
   if (!nhan.length) return { ok: true, het: true, viec: [] }
