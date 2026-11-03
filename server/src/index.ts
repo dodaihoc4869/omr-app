@@ -2,6 +2,7 @@ import { docPhongChoDongThoi, xoaDemPhongCho } from './phong-cho-dong-thoi'
 import { lamSachThanLoi, loiBanTheoDuong, thanTuLoiNem } from './loi-may-chu'
 import { khoiPhucChienDich0810 } from './khoi-phuc-chien-dich-0810'
 import { nhipCa } from './nhip-ca'
+import { hsLichSuQid, gvLichSuCaEm } from './lich-su-qid'
 import { anhCo, anhDay, layAnh } from './kho-anh'
 import { ghiDoLenh, heSoGoiNen, nhipDeNghi, sucKhoeMay, tenLenh } from './suc-khoe-may'
 import { emCoGhi, keHoachCoDem } from './dem-ke-hoach'
@@ -3772,6 +3773,7 @@ const boXuLy = {
       if (p === '/hs/lich-su') return ra(await G.hsLichSuCa(env, b))
       if (p === '/hs/cau-sai') return ra(await G.hsCauSai(env, b))
       if (p === '/hs/cau-da-thi') return ra(await G.hsCauDaThi(env, b))
+      if (p === '/hs/lich-su-qid') return ra(await hsLichSuQid(env, b))
       if (p === '/hs/than-thu') return ra(await G.thanThuDoc(env, b))
       if (p === '/hs/than-thu-ghi') return ra(await G.thanThuGhi(env, b))
       if (p === '/hs/btvn') return ra(await G.hsBtvn(env, b))
@@ -4002,6 +4004,7 @@ const boXuLy = {
       if (p === '/ke-hoach/hom-nay-thay') return ra(await homNayThay(env, b))
       // Kế hoạch hôm nay của MỘT em cho màn Học sinh của thầy: CHỈ ĐỌC (không lập kế hoạch, không capNhatExp) để không nuốt `expNhan` của em.
       if (p === '/gv/ke-hoach-em') return ra(await gvKeHoachEm(envDoc, b))
+      if (p === '/gv/lich-su-ca-em') return ra(await gvLichSuCaEm(envDoc, b))
       // HÔM NAY v2 (docs/hop-dong-hom-nay-v2-2109.md): MỘT lệnh GHI (cảnh báo em chưa nộp — chỉ thầy bấm mới gửi).
       if (p === '/gv/canh-bao-nop-bai') return ra(await guiCanhBao(env, b))
       if (p === '/gv/nhac-tu-dong') return ra(await gvNhacTuDong(env, b))

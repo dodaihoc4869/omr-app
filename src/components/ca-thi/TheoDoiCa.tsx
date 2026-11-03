@@ -22,6 +22,8 @@ export interface EmTheoDoi {
 export interface TheoDoiCaProps {
   tenCa: string
   maCa: string
+  /** (03/11) Đọc «em từng sai / đúng bao nhiêu lần» của cả ca — có ⇒ hiện nhãn dưới tên em + nút xếp «câu đã làm sai nhiều nhất trước». */
+  layLichSu?: (maCa: string) => Promise<Record<string, [number, number]> | null>
   link: string
   daChepLink: boolean
   onChepLink: () => void
@@ -91,6 +93,16 @@ function useGiayCon(hetLucMs: number | null | undefined): number | null | undefi
 
 export default function TheoDoiCa(p: TheoDoiCaProps) {
   const [loc, setLoc] = useState<Loc>('tat_ca')
+  // NHÃN «SAI N LẦN · ĐÚNG M LẦN» (thầy 03/11): đọc MỘT lần khi mở ca (+ khi thầy bấm «Làm mới»), không theo nhịp 20 giây; xếp em sai nhiều nhất lên trước.
+  const [lichSu, setLichSu] = useState<Record<string, [number, number]> | null>(null)
+  const [xepSai, setXepSai] = useState(true)
+  const { layLichSu, maCa } = p
+  useEffect(() => {
+    if (!layLichSu) return
+    let huy = false
+    void layLichSu(maCa).then((d) => { if (!huy && d) setLichSu(d) }).catch(() => {})
+    return () => { huy = true }
+  }, [layLichSu, maCa, p.em.length]) // đọc lại khi số em đổi (em mới vào có câu trong ca)
   const giayTuDem = useGiayCon(p.hetLucMs)
   const conGiay = giayTuDem === undefined ? p.conGiay : giayTuDem
   const dangLam = p.em.filter((e) => e.tt === 'dang_lam')
@@ -106,7 +118,8 @@ export default function TheoDoiCa(p: TheoDoiCaProps) {
     return co.length ? Math.round(co.reduce((a, e) => a + (e.daLam ?? 0), 0) / co.length) : null
   }, [dangLam])
   const tongCau = p.em.find((e) => e.tongCau)?.tongCau ?? null
-  const dsLoc = loc === 'canh_bao' ? canhBao : loc === 'chua_vao' ? chuaVao : loc === 'da_nop' ? daNop : loc === 'dang_lam' ? dangLam : p.em
+  const dsLoc0 = loc === 'canh_bao' ? canhBao : loc === 'chua_vao' ? chuaVao : loc === 'da_nop' ? daNop : loc === 'dang_lam' ? dangLam : p.em
+  const dsLoc = lichSu && xepSai ? [...dsLoc0].sort((a, b) => (lichSu[b.sbd]?.[0] ?? -1) - (lichSu[a.sbd]?.[0] ?? -1)) : dsLoc0 // ổn định: bằng nhau giữ thứ tự cũ
   const phutCon = conGiay === null ? null : Math.max(0, conGiay)
   const vongR = 56
   const cv = 2 * Math.PI * vongR
@@ -272,6 +285,11 @@ export default function TheoDoiCa(p: TheoDoiCaProps) {
           <p className="ct-ghi" style={{ margin: '0 0 10px' }}>
             Chạm thẻ em để mở hồ sơ: cho thi lại, mở khoá, cho vào bằng máy khác nằm ở đó.
           </p>
+          {lichSu && (
+            <button type="button" className="ct-chip ct-xep-sai" aria-pressed={xepSai} onClick={() => setXepSai((v) => !v)}>
+              ⇅ Xếp theo: câu đã làm sai nhiều nhất trước
+            </button>
+          )}
           {dsLoc.length === 0 ? (
             <p className="ct-ghi">Không em nào ở mục này.</p>
           ) : (
@@ -283,6 +301,12 @@ export default function TheoDoiCa(p: TheoDoiCaProps) {
                     <span className={`ct-nhan ${NHAN_TT[e.tt]}`}>{TEN_TT[e.tt]}</span>
                   </div>
                   <span className="sbd so">SBD {e.sbd}</span>
+                  {lichSu?.[e.sbd] && (lichSu[e.sbd]![0] > 0 || lichSu[e.sbd]![1] > 0) && (
+                    <span className="ct-ls" title="Số lần em từng làm sai / đúng đúng những câu có trong ca này, ở mọi nơi em đã làm (trừ chính ca)">
+                      {lichSu[e.sbd]![0] > 0 && <i className="s">Sai {lichSu[e.sbd]![0]} lần</i>}
+                      {lichSu[e.sbd]![1] > 0 && <i className="d">Đúng {lichSu[e.sbd]![1]} lần</i>}
+                    </span>
+                  )}
                   {e.tt !== 'chua_vao' && (
                     <>
                       <div className="tien" aria-hidden="true">

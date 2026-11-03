@@ -3353,6 +3353,11 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                   ? luoiTungCau(graded.score, graded.studentAnswers) // đúng · sai · đúng một phần · BỎ TRỐNG (đọc từ chính bài làm — ket-qua-sau-nop.ts)
                   : undefined
               }
+              lichSu={graded && attempt?.loai !== 'baitap' && attempt?.maCa ? {
+                tru: `thi|${attempt.maCa}`,
+                ds: luoiTungCau(graded.score, graded.studentAnswers).filter((c) => c.kq !== 'trong')
+                  .map((c) => `${(c.phan === 'I' ? assignment?.phanI : c.phan === 'II' ? assignment?.phanII : assignment?.phanIII)?.[c.so - 1]?.qid ?? ''}:${c.kq === 'dung' ? 1 : 0}`).join(','),
+              } : undefined}
               soDaLam={soDaLam}
               tongCau={flat.length}
               lam2={thoiGianLam(attempt?.startedAt, attempt?.submittedAt)}
@@ -4115,6 +4120,9 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       tong: total,
       luu: { nhan: dotLabel, tt: loiKhoNen ? 'loi' : dangLuuNen || saveFlash ? 'dang' : !online ? 'mang' : 'da' },
       cauHien: Math.min(Math.max(1, cauDuo), total),
+      // nhãn «đã làm đúng/sai» (thầy 03/11): qid câu đang xem + lần làm này (ca thi: 'thi|maCa'; bài tập về nhà không nhãn)
+      qidHien: ((f) => (f ? (f.phan === 'I' ? assignment.phanI : f.phan === 'II' ? assignment.phanII : assignment.phanIII)[f.i]?.qid : undefined))(flat[Math.min(Math.max(1, cauDuo), total) - 1]),
+      truNhan: !laBaiTap && attempt.maCa ? `thi|${attempt.maCa}` : undefined,
       onDenCau: (so) => {
         if (so > soTheDung) setTheDaDung({ khoa: assignment, n: Infinity }) // câu chưa dựng (DỰNG ĐỀ DẦN) ⇒ dựng hết cùng lượt vẽ
         setCauDuo(so)

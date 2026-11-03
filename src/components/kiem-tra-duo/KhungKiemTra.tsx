@@ -55,11 +55,12 @@ export function ThanhTrenKt({ onDong, nhanDong, khoaDong, daLam, tong, gio, nhan
   )
 }
 
-/** Nhãn đầu câu: «CÂU 3/28 · PHẦN I · TRẮC NGHIỆM» + chỗ cho nút phụ (Xem lại sau). */
-export function NhanCauKt({ so, tong, phu, children }: { so: number; tong: number; phu?: string; children?: ReactNode }) {
+/** Nhãn đầu câu: «CÂU 3/28 · PHẦN I · TRẮC NGHIỆM» + chỗ cho nút phụ (Xem lại sau). `qid` + `tru` (nguon|maNguon của lần làm này): chỗ giữ cho nhãn «Sai N lần · Đúng M lần»
+ *  (thầy 03/11) — chỉ phần tử rỗng, phần vẽ ở mảnh nạp lười src/lib/nhan-lich-su.ts. */
+export function NhanCauKt({ so, tong, phu, children, qid, tru }: { so: number; tong: number; phu?: string; children?: ReactNode; qid?: string; tru?: string }) {
   return (
     <div className="duo-kt-nhan">
-      <p><span>Câu {so}/{tong}</span>{phu && <span className="duo-kt-nhan-phu">{phu}</span>}</p>
+      <p><span>Câu {so}/{tong}</span>{qid && <span className="duo-kt-ls" data-qid={qid} data-tru={tru} hidden />}{phu && <span className="duo-kt-nhan-phu">{phu}</span>}</p>
       {children}
     </div>
   )

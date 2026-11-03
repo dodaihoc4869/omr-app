@@ -457,7 +457,9 @@ export default function TheCau(props: TheCauProps) {
   return (
     <TheNoiDung id={id} noPadding className="the-cau">
       <DauThe index={stt - 1} badge={stt} title={tieuDe?.trim() ?? ''} />
-      {/* DẢI "CÂU EM ĐÃ SAI BUỔI TRƯỚC" — CHỈ Ở CHẾ ĐỘ XEM LẠI.
+      {/* 03/11 THẦY ĐẢO QUYẾT ĐỊNH 12/09 DƯỚI ĐÂY: «các màn rút kiểm tra khi hs nhận câu có nhãn đã làm đúng / đã làm sai, đếm rõ mấy lần» ⇒ nhãn ở đầu câu thi / kiểm tra
+          (NhanCauKt + src/lib/nhan-lich-su.ts). Đánh đổi thầy chấp nhận: em biết câu nào mình từng sai khi đang làm (số liệu «sai → đúng lại / sai → sai lại» là dữ liệu mới).
+          Dải cũ "CÂU EM ĐÃ SAI BUỔI TRƯỚC" dưới đây vẫn CHỈ ở chế độ xem lại.
           Thầy chốt 12/09: "trong màn thi rút câu sai thì không gán nhãn câu đã
           sai trước đó". Đang làm bài mà thấy dải ấy là em biết ngay câu nào
           mình từng sai, và đó là thứ làm hỏng phép đo: em dồn sức vào đúng

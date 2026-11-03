@@ -12,6 +12,8 @@
 // tự dò nhóm phương án ở đây (src/lib/vua-phuong-an.ts) — đường /t không mang thêm byte. Không đổi gì phần đo treo máy.
 // Nạp LƯỜI lồng (không nhập tĩnh): nhập tĩnh ⇒ Vite ghi tên mảnh đo vào danh sách nạp kèm của ExamTakeScreen (+30 B nén đường /t).
 if (typeof document !== 'undefined') void import('./vua-phuong-an').then((m) => m.ganToanTrang(), () => {})
+// Cùng chỗ: bộ quét nhãn «đã làm đúng/sai» của màn thi (thầy 03/11) — nạp lười lồng, đường /t không thêm byte tĩnh.
+if (typeof document !== 'undefined') void import('./nhan-lich-su').then((m) => m.ganNhanLichSu(), () => {})
 
 /** Phần đo thêm của một câu, lưu cùng lượt làm (IndexedDB) để mở lại vẫn cộng dồn. */
 export interface DoTreoCau {
