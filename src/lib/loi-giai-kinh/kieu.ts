@@ -44,6 +44,19 @@ export type CanhKinh =
       trai: { ten: string; y: string[] }
       phai: { ten: string; y: string[] }
     }
+  | {
+      /** GỌI TÊN theo đúng ba bước của thầy (03/11): mạch chính đã đánh số (C1 = đầu ưu tiên chức → π → nhánh) + các mảnh tên theo công thức
+       *  nhánh + mạch chính + liên kết + chức (ester: gốc R′ + gốc RCOO). Vắng `soC` ⇒ chỉ lắp mảnh. */
+      loai: 'danh-phap'
+      soC?: number
+      chuc?: { viTri: number; ten: string }
+      nhanh: { viTri: number; ten: string }[]
+      pi: { viTri: number; loai: 'doi' | 'ba' }[]
+      manh: { loai: ManhTen; chu: string; giai: string }[]
+      ten: string
+    }
+export const MANH_TEN = ['nhanh', 'mach', 'lien-ket', 'chuc', 'goc-ancol', 'goc-acid'] as const
+export type ManhTen = (typeof MANH_TEN)[number]
 export const MAU_LOP = ['trong', 'xanh', 'cam', 'vang', 'hong', 'tim', 'nau', 'trang-duc'] as const
 export type MauLop = (typeof MAU_LOP)[number]
 

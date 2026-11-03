@@ -4,6 +4,7 @@
 // src/lib/loi-giai-kinh/kieu.ts
 var PHIEN_BAN_KINH = 1;
 var HINH_NHIP = ["binh", "ong-nghiem", "dun", "chiet", "loc", "can", "khi", "ket-tua", "mau", "nhiet", "ap-suat", "xuc-tac", "nguyen-tu", "phan-tu", "lien-ket", "dien", "pin", "do-thi", "mui-ten", "kinh-lup", "so-sanh", "cong-thuc"];
+var MANH_TEN = ["nhanh", "mach", "lien-ket", "chuc", "goc-ancol", "goc-acid"];
 var MAU_LOP = ["trong", "xanh", "cam", "vang", "hong", "tim", "nau", "trang-duc"];
 
 // src/lib/doc-so-phan-iii.ts
@@ -619,6 +620,21 @@ function docCanh(x) {
     const t = ve(x.trai), p = ve(x.phai);
     if (!t || !p || !t.y.length || !p.y.length) return null;
     return { loai: "so-sanh", trai: t, phai: p };
+  }
+  if (x.loai === "danh-phap") {
+    const soC = Number.isInteger(x.soC) && Number(x.soC) >= 1 && Number(x.soC) <= 12 ? Number(x.soC) : void 0;
+    const trongMach = (v, tran) => Number.isInteger(v) && Number(v) >= 1 && Number(v) <= tran;
+    const nhom = (g) => laObj(g) && s(g.ten, 16) && (!soC || trongMach(g.viTri, soC)) ? { viTri: Number(g.viTri) || 1, ten: s(g.ten, 16) } : null;
+    const chuc = x.chuc === void 0 || x.chuc === null ? void 0 : nhom(x.chuc);
+    const nhanh = mang(x.nhanh).map(nhom);
+    const pi = mang(x.pi).map((q) => laObj(q) && soC && trongMach(q.viTri, soC - 1) && (q.loai === "doi" || q.loai === "ba") ? { viTri: Number(q.viTri), loai: q.loai } : null);
+    const manh = mang(x.manh).map((m) => laObj(m) && MANH_TEN.includes(String(m.loai)) && typeof m.chu === "string" && m.chu.trim() && s(m.giai, 220) ? { loai: m.loai, chu: String(m.chu).slice(0, 40), giai: s(m.giai, 220) } : null);
+    const ten = s(x.ten, 80);
+    const gon = (t) => t.normalize("NFC").toLowerCase().replace(/[\s ]+/g, "");
+    if (x.chuc !== void 0 && x.chuc !== null && !chuc) return null;
+    if (nhanh.some((g) => !g) || pi.some((q) => !q) || manh.length < 2 || manh.length > 5 || manh.some((m) => !m) || !ten || nhanh.length > 6) return null;
+    if (gon(manh.map((m) => m.chu).join("")) !== gon(ten)) return null;
+    return { loai: "danh-phap", ...soC ? { soC } : {}, ...chuc ? { chuc } : {}, nhanh, pi, manh, ten };
   }
   return null;
 }

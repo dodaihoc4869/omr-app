@@ -14,9 +14,17 @@ const ds = [
   { phan: 'II', dapAn: 'SDSD', em: 'DDDD', luaChon: ['Tăng nhiệt độ, cân bằng chuyển dịch theo chiều thuận.', 'Tăng áp suất, cân bằng chuyển dịch theo chiều thuận.', 'Thêm bột Fe làm xúc tác, cân bằng chuyển dịch theo chiều thuận.', 'Lấy bớt NH3 ra khỏi hệ, cân bằng chuyển dịch theo chiều thuận.'], de: 'Cho cân bằng N2(g) + 3H2(g) ⇌ 2NH3(g), ΔrH = −92 kJ. Mỗi ý sau đúng hay sai?' },
   { phan: 'III', dapAn: '13,2', em: '17,6', de: 'Đun nóng 12 gam acetic acid với 13,8 gam ethanol (xúc tác H2SO4 đặc), hiệu suất 75%. Khối lượng ethyl acetate thu được là bao nhiêu gam?' },
 ] as const
-const i = Math.max(0, Math.min(2, Number(new URLSearchParams(location.search).get('cau') || '1') - 1))
-const d = ds[i]!
-const ban = { ...(mau as unknown[])[i] as object, qid: `mau-${i + 1}`, phienBan: 1, phan: d.phan } as unknown as BanKinh
+const soCau = Number(new URLSearchParams(location.search).get('cau') || '1')
+const i = Math.max(0, Math.min(2, soCau - 1))
+// ?cau=4: câu GỌI TÊN (lysine) — xem cảnh danh-phap theo ba bước của thầy (03/11)
+const DP = {
+  cotLoi: { chu: 'Gọi tên theo công thức của thầy: **nhánh + mạch chính + liên kết + chức**. Amino acid: COOH là chức chính, C của COOH là số 1, NH₂ là nhánh **amino**.', chip: [{ nhan: 'Đánh số', chu: 'chức → π → nhánh' }, { nhan: 'Đơn chức', chu: 'bỏ e' }] },
+  canh: { loai: 'danh-phap', soC: 6, chuc: { viTri: 1, ten: 'COOH' }, nhanh: [{ viTri: 2, ten: 'NH2' }, { viTri: 6, ten: 'NH2' }], pi: [],
+    manh: [{ loai: 'nhanh', chu: '2,6-diamino', giai: 'Hai nhóm NH₂ ở carbon số 2 và số 6 là **nhánh amino**; có 2 nhánh nên thêm **di**.' }, { loai: 'mach', chu: 'hex', giai: 'Mạch chính 6 C ⇒ **hex**.' },
+      { loai: 'lien-ket', chu: 'an', giai: 'Toàn liên kết đơn ⇒ **an**.' }, { loai: 'chuc', chu: 'oic acid', giai: 'Chức COOH đọc là **oic acid**; đơn chức nên bỏ e (hexane → hexan).' }], ten: '2,6-diaminohexanoic acid' },
+}
+const d = soCau === 4 ? ds[0] : ds[i]!
+const ban = { ...(mau as unknown[])[i] as object, ...(soCau === 4 ? DP : {}), qid: `mau-${i + 1}`, phienBan: 1, phan: d.phan } as unknown as BanKinh
 document.body.style.background = 'var(--tr-nen)'
 // ?hop=1: hộp «Lời giải» của màn làm bài (thanh tiêu đề + nút «Lời giải thu gọn» sát nút đóng); ?mo=1 bấm mở sẵn.
 function Hop() {
