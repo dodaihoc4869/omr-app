@@ -28,7 +28,9 @@ const datDo = (ds: HTMLElement[], bat: boolean): void => { for (const e of ds) e
  *  Lưới 2 cột (đọc số cột THẬT của khung — mọi luật CSS: data-luoi, chặng ngang, tranh phân tử…) phải thu quá CO_LUOI ⇒ ép 1 cột (kiểu thẳng trên khung). */
 export function vuaNhieu(ds0: Iterable<HTMLElement>): void {
   const nhom = Array.from(ds0, (khung) => ({ khung, ds: Array.from(khung.querySelectorAll<HTMLElement>(CHU)), hai: false, k: 1 as number | null }))
-    .filter((n) => n.ds.length && n.khung.isConnected)
+    // CHỈ nhóm có «từ» dài (≥ 7 ký tự liền — ô hẹp nhất, Fold gập 2 cột, chứa ~7 chữ; công thức viết liền) mới có thể tràn ô: đáp án ngắn / có dấu cách (số, «6,8 gam.») bỏ qua, KHÔNG ghi + đọc bố cục
+    // (tác tử toc-do 03/11: đo ép ~19 ms mỗi lần dựng màn câu ở CPU ×6 làm «vào chặng» chậm hơn — chỉ đọc chữ, không đụng bố cục).
+    .filter((n) => n.ds.length && n.khung.isConnected && n.ds.some((e) => /\S{7,}/.test(e.textContent!)))
   for (const n of nhom) { for (const e of n.ds) e.style.fontSize = ''; n.khung.style.gridTemplateColumns = ''; datDo(n.ds, true) }
   for (const n of nhom) { n.hai = getComputedStyle(n.khung).gridTemplateColumns.trim().split(/\s+/).length > 1; n.k = heSoCo(doTiLe(n.ds), n.hai ? CO_LUOI : CO_MIN) }
   const doi = nhom.filter((n) => n.k === null && n.hai)
