@@ -437,6 +437,7 @@ export async function quetHienKinh(env: Env, b: Obj) {
   const dem: Record<string, number> = {}
   const viDu: Record<string, string[]> = {}
   const theoBo: Record<string, number> = {}
+  const chiTiet: Obj[] = []
   const tran = b.tatCa === true ? 3000 : 12
   const ghi = (k: string, qid: string, bo: string) => { dem[k] = (dem[k] ?? 0) + 1; if (k !== 'hien') { theoBo[`${bo || '?'}·${k}`] = (theoBo[`${bo || '?'}·${k}`] ?? 0) + 1; if ((viDu[k] ??= []).length < tran) viDu[k]!.push(qid) } }
   for (const x of r.results ?? []) {
@@ -454,10 +455,16 @@ export async function quetHienKinh(env: Env, b: Obj) {
     const xep = xepTheoCauPhat(tho, { phan, choices, ideas, correct })
     if (xep) { ghi('hien', qid, bo); continue }
     const khongGoc = xepTheoCauPhat({ ...tho, _goc: undefined }, { phan, choices: undefined, ideas: undefined, correct })
-    ghi(phan === 'III' ? 'lech_dap_so' : khongGoc ? 'lech_chu_phuong_an' : 'lech_dap_an', qid, bo)
+    const lyDo = phan === 'III' ? 'lech_dap_so' : khongGoc ? 'lech_chu_phuong_an' : 'lech_dap_an'
+    ghi(lyDo, qid, bo)
+    // chiTiet: chữ phương án / ý máy em nhận vs chữ lúc soạn (_goc) — để tìm vì sao không ghép được (chỉ lệnh thầy, sau cổng mã bí mật).
+    if (b.chiTiet === true && lyDo !== 'lech_dap_an' && (chiTiet.length < 40)) {
+      const g = (tho._goc ?? {}) as { pa?: Record<string, string> | null; y?: Record<string, string> | null }
+      chiTiet.push({ qid, phan, nhan: (phan === 'I' ? choices : ideas) ?? [], goc: (phan === 'I' ? g.pa : g.y) ?? null, ketQua: str(tho.ketQua), correct })
+    }
   }
   const n = (r.results ?? []).length
-  return { ok: true, tu, so: n, tiep: n === so ? tu + so : null, dem, theoBo, viDu }
+  return { ok: true, tu, so: n, tiep: n === so ? tu + so : null, dem, theoBo, viDu, ...(b.chiTiet === true ? { chiTiet } : {}) }
 }
 
 /** SOẠN LẠI các câu quét-hiện báo không hiện (lệch chữ phương án / đáp số): đưa băm HIỆN TẠI của câu về hàng chờ. Bản cũ vẫn ở bảng cho tới khi bản mới đạt. */
