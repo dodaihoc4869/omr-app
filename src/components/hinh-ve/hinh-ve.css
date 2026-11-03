@@ -67,4 +67,4 @@ html.may-yeu .hv-svg * { animation: none !important; transition: none !important
 .hv-tu-do .t-dam { font-weight: 800; } .hv-tu-do .t-nho { font-size: 13px; } .hv-tu-do .t-lon { font-size: 17px; font-weight: 800; }
 
 /* Đã vẽ lại đủ hình của đề ⇒ ẩn ảnh gốc ở cùng khối (dấu .hv-thay do HinhVeLaiCuaCau đặt). */
-div:has(> .hv-thay) [data-hinh-de] { display: none; }
+div:has(> .hv-thay) :is([data-vt="sau_de"], [data-vt="cuoi_cau"]) { display: none; }

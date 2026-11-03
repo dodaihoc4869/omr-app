@@ -69,11 +69,11 @@ export function BangSoLieu({ table }: { table?: string[][] }) {
 }
 
 /** Một ảnh cắt từ đề gốc trong khung .cau-hinh — bấm mở toàn màn hình. */
-export function CauHinh({ src, alt, onZoom, de }: { src: string; alt: string; onZoom?: (src: string) => void; /** ảnh CỦA ĐỀ (sau_de / cuoi_cau): hình vẽ lại xong thì CSS ẩn ảnh gốc (hinh-ve.css) */ de?: boolean }) {
+export function CauHinh({ src, alt, onZoom, vt }: { src: string; alt: string; onZoom?: (src: string) => void; /** vị trí ảnh: sau_de / cuoi_cau là ảnh CỦA ĐỀ — hình vẽ lại xong thì CSS ẩn ảnh gốc (hinh-ve.css) */ vt?: string }) {
   const [phongTo, setPhongTo] = useState(false)
   const mo = () => (onZoom ? onZoom(src) : setPhongTo(true))
   return (
-    <div className="cau-hinh" data-hinh-de={de ? '' : undefined}>
+    <div className="cau-hinh" data-vt={vt}>
       <img decoding="async" src={src} alt={alt} loading="lazy" onClick={mo} />
       {phongTo && <ManHinhAnh src={src} alt={alt} onClose={() => setPhongTo(false)} />}
     </div>
@@ -87,7 +87,7 @@ export function HinhTaiViTri({ hinhAnh, viTri, onZoom, nhan }: { hinhAnh?: HinhA
   return (
     <>
       {ds.map((h, i) => (
-        <CauHinh key={i} src={h.src} alt={h.alt ?? `Hình ${nhan}${ds.length > 1 ? ` (${i + 1})` : ''}`} onZoom={onZoom} de={viTri === 'sau_de' || viTri === 'cuoi_cau'} />
+        <CauHinh key={i} src={h.src} alt={h.alt ?? `Hình ${nhan}${ds.length > 1 ? ` (${i + 1})` : ''}`} onZoom={onZoom} vt={viTri} />
       ))}
     </>
   )
