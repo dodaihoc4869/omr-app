@@ -252,7 +252,9 @@ async function trongXemChua12h(env: Env, r: Row, d: ReturnType<typeof de>): Prom
 /** Chốt một lần, ghi sổ có receipt ổn định; retry/cron có thể hồi phục sau khi ghi sổ lỗi. */
 export async function chotKtCn(env: Env, r: Row, now: number, hetHan = false) {
   // câu tạm giữ (kiemNguon) mà em CHƯA trả lời ⇒ không tính điểm (em không được nhận câu ấy). Lỗi đọc ⇒ tính như cũ.
-  const giuChot=r.nop_luc?new Set<string>():await kiemNguon(env,s(r.sbd),de(r).cau).catch(()=>new Set<string>())
+  // Chỉ soi câu CHƯA trả lời (câu đã trả lời luôn tính) ⇒ nộp đủ câu (thường gặp) không thêm lượt đọc nào.
+  const chuaTra=r.nop_luc?[]:de(r).cau.filter(c=>!duTraKt(c.q.phan,tra(r)[c.q.qid]??''))
+  const giuChot=chuaTra.length?await kiemNguon(env,s(r.sbd),chuaTra).catch(()=>new Set<string>()):new Set<string>()
   for(let lan=0;!r.nop_luc&&lan<4;lan++) {
     const d0=de(r), t=tra(r), d={...d0,cau:d0.cau.filter(c=>!giuChot.has(c.q.qid)||duTraKt(c.q.phan,t[c.q.qid]??''))}, diem=diemTo7(d.cau.reduce((n,c)=>n+diemGoi7(c.q.phan,t[c.q.qid]??'',c.q.correct,dungKt(c.q,t[c.q.qid]??'')),0),d.cau.reduce((n,c)=>n+(c.q.phan==='II'?1:0.25),0))
     // Chốt đúng phiên bản nháp đã chấm; một lượt lưu chen vào phải khiến chấm lại, không lệch điểm với sổ.

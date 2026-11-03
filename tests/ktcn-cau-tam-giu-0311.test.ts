@@ -47,7 +47,12 @@ it('một câu của chặng đang giữ cho ca thi ⇒ chặng vẫn mở (khô
     const tra = Object.fromEntries(d.cau.filter((c) => d.chang[i]!.qids.includes(c.q.qid) && c.q.qid !== cauGiu).map((c) => [c.q.qid, c.q.correct]))
     await ktCnAction(k.env, 'S1', 'hoc-tap-ktcn-chot-chang', { id, chang: i, tra, revision: Number(bai.revision) }, now + 2_000 + i)
   }
-  const kq = await ktCnAction(k.env, 'S1', 'hoc-tap-ktcn-nop', { id }, now + 60_000)
+  // gói phần chữa tải sẵn (mã hoá) có cả câu đang giữ ⇒ nộp kèm phiên bản gói KHÔNG được trao chìa (chìa mở được câu đang bảo vệ)
+  ;(k.env as { MA_BI_MAT?: string }).MA_BI_MAT = 'bi-mat-thu'
+  const g = await ktCnAction(k.env, 'S1', 'hoc-tap-ktcn-goi', { id }, now + 50_000) as { phien: string }
+  const kq = await ktCnAction(k.env, 'S1', 'hoc-tap-ktcn-nop', { id, phienKq: g.phien }, now + 60_000)
+  expect(kq.khoaKq).toBeUndefined()
+  expect(JSON.stringify(kq.ketQua)).not.toContain(cauGiu)
   expect(kq.kiemTra).toMatchObject({ trangThai: 'da_nop' })
   expect(Number((await docKtCn(k.env, 'S1', now + 60_000))!.diem)).toBe(10)
   const xem = await ktCnAction(k.env, 'S1', 'hoc-tap-ktcn-ket-qua', { id }, now + 61_000)
