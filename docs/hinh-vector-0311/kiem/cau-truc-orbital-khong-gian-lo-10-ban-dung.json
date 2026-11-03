@@ -6,8 +6,10 @@
     "svg": "orbital-khong-gian-7e3e179d8bd7401a327456ecb6b7cc1e1c3b3b217fa69544fe29cba8e8f00925.svg",
     "hashSvg": "7e3e179d8bd7401a327456ecb6b7cc1e1c3b3b217fa69544fe29cba8e8f00925",
     "byteSvg": 3627,
-    "trangThai": "cho-soat-doc-lap",
+    "trangThai": "da-soat-doc-lap",
     "nguoiDocNguon": "cau_truc_6",
-    "ghiChu": "a:cầu,khôngarrowhead,x dưới-trái;b:trênphảitrắng/dướitráitô;c:tráitrắng/phảitô;b/carrowchéodướitrái,chữxtrênphải;khôngthêmtênAO/dấuphase."
+    "ghiChu": "a:cầu,khôngarrowhead,x dưới-trái;b:trênphảitrắng/dướitráitô;c:tráitrắng/phảitô;b/carrowchéodướitrái,chữxtrênphải;khôngthêmtênAO/dấuphase.",
+    "hashSvgDaSoat": "7e3e179d8bd7401a327456ecb6b7cc1e1c3b3b217fa69544fe29cba8e8f00925",
+    "nguoiSoat": "soat_nguon_2"
   }
 ]

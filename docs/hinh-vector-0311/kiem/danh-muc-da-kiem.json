@@ -2832,6 +2832,14 @@
       "byteGzip": 395,
       "trangThai": "cau-truc-da-soat-doc-lap",
       "canNenSang": true
+    },
+    "0361afe28db5cea013014d170fc4e0293031367734af2290328f9dedc2d291e9": {
+      "tep": "orbital-khong-gian-7e3e179d8bd7401a327456ecb6b7cc1e1c3b3b217fa69544fe29cba8e8f00925.svg",
+      "hashSvg": "7e3e179d8bd7401a327456ecb6b7cc1e1c3b3b217fa69544fe29cba8e8f00925",
+      "byteSvg": 3627,
+      "byteGzip": 927,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true
     }
   },
   "theoCau": [
@@ -2878,6 +2886,20 @@
           "where": "10-C1-B3-D1-I-62.hinh.0.du_lieu",
           "hashDataUrl": "4147ce0d31f2f994996e9324127c24477d92bc25b664bfce6f1765835de876e5",
           "vector": "orbital-9147c8ca36bcaaf50fa8a558db2e2519c44cffa37601257d1de43bc5a2a09b11.svg"
+        }
+      ]
+    },
+    {
+      "qid": "10-C1-B3-D2-I-2",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "0361afe28db5cea013014d170fc4e0293031367734af2290328f9dedc2d291e9",
+          "where": "10-C1-B3-D2-I-2.hinh.0.du_lieu",
+          "hashDataUrl": "fc4d8db9df26220eee6fdf87627c36df8d7c0407aa974c09efea4d820fae5a95",
+          "vector": "orbital-khong-gian-7e3e179d8bd7401a327456ecb6b7cc1e1c3b3b217fa69544fe29cba8e8f00925.svg"
         }
       ]
     },
@@ -5402,6 +5424,20 @@
           "where": "DB-10-B3-D1-I-53.hinh.0.du_lieu",
           "hashDataUrl": "4147ce0d31f2f994996e9324127c24477d92bc25b664bfce6f1765835de876e5",
           "vector": "orbital-9147c8ca36bcaaf50fa8a558db2e2519c44cffa37601257d1de43bc5a2a09b11.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-10-B3-D1-I-78",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "0361afe28db5cea013014d170fc4e0293031367734af2290328f9dedc2d291e9",
+          "where": "DB-10-B3-D1-I-78.hinh.0.du_lieu",
+          "hashDataUrl": "fc4d8db9df26220eee6fdf87627c36df8d7c0407aa974c09efea4d820fae5a95",
+          "vector": "orbital-khong-gian-7e3e179d8bd7401a327456ecb6b7cc1e1c3b3b217fa69544fe29cba8e8f00925.svg"
         }
       ]
     },
@@ -10107,6 +10143,7 @@
   "cauDuMoiHinh": [
     "10-C1-B3-D1-I-33",
     "10-C1-B3-D1-I-62",
+    "10-C1-B3-D2-I-2",
     "10-C1-B3-D2-III-15",
     "10-C1-B3-D2-III-19",
     "10-C6-B19-II-3",
@@ -10253,6 +10290,7 @@
     "DB-10-B2-D2-III-131",
     "DB-10-B3-D1-I-29",
     "DB-10-B3-D1-I-53",
+    "DB-10-B3-D1-I-78",
     "DB-10-B3-D1-III-125",
     "DB-10-B3-D1-III-126",
     "DB-10-B3-D1-I-177",

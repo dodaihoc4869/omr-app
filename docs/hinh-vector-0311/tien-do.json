@@ -60,8 +60,8 @@
       "Toàn kho còn chưa hoàn tất, app chưa thay hình; không báo đã xong hoặc đã triển khai."
     ],
     "danhMucDaKiem": "docs/hinh-vector-0311/kiem/danh-muc-da-kiem.json",
-    "loVuaXong": "Lô9: 8 đồ thị nguồn đã soát độc lập, sửa dáng404 và nhãn476. Tổng406 câu đủ mọi hình; nguồn19 orbital đã dựng, chờ soát.",
-    "viecNenLamTiep": "Soát độc lập orbital19, tiếp tục lô hình; hoàn tất full vitest hai nhánh, so tên, kiểm cổng trước khi đẩy checkpoint. Hình chưa tích hợp.",
+    "loVuaXong": "Lô10: orbital nguồn19 đã soát độc lập, dùng trong 2 câu; tổng408 câu đủ mọi hình,27 một phần;355 nguồn→233SVG.",
+    "viecNenLamTiep": "Đang nhận dạng nhóm nguồn dùng chung nhiều câu để dựng và soát; hoàn tất full vitest hai nhánh và so tên trước khi đẩy checkpoint; chưa tích hợp/phát hành.",
     "canhBaoCheckpoint": "Checkpoint mới đã commit cục bộ; chưa đẩy sau lô4/5/6 vì cổng tốc độ cũng đỏ trên main sạch8592da49. Không nâng mốc, không phát hành. Còn tiếp tục vẽ trong worktree hiện tại."
   },
   "tuDongTiepTuc": {
@@ -79,14 +79,14 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 354,
-    "soSvgRieng": 232,
-    "soCauDungHinh": 433,
-    "soCauDuMoiHinh": 406,
+    "soAnhNguon": 355,
+    "soSvgRieng": 233,
+    "soCauDungHinh": 435,
+    "soCauDuMoiHinh": 408,
     "soCauMoiXongMotPhan": 27,
-    "byteSvg": 1754636,
-    "byteGzip": 369330,
-    "soAnhNguonConLai": 1074,
+    "byteSvg": 1758263,
+    "byteGzip": 370257,
+    "soAnhNguonConLai": 1073,
     "daTichHop": false
   },
   "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.",
