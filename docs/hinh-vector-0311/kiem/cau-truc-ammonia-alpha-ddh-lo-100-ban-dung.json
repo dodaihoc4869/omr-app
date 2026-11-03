@@ -1,0 +1,118 @@
+[
+  {
+    "i": 390,
+    "hash": "456c615e63e52fc1d9ba94fcbdeac58d95ec2619c8aef7418b15dbf3ff704971",
+    "fileNguon": "anh/456c615e63e52fc1d9ba94fcbdeac58d95ec2619c8aef7418b15dbf3ff704971.png",
+    "canvas": [
+      788,
+      40
+    ],
+    "daMoNative": true,
+    "kind": "reaction-literal",
+    "reactants": "N₂(g) + 3H₂(g)",
+    "products": "2NH₃(g)",
+    "arrow": "⇌",
+    "overArrow": "380 – 450 °C, 25 – 200 bar, Fe",
+    "enthalpy": "ΔᵣH°₂₉₈ = −92 kJ",
+    "notes": "Giữ2mũitêncânbằngngượchướng,nhiệtđộ/ápsuất/xúctáctrênmũitên. KýhiệuΔrH°298: rsubscript,298subscript,°superscript. Nguồn−92kJ,KHÔNGtựthành−91,8kJtheostemvariant. Khôngcaption.",
+    "questions": [
+      {
+        "qid": "DB-11-B1-D1-I-124",
+        "de": "Cho phương trình sản xuất ammonia (NH₃) trong công nghiệp: Biểu thức tính hằng số cân bằng của phản ứng trên là",
+        "refs": [
+          {
+            "where": "DB-11-B1-D1-I-124.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-11-B1-D1-I-139",
+        "de": "Cho phương trình sản xuất ammonia (NH₃) trong công nghiệp: Yếu tố nào sau đây không làm ảnh hưởng đến sự chuyển dịch cân bằng hóa học của phản ứng trên?",
+        "refs": [
+          {
+            "where": "DB-11-B1-D1-I-139.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C1-B1-I-10",
+        "de": "Cho phương trình sản xuất ammonia (NH₃) trong công nghiệp: Biểu thức tính hằng số cân bằng của phản ứng trên là",
+        "refs": [
+          {
+            "where": "DH-11-C1-B1-I-10.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C1-B1-I-25",
+        "de": "Cho phương trình sản xuất ammonia (NH₃) trong công nghiệp: Yếu tố nào sau đây không làm ảnh hưởng đến sự chuyển dịch cân bằng hóa học của phản ứng trên?",
+        "refs": [
+          {
+            "where": "DH-11-C1-B1-I-25.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false,
+    "svg": "ammonia-alpha-ddh-ed6173d021531d716c4995c369048dce301068bab3209a51ef25adc66a1c2dbe.svg",
+    "hashSvg": "ed6173d021531d716c4995c369048dce301068bab3209a51ef25adc66a1c2dbe",
+    "byteSvg": 24747,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "αvàΔcótrongcmapmergedappthật;khôngdùngcmapmảnhvietnameseđểkếtluậnthiếu. r/298dựngpathsize nhỏởsubscript,°superscript;−92kJgiữnguyên.",
+    "hashSvgDaSoat": "ed6173d021531d716c4995c369048dce301068bab3209a51ef25adc66a1c2dbe",
+    "nguoiSoat": "cau_truc_6"
+  },
+  {
+    "i": 231,
+    "hash": "28842185852e83ce6d5a17bb8d4c29b36aa2d77caf107a7da85326d6a92461fb",
+    "fileNguon": "anh/28842185852e83ce6d5a17bb8d4c29b36aa2d77caf107a7da85326d6a92461fb.png",
+    "canvas": [
+      67,
+      57
+    ],
+    "daMoNative": true,
+    "kind": "literal-symbol",
+    "text": [
+      "α"
+    ],
+    "notes": "CHỈglyphalphaHyLạpđen,lớnnghiêngnhưnative,khôngsố/caption. KhôngthaybằngaLatin;nguồnimageđơnphảigiữtrongqidthựctế.",
+    "questions": [
+      {
+        "qid": "DB-12-B9-P2-D1-I-179",
+        "de": "Phát biểu nào sau đây không đúng?",
+        "refs": [
+          {
+            "where": "DB-12-B9-P2-D1-I-179.hinh.0.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B9-P2-I-41",
+        "de": "Phát biểu nào sau đây không đúng?",
+        "refs": [
+          {
+            "where": "DH-12-C3-B9-P2-I-41.hinh.0.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false,
+    "svg": "ammonia-alpha-ddh-2e94a49e8b6e66c660841ced9c30346880dacea18266060a053f592ece983962.svg",
+    "hashSvg": "2e94a49e8b6e66c660841ced9c30346880dacea18266060a053f592ece983962",
+    "byteSvg": 877,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "αvàΔcótrongcmapmergedappthật;khôngdùngcmapmảnhvietnameseđểkếtluậnthiếu. r/298dựngpathsize nhỏởsubscript,°superscript;−92kJgiữnguyên.",
+    "hashSvgDaSoat": "2e94a49e8b6e66c660841ced9c30346880dacea18266060a053f592ece983962",
+    "nguoiSoat": "cau_truc_6"
+  }
+]

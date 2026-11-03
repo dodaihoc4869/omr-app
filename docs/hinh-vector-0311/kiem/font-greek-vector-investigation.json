@@ -1,0 +1,189 @@
+{
+  "readOnly": true,
+  "repoModified": false,
+  "fontDownloaded": false,
+  "conclusion": "α/Δ/β có sẵn đúng DDH với outlines thật ở cả2kiểu; premise thiếuGreek không đúng với bộ hiện tại. Chỉᵣ/ₓ/ᵧ không có cmap và HarfBuzz trảgid0. Không cần tải font hay tái tạo Greek cho231.",
+  "combinedDeWoff2Sha256": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+  "checks": [
+    {
+      "weight": "de",
+      "ttf": "/workspace/scratch/vector-font-ddh/ddh-de.ttf",
+      "checks": {
+        "α": {
+          "codepoint": "U+03B1",
+          "cmap": "alpha",
+          "harfbuzzGlyphIds": [
+            141
+          ],
+          "contours": 2,
+          "bounds": [
+            52,
+            -13,
+            591,
+            549
+          ],
+          "advance": 644
+        },
+        "Δ": {
+          "codepoint": "U+0394",
+          "cmap": "uni0394",
+          "harfbuzzGlyphIds": [
+            140
+          ],
+          "contours": 2,
+          "bounds": [
+            32,
+            -3,
+            635,
+            733
+          ],
+          "advance": 668
+        },
+        "β": {
+          "codepoint": "U+03B2",
+          "cmap": "beta",
+          "harfbuzzGlyphIds": [
+            142
+          ],
+          "contours": 2,
+          "bounds": [
+            88,
+            -223,
+            568,
+            759
+          ],
+          "advance": 616
+        },
+        "ᵣ": {
+          "codepoint": "U+1D63",
+          "cmap": null,
+          "harfbuzzGlyphIds": [
+            0
+          ]
+        },
+        "ₓ": {
+          "codepoint": "U+2093",
+          "cmap": null,
+          "harfbuzzGlyphIds": [
+            0
+          ]
+        },
+        "ᵧ": {
+          "codepoint": "U+1D67",
+          "cmap": null,
+          "harfbuzzGlyphIds": [
+            0
+          ]
+        }
+      }
+    },
+    {
+      "weight": "dam",
+      "ttf": "/workspace/scratch/vector-font-ddh/ddh-dam.ttf",
+      "checks": {
+        "α": {
+          "codepoint": "U+03B1",
+          "cmap": "alpha",
+          "harfbuzzGlyphIds": [
+            141
+          ],
+          "contours": 2,
+          "bounds": [
+            30,
+            -18,
+            578,
+            554
+          ],
+          "advance": 607
+        },
+        "Δ": {
+          "codepoint": "U+0394",
+          "cmap": "uni0394",
+          "harfbuzzGlyphIds": [
+            140
+          ],
+          "contours": 2,
+          "bounds": [
+            10,
+            -8,
+            616,
+            738
+          ],
+          "advance": 627
+        },
+        "β": {
+          "codepoint": "U+03B2",
+          "cmap": "beta",
+          "harfbuzzGlyphIds": [
+            142
+          ],
+          "contours": 2,
+          "bounds": [
+            64,
+            -228,
+            549,
+            764
+          ],
+          "advance": 574
+        },
+        "ᵣ": {
+          "codepoint": "U+1D63",
+          "cmap": null,
+          "harfbuzzGlyphIds": [
+            0
+          ]
+        },
+        "ₓ": {
+          "codepoint": "U+2093",
+          "cmap": null,
+          "harfbuzzGlyphIds": [
+            0
+          ]
+        },
+        "ᵧ": {
+          "codepoint": "U+1D67",
+          "cmap": null,
+          "harfbuzzGlyphIds": [
+            0
+          ]
+        }
+      }
+    }
+  ],
+  "references": [
+    {
+      "path": "scripts/tao-phong-ddh-rounded.py:37",
+      "evidence": "LATIN allowlist đã gồm0x394,0x3B1,0x3B2; output subset giữGreek."
+    },
+    {
+      "path": "scripts/tao-phong-ddh-rounded.py:278",
+      "evidence": "subset→hạchỉsố→mũitên/l/1→lam_dam→bien_doi→dat_ten→chiaWOFF2. Greek trải qua cùngnet/sx/tracking vàGreek lowercase categoryLl cókxh1.03."
+    },
+    {
+      "path": "src/styles/phong-ddh/README.md:5",
+      "evidence": "M PLUS Rounded1c dẫn xuấtOFL; Regular/Bold, khôngfallbackfontkhác."
+    },
+    {
+      "path": "src/styles/trong-hs.css:24",
+      "evidence": "unicode-range đã gồmU+0394/U+03B1-03B2 ởcả2kiểu."
+    },
+    {
+      "path": "scripts/phong-vector-0311.py:25",
+      "evidence": "label nhận nguyênα/Δ rồiHarfBuzz→glyphpaths; thiếucmap/gid0raise. Không đổiαthànha, khôngfallback."
+    }
+  ],
+  "existingTtfPaths": [
+    "/workspace/scratch/vector-font-ddh/ddh-de.ttf",
+    "/workspace/scratch/vector-font-ddh/ddh-dam.ttf",
+    "/workspace/scratch/vector-font-ddh/de-latin.ttf",
+    "/workspace/scratch/vector-font-ddh/dam-latin.ttf"
+  ],
+  "originalMplusTtfFound": false,
+  "originalSearchScope": "/workspace bỏnode_modules/dist; scratch chỉcóTTFDDHdẫnxuất; không cóMPLUSRounded1c-Regular.ttf/-Bold.ttf. Không tải mới.",
+  "concreteProposal": [
+    "231: dùnglabel(...,\"α\",...) trực tiếp từ bộWOFF2hiện tại, giữHASH88d88b…; nếu lỗi vẫn xuất hiện kiểmU+03B1thật,weight/context/cmaphaycache nào đangdùng; lỗi không phải thiếuGreekởfontapp.",
+    "ᵣ U+1D63/ₓ U+2093/ᵧ U+1D67 thực sự thiếu. Với vector cần chỉsố, dùngglyphr/x/y hiệncóDDH thànhpathởsize nhỏ vàbaseline thíchhợp, giữaria-label nguyênchuỗi chỉsố; đây làtypesettingchỉsố, khônggáncmapLatin giảlàmGreek. Lưuýᵣvàᵧlàmodifierlettersubscript khácₓ.",
+    "Nếu bắtbuộc thêmUnicodeglyphthật: cầnTTFMPLUSgốc đúngversion/sha vàxácnhậncmap của3ký tựtrước; không assumegốc có. Thêm chếđộopt-in separateextensionoutput/allowlist cảđầu vào278vàđầu ra303; giữbranchdefault và4WOFF2hiện có nguyênbytes. VớiGreekkhác cótronggốc, chạyđúngnet3/8,sx1.03/.96,tracking12/-15,kxh1.03; không lấyLatin lookalike. Extension cầnhash/provenance riêng, không khai làhash88d88b…cũ.",
+    "Không cần đổigenerator/fontdefault choα/Δvìđãsẵn. Testdefaulthashkhôngđổi vàglyphkhônggid0 trước dùng."
+  ]
+}

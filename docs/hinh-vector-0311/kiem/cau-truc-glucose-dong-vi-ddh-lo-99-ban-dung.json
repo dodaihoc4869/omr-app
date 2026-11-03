@@ -1,0 +1,80 @@
+[
+  {
+    "i": 1222,
+    "hash": "de191b75b349512e14e78bfac9101823d2e4f2b9049fe1dcc22f7479434554ef",
+    "fileNguon": "anh/de191b75b349512e14e78bfac9101823d2e4f2b9049fe1dcc22f7479434554ef.png",
+    "canvas": [
+      549,
+      116
+    ],
+    "daMoNative": true,
+    "kind": "reaction-isotope-haworth",
+    "reactants": [
+      "HaworthđánhgiáthứtựH/OHdưới",
+      "H₃C–¹⁸O–H"
+    ],
+    "arrow": "→",
+    "overArrow": "HCl khan",
+    "products": [
+      "A (C₇HₓOᵧ)",
+      "H₂O"
+    ],
+    "haworth": {
+      "ring": "Otrênphải,C1phải,C2dướiphải,C3dướitrái,C4trái,C5trêntrái;cạnhtrướcđậm",
+      "C1": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C2": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C3": {
+        "up": "OH",
+        "down": "H"
+      },
+      "C4": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C5": {
+        "up": "CH₂OH",
+        "down": "H"
+      }
+    },
+    "notes": "Mộtmũitênsangphải,HClkhantrên;dấu+giữaHaworthvàmethanol18O,vàgiữaAformula/H₂O. Ađậm;C₇HₓOᵧgiữx/ybiến,KHÔNGtínhsốH/Ohoặcđápán. ¹⁸nằmSUPERSCRIPTtrướcO,khôngphảiCH₃isotope18C. MọiHvòngHaworthexplicitphảigiữ. Khôngđặtcaptions/sốCchovòng.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D2-II-106",
+        "de": "Tiến hành nghiên cứu phản ứng giữa glucose với methanol (xúc tác HCl khan) trong đó nguyên tử oxygen trong phân tử methanol là đồng vị ¹⁸O, các nguyên tử trong glucose là đồng vị ¹²C; ¹H và ¹⁶O và trong methanol là đồng vị ¹²C; ¹H. Kết quả thí nghiệm thu được như sau:",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-II-106.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-II-23",
+        "de": "Tiến hành nghiên cứu phản ứng giữa glucose với methanol (xúc tác HCl khan) trong đó nguyên tử oxygen trong phân tử methanol là đồng vị ¹⁸O, các nguyên tử trong glucose là đồng vị ¹²C; ¹H và ¹⁶O và trong methanol là đồng vị ¹²C; ¹H. Kết quả thí nghiệm thu được như sau:",
+        "refs": [
+          {
+            "where": "DH-12-C2-B4-II-23.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false,
+    "svg": "glucose-dong-vi-ddh-93013b9f1fbb5ada4075ac6f3fa9b7fcaff38098c81814fa2954c5ff88771e3a.svg",
+    "hashSvg": "93013b9f1fbb5ada4075ac6f3fa9b7fcaff38098c81814fa2954c5ff88771e3a",
+    "byteSvg": 24583,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "GiữmọiH/OHhướngvòngtheosource;18suptrướcO/không18C;C7HxOygiữx/ybiếnpathLatinởvịtrísubscript,khôngfallbackglyphsubx/y;AđậmWOFF2thật.",
+    "hashSvgDaSoat": "93013b9f1fbb5ada4075ac6f3fa9b7fcaff38098c81814fa2954c5ff88771e3a",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

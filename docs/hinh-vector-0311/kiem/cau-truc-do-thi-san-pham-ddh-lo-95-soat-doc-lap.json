@@ -1,0 +1,34 @@
+[
+  {
+    "i": 300,
+    "hashSvg": "8321fb4dc10f2e7f6e0fe229b0d09b199be65e4dd7729217bae78ac1a876b39c",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG native và SVG render thật. Đường thẳng từ gốc tăng dốc lớn, đúng góc/đầu cuối tương đối nguồn. Đủ [P], Thời gian và hai mũi tên trục; không thêm A–D/ticks/guide/số. DDH path tự chứa, các khoảng cách glyph/trục rõ; không cắt/chạm/tràn. Hash byte thực khớp metadata.",
+    "hash": "33b7869e65f89699c185bbf0aa6211cdd2e72634d7528b87064435009875758c",
+    "hashSvgDaSoat": "8321fb4dc10f2e7f6e0fe229b0d09b199be65e4dd7729217bae78ac1a876b39c"
+  },
+  {
+    "i": 427,
+    "hashSvg": "a00b4544a9dc04522dc76439b431df08b51ca5fa1622d119b6881c0302b32dbb",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG native và SVG render thật. Đường thẳng từ gốc tăng dốc nhỏ sát trục X, giữ khác biệt rõ với300. Đủ [P], Thời gian và hai mũi tên trục; không thêm A–D/ticks/guide/số. DDH path tự chứa, các khoảng cách glyph/trục rõ; không cắt/chạm/tràn. Hash byte thực khớp metadata.",
+    "hash": "4c7b28f23841c309217e9183d2d91b6efbf2ed861bb7aecf0f4c9a209adbbe53",
+    "hashSvgDaSoat": "a00b4544a9dc04522dc76439b431df08b51ca5fa1622d119b6881c0302b32dbb"
+  },
+  {
+    "i": 1364,
+    "hashSvg": "77bd69ce4009ce99ca734c6b180029af0df2bb047573f339b520fbe965abef90",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG native và SVG render thật. Curve từ gốc tăng lõm xuống, tiến tới plateau dương và hơi cong xuống ở cuối đúng nguồn, không tự sửa thành đoạn ngang tuyệt đối. Đủ [P], Thời gian và hai mũi tên trục; không thêm A–D/ticks/guide/số. DDH path tự chứa, các khoảng cách glyph/trục rõ; không cắt/chạm/tràn. Hash byte thực khớp metadata.",
+    "hash": "f654f68b69b4b12f26356fef1c7a04924d3686dfc01faf92fa12d80c99340d6c",
+    "hashSvgDaSoat": "77bd69ce4009ce99ca734c6b180029af0df2bb047573f339b520fbe965abef90"
+  },
+  {
+    "i": 659,
+    "hashSvg": "1336bc615cbd0e13ddddeeb63046a358b024d5bd87e6c619edd8a030932f41ea",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG native và SVG render thật. Curve ban đầu gần sát trục X rồi tăng nhanh, lõm lên đúng nguồn; giữ phần gần ngang ban đầu. Đủ [P], Thời gian và hai mũi tên trục; không thêm A–D/ticks/guide/số. DDH path tự chứa, các khoảng cách glyph/trục rõ; không cắt/chạm/tràn. Hash byte thực khớp metadata.",
+    "hash": "7a78460e5fc629060c06a6601e6700ee1245ac4d7683d0862049587c6707f280",
+    "hashSvgDaSoat": "1336bc615cbd0e13ddddeeb63046a358b024d5bd87e6c619edd8a030932f41ea"
+  }
+]

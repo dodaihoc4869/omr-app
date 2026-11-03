@@ -1,0 +1,179 @@
+[
+  {
+    "i": 1352,
+    "hash": "f4f7b22b19489642ca15e4d982f03ac203813886d36b5df70bbfe3bcc9027565",
+    "fileNguon": "anh/f4f7b22b19489642ca15e4d982f03ac203813886d36b5df70bbfe3bcc9027565.png",
+    "canvas": [
+      648,
+      290
+    ],
+    "daMoNative": true,
+    "kind": "nutrition-label",
+    "text": [
+      "Thành phần dinh dưỡng",
+      "Trong 1 viên nhộng",
+      "Hàm lượng",
+      "L-Lysine",
+      "500 mg",
+      "(gồm 637 mg L-Lysine Hydrochloride)"
+    ],
+    "notes": "GiữNGUYÊNchữ nhộng(trongảnh),KHÔNGsửathànhnhộng/nangtheothói quen. Khungđen chữnhật,2đườngngang dướiTrong1viênnhộng vàdướidòngngoặc. Thànhphầndinhdưỡng/Hàmlượngđậm;L-Lysine trái,500mgcănphải cùnghàng;dòngngoặccăngiữa. Khôngsửasố637.",
+    "questions": [
+      {
+        "qid": "DB-12-B9-P1-D1-I-223",
+        "de": "Lysine là một amino acid thiết yếu, quan trọng cho sự phát triển và phục hồi cơ bắp, nên được dùng bổ sung cho người tập thể hình dưới dạng viên nén chứa thành phần chính là lysine hydrochloride (C₆H₁₄N₂O₂HCl).\nMột công ty dược phẩm sản xuất loại viên nén này, thông tin của mỗi viên thuốc cho như hình bên.\nĐể sản xuất 3 triệu viên thuốc trên cần tối thiểu bao nhiêu tấn lysine biết hiệu suất phản ứng tính theo lysine là 95%?",
+        "refs": [
+          {
+            "where": "DB-12-B9-P1-D1-I-223.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B9-P1-I-79",
+        "de": "Lysine là một amino acid thiết yếu, quan trọng cho sự phát triển và phục hồi cơ bắp, nên được dùng bổ sung cho người tập thể hình dưới dạng viên nén chứa thành phần chính là lysine hydrochloride (C₆H₁₄N₂O₂HCl).\nMột công ty dược phẩm sản xuất loại viên nén này, thông tin của mỗi viên thuốc cho như hình bên.\nĐể sản xuất 3 triệu viên thuốc trên cần tối thiểu bao nhiêu tấn lysine biết hiệu suất phản ứng tính theo lysine là 95%?",
+        "refs": [
+          {
+            "where": "DH-12-C3-B9-P1-I-79.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false,
+    "svg": "nhan-orbital-config-ddh-1f5d2faaff9a85c9c0911c71f62892c42d65b9801c1851b1f850c090ab93b409.svg",
+    "hashSvg": "1f5d2faaff9a85c9c0911c71f62892c42d65b9801c1851b1f850c090ab93b409",
+    "byteSvg": 42327,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Giữnhộng/637mg/500mg;3sCHỈ1↑;Rkhông4s,Tgiữ1−,đủdấuchấmcuốidòng. Chữthường/đậmtừfontapp,khôngfauxitalic/bold.",
+    "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+    "hashSvgDaSoat": "1f5d2faaff9a85c9c0911c71f62892c42d65b9801c1851b1f850c090ab93b409",
+    "nguoiSoat": "cau_truc_6"
+  },
+  {
+    "i": 1360,
+    "hash": "f60bf7d35f9e4ec76a4350a37cf65aa69c028b6ba654ec61dbbfe56ee7282390",
+    "fileNguon": "anh/f60bf7d35f9e4ec76a4350a37cf65aa69c028b6ba654ec61dbbfe56ee7282390.png",
+    "canvas": [
+      375,
+      80
+    ],
+    "daMoNative": true,
+    "kind": "orbital-box",
+    "boxes": [
+      {
+        "label": "1s",
+        "cells": [
+          "↑↓"
+        ]
+      },
+      {
+        "label": "2s",
+        "cells": [
+          "↑↓"
+        ]
+      },
+      {
+        "label": "2p",
+        "cells": [
+          "↑↓",
+          "↑↓",
+          "↑↓"
+        ]
+      },
+      {
+        "label": "3s",
+        "cells": [
+          "↑"
+        ]
+      }
+    ],
+    "notes": "4cụmboxngang,1s1ô,2s1ô,2p3ôliền,3s1ô.BẮTBUỘC3sCHỈ1mũitên↑,khôngsửa↑↓theosốnguyêntửtrongstem. Nhãn1s/2s/2p/3sđậmnghiêngdướimỗi cụm. Khôngsố/tênnguyêntửthêm.",
+    "questions": [
+      {
+        "qid": "DB-10-B1-D1-II-205",
+        "de": "Magnesium được sử dụng nhiều trong công nghiệp để chế tạo các bộ phận của máy bay, ô tô,… Nguyên tử nguyên tố magnesium có 12 electron.",
+        "refs": [
+          {
+            "where": "DB-10-B1-D1-II-205.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B3-II-22",
+        "de": "Magnesium được sử dụng nhiều trong công nghiệp để chế tạo các bộ phận của máy bay, ô tô,… Nguyên tử nguyên tố magnesium có 12 electron.",
+        "refs": [
+          {
+            "where": "DH-10-C1-B3-II-22.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false,
+    "svg": "nhan-orbital-config-ddh-eeb5bda9bca2ef77322594e91a4d100c423f278b8afe86362d6a33b716e83347.svg",
+    "hashSvg": "eeb5bda9bca2ef77322594e91a4d100c423f278b8afe86362d6a33b716e83347",
+    "byteSvg": 7383,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Giữnhộng/637mg/500mg;3sCHỈ1↑;Rkhông4s,Tgiữ1−,đủdấuchấmcuốidòng. Chữthường/đậmtừfontapp,khôngfauxitalic/bold.",
+    "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+    "hashSvgDaSoat": "eeb5bda9bca2ef77322594e91a4d100c423f278b8afe86362d6a33b716e83347",
+    "nguoiSoat": "cau_truc_6"
+  },
+  {
+    "i": 340,
+    "hash": "3c0e31666d9de063891b85796175baeee5e5ea24c3023cfc48bf84197330e9d2",
+    "fileNguon": "anh/3c0e31666d9de063891b85796175baeee5e5ea24c3023cfc48bf84197330e9d2.png",
+    "canvas": [
+      373,
+      199
+    ],
+    "daMoNative": true,
+    "kind": "literal-electron-config",
+    "text": [
+      "X²⁻: 1s²2s²2p⁶3s²3p⁶.",
+      "Y³⁺: 1s²2s²2p⁶.",
+      "R²⁺: 1s²2s²2p⁶3s²3p⁶3d⁶.",
+      "T¹⁻: 1s²2s²2p⁶."
+    ],
+    "notes": "4dòng,tráicănthẳng,kýhiệunguyêntửnghiêng,chỉsốđiệntíchtrên;giữdấuchấmcuốidòng. RKHÔNGcó4s,Tnguồnhiện1−tườngminhkhôngbỏ1. KhôngsuyX/Y/R/Tlànguyêntốnào.",
+    "questions": [
+      {
+        "qid": "DB-10-B5-D1-III-189",
+        "de": "Cho cấu hình electron của các hạt vi mô như hình dưới. Có bao nhiêu nguyên tố đều thuộc chu kì 3?",
+        "refs": [
+          {
+            "where": "DB-10-B5-D1-III-189.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C2-B9-D1-III-1",
+        "de": "Cho cấu hình electron của các hạt vi mô như hình dưới. Có bao nhiêu nguyên tố đều thuộc chu kì 3?",
+        "refs": [
+          {
+            "where": "DH-10-C2-B9-D1-III-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false,
+    "svg": "nhan-orbital-config-ddh-ab84a646614741e929d0a47c9fea92bd1de66c88de1ddd21fc47cd640c95641f.svg",
+    "hashSvg": "ab84a646614741e929d0a47c9fea92bd1de66c88de1ddd21fc47cd640c95641f",
+    "byteSvg": 32452,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Giữnhộng/637mg/500mg;3sCHỈ1↑;Rkhông4s,Tgiữ1−,đủdấuchấmcuốidòng. Chữthường/đậmtừfontapp,khôngfauxitalic/bold.",
+    "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+    "hashSvgDaSoat": "ab84a646614741e929d0a47c9fea92bd1de66c88de1ddd21fc47cd640c95641f",
+    "nguoiSoat": "cau_truc_6"
+  }
+]

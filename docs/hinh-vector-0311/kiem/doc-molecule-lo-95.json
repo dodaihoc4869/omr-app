@@ -1,0 +1,815 @@
+[
+  {
+    "i": 300,
+    "hash": "33b7869e65f89699c185bbf0aa6211cdd2e72634d7528b87064435009875758c",
+    "fileNguon": "anh/33b7869e65f89699c185bbf0aa6211cdd2e72634d7528b87064435009875758c.png",
+    "canvas": [
+      180,
+      178
+    ],
+    "daMoNative": true,
+    "kind": "graph",
+    "xLabel": "Thời gian",
+    "yLabel": "[P]",
+    "geometry": "Canvas180x180;origin(30,147),Yarrow(30,7),Xarrow(165,147). Thẳngtừorigin→(162,17),độdốc~1. Khôngticks/số/guide/caption.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D2-I-135",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-I-135.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B6-I-83",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian?",
+        "refs": [
+          {
+            "where": "DH-12-C2-B6-I-83.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false
+  },
+  {
+    "i": 427,
+    "hash": "4c7b28f23841c309217e9183d2d91b6efbf2ed861bb7aecf0f4c9a209adbbe53",
+    "fileNguon": "anh/4c7b28f23841c309217e9183d2d91b6efbf2ed861bb7aecf0f4c9a209adbbe53.png",
+    "canvas": [
+      181,
+      178
+    ],
+    "daMoNative": true,
+    "kind": "graph",
+    "xLabel": "Thời gian",
+    "yLabel": "[P]",
+    "geometry": "Canvas181x178;origin(34,147),Yarrow(34,7),Xarrow(168,147). ĐườngthẳngdốcNHỎ từorigin→(161,126),độdốc~0,165. Khôngticks/số/guide/caption.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D2-I-135",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-I-135.hinh.1.du_lieu",
+            "viTri": "sau_pa_B"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B6-I-83",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian?",
+        "refs": [
+          {
+            "where": "DH-12-C2-B6-I-83.hinh.1.du_lieu",
+            "viTri": "sau_pa_B"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false
+  },
+  {
+    "i": 1364,
+    "hash": "f654f68b69b4b12f26356fef1c7a04924d3686dfc01faf92fa12d80c99340d6c",
+    "fileNguon": "anh/f654f68b69b4b12f26356fef1c7a04924d3686dfc01faf92fa12d80c99340d6c.png",
+    "canvas": [
+      183,
+      184
+    ],
+    "daMoNative": true,
+    "kind": "graph",
+    "xLabel": "Thời gian",
+    "yLabel": "[P]",
+    "geometry": "Canvas185x185;origin(35,152),Yarrow(35,5),Xarrow(177,152). Curve tăngtừorigin qua~(72,122),(108,100) rồiđếnplateau~y92 ởx150..176;khôngnằmngangbằngtrụcX. Conglõmxuống,tăngrồibãohòa. Khôngticks/số/guide/caption.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D2-I-135",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-I-135.hinh.2.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B6-I-83",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian?",
+        "refs": [
+          {
+            "where": "DH-12-C2-B6-I-83.hinh.2.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false
+  },
+  {
+    "i": 659,
+    "hash": "7a78460e5fc629060c06a6601e6700ee1245ac4d7683d0862049587c6707f280",
+    "fileNguon": "anh/7a78460e5fc629060c06a6601e6700ee1245ac4d7683d0862049587c6707f280.png",
+    "canvas": [
+      184,
+      185
+    ],
+    "daMoNative": true,
+    "kind": "graph",
+    "xLabel": "Thời gian",
+    "yLabel": "[P]",
+    "geometry": "Canvas184x188;origin(30,156),Yarrow(30,3),Xarrow(176,156). Curve tạigầnoriginphẳngthấp,~(74,155),~(113,144),~(145,122),đến(175,94);conglõmLÊN tăngnhanhcuối,khôngsaturation. Khôngticks/số/guide/caption.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D2-I-135",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-I-135.hinh.3.du_lieu",
+            "viTri": "sau_pa_D"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B6-I-83",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian?",
+        "refs": [
+          {
+            "where": "DH-12-C2-B6-I-83.hinh.3.du_lieu",
+            "viTri": "sau_pa_D"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false
+  },
+  {
+    "i": 1352,
+    "hash": "f4f7b22b19489642ca15e4d982f03ac203813886d36b5df70bbfe3bcc9027565",
+    "fileNguon": "anh/f4f7b22b19489642ca15e4d982f03ac203813886d36b5df70bbfe3bcc9027565.png",
+    "canvas": [
+      648,
+      290
+    ],
+    "daMoNative": true,
+    "kind": "nutrition-label",
+    "text": [
+      "Thành phần dinh dưỡng",
+      "Trong 1 viên nhộng",
+      "Hàm lượng",
+      "L-Lysine",
+      "500 mg",
+      "(gồm 637 mg L-Lysine Hydrochloride)"
+    ],
+    "notes": "GiữNGUYÊNchữ nhộng(trongảnh),KHÔNGsửathànhnhộng/nangtheothói quen. Khungđen chữnhật,2đườngngang dướiTrong1viênnhộng vàdướidòngngoặc. Thànhphầndinhdưỡng/Hàmlượngđậm;L-Lysine trái,500mgcănphải cùnghàng;dòngngoặccăngiữa. Khôngsửasố637.",
+    "questions": [
+      {
+        "qid": "DB-12-B9-P1-D1-I-223",
+        "de": "Lysine là một amino acid thiết yếu, quan trọng cho sự phát triển và phục hồi cơ bắp, nên được dùng bổ sung cho người tập thể hình dưới dạng viên nén chứa thành phần chính là lysine hydrochloride (C₆H₁₄N₂O₂HCl).\nMột công ty dược phẩm sản xuất loại viên nén này, thông tin của mỗi viên thuốc cho như hình bên.\nĐể sản xuất 3 triệu viên thuốc trên cần tối thiểu bao nhiêu tấn lysine biết hiệu suất phản ứng tính theo lysine là 95%?",
+        "refs": [
+          {
+            "where": "DB-12-B9-P1-D1-I-223.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B9-P1-I-79",
+        "de": "Lysine là một amino acid thiết yếu, quan trọng cho sự phát triển và phục hồi cơ bắp, nên được dùng bổ sung cho người tập thể hình dưới dạng viên nén chứa thành phần chính là lysine hydrochloride (C₆H₁₄N₂O₂HCl).\nMột công ty dược phẩm sản xuất loại viên nén này, thông tin của mỗi viên thuốc cho như hình bên.\nĐể sản xuất 3 triệu viên thuốc trên cần tối thiểu bao nhiêu tấn lysine biết hiệu suất phản ứng tính theo lysine là 95%?",
+        "refs": [
+          {
+            "where": "DH-12-C3-B9-P1-I-79.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false
+  },
+  {
+    "i": 390,
+    "hash": "456c615e63e52fc1d9ba94fcbdeac58d95ec2619c8aef7418b15dbf3ff704971",
+    "fileNguon": "anh/456c615e63e52fc1d9ba94fcbdeac58d95ec2619c8aef7418b15dbf3ff704971.png",
+    "canvas": [
+      788,
+      40
+    ],
+    "daMoNative": true,
+    "kind": "reaction-literal",
+    "reactants": "N₂(g) + 3H₂(g)",
+    "products": "2NH₃(g)",
+    "arrow": "⇌",
+    "overArrow": "380 – 450 °C, 25 – 200 bar, Fe",
+    "enthalpy": "ΔᵣH°₂₉₈ = −92 kJ",
+    "notes": "Giữ2mũitêncânbằngngượchướng,nhiệtđộ/ápsuất/xúctáctrênmũitên. KýhiệuΔrH°298: rsubscript,298subscript,°superscript. Nguồn−92kJ,KHÔNGtựthành−91,8kJtheostemvariant. Khôngcaption.",
+    "questions": [
+      {
+        "qid": "DB-11-B1-D1-I-124",
+        "de": "Cho phương trình sản xuất ammonia (NH₃) trong công nghiệp: Biểu thức tính hằng số cân bằng của phản ứng trên là",
+        "refs": [
+          {
+            "where": "DB-11-B1-D1-I-124.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-11-B1-D1-I-139",
+        "de": "Cho phương trình sản xuất ammonia (NH₃) trong công nghiệp: Yếu tố nào sau đây không làm ảnh hưởng đến sự chuyển dịch cân bằng hóa học của phản ứng trên?",
+        "refs": [
+          {
+            "where": "DB-11-B1-D1-I-139.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C1-B1-I-10",
+        "de": "Cho phương trình sản xuất ammonia (NH₃) trong công nghiệp: Biểu thức tính hằng số cân bằng của phản ứng trên là",
+        "refs": [
+          {
+            "where": "DH-11-C1-B1-I-10.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C1-B1-I-25",
+        "de": "Cho phương trình sản xuất ammonia (NH₃) trong công nghiệp: Yếu tố nào sau đây không làm ảnh hưởng đến sự chuyển dịch cân bằng hóa học của phản ứng trên?",
+        "refs": [
+          {
+            "where": "DH-11-C1-B1-I-25.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false
+  },
+  {
+    "i": 807,
+    "hash": "95dd65166507c6a1e9e28b991b9868a2174d6d8be56fde930cf54b3196729a5e",
+    "fileNguon": "anh/95dd65166507c6a1e9e28b991b9868a2174d6d8be56fde930cf54b3196729a5e.png",
+    "canvas": [
+      216,
+      227
+    ],
+    "daMoNative": true,
+    "kind": "element-cell",
+    "text": [
+      "7",
+      "14,007",
+      "N",
+      "Nitrogen"
+    ],
+    "notes": "Ôgócbo,nềnxámsáng,ô vuônggóctrêntráitốihơnchứa7.14,007trênphải,Ndậmlớngiữa,Nitrogendưới. Giữdấuphẩy;khôngthêmcấuhìnhelectron.",
+    "questions": [
+      {
+        "qid": "DB-10-B5-D1-I-194",
+        "de": "Hình dưới là ô nguyên tố của nitrogen (N). Phát biểu nào dưới đây là không đúng?",
+        "refs": [
+          {
+            "where": "DB-10-B5-D1-I-194.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C2-B9-D2-I-7",
+        "de": "Hình dưới là ô nguyên tố của nitrogen (N). Phát biểu nào dưới đây là không đúng?",
+        "refs": [
+          {
+            "where": "DH-10-C2-B9-D2-I-7.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false
+  },
+  {
+    "i": 764,
+    "hash": "8de870720812cbf37124255f9bec57296bd7debef1b6bca6b6fa72c5e1c422f6",
+    "fileNguon": "anh/8de870720812cbf37124255f9bec57296bd7debef1b6bca6b6fa72c5e1c422f6.png",
+    "canvas": [
+      250,
+      244
+    ],
+    "daMoNative": true,
+    "kind": "element-cell",
+    "text": [
+      "15",
+      "30.974",
+      "P",
+      "Phosphorus",
+      "[Ne]3s²3p³",
+      "Nonmetal"
+    ],
+    "notes": "Ôvuôngboxanhđậm,viềntrắngđôi.Chữtrắng:15trêntrái,30.974trênphải,Pgiữa,tênPhosphorus,[Ne]3s²3p³,Nonmetaldưới. Giữdấuchấmvàcapitalization.",
+    "questions": [
+      {
+        "qid": "DB-10-B5-D1-I-14",
+        "de": "Ô nguyên tố trong bảng tuần hoàn không cho biết thông tin nào sau đây?",
+        "refs": [
+          {
+            "where": "DB-10-B5-D1-I-14.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C2-B5-I-5",
+        "de": "Ô nguyên tố trong bảng tuần hoàn không cho biết thông tin nào sau đây?",
+        "refs": [
+          {
+            "where": "DH-10-C2-B5-I-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false
+  },
+  {
+    "i": 468,
+    "hash": "55550e68386f718d6c82a079829ae3b8df4e6257da0103b77ac37a38102a9bb9",
+    "fileNguon": "anh/55550e68386f718d6c82a079829ae3b8df4e6257da0103b77ac37a38102a9bb9.png",
+    "canvas": [
+      250,
+      252
+    ],
+    "daMoNative": true,
+    "kind": "element-cell",
+    "text": [
+      "11",
+      "22.990",
+      "Na",
+      "Sodium",
+      "[Ne]3s¹",
+      "Alkali metal"
+    ],
+    "notes": "Boxanhđậm,viềntrắngđôi.Chữtrắng:11trêntrái,22.990trênphải,Nagiữa,tênSodium,[Ne]3s¹,Alkalimetaldưới. Giữdấuchấmvàsuperscript1.",
+    "questions": [
+      {
+        "qid": "DB-10-B5-D1-I-45",
+        "de": "Hình bên là ô nguyên tố của Sodium. Phát biểu nào đưới đây không đúng?",
+        "refs": [
+          {
+            "where": "DB-10-B5-D1-I-45.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C2-B5-I-42",
+        "de": "Hình bên là ô nguyên tố của Sodium. Phát biểu nào đưới đây không đúng?",
+        "refs": [
+          {
+            "where": "DH-10-C2-B5-I-42.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false
+  },
+  {
+    "i": 658,
+    "hash": "7a4f13374d6061568eb232412792216b708e86de1a3a497073031ed7954aa016",
+    "fileNguon": "anh/7a4f13374d6061568eb232412792216b708e86de1a3a497073031ed7954aa016.png",
+    "canvas": [
+      205,
+      233
+    ],
+    "daMoNative": true,
+    "kind": "element-cell",
+    "text": [
+      "79",
+      "196,97",
+      "Au",
+      "Gold"
+    ],
+    "notes": "Khungxámvuôngnềntrắng;ôxámnhạtfillsgóctrêntráichứa79đậm.196,97trênphải,Aumàuxámgiữa,Goldxámdưới. Giữdấuphẩy.",
+    "questions": [
+      {
+        "qid": "DB-10-B5-D1-II-62",
+        "de": "Hình bên dưới mô tả ô nguyên tố của vàng (gold) trong bảng tuần hoàn các nguyên tố hóa học.",
+        "refs": [
+          {
+            "where": "DB-10-B5-D1-II-62.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C2-B5-II-3",
+        "de": "Hình bên dưới mô tả ô nguyên tố của vàng (gold) trong bảng tuần hoàn các nguyên tố hóa học.",
+        "refs": [
+          {
+            "where": "DH-10-C2-B5-II-3.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false
+  },
+  {
+    "i": 1140,
+    "hash": "cda754929fac85420ea195c9ac0591a95aeb1009f1b5838925464d87c9c71cc6",
+    "fileNguon": "anh/cda754929fac85420ea195c9ac0591a95aeb1009f1b5838925464d87c9c71cc6.png",
+    "canvas": [
+      135,
+      153
+    ],
+    "daMoNative": true,
+    "kind": "recycle",
+    "text": [
+      "5",
+      "PP"
+    ],
+    "notes": "3mũitênđenquaytheochiềukimđồnghồtạotamgiácbo:nhánhlênbêntrái,đầumũitêntrênphảichỉxuốngphải,đầumũitêndướichỉTRÁI. 5ởgiữa,PPởdưới;khôngsố0trước5.",
+    "questions": [
+      {
+        "qid": "VIP27-C4-B13-I-3",
+        "de": "Polypropylene (PP) là chất dẻo thường được sử dụng để sản xuất các sản phẩm thiết bị y tế, đồ gia dụng, ... Vật liệu được chế tạo từ PP thường có kí hiệu như hình bên, PP được tổng hợp từ monomer nào sau đây?",
+        "refs": [
+          {
+            "where": "VIP27-C4-B13-I-3.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false
+  },
+  {
+    "i": 792,
+    "hash": "937430b17a4ec339eb401f079799a0fefc844c89e9e9ef23bef8156aa1c388ad",
+    "fileNguon": "anh/937430b17a4ec339eb401f079799a0fefc844c89e9e9ef23bef8156aa1c388ad.png",
+    "canvas": [
+      232,
+      253
+    ],
+    "daMoNative": true,
+    "kind": "recycle",
+    "text": [
+      "2",
+      "HDPE"
+    ],
+    "notes": "3mũitênđenquaykimđồnghồtamgiácbo;đầumũitêndướichỉtrái.2ởgiữa,HDPEdưới.Không02.",
+    "questions": [
+      {
+        "qid": "12-C4-B13-III-27",
+        "de": "Một nhà máy sản xuất túi nylon (túi có 2 mặt) từ HDPE cần sản xuất túi đựng hình chữ nhật (có kích thước 20 cm × 30 cm, bề dày lớp nylon 0,02 cm). Biết hiệu suất phản ứng trùng hợp ethylene để điều chế HDPE là 60%, quá trình chuyển nhựa thành túi có hiệu suất là 95% và biết khối lượng riêng của nhựa HDPE là 0,95 g/cm³.\nKhối lượng nguyên liệu ethylene (tấn) dùng để sản xuất đơn hàng 100.000 túi trên bằng bao nhiêu tấn? (Làm tròn kết quả đến hàng phần nguyên)",
+        "refs": [
+          {
+            "where": "12-C4-B13-III-27.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false
+  },
+  {
+    "i": 676,
+    "hash": "7cd353b60697a1bf85dd83f2b5e17ee30dcd38728aa29deccbcb6b054fb41246",
+    "fileNguon": "anh/7cd353b60697a1bf85dd83f2b5e17ee30dcd38728aa29deccbcb6b054fb41246.png",
+    "canvas": [
+      246,
+      229
+    ],
+    "daMoNative": true,
+    "kind": "recycle",
+    "text": [
+      "3",
+      "PVC"
+    ],
+    "notes": "3mũitênđenquaykimđồnghồtamgiácbo;3giữa,PVCdưới.Khôngthêm0trước3.",
+    "questions": [
+      {
+        "qid": "12-KT-C4-D1-I-10",
+        "de": "Polymer X được dùng làm ống dẫn nước thải, vỏ dây điện, vải giả da.\nTrên các vật dụng làm từ X, thường được in kí hiệu như hình dưới đây.\nX được tổng hợp từ monomer nào sau đây?",
+        "refs": [
+          {
+            "where": "12-KT-C4-D1-I-10.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false
+  },
+  {
+    "i": 405,
+    "hash": "47a0a64cab5ea3c7d1e074f37808f49ad453d2a752251ec3ac3ccb47eeaddbe0",
+    "fileNguon": "anh/47a0a64cab5ea3c7d1e074f37808f49ad453d2a752251ec3ac3ccb47eeaddbe0.png",
+    "canvas": [
+      184,
+      214
+    ],
+    "daMoNative": true,
+    "kind": "recycle",
+    "text": [
+      "4",
+      "LDPE"
+    ],
+    "notes": "3mũitênđenquaykimđồnghồtamgiácbo,4giữa,LDPEdưới. Cóbandnềnxámnhạtởméptrênkhôngchữ,chỉbackgroundkhôngnộidung;khiđổistylecóthểdùngnềnapp. Giữ4không04.",
+    "questions": [
+      {
+        "qid": "12-BD7-17-I-5",
+        "de": "LDPE là một chất dẻo dễ tạo màng, có tính dai bền nên được sử dụng làm túi nylon, màng bọc, bao gói thực phẩm.\nTrên các bao bì làm từ LDPE thường được in kí hiệu như hình bên.\nPolymer dùng để sản xuất LDPE được tổng hợp từ monomer nào sau đây?",
+        "refs": [
+          {
+            "where": "12-BD7-17-I-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "12-C4-B13-I-15",
+        "de": "LDPE là một chất dẻo dễ tạo màng, có tính dai bền nên được sử dụng làm túi nylon, màng bọc, bao gói thực phẩm.\nTrên các bao bì làm từ LDPE thường được in kí hiệu như hình bên.\nPolymer dùng để sản xuất LDPE được tổng hợp từ monomer nào sau đây?",
+        "refs": [
+          {
+            "where": "12-C4-B13-I-15.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false
+  },
+  {
+    "i": 1119,
+    "hash": "c9cc85009724dca16f332ba3eae0741f4c4e9b89a816878b949e20d11d88587c",
+    "fileNguon": "anh/c9cc85009724dca16f332ba3eae0741f4c4e9b89a816878b949e20d11d88587c.png",
+    "canvas": [
+      212,
+      212
+    ],
+    "daMoNative": true,
+    "kind": "recycle",
+    "text": [
+      "03",
+      "PVC"
+    ],
+    "notes": "3mũitênđenquaykimđồnghồtamgiácbo. BẮTBUỘCgiữ03hấpsố0,khôngdùngcùngSVG676có3.PVCdưới.",
+    "questions": [
+      {
+        "qid": "12-C4-B13-II-14",
+        "de": "Poly(vinyl chloride) (PVC) là chất dẻo có tính cách điện tốt, bền với acid, dùng phổ biến để sản xuất vật liệu cách điện, ống dẫn nước, áo mưa. Kí hiệu của PVC thường được in như hình bên:",
+        "refs": [
+          {
+            "where": "12-C4-B13-II-14.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false
+  },
+  {
+    "i": 1228,
+    "hash": "dedbbd40201755cab0145ea71e1138ff4f35f856c5c42747dabdbe622c6de8a0",
+    "fileNguon": "anh/dedbbd40201755cab0145ea71e1138ff4f35f856c5c42747dabdbe622c6de8a0.png",
+    "canvas": [
+      254,
+      256
+    ],
+    "daMoNative": true,
+    "kind": "recycle",
+    "text": [
+      "5",
+      "PP"
+    ],
+    "notes": "3mũitênđenquaykimđồnghồtamgiácbo;5ởgiữa,PPdưới.Cùngtext1140nhưngnguồnhìnhhọc/rọngnétkhác,khôngcầngiữnhiễunét.",
+    "questions": [
+      {
+        "qid": "12-KT-C34-D1-II-3",
+        "de": "Polymer X có thể chịu được nhiệt độ lên tới 160°C nên được dùng làm ống dẫn nước nóng, hộp đựng thực phẩm có thể sử dụng trong lò vi sóng. Các vật dụng làm từ X thường được in kí hiệu như hình dưới.",
+        "refs": [
+          {
+            "where": "12-KT-C34-D1-II-3.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false
+  },
+  {
+    "i": 1360,
+    "hash": "f60bf7d35f9e4ec76a4350a37cf65aa69c028b6ba654ec61dbbfe56ee7282390",
+    "fileNguon": "anh/f60bf7d35f9e4ec76a4350a37cf65aa69c028b6ba654ec61dbbfe56ee7282390.png",
+    "canvas": [
+      375,
+      80
+    ],
+    "daMoNative": true,
+    "kind": "orbital-box",
+    "boxes": [
+      {
+        "label": "1s",
+        "cells": [
+          "↑↓"
+        ]
+      },
+      {
+        "label": "2s",
+        "cells": [
+          "↑↓"
+        ]
+      },
+      {
+        "label": "2p",
+        "cells": [
+          "↑↓",
+          "↑↓",
+          "↑↓"
+        ]
+      },
+      {
+        "label": "3s",
+        "cells": [
+          "↑"
+        ]
+      }
+    ],
+    "notes": "4cụmboxngang,1s1ô,2s1ô,2p3ôliền,3s1ô.BẮTBUỘC3sCHỈ1mũitên↑,khôngsửa↑↓theosốnguyêntửtrongstem. Nhãn1s/2s/2p/3sđậmnghiêngdướimỗi cụm. Khôngsố/tênnguyêntửthêm.",
+    "questions": [
+      {
+        "qid": "DB-10-B1-D1-II-205",
+        "de": "Magnesium được sử dụng nhiều trong công nghiệp để chế tạo các bộ phận của máy bay, ô tô,… Nguyên tử nguyên tố magnesium có 12 electron.",
+        "refs": [
+          {
+            "where": "DB-10-B1-D1-II-205.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B3-II-22",
+        "de": "Magnesium được sử dụng nhiều trong công nghiệp để chế tạo các bộ phận của máy bay, ô tô,… Nguyên tử nguyên tố magnesium có 12 electron.",
+        "refs": [
+          {
+            "where": "DH-10-C1-B3-II-22.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false
+  },
+  {
+    "i": 340,
+    "hash": "3c0e31666d9de063891b85796175baeee5e5ea24c3023cfc48bf84197330e9d2",
+    "fileNguon": "anh/3c0e31666d9de063891b85796175baeee5e5ea24c3023cfc48bf84197330e9d2.png",
+    "canvas": [
+      373,
+      199
+    ],
+    "daMoNative": true,
+    "kind": "literal-electron-config",
+    "text": [
+      "X²⁻: 1s²2s²2p⁶3s²3p⁶.",
+      "Y³⁺: 1s²2s²2p⁶.",
+      "R²⁺: 1s²2s²2p⁶3s²3p⁶3d⁶.",
+      "T¹⁻: 1s²2s²2p⁶."
+    ],
+    "notes": "4dòng,tráicănthẳng,kýhiệunguyêntửnghiêng,chỉsốđiệntíchtrên;giữdấuchấmcuốidòng. RKHÔNGcó4s,Tnguồnhiện1−tườngminhkhôngbỏ1. KhôngsuyX/Y/R/Tlànguyêntốnào.",
+    "questions": [
+      {
+        "qid": "DB-10-B5-D1-III-189",
+        "de": "Cho cấu hình electron của các hạt vi mô như hình dưới. Có bao nhiêu nguyên tố đều thuộc chu kì 3?",
+        "refs": [
+          {
+            "where": "DB-10-B5-D1-III-189.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C2-B9-D1-III-1",
+        "de": "Cho cấu hình electron của các hạt vi mô như hình dưới. Có bao nhiêu nguyên tố đều thuộc chu kì 3?",
+        "refs": [
+          {
+            "where": "DH-10-C2-B9-D1-III-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false
+  },
+  {
+    "i": 231,
+    "hash": "28842185852e83ce6d5a17bb8d4c29b36aa2d77caf107a7da85326d6a92461fb",
+    "fileNguon": "anh/28842185852e83ce6d5a17bb8d4c29b36aa2d77caf107a7da85326d6a92461fb.png",
+    "canvas": [
+      67,
+      57
+    ],
+    "daMoNative": true,
+    "kind": "literal-symbol",
+    "text": [
+      "α"
+    ],
+    "notes": "CHỈglyphalphaHyLạpđen,lớnnghiêngnhưnative,khôngsố/caption. KhôngthaybằngaLatin;nguồnimageđơnphảigiữtrongqidthựctế.",
+    "questions": [
+      {
+        "qid": "DB-12-B9-P2-D1-I-179",
+        "de": "Phát biểu nào sau đây không đúng?",
+        "refs": [
+          {
+            "where": "DB-12-B9-P2-D1-I-179.hinh.0.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B9-P2-I-41",
+        "de": "Phát biểu nào sau đây không đúng?",
+        "refs": [
+          {
+            "where": "DH-12-C3-B9-P2-I-41.hinh.0.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false
+  },
+  {
+    "i": 1222,
+    "hash": "de191b75b349512e14e78bfac9101823d2e4f2b9049fe1dcc22f7479434554ef",
+    "fileNguon": "anh/de191b75b349512e14e78bfac9101823d2e4f2b9049fe1dcc22f7479434554ef.png",
+    "canvas": [
+      549,
+      116
+    ],
+    "daMoNative": true,
+    "kind": "reaction-isotope-haworth",
+    "reactants": [
+      "HaworthđánhgiáthứtựH/OHdưới",
+      "H₃C–¹⁸O–H"
+    ],
+    "arrow": "→",
+    "overArrow": "HCl khan",
+    "products": [
+      "A (C₇HₓOᵧ)",
+      "H₂O"
+    ],
+    "haworth": {
+      "ring": "Otrênphải,C1phải,C2dướiphải,C3dướitrái,C4trái,C5trêntrái;cạnhtrướcđậm",
+      "C1": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C2": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C3": {
+        "up": "OH",
+        "down": "H"
+      },
+      "C4": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C5": {
+        "up": "CH₂OH",
+        "down": "H"
+      }
+    },
+    "notes": "Mộtmũitênsangphải,HClkhantrên;dấu+giữaHaworthvàmethanol18O,vàgiữaAformula/H₂O. Ađậm;C₇HₓOᵧgiữx/ybiến,KHÔNGtínhsốH/Ohoặcđápán. ¹⁸nằmSUPERSCRIPTtrướcO,khôngphảiCH₃isotope18C. MọiHvòngHaworthexplicitphảigiữ. Khôngđặtcaptions/sốCchovòng.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D2-II-106",
+        "de": "Tiến hành nghiên cứu phản ứng giữa glucose với methanol (xúc tác HCl khan) trong đó nguyên tử oxygen trong phân tử methanol là đồng vị ¹⁸O, các nguyên tử trong glucose là đồng vị ¹²C; ¹H và ¹⁶O và trong methanol là đồng vị ¹²C; ¹H. Kết quả thí nghiệm thu được như sau:",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-II-106.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-II-23",
+        "de": "Tiến hành nghiên cứu phản ứng giữa glucose với methanol (xúc tác HCl khan) trong đó nguyên tử oxygen trong phân tử methanol là đồng vị ¹⁸O, các nguyên tử trong glucose là đồng vị ¹²C; ¹H và ¹⁶O và trong methanol là đồng vị ¹²C; ¹H. Kết quả thí nghiệm thu được như sau:",
+        "refs": [
+          {
+            "where": "DH-12-C2-B4-II-23.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false
+  }
+]

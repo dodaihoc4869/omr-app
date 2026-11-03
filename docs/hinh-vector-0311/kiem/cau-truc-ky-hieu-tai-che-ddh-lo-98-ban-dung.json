@@ -1,0 +1,246 @@
+[
+  {
+    "i": 1140,
+    "hash": "cda754929fac85420ea195c9ac0591a95aeb1009f1b5838925464d87c9c71cc6",
+    "fileNguon": "anh/cda754929fac85420ea195c9ac0591a95aeb1009f1b5838925464d87c9c71cc6.png",
+    "canvas": [
+      135,
+      153
+    ],
+    "daMoNative": true,
+    "kind": "recycle",
+    "text": [
+      "5",
+      "PP"
+    ],
+    "notes": "3mũitênđenquaytheochiềukimđồnghồtạotamgiácbo:nhánhlênbêntrái,đầumũitêntrênphảichỉxuốngphải,đầumũitêndướichỉTRÁI. 5ởgiữa,PPởdưới;khôngsố0trước5.",
+    "questions": [
+      {
+        "qid": "VIP27-C4-B13-I-3",
+        "de": "Polypropylene (PP) là chất dẻo thường được sử dụng để sản xuất các sản phẩm thiết bị y tế, đồ gia dụng, ... Vật liệu được chế tạo từ PP thường có kí hiệu như hình bên, PP được tổng hợp từ monomer nào sau đây?",
+        "refs": [
+          {
+            "where": "VIP27-C4-B13-I-3.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false,
+    "svg": "tai-che-ddh-0776509fa21c771b283489ff1f55ce9bbf3734a80ca78ffe640694ce2151c0f8.svg",
+    "hashSvg": "0776509fa21c771b283489ff1f55ce9bbf3734a80ca78ffe640694ce2151c0f8",
+    "byteSvg": 2093,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "3arrowclockwise:tráilên/trênxuốngphải/dướisangtrái. Giữsố5/2/3/4/03/5vàPP/HDPE/PVC/LDPE/PVC/PP;khôngthêm0,1119bắtbuộc03.ChữđậmWOFF2appthật.",
+    "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+    "hashSvgDaSoat": "0776509fa21c771b283489ff1f55ce9bbf3734a80ca78ffe640694ce2151c0f8",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 792,
+    "hash": "937430b17a4ec339eb401f079799a0fefc844c89e9e9ef23bef8156aa1c388ad",
+    "fileNguon": "anh/937430b17a4ec339eb401f079799a0fefc844c89e9e9ef23bef8156aa1c388ad.png",
+    "canvas": [
+      232,
+      253
+    ],
+    "daMoNative": true,
+    "kind": "recycle",
+    "text": [
+      "2",
+      "HDPE"
+    ],
+    "notes": "3mũitênđenquaykimđồnghồtamgiácbo;đầumũitêndướichỉtrái.2ởgiữa,HDPEdưới.Không02.",
+    "questions": [
+      {
+        "qid": "12-C4-B13-III-27",
+        "de": "Một nhà máy sản xuất túi nylon (túi có 2 mặt) từ HDPE cần sản xuất túi đựng hình chữ nhật (có kích thước 20 cm × 30 cm, bề dày lớp nylon 0,02 cm). Biết hiệu suất phản ứng trùng hợp ethylene để điều chế HDPE là 60%, quá trình chuyển nhựa thành túi có hiệu suất là 95% và biết khối lượng riêng của nhựa HDPE là 0,95 g/cm³.\nKhối lượng nguyên liệu ethylene (tấn) dùng để sản xuất đơn hàng 100.000 túi trên bằng bao nhiêu tấn? (Làm tròn kết quả đến hàng phần nguyên)",
+        "refs": [
+          {
+            "where": "12-C4-B13-III-27.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false,
+    "svg": "tai-che-ddh-26adfa13db16cfb567ddd11225de9467edb1d9a366da08cf0030f10cb82b6b34.svg",
+    "hashSvg": "26adfa13db16cfb567ddd11225de9467edb1d9a366da08cf0030f10cb82b6b34",
+    "byteSvg": 2947,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "3arrowclockwise:tráilên/trênxuốngphải/dướisangtrái. Giữsố5/2/3/4/03/5vàPP/HDPE/PVC/LDPE/PVC/PP;khôngthêm0,1119bắtbuộc03.ChữđậmWOFF2appthật.",
+    "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+    "hashSvgDaSoat": "26adfa13db16cfb567ddd11225de9467edb1d9a366da08cf0030f10cb82b6b34",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 676,
+    "hash": "7cd353b60697a1bf85dd83f2b5e17ee30dcd38728aa29deccbcb6b054fb41246",
+    "fileNguon": "anh/7cd353b60697a1bf85dd83f2b5e17ee30dcd38728aa29deccbcb6b054fb41246.png",
+    "canvas": [
+      246,
+      229
+    ],
+    "daMoNative": true,
+    "kind": "recycle",
+    "text": [
+      "3",
+      "PVC"
+    ],
+    "notes": "3mũitênđenquaykimđồnghồtamgiácbo;3giữa,PVCdưới.Khôngthêm0trước3.",
+    "questions": [
+      {
+        "qid": "12-KT-C4-D1-I-10",
+        "de": "Polymer X được dùng làm ống dẫn nước thải, vỏ dây điện, vải giả da.\nTrên các vật dụng làm từ X, thường được in kí hiệu như hình dưới đây.\nX được tổng hợp từ monomer nào sau đây?",
+        "refs": [
+          {
+            "where": "12-KT-C4-D1-I-10.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false,
+    "svg": "tai-che-ddh-179bc8f8a5f77bc080d71929ead922ded317ab4a0b2b8b2426b1e818e86f6f6e.svg",
+    "hashSvg": "179bc8f8a5f77bc080d71929ead922ded317ab4a0b2b8b2426b1e818e86f6f6e",
+    "byteSvg": 2537,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "3arrowclockwise:tráilên/trênxuốngphải/dướisangtrái. Giữsố5/2/3/4/03/5vàPP/HDPE/PVC/LDPE/PVC/PP;khôngthêm0,1119bắtbuộc03.ChữđậmWOFF2appthật.",
+    "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+    "hashSvgDaSoat": "179bc8f8a5f77bc080d71929ead922ded317ab4a0b2b8b2426b1e818e86f6f6e",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 405,
+    "hash": "47a0a64cab5ea3c7d1e074f37808f49ad453d2a752251ec3ac3ccb47eeaddbe0",
+    "fileNguon": "anh/47a0a64cab5ea3c7d1e074f37808f49ad453d2a752251ec3ac3ccb47eeaddbe0.png",
+    "canvas": [
+      184,
+      214
+    ],
+    "daMoNative": true,
+    "kind": "recycle",
+    "text": [
+      "4",
+      "LDPE"
+    ],
+    "notes": "3mũitênđenquaykimđồnghồtamgiácbo,4giữa,LDPEdưới. Cóbandnềnxámnhạtởméptrênkhôngchữ,chỉbackgroundkhôngnộidung;khiđổistylecóthểdùngnềnapp. Giữ4không04.",
+    "questions": [
+      {
+        "qid": "12-BD7-17-I-5",
+        "de": "LDPE là một chất dẻo dễ tạo màng, có tính dai bền nên được sử dụng làm túi nylon, màng bọc, bao gói thực phẩm.\nTrên các bao bì làm từ LDPE thường được in kí hiệu như hình bên.\nPolymer dùng để sản xuất LDPE được tổng hợp từ monomer nào sau đây?",
+        "refs": [
+          {
+            "where": "12-BD7-17-I-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "12-C4-B13-I-15",
+        "de": "LDPE là một chất dẻo dễ tạo màng, có tính dai bền nên được sử dụng làm túi nylon, màng bọc, bao gói thực phẩm.\nTrên các bao bì làm từ LDPE thường được in kí hiệu như hình bên.\nPolymer dùng để sản xuất LDPE được tổng hợp từ monomer nào sau đây?",
+        "refs": [
+          {
+            "where": "12-C4-B13-I-15.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false,
+    "svg": "tai-che-ddh-600569c999fe2b293ae0fa706028a037645ed499dada4a3fea4f909f0a1c90d5.svg",
+    "hashSvg": "600569c999fe2b293ae0fa706028a037645ed499dada4a3fea4f909f0a1c90d5",
+    "byteSvg": 2813,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "3arrowclockwise:tráilên/trênxuốngphải/dướisangtrái. Giữsố5/2/3/4/03/5vàPP/HDPE/PVC/LDPE/PVC/PP;khôngthêm0,1119bắtbuộc03.ChữđậmWOFF2appthật.",
+    "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+    "hashSvgDaSoat": "600569c999fe2b293ae0fa706028a037645ed499dada4a3fea4f909f0a1c90d5",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 1119,
+    "hash": "c9cc85009724dca16f332ba3eae0741f4c4e9b89a816878b949e20d11d88587c",
+    "fileNguon": "anh/c9cc85009724dca16f332ba3eae0741f4c4e9b89a816878b949e20d11d88587c.png",
+    "canvas": [
+      212,
+      212
+    ],
+    "daMoNative": true,
+    "kind": "recycle",
+    "text": [
+      "03",
+      "PVC"
+    ],
+    "notes": "3mũitênđenquaykimđồnghồtamgiácbo. BẮTBUỘCgiữ03hấpsố0,khôngdùngcùngSVG676có3.PVCdưới.",
+    "questions": [
+      {
+        "qid": "12-C4-B13-II-14",
+        "de": "Poly(vinyl chloride) (PVC) là chất dẻo có tính cách điện tốt, bền với acid, dùng phổ biến để sản xuất vật liệu cách điện, ống dẫn nước, áo mưa. Kí hiệu của PVC thường được in như hình bên:",
+        "refs": [
+          {
+            "where": "12-C4-B13-II-14.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false,
+    "svg": "tai-che-ddh-cd287e863235681ee8f306de272bdb2bd4e5553bf1f2af1aca8c5bf09133855f.svg",
+    "hashSvg": "cd287e863235681ee8f306de272bdb2bd4e5553bf1f2af1aca8c5bf09133855f",
+    "byteSvg": 2959,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "3arrowclockwise:tráilên/trênxuốngphải/dướisangtrái. Giữsố5/2/3/4/03/5vàPP/HDPE/PVC/LDPE/PVC/PP;khôngthêm0,1119bắtbuộc03.ChữđậmWOFF2appthật.",
+    "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+    "hashSvgDaSoat": "cd287e863235681ee8f306de272bdb2bd4e5553bf1f2af1aca8c5bf09133855f",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 1228,
+    "hash": "dedbbd40201755cab0145ea71e1138ff4f35f856c5c42747dabdbe622c6de8a0",
+    "fileNguon": "anh/dedbbd40201755cab0145ea71e1138ff4f35f856c5c42747dabdbe622c6de8a0.png",
+    "canvas": [
+      254,
+      256
+    ],
+    "daMoNative": true,
+    "kind": "recycle",
+    "text": [
+      "5",
+      "PP"
+    ],
+    "notes": "3mũitênđenquaykimđồnghồtamgiácbo;5ởgiữa,PPdưới.Cùngtext1140nhưngnguồnhìnhhọc/rọngnétkhác,khôngcầngiữnhiễunét.",
+    "questions": [
+      {
+        "qid": "12-KT-C34-D1-II-3",
+        "de": "Polymer X có thể chịu được nhiệt độ lên tới 160°C nên được dùng làm ống dẫn nước nóng, hộp đựng thực phẩm có thể sử dụng trong lò vi sóng. Các vật dụng làm từ X thường được in kí hiệu như hình dưới.",
+        "refs": [
+          {
+            "where": "12-KT-C34-D1-II-3.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false,
+    "svg": "tai-che-ddh-0776509fa21c771b283489ff1f55ce9bbf3734a80ca78ffe640694ce2151c0f8.svg",
+    "hashSvg": "0776509fa21c771b283489ff1f55ce9bbf3734a80ca78ffe640694ce2151c0f8",
+    "byteSvg": 2093,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "3arrowclockwise:tráilên/trênxuốngphải/dướisangtrái. Giữsố5/2/3/4/03/5vàPP/HDPE/PVC/LDPE/PVC/PP;khôngthêm0,1119bắtbuộc03.ChữđậmWOFF2appthật.",
+    "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+    "hashSvgDaSoat": "0776509fa21c771b283489ff1f55ce9bbf3734a80ca78ffe640694ce2151c0f8",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

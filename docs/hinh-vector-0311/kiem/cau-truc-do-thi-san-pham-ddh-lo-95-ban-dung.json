@@ -1,0 +1,186 @@
+[
+  {
+    "i": 300,
+    "hash": "33b7869e65f89699c185bbf0aa6211cdd2e72634d7528b87064435009875758c",
+    "fileNguon": "anh/33b7869e65f89699c185bbf0aa6211cdd2e72634d7528b87064435009875758c.png",
+    "canvas": [
+      180,
+      178
+    ],
+    "daMoNative": true,
+    "kind": "graph",
+    "xLabel": "Thời gian",
+    "yLabel": "[P]",
+    "geometry": "Canvas180x180;origin(30,147),Yarrow(30,7),Xarrow(165,147). Thẳngtừorigin→(162,17),độdốc~1. Khôngticks/số/guide/caption.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D2-I-135",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-I-135.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B6-I-83",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian?",
+        "refs": [
+          {
+            "where": "DH-12-C2-B6-I-83.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false,
+    "svg": "san-pham-graph-ddh-8321fb4dc10f2e7f6e0fe229b0d09b199be65e4dd7729217bae78ac1a876b39c.svg",
+    "hashSvg": "8321fb4dc10f2e7f6e0fe229b0d09b199be65e4dd7729217bae78ac1a876b39c",
+    "byteSvg": 5803,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "KhôngthêmnhãnA/B/C/D,tick/số/guide. Giữthẳngdốclớn/thẳngdốcnhỏ/conglõmxuốngbãohòa/conglõmlên theo từngPNGsource.",
+    "hashSvgDaSoat": "8321fb4dc10f2e7f6e0fe229b0d09b199be65e4dd7729217bae78ac1a876b39c",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 427,
+    "hash": "4c7b28f23841c309217e9183d2d91b6efbf2ed861bb7aecf0f4c9a209adbbe53",
+    "fileNguon": "anh/4c7b28f23841c309217e9183d2d91b6efbf2ed861bb7aecf0f4c9a209adbbe53.png",
+    "canvas": [
+      181,
+      178
+    ],
+    "daMoNative": true,
+    "kind": "graph",
+    "xLabel": "Thời gian",
+    "yLabel": "[P]",
+    "geometry": "Canvas181x178;origin(34,147),Yarrow(34,7),Xarrow(168,147). ĐườngthẳngdốcNHỎ từorigin→(161,126),độdốc~0,165. Khôngticks/số/guide/caption.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D2-I-135",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-I-135.hinh.1.du_lieu",
+            "viTri": "sau_pa_B"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B6-I-83",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian?",
+        "refs": [
+          {
+            "where": "DH-12-C2-B6-I-83.hinh.1.du_lieu",
+            "viTri": "sau_pa_B"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false,
+    "svg": "san-pham-graph-ddh-a00b4544a9dc04522dc76439b431df08b51ca5fa1622d119b6881c0302b32dbb.svg",
+    "hashSvg": "a00b4544a9dc04522dc76439b431df08b51ca5fa1622d119b6881c0302b32dbb",
+    "byteSvg": 5804,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "KhôngthêmnhãnA/B/C/D,tick/số/guide. Giữthẳngdốclớn/thẳngdốcnhỏ/conglõmxuốngbãohòa/conglõmlên theo từngPNGsource.",
+    "hashSvgDaSoat": "a00b4544a9dc04522dc76439b431df08b51ca5fa1622d119b6881c0302b32dbb",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 1364,
+    "hash": "f654f68b69b4b12f26356fef1c7a04924d3686dfc01faf92fa12d80c99340d6c",
+    "fileNguon": "anh/f654f68b69b4b12f26356fef1c7a04924d3686dfc01faf92fa12d80c99340d6c.png",
+    "canvas": [
+      183,
+      184
+    ],
+    "daMoNative": true,
+    "kind": "graph",
+    "xLabel": "Thời gian",
+    "yLabel": "[P]",
+    "geometry": "Canvas185x185;origin(35,152),Yarrow(35,5),Xarrow(177,152). Curve tăngtừorigin qua~(72,122),(108,100) rồiđếnplateau~y92 ởx150..176;khôngnằmngangbằngtrụcX. Conglõmxuống,tăngrồibãohòa. Khôngticks/số/guide/caption.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D2-I-135",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-I-135.hinh.2.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B6-I-83",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian?",
+        "refs": [
+          {
+            "where": "DH-12-C2-B6-I-83.hinh.2.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false,
+    "svg": "san-pham-graph-ddh-77bd69ce4009ce99ca734c6b180029af0df2bb047573f339b520fbe965abef90.svg",
+    "hashSvg": "77bd69ce4009ce99ca734c6b180029af0df2bb047573f339b520fbe965abef90",
+    "byteSvg": 5831,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "KhôngthêmnhãnA/B/C/D,tick/số/guide. Giữthẳngdốclớn/thẳngdốcnhỏ/conglõmxuốngbãohòa/conglõmlên theo từngPNGsource.",
+    "hashSvgDaSoat": "77bd69ce4009ce99ca734c6b180029af0df2bb047573f339b520fbe965abef90",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 659,
+    "hash": "7a78460e5fc629060c06a6601e6700ee1245ac4d7683d0862049587c6707f280",
+    "fileNguon": "anh/7a78460e5fc629060c06a6601e6700ee1245ac4d7683d0862049587c6707f280.png",
+    "canvas": [
+      184,
+      185
+    ],
+    "daMoNative": true,
+    "kind": "graph",
+    "xLabel": "Thời gian",
+    "yLabel": "[P]",
+    "geometry": "Canvas184x188;origin(30,156),Yarrow(30,3),Xarrow(176,156). Curve tạigầnoriginphẳngthấp,~(74,155),~(113,144),~(145,122),đến(175,94);conglõmLÊN tăngnhanhcuối,khôngsaturation. Khôngticks/số/guide/caption.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D2-I-135",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-I-135.hinh.3.du_lieu",
+            "viTri": "sau_pa_D"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B6-I-83",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian?",
+        "refs": [
+          {
+            "where": "DH-12-C2-B6-I-83.hinh.3.du_lieu",
+            "viTri": "sau_pa_D"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauDotDau": false,
+    "svg": "san-pham-graph-ddh-1336bc615cbd0e13ddddeeb63046a358b024d5bd87e6c619edd8a030932f41ea.svg",
+    "hashSvg": "1336bc615cbd0e13ddddeeb63046a358b024d5bd87e6c619edd8a030932f41ea",
+    "byteSvg": 5834,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "KhôngthêmnhãnA/B/C/D,tick/số/guide. Giữthẳngdốclớn/thẳngdốcnhỏ/conglõmxuốngbãohòa/conglõmlên theo từngPNGsource.",
+    "hashSvgDaSoat": "1336bc615cbd0e13ddddeeb63046a358b024d5bd87e6c619edd8a030932f41ea",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
