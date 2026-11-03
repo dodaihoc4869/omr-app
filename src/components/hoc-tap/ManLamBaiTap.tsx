@@ -1297,7 +1297,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
             </div>
             : <VungChamDe key={`v${q.qid}`} q={q} token={token} phien={phien} onHoTro={danhDauHoTro} nutBatDau={nutBatDau}><DeCau q={q} stt={stt} /></VungChamDe>}
           {coDangCanh(q.text) && <MinhHoaDe key={`m${q.qid}`} text={q.text} />}
-          {coHinhDe(q.hinhAnh) && <Suspense key={`hv${q.qid}`} fallback={null}><HinhVeLaiCuaCau qid={q.qid} /></Suspense>}{/* thầy 03/11: hình của đề vẽ lại = thẻ riêng ở dưới */}
+          {coHinhDe(q.hinhAnh) && <Suspense fallback={null}><HinhVeLaiCuaCau qid={q.qid} hinh={q.hinhAnh} /></Suspense>}{/* thầy 03/11: hình của đề vẽ lại = thẻ riêng ở dưới */}
           {q.goiY && goiY && dangTraLoi && <section key={`y${q.qid}`} id="ht2-lam-goi-y" className="ht2-lam-goi-y" aria-label="Gợi ý"><b><Lightbulb size={18} aria-hidden="true" />Gợi ý</b><p>{q.goiY.cotLoi || (q.goiY.gach?.length ? `Có thể loại phương án ${q.goiY.gach.join(', ')}.` : 'Đọc lại kiến thức cốt lõi của bài.')}</p></section>}
           </div>
           <ThanhCuon key="cd" cot="de" />
