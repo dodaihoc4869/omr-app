@@ -57,7 +57,10 @@
       "Mẫu 3 hình được thầy duyệt; 6 công thức mới đã được agent mở từng nguồn đối chiếu độc lập, 6/6 đạt.",
       "Thầy đã giao tự sửa và tích hợp khi đạt; không xin thầy duyệt lại từng lô.",
       "Toàn kho còn chưa hoàn tất, app chưa thay hình; không báo đã xong hoặc đã triển khai."
-    ]
+    ],
+    "danhMucDaKiem": "docs/hinh-vector-0311/kiem/danh-muc-da-kiem.json",
+    "loVuaXong": "23 hình nguồn orbital → 12 SVG riêng; 3 tác tử soát trực tiếp 23/23 đạt.",
+    "viecNenLamTiep": "Hoàn thiện phần còn lại của nhóm orbital: các hình có nhãn cắt ở rìa cần đối chiếu ngữ cảnh đúng từng câu; các hình AO không gian cần giữ trục/nhãn/phân biệt 2 thùy. Hoặc chọn một cụm hình hóa học đơn giản chưa có trong danh-muc-da-kiem, mở nguồn riêng rồi dựng hình học và soát độc lập."
   },
   "tuDongTiepTuc": {
     "id": "6ae96c39083081918a50bc48bc6c8d3e",
@@ -65,5 +68,20 @@
     "lich": "moi-gio",
     "mucTieu": "Tự vẽ, soát, sửa, tích hợp và kiểm bản sống đến khi đạt; tự tắt khi hoàn tất",
     "thongBao": "Chỉ khi hoàn tất, có lỗi chặn thực sự hoặc cần hành động của thầy"
+  },
+  "loOrbitalDaSoat": {
+    "soAnhNguon": 23,
+    "soSvgRieng": 12,
+    "ketQua": "23/23 đạt đối chiếu độc lập",
+    "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
+  },
+  "tongDaDoiChieu": {
+    "soAnhNguon": 32,
+    "soSvgRieng": 21,
+    "soCauDungHinh": 32,
+    "byteSvg": 34803,
+    "byteGzip": 9980,
+    "soAnhNguonConLai": 1396,
+    "daTichHop": false
   }
 }

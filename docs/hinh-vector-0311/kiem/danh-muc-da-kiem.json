@@ -1,0 +1,801 @@
+{
+  "ghiChu": "Danh mục tài sản đã đối chiếu để chuẩn bị tích hợp. Chưa được app dùng, chưa phát hành; không có đáp án.",
+  "theoHashNguon": {
+    "fd9dc4ef16a9abd4bb2a16d9f10a9a8650446ba720443d35ed5f2d27a29ae739": {
+      "tep": "12-C5-B16-I-24-hinh-01.svg",
+      "hashSvg": "3e196eef675c2eaa0f7851b8f198375c72749418ebccc027a7adbf07ed97f912",
+      "byteSvg": 3089,
+      "byteGzip": 909,
+      "trangThai": "mau-thay-duyet",
+      "canNenSang": true
+    },
+    "07407bbff732b964612d21d11c18620133f2e8b86ecc26c34f4db9764847ee8d": {
+      "tep": "DH-11-C1-B1-II-5-hinh-01.svg",
+      "hashSvg": "379560a8075e3642fb5b9ff261ce4d5bff9d3333874cb7c3f2b4534cc9ee84ab",
+      "byteSvg": 3875,
+      "byteGzip": 1005,
+      "trangThai": "mau-thay-duyet",
+      "canNenSang": true
+    },
+    "665cf34d8440e83aa8c3e0a04da87ca0fd0c5bd661d755ef53968e0522986f25": {
+      "tep": "DH-11-C1-B1-II-11-hinh-01.svg",
+      "hashSvg": "2a1c47a8adbf580287eb1ecac4d4204cd6dc0067ee1d7c180a5c56471c12110b",
+      "byteSvg": 1776,
+      "byteGzip": 627,
+      "trangThai": "mau-thay-duyet",
+      "canNenSang": true
+    },
+    "0221fbc67e2428efcf900364916a9d651a11a869d0ee40e1af07276f0d9f31f8": {
+      "tep": "hoa-0221fbc67e2428efcf900364916a9d651a11a869d0ee40e1af07276f0d9f31f8.svg",
+      "hashSvg": "acd7e0aa89b88ed583418a821cbff786662a7f305a3983b4c48fd9d0ef441435",
+      "byteSvg": 2173,
+      "byteGzip": 499,
+      "trangThai": "hoa-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "0998c4ae2c931e01ad5b3c19128fb0c1c20414836d9d0413ca523ec2a1d70e96": {
+      "tep": "hoa-0998c4ae2c931e01ad5b3c19128fb0c1c20414836d9d0413ca523ec2a1d70e96.svg",
+      "hashSvg": "6ddfaa417cedec404a6a1e978b0455a7635deb66d65b806e26e3eb1a3900381a",
+      "byteSvg": 2164,
+      "byteGzip": 500,
+      "trangThai": "hoa-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "6877f1be391569da3f7c3d244d7940ecb7c3f16221a78b630c87d34acc41ef96": {
+      "tep": "hoa-6877f1be391569da3f7c3d244d7940ecb7c3f16221a78b630c87d34acc41ef96.svg",
+      "hashSvg": "2198c96cc6833cff3eaa73ce2d51e0c2ca1c9823d0e6895eb29d94b4d4337103",
+      "byteSvg": 1115,
+      "byteGzip": 373,
+      "trangThai": "hoa-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "6be1c3244a4ee89e40ecd5ddcb70d95a98b912e2c801bcef8fce2ea15bb91e93": {
+      "tep": "hoa-6be1c3244a4ee89e40ecd5ddcb70d95a98b912e2c801bcef8fce2ea15bb91e93.svg",
+      "hashSvg": "bf04e9b63bf9990a97cc93cd02bfe816029e15101eccbb83788634e96322d4f3",
+      "byteSvg": 2289,
+      "byteGzip": 520,
+      "trangThai": "hoa-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "70bfd8e31ade588266c3d0c9fd50af5d24e33f7b4a60a80bbf192d68818d07fa": {
+      "tep": "hoa-70bfd8e31ade588266c3d0c9fd50af5d24e33f7b4a60a80bbf192d68818d07fa.svg",
+      "hashSvg": "c040934e1a5d6c6f24cc7727dfb1c53addf665495e0fb27c58fb88d56c346d84",
+      "byteSvg": 1619,
+      "byteGzip": 454,
+      "trangThai": "hoa-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "03aa1f42f69d26fc8100de0f17cda5072d5149c61051aa09a476834f4997a1ac": {
+      "tep": "hoa-03aa1f42f69d26fc8100de0f17cda5072d5149c61051aa09a476834f4997a1ac.svg",
+      "hashSvg": "5bb79f148e647d63f89dd4ce2f98f96f7fc60821d8dc07c3cf57c2515c2a62bb",
+      "byteSvg": 2204,
+      "byteGzip": 484,
+      "trangThai": "hoa-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "06fbb84758192112a98b4959a44b84b9a0e81054fa693f9476a1c012466b438f": {
+      "tep": "orbital-97b31decd909a44923c137e1f9f0014445ef301e982b5abd71df46943af85ac9.svg",
+      "hashSvg": "97b31decd909a44923c137e1f9f0014445ef301e982b5abd71df46943af85ac9",
+      "byteSvg": 557,
+      "byteGzip": 299,
+      "trangThai": "orbital-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "1396e5b67abc81bead4e75250dc5d8233260d8b0be26b3fd1132400e47c900d1": {
+      "tep": "orbital-c27627fcc3a1b5f3880024a6f42b2c73d9c8db1faaf5aa42fa9a88075dc776ba.svg",
+      "hashSvg": "c27627fcc3a1b5f3880024a6f42b2c73d9c8db1faaf5aa42fa9a88075dc776ba",
+      "byteSvg": 407,
+      "byteGzip": 273,
+      "trangThai": "orbital-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "13e4b159f0e3ad0766f07765162e2855c7e3760ccc8a5162c457c90be6938822": {
+      "tep": "orbital-3e8064ed68075612c348d886b706b00e3194cb7981349bb6b05ff2d361888306.svg",
+      "hashSvg": "3e8064ed68075612c348d886b706b00e3194cb7981349bb6b05ff2d361888306",
+      "byteSvg": 557,
+      "byteGzip": 296,
+      "trangThai": "orbital-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "25b7eeb9f487204873ef366bf2a3fcdabea2d09e7f2f33a7512bf48c3f779036": {
+      "tep": "orbital-6aba5002332bd4bda14688645c1f8bc13d8aba1511af6660d809d1a83f1a0f37.svg",
+      "hashSvg": "6aba5002332bd4bda14688645c1f8bc13d8aba1511af6660d809d1a83f1a0f37",
+      "byteSvg": 1320,
+      "byteGzip": 387,
+      "trangThai": "orbital-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "314b2ba78c6b8ca335aef283f010ea4db4689ccbc975810af9445ad0af97066e": {
+      "tep": "orbital-3e8064ed68075612c348d886b706b00e3194cb7981349bb6b05ff2d361888306.svg",
+      "hashSvg": "3e8064ed68075612c348d886b706b00e3194cb7981349bb6b05ff2d361888306",
+      "byteSvg": 557,
+      "byteGzip": 296,
+      "trangThai": "orbital-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "3a94ee1cc2595f58fec1bb9e9ddc2336f2515dc05e5a907f27d8394a2028a95b": {
+      "tep": "orbital-9fa7a045877f8f24a27aaae54dd9995d72eaefdb9794c1b9661dcf230d066c7b.svg",
+      "hashSvg": "9fa7a045877f8f24a27aaae54dd9995d72eaefdb9794c1b9661dcf230d066c7b",
+      "byteSvg": 407,
+      "byteGzip": 272,
+      "trangThai": "orbital-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "5dacda07ffc2e3e50a619b0ec78beceb679614951e05084ac5bef3ef48042526": {
+      "tep": "orbital-887d2eaf4c26fb9860b98c7005d05e5764fc4d5ad729cee8606a8fdec56fe8c5.svg",
+      "hashSvg": "887d2eaf4c26fb9860b98c7005d05e5764fc4d5ad729cee8606a8fdec56fe8c5",
+      "byteSvg": 860,
+      "byteGzip": 326,
+      "trangThai": "orbital-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "654c1aa11b98addabe096bea1b5e9e0a31052d4bfdd617d7c8e006b026d7582e": {
+      "tep": "orbital-93b9973588676ae1be2dea4c8c80147e6f09fe3e9b19efb9fc0862021fbef6a5.svg",
+      "hashSvg": "93b9973588676ae1be2dea4c8c80147e6f09fe3e9b19efb9fc0862021fbef6a5",
+      "byteSvg": 1772,
+      "byteGzip": 433,
+      "trangThai": "orbital-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "74273141449e16db38457df595b7840b68895b0b685e1ab83eea4611ff7a3792": {
+      "tep": "orbital-a4918484a00878b9242dcba0c3f994233fe1e09106ab7a23f73562238f187d60.svg",
+      "hashSvg": "a4918484a00878b9242dcba0c3f994233fe1e09106ab7a23f73562238f187d60",
+      "byteSvg": 1010,
+      "byteGzip": 353,
+      "trangThai": "orbital-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "7d220dc95d57ddec2839045f0617c8a4f858a1aef612eed20236cfe46aad0ec5": {
+      "tep": "orbital-c27627fcc3a1b5f3880024a6f42b2c73d9c8db1faaf5aa42fa9a88075dc776ba.svg",
+      "hashSvg": "c27627fcc3a1b5f3880024a6f42b2c73d9c8db1faaf5aa42fa9a88075dc776ba",
+      "byteSvg": 407,
+      "byteGzip": 273,
+      "trangThai": "orbital-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "91b284acf35068ec73db31f1ab89752ac24b22f1222dd143f29582099cc63d3d": {
+      "tep": "orbital-8481b65e2965ec353d15b583af5c92dfe8d8a753049d9adb8895e787e63d0145.svg",
+      "hashSvg": "8481b65e2965ec353d15b583af5c92dfe8d8a753049d9adb8895e787e63d0145",
+      "byteSvg": 1086,
+      "byteGzip": 347,
+      "trangThai": "orbital-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "9d0bb6b65463ff35620c6101fb0661100ca1b1b8736faf4bcb20491eb66b5403": {
+      "tep": "orbital-9fa7a045877f8f24a27aaae54dd9995d72eaefdb9794c1b9661dcf230d066c7b.svg",
+      "hashSvg": "9fa7a045877f8f24a27aaae54dd9995d72eaefdb9794c1b9661dcf230d066c7b",
+      "byteSvg": 407,
+      "byteGzip": 272,
+      "trangThai": "orbital-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "a84721580968e9648a74caeebe13143e4d4fa42e21c9184285206476d135bb30": {
+      "tep": "orbital-a4918484a00878b9242dcba0c3f994233fe1e09106ab7a23f73562238f187d60.svg",
+      "hashSvg": "a4918484a00878b9242dcba0c3f994233fe1e09106ab7a23f73562238f187d60",
+      "byteSvg": 1010,
+      "byteGzip": 353,
+      "trangThai": "orbital-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "bf686264e8a76dd549a6ce6e6f738470a520cfafc54a86a04ec9bd34329f2fca": {
+      "tep": "orbital-887d2eaf4c26fb9860b98c7005d05e5764fc4d5ad729cee8606a8fdec56fe8c5.svg",
+      "hashSvg": "887d2eaf4c26fb9860b98c7005d05e5764fc4d5ad729cee8606a8fdec56fe8c5",
+      "byteSvg": 860,
+      "byteGzip": 326,
+      "trangThai": "orbital-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "c5c215f7020d757a1be2b5157da17636f5c30eb903b557943df39ac90181215c": {
+      "tep": "orbital-426eb4baa4fd82f71b18201e153e931e9295b2df699d7be21583d3ecacde0e49.svg",
+      "hashSvg": "426eb4baa4fd82f71b18201e153e931e9295b2df699d7be21583d3ecacde0e49",
+      "byteSvg": 855,
+      "byteGzip": 338,
+      "trangThai": "orbital-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "df877d62ec703dd1b8c1b624468e2be79b54b9be0f011cf10f674ec28fcc58d8": {
+      "tep": "orbital-3e8064ed68075612c348d886b706b00e3194cb7981349bb6b05ff2d361888306.svg",
+      "hashSvg": "3e8064ed68075612c348d886b706b00e3194cb7981349bb6b05ff2d361888306",
+      "byteSvg": 557,
+      "byteGzip": 296,
+      "trangThai": "orbital-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "e524d842d7a7f0dea3b8e9e75f612c21cc6cd7fdda52cd94777d2e2ad9c8c54c": {
+      "tep": "orbital-6aba5002332bd4bda14688645c1f8bc13d8aba1511af6660d809d1a83f1a0f37.svg",
+      "hashSvg": "6aba5002332bd4bda14688645c1f8bc13d8aba1511af6660d809d1a83f1a0f37",
+      "byteSvg": 1320,
+      "byteGzip": 387,
+      "trangThai": "orbital-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "e8b8cb05cb9db26a0060b9cd72b37fae16b7435436917d20aa000d41fcb0745d": {
+      "tep": "orbital-97b31decd909a44923c137e1f9f0014445ef301e982b5abd71df46943af85ac9.svg",
+      "hashSvg": "97b31decd909a44923c137e1f9f0014445ef301e982b5abd71df46943af85ac9",
+      "byteSvg": 557,
+      "byteGzip": 299,
+      "trangThai": "orbital-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "edebfb0c465fee957210cb693f6d983e04ea065c3cc7f2dcca67540854c1c855": {
+      "tep": "orbital-97b31decd909a44923c137e1f9f0014445ef301e982b5abd71df46943af85ac9.svg",
+      "hashSvg": "97b31decd909a44923c137e1f9f0014445ef301e982b5abd71df46943af85ac9",
+      "byteSvg": 557,
+      "byteGzip": 299,
+      "trangThai": "orbital-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "869864ad75107803b245195a4c8ea5d34936052ad1723307c1b2e0638645d360": {
+      "tep": "orbital-9147c8ca36bcaaf50fa8a558db2e2519c44cffa37601257d1de43bc5a2a09b11.svg",
+      "hashSvg": "9147c8ca36bcaaf50fa8a558db2e2519c44cffa37601257d1de43bc5a2a09b11",
+      "byteSvg": 2216,
+      "byteGzip": 555,
+      "trangThai": "orbital-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "94167376a41f35f192cc290be6dd70a5a2015659e2e899376dc3e1d2f62d27cf": {
+      "tep": "orbital-9147c8ca36bcaaf50fa8a558db2e2519c44cffa37601257d1de43bc5a2a09b11.svg",
+      "hashSvg": "9147c8ca36bcaaf50fa8a558db2e2519c44cffa37601257d1de43bc5a2a09b11",
+      "byteSvg": 2216,
+      "byteGzip": 555,
+      "trangThai": "orbital-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "60f6db433623d065c4fd9af057a0844231fe19f1eb9ac5da5d4f9e8eee779da5": {
+      "tep": "orbital-16a6c28bc55446720d58664daf56ee6abd1fed8d9baf484f4ddba24b749c70c3.svg",
+      "hashSvg": "16a6c28bc55446720d58664daf56ee6abd1fed8d9baf484f4ddba24b749c70c3",
+      "byteSvg": 3452,
+      "byteGzip": 730,
+      "trangThai": "orbital-da-soat-doc-lap",
+      "canNenSang": true
+    },
+    "ac8c966cba95a17fcfb5f4d9c79c42e6ae00f793bff4a13ef709482861d990ed": {
+      "tep": "orbital-16a6c28bc55446720d58664daf56ee6abd1fed8d9baf484f4ddba24b749c70c3.svg",
+      "hashSvg": "16a6c28bc55446720d58664daf56ee6abd1fed8d9baf484f4ddba24b749c70c3",
+      "byteSvg": 3452,
+      "byteGzip": 730,
+      "trangThai": "orbital-da-soat-doc-lap",
+      "canNenSang": true
+    }
+  },
+  "theoCau": [
+    {
+      "qid": "10-C1-B3-D1-I-62",
+      "hinh": [
+        {
+          "hash": "94167376a41f35f192cc290be6dd70a5a2015659e2e899376dc3e1d2f62d27cf",
+          "where": "10-C1-B3-D1-I-62.hinh.0.du_lieu",
+          "hashDataUrl": "4147ce0d31f2f994996e9324127c24477d92bc25b664bfce6f1765835de876e5",
+          "vector": "orbital-9147c8ca36bcaaf50fa8a558db2e2519c44cffa37601257d1de43bc5a2a09b11.svg"
+        }
+      ]
+    },
+    {
+      "qid": "10-C1-B3-D2-III-15",
+      "hinh": [
+        {
+          "hash": "60f6db433623d065c4fd9af057a0844231fe19f1eb9ac5da5d4f9e8eee779da5",
+          "where": "10-C1-B3-D2-III-15.hinh.0.du_lieu",
+          "hashDataUrl": "13ef8b6cf6f843ef6d6f4b6a22282513cc156df57a047a051dc8e88a8457a892",
+          "vector": "orbital-16a6c28bc55446720d58664daf56ee6abd1fed8d9baf484f4ddba24b749c70c3.svg"
+        }
+      ]
+    },
+    {
+      "qid": "10-C1-B3-D2-III-19",
+      "hinh": [
+        {
+          "hash": "bf686264e8a76dd549a6ce6e6f738470a520cfafc54a86a04ec9bd34329f2fca",
+          "where": "10-C1-B3-D2-III-19.hinh.0.du_lieu",
+          "hashDataUrl": "51f1aa35d910b84b862c2eadba54b79f0e13e5dc53c377c307b1fdbcfe1be024",
+          "vector": "orbital-887d2eaf4c26fb9860b98c7005d05e5764fc4d5ad729cee8606a8fdec56fe8c5.svg"
+        },
+        {
+          "hash": "25b7eeb9f487204873ef366bf2a3fcdabea2d09e7f2f33a7512bf48c3f779036",
+          "where": "10-C1-B3-D2-III-19.hinh.2.du_lieu",
+          "hashDataUrl": "5bf00d96525f2e0866890a743af28164db451c6b4def9033ee6d3a1618bc624a",
+          "vector": "orbital-6aba5002332bd4bda14688645c1f8bc13d8aba1511af6660d809d1a83f1a0f37.svg"
+        }
+      ]
+    },
+    {
+      "qid": "11-C6-B23-II-2",
+      "hinh": [
+        {
+          "hash": "0998c4ae2c931e01ad5b3c19128fb0c1c20414836d9d0413ca523ec2a1d70e96",
+          "where": "11-C6-B23-II-2.hinh.0.du_lieu",
+          "hashDataUrl": "47d7f6c702e02e5e03eb1e93bc900e50227bd164a3c3e941e6f7478a7e0b2c37",
+          "vector": "hoa-0998c4ae2c931e01ad5b3c19128fb0c1c20414836d9d0413ca523ec2a1d70e96.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-C1-B1-D1-II-19",
+      "hinh": [
+        {
+          "hash": "70bfd8e31ade588266c3d0c9fd50af5d24e33f7b4a60a80bbf192d68818d07fa",
+          "where": "12-C1-B1-D1-II-19.hinh.0.du_lieu",
+          "hashDataUrl": "2910c25c45bb2ae73ff35aea06e3370c6c8f7c104acbc83d513cd69305467d3b",
+          "vector": "hoa-70bfd8e31ade588266c3d0c9fd50af5d24e33f7b4a60a80bbf192d68818d07fa.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-C3-B10-D2-III-21",
+      "hinh": [
+        {
+          "hash": "03aa1f42f69d26fc8100de0f17cda5072d5149c61051aa09a476834f4997a1ac",
+          "where": "12-C3-B10-D2-III-21.hinh.0.du_lieu",
+          "hashDataUrl": "4a4cf4e2ba098b5b507cbdda60417bbc077c52c1a8fcfa40936f877743bc410b",
+          "vector": "hoa-03aa1f42f69d26fc8100de0f17cda5072d5149c61051aa09a476834f4997a1ac.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-C3-B11-D2-III-6",
+      "hinh": [
+        {
+          "hash": "03aa1f42f69d26fc8100de0f17cda5072d5149c61051aa09a476834f4997a1ac",
+          "where": "12-C3-B11-D2-III-6.hinh.0.du_lieu",
+          "hashDataUrl": "4a4cf4e2ba098b5b507cbdda60417bbc077c52c1a8fcfa40936f877743bc410b",
+          "vector": "hoa-03aa1f42f69d26fc8100de0f17cda5072d5149c61051aa09a476834f4997a1ac.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-C5-B16-I-24",
+      "hinh": [
+        {
+          "hash": "fd9dc4ef16a9abd4bb2a16d9f10a9a8650446ba720443d35ed5f2d27a29ae739",
+          "where": "12-C5-B16-I-24.hinh.0.du_lieu",
+          "hashDataUrl": "bbb6d92640b3a466fbc01c107fdd21fe9e5ab2baa6584e7c7835f0b2f122fe39",
+          "vector": "12-C5-B16-I-24-hinh-01.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-10-B3-D1-I-53",
+      "hinh": [
+        {
+          "hash": "94167376a41f35f192cc290be6dd70a5a2015659e2e899376dc3e1d2f62d27cf",
+          "where": "DB-10-B3-D1-I-53.hinh.0.du_lieu",
+          "hashDataUrl": "4147ce0d31f2f994996e9324127c24477d92bc25b664bfce6f1765835de876e5",
+          "vector": "orbital-9147c8ca36bcaaf50fa8a558db2e2519c44cffa37601257d1de43bc5a2a09b11.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-10-B3-D1-III-125",
+      "hinh": [
+        {
+          "hash": "60f6db433623d065c4fd9af057a0844231fe19f1eb9ac5da5d4f9e8eee779da5",
+          "where": "DB-10-B3-D1-III-125.hinh.0.du_lieu",
+          "hashDataUrl": "13ef8b6cf6f843ef6d6f4b6a22282513cc156df57a047a051dc8e88a8457a892",
+          "vector": "orbital-16a6c28bc55446720d58664daf56ee6abd1fed8d9baf484f4ddba24b749c70c3.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-10-B3-D1-III-126",
+      "hinh": [
+        {
+          "hash": "bf686264e8a76dd549a6ce6e6f738470a520cfafc54a86a04ec9bd34329f2fca",
+          "where": "DB-10-B3-D1-III-126.hinh.0.du_lieu",
+          "hashDataUrl": "51f1aa35d910b84b862c2eadba54b79f0e13e5dc53c377c307b1fdbcfe1be024",
+          "vector": "orbital-887d2eaf4c26fb9860b98c7005d05e5764fc4d5ad729cee8606a8fdec56fe8c5.svg"
+        },
+        {
+          "hash": "25b7eeb9f487204873ef366bf2a3fcdabea2d09e7f2f33a7512bf48c3f779036",
+          "where": "DB-10-B3-D1-III-126.hinh.2.du_lieu",
+          "hashDataUrl": "5bf00d96525f2e0866890a743af28164db451c6b4def9033ee6d3a1618bc624a",
+          "vector": "orbital-6aba5002332bd4bda14688645c1f8bc13d8aba1511af6660d809d1a83f1a0f37.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-10-B3-D1-I-177",
+      "hinh": [
+        {
+          "hash": "9d0bb6b65463ff35620c6101fb0661100ca1b1b8736faf4bcb20491eb66b5403",
+          "where": "DB-10-B3-D1-I-177.hinh.0.du_lieu",
+          "hashDataUrl": "eb17cee87190b96cad8c0f5b5e5e0c89b37c143daeee8aba3f401fafdebd387c",
+          "vector": "orbital-9fa7a045877f8f24a27aaae54dd9995d72eaefdb9794c1b9661dcf230d066c7b.svg"
+        },
+        {
+          "hash": "1396e5b67abc81bead4e75250dc5d8233260d8b0be26b3fd1132400e47c900d1",
+          "where": "DB-10-B3-D1-I-177.hinh.1.du_lieu",
+          "hashDataUrl": "e3132d39c625f84347a116c51298e53717473926587a4116479c636901016e52",
+          "vector": "orbital-c27627fcc3a1b5f3880024a6f42b2c73d9c8db1faaf5aa42fa9a88075dc776ba.svg"
+        },
+        {
+          "hash": "06fbb84758192112a98b4959a44b84b9a0e81054fa693f9476a1c012466b438f",
+          "where": "DB-10-B3-D1-I-177.hinh.2.du_lieu",
+          "hashDataUrl": "f9e4b74cdc9321b59081e1cbf006d9a371c632c6bbd5458bba6665a3206617c7",
+          "vector": "orbital-97b31decd909a44923c137e1f9f0014445ef301e982b5abd71df46943af85ac9.svg"
+        },
+        {
+          "hash": "13e4b159f0e3ad0766f07765162e2855c7e3760ccc8a5162c457c90be6938822",
+          "where": "DB-10-B3-D1-I-177.hinh.3.du_lieu",
+          "hashDataUrl": "2a780a55132bfee6dc41829e51121795cee2004bc74071ed7c7b0740b1fc749d",
+          "vector": "orbital-3e8064ed68075612c348d886b706b00e3194cb7981349bb6b05ff2d361888306.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-10-B3-D1-I-190",
+      "hinh": [
+        {
+          "hash": "314b2ba78c6b8ca335aef283f010ea4db4689ccbc975810af9445ad0af97066e",
+          "where": "DB-10-B3-D1-I-190.hinh.0.du_lieu",
+          "hashDataUrl": "6d1d202d5dac4bdcf7c7f5a54e7d9a638b028930eafe7bff058de6ed7160c7a0",
+          "vector": "orbital-3e8064ed68075612c348d886b706b00e3194cb7981349bb6b05ff2d361888306.svg"
+        },
+        {
+          "hash": "c5c215f7020d757a1be2b5157da17636f5c30eb903b557943df39ac90181215c",
+          "where": "DB-10-B3-D1-I-190.hinh.1.du_lieu",
+          "hashDataUrl": "14e8cdf9059bfc52eaff7b85ad17d3b1c05e9bf8ede4e960bf77fd275e888231",
+          "vector": "orbital-426eb4baa4fd82f71b18201e153e931e9295b2df699d7be21583d3ecacde0e49.svg"
+        },
+        {
+          "hash": "74273141449e16db38457df595b7840b68895b0b685e1ab83eea4611ff7a3792",
+          "where": "DB-10-B3-D1-I-190.hinh.2.du_lieu",
+          "hashDataUrl": "fe9e71e3c975d566184df4da2f9ca15ec8c4341fee36d33d204614ddb958d0f4",
+          "vector": "orbital-a4918484a00878b9242dcba0c3f994233fe1e09106ab7a23f73562238f187d60.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-10-B3-D1-I-202",
+      "hinh": [
+        {
+          "hash": "869864ad75107803b245195a4c8ea5d34936052ad1723307c1b2e0638645d360",
+          "where": "DB-10-B3-D1-I-202.hinh.0.du_lieu",
+          "hashDataUrl": "e56c197daad0884d4cad0bb21dfc9afebfb0909eb3d3f76ce43d5a982921e21a",
+          "vector": "orbital-9147c8ca36bcaaf50fa8a558db2e2519c44cffa37601257d1de43bc5a2a09b11.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-10-B3-D1-I-229",
+      "hinh": [
+        {
+          "hash": "3a94ee1cc2595f58fec1bb9e9ddc2336f2515dc05e5a907f27d8394a2028a95b",
+          "where": "DB-10-B3-D1-I-229.hinh.0.du_lieu",
+          "hashDataUrl": "cba89e91789d9bca08296458be06840c0a5c4a44814e5a004a05e67da8c97992",
+          "vector": "orbital-9fa7a045877f8f24a27aaae54dd9995d72eaefdb9794c1b9661dcf230d066c7b.svg"
+        },
+        {
+          "hash": "7d220dc95d57ddec2839045f0617c8a4f858a1aef612eed20236cfe46aad0ec5",
+          "where": "DB-10-B3-D1-I-229.hinh.1.du_lieu",
+          "hashDataUrl": "be3f009c4d9f5bba5eb222b6a2d83aec9446fdd82c520f9be60a10ee4c227613",
+          "vector": "orbital-c27627fcc3a1b5f3880024a6f42b2c73d9c8db1faaf5aa42fa9a88075dc776ba.svg"
+        },
+        {
+          "hash": "e8b8cb05cb9db26a0060b9cd72b37fae16b7435436917d20aa000d41fcb0745d",
+          "where": "DB-10-B3-D1-I-229.hinh.2.du_lieu",
+          "hashDataUrl": "265b93ec65713e62b57c94b75b97ff35ded8ff2d421f94b3dbe361fdd11f178b",
+          "vector": "orbital-97b31decd909a44923c137e1f9f0014445ef301e982b5abd71df46943af85ac9.svg"
+        },
+        {
+          "hash": "df877d62ec703dd1b8c1b624468e2be79b54b9be0f011cf10f674ec28fcc58d8",
+          "where": "DB-10-B3-D1-I-229.hinh.3.du_lieu",
+          "hashDataUrl": "b9f02c5b365bbc833eb95ba5e139ebd76de206fded2eb19d1a12a923123ae982",
+          "vector": "orbital-3e8064ed68075612c348d886b706b00e3194cb7981349bb6b05ff2d361888306.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-10-B3-D1-III-265",
+      "hinh": [
+        {
+          "hash": "ac8c966cba95a17fcfb5f4d9c79c42e6ae00f793bff4a13ef709482861d990ed",
+          "where": "DB-10-B3-D1-III-265.hinh.0.du_lieu",
+          "hashDataUrl": "aff0def4c22e11cec226fcb6d54aa36dca4c0545d3557d041432c0e921f94aa7",
+          "vector": "orbital-16a6c28bc55446720d58664daf56ee6abd1fed8d9baf484f4ddba24b749c70c3.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-10-B3-D1-III-266",
+      "hinh": [
+        {
+          "hash": "edebfb0c465fee957210cb693f6d983e04ea065c3cc7f2dcca67540854c1c855",
+          "where": "DB-10-B3-D1-III-266.hinh.0.du_lieu",
+          "hashDataUrl": "997ac4674483a3305f1b4b532cf40b067661b057879272f0ee131934d681257c",
+          "vector": "orbital-97b31decd909a44923c137e1f9f0014445ef301e982b5abd71df46943af85ac9.svg"
+        },
+        {
+          "hash": "654c1aa11b98addabe096bea1b5e9e0a31052d4bfdd617d7c8e006b026d7582e",
+          "where": "DB-10-B3-D1-III-266.hinh.1.du_lieu",
+          "hashDataUrl": "1350eebbbb1ffdf4315dd8e38dd1eb2e6236fedc582ef2576ee7a2ca0fd1aff9",
+          "vector": "orbital-93b9973588676ae1be2dea4c8c80147e6f09fe3e9b19efb9fc0862021fbef6a5.svg"
+        },
+        {
+          "hash": "a84721580968e9648a74caeebe13143e4d4fa42e21c9184285206476d135bb30",
+          "where": "DB-10-B3-D1-III-266.hinh.2.du_lieu",
+          "hashDataUrl": "2e18b25204f92e6260f62d68bd6a274c8cc4f980833740d8f3668f7f3d1b5ffa",
+          "vector": "orbital-a4918484a00878b9242dcba0c3f994233fe1e09106ab7a23f73562238f187d60.svg"
+        },
+        {
+          "hash": "e524d842d7a7f0dea3b8e9e75f612c21cc6cd7fdda52cd94777d2e2ad9c8c54c",
+          "where": "DB-10-B3-D1-III-266.hinh.3.du_lieu",
+          "hashDataUrl": "088543fafb2cfef7bce97cffe48b3a6ee5081c87d805c09f68cd9390728d9c39",
+          "vector": "orbital-6aba5002332bd4bda14688645c1f8bc13d8aba1511af6660d809d1a83f1a0f37.svg"
+        },
+        {
+          "hash": "91b284acf35068ec73db31f1ab89752ac24b22f1222dd143f29582099cc63d3d",
+          "where": "DB-10-B3-D1-III-266.hinh.4.du_lieu",
+          "hashDataUrl": "ce371f82c4d81ad4c2948276f17cfa96d2798a776f4d83a47cbbbacb00cc804b",
+          "vector": "orbital-8481b65e2965ec353d15b583af5c92dfe8d8a753049d9adb8895e787e63d0145.svg"
+        },
+        {
+          "hash": "5dacda07ffc2e3e50a619b0ec78beceb679614951e05084ac5bef3ef48042526",
+          "where": "DB-10-B3-D1-III-266.hinh.5.du_lieu",
+          "hashDataUrl": "3fba9824e17b6e4d4aa74296798dd9cf21e8f70bd86032553eb71576dfce70c6",
+          "vector": "orbital-887d2eaf4c26fb9860b98c7005d05e5764fc4d5ad729cee8606a8fdec56fe8c5.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-11-B1-D1-II-168",
+      "hinh": [
+        {
+          "hash": "07407bbff732b964612d21d11c18620133f2e8b86ecc26c34f4db9764847ee8d",
+          "where": "DB-11-B1-D1-II-168.hinh.0.du_lieu",
+          "hashDataUrl": "db701a6dd4a8d47e4061cf78b9faa5b03f2207b8634121ffa4213f2a0d203be1",
+          "vector": "DH-11-C1-B1-II-5-hinh-01.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-11-B1-D1-II-174",
+      "hinh": [
+        {
+          "hash": "665cf34d8440e83aa8c3e0a04da87ca0fd0c5bd661d755ef53968e0522986f25",
+          "where": "DB-11-B1-D1-II-174.hinh.0.du_lieu",
+          "hashDataUrl": "0ab0d86ff0ad66fc83c5f4dc65946a7eb2c198c13267f44709bd227ec1b01645",
+          "vector": "DH-11-C1-B1-II-11-hinh-01.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B1-P1-D1-I-145",
+      "hinh": [
+        {
+          "hash": "6877f1be391569da3f7c3d244d7940ecb7c3f16221a78b630c87d34acc41ef96",
+          "where": "DB-12-B1-P1-D1-I-145.hinh.1.du_lieu",
+          "hashDataUrl": "0f8088def4245896596e49ac753423bf7b033a66f77b9c0cbf47e5e9ab2fd8ce",
+          "vector": "hoa-6877f1be391569da3f7c3d244d7940ecb7c3f16221a78b630c87d34acc41ef96.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DH-10-C1-B3-I-36",
+      "hinh": [
+        {
+          "hash": "9d0bb6b65463ff35620c6101fb0661100ca1b1b8736faf4bcb20491eb66b5403",
+          "where": "DH-10-C1-B3-I-36.hinh.0.du_lieu",
+          "hashDataUrl": "eb17cee87190b96cad8c0f5b5e5e0c89b37c143daeee8aba3f401fafdebd387c",
+          "vector": "orbital-9fa7a045877f8f24a27aaae54dd9995d72eaefdb9794c1b9661dcf230d066c7b.svg"
+        },
+        {
+          "hash": "1396e5b67abc81bead4e75250dc5d8233260d8b0be26b3fd1132400e47c900d1",
+          "where": "DH-10-C1-B3-I-36.hinh.1.du_lieu",
+          "hashDataUrl": "e3132d39c625f84347a116c51298e53717473926587a4116479c636901016e52",
+          "vector": "orbital-c27627fcc3a1b5f3880024a6f42b2c73d9c8db1faaf5aa42fa9a88075dc776ba.svg"
+        },
+        {
+          "hash": "06fbb84758192112a98b4959a44b84b9a0e81054fa693f9476a1c012466b438f",
+          "where": "DH-10-C1-B3-I-36.hinh.2.du_lieu",
+          "hashDataUrl": "f9e4b74cdc9321b59081e1cbf006d9a371c632c6bbd5458bba6665a3206617c7",
+          "vector": "orbital-97b31decd909a44923c137e1f9f0014445ef301e982b5abd71df46943af85ac9.svg"
+        },
+        {
+          "hash": "13e4b159f0e3ad0766f07765162e2855c7e3760ccc8a5162c457c90be6938822",
+          "where": "DH-10-C1-B3-I-36.hinh.3.du_lieu",
+          "hashDataUrl": "2a780a55132bfee6dc41829e51121795cee2004bc74071ed7c7b0740b1fc749d",
+          "vector": "orbital-3e8064ed68075612c348d886b706b00e3194cb7981349bb6b05ff2d361888306.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DH-10-C1-B3-I-49",
+      "hinh": [
+        {
+          "hash": "314b2ba78c6b8ca335aef283f010ea4db4689ccbc975810af9445ad0af97066e",
+          "where": "DH-10-C1-B3-I-49.hinh.0.du_lieu",
+          "hashDataUrl": "6d1d202d5dac4bdcf7c7f5a54e7d9a638b028930eafe7bff058de6ed7160c7a0",
+          "vector": "orbital-3e8064ed68075612c348d886b706b00e3194cb7981349bb6b05ff2d361888306.svg"
+        },
+        {
+          "hash": "c5c215f7020d757a1be2b5157da17636f5c30eb903b557943df39ac90181215c",
+          "where": "DH-10-C1-B3-I-49.hinh.1.du_lieu",
+          "hashDataUrl": "14e8cdf9059bfc52eaff7b85ad17d3b1c05e9bf8ede4e960bf77fd275e888231",
+          "vector": "orbital-426eb4baa4fd82f71b18201e153e931e9295b2df699d7be21583d3ecacde0e49.svg"
+        },
+        {
+          "hash": "74273141449e16db38457df595b7840b68895b0b685e1ab83eea4611ff7a3792",
+          "where": "DH-10-C1-B3-I-49.hinh.2.du_lieu",
+          "hashDataUrl": "fe9e71e3c975d566184df4da2f9ca15ec8c4341fee36d33d204614ddb958d0f4",
+          "vector": "orbital-a4918484a00878b9242dcba0c3f994233fe1e09106ab7a23f73562238f187d60.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DH-10-C1-B3-I-66",
+      "hinh": [
+        {
+          "hash": "869864ad75107803b245195a4c8ea5d34936052ad1723307c1b2e0638645d360",
+          "where": "DH-10-C1-B3-I-66.hinh.0.du_lieu",
+          "hashDataUrl": "e56c197daad0884d4cad0bb21dfc9afebfb0909eb3d3f76ce43d5a982921e21a",
+          "vector": "orbital-9147c8ca36bcaaf50fa8a558db2e2519c44cffa37601257d1de43bc5a2a09b11.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DH-10-C1-B3-I-110",
+      "hinh": [
+        {
+          "hash": "3a94ee1cc2595f58fec1bb9e9ddc2336f2515dc05e5a907f27d8394a2028a95b",
+          "where": "DH-10-C1-B3-I-110.hinh.0.du_lieu",
+          "hashDataUrl": "cba89e91789d9bca08296458be06840c0a5c4a44814e5a004a05e67da8c97992",
+          "vector": "orbital-9fa7a045877f8f24a27aaae54dd9995d72eaefdb9794c1b9661dcf230d066c7b.svg"
+        },
+        {
+          "hash": "7d220dc95d57ddec2839045f0617c8a4f858a1aef612eed20236cfe46aad0ec5",
+          "where": "DH-10-C1-B3-I-110.hinh.1.du_lieu",
+          "hashDataUrl": "be3f009c4d9f5bba5eb222b6a2d83aec9446fdd82c520f9be60a10ee4c227613",
+          "vector": "orbital-c27627fcc3a1b5f3880024a6f42b2c73d9c8db1faaf5aa42fa9a88075dc776ba.svg"
+        },
+        {
+          "hash": "e8b8cb05cb9db26a0060b9cd72b37fae16b7435436917d20aa000d41fcb0745d",
+          "where": "DH-10-C1-B3-I-110.hinh.2.du_lieu",
+          "hashDataUrl": "265b93ec65713e62b57c94b75b97ff35ded8ff2d421f94b3dbe361fdd11f178b",
+          "vector": "orbital-97b31decd909a44923c137e1f9f0014445ef301e982b5abd71df46943af85ac9.svg"
+        },
+        {
+          "hash": "df877d62ec703dd1b8c1b624468e2be79b54b9be0f011cf10f674ec28fcc58d8",
+          "where": "DH-10-C1-B3-I-110.hinh.3.du_lieu",
+          "hashDataUrl": "b9f02c5b365bbc833eb95ba5e139ebd76de206fded2eb19d1a12a923123ae982",
+          "vector": "orbital-3e8064ed68075612c348d886b706b00e3194cb7981349bb6b05ff2d361888306.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DH-10-C1-B3-III-18",
+      "hinh": [
+        {
+          "hash": "ac8c966cba95a17fcfb5f4d9c79c42e6ae00f793bff4a13ef709482861d990ed",
+          "where": "DH-10-C1-B3-III-18.hinh.0.du_lieu",
+          "hashDataUrl": "aff0def4c22e11cec226fcb6d54aa36dca4c0545d3557d041432c0e921f94aa7",
+          "vector": "orbital-16a6c28bc55446720d58664daf56ee6abd1fed8d9baf484f4ddba24b749c70c3.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DH-10-C1-B3-III-24",
+      "hinh": [
+        {
+          "hash": "edebfb0c465fee957210cb693f6d983e04ea065c3cc7f2dcca67540854c1c855",
+          "where": "DH-10-C1-B3-III-24.hinh.0.du_lieu",
+          "hashDataUrl": "997ac4674483a3305f1b4b532cf40b067661b057879272f0ee131934d681257c",
+          "vector": "orbital-97b31decd909a44923c137e1f9f0014445ef301e982b5abd71df46943af85ac9.svg"
+        },
+        {
+          "hash": "654c1aa11b98addabe096bea1b5e9e0a31052d4bfdd617d7c8e006b026d7582e",
+          "where": "DH-10-C1-B3-III-24.hinh.1.du_lieu",
+          "hashDataUrl": "1350eebbbb1ffdf4315dd8e38dd1eb2e6236fedc582ef2576ee7a2ca0fd1aff9",
+          "vector": "orbital-93b9973588676ae1be2dea4c8c80147e6f09fe3e9b19efb9fc0862021fbef6a5.svg"
+        },
+        {
+          "hash": "a84721580968e9648a74caeebe13143e4d4fa42e21c9184285206476d135bb30",
+          "where": "DH-10-C1-B3-III-24.hinh.2.du_lieu",
+          "hashDataUrl": "2e18b25204f92e6260f62d68bd6a274c8cc4f980833740d8f3668f7f3d1b5ffa",
+          "vector": "orbital-a4918484a00878b9242dcba0c3f994233fe1e09106ab7a23f73562238f187d60.svg"
+        },
+        {
+          "hash": "e524d842d7a7f0dea3b8e9e75f612c21cc6cd7fdda52cd94777d2e2ad9c8c54c",
+          "where": "DH-10-C1-B3-III-24.hinh.3.du_lieu",
+          "hashDataUrl": "088543fafb2cfef7bce97cffe48b3a6ee5081c87d805c09f68cd9390728d9c39",
+          "vector": "orbital-6aba5002332bd4bda14688645c1f8bc13d8aba1511af6660d809d1a83f1a0f37.svg"
+        },
+        {
+          "hash": "91b284acf35068ec73db31f1ab89752ac24b22f1222dd143f29582099cc63d3d",
+          "where": "DH-10-C1-B3-III-24.hinh.4.du_lieu",
+          "hashDataUrl": "ce371f82c4d81ad4c2948276f17cfa96d2798a776f4d83a47cbbbacb00cc804b",
+          "vector": "orbital-8481b65e2965ec353d15b583af5c92dfe8d8a753049d9adb8895e787e63d0145.svg"
+        },
+        {
+          "hash": "5dacda07ffc2e3e50a619b0ec78beceb679614951e05084ac5bef3ef48042526",
+          "where": "DH-10-C1-B3-III-24.hinh.5.du_lieu",
+          "hashDataUrl": "3fba9824e17b6e4d4aa74296798dd9cf21e8f70bd86032553eb71576dfce70c6",
+          "vector": "orbital-887d2eaf4c26fb9860b98c7005d05e5764fc4d5ad729cee8606a8fdec56fe8c5.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DH-10-C1-B3-VD-I-3",
+      "hinh": [
+        {
+          "hash": "3a94ee1cc2595f58fec1bb9e9ddc2336f2515dc05e5a907f27d8394a2028a95b",
+          "where": "DH-10-C1-B3-VD-I-3.hinh.0.du_lieu",
+          "hashDataUrl": "cba89e91789d9bca08296458be06840c0a5c4a44814e5a004a05e67da8c97992",
+          "vector": "orbital-9fa7a045877f8f24a27aaae54dd9995d72eaefdb9794c1b9661dcf230d066c7b.svg"
+        },
+        {
+          "hash": "7d220dc95d57ddec2839045f0617c8a4f858a1aef612eed20236cfe46aad0ec5",
+          "where": "DH-10-C1-B3-VD-I-3.hinh.1.du_lieu",
+          "hashDataUrl": "be3f009c4d9f5bba5eb222b6a2d83aec9446fdd82c520f9be60a10ee4c227613",
+          "vector": "orbital-c27627fcc3a1b5f3880024a6f42b2c73d9c8db1faaf5aa42fa9a88075dc776ba.svg"
+        },
+        {
+          "hash": "e8b8cb05cb9db26a0060b9cd72b37fae16b7435436917d20aa000d41fcb0745d",
+          "where": "DH-10-C1-B3-VD-I-3.hinh.2.du_lieu",
+          "hashDataUrl": "265b93ec65713e62b57c94b75b97ff35ded8ff2d421f94b3dbe361fdd11f178b",
+          "vector": "orbital-97b31decd909a44923c137e1f9f0014445ef301e982b5abd71df46943af85ac9.svg"
+        },
+        {
+          "hash": "df877d62ec703dd1b8c1b624468e2be79b54b9be0f011cf10f674ec28fcc58d8",
+          "where": "DH-10-C1-B3-VD-I-3.hinh.3.du_lieu",
+          "hashDataUrl": "b9f02c5b365bbc833eb95ba5e139ebd76de206fded2eb19d1a12a923123ae982",
+          "vector": "orbital-3e8064ed68075612c348d886b706b00e3194cb7981349bb6b05ff2d361888306.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DH-11-C1-B1-II-5",
+      "hinh": [
+        {
+          "hash": "07407bbff732b964612d21d11c18620133f2e8b86ecc26c34f4db9764847ee8d",
+          "where": "DH-11-C1-B1-II-5.hinh.0.du_lieu",
+          "hashDataUrl": "db701a6dd4a8d47e4061cf78b9faa5b03f2207b8634121ffa4213f2a0d203be1",
+          "vector": "DH-11-C1-B1-II-5-hinh-01.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DH-11-C1-B1-II-11",
+      "hinh": [
+        {
+          "hash": "665cf34d8440e83aa8c3e0a04da87ca0fd0c5bd661d755ef53968e0522986f25",
+          "where": "DH-11-C1-B1-II-11.hinh.0.du_lieu",
+          "hashDataUrl": "0ab0d86ff0ad66fc83c5f4dc65946a7eb2c198c13267f44709bd227ec1b01645",
+          "vector": "DH-11-C1-B1-II-11-hinh-01.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C1-B1-P1-I-75",
+      "hinh": [
+        {
+          "hash": "6877f1be391569da3f7c3d244d7940ecb7c3f16221a78b630c87d34acc41ef96",
+          "where": "DH-12-C1-B1-P1-I-75.hinh.1.du_lieu",
+          "hashDataUrl": "0f8088def4245896596e49ac753423bf7b033a66f77b9c0cbf47e5e9ab2fd8ce",
+          "vector": "hoa-6877f1be391569da3f7c3d244d7940ecb7c3f16221a78b630c87d34acc41ef96.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C3-B9-P1-II-19",
+      "hinh": [
+        {
+          "hash": "6be1c3244a4ee89e40ecd5ddcb70d95a98b912e2c801bcef8fce2ea15bb91e93",
+          "where": "DH-12-C3-B9-P1-II-19.hinh.0.du_lieu",
+          "hashDataUrl": "6be34205ee561b8d6eca489bccaf43cd8e5d04acd3605a97c98986754a2a1171",
+          "vector": "hoa-6be1c3244a4ee89e40ecd5ddcb70d95a98b912e2c801bcef8fce2ea15bb91e93.svg"
+        }
+      ]
+    },
+    {
+      "qid": "VIP27-C3-B11-D2-II-4",
+      "hinh": [
+        {
+          "hash": "0221fbc67e2428efcf900364916a9d651a11a869d0ee40e1af07276f0d9f31f8",
+          "where": "VIP27-C3-B11-D2-II-4.hinh.0.du_lieu",
+          "hashDataUrl": "b59e271dd075bfd03f120e69310eb5ebd6c521feb55285a31e366023244d5e1d",
+          "vector": "hoa-0221fbc67e2428efcf900364916a9d651a11a869d0ee40e1af07276f0d9f31f8.svg"
+        }
+      ]
+    }
+  ]
+}
