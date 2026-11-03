@@ -2,6 +2,7 @@
 // Dữ liệu học tập mẫu; không tài khoản thật, không đáp án trong câu gửi xuống trước khi nộp.
 // Nạp bằng Vite SSR (ssrLoadModule); không phụ thuộc fixture Cửa hàng đã ngừng.
 import { nhipGia } from '../chup-ph-dot19/gia'
+import { tongQuanGia } from '../../tests/_thuong-mau'
 
 type Obj = Record<string, unknown>
 const MAU = [
@@ -109,6 +110,9 @@ export async function traLoi(duong: string, body: Obj): Promise<Obj> {
       return { ok: true, items: [], caDangMo: null }
     case '/presence':
       return { ok: true }
+    // 03/11: như bản sống — có hệ thưởng (thanh số trong menu Thêm). Thiếu lệnh này app vẽ dải số cũ SAU một nhịp ⇒ đo tải lại thấy «chớp» không có ở máy thật.
+    case '/hs/thuong':
+      return tongQuanGia()
     case '/hs/ke-hoach-ngay':
       return { ok: true, ngay: ngayVn(), viec: [], nganSach: { mucTieuCau: 20 }, tienBo: { daLamCau: 12, soCauHienThi: 12, dat: false, toiThieuCau: 20, conThieu: 8 }, thanThu: { pet: 'lua_phuong', cap: 7, nickname: 'Lửa Nhỏ', shopBat: true }, exp: { homNay: 40, expConThieu: 120, ongNghiem: 620 }, doanMo: true, capNhatLuc: new Date().toISOString() }
     case '/luyen-de/dieu-kien':

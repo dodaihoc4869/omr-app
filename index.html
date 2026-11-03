@@ -25,6 +25,10 @@
       Sửa cả hai: `start_url` nay mang sẵn `?vai=`, và thẻ manifest được chọn
       bằng đoạn mã đồng bộ ngay dưới đây, đọc vai từ chính đường dẫn đang mở.
       Không có JS thì vẫn còn thẻ `<link>` dự phòng ở sau. -->
+    <!-- (chú thích để ở HTML — lúc build bị lọc) 03/11 thầy «load lại app hiện hình chớp … loại bỏ đi triệt để»: quay từng khung lúc F5 thấy MỘT KHUNG TRẮNG trước khi tờ CSS về
+         (nền <html> mặc định trắng) ⇒ app học sinh tô sẵn nền --tr-nen sáng / tối ngay trong <head>, cùng chỗ ghi theme-color — CHỈ khi <html> chưa có
+         data-trong (main.tsx / khung tĩnh gắn ngay lúc chạy): sau đó nền body (bán trong suốt) phải lan ra khung nhìn như cũ, không đè mờ dải loang Kính.
+         Khung tĩnh Lộ trình (src/lib/khung-tinh-noi-tuyen.ts) nay chạy trong <head> ⇒ tờ kiểu chặn vẽ thật, không còn khung nền trống. -->
     <!-- (chú thích để ở HTML — lúc build bị lọc, không tải xuống máy) App học sinh (thầy 28/10 «full hẳn, không dải đen»): thanh trạng thái CÙNG MÀU NỀN
          app học sinh (--tr-nen sáng / tối ở src/styles/trong-hs-mau.css). Script dưới viết thẻ theme-color của app học sinh TRƯỚC ba thẻ chung ⇒ trình duyệt
          lấy thẻ khớp đầu tiên. Sau khi app chạy, src/lib/toan-man-hs.ts còn tự đặt lại theo nền đang vẽ. -->
@@ -51,6 +55,7 @@
           if (vai === 'hs') {
             document.write('<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f6fc">')
             document.write('<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1a1a29">')
+            document.write('<style>html:not([data-trong]){background:#f6f6fc}@media (prefers-color-scheme: dark){html:not([data-trong]){background:#1a1a29}}</style>')
           }
         } catch (e) {
           document.write('<link rel="manifest" href="/manifest.json">')

@@ -202,10 +202,11 @@ function napTruocManEm(): Plugin {
           } catch { return ham }
         }
         let ra = html.slice(0, moc) + `<script>${taoMaNapTruoc(bang, gon)}</script>\n` + html.slice(moc)
-        // KHUNG TĨNH LỘ TRÌNH (28/10): đoạn mã ngay SAU #root (body đã có) — dựng ảnh Lộ trình lần mở trước trước khi mã chính chạy.
+        // KHUNG TĨNH LỘ TRÌNH (28/10): dựng ảnh Lộ trình lần mở trước trước khi mã chính chạy. 03/11: đặt NGAY TRƯỚC #root (bản dựng bỏ thẻ <head>/<body>
+        // tuỳ chọn ⇒ trình phân tích còn ở <head>, body = null) ⇒ tờ kiểu blocking=render chặn vẽ thật (sau body thì không) — hết khung nền trống lúc F5.
         const gocRoot = '<main id="root"></main>'
         if (khungCss.length && ra.includes(gocRoot))
-          ra = ra.replace(gocRoot, `${gocRoot}<script>(${gon(moKhungTinh.toString())})(window,document,${JSON.stringify(khungCss)},${JSON.stringify(taoKhungXuong())},${JSON.stringify(KHOA_KHUNG_TINH)},"omr_student_portal_auth")</script>`)
+          ra = ra.replace(gocRoot, `<script>(${gon(moKhungTinh.toString())})(window,document,${JSON.stringify(khungCss)},${JSON.stringify(taoKhungXuong())},${JSON.stringify(KHOA_KHUNG_TINH)},"omr_student_portal_auth")</script>${gocRoot}`)
         return ra
       },
     },

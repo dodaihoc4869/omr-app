@@ -75,10 +75,12 @@ export function moKhungTinh(w: any, d: any, css: string[], xuong: string, khoa: 
     g.setAttribute('data-ht2', '')
     var o2 = d.createElement('div'), cho = 0
     var hien = function () { if (--cho <= 0 && o2) o2.style.visibility = '' }
+    // Nền lớp phủ = đúng chồng lớp của app thật (03/11, quay F5 nền tối lệch 3 mức sáng khi gỡ lớp phủ): nền khung nhìn (Canvas) → nền body --kinh-nen
+    // (bán trong suốt, lan ra khung nhìn) → dải loang (body::before). Đặc ⇒ vẫn che các lượt dựng dở của React bên dưới.
     o2.id = 'khung-tinh-hs'
     o2.setAttribute('aria-hidden', 'true')
     o2.setAttribute('inert', '')
-    o2.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483000;overflow:hidden;background:var(--tr-nen)'
+    o2.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483000;overflow:hidden;background:var(--kinh-loang),linear-gradient(var(--kinh-nen) 0 0) Canvas'
     for (var i = 0; i < css.length; i++) {
       var e = d.createElement('link')
       e.rel = 'stylesheet'
@@ -90,7 +92,12 @@ export function moKhungTinh(w: any, d: any, css: string[], xuong: string, khoa: 
       d.head.appendChild(e)
     }
     o2.innerHTML = '<style>#khung-tinh-hs *{animation:none!important;transition:none!important}</style>' + html
-    d.body.appendChild(o2)
+    // 03/11 (thầy «load lại app hiện hình chớp … loại bỏ triệt để»; quay từng khung lúc F5, CPU ×6: MỘT KHUNG NỀN TRỐNG ~200 ms trước ảnh Lộ trình): đoạn mã
+    // này trước nằm SAU <main id="root"> ⇒ body đã có ⇒ theo chuẩn HTML, thẻ blocking=render chèn lúc ấy KHÔNG chặn vẽ ⇒ trình duyệt vẽ nền trước khi tờ kiểu
+    // về. Nay chạy TRONG <head> (vite.config.ts đặt trước #root, body còn null) ⇒ tờ kiểu chặn vẽ thật; lớp phủ gắn vào body ngay khi trình phân tích tạo
+    // body (MutationObserver — trả lời trước lượt vẽ đầu, mà lượt vẽ còn bị tờ kiểu chặn).
+    var gan = function () { if (!d.body) return false; if (o2) d.body.appendChild(o2); return true }
+    if (!gan()) { var mo = new w.MutationObserver(function () { if (gan()) mo.disconnect() }); mo.observe(g, { childList: true }) }
     var go = function () {
       if (!o2) return
       o2.remove()
