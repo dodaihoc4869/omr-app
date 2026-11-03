@@ -142,7 +142,7 @@ describe('máy chủ chỉ trả câu lặp CỦA CHÍNH EM', () => {
 
 describe('thẻ câu đánh dấu câu em đã sai buổi trước', () => {
   it('có dải nhắc, đặt TRƯỚC đề bài chứ không phải sau', () => {
-    expect(THE_CAU).toContain('Câu em đã sai buổi trước')
+    expect(THE_CAU).toContain('Ôn lỗi trước')
     const dau = THE_CAU.indexOf('{props.cauHoiLai && <DaiHoiLai')
     const de = THE_CAU.indexOf('{thanCauImg ? (')
     expect(dau).toBeGreaterThan(0)
@@ -155,7 +155,7 @@ describe('thẻ câu đánh dấu câu em đã sai buổi trước', () => {
 
   it('CẤM BỊA SỐ LẦN — chưa biết là lần mấy thì không in số', () => {
     expect(THE_CAU).toContain('const co = Number.isFinite(n) && n > 0')
-    expect(THE_CAU).toContain("co ? `Câu em đã sai buổi trước (${n} lần) — đọc kỹ lại từ đầu` : 'Câu em đã sai buổi trước — đọc kỹ lại từ đầu'")
+    expect(THE_CAU).toContain("Ôn lỗi trước${co ? ` (${n} lần sai)` : ''}")
   })
 
   it('KHÔNG EMOJI trong dải nhắc', () => {

@@ -1250,7 +1250,7 @@ export default function ExamMonitorScreen() {
             demSai = {}
             banDoDaDung = dd.banDoDaDung
             bienBan = dd.bienBan as unknown as BienBanDeRieng
-            await luuDeRiengCa(chiTiet.ca.maCa, dd.boTheoEm, {}, {}, bienBan)
+            void luuDeRiengCa(chiTiet.ca.maCa, dd.boTheoEm, {}, {}, bienBan).catch(() => showToast('Chưa lưu được bản sao đề riêng trên máy này.', 'warn'))
             setRutThuDaDung(docRutThuDaDung(chiTiet.ca.maCa) ?? null)
             if (dd.soEmRutThem > 0) showToast(`Đã rút thêm bộ câu cho ${dd.soEmRutThem} em vào phòng sau lượt chạy thử.`, 'success')
             if (dd.soCauNoiThem > 0) showToast(`Đã nối ${dd.soCauNoiThem} câu (câu thay và câu em đã làm đúng nằm ngoài kho ca) vào đề ca này.`, 'success')
@@ -1270,7 +1270,7 @@ export default function ExamMonitorScreen() {
             bacTheoEm = v2.bacTheoEm
             bienBan = v2.bienBan as unknown as BienBanDeRieng
             demSai = {}
-            await luuDeRiengCa(chiTiet.ca.maCa, v2.boTheoEm, {}, v2.lapTheoEm, bienBan)
+            void luuDeRiengCa(chiTiet.ca.maCa, v2.boTheoEm, {}, v2.lapTheoEm, bienBan).catch(() => showToast('Chưa lưu được bản sao đề riêng trên máy này.', 'warn'))
             setRutThu(docRutThu(chiTiet.ca.maCa) ?? null)
             if (v2.soEmCapNhat > 0) showToast(`Đã cập nhật đề của ${v2.soEmCapNhat} em theo bài các em vừa làm.`, 'success')
             if (v2.soEmRutThem > 0) showToast(`Đã rút thêm bộ câu cho ${v2.soEmRutThem} em vào phòng sau lượt chạy thử.`, 'success')
@@ -1307,7 +1307,7 @@ export default function ExamMonitorScreen() {
           }
           daLamLaiTheoEm = ra.daLamLaiTheoEm
           demSai = ra.lapCua
-          await luuDeRiengCa(chiTiet.ca.maCa, ra.boTheoEm, ra.lapCua, ra.lapTheoEm, bienBan)
+          void luuDeRiengCa(chiTiet.ca.maCa, ra.boTheoEm, ra.lapCua, ra.lapTheoEm, bienBan).catch(() => showToast('Chưa lưu được bản sao đề riêng trên máy này.', 'warn'))
           const tongSongSinh = Object.values(ra.songSinhTheoEm ?? {}).reduce((s, a) => s + (a?.length ?? 0), 0)
           if (tongSongSinh > 0) showToast(`Đã sinh ${tongSongSinh} câu song sinh cùng dạng đổi số chống học vẹt.`, 'success')
           if (ra.cauNoiThem.soCau > 0) showToast(`Đã kéo ${ra.cauNoiThem.soCau} câu em từng sai từ kho vào đề ca này.`, 'success')
@@ -2346,13 +2346,13 @@ export default function ExamMonitorScreen() {
                         )}
                       </span>
                       <span className="ca-o ca-o-gian">
-                          {daNop && l.soLanRoiMan > 0 && <Nhan tone="cam">rời màn {l.soLanRoiMan} lần / {l.tongGiayRoiMan}s</Nhan>}
+                          {daNop && l.soLanRoiMan > 0 && <Nhan tone="cam" wrap>rời màn {l.soLanRoiMan} lần / {l.tongGiayRoiMan}s</Nhan>}
                           {!daNop && l.soLanRoiMan > 0 && <span className="ca-gian-so">{l.tongGiayRoiMan}s ngoài màn</span>}
                           {/* GIỮ ĐỂ ĐỌC (GIUDEDOC mục 4F): hai con số, KHÔNG tô
                               đỏ, KHÔNG gọi là vi phạm. Nhả tay là chuyện bình
                               thường; nhưng đề tắt 20 phút trong ca 50 phút là
                               điều thầy nên nhìn. */}
-                          {chuTatDe(l.integrity) && <Nhan tone="xam">{chuTatDe(l.integrity)}</Nhan>}
+                          {chuTatDe(l.integrity) && <Nhan tone="xam" wrap>{chuTatDe(l.integrity)}</Nhan>}
                           {l.soLanRoiMan === 0 && !chuTatDe(l.integrity) && <span className="ca-khong" aria-label="Không có cảnh báo">—</span>}
                       </span>
                       <span className="ca-hd">

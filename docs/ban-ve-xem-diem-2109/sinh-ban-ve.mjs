@@ -4,7 +4,7 @@
 //   node docs/ban-ve-xem-diem-2109/sinh-ban-ve.mjs --anh      thêm: chụp Chromium 390 + 1440, sáng + tối, JPG ≤ 150 KB vào ./anh/
 // Chỉ dữ liệu GIẢ (tên giả). Màu đọc từ tokens.css + m3-theme.css của app (không màu riêng); sáng/tối theo prefers-color-scheme.
 // Một bộ thành phần (hàm bên dưới) dùng cho mọi trang — Code 4 dựng bản Giáo viên dùng lại đúng bộ này.
-import { readFileSync, writeFileSync, mkdirSync, existsSync, statSync } from 'node:fs'
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createRequire } from 'node:module'

@@ -200,8 +200,13 @@
   grid-area: gian;
   justify-content: flex-end;
 }
+.ca-o-gian > span {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
 .ca-o-diem {
   grid-area: diem;
+  overflow-wrap: anywhere;
   flex-direction: column;
   align-items: flex-end;
   gap: 0;
