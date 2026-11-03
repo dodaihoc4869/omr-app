@@ -1,0 +1,35 @@
+{
+  "doNhanh": [
+    "bang-tin-san-chong-chu-trinh-duyet-2109.test.ts > lỗi nạp tệp",
+    "chon-luot-2109.test.ts > MÔ PHỎNG 60 em giả × 7 ngày × 3–6 lượt: không lượt rỗng, tỉ lệ câu lặp thấp, không lặp trong ngày kho 330 câu: mọi lượt đủ 6 câu; câu lặp trong 7 ngày < 30 % (kho giả nhỏ); không nhóm nào lặp trong cùng một ngày; câu sai hôm nay không quay lại hôm nay",
+    "chon-luot-2109.test.ts > MỐC 4 — KHÔNG LƯỢT RỖNG khi kho còn câu; thang nới kho NHỎ (7–20 câu) và em đã làm gần hết: vẫn trả đủ min(6, kho) câu, KHÔNG rỗng (thang nới: bậc + 1 → câu sai hôm nay cũng được lấy lại khi hết câu khác)",
+    "chon-luot-2109.test.ts > ĐOÀN HỘ TỐNG dùng CÙNG bộ chọn với Đảo Đợt 2 (thầy 21/09 tối: \"đúng luật cá nhân hoá, nâng đỡ, chặn lặp\") KHÔNG lượt rỗng khi kho Đoàn thu hẹp còn ít câu (7–20 câu Phần I/III): trả đủ min(6, số câu ĐỦ BẬC) — Đoàn chỉ báo \"chưa có câu vừa sức\" khi kho thật sự chỉ còn câu quá bậc",
+    "chon-luot-2109.test.ts > ĐOÀN HỘ TỐNG dùng CÙNG bộ chọn với Đảo Đợt 2 (thầy 21/09 tối: \"đúng luật cá nhân hoá, nâng đỡ, chặn lặp\") loại \"khoi_dong\": 30 em × 7 ngày × 4 chặng — mỗi chặng đủ 6 câu, KHÔNG Phần II, không nhóm nào lặp trong ngày, bậc ≤ bậc em + 1, câu chưa gặp ≥ 3 khi kho còn nhiều, chỉ Phần I",
+    "hoa2-cau-da-lam-2709.test.tsx > CauDaLam — theo bản vẽ HS-CauDaLam bấm thẻ ⇒ đề + LỜI GIẢI chuẩn của TheCau (Kiến thức cốt lõi, ✓✗ từng phương án) + lịch sử; chi tiết lấy qua hoa2-cau-chi-tiet cho câu đang lọc",
+    "hom-nay-v2-2109.test.tsx > OTraCuu — ô tra cứu lớn bấm vào gợi ý mở em; Esc đóng + xoá; 6 số ⇒ \"Mở ca kiểm tra mã …\"; không có ⇒ nói thật ngay trong ô; danh sách lớp trống ⇒ hướng dẫn nạp",
+    "lam-bai-3-co-dot16-1210i.test.tsx > ManLamBaiTap theo khổ màn (chỉ đổi chỗ đặt) máy tính 1440×900: phương án + ghi chú sang cột phải ngay trên nút Nộp; nộp gửi y nguyên lệnh cũ; dải kết quả đứng đầu cột phải",
+    "man-lam-bai-1210d.test.tsx > màn làm bài Trả lời ngắn: 4 ô + bàn phím số riêng, KHÔNG có ô nhập (không bật bàn phím điện thoại); phím máy tính vẫn nhập; gửi \"-1,5\"",
+    "man-lam-bai-1210d.test.tsx > màn làm bài Trắc nghiệm: 4 ô role=radio, \"Nộp câu · đã chọn B\"; sau khi nộp đánh dấu ô em chọn / đáp án",
+    "man-lam-bai-1210d.test.tsx > màn làm bài Đúng–sai: chọn đủ 4 ý mới nộp; gửi \"DDDD\" đúng định dạng cũ; phản hồi từng ý + giải thích ý sai mở sẵn",
+    "phieu-tuong-phan-trinh-duyet.test.ts > lỗi nạp tệp",
+    "tu-chua-truc-tiep-1210.test.tsx > Chữa trực tiếp câu gốc khi thiếu bài luyện từng bước không còn ngõ cụt: câu gốc + đáp án em chọn → tự làm lại (sai, thử thêm, vẫn sai) → đáp án + lời giải",
+    "tu-luyen-v3-giao-dien-3009.test.tsx > Chấm từng câu bật công tắc (nhớ theo máy) ⇒ Kiểm tra gửi đúng một câu, hiện Đúng + lời giải + Câu tiếp; câu đã chấm bị khoá"
+  ],
+  "doMain": [
+    "bang-tin-san-chong-chu-trinh-duyet-2109.test.ts > lỗi nạp tệp",
+    "chon-luot-2109.test.ts > MÔ PHỎNG 60 em giả × 7 ngày × 3–6 lượt: không lượt rỗng, tỉ lệ câu lặp thấp, không lặp trong ngày kho 330 câu: mọi lượt đủ 6 câu; câu lặp trong 7 ngày < 30 % (kho giả nhỏ); không nhóm nào lặp trong cùng một ngày; câu sai hôm nay không quay lại hôm nay",
+    "chon-luot-2109.test.ts > MỐC 4 — KHÔNG LƯỢT RỖNG khi kho còn câu; thang nới kho NHỎ (7–20 câu) và em đã làm gần hết: vẫn trả đủ min(6, kho) câu, KHÔNG rỗng (thang nới: bậc + 1 → câu sai hôm nay cũng được lấy lại khi hết câu khác)",
+    "chon-luot-2109.test.ts > ĐOÀN HỘ TỐNG dùng CÙNG bộ chọn với Đảo Đợt 2 (thầy 21/09 tối: \"đúng luật cá nhân hoá, nâng đỡ, chặn lặp\") KHÔNG lượt rỗng khi kho Đoàn thu hẹp còn ít câu (7–20 câu Phần I/III): trả đủ min(6, số câu ĐỦ BẬC) — Đoàn chỉ báo \"chưa có câu vừa sức\" khi kho thật sự chỉ còn câu quá bậc",
+    "chon-luot-2109.test.ts > ĐOÀN HỘ TỐNG dùng CÙNG bộ chọn với Đảo Đợt 2 (thầy 21/09 tối: \"đúng luật cá nhân hoá, nâng đỡ, chặn lặp\") loại \"khoi_dong\": 30 em × 7 ngày × 4 chặng — mỗi chặng đủ 6 câu, KHÔNG Phần II, không nhóm nào lặp trong ngày, bậc ≤ bậc em + 1, câu chưa gặp ≥ 3 khi kho còn nhiều, chỉ Phần I",
+    "hoa2-cau-da-lam-2709.test.tsx > CauDaLam — theo bản vẽ HS-CauDaLam bấm thẻ ⇒ đề + LỜI GIẢI chuẩn của TheCau (Kiến thức cốt lõi, ✓✗ từng phương án) + lịch sử; chi tiết lấy qua hoa2-cau-chi-tiet cho câu đang lọc",
+    "hom-nay-v2-2109.test.tsx > OTraCuu — ô tra cứu lớn bấm vào gợi ý mở em; Esc đóng + xoá; 6 số ⇒ \"Mở ca kiểm tra mã …\"; không có ⇒ nói thật ngay trong ô; danh sách lớp trống ⇒ hướng dẫn nạp",
+    "lam-bai-3-co-dot16-1210i.test.tsx > ManLamBaiTap theo khổ màn (chỉ đổi chỗ đặt) máy tính 1440×900: phương án + ghi chú sang cột phải ngay trên nút Nộp; nộp gửi y nguyên lệnh cũ; dải kết quả đứng đầu cột phải",
+    "man-lam-bai-1210d.test.tsx > màn làm bài Trả lời ngắn: 4 ô + bàn phím số riêng, KHÔNG có ô nhập (không bật bàn phím điện thoại); phím máy tính vẫn nhập; gửi \"-1,5\"",
+    "man-lam-bai-1210d.test.tsx > màn làm bài Trắc nghiệm: 4 ô role=radio, \"Nộp câu · đã chọn B\"; sau khi nộp đánh dấu ô em chọn / đáp án",
+    "man-lam-bai-1210d.test.tsx > màn làm bài Đúng–sai: chọn đủ 4 ý mới nộp; gửi \"DDDD\" đúng định dạng cũ; phản hồi từng ý + giải thích ý sai mở sẵn",
+    "phieu-tuong-phan-trinh-duyet.test.ts > lỗi nạp tệp",
+    "tu-chua-truc-tiep-1210.test.tsx > Chữa trực tiếp câu gốc khi thiếu bài luyện từng bước không còn ngõ cụt: câu gốc + đáp án em chọn → tự làm lại (sai, thử thêm, vẫn sai) → đáp án + lời giải",
+    "tu-luyen-v3-giao-dien-3009.test.tsx > Chấm từng câu bật công tắc (nhớ theo máy) ⇒ Kiểm tra gửi đúng một câu, hiện Đúng + lời giải + Câu tiếp; câu đã chấm bị khoá"
+  ],
+  "doMoi": []
+}
