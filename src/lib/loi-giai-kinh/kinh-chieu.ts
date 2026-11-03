@@ -66,7 +66,9 @@ export function kinhChieuHtml(ban: BanKinh, c: Pick<CauLuyen, 'phan' | 'dapAn' |
 }
 
 /** Kiểu riêng khối Kính trên tờ chiếu — chỉ biến --mc-* của tờ (đổi được 5 chế độ máy chiếu). Tờ chèn MỘT lần. */
-export const KINH_CHIEU_CSS = `.mck .mck-ct{font-size:1.5em;font-weight:800;margin-bottom:.2em}
+export const KINH_CHIEU_CSS = `.mck .sol-text,.mck .sol-step,.mck .sol-cot-loi,.mck .sol-text strong,.mck .sol-ly{color:var(--mc-muc)}.mck .sol-label{color:var(--mc-nhat)}
+.mck .sol-step>b:first-child{color:var(--mc-xanh)}.mck .sol-pa.chon .sol-ly{font-weight:700}
+.mck .mck-ct{font-size:1.5em;font-weight:800;margin-bottom:.2em}
 .mck-chip{display:flex;flex-wrap:wrap;gap:.4em;margin:.2em 0 .5em}.mck-chip span{padding:.15em .6em;border-radius:1em;border:1px solid var(--mc-vien);color:var(--mc-muc)}.mck-chip b{color:var(--mc-xanh)}
 .mck-phu{display:block;color:var(--mc-nhat);font-size:.9em;margin-top:.1em}
 .mck-manh{display:grid;grid-template-columns:repeat(auto-fit,minmax(9em,1fr));gap:.5em;margin:.3em 0}.mck-manh span{display:flex;flex-direction:column;gap:.1em;padding:.4em .6em;border-radius:.7em;border:2px solid var(--mc-vien);background:var(--mc-xanh-nen)}
