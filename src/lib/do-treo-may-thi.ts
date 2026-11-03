@@ -8,6 +8,11 @@
 // ExamTakeScreen NẠP LƯỜI mô-đun này sau khi vào đề (cổng tốc độ: đường /t không mang thêm byte); mảnh nằm ở kho chạy-lúc (vite.config globIgnores),
 // mất mạng không nạp được thì chỉ thiếu số đo, bài thi không ảnh hưởng. Không setState: màn thi gọi `nhip` trong nhịp 1 giây sẵn có.
 
+// 03/11 PHƯƠNG ÁN VỪA VẶN ở MÀN THI (thầy «tất cả công thức kiểu này phải hiển thị đẹp vừa vặn»): mảnh này là mảnh nạp lười ĐẦU TIÊN sau khi vào đề ⇒ gắn bộ
+// tự dò nhóm phương án ở đây (src/lib/vua-phuong-an.ts) — đường /t không mang thêm byte. Không đổi gì phần đo treo máy.
+// Nạp LƯỜI lồng (không nhập tĩnh): nhập tĩnh ⇒ Vite ghi tên mảnh đo vào danh sách nạp kèm của ExamTakeScreen (+30 B nén đường /t).
+if (typeof document !== 'undefined') void import('./vua-phuong-an').then((m) => m.ganToanTrang(), () => {})
+
 /** Phần đo thêm của một câu, lưu cùng lượt làm (IndexedDB) để mở lại vẫn cộng dồn. */
 export interface DoTreoCau {
   a?: number

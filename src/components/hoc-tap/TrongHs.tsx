@@ -16,6 +16,7 @@ import { Bi, SU_KIEN_LUA_CAP, type CamBi } from '../linh-vat/Bi'
 // LỬA ĐỔI CẢM XÚC (thầy «Chốt duyệt tất» 31/10, docs/DE-XUAT-BI-CAM-XUC-3110.md): luật + lời (hàm thuần) · sổ câu được tính trên máy · biểu tượng tab + chấm số.
 import { chanNgon, loiLua, mocDoiLua, soLuot, xetLua, type CapLua, type VaoLua } from '../../lib/lua-cam-xuc'
 import { chonChoBong, rongOmChu, type Hop } from '../../lib/bong-bong-mol'
+import { useBongVuaChu } from '../../lib/bong-vua-chu'
 import { docLuaThat } from '../../lib/lua-that'
 import { gioMayChu } from '../../lib/gio-may-chu'
 import { anMung, banHat, KHOA_AM_AN_MUNG, kichRuong, napAnMung, napTruocAnMung, yenLang } from '../../lib/hieu-ung'
@@ -557,6 +558,8 @@ type NhoLoiMol = { l?: string; c?: string; t?: string }
 const docLoiMol = (): NhoLoiMol => { try { const v = JSON.parse(localStorage.getItem(KHOA_LOI_MOL) || '{}'); return v && typeof v === 'object' ? v : {} } catch { return {} } }
 const ghiLoiMol = (v: NhoLoiMol) => { try { localStorage.setItem(KHOA_LOI_MOL, JSON.stringify(v)) } catch { /* không lưu được: lượt sau có thể lặp câu */ } }
 
+/** Cỡ Mol góc thẻ đầu (px), PHẢI ≥ 64: dưới 64 Bi chạy chế độ 'nho' mặt tĩnh (thầy 03/11 «hiệu ứng của mol mất hết rồi … cho Mol to lên»). */
+export const MOL_GOC = 84
 function LoiBi({ cam, loi, coBi = true, khoa, cap = 0, ben, chanNgon: laChanNgon, goc }: { cam: CamBi; loi: string; coBi?: boolean; khoa?: string; cap?: number; ben?: HTMLElement | null; chanNgon?: boolean; goc?: boolean }) {
   // pha: hien (gõ chữ, giữ ~4 s) → thu (mờ + co chiều cao mượt, đường đi trượt lên) → an (gỡ hẳn). Không khoá (lời quan trọng) ⇒ luôn hiện.
   const [pha, setPha] = useState<'hien' | 'thu' | 'an'>(() => (khoa && docDaNhac().includes(khoa) ? 'an' : 'hien'))
@@ -660,10 +663,11 @@ function LoiBi({ cam, loi, coBi = true, khoa, cap = 0, ben, chanNgon: laChanNgon
       window.removeEventListener('resize', henDat); window.removeEventListener('scrollend', henDat, { capture: true })
     }
   }, [ben, daAn, doc]) // eslint-disable-line react-hooks/exhaustive-deps
+  const bongGoc = useBongVuaChu(!!goc, loi) // thầy 03/11 «khung bong bóng vừa với chữ» (src/lib/bong-vua-chu.ts)
   // màu bong bóng theo cảm xúc (trong-hs.css .bi-loi-bong[data-cx]): cấp ≥ 2 ⇒ dỗi · bực · cáu · rất cáu; còn lại theo mặt Mol
   const cx = cap >= 2 ? (['doi', 'buc', 'cau', 'ratCau'] as const)[Math.min(cap, 5) - 2] : cam === 'mung' || cam === 'lua' ? 'khen' : cam === 'sai' ? 'buon' : cam
   // MOL Ở GÓC TRÁI THẺ ĐẦU (thầy 03/11 «cho mol hiển thị lên bảng đầu tiên góc trái … hiển thị cả bong bóng cảm xúc», chốt bản vẽ docs/ban-ve-mol-goc-0311): Mol nhỏ ở góc trái thẻ «Tổng câu hôm nay», bong bóng cảm xúc cạnh Mol
-  if (goc) return <div className="kb-mol"><Bi cam={cam} cap={cap} size={58} noi={loi} /><p className="bi-loi-bong kb-mol-bong" data-cap={cap >= 4 ? cap : undefined} data-cx={cx} data-chan-ngon={laChanNgon || undefined}><span className="ht2-an">{loi}</span><span aria-hidden="true">{loi.slice(0, n)}<span className="bi-loi-con">{loi.slice(n)}</span></span></p></div>
+  if (goc) return <div className="kb-mol"><Bi cam={cam} cap={cap} size={MOL_GOC} noi={loi} /><p ref={bongGoc} className="bi-loi-bong kb-mol-bong" data-cap={cap >= 4 ? cap : undefined} data-cx={cx} data-chan-ngon={laChanNgon || undefined}><span className="ht2-an">{loi}</span><span aria-hidden="true">{loi.slice(0, n)}<span className="bi-loi-con">{loi.slice(n)}</span></span></p></div>
   if (pha === 'an') return null
   // cấp 4–5: viền bong bóng màu «sai» (token có sẵn). `ben` (điện thoại ngang thấp): bong bóng nói CẠNH Lửa trên đường, đuôi chỉ xuống Lửa.
   const bong = <div className="bi-loi-boc" data-thu={pha === 'thu' || undefined} data-ben={ben ? '' : undefined}><div className="bi-loi" data-khong-bi={!coBi || !!ben || undefined}>{coBi && !ben && <Bi cam={cam} cap={cap} size={84} noi={loi} />}<p className="bi-loi-bong" data-cap={cap >= 4 ? cap : undefined} data-cx={cx} data-chan-ngon={laChanNgon || undefined}><span className="ht2-an">{loi}</span><span aria-hidden="true">{loi.slice(0, n)}<span className="bi-loi-con">{loi.slice(n)}</span></span></p></div></div>

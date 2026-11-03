@@ -79,6 +79,7 @@ export function moKhungTinh(w: any, d: any, css: string[], xuong: string, khoa: 
     o2.setAttribute('aria-hidden', 'true')
     o2.setAttribute('inert', '')
     o2.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483000;overflow:hidden;background:var(--tr-nen)'
+    o2.style.backgroundImage = 'var(--kinh-loang)' // dải loang Kính như body::before của app thật (03/11: lớp phủ trơn ⇒ lúc gỡ thấy nền đổi)
     for (var i = 0; i < css.length; i++) {
       var e = d.createElement('link')
       e.rel = 'stylesheet'
@@ -90,7 +91,12 @@ export function moKhungTinh(w: any, d: any, css: string[], xuong: string, khoa: 
       d.head.appendChild(e)
     }
     o2.innerHTML = '<style>#khung-tinh-hs *{animation:none!important;transition:none!important}</style>' + html
-    d.body.appendChild(o2)
+    // 03/11 (thầy «load lại app hiện hình chớp … loại bỏ triệt để»; quay từng khung lúc F5, CPU ×6: MỘT KHUNG NỀN TRỐNG ~200 ms trước ảnh Lộ trình): đoạn mã
+    // này trước nằm SAU <main id="root"> ⇒ body đã có ⇒ theo chuẩn HTML, thẻ blocking=render chèn lúc ấy KHÔNG chặn vẽ ⇒ trình duyệt vẽ nền trước khi tờ kiểu
+    // về. Nay chạy TRONG <head> (vite.config.ts đặt trước #root, body còn null) ⇒ tờ kiểu chặn vẽ thật; lớp phủ gắn vào body ngay khi trình phân tích tạo
+    // body (MutationObserver — trả lời trước lượt vẽ đầu, mà lượt vẽ còn bị tờ kiểu chặn).
+    var mo = new w.MutationObserver(function () { if (d.body) { mo.disconnect(); if (o2) d.body.appendChild(o2) } })
+    if (d.body) d.body.appendChild(o2); else mo.observe(g, { childList: true })
     var go = function () {
       if (!o2) return
       o2.remove()

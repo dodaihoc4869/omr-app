@@ -267,5 +267,6 @@
 @keyframes mol-nut-quay { from { transform: translateY(0) rotate(0); } 50% { transform: translateY(-3px) rotate(180deg); } to { transform: translateY(0) rotate(360deg); } }
 @keyframes mol-noi { from { transform: scaleY(1); } to { transform: scaleY(0.55); } }
 .mol-svg[data-khuat], .mol-svg[data-khuat] * { animation-play-state: paused !important; }
-.mol-svg[data-tinh], .mol-svg[data-tinh] *, html.may-yeu .mol-svg, html.may-yeu .mol-svg * { animation: none !important; }
+/* Máy yếu: tắt hoạt ảnh CSS nền — TRỪ miệng mấp máy lúc Mol đang nói (chỉ chạy trong lúc nói, hình nhỏ) (thầy 03/11 «nhớ tải sẵn mọi hiệu ứng cho máy yếu»). */
+.mol-svg[data-tinh], .mol-svg[data-tinh] *, html.may-yeu .mol-svg, html.may-yeu .mol-svg :not(.mol-mieng) { animation: none !important; }
 @media (prefers-reduced-motion: reduce) { .mol-svg, .mol-svg * { animation: none !important; } .mol-svg [data-k='nhom'] { transition-duration: 0.01s; } }
