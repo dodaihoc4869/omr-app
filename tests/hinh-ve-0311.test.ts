@@ -80,3 +80,20 @@ it('ảnh không có chữ: svg không nhãn vẫn đạt, khuôn khác thì kh�
   expect(kiemCanhHinh({ tieuDe: 'Hình minh hoạ', canh: { loai: 'svg', rong: 200, cao: 120, svg: '<circle cx="50" cy="50" r="20" class="f-sao s-chu nc"/>' } }, []).ok).toBe(true)
   expect(kiemCanhHinh(soDo(), []).ok).toBe(false)
 })
+
+import { chiSoChuan } from '../src/lib/hinh-ve/chi-so'
+describe('chiSoChuan (chỉ số dưới / trên không phụ thuộc phông)', () => {
+  it('NH₃ ⇒ N H + tspan 3 hạ; SO₄²⁻ ⇒ 4 hạ, 2 − nâng, rồi về đường chữ', () => {
+    const a = chiSoChuan('<text>NH₃</text>')
+    expect(a).toContain('<tspan dy="0.286em" font-size="70%">3</tspan>')
+    const b = chiSoChuan('<text>SO₄²⁻ + Cu²⁺</text>')
+    expect(b).toContain('font-size="70%">4</tspan>')
+    expect(b).toContain('font-size="70%">2</tspan>')
+    expect(b).not.toMatch(/[₀-₉⁰-⁹⁺⁻]/)
+  })
+  it('chữ thường giữ nguyên', () => { expect(chiSoChuan('<text>NaOH</text>')).toBe('<text>NaOH</text>') })
+  it('lớp «hình mẫu» của thầy qua bộ làm sạch', () => {
+    const k = kiemCanhHinh({ tieuDe: 'Hình minh hoạ', canh: { loai: 'svg', rong: 330, cao: 129, svg: '<g transform="translate(150 6)"><ellipse cx="14" cy="98" rx="18" ry="4" class="f-bong"/><path d="M4 8h20v76a10 10 0 0 1-20 0z" class="f-kinh"/><path d="M10 18v18" class="s-sang" stroke-width="3.5"/><text x="62" y="120" text-anchor="middle" class="t-chu t-dam">H₂NCH₂COOH</text></g>' } }, ['H2NCH2COOH'])
+    expect(k.ok).toBe(true)
+  })
+})

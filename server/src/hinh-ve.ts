@@ -104,6 +104,8 @@ export async function layViecHinh(env: Env, b: Obj) {
   const so = Math.min(8, Math.max(1, Number(b.so ?? 5) || 5))
   const han = new Date(nay - PHUT_GIU_VIEC_HINH * 60_000).toISOString()
   await env.DB.prepare("UPDATE hinh_ve_viec SET trang_thai = 'cho', ma_luot = NULL WHERE trang_thai = 'dang' AND nhan_luc < ?").bind(han).run()
+  // thầy 03/11: «ko hình nào được dùng hình cũ» — hình từng bị đánh «giữ gốc» (trước khi máy ngừng xin giữ gốc) quay lại hàng chờ, vẽ lại
+  await env.DB.prepare("UPDATE hinh_ve_viec SET trang_thai = 'cho' WHERE trang_thai = 'xong' AND so_lan < ? AND bam IN (SELECT bam FROM hinh_ve WHERE cong = 'giu_goc')").bind(SO_LAN_PHAT_TOI_DA_HINH).run()
   const maLuot = crypto.randomUUID(), nhanLuc = new Date(nay).toISOString()
   await env.DB.prepare(
     `UPDATE hinh_ve_viec SET trang_thai = 'dang', ma_luot = ?, nhan_luc = ?, so_lan = so_lan + 1
@@ -152,6 +154,13 @@ export async function nopHinh(env: Env, b: Obj) {
     env.DB.prepare("UPDATE hinh_ve_viec SET trang_thai = CASE WHEN ? IN ('dat', 'giu_goc') THEN 'xong' ELSE 'cho' END, ma_luot = NULL, loi = ? WHERE bam = ?").bind(cong, lyDo.slice(0, 220), bam),
   ])
   return { ok: true, ket: cong, lyDo }
+}
+
+/** Vẽ lại các hình ĐÃ xong (khi lời nhắc máy vẽ nâng chuẩn): đưa về hàng chờ, cảnh cũ vẫn phục vụ tới khi cảnh mới ĐẠT thay thế (lệch ⇒ giữ cảnh cũ). Chỉ-thêm: không xoá bảng nào. */
+export async function lamLaiHinh(env: Env) {
+  await damBaoBangHinh(env)
+  const r = await env.DB.prepare("UPDATE hinh_ve_viec SET trang_thai = 'cho', so_lan = 0 WHERE trang_thai = 'xong'").run()
+  return { ok: true, daDua: r.meta?.changes ?? 0 }
 }
 
 export async function tongHinh(env: Env) {
