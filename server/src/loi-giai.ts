@@ -137,6 +137,9 @@ export async function ghiCauVaoHang(env: Env, maDe: string, goi: unknown): Promi
     const kq = await env.DB.batch(lenh.slice(i, i + 100))
     kq.forEach((r, j) => { if (laViec[i + j]) vaoHang += r.meta?.changes ?? 0 })
   }
+  // ĐỀ NẠP MỚI tự vào hàng (thầy 03/11 «áp dụng cả cho nạp đề mới sau này»): ảnh của đề → hàng vẽ lại; băm câu mới → hàng Lời giải Kính. Lỗi ở đây KHÔNG làm hỏng nạp đề.
+  try { await (await import('./hinh-ve')).ghiHinhVaoHang(env, maDe, goi) } catch { /* máy vẽ quét bù bằng nap-hang */ }
+  try { await (await import('./loi-giai-kinh')).napKinhCuaTo(env, maDe) } catch { /* nap-hang bù */ }
   return { soCau, vaoHang }
 }
 

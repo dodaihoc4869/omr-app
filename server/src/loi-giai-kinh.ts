@@ -118,6 +118,18 @@ export async function napHangKinh(env: Env) {
   return { ok: true, themMoi: Number(r.meta?.changes ?? 0) }
 }
 
+/** Đề nạp mới (thầy 03/11): băm câu của MỘT tờ chưa có hàng Kính ⇒ vào hàng chờ (`ghiCauVaoHang` gọi sau khi chỉ mục lời giải ghi xong). Gọi lại được. */
+export async function napKinhCuaTo(env: Env, maDe: string) {
+  await damBaoBangKinh(env)
+  const nay = new Date().toISOString()
+  const r = await env.DB.prepare(
+    `INSERT OR IGNORE INTO loi_giai_kinh_viec (bam, qid, ma_de, bo, lop, phan, uu_tien, trang_thai, so_lan, tao_luc)
+     SELECT q.bam, MIN(q.qid), MIN(q.ma_de), MIN(q.bo), MIN(q.lop), CASE MIN(q.dang) WHEN 'tn' THEN 'I' WHEN 'ds' THEN 'II' WHEN 'tln' THEN 'III' ELSE MIN(q.dang) END, CASE WHEN MIN(q.lop) = '12' THEN 30 ELSE 0 END, 'cho', 0, ?
+     FROM loi_giai_cau q WHERE q.ma_de = ? AND q.bam NOT IN (SELECT bam FROM loi_giai_kinh) GROUP BY q.bam`,
+  ).bind(nay, maDe).run()
+  return { ok: true, themMoi: Number(r.meta?.changes ?? 0) }
+}
+
 /** Nhận một lô cùng chương. Đầu vào DỰNG LẠI TỪ KHO; kèm bản sơ đồ đã đạt của câu (nếu có) để máy soạn dùng lại phép tính đã kiểm. */
 export async function layViecKinh(env: Env, b: Obj) {
   await damBaoBangKinh(env)

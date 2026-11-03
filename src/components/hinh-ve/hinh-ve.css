@@ -1,0 +1,53 @@
+/* THẺ «HÌNH CỦA ĐỀ · VẼ LẠI» (thầy 03/11). Kính nổi như khung Lời giải Kính; chỉ biến --tr-* / --kinh-* sẵn có của app học sinh. */
+.hv-the { display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 28px; font-family: inherit; color: var(--tr-chu);
+  background: color-mix(in oklab, var(--tr-mat) 62%, transparent); -webkit-backdrop-filter: blur(22px) saturate(165%); backdrop-filter: blur(22px) saturate(165%);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--tr-mat) 85%, transparent), inset 0 0 0 1px color-mix(in oklab, var(--tr-vien) 50%, transparent), 0 24px 48px -28px var(--tr-phu), 0 2px 6px -3px var(--tr-phu); }
+.hv-nhan-the { font-size: 13px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--tr-hs-chu); }
+.hv-lgk { --lgk-dam: color-mix(in oklab, var(--tr-mat) 80%, transparent); }
+html.may-yeu .hv-the { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--tr-mat); }
+
+.hv-tieu-de { font-size: 16px; font-weight: 800; color: var(--tr-chu); }
+.hv-san { border-radius: 22px; padding: 8px; background: color-mix(in oklab, var(--tr-mat) 55%, transparent); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--tr-vien) 60%, transparent); }
+.hv-svg { display: block; width: 100%; height: auto; font-family: inherit; shape-rendering: geometricPrecision; text-rendering: geometricPrecision; }
+.hv-o rect { fill: color-mix(in oklab, var(--tr-sao) 38%, var(--tr-mat)); stroke: var(--tr-sao-day); stroke-width: 2; }
+.hv-o text { fill: var(--tr-chu); font-size: 13.5px; font-weight: 800; }
+.hv-o { opacity: 0; transform-box: fill-box; transition: opacity .35s; } .hv-o[data-hien] { opacity: 1; }
+.hv-noi path { fill: none; stroke: var(--tr-hs-day); stroke-width: 2.5; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset .6s ease; }
+.hv-noi[data-sang] path { stroke-dashoffset: 0; }
+.hv-mui { fill: var(--tr-hs-day); }
+.hv-so { fill: var(--tr-hs-chu); font-size: 12.5px; font-weight: 800; } .hv-nhan { fill: var(--tr-chu-2); font-size: 12px; font-weight: 700; }
+.hv-noi:not([data-sang]) text { opacity: 0; } .hv-noi text { transition: opacity .3s .3s; }
+.hv-truc { stroke: var(--tr-chu-2); stroke-width: 2.5; stroke-linecap: round; } .hv-luoi { stroke: color-mix(in oklab, var(--tr-chu) 12%, transparent); stroke-width: 1; stroke-dasharray: 3 4; }
+.hv-vach { fill: var(--tr-chu-2); font-size: 12px; font-weight: 700; } .hv-nhan-truc { fill: var(--tr-chu-3); font-size: 12px; font-weight: 800; }
+.hv-que rect { fill: var(--tr-sai); transform-box: fill-box; transform-origin: bottom; transform: scaleY(0); transition: transform .7s cubic-bezier(.2,.8,.2,1) var(--tre); }
+.hv-que[data-len] rect { transform: none; }
+.hv-que .hv-nhan { fill: var(--tr-sai-chu); font-size: 12.5px; font-weight: 800; opacity: 0; transition: opacity .3s; } .hv-que .hv-nhan[data-hien] { opacity: 1; }
+.hv-k0 { stop-color: color-mix(in oklab, var(--tr-mat) 85%, transparent); } .hv-k1 { stop-color: color-mix(in oklab, var(--tr-tin) 18%, var(--tr-mat)); }
+.hv-nut { fill: color-mix(in oklab, var(--tr-chu-y) 45%, var(--tr-mat)); stroke: var(--tr-chu-2); stroke-width: 1.5; } .hv-nhiet-ke { fill: var(--tr-sai); }
+.hv-den-co { fill: var(--tr-chu-2); }
+.hv-ban { fill: color-mix(in oklab, var(--tr-chu) 18%, var(--tr-mat)); } .hv-gia rect { fill: color-mix(in oklab, var(--tr-chu) 35%, var(--tr-mat)); }
+.hv-den { fill: color-mix(in oklab, var(--tr-tin) 18%, var(--tr-mat)); stroke: var(--tr-chu-2); stroke-width: 2; }
+.hv-lua { fill: color-mix(in oklab, var(--tr-sao) 75%, var(--tr-sai)); transform-box: fill-box; transform-origin: bottom; animation: hv-lua .5s ease-in-out 8 alternate; }
+@keyframes hv-lua { from { transform: scale(.9, .85); } to { transform: scale(1.05, 1.1); } }
+.hv-luoi-tn { fill: color-mix(in oklab, var(--tr-chu) 40%, var(--tr-mat)); }
+.hv-thuy { fill: color-mix(in oklab, var(--tr-mat) 70%, transparent); stroke: var(--tr-chu-2); stroke-width: 2.5; }
+.hv-long { fill: color-mix(in oklab, var(--tr-chu-y) 40%, var(--tr-mat)); } .hv-long-2 { fill: color-mix(in oklab, var(--tr-tin) 40%, var(--tr-mat)); }
+.hv-bot { fill: var(--tr-mat); animation: hv-bot 1.2s ease-in 8; } @keyframes hv-bot { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-14px); opacity: 0; } }
+.hv-ong { fill: none; stroke: var(--tr-chu-2); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+.hv-sinh-han { fill: none; stroke: color-mix(in oklab, var(--tr-tin) 45%, var(--tr-mat)); stroke-width: 22; stroke-linecap: round; opacity: .85; }
+.hv-hoi { fill: none; stroke: var(--tr-trang); stroke-width: 2.5; stroke-dasharray: .06 .06; animation: hv-hoi 2s linear 8; } @keyframes hv-hoi { to { stroke-dashoffset: -.24; } }
+.hv-nuoc-ong { stroke: var(--tr-tin-day); stroke-width: 5; stroke-linecap: round; }
+.hv-giot { fill: color-mix(in oklab, var(--tr-tin) 60%, var(--tr-mat)); animation: hv-giot 1.4s ease-in 8; } @keyframes hv-giot { from { transform: translateY(0); opacity: 1; } to { transform: translateY(40px); opacity: 0; } }
+.hv-chi path { fill: none; stroke: var(--tr-chu-3); stroke-width: 1.5; stroke-dasharray: 2 3; }
+.hv-nhan-tn text { fill: var(--tr-chu); font-size: 12.5px; font-weight: 800; }
+.hv-nhom-dau { fill: var(--tr-chu); font-size: 15px; font-weight: 800; } .hv-truc-f { stroke: var(--tr-chu-2); stroke-width: 3; }
+.hv-ngang-f { stroke: var(--tr-chu-2); stroke-width: 2.5; } .hv-c-f { fill: var(--tr-hs-day); }
+.hv-hang-f text { fill: var(--tr-chu); font-size: 15px; font-weight: 800; } .hv-hang-f text[data-oh] { fill: var(--tr-sai-chu); }
+.hv-hang-f { opacity: 0; transition: opacity .3s; } .hv-hang-f[data-hien] { opacity: 1; }
+.hv-nuoc-nen { fill: color-mix(in oklab, var(--tr-tin) 16%, var(--tr-mat)); stroke: color-mix(in oklab, var(--tr-tin) 45%, var(--tr-mat)); stroke-width: 2; }
+.hv-vat-lieu { fill: color-mix(in oklab, var(--tr-tim) 22%, var(--tr-mat)); }
+.hv-vet { fill: color-mix(in oklab, var(--tr-chu-y-chu) 70%, var(--tr-chu)); }
+.hv-xp { transition: transform 1s cubic-bezier(.2,.8,.2,1); } .hv-xp-dau { fill: var(--tr-tin-day); stroke: var(--tr-mat); stroke-width: 1.5; } .hv-xp-duoi { stroke: var(--tr-chu-3); stroke-width: 2.5; stroke-linecap: round; }
+.hv-chu-giai text { fill: var(--tr-chu); font-size: 12px; font-weight: 800; }
+html.may-yeu .hv-svg * { animation: none !important; transition: none !important; }
+@media (prefers-reduced-motion: reduce) { .hv-xp { transition: none; } .hv-lua, .hv-bot, .hv-hoi, .hv-giot { animation: none; } .hv-noi path, .hv-que rect { transition: none; } }
