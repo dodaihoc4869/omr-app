@@ -295,6 +295,18 @@ html.may-yeu .lgk-tg-than { animation: none; }
 .duo-lg-the .lgk-boc { background: none; padding: 0; border-radius: 0; }
 [data-trong='hs'] .duo-lg-the:has(.lgk-boc) > .duo-lg-dau { background: var(--kinh-mat-dam); -webkit-backdrop-filter: var(--kinh-mo); backdrop-filter: var(--kinh-mo); border-bottom-color: var(--kinh-vien-2); }
 html.may-yeu[data-trong='hs'] .duo-lg-the:has(.lgk-boc) > .duo-lg-dau { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--tr-mat); }
+/* Thầy 03/11 (ảnh thanh «Lời giải · Câu 4»): «cái thanh này bỏ nền, chỉ hiện các nút kính thôi» ⇒ thanh tiêu đề TRONG SUỐT (không nền, không viền, không mờ
+   nền), vẫn dính đầu tấm khi cuộn; chạm xuyên qua phần trống. Tên câu thành VIÊN KÍNH cùng kiểu nút «Lời giải thu gọn» ⇒ đọc rõ khi nội dung cuộn bên dưới. */
+[data-trong='hs'] .duo-lg-the:has(.lgk-boc) > .duo-lg-dau, html.may-yeu[data-trong='hs'] .duo-lg-the:has(.lgk-boc) > .duo-lg-dau {
+  background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; border-bottom-color: transparent; box-shadow: none; pointer-events: none; }
+[data-trong='hs'] .duo-lg-the:has(.lgk-boc) > .duo-lg-dau > * { pointer-events: auto; }
+[data-trong='hs'] .duo-lg-the:has(.lgk-boc) > .duo-lg-dau > b { flex: 0 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height: 44px; padding: 0 16px; border-radius: 22px; }
+[data-trong='hs'] .duo-lg-the:has(.lgk-boc) > .duo-lg-dau > b, [data-trong='hs'] .duo-lg-the:has(.lgk-boc) > .duo-lg-dau > .duo-dong, [data-trong='hs'] .duo-lg-the:has(.lgk-boc) > .duo-lg-dau > .duo-lg-khe .lgk-tg-vien:not([aria-expanded='true']) {
+  background: color-mix(in oklab, var(--tr-mat) 94%, transparent); -webkit-backdrop-filter: var(--kinh-mo); backdrop-filter: var(--kinh-mo);
+  box-shadow: inset 0 1px 0 var(--kinh-vien, transparent), inset 0 0 0 1px color-mix(in oklab, var(--tr-vien) 70%, transparent), 0 6px 16px -10px var(--tr-phu); }
+[data-trong='hs'] .duo-lg-the:has(.lgk-boc) > .duo-lg-dau > .duo-dong { border-radius: 22px; }
+[data-trong='hs'] .duo-lg-the:has(.lgk-boc) > .duo-lg-dau > .duo-lg-khe { flex: none; }
+html.may-yeu[data-trong='hs'] .duo-lg-the:has(.lgk-boc) > .duo-lg-dau > b, html.may-yeu[data-trong='hs'] .duo-lg-the:has(.lgk-boc) > .duo-lg-dau > .duo-dong, html.may-yeu[data-trong='hs'] .duo-lg-the:has(.lgk-boc) > .duo-lg-dau > .duo-lg-khe .lgk-tg-vien:not([aria-expanded='true']) { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--tr-mat); }
 .lgk-dk > .lgk-vach { flex: 1; }
 @media (prefers-reduced-motion: reduce) { .lgk-giai-so > div { animation: none; } }
 html.may-yeu .lgk-giai-so > div { animation: none; }

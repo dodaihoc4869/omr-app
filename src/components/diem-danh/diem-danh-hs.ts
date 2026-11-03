@@ -90,7 +90,9 @@ export function useDiemDanhHs(token: string, bat = true) {
     // em vừa từ màn khác về Lộ trình (StudentPortalScreen `SU_KIEN_VE_LO_TRINH`) ⇒ hỏi lại buổi đang mở
     const ve = () => { void hoi() }
     window.addEventListener('ddh-ve-lo-trinh', ve)
-    return () => { document.removeEventListener('visibilitychange', hien); window.removeEventListener('ddh-ve-lo-trinh', ve) }
+    // máy / thẻ khác của em vừa điểm danh (kênh đẩy lib/kenh-day.ts, thầy 03/11 «đồng bộ tức thì mọi chỗ») ⇒ hỏi lại ngay, ẩn ô nhập mã ở máy này
+    window.addEventListener('ddh:doi-may-khac', ve)
+    return () => { document.removeEventListener('visibilitychange', hien); window.removeEventListener('ddh-ve-lo-trinh', ve); window.removeEventListener('ddh:doi-may-khac', ve) }
   }, [gui, hoi, bat])
 
   return { tt, setTt, mo, setMo, ma, setMa, loi, setLoi, dangGui, gui, oNhap, tuQr }

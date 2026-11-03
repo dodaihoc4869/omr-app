@@ -134,6 +134,10 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:
   void tai()
   return()=>{mounted.current=false;lanPhien.current++;huyHenThuLai();huyDongBo();if(timer.current)clearTimeout(timer.current)}
  },[token,id])
+ // ĐỒNG BỘ TỨC THÌ (thầy 03/11): máy / thẻ khác của em vừa làm / nộp chặng kiểm tra (kênh đẩy lib/kenh-day.ts) ⇒ đang ở DANH SÁCH chặng thì đọc lại ngay;
+ // đang làm một chặng thì thôi (không đổi câu dưới tay em — vào lại danh sách / mở lại app sẽ đọc lại như cũ).
+ const taiRef=useRef(tai);taiRef.current=tai;const sttRef=useRef(stt);sttRef.current=stt
+ useEffect(()=>{const doi=()=>{if(sttRef.current===null&&!document.hidden)void taiRef.current()};window.addEventListener('ddh:doi-may-khac',doi);return()=>window.removeEventListener('ddh:doi-may-khac',doi)},[])
  const save=(submit=false)=>{
   if(stt===null)return Promise.resolve()
   if(timer.current)clearTimeout(timer.current)

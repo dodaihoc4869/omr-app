@@ -14,6 +14,10 @@ export const LUI_NOI_MS: readonly number[] = [2_000, 5_000, 15_000, 30_000, 60_0
 const NHIP_PING_MS = 50_000
 /** Hai tin sát nhau ⇒ một lượt đọc lại. */
 const GOP_MS = 400
+/** Báo thẻ khác cùng máy sau khi lệnh ghi xong (≈ CHO_PHAT_MS của máy chủ: việc phụ sau phản hồi đã ghi) — gom mọi lệnh trong khoảng này thành MỘT tin. */
+export const CHO_BC_MS = 1200
+/** Đường lệnh LÀM ĐỔI tiến độ — CÙNG danh sách `LENH_DOI` của server/src/kenh-day.ts (test kenh-day-the-0311 khoá hai bên khớp nhau). */
+export const LENH_DOI_DUONG = /^\/(?:game-v2\/(?:answer|complete|hoc-tap-kiem-nop|hoc-tap-ktcn-nop|hoc-tap-ktcn-chot-chang)|hs\/(?:chua-cau-sai\/(?:gon-nop|nop-item)|on-lai\/nop|luyen-nen\/nop|thu-thach-hom-nay\/nop|hoi-tro-ly\/kiem\/nop|tu-luyen\/nop|thuong\/(?:mua-binh|mo-ruong|cuoc)|diem-danh)|mom\/submit)$/
 
 /** Mở kênh cho token của em; trả hàm đóng (đăng xuất / đổi em). */
 export function moKenhDay(token: string): () => void {
@@ -65,6 +69,25 @@ export function moKenhDay(token: string): () => void {
       dangNoi = false
     }
   }
+  // THẺ KHÁC CÙNG MÁY (thầy 03/11 «đồng bộ tức thì cho các thiết bị mọi chỗ»): máy chủ bỏ qua máy vừa làm theo chữ ký token ⇒ hai thẻ / cửa sổ cùng trình duyệt
+  // (chung token) KHÔNG báo nhau qua WebSocket. ⇒ BroadcastChannel: thẻ này gọi THÀNH CÔNG một lệnh làm đổi tiến độ (cùng danh sách LENH_DOI của máy chủ —
+  // server/src/kenh-day.ts) ⇒ sau CHO_PHAT (máy chủ ghi xong việc phụ) báo các thẻ khác ⇒ chúng đọc lại như khi có tin đẩy. Bọc `fetch` CHỈ để nhìn đường +
+  // trạng thái (không đọc thân, không đổi gì), gỡ khi đóng kênh. Không có BroadcastChannel ⇒ như cũ.
+  const BC = (window as Window & { BroadcastChannel?: typeof BroadcastChannel }).BroadcastChannel
+  const bc = typeof BC === 'function' ? new BC('ddh-doi-hs') : null
+  let henBc: ReturnType<typeof setTimeout> | undefined
+  const fetchGoc = window.fetch
+  const boc: typeof fetch = function (this: unknown, ...a: Parameters<typeof fetch>) {
+    const p = fetchGoc.apply(this, a)
+    try {
+      const v = a[0], yc = v instanceof Request ? v : null
+      const m = String(a[1]?.method || yc?.method || 'GET').toUpperCase()
+      if (m === 'POST' && LENH_DOI_DUONG.test(new URL(yc ? yc.url : String(v), location.href).pathname))
+        void p.then((r) => { if (r.ok && bc && !henBc) henBc = setTimeout(() => { henBc = undefined; try { bc.postMessage(1) } catch { /* đã đóng */ } }, CHO_BC_MS) }, () => {})
+    } catch { /* đường lạ ⇒ bỏ qua */ }
+    return p
+  }
+  if (bc) { bc.onmessage = () => { if (!an()) bao() }; window.fetch = boc }
   const khiHien = () => { if (!an() && !ws) { if (hen) { clearTimeout(hen); hen = undefined } void noi() } }
   document.addEventListener('visibilitychange', khiHien)
   window.addEventListener('online', khiHien)
@@ -73,6 +96,9 @@ export function moKenhDay(token: string): () => void {
     dung = true
     if (hen) clearTimeout(hen)
     if (gop) clearTimeout(gop)
+    if (henBc) clearTimeout(henBc)
+    if (window.fetch === boc) window.fetch = fetchGoc
+    try { bc?.close() } catch { /* đã đóng */ }
     tatPing()
     document.removeEventListener('visibilitychange', khiHien)
     window.removeEventListener('online', khiHien)
