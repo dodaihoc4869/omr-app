@@ -1,0 +1,458 @@
+[
+  {
+    "i": 162,
+    "repeatLiteral": "–CH₂–CH(CH₃)–",
+    "backbone": [
+      "CH₂",
+      "CH"
+    ],
+    "branches": [
+      {
+        "site": 2,
+        "bond": "single",
+        "label": "CH₃",
+        "direction": "down"
+      }
+    ],
+    "bracketStyle": "parentheses",
+    "bracketSpan": "Ngoặc bao trọn hai C chính và nhánh CH₃ phía dưới; không chỉ bao hàng CH₂–CH.",
+    "geometry": "Mạch chính nằm ngang, nhánh methyl từ CH thứ hai hướng xuống.",
+    "subscriptPosition": "Ngoài ngoặc phải, thấp hơn mạch chính.",
+    "atomCountPerUnit": {
+      "C": 3,
+      "H": 6
+    },
+    "stereo": "Không có ký hiệu lập thể/đẳng cấu; không tự gán tacticity.",
+    "daMoNguonDayDu": true,
+    "caption": [],
+    "subscript": "n",
+    "duLieu": "nguon-da-doc-chua-soat-ban-ve",
+    "smiles": null,
+    "headGroupsShown": false,
+    "tailGroupsShown": false,
+    "outsideBonds": "Một đoạn liên kết đơn đi từ mép trái vào qua ngoặc đến nguyên tử đầu, một đoạn liên kết đơn từ nguyên tử cuối đi qua ngoặc phải ra mép phải. Không có nguyên tử/nhóm chấm dứt ngoài ngoặc.",
+    "hash": "1bdc3d61588eacf650f495e66cf25075a39d9fe16386274476c81a38fc6c5fb7",
+    "fileNguon": "anh/1bdc3d61588eacf650f495e66cf25075a39d9fe16386274476c81a38fc6c5fb7.png",
+    "soQid": 2,
+    "qids": [
+      "12-BD7-07-I-6",
+      "12-C4-B12-I-1"
+    ]
+  },
+  {
+    "i": 1211,
+    "repeatLiteral": "–CH(CH₃)–CH(CH₃)–",
+    "backbone": [
+      "CH",
+      "CH"
+    ],
+    "branches": [
+      {
+        "site": 1,
+        "bond": "single",
+        "label": "CH₃",
+        "direction": "down"
+      },
+      {
+        "site": 2,
+        "bond": "single",
+        "label": "CH₃",
+        "direction": "down"
+      }
+    ],
+    "bracketStyle": "parentheses",
+    "bracketSpan": "Nguồn vẽ ngoặc TRÒN NGẮN ôm hàng CH–CH; hai CH₃ phía dưới thấp hơn đáy ngoặc. Về liên kết, cả hai nhánh vẫn thuộc repeat vì gắn vào hai CH trong ngoặc; không phải endgroup.",
+    "geometry": "Hai CH ở hàng ngang, mỗi CH có một CH₃ xuống riêng.",
+    "subscriptPosition": "Ngoài ngoặc phải, dưới mạch chính.",
+    "atomCountPerUnit": {
+      "C": 4,
+      "H": 8
+    },
+    "stereo": "Không tự suy hai nhánh cùng phía là tacticity; đây biểu diễn chữ, không có nêm.",
+    "trap": "Không thay bằng –CH₂–C(CH₃)₂–.",
+    "daMoNguonDayDu": true,
+    "caption": [],
+    "subscript": "n",
+    "duLieu": "nguon-da-doc-chua-soat-ban-ve",
+    "smiles": null,
+    "headGroupsShown": false,
+    "tailGroupsShown": false,
+    "outsideBonds": "Một đoạn liên kết đơn đi từ mép trái vào qua ngoặc đến nguyên tử đầu, một đoạn liên kết đơn từ nguyên tử cuối đi qua ngoặc phải ra mép phải. Không có nguyên tử/nhóm chấm dứt ngoài ngoặc.",
+    "hash": "db5a757f65264cc3f209ddf16a96d6aa6016b31cdc3557be33666bf1d638d5e0",
+    "fileNguon": "anh/db5a757f65264cc3f209ddf16a96d6aa6016b31cdc3557be33666bf1d638d5e0.png",
+    "soQid": 1,
+    "qids": [
+      "12-KT-C34-D2-I-8"
+    ],
+    "bracketSemanticScope": "Toàn bộ nhánh gắn lên nguyên tử mainchain trong ngoặc là một phần repeat, dù nguồn dùng ngoặc ngắn không ôm hết nhánh."
+  },
+  {
+    "i": 1045,
+    "repeatLiteral": "–HN–CH₂–CH₂–CH₂–CH₂–CH₂–CO–",
+    "backbone": [
+      "HN",
+      "CH₂",
+      "CH₂",
+      "CH₂",
+      "CH₂",
+      "CH₂",
+      "CO"
+    ],
+    "branches": [],
+    "bracketStyle": "parentheses",
+    "bracketSpan": "Ngoặc mở trước HN và đóng sau CO; toàn bộ năm CH₂ nằm trong.",
+    "geometry": "Toàn bộ nhãn trên cùng hàng ngang. Nguồn viết CO inline, không vẽ O xuống riêng.",
+    "subscriptPosition": "Ngoài ngoặc phải, dưới hàng nhãn.",
+    "atomCountPerUnit": {
+      "C": 6,
+      "N": 1,
+      "O": 1
+    },
+    "stereo": "Không có.",
+    "trap": "Giữ đúng5 CH₂; HN là nguyên văn nguồn, không thêm H đầu mạch.",
+    "daMoNguonDayDu": true,
+    "caption": [],
+    "subscript": "n",
+    "duLieu": "nguon-da-doc-chua-soat-ban-ve",
+    "smiles": null,
+    "headGroupsShown": false,
+    "tailGroupsShown": false,
+    "outsideBonds": "Một đoạn liên kết đơn đi từ mép trái vào qua ngoặc đến nguyên tử đầu, một đoạn liên kết đơn từ nguyên tử cuối đi qua ngoặc phải ra mép phải. Không có nguyên tử/nhóm chấm dứt ngoài ngoặc.",
+    "hash": "bbf3cdb15d67de92dc3ebe5a2e679f3b8e5e57548d1886c0694e93c760828424",
+    "fileNguon": "anh/bbf3cdb15d67de92dc3ebe5a2e679f3b8e5e57548d1886c0694e93c760828424.png",
+    "soQid": 1,
+    "qids": [
+      "12-C4-B13-I-74"
+    ]
+  },
+  {
+    "i": 1001,
+    "repeatLiteral": "–CH₂–CH=C(CH₃)–CH₂–",
+    "backbone": [
+      "CH₂",
+      "C",
+      "C",
+      "CH₂"
+    ],
+    "branches": [
+      {
+        "site": 2,
+        "label": "H",
+        "direction": "down-left"
+      },
+      {
+        "site": 3,
+        "label": "CH₃",
+        "direction": "down-right"
+      }
+    ],
+    "bonds": [
+      "single",
+      "double",
+      "single"
+    ],
+    "bracketStyle": "parentheses",
+    "bracketSpan": "Ngoặc bao cả CH₂ trái/phải, hai C không ghi nhãn tại hai đầu =, H dưới-trái và CH₃ dưới-phải.",
+    "geometry": "C=C nằm ngang ở giữa; hai CH₂ đều trên hai đầu C=C; H dưới bên trái, CH₃ dưới bên phải. Hai nhóm tiếp mạch CH₂ ở cùng phía liên kết đôi; giữ nguyên bố trí cis của hình.",
+    "subscriptPosition": "n ngoài ngoặc phải, thấp ngang CH₃.",
+    "atomCountPerUnit": {
+      "C": 5,
+      "H": 8
+    },
+    "stereo": "Nguồn hình học cis rõ; không làm phẳng thành hàng ngang không xác định.",
+    "daMoNguonDayDu": true,
+    "caption": [],
+    "subscript": "n",
+    "duLieu": "nguon-da-doc-chua-soat-ban-ve",
+    "smiles": null,
+    "headGroupsShown": false,
+    "tailGroupsShown": false,
+    "outsideBonds": "Một đoạn liên kết đơn đi từ mép trái vào qua ngoặc đến nguyên tử đầu, một đoạn liên kết đơn từ nguyên tử cuối đi qua ngoặc phải ra mép phải. Không có nguyên tử/nhóm chấm dứt ngoài ngoặc.",
+    "hash": "b4301d02a667c8c77d8aa8975cbad8ecce7de27f68f1e59b6489e6af0029cf90",
+    "fileNguon": "anh/b4301d02a667c8c77d8aa8975cbad8ecce7de27f68f1e59b6489e6af0029cf90.png",
+    "soQid": 1,
+    "qids": [
+      "12-KT-C1234-D1-I-15"
+    ]
+  },
+  {
+    "i": 896,
+    "repeatLiteral": "–CH₂–C(CH₃)=CH–CH₂–",
+    "backbone": [
+      "CH₂",
+      "C",
+      "CH",
+      "CH₂"
+    ],
+    "branches": [
+      {
+        "site": 2,
+        "label": "CH₃",
+        "direction": "down"
+      }
+    ],
+    "bonds": [
+      "single",
+      "double",
+      "single"
+    ],
+    "bracketStyle": "parentheses",
+    "bracketSpan": "Nguồn vẽ ngoặc TRÒN NGẮN ôm hàng CH₂–C=CH–CH₂; nhánh CH₃ xuống thấp hơn đáy ngoặc. Nhánh vẫn thuộc repeat vì gắn vào C bên trong.",
+    "geometry": "Mạch chính nằm ngang: CH₂–C=CH–CH₂; dưới C không H là CH₃.",
+    "subscriptPosition": "n ngoài ngoặc phải, dưới hàng chính.",
+    "atomCountPerUnit": {
+      "C": 5,
+      "H": 8
+    },
+    "stereo": "Nguồn công thức hàng ngang không gán E/Z; không tự alias với1001 có hình cis.",
+    "daMoNguonDayDu": true,
+    "caption": [],
+    "subscript": "n",
+    "duLieu": "nguon-da-doc-chua-soat-ban-ve",
+    "smiles": null,
+    "headGroupsShown": false,
+    "tailGroupsShown": false,
+    "outsideBonds": "Một đoạn liên kết đơn đi từ mép trái vào qua ngoặc đến nguyên tử đầu, một đoạn liên kết đơn từ nguyên tử cuối đi qua ngoặc phải ra mép phải. Không có nguyên tử/nhóm chấm dứt ngoài ngoặc.",
+    "hash": "a3f1f296bda5eeaabd3d4e6d1949472b41174665d13ec544ae1ea81d021c6baa",
+    "fileNguon": "anh/a3f1f296bda5eeaabd3d4e6d1949472b41174665d13ec544ae1ea81d021c6baa.png",
+    "soQid": 1,
+    "qids": [
+      "12-KT-C34-D1-I-11"
+    ],
+    "bracketSemanticScope": "Toàn bộ nhánh gắn lên nguyên tử mainchain trong ngoặc là một phần repeat, dù nguồn dùng ngoặc ngắn không ôm hết nhánh."
+  },
+  {
+    "i": 887,
+    "repeatLiteral": "–CH₂–CH(CH₂CH₃)–",
+    "backbone": [
+      "CH₂",
+      "CH"
+    ],
+    "branches": [
+      {
+        "site": 2,
+        "label": "CH₂CH₃",
+        "direction": "down"
+      }
+    ],
+    "bracketStyle": "parentheses",
+    "bracketSpan": "Nguồn vẽ ngoặc TRÒN NGẮN ôm hàng CH₂–CH; nhánh CH₂CH₃ xuống thấp hơn đáy ngoặc. Nhánh vẫn thuộc repeat, không chuyển thành nhóm đầu mạch.",
+    "geometry": "Hai C chính ngang, nhánh ethyl dưới CH.",
+    "subscriptPosition": "n ngoài ngoặc phải, dưới hàng chính.",
+    "atomCountPerUnit": {
+      "C": 4,
+      "H": 8
+    },
+    "stereo": "Không có nêm.",
+    "trap": "Nhánh ethyl2C, không methyl hoặc hai methyl.",
+    "daMoNguonDayDu": true,
+    "caption": [],
+    "subscript": "n",
+    "duLieu": "nguon-da-doc-chua-soat-ban-ve",
+    "smiles": null,
+    "headGroupsShown": false,
+    "tailGroupsShown": false,
+    "outsideBonds": "Một đoạn liên kết đơn đi từ mép trái vào qua ngoặc đến nguyên tử đầu, một đoạn liên kết đơn từ nguyên tử cuối đi qua ngoặc phải ra mép phải. Không có nguyên tử/nhóm chấm dứt ngoài ngoặc.",
+    "hash": "a29cb6ad47997be7141d8ffee217ce6440278d82578ad9f7ccb117dae44f828b",
+    "fileNguon": "anh/a29cb6ad47997be7141d8ffee217ce6440278d82578ad9f7ccb117dae44f828b.png",
+    "soQid": 1,
+    "qids": [
+      "12-KT-C34-D2-I-8"
+    ],
+    "bracketSemanticScope": "Toàn bộ nhánh gắn lên nguyên tử mainchain trong ngoặc là một phần repeat, dù nguồn dùng ngoặc ngắn không ôm hết nhánh."
+  },
+  {
+    "i": 842,
+    "repeatLiteral": "–NH–[CH₂]₅–C(=O)–",
+    "backbone": [
+      "NH",
+      "[CH₂]₅",
+      "C"
+    ],
+    "branches": [
+      {
+        "site": 3,
+        "bond": "double",
+        "label": "O",
+        "direction": "down"
+      }
+    ],
+    "bracketStyle": "parentheses",
+    "bracketSpan": "Ngoặc mở trước NH, đóng sau C và bao O carbonyl phía dưới.",
+    "geometry": "NH–[CH₂]₅–C trên hàng ngang; C=O hướng xuống bằng hai nét; không chuyển O thành nhánh đơn.",
+    "subscriptPosition": "n ngoài ngoặc phải, thấp gần O.",
+    "atomCountPerUnit": {
+      "C": 6,
+      "N": 1,
+      "O": 1
+    },
+    "stereo": "Không có.",
+    "trap": "Giữ dấu ngoặc vuông và số5 của nhóm CH₂ bên trong ngoặc tròn n.",
+    "daMoNguonDayDu": true,
+    "caption": [],
+    "subscript": "n",
+    "duLieu": "nguon-da-doc-chua-soat-ban-ve",
+    "smiles": null,
+    "headGroupsShown": false,
+    "tailGroupsShown": false,
+    "outsideBonds": "Một đoạn liên kết đơn đi từ mép trái vào qua ngoặc đến nguyên tử đầu, một đoạn liên kết đơn từ nguyên tử cuối đi qua ngoặc phải ra mép phải. Không có nguyên tử/nhóm chấm dứt ngoài ngoặc.",
+    "hash": "9b0cc59457aa046a05d1da5f1d1f04c47303d5114ed366dedcc1a00c07c6a45b",
+    "fileNguon": "anh/9b0cc59457aa046a05d1da5f1d1f04c47303d5114ed366dedcc1a00c07c6a45b.png",
+    "soQid": 1,
+    "qids": [
+      "12-C4-B13-I-68"
+    ]
+  },
+  {
+    "i": 823,
+    "repeatLiteral": "–HN–CH₂–CH₂–CH₂–CH₂–CH₂–CO–",
+    "backbone": [
+      "HN",
+      "CH₂",
+      "CH₂",
+      "CH₂",
+      "CH₂",
+      "CH₂",
+      "CO"
+    ],
+    "branches": [],
+    "bracketStyle": "parentheses",
+    "bracketSpan": "Ngoặc mở trước HN, đóng sau CO, toàn bộ5CH₂ trong ngoặc.",
+    "geometry": "Cùng kiểu literal1045: CO inline, năm CH₂ rời trên hàng ngang.",
+    "subscriptPosition": "Ngoài ngoặc phải, dưới hàng chính.",
+    "atomCountPerUnit": {
+      "C": 6,
+      "N": 1,
+      "O": 1
+    },
+    "stereo": "Không có.",
+    "trap": "Nguồn riêng đã mở; có thể dùng chung mẫu1045 nếu giữ HN và5CH₂.",
+    "daMoNguonDayDu": true,
+    "caption": [],
+    "subscript": "n",
+    "duLieu": "nguon-da-doc-chua-soat-ban-ve",
+    "smiles": null,
+    "headGroupsShown": false,
+    "tailGroupsShown": false,
+    "outsideBonds": "Một đoạn liên kết đơn đi từ mép trái vào qua ngoặc đến nguyên tử đầu, một đoạn liên kết đơn từ nguyên tử cuối đi qua ngoặc phải ra mép phải. Không có nguyên tử/nhóm chấm dứt ngoài ngoặc.",
+    "hash": "9872953bd37460fdf3828fe9a7e4449d1db9eb0ecc39b37796c71290d0d9fd94",
+    "fileNguon": "anh/9872953bd37460fdf3828fe9a7e4449d1db9eb0ecc39b37796c71290d0d9fd94.png",
+    "soQid": 1,
+    "qids": [
+      "12-KT-C4-D2-I-14"
+    ]
+  },
+  {
+    "i": 334,
+    "repeatLiteral": "–NH–[CH₂]₆–C(=O)–",
+    "backbone": [
+      "NH",
+      "[CH₂]₆",
+      "C"
+    ],
+    "branches": [
+      {
+        "site": 3,
+        "bond": "double",
+        "label": "O",
+        "direction": "down"
+      }
+    ],
+    "bracketStyle": "parentheses",
+    "bracketSpan": "Ngoặc tròn bao NH, nhóm[CH₂]₆, C và O carbonyl dưới C.",
+    "geometry": "NH–[CH₂]₆–C ngang, C=O xuống.",
+    "subscriptPosition": "Ngoài ngoặc phải, dưới hàng chính.",
+    "atomCountPerUnit": {
+      "C": 7,
+      "N": 1,
+      "O": 1
+    },
+    "stereo": "Không có.",
+    "trap": "Nguồn là số6 RÕ, không đổi thành5 để khớp một tên polymer quen thuộc; khác842.",
+    "daMoNguonDayDu": true,
+    "caption": [],
+    "subscript": "n",
+    "duLieu": "nguon-da-doc-chua-soat-ban-ve",
+    "smiles": null,
+    "headGroupsShown": false,
+    "tailGroupsShown": false,
+    "outsideBonds": "Một đoạn liên kết đơn đi từ mép trái vào qua ngoặc đến nguyên tử đầu, một đoạn liên kết đơn từ nguyên tử cuối đi qua ngoặc phải ra mép phải. Không có nguyên tử/nhóm chấm dứt ngoài ngoặc.",
+    "hash": "3adf0c0833728e8678bbf589ee81b96a7bab6d54c575e0e7bd9e24b6d80b4f22",
+    "fileNguon": "anh/3adf0c0833728e8678bbf589ee81b96a7bab6d54c575e0e7bd9e24b6d80b4f22.png",
+    "soQid": 1,
+    "qids": [
+      "12-C4-B13-I-68"
+    ]
+  },
+  {
+    "i": 33,
+    "repeatLiteral": "–CO–(CH₂)₄–CO–NH–(CH₂)₆–NH–",
+    "backbone": [
+      "C(=O)",
+      "CH₂",
+      "CH₂",
+      "CH₂",
+      "CH₂",
+      "C(=O)",
+      "NH",
+      "CH₂",
+      "CH₂",
+      "CH₂",
+      "CH₂",
+      "CH₂",
+      "CH₂",
+      "NH"
+    ],
+    "branches": [
+      {
+        "site": 1,
+        "bond": "double",
+        "label": "O",
+        "direction": "up"
+      },
+      {
+        "site": 6,
+        "bond": "double",
+        "label": "O",
+        "direction": "down"
+      },
+      {
+        "site": 7,
+        "bond": "single",
+        "label": "H",
+        "direction": "up"
+      },
+      {
+        "site": 14,
+        "bond": "single",
+        "label": "H",
+        "direction": "down"
+      }
+    ],
+    "bracketStyle": "square",
+    "bracketSpan": "Ngoặc vuông trái trước carbonyl đầu, phải sau NH cuối; cả hai O carbonyl và hai H trên N đều trong ngoặc.",
+    "geometry": "Mạch xương ziczac: CO đầu tại đỉnh cao có =O lên; bốn CH₂ rồi CO ở đỉnh thấp có =O xuống; NH kế có H lên; sáu CH₂ rồi NH cuối có H xuống. Liên kết ngoài ngoặc chỉ là hai đoạn nối tiếp, không có endgroup.",
+    "subscriptPosition": "n ngoài góc phải-dưới của ngoặc vuông.",
+    "atomCountPerUnit": {
+      "C": 12,
+      "N": 2,
+      "O": 2
+    },
+    "stereo": "Không có.",
+    "trap": "Đếm đúng4CH₂ giữa2CO,6CH₂ giữa2N; không cắt thành diamine/diacid hữu hạn, không thêm OH/H ở hai đầu.",
+    "daMoNguonDayDu": true,
+    "caption": [],
+    "subscript": "n",
+    "duLieu": "nguon-da-doc-chua-soat-ban-ve",
+    "smiles": null,
+    "headGroupsShown": false,
+    "tailGroupsShown": false,
+    "outsideBonds": "Một đoạn liên kết đơn đi từ mép trái vào qua ngoặc đến nguyên tử đầu, một đoạn liên kết đơn từ nguyên tử cuối đi qua ngoặc phải ra mép phải. Không có nguyên tử/nhóm chấm dứt ngoài ngoặc.",
+    "hash": "06c60a8e7f0f0ad38ec85e732f715a1d24e92d7d6754a71c49bc37d8cee6816e",
+    "fileNguon": "anh/06c60a8e7f0f0ad38ec85e732f715a1d24e92d7d6754a71c49bc37d8cee6816e.png",
+    "soQid": 1,
+    "qids": [
+      "12-C4-B13-II-21"
+    ]
+  }
+]

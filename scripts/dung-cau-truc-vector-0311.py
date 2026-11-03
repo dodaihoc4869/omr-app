@@ -130,6 +130,7 @@ def build(source):
    if r.get('phongApp'):
     import importlib.util
     spec=importlib.util.spec_from_file_location('phong_vector',G/'scripts/phong-vector-0311.py');phong=importlib.util.module_from_spec(spec);spec.loader.exec_module(phong);o.fontFile=str(phong.PATH);r['font']='DDH Rounded';r['hashPhong']=phong.HASH
+   if r.get('methylTuongMinh'):o.explicitMethyl=True
    o.bondLineWidth=2.5;o.minFontSize=20;o.maxFontSize=30;o.padding=.12;o.legendFontSize=22;o.legendFraction=.15
    o.setLegendColour((8/255,127/255,142/255))
    legend='\n'.join(r.get('caption',[]))

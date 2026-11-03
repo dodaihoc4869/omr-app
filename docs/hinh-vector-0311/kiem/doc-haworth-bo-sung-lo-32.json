@@ -1,0 +1,39 @@
+[
+  {
+    "i": 788,
+    "hash": "92e68e75b91d69396f9b950c1e70a51cc81d03fa9c3c032b809ed3f24d8ffdf5",
+    "fileNguon": "anh/92e68e75b91d69396f9b950c1e70a51cc81d03fa9c3c032b809ed3f24d8ffdf5.png",
+    "nguoiDocNguon": "root",
+    "daMoNguonNative": true,
+    "panels": [
+      {
+        "ringSize": 6,
+        "use": "quyUoc6",
+        "branches": {
+          "C1": {
+            "up": "OH",
+            "down": "H"
+          },
+          "C2": {
+            "up": "OH",
+            "down": "H"
+          },
+          "C3": {
+            "up": "OH",
+            "down": "H"
+          },
+          "C4": {
+            "up": "H",
+            "down": "OH"
+          },
+          "C5": {
+            "up": "CH2OH",
+            "down": "H"
+          }
+        },
+        "caption": [],
+        "carbonNumbers": []
+      }
+    ]
+  }
+]

@@ -1,0 +1,351 @@
+[
+  {
+    "i": 484,
+    "hash": "59241650c9932b6ea197ff25428d3c3195f08502235ec2c27d3427c009f31a87",
+    "fileNguon": "anh/59241650c9932b6ea197ff25428d3c3195f08502235ec2c27d3427c009f31a87.png",
+    "nguoiDoc": "cau_truc_6",
+    "daMoPNGGocNative": true,
+    "chuaTrongManifest": true,
+    "kind": "graph",
+    "labels": [
+      "n",
+      "t",
+      "0",
+      "0,1"
+    ],
+    "axis": "Trục n dọc mũi tên lên, t ngang mũi tên phải; 0 ở góc trái dưới. Không có đơn vị hay tick thời gian.",
+    "curve": "Đường thẳng liền tăng từ gốc (x≈89,y≈208) đến góc (209,85), rồi đoạn ngang liền tới (289,85). Đường gióng ngang chấm từ trục n ở y≈85 đến góc gấp. Nhãn 0,1 bên trái trục tại y85.",
+    "caption": [],
+    "contexts": [
+      {
+        "qid": "12-C1-B1-D1-I-102",
+        "de": "Thực hiện phản ứng ester hoá sau: cho 0,1 mol alcohol tác dụng với 0,1 mol carboxylic acid, có mặt H₂SO₄ đặc làm xúc tác.\nĐồ thị nào sau đây biểu diễn sự thay đổi số mol (n) alcohol theo thời gian (t)?",
+        "where": "12-C1-B1-D1-I-102.hinh.1.du_lieu",
+        "ref": {
+          "where": "12-C1-B1-D1-I-102.hinh.1.du_lieu",
+          "hashDataUrl": "12f40986e956a75d31b5e10dd53f938a69bc2dce2af6de94334f2d56d4c7ac53",
+          "viTri": "sau_pa_B",
+          "truong": "hinh",
+          "congKhaiTruocNop": true
+        }
+      },
+      {
+        "qid": "DB-12-B1-P1-D2-I-12",
+        "de": "Thực hiện phản ứng ester hoá sau: cho 0,1 mol alcohol tác dụng với 0,1 mol carboxylic acid, có mặt H₂SO₄ đặc làm xúc tác.\nĐồ thị nào sau đây biểu diễn sự thay đổi số mol (n) alcohol theo thời gian (t)?",
+        "where": "DB-12-B1-P1-D2-I-12.hinh.1.du_lieu",
+        "ref": {
+          "where": "DB-12-B1-P1-D2-I-12.hinh.1.du_lieu",
+          "hashDataUrl": "12f40986e956a75d31b5e10dd53f938a69bc2dce2af6de94334f2d56d4c7ac53",
+          "viTri": "sau_pa_B",
+          "truong": "hinh",
+          "congKhaiTruocNop": true
+        }
+      }
+    ],
+    "nhanPDF": "Không có chữ A/B/C/D in trong ảnh; refs xác định nhãn phương án nằm ngoài ảnh. Giữ caption rỗng, không tự thêm nhãn vào SVG."
+  },
+  {
+    "i": 1286,
+    "hash": "e9e121ed2dcf14132f1ee7aa085d412b9cc961fffc001a0bbc6e16e1efc402c9",
+    "fileNguon": "anh/e9e121ed2dcf14132f1ee7aa085d412b9cc961fffc001a0bbc6e16e1efc402c9.png",
+    "nguoiDoc": "cau_truc_6",
+    "daMoPNGGocNative": true,
+    "chuaTrongManifest": true,
+    "kind": "graph",
+    "labels": [
+      "n",
+      "t",
+      "0",
+      "0,1"
+    ],
+    "axis": "n dọc mũi tên lên, t ngang mũi tên phải; gốc (83,181), nhãn0 dưới trái; 0,1 ở (30,64).",
+    "curve": "Đường liền bắt đầu trên trục n tại (83,65), cong giảm nhanh rồi giảm chậm, tiếp ngang ở y≈149 từ x≈162 tới≈278. Đường gióng chấm ngang từ trục n tới đoạn ngang, mức này dương và không ghi giá trị. Tuyệt đối không ghi 0 ở mức plateau hoặc suy số cân bằng.",
+    "caption": [],
+    "contexts": [
+      {
+        "qid": "12-C1-B1-D1-I-102",
+        "de": "Thực hiện phản ứng ester hoá sau: cho 0,1 mol alcohol tác dụng với 0,1 mol carboxylic acid, có mặt H₂SO₄ đặc làm xúc tác.\nĐồ thị nào sau đây biểu diễn sự thay đổi số mol (n) alcohol theo thời gian (t)?",
+        "where": "12-C1-B1-D1-I-102.hinh.2.du_lieu",
+        "ref": {
+          "where": "12-C1-B1-D1-I-102.hinh.2.du_lieu",
+          "hashDataUrl": "4e2f60fb84698a0a9265e7500cab6b212558253ab5ec5c597763ae434e806877",
+          "viTri": "sau_pa_C",
+          "truong": "hinh",
+          "congKhaiTruocNop": true
+        }
+      },
+      {
+        "qid": "DB-12-B1-P1-D2-I-12",
+        "de": "Thực hiện phản ứng ester hoá sau: cho 0,1 mol alcohol tác dụng với 0,1 mol carboxylic acid, có mặt H₂SO₄ đặc làm xúc tác.\nĐồ thị nào sau đây biểu diễn sự thay đổi số mol (n) alcohol theo thời gian (t)?",
+        "where": "DB-12-B1-P1-D2-I-12.hinh.2.du_lieu",
+        "ref": {
+          "where": "DB-12-B1-P1-D2-I-12.hinh.2.du_lieu",
+          "hashDataUrl": "4e2f60fb84698a0a9265e7500cab6b212558253ab5ec5c597763ae434e806877",
+          "viTri": "sau_pa_C",
+          "truong": "hinh",
+          "congKhaiTruocNop": true
+        }
+      }
+    ],
+    "nhanPDF": "Không có chữ A/B/C/D in trong ảnh; refs xác định nhãn phương án nằm ngoài ảnh. Giữ caption rỗng, không tự thêm nhãn vào SVG."
+  },
+  {
+    "i": 353,
+    "hash": "3e730acbcb2c4c164026c4253cfaee7089005e16ee7dc3ea54c5af3b59048bea",
+    "fileNguon": "anh/3e730acbcb2c4c164026c4253cfaee7089005e16ee7dc3ea54c5af3b59048bea.png",
+    "nguoiDoc": "cau_truc_6",
+    "daMoPNGGocNative": true,
+    "chuaTrongManifest": true,
+    "kind": "graph",
+    "labels": [
+      "n",
+      "t",
+      "0",
+      "0,1"
+    ],
+    "axis": "n dọc lên, t ngang phải; gốc (85,180); nhãn0 dưới trái; nhãn0,1 ở y≈68.",
+    "curve": "Đường liền từ (85,73) cong giảm tới chạm trục t khoảng (183,180), rồi trùng trục ngang. Mức cuối bằng0, khác1286 plateau dương. Không thêm đường gióng hoặc số thời gian.",
+    "noise": "Có gạch nhỏ rời ở dưới vùng trục khoảng x205,y208; không phải nhãn số/chữ, cần xem là nhiễu scan nếu làm sạch.",
+    "caption": [],
+    "contexts": [
+      {
+        "qid": "12-C1-B1-D1-I-102",
+        "de": "Thực hiện phản ứng ester hoá sau: cho 0,1 mol alcohol tác dụng với 0,1 mol carboxylic acid, có mặt H₂SO₄ đặc làm xúc tác.\nĐồ thị nào sau đây biểu diễn sự thay đổi số mol (n) alcohol theo thời gian (t)?",
+        "where": "12-C1-B1-D1-I-102.hinh.3.du_lieu",
+        "ref": {
+          "where": "12-C1-B1-D1-I-102.hinh.3.du_lieu",
+          "hashDataUrl": "aad07fcbd7f02723c830b995b76d061dc337b3a94bcd4b34f5212afe9b5cbafd",
+          "viTri": "sau_pa_D",
+          "truong": "hinh",
+          "congKhaiTruocNop": true
+        }
+      },
+      {
+        "qid": "DB-12-B1-P1-D2-I-12",
+        "de": "Thực hiện phản ứng ester hoá sau: cho 0,1 mol alcohol tác dụng với 0,1 mol carboxylic acid, có mặt H₂SO₄ đặc làm xúc tác.\nĐồ thị nào sau đây biểu diễn sự thay đổi số mol (n) alcohol theo thời gian (t)?",
+        "where": "DB-12-B1-P1-D2-I-12.hinh.3.du_lieu",
+        "ref": {
+          "where": "DB-12-B1-P1-D2-I-12.hinh.3.du_lieu",
+          "hashDataUrl": "aad07fcbd7f02723c830b995b76d061dc337b3a94bcd4b34f5212afe9b5cbafd",
+          "viTri": "sau_pa_D",
+          "truong": "hinh",
+          "congKhaiTruocNop": true
+        }
+      }
+    ],
+    "nhanPDF": "Không có chữ A/B/C/D in trong ảnh; refs xác định nhãn phương án nằm ngoài ảnh. Giữ caption rỗng, không tự thêm nhãn vào SVG."
+  },
+  {
+    "i": 277,
+    "hash": "2ee969371c8ed8c022c2c97a70b64bf1a6b38d1817f60632d3eec14da28d7c35",
+    "fileNguon": "anh/2ee969371c8ed8c022c2c97a70b64bf1a6b38d1817f60632d3eec14da28d7c35.png",
+    "nguoiDoc": "cau_truc_6",
+    "daMoPNGGocNative": true,
+    "chuaTrongManifest": true,
+    "kind": "literal-bond",
+    "labels": [
+      "HO",
+      "HO",
+      "S",
+      "O",
+      "O"
+    ],
+    "nodes": [
+      {
+        "text": "S",
+        "position": "giữa"
+      },
+      {
+        "text": "HO",
+        "position": "trên trái"
+      },
+      {
+        "text": "HO",
+        "position": "dưới trái"
+      },
+      {
+        "text": "O",
+        "position": "trên phải"
+      },
+      {
+        "text": "O",
+        "position": "dưới phải"
+      }
+    ],
+    "bonds": [
+      {
+        "from": "HO trên trái",
+        "to": "S",
+        "type": "single normal"
+      },
+      {
+        "from": "HO dưới trái",
+        "to": "S",
+        "type": "single normal"
+      },
+      {
+        "from": "S",
+        "to": "O trên phải",
+        "type": "arrow S→O, mũi tên chéo lên phải"
+      },
+      {
+        "from": "S",
+        "to": "O dưới phải",
+        "type": "arrow S→O, mũi tên chéo xuống phải"
+      }
+    ],
+    "charges": [],
+    "caption": [],
+    "notes": "Không tự đổi hai mũi tên thành liên kết đôi, không thêm điện tích hay chấm electron.",
+    "contexts": [
+      {
+        "qid": "DB-11-B8-D1-I-26",
+        "de": "Biểu diễn công thức cấu tạo của H₂SO₄ nào sau đây tuân theo quy tắc octet?",
+        "where": "DB-11-B8-D1-I-26.hinh.0.du_lieu",
+        "ref": {
+          "where": "DB-11-B8-D1-I-26.hinh.0.du_lieu",
+          "hashDataUrl": "331c48a1d15b093aaa8ac7cc1621ab95b62805d00874f1e884df5feb7883917c",
+          "viTri": "sau_pa_A",
+          "truong": "hinh",
+          "congKhaiTruocNop": true
+        }
+      },
+      {
+        "qid": "DH-11-C2-B8-I-2",
+        "de": "Biểu diễn công thức cấu tạo của H₂SO₄ nào sau đây tuân theo quy tắc octet?",
+        "where": "DH-11-C2-B8-I-2.hinh.0.du_lieu",
+        "ref": {
+          "where": "DH-11-C2-B8-I-2.hinh.0.du_lieu",
+          "hashDataUrl": "331c48a1d15b093aaa8ac7cc1621ab95b62805d00874f1e884df5feb7883917c",
+          "viTri": "sau_pa_A",
+          "truong": "hinh",
+          "congKhaiTruocNop": true
+        }
+      }
+    ],
+    "nhanPDF": "Không có chữ A/B/C/D in trong ảnh; refs xác định nhãn phương án nằm ngoài ảnh. Giữ caption rỗng, không tự thêm nhãn vào SVG."
+  },
+  {
+    "i": 1285,
+    "hash": "e9066088a69abc7b458c2f6ad9432e0b581c57ac0e8b8d8f7966aab5a9766b0c",
+    "fileNguon": "anh/e9066088a69abc7b458c2f6ad9432e0b581c57ac0e8b8d8f7966aab5a9766b0c.png",
+    "nguoiDoc": "cau_truc_6",
+    "daMoPNGGocNative": true,
+    "chuaTrongManifest": true,
+    "kind": "literal-bond",
+    "labels": [
+      "HO",
+      "HO",
+      "S",
+      "O",
+      "O"
+    ],
+    "nodes": [
+      {
+        "text": "S",
+        "position": "giữa"
+      },
+      {
+        "text": "HO",
+        "position": "trên trái"
+      },
+      {
+        "text": "HO",
+        "position": "dưới trái"
+      },
+      {
+        "text": "O",
+        "position": "trên phải"
+      },
+      {
+        "text": "O",
+        "position": "dưới phải"
+      }
+    ],
+    "bonds": [
+      {
+        "from": "HO trên trái",
+        "to": "S",
+        "type": "single normal"
+      },
+      {
+        "from": "HO dưới trái",
+        "to": "S",
+        "type": "single normal"
+      },
+      {
+        "from": "S",
+        "to": "O trên phải",
+        "type": "single normal, KHÔNG mũi tên"
+      },
+      {
+        "from": "S",
+        "to": "O dưới phải",
+        "type": "single normal, KHÔNG mũi tên"
+      }
+    ],
+    "charges": [],
+    "caption": [],
+    "notes": "Giữ đúng phương án bốn liên kết đơn dù tên/thân câu gợi công thức khác; không tự sửa hóa trị/đáp án.",
+    "contexts": [
+      {
+        "qid": "DB-11-B8-D1-I-26",
+        "de": "Biểu diễn công thức cấu tạo của H₂SO₄ nào sau đây tuân theo quy tắc octet?",
+        "where": "DB-11-B8-D1-I-26.hinh.3.du_lieu",
+        "ref": {
+          "where": "DB-11-B8-D1-I-26.hinh.3.du_lieu",
+          "hashDataUrl": "c99cc60ca1e2969770354979c1ca49587997c7ceabc10c646dd2194b03750957",
+          "viTri": "sau_pa_D",
+          "truong": "hinh",
+          "congKhaiTruocNop": true
+        }
+      },
+      {
+        "qid": "DH-11-C2-B8-I-2",
+        "de": "Biểu diễn công thức cấu tạo của H₂SO₄ nào sau đây tuân theo quy tắc octet?",
+        "where": "DH-11-C2-B8-I-2.hinh.3.du_lieu",
+        "ref": {
+          "where": "DH-11-C2-B8-I-2.hinh.3.du_lieu",
+          "hashDataUrl": "c99cc60ca1e2969770354979c1ca49587997c7ceabc10c646dd2194b03750957",
+          "viTri": "sau_pa_D",
+          "truong": "hinh",
+          "congKhaiTruocNop": true
+        }
+      }
+    ],
+    "nhanPDF": "Không có chữ A/B/C/D in trong ảnh; refs xác định nhãn phương án nằm ngoài ảnh. Giữ caption rỗng, không tự thêm nhãn vào SVG."
+  },
+  {
+    "i": 893,
+    "hash": "a3b8c45ec87b53faf5fb6c116a6a6c2e36809c565e6a203db392bfa6eacfb9c1",
+    "fileNguon": "anh/a3b8c45ec87b53faf5fb6c116a6a6c2e36809c565e6a203db392bfa6eacfb9c1.png",
+    "nguoiDoc": "cau_truc_6",
+    "daMoPNGGocNative": true,
+    "chuaTrongManifest": true,
+    "kind": "structure",
+    "smiles": "CC([NH3+])C(=O)[O-]",
+    "literal": "CH3–CH(NH3+)–COO−",
+    "sourceGeometry": "Carbon alpha tại giữa, nhánh methyl một nét chéo lên trái, COO− một nét chéo lên phải, NH3+ một nét thẳng xuống. Không có nêm/dash, không CIP.",
+    "labels": [
+      "COO−",
+      "NH3+"
+    ],
+    "caption": [],
+    "notes": "COO− âm một, NH3+ dương một; H alpha và methyl ẩn dạng đầu mút, không thêm N–H riêng ngoài NH3.",
+    "contexts": [
+      {
+        "qid": "12-C3-B10-D2-I-3",
+        "de": "Cơ thể người mã hoá được loại amino acid nào sau đây trong tổng hợp protein cho cơ thể?",
+        "where": "12-C3-B10-D2-I-3.hinh.1.du_lieu",
+        "ref": {
+          "where": "12-C3-B10-D2-I-3.hinh.1.du_lieu",
+          "hashDataUrl": "e001b482ef5819dc79ec281154010e562dad81722917a3c3da0c5a8c87afd69b",
+          "viTri": "sau_pa_B",
+          "truong": "hinh",
+          "congKhaiTruocNop": true
+        }
+      }
+    ],
+    "nhanPDF": "Không có chữ A/B/C/D in trong ảnh; refs xác định nhãn phương án nằm ngoài ảnh. Giữ caption rỗng, không tự thêm nhãn vào SVG."
+  }
+]

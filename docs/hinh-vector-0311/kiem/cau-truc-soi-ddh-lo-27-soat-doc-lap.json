@@ -1,0 +1,18 @@
+[
+  {
+    "i": 704,
+    "hashSvg": "d1a88ece6af784f7df5ccb98c86c45ab87ec5a72bae6cdf7d3b42a432f1fb527",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở nguồn+render thật; đúng5côngthức và17/21/32/48/65,ticks0/20/40/60/80,4cạnhkhung,không title/legend; DDH/chỉsố rõ, không chạm/cắt/tràn.",
+    "hash": "831d51e3deec870a02f7ebb5f1f2197152fa2cb7e9ebf86e86c5df24be45148f",
+    "hashSvgDaSoat": "d1a88ece6af784f7df5ccb98c86c45ab87ec5a72bae6cdf7d3b42a432f1fb527"
+  },
+  {
+    "i": 1418,
+    "hashSvg": "336822a4f0dc929e4ff0b8a883ed0593e9187ec337e83e710cc54e91e731f929",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: mở lại nguồn và render SVG bản sửa; nhãn48 nằm trong cột, không xóa biên. Đúng title,5formula/chỉ số/hyphen,mass59/60/59/59/60,temp3/8/37/48/97,2trục độc lập trái20..80/phải0..100,cột chấm/nét đứt+tam giác,đủlegend. Chữ DDH path-only không chạm/cắt/tràn; SHA256 khớp.",
+    "hash": "fee3331808c1dd3d6716875f512933b96ffaf52bec69405d17df9d7fd760574c",
+    "hashSvgDaSoat": "336822a4f0dc929e4ff0b8a883ed0593e9187ec337e83e710cc54e91e731f929"
+  }
+]

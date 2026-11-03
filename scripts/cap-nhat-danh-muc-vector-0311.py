@@ -27,12 +27,20 @@ for file in M.glob('cau-truc-*-ban-dung.json'):
     alternatives.setdefault(r['hash'],[]).append({'tep':r['svg'],'hashSvg':r['hashSvgDaSoat']});continue
   add(r['hash'],r['svg'],'cau-truc-da-soat-doc-lap',r['hashSvgDaSoat'])
   if r.get('font'):mapping[r['hash']]['font']=r['font']
+# Mẫu Ni cũ thiếu dây V–Pt: giữ lịch sử, tuyệt đối không coi là bản thay thế đạt.
+rejected={}
+for h, rows in list(alternatives.items()):
+ bad=[v for v in rows if v['hashSvg']=='42684c33088fbcdb2659ecbd9a769c8fefab06139e43d9ad8ffa1d1461279dfc']
+ if bad:
+  rejected[h]=[dict(v,lyDo='Soát lại lô18 phát hiện thiếu dây V–Pt; bản DDH đang chọn đã sửa và soát độc lập.')for v in bad]
+  alternatives[h]=[v for v in rows if v not in bad]
+  if not alternatives[h]:del alternatives[h]
 qs=[];full=[];partial=[]
 for q in SRC['questions']:
  matched=[dict(h,vector=mapping[h['hash']]['tep'])for h in q['hinh']if h['hash']in mapping]
  if not matched:continue
  done=len(matched)==len(q['hinh']);qs.append({'qid':q['qid'],'duMoiHinh':done,'soHinhNguon':len(q['hinh']),'soHinhDaKiem':len(matched),'hinh':matched})
  (full if done else partial).append(q['qid'])
-manifest={'ghiChu':'Tài sản đã đối chiếu để chuẩn bị tích hợp; CHƯA được app dùng, CHƯA phát hành, không có đáp án. Câu chỉ được tính xong khi đủ mọi hình nguồn.','theoHashNguon':mapping,'theoCau':qs,'cauDuMoiHinh':full,'cauMoiXongMotPhan':partial,'bienTheKhacDaSoat':alternatives}
+manifest={'ghiChu':'Tài sản đã đối chiếu để chuẩn bị tích hợp; CHƯA được app dùng, CHƯA phát hành, không có đáp án. Câu chỉ được tính xong khi đủ mọi hình nguồn.','theoHashNguon':mapping,'theoCau':qs,'cauDuMoiHinh':full,'cauMoiXongMotPhan':partial,'bienTheKhacDaSoat':alternatives,'bienTheBiLoaiSauSoatLai':rejected}
 (M/'danh-muc-da-kiem.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
 p=P/'tien-do.json';d=json.loads(p.read_text());unique={a['tep']:a for a in mapping.values()};d['tongDaDoiChieu']={'soAnhNguon':len(mapping),'soSvgRieng':len(unique),'soCauDungHinh':len(qs),'soCauDuMoiHinh':len(full),'soCauMoiXongMotPhan':len(partial),'byteSvg':sum(a['byteSvg']for a in unique.values()),'byteGzip':sum(a['byteGzip']for a in unique.values()),'soAnhNguonConLai':SRC['soAnhRieng']-len(mapping),'daTichHop':False};d['cachDem']='soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.';d['daDatPhongApp']={'soNguon':sum(v.get('font')=='DDH Rounded'for v in mapping.values()),'soCauDuHinhVaPhong':sum(all(h['hash']in mapping and mapping[h['hash']].get('font')=='DDH Rounded'for h in q['hinh'])for q in SRC['questions']if q['hinh']),'ghiChu':'Các số tổngDaDoiChieu vẫn mô tả nội dung đã kiểm; bản cũ chưa đổi phông không được coi đạt yêu cầu phông mới.'};p.write_text(json.dumps(d,ensure_ascii=False,indent=2));print(json.dumps(d['tongDaDoiChieu'],ensure_ascii=False))

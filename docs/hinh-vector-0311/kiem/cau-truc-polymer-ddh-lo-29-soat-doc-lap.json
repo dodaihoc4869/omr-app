@@ -1,0 +1,42 @@
+[
+  {
+    "i": 162,
+    "hashSvg": "2a7747c6e361d6d477f0a8f3e5a4d2dd870c1a64c6ddc5bdb530f4a968c3fee4",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; CH2–CH(CH3), ngoặc tròn ôm nhánh CH3. nngoài ngoặc phải,2đoạn bond xuyên ngoặc đúng; không thêm endgroup/stereo/tên. Chữ DDH path-only, bond nhánh đínhC, không chạm/cắt/tràn. SHA256 khớp.",
+    "hash": "1bdc3d61588eacf650f495e66cf25075a39d9fe16386274476c81a38fc6c5fb7",
+    "hashSvgDaSoat": "2a7747c6e361d6d477f0a8f3e5a4d2dd870c1a64c6ddc5bdb530f4a968c3fee4"
+  },
+  {
+    "i": 1211,
+    "hashSvg": "595a75dc2c7474672551c369dfe0d5bdf23b6959e00a5933ec868cd1d79449fa",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; CH(CH3)–CH(CH3), giữ2nhánh CH3 và ngoặc tròn ngắn. nngoài ngoặc phải,2đoạn bond xuyên ngoặc đúng; không thêm endgroup/stereo/tên. Chữ DDH path-only, bond nhánh đínhC, không chạm/cắt/tràn. SHA256 khớp.",
+    "hash": "db5a757f65264cc3f209ddf16a96d6aa6016b31cdc3557be33666bf1d638d5e0",
+    "hashSvgDaSoat": "595a75dc2c7474672551c369dfe0d5bdf23b6959e00a5933ec868cd1d79449fa"
+  },
+  {
+    "i": 1045,
+    "hashSvg": "7f761f0a47b5eb261d7aac4bf39c37409cbdf057b4b93c7fdfc9ed958f3c3901",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; HN–5CH2–CO inline đúng nguồn. nngoài ngoặc phải,2đoạn bond xuyên ngoặc đúng; không thêm endgroup/stereo/tên. Chữ DDH path-only, bond nhánh đínhC, không chạm/cắt/tràn. SHA256 khớp.",
+    "hash": "bbf3cdb15d67de92dc3ebe5a2e679f3b8e5e57548d1886c0694e93c760828424",
+    "hashSvgDaSoat": "7f761f0a47b5eb261d7aac4bf39c37409cbdf057b4b93c7fdfc9ed958f3c3901"
+  },
+  {
+    "i": 887,
+    "hashSvg": "c0a475673fed93626b5ea181f87582e587e7108db25cd95f6799c5ff89b9dd6a",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; CH2–CH(CH2CH3), nhánh ethyl đủ2C, bond gắn Cđầu nhánh, ngoặc ngắn. nngoài ngoặc phải,2đoạn bond xuyên ngoặc đúng; không thêm endgroup/stereo/tên. Chữ DDH path-only, bond nhánh đínhC, không chạm/cắt/tràn. SHA256 khớp.",
+    "hash": "a29cb6ad47997be7141d8ffee217ce6440278d82578ad9f7ccb117dae44f828b",
+    "hashSvgDaSoat": "c0a475673fed93626b5ea181f87582e587e7108db25cd95f6799c5ff89b9dd6a"
+  },
+  {
+    "i": 823,
+    "hashSvg": "7f761f0a47b5eb261d7aac4bf39c37409cbdf057b4b93c7fdfc9ed958f3c3901",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật; HN–5CH2–CO inline đúng nguồn. nngoài ngoặc phải,2đoạn bond xuyên ngoặc đúng; không thêm endgroup/stereo/tên. Chữ DDH path-only, bond nhánh đínhC, không chạm/cắt/tràn. SHA256 khớp.",
+    "hash": "9872953bd37460fdf3828fe9a7e4449d1db9eb0ecc39b37796c71290d0d9fd94",
+    "hashSvgDaSoat": "7f761f0a47b5eb261d7aac4bf39c37409cbdf057b4b93c7fdfc9ed958f3c3901"
+  }
+]

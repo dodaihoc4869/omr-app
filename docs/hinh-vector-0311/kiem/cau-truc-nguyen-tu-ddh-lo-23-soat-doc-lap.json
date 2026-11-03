@@ -1,0 +1,26 @@
+[
+  {
+    "i": 949,
+    "hashSvg": "66e18baf05c3cd4658c1c4ffe8c885284702b98d6fbd3e876293684540e7c21c",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: đã mở riêng nguồn PNG và PNG tự render SVG, SHA256 khớp. Hai ellipse/lớp có 2 electron trong và 5 electron ngoài, giữ vị trí tương ứng; nhãn +7 DDH đúng. Không thêm dấu âm/tên nguyên tố/mũi tên, không chạm/cắt/tràn ngoài các dot nằm trên vòng như nguồn.",
+    "hash": "abb13cc13557d21fc9220dbd84e6eeb06c26e87e12f6a699848f32b2a8d32970",
+    "hashSvgDaSoat": "66e18baf05c3cd4658c1c4ffe8c885284702b98d6fbd3e876293684540e7c21c"
+  },
+  {
+    "i": 1368,
+    "hashSvg": "2decfa921639f32abd4e8bb589cebc8c07f563f7cb7b8e6f3390f6afce72490a",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: đã mở lại nguồn PNG và PNG tự render revision mới sau sửa ellipse ngoài cx210/cy198/rx135/ry132; SHA256 khớp. Đúng ba lớp 2–8–2 electron, vị trí dot và nhãn +12 nguồn được giữ; không thêm K/L/M, tên nguyên tố, dấu âm hay mũi tên. Chữ DDH thành path, không fallback/chạm/cắt/tràn. Không dùng hash revision cũ.",
+    "hash": "f7334aabb6af142657757ea187ea631ef575c9c5b1c6c0acdce50979636b1994",
+    "hashSvgDaSoat": "2decfa921639f32abd4e8bb589cebc8c07f563f7cb7b8e6f3390f6afce72490a"
+  },
+  {
+    "i": 415,
+    "hashSvg": "1e02356d541eef05973c6bdd7667cf644fbd2ad75af1271d1f1c7293c13f100f",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: đã mở riêng PNG nguồn và PNG tự render SVG, SHA256 khớp. Một quỹ đạo với hai electron xanh đúng vị trí; hạt nhân giữ hai hạt cam mỗi hạt có dấu + DDH và hai hạt vàng không dấu, đúng bố cục che lớp nguồn. Không thêm tên hạt/số khối/điện tích tổng/dấu âm/mũi tên; không chữ chạm/cắt/tràn.",
+    "hash": "4a29d03d6b5b62d291d30a3818d77a0855d9bef147faeb55802ef6831e25e9d6",
+    "hashSvgDaSoat": "1e02356d541eef05973c6bdd7667cf644fbd2ad75af1271d1f1c7293c13f100f"
+  }
+]

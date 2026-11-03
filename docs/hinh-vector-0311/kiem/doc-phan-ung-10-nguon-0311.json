@@ -1,0 +1,431 @@
+[
+  {
+    "i": 18,
+    "hash": "030e148eda77181fe8c1e06a67591cd9eeb5c4dbb0cd5bd1daa2d2c315ed9c5e",
+    "fileNguon": "anh/030e148eda77181fe8c1e06a67591cd9eeb5c4dbb0cd5bd1daa2d2c315ed9c5e.png",
+    "soRefs": 2,
+    "kieu": "chuoi",
+    "nodes": [
+      {
+        "text": "C6H6"
+      },
+      {
+        "text": "C6H5NO2"
+      },
+      {
+        "text": "C6H5NH2"
+      }
+    ],
+    "arrows": [
+      {
+        "from": 0,
+        "to": 1,
+        "kind": "→",
+        "above": "+HNO3",
+        "below": "H2SO4, t°"
+      },
+      {
+        "from": 1,
+        "to": 2,
+        "kind": "→",
+        "above": "+6H, t°",
+        "below": "Fe+HCl"
+      }
+    ],
+    "notes": "Giữ +6H đúng nguồn, không tự thay thành 3H2 hoặc thêm 2H2O. H2SO4 không có chữ 'đặc' trong hình này.",
+    "gioiHan": "Đã mở PNG nguồn đầy đủ; chỉ ghi nội dung hình. Nguồn không ghi trạng thái (s)/(l)/(g)/(aq), không tự thêm trạng thái hoặc cân bằng/bổ sung sản phẩm.",
+    "trangThai": "da-doc-nguon-chua-dung-chua-soat-ban-ve"
+  },
+  {
+    "i": 101,
+    "hash": "13bf4d0cad1e75ab4ef58f8ca6f78ee8b6aa4404c5b637ca658d21cd0115c4fe",
+    "fileNguon": "anh/13bf4d0cad1e75ab4ef58f8ca6f78ee8b6aa4404c5b637ca658d21cd0115c4fe.png",
+    "soRefs": 2,
+    "kieu": "chuoi",
+    "nodes": [
+      {
+        "kieu": "cau-truc",
+        "smiles": "*c1ccccc1",
+        "dummyLabel": "R",
+        "vongTron": true,
+        "caption": []
+      },
+      {
+        "kieu": "cau-truc",
+        "smiles": "*c1ccc(S(=O)(=O)O)cc1",
+        "dummyLabel": "R",
+        "vongTron": true,
+        "nhomThuGonNguon": "SO3H",
+        "caption": []
+      },
+      {
+        "kieu": "cau-truc",
+        "smiles": "*c1ccc(S(=O)(=O)[O-])cc1.[Na+]",
+        "dummyLabel": "R",
+        "vongTron": true,
+        "nhomThuGonNguon": "SO3Na",
+        "caption": []
+      }
+    ],
+    "arrows": [
+      {
+        "from": 0,
+        "to": 1,
+        "kind": "→",
+        "above": "H2SO4 đặc",
+        "below": "t°"
+      },
+      {
+        "from": 1,
+        "to": 2,
+        "kind": "→",
+        "above": "X",
+        "below": ""
+      }
+    ],
+    "notes": "Ba vòng thơm đều là vòng tròn; R và SO3H/SO3Na đối nhau (para). X là ẩn số NGUYÊN VĂN, không thay bằng tên thuốc thử/đáp án. Dấu * trong SMILES chỉ placeholder R, không được hiện thành *.",
+    "gioiHan": "Đã mở PNG nguồn đầy đủ; chỉ ghi nội dung hình. Nguồn không ghi trạng thái (s)/(l)/(g)/(aq), không tự thêm trạng thái hoặc cân bằng/bổ sung sản phẩm.",
+    "trangThai": "da-doc-nguon-chua-dung-chua-soat-ban-ve"
+  },
+  {
+    "i": 176,
+    "hash": "1e4c07809750802525d6d91583a40f7ea072e611dec648e2c579f1a799d93021",
+    "fileNguon": "anh/1e4c07809750802525d6d91583a40f7ea072e611dec648e2c579f1a799d93021.png",
+    "soRefs": 2,
+    "kieu": "phan-ung",
+    "left": [
+      {
+        "kieu": "cau-truc",
+        "smiles": "CC(=O)Oc1ccccc1C(=O)O",
+        "vongTron": true,
+        "nhomThuGonNguon": "OOCCH3; COOH ở hai vị trí ortho",
+        "caption": [
+          "Aspirin"
+        ]
+      },
+      {
+        "text": "H2O"
+      }
+    ],
+    "right": [
+      {
+        "kieu": "cau-truc",
+        "smiles": "O=C(O)c1ccccc1O",
+        "vongTron": true,
+        "nhomThuGonNguon": "OH và COOH ở ortho",
+        "caption": [
+          "Salicylic acid"
+        ]
+      },
+      {
+        "text": "CH3COOH"
+      }
+    ],
+    "arrow": {
+      "kind": "⇌",
+      "above": "H+, t°",
+      "below": ""
+    },
+    "plusLeft": true,
+    "plusRight": true,
+    "notes": "Hai vòng thơm giữ vòng tròn. Nhãn gốc OOCCH3 và COOH ở ortho; OOCCH3 là cách ghi nhóm acetoxy nguồn, không dịch thành liên kết peroxide O–O. Nguồn có cả H+ và t°, không bỏ t°. Hệ số đều 1 nhưng nguồn không in số1.",
+    "gioiHan": "Đã mở PNG nguồn đầy đủ; chỉ ghi nội dung hình. Nguồn không ghi trạng thái (s)/(l)/(g)/(aq), không tự thêm trạng thái hoặc cân bằng/bổ sung sản phẩm.",
+    "trangThai": "da-doc-nguon-chua-dung-chua-soat-ban-ve"
+  },
+  {
+    "i": 202,
+    "hash": "2244842bb9174b43a2ff8dc140b04a2c7338208fbf94475f0ae57b681cec5097",
+    "fileNguon": "anh/2244842bb9174b43a2ff8dc140b04a2c7338208fbf94475f0ae57b681cec5097.png",
+    "soRefs": 2,
+    "kieu": "phan-ung",
+    "left": [
+      {
+        "kieu": "cau-truc",
+        "smiles": "CC(=O)Oc1ccccc1C(=O)O",
+        "vongTron": false,
+        "nhomThuGonNguon": "OOCCH3; COOH ở hai vị trí ortho",
+        "caption": []
+      },
+      {
+        "text": "H2O"
+      }
+    ],
+    "right": [
+      {
+        "kieu": "cau-truc",
+        "smiles": "O=C(O)c1ccccc1O",
+        "vongTron": false,
+        "nhomThuGonNguon": "OH và COOH ở ortho",
+        "caption": []
+      },
+      {
+        "text": "CH3COOH"
+      }
+    ],
+    "arrow": {
+      "kind": "⇌",
+      "above": "H+",
+      "below": ""
+    },
+    "plusLeft": true,
+    "plusRight": true,
+    "notes": "Vòng thơm có ba liên kết đôi, không vòng tròn; không caption tên chất. Nguồn chỉ H+, KHÔNG có t°, không dùng chung asset176 có t°/caption/circle.",
+    "gioiHan": "Đã mở PNG nguồn đầy đủ; chỉ ghi nội dung hình. Nguồn không ghi trạng thái (s)/(l)/(g)/(aq), không tự thêm trạng thái hoặc cân bằng/bổ sung sản phẩm.",
+    "trangThai": "da-doc-nguon-chua-dung-chua-soat-ban-ve"
+  },
+  {
+    "i": 211,
+    "hash": "23764464098ba10c9a74b47d5ba441adc22d1d676f47bddeedc73db1ba8ce2af",
+    "fileNguon": "anh/23764464098ba10c9a74b47d5ba441adc22d1d676f47bddeedc73db1ba8ce2af.png",
+    "soRefs": 2,
+    "kieu": "phan-ung",
+    "left": [
+      {
+        "kieu": "cau-truc",
+        "smiles": "CC(=O)Oc1ccccc1C(=O)O",
+        "vongTron": false,
+        "nhomThuGonNguon": "OOCCH3; COOH ở hai vị trí ortho",
+        "caption": []
+      },
+      {
+        "text": "H2O"
+      }
+    ],
+    "right": [
+      {
+        "kieu": "cau-truc",
+        "smiles": "O=C(O)c1ccccc1O",
+        "vongTron": false,
+        "nhomThuGonNguon": "OH và COOH ở ortho",
+        "caption": []
+      },
+      {
+        "text": "CH3COOH"
+      }
+    ],
+    "arrow": {
+      "kind": "⇌",
+      "above": "H+",
+      "below": ""
+    },
+    "plusLeft": true,
+    "plusRight": true,
+    "notes": "Cùng nội dung202 sau mở từng nguồn: vòng ba nối đôi, không caption, chỉ H+; có thể dùng lại hình vector202 sau soát alias riêng.",
+    "gioiHan": "Đã mở PNG nguồn đầy đủ; chỉ ghi nội dung hình. Nguồn không ghi trạng thái (s)/(l)/(g)/(aq), không tự thêm trạng thái hoặc cân bằng/bổ sung sản phẩm.",
+    "trangThai": "da-doc-nguon-chua-dung-chua-soat-ban-ve"
+  },
+  {
+    "i": 55,
+    "hash": "0b13ec2c25674b87dd20990b9893762640cf28c23c0dad6ead169a56f2e44e28",
+    "fileNguon": "anh/0b13ec2c25674b87dd20990b9893762640cf28c23c0dad6ead169a56f2e44e28.png",
+    "soRefs": 1,
+    "kieu": "phan-ung",
+    "left": [
+      {
+        "kieu": "cau-truc-chu",
+        "text": "CH3–C(=O)–OH",
+        "smiles": "CC(=O)O",
+        "caption": []
+      },
+      {
+        "text": "CH3CH2OH",
+        "smiles": "CCO"
+      }
+    ],
+    "right": [
+      {
+        "kieu": "cau-truc-chu",
+        "text": "CH3–C(=O)–O–CH2CH3",
+        "smiles": "CC(=O)OCC",
+        "caption": []
+      },
+      {
+        "text": "H2O"
+      }
+    ],
+    "arrow": {
+      "kind": "⇌",
+      "above": "H2SO4 đặc, t°",
+      "below": ""
+    },
+    "plusLeft": true,
+    "plusRight": true,
+    "notes": "Hai carbonyl C=O dựng dọc như nguồn, C tường minh; không thêm tên Acetic acid/Ethanol vì hình không ghi tên.",
+    "gioiHan": "Đã mở PNG nguồn đầy đủ; chỉ ghi nội dung hình. Nguồn không ghi trạng thái (s)/(l)/(g)/(aq), không tự thêm trạng thái hoặc cân bằng/bổ sung sản phẩm.",
+    "trangThai": "da-doc-nguon-chua-dung-chua-soat-ban-ve"
+  },
+  {
+    "i": 78,
+    "hash": "1004f947949f843da9d08022c2033484e471b6e2f7edc7b5bdac08277662805f",
+    "fileNguon": "anh/1004f947949f843da9d08022c2033484e471b6e2f7edc7b5bdac08277662805f.png",
+    "soRefs": 1,
+    "kieu": "chuoi",
+    "nodes": [
+      {
+        "text": "R–CH2–CH2–R"
+      },
+      {
+        "text": "2RCOOH"
+      },
+      {
+        "text": "2RCOONa (sodium stearate)"
+      }
+    ],
+    "arrows": [
+      {
+        "from": 0,
+        "to": 1,
+        "kind": "→",
+        "above": "+O2, xt",
+        "below": "−H2O",
+        "stepLabel": "(1)"
+      },
+      {
+        "from": 1,
+        "to": 2,
+        "kind": "→",
+        "above": "+NaOH",
+        "below": "−H2O",
+        "stepLabel": "(2)"
+      }
+    ],
+    "notes": "R hai đầu giống nhau, không R'. Giữ hệ số2 ở acid và muối, caption(sodium stearate) và số bước nguồn; không tự gán R hoặc sửa tên caption. Dấu trừ H2O nằm dưới mũi tên, không phải một node sản phẩm có dấu cộng. Mép trên có nét dư bị cắt không thuộc dòng sơ đồ.",
+    "gioiHan": "Đã mở PNG nguồn đầy đủ; chỉ ghi nội dung hình. Nguồn không ghi trạng thái (s)/(l)/(g)/(aq), không tự thêm trạng thái hoặc cân bằng/bổ sung sản phẩm.",
+    "trangThai": "da-doc-nguon-chua-dung-chua-soat-ban-ve"
+  },
+  {
+    "i": 141,
+    "hash": "1907b3ca18d038df6af92575879dd5d9989ff81027648aaf78b78934c0b18ce9",
+    "fileNguon": "anh/1907b3ca18d038df6af92575879dd5d9989ff81027648aaf78b78934c0b18ce9.png",
+    "soRefs": 1,
+    "kieu": "chuoi",
+    "nodes": [
+      {
+        "text": "HC≡CH"
+      },
+      {
+        "text": "X"
+      },
+      {
+        "text": "PVAc"
+      },
+      {
+        "text": "PVA"
+      }
+    ],
+    "arrows": [
+      {
+        "from": 0,
+        "to": 1,
+        "kind": "→",
+        "above": "+CH3COOH",
+        "below": "(1)"
+      },
+      {
+        "from": 1,
+        "to": 2,
+        "kind": "→",
+        "above": "xt, t°, p",
+        "below": "(2)"
+      },
+      {
+        "from": 2,
+        "to": 3,
+        "kind": "→",
+        "above": "+NaOH, t°",
+        "below": "(3)"
+      }
+    ],
+    "notes": "Đủ3 mũi tên một chiều; giữ X ẩn số, PVAc đúng chữ hoa/thường. Không tự ghi cấu trúc/tên X hay thêm muối acetate vào sản phẩm.",
+    "gioiHan": "Đã mở PNG nguồn đầy đủ; chỉ ghi nội dung hình. Nguồn không ghi trạng thái (s)/(l)/(g)/(aq), không tự thêm trạng thái hoặc cân bằng/bổ sung sản phẩm.",
+    "trangThai": "da-doc-nguon-chua-dung-chua-soat-ban-ve"
+  },
+  {
+    "i": 6,
+    "hash": "00f765ef9dd9789294d0708d736ec839ec59ad2dbd6a135ed5a6c02b002c37ba",
+    "fileNguon": "anh/00f765ef9dd9789294d0708d736ec839ec59ad2dbd6a135ed5a6c02b002c37ba.png",
+    "soRefs": 1,
+    "kieu": "phan-ung",
+    "left": [
+      {
+        "kieu": "cau-truc",
+        "smiles": "CC(=O)O",
+        "caption": [
+          "Acetic acid"
+        ]
+      },
+      {
+        "kieu": "cau-truc",
+        "smiles": "CC(C)CCO",
+        "caption": [
+          "Isoamyl alcohol"
+        ]
+      }
+    ],
+    "right": [
+      {
+        "kieu": "cau-truc",
+        "smiles": "CC(=O)OCCC(C)C",
+        "caption": [
+          "Isoamyl acetate"
+        ]
+      },
+      {
+        "text": "H2O"
+      }
+    ],
+    "arrow": {
+      "kind": "⇌",
+      "above": "H2SO4 đặc, t°",
+      "below": ""
+    },
+    "plusLeft": true,
+    "plusRight": true,
+    "notes": "Alcohol HO–CH2–CH2–CH(CH3)2 đúng5C, không nhầm 2-methylbutan-1-ol. Ester giữ 2CH2 sau O trước CH(CH3)2. Caption đúng kiểu hoa Acetic/Isoamyl; hệ số1 không in.",
+    "gioiHan": "Đã mở PNG nguồn đầy đủ; chỉ ghi nội dung hình. Nguồn không ghi trạng thái (s)/(l)/(g)/(aq), không tự thêm trạng thái hoặc cân bằng/bổ sung sản phẩm.",
+    "trangThai": "da-doc-nguon-chua-dung-chua-soat-ban-ve"
+  },
+  {
+    "i": 125,
+    "hash": "17540046af8c017b4be40fdfd1c4d8a94b5e90f276b7938993fbaf8a1514e94e",
+    "fileNguon": "anh/17540046af8c017b4be40fdfd1c4d8a94b5e90f276b7938993fbaf8a1514e94e.png",
+    "soRefs": 1,
+    "kieu": "phan-ung-polymer",
+    "left": [
+      {
+        "kieu": "mat-xich",
+        "backbone": "–CH2–CH–",
+        "nhomNhanhDuoiCH": "OOCCH3",
+        "repeat": "n",
+        "caption": [
+          "polymer X"
+        ]
+      },
+      {
+        "text": "nNaOH"
+      }
+    ],
+    "right": [
+      {
+        "kieu": "mat-xich",
+        "backbone": "–CH2–CH–",
+        "nhomNhanhDuoiCH": "OH",
+        "repeat": "n",
+        "caption": []
+      },
+      {
+        "text": "nCH3COONa"
+      }
+    ],
+    "arrow": {
+      "kind": "→",
+      "above": "t°",
+      "below": ""
+    },
+    "plusLeft": true,
+    "plusRight": true,
+    "notes": "Nguồn thực ghi OOCCH3 dưới CH, giữ cách ghi nguyên văn/không đọc như peroxide. Hai mắt xích ngoặc tròn, n dưới-phải; đường backbone xuyên ngoặc; chỉ trái có caption 'polymer X'. Không đổi mũi tên thành cân bằng hoặc tự thêm tên polymer sản phẩm.",
+    "gioiHan": "Đã mở PNG nguồn đầy đủ; chỉ ghi nội dung hình. Nguồn không ghi trạng thái (s)/(l)/(g)/(aq), không tự thêm trạng thái hoặc cân bằng/bổ sung sản phẩm.",
+    "trangThai": "da-doc-nguon-chua-dung-chua-soat-ban-ve"
+  }
+]

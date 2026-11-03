@@ -8,19 +8,37 @@
     "byteSvg": 1600,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
-    "trangThai": "cho-soat-doc-lap",
-    "ghiChu": "Đúng2electron lớp trong/5lớp ngoài,nhãn+7;khôngthêmdấuâm/tênnguyêntố/mũitên."
+    "trangThai": "da-soat-doc-lap",
+    "ghiChu": "Đúng2electron lớp trong/5lớp ngoài,nhãn+7;khôngthêmdấuâm/tênnguyêntố/mũitên.",
+    "hashSvgDaSoat": "66e18baf05c3cd4658c1c4ffe8c885284702b98d6fbd3e876293684540e7c21c",
+    "nguoiSoat": "soat_nguon_2"
   },
   {
     "i": 1368,
     "hash": "f7334aabb6af142657757ea187ea631ef575c9c5b1c6c0acdce50979636b1994",
     "fileNguon": "anh/f7334aabb6af142657757ea187ea631ef575c9c5b1c6c0acdce50979636b1994.png",
-    "svg": "nguyen-tu-ddh-87040c3e21e35491ee9b75607854d39ad31164397ce4f06bb075692954e16621.svg",
-    "hashSvg": "87040c3e21e35491ee9b75607854d39ad31164397ce4f06bb075692954e16621",
+    "svg": "nguyen-tu-ddh-2decfa921639f32abd4e8bb589cebc8c07f563f7cb7b8e6f3390f6afce72490a.svg",
+    "hashSvg": "2decfa921639f32abd4e8bb589cebc8c07f563f7cb7b8e6f3390f6afce72490a",
     "byteSvg": 2771,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
-    "trangThai": "cho-soat-doc-lap",
-    "ghiChu": "Ba lớp electron2–8–2,nhãn+12;khôngthêmK/L/M,dấuâmhoặctênnguyêntố."
+    "trangThai": "da-soat-doc-lap",
+    "ghiChu": "Ba lớp electron2–8–2,nhãn+12;khôngthêmK/L/M,dấuâmhoặctênnguyêntố.",
+    "hashSvgDaSoat": "2decfa921639f32abd4e8bb589cebc8c07f563f7cb7b8e6f3390f6afce72490a",
+    "nguoiSoat": "soat_nguon_2"
+  },
+  {
+    "i": 415,
+    "hash": "4a29d03d6b5b62d291d30a3818d77a0855d9bef147faeb55802ef6831e25e9d6",
+    "fileNguon": "anh/4a29d03d6b5b62d291d30a3818d77a0855d9bef147faeb55802ef6831e25e9d6.png",
+    "svg": "nguyen-tu-ddh-1e02356d541eef05973c6bdd7667cf644fbd2ad75af1271d1f1c7293c13f100f.svg",
+    "hashSvg": "1e02356d541eef05973c6bdd7667cf644fbd2ad75af1271d1f1c7293c13f100f",
+    "byteSvg": 2153,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChu": "1quỹđạo/2electronxanh,2hạtcammangdấu+và2hạtvàngkhôngdấu;khôngthêmtênhạt/sốkhối/điệntíchtổng.",
+    "hashSvgDaSoat": "1e02356d541eef05973c6bdd7667cf644fbd2ad75af1271d1f1c7293c13f100f",
+    "nguoiSoat": "soat_nguon_2"
   }
 ]

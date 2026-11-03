@@ -1,0 +1,10 @@
+[
+  {
+    "i": 1219,
+    "hashSvg": "7be1767ebc1dab8109bb26b36701c8a316b08ffbdc5f7b7a051b885b9a42aa88",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở PNG nguồn và render SVG thật; đủ3ellipse đồng tâm và hạt nhân. A trên vòng trong, B vòng giữa, D vòng ngoài; C nằm giữa vòng giữa và vòng ngoài, không đặt lên nét. Giữ các đoạn vòng phía trước hạt nhân như nguồn. Nhãn A/B/C/D/Hạt nhân đúng, DDH thành path, không thêm mũi tên/điện tích/tên; không chạm/cắt/tràn. SHA256 khớp.",
+    "hash": "dd6fc46eb2ad1272dab7676f05c46b09dc6a33e79985673123134b75f7bf65a0",
+    "hashSvgDaSoat": "7be1767ebc1dab8109bb26b36701c8a316b08ffbdc5f7b7a051b885b9a42aa88"
+  }
+]

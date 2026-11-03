@@ -1,0 +1,30 @@
+[
+  {
+    "i": 879,
+    "hash": "9fb47d7d1d4486150d102ba7dfcf604da83d86cb708f7a6bf889a636ae86581f",
+    "fileNguon": "anh/9fb47d7d1d4486150d102ba7dfcf604da83d86cb708f7a6bf889a636ae86581f.png",
+    "svg": "hinh-ddh-6fd1511f6eacd8e16ee6cbcb0c293d0bcdd4cdf996a2f4f84851832d932c7483.svg",
+    "hashSvg": "6fd1511f6eacd8e16ee6cbcb0c293d0bcdd4cdf996a2f4f84851832d932c7483",
+    "byteSvg": 3743,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChu": "Một carbon ẩn ở đỉnh chữV;H3N+ trái vàCOO− phải; không thêm tên chất/số carbon.",
+    "hashSvgDaSoat": "6fd1511f6eacd8e16ee6cbcb0c293d0bcdd4cdf996a2f4f84851832d932c7483",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 1160,
+    "hash": "d2840011c327d935fd2830a5669b5f13646e1a11a33b2f6efdfffa72ebc88b72",
+    "fileNguon": "anh/d2840011c327d935fd2830a5669b5f13646e1a11a33b2f6efdfffa72ebc88b72.png",
+    "svg": "hinh-ddh-5a20a9617554ee99be56cf660ee135fd5fe154937a686a238fa6f935ea2f7e17.svg",
+    "hashSvg": "5a20a9617554ee99be56cf660ee135fd5fe154937a686a238fa6f935ea2f7e17",
+    "byteSvg": 11261,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChu": "Hai đường nồng độ định tính:HI tăng,H2+I2 giảm;đoạn cân bằng hữu hạn,không thêm tick hoặc số liệu.",
+    "hashSvgDaSoat": "5a20a9617554ee99be56cf660ee135fd5fe154937a686a238fa6f935ea2f7e17",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

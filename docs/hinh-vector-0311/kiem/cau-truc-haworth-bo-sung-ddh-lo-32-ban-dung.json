@@ -1,0 +1,47 @@
+[
+  {
+    "i": 788,
+    "hash": "92e68e75b91d69396f9b950c1e70a51cc81d03fa9c3c032b809ed3f24d8ffdf5",
+    "fileNguon": "anh/92e68e75b91d69396f9b950c1e70a51cc81d03fa9c3c032b809ed3f24d8ffdf5.png",
+    "nguoiDocNguon": "root",
+    "daMoNguonNative": true,
+    "panels": [
+      {
+        "ringSize": 6,
+        "use": "quyUoc6",
+        "branches": {
+          "C1": {
+            "up": "OH",
+            "down": "H"
+          },
+          "C2": {
+            "up": "OH",
+            "down": "H"
+          },
+          "C3": {
+            "up": "OH",
+            "down": "H"
+          },
+          "C4": {
+            "up": "H",
+            "down": "OH"
+          },
+          "C5": {
+            "up": "CH2OH",
+            "down": "H"
+          }
+        },
+        "caption": [],
+        "carbonNumbers": []
+      }
+    ],
+    "svg": "haworth-ddh-f2a9d043d530350580e4759aec2a4a0a7db3f1f537323389fd2a146a8a276c5d.svg",
+    "hashSvg": "f2a9d043d530350580e4759aec2a4a0a7db3f1f537323389fd2a146a8a276c5d",
+    "byteSvg": 10978,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "hashSvgDaSoat": "f2a9d043d530350580e4759aec2a4a0a7db3f1f537323389fd2a146a8a276c5d",
+    "nguoiSoat": "soat_nguon_3"
+  }
+]

@@ -1,0 +1,333 @@
+[
+  {
+    "i": 879,
+    "hash": "9fb47d7d1d4486150d102ba7dfcf604da83d86cb708f7a6bf889a636ae86581f",
+    "file": "anh/9fb47d7d1d4486150d102ba7dfcf604da83d86cb708f7a6bf889a636ae86581f.png",
+    "mime": "image/png",
+    "bytes": 5657,
+    "daMoNguonDayDu": true,
+    "chiDocDeVaHinhCongKhai": true,
+    "questions": [
+      {
+        "qid": "12-KT-C3-D2-I-11",
+        "de": "Dạng ion chủ yếu nào của amino acid có trong môi trường acid mạnh (pH thấp)?"
+      },
+      {
+        "qid": "DB-12-B9-P1-D2-I-67",
+        "de": "Dạng ion chủ yếu nào của amino acid có trong môi trường acid mạnh (pH thấp)?"
+      }
+    ],
+    "refs": [
+      {
+        "qid": "12-KT-C3-D2-I-11",
+        "hash": "9fb47d7d1d4486150d102ba7dfcf604da83d86cb708f7a6bf889a636ae86581f",
+        "where": "12-KT-C3-D2-I-11.hinh.1.du_lieu",
+        "hashDataUrl": "9bf6c9fc2043138271946689fce144bc0e949d85db864164ac7e7c3b89310c28",
+        "viTri": "sau_pa_B",
+        "congKhaiTruocNop": true
+      },
+      {
+        "qid": "DB-12-B9-P1-D2-I-67",
+        "hash": "9fb47d7d1d4486150d102ba7dfcf604da83d86cb708f7a6bf889a636ae86581f",
+        "where": "DB-12-B9-P1-D2-I-67.hinh.1.du_lieu",
+        "hashDataUrl": "9bf6c9fc2043138271946689fce144bc0e949d85db864164ac7e7c3b89310c28",
+        "viTri": "sau_pa_B",
+        "congKhaiTruocNop": true
+      }
+    ],
+    "trangThai": "du-lieu-nguon-chua-soat-ban-dung",
+    "nhomDung": "cau-truc-ion-don-nguon-khong-nhan",
+    "literal": "H₃N⁺–CH₂–COO⁻",
+    "smiles": "[NH3+]CC(=O)[O-]",
+    "caption": [],
+    "structure": {
+      "carbons": 2,
+      "methylene": 1,
+      "charges": {
+        "NH3": "+1",
+        "COO": "-1"
+      },
+      "netCharge": 0,
+      "stereo": "Không nêm hoặc Fischer."
+    },
+    "ghiChu": [
+      "Nguồn không có A/B/C/D in trên hình. Ref xác nhận sau_pa_B cho cả hai qid; không tự in B. vào SVG.",
+      "Đề hỏi pH acid mạnh là bối cảnh chọn phương án; KHÔNG tự sửa ion lưỡng cực này thành NH3+–CH2–COOH."
+    ]
+  },
+  {
+    "i": 1160,
+    "hash": "d2840011c327d935fd2830a5669b5f13646e1a11a33b2f6efdfffa72ebc88b72",
+    "file": "anh/d2840011c327d935fd2830a5669b5f13646e1a11a33b2f6efdfffa72ebc88b72.png",
+    "mime": "image/png",
+    "bytes": 4802,
+    "daMoNguonDayDu": true,
+    "chiDocDeVaHinhCongKhai": true,
+    "questions": [
+      {
+        "qid": "DB-11-B1-D1-I-150",
+        "de": "Quan sát hình dưới đây và chọn phát biểu đúng. | (a) | (b)"
+      },
+      {
+        "qid": "DH-11-C1-B1-I-36",
+        "de": "Quan sát hình dưới đây và chọn phát biểu đúng. | (a) | (b)"
+      }
+    ],
+    "refs": [
+      {
+        "qid": "DB-11-B1-D1-I-150",
+        "hash": "d2840011c327d935fd2830a5669b5f13646e1a11a33b2f6efdfffa72ebc88b72",
+        "where": "DB-11-B1-D1-I-150.hinh.0.du_lieu",
+        "hashDataUrl": "77e4ee5969a9995689fc28c40934a5f3fb4b845d1688bf5a8b66795737d47e22",
+        "viTri": "sau_de",
+        "congKhaiTruocNop": true
+      },
+      {
+        "qid": "DH-11-C1-B1-I-36",
+        "hash": "d2840011c327d935fd2830a5669b5f13646e1a11a33b2f6efdfffa72ebc88b72",
+        "where": "DH-11-C1-B1-I-36.hinh.0.du_lieu",
+        "hashDataUrl": "77e4ee5969a9995689fc28c40934a5f3fb4b845d1688bf5a8b66795737d47e22",
+        "viTri": "sau_de",
+        "congKhaiTruocNop": true
+      }
+    ],
+    "trangThai": "du-lieu-nguon-chua-soat-ban-dung",
+    "nhomDung": "do-thi-dinh-tinh-nong-do-thoi-gian",
+    "axes": {
+      "x": "Thời gian",
+      "y": "Nồng độ",
+      "xArrow": "right",
+      "yArrow": "up",
+      "ticks": [],
+      "numbers": []
+    },
+    "curves": [
+      {
+        "label": "HI",
+        "starts": "Từ gốc tọa độ",
+        "direction": "Tăng, độ dốc giảm dần",
+        "end": "Đoạn nằm ngang ở mức cao"
+      },
+      {
+        "label": "H₂ + I₂",
+        "starts": "Nồng độ cao ngay gần trục tung",
+        "direction": "Giảm mạnh lúc đầu rồi thoải dần",
+        "end": "Đoạn nằm ngang ở mức THẤP hơn plateau HI nhưng vẫn trên trục thời gian"
+      }
+    ],
+    "caption": [],
+    "ghiChu": [
+      "Hai đường cắt nhau, plateau KHÔNG bằng nhau. Không dùng mẫu đồ thị tốc độ hai nhánh nhập thành một đoạn cân bằng.",
+      "Không có số trục, không thêm tọa độ/điểm cân bằng/dấu gạch trợ giúp.",
+      "de của hai qid đã có | (a) | (b); hình này là hinh.0, cả hai hình sau_de. Trong PNG không có nhãn (a), không tự đưa (a) hoặc (b) vào đồ thị."
+    ]
+  },
+  {
+    "i": 989,
+    "hash": "b183ccffbe785ae910953bd055d1ea5350944d7bf2d13782d9fd0edf698b1ed7",
+    "file": "anh/b183ccffbe785ae910953bd055d1ea5350944d7bf2d13782d9fd0edf698b1ed7.png",
+    "mime": "image/png",
+    "bytes": 2142,
+    "daMoNguonDayDu": true,
+    "chiDocDeVaHinhCongKhai": true,
+    "questions": [
+      {
+        "qid": "DB-12-B9-P1-D1-I-205",
+        "de": "Dung dịch của chất nào sau đây có môi trường base?"
+      },
+      {
+        "qid": "DH-12-C3-B9-P1-I-47",
+        "de": "Dung dịch của chất nào sau đây có môi trường base?"
+      }
+    ],
+    "refs": [
+      {
+        "qid": "DB-12-B9-P1-D1-I-205",
+        "hash": "b183ccffbe785ae910953bd055d1ea5350944d7bf2d13782d9fd0edf698b1ed7",
+        "where": "DB-12-B9-P1-D1-I-205.hinh.0.du_lieu",
+        "hashDataUrl": "0d8d4d56edd3a90b193c90707c04a2124e174a40d1b0469b01a956f7a0238c03",
+        "viTri": "sau_pa_A",
+        "congKhaiTruocNop": true
+      },
+      {
+        "qid": "DH-12-C3-B9-P1-I-47",
+        "hash": "b183ccffbe785ae910953bd055d1ea5350944d7bf2d13782d9fd0edf698b1ed7",
+        "where": "DH-12-C3-B9-P1-I-47.hinh.0.du_lieu",
+        "hashDataUrl": "0d8d4d56edd3a90b193c90707c04a2124e174a40d1b0469b01a956f7a0238c03",
+        "viTri": "sau_pa_A",
+        "congKhaiTruocNop": true
+      }
+    ],
+    "trangThai": "du-lieu-nguon-chua-soat-ban-dung",
+    "nhomDung": "ion-co-nhom-CH2-lap-huu-han-khong-phai-polymer",
+    "literal": "⁺H₃N–[CH₂]₄–CH(NH₂)–COO⁻",
+    "smiles": "[NH3+]CCCCC(N)C(=O)[O-]",
+    "caption": [],
+    "structure": {
+      "repeat": "Một đỉnh CH₂ trong cặp ngoặc vuông, chỉ số4 ở ngoài phía dưới-phải",
+      "chain": "NH3+–4CH2–CH(NH2)–COO−",
+      "carbons": 6,
+      "charges": {
+        "NH3_dau_mach": "+1",
+        "NH2_gan_alpha": "0",
+        "COO": "-1"
+      },
+      "netCharge": 0,
+      "stereo": "Không nêm, không gán CIP."
+    },
+    "geometry": "Nguồn NH3+ bên trái; đỉnh CH2 được ngoặc vuông [ ] kèm4; CH kế ngoài ngoặc có NH2 hướng xuống, COO− ở trên-phải. Không có n, không có end-bond không xác định.",
+    "ghiChu": [
+      "Đã phóng đọc gốc: có đúng số4, không phải n; giữ ký hiệu lặp hữu hạn.",
+      "Ref xác nhận sau_pa_A cho cả hai qid; PNG không có A. nên không tự thêm.",
+      "Giữ vị trí hai N: NH3+ ở đầu mạch xa carboxyl, NH2 trung hòa ở carbon alpha; không đổi chỗ proton hóa theo suy luận pH."
+    ]
+  },
+  {
+    "i": 1275,
+    "hash": "e7e5615deb8786b79246b5d45fa28401802fe398ce946b569e724df5bdd34de3",
+    "file": "anh/e7e5615deb8786b79246b5d45fa28401802fe398ce946b569e724df5bdd34de3.png",
+    "mime": "image/png",
+    "bytes": 18310,
+    "daMoNguonDayDu": true,
+    "chiDocDeVaHinhCongKhai": true,
+    "questions": [
+      {
+        "qid": "DB-12-B9-P1-D2-II-108",
+        "de": "Thực hiện thí nghiệm về tính điện di ở pH = 6 của các amino acid gồm arginine, glycine, glutamic acid. Xét các thông tin trong bảng dưới.\npHI là giá trị pH mà tại đó amino acid tồn tại ở dạng ion lưỡng cực có tổng điện tích dương bằng tổng điện tích âm."
+      },
+      {
+        "qid": "DH-12-C3-B9-P1-II-16",
+        "de": "Thực hiện thí nghiệm về tính điện di ở pH = 6 của các amino acid gồm arginine, glycine, glutamic acid. Xét các thông tin trong bảng dưới.\npHI là giá trị pH mà tại đó amino acid tồn tại ở dạng ion lưỡng cực có tổng điện tích dương bằng tổng điện tích âm."
+      }
+    ],
+    "refs": [
+      {
+        "qid": "DB-12-B9-P1-D2-II-108",
+        "hash": "e7e5615deb8786b79246b5d45fa28401802fe398ce946b569e724df5bdd34de3",
+        "where": "DB-12-B9-P1-D2-II-108.hinh.3.du_lieu",
+        "hashDataUrl": "b4405925557700362bd93c644752cf5c06d47b46586910fd905b2f6f88b6220a",
+        "viTri": "sau_de",
+        "congKhaiTruocNop": true
+      },
+      {
+        "qid": "DH-12-C3-B9-P1-II-16",
+        "hash": "e7e5615deb8786b79246b5d45fa28401802fe398ce946b569e724df5bdd34de3",
+        "where": "DH-12-C3-B9-P1-II-16.hinh.3.du_lieu",
+        "hashDataUrl": "b4405925557700362bd93c644752cf5c06d47b46586910fd905b2f6f88b6220a",
+        "viTri": "sau_de",
+        "congKhaiTruocNop": true
+      }
+    ],
+    "trangThai": "du-lieu-nguon-chua-soat-ban-dung",
+    "nhomDung": "so-do-thi-nghiem-dien-di-pH6",
+    "labels": [
+      "Nguồn điện",
+      "−",
+      "+",
+      "Kết thúc",
+      "cathode",
+      "anode",
+      "(1)",
+      "(2)",
+      "(3)"
+    ],
+    "caption": [
+      "Hình: kết quả thí nghiệm tính điện di ở pH = 6"
+    ],
+    "geometry": {
+      "nguonDien": "Hộp ở phía trên, cổng trái−, cổng phải+; dây vòng ngoài nối vào hai điện cực của hộp dưới.",
+      "hopThiNghiem": "Hộp chữ nhật phía dưới. Cathode ở trái với dấu−; anode ở phải với dấu+.",
+      "baDai": "Ba dải thẳng đứng xấp xỉ bằng nhau, từ trái sang phải được gọi (1),(2),(3); mỗi nhãn nối tới đúng dải bằng đường chỉ dẫn.",
+      "ketThuc": "Chữ Kết thúc ở ngoài bên trái gần dây vòng, phải giữ như nguồn."
+    },
+    "ghiChu": [
+      "Không tự gắn tên arginine/glycine/glutamic acid vào các dải; đó là nội dung người học phải xét.",
+      "Không đổi cực hoặc đảo thứ tự1–3. Giữ điều kiện pH=6 trong caption.",
+      "Hình đứng thứ4 trong4ảnh sau_de; ba ảnh trước là cấu trúc amino acid, không ghép chúng thành nhãn dải."
+    ]
+  },
+  {
+    "i": 1353,
+    "hash": "f50b3a16266b96e49f5b5641cdba93d3343da3e4470b238309e68597daf3a136",
+    "file": "anh/f50b3a16266b96e49f5b5641cdba93d3343da3e4470b238309e68597daf3a136.png",
+    "mime": "image/png",
+    "bytes": 22270,
+    "daMoNguonDayDu": true,
+    "chiDocDeVaHinhCongKhai": true,
+    "questions": [
+      {
+        "qid": "12-C3-B8-D2-II-35",
+        "de": "Hạnh phúc là điều mà tất cả chúng ta luôn mong muốn có được trong cuộc sống. Hạnh phúc có được do nhiều yếu tố bên ngoài đem đến. Tuy nhiên, trong cơ thể mỗi người đều có những hormone “hạnh phúc” – chúng tác động đến tâm trạng và cảm xúc của bạn làm bạn cảm thấy vui vẻ, yêu đời và dễ chịu hơn.\nMột trong số những hormone đó là Dopamine. Dopamine có công thức cấu tạo như sau: Nghiên cứu nồng độ Dopamine cùng các chất chuyển hóa của Dopamine (DOPAC) trong dịch não tủy và mối liên quan với một số biểu hiện lâm sàng ở bệnh nhân mắc bệnh Parkinson.\nXét nghiệm định lượng nồng độ Dopamine, DOPAC dịch não tủy cho cả nhóm bệnh và nhóm chứng (không bị bệnh nghiên cứu). Kết quả theo bảng sau:"
+      }
+    ],
+    "refs": [
+      {
+        "qid": "12-C3-B8-D2-II-35",
+        "hash": "f50b3a16266b96e49f5b5641cdba93d3343da3e4470b238309e68597daf3a136",
+        "where": "12-C3-B8-D2-II-35.hinh.1.du_lieu",
+        "hashDataUrl": "f9d5387e2e96949153483255a83f87007fed15542e1c737e17a186dd3a50fb73",
+        "viTri": "sau_de",
+        "congKhaiTruocNop": true
+      }
+    ],
+    "trangThai": "du-lieu-nguon-chua-soat-ban-dung",
+    "nhomDung": "bang-du-lieu-3-cot-2-hang",
+    "table": [
+      [
+        "Nhóm người",
+        "Nồng độ Dopamine trung bình",
+        "Nồng độ DOPAC trung bình"
+      ],
+      [
+        "Nhóm bệnh nhân Parkinson",
+        "20,10 ± 3,52 pg/mL",
+        "3,75 ± 3,00 pg/mL"
+      ],
+      [
+        "Nhóm chứng (không bị bệnh Parkinson)",
+        "31,85 ± 12,56 pg/mL",
+        "7,03 ± 4,14 ng/mL"
+      ]
+    ],
+    "caption": [],
+    "ghiChu": [
+      "Giữ dấu phẩy thập phân, dấu± và toàn bộ chữ số.",
+      "ĐẶC BIỆT ô DOPAC nhóm chứng nguồn ghi ng/mL, trong khi ô nhóm bệnh ghi pg/mL; không tự đồng bộ hoặc quy đổi đơn vị.",
+      "Đây dữ liệu công khai đi với câu đúng/sai, không phải đáp án/lời giải. Có thể dựng bảng SVG DDH để giữ liên kết theo hash, không ghi lại dữ liệu kho."
+    ]
+  },
+  {
+    "i": 1198,
+    "hash": "d8c61f86f9e6495b88f11b33d3434678b97f3e0e4f9d093439b0d9c91fbcbb24",
+    "file": "anh/d8c61f86f9e6495b88f11b33d3434678b97f3e0e4f9d093439b0d9c91fbcbb24.png",
+    "mime": "image/png",
+    "bytes": 27557,
+    "daMoNguonDayDu": true,
+    "chiDocDeVaHinhCongKhai": true,
+    "questions": [
+      {
+        "qid": "DH-12-C1-B1-P1-III-10",
+        "de": "Geranyl acetate là ester có mùi hoa hồng, có công thức cấu tạo như hình dưới đây: Tổng số nguyên tử có trong phân tử geranyl acetate là bao nhiêu?"
+      }
+    ],
+    "refs": [
+      {
+        "qid": "DH-12-C1-B1-P1-III-10",
+        "hash": "d8c61f86f9e6495b88f11b33d3434678b97f3e0e4f9d093439b0d9c91fbcbb24",
+        "where": "DH-12-C1-B1-P1-III-10.hinh.1.du_lieu",
+        "hashDataUrl": "c4ee86d2b0f58557d05efa35b969c4c67da1445ccd29c07f167b38252bc99551",
+        "viTri": "sau_de",
+        "congKhaiTruocNop": true
+      }
+    ],
+    "trangThai": "du-lieu-nguon-chua-soat-ban-dung",
+    "nhomDung": "anh-chup-minh-hoa-giu-anh-that",
+    "noiDung": "Ảnh chụp một bông hồng đỏ, nền lá xanh/trắng; không có chữ, nhãn, công thức hoặc đường sơ đồ.",
+    "caption": [],
+    "ghiChu": [
+      "de nói geranyl acetate có mùi hoa hồng. Ảnh này là hinh.1 minh họa hương hoa; hinh.0 mới là cấu trúc ester.",
+      "Không chuyển ảnh chụp thành các path giả rồi gọi là bản vẽ vector. Giữ PNG gốc trong nhóm ảnh thật và tải sẵn/offline theo hash.",
+      "Không tự in tên geranyl acetate hoặc caption Hoa hồng vào hình vì nguồn không có chữ."
+    ]
+  }
+]

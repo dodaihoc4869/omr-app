@@ -1,0 +1,38 @@
+[
+  {
+    "i": 1098,
+    "hash": "c5f74e44f554863c549965c3c1f6a745ea6aa132b81d84b3a9a9aab6f788967b",
+    "fileNguon": "anh/c5f74e44f554863c549965c3c1f6a745ea6aa132b81d84b3a9a9aab6f788967b.png",
+    "smiles": "CC(=O)OCC",
+    "caption": [],
+    "phongApp": true,
+    "methylTuongMinh": true,
+    "xuLyNhanGiay": "Bỏ B. và dấu chấm chốt lựa chọn PDF; giữ toàn bộ cấu trúc. Hai qid đều sau_pa_B, app tự hiện nhãn ngoài theo hoán vị. Không đổi thứ tự/qid/đáp án.",
+    "bangChungViTri": [
+      {
+        "where": "12-KT-C1-D5-I-9.hinh.1.du_lieu",
+        "hashDataUrl": "76a351a0d49ccac2ff64c41ea7f26c96f5337d57cabe7dae5d1b271c0e002699",
+        "viTri": "sau_pa_B",
+        "truong": "hinh",
+        "congKhaiTruocNop": true
+      },
+      {
+        "where": "DB-12-B1-P1-D1-I-110.hinh.1.du_lieu",
+        "hashDataUrl": "76a351a0d49ccac2ff64c41ea7f26c96f5337d57cabe7dae5d1b271c0e002699",
+        "viTri": "sau_pa_B",
+        "truong": "hinh",
+        "congKhaiTruocNop": true
+      }
+    ],
+    "bangChungDe": [
+      {
+        "qid": "12-KT-C1-D5-I-9",
+        "de": "Thủy phân ester nào sau đây trong dung dịch NaOH dư thu được sodium acetate?"
+      },
+      {
+        "qid": "DB-12-B1-P1-D1-I-110",
+        "de": "Thủy phân ester nào sau đây trong dung dịch NaOH dư thu được sodium acetate?"
+      }
+    ]
+  }
+]

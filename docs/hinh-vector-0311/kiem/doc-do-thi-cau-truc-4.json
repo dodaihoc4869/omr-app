@@ -1,0 +1,92 @@
+[
+  {
+    "i": 322,
+    "hash": "376fe26a3db26928e1fa6a8549aa75382a580da670ab290bfd50a8aa48917197",
+    "file": "anh/376fe26a3db26928e1fa6a8549aa75382a580da670ab290bfd50a8aa48917197.png",
+    "mime": "image/png",
+    "bytes": 19055,
+    "notes": "Y='Tốc độ phản ứng', X='Thời gian'; both arrow axes; no ticks/numeric data. Curve(a)decreases from(65,70), curve(b)increases from(65,373), meet(256,222); shared plateau to(504,222), label='Trạng thái cân bằng'. Source bottom has cropped prose; don't invent/reconstruct cropped text.",
+    "daMoNguonDayDu": true
+  },
+  {
+    "i": 341,
+    "hash": "3cc7d992ffc43196906bb619bbda4d46780256b6d9351d14d9daa87b36b05d24",
+    "file": "anh/3cc7d992ffc43196906bb619bbda4d46780256b6d9351d14d9daa87b36b05d24.png",
+    "mime": "image/png",
+    "bytes": 5664,
+    "notes": "Line chart y='số mol ethyl alcohol', x='Ngày'; xTicks0/2/4/6/8/10/12/14, yTicks0/0.5/1/1.5/2 (source period). No data markers or numeric vertex labels. Pixel-only polyline (203,239),(260,190),(375,142),(431,111),(489,65),(604,65). These pixels preserve geometry; do NOT publish interpolated mol as source data. Horizontal gridlines64/108/152/196/239; outer frame37,36..648,366.",
+    "daMoNguonDayDu": true
+  },
+  {
+    "i": 344,
+    "hash": "3d3bd8e91b1ed4e0bba9702584b485f3c072db82461e4b2840e57c84a903bc72",
+    "file": "anh/3d3bd8e91b1ed4e0bba9702584b485f3c072db82461e4b2840e57c84a903bc72.png",
+    "mime": "image/png",
+    "bytes": 1262,
+    "notes": "Single curve rising concave down from origin(35,101), approaches horizontal near y31 through x148. xaxis arrow right t, yaxis arrow up n; origin0; only ytick='0,1' at y31. Dotted horizontal from(35,31)to(148,31). No x ticks/other values. Coordinates are source pixels only.",
+    "daMoNguonDayDu": true
+  },
+  {
+    "i": 353,
+    "hash": "3e730acbcb2c4c164026c4253cfaee7089005e16ee7dc3ea54c5af3b59048bea",
+    "file": "anh/3e730acbcb2c4c164026c4253cfaee7089005e16ee7dc3ea54c5af3b59048bea.png",
+    "mime": "image/png",
+    "bytes": 2916,
+    "notes": "Single curve decreasing from sourcepixel(86,73), approaches xaxis by(190,180), then coincides with baseline to(278,180). Axes arrow n/t, origin0; y label0,1 at start height; no numeric x ticks. Native source contains small dash below xaxis nearx214; contextual role unclear, do not assign new quantity.",
+    "daMoNguonDayDu": true
+  },
+  {
+    "i": 357,
+    "hash": "3f34093f73304e77ddefefbbcc1e97af0d5c35a7dc98ac9b46f458a3c2d80fc3",
+    "file": "anh/3f34093f73304e77ddefefbbcc1e97af0d5c35a7dc98ac9b46f458a3c2d80fc3.png",
+    "mime": "image/png",
+    "bytes": 3066,
+    "notes": "Curve decreasing from(85,72), levels to positive plateau around(166,149)..(279,149), above xaxis y181. Horizontal dotted guide y149; axis arrows n/t, origin0, ytick0,1. No numeric plateau value or x ticks.",
+    "daMoNguonDayDu": true
+  },
+  {
+    "i": 361,
+    "hash": "3fcedad51de51f5faf65271a7c871ac317f639f814ccc718e5746031f85ab2d6",
+    "file": "anh/3fcedad51de51f5faf65271a7c871ac317f639f814ccc718e5746031f85ab2d6.png",
+    "mime": "image/png",
+    "bytes": 19901,
+    "notes": "Two curves concentration vs time. Y='Nồng độ', X='Thời gian', arrow axes. Curve(a)decreases from(98,74) toward lower plateau y252 aroundx261, endsx467; curve(b)increases from(98,320)to upperplateau y158 aroundx261, endsx467. They cross near(161,205). Dashed vertical t1x162,t2x260,t3x328,t4x386. No numeric concentration data.",
+    "daMoNguonDayDu": true
+  },
+  {
+    "i": 384,
+    "hash": "44b3f6c9c5ada7945e3554b454759c41eda3f50305bd4c0b37f9979dc6437d05",
+    "file": "anh/44b3f6c9c5ada7945e3554b454759c41eda3f50305bd4c0b37f9979dc6437d05.png",
+    "mime": "image/png",
+    "bytes": 10368,
+    "notes": "4panels ordered(1)..(4). Allaxes n/t, arrows, origin0, ytick0,1. (1)curve rises to plateau below0,1, guidey74, axisorigin(39,127), tick0,1 aty44; (2)curve rises to0,1 plateau guidey45, origin(241,127); (3)piecewise straight rise origin(455,127)to(529,45), horizontalto(573,45), guidey45; (4)curve falls from0,1 near(652,45)to positiveplateau around(708,106)..(771,106), guidey106, origin(651,127). Pixel coords only, never invent lower plateau number.",
+    "daMoNguonDayDu": true
+  },
+  {
+    "i": 392,
+    "hash": "4597313c406a734b7d7220f98085e8821ffc1df69e1854341f61e9589096b9f4",
+    "file": "anh/4597313c406a734b7d7220f98085e8821ffc1df69e1854341f61e9589096b9f4.png",
+    "mime": "image/png",
+    "bytes": 12477,
+    "notes": "Two enzyme curves. Y='Tốc độ phản ứng', X='pH', arrow axes. Xlabels1..12, no y numeric ticks. Pepsin solid curve begins~(99,283), peak~(164,108), ends~(256,407), dotted vertical atpeak tobaseliney434. Chymotrypsin dashed begins~(365,385), peak~(492,94), ends~(625,385). Keep actual source geometry, do not infer maximum pH numerical label7.5; source only ticks integers. Labels Pepsin/Chymotrypsin; no legend.",
+    "daMoNguonDayDu": true
+  },
+  {
+    "i": 704,
+    "hash": "831d51e3deec870a02f7ebb5f1f2197152fa2cb7e9ebf86e86c5df24be45148f",
+    "file": "anh/831d51e3deec870a02f7ebb5f1f2197152fa2cb7e9ebf86e86c5df24be45148f.png",
+    "mime": "image/png",
+    "bytes": 24020,
+    "notes": "Bar chart, y='Nhiệt độ sôi (°C)', yTicks=['0','20','40','60','80']; bars ordered CH3CH2NH2:17, CH3CHO:21, HCOOCH3:32, CH3CH2CH2NH2:48, CH3OH:65. Four frame edges. No title/legend/x label.",
+    "daMoNguonDayDu": true
+  },
+  {
+    "i": 1418,
+    "hash": "fee3331808c1dd3d6716875f512933b96ffaf52bec69405d17df9d7fd760574c",
+    "file": "anh/fee3331808c1dd3d6716875f512933b96ffaf52bec69405d17df9d7fd760574c.png",
+    "mime": "image/png",
+    "bytes": 73247,
+    "notes": "Title='BIỂU ĐỒ SO SÁNH PHÂN TỬ KHỐI VÀ NHIỆT ĐỘ SÔI CỦA MỘT SỐ HỢP CHẤT HỮU CƠ'. Left y='Phân tử khối', ticks20/40/60/80; baseline truncated at20. Right y='Nhiệt độ sôi (°C)', ticks0/20/40/60/80/100. Ordered categories (CH3)3N, CH3CH2-O-CH3, CH3CH2-NH-CH3, CH3CH2CH2-NH2, CH3CH2CH2-OH. Bar labels59/60/59/59/60; dashed line triangle labels3/8/37/48/97. Legend dotted bars 'Phân tử khối', dashed line triangles 'Nhiệt độ sôi (°C)'.",
+    "daMoNguonDayDu": true
+  }
+]

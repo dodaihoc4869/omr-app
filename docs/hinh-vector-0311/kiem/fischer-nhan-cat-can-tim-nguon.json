@@ -9,8 +9,6 @@
     "12-C2-B4-D1-I-33",
     "DB-12-B4-D3-I-24"
   ],
-  "lyDo": "Bốn ảnh đều sau_de; nhãn A/B/C bị cắt, nhãn cuối không đủ chứng minh D. Chưa dựng thay ảnh, không đoán nhãn từ thứ tự hay kiến thức fructose.",
-  "daSoat": "cau_truc_5 đã mở cả4 nguồn và bản trùng; bản trùng chỉ xác nhận cấu trúc, không có nhãn rõ.",
   "thuTuNguon": [
     27,
     928,
@@ -22,5 +20,13 @@
     "LRR",
     "RRL",
     "RLR"
-  ]
+  ],
+  "lichSuTamGiu": {
+    "lyDo": "Bốn ảnh đều sau_de; nhãn A/B/C bị cắt, nhãn cuối không đủ chứng minh D. Chưa dựng thay ảnh, không đoán nhãn từ thứ tự hay kiến thức fructose.",
+    "daSoat": "cau_truc_5 đã mở cả4 nguồn và bản trùng; bản trùng chỉ xác nhận cấu trúc, không có nhãn rõ."
+  },
+  "trangThai": "da-giai-quyet-lo-33",
+  "bangChung": "doc-fischer-4-ngu-canh.json",
+  "soatDocLap": "cau-truc-fischer-ngu-canh-ddh-lo-33-soat-doc-lap.json",
+  "ketLuan": "Đã mở cả bộ nguồn và câu dẫn công khai; đối chiếu nhãn A/B/C và nhãn còn thiếu D trong bộ bốn. Không suy từ tên chất, đáp án hoặc thứ tự ảnh."
 }

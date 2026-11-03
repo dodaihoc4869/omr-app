@@ -1,0 +1,163 @@
+{
+  "nguoiDoc": "cau_truc_6",
+  "daMo4PNGGocNative": true,
+  "nguCanhDaDoc": {
+    "qid": [
+      "12-C2-B4-D1-I-33",
+      "DB-12-B4-D3-I-24"
+    ],
+    "de": "Công thức nào dưới đây mô tả đúng cấu tạo của fructose ở dạng mạch hở?",
+    "pa": {
+      "A": "(xem hình)",
+      "B": "(xem hình)",
+      "C": "(xem hình)",
+      "D": "(xem hình)"
+    },
+    "viTri": "Cả bốn ảnh đều sau_de; không có ảnh phương án riêng khác trong hai bản câu này."
+  },
+  "ketLuanNhan": "Có thể xác minh duy nhất bộ nhãn A/B/C/D theo ba nhãn A/B/C đọc trực tiếp dù cắt mép trái, và PA công khai có đúng bốn lựa chọn xem hình. Nhãn D suy ra bằng loại trừ nhãn trong bộ bốn, đồng thời khớp bầu phải + dấu chấm còn lại ở 1123. Không dựa tên fructose, đáp án hoặc thứ tự ảnh để gán. Đây dữ liệu nguồn, chưa duyệt SVG mới.",
+  "bangChungNhan": {
+    "27": "Phần phải A và dấu chấm vẫn thấy, nét nghiêng phải cùng phần ngang/đáy đủ nhận A; mép trái bị cắt.",
+    "928": "Hai bầu phải phân biệt B và dấu chấm rõ; mép trái bị cắt.",
+    "1407": "Cung C mở bên phải và dấu chấm thấy rõ; mép trái bị cắt.",
+    "1123": "Bầu phải và dấu chấm còn, nét đứng trái bị cắt nên riêng ảnh không đủ đọc trọn D. D chỉ xác nhận khi ghép bằng chứng bộ bốn PA và ba nhãn trực tiếp kia."
+  },
+  "records": [
+    {
+      "i": 27,
+      "hash": "058c053726fa198a877f7b5b6cc98cbf4cb175a37875f78472d15257f2858f2e",
+      "fileNguon": "anh/058c053726fa198a877f7b5b6cc98cbf4cb175a37875f78472d15257f2858f2e.png",
+      "caption": [
+        "A."
+      ],
+      "captionEvidence": "trực tiếp và đối chiếu bộ PA",
+      "top": "CH2OH",
+      "bottom": "CH2OH",
+      "rows": [
+        {
+          "kind": "carbonyl",
+          "side": "right",
+          "centerLabel": null
+        },
+        {
+          "left": "HO",
+          "right": "H",
+          "centerLabel": null
+        },
+        {
+          "left": "H",
+          "right": "OH",
+          "centerLabel": null
+        },
+        {
+          "left": "HO",
+          "right": "H",
+          "centerLabel": null
+        }
+      ],
+      "notes": "Giữ nguyên HO ở nhánh trái (không đảo hàng); không thêm C/H ở giao điểm; không thay cấu hình theo tên chất."
+    },
+    {
+      "i": 928,
+      "hash": "a8403a490c888ab8d0bc445109a59247a165d7cffa2e3e42d9107b20b30900ac",
+      "fileNguon": "anh/a8403a490c888ab8d0bc445109a59247a165d7cffa2e3e42d9107b20b30900ac.png",
+      "caption": [
+        "B."
+      ],
+      "captionEvidence": "trực tiếp và đối chiếu bộ PA",
+      "top": "CH2OH",
+      "bottom": "CH2OH",
+      "rows": [
+        {
+          "kind": "carbonyl",
+          "side": "right",
+          "centerLabel": null
+        },
+        {
+          "left": "HO",
+          "right": "H",
+          "centerLabel": null
+        },
+        {
+          "left": "H",
+          "right": "OH",
+          "centerLabel": null
+        },
+        {
+          "left": "H",
+          "right": "OH",
+          "centerLabel": null
+        }
+      ],
+      "notes": "Giữ nguyên HO ở nhánh trái (không đảo hàng); không thêm C/H ở giao điểm; không thay cấu hình theo tên chất."
+    },
+    {
+      "i": 1407,
+      "hash": "fce9235e043a996feac1e82a492048330d3e9ebb24fbb3535ee06b3f9ab3ccbe",
+      "fileNguon": "anh/fce9235e043a996feac1e82a492048330d3e9ebb24fbb3535ee06b3f9ab3ccbe.png",
+      "caption": [
+        "C."
+      ],
+      "captionEvidence": "trực tiếp và đối chiếu bộ PA",
+      "top": "CH2OH",
+      "bottom": "CH2OH",
+      "rows": [
+        {
+          "kind": "carbonyl",
+          "side": "right",
+          "centerLabel": null
+        },
+        {
+          "left": "H",
+          "right": "OH",
+          "centerLabel": null
+        },
+        {
+          "left": "H",
+          "right": "OH",
+          "centerLabel": null
+        },
+        {
+          "left": "HO",
+          "right": "H",
+          "centerLabel": null
+        }
+      ],
+      "notes": "Giữ nguyên HO ở nhánh trái (không đảo hàng); không thêm C/H ở giao điểm; không thay cấu hình theo tên chất."
+    },
+    {
+      "i": 1123,
+      "hash": "ca6d497b2cf4647405bf115ff7923e838c21c5f7f3c96d4e6e41be705f396bd7",
+      "fileNguon": "anh/ca6d497b2cf4647405bf115ff7923e838c21c5f7f3c96d4e6e41be705f396bd7.png",
+      "caption": [
+        "D."
+      ],
+      "captionEvidence": "loại trừ duy nhất trong bộ PA + nét còn lại tương thích",
+      "top": "CH2OH",
+      "bottom": "CH2OH",
+      "rows": [
+        {
+          "kind": "carbonyl",
+          "side": "right",
+          "centerLabel": null
+        },
+        {
+          "left": "H",
+          "right": "OH",
+          "centerLabel": null
+        },
+        {
+          "left": "HO",
+          "right": "H",
+          "centerLabel": null
+        },
+        {
+          "left": "H",
+          "right": "OH",
+          "centerLabel": null
+        }
+      ],
+      "notes": "Giữ nguyên HO ở nhánh trái (không đảo hàng); không thêm C/H ở giao điểm; không thay cấu hình theo tên chất."
+    }
+  ]
+}

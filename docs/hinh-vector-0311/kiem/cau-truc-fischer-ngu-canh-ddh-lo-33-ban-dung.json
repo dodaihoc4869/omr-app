@@ -1,0 +1,178 @@
+[
+  {
+    "i": 27,
+    "hash": "058c053726fa198a877f7b5b6cc98cbf4cb175a37875f78472d15257f2858f2e",
+    "fileNguon": "anh/058c053726fa198a877f7b5b6cc98cbf4cb175a37875f78472d15257f2858f2e.png",
+    "caption": [
+      "A."
+    ],
+    "captionEvidence": "trực tiếp và đối chiếu bộ PA",
+    "top": "CH2OH",
+    "bottom": "CH2OH",
+    "rows": [
+      {
+        "kind": "carbonyl",
+        "side": "right",
+        "centerLabel": null
+      },
+      {
+        "left": "HO",
+        "right": "H",
+        "centerLabel": null
+      },
+      {
+        "left": "H",
+        "right": "OH",
+        "centerLabel": null
+      },
+      {
+        "left": "HO",
+        "right": "H",
+        "centerLabel": null
+      }
+    ],
+    "notes": "Giữ nguyên HO ở nhánh trái (không đảo hàng); không thêm C/H ở giao điểm; không thay cấu hình theo tên chất.",
+    "svg": "fischer-ngucanh-ddh-617684c5dff7f8bb68021bd24cfd7572ee04911481dadc2adb293e9461169207.svg",
+    "hashSvg": "617684c5dff7f8bb68021bd24cfd7572ee04911481dadc2adb293e9461169207",
+    "byteSvg": 11343,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "bangChungNhan": "doc-fischer-4-ngu-canh.json",
+    "pattern": "KLRL",
+    "hashSvgDaSoat": "617684c5dff7f8bb68021bd24cfd7572ee04911481dadc2adb293e9461169207",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 928,
+    "hash": "a8403a490c888ab8d0bc445109a59247a165d7cffa2e3e42d9107b20b30900ac",
+    "fileNguon": "anh/a8403a490c888ab8d0bc445109a59247a165d7cffa2e3e42d9107b20b30900ac.png",
+    "caption": [
+      "B."
+    ],
+    "captionEvidence": "trực tiếp và đối chiếu bộ PA",
+    "top": "CH2OH",
+    "bottom": "CH2OH",
+    "rows": [
+      {
+        "kind": "carbonyl",
+        "side": "right",
+        "centerLabel": null
+      },
+      {
+        "left": "HO",
+        "right": "H",
+        "centerLabel": null
+      },
+      {
+        "left": "H",
+        "right": "OH",
+        "centerLabel": null
+      },
+      {
+        "left": "H",
+        "right": "OH",
+        "centerLabel": null
+      }
+    ],
+    "notes": "Giữ nguyên HO ở nhánh trái (không đảo hàng); không thêm C/H ở giao điểm; không thay cấu hình theo tên chất.",
+    "svg": "fischer-ngucanh-ddh-a1c04db1918fdd0eb935ae8033420120b012e2379d6fdf3ae634efef09d43f92.svg",
+    "hashSvg": "a1c04db1918fdd0eb935ae8033420120b012e2379d6fdf3ae634efef09d43f92",
+    "byteSvg": 11398,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "bangChungNhan": "doc-fischer-4-ngu-canh.json",
+    "pattern": "KLRR",
+    "hashSvgDaSoat": "a1c04db1918fdd0eb935ae8033420120b012e2379d6fdf3ae634efef09d43f92",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 1407,
+    "hash": "fce9235e043a996feac1e82a492048330d3e9ebb24fbb3535ee06b3f9ab3ccbe",
+    "fileNguon": "anh/fce9235e043a996feac1e82a492048330d3e9ebb24fbb3535ee06b3f9ab3ccbe.png",
+    "caption": [
+      "C."
+    ],
+    "captionEvidence": "trực tiếp và đối chiếu bộ PA",
+    "top": "CH2OH",
+    "bottom": "CH2OH",
+    "rows": [
+      {
+        "kind": "carbonyl",
+        "side": "right",
+        "centerLabel": null
+      },
+      {
+        "left": "H",
+        "right": "OH",
+        "centerLabel": null
+      },
+      {
+        "left": "H",
+        "right": "OH",
+        "centerLabel": null
+      },
+      {
+        "left": "HO",
+        "right": "H",
+        "centerLabel": null
+      }
+    ],
+    "notes": "Giữ nguyên HO ở nhánh trái (không đảo hàng); không thêm C/H ở giao điểm; không thay cấu hình theo tên chất.",
+    "svg": "fischer-ngucanh-ddh-41c2ba4a07da5ef619669fa5d3334154463b52ed4b963b7ec5ea5cc681df54ad.svg",
+    "hashSvg": "41c2ba4a07da5ef619669fa5d3334154463b52ed4b963b7ec5ea5cc681df54ad",
+    "byteSvg": 11285,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "bangChungNhan": "doc-fischer-4-ngu-canh.json",
+    "pattern": "KRRL",
+    "hashSvgDaSoat": "41c2ba4a07da5ef619669fa5d3334154463b52ed4b963b7ec5ea5cc681df54ad",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 1123,
+    "hash": "ca6d497b2cf4647405bf115ff7923e838c21c5f7f3c96d4e6e41be705f396bd7",
+    "fileNguon": "anh/ca6d497b2cf4647405bf115ff7923e838c21c5f7f3c96d4e6e41be705f396bd7.png",
+    "caption": [
+      "D."
+    ],
+    "captionEvidence": "loại trừ duy nhất trong bộ PA + nét còn lại tương thích",
+    "top": "CH2OH",
+    "bottom": "CH2OH",
+    "rows": [
+      {
+        "kind": "carbonyl",
+        "side": "right",
+        "centerLabel": null
+      },
+      {
+        "left": "H",
+        "right": "OH",
+        "centerLabel": null
+      },
+      {
+        "left": "HO",
+        "right": "H",
+        "centerLabel": null
+      },
+      {
+        "left": "H",
+        "right": "OH",
+        "centerLabel": null
+      }
+    ],
+    "notes": "Giữ nguyên HO ở nhánh trái (không đảo hàng); không thêm C/H ở giao điểm; không thay cấu hình theo tên chất.",
+    "svg": "fischer-ngucanh-ddh-50e46252227d65162c6d0c9587d1929cfaa55447b099dbaba7dd696d4b4cd713.svg",
+    "hashSvg": "50e46252227d65162c6d0c9587d1929cfaa55447b099dbaba7dd696d4b4cd713",
+    "byteSvg": 11225,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "bangChungNhan": "doc-fischer-4-ngu-canh.json",
+    "pattern": "KRLR",
+    "hashSvgDaSoat": "50e46252227d65162c6d0c9587d1929cfaa55447b099dbaba7dd696d4b4cd713",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

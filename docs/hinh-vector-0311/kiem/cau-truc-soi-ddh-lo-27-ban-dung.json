@@ -1,0 +1,86 @@
+[
+  {
+    "i": 704,
+    "hash": "831d51e3deec870a02f7ebb5f1f2197152fa2cb7e9ebf86e86c5df24be45148f",
+    "fileNguon": "anh/831d51e3deec870a02f7ebb5f1f2197152fa2cb7e9ebf86e86c5df24be45148f.png",
+    "svg": "soi-ddh-d1a88ece6af784f7df5ccb98c86c45ab87ec5a72bae6cdf7d3b42a432f1fb527.svg",
+    "hashSvg": "d1a88ece6af784f7df5ccb98c86c45ab87ec5a72bae6cdf7d3b42a432f1fb527",
+    "byteSvg": 35620,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "xLabels": [
+      "CH₃CH₂NH₂",
+      "CH₃CHO",
+      "HCOOCH₃",
+      "CH₃CH₂CH₂NH₂",
+      "CH₃OH"
+    ],
+    "values": [
+      17,
+      21,
+      32,
+      48,
+      65
+    ],
+    "yTicks": [
+      0,
+      20,
+      40,
+      60,
+      80
+    ],
+    "ghiChu": "Mộtseries,đủ4cạnhkhung,khôngthêmtitle/legend/xlabel.",
+    "hashSvgDaSoat": "d1a88ece6af784f7df5ccb98c86c45ab87ec5a72bae6cdf7d3b42a432f1fb527",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 1418,
+    "hash": "fee3331808c1dd3d6716875f512933b96ffaf52bec69405d17df9d7fd760574c",
+    "fileNguon": "anh/fee3331808c1dd3d6716875f512933b96ffaf52bec69405d17df9d7fd760574c.png",
+    "svg": "soi-ddh-336822a4f0dc929e4ff0b8a883ed0593e9187ec337e83e710cc54e91e731f929.svg",
+    "hashSvg": "336822a4f0dc929e4ff0b8a883ed0593e9187ec337e83e710cc54e91e731f929",
+    "byteSvg": 102151,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "xLabels": [
+      "(CH₃)₃N",
+      "CH₃CH₂-O-CH₃",
+      "CH₃CH₂-NH-CH₃",
+      "CH₃CH₂CH₂-NH₂",
+      "CH₃CH₂CH₂-OH"
+    ],
+    "mass": [
+      59,
+      60,
+      59,
+      59,
+      60
+    ],
+    "temperature": [
+      3,
+      8,
+      37,
+      48,
+      97
+    ],
+    "yTicksMass": [
+      20,
+      40,
+      60,
+      80
+    ],
+    "yTicksTemperature": [
+      0,
+      20,
+      40,
+      60,
+      80,
+      100
+    ],
+    "ghiChu": "Giữ2thangkhácnhau;khônggộptrục,masscộtchấm,tempnétđứt+tamgiác,đủlegend/title/datalabel.",
+    "hashSvgDaSoat": "336822a4f0dc929e4ff0b8a883ed0593e9187ec337e83e710cc54e91e731f929",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

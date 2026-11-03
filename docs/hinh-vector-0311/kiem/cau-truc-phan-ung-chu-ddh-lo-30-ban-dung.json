@@ -1,0 +1,92 @@
+[
+  {
+    "i": 18,
+    "hash": "030e148eda77181fe8c1e06a67591cd9eeb5c4dbb0cd5bd1daa2d2c315ed9c5e",
+    "fileNguon": "anh/030e148eda77181fe8c1e06a67591cd9eeb5c4dbb0cd5bd1daa2d2c315ed9c5e.png",
+    "soRefs": 2,
+    "kieu": "chuoi",
+    "nodes": [
+      {
+        "text": "C6H6"
+      },
+      {
+        "text": "C6H5NO2"
+      },
+      {
+        "text": "C6H5NH2"
+      }
+    ],
+    "arrows": [
+      {
+        "from": 0,
+        "to": 1,
+        "kind": "→",
+        "above": "+HNO3",
+        "below": "H2SO4, t°"
+      },
+      {
+        "from": 1,
+        "to": 2,
+        "kind": "→",
+        "above": "+6H, t°",
+        "below": "Fe+HCl"
+      }
+    ],
+    "notes": "Giữ +6H đúng nguồn, không tự thay thành 3H2 hoặc thêm 2H2O. H2SO4 không có chữ 'đặc' trong hình này.",
+    "gioiHan": "Đã mở PNG nguồn đầy đủ; chỉ ghi nội dung hình. Nguồn không ghi trạng thái (s)/(l)/(g)/(aq), không tự thêm trạng thái hoặc cân bằng/bổ sung sản phẩm.",
+    "trangThai": "da-soat-doc-lap",
+    "svg": "phan-ung-chu-ddh-94bdbe3d94684bdbcd66a3420a427ea1fad87d7ff5cccacd134a139e66b229ef.svg",
+    "hashSvg": "94bdbe3d94684bdbcd66a3420a427ea1fad87d7ff5cccacd134a139e66b229ef",
+    "byteSvg": 20310,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashSvgDaSoat": "94bdbe3d94684bdbcd66a3420a427ea1fad87d7ff5cccacd134a139e66b229ef",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 78,
+    "hash": "1004f947949f843da9d08022c2033484e471b6e2f7edc7b5bdac08277662805f",
+    "fileNguon": "anh/1004f947949f843da9d08022c2033484e471b6e2f7edc7b5bdac08277662805f.png",
+    "soRefs": 1,
+    "kieu": "chuoi",
+    "nodes": [
+      {
+        "text": "R–CH2–CH2–R"
+      },
+      {
+        "text": "2RCOOH"
+      },
+      {
+        "text": "2RCOONa (sodium stearate)"
+      }
+    ],
+    "arrows": [
+      {
+        "from": 0,
+        "to": 1,
+        "kind": "→",
+        "above": "+O2, xt",
+        "below": "−H2O",
+        "stepLabel": "(1)"
+      },
+      {
+        "from": 1,
+        "to": 2,
+        "kind": "→",
+        "above": "+NaOH",
+        "below": "−H2O",
+        "stepLabel": "(2)"
+      }
+    ],
+    "notes": "R hai đầu giống nhau, không R'. Giữ hệ số2 ở acid và muối, caption(sodium stearate) và số bước nguồn; không tự gán R hoặc sửa tên caption. Dấu trừ H2O nằm dưới mũi tên, không phải một node sản phẩm có dấu cộng. Mép trên có nét dư bị cắt không thuộc dòng sơ đồ.",
+    "gioiHan": "Đã mở PNG nguồn đầy đủ; chỉ ghi nội dung hình. Nguồn không ghi trạng thái (s)/(l)/(g)/(aq), không tự thêm trạng thái hoặc cân bằng/bổ sung sản phẩm.",
+    "trangThai": "da-soat-doc-lap",
+    "svg": "phan-ung-chu-ddh-1d8c8d9c503f99007ecac111d1f7ee8676eaab3d8fec5a1148dc54af365ee080.svg",
+    "hashSvg": "1d8c8d9c503f99007ecac111d1f7ee8676eaab3d8fec5a1148dc54af365ee080",
+    "byteSvg": 29304,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashSvgDaSoat": "1d8c8d9c503f99007ecac111d1f7ee8676eaab3d8fec5a1148dc54af365ee080",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
