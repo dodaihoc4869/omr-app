@@ -1,0 +1,56 @@
+name: Kiểm vị trí công khai của hình (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/ve-lai-hinh-kho-0311]
+    paths: ['scripts/kiem-vi-tri-hinh-0311.mjs', '.github/workflows/kiem-vi-tri-hinh-0311.yml']
+permissions:
+  contents: write
+concurrency:
+  group: kiem-vi-tri-hinh-0311
+  cancel-in-progress: false
+jobs:
+  doc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Chuẩn hoá cấu hình đọc Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Mở binding R2 chỉ đọc trên runner, không phát hành Worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          cat > scripts/wrangler-doc-hinh.toml <<'TOML'
+          name = "omr-doc-hinh-cuc-bo"
+          main = "doc-r2-hinh-0311.mjs"
+          compatibility_date = "2026-09-11"
+          [[r2_buckets]]
+          binding = "DE"
+          bucket_name = "omr-de"
+          remote = true
+          TOML
+          nohup npx -y wrangler@4 dev -c scripts/wrangler-doc-hinh.toml --ip 127.0.0.1 --port 8788 > /tmp/doc-r2.log 2>&1 &
+          for i in $(seq 1 60); do curl -s -o /dev/null http://127.0.0.1:8788/ && break; sleep 2; done
+          curl -fsS -o /dev/null 'http://127.0.0.1:8788/?key=kho/DH-10-C1-B1.json' || true
+      - name: Chỉ SELECT D1 và GET R2, không ghi kho
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: node scripts/kiem-vi-tri-hinh-0311.mjs
+      - name: Lưu hash và vị trí, không có nội dung đề hoặc đáp án
+        run: |
+          cp /tmp/vi-tri-cong-khai.json docs/hinh-vector-0311/nguon/vi-tri-cong-khai.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- docs/hinh-vector-0311/nguon/vi-tri-cong-khai.json
+          git diff --cached --quiet || git commit -m "Kiểm vị trí công khai của ảnh trước khi chuẩn bị tải offline"
+          git pull --rebase origin codex/ve-lai-hinh-kho-0311
+          git push origin HEAD:codex/ve-lai-hinh-kho-0311
