@@ -16,7 +16,7 @@ const ds = [
   { phan: 'III', dapAn: '13,2', em: '17,6', de: 'Đun nóng 12 gam acetic acid với 13,8 gam ethanol (xúc tác H2SO4 đặc), hiệu suất 75%. Khối lượng ethyl acetate thu được là bao nhiêu gam?' },
 ] as const
 const soCau = Number(new URLSearchParams(location.search).get('cau') || '1')
-const i = Math.max(0, Math.min(2, soCau - 1))
+const i = soCau === 5 ? 1 : soCau === 6 ? 2 : Math.max(0, Math.min(2, soCau - 1))
 // ?cau=4: câu GỌI TÊN (lysine) — xem cảnh danh-phap theo ba bước của thầy (03/11)
 const DP = {
   cotLoi: { chu: 'Gọi tên theo công thức của thầy: **nhánh + mạch chính + liên kết + chức**. Amino acid: COOH là chức chính, C của COOH là số 1, NH₂ là nhánh **amino**.', chip: [{ nhan: 'Đánh số', chu: 'chức → π → nhánh' }, { nhan: 'Đơn chức', chu: 'bỏ e' }] },
@@ -24,9 +24,18 @@ const DP = {
     manh: [{ loai: 'nhanh', chu: '2,6-diamino', giai: 'Hai nhóm NH₂ ở carbon số 2 và số 6 là **nhánh amino**; có 2 nhánh nên thêm **di**.' }, { loai: 'mach', chu: 'hex', giai: 'Mạch chính 6 C ⇒ **hex**.' },
       { loai: 'lien-ket', chu: 'an', giai: 'Toàn liên kết đơn ⇒ **an**.' }, { loai: 'chuc', chu: 'oic acid', giai: 'Chức COOH đọc là **oic acid**; đơn chức nên bỏ e (hexane → hexan).' }], ten: '2,6-diaminohexanoic acid' },
 }
-const d = soCau === 4 ? ds[0] : ds[i]!
+// ?cau=5: cảnh ĐIỆN DI · ?cau=6: cảnh ĐỘ TAN (kết tinh CuSO4·5H2O) — bản vẽ chờ thầy duyệt 03/11
+const DD = { canh: { loai: 'dien-di', pH: 6, chat: [
+  { ten: 'Glu', pI: 3.2, nhom: [{ ten: 'NH_3^{+}', dien: 1 }, { ten: 'COO^{-}', dien: -1 }, { ten: 'COO^{-}', dien: -1 }] },
+  { ten: 'Gly', pI: 6, nhom: [{ ten: 'NH_3^{+}', dien: 1 }, { ten: 'COO^{-}', dien: -1 }] },
+  { ten: 'Lys', pI: 9.7, nhom: [{ ten: 'NH_3^{+}', dien: 1 }, { ten: 'NH_3^{+}', dien: 1 }, { ten: 'COO^{-}', dien: -1 }] }] } }
+const DT = { canh: { loai: 'do-tan', chat: 'CuSO4', S: [{ t: 80, S: 55 }, { t: 20, S: 20.7 }], hang: [
+  { nhan: 'Dung dịch bão hoà ở 80 °C', ct: 55, nuoc: 100, baoHoa: 80 },
+  { nhan: 'Tách ra: 60,66 g CuSO4·5H2O', ct: 38.82, nuoc: 21.84, tachRa: true },
+  { nhan: 'Còn lại: dung dịch bão hoà ở 20 °C', ct: 16.18, nuoc: 78.16, baoHoa: 20 }] } }
+const d = soCau === 4 ? ds[0] : soCau === 5 ? ds[1] : soCau === 6 ? ds[2] : ds[i]!
 const PT = { cotLoi: { congThuc: 'H_2N-CH_2-COOH + C_2H_5OH + HCl → ClH_3N-CH_2-COOC_2H_5 + H_2O', chu: 'COOH của glycine ester hoá với OH của ethyl alcohol, mất một H₂O; có HCl nên nhóm NH₂ **nhận H⁺**.', chip: [{ nhan: 'COOH + OH', chu: 'ester hoá, mất H₂O' }] } }
-const ban = { ...(mau as unknown[])[i] as object, ...(soCau === 4 ? DP : {}), ...(new URLSearchParams(location.search).get('pt') ? PT : {}), qid: `mau-${i + 1}`, phienBan: 1, phan: d.phan } as unknown as BanKinh
+const ban = { ...(mau as unknown[])[i] as object, ...(soCau === 4 ? DP : soCau === 5 ? DD : soCau === 6 ? DT : {}), ...(new URLSearchParams(location.search).get('pt') ? PT : {}), qid: `mau-${i + 1}`, phienBan: 1, phan: d.phan } as unknown as BanKinh
 document.body.style.background = 'var(--tr-nen)'
 // ?hop=1: hộp «Lời giải» của màn làm bài (thanh tiêu đề + nút «Lời giải thu gọn» sát nút đóng); ?mo=1 bấm mở sẵn.
 function Hop() {

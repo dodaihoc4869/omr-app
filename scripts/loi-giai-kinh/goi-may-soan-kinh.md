@@ -72,6 +72,13 @@ Thầy: «có câu xác định nhóm trong bảng tuần hoàn ko đưa kiến 
       Vị trí carbon trong chữ viết «carbon số 2» hoặc «vị trí 2», KHÔNG viết «C2» (app hạ số sau chữ thành chỉ số, thành C₂ dễ hiểu nhầm).
       Mảnh có thể rỗng nghĩa thì bỏ (vd không có nhánh thì không có mảnh `nhanh`).
     - `ten`: tên đầy đủ = ghép các `chu` (máy so bỏ dấu cách). Phải đúng với đáp án kho.
+  - `{ "loai": "dien-di", "pH": số, "chat": 1–3 { "ten": "Gly", "pI"?: số, "nhom": 1–4 { "ten": "NH_3^{+}", "dien": 1 } } }` — BẮT BUỘC cho câu ĐIỆN DI
+    (thầy 03/11). `nhom` = các nhóm của chất Ở ĐÚNG pH đề cho (NH₃⁺ +1, COO⁻ −1, nhóm trung hoà 0); app cộng điện tích, chạy về cực. Có `pI` thì dấu tổng phải đúng luật
+    pH < pI ⇒ dương, pH > pI ⇒ âm (lệch ⇒ máy bỏ cảnh).
+  - `{ "loai": "do-tan", "chat": "CuSO4", "S": 1–3 { "t": °C, "S": g/100 g nước }, "hang": 1–4 { "nhan", "ct": g chất tan, "nuoc": g nước, "baoHoa"?: °C, "tachRa"?: true } }` —
+    BẮT BUỘC cho câu ĐỘ TAN định lượng. App vẽ hàng chuẩn 100 g nước rồi từng hàng thật theo tỉ lệ gam. Hàng `baoHoa: t` phải có ct/nước·100 = S(t) (±1 %);
+    kết tinh: 3 hàng «trước · tách ra (`tachRa`) · còn lại», máy kiểm trước = tách ra + còn lại cho CẢ chất tan lẫn nước. Tinh thể ngậm nước: tách thành phần chất tan
+    và phần nước của tinh thể (ghi khối lượng tinh thể trong `nhan`).
 - `thanChu`: mảng chữ thần chú — CHỈ chép ĐÚNG CHỮ trường `chu` trong `than-chu.json`, chỉ khi đúng chuyện câu đang hỏi. Không có thì `[]`. Tuyệt đối không tự đặt thần chú.
 - `thayNoi` (tuỳ chọn): MỘT câu chép NGUYÊN VĂN từ `noi` của một mục trong `.muc.json`, hợp ý bài. Không có câu hợp thì bỏ trường. Không sửa chữ (chỉ được sửa axit→acid, bazơ→base, este→ester, ancol→alcohol, oxit→oxide, amin→amine, anđehit→aldehyde). Sửa thuật ngữ thì máy chủ không khớp ⇒ thà chép nguyên.
 - `meo` (tuỳ chọn): chép NGUYÊN VĂN `meo` của mục hợp ý.

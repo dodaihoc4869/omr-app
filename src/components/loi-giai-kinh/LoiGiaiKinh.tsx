@@ -172,6 +172,8 @@ function Canh({ canh }: { canh: CanhKinh }) {
   if (canh.loai === 'can-bang') return <CanhCanBang canh={canh} />
   if (canh.loai === 'ong-nghiem') return <CanhOngNghiem canh={canh} />
   if (canh.loai === 'danh-phap') return <CanhDanhPhap canh={canh} />
+  if (canh.loai === 'dien-di') return <CanhDienDi canh={canh} />
+  if (canh.loai === 'do-tan') return <CanhDoTan canh={canh} />
   return <CanhSoSanh canh={canh} />
 }
 function CanhCanBang({ canh }: { canh: Extract<CanhKinh, { loai: 'can-bang' }> }) {
@@ -318,6 +320,99 @@ function MachC({ canh, sang, so }: { canh: CanhDP; sang: string; so: boolean }) 
         })}
       </svg>
     </div>
+  )
+}
+
+// ---------------------------------------------------------------- CẢNH ĐIỆN DI (thầy 03/11, skill 10.C3 + 2007 ôn tập ch.3)
+// Nhịp đúng chuỗi thầy: điện di là gì → so pH với pI (acid / base của chất) → đầu nhận / nhường H⁺ (nhóm hiện điện tích) → cộng điện tích → chạy về cực.
+const soDau = (d: number) => (d > 0 ? `+${d}` : d < 0 ? `−${-d}` : '0')
+const chuSo = (v: number) => String(v).replace('.', ',')
+function CanhDienDi({ canh }: { canh: Extract<CanhKinh, { loai: 'dien-di' }> }) {
+  const tong = canh.chat.map((c) => c.nhom.reduce((a, g) => a + g.dien, 0))
+  const nhip = [
+    '**Điện di** = điện tích **di chuyển trong điện trường**: ion dương bị **cực âm** hút, ion âm bị **cực dương** hút.',
+    canh.chat.map((c) => (c.pI === undefined ? `${c.ten}: xét môi trường pH = ${chuSo(canh.pH)}` : `${c.ten}: pH ${chuSo(canh.pH)} ${canh.pH < c.pI ? '<' : canh.pH > c.pI ? '>' : '='} pI ${chuSo(c.pI)} ⇒ ${canh.pH < c.pI ? '**môi trường acid** của chất' : canh.pH > c.pI ? '**môi trường base** của chất' : 'đúng điểm đẳng điện'}`)).join(' · ') + '.',
+    canh.chat.map((c) => `${c.ten}: ${c.nhom.map((g) => g.ten).join(', ')}`).join(' · ') + ' — acid thì đầu N **nhận H⁺** thành NH₃⁺, base thì COOH **nhường H⁺** thành COO⁻.',
+    canh.chat.map((c, i) => `${c.ten}: ${c.nhom.map((g) => `(${soDau(g.dien)})`).join(' + ')} = **${soDau(tong[i]!)}**`).join(' · ') + ' — **cộng điện tích hai đầu**.',
+    canh.chat.map((c, i) => `${c.ten} ${tong[i]! > 0 ? '⇒ ion dương ⇒ về **cực âm**' : tong[i]! < 0 ? '⇒ ion âm ⇒ về **cực dương**' : '⇒ tổng 0 ⇒ **đứng yên**'}`).join(' · ') + '.',
+  ]
+  const n = nhip.length
+  const { datGoc, ...p } = useChayMotLuot(n, 3600)
+  const k = p.buoc
+  return (
+    <section className="lgk-the lgk-canh lgk-dd" ref={datGoc} aria-label="Điện di theo cách của thầy" data-nhip={k}>
+      <div className="lgk-dau"><span className="lgk-nhan">Điện di</span><span className="lgk-dem">Nhịp {k}/{n}</span></div>
+      <Vach n={n} buoc={k} chay={p.chay} den={(x) => p.den(x)} t={p.t} nhan="Nhịp" />
+      <div className="lgk-dd-ph" aria-label={`Thang pH, pH bằng ${chuSo(canh.pH)}`} data-sang={k === 2 ? '' : undefined}>
+        <span className="lgk-dd-ph-ray" />
+        <span className="lgk-dd-ph-moc" style={{ left: `${(canh.pH / 14) * 100}%` }}><b>pH {chuSo(canh.pH)}</b></span>
+        {canh.chat.map((c, i) => c.pI !== undefined && <span key={i} className="lgk-dd-pi" style={{ left: `${(c.pI / 14) * 100}%` }}>pI {c.ten}</span>)}
+        <span className="lgk-dd-ph-hai"><span>acid</span><span>base</span></span>
+      </div>
+      <div className="lgk-dd-san">
+        <span className="lgk-dd-cuc" data-dau="am">− cực âm</span>
+        <div className="lgk-dd-lan">
+          {canh.chat.map((c, i) => (
+            <div key={i} className="lgk-dd-hang">
+              <span className="lgk-dd-giua" aria-hidden="true" />
+              <span className="lgk-dd-phan" style={{ transform: k >= 5 && tong[i] ? `translateX(${Math.sign(tong[i]!) * -Math.min(30, 16 + 8 * Math.abs(tong[i]!))}cqi)` : 'none' }} data-dau={tong[i]! > 0 ? 'duong' : tong[i]! < 0 ? 'am' : 'khong'}>
+                <b>{c.ten}</b>
+                {k >= 3 && <span className="lgk-dd-nhom">{c.nhom.map((g, j) => <i key={j} data-dien={g.dien > 0 ? 'duong' : g.dien < 0 ? 'am' : 'khong'}><ChuTron chu={g.ten} /></i>)}</span>}
+                {k >= 4 && <em>{soDau(tong[i]!)}</em>}
+              </span>
+            </div>
+          ))}
+        </div>
+        <span className="lgk-dd-cuc" data-dau="duong">cực dương +</span>
+      </div>
+      <p className="lgk-loi" aria-live="polite"><span className="lgk-so-tron">{k}</span><span><Chu chu={nhip[k - 1]!} /></span></p>
+      <div className="lgk-dk"><NutChay chay={p.chay} buoc={k} n={n} onClick={p.nut} /></div>
+    </section>
+  )
+}
+
+// ---------------------------------------------------------------- CẢNH ĐỘ TAN (thầy 03/11): hàng chuẩn 100 g nước → hàng thật theo tỉ lệ → tách ra → còn lại; mỗi hàng một thanh chất tan | nước
+function CanhDoTan({ canh }: { canh: Extract<CanhKinh, { loai: 'do-tan' }> }) {
+  const chuan = canh.S.map((v) => ({ nhan: `Chuẩn ở ${chuSo(v.t)} °C: 100 g nước`, ct: v.S, nuoc: 100, chuan: true as const }))
+  const hang = [...chuan.slice(0, 1), ...canh.hang.map((h) => ({ ...h, chuan: false as const })), ...chuan.slice(1)]
+  const lon = Math.max(...hang.map((h) => h.ct + h.nuoc))
+  const tach = canh.hang.some((h) => h.tachRa)
+  const nhip = [
+    `**Độ tan S** = số gam ${canh.chat} tan tối đa trong **100 g nước** (dung dịch bão hoà). Ở ${chuSo(canh.S[0]!.t)} °C: S = **${chuSo(canh.S[0]!.S)}**.`,
+    ...canh.hang.map((h) => (h.tachRa ? `**${h.nhan}**: ${chuSo(+h.ct.toFixed(2))} g ${canh.chat} + ${chuSo(+h.nuoc.toFixed(2))} g nước tách khỏi dung dịch.`
+      : `**${h.nhan}**: ${chuSo(+h.ct.toFixed(2))} g chất tan + ${chuSo(+h.nuoc.toFixed(2))} g nước${h.baoHoa !== undefined ? ` — bão hoà ở ${chuSo(h.baoHoa)} °C nên tỉ lệ đúng bằng hàng chuẩn (S/100)` : ''}.`)),
+    ...(tach ? [(() => {
+      const [a, b2, c] = canh.hang, g = (v: number) => chuSo(+v.toFixed(2))
+      return canh.hang.length === 3 && a && b2 && c ? `**Bảo toàn** chất tan: ${g(a.ct)} = ${g(b2.ct)} + ${g(c.ct)} · nước: ${g(a.nuoc)} = ${g(b2.nuoc)} + ${g(c.nuoc)} ⇒ MỘT phương trình một ẩn.`
+        : '**Bảo toàn**: chất tan trước = tách ra + còn lại; nước trước = tách ra + còn lại ⇒ MỘT phương trình.'
+    })()] : []),
+  ]
+  const n = nhip.length
+  const { datGoc, ...p } = useChayMotLuot(n, 3600)
+  const k = p.buoc
+  return (
+    <section className="lgk-the lgk-canh lgk-dt" ref={datGoc} aria-label="Độ tan theo hàng chuẩn 100 g nước" data-bao-toan={tach && k === n ? '' : undefined}>
+      <div className="lgk-dau"><span className="lgk-nhan">Độ tan <span className="lgk-dt-chat"><CongThuc chu={canh.chat} /></span></span><span className="lgk-dem">Nhịp {k}/{n}</span></div>
+      <Vach n={n} buoc={k} chay={p.chay} den={(x) => p.den(x)} t={p.t} nhan="Nhịp" />
+      <div className="lgk-dt-chu"><span data-loai="ct">chất tan</span><span data-loai="nuoc">nước</span></div>
+      <div className="lgk-dt-bang">
+        {hang.map((h, i) => {
+          const m = canh.hang.length
+          const hien = i === 0 || (i <= m ? k >= i + 1 : k >= m + 1)
+          return (
+            <div key={i} className="lgk-dt-hang" data-chuan={h.chuan ? '' : undefined} data-tach={!h.chuan && h.tachRa ? '' : undefined} data-hien={hien ? '' : undefined}>
+              <span className="lgk-dt-nhan"><ChuTron chu={h.nhan} /></span>
+              <span className="lgk-dt-thanh" style={{ width: `${Math.max(18, ((h.ct + h.nuoc) / lon) * 100)}%` }}>
+                <i data-loai="ct" style={{ flexGrow: h.ct }}>{chuSo(+h.ct.toFixed(2))}</i>
+                <i data-loai="nuoc" style={{ flexGrow: h.nuoc }}>{chuSo(+h.nuoc.toFixed(2))}</i>
+              </span>
+            </div>
+          )
+        })}
+      </div>
+      <p className="lgk-loi" aria-live="polite"><span className="lgk-so-tron">{k}</span><span><Chu chu={nhip[k - 1]!} /></span></p>
+      <div className="lgk-dk"><NutChay chay={p.chay} buoc={k} n={n} onClick={p.nut} /></div>
+    </section>
   )
 }
 

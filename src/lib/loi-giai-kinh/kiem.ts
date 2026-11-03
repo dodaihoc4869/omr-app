@@ -91,6 +91,32 @@ function docCanh(x: unknown): CanhKinh | null {
     if (!t || !p || !t.y.length || !p.y.length) return null
     return { loai: 'so-sanh', trai: t, phai: p }
   }
+  if (x.loai === 'dien-di') {
+    const pH = Number(x.pH)
+    const chat = mang(x.chat).map((c) => {
+      if (!laObj(c) || !s(c.ten, 24)) return null
+      const nhom = mang(c.nhom).map((g) => (laObj(g) && s(g.ten, 16) && Number.isInteger(g.dien) && Math.abs(Number(g.dien)) <= 2 ? { ten: s(g.ten, 16), dien: Number(g.dien) } : null))
+      if (!nhom.length || nhom.length > 4 || nhom.some((g) => !g)) return null
+      const pI = Number(c.pI)
+      return { ten: s(c.ten, 24), ...(Number.isFinite(pI) && pI > 0 && pI < 14 ? { pI } : {}), nhom: nhom as { ten: string; dien: number }[] }
+    })
+    if (!Number.isFinite(pH) || pH < 0 || pH > 14 || !chat.length || chat.length > 3 || chat.some((c) => !c)) return null
+    // pH < pI ⇒ tổng phải dương; pH > pI ⇒ tổng phải âm (luật thầy) — lệch ⇒ bỏ cảnh (không vẽ sai chiều).
+    for (const c of chat) { const tong = c!.nhom.reduce((a, g) => a + g.dien, 0); if (c!.pI !== undefined && Math.abs(pH - c!.pI) > 0.3 && Math.sign(tong) !== (pH < c!.pI ? 1 : -1)) return null }
+    return { loai: 'dien-di', pH, chat: chat as never }
+  }
+  if (x.loai === 'do-tan') {
+    const Sds = mang(x.S).map((v) => (laObj(v) && Number.isFinite(Number(v.t)) && Number(v.S) > 0 ? { t: Number(v.t), S: Number(v.S) } : null))
+    const hang = mang(x.hang).map((h) => (laObj(h) && s(h.nhan, 60) && Number(h.ct) >= 0 && Number(h.nuoc) >= 0 && Number(h.ct) + Number(h.nuoc) > 0
+      ? { nhan: s(h.nhan, 60), ct: Number(h.ct), nuoc: Number(h.nuoc), ...(Number.isFinite(Number(h.baoHoa)) && h.baoHoa !== undefined && h.baoHoa !== null ? { baoHoa: Number(h.baoHoa) } : {}), ...(h.tachRa === true ? { tachRa: true } : {}) } : null))
+    if (!s(x.chat, 30) || !Sds.length || Sds.length > 3 || Sds.some((v) => !v) || !hang.length || hang.length > 4 || hang.some((h) => !h)) return null
+    const gan = (a: number, b: number) => Math.abs(a - b) <= Math.max(0.05, 0.01 * Math.abs(b))
+    // hàng bão hoà ở t ⇒ ct/nước·100 = S(t); có hàng «tách ra» ⇒ hàng đầu = tách ra + còn lại (bảo toàn chất tan, bảo toàn nước)
+    for (const h of hang) if (h!.baoHoa !== undefined) { const sv = Sds.find((v) => v!.t === h!.baoHoa); if (!sv || !h!.nuoc || !gan((h!.ct / h!.nuoc) * 100, sv.S)) return null }
+    const tach = hang.findIndex((h) => h!.tachRa)
+    if (tach > 0 && hang.length === 3) { const [a, b, c] = tach === 1 ? [hang[0]!, hang[1]!, hang[2]!] : [hang[0]!, hang[2]!, hang[1]!]; if (!gan(a.ct, b.ct + c.ct) || !gan(a.nuoc, b.nuoc + c.nuoc)) return null }
+    return { loai: 'do-tan', chat: s(x.chat, 30), S: Sds as never, hang: hang as never }
+  }
   if (x.loai === 'danh-phap') {
     const soC = Number.isInteger(x.soC) && Number(x.soC) >= 1 && Number(x.soC) <= 12 ? Number(x.soC) : undefined
     const trongMach = (v: unknown, tran: number) => Number.isInteger(v) && Number(v) >= 1 && Number(v) <= tran
