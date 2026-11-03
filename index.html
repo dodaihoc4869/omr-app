@@ -53,9 +53,10 @@
           document.write('<link rel="manifest" href="/' + ten + '">')
           document.write('<meta name="apple-mobile-web-app-title" content="' + ten2 + '">')
           if (vai === 'hs') {
-            document.write('<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f6fc">')
-            document.write('<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1a1a29">')
-            document.write('<style>html:not([data-trong]){background:#f6f6fc}@media (prefers-color-scheme: dark){html:not([data-trong]){background:#1a1a29}}</style>')
+            var ms = '(prefers-color-scheme: dark)', ns = '#f6f6fc', nt = '#1a1a29'
+            document.write('<meta name="theme-color" media="(prefers-color-scheme: light)" content="' + ns + '">')
+            document.write('<meta name="theme-color" media="' + ms + '" content="' + nt + '">')
+            document.write('<style>html:not([data-trong]){background:' + ns + '}@media ' + ms + '{html:not([data-trong]){background:' + nt + '}}</style>')
           }
         } catch (e) {
           document.write('<link rel="manifest" href="/manifest.json">')

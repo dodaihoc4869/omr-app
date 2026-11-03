@@ -387,7 +387,9 @@ try {
     await p.reload({ waitUntil: 'commit' })
     const vet = []
     const xem = () => p.evaluate(() => { const e = document.elementFromPoint(60, 16); const c = []; for (let x = e; x && c.length < 6; x = x.parentElement) c.push((x.className && typeof x.className === 'string' ? x.className : x.tagName).slice(0, 60)); return { t: Math.round(performance.now()), c: c.join(' < '), top: Math.round(document.querySelector('.kb-hero')?.getBoundingClientRect().top ?? -1) } }).catch(() => null)
-    for (let i = 0; i < 40; i++) { const v = await xem(); if (v) vet.push(v); await p.waitForTimeout(80) }
+    const soi = arg('quay-soi', '') // --quay-soi=<css>: in nền / lớp <html> của phần tử ấy trong ảnh tĩnh và app thật theo thời gian (tìm chỗ lệch màu)
+    const xemSoi = () => p.evaluate((q) => { const f = (e) => { if (!e) return '-'; const r = []; for (let x = e; x && x !== document.documentElement; x = x.parentElement) { const c = getComputedStyle(x); if (c.opacity !== '1' || c.filter !== 'none' || c.mixBlendMode !== 'normal' || (c.backgroundColor !== 'rgba(0, 0, 0, 0)')) r.push(String(x.className || x.tagName).slice(0, 24) + ':' + c.backgroundColor + '/' + c.opacity + '/' + c.filter + '/' + c.mixBlendMode) } return r.join(' > ') }; return document.documentElement.className + ' tinh=' + f(document.querySelector('#khung-tinh-hs ' + q)) + ' that=' + f(document.querySelector('#root ' + q)) }, soi).catch(() => null)
+    for (let i = 0; i < 40; i++) { const v = await xem(); if (v) vet.push(v); if (soi) { const s = await xemSoi(); if (s && s !== vet.soiCu) { console.log('SOI', i * 80, s); vet.soiCu = s } } await p.waitForTimeout(80) }
     console.log(JSON.stringify(vet.filter((v, i, a) => !i || v.c !== a[i - 1].c || v.top !== a[i - 1].top)))
     await p.waitForTimeout(800)
     await cdp.send('Page.stopScreencast')

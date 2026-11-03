@@ -73,14 +73,16 @@ export function moKhungTinh(w: any, d: any, css: string[], xuong: string, khoa: 
     var g = d.documentElement
     g.setAttribute('data-trong', 'hs')
     g.setAttribute('data-ht2', '')
+    // máy đã đo là yếu (src/lib/may-yeu.ts nhớ 'ddh.mayYeu' = '1') ⇒ gắn lớp may-yeu NGAY (thẻ kính đặc như app thật) — trước đây gắn sau mã chính ⇒ gỡ ảnh tĩnh
+    // thì thẻ sáng lên 3–5 mức (quay F5 nền tối CPU ×6, 03/11).
+    if (s2.getItem('ddh.mayYeu') === '1') g.classList.add('may-yeu')
     var o2 = d.createElement('div'), cho = 0
     var hien = function () { if (--cho <= 0 && o2) o2.style.visibility = '' }
-    // Nền lớp phủ = đúng chồng lớp của app thật (03/11, quay F5 nền tối lệch 3 mức sáng khi gỡ lớp phủ): nền khung nhìn (Canvas) → nền body --kinh-nen
-    // (bán trong suốt, lan ra khung nhìn) → dải loang (body::before). Đặc ⇒ vẫn che các lượt dựng dở của React bên dưới.
     o2.id = 'khung-tinh-hs'
     o2.setAttribute('aria-hidden', 'true')
     o2.setAttribute('inert', '')
-    o2.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483000;overflow:hidden;background:var(--kinh-loang),linear-gradient(var(--kinh-nen) 0 0) Canvas'
+    o2.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483000;overflow:hidden;background:var(--tr-nen)'
+    o2.style.backgroundImage = 'var(--kinh-loang)' // dải loang Kính như body::before của app thật (03/11: lớp phủ trơn ⇒ lúc gỡ thấy nền đổi)
     for (var i = 0; i < css.length; i++) {
       var e = d.createElement('link')
       e.rel = 'stylesheet'

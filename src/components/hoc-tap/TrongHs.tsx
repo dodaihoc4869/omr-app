@@ -16,6 +16,7 @@ import { Bi, SU_KIEN_LUA_CAP, type CamBi } from '../linh-vat/Bi'
 // LỬA ĐỔI CẢM XÚC (thầy «Chốt duyệt tất» 31/10, docs/DE-XUAT-BI-CAM-XUC-3110.md): luật + lời (hàm thuần) · sổ câu được tính trên máy · biểu tượng tab + chấm số.
 import { chanNgon, loiLua, mocDoiLua, soLuot, xetLua, type CapLua, type VaoLua } from '../../lib/lua-cam-xuc'
 import { chonChoBong, rongOmChu, type Hop } from '../../lib/bong-bong-mol'
+import { useBongVuaChu } from '../../lib/bong-vua-chu'
 import { docLuaThat } from '../../lib/lua-that'
 import { gioMayChu } from '../../lib/gio-may-chu'
 import { anMung, banHat, KHOA_AM_AN_MUNG, kichRuong, napAnMung, napTruocAnMung, yenLang } from '../../lib/hieu-ung'
@@ -557,8 +558,7 @@ type NhoLoiMol = { l?: string; c?: string; t?: string }
 const docLoiMol = (): NhoLoiMol => { try { const v = JSON.parse(localStorage.getItem(KHOA_LOI_MOL) || '{}'); return v && typeof v === 'object' ? v : {} } catch { return {} } }
 const ghiLoiMol = (v: NhoLoiMol) => { try { localStorage.setItem(KHOA_LOI_MOL, JSON.stringify(v)) } catch { /* không lưu được: lượt sau có thể lặp câu */ } }
 
-/** Cỡ Mol ở góc thẻ đầu (px). PHẢI ≥ 64: dưới 64 Bi chạy chế độ 'nho' (mặt tĩnh, không vòng hiệu ứng) — thầy 03/11 «hiệu ứng của mol mất hết rồi … cho Mol to lên
- *  cân đối với bảng». Màn rộng phóng thêm bằng CSS (--lv-w, trong-kinh.css .kb-mol), chế độ vẫn 'day-du' / 'gon'. */
+/** Cỡ Mol góc thẻ đầu (px), PHẢI ≥ 64: dưới 64 Bi chạy chế độ 'nho' mặt tĩnh (thầy 03/11 «hiệu ứng của mol mất hết rồi … cho Mol to lên»). */
 export const MOL_GOC = 84
 function LoiBi({ cam, loi, coBi = true, khoa, cap = 0, ben, chanNgon: laChanNgon, goc }: { cam: CamBi; loi: string; coBi?: boolean; khoa?: string; cap?: number; ben?: HTMLElement | null; chanNgon?: boolean; goc?: boolean }) {
   // pha: hien (gõ chữ, giữ ~4 s) → thu (mờ + co chiều cao mượt, đường đi trượt lên) → an (gỡ hẳn). Không khoá (lời quan trọng) ⇒ luôn hiện.
@@ -663,33 +663,7 @@ function LoiBi({ cam, loi, coBi = true, khoa, cap = 0, ben, chanNgon: laChanNgon
       window.removeEventListener('resize', henDat); window.removeEventListener('scrollend', henDat, { capture: true })
     }
   }, [ben, daAn, doc]) // eslint-disable-line react-hooks/exhaustive-deps
-  // MOL GÓC THẺ ĐẦU — BONG BÓNG VỪA CHỮ (thầy 03/11 «khung bong bóng vừa với chữ»): chữ xuống 2 dòng thì hộp vẫn rộng hết hàng ⇒ đo DÒNG DÀI NHẤT
-  // (cả phần chữ chưa gõ — visibility: hidden vẫn chiếm chỗ) rồi đặt bề rộng ôm sát. Đo sau bố cục (ResizeObserver hàng Mol), lại khi hàng đổi bề rộng / phông nạp xong.
-  const bongGoc = useRef<HTMLParagraphElement>(null)
-  useLayoutEffect(() => {
-    const bb = bongGoc.current, hang = bb?.parentElement, chu = bb?.querySelector('[aria-hidden="true"]')
-    if (!goc || !bb || !hang || !chu || typeof document.createRange !== 'function') return
-    let rongHang = -1
-    const doLai = (ep?: boolean) => {
-      const r = hang.getBoundingClientRect().width
-      if (!ep && r === rongHang) return
-      rongHang = r
-      bb.style.width = ''
-      const rg = document.createRange(); rg.selectNodeContents(chu)
-      if (typeof rg.getClientRects !== 'function') return
-      const cs = getComputedStyle(bb), so = (x: string) => parseFloat(x) || 0
-      const w = rongOmChu(Array.from(rg.getClientRects()), so(cs.paddingLeft) + so(cs.paddingRight) + so(cs.borderLeftWidth) + so(cs.borderRightWidth))
-      if (w && w + 1 < bb.getBoundingClientRect().width) bb.style.width = `${w + 1}px`
-    }
-    const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(() => doLai()) : null
-    if (ro) ro.observe(hang); else doLai()
-    // phông web có thể CHƯA bắt đầu tải lúc này (fonts.ready xong ngay, đo bằng phông thay thế ⇒ phông thật về làm chữ tràn xuống dòng 3) ⇒ đo lại khi phông nạp xong
-    let con = true
-    const doPhong = () => { if (con) doLai(true) }
-    void document.fonts?.ready.then(doPhong)
-    document.fonts?.addEventListener?.('loadingdone', doPhong)
-    return () => { con = false; ro?.disconnect(); document.fonts?.removeEventListener?.('loadingdone', doPhong) }
-  }, [goc, loi])
+  const bongGoc = useBongVuaChu(!!goc, loi) // thầy 03/11 «khung bong bóng vừa với chữ» (src/lib/bong-vua-chu.ts)
   // màu bong bóng theo cảm xúc (trong-hs.css .bi-loi-bong[data-cx]): cấp ≥ 2 ⇒ dỗi · bực · cáu · rất cáu; còn lại theo mặt Mol
   const cx = cap >= 2 ? (['doi', 'buc', 'cau', 'ratCau'] as const)[Math.min(cap, 5) - 2] : cam === 'mung' || cam === 'lua' ? 'khen' : cam === 'sai' ? 'buon' : cam
   // MOL Ở GÓC TRÁI THẺ ĐẦU (thầy 03/11 «cho mol hiển thị lên bảng đầu tiên góc trái … hiển thị cả bong bóng cảm xúc», chốt bản vẽ docs/ban-ve-mol-goc-0311): Mol nhỏ ở góc trái thẻ «Tổng câu hôm nay», bong bóng cảm xúc cạnh Mol

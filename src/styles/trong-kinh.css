@@ -577,9 +577,7 @@ html[data-trong='hs'] .kb-thanh .kb-thanh-muc.tr-menu-cham[aria-expanded='true']
 html[data-vua-mo] *, html[data-vua-mo] *::before, html[data-vua-mo] *::after { animation-delay: -30s !important; transition-duration: 0s !important; transition-delay: 0s !important; }
 
 /* MOL Ở GÓC TRÁI THẺ ĐẦU (chốt 03/11, docs/ban-ve-mol-goc-0311) (thầy «cho mol hiển thị lên bảng đầu tiên góc trái cho tinh tế đẹp mắt hiển thị cả bong bóng cảm xúc của mol») */
-/* 03/11 tối (thầy «hiệu ứng của mol mất hết … cho Mol to lên cân đối với bảng · khung bong bóng vừa với chữ và có màu nền theo cảm xúc»): Mol 84 px (≥ 64 ⇒ đủ
-   vòng hiệu ứng, TrongHs.tsx MOL_GOC); bong bóng KHÔNG giãn hết hàng (bi.css cho flex-grow 1) — bề rộng ôm dòng dài nhất do TrongHs đo; nền · viền · chữ theo
-   data-cx (bộ màu trong-hs.css .bi-loi-bong[data-cx]), đổi màu mượt 300 ms; rất cáu: viền đập nhẹ (máy yếu / giảm chuyển động đứng yên — trong-hs.css). */
+/* 03/11 (thầy «Mol to lên · bong bóng vừa chữ, màu theo cảm xúc»): bong bóng không giãn (bi.css flex-grow 1), bề rộng do src/lib/bong-vua-chu.ts đo; màu theo data-cx. */
 html[data-trong='hs'] .kb-mol { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; margin: -8px 0 2px -10px; min-width: 0; }
 html[data-trong='hs'] .kb-mol .bi { flex: none; }
 html[data-trong='hs'] .kb-mol .kb-mol-bong { position: relative; flex: 0 1 auto; margin: 0; padding: 9px 14px; max-width: 100%; min-width: 0; font-size: 15px; line-height: 1.35; border-radius: 18px 18px 18px 6px; text-wrap: balance; }

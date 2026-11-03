@@ -20,6 +20,7 @@ describe('Mol góc thẻ đầu', () => {
     expect(css).toMatch(/\.kb-mol \.kb-mol-bong\[data-cx\][^{]*\{\s*background: var\(--bb-nen/)
     expect(css).toMatch(/\.kb-mol \.kb-mol-bong\[data-cx\] \{ color: var\(--bb-chu/)
     expect(doc('src/components/hoc-tap/TrongHs.tsx')).toMatch(/ref=\{bongGoc\} className="bi-loi-bong kb-mol-bong"/)
+    expect(doc('src/components/hoc-tap/TrongHs.tsx')).toMatch(/useBongVuaChu\(!!goc, loi\)/)
   })
   it('máy yếu: vẫn mấp máy miệng khi Mol nói (không tắt sạch hoạt ảnh)', () => {
     expect(doc('src/styles/mol.css')).toMatch(/html\.may-yeu \.mol-svg :not\(\.mol-mieng\) \{ animation: none !important; \}/)
