@@ -73,9 +73,6 @@ export function moKhungTinh(w: any, d: any, css: string[], xuong: string, khoa: 
     var g = d.documentElement
     g.setAttribute('data-trong', 'hs')
     g.setAttribute('data-ht2', '')
-    // máy đã đo là yếu (src/lib/may-yeu.ts nhớ 'ddh.mayYeu' = '1') ⇒ gắn lớp may-yeu NGAY (thẻ kính đặc như app thật) — trước đây gắn sau mã chính ⇒ gỡ ảnh tĩnh
-    // thì thẻ sáng lên 3–5 mức (quay F5 nền tối CPU ×6, 03/11).
-    if (s2.getItem('ddh.mayYeu') === '1') g.classList.add('may-yeu')
     var o2 = d.createElement('div'), cho = 0
     var hien = function () { if (--cho <= 0 && o2) o2.style.visibility = '' }
     o2.id = 'khung-tinh-hs'
@@ -98,8 +95,8 @@ export function moKhungTinh(w: any, d: any, css: string[], xuong: string, khoa: 
     // này trước nằm SAU <main id="root"> ⇒ body đã có ⇒ theo chuẩn HTML, thẻ blocking=render chèn lúc ấy KHÔNG chặn vẽ ⇒ trình duyệt vẽ nền trước khi tờ kiểu
     // về. Nay chạy TRONG <head> (vite.config.ts đặt trước #root, body còn null) ⇒ tờ kiểu chặn vẽ thật; lớp phủ gắn vào body ngay khi trình phân tích tạo
     // body (MutationObserver — trả lời trước lượt vẽ đầu, mà lượt vẽ còn bị tờ kiểu chặn).
-    var gan = function () { if (!d.body) return false; if (o2) d.body.appendChild(o2); return true }
-    if (!gan()) { var mo = new w.MutationObserver(function () { if (gan()) mo.disconnect() }); mo.observe(g, { childList: true }) }
+    var mo = new w.MutationObserver(function () { if (d.body) { mo.disconnect(); if (o2) d.body.appendChild(o2) } })
+    if (d.body) d.body.appendChild(o2); else mo.observe(g, { childList: true })
     var go = function () {
       if (!o2) return
       o2.remove()

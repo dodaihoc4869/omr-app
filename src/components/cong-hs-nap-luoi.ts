@@ -23,6 +23,10 @@ export const napBong = () => import('./ai-ddh/BongBongAiDdh')
 // MÁY YẾU 27/10 (thầy: «Máy yếu bị lag»): mảnh này nạp lúc rảnh sau khi Lộ trình hiện ⇒ đo nhịp khung thật ở đây (src/lib/do-nhip-khung.ts):
 // thông số máy trông ổn mà khung hình chậm ⇒ bật chế độ máy yếu ngay + nhớ cho lần mở sau. Không thêm tệp, không cộng byte lượt mở.
 import { henDoNhipKhung } from '../lib/do-nhip-khung'
+// 03/11 PHƯƠNG ÁN VỪA VẶN (thầy «tất cả công thức kiểu này phải hiển thị đẹp vừa vặn»): tự dò mọi nhóm phương án (làm chặng · luyện tập · kiểm tra · xem lại)
+// ⇒ công thức dài không bị cắt giữa chừng: thu cỡ chữ cả nhóm / lưới 2 cột ⇒ 1 cột (src/lib/vua-phuong-an.ts). Gắn ở mảnh nạp lười này ⇒ lượt mở /hs không cộng byte.
+import { ganToanTrang } from '../lib/vua-phuong-an'
+if (typeof document !== 'undefined') ganToanTrang()
 if (typeof window !== 'undefined') henDoNhipKhung(window)
 
 // 27/10 MƯỢT: hâm nóng bộ dò «Chạm để hiểu đề» lúc rảnh trên Lộ trình (src/components/goi-y-cham/tu-dien.ts) ⇒ mở câu đầu / sang câu không còn khựng

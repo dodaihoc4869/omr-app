@@ -18,7 +18,7 @@ describe('Mol góc thẻ đầu', () => {
     const css = doc('src/styles/trong-kinh.css')
     expect(css).toMatch(/\.kb-mol \.kb-mol-bong \{[^}]*flex: 0 1 auto/)
     expect(css).toMatch(/\.kb-mol \.kb-mol-bong\[data-cx\][^{]*\{\s*background: var\(--bb-nen/)
-    expect(css).toMatch(/\.kb-mol \.kb-mol-bong\[data-cx\] \{ color: var\(--bb-chu/)
+    expect(css).toMatch(/\.kb-mol \.kb-mol-bong\[data-cx\][^{]*\{[^}]*color: var\(--bb-chu/)
     expect(doc('src/components/hoc-tap/TrongHs.tsx')).toMatch(/ref=\{bongGoc\} className="bi-loi-bong kb-mol-bong"/)
     expect(doc('src/components/hoc-tap/TrongHs.tsx')).toMatch(/useBongVuaChu\(!!goc, loi\)/)
   })

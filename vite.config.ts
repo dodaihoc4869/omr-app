@@ -52,7 +52,7 @@ ghiSwVersion()
 // Bỏ thư viện lớn chỉ dùng khi bấm (xuất PDF / ảnh, bản đồ 3D) — tải khi cần như cũ.
 const KHO_HS_BO = /^assets\/(?:ban-do-3d-three|jspdf|html2canvas|purify|index\.es|fflate)/
 // Gốc chọn tay: mảnh nạp lười CHỈ app học sinh dùng (đồ thị từ vỏ học sinh lan sang cả màn thầy qua mảnh chung ⇒ không lấy trọn). Mỗi gốc kéo theo mảnh nó nạp TĨNH + CSS.
-const KHO_HS_GOC = /^assets\/(?:TrongHs|ManLamBaiTap|LoiGiaiKinhHs|tai-san|hieu-ung|hieu-ung-an-mung|mol-dong|lua-dong|lua-gian|bi-dong|Bi|GiamThi|giam-thi|ManThuong|KetBaiThuong|thuong-gon|thuong-chung|trong-lam-bai|ChuaGonDuo|duo-sua|TamGiuChan|giu-chan|KhungKiemTra|ThiDuo|BiNop|KetQuaSauNop|ManKiemTraCaNhan|TheKiemTraCaNhan|TheKiemTraCon|BangKiemTraCaNhan|kiem-tra-ca-nhan|LuyenDeChuan|LuyenDeCauTruc|ManTuLuyen|ManTuChua|ManChuaCauSai|ManTienBo|ManDiemSo|LichSuCaEm|CauDaLam|HopHoiThay|BongBongAiDdh|LamCauOn|TheBaiHangNgay|TheBaiDaDay|KhungLoiGiai|ThanhSoCauChua|HoSoCuaEmHs|HoSoHocThatEm|BaoCaoCaCuaEm|NhacSamsung|kenh-day|DauIon|PhongChoGame|TheDiemDanhHs|DiemDanhBuoi)-[\w-]{8}\.(?:js|css)$/
+const KHO_HS_GOC = /^assets\/(?:TrongHs|ManLamBaiTap|LoiGiaiKinhHs|tai-san|hieu-ung|hieu-ung-an-mung|mol-dong|vua-phuong-an|lua-dong|lua-gian|bi-dong|Bi|GiamThi|giam-thi|ManThuong|KetBaiThuong|thuong-gon|thuong-chung|trong-lam-bai|ChuaGonDuo|duo-sua|TamGiuChan|giu-chan|KhungKiemTra|ThiDuo|BiNop|KetQuaSauNop|ManKiemTraCaNhan|TheKiemTraCaNhan|TheKiemTraCon|BangKiemTraCaNhan|kiem-tra-ca-nhan|LuyenDeChuan|LuyenDeCauTruc|ManTuLuyen|ManTuChua|ManChuaCauSai|ManTienBo|ManDiemSo|LichSuCaEm|CauDaLam|HopHoiThay|BongBongAiDdh|LamCauOn|TheBaiHangNgay|TheBaiDaDay|KhungLoiGiai|ThanhSoCauChua|HoSoCuaEmHs|HoSoHocThatEm|BaoCaoCaCuaEm|NhacSamsung|kenh-day|DauIon|PhongChoGame|TheDiemDanhHs|DiemDanhBuoi)-[\w-]{8}\.(?:js|css)$/
 function khoNapTruocHs(): Plugin {
   let dsCho: string[] = []
   return {
@@ -390,6 +390,8 @@ export default defineConfig({
           '**/lua-gian-*.{js,css}',
           // Mol (01/11, thay hình Lửa): mặt bình cầu nạp lười như lua-dong ⇒ kho chạy-lúc; mất mạng lần mở đầu ⇒ khung giữ chỗ trống, không vỡ bố cục.
           '**/mol-dong-*.{js,css}',
+          // Phương án vừa vặn (03/11, lib/vua-phuong-an.ts): mảnh đo nạp lười ⇒ kho chạy-lúc (precache giữ 170); mất mạng ⇒ phương án ngắt dòng như cũ.
+          '**/vua-phuong-an-*.js',
           // Thẻ nhắc Samsung Internet (27/10): chỉ máy Samsung Internet tải, một lần ⇒ kho chạy-lúc; mất mạng ⇒ không hiện thẻ, Lộ trình vẫn đủ.
           '**/NhacSamsung-*.{js,css}',
           // Thẻ điểm danh nổi của giao diện CŨ (không «Trong», 30/10 nạp lười): chỉ máy tắt «Trong» tải ⇒ kho chạy-lúc.
