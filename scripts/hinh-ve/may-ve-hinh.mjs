@@ -6,7 +6,7 @@
 //   node scripts/hinh-ve/may-ve-hinh.mjs --tong          # số đếm: hàng việc / đạt / giữ gốc
 //   node scripts/hinh-ve/may-ve-hinh.mjs --thu           # 1 lô, KHÔNG nộp (soát chất lượng, xem .may-ve-hinh/…)
 //   node scripts/hinh-ve/may-ve-hinh.mjs                 # chạy tới hết hàng (--mot-lan: hết hàng thì dừng — dùng cho lịch hằng ngày)
-//   Tuỳ chọn: --luong 3 · --so 5 (ảnh mỗi lô, ≤ 8) · --mot-lan · --model <tên>
+//   Tuỳ chọn: --ngau-nhien (lấy ảnh ngẫu nhiên khắp kho — dùng khi chạy thử để ước tỉ lệ vẽ được) · --luong 3 · --so 5 (ảnh mỗi lô, ≤ 8) · --mot-lan · --model <tên>
 //
 // Mỗi lô: máy chủ phát N ảnh ⇒ HAI phiên âm ĐỘC LẬP (hai phiên claude khác nhau chép chữ trong ảnh) ⇒ phải khớp nhau (≥ 90 % hai chiều) ⇒ phiên thứ ba vẽ cảnh chỉ bằng chữ đã
 // phiên âm ⇒ bộ kiểm trong lô ⇒ nộp. Máy chủ kiểm lại: chữ ngoài ảnh / hai phiên âm lệch / khuôn chưa hỗ trợ ⇒ «giu_goc» (app giữ ảnh gốc, không vẽ).
@@ -84,7 +84,7 @@ const doc = (dir, bam) => { const j = docJson(path.join(dir, 'ra', `${bam}.json`
 const dem = { lo: 0, nop: 0, dat: 0, giuGoc: 0, lech: 0 }
 async function motLuong(luong) {
   for (;;) {
-    const lo = await goi('/kho/hinh-ve/viec', { so: SO_ANH })
+    const lo = await goi('/kho/hinh-ve/viec', { so: SO_ANH, ...(co('--ngau-nhien') ? { ngauNhien: true } : {}) })
     if (!lo.ok) { console.log(`[${gio()}] luồng ${luong}: lỗi nhận việc: ${String(lo.error).slice(0, 120)}`); await ngu(60_000); continue }
     if (lo.het || !lo.viec?.length) { if (co('--mot-lan') || co('--thu')) return; console.log(`[${gio()}] luồng ${luong}: hết hàng, 10 phút hỏi lại`); await ngu(600_000); continue }
     const viec = lo.viec
