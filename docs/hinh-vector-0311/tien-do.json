@@ -58,5 +58,12 @@
       "Thầy đã giao tự sửa và tích hợp khi đạt; không xin thầy duyệt lại từng lô.",
       "Toàn kho còn chưa hoàn tất, app chưa thay hình; không báo đã xong hoặc đã triển khai."
     ]
+  },
+  "tuDongTiepTuc": {
+    "id": "6ae96c39083081918a50bc48bc6c8d3e",
+    "trangThai": "da-tao-va-bat",
+    "lich": "moi-gio",
+    "mucTieu": "Tự vẽ, soát, sửa, tích hợp và kiểm bản sống đến khi đạt; tự tắt khi hoàn tất",
+    "thongBao": "Chỉ khi hoàn tất, có lỗi chặn thực sự hoặc cần hành động của thầy"
   }
 }
