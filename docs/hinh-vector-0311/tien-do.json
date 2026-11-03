@@ -61,7 +61,7 @@
     ],
     "danhMucDaKiem": "docs/hinh-vector-0311/kiem/danh-muc-da-kiem.json",
     "loVuaXong": "816câu đủ mọi hình+DDH/2mộtphần;642nguồn→429SVG;6.241.667byte/gzip1.271.445;786nguồn còn lại.5nguồnmớiđãmởRIÊNGtừngPNG+SVG renderthật/soátđộclậpexacthash;nhóm106đủ20/20.",
-    "viecNenLamTiep": "Nhóm117cau_truc_5đangđọc scratch/doc-molecule-lo-117.json(copybảnmớivềkiem).1184và1243ĐÃXONGqua117/118.935/113fructofuranose5ringđủsố1..6/2CH2OHkha triển và799cùng5ringkhôngsố/CH2OHtext đãđọccònCHƯADỰNG.15nguồncònđangđọc;đốimanifesttrướcdựng. Nhóm10620/20đãxongkhônglàmtrùng.2partialchỉảnhhoa1403/1198thậtgiữnguyênkhôngcộngsốvẽ.",
+    "viecNenLamTiep": "Nhóm117đãđọccopy20recordsởkiem/doc-molecule-lo-117.json;5đãmanifest1184/1243/1279/593/304KHÔNGdựngtrùng. Còn15chưadựng935/113/799/880/838/952/627/737/981/1175/1337/1254/125/1155/578. Ưutiênfructofuranose935/113đủsốC/799khôngsố,giữarrow880/838vàlabelbond952nguyênvăn;polymer125branchOOCCH3khôngsửathànhOCOCH3.2partialchỉảnhhoa1403/1198giữnguyênkhôngcộngsốvẽ.",
     "canhBaoCheckpoint": "Checkpointmớiđượcghi/sẽpushsaukiểm;ưu tiêncommit/worktree localmớinhất. Khôngcheckoutremote cũ đè. Khônghạgate,khôngbáotíchhợp/pháthànhkhibộchưađủ. Mainorigin7dff17afchưagộp."
   },
   "tuDongTiepTuc": {
@@ -114,7 +114,7 @@
     "lo": "115–118",
     "ketQua": "816câu đủ mọi hình+DDH/2mộtphần;642nguồn→429SVG;6.241.667byte/gzip1.271.445;786nguồn còn lại.5nguồnmớiđãmởRIÊNGtừngPNG+SVG renderthật/soátđộclậpexacthash;nhóm106đủ20/20.",
     "suaLoi": "1095đủ5curves/circlemở/legend/grid;1330đủ3curve/5guides/t1/labels;1162đủ2/8/8/18ô/10ôd/NaCPNe.1184giữC1OCH3xuống/nhánhC6implicitkhônginCH2/0Hexplicit/khôngsửatheostemfructose.1243giữOH1lên/6sốC/khôngalias1036OH1down.",
-    "tiepTheo": "Nhóm117cau_truc_5đangđọc scratch/doc-molecule-lo-117.json(copybảnmớivềkiem).1184và1243ĐÃXONGqua117/118.935/113fructofuranose5ringđủsố1..6/2CH2OHkha triển và799cùng5ringkhôngsố/CH2OHtext đãđọccònCHƯADỰNG.15nguồncònđangđọc;đốimanifesttrướcdựng. Nhóm10620/20đãxongkhônglàmtrùng.2partialchỉảnhhoa1403/1198thậtgiữnguyênkhôngcộngsốvẽ.",
+    "tiepTheo": "Nhóm117đãđọccopy20recordsởkiem/doc-molecule-lo-117.json;5đãmanifest1184/1243/1279/593/304KHÔNGdựngtrùng. Còn15chưadựng935/113/799/880/838/952/627/737/981/1175/1337/1254/125/1155/578. Ưutiênfructofuranose935/113đủsốC/799khôngsố,giữarrow880/838vàlabelbond952nguyênvăn;polymer125branchOOCCH3khôngsửathànhOCOCH3.2partialchỉảnhhoa1403/1198giữnguyênkhôngcộngsốvẽ.",
     "gioiHan": "Chưa tíchhợp hình/chưa reloadofflineapp/chưa phát hành. Build/tốcđộlô116đạt/precache170/2613KB,sauđóchỉassets/scripts. Origin/main7dff17afchưagộp;phảicậpnhậtmainmớinhất/sotesttheotên/kiểm cathi trước triểnkhai."
   }
 }
