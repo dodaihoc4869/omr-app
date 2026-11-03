@@ -59,8 +59,8 @@
       "Toàn kho còn chưa hoàn tất, app chưa thay hình; không báo đã xong hoặc đã triển khai."
     ],
     "danhMucDaKiem": "docs/hinh-vector-0311/kiem/danh-muc-da-kiem.json",
-    "loVuaXong": "Lô4:84 nguồn cấu trúc; lô5:40 hình ghép/141 cấu trúc thành phần đã soát chéo độc lập. Tổng265 câu đủ mọi hình;174 SVG tự chứa giải mã Chromium đạt.",
-    "viecNenLamTiep": "Lô6 Fischer:21 nguồn đã dựng, đang soát độc lập từng nguồn; chưa tính đạt. Tiếp tục xử lý hình cắt nhãn theo ngữ cảnh phương án công khai."
+    "loVuaXong": "Lô6 Fischer25 nguồn soát độc lập đạt, thêm16 câu đủ mọi hình; tổng281 câu đủ hình,26 một phần,282 nguồn→182 SVG. Nguồn1331 đã dựng, đang soát, chưa tính đạt.",
+    "viecNenLamTiep": "Lô6: kiểm1331, xử lý4 hình q33 có nhãn cắt. Lô7: tác tử chỉ đọc đang nhận dạng cấu trúc mới còn lại để dựng và soát chéo. Không dừng sau kiểm trạng thái."
   },
   "tuDongTiepTuc": {
     "id": "6ae96c39083081918a50bc48bc6c8d3e",
@@ -77,14 +77,14 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 257,
-    "soSvgRieng": 174,
-    "soCauDungHinh": 291,
-    "soCauDuMoiHinh": 265,
+    "soAnhNguon": 282,
+    "soSvgRieng": 182,
+    "soCauDungHinh": 307,
+    "soCauDuMoiHinh": 281,
     "soCauMoiXongMotPhan": 26,
-    "byteSvg": 1153112,
-    "byteGzip": 253974,
-    "soAnhNguonConLai": 1171,
+    "byteSvg": 1171428,
+    "byteGzip": 257610,
+    "soAnhNguonConLai": 1146,
     "daTichHop": false
   },
   "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất."
