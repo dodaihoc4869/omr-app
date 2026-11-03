@@ -164,3 +164,19 @@ describe('xepTheoCauPhat — 40 câu quét ra 03/11', () => {
     expect(xepTheoCauPhat({ qid: 'q', lyDo: [], ketQua: '+8' }, { phan: 'III', correct: '+8' })).not.toBeNull()
   })
 })
+
+describe('cảnh điện di + độ tan (thầy 03/11)', () => {
+  it('điện di: dấu tổng đúng luật pH ↔ pI ⇒ giữ; sai chiều ⇒ bỏ cảnh', () => {
+    const dd = { loai: 'dien-di', pH: 6, chat: [{ ten: 'Lys', pI: 9.7, nhom: [{ ten: 'NH3+', dien: 1 }, { ten: 'NH3+', dien: 1 }, { ten: 'COO-', dien: -1 }] }] }
+    expect(kiemBanKinh({ ...mauII(), canh: dd }, ctxII).ban!.canh).toMatchObject({ loai: 'dien-di', pH: 6 })
+    const sai = { ...dd, chat: [{ ten: 'Lys', pI: 9.7, nhom: [{ ten: 'COO-', dien: -1 }] }] }
+    expect(kiemBanKinh({ ...mauII(), canh: sai }, ctxII).ban!.canh).toBeUndefined()
+  })
+  it('độ tan: hàng bão hoà khớp S, bảo toàn trước = tách + còn lại ⇒ giữ; lệch ⇒ bỏ', () => {
+    const dt = { loai: 'do-tan', chat: 'CuSO4', S: [{ t: 80, S: 55 }, { t: 20, S: 20.7 }], hang: [
+      { nhan: 'trước', ct: 55, nuoc: 100, baoHoa: 80 }, { nhan: 'tách', ct: 38.82, nuoc: 21.84, tachRa: true }, { nhan: 'còn lại', ct: 16.18, nuoc: 78.16, baoHoa: 20 }] }
+    expect(kiemBanKinh({ ...mauII(), canh: dt }, ctxII).ban!.canh).toMatchObject({ loai: 'do-tan' })
+    const lech = { ...dt, hang: [dt.hang[0], dt.hang[1], { ...dt.hang[2], ct: 20 }] }
+    expect(kiemBanKinh({ ...mauII(), canh: lech }, ctxII).ban!.canh).toBeUndefined()
+  })
+})

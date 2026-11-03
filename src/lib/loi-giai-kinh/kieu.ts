@@ -55,6 +55,19 @@ export type CanhKinh =
       manh: { loai: ManhTen; chu: string; giai: string }[]
       ten: string
     }
+  | {
+      /** ĐIỆN DI (thầy 03/11, skill 10.C3): ở pH đã cho, mỗi chất mang các nhóm tích điện (NH₃⁺ +1, COO⁻ −1, nhóm trung hoà 0) ⇒ cộng ⇒ chạy về cực. */
+      loai: 'dien-di'
+      pH: number
+      chat: { ten: string; pI?: number; nhom: { ten: string; dien: number }[] }[]
+    }
+  | {
+      /** ĐỘ TAN (thầy 03/11): hàng chuẩn 100 g nước theo S(t), các hàng thật (gam chất tan / gam nước) — kết tinh: trước = tách ra + còn lại. */
+      loai: 'do-tan'
+      chat: string
+      S: { t: number; S: number }[]
+      hang: { nhan: string; ct: number; nuoc: number; baoHoa?: number; tachRa?: boolean }[]
+    }
 export const MANH_TEN = ['nhanh', 'mach', 'lien-ket', 'chuc', 'goc-ancol', 'goc-acid'] as const
 export type ManhTen = (typeof MANH_TEN)[number]
 export const MAU_LOP = ['trong', 'xanh', 'cam', 'vang', 'hong', 'tim', 'nau', 'trang-duc'] as const
