@@ -1,0 +1,18 @@
+[
+  {
+    "i": 8,
+    "hash": "014a4e7d0e3ef32c1417aae321e22ef8dc1314e08a9b6b43cb0057e25500e6d2",
+    "hashSvgDaSoat": "0d5df0e804efed6f2366272049e9b7689b0daa84075c9ae732318f04d7d4b8a3",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Mở nguồn+SVG render thực đạt; trục/nhãn/tick/đơn vị đúng nguồn, không tràn.",
+    "kiemThem": "8: tăng đơn điệu, không vượt0,1, có đoạn nganghữu hạn380..472 sau sửa.70: đủ4điểm và tất cảticks/đơn vị."
+  },
+  {
+    "i": 70,
+    "hash": "0da771534797a3499277c352b6c18becffb8ca5d3cb5be87c3cfb47eecbb3ede",
+    "hashSvgDaSoat": "c118d3efe1f3a9fd17004c587211512898c63e73512246eaf25384b6641a7f2a",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Mở nguồn+SVG render thực đạt; trục/nhãn/tick/đơn vị đúng nguồn, không tràn.",
+    "kiemThem": "8: tăng đơn điệu, không vượt0,1, có đoạn nganghữu hạn380..472 sau sửa.70: đủ4điểm và tất cảticks/đơn vị."
+  }
+]

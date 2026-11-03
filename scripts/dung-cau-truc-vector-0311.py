@@ -35,6 +35,12 @@ def special(kind):
   sides=[(175,'CH₃'),(460,'CH₂CH₂COOH')]if kind=='ala-glu-gly'else[(460,'CH₃'),(745,'CH(CH₃)₂')]
   for x,t in sides:b+=line(x,248,x,320)+text(x,360,t)
   return '<svg xmlns="http://www.w3.org/2000/svg" width="950" height="400" viewBox="0 0 950 400"><title>Biểu thức cấu tạo peptide theo hình nguồn</title>'+b+'</svg>'
+ elif kind=='styrene-vong-tron-chu':
+  pts=[(240,140),(205,79),(135,79),(100,140),(135,201),(205,201)]
+  b=''.join(line(*pts[i],*pts[(i+1)%6])for i in range(6))
+  b+='<circle cx="170" cy="140" r="46" fill="none" stroke="#252440" stroke-width="2.5"/>'
+  b+=line(240,140,280,140)+text(292,152,'CH=CH₂.','start')
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="280" viewBox="0 0 600 280"><title>Công thức styrene theo hình nguồn</title>'+b+'</svg>'
  elif kind=='nguon-H3N-ch2-ch2-coo':
   b=text(100,190,'H₃N')+line(148,174,230,126)+line(230,126,330,184)+line(330,184,393,148)+text(455,158,'COO⁻')
   return '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="260" viewBox="0 0 600 260"><title>Biểu diễn nguyên văn theo hình nguồn</title>'+b+'</svg>'
@@ -136,6 +142,12 @@ def build(source):
      xy=[d.GetDrawCoords(a)for a in ring];cx=sum(p.x for p in xy)/6;cy=sum(p.y for p in xy)/6;radius=sum(math.hypot(p.x-cx,p.y-cy)for p in xy)/6*.6
      ET.SubElement(root,'{'+ns+'}circle',{'cx':f'{cx:.2f}','cy':f'{cy:.2f}','r':f'{radius:.2f}','fill':'none','stroke':'#252440','stroke-width':'2.5'})
     svg=ET.tostring(root,encoding='unicode')
+   if r.get('nhanTrongVong'):
+    label=r['nhanTrongVong'];rings=[ring for ring in drawMol.GetRingInfo().AtomRings()if len(ring)==label['soCanh']and any(drawMol.GetAtomWithIdx(a).GetAtomicNum()==7 for a in ring)]
+    if len(rings)!=1:raise ValueError('Nhãn vòng không xác định duy nhất')
+    xy=[d.GetDrawCoords(a)for a in rings[0]];cx=sum(p.x for p in xy)/len(xy);cy=sum(p.y for p in xy)/len(xy)
+    ns='http://www.w3.org/2000/svg';ET.register_namespace('',ns);root=ET.fromstring(svg)
+    t=ET.SubElement(root,'{'+ns+'}text',{'x':f'{cx:.2f}','y':f'{cy+7:.2f}','text-anchor':'middle','font-family':'DejaVu Sans,Arial,sans-serif','font-size':'22','fill':'#252440'});t.text=label['chu'];svg=ET.tostring(root,encoding='unicode')
    at=svg.find('>',svg.find('<svg'))+1;svg=svg[:at]+'<title>Công thức cấu tạo theo hình nguồn</title>'+svg[at:]
    if r['smiles']=='[H]O[H]':
     svg='<svg xmlns="http://www.w3.org/2000/svg" width="300" height="110" viewBox="0 0 300 110"><title>Liên kết trong phân tử nước</title><g fill="#252440" font-family="DejaVu Sans,Arial,sans-serif" font-size="32" text-anchor="middle"><text x="45" y="66">H</text><text x="150" y="66">O</text><text x="255" y="66">H</text></g><path d="M65 55H125M175 55H235" stroke="#252440" stroke-width="2.5"/></svg>'
@@ -148,4 +160,14 @@ def build(source):
   results.append(r)
  return results
 if __name__=='__main__':
- p=Path(sys.argv[1]);r=build(json.loads(p.read_text()));out=p.with_name(p.stem+'-ban-dung.json');out.write_text(json.dumps(r,ensure_ascii=False,indent=2));print('Đã dựng',sum(a['trangThai']=='cho-soat-doc-lap'for a in r),'/',len(r),'hình; chờ so nguồn từng bản mới.',out)
+ p=Path(sys.argv[1]);out=p.with_name(p.stem+'-ban-dung.json')
+ previous={(a['hash'],a.get('hashSvg')):a for a in json.loads(out.read_text())}if out.exists()else{}
+ r=build(json.loads(p.read_text()))
+ # Chỉ giữ chứng nhận nếu cả hash nguồn và toàn bộ byteSVG không đổi.
+ for item in r:
+  old=previous.get((item['hash'],item.get('hashSvg')), {})
+  if old.get('trangThai')=='da-soat-doc-lap' and old.get('hashSvgDaSoat')==item.get('hashSvg'):
+   for key in ['trangThai','hashSvgDaSoat','nguoiSoat']:
+    if key in old:item[key]=old[key]
+ out.write_text(json.dumps(r,ensure_ascii=False,indent=2))
+ print('Đã dựng',len(r),'nguồn; đã soát',sum(a['trangThai']=='da-soat-doc-lap'for a in r),'; còn chờ',sum(a['trangThai']=='cho-soat-doc-lap'for a in r),out)

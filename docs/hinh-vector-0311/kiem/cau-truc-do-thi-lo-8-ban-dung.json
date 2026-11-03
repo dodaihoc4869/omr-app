@@ -1,0 +1,76 @@
+[
+  {
+    "i": 8,
+    "kieu": "dinh-tinh",
+    "truc": [
+      "n",
+      "t"
+    ],
+    "mocY": "0,1",
+    "ghiChu": "Không suy thời gian đạt cân bằng hoặc thêm mốc t; đường cong tăng rồi nằm ngang như nguồn.",
+    "hash": "014a4e7d0e3ef32c1417aae321e22ef8dc1314e08a9b6b43cb0057e25500e6d2",
+    "fileNguon": "anh/014a4e7d0e3ef32c1417aae321e22ef8dc1314e08a9b6b43cb0057e25500e6d2.png",
+    "svg": "do-thi-0d5df0e804efed6f2366272049e9b7689b0daa84075c9ae732318f04d7d4b8a3.svg",
+    "hashSvg": "0d5df0e804efed6f2366272049e9b7689b0daa84075c9ae732318f04d7d4b8a3",
+    "byteSvg": 1122,
+    "trangThai": "da-soat-doc-lap",
+    "hashSvgDaSoat": "0d5df0e804efed6f2366272049e9b7689b0daa84075c9ae732318f04d7d4b8a3",
+    "nguoiSoat": "soat_nguon_2"
+  },
+  {
+    "i": 70,
+    "kieu": "so-lieu",
+    "diem": [
+      [
+        0,
+        180
+      ],
+      [
+        0.5,
+        120
+      ],
+      [
+        1,
+        60
+      ],
+      [
+        1.5,
+        30
+      ]
+    ],
+    "xTick": [
+      "0",
+      "0.25",
+      "0.5",
+      "0.75",
+      "1",
+      "1.25",
+      "1.5"
+    ],
+    "yTick": [
+      0,
+      20,
+      40,
+      60,
+      80,
+      100,
+      120,
+      140,
+      160,
+      180,
+      200
+    ],
+    "nhanTruc": [
+      "Nồng độ enzyme protease (%)",
+      "Thời gian làm mềm thịt (phút)"
+    ],
+    "hash": "0da771534797a3499277c352b6c18becffb8ca5d3cb5be87c3cfb47eecbb3ede",
+    "fileNguon": "anh/0da771534797a3499277c352b6c18becffb8ca5d3cb5be87c3cfb47eecbb3ede.png",
+    "svg": "do-thi-c118d3efe1f3a9fd17004c587211512898c63e73512246eaf25384b6641a7f2a.svg",
+    "hashSvg": "c118d3efe1f3a9fd17004c587211512898c63e73512246eaf25384b6641a7f2a",
+    "byteSvg": 4548,
+    "trangThai": "da-soat-doc-lap",
+    "hashSvgDaSoat": "c118d3efe1f3a9fd17004c587211512898c63e73512246eaf25384b6641a7f2a",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

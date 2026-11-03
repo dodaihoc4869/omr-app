@@ -1,0 +1,16 @@
+{
+  "ngay": "2026-11-03",
+  "main": "8592da493b310de17caf8dc002a4588a204f0e02",
+  "buildNhanh": "đạt",
+  "buildMainSach": "đạt",
+  "precache": {
+    "tep": 170,
+    "KiB": 2614.86
+  },
+  "kiemMauGiu": "0 tệp src thay đổi, 0 vi phạm",
+  "kiemSW": "14/14 đạt",
+  "tocDoNhanh": "đỏ tại đường /t và /hs đã đăng nhập",
+  "tocDoMainSach": "cũng đỏ tại /hs đã đăng nhập",
+  "ghiChu": "Bộ hình/chương trình vẽ chỉ trong docs/scripts; không sửa src/server, không nâng mốc. Chưa đẩy checkpoint mới vì cổng tốc độ chưa xanh; vẫn tiếp tục vẽ/soát, không triển khai bộ chưa đủ.",
+  "coVan": "chưa tham vấn được cố vấn"
+}

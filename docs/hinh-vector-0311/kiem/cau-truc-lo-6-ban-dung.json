@@ -415,6 +415,8 @@
     "svg": "cau-truc-fischer-14e8c1ea79dcfec5adb368999f3639de91ec341b9004c1bee31d6dba4a6dcc48.svg",
     "hashSvg": "14e8c1ea79dcfec5adb368999f3639de91ec341b9004c1bee31d6dba4a6dcc48",
     "byteSvg": 642,
-    "trangThai": "cho-soat-doc-lap"
+    "trangThai": "da-soat-doc-lap",
+    "hashSvgDaSoat": "14e8c1ea79dcfec5adb368999f3639de91ec341b9004c1bee31d6dba4a6dcc48",
+    "nguoiSoat": "cau_truc_6"
   }
 ]

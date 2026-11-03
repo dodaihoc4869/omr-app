@@ -59,8 +59,9 @@
       "Toàn kho còn chưa hoàn tất, app chưa thay hình; không báo đã xong hoặc đã triển khai."
     ],
     "danhMucDaKiem": "docs/hinh-vector-0311/kiem/danh-muc-da-kiem.json",
-    "loVuaXong": "Lô6 Fischer25 nguồn soát độc lập đạt, thêm16 câu đủ mọi hình; tổng281 câu đủ hình,26 một phần,282 nguồn→182 SVG. Nguồn1331 đã dựng, đang soát, chưa tính đạt.",
-    "viecNenLamTiep": "Lô6: kiểm1331, xử lý4 hình q33 có nhãn cắt. Lô7: tác tử chỉ đọc đang nhận dạng cấu trúc mới còn lại để dựng và soát chéo. Không dừng sau kiểm trạng thái."
+    "loVuaXong": "Lô6:26nguồn đãsoát. Lô7:61/61nguồn soátchéo6tác tử đạt sau sửa393 thiếu2Cethyl. Lô8:2đồthị đạt sau sửa đoạnngang8. Tổng398câu ĐỦ mọi hình/25mộtphần,346nguồn→224SVG.",
+    "viecNenLamTiep": "Tiếp tục nhóm đồthị: soat_nguon_3 đang đọc tốiđa8nguồn0..479; orbital19đã đọcnguồn chưa dựng (bằng chứng trục/phases trong thread). 4Fischer27/928/1407/1123giữ do nhãn bịcắt, khôngđoán. Hoàn thiện lô mới, không dừng ở kiểm trạng thái.",
+    "canhBaoCheckpoint": "Checkpoint mới đã commit cục bộ; chưa đẩy sau lô4/5/6 vì cổng tốc độ cũng đỏ trên main sạch8592da49. Không nâng mốc, không phát hành. Còn tiếp tục vẽ trong worktree hiện tại."
   },
   "tuDongTiepTuc": {
     "id": "6ae96c39083081918a50bc48bc6c8d3e",
@@ -77,15 +78,20 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 282,
-    "soSvgRieng": 182,
-    "soCauDungHinh": 307,
-    "soCauDuMoiHinh": 281,
-    "soCauMoiXongMotPhan": 26,
-    "byteSvg": 1171428,
-    "byteGzip": 257610,
-    "soAnhNguonConLai": 1146,
+    "soAnhNguon": 346,
+    "soSvgRieng": 224,
+    "soCauDungHinh": 423,
+    "soCauDuMoiHinh": 398,
+    "soCauMoiXongMotPhan": 25,
+    "byteSvg": 1723439,
+    "byteGzip": 362807,
+    "soAnhNguonConLai": 1082,
     "daTichHop": false
   },
-  "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất."
+  "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.",
+  "canKiemKhiTichHop": [
+    "TheCau.tsx: hình sau phương án trong gopAnh đangmaxHeight112 vàkhôngonZoom riêng, cần kiểm khả năng đọc/phóng to trước khi đưa Fischer/peptide vàoapp.",
+    "SVG cần nền sáng theo manifest, không đảo màu làm mất nêm/điện tích.",
+    "Đồ thị định tính không thêm mốc số; sơ đồ phương án sai giữ nguyên sai, không sửa hóa học."
+  ]
 }

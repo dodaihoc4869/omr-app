@@ -1,0 +1,1101 @@
+[
+  {
+    "i": 60,
+    "hash": "0bc800ce21c3523dae2f6be493321ef438a09577ec64cd88a8c3124ef386ba60",
+    "fileNguon": "anh/0bc800ce21c3523dae2f6be493321ef438a09577ec64cd88a8c3124ef386ba60.png",
+    "kind": "grid",
+    "columns": 3,
+    "panels": [
+      {
+        "smiles": "CCCN",
+        "caption": [
+          "(1)"
+        ],
+        "circle": false,
+        "explicitH": false
+      },
+      {
+        "smiles": "CCCCN",
+        "caption": [
+          "(2)"
+        ],
+        "circle": false,
+        "explicitH": false
+      },
+      {
+        "smiles": "CCC(N)C",
+        "caption": [
+          "(3)"
+        ],
+        "circle": false,
+        "explicitH": false
+      },
+      {
+        "smiles": "NC1CCCCC1",
+        "caption": [
+          "(4)"
+        ],
+        "circle": false,
+        "explicitH": false
+      },
+      {
+        "smiles": "CCN([H])CC",
+        "caption": [
+          "(5)"
+        ],
+        "explicitH": true
+      },
+      {
+        "smiles": "CCN(C)CC",
+        "caption": [
+          "(6)"
+        ],
+        "circle": false,
+        "explicitH": false
+      }
+    ],
+    "nguoiDocNguon": "soat_nguon_2"
+  },
+  {
+    "i": 62,
+    "hash": "0c37509b29a97c6dab138f152e4344bdc660d9aa778ec23508d121036268c9c9",
+    "fileNguon": "anh/0c37509b29a97c6dab138f152e4344bdc660d9aa778ec23508d121036268c9c9.png",
+    "textNguyenVan": "⁺H₃N–[CH₂]₄–CH(NH₂)–COO⁻",
+    "smilesThamChieu": "[NH3+]CCCCC(N)C(=O)[O-]",
+    "nguoiDocNguon": "soat_nguon_2",
+    "ghiChu": "Giữ số lặp4 và vị trí NH3+/NH2/COO−, không đổi vị trí hai N."
+  },
+  {
+    "i": 63,
+    "hash": "0c5e4fb1b34778dae7a8b70edac05d85989c1c84d24bb88dd41af6f3931bda50",
+    "fileNguon": "anh/0c5e4fb1b34778dae7a8b70edac05d85989c1c84d24bb88dd41af6f3931bda50.png",
+    "smiles": "CCCCC(c1ccc(S(=O)(=O)[O-])cc1)CCCCC(C)C.[Na+]",
+    "caption": [],
+    "terminalCationText": "ONa",
+    "nguoiDocNguon": "soat_nguon_2"
+  },
+  {
+    "i": 486,
+    "hash": "5a2e6ffbc70b26babd0831f582db31f36ed42e33b81f7159effe1f8bff24376f",
+    "fileNguon": "anh/5a2e6ffbc70b26babd0831f582db31f36ed42e33b81f7159effe1f8bff24376f.png",
+    "smiles": "CC(=O)OC/C=C(\\C)CCC=C(C)C",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_4"
+  },
+  {
+    "i": 533,
+    "hash": "64da7f131ac24ecf86610d5e5e685501f993bf8a8555b1df723e16c2f1dbf3cd",
+    "fileNguon": "anh/64da7f131ac24ecf86610d5e5e685501f993bf8a8555b1df723e16c2f1dbf3cd.png",
+    "smiles": "N[C@@H](Cc1ccc(O)cc1)C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_4"
+  },
+  {
+    "i": 572,
+    "hash": "6ab3bcc36d948082bd1be3d86719ac805eb3d3be73dad691028b6f6a12ecda94",
+    "fileNguon": "anh/6ab3bcc36d948082bd1be3d86719ac805eb3d3be73dad691028b6f6a12ecda94.png",
+    "smiles": "O=C(O)c1ccccc1C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_4",
+    "vongThomDangTron": true
+  },
+  {
+    "i": 601,
+    "hash": "6f77b5b4baeff4fab21cd412489eac334f96d7dc257ac315b27eec4f58fc1482",
+    "fileNguon": "anh/6f77b5b4baeff4fab21cd412489eac334f96d7dc257ac315b27eec4f58fc1482.png",
+    "smiles": "CCCCCCCCCCCCCC(=O)OC(C)C",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_4"
+  },
+  {
+    "i": 629,
+    "hash": "745e6d6323ade4d5111d93b9badd360de3eb90b159aa845a8db912894940f29b",
+    "fileNguon": "anh/745e6d6323ade4d5111d93b9badd360de3eb90b159aa845a8db912894940f29b.png",
+    "smiles": "N[C@@H](CCCCN)C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_4"
+  },
+  {
+    "i": 706,
+    "hash": "833b2619fabf9bfe84aba57f69d141a3c0c57fc7b3c5a94a7abda48c234df0ea",
+    "fileNguon": "anh/833b2619fabf9bfe84aba57f69d141a3c0c57fc7b3c5a94a7abda48c234df0ea.png",
+    "smiles": "NCC(=O)NC(C)C(=O)NC(C)C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_4"
+  },
+  {
+    "i": 585,
+    "hash": "6cf438fa9818a2f94e864aa73aeec5725fd5660242f9b30abfa18246a46ec6ef",
+    "fileNguon": "anh/6cf438fa9818a2f94e864aa73aeec5725fd5660242f9b30abfa18246a46ec6ef.png",
+    "giuNguyenVanKhongSuyHoaTri": true,
+    "kieuDacBiet": "nguon-H3N-ch2-ch2-coo",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_4",
+    "canhBaoNguon": "Nguồn H3N không thấy+, giữ nguyên văn, không sửa thànhNH2 hoặc tự thêm+."
+  },
+  {
+    "i": 662,
+    "hash": "7a95145693c30a69a24fe044e04e8e5d684870c8dac50753dc3b120ef83cced3",
+    "fileNguon": "anh/7a95145693c30a69a24fe044e04e8e5d684870c8dac50753dc3b120ef83cced3.png",
+    "kind": "grid",
+    "columns": 3,
+    "panels": [
+      {
+        "smiles": "CCN",
+        "caption": [
+          "(1)"
+        ],
+        "circle": false,
+        "explicitH": false
+      },
+      {
+        "smiles": "NCCC(=O)O",
+        "caption": [
+          "(2)"
+        ],
+        "circle": false,
+        "explicitH": false
+      },
+      {
+        "smiles": "NCC(=O)N([H])CC(=O)O",
+        "caption": [
+          "(3)"
+        ],
+        "explicitH": true
+      }
+    ],
+    "nguoiDocNguon": "cau_truc_4"
+  },
+  {
+    "i": 243,
+    "hash": "2a182ea7eb9a32005c2d1a5222478d7b4a5eb157b8511c984099d9d689876a58",
+    "fileNguon": "anh/2a182ea7eb9a32005c2d1a5222478d7b4a5eb157b8511c984099d9d689876a58.png",
+    "nguoiDocNguon": "soat_nguon_3",
+    "smiles": "CC(C)C(N)C(=O)NCC(=O)NC(CO)C(=O)NC(C)C(=O)O",
+    "caption": []
+  },
+  {
+    "i": 370,
+    "hash": "41ae85b6d639f76d516308e125b3abd097bf2923fd594737fff1b0a3780c397c",
+    "fileNguon": "anh/41ae85b6d639f76d516308e125b3abd097bf2923fd594737fff1b0a3780c397c.png",
+    "nguoiDocNguon": "soat_nguon_3",
+    "smiles": "CC(N)C(=O)NCC(=O)O",
+    "caption": []
+  },
+  {
+    "i": 304,
+    "hash": "341406fd71732e095629b445fe0c5a17c75a11e1d891ee98b732338d021b67f9",
+    "fileNguon": "anh/341406fd71732e095629b445fe0c5a17c75a11e1d891ee98b732338d021b67f9.png",
+    "nguoiDocNguon": "soat_nguon_3",
+    "kind": "grid",
+    "columns": 3,
+    "panels": [
+      {
+        "smiles": "CC(N)C(=O)NCC(=O)O",
+        "caption": [
+          "(1)"
+        ]
+      },
+      {
+        "smiles": "CC(N)C(=O)NC(C)C(=O)O",
+        "caption": [
+          "(2)"
+        ]
+      },
+      {
+        "smiles": "NCC(C)C(=O)NC(C)C(=O)O",
+        "caption": [
+          "(3)"
+        ]
+      },
+      {
+        "smiles": "NCC(C)C(=O)NCC(=O)NC(C)C(=O)NCC(=O)O",
+        "caption": [
+          "(4)"
+        ]
+      },
+      {
+        "smiles": "CC(N)C(=O)NCC(=O)NC(C)C(=O)NCC(=O)O",
+        "caption": [
+          "(5)"
+        ]
+      }
+    ],
+    "ghiChu": "Giữ (1)..(5), không sửa phương án beta-amino thành alpha; bố cục tối đa2cột chờ kiểm ngữ cảnh."
+  },
+  {
+    "i": 316,
+    "hash": "365991501833b22082587d6ab55144e44634fb3b6ea2b97de6b32d667554f87a",
+    "fileNguon": "anh/365991501833b22082587d6ab55144e44634fb3b6ea2b97de6b32d667554f87a.png",
+    "nguoiDocNguon": "soat_nguon_3",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "smiles": "O=C(O)CCC([NH3+])C(=O)O",
+        "caption": [
+          "Dạng (I)",
+          "pH = 1,50"
+        ]
+      },
+      {
+        "smiles": "O=C(O)CCC([NH3+])C(=O)[O-]",
+        "caption": [
+          "Dạng (II)",
+          "pH = 3,22"
+        ]
+      },
+      {
+        "smiles": "[O-]C(=O)CCC([NH3+])C(=O)[O-]",
+        "caption": [
+          "Dạng (III)",
+          "pH = 6,96"
+        ]
+      },
+      {
+        "smiles": "[O-]C(=O)CCC(N)C(=O)[O-]",
+        "caption": [
+          "Dạng (IV)",
+          "pH = 11,5"
+        ]
+      }
+    ],
+    "ghiChu": "Nguồn không mũi tên, giữpH6,96 nguyên văn, không sửa theo giá trị quen thuộc."
+  },
+  {
+    "i": 331,
+    "hash": "39fd0ff9f097d1688a34476945e658946f00f64be9375d5b02a12240fec28c8e",
+    "fileNguon": "anh/39fd0ff9f097d1688a34476945e658946f00f64be9375d5b02a12240fec28c8e.png",
+    "nguoiDocNguon": "soat_nguon_3",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "smiles": "O=C(O)CCC([NH3+])C(=O)O",
+        "caption": [
+          "pH = 1,50"
+        ]
+      },
+      {
+        "smiles": "O=C(O)CCC([NH3+])C(=O)[O-]",
+        "caption": [
+          "pH = 3,22"
+        ]
+      },
+      {
+        "smiles": "[O-]C(=O)CCC([NH3+])C(=O)[O-]",
+        "caption": [
+          "pH = 6,96"
+        ]
+      },
+      {
+        "smiles": "[O-]C(=O)CCC(N)C(=O)[O-]",
+        "caption": [
+          "pH = 11,5"
+        ]
+      }
+    ],
+    "ghiChu": "Nguồn không mũi tên, giữpH6,96 nguyên văn, không sửa theo giá trị quen thuộc."
+  },
+  {
+    "i": 1223,
+    "hash": "de21b411d704396f11f6b56b8142e6c8615b9a37c4733c1390443af8f424df8b",
+    "fileNguon": "anh/de21b411d704396f11f6b56b8142e6c8615b9a37c4733c1390443af8f424df8b.png",
+    "smiles": "NCCCCC(N)C(=O)NC(C)C(=O)NCC(=O)NC(C)C(=O)NCC(=O)NC(CCC(=O)O)C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_6"
+  },
+  {
+    "i": 1262,
+    "hash": "e4fd30d8f94eb36724e36350803fecc451eb8e13bc31c288dcc61b742943a131",
+    "fileNguon": "anh/e4fd30d8f94eb36724e36350803fecc451eb8e13bc31c288dcc61b742943a131.png",
+    "smiles": "NCCCC[C@H](N)C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_6",
+    "CIPNguon": [
+      "S"
+    ]
+  },
+  {
+    "i": 1282,
+    "hash": "e8bd99cd5d3d04c97e30490e3c609324c5a2ff80c09f221334419b8a16804b94",
+    "fileNguon": "anh/e8bd99cd5d3d04c97e30490e3c609324c5a2ff80c09f221334419b8a16804b94.png",
+    "smiles": "N[C@@H](CCC(=O)O)C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_6",
+    "CIPNguon": [
+      "S"
+    ]
+  },
+  {
+    "i": 1315,
+    "hash": "ee6c0c3ab4ce8aca148183b65dc8ec43f0e7c707007632a1d951ad0e23d351ba",
+    "fileNguon": "anh/ee6c0c3ab4ce8aca148183b65dc8ec43f0e7c707007632a1d951ad0e23d351ba.png",
+    "smiles": "N[C@@H](CCC(=O)O)C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_6",
+    "CIPNguon": [
+      "S"
+    ]
+  },
+  {
+    "i": 1346,
+    "hash": "f3c29e20a488fa3b05f46610eaa279091ea7329a17f0269888be7d25a8cb61e5",
+    "fileNguon": "anh/f3c29e20a488fa3b05f46610eaa279091ea7329a17f0269888be7d25a8cb61e5.png",
+    "smiles": "CC(N)C(=O)NCC(=O)NC(CCC(=O)O)C(=O)NC(C(C)C)C(=O)NC(CCCCN)C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_6"
+  },
+  {
+    "i": 1380,
+    "hash": "f91756dde0c101a9d803836e55f18ae3db7d5a31590a78852763e594383c48f2",
+    "fileNguon": "anh/f91756dde0c101a9d803836e55f18ae3db7d5a31590a78852763e594383c48f2.png",
+    "smiles": "COC(=O)[C@H](Cc1ccccc1)NC(=O)[C@@H](N)CC(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_6",
+    "CIPNguon": [
+      "S",
+      "S"
+    ]
+  },
+  {
+    "i": 1387,
+    "hash": "f9f4f187af832fb7f602079ab87c792a2fb6496b099fe3563dd2d1d4c6b193c7",
+    "fileNguon": "anh/f9f4f187af832fb7f602079ab87c792a2fb6496b099fe3563dd2d1d4c6b193c7.png",
+    "smiles": "N[C@@H](CCC(=O)O)C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_6",
+    "CIPNguon": [
+      "S"
+    ]
+  },
+  {
+    "i": 1394,
+    "hash": "fb09b593b0c271c065a25c19482b41763c8d307118964452d4ef6d33286de0ec",
+    "fileNguon": "anh/fb09b593b0c271c065a25c19482b41763c8d307118964452d4ef6d33286de0ec.png",
+    "smiles": "CC(C)C(N)C(=O)NCC(=O)NC(CO)C(=O)NC(C)C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_6"
+  },
+  {
+    "i": 1408,
+    "hash": "fd0b306c63b468ad2e94123b5e7fc6e726022786827ff80abc4e4a570cb088a5",
+    "fileNguon": "anh/fd0b306c63b468ad2e94123b5e7fc6e726022786827ff80abc4e4a570cb088a5.png",
+    "smiles": "NC(CCC(=O)NC(CS)C(=O)NCC(=O)O)C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_6"
+  },
+  {
+    "i": 730,
+    "hash": "88ca3be21f2f1ea3edd16e69826ab44db0baff8393447ea39a34d55b0668b678",
+    "fileNguon": "anh/88ca3be21f2f1ea3edd16e69826ab44db0baff8393447ea39a34d55b0668b678.png",
+    "nguoiDocNguon": "soat_hinh_vector",
+    "smiles": "CCCCCCCCCCCCCCCC(=O)[O-].[K+]",
+    "caption": [],
+    "terminalCationText": "OK"
+  },
+  {
+    "i": 832,
+    "hash": "99dbe1448acae9457e382bb939e2433ba36a12824e67bfb556bc124c73d2ac21",
+    "fileNguon": "anh/99dbe1448acae9457e382bb939e2433ba36a12824e67bfb556bc124c73d2ac21.png",
+    "nguoiDocNguon": "soat_hinh_vector",
+    "kind": "grid",
+    "columns": 3,
+    "panels": [
+      {
+        "smiles": "NC1CCCCC1",
+        "caption": [
+          "(1)"
+        ],
+        "explicitH": false
+      },
+      {
+        "smiles": "Nc1ccccc1",
+        "caption": [
+          "(2)"
+        ],
+        "explicitH": false
+      },
+      {
+        "smiles": "c1ccc(N([H])c2ccccc2)cc1",
+        "caption": [
+          "(3)"
+        ],
+        "explicitH": true
+      },
+      {
+        "smiles": "NCc1ccccc1",
+        "caption": [
+          "(4)"
+        ],
+        "explicitH": false
+      },
+      {
+        "smiles": "CN([H])c1ccccc1",
+        "caption": [
+          "(5)"
+        ],
+        "explicitH": true
+      }
+    ]
+  },
+  {
+    "i": 858,
+    "hash": "9cb9433836ef70f8a569e1f36fede41b0a32bbd056f30178cd8f203a825b4cd0",
+    "fileNguon": "anh/9cb9433836ef70f8a569e1f36fede41b0a32bbd056f30178cd8f203a825b4cd0.png",
+    "nguoiDocNguon": "soat_hinh_vector",
+    "smiles": "NCC(=O)N([H])C(CCCCN)C(=O)N([H])C(CCC(=O)O)C(=O)O",
+    "caption": [],
+    "giuHTuongMinh": true
+  },
+  {
+    "i": 527,
+    "hash": "636d0fadaf9fef5b3b39cef7d29d958c8f108ff080d839a02b6180a7e033b15e",
+    "fileNguon": "anh/636d0fadaf9fef5b3b39cef7d29d958c8f108ff080d839a02b6180a7e033b15e.png",
+    "nguoiDocNguon": "cau_truc_4",
+    "smiles": "N[C@@H](CCC(=O)O)C(=O)O",
+    "caption": [],
+    "CIPNguon": [
+      "S"
+    ]
+  },
+  {
+    "i": 703,
+    "hash": "82f94f634b9677cbe29d2f761f5b2478ab226c893f8206695c976003f6160fad",
+    "fileNguon": "anh/82f94f634b9677cbe29d2f761f5b2478ab226c893f8206695c976003f6160fad.png",
+    "nguoiDocNguon": "cau_truc_4",
+    "smiles": "N[C@@H](CO)C(=O)O",
+    "caption": [
+      "L-serine"
+    ],
+    "CIPNguon": [
+      "S"
+    ]
+  },
+  {
+    "i": 532,
+    "hash": "64a0b2b7bdb7d66da71bdc3ce830e51e38bd4b137977b16e761f9b593b324cd3",
+    "fileNguon": "anh/64a0b2b7bdb7d66da71bdc3ce830e51e38bd4b137977b16e761f9b593b324cd3.png",
+    "nguoiDocNguon": "cau_truc_4",
+    "kind": "grid",
+    "columns": 3,
+    "panels": [
+      {
+        "smiles": "NC1CCCCC1",
+        "caption": [
+          "(1)"
+        ],
+        "explicitH": false
+      },
+      {
+        "smiles": "Nc1ccccc1",
+        "caption": [
+          "(2)"
+        ],
+        "explicitH": false
+      },
+      {
+        "smiles": "c1ccc(N([H])c2ccccc2)cc1",
+        "caption": [
+          "(3)"
+        ],
+        "explicitH": true
+      },
+      {
+        "smiles": "NCc1ccccc1",
+        "caption": [
+          "(4)"
+        ],
+        "explicitH": false
+      },
+      {
+        "smiles": "CN([H])c1ccccc1",
+        "caption": [
+          "(5)"
+        ],
+        "explicitH": true
+      }
+    ]
+  },
+  {
+    "i": 538,
+    "hash": "6554003e42899d41333e8fbcba14cd4eca22d97f71e7fbd7e32fc78a9c9d38ff",
+    "fileNguon": "anh/6554003e42899d41333e8fbcba14cd4eca22d97f71e7fbd7e32fc78a9c9d38ff.png",
+    "nguoiDocNguon": "cau_truc_4",
+    "kind": "grid",
+    "columns": 2,
+    "panels": [
+      {
+        "smiles": "CCCCCCCCCCCCCCCC(=O)[O-].[Na+]",
+        "caption": [
+          "sodium palmitate"
+        ],
+        "terminalCationText": "ONa"
+      },
+      {
+        "smiles": "CCCCCCCCCCCCOS(=O)(=O)[O-].[Na+]",
+        "caption": [
+          "sodium laurylsulfate"
+        ],
+        "terminalCationText": "ONa"
+      }
+    ]
+  },
+  {
+    "i": 541,
+    "hash": "65d707399e149ff5ef6f57c9255713dddfb5313cd4d7cc08ae311723cba4fd00",
+    "fileNguon": "anh/65d707399e149ff5ef6f57c9255713dddfb5313cd4d7cc08ae311723cba4fd00.png",
+    "nguoiDocNguon": "cau_truc_4",
+    "smiles": "CCCCCCCCCCCCCCCC(=O)[O-].[Na+]",
+    "caption": [],
+    "terminalCationText": "ONa"
+  },
+  {
+    "i": 565,
+    "hash": "6906af11562357da39ba4c821a51c3ae0cd9a226ea9170a2ca51d758b86ca1a7",
+    "fileNguon": "anh/6906af11562357da39ba4c821a51c3ae0cd9a226ea9170a2ca51d758b86ca1a7.png",
+    "nguoiDocNguon": "cau_truc_4",
+    "textNguyenVan": "CH₃(CH₂)₁₅CH₂–C(=O)–ONa",
+    "caption": [],
+    "ghiChu": "Giữ nguyên số lặp15; tổng18C."
+  },
+  {
+    "i": 714,
+    "hash": "84a81582454d5245c25e704963a56f8736b7da306601d70d3fb4dfab2ac37cc6",
+    "fileNguon": "anh/84a81582454d5245c25e704963a56f8736b7da306601d70d3fb4dfab2ac37cc6.png",
+    "nguoiDocNguon": "cau_truc_4",
+    "smiles": "CCCCCCCCCCCCCCCC(=O)[O-].[K+]",
+    "caption": [],
+    "terminalCationText": "OK"
+  },
+  {
+    "i": 970,
+    "hash": "ae32a63ff67848fb88278ab2f942d8a02afb79d3cebf61fc75bfbcc740a257c2",
+    "fileNguon": "anh/ae32a63ff67848fb88278ab2f942d8a02afb79d3cebf61fc75bfbcc740a257c2.png",
+    "nguoiDocNguon": "cau_truc_5",
+    "kind": "grid",
+    "columns": 2,
+    "panelBorder": "dashed",
+    "panels": [
+      {
+        "smiles": "O=C(O)CC(O)(CC(=O)O)C(=O)O",
+        "caption": [
+          "(1)"
+        ]
+      },
+      {
+        "smiles": "O=C(O)C(=O)O",
+        "caption": [
+          "(2)"
+        ]
+      },
+      {
+        "smiles": "CC(O)C(=O)O",
+        "caption": [
+          "(3)"
+        ]
+      },
+      {
+        "smiles": "O=C(O)CC(O)C(=O)O",
+        "caption": [
+          "(4)"
+        ]
+      }
+    ]
+  },
+  {
+    "i": 985,
+    "hash": "b0f28ad467a584e384bebe43ecb184eaad7c58a971a3879a0c843246824846bb",
+    "fileNguon": "anh/b0f28ad467a584e384bebe43ecb184eaad7c58a971a3879a0c843246824846bb.png",
+    "nguoiDocNguon": "cau_truc_5",
+    "smiles": "CCCCC/C=C\\C/C=C\\CCCCCCCC(=O)O",
+    "caption": [
+      "linoleic acid"
+    ],
+    "stereoNguon": "9Z,12Z"
+  },
+  {
+    "i": 1150,
+    "hash": "cfd644552410357d2d14b998b1363a9fbbfb781a3dc214cb895d221fdf17c399",
+    "fileNguon": "anh/cfd644552410357d2d14b998b1363a9fbbfb781a3dc214cb895d221fdf17c399.png",
+    "nguoiDocNguon": "cau_truc_5",
+    "smiles": "CCCCC/C=C\\C/C=C\\CCCCCCCC(=O)O",
+    "caption": [],
+    "stereoNguon": "9Z,12Z"
+  },
+  {
+    "i": 1047,
+    "hash": "bcee990cec0cb656a9696a23128b2f10e71e69c605c04c651361b609a47a7465",
+    "fileNguon": "anh/bcee990cec0cb656a9696a23128b2f10e71e69c605c04c651361b609a47a7465.png",
+    "nguoiDocNguon": "cau_truc_5",
+    "kind": "grid",
+    "columns": 2,
+    "panels": [
+      {
+        "smiles": "[NH3+]C(CCC(=O)O)C(=O)O",
+        "caption": [
+          "pH = 1,50"
+        ]
+      },
+      {
+        "smiles": "[NH3+]C(CCC(=O)O)C(=O)[O-]",
+        "caption": [
+          "pH = 3,22"
+        ]
+      },
+      {
+        "smiles": "[NH3+]C(CCC(=O)[O-])C(=O)[O-]",
+        "caption": [
+          "pH = 6,96"
+        ]
+      },
+      {
+        "smiles": "NC(CCC(=O)[O-])C(=O)[O-]",
+        "caption": [
+          "pH = 11,5"
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1084,
+    "hash": "c36d9e2bc03d0a06ced5e1569f7ec8df26a4cdba4044a661797f5368ca1fa83a",
+    "fileNguon": "anh/c36d9e2bc03d0a06ced5e1569f7ec8df26a4cdba4044a661797f5368ca1fa83a.png",
+    "nguoiDocNguon": "cau_truc_5",
+    "kind": "grid",
+    "columns": 2,
+    "panels": [
+      {
+        "smiles": "CCCCCCCCCCCCCCCC(=O)[O-].[Na+]",
+        "caption": [
+          "sodium palmitate (X)"
+        ],
+        "terminalCationText": "ONa"
+      },
+      {
+        "smiles": "CCCCCCCCCCCCOS(=O)(=O)[O-].[Na+]",
+        "caption": [
+          "sodium laurylsulfate (Y)"
+        ],
+        "terminalCationText": "ONa"
+      }
+    ]
+  },
+  {
+    "i": 1094,
+    "hash": "c4ed3560332937ea5e63e012bce94d031d74eb1eb2942413c0d1bfe2e054380a",
+    "fileNguon": "anh/c4ed3560332937ea5e63e012bce94d031d74eb1eb2942413c0d1bfe2e054380a.png",
+    "nguoiDocNguon": "cau_truc_5",
+    "kind": "grid",
+    "columns": 2,
+    "panels": [
+      {
+        "smiles": "CCCCCCCCCCCCCCCC(=O)[O-].[Na+]",
+        "caption": [],
+        "terminalCationText": "ONa"
+      },
+      {
+        "smiles": "CCCCCCCCCCCCOS(=O)(=O)[O-].[Na+]",
+        "caption": [],
+        "terminalCationText": "ONa"
+      }
+    ]
+  },
+  {
+    "i": 1126,
+    "hash": "ca94a9951d9998279e90f8cad3459d74b94c4abd4ac1ca8dae08da7412bb01cd",
+    "fileNguon": "anh/ca94a9951d9998279e90f8cad3459d74b94c4abd4ac1ca8dae08da7412bb01cd.png",
+    "nguoiDocNguon": "cau_truc_5",
+    "kind": "grid",
+    "columns": 2,
+    "panels": [
+      {
+        "text": "CH₃CH₂NH₂",
+        "caption": [
+          "(1)"
+        ]
+      },
+      {
+        "text": "H₂N[CH₂]₆NH₂",
+        "caption": [
+          "(2)"
+        ]
+      },
+      {
+        "smiles": "Nc1ccccc1",
+        "caption": [
+          "(3)"
+        ],
+        "circle": true
+      },
+      {
+        "smiles": "CNc1ccc(C)cc1",
+        "caption": [
+          "(4)"
+        ]
+      },
+      {
+        "smiles": "CCCN(C)C",
+        "caption": [
+          "(5)"
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1127,
+    "hash": "caa3af287782315469517eceb4116491d700b7b4d60eab82d22ee36c29b79522",
+    "fileNguon": "anh/caa3af287782315469517eceb4116491d700b7b4d60eab82d22ee36c29b79522.png",
+    "nguoiDocNguon": "cau_truc_5",
+    "kind": "grid",
+    "columns": 2,
+    "panelBorder": "dashed",
+    "panels": [
+      {
+        "smiles": "COC(=O)C(=O)O",
+        "caption": [
+          "Chất X"
+        ],
+        "explicitH": false
+      },
+      {
+        "smiles": "[H]C(=O)OCCOC([H])=O",
+        "caption": [
+          "Chất Y"
+        ],
+        "explicitH": true
+      },
+      {
+        "smiles": "[H]C(=O)OCCC(=O)O",
+        "caption": [
+          "Chất Z"
+        ],
+        "explicitH": true
+      },
+      {
+        "smiles": "[H]C(=O)OCCCC(=O)O",
+        "caption": [
+          "Chất T"
+        ],
+        "explicitH": true
+      }
+    ]
+  },
+  {
+    "i": 1144,
+    "hash": "cecf74b3cffed1d2381d2938b50352d0f20f4ec5f72c8fcbaa5b4cfe7eec9962",
+    "fileNguon": "anh/cecf74b3cffed1d2381d2938b50352d0f20f4ec5f72c8fcbaa5b4cfe7eec9962.png",
+    "nguoiDocNguon": "cau_truc_5",
+    "smiles": "CC(N)C(=O)NC(CCC(=O)O)C(=O)NCC(=O)NC(C)C(=O)NC(C(C)C)C(=O)O",
+    "caption": []
+  },
+  {
+    "i": 1169,
+    "hash": "d340fca5866795895f65c10087ee6f1ee66ee48c7ae313fa6309f7f333112927",
+    "fileNguon": "anh/d340fca5866795895f65c10087ee6f1ee66ee48c7ae313fa6309f7f333112927.png",
+    "nguoiDocNguon": "cau_truc_5",
+    "smiles": "CC(C)C(N)C(=O)NCC(=O)NC(CO)C(=O)NC(C)C(=O)O",
+    "caption": []
+  },
+  {
+    "i": 1199,
+    "hash": "d906b772d96ae7e468c86f20bddd0ed06aba208e82291bcb0cc06e0f22bf66cc",
+    "fileNguon": "anh/d906b772d96ae7e468c86f20bddd0ed06aba208e82291bcb0cc06e0f22bf66cc.png",
+    "nguoiDocNguon": "cau_truc_5",
+    "kind": "grid",
+    "columns": 2,
+    "panels": [
+      {
+        "smiles": "CC(N)C(=O)NC(C)C(=O)O",
+        "caption": [
+          "(1)"
+        ]
+      },
+      {
+        "smiles": "CC(N)C(=O)NCC(=O)O",
+        "caption": [
+          "(2)"
+        ]
+      },
+      {
+        "smiles": "NCCC(=O)NCC(=O)O",
+        "caption": [
+          "(3)"
+        ]
+      },
+      {
+        "smiles": "NCC(N)C(=O)NCC(=O)NCC(=O)O",
+        "caption": [
+          "(4)"
+        ]
+      }
+    ]
+  },
+  {
+    "i": 381,
+    "hash": "4464502250376a72b8f8f8eae9c8961735c562c1de7e4fa426dac364b3e110f3",
+    "fileNguon": "anh/4464502250376a72b8f8f8eae9c8961735c562c1de7e4fa426dac364b3e110f3.png",
+    "nguoiDocNguon": "soat_nguon_3",
+    "giuNguyenVanKhongSuyHoaTri": true,
+    "kieuDacBiet": "styrene-vong-tron-chu",
+    "smilesThamChieu": "C=Cc1ccccc1",
+    "caption": [],
+    "ghiChu": "Giữ chữ vinylCH=CH2,chấm cuối,vòngtròn; bỏ đường kẻ trang dưới không thuộc phân tử."
+  },
+  {
+    "i": 395,
+    "hash": "460613b41bef159198c4761a4ca6e4b39a92a765bae179bcefdad32052a041fa",
+    "fileNguon": "anh/460613b41bef159198c4761a4ca6e4b39a92a765bae179bcefdad32052a041fa.png",
+    "nguoiDocNguon": "soat_nguon_3",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "smiles": "NCC(=O)O",
+        "caption": [
+          "Glycine (Gly)"
+        ]
+      },
+      {
+        "smiles": "CC(N)C(=O)O",
+        "caption": [
+          "Alanine (Ala)"
+        ]
+      },
+      {
+        "smiles": "CC(C)C(N)C(=O)O",
+        "caption": [
+          "Valine (Val)"
+        ]
+      },
+      {
+        "smiles": "NC(Cc1ccccc1)C(=O)O",
+        "caption": [
+          "Phenylalanine (Phe)"
+        ]
+      }
+    ]
+  },
+  {
+    "i": 431,
+    "hash": "4d8ac4ad6bc0112e71dd61168eaa9aa88177568a848cea55561f6f386068d65a",
+    "fileNguon": "anh/4d8ac4ad6bc0112e71dd61168eaa9aa88177568a848cea55561f6f386068d65a.png",
+    "nguoiDocNguon": "soat_nguon_3",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "smiles": "CCCO",
+        "caption": [
+          "(1)"
+        ]
+      },
+      {
+        "smiles": "CC(=O)O",
+        "caption": [
+          "(2)"
+        ]
+      },
+      {
+        "smiles": "NCCN",
+        "caption": [
+          "(3)"
+        ]
+      },
+      {
+        "smiles": "CC(O)C",
+        "caption": [
+          "(4)"
+        ]
+      }
+    ]
+  },
+  {
+    "i": 435,
+    "hash": "4e8d1979da38be6d03924b4b4c621dbac425644c5f2265e1ecc2706545c55db8",
+    "fileNguon": "anh/4e8d1979da38be6d03924b4b4c621dbac425644c5f2265e1ecc2706545c55db8.png",
+    "nguoiDocNguon": "soat_nguon_3",
+    "smiles": "C=CCS(=O)CC(N)C(=O)O",
+    "caption": []
+  },
+  {
+    "i": 462,
+    "hash": "53ec21f1e1cd54ce7570ecc20bec2fe5008ba22c8841d4b5a8a0c14a7ab957ba",
+    "fileNguon": "anh/53ec21f1e1cd54ce7570ecc20bec2fe5008ba22c8841d4b5a8a0c14a7ab957ba.png",
+    "nguoiDocNguon": "soat_nguon_3",
+    "smiles": "CC1CCCCC1O",
+    "caption": []
+  },
+  {
+    "i": 432,
+    "hash": "4dbc9b5a6b909a0db66e1aa66faccfe9ef888c9f344d3feb3344a74b57109f02",
+    "fileNguon": "anh/4dbc9b5a6b909a0db66e1aa66faccfe9ef888c9f344d3feb3344a74b57109f02.png",
+    "nguoiDocNguon": "soat_nguon_3",
+    "smiles": "N[C@@H](CC(=O)O)C(=O)N[C@@H](Cc1ccccc1)C(=O)OC",
+    "caption": [],
+    "CIPNguon": [
+      "S",
+      "S"
+    ]
+  },
+  {
+    "i": 393,
+    "hash": "45faf978c04aa7369c9860dd1fbc753f61186b10e432b7fa54339a4b13b4f67e",
+    "fileNguon": "anh/45faf978c04aa7369c9860dd1fbc753f61186b10e432b7fa54339a4b13b4f67e.png",
+    "nguoiDocNguon": "soat_nguon_3",
+    "smiles": "CCOC(=O)c1ccccc1C(=O)OCC",
+    "caption": [],
+    "smilesDocLanDau": "COC(=O)c1ccccc1C(=O)OC",
+    "suaSauSoat": "Nguồn có2nhánhOCH2CH3; bản đầu đọc nhầm methylester thiếu2C, tác tửcau_truc_4 đã đối chiếu nét gốc phát hiện."
+  },
+  {
+    "i": 454,
+    "hash": "523db0327209a065d66ba302c589237f2f9e751af7b1157351d4edfb2d697c8d",
+    "fileNguon": "anh/523db0327209a065d66ba302c589237f2f9e751af7b1157351d4edfb2d697c8d.png",
+    "nguoiDocNguon": "soat_nguon_3",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "smiles": "O=C(O)CCC([NH3+])C(=O)O",
+        "caption": [
+          "pH = 1,50"
+        ]
+      },
+      {
+        "smiles": "O=C(O)CCC([NH3+])C(=O)[O-]",
+        "caption": [
+          "pH = 3,22"
+        ]
+      },
+      {
+        "smiles": "[O-]C(=O)CCC([NH3+])C(=O)[O-]",
+        "caption": [
+          "pH = 6,96"
+        ]
+      },
+      {
+        "smiles": "[O-]C(=O)CCC(N)C(=O)[O-]",
+        "caption": [
+          "pH = 11,5"
+        ]
+      }
+    ],
+    "ghiChu": "Không mũi tên, không Dạng; pH6,96 nguyên nguồn."
+  },
+  {
+    "i": 464,
+    "hash": "54457846807fd830443977f8212b6ee84aa0b30dd17cfe1a07850d80e11380af",
+    "fileNguon": "anh/54457846807fd830443977f8212b6ee84aa0b30dd17cfe1a07850d80e11380af.png",
+    "nguoiDocNguon": "soat_nguon_3",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "smiles": "O=C(O)CCC([NH3+])C(=O)O",
+        "caption": [
+          "pH = 1,50"
+        ]
+      },
+      {
+        "smiles": "O=C(O)CCC([NH3+])C(=O)[O-]",
+        "caption": [
+          "pH = 3,22"
+        ]
+      },
+      {
+        "smiles": "[O-]C(=O)CCC([NH3+])C(=O)[O-]",
+        "caption": [
+          "pH = 6,96"
+        ]
+      },
+      {
+        "smiles": "[O-]C(=O)CCC(N)C(=O)[O-]",
+        "caption": [
+          "pH = 11,5"
+        ]
+      }
+    ],
+    "ghiChu": "Không mũi tên, không Dạng; pH6,96 nguyên nguồn."
+  },
+  {
+    "i": 477,
+    "hash": "57c9abb88b59257645340e99f96b79aee817c428da4c5361fefa4d75c060bc9a",
+    "fileNguon": "anh/57c9abb88b59257645340e99f96b79aee817c428da4c5361fefa4d75c060bc9a.png",
+    "nguoiDocNguon": "soat_nguon_3",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "smiles": "O=C(O)CCC([NH3+])C(=O)O",
+        "caption": [
+          "pH = 1,50"
+        ]
+      },
+      {
+        "smiles": "O=C(O)CCC([NH3+])C(=O)[O-]",
+        "caption": [
+          "pH = 3,22"
+        ]
+      },
+      {
+        "smiles": "[O-]C(=O)CCC([NH3+])C(=O)[O-]",
+        "caption": [
+          "pH = 6,96"
+        ]
+      },
+      {
+        "smiles": "[O-]C(=O)CCC(N)C(=O)[O-]",
+        "caption": [
+          "pH = 11,5"
+        ]
+      }
+    ],
+    "ghiChu": "Không mũi tên, không Dạng; pH6,96 nguyên nguồn."
+  },
+  {
+    "i": 112,
+    "hash": "15451f2f266f370905c71d44e8ca2c7b64d3d53d03a1638e42b614f124de123a",
+    "fileNguon": "anh/15451f2f266f370905c71d44e8ca2c7b64d3d53d03a1638e42b614f124de123a.png",
+    "smiles": "CN1CCCC1c1cccnc1",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_2",
+    "nhanTrongVong": {
+      "soCanh": 5,
+      "chu": "(1)"
+    }
+  },
+  {
+    "i": 114,
+    "hash": "156a6916b1f53e6a39a95f4a22f5345df6a28a08fabcd6e14291f2808593e7b0",
+    "fileNguon": "anh/156a6916b1f53e6a39a95f4a22f5345df6a28a08fabcd6e14291f2808593e7b0.png",
+    "smiles": "CC(C)C(N)C(=O)NCC(=O)NC(CO)C(=O)NC(C)C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_2"
+  },
+  {
+    "i": 126,
+    "hash": "175a752561e16747bd38b90a1876a4a5be4da51a13b2c5b28a461c479c5e5b7f",
+    "fileNguon": "anh/175a752561e16747bd38b90a1876a4a5be4da51a13b2c5b28a461c479c5e5b7f.png",
+    "smiles": "CC(=O)OCC(C)CC",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_2"
+  },
+  {
+    "i": 155,
+    "hash": "1ae35a988392e280237d91af8b9abb3eb3458d565994d816523412a466b570d0",
+    "fileNguon": "anh/1ae35a988392e280237d91af8b9abb3eb3458d565994d816523412a466b570d0.png",
+    "smiles": "CC(=O)OC/C=C(\\C)CCC=C(C)C",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_2"
+  },
+  {
+    "i": 205,
+    "hash": "227c753d7f6eeeef985640be66e194daef21baa64e3eff574c2df0ffaebe3bee",
+    "fileNguon": "anh/227c753d7f6eeeef985640be66e194daef21baa64e3eff574c2df0ffaebe3bee.png",
+    "smiles": "CC(c1ccc(S(=O)(=O)[O-])cc1)CCCCCCC(C)(C)C.[Na+]",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_2",
+    "terminalCationText": "ONa"
+  }
+]

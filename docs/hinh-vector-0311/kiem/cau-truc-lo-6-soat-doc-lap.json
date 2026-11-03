@@ -177,5 +177,12 @@
     "hashSvgDaSoat": "8c569038b571683c8df169caf2b2db29a4375c9beb07cd91c571a7517011d144",
     "nguoiSoat": "cau_truc_4",
     "ketQua": "Đạt: mở từng nguồn và render SVG thực tế, đúng từng hàng OH, top/bottom, carbonyl; không tràn, không mirror."
+  },
+  {
+    "i": 1331,
+    "hash": "f11b28f6c81d4749eb7ffc02452de341fde40e4f6f4099c7142a9beb9025123a",
+    "hashSvgDaSoat": "14e8c1ea79dcfec5adb368999f3639de91ec341b9004c1bee31d6dba4a6dcc48",
+    "nguoiSoat": "cau_truc_6",
+    "ketQua": "Đạt mở nguồn/SVG render thực:6 C ẩn,4OH bên RLRR,OH cuối,carbonyl2 nét chéo lên phải; H/C/số đều ẩn, không cắt/chồng. Nguồn922/1415 cùng mạch nhưng không sao chép nhãn từ đó."
   }
 ]
