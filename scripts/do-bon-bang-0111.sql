@@ -1,4 +1,4 @@
--- HÔM NAY · 4 BẢNG — SOÁT TRÊN DỮ LIỆU THẬT (CHỈ ĐỌC, 01/11 · đếm lại 02/11 sau tính BAN_BON 4 = v3 ca thi + lên bảng, v3b hai trục bỏ «Đang theo dõi», PR #741).
+-- HÔM NAY · 4 BẢNG — SOÁT TRÊN DỮ LIỆU THẬT (CHỈ ĐỌC, 01/11 · đếm lại 02/11 sau tính BAN_BON 4 = v3 ca thi + lên bảng, v3b hai trục bỏ «Đang theo dõi», PR #741). · đếm 03/11 sáng
 -- Một câu SELECT, chỉ SỐ ĐẾM GỘP: không SBD, không tên (repo công khai). Cột v3 chỉ tính trên dòng đã tính lại `ban = 4`.
 -- PHẢI = 0: chua_xep_bang_nao, sai_truc_cong_suc, chong_ht_dp, dang_theo_doi_ban4. chua_co_ban_tinh = em đang học chưa có dòng (cron chưa tới lượt).
 SELECT
