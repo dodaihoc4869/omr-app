@@ -86,7 +86,7 @@ function CotLoi({ ban }: { ban: BanKinh }) {
   return (
     <section className="lgk-the lgk-cot-loi" aria-label="Kiến thức cốt lõi">
       <span className="lgk-nhan">Kiến thức cốt lõi</span>
-      {ban.cotLoi.congThuc && <div className="lgk-ct-to"><CongThuc chu={ban.cotLoi.congThuc} /></div>}
+      {ban.cotLoi.congThuc && <CongThucLon chu={ban.cotLoi.congThuc} />}
       <p className="lgk-ct-chu"><Chu chu={ban.cotLoi.chu} /></p>
       {ban.cotLoi.chip.length > 0 && <div className="lgk-chip-hang">{ban.cotLoi.chip.map((c, i) => <span key={i} className="lgk-chip"><b><Chu chu={c.nhan} /></b> <Chu chu={c.chu} /></span>)}</div>}
     </section>
@@ -382,6 +382,18 @@ function PhepTinh({ ban }: { ban: BanKinh }) {
 }
 
 // ---------------------------------------------------------------- THẦY GIẢNG
+/** Công thức lớn của Kiến thức cốt lõi: phương trình dài (thầy 03/11 «chỉnh lại tràn trang phương trình gọn lại») co chữ theo độ dài và chỉ xuống dòng
+ *  GIỮA các chất (sau dấu +, →, ⇌, =) — mỗi chất một cụm không bẻ đôi. */
+function CongThucLon({ chu }: { chu: string }) {
+  const dai = chu.replace(/[_{}^]/g, '').length
+  const cum = chu.split(/(?=\s[+→⇌=⇒]\s)/).map((x) => x.trim()).filter(Boolean)
+  return (
+    <div className="lgk-ct-to" data-dai={dai > 34 ? 'dai' : dai > 16 ? 'vua' : undefined}>
+      {cum.length > 1 ? cum.map((x, i) => <Fragment key={i}>{i > 0 && ' '}<span className="lgk-ct-cum"><CongThuc chu={x} /></span></Fragment>) : <CongThuc chu={chu} />}
+    </div>
+  )
+}
+
 /** Ô «Đ» hình BÁNH QUY 12 MÚI (logo app học sinh, bản mẫu docs/ban-ve-ban-sac-hs-0211/v2/kve.js `banh(12, 0.075)`) — vẽ bằng mã, tính một lần. */
 const BANH = (() => {
   let d = ''
