@@ -8,7 +8,7 @@
     "byteSvg": 47131,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
-    "trangThai": "cho-soat-doc-lap",
+    "trangThai": "da-soat-doc-lap",
     "points": [
       [
         20,
@@ -40,7 +40,9 @@
       80,
       100
     ],
-    "ghiChu": "Không có nhãn0 hoặc mũi tên; khoảng m/z đúng tỷ lệ. Chữ đã thành nét phông app, tự chứa/offline."
+    "ghiChu": "Không có nhãn0 hoặc mũi tên; khoảng m/z đúng tỷ lệ. Chữ đã thành nét phông app, tự chứa/offline.",
+    "hashSvgDaSoat": "fdfc619e1fa023fc60aed9551b1d9669caaffb2ac06b12e7cf9a8639bfa4f19e",
+    "nguoiSoat": "soat_nguon_2"
   },
   {
     "i": 1230,
@@ -51,7 +53,7 @@
     "byteSvg": 47131,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
-    "trangThai": "cho-soat-doc-lap",
+    "trangThai": "da-soat-doc-lap",
     "points": [
       [
         20,
@@ -83,7 +85,9 @@
       80,
       100
     ],
-    "ghiChu": "Không có nhãn0 hoặc mũi tên; khoảng m/z đúng tỷ lệ. Chữ đã thành nét phông app, tự chứa/offline."
+    "ghiChu": "Không có nhãn0 hoặc mũi tên; khoảng m/z đúng tỷ lệ. Chữ đã thành nét phông app, tự chứa/offline.",
+    "hashSvgDaSoat": "fdfc619e1fa023fc60aed9551b1d9669caaffb2ac06b12e7cf9a8639bfa4f19e",
+    "nguoiSoat": "soat_nguon_2"
   },
   {
     "i": 192,
@@ -94,7 +98,7 @@
     "byteSvg": 35856,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
-    "trangThai": "cho-soat-doc-lap",
+    "trangThai": "da-soat-doc-lap",
     "points": [
       [
         54,
@@ -130,7 +134,9 @@
       80,
       100
     ],
-    "ghiChu": "Không có nhãn0 hoặc mũi tên; khoảng m/z đúng tỷ lệ. Chữ đã thành nét phông app, tự chứa/offline."
+    "ghiChu": "Không có nhãn0 hoặc mũi tên; khoảng m/z đúng tỷ lệ. Chữ đã thành nét phông app, tự chứa/offline.",
+    "hashSvgDaSoat": "78cbd701a655883b8f9e57da3065f850fe0219813e79493a2c5f1803cd3d920e",
+    "nguoiSoat": "soat_nguon_2"
   },
   {
     "i": 1333,
@@ -141,7 +147,7 @@
     "byteSvg": 35856,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
-    "trangThai": "cho-soat-doc-lap",
+    "trangThai": "da-soat-doc-lap",
     "points": [
       [
         54,
@@ -177,6 +183,8 @@
       80,
       100
     ],
-    "ghiChu": "Không có nhãn0 hoặc mũi tên; khoảng m/z đúng tỷ lệ. Chữ đã thành nét phông app, tự chứa/offline."
+    "ghiChu": "Không có nhãn0 hoặc mũi tên; khoảng m/z đúng tỷ lệ. Chữ đã thành nét phông app, tự chứa/offline.",
+    "hashSvgDaSoat": "78cbd701a655883b8f9e57da3065f850fe0219813e79493a2c5f1803cd3d920e",
+    "nguoiSoat": "soat_nguon_2"
   }
 ]

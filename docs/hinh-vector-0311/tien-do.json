@@ -60,7 +60,7 @@
       "Toàn kho còn chưa hoàn tất, app chưa thay hình; không báo đã xong hoặc đã triển khai."
     ],
     "danhMucDaKiem": "docs/hinh-vector-0311/kiem/danh-muc-da-kiem.json",
-    "loVuaXong": "Lô10: orbital nguồn19 đã soát độc lập, dùng trong 2 câu; tổng408 câu đủ mọi hình,27 một phần;355 nguồn→233SVG.",
+    "loVuaXong": "Lô11 4 nguồn MS và lô12 6 cấu trúc đã soát đúng phông DDH; lô13 6 thủ công/lô14 26Fischer đangsoát. Nội dung422câu đủhình; yêu cầu phông mới được đếm riêng, chưa hoàn tất toànkho.",
     "viecNenLamTiep": "Ưu tiên phông DDH Rounded trên toàn bộ SVG: RDKit fontFile bằng TTF dựng từWOFF2app; các text SVG chuyển nét bằng HarfBuzz/fontTools, không chỉ đổi font-family. Soát lại bố cục/hash sau đổi phông. Lô11 4MS đangsoát; tiếp tục nhóm dùng chung.",
     "canhBaoCheckpoint": "Checkpoint mới đã commit cục bộ; chưa đẩy sau lô4/5/6 vì cổng tốc độ cũng đỏ trên main sạch8592da49. Không nâng mốc, không phát hành. Còn tiếp tục vẽ trong worktree hiện tại."
   },
@@ -79,14 +79,14 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 355,
-    "soSvgRieng": 233,
-    "soCauDungHinh": 435,
-    "soCauDuMoiHinh": 408,
+    "soAnhNguon": 359,
+    "soSvgRieng": 240,
+    "soCauDungHinh": 449,
+    "soCauDuMoiHinh": 422,
     "soCauMoiXongMotPhan": 27,
-    "byteSvg": 1758263,
-    "byteGzip": 370257,
-    "soAnhNguonConLai": 1073,
+    "byteSvg": 1891181,
+    "byteGzip": 398396,
+    "soAnhNguonConLai": 1069,
     "daTichHop": false
   },
   "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.",
@@ -103,5 +103,10 @@
     "ghiChu": "233 SVG cũ đã kiểm nội dung nhưng cần dựng lại chữ bằng đúng phông app và soát bố cục sau đổi phông; không coi bản cũ đã đạt yêu cầu phông mới.",
     "loMoi": "Lô11:4nguồn MS dựng chữ thànhpath từWOFF2 DDH củaapp, đangsoát độc lập.",
     "congCu": "scripts/phong-vector-0311.py"
+  },
+  "daDatPhongApp": {
+    "soNguon": 16,
+    "soCauDuHinhVaPhong": 27,
+    "ghiChu": "Các số tổngDaDoiChieu vẫn mô tả nội dung đã kiểm; bản cũ chưa đổi phông không được coi đạt yêu cầu phông mới."
   }
 }

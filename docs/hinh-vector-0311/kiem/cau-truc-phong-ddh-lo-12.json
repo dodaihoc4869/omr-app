@@ -1,0 +1,60 @@
+[
+  {
+    "i": 533,
+    "hash": "64da7f131ac24ecf86610d5e5e685501f993bf8a8555b1df723e16c2f1dbf3cd",
+    "fileNguon": "anh/64da7f131ac24ecf86610d5e5e685501f993bf8a8555b1df723e16c2f1dbf3cd.png",
+    "smiles": "N[C@@H](Cc1ccc(O)cc1)C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_4",
+    "phongApp": true
+  },
+  {
+    "i": 572,
+    "hash": "6ab3bcc36d948082bd1be3d86719ac805eb3d3be73dad691028b6f6a12ecda94",
+    "fileNguon": "anh/6ab3bcc36d948082bd1be3d86719ac805eb3d3be73dad691028b6f6a12ecda94.png",
+    "smiles": "O=C(O)c1ccccc1C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_4",
+    "vongThomDangTron": true,
+    "phongApp": true
+  },
+  {
+    "i": 601,
+    "hash": "6f77b5b4baeff4fab21cd412489eac334f96d7dc257ac315b27eec4f58fc1482",
+    "fileNguon": "anh/6f77b5b4baeff4fab21cd412489eac334f96d7dc257ac315b27eec4f58fc1482.png",
+    "smiles": "CCCCCCCCCCCCCC(=O)OC(C)C",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_4",
+    "phongApp": true
+  },
+  {
+    "i": 629,
+    "hash": "745e6d6323ade4d5111d93b9badd360de3eb90b159aa845a8db912894940f29b",
+    "fileNguon": "anh/745e6d6323ade4d5111d93b9badd360de3eb90b159aa845a8db912894940f29b.png",
+    "smiles": "N[C@@H](CCCCN)C(=O)O",
+    "caption": [],
+    "nguoiDocNguon": "cau_truc_4",
+    "phongApp": true
+  },
+  {
+    "i": 527,
+    "hash": "636d0fadaf9fef5b3b39cef7d29d958c8f108ff080d839a02b6180a7e033b15e",
+    "fileNguon": "anh/636d0fadaf9fef5b3b39cef7d29d958c8f108ff080d839a02b6180a7e033b15e.png",
+    "nguoiDocNguon": "cau_truc_4",
+    "smiles": "N[C@@H](CCC(=O)O)C(=O)O",
+    "caption": [],
+    "CIPNguon": [
+      "S"
+    ],
+    "phongApp": true
+  },
+  {
+    "i": 126,
+    "hash": "175a752561e16747bd38b90a1876a4a5be4da51a13b2c5b28a461c479c5e5b7f",
+    "fileNguon": "anh/175a752561e16747bd38b90a1876a4a5be4da51a13b2c5b28a461c479c5e5b7f.png",
+    "smiles": "CC(=O)OCC(C)CC",
+    "caption": [],
+    "nguoiDocNguon": "soat_nguon_2",
+    "phongApp": true
+  }
+]
