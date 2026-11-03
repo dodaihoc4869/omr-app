@@ -17,7 +17,7 @@ import { kiemCong } from './so-do-cong'
 import { THAN_CHU } from './kinh-than-chu'
 import { cauTrongGoi, dauVao, loaiCau, lopCua } from '../../src/lib/loi-giai-kiem'
 import { laCauTuLuan, laMaDeTuLuan } from '../../src/lib/cau-tu-luan'
-import { kiemBanKinh } from '../../src/lib/loi-giai-kinh/kiem'
+import { kiemBanKinh, xepTheoCauPhat } from '../../src/lib/loi-giai-kinh/kiem'
 import { PHIEN_BAN_KINH, type BanKinh, type PhanKinh } from '../../src/lib/loi-giai-kinh/kieu'
 
 type Obj = Record<string, unknown>
@@ -264,9 +264,11 @@ export async function soatViecKinh(env: Env, b: Obj) {
   const han = new Date(nay - PHUT_GIU_VIEC_KINH * 60_000).toISOString()
   const uuTien = mangChu(b.uuTien, 30)
   const chiBo = mangChu(b.chiBo, 30)
-  const locBo = chiBo.length ? ` AND COALESCE(k.bo, '') IN (SELECT value FROM json_each(?))` : ''
+  // `coChu`: chỉ soát bản có một trong các cụm chữ (vd «gọi tên», «danh pháp» — thầy 03/11 «đồng bộ với tất cả các bài gọi danh pháp»).
+  const coChu = mangChu(b.coChu, 10)
+  const locBo = (chiBo.length ? ` AND COALESCE(k.bo, '') IN (SELECT value FROM json_each(?))` : '') + (coChu.length ? ` AND (${coChu.map(() => 'k.ban_json LIKE ?').join(' OR ')})` : '')
   const conSoat = `k.cong = 'dat' AND (s.bam IS NULL OR (s.trang_thai = 'dang' AND s.nhan_luc < ?))${locBo}`
-  const thamLoc = chiBo.length ? [JSON.stringify(chiBo)] : []
+  const thamLoc = [...(chiBo.length ? [JSON.stringify(chiBo)] : []), ...coChu.map((c) => `%${c}%`)]
   const dau = await env.DB.prepare(
     `SELECT COALESCE(k.bo, '') AS bo FROM loi_giai_kinh k LEFT JOIN loi_giai_kinh_soat s ON s.bam = k.bam WHERE ${conSoat}
      ORDER BY CASE WHEN COALESCE(k.bo, '') IN (SELECT value FROM json_each(?)) THEN 0 ELSE 1 END, k.bo LIMIT 1`,
@@ -349,4 +351,44 @@ export async function thieuChiTietKinh(env: Env) {
     }
   }
   return { ok: true, tong: (r.results ?? []).length, lyDo, viDu }
+}
+
+/**
+ * QUÉT HIỆN (thầy 03/11 «lúc nãy tôi thấy một số câu xà phòng ko hiện lời giải mới, quét lại đi»): với từng câu kho ĐANG DÙNG (chỉ mục game), làm đúng như máy
+ * em lúc mở lời giải — tìm bản đạt theo băm hiện tại rồi `xepTheoCauPhat` với phương án / ý / đáp án học sinh nhận — và đếm câu KHÔNG hiện được theo lý do.
+ * Chỉ đọc. Theo trang `tu` (mặc định 1500 câu một lần) để không quá giờ CPU.
+ */
+export async function quetHienKinh(env: Env, b: Obj) {
+  const tu = Math.max(0, Number(b.tu ?? 0) || 0), so = Math.min(3000, Math.max(100, Number(b.so ?? 1500) || 1500))
+  const loc = str(b.chu) // lọc theo chữ trong đề (vd «xà phòng»), tuỳ chọn
+  const r = await env.DB.prepare(
+    `SELECT q.qid, q.json, c.bam, c.bo, k.ban_json FROM game_v2_question q JOIN de_kho d ON d.ma_de = q.ma_de
+       JOIN game_v2_index g ON g.ma_de = d.ma_de AND g.source_version = d.cap_nhat_luc
+       LEFT JOIN loi_giai_cau c ON c.qid = q.qid
+       LEFT JOIN loi_giai_kinh k ON k.bam = c.bam AND k.cong = 'dat' AND k.phien_ban >= ?
+     WHERE COALESCE(d.da_xoa, 0) = 0 ${loc ? 'AND q.json LIKE ?' : ''} ORDER BY q.qid LIMIT ? OFFSET ?`,
+  ).bind(PHIEN_BAN_KINH, ...(loc ? [`%${loc}%`] : []), so, tu).all<Obj>()
+  const dem: Record<string, number> = {}
+  const viDu: Record<string, string[]> = {}
+  const theoBo: Record<string, number> = {}
+  const ghi = (k: string, qid: string, bo: string) => { dem[k] = (dem[k] ?? 0) + 1; if (k !== 'hien') { theoBo[`${bo || '?'}·${k}`] = (theoBo[`${bo || '?'}·${k}`] ?? 0) + 1; if ((viDu[k] ??= []).length < 12) viDu[k]!.push(qid) } }
+  for (const x of r.results ?? []) {
+    const qid = str(x.qid), bo = str(x.bo)
+    let q: Obj
+    try { q = JSON.parse(str(x.json)) as Obj } catch { ghi('json_hong', qid, bo); continue }
+    const phan = str(q.phan) as PhanKinh
+    if (!str(x.bam)) { ghi('chua_chi_muc', qid, bo); continue }
+    if (!str(x.ban_json)) { ghi('chua_ban_dat', qid, bo); continue }
+    let tho: Obj
+    try { tho = JSON.parse(str(x.ban_json)) as Obj } catch { ghi('ban_hong', qid, bo); continue }
+    const mang = (v: unknown) => (Array.isArray(v) ? v.map((t) => (t && typeof t === 'object' ? str((t as Obj).text ?? (t as Obj).t) : str(t))) : undefined)
+    const choices = mang(q.choices), ideas = mang(q.ideas)
+    const correct = Array.isArray(q.correct) ? (q.correct as unknown[]).map(str).join('') : str(q.correct)
+    const xep = xepTheoCauPhat(tho, { phan, choices, ideas, correct })
+    if (xep) { ghi('hien', qid, bo); continue }
+    const khongGoc = xepTheoCauPhat({ ...tho, _goc: undefined }, { phan, choices: undefined, ideas: undefined, correct })
+    ghi(phan === 'III' ? 'lech_dap_so' : khongGoc ? 'lech_chu_phuong_an' : 'lech_dap_an', qid, bo)
+  }
+  const n = (r.results ?? []).length
+  return { ok: true, tu, so: n, tiep: n === so ? tu + so : null, dem, theoBo, viDu }
 }

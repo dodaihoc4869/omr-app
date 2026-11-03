@@ -259,7 +259,9 @@ for (const k of ['--gt-mau-nb: #00c3d7', '--gt-mau-th: #9990ff', '--gt-mau-vd: #
 for (const k of ['--gt-mau-nb: #58cc02', '--gt-mau-th: #ce82ff', '--gt-mau-vd: #ff9600', '--gt-mau-vdc: #ff4b4b']) MAU_CU_THAY_RA_LENH[`src/components/giam-thi/giam-thi.css · ${k}`] = (MAU_CU_THAY_RA_LENH[`src/components/giam-thi/giam-thi.css · ${k}`] ?? 0) + 1
 // Cùng lệnh: trong-hs-mau.css là bảng màu RIÊNG app học sinh (chỉ :root[data-trong='hs'], nạp lười) ⇒ khai báo màu trong tệp này được đổi giá trị
 // (ngoại lệ ĐÓNG, đúng một tệp); trong.css chỉ được đổi đúng 7 biến của dòng tối riêng học sinh (:root[data-trong='hs'] trong @media dark).
-const BANG_HS_DOI_DUOC = new Set(['src/styles/trong-hs-mau.css'])
+// 03/11: thầy «sửa cho chính xác bản mẫu» · «mọi hiệu ứng nổi khối y như bản mẫu», và DUYỆT thêm tệp này (hộp hỏi 03/11, trả lời «Cho phép»): CSS khung
+// Lời giải Kính (thành phần riêng app học sinh từ 02/11, bản vẽ thầy chốt docs/ban-ve-loi-giai-0211/) đổi giá trị màu theo bản vẽ — vẫn chỉ biến --tr-* / --kinh-*.
+const BANG_HS_DOI_DUOC = new Set(['src/styles/trong-hs-mau.css', 'src/components/loi-giai-kinh/loi-giai-kinh.css'])
 for (const k of ['--tr-nen: #121129', '--tr-mat: #1c1b3a', '--tr-mat-2: #24234a', '--tr-mat-3: #312f5e', '--tr-vien: #2f2d59', '--tr-vien-2: #403e72', '--tr-chu: #f1f0ff']) MAU_CU_THAY_RA_LENH[`src/styles/trong.css · ${k}`] = (MAU_CU_THAY_RA_LENH[`src/styles/trong.css · ${k}`] ?? 0) + 1 // 28/10 tối đo theo Duolingo
 for (const k of ['--tr-nen: #131f24', '--tr-mat: #202f36', '--tr-mat-2: #2a3a42', '--tr-mat-3: #37464f', '--tr-vien: #37464f', '--tr-vien-2: #4a5b64', '--tr-chu: #f2f1ea']) MAU_CU_THAY_RA_LENH[`src/styles/trong.css · ${k}`] = (MAU_CU_THAY_RA_LENH[`src/styles/trong.css · ${k}`] ?? 0) + 1
 const MAU_THAY_RA_LENH = new Set([

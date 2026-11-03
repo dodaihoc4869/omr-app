@@ -182,10 +182,11 @@ async function nopBan(dir, ten, vao, ban) {
 // ---------------------------------------------------------------- một luồng SOÁT (thầy 03/11: soát bản đạt theo đúng bài giảng của dạng bài, thiếu thì soạn lại)
 const UU_TIEN = lay('--uu-tien', 'BANG_TUAN_HOAN,NGUYEN_TU,KIM_LOAI_IA_IIA,KIM_LOAI,PHUC_CHAT,LIEN_KET').split(',').map((x) => x.trim()).filter(Boolean)
 const CHI_BO = lay('--chi-bo', '').split(',').map((x) => x.trim()).filter(Boolean)
+const CO_CHU = lay('--co-chu', '').split(',').map((x) => x.trim()).filter(Boolean) // vd --co-chu "gọi tên,danh pháp,tên thay thế,tên gọi
 const demSoat = { lo: 0, giu: 0, sua: 0, loi: 0, canThay: 0, thieuKq: 0 }
 async function motLuongSoat(luong) {
   for (;;) {
-    const lo = await goi('/kho/loi-giai-kinh/soat-viec', { so: SO_CAU, uuTien: UU_TIEN, ...(CHI_BO.length ? { chiBo: CHI_BO } : {}) })
+    const lo = await goi('/kho/loi-giai-kinh/soat-viec', { so: SO_CAU, uuTien: UU_TIEN, ...(CHI_BO.length ? { chiBo: CHI_BO } : {}), ...(CO_CHU.length ? { coChu: CO_CHU } : {}) })
     if (!lo.ok) { console.log(`[${gio()}] soát ${luong}: lỗi nhận việc: ${String(lo.error).slice(0, 120)}`); await ngu(60_000); continue }
     if (lo.het || !lo.viec?.length) { console.log(`[${gio()}] soát ${luong}: hết bản cần soát`); return }
     const viec = co('--thu') ? lo.viec.slice(0, 3) : lo.viec

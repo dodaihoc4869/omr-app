@@ -97,7 +97,7 @@ async function coChangKtcnChuaCau(env: Env, qid: string, nowMs: number): Promise
 }
 
 /** Ba cổng chạy song song; lỗi đọc ⇒ từ chối (đóng cửa). */
-async function kiemCong(env: Env, qid: string, nhom: string, nowMs: number): Promise<TuChoi | null> {
+export async function kiemCong(env: Env, qid: string, nhom: string, nowMs: number): Promise<TuChoi | null> {
   let kq: [string | null, Set<string>, boolean]
   try {
     kq = await Promise.all([coCaThiMo(env), protectedQuestions(env), coChangKtcnChuaCau(env, qid, nowMs)])
