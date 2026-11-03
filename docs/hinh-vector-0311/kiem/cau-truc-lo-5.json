@@ -1,0 +1,1603 @@
+[
+  {
+    "i": 0,
+    "hash": "001dd9e2e6acf6a16af95efa67caed5ecd6b39b319960476fb26132218ac765d",
+    "fileNguon": "anh/001dd9e2e6acf6a16af95efa67caed5ecd6b39b319960476fb26132218ac765d.png",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "caption": [
+          "(1)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC/C=C\\C"
+      },
+      {
+        "caption": [
+          "(2)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "Cc1ccccc1C"
+      },
+      {
+        "caption": [
+          "(3)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CCCCC"
+      },
+      {
+        "caption": [
+          "(4)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC#CCC"
+      }
+    ],
+    "nguoiDocNguon": "soat_hinh_vector",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 140,
+    "hash": "18dc9c2cb7da356866a860d0785f0844845ffc01cb8b5653c30e6127c146c24b",
+    "fileNguon": "anh/18dc9c2cb7da356866a860d0785f0844845ffc01cb8b5653c30e6127c146c24b.png",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "caption": [
+          "(1)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CCN"
+      },
+      {
+        "caption": [
+          "(2)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "Cc1cccc(N)c1"
+      },
+      {
+        "caption": [
+          "(3)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(N)=O"
+      },
+      {
+        "caption": [
+          "(4)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "NCc1ccccc1"
+      }
+    ],
+    "nguoiDocNguon": "soat_hinh_vector",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 154,
+    "hash": "1abc15472e085941b56a965267dba71ed3975cdd12f7688c66906bc137e5ee2c",
+    "fileNguon": "anh/1abc15472e085941b56a965267dba71ed3975cdd12f7688c66906bc137e5ee2c.png",
+    "kind": "grid",
+    "columns": 2,
+    "panels": [
+      {
+        "caption": [
+          "amphetamine"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(N)Cc1ccccc1"
+      },
+      {
+        "caption": [
+          "methamphetamine"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CNC(C)Cc1ccccc1"
+      }
+    ],
+    "nguoiDocNguon": "soat_hinh_vector",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 171,
+    "hash": "1d640478ca3b1474a8b23f384e919bf0ec48f9303a7cba97c9b7bccb8bbd0d94",
+    "fileNguon": "anh/1d640478ca3b1474a8b23f384e919bf0ec48f9303a7cba97c9b7bccb8bbd0d94.png",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "caption": [
+          "(1)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(=O)OC(C)=O"
+      },
+      {
+        "caption": [
+          "(2)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(=O)Cl"
+      },
+      {
+        "caption": [
+          "(3)"
+        ],
+        "circle": false,
+        "explicitH": true,
+        "smiles": "CC(=O)[NH]C"
+      },
+      {
+        "caption": [
+          "(4)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(=O)OC"
+      }
+    ],
+    "nguoiDocNguon": "soat_hinh_vector",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 186,
+    "hash": "1ff018369b65d591472be8b50465be98fa6b65c7e9b885143587e093a4745d10",
+    "fileNguon": "anh/1ff018369b65d591472be8b50465be98fa6b65c7e9b885143587e093a4745d10.png",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "caption": [
+          "(1)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CCC(N)C(=O)O"
+      },
+      {
+        "caption": [
+          "(2)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(N)C(=O)O"
+      },
+      {
+        "caption": [
+          "(3)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "NCCC(=O)O"
+      },
+      {
+        "caption": [
+          "(4)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CCC(N)CC(=O)O"
+      }
+    ],
+    "nguoiDocNguon": "soat_hinh_vector",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 226,
+    "hash": "26b729c55f01b62ae86d3bef2c796533125a8fafed561438f07f7fcd09324fdf",
+    "fileNguon": "anh/26b729c55f01b62ae86d3bef2c796533125a8fafed561438f07f7fcd09324fdf.png",
+    "kind": "grid",
+    "columns": 2,
+    "panels": [
+      {
+        "caption": [
+          "adrenaline"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CNCC(O)c1ccc(O)c(O)c1"
+      },
+      {
+        "caption": [
+          "dopamine"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "NCCc1cc(O)c(O)cc1"
+      }
+    ],
+    "nguoiDocNguon": "soat_hinh_vector",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 279,
+    "hash": "2f468c3d84373a4984e4ed60364b409269f6f9639131f392c348188321bd01de",
+    "fileNguon": "anh/2f468c3d84373a4984e4ed60364b409269f6f9639131f392c348188321bd01de.png",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "caption": [
+          "(1)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(=O)OC(C)=O"
+      },
+      {
+        "caption": [
+          "(2)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(=O)Cl"
+      },
+      {
+        "caption": [
+          "(3)"
+        ],
+        "circle": false,
+        "explicitH": true,
+        "smiles": "CC(=O)[NH]C"
+      },
+      {
+        "caption": [
+          "(4)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(=O)OC"
+      }
+    ],
+    "nguoiDocNguon": "soat_nguon_2",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 280,
+    "hash": "2f4b605287ea0bbe117ae9f90ce9f9793f44d8d9891d1cc50437d6ca861d7a67",
+    "fileNguon": "anh/2f4b605287ea0bbe117ae9f90ce9f9793f44d8d9891d1cc50437d6ca861d7a67.png",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "caption": [
+          "aniline"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "Nc1ccccc1"
+      },
+      {
+        "caption": [
+          "ethanamine"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CCN"
+      },
+      {
+        "caption": [
+          "dimethylamine"
+        ],
+        "circle": false,
+        "explicitH": true,
+        "smiles": "C[NH]C"
+      },
+      {
+        "caption": [
+          "triphenylamine"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "N(c1ccccc1)(c1ccccc1)c1ccccc1"
+      }
+    ],
+    "nguoiDocNguon": "soat_nguon_2",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 281,
+    "hash": "2f76455207e856f9cccce97b2c074d62824b86693914ce3e688184145f2fe50d",
+    "fileNguon": "anh/2f76455207e856f9cccce97b2c074d62824b86693914ce3e688184145f2fe50d.png",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "caption": [
+          "(1)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CCC(N)C(=O)O"
+      },
+      {
+        "caption": [
+          "(2)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(N)C(=O)O"
+      },
+      {
+        "caption": [
+          "(3)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "NCC(N)C(=O)O"
+      },
+      {
+        "caption": [
+          "(4)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CCC(N)CC(=O)O"
+      }
+    ],
+    "nguoiDocNguon": "soat_nguon_2",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 315,
+    "hash": "36392b8cdc063d25d6ec82278074e597a7be4ca2304a1c6eefc78c00c7abb28e",
+    "fileNguon": "anh/36392b8cdc063d25d6ec82278074e597a7be4ca2304a1c6eefc78c00c7abb28e.png",
+    "kind": "grid",
+    "columns": 3,
+    "panels": [
+      {
+        "caption": [
+          "Glu (pH_I = 3,1)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "NC(CCC(=O)O)C(=O)O"
+      },
+      {
+        "caption": [
+          "Gly (pH_I = 6,0)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "NCC(=O)O"
+      },
+      {
+        "caption": [
+          "Arg (pH_I = 10,8)"
+        ],
+        "circle": false,
+        "explicitH": true,
+        "smiles": "[NH]=C(N)[NH]CCCC(N)C(=O)O"
+      }
+    ],
+    "nguoiDocNguon": "soat_nguon_2",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 364,
+    "hash": "40996d8a60e4ec611cd28f8787bbafb5ffc58aabb678b9074e3339d614268469",
+    "fileNguon": "anh/40996d8a60e4ec611cd28f8787bbafb5ffc58aabb678b9074e3339d614268469.png",
+    "kind": "grid",
+    "columns": 2,
+    "panels": [
+      {
+        "caption": [
+          "(1)"
+        ],
+        "circle": false,
+        "explicitH": true,
+        "smiles": "CC(N)C(=O)NC(C)C(=O)O"
+      },
+      {
+        "caption": [
+          "(2)"
+        ],
+        "circle": false,
+        "explicitH": true,
+        "smiles": "CC(N)C(=O)NCC(=O)O"
+      },
+      {
+        "caption": [
+          "(3)"
+        ],
+        "circle": false,
+        "explicitH": true,
+        "smiles": "NCCC(=O)NCC(=O)O"
+      },
+      {
+        "caption": [
+          "(4)"
+        ],
+        "circle": false,
+        "explicitH": true,
+        "smiles": "NCC(=O)NCC(=O)NCC(=O)O"
+      }
+    ],
+    "nguoiDocNguon": "soat_nguon_2",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 417,
+    "hash": "4a8cda10004255905a11ca6564892c8e1c2323ceb827764500ae5f84f6e636b7",
+    "fileNguon": "anh/4a8cda10004255905a11ca6564892c8e1c2323ceb827764500ae5f84f6e636b7.png",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "caption": [
+          "(1)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(=O)OC(C)=O"
+      },
+      {
+        "caption": [
+          "(2)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(=O)Cl"
+      },
+      {
+        "caption": [
+          "(3)"
+        ],
+        "circle": false,
+        "explicitH": true,
+        "smiles": "CC(=O)[NH]C"
+      },
+      {
+        "caption": [
+          "(4)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(=O)OC"
+      }
+    ],
+    "nguoiDocNguon": "soat_nguon_2",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 458,
+    "hash": "52d0ee97cec259956854e6455066b0775bd2d7bc7360c6e9f42d07a08af4dff8",
+    "fileNguon": "anh/52d0ee97cec259956854e6455066b0775bd2d7bc7360c6e9f42d07a08af4dff8.png",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "caption": [
+          "(I)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(=O)O"
+      },
+      {
+        "caption": [
+          "(II)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(=O)OC"
+      },
+      {
+        "caption": [
+          "(III)"
+        ],
+        "circle": false,
+        "explicitH": true,
+        "smiles": "[H]C(=O)C"
+      },
+      {
+        "caption": [
+          "(IV)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(=O)[O-]"
+      }
+    ],
+    "nguoiDocNguon": "soat_nguon_2",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 459,
+    "hash": "53a766466009ac8bf817899ce4d029c2e0f2f87e99d50c5fb4830acd3282addc",
+    "fileNguon": "anh/53a766466009ac8bf817899ce4d029c2e0f2f87e99d50c5fb4830acd3282addc.png",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "caption": [
+          "(1)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CCC(N)C(=O)O"
+      },
+      {
+        "caption": [
+          "(2)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(N)C(=O)O"
+      },
+      {
+        "caption": [
+          "(3)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(O)C(=O)N"
+      },
+      {
+        "caption": [
+          "(4)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "[NH3+]CC(=O)[O-]"
+      }
+    ],
+    "nguoiDocNguon": "soat_nguon_2",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 480,
+    "hash": "58752bbfe20d1ec7e27501f2157daae86ea138acc2c901fb22bafbda08eceec4",
+    "fileNguon": "anh/58752bbfe20d1ec7e27501f2157daae86ea138acc2c901fb22bafbda08eceec4.png",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "caption": [
+          "chất X"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "OC1CCCCC1O"
+      },
+      {
+        "caption": [
+          "chất Y"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "OCc1ccccc1O"
+      },
+      {
+        "caption": [
+          "chất Z"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "Oc1ccccc1O"
+      },
+      {
+        "caption": [
+          "chất T"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "OCc1ccccc1CO"
+      }
+    ],
+    "nguoiDocNguon": "soat_nguon_3",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve",
+    "panelBorder": "dashed"
+  },
+  {
+    "i": 523,
+    "hash": "621691d297a3501f9e9fb5cb7f44d6d3b94f8bcfb8c504bde0f309bafb228a46",
+    "fileNguon": "anh/621691d297a3501f9e9fb5cb7f44d6d3b94f8bcfb8c504bde0f309bafb228a46.png",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "caption": [
+          "(1)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "Nc1ccccc1"
+      },
+      {
+        "caption": [
+          "(2)"
+        ],
+        "circle": false,
+        "explicitH": true,
+        "smiles": "c1ccc(Nc2ccccc2)cc1"
+      },
+      {
+        "caption": [
+          "(3)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "NCc1ccccc1"
+      },
+      {
+        "caption": [
+          "(4)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "C=CN(C)c1ccccc1"
+      }
+    ],
+    "nguoiDocNguon": "soat_nguon_3",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 524,
+    "hash": "627bfdb99742a58059703a543e432e49613de96a298dddb89371931f382a43d3",
+    "fileNguon": "anh/627bfdb99742a58059703a543e432e49613de96a298dddb89371931f382a43d3.png",
+    "kind": "grid",
+    "columns": 3,
+    "panels": [
+      {
+        "caption": [
+          "X"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CCCN"
+      },
+      {
+        "caption": [
+          "Y"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(N)C"
+      },
+      {
+        "caption": [
+          "Z"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CN(C)C"
+      }
+    ],
+    "nguoiDocNguon": "soat_nguon_3",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 539,
+    "hash": "657ab7a718276783dc5eb138a544a78b18330545a67719e9f7005bbe0112bb2f",
+    "fileNguon": "anh/657ab7a718276783dc5eb138a544a78b18330545a67719e9f7005bbe0112bb2f.png",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "caption": [
+          "Glycine (Gly)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "NCC(=O)O"
+      },
+      {
+        "caption": [
+          "Alanine (Ala)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(N)C(=O)O"
+      },
+      {
+        "caption": [
+          "Valine (Val)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(C)C(N)C(=O)O"
+      },
+      {
+        "caption": [
+          "Phenylalanine (Phe)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "NC(Cc1ccccc1)C(=O)O"
+      }
+    ],
+    "nguoiDocNguon": "soat_nguon_3",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 564,
+    "hash": "68d793e5a94dda023ea298d37601df62daf51aa811823eea331c1d31557cee6a",
+    "fileNguon": "anh/68d793e5a94dda023ea298d37601df62daf51aa811823eea331c1d31557cee6a.png",
+    "kind": "grid",
+    "columns": 2,
+    "panels": [
+      {
+        "caption": [
+          "(1)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(N)C(=O)NCC(=O)O"
+      },
+      {
+        "caption": [
+          "(2)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(N)C(=O)NC(C)C(=O)O"
+      },
+      {
+        "caption": [
+          "(3)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(N)C(=O)OCC(=O)O"
+      },
+      {
+        "caption": [
+          "(4)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "NCCC(=O)NCC(=O)O"
+      }
+    ],
+    "nguoiDocNguon": "soat_nguon_3",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 614,
+    "hash": "7274ba339bedc36993f8da89e9a5045dcfdfcd2d4e77afe48e67b6e874271318",
+    "fileNguon": "anh/7274ba339bedc36993f8da89e9a5045dcfdfcd2d4e77afe48e67b6e874271318.png",
+    "kind": "grid",
+    "columns": 3,
+    "panels": [
+      {
+        "caption": [],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CCN"
+      },
+      {
+        "caption": [],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "NCCC(=O)O"
+      },
+      {
+        "caption": [],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "NCC(=O)NCC(=O)O"
+      }
+    ],
+    "nguoiDocNguon": "soat_nguon_3",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve",
+    "separators": [
+      ",",
+      ","
+    ]
+  },
+  {
+    "i": 647,
+    "hash": "78a5d13c512171289d9d445b53dca36a1fd2debc833cc6d23f88351d72d6be6a",
+    "fileNguon": "anh/78a5d13c512171289d9d445b53dca36a1fd2debc833cc6d23f88351d72d6be6a.png",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "caption": [
+          "(I)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(=O)O"
+      },
+      {
+        "caption": [
+          "(II)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(=O)OC"
+      },
+      {
+        "caption": [
+          "(III)"
+        ],
+        "circle": false,
+        "explicitH": true,
+        "smiles": "[H]C(=O)C"
+      },
+      {
+        "caption": [
+          "(IV)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(=O)[O-]"
+      }
+    ],
+    "nguoiDocNguon": "soat_nguon_3",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 680,
+    "hash": "7d75b4d25e1a3787cbd9035ccad19647504cf21e0aaf44183a22df683f5d9544",
+    "fileNguon": "anh/7d75b4d25e1a3787cbd9035ccad19647504cf21e0aaf44183a22df683f5d9544.png",
+    "kind": "grid",
+    "columns": 2,
+    "panels": [
+      {
+        "caption": [
+          "hexylresorcinol"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CCCCCCc1ccc(O)cc1O"
+      },
+      {
+        "caption": [
+          "menthol"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(C)C1CCC(C)CC1O"
+      }
+    ],
+    "nguoiDocNguon": "soat_nguon_3",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 743,
+    "hash": "8b38e1a904f4478fc5367cddc1bd97bba1feef354bf82c5b756b6f63a682c812",
+    "fileNguon": "anh/8b38e1a904f4478fc5367cddc1bd97bba1feef354bf82c5b756b6f63a682c812.png",
+    "kind": "grid",
+    "columns": 2,
+    "panels": [
+      {
+        "caption": [
+          "Salicylic acid"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "O=C(O)c1ccccc1O"
+      },
+      {
+        "caption": [
+          "Methyl salicylate"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "COC(=O)c1ccccc1O"
+      }
+    ],
+    "nguoiDocNguon": "cau_truc_4",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 768,
+    "hash": "8f80824eb7a85621132c62f022923bb3d438aac311d3bd4951d6eb1006d20e30",
+    "fileNguon": "anh/8f80824eb7a85621132c62f022923bb3d438aac311d3bd4951d6eb1006d20e30.png",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "caption": [
+          "(1)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CCN"
+      },
+      {
+        "caption": [
+          "(2)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "Cc1cccc(N)c1"
+      },
+      {
+        "caption": [
+          "(3)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(=O)N"
+      },
+      {
+        "caption": [
+          "(4)"
+        ],
+        "circle": false,
+        "explicitH": true,
+        "smiles": "CNc1ccc(C)cc1"
+      }
+    ],
+    "nguoiDocNguon": "cau_truc_4",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 830,
+    "hash": "99b05f6e10a7d3c6820b80ffadd017a7d08c1a7e05c14cd2b473ece9bb6a779a",
+    "fileNguon": "anh/99b05f6e10a7d3c6820b80ffadd017a7d08c1a7e05c14cd2b473ece9bb6a779a.png",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "caption": [
+          "(1)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(=O)OC(C)=O"
+      },
+      {
+        "caption": [
+          "(2)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(=O)Cl"
+      },
+      {
+        "caption": [
+          "(3)"
+        ],
+        "circle": false,
+        "explicitH": true,
+        "smiles": "CC(=O)[NH]C"
+      },
+      {
+        "caption": [
+          "(4)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(=O)OC"
+      }
+    ],
+    "nguoiDocNguon": "cau_truc_4",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 895,
+    "hash": "a3da0a5c4aad5ffeb7f5717528cc57cf206f43ca427bbe801a322486a484e856",
+    "fileNguon": "anh/a3da0a5c4aad5ffeb7f5717528cc57cf206f43ca427bbe801a322486a484e856.png",
+    "kind": "grid",
+    "columns": 2,
+    "panels": [
+      {
+        "caption": [],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "c1ccccc1"
+      },
+      {
+        "caption": [],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "Cc1ccccc1"
+      }
+    ],
+    "nguoiDocNguon": "cau_truc_4",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 912,
+    "hash": "a69c61abe64eeae2262bc88323091d63730bf1e9a677b73ea7872f63f9e68a73",
+    "fileNguon": "anh/a69c61abe64eeae2262bc88323091d63730bf1e9a677b73ea7872f63f9e68a73.png",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "caption": [
+          "(1)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "Cc1cccc(Cl)c1"
+      },
+      {
+        "caption": [
+          "(2)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "Cc1ccc(Cl)cc1"
+      },
+      {
+        "caption": [
+          "(3)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "ClCc1ccccc1"
+      },
+      {
+        "caption": [
+          "(4)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "Cc1ccccc1Cl"
+      }
+    ],
+    "nguoiDocNguon": "cau_truc_4",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 916,
+    "hash": "a74dc324079434dba8997d1ad191fe6320302d7d65a157048d5078cce27e1fd0",
+    "fileNguon": "anh/a74dc324079434dba8997d1ad191fe6320302d7d65a157048d5078cce27e1fd0.png",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "caption": [
+          "Gly"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "text": "H₂N–CH₂–COOH"
+      },
+      {
+        "caption": [
+          "Glu"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "text": "HOOC–CH₂–CH₂–CH(NH₂)–COOH"
+      },
+      {
+        "caption": [
+          "Lys"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "text": "H₂N–[CH₂]₄–CH(NH₂)–COOH"
+      },
+      {
+        "caption": [
+          "Ala"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "text": "CH₃–CH(NH₂)–COOH"
+      }
+    ],
+    "nguoiDocNguon": "cau_truc_4",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve",
+    "panelBorder": "solid"
+  },
+  {
+    "i": 965,
+    "hash": "ad5c85d3643041dd418996f84ecf3c0d4f3535b9635cbaeaa7269a8ff5b3453a",
+    "fileNguon": "anh/ad5c85d3643041dd418996f84ecf3c0d4f3535b9635cbaeaa7269a8ff5b3453a.png",
+    "kind": "grid",
+    "columns": 2,
+    "panels": [
+      {
+        "caption": [
+          "X"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CCN"
+      },
+      {
+        "caption": [
+          "Y"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "Nc1ccccc1"
+      }
+    ],
+    "nguoiDocNguon": "cau_truc_5",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1010,
+    "hash": "b59bcdf82760cb0479f10faa1bea27066311aaefff768323679a7ee968094726",
+    "fileNguon": "anh/b59bcdf82760cb0479f10faa1bea27066311aaefff768323679a7ee968094726.png",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "caption": [
+          "(1)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CCC(N)C(=O)O"
+      },
+      {
+        "caption": [
+          "(2)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(N)C(=O)O"
+      },
+      {
+        "caption": [
+          "(3)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "NCC(N)C(=O)O"
+      },
+      {
+        "caption": [
+          "(4)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CCC(N)CC(=O)O"
+      }
+    ],
+    "nguoiDocNguon": "cau_truc_5",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1016,
+    "hash": "b65409714f7477d091d4872f473deec2c683163e0187af160de1f0ec291405c3",
+    "fileNguon": "anh/b65409714f7477d091d4872f473deec2c683163e0187af160de1f0ec291405c3.png",
+    "kind": "grid",
+    "columns": 3,
+    "panels": [
+      {
+        "caption": [
+          "X"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CCCN"
+      },
+      {
+        "caption": [
+          "Y"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(N)C"
+      },
+      {
+        "caption": [
+          "Z"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CN(C)C"
+      }
+    ],
+    "nguoiDocNguon": "cau_truc_5",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1040,
+    "hash": "bb645a23017941f068e7da31898c1e5e2411581741e719419c964c2b3eeb2e63",
+    "fileNguon": "anh/bb645a23017941f068e7da31898c1e5e2411581741e719419c964c2b3eeb2e63.png",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "caption": [
+          "(1)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CCC(N)C(=O)O"
+      },
+      {
+        "caption": [
+          "(2)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(N)C(=O)O"
+      },
+      {
+        "caption": [
+          "(3)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "NCCC(=O)O"
+      },
+      {
+        "caption": [
+          "(4)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CCC(N)CC(=O)O"
+      }
+    ],
+    "nguoiDocNguon": "cau_truc_5",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1051,
+    "hash": "be1b9bb1f70bc1cad5a98154734cdc22a32e5b8a97d07a016f289ad56d4db73d",
+    "fileNguon": "anh/be1b9bb1f70bc1cad5a98154734cdc22a32e5b8a97d07a016f289ad56d4db73d.png",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "caption": [
+          "(1)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CCC(=O)OC"
+      },
+      {
+        "caption": [
+          "(2)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CCCC(=O)O"
+      },
+      {
+        "caption": [
+          "(3)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(C)C(=O)O"
+      },
+      {
+        "caption": [
+          "(4)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(=O)CCO"
+      }
+    ],
+    "nguoiDocNguon": "cau_truc_5",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1089,
+    "hash": "c3e3536a3f224e91e6d922f6060ced27e8a267b8367650a6ed619e7754d7b352",
+    "fileNguon": "anh/c3e3536a3f224e91e6d922f6060ced27e8a267b8367650a6ed619e7754d7b352.png",
+    "kind": "grid",
+    "columns": 2,
+    "panels": [
+      {
+        "caption": [
+          "(1)"
+        ],
+        "circle": false,
+        "explicitH": true,
+        "smiles": "CC(N)C(=O)NC(C)C(=O)O"
+      },
+      {
+        "caption": [
+          "(2)"
+        ],
+        "circle": false,
+        "explicitH": true,
+        "smiles": "CC(N)C(=O)NCC(=O)O"
+      },
+      {
+        "caption": [
+          "(3)"
+        ],
+        "circle": false,
+        "explicitH": true,
+        "smiles": "NCCC(=O)NCC(=O)O"
+      },
+      {
+        "caption": [
+          "(4)"
+        ],
+        "circle": false,
+        "explicitH": true,
+        "smiles": "NCC(=O)NCC(=O)NCC(=O)O"
+      }
+    ],
+    "nguoiDocNguon": "cau_truc_5",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1164,
+    "hash": "d2dc70c5255e84adad9775fa614dfafe768a44d6640cc5b1a1ee8d7ba3430ee8",
+    "fileNguon": "anh/d2dc70c5255e84adad9775fa614dfafe768a44d6640cc5b1a1ee8d7ba3430ee8.png",
+    "kind": "grid",
+    "columns": 4,
+    "panels": [
+      {
+        "caption": [
+          "(1)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CCCCN"
+      },
+      {
+        "caption": [
+          "(2)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(C)=CCO"
+      },
+      {
+        "caption": [
+          "(3)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CC(C)=CCC(=O)O"
+      },
+      {
+        "caption": [
+          "(4)"
+        ],
+        "circle": false,
+        "explicitH": true,
+        "smiles": "CC(C)=CCC([H])=O"
+      }
+    ],
+    "nguoiDocNguon": "cau_truc_5",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1165,
+    "hash": "d2f48c91d531306eb059e7d9c5887f7e5d761699c58e07c1ea6664ad3bbb97d2",
+    "fileNguon": "anh/d2f48c91d531306eb059e7d9c5887f7e5d761699c58e07c1ea6664ad3bbb97d2.png",
+    "kind": "grid",
+    "columns": 3,
+    "panels": [
+      {
+        "caption": [],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "O=C(O)c1ccc(C(=O)O)cc1"
+      },
+      {
+        "caption": [],
+        "circle": false,
+        "explicitH": false,
+        "text": "HO–[CH₂]₄–OH"
+      },
+      {
+        "caption": [],
+        "circle": false,
+        "explicitH": false,
+        "text": "HOOC–[CH₂]₄–COOH"
+      }
+    ],
+    "nguoiDocNguon": "cau_truc_5",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve",
+    "separators": [
+      ";",
+      "và"
+    ]
+  },
+  {
+    "i": 1302,
+    "hash": "ebc930a4f2e5da07bd0d0bf415425f4f553dc5aa58bb510e3a90c61ce9b59565",
+    "fileNguon": "anh/ebc930a4f2e5da07bd0d0bf415425f4f553dc5aa58bb510e3a90c61ce9b59565.png",
+    "kind": "grid",
+    "columns": 3,
+    "panels": [
+      {
+        "caption": [],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CCN"
+      },
+      {
+        "caption": [],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "NCCC(=O)O"
+      },
+      {
+        "caption": [],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "NCC(=O)NCC(=O)O"
+      }
+    ],
+    "nguoiDocNguon": "cau_truc_6",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1357,
+    "hash": "f5b18964a766ac99e70b4900719a3f78c9b33ada29147da8435bcce06e4c4364",
+    "fileNguon": "anh/f5b18964a766ac99e70b4900719a3f78c9b33ada29147da8435bcce06e4c4364.png",
+    "kind": "grid",
+    "columns": 2,
+    "panels": [
+      {
+        "caption": [
+          "(1)"
+        ],
+        "circle": false,
+        "explicitH": true,
+        "smiles": "CC(N)C(=O)NC(C)C(=O)O"
+      },
+      {
+        "caption": [
+          "(2)"
+        ],
+        "circle": false,
+        "explicitH": true,
+        "smiles": "CC(N)C(=O)NCC(=O)O"
+      },
+      {
+        "caption": [
+          "(3)"
+        ],
+        "circle": false,
+        "explicitH": true,
+        "smiles": "NCCC(=O)NCC(=O)O"
+      },
+      {
+        "caption": [
+          "(4)"
+        ],
+        "circle": false,
+        "explicitH": true,
+        "smiles": "NCC(N)C(=O)NCC(=O)NCC(=O)O"
+      }
+    ],
+    "nguoiDocNguon": "cau_truc_6",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1375,
+    "hash": "f88f6297418a6cc9da2d5820485623293476e8a2db358d70665031848baae3cd",
+    "fileNguon": "anh/f88f6297418a6cc9da2d5820485623293476e8a2db358d70665031848baae3cd.png",
+    "kind": "grid",
+    "columns": 3,
+    "panels": [
+      {
+        "caption": [
+          "(1)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "CCN"
+      },
+      {
+        "caption": [
+          "(2)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "NCCC(=O)O"
+      },
+      {
+        "caption": [
+          "(3)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "NCC(=O)NCC(=O)O"
+      }
+    ],
+    "nguoiDocNguon": "cau_truc_6",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve"
+  },
+  {
+    "i": 1324,
+    "hash": "f00428ad263b27ebbe9bf69482df460112eef1438902c32684be6170672ad73c",
+    "fileNguon": "anh/f00428ad263b27ebbe9bf69482df460112eef1438902c32684be6170672ad73c.png",
+    "kind": "grid",
+    "columns": 1,
+    "panels": [
+      {
+        "caption": [
+          "a)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "[Na+].CCCCCCCCCCCCOS(=O)(=O)[O-]",
+        "terminalCationText": "ONa"
+      },
+      {
+        "caption": [
+          "b)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "[Na+].CCCCCCCCCCCCCCCC(=O)[O-]",
+        "terminalCationText": "ONa"
+      },
+      {
+        "caption": [
+          "c)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "[K+].CCCCCCCCCCCCCCCC(=O)[O-]",
+        "terminalCationText": "OK"
+      },
+      {
+        "caption": [
+          "d)"
+        ],
+        "circle": false,
+        "explicitH": false,
+        "smiles": "[Na+].CCC(=O)[O-]",
+        "terminalCationText": "ONa"
+      }
+    ],
+    "nguoiDocNguon": "cau_truc_6",
+    "daMoNguonDayDu": true,
+    "trangThai": "doc-nguon-chua-soat-ban-ve",
+    "compact": true
+  }
+]
