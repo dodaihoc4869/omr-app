@@ -4242,6 +4242,7 @@ const boXuLy = {
       if (p === '/kho/loi-giai-kinh/soat-viec') return ra(await import('./loi-giai-kinh').then((m) => m.soatViecKinh(env, b)))
       if (p === '/kho/loi-giai-kinh/soat-nop') return ra(await import('./loi-giai-kinh').then((m) => m.soatNopKinh(env, b)))
       if (p === '/kho/loi-giai-kinh/soat-tong') return ra(await import('./loi-giai-kinh').then((m) => m.soatTongKinh(env)))
+      if (p === '/kho/hinh-de/dem') return ra(await import('./hinh-de').then((m) => m.demHinhDe(env)))
       if (p === '/kho/loi-giai-kinh/lam-lai') return ra(await import('./loi-giai-kinh').then((m) => m.lamLaiKinh(env, b)))
       if (p === '/kho/loi-giai-kinh/quet-hien') return ra(await import('./loi-giai-kinh').then((m) => m.quetHienKinh(env, b)))
       if (p === '/kho/xoa-cau-dap-an-dai') return ra(await import('./xoa-cau-kho').then((m) => m.xoaCauKho(env, b)))
