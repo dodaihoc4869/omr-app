@@ -1,0 +1,66 @@
+[
+  {
+    "i": 179,
+    "hashSvg": "83f0e8f45a6cdf4544be4b7fff7dc0a0620522aac9d7e583c6494a2a072fcf3a",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG native và SVG render thật. NH3 đúng N giữa/ba H trái-phải-dưới, ba cặp liên kết đỏ và một cặp tự do trên N: tổng8 chấm, không bondline. DDH tự chứa path, từng glyph và electron/bond rõ, không chạm/cắt/tràn; hash byte thực khớp metadata.",
+    "hash": "1f21749c722a82184b8f3920fd3766e3487a13a170c9c4c8a62b25564792534c",
+    "hashSvgDaSoat": "83f0e8f45a6cdf4544be4b7fff7dc0a0620522aac9d7e583c6494a2a072fcf3a"
+  },
+  {
+    "i": 1253,
+    "hashSvg": "7ac2d3c3896138ff5d16614bbbb19b551c4aab1d98e36455b053295023b33657",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG native và SVG render thật. BH3 đúng B giữa/ba H trái-phải-dưới, ba cặp liên kết đỏ: tổng6 chấm, không tự thêm freepair/bondline. DDH tự chứa path, từng glyph và electron/bond rõ, không chạm/cắt/tràn; hash byte thực khớp metadata.",
+    "hash": "e3a963eca466d0342a72c071807287ecab7c7415484f8ef1d9ccc331b60d4c2a",
+    "hashSvgDaSoat": "7ac2d3c3896138ff5d16614bbbb19b551c4aab1d98e36455b053295023b33657"
+  },
+  {
+    "i": 199,
+    "hashSvg": "81f48bc0fb367dd72a242c21734e61aace599d96e7a5cc7be35c54b80c200f45",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG native và SVG render thật. Cl2 đúng hai Cl, một cặp liên kết giữa và ba cặp tự do mỗi Cl (trên/dưới/ngoài): tổng14 chấm đỏ, không bondline. DDH tự chứa path, từng glyph và electron/bond rõ, không chạm/cắt/tràn; hash byte thực khớp metadata.",
+    "hash": "21d59f863303fb7194da4391c53665486798be137c76a1283c3f192752280a48",
+    "hashSvgDaSoat": "81f48bc0fb367dd72a242c21734e61aace599d96e7a5cc7be35c54b80c200f45"
+  },
+  {
+    "i": 1000,
+    "hashSvg": "6f8844619af24feea5b317d5f6e2eba477e66cc46b1857377152a0542592d0ee",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG native và SVG render thật. CO2 Lewis đúng O–C–O dạng electron: hai cặp liên kết ở mỗi bên C và hai cặp tự do trên/dưới mỗi O: tổng16 chấm đỏ, không bondline. DDH tự chứa path, từng glyph và electron/bond rõ, không chạm/cắt/tràn; hash byte thực khớp metadata.",
+    "hash": "b4178445afa068135a445394a37e5667deb592341429afb8c313a7d443c358cb",
+    "hashSvgDaSoat": "6f8844619af24feea5b317d5f6e2eba477e66cc46b1857377152a0542592d0ee"
+  },
+  {
+    "i": 306,
+    "hashSvg": "43541ed9e7b5bdf9fc9f85f049b8732f5eb15319ace8c9fa0976c305125dae97",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG native và SVG render thật. Giữ literal CO₂ đúng một C/một O/chỉ số2, không tự chuyển thành cấu trúc Lewis hay thêm dữ kiện. DDH tự chứa path, từng glyph và electron/bond rõ, không chạm/cắt/tràn; hash byte thực khớp metadata.",
+    "hash": "3478863ef6d43212da99924b0429d10ebcbff0b518917b8dcab86ececa151c4a",
+    "hashSvgDaSoat": "43541ed9e7b5bdf9fc9f85f049b8732f5eb15319ace8c9fa0976c305125dae97"
+  },
+  {
+    "i": 1080,
+    "hashSvg": "f22b7a63ba75b9a3eb6b1bee70eeb47d8b17de50ac21cec8349a9e9a6b0cd37c",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG native và SVG render thật. Giữ H–O–N; N=O chếch phải trên và N→O chếch phải dưới, dative từ N tới O, không thêm charges/freepairs/caption. DDH tự chứa path, từng glyph và electron/bond rõ, không chạm/cắt/tràn; hash byte thực khớp metadata.",
+    "hash": "c2f87c5ab2d7d3f4db979f386248d262efad179435bd504919bb3ff6e0eda532",
+    "hashSvgDaSoat": "f22b7a63ba75b9a3eb6b1bee70eeb47d8b17de50ac21cec8349a9e9a6b0cd37c"
+  },
+  {
+    "i": 1384,
+    "hashSvg": "478046bf1508cfa62b357d2b3cb7b1295fde8e7e6077117723304c7436f90150",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG native và SVG render thật. Giữ H–O–N; N=O chếch phải trên và N→O chếch phải dưới, dative đúng chiều; giữ nhãn b), không thêm charges/freepairs. DDH tự chứa path, từng glyph và electron/bond rõ, không chạm/cắt/tràn; hash byte thực khớp metadata.",
+    "hash": "f97e1f396ff45454544908aa8d9f629945c7dca031fc07662aad1b8cc6be94a1",
+    "hashSvgDaSoat": "478046bf1508cfa62b357d2b3cb7b1295fde8e7e6077117723304c7436f90150"
+  },
+  {
+    "i": 354,
+    "hashSvg": "03107ea1b15c7634823c03d0ee0f7f62c7537cc199be18eba3b0cd76d278f74e",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG native và SVG render thật. Giữ hướng riêng nguồn: H trái trên–O trái dưới–N giữa, N=O thẳng lên, N→O chếch phải dưới; không alias hướng1080, không thêm charges/freepairs/caption. DDH tự chứa path, từng glyph và electron/bond rõ, không chạm/cắt/tràn; hash byte thực khớp metadata.",
+    "hash": "3eac592a7f4e37a154e2b4ce6156c4918f86a92659b8f36ca56127ccd9253daf",
+    "hashSvgDaSoat": "03107ea1b15c7634823c03d0ee0f7f62c7537cc199be18eba3b0cd76d278f74e"
+  }
+]

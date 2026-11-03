@@ -1,0 +1,55 @@
+[
+  {
+    "i": 136,
+    "hash": "185eee39919d27e49028347d5eaa07614e1ba050d9dfc370343c076e8626c5e9",
+    "fileNguon": "anh/185eee39919d27e49028347d5eaa07614e1ba050d9dfc370343c076e8626c5e9.png",
+    "canvas": [
+      342,
+      213
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "smiles": "CC(=O)OCc1ccccc1",
+    "notes": "Benzylacetate:Ph–CH₂–O–C(=O)–CH₃. CHỈ1CH₂giữaPh/O. Vòng3đôi khôngcircle. Native136cạnhphảichạmendpointmethyl;đãđốichứngmoleculecùngnộidungtrong944(fullmolecule+photo)thấymethylendpointđầyđủ;khôngthêmphoto944vàohình136. Khôngcaption/charges/stereo.",
+    "questions": [
+      {
+        "qid": "DH-12-C1-B1-P1-II-5",
+        "de": "Chất X là một ester có mùi thơm của hoa nhài. X có công thức cấu tạo như sau:",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P1-II-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": false,
+      "hasDativeArrow": false,
+      "isTable": false,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "Giữcaption/header/nhãnđãliệtkê;khôngtựđặttênmoleculehoặcđánhnhãnPDFmới.",
+    "phongApp": true,
+    "canvasWidth": 900,
+    "canvasHeight": 450,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "svg": "cau-truc-42de1376ad281a20e79f7c1d2fe72ee55d6be7af7667d6501fb50afe4fdb4fc9.svg",
+    "hashSvg": "42de1376ad281a20e79f7c1d2fe72ee55d6be7af7667d6501fb50afe4fdb4fc9",
+    "byteSvg": 5738,
+    "smilesChuan": "CC(=O)OCc1ccccc1",
+    "congThuc": "C9H10O2",
+    "soNguyenTuNang": 11,
+    "rdkit": "2026.09.1",
+    "trangThai": "da-soat-doc-lap",
+    "hashSvgDaSoat": "42de1376ad281a20e79f7c1d2fe72ee55d6be7af7667d6501fb50afe4fdb4fc9",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

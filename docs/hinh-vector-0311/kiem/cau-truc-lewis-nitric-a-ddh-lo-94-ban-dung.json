@@ -1,0 +1,40 @@
+[
+  {
+    "i": 986,
+    "hash": "b1010f34108a8ffda13630adf729ac74a255f9e9ac7b005b2f627d26c4c5b9df",
+    "fileNguon": "anh/b1010f34108a8ffda13630adf729ac74a255f9e9ac7b005b2f627d26c4c5b9df.png",
+    "questions": [
+      {
+        "qid": "DB-11-B6-D2-II-54",
+        "de": "Nitric acid có công thức Lewis và công thức cấu tạo như hình dưới đây:",
+        "refs": [
+          {
+            "hash": "b1010f34108a8ffda13630adf729ac74a255f9e9ac7b005b2f627d26c4c5b9df",
+            "where": "DB-11-B6-D2-II-54.hinh.0.du_lieu",
+            "hashDataUrl": "9d7adbbd4bb79dcec334244fa36a2fc59f706e4043f24147fc42eaf4fd4c3fe8"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B6-II-5",
+        "de": "Nitric acid có công thức Lewis và công thức cấu tạo như hình dưới đây:",
+        "refs": [
+          {
+            "hash": "b1010f34108a8ffda13630adf729ac74a255f9e9ac7b005b2f627d26c4c5b9df",
+            "where": "DH-11-C2-B6-II-5.hinh.0.du_lieu",
+            "hashDataUrl": "9d7adbbd4bb79dcec334244fa36a2fc59f706e4043f24147fc42eaf4fd4c3fe8"
+          }
+        ]
+      }
+    ],
+    "svg": "lewis-nitric-a-ddh-c261b66aa6fe3add4de7ef758d48b9c46c5b09c29b2f432a5fde4ab01d4ae104.svg",
+    "hashSvg": "c261b66aa6fe3add4de7ef758d48b9c46c5b09c29b2f432a5fde4ab01d4ae104",
+    "byteSvg": 4556,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "O-H2cặptựdo,Odouble2cặp,Oterminal3cặp;khôngdotsN/charge. N–Oterminalnétđơnkhôngarrowởa),captiona)giữnguyên.",
+    "hashSvgDaSoat": "c261b66aa6fe3add4de7ef758d48b9c46c5b09c29b2f432a5fde4ab01d4ae104",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

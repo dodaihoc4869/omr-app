@@ -1,0 +1,268 @@
+[
+  {
+    "i": 222,
+    "hash": "26564c0da4fff9e7c0c98d9b57aaddbccc054e74e9ebbbb9fec810dc2a7a9eb3",
+    "fileNguon": "anh/26564c0da4fff9e7c0c98d9b57aaddbccc054e74e9ebbbb9fec810dc2a7a9eb3.png",
+    "canvas": [
+      959,
+      169
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "panels": [
+      {
+        "smiles": "[NH3+]C(Cc1c[nH+]c[nH]1)C(=O)[O-]",
+        "caption": [
+          "Dạng (I)"
+        ],
+        "pH": "4,0",
+        "notes": "RingtopNHneutral,bottom-leftNH⁺. AlphaNH₃⁺;COO⁻.Tổng+1.2liênkếtđôivòng,khôngcircle."
+      },
+      {
+        "smiles": "[NH3+]C(Cc1cnc[nH]1)C(=O)[O-]",
+        "caption": [
+          "Dạng (II)"
+        ],
+        "pH": "7,6",
+        "notes": "RingtopNHneutral,bottom-leftNkhôngH. AlphaNH₃⁺,COO⁻;tổng0."
+      },
+      {
+        "smiles": "NC(Cc1cnc[nH]1)C(=O)[O-]",
+        "caption": [
+          "Dạng (III)"
+        ],
+        "pH": "12,0",
+        "notes": "RingtopNHneutral,bottom-leftN. AlphaNH₂neutral,COO⁻;tổng−1."
+      }
+    ],
+    "notes": "Bảng2hàng/4cột:header pH |4,0|7,6|12,0;ôtráidưới Dạng tồn tại;3ôcấutrúcdướicócaptionDạng(I)/(II)/(III). GIỮkhungbảng,tấtcảpH/caption. Vòngimidazole5cạnh:NHtrên,bêntrênphảiC nốiCH₂–alphaC,bêndướiphảiC,bêndướitráiN,bêntrêntráiC. Chỉ1CH₂giữavòngvàalphaC;khôngstereo. KhônghoánvịtautomerNH.",
+    "questions": [
+      {
+        "qid": "DB-12-B9-P1-D2-I-100",
+        "de": "Histidine là một trong những amino acid thiết yếu đối với cơ thể con người. Với mỗi môi trường có giá trị pH bằng 4,0; 7,6; 12,0 coi histidine chỉ tồn tại ở dạng cho dưới đây: Trong quá trình điện di, ion sẽ di chuyển về phía điện cực trái dấu với ion.\nCho các nhận định sau về quá trình điện di của histidine:\n(a) Với môi trường pH = 7,6 thì dạng (II) hầu như không dịch chuyển về các điện cực.\n(b) Với môi trường pH = 4,0 thì dạng (I) di chuyển về phía cực âm.\n(c) Với môi trường pH = 12,0 thì dạng (III) di chuyển về phía cực dương.\n(d) Với môi trường pH = 7,6 thì dạng (II) di chuyển về phía cực âm.\nCác nhận định đúng là",
+        "refs": [
+          {
+            "where": "DB-12-B9-P1-D2-I-100.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B9-P1-I-64",
+        "de": "Histidine là một trong những amino acid thiết yếu đối với cơ thể con người. Với mỗi môi trường có giá trị pH bằng 4,0; 7,6; 12,0 coi histidine chỉ tồn tại ở dạng cho dưới đây: Trong quá trình điện di, ion sẽ di chuyển về phía điện cực trái dấu với ion.\nCho các nhận định sau về quá trình điện di của histidine:\n(a) Với môi trường pH = 7,6 thì dạng (II) hầu như không dịch chuyển về các điện cực.\n(b) Với môi trường pH = 4,0 thì dạng (I) di chuyển về phía cực âm.\n(c) Với môi trường pH = 12,0 thì dạng (III) di chuyển về phía cực dương.\n(d) Với môi trường pH = 7,6 thì dạng (II) di chuyển về phía cực âm.\nCác nhận định đúng là",
+        "refs": [
+          {
+            "where": "DH-12-C3-B9-P1-I-64.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": false,
+      "hasDativeArrow": false,
+      "isTable": true,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "Giữcaption/header/nhãnđãliệtkê;khôngtựđặttênmoleculehoặcđánhnhãnPDFmới.",
+    "svg": "histidine-table-ddh-915d2e572a95dda00edc69a96d79129c02b0d53d36678c4c3feb68d35713fd3d.svg",
+    "hashSvg": "915d2e572a95dda00edc69a96d79129c02b0d53d36678c4c3feb68d35713fd3d",
+    "byteSvg": 39789,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "GiữtopNHcả3vòng;bottomleftHN+chỉI,NởII/III. I/IIalphaNH3+,IIIalphaNH2;COO−cả3. Khônghoánvịtautomer/H,khôngcircle,khôngstereo. HeaderpH4,0/7,6/12,0 vàcaptionDạng(I)/(II)/(III),khungđầyđủ.",
+    "hashSvgDaSoat": "915d2e572a95dda00edc69a96d79129c02b0d53d36678c4c3feb68d35713fd3d",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 1135,
+    "hash": "cbdd3f7615eb24b08e99c3378858c628819b127050a5dca5e5c4412a8b834350",
+    "fileNguon": "anh/cbdd3f7615eb24b08e99c3378858c628819b127050a5dca5e5c4412a8b834350.png",
+    "canvas": [
+      1329,
+      295
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "panels": [
+      {
+        "smiles": "[NH3+]C(Cc1c[nH+]c[nH]1)C(=O)[O-]",
+        "caption": [
+          "Dạng (I)"
+        ],
+        "pH": "4,0",
+        "notes": "RingtopNHneutral,bottom-leftNH⁺. AlphaNH₃⁺;COO⁻.Tổng+1.2liênkếtđôivòng,khôngcircle."
+      },
+      {
+        "smiles": "[NH3+]C(Cc1cnc[nH]1)C(=O)[O-]",
+        "caption": [
+          "Dạng (II)"
+        ],
+        "pH": "7,6",
+        "notes": "RingtopNHneutral,bottom-leftNkhôngH. AlphaNH₃⁺,COO⁻;tổng0."
+      },
+      {
+        "smiles": "NC(Cc1cnc[nH]1)C(=O)[O-]",
+        "caption": [
+          "Dạng (III)"
+        ],
+        "pH": "12,0",
+        "notes": "RingtopNHneutral,bottom-leftN. AlphaNH₂neutral,COO⁻;tổng−1."
+      }
+    ],
+    "notes": "Bảng2hàng/4cột:header pH |4,0|7,6|12,0;ôtráidưới Dạng tồn tại;3ôcấutrúcdướicócaptionDạng(I)/(II)/(III). GIỮkhungbảng,tấtcảpH/caption. Vòngimidazole5cạnh:NHtrên,bêntrênphảiC nốiCH₂–alphaC,bêndướiphảiC,bêndướitráiN,bêntrêntráiC. Chỉ1CH₂giữavòngvàalphaC;khôngstereo. KhônghoánvịtautomerNH.",
+    "questions": [
+      {
+        "qid": "12-KT-C3-D4-I-17",
+        "de": "Histidine là một trong những amino acid thiết yếu đối với cơ thể con người. Với mỗi môi trường có giá trị pH bằng 4,0; 7,6; 12,0, coi histidine chỉ tồn tại ở dạng cho trong hình dưới đây.\nCho histidine tác dụng với dung dịch HCl dư, thu được dung dịch X. Histidine trong dung dịch X tồn tại chủ yếu ở dạng nào?",
+        "refs": [
+          {
+            "where": "12-KT-C3-D4-I-17.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "12-KT-C3-D4-I-18",
+        "de": "Với thông tin về ba dạng tồn tại của histidine trong hình dưới đây: nhúng hai điện cực của dòng điện có hiệu điện thế thấp vào dung dịch X (dung dịch thu được khi cho histidine tác dụng với HCl dư), sau đó nhỏ từ từ dung dịch NaOH vào dung dịch X cho đến khi pH của dung dịch là 7,6.\nHãy cho biết histidine trong dung dịch X sẽ điện di như thế nào?",
+        "refs": [
+          {
+            "where": "12-KT-C3-D4-I-18.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P1-D2-I-76",
+        "de": "Histidine là một trong những amino acid thiết yếu đối với cơ thể con người. Với mỗi môi trường có giá trị pH bằng 4,0; 7,6; 12,0, coi histidine chỉ tồn tại ở dạng cho trong hình dưới đây.\nCho histidine tác dụng với dung dịch HCl dư, thu được dung dịch X. Histidine trong dung dịch X tồn tại chủ yếu ở dạng nào?",
+        "refs": [
+          {
+            "where": "DB-12-B9-P1-D2-I-76.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P1-D2-I-77",
+        "de": "Với thông tin về ba dạng tồn tại của histidine trong hình dưới đây: nhúng hai điện cực của dòng điện có hiệu điện thế thấp vào dung dịch X (dung dịch thu được khi cho histidine tác dụng với HCl dư), sau đó nhỏ từ từ dung dịch NaOH vào dung dịch X cho đến khi pH của dung dịch là 7,6.\nHãy cho biết histidine trong dung dịch X sẽ điện di như thế nào?",
+        "refs": [
+          {
+            "where": "DB-12-B9-P1-D2-I-77.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": false,
+      "hasDativeArrow": false,
+      "isTable": true,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "Giữcaption/header/nhãnđãliệtkê;khôngtựđặttênmoleculehoặcđánhnhãnPDFmới.",
+    "svg": "histidine-table-ddh-915d2e572a95dda00edc69a96d79129c02b0d53d36678c4c3feb68d35713fd3d.svg",
+    "hashSvg": "915d2e572a95dda00edc69a96d79129c02b0d53d36678c4c3feb68d35713fd3d",
+    "byteSvg": 39789,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "GiữtopNHcả3vòng;bottomleftHN+chỉI,NởII/III. I/IIalphaNH3+,IIIalphaNH2;COO−cả3. Khônghoánvịtautomer/H,khôngcircle,khôngstereo. HeaderpH4,0/7,6/12,0 vàcaptionDạng(I)/(II)/(III),khungđầyđủ.",
+    "hashSvgDaSoat": "915d2e572a95dda00edc69a96d79129c02b0d53d36678c4c3feb68d35713fd3d",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 566,
+    "hash": "695f393bb8382c1d7db484af3dfe3e19fa779be9255a3a4a12367abb61588beb",
+    "fileNguon": "anh/695f393bb8382c1d7db484af3dfe3e19fa779be9255a3a4a12367abb61588beb.png",
+    "canvas": [
+      1381,
+      290
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "panels": [
+      {
+        "smiles": "[NH3+]C(Cc1c[nH+]c[nH]1)C(=O)[O-]",
+        "caption": [
+          "Dạng (I)"
+        ],
+        "pH": "4,0",
+        "notes": "RingtopNHneutral,bottom-leftNH⁺. AlphaNH₃⁺;COO⁻.Tổng+1.2liênkếtđôivòng,khôngcircle."
+      },
+      {
+        "smiles": "[NH3+]C(Cc1cnc[nH]1)C(=O)[O-]",
+        "caption": [
+          "Dạng (II)"
+        ],
+        "pH": "7,6",
+        "notes": "RingtopNHneutral,bottom-leftNkhôngH. AlphaNH₃⁺,COO⁻;tổng0."
+      },
+      {
+        "smiles": "NC(Cc1cnc[nH]1)C(=O)[O-]",
+        "caption": [
+          "Dạng (III)"
+        ],
+        "pH": "12,0",
+        "notes": "RingtopNHneutral,bottom-leftN. AlphaNH₂neutral,COO⁻;tổng−1."
+      }
+    ],
+    "notes": "Bảng2hàng/4cột:header pH |4,0|7,6|12,0;ôtráidưới Dạng tồn tại;3ôcấutrúcdướicócaptionDạng(I)/(II)/(III). GIỮkhungbảng,tấtcảpH/caption. Vòngimidazole5cạnh:NHtrên,bêntrênphảiC nốiCH₂–alphaC,bêndướiphảiC,bêndướitráiN,bêntrêntráiC. Chỉ1CH₂giữavòngvàalphaC;khôngstereo. KhônghoánvịtautomerNH.",
+    "questions": [
+      {
+        "qid": "12-C3-B9-D1-I-82",
+        "de": "Histidine là một trong những amino acid thiết yếu đối với cơ thể con người.\nVới mỗi môi trường có giá trị pH bằng 4,0; 7,6; 12,0 coi histidine chỉ tồn tại ở dạng cho dưới đây (bảng): pH 4,0 – dạng (I): vòng imidazole proton hoá (+), -NH₃⁺, -COO⁻; pH 7,6 – dạng (II): vòng trung hoà, -NH₃⁺, -COO⁻; pH 12,0 – dạng (III): vòng trung hoà, -NH₂, -COO⁻.\nTrong quá trình điện di, ion sẽ di chuyển về phía điện cực trái dấu với ion.\nCho các nhận định sau về quá trình điện di của histidine:\n(a) Với môi trường pH = 7,6 thì dạng (II) hầu như không dịch chuyển về các điện cực.\n(b) Với môi trường pH = 4,0 thì dạng (I) di chuyển về phía cực âm.\n(c) Với môi trường pH = 12,0 thì dạng (III) di chuyển về phía cực dương.\n(d) Với môi trường pH = 7,6 thì dạng (II) di chuyển về phía cực âm.\nCác nhận định đúng là",
+        "refs": [
+          {
+            "where": "12-C3-B9-D1-I-82.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P1-D2-I-18",
+        "de": "Histidine là một trong những amino acid thiết yếu đối với cơ thể con người.\nVới mỗi môi trường có giá trị pH bằng 4,0; 7,6; 12,0 coi histidine chỉ tồn tại ở dạng cho dưới đây (bảng): pH 4,0 – dạng (I): vòng imidazole proton hoá (+), -NH₃⁺, -COO⁻; pH 7,6 – dạng (II): vòng trung hoà, -NH₃⁺, -COO⁻; pH 12,0 – dạng (III): vòng trung hoà, -NH₂, -COO⁻.\nTrong quá trình điện di, ion sẽ di chuyển về phía điện cực trái dấu với ion.\nCho các nhận định sau về quá trình điện di của histidine:\n(a) Với môi trường pH = 7,6 thì dạng (II) hầu như không dịch chuyển về các điện cực.\n(b) Với môi trường pH = 4,0 thì dạng (I) di chuyển về phía cực âm.\n(c) Với môi trường pH = 12,0 thì dạng (III) di chuyển về phía cực dương.\n(d) Với môi trường pH = 7,6 thì dạng (II) di chuyển về phía cực âm.\nCác nhận định đúng là",
+        "refs": [
+          {
+            "where": "DB-12-B9-P1-D2-I-18.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": false,
+      "hasDativeArrow": false,
+      "isTable": true,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "Giữcaption/header/nhãnđãliệtkê;khôngtựđặttênmoleculehoặcđánhnhãnPDFmới.",
+    "svg": "histidine-table-ddh-915d2e572a95dda00edc69a96d79129c02b0d53d36678c4c3feb68d35713fd3d.svg",
+    "hashSvg": "915d2e572a95dda00edc69a96d79129c02b0d53d36678c4c3feb68d35713fd3d",
+    "byteSvg": 39789,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "GiữtopNHcả3vòng;bottomleftHN+chỉI,NởII/III. I/IIalphaNH3+,IIIalphaNH2;COO−cả3. Khônghoánvịtautomer/H,khôngcircle,khôngstereo. HeaderpH4,0/7,6/12,0 vàcaptionDạng(I)/(II)/(III),khungđầyđủ.",
+    "hashSvgDaSoat": "915d2e572a95dda00edc69a96d79129c02b0d53d36678c4c3feb68d35713fd3d",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

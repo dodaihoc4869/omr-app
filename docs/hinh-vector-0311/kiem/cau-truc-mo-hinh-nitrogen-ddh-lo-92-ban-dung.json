@@ -1,0 +1,49 @@
+[
+  {
+    "i": 925,
+    "hash": "a7b7fe6ca6dee2b167b60a244369ed53b5bbd7eee82ed7a8c3ae1f1e2ecb903d",
+    "fileNguon": "anh/a7b7fe6ca6dee2b167b60a244369ed53b5bbd7eee82ed7a8c3ae1f1e2ecb903d.png",
+    "canvas": [
+      469,
+      118
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "smiles": "N#N",
+    "notes": "Môhình2quảcầuxanhgắnNtrắng,baốngxámnối3liênkếtgiữa2N chéo lênphải;captionphải E_B (N≡N) = 945 kJ/mol vớiBsubscript. Khôngtựđổi945hayđơnvị;kýhiệubondtrongcaptionlà≡. GiữmôhìnhchứkhôngchỉvẽSMILESnétphẳng.",
+    "questions": [
+      {
+        "qid": "DH-11-C2-B4-II-9",
+        "de": "Mô hình phân tử nitrogen và năng lượng liên kết trong phân tử nitrogen:",
+        "refs": [
+          {
+            "where": "DH-11-C2-B4-II-9.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": false,
+      "hasDativeArrow": false,
+      "isTable": false,
+      "literalFormulaOnly": false,
+      "modelWithCaption": true
+    },
+    "labelHandling": "Giữcaption/header/nhãnđãliệtkê;khôngtựđặttênmoleculehoặcđánhnhãnPDFmới.",
+    "svg": "nitrogen-model-ddh-fa99ffa13d9f98e81d3c92d24d2db41a05bc1fa464a33e0e462a4ccefadad752.svg",
+    "hashSvg": "fa99ffa13d9f98e81d3c92d24d2db41a05bc1fa464a33e0e462a4ccefadad752",
+    "byteSvg": 9472,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Hai cầuN xanh/nhãnNtrắng,3ốngxám chéo lênphải,captionE_B(N≡N)=945kJ/mol;Bđúngsubscriptpath,khôngUnicodebeta.",
+    "hashSvgDaSoat": "fa99ffa13d9f98e81d3c92d24d2db41a05bc1fa464a33e0e462a4ccefadad752",
+    "nguoiSoat": "cau_truc_6"
+  }
+]

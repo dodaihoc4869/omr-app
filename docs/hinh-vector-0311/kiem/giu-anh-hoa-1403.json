@@ -1,0 +1,12 @@
+{
+  "i": 1403,
+  "hash": "fc609a500a7dfc67073125a615ccb17f7d51d781fbc64e4c19a0da404a3947b8",
+  "nguoiSoat": "soat_hinh_vector",
+  "ketQua": "Giữ nguyên ảnh chụp thật: Đã mở PNG native, là hoa trắng với cánh/lá xanh có chi tiết ánh sáng và nền ảnh chụp, không phải sơ đồ cần vector hóa. Kiểm inventory qid DH-12-C1-B1-P1-II-5: câu dẫn Chất X là một ester có mùi thơm của hoa nhài. X có công thức cấu tạo như sau:, ảnh hoa nằm hinh.1. Kiểm vi-tri-cong-khai: hinh.1 viTri sau_de, congKhaiTruocNop true. Giữ nguyên nguồn, không vẽ lại, không cộng số hình vector.",
+  "qid": "DH-12-C1-B1-P1-II-5",
+  "where": "DH-12-C1-B1-P1-II-5.hinh.1.du_lieu",
+  "viTri": "sau_de",
+  "congKhaiTruocNop": true,
+  "veLai": false,
+  "congSoVe": false
+}

@@ -23,7 +23,19 @@
           }
         ]
       }
-    ]
+    ],
+    "daTrongManifestSauKhiGuiDotDau": true,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": false,
+      "hasDativeArrow": false,
+      "isTable": false,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "Giữcaption/header/nhãnđãliệtkê;khôngtựđặttênmoleculehoặcđánhnhãnPDFmới."
   },
   {
     "i": 504,
@@ -49,7 +61,19 @@
           }
         ]
       }
-    ]
+    ],
+    "daTrongManifestSauKhiGuiDotDau": true,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": true,
+      "hasLewisElectronDots": false,
+      "hasDativeArrow": false,
+      "isTable": false,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "Giữcaption/header/nhãnđãliệtkê;khôngtựđặttênmoleculehoặcđánhnhãnPDFmới."
   },
   {
     "i": 1015,
@@ -75,7 +99,19 @@
           }
         ]
       }
-    ]
+    ],
+    "daTrongManifestSauKhiGuiDotDau": true,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": true,
+      "hasLewisElectronDots": false,
+      "hasDativeArrow": false,
+      "isTable": false,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "Giữcaption/header/nhãnđãliệtkê;khôngtựđặttênmoleculehoặcđánhnhãnPDFmới."
   },
   {
     "i": 208,
@@ -101,7 +137,19 @@
           }
         ]
       }
-    ]
+    ],
+    "daTrongManifestSauKhiGuiDotDau": true,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": true,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": false,
+      "hasDativeArrow": false,
+      "isTable": false,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "Giữcaption/header/nhãnđãliệtkê;khôngtựđặttênmoleculehoặcđánhnhãnPDFmới."
   },
   {
     "i": 95,
@@ -127,7 +175,19 @@
           }
         ]
       }
-    ]
+    ],
+    "daTrongManifestSauKhiGuiDotDau": true,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": true,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": false,
+      "hasDativeArrow": false,
+      "isTable": false,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "Giữcaption/header/nhãnđãliệtkê;khôngtựđặttênmoleculehoặcđánhnhãnPDFmới."
   },
   {
     "i": 1052,
@@ -153,7 +213,19 @@
           }
         ]
       }
-    ]
+    ],
+    "daTrongManifestSauKhiGuiDotDau": true,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": true,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": false,
+      "hasDativeArrow": false,
+      "isTable": false,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "Giữcaption/header/nhãnđãliệtkê;khôngtựđặttênmoleculehoặcđánhnhãnPDFmới."
   },
   {
     "i": 1409,
@@ -179,6 +251,679 @@
           }
         ]
       }
-    ]
+    ],
+    "daTrongManifestSauKhiGuiDotDau": true,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": true,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": false,
+      "hasDativeArrow": false,
+      "isTable": false,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "Giữcaption/header/nhãnđãliệtkê;khôngtựđặttênmoleculehoặcđánhnhãnPDFmới."
+  },
+  {
+    "i": 179,
+    "hash": "1f21749c722a82184b8f3920fd3766e3487a13a170c9c4c8a62b25564792534c",
+    "fileNguon": "anh/1f21749c722a82184b8f3920fd3766e3487a13a170c9c4c8a62b25564792534c.png",
+    "canvas": [
+      123,
+      120
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "smiles": "[NH3]",
+    "notes": "LewisNH₃: Ngiữa,Htrái/Hphải/Hdưới.3cặp electronLIÊNKẾTđỏ ởtráiN/phảiN/dướiN;1cặpelectronTỰDOđỏtrênN. Khôngvẽthêmbondlines,vìnguồndùngchấm. Khôngcharge/caption.",
+    "questions": [
+      {
+        "qid": "DH-10-C3-B10-I-24",
+        "de": "Công thức electron nào sau đây **không** đủ electron theo quy tắc octet?",
+        "refs": [
+          {
+            "where": "DH-10-C3-B10-I-24.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": true,
+      "hasDativeArrow": false,
+      "isTable": false,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "KhôngthêmA/B/C/D vìnguồnkhôngin nhãn;refsđãsau_pa_tươngứng. Chấm đỏ electronlàdữliệubắtbuộc,khôngthaycôngthứccấutrúcnét."
+  },
+  {
+    "i": 1253,
+    "hash": "e3a963eca466d0342a72c071807287ecab7c7415484f8ef1d9ccc331b60d4c2a",
+    "fileNguon": "anh/e3a963eca466d0342a72c071807287ecab7c7415484f8ef1d9ccc331b60d4c2a.png",
+    "canvas": [
+      124,
+      120
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "smiles": "[BH3]",
+    "notes": "LewisBH₃: Bgiữa,Htrái/Hphải/Hdưới.3cặp electronLIÊNKẾTđỏ,trái/phải/dưới;KHÔNGlonepairtrênB (Bsextet). Khôngcharge/caption/bondlines.",
+    "questions": [
+      {
+        "qid": "DH-10-C3-B10-I-24",
+        "de": "Công thức electron nào sau đây **không** đủ electron theo quy tắc octet?",
+        "refs": [
+          {
+            "where": "DH-10-C3-B10-I-24.hinh.1.du_lieu",
+            "viTri": "sau_pa_B"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": true,
+      "hasDativeArrow": false,
+      "isTable": false,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "KhôngthêmA/B/C/D vìnguồnkhôngin nhãn;refsđãsau_pa_tươngứng. Chấm đỏ electronlàdữliệubắtbuộc,khôngthaycôngthứccấutrúcnét."
+  },
+  {
+    "i": 199,
+    "hash": "21d59f863303fb7194da4391c53665486798be137c76a1283c3f192752280a48",
+    "fileNguon": "anh/21d59f863303fb7194da4391c53665486798be137c76a1283c3f192752280a48.png",
+    "canvas": [
+      130,
+      120
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "smiles": "ClCl",
+    "notes": "LewisCl₂: Cltrái/Clphải,cặp electronliênkếtđỏgiữa2Cl. MỖICl3cặpfreeelectron trên/dưới/ngoaicùng. Tổng7cặp14e. Khôngbondline,circle/charge/caption.",
+    "questions": [
+      {
+        "qid": "DH-10-C3-B10-I-24",
+        "de": "Công thức electron nào sau đây **không** đủ electron theo quy tắc octet?",
+        "refs": [
+          {
+            "where": "DH-10-C3-B10-I-24.hinh.3.du_lieu",
+            "viTri": "sau_pa_D"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": true,
+      "hasDativeArrow": false,
+      "isTable": false,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "KhôngthêmA/B/C/D vìnguồnkhôngin nhãn;refsđãsau_pa_tươngứng. Chấm đỏ electronlàdữliệubắtbuộc,khôngthaycôngthứccấutrúcnét."
+  },
+  {
+    "i": 1000,
+    "hash": "b4178445afa068135a445394a37e5667deb592341429afb8c313a7d443c358cb",
+    "fileNguon": "anh/b4178445afa068135a445394a37e5667deb592341429afb8c313a7d443c358cb.png",
+    "canvas": [
+      152,
+      120
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "smiles": "O=C=O",
+    "notes": "LewisCO₂: Otrái–Cgiữa–Ophảidùngchấm đỏ. GiữaC vàmỗiO có2cặpelectron (4chấm). MỗiO có2cặpfreeelectrontrên/dưới. Tổng8cặp16e. Khôngđườngbond,circle/charge/caption.",
+    "questions": [
+      {
+        "qid": "DH-10-C3-B10-I-24",
+        "de": "Công thức electron nào sau đây **không** đủ electron theo quy tắc octet?",
+        "refs": [
+          {
+            "where": "DH-10-C3-B10-I-24.hinh.2.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": true,
+      "hasDativeArrow": false,
+      "isTable": false,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "KhôngthêmA/B/C/D vìnguồnkhôngin nhãn;refsđãsau_pa_tươngứng. Chấm đỏ electronlàdữliệubắtbuộc,khôngthaycôngthứccấutrúcnét."
+  },
+  {
+    "i": 306,
+    "hash": "3478863ef6d43212da99924b0429d10ebcbff0b518917b8dcab86ececa151c4a",
+    "fileNguon": "anh/3478863ef6d43212da99924b0429d10ebcbff0b518917b8dcab86ececa151c4a.png",
+    "canvas": [
+      123,
+      109
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "smiles": "O=C=O",
+    "notes": "NguồnCHỈtextCO₂,chỉsố2dướiphải,khôngcôngthứccấutrúc. PhảidựngliteralCO₂,khôngthaybằngO=C=Ohiểnthị;SMILESchỉkhóanộidung.",
+    "questions": [
+      {
+        "qid": "12-C2-B6-D2-II-27",
+        "de": "Xăng sinh học là hỗn hợp xăng thông thường và ethanol sinh học (bio-ethanol, ethanol được sản xuất từ sinh khối như cây cối, ngũ cốc, phụ phẩm nông nghiệp). Việc sử dụng xăng sinh học góp phần vào việc giảm sự phụ thuộc vào nhiên liệu hoá thạch (than đá, dầu mỏ, khí đốt), giảm phát thải khí nhà kính, góp phần đảm bảo an ninh năng lượng.\nQuy trình sản xuất xăng sinh học từ tinh bột ngô ở một nhà máy được mô tả như sau:",
+        "refs": [
+          {
+            "where": "12-C2-B6-D2-II-27.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D2-II-43",
+        "de": "Xăng sinh học là hỗn hợp xăng thông thường và ethanol sinh học (bio-ethanol, ethanol được sản xuất từ sinh khối như cây cối, ngũ cốc, phụ phẩm nông nghiệp). Việc sử dụng xăng sinh học góp phần vào việc giảm sự phụ thuộc vào nhiên liệu hoá thạch (than đá, dầu mỏ, khí đốt), giảm phát thải khí nhà kính, góp phần đảm bảo an ninh năng lượng.\nQuy trình sản xuất xăng sinh học từ tinh bột ngô ở một nhà máy được mô tả như sau:",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-II-43.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": false,
+      "hasDativeArrow": false,
+      "isTable": false,
+      "literalFormulaOnly": true,
+      "modelWithCaption": false
+    },
+    "labelHandling": "Giữcaption/header/nhãnđãliệtkê;khôngtựđặttênmoleculehoặcđánhnhãnPDFmới."
+  },
+  {
+    "i": 925,
+    "hash": "a7b7fe6ca6dee2b167b60a244369ed53b5bbd7eee82ed7a8c3ae1f1e2ecb903d",
+    "fileNguon": "anh/a7b7fe6ca6dee2b167b60a244369ed53b5bbd7eee82ed7a8c3ae1f1e2ecb903d.png",
+    "canvas": [
+      469,
+      118
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "smiles": "N#N",
+    "notes": "Môhình2quảcầuxanhgắnNtrắng,baốngxámnối3liênkếtgiữa2N chéo lênphải;captionphải E_B (N≡N) = 945 kJ/mol vớiBsubscript. Khôngtựđổi945hayđơnvị;kýhiệubondtrongcaptionlà≡. GiữmôhìnhchứkhôngchỉvẽSMILESnétphẳng.",
+    "questions": [
+      {
+        "qid": "DH-11-C2-B4-II-9",
+        "de": "Mô hình phân tử nitrogen và năng lượng liên kết trong phân tử nitrogen:",
+        "refs": [
+          {
+            "where": "DH-11-C2-B4-II-9.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": false,
+      "hasDativeArrow": false,
+      "isTable": false,
+      "literalFormulaOnly": false,
+      "modelWithCaption": true
+    },
+    "labelHandling": "Giữcaption/header/nhãnđãliệtkê;khôngtựđặttênmoleculehoặcđánhnhãnPDFmới."
+  },
+  {
+    "i": 136,
+    "hash": "185eee39919d27e49028347d5eaa07614e1ba050d9dfc370343c076e8626c5e9",
+    "fileNguon": "anh/185eee39919d27e49028347d5eaa07614e1ba050d9dfc370343c076e8626c5e9.png",
+    "canvas": [
+      342,
+      213
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "smiles": "CC(=O)OCc1ccccc1",
+    "notes": "Benzylacetate:Ph–CH₂–O–C(=O)–CH₃. CHỈ1CH₂giữaPh/O. Vòng3đôi khôngcircle. Native136cạnhphảichạmendpointmethyl;đãđốichứngmoleculecùngnộidungtrong944(fullmolecule+photo)thấymethylendpointđầyđủ;khôngthêmphoto944vàohình136. Khôngcaption/charges/stereo.",
+    "questions": [
+      {
+        "qid": "DH-12-C1-B1-P1-II-5",
+        "de": "Chất X là một ester có mùi thơm của hoa nhài. X có công thức cấu tạo như sau:",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P1-II-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": false,
+      "hasDativeArrow": false,
+      "isTable": false,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "Giữcaption/header/nhãnđãliệtkê;khôngtựđặttênmoleculehoặcđánhnhãnPDFmới."
+  },
+  {
+    "i": 222,
+    "hash": "26564c0da4fff9e7c0c98d9b57aaddbccc054e74e9ebbbb9fec810dc2a7a9eb3",
+    "fileNguon": "anh/26564c0da4fff9e7c0c98d9b57aaddbccc054e74e9ebbbb9fec810dc2a7a9eb3.png",
+    "canvas": [
+      959,
+      169
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "panels": [
+      {
+        "smiles": "[NH3+]C(Cc1c[nH+]c[nH]1)C(=O)[O-]",
+        "caption": [
+          "Dạng (I)"
+        ],
+        "pH": "4,0",
+        "notes": "RingtopNHneutral,bottom-leftNH⁺. AlphaNH₃⁺;COO⁻.Tổng+1.2liênkếtđôivòng,khôngcircle."
+      },
+      {
+        "smiles": "[NH3+]C(Cc1cnc[nH]1)C(=O)[O-]",
+        "caption": [
+          "Dạng (II)"
+        ],
+        "pH": "7,6",
+        "notes": "RingtopNHneutral,bottom-leftNkhôngH. AlphaNH₃⁺,COO⁻;tổng0."
+      },
+      {
+        "smiles": "NC(Cc1cnc[nH]1)C(=O)[O-]",
+        "caption": [
+          "Dạng (III)"
+        ],
+        "pH": "12,0",
+        "notes": "RingtopNHneutral,bottom-leftN. AlphaNH₂neutral,COO⁻;tổng−1."
+      }
+    ],
+    "notes": "Bảng2hàng/4cột:header pH |4,0|7,6|12,0;ôtráidưới Dạng tồn tại;3ôcấutrúcdướicócaptionDạng(I)/(II)/(III). GIỮkhungbảng,tấtcảpH/caption. Vòngimidazole5cạnh:NHtrên,bêntrênphảiC nốiCH₂–alphaC,bêndướiphảiC,bêndướitráiN,bêntrêntráiC. Chỉ1CH₂giữavòngvàalphaC;khôngstereo. KhônghoánvịtautomerNH.",
+    "questions": [
+      {
+        "qid": "DB-12-B9-P1-D2-I-100",
+        "de": "Histidine là một trong những amino acid thiết yếu đối với cơ thể con người. Với mỗi môi trường có giá trị pH bằng 4,0; 7,6; 12,0 coi histidine chỉ tồn tại ở dạng cho dưới đây: Trong quá trình điện di, ion sẽ di chuyển về phía điện cực trái dấu với ion.\nCho các nhận định sau về quá trình điện di của histidine:\n(a) Với môi trường pH = 7,6 thì dạng (II) hầu như không dịch chuyển về các điện cực.\n(b) Với môi trường pH = 4,0 thì dạng (I) di chuyển về phía cực âm.\n(c) Với môi trường pH = 12,0 thì dạng (III) di chuyển về phía cực dương.\n(d) Với môi trường pH = 7,6 thì dạng (II) di chuyển về phía cực âm.\nCác nhận định đúng là",
+        "refs": [
+          {
+            "where": "DB-12-B9-P1-D2-I-100.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B9-P1-I-64",
+        "de": "Histidine là một trong những amino acid thiết yếu đối với cơ thể con người. Với mỗi môi trường có giá trị pH bằng 4,0; 7,6; 12,0 coi histidine chỉ tồn tại ở dạng cho dưới đây: Trong quá trình điện di, ion sẽ di chuyển về phía điện cực trái dấu với ion.\nCho các nhận định sau về quá trình điện di của histidine:\n(a) Với môi trường pH = 7,6 thì dạng (II) hầu như không dịch chuyển về các điện cực.\n(b) Với môi trường pH = 4,0 thì dạng (I) di chuyển về phía cực âm.\n(c) Với môi trường pH = 12,0 thì dạng (III) di chuyển về phía cực dương.\n(d) Với môi trường pH = 7,6 thì dạng (II) di chuyển về phía cực âm.\nCác nhận định đúng là",
+        "refs": [
+          {
+            "where": "DH-12-C3-B9-P1-I-64.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": false,
+      "hasDativeArrow": false,
+      "isTable": true,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "Giữcaption/header/nhãnđãliệtkê;khôngtựđặttênmoleculehoặcđánhnhãnPDFmới."
+  },
+  {
+    "i": 1135,
+    "hash": "cbdd3f7615eb24b08e99c3378858c628819b127050a5dca5e5c4412a8b834350",
+    "fileNguon": "anh/cbdd3f7615eb24b08e99c3378858c628819b127050a5dca5e5c4412a8b834350.png",
+    "canvas": [
+      1329,
+      295
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "panels": [
+      {
+        "smiles": "[NH3+]C(Cc1c[nH+]c[nH]1)C(=O)[O-]",
+        "caption": [
+          "Dạng (I)"
+        ],
+        "pH": "4,0",
+        "notes": "RingtopNHneutral,bottom-leftNH⁺. AlphaNH₃⁺;COO⁻.Tổng+1.2liênkếtđôivòng,khôngcircle."
+      },
+      {
+        "smiles": "[NH3+]C(Cc1cnc[nH]1)C(=O)[O-]",
+        "caption": [
+          "Dạng (II)"
+        ],
+        "pH": "7,6",
+        "notes": "RingtopNHneutral,bottom-leftNkhôngH. AlphaNH₃⁺,COO⁻;tổng0."
+      },
+      {
+        "smiles": "NC(Cc1cnc[nH]1)C(=O)[O-]",
+        "caption": [
+          "Dạng (III)"
+        ],
+        "pH": "12,0",
+        "notes": "RingtopNHneutral,bottom-leftN. AlphaNH₂neutral,COO⁻;tổng−1."
+      }
+    ],
+    "notes": "Bảng2hàng/4cột:header pH |4,0|7,6|12,0;ôtráidưới Dạng tồn tại;3ôcấutrúcdướicócaptionDạng(I)/(II)/(III). GIỮkhungbảng,tấtcảpH/caption. Vòngimidazole5cạnh:NHtrên,bêntrênphảiC nốiCH₂–alphaC,bêndướiphảiC,bêndướitráiN,bêntrêntráiC. Chỉ1CH₂giữavòngvàalphaC;khôngstereo. KhônghoánvịtautomerNH.",
+    "questions": [
+      {
+        "qid": "12-KT-C3-D4-I-17",
+        "de": "Histidine là một trong những amino acid thiết yếu đối với cơ thể con người. Với mỗi môi trường có giá trị pH bằng 4,0; 7,6; 12,0, coi histidine chỉ tồn tại ở dạng cho trong hình dưới đây.\nCho histidine tác dụng với dung dịch HCl dư, thu được dung dịch X. Histidine trong dung dịch X tồn tại chủ yếu ở dạng nào?",
+        "refs": [
+          {
+            "where": "12-KT-C3-D4-I-17.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "12-KT-C3-D4-I-18",
+        "de": "Với thông tin về ba dạng tồn tại của histidine trong hình dưới đây: nhúng hai điện cực của dòng điện có hiệu điện thế thấp vào dung dịch X (dung dịch thu được khi cho histidine tác dụng với HCl dư), sau đó nhỏ từ từ dung dịch NaOH vào dung dịch X cho đến khi pH của dung dịch là 7,6.\nHãy cho biết histidine trong dung dịch X sẽ điện di như thế nào?",
+        "refs": [
+          {
+            "where": "12-KT-C3-D4-I-18.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P1-D2-I-76",
+        "de": "Histidine là một trong những amino acid thiết yếu đối với cơ thể con người. Với mỗi môi trường có giá trị pH bằng 4,0; 7,6; 12,0, coi histidine chỉ tồn tại ở dạng cho trong hình dưới đây.\nCho histidine tác dụng với dung dịch HCl dư, thu được dung dịch X. Histidine trong dung dịch X tồn tại chủ yếu ở dạng nào?",
+        "refs": [
+          {
+            "where": "DB-12-B9-P1-D2-I-76.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P1-D2-I-77",
+        "de": "Với thông tin về ba dạng tồn tại của histidine trong hình dưới đây: nhúng hai điện cực của dòng điện có hiệu điện thế thấp vào dung dịch X (dung dịch thu được khi cho histidine tác dụng với HCl dư), sau đó nhỏ từ từ dung dịch NaOH vào dung dịch X cho đến khi pH của dung dịch là 7,6.\nHãy cho biết histidine trong dung dịch X sẽ điện di như thế nào?",
+        "refs": [
+          {
+            "where": "DB-12-B9-P1-D2-I-77.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": false,
+      "hasDativeArrow": false,
+      "isTable": true,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "Giữcaption/header/nhãnđãliệtkê;khôngtựđặttênmoleculehoặcđánhnhãnPDFmới."
+  },
+  {
+    "i": 566,
+    "hash": "695f393bb8382c1d7db484af3dfe3e19fa779be9255a3a4a12367abb61588beb",
+    "fileNguon": "anh/695f393bb8382c1d7db484af3dfe3e19fa779be9255a3a4a12367abb61588beb.png",
+    "canvas": [
+      1381,
+      290
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "panels": [
+      {
+        "smiles": "[NH3+]C(Cc1c[nH+]c[nH]1)C(=O)[O-]",
+        "caption": [
+          "Dạng (I)"
+        ],
+        "pH": "4,0",
+        "notes": "RingtopNHneutral,bottom-leftNH⁺. AlphaNH₃⁺;COO⁻.Tổng+1.2liênkếtđôivòng,khôngcircle."
+      },
+      {
+        "smiles": "[NH3+]C(Cc1cnc[nH]1)C(=O)[O-]",
+        "caption": [
+          "Dạng (II)"
+        ],
+        "pH": "7,6",
+        "notes": "RingtopNHneutral,bottom-leftNkhôngH. AlphaNH₃⁺,COO⁻;tổng0."
+      },
+      {
+        "smiles": "NC(Cc1cnc[nH]1)C(=O)[O-]",
+        "caption": [
+          "Dạng (III)"
+        ],
+        "pH": "12,0",
+        "notes": "RingtopNHneutral,bottom-leftN. AlphaNH₂neutral,COO⁻;tổng−1."
+      }
+    ],
+    "notes": "Bảng2hàng/4cột:header pH |4,0|7,6|12,0;ôtráidưới Dạng tồn tại;3ôcấutrúcdướicócaptionDạng(I)/(II)/(III). GIỮkhungbảng,tấtcảpH/caption. Vòngimidazole5cạnh:NHtrên,bêntrênphảiC nốiCH₂–alphaC,bêndướiphảiC,bêndướitráiN,bêntrêntráiC. Chỉ1CH₂giữavòngvàalphaC;khôngstereo. KhônghoánvịtautomerNH.",
+    "questions": [
+      {
+        "qid": "12-C3-B9-D1-I-82",
+        "de": "Histidine là một trong những amino acid thiết yếu đối với cơ thể con người.\nVới mỗi môi trường có giá trị pH bằng 4,0; 7,6; 12,0 coi histidine chỉ tồn tại ở dạng cho dưới đây (bảng): pH 4,0 – dạng (I): vòng imidazole proton hoá (+), -NH₃⁺, -COO⁻; pH 7,6 – dạng (II): vòng trung hoà, -NH₃⁺, -COO⁻; pH 12,0 – dạng (III): vòng trung hoà, -NH₂, -COO⁻.\nTrong quá trình điện di, ion sẽ di chuyển về phía điện cực trái dấu với ion.\nCho các nhận định sau về quá trình điện di của histidine:\n(a) Với môi trường pH = 7,6 thì dạng (II) hầu như không dịch chuyển về các điện cực.\n(b) Với môi trường pH = 4,0 thì dạng (I) di chuyển về phía cực âm.\n(c) Với môi trường pH = 12,0 thì dạng (III) di chuyển về phía cực dương.\n(d) Với môi trường pH = 7,6 thì dạng (II) di chuyển về phía cực âm.\nCác nhận định đúng là",
+        "refs": [
+          {
+            "where": "12-C3-B9-D1-I-82.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P1-D2-I-18",
+        "de": "Histidine là một trong những amino acid thiết yếu đối với cơ thể con người.\nVới mỗi môi trường có giá trị pH bằng 4,0; 7,6; 12,0 coi histidine chỉ tồn tại ở dạng cho dưới đây (bảng): pH 4,0 – dạng (I): vòng imidazole proton hoá (+), -NH₃⁺, -COO⁻; pH 7,6 – dạng (II): vòng trung hoà, -NH₃⁺, -COO⁻; pH 12,0 – dạng (III): vòng trung hoà, -NH₂, -COO⁻.\nTrong quá trình điện di, ion sẽ di chuyển về phía điện cực trái dấu với ion.\nCho các nhận định sau về quá trình điện di của histidine:\n(a) Với môi trường pH = 7,6 thì dạng (II) hầu như không dịch chuyển về các điện cực.\n(b) Với môi trường pH = 4,0 thì dạng (I) di chuyển về phía cực âm.\n(c) Với môi trường pH = 12,0 thì dạng (III) di chuyển về phía cực dương.\n(d) Với môi trường pH = 7,6 thì dạng (II) di chuyển về phía cực âm.\nCác nhận định đúng là",
+        "refs": [
+          {
+            "where": "DB-12-B9-P1-D2-I-18.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": false,
+      "hasDativeArrow": false,
+      "isTable": true,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "Giữcaption/header/nhãnđãliệtkê;khôngtựđặttênmoleculehoặcđánhnhãnPDFmới."
+  },
+  {
+    "i": 1080,
+    "hash": "c2f87c5ab2d7d3f4db979f386248d262efad179435bd504919bb3ff6e0eda532",
+    "fileNguon": "anh/c2f87c5ab2d7d3f4db979f386248d262efad179435bd504919bb3ff6e0eda532.png",
+    "canvas": [
+      211,
+      104
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "smiles": "[OH]N(=O)->[O]",
+    "notes": "NitricacidliteralH–O–N(=O)→O. NnốisingletớiO-H,triplanarOdoublevàOreceivingdativearrow;nguồnKHÔNGcharges/khônglonepairs. BắtbuộcgiữmũitênN→O (mũinhọnởOterminal),KHÔNGtựđổisang[N+]–[O−]hiểnthị. Hacidexplicit;khôngcaptiontrừ1384cób). SMILESdativeđượcRDKitđọc,phảikiểmrenderkhôngtựthêmH/charge.",
+    "questions": [
+      {
+        "qid": "DB-11-B6-D2-I-95",
+        "de": "Cho các nhận định sau về cấu tạo phân tử nitric acid (hình dưới):\n(a) Liên kết O – H phân cực về oxygen.\n(b) Nguyên tử N có số oxi hóa là +5.\n(c) Nguyên tử N có hóa trị bằng IV.\n(d) Liên kết cho – nhận N → O kém bền.\nSố nhận định đúng là",
+        "refs": [
+          {
+            "where": "DB-11-B6-D2-I-95.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B9-D1-I-11",
+        "de": "Cho các nhận định sau về cấu tạo phân tử nitric acid (hình dưới):\n(a) Liên kết O – H phân cực về oxygen.\n(b) Nguyên tử N có số oxi hóa là +5.\n(c) Nguyên tử N có hóa trị bằng IV.\n(d) Liên kết cho – nhận N → O kém bền.\nSố nhận định đúng là",
+        "refs": [
+          {
+            "where": "DH-11-C2-B9-D1-I-11.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": false,
+      "hasDativeArrow": true,
+      "isTable": false,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "Giữcaption/header/nhãnđãliệtkê;khôngtựđặttênmoleculehoặcđánhnhãnPDFmới."
+  },
+  {
+    "i": 1384,
+    "hash": "f97e1f396ff45454544908aa8d9f629945c7dca031fc07662aad1b8cc6be94a1",
+    "fileNguon": "anh/f97e1f396ff45454544908aa8d9f629945c7dca031fc07662aad1b8cc6be94a1.png",
+    "canvas": [
+      183,
+      94
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [
+      "b)"
+    ],
+    "smiles": "[OH]N(=O)->[O]",
+    "notes": "NitricacidliteralH–O–N(=O)→O. NnốisingletớiO-H,triplanarOdoublevàOreceivingdativearrow;nguồnKHÔNGcharges/khônglonepairs. BắtbuộcgiữmũitênN→O (mũinhọnởOterminal),KHÔNGtựđổisang[N+]–[O−]hiểnthị. Hacidexplicit;khôngcaptiontrừ1384cób). SMILESdativeđượcRDKitđọc,phảikiểmrenderkhôngtựthêmH/charge.",
+    "questions": [
+      {
+        "qid": "DB-11-B6-D2-II-54",
+        "de": "Nitric acid có công thức Lewis và công thức cấu tạo như hình dưới đây:",
+        "refs": [
+          {
+            "where": "DB-11-B6-D2-II-54.hinh.1.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B6-II-5",
+        "de": "Nitric acid có công thức Lewis và công thức cấu tạo như hình dưới đây:",
+        "refs": [
+          {
+            "where": "DH-11-C2-B6-II-5.hinh.1.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": false,
+      "hasDativeArrow": true,
+      "isTable": false,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "Giữb) nguyênvăn trongảnhvìrefsau_de."
+  },
+  {
+    "i": 354,
+    "hash": "3eac592a7f4e37a154e2b4ce6156c4918f86a92659b8f36ca56127ccd9253daf",
+    "fileNguon": "anh/3eac592a7f4e37a154e2b4ce6156c4918f86a92659b8f36ca56127ccd9253daf.png",
+    "canvas": [
+      237,
+      150
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "smiles": "[OH]N(=O)->[O]",
+    "notes": "NitricacidliteralH–O–N(=O)→O. NnốisingletớiO-H,triplanarOdoublevàOreceivingdativearrow;nguồnKHÔNGcharges/khônglonepairs. BắtbuộcgiữmũitênN→O (mũinhọnởOterminal),KHÔNGtựđổisang[N+]–[O−]hiểnthị. Hacidexplicit;khôngcaptiontrừ1384cób). SMILESdativeđượcRDKitđọc,phảikiểmrenderkhôngtựthêmH/charge.",
+    "questions": [
+      {
+        "qid": "DB-11-B6-D2-III-83",
+        "de": "Viết phương trình hoá học minh hoạ tác động của mưa acid đối với calcium carbonate trong núi đá vôi và với kim loại sắt có trong thép.",
+        "refs": [
+          {
+            "where": "DB-11-B6-D2-III-83.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B6-III-28",
+        "de": "Viết phương trình hoá học minh hoạ tác động của mưa acid đối với calcium carbonate trong núi đá vôi và với kim loại sắt có trong thép.",
+        "refs": [
+          {
+            "where": "DH-11-C2-B6-III-28.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": false,
+      "hasDativeArrow": true,
+      "isTable": false,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "Giữcaption/header/nhãnđãliệtkê;khôngtựđặttênmoleculehoặcđánhnhãnPDFmới."
   }
 ]

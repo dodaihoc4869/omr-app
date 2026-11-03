@@ -1,0 +1,412 @@
+[
+  {
+    "i": 179,
+    "hash": "1f21749c722a82184b8f3920fd3766e3487a13a170c9c4c8a62b25564792534c",
+    "fileNguon": "anh/1f21749c722a82184b8f3920fd3766e3487a13a170c9c4c8a62b25564792534c.png",
+    "canvas": [
+      123,
+      120
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "smiles": "[NH3]",
+    "notes": "LewisNH₃: Ngiữa,Htrái/Hphải/Hdưới.3cặp electronLIÊNKẾTđỏ ởtráiN/phảiN/dướiN;1cặpelectronTỰDOđỏtrênN. Khôngvẽthêmbondlines,vìnguồndùngchấm. Khôngcharge/caption.",
+    "questions": [
+      {
+        "qid": "DH-10-C3-B10-I-24",
+        "de": "Công thức electron nào sau đây **không** đủ electron theo quy tắc octet?",
+        "refs": [
+          {
+            "where": "DH-10-C3-B10-I-24.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": true,
+      "hasDativeArrow": false,
+      "isTable": false,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "KhôngthêmA/B/C/D vìnguồnkhôngin nhãn;refsđãsau_pa_tươngứng. Chấm đỏ electronlàdữliệubắtbuộc,khôngthaycôngthứccấutrúcnét.",
+    "svg": "lewis-nitric-ddh-83f0e8f45a6cdf4544be4b7fff7dc0a0620522aac9d7e583c6494a2a072fcf3a.svg",
+    "hashSvg": "83f0e8f45a6cdf4544be4b7fff7dc0a0620522aac9d7e583c6494a2a072fcf3a",
+    "byteSvg": 2596,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "hashSvgDaSoat": "83f0e8f45a6cdf4544be4b7fff7dc0a0620522aac9d7e583c6494a2a072fcf3a",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 1253,
+    "hash": "e3a963eca466d0342a72c071807287ecab7c7415484f8ef1d9ccc331b60d4c2a",
+    "fileNguon": "anh/e3a963eca466d0342a72c071807287ecab7c7415484f8ef1d9ccc331b60d4c2a.png",
+    "canvas": [
+      124,
+      120
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "smiles": "[BH3]",
+    "notes": "LewisBH₃: Bgiữa,Htrái/Hphải/Hdưới.3cặp electronLIÊNKẾTđỏ,trái/phải/dưới;KHÔNGlonepairtrênB (Bsextet). Khôngcharge/caption/bondlines.",
+    "questions": [
+      {
+        "qid": "DH-10-C3-B10-I-24",
+        "de": "Công thức electron nào sau đây **không** đủ electron theo quy tắc octet?",
+        "refs": [
+          {
+            "where": "DH-10-C3-B10-I-24.hinh.1.du_lieu",
+            "viTri": "sau_pa_B"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": true,
+      "hasDativeArrow": false,
+      "isTable": false,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "KhôngthêmA/B/C/D vìnguồnkhôngin nhãn;refsđãsau_pa_tươngứng. Chấm đỏ electronlàdữliệubắtbuộc,khôngthaycôngthứccấutrúcnét.",
+    "svg": "lewis-nitric-ddh-7ac2d3c3896138ff5d16614bbbb19b551c4aab1d98e36455b053295023b33657.svg",
+    "hashSvg": "7ac2d3c3896138ff5d16614bbbb19b551c4aab1d98e36455b053295023b33657",
+    "byteSvg": 2620,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "hashSvgDaSoat": "7ac2d3c3896138ff5d16614bbbb19b551c4aab1d98e36455b053295023b33657",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 199,
+    "hash": "21d59f863303fb7194da4391c53665486798be137c76a1283c3f192752280a48",
+    "fileNguon": "anh/21d59f863303fb7194da4391c53665486798be137c76a1283c3f192752280a48.png",
+    "canvas": [
+      130,
+      120
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "smiles": "ClCl",
+    "notes": "LewisCl₂: Cltrái/Clphải,cặp electronliênkếtđỏgiữa2Cl. MỖICl3cặpfreeelectron trên/dưới/ngoaicùng. Tổng7cặp14e. Khôngbondline,circle/charge/caption.",
+    "questions": [
+      {
+        "qid": "DH-10-C3-B10-I-24",
+        "de": "Công thức electron nào sau đây **không** đủ electron theo quy tắc octet?",
+        "refs": [
+          {
+            "where": "DH-10-C3-B10-I-24.hinh.3.du_lieu",
+            "viTri": "sau_pa_D"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": true,
+      "hasDativeArrow": false,
+      "isTable": false,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "KhôngthêmA/B/C/D vìnguồnkhôngin nhãn;refsđãsau_pa_tươngứng. Chấm đỏ electronlàdữliệubắtbuộc,khôngthaycôngthứccấutrúcnét.",
+    "svg": "lewis-nitric-ddh-81f48bc0fb367dd72a242c21734e61aace599d96e7a5cc7be35c54b80c200f45.svg",
+    "hashSvg": "81f48bc0fb367dd72a242c21734e61aace599d96e7a5cc7be35c54b80c200f45",
+    "byteSvg": 2251,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "hashSvgDaSoat": "81f48bc0fb367dd72a242c21734e61aace599d96e7a5cc7be35c54b80c200f45",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 1000,
+    "hash": "b4178445afa068135a445394a37e5667deb592341429afb8c313a7d443c358cb",
+    "fileNguon": "anh/b4178445afa068135a445394a37e5667deb592341429afb8c313a7d443c358cb.png",
+    "canvas": [
+      152,
+      120
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "smiles": "O=C=O",
+    "notes": "LewisCO₂: Otrái–Cgiữa–Ophảidùngchấm đỏ. GiữaC vàmỗiO có2cặpelectron (4chấm). MỗiO có2cặpfreeelectrontrên/dưới. Tổng8cặp16e. Khôngđườngbond,circle/charge/caption.",
+    "questions": [
+      {
+        "qid": "DH-10-C3-B10-I-24",
+        "de": "Công thức electron nào sau đây **không** đủ electron theo quy tắc octet?",
+        "refs": [
+          {
+            "where": "DH-10-C3-B10-I-24.hinh.2.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": true,
+      "hasDativeArrow": false,
+      "isTable": false,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "KhôngthêmA/B/C/D vìnguồnkhôngin nhãn;refsđãsau_pa_tươngứng. Chấm đỏ electronlàdữliệubắtbuộc,khôngthaycôngthứccấutrúcnét.",
+    "svg": "lewis-nitric-ddh-6f8844619af24feea5b317d5f6e2eba477e66cc46b1857377152a0542592d0ee.svg",
+    "hashSvg": "6f8844619af24feea5b317d5f6e2eba477e66cc46b1857377152a0542592d0ee",
+    "byteSvg": 2356,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "hashSvgDaSoat": "6f8844619af24feea5b317d5f6e2eba477e66cc46b1857377152a0542592d0ee",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 306,
+    "hash": "3478863ef6d43212da99924b0429d10ebcbff0b518917b8dcab86ececa151c4a",
+    "fileNguon": "anh/3478863ef6d43212da99924b0429d10ebcbff0b518917b8dcab86ececa151c4a.png",
+    "canvas": [
+      123,
+      109
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "smiles": "O=C=O",
+    "notes": "NguồnCHỈtextCO₂,chỉsố2dướiphải,khôngcôngthứccấutrúc. PhảidựngliteralCO₂,khôngthaybằngO=C=Ohiểnthị;SMILESchỉkhóanộidung.",
+    "questions": [
+      {
+        "qid": "12-C2-B6-D2-II-27",
+        "de": "Xăng sinh học là hỗn hợp xăng thông thường và ethanol sinh học (bio-ethanol, ethanol được sản xuất từ sinh khối như cây cối, ngũ cốc, phụ phẩm nông nghiệp). Việc sử dụng xăng sinh học góp phần vào việc giảm sự phụ thuộc vào nhiên liệu hoá thạch (than đá, dầu mỏ, khí đốt), giảm phát thải khí nhà kính, góp phần đảm bảo an ninh năng lượng.\nQuy trình sản xuất xăng sinh học từ tinh bột ngô ở một nhà máy được mô tả như sau:",
+        "refs": [
+          {
+            "where": "12-C2-B6-D2-II-27.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D2-II-43",
+        "de": "Xăng sinh học là hỗn hợp xăng thông thường và ethanol sinh học (bio-ethanol, ethanol được sản xuất từ sinh khối như cây cối, ngũ cốc, phụ phẩm nông nghiệp). Việc sử dụng xăng sinh học góp phần vào việc giảm sự phụ thuộc vào nhiên liệu hoá thạch (than đá, dầu mỏ, khí đốt), giảm phát thải khí nhà kính, góp phần đảm bảo an ninh năng lượng.\nQuy trình sản xuất xăng sinh học từ tinh bột ngô ở một nhà máy được mô tả như sau:",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-II-43.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": false,
+      "hasDativeArrow": false,
+      "isTable": false,
+      "literalFormulaOnly": true,
+      "modelWithCaption": false
+    },
+    "labelHandling": "Giữcaption/header/nhãnđãliệtkê;khôngtựđặttênmoleculehoặcđánhnhãnPDFmới.",
+    "svg": "lewis-nitric-ddh-43541ed9e7b5bdf9fc9f85f049b8732f5eb15319ace8c9fa0976c305125dae97.svg",
+    "hashSvg": "43541ed9e7b5bdf9fc9f85f049b8732f5eb15319ace8c9fa0976c305125dae97",
+    "byteSvg": 1491,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "hashSvgDaSoat": "43541ed9e7b5bdf9fc9f85f049b8732f5eb15319ace8c9fa0976c305125dae97",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 1080,
+    "hash": "c2f87c5ab2d7d3f4db979f386248d262efad179435bd504919bb3ff6e0eda532",
+    "fileNguon": "anh/c2f87c5ab2d7d3f4db979f386248d262efad179435bd504919bb3ff6e0eda532.png",
+    "canvas": [
+      211,
+      104
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "smiles": "[OH]N(=O)->[O]",
+    "notes": "NitricacidliteralH–O–N(=O)→O. NnốisingletớiO-H,triplanarOdoublevàOreceivingdativearrow;nguồnKHÔNGcharges/khônglonepairs. BắtbuộcgiữmũitênN→O (mũinhọnởOterminal),KHÔNGtựđổisang[N+]–[O−]hiểnthị. Hacidexplicit;khôngcaptiontrừ1384cób). SMILESdativeđượcRDKitđọc,phảikiểmrenderkhôngtựthêmH/charge.",
+    "questions": [
+      {
+        "qid": "DB-11-B6-D2-I-95",
+        "de": "Cho các nhận định sau về cấu tạo phân tử nitric acid (hình dưới):\n(a) Liên kết O – H phân cực về oxygen.\n(b) Nguyên tử N có số oxi hóa là +5.\n(c) Nguyên tử N có hóa trị bằng IV.\n(d) Liên kết cho – nhận N → O kém bền.\nSố nhận định đúng là",
+        "refs": [
+          {
+            "where": "DB-11-B6-D2-I-95.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B9-D1-I-11",
+        "de": "Cho các nhận định sau về cấu tạo phân tử nitric acid (hình dưới):\n(a) Liên kết O – H phân cực về oxygen.\n(b) Nguyên tử N có số oxi hóa là +5.\n(c) Nguyên tử N có hóa trị bằng IV.\n(d) Liên kết cho – nhận N → O kém bền.\nSố nhận định đúng là",
+        "refs": [
+          {
+            "where": "DH-11-C2-B9-D1-I-11.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": false,
+      "hasDativeArrow": true,
+      "isTable": false,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "Giữcaption/header/nhãnđãliệtkê;khôngtựđặttênmoleculehoặcđánhnhãnPDFmới.",
+    "svg": "lewis-nitric-ddh-f22b7a63ba75b9a3eb6b1bee70eeb47d8b17de50ac21cec8349a9e9a6b0cd37c.svg",
+    "hashSvg": "f22b7a63ba75b9a3eb6b1bee70eeb47d8b17de50ac21cec8349a9e9a6b0cd37c",
+    "byteSvg": 3074,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "hashSvgDaSoat": "f22b7a63ba75b9a3eb6b1bee70eeb47d8b17de50ac21cec8349a9e9a6b0cd37c",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 1384,
+    "hash": "f97e1f396ff45454544908aa8d9f629945c7dca031fc07662aad1b8cc6be94a1",
+    "fileNguon": "anh/f97e1f396ff45454544908aa8d9f629945c7dca031fc07662aad1b8cc6be94a1.png",
+    "canvas": [
+      183,
+      94
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [
+      "b)"
+    ],
+    "smiles": "[OH]N(=O)->[O]",
+    "notes": "NitricacidliteralH–O–N(=O)→O. NnốisingletớiO-H,triplanarOdoublevàOreceivingdativearrow;nguồnKHÔNGcharges/khônglonepairs. BắtbuộcgiữmũitênN→O (mũinhọnởOterminal),KHÔNGtựđổisang[N+]–[O−]hiểnthị. Hacidexplicit;khôngcaptiontrừ1384cób). SMILESdativeđượcRDKitđọc,phảikiểmrenderkhôngtựthêmH/charge.",
+    "questions": [
+      {
+        "qid": "DB-11-B6-D2-II-54",
+        "de": "Nitric acid có công thức Lewis và công thức cấu tạo như hình dưới đây:",
+        "refs": [
+          {
+            "where": "DB-11-B6-D2-II-54.hinh.1.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B6-II-5",
+        "de": "Nitric acid có công thức Lewis và công thức cấu tạo như hình dưới đây:",
+        "refs": [
+          {
+            "where": "DH-11-C2-B6-II-5.hinh.1.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": false,
+      "hasDativeArrow": true,
+      "isTable": false,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "Giữb) nguyênvăn trongảnhvìrefsau_de.",
+    "svg": "lewis-nitric-ddh-478046bf1508cfa62b357d2b3cb7b1295fde8e7e6077117723304c7436f90150.svg",
+    "hashSvg": "478046bf1508cfa62b357d2b3cb7b1295fde8e7e6077117723304c7436f90150",
+    "byteSvg": 3983,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "hashSvgDaSoat": "478046bf1508cfa62b357d2b3cb7b1295fde8e7e6077117723304c7436f90150",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 354,
+    "hash": "3eac592a7f4e37a154e2b4ce6156c4918f86a92659b8f36ca56127ccd9253daf",
+    "fileNguon": "anh/3eac592a7f4e37a154e2b4ce6156c4918f86a92659b8f36ca56127ccd9253daf.png",
+    "canvas": [
+      237,
+      150
+    ],
+    "daMoNative": true,
+    "circle": false,
+    "caption": [],
+    "smiles": "[OH]N(=O)->[O]",
+    "notes": "NitricacidliteralH–O–N(=O)→O. NnốisingletớiO-H,triplanarOdoublevàOreceivingdativearrow;nguồnKHÔNGcharges/khônglonepairs. BắtbuộcgiữmũitênN→O (mũinhọnởOterminal),KHÔNGtựđổisang[N+]–[O−]hiểnthị. Hacidexplicit;khôngcaptiontrừ1384cób). SMILESdativeđượcRDKitđọc,phảikiểmrenderkhôngtựthêmH/charge.",
+    "questions": [
+      {
+        "qid": "DB-11-B6-D2-III-83",
+        "de": "Viết phương trình hoá học minh hoạ tác động của mưa acid đối với calcium carbonate trong núi đá vôi và với kim loại sắt có trong thép.",
+        "refs": [
+          {
+            "where": "DB-11-B6-D2-III-83.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B6-III-28",
+        "de": "Viết phương trình hoá học minh hoạ tác động của mưa acid đối với calcium carbonate trong núi đá vôi và với kim loại sắt có trong thép.",
+        "refs": [
+          {
+            "where": "DH-11-C2-B6-III-28.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "flags": {
+      "aromaticCircle": false,
+      "hasHighlightEllipse": false,
+      "hasStereoWedge": false,
+      "hasLewisElectronDots": false,
+      "hasDativeArrow": true,
+      "isTable": false,
+      "literalFormulaOnly": false,
+      "modelWithCaption": false
+    },
+    "labelHandling": "Giữcaption/header/nhãnđãliệtkê;khôngtựđặttênmoleculehoặcđánhnhãnPDFmới.",
+    "svg": "lewis-nitric-ddh-03107ea1b15c7634823c03d0ee0f7f62c7537cc199be18eba3b0cd76d278f74e.svg",
+    "hashSvg": "03107ea1b15c7634823c03d0ee0f7f62c7537cc199be18eba3b0cd76d278f74e",
+    "byteSvg": 3074,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "hashSvgDaSoat": "03107ea1b15c7634823c03d0ee0f7f62c7537cc199be18eba3b0cd76d278f74e",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
