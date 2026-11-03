@@ -1,0 +1,26 @@
+{
+  "i": 1198,
+  "hashNguon": "d8c61f86f9e6495b88f11b33d3434678b97f3e0e4f9d093439b0d9c91fbcbb24",
+  "nguoiSoat": "soat_nguon_2",
+  "tepNguon": "docs/hinh-vector-0311/nguon/anh/d8c61f86f9e6495b88f11b33d3434678b97f3e0e4f9d093439b0d9c91fbcbb24.png",
+  "daMoPNGNative": true,
+  "daKiemSha256": true,
+  "loai": "anh-chup-that",
+  "refs": [
+    {
+      "qid": "DH-12-C1-B1-P1-III-10",
+      "maDe": "DH-12-C1-B1-P1",
+      "where": "DH-12-C1-B1-P1-III-10.hinh.1.du_lieu",
+      "thuTuAnhTrongMang": 2,
+      "hashDataUrl": "c4ee86d2b0f58557d05efa35b969c4c67da1445ccd29c07f167b38252bc99551",
+      "de": "Geranyl acetate là ester có mùi hoa hồng, có công thức cấu tạo như hình dưới đây: Tổng số nguyên tử có trong phân tử geranyl acetate là bao nhiêu?",
+      "vaiTro": "Ảnh bông hồng phụ trợ. Hình cấu tạo của cùng câu là media thứ nhất, hash 1ae35a988392e280237d91af8b9abb3eb3458d565994d816523412a466b570d0 (chỉ số155)."
+    }
+  ],
+  "nhanXet": "Ảnh cận cảnh một bông hồng đỏ cùng lá/nền. Không có công thức cấu tạo, bản vẽ khoa học, chữ/nhãn, mũi tên hoặc dữ liệu cần dựng lại/đổi phông. Việc ảnh đã nén/giảm màu không biến nội dung thành bản vẽ.",
+  "xuLy": "Giữ nguyên ảnh thật và liên kết media; chỉ hình cấu tạo riêng của câu thuộc phần vẽ lại vector.",
+  "ghiChuViTri": "Vị trí xác minh được từ kiểm kê là phần tử hinh[1].du_lieu (ảnh thứ2). File kiểm kê không chứa vi_tri/viTri giao diện, không tự suy vị trí sau_de/sau_pa.",
+  "soCauVeMoi": 0,
+  "soHinhVectorMoi": 0,
+  "khongDocLoiGiaiDapAn": true
+}

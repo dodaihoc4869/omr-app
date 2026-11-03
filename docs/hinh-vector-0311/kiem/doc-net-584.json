@@ -1,0 +1,22 @@
+{
+  "i": 584,
+  "hashNguon": "6cea1e46f443413dfc7758dd50521447e4a95789d0d9c76018ccbc2ab3fca312",
+  "nguoiDocNguon": "soat_nguon_3",
+  "kichThuocPx": [
+    137,
+    115
+  ],
+  "daMoNative": true,
+  "zoom": "/workspace/scratch/source584-zoom.png",
+  "zoomPhuongPhap": "nearest-neighbour ×5, không nội suy chi tiết mới",
+  "qids": [
+    "DB-11-B8-D1-I-26",
+    "DH-11-C2-B8-I-2"
+  ],
+  "doiChieuHaiQid": "Cả hai dùng đúng cùng hash và cùng kích thước137×115; không có bản rõ hơn trong hai câu này.",
+  "timBanTrung": "Đã quét so hình1428asset, không tìm thấy bản khác cùng nội dung/độ phân giải cao hơn. Không khẳng định tuyệt đối không tồn tại ở nguồn ngoài kho.",
+  "bangChungRaster": "S–Hphải là một vệt ngang gần liên tục tại y57,x77..115, độ dày1–3px không tăng dần. Có răng cưa/vết lồi ngẫu nhiên, không thấy dãy vạch tách rời kiểu nêm đứt.",
+  "doRo": "Nguồn rất thấp; vùng S–H phải có nhiễu raster, không đủ căn cứ khẳng định chủ ý stereo của bản gốc trước khi raster hóa.",
+  "ketLuan": "Không đủ bằng chứng gọi S–Hphải là nêm đứt. Nên bám một nét đơn nằm ngang đọc thấy; không tự gán stereo.",
+  "khongSuyDien": "Không suy từ H2SO4chuẩn, quy tắc octet, đáp án hoặc các ảnh277/102/1285 vì chúng là cấu trúc khác."
+}

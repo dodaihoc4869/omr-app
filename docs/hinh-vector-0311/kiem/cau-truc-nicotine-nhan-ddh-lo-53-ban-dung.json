@@ -1,0 +1,30 @@
+[
+  {
+    "i": 1141,
+    "hash": "ce1617fd5c91c001258a7067b314decf60d58f469affc264da9c58c0f034a9b7",
+    "fileNguon": "anh/ce1617fd5c91c001258a7067b314decf60d58f469affc264da9c58c0f034a9b7.png",
+    "svg": "hinh-ddh-4d6fd077d37b3f28fd5beecca049ca13e1429f81e3739eb6c626a481cc6bd914.svg",
+    "hashSvg": "4d6fd077d37b3f28fd5beecca049ca13e1429f81e3739eb6c626a481cc6bd914",
+    "byteSvg": 3764,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChu": "Pyridinenitrogenvịtrí1,nhánhpyrrolidinegắnvịtrí3,vòng5N-methyl;giữ(1)trongvòng5vàCH3tườngminh.",
+    "hashSvgDaSoat": "4d6fd077d37b3f28fd5beecca049ca13e1429f81e3739eb6c626a481cc6bd914",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 1227,
+    "hash": "ded3e1cec6778bb2ff03f54e575e01f80424105447e8138e2d19548fd4fd2e8e",
+    "fileNguon": "anh/ded3e1cec6778bb2ff03f54e575e01f80424105447e8138e2d19548fd4fd2e8e.png",
+    "svg": "hinh-ddh-eb834cc9b4cbd51d09c99265169ddd8908843a886efc57ba6c21ef6ad5241f2d.svg",
+    "hashSvg": "eb834cc9b4cbd51d09c99265169ddd8908843a886efc57ba6c21ef6ad5241f2d",
+    "byteSvg": 3427,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChu": "GiữN(1)pyrrolidine/N(2)pyridine;N-methylẩnđầunétthẳng,khôngtựthêmCH3text;khôngstereo.",
+    "hashSvgDaSoat": "eb834cc9b4cbd51d09c99265169ddd8908843a886efc57ba6c21ef6ad5241f2d",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

@@ -1,0 +1,122 @@
+[
+  {
+    "hash": "a27b8e35b4c3322c6bccb0ea0d657de5846cf73624b948493c7742c517bcf746",
+    "file": "anh/a27b8e35b4c3322c6bccb0ea0d657de5846cf73624b948493c7742c517bcf746.png",
+    "mime": "image/png",
+    "bytes": 1639,
+    "i": 886,
+    "refs": [
+      {
+        "qid": "DB-12-B2-D1-I-175",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "where": [
+          "DB-12-B2-D1-I-175.hinh.2.du_lieu"
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B2-I-45",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "where": [
+          "DH-12-C1-B2-I-45.hinh.2.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "CCCCCCCCCCCCc1ccc(S(=O)(=O)[O-])cc1.[Na+]",
+    "notes": "12C thẳng + benzene para; Kekule; no caption",
+    "caption": [],
+    "circle": false,
+    "trangThai": "da-soat-doc-lap",
+    "fileNguon": "anh/a27b8e35b4c3322c6bccb0ea0d657de5846cf73624b948493c7742c517bcf746.png",
+    "soQids": 2,
+    "nhanPdfCoTheBo": [],
+    "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn.",
+    "explicitH": false,
+    "svg": "hinh-ddh-9a4a7d22745a018f9566926448c6a6474fbb7bccdf06fe99e470bc8f68a0a43b.svg",
+    "hashSvg": "9a4a7d22745a018f9566926448c6a6474fbb7bccdf06fe99e470bc8f68a0a43b",
+    "byteSvg": 3003,
+    "font": "DDH Rounded",
+    "nhomDungChung": 876,
+    "hashSvgDaSoat": "9a4a7d22745a018f9566926448c6a6474fbb7bccdf06fe99e470bc8f68a0a43b",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "hash": "e701771752729524942f6190583abaceb1828caaa2bd443a0d3611d38bd36888",
+    "file": "anh/e701771752729524942f6190583abaceb1828caaa2bd443a0d3611d38bd36888.png",
+    "mime": "image/png",
+    "bytes": 1920,
+    "i": 1272,
+    "refs": [
+      {
+        "qid": "DB-12-B2-D1-I-175",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "where": [
+          "DB-12-B2-D1-I-175.hinh.3.du_lieu"
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B2-I-45",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "where": [
+          "DH-12-C1-B2-I-45.hinh.3.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "CC(C)C(c1ccc(S(=O)(=O)[O-])cc1)C(C)CC(C)C(C)C.[Na+]",
+    "caption": [],
+    "circle": false,
+    "explicitH": false,
+    "notes": "Cùng graph1134, native không có D.; không tự thêm chữ D. Alkyl12C.",
+    "trangThai": "da-soat-doc-lap",
+    "fileNguon": "anh/e701771752729524942f6190583abaceb1828caaa2bd443a0d3611d38bd36888.png",
+    "soQids": 2,
+    "nhanPdfCoTheBo": [],
+    "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn.",
+    "svg": "hinh-ddh-b4ee48a581fcf41b7845bf845580cc07b0e942289b048b54e15278a16735c3f9.svg",
+    "hashSvg": "b4ee48a581fcf41b7845bf845580cc07b0e942289b048b54e15278a16735c3f9",
+    "byteSvg": 3018,
+    "font": "DDH Rounded",
+    "nhomDungChung": 910,
+    "hashSvgDaSoat": "b4ee48a581fcf41b7845bf845580cc07b0e942289b048b54e15278a16735c3f9",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "hash": "ecb43272cf41c432b9889564681590693a0f5c7906d29e4da84b81646b371cd5",
+    "file": "anh/ecb43272cf41c432b9889564681590693a0f5c7906d29e4da84b81646b371cd5.png",
+    "mime": "image/png",
+    "bytes": 1588,
+    "i": 1308,
+    "refs": [
+      {
+        "qid": "DB-12-B8-D1-II-398",
+        "de": "Naftifine là một chất có tác dụng chống nấm. Naftifine có cấu tạo như hình sau:",
+        "where": [
+          "DB-12-B8-D1-II-398.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B8-II-19",
+        "de": "Naftifine là một chất có tác dụng chống nấm. Naftifine có cấu tạo như hình sau:",
+        "where": [
+          "DH-12-C3-B8-II-19.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "CN(C/C=C/c1ccccc1)Cc1cccc2ccccc12",
+    "caption": [],
+    "circle": false,
+    "explicitH": false,
+    "notes": "3C N–CH2–CH=CH–Ph E; naphthalen-1-ylmethyl; Kekulé; không caption.",
+    "trangThai": "da-soat-doc-lap",
+    "fileNguon": "anh/ecb43272cf41c432b9889564681590693a0f5c7906d29e4da84b81646b371cd5.png",
+    "soQids": 2,
+    "nhanPdfCoTheBo": [],
+    "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn.",
+    "svg": "cau-truc-b4b3a09f868564ed27da6fa7961569df097db590117b7eab9e349012d20faef0.svg",
+    "hashSvg": "b4b3a09f868564ed27da6fa7961569df097db590117b7eab9e349012d20faef0",
+    "byteSvg": 12692,
+    "font": "DDH Rounded",
+    "nhomDungChung": 194,
+    "hashSvgDaSoat": "b4b3a09f868564ed27da6fa7961569df097db590117b7eab9e349012d20faef0",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

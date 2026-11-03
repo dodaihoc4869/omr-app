@@ -1,0 +1,149 @@
+[
+  {
+    "hash": "2149c3844e589dc1af43a19ffc0b58669a55de592aaab951f128e7c53d20f18c",
+    "file": "anh/2149c3844e589dc1af43a19ffc0b58669a55de592aaab951f128e7c53d20f18c.png",
+    "mime": "image/png",
+    "bytes": 5567,
+    "i": 194,
+    "refs": [
+      {
+        "qid": "12-C3-B8-D2-II-19",
+        "de": "Naftifine là một chất có tác dụng chống nấm. Naftifine có cấu tạo như hình sau:",
+        "where": [
+          "12-C3-B8-D2-II-19.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DB-12-B8-D2-II-26",
+        "de": "Naftifine là một chất có tác dụng chống nấm. Naftifine có cấu tạo như hình sau:",
+        "where": [
+          "DB-12-B8-D2-II-26.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "CN(C/C=C/c1ccccc1)Cc1cccc2ccccc12",
+    "notes": "3C N–CH2–CH=CH–Ph; E; naphthalen-1-ylmethyl; no circle/caption",
+    "caption": [],
+    "circle": false,
+    "trangThai": "da-doc-nguon-chua-duyet-ban-ve",
+    "fileNguon": "anh/2149c3844e589dc1af43a19ffc0b58669a55de592aaab951f128e7c53d20f18c.png",
+    "soQids": 2,
+    "nhanPdfCoTheBo": [],
+    "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn.",
+    "explicitH": false,
+    "phongApp": true,
+    "canvasWidth": 1000,
+    "canvasHeight": 430,
+    "methylTuongMinh": true
+  },
+  {
+    "hash": "97636875178cc88d54e0384eed8d1fd619feedb7c2c4b4db901a1357d35ff540",
+    "file": "anh/97636875178cc88d54e0384eed8d1fd619feedb7c2c4b4db901a1357d35ff540.png",
+    "mime": "image/png",
+    "bytes": 4705,
+    "i": 817,
+    "refs": [
+      {
+        "qid": "12-C3-B9-D2-I-41",
+        "de": "Glutathione là một chất có khả năng chống oxi hóa tự nhiên trong cơ thể, bảo vệ tế bào khỏi tổn thương, loại bỏ các chất độc hại và các gốc tự do gây hại cho tế bào.\nCông thức cấu tạo của glutathione: HOOC-CH(NH₂)-CH₂CH₂-CO-NH-CH(CH₂SH)-CO-NH-CH₂-COOH (γ-Glu-Cys-Gly).\nPhát biểu nào sau đây không đúng?",
+        "where": [
+          "12-C3-B9-D2-I-41.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P2-D1-I-55",
+        "de": "Glutathione là một chất có khả năng chống oxi hóa tự nhiên trong cơ thể, bảo vệ tế bào khỏi tổn thương, loại bỏ các chất độc hại và các gốc tự do gây hại cho tế bào.\nCông thức cấu tạo của glutathione: HOOC-CH(NH₂)-CH₂CH₂-CO-NH-CH(CH₂SH)-CO-NH-CH₂-COOH (γ-Glu-Cys-Gly).\nPhát biểu nào sau đây không đúng?",
+        "where": [
+          "DB-12-B9-P2-D1-I-55.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "NC(CCC(=O)NC(CS)C(=O)NCC(=O)O)C(=O)O",
+    "notes": "gamma-Glu–Cys–Gly; no wedge/stereo in PNG; no caption",
+    "caption": [],
+    "circle": false,
+    "trangThai": "da-doc-nguon-chua-duyet-ban-ve",
+    "fileNguon": "anh/97636875178cc88d54e0384eed8d1fd619feedb7c2c4b4db901a1357d35ff540.png",
+    "soQids": 2,
+    "nhanPdfCoTheBo": [],
+    "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn.",
+    "explicitH": false,
+    "phongApp": true,
+    "canvasWidth": 1000,
+    "canvasHeight": 430
+  },
+  {
+    "hash": "aaa84962cfbf02ad34561142bb878d322143216079154f9deb731261a54e565b",
+    "file": "anh/aaa84962cfbf02ad34561142bb878d322143216079154f9deb731261a54e565b.png",
+    "mime": "image/png",
+    "bytes": 5048,
+    "i": 945,
+    "refs": [
+      {
+        "qid": "12-C1-B2-I-51",
+        "de": "Hợp chất hữu cơ X có công thức cấu tạo như sau:\nPhát biểu nào sau đây đúng?",
+        "where": [
+          "12-C1-B2-I-51.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DB-12-B2-D1-I-35",
+        "de": "Hợp chất hữu cơ X có công thức cấu tạo như sau:\nPhát biểu nào sau đây đúng?",
+        "where": [
+          "DB-12-B2-D1-I-35.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "CCCCCCCCCCCCCCCC(=O)[O-].[K+]",
+    "notes": "16C including carbonyl; source OK; no caption",
+    "caption": [],
+    "circle": false,
+    "trangThai": "da-doc-nguon-chua-duyet-ban-ve",
+    "fileNguon": "anh/aaa84962cfbf02ad34561142bb878d322143216079154f9deb731261a54e565b.png",
+    "soQids": 2,
+    "nhanPdfCoTheBo": [],
+    "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn.",
+    "explicitH": false,
+    "phongApp": true,
+    "canvasWidth": 1000,
+    "canvasHeight": 330,
+    "terminalCationText": "OK"
+  },
+  {
+    "hash": "bbf27e738832a378ea57bf5b36734478d601754eed6b01fb92b167d6000eb990",
+    "file": "anh/bbf27e738832a378ea57bf5b36734478d601754eed6b01fb92b167d6000eb990.png",
+    "mime": "image/png",
+    "bytes": 5174,
+    "i": 1044,
+    "refs": [
+      {
+        "qid": "12-C1-B2-I-52",
+        "de": "Hợp chất hữu cơ X có công thức cấu tạo như sau:\nPhát biểu nào sau đây không đúng?",
+        "where": [
+          "12-C1-B2-I-52.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DB-12-B2-D1-I-36",
+        "de": "Hợp chất hữu cơ X có công thức cấu tạo như sau:\nPhát biểu nào sau đây không đúng?",
+        "where": [
+          "DB-12-B2-D1-I-36.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "CCCCCCCCCCCCc1ccc(S(=O)(=O)[O-])cc1.[Na+]",
+    "notes": "12C thẳng + para benzene; explicit S(=O)2ONa; Kekule",
+    "caption": [],
+    "circle": false,
+    "trangThai": "da-doc-nguon-chua-duyet-ban-ve",
+    "fileNguon": "anh/bbf27e738832a378ea57bf5b36734478d601754eed6b01fb92b167d6000eb990.png",
+    "soQids": 2,
+    "nhanPdfCoTheBo": [],
+    "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn.",
+    "explicitH": false,
+    "phongApp": true,
+    "canvasWidth": 1000,
+    "canvasHeight": 330,
+    "terminalONa": true
+  }
+]

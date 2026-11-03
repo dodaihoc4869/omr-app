@@ -1,0 +1,333 @@
+[
+  {
+    "i": 87,
+    "hash": "118ee34ae022113b39936d0099c05d7e09078b2ba6e488995550604823d32236",
+    "fileNguon": "anh/118ee34ae022113b39936d0099c05d7e09078b2ba6e488995550604823d32236.png",
+    "nguoiDoc": "cau_truc_6",
+    "daMoPNGGocNative": true,
+    "kind": "polymer-literal",
+    "repeat": "–NH–[CH₂]₃–CO–",
+    "outerBracket": "Ngoặc tròn trái/phải ôm cả repeat, n chỉ số dưới ngoài ngoặc phải.",
+    "innerBracket": "Ngoặc vuông quanh CH₂, 3 chỉ số dưới ngoài ngoặc vuông phải; không đổi thành 5.",
+    "functionalGroups": "NH amide, nhóm CO viết condensed liền CO (nguồn không vẽ O bằng liên kết đôi riêng).",
+    "chainEnds": "Nét ngang kéo xuyên ngoặc tròn ở cả hai đầu; không đầu NH₂/COOH.",
+    "labels": [],
+    "caption": [],
+    "smiles": null,
+    "notes": "Không khai triển CH₂3 thành nét xương nếu làm mất số lặp; giữ đúng NH và CO, không tự sửa theo tính toán từ thân câu.",
+    "contexts": [
+      {
+        "qid": "12-C4-B13-I-68",
+        "de": "Thuỷ phân hoàn toàn một polymer X thu được một amino acid Y mạch không phân nhánh, có nhóm amine ở một đầu mạch của phân tử. Kết quả phân tích nguyên tố cho biết phân tử Y có phần trăm khối lượng các nguyên tố C, H, N lần lượt bằng 54,96%, 9,85% và 10,61%, còn lại là oxygen. Từ phổ khối lượng (MS) xác định được phân tử khối của Y bằng 131.\nTừ Y, bằng phản ứng trùng ngưng lại thu được polymer X ban đầu.\nCông thức của polymer X là",
+        "ref": {
+          "where": "12-C4-B13-I-68.hinh.0.du_lieu",
+          "hashDataUrl": "fbdf7e27a3ad29b06ee3d88fd0e771e9013562c3e55a60fc5d73b8afd398038f",
+          "viTri": "sau_pa_A",
+          "truong": "hinh",
+          "congKhaiTruocNop": true
+        }
+      }
+    ],
+    "nhanPDF": "Không in nhãn PA trong PNG. Giữ caption rỗng, nhãn ngoài ảnh theo refs; 684 là sau_de không nhãn.",
+    "backbone": [
+      "NH",
+      "[CH₂]₃",
+      "CO"
+    ],
+    "branches": [],
+    "svg": "polymer-ddh-3fc01332580a3afdbd8a2a51abf4ba75d96e1cb77a7a73595a68b9e4cf3dfdbd.svg",
+    "hashSvg": "3fc01332580a3afdbd8a2a51abf4ba75d96e1cb77a7a73595a68b9e4cf3dfdbd",
+    "byteSvg": 5701,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "hashSvgDaSoat": "3fc01332580a3afdbd8a2a51abf4ba75d96e1cb77a7a73595a68b9e4cf3dfdbd",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 488,
+    "hash": "5ad0e19dcb44d2580ccf22ce20fc5128f12453d7c96413f43ba1d0100b210cec",
+    "fileNguon": "anh/5ad0e19dcb44d2580ccf22ce20fc5128f12453d7c96413f43ba1d0100b210cec.png",
+    "nguoiDoc": "cau_truc_6",
+    "daMoPNGGocNative": true,
+    "kind": "polymer-literal",
+    "repeat": "–NH–CH(CH₃)–C(=O)–",
+    "layout": "NH–CH–C nằm hàng ngang; CH₃ nhánh thẳng xuống từ CH; O nằm dưới C, hai nét dọc song song C=O.",
+    "outerBracket": "Ngoặc tròn hai bên ôm cả repeat gồm nhánh CH₃ và O dưới; n chỉ số dưới ngoài phải.",
+    "functionalGroups": "NH amide và C=O; methyl ở alpha CH.",
+    "chainEnds": "Nét ngang vượt ra ngoài ngoặc hai đầu; không thêm nhóm kết thúc.",
+    "labels": [],
+    "caption": [],
+    "smiles": null,
+    "notes": "NH đúng một H, CH đúng một H; không NH₂, không mất methyl.",
+    "contexts": [
+      {
+        "qid": "12-C4-B13-I-68",
+        "de": "Thuỷ phân hoàn toàn một polymer X thu được một amino acid Y mạch không phân nhánh, có nhóm amine ở một đầu mạch của phân tử. Kết quả phân tích nguyên tố cho biết phân tử Y có phần trăm khối lượng các nguyên tố C, H, N lần lượt bằng 54,96%, 9,85% và 10,61%, còn lại là oxygen. Từ phổ khối lượng (MS) xác định được phân tử khối của Y bằng 131.\nTừ Y, bằng phản ứng trùng ngưng lại thu được polymer X ban đầu.\nCông thức của polymer X là",
+        "ref": {
+          "where": "12-C4-B13-I-68.hinh.1.du_lieu",
+          "hashDataUrl": "ec3aa9de0b7181da9d2cc7b1f4c41060538663a7c66a6a48495b42e8825d967e",
+          "viTri": "sau_pa_B",
+          "truong": "hinh",
+          "congKhaiTruocNop": true
+        }
+      }
+    ],
+    "nhanPDF": "Không in nhãn PA trong PNG. Giữ caption rỗng, nhãn ngoài ảnh theo refs; 684 là sau_de không nhãn.",
+    "backbone": [
+      "NH",
+      "CH",
+      "C"
+    ],
+    "branches": [
+      {
+        "site": 2,
+        "label": "CH₃"
+      },
+      {
+        "site": 3,
+        "label": "O",
+        "bond": "double"
+      }
+    ],
+    "svg": "polymer-ddh-84d95cac3a8ba3c2ef0fb44c32026e880df92201042baab6f24922a0991ad9b5.svg",
+    "hashSvg": "84d95cac3a8ba3c2ef0fb44c32026e880df92201042baab6f24922a0991ad9b5",
+    "byteSvg": 5821,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "hashSvgDaSoat": "84d95cac3a8ba3c2ef0fb44c32026e880df92201042baab6f24922a0991ad9b5",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 641,
+    "hash": "77211d8fd7c59f16c16efea6bd88152bc8e27cf7380ce3b4f114ca6efaa7cefd",
+    "fileNguon": "anh/77211d8fd7c59f16c16efea6bd88152bc8e27cf7380ce3b4f114ca6efaa7cefd.png",
+    "nguoiDoc": "cau_truc_6",
+    "daMoPNGGocNative": true,
+    "kind": "polymer-literal",
+    "repeat": "–CH₂–CH(CH₃)–",
+    "layout": "CH₂–CH nằm ngang, từ CH một nét dọc xuống CH₃; các chỉ số2/3 nhỏ dưới dòng.",
+    "outerBracket": "Ngoặc tròn ôm repeat, n chỉ số dưới ngoài phải.",
+    "chainEnds": "Nét đơn ngang kéo qua ngoặc ở hai đầu.",
+    "labels": [],
+    "caption": [],
+    "smiles": null,
+    "notes": "Không thay nhánh CH₃ thành H, không thêm stereo.",
+    "contexts": [
+      {
+        "qid": "12-KT-C34-D2-I-8",
+        "de": "Cấu tạo của một đoạn mạch polymer X như hình dưới. Công thức của polymer X là",
+        "ref": {
+          "where": "12-KT-C34-D2-I-8.hinh.1.du_lieu",
+          "hashDataUrl": "ab000459e638bddec3abafe9b373dc2285264c176fd9b0511dd1e9219f0ca434",
+          "viTri": "sau_pa_A",
+          "truong": "hinh",
+          "congKhaiTruocNop": true
+        }
+      }
+    ],
+    "nhanPDF": "Không in nhãn PA trong PNG. Giữ caption rỗng, nhãn ngoài ảnh theo refs; 684 là sau_de không nhãn.",
+    "backbone": [
+      "CH₂",
+      "CH"
+    ],
+    "branches": [
+      {
+        "site": 2,
+        "label": "CH₃"
+      }
+    ],
+    "svg": "polymer-ddh-cd399b62ca25b8f64b05431d805dd6249dc2c0438370e0a359d79edd4ecdb1e9.svg",
+    "hashSvg": "cd399b62ca25b8f64b05431d805dd6249dc2c0438370e0a359d79edd4ecdb1e9",
+    "byteSvg": 5002,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "hashSvgDaSoat": "cd399b62ca25b8f64b05431d805dd6249dc2c0438370e0a359d79edd4ecdb1e9",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 418,
+    "hash": "4aa5b55630aed2168df89a1abd60f4620c4eb0489d7aa993b15cbe55663d935b",
+    "fileNguon": "anh/4aa5b55630aed2168df89a1abd60f4620c4eb0489d7aa993b15cbe55663d935b.png",
+    "nguoiDoc": "cau_truc_6",
+    "daMoPNGGocNative": true,
+    "kind": "polymer-literal",
+    "repeat": "–CH₂–CH₂–",
+    "layout": "Hai CH₂ hàng ngang nối đơn, cả hai chỉ số2 nhỏ dưới dòng.",
+    "outerBracket": "Ngoặc tròn trái/phải, n dưới bên ngoài phải.",
+    "chainEnds": "Nét ngang vượt ngoặc hai đầu; không nhánh.",
+    "labels": [],
+    "caption": [],
+    "smiles": null,
+    "notes": "Giữ khác641: không CH/CH₃ nhánh.",
+    "contexts": [
+      {
+        "qid": "12-KT-C34-D2-I-8",
+        "de": "Cấu tạo của một đoạn mạch polymer X như hình dưới. Công thức của polymer X là",
+        "ref": {
+          "where": "12-KT-C34-D2-I-8.hinh.4.du_lieu",
+          "hashDataUrl": "1c5d1335963e91373448ec6fd41ce35050c37e2501a776c68312ee969f88e073",
+          "viTri": "sau_pa_D",
+          "truong": "hinh",
+          "congKhaiTruocNop": true
+        }
+      }
+    ],
+    "nhanPDF": "Không in nhãn PA trong PNG. Giữ caption rỗng, nhãn ngoài ảnh theo refs; 684 là sau_de không nhãn.",
+    "backbone": [
+      "CH₂",
+      "CH₂"
+    ],
+    "branches": [],
+    "svg": "polymer-ddh-060a56878eed0bde096513b55aa31750047f722ce6482fa090add02b7ace3e51.svg",
+    "hashSvg": "060a56878eed0bde096513b55aa31750047f722ce6482fa090add02b7ace3e51",
+    "byteSvg": 3904,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "hashSvgDaSoat": "060a56878eed0bde096513b55aa31750047f722ce6482fa090add02b7ace3e51",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 684,
+    "hash": "7eab11a85d3d5fc3d8bda4f59a1fe1ac392311f426135fe121558399cc50cfe8",
+    "fileNguon": "anh/7eab11a85d3d5fc3d8bda4f59a1fe1ac392311f426135fe121558399cc50cfe8.png",
+    "nguoiDoc": "cau_truc_6",
+    "daMoPNGGocNative": true,
+    "kind": "polymer-skeletal-segment",
+    "repeatUnderlying": "–CH₂–CH(CH₃)– nhưng nguồn không có công thức chữ/ngoặc/n; dựng literal hình đoạn mạch",
+    "sourceSize": [
+      887,
+      179
+    ],
+    "spineVerticesSolid": [
+      [
+        143,
+        131
+      ],
+      [
+        203,
+        97
+      ],
+      [
+        263,
+        131
+      ],
+      [
+        324,
+        97
+      ],
+      [
+        384,
+        131
+      ],
+      [
+        444,
+        97
+      ],
+      [
+        504,
+        131
+      ],
+      [
+        565,
+        97
+      ],
+      [
+        625,
+        131
+      ],
+      [
+        685,
+        97
+      ],
+      [
+        745,
+        131
+      ]
+    ],
+    "branches": [
+      {
+        "from": [
+          203,
+          97
+        ],
+        "to": [
+          203,
+          45
+        ]
+      },
+      {
+        "from": [
+          324,
+          97
+        ],
+        "to": [
+          324,
+          45
+        ]
+      },
+      {
+        "from": [
+          444,
+          97
+        ],
+        "to": [
+          444,
+          45
+        ]
+      },
+      {
+        "from": [
+          565,
+          97
+        ],
+        "to": [
+          565,
+          45
+        ]
+      },
+      {
+        "from": [
+          685,
+          97
+        ],
+        "to": [
+          685,
+          45
+        ]
+      }
+    ],
+    "branchMeaning": "Năm nét đơn thẳng lên, mỗi đầu mút ngầm một methyl. Cả năm cùng phía trên của trang; không suy R/S.",
+    "chainEnds": "Hai đoạn tiếp mạch nét đứt chéo: trái từ khoảng(84,97) tới(143,131); phải từ(745,131) tới(808,97). Đây tiếp mạch vô hạn, không nhóm cuối thật.",
+    "bondOrders": "Tất cả liên kết đơn; không nêm, không liên kết đôi.",
+    "labels": [],
+    "caption": [],
+    "smiles": null,
+    "notes": "Không coi đầu mút nét đứt là C kết thúc hữu hạn. Không tự thêm n/ngoặc/methyl text hay đổi chiều nhánh.",
+    "contexts": [
+      {
+        "qid": "12-KT-C34-D2-I-8",
+        "de": "Cấu tạo của một đoạn mạch polymer X như hình dưới. Công thức của polymer X là",
+        "ref": {
+          "where": "12-KT-C34-D2-I-8.hinh.0.du_lieu",
+          "hashDataUrl": "a4e8e7e3bf651cebf70467bd6e1a5c09787b9bb8b16ade34d47f5ab34f29b4b8",
+          "viTri": "sau_de",
+          "truong": "hinh",
+          "congKhaiTruocNop": true
+        }
+      }
+    ],
+    "nhanPDF": "Không in nhãn PA trong PNG. Giữ caption rỗng, nhãn ngoài ảnh theo refs; 684 là sau_de không nhãn.",
+    "svg": "polymer-ddh-717546d3117cf9228c06eea17571dc386b5a809649ae713d38f1967bef902f94.svg",
+    "hashSvg": "717546d3117cf9228c06eea17571dc386b5a809649ae713d38f1967bef902f94",
+    "byteSvg": 922,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "hashSvgDaSoat": "717546d3117cf9228c06eea17571dc386b5a809649ae713d38f1967bef902f94",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

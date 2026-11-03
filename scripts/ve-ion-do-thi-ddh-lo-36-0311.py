@@ -1,4 +1,4 @@
-"""Nguồn1229: hai CH2 trong ngoặc2, NH3+/COO− đúng nguyên văn."""
+"""Hai hình ion và đồ thị nồng độ theo đúng nguồn."""
 from pathlib import Path
 import json,hashlib,importlib.util
 G=Path(__file__).resolve().parents[1];P=G/'docs/hinh-vector-0311';M=P/'kiem';sp=importlib.util.spec_from_file_location('phong',G/'scripts/phong-vector-0311.py');F=importlib.util.module_from_spec(sp);sp.loader.exec_module(F);A=sorted(json.loads((P/'nguon/kiem-ke.json').read_text())['assets'],key=lambda a:a['hash']);rows=[]

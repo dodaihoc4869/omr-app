@@ -1,0 +1,34 @@
+[
+  {
+    "i": 194,
+    "hashSvg": "b4b3a09f868564ed27da6fa7961569df097db590117b7eab9e349012d20faef0",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNGnguồn và renderSVGthật. Đếm đúng3C nhánh N–CH2–CH=CH–Ph, nối đôiE giữ đối phía; naphthalen-1-ylmethyl gắn N qua1CH2,CH3N tườngminh; đủ10C naphthalene/6C phenyl/5đôi naphthalene+3đôi phenyl,không thêm NH/charge. DDH glyph thànhpath,bond/nhánh đúng khôngchạm/cắt/tràn,SHA256khớp.",
+    "hash": "2149c3844e589dc1af43a19ffc0b58669a55de592aaab951f128e7c53d20f18c",
+    "hashSvgDaSoat": "b4b3a09f868564ed27da6fa7961569df097db590117b7eab9e349012d20faef0"
+  },
+  {
+    "i": 817,
+    "hashSvg": "b459f822b12e990b2ad874bb6123ded99a0da115703d921d30ee038e6e7a579d",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNGnguồn và renderSVGthật. Đúnggamma-Glu–Cys–Gly:COOHalpha củaGlu tựdo,NH2alpha;Glu–CH2–CH2–CO–NH nốiCys,không đổi thànhalpha-peptide. Cys–CH(CH2SH)–CO–NH–CH2–COOH đủ2amideNH/4carbonyl/2COOH/SH,NH2;không thêmstereo/charge. DDH glyph thànhpath,bond/nhánh đúng khôngchạm/cắt/tràn,SHA256khớp.",
+    "hash": "97636875178cc88d54e0384eed8d1fd619feedb7c2c4b4db901a1357d35ff540",
+    "hashSvgDaSoat": "b459f822b12e990b2ad874bb6123ded99a0da115703d921d30ee038e6e7a579d"
+  },
+  {
+    "i": 945,
+    "hashSvg": "816c0e3b30295d1080cfb9196776ad6ab7f1286c3bc17d0575050e5bf9fb8339",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mởPNGnguồn vàrenderSVGthật;đếm16C tổng bao gồmCcarbonyl(CH3+14CH2+CO),mạchthẳngkhôngC=C/nhánh;2O vớiC=O vànhãnOK liềnnhưnguồn,giữK khôngđổiNa/khôngthêmK+hayO−/khôngHhaycaption mới. DDHpath đúngfontapp,nhãnO/S/OK/ONa khôngchạm/cắt/tràn.",
+    "hash": "aaa84962cfbf02ad34561142bb878d322143216079154f9deb731261a54e565b",
+    "hashSvgDaSoat": "816c0e3b30295d1080cfb9196776ad6ab7f1286c3bc17d0575050e5bf9fb8339"
+  },
+  {
+    "i": 1044,
+    "hashSvg": "f007de27c8bc29a69efb2d38ec1297eb6702711c4687cc7cbf5d2b8e3e847c00",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mởPNGnguồn vàrenderSVGthật;đếm12C alkyl thẳng riêng+6C vòngbenzene=18C;vịtrípara,S(=O)2ONa gồm3O/2S=O/1S–ONa,3đôivòngKekule đúngnguồn;nhãnONa khôngthêmcharge/khôngHhaycaption mới. DDHpath đúngfontapp,nhãnO/S/OK/ONa khôngchạm/cắt/tràn.",
+    "hash": "bbf27e738832a378ea57bf5b36734478d601754eed6b01fb92b167d6000eb990",
+    "hashSvgDaSoat": "f007de27c8bc29a69efb2d38ec1297eb6702711c4687cc7cbf5d2b8e3e847c00"
+  }
+]

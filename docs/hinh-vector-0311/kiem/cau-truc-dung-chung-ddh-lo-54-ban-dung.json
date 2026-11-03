@@ -1,0 +1,44 @@
+[
+  {
+    "i": 419,
+    "hash": "4ae4e85023ce48f57a9069414b06c8c355f0f7140e7873af8b731021b1483f03",
+    "fileNguon": "anh/4ae4e85023ce48f57a9069414b06c8c355f0f7140e7873af8b731021b1483f03.png",
+    "svg": "hinh-ddh-9a4a7d22745a018f9566926448c6a6474fbb7bccdf06fe99e470bc8f68a0a43b.svg",
+    "hashSvg": "9a4a7d22745a018f9566926448c6a6474fbb7bccdf06fe99e470bc8f68a0a43b",
+    "byteSvg": 3003,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "bangChungViTri": [
+      {
+        "where": "12-C1-B2-I-54.hinh.2.du_lieu",
+        "hashDataUrl": "91b75eaa5815bac2b2c1f3d5bad70f5cbc93b3ce887202bdcb0da0f073939e18",
+        "viTri": "sau_pa_C",
+        "truong": "hinh",
+        "congKhaiTruocNop": true
+      },
+      {
+        "where": "DB-12-B2-D1-I-37.hinh.2.du_lieu",
+        "hashDataUrl": "91b75eaa5815bac2b2c1f3d5bad70f5cbc93b3ce887202bdcb0da0f073939e18",
+        "viTri": "sau_pa_C",
+        "truong": "hinh",
+        "congKhaiTruocNop": true
+      }
+    ],
+    "bangChungDe": [
+      {
+        "qid": "12-C1-B2-I-54",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?"
+      },
+      {
+        "qid": "DB-12-B2-D1-I-37",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?"
+      }
+    ],
+    "caption": [],
+    "xuLyNhanGiay": "Bỏ C. PDF sát mép; mọi ref đều sau_pa_C, câu dẫn generic không gọiC;app tự hiển thịnhãn vàhoánvị,giữqid/order/đápán.",
+    "ghiChu": "12Calkylthẳng,vòngbenzeneparaSO3Na/3đôivòng,khôngcharge.",
+    "hashSvgDaSoat": "9a4a7d22745a018f9566926448c6a6474fbb7bccdf06fe99e470bc8f68a0a43b",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

@@ -1,0 +1,283 @@
+[
+  {
+    "i": 848,
+    "hash": "9bb7aa06b64ca2d835e85ce63916337dfab7c55fc56377de55a99fb584e1c084",
+    "fileNguon": "anh/9bb7aa06b64ca2d835e85ce63916337dfab7c55fc56377de55a99fb584e1c084.png",
+    "daMoNguonPNG": true,
+    "caption": [],
+    "chon": true,
+    "nhom": "literal-ion",
+    "literal": "H₃N–CH₂–CH₂–COO⁻",
+    "notes": "Nguồn hiện H₃N KHÔNG thấy dấu +. Hai carbon zigzag giữa N và COO, tổng 3C. Chỉ COO có dấu −. Không tự thêm + hoặc sửa H₃N thành NH₂; dựng literal, không SMILES chuẩn hóa ion. Không caption.",
+    "questions": [
+      {
+        "qid": "12-C3-B10-D2-I-3",
+        "de": "Cơ thể người mã hoá được loại amino acid nào sau đây trong tổng hợp protein cho cơ thể?",
+        "refs": [
+          {
+            "where": "12-C3-B10-D2-I-3.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 876,
+    "hash": "9f566e6767cafeb00d1be0fdeae9a8caf2be22da5386ebb281ebfb8d403acc89",
+    "fileNguon": "anh/9f566e6767cafeb00d1be0fdeae9a8caf2be22da5386ebb281ebfb8d403acc89.png",
+    "daMoNguonPNG": true,
+    "caption": [],
+    "chon": true,
+    "nhom": "alkylbenzene-sulfonate",
+    "smiles": "[Na+].CCCCCCCCCCCCc1ccc(S(=O)(=O)[O-])cc1",
+    "notes": "Vòng benzene 3 liên kết đôi luân phiên, KHÔNG vòng tròn. Alkyl thẳng 12C nối đỉnh trên; SO₃Na ở đỉnh dưới para. Nguồn hiện SO₃Na dạng gộp, không dấu điện tích riêng, không caption/stereo. Giữ nhãn SO₃Na, không thay ion rời nếu mất hình thức dữ liệu.",
+    "questions": [
+      {
+        "qid": "12-KT-C1-D1-I-16",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "refs": [
+          {
+            "where": "12-KT-C1-D1-I-16.hinh.2.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B2-D1-I-112",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "refs": [
+          {
+            "where": "DB-12-B2-D1-I-112.hinh.2.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 910,
+    "hash": "a6776074c5d6f23047a03c66de17473ce4aaf72adc56f9e2aa6a86fb5b6e5ce6",
+    "fileNguon": "anh/a6776074c5d6f23047a03c66de17473ce4aaf72adc56f9e2aa6a86fb5b6e5ce6.png",
+    "daMoNguonPNG": true,
+    "caption": [],
+    "chon": true,
+    "nhom": "branched-alkylbenzene-sulfonate",
+    "smiles": "CC(C)C(c1ccc(S(=O)(=O)[O-])cc1)C(C)CC(C)C(C)C.[Na+]",
+    "notes": "Mạch ngang 8C trái→phải: C1 đầu trái,C2 nhánh CH₃ lên,C3 nối benzene xuống,C4 nhánh CH₃ lên,C5 không nhánh,C6 nhánh CH₃ lên,C7 nhánh CH₃ xuống,C8 đầu phải. Tổng 12C ngoài vòng. SO₃Na para nhánh alkyl; vòng 3 đôi, không circle; không stereo/caption. Giữ SO₃Na gộp.",
+    "questions": [
+      {
+        "qid": "12-KT-C1-D1-I-16",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "refs": [
+          {
+            "where": "12-KT-C1-D1-I-16.hinh.3.du_lieu",
+            "viTri": "sau_pa_D"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B2-D1-I-112",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "refs": [
+          {
+            "where": "DB-12-B2-D1-I-112.hinh.3.du_lieu",
+            "viTri": "sau_pa_D"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1327,
+    "hash": "f0b5f21822060d0ce6192a681517a3957d00110fc0bdaf602bb1d4a71f45b68d",
+    "fileNguon": "anh/f0b5f21822060d0ce6192a681517a3957d00110fc0bdaf602bb1d4a71f45b68d.png",
+    "daMoNguonPNG": true,
+    "caption": [],
+    "chon": true,
+    "nhom": "haworth-literal",
+    "notes": "Vòng pyranose: O góc trên phải, C1 phải,C2 dưới phải,C3 dưới trái,C4 trái,C5 trên trái; cạnh trước C4-C3-C2 đậm. C5 CH₂OH lên/H xuống; C4 H lên/OH xuống; C3 OH lên/H xuống; C2 H lên/OH xuống; C1 H lên/OH xuống. Mọi H và OH explicit, không caption/điện tích. Không suy từ câu hỏi beta-glucose.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D3-I-188",
+        "de": "Ở trạng thái rắn, glucose chủ yếu tồn tại ở dạng mạch vòng β-glucose.\nCông thức cấu trúc nào dưới đây là của β-glucose?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-188.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-I-49",
+        "de": "Ở trạng thái rắn, glucose chủ yếu tồn tại ở dạng mạch vòng β-glucose.\nCông thức cấu trúc nào dưới đây là của β-glucose?",
+        "refs": [
+          {
+            "where": "DH-12-C2-B4-I-49.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 826,
+    "hash": "990cab886fadf0e315ae8824844d74929b0a6006ed9b44f0a11678a23b32f3ab",
+    "fileNguon": "anh/990cab886fadf0e315ae8824844d74929b0a6006ed9b44f0a11678a23b32f3ab.png",
+    "daMoNguonPNG": true,
+    "caption": [],
+    "chon": true,
+    "nhom": "haworth-literal",
+    "notes": "Cùng tọa độ vòng như1327: O trên phải; C5 CH₂OH lên/H xuống; C4 H lên/OH xuống; C3 OH lên/H xuống; C2 H lên/OH xuống; C1 OH lên/H xuống. Cạnh trước C4-C3-C2 đậm. H/OH explicit; không caption/điện tích.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D3-I-188",
+        "de": "Ở trạng thái rắn, glucose chủ yếu tồn tại ở dạng mạch vòng β-glucose.\nCông thức cấu trúc nào dưới đây là của β-glucose?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-188.hinh.1.du_lieu",
+            "viTri": "sau_pa_B"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-I-49",
+        "de": "Ở trạng thái rắn, glucose chủ yếu tồn tại ở dạng mạch vòng β-glucose.\nCông thức cấu trúc nào dưới đây là của β-glucose?",
+        "refs": [
+          {
+            "where": "DH-12-C2-B4-I-49.hinh.1.du_lieu",
+            "viTri": "sau_pa_B"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1117,
+    "hash": "c94eedb32fb76079c5cc688c6e491e8c76f27180f51d21d2aa040805566f6de6",
+    "fileNguon": "anh/c94eedb32fb76079c5cc688c6e491e8c76f27180f51d21d2aa040805566f6de6.png",
+    "daMoNguonPNG": true,
+    "caption": [],
+    "chon": true,
+    "nhom": "haworth-literal",
+    "notes": "Cùng vòng như1327: O trên phải; C5 CH₂OH lên/H xuống; C4 H lên/OH xuống; C3 OH lên/H xuống; C2 OH lên/H xuống; C1 OH lên/H xuống. Cạnh trước C4-C3-C2 đậm. Khác826 tại C2: OH lên,H xuống. Không caption/điện tích.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D3-I-188",
+        "de": "Ở trạng thái rắn, glucose chủ yếu tồn tại ở dạng mạch vòng β-glucose.\nCông thức cấu trúc nào dưới đây là của β-glucose?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-188.hinh.3.du_lieu",
+            "viTri": "sau_pa_D"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-I-49",
+        "de": "Ở trạng thái rắn, glucose chủ yếu tồn tại ở dạng mạch vòng β-glucose.\nCông thức cấu trúc nào dưới đây là của β-glucose?",
+        "refs": [
+          {
+            "where": "DH-12-C2-B4-I-49.hinh.3.du_lieu",
+            "viTri": "sau_pa_D"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 276,
+    "hash": "2ec39076bcc2849239103f7293e75e683e330bbbf2b9eb812b4915e34d438828",
+    "fileNguon": "anh/2ec39076bcc2849239103f7293e75e683e330bbbf2b9eb812b4915e34d438828.png",
+    "daMoNguonPNG": true,
+    "caption": [],
+    "chon": false,
+    "nhom": "amino-acid-wedge",
+    "notes": "HOOC–CH₂–CH₂–CH(NH₂)–COOH. Hai COOH đều hiện C=O lên, OH ngoài trái/phải. NH₂ alpha hướng xuống bằng nêm đặc (giữ đúng nêm, không bỏ). Nhãn (1) dưới COOH trái; (2) dưới COOH phải. Trung tính, không +/−. Tạm ngoài6 ưu tiên vì cần giữ nêm.",
+    "questions": [
+      {
+        "qid": "DB-12-B9-P2-D2-II-135",
+        "de": "Insulin là hormone do tuyến tuỵ tiết ra, giúp điều hoà lượng đường trong máu bằng cách thúc đẩy tế bào sử dụng glucose làm năng lượng. Sự thiếu hụt insulin hoặc giảm đáp ứng với insulin có nguy cơ gây ra bệnh tiểu đường.\nThuỷ phân không hoàn toàn một đoạn phân tử insulin thu được tripeptide X mạch hở Glu-Arg-Gly. Cho công thức cấu tạo và kí hiệu một số nhóm chức của các amino acid Arginine (Arg), Glutamic acid (Glu), Glycine (Gly) như hình dưới.",
+        "refs": [
+          {
+            "where": "DB-12-B9-P2-D2-II-135.hinh.1.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B9-P2-II-20",
+        "de": "Insulin là hormone do tuyến tuỵ tiết ra, giúp điều hoà lượng đường trong máu bằng cách thúc đẩy tế bào sử dụng glucose làm năng lượng. Sự thiếu hụt insulin hoặc giảm đáp ứng với insulin có nguy cơ gây ra bệnh tiểu đường.\nThuỷ phân không hoàn toàn một đoạn phân tử insulin thu được tripeptide X mạch hở Glu-Arg-Gly. Cho công thức cấu tạo và kí hiệu một số nhóm chức của các amino acid Arginine (Arg), Glutamic acid (Glu), Glycine (Gly) như hình dưới.",
+        "refs": [
+          {
+            "where": "DH-12-C3-B9-P2-II-20.hinh.1.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 278,
+    "hash": "2f02585006ea184d97145c818ef228e2106b7c20b6387c17b4022d95d96f1b75",
+    "fileNguon": "anh/2f02585006ea184d97145c818ef228e2106b7c20b6387c17b4022d95d96f1b75.png",
+    "daMoNguonPNG": true,
+    "caption": [],
+    "chon": false,
+    "nhom": "amino-acid-wedge",
+    "notes": "H₂N–C(=NH)–NH–CH₂–CH₂–CH₂–CH(NH₂)–COOH. Imine NH lên, NH nối mạch xuống, 3CH₂ giữa NH và alphaC; alpha NH₂ nêm đặc xuống; COOH phải C=O lên. Nhãn (1) dưới H₂N guanidine trái; (2) trái NH₂ alpha. Trung tính, không điện tích. Ngoài6 ưu tiên vì nêm.",
+    "questions": [
+      {
+        "qid": "DB-12-B9-P2-D2-II-135",
+        "de": "Insulin là hormone do tuyến tuỵ tiết ra, giúp điều hoà lượng đường trong máu bằng cách thúc đẩy tế bào sử dụng glucose làm năng lượng. Sự thiếu hụt insulin hoặc giảm đáp ứng với insulin có nguy cơ gây ra bệnh tiểu đường.\nThuỷ phân không hoàn toàn một đoạn phân tử insulin thu được tripeptide X mạch hở Glu-Arg-Gly. Cho công thức cấu tạo và kí hiệu một số nhóm chức của các amino acid Arginine (Arg), Glutamic acid (Glu), Glycine (Gly) như hình dưới.",
+        "refs": [
+          {
+            "where": "DB-12-B9-P2-D2-II-135.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B9-P2-II-20",
+        "de": "Insulin là hormone do tuyến tuỵ tiết ra, giúp điều hoà lượng đường trong máu bằng cách thúc đẩy tế bào sử dụng glucose làm năng lượng. Sự thiếu hụt insulin hoặc giảm đáp ứng với insulin có nguy cơ gây ra bệnh tiểu đường.\nThuỷ phân không hoàn toàn một đoạn phân tử insulin thu được tripeptide X mạch hở Glu-Arg-Gly. Cho công thức cấu tạo và kí hiệu một số nhóm chức của các amino acid Arginine (Arg), Glutamic acid (Glu), Glycine (Gly) như hình dưới.",
+        "refs": [
+          {
+            "where": "DH-12-C3-B9-P2-II-20.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 584,
+    "hash": "6cea1e46f443413dfc7758dd50521447e4a95789d0d9c76018ccbc2ab3fca312",
+    "fileNguon": "anh/6cea1e46f443413dfc7758dd50521447e4a95789d0d9c76018ccbc2ab3fca312.png",
+    "daMoNguonPNG": true,
+    "caption": [],
+    "chon": false,
+    "nhom": "literal-wrong-option",
+    "notes": "Nguồn không phải công thức H₂SO₄ chuẩn: S giữa;4O ở4góc; cả4 S–O đơn; O trái-trên nối đơn O phải-trên ngang; O trái-dưới nối đơn O phải-dưới ngang. H trái nối S bằng nét thường, H phải nối S bằng nêm đứt/nét gạch ngang nhỏ. Không OH,không điện tích,không liên kết đôi. Phải dựng nguyên lựa chọn sai, không sửa thành H₂SO₄ chuẩn. Ngoài6 vì nét phải cần giữ literal.",
+    "questions": [
+      {
+        "qid": "DB-11-B8-D1-I-26",
+        "de": "Biểu diễn công thức cấu tạo của H₂SO₄ nào sau đây tuân theo quy tắc octet?",
+        "refs": [
+          {
+            "where": "DB-11-B8-D1-I-26.hinh.2.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B8-I-2",
+        "de": "Biểu diễn công thức cấu tạo của H₂SO₄ nào sau đây tuân theo quy tắc octet?",
+        "refs": [
+          {
+            "where": "DH-11-C2-B8-I-2.hinh.2.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      }
+    ]
+  }
+]

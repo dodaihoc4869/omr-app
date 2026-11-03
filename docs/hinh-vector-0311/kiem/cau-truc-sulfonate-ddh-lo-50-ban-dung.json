@@ -1,0 +1,44 @@
+[
+  {
+    "i": 839,
+    "hash": "9acf8a0a8dd4ddd57055a105d22a5c375e8066934964242434cee1258247a0b2",
+    "fileNguon": "anh/9acf8a0a8dd4ddd57055a105d22a5c375e8066934964242434cee1258247a0b2.png",
+    "svg": "hinh-ddh-41b9629a93af5ba52440304ec69e5cc4f15f01830d17da1c30b1a3313871267b.svg",
+    "hashSvg": "41b9629a93af5ba52440304ec69e5cc4f15f01830d17da1c30b1a3313871267b",
+    "byteSvg": 3225,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChu": "12CalkylthẳngkếtnốiOSO3Na literal,giữOphâncáchalkyl/S,khôngthêmdấuđiệntích/táchnhóm.",
+    "hashSvgDaSoat": "41b9629a93af5ba52440304ec69e5cc4f15f01830d17da1c30b1a3313871267b",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 1273,
+    "hash": "e704062454cde7234656a4f55dad1d6d9ad6fd2fb6513721bd8077b7fd86f4c5",
+    "fileNguon": "anh/e704062454cde7234656a4f55dad1d6d9ad6fd2fb6513721bd8077b7fd86f4c5.png",
+    "svg": "hinh-ddh-118f28fd3de4b57ec8e749e10d838d001c53ba5974d80d6b8d0fb23f69e7a0ad.svg",
+    "hashSvg": "118f28fd3de4b57ec8e749e10d838d001c53ba5974d80d6b8d0fb23f69e7a0ad",
+    "byteSvg": 3016,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChu": "12Calkyl:CH3–CH(Ar)–6CH2–C(CH3)3;benzeneparaSO3Na/3đôi;nguồnkhôngB.khôngthêmnhãn.",
+    "hashSvgDaSoat": "118f28fd3de4b57ec8e749e10d838d001c53ba5974d80d6b8d0fb23f69e7a0ad",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 363,
+    "hash": "4091e04a3d4e905b27aa1782c43c296835649f6dea54c33af1919facb51388a0",
+    "fileNguon": "anh/4091e04a3d4e905b27aa1782c43c296835649f6dea54c33af1919facb51388a0.png",
+    "svg": "hinh-ddh-3e64e6c4495b872e511794798f70cee387488cf3f0d11825ec4efcb88789c859.svg",
+    "hashSvg": "3e64e6c4495b872e511794798f70cee387488cf3f0d11825ec4efcb88789c859",
+    "byteSvg": 3010,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChu": "12Calkyl:alphaAr+nBu4C+(CH2)4–CH(CH3)2;3đôivòng/paraSO3Na;nguồnkhôngA.khôngthêmnhãn.",
+    "hashSvgDaSoat": "3e64e6c4495b872e511794798f70cee387488cf3f0d11825ec4efcb88789c859",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

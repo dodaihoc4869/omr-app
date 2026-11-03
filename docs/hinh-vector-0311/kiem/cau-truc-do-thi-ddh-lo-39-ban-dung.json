@@ -1,0 +1,44 @@
+[
+  {
+    "i": 484,
+    "hash": "59241650c9932b6ea197ff25428d3c3195f08502235ec2c27d3427c009f31a87",
+    "fileNguon": "anh/59241650c9932b6ea197ff25428d3c3195f08502235ec2c27d3427c009f31a87.png",
+    "svg": "hinh-ddh-654f23926ecae55a9f04ad8e99f3bfc7f25adfdd6356a52dabf5166fd1c96da2.svg",
+    "hashSvg": "654f23926ecae55a9f04ad8e99f3bfc7f25adfdd6356a52dabf5166fd1c96da2",
+    "byteSvg": 3140,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChu": "Đường tăng thẳng từ0 đến0,1 rồi ngang hữu hạn; gióng ngang chấm,không đơnvị/tickthờigian/caption.",
+    "hashSvgDaSoat": "654f23926ecae55a9f04ad8e99f3bfc7f25adfdd6356a52dabf5166fd1c96da2",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 1286,
+    "hash": "e9e121ed2dcf14132f1ee7aa085d412b9cc961fffc001a0bbc6e16e1efc402c9",
+    "fileNguon": "anh/e9e121ed2dcf14132f1ee7aa085d412b9cc961fffc001a0bbc6e16e1efc402c9.png",
+    "svg": "hinh-ddh-e170082582bf47e02f59c90ea40f4e8fd4b97f8a75f88007ea6e2bf4b5d21b41.svg",
+    "hashSvg": "e170082582bf47e02f59c90ea40f4e8fd4b97f8a75f88007ea6e2bf4b5d21b41",
+    "byteSvg": 3152,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChu": "Giảm từ0,1 về plateau DƯƠNG không ghi số; có gióng chấm;không suy giátrị cân bằng.",
+    "hashSvgDaSoat": "e170082582bf47e02f59c90ea40f4e8fd4b97f8a75f88007ea6e2bf4b5d21b41",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 353,
+    "hash": "3e730acbcb2c4c164026c4253cfaee7089005e16ee7dc3ea54c5af3b59048bea",
+    "fileNguon": "anh/3e730acbcb2c4c164026c4253cfaee7089005e16ee7dc3ea54c5af3b59048bea.png",
+    "svg": "hinh-ddh-9d58400ad6030b1a8a7a1900e11d7b3393da52b4a2408dc8c536f47801856747.svg",
+    "hashSvg": "9d58400ad6030b1a8a7a1900e11d7b3393da52b4a2408dc8c536f47801856747",
+    "byteSvg": 3060,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChu": "Giảm từ0,1 về0 trên trụct,sauđó ngang hữu hạn,khôngcaption/đơnvị/tick/sốmới.",
+    "hashSvgDaSoat": "9d58400ad6030b1a8a7a1900e11d7b3393da52b4a2408dc8c536f47801856747",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

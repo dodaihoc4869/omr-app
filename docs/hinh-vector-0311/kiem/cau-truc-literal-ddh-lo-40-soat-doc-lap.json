@@ -1,0 +1,26 @@
+[
+  {
+    "i": 277,
+    "hashSvg": "500c32e63d731bad83401f03ed1bf4189886f1c49307aadf1d620fe8acf5522f",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật. Giữ2S→O mũi tên đúng chiều,2HO–S đơn,không đổi thành S=O. Chữ DDH path-only, nguyên tử/gắn bond đúng, không chạm/cắt/tràn. SHA256 khớp.",
+    "hash": "2ee969371c8ed8c022c2c97a70b64bf1a6b38d1817f60632d3eec14da28d7c35",
+    "hashSvgDaSoat": "500c32e63d731bad83401f03ed1bf4189886f1c49307aadf1d620fe8acf5522f"
+  },
+  {
+    "i": 1285,
+    "hashSvg": "bb6aec12e190a835a1534f87a4cf38ccdac8e784255655df26d61a228abcc295",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật. Giữ cả4S–O đơn với2HO/2O,không tự sửa hóa trị/điện tích/liên kếtđôi của phương án nguồn. Chữ DDH path-only, nguyên tử/gắn bond đúng, không chạm/cắt/tràn. SHA256 khớp.",
+    "hash": "e9066088a69abc7b458c2f6ad9432e0b581c57ac0e8b8d8f7966aab5a9766b0c",
+    "hashSvgDaSoat": "bb6aec12e190a835a1534f87a4cf38ccdac8e784255655df26d61a228abcc295"
+  },
+  {
+    "i": 893,
+    "hashSvg": "19c9e6a917920f8f17b3d50d7042ac2c13ae6a689849cae6aa1bb4efdc7903f6",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đã mở từng PNG nguồn và render SVG thật. Giữ CH3ẩn đầu néttrái,CHalpha vertex,NH3+ xuống dưới/COO−phải;bond đínhNđầu/Cđầu đúng,không thêm stereo/tên/C/Hhiện. Chữ DDH path-only, nguyên tử/gắn bond đúng, không chạm/cắt/tràn. SHA256 khớp.",
+    "hash": "a3b8c45ec87b53faf5fb6c116a6a6c2e36809c565e6a203db392bfa6eacfb9c1",
+    "hashSvgDaSoat": "19c9e6a917920f8f17b3d50d7042ac2c13ae6a689849cae6aa1bb4efdc7903f6"
+  }
+]

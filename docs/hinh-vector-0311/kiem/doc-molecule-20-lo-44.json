@@ -1,0 +1,660 @@
+[
+  {
+    "hash": "2149c3844e589dc1af43a19ffc0b58669a55de592aaab951f128e7c53d20f18c",
+    "file": "anh/2149c3844e589dc1af43a19ffc0b58669a55de592aaab951f128e7c53d20f18c.png",
+    "mime": "image/png",
+    "bytes": 5567,
+    "i": 194,
+    "refs": [
+      {
+        "qid": "12-C3-B8-D2-II-19",
+        "de": "Naftifine là một chất có tác dụng chống nấm. Naftifine có cấu tạo như hình sau:",
+        "where": [
+          "12-C3-B8-D2-II-19.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DB-12-B8-D2-II-26",
+        "de": "Naftifine là một chất có tác dụng chống nấm. Naftifine có cấu tạo như hình sau:",
+        "where": [
+          "DB-12-B8-D2-II-26.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "CN(C/C=C/c1ccccc1)Cc1cccc2ccccc12",
+    "notes": "3C N–CH2–CH=CH–Ph; E; naphthalen-1-ylmethyl; no circle/caption",
+    "caption": [],
+    "circle": false,
+    "trangThai": "da-doc-nguon-chua-duyet-ban-ve",
+    "fileNguon": "anh/2149c3844e589dc1af43a19ffc0b58669a55de592aaab951f128e7c53d20f18c.png",
+    "soQids": 2,
+    "nhanPdfCoTheBo": [],
+    "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn.",
+    "explicitH": false
+  },
+  {
+    "hash": "97636875178cc88d54e0384eed8d1fd619feedb7c2c4b4db901a1357d35ff540",
+    "file": "anh/97636875178cc88d54e0384eed8d1fd619feedb7c2c4b4db901a1357d35ff540.png",
+    "mime": "image/png",
+    "bytes": 4705,
+    "i": 817,
+    "refs": [
+      {
+        "qid": "12-C3-B9-D2-I-41",
+        "de": "Glutathione là một chất có khả năng chống oxi hóa tự nhiên trong cơ thể, bảo vệ tế bào khỏi tổn thương, loại bỏ các chất độc hại và các gốc tự do gây hại cho tế bào.\nCông thức cấu tạo của glutathione: HOOC-CH(NH₂)-CH₂CH₂-CO-NH-CH(CH₂SH)-CO-NH-CH₂-COOH (γ-Glu-Cys-Gly).\nPhát biểu nào sau đây không đúng?",
+        "where": [
+          "12-C3-B9-D2-I-41.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P2-D1-I-55",
+        "de": "Glutathione là một chất có khả năng chống oxi hóa tự nhiên trong cơ thể, bảo vệ tế bào khỏi tổn thương, loại bỏ các chất độc hại và các gốc tự do gây hại cho tế bào.\nCông thức cấu tạo của glutathione: HOOC-CH(NH₂)-CH₂CH₂-CO-NH-CH(CH₂SH)-CO-NH-CH₂-COOH (γ-Glu-Cys-Gly).\nPhát biểu nào sau đây không đúng?",
+        "where": [
+          "DB-12-B9-P2-D1-I-55.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "NC(CCC(=O)NC(CS)C(=O)NCC(=O)O)C(=O)O",
+    "notes": "gamma-Glu–Cys–Gly; no wedge/stereo in PNG; no caption",
+    "caption": [],
+    "circle": false,
+    "trangThai": "da-doc-nguon-chua-duyet-ban-ve",
+    "fileNguon": "anh/97636875178cc88d54e0384eed8d1fd619feedb7c2c4b4db901a1357d35ff540.png",
+    "soQids": 2,
+    "nhanPdfCoTheBo": [],
+    "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn.",
+    "explicitH": false
+  },
+  {
+    "hash": "9acf8a0a8dd4ddd57055a105d22a5c375e8066934964242434cee1258247a0b2",
+    "file": "anh/9acf8a0a8dd4ddd57055a105d22a5c375e8066934964242434cee1258247a0b2.png",
+    "mime": "image/png",
+    "bytes": 958,
+    "i": 839,
+    "refs": [
+      {
+        "qid": "DB-12-B2-D1-III-204",
+        "de": "Một loại chất giặt rửa tổng hợp có thành phần chính là muối sau: Thành phần % theo khối lượng của carbon trong muối trên là a%.\nXác định giá trị của a.",
+        "where": [
+          "DB-12-B2-D1-III-204.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B2-III-6",
+        "de": "Một loại chất giặt rửa tổng hợp có thành phần chính là muối sau: Thành phần % theo khối lượng của carbon trong muối trên là a%.\nXác định giá trị của a.",
+        "where": [
+          "DH-12-C1-B2-III-6.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "CCCCCCCCCCCCOS(=O)(=O)[O-].[Na+]",
+    "notes": "12C thẳng; OSO3Na; no caption",
+    "caption": [],
+    "circle": false,
+    "trangThai": "da-doc-nguon-chua-duyet-ban-ve",
+    "fileNguon": "anh/9acf8a0a8dd4ddd57055a105d22a5c375e8066934964242434cee1258247a0b2.png",
+    "soQids": 2,
+    "nhanPdfCoTheBo": [],
+    "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn.",
+    "explicitH": false
+  },
+  {
+    "hash": "a27b8e35b4c3322c6bccb0ea0d657de5846cf73624b948493c7742c517bcf746",
+    "file": "anh/a27b8e35b4c3322c6bccb0ea0d657de5846cf73624b948493c7742c517bcf746.png",
+    "mime": "image/png",
+    "bytes": 1639,
+    "i": 886,
+    "refs": [
+      {
+        "qid": "DB-12-B2-D1-I-175",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "where": [
+          "DB-12-B2-D1-I-175.hinh.2.du_lieu"
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B2-I-45",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "where": [
+          "DH-12-C1-B2-I-45.hinh.2.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "CCCCCCCCCCCCc1ccc(S(=O)(=O)[O-])cc1.[Na+]",
+    "notes": "12C thẳng + benzene para; Kekule; no caption",
+    "caption": [],
+    "circle": false,
+    "trangThai": "da-doc-nguon-chua-duyet-ban-ve",
+    "fileNguon": "anh/a27b8e35b4c3322c6bccb0ea0d657de5846cf73624b948493c7742c517bcf746.png",
+    "soQids": 2,
+    "nhanPdfCoTheBo": [],
+    "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn.",
+    "explicitH": false
+  },
+  {
+    "hash": "aaa84962cfbf02ad34561142bb878d322143216079154f9deb731261a54e565b",
+    "file": "anh/aaa84962cfbf02ad34561142bb878d322143216079154f9deb731261a54e565b.png",
+    "mime": "image/png",
+    "bytes": 5048,
+    "i": 945,
+    "refs": [
+      {
+        "qid": "12-C1-B2-I-51",
+        "de": "Hợp chất hữu cơ X có công thức cấu tạo như sau:\nPhát biểu nào sau đây đúng?",
+        "where": [
+          "12-C1-B2-I-51.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DB-12-B2-D1-I-35",
+        "de": "Hợp chất hữu cơ X có công thức cấu tạo như sau:\nPhát biểu nào sau đây đúng?",
+        "where": [
+          "DB-12-B2-D1-I-35.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "CCCCCCCCCCCCCCCC(=O)[O-].[K+]",
+    "notes": "16C including carbonyl; source OK; no caption",
+    "caption": [],
+    "circle": false,
+    "trangThai": "da-doc-nguon-chua-duyet-ban-ve",
+    "fileNguon": "anh/aaa84962cfbf02ad34561142bb878d322143216079154f9deb731261a54e565b.png",
+    "soQids": 2,
+    "nhanPdfCoTheBo": [],
+    "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn.",
+    "explicitH": false
+  },
+  {
+    "hash": "b6fa044081cf4aac3d8fdbe9ff257222b201e9deb91308eb7243f8b233c5ae51",
+    "file": "anh/b6fa044081cf4aac3d8fdbe9ff257222b201e9deb91308eb7243f8b233c5ae51.png",
+    "mime": "image/png",
+    "bytes": 5682,
+    "i": 1020,
+    "refs": [
+      {
+        "qid": "12-C1-B2-I-54",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "where": [
+          "12-C1-B2-I-54.hinh.1.du_lieu"
+        ]
+      },
+      {
+        "qid": "DB-12-B2-D1-I-37",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "where": [
+          "DB-12-B2-D1-I-37.hinh.1.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "CC(c1ccc(S(=O)(=O)[O-])cc1)CCCCCCC(C)(C)C.[Na+]",
+    "notes": "12C alkyl total; alphaMe+(CH2)6–C(CH3)3; keep B. source partly clipped",
+    "caption": [
+      "B."
+    ],
+    "circle": false,
+    "trangThai": "da-doc-nguon-chua-duyet-ban-ve",
+    "fileNguon": "anh/b6fa044081cf4aac3d8fdbe9ff257222b201e9deb91308eb7243f8b233c5ae51.png",
+    "soQids": 2,
+    "nhanPdfCoTheBo": [],
+    "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn.",
+    "explicitH": false
+  },
+  {
+    "hash": "bbf27e738832a378ea57bf5b36734478d601754eed6b01fb92b167d6000eb990",
+    "file": "anh/bbf27e738832a378ea57bf5b36734478d601754eed6b01fb92b167d6000eb990.png",
+    "mime": "image/png",
+    "bytes": 5174,
+    "i": 1044,
+    "refs": [
+      {
+        "qid": "12-C1-B2-I-52",
+        "de": "Hợp chất hữu cơ X có công thức cấu tạo như sau:\nPhát biểu nào sau đây không đúng?",
+        "where": [
+          "12-C1-B2-I-52.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DB-12-B2-D1-I-36",
+        "de": "Hợp chất hữu cơ X có công thức cấu tạo như sau:\nPhát biểu nào sau đây không đúng?",
+        "where": [
+          "DB-12-B2-D1-I-36.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "CCCCCCCCCCCCc1ccc(S(=O)(=O)[O-])cc1.[Na+]",
+    "notes": "12C thẳng + para benzene; explicit S(=O)2ONa; Kekule",
+    "caption": [],
+    "circle": false,
+    "trangThai": "da-doc-nguon-chua-duyet-ban-ve",
+    "fileNguon": "anh/bbf27e738832a378ea57bf5b36734478d601754eed6b01fb92b167d6000eb990.png",
+    "soQids": 2,
+    "nhanPdfCoTheBo": [],
+    "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn.",
+    "explicitH": false
+  },
+  {
+    "hash": "a5b8482f4c6b5f3367160215f81c16704b0510b609688e8ad49d17b272b30c6d",
+    "file": "anh/a5b8482f4c6b5f3367160215f81c16704b0510b609688e8ad49d17b272b30c6d.png",
+    "mime": "image/png",
+    "bytes": 3309,
+    "i": 904,
+    "refs": [
+      {
+        "qid": "12-C3-B9-D3-I-20",
+        "de": "Lysine (Lys) có công thức cấu tạo như sau: Thêm dung dịch acid HCl (dư) vào ống nghiệm đựng dung dịch Lys, sau đó đặt ống nghiệm vào trong điện trường. Khi đó, Lys",
+        "where": [
+          "12-C3-B9-D3-I-20.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P1-D1-I-109",
+        "de": "Lysine (Lys) có công thức cấu tạo như sau: Thêm dung dịch acid HCl (dư) vào ống nghiệm đựng dung dịch Lys, sau đó đặt ống nghiệm vào trong điện trường. Khi đó, Lys",
+        "where": [
+          "DB-12-B9-P1-D1-I-109.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "N[C@@H](CCCCN)C(=O)O",
+    "caption": [],
+    "circle": false,
+    "explicitH": "wedge-NH2",
+    "notes": "NH2 nêm đặc xuống; COOH trên phải, sidechain trên trái ⇒ S. 4CH2 rồi NH2 đầu mạch; trung hòa.",
+    "trangThai": "da-doc-nguon-chua-duyet-ban-ve",
+    "fileNguon": "anh/a5b8482f4c6b5f3367160215f81c16704b0510b609688e8ad49d17b272b30c6d.png",
+    "soQids": 2,
+    "nhanPdfCoTheBo": [],
+    "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn."
+  },
+  {
+    "hash": "c038023162e1dac36b5cf25244d03b41a7caa08b0ccdc3ea9b1802bc77746970",
+    "file": "anh/c038023162e1dac36b5cf25244d03b41a7caa08b0ccdc3ea9b1802bc77746970.png",
+    "mime": "image/png",
+    "bytes": 6330,
+    "i": 1064,
+    "refs": [
+      {
+        "qid": "12-C1-B2-I-54",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "where": [
+          "12-C1-B2-I-54.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DB-12-B2-D1-I-37",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "where": [
+          "DB-12-B2-D1-I-37.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "CCCCC(c1ccc(S(=O)(=O)[O-])cc1)CCCCC(C)C.[Na+]",
+    "caption": [
+      "A."
+    ],
+    "circle": false,
+    "explicitH": false,
+    "notes": "12C alkyl: alpha gắn aryl + nhánh n-butyl4C + (CH2)4–CH(CH3)2 7C; para; nhãn A. cắt sát trái.",
+    "trangThai": "da-doc-nguon-chua-duyet-ban-ve",
+    "fileNguon": "anh/c038023162e1dac36b5cf25244d03b41a7caa08b0ccdc3ea9b1802bc77746970.png",
+    "soQids": 2,
+    "nhanPdfCoTheBo": [],
+    "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn."
+  },
+  {
+    "hash": "c23f73e27c65c5a98563a6a6ddf22eabfebbe4a7816b3b265402f48628e4f8bd",
+    "file": "anh/c23f73e27c65c5a98563a6a6ddf22eabfebbe4a7816b3b265402f48628e4f8bd.png",
+    "mime": "image/png",
+    "bytes": 1250,
+    "i": 1078,
+    "refs": [
+      {
+        "qid": "DB-12-B9-P1-D1-I-217",
+        "de": "Lysine (Lys) có công thức cấu tạo như sau: Thêm dung dịch acid HCl(dư) vào ống nghiệm đựng dung dịch Lys, sau đó đặt ống nghiệm vào trong điện trường. Khi đó, Lys",
+        "where": [
+          "DB-12-B9-P1-D1-I-217.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B9-P1-I-68",
+        "de": "Lysine (Lys) có công thức cấu tạo như sau: Thêm dung dịch acid HCl(dư) vào ống nghiệm đựng dung dịch Lys, sau đó đặt ống nghiệm vào trong điện trường. Khi đó, Lys",
+        "where": [
+          "DH-12-C3-B9-P1-I-68.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "N[C@@H](CCCCN)C(=O)O",
+    "caption": [],
+    "circle": false,
+    "explicitH": "wedge-NH2",
+    "notes": "NH2 nêm đặc xuống; COOH trên phải, sidechain trên trái ⇒ S;4CH2 rồi NH2 đầu mạch.",
+    "trangThai": "da-doc-nguon-chua-duyet-ban-ve",
+    "fileNguon": "anh/c23f73e27c65c5a98563a6a6ddf22eabfebbe4a7816b3b265402f48628e4f8bd.png",
+    "soQids": 2,
+    "nhanPdfCoTheBo": [],
+    "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn."
+  },
+  {
+    "hash": "cbacfec9a20c369fd297063a1459d57308549c222caa8be75146f4f8ba9f28cf",
+    "file": "anh/cbacfec9a20c369fd297063a1459d57308549c222caa8be75146f4f8ba9f28cf.png",
+    "mime": "image/png",
+    "bytes": 5975,
+    "i": 1134,
+    "refs": [
+      {
+        "qid": "12-C1-B2-I-54",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "where": [
+          "12-C1-B2-I-54.hinh.3.du_lieu"
+        ]
+      },
+      {
+        "qid": "DB-12-B2-D1-I-37",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "where": [
+          "DB-12-B2-D1-I-37.hinh.3.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "CC(C)C(c1ccc(S(=O)(=O)[O-])cc1)C(C)CC(C)C(C)C.[Na+]",
+    "caption": [
+      "D."
+    ],
+    "circle": false,
+    "explicitH": false,
+    "notes": "12C alkyl: alphaAr có iPr trái và CH(CH3)–CH2–CH(CH3)–CH(CH3)2 phải; không nêm/stereo; nhãn D. cắt sát trái.",
+    "trangThai": "da-doc-nguon-chua-duyet-ban-ve",
+    "fileNguon": "anh/cbacfec9a20c369fd297063a1459d57308549c222caa8be75146f4f8ba9f28cf.png",
+    "soQids": 2,
+    "nhanPdfCoTheBo": [],
+    "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn."
+  },
+  {
+    "hash": "ce1617fd5c91c001258a7067b314decf60d58f469affc264da9c58c0f034a9b7",
+    "file": "anh/ce1617fd5c91c001258a7067b314decf60d58f469affc264da9c58c0f034a9b7.png",
+    "mime": "image/png",
+    "bytes": 3414,
+    "i": 1141,
+    "refs": [
+      {
+        "qid": "12-C3-B8-D1-I-38",
+        "de": "Nicotine là một loại alkaloid tự nhiên được tìm thấy trong cây thuộc họ Cà, chủ yếu trong thuốc lá\n(nicotine chiếm 0,6 – 3,0% trọng lượng thuốc lá khô). Nicotine có nhiều tác hại đối với cơ thể, nhất là đối với phụ nữ mang thai và trẻ sơ sinh, do đó cần hạn chế sử dụng và phổ biến thuốc lá.\nCông thức cấu tạo phân tử nicotine như hình bên.\nTrong phân tử nicotine, nguyên tử N số (1) là amine bậc mấy?",
+        "where": [
+          "12-C3-B8-D1-I-38.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DB-12-B8-D1-I-33",
+        "de": "Nicotine là một loại alkaloid tự nhiên được tìm thấy trong cây thuộc họ Cà, chủ yếu trong thuốc lá\n(nicotine chiếm 0,6 – 3,0% trọng lượng thuốc lá khô). Nicotine có nhiều tác hại đối với cơ thể, nhất là đối với phụ nữ mang thai và trẻ sơ sinh, do đó cần hạn chế sử dụng và phổ biến thuốc lá.\nCông thức cấu tạo phân tử nicotine như hình bên.\nTrong phân tử nicotine, nguyên tử N số (1) là amine bậc mấy?",
+        "where": [
+          "DB-12-B8-D1-I-33.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "CN1CCCC1c1cccnc1",
+    "caption": [],
+    "circle": false,
+    "explicitH": false,
+    "notes": "Giữ (1) trong vòng pyrrolidine ở gần N-methyl (không gắn nhãn này sang N pyridine). Câu dẫn hỏi N số(1). Không stereo.",
+    "trangThai": "da-doc-nguon-chua-duyet-ban-ve",
+    "fileNguon": "anh/ce1617fd5c91c001258a7067b314decf60d58f469affc264da9c58c0f034a9b7.png",
+    "soQids": 2,
+    "nhanPdfCoTheBo": [],
+    "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn."
+  },
+  {
+    "hash": "ded3e1cec6778bb2ff03f54e575e01f80424105447e8138e2d19548fd4fd2e8e",
+    "file": "anh/ded3e1cec6778bb2ff03f54e575e01f80424105447e8138e2d19548fd4fd2e8e.png",
+    "mime": "image/png",
+    "bytes": 2115,
+    "i": 1227,
+    "refs": [
+      {
+        "qid": "12-KT-C3-D4-I-15",
+        "de": "Khói thuốc lá và thuốc lá điện tử chứa các thành phần là nicotine, carbon monoxide, benzene, formaldehyde, là những chất tác động trực tiếp lên não, thần kinh, tim mạch, hệ hô hấp và nguy cơ dẫn đến ung thư.\nNicotine (có cấu tạo như hình dưới đây) là hợp chất thuộc loại amine rất độc.\nBậc của nguyên tử N(1) trong phân tử nicotine là",
+        "where": [
+          "12-KT-C3-D4-I-15.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DB-12-B8-D1-I-275",
+        "de": "Khói thuốc lá và thuốc lá điện tử chứa các thành phần là nicotine, carbon monoxide, benzene, formaldehyde, là những chất tác động trực tiếp lên não, thần kinh, tim mạch, hệ hô hấp và nguy cơ dẫn đến ung thư.\nNicotine (có cấu tạo như hình dưới đây) là hợp chất thuộc loại amine rất độc.\nBậc của nguyên tử N(1) trong phân tử nicotine là",
+        "where": [
+          "DB-12-B8-D1-I-275.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "CN1CCCC1c1cccnc1",
+    "caption": [],
+    "circle": false,
+    "explicitH": false,
+    "notes": "Giữ N(1) là N-methylpyrrolidine, N(2) là N pyridine. Đầu đoạn thẳng dưới N là methyl dù không ghi CH3. Câu dẫn hỏi N(1). Không stereo.",
+    "trangThai": "da-doc-nguon-chua-duyet-ban-ve",
+    "fileNguon": "anh/ded3e1cec6778bb2ff03f54e575e01f80424105447e8138e2d19548fd4fd2e8e.png",
+    "soQids": 2,
+    "nhanPdfCoTheBo": [],
+    "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn."
+  },
+  {
+    "hash": "e701771752729524942f6190583abaceb1828caaa2bd443a0d3611d38bd36888",
+    "file": "anh/e701771752729524942f6190583abaceb1828caaa2bd443a0d3611d38bd36888.png",
+    "mime": "image/png",
+    "bytes": 1920,
+    "i": 1272,
+    "refs": [
+      {
+        "qid": "DB-12-B2-D1-I-175",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "where": [
+          "DB-12-B2-D1-I-175.hinh.3.du_lieu"
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B2-I-45",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "where": [
+          "DH-12-C1-B2-I-45.hinh.3.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "CC(C)C(c1ccc(S(=O)(=O)[O-])cc1)C(C)CC(C)C(C)C.[Na+]",
+    "caption": [],
+    "circle": false,
+    "explicitH": false,
+    "notes": "Cùng graph1134, native không có D.; không tự thêm chữ D. Alkyl12C.",
+    "trangThai": "da-doc-nguon-chua-duyet-ban-ve",
+    "fileNguon": "anh/e701771752729524942f6190583abaceb1828caaa2bd443a0d3611d38bd36888.png",
+    "soQids": 2,
+    "nhanPdfCoTheBo": [],
+    "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn."
+  },
+  {
+    "hash": "e704062454cde7234656a4f55dad1d6d9ad6fd2fb6513721bd8077b7fd86f4c5",
+    "file": "anh/e704062454cde7234656a4f55dad1d6d9ad6fd2fb6513721bd8077b7fd86f4c5.png",
+    "mime": "image/png",
+    "bytes": 1797,
+    "i": 1273,
+    "refs": [
+      {
+        "qid": "DB-12-B2-D1-I-175",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "where": [
+          "DB-12-B2-D1-I-175.hinh.1.du_lieu"
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B2-I-45",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "where": [
+          "DH-12-C1-B2-I-45.hinh.1.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "CC(c1ccc(S(=O)(=O)[O-])cc1)CCCCCCC(C)(C)C.[Na+]",
+    "caption": [],
+    "circle": false,
+    "explicitH": false,
+    "notes": "Cùng graph1020, native không có B.; không tự thêm chữ B. Alkyl12C.",
+    "trangThai": "da-doc-nguon-chua-duyet-ban-ve",
+    "fileNguon": "anh/e704062454cde7234656a4f55dad1d6d9ad6fd2fb6513721bd8077b7fd86f4c5.png",
+    "soQids": 2,
+    "nhanPdfCoTheBo": [],
+    "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn."
+  },
+  {
+    "hash": "ecb43272cf41c432b9889564681590693a0f5c7906d29e4da84b81646b371cd5",
+    "file": "anh/ecb43272cf41c432b9889564681590693a0f5c7906d29e4da84b81646b371cd5.png",
+    "mime": "image/png",
+    "bytes": 1588,
+    "i": 1308,
+    "refs": [
+      {
+        "qid": "DB-12-B8-D1-II-398",
+        "de": "Naftifine là một chất có tác dụng chống nấm. Naftifine có cấu tạo như hình sau:",
+        "where": [
+          "DB-12-B8-D1-II-398.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B8-II-19",
+        "de": "Naftifine là một chất có tác dụng chống nấm. Naftifine có cấu tạo như hình sau:",
+        "where": [
+          "DH-12-C3-B8-II-19.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "CN(C/C=C/c1ccccc1)Cc1cccc2ccccc12",
+    "caption": [],
+    "circle": false,
+    "explicitH": false,
+    "notes": "3C N–CH2–CH=CH–Ph E; naphthalen-1-ylmethyl; Kekulé; không caption.",
+    "trangThai": "da-doc-nguon-chua-duyet-ban-ve",
+    "fileNguon": "anh/ecb43272cf41c432b9889564681590693a0f5c7906d29e4da84b81646b371cd5.png",
+    "soQids": 2,
+    "nhanPdfCoTheBo": [],
+    "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn."
+  },
+  {
+    "hash": "f47c0050bf875aac111b1e94982600965777fcbd9e370fe2c74398a973eee53d",
+    "file": "anh/f47c0050bf875aac111b1e94982600965777fcbd9e370fe2c74398a973eee53d.png",
+    "mime": "image/png",
+    "bytes": 16227,
+    "i": 1348,
+    "refs": [
+      {
+        "qid": "12-KT-C3-D5-II-4",
+        "de": "Insulin, một loại hormone thuộc loại protein, được sản sinh bởi tuyến tuỵ, có chức năng điều hoà quá trình chuyển hoá glucose trong cơ thể. Insulin thúc đẩy sự hấp thu glucose của các tế bào và dự trữ glucose dư thừa trong gan và cơ. Thuỷ phân không hoàn toàn một đoạn phân tử insulin thu được tripeptide X có công thức cấu tạo như hình dưới đây.",
+        "where": [
+          "12-KT-C3-D5-II-4.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P2-D2-II-89",
+        "de": "Insulin, một loại hormone thuộc loại protein, được sản sinh bởi tuyến tuỵ, có chức năng điều hoà quá trình chuyển hoá glucose trong cơ thể. Insulin thúc đẩy sự hấp thu glucose của các tế bào và dự trữ glucose dư thừa trong gan và cơ. Thuỷ phân không hoàn toàn một đoạn phân tử insulin thu được tripeptide X có công thức cấu tạo như hình dưới đây.",
+        "where": [
+          "DB-12-B9-P2-D2-II-89.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "NC(C)C(=O)NC(CCC(=O)O)C(=O)NC(C(C)C)C(=O)O",
+    "caption": [],
+    "circle": false,
+    "explicitH": "NH",
+    "notes": "Ala–Glu–Val,3residue; source [CH2]2COOH ở Glu; giữ NH peptide tường minh và NH2 đầu/COOH cuối. Không nêm/stereo; không tự thêm tên peptide.",
+    "trangThai": "da-doc-nguon-chua-duyet-ban-ve",
+    "fileNguon": "anh/f47c0050bf875aac111b1e94982600965777fcbd9e370fe2c74398a973eee53d.png",
+    "soQids": 2,
+    "nhanPdfCoTheBo": [],
+    "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn."
+  },
+  {
+    "hash": "f8b625aed3fe5cc73ff558cb41334e9a3a1b725fa5d143e414b1f0621dce2da8",
+    "file": "anh/f8b625aed3fe5cc73ff558cb41334e9a3a1b725fa5d143e414b1f0621dce2da8.png",
+    "mime": "image/png",
+    "bytes": 19792,
+    "i": 1377,
+    "refs": [
+      {
+        "qid": "12-C3-B9-D2-I-16",
+        "de": "Cho peptide Y có công thức cấu tạo: H₂N-CH[CH(CH₃)₂]-CO-NH-CH₂-CO-NH-CH(CH₃)-COOH.\nTên viết tắt của Y là",
+        "where": [
+          "12-C3-B9-D2-I-16.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P2-D1-I-37",
+        "de": "Cho peptide Y có công thức cấu tạo: H₂N-CH[CH(CH₃)₂]-CO-NH-CH₂-CO-NH-CH(CH₃)-COOH.\nTên viết tắt của Y là",
+        "where": [
+          "DB-12-B9-P2-D1-I-37.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "NC(C(C)C)C(=O)NCC(=O)NC(C)C(=O)O",
+    "caption": [],
+    "circle": false,
+    "explicitH": "all-source-H",
+    "notes": "Val–Gly–Ala; nguồn khai triển hiện H ở Cα Val/Ala,2H ở Gly,H ở C nhánh isopropyl và H từng NH peptide; giữ các H tường minh. Không nêm/stereo; không tự thêm tên.",
+    "trangThai": "da-doc-nguon-chua-duyet-ban-ve",
+    "fileNguon": "anh/f8b625aed3fe5cc73ff558cb41334e9a3a1b725fa5d143e414b1f0621dce2da8.png",
+    "soQids": 2,
+    "nhanPdfCoTheBo": [],
+    "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn."
+  },
+  {
+    "hash": "ef3c65eb2e3b3306259bd39f3d98bb0378c478c7dbbde2e7c7dddb79cc380f65",
+    "file": "anh/ef3c65eb2e3b3306259bd39f3d98bb0378c478c7dbbde2e7c7dddb79cc380f65.png",
+    "mime": "image/png",
+    "bytes": 20727,
+    "i": 1322,
+    "refs": [
+      {
+        "qid": "VIP27-BDT-L1-507-I-12",
+        "de": "Nước ép chanh chứa khoảng 5% (khoảng 0,3 mol/lít) citric acid (hình bên dưới), điều này giúp chanh có vị chua và pH của chanh từ 2-3. Công thức phân tử của citric acid là",
+        "where": [
+          "VIP27-BDT-L1-507-I-12.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "O=C(O)CC(O)(CC(=O)O)C(=O)O",
+    "caption": [],
+    "circle": false,
+    "explicitH": "all-OH-H",
+    "notes": "Citric graph: 3COOH,2CH2,1C trung tâm–OH; nguồn O–H vẽ tường minh ở cả3acid+1alcohol. Không nêm/stereo; không caption.",
+    "trangThai": "da-doc-nguon-chua-duyet-ban-ve",
+    "fileNguon": "anh/ef3c65eb2e3b3306259bd39f3d98bb0378c478c7dbbde2e7c7dddb79cc380f65.png",
+    "soQids": 1,
+    "nhanPdfCoTheBo": [],
+    "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn."
+  },
+  {
+    "hash": "4091e04a3d4e905b27aa1782c43c296835649f6dea54c33af1919facb51388a0",
+    "file": "anh/4091e04a3d4e905b27aa1782c43c296835649f6dea54c33af1919facb51388a0.png",
+    "mime": "image/png",
+    "bytes": 1958,
+    "i": 363,
+    "refs": [
+      {
+        "qid": "DB-12-B2-D1-I-175",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "where": [
+          "DB-12-B2-D1-I-175.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B2-I-45",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "where": [
+          "DH-12-C1-B2-I-45.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "fileNguon": "anh/4091e04a3d4e905b27aa1782c43c296835649f6dea54c33af1919facb51388a0.png",
+    "soQids": 2,
+    "smiles": "CCCCC(c1ccc(S(=O)(=O)[O-])cc1)CCCCC(C)C.[Na+]",
+    "caption": [],
+    "circle": false,
+    "explicitH": false,
+    "notes": "12C alkyl: alpha–nBu4C + (CH2)4–CH(CH3)2 7C; cùng graph1064 nhưng native KHÔNG có nhãn A.; không tự thêm.",
+    "nhanPdfCoTheBo": [],
+    "trangThai": "da-doc-nguon-chua-duyet-ban-ve"
+  }
+]

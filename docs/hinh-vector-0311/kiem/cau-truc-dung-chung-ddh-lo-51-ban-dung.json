@@ -1,0 +1,194 @@
+[
+  {
+    "hash": "b6fa044081cf4aac3d8fdbe9ff257222b201e9deb91308eb7243f8b233c5ae51",
+    "file": "anh/b6fa044081cf4aac3d8fdbe9ff257222b201e9deb91308eb7243f8b233c5ae51.png",
+    "mime": "image/png",
+    "bytes": 5682,
+    "i": 1020,
+    "refs": [
+      {
+        "qid": "12-C1-B2-I-54",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "where": [
+          "12-C1-B2-I-54.hinh.1.du_lieu"
+        ]
+      },
+      {
+        "qid": "DB-12-B2-D1-I-37",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "where": [
+          "DB-12-B2-D1-I-37.hinh.1.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "CC(c1ccc(S(=O)(=O)[O-])cc1)CCCCCCC(C)(C)C.[Na+]",
+    "circle": false,
+    "trangThai": "da-soat-doc-lap",
+    "fileNguon": "anh/b6fa044081cf4aac3d8fdbe9ff257222b201e9deb91308eb7243f8b233c5ae51.png",
+    "soQids": 2,
+    "explicitH": false,
+    "svg": "hinh-ddh-118f28fd3de4b57ec8e749e10d838d001c53ba5974d80d6b8d0fb23f69e7a0ad.svg",
+    "hashSvg": "118f28fd3de4b57ec8e749e10d838d001c53ba5974d80d6b8d0fb23f69e7a0ad",
+    "byteSvg": 3016,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "nhomDungChung": 1273,
+    "bangChungViTri": [
+      {
+        "where": "12-C1-B2-I-54.hinh.1.du_lieu",
+        "hashDataUrl": "31f9085e5fd0dbe5bb8b91e69dc7126520adb213781022328b753236b8c811c9",
+        "viTri": "sau_pa_B",
+        "truong": "hinh",
+        "congKhaiTruocNop": true
+      },
+      {
+        "where": "DB-12-B2-D1-I-37.hinh.1.du_lieu",
+        "hashDataUrl": "31f9085e5fd0dbe5bb8b91e69dc7126520adb213781022328b753236b8c811c9",
+        "viTri": "sau_pa_B",
+        "truong": "hinh",
+        "congKhaiTruocNop": true
+      }
+    ],
+    "xuLyNhanGiay": "Bỏ A./B./D. sát mép và dấu chấm rời PDF; giữ đủ cấu trúc. Mọi ref đều sau_pa tương ứng, câu dẫn không gọi nhãn này; app tự hiện nhãn ngoài và có hoán vị. Không đổi qid/thứ tự/đáp án.",
+    "ghiNhanDocNguonBanDau": {
+      "caption": [
+        "B."
+      ],
+      "notes": "12C alkyl total; alphaMe+(CH2)6–C(CH3)3; keep B. source partly clipped",
+      "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn.",
+      "nhanPdfCoTheBo": []
+    },
+    "caption": [],
+    "notes": "Giữ đủ12Calkyl/benzeneparaSO3Na/3đôivòng;nhãnPDFđãxửlýtheobằngchứngsau_pa,câudẫnvàsoátđộclập.",
+    "hashSvgDaSoat": "118f28fd3de4b57ec8e749e10d838d001c53ba5974d80d6b8d0fb23f69e7a0ad",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "hash": "c038023162e1dac36b5cf25244d03b41a7caa08b0ccdc3ea9b1802bc77746970",
+    "file": "anh/c038023162e1dac36b5cf25244d03b41a7caa08b0ccdc3ea9b1802bc77746970.png",
+    "mime": "image/png",
+    "bytes": 6330,
+    "i": 1064,
+    "refs": [
+      {
+        "qid": "12-C1-B2-I-54",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "where": [
+          "12-C1-B2-I-54.hinh.0.du_lieu"
+        ]
+      },
+      {
+        "qid": "DB-12-B2-D1-I-37",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "where": [
+          "DB-12-B2-D1-I-37.hinh.0.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "CCCCC(c1ccc(S(=O)(=O)[O-])cc1)CCCCC(C)C.[Na+]",
+    "circle": false,
+    "explicitH": false,
+    "trangThai": "da-soat-doc-lap",
+    "fileNguon": "anh/c038023162e1dac36b5cf25244d03b41a7caa08b0ccdc3ea9b1802bc77746970.png",
+    "soQids": 2,
+    "svg": "hinh-ddh-3e64e6c4495b872e511794798f70cee387488cf3f0d11825ec4efcb88789c859.svg",
+    "hashSvg": "3e64e6c4495b872e511794798f70cee387488cf3f0d11825ec4efcb88789c859",
+    "byteSvg": 3010,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "nhomDungChung": 363,
+    "bangChungViTri": [
+      {
+        "where": "12-C1-B2-I-54.hinh.0.du_lieu",
+        "hashDataUrl": "1b44d821a806252d4d8611f7320344ce0b11f0150f39159d72d33031b8c0fadb",
+        "viTri": "sau_pa_A",
+        "truong": "hinh",
+        "congKhaiTruocNop": true
+      },
+      {
+        "where": "DB-12-B2-D1-I-37.hinh.0.du_lieu",
+        "hashDataUrl": "1b44d821a806252d4d8611f7320344ce0b11f0150f39159d72d33031b8c0fadb",
+        "viTri": "sau_pa_A",
+        "truong": "hinh",
+        "congKhaiTruocNop": true
+      }
+    ],
+    "xuLyNhanGiay": "Bỏ A./B./D. sát mép và dấu chấm rời PDF; giữ đủ cấu trúc. Mọi ref đều sau_pa tương ứng, câu dẫn không gọi nhãn này; app tự hiện nhãn ngoài và có hoán vị. Không đổi qid/thứ tự/đáp án.",
+    "ghiNhanDocNguonBanDau": {
+      "caption": [
+        "A."
+      ],
+      "notes": "12C alkyl: alpha gắn aryl + nhánh n-butyl4C + (CH2)4–CH(CH3)2 7C; para; nhãn A. cắt sát trái.",
+      "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn.",
+      "nhanPdfCoTheBo": []
+    },
+    "caption": [],
+    "notes": "Giữ đủ12Calkyl/benzeneparaSO3Na/3đôivòng;nhãnPDFđãxửlýtheobằngchứngsau_pa,câudẫnvàsoátđộclập.",
+    "hashSvgDaSoat": "3e64e6c4495b872e511794798f70cee387488cf3f0d11825ec4efcb88789c859",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "hash": "cbacfec9a20c369fd297063a1459d57308549c222caa8be75146f4f8ba9f28cf",
+    "file": "anh/cbacfec9a20c369fd297063a1459d57308549c222caa8be75146f4f8ba9f28cf.png",
+    "mime": "image/png",
+    "bytes": 5975,
+    "i": 1134,
+    "refs": [
+      {
+        "qid": "12-C1-B2-I-54",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "where": [
+          "12-C1-B2-I-54.hinh.3.du_lieu"
+        ]
+      },
+      {
+        "qid": "DB-12-B2-D1-I-37",
+        "de": "Thông thường, nếu mạch carbon của chất giặt rửa tổng hợp không phân nhánh thì chất tẩy rửa đó dễ phân huỷ sinh học hơn so với mạch carbon phân nhánh.\nChất tẩy rửa nào sau đây thân thiện với môi trường nhất?",
+        "where": [
+          "DB-12-B2-D1-I-37.hinh.3.du_lieu"
+        ]
+      }
+    ],
+    "smiles": "CC(C)C(c1ccc(S(=O)(=O)[O-])cc1)C(C)CC(C)C(C)C.[Na+]",
+    "circle": false,
+    "explicitH": false,
+    "trangThai": "da-soat-doc-lap",
+    "fileNguon": "anh/cbacfec9a20c369fd297063a1459d57308549c222caa8be75146f4f8ba9f28cf.png",
+    "soQids": 2,
+    "svg": "hinh-ddh-b4ee48a581fcf41b7845bf845580cc07b0e942289b048b54e15278a16735c3f9.svg",
+    "hashSvg": "b4ee48a581fcf41b7845bf845580cc07b0e942289b048b54e15278a16735c3f9",
+    "byteSvg": 3018,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "nhomDungChung": 910,
+    "bangChungViTri": [
+      {
+        "where": "12-C1-B2-I-54.hinh.3.du_lieu",
+        "hashDataUrl": "4dd9b5c06c78aedb1d9b15ca027e0ac399f6c4003f9163aa1526b3861454e2f0",
+        "viTri": "sau_pa_D",
+        "truong": "hinh",
+        "congKhaiTruocNop": true
+      },
+      {
+        "where": "DB-12-B2-D1-I-37.hinh.3.du_lieu",
+        "hashDataUrl": "4dd9b5c06c78aedb1d9b15ca027e0ac399f6c4003f9163aa1526b3861454e2f0",
+        "viTri": "sau_pa_D",
+        "truong": "hinh",
+        "congKhaiTruocNop": true
+      }
+    ],
+    "xuLyNhanGiay": "Bỏ A./B./D. sát mép và dấu chấm rời PDF; giữ đủ cấu trúc. Mọi ref đều sau_pa tương ứng, câu dẫn không gọi nhãn này; app tự hiện nhãn ngoài và có hoán vị. Không đổi qid/thứ tự/đáp án.",
+    "ghiNhanDocNguonBanDau": {
+      "caption": [
+        "D."
+      ],
+      "notes": "12C alkyl: alphaAr có iPr trái và CH(CH3)–CH2–CH(CH3)–CH(CH3)2 phải; không nêm/stereo; nhãn D. cắt sát trái.",
+      "lyDoKhongBoNhan": "Không có bằng chứng cho phép bỏ nhãn thực có; giữ nguyên nhãn/không thêm tên từ câu dẫn.",
+      "nhanPdfCoTheBo": []
+    },
+    "caption": [],
+    "notes": "Giữ đủ12Calkyl/benzeneparaSO3Na/3đôivòng;nhãnPDFđãxửlýtheobằngchứngsau_pa,câudẫnvàsoátđộclập.",
+    "hashSvgDaSoat": "b4ee48a581fcf41b7845bf845580cc07b0e942289b048b54e15278a16735c3f9",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

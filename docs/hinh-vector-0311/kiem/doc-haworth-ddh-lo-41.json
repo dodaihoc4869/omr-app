@@ -1,0 +1,185 @@
+[
+  {
+    "i": 1327,
+    "hash": "f0b5f21822060d0ce6192a681517a3957d00110fc0bdaf602bb1d4a71f45b68d",
+    "fileNguon": "anh/f0b5f21822060d0ce6192a681517a3957d00110fc0bdaf602bb1d4a71f45b68d.png",
+    "daMoNguonPNG": true,
+    "caption": [],
+    "chon": true,
+    "nhom": "haworth-literal",
+    "notes": "Vòng pyranose: O góc trên phải, C1 phải,C2 dưới phải,C3 dưới trái,C4 trái,C5 trên trái; cạnh trước C4-C3-C2 đậm. C5 CH₂OH lên/H xuống; C4 H lên/OH xuống; C3 OH lên/H xuống; C2 H lên/OH xuống; C1 H lên/OH xuống. Mọi H và OH explicit, không caption/điện tích. Không suy từ câu hỏi beta-glucose.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D3-I-188",
+        "de": "Ở trạng thái rắn, glucose chủ yếu tồn tại ở dạng mạch vòng β-glucose.\nCông thức cấu trúc nào dưới đây là của β-glucose?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-188.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-I-49",
+        "de": "Ở trạng thái rắn, glucose chủ yếu tồn tại ở dạng mạch vòng β-glucose.\nCông thức cấu trúc nào dưới đây là của β-glucose?",
+        "refs": [
+          {
+            "where": "DH-12-C2-B4-I-49.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      }
+    ],
+    "panels": [
+      {
+        "ringSize": 6,
+        "branches": {
+          "C1": {
+            "up": "H",
+            "down": "OH"
+          },
+          "C2": {
+            "up": "H",
+            "down": "OH"
+          },
+          "C3": {
+            "up": "OH",
+            "down": "H"
+          },
+          "C4": {
+            "up": "H",
+            "down": "OH"
+          },
+          "C5": {
+            "up": "CH2OH",
+            "down": "H"
+          }
+        },
+        "carbonNumbers": [],
+        "caption": []
+      }
+    ]
+  },
+  {
+    "i": 826,
+    "hash": "990cab886fadf0e315ae8824844d74929b0a6006ed9b44f0a11678a23b32f3ab",
+    "fileNguon": "anh/990cab886fadf0e315ae8824844d74929b0a6006ed9b44f0a11678a23b32f3ab.png",
+    "daMoNguonPNG": true,
+    "caption": [],
+    "chon": true,
+    "nhom": "haworth-literal",
+    "notes": "Cùng tọa độ vòng như1327: O trên phải; C5 CH₂OH lên/H xuống; C4 H lên/OH xuống; C3 OH lên/H xuống; C2 H lên/OH xuống; C1 OH lên/H xuống. Cạnh trước C4-C3-C2 đậm. H/OH explicit; không caption/điện tích.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D3-I-188",
+        "de": "Ở trạng thái rắn, glucose chủ yếu tồn tại ở dạng mạch vòng β-glucose.\nCông thức cấu trúc nào dưới đây là của β-glucose?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-188.hinh.1.du_lieu",
+            "viTri": "sau_pa_B"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-I-49",
+        "de": "Ở trạng thái rắn, glucose chủ yếu tồn tại ở dạng mạch vòng β-glucose.\nCông thức cấu trúc nào dưới đây là của β-glucose?",
+        "refs": [
+          {
+            "where": "DH-12-C2-B4-I-49.hinh.1.du_lieu",
+            "viTri": "sau_pa_B"
+          }
+        ]
+      }
+    ],
+    "panels": [
+      {
+        "ringSize": 6,
+        "branches": {
+          "C1": {
+            "up": "OH",
+            "down": "H"
+          },
+          "C2": {
+            "up": "H",
+            "down": "OH"
+          },
+          "C3": {
+            "up": "OH",
+            "down": "H"
+          },
+          "C4": {
+            "up": "H",
+            "down": "OH"
+          },
+          "C5": {
+            "up": "CH2OH",
+            "down": "H"
+          }
+        },
+        "carbonNumbers": [],
+        "caption": []
+      }
+    ]
+  },
+  {
+    "i": 1117,
+    "hash": "c94eedb32fb76079c5cc688c6e491e8c76f27180f51d21d2aa040805566f6de6",
+    "fileNguon": "anh/c94eedb32fb76079c5cc688c6e491e8c76f27180f51d21d2aa040805566f6de6.png",
+    "daMoNguonPNG": true,
+    "caption": [],
+    "chon": true,
+    "nhom": "haworth-literal",
+    "notes": "Cùng vòng như1327: O trên phải; C5 CH₂OH lên/H xuống; C4 H lên/OH xuống; C3 OH lên/H xuống; C2 OH lên/H xuống; C1 OH lên/H xuống. Cạnh trước C4-C3-C2 đậm. Khác826 tại C2: OH lên,H xuống. Không caption/điện tích.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D3-I-188",
+        "de": "Ở trạng thái rắn, glucose chủ yếu tồn tại ở dạng mạch vòng β-glucose.\nCông thức cấu trúc nào dưới đây là của β-glucose?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-188.hinh.3.du_lieu",
+            "viTri": "sau_pa_D"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-I-49",
+        "de": "Ở trạng thái rắn, glucose chủ yếu tồn tại ở dạng mạch vòng β-glucose.\nCông thức cấu trúc nào dưới đây là của β-glucose?",
+        "refs": [
+          {
+            "where": "DH-12-C2-B4-I-49.hinh.3.du_lieu",
+            "viTri": "sau_pa_D"
+          }
+        ]
+      }
+    ],
+    "panels": [
+      {
+        "ringSize": 6,
+        "branches": {
+          "C1": {
+            "up": "OH",
+            "down": "H"
+          },
+          "C2": {
+            "up": "OH",
+            "down": "H"
+          },
+          "C3": {
+            "up": "OH",
+            "down": "H"
+          },
+          "C4": {
+            "up": "H",
+            "down": "OH"
+          },
+          "C5": {
+            "up": "CH2OH",
+            "down": "H"
+          }
+        },
+        "carbonNumbers": [],
+        "caption": []
+      }
+    ]
+  }
+]

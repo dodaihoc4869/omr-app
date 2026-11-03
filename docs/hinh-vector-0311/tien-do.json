@@ -79,14 +79,14 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 403,
-    "soSvgRieng": 278,
-    "soCauDungHinh": 516,
-    "soCauDuMoiHinh": 503,
-    "soCauMoiXongMotPhan": 13,
-    "byteSvg": 3902157,
-    "byteGzip": 795906,
-    "soAnhNguonConLai": 1025,
+    "soAnhNguon": 449,
+    "soSvgRieng": 313,
+    "soCauDungHinh": 549,
+    "soCauDuMoiHinh": 548,
+    "soCauMoiXongMotPhan": 1,
+    "byteSvg": 4119895,
+    "byteGzip": 847323,
+    "soAnhNguonConLai": 979,
     "daTichHop": false
   },
   "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.",
@@ -106,15 +106,14 @@
     "daChuyenHetBoDaVe": true
   },
   "daDatPhongApp": {
-    "soNguon": 403,
-    "soCauDuHinhVaPhong": 503,
+    "soNguon": 449,
+    "soCauDuHinhVaPhong": 548,
     "ghiChu": "Các số tổngDaDoiChieu vẫn mô tả nội dung đã kiểm; bản cũ chưa đổi phông không được coi đạt yêu cầu phông mới."
   },
   "loMoiNhat": {
-    "lo": "23–38",
-    "ketQua": "Đã soát độc lập từng PNG nguồn và SVG render, hash cụ thể trong kiem/*soat-doc-lap.json. Từ456 lên503 câu đủ hình/phông.",
-    "moiTruong": "Đã khôi phục, worktree/commit giữ nguyên;5cd25608 đã push.",
-    "tiepTheo": "Ảnh1198 là ảnh thật giữ nguyên; ưu tiên các câu một phần, tiếp tục nhóm cấu trúc/Haworth/polymer/đồ thị. Bốn Fischer27/928/1407/1123 đã giải quyết lô33.",
-    "gioiHan": "Chưa tích hợp hình, chưa kiểm reload offline app, chưa phát hành. Chromium assets-only không thay kiểm ứng dụng."
+    "lo": "39–56",
+    "ketQua": "548 câu đủ mọi hình+DDH;449nguồn→313SVG. Toàn bộ20nguồn doc-molecule-20-lo-44.json đã dựng/soát; giữ từngHexplicit/caption/nhómcondensed/stereo,cleanupnhãnPDFcóbằngchứngriêng.",
+    "tiepTheo": "Tác tửcau_truc_5 đang đọc20nguồnmới lô57: /workspace/scratch/doc-molecule-lo-57.json. Tiếp tục dựng và soát độc lập từngnguồn.1198làảnhhoa thật giữnguyên,khôngcộngsốvẽ.",
+    "gioiHan": "Chưa tích hợp/chưa reloadofflineapp/chưa phát hành. Main93b88d37 chưa gộp, phải kiểm lại trước triển khai."
   }
 }
