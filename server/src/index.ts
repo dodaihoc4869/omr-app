@@ -3865,6 +3865,7 @@ const boXuLy = {
       if (p === '/hs/goi-y-so-do') return ra(await import('./loi-giai-so-do').then((m) => m.hsGoiYSoDo(env, b, { sau: ctx ? (viec) => ctx.waitUntil(viec) : undefined })))
       // LỜI GIẢI KÍNH (thầy chốt 02/11): tải sẵn bản Kính mã hoá cho câu em đang có (loi-giai-kinh.ts — cùng luật phạm vi với gói đáp án dm).
       if (p === '/hs/loi-giai-kinh') return ra(await import('./loi-giai-kinh').then((m) => m.hsGoiKinh(env, b)))
+      if (p === '/hs/hinh-ve') return ra(await import('./hinh-ve').then((m) => m.hsHinhVe(env, b)))
       if (p === '/hs/hoi-thay') {
         // HỎI THÊM THẦY (13/10, hoi-tro-ly.ts): phản hồi mở được lời giải ⇒ kèm `hoiThem` = máy em hiện ô nhắn hỏi Thầy (AI) dưới lời giải.
         // Tốc độ (thầy 13/10): cờ đọc SONG SONG với các lượt kiểm của hsHoiThay; việc ghi sổ chạy sau phản hồi (ctx.waitUntil).
@@ -4243,6 +4244,10 @@ const boXuLy = {
       if (p === '/kho/loi-giai-kinh/soat-nop') return ra(await import('./loi-giai-kinh').then((m) => m.soatNopKinh(env, b)))
       if (p === '/kho/loi-giai-kinh/soat-tong') return ra(await import('./loi-giai-kinh').then((m) => m.soatTongKinh(env)))
       if (p === '/kho/hinh-de/dem') return ra(await import('./hinh-de').then((m) => m.demHinhDe(env)))
+      if (p === '/kho/hinh-ve/nap-hang') return ra(await import('./hinh-ve').then((m) => m.napHangHinh(env, b)))
+      if (p === '/kho/hinh-ve/viec') return ra(await import('./hinh-ve').then((m) => m.layViecHinh(env, b)))
+      if (p === '/kho/hinh-ve/nop') return ra(await import('./hinh-ve').then((m) => m.nopHinh(env, b)))
+      if (p === '/kho/hinh-ve/tong') return ra(await import('./hinh-ve').then((m) => m.tongHinh(env)))
       if (p === '/kho/loi-giai-kinh/lam-lai') return ra(await import('./loi-giai-kinh').then((m) => m.lamLaiKinh(env, b)))
       if (p === '/kho/loi-giai-kinh/quet-hien') return ra(await import('./loi-giai-kinh').then((m) => m.quetHienKinh(env, b)))
       if (p === '/kho/xoa-cau-dap-an-dai') return ra(await import('./xoa-cau-kho').then((m) => m.xoaCauKho(env, b)))
@@ -4267,6 +4272,7 @@ const boXuLy = {
       if (p === '/ca/cau-nghi-dap-an') return ra(await dsCauNghi(env))
       if (p === '/gv/loi-giai/xem') return ra(await gvXemHoSo(env, b))
       // LỜI GIẢI KÍNH cho app THẦY / màn chiếu (thầy 03/11 «Hiển thị lời giải mới cho tất cả phần chiếu lên bảng»): sau cổng mã bí mật như mọi /gv/*; MỘT câu D1.
+      if (p === '/gv/hinh-ve') return ra(await import('./hinh-ve').then((m) => m.gvHinhVe(env, b)))
       if (p === '/gv/loi-giai-kinh') return ra(await import('./loi-giai-kinh').then(async (m) => ({ ok: true, ban: Object.fromEntries(await m.docBanKinh(env, (Array.isArray(b.qids) ? b.qids : []).map(String).slice(0, 200))) })))
       if (p === '/gv/loi-giai/duyet') return ra(await gvDuyet(env, b))
       if (p === '/gv/loi-giai/soan-gap') return ra(await gvSoanGap(env, b))

@@ -36,8 +36,10 @@ import { VungChamDe } from '../goi-y-cham/VungChamDe'
 const LoiGiaiCauCoSoDo = lazy(() => import('../goi-y-cham/LoiGiaiCauCoSoDo'))
 // LỜI GIẢI KÍNH (thầy chốt 02/11): mảnh nạp lười; câu chưa có bản Kính ⇒ lời giải đang có (sơ đồ / chữ).
 const LoiGiaiKinhHs = lazy(() => import('../loi-giai-kinh/LoiGiaiKinhHs'))
+const HinhVeLaiCuaCau = lazy(() => import('../hinh-ve/HinhVeLaiCuaCau'))
 // NÂNG CẤP 27/10 (bản vẽ ve-moi/nang-cap): tranh Hoá học (cảnh phản ứng dưới đề · phân tử trong ô phương án). Nằm CHUNG mảnh màn làm bài (mảnh này đã
 // nạp lười, ngoài lượt mở app) — không tách mảnh riêng để precache không thêm tệp; chỉ vẽ khi chữ đề / phương án có dáng chất (lọc rẻ ngay đây).
+import { coHinhDe } from '../../lib/hinh-ve/co-hinh'
 import { IcLapLanh, IcMayTinh, MinhHoaDe, TranhPa } from './minh-hoa-hoa'
 import { chayThuong, chuMoc, mocCombo } from './hieu-ung-duo'
 import { SoLan } from './SoLan'
@@ -1295,6 +1297,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
             </div>
             : <VungChamDe key={`v${q.qid}`} q={q} token={token} phien={phien} onHoTro={danhDauHoTro} nutBatDau={nutBatDau}><DeCau q={q} stt={stt} /></VungChamDe>}
           {coDangCanh(q.text) && <MinhHoaDe key={`m${q.qid}`} text={q.text} />}
+          {coHinhDe(q.hinhAnh) && <Suspense key={`hv${q.qid}`} fallback={null}><HinhVeLaiCuaCau qid={q.qid} /></Suspense>}{/* thầy 03/11: hình của đề vẽ lại = thẻ riêng ở dưới */}
           {q.goiY && goiY && dangTraLoi && <section key={`y${q.qid}`} id="ht2-lam-goi-y" className="ht2-lam-goi-y" aria-label="Gợi ý"><b><Lightbulb size={18} aria-hidden="true" />Gợi ý</b><p>{q.goiY.cotLoi || (q.goiY.gach?.length ? `Có thể loại phương án ${q.goiY.gach.join(', ')}.` : 'Đọc lại kiến thức cốt lõi của bài.')}</p></section>}
           </div>
           <ThanhCuon key="cd" cot="de" />
