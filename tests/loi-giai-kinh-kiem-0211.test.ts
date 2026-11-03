@@ -107,3 +107,24 @@ describe('chữ thầy nói theo thuật ngữ SGK', () => {
     expect(k.ban!.thayNoi).toBe('Xà phòng là muối của acid béo.')
   })
 })
+
+describe('cảnh gọi tên danh-phap (thầy 03/11: công thức nhánh + mạch chính + liên kết + chức)', () => {
+  const canh = { loai: 'danh-phap', soC: 6, chuc: { viTri: 1, ten: 'COOH' }, nhanh: [{ viTri: 2, ten: 'NH2' }, { viTri: 6, ten: 'NH2' }], pi: [],
+    manh: [{ loai: 'nhanh', chu: '2,6-diamino', giai: 'Hai nhánh amino.' }, { loai: 'mach', chu: 'hex', giai: '6 C.' }, { loai: 'lien-ket', chu: 'an', giai: 'Đơn.' }, { loai: 'chuc', chu: 'oic acid', giai: 'COOH.' }],
+    ten: '2,6-diaminohexanoic acid' }
+  it('đúng khuôn, tên = ghép các mảnh ⇒ giữ cảnh', () => {
+    const k = kiemBanKinh({ ...mauII(), canh }, ctxII)
+    expect(k.ket).toBe('dat')
+    expect(k.ban!.canh).toMatchObject({ loai: 'danh-phap', soC: 6, ten: '2,6-diaminohexanoic acid' })
+  })
+  it('tên không khớp các mảnh / vị trí ngoài mạch ⇒ bỏ cảnh (bản vẫn đạt)', () => {
+    const k1 = kiemBanKinh({ ...mauII(), canh: { ...canh, ten: '2,6-diaminopentanoic acid' } }, ctxII)
+    expect(k1.ban!.canh).toBeUndefined(); expect(k1.boKhoi).toContain('cảnh minh hoạ sai khuôn')
+    const k2 = kiemBanKinh({ ...mauII(), canh: { ...canh, nhanh: [{ viTri: 9, ten: 'NH2' }] } }, ctxII)
+    expect(k2.ban!.canh).toBeUndefined()
+  })
+  it('ester chỉ lắp mảnh (không mạch)', () => {
+    const k = kiemBanKinh({ ...mauII(), canh: { loai: 'danh-phap', nhanh: [], pi: [], manh: [{ loai: 'goc-ancol', chu: 'ethyl', giai: 'Gốc R′.' }, { loai: 'goc-acid', chu: ' acetate', giai: 'Gốc RCOO.' }], ten: 'ethyl acetate' } }, ctxII)
+    expect(k.ban!.canh).toMatchObject({ loai: 'danh-phap', ten: 'ethyl acetate' })
+  })
+})

@@ -49,6 +49,7 @@ Thầy: «có câu xác định nhóm trong bảng tuần hoàn ko đưa kiến 
     - `manh`: 2–5 mảnh ĐÚNG THỨ TỰ công thức thầy, mỗi mảnh `{ "loai", "chu", "giai" }`:
       tên thay thế: `nhanh` (vd "2,6-diamino") → `mach` ("hex") → `lien-ket` ("an" / "-2-en" …) → `chuc` ("oic acid", "-1-ol", "al", "amine"…);
       ester: `goc-ancol` ("ethyl") → `goc-acid` (" acetate"). `giai`: MỘT câu rất dễ hiểu vì sao mảnh này là vậy (vd «2 nhóm NH₂ ở C2 và C6 là nhánh amino, có 2 nhánh nên thêm di»).
+      Vị trí carbon trong chữ viết «carbon số 2» hoặc «vị trí 2», KHÔNG viết «C2» (app hạ số sau chữ thành chỉ số, thành C₂ dễ hiểu nhầm).
       Mảnh có thể rỗng nghĩa thì bỏ (vd không có nhánh thì không có mảnh `nhanh`).
     - `ten`: tên đầy đủ = ghép các `chu` (máy so bỏ dấu cách). Phải đúng với đáp án kho.
 - `thanChu`: mảng chữ thần chú — CHỈ chép ĐÚNG CHỮ trường `chu` trong `than-chu.json`, chỉ khi đúng chuyện câu đang hỏi. Không có thì `[]`. Tuyệt đối không tự đặt thần chú.

@@ -2,7 +2,7 @@
 // Chuẩn = bản mẫu thầy chốt 02/11 (docs/ban-ve-loi-giai-0211/): đủ khối, khớp đáp án kho, không bịa lời thầy, không ký hiệu cấm.
 // Trả `ket`: 'dat' (hiện được) · 'lech' (lệch đáp án kho / phép tính) · 'thieu' (thiếu khối chuẩn) · 'khong_kiem_duoc' (khuôn hỏng).
 // Thần chú / câu thầy nói / mẹo KHÔNG có trong nguồn ⇒ chỉ BỎ khối đó (không đánh trượt cả bản) — máy chủ không tin chữ mô hình tự nhận là của thầy.
-import { HINH_NHIP, MAU_LOP, PHIEN_BAN_KINH, type BanKinh, type CanhKinh, type CongKinh, type HayNham, type LyDoKinh, type NhipPhim, type PhanKinh, type PhepTinhKinh, type TheNho } from './kieu'
+import { HINH_NHIP, MANH_TEN, MAU_LOP, PHIEN_BAN_KINH, type BanKinh, type CanhKinh, type CongKinh, type HayNham, type LyDoKinh, type NhipPhim, type PhanKinh, type PhepTinhKinh, type TheNho } from './kieu'
 import { tinhBieuThuc } from '../loi-giai-kiem'
 import type { BuocTinh, SoDo } from '../goi-y-cham/kieu'
 
@@ -87,6 +87,22 @@ function docCanh(x: unknown): CanhKinh | null {
     const t = ve(x.trai), p = ve(x.phai)
     if (!t || !p || !t.y.length || !p.y.length) return null
     return { loai: 'so-sanh', trai: t, phai: p }
+  }
+  if (x.loai === 'danh-phap') {
+    const soC = Number.isInteger(x.soC) && Number(x.soC) >= 1 && Number(x.soC) <= 12 ? Number(x.soC) : undefined
+    const trongMach = (v: unknown, tran: number) => Number.isInteger(v) && Number(v) >= 1 && Number(v) <= tran
+    const nhom = (g: unknown) => (laObj(g) && s(g.ten, 16) && (!soC || trongMach(g.viTri, soC)) ? { viTri: Number(g.viTri) || 1, ten: s(g.ten, 16) } : null)
+    const chuc = x.chuc === undefined || x.chuc === null ? undefined : nhom(x.chuc)
+    const nhanh = mang(x.nhanh).map(nhom)
+    const pi = mang(x.pi).map((q) => (laObj(q) && soC && trongMach(q.viTri, soC - 1) && (q.loai === 'doi' || q.loai === 'ba') ? { viTri: Number(q.viTri), loai: q.loai as 'doi' | 'ba' } : null))
+    const manh = mang(x.manh).map((m) => (laObj(m) && (MANH_TEN as readonly string[]).includes(String(m.loai)) && typeof m.chu === 'string' && m.chu.trim() && s(m.giai, 220)
+      ? { loai: m.loai as never, chu: String(m.chu).slice(0, 40), giai: s(m.giai, 220) } : null))
+    const ten = s(x.ten, 80)
+    const gon = (t: string) => t.normalize('NFC').toLowerCase().replace(/[\s ]+/g, '')
+    if (x.chuc !== undefined && x.chuc !== null && !chuc) return null
+    if (nhanh.some((g) => !g) || pi.some((q) => !q) || manh.length < 2 || manh.length > 5 || manh.some((m) => !m) || !ten || nhanh.length > 6) return null
+    if (gon(manh.map((m) => m!.chu).join('')) !== gon(ten)) return null // tên = ghép đủ các mảnh
+    return { loai: 'danh-phap', ...(soC ? { soC } : {}), ...(chuc ? { chuc } : {}), nhanh: nhanh as never, pi: pi as never, manh: manh as never, ten }
   }
   return null
 }

@@ -171,6 +171,7 @@ function Phim({ ban }: { ban: BanKinh }) {
 function Canh({ canh }: { canh: CanhKinh }) {
   if (canh.loai === 'can-bang') return <CanhCanBang canh={canh} />
   if (canh.loai === 'ong-nghiem') return <CanhOngNghiem canh={canh} />
+  if (canh.loai === 'danh-phap') return <CanhDanhPhap canh={canh} />
   return <CanhSoSanh canh={canh} />
 }
 function CanhCanBang({ canh }: { canh: Extract<CanhKinh, { loai: 'can-bang' }> }) {
@@ -222,6 +223,101 @@ function CanhSoSanh({ canh }: { canh: Extract<CanhKinh, { loai: 'so-sanh' }> }) 
       <span className="lgk-nhan">Đặt cạnh nhau</span>
       <div className="lgk-ss">{[canh.trai, canh.phai].map((v, i) => <div key={i}><b><CongThuc chu={v.ten} /></b><ul>{v.y.map((y, j) => <li key={j}><Chu chu={y} /></li>)}</ul></div>)}</div>
     </section>
+  )
+}
+
+// CẢNH GỌI TÊN (thầy 03/11: «kiểm tra xem danh pháp thầy sử dụng công thức gọi tên như thế nào và đồng bộ với tất cả các bài gọi danh pháp»,
+// «nhớ mô phỏng chi tiết cực kì dễ hiểu theo cách gọi tên của thầy»). Đúng BA BƯỚC thầy dạy (skill 2008 «Ba bước gọi tên hợp chất hữu cơ»,
+// 2008 Ch.6 «Quy tắc gọi tên hợp chất chứa nhóm chức», 10.C3 «Cách gọi tên amino acid»):
+//   1) chọn mạch chính (dài nhất, chứa nhóm chức) · 2) đánh số — ưu tiên CHỨC → π → NHÁNH · 3) gọi tên theo công thức
+//      NHÁNH (vị trí-tên) + MẠCH CHÍNH + LIÊN KẾT (an / en / in) + CHỨC — đơn chức bỏ «e», đa chức giữ «e».
+// Ester (skill 1.C1): đọc GỐC R′ (phần alcohol) trước, rồi GỐC RCOO (phần acid, đuôi «ate»).
+// Vẽ bằng mã (SVG), chạy MỘT lượt kiểu Stories; mỗi nhịp sáng đúng phần đang nói + lắp thêm một mảnh tên. Màu chỉ biến --tr-*.
+type CanhDP = Extract<CanhKinh, { loai: 'danh-phap' }>
+const NHAN_MANH: Record<CanhDP['manh'][number]['loai'], string> = { nhanh: 'Nhánh', mach: 'Mạch chính', 'lien-ket': 'Liên kết', chuc: 'Chức', 'goc-ancol': 'Gốc R′ (alcohol)', 'goc-acid': 'Gốc RCOO (acid)' }
+
+function CanhDanhPhap({ canh }: { canh: CanhDP }) {
+  const coMach = !!canh.soC
+  // Nhịp: [chọn mạch chính, đánh số] (khi có mạch) + mỗi mảnh tên một nhịp + nhịp chốt tên đủ.
+  const nhip = useMemo(() => {
+    const ds: { chu: string; sang: string; soManh: number; so: boolean }[] = []
+    if (coMach) {
+      ds.push({ chu: `**Bước 1 · chọn mạch chính**: mạch dài nhất chứa nhóm chức — **${canh.soC} C**.`, sang: 'mach', soManh: 0, so: false })
+      ds.push({ chu: `**Bước 2 · đánh số**: ưu tiên **chức → π → nhánh**${canh.chuc ? ` — nhóm ${canh.chuc.ten} gắn carbon số ${canh.chuc.viTri}` : ''}.`, sang: 'so', soManh: 0, so: true })
+    }
+    canh.manh.forEach((m, i) => ds.push({ chu: `${coMach ? '**Bước 3 · ' : '**'}${NHAN_MANH[m.loai]}**${coMach ? '' : ''}: ${m.giai}`, sang: m.loai, soManh: i + 1, so: coMach }))
+    ds.push({ chu: `Ghép đủ theo công thức của thầy ⇒ **${canh.ten}**.`, sang: 'het', soManh: canh.manh.length, so: coMach })
+    return ds
+  }, [canh, coMach])
+  const n = nhip.length
+  const { datGoc, ...p } = useChayMotLuot(n, 3600)
+  const h = nhip[p.buoc - 1]!
+  return (
+    <section className="lgk-the lgk-canh lgk-dp" ref={datGoc} aria-label="Gọi tên theo cách của thầy">
+      <div className="lgk-dau"><span className="lgk-nhan">Gọi tên theo cách của thầy</span><span className="lgk-dem">Nhịp {p.buoc}/{n}</span></div>
+      <Vach n={n} buoc={p.buoc} chay={p.chay} den={(k) => p.den(k)} t={p.t} nhan="Nhịp" />
+      {coMach && <MachC canh={canh} sang={h.sang} so={h.so} />}
+      <div className="lgk-dp-cong" aria-label="Công thức gọi tên">
+        {canh.manh.map((m, i) => (
+          <span key={i} className="lgk-dp-o" data-loai={m.loai} data-co={i < h.soManh ? '' : undefined} data-sang={i + 1 === h.soManh && h.sang !== 'het' ? '' : undefined}>
+            <small>{NHAN_MANH[m.loai]}</small><b>{i < h.soManh ? <ChuTron chu={m.chu.trim() || '—'} /> : '?'}</b>
+          </span>
+        ))}
+      </div>
+      <div className="lgk-dp-ten" data-xong={h.sang === 'het' ? '' : undefined}>
+        {canh.manh.map((m, i) => <span key={i} data-loai={m.loai} data-an={i >= h.soManh ? '' : undefined}><ChuTron chu={m.chu} /></span>)}
+      </div>
+      <p className="lgk-loi" aria-live="polite"><span className="lgk-so-tron">{p.buoc}</span><span><Chu chu={h.chu} /></span></p>
+      <div className="lgk-dk"><NutChay chay={p.chay} buoc={p.buoc} n={n} onClick={p.nut} /></div>
+    </section>
+  )
+}
+
+/** Mạch carbon dích dắc: C1 … Cn từ TRÁI (đã đánh số — đầu ưu tiên ở C1), nhóm chức / nhánh đứng ở carbon của nó, π vẽ nét đôi / ba. */
+function MachC({ canh, sang, so }: { canh: CanhDP; sang: string; so: boolean }) {
+  const soC = canh.soC!
+  const W = 340, dx = soC > 1 ? Math.min(54, (W - 70) / (soC - 1)) : 0
+  const x0 = (W - dx * (soC - 1)) / 2
+  const xy = (i: number) => ({ x: x0 + (i - 1) * dx, y: i % 2 ? 96 : 74 })
+  const len = (i: number) => (i % 2 ? 1 : -1) // C lẻ ở dưới ⇒ nhóm gắn quay xuống; C chẵn ở trên ⇒ quay lên
+  const pi = new Map(canh.pi.map((x) => [x.viTri, x.loai]))
+  const nhom = [...(canh.chuc ? [{ ...canh.chuc, la: 'chuc' as const }] : []), ...canh.nhanh.map((x) => ({ ...x, la: 'nhanh' as const }))]
+  return (
+    <div className="lgk-dp-san" data-sang={sang}>
+      <svg viewBox={`0 0 ${W} 170`} role="img" aria-label={`Mạch chính ${soC} carbon${nhom.map((g) => `, ${g.ten} ở C${g.viTri}`).join('')}`}>
+        {Array.from({ length: soC - 1 }, (_, k) => {
+          const a = xy(k + 1), b = xy(k + 2), l = pi.get(k + 1)
+          const nx = -(b.y - a.y), ny = b.x - a.x, d = Math.hypot(nx, ny) || 1, ox = (nx / d) * 5, oy = (ny / d) * 5
+          return (
+            <g key={k} className="lgk-dp-lk" data-pi={l ? '' : undefined}>
+              <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} />
+              {l && <line x1={a.x + ox} y1={a.y + oy} x2={b.x + ox} y2={b.y + oy} />}
+              {l === 'ba' && <line x1={a.x - ox} y1={a.y - oy} x2={b.x - ox} y2={b.y - oy} />}
+            </g>
+          )
+        })}
+        {nhom.map((g, k) => {
+          const c = xy(g.viTri), v = len(g.viTri), y2 = c.y + v * 40
+          return (
+            <g key={`g${k}`} className="lgk-dp-nhom" data-la={g.la}>
+              <line x1={c.x} y1={c.y + v * 14} x2={c.x} y2={y2 - v * 12} />
+              <rect x={c.x - 30} y={y2 - 13} width={60} height={26} rx={13} />
+              <text x={c.x} y={y2 + 5} textAnchor="middle">{g.ten.replace(/_?(\d)/g, (_, d: string) => '₀₁₂₃₄₅₆₇₈₉'[+d]!)}</text>
+            </g>
+          )
+        })}
+        {Array.from({ length: soC }, (_, k) => {
+          const c = xy(k + 1)
+          return (
+            <g key={`c${k}`} className="lgk-dp-c">
+              <circle cx={c.x} cy={c.y} r={14} />
+              <text x={c.x} y={c.y + 5} textAnchor="middle">C</text>
+              <text className="lgk-dp-so" data-hien={so ? '' : undefined} style={{ transitionDelay: so ? `${k * 120}ms` : '0ms' }} x={c.x} y={c.y + (len(k + 1) > 0 ? -22 : 34)} textAnchor="middle">{k + 1}</text>
+            </g>
+          )
+        })}
+      </svg>
+    </div>
   )
 }
 
