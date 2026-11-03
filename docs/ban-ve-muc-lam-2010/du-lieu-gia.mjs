@@ -75,7 +75,6 @@ const THEM_C12 = [
   ['Bùi Tuấn Kiệt', -0.2, 38, 'Tự sửa lỗi', '25/10', '19:40'], ['Tô Gia Hân', 0.2, 49, 'Tự sửa lỗi', '25/10', '20:03'],
 ]
 const gioBtvn = (i) => { const ph = 18 * 60 + 30 + i * 9; return `${String(Math.floor(ph / 60)).padStart(2, '0')}:${String(ph % 60).padStart(2, '0')}` }
-const byTen = new Map(SAI_C12.map((r, i) => [r[0], i]))
 export const LUOT_SAI_C12 = [
   ...SAI_C12.map(([ten, tau, giay], i) => ({ ten, tau, giay, nguon: 'BTVN', ngay: '26/10', gio: gioBtvn(i) })),
   ...THEM_C12.map(([ten, tau, giay, nguon, ngay, gio]) => ({ ten, tau, giay, nguon, ngay, gio })),
