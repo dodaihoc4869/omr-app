@@ -1,0 +1,442 @@
+{
+  "author": "cau_truc_6",
+  "scope": "Read-only traces/callgraph; no repo/app/budget changes",
+  "runsSoDo21": [
+    {
+      "file": "/workspace/scratch/vector-d1-trace166-2.jsonl",
+      "dot": 3,
+      "lenh": 26,
+      "events": [
+        {
+          "seq": 21,
+          "event": "flush",
+          "dot": 1,
+          "count": 20
+        },
+        {
+          "seq": 67,
+          "event": "flush",
+          "dot": 2,
+          "count": 5
+        },
+        {
+          "seq": 78,
+          "event": "enqueue",
+          "id": 159
+        },
+        {
+          "seq": 79,
+          "event": "flush",
+          "dot": 3,
+          "count": 1
+        },
+        {
+          "seq": 80,
+          "event": "start",
+          "id": 159
+        },
+        {
+          "seq": 81,
+          "event": "done",
+          "id": 159
+        }
+      ],
+      "batch159stack": []
+    },
+    {
+      "file": "/workspace/scratch/vector-d1-trace166-3.jsonl",
+      "dot": 2,
+      "lenh": 26,
+      "events": [
+        {
+          "seq": 21,
+          "event": "flush",
+          "dot": 1,
+          "count": 20
+        },
+        {
+          "seq": 67,
+          "event": "enqueue",
+          "id": 159
+        },
+        {
+          "seq": 68,
+          "event": "flush",
+          "dot": 2,
+          "count": 6
+        },
+        {
+          "seq": 74,
+          "event": "start",
+          "id": 159
+        },
+        {
+          "seq": 80,
+          "event": "done",
+          "id": 159
+        }
+      ],
+      "batch159stack": []
+    },
+    {
+      "file": "/workspace/scratch/vector-d1-trace166-4.jsonl",
+      "dot": 2,
+      "lenh": 26,
+      "events": [
+        {
+          "seq": 21,
+          "event": "flush",
+          "dot": 1,
+          "count": 20
+        },
+        {
+          "seq": 67,
+          "event": "enqueue",
+          "id": 159
+        },
+        {
+          "seq": 68,
+          "event": "flush",
+          "dot": 2,
+          "count": 6
+        },
+        {
+          "seq": 74,
+          "event": "start",
+          "id": 159
+        },
+        {
+          "seq": 80,
+          "event": "done",
+          "id": 159
+        }
+      ],
+      "batch159stack": []
+    },
+    {
+      "file": "/workspace/scratch/vector-d1-trace166-crypto.jsonl",
+      "dot": 2,
+      "lenh": 26,
+      "events": [
+        {
+          "seq": 1,
+          "event": "crypto.sign.begin"
+        },
+        {
+          "seq": 2,
+          "event": "crypto.sign.done"
+        },
+        {
+          "seq": 23,
+          "event": "flush",
+          "dot": 1,
+          "count": 20
+        },
+        {
+          "seq": 69,
+          "event": "enqueue",
+          "id": 159
+        },
+        {
+          "seq": 70,
+          "event": "flush",
+          "dot": 2,
+          "count": 6
+        },
+        {
+          "seq": 76,
+          "event": "start",
+          "id": 159
+        },
+        {
+          "seq": 82,
+          "event": "done",
+          "id": 159
+        }
+      ],
+      "batch159stack": [
+        "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:694:75",
+        "    at tat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:45:18)",
+        "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:694:11)"
+      ]
+    },
+    {
+      "file": "/workspace/scratch/vector-d1-trace166-crypto2.jsonl",
+      "dot": 2,
+      "lenh": 26,
+      "events": [
+        {
+          "seq": 1,
+          "event": "crypto.sign.begin"
+        },
+        {
+          "seq": 2,
+          "event": "crypto.sign.done"
+        },
+        {
+          "seq": 23,
+          "event": "flush",
+          "dot": 1,
+          "count": 20
+        },
+        {
+          "seq": 69,
+          "event": "enqueue",
+          "id": 159
+        },
+        {
+          "seq": 70,
+          "event": "flush",
+          "dot": 2,
+          "count": 6
+        },
+        {
+          "seq": 76,
+          "event": "start",
+          "id": 159
+        },
+        {
+          "seq": 82,
+          "event": "done",
+          "id": 159
+        }
+      ],
+      "batch159stack": [
+        "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:694:75",
+        "    at tat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:45:18)",
+        "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:694:11)"
+      ]
+    },
+    {
+      "file": "/workspace/scratch/vector-d1-trace166-crypto3.jsonl",
+      "dot": 3,
+      "lenh": 26,
+      "events": [
+        {
+          "seq": 1,
+          "event": "crypto.sign.begin"
+        },
+        {
+          "seq": 2,
+          "event": "crypto.sign.done"
+        },
+        {
+          "seq": 23,
+          "event": "flush",
+          "dot": 1,
+          "count": 20
+        },
+        {
+          "seq": 69,
+          "event": "flush",
+          "dot": 2,
+          "count": 5
+        },
+        {
+          "seq": 80,
+          "event": "enqueue",
+          "id": 159
+        },
+        {
+          "seq": 81,
+          "event": "flush",
+          "dot": 3,
+          "count": 1
+        },
+        {
+          "seq": 82,
+          "event": "start",
+          "id": 159
+        },
+        {
+          "seq": 83,
+          "event": "done",
+          "id": 159
+        }
+      ],
+      "batch159stack": [
+        "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:694:75",
+        "    at tat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:45:18)",
+        "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:694:11)"
+      ]
+    },
+    {
+      "file": "/workspace/scratch/vector-d1-trace166-crypto4.jsonl",
+      "dot": 2,
+      "lenh": 26,
+      "events": [
+        {
+          "seq": 1,
+          "event": "crypto.sign.begin"
+        },
+        {
+          "seq": 2,
+          "event": "crypto.sign.done"
+        },
+        {
+          "seq": 23,
+          "event": "flush",
+          "dot": 1,
+          "count": 20
+        },
+        {
+          "seq": 69,
+          "event": "enqueue",
+          "id": 159
+        },
+        {
+          "seq": 70,
+          "event": "flush",
+          "dot": 2,
+          "count": 6
+        },
+        {
+          "seq": 76,
+          "event": "start",
+          "id": 159
+        },
+        {
+          "seq": 82,
+          "event": "done",
+          "id": 159
+        }
+      ],
+      "batch159stack": [
+        "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:694:75",
+        "    at tat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:45:18)",
+        "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:694:11)"
+      ]
+    },
+    {
+      "file": "/workspace/scratch/vector-d1-trace166-stack.jsonl",
+      "dot": 2,
+      "lenh": 26,
+      "events": [
+        {
+          "seq": 21,
+          "event": "flush",
+          "dot": 1,
+          "count": 20
+        },
+        {
+          "seq": 67,
+          "event": "enqueue",
+          "id": 159
+        },
+        {
+          "seq": 68,
+          "event": "flush",
+          "dot": 2,
+          "count": 6
+        },
+        {
+          "seq": 74,
+          "event": "start",
+          "id": 159
+        },
+        {
+          "seq": 80,
+          "event": "done",
+          "id": 159
+        }
+      ],
+      "batch159stack": [
+        "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:694:75",
+        "    at tat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:45:18)",
+        "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:694:11)"
+      ]
+    },
+    {
+      "file": "/workspace/scratch/vector-d1-trace166.jsonl",
+      "dot": 2,
+      "lenh": 26,
+      "events": [
+        {
+          "seq": 21,
+          "event": "flush",
+          "dot": 1,
+          "count": 20
+        },
+        {
+          "seq": 67,
+          "event": "enqueue",
+          "id": 159
+        },
+        {
+          "seq": 68,
+          "event": "flush",
+          "dot": 2,
+          "count": 6
+        },
+        {
+          "seq": 74,
+          "event": "start",
+          "id": 159
+        },
+        {
+          "seq": 80,
+          "event": "done",
+          "id": 159
+        }
+      ],
+      "batch159stack": []
+    }
+  ],
+  "confirmed": [
+    {
+      "claim": "Cùng26D1,đỏkháctại vịtríbatch159soflush2,chứkhôngthêmquery.",
+      "evidence": "green166:enq159seq67 trướcflush2seq68,count6;red166-2:flush2seq67,count5,start154..158seq68..72,done73..77,enq159seq78,flush3seq79."
+    },
+    {
+      "claim": "Batch159khôngcódependencybắtbuộcvàokếtquả5query154..158.",
+      "evidence": "Greenenqueue159TRƯỚCstartbấtkỳ154..158;đủbằngchứngloạigiảthuyếtbatchphảichờ5querynày. RedenqueueSAUdone5querychỉlàthứtựthờigian,khôngchứngminhdependency."
+    },
+    {
+      "claim": "5query154..158làvềđích,lệnh159làlưukếhoạch.",
+      "evidence": "stackcrypto2:154WITHdangbtvn,155docEmVaCa,156docOn,157docGoi,158docSoHoctạive-dich-d1.ts178/247/279/292/308/365,index.ts157/159;159INSERTke_hoach_ngaytạike-hoach-ngay-d1.ts694."
+    },
+    {
+      "claim": "Authsignkhôngnằmtạikheflush2/3trongcryptoredđãthu.",
+      "evidence": "crypto3soDo21sign.beginseq1,done2,flush1seq23;flush2seq69,enq159seq80,flush3seq81. Khôngquykhetrễnàychosign. Chưađạidiệndigest/importKey/dynamicimport."
+    }
+  ],
+  "callgraph": [
+    {
+      "location": "server/src/ke-hoach-ngay-d1.ts654..694",
+      "detail": "dau/pDauVaođọcsongsong;awaitdau/cong;launchpDung;khisoHoSopreparedcallbackkíchvềđích;awaitpDauVao/pDung;lapKeHoachNgaysync,prepareLUU+awaitDB.batch694."
+    },
+    {
+      "location": "server/src/index.ts150..164",
+      "detail": "dungKeHoachEmcallbacktừhsKeHoachNgayCoExp→docVeDichCuaEm,độc lậpvới lưukếhoạchphíasau. Causalsharingcommonantecedentkhácvớidependency154→159."
+    }
+  ],
+  "notProven": [
+    "Non-D1operation/cụthểawaitnàolàm159missflush2chưaxácđịnh. CầntracepDauVao/pDung/congresolve,khisoHoSocallbackvànativecrypto.digest/importKey;khôngsửaappchỉvìtimingcorrelation.",
+    "Chưacótraceđỏnop-cau-luong-truot4/7vớifirstwrite/firstreadđểquykết;JSONsoDo21khôngđủchứngminhlỗistreamđãhết.",
+    "Chưaphânđịnhcuốicùngharnessvsapp:querydependencydiagramloại1giảthuyếtnhưngresponsevẫncầnawaitLUU;nonD1latencythậtkhôngđượcgọilàkhôngcó."
+  ],
+  "twoSetImmediateReview": {
+    "verdict": "Cóthểdùngnhưboundedqueue-coalescingheuristic,khôngcoilàcausality-proofhoặcđảmbảohếtflaky.",
+    "doesNotHide": "AawaitD1→BawaitD1criticalvẫncầnflushAtrướckhiBenqueue,nên2flushthậtvẫnbịnegativecontrolbắt;chờqueue2turnkhôngtựresolveD1A.",
+    "limitation": "Queueunchanged2setImmediatekhôngchứngminhnativecrypto/dynamicimport/I/Ođãsettle;operationcóthểtrễ3+turnvẫnđỏ. Threshold2arbitrary,chỉđếmD1roundskhôngđolaten cymsvàcóthểđổikếtquảkhiCPUnặng.",
+    "validation": [
+      "Keep2criticalnegative/JSON+realstreamtests;addnonD1delay0/1/2/3/NturnwithsameSQLDAG,witnessmetricshouldnotdependonthechosen2turnifclaimingcausalwaves.",
+      "Tracegreen/redbefore-after,SQLfingerprint/budgetunchanged;testunexpectedextraD1criticalstillred.",
+      "Khônggắnxanhhoặcclaimfixmọiflakytrướckhibằngchứngmớivàboundedparallelrun."
+    ]
+  },
+  "lessArbitraryAlternatives": [
+    {
+      "proposal": "Observablependingnativeoperationsbarrier",
+      "details": "Test-onlytransparentwrapperscrypto.importKey/sign/digestgiữđúngpromisenguyêngốcvàpendingcountertheorequest. TrướcflushchờnhữngnativeoperationsĐÃBẮTĐẦU,khôngphụthuộcunresolvedD1,tớisettle;khôngsleep2turnvàkhôngđổicryptokếtquả. Phảiđolạiobservereffect,lọcrequestđúng;chưa giải quyếtunobservabledynamicimport/timer."
+    },
+    {
+      "proposal": "SQLcausalDAG",
+      "details": "Instrumentpromise/async-contextNodeasync_hooksđểghiquan hệSQLresult→continuationenqueue;đếmcriticalSQLdependencywaves,theocausalpathkhôngtheosetImmediate. KhóvàcầnsyntheticcontrolschoPromise.all/sharedpromise/crossrequest/dynamicimports;khôngdùngstackcalleralonethaydependency."
+    },
+    {
+      "proposal": "Retainexistingbudgetanddocumentuncertainty",
+      "details": "Nếuchưađủthờigianxácminh,giữcổngđỏvàbằngchứng,khôngnângmốc/hạtesthayrerununtilgreenđểtriểnkhai."
+    }
+  ]
+}
