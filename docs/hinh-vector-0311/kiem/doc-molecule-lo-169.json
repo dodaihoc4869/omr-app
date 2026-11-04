@@ -64,7 +64,8 @@
         ]
       }
     ],
-    "chiLaDuLieuDungChuaSoatRender": true
+    "chiLaDuLieuDungChuaSoatRender": true,
+    "daCoManifestTaiCheckpoint168": false
   },
   {
     "i": 907,
@@ -131,7 +132,8 @@
         ]
       }
     ],
-    "chiLaDuLieuDungChuaSoatRender": true
+    "chiLaDuLieuDungChuaSoatRender": true,
+    "daCoManifestTaiCheckpoint168": false
   },
   {
     "i": 998,
@@ -197,7 +199,8 @@
         ]
       }
     ],
-    "chiLaDuLieuDungChuaSoatRender": true
+    "chiLaDuLieuDungChuaSoatRender": true,
+    "daCoManifestTaiCheckpoint168": false
   },
   {
     "i": 634,
@@ -248,7 +251,9 @@
         ]
       }
     ],
-    "chiLaDuLieuDungChuaSoatRender": true
+    "chiLaDuLieuDungChuaSoatRender": true,
+    "daCoManifestTaiCheckpoint168": true,
+    "luuYRoot": "Đã đạt ởmanifest,KHÔNGdựngtrùng/khôngcộngnguồnmới;chỉlànguồnđốichiếuchoảnhkhác."
   },
   {
     "i": 1018,
@@ -299,6 +304,7 @@
         ]
       }
     ],
-    "chiLaDuLieuDungChuaSoatRender": true
+    "chiLaDuLieuDungChuaSoatRender": true,
+    "daCoManifestTaiCheckpoint168": false
   }
 ]
