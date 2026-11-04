@@ -22,7 +22,8 @@
           }
         ]
       }
-    ]
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false
   },
   {
     "i": 1393,
@@ -90,7 +91,8 @@
           }
         ]
       }
-    ]
+    ],
+    "daTrongManifestSauKhiGuiDotDau": true
   },
   {
     "i": 264,
@@ -158,7 +160,8 @@
           }
         ]
       }
-    ]
+    ],
+    "daTrongManifestSauKhiGuiDotDau": true
   },
   {
     "i": 567,
@@ -185,7 +188,8 @@
           }
         ]
       }
-    ]
+    ],
+    "daTrongManifestSauKhiGuiDotDau": true
   },
   {
     "i": 1032,
@@ -221,7 +225,8 @@
           }
         ]
       }
-    ]
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false
   },
   {
     "i": 785,
@@ -261,7 +266,8 @@
           }
         ]
       }
-    ]
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false
   },
   {
     "i": 899,
@@ -291,7 +297,8 @@
           }
         ]
       }
-    ]
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false
   },
   {
     "i": 1038,
@@ -321,7 +328,8 @@
           }
         ]
       }
-    ]
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false
   },
   {
     "i": 941,
@@ -351,7 +359,8 @@
           }
         ]
       }
-    ]
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false
   },
   {
     "i": 660,
@@ -392,7 +401,8 @@
           }
         ]
       }
-    ]
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false
   },
   {
     "i": 1182,
@@ -423,7 +433,8 @@
           }
         ]
       }
-    ]
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false
   },
   {
     "i": 52,
@@ -465,7 +476,8 @@
           }
         ]
       }
-    ]
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false
   },
   {
     "i": 837,
@@ -510,7 +522,8 @@
           }
         ]
       }
-    ]
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false
   },
   {
     "i": 378,
@@ -542,7 +555,8 @@
           }
         ]
       }
-    ]
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false
   },
   {
     "i": 700,
@@ -574,7 +588,8 @@
           }
         ]
       }
-    ]
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false
   },
   {
     "i": 200,
@@ -615,7 +630,8 @@
           }
         ]
       }
-    ]
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false
   },
   {
     "i": 330,
@@ -656,7 +672,8 @@
           }
         ]
       }
-    ]
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false
   },
   {
     "i": 1178,
@@ -697,7 +714,8 @@
           }
         ]
       }
-    ]
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false
   },
   {
     "i": 1100,
@@ -728,7 +746,8 @@
           }
         ]
       }
-    ]
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false
   },
   {
     "i": 1063,
@@ -783,6 +802,63 @@
           }
         ]
       }
-    ]
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false
+  },
+  {
+    "i": 581,
+    "hash": "6c478010fdebd004d5254bb39b705b4e5f36c3ee49543509cae134372076c3f8",
+    "fileNguon": "anh/6c478010fdebd004d5254bb39b705b4e5f36c3ee49543509cae134372076c3f8.png",
+    "canvas": [
+      459,
+      256
+    ],
+    "daMoNative": true,
+    "kind": "keep-raster-photo",
+    "ngoai20NguonVector": true,
+    "notes": "ẢnhTHẬT hộpthuốcvàtuýpMethocylat/MethylSalicylat,màuxanh/trắng. KHÔNGphảihìnhvẽvàkhôngvẽvectorlạichữlogo/mặthộp. Giữnguyênrasterimmutable,đánhroutekeep-raster/cacheofflinechophoto. Cả4qidpartialcùngảnh581hinh.0sau_devàsource264reactionhinh.1đãđạt. KhôngđượcgọiđãvẽSVGphoto581.",
+    "questions": [
+      {
+        "qid": "DB-12-B1-P1-D2-III-114",
+        "de": "Methyl salicylate dùng làm thuốc xoa bóp giảm đau, được điều chế bằng phản ứng ester hoá giữa salicylic acid và methanol. Để sản xuất 1,9 triệu tuýp thuốc xoa bóp giảm đau cần tối thiểu m tấn salicylic acid.\nBiết mỗi tuýp thuốc chứa 2,7 gam methyl salicylate và hiệu suất phản ứng tính theo salicylic acid là 75%.\nGiá trị của m là bao nhiêu? (Kết quả làm tròn đến hàng phần mười.)",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D2-III-114.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D2-III-118",
+        "de": "Methyl salicylate dùng làm thuốc xoa bóp giảm đau, được điều chế từ salicylic acid và methanol. Để sản xuất 1,9 triệu tuýp thuốc xoa bóp giảm đau cần tối thiểu m tấn salicylic acid.\nBiết mỗi tuýp thuốc chứa 2,7 gam methyl salicylate và hiệu suất phản ứng tính theo salicylic acid là 75%.\nGiá trị của m là bao nhiêu? (Làm tròn đến hàng phần trăm)",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D2-III-118.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B1-P1-III-42",
+        "de": "Methyl salicylate dùng làm thuốc xoa bóp giảm đau, được điều chế bằng phản ứng ester hoá giữa salicylic acid và methanol. Để sản xuất 1,9 triệu tuýp thuốc xoa bóp giảm đau cần tối thiểu m tấn salicylic acid.\nBiết mỗi tuýp thuốc chứa 2,7 gam methyl salicylate và hiệu suất phản ứng tính theo salicylic acid là 75%.\nGiá trị của m là bao nhiêu? (Kết quả làm tròn đến hàng phần mười.)",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P1-III-42.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B3-D1-III-5",
+        "de": "Methyl salicylate dùng làm thuốc xoa bóp giảm đau, được điều chế từ salicylic acid và methanol. Để sản xuất 1,9 triệu tuýp thuốc xoa bóp giảm đau cần tối thiểu m tấn salicylic acid.\nBiết mỗi tuýp thuốc chứa 2,7 gam methyl salicylate và hiệu suất phản ứng tính theo salicylic acid là 75%.\nGiá trị của m là bao nhiêu? (Làm tròn đến hàng phần trăm)",
+        "refs": [
+          {
+            "where": "DH-12-C1-B3-D1-III-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false
   }
 ]
