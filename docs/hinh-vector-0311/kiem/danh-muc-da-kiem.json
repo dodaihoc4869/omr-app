@@ -1927,6 +1927,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "b7ea7934af2b39b7b32ac961724ff6b366f8c67a13650d1f76379ae065510c49": {
+      "tep": "chung-cat-so-ddh-034cac7d1b2887a89458544e61caf48d6e2c840260d6e40a2a1a1bfa41d49e98.svg",
+      "hashSvg": "034cac7d1b2887a89458544e61caf48d6e2c840260d6e40a2a1a1bfa41d49e98",
+      "byteSvg": 17701,
+      "byteGzip": 5113,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "a0009cc3dab4b85ded1805c3fdb2f65f17541096f6ee4d992d95fb4dd4bdf86a": {
       "tep": "nhan-lien-ket-ddh-69575d0a9f7d3a6d691d0fb500bc2d9e185edc1f816a8d434d3a34ffdc61ebfe.svg",
       "hashSvg": "69575d0a9f7d3a6d691d0fb500bc2d9e185edc1f816a8d434d3a34ffdc61ebfe",
@@ -7233,6 +7242,20 @@
       ]
     },
     {
+      "qid": "100-II-2",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "b7ea7934af2b39b7b32ac961724ff6b366f8c67a13650d1f76379ae065510c49",
+          "where": "100-II-2.hinh.0.du_lieu",
+          "hashDataUrl": "c910d481ee10258854b6acf462f9ac7d4300fcd4b2523e7466eb65be09e47ac3",
+          "vector": "chung-cat-so-ddh-034cac7d1b2887a89458544e61caf48d6e2c840260d6e40a2a1a1bfa41d49e98.svg"
+        }
+      ]
+    },
+    {
       "qid": "100-III-3",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -7791,6 +7814,20 @@
           "where": "12-C1-B1-D1-I-103.hinh.0.du_lieu",
           "hashDataUrl": "1a9270744ff24e4082d797d291c85f485e003a19dd3e6d058fe77a5d1aa1f080",
           "vector": "cau-truc-ddh-6c8ad21724f663036932aef18275a57b56aa9d4d0b0a6f9c9c358353f4f9304b.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-C1-B1-D1-II-1",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "b7ea7934af2b39b7b32ac961724ff6b366f8c67a13650d1f76379ae065510c49",
+          "where": "12-C1-B1-D1-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "c910d481ee10258854b6acf462f9ac7d4300fcd4b2523e7466eb65be09e47ac3",
+          "vector": "chung-cat-so-ddh-034cac7d1b2887a89458544e61caf48d6e2c840260d6e40a2a1a1bfa41d49e98.svg"
         }
       ]
     },
@@ -13201,6 +13238,20 @@
       ]
     },
     {
+      "qid": "DB-12-B1-P1-D2-II-14",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "b7ea7934af2b39b7b32ac961724ff6b366f8c67a13650d1f76379ae065510c49",
+          "where": "DB-12-B1-P1-D2-II-14.hinh.0.du_lieu",
+          "hashDataUrl": "c910d481ee10258854b6acf462f9ac7d4300fcd4b2523e7466eb65be09e47ac3",
+          "vector": "chung-cat-so-ddh-034cac7d1b2887a89458544e61caf48d6e2c840260d6e40a2a1a1bfa41d49e98.svg"
+        }
+      ]
+    },
+    {
       "qid": "DB-12-B1-P1-D2-II-21",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -13327,6 +13378,20 @@
           "where": "DB-12-B1-P1-D2-III-54.hinh.0.du_lieu",
           "hashDataUrl": "c36b4462f8b04ebf5270d39e7d8f112a8ca9e722c9fd423a326bfdefec5724c8",
           "vector": "salicylate-ddh-f6c4c8c5374e3089c24fe4c3251b1a01db89fc3b30d515fd2e1e51b01fbec232.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B1-P1-D2-II-55",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "b7ea7934af2b39b7b32ac961724ff6b366f8c67a13650d1f76379ae065510c49",
+          "where": "DB-12-B1-P1-D2-II-55.hinh.0.du_lieu",
+          "hashDataUrl": "c910d481ee10258854b6acf462f9ac7d4300fcd4b2523e7466eb65be09e47ac3",
+          "vector": "chung-cat-so-ddh-034cac7d1b2887a89458544e61caf48d6e2c840260d6e40a2a1a1bfa41d49e98.svg"
         }
       ]
     },
@@ -22391,6 +22456,7 @@
     "11-C1-B1-III-19",
     "11-C1-B2-D2-II-8",
     "100-I-16",
+    "100-II-2",
     "100-III-3",
     "11-C3-B12-III-1",
     "11-C3-B10-I-5",
@@ -22423,6 +22489,7 @@
     "12-C1-B1-D1-I-95",
     "12-C1-B1-D1-I-102",
     "12-C1-B1-D1-I-103",
+    "12-C1-B1-D1-II-1",
     "12-C1-B1-D1-II-7",
     "12-C1-B1-D1-II-17",
     "12-C1-B1-D1-II-19",
@@ -22756,6 +22823,7 @@
     "DB-11-B8-D1-I-26",
     "DB-11-B8-D5-II-9",
     "DB-12-B1-P1-D2-I-12",
+    "DB-12-B1-P1-D2-II-14",
     "DB-12-B1-P1-D2-II-21",
     "DB-12-B1-P1-D2-III-34",
     "DB-12-B1-P1-D2-I-42",
@@ -22764,6 +22832,7 @@
     "DB-12-B1-P1-D2-I-46",
     "DB-12-B1-P1-D2-II-50",
     "DB-12-B1-P1-D2-III-54",
+    "DB-12-B1-P1-D2-II-55",
     "DB-12-B1-P1-D2-III-62",
     "DB-12-B1-P1-D2-III-70",
     "DB-12-B1-P1-D2-I-87",

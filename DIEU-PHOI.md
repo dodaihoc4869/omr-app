@@ -1230,3 +1230,10 @@ Phân vùng dự kiến theo hai bản thiết kế:
 - GiữproductaH2NCH2CH2COOCH3sai-looking,bClH3NCH(CH3)COOHliteral/khôngcharge;đủ4rowa-d/conditions/ngoặcpolymern/stubs/+nH2O. Tác tử chỉđọc mởPNGnative/full+actualrenderSVG/exacthash50c4de…a96566đạt. Không sửa hóa học/đápán.
 - Chromium498/498/hash/XML/path/PythonAST/build/tốcđộđạt/precache170/2613.23KiB. Mainfetch0200b893chưa gộp/WOFF2khôngdiff;phải cậpnhậtmainmớinhất/sotesttheotên/kiểmcathi trước triểnkhai. Chưa tíchhợp/chưa reload offlineapp/chưa phát hành. Chưa tham vấn được cố vấn.
 - Nhóm149xong15/20,còn1024/1259/1014/7/209;59/1391vẫn bịloạiphongcách,khôngđoán/hạgate.
+
+
+### 04/11 — Vector lô160: chưng cất nguồn1024
+- Thêm1nguồn/1SVG/4câu;964câu đủ mọi hình+DDH/7mộtphần;740nguồn→499SVG,7.418.534byte/gzip1.493.070,còn688nguồn.
+- Đủ2stands/flask/lamp/thermometer/2wallvaportube+jacket/2waterports/3dropsRÕ/labelsNhiệtkế,(1)..(5),Đèncồn. Hatchngangđúngsource,khôngthêmflowarrows/khôngalias587. Tác tử chỉđọc mởPNGnative/full+actualrenderSVG/exacthash034cac…49e98đạt.
+- Chromium499/499/hash/XML/path/PythonAST/build/tốcđộđạt/precache170/2613.23KiB. Mainfetch0200b893chưa gộp/WOFF2khôngdiff;phải cậpnhậtmainmớinhất/sotesttheotên/kiểmcathi trước triểnkhai. Chưa tíchhợp/chưa reload offlineapp/chưa phát hành. Chưa tham vấn được cố vấn.
+- Nhóm149xong16/20,còn1259/1014/7/209;59/1391vẫn bịloạiphongcách,khôngđoán/hạgate.

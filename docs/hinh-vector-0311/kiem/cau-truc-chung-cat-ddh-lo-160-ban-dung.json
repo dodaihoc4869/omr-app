@@ -1,0 +1,661 @@
+[
+  {
+    "i": 1024,
+    "hash": "b7ea7934af2b39b7b32ac961724ff6b366f8c67a13650d1f76379ae065510c49",
+    "fileNguon": "anh/b7ea7934af2b39b7b32ac961724ff6b366f8c67a13650d1f76379ae065510c49.png",
+    "canvas": [
+      739,
+      567
+    ],
+    "daMoNative": true,
+    "kind": "distillation-lab-numbered",
+    "labels": [
+      "Nhiệt kế",
+      "Đèn cồn",
+      "(1)",
+      "(2)",
+      "(3)",
+      "(4)",
+      "(5)"
+    ],
+    "notes": "2giáđỡkẹpflasktráivàsinhhàninclineddownright,2chânđế.CổflaskcónhiệtkếđứngLÊNqua nútđen,cácvạchnhỏtrênthermometerKHÔNGcósố. Nhánhhơibênphảinốisinhhàn2lớpvàraốngcongđếnErlenhứng,giữ3giọtrơitrongreceiver vàmứcchấtlỏng.Sinhhànjacketcóvânnétchéo bêntrong.Parentlabels(1)portwaterđầuthấpphảidướisinhhàn,(2)portđầucaotráitrên,(3)leadertrongjacket,(4)roundflask,(5)receivingErlen. Khôngmũitênflowởportschỉleadernhãn,đừngthêmcoldwaterflow. LabelĐèncồnleadertrỏdènflametrái;Nhiệtkếleadertrỏthermometer. Giữmesh/labstandnhưsourcekhôngvẽốnghơitrởlạiflas.",
+    "questions": [
+      {
+        "qid": "100-II-2",
+        "de": "Trong phòng thí nghiệm, ethyl acetate được điều chế từ acetic acid và ethanol, xúc tác H₂SO₄ đặc, theo mô hình thí nghiệm như hình. Biết nhiệt độ trong bình cầu (4) giữ ở mức 65–70°C, nhiệt độ trong ống sinh hàn (3) duy trì ở 25°C. Sau thí nghiệm, tiến hành phân tách sản phẩm. Ghi phổ hồng ngoại của acetic acid, ethanol và ethyl acetate.\nCho biết số sóng hấp thụ đặc trưng của một số liên kết trên phổ hồng ngoại như bảng dưới.",
+        "refs": [
+          {
+            "where": "100-II-2.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "12-C1-B1-D1-II-1",
+        "de": "Trong phòng thí nghiệm, ethyl acetate được điều chế từ acetic acid và ethanol, xúc tác H₂SO₄ đặc, theo mô hình thí nghiệm như hình. Biết nhiệt độ trong bình cầu (4) giữ ở mức 65–70°C, nhiệt độ trong ống sinh hàn (3) duy trì ở 25°C. Sau thí nghiệm, tiến hành phân tách sản phẩm. Ghi phổ hồng ngoại của acetic acid, ethanol và ethyl acetate.\nCho biết số sóng hấp thụ đặc trưng của một số liên kết trên phổ hồng ngoại như bảng dưới.",
+        "refs": [
+          {
+            "where": "12-C1-B1-D1-II-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D2-II-14",
+        "de": "Trong phòng thí nghiệm, ethyl acetate được điều chế từ acetic acid và ethanol, xúc tác H₂SO₄ đặc, theo mô hình thí nghiệm như hình. Biết nhiệt độ trong bình cầu (4) giữ ở mức 65–70°C, nhiệt độ trong ống sinh hàn (3) duy trì ở 25°C. Sau thí nghiệm, tiến hành phân tách sản phẩm. Ghi phổ hồng ngoại của acetic acid, ethanol và ethyl acetate.\nCho biết số sóng hấp thụ đặc trưng của một số liên kết trên phổ hồng ngoại như bảng dưới.",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D2-II-14.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D2-II-55",
+        "de": "Trong phòng thí nghiệm, ethyl acetate được điều chế từ acetic acid và ethanol, xúc tác H₂SO₄ đặc, theo mô hình thí nghiệm như hình. Biết nhiệt độ trong bình cầu (4) giữ ở mức 65–70°C, nhiệt độ trong ống sinh hàn (3) duy trì ở 25°C. Sau thí nghiệm, tiến hành phân tách sản phẩm. Ghi phổ hồng ngoại của acetic acid, ethanol và ethyl acetate.\nCho biết số sóng hấp thụ đặc trưng của một số liên kết trên phổ hồng ngoại như bảng dưới.",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D2-II-55.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry155": {
+      "canvas": [
+        739,
+        567
+      ],
+      "leftStand": {
+        "pole": [
+          [
+            84,
+            87
+          ],
+          [
+            84,
+            529
+          ]
+        ],
+        "footPolygon": [
+          [
+            11,
+            528
+          ],
+          [
+            316,
+            528
+          ],
+          [
+            329,
+            540
+          ],
+          [
+            315,
+            549
+          ],
+          [
+            11,
+            549
+          ]
+        ],
+        "clamps": [
+          [
+            42,
+            201,
+            189,
+            216
+          ],
+          [
+            40,
+            378,
+            151,
+            393
+          ]
+        ]
+      },
+      "rightStand": {
+        "pole": [
+          [
+            442,
+            84
+          ],
+          [
+            442,
+            530
+          ]
+        ],
+        "footPolygon": [
+          [
+            379,
+            530
+          ],
+          [
+            519,
+            530
+          ],
+          [
+            525,
+            543
+          ],
+          [
+            368,
+            543
+          ]
+        ],
+        "jacketClampsApprox": [
+          [
+            423,
+            222,
+            456,
+            241
+          ],
+          [
+            429,
+            272,
+            460,
+            296
+          ]
+        ]
+      },
+      "flask": {
+        "neckWalls": [
+          [
+            [
+              187,
+              126
+            ],
+            [
+              187,
+              250
+            ]
+          ],
+          [
+            [
+              220,
+              126
+            ],
+            [
+              220,
+              250
+            ]
+          ]
+        ],
+        "blackStopper": [
+          185,
+          115,
+          222,
+          130
+        ],
+        "bulbOutlineApprox": [
+          [
+            187,
+            250
+          ],
+          [
+            164,
+            267
+          ],
+          [
+            151,
+            292
+          ],
+          [
+            151,
+            326
+          ],
+          [
+            165,
+            353
+          ],
+          [
+            187,
+            373
+          ],
+          [
+            218,
+            374
+          ],
+          [
+            244,
+            351
+          ],
+          [
+            259,
+            326
+          ],
+          [
+            259,
+            292
+          ],
+          [
+            244,
+            269
+          ],
+          [
+            220,
+            250
+          ]
+        ],
+        "liquidTopY": 330
+      },
+      "thermometer": {
+        "tubeApprox": [
+          [
+            199,
+            12
+          ],
+          [
+            205,
+            12
+          ],
+          [
+            206,
+            207
+          ],
+          [
+            202,
+            212
+          ],
+          [
+            199,
+            207
+          ],
+          [
+            199,
+            12
+          ]
+        ],
+        "graduations": "tinyblackticksinside,notnumeric",
+        "label": [
+          "Nhiệt kế",
+          [
+            279,
+            29
+          ]
+        ],
+        "leader": [
+          [
+            241,
+            44
+          ],
+          [
+            203,
+            56
+          ]
+        ]
+      },
+      "condenser": {
+        "vapourAxis": [
+          [
+            220,
+            172
+          ],
+          [
+            615,
+            321
+          ]
+        ],
+        "jointAdapterApprox": [
+          [
+            250,
+            170
+          ],
+          [
+            276,
+            179
+          ],
+          [
+            289,
+            192
+          ],
+          [
+            279,
+            205
+          ],
+          [
+            245,
+            192
+          ]
+        ],
+        "jacketOutlineApprox": [
+          [
+            319,
+            197
+          ],
+          [
+            343,
+            195
+          ],
+          [
+            564,
+            281
+          ],
+          [
+            578,
+            295
+          ],
+          [
+            576,
+            307
+          ],
+          [
+            564,
+            315
+          ],
+          [
+            319,
+            230
+          ],
+          [
+            310,
+            217
+          ],
+          [
+            312,
+            205
+          ]
+        ],
+        "waterPortHigh2": [
+          [
+            354,
+            206
+          ],
+          [
+            359,
+            191
+          ],
+          [
+            366,
+            194
+          ],
+          [
+            361,
+            209
+          ]
+        ],
+        "waterPortLow1": [
+          [
+            529,
+            307
+          ],
+          [
+            523,
+            327
+          ],
+          [
+            531,
+            330
+          ],
+          [
+            538,
+            311
+          ]
+        ],
+        "hachure": "diagonalparallelwaterjacketmarksinside,scannednativesomefaint;notnumericcountdata"
+      },
+      "outletDoubleTube": [
+        [
+          [
+            614,
+            320
+          ],
+          [
+            637,
+            334
+          ],
+          [
+            644,
+            349
+          ],
+          [
+            645,
+            409
+          ]
+        ],
+        [
+          [
+            610,
+            328
+          ],
+          [
+            625,
+            339
+          ],
+          [
+            630,
+            351
+          ],
+          [
+            630,
+            414
+          ]
+        ]
+      ],
+      "receiver": {
+        "mouthX": [
+          614,
+          654
+        ],
+        "neckY": [
+          394,
+          414
+        ],
+        "bodyApprox": [
+          [
+            614,
+            414
+          ],
+          [
+            569,
+            540
+          ],
+          [
+            574,
+            555
+          ],
+          [
+            682,
+            555
+          ],
+          [
+            699,
+            540
+          ],
+          [
+            654,
+            414
+          ]
+        ],
+        "liquidSurfaceY": 520,
+        "drops": [
+          {
+            "center": [
+              632,
+              449
+            ],
+            "teardropTip": [
+              630,
+              439
+            ]
+          },
+          {
+            "center": [
+              639,
+              482
+            ],
+            "teardropTip": [
+              637,
+              470
+            ]
+          },
+          {
+            "center": [
+              630,
+              509
+            ],
+            "teardropTip": [
+              628,
+              499
+            ]
+          }
+        ],
+        "dropCountCertain": 3
+      },
+      "alcoholLamp": {
+        "bodyEllipse": [
+          210,
+          484,
+          47,
+          39
+        ],
+        "wickApprox": [
+          [
+            209,
+            451
+          ],
+          [
+            201,
+            484
+          ],
+          [
+            196,
+            521
+          ]
+        ],
+        "flameApprox": [
+          [
+            196,
+            419
+          ],
+          [
+            198,
+            405
+          ],
+          [
+            203,
+            415
+          ],
+          [
+            210,
+            403
+          ],
+          [
+            218,
+            413
+          ],
+          [
+            222,
+            421
+          ]
+        ],
+        "blackBurner": [
+          197,
+          421,
+          220,
+          451
+        ]
+      },
+      "labels": [
+        {
+          "text": "(1)",
+          "at": [
+            515,
+            352
+          ],
+          "target": "lower-rightwaterport"
+        },
+        {
+          "text": "(2)",
+          "at": [
+            370,
+            163
+          ],
+          "target": "upper-leftwaterport"
+        },
+        {
+          "text": "(3)",
+          "at": [
+            521,
+            203
+          ],
+          "leader": [
+            [
+              522,
+              223
+            ],
+            [
+              491,
+              265
+            ]
+          ],
+          "arrowHead": false
+        },
+        {
+          "text": "(4)",
+          "at": [
+            314,
+            305
+          ],
+          "leader": [
+            [
+              283,
+              302
+            ],
+            [
+              258,
+              314
+            ]
+          ],
+          "arrowHead": false
+        },
+        {
+          "text": "(5)",
+          "at": [
+            717,
+            451
+          ],
+          "leader": [
+            [
+              699,
+              474
+            ],
+            [
+              662,
+              493
+            ]
+          ],
+          "arrowHead": false
+        },
+        {
+          "text": "Đèn cồn",
+          "at": [
+            320,
+            462
+          ],
+          "leader": [
+            [
+              290,
+              474
+            ],
+            [
+              232,
+              495
+            ]
+          ],
+          "arrowHead": false
+        }
+      ]
+    },
+    "sourceCaution": "(1)/(2)KHÔNGflowarrows,khôngtựđặtmũitênnhư926hoặc587.Label3chỉjacket,4flask,5receiver.Vạchthermometernhỏkhôngsố;3dropsrõ,khôngbỏgiọtnướctạođápán.",
+    "svg": "chung-cat-so-ddh-034cac7d1b2887a89458544e61caf48d6e2c840260d6e40a2a1a1bfa41d49e98.svg",
+    "hashSvg": "034cac7d1b2887a89458544e61caf48d6e2c840260d6e40a2a1a1bfa41d49e98",
+    "byteSvg": 17701,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "2stands/thermometer/5numberlabels/Đèncồn/2wallvaportube+condenser/3dropsRÕ,khôngthêmflowarrows.",
+    "hashSvgDaSoat": "034cac7d1b2887a89458544e61caf48d6e2c840260d6e40a2a1a1bfa41d49e98",
+    "nguoiSoat": "cau_truc_4"
+  }
+]
