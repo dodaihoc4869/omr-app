@@ -23,6 +23,11 @@ export function docGoiDe(maCa: string, sbd: string): GoiDe | null {
   } catch { /* máy không cho đọc ⇒ không có gói, nộp đi đường cũ */ }
   return null
 }
+/** Bỏ gói tờ đáp án đang giữ của em ở ca `maCa` (đề đổi phiên bản ⇒ tải lại gói mới). */
+function boGoiDe(maCa: string, sbd: string): void {
+  if (nho.get(sbd)?.maCa === maCa) nho.delete(sbd)
+  try { const o = JSON.parse(localStorage.getItem(khoaLuu(sbd)) ?? 'null') as GoiDe | null; if (o?.maCa === maCa) localStorage.removeItem(khoaLuu(sbd)) } catch { /* bỏ qua */ }
+}
 function luuGoiDe(sbd: string, g: GoiDe): void {
   nho.set(sbd, g)
   try { localStorage.setItem(khoaLuu(sbd), JSON.stringify(g)) } catch { /* đầy / bị chặn ⇒ chỉ giữ trong bộ nhớ */ }
@@ -67,15 +72,23 @@ export interface GoiDeTruoc { maCa: string; phien: string; goi: string }
 export const kemDeTruoc = (maCa: string, phien: string): string => `de-truoc|${maCa}|${phien}`
 const deTruocNho = new Map<string, GoiDeTruoc>()
 export const docDeTruoc = (maCa: string): GoiDeTruoc | null => deTruocNho.get(maCa) ?? null
+/** Ca đã thôi hỏi lại gói ở phòng chờ (vào thi / ca bắt đầu / đóng) — `hoiLaiPhongCho` bên dưới. */
+const dungHoiLai = new Set<string>()
 
-/** Tải gói đề đã khoá (nếu chưa có). Máy chủ từ chối / lỗi ⇒ thôi (vào thi tải đề như cũ). */
-export async function taiDeTruoc(ch: CauHinhMayChu, maCa: string, sbd: string): Promise<boolean> {
+/** Tải gói đề đã khoá. Có gói ⇒ thôi, trừ khi `lamMoi` (hỏi lại phòng chờ): gửi phiên bản đang giữ, máy chủ đáp `khongDoi` hoặc gói mới. Trả `'moi'` khi
+ *  vừa nhận gói mới (lần đầu / đề đổi), `true` khi giữ gói cũ còn đúng, `false` khi không có gói. Máy chủ từ chối / lỗi ⇒ giữ nguyên (vào thi tải đề như cũ). */
+export async function taiDeTruoc(ch: CauHinhMayChu, maCa: string, sbd: string, lamMoi = false): Promise<boolean | 'moi'> {
   if (!maCa || !sbd) return false
-  if (deTruocNho.has(maCa)) return true
-  const r = await goiWorker<{ ok?: boolean; goi?: unknown; phien?: unknown }>(ch, '/de-truoc', { maCa, sbd }, nhipNong(ch))
-  if (r?.ok !== true || typeof r.goi !== 'string' || typeof r.phien !== 'string' || !r.goi || !r.phien) return false
+  const cu = deTruocNho.get(maCa)
+  if (cu && !lamMoi) return true
+  const r = await goiWorker<{ ok?: boolean; goi?: unknown; phien?: unknown; khongDoi?: unknown; lyDo?: unknown }>(ch, '/de-truoc', { maCa, sbd, ...(cu ? { phien: cu.phien } : {}) }, nhipNong(ch))
+  if (r?.ok === true && r.khongDoi === true && cu && r.phien === cu.phien) return true
+  if (r?.ok !== true || typeof r.goi !== 'string' || typeof r.phien !== 'string' || !r.goi || !r.phien) {
+    if (r && r.ok === false && (r.lyDo === 'khong_tim_thay' || r.lyDo === 'da_bat_dau')) dungHoiLai.add(maCa) // ca đã bắt đầu / đóng / em rời phòng chờ ⇒ thôi hỏi lại
+    return !!cu
+  }
   deTruocNho.set(maCa, { maCa, phien: r.phien, goi: r.goi })
-  return true
+  return 'moi'
 }
 
 /** Phòng chờ: tải sẵn CẢ gói đề lẫn gói tờ đáp án (song song). Lỗi ⇒ im lặng (đường cũ lúc vào thi). */
@@ -83,16 +96,49 @@ export async function taiSanChoCa(ch: CauHinhMayChu, maCa: string, sbd: string):
   await Promise.all([taiDeTruoc(ch, maCa, sbd).catch(() => false), taiGoiDe(ch, maCa, sbd).catch(() => undefined)])
 }
 
-/** Màn thi gọi khi em vào phòng chờ (đã rải 0–4 giây): đọc địa chỉ + cấu hình máy chủ rồi tải sẵn cả hai gói. Lỗi ⇒ im lặng (vào thi đi đường cũ). */
+/** Nhịp hỏi lại gói ở phòng chờ (ms, có rải): ca đề riêng máy thầy nối câu ngoài kho trong lúc chờ ⇒ đề / tờ đáp án đổi phiên bản. */
+export const NHIP_HOI_LAI_PHONG_CHO_MS = 20_000
+/** Hỏi lại tối đa (ms) — phòng chờ dài hơn nữa thì thôi (vào thi vẫn hỏi `/de?phien=` như cũ). */
+const TRAN_HOI_LAI_MS = 3 * 3_600_000
+const dangHoiLai = new Set<string>()
+
+/**
+ * PHÒNG CHỜ HỎI LẠI GÓI (thầy 04/11: «Tải sẵn đề đáp án tới máy hs khi vào phòng chờ», «tức thì lúc bấm bắt đầu»): trước đây máy em tải gói MỘT lần lúc vào
+ * phòng chờ; ca đề riêng thầy nối thêm câu sai cũ / câu song sinh vào kho ca trong lúc chờ (chuẩn bị ngầm, nối sớm) ⇒ gói cũ lệch phiên bản ⇒ lúc Bắt đầu cả
+ * lớp (127 máy) cùng tải lại nguyên gói. Nay mỗi ~20 giây máy em gửi phiên bản đang giữ: không đổi ⇒ máy chủ đáp một dòng; đổi ⇒ nhận gói đề mới + tải lại
+ * gói tờ đáp án (vẫn ĐÃ KHOÁ — chìa đề trao lúc vào thi, chìa đáp án trao SAU khi nộp). Dừng khi em vào thi (`moDeTruoc`), ca đóng, quá 3 giờ.
+ */
+async function hoiLaiPhongCho(ch: CauHinhMayChu, maCa: string, sbd: string): Promise<void> {
+  if (dangHoiLai.has(maCa)) return
+  dangHoiLai.add(maCa)
+  const dau = Date.now()
+  try {
+    while (!dungHoiLai.has(maCa) && Date.now() - dau < TRAN_HOI_LAI_MS) {
+      await new Promise((xong) => setTimeout(xong, NHIP_HOI_LAI_PHONG_CHO_MS * (0.75 + Math.random() * 0.5)))
+      if (dungHoiLai.has(maCa)) break
+      const kq = await taiDeTruoc(ch, maCa, sbd, true).catch(() => true as const)
+      if (kq === 'moi') { boGoiDe(maCa, sbd); await taiGoiDe(ch, maCa, sbd).catch(() => undefined) }
+    }
+  } finally { dangHoiLai.delete(maCa) }
+}
+
+/** Màn thi gọi khi em vào phòng chờ (đã rải 0–4 giây): đọc địa chỉ + cấu hình máy chủ rồi tải sẵn cả hai gói, rồi hỏi lại theo nhịp. Lỗi ⇒ im lặng (vào thi đi đường cũ). */
 export async function taiSanPhongCho(url: string, maCa: string, sbd: string): Promise<void> {
   try {
     const u = await layDiaChiMayChu(url)
-    if (u) await taiSanChoCa({ ...(await layCauHinhMayChu()), BAT: true, URL: u }, maCa, sbd)
+    if (!u) return
+    const ch = { ...(await layCauHinhMayChu()), BAT: true, URL: u }
+    dungHoiLai.delete(maCa)
+    await taiSanChoCa(ch, maCa, sbd)
+    void hoiLaiPhongCho(ch, maCa, sbd)
   } catch { /* mạng / máy chủ cũ: vào thi đi đường cũ */ }
 }
+/** Em đã vào thi / rời phòng chờ ⇒ thôi hỏi lại gói. */
+export const thoiHoiLaiPhongCho = (maCa: string): void => void dungHoiLai.add(maCa)
 
 /** Mở gói đề tải sẵn bằng chìa `/vao-thi` trao. Sai chìa / hỏng ⇒ null (nơi gọi tải đề như cũ). */
 export async function moDeTruoc(g: GoiDeTruoc, khoa: unknown): Promise<unknown | null> {
+  dungHoiLai.add(g.maCa) // đã vào thi ⇒ thôi hỏi lại gói ở phòng chờ
   if (typeof khoa !== 'string' || !khoa) return null
   try {
     const b = tuB64u(g.goi)
@@ -139,6 +185,7 @@ export const datGoiCa = (ds: GoiCaTruoc[]): void => { goiCa = ds; hoiLuc = 0 }
  * (nơi gọi tải đề như cũ). Không có gói ⇒ undefined (đường cũ, không hỏi gì).
  */
 export async function truocVao(goc: string, maCa: string, sbd: string): Promise<((r: { khoaDeTruoc?: unknown; idCa?: unknown }) => Promise<unknown>) | undefined> {
+  dungHoiLai.add(maCa) // đang vào thi ⇒ thôi hỏi lại gói ở phòng chờ
   await sanSang
   const g = docDeTruoc(maCa)
   const coDe = goiCa.filter((x) => x.de)

@@ -1219,6 +1219,7 @@ export default function ExamMonitorScreen() {
       let daLamLaiTheoEm: Record<string, Record<string, string>> | undefined
       let bacTheoEm: Record<string, Record<string, string>> | undefined
       let banDoDaDung: { daDung: Record<string, Record<string, string>>; demDaDung: Record<string, Record<string, [number, number]>> } | undefined
+      let loiV2 = ''
       if (caCanDeRieng) {
         // ĐÚNG NHỮNG EM TRONG PHÒNG CHỜ — không ∪ cả lớp đăng ký (vá 19/09). Bản 17/09
         // gộp thêm mọi em cùng lớp: em vắng cũng chiếm một suất chia vòng tròn, nên
@@ -1277,7 +1278,8 @@ export default function ExamMonitorScreen() {
             if (v2.soCauNoiThem > 0) showToast(`Đã nối ${v2.soCauNoiThem} câu ngoài kho (câu sai cũ, câu song sinh) vào đề ca này.`, 'success')
             for (const c of v2.canhBao) showToast(c, 'warn')
           } catch (e) {
-            showToast(`Chưa rút được theo cách mới (${e instanceof Error ? e.message : 'lỗi không rõ'}) — app rút theo cách cũ.`, 'warn')
+            loiV2 = (e instanceof Error ? e.message : 'lỗi không rõ').slice(0, 200)
+            showToast(`Chưa rút được theo cách mới (${loiV2}) — app rút theo cách cũ.`, 'warn')
           }
         }
         if (!boTheoEm) {
@@ -1303,6 +1305,8 @@ export default function ExamMonitorScreen() {
             songSinhTheoEm: ra.songSinhTheoEm,
             ghiChu: ra.ghiChu,
             ...(Object.keys(ra.daLamLaiTheoEm).length > 0 ? { daLamLaiTheoEm: ra.daLamLaiTheoEm } : {}),
+            // 04/11: đi đường cũ vì cách mới LỖI ⇒ ghi lý do lên biên bản (máy chủ giữ) — đo chỉ đọc biết ngay vì sao (.github/workflows/do-rut-de-0411.yml).
+            ...(loiV2 ? ({ loiV2 } as Record<string, string>) : {}),
             lucRut: new Date().toISOString(),
           }
           daLamLaiTheoEm = ra.daLamLaiTheoEm

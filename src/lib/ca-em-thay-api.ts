@@ -19,7 +19,20 @@ export interface LoiDenHanEm {
   cauSongSinh?: { id: string; phan: 'I' | 'II' | 'III'; text: string; choices?: string[]; correct: string } & QuestionMedia
 }
 
-/** RÚT ĐỀ v2 — `/ca/loi-den-han` theo LÔ 20 em (4 lô song song). Máy chủ chưa có lệnh ⇒ NÉM LỖI (chỗ gọi đi đường rút cũ). */
+/** Lô em mỗi lượt `/ca/loi-den-han` (máy chủ nhận tối đa 20 — `TOI_DA_EM_MOT_LUOT`). Lô nhỏ ⇒ mỗi lượt ít truy vấn D1, không chạm trần lúc D1 nghẽn. */
+export const LO_EM_LOI_DEN_HAN = 10
+/** Số lô chạy song song. */
+export const SONG_SONG_LOI_DEN_HAN = 6
+/** Lỗi CẤU TRÚC (máy chủ chưa có lệnh / máy chưa có địa chỉ) — chỗ gọi đi đường rút cũ. Lỗi một lô (nghẽn, hết giờ) KHÔNG ném loại này. */
+export class LoiChuaCoLenhRut extends Error {}
+
+/**
+ * RÚT ĐỀ v2 — `/ca/loi-den-han` theo LÔ `LO_EM_LOI_DEN_HAN` em, `SONG_SONG_LOI_DEN_HAN` lô song song.
+ * BỀN (thầy 04/11: «Liên tục báo ko rút đc kiểu mới chỉ rút đc kiểu cũ», «rút cực lâu khi thầy bấm bắt đầu»): trước đây MỘT lô lỗi (giờ cao điểm D1 nghẽn,
+ * lượt hết giờ, HTTP 5xx) là NÉM cả lượt ⇒ màn Theo dõi rơi về đường rút CŨ (chậm hơn nữa, đọc lại cả lớp). Nay lô lỗi ⇒ chia đôi thử lại; vẫn lỗi ⇒ các em
+ * của lô ấy vào `hong` (rút như em chưa có lỗi nào — đủ câu, không câu ôn lại; bảng biên bản nói ra). CHỈ ném khi máy chủ chưa có lệnh (404) / chưa có địa
+ * chỉ, hoặc MỌI lô đều hỏng (không đọc được hồ sơ của em nào — chỗ gọi đi đường cũ như trước).
+ */
 export async function loiDenHanTheoEm(
   scriptUrl: string,
   secret: string,
@@ -31,32 +44,53 @@ export async function loiDenHanTheoEm(
   const ra = { em: {} as Record<string, LoiDenHanEm[]>, daGap: {} as Record<string, Record<string, string>>, hong: [] as string[], nhomTrung: {} as Record<string, string> }
   if (ds.length === 0) return ra
   const base = await layDiaChiMayChu(scriptUrl)
-  if (!base) throw new Error('Máy này chưa có địa chỉ máy chủ mới')
+  if (!base) throw new LoiChuaCoLenhRut('Máy này chưa có địa chỉ máy chủ mới')
   const lo: string[][] = []
-  for (let i = 0; i < ds.length; i += 20) lo.push(ds.slice(i, i + 20))
-  let chiSo = 0
-  const chay = async () => {
-    while (chiSo < lo.length) {
-      const phan = lo[chiSo++]!
-      const res = await fetchCoHan(
-        `${base}/ca/loi-den-han`,
-        {
-          method: 'POST',
-          headers: { 'content-type': 'application/json', 'x-ma-bi-mat': secret.trim() },
-          body: JSON.stringify({ secret: secret.trim(), sbd: phan, ngay, ...(qids && qids.length ? { qids } : {}) }),
-        },
-        HAN_GIAY,
-      )
-      if (!res.ok) throw new Error(res.status === 404 ? 'Máy chủ chưa có lệnh lỗi đến hạn' : `Máy chủ trả lỗi HTTP ${res.status}`)
-      const r = (await res.json()) as { ok?: boolean; error?: string; em?: Record<string, LoiDenHanEm[]>; daGap?: Record<string, Record<string, string>>; hong?: string[]; nhomTrung?: Record<string, string> }
-      if (!r.ok) throw new Error(r.error || 'Không đọc được lỗi đến hạn')
-      Object.assign(ra.em, r.em ?? {})
-      Object.assign(ra.daGap, r.daGap ?? {})
-      Object.assign(ra.nhomTrung, r.nhomTrung ?? {})
-      ra.hong.push(...(r.hong ?? []))
-    }
+  for (let i = 0; i < ds.length; i += LO_EM_LOI_DEN_HAN) lo.push(ds.slice(i, i + LO_EM_LOI_DEN_HAN))
+  type TraVe = { ok?: boolean; error?: string; em?: Record<string, LoiDenHanEm[]>; daGap?: Record<string, Record<string, string>>; hong?: string[]; nhomTrung?: Record<string, string> }
+  const goi = async (phan: string[]): Promise<TraVe> => {
+    const res = await fetchCoHan(
+      `${base}/ca/loi-den-han`,
+      {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-ma-bi-mat': secret.trim() },
+        body: JSON.stringify({ secret: secret.trim(), sbd: phan, ngay, ...(qids && qids.length ? { qids } : {}) }),
+      },
+      HAN_GIAY,
+    )
+    if (res.status === 404) throw new LoiChuaCoLenhRut('Máy chủ chưa có lệnh lỗi đến hạn')
+    if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
+    const r = (await res.json()) as TraVe
+    if (!r.ok) throw new Error(r.error || 'Không đọc được lỗi đến hạn')
+    return r
   }
-  await Promise.all(Array.from({ length: Math.min(4, lo.length) }, chay))
+  let soDoc = 0
+  let loiCuoi: unknown = null
+  const nhan = (r: TraVe) => {
+    Object.assign(ra.em, r.em ?? {})
+    Object.assign(ra.daGap, r.daGap ?? {})
+    Object.assign(ra.nhomTrung, r.nhomTrung ?? {})
+    ra.hong.push(...(r.hong ?? []))
+  }
+  /** Một lô: thử; lỗi (không phải 404) ⇒ chia đôi thử lại (lô một em thử lại một lần); vẫn lỗi ⇒ em của lô vào `hong`. */
+  const docLo = async (phan: string[], conChia: boolean): Promise<void> => {
+    try { nhan(await goi(phan)); soDoc += phan.length; return } catch (e) {
+      if (e instanceof LoiChuaCoLenhRut) throw e
+      loiCuoi = e
+    }
+    if (conChia && phan.length > 1) {
+      const g = Math.ceil(phan.length / 2)
+      await Promise.all([docLo(phan.slice(0, g), false), docLo(phan.slice(g), false)])
+      return
+    }
+    if (conChia) { try { nhan(await goi(phan)); soDoc += phan.length; return } catch (e) { if (e instanceof LoiChuaCoLenhRut) throw e; loiCuoi = e } }
+    ra.hong.push(...phan)
+  }
+  let chiSo = 0
+  const chay = async () => { while (chiSo < lo.length) await docLo(lo[chiSo++]!, true) }
+  await Promise.all(Array.from({ length: Math.min(SONG_SONG_LOI_DEN_HAN, lo.length) }, chay))
+  if (soDoc === 0) throw loiCuoi instanceof Error ? loiCuoi : new Error('Không đọc được lỗi đến hạn')
+  ra.hong = [...new Set(ra.hong)]
   return ra
 }
 
@@ -96,7 +130,9 @@ export interface CauDaDungEm {
   soLanSai: number
 }
 
-/** KIỂM CHỨNG CÂU ĐÃ ĐÚNG (02/10) — `/ca/cau-da-dung` theo LÔ 20 em (4 lô song song). Máy chủ chưa có lệnh ⇒ NÉM LỖI. */
+/** KIỂM CHỨNG CÂU ĐÃ ĐÚNG (02/10) — `/ca/cau-da-dung` theo LÔ `LO_EM_LOI_DEN_HAN` em (`SONG_SONG_LOI_DEN_HAN` lô song song). Máy chủ chưa có lệnh ⇒ NÉM LỖI.
+ *  04/11: lô lỗi (nghẽn / hết giờ) ⇒ THỬ LẠI một lần trước khi ném — trước đây một lô trượt là ca «Kiểm chứng câu đã đúng» không bắt đầu được (đường này không có
+ *  đường dự phòng: đường cũ lấp câu em chưa đúng). */
 export async function cauDaDungTheoEm(scriptUrl: string, secret: string, dsSbd: string[]): Promise<{ em: Record<string, CauDaDungEm[]> }> {
   const ds = [...new Set(dsSbd.map((x) => String(x || '').trim()).filter(Boolean))]
   const ra = { em: {} as Record<string, CauDaDungEm[]> }
@@ -104,11 +140,9 @@ export async function cauDaDungTheoEm(scriptUrl: string, secret: string, dsSbd: 
   const base = await layDiaChiMayChu(scriptUrl)
   if (!base) throw new Error('Máy này chưa có địa chỉ máy chủ mới')
   const lo: string[][] = []
-  for (let i = 0; i < ds.length; i += 20) lo.push(ds.slice(i, i + 20))
+  for (let i = 0; i < ds.length; i += LO_EM_LOI_DEN_HAN) lo.push(ds.slice(i, i + LO_EM_LOI_DEN_HAN))
   let chiSo = 0
-  const chay = async () => {
-    while (chiSo < lo.length) {
-      const phan = lo[chiSo++]!
+  const motLo = async (phan: string[]) => {
       const res = await fetchCoHan(
         `${base}/ca/cau-da-dung`,
         {
@@ -118,13 +152,19 @@ export async function cauDaDungTheoEm(scriptUrl: string, secret: string, dsSbd: 
         },
         HAN_GIAY,
       )
-      if (!res.ok) throw new Error(res.status === 404 ? 'Máy chủ chưa có lệnh câu đã làm đúng' : `Máy chủ trả lỗi HTTP ${res.status}`)
+      if (res.status === 404) throw new LoiChuaCoLenhRut('Máy chủ chưa có lệnh câu đã làm đúng')
+      if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
       const r = (await res.json()) as { ok?: boolean; error?: string; em?: Record<string, CauDaDungEm[]> }
       if (!r.ok) throw new Error(r.error || 'Không đọc được câu em đã làm đúng')
       Object.assign(ra.em, r.em ?? {})
+  }
+  const chay = async () => {
+    while (chiSo < lo.length) {
+      const phan = lo[chiSo++]!
+      try { await motLo(phan) } catch (e) { if (e instanceof LoiChuaCoLenhRut) throw e; await motLo(phan) }
     }
   }
-  await Promise.all(Array.from({ length: Math.min(4, lo.length) }, chay))
+  await Promise.all(Array.from({ length: Math.min(SONG_SONG_LOI_DEN_HAN, lo.length) }, chay))
   return ra
 }
 

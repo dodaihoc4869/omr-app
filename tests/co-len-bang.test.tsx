@@ -70,13 +70,13 @@ vi.mock('../src/store/appStore', () => ({
 
 const { default: ExamSetupScreen } = await import('../src/screens/ExamSetupScreen')
 
-type CachLay = 'rut' | 'tron' | 'lenbang'
+type CachLay = 'rut' | 'tron' | 'rieng'
 // MÀN MỞ CA 21/10: cách ra đề là BỐN THẺ (radio) ngay trong bước Đề, không còn hộp nổi Rút đề.
 //   rut     = thẻ "Cả lớp cùng một đề", kho lớn ⇒ tự rút thông minh (chip "14 câu (9 · 2 · 3)" tích sẵn)
 //   tron    = thẻ "Cả lớp cùng một đề", kho vừa một đề ⇒ chip "Trọn đề (N câu)" tích sẵn
-//   lenbang = thẻ "Kiểm tra điểm yếu"
-const THE: Record<CachLay, RegExp> = { rut: /^Cả lớp cùng một đề/, tron: /^Cả lớp cùng một đề/, lenbang: /^Kiểm tra điểm yếu/ }
-const CHIP: Record<CachLay, RegExp | null> = { rut: /^14 câu \(9 · 2 · 3\)$/, tron: /^Trọn đề \(\d+ câu\)$/, lenbang: null }
+//   rieng   = thẻ "Đề riêng từng em" (04/11 thầy bỏ thẻ «Kiểm tra điểm yếu» — thẻ duy nhất từng bật cờ lên bảng)
+const THE: Record<CachLay, RegExp> = { rut: /^Cả lớp cùng một đề/, tron: /^Cả lớp cùng một đề/, rieng: /^Đề riêng từng em/ }
+const CHIP: Record<CachLay, RegExp | null> = { rut: /^14 câu \(9 · 2 · 3\)$/, tron: /^Trọn đề \(\d+ câu\)$/, rieng: null }
 
 /** Soạn đủ một ca hợp lệ theo cách lấy câu đã chọn rồi bấm Mở ca. */
 /** HẠN CHO CẢ PHÉP KIỂM, không chỉ cho từng lượt chờ bên trong.
@@ -155,13 +155,13 @@ describe('cờ lên bảng suy từ khối Bộ câu ra đề', () => {
       expect(nhan, 'công tắc/nút bật-tắt trên màn Mở ca').not.toMatch(/lên bảng|Gọi lên bảng/i)
     }
     expect(r.container.textContent).not.toContain('Ca này dùng làm gì')
-    // và cờ vẫn chỉ nằm ở thẻ cách ra đề "Kiểm tra điểm yếu"
-    expect(r.getByRole('radio', { name: /^Kiểm tra điểm yếu/ })).toBeTruthy()
+    // 04/11: thẻ «Kiểm tra điểm yếu» (nơi duy nhất bật cờ lên bảng) đã bỏ ⇒ màn Mở ca không còn đường nào bật cờ
+    expect(r.queryByRole('radio', { name: /^Kiểm tra điểm yếu/ })).toBeNull()
   }, HAN_PHEP_KIEM)
 
-  it('chọn "Kiểm tra điểm yếu" → ca đẩy dữ liệu sang màn Gọi lên bảng', async () => {
-    const { goi } = await moCa('lenbang')
-    expect(co(goi)).toBe(true)
+  it('chọn "Đề riêng từng em" → không đẩy (không còn thẻ nào bật cờ lên bảng, 04/11)', async () => {
+    const { goi } = await moCa('rieng')
+    expect(co(goi)).toBe(false)
   }, HAN_PHEP_KIEM)
 
   it('chọn "Cả lớp cùng một đề" (kho lớn ⇒ rút thông minh) → không đẩy', async () => {
@@ -177,19 +177,19 @@ describe('cờ lên bảng suy từ khối Bộ câu ra đề', () => {
 
 describe('mọi lựa chọn đều lấy dữ liệu phiếu phụ huynh và mạnh/yếu', () => {
   it('bản đề CÓ đáp án vẫn lưu trên máy thầy ở CẢ BA cách lấy câu', async () => {
-    for (const cach of ['rut', 'tron', 'lenbang'] as CachLay[]) {
+    for (const cach of ['rut', 'tron', 'rieng'] as CachLay[]) {
       await moCa(cach)
       expect(saveSessionTeacherBank, `cách lấy: ${cach}`).toHaveBeenCalledTimes(1)
     }
   }, HAN_PHEP_KIEM)
 
   it('cách công bố điểm và mọi tuỳ chọn khác KHÔNG đổi theo cờ lên bảng', async () => {
-    const a = (await moCa('lenbang')).goi
+    const a = (await moCa('rieng')).goi
     const b = (await moCa('rut')).goi
     // 5 = cách công bố · 6 = keyBank. Hai thứ quyết định em xem được điểm và
     // thầy chấm lại được — không được dính gì tới cờ lên bảng.
     expect(a[5]).toBe(b[5])
-    // keyBank: "Kiểm tra điểm yếu" và "Rút đề thông minh" chọn số câu KHÁC nhau theo thiết kế (chẩn đoán 15 câu I, rút mặc định 9), nên không còn so nội dung
+    // keyBank: "Đề riêng từng em" và "Rút đề thông minh" có thể chọn số câu KHÁC nhau theo thiết kế, nên không còn so nội dung
     // từng câu; điều phải giữ là CẢ HAI đều mang đáp án (thầy chấm lại được) — cờ lên bảng không bao giờ làm mất đáp án.
     const coDapAn = (k: unknown) => {
       const bank = k as { phanI: { correct?: unknown }[]; phanII: { correct?: unknown }[]; phanIII: { correct?: unknown }[] }
@@ -198,7 +198,7 @@ describe('mọi lựa chọn đều lấy dữ liệu phiếu phụ huynh và m�
     }
     expect(coDapAn(a[6])).toBe(true)
     expect(coDapAn(b[6])).toBe(true)
-    // RÚT ĐỀ v2 (02/10, thầy chốt): "Kiểm tra điểm yếu" ⇒ BỘ RIÊNG TỪNG EM ⇒ ca bật cờ đề riêng (kéo theo phòng chờ). Hai cờ ấy đổi
+    // RÚT ĐỀ v2 (02/10, thầy chốt): "Đề riêng từng em" ⇒ BỘ RIÊNG TỪNG EM ⇒ ca bật cờ đề riêng (kéo theo phòng chờ). Hai cờ ấy đổi
     // theo chế độ là ĐÚNG thiết kế; mọi tuỳ chọn khác vẫn không được đổi.
     const { lenBang: _a, deRieng: drA, phongCho: pcA, ...conLaiA } = a[7] as Record<string, unknown>
     const { lenBang: _b, deRieng: drB, phongCho: pcB, ...conLaiB } = b[7] as Record<string, unknown>

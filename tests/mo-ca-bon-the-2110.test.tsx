@@ -1,6 +1,6 @@
 // MÀN MỞ CA GỌN — BỐN THẺ CÁCH RA ĐỀ (thầy chốt 21/10: "chốt mọi thứ bạn làm luôn đi").
 //
-//   1. Một tầng, bốn thẻ: Cả lớp cùng một đề · Đề riêng từng em · Kiểm tra điểm yếu · Kiểm chứng câu đã đúng.
+//   1. Một tầng, ba thẻ: Cả lớp cùng một đề · Đề riêng từng em · Kiểm chứng câu đã đúng (04/11 thầy «Bỏ phần ca thi kiểm tra điểm yếu»).
 //   2. Kho lớn ⇒ KHÔNG có "Trọn đề" (bỏ bẫy mỗi em bốc ngẫu nhiên 18/4/6 khác nhau).
 //   3. Chế độ giữ ở màn — đi bước khác rồi quay lại không mất (lỗi cũ: mở lại hộp Rút đề kéo về Rút đề thông minh).
 //   4. Đề riêng: MỘT công tắc "Có câu chữa lỗi"; tắt ⇒ phamViHoiLai 'khong' lên máy chủ.
@@ -62,11 +62,12 @@ async function moCa(r: ReturnType<typeof render>) {
   return publishSession.mock.calls.at(-1) as unknown as unknown[]
 }
 
-describe('bốn thẻ, một tầng', () => {
-  it('đủ bốn thẻ; mặc định Cả lớp cùng một đề; kho lớn ⇒ KHÔNG có "Trọn đề"; không còn chip/hộp Rút đề cũ', async () => {
+describe('ba thẻ, một tầng (04/11 thầy bỏ «Kiểm tra điểm yếu»)', () => {
+  it('đủ ba thẻ, KHÔNG còn «Kiểm tra điểm yếu»; mặc định Cả lớp cùng một đề; kho lớn ⇒ KHÔNG có "Trọn đề"; không còn chip/hộp Rút đề cũ', async () => {
     const r = await dung(KHO_DAY)
     const ten = r.getAllByRole('radio').map((e) => e.querySelector('b')?.textContent)
-    expect(ten).toEqual(['Cả lớp cùng một đề', 'Đề riêng từng em', 'Kiểm tra điểm yếu', 'Kiểm chứng câu đã đúng'])
+    expect(ten).toEqual(['Cả lớp cùng một đề', 'Đề riêng từng em', 'Kiểm chứng câu đã đúng'])
+    expect(r.queryByRole('radio', { name: /^Kiểm tra điểm yếu/ })).toBeNull()
     expect(the(r, /^Cả lớp cùng một đề/).getAttribute('aria-checked')).toBe('true')
     expect(r.queryByRole('checkbox', { name: /^Trọn đề/ })).toBeNull()
     expect(r.container.textContent).not.toContain('Lấy nguyên đề')
@@ -100,12 +101,11 @@ describe('bốn thẻ, một tầng', () => {
     expect(goi[7]).toMatchObject({ deRieng: true, phamViHoiLai: 'khong', phongCho: true })
   }, HAN)
 
-  it('Kiểm tra điểm yếu đặt ca 15 phút, gửi lên bảng + gan_nhat', async () => {
+  it('không thẻ nào mở ca mới ở chế độ «Kiểm tra điểm yếu» (cờ lên bảng luôn tắt khi mở ca)', async () => {
     const r = await dung(KHO_DAY)
-    fireEvent.click(the(r, /^Kiểm tra điểm yếu/))
+    fireEvent.click(the(r, /^Đề riêng từng em/))
     const goi = await moCa(r)
-    expect(goi[3]).toBe(15)
-    expect(goi[7]).toMatchObject({ lenBang: true, deRieng: true, phamViHoiLai: 'gan_nhat' })
+    expect(goi[7]).toMatchObject({ lenBang: false, deRieng: true })
   }, HAN)
 })
 

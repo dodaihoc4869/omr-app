@@ -171,12 +171,12 @@ describe('chọn câu cho buổi chữa bài', () => {
 
 describe('khối Bộ câu ra đề — chế độ thứ ba', () => {
   // RÚT ĐỀ v2 (02/10, thầy chốt): "Kiểm tra điểm yếu" ⇒ BỘ RIÊNG TỪNG EM (thay luật cũ "cả lớp cùng một đề").
-  it('có chip "Kiểm tra điểm yếu" và chuyển ca sang đề riêng từng em, đủ số câu chẩn đoán', async () => {
+  it('chế độ "Kiểm tra điểm yếu" (ca cũ) vẫn chuyển ca sang đề riêng từng em, đủ số câu chẩn đoán; màn Mở ca KHÔNG còn thẻ mở mới (04/11)', async () => {
     const ma = (await import('../src/components/KhoiRutDe.tsx?raw')).default
-    // Từ 21/10 chế độ là THẺ ở màn Mở ca; khối nhận `cheDo === 'diem_yeu'`.
+    // Từ 21/10 chế độ là THẺ ở màn Mở ca; khối nhận `cheDo === 'diem_yeu'`. 04/11 thầy «Bỏ phần ca thi kiểm tra điểm yếu»: bỏ THẺ, khối giữ nhánh cho ca cũ.
     expect(ma).toContain("const lenBang = cheDo === 'diem_yeu'")
     const man = (await import('../src/screens/ExamSetupScreen.tsx?raw')).default
-    expect(man).toContain("{ id: 'diem_yeu', ten: 'Kiểm tra điểm yếu'")
+    expect(man).not.toContain("{ id: 'diem_yeu', ten: 'Kiểm tra điểm yếu'")
     // soCau báo lên = ĐÚNG cỡ bộ chẩn đoán; cờ đề riêng bật ⇒ lúc Bắt đầu mỗi em một bộ theo lỗi của chính em
     expect(ma).toContain('onDoi({ ids: moiIdDaRut(kq), soCau: kho, lenBang: true, idsChua: moiIdDaRut(chua), deRieng: true, phamViHoiLai })')
     expect(ma).not.toContain('Cả lớp làm CÙNG một đề')
