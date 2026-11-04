@@ -1,0 +1,15 @@
+{
+  "kyTuNguon": "R′",
+  "primeUnicode": "U+2032",
+  "fontAppThieuPrime": true,
+  "phuongAn": "R DDH + glyph dấu nháy U+0027 cùng font DDH, cỡ 70%, baseline nâng 45% cỡ chữ R; HarfBuzz/fontTools dựng path tự chứa.",
+  "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+  "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+  "fontFallback": false,
+  "nguonApDung": [
+    200,
+    330,
+    1178
+  ],
+  "kiemDocLap": "Lô135 mở riêng nguồn/render/exacthash; soat-ddh135a đã đạt."
+}

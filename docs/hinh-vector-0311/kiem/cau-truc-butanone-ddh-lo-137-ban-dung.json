@@ -1,0 +1,38 @@
+[
+  {
+    "i": 568,
+    "hash": "69d6cb92f6ab726134c690944054219e9419cf39574216b3aac87ff7edbdea36",
+    "fileNguon": "anh/69d6cb92f6ab726134c690944054219e9419cf39574216b3aac87ff7edbdea36.png",
+    "canvas": [
+      300,
+      175
+    ],
+    "daMoNative": true,
+    "kind": "butanone-highlight",
+    "smiles": "CCC(=O)C",
+    "notes": "LiteralC₂H₅–C(=O xuống)–CH₃ngang. Highlight(A)làkhungnềnVÀNGbochữnhậtbaoC₂H₅–C=O,khôngCH₃;(A)ởdướitráitrongnềnvàng. (B)làovalCHẤMđỏđứngbaoC₂H₅,(B)ởtrêntrongoval. (C)làovalNÉTĐỨTđỏlớnbaoC(=O)–CH₃,(C)dướiphảitrongoval. Giữ3highlightkhácnhau/3label,mộtSMILESđơnlẻkhôngđủ. Khôngcharge/stereo.",
+    "questions": [
+      {
+        "qid": "VIP27-BDT-L2-0201-I-11",
+        "de": "Đặc điểm cấu tạo nào trong phân tử butanone (được kí hiệu như hình bên) quyết định khả năng tham gia phản ứng iodoform?",
+        "refs": [
+          {
+            "where": "VIP27-BDT-L2-0201-I-11.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "svg": "butanone-khoanh-ddh-7fd96b24a6d4a58d390d72b6e75f03bc3427ce90a3c673f5f34f3355b8703c54.svg",
+    "hashSvg": "7fd96b24a6d4a58d390d72b6e75f03bc3427ce90a3c673f5f34f3355b8703c54",
+    "byteSvg": 8723,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "A nềnvàngbo gócbaoC2H5COkhôngCH3;BovalCHẤMđỏC2H5;CovalNÉTĐỨTđỏCOCH3cắtởmépdướinhưsource.3nhãnđậmthậtDDH/khôngcharge.",
+    "hashSvgDaSoat": "7fd96b24a6d4a58d390d72b6e75f03bc3427ce90a3c673f5f34f3355b8703c54",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

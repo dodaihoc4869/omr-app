@@ -1,0 +1,293 @@
+[
+  {
+    "i": 1248,
+    "hash": "e28c736f07f1c1fef519b548a13962324963ffec0dffe820c494d9dfb5dcc2e3",
+    "fileNguon": "anh/e28c736f07f1c1fef519b548a13962324963ffec0dffe820c494d9dfb5dcc2e3.png",
+    "canvas": [
+      1024,
+      832
+    ],
+    "daMoNative": true,
+    "kind": "fertilizer-flow-7box",
+    "nodes": [
+      "SO₂(g) + O₂(g)",
+      "A(g)",
+      "Hợp chất (Q)",
+      "Hợp chất (X)",
+      "N₂(g) + H₂(g)",
+      "Hợp chất (Y)",
+      "Phân bón (Z)"
+    ],
+    "edges": [
+      {
+        "from": 0,
+        "to": 1,
+        "text": "t°, V₂O₅(s)"
+      },
+      {
+        "from": 1,
+        "to": 2,
+        "text": "+ H₂SO₄(l)"
+      },
+      {
+        "from": 2,
+        "to": 3,
+        "text": "+ H₂O(l)"
+      },
+      {
+        "from": 4,
+        "to": 5,
+        "text": ""
+      },
+      {
+        "from": [
+          3,
+          5
+        ],
+        "to": 6,
+        "text": ""
+      }
+    ],
+    "notes": "7boxviềnđen/nềntrắng;nhánhtrái4boxdọc,nhánhphải2boxdọcnganghàng3/4nhánhtrái;2boxcuốinốidâygấpphíadướivào1nútgiữa,mũitênxuốngPhânbón(Z). KHÔNGđiềukiệntrênN₂+H₂→YtrongsourceđừngthêmFe/t/p.KHÔNGtựgiảiA/Q/X/Y/Zsốchất. Giữngoặcvòngở(Q)/(X)/(Y)/(Z),statetagsg/s/l.",
+    "questions": [
+      {
+        "qid": "DB-11-B8-D5-II-9",
+        "de": "Sơ đồ quy trình dưới đây mô tả các bước trong quá trình sản xuất phân bón (Z):",
+        "refs": [
+          {
+            "where": "DB-11-B8-D5-II-9.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B8-II-18",
+        "de": "Sơ đồ quy trình dưới đây mô tả các bước trong quá trình sản xuất phân bón (Z):",
+        "refs": [
+          {
+            "where": "DH-11-C2-B8-II-18.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 984,
+    "hash": "b03f83efa970cd709a3b8e93576bcf818d7c0b6fa1b96c6e3da971f9b314572c",
+    "fileNguon": "anh/b03f83efa970cd709a3b8e93576bcf818d7c0b6fa1b96c6e3da971f9b314572c.png",
+    "canvas": [
+      644,
+      70
+    ],
+    "daMoNative": true,
+    "kind": "aniline-reaction-4",
+    "nodes": [
+      "benzene",
+      "nitrobenzene",
+      "phenyl–NH₃Cl",
+      "aniline"
+    ],
+    "arrows": [
+      {
+        "text": ""
+      },
+      {
+        "over": "Zn + HCl(aq)"
+      },
+      {
+        "over": "NaOH(aq)"
+      }
+    ],
+    "notes": "4vòngbenzene3đôiKHÔNGcircle,nhómNO₂/NH₃Cl/NH₂đềuởtrên-phải. SourceNH₃ClviếtgộpKHÔNGdấuNH₃⁺/Cl⁻đừngtựthêmioncharges. Arrow1KHÔNGđiềukiện,nativekhôngHNO₃đừngtựthêm. Arrow2Zn+HCl(aq),khôngFe. Khôngcaption/tênchấthiểnthịtrongảnh.",
+    "questions": [
+      {
+        "qid": "DB-12-B8-D1-III-432",
+        "de": "Aniline có thể được tổng hợp từ benzene theo sơ đồ chuyển hoá sau: Biết hiệu suất cả quá trình là 78%.\nKhối lượng aniline thu được khi điều chế từ 156 kg benzene là bao nhiêu kg? (Kết quả làm tròn đến chữ số hàng đơn vị).",
+        "refs": [
+          {
+            "where": "DB-12-B8-D1-III-432.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B8-DT-III-5",
+        "de": "Aniline có thể được tổng hợp từ benzene theo sơ đồ chuyển hoá sau: Biết hiệu suất cả quá trình là 78%.\nKhối lượng aniline thu được khi điều chế từ 156 kg benzene là bao nhiêu kg? (Kết quả làm tròn đến chữ số hàng đơn vị).",
+        "refs": [
+          {
+            "where": "DH-12-C3-B8-DT-III-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B8-III-38",
+        "de": "Aniline có thể được tổng hợp từ benzene theo sơ đồ chuyển hoá sau: Biết hiệu suất cả quá trình là 78%.\nKhối lượng aniline thu được khi điều chế từ 156 kg benzene là bao nhiêu kg? (Kết quả làm tròn đến chữ số hàng đơn vị).",
+        "refs": [
+          {
+            "where": "DH-12-C3-B8-III-38.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1292,
+    "hash": "eaad5541aeb2e82801ffd094fc88ef313586974e86928fb37b4e8329a9143790",
+    "fileNguon": "anh/eaad5541aeb2e82801ffd094fc88ef313586974e86928fb37b4e8329a9143790.png",
+    "canvas": [
+      1134,
+      245
+    ],
+    "daMoNative": true,
+    "kind": "aniline-reaction-3-circles",
+    "nodes": [
+      "benzene",
+      "nitrobenzene",
+      "aniline"
+    ],
+    "arrows": [
+      {
+        "over": "+ HNO₃ đặc",
+        "under": "xt, t⁰"
+      },
+      {
+        "over": "+ Fe/HCl"
+      }
+    ],
+    "notes": "3vòngbenzeneCÓVÒNGTRÒNtrong,mỗihexagonkhông3double. NO₂/NH₂đứngtrênvòng.CặpcondfirstarrowHNO₃đặctrên/xt,t⁰dưới;arrow2+Fe/HCltrên,khôngZn/NaOH/hệsốthêm. Khôngcaption.",
+    "questions": [
+      {
+        "qid": "12-KT-C3-D5-III-5",
+        "de": "Trong phòng thí nghiệm, một học sinh tiến hành điều chế aniline từ 15,6 gam benzene theo sơ đồ trong hình dưới đây. Hiệu suất giai đoạn tạo thành nitrobenzene và aniline lần lượt là 60% và h%.\nKết thúc thí nghiệm, thu được 5,58 gam aniline.\nGiá trị của h là bao nhiêu?",
+        "refs": [
+          {
+            "where": "12-KT-C3-D5-III-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B8-D3-III-6",
+        "de": "Trong phòng thí nghiệm, một học sinh tiến hành điều chế aniline từ 15,6 gam benzene theo sơ đồ trong hình dưới đây. Hiệu suất giai đoạn tạo thành nitrobenzene và aniline lần lượt là 60% và h%.\nKết thúc thí nghiệm, thu được 5,58 gam aniline.\nGiá trị của h là bao nhiêu?",
+        "refs": [
+          {
+            "where": "DB-12-B8-D3-III-6.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 727,
+    "hash": "881eabf1171f2c86c696828c17a1bb0d7d4d7c44167ca97868c002ffee9c2e83",
+    "fileNguon": "anh/881eabf1171f2c86c696828c17a1bb0d7d4d7c44167ca97868c002ffee9c2e83.png",
+    "canvas": [
+      899,
+      211
+    ],
+    "daMoNative": true,
+    "kind": "aspirin-hydrolysis",
+    "literalReactantBranch": "OCOCH₃",
+    "phenylSubstituents": "COOHtop,OCOCH₃top-right,ortho",
+    "reactants": [
+      "aspirin",
+      "H₂O"
+    ],
+    "products": [
+      "salicylic acid",
+      "CH₃COOH"
+    ],
+    "arrow": "⇌",
+    "captions": [
+      "Aspirin",
+      "Salicylic acid"
+    ],
+    "notes": "Vòng3đôiKHÔNGcircle,COOHtexttop/pháiOCOCH₃trênphải(phảigiữthứtựOCO)ortho. ProductOHtoprightorthoCOOHtop. KHÔNGH⁺/t⁰trênarrownguồn,kHÔNGnhãn(1)cuốirxn.Khôngtựthêmđiềukiện/tênCH₃COOH/H₂Ongoàicapđãcó.",
+    "questions": [
+      {
+        "qid": "DB-12-B1-P1-D1-II-158",
+        "de": "Aspirin là một hợp chất được sử dụng làm giảm đau, hạ sốt. Sau khi uống, aspirin bị thủy phân trong cơ thể sẽ tạo thành salicylic acid theo phương trình hoá học sau:",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D1-II-158.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B1-P1-II-31",
+        "de": "Aspirin là một hợp chất được sử dụng làm giảm đau, hạ sốt. Sau khi uống, aspirin bị thủy phân trong cơ thể sẽ tạo thành salicylic acid theo phương trình hoá học sau:",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P1-II-31.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B1-P1-VD-II-3",
+        "de": "Aspirin là một hợp chất được sử dụng làm giảm đau, hạ sốt. Sau khi uống, aspirin bị thủy phân trong cơ thể sẽ tạo thành salicylic acid theo phương trình hoá học sau:",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P1-VD-II-3.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1323,
+    "hash": "ef539229317d33ae386b1c98aa6249c155255e9da231e9c963157be9d4460ebe",
+    "fileNguon": "anh/ef539229317d33ae386b1c98aa6249c155255e9da231e9c963157be9d4460ebe.png",
+    "canvas": [
+      926,
+      229
+    ],
+    "daMoNative": true,
+    "kind": "aspirin-hydrolysis-numbered",
+    "literalReactantBranch": "OCOCH₃",
+    "phenylSubstituents": "COOHtop,OCOCH₃top-right,ortho",
+    "reactants": [
+      "aspirin",
+      "H₂O"
+    ],
+    "products": [
+      "salicylic acid",
+      "CH₃COOH"
+    ],
+    "arrow": "⇌",
+    "captions": [
+      "Aspirin",
+      "Salicylic acid"
+    ],
+    "reactionLabel": "(1)",
+    "notes": "Cùngcấutrúcvòng3đôi/2capnhư727NHƯNGGIỮ(1)ởbênphảicuốiphươngtrình. KhôngH⁺/t⁰trênarrow. Native1323đãmởriêng,khôngalias727làmrụng(1).",
+    "questions": [
+      {
+        "qid": "12-KT-C1-D4-II-2",
+        "de": "Aspirin là một hợp chất được sử dụng làm giảm đau, hạ sốt. Sau khi uống, aspirin bị thủy phân một phần trong cơ thể sẽ tạo thành salicylic acid theo phương trình hoá học sau:",
+        "refs": [
+          {
+            "where": "12-KT-C1-D4-II-2.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D1-II-108",
+        "de": "Aspirin là một hợp chất được sử dụng làm giảm đau, hạ sốt. Sau khi uống, aspirin bị thủy phân một phần trong cơ thể sẽ tạo thành salicylic acid theo phương trình hoá học sau:",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D1-II-108.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  }
+]

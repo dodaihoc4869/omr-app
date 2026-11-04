@@ -1,0 +1,332 @@
+[
+  {
+    "i": 1063,
+    "hash": "bff4825eb8c5e79260af176a9308496c4904f63f45ab0afba0f386b31763cab7",
+    "fileNguon": "anh/bff4825eb8c5e79260af176a9308496c4904f63f45ab0afba0f386b31763cab7.png",
+    "canvas": [
+      567,
+      80
+    ],
+    "daMoNative": true,
+    "kind": "hydrocarbon-grid-4",
+    "columns": 2,
+    "panels": [
+      {
+        "smiles": "C=C(C)CC",
+        "caption": [
+          "(a)"
+        ],
+        "notes": "CH₂=C(CH₃)CH₂CH₃:5C,terminalalkene,khôngE/Z."
+      },
+      {
+        "smiles": "CC(C)C#CC",
+        "caption": [
+          "(b)"
+        ],
+        "notes": "Branchedalkyne6C:CH(CH₃)₂–C≡C–CH₃;khôngbỏmethylnhánh."
+      },
+      {
+        "smiles": "CC#CCC",
+        "caption": [
+          "(c)"
+        ],
+        "notes": "Pentyne5C:CH₃–C≡C–CH₂–CH₃."
+      },
+      {
+        "smiles": "C=CCC(C)(C)C",
+        "caption": [
+          "(d)"
+        ],
+        "notes": "7C:CH₂=CH–CH₂–C(CH₃)₃;centralquaternaryC3methylvà1CH₂,khônghydrogen.C=ClàterminalkhôngE/Z."
+      }
+    ],
+    "notes": "4panelnguồnmộthàng,nhãn(a)..(d)dướitừngchất. Cóthểreflow2cộtkhôngmấtlabels. NoHexplicit/charges/stereo/circle.",
+    "questions": [
+      {
+        "qid": "VIP27-C1-HC11-D1-I-17",
+        "de": "Cho công thức cấu tạo của một số hydrocarbon sau đây (hình (a), (b), (c), (d)).\nPhát biểu nào sau đây là đúng?",
+        "refs": [
+          {
+            "where": "VIP27-C1-HC11-D1-I-17.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "nativePanelRectsApprox": {
+      "a": [
+        0,
+        0,
+        95,
+        80
+      ],
+      "b": [
+        137,
+        0,
+        260,
+        80
+      ],
+      "c": [
+        296,
+        0,
+        421,
+        80
+      ],
+      "d": [
+        460,
+        0,
+        567,
+        80
+      ]
+    },
+    "panelGeometry": [
+      {
+        "caption": "(a)",
+        "vertices": [
+          [
+            17,
+            10
+          ],
+          [
+            33,
+            20
+          ],
+          [
+            53,
+            7
+          ],
+          [
+            72,
+            18
+          ],
+          [
+            33,
+            44
+          ]
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1,
+            "order": 2
+          },
+          {
+            "from": 1,
+            "to": 2,
+            "order": 1
+          },
+          {
+            "from": 2,
+            "to": 3,
+            "order": 1
+          },
+          {
+            "from": 1,
+            "to": 4,
+            "order": 1
+          }
+        ],
+        "carbonCount": 5,
+        "labelAnchor": [
+          40,
+          67
+        ]
+      },
+      {
+        "caption": "(b)",
+        "vertices": [
+          [
+            153,
+            19
+          ],
+          [
+            174,
+            32
+          ],
+          [
+            153,
+            45
+          ],
+          [
+            196,
+            32
+          ],
+          [
+            218,
+            32
+          ],
+          [
+            241,
+            32
+          ]
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1,
+            "order": 1
+          },
+          {
+            "from": 1,
+            "to": 2,
+            "order": 1
+          },
+          {
+            "from": 1,
+            "to": 3,
+            "order": 1
+          },
+          {
+            "from": 3,
+            "to": 4,
+            "order": 3
+          },
+          {
+            "from": 4,
+            "to": 5,
+            "order": 1
+          }
+        ],
+        "carbonCount": 6,
+        "labelAnchor": [
+          187,
+          67
+        ]
+      },
+      {
+        "caption": "(c)",
+        "vertices": [
+          [
+            311,
+            32
+          ],
+          [
+            334,
+            32
+          ],
+          [
+            358,
+            32
+          ],
+          [
+            381,
+            32
+          ],
+          [
+            402,
+            45
+          ]
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1,
+            "order": 1
+          },
+          {
+            "from": 1,
+            "to": 2,
+            "order": 3
+          },
+          {
+            "from": 2,
+            "to": 3,
+            "order": 1
+          },
+          {
+            "from": 3,
+            "to": 4,
+            "order": 1
+          }
+        ],
+        "carbonCount": 5,
+        "labelAnchor": [
+          345,
+          67
+        ]
+      },
+      {
+        "caption": "(d)",
+        "vertices": [
+          [
+            474,
+            12
+          ],
+          [
+            493,
+            23
+          ],
+          [
+            482,
+            44
+          ],
+          [
+            510,
+            44
+          ],
+          [
+            514,
+            11
+          ],
+          [
+            534,
+            23
+          ],
+          [
+            556,
+            7
+          ]
+        ],
+        "edges": [
+          {
+            "from": 1,
+            "to": 0,
+            "order": 1
+          },
+          {
+            "from": 1,
+            "to": 2,
+            "order": 1
+          },
+          {
+            "from": 1,
+            "to": 3,
+            "order": 1
+          },
+          {
+            "from": 1,
+            "to": 4,
+            "order": 1
+          },
+          {
+            "from": 4,
+            "to": 5,
+            "order": 1
+          },
+          {
+            "from": 5,
+            "to": 6,
+            "order": 2
+          }
+        ],
+        "carbonCount": 7,
+        "labelAnchor": [
+          507,
+          67
+        ]
+      }
+    ],
+    "explicitH": "TấtcảHẩn,khôngthêmtextC/CH₃/H. EndpointsđạidiệnCđúngnhưvertices.",
+    "stereo": "2alkeneterminal(a)/(d)khôngE/Z;2alkyne(b)/(c)khôngstereo. Nobondwedges/charges.",
+    "svg": "hydrocarbon-grid-ddh-5ac181ef0f832b06616380272b089f13487aafe0178141fac2523ef4546169e9.svg",
+    "hashSvg": "5ac181ef0f832b06616380272b089f13487aafe0178141fac2523ef4546169e9",
+    "byteSvg": 7533,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "4panelngang/a5C/b6C/c5C/d7C,triple3nét/2terminalalkene/0H-Ctext,giữ4nhãn.",
+    "hashSvgDaSoat": "5ac181ef0f832b06616380272b089f13487aafe0178141fac2523ef4546169e9",
+    "nguoiSoat": "cau_truc_6"
+  }
+]
