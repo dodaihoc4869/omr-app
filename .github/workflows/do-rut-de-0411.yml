@@ -1,0 +1,38 @@
+# ĐO RÚT ĐỀ RIÊNG + BÀI BỔ SUNG (CHỈ ĐỌC) — thầy 04/11: «ca kiểm tra rút câu sai rút cực lâu khi thầy bấm bắt đầu. Liên tục báo ko rút đc kiểu mới chỉ rút đc
+# kiểu cũ. Khi bấm kết thúc ca thì nhiều hs ko chấm chuẩn bị mất câu phải bấm nhận chấm lại».
+# Đếm theo ngày: ca đề riêng · rút bằng cách mới (bản đồ có `bac` / `cheDo`) · rơi về cách cũ (biên bản có `caDaQuet`) · bài bổ sung chờ / đã nhận.
+# CHỈ in số đếm gộp — không mã em, tên em, mã câu (repo công khai).
+name: Đo rút đề riêng + bài bổ sung (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/focused-ramanujan-fq23pk]
+    paths: ['.github/workflows/do-rut-de-0411.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-rut-de-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm (chỉ SELECT gộp)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results'; }
+          q "ca thi đang mở" "SELECT COUNT(*) n FROM ca WHERE trang_thai='mo'"
+          q "khoá của bản đồ đề riêng (mẫu 1 ca gần nhất)" "SELECT (SELECT group_concat(key) FROM json_each(c.bo_theo_em_json)) khoa, (SELECT group_concat(key) FROM json_each(c.bo_theo_em_json,'\$.bb')) khoa_bb FROM ca c WHERE de_rieng=1 AND bo_theo_em_json IS NOT NULL AND bo_theo_em_json<>'' ORDER BY cap_nhat_luc DESC LIMIT 1"
+          q "ca đề riêng theo ngày từ 25/10: số ca · có bản đồ · rút cách mới (bac) · kiểm chứng đã đúng · cách cũ (caDaQuet) · số em có bộ (TB)" "SELECT substr(COALESCE(NULLIF(bat_dau_thi_luc,''),cap_nhat_luc),1,10) ngay, COUNT(*) ca, SUM(bo_theo_em_json IS NOT NULL AND bo_theo_em_json<>'') co_ban_do, SUM(json_type(bo_theo_em_json,'\$.bac') IS NOT NULL) moi_bac, SUM(json_extract(bo_theo_em_json,'\$.cheDo')='da_dung') da_dung, SUM(json_type(bo_theo_em_json,'\$.bb.caDaQuet') IS NOT NULL) cu, ROUND(AVG((SELECT COUNT(*) FROM json_each(bo_theo_em_json,'\$.bo'))),1) em_tb FROM ca WHERE de_rieng=1 AND trang_thai<>'da_xoa' AND COALESCE(NULLIF(bat_dau_thi_luc,''),cap_nhat_luc)>='2026-10-25' GROUP BY ngay ORDER BY ngay"
+          q "bài bổ sung theo ngày từ 25/10: chờ · đã nhận · đã bỏ · số ca" "SELECT substr(gui_luc,1,10) ngay, SUM(trang_thai='cho') cho, SUM(trang_thai='nhan') nhan, SUM(trang_thai='bo') bo, COUNT(DISTINCT ma_ca) so_ca FROM bai_bo_sung WHERE gui_luc>='2026-10-25' GROUP BY ngay ORDER BY ngay"
+          q "lượt chưa có điểm sau khi ca đóng (ca đóng từ 25/10)" "SELECT substr(c.cap_nhat_luc,1,10) ngay, COUNT(*) luot, SUM(l.tong IS NULL) chua_diem FROM ca c JOIN luot l ON l.ma_ca=c.ma_ca WHERE c.trang_thai='dong' AND c.cap_nhat_luc>='2026-10-25' AND l.trang_thai IN('da_nop','khoa') GROUP BY ngay ORDER BY ngay"
