@@ -22,17 +22,38 @@ import { damBaoKtCn } from '../server/src/kiem-tra-ca-nhan-schema'
 import { metaKt } from '../server/src/kiem-tra-ca-nhan'
 import type { Env } from '../server/src/kieu'
 
+const nativeDangCho = new Set<Promise<unknown>>()
+function theoDoiNative<T>(p: Promise<T>): Promise<T> {
+  nativeDangCho.add(p)
+  void p.then(() => nativeDangCho.delete(p), () => nativeDangCho.delete(p))
+  return p
+}
 let vetCrypto: ((event: string) => void) | null = null
 const NOW = Date.parse('2026-10-12T13:30:00Z') // 20:30 giờ VN — giờ cao điểm
 beforeEach(() => {
-  vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(NOW)
+  vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(NOW); nativeDangCho.clear()
   if (process.env.TRACE_D1_VECTOR) {
+    const jsonGoc = Response.prototype.json
+    vi.spyOn(Response.prototype, 'json').mockImplementation(async function (this: Response) {
+      vetCrypto?.('response.json.begin')
+      try { return await jsonGoc.call(this) } finally { vetCrypto?.('response.json.done') }
+    })
+  }
+    const importGoc = crypto.subtle.importKey.bind(crypto.subtle)
+    vi.spyOn(crypto.subtle, 'importKey').mockImplementation(async (...args) => {
+      vetCrypto?.('crypto.importKey.begin')
+      try { return await theoDoiNative(Reflect.apply(importGoc, crypto.subtle, args) as Promise<CryptoKey>) } finally { vetCrypto?.('crypto.importKey.done') }
+    })
+    const digestGoc = crypto.subtle.digest.bind(crypto.subtle)
+    vi.spyOn(crypto.subtle, 'digest').mockImplementation(async (...args) => {
+      vetCrypto?.('crypto.digest.begin')
+      try { return await theoDoiNative(digestGoc(...args)) } finally { vetCrypto?.('crypto.digest.done') }
+    })
     const goc = crypto.subtle.sign.bind(crypto.subtle)
     vi.spyOn(crypto.subtle, 'sign').mockImplementation(async (...args) => {
       vetCrypto?.('crypto.sign.begin')
-      try { return await goc(...args) } finally { vetCrypto?.('crypto.sign.done') }
+      try { return await theoDoiNative(goc(...args)) } finally { vetCrypto?.('crypto.sign.done') }
     })
-  }
 })
 afterEach(() => { vi.restoreAllMocks(); vi.useRealTimers(); xoaDemPhamVi(); xoaDemChienDich(); xoaDemCaBaoVe(); xoaDemChanKhoi(); xoaDemMetaCau() })
 
@@ -84,6 +105,14 @@ function boDemDot(goc: Env['DB']) {
     p.catch(() => {})
     for (;;) {
       await raNgoai()
+      // Đo phụ thuộc D1, không biến thời gian băm native thành một đợt D1 giả.
+      // Chỉ chờ promise native ĐÃ BẮT ĐẦU, không chờ promise ứng dụng có thể cần D1 đang treo.
+      while (nativeDangCho.size) {
+        await Promise.allSettled([...nativeDangCho])
+        // Promise native đã xong; để toàn bộ chuỗi continuation của nó đưa D1 vào hàng đợi.
+        // Đây là biên microtask sau một native operation cụ thể, không phải đợi queue yên N vòng.
+        await raNgoai()
+      }
       if (xong) break
       if (hang.length) { if (!daChot) dot++; vet('flush', { dot, count: hang.length }); for (const f of hang.splice(0)) f() }
     }
@@ -283,4 +312,39 @@ it.each([1, 2])('TransformStream thật: tính đủ %i đợt trước newline1
   expect(r).toEqual({ kq: { tam: true }, dot: soDotDau, lenh: soDotDau })
   expect(JSON.parse(await du)).toEqual({ ok: true })
   if (soDotDau === 2) expect(r.dot).toBeGreaterThan(1)
+})
+
+
+it.each([0, 200])('gom nhánh D1 độc lập sau băm native và %i continuation, không mất lệnh thật', async (soTiep) => {
+  const goc = { prepare: () => ({ first: async () => 1 }) } as unknown as Env['DB']
+  const bo = boDemDot(goc)
+  const r = await bo.chay(async () => {
+    await Promise.all([
+      (async () => { await bo.db.prepare('A').first(); await crypto.subtle.digest('SHA-256', new Uint8Array(16 * 1024 * 1024)); for (let i = 0; i < soTiep; i++) await Promise.resolve(); await bo.db.prepare('C').first() })(),
+      (async () => { await bo.db.prepare('B').first(); await bo.db.prepare('D').first() })(),
+    ])
+    return true
+  }, [])
+  expect(r).toEqual({ kq: true, dot: 2, lenh: 4 })
+})
+
+it('băm native không che ba đợt D1 nối tiếp và vẫn tính đúng SHA-256 thật', async () => {
+  const goc = { prepare: () => ({ first: async () => 1 }) } as unknown as Env['DB']
+  const bo = boDemDot(goc)
+  const r = await bo.chay(async () => {
+    for (let i = 0; i < 3; i++) { await bo.db.prepare('nối tiếp').first(); await crypto.subtle.digest('SHA-256', new TextEncoder().encode('abc')) }
+    return true
+  }, [])
+  expect(r.dot).toBe(3); expect(r.lenh).toBe(3)
+  const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('abc'))
+  expect(Buffer.from(hash).toString('hex')).toBe('ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad')
+})
+
+it('native từ chối vẫn giữ lỗi và dọn tracker trước lượt D1 kế tiếp', async () => {
+  await expect(crypto.subtle.digest('KHONG-HOP-LE', new Uint8Array([1]))).rejects.toThrow()
+  expect(nativeDangCho.size).toBe(0)
+  const goc = { prepare: () => ({ first: async () => 1 }) } as unknown as Env['DB']
+  const bo = boDemDot(goc)
+  const r = await bo.chay(async () => { await bo.db.prepare('sau lỗi native').first(); return true }, [])
+  expect(r).toEqual({ kq: true, dot: 1, lenh: 1 })
 })

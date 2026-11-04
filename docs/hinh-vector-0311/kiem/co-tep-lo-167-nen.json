@@ -1,0 +1,9 @@
+{
+  "file": "server/src/index.ts",
+  "byte": 297644,
+  "hash": "6dcb6ec27a48a83722658c956485e0b64e83c22a784e4d210357582d877e3adf",
+  "checkpointRemoteTruoc": "e7b25161",
+  "byteTaiCheckpointTruoc": 297644,
+  "giuNguyenByteSoVoiCheckpointTruoc": true,
+  "ketQuaCong": "Đỏ nền:297644 > mốc295021+2048. Lô165–167 không sửa mã production/server/index hay nâng mốc;phải xửlýkhi cậpnhậtmain trướcmerge/deploy. Khôngxóa/giảbáocổngnàyxanh."
+}

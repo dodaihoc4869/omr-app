@@ -1,0 +1,67 @@
+{
+  "reviewer": "cau_truc_6",
+  "scope": "Read-only current diff/nativecrypto scheduler tests",
+  "fileSha256": "ebeb3d2fca52a3fd98280c1baf25d7a76796f18d01df73398ff3030a60f58619",
+  "diffSha256": "2ee211e45716e1a695092814a611566b36356f1107aa8e752731b8dea11733a6",
+  "locations": {
+    "const nativeDangCho": 25,
+    "function theoDoiNative": 26,
+    "while (nativeDangCho.size)": 110,
+    "it('gom các nhánh": 313,
+    "it('băm native": 326
+  },
+  "verdict": "Không thấy lỗi chặn về deadlock/mấtD1/đổikếtquảcrypto trong diff hiện tại. Chấp nhận ở phạm vi metric D1 dependency waves,không khẳng định mọi flaky được fix.",
+  "confirmedByCode": [
+    "Set chỉ chứa promise thực trả từnative crypto.subtle.importKey/sign/digest;không chứa ứng dụng promisecóthểawaitD1. Do đó barrier không có vòng chờ native→D1queue tự tạo.",
+    "theoDoiNative thêm promise rồi đăng ký deletecảfulfill/reject;trảoriginalnativepromise. Spies asyncawait delegate native thật,khôngmockdigest/keys/signatures,kếtquả/lỗiđượcpropagate. asyncwrapper cóthêm promise/microtask nên transparentvềgiátrị/lỗi chứkhôngidenticaltiming/promiseidentity.",
+    "Pump trướcflushchờ mọi actualnative đã bắt đầu,tiếptục while cho nativeoperationnốitiếp. D1pendingkhôngđượcresolve tronglúcchờ,so criticalD1A→Bvẫncần2dispatch,khôngbịgộpgiả. Dot/lan/lệnhkhôngbịtrừthêm;budgetkhôngđổi.",
+    "Snapshotfirstline/metricfreezevàdrainlogicgiữnguyên;barrierkhôngbỏwaitUntil/tail. Rejectednativekhôngnémtrựctiếptừpump(vìallSettled)nhưngứngdụngawaitspyvẫnrejectvàviec.finallysettle;khôngchefailurevềgiátrị.",
+    "2tests mới meaningful:independent A→SHA16MiB→C vàB→D expected2waves/4D1;negative3serialD1xenSHAexpected3waves/3D1;knownabcSHA256checksrealnativekếtquả. GiữcácnegativeJSON/realTransformStreamcũ."
+  ],
+  "limitations": [
+    "Đây thay đổimôhìnhscheduler đểđếmD1 dependency waves,khôngđochậmcryptotrongwallclock. Khôngdùngxanhmớilàchứngminhclientresponsemsnhanhhơn.",
+    "Set cấpfile không phânrequest:operationnative nền chưa drain hoặcactorngoàirequestcóthểlàmflushchờlâu. Test hiệnsequential với priorrequestdrain;giữđiềukiệnnày,khôngdùnghelperchosong songrequestmetricmàkhôngtag.",
+    "nativepending vôhạn/chuỗinative liên tục cóthểstarveflush;nativeWebCryptogốcđộclậpD1 vàworkloadtestfinite nênkhôngthấylỗideadlockmới. Cóthểthêmtestfailure/cleanupđểbắtspyleak.",
+    "Chưađiềukhiểndynamicimport/nativeoperationkháckhôngtrongSet;chưabaophủmọinguyênnhânflakyJSON/stream. Cầntrace/red-greenactual saupatch,khôngclaimtoànbộ.",
+    "PromiseallSettled rawcrypto cóchainasyncwrapper;2tests mớicầnchạyđểxácnhậnappcontinuationenqueueCtrướcpumpflushtrongruntimeđích. Reviewerchỉđọcmã,khôngtựchạytest."
+  ],
+  "recommendedChecks": [
+    "Hoànthànhmatrix21test3off+2onvàtrace159nằmwave2/criticalnegatives3đợt;giữmọilogđỏ20test. Khôngclaimfixallflaky.",
+    "Nếuvẫnđỏ,tracependingnative/latestnativefinish/raNgoaibefore-after/chot vàSQL159enqueueđểxáclậpkhenon-D1ngoàiSet,khôngtăngidleturn/mốc."
+  ],
+  "reviewContinuationUpdate": {
+    "verdict": "Không thấy lỗi chặn mới trong awaitraNgoai sau actualnative settlement. Đúng mục tiêu đếm D1waves;khôngkhẳngđịnhđãhếtmọiflaky.",
+    "matrixEvidence": "Matrix20testđãcólượtJSONđỏphảigiữ;matrix21testmới3off+2onđều21/21xanh,reviewerđãđọclog. Regressioncopybỏpostnativeawaitbắtcase200đỏ3/4.",
+    "reasoning": [
+      "Pump đangawaitallSettled actualnative rồiresumetrongmicrotaskcóthểsớm hơnchuỗicontinuationứngdụng;awaitsetImmediateởđâysẽđểfinitePromise.resolvecontinuationsđượcdraintrướckhiflush. Nóanchoredtheooperationnativecụthể,khôngđếmNidleturnchoqueue.",
+      "KhôngresolveD1pendingtronglúcchờnênA→awaitD1A→BvẫncầnflushAtrướckhiBenqueue;negative3serialxenSHAgiữnguyên3wave. Khôngthaymốc/khôngtrừSQLnàokhỏiđếm.",
+      "GiữactualnativepromiseSetvàdelegatecrypto,awaitraNgoaikhôngawaitappPromisecóthểchờD1nênkhôngtạovòngdeadlockmới. Phầnrequestxongtrongintervalđượcbreaktrướcflushsauđókếthợpdraincũ.",
+      "Positiveit.each0/200continuationskiểmđúngcửasổmicrotask;negative3serial/knownhash/rejectioncleanupvẫnmeaningful."
+    ],
+    "limits": [
+      "Chỉđảmbảodrainfinitequeuedmicrotasks,trongđósố200khônglàthresholdimplementation;khôngđảmbảotimer/I/O/importcontinuationtươnglaihoặcchuỗimicrotaskvôhạn. Commenttoànbộchuỗicontinuationnênhiểulàmicrotaskchainđãsẵn,sẽkhôngchờarbitraryfutureI/O.",
+      "Setfileglobal/boundedfiniteworkload/priorrequestdraincaveatsgiữnguyên. ExtraeventloopturnlàthayđổischedulerđểđoD1waves,khôngbằngchứngwallclocklatencyappgiảm.",
+      "Chưacóactualmatrix21test/traceđểkhẳngđịnhJSONkehoach3đợthếttáihiện;khôngxóacácred20test."
+    ]
+  },
+  "rejectionControlReview": "Đãđọctestinvaliddigest.rejects/nativeDangCho0rồilượtDB1wave1query. Testgiữlỗi/cleanupđúngkhôngchefailure;khôngthấylỗichặn.",
+  "signedReview": {
+    "file": "tests/toc-do-may-chu-nop-2710.test.ts",
+    "sha256": "ebeb3d2fca52a3fd98280c1baf25d7a76796f18d01df73398ff3030a60f58619",
+    "reviewer": "cau_truc_6",
+    "verdict": "Không có phát hiện chặn trong phạm vi diff scheduler D1waves hiện tại. Evidence regression và5fullruns xác nhận cửa sổmicrotask cụ thể được fix,khôngkhẳngđịnhmọiflaky."
+  },
+  "verifiedEvidenceNew": {
+    "regressionLog": "/workspace/scratch/vector-before167-regression.log",
+    "regressionObserved": "Đã đọc log:case200continuationFAILactual3waves4D1expected2/4,case0PASS;kếtquả1failed1passed9skipped. Parent báo temporarycopy chỉbỏduynhấtawaitraNgoaisaunativevàđãxóa;reviewerxácnhậnlog,khôngcònfiletạmđểbytecompare.",
+    "matrixLogs": [
+      "/workspace/scratch/vector-speed167-cont-1.log",
+      "/workspace/scratch/vector-speed167-cont-2.log",
+      "/workspace/scratch/vector-speed167-cont-3.log",
+      "/workspace/scratch/vector-trace167-cont-1.log",
+      "/workspace/scratch/vector-trace167-cont-2.log"
+    ],
+    "matrixObserved": "Đãđọccả5log:4testfiles/21testPASSmỗilượt(3traceoff+2traceon,theoparentchếđộ). KhôngcóFAILtrong5lognày.",
+    "scopeStatus": "gitstatuspaths tests/docs-moc/server/src chỉtestharnessmodified;server/src,src,docs/moc-toc-do.jsonkhôngmodified soHEADtrongchecknày. Khôngnângmốc/khôngproductionedit."
+  }
+}
