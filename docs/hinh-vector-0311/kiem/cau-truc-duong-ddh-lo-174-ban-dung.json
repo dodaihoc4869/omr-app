@@ -1,0 +1,153 @@
+[
+  {
+    "i": 990,
+    "hash": "b185d8192458386a410e77314cf71db4fee2e83f4860c0a8bcd30a5d3735630b",
+    "fileNguon": "anh/b185d8192458386a410e77314cf71db4fee2e83f4860c0a8bcd30a5d3735630b.png",
+    "canvas": [
+      420,
+      290
+    ],
+    "daMoNative": true,
+    "kind": "ketofuranose-literal-NO-carbon-number-inference",
+    "substituentsByGeometry": {
+      "leftVertex": {
+        "up": "CH₂OH",
+        "down": "OH"
+      },
+      "lowerLeftVertex": {
+        "down": "OH"
+      },
+      "lowerRightVertex": {
+        "up": "OH"
+      },
+      "rightVertex": {
+        "down": "CH₂OH"
+      }
+    },
+    "notes": "5ringOtopgiữa,front3bondsleft→lowerleft→lowerright→rightđậm.KHÔNGHexplicit/KHÔNGCnumbers/caption.LEFTvertexcó4bonds(2ring+CH₂OHup+OHdown),RIGHTvertexchỉ3bonds(2ring+CH₂OHdown),Hẩn.Nhưvậyhemi-centerởTRÁI,KHÔNGápbody799fructoseC2phảiđểtựdờiOH.HO/Hdirectionsphảigiữnguyên,khôngtựgántên/SIPdựađápán.",
+    "questions": [
+      {
+        "qid": "12-KT-C12-D2-I-2",
+        "de": "Monosaccharide X có công thức cấu tạo như hình dưới. Tên gọi của X là",
+        "refs": [
+          {
+            "where": "12-KT-C12-D2-I-2.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-I-137",
+        "de": "Monosaccharide X có công thức cấu tạo như hình dưới. Tên gọi của X là",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-137.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daCoManifestTaiCheckpoint": false,
+    "svg": "duong-ddh-7c00549bd5d9094fb1a4e1fa6d5044df7aff09c2b798e8be396c37441c2a73ec.svg",
+    "hashSvg": "7c00549bd5d9094fb1a4e1fa6d5044df7aff09c2b798e8be396c37441c2a73ec",
+    "byteSvg": 8810,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "990leftC4bondCH2OHup+OHdown/rightCH2OHdown/lowleftOHdown/lowrightOHup/nofixedCnumbersH;1138Fischer2x4rowsRLRR/topCHO→CH2OH/bottomCH2OH/+H2/Nitdegree/2lowercasecaptions;khôngtựđảostereo/giảibài.",
+    "hashSvgDaSoat": "7c00549bd5d9094fb1a4e1fa6d5044df7aff09c2b798e8be396c37441c2a73ec",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 1138,
+    "hash": "cd02bc25fe58c3b4a7465e8bc79d593e00a4841a2632ebc79bf38361e65f586f",
+    "fileNguon": "anh/cd02bc25fe58c3b4a7465e8bc79d593e00a4841a2632ebc79bf38361e65f586f.png",
+    "canvas": [
+      698,
+      354
+    ],
+    "daMoNative": true,
+    "kind": "Fischer-hydrogenation-glucose-sorbitol",
+    "left": {
+      "top": "CHO",
+      "bottom": "CH₂OH",
+      "rows": [
+        {
+          "left": "H",
+          "right": "OH"
+        },
+        {
+          "left": "HO",
+          "right": "H"
+        },
+        {
+          "left": "H",
+          "right": "OH"
+        },
+        {
+          "left": "H",
+          "right": "OH"
+        }
+      ],
+      "caption": "glucose"
+    },
+    "right": {
+      "top": "CH₂OH",
+      "bottom": "CH₂OH",
+      "rows": [
+        {
+          "left": "H",
+          "right": "OH"
+        },
+        {
+          "left": "HO",
+          "right": "H"
+        },
+        {
+          "left": "H",
+          "right": "OH"
+        },
+        {
+          "left": "H",
+          "right": "OH"
+        }
+      ],
+      "caption": "sorbitol"
+    },
+    "reagent": "+ H₂",
+    "overArrow": "Ni, t°",
+    "notes": "Arrow1phải,Ni,t°trên,giữ2Fischer4rowcrossH/OHthứtựRLRRgiốngnhaucenterkhôngviếtC. TopCHOchuyểnCH₂OH,khôngtựđảo/mirrorrow.AcidaldhydeHchỉẩntrongCHOtext,captionlowercaseglucose/sorbitolphảigiữ.",
+    "questions": [
+      {
+        "qid": "12-KT-C2-D1-III-1",
+        "de": "Sorbitol là một chất được dùng trong sản xuất một số loại bánh để tạo vị ngọt, đồng thời làm cho bánh giữ được độ ẩm, độ bóng mịn.\nSorbitol cũng được dùng làm thuốc trị táo bón, khó tiêu.\nSorbitol thường được tạo thành từ phản ứng hydrogen hoá glucose: Tổng số nguyên tử trong một phân tử sorbitol là bao nhiêu?",
+        "refs": [
+          {
+            "where": "12-KT-C2-D1-III-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-III-150",
+        "de": "Sorbitol là một chất được dùng trong sản xuất một số loại bánh để tạo vị ngọt, đồng thời làm cho bánh giữ được độ ẩm, độ bóng mịn.\nSorbitol cũng được dùng làm thuốc trị táo bón, khó tiêu.\nSorbitol thường được tạo thành từ phản ứng hydrogen hoá glucose: Tổng số nguyên tử trong một phân tử sorbitol là bao nhiêu?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-III-150.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daCoManifestTaiCheckpoint": false,
+    "svg": "duong-ddh-1e33b3b1d900f310e2527792cee9a25412bf121a09642665637118282e4654ac.svg",
+    "hashSvg": "1e33b3b1d900f310e2527792cee9a25412bf121a09642665637118282e4654ac",
+    "byteSvg": 31399,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "990leftC4bondCH2OHup+OHdown/rightCH2OHdown/lowleftOHdown/lowrightOHup/nofixedCnumbersH;1138Fischer2x4rowsRLRR/topCHO→CH2OH/bottomCH2OH/+H2/Nitdegree/2lowercasecaptions;khôngtựđảostereo/giảibài.",
+    "hashSvgDaSoat": "1e33b3b1d900f310e2527792cee9a25412bf121a09642665637118282e4654ac",
+    "nguoiSoat": "cau_truc_4"
+  }
+]
