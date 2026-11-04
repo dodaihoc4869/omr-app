@@ -1281,11 +1281,18 @@ export async function xoaEm(env: Env, b: Record<string, unknown>): Promise<Recor
   return { ok: true, daXoaKhoiDanhSach: (d?.meta?.changes ?? 0) > 0 }
 }
 
-/** Đánh dấu nghỉ học một chiều; giữ nguyên tài khoản, điểm và lịch sử. */
+/** Đánh dấu nghỉ học; giữ nguyên tài khoản, điểm và lịch sử. `nghi: false` ⇒ KHÔI PHỤC đi học lại (thầy 04/11 «khôi phục bỏ đã nghỉ … tạo một công tắc
+ *  khôi phục»): chỉ em đang `da_nghi` ⇒ `da_duyet` (trạng thái thường của em đã vào sổ); em bị khoá / đang học thì không đổi. */
 export async function danhDauNghiHoc(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
   const sbd = chuoi(b.sbd).trim()
   if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
-  if (b.nghi === false) return { ok: false, error: 'Chưa hỗ trợ khôi phục đi học lại' }
+  if (b.nghi === false) {
+    const r = await env.DB.prepare("UPDATE hoc_sinh SET trang_thai = 'da_duyet', cap_nhat_luc = ? WHERE sbd = ? AND trang_thai = 'da_nghi'").bind(NAY(), sbd).run()
+    const sau = await env.DB.prepare('SELECT trang_thai FROM hoc_sinh WHERE sbd = ?').bind(sbd).first<{ trang_thai: string | null }>()
+    if (!sau) return { ok: false, error: 'Không tìm thấy học sinh' }
+    if (sau.trang_thai === 'khoa') return { ok: false, error: 'Học sinh đang bị khóa; không đổi trạng thái' }
+    return { ok: true, sbd, daNghi: false, trangThai: sau.trang_thai ?? '', daKhoiPhuc: Number(r.meta?.changes ?? 0) > 0 }
+  }
   const em = await env.DB.prepare(
     `SELECT h.trang_thai FROM (SELECT sbd FROM danh_sach WHERE sbd = ? UNION SELECT sbd FROM hoc_sinh WHERE sbd = ?) e
      LEFT JOIN hoc_sinh h ON h.sbd = e.sbd`,

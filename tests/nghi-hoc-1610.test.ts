@@ -12,7 +12,7 @@ function them(d: ReturnType<typeof taoD1That>, sbd: string, trangThai = '', chiD
 }
 const nghi = (d: ReturnType<typeof taoD1That>, sbd: string) => goiWorker(worker,d.env,'/gv/nghi-hoc',{sbd},true)
 
-describe('Nghỉ học một chiều, D1 SQLite chạy câu SQL thật', () => {
+describe('Nghỉ học (+ khôi phục 04/11), D1 SQLite chạy câu SQL thật', () => {
   it('lưu bền, hồ sơ và danh sách hiện trạng thái; không mất tài khoản, điểm hay lịch sử', async () => {
     const d=taoD1That(); them(d,'11035'); them(d,'12129');
     d.sql.exec("INSERT INTO luot(khoa,ma_ca,sbd,lan_thu,vao_luc,trang_thai,cap_nhat_luc,tong,nop_luc) VALUES('luot-cu','ca-cu','11035',1,'x','da_nop','x',8.25,'2026-10-10')")
@@ -42,11 +42,15 @@ describe('Nghỉ học một chiều, D1 SQLite chạy câu SQL thật', () => {
     expect(await nghi(d,'')).toMatchObject({ok:false,error:'Thiếu số báo danh'})
     expect(d.sql.prepare('SELECT count(*) n FROM hoc_sinh').get()).toMatchObject({n:0})
   })
-  it('không đổi trạng thái khóa, không hỗ trợ đi học lại vô tình mở quyền', async()=>{
-    const d=taoD1That();them(d,'S1','khoa');them(d,'S2','da_nghi')
+  it('không đổi trạng thái khóa; 04/11 KHÔI PHỤC (nghi:false): đã nghỉ ⇒ da_duyet, giữ tài khoản; em bị khóa / đang học không đổi', async()=>{
+    const d=taoD1That();them(d,'S1','khoa');them(d,'S2','da_nghi');them(d,'S3','da_duyet')
     expect(await nghi(d,'S1')).toMatchObject({ok:false})
-    expect(await goiWorker(worker,d.env,'/gv/nghi-hoc',{sbd:'S2',nghi:false},true)).toMatchObject({ok:false})
-    expect(d.sql.prepare('SELECT trang_thai FROM hoc_sinh ORDER BY sbd').all()).toEqual([{trang_thai:'khoa'},{trang_thai:'da_nghi'}])
+    expect(await goiWorker(worker,d.env,'/gv/nghi-hoc',{sbd:'S2',nghi:false},true)).toMatchObject({ok:true,daNghi:false,trangThai:'da_duyet',daKhoiPhuc:true})
+    expect(await goiWorker(worker,d.env,'/gv/nghi-hoc',{sbd:'S1',nghi:false},true)).toMatchObject({ok:false})
+    expect(await goiWorker(worker,d.env,'/gv/nghi-hoc',{sbd:'S3',nghi:false},true)).toMatchObject({ok:true,daKhoiPhuc:false,trangThai:'da_duyet'})
+    expect(await goiWorker(worker,d.env,'/gv/nghi-hoc',{sbd:'X9',nghi:false},true)).toMatchObject({ok:false,error:'Không tìm thấy học sinh'})
+    expect(await goiWorker(worker,d.env,'/gv/nghi-hoc',{sbd:'S2',nghi:false})).toMatchObject({ok:false}) // cần quyền thầy
+    expect(d.sql.prepare('SELECT trang_thai,mat_khau FROM hoc_sinh ORDER BY sbd').all()).toEqual([{trang_thai:'khoa',mat_khau:'mk'},{trang_thai:'da_duyet',mat_khau:'mk'},{trang_thai:'da_duyet',mat_khau:'mk'}])
   })
   it('cả đường mới và lệnh tương thích đều cần quyền thầy', async()=>{
     const d=taoD1That();them(d,'S1')

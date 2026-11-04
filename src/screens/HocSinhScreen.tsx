@@ -16,7 +16,8 @@ import BieuDoTienBoGoogle from '../components/BieuDoTienBoGoogle'
 import { useLopThay } from '../lib/ten-lop-thay'
 import ChuTheLoc, { tenTheLoc } from '../components/ChuTheLoc'
 import DoiLopMotEm from '../components/DoiLopMotEm'
-import { danhSachEm, deleteStudentRegistration, danhDauNghiHocApi, hoSoEm, khoiTuNamSinh, resetMatKhauHsApi, type EmTomTat, type HoSoEm } from '../lib/exam-api'
+import { danhDauNghiHocApi } from '../lib/nghi-hoc-api'
+import { danhSachEm, deleteStudentRegistration, hoSoEm, khoiTuNamSinh, resetMatKhauHsApi, type EmTomTat, type HoSoEm } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { classify } from '../engine/score'
 import { useAppStore } from '../store/appStore'
@@ -192,13 +193,13 @@ export default function HocSinhScreen() {
     if (!cauHinh) return showToast('Chưa có địa chỉ máy chủ hoặc mã bí mật', 'error')
     setCanXacNhan({ loai: 'nghi-hoc', sbd, hoTen })
   }
-  const doiTrangThaiNghiHoc = async (sbd: string) => {
+  const doiTrangThaiNghiHoc = async (sbd: string, nghi = true) => {
     if (!cauHinh) return showToast('Chưa có địa chỉ máy chủ hoặc mã bí mật', 'error')
     setDangDoiNghiHoc(true)
     try {
-      const res = await danhDauNghiHocApi(cauHinh.url, cauHinh.mat, sbd)
+      const res = await danhDauNghiHocApi(cauHinh.url, cauHinh.mat, sbd, nghi)
       if (res.ok) {
-        showToast(`Đã đánh dấu SBD ${sbd} đã nghỉ học`, 'success')
+        showToast(nghi ? `Đã đánh dấu SBD ${sbd} đã nghỉ học` : `Đã khôi phục SBD ${sbd} đi học lại`, 'success')
         setHoSo((cu) => (cu?.em.sbd === sbd ? { ...cu, em: { ...cu.em, trangThai: res.trangThai } } : cu))
         setDs((cu) => (cu ?? []).map((e) => (e.sbd === sbd ? { ...e, trangThai: res.trangThai } : e)))
       } else {
@@ -479,15 +480,19 @@ export default function HocSinhScreen() {
                 >
                   Cho thi lại
                 </button>
+                {/* CÔNG TẮC ĐI HỌC (thầy 04/11 «khôi phục bỏ đã nghỉ … tạo một công tắc khôi phục»): bật = đang học. Tắt ⇒ hỏi xác nhận rồi đánh dấu
+                    nghỉ (như cũ); em đã nghỉ ⇒ bấm là KHÔI PHỤC đi học lại ngay (điểm, lịch sử vẫn nguyên). */}
                 <button
                   type="button"
+                  role="switch"
+                  aria-checked={hoSo.em.trangThai !== 'da_nghi'}
                   className="tap-target hs-nut-vien"
-                  onClick={() => hoiNghiHoc(hoSo.em.sbd, hoSo.em.hoTen)}
+                  onClick={() => (hoSo.em.trangThai === 'da_nghi' ? void doiTrangThaiNghiHoc(hoSo.em.sbd, false) : hoiNghiHoc(hoSo.em.sbd, hoSo.em.hoTen))}
                   style={hoSo.em.trangThai === 'da_nghi' ? { color: 'var(--do)', borderColor: 'var(--do)' } : undefined}
-                  disabled={dangDoiNghiHoc || hoSo.em.trangThai === 'da_nghi'}
-                  title="Đánh dấu học sinh nghỉ học"
+                  disabled={dangDoiNghiHoc}
+                  title={hoSo.em.trangThai === 'da_nghi' ? 'Em đang nghỉ học — bấm để khôi phục đi học lại' : 'Đánh dấu học sinh nghỉ học'}
                 >
-                  {hoSo.em.trangThai === 'da_nghi' ? 'Đã nghỉ' : 'Nghỉ học'}
+                  {hoSo.em.trangThai === 'da_nghi' ? 'Đã nghỉ · Khôi phục' : 'Đang học · Nghỉ học'}
                 </button>
               </div>
 

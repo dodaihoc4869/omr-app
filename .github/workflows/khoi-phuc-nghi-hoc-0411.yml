@@ -1,0 +1,49 @@
+# KHÔI PHỤC ĐI HỌC LẠI 2 EM (thầy 04/11: «khôi phục bỏ đã nghỉ cho minh chiến và thiên ngọc»).
+# Chỉ đổi `hoc_sinh.trang_thai` 'da_nghi' ⇒ 'da_duyet' (đúng như công tắc «Đã nghỉ · Khôi phục» ở hồ sơ em — goi-cu.ts danhDauNghiHoc nghi:false).
+# AN TOÀN: đếm trước; CHỈ ghi khi MỖI tên khớp ĐÚNG MỘT em đang nghỉ (trùng tên / không thấy ⇒ dừng, không đụng ai). Điểm, tài khoản, lịch sử không đổi.
+# Log CHỈ in số đếm — không mã em, không tên (repo công khai).
+name: Khôi phục đi học lại 2 em (một lần)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/focused-ramanujan-fq23pk]
+    paths: ['.github/workflows/khoi-phuc-nghi-hoc-0411.yml']
+permissions:
+  contents: read
+concurrency:
+  group: khoi-phuc-nghi-hoc-0411
+  cancel-in-progress: false
+jobs:
+  lam:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm rồi khôi phục (chỉ khi mỗi tên đúng một em)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          set -euo pipefail
+          q() { npx -y wrangler@4 d1 execute omr --remote --json --command "$1" | jq -c '.[0].results'; }
+          DK="(lower(trim(ho_ten)) LIKE lower('%Minh Chiến') OR lower(trim(ho_ten)) LIKE lower('%Thiên Ngọc'))"
+          echo "== tổng em đang nghỉ · trong đó tên có «Chiến» / «Ngọc» / «CHIẾN» / «NGỌC» (đếm, so cả dạng dấu tách NFD)"
+          q "SELECT COUNT(*) tong, SUM(instr(ho_ten,'Chiến')>0 OR instr(ho_ten,'CHIẾN')>0 OR instr(ho_ten,'Chiê')>0) chien, SUM(instr(ho_ten,'Ngọc')>0 OR instr(ho_ten,'NGỌC')>0 OR instr(ho_ten,'Ngo')>0) ngoc, SUM(instr(ho_ten,'Minh')>0 OR instr(ho_ten,'MINH')>0) minh, SUM(instr(ho_ten,'Thiên')>0 OR instr(ho_ten,'THIÊN')>0 OR instr(ho_ten,'Thiê')>0) thien FROM hoc_sinh WHERE trang_thai='da_nghi'"
+          echo "== hai em theo tên: cập nhật lần cuối (giờ UTC, không mã em)"
+          q "SELECT CASE WHEN lower(trim(ho_ten)) LIKE lower('%Minh Chiến') THEN 'minh_chien' ELSE 'thien_ngoc' END ten, cap_nhat_luc FROM hoc_sinh WHERE (lower(trim(ho_ten)) LIKE lower('%Minh Chiến') OR lower(trim(ho_ten)) LIKE lower('%Thiên Ngọc'))"
+          echo "== mọi trạng thái của em trùng hai tên (đếm)"
+          q "SELECT CASE WHEN lower(trim(ho_ten)) LIKE lower('%Minh Chiến') THEN 'minh_chien' ELSE 'thien_ngoc' END ten, COALESCE(trang_thai,'') tt, COUNT(*) n FROM hoc_sinh WHERE $DK GROUP BY ten, tt"
+          A=$(q "SELECT COUNT(*) n FROM hoc_sinh WHERE trang_thai='da_nghi' AND lower(trim(ho_ten)) LIKE lower('%Minh Chiến')" | jq '.[0].n')
+          B=$(q "SELECT COUNT(*) n FROM hoc_sinh WHERE trang_thai='da_nghi' AND lower(trim(ho_ten)) LIKE lower('%Thiên Ngọc')" | jq '.[0].n')
+          echo "đang nghỉ: Minh Chiến=$A · Thiên Ngọc=$B"
+          if [ "$A" != "1" ] || [ "$B" != "1" ]; then echo "::warning::Không đúng một em mỗi tên ⇒ KHÔNG ghi gì. Thầy dùng công tắc «Đã nghỉ · Khôi phục» trong hồ sơ em."; exit 0; fi
+          echo "== khôi phục"
+          npx -y wrangler@4 d1 execute omr --remote --json --command "UPDATE hoc_sinh SET trang_thai='da_duyet', cap_nhat_luc=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE trang_thai='da_nghi' AND $DK" | jq -c '.[0].meta.changes'
+          echo "== sau khi khôi phục (đếm)"
+          q "SELECT COALESCE(trang_thai,'') tt, COUNT(*) n FROM hoc_sinh WHERE $DK GROUP BY tt"
