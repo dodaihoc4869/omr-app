@@ -1,0 +1,186 @@
+[
+  {
+    "i": 1120,
+    "hash": "c9d4d6eccb45a0a4af0535a0081e8e60917376565538daf4a027c3fc704dde00",
+    "fileNguon": "anh/c9d4d6eccb45a0a4af0535a0081e8e60917376565538daf4a027c3fc704dde00.png",
+    "canvas": [
+      313,
+      281
+    ],
+    "daMoNative": true,
+    "kind": "glucose-open-chain-plus-ring-bond-labels",
+    "leftLiteralRows": [
+      {
+        "left": "H",
+        "center": "C",
+        "right": "O",
+        "bondRight": "double"
+      },
+      {
+        "left": "H",
+        "center": "C",
+        "right": "OH"
+      },
+      {
+        "left": "HO",
+        "center": "C",
+        "right": "H"
+      },
+      {
+        "left": "H",
+        "center": "C",
+        "right": "OH"
+      },
+      {
+        "left": "H",
+        "center": "C",
+        "right": "OH"
+      },
+      {
+        "left": "H",
+        "center": "C",
+        "right": "OH",
+        "bottom": "H"
+      }
+    ],
+    "ringSubstituents": {
+      "C1": "OHdown",
+      "C2": "OHdown",
+      "C3": "OHup",
+      "C4": "OHdown",
+      "C5": "CH₂OHup"
+    },
+    "ringCaption": "α-glucose",
+    "ringBondLabels": {
+      "(1)": "O_vòng–C1chéoupperright",
+      "(2)": "C1–C2frontchéoright",
+      "(3)": "C2–C3fronthorizontal",
+      "(4)": "C5–O_vònghorizontalupper"
+    },
+    "notes": "2panelngangKHÔNGarrowgiữa,cả2rootmởRIÊNG.CenterschainCEXPLICITall6,5verticalC–Cbonds;CH₂OHcuốikha triểnC6Hleft/Hbelow/OHright,KHÔNGgộpCH₂OHmấthìnhthứcsource.MọiH/HO/OHchainexplicit.Ring0Hexplicit,CH₂OHtext,3frontbondsbold,4labelsLÀBONDNOTcarbonnumbers. KhôngsoátbằngFischerRLRRalonephảigiữaldehydeH–C=Oởtop.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D3-I-191",
+        "de": "Đồng phân mạch hở và mạch vòng của glucose có thể chuyển hóa lẫn nhau.\nCấu tạo dạng mạch hở của glucose và dạng vòng 6 cạnh α-glucose được cho ở hình bên.\nLiên kết nào trong số các liên kết được đánh số (1), (2), (3), (4) sẽ bị phá vỡ khi mở vòng α-glucose để chuyển hóa thành dạng mạch hở?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-191.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-I-52",
+        "de": "Đồng phân mạch hở và mạch vòng của glucose có thể chuyển hóa lẫn nhau.\nCấu tạo dạng mạch hở của glucose và dạng vòng 6 cạnh α-glucose được cho ở hình bên.\nLiên kết nào trong số các liên kết được đánh số (1), (2), (3), (4) sẽ bị phá vỡ khi mở vòng α-glucose để chuyển hóa thành dạng mạch hở?",
+        "refs": [
+          {
+            "where": "DH-12-C2-B4-I-52.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daCoManifestTaiCheckpoint": false,
+    "svg": "glucose-mo-vong-ddh-f5630f2b2c09bb1f9a31e183ecaf693cfd64204a92d6a191954ee82e08fc6d3d.svg",
+    "hashSvg": "f5630f2b2c09bb1f9a31e183ecaf693cfd64204a92d6a191954ee82e08fc6d3d",
+    "byteSvg": 29423,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "2panelsNOarrow/chainall6Cexplicit+5verticalCC/H-C=Otop/C6HleftOHrightHbelow/ring0H/CH2OHtext/C1OHdown/3frontbold/(1)..(4)LÀBONDkhôngcarbonnumbers/α-glucosecaption;khônggiảiquestion.",
+    "hashSvgDaSoat": "f5630f2b2c09bb1f9a31e183ecaf693cfd64204a92d6a191954ee82e08fc6d3d",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 1030,
+    "hash": "b8b349e3efe2d20153583890f18d7e2d476b4ba9170cfe28abc41271956765b5",
+    "fileNguon": "anh/b8b349e3efe2d20153583890f18d7e2d476b4ba9170cfe28abc41271956765b5.png",
+    "canvas": [
+      313,
+      281
+    ],
+    "daMoNative": true,
+    "kind": "glucose-open-chain-plus-ring-bond-labels",
+    "leftLiteralRows": [
+      {
+        "left": "H",
+        "center": "C",
+        "right": "O",
+        "bondRight": "double"
+      },
+      {
+        "left": "H",
+        "center": "C",
+        "right": "OH"
+      },
+      {
+        "left": "HO",
+        "center": "C",
+        "right": "H"
+      },
+      {
+        "left": "H",
+        "center": "C",
+        "right": "OH"
+      },
+      {
+        "left": "H",
+        "center": "C",
+        "right": "OH"
+      },
+      {
+        "left": "H",
+        "center": "C",
+        "right": "OH",
+        "bottom": "H"
+      }
+    ],
+    "ringSubstituents": {
+      "C1": "OHdown",
+      "C2": "OHdown",
+      "C3": "OHup",
+      "C4": "OHdown",
+      "C5": "CH₂OHup"
+    },
+    "ringCaption": "α-glucose",
+    "ringBondLabels": {
+      "(1)": "O_vòng–C1chéoupperright",
+      "(2)": "C1–C2frontchéoright",
+      "(3)": "C2–C3fronthorizontal",
+      "(4)": "C5–O_vònghorizontalupper"
+    },
+    "notes": "2panelngangKHÔNGarrowgiữa,cả2rootmởRIÊNG.CenterschainCEXPLICITall6,5verticalC–Cbonds;CH₂OHcuốikha triểnC6Hleft/Hbelow/OHright,KHÔNGgộpCH₂OHmấthìnhthứcsource.MọiH/HO/OHchainexplicit.Ring0Hexplicit,CH₂OHtext,3frontbondsbold,4labelsLÀBONDNOTcarbonnumbers. KhôngsoátbằngFischerRLRRalonephảigiữaldehydeH–C=Oởtop.",
+    "questions": [
+      {
+        "qid": "12-C2-B4-D1-I-34",
+        "de": "Đồng phân mạch hở và mạch vòng của glucose có thể chuyển hóa lẫn nhau.\nCấu tạo dạng mạch hở của glucose và dạng vòng 6 cạnh α-glucose được cho ở hình bên.\nLiên kết nào trong số các liên kết được đánh số (1), (2), (3), (4) sẽ bị phá vỡ khi mở vòng α-glucose để chuyển hóa thành dạng mạch hở?",
+        "refs": [
+          {
+            "where": "12-C2-B4-D1-I-34.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-I-25",
+        "de": "Đồng phân mạch hở và mạch vòng của glucose có thể chuyển hóa lẫn nhau.\nCấu tạo dạng mạch hở của glucose và dạng vòng 6 cạnh α-glucose được cho ở hình bên.\nLiên kết nào trong số các liên kết được đánh số (1), (2), (3), (4) sẽ bị phá vỡ khi mở vòng α-glucose để chuyển hóa thành dạng mạch hở?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-25.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daCoManifestTaiCheckpoint": false,
+    "svg": "glucose-mo-vong-ddh-f5630f2b2c09bb1f9a31e183ecaf693cfd64204a92d6a191954ee82e08fc6d3d.svg",
+    "hashSvg": "f5630f2b2c09bb1f9a31e183ecaf693cfd64204a92d6a191954ee82e08fc6d3d",
+    "byteSvg": 29423,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "2panelsNOarrow/chainall6Cexplicit+5verticalCC/H-C=Otop/C6HleftOHrightHbelow/ring0H/CH2OHtext/C1OHdown/3frontbold/(1)..(4)LÀBONDkhôngcarbonnumbers/α-glucosecaption;khônggiảiquestion.",
+    "hashSvgDaSoat": "f5630f2b2c09bb1f9a31e183ecaf693cfd64204a92d6a191954ee82e08fc6d3d",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

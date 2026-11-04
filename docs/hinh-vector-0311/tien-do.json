@@ -60,8 +60,8 @@
       "Toàn kho còn chưa hoàn tất, app chưa thay hình; không báo đã xong hoặc đã triển khai."
     ],
     "danhMucDaKiem": "docs/hinh-vector-0311/kiem/danh-muc-da-kiem.json",
-    "loVuaXong": "1009 câu đủ mọi hình+DDH/7 một phần;761 nguồn→515 SVG;8.013.057byte/gzip1.594.249;667 nguồn còn lại. Lô173–174 hoànthiện4nguồn/2SVG mới và2filedùngchungđãsoát riêng,khép8câu.",
-    "viecNenLamTiep": "Nhóm169đãxong12/20;1731012→base1243,997→base1184đãsoátRIÊNGsource/base/SVG/hash;174990/1138đãdựng/soátđúngsource. KHÔNGdựngtrùng4này. CÒN8CHƯADỰNG765/1195/806/1028/1046/1120/1030/1416. Fullsource/publicde/refs/geometrykiem/doc-molecule-lo-169.json;bảnmớiscratchnếucóưu tiênnhưngPHẢIsocảhashmanifest. Ưutiên1120/1030openchain-ringvà1046fructose3forms/1416glucose3formsđểkhépcảbộ;từngH/OH/stereo/bondlabel/highlight/arrow/captionphảimởsource+renderthật/soátđộclậpexacthash.765MSweakbaselinehairlines/1195sulfur/806aniline/1028curvesphảigiữtick/label/pixelkhôngsuytheory.1033IR2panelE/F,736surfactantchưađọchết;1213stereo/1214triesterđãmởnativeCHƯAđủgeometry. Giữharness167actualnativepending+postnativecontinuationdrain/modelD1waves/khôngđổi mốc/app;cổng17421/21đạt,khôngsuyramọiscenariohếtflaky/khôngxóađỏcũ.CỡtệpđỏNỀNindex.tsnguyênbytesoe7b25161,phảixửlýkhicậpnhậtmaintrướcgộp/deploy.Mainab81c625chưagộp/WOFF2khôngdiff;trướcpháthànhmainmớinhất/fulltesttheotên/cathi/offlinethật.149còn1014composite/209BỊLOẠIphongcách;59/1391vẫnbịloại,khôngđoán/hạgate.",
+    "loVuaXong": "1015 câu đủ mọi hình+DDH/7 một phần;764 nguồn→517 SVG;8.105.304byte/gzip1.605.937;664 nguồn còn lại. Lô175–176 hoàn thiện3nguồn/2SVG mới,khép6câu.",
+    "viecNenLamTiep": "Nhóm169đãxong15/20;1120/1030/1046ĐÃĐẠTđừngtrùng. CÒN765/1195/806/1028/1416CHƯAdựng. Ưutiên1416glucose3forms/18nums/2OHboxdashed+curvedleaders+OHhemiacetal;rootđãmởnative:betaC4downlàOH,alphaC4downlàHO(đọcghi169cũbetaHOphảisửatheoglyph). KhôngđoánH/OH/arrow. Fullsource/publicrefs/geometrykiem/doc-molecule-lo-169.json. Giữharness167/mốc/đỏcũ. CỡtệpđỏNỀNindex.tsnguyênbytephảixửlýtrướcgộp/deploy.Mainphảicậpnhậtmớinhất/fulltestTHEOTÊN/cathi/offlineapp.1014/209/59/1391vẫnchưađạt.",
     "canhBaoCheckpoint": "Giữworktree/commitmớihơn. Origin/mainab81c625chưagộp;khôngpháthànhkhichưatoànphạmvi/cổng/offlineappđạt."
   },
   "tuDongTiepTuc": {
@@ -70,7 +70,7 @@
     "lich": "moi-gio",
     "mucTieu": "Tự vẽ, soát, sửa, tích hợp và kiểm bản sống đến khi đạt; tự tắt khi hoàn tất",
     "thongBao": "Chỉ khi hoàn tất, có lỗi chặn thực sự hoặc cần hành động của thầy",
-    "lyDo": "Tiếp tục từ1009câu/515SVG,mỗi lượt hoànthiệnlôthật;chỉtắt khi toànphạmvi đạt,vàoapp vàkiểmbảnsống."
+    "lyDo": "Tiếp từ1015câu/517SVG;chỉtắt khi toànphạmviđạt/vàoapp/kiểmbảnsống."
   },
   "loOrbitalDaSoat": {
     "soAnhNguon": 23,
@@ -79,14 +79,14 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 761,
-    "soSvgRieng": 515,
-    "soCauDungHinh": 1016,
-    "soCauDuMoiHinh": 1009,
+    "soAnhNguon": 764,
+    "soSvgRieng": 517,
+    "soCauDungHinh": 1022,
+    "soCauDuMoiHinh": 1015,
     "soCauMoiXongMotPhan": 7,
-    "byteSvg": 8013057,
-    "byteGzip": 1594249,
-    "soAnhNguonConLai": 667,
+    "byteSvg": 8105304,
+    "byteGzip": 1605937,
+    "soAnhNguonConLai": 664,
     "daTichHop": false
   },
   "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.",
@@ -101,20 +101,20 @@
     "batBuocMoiHinh": true,
     "daHoanTatToanBo": false,
     "ghiChu": "Bộ đangchọn đãđạtfontDDH/pathtựchứa vàsoátđộclập;toànkhochưahoàntất,khôngpháthànhbộchưađủ.",
-    "loMoi": "173–174mọichữ/H/OH/CHO/CH2OH/caption/Nit° DDH Rounded path tựchứa,0fallback.",
+    "loMoi": "175–176 toàn bộ chữ DDH Rounded path tự chứa/không fallback.",
     "congCu": "scripts/phong-vector-0311.py",
     "daChuyenHetBoDaVe": true
   },
   "daDatPhongApp": {
-    "soNguon": 761,
-    "soCauDuHinhVaPhong": 1009,
+    "soNguon": 764,
+    "soCauDuHinhVaPhong": 1015,
     "ghiChu": "Các số tổngDaDoiChieu vẫn mô tả nội dung đã kiểm; bản cũ chưa đổi phông không được coi đạt yêu cầu phông mới."
   },
   "loMoiNhat": {
-    "lo": "173–174",
-    "ketQua": "1009 câu đủ mọi hình+DDH/7 một phần;761 nguồn→515 SVG;8.013.057byte/gzip1.594.249;667 nguồn còn lại. Lô173–174 hoànthiện4nguồn/2SVG mới và2filedùngchungđãsoát riêng,khép8câu.",
-    "suaLoi": "1012giữC1OHUP/6nums/CH2OHtext/0H;997C1OCH3DOWN/C6implicitup-bentOH/0Hnums/3frontbold.990left4bondsCH2OHupOHdown/rightCH2OHdownHẩn/lowleftOHdown/lowrightOHup/3frontboldkhôngsửatheo799.1138Fischer2x4RLRR/topCHO→CH2OH/bottomCH2OH/+H2/Nit°/captionslowercase,4spinenốiđúngCđầuchuỗikhôngnốiH/O. TừngPNGnative/full/basekhidùngchung/actualSVG/exacthashđãsoátđộclập.",
-    "tiepTheo": "Nhóm169đãxong12/20;1731012→base1243,997→base1184đãsoátRIÊNGsource/base/SVG/hash;174990/1138đãdựng/soátđúngsource. KHÔNGdựngtrùng4này. CÒN8CHƯADỰNG765/1195/806/1028/1046/1120/1030/1416. Fullsource/publicde/refs/geometrykiem/doc-molecule-lo-169.json;bảnmớiscratchnếucóưu tiênnhưngPHẢIsocảhashmanifest. Ưutiên1120/1030openchain-ringvà1046fructose3forms/1416glucose3formsđểkhépcảbộ;từngH/OH/stereo/bondlabel/highlight/arrow/captionphảimởsource+renderthật/soátđộclậpexacthash.765MSweakbaselinehairlines/1195sulfur/806aniline/1028curvesphảigiữtick/label/pixelkhôngsuytheory.1033IR2panelE/F,736surfactantchưađọchết;1213stereo/1214triesterđãmởnativeCHƯAđủgeometry. Giữharness167actualnativepending+postnativecontinuationdrain/modelD1waves/khôngđổi mốc/app;cổng17421/21đạt,khôngsuyramọiscenariohếtflaky/khôngxóađỏcũ.CỡtệpđỏNỀNindex.tsnguyênbytesoe7b25161,phảixửlýkhicậpnhậtmaintrướcgộp/deploy.Mainab81c625chưagộp/WOFF2khôngdiff;trướcpháthànhmainmớinhất/fulltesttheotên/cathi/offlinethật.149còn1014composite/209BỊLOẠIphongcách;59/1391vẫnbịloại,khôngđoán/hạgate.",
-    "gioiHan": "Chưa tích hợp/chưa reloadofflineapp/chưa phát hành.Build174/precache170/2613.23KiB/hash/XML/path/ASTđạt;Chromium515/515chỉkiểmtàisảnkhôngphảireloadofflineapp.Cổngtốcđộ21/21đạt.Cỡtệpđỏnềnindex.tsnguyênbytekhôngtănglômới,phảixửlýtrướcgộp/deploy.Mainab81c625chưagộp/WOFF2khôngdiff."
+    "lo": "175–176",
+    "ketQua": "1015 câu đủ mọi hình+DDH/7 một phần;764 nguồn→517 SVG;8.105.304byte/gzip1.605.937;664 nguồn còn lại. Lô175–176 hoàn thiện3nguồn/2SVG mới,khép6câu.",
+    "suaLoi": "1120/1030 giữFischer6Cexplicit/RLRR/CH2OHkhai triển vàvòngα-glucose0H/nhãn(1)..(4)chỉBONDkhôngsốC.1046giữ3formα/open/β/18sốC/allH-OH/HOCH2trái/2cặp⇌/3caption. TừngPNGnative/full+actualSVG/exacthashđãsoátđộclập.",
+    "tiepTheo": "Nhóm169đãxong15/20;1120/1030/1046ĐÃĐẠTđừngtrùng. CÒN765/1195/806/1028/1416CHƯAdựng. Ưutiên1416glucose3forms/18nums/2OHboxdashed+curvedleaders+OHhemiacetal;rootđãmởnative:betaC4downlàOH,alphaC4downlàHO(đọcghi169cũbetaHOphảisửatheoglyph). KhôngđoánH/OH/arrow. Fullsource/publicrefs/geometrykiem/doc-molecule-lo-169.json. Giữharness167/mốc/đỏcũ. CỡtệpđỏNỀNindex.tsnguyênbytephảixửlýtrướcgộp/deploy.Mainphảicậpnhậtmớinhất/fulltestTHEOTÊN/cathi/offlineapp.1014/209/59/1391vẫnchưađạt.",
+    "gioiHan": "Chưa tích hợp/chưa reload offline app/chưa phát hành. CỡtệpđỏNỀNindex.tsphảixửlýtrướcgộp/deploy."
   }
 }

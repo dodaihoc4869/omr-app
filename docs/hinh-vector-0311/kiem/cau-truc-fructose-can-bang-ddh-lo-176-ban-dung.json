@@ -1,0 +1,112 @@
+[
+  {
+    "i": 1046,
+    "hash": "bcc1de93c6ba738dda7074c04bafd123781d49dad1ab95b22f999a0cc0e781b3",
+    "fileNguon": "anh/bcc1de93c6ba738dda7074c04bafd123781d49dad1ab95b22f999a0cc0e781b3.png",
+    "canvas": [
+      1039,
+      462
+    ],
+    "daMoNative": true,
+    "kind": "fructose-three-form-equilibrium",
+    "leftHaworth": {
+      "caption": "dạng α-fructose",
+      "ring": "5ringOtop,C2right,C3lowerright,C4lowerleft,C5left",
+      "C2": {
+        "up": "CH₂OH(carbon1)",
+        "down": "OH"
+      },
+      "C3": {
+        "up": "HO",
+        "down": "H"
+      },
+      "C4": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C5": {
+        "up": "HOCH₂(carbon6)",
+        "down": "H"
+      }
+    },
+    "middleFischer": {
+      "caption": "fructose, mạch hở",
+      "top": "CH₂OH(carbon1)",
+      "bottom": "CH₂OH(carbon6)",
+      "rows": [
+        {
+          "kind": "carbonyl",
+          "side": "right",
+          "carbonNumber": 2
+        },
+        {
+          "left": "HO",
+          "right": "H",
+          "carbonNumber": 3
+        },
+        {
+          "left": "H",
+          "right": "OH",
+          "carbonNumber": 4
+        },
+        {
+          "left": "H",
+          "right": "OH",
+          "carbonNumber": 5
+        }
+      ]
+    },
+    "rightHaworth": {
+      "caption": "dạng β-fructose",
+      "C2": {
+        "up": "OH",
+        "down": "CH₂OH(carbon1)"
+      },
+      "C3": {
+        "up": "HO",
+        "down": "H"
+      },
+      "C4": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C5": {
+        "up": "HOCH₂(carbon6)",
+        "down": "H"
+      }
+    },
+    "notes": "3panelngangα⇌open⇌β,horizontal2equilibriumarrowpairskhôngđiềukiện.Carbonnumbers1..6MỌIpanelphảigiữ,ringH_C3/C4/C5explicit;HOCH₂leftbranchtextviếtngượchướngnhưsourcekhôngđổiđặtbranchvịtrí.Q2anomerOHαDOWN/βUP,2ringfront3bondsđậm.ChemH/C/SIPđừngđoántheoβname.",
+    "questions": [
+      {
+        "qid": "12-C2-B4-D1-II-6",
+        "de": "Cho cấu tạo của fructose ở hình bên:",
+        "refs": [
+          {
+            "where": "12-C2-B4-D1-II-6.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-II-44",
+        "de": "Cho cấu tạo của fructose ở hình bên:",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-II-44.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daCoManifestTaiCheckpoint": false,
+    "svg": "fructose-can-bang-ddh-dac322d24db2d603a0cce7da2e2ccc24cfb0baaaad1913c3448fa46af151070e.svg",
+    "hashSvg": "dac322d24db2d603a0cce7da2e2ccc24cfb0baaaad1913c3448fa46af151070e",
+    "byteSvg": 62824,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "3panelsα/open/β/2equilibriumarrowpairs/1..6numbersMỖIpanel/3ringHexplicit/HOCH2leftC6reverse/αC2OHdownCH2OHupvsβOHupCH2OHdown/3frontbold/FischernoCcentertext/C2=O/3captions/noanswer.",
+    "hashSvgDaSoat": "dac322d24db2d603a0cce7da2e2ccc24cfb0baaaad1913c3448fa46af151070e",
+    "nguoiSoat": "cau_truc_6"
+  }
+]
