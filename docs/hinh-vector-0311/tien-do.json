@@ -60,9 +60,9 @@
       "Toàn kho còn chưa hoàn tất, app chưa thay hình; không báo đã xong hoặc đã triển khai."
     ],
     "danhMucDaKiem": "docs/hinh-vector-0311/kiem/danh-muc-da-kiem.json",
-    "loVuaXong": "985 câu đủ mọi hình+DDH/7 một phần;747 nguồn→506 SVG;7.731.055byte/gzip1.539.231;681 nguồn còn lại. Lô167 thêm1nguồn/1SVG/4câu đãsoát độc lập PNGnative/full/renderSVG/exacthash.",
-    "viecNenLamTiep": "CổngtốcđộD1đãfixphépđo/5x21xanh;đừngrollbacknativewait+postnativecontinuationdrain. CổngcỡtệpđỏNỀNindex.tsbytegiữnguyêne7b25161,khôngtăngtronglô165–167;co-tep-lo-167-nen.jsonlưu,phảixửlýkhi cậpnhậtmaintrướcgộp/pháthành. 167ĐÃĐẠT840(4câu),khôngdựngtrùng. Tiếpnguồnmới1033IR2panelsE/FđãrootmởnativeCHƯAđọcđủ/dựng;736surfactant4panelsđãmởnativeCHƯAđọchết;1176/1213/1214được4refmỗiảnhcầnđọcPNG/stem/refs.165675/166695/1647871325đãđạtđừngtrùng. Harness167bảncuối3off+2on21/21xanh,đãdrainmicrotasksauactualnativecụthể;negativebỏdrain táihiệnlỗi3vs2. HarnesschờCHỈactualnativeWebCryptoimportKey/sign/digestđãbắtđầu trướcmỗiflushD1,giữnguyênbytes/lỗi,nofixedturn/sleep/khôngđổi mốc/app. Chốtnewline1 trước tail vàdrainvẫngiữ;synthetic2nhánhxen16MiBSHA=2waves4D1,negative3serialxenSHA=3waves3D1/knownabcSHAđúng;crypto-rejectiondọntracker. Read-onlyreviewkhôngthấylỗichặn,modelđếmD1dependencywavesKHÔNGwallclock/khôngkhẳngđịnhmọiI/Oloạikhácđãsettle. TraceResponse.jsonchỉenv;Setglobaltrongtệpđòipriorrequestsdrain.Khôngxóabằngchứngđỏ164–166. Fullmainmớinhất/testtheotên/cathi/offlineappcònphảilàmtrướctriểnkhai. Mainab81c625chưagộp/WOFF2khôngdiff.149còn1014composite/209BỊLOẠIphongcách;59/1391vẫnbịloại,khôngđoán/hạgate.",
-    "canhBaoCheckpoint": "Giữworktree/commitmớihơn. Origin/main0200b893chưagộp;khôngpháthànhkhichưatoànphạmvi."
+    "loVuaXong": "989 câu đủ mọi hình+DDH/7 một phần;748 nguồn→507 SVG;7.777.520byte/gzip1.546.436;680 nguồn còn lại. Lô168 thêm1nguồn/1SVG/4câu đãsoát độc lập PNGnative/full/renderSVG/exacthash.",
+    "viecNenLamTiep": "168ĐÃĐẠT1176MSkhôngdựngtrùng. Nhóm169đangđượccau_truc_5đọc20nguồnchưamanifest/native+publicde/refs/geometry;artifactscratch/doc-molecule-lo-169.json,mới nhấtưu tiên/copyvềkiemtrướccheckpoint. Ưutiên1213stereochemicaldisaccharide/1214triesterhydrolysisđãrootmởnativeCHƯAdựng vàchưakiểmtừngstereo/atom.1033IR2panelsE/FđãmởnativeCHƯAđọchết;736surfactant4panelsđãmởnativeCHƯAđọchết. Ranking/fingerprintchỉgợiýkhôngtựduyệtalias;đốimanifesttrướcdựng. Harness167giữactualnativepending+postnativecontinuationdrain/chốtnewline1/giữdrain/mốc,modelD1waveskhôngwallclock;5x21xanhvàgate16821/21đạt,khôngsuyramọiscenariohếtflaky/khôngxóađỏcũ. CổngcỡtệpđỏNỀNindex.tsnguyênbytesoe7b25161,phảixửlýkhicậpnhậtmaintrướcgộp/deploy(kiểmco-tep-lo-167-nen.json),khôngnângmốc. Mainab81c625chưagộp/WOFF2khôngdiff;trướcpháthànhmainmớinhất/fulltesttheotên/cathi/offlinethật.149còn1014composite/209BỊLOẠIphongcách;59/1391vẫnbịloại,khôngđoán/hạgate.",
+    "canhBaoCheckpoint": "Giữworktree/commitmớihơn. Origin/mainab81c625chưagộp;khôngpháthànhkhichưatoànphạmvi/cổng/offlineappđạt."
   },
   "tuDongTiepTuc": {
     "id": "6ae96c39083081918a50bc48bc6c8d3e",
@@ -70,7 +70,7 @@
     "lich": "moi-gio",
     "mucTieu": "Tự vẽ, soát, sửa, tích hợp và kiểm bản sống đến khi đạt; tự tắt khi hoàn tất",
     "thongBao": "Chỉ khi hoàn tất, có lỗi chặn thực sự hoặc cần hành động của thầy",
-    "lyDo": "Tiếp tục từ985câu/506SVG,mỗi lượt hoànthiệnlôthật;chỉtắt khi toànphạmvi đạt,vàoapp vàkiểmbảnsống."
+    "lyDo": "Tiếp tục từ989câu/507SVG,mỗi lượt hoànthiệnlôthật;chỉtắt khi toànphạmvi đạt,vàoapp vàkiểmbảnsống."
   },
   "loOrbitalDaSoat": {
     "soAnhNguon": 23,
@@ -79,14 +79,14 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 747,
-    "soSvgRieng": 506,
-    "soCauDungHinh": 992,
-    "soCauDuMoiHinh": 985,
+    "soAnhNguon": 748,
+    "soSvgRieng": 507,
+    "soCauDungHinh": 996,
+    "soCauDuMoiHinh": 989,
     "soCauMoiXongMotPhan": 7,
-    "byteSvg": 7731055,
-    "byteGzip": 1539231,
-    "soAnhNguonConLai": 681,
+    "byteSvg": 7777520,
+    "byteGzip": 1546436,
+    "soAnhNguonConLai": 680,
     "daTichHop": false
   },
   "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.",
@@ -101,20 +101,20 @@
     "batBuocMoiHinh": true,
     "daHoanTatToanBo": false,
     "ghiChu": "Bộ đangchọn đãđạtfontDDH/pathtựchứa vàsoátđộclập;toànkhochưahoàntất,khôngpháthànhbộchưađủ.",
-    "loMoi": "167mọinhãnO DDH Rounded path tựchứa,0fallback.",
+    "loMoi": "168mọichữ/số/trục/[M]sup+ DDH Rounded path tựchứa,0fallback.",
     "congCu": "scripts/phong-vector-0311.py",
     "daChuyenHetBoDaVe": true
   },
   "daDatPhongApp": {
-    "soNguon": 747,
-    "soCauDuHinhVaPhong": 985,
+    "soNguon": 748,
+    "soCauDuHinhVaPhong": 989,
     "ghiChu": "Các số tổngDaDoiChieu vẫn mô tả nội dung đã kiểm; bản cũ chưa đổi phông không được coi đạt yêu cầu phông mới."
   },
   "loMoiNhat": {
-    "lo": "167",
-    "ketQua": "985 câu đủ mọi hình+DDH/7 một phần;747 nguồn→506 SVG;7.731.055byte/gzip1.539.231;681 nguồn còn lại. Lô167 thêm1nguồn/1SVG/4câu đãsoát độc lập PNGnative/full/renderSVG/exacthash.",
-    "suaLoi": "8403sixmemberrings/6O(3ring+2bridge+1terminal)/2wavyends/allthin/arrowđúngsecondC1–bridgeO,noH-OH-n-numbers. Hash92a015…a12cbfđãsoátđộclậpđạt. HarnessnativependingthậtgiúpđếmD1dependencywaveskhônglẫnthờigianbăm;khôngđổi production/mốc,bằngchứngđỏcũgiữriêng. Pumpđợiactualnativeđãbắtđầu rồi đểmicrotaskcontinuationscủanativeđưaD1vàoqueue trướcflush;khôngfixedNidleturn.11targettests(gồmnegative3D1serial/invaliddigestcleanup/Streamthật/200continuations)đềuđạt.",
-    "tiepTheo": "167ĐÃĐẠT840(4câu),khôngdựngtrùng. Tiếpnguồnmới1033IR2panelsE/FđãrootmởnativeCHƯAđọcđủ/dựng;736surfactant4panelsđãmởnativeCHƯAđọchết;1176/1213/1214được4refmỗiảnhcầnđọcPNG/stem/refs.165675/166695/1647871325đãđạtđừngtrùng. Harness167chờCHỈactualnativeWebCryptoimportKey/sign/digestđãbắtđầu trướcmỗiflushD1,giữnguyênbytes/lỗi,nofixedturn/sleep/khôngđổi mốc/app. Chốtnewline1 trước tail vàdrainvẫngiữ;synthetic2nhánhxen16MiBSHA=2waves4D1,negative3serialxenSHA=3waves3D1/knownabcSHAđúng;crypto-rejectiondọntracker. Read-onlyreviewkhôngthấylỗichặn,modelđếmD1dependencywavesKHÔNGwallclock/khôngkhẳngđịnhmọiI/Oloạikhácđãsettle. TraceResponse.jsonchỉenv;Setglobaltrongtệpđòipriorrequestsdrain.Khôngxóabằngchứngđỏ164–166. Fullmainmớinhất/testtheotên/cathi/offlineappcònphảilàmtrướctriểnkhai. Mainab81c625chưagộp/WOFF2khôngdiff.149còn1014composite/209BỊLOẠIphongcách;59/1391vẫnbịloại,khôngđoán/hạgate.",
-    "gioiHan": "Chưa tích hợp/chưa reloadofflineapp/chưa phát hành. Build167/precache170/2613.23KiB/hash/XML/path/ASTđạt;Chromium506/506chỉkiểmtàisản. Cổngbảncuốicốđịnh3traceoff+2traceonđều21/21xanh. Bảntrước20testcóđỏđãgiữ;negativebỏdrainmicrotasktáihiện3vs2wave ởcase200continuations. Khôngđổi mốc/codeproduction. Mainab81c625chưagộp/WOFF2khôngdiff;phải testtheotên/mainmớinhất/cathi trước triểnkhai. Cổngcỡtệpđỏnềnserver/src/index.ts297644B(mốc295021+2048),BYTEGIỮNGUYÊNsoe7b25161khôngtănglô165–167;đãlưuprooftệp,bắtbuộcxửlýtrướcgộp/deploy,khôngbáocổngnàyxanh."
+    "lo": "168",
+    "ketQua": "989 câu đủ mọi hình+DDH/7 một phần;748 nguồn→507 SVG;7.777.520byte/gzip1.546.436;680 nguồn còn lại. Lô168 thêm1nguồn/1SVG/4câu đãsoát độc lập PNGnative/full/renderSVG/exacthash.",
+    "suaLoi": "1176MS giữtừngđỉnh15/18/26..31/39/41..44/58/59heightpixel,đãmởnative/zoomđểphânbiệtminor ticks/khôngthêm60peak;đủframe/ticksX5-1/Y20-10/2titles/nhãn30tráiđỉnh100/[M]sup+,khôngnormalizeheight/phầntrăm. Hashff2b40…334d4đãsoátđộclậpđạt.",
+    "tiepTheo": "168ĐÃĐẠT1176MSkhôngdựngtrùng. Nhóm169đangđượccau_truc_5đọc20nguồnchưamanifest/native+publicde/refs/geometry;artifactscratch/doc-molecule-lo-169.json,mới nhấtưu tiên/copyvềkiemtrướccheckpoint. Ưutiên1213stereochemicaldisaccharide/1214triesterhydrolysisđãrootmởnativeCHƯAdựng vàchưakiểmtừngstereo/atom.1033IR2panelsE/FđãmởnativeCHƯAđọchết;736surfactant4panelsđãmởnativeCHƯAđọchết. Ranking/fingerprintchỉgợiýkhôngtựduyệtalias;đốimanifesttrướcdựng. Harness167giữactualnativepending+postnativecontinuationdrain/chốtnewline1/giữdrain/mốc,modelD1waveskhôngwallclock;5x21xanhvàgate16821/21đạt,khôngsuyramọiscenariohếtflaky/khôngxóađỏcũ. CổngcỡtệpđỏNỀNindex.tsnguyênbytesoe7b25161,phảixửlýkhicậpnhậtmaintrướcgộp/deploy(kiểmco-tep-lo-167-nen.json),khôngnângmốc. Mainab81c625chưagộp/WOFF2khôngdiff;trướcpháthànhmainmớinhất/fulltesttheotên/cathi/offlinethật.149còn1014composite/209BỊLOẠIphongcách;59/1391vẫnbịloại,khôngđoán/hạgate.",
+    "gioiHan": "Chưa tích hợp/chưa reloadofflineapp/chưa phát hành. Build168/precache170/2613.23KiB/hash/XML/path/ASTđạt;Chromium507/507chỉkiểmtàisảnkhôngphảireloadofflineapp. Cổngtốcđộ21/21đạt. Cỡtệpđỏnềnindex.tsnguyênbytekhôngtănglômới,phảixửlýtrướcgộp/deploy. Mainab81c625chưagộp/WOFF2khôngdiff."
   }
 }

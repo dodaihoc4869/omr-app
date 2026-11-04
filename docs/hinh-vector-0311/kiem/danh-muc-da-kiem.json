@@ -6409,6 +6409,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "d451f99caeef4918dc46f959ed5e12d44ee7c555da23891baefa5d79a0c16e41": {
+      "tep": "ms-ddh-ff2b4012b9494638bb7d71840e6bfd478247087463fced150506d789922334d4.svg",
+      "hashSvg": "ff2b4012b9494638bb7d71840e6bfd478247087463fced150506d789922334d4",
+      "byteSvg": 46465,
+      "byteGzip": 7205,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "4742d9ecfbbf83bd084bf2c93f267b84f2871d4e347f25246cc021a44505e216": {
       "tep": "do-thi-tick-ddh-b1e9a586830f79ee9044689b32d1d167e68cfd61bfb598d342c8751d00e7d049.svg",
       "hashSvg": "b1e9a586830f79ee9044689b32d1d167e68cfd61bfb598d342c8751d00e7d049",
@@ -9383,6 +9392,20 @@
       ]
     },
     {
+      "qid": "12-C3-B8-D1-I-22",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "d451f99caeef4918dc46f959ed5e12d44ee7c555da23891baefa5d79a0c16e41",
+          "where": "12-C3-B8-D1-I-22.hinh.0.du_lieu",
+          "hashDataUrl": "de5c059c08282604027403b10fe32f8624e51364717e80eba064d40c269f30ac",
+          "vector": "ms-ddh-ff2b4012b9494638bb7d71840e6bfd478247087463fced150506d789922334d4.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-C3-B8-D1-I-38",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -9669,6 +9692,20 @@
           "where": "12-C3-B11-D1-I-3.hinh.0.du_lieu",
           "hashDataUrl": "ed7b037d5d082042b1676ba1aca375a298eb39fa5be1701140df8cb4b6f0d118",
           "vector": "cau-truc-035b15b79c992716eceedb84de2e891bea2eea6d06f876feddf35a9240c3e808.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-C3-B11-D1-I-16",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "d451f99caeef4918dc46f959ed5e12d44ee7c555da23891baefa5d79a0c16e41",
+          "where": "12-C3-B11-D1-I-16.hinh.0.du_lieu",
+          "hashDataUrl": "de5c059c08282604027403b10fe32f8624e51364717e80eba064d40c269f30ac",
+          "vector": "ms-ddh-ff2b4012b9494638bb7d71840e6bfd478247087463fced150506d789922334d4.svg"
         }
       ]
     },
@@ -15841,6 +15878,20 @@
       ]
     },
     {
+      "qid": "DB-12-B8-D1-I-18",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "d451f99caeef4918dc46f959ed5e12d44ee7c555da23891baefa5d79a0c16e41",
+          "where": "DB-12-B8-D1-I-18.hinh.0.du_lieu",
+          "hashDataUrl": "de5c059c08282604027403b10fe32f8624e51364717e80eba064d40c269f30ac",
+          "vector": "ms-ddh-ff2b4012b9494638bb7d71840e6bfd478247087463fced150506d789922334d4.svg"
+        }
+      ]
+    },
+    {
       "qid": "DB-12-B8-D1-I-33",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -16093,6 +16144,20 @@
           "where": "DB-12-B8-D1-I-223.hinh.0.du_lieu",
           "hashDataUrl": "ed7b037d5d082042b1676ba1aca375a298eb39fa5be1701140df8cb4b6f0d118",
           "vector": "cau-truc-035b15b79c992716eceedb84de2e891bea2eea6d06f876feddf35a9240c3e808.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B8-D1-I-225",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "d451f99caeef4918dc46f959ed5e12d44ee7c555da23891baefa5d79a0c16e41",
+          "where": "DB-12-B8-D1-I-225.hinh.0.du_lieu",
+          "hashDataUrl": "de5c059c08282604027403b10fe32f8624e51364717e80eba064d40c269f30ac",
+          "vector": "ms-ddh-ff2b4012b9494638bb7d71840e6bfd478247087463fced150506d789922334d4.svg"
         }
       ]
     },
@@ -22967,6 +23032,7 @@
     "12-C3-B11-D2-III-3",
     "12-C3-B11-D2-III-6",
     "12-C3-B8-D1-I-18",
+    "12-C3-B8-D1-I-22",
     "12-C3-B8-D1-I-38",
     "12-C3-B8-D1-I-82",
     "12-C3-B8-D1-I-89",
@@ -22986,6 +23052,7 @@
     "12-C3-B8-D2-III-40",
     "12-C3-B8-D2-III-45",
     "12-C3-B11-D1-I-3",
+    "12-C3-B11-D1-I-16",
     "12-C3-B11-D1-II-2",
     "12-C3-B11-D1-II-4",
     "12-C3-B9-D1-I-1",
@@ -23356,6 +23423,7 @@
     "DB-12-B9-P1-D1-III-246",
     "DB-12-B9-P1-D1-III-262",
     "DB-12-B8-D1-I-16",
+    "DB-12-B8-D1-I-18",
     "DB-12-B8-D1-I-33",
     "DB-12-B8-D1-I-81",
     "DB-12-B8-D1-I-88",
@@ -23373,6 +23441,7 @@
     "DB-12-B8-D1-III-194",
     "DB-12-B8-D1-I-197",
     "DB-12-B8-D1-I-223",
+    "DB-12-B8-D1-I-225",
     "DB-12-B8-D1-I-240",
     "DB-12-B8-D1-I-246",
     "DB-12-B8-D1-I-247",

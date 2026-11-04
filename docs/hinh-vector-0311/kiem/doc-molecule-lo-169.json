@@ -1,0 +1,304 @@
+[
+  {
+    "i": 1203,
+    "hash": "da5d48cb9501a38569a0c357ee3e128455d49b8fd1a9c7e4a0c2f697278e376c",
+    "fileNguon": "anh/da5d48cb9501a38569a0c357ee3e128455d49b8fd1a9c7e4a0c2f697278e376c.png",
+    "canvas": [
+      699,
+      457
+    ],
+    "daMoNative": true,
+    "kind": "MS-silver-two-peaks",
+    "xLabel": "m/z",
+    "yLabel": "Phần trăm số nguyên tử đồng vị (%)",
+    "xLabels": [
+      106,
+      107,
+      108,
+      109,
+      110
+    ],
+    "yLabels": [
+      "47,5",
+      "48",
+      "48,5",
+      "49",
+      "49,5",
+      "50",
+      "50,5",
+      "51",
+      "51,5",
+      "52",
+      "52,5"
+    ],
+    "peaks": [
+      {
+        "mz": 107,
+        "label": "51,8"
+      },
+      {
+        "mz": 109,
+        "label": "48,2"
+      }
+    ],
+    "notes": "2nétđenhẹpở107/109,baselineY47,5KHÔNG0,trái51,8cao hơnphải48,2. Giữphẩydecimal,labelexactkhôngtựthêm%trên2bar(vìsourcekhôngviết%). Xmajor106..110vàvạchminorhalfstepskhônglabel;khôngarrow/khungtrênphải/grid. 1203nativeđãmởriêng.",
+    "questions": [
+      {
+        "qid": "DB-10-B2-D2-I-83",
+        "de": "Cho phổ khối lượng MS của silver (Ag) ở hình dưới đây: Nguyên tử khối trung bình của nguyên tố silver là",
+        "refs": [
+          {
+            "where": "DB-10-B2-D2-I-83.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B2-I-42",
+        "de": "Cho phổ khối lượng MS của silver (Ag) ở hình dưới đây: Nguyên tử khối trung bình của nguyên tố silver là",
+        "refs": [
+          {
+            "where": "DH-10-C1-B2-I-42.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "chiLaDuLieuDungChuaSoatRender": true
+  },
+  {
+    "i": 907,
+    "hash": "a629aad71176a99d6ffbe905da34b473a41fdd3b226f22d818c80809a6acf672",
+    "fileNguon": "anh/a629aad71176a99d6ffbe905da34b473a41fdd3b226f22d818c80809a6acf672.png",
+    "canvas": [
+      777,
+      504
+    ],
+    "daMoNative": true,
+    "kind": "MS-silver-two-peaks",
+    "xLabel": "m/z",
+    "yLabel": "Phần trăm số nguyên tử đồng vị (%)",
+    "xLabels": [
+      106,
+      107,
+      108,
+      109,
+      110
+    ],
+    "yLabels": [
+      "47,5",
+      "48",
+      "48,5",
+      "49",
+      "49,5",
+      "50",
+      "50,5",
+      "51",
+      "51,5",
+      "52",
+      "52,5"
+    ],
+    "peaks": [
+      {
+        "mz": 107,
+        "label": "51,8"
+      },
+      {
+        "mz": 109,
+        "label": "48,2"
+      }
+    ],
+    "notes": "Cùngnộidung1203NHƯNGnative907mởRIÊNGbaseline47,5/top52,5/x107109labels51,8/48,2giữnguyên. Nolegends/atomAgthêm,khôngthànhphổglucose96nhưpHashmismatchcũ.",
+    "questions": [
+      {
+        "qid": "10-C1-B2-I-44",
+        "de": "Cho phổ khối lượng MS của silver (Ag) ở hình dưới đây:\nNguyên tử khối trung bình của nguyên tố silver là",
+        "refs": [
+          {
+            "where": "10-C1-B2-I-44.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-10-B2-D2-I-18",
+        "de": "Cho phổ khối lượng MS của silver (Ag) ở hình dưới đây:\nNguyên tử khối trung bình của nguyên tố silver là",
+        "refs": [
+          {
+            "where": "DB-10-B2-D2-I-18.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "chiLaDuLieuDungChuaSoatRender": true
+  },
+  {
+    "i": 998,
+    "hash": "b3c459e6eb6553fa1abaeebddfc83bd9660c572f5e8f8fc086ab7aa2f8cd0086",
+    "fileNguon": "anh/b3c459e6eb6553fa1abaeebddfc83bd9660c572f5e8f8fc086ab7aa2f8cd0086.png",
+    "canvas": [
+      550,
+      510
+    ],
+    "daMoNative": true,
+    "kind": "MS-magnesium-three-peaks",
+    "xLabel": "Tỉ lệ nguyên tử khối/điện tích (m/z)",
+    "yLabel": "Phần trăm số nguyên tử đồng vị (%)",
+    "peaks": [
+      {
+        "mz": 24,
+        "label": "79",
+        "pixel": [
+          181,
+          101,
+          401
+        ]
+      },
+      {
+        "mz": 25,
+        "label": "10",
+        "pixel": [
+          272,
+          366,
+          401
+        ]
+      },
+      {
+        "mz": 26,
+        "label": "11",
+        "pixel": [
+          369,
+          362,
+          401
+        ]
+      }
+    ],
+    "notes": "3barđenmảnh,labelsCHỈ79/10/11không%trênbar;YKHÔNGbấtkỳtick/số,nolegend.Peaks24/25/26xLabels,4emptytickx226/319/422/474khôngtựviếtsố. Axisorigin93,401,xend518,401,yend93,36,KHÔNGarrowheads/khungtrênphải/grid.",
+    "questions": [
+      {
+        "qid": "10-C1-B2-III-15",
+        "de": "Từ phổ khối lượng MS của magnesium (Mg) ở hình dưới đây:\nHãy cho biết giá trị nguyên tử khối trung bình của magnesium là bao nhiêu?\nBiết z = 1. (Kết quả làm tròn kết quả đến hàng phần mười).",
+        "refs": [
+          {
+            "where": "10-C1-B2-III-15.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-10-B2-D2-III-51",
+        "de": "Từ phổ khối lượng MS của magnesium (Mg) ở hình dưới đây:\nHãy cho biết giá trị nguyên tử khối trung bình của magnesium là bao nhiêu?\nBiết z = 1. (Kết quả làm tròn kết quả đến hàng phần mười).",
+        "refs": [
+          {
+            "where": "DB-10-B2-D2-III-51.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "chiLaDuLieuDungChuaSoatRender": true
+  },
+  {
+    "i": 634,
+    "hash": "7528960cd4e8203592e7f30ab451dc371d554cedc2882528065fa397f910ae00",
+    "fileNguon": "anh/7528960cd4e8203592e7f30ab451dc371d554cedc2882528065fa397f910ae00.png",
+    "canvas": [
+      241,
+      196
+    ],
+    "daMoNative": true,
+    "kind": "MS-two-equal-unlabelled-peaks",
+    "xLabel": "m/z",
+    "yLabel": "Phần trăm số nguyên tử đồng vị (%)",
+    "xLabels": [
+      20,
+      40,
+      60,
+      80,
+      100
+    ],
+    "yLabels": [
+      0,
+      20,
+      40,
+      60,
+      80
+    ],
+    "notes": "2peakđenmảnhcaobằngnhau~50%,nativex164/169từbaseliney155lên~66. KHÔNGcótextm/z63/65hay%sốtrênpeak,đừngtựsuytừstemCu. Axisorigin57,155,xticks90/123/157/190/223.Y80ở16.Xrange0..100shapeonly,noarrows/khungtopright/guide.",
+    "questions": [
+      {
+        "qid": "DB-10-B2-D2-I-127",
+        "de": "Đồng có hai đồng vị bền trong tự nhiên là ⁶³Cu và ⁶⁵Cu.\nNguyên tử khối trung bình của đồng là 63,55 (điện tích z của các ion đồng vị đồng đều bằng 1+).\nHình vẽ phổ khối nào dưới đây là đúng?",
+        "refs": [
+          {
+            "where": "DB-10-B2-D2-I-127.hinh.1.du_lieu",
+            "viTri": "sau_pa_B"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B4-D1-I-8",
+        "de": "Đồng có hai đồng vị bền trong tự nhiên là ⁶³Cu và ⁶⁵Cu.\nNguyên tử khối trung bình của đồng là 63,55 (điện tích z của các ion đồng vị đồng đều bằng 1+).\nHình vẽ phổ khối nào dưới đây là đúng?",
+        "refs": [
+          {
+            "where": "DH-10-C1-B4-D1-I-8.hinh.1.du_lieu",
+            "viTri": "sau_pa_B"
+          }
+        ]
+      }
+    ],
+    "chiLaDuLieuDungChuaSoatRender": true
+  },
+  {
+    "i": 1018,
+    "hash": "b6abad28c244be06fd398daee6695f3c856122f5d991cbc7fae27e39403cd206",
+    "fileNguon": "anh/b6abad28c244be06fd398daee6695f3c856122f5d991cbc7fae27e39403cd206.png",
+    "canvas": [
+      400,
+      317
+    ],
+    "daMoNative": true,
+    "kind": "MS-two-equal-unlabelled-peaks",
+    "xLabel": "m/z",
+    "yLabel": "Phần trăm số nguyên tử đồng vị (%)",
+    "xLabels": [
+      20,
+      40,
+      60,
+      80,
+      100
+    ],
+    "yLabels": [
+      0,
+      20,
+      40,
+      60,
+      80
+    ],
+    "notes": "Cùng2peakcao~50%634nhưngnative1018scale400x317đãmởRIÊNG.2nétđenx263/270,topy123,baseline249. Origin110,249,xticks157/204/251/299/347;Y0/20/40/60/80ở249/199/150/101/51. Khônglabeltrênpeak/khôngtự63/65/percentagephântích.",
+    "questions": [
+      {
+        "qid": "10-C1-B2-I-58",
+        "de": "Đồng có hai đồng vị bền trong tự nhiên là ⁶³Cu và ⁶⁵Cu.\nNguyên tử khối trung bình của đồng là 63,55 (điện tích z của các ion đồng vị đồng đều bằng 1+).\nHình vẽ phổ khối nào dưới đây là đúng?",
+        "refs": [
+          {
+            "where": "10-C1-B2-I-58.hinh.1.du_lieu",
+            "viTri": "sau_pa_B"
+          }
+        ]
+      },
+      {
+        "qid": "DB-10-B2-D2-I-29",
+        "de": "Đồng có hai đồng vị bền trong tự nhiên là ⁶³Cu và ⁶⁵Cu.\nNguyên tử khối trung bình của đồng là 63,55 (điện tích z của các ion đồng vị đồng đều bằng 1+).\nHình vẽ phổ khối nào dưới đây là đúng?",
+        "refs": [
+          {
+            "where": "DB-10-B2-D2-I-29.hinh.1.du_lieu",
+            "viTri": "sau_pa_B"
+          }
+        ]
+      }
+    ],
+    "chiLaDuLieuDungChuaSoatRender": true
+  }
+]
