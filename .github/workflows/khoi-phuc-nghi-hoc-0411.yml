@@ -33,6 +33,10 @@ jobs:
           set -euo pipefail
           q() { npx -y wrangler@4 d1 execute omr --remote --json --command "$1" | jq -c '.[0].results'; }
           DK="(lower(trim(ho_ten)) LIKE lower('%Minh Chiến') OR lower(trim(ho_ten)) LIKE lower('%Thiên Ngọc'))"
+          echo "== tổng em đang nghỉ · trong đó tên có «Chiến» / «Ngọc» / «CHIẾN» / «NGỌC» (đếm, so cả dạng dấu tách NFD)"
+          q "SELECT COUNT(*) tong, SUM(instr(ho_ten,'Chiến')>0 OR instr(ho_ten,'CHIẾN')>0 OR instr(ho_ten,'Chiê')>0) chien, SUM(instr(ho_ten,'Ngọc')>0 OR instr(ho_ten,'NGỌC')>0 OR instr(ho_ten,'Ngo')>0) ngoc, SUM(instr(ho_ten,'Minh')>0 OR instr(ho_ten,'MINH')>0) minh, SUM(instr(ho_ten,'Thiên')>0 OR instr(ho_ten,'THIÊN')>0 OR instr(ho_ten,'Thiê')>0) thien FROM hoc_sinh WHERE trang_thai='da_nghi'"
+          echo "== hai em theo tên: cập nhật lần cuối (giờ UTC, không mã em)"
+          q "SELECT CASE WHEN lower(trim(ho_ten)) LIKE lower('%Minh Chiến') THEN 'minh_chien' ELSE 'thien_ngoc' END ten, cap_nhat_luc FROM hoc_sinh WHERE (lower(trim(ho_ten)) LIKE lower('%Minh Chiến') OR lower(trim(ho_ten)) LIKE lower('%Thiên Ngọc'))"
           echo "== mọi trạng thái của em trùng hai tên (đếm)"
           q "SELECT CASE WHEN lower(trim(ho_ten)) LIKE lower('%Minh Chiến') THEN 'minh_chien' ELSE 'thien_ngoc' END ten, COALESCE(trang_thai,'') tt, COUNT(*) n FROM hoc_sinh WHERE $DK GROUP BY ten, tt"
           A=$(q "SELECT COUNT(*) n FROM hoc_sinh WHERE trang_thai='da_nghi' AND lower(trim(ho_ten)) LIKE lower('%Minh Chiến')" | jq '.[0].n')
