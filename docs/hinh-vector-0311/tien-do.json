@@ -60,8 +60,8 @@
       "Toàn kho còn chưa hoàn tất, app chưa thay hình; không báo đã xong hoặc đã triển khai."
     ],
     "danhMucDaKiem": "docs/hinh-vector-0311/kiem/danh-muc-da-kiem.json",
-    "loVuaXong": "958 câu đủ mọi hình+DDH/7 một phần;738 nguồn→497 SVG;7.327.689 byte/gzip1.480.806;690 nguồn còn lại. Lô157–158 thêm2nguồn/2SVG,khép9câu;đãsoát độc lập từng PNGnative/renderSVG/exacthash.",
-    "viecNenLamTiep": "Nhóm149 đãxong14/20,82/587 ĐÃĐẠT157–158 khôngdựngtrùng. CÒN6:1024/1259/1014/1379/7/209. Fullsource/de/refskiem/doc-molecule-lo-149.json;FULLgeometry kiem/doc-chi-tiet-con-lai-lo-155.json field geometry155. Ưutiên1024distillation5number/thermometer/3dropsRÕ/khôngthêmflowarrow;1259pH15icon0..14/EnglishCoffee-BakingSoda.1379literalproductaH2NCH2CH2COOCH3vàbClH3NCH(CH3)COOH KHÔNGsửatheory;7NOenergy12sphere/arrow/text làdữliệu khônggiải;2093cáchthukhí/outlineddoubletubes/arrows/caption,khôngđoánbubblesmờ.1014COMPOSITE:giữpixel2ốngraster,2label+2arrowPHẢItáchDDH/vector,CHƯAdựng/chưađạt;khôngvẽgiảống/khônggiữchữngoàiphoto rồicoiđúngfont. Nhóm12459/1391vẫnBỊLOẠIphongcách,khônghạgate/đoánshortticks-hạt.7partialCHỈ4photo581+hoa1198/1403giữraster và1câu4icons thiếu59/1391.",
+    "loVuaXong": "960 câu đủ mọi hình+DDH/7 một phần;739 nguồn→498 SVG;7.400.833byte/gzip1.487.957;689 nguồn còn lại. Lô159 thêm1nguồn/1SVG/2câu đãsoát độc lập PNGnative/full/renderSVG/exacthash.",
+    "viecNenLamTiep": "Nhóm149đãxong15/20;1379ĐÃĐẠT159khôngdựngtrùng. CÒN5:1024/1259/1014/7/209. Fullsource/de/refskiem/doc-molecule-lo-149.json;FULLgeometry kiem/doc-chi-tiet-con-lai-lo-155.json field geometry155. Ưutiên1024distillation5number/thermometer/3dropsRÕ/khôngthêmflowarrow;1259pH15icon0..14/EnglishCoffee-BakingSoda.7NOenergy12sphere/arrow/text làdữliệu khônggiải;2093cáchthukhí/outlineddoubletubes/arrows/caption,khôngđoánbubblesmờ.1014COMPOSITE:giữpixel2ốngraster,2label+2arrowPHẢItáchDDH/vector,CHƯAdựng/chưađạt;khôngvẽgiảống/khônggiữchữngoàiphoto rồicoiđúngfont.59/1391vẫnBỊLOẠIphongcách,khônghạgate/đoánshortticks-hạt.7partialCHỈ4photo581+hoa1198/1403giữraster và1câu4icons thiếu59/1391.",
     "canhBaoCheckpoint": "Giữworktree/commitmớihơn. Origin/main0200b893chưagộp;khôngpháthànhkhichưatoànphạmvi."
   },
   "tuDongTiepTuc": {
@@ -70,7 +70,7 @@
     "lich": "moi-gio",
     "mucTieu": "Tự vẽ, soát, sửa, tích hợp và kiểm bản sống đến khi đạt; tự tắt khi hoàn tất",
     "thongBao": "Chỉ khi hoàn tất, có lỗi chặn thực sự hoặc cần hành động của thầy",
-    "lyDo": "Tiếp tục từ958câu/497SVG,mỗi lượt hoànthiệnlôthật;chỉtắt khi toànphạmvi đạt,vàoapp vàkiểmbảnsống."
+    "lyDo": "Tiếp tục từ960câu/498SVG,mỗi lượt hoànthiệnlôthật;chỉtắt khi toànphạmvi đạt,vàoapp vàkiểmbảnsống."
   },
   "loOrbitalDaSoat": {
     "soAnhNguon": 23,
@@ -79,14 +79,14 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 738,
-    "soSvgRieng": 497,
-    "soCauDungHinh": 965,
-    "soCauDuMoiHinh": 958,
+    "soAnhNguon": 739,
+    "soSvgRieng": 498,
+    "soCauDungHinh": 967,
+    "soCauDuMoiHinh": 960,
     "soCauMoiXongMotPhan": 7,
-    "byteSvg": 7327689,
-    "byteGzip": 1480806,
-    "soAnhNguonConLai": 690,
+    "byteSvg": 7400833,
+    "byteGzip": 1487957,
+    "soAnhNguonConLai": 689,
     "daTichHop": false
   },
   "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.",
@@ -101,20 +101,20 @@
     "batBuocMoiHinh": true,
     "daHoanTatToanBo": false,
     "ghiChu": "Bộ đangchọn đãđạtfontDDH/pathtựchứa vàsoátđộclập;toànkhochưahoàntất,khôngpháthànhbộchưađủ.",
-    "loMoi": "157–158mọinhãn DDH Rounded path tựchứa,source82hai dòng trênsize16giữgapcurvedarrow;khôngfallback.",
+    "loMoi": "159mọi công thức/nhãn/condition DDH Rounded path tựchứa,0fallback.",
     "congCu": "scripts/phong-vector-0311.py",
     "daChuyenHetBoDaVe": true
   },
   "daDatPhongApp": {
-    "soNguon": 738,
-    "soCauDuHinhVaPhong": 958,
+    "soNguon": 739,
+    "soCauDuHinhVaPhong": 960,
     "ghiChu": "Các số tổngDaDoiChieu vẫn mô tả nội dung đã kiểm; bản cũ chưa đổi phông không được coi đạt yêu cầu phông mới."
   },
   "loMoiNhat": {
-    "lo": "157–158",
-    "ketQua": "958 câu đủ mọi hình+DDH/7 một phần;738 nguồn→497 SVG;7.327.689 byte/gzip1.480.806;690 nguồn còn lại. Lô157–158 thêm2nguồn/2SVG,khép9câu;đãsoát độc lập từng PNGnative/renderSVG/exacthash.",
-    "suaLoi": "82:5dòngđỏ/2mL5mL40%/bátsứ/liquid/rod/curvedarrow/mesh3chân/lamp;đãsửafont2dòngtrên16đểgapmũitênrõ,bảnchạmchữBỊLOẠI.587:6labels/2stands/flaskmeshspiritlamp/2wallcondenser/portsOUTupperINlower/receiverwoodblock,đãbổsungkẹpstandphải trướcống,khôngthermometer/numbers/khôngđoáncountgiọtmờ. Freshhash2bản đãsoátđộclậpđạt.",
-    "tiepTheo": "Nhóm149 đãxong14/20,82/587 ĐÃĐẠT157–158 khôngdựngtrùng. CÒN6:1024/1259/1014/1379/7/209. Fullsource/de/refskiem/doc-molecule-lo-149.json;FULLgeometry kiem/doc-chi-tiet-con-lai-lo-155.json field geometry155. Ưutiên1024distillation5number/thermometer/3dropsRÕ/khôngthêmflowarrow;1259pH15icon0..14/EnglishCoffee-BakingSoda.1379literalproductaH2NCH2CH2COOCH3vàbClH3NCH(CH3)COOH KHÔNGsửatheory;7NOenergy12sphere/arrow/text làdữliệu khônggiải;2093cáchthukhí/outlineddoubletubes/arrows/caption,khôngđoánbubblesmờ.1014COMPOSITE:giữpixel2ốngraster,2label+2arrowPHẢItáchDDH/vector,CHƯAdựng/chưađạt;khôngvẽgiảống/khônggiữchữngoàiphoto rồicoiđúngfont. Nhóm12459/1391vẫnBỊLOẠIphongcách,khônghạgate/đoánshortticks-hạt.7partialCHỈ4photo581+hoa1198/1403giữraster và1câu4icons thiếu59/1391.",
-    "gioiHan": "Chưa tíchhợp/chưa reloadofflineapp/chưa phát hành. Build/tốcđộlô158đạt/precache170/2613.23KiB. Mainfetch0200b893chưa gộp/WOFF2khôngdiff;phải cậpnhậtmainmớinhất/sotesttheotên/kiểmcathitrướctriểnkhai."
+    "lo": "159",
+    "ketQua": "960 câu đủ mọi hình+DDH/7 một phần;739 nguồn→498 SVG;7.400.833byte/gzip1.487.957;689 nguồn còn lại. Lô159 thêm1nguồn/1SVG/2câu đãsoát độc lập PNGnative/full/renderSVG/exacthash.",
+    "suaLoi": "1379 đủ4rowsa-d,giữproductaH2NCH2CH2COOCH3literal sai-looking vàbClH3NCH(CH3)COOHkhôngcharge/khôngsửatheory;conditionsH2SO4t0 vàxtt0p;polymerHN–[CH2]5–CO/ngoặc/n/stubs/+nH2O. MọiH/chỉsố/caption đãsoátPNGnative+renderfresh/exacthash.",
+    "tiepTheo": "Nhóm149đãxong15/20;1379ĐÃĐẠT159khôngdựngtrùng. CÒN5:1024/1259/1014/7/209. Fullsource/de/refskiem/doc-molecule-lo-149.json;FULLgeometry kiem/doc-chi-tiet-con-lai-lo-155.json field geometry155. Ưutiên1024distillation5number/thermometer/3dropsRÕ/khôngthêmflowarrow;1259pH15icon0..14/EnglishCoffee-BakingSoda.7NOenergy12sphere/arrow/text làdữliệu khônggiải;2093cáchthukhí/outlineddoubletubes/arrows/caption,khôngđoánbubblesmờ.1014COMPOSITE:giữpixel2ốngraster,2label+2arrowPHẢItáchDDH/vector,CHƯAdựng/chưađạt;khôngvẽgiảống/khônggiữchữngoàiphoto rồicoiđúngfont.59/1391vẫnBỊLOẠIphongcách,khônghạgate/đoánshortticks-hạt.7partialCHỈ4photo581+hoa1198/1403giữraster và1câu4icons thiếu59/1391.",
+    "gioiHan": "Chưa tích hợp/chưa reloadofflineapp/chưa phát hành. Mainfetch0200b893chưagộp/WOFF2khôngdiff;phải cậpnhậtmainmớinhất/sotesttheotên/kiểmcathitrướctriểnkhai. Build/tốcđộlô159đạt/precache170/2613.23KiB;Chromium498/498 chỉkiểmtàisảnkhôngphảireloadofflineapp."
   }
 }

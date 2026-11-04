@@ -1,0 +1,205 @@
+[
+  {
+    "i": 1379,
+    "hash": "f8fb0793580a20e441af19c3251aa8acd1b82aed91d89de8c1d8f9da27ca168b",
+    "fileNguon": "anh/f8fb0793580a20e441af19c3251aa8acd1b82aed91d89de8c1d8f9da27ca168b.png",
+    "canvas": [
+      1123,
+      306
+    ],
+    "daMoNative": true,
+    "kind": "four-amino-acid-reactions-literal",
+    "rows": [
+      {
+        "label": "a)",
+        "left": "H₂NCH₂COOH + CH₃CH₂OH",
+        "overArrow": "H₂SO₄, t⁰",
+        "right": "H₂NCH₂CH₂COOCH₃ + H₂O"
+      },
+      {
+        "label": "b)",
+        "left": "HCl + H₂NCH(CH₃)COOH",
+        "overArrow": "",
+        "right": "ClH₃NCH(CH₃)COOH"
+      },
+      {
+        "label": "c)",
+        "left": "H₂NCH(CH₃)COOH + NaOH",
+        "overArrow": "",
+        "right": "H₂NCH(CH₃)COONa + H₂O"
+      },
+      {
+        "label": "d)",
+        "left": "nH₂N[CH₂]₅COOH",
+        "overArrow": "xt, t⁰, p",
+        "right": "(–HN–[CH₂]₅–CO–)ₙ + nH₂O"
+      }
+    ],
+    "notes": "4rowđềumộtarrowphải,khôngequilibrium. Sourcea)productthậtH₂NCH₂CH₂COOCH₃khácethylglycinatechuẩn,PHẢIGIỮ2CH₂phíaN/methylester,đừngsửagiảđịnhđềsai. Sourceb)đãZOOM3xđọcrõClH₃N(...),C+l+H3,khôngCH3N vàkhôngionchargeđượcthêm. d)polymerroundparentheses+repeatnngoàithấpphải,giữ5vàstubhaiđầu,kHÔNGfiniteSMILES. Khôngtínhđápánamphoteric.",
+    "questions": [
+      {
+        "qid": "12-KT-C3-D2-I-13",
+        "de": "Cho các phản ứng của các amino acid trong hình dưới đây.\nTrong các phản ứng trên, phản ứng nào chứng minh tính chất lưỡng tính của amino acid?",
+        "refs": [
+          {
+            "where": "12-KT-C3-D2-I-13.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P1-D2-I-68",
+        "de": "Cho các phản ứng của các amino acid trong hình dưới đây.\nTrong các phản ứng trên, phản ứng nào chứng minh tính chất lưỡng tính của amino acid?",
+        "refs": [
+          {
+            "where": "DB-12-B9-P1-D2-I-68.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry155": {
+      "canvas": [
+        1123,
+        306
+      ],
+      "rows": [
+        {
+          "label": "a)",
+          "labelAnchor": [
+            66,
+            50
+          ],
+          "leftTextAnchor": [
+            91,
+            50
+          ],
+          "arrow": {
+            "tail": [
+              501,
+              52
+            ],
+            "head": [
+              673,
+              52
+            ]
+          },
+          "conditionAnchor": [
+            588,
+            35
+          ],
+          "rightTextAnchor": [
+            685,
+            50
+          ]
+        },
+        {
+          "label": "b)",
+          "labelAnchor": [
+            65,
+            110
+          ],
+          "leftTextAnchor": [
+            91,
+            110
+          ],
+          "arrow": {
+            "tail": [
+              481,
+              111
+            ],
+            "head": [
+              559,
+              111
+            ]
+          },
+          "rightTextAnchor": [
+            573,
+            110
+          ]
+        },
+        {
+          "label": "c)",
+          "labelAnchor": [
+            65,
+            170
+          ],
+          "leftTextAnchor": [
+            91,
+            170
+          ],
+          "arrow": {
+            "tail": [
+              512,
+              171
+            ],
+            "head": [
+              591,
+              171
+            ]
+          },
+          "rightTextAnchor": [
+            603,
+            170
+          ]
+        },
+        {
+          "label": "d)",
+          "labelAnchor": [
+            65,
+            229
+          ],
+          "leftTextAnchor": [
+            91,
+            229
+          ],
+          "arrow": {
+            "tail": [
+              373,
+              233
+            ],
+            "head": [
+              505,
+              233
+            ]
+          },
+          "conditionAnchor": [
+            441,
+            215
+          ],
+          "polymer": {
+            "leftParenthesisCenter": [
+              535,
+              232
+            ],
+            "rightParenthesisCenter": [
+              800,
+              232
+            ],
+            "repeatnAnchor": [
+              815,
+              247
+            ],
+            "backboneText": "HN–[CH₂]₅–CO",
+            "horizontalStubs": "leftcrossingparenandrightcrossingparen"
+          },
+          "byproductTextAnchor": [
+            860,
+            229
+          ]
+        }
+      ]
+    },
+    "criticalLiteral": "a)tráiH₂NCH₂COOH+CH₃CH₂OHnhưngPHẢIgiữproductH₂NCH₂CH₂COOCH₃+H₂Otheonative,đừngsửaethylester.b)productClH₃NCH(CH₃)COOHđãzoom3xđọcrõCl,gộpformulaNATIVEkhôngthêm+−.c)NaOH/saltNa/hệsốkhôngthêm.d)polymern[CH₂]₅,repeatnngoàiroundbrackets,khôngfiniteSMILES.Nocânbằnghaygiảiđápán.",
+    "diagnosticProductB": "/workspace/scratch/1379-productb-3x.png",
+    "svg": "phan-ung-ddh-50c4de1384431a0a28d63f42d3b1f64c97feb1cf81c4fc2112912261a2a96566.svg",
+    "hashSvg": "50c4de1384431a0a28d63f42d3b1f64c97feb1cf81c4fc2112912261a2a96566",
+    "byteSvg": 73144,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "4rowsa-d;productaH2NCH2CH2COOCH3literal/productbClH3NCH(CH3)COOHnochargethêm;polymerHN[CH2]5CO/ngoặcn/stubs/+nH2O,conditionsH2SO4t0 vàxtt0p.",
+    "hashSvgDaSoat": "50c4de1384431a0a28d63f42d3b1f64c97feb1cf81c4fc2112912261a2a96566",
+    "nguoiSoat": "cau_truc_4"
+  }
+]
