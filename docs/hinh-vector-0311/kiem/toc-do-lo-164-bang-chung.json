@@ -1,0 +1,40 @@
+{
+  "ghiChu": "Không đổi mốc/codeapp/tests. Hai fullrunđỏ ởnop-cau-luong-truot4đợt7D1(mốc1/3);isolatednhánh+mainxanh;fullfinal11/11xanh. Chưa kết luận nguyên nhân, cần kiểm lại trước triển khai.",
+  "lanChay": [
+    {
+      "fileScratch": "vector-speed-lo164.log",
+      "hashSha256": "36bcec503575e6465057e5722d6405ad9c5fa2caebc85803805f4fcf01c9325d",
+      "ketQua": "Cần sửa",
+      "cuoiLog": "\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯\n\n\n Test Files  1 failed | 3 passed (4)\n      Tests  1 failed | 10 passed (11)\n   Start at  16:07:16\n   Duration  6.23s (transform 11.08s, setup 806ms, import 13.30s, tests 2.65s, environment 0ms)\n",
+      "nguCanh": "nhánh đầy đủ"
+    },
+    {
+      "fileScratch": "vector-speed-lo164-rerun.log",
+      "hashSha256": "855b129d598319125899c23545a614a54b5498fa681168f1bc3a2e066e1fcd37",
+      "ketQua": "Cần sửa",
+      "cuoiLog": "\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯\n\n\n Test Files  1 failed | 3 passed (4)\n      Tests  1 failed | 10 passed (11)\n   Start at  16:07:55\n   Duration  7.30s (transform 13.61s, setup 623ms, import 16.74s, tests 2.74s, environment 0ms)\n",
+      "nguCanh": "nhánh đầy đủ"
+    },
+    {
+      "fileScratch": "vector-main-speed164.log",
+      "hashSha256": "37920c5f8d1a73d5a05682379652398b70516753673ae0a50f3658a9ffe4ae2d",
+      "ketQua": "Đạt",
+      "cuoiLog": "[nop-luong] {\"nguon\":\"som\",\"dong1Ms\":0,\"duMs\":0,\"ok\":true,\"khop\":true}\n\n·\n\n Test Files  1 passed (1)\n      Tests  1 passed (1)\n   Start at  16:09:18\n   Duration  5.02s (transform 3.70s, setup 171ms, import 4.37s, tests 358ms, environment 0ms)\n",
+      "nguCanh": "nhánh chạy riêng"
+    },
+    {
+      "fileScratch": "vector-main-clean-speed164.log",
+      "hashSha256": "47882d11eba25ff1cab084c8b555aacccd69600354b097b51b700167f7a779dc",
+      "ketQua": "Đạt",
+      "cuoiLog": "[nop-luong] {\"nguon\":\"som\",\"dong1Ms\":0,\"duMs\":0,\"ok\":true,\"khop\":true}\n\n·\n\n Test Files  1 passed (1)\n      Tests  1 passed (1)\n   Start at  16:09:24\n   Duration  6.01s (transform 4.32s, setup 208ms, import 5.12s, tests 369ms, environment 0ms)\n",
+      "nguCanh": "main sạch8513361b chạy riêng"
+    },
+    {
+      "fileScratch": "vector-speed-lo164-final.log",
+      "hashSha256": "44c2eda8652fa7159a1a19cde5f30ff0e260af7173f740defa842694c07fb176",
+      "ketQua": "Đạt",
+      "cuoiLog": "  nop-cau: 6 đợt / 9 lệnh (mốc 7 / 9)\n\n·\n\n Test Files  4 passed (4)\n      Tests  11 passed (11)\n   Start at  16:09:35\n   Duration  6.49s (transform 11.35s, setup 615ms, import 14.11s, tests 2.87s, environment 1ms)\n",
+      "nguCanh": "nhánh đầy đủ"
+    }
+  ]
+}

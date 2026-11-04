@@ -1251,3 +1251,10 @@ Phân vùng dự kiến theo hai bản thiết kế:
 - Lô162source209đãdựng nhưngROI bọtBỊLOẠIphongcách/nétbậcthang/nối,mờkhôngxácnhậntopology;KHÔNGcộng. Tìmtrùng761cùngsơđồnhưngmờhơn;795/1197khácthiếtbị. Lưuprooftìmnguồn+proofBỊLOẠI,khônghạgate/đoáncount.
 - Chromium501/501/hash/XML/path/PythonAST/build/tốcđộđạt/precache170/2613.23KiB. Mainfetch0200b893chưa gộp/WOFF2khôngdiff;phải cậpnhậtmainmớinhất/sotesttheotên/kiểmcathi trước triểnkhai. Chưa tíchhợp/chưa reload offlineapp/chưa phát hành. Chưa tham vấn được cố vấn.
 - Nhóm149xong18/20,còn1014composite/209chưađạt;59/1391vẫn bịloạiphongcách. Cóthểtiếpnguồnmớitronglúcgiảiquyếtcácnguồnnày.
+
+
+### 04/11 — Vector lô164: hai disaccharide dùng5câu
+- Thêm2nguồn/2SVG/5câu;973câu đủ mọi hình+DDH/7mộtphần;744nguồn→503SVG,7.686.139byte/gzip1.534.832,còn684nguồn.787giữ2pyranoseα1,4;1325pyranose+furanoseα1,2/từngH-OH/CH2OHvsHOCH2/6sốmỗivòng/frontboldngang/bridgeO/leader. Tác tử chỉđọc mởRIÊNG2PNGnative/full+actualrenderSVG/exacthashđạt.
+- Chromium503/503/hash/XML/path/PythonAST/buildđạt/precache170/2613.23KiB. Speedfull2lầnđỏ,isolatednhánh+mainclean8513361bđềuxanh;fullfinal11/11xanh. Khôngđổimốc/codeapp/tests. Lưubằngchứngtoc-do-lo-164-bang-chung.json;read-onlyagentpháthiệnkheharnessgoiLuongđọc dòng2trướcsnapshot,cóthểlẫnD1nền,phảixửlý/kiểmlạitrướctriểnkhai,khôngcheđỏ.
+- Mainfetch8513361bchưagộp/WOFF2khôngdiff;phải cậpnhậtmainmớinhất/sotesttheotên/kiểmcathi trước triểnkhai. Chưa tíchhợp/chưa reload offlineapp/chưa phát hành. Chưa tham vấn được cố vấn.
+- Nhóm149còn1014/209chưađạt;59/1391vẫnloạiphongcách. Nguồnmớiưu tiên736(đãmởnativechưađọchết)/675/695/840/1033/1176/1213/1214,đốimanifesttrướcdựng.
