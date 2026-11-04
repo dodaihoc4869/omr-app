@@ -1,0 +1,75 @@
+{
+  "nguoiSoat": "cau_truc_6",
+  "scope": "Read-only diff review tests/toc-do-may-chu-nop-2710.test.ts",
+  "repoModified": false,
+  "verdict": "Không thấy lỗi chặn trong bản sửa biên đo dòng1. Chấp nhận sửa harness ở phạm vi hẹp; không khẳng định đã fix mọi flaky.",
+  "reviewed": [
+    {
+      "lines": [
+        60,
+        62,
+        64
+      ],
+      "finding": "chotDo idempotent snapshot ngay;finally fallback vẫn chốt JSON/nonstream khi không có callback. Không thay budget,mốc hoặc SQL production."
+    },
+    {
+      "lines": [
+        127,
+        128,
+        129
+      ],
+      "finding": "JSON.parse dòng1 thành công rồi chotDo đồng bộ,không await ở giữa;tail reader chỉ bắt đầu sau snapshot. Lỗi parse không bị biến thành dòng1 hợp lệ."
+    },
+    {
+      "lines": [
+        69,
+        72,
+        73,
+        74,
+        75,
+        129,
+        131
+      ],
+      "finding": "Sau snapshot vẫn flush queue D1 và drain waitUntil,tail reader đã chạy trước awaitchay hoàn tất nên không tạo deadlock mới của secondwrite TransformStream. goiLuong vẫn await tail và parse full response;main test vẫn kiểmdu.ok/correct."
+    },
+    {
+      "lines": [
+        212,
+        223,
+        226,
+        237
+      ],
+      "finding": "3case0/1/4tail cho thấy snapshot không bị tăng và mọi tail D1 thực thi;negative2critical vàJSON giữdot/lenh2,vượtbudget1khôngbịche. Đây test callback/state không phải synthetic stream transport."
+    },
+    {
+      "lines": [
+        241,
+        265
+      ],
+      "finding": "Bổ sung2syntheticTransformStream thật:producer1/2D1critical rồiawaitwritefirstline,3D1tail rồiwrite2/close;consumerread/parse/chotđồngbộtrướctailread. Assertmetric1/2vàfulltailok,case2vượt1;khôngbỏdrain/khôngchecritical/khôngmớideadlock. Tailokchỉcósausau3D1nênxácnhậntailđãhoàn tất."
+    }
+  ],
+  "limitationsNotNewBugs": [
+    {
+      "finding": "D1 nền đã bắt đầu/flush TRƯỚC client đọc newline1 vẫn bị tính. Patch chỉ đóng cửa sổ SAU dòng1,trước tail đọc,không phân loại causal criticalpath/background. Không thể từ đây kết luận 4đợt/7lệnh cũ đã được giải thích hoàn toàn."
+    },
+    {
+      "finding": "ke-hoach-ngay-lai làJSON,không gọi explicitchotDo;vẫn fallbackfinally như cũ. Lỗi3đợt mốc2 chưa được xử lý/chứng minh nguyên nhân bởi patch này."
+    },
+    {
+      "finding": "Promise.allSettled(viecPhu) nuốt background rejection là hành vi trước patch;patch không làm mất awaitdrain mới. Existing actual stream test kiểm dòng2 ok nhưng synthetictail không có failure/cancel cases. Không tuyên bố toàn bộ background errors luôn được phát hiện."
+    },
+    {
+      "finding": "boDemDot.chay giới hạn10k vòng rồi awaitphu có thể treo nếu công việc bất tận;đã có trước patch,không phải regression diff."
+    }
+  ],
+  "recommendedValidation": [
+    "Đã bổ sung syntheticTransformStream thật1/2criticalD1+3tailD1:đãreviewmã,khôngthấylỗichặn. Cóthểbổsungfragmentednewline/coalescedlines/deferredorderingsau;khôngkhẳngđịnhbaoquátmọitiming.",
+    "Đối chứng streamfirstline cần2criticalD1phảiđỏmốc1;tail phát lỗi phải đượcassert thay vì chỉ allSettled. Cócasecancel/error để xác nhận không treo/drainbịbỏ.",
+    "Chạy isolated+fullparallel trênvector/main và lưu cảđỏ/xanh;khôngrerun-until-green làm bằngchứngduynhất. KhôngclaimJSONkehoachfix cho tới cótrace riêng."
+  ],
+  "testEvidence": "Parent báo5testisolatedbảntrướcxanh;đangchạytarget+3fullgatevớistreamtests. Reviewer chỉđọcdiff/mãkhôngtựchạytests.",
+  "newStreamReview": "Không thấy lỗi chặn trong2case stream mới. Đây test transport backpressure thật bổ sung cho counter callbacktests. Firstline writerwrite1chunk nên không kiểmfragmentednewline hoặc coalescedmultiplelines;khôngphảicamkếtmọistreamordering.",
+  "currentFileSha256": "c7bb1b5446623cbaa7ab23bd853b10f20647215d2d1b52cb0b8b5b0013ac081f",
+  "reviewedDiffSha256": "73d30ad1ae0d4abe2fcec68c669c8f73a65f99e1ac527ad439c1138541c4ea99"
+}

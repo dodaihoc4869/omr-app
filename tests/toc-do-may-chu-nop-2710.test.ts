@@ -52,22 +52,27 @@ function boDemDot(goc: Env['DB']) {
   db.withSession = () => db
   const raNgoai = () => new Promise<void>((r) => setImmediate(r))
   /** Chạy `viec` tới khi có phản hồi; trả số đợt chờ D1 nối tiếp và tổng số lệnh D1 trên đường trả lời. Sau đó xả hết việc phụ (không tính). */
-  async function chay<T>(viec: () => Promise<T>, viecPhu: Promise<unknown>[]): Promise<{ kq: T; dot: number; lenh: number }> {
+  async function chay<T>(viec: (chotDo: () => void) => Promise<T>, viecPhu: Promise<unknown>[]): Promise<{ kq: T; dot: number; lenh: number }> {
     let xong = false, dot = 0
     const lan0 = lan
-    const p = viec().finally(() => { xong = true })
+    let daChot = false, dotChot = 0, lenhChot = 0
+    // Chốt ngay ở biên nhận phản hồi, trước khi phía đọc tiếp luồng nhường lượt cho D1 nền.
+    const chotDo = () => {
+      if (daChot) return
+      daChot = true; dotChot = dot; lenhChot = lan - lan0 - hang.length
+    }
+    const p = viec(chotDo).finally(() => { chotDo(); xong = true })
     p.catch(() => {})
     for (;;) {
       await raNgoai()
       if (xong) break
-      if (hang.length) { dot++; for (const f of hang.splice(0)) f() }
+      if (hang.length) { if (!daChot) dot++; for (const f of hang.splice(0)) f() }
     }
-    const lenh = lan - lan0 - hang.length
     let phuXong = false
     const phu = Promise.allSettled(viecPhu).finally(() => { phuXong = true })
     for (let i = 0; i < 10_000 && !(phuXong && !hang.length); i++) { await raNgoai(); for (const f of hang.splice(0)) f() }
     await phu
-    return { kq: await p, dot, lenh }
+    return { kq: await p, dot: dotChot, lenh: lenhChot }
   }
   return { db: db as unknown as Env['DB'], chay }
 }
@@ -113,13 +118,15 @@ async function goiLuong(k: Awaited<ReturnType<typeof kho>>, than: Record<string,
   const viecPhu: Promise<unknown>[] = []
   const ctx = { waitUntil: (p: Promise<unknown>) => { viecPhu.push(p) }, passThroughOnException() {} }
   let conLai: Promise<string> = Promise.resolve('')
-  const r = await k.bo.chay(async () => {
+  const r = await k.bo.chay(async (chotDo) => {
     const res = await worker.fetch(new Request('https://test/game-v2/answer', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...than, luong: 1, token: k.token }) }), k.env, ctx as never)
     if (!/ndjson/.test(res.headers.get('content-type') ?? '')) return { ...(await res.json()) as Record<string, unknown>, __khongLuong: true }
     const doc = res.body!.getReader(), gm = new TextDecoder()
     let dem = ''
     for (;;) { const { value, done } = await doc.read(); if (value) dem += gm.decode(value, { stream: true }); const i = dem.indexOf('\n'); if (i >= 0 || done) { const d1 = dem.slice(0, i >= 0 ? i : undefined); dem = dem.slice(i + 1)
-      conLai = (async () => { for (;;) { const x = await doc.read(); if (x.value) dem += gm.decode(x.value, { stream: true }); if (x.done) return dem } })(); return JSON.parse(d1) as Record<string, unknown> } }
+      const dongDau = JSON.parse(d1) as Record<string, unknown>
+      chotDo()
+      conLai = (async () => { for (;;) { const x = await doc.read(); if (x.value) dem += gm.decode(x.value, { stream: true }); if (x.done) return dem } })(); return dongDau } }
   }, viecPhu)
   const du = (await conLai).trim()
   return { ...r, du: du ? JSON.parse(du.split('\n').pop()!) as Record<string, unknown> : null }
@@ -199,4 +206,60 @@ it('nút «Kiểm tra» (answer) và lệnh đếm sau câu: số đợt chờ D
   if (ha.length) console.info(`Nhanh hơn mốc — hạ mốc trong docs/moc-toc-do.json:\n  ${ha.join('\n  ')}`)
   expect(thieuMoc, 'thiếu mốc mayChuNop').toEqual([])
   expect(vuot, 'CHẬM HƠN bản trước — làm lại cho nhanh bằng/hơn rồi mới đẩy').toEqual([])
+})
+
+
+it.each([0, 1, 4])('đóng phép đo dòng đầu trước %i đợt D1 nền, vẫn xả hết phần còn lại', async (soDotNen) => {
+  const ketQua: number[] = []
+  const goc = { prepare: () => ({ first: async () => { ketQua.push(1); return 1 } }) } as unknown as Env['DB']
+  const bo = boDemDot(goc), phu: Promise<unknown>[] = []
+  const r = await bo.chay(async (chotDo) => {
+    await bo.db.prepare('critical').first()
+    chotDo()
+    phu.push((async () => { for (let i = 0; i < soDotNen; i++) await bo.db.prepare('tail').first() })())
+    return 'dòng đầu'
+  }, phu)
+  expect(r).toEqual({ kq: 'dòng đầu', dot: 1, lenh: 1 })
+  expect(ketQua).toHaveLength(1 + soDotNen)
+})
+
+it('phép đo không giấu hai đợt D1 thật trước dòng đầu hoặc phản hồi JSON', async () => {
+  for (const chotSom of [true, false]) {
+    const goc = { prepare: () => ({ first: async () => 1 }) } as unknown as Env['DB']
+    const bo = boDemDot(goc)
+    const r = await bo.chay(async (chotDo) => {
+      await bo.db.prepare('critical-1').first()
+      await bo.db.prepare('critical-2').first()
+      if (chotSom) chotDo()
+      return 'đủ'
+    }, [])
+    expect(r.dot).toBe(2); expect(r.lenh).toBe(2)
+    expect(r.dot).toBeGreaterThan(1) // Đối chứng âm: mốc một đợt vẫn bị vượt.
+  }
+})
+
+it.each([1, 2])('TransformStream thật: tính đủ %i đợt trước newline1, không tính ba đợt của dòng2', async (soDotDau) => {
+  const goc = { prepare: () => ({ first: async () => 1 }) } as unknown as Env['DB']
+  const bo = boDemDot(goc), phu: Promise<unknown>[] = []
+  let du: Promise<string> = Promise.resolve('')
+  const r = await bo.chay(async (chotDo) => {
+    const stream = new TransformStream<Uint8Array, Uint8Array>(), ghi = stream.writable.getWriter()
+    const ma = new TextEncoder()
+    phu.push((async () => {
+      for (let i = 0; i < soDotDau; i++) await bo.db.prepare('trước dòng1').first()
+      await ghi.write(ma.encode('{"tam":true}\n'))
+      for (let i = 0; i < 3; i++) await bo.db.prepare('sau dòng1').first()
+      await ghi.write(ma.encode('{"ok":true}\n')); await ghi.close()
+    })())
+    const doc = stream.readable.getReader(), gm = new TextDecoder()
+    const dau = await doc.read(), text = gm.decode(dau.value)
+    expect(text.endsWith('\n')).toBe(true)
+    const kq = JSON.parse(text) as { tam: boolean }
+    chotDo()
+    du = (async () => { let text = ''; for (;;) { const x = await doc.read(); if (x.value) text += gm.decode(x.value); if (x.done) return text } })()
+    return kq
+  }, phu)
+  expect(r).toEqual({ kq: { tam: true }, dot: soDotDau, lenh: soDotDau })
+  expect(JSON.parse(await du)).toEqual({ ok: true })
+  if (soDotDau === 2) expect(r.dot).toBeGreaterThan(1)
 })

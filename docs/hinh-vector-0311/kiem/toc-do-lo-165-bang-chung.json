@@ -1,0 +1,47 @@
+{
+  "ghiChu": "Snapshotcallback tại newline1 đã được sửa và đối chứngStream thật/negative đã qua;chưa sửa mọi race/phụ thuộc thực.3fullrun15/15xanh;thêm2Streamtestfull17/17xanh1lượt, lượt2đỏJSONkehoach3đợtvsmốc2vàluongtruot4/7vsmốc1/3. Khônghạ/nângmốc,khôngtựxóabằngchứngđỏ,CHƯAPUSHcheckpointmới. Cầntrace critical/background enqueue/flush/firstline/JSONsettle đểsửađúnglớp.",
+  "lanChay": [
+    {
+      "fileScratch": "vector-harness165.log",
+      "hash": "15644fd447bb45d509ffa0e9183c3a4269df005f28c51042cc63955c5c0f2421",
+      "ketQua": "Đạt",
+      "cuoiLog": "stdout | tests/toc-do-may-chu-nop-2710.test.ts > nút «Kiểm tra» (answer) và lệnh đếm sau câu: số đợt chờ D1 không vượt mốc bản trước\n[nop-luong] {\"nguon\":\"som\",\"dong1Ms\":0,\"duMs\":0,\"ok\":true,\"khop\":true}\n\n·····\n\n Test Files  1 passed (1)\n      Tests  5 passed (5)\n   Start at  16:59:24\n   Duration  4.98s (transform 3.75s, setup 185ms, import 4.37s, tests 300ms, environment 0ms)\n"
+    },
+    {
+      "fileScratch": "vector-harness165-stream.log",
+      "hash": "a06e0099d4d1cab4496bbc793184a69f0363bebd047cc4b26473303973254927",
+      "ketQua": "Đạt",
+      "cuoiLog": "stdout | tests/toc-do-may-chu-nop-2710.test.ts > nút «Kiểm tra» (answer) và lệnh đếm sau câu: số đợt chờ D1 không vượt mốc bản trước\n[nop-luong] {\"nguon\":\"som\",\"dong1Ms\":0,\"duMs\":0,\"ok\":true,\"khop\":true}\n\n·······\n\n Test Files  1 passed (1)\n      Tests  7 passed (7)\n   Start at  17:03:37\n   Duration  4.55s (transform 3.42s, setup 183ms, import 3.94s, tests 298ms, environment 0ms)\n"
+    },
+    {
+      "fileScratch": "vector-speed-lo165-1.log",
+      "hash": "d3cff8aedd1d28500982f56818c26b5f672a9c82b3e86c3df275d5dc34a2590b",
+      "ketQua": "Đạt",
+      "cuoiLog": "  sanh-lan-dau: 12 đợt / 20 lệnh (mốc 12 / 25)\n  sanh-lan-sau: 1 đợt / 2 lệnh (mốc 1 / 3)\n\n·\n\n Test Files  4 passed (4)\n      Tests  15 passed (15)\n   Start at  17:01:52\n   Duration  6.58s (transform 11.85s, setup 617ms, import 14.68s, tests 2.84s, environment 0ms)\n"
+    },
+    {
+      "fileScratch": "vector-speed-lo165-2.log",
+      "hash": "e3388bebdd6c5a0f570b3834df4034af57f2f2466f86e0a19a225f0e06503f39",
+      "ketQua": "Đạt",
+      "cuoiLog": "  sanh-lan-dau: 12 đợt / 20 lệnh (mốc 12 / 25)\n  sanh-lan-sau: 1 đợt / 2 lệnh (mốc 1 / 3)\n\n·\n\n Test Files  4 passed (4)\n      Tests  15 passed (15)\n   Start at  17:02:00\n   Duration  6.29s (transform 11.35s, setup 574ms, import 14.06s, tests 2.64s, environment 0ms)\n"
+    },
+    {
+      "fileScratch": "vector-speed-lo165-3.log",
+      "hash": "2aeb9a7c42003b49402e1d97984cc73346298585033f846a1f6f6f99bf0677b3",
+      "ketQua": "Đạt",
+      "cuoiLog": "  sanh-lan-dau: 12 đợt / 20 lệnh (mốc 12 / 25)\n  sanh-lan-sau: 1 đợt / 2 lệnh (mốc 1 / 3)\n\n·\n\n Test Files  4 passed (4)\n      Tests  15 passed (15)\n   Start at  17:02:06\n   Duration  6.56s (transform 11.31s, setup 683ms, import 13.96s, tests 2.71s, environment 0ms)\n"
+    },
+    {
+      "fileScratch": "vector-speed-lo165-stream1.log",
+      "hash": "2904a1a438c057ce173574022a8a955a89f7d4f20edbb583cd74e0745fdc1fe5",
+      "ketQua": "Đạt",
+      "cuoiLog": "  sanh-lan-dau: 12 đợt / 20 lệnh (mốc 12 / 25)\n  sanh-lan-sau: 1 đợt / 2 lệnh (mốc 1 / 3)\n\n·\n\n Test Files  4 passed (4)\n      Tests  17 passed (17)\n   Start at  17:03:42\n   Duration  6.02s (transform 10.62s, setup 683ms, import 12.89s, tests 2.40s, environment 0ms)\n"
+    },
+    {
+      "fileScratch": "vector-speed-lo165-stream2.log",
+      "hash": "db0ce44a3e86d976dd0a7be228ee23cd1057e2afff2dcaa465ede76a587323de",
+      "ketQua": "Chưa đạt",
+      "cuoiLog": "    210|\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯\n\n\n Test Files  1 failed | 3 passed (4)\n      Tests  1 failed | 16 passed (17)\n   Start at  17:03:49\n   Duration  5.97s (transform 10.33s, setup 535ms, import 12.84s, tests 2.59s, environment 0ms)\n"
+    }
+  ]
+}

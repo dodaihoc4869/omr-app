@@ -1,0 +1,59 @@
+[
+  {
+    "i": 675,
+    "hash": "7cb2e8034c07ec64317e0f9f9ea732f2daa7dc4870420c5551231f0994562d8a",
+    "fileNguon": "anh/7cb2e8034c07ec64317e0f9f9ea732f2daa7dc4870420c5551231f0994562d8a.png",
+    "questions": [
+      {
+        "qid": "12-BD7-21-II-1",
+        "de": "Ngô và mía là hai nguyên liệu chính được sử dụng trong sản xuất ethanol. Tuy nhiên, chúng là những loại cây lương thực quan trọng. Trong khi đó, cellulose – một nguồn nguyên liệu dồi dào và dễ tìm - cũng có thể dùng để sản xuất ethanol.\nTuy giá thành sản xuất ethanol từ cellulose còn cao, do quá trình nuôi cấy nấm sản sinh enzyme cellulase để thuỷ phân cellulose thành glucose tốn kém nhiều năng lượng, nhưng đây vẫn là một hướng đi đầy hứa hẹn trong tương lai. Cấu trúc cellulose cho ở hình dưới.",
+        "refs": [
+          {
+            "where": "12-BD7-21-II-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "12-C2-B6-D1-II-3",
+        "de": "Ngô và mía là hai nguyên liệu chính được sử dụng trong sản xuất ethanol. Tuy nhiên, chúng là những loại cây lương thực quan trọng. Trong khi đó, cellulose – một nguồn nguyên liệu dồi dào và dễ tìm - cũng có thể dùng để sản xuất ethanol.\nTuy giá thành sản xuất ethanol từ cellulose còn cao, do quá trình nuôi cấy nấm sản sinh enzyme cellulase để thuỷ phân cellulose thành glucose tốn kém nhiều năng lượng, nhưng đây vẫn là một hướng đi đầy hứa hẹn trong tương lai. Cấu trúc cellulose cho ở hình dưới.",
+        "refs": [
+          {
+            "where": "12-C2-B6-D1-II-3.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D2-II-38",
+        "de": "Ngô và mía là hai nguyên liệu chính được sử dụng trong sản xuất ethanol. Tuy nhiên, chúng là những loại cây lương thực quan trọng. Trong khi đó, cellulose – một nguồn nguyên liệu dồi dào và dễ tìm - cũng có thể dùng để sản xuất ethanol.\nTuy giá thành sản xuất ethanol từ cellulose còn cao, do quá trình nuôi cấy nấm sản sinh enzyme cellulase để thuỷ phân cellulose thành glucose tốn kém nhiều năng lượng, nhưng đây vẫn là một hướng đi đầy hứa hẹn trong tương lai. Cấu trúc cellulose cho ở hình dưới.",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-II-38.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D2-II-66",
+        "de": "Ngô và mía là hai nguyên liệu chính được sử dụng trong sản xuất ethanol. Tuy nhiên, chúng là những loại cây lương thực quan trọng. Trong khi đó, cellulose – một nguồn nguyên liệu dồi dào và dễ tìm - cũng có thể dùng để sản xuất ethanol.\nTuy giá thành sản xuất ethanol từ cellulose còn cao, do quá trình nuôi cấy nấm sản sinh enzyme cellulase để thuỷ phân cellulose thành glucose tốn kém nhiều năng lượng, nhưng đây vẫn là một hướng đi đầy hứa hẹn trong tương lai. Cấu trúc cellulose cho ở hình dưới.",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-II-66.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daMoNative": true,
+    "svg": "chair-polymer-ddh-5308efb9f40c37e2ea219bfaa0368f74c481ffe5c6a8d4df5ac334db807d9c3a.svg",
+    "hashSvg": "5308efb9f40c37e2ea219bfaa0368f74c481ffe5c6a8d4df5ac334db807d9c3a",
+    "byteSvg": 9292,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "2chair/3OHmỗivòng/2ringO+2bridgeO/ngoặc2đầu+stubs+n;giữđộđậmnguồnkhônggánCIP/khôngthêmH/sốC.",
+    "hashSvgDaSoat": "5308efb9f40c37e2ea219bfaa0368f74c481ffe5c6a8d4df5ac334db807d9c3a",
+    "nguoiSoat": "cau_truc_4"
+  }
+]
