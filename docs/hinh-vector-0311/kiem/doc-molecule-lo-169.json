@@ -64,8 +64,11 @@
         ]
       }
     ],
-    "chiLaDuLieuDungChuaSoatRender": true,
-    "daCoManifestTaiCheckpoint168": false
+    "chiLaDuLieuDungChuaSoatRender": false,
+    "daCoManifestTaiCheckpoint": true,
+    "hashSvgDaSoatTaiCheckpoint": "6730ae08bff9134ed0ef0ac041ab62947ce4bc517604200da188af55e389915b",
+    "tepSvgDaSoatTaiCheckpoint": "ms-nhom169-ddh-6730ae08bff9134ed0ef0ac041ab62947ce4bc517604200da188af55e389915b.svg",
+    "ghiChuRootCheckpoint": "Đã dựng và soát độc lập qua metadata/proof169–171;KHÔNGdựngtrùng."
   },
   {
     "i": 907,
@@ -132,8 +135,11 @@
         ]
       }
     ],
-    "chiLaDuLieuDungChuaSoatRender": true,
-    "daCoManifestTaiCheckpoint168": false
+    "chiLaDuLieuDungChuaSoatRender": false,
+    "daCoManifestTaiCheckpoint": true,
+    "hashSvgDaSoatTaiCheckpoint": "6730ae08bff9134ed0ef0ac041ab62947ce4bc517604200da188af55e389915b",
+    "tepSvgDaSoatTaiCheckpoint": "ms-nhom169-ddh-6730ae08bff9134ed0ef0ac041ab62947ce4bc517604200da188af55e389915b.svg",
+    "ghiChuRootCheckpoint": "Đã dựng và soát độc lập qua metadata/proof169–171;KHÔNGdựngtrùng."
   },
   {
     "i": 998,
@@ -199,61 +205,11 @@
         ]
       }
     ],
-    "chiLaDuLieuDungChuaSoatRender": true,
-    "daCoManifestTaiCheckpoint168": false
-  },
-  {
-    "i": 634,
-    "hash": "7528960cd4e8203592e7f30ab451dc371d554cedc2882528065fa397f910ae00",
-    "fileNguon": "anh/7528960cd4e8203592e7f30ab451dc371d554cedc2882528065fa397f910ae00.png",
-    "canvas": [
-      241,
-      196
-    ],
-    "daMoNative": true,
-    "kind": "MS-two-equal-unlabelled-peaks",
-    "xLabel": "m/z",
-    "yLabel": "Phần trăm số nguyên tử đồng vị (%)",
-    "xLabels": [
-      20,
-      40,
-      60,
-      80,
-      100
-    ],
-    "yLabels": [
-      0,
-      20,
-      40,
-      60,
-      80
-    ],
-    "notes": "2peakđenmảnhcaobằngnhau~50%,nativex164/169từbaseliney155lên~66. KHÔNGcótextm/z63/65hay%sốtrênpeak,đừngtựsuytừstemCu. Axisorigin57,155,xticks90/123/157/190/223.Y80ở16.Xrange0..100shapeonly,noarrows/khungtopright/guide.",
-    "questions": [
-      {
-        "qid": "DB-10-B2-D2-I-127",
-        "de": "Đồng có hai đồng vị bền trong tự nhiên là ⁶³Cu và ⁶⁵Cu.\nNguyên tử khối trung bình của đồng là 63,55 (điện tích z của các ion đồng vị đồng đều bằng 1+).\nHình vẽ phổ khối nào dưới đây là đúng?",
-        "refs": [
-          {
-            "where": "DB-10-B2-D2-I-127.hinh.1.du_lieu",
-            "viTri": "sau_pa_B"
-          }
-        ]
-      },
-      {
-        "qid": "DH-10-C1-B4-D1-I-8",
-        "de": "Đồng có hai đồng vị bền trong tự nhiên là ⁶³Cu và ⁶⁵Cu.\nNguyên tử khối trung bình của đồng là 63,55 (điện tích z của các ion đồng vị đồng đều bằng 1+).\nHình vẽ phổ khối nào dưới đây là đúng?",
-        "refs": [
-          {
-            "where": "DH-10-C1-B4-D1-I-8.hinh.1.du_lieu",
-            "viTri": "sau_pa_B"
-          }
-        ]
-      }
-    ],
-    "chiLaDuLieuDungChuaSoatRender": true,
-    "daCoManifestTaiCheckpoint168": true,
-    "luuYRoot": "Đã đạt ởmanifest,KHÔNGdựngtrùng/khôngcộngnguồnmới;chỉlànguồnđốichiếuchoảnhkhác."
+    "chiLaDuLieuDungChuaSoatRender": false,
+    "daCoManifestTaiCheckpoint": true,
+    "hashSvgDaSoatTaiCheckpoint": "90a1cf07d492237a7afc98416c924827cbbd34f7c5f8b8ed2fcaced2b9e8b752",
+    "tepSvgDaSoatTaiCheckpoint": "ms-nhom169-ddh-90a1cf07d492237a7afc98416c924827cbbd34f7c5f8b8ed2fcaced2b9e8b752.svg",
+    "ghiChuRootCheckpoint": "Đã dựng và soát độc lập qua metadata/proof169–171;KHÔNGdựngtrùng."
   },
   {
     "i": 1018,
@@ -304,7 +260,1444 @@
         ]
       }
     ],
+    "chiLaDuLieuDungChuaSoatRender": false,
+    "daCoManifestTaiCheckpoint": true,
+    "hashSvgDaSoatTaiCheckpoint": "49f4dafc8435fc447b54b01956764fdece4c5acb70ee019bfe19ce3c4f5f587f",
+    "tepSvgDaSoatTaiCheckpoint": "ms-nhom169-ddh-49f4dafc8435fc447b54b01956764fdece4c5acb70ee019bfe19ce3c4f5f587f.svg",
+    "ghiChuRootCheckpoint": "Đã dựng và soát độc lập qua metadata/proof169–171;KHÔNGdựngtrùng."
+  },
+  {
+    "i": 636,
+    "hash": "761f47231086dee0479786db1f40cf1a9d8de1f6183b6f600d7ed6ebd7abef78",
+    "fileNguon": "anh/761f47231086dee0479786db1f40cf1a9d8de1f6183b6f600d7ed6ebd7abef78.png",
+    "canvas": [
+      600,
+      560
+    ],
+    "daMoNative": true,
+    "kind": "MS-magnesium-three-peaks",
+    "xLabel": "Tỉ lệ nguyên tử khối/điện tích (m/z)",
+    "yLabel": "Phần trăm số nguyên tử đồng vị (%)",
+    "peaks": [
+      {
+        "mz": 24,
+        "label": "79"
+      },
+      {
+        "mz": 25,
+        "label": "10"
+      },
+      {
+        "mz": 26,
+        "label": "11"
+      }
+    ],
+    "notes": "Native636đãmởRIÊNG,cùngnộidung998khácscale:79/10/11KHÔNG%trênbar,Ykhôngbấtkỳsố/ticks. CácXlabels24/25/26và4XticksKHÔNGsốởgiữagiữa/phảinguồn,khôngtựđiềnsố. Axisnoupperrightframe/noarrow/grid. Khôngtựđổithành80/10/10theobiểukhác1207.",
+    "questions": [
+      {
+        "qid": "DB-10-B2-D2-III-111",
+        "de": "Từ phổ khối lượng MS của magnesium (Mg) ở hình dưới đây: Hãy cho biết giá trị nguyên tử khối trung bình của magnesium là bao nhiêu?\nBiết z = 1. (Kết quả làm tròn kết quả đến hàng phần mười).",
+        "refs": [
+          {
+            "where": "DB-10-B2-D2-III-111.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B2-III-14",
+        "de": "Từ phổ khối lượng MS của magnesium (Mg) ở hình dưới đây: Hãy cho biết giá trị nguyên tử khối trung bình của magnesium là bao nhiêu?\nBiết z = 1. (Kết quả làm tròn kết quả đến hàng phần mười).",
+        "refs": [
+          {
+            "where": "DH-10-C1-B2-III-14.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "chiLaDuLieuDungChuaSoatRender": false,
+    "daCoManifestTaiCheckpoint": true,
+    "hashSvgDaSoatTaiCheckpoint": "90a1cf07d492237a7afc98416c924827cbbd34f7c5f8b8ed2fcaced2b9e8b752",
+    "tepSvgDaSoatTaiCheckpoint": "ms-nhom169-ddh-90a1cf07d492237a7afc98416c924827cbbd34f7c5f8b8ed2fcaced2b9e8b752.svg",
+    "ghiChuRootCheckpoint": "Đã dựng và soát độc lập qua metadata/proof169–171;KHÔNGdựngtrùng."
+  },
+  {
+    "i": 535,
+    "hash": "653638eb044b95417dd6a82759c8957852dc277cc6174d285e5d942de28d9e3b",
+    "fileNguon": "anh/653638eb044b95417dd6a82759c8957852dc277cc6174d285e5d942de28d9e3b.png",
+    "canvas": [
+      415,
+      336
+    ],
+    "daMoNative": true,
+    "kind": "MS-Cu-option-two-unlabelled-peaks",
+    "xLabel": "m/z",
+    "yLabel": "Phần trăm số nguyên tử đồng vị (%)",
+    "xLabels": [
+      20,
+      40,
+      60,
+      80,
+      100
+    ],
+    "yLabels": [
+      0,
+      20,
+      40,
+      60,
+      80
+    ],
+    "notes": "5352peaktráicao/phảithấp,nativeorigin114255,peaksx273topy70và281topy186. SourceKHÔNGtextmassm/z63/65hay%trênpeak;plotgeo/ticksphảigiữnguồnkhôngtựgánnumberscụthểtừstemCu.Vềschemađượcsoátbase870/1297nếurootđãđạt,nhưngCHƯAalias/renderđạt.",
+    "questions": [
+      {
+        "qid": "10-C1-B2-I-58",
+        "de": "Đồng có hai đồng vị bền trong tự nhiên là ⁶³Cu và ⁶⁵Cu.\nNguyên tử khối trung bình của đồng là 63,55 (điện tích z của các ion đồng vị đồng đều bằng 1+).\nHình vẽ phổ khối nào dưới đây là đúng?",
+        "refs": [
+          {
+            "where": "10-C1-B2-I-58.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      },
+      {
+        "qid": "DB-10-B2-D2-I-29",
+        "de": "Đồng có hai đồng vị bền trong tự nhiên là ⁶³Cu và ⁶⁵Cu.\nNguyên tử khối trung bình của đồng là 63,55 (điện tích z của các ion đồng vị đồng đều bằng 1+).\nHình vẽ phổ khối nào dưới đây là đúng?",
+        "refs": [
+          {
+            "where": "DB-10-B2-D2-I-29.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      }
+    ],
+    "chiLaDuLieuDungChuaSoatRender": false,
+    "daCoManifestTaiCheckpoint": true,
+    "hashSvgDaSoatTaiCheckpoint": "a39a6aed14a0fa6968544c9706e02c65b48624346c49a0e3758465fa4822ed4a",
+    "tepSvgDaSoatTaiCheckpoint": "ms-pa-ddh-a39a6aed14a0fa6968544c9706e02c65b48624346c49a0e3758465fa4822ed4a.svg",
+    "ghiChuRootCheckpoint": "Đã dựng và soát độc lập qua metadata/proof169–171;KHÔNGdựngtrùng."
+  },
+  {
+    "i": 692,
+    "hash": "8039b74dce86a563f589275fd79ccf04bcd29716c3345d7abaf6724585d2c18d",
+    "fileNguon": "anh/8039b74dce86a563f589275fd79ccf04bcd29716c3345d7abaf6724585d2c18d.png",
+    "canvas": [
+      406,
+      339
+    ],
+    "daMoNative": true,
+    "kind": "MS-Cu-option-two-unlabelled-peaks",
+    "xLabel": "m/z",
+    "yLabel": "Phần trăm số nguyên tử đồng vị (%)",
+    "xLabels": [
+      20,
+      40,
+      60,
+      80,
+      100
+    ],
+    "yLabels": [
+      0,
+      20,
+      40,
+      60,
+      80
+    ],
+    "notes": "6922peaktráithấp/phảicao,nativeorigin112248,peaksx269topy177và277topy58. SourceKHÔNGtextmassm/z63/65hay%trênpeak;plotgeo/ticksphảigiữnguồnkhôngtựgánnumberscụthểtừstemCu.Vềschemađượcsoátbase870/1297nếurootđãđạt,nhưngCHƯAalias/renderđạt.",
+    "questions": [
+      {
+        "qid": "10-C1-B2-I-58",
+        "de": "Đồng có hai đồng vị bền trong tự nhiên là ⁶³Cu và ⁶⁵Cu.\nNguyên tử khối trung bình của đồng là 63,55 (điện tích z của các ion đồng vị đồng đều bằng 1+).\nHình vẽ phổ khối nào dưới đây là đúng?",
+        "refs": [
+          {
+            "where": "10-C1-B2-I-58.hinh.2.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      },
+      {
+        "qid": "DB-10-B2-D2-I-29",
+        "de": "Đồng có hai đồng vị bền trong tự nhiên là ⁶³Cu và ⁶⁵Cu.\nNguyên tử khối trung bình của đồng là 63,55 (điện tích z của các ion đồng vị đồng đều bằng 1+).\nHình vẽ phổ khối nào dưới đây là đúng?",
+        "refs": [
+          {
+            "where": "DB-10-B2-D2-I-29.hinh.2.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      }
+    ],
+    "chiLaDuLieuDungChuaSoatRender": false,
+    "daCoManifestTaiCheckpoint": true,
+    "hashSvgDaSoatTaiCheckpoint": "b4180b53528fde3cb89691cd4c38df1cb8e0f5f53ccca638d6d2e8de7fc2785c",
+    "tepSvgDaSoatTaiCheckpoint": "ms-pa-ddh-b4180b53528fde3cb89691cd4c38df1cb8e0f5f53ccca638d6d2e8de7fc2785c.svg",
+    "ghiChuRootCheckpoint": "Đã dựng và soát độc lập qua metadata/proof169–171;KHÔNGdựngtrùng."
+  },
+  {
+    "i": 203,
+    "hash": "224ea7b1fb3a13b22e285f41588d4bb7e41d019eee3eb04681253ec52e63474b",
+    "fileNguon": "anh/224ea7b1fb3a13b22e285f41588d4bb7e41d019eee3eb04681253ec52e63474b.png",
+    "canvas": [
+      686,
+      442
+    ],
+    "daMoNative": true,
+    "kind": "MS-organic-labelled-peaks",
+    "xLabel": "m/z",
+    "yLabel": "Cường độ tương đối (%)",
+    "xTickLabels": [
+      10,
+      15,
+      20,
+      25,
+      30,
+      35,
+      40,
+      45,
+      50,
+      55,
+      60
+    ],
+    "yTickLabels": [
+      0,
+      20,
+      40,
+      60,
+      80,
+      100
+    ],
+    "labelledMz": [
+      15,
+      18,
+      27,
+      28,
+      30,
+      39,
+      41,
+      58,
+      59
+    ],
+    "molecularLabel": "[M]⁺ at 59",
+    "notes": "1plot4cạnh,basepeak30reaches100Ytop,59[M]⁺ởphải9–10%height.Mỗi15/18/27/28/39/41/58cũngcólabeltrênbar,giữtấtcả. Source203cùngbộpublicstem1176vừasoát168nênưu tiênrootđốinguồncùngbodycandidate1176.HairlinesprèsbaselinevàđốmscanKHÔNGđượccoitấtcảlàpeak;CHƯAchốtsốtấtcảminipeaks,nếutựdựngcầnmởfull/zoomtracemasktheonguồn,chưaduyệtallbars.",
+    "questions": [
+      {
+        "qid": "DB-12-B8-D1-I-293",
+        "de": "Kết quả phân tích nguyên tố cho thấy trong hợp chất X: carbon chiếm 61,02%; hydrogen chiếm 15,25%; còn lại là nitrogen về khối lượng.\nTừ phổ khối lượng của X xác định được giá trị m/z của peak [M⁺] bằng 59.\nCông thức phân tử của X là",
+        "refs": [
+          {
+            "where": "DB-12-B8-D1-I-293.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B11-D1-I-16",
+        "de": "Kết quả phân tích nguyên tố cho thấy trong hợp chất X: carbon chiếm 61,02%; hydrogen chiếm 15,25%; còn lại là nitrogen về khối lượng.\nTừ phổ khối lượng của X xác định được giá trị m/z của peak [M⁺] bằng 59.\nCông thức phân tử của X là",
+        "refs": [
+          {
+            "where": "DH-12-C3-B11-D1-I-16.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "chiLaDuLieuDungChuaSoatRender": false,
+    "daCoManifestTaiCheckpoint": true,
+    "hashSvgDaSoatTaiCheckpoint": "ff2b4012b9494638bb7d71840e6bfd478247087463fced150506d789922334d4",
+    "tepSvgDaSoatTaiCheckpoint": "ms-ddh-ff2b4012b9494638bb7d71840e6bfd478247087463fced150506d789922334d4.svg",
+    "ghiChuRootCheckpoint": "Đã dựng và soát độc lập qua metadata/proof169–171;KHÔNGdựngtrùng."
+  },
+  {
+    "i": 765,
+    "hash": "8ec3f9d772b36a656b81c9367127d6930dcdc2c2c25d3b8df8caea633753badb",
+    "fileNguon": "anh/8ec3f9d772b36a656b81c9367127d6930dcdc2c2c25d3b8df8caea633753badb.png",
+    "canvas": [
+      579,
+      294
+    ],
+    "daMoNative": true,
+    "kind": "MS-ester-single-plot",
+    "xLabel": "m/z",
+    "yLabel": "Cường độ tương đối (%)",
+    "xTickLabels": [
+      10,
+      20,
+      30,
+      40,
+      50,
+      60,
+      70
+    ],
+    "yTickLabels": [
+      0,
+      20,
+      40,
+      60,
+      80,
+      100
+    ],
+    "geometry": {
+      "plotBox": [
+        81,
+        7,
+        543,
+        248
+      ],
+      "prominentBarPixels": [
+        [
+          120,
+          203,
+          248
+        ],
+        [
+          219,
+          236,
+          248
+        ],
+        [
+          227,
+          139,
+          248
+        ],
+        [
+          235,
+          233,
+          248
+        ],
+        [
+          243,
+          8,
+          248
+        ],
+        [
+          251,
+          139,
+          248
+        ],
+        [
+          466,
+          157,
+          248
+        ]
+      ]
+    },
+    "notes": "CácbarKHÔNGlabelsriêngvàKHÔNG[M]marker. Đừngtựghi15/27/28/29/30/31/60trênbarvìnativechỉaxislabels. Parentplotgiữ4frame/minorticks.HairlinestinybaselinecòncầnsoátzoomtracemaskCHƯAchốttotalpeakcount,vìcóđốmscan/axisminor.Nhóm3qidnguồn765đọcđủfullđểđềxuấtdựng,cácyheightpixelkhôngphảiinferredchemanswer.",
+    "questions": [
+      {
+        "qid": "DH-12-C1-B1-P1-II-14",
+        "de": "Phổ khối lượng của ester E được cho ở hình dưới đây:",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P1-II-14.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B1-P1-II-29",
+        "de": "Phổ khối lượng của ester mạch hở E được cho ở hình dưới đây:",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P1-II-29.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B1-P1-VD-II-1",
+        "de": "Phổ khối lượng của ester mạch hở E được cho ở hình dưới đây:",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P1-VD-II-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
     "chiLaDuLieuDungChuaSoatRender": true,
-    "daCoManifestTaiCheckpoint168": false
+    "daCoManifestTaiCheckpoint": false
+  },
+  {
+    "i": 1195,
+    "hash": "d870a8f44437563c0509c17e0b33d23fb0e4b5d422193822aa75b441e685b955",
+    "fileNguon": "anh/d870a8f44437563c0509c17e0b33d23fb0e4b5d422193822aa75b441e685b955.png",
+    "canvas": [
+      514,
+      361
+    ],
+    "daMoNative": true,
+    "kind": "MS-sulfur",
+    "xLabel": "m/z",
+    "yLabel": "Cường độ tương đối (%)",
+    "xTickLabels": [
+      30,
+      60,
+      90,
+      120,
+      150,
+      180,
+      210,
+      240,
+      270
+    ],
+    "yTickLabels": [
+      0,
+      20,
+      40,
+      60,
+      80,
+      100,
+      120
+    ],
+    "geometry": {
+      "origin": [
+        65,
+        305
+      ],
+      "topY": 10,
+      "prominentBarsPixels": [
+        [
+          160,
+          92,
+          305
+        ],
+        [
+          204,
+          253,
+          305
+        ],
+        [
+          249,
+          204,
+          305
+        ],
+        [
+          295,
+          163,
+          305
+        ],
+        [
+          345,
+          254,
+          305
+        ],
+        [
+          392,
+          295,
+          305
+        ],
+        [
+          434,
+          129,
+          305
+        ],
+        [
+          442,
+          248,
+          305
+        ]
+      ]
+    },
+    "molecularLabel": "[M⁺] = 256",
+    "notes": "Nguồn[M⁺]=256labeltrênbarphảiRÕ,khôngsuySatommultiple/câutrảlời.Largestsignaltráiy100nearx160,molecularbar256height~80.CácbarKHÔNGmzlabelsriêng,khôngtựgắn64/96/128/160/192/224/258.Vạchdọcđenmépphải~504làFRAMEkhôngpeak. 8prominentbarsvisible,cáckýhiệuscanspeckkhôngdatapoints,allminipeakchưatựchứngnhận.",
+    "questions": [
+      {
+        "qid": "DB-11-B7-D2-III-65",
+        "de": "Phổ MS của đơn chất sulfur (Sₙ) được cho ở hình dưới đây: Dựa vào phổ MS hãy xác định giá trị của n trong đơn chất sulfur?",
+        "refs": [
+          {
+            "where": "DB-11-B7-D2-III-65.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B7-III-8",
+        "de": "Phổ MS của đơn chất sulfur (Sₙ) được cho ở hình dưới đây: Dựa vào phổ MS hãy xác định giá trị của n trong đơn chất sulfur?",
+        "refs": [
+          {
+            "where": "DH-11-C2-B7-III-8.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "chiLaDuLieuDungChuaSoatRender": true,
+    "daCoManifestTaiCheckpoint": false
+  },
+  {
+    "i": 806,
+    "hash": "95b813c93b53365f6fc1b24723ad9f8a0a6333264d36686517b51c0c8c749917",
+    "fileNguon": "anh/95b813c93b53365f6fc1b24723ad9f8a0a6333264d36686517b51c0c8c749917.png",
+    "canvas": [
+      716,
+      644
+    ],
+    "daMoNative": true,
+    "kind": "MS-aniline-coloured",
+    "xLabel": "m/z",
+    "yLabel": "Cường độ tương đối (%)",
+    "xTickLabels": [
+      20,
+      40,
+      60,
+      80
+    ],
+    "yTickLabels": [
+      50,
+      100
+    ],
+    "labelledMz": [
+      28,
+      30,
+      39,
+      41,
+      46,
+      52,
+      63,
+      66,
+      74,
+      78,
+      93
+    ],
+    "caption": "▲ Phổ khối lượng của aniline",
+    "notes": "1plot2trụcxanhlamnhạt,barspink/magenta.CóNHIỀUbarKHÔNGlabelngoài11labelđãliệtkê,bắtbuộcgiữkhirootdựng,KHÔNGvẽchỉ11labelledpeaks. Peak93tớigần100,peak66height~70,39~20;unlabelledbar92rấtcaogần50. Không[M]⁺marker/khungtrênphải/grid.Cầntracemaskmàumagentapolylines/đọcfulltrướcduyệtallbar,vịtríminibarKHÔNGđượcđoántừanilinefragmentation.Captionsource▲đenhồngmarkerphảigiữ.",
+    "questions": [
+      {
+        "qid": "DH-11-C3-B12-III-21",
+        "de": "Aniline là hợp chất quan trọng trong công nghiệp phẩm nhuộm sản xuất polymer. Kết quả phân tích nguyên tố aniline như sau 77,42% C, 7,53% H về khối lượng còn lại là nitrogen. Phân tử khối của aniline được xác định trên phổ khối lượng nguyên tử tương ứng với peak có cường độ tương đối mạnh nhất.\nCó bao nhiêu nguyên tử carbon trong phân tử aniline?",
+        "refs": [
+          {
+            "where": "DH-11-C3-B12-III-21.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "chiLaDuLieuDungChuaSoatRender": true,
+    "daCoManifestTaiCheckpoint": false
+  },
+  {
+    "i": 1028,
+    "hash": "b870c7568e7c64e8245dc20b5720734c2c328cc9d3d27e83ff38312d3b3cfdb2",
+    "fileNguon": "anh/b870c7568e7c64e8245dc20b5720734c2c328cc9d3d27e83ff38312d3b3cfdb2.png",
+    "canvas": [
+      973,
+      548
+    ],
+    "daMoNative": true,
+    "kind": "nitric-acid-five-product-curves",
+    "xLabel": "C_HNO₃ (mol L⁻¹)",
+    "yLabel": "Hàm lượng sản phẩm khử",
+    "xTickLabels": [
+      "4,02",
+      "8,06",
+      "9,75",
+      "12,2"
+    ],
+    "yTickLabels": [
+      "0",
+      "5",
+      "10"
+    ],
+    "curves": [
+      {
+        "label": "NH₄⁺",
+        "samples": [
+          [
+            167,
+            146
+          ],
+          [
+            220,
+            163
+          ],
+          [
+            280,
+            199
+          ],
+          [
+            340,
+            243
+          ],
+          [
+            390,
+            293
+          ],
+          [
+            429,
+            347
+          ],
+          [
+            450,
+            403
+          ],
+          [
+            461,
+            453
+          ]
+        ]
+      },
+      {
+        "label": "N₂",
+        "samples": [
+          [
+            167,
+            395
+          ],
+          [
+            220,
+            392
+          ],
+          [
+            280,
+            367
+          ],
+          [
+            320,
+            340
+          ],
+          [
+            350,
+            326
+          ],
+          [
+            390,
+            339
+          ],
+          [
+            440,
+            379
+          ],
+          [
+            490,
+            421
+          ],
+          [
+            541,
+            453
+          ]
+        ]
+      },
+      {
+        "label": "N₂O",
+        "samples": [
+          [
+            167,
+            419
+          ],
+          [
+            220,
+            409
+          ],
+          [
+            280,
+            393
+          ],
+          [
+            340,
+            382
+          ],
+          [
+            400,
+            373
+          ],
+          [
+            460,
+            369
+          ],
+          [
+            510,
+            370
+          ],
+          [
+            550,
+            389
+          ],
+          [
+            585,
+            423
+          ],
+          [
+            615,
+            453
+          ]
+        ]
+      },
+      {
+        "label": "NO",
+        "samples": [
+          [
+            167,
+            281
+          ],
+          [
+            220,
+            275
+          ],
+          [
+            280,
+            263
+          ],
+          [
+            340,
+            244
+          ],
+          [
+            400,
+            217
+          ],
+          [
+            440,
+            194
+          ],
+          [
+            480,
+            145
+          ],
+          [
+            520,
+            105
+          ],
+          [
+            553,
+            94
+          ],
+          [
+            585,
+            102
+          ],
+          [
+            623,
+            127
+          ]
+        ]
+      },
+      {
+        "label": "NO₂",
+        "samples": [
+          [
+            167,
+            438
+          ],
+          [
+            220,
+            433
+          ],
+          [
+            280,
+            418
+          ],
+          [
+            340,
+            393
+          ],
+          [
+            400,
+            362
+          ],
+          [
+            460,
+            319
+          ],
+          [
+            520,
+            266
+          ],
+          [
+            575,
+            195
+          ],
+          [
+            623,
+            128
+          ]
+        ]
+      }
+    ],
+    "geometry": {
+      "origin": [
+        166,
+        453
+      ],
+      "xHead": [
+        934,
+        453
+      ],
+      "yHead": [
+        166,
+        58
+      ],
+      "xTickPixels": [
+        312,
+        461,
+        541,
+        615
+      ],
+      "guideYs": [
+        420,
+        383,
+        347,
+        309,
+        273,
+        236,
+        200,
+        165,
+        129,
+        93
+      ],
+      "guideXrange": [
+        166,
+        670
+      ]
+    },
+    "notes": "5curveđenliền,10guidehorizđứt;YKHÔNG%unit. GiữNH₄⁺superscript+,N₂/N₂O/NO/NO₂labelsứngcurve. NOhumpđỉnh10rồigiảm,NO₂tăngendgầnNO;N₂peak~3,5rồivề0ở9,75;NH₄⁺về0ở8,06;N₂Ovề0ở12,2. Sampleschỉpixelreadnativekhôngthêmnumberschem/answers. Khônggiảsửaxmisscalibration.",
+    "questions": [
+      {
+        "qid": "11-C2-B6-II-2",
+        "de": "Khi Fe phản ứng với HNO₃ với nồng độ khác nhau, hàm lượng sản phẩm khử với nồng độ nitric acid được thể hiện trong Hình 2.2.",
+        "refs": [
+          {
+            "where": "11-C2-B6-II-2.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-11-B6-D2-II-5",
+        "de": "Khi Fe phản ứng với HNO₃ với nồng độ khác nhau, hàm lượng sản phẩm khử với nồng độ nitric acid được thể hiện trong Hình 2.2.",
+        "refs": [
+          {
+            "where": "DB-11-B6-D2-II-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "chiLaDuLieuDungChuaSoatRender": true,
+    "daCoManifestTaiCheckpoint": false
+  },
+  {
+    "i": 1012,
+    "hash": "b5d12b286c8031b25a41a2290ceedbb32d6e91c884b988973ff5724cd32b5bd6",
+    "fileNguon": "anh/b5d12b286c8031b25a41a2290ceedbb32d6e91c884b988973ff5724cd32b5bd6.png",
+    "canvas": [
+      347,
+      294
+    ],
+    "daMoNative": true,
+    "kind": "beta-glucopyranose-numbered",
+    "substituents": {
+      "C1": {
+        "up": "OH"
+      },
+      "C2": {
+        "down": "OH"
+      },
+      "C3": {
+        "up": "OH"
+      },
+      "C4": {
+        "down": "OH"
+      },
+      "C5": {
+        "up": "CH₂OH"
+      }
+    },
+    "notes": "6ringOupperright,0Hexplicit,Cnumbers1..6GIỮ,C6ởtrênCH₂OHtext. C1OHUPkhác1036C1OHdown. Front3bondsC4–C3–C2–C1đậm.KhôngthêmH/nêm/charges/caption. Candidate1243cùngvariantnhưngchưasVGaliastrướcsoátnative+actualrender.",
+    "questions": [
+      {
+        "qid": "12-C2-B4-D1-I-44",
+        "de": "Phân tử β-glucose có cấu tạo như sau:\nTrong phân tử β-glucose, nhóm -OH ở vị trí carbon số mấy có khả năng phản ứng với ethanol khi có mặt của HCl khan, tạo thành ethyl glucoside?",
+        "refs": [
+          {
+            "where": "12-C2-B4-D1-I-44.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D2-I-4",
+        "de": "Phân tử β-glucose có cấu tạo như sau:\nTrong phân tử β-glucose, nhóm -OH ở vị trí carbon số mấy có khả năng phản ứng với ethanol khi có mặt của HCl khan, tạo thành ethyl glucoside?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-I-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "chiLaDuLieuDungChuaSoatRender": true,
+    "daCoManifestTaiCheckpoint": false
+  },
+  {
+    "i": 990,
+    "hash": "b185d8192458386a410e77314cf71db4fee2e83f4860c0a8bcd30a5d3735630b",
+    "fileNguon": "anh/b185d8192458386a410e77314cf71db4fee2e83f4860c0a8bcd30a5d3735630b.png",
+    "canvas": [
+      420,
+      290
+    ],
+    "daMoNative": true,
+    "kind": "ketofuranose-literal-NO-carbon-number-inference",
+    "substituentsByGeometry": {
+      "leftVertex": {
+        "up": "CH₂OH",
+        "down": "OH"
+      },
+      "lowerLeftVertex": {
+        "down": "OH"
+      },
+      "lowerRightVertex": {
+        "up": "OH"
+      },
+      "rightVertex": {
+        "down": "CH₂OH"
+      }
+    },
+    "notes": "5ringOtopgiữa,front3bondsleft→lowerleft→lowerright→rightđậm.KHÔNGHexplicit/KHÔNGCnumbers/caption.LEFTvertexcó4bonds(2ring+CH₂OHup+OHdown),RIGHTvertexchỉ3bonds(2ring+CH₂OHdown),Hẩn.Nhưvậyhemi-centerởTRÁI,KHÔNGápbody799fructoseC2phảiđểtựdờiOH.HO/Hdirectionsphảigiữnguyên,khôngtựgántên/SIPdựađápán.",
+    "questions": [
+      {
+        "qid": "12-KT-C12-D2-I-2",
+        "de": "Monosaccharide X có công thức cấu tạo như hình dưới. Tên gọi của X là",
+        "refs": [
+          {
+            "where": "12-KT-C12-D2-I-2.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-I-137",
+        "de": "Monosaccharide X có công thức cấu tạo như hình dưới. Tên gọi của X là",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-137.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "chiLaDuLieuDungChuaSoatRender": true,
+    "daCoManifestTaiCheckpoint": false
+  },
+  {
+    "i": 1138,
+    "hash": "cd02bc25fe58c3b4a7465e8bc79d593e00a4841a2632ebc79bf38361e65f586f",
+    "fileNguon": "anh/cd02bc25fe58c3b4a7465e8bc79d593e00a4841a2632ebc79bf38361e65f586f.png",
+    "canvas": [
+      698,
+      354
+    ],
+    "daMoNative": true,
+    "kind": "Fischer-hydrogenation-glucose-sorbitol",
+    "left": {
+      "top": "CHO",
+      "bottom": "CH₂OH",
+      "rows": [
+        {
+          "left": "H",
+          "right": "OH"
+        },
+        {
+          "left": "HO",
+          "right": "H"
+        },
+        {
+          "left": "H",
+          "right": "OH"
+        },
+        {
+          "left": "H",
+          "right": "OH"
+        }
+      ],
+      "caption": "glucose"
+    },
+    "right": {
+      "top": "CH₂OH",
+      "bottom": "CH₂OH",
+      "rows": [
+        {
+          "left": "H",
+          "right": "OH"
+        },
+        {
+          "left": "HO",
+          "right": "H"
+        },
+        {
+          "left": "H",
+          "right": "OH"
+        },
+        {
+          "left": "H",
+          "right": "OH"
+        }
+      ],
+      "caption": "sorbitol"
+    },
+    "reagent": "+ H₂",
+    "overArrow": "Ni, t°",
+    "notes": "Arrow1phải,Ni,t°trên,giữ2Fischer4rowcrossH/OHthứtựRLRRgiốngnhaucenterkhôngviếtC. TopCHOchuyểnCH₂OH,khôngtựđảo/mirrorrow.AcidaldhydeHchỉẩntrongCHOtext,captionlowercaseglucose/sorbitolphảigiữ.",
+    "questions": [
+      {
+        "qid": "12-KT-C2-D1-III-1",
+        "de": "Sorbitol là một chất được dùng trong sản xuất một số loại bánh để tạo vị ngọt, đồng thời làm cho bánh giữ được độ ẩm, độ bóng mịn.\nSorbitol cũng được dùng làm thuốc trị táo bón, khó tiêu.\nSorbitol thường được tạo thành từ phản ứng hydrogen hoá glucose: Tổng số nguyên tử trong một phân tử sorbitol là bao nhiêu?",
+        "refs": [
+          {
+            "where": "12-KT-C2-D1-III-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-III-150",
+        "de": "Sorbitol là một chất được dùng trong sản xuất một số loại bánh để tạo vị ngọt, đồng thời làm cho bánh giữ được độ ẩm, độ bóng mịn.\nSorbitol cũng được dùng làm thuốc trị táo bón, khó tiêu.\nSorbitol thường được tạo thành từ phản ứng hydrogen hoá glucose: Tổng số nguyên tử trong một phân tử sorbitol là bao nhiêu?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-III-150.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "chiLaDuLieuDungChuaSoatRender": true,
+    "daCoManifestTaiCheckpoint": false
+  },
+  {
+    "i": 1046,
+    "hash": "bcc1de93c6ba738dda7074c04bafd123781d49dad1ab95b22f999a0cc0e781b3",
+    "fileNguon": "anh/bcc1de93c6ba738dda7074c04bafd123781d49dad1ab95b22f999a0cc0e781b3.png",
+    "canvas": [
+      1039,
+      462
+    ],
+    "daMoNative": true,
+    "kind": "fructose-three-form-equilibrium",
+    "leftHaworth": {
+      "caption": "dạng α-fructose",
+      "ring": "5ringOtop,C2right,C3lowerright,C4lowerleft,C5left",
+      "C2": {
+        "up": "CH₂OH(carbon1)",
+        "down": "OH"
+      },
+      "C3": {
+        "up": "HO",
+        "down": "H"
+      },
+      "C4": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C5": {
+        "up": "HOCH₂(carbon6)",
+        "down": "H"
+      }
+    },
+    "middleFischer": {
+      "caption": "fructose, mạch hở",
+      "top": "CH₂OH(carbon1)",
+      "bottom": "CH₂OH(carbon6)",
+      "rows": [
+        {
+          "kind": "carbonyl",
+          "side": "right",
+          "carbonNumber": 2
+        },
+        {
+          "left": "HO",
+          "right": "H",
+          "carbonNumber": 3
+        },
+        {
+          "left": "H",
+          "right": "OH",
+          "carbonNumber": 4
+        },
+        {
+          "left": "H",
+          "right": "OH",
+          "carbonNumber": 5
+        }
+      ]
+    },
+    "rightHaworth": {
+      "caption": "dạng β-fructose",
+      "C2": {
+        "up": "OH",
+        "down": "CH₂OH(carbon1)"
+      },
+      "C3": {
+        "up": "HO",
+        "down": "H"
+      },
+      "C4": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C5": {
+        "up": "HOCH₂(carbon6)",
+        "down": "H"
+      }
+    },
+    "notes": "3panelngangα⇌open⇌β,horizontal2equilibriumarrowpairskhôngđiềukiện.Carbonnumbers1..6MỌIpanelphảigiữ,ringH_C3/C4/C5explicit;HOCH₂leftbranchtextviếtngượchướngnhưsourcekhôngđổiđặtbranchvịtrí.Q2anomerOHαDOWN/βUP,2ringfront3bondsđậm.ChemH/C/SIPđừngđoántheoβname.",
+    "questions": [
+      {
+        "qid": "12-C2-B4-D1-II-6",
+        "de": "Cho cấu tạo của fructose ở hình bên:",
+        "refs": [
+          {
+            "where": "12-C2-B4-D1-II-6.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-II-44",
+        "de": "Cho cấu tạo của fructose ở hình bên:",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-II-44.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "chiLaDuLieuDungChuaSoatRender": true,
+    "daCoManifestTaiCheckpoint": false
+  },
+  {
+    "i": 997,
+    "hash": "b39784e01ab313bdbdcd62e47321a82ed929130bc2128b95ac2e94af5adf4ef9",
+    "fileNguon": "anh/b39784e01ab313bdbdcd62e47321a82ed929130bc2128b95ac2e94af5adf4ef9.png",
+    "canvas": [
+      323,
+      270
+    ],
+    "daMoNative": true,
+    "kind": "methyl-glucopyranoside",
+    "substituents": {
+      "rightAnomeric": {
+        "down": "OCH₃"
+      },
+      "lowerRight": {
+        "down": "OH"
+      },
+      "lowerLeft": {
+        "up": "OH"
+      },
+      "left": {
+        "down": "OH"
+      },
+      "upperLeft": {
+        "up": "CH₂–OH expanded"
+      }
+    },
+    "notes": "6ringOupperright,0Hexplicit,3frontbondsbold. TopbranchskeletalCH₂upthenbentup-rightOH(khôngCH₂OHtext),C1OCH₃downRÕ.NoCnumbers/charges/caption.Candidate1184samebodyđãđạtnhưngcầnsoátactualrender,khôngtựthànhOHởanomericC.",
+    "questions": [
+      {
+        "qid": "12-C2-B4-D2-III-38",
+        "de": "Ở dạng cấu tạo mạch vòng, nhóm -OH hemiacetal của glucose tác dụng với methanol khi có mặt của HCl khan, tạo thành methyl glucoside có công thức cấu tạo: Methyl α-glucoside Tổng số nguyên tử có trong một phân tử methyl α-glucoside là bao nhiêu?",
+        "refs": [
+          {
+            "where": "12-C2-B4-D2-III-38.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D2-III-28",
+        "de": "Ở dạng cấu tạo mạch vòng, nhóm -OH hemiacetal của glucose tác dụng với methanol khi có mặt của HCl khan, tạo thành methyl glucoside có công thức cấu tạo: Methyl α-glucoside Tổng số nguyên tử có trong một phân tử methyl α-glucoside là bao nhiêu?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-III-28.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "chiLaDuLieuDungChuaSoatRender": true,
+    "daCoManifestTaiCheckpoint": false
+  },
+  {
+    "i": 1120,
+    "hash": "c9d4d6eccb45a0a4af0535a0081e8e60917376565538daf4a027c3fc704dde00",
+    "fileNguon": "anh/c9d4d6eccb45a0a4af0535a0081e8e60917376565538daf4a027c3fc704dde00.png",
+    "canvas": [
+      313,
+      281
+    ],
+    "daMoNative": true,
+    "kind": "glucose-open-chain-plus-ring-bond-labels",
+    "leftLiteralRows": [
+      {
+        "left": "H",
+        "center": "C",
+        "right": "O",
+        "bondRight": "double"
+      },
+      {
+        "left": "H",
+        "center": "C",
+        "right": "OH"
+      },
+      {
+        "left": "HO",
+        "center": "C",
+        "right": "H"
+      },
+      {
+        "left": "H",
+        "center": "C",
+        "right": "OH"
+      },
+      {
+        "left": "H",
+        "center": "C",
+        "right": "OH"
+      },
+      {
+        "left": "H",
+        "center": "C",
+        "right": "OH",
+        "bottom": "H"
+      }
+    ],
+    "ringSubstituents": {
+      "C1": "OHdown",
+      "C2": "OHdown",
+      "C3": "OHup",
+      "C4": "OHdown",
+      "C5": "CH₂OHup"
+    },
+    "ringCaption": "α-glucose",
+    "ringBondLabels": {
+      "(1)": "O_vòng–C1chéoupperright",
+      "(2)": "C1–C2frontchéoright",
+      "(3)": "C2–C3fronthorizontal",
+      "(4)": "C5–O_vònghorizontalupper"
+    },
+    "notes": "2panelngangKHÔNGarrowgiữa,cả2rootmởRIÊNG.CenterschainCEXPLICITall6,5verticalC–Cbonds;CH₂OHcuốikha triểnC6Hleft/Hbelow/OHright,KHÔNGgộpCH₂OHmấthìnhthứcsource.MọiH/HO/OHchainexplicit.Ring0Hexplicit,CH₂OHtext,3frontbondsbold,4labelsLÀBONDNOTcarbonnumbers. KhôngsoátbằngFischerRLRRalonephảigiữaldehydeH–C=Oởtop.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D3-I-191",
+        "de": "Đồng phân mạch hở và mạch vòng của glucose có thể chuyển hóa lẫn nhau.\nCấu tạo dạng mạch hở của glucose và dạng vòng 6 cạnh α-glucose được cho ở hình bên.\nLiên kết nào trong số các liên kết được đánh số (1), (2), (3), (4) sẽ bị phá vỡ khi mở vòng α-glucose để chuyển hóa thành dạng mạch hở?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-191.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-I-52",
+        "de": "Đồng phân mạch hở và mạch vòng của glucose có thể chuyển hóa lẫn nhau.\nCấu tạo dạng mạch hở của glucose và dạng vòng 6 cạnh α-glucose được cho ở hình bên.\nLiên kết nào trong số các liên kết được đánh số (1), (2), (3), (4) sẽ bị phá vỡ khi mở vòng α-glucose để chuyển hóa thành dạng mạch hở?",
+        "refs": [
+          {
+            "where": "DH-12-C2-B4-I-52.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "chiLaDuLieuDungChuaSoatRender": true,
+    "daCoManifestTaiCheckpoint": false
+  },
+  {
+    "i": 1030,
+    "hash": "b8b349e3efe2d20153583890f18d7e2d476b4ba9170cfe28abc41271956765b5",
+    "fileNguon": "anh/b8b349e3efe2d20153583890f18d7e2d476b4ba9170cfe28abc41271956765b5.png",
+    "canvas": [
+      313,
+      281
+    ],
+    "daMoNative": true,
+    "kind": "glucose-open-chain-plus-ring-bond-labels",
+    "leftLiteralRows": [
+      {
+        "left": "H",
+        "center": "C",
+        "right": "O",
+        "bondRight": "double"
+      },
+      {
+        "left": "H",
+        "center": "C",
+        "right": "OH"
+      },
+      {
+        "left": "HO",
+        "center": "C",
+        "right": "H"
+      },
+      {
+        "left": "H",
+        "center": "C",
+        "right": "OH"
+      },
+      {
+        "left": "H",
+        "center": "C",
+        "right": "OH"
+      },
+      {
+        "left": "H",
+        "center": "C",
+        "right": "OH",
+        "bottom": "H"
+      }
+    ],
+    "ringSubstituents": {
+      "C1": "OHdown",
+      "C2": "OHdown",
+      "C3": "OHup",
+      "C4": "OHdown",
+      "C5": "CH₂OHup"
+    },
+    "ringCaption": "α-glucose",
+    "ringBondLabels": {
+      "(1)": "O_vòng–C1chéoupperright",
+      "(2)": "C1–C2frontchéoright",
+      "(3)": "C2–C3fronthorizontal",
+      "(4)": "C5–O_vònghorizontalupper"
+    },
+    "notes": "2panelngangKHÔNGarrowgiữa,cả2rootmởRIÊNG.CenterschainCEXPLICITall6,5verticalC–Cbonds;CH₂OHcuốikha triểnC6Hleft/Hbelow/OHright,KHÔNGgộpCH₂OHmấthìnhthứcsource.MọiH/HO/OHchainexplicit.Ring0Hexplicit,CH₂OHtext,3frontbondsbold,4labelsLÀBONDNOTcarbonnumbers. KhôngsoátbằngFischerRLRRalonephảigiữaldehydeH–C=Oởtop.",
+    "questions": [
+      {
+        "qid": "12-C2-B4-D1-I-34",
+        "de": "Đồng phân mạch hở và mạch vòng của glucose có thể chuyển hóa lẫn nhau.\nCấu tạo dạng mạch hở của glucose và dạng vòng 6 cạnh α-glucose được cho ở hình bên.\nLiên kết nào trong số các liên kết được đánh số (1), (2), (3), (4) sẽ bị phá vỡ khi mở vòng α-glucose để chuyển hóa thành dạng mạch hở?",
+        "refs": [
+          {
+            "where": "12-C2-B4-D1-I-34.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-I-25",
+        "de": "Đồng phân mạch hở và mạch vòng của glucose có thể chuyển hóa lẫn nhau.\nCấu tạo dạng mạch hở của glucose và dạng vòng 6 cạnh α-glucose được cho ở hình bên.\nLiên kết nào trong số các liên kết được đánh số (1), (2), (3), (4) sẽ bị phá vỡ khi mở vòng α-glucose để chuyển hóa thành dạng mạch hở?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-25.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "chiLaDuLieuDungChuaSoatRender": true,
+    "daCoManifestTaiCheckpoint": false
+  },
+  {
+    "i": 1416,
+    "hash": "fe6a83da39aefc1338a6de5eff56c4c40f5e3bb0711a115bad868088cf70777e",
+    "fileNguon": "anh/fe6a83da39aefc1338a6de5eff56c4c40f5e3bb0711a115bad868088cf70777e.png",
+    "canvas": [
+      1024,
+      340
+    ],
+    "daMoNative": true,
+    "kind": "glucose-three-form-highlight-equilibrium",
+    "leftAlpha": {
+      "caption": "α-glucose",
+      "ring": "6ringOupperright",
+      "C1": {
+        "up": "H",
+        "down": "OH boxed"
+      },
+      "C2": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C3": {
+        "up": "OH",
+        "down": "H"
+      },
+      "C4": {
+        "up": "H",
+        "down": "HO"
+      },
+      "C5": {
+        "up": "CH₂OH(carbon6)",
+        "down": "H"
+      }
+    },
+    "middleFischer": {
+      "caption": "glucose",
+      "top": "CHO(carbon1)",
+      "bottom": "CH₂OH(carbon6)",
+      "rows": [
+        {
+          "left": "H",
+          "right": "OH",
+          "carbonNumber": 2
+        },
+        {
+          "left": "HO",
+          "right": "H",
+          "carbonNumber": 3
+        },
+        {
+          "left": "H",
+          "right": "OH",
+          "carbonNumber": 4
+        },
+        {
+          "left": "H",
+          "right": "OH",
+          "carbonNumber": 5
+        }
+      ]
+    },
+    "rightBeta": {
+      "caption": "β-glucose",
+      "C1": {
+        "up": "OH boxed",
+        "down": "H"
+      },
+      "C2": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C3": {
+        "up": "OH",
+        "down": "H"
+      },
+      "C4": {
+        "up": "H",
+        "down": "HO"
+      },
+      "C5": {
+        "up": "CH₂OH(carbon6)",
+        "down": "H"
+      }
+    },
+    "highlightLabels": [
+      "OH hemiacetal",
+      "OH hemiacetal"
+    ],
+    "notes": "α⇌Fischer⇌β2equilibriumarrowpairsnoextraNi/H⁺. GIỮCnumbers1..6cả3panel/allringHexplicit,αanomericOHdown dashedroundedBOXvàcurvedarrowlabelOHhemiacetalDƯỚI;βanomericOHup dashedroundedBOX+curvedarrowlabelOHhemiacetalTRÊN. Chỉ2OHhighlightboxes,khônghighlightcácOHkhác. NoCIPwedge/charges,nothêmglucopyranosidename.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D3-II-218",
+        "de": "Glucose là loại monosaccharide phổ biến và có nhiều ứng dụng. Glucose tồn tại chủ yếu ở hai dạng mạch vòng là α-glucose và β-glucose. Trong dung dịch, hai dạng mạch vòng này có thể chuyển hoá lẫn nhau thông qua dạng mạch hở như hình sau:",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-II-218.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-II-14",
+        "de": "Glucose là loại monosaccharide phổ biến và có nhiều ứng dụng. Glucose tồn tại chủ yếu ở hai dạng mạch vòng là α-glucose và β-glucose. Trong dung dịch, hai dạng mạch vòng này có thể chuyển hoá lẫn nhau thông qua dạng mạch hở như hình sau:",
+        "refs": [
+          {
+            "where": "DH-12-C2-B4-II-14.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "chiLaDuLieuDungChuaSoatRender": true,
+    "daCoManifestTaiCheckpoint": false
   }
 ]

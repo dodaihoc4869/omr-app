@@ -1287,3 +1287,10 @@ Phân vùng dự kiến theo hai bản thiết kế:
 -Nhóm169cau_truc_5đangđọc20nguồnmớiưu tiên4refs/3refs/native+publicde/refs/geometry;scratch/doc-molecule-lo-169.json,copymớivềkiemkhicó.1213/1214đãrootmởnativeCHƯAdựng,1033IRvà736surfactantchưađọchết. Khôngtựtínhứngviênđạt/khônglàmtrùng1176.
 
 -168nguồnnhóm169đãlưubản5recordnative/publicrefs:4chưađạt1203/907/998/1018;634ĐÃmanifest85/rootgắnnoteKHÔNGdựngtrùng. Agenttiếpđọc/thay634bằngnguồnmới. Khôngtính4nguồnđọcsource làđãvẽ/đãsoát.
+
+
+### 04/11 — Lô169–172: phổAg/Mg vàkhéptrọnbộCuA–D
+-Hoànthiện9nguồn/6SVGmới,khép12câu;tổng1001câuđủmọihình+DDH/7partial;757nguồn→513SVG,7.972.848byte/gzip1.588.825,còn671nguồn. Ag1203/907baseline47,5..52,5/51,8-48,2;Mg998/63679-10-11/noYticks/4emptyXt;1018equal2peakno63/65/%thêm;203đốichiếutừngweakpeakvớibase1176;535/692giữpixelkhôngnormalize;314singlepeakheight112..249/2vếtmựcrờiđãsoátnoise. TừngPNGnative/full/basekhi dùngchung/actualSVG/exacthashđãagentchỉđọcsoátriêng.
+-CuA535/B1018/C692/D314khép2partial(10-C1-B2-I-58,DB-10-B2-D2-I-29),khôngsửaPA/đápán. Silver/Mg dùngchungfileSVGnhưngsourceRIÊNGđãsoát,khôngpHashtựduyệt/khôngnhânfiletrùnghash.
+-Chromium513/513/hash/XML/path/selfcontained/AST/build171/precache170/2613.23KiB/speed21/21đạt. Khôngđổimốc/production/harness167. Cỡtệpđỏnềnindex.tsnguyênbyte,phảixửlýtrướcgộp/deploy;khôngbáoallrepođãđạt. Mainab81c625chưagộp/WOFF2khôngdiff;trướcpháthànhmainmớinhất/fulltesttheotên/cathi/offlinethật. Chưatíchhợp/chưareloadofflineapp/chưapháthành. Chưa tham vấn được cố vấn.
+-ĐãcopyĐỦ20source169native/publicrefs/geometry;8đãmanifestqua169–171,còn12CHƯAdựng765/1195/806/1028/1012/990/1138/1046/997/1120/1030/1416. Ưutiênchem1012/990/1138/997/11201030đểkhépcảbộ;nghiêmngặttừngH/OH/stereo/nhãn.Bản169634lặpcũđãloạikhỏi20,khôngdựngtrùng.314làsourcebổsungngoài20.

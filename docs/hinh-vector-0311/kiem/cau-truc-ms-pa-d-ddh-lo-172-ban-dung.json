@@ -1,0 +1,39 @@
+[
+  {
+    "i": 314,
+    "hash": "360b679bb1ef4381ca9f5cbe5bc6e57c63f023111fd62827cba4a45eb727bf0f",
+    "fileNguon": "anh/360b679bb1ef4381ca9f5cbe5bc6e57c63f023111fd62827cba4a45eb727bf0f.png",
+    "questions": [
+      {
+        "qid": "10-C1-B2-I-58",
+        "de": "Đồng có hai đồng vị bền trong tự nhiên là ⁶³Cu và ⁶⁵Cu.\nNguyên tử khối trung bình của đồng là 63,55 (điện tích z của các ion đồng vị đồng đều bằng 1+).\nHình vẽ phổ khối nào dưới đây là đúng?",
+        "refs": [
+          {
+            "where": "10-C1-B2-I-58.hinh.3.du_lieu",
+            "viTri": "sau_pa_D"
+          }
+        ]
+      },
+      {
+        "qid": "DB-10-B2-D2-I-29",
+        "de": "Đồng có hai đồng vị bền trong tự nhiên là ⁶³Cu và ⁶⁵Cu.\nNguyên tử khối trung bình của đồng là 63,55 (điện tích z của các ion đồng vị đồng đều bằng 1+).\nHình vẽ phổ khối nào dưới đây là đúng?",
+        "refs": [
+          {
+            "where": "DB-10-B2-D2-I-29.hinh.3.du_lieu",
+            "viTri": "sau_pa_D"
+          }
+        ]
+      }
+    ],
+    "daMoNative": true,
+    "svg": "ms-pa-d-ddh-257b3faf028de13bda6a377b66987c5e348a35a1af3dd18d874f80722f931a92.svg",
+    "hashSvg": "257b3faf028de13bda6a377b66987c5e348a35a1af3dd18d874f80722f931a92",
+    "byteSvg": 27962,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Source314mộtcột(x276top112baseline249)/Y0..80/X20..100/2titles,no%/masslabel/khôngsửaheightthành100. Vếtmựcrờiquanhx207y145..170khôngnốibaselinecầnsoátđộclậpclassificationnoise,khôngtựthànhpeak.",
+    "hashSvgDaSoat": "257b3faf028de13bda6a377b66987c5e348a35a1af3dd18d874f80722f931a92",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

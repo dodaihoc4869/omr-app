@@ -1,0 +1,143 @@
+[
+  {
+    "i": 636,
+    "hash": "761f47231086dee0479786db1f40cf1a9d8de1f6183b6f600d7ed6ebd7abef78",
+    "fileNguon": "anh/761f47231086dee0479786db1f40cf1a9d8de1f6183b6f600d7ed6ebd7abef78.png",
+    "canvas": [
+      600,
+      560
+    ],
+    "daMoNative": true,
+    "kind": "MS-magnesium-three-peaks",
+    "xLabel": "Tỉ lệ nguyên tử khối/điện tích (m/z)",
+    "yLabel": "Phần trăm số nguyên tử đồng vị (%)",
+    "peaks": [
+      {
+        "mz": 24,
+        "label": "79"
+      },
+      {
+        "mz": 25,
+        "label": "10"
+      },
+      {
+        "mz": 26,
+        "label": "11"
+      }
+    ],
+    "notes": "Native636đãmởRIÊNG,cùngnộidung998khácscale:79/10/11KHÔNG%trênbar,Ykhôngbấtkỳsố/ticks. CácXlabels24/25/26và4XticksKHÔNGsốởgiữagiữa/phảinguồn,khôngtựđiềnsố. Axisnoupperrightframe/noarrow/grid. Khôngtựđổithành80/10/10theobiểukhác1207.",
+    "questions": [
+      {
+        "qid": "DB-10-B2-D2-III-111",
+        "de": "Từ phổ khối lượng MS của magnesium (Mg) ở hình dưới đây: Hãy cho biết giá trị nguyên tử khối trung bình của magnesium là bao nhiêu?\nBiết z = 1. (Kết quả làm tròn kết quả đến hàng phần mười).",
+        "refs": [
+          {
+            "where": "DB-10-B2-D2-III-111.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B2-III-14",
+        "de": "Từ phổ khối lượng MS của magnesium (Mg) ở hình dưới đây: Hãy cho biết giá trị nguyên tử khối trung bình của magnesium là bao nhiêu?\nBiết z = 1. (Kết quả làm tròn kết quả đến hàng phần mười).",
+        "refs": [
+          {
+            "where": "DH-10-C1-B2-III-14.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "ms-nhom169-ddh-90a1cf07d492237a7afc98416c924827cbbd34f7c5f8b8ed2fcaced2b9e8b752.svg",
+    "hashSvg": "90a1cf07d492237a7afc98416c924827cbbd34f7c5f8b8ed2fcaced2b9e8b752",
+    "byteSvg": 37199,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "iNguonDoiChieu": 998,
+    "hashNguonDoiChieu": "b3c459e6eb6553fa1abaeebddfc83bd9660c572f5e8f8fc086ab7aa2f8cd0086",
+    "ghiChuDung": "ỨngviêndùngchungnộidungKHÔNGtựĐạt:PHẢIsoátPNGnative source/base vàactualSVGrender/hashriêng;khôngpHashthayreview.",
+    "hashSvgDaSoat": "90a1cf07d492237a7afc98416c924827cbbd34f7c5f8b8ed2fcaced2b9e8b752",
+    "nguoiSoat": "cau_truc_6"
+  },
+  {
+    "i": 203,
+    "hash": "224ea7b1fb3a13b22e285f41588d4bb7e41d019eee3eb04681253ec52e63474b",
+    "fileNguon": "anh/224ea7b1fb3a13b22e285f41588d4bb7e41d019eee3eb04681253ec52e63474b.png",
+    "canvas": [
+      686,
+      442
+    ],
+    "daMoNative": true,
+    "kind": "MS-organic-labelled-peaks",
+    "xLabel": "m/z",
+    "yLabel": "Cường độ tương đối (%)",
+    "xTickLabels": [
+      10,
+      15,
+      20,
+      25,
+      30,
+      35,
+      40,
+      45,
+      50,
+      55,
+      60
+    ],
+    "yTickLabels": [
+      0,
+      20,
+      40,
+      60,
+      80,
+      100
+    ],
+    "labelledMz": [
+      15,
+      18,
+      27,
+      28,
+      30,
+      39,
+      41,
+      58,
+      59
+    ],
+    "molecularLabel": "[M]⁺ at 59",
+    "notes": "1plot4cạnh,basepeak30reaches100Ytop,59[M]⁺ởphải9–10%height.Mỗi15/18/27/28/39/41/58cũngcólabeltrênbar,giữtấtcả. Source203cùngbộpublicstem1176vừasoát168nênưu tiênrootđốinguồncùngbodycandidate1176.HairlinesprèsbaselinevàđốmscanKHÔNGđượccoitấtcảlàpeak;CHƯAchốtsốtấtcảminipeaks,nếutựdựngcầnmởfull/zoomtracemasktheonguồn,chưaduyệtallbars.",
+    "questions": [
+      {
+        "qid": "DB-12-B8-D1-I-293",
+        "de": "Kết quả phân tích nguyên tố cho thấy trong hợp chất X: carbon chiếm 61,02%; hydrogen chiếm 15,25%; còn lại là nitrogen về khối lượng.\nTừ phổ khối lượng của X xác định được giá trị m/z của peak [M⁺] bằng 59.\nCông thức phân tử của X là",
+        "refs": [
+          {
+            "where": "DB-12-B8-D1-I-293.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B11-D1-I-16",
+        "de": "Kết quả phân tích nguyên tố cho thấy trong hợp chất X: carbon chiếm 61,02%; hydrogen chiếm 15,25%; còn lại là nitrogen về khối lượng.\nTừ phổ khối lượng của X xác định được giá trị m/z của peak [M⁺] bằng 59.\nCông thức phân tử của X là",
+        "refs": [
+          {
+            "where": "DH-12-C3-B11-D1-I-16.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "ms-ddh-ff2b4012b9494638bb7d71840e6bfd478247087463fced150506d789922334d4.svg",
+    "hashSvg": "ff2b4012b9494638bb7d71840e6bfd478247087463fced150506d789922334d4",
+    "byteSvg": 46465,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "iNguonDoiChieu": 1176,
+    "hashNguonDoiChieu": "d451f99caeef4918dc46f959ed5e12d44ee7c555da23891baefa5d79a0c16e41",
+    "ghiChuDung": "ỨngviêndùngchungnộidungKHÔNGtựĐạt:PHẢIsoátPNGnative source/base vàactualSVGrender/hashriêng;khôngpHashthayreview.",
+    "hashSvgDaSoat": "ff2b4012b9494638bb7d71840e6bfd478247087463fced150506d789922334d4",
+    "nguoiSoat": "cau_truc_6"
+  }
+]
