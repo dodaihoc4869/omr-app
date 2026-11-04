@@ -64,6 +64,43 @@ export function gopBai(cuV: unknown, moiV: unknown): BaiLam {
   return ra
 }
 
+/** DẤU «THẦY KẾT THÚC CA ĐÓNG HỘ» (thầy 04/11: «Khi bấm kết thúc ca thì nhiều hs ko chấm chuẩn bị mất câu phải bấm nhận chấm lại»): lượt `dang_lam` bị
+ *  đóng bởi nút Kết thúc ca (goi-cu.ts `khoaCa`, index.ts sửa ca `khoaLuot`) mang `integrity_json.dongBoi = 'khoa'` — em CHƯA tự nộp. */
+export const SQL_DAU_KHOA = `integrity_json = json_set(COALESCE(NULLIF(integrity_json, ''), '{}'), '$.dongBoi', 'khoa')`
+/** Cửa nhận bài máy em gửi tới SAU khi thầy kết thúc ca (giây): máy em biết ca đóng qua nhịp hỏi trạng thái rồi nộp ngay — mạng chậm vài chục giây. */
+export const GIAY_NHAN_SAU_KHOA = 180
+
+/**
+ * `/nop` tới khi lượt ĐÃ đóng. Lượt do thầy KẾT THÚC CA đóng hộ (dấu `SQL_DAU_KHOA`) và bài tới trong `GIAY_NHAN_SAU_KHOA` giây ⇒ NHẬN THẲNG vào bài
+ * (gộp bản lưu tạm + bài máy em, máy em thắng ô nào có trả lời), xoá điểm cũ ⇒ cron chấm bù (cham-bu.ts) chấm lại ngay lượt sau — không còn «bài bổ sung chờ
+ * duyệt», thầy không phải bấm Nhận. Một lần duy nhất (lần nhận xoá dấu). Quá cửa / lượt em tự nộp / bị khoá ⇒ như cũ: cất bài bổ sung chờ thầy duyệt
+ * (01/10 — ca 313224 ba em mất mọi câu làm sau khi máy ngừng liên lạc; em không thể lợi dụng để sửa bài sau giờ).
+ */
+export async function nhanSauKhoaHoacBoSung(
+  env: Env,
+  d: { khoa?: string; ma_ca?: string; sbd?: string; lan_thu?: number; dap_an_json?: unknown; nop_luc?: string | null; integrity_json?: string | null; trang_thai?: string },
+  b: Record<string, unknown>,
+  nowMs = Date.now(),
+): Promise<{ nhan: boolean; boSung: number }> {
+  if (!d.khoa) return { nhan: false, boSung: 0 }
+  let dau = ''
+  try { dau = String((JSON.parse(String(d.integrity_json ?? '')) as { dongBoi?: unknown })?.dongBoi ?? '') } catch { /* không dấu */ }
+  const tre = nowMs - Date.parse(String(d.nop_luc ?? ''))
+  if (d.trang_thai === 'da_nop' && dau === 'khoa' && b.dapAn && typeof b.dapAn === 'object' && tre >= 0 && tre <= GIAY_NHAN_SAU_KHOA * 1000) {
+    const it = (b.integrity && typeof b.integrity === 'object' ? b.integrity : {}) as { leaveCount?: unknown; totalHiddenMs?: unknown }
+    const r = await env.DB.prepare(
+      `UPDATE luot SET dap_an_json = ?, giay_cau_json = COALESCE(?, giay_cau_json), integrity_json = ?, so_lan_roi_man = ?, tong_giay_roi_man = ?,
+         da_day_sheet = 0, tong = NULL, diem_i = NULL, diem_ii = NULL, diem_iii = NULL, cap_nhat_luc = ?
+       WHERE khoa = ? AND trang_thai = 'da_nop' AND json_extract(integrity_json, '$.dongBoi') = 'khoa'`,
+    ).bind(
+      JSON.stringify(gopBai(d.dap_an_json, b.dapAn)), b.giayCau ? JSON.stringify(b.giayCau) : null, JSON.stringify({ ...it, nopSauKhoa: true }),
+      Number(it.leaveCount ?? 0) || 0, Math.round(Number(it.totalHiddenMs ?? 0) / 1000) || 0, new Date(nowMs).toISOString(), d.khoa,
+    ).run().catch(() => null)
+    if (r && Number(r.meta?.changes ?? 0) > 0) return { nhan: true, boSung: 0 }
+  }
+  return { nhan: false, boSung: await catBaiBoSung(env, { khoa: d.khoa, ma_ca: String(d.ma_ca ?? ''), sbd: String(d.sbd ?? ''), lan_thu: Number(d.lan_thu) || 1, dap_an_json: d.dap_an_json }, b.dapAn, b.giayCau) }
+}
+
 /** Gọi từ `/nop` khi lượt ĐÃ đóng. Trả số câu mới đã cất (0 = bài trùng, không cất). Không bao giờ ném lỗi. */
 export async function catBaiBoSung(
   env: Env,

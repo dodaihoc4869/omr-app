@@ -64,7 +64,7 @@ import {chamBuCa, cronChamBu} from './cham-bu'
 import {kiemChamCa} from './kiem-cham'
 import {phucHoiKeyCa} from './key-bank-bo-sung'
 import {buSoCauChoKeyBank, hopNhatKeyBank} from './key-bank-hop-nhat'
-import { catBaiBoSung, dsBaiBoSung, xuLyBaiBoSung } from './bai-bo-sung'
+import { nhanSauKhoaHoacBoSung, SQL_DAU_KHOA, dsBaiBoSung, xuLyBaiBoSung } from './bai-bo-sung'
 import { mom, LoiChamMom } from './mom'
 import { luyenDe } from './luyen-de'
 import {adminGame} from './game-v2-reports'
@@ -639,7 +639,7 @@ async function nop(env: Env, b: Record<string, unknown>): Promise<Response> {
       ...dk.tham,
       ...(chan ? [maCa] : []),
     )
-  const docLuot = () => env.DB.prepare(`SELECT het_gio_luc, trang_thai, nop_luc, khoa, ma_ca, sbd, lan_thu, dap_an_json FROM luot WHERE ${dk.sql}`).bind(...dk.tham)
+  const docLuot = () => env.DB.prepare(`SELECT het_gio_luc, trang_thai, nop_luc, khoa, ma_ca, sbd, lan_thu, dap_an_json, integrity_json FROM luot WHERE ${dk.sql}`).bind(...dk.tham)
   // Tờ đáp án (ca công bố ngay) tải SONG SONG với vòng D1 khi isolate đã biết ca này công bố ngay; quyết định trả hay không vẫn theo
   // `cong_bo` đọc trong chính batch dưới đây.
   const keySom = maCa && env.DE && doanCongBoNgay(maCa) ? docKeyBankDem(env, maCa).catch(() => null) : null
@@ -675,10 +675,8 @@ async function nop(env: Env, b: Record<string, unknown>): Promise<Response> {
     // chuyện thường, báo đỏ ở đây là em tưởng mất bài và nộp lại lần nữa.
     const da = sau
     if (da && (da.trang_thai === 'da_nop' || da.trang_thai === 'khoa')) {
-      // 01/10: lượt đã đóng (máy chủ chốt hộ / thầy khoá) mà máy em gửi tới bài KHÁC ⇒ cất làm BÀI BỔ SUNG chờ thầy duyệt,
-      // không vứt đi như trước (ca 313224: ba em mất mọi câu làm sau khi máy ngừng liên lạc).
-      const d = da as DongLuot & { khoa?: string; ma_ca?: string; sbd?: string; lan_thu?: number; dap_an_json?: unknown }
-      const boSung = d.khoa ? await catBaiBoSung(env, { khoa: d.khoa, ma_ca: String(d.ma_ca ?? ''), sbd: String(d.sbd ?? ''), lan_thu: Number(d.lan_thu) || 1, dap_an_json: d.dap_an_json }, b.dapAn, b.giayCau) : 0
+      // Lượt đã đóng: thầy vừa kết thúc ca (≤ 3 phút) ⇒ nhận thẳng + chấm lại; không ⇒ bài bổ sung chờ duyệt (bai-bo-sung.ts, 01/10 ca 313224).
+      const { boSung } = await nhanSauKhoaHoacBoSung(env, da as never, b)
       return raCoKeyBank({ ok: true, daNhan: true, nopLuc: da.nop_luc, ...(boSung > 0 ? { boSung } : {}) }, await congBo())
     }
     return ra({ ok: false, lyDo: 'khong_tim_thay' })
@@ -1416,7 +1414,7 @@ async function suaCa(env: Env, b: Record<string, unknown>): Promise<Response> {
     const ghi = String(b.ghiChu ?? '') || `thầy khoá ca ${nay.slice(11, 16)}Z, nộp phần đã làm`
     const r = await env.DB.prepare(
       `UPDATE luot
-          SET trang_thai = 'da_nop',
+          SET trang_thai = 'da_nop', ${SQL_DAU_KHOA},
               nop_luc = ?,
               ghi_chu = CASE WHEN ghi_chu IS NULL OR ghi_chu = '' THEN ? ELSE ghi_chu || ' · ' || ? END,
               cap_nhat_luc = ?
