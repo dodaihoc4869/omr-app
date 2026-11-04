@@ -1,0 +1,876 @@
+[
+  {
+    "i": 266,
+    "hash": "2d2551ae312eea69476e3ceca4adfeaa1026c86b3c37922987db8e7144fa0b1f",
+    "fileNguon": "anh/2d2551ae312eea69476e3ceca4adfeaa1026c86b3c37922987db8e7144fa0b1f.png",
+    "canvas": [
+      367,
+      190
+    ],
+    "nativeOpened": true,
+    "zoomOpened": "/workspace/scratch/dien-266-zoom.png",
+    "status": "Source reading only; SVG not reviewed/approved",
+    "coordinateSystem": "Approximate native pixels, origin top-left; preserve topology and label ownership, not pixel-perfect claim",
+    "questions": [
+      {
+        "qid": "VIP27-C3-B11-D2-II-3",
+        "de": "Thuỷ phân hoàn toàn tripeptide E chứa các gốc amino acid của glycine (Gly), glutamic acid (Glu) và lysine (Lys) trong dung dịch NaOH thu được dung dịch X. Nhúng hai điện cực của dòng điện một chiều có hiệu điện thế thấp vào dung dịch X (hình vẽ), sau đó thêm từ từ dung dịch HCl vào X đến khi dung dịch thu được có pH = 1,0 (dung dịch Y).",
+        "refs": [
+          {
+            "where": "VIP27-C3-B11-D2-II-3.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "labels": [
+      {
+        "text": "(+)",
+        "at": [
+          67,
+          29
+        ]
+      },
+      {
+        "text": "(−)",
+        "at": [
+          276,
+          29
+        ]
+      },
+      {
+        "text": "dung dịch X",
+        "at": [
+          170,
+          149
+        ]
+      }
+    ],
+    "container": {
+      "kind": "open-top rectangular U outline, NOT salt bridge",
+      "path": [
+        [
+          45,
+          69
+        ],
+        [
+          45,
+          185
+        ],
+        [
+          305,
+          185
+        ],
+        [
+          305,
+          69
+        ]
+      ],
+      "liquidRect": [
+        46,
+        98,
+        258,
+        86
+      ]
+    },
+    "bars": [
+      {
+        "bounds": [
+          63,
+          44,
+          11,
+          130
+        ],
+        "polarity": "+"
+      },
+      {
+        "bounds": [
+          272,
+          45,
+          11,
+          130
+        ],
+        "polarity": "−"
+      }
+    ],
+    "wires": [
+      {
+        "from": [
+          67,
+          52
+        ],
+        "via": [
+          [
+            39,
+            43
+          ],
+          [
+            25,
+            32
+          ]
+        ],
+        "to": [
+          8,
+          11
+        ],
+        "note": "curved thin free lead to upper-left, no source box"
+      },
+      {
+        "from": [
+          278,
+          50
+        ],
+        "via": [
+          [
+            313,
+            44
+          ],
+          [
+            335,
+            30
+          ]
+        ],
+        "to": [
+          359,
+          6
+        ],
+        "note": "curved free lead to upper-right"
+      }
+    ],
+    "saltBridge": false,
+    "arrows": [],
+    "sourceVoltage": null,
+    "notes": [
+      "2 outlined rectangular electrode bars; white interior.",
+      "No bubbles, ion/electron arrows, electrode names or V box."
+    ]
+  },
+  {
+    "i": 831,
+    "hash": "99b912de8d32f2f4669eae8d6ff0e0ca019b29da6d83d45aa95776f50c04423f",
+    "fileNguon": "anh/99b912de8d32f2f4669eae8d6ff0e0ca019b29da6d83d45aa95776f50c04423f.png",
+    "canvas": [
+      305,
+      179
+    ],
+    "nativeOpened": true,
+    "zoomOpened": "/workspace/scratch/dien-831-zoom.png",
+    "status": "Source reading only; SVG not reviewed/approved",
+    "coordinateSystem": "Approximate native pixels, origin top-left; preserve topology and label ownership, not pixel-perfect claim",
+    "questions": [
+      {
+        "qid": "VIP27-C5-B15-I-17",
+        "de": "Một học sinh tiến hành thí nghiệm pin điện hóa, tra cứu điện thế khử chuẩn của 4 cặp oxi hóa - khử như bảng dưới và chuẩn bị nước cất, cầu muối, cốc có mỏ, các loại muối và điện cực tương ứng. Học sinh lấy ra hai cặp oxi hóa - khử, và dùng cầu muối kết nối chúng để tạo thành pin điện hóa, như hình sau.\nCho các phát biểu sau:\n(a) Trong pin đo được suất điện động 0,57 V (ảnh trên) thì cực dương (cathode) là lá đồng (Cu).\n(b) Trong pin Nickel-Zinc, lá nickel (Ni) là cực âm (anode).\n(c) Suất điện động đo được của pin Ni-Pb sẽ lớn hơn 0,36 V.\n(d) Nếu tháo cầu muối và thay bằng dây đồng, vẫn có thể tạo thành pin.\n(e) Nếu thay kim loại của bán pin bằng than chì (graphite), vẫn có thể tạo thành pin.\nSố phát biểu đúng là",
+        "refs": [
+          {
+            "where": "VIP27-C5-B15-I-17.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "labels": [
+      {
+        "text": "−",
+        "at": [
+          119,
+          7
+        ]
+      },
+      {
+        "text": "+",
+        "at": [
+          252,
+          5
+        ]
+      },
+      {
+        "text": "Thanh kim loại",
+        "at": [
+          73,
+          167
+        ],
+        "leader": [
+          [
+            91,
+            156
+          ],
+          [
+            134,
+            122
+          ]
+        ]
+      },
+      {
+        "text": "Dung dịch",
+        "at": [
+          137,
+          168
+        ],
+        "leader": [
+          [
+            140,
+            158
+          ],
+          [
+            161,
+            143
+          ]
+        ]
+      },
+      {
+        "text": "Thanh\nkim loại",
+        "at": [
+          284,
+          129
+        ],
+        "leader": [
+          [
+            266,
+            128
+          ],
+          [
+            238,
+            126
+          ]
+        ]
+      },
+      {
+        "text": "Dung dịch",
+        "at": [
+          258,
+          168
+        ],
+        "leader": [
+          [
+            252,
+            158
+          ],
+          [
+            242,
+            141
+          ]
+        ]
+      }
+    ],
+    "beakers": [
+      {
+        "mouth": [
+          116,
+          94,
+          57,
+          6
+        ],
+        "bottom": [
+          145,
+          151
+        ],
+        "liquidY": 114
+      },
+      {
+        "mouth": [
+          201,
+          94,
+          56,
+          6
+        ],
+        "bottom": [
+          230,
+          151
+        ],
+        "liquidY": 114
+      }
+    ],
+    "bars": [
+      {
+        "axis": [
+          [
+            116,
+            24
+          ],
+          [
+            139,
+            148
+          ]
+        ],
+        "polarity": "−",
+        "note": "dark tilted bar; top connector/crocodile-like sleeve"
+      },
+      {
+        "axis": [
+          [
+            257,
+            24
+          ],
+          [
+            232,
+            148
+          ]
+        ],
+        "polarity": "+",
+        "note": "light tilted bar; top connector/sleeve"
+      }
+    ],
+    "saltBridge": {
+      "count": 1,
+      "kind": "inverted U broad tube, 2 parallel outlines, rounded top",
+      "outerApprox": [
+        [
+          159,
+          132
+        ],
+        [
+          159,
+          72
+        ],
+        [
+          164,
+          51
+        ],
+        [
+          185,
+          44
+        ],
+        [
+          205,
+          51
+        ],
+        [
+          212,
+          72
+        ],
+        [
+          212,
+          132
+        ]
+      ],
+      "innerLegEnds": [
+        [
+          162,
+          135
+        ],
+        [
+          210,
+          135
+        ]
+      ],
+      "note": "Both lower tube ends submerged; small darker end plugs/caps. U top above mouths, not a flat wire."
+    },
+    "meter": {
+      "bounds": [
+        24,
+        78,
+        51,
+        66
+      ],
+      "display": "0.57",
+      "displayBounds": [
+        33,
+        84,
+        37,
+        16
+      ],
+      "knob": {
+        "center": [
+          51,
+          119
+        ],
+        "radius": 16,
+        "diagonal": "upper-left to lower-right"
+      },
+      "smallButtons": [
+        [
+          36,
+          104
+        ],
+        [
+          66,
+          104
+        ],
+        [
+          36,
+          133
+        ],
+        [
+          66,
+          133
+        ]
+      ],
+      "leadJacks": [
+        [
+          51,
+          139
+        ],
+        [
+          61,
+          138
+        ]
+      ],
+      "note": "Literal decimal POINT, not comma. No V text visible on meter."
+    },
+    "wires": [
+      {
+        "from": "left meter jack around(51,139)",
+        "to": "one electrode top terminal",
+        "routing": "runs right near y142 then loops up through central gap; source crossing has no junction dot"
+      },
+      {
+        "from": "right meter jack around(61,138)",
+        "to": "other electrode top terminal",
+        "routing": "runs right near y142 then loops up through central gap; two fine curves cross; no joined electrical node"
+      }
+    ],
+    "wireEndpointCertainty": "Each electrode top has one independent lead and meter has two independent jacks. At native raster crossing/overlap with tube makes exact jack-to-left/right mapping not safe to assert; do not invent junction or electron direction. Preserve traced visual curves.",
+    "arrows": [],
+    "sourceVoltage": null,
+    "notes": [
+      "2 generic beakers,2 electrodes,1 inverted-U bridge,1 digital meter.",
+      "Both beakers have own Thanh kim loại and Dung dịch labels. Do not add Zn/Cu or named salt."
+    ]
+  },
+  {
+    "i": 1090,
+    "hash": "c3e93280205f90d144dea03f56c58dd506e47401172e179b1bf36df376188460",
+    "fileNguon": "anh/c3e93280205f90d144dea03f56c58dd506e47401172e179b1bf36df376188460.png",
+    "canvas": [
+      249,
+      255
+    ],
+    "nativeOpened": true,
+    "zoomOpened": "/workspace/scratch/dien-1090-zoom.png",
+    "status": "Source reading only; SVG not reviewed/approved",
+    "coordinateSystem": "Approximate native pixels, origin top-left; preserve topology and label ownership, not pixel-perfect claim",
+    "questions": [
+      {
+        "qid": "VIP27-C5-B17-D1-I-9",
+        "de": "Dụng cụ nào cần bổ sung vào hệ được mô tả như sơ đồ ở hình bên để tạo thành pin Galvani hoạt động?",
+        "refs": [
+          {
+            "where": "VIP27-C5-B17-D1-I-9.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "labels": [
+      {
+        "text": "Bóng đèn",
+        "at": [
+          120,
+          10
+        ]
+      },
+      {
+        "text": "Dây\ndẫn điện",
+        "at": [
+          121,
+          65
+        ]
+      },
+      {
+        "text": "Thanh Zn",
+        "at": [
+          31,
+          56
+        ]
+      },
+      {
+        "text": "Thanh Cu",
+        "at": [
+          215,
+          56
+        ]
+      },
+      {
+        "text": "Dung dịch\nZnSO₄ 1,0 M",
+        "at": [
+          70,
+          235
+        ]
+      },
+      {
+        "text": "Dung dịch\nCuSO₄ 1,0 M",
+        "at": [
+          182,
+          235
+        ]
+      }
+    ],
+    "beakers": [
+      {
+        "mouthApprox": [
+          21,
+          91,
+          91,
+          18
+        ],
+        "bottomY": 214,
+        "liquidEllipse": [
+          30,
+          128,
+          79,
+          16
+        ]
+      },
+      {
+        "mouthApprox": [
+          135,
+          91,
+          88,
+          18
+        ],
+        "bottomY": 214,
+        "liquidEllipse": [
+          143,
+          128,
+          76,
+          16
+        ]
+      }
+    ],
+    "bars": [
+      {
+        "bounds": [
+          60,
+          65,
+          19,
+          122
+        ],
+        "label": "Zn"
+      },
+      {
+        "bounds": [
+          169,
+          65,
+          20,
+          122
+        ],
+        "label": "Cu"
+      }
+    ],
+    "lamp": {
+      "circle": [
+        121,
+        33,
+        12
+      ],
+      "inside": "X, two diagonal lines"
+    },
+    "wires": [
+      {
+        "from": [
+          69,
+          65
+        ],
+        "via": [
+          [
+            69,
+            33
+          ]
+        ],
+        "to": [
+          109,
+          33
+        ]
+      },
+      {
+        "from": [
+          133,
+          33
+        ],
+        "via": [
+          [
+            179,
+            33
+          ]
+        ],
+        "to": [
+          179,
+          65
+        ]
+      }
+    ],
+    "saltBridge": false,
+    "arrows": [],
+    "sourceVoltage": null,
+    "notes": [
+      "NO connecting tube/bridge between solutions in native source. The missing device is part of public question; never add it.",
+      "No +/−, no e arrows. Two beakers with spouts at upper-left, each one rectangular electrode. Concentrations use comma 1,0 M."
+    ]
+  },
+  {
+    "i": 1399,
+    "hash": "fc0e80ce07efe61d7fd3637d5b7d6a187bbcb9700a20ad51a9fc87c866a8a6ca",
+    "fileNguon": "anh/fc0e80ce07efe61d7fd3637d5b7d6a187bbcb9700a20ad51a9fc87c866a8a6ca.png",
+    "canvas": [
+      354,
+      207
+    ],
+    "nativeOpened": true,
+    "zoomOpened": "/workspace/scratch/dien-1399-zoom.png",
+    "status": "Source reading only; SVG not reviewed/approved",
+    "coordinateSystem": "Approximate native pixels, origin top-left; preserve topology and label ownership, not pixel-perfect claim",
+    "questions": [
+      {
+        "qid": "DB-10-B1-D1-II-142",
+        "de": "J. J. Thomson, nhà vật lí người Anh, được trao Giải thưởng Nobel Vật lí vào năm 1906 vì phát hiện ra một loại hạt cơ bản tạo nên nguyên tử.\nThomson đã chế tạo ống tia âm cực gồm một ống thuỷ tinh được hút phần lớn không khí ra khỏi ống, một hiệu điện thế cao được đặt vào hai điện cực gắn ở hai đầu ống. Năm 1897, ông phát hiện ra một dòng hạt đi ra từ điện cực tích điện âm sang điện cực tích điện dương. Ống tia âm cực",
+        "refs": [
+          {
+            "where": "DB-10-B1-D1-II-142.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B1-II-3",
+        "de": "J. J. Thomson, nhà vật lí người Anh, được trao Giải thưởng Nobel Vật lí vào năm 1906 vì phát hiện ra một loại hạt cơ bản tạo nên nguyên tử.\nThomson đã chế tạo ống tia âm cực gồm một ống thuỷ tinh được hút phần lớn không khí ra khỏi ống, một hiệu điện thế cao được đặt vào hai điện cực gắn ở hai đầu ống. Năm 1897, ông phát hiện ra một dòng hạt đi ra từ điện cực tích điện âm sang điện cực tích điện dương. Ống tia âm cực",
+        "refs": [
+          {
+            "where": "DH-10-C1-B1-II-3.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "labels": [
+      {
+        "text": "Ống phóng điện",
+        "at": [
+          78,
+          19
+        ],
+        "leader": [
+          [
+            85,
+            36
+          ],
+          [
+            101,
+            43
+          ]
+        ]
+      },
+      {
+        "text": "Cực âm",
+        "at": [
+          95,
+          125
+        ],
+        "leader": [
+          [
+            83,
+            107
+          ],
+          [
+            118,
+            78
+          ]
+        ]
+      },
+      {
+        "text": "Cực dương",
+        "at": [
+          290,
+          120
+        ],
+        "leader": [
+          [
+            291,
+            104
+          ],
+          [
+            272,
+            79
+          ]
+        ]
+      },
+      {
+        "text": "Hiệu điện thế cao",
+        "at": [
+          93,
+          185
+        ],
+        "leader": [
+          [
+            157,
+            183
+          ],
+          [
+            171,
+            180
+          ]
+        ]
+      },
+      {
+        "text": "−",
+        "at": [
+          68,
+          65
+        ]
+      },
+      {
+        "text": "+",
+        "at": [
+          320,
+          60
+        ]
+      }
+    ],
+    "tube": {
+      "bounds": [
+        76,
+        42,
+        236,
+        60
+      ],
+      "shape": "horizontal capsule, pale yellow interior",
+      "bars": [
+        {
+          "axis": [
+            [
+              118,
+              52
+            ],
+            [
+              118,
+              92
+            ]
+          ],
+          "polarity": "−"
+        },
+        {
+          "axis": [
+            [
+              272,
+              52
+            ],
+            [
+              272,
+              92
+            ]
+          ],
+          "polarity": "+"
+        }
+      ]
+    },
+    "rays": [
+      {
+        "from": [
+          122,
+          65
+        ],
+        "to": [
+          267,
+          65
+        ],
+        "arrow": "right"
+      },
+      {
+        "from": [
+          122,
+          71
+        ],
+        "to": [
+          267,
+          71
+        ],
+        "arrow": "right"
+      },
+      {
+        "from": [
+          122,
+          78
+        ],
+        "to": [
+          267,
+          78
+        ],
+        "arrow": "right"
+      }
+    ],
+    "wires": [
+      {
+        "from": [
+          118,
+          71
+        ],
+        "via": [
+          [
+            54,
+            71
+          ],
+          [
+            54,
+            156
+          ],
+          [
+            183,
+            156
+          ]
+        ],
+        "to": [
+          183,
+          168
+        ]
+      },
+      {
+        "from": [
+          272,
+          71
+        ],
+        "via": [
+          [
+            336,
+            71
+          ],
+          [
+            336,
+            156
+          ],
+          [
+            207,
+            156
+          ]
+        ],
+        "to": [
+          207,
+          168
+        ]
+      }
+    ],
+    "source": {
+      "bounds": [
+        171,
+        168,
+        45,
+        24
+      ],
+      "color": "dark red",
+      "terminals": [
+        {
+          "text": "−",
+          "at": [
+            184,
+            180
+          ],
+          "wire": "left"
+        },
+        {
+          "text": "+",
+          "at": [
+            203,
+            180
+          ],
+          "wire": "right"
+        }
+      ],
+      "voltageText": "Hiệu điện thế cao",
+      "numericVoltage": null
+    },
+    "saltBridge": false,
+    "notes": [
+      "3 horizontal ray lines with tiny arrowheads near right electrode; all point right. Do not substitute electron dots or add gas/pressure/V values.",
+      "Exterior wire horizontal through tube endpoints to each electrode; label leader lines are separate, not extra wires."
+    ]
+  }
+]
