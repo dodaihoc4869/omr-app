@@ -1415,13 +1415,14 @@ export async function deleteStudentRegistration(scriptUrl: string, secret: strin
   if (!result.ok) throw new Error(result.error || 'Xoá đăng ký thất bại')
 }
 
-/** Đánh dấu học sinh nghỉ học — chỉ thầy (mã bí mật). */
+/** Đánh dấu học sinh nghỉ học — chỉ thầy (mã bí mật). `nghi: false` ⇒ khôi phục đi học lại (công tắc ở hồ sơ em, thầy 04/11). */
 export async function danhDauNghiHocApi(
   scriptUrl: string,
   secret: string,
   sbd: string,
+  nghi = true,
 ): Promise<{ ok: boolean; sbd: string; daNghi: boolean; trangThai: string; error?: string }> {
-  const result = await postJson(scriptUrl, { action: 'danhDauNghiHoc', secret, sbd })
+  const result = await postJson(scriptUrl, { action: 'danhDauNghiHoc', secret, sbd, ...(nghi ? {} : { nghi: false }) })
   if (!result.ok) throw new Error(result.error || 'Cập nhật trạng thái thất bại')
   return result as { ok: boolean; sbd: string; daNghi: boolean; trangThai: string; error?: string }
 }
