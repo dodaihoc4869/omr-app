@@ -1740,6 +1740,8 @@
       }
     ],
     "chiLaDuLieuDungChuaSoatRender": true,
-    "daCoManifestTaiCheckpoint": false
+    "daCoManifestTaiCheckpoint": true,
+    "svgDaChon": "glucose-ba-dang-ddh-76b01127d40681543007d373112f12b29e2946b1fcf7cc2875c714c8d18ba25f.svg",
+    "hashSvgDaChon": "76b01127d40681543007d373112f12b29e2946b1fcf7cc2875c714c8d18ba25f"
   }
 ]

@@ -1307,3 +1307,10 @@ Phân vùng dự kiến theo hai bản thiết kế:
 1120/1030 giữFischer6Cexplicit/RLRR/CH2OHkhai triển vàvòngα-glucose0H/nhãn(1)..(4)chỉBONDkhôngsốC.1046giữ3formα/open/β/18sốC/allH-OH/HOCH2trái/2cặp⇌/3caption. TừngPNGnative/full+actualSVG/exacthashđãsoátđộclập.
 Nhóm169đãxong15/20;1120/1030/1046ĐÃĐẠTđừngtrùng. CÒN765/1195/806/1028/1416CHƯAdựng. Ưutiên1416glucose3forms/18nums/2OHboxdashed+curvedleaders+OHhemiacetal;rootđãmởnative:betaC4downlàOH,alphaC4downlàHO(đọcghi169cũbetaHOphảisửatheoglyph). KhôngđoánH/OH/arrow. Fullsource/publicrefs/geometrykiem/doc-molecule-lo-169.json. Giữharness167/mốc/đỏcũ. CỡtệpđỏNỀNindex.tsnguyênbytephảixửlýtrướcgộp/deploy.Mainphảicậpnhậtmớinhất/fulltestTHEOTÊN/cathi/offlineapp.1014/209/59/1391vẫnchưađạt.
 -Chromium517/517/hash/XML/path/selfcontained/AST/build176/precache170/2613.23KiB/speed21/21đạt. Không đổi mốc/production/harness167. CỡtệpđỏNỀNindex.tsgiữnguyênphảixửlýtrướcgộp/deploy;khôngbáoallrepođạt. Mainab81c625chưagộp/WOFF2khôngdiff. Chưa tích hợp/chưa reload offline app/chưa phát hành. Chưa tham vấn được cố vấn.
+
+
+### 04/11 — Lô177: ba dạng glucose
+-1017 câu đủ mọi hình+DDH/7 một phần;765 nguồn→518 SVG;8168641byte/gzip1612610;663 nguồn còn lại.
+-1416ba dạngα-glucose/mạchhở/β-glucose,18sốC/allH-OH/2cặp⇌/2OHboxdashed/2curvedleader+OHhemiacetal/3caption. GiữalphaC4HOdown,betaC4OHdown theo glyph nguồn. TừngPNGnative/full+actualSVG/exacthashsoátđộclập.
+-Chromium518/518/hash/XML/path/selfcontained/AST/build177/precache170/2613.23KiB/speed21/21đạt. SizegateđỏNỀNindex.tsnguyênbytekhôngnângmốc;phảixửlýtrướcgộp/deploy.Mainab81c625chưagộp/WOFF2khôngdiff. Chưa tích hợp/chưa reload offline app/chưa phát hành. Chưa tham vấn được cố vấn.
+-Nhóm169đãđạt16/20;còn765/1195/806/1028chưadựng. 1416/1046/1120/1030đãđạtđừngtrùng.765MSweakbaselinehairlines/1195sulfur/806aniline/1028curvesgiữtick/label/pixelkhôngsuytheory. Fullsource/publicde/refs/geometrykiem/doc-molecule-lo-169.json. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.

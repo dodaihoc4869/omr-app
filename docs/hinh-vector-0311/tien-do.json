@@ -60,8 +60,8 @@
       "Toàn kho còn chưa hoàn tất, app chưa thay hình; không báo đã xong hoặc đã triển khai."
     ],
     "danhMucDaKiem": "docs/hinh-vector-0311/kiem/danh-muc-da-kiem.json",
-    "loVuaXong": "1015 câu đủ mọi hình+DDH/7 một phần;764 nguồn→517 SVG;8.105.304byte/gzip1.605.937;664 nguồn còn lại. Lô175–176 hoàn thiện3nguồn/2SVG mới,khép6câu.",
-    "viecNenLamTiep": "Nhóm169đãxong15/20;1120/1030/1046ĐÃĐẠTđừngtrùng. CÒN765/1195/806/1028/1416CHƯAdựng. Ưutiên1416glucose3forms/18nums/2OHboxdashed+curvedleaders+OHhemiacetal;rootđãmởnative:betaC4downlàOH,alphaC4downlàHO(đọcghi169cũbetaHOphảisửatheoglyph). KhôngđoánH/OH/arrow. Fullsource/publicrefs/geometrykiem/doc-molecule-lo-169.json. Giữharness167/mốc/đỏcũ. CỡtệpđỏNỀNindex.tsnguyênbytephảixửlýtrướcgộp/deploy.Mainphảicậpnhậtmớinhất/fulltestTHEOTÊN/cathi/offlineapp.1014/209/59/1391vẫnchưađạt.",
+    "loVuaXong": "1017 câu đủ mọi hình+DDH/7 một phần;765 nguồn→518 SVG;8168641byte/gzip1612610;663 nguồn còn lại.",
+    "viecNenLamTiep": "Nhóm169đãđạt16/20;còn765/1195/806/1028chưadựng. 1416/1046/1120/1030đãđạtđừngtrùng.765MSweakbaselinehairlines/1195sulfur/806aniline/1028curvesgiữtick/label/pixelkhôngsuytheory. Fullsource/publicde/refs/geometrykiem/doc-molecule-lo-169.json. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.",
     "canhBaoCheckpoint": "Giữworktree/commitmớihơn. Origin/mainab81c625chưagộp;khôngpháthànhkhichưatoànphạmvi/cổng/offlineappđạt."
   },
   "tuDongTiepTuc": {
@@ -70,7 +70,7 @@
     "lich": "moi-gio",
     "mucTieu": "Tự vẽ, soát, sửa, tích hợp và kiểm bản sống đến khi đạt; tự tắt khi hoàn tất",
     "thongBao": "Chỉ khi hoàn tất, có lỗi chặn thực sự hoặc cần hành động của thầy",
-    "lyDo": "Tiếp từ1015câu/517SVG;chỉtắt khi toànphạmviđạt/vàoapp/kiểmbảnsống."
+    "lyDo": "Tiếp từ1017câu/518SVG;chỉtắt khi toànphạmviđạt/vàoapp/kiểmbảnsống."
   },
   "loOrbitalDaSoat": {
     "soAnhNguon": 23,
@@ -79,14 +79,14 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 764,
-    "soSvgRieng": 517,
-    "soCauDungHinh": 1022,
-    "soCauDuMoiHinh": 1015,
+    "soAnhNguon": 765,
+    "soSvgRieng": 518,
+    "soCauDungHinh": 1024,
+    "soCauDuMoiHinh": 1017,
     "soCauMoiXongMotPhan": 7,
-    "byteSvg": 8105304,
-    "byteGzip": 1605937,
-    "soAnhNguonConLai": 664,
+    "byteSvg": 8168641,
+    "byteGzip": 1612610,
+    "soAnhNguonConLai": 663,
     "daTichHop": false
   },
   "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.",
@@ -101,20 +101,20 @@
     "batBuocMoiHinh": true,
     "daHoanTatToanBo": false,
     "ghiChu": "Bộ đangchọn đãđạtfontDDH/pathtựchứa vàsoátđộclập;toànkhochưahoàntất,khôngpháthànhbộchưađủ.",
-    "loMoi": "175–176 toàn bộ chữ DDH Rounded path tự chứa/không fallback.",
+    "loMoi": "177mọichữ/DDH Rounded path tự chứa/khôngfallback.",
     "congCu": "scripts/phong-vector-0311.py",
     "daChuyenHetBoDaVe": true
   },
   "daDatPhongApp": {
-    "soNguon": 764,
-    "soCauDuHinhVaPhong": 1015,
+    "soNguon": 765,
+    "soCauDuHinhVaPhong": 1017,
     "ghiChu": "Các số tổngDaDoiChieu vẫn mô tả nội dung đã kiểm; bản cũ chưa đổi phông không được coi đạt yêu cầu phông mới."
   },
   "loMoiNhat": {
-    "lo": "175–176",
-    "ketQua": "1015 câu đủ mọi hình+DDH/7 một phần;764 nguồn→517 SVG;8.105.304byte/gzip1.605.937;664 nguồn còn lại. Lô175–176 hoàn thiện3nguồn/2SVG mới,khép6câu.",
-    "suaLoi": "1120/1030 giữFischer6Cexplicit/RLRR/CH2OHkhai triển vàvòngα-glucose0H/nhãn(1)..(4)chỉBONDkhôngsốC.1046giữ3formα/open/β/18sốC/allH-OH/HOCH2trái/2cặp⇌/3caption. TừngPNGnative/full+actualSVG/exacthashđãsoátđộclập.",
-    "tiepTheo": "Nhóm169đãxong15/20;1120/1030/1046ĐÃĐẠTđừngtrùng. CÒN765/1195/806/1028/1416CHƯAdựng. Ưutiên1416glucose3forms/18nums/2OHboxdashed+curvedleaders+OHhemiacetal;rootđãmởnative:betaC4downlàOH,alphaC4downlàHO(đọcghi169cũbetaHOphảisửatheoglyph). KhôngđoánH/OH/arrow. Fullsource/publicrefs/geometrykiem/doc-molecule-lo-169.json. Giữharness167/mốc/đỏcũ. CỡtệpđỏNỀNindex.tsnguyênbytephảixửlýtrướcgộp/deploy.Mainphảicậpnhậtmớinhất/fulltestTHEOTÊN/cathi/offlineapp.1014/209/59/1391vẫnchưađạt.",
-    "gioiHan": "Chưa tích hợp/chưa reload offline app/chưa phát hành. CỡtệpđỏNỀNindex.tsphảixửlýtrướcgộp/deploy."
+    "lo": "177",
+    "ketQua": "1017 câu đủ mọi hình+DDH/7 một phần;765 nguồn→518 SVG;8168641byte/gzip1612610;663 nguồn còn lại.",
+    "suaLoi": "1416ba dạngα-glucose/mạchhở/β-glucose,18sốC/allH-OH/2cặp⇌/2OHboxdashed/2curvedleader+OHhemiacetal/3caption. GiữalphaC4HOdown,betaC4OHdown theo glyph nguồn. TừngPNGnative/full+actualSVG/exacthashsoátđộclập.",
+    "tiepTheo": "Nhóm169đãđạt16/20;còn765/1195/806/1028chưadựng. 1416/1046/1120/1030đãđạtđừngtrùng.765MSweakbaselinehairlines/1195sulfur/806aniline/1028curvesgiữtick/label/pixelkhôngsuytheory. Fullsource/publicde/refs/geometrykiem/doc-molecule-lo-169.json. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.",
+    "gioiHan": "Chưa tích hợp/chưa reload offline app/chưa phát hành. Build177/speed21/21/Chromium518/518/hashXML/path/ASTđạt;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy."
   }
 }

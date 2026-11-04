@@ -1,0 +1,124 @@
+[
+  {
+    "i": 1416,
+    "hash": "fe6a83da39aefc1338a6de5eff56c4c40f5e3bb0711a115bad868088cf70777e",
+    "fileNguon": "anh/fe6a83da39aefc1338a6de5eff56c4c40f5e3bb0711a115bad868088cf70777e.png",
+    "canvas": [
+      1024,
+      340
+    ],
+    "daMoNative": true,
+    "kind": "glucose-three-form-highlight-equilibrium",
+    "leftAlpha": {
+      "caption": "α-glucose",
+      "ring": "6ringOupperright",
+      "C1": {
+        "up": "H",
+        "down": "OH boxed"
+      },
+      "C2": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C3": {
+        "up": "OH",
+        "down": "H"
+      },
+      "C4": {
+        "up": "H",
+        "down": "HO"
+      },
+      "C5": {
+        "up": "CH₂OH(carbon6)",
+        "down": "H"
+      }
+    },
+    "middleFischer": {
+      "caption": "glucose",
+      "top": "CHO(carbon1)",
+      "bottom": "CH₂OH(carbon6)",
+      "rows": [
+        {
+          "left": "H",
+          "right": "OH",
+          "carbonNumber": 2
+        },
+        {
+          "left": "HO",
+          "right": "H",
+          "carbonNumber": 3
+        },
+        {
+          "left": "H",
+          "right": "OH",
+          "carbonNumber": 4
+        },
+        {
+          "left": "H",
+          "right": "OH",
+          "carbonNumber": 5
+        }
+      ]
+    },
+    "rightBeta": {
+      "caption": "β-glucose",
+      "C1": {
+        "up": "OH boxed",
+        "down": "H"
+      },
+      "C2": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C3": {
+        "up": "OH",
+        "down": "H"
+      },
+      "C4": {
+        "up": "H",
+        "down": "HO"
+      },
+      "C5": {
+        "up": "CH₂OH(carbon6)",
+        "down": "H"
+      }
+    },
+    "highlightLabels": [
+      "OH hemiacetal",
+      "OH hemiacetal"
+    ],
+    "notes": "α⇌Fischer⇌β2equilibriumarrowpairsnoextraNi/H⁺. GIỮCnumbers1..6cả3panel/allringHexplicit,αanomericOHdown dashedroundedBOXvàcurvedarrowlabelOHhemiacetalDƯỚI;βanomericOHup dashedroundedBOX+curvedarrowlabelOHhemiacetalTRÊN. Chỉ2OHhighlightboxes,khônghighlightcácOHkhác. NoCIPwedge/charges,nothêmglucopyranosidename.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D3-II-218",
+        "de": "Glucose là loại monosaccharide phổ biến và có nhiều ứng dụng. Glucose tồn tại chủ yếu ở hai dạng mạch vòng là α-glucose và β-glucose. Trong dung dịch, hai dạng mạch vòng này có thể chuyển hoá lẫn nhau thông qua dạng mạch hở như hình sau:",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-II-218.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-II-14",
+        "de": "Glucose là loại monosaccharide phổ biến và có nhiều ứng dụng. Glucose tồn tại chủ yếu ở hai dạng mạch vòng là α-glucose và β-glucose. Trong dung dịch, hai dạng mạch vòng này có thể chuyển hoá lẫn nhau thông qua dạng mạch hở như hình sau:",
+        "refs": [
+          {
+            "where": "DH-12-C2-B4-II-14.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daCoManifestTaiCheckpoint": false,
+    "svg": "glucose-ba-dang-ddh-76b01127d40681543007d373112f12b29e2946b1fcf7cc2875c714c8d18ba25f.svg",
+    "hashSvg": "76b01127d40681543007d373112f12b29e2946b1fcf7cc2875c714c8d18ba25f",
+    "byteSvg": 63337,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "3forms/18numbers/allringH/2dashedOHboxes/2curvedleaders/2OHhemiacetal/2equilibriumpairs. AlphaC4HOdown,betaC4OHdown theo glyph nguồn, sửa ghi chú đọc cũ betaHO. No conditions added.",
+    "hashSvgDaSoat": "76b01127d40681543007d373112f12b29e2946b1fcf7cc2875c714c8d18ba25f",
+    "nguoiSoat": "cau_truc_4"
+  }
+]
