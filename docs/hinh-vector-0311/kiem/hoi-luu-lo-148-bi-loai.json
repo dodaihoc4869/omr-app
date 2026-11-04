@@ -1,0 +1,8 @@
+[
+  {
+    "i": 926,
+    "hashSvg": "340ab564554c5946df5de8bce78e792bfa8f89f56b13ec534678418ea0f76b60",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Cần sửa: Đã mở nativefull+actualSVG hiện tại và đọc geometry/generator. Stirbar y367..373 vẫn chạm/nhập cạnh dưới vào nét đáy flask (render y776/777); arc flask hiện đáy khoảng373.5native nên nâng3px chưa đủ, cần khe trắng rõ bar/đáy. Các thành phần khác đạt: jacket2lớp/2portleft/1arrowRIGHTupper2LEFTlower/3rodleaderNOhead/4bentarrowLEFTcap/5LEFTbath/3necks/caps/connector/waveliquid/đủlabels1..5, không thêmscale/bulb/flame/t°. DDHpath/hash khớp, không crop canvas. Chưa Đạt do stirbar."
+  }
+]

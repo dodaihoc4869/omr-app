@@ -1,0 +1,458 @@
+[
+  {
+    "i": 1197,
+    "hash": "d8b95f0d03c89489fddd25896a1866c3b88ab6aac8f94f39e851a77a080093af",
+    "fileNguon": "anh/d8b95f0d03c89489fddd25896a1866c3b88ab6aac8f94f39e851a77a080093af.png",
+    "canvas": [
+      857,
+      216
+    ],
+    "daMoNative": true,
+    "kind": "gas-collection-grid-4",
+    "labels": [
+      "X",
+      "Y",
+      "Z",
+      "T"
+    ],
+    "notes": "4panelngang.X:bìnhtamgiácĐỨNGnút2lỗ?nativecổlàplugkẹpống,ốngdẫnngắnđixuốngtrongbình,vàcổngtrênbẻngangphải mởmiệngphải,mũitênTRÁIởmiệngchỉkhívàobình;labelXtrên.Y:bìnhtamgiácÚPngược,cổngnhỏdưới,ốngbẻLđivàotừtráiphíadưới,mũitênPHẢI,labelYtráidưới.Z:bìnhĐỨNG,ốngbẻLtrênmiệngcổtừTRÁI,mũitênPHẢIởđầuvàokhí,labelZtrên;ốngbêndướitrongbìnhKHÔNGkéodàiđếnđáy.T:bểchữnhậtchứanước(đườnggạchngangmức),bìnhnónÚPtrongbể,miệngdướinước;ốngdẫntừtrêntráichéoxuốngbểrồiuốnUđilênvàobình,bọtkhítròntrongbình;mũitênchéoxuốngphảiởcổngtrêntrái,labelT.Khônggántênchấtkhí/giảiđápán. GiữhướngmũitênphânbiệtX/Y/Z/T.",
+    "questions": [
+      {
+        "qid": "DB-11-B5-D2-I-55",
+        "de": "Các chất khí được thu vào bình theo đúng nguyên tắc bằng cách đẩy không khí (X, Y, Z) và đẩy nước (T) như sau: Nhận xét nào sau đây không đúng?",
+        "refs": [
+          {
+            "where": "DB-11-B5-D2-I-55.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B5-I-67",
+        "de": "Các chất khí được thu vào bình theo đúng nguyên tắc bằng cách đẩy không khí (X, Y, Z) và đẩy nước (T) như sau: Nhận xét nào sau đây không đúng?",
+        "refs": [
+          {
+            "where": "DH-11-C2-B5-I-67.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry": {
+      "panelX": {
+        "flaskApprox": [
+          [
+            47,
+            200
+          ],
+          [
+            82,
+            77
+          ],
+          [
+            82,
+            62
+          ],
+          [
+            105,
+            62
+          ],
+          [
+            105,
+            77
+          ],
+          [
+            139,
+            200
+          ]
+        ],
+        "label": [
+          "X",
+          [
+            119,
+            17
+          ]
+        ],
+        "gasTubeDoublePath": [
+          [
+            [
+              90,
+              138
+            ],
+            [
+              90,
+              44
+            ],
+            [
+              94,
+              36
+            ],
+            [
+              151,
+              36
+            ]
+          ],
+          [
+            [
+              97,
+              138
+            ],
+            [
+              97,
+              45
+            ],
+            [
+              100,
+              42
+            ],
+            [
+              151,
+              42
+            ]
+          ]
+        ],
+        "flowArrow": {
+          "tail": [
+            193,
+            38
+          ],
+          "head": [
+            160,
+            38
+          ]
+        },
+        "note": "Đứng,cổngngoàitừPHẢIvào,mũitênTRÁI,ốngtrongngắny138khôngđếnđáy."
+      },
+      "panelY": {
+        "invertedFlaskApprox": [
+          [
+            261,
+            37
+          ],
+          [
+            352,
+            37
+          ],
+          [
+            316,
+            176
+          ],
+          [
+            299,
+            176
+          ],
+          [
+            261,
+            37
+          ]
+        ],
+        "label": [
+          "Y",
+          [
+            261,
+            180
+          ]
+        ],
+        "gasTubeDoublePath": [
+          [
+            [
+              249,
+              198
+            ],
+            [
+              298,
+              198
+            ],
+            [
+              303,
+              194
+            ],
+            [
+              303,
+              99
+            ]
+          ],
+          [
+            [
+              249,
+              204
+            ],
+            [
+              302,
+              204
+            ],
+            [
+              309,
+              198
+            ],
+            [
+              309,
+              99
+            ]
+          ]
+        ],
+        "flowArrow": {
+          "tail": [
+            207,
+            199
+          ],
+          "head": [
+            240,
+            199
+          ]
+        },
+        "note": "Úpngược,mởcổdưới,ốngsupplytừTRÁIdướirồibẻLđilên,mũitênPHẢI."
+      },
+      "panelZ": {
+        "flaskApprox": [
+          [
+            453,
+            205
+          ],
+          [
+            489,
+            83
+          ],
+          [
+            489,
+            66
+          ],
+          [
+            513,
+            66
+          ],
+          [
+            513,
+            83
+          ],
+          [
+            546,
+            205
+          ]
+        ],
+        "label": [
+          "Z",
+          [
+            469,
+            20
+          ]
+        ],
+        "gasTubeDoublePath": [
+          [
+            [
+              443,
+              40
+            ],
+            [
+              495,
+              40
+            ],
+            [
+              503,
+              45
+            ],
+            [
+              503,
+              154
+            ]
+          ],
+          [
+            [
+              443,
+              47
+            ],
+            [
+              493,
+              47
+            ],
+            [
+              497,
+              51
+            ],
+            [
+              497,
+              154
+            ]
+          ]
+        ],
+        "flowArrow": {
+          "tail": [
+            402,
+            42
+          ],
+          "head": [
+            435,
+            42
+          ]
+        },
+        "note": "Đứng,cổngngoàitừTRÁIvào,mũitênPHẢI,ốngtrongngắny154khôngđếnđáy."
+      },
+      "panelT": {
+        "label": [
+          "T",
+          [
+            669,
+            82
+          ]
+        ],
+        "bathApprox": [
+          [
+            642,
+            119
+          ],
+          [
+            642,
+            192
+          ],
+          [
+            645,
+            202
+          ],
+          [
+            656,
+            206
+          ],
+          [
+            817,
+            206
+          ],
+          [
+            832,
+            199
+          ],
+          [
+            834,
+            119
+          ]
+        ],
+        "bathWaterSurface": [
+          [
+            642,
+            128
+          ],
+          [
+            834,
+            128
+          ]
+        ],
+        "invertedFlaskApprox": [
+          [
+            700,
+            36
+          ],
+          [
+            791,
+            36
+          ],
+          [
+            755,
+            145
+          ],
+          [
+            755,
+            175
+          ],
+          [
+            735,
+            175
+          ],
+          [
+            735,
+            145
+          ],
+          [
+            700,
+            36
+          ]
+        ],
+        "internalLiquidTopY": 91,
+        "gasTubeDoublePath": [
+          [
+            [
+              648,
+              88
+            ],
+            [
+              717,
+              186
+            ],
+            [
+              731,
+              190
+            ],
+            [
+              739,
+              187
+            ],
+            [
+              740,
+              129
+            ]
+          ],
+          [
+            [
+              655,
+              84
+            ],
+            [
+              725,
+              178
+            ],
+            [
+              733,
+              184
+            ],
+            [
+              745,
+              180
+            ],
+            [
+              747,
+              129
+            ]
+          ]
+        ],
+        "flowArrow": {
+          "tail": [
+            625,
+            61
+          ],
+          "head": [
+            643,
+            81
+          ]
+        },
+        "bubbleCirclesApprox": [
+          [
+            745,
+            114,
+            4
+          ],
+          [
+            739,
+            123,
+            4
+          ],
+          [
+            750,
+            122,
+            4
+          ]
+        ],
+        "bubbleCountCertain": 3,
+        "waterPattern": "Short horizontaldashesinsidetankbelow128ANDinsidereceiveraboveexternal128uptointernal91,giữ2mứcsourcekhácnhau."
+      }
+    },
+    "diagnostic": "/workspace/scratch/gas1197-T-4x.png",
+    "notesGeometry": "Nativefull857x216vàTcrop4xđãmở.3bubblestrònrõ,nodeTflowarrowchéoxuốngphải,khôngcopyngượcarrowX. Mộtfig4panelkhônglabel(a)..(d),chỉX/Y/Z/T.",
+    "svg": "thu-khi-ddh-d127daa662b7c97e91a8531174dc04006cabca1cc036228abf6c0b94ee575fcb.svg",
+    "hashSvg": "d127daa662b7c97e91a8531174dc04006cabca1cc036228abf6c0b94ee575fcb",
+    "byteSvg": 26601,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "4panelXYZT:flowXleft/Yright/Zright/Tdownright;đứng/úpđúngsource,doublepathtubeskhôngđếnđáyX/Z;Tbath2mứcnước/3bubbleRÕ;khôngtênkhí/đápán/labelphụ.",
+    "hashSvgDaSoat": "d127daa662b7c97e91a8531174dc04006cabca1cc036228abf6c0b94ee575fcb",
+    "nguoiSoat": "cau_truc_6"
+  }
+]

@@ -1,0 +1,450 @@
+[
+  {
+    "i": 678,
+    "hash": "7cee507b549b6654e46c85a37661b230e109254b630fb59190d82776aada6d62",
+    "fileNguon": "anh/7cee507b549b6654e46c85a37661b230e109254b630fb59190d82776aada6d62.png",
+    "canvas": [
+      321,
+      220
+    ],
+    "daMoNative": true,
+    "kind": "NO2-equilibrium-two-tubes",
+    "labels": [
+      "(a)",
+      "(b)",
+      "K",
+      "Nước đá"
+    ],
+    "notes": "2ốngnghiệmđáytrònĐỨNGcónútđenmiệng;ốngtrái(a)màuvàngnâuNHẠT,nằmtrongbeakerNƯỚCĐÁviềnxanh(icechunksrõ);ốngphải(b)màunâuđỏĐẬMởngoàikhôngbeaker. 2nhánhngangngắngiữaốngcùngcaogắnkhóaKthânxanhdương/handleđenđứng. LabelKtrênvan,(a)tráitrêntubetrái,(b)phảitrêntubephải;Nướcđácóleaderchéotrỏicebath.KhôngtựghiNO₂/N₂O₄/t⁰/arrowvìnguồnkhôngcó. 678/1356cùngnộidungmởriêng;sourcecolorskháclýthuyếtcầngiữquan hệđậmtươngứng.",
+    "questions": [
+      {
+        "qid": "DB-11-B1-D1-I-215",
+        "de": "Lắp bộ dụng cụ gồm 2 ống nghiệm có nhánh (a) và (b), được nối với nhau bằng một ống nhựa mềm, có khóa K. Cho cân bằng sau trong bình kín:\n2NO₂(g) (màu nâu đỏ) ⇌ N₂O₄(g) (không màu).\nBiết khi ngâm ống nghiệm (a) vào cốc nước đá thì màu của ống nghiệm (a) nhạt dần. Phản ứng thuận có",
+        "refs": [
+          {
+            "where": "DB-11-B1-D1-I-215.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C1-B3-D1-I-10",
+        "de": "Lắp bộ dụng cụ gồm 2 ống nghiệm có nhánh (a) và (b), được nối với nhau bằng một ống nhựa mềm, có khóa K. Cho cân bằng sau trong bình kín:\n2NO₂(g) (màu nâu đỏ) ⇌ N₂O₄(g) (không màu).\nBiết khi ngâm ống nghiệm (a) vào cốc nước đá thì màu của ống nghiệm (a) nhạt dần. Phản ứng thuận có",
+        "refs": [
+          {
+            "where": "DH-11-C1-B3-D1-I-10.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry": {
+      "tubeLeft": {
+        "walls": [
+          [
+            125,
+            31
+          ],
+          [
+            125,
+            193
+          ],
+          [
+            127,
+            207
+          ],
+          [
+            139,
+            214
+          ],
+          [
+            151,
+            213
+          ],
+          [
+            162,
+            204
+          ],
+          [
+            163,
+            31
+          ]
+        ],
+        "fill": "ochre/mustardlight"
+      },
+      "tubeRight": {
+        "walls": [
+          [
+            256,
+            31
+          ],
+          [
+            256,
+            194
+          ],
+          [
+            260,
+            207
+          ],
+          [
+            274,
+            214
+          ],
+          [
+            289,
+            208
+          ],
+          [
+            294,
+            194
+          ],
+          [
+            294,
+            31
+          ]
+        ],
+        "fill": "brownorange-dark"
+      },
+      "caps": [
+        [
+          121,
+          10,
+          167,
+          34
+        ],
+        [
+          252,
+          10,
+          298,
+          34
+        ]
+      ],
+      "connectorY": [
+        62,
+        73
+      ],
+      "valveBlueBox": [
+        188,
+        60,
+        233,
+        75
+      ],
+      "valveHandle": [
+        [
+          209,
+          53
+        ],
+        [
+          209,
+          82
+        ]
+      ],
+      "valveTopBar": [
+        [
+          202,
+          53
+        ],
+        [
+          216,
+          53
+        ]
+      ],
+      "iceBeaker": {
+        "leftTop": [
+          66,
+          107
+        ],
+        "rightTop": [
+          216,
+          107
+        ],
+        "bottomApprox": [
+          [
+            66,
+            201
+          ],
+          [
+            69,
+            211
+          ],
+          [
+            78,
+            216
+          ],
+          [
+            206,
+            216
+          ],
+          [
+            216,
+            205
+          ]
+        ],
+        "waterIceTopY": 129
+      },
+      "labels": {
+        "(a)": [
+          111,
+          69
+        ],
+        "(b)": [
+          310,
+          69
+        ],
+        "K": [
+          210,
+          40
+        ],
+        "Nước đá": [
+          32,
+          140
+        ]
+      },
+      "iceLeader": [
+        [
+          43,
+          151
+        ],
+        [
+          91,
+          174
+        ]
+      ]
+    },
+    "tubeFluidNote": "Màuvàngnâu/xámđậmtrongốnglàkhímàuminhhọađầybody,KHÔNGvẽmặtchấtlỏngđúngống.Khốitrongbeakertráilànhữngmảnhnướcđákhôngđềuxanhtrắng,cóđườngmứcnước/đámđátrên,chỉống(a)ngâm.Kcount1van,khôngmũitên/khíformula/nhiệtđộtrênsource.",
+    "duplication": "678/1356cùngnộidungnhưngscale/fonts/bềrộngbốtríkhác;giữtọađộrelativebody/labels,nocroppedpartiallabels.",
+    "svg": "ong-nuoc-da-ddh-997288ed2f4cc69d4e57fc6858933c13f231f3cb9f6ea85cdf2319aa5cad672c.svg",
+    "hashSvg": "997288ed2f4cc69d4e57fc6858933c13f231f3cb9f6ea85cdf2319aa5cad672c",
+    "byteSvg": 20259,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "2tubeđáytròn/capsđen/1vanKblue+handleđen/left(a)nhạtngâmicebath/right(b)đậmngoài/labelNướcđá+leader;khífillđầybodyKHÔNGmặtchấtlỏngtrongtube/côngthức/t°/arrowthêm. Đườngmảnhnướcđákýhoạkhôngsốhạt.",
+    "hashSvgDaSoat": "997288ed2f4cc69d4e57fc6858933c13f231f3cb9f6ea85cdf2319aa5cad672c",
+    "nguoiSoat": "cau_truc_6"
+  },
+  {
+    "i": 1356,
+    "hash": "f5aaeff9d163e12a895e3c80a64fe0bcb0da9ac2436319faa7c38b83b1c0b1d9",
+    "fileNguon": "anh/f5aaeff9d163e12a895e3c80a64fe0bcb0da9ac2436319faa7c38b83b1c0b1d9.png",
+    "canvas": [
+      478,
+      344
+    ],
+    "daMoNative": true,
+    "kind": "NO2-equilibrium-two-tubes",
+    "labels": [
+      "(a)",
+      "(b)",
+      "K",
+      "Nước đá"
+    ],
+    "notes": "2ốngnghiệmđáytrònĐỨNGcónútđenmiệng;ốngtrái(a)màuvàngnâuNHẠT,nằmtrongbeakerNƯỚCĐÁviềnxanh(icechunksrõ);ốngphải(b)màunâuđỏĐẬMởngoàikhôngbeaker. 2nhánhngangngắngiữaốngcùngcaogắnkhóaKthânxanhdương/handleđenđứng. LabelKtrênvan,(a)tráitrêntubetrái,(b)phảitrêntubephải;Nướcđácóleaderchéotrỏicebath.KhôngtựghiNO₂/N₂O₄/t⁰/arrowvìnguồnkhôngcó. 678/1356cùngnộidungmởriêng;sourcecolorskháclýthuyếtcầngiữquan hệđậmtươngứng.",
+    "questions": [
+      {
+        "qid": "11-C1-B1-I-52",
+        "de": "Lắp bộ dụng cụ gồm 2 ống nghiệm có nhánh (a) và (b), được nối với nhau bằng một ống nhựa mềm, có khoá K như hình. Cho cân bằng sau trong bình kín:\n2NO₂(g) (màu nâu đỏ) ⇌ N₂O₄(g) (không màu).\nBiết khi ngâm ống nghiệm (a) vào cốc nước đá thì màu của ống nghiệm (a) nhạt dần. Phản ứng thuận có",
+        "refs": [
+          {
+            "where": "11-C1-B1-I-52.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-11-B1-D1-I-50",
+        "de": "Lắp bộ dụng cụ gồm 2 ống nghiệm có nhánh (a) và (b), được nối với nhau bằng một ống nhựa mềm, có khoá K như hình. Cho cân bằng sau trong bình kín:\n2NO₂(g) (màu nâu đỏ) ⇌ N₂O₄(g) (không màu).\nBiết khi ngâm ống nghiệm (a) vào cốc nước đá thì màu của ống nghiệm (a) nhạt dần. Phản ứng thuận có",
+        "refs": [
+          {
+            "where": "DB-11-B1-D1-I-50.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry": {
+      "tubeLeft": {
+        "walls": [
+          [
+            190,
+            72
+          ],
+          [
+            190,
+            282
+          ],
+          [
+            194,
+            298
+          ],
+          [
+            205,
+            306
+          ],
+          [
+            224,
+            306
+          ],
+          [
+            240,
+            295
+          ],
+          [
+            242,
+            72
+          ]
+        ],
+        "fill": "ochre/mustardlight"
+      },
+      "tubeRight": {
+        "walls": [
+          [
+            365,
+            72
+          ],
+          [
+            365,
+            282
+          ],
+          [
+            369,
+            298
+          ],
+          [
+            382,
+            307
+          ],
+          [
+            402,
+            306
+          ],
+          [
+            415,
+            293
+          ],
+          [
+            416,
+            72
+          ]
+        ],
+        "fill": "brownorange-dark"
+      },
+      "caps": [
+        [
+          187,
+          41,
+          244,
+          74
+        ],
+        [
+          362,
+          41,
+          419,
+          74
+        ]
+      ],
+      "connectorY": [
+        109,
+        124
+      ],
+      "valveBlueBox": [
+        274,
+        105,
+        334,
+        126
+      ],
+      "valveHandle": [
+        [
+          304,
+          97
+        ],
+        [
+          304,
+          134
+        ]
+      ],
+      "valveTopBar": [
+        [
+          294,
+          97
+        ],
+        [
+          313,
+          97
+        ]
+      ],
+      "iceBeaker": {
+        "leftTop": [
+          114,
+          167
+        ],
+        "rightTop": [
+          313,
+          167
+        ],
+        "bottomApprox": [
+          [
+            114,
+            291
+          ],
+          [
+            118,
+            305
+          ],
+          [
+            133,
+            310
+          ],
+          [
+            297,
+            310
+          ],
+          [
+            313,
+            296
+          ]
+        ],
+        "waterIceTopY": 197
+      },
+      "labels": {
+        "(a)": [
+          172,
+          118
+        ],
+        "(b)": [
+          436,
+          118
+        ],
+        "K": [
+          304,
+          81
+        ],
+        "Nước đá": [
+          69,
+          212
+        ]
+      },
+      "iceLeader": [
+        [
+          79,
+          228
+        ],
+        [
+          157,
+          266
+        ]
+      ]
+    },
+    "tubeFluidNote": "Màuvàngnâu/xámđậmtrongốnglàkhímàuminhhọađầybody,KHÔNGvẽmặtchấtlỏngđúngống.Khốitrongbeakertráilànhữngmảnhnướcđákhôngđềuxanhtrắng,cóđườngmứcnước/đámđátrên,chỉống(a)ngâm.Kcount1van,khôngmũitên/khíformula/nhiệtđộtrênsource.",
+    "duplication": "678/1356cùngnộidungnhưngscale/fonts/bềrộngbốtríkhác;giữtọađộrelativebody/labels,nocroppedpartiallabels.",
+    "svg": "ong-nuoc-da-ddh-997288ed2f4cc69d4e57fc6858933c13f231f3cb9f6ea85cdf2319aa5cad672c.svg",
+    "hashSvg": "997288ed2f4cc69d4e57fc6858933c13f231f3cb9f6ea85cdf2319aa5cad672c",
+    "byteSvg": 20259,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "2tubeđáytròn/capsđen/1vanKblue+handleđen/left(a)nhạtngâmicebath/right(b)đậmngoài/labelNướcđá+leader;khífillđầybodyKHÔNGmặtchấtlỏngtrongtube/côngthức/t°/arrowthêm. Đườngmảnhnướcđákýhoạkhôngsốhạt.",
+    "hashSvgDaSoat": "997288ed2f4cc69d4e57fc6858933c13f231f3cb9f6ea85cdf2319aa5cad672c",
+    "nguoiSoat": "cau_truc_6"
+  }
+]

@@ -1394,5 +1394,890 @@
     },
     "diagnostic": "/workspace/scratch/gas1197-T-4x.png",
     "notesGeometry": "Nativefull857x216vàTcrop4xđãmở.3bubblestrònrõ,nodeTflowarrowchéoxuốngphải,khôngcopyngượcarrowX. Mộtfig4panelkhônglabel(a)..(d),chỉX/Y/Z/T."
+  },
+  {
+    "i": 926,
+    "hash": "a7d554899fc246f3df01f53c36716d273fa9f48e59d75c7946e3a51ae5295283",
+    "fileNguon": "anh/a7d554899fc246f3df01f53c36716d273fa9f48e59d75c7946e3a51ae5295283.png",
+    "canvas": [
+      440,
+      445
+    ],
+    "daMoNative": true,
+    "kind": "reflux-lab-5labels",
+    "labels": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5"
+    ],
+    "notes": "BìnhcầucổgiữagắnsinhhànTHẲNGđứngjacket2lớp,bêntráicó2portngang:portTRÊNlabel1arrowPHẢIđivàoport;portDƯỚIlabel2arrowTRÁIđirangoài(giữnguồnkhôngsửawaterflowtheolýthuyết). Trênsinhhàncómộtnắpvùngnhỏ.3leaderchỉvàoRODchéotừtrêntráixuyênquaadaptervàcổtráiflas xuốngtrongliquid;khôngscale/tênthermometerthêm.4leadergấpvuôngmũinhọnTRÁIchỉcổnhánhphảicầubịtadapter/stopper.5leaderngangmũinhọnTRÁIchỉvùngbểgia_nhiệtchữnhậtdướiflas. Trongflas mặtliquidgợnsóng,1stirbarhìnhchữnhậtnhỏởđáy;khôngngọnlửa/cầuchưngcấtngangphátminhthêm.",
+    "questions": [
+      {
+        "qid": "12-C1-B1-D3-I-58",
+        "de": "Phản ứng ester hoá được coi là một trong những phản ứng hoá học quan trọng trong công nghiệp. Các ester của acrylic acid có nhiều ứng dụng trong công nghiệp như để sản xuất lớp phủ và mực, chất kết dính, dệt may, nhựa và chất đàn hồi.\nTrong một phương pháp tổng hợp methyl acrylate, người ta đun hồi lưu acid và alcohol tương ứng với xúc tác là H₂SO₄. Trong một thí nghiệm điều chế ester này, người ta lắp đặt dụng cụ như ở hình 1. Các chất phản ứng được cho vào bình cầu 3 cổ (đặt trên máy khuấy từ - vị trí 5).\nCác vị trí còn lại (đánh số 1, 2, 3, 4) đang thiếu thông tin.\nTrong hình vẽ về thí nghiệm nói trên, chất phản ứng được đưa vào ở vị trí nào?",
+        "refs": [
+          {
+            "where": "12-C1-B1-D3-I-58.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "12-C1-B1-D3-I-59",
+        "de": "Phản ứng ester hoá được coi là một trong những phản ứng hoá học quan trọng trong công nghiệp. Các ester của acrylic acid có nhiều ứng dụng trong công nghiệp như để sản xuất lớp phủ và mực, chất kết dính, dệt may, nhựa và chất đàn hồi.\nTrong một phương pháp tổng hợp ethyl acrylate, người ta đun hồi lưu acid và alcohol tương ứng với xúc tác là H₂SO₄. Trong một thí nghiệm điều chế ester này, người ta lắp đặt dụng cụ như ở hình 1. Các chất phản ứng được cho vào bình cầu 3 cổ (đặt trên máy khuấy từ - vị trí 5).\nCác vị trí còn lại (đánh số 1, 2, 3, 4) đang thiếu thông tin.\nPhát biểu nào dưới đây là đúng khi nhận xét về đặc điểm của phản ứng giữa acrylic acid và ethyl alcohol?",
+        "refs": [
+          {
+            "where": "12-C1-B1-D3-I-59.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D2-I-44",
+        "de": "Phản ứng ester hoá được coi là một trong những phản ứng hoá học quan trọng trong công nghiệp. Các ester của acrylic acid có nhiều ứng dụng trong công nghiệp như để sản xuất lớp phủ và mực, chất kết dính, dệt may, nhựa và chất đàn hồi.\nTrong một phương pháp tổng hợp methyl acrylate, người ta đun hồi lưu acid và alcohol tương ứng với xúc tác là H₂SO₄. Trong một thí nghiệm điều chế ester này, người ta lắp đặt dụng cụ như ở hình 1. Các chất phản ứng được cho vào bình cầu 3 cổ (đặt trên máy khuấy từ - vị trí 5).\nCác vị trí còn lại (đánh số 1, 2, 3, 4) đang thiếu thông tin.\nTrong hình vẽ về thí nghiệm nói trên, chất phản ứng được đưa vào ở vị trí nào?",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D2-I-44.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D2-I-45",
+        "de": "Phản ứng ester hoá được coi là một trong những phản ứng hoá học quan trọng trong công nghiệp. Các ester của acrylic acid có nhiều ứng dụng trong công nghiệp như để sản xuất lớp phủ và mực, chất kết dính, dệt may, nhựa và chất đàn hồi.\nTrong một phương pháp tổng hợp ethyl acrylate, người ta đun hồi lưu acid và alcohol tương ứng với xúc tác là H₂SO₄. Trong một thí nghiệm điều chế ester này, người ta lắp đặt dụng cụ như ở hình 1. Các chất phản ứng được cho vào bình cầu 3 cổ (đặt trên máy khuấy từ - vị trí 5).\nCác vị trí còn lại (đánh số 1, 2, 3, 4) đang thiếu thông tin.\nPhát biểu nào dưới đây là đúng khi nhận xét về đặc điểm của phản ứng giữa acrylic acid và ethyl alcohol?",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D2-I-45.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry": {
+      "canvas": [
+        440,
+        445
+      ],
+      "condenser": {
+        "outerBodyApprox": [
+          [
+            186,
+            48
+          ],
+          [
+            186,
+            63
+          ],
+          [
+            179,
+            73
+          ],
+          [
+            179,
+            211
+          ],
+          [
+            186,
+            219
+          ],
+          [
+            202,
+            219
+          ],
+          [
+            210,
+            209
+          ],
+          [
+            210,
+            74
+          ],
+          [
+            202,
+            64
+          ],
+          [
+            202,
+            48
+          ]
+        ],
+        "innerJacketWalls": [
+          [
+            [
+              181,
+              75
+            ],
+            [
+              188,
+              82
+            ],
+            [
+              188,
+              201
+            ],
+            [
+              180,
+              211
+            ]
+          ],
+          [
+            [
+              209,
+              75
+            ],
+            [
+              202,
+              82
+            ],
+            [
+              202,
+              201
+            ],
+            [
+              210,
+              210
+            ]
+          ]
+        ],
+        "topCap": [
+          183,
+          35,
+          205,
+          48
+        ],
+        "lowerTube": [
+          [
+            186,
+            219
+          ],
+          [
+            186,
+            231
+          ],
+          [
+            202,
+            231
+          ],
+          [
+            202,
+            219
+          ]
+        ],
+        "connectorCollar": [
+          183,
+          231,
+          207,
+          243
+        ],
+        "flaskNeck": [
+          [
+            186,
+            243
+          ],
+          [
+            186,
+            275
+          ]
+        ],
+        "flaskNeckRight": [
+          [
+            202,
+            243
+          ],
+          [
+            202,
+            275
+          ]
+        ],
+        "ports": [
+          {
+            "rectApprox": [
+              123,
+              88,
+              179,
+              96
+            ],
+            "label": "1",
+            "labelAt": [
+              63,
+              94
+            ],
+            "flowArrow": {
+              "tail": [
+                80,
+                91
+              ],
+              "head": [
+                113,
+                91
+              ]
+            }
+          },
+          {
+            "rectApprox": [
+              123,
+              173,
+              179,
+              181
+            ],
+            "label": "2",
+            "labelAt": [
+              63,
+              180
+            ],
+            "flowArrow": {
+              "tail": [
+                114,
+                177
+              ],
+              "head": [
+                82,
+                177
+              ]
+            }
+          }
+        ]
+      },
+      "flask": {
+        "center": [
+          194,
+          327
+        ],
+        "radiusApprox": 55,
+        "neckEnds": {
+          "top": [
+            [
+              186,
+              275
+            ],
+            [
+              202,
+              275
+            ]
+          ],
+          "left": [
+            [
+              147,
+              291
+            ],
+            [
+              119,
+              265
+            ],
+            [
+              128,
+              257
+            ],
+            [
+              157,
+              282
+            ]
+          ],
+          "right": [
+            [
+              236,
+              287
+            ],
+            [
+              254,
+              268
+            ],
+            [
+              263,
+              277
+            ],
+            [
+              245,
+              297
+            ]
+          ]
+        },
+        "liquidSurfaceApprox": [
+          [
+            141,
+            315
+          ],
+          [
+            159,
+            316
+          ],
+          [
+            176,
+            312
+          ],
+          [
+            191,
+            313
+          ],
+          [
+            199,
+            309
+          ],
+          [
+            215,
+            314
+          ],
+          [
+            230,
+            315
+          ],
+          [
+            241,
+            319
+          ],
+          [
+            248,
+            316
+          ]
+        ],
+        "stirbarRect": [
+          189,
+          370,
+          202,
+          376
+        ]
+      },
+      "probe3": {
+        "line": [
+          [
+            73,
+            225
+          ],
+          [
+            189,
+            329
+          ]
+        ],
+        "leftAdapterBand": [
+          [
+            114,
+            271
+          ],
+          [
+            128,
+            257
+          ],
+          [
+            136,
+            266
+          ],
+          [
+            121,
+            279
+          ]
+        ],
+        "label": [
+          "3",
+          [
+            50,
+            255
+          ]
+        ],
+        "leaderNoHead": [
+          [
+            64,
+            252
+          ],
+          [
+            85,
+            252
+          ]
+        ],
+        "note": "Rod/probe3khôngscale/khôngbulb/nocaptionname;rodđiđètrênliquidđến(189329)."
+      },
+      "rightCap4": {
+        "adapterBand": [
+          [
+            247,
+            266
+          ],
+          [
+            260,
+            253
+          ],
+          [
+            268,
+            261
+          ],
+          [
+            255,
+            274
+          ]
+        ],
+        "stopperOuter": [
+          [
+            256,
+            256
+          ],
+          [
+            265,
+            248
+          ],
+          [
+            280,
+            263
+          ],
+          [
+            271,
+            271
+          ]
+        ],
+        "label": [
+          "4",
+          [
+            348,
+            284
+          ]
+        ],
+        "bentLeaderArrow": {
+          "tail": [
+            333,
+            279
+          ],
+          "via": [
+            [
+              308,
+              279
+            ],
+            [
+              306,
+              260
+            ]
+          ],
+          "head": [
+            284,
+            260
+          ]
+        }
+      },
+      "bath5": {
+        "outline": [
+          [
+            73,
+            327
+          ],
+          [
+            139,
+            327
+          ],
+          [
+            139,
+            327
+          ],
+          [
+            249,
+            327
+          ],
+          [
+            315,
+            327
+          ],
+          [
+            315,
+            408
+          ],
+          [
+            73,
+            408
+          ],
+          [
+            73,
+            327
+          ]
+        ],
+        "layer": "behindflask:topsegment139..249coveredbyflaskbody",
+        "label": [
+          "5",
+          [
+            395,
+            351
+          ]
+        ],
+        "leaderArrow": {
+          "tail": [
+            385,
+            350
+          ],
+          "head": [
+            267,
+            350
+          ]
+        }
+      }
+    },
+    "arrowCaution": "1headPHẢIINupperport,2headTRÁIOUTlowerport.Nativegiữnhưvậy,khôngđảođểsửaflowlýthuyết.3leaderkhôngarrowhead,4bentheadtrái,5horizontalheadtrái. Khôngair/steamlabels/nohighvoltagemeter/nguồnheatdophỏngđoán.",
+    "diagnostic": "/workspace/scratch/source926-144-2x.png"
+  },
+  {
+    "i": 1309,
+    "hash": "eccf27dc2a580c69eb29157c0c839617cdc3884a3fb103fd36b959f587810e54",
+    "fileNguon": "anh/eccf27dc2a580c69eb29157c0c839617cdc3884a3fb103fd36b959f587810e54.png",
+    "canvas": [
+      1216,
+      182
+    ],
+    "daMoNative": true,
+    "kind": "cellulose-nitration-chair-repeat",
+    "overArrow": "+ HNO₃ (đặc)/xt H₂SO₄ đặc, t°",
+    "underArrow": "− H₂O",
+    "notes": "2đơnvịchairglucopyranosepolymer,trái3OHtựdo(phảivẽđúngnốiCH₂OHtop-left/OHleft/OHlower-right),phảicùngchairthay3OHbằng3nitrateester:branchCH₂–ONO₂top-left,branchleftlabelO₂NO(terminalOởphảinốicarbon),branchlower-rightlabelONO₂. RingOphảivàglycosidicOngoàianomericCgiữNGUYÊNkhôngnitrate. LinkbêntráitừC4làdashedstubchainvàbênphảiquaOngoàivòngrồidashedstubchain;khôngfiniteSMILES/khôngtựđặtnngoặc. Native3OHchuyển3ONO₂nhưngarrowtextKHÔNGhệsố3HNO₃/3H₂Ogiữnhưsource,khôngtựcânbằng. NoHexplittrêncarbon,KHÔNGthêmH/sốC/labels.",
+    "questions": [
+      {
+        "qid": "DB-12-B6-D2-II-41",
+        "de": "Cellulose trinitrate là một hóa chất được sử dụng nhiều trong công nghiệp quốc phòng với mục đích chính là làm thuốc nổ. Phản ứng điều chế cellulose trinitrate từ cellulose và nitric acid (xúc tác H₂SO₄ đặc) như sau: Khi đốt cháy cellulose trinitrate bằng oxygen thu được sản phẩm cháy gồm CO₂, N₂ và H₂O.",
+        "refs": [
+          {
+            "where": "DB-12-B6-D2-II-41.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B7-D2-II-4",
+        "de": "Cellulose trinitrate là một hóa chất được sử dụng nhiều trong công nghiệp quốc phòng với mục đích chính là làm thuốc nổ. Phản ứng điều chế cellulose trinitrate từ cellulose và nitric acid (xúc tác H₂SO₄ đặc) như sau: Khi đốt cháy cellulose trinitrate bằng oxygen thu được sản phẩm cháy gồm CO₂, N₂ và H₂O.",
+        "refs": [
+          {
+            "where": "DH-12-C2-B7-D2-II-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry": {
+      "canvas": [
+        1216,
+        182
+      ],
+      "units": [
+        {
+          "side": "left",
+          "ringVertices": {
+            "C4": [
+              96,
+              73
+            ],
+            "C3": [
+              151,
+              137
+            ],
+            "C2": [
+              241,
+              116
+            ],
+            "C1": [
+              331,
+              132
+            ],
+            "ringO": [
+              257,
+              72
+            ],
+            "C5": [
+              166,
+              91
+            ]
+          },
+          "ringOrder": [
+            "C4",
+            "C3",
+            "C2",
+            "C1",
+            "ringO",
+            "C5",
+            "C4"
+          ],
+          "bondOrders": "ALLsingle;frontthickness/depthKHÔNGdoublebond/CIPnêm",
+          "frontDepthBonds": [
+            [
+              "C4",
+              "C3"
+            ],
+            [
+              "C3",
+              "C2"
+            ],
+            [
+              "C2",
+              "C1"
+            ]
+          ],
+          "substituents": {
+            "C5_CH2OH": {
+              "bonds": [
+                [
+                  166,
+                  91
+                ],
+                [
+                  136,
+                  50
+                ],
+                [
+                  160,
+                  21
+                ]
+              ],
+              "text": "OH",
+              "textAnchor": [
+                181,
+                14
+              ]
+            },
+            "C3_OH": {
+              "bond": [
+                [
+                  151,
+                  137
+                ],
+                [
+                  103,
+                  137
+                ]
+              ],
+              "text": "HO",
+              "textAnchor": [
+                80,
+                136
+              ]
+            },
+            "C2_OH": {
+              "bond": [
+                [
+                  241,
+                  116
+                ],
+                [
+                  279,
+                  140
+                ]
+              ],
+              "text": "OH",
+              "textAnchor": [
+                302,
+                149
+              ]
+            }
+          },
+          "polymerLinks": {
+            "previousUnit": {
+              "from": [
+                96,
+                73
+              ],
+              "to": [
+                51,
+                112
+              ],
+              "style": "dashed"
+            },
+            "glycosidicO": {
+              "from": [
+                331,
+                132
+              ],
+              "to": [
+                375,
+                106
+              ],
+              "atomText": "O",
+              "atomAnchor": [
+                387,
+                95
+              ]
+            },
+            "nextUnit": {
+              "from": [
+                401,
+                105
+              ],
+              "to": [
+                439,
+                126
+              ],
+              "style": "dashed"
+            }
+          }
+        },
+        {
+          "side": "right",
+          "ringVertices": {
+            "C4": [
+              856,
+              81
+            ],
+            "C3": [
+              912,
+              145
+            ],
+            "C2": [
+              1002,
+              123
+            ],
+            "C1": [
+              1095,
+              140
+            ],
+            "ringO": [
+              1019,
+              79
+            ],
+            "C5": [
+              928,
+              99
+            ]
+          },
+          "ringOrder": [
+            "C4",
+            "C3",
+            "C2",
+            "C1",
+            "ringO",
+            "C5",
+            "C4"
+          ],
+          "bondOrders": "ALLsingle",
+          "frontDepthBonds": [
+            [
+              "C4",
+              "C3"
+            ],
+            [
+              "C3",
+              "C2"
+            ],
+            [
+              "C2",
+              "C1"
+            ]
+          ],
+          "substituents": {
+            "C5_CH2ONO2": {
+              "bonds": [
+                [
+                  928,
+                  99
+                ],
+                [
+                  896,
+                  57
+                ],
+                [
+                  922,
+                  29
+                ]
+              ],
+              "text": "ONO₂",
+              "textAnchor": [
+                958,
+                22
+              ],
+              "attachmentAtom": "OđầutiêntrongONO₂"
+            },
+            "C3_ONO2": {
+              "bond": [
+                [
+                  912,
+                  145
+                ],
+                [
+                  861,
+                  145
+                ]
+              ],
+              "text": "O₂NO",
+              "textAnchor": [
+                827,
+                148
+              ],
+              "attachmentAtom": "OcuốicùngbênPHẢItrongO₂NO,nốitớicarbonC3"
+            },
+            "C2_ONO2": {
+              "bond": [
+                [
+                  1002,
+                  123
+                ],
+                [
+                  1036,
+                  157
+                ]
+              ],
+              "text": "ONO₂",
+              "textAnchor": [
+                1071,
+                171
+              ],
+              "attachmentAtom": "Ođầutiên"
+            }
+          },
+          "polymerLinks": {
+            "previousUnit": {
+              "from": [
+                856,
+                81
+              ],
+              "to": [
+                810,
+                112
+              ],
+              "style": "dashed"
+            },
+            "glycosidicO": {
+              "from": [
+                1095,
+                140
+              ],
+              "to": [
+                1136,
+                113
+              ],
+              "atomText": "O",
+              "atomAnchor": [
+                1148,
+                103
+              ]
+            },
+            "nextUnit": {
+              "from": [
+                1164,
+                113
+              ],
+              "to": [
+                1205,
+                141
+              ],
+              "style": "dashed"
+            }
+          }
+        }
+      ],
+      "reactionArrow": {
+        "from": [
+          475,
+          122
+        ],
+        "to": [
+          765,
+          122
+        ],
+        "direction": "right",
+        "over": "+ HNO₃ (đặc)/xt H₂SO₄ đặc, t°",
+        "overAnchor": [
+          618,
+          93
+        ],
+        "under": "− H₂O",
+        "underAnchor": [
+          610,
+          151
+        ]
+      }
+    },
+    "explicitHAndCharges": "TráiHchỉtrong3OHtext;phải3OHđãthay3ONO₂khôngOH/Htextthêm;mọicarbonHẩn.KHÔNGformalNO₂⁺/O⁻chargesvìsourcenitrateviếtgộp. Khônglabelcarbon1..6trongảnh,IDsC1..C5chỉlàthamchiếureport.",
+    "criticalTopology": "RingO và2glycosidiclinkgiữbênđầu/cuốiKHÔNGđượcđổithànhnitrate. KhôngfiniteSMILES.4dashedstubscho2unitđúngvịtrítạonộidungpolymer. HaiunitcùngchairgeometryC5branchup-left,C3branchleft,C2branchdown-right,khôngHaworthphẳngthaychair.",
+    "coefficientCaution": "Sourceover+HNO₃/under−H₂Ođềukhônghệsố3;đừngtựchèn3hayđiềukiệnkhác. Nguồnkhôngngoặcn/nlabel/caption/tênchất.",
+    "diagnostic": "/workspace/scratch/source1309-144-2x.png"
   }
 ]

@@ -1,0 +1,251 @@
+[
+  {
+    "i": 1291,
+    "hash": "eaac9a38986a1cd27a039ffce453de540a9f14e1f1948ee2cb8facb26b96074c",
+    "fileNguon": "anh/eaac9a38986a1cd27a039ffce453de540a9f14e1f1948ee2cb8facb26b96074c.png",
+    "canvas": [
+      587,
+      428
+    ],
+    "daMoNative": true,
+    "kind": "enzyme-temperature-bell",
+    "xLabel": "T(°C)",
+    "yLabel": "r",
+    "xTicks": [
+      10,
+      20,
+      30,
+      40,
+      50,
+      60
+    ],
+    "notes": "1curveđenbắtđầu~(71,317),tăngđếnđỉnh(308,73),rồigiảmđến(479,345). Origin(40,355),Yarrow(40,54),Xarrow(529,355). DóngDỌCĐỨTtừ(295,355)lên(295,74)ởgiữa30/40(gần38°C),KHÔNGđiđúngtick40;đỉnhcurve(30873)lệchphảidóng~13px. Sourcegiữdóng38-ishkhôngtựdờisangđỉnh.Ticksnative10x68/20x150/30x230/40x311/50x392/60x474. KHÔNGYticks/0/labelamylase.",
+    "questions": [
+      {
+        "qid": "12-KT-C2-D4-II-4",
+        "de": "Sự phụ thuộc của tốc độ thuỷ phân tinh bột (r) vào nhiệt độ (T) của phản ứng được xúc tác bởi một loại enzyme amylase (có cấu tạo từ protein) được mô tả như hình dưới đây.",
+        "refs": [
+          {
+            "where": "12-KT-C2-D4-II-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B6-D1-II-51",
+        "de": "Sự phụ thuộc của tốc độ thuỷ phân tinh bột (r) vào nhiệt độ (T) của phản ứng được xúc tác bởi một loại enzyme amylase (có cấu tạo từ protein) được mô tả như hình dưới đây.",
+        "refs": [
+          {
+            "where": "DB-12-B6-D1-II-51.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1207,
+    "hash": "dae44689d492fe14f28614e3ff5450635e5541f06bd3a86fcf7a2c2b79f82b1f",
+    "fileNguon": "anh/dae44689d492fe14f28614e3ff5450635e5541f06bd3a86fcf7a2c2b79f82b1f.png",
+    "canvas": [
+      795,
+      654
+    ],
+    "daMoNative": true,
+    "kind": "isotope-MS-magnesium",
+    "xLabel": "m/z",
+    "yLabel": "Phần trăm số nguyên tử, %",
+    "peaks": [
+      {
+        "mz": 24,
+        "percent": "80%"
+      },
+      {
+        "mz": 25,
+        "percent": "10%"
+      },
+      {
+        "mz": 26,
+        "percent": "10%"
+      }
+    ],
+    "notes": "3đỉnhbarđen/xámhẹp,24cao80%,25và26cao10%bằngnhau;label80%/10%/10%trênđỉnh. Yticks0/20/40/60/80/100;khung4cạnh,khôngmũitên/grid. Xcó3tickCÓSỐ24/25/26và3tickkhôngsốởphầntrái/phảiquanhphổ,đừngtựghi22/23/27.Vịtrínativeplotbox172,70..717,555;peaks404,168..555/482,503..555/558,503..555. Khôngthêm²⁴Mgtextnếunguồnkhôngcó.",
+    "questions": [
+      {
+        "qid": "10-C1-B2-II-19",
+        "de": "Nguyên tố magnesium (₁₂Mg) là nguyên tố phổ biến thứ tám trên vỏ Trái Đất, có trong thành phần đá xà vân, quặng dolomite, carnallite... Phổ khối lượng của nguyên tố magnesium được cho ở hình dưới. Cho 1 amu = 1,66 × 10⁻²⁴ gam.",
+        "refs": [
+          {
+            "where": "10-C1-B2-II-19.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-10-B2-D2-II-42",
+        "de": "Nguyên tố magnesium (₁₂Mg) là nguyên tố phổ biến thứ tám trên vỏ Trái Đất, có trong thành phần đá xà vân, quặng dolomite, carnallite... Phổ khối lượng của nguyên tố magnesium được cho ở hình dưới. Cho 1 amu = 1,66 × 10⁻²⁴ gam.",
+        "refs": [
+          {
+            "where": "DB-10-B2-D2-II-42.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1304,
+    "hash": "ebdaab182a48b7ffd7453938ee65a70b77f1769baa9d87824e425aaf5cf92198",
+    "fileNguon": "anh/ebdaab182a48b7ffd7453938ee65a70b77f1769baa9d87824e425aaf5cf92198.png",
+    "canvas": [
+      1193,
+      254
+    ],
+    "daMoNative": true,
+    "kind": "triglyceride-saponification-literal",
+    "leftRows": [
+      "C₁₅H₃₁COOCH₂",
+      "C₁₅H₃₁COOCH",
+      "C₁₅H₃₁COOCH₂"
+    ],
+    "reactantAdditional": "3NaOH",
+    "overArrow": "t°",
+    "products": [
+      "3C₁₅H₃₁COONa",
+      {
+        "rows": [
+          "CH₂OH",
+          "CHOH",
+          "CH₂OH"
+        ],
+        "verticalBonds": true
+      }
+    ],
+    "notes": "Cùngliteral346đãđạt:3rowleftglycerolCH₂–CH–CH₂nốidọc,1arrowphảit°;2sign+giữaester/3NaOHvàsalt/glycerol. Source1304rasterriêngđãmở,khôngtựthêmcaption/charges/finitefattyacidlength;candidatealias346chỉsausoátSVGthật.",
+    "questions": [
+      {
+        "qid": "12-C1-B1-D2-I-49",
+        "de": "Cho phản ứng được biểu diễn thông qua phương trình hoá học sau:\nPhản ứng trên thuộc loại phản ứng nào sau đây?",
+        "refs": [
+          {
+            "where": "12-C1-B1-D2-I-49.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D1-I-38",
+        "de": "Cho phản ứng được biểu diễn thông qua phương trình hoá học sau:\nPhản ứng trên thuộc loại phản ứng nào sau đây?",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D1-I-38.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1339,
+    "hash": "f28dee75abab70b43232fbfd29122e279ec25fde4d81c1ab00c628cb0bc391d4",
+    "fileNguon": "anh/f28dee75abab70b43232fbfd29122e279ec25fde4d81c1ab00c628cb0bc391d4.png",
+    "canvas": [
+      1128,
+      225
+    ],
+    "daMoNative": true,
+    "kind": "pH-color-scale-14",
+    "topLeft": [
+      "[H⁺]",
+      "(mol/L)"
+    ],
+    "bottomLeft": "pH",
+    "pHNumbers": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "concentrationLabels": [
+      {
+        "atPH": 1,
+        "text": "10⁻¹"
+      },
+      {
+        "atPH": 7,
+        "text": "10⁻⁷"
+      },
+      {
+        "atPH": 14,
+        "text": "10⁻¹⁴"
+      }
+    ],
+    "notes": "14ôchữnhậtmàutừtráiphảipH1..14;từđỏtím→đỏhồng→cam→vàngcam→vàng→vàngtươi→vàngolive→xanhláxám→xanhláđậm→xanhlụcxám→xanhxám→xanhdươngxám→xanhchàm→tím. Mỗiôcó1tickngắntrênvà1tickdưới,sốpHởdưới. CHỈ3concentrationlabel10^-1/-7/-14bêntrên1/7/14,khôngthêm12nhãnkhác. KhôngpH0/15 haytênacid/base;giữdấungoặc[H⁺].",
+    "questions": [
+      {
+        "qid": "11-C1-B2-D2-II-8",
+        "de": "Thang màu pH và nồng độ mol của ion H⁺ trong dung dịch được mô tả ở hình dưới đây:",
+        "refs": [
+          {
+            "where": "11-C1-B2-D2-II-8.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-11-B2-D3-II-62",
+        "de": "Thang màu pH và nồng độ mol của ion H⁺ trong dung dịch được mô tả ở hình dưới đây:",
+        "refs": [
+          {
+            "where": "DB-11-B2-D3-II-62.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1406,
+    "hash": "fcca2f3cd109a98de6620b44ca19a1cfbfa1be7abe9d20710c8f0a2b82182285",
+    "fileNguon": "anh/fcca2f3cd109a98de6620b44ca19a1cfbfa1be7abe9d20710c8f0a2b82182285.png",
+    "canvas": [
+      506,
+      166
+    ],
+    "daMoNative": true,
+    "kind": "polysaccharide-three-unit-labelled-link",
+    "notes": "3glucopyranose6ringOtoprightliêntụcliênkếtglycosidicOởdướigiữa2unit.MỖIunitCH₂OHlênC5,OHlênC3,OHxuốngC2;C4bêntráivàC1bênphảilàđiểmnốimạch,KHÔNGOHtựdothêm. KHÔNGHexplit,cácCH₂OH/OHtextphảigiữ.Tấtcảunitcùngorientation,frontC4–C3–C2đậm. Giữaunit1và2:labelcarbon1ởC1unit1,4ởC4unit2;khôngarrowchỉsố1/4.KHÔNGcarbonnumberskhác.Tráivàphảicóellipsis... nốiraC4unit1vàOngoàiC1unit3;giữcả2stub/ellipsis,khôngfinite trisaccharide/nohydrogenendcap.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D2-II-138",
+        "de": "Tại một nhà máy sản xuất rượu, cứ 10 tấn tinh bột (chứa 6,85% tạp chất trơ) sẽ sản xuất được 7,21 m³ dung dịch ethanol 40° (cho khối lượng riêng của ethanol nguyên chất là 0,789 g/cm³). Tinh bột là một polysaccharide gồm nhiều gốc α-glucose liên kết với nhau tạo ra hai dạng mạch amylose và amylopectin. Dưới đây là một đoạn cấu tạo của tinh bột:",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-II-138.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B6-II-28",
+        "de": "Tại một nhà máy sản xuất rượu, cứ 10 tấn tinh bột (chứa 6,85% tạp chất trơ) sẽ sản xuất được 7,21 m³ dung dịch ethanol 40° (cho khối lượng riêng của ethanol nguyên chất là 0,789 g/cm³). Tinh bột là một polysaccharide gồm nhiều gốc α-glucose liên kết với nhau tạo ra hai dạng mạch amylose và amylopectin. Dưới đây là một đoạn cấu tạo của tinh bột:",
+        "refs": [
+          {
+            "where": "DH-12-C2-B6-II-28.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  }
+]

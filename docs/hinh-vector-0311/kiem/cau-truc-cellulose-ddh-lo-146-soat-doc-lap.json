@@ -1,0 +1,10 @@
+[
+  {
+    "i": 1309,
+    "hashSvg": "164803f9cfed0fa7babbe84c35652cae412c6a4d4908e0440c65cbea258a12e1",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở native full và actual SVG render, đọc geometry doc-chi-tiet-con-lai-lo-144.json. Giữ hai chair không Haworth, từng ringO/glycosidicO và nhánh CH2 trên đúng kết nối; ba OH trái chuyển thành ONO2 trên/dưới và O2NO trái (terminalO phải nối C) đúng nguồn. Mỗi ring3 cạnh frontdepth vẫn ALLsingle không double/CIP; đủ4 dashed polymer stubs. Arrow phải,+HNO3(đặc)/xtH2SO4 đặc,t° trên và−H2O dưới nguyên văn không thêm hệ số3. Không finiteSMILES/nrepeat/ngoặc/labelsC/charge/H-C/caption. DDH path tự chứa không text/image/fallback; glyph-bond/gaps đủ, không cắt/chạm/tràn. Hash byte thực khớp metadata.",
+    "hash": "eccf27dc2a580c69eb29157c0c839617cdc3884a3fb103fd36b959f587810e54",
+    "hashSvgDaSoat": "164803f9cfed0fa7babbe84c35652cae412c6a4d4908e0440c65cbea258a12e1"
+  }
+]

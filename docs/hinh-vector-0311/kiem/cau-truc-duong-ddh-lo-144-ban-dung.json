@@ -1,0 +1,539 @@
+[
+  {
+    "i": 1210,
+    "hash": "db3df2a7a2209f940e1f28d19e617e21b76a012af20dc82293b7911a3aea9900",
+    "fileNguon": "anh/db3df2a7a2209f940e1f28d19e617e21b76a012af20dc82293b7911a3aea9900.png",
+    "canvas": [
+      362,
+      259
+    ],
+    "daMoNative": true,
+    "kind": "haworth-glucose-numbered",
+    "substituents": {
+      "C1": {
+        "down": "OH"
+      },
+      "C2": {
+        "down": "OH"
+      },
+      "C3": {
+        "up": "OH"
+      },
+      "C4": {
+        "down": "OH"
+      },
+      "C5": {
+        "up": "CH₂–OH expanded, carbon6"
+      }
+    },
+    "notes": "6ringOtopright,frontC4–C3–C2–C1đậm. NoHexplicit.MởrộngCH₂OHC5lênCH₂rồichéolênphảiOH. Sốcarbon1..6đủ:1bênphảiC1,2tráidướiC2,3dướiC3,4tráiC4,5tráiC5,6tráitrênbranch. KhônggộpbranchthànhCH₂OHtextnếumấtsố6/khácnguồn. Khác1243C1OHup,C1đâydown.",
+    "questions": [
+      {
+        "qid": "12-KT-C2-D4-I-3",
+        "de": "Cho công thức cấu tạo dạng mạch vòng α-glucose như sau: Nhóm OH hemiacetal trong α-glucose liên kết với nguyên tử carbon số mấy?",
+        "refs": [
+          {
+            "where": "12-KT-C2-D4-I-3.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B5-D2-I-217",
+        "de": "Cho công thức cấu tạo dạng mạch vòng α-glucose như sau: Nhóm OH hemiacetal trong α-glucose liên kết với nguyên tử carbon số mấy?",
+        "refs": [
+          {
+            "where": "DB-12-B5-D2-I-217.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry": {
+      "ringVertices": {
+        "C1": [
+          297,
+          136
+        ],
+        "C2": [
+          229,
+          167
+        ],
+        "C3": [
+          131,
+          167
+        ],
+        "C4": [
+          69,
+          136
+        ],
+        "C5": [
+          132,
+          104
+        ],
+        "ringO": [
+          230,
+          104
+        ]
+      },
+      "ringOrder": [
+        "C5",
+        "ringO",
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "C5"
+      ],
+      "boldBonds": [
+        [
+          "C4",
+          "C3"
+        ],
+        [
+          "C3",
+          "C2"
+        ],
+        [
+          "C2",
+          "C1"
+        ]
+      ],
+      "substituentBonds": {
+        "C1_OH": [
+          [
+            297,
+            136
+          ],
+          [
+            297,
+            164
+          ]
+        ],
+        "C2_OH": [
+          [
+            229,
+            167
+          ],
+          [
+            229,
+            195
+          ]
+        ],
+        "C3_OH": [
+          [
+            131,
+            167
+          ],
+          [
+            131,
+            143
+          ]
+        ],
+        "C4_OH": [
+          [
+            69,
+            136
+          ],
+          [
+            69,
+            160
+          ]
+        ],
+        "C5_C6": [
+          [
+            132,
+            104
+          ],
+          [
+            132,
+            77
+          ]
+        ],
+        "C6_OH": [
+          [
+            132,
+            77
+          ],
+          [
+            160,
+            63
+          ]
+        ]
+      },
+      "textAnchors": {
+        "ringO": [
+          230,
+          104
+        ],
+        "OH_C1": [
+          298,
+          180
+        ],
+        "OH_C2": [
+          236,
+          207
+        ],
+        "OH_C3": [
+          147,
+          137
+        ],
+        "OH_C4": [
+          82,
+          174
+        ],
+        "OH_C6": [
+          183,
+          59
+        ]
+      },
+      "carbonNumbers": {
+        "1": [
+          303,
+          128
+        ],
+        "2": [
+          213,
+          187
+        ],
+        "3": [
+          133,
+          187
+        ],
+        "4": [
+          55,
+          134
+        ],
+        "5": [
+          115,
+          100
+        ],
+        "6": [
+          120,
+          75
+        ]
+      }
+    },
+    "explicitH": "KhôngcóbấtkỳHtrêncarbonhiểnthị,CH₂carbon6kha triểnđứng/chéotớitextOH,cáccarbonkhôngviếtC/CH₂.Giữsố6kềbranchngayvịtrí.CH₂OHkhônggộptextvìmấtsố6geometry.",
+    "pixelNote": "Anchorsnativeapproxtextcenter,rootphảigiữCOHorientationvàcarbonnumbersnhưnativekhôngsuybeta/alpha.",
+    "svg": "glucose-c6-ddh-8282151d59121234380c7055ee9898332ce1248fc795d32e72be5273b580afba.svg",
+    "hashSvg": "8282151d59121234380c7055ee9898332ce1248fc795d32e72be5273b580afba",
+    "byteSvg": 9921,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "1210C6nodeẩn+số6/nhánhchéoOH,KHÔNGalias1036CH2OHtext;C1OHdown/5OH/3frontbold/6sốC/0Hexplicit.1266candidatebase880cùngH/CH2OH/arrowmapping,phảisoátriêngsource/base/render/hash.",
+    "hashSvgDaSoat": "8282151d59121234380c7055ee9898332ce1248fc795d32e72be5273b580afba",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 1266,
+    "hash": "e5a6ab2cc58f236eeb16e783a265b05e1d63572691b3d44eaf647a17df1da18d",
+    "fileNguon": "anh/e5a6ab2cc58f236eeb16e783a265b05e1d63572691b3d44eaf647a17df1da18d.png",
+    "canvas": [
+      412,
+      248
+    ],
+    "daMoNative": true,
+    "kind": "fructose-arrow-labels",
+    "substituents": {
+      "C2": {
+        "up": "CH₂OH",
+        "down": "OH"
+      },
+      "C3": {
+        "up": "HO",
+        "down": "H"
+      },
+      "C4": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C5": {
+        "up": "CH₂OH",
+        "down": "H"
+      }
+    },
+    "arrowLabels": {
+      "1": "OHởC2dướiphải",
+      "2": "bondO_vòng–C2ởtrênphải",
+      "3": "OHởC4dướitrái",
+      "4": "CH₂OHởC2trênphải"
+    },
+    "notes": "Cùngbody+mapping880đãđọc:5ringOtop,C2right,C3lowerright,C4lowerleft,C5left,3cạnhtrướcđậm. Giữ3Hexplicitvà2CH₂OHtext. Label2arrowtipthậtnativeởBONDchéoO–C2khôngtựdờisangHOcủaC3. Source1266đãmởriêngmọiarrow/labelsđủ. Khôngcarbonnumbers.",
+    "questions": [
+      {
+        "qid": "12-KT-C2-D1-I-9",
+        "de": "Trong công thức của fructose ở hình dưới đây, nhóm OH hemiketal là nhóm OH được đánh số",
+        "refs": [
+          {
+            "where": "12-KT-C2-D1-I-9.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-I-146",
+        "de": "Trong công thức của fructose ở hình dưới đây, nhóm OH hemiketal là nhóm OH được đánh số",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-146.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry": {
+      "ringVertices": {
+        "C5": [
+          88,
+          114
+        ],
+        "ringO": [
+          187,
+          85
+        ],
+        "C2": [
+          280,
+          116
+        ],
+        "C3": [
+          242,
+          166
+        ],
+        "C4": [
+          123,
+          166
+        ]
+      },
+      "ringOrder": [
+        "C5",
+        "ringO",
+        "C2",
+        "C3",
+        "C4",
+        "C5"
+      ],
+      "boldBonds": [
+        [
+          "C5",
+          "C4"
+        ],
+        [
+          "C4",
+          "C3"
+        ],
+        [
+          "C3",
+          "C2"
+        ]
+      ],
+      "substituents": {
+        "C5_CH2OH": {
+          "bond": [
+            [
+              88,
+              114
+            ],
+            [
+              88,
+              94
+            ]
+          ],
+          "text": [
+            126,
+            76
+          ]
+        },
+        "C5_H": {
+          "bond": [
+            [
+              88,
+              114
+            ],
+            [
+              88,
+              134
+            ]
+          ],
+          "text": [
+            88,
+            147
+          ]
+        },
+        "C4_H": {
+          "bond": [
+            [
+              123,
+              166
+            ],
+            [
+              123,
+              146
+            ]
+          ],
+          "text": [
+            123,
+            137
+          ]
+        },
+        "C4_OH": {
+          "bond": [
+            [
+              123,
+              166
+            ],
+            [
+              123,
+              186
+            ]
+          ],
+          "text": [
+            137,
+            199
+          ]
+        },
+        "C3_HO": {
+          "bond": [
+            [
+              242,
+              166
+            ],
+            [
+              242,
+              146
+            ]
+          ],
+          "text": [
+            230,
+            132
+          ]
+        },
+        "C3_H": {
+          "bond": [
+            [
+              242,
+              166
+            ],
+            [
+              242,
+              186
+            ]
+          ],
+          "text": [
+            242,
+            199
+          ]
+        },
+        "C2_CH2OH": {
+          "bond": [
+            [
+              280,
+              116
+            ],
+            [
+              280,
+              95
+            ]
+          ],
+          "text": [
+            318,
+            76
+          ]
+        },
+        "C2_OH": {
+          "bond": [
+            [
+              280,
+              116
+            ],
+            [
+              280,
+              137
+            ]
+          ],
+          "text": [
+            294,
+            152
+          ]
+        }
+      },
+      "arrows": [
+        {
+          "label": "1",
+          "labelAt": [
+            339,
+            193
+          ],
+          "tail": [
+            321,
+            184
+          ],
+          "tip": [
+            289,
+            164
+          ],
+          "target": "OH_C2"
+        },
+        {
+          "label": "2",
+          "labelAt": [
+            246,
+            48
+          ],
+          "tail": [
+            246,
+            61
+          ],
+          "tip": [
+            246,
+            108
+          ],
+          "target": "BOND ringO–C2,giữarrow2đèđúngbondnativeKHÔNGdờisangHO_C3"
+        },
+        {
+          "label": "3",
+          "labelAt": [
+            46,
+            173
+          ],
+          "tail": [
+            61,
+            178
+          ],
+          "tip": [
+            109,
+            190
+          ],
+          "target": "OH_C4"
+        },
+        {
+          "label": "4",
+          "labelAt": [
+            365,
+            154
+          ],
+          "tail": [
+            358,
+            143
+          ],
+          "tip": [
+            345,
+            96
+          ],
+          "target": "CH₂OH_C2"
+        }
+      ]
+    },
+    "explicitH": "3HtrênC5xuống/C4lên/C3xuốngtườngminh;C2khôngH,2CH₂OHtext. Khôngprime/numberscarbon.4numberlàARROWlabels.",
+    "svg": "nhan-lien-ket-ddh-69575d0a9f7d3a6d691d0fb500bc2d9e185edc1f816a8d434d3a34ffdc61ebfe.svg",
+    "hashSvg": "69575d0a9f7d3a6d691d0fb500bc2d9e185edc1f816a8d434d3a34ffdc61ebfe",
+    "byteSvg": 13780,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "1210C6nodeẩn+số6/nhánhchéoOH,KHÔNGalias1036CH2OHtext;C1OHdown/5OH/3frontbold/6sốC/0Hexplicit.1266candidatebase880cùngH/CH2OH/arrowmapping,phảisoátriêngsource/base/render/hash.",
+    "hashSvgDaSoat": "69575d0a9f7d3a6d691d0fb500bc2d9e185edc1f816a8d434d3a34ffdc61ebfe",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

@@ -1,0 +1,381 @@
+[
+  {
+    "i": 1309,
+    "hash": "eccf27dc2a580c69eb29157c0c839617cdc3884a3fb103fd36b959f587810e54",
+    "fileNguon": "anh/eccf27dc2a580c69eb29157c0c839617cdc3884a3fb103fd36b959f587810e54.png",
+    "canvas": [
+      1216,
+      182
+    ],
+    "daMoNative": true,
+    "kind": "cellulose-nitration-chair-repeat",
+    "overArrow": "+ HNO₃ (đặc)/xt H₂SO₄ đặc, t°",
+    "underArrow": "− H₂O",
+    "notes": "2đơnvịchairglucopyranosepolymer,trái3OHtựdo(phảivẽđúngnốiCH₂OHtop-left/OHleft/OHlower-right),phảicùngchairthay3OHbằng3nitrateester:branchCH₂–ONO₂top-left,branchleftlabelO₂NO(terminalOởphảinốicarbon),branchlower-rightlabelONO₂. RingOphảivàglycosidicOngoàianomericCgiữNGUYÊNkhôngnitrate. LinkbêntráitừC4làdashedstubchainvàbênphảiquaOngoàivòngrồidashedstubchain;khôngfiniteSMILES/khôngtựđặtnngoặc. Native3OHchuyển3ONO₂nhưngarrowtextKHÔNGhệsố3HNO₃/3H₂Ogiữnhưsource,khôngtựcânbằng. NoHexplittrêncarbon,KHÔNGthêmH/sốC/labels.",
+    "questions": [
+      {
+        "qid": "DB-12-B6-D2-II-41",
+        "de": "Cellulose trinitrate là một hóa chất được sử dụng nhiều trong công nghiệp quốc phòng với mục đích chính là làm thuốc nổ. Phản ứng điều chế cellulose trinitrate từ cellulose và nitric acid (xúc tác H₂SO₄ đặc) như sau: Khi đốt cháy cellulose trinitrate bằng oxygen thu được sản phẩm cháy gồm CO₂, N₂ và H₂O.",
+        "refs": [
+          {
+            "where": "DB-12-B6-D2-II-41.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B7-D2-II-4",
+        "de": "Cellulose trinitrate là một hóa chất được sử dụng nhiều trong công nghiệp quốc phòng với mục đích chính là làm thuốc nổ. Phản ứng điều chế cellulose trinitrate từ cellulose và nitric acid (xúc tác H₂SO₄ đặc) như sau: Khi đốt cháy cellulose trinitrate bằng oxygen thu được sản phẩm cháy gồm CO₂, N₂ và H₂O.",
+        "refs": [
+          {
+            "where": "DH-12-C2-B7-D2-II-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry": {
+      "canvas": [
+        1216,
+        182
+      ],
+      "units": [
+        {
+          "side": "left",
+          "ringVertices": {
+            "C4": [
+              96,
+              73
+            ],
+            "C3": [
+              151,
+              137
+            ],
+            "C2": [
+              241,
+              116
+            ],
+            "C1": [
+              331,
+              132
+            ],
+            "ringO": [
+              257,
+              72
+            ],
+            "C5": [
+              166,
+              91
+            ]
+          },
+          "ringOrder": [
+            "C4",
+            "C3",
+            "C2",
+            "C1",
+            "ringO",
+            "C5",
+            "C4"
+          ],
+          "bondOrders": "ALLsingle;frontthickness/depthKHÔNGdoublebond/CIPnêm",
+          "frontDepthBonds": [
+            [
+              "C4",
+              "C3"
+            ],
+            [
+              "C3",
+              "C2"
+            ],
+            [
+              "C2",
+              "C1"
+            ]
+          ],
+          "substituents": {
+            "C5_CH2OH": {
+              "bonds": [
+                [
+                  166,
+                  91
+                ],
+                [
+                  136,
+                  50
+                ],
+                [
+                  160,
+                  21
+                ]
+              ],
+              "text": "OH",
+              "textAnchor": [
+                181,
+                14
+              ]
+            },
+            "C3_OH": {
+              "bond": [
+                [
+                  151,
+                  137
+                ],
+                [
+                  103,
+                  137
+                ]
+              ],
+              "text": "HO",
+              "textAnchor": [
+                80,
+                136
+              ]
+            },
+            "C2_OH": {
+              "bond": [
+                [
+                  241,
+                  116
+                ],
+                [
+                  279,
+                  140
+                ]
+              ],
+              "text": "OH",
+              "textAnchor": [
+                302,
+                149
+              ]
+            }
+          },
+          "polymerLinks": {
+            "previousUnit": {
+              "from": [
+                96,
+                73
+              ],
+              "to": [
+                51,
+                112
+              ],
+              "style": "dashed"
+            },
+            "glycosidicO": {
+              "from": [
+                331,
+                132
+              ],
+              "to": [
+                375,
+                106
+              ],
+              "atomText": "O",
+              "atomAnchor": [
+                387,
+                95
+              ]
+            },
+            "nextUnit": {
+              "from": [
+                401,
+                105
+              ],
+              "to": [
+                439,
+                126
+              ],
+              "style": "dashed"
+            }
+          }
+        },
+        {
+          "side": "right",
+          "ringVertices": {
+            "C4": [
+              856,
+              81
+            ],
+            "C3": [
+              912,
+              145
+            ],
+            "C2": [
+              1002,
+              123
+            ],
+            "C1": [
+              1095,
+              140
+            ],
+            "ringO": [
+              1019,
+              79
+            ],
+            "C5": [
+              928,
+              99
+            ]
+          },
+          "ringOrder": [
+            "C4",
+            "C3",
+            "C2",
+            "C1",
+            "ringO",
+            "C5",
+            "C4"
+          ],
+          "bondOrders": "ALLsingle",
+          "frontDepthBonds": [
+            [
+              "C4",
+              "C3"
+            ],
+            [
+              "C3",
+              "C2"
+            ],
+            [
+              "C2",
+              "C1"
+            ]
+          ],
+          "substituents": {
+            "C5_CH2ONO2": {
+              "bonds": [
+                [
+                  928,
+                  99
+                ],
+                [
+                  896,
+                  57
+                ],
+                [
+                  922,
+                  29
+                ]
+              ],
+              "text": "ONO₂",
+              "textAnchor": [
+                958,
+                22
+              ],
+              "attachmentAtom": "OđầutiêntrongONO₂"
+            },
+            "C3_ONO2": {
+              "bond": [
+                [
+                  912,
+                  145
+                ],
+                [
+                  861,
+                  145
+                ]
+              ],
+              "text": "O₂NO",
+              "textAnchor": [
+                827,
+                148
+              ],
+              "attachmentAtom": "OcuốicùngbênPHẢItrongO₂NO,nốitớicarbonC3"
+            },
+            "C2_ONO2": {
+              "bond": [
+                [
+                  1002,
+                  123
+                ],
+                [
+                  1036,
+                  157
+                ]
+              ],
+              "text": "ONO₂",
+              "textAnchor": [
+                1071,
+                171
+              ],
+              "attachmentAtom": "Ođầutiên"
+            }
+          },
+          "polymerLinks": {
+            "previousUnit": {
+              "from": [
+                856,
+                81
+              ],
+              "to": [
+                810,
+                112
+              ],
+              "style": "dashed"
+            },
+            "glycosidicO": {
+              "from": [
+                1095,
+                140
+              ],
+              "to": [
+                1136,
+                113
+              ],
+              "atomText": "O",
+              "atomAnchor": [
+                1148,
+                103
+              ]
+            },
+            "nextUnit": {
+              "from": [
+                1164,
+                113
+              ],
+              "to": [
+                1205,
+                141
+              ],
+              "style": "dashed"
+            }
+          }
+        }
+      ],
+      "reactionArrow": {
+        "from": [
+          475,
+          122
+        ],
+        "to": [
+          765,
+          122
+        ],
+        "direction": "right",
+        "over": "+ HNO₃ (đặc)/xt H₂SO₄ đặc, t°",
+        "overAnchor": [
+          618,
+          93
+        ],
+        "under": "− H₂O",
+        "underAnchor": [
+          610,
+          151
+        ]
+      }
+    },
+    "explicitHAndCharges": "TráiHchỉtrong3OHtext;phải3OHđãthay3ONO₂khôngOH/Htextthêm;mọicarbonHẩn.KHÔNGformalNO₂⁺/O⁻chargesvìsourcenitrateviếtgộp. Khônglabelcarbon1..6trongảnh,IDsC1..C5chỉlàthamchiếureport.",
+    "criticalTopology": "RingO và2glycosidiclinkgiữbênđầu/cuốiKHÔNGđượcđổithànhnitrate. KhôngfiniteSMILES.4dashedstubscho2unitđúngvịtrítạonộidungpolymer. HaiunitcùngchairgeometryC5branchup-left,C3branchleft,C2branchdown-right,khôngHaworthphẳngthaychair.",
+    "coefficientCaution": "Sourceover+HNO₃/under−H₂Ođềukhônghệsố3;đừngtựchèn3hayđiềukiệnkhác. Nguồnkhôngngoặcn/nlabel/caption/tênchất.",
+    "diagnostic": "/workspace/scratch/source1309-144-2x.png",
+    "svg": "cellulose-chair-ddh-164803f9cfed0fa7babbe84c35652cae412c6a4d4908e0440c65cbea258a12e1.svg",
+    "hashSvg": "164803f9cfed0fa7babbe84c35652cae412c6a4d4908e0440c65cbea258a12e1",
+    "byteSvg": 26970,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "2chairpolymer/3OH→3nitrateđúngO2NOleft-ONO2top/lower/giữringO+glycosidicO/4dashedstubs;ALLsingle3frontdepthkhôngCIP;KHÔNGnrepeat/ngoặc/sốC/hệsố3/H-Cextra/charges/finiteSMILES. Arrow+HNO3(đặc)/xtH2SO4đặc,t°;−H2Onguyênvăn.",
+    "hashSvgDaSoat": "164803f9cfed0fa7babbe84c35652cae412c6a4d4908e0440c65cbea258a12e1",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
