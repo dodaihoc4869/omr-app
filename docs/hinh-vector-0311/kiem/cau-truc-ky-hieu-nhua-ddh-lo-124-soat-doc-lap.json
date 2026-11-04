@@ -1,0 +1,42 @@
+[
+  {
+    "i": 67,
+    "hashSvg": "0776509fa21c771b283489ff1f55ce9bbf3734a80ca78ffe640694ce2151c0f8",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG source native, render từng SVG cơ sở đã đạt và render SVG thật hiện tại, đối chiếu actual không dựa pHash. Giữ5/PP không05. Mỗi logo3arrow clockwise, bottom sang trái; giữ mũi nhọn/thân liền/khe tách, không thêm groupcaption. DDH Rounded dam thật từ cơ sở đã soát, path tự chứa không text/image/fallback; gaps/nhãn/bounds rõ, không cắt/chạm/tràn. Hash byte thực của hình và từng cơ sở khớp metadata.",
+    "hash": "0ccb5d5b1660ba243671e13736c278fc42f7428680c445b029594bc55570d0c7",
+    "hashSvgDaSoat": "0776509fa21c771b283489ff1f55ce9bbf3734a80ca78ffe640694ce2151c0f8"
+  },
+  {
+    "i": 810,
+    "hashSvg": "0776509fa21c771b283489ff1f55ce9bbf3734a80ca78ffe640694ce2151c0f8",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG source native, render từng SVG cơ sở đã đạt và render SVG thật hiện tại, đối chiếu actual không dựa pHash. Giữ5/PP không05. Mỗi logo3arrow clockwise, bottom sang trái; giữ mũi nhọn/thân liền/khe tách, không thêm groupcaption. DDH Rounded dam thật từ cơ sở đã soát, path tự chứa không text/image/fallback; gaps/nhãn/bounds rõ, không cắt/chạm/tràn. Hash byte thực của hình và từng cơ sở khớp metadata.",
+    "hash": "9636380b824717a97e8cb5a91e5204b6a2da365cad436fb020394eeb6c319e71",
+    "hashSvgDaSoat": "0776509fa21c771b283489ff1f55ce9bbf3734a80ca78ffe640694ce2151c0f8"
+  },
+  {
+    "i": 933,
+    "hashSvg": "cd287e863235681ee8f306de272bdb2bd4e5553bf1f2af1aca8c5bf09133855f",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG source native, render từng SVG cơ sở đã đạt và render SVG thật hiện tại, đối chiếu actual không dựa pHash. Giữ03/PVC, bắt buộc0 đầu không alias3. Mỗi logo3arrow clockwise, bottom sang trái; giữ mũi nhọn/thân liền/khe tách, không thêm groupcaption. DDH Rounded dam thật từ cơ sở đã soát, path tự chứa không text/image/fallback; gaps/nhãn/bounds rõ, không cắt/chạm/tràn. Hash byte thực của hình và từng cơ sở khớp metadata.",
+    "hash": "a8c82fee05086272d56d16bed54361decfdb80a1eff163de86e8f5765c269ba7",
+    "hashSvgDaSoat": "cd287e863235681ee8f306de272bdb2bd4e5553bf1f2af1aca8c5bf09133855f"
+  },
+  {
+    "i": 399,
+    "hashSvg": "bf9d9941a5d281d2e26e5dba1867f30670d7b81f349a89230128440afceb0fba",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG source native, render từng SVG cơ sở đã đạt và render SVG thật hiện tại, đối chiếu actual không dựa pHash. Giữ cặp trái2/HDPE, phải3/PVC và đường phân cách ĐỨNG giữa. Mỗi logo3arrow clockwise, bottom sang trái; giữ mũi nhọn/thân liền/khe tách, không thêm groupcaption. DDH Rounded dam thật từ cơ sở đã soát, path tự chứa không text/image/fallback; gaps/nhãn/bounds rõ, không cắt/chạm/tràn. Hash byte thực của hình và từng cơ sở khớp metadata.",
+    "hash": "46677a532fbee3cac3095f3676709da492552a0bd4bcf11c29be629325367d56",
+    "hashSvgDaSoat": "bf9d9941a5d281d2e26e5dba1867f30670d7b81f349a89230128440afceb0fba"
+  },
+  {
+    "i": 755,
+    "hashSvg": "610142b2ffb4121d6252796b06de001392c4405a7115b742c61b1c5578b6f995",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG source native, render từng SVG cơ sở đã đạt và render SVG thật hiện tại, đối chiếu actual không dựa pHash. Giữ cặp trái2/HDPE, phải4/LDPE màu xám, không thêm đường giữa. Mỗi logo3arrow clockwise, bottom sang trái; giữ mũi nhọn/thân liền/khe tách, không thêm groupcaption. DDH Rounded dam thật từ cơ sở đã soát, path tự chứa không text/image/fallback; gaps/nhãn/bounds rõ, không cắt/chạm/tràn. Hash byte thực của hình và từng cơ sở khớp metadata.",
+    "hash": "8c9f331305502b341848064f45d00c659c60393deb65d298911d655eb6931453",
+    "hashSvgDaSoat": "610142b2ffb4121d6252796b06de001392c4405a7115b742c61b1c5578b6f995"
+  }
+]

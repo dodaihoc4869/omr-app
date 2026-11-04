@@ -150,5 +150,509 @@
         ]
       }
     ]
+  },
+  {
+    "i": 349,
+    "hash": "3dd1d63d0bf5a7d7b54867143d10b7ea1caccb0b8dd4418bf9b11fe77c63b6be",
+    "fileNguon": "anh/3dd1d63d0bf5a7d7b54867143d10b7ea1caccb0b8dd4418bf9b11fe77c63b6be.png",
+    "canvas": [
+      602,
+      120
+    ],
+    "daMoNative": true,
+    "kind": "polymerization-nitrile-literal",
+    "reactants": "n CH₂=CH(CN)",
+    "overArrow": "t⁰, xt, p",
+    "productUnit": {
+      "backbone": "–CH₂–CH–",
+      "branch": "CN down at CH",
+      "brackets": "round parentheses around backbone row only",
+      "repeat": "n outside lower-right"
+    },
+    "notes": "CH₂=CHmonomerhorizontal,CNnhánhxuốngCphải. Mộtmũitênphảiđiềukiệnt⁰,xt,p. PolymerrepeatKHÔNGfiniteSMILES;2bondstubhaiđầuđiquangoặc,CNđặtdướihàngbackbone,sourceNGOẶCNGẮNchỉbaoCH₂–CH,CNởdướingoặcnhưngthuộcrepeatunit. nngoàibênphảiởmứcthấphơnbackbone. Giữnmonomer,nrepeat,nothêmtênpolymer.",
+    "questions": [
+      {
+        "qid": "DH-12-C4-B14-D2-II-3",
+        "de": "Trùng hợp acrylonitrile thu được polymer X theo phương trình hoá học ở hình dưới đây. Trong điều kiện thích hợp, trùng hợp vinyl chloride thu được polymer Y.",
+        "refs": [
+          {
+            "where": "DH-12-C4-B14-D2-II-3.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 387,
+    "hash": "452c8961af759889c1bd0ba3961533b2862475e6fe70d494aeb79bda80eabcda",
+    "fileNguon": "anh/452c8961af759889c1bd0ba3961533b2862475e6fe70d494aeb79bda80eabcda.png",
+    "canvas": [
+      577,
+      92
+    ],
+    "daMoNative": true,
+    "kind": "PVC-chain-segment",
+    "literal": "–CH₂–CH(Cl)–CH₂–CH(Cl)–CH₂–CH(Cl)–CH₂–CH(Cl)–",
+    "notes": "8carbonmainrow,4CH₂/4CHluânphiên,4nhánhClđềuxuốngtừ4CH. Dấu–haiđầulàstubmạchdàitiếpnối,khôngcapH/CH₃,khôngvẽngoặcnnếunguồnkhôngcó. Khôngthêmstereo/tacticity/caption.",
+    "questions": [
+      {
+        "qid": "DH-12-C4-B14-D2-I-6",
+        "de": "Cho cấu tạo của một đoạn mạch trong phân tử polymer X:\nTên của X là",
+        "refs": [
+          {
+            "where": "DH-12-C4-B14-D2-I-6.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 164,
+    "hash": "1c3a1d884337d12ae2774d0c55451d9fabfcb69bf8183bcfc639773b96ca22b4",
+    "fileNguon": "anh/1c3a1d884337d12ae2774d0c55451d9fabfcb69bf8183bcfc639773b96ca22b4.png",
+    "canvas": [
+      285,
+      288
+    ],
+    "daMoNative": true,
+    "kind": "bohr-potassium",
+    "nucleus": [
+      "19p",
+      "20n"
+    ],
+    "shellCounts": [
+      2,
+      8,
+      8,
+      1
+    ],
+    "notes": "4vòngtrònđồngtâmviềnxanhlục,19electronscầucam/điểmsángtrắng. Nucleusmàuxanhdương,textTRẮNG2dòng19p/20n. Inner2N,S;2nd8đều8hướng;3rd8đều8hướng;outer1duynhấtN.CácsampleNđiểmelectroncùngđườngthẳngđứngtrêncenter. KhôngtựthêmK/19⁺/tổngmass39/nhãnshell.",
+    "questions": [
+      {
+        "qid": "DH-10-C3-B10-I-25",
+        "de": "Nguyên tử có mô hình cấu tạo sau đây có xu hướng nhường hoặc nhận electron như thế nào khi hình thành liên kết hóa học?",
+        "refs": [
+          {
+            "where": "DH-10-C3-B10-I-25.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 297,
+    "hash": "336c72cf901887430d659a59bb75171a029035c25352c93dd9043f0499ae1680",
+    "fileNguon": "anh/336c72cf901887430d659a59bb75171a029035c25352c93dd9043f0499ae1680.png",
+    "canvas": [
+      651,
+      115
+    ],
+    "daMoNative": true,
+    "kind": "reaction-literal",
+    "reactants": "2 CH₃CHO",
+    "products": "CH₃COOCH₂CH₃",
+    "overArrow": "xt",
+    "underArrow": "H = 90%",
+    "notes": "Mộtmũitênphải. xttrênmũitên,H=90%dướimũitên;HkýhiệuhiệusuấtkhôngnguyêntửHtrongphươngtrình. Khôngtựthêmreagent/xúctáccụthể/caption.",
+    "questions": [
+      {
+        "qid": "12-C1-B1-D3-I-75",
+        "de": "Ethyl acetate được dùng làm dung môi, khử caffein của hạt cà phê và trà.\nTrong công nghiệp, ethyl acetate được điều chế từ acetaldehyde với xúc tác alkoxide theo phương trình ở hình dưới (hiệu suất 90%).\nTừ nguyên liệu ban đầu là 1 tấn acetaldehyde thì khối lượng ethyl acetate thu được là bao nhiêu?",
+        "refs": [
+          {
+            "where": "12-C1-B1-D3-I-75.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D2-I-46",
+        "de": "Ethyl acetate được dùng làm dung môi, khử caffein của hạt cà phê và trà.\nTrong công nghiệp, ethyl acetate được điều chế từ acetaldehyde với xúc tác alkoxide theo phương trình ở hình dưới (hiệu suất 90%).\nTừ nguyên liệu ban đầu là 1 tấn acetaldehyde thì khối lượng ethyl acetate thu được là bao nhiêu?",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D2-I-46.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 859,
+    "hash": "9ccb0ab74e2bc3a6a990474ef877025da2d5cc183e94beab1dad372564d3b13a",
+    "fileNguon": "anh/9ccb0ab74e2bc3a6a990474ef877025da2d5cc183e94beab1dad372564d3b13a.png",
+    "canvas": [
+      731,
+      54
+    ],
+    "daMoNative": true,
+    "kind": "reaction-step-flow",
+    "nodes": [
+      "Glycerol",
+      "X",
+      "Y",
+      "Z"
+    ],
+    "edges": [
+      {
+        "over": "+CH₃COOH",
+        "under": "−H₂O"
+      },
+      {
+        "over": "+CH₃COOH",
+        "under": "−H₂O"
+      },
+      {
+        "over": "+CH₃COOH",
+        "under": "−H₂O"
+      }
+    ],
+    "notes": "4nodengang,3mũitênphải;MỖIarrowabove+CH₃COOH/below−H₂O. Dấustubgiữanode/arrowkhôngphảiđiệntíchâm,nếutypesetgộpđườngarrowđầyđủđượcthểhiệnnhưngkhôngthêmhệsố. GiữbiếnX/Y/Z,kHÔNGtựthaybằngmono/di/triacetin.",
+    "questions": [
+      {
+        "qid": "VIP27-BDT-L4-0401-III-2",
+        "de": "Thực hiện các phản ứng (với xúc tác $\\ce{H2SO4}$ đặc, đun nóng) theo sơ đồ: Glycerol →(+ $\\ce{CH3COOH}$, − $\\ce{H2O}$) X →(+ $\\ce{CH3COOH}$, − $\\ce{H2O}$) Y →(+ $\\ce{CH3COOH}$, − $\\ce{H2O}$) Z.\nPhân tử khối của chất Y là bao nhiêu?",
+        "refs": [
+          {
+            "where": "VIP27-BDT-L4-0401-III-2.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 786,
+    "hash": "92c050f40c2022dd8b8eedf05b0ccf0c7c409ea549b22afe8bbb74e757a4823b",
+    "fileNguon": "anh/92c050f40c2022dd8b8eedf05b0ccf0c7c409ea549b22afe8bbb74e757a4823b.png",
+    "canvas": [
+      873,
+      48
+    ],
+    "daMoNative": true,
+    "kind": "reaction-name-flow",
+    "nodes": [
+      "Benzene",
+      "Nitrobenzene",
+      "Aniline"
+    ],
+    "edges": [
+      {
+        "over": "+HNO₃, H₂SO₄ (đặc)"
+      },
+      {
+        "over": "+Fe + HCl, t⁰"
+      }
+    ],
+    "notes": "3nodetênchấtEnglishđúngcapitalB/N/A,2mũitênphải. Chỉtextkhôngvòngmolecule,khôngtựthêmstructures/hệsố/đápán. Giữđặcngoặcvòngvàt⁰trênarrow2.",
+    "questions": [
+      {
+        "qid": "DB-12-B8-D3-III-7",
+        "de": "Từ benzene người ta điều chế aniline theo sơ đồ sau: Biết hiệu suất giai đoạn tạo thành nitrobenzene đạt 60% và hiệu suất giai đoạn tạo thành aniline đạt 50%.\nTính khối lượng aniline (theo gam) thu được khi điều chế từ 156 gam benzene? (Làm tròn kết quả đến hàng phần mười).",
+        "refs": [
+          {
+            "where": "DB-12-B8-D3-III-7.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B11-D2-III-4",
+        "de": "Từ benzene người ta điều chế aniline theo sơ đồ sau: Biết hiệu suất giai đoạn tạo thành nitrobenzene đạt 60% và hiệu suất giai đoạn tạo thành aniline đạt 50%.\nTính khối lượng aniline (theo gam) thu được khi điều chế từ 156 gam benzene? (Làm tròn kết quả đến hàng phần mười).",
+        "refs": [
+          {
+            "where": "DH-12-C3-B11-D2-III-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 346,
+    "hash": "3d83b8c03103af06d2cd380edd4ab4206876461bb60acf0f6d01f73697fd646f",
+    "fileNguon": "anh/3d83b8c03103af06d2cd380edd4ab4206876461bb60acf0f6d01f73697fd646f.png",
+    "canvas": [
+      710,
+      120
+    ],
+    "daMoNative": true,
+    "kind": "triglyceride-saponification-literal",
+    "leftRows": [
+      "C₁₅H₃₁COOCH₂",
+      "C₁₅H₃₁COOCH",
+      "C₁₅H₃₁COOCH₂"
+    ],
+    "reactantAdditional": "3NaOH",
+    "overArrow": "t⁰",
+    "products": [
+      "3C₁₅H₃₁COONa",
+      {
+        "rows": [
+          "CH₂OH",
+          "CHOH",
+          "CH₂OH"
+        ],
+        "verticalBonds": true
+      }
+    ],
+    "notes": "C3glycerolrowsnốidọcquaCH₂–CH–CH₂tạibênphảimỗileftrow. Haisign+giữatriglyceride/3NaOH vàsalt/glycerol.Mộtmũitênphải,t⁰trên;KHÔNGfiniteSMILESkhiếntựđổiđộdàimạch. Giữ15/31chuẩn,parentglycerolCHOHtráitriesterCHkhôngOHtựdo.",
+    "questions": [
+      {
+        "qid": "DB-12-B1-P1-D1-I-183",
+        "de": "Cho phản ứng được biểu diễn thông qua phương trình hoá học sau: Phản ứng trên thuộc loại phản ứng nào sau đây?",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D1-I-183.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B2-I-13",
+        "de": "Cho phản ứng được biểu diễn thông qua phương trình hoá học sau: Phản ứng trên thuộc loại phản ứng nào sau đây?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B2-I-13.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1166,
+    "hash": "d319f77425ea93334ab02573d1f06dcc62971599d34eb6aafb8aa61a35ec1966",
+    "fileNguon": "anh/d319f77425ea93334ab02573d1f06dcc62971599d34eb6aafb8aa61a35ec1966.png",
+    "canvas": [
+      74,
+      179
+    ],
+    "daMoNative": true,
+    "kind": "separatory-funnel-icon",
+    "notes": "Phễuchiếtđứng,mặttrênnắphìnhtrụnhỏ,thânhìnhquảlêthonxuống,vanngangởgầndưới,từvanđiốngthẳnghẹpxuốngvàmiệngcắtchéo. Hìnhđenxámlineartkhôngchứa chấtlỏng/nhãn/vạchchia/giáđỡ. Giữcóvan,chớvẽthànhphễulọcthường.",
+    "questions": [
+      {
+        "qid": "VIP27-BDT-KTTX-601-I-2",
+        "de": "Trong thí nghiệm điều chế ethyl acetate, bạn học sinh cần đong 24 mL cồn 96°. Dụng cụ nào sau đây phù hợp nhất cho thao tác trên?",
+        "refs": [
+          {
+            "where": "VIP27-BDT-KTTX-601-I-2.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 59,
+    "hash": "0bbe101793287d27bd0b5b390c30f8a47d938232a77ff74658b46a53631a2184",
+    "fileNguon": "anh/0bbe101793287d27bd0b5b390c30f8a47d938232a77ff74658b46a53631a2184.png",
+    "canvas": [
+      91,
+      182
+    ],
+    "daMoNative": true,
+    "kind": "graduated-cylinder-icon",
+    "notes": "Ốngđongđứng:miệngovalhở/trêncólip,thânhìnhtrụthon,nềntrắng,đếovalxòerộng. Nhiềuvạchchiangắn/dàibênphảiTRONGthânvùngy~39..160,tuyệtnhiênKHÔNGcósố/đơnvị.Bềrộngvạchlớn/nhỏđúngnhìnnguồn,khônggánmLhaythangdungtích.Khôngchấtlỏng.",
+    "questions": [
+      {
+        "qid": "VIP27-BDT-KTTX-601-I-2",
+        "de": "Trong thí nghiệm điều chế ethyl acetate, bạn học sinh cần đong 24 mL cồn 96°. Dụng cụ nào sau đây phù hợp nhất cho thao tác trên?",
+        "refs": [
+          {
+            "where": "VIP27-BDT-KTTX-601-I-2.hinh.1.du_lieu",
+            "viTri": "sau_pa_B"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 752,
+    "hash": "8bcfb4705d31c35efb9a158babde3b7af2b3fbdb8f78111fc6d347668b32d33a",
+    "fileNguon": "anh/8bcfb4705d31c35efb9a158babde3b7af2b3fbdb8f78111fc6d347668b32d33a.png",
+    "canvas": [
+      136,
+      177
+    ],
+    "daMoNative": true,
+    "kind": "erlenmeyer-icon",
+    "notes": "BìnhtamgiácErlenmeyer:miệngovalnhỏ,cổhẹp,thâncônrộngxuống,đáyovalrộng. Có3vạchchiaNGANGbênphảithânởkhoảngy92/125/156native,khôngcósố/đơnvị/chấtlỏng. Khôngnút/van/phễu.",
+    "questions": [
+      {
+        "qid": "VIP27-BDT-KTTX-601-I-2",
+        "de": "Trong thí nghiệm điều chế ethyl acetate, bạn học sinh cần đong 24 mL cồn 96°. Dụng cụ nào sau đây phù hợp nhất cho thao tác trên?",
+        "refs": [
+          {
+            "where": "VIP27-BDT-KTTX-601-I-2.hinh.3.du_lieu",
+            "viTri": "sau_pa_D"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1391,
+    "hash": "facc4804d6a988274d7b9f4575aaa8405d3153b3cdf67054c5e931645cfcb271",
+    "fileNguon": "anh/facc4804d6a988274d7b9f4575aaa8405d3153b3cdf67054c5e931645cfcb271.png",
+    "canvas": [
+      169,
+      182
+    ],
+    "daMoNative": true,
+    "kind": "beaker-solid-icon",
+    "notes": "Cốccótia/rótspouttrêntrái,miệngoval/2đườnglip,thânhìnhtrụđáycong. 4vạchchiangắncongbênphảithân,khôngsố/đơnvị. ĐáytrongcốccónhiềuhạtchấtRẮNnhỏđenrờihạt,khôngmặtnướcnằmngang. Khôngđổiđáyhạtthànhdungdịch/chấtrắnkhốiđặc.",
+    "questions": [
+      {
+        "qid": "VIP27-BDT-KTTX-601-I-2",
+        "de": "Trong thí nghiệm điều chế ethyl acetate, bạn học sinh cần đong 24 mL cồn 96°. Dụng cụ nào sau đây phù hợp nhất cho thao tác trên?",
+        "refs": [
+          {
+            "where": "VIP27-BDT-KTTX-601-I-2.hinh.2.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 266,
+    "hash": "2d2551ae312eea69476e3ceca4adfeaa1026c86b3c37922987db8e7144fa0b1f",
+    "fileNguon": "anh/2d2551ae312eea69476e3ceca4adfeaa1026c86b3c37922987db8e7144fa0b1f.png",
+    "canvas": [
+      367,
+      190
+    ],
+    "daMoNative": true,
+    "kind": "electrolysis-generic",
+    "labels": [
+      "(+)",
+      "(−)",
+      "dung dịch X"
+    ],
+    "notes": "BìnhchữUthànhđenđậmmởmiệng,nềnchấtlỏngxámnhạtnằmngang.2điệncựcdạngthanhchữnhậtviềnxámđứngnhúnggầnđáy,tráighi(+)trên,phảighi(−)trên;dâydẫnmảnhđitừđầutrênmỗithanhra2góctrênngoài. LabeldungdịchXnằmgiữathânxámdưới. KHÔNGmũitênelectron/bọtkhí/nguồnV/tênđiệncựcthêm.",
+    "questions": [
+      {
+        "qid": "VIP27-C3-B11-D2-II-3",
+        "de": "Thuỷ phân hoàn toàn tripeptide E chứa các gốc amino acid của glycine (Gly), glutamic acid (Glu) và lysine (Lys) trong dung dịch NaOH thu được dung dịch X. Nhúng hai điện cực của dòng điện một chiều có hiệu điện thế thấp vào dung dịch X (hình vẽ), sau đó thêm từ từ dung dịch HCl vào X đến khi dung dịch thu được có pH = 1,0 (dung dịch Y).",
+        "refs": [
+          {
+            "where": "VIP27-C3-B11-D2-II-3.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 831,
+    "hash": "99b912de8d32f2f4669eae8d6ff0e0ca019b29da6d83d45aa95776f50c04423f",
+    "fileNguon": "anh/99b912de8d32f2f4669eae8d6ff0e0ca019b29da6d83d45aa95776f50c04423f.png",
+    "canvas": [
+      305,
+      179
+    ],
+    "daMoNative": true,
+    "kind": "galvanic-generic-meter",
+    "labels": [
+      "−",
+      "+",
+      "Thanh kim loại",
+      "Dung dịch",
+      "Thanh kim loại",
+      "Dung dịch"
+    ],
+    "meterDisplay": "0.57",
+    "notes": "2cốcngangchứadungdịchxámnhạt,cầuUcongNHÚNGtrongcả2cốc,2thanhkimloạinghiêng:thanhtráicựctrái−trên,thanhphảicựcphải+trên. ĐồnghồsốởngoàitráiHIỆN0.57(dấuchấm)kèmnúmvặntròn,2dâydẫnngoàinốicáccựctheoảnh. LabelsThanhkimloạivàDungdịchchoCẢ2cốc,leaderpointergiữđúngmục.KhônggánZn/Cu/muốinàovìnguồnchỉgeneric;khôngthêmchiềue/ionarrow.",
+    "questions": [
+      {
+        "qid": "VIP27-C5-B15-I-17",
+        "de": "Một học sinh tiến hành thí nghiệm pin điện hóa, tra cứu điện thế khử chuẩn của 4 cặp oxi hóa - khử như bảng dưới và chuẩn bị nước cất, cầu muối, cốc có mỏ, các loại muối và điện cực tương ứng. Học sinh lấy ra hai cặp oxi hóa - khử, và dùng cầu muối kết nối chúng để tạo thành pin điện hóa, như hình sau.\nCho các phát biểu sau:\n(a) Trong pin đo được suất điện động 0,57 V (ảnh trên) thì cực dương (cathode) là lá đồng (Cu).\n(b) Trong pin Nickel-Zinc, lá nickel (Ni) là cực âm (anode).\n(c) Suất điện động đo được của pin Ni-Pb sẽ lớn hơn 0,36 V.\n(d) Nếu tháo cầu muối và thay bằng dây đồng, vẫn có thể tạo thành pin.\n(e) Nếu thay kim loại của bán pin bằng than chì (graphite), vẫn có thể tạo thành pin.\nSố phát biểu đúng là",
+        "refs": [
+          {
+            "where": "VIP27-C5-B15-I-17.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1090,
+    "hash": "c3e93280205f90d144dea03f56c58dd506e47401172e179b1bf36df376188460",
+    "fileNguon": "anh/c3e93280205f90d144dea03f56c58dd506e47401172e179b1bf36df376188460.png",
+    "canvas": [
+      249,
+      255
+    ],
+    "daMoNative": true,
+    "kind": "galvanic-Zn-Cu-lamp",
+    "labels": [
+      "Bóng đèn",
+      "Dây dẫn điện",
+      "Thanh Zn",
+      "Thanh Cu",
+      "Dung dịch ZnSO₄ 1,0 M",
+      "Dung dịch CuSO₄ 1,0 M"
+    ],
+    "notes": "2cốcngang,thanhZntráivàCuphaiđứngnhúngdungdịch. Cầumạchnuốigiữa2dungdịchvắngTRONGẢNH:KHÔNGtựthêmcầumuối. DâyđiệnnốitopZn→bóngđènkýhiệuvòngtrònXtrêngiữa→topCu,khôngmũitênelectron/+/−. LabelDâydẫnđiện2dòngtrongvùnggiữa2dâythẳngđứngtoptop. Mỗicốcdướigiữdungdịchmuốitươngứng1,0M. KhôngđổiZnSO₄thànhZnCl₂.",
+    "questions": [
+      {
+        "qid": "VIP27-C5-B17-D1-I-9",
+        "de": "Dụng cụ nào cần bổ sung vào hệ được mô tả như sơ đồ ở hình bên để tạo thành pin Galvani hoạt động?",
+        "refs": [
+          {
+            "where": "VIP27-C5-B17-D1-I-9.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1399,
+    "hash": "fc0e80ce07efe61d7fd3637d5b7d6a187bbcb9700a20ad51a9fc87c866a8a6ca",
+    "fileNguon": "anh/fc0e80ce07efe61d7fd3637d5b7d6a187bbcb9700a20ad51a9fc87c866a8a6ca.png",
+    "canvas": [
+      354,
+      207
+    ],
+    "daMoNative": true,
+    "kind": "discharge-tube",
+    "labels": [
+      "Ống phóng điện",
+      "Cực âm",
+      "Cực dương",
+      "Hiệu điện thế cao",
+      "−",
+      "+"
+    ],
+    "notes": "Ốngcapsuleovalnằmhorizontalnềnvàngnhạt. Haiđiệncựcverticaltrongống:tráiâm−,phảidương+;3tia/đườngmảnhngangbêntrongtừtráiphải,khuvựcphảiđầutia cómũinhọnnhỏhướngPHẢI.Cựcâm/cựcdươnglabelsleaderởdưới2điệncực,Ốngphóngđiệnleaderởtrêntrái. DâyngoàichữUvuôngvềnguồncaoápdướigiữa,nguồnhộpđỏ2cực−trái/+phải;labelHiệuđiệnthếcaoởdướitráicạnhnguồn. KHÔNGthêmkhí/áp suất/giátrịV/electrondot.",
+    "questions": [
+      {
+        "qid": "DB-10-B1-D1-II-142",
+        "de": "J. J. Thomson, nhà vật lí người Anh, được trao Giải thưởng Nobel Vật lí vào năm 1906 vì phát hiện ra một loại hạt cơ bản tạo nên nguyên tử.\nThomson đã chế tạo ống tia âm cực gồm một ống thuỷ tinh được hút phần lớn không khí ra khỏi ống, một hiệu điện thế cao được đặt vào hai điện cực gắn ở hai đầu ống. Năm 1897, ông phát hiện ra một dòng hạt đi ra từ điện cực tích điện âm sang điện cực tích điện dương. Ống tia âm cực",
+        "refs": [
+          {
+            "where": "DB-10-B1-D1-II-142.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B1-II-3",
+        "de": "J. J. Thomson, nhà vật lí người Anh, được trao Giải thưởng Nobel Vật lí vào năm 1906 vì phát hiện ra một loại hạt cơ bản tạo nên nguyên tử.\nThomson đã chế tạo ống tia âm cực gồm một ống thuỷ tinh được hút phần lớn không khí ra khỏi ống, một hiệu điện thế cao được đặt vào hai điện cực gắn ở hai đầu ống. Năm 1897, ông phát hiện ra một dòng hạt đi ra từ điện cực tích điện âm sang điện cực tích điện dương. Ống tia âm cực",
+        "refs": [
+          {
+            "where": "DH-10-C1-B1-II-3.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
   }
 ]

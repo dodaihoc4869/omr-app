@@ -1,0 +1,138 @@
+[
+  {
+    "i": 349,
+    "hash": "3dd1d63d0bf5a7d7b54867143d10b7ea1caccb0b8dd4418bf9b11fe77c63b6be",
+    "fileNguon": "anh/3dd1d63d0bf5a7d7b54867143d10b7ea1caccb0b8dd4418bf9b11fe77c63b6be.png",
+    "canvas": [
+      602,
+      120
+    ],
+    "daMoNative": true,
+    "kind": "polymerization-nitrile-literal",
+    "reactants": "n CH₂=CH(CN)",
+    "overArrow": "t⁰, xt, p",
+    "productUnit": {
+      "backbone": "–CH₂–CH–",
+      "branch": "CN down at CH",
+      "brackets": "round parentheses around backbone row only",
+      "repeat": "n outside lower-right"
+    },
+    "notes": "CH₂=CHmonomerhorizontal,CNnhánhxuốngCphải. Mộtmũitênphảiđiềukiệnt⁰,xt,p. PolymerrepeatKHÔNGfiniteSMILES;2bondstubhaiđầuđiquangoặc,CNđặtdướihàngbackbone,sourceNGOẶCNGẮNchỉbaoCH₂–CH,CNởdướingoặcnhưngthuộcrepeatunit. nngoàibênphảiởmứcthấphơnbackbone. Giữnmonomer,nrepeat,nothêmtênpolymer.",
+    "questions": [
+      {
+        "qid": "DH-12-C4-B14-D2-II-3",
+        "de": "Trùng hợp acrylonitrile thu được polymer X theo phương trình hoá học ở hình dưới đây. Trong điều kiện thích hợp, trùng hợp vinyl chloride thu được polymer Y.",
+        "refs": [
+          {
+            "where": "DH-12-C4-B14-D2-II-3.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "polymer-xa-phong-ddh-fbb9eae52ea12871351b7983b350f6d1ea93b346cda20e902832abeaa58a9aeb.svg",
+    "hashSvg": "fbb9eae52ea12871351b7983b350f6d1ea93b346cda20e902832abeaa58a9aeb",
+    "byteSvg": 11429,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "349nmonomer/ngoặcNGẮNquanhbackbonenative,CNnhánhdướingoặc/nngoài/stub;3878C4Cl/khôngngoặnn/cap;346C15H31đủ3rows/3NaOH/3salt/glycerol3Cvertical/2plus.",
+    "hashSvgDaSoat": "fbb9eae52ea12871351b7983b350f6d1ea93b346cda20e902832abeaa58a9aeb",
+    "nguoiSoat": "cau_truc_6"
+  },
+  {
+    "i": 387,
+    "hash": "452c8961af759889c1bd0ba3961533b2862475e6fe70d494aeb79bda80eabcda",
+    "fileNguon": "anh/452c8961af759889c1bd0ba3961533b2862475e6fe70d494aeb79bda80eabcda.png",
+    "canvas": [
+      577,
+      92
+    ],
+    "daMoNative": true,
+    "kind": "PVC-chain-segment",
+    "literal": "–CH₂–CH(Cl)–CH₂–CH(Cl)–CH₂–CH(Cl)–CH₂–CH(Cl)–",
+    "notes": "8carbonmainrow,4CH₂/4CHluânphiên,4nhánhClđềuxuốngtừ4CH. Dấu–haiđầulàstubmạchdàitiếpnối,khôngcapH/CH₃,khôngvẽngoặcnnếunguồnkhôngcó. Khôngthêmstereo/tacticity/caption.",
+    "questions": [
+      {
+        "qid": "DH-12-C4-B14-D2-I-6",
+        "de": "Cho cấu tạo của một đoạn mạch trong phân tử polymer X:\nTên của X là",
+        "refs": [
+          {
+            "where": "DH-12-C4-B14-D2-I-6.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "polymer-xa-phong-ddh-985168203892618b225b4969a4518329e6e193f2d0cf300ce8f8d6d27d35e745.svg",
+    "hashSvg": "985168203892618b225b4969a4518329e6e193f2d0cf300ce8f8d6d27d35e745",
+    "byteSvg": 13479,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "349nmonomer/ngoặcNGẮNquanhbackbonenative,CNnhánhdướingoặc/nngoài/stub;3878C4Cl/khôngngoặnn/cap;346C15H31đủ3rows/3NaOH/3salt/glycerol3Cvertical/2plus.",
+    "hashSvgDaSoat": "985168203892618b225b4969a4518329e6e193f2d0cf300ce8f8d6d27d35e745",
+    "nguoiSoat": "cau_truc_6"
+  },
+  {
+    "i": 346,
+    "hash": "3d83b8c03103af06d2cd380edd4ab4206876461bb60acf0f6d01f73697fd646f",
+    "fileNguon": "anh/3d83b8c03103af06d2cd380edd4ab4206876461bb60acf0f6d01f73697fd646f.png",
+    "canvas": [
+      710,
+      120
+    ],
+    "daMoNative": true,
+    "kind": "triglyceride-saponification-literal",
+    "leftRows": [
+      "C₁₅H₃₁COOCH₂",
+      "C₁₅H₃₁COOCH",
+      "C₁₅H₃₁COOCH₂"
+    ],
+    "reactantAdditional": "3NaOH",
+    "overArrow": "t⁰",
+    "products": [
+      "3C₁₅H₃₁COONa",
+      {
+        "rows": [
+          "CH₂OH",
+          "CHOH",
+          "CH₂OH"
+        ],
+        "verticalBonds": true
+      }
+    ],
+    "notes": "C3glycerolrowsnốidọcquaCH₂–CH–CH₂tạibênphảimỗileftrow. Haisign+giữatriglyceride/3NaOH vàsalt/glycerol.Mộtmũitênphải,t⁰trên;KHÔNGfiniteSMILESkhiếntựđổiđộdàimạch. Giữ15/31chuẩn,parentglycerolCHOHtráitriesterCHkhôngOHtựdo.",
+    "questions": [
+      {
+        "qid": "DB-12-B1-P1-D1-I-183",
+        "de": "Cho phản ứng được biểu diễn thông qua phương trình hoá học sau: Phản ứng trên thuộc loại phản ứng nào sau đây?",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D1-I-183.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B2-I-13",
+        "de": "Cho phản ứng được biểu diễn thông qua phương trình hoá học sau: Phản ứng trên thuộc loại phản ứng nào sau đây?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B2-I-13.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "polymer-xa-phong-ddh-a5f677f01625c969c2441e21fb22f34372489b5b39d53a5d5fbdc825883e2237.svg",
+    "hashSvg": "a5f677f01625c969c2441e21fb22f34372489b5b39d53a5d5fbdc825883e2237",
+    "byteSvg": 31987,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "349nmonomer/ngoặcNGẮNquanhbackbonenative,CNnhánhdướingoặc/nngoài/stub;3878C4Cl/khôngngoặnn/cap;346C15H31đủ3rows/3NaOH/3salt/glycerol3Cvertical/2plus.",
+    "hashSvgDaSoat": "a5f677f01625c969c2441e21fb22f34372489b5b39d53a5d5fbdc825883e2237",
+    "nguoiSoat": "cau_truc_6"
+  }
+]

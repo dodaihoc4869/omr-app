@@ -1,0 +1,201 @@
+[
+  {
+    "i": 164,
+    "hash": "1c3a1d884337d12ae2774d0c55451d9fabfcb69bf8183bcfc639773b96ca22b4",
+    "fileNguon": "anh/1c3a1d884337d12ae2774d0c55451d9fabfcb69bf8183bcfc639773b96ca22b4.png",
+    "canvas": [
+      285,
+      288
+    ],
+    "daMoNative": true,
+    "kind": "bohr-potassium",
+    "nucleus": [
+      "19p",
+      "20n"
+    ],
+    "shellCounts": [
+      2,
+      8,
+      8,
+      1
+    ],
+    "notes": "4vòngtrònđồngtâmviềnxanhlục,19electronscầucam/điểmsángtrắng. Nucleusmàuxanhdương,textTRẮNG2dòng19p/20n. Inner2N,S;2nd8đều8hướng;3rd8đều8hướng;outer1duynhấtN.CácsampleNđiểmelectroncùngđườngthẳngđứngtrêncenter. KhôngtựthêmK/19⁺/tổngmass39/nhãnshell.",
+    "questions": [
+      {
+        "qid": "DH-10-C3-B10-I-25",
+        "de": "Nguyên tử có mô hình cấu tạo sau đây có xu hướng nhường hoặc nhận electron như thế nào khi hình thành liên kết hóa học?",
+        "refs": [
+          {
+            "where": "DH-10-C3-B10-I-25.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "phan-ung-va-k-ddh-652fb31a2bb6dfcd1b750cce4dd44208029ab144e2253a87b97324253d832898.svg",
+    "hashSvg": "652fb31a2bb6dfcd1b750cce4dd44208029ab144e2253a87b97324253d832898",
+    "byteSvg": 5738,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "1642/8/8/1=19electron/19p20nkhôngKthêm;297giữxt/H=90%;859giữXYZbiến/3lần+CH3COOH−H2O;786giữtênchấtEnglish/điềukiệnnguyênvăn.",
+    "hashSvgDaSoat": "652fb31a2bb6dfcd1b750cce4dd44208029ab144e2253a87b97324253d832898",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 297,
+    "hash": "336c72cf901887430d659a59bb75171a029035c25352c93dd9043f0499ae1680",
+    "fileNguon": "anh/336c72cf901887430d659a59bb75171a029035c25352c93dd9043f0499ae1680.png",
+    "canvas": [
+      651,
+      115
+    ],
+    "daMoNative": true,
+    "kind": "reaction-literal",
+    "reactants": "2 CH₃CHO",
+    "products": "CH₃COOCH₂CH₃",
+    "overArrow": "xt",
+    "underArrow": "H = 90%",
+    "notes": "Mộtmũitênphải. xttrênmũitên,H=90%dướimũitên;HkýhiệuhiệusuấtkhôngnguyêntửHtrongphươngtrình. Khôngtựthêmreagent/xúctáccụthể/caption.",
+    "questions": [
+      {
+        "qid": "12-C1-B1-D3-I-75",
+        "de": "Ethyl acetate được dùng làm dung môi, khử caffein của hạt cà phê và trà.\nTrong công nghiệp, ethyl acetate được điều chế từ acetaldehyde với xúc tác alkoxide theo phương trình ở hình dưới (hiệu suất 90%).\nTừ nguyên liệu ban đầu là 1 tấn acetaldehyde thì khối lượng ethyl acetate thu được là bao nhiêu?",
+        "refs": [
+          {
+            "where": "12-C1-B1-D3-I-75.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D2-I-46",
+        "de": "Ethyl acetate được dùng làm dung môi, khử caffein của hạt cà phê và trà.\nTrong công nghiệp, ethyl acetate được điều chế từ acetaldehyde với xúc tác alkoxide theo phương trình ở hình dưới (hiệu suất 90%).\nTừ nguyên liệu ban đầu là 1 tấn acetaldehyde thì khối lượng ethyl acetate thu được là bao nhiêu?",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D2-I-46.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "phan-ung-va-k-ddh-4209eee0a0bdc449535303e9438c8cd5100c26630d04def3a806334a7632d7bd.svg",
+    "hashSvg": "4209eee0a0bdc449535303e9438c8cd5100c26630d04def3a806334a7632d7bd",
+    "byteSvg": 12564,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "1642/8/8/1=19electron/19p20nkhôngKthêm;297giữxt/H=90%;859giữXYZbiến/3lần+CH3COOH−H2O;786giữtênchấtEnglish/điềukiệnnguyênvăn.",
+    "hashSvgDaSoat": "4209eee0a0bdc449535303e9438c8cd5100c26630d04def3a806334a7632d7bd",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 859,
+    "hash": "9ccb0ab74e2bc3a6a990474ef877025da2d5cc183e94beab1dad372564d3b13a",
+    "fileNguon": "anh/9ccb0ab74e2bc3a6a990474ef877025da2d5cc183e94beab1dad372564d3b13a.png",
+    "canvas": [
+      731,
+      54
+    ],
+    "daMoNative": true,
+    "kind": "reaction-step-flow",
+    "nodes": [
+      "Glycerol",
+      "X",
+      "Y",
+      "Z"
+    ],
+    "edges": [
+      {
+        "over": "+CH₃COOH",
+        "under": "−H₂O"
+      },
+      {
+        "over": "+CH₃COOH",
+        "under": "−H₂O"
+      },
+      {
+        "over": "+CH₃COOH",
+        "under": "−H₂O"
+      }
+    ],
+    "notes": "4nodengang,3mũitênphải;MỖIarrowabove+CH₃COOH/below−H₂O. Dấustubgiữanode/arrowkhôngphảiđiệntíchâm,nếutypesetgộpđườngarrowđầyđủđượcthểhiệnnhưngkhôngthêmhệsố. GiữbiếnX/Y/Z,kHÔNGtựthaybằngmono/di/triacetin.",
+    "questions": [
+      {
+        "qid": "VIP27-BDT-L4-0401-III-2",
+        "de": "Thực hiện các phản ứng (với xúc tác $\\ce{H2SO4}$ đặc, đun nóng) theo sơ đồ: Glycerol →(+ $\\ce{CH3COOH}$, − $\\ce{H2O}$) X →(+ $\\ce{CH3COOH}$, − $\\ce{H2O}$) Y →(+ $\\ce{CH3COOH}$, − $\\ce{H2O}$) Z.\nPhân tử khối của chất Y là bao nhiêu?",
+        "refs": [
+          {
+            "where": "VIP27-BDT-L4-0401-III-2.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "phan-ung-va-k-ddh-3a524ad71cee779df3928268e5c4797878c4a7241657d512d6e7015f9e0b83d0.svg",
+    "hashSvg": "3a524ad71cee779df3928268e5c4797878c4a7241657d512d6e7015f9e0b83d0",
+    "byteSvg": 20715,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "1642/8/8/1=19electron/19p20nkhôngKthêm;297giữxt/H=90%;859giữXYZbiến/3lần+CH3COOH−H2O;786giữtênchấtEnglish/điềukiệnnguyênvăn.",
+    "hashSvgDaSoat": "3a524ad71cee779df3928268e5c4797878c4a7241657d512d6e7015f9e0b83d0",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 786,
+    "hash": "92c050f40c2022dd8b8eedf05b0ccf0c7c409ea549b22afe8bbb74e757a4823b",
+    "fileNguon": "anh/92c050f40c2022dd8b8eedf05b0ccf0c7c409ea549b22afe8bbb74e757a4823b.png",
+    "canvas": [
+      873,
+      48
+    ],
+    "daMoNative": true,
+    "kind": "reaction-name-flow",
+    "nodes": [
+      "Benzene",
+      "Nitrobenzene",
+      "Aniline"
+    ],
+    "edges": [
+      {
+        "over": "+HNO₃, H₂SO₄ (đặc)"
+      },
+      {
+        "over": "+Fe + HCl, t⁰"
+      }
+    ],
+    "notes": "3nodetênchấtEnglishđúngcapitalB/N/A,2mũitênphải. Chỉtextkhôngvòngmolecule,khôngtựthêmstructures/hệsố/đápán. Giữđặcngoặcvòngvàt⁰trênarrow2.",
+    "questions": [
+      {
+        "qid": "DB-12-B8-D3-III-7",
+        "de": "Từ benzene người ta điều chế aniline theo sơ đồ sau: Biết hiệu suất giai đoạn tạo thành nitrobenzene đạt 60% và hiệu suất giai đoạn tạo thành aniline đạt 50%.\nTính khối lượng aniline (theo gam) thu được khi điều chế từ 156 gam benzene? (Làm tròn kết quả đến hàng phần mười).",
+        "refs": [
+          {
+            "where": "DB-12-B8-D3-III-7.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B11-D2-III-4",
+        "de": "Từ benzene người ta điều chế aniline theo sơ đồ sau: Biết hiệu suất giai đoạn tạo thành nitrobenzene đạt 60% và hiệu suất giai đoạn tạo thành aniline đạt 50%.\nTính khối lượng aniline (theo gam) thu được khi điều chế từ 156 gam benzene? (Làm tròn kết quả đến hàng phần mười).",
+        "refs": [
+          {
+            "where": "DH-12-C3-B11-D2-III-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "phan-ung-va-k-ddh-ac7fec27770eee5244f796e4c8e2249c2722c1ea4ab850f557348536cde40be8.svg",
+    "hashSvg": "ac7fec27770eee5244f796e4c8e2249c2722c1ea4ab850f557348536cde40be8",
+    "byteSvg": 23435,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "1642/8/8/1=19electron/19p20nkhôngKthêm;297giữxt/H=90%;859giữXYZbiến/3lần+CH3COOH−H2O;786giữtênchấtEnglish/điềukiệnnguyênvăn.",
+    "hashSvgDaSoat": "ac7fec27770eee5244f796e4c8e2249c2722c1ea4ab850f557348536cde40be8",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

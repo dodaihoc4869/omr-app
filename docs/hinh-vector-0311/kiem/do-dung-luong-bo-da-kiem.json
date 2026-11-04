@@ -1,8 +1,8 @@
 {
-  "nguonDaDoiChieu": 657,
-  "anhGocRiengByte": 6701264,
-  "svgRieng": 442,
-  "svgRawByte": 6409307,
-  "svgGzipFileByte": 1302229,
+  "nguonDaDoiChieu": 669,
+  "anhGocRiengByte": 6831309,
+  "svgRieng": 451,
+  "svgRawByte": 6540045,
+  "svgGzipFileByte": 1325680,
   "ghiChu": "Chỉ bộ đã kiểm. gzip đo từng tệp tại máy, chưa phải byte tải sản phẩm. Chưa đo quota/cache/reload offline app, không ngoại suy toàn kho."
 }
