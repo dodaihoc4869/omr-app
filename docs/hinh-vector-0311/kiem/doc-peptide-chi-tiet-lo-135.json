@@ -1,0 +1,1041 @@
+[
+  {
+    "i": 200,
+    "hash": "222dc75add8005c94fd4e8910c4b9e739d8c0de91d1e514ac568e50051daee4e",
+    "fileNguon": "anh/222dc75add8005c94fd4e8910c4b9e739d8c0de91d1e514ac568e50051daee4e.png",
+    "canvas": [
+      261,
+      207
+    ],
+    "daMoNative": true,
+    "kind": "generic-peptide-bond-arrows",
+    "literal": "CH₃–NH–CH(R′)–C(=O)–NH–CH(R)–C(=O)–NH–CH₃",
+    "labels": {
+      "(1)": "first C=O bond, Oup",
+      "(2)": "first carbonylC–middleNH bond",
+      "(3)": "left CH(R′)–first carbonylC bond",
+      "(4)": "middleNH–right CH(R) bond"
+    },
+    "notes": "3NđềuNH(3H trênN),2C=O(đầulên/cuốixuống),2CHalphaHẩn,R′dướitrái,Rtrênphải. GiữCH₃endpointtrái/phảiẩntrongline.Số(1)..(4)làarrowlabelsđềucóHEADchỉtớibond,khônggắntrênatomkhác. KhôngtựthêmfreeNH₂/COOH/charge/stereo. Source200/330/1178cùngliteral/labelmappingđãmởriêng.",
+    "questions": [
+      {
+        "qid": "DB-12-B9-P2-D1-I-151",
+        "de": "Trong cấu trúc phân tử của chất cho ở hình bên, liên kết peptide là",
+        "refs": [
+          {
+            "where": "DB-12-B9-P2-D1-I-151.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B9-P2-I-4",
+        "de": "Trong cấu trúc phân tử của chất cho ở hình bên, liên kết peptide là",
+        "refs": [
+          {
+            "where": "DH-12-C3-B9-P2-I-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "explicitH": "NtráiHnốibondđứngLÊN;NgiữaHnốibondđứngXUỐNG;NphảiHviếtgộpNHtrongcùngtextkhôngđứngrời.NhaiđầuđềunốimethylendpointẩnkhôngviếtCH₃. HaiCHalphaHẨN(đừngthêmHnhãn).",
+    "Rlabels": "R′ởnhánhđứngXUỐNGalphaCHtrái,RkhôngprimeởnhánhđứngLÊNalphaCHphải. KHÔNGR₁/R₂.",
+    "carbonyls": "2C=O:đầuC=OđứngLÊN,cuốiC=OđứngXUỐNG.",
+    "arrowMapping": {
+      "(1)": "firstcarbonylC=Obond",
+      "(2)": "firstcarbonylC–Ngiữa",
+      "(3)": "CH(R′)trái–firstcarbonylC",
+      "(4)": "Ngiữa–CH(R)phải"
+    },
+    "chargeStereo": "Khôngđiệntích,khôngnêm/đứtstereo/circle. CácnétđậmtípnhỏởđầuarrowlàarrowheadsKHÔNGnêmhóahọc.",
+    "pixelGeometryApprox": {
+      "backbone": {
+        "methylLeft": [
+          25,
+          124
+        ],
+        "Nleft": [
+          53,
+          110
+        ],
+        "alphaLeft": [
+          80,
+          124
+        ],
+        "carbonyl1": [
+          108,
+          110
+        ],
+        "Nmiddle": [
+          134,
+          124
+        ],
+        "alphaRight": [
+          161,
+          110
+        ],
+        "carbonyl2": [
+          190,
+          125
+        ],
+        "Nright": [
+          220,
+          113
+        ],
+        "methylRight": [
+          252,
+          130
+        ]
+      },
+      "labels": {
+        "Hleft": [
+          53,
+          82
+        ],
+        "Hmiddle": [
+          134,
+          158
+        ],
+        "Rprime": [
+          80,
+          154
+        ],
+        "R": [
+          163,
+          85
+        ],
+        "O1": [
+          108,
+          82
+        ],
+        "O2": [
+          190,
+          156
+        ]
+      },
+      "arrows": [
+        {
+          "label": "(1)",
+          "labelAt": [
+            45,
+            31
+          ],
+          "tail": [
+            46,
+            44
+          ],
+          "tip": [
+            100,
+            100
+          ]
+        },
+        {
+          "label": "(2)",
+          "labelAt": [
+            162,
+            32
+          ],
+          "tail": [
+            159,
+            46
+          ],
+          "tip": [
+            124,
+            108
+          ]
+        },
+        {
+          "label": "(3)",
+          "labelAt": [
+            132,
+            187
+          ],
+          "tail": [
+            126,
+            174
+          ],
+          "tip": [
+            95,
+            123
+          ]
+        },
+        {
+          "label": "(4)",
+          "labelAt": [
+            176,
+            187
+          ],
+          "tail": [
+            172,
+            175
+          ],
+          "tip": [
+            156,
+            123
+          ]
+        }
+      ]
+    },
+    "geometryNote": "Anchorsđọctrựcquantrênnativefull,cóthểsaikhác1..3pixelanti-alias;đặtarrowtipngayvịtrínguồn(kểcảnguồncókhoảngcáchvớibond),khôngkéodàiđâmmũitênlàmcheatom/H.R′/Rpositionsvàbondtargetmappingbắtbuộc."
+  },
+  {
+    "i": 330,
+    "hash": "398d9ba47e4adbca478595a6c6586a61736347e1c3f35d78e450bde05818e1ae",
+    "fileNguon": "anh/398d9ba47e4adbca478595a6c6586a61736347e1c3f35d78e450bde05818e1ae.png",
+    "canvas": [
+      495,
+      385
+    ],
+    "daMoNative": true,
+    "kind": "generic-peptide-bond-arrows",
+    "literal": "CH₃–NH–CH(R′)–C(=O)–NH–CH(R)–C(=O)–NH–CH₃",
+    "labels": {
+      "(1)": "first C=O bond, Oup",
+      "(2)": "first carbonylC–middleNH bond",
+      "(3)": "left CH(R′)–first carbonylC bond",
+      "(4)": "middleNH–right CH(R) bond"
+    },
+    "notes": "3NđềuNH(3H trênN),2C=O(đầulên/cuốixuống),2CHalphaHẩn,R′dướitrái,Rtrênphải. GiữCH₃endpointtrái/phảiẩntrongline.Số(1)..(4)làarrowlabelsđềucóHEADchỉtớibond,khônggắntrênatomkhác. KhôngtựthêmfreeNH₂/COOH/charge/stereo. Source200/330/1178cùngliteral/labelmappingđãmởriêng.",
+    "questions": [
+      {
+        "qid": "12-KT-C3-D5-I-8",
+        "de": "Trong cấu trúc phân tử của chất cho ở hình dưới đây, liên kết peptide là",
+        "refs": [
+          {
+            "where": "12-KT-C3-D5-I-8.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P2-D1-I-129",
+        "de": "Trong cấu trúc phân tử của chất cho ở hình dưới đây, liên kết peptide là",
+        "refs": [
+          {
+            "where": "DB-12-B9-P2-D1-I-129.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "explicitH": "NtráiHnốibondđứngLÊN;NgiữaHnốibondđứngXUỐNG;NphảiHviếtgộpNHtrongcùngtextkhôngđứngrời.NhaiđầuđềunốimethylendpointẩnkhôngviếtCH₃. HaiCHalphaHẨN(đừngthêmHnhãn).",
+    "Rlabels": "R′ởnhánhđứngXUỐNGalphaCHtrái,RkhôngprimeởnhánhđứngLÊNalphaCHphải. KHÔNGR₁/R₂.",
+    "carbonyls": "2C=O:đầuC=OđứngLÊN,cuốiC=OđứngXUỐNG.",
+    "arrowMapping": {
+      "(1)": "firstcarbonylC=Obond",
+      "(2)": "firstcarbonylC–Ngiữa",
+      "(3)": "CH(R′)trái–firstcarbonylC",
+      "(4)": "Ngiữa–CH(R)phải"
+    },
+    "chargeStereo": "Khôngđiệntích,khôngnêm/đứtstereo/circle. CácnétđậmtípnhỏởđầuarrowlàarrowheadsKHÔNGnêmhóahọc.",
+    "pixelGeometryApprox": {
+      "backbone": {
+        "methylLeft": [
+          83,
+          232
+        ],
+        "Nleft": [
+          125,
+          214
+        ],
+        "alphaLeft": [
+          169,
+          231
+        ],
+        "carbonyl1": [
+          210,
+          211
+        ],
+        "Nmiddle": [
+          253,
+          231
+        ],
+        "alphaRight": [
+          295,
+          212
+        ],
+        "carbonyl2": [
+          338,
+          233
+        ],
+        "Nright": [
+          389,
+          217
+        ],
+        "methylRight": [
+          435,
+          240
+        ]
+      },
+      "labels": {
+        "Hleft": [
+          125,
+          167
+        ],
+        "Hmiddle": [
+          253,
+          276
+        ],
+        "Rprime": [
+          169,
+          276
+        ],
+        "R": [
+          296,
+          173
+        ],
+        "O1": [
+          211,
+          172
+        ],
+        "O2": [
+          339,
+          276
+        ]
+      },
+      "arrows": [
+        {
+          "label": "(1)",
+          "labelAt": [
+            116,
+            92
+          ],
+          "tail": [
+            118,
+            113
+          ],
+          "tip": [
+            201,
+            195
+          ]
+        },
+        {
+          "label": "(2)",
+          "labelAt": [
+            295,
+            93
+          ],
+          "tail": [
+            294,
+            113
+          ],
+          "tip": [
+            236,
+            209
+          ]
+        },
+        {
+          "label": "(3)",
+          "labelAt": [
+            249,
+            328
+          ],
+          "tail": [
+            241,
+            311
+          ],
+          "tip": [
+            190,
+            232
+          ]
+        },
+        {
+          "label": "(4)",
+          "labelAt": [
+            323,
+            327
+          ],
+          "tail": [
+            311,
+            306
+          ],
+          "tip": [
+            286,
+            230
+          ]
+        }
+      ]
+    },
+    "geometryNote": "Anchorsđọctrựcquantrênnativefull,cóthểsaikhác1..3pixelanti-alias;đặtarrowtipngayvịtrínguồn(kểcảnguồncókhoảngcáchvớibond),khôngkéodàiđâmmũitênlàmcheatom/H.R′/Rpositionsvàbondtargetmappingbắtbuộc."
+  },
+  {
+    "i": 1178,
+    "hash": "d4d87ec0a2b8498b1d9b306b51c46036eadb97450b6316d99ba9939e44ff07e8",
+    "fileNguon": "anh/d4d87ec0a2b8498b1d9b306b51c46036eadb97450b6316d99ba9939e44ff07e8.png",
+    "canvas": [
+      458,
+      368
+    ],
+    "daMoNative": true,
+    "kind": "generic-peptide-bond-arrows",
+    "literal": "CH₃–NH–CH(R′)–C(=O)–NH–CH(R)–C(=O)–NH–CH₃",
+    "labels": {
+      "(1)": "first C=O bond, Oup",
+      "(2)": "first carbonylC–middleNH bond",
+      "(3)": "left CH(R′)–first carbonylC bond",
+      "(4)": "middleNH–right CH(R) bond"
+    },
+    "notes": "3NđềuNH(3H trênN),2C=O(đầulên/cuốixuống),2CHalphaHẩn,R′dướitrái,Rtrênphải. GiữCH₃endpointtrái/phảiẩntrongline.Số(1)..(4)làarrowlabelsđềucóHEADchỉtớibond,khônggắntrênatomkhác. KhôngtựthêmfreeNH₂/COOH/charge/stereo. Source200/330/1178cùngliteral/labelmappingđãmởriêng.",
+    "questions": [
+      {
+        "qid": "12-C3-B9-D2-I-4",
+        "de": "Trong cấu trúc phân tử của chất cho ở hình bên (CH₃-NH-CH(R')-C(=O)-NH-CH(R)-C(=O)-NH-CH₃; mũi tên (1) chỉ liên kết C=O, (2) chỉ liên kết C(=O)-N, (3) chỉ liên kết CH(R')-C(=O), (4) chỉ liên kết N-CH(R)), liên kết peptide là",
+        "refs": [
+          {
+            "where": "12-C3-B9-D2-I-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P2-D1-I-25",
+        "de": "Trong cấu trúc phân tử của chất cho ở hình bên (CH₃-NH-CH(R')-C(=O)-NH-CH(R)-C(=O)-NH-CH₃; mũi tên (1) chỉ liên kết C=O, (2) chỉ liên kết C(=O)-N, (3) chỉ liên kết CH(R')-C(=O), (4) chỉ liên kết N-CH(R)), liên kết peptide là",
+        "refs": [
+          {
+            "where": "DB-12-B9-P2-D1-I-25.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "explicitH": "NtráiHnốibondđứngLÊN;NgiữaHnốibondđứngXUỐNG;NphảiHviếtgộpNHtrongcùngtextkhôngđứngrời.NhaiđầuđềunốimethylendpointẩnkhôngviếtCH₃. HaiCHalphaHẨN(đừngthêmHnhãn).",
+    "Rlabels": "R′ởnhánhđứngXUỐNGalphaCHtrái,RkhôngprimeởnhánhđứngLÊNalphaCHphải. KHÔNGR₁/R₂.",
+    "carbonyls": "2C=O:đầuC=OđứngLÊN,cuốiC=OđứngXUỐNG.",
+    "arrowMapping": {
+      "(1)": "firstcarbonylC=Obond",
+      "(2)": "firstcarbonylC–Ngiữa",
+      "(3)": "CH(R′)trái–firstcarbonylC",
+      "(4)": "Ngiữa–CH(R)phải"
+    },
+    "chargeStereo": "Khôngđiệntích,khôngnêm/đứtstereo/circle. CácnétđậmtípnhỏởđầuarrowlàarrowheadsKHÔNGnêmhóahọc.",
+    "pixelGeometryApprox": {
+      "backbone": {
+        "methylLeft": [
+          65,
+          214
+        ],
+        "Nleft": [
+          106,
+          196
+        ],
+        "alphaLeft": [
+          150,
+          215
+        ],
+        "carbonyl1": [
+          191,
+          195
+        ],
+        "Nmiddle": [
+          235,
+          216
+        ],
+        "alphaRight": [
+          277,
+          195
+        ],
+        "carbonyl2": [
+          320,
+          215
+        ],
+        "Nright": [
+          368,
+          200
+        ],
+        "methylRight": [
+          419,
+          225
+        ]
+      },
+      "labels": {
+        "Hleft": [
+          108,
+          151
+        ],
+        "Hmiddle": [
+          235,
+          261
+        ],
+        "Rprime": [
+          150,
+          260
+        ],
+        "R": [
+          278,
+          154
+        ],
+        "O1": [
+          192,
+          154
+        ],
+        "O2": [
+          319,
+          257
+        ]
+      },
+      "arrows": [
+        {
+          "label": "(1)",
+          "labelAt": [
+            97,
+            74
+          ],
+          "tail": [
+            100,
+            94
+          ],
+          "tip": [
+            182,
+            179
+          ]
+        },
+        {
+          "label": "(2)",
+          "labelAt": [
+            277,
+            74
+          ],
+          "tail": [
+            274,
+            95
+          ],
+          "tip": [
+            217,
+            194
+          ]
+        },
+        {
+          "label": "(3)",
+          "labelAt": [
+            230,
+            315
+          ],
+          "tail": [
+            224,
+            296
+          ],
+          "tip": [
+            174,
+            216
+          ]
+        },
+        {
+          "label": "(4)",
+          "labelAt": [
+            297,
+            315
+          ],
+          "tail": [
+            292,
+            295
+          ],
+          "tip": [
+            270,
+            214
+          ]
+        }
+      ]
+    },
+    "geometryNote": "Anchorsđọctrựcquantrênnativefull,cóthểsaikhác1..3pixelanti-alias;đặtarrowtipngayvịtrínguồn(kểcảnguồncókhoảngcáchvớibond),khôngkéodàiđâmmũitênlàmcheatom/H.R′/Rpositionsvàbondtargetmappingbắtbuộc."
+  },
+  {
+    "i": 1100,
+    "hash": "c66a57952918d2dca9114ee94513af864eebc79f72b720177b8737483d618276",
+    "fileNguon": "anh/c66a57952918d2dca9114ee94513af864eebc79f72b720177b8737483d618276.png",
+    "canvas": [
+      391,
+      170
+    ],
+    "daMoNative": true,
+    "kind": "generic-peptide-bond-leaders",
+    "literal": "CH₃–NH–CH(R₁)–C(=O)–NH–CH(R₂)–C(=O)–NH–CH₃",
+    "labels": {
+      "(1)": "left NH–CH(R₁) bond",
+      "(2)": "first C=O bond",
+      "(3)": "first carbonylC–middleNH bond",
+      "(4)": "middleNH–CH(R₂) bond"
+    },
+    "notes": "Khôngđượcalias200:nguồn1100dùngR₁/R₂thayR′/Rvàlabels1/2/3mappingKHÁC. Cácleaderlinesmảnhgầnnhãnvànativekhôngheadarrowrõ,giữleaderkhôngthêmheadto.R₁dướiCHtrái,R₂trênCHphải.3NHexplicitH;2C=Ođầulên/cuốixuống,endpointsmethylẩn. Nocharge/stereo.",
+    "questions": [
+      {
+        "qid": "VIP27-C3-B11-D2-I-11",
+        "de": "Trong cấu trúc phân tử của chất cho ở hình bên, liên kết peptide là",
+        "refs": [
+          {
+            "where": "VIP27-C3-B11-D2-I-11.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "explicitH": "3NHđềucóHrờivàbondđứng:NHtráiHtrên,NHgiữaHdưới,NHphảiHtrên. Khác200/330/1178NHphảiviếtgộpNH. Giữ3Hriêngtheohình1100.CácHalphaẩnkhôngthêm.",
+    "Rlabels": "R₁subscript1dướialphaCHtrái,R₂subscript2trênalphaCHphải. KHÔNGprime/Rplain.",
+    "carbonyls": "C=Ođầulên/C=Ocuốixuống.",
+    "leaderMapping": {
+      "(1)": "Ntrái–alphaCHtrái",
+      "(2)": "firstC=O",
+      "(3)": "firstcarbonylC–Ngiữa",
+      "(4)": "Ngiữa–alphaCHphải"
+    },
+    "pixelGeometryApprox": {
+      "backbone": {
+        "methylLeft": [
+          8,
+          102
+        ],
+        "Nleft": [
+          54,
+          76
+        ],
+        "alphaLeft": [
+          98,
+          102
+        ],
+        "carbonyl1": [
+          145,
+          76
+        ],
+        "Nmiddle": [
+          191,
+          102
+        ],
+        "alphaRight": [
+          237,
+          76
+        ],
+        "carbonyl2": [
+          283,
+          102
+        ],
+        "Nright": [
+          330,
+          76
+        ],
+        "methylRight": [
+          376,
+          102
+        ]
+      },
+      "atomsAndSubstituents": {
+        "Hleft": [
+          54,
+          21
+        ],
+        "Hmiddle": [
+          191,
+          157
+        ],
+        "Hright": [
+          330,
+          21
+        ],
+        "R1": [
+          99,
+          157
+        ],
+        "R2": [
+          237,
+          23
+        ],
+        "O1": [
+          145,
+          21
+        ],
+        "O2": [
+          283,
+          157
+        ]
+      },
+      "leaders": [
+        {
+          "label": "(1)",
+          "labelAt": [
+            37,
+            143
+          ],
+          "start": [
+            49,
+            133
+          ],
+          "end": [
+            77,
+            100
+          ]
+        },
+        {
+          "label": "(2)",
+          "labelAt": [
+            85,
+            54
+          ],
+          "start": [
+            103,
+            53
+          ],
+          "end": [
+            136,
+            53
+          ]
+        },
+        {
+          "label": "(3)",
+          "labelAt": [
+            132,
+            138
+          ],
+          "start": [
+            139,
+            125
+          ],
+          "end": [
+            159,
+            95
+          ]
+        },
+        {
+          "label": "(4)",
+          "labelAt": [
+            191,
+            50
+          ],
+          "start": [
+            200,
+            58
+          ],
+          "end": [
+            218,
+            83
+          ]
+        }
+      ]
+    },
+    "arrowheadFinding": "Đãmởnative1100riêng:4leaderlinesmảnhKHÔNGthấyđầumũitênnhọnrõ,khôngtựthêmheadvào4leader.Cácnhãnarrow200khôngđượcápnhầmsang1100.",
+    "chargeStereo": "Khôngcharge/nêm/stereo."
+  },
+  {
+    "i": 1063,
+    "hash": "bff4825eb8c5e79260af176a9308496c4904f63f45ab0afba0f386b31763cab7",
+    "fileNguon": "anh/bff4825eb8c5e79260af176a9308496c4904f63f45ab0afba0f386b31763cab7.png",
+    "canvas": [
+      567,
+      80
+    ],
+    "daMoNative": true,
+    "kind": "hydrocarbon-grid-4",
+    "columns": 2,
+    "panels": [
+      {
+        "smiles": "C=C(C)CC",
+        "caption": [
+          "(a)"
+        ],
+        "notes": "CH₂=C(CH₃)CH₂CH₃:5C,terminalalkene,khôngE/Z."
+      },
+      {
+        "smiles": "CC(C)C#CC",
+        "caption": [
+          "(b)"
+        ],
+        "notes": "Branchedalkyne6C:CH(CH₃)₂–C≡C–CH₃;khôngbỏmethylnhánh."
+      },
+      {
+        "smiles": "CC#CCC",
+        "caption": [
+          "(c)"
+        ],
+        "notes": "Pentyne5C:CH₃–C≡C–CH₂–CH₃."
+      },
+      {
+        "smiles": "C=CCC(C)(C)C",
+        "caption": [
+          "(d)"
+        ],
+        "notes": "7C:CH₂=CH–CH₂–C(CH₃)₃;centralquaternaryC3methylvà1CH₂,khônghydrogen.C=ClàterminalkhôngE/Z."
+      }
+    ],
+    "notes": "4panelnguồnmộthàng,nhãn(a)..(d)dướitừngchất. Cóthểreflow2cộtkhôngmấtlabels. NoHexplicit/charges/stereo/circle.",
+    "questions": [
+      {
+        "qid": "VIP27-C1-HC11-D1-I-17",
+        "de": "Cho công thức cấu tạo của một số hydrocarbon sau đây (hình (a), (b), (c), (d)).\nPhát biểu nào sau đây là đúng?",
+        "refs": [
+          {
+            "where": "VIP27-C1-HC11-D1-I-17.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "nativePanelRectsApprox": {
+      "a": [
+        0,
+        0,
+        95,
+        80
+      ],
+      "b": [
+        137,
+        0,
+        260,
+        80
+      ],
+      "c": [
+        296,
+        0,
+        421,
+        80
+      ],
+      "d": [
+        460,
+        0,
+        567,
+        80
+      ]
+    },
+    "panelGeometry": [
+      {
+        "caption": "(a)",
+        "vertices": [
+          [
+            17,
+            10
+          ],
+          [
+            33,
+            20
+          ],
+          [
+            53,
+            7
+          ],
+          [
+            72,
+            18
+          ],
+          [
+            33,
+            44
+          ]
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1,
+            "order": 2
+          },
+          {
+            "from": 1,
+            "to": 2,
+            "order": 1
+          },
+          {
+            "from": 2,
+            "to": 3,
+            "order": 1
+          },
+          {
+            "from": 1,
+            "to": 4,
+            "order": 1
+          }
+        ],
+        "carbonCount": 5,
+        "labelAnchor": [
+          40,
+          67
+        ]
+      },
+      {
+        "caption": "(b)",
+        "vertices": [
+          [
+            153,
+            19
+          ],
+          [
+            174,
+            32
+          ],
+          [
+            153,
+            45
+          ],
+          [
+            196,
+            32
+          ],
+          [
+            218,
+            32
+          ],
+          [
+            241,
+            32
+          ]
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1,
+            "order": 1
+          },
+          {
+            "from": 1,
+            "to": 2,
+            "order": 1
+          },
+          {
+            "from": 1,
+            "to": 3,
+            "order": 1
+          },
+          {
+            "from": 3,
+            "to": 4,
+            "order": 3
+          },
+          {
+            "from": 4,
+            "to": 5,
+            "order": 1
+          }
+        ],
+        "carbonCount": 6,
+        "labelAnchor": [
+          187,
+          67
+        ]
+      },
+      {
+        "caption": "(c)",
+        "vertices": [
+          [
+            311,
+            32
+          ],
+          [
+            334,
+            32
+          ],
+          [
+            358,
+            32
+          ],
+          [
+            381,
+            32
+          ],
+          [
+            402,
+            45
+          ]
+        ],
+        "edges": [
+          {
+            "from": 0,
+            "to": 1,
+            "order": 1
+          },
+          {
+            "from": 1,
+            "to": 2,
+            "order": 3
+          },
+          {
+            "from": 2,
+            "to": 3,
+            "order": 1
+          },
+          {
+            "from": 3,
+            "to": 4,
+            "order": 1
+          }
+        ],
+        "carbonCount": 5,
+        "labelAnchor": [
+          345,
+          67
+        ]
+      },
+      {
+        "caption": "(d)",
+        "vertices": [
+          [
+            474,
+            12
+          ],
+          [
+            493,
+            23
+          ],
+          [
+            482,
+            44
+          ],
+          [
+            510,
+            44
+          ],
+          [
+            514,
+            11
+          ],
+          [
+            534,
+            23
+          ],
+          [
+            556,
+            7
+          ]
+        ],
+        "edges": [
+          {
+            "from": 1,
+            "to": 0,
+            "order": 1
+          },
+          {
+            "from": 1,
+            "to": 2,
+            "order": 1
+          },
+          {
+            "from": 1,
+            "to": 3,
+            "order": 1
+          },
+          {
+            "from": 1,
+            "to": 4,
+            "order": 1
+          },
+          {
+            "from": 4,
+            "to": 5,
+            "order": 1
+          },
+          {
+            "from": 5,
+            "to": 6,
+            "order": 2
+          }
+        ],
+        "carbonCount": 7,
+        "labelAnchor": [
+          507,
+          67
+        ]
+      }
+    ],
+    "explicitH": "TấtcảHẩn,khôngthêmtextC/CH₃/H. EndpointsđạidiệnCđúngnhưvertices.",
+    "stereo": "2alkeneterminal(a)/(d)khôngE/Z;2alkyne(b)/(c)khôngstereo. Nobondwedges/charges."
+  }
+]

@@ -1,0 +1,811 @@
+[
+  {
+    "i": 785,
+    "hash": "92b8d83f947812ee95d51236134a2f528e01990d5e68aa5580755979ee125958",
+    "fileNguon": "anh/92b8d83f947812ee95d51236134a2f528e01990d5e68aa5580755979ee125958.png",
+    "canvas": [
+      228,
+      36
+    ],
+    "daMoNative": true,
+    "kind": "fatty-acid-skeletal",
+    "smiles": "CCCCC/C=C\\CCCCCCC(=O)O",
+    "carbonCount": 14,
+    "doubleBondsFromCOOH": [
+      8
+    ],
+    "stereo": "Z ởC8=C9 từcarboxyl,2nhánhcarboncùngphíadướiC=Cngangtrên",
+    "notes": "Nguồnmạch14C gồmCOOH,KHÔNGtựthànholeicC18. Từmethyltrái:5CđơntrướcC6=C7ngangtrên,saudoubleđến7Ctínhcarboxylởphải. COOHgiữtextgộp,noH/charge/caption.899/1038/941bodycùngnhaukhácscale,785nhỏhơncùng14C/1Z. NativeđãmởRIÊNGtừngnguồn.",
+    "questions": [
+      {
+        "qid": "DH-12-C1-B1-P2-I-30",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P2-I-30.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B3-D1-I-3",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B3-D1-I-3.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "svg": "acid-beo-ddh-49c6aa41d25f086a97b2d5f36a91525836e24de64b50b1e24e74cf8269b40e8b.svg",
+    "hashSvg": "49c6aa41d25f086a97b2d5f36a91525836e24de64b50b1e24e74cf8269b40e8b",
+    "byteSvg": 3274,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "diemCarbon": [
+      [
+        20,
+        90
+      ],
+      [
+        44,
+        50
+      ],
+      [
+        68,
+        90
+      ],
+      [
+        92,
+        50
+      ],
+      [
+        116,
+        90
+      ],
+      [
+        140,
+        50
+      ],
+      [
+        188,
+        50
+      ],
+      [
+        212,
+        90
+      ],
+      [
+        236,
+        50
+      ],
+      [
+        260,
+        90
+      ],
+      [
+        284,
+        50
+      ],
+      [
+        308,
+        90
+      ],
+      [
+        332,
+        50
+      ],
+      [
+        356,
+        90
+      ]
+    ],
+    "bondDoiTuMethyl": [
+      6
+    ],
+    "ghiChuDung": "Giữ COOH gộp, mạch14/18/22C theo source; mọi C=C ngang cao/2nhánh cùng dưới,khôngtựsửa theo tên thường.",
+    "hashSvgDaSoat": "49c6aa41d25f086a97b2d5f36a91525836e24de64b50b1e24e74cf8269b40e8b",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 899,
+    "hash": "a50a2a52398f76714ece7c42807d53ed0badd85ed77224ce064360f1fa969591",
+    "fileNguon": "anh/a50a2a52398f76714ece7c42807d53ed0badd85ed77224ce064360f1fa969591.png",
+    "canvas": [
+      481,
+      104
+    ],
+    "daMoNative": true,
+    "kind": "fatty-acid-skeletal",
+    "smiles": "CCCCC/C=C\\CCCCCCC(=O)O",
+    "carbonCount": 14,
+    "doubleBondsFromCOOH": [
+      8
+    ],
+    "stereo": "Z ởC8=C9 từcarboxyl,2nhánhcarboncùngphíadướiC=Cngangtrên",
+    "notes": "Nguồnmạch14C gồmCOOH,KHÔNGtựthànholeicC18. Từmethyltrái:5CđơntrướcC6=C7ngangtrên,saudoubleđến7Ctínhcarboxylởphải. COOHgiữtextgộp,noH/charge/caption.899/1038/941bodycùngnhaukhácscale,785nhỏhơncùng14C/1Z. NativeđãmởRIÊNGtừngnguồn.",
+    "questions": [
+      {
+        "qid": "12-C1-B3-D1-I-2",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "12-C1-B3-D1-I-2.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "svg": "acid-beo-ddh-49c6aa41d25f086a97b2d5f36a91525836e24de64b50b1e24e74cf8269b40e8b.svg",
+    "hashSvg": "49c6aa41d25f086a97b2d5f36a91525836e24de64b50b1e24e74cf8269b40e8b",
+    "byteSvg": 3274,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "diemCarbon": [
+      [
+        20,
+        90
+      ],
+      [
+        44,
+        50
+      ],
+      [
+        68,
+        90
+      ],
+      [
+        92,
+        50
+      ],
+      [
+        116,
+        90
+      ],
+      [
+        140,
+        50
+      ],
+      [
+        188,
+        50
+      ],
+      [
+        212,
+        90
+      ],
+      [
+        236,
+        50
+      ],
+      [
+        260,
+        90
+      ],
+      [
+        284,
+        50
+      ],
+      [
+        308,
+        90
+      ],
+      [
+        332,
+        50
+      ],
+      [
+        356,
+        90
+      ]
+    ],
+    "bondDoiTuMethyl": [
+      6
+    ],
+    "ghiChuDung": "Giữ COOH gộp, mạch14/18/22C theo source; mọi C=C ngang cao/2nhánh cùng dưới,khôngtựsửa theo tên thường.",
+    "hashSvgDaSoat": "49c6aa41d25f086a97b2d5f36a91525836e24de64b50b1e24e74cf8269b40e8b",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 1038,
+    "hash": "bb39cba6cb479897d6fb0d6b6a3b0069d791f87e6e27ec20af8fecf03a23f98f",
+    "fileNguon": "anh/bb39cba6cb479897d6fb0d6b6a3b0069d791f87e6e27ec20af8fecf03a23f98f.png",
+    "canvas": [
+      481,
+      104
+    ],
+    "daMoNative": true,
+    "kind": "fatty-acid-skeletal",
+    "smiles": "CCCCC/C=C\\CCCCCCC(=O)O",
+    "carbonCount": 14,
+    "doubleBondsFromCOOH": [
+      8
+    ],
+    "stereo": "Z ởC8=C9 từcarboxyl,2nhánhcarboncùngphíadướiC=Cngangtrên",
+    "notes": "Nguồnmạch14C gồmCOOH,KHÔNGtựthànholeicC18. Từmethyltrái:5CđơntrướcC6=C7ngangtrên,saudoubleđến7Ctínhcarboxylởphải. COOHgiữtextgộp,noH/charge/caption.899/1038/941bodycùngnhaukhácscale,785nhỏhơncùng14C/1Z. NativeđãmởRIÊNGtừngnguồn.",
+    "questions": [
+      {
+        "qid": "12-KT-C1-D2-I-14",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "12-KT-C1-D2-I-14.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "svg": "acid-beo-ddh-49c6aa41d25f086a97b2d5f36a91525836e24de64b50b1e24e74cf8269b40e8b.svg",
+    "hashSvg": "49c6aa41d25f086a97b2d5f36a91525836e24de64b50b1e24e74cf8269b40e8b",
+    "byteSvg": 3274,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "diemCarbon": [
+      [
+        20,
+        90
+      ],
+      [
+        44,
+        50
+      ],
+      [
+        68,
+        90
+      ],
+      [
+        92,
+        50
+      ],
+      [
+        116,
+        90
+      ],
+      [
+        140,
+        50
+      ],
+      [
+        188,
+        50
+      ],
+      [
+        212,
+        90
+      ],
+      [
+        236,
+        50
+      ],
+      [
+        260,
+        90
+      ],
+      [
+        284,
+        50
+      ],
+      [
+        308,
+        90
+      ],
+      [
+        332,
+        50
+      ],
+      [
+        356,
+        90
+      ]
+    ],
+    "bondDoiTuMethyl": [
+      6
+    ],
+    "ghiChuDung": "Giữ COOH gộp, mạch14/18/22C theo source; mọi C=C ngang cao/2nhánh cùng dưới,khôngtựsửa theo tên thường.",
+    "hashSvgDaSoat": "49c6aa41d25f086a97b2d5f36a91525836e24de64b50b1e24e74cf8269b40e8b",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 941,
+    "hash": "aa146568fcf3cf338b63eb86d670e566a03b846be55b621bc49d50b34ad5dcf5",
+    "fileNguon": "anh/aa146568fcf3cf338b63eb86d670e566a03b846be55b621bc49d50b34ad5dcf5.png",
+    "canvas": [
+      482,
+      104
+    ],
+    "daMoNative": true,
+    "kind": "fatty-acid-skeletal",
+    "smiles": "CCCCC/C=C\\CCCCCCC(=O)O",
+    "carbonCount": 14,
+    "doubleBondsFromCOOH": [
+      8
+    ],
+    "stereo": "Z ởC8=C9 từcarboxyl,2nhánhcarboncùngphíadướiC=Cngangtrên",
+    "notes": "Nguồnmạch14C gồmCOOH,KHÔNGtựthànholeicC18. Từmethyltrái:5CđơntrướcC6=C7ngangtrên,saudoubleđến7Ctínhcarboxylởphải. COOHgiữtextgộp,noH/charge/caption.899/1038/941bodycùngnhaukhácscale,785nhỏhơncùng14C/1Z. NativeđãmởRIÊNGtừngnguồn.",
+    "questions": [
+      {
+        "qid": "12-C1-B1-D3-I-39",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "12-C1-B1-D3-I-39.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "svg": "acid-beo-ddh-49c6aa41d25f086a97b2d5f36a91525836e24de64b50b1e24e74cf8269b40e8b.svg",
+    "hashSvg": "49c6aa41d25f086a97b2d5f36a91525836e24de64b50b1e24e74cf8269b40e8b",
+    "byteSvg": 3274,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "diemCarbon": [
+      [
+        20,
+        90
+      ],
+      [
+        44,
+        50
+      ],
+      [
+        68,
+        90
+      ],
+      [
+        92,
+        50
+      ],
+      [
+        116,
+        90
+      ],
+      [
+        140,
+        50
+      ],
+      [
+        188,
+        50
+      ],
+      [
+        212,
+        90
+      ],
+      [
+        236,
+        50
+      ],
+      [
+        260,
+        90
+      ],
+      [
+        284,
+        50
+      ],
+      [
+        308,
+        90
+      ],
+      [
+        332,
+        50
+      ],
+      [
+        356,
+        90
+      ]
+    ],
+    "bondDoiTuMethyl": [
+      6
+    ],
+    "ghiChuDung": "Giữ COOH gộp, mạch14/18/22C theo source; mọi C=C ngang cao/2nhánh cùng dưới,khôngtựsửa theo tên thường.",
+    "hashSvgDaSoat": "49c6aa41d25f086a97b2d5f36a91525836e24de64b50b1e24e74cf8269b40e8b",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 660,
+    "hash": "7a7982aa8e05dc2bd46c690dfe637315f28742ecb78bae194ebabceee39fcd0d",
+    "fileNguon": "anh/7a7982aa8e05dc2bd46c690dfe637315f28742ecb78bae194ebabceee39fcd0d.png",
+    "canvas": [
+      293,
+      38
+    ],
+    "daMoNative": true,
+    "kind": "fatty-acid-skeletal",
+    "smiles": "CCCCC/C=C\\C/C=C\\CCCCCCCC(=O)O",
+    "carbonCount": 18,
+    "doubleBondsFromCOOH": [
+      9,
+      12
+    ],
+    "stereo": "Z,Z;C=Cđềungangởcao,2nhánhkếhaiđầuxuốngcùngphía",
+    "notes": "Đếmmạch18CbaoCOOH,textCOOHphải. TừmethyltráicácdoubleởC6=C7 vàC9=C10,ngăn1CH₂.Sốđôi2,chứkhông3.NoH/charge/caption. KhôngdùngtênlinoleicthaybằngchứngđếmC.",
+    "questions": [
+      {
+        "qid": "DH-12-C1-B1-P2-I-30",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P2-I-30.hinh.2.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B3-D1-I-3",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B3-D1-I-3.hinh.2.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "svg": "acid-beo-ddh-0f00c2995bfb636cb1b7307eef593becdea0105070a504a412e31ce35f976cc7.svg",
+    "hashSvg": "0f00c2995bfb636cb1b7307eef593becdea0105070a504a412e31ce35f976cc7",
+    "byteSvg": 3747,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "diemCarbon": [
+      [
+        20,
+        90
+      ],
+      [
+        44,
+        50
+      ],
+      [
+        68,
+        90
+      ],
+      [
+        92,
+        50
+      ],
+      [
+        116,
+        90
+      ],
+      [
+        140,
+        50
+      ],
+      [
+        188,
+        50
+      ],
+      [
+        212,
+        90
+      ],
+      [
+        236,
+        50
+      ],
+      [
+        284,
+        50
+      ],
+      [
+        308,
+        90
+      ],
+      [
+        332,
+        50
+      ],
+      [
+        356,
+        90
+      ],
+      [
+        380,
+        50
+      ],
+      [
+        404,
+        90
+      ],
+      [
+        428,
+        50
+      ],
+      [
+        452,
+        90
+      ],
+      [
+        476,
+        50
+      ]
+    ],
+    "bondDoiTuMethyl": [
+      6,
+      9
+    ],
+    "ghiChuDung": "Giữ COOH gộp, mạch14/18/22C theo source; mọi C=C ngang cao/2nhánh cùng dưới,khôngtựsửa theo tên thường.",
+    "hashSvgDaSoat": "0f00c2995bfb636cb1b7307eef593becdea0105070a504a412e31ce35f976cc7",
+    "nguoiSoat": "cau_truc_6"
+  },
+  {
+    "i": 1182,
+    "hash": "d669a6a8f8cd13ad455a2e2a49f472d2d4111853366a7a5f32b0c3ed86f9cb81",
+    "fileNguon": "anh/d669a6a8f8cd13ad455a2e2a49f472d2d4111853366a7a5f32b0c3ed86f9cb81.png",
+    "canvas": [
+      377,
+      62
+    ],
+    "daMoNative": true,
+    "kind": "fatty-acid-skeletal",
+    "smiles": "CCCCC/C=C\\C/C=C\\CCCCCCCC(=O)O",
+    "carbonCount": 18,
+    "doubleBondsFromCOOH": [
+      9,
+      12
+    ],
+    "stereo": "Z,Z;C=Cđềungangởcao,2nhánhkếhaiđầuxuốngcùngphía",
+    "notes": "Đếmmạch18CbaoCOOH,textCOOHphải. TừmethyltráicácdoubleởC6=C7 vàC9=C10,ngăn1CH₂.Sốđôi2,chứkhông3.NoH/charge/caption. KhôngdùngtênlinoleicthaybằngchứngđếmC.",
+    "questions": [
+      {
+        "qid": "VIP27-CDK-ESTER-TN-II-16",
+        "de": "Dầu hạt lanh là một nguồn dưỡng chất thực vật quý giá, đặc biệt giàu các acid béo không bão hòa đa, có lợi cho hệ tim mạch và giảm cholesterol xấu. Thành phần chính tạo nên giá trị của loại dầu này là hai loại acid béo thiết yếu: α-linolenic acid (ALA) và linoleic acid (LA). Cơ thể người không thể tự tổng hợp được hai acid này mà bắt buộc phải hấp thu từ chế độ ăn uống. Mỗi viên nang mềm \"Dầu hạt lanh hữu cơ\" có khối lượng 500 mg dầu nền, trong đó chứa 55% ALA và 15% LA về khối lượng. ALA và LA có công thức cấu tạo phân tử mạch hở như hình (hình trên: ALA; hình dưới: LA).",
+        "refs": [
+          {
+            "where": "VIP27-CDK-ESTER-TN-II-16.hinh.1.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "svg": "acid-beo-ddh-0f00c2995bfb636cb1b7307eef593becdea0105070a504a412e31ce35f976cc7.svg",
+    "hashSvg": "0f00c2995bfb636cb1b7307eef593becdea0105070a504a412e31ce35f976cc7",
+    "byteSvg": 3747,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "diemCarbon": [
+      [
+        20,
+        90
+      ],
+      [
+        44,
+        50
+      ],
+      [
+        68,
+        90
+      ],
+      [
+        92,
+        50
+      ],
+      [
+        116,
+        90
+      ],
+      [
+        140,
+        50
+      ],
+      [
+        188,
+        50
+      ],
+      [
+        212,
+        90
+      ],
+      [
+        236,
+        50
+      ],
+      [
+        284,
+        50
+      ],
+      [
+        308,
+        90
+      ],
+      [
+        332,
+        50
+      ],
+      [
+        356,
+        90
+      ],
+      [
+        380,
+        50
+      ],
+      [
+        404,
+        90
+      ],
+      [
+        428,
+        50
+      ],
+      [
+        452,
+        90
+      ],
+      [
+        476,
+        50
+      ]
+    ],
+    "bondDoiTuMethyl": [
+      6,
+      9
+    ],
+    "ghiChuDung": "Giữ COOH gộp, mạch14/18/22C theo source; mọi C=C ngang cao/2nhánh cùng dưới,khôngtựsửa theo tên thường.",
+    "hashSvgDaSoat": "0f00c2995bfb636cb1b7307eef593becdea0105070a504a412e31ce35f976cc7",
+    "nguoiSoat": "cau_truc_6"
+  },
+  {
+    "i": 52,
+    "hash": "0ace5ac23faae6a3368caefca50597e6e7876896c2b674a761e6f39e82821183",
+    "fileNguon": "anh/0ace5ac23faae6a3368caefca50597e6e7876896c2b674a761e6f39e82821183.png",
+    "canvas": [
+      357,
+      38
+    ],
+    "daMoNative": true,
+    "kind": "fatty-acid-skeletal",
+    "smiles": "CCCCC/C=C\\C/C=C\\C/C=C\\CCCCCCCCC(=O)O",
+    "carbonCount": 22,
+    "doubleBondsFromCOOH": [
+      10,
+      13,
+      16
+    ],
+    "stereo": "Z,Z,Z từ2nhánhkềC=Cđềuxuốngcùngphía",
+    "notes": "Đếmmạchsource22CbaoCOOH,KHÔNGtựthànhALA18C. Từmethyltrái3doubleởC6=C7,C9=C10,C12=C13;khúcđơnsaudouble3đếnCOOHcòn9Ctínhcarboxyl. COOHtextphải,khôngcaption/Hexplicit/charges. Khirootsoátphảiđếm21skeletalCngoàitext+1COOH,làmriêngkhôngaliaslinolenic.",
+    "questions": [
+      {
+        "qid": "DH-12-C1-B1-P2-I-30",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P2-I-30.hinh.3.du_lieu",
+            "viTri": "sau_pa_D"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B3-D1-I-3",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B3-D1-I-3.hinh.3.du_lieu",
+            "viTri": "sau_pa_D"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "svg": "acid-beo-ddh-f5cf49a86d186c3088495da1b96992a25283fa6ac481393e6cde50877232b869.svg",
+    "hashSvg": "f5cf49a86d186c3088495da1b96992a25283fa6ac481393e6cde50877232b869",
+    "byteSvg": 4218,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "diemCarbon": [
+      [
+        20,
+        90
+      ],
+      [
+        44,
+        50
+      ],
+      [
+        68,
+        90
+      ],
+      [
+        92,
+        50
+      ],
+      [
+        116,
+        90
+      ],
+      [
+        140,
+        50
+      ],
+      [
+        188,
+        50
+      ],
+      [
+        212,
+        90
+      ],
+      [
+        236,
+        50
+      ],
+      [
+        284,
+        50
+      ],
+      [
+        308,
+        90
+      ],
+      [
+        332,
+        50
+      ],
+      [
+        380,
+        50
+      ],
+      [
+        404,
+        90
+      ],
+      [
+        428,
+        50
+      ],
+      [
+        452,
+        90
+      ],
+      [
+        476,
+        50
+      ],
+      [
+        500,
+        90
+      ],
+      [
+        524,
+        50
+      ],
+      [
+        548,
+        90
+      ],
+      [
+        572,
+        50
+      ],
+      [
+        596,
+        90
+      ]
+    ],
+    "bondDoiTuMethyl": [
+      6,
+      9,
+      12
+    ],
+    "ghiChuDung": "Giữ COOH gộp, mạch14/18/22C theo source; mọi C=C ngang cao/2nhánh cùng dưới,khôngtựsửa theo tên thường.",
+    "hashSvgDaSoat": "f5cf49a86d186c3088495da1b96992a25283fa6ac481393e6cde50877232b869",
+    "nguoiSoat": "cau_truc_6"
+  }
+]

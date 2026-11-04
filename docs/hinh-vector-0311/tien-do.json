@@ -60,8 +60,8 @@
       "Toàn kho còn chưa hoàn tất, app chưa thay hình; không báo đã xong hoặc đã triển khai."
     ],
     "danhMucDaKiem": "docs/hinh-vector-0311/kiem/danh-muc-da-kiem.json",
-    "loVuaXong": "869 câu đủ mọi hình+DDH/7 một phần;678 nguồn→459SVG;6.668.553 byte/gzip1.350.931;750 nguồn còn lại. Lô129–131 thêm4nguồn soát độc lập từngPNG/render/exacthash.",
-    "viecNenLamTiep": "Nhóm124 chỉcòn59/1391CHƯAĐẠT:ROI bịloại phongcách, phải sửa thật/không đoánshortticks/hạt.831đãđạt129. Nhóm130 đangđọc scratch/doc-molecule-lo-130.json:1393/264/567đãdựng/soát xong,KHÔNGtrùng.568butanone3highlightvà1032pie78%/21%chưadựng.4partialmớicùngphoto581hộp/tuýpMethocylat,giữảnhthật/khôngcộngsốvẽ;2hoa1198/1403thậtgiữ,1câu4icons thiếu59/1391.",
+    "loVuaXong": "878 câu đủ mọi hình+DDH/7 một phần;697 nguồn→465 SVG;6.693.033 byte/gzip1.356.399;731 nguồn còn lại. Lô132–134 thêm19nguồn soát độc lập từngPNG/base/render/exacthash,khép9câu.",
+    "viecNenLamTiep": "Nhóm130còn7CHƯADỰNG568/1032/200/330/1178/1100/1063.568butanone3highlightA/B/C;1032pie78%/21%khôngthêm1%;4peptidegiữRprime/Rsub/arrowtipbondlabels,1100mappingkhác200. Geometry5nguồnđãđọcđủvàlưukiem/doc-peptide-chi-tiet-lo-135.json:200/330/1178NHgộp/Rprime/Rplain,1100Hrời/R1R2/leaderkhônghead/khácmapping;1063grid5/6/5/7C/triple3nét. Nhóm12459/1391ROI bịloại phongcách chưađạt/khôngđoánshortticks/hạt.7partialCHỈ6câuảnhthật(4photo581+hoa1198/1403)giữnguyênvà1câu4icons thiếu59/1391. Nhómacid130đủ10/10và9sourcekhép134đãxongđừngdựngtrùng.",
     "canhBaoCheckpoint": "Giữworktree/commitmớihơn. Origin/main0200b893chưagộp;khôngpháthànhkhichưatoànphạmvi."
   },
   "tuDongTiepTuc": {
@@ -79,14 +79,14 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 678,
-    "soSvgRieng": 459,
-    "soCauDungHinh": 876,
-    "soCauDuMoiHinh": 869,
+    "soAnhNguon": 697,
+    "soSvgRieng": 465,
+    "soCauDungHinh": 885,
+    "soCauDuMoiHinh": 878,
     "soCauMoiXongMotPhan": 7,
-    "byteSvg": 6668553,
-    "byteGzip": 1350931,
-    "soAnhNguonConLai": 750,
+    "byteSvg": 6693033,
+    "byteGzip": 1356399,
+    "soAnhNguonConLai": 731,
     "daTichHop": false
   },
   "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.",
@@ -106,15 +106,15 @@
     "daChuyenHetBoDaVe": true
   },
   "daDatPhongApp": {
-    "soNguon": 678,
-    "soCauDuHinhVaPhong": 869,
+    "soNguon": 697,
+    "soCauDuHinhVaPhong": 878,
     "ghiChu": "Các số tổngDaDoiChieu vẫn mô tả nội dung đã kiểm; bản cũ chưa đổi phông không được coi đạt yêu cầu phông mới."
   },
   "loMoiNhat": {
-    "lo": "129–131",
-    "ketQua": "869 câu đủ mọi hình+DDH/7 một phần;678 nguồn→459SVG;6.668.553 byte/gzip1.350.931;750 nguồn còn lại. Lô129–131 thêm4nguồn soát độc lập từngPNG/render/exacthash.",
-    "suaLoi": "831giữđoạndâylộ/cheU+cốc/khôngsuyjackmapping/khôngjunction/0.57dot;1393/264ortho3đôi/H+/2arrow;567sửaanchorstartngănclip/chạm,sauđãrender+freshreviewhashmới.",
-    "tiepTheo": "Nhóm124 chỉcòn59/1391CHƯAĐẠT:ROI bịloại phongcách, phải sửa thật/không đoánshortticks/hạt.831đãđạt129. Nhóm130 đangđọc scratch/doc-molecule-lo-130.json:1393/264/567đãdựng/soát xong,KHÔNGtrùng.568butanone3highlightvà1032pie78%/21%chưadựng.4partialmớicùngphoto581hộp/tuýpMethocylat,giữảnhthật/khôngcộngsốvẽ;2hoa1198/1403thậtgiữ,1câu4icons thiếu59/1391.",
-    "gioiHan": "Appchưatíchhợp/chưareloadoffline/chưapháthành. Build/tốcđộlô129đạt/precache170/2613KB,sauđóchỉassets/scripts. Mainvừafetch0200b893CHƯAgộp;WOFF2khôngdiff. Phảisotesttheotên/kiểmcathi/mainmớinhấttrướctriểnkhai."
+    "lo": "132–134",
+    "ketQua": "878 câu đủ mọi hình+DDH/7 một phần;697 nguồn→465 SVG;6.693.033 byte/gzip1.356.399;731 nguồn còn lại. Lô132–134 thêm19nguồn soát độc lập từngPNG/base/render/exacthash,khép9câu.",
+    "suaLoi": "132giữ14C1Z/18C2Z/22C3Zkhôngtựsửatheotên;133HO+C=Okhatriểntrái83722C6Z/C=Oxuống,37870018C3Z/C=Olên.134EPA20C5ZdoubleDƯỚI/nhánhlên,5aliasđãmởRIÊNGsource/base/render/hash.",
+    "tiepTheo": "Nhóm130còn7CHƯADỰNG568/1032/200/330/1178/1100/1063.568butanone3highlightA/B/C;1032pie78%/21%khôngthêm1%;4peptidegiữRprime/Rsub/arrowtipbondlabels,1100mappingkhác200. Geometry5nguồnđãđọcđủvàlưukiem/doc-peptide-chi-tiet-lo-135.json:200/330/1178NHgộp/Rprime/Rplain,1100Hrời/R1R2/leaderkhônghead/khácmapping;1063grid5/6/5/7C/triple3nét. Nhóm12459/1391ROI bịloại phongcách chưađạt/khôngđoánshortticks/hạt.7partialCHỈ6câuảnhthật(4photo581+hoa1198/1403)giữnguyênvà1câu4icons thiếu59/1391. Nhómacid130đủ10/10và9sourcekhép134đãxongđừngdựngtrùng.",
+    "gioiHan": "Chưa tíchhợp/chưa reload offline app/chưa phát hành. Build/tốcđộlô133đạt/precache170/2613KB,sauđóchỉassets/scripts134. Main0200b893chưagộp;phảicậpnhậtmainmớinhất/sotesttheotên/kiểmcathi trướctriểnkhai."
   }
 }

@@ -1,0 +1,417 @@
+[
+  {
+    "i": 903,
+    "hash": "a5b6d2dddc65dc8e779a16c3a6fd366cd6b854bef1ae1c906b4b44461491fbbf",
+    "fileNguon": "anh/a5b6d2dddc65dc8e779a16c3a6fd366cd6b854bef1ae1c906b4b44461491fbbf.png",
+    "canvas": [
+      737,
+      87
+    ],
+    "daMoNativeRieng": true,
+    "questions": [
+      {
+        "qid": "12-C1-B3-D1-I-2",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "12-C1-B3-D1-I-2.hinh.1.du_lieu",
+            "viTri": "sau_pa_B"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestLucDoc": false,
+    "kind": "fatty-acid-skeletal",
+    "carbonCount": 20,
+    "doubleBondsFromCOOH": [
+      5,
+      8,
+      11,
+      14,
+      17
+    ],
+    "stereo": "5Z;mọiC=Cngangởdưới,2nhánhkềhướnglêncùngphía",
+    "smiles": "CC/C=C\\C/C=C\\C/C=C\\C/C=C\\C/C=C\\CCCC(=O)O",
+    "geometry": "TừmethyltráiđếmpolylineC1end→C2đỉnhcao→C3thấp=C4thấp→C5cao→C6thấp=C7thấp→C8cao→C9thấp=C10thấp→C11cao→C12thấp=C13thấp→C14cao→C15thấp=C16thấp→C17cao→C18thấp→C19cao→C20trongCOOHphải. 5doubleđượcbổsungđườngngắnTHỨ2ởTRÊNnétđôithấp. C3=C4,C6=C7,C9=C10,C12=C13,C15=C16tínhmethylkhôngphảicarboxyl.",
+    "caption": [],
+    "explicitH": "ChỉHtrongCOOHtext,glycounitskhôngHexplicit.",
+    "charges": [],
+    "notes": "ĐâylàC20/5ZkhôngC22DHA6Z,khôngbỏ1double. 4nguồncùngnộidungđãmởRIÊNG,dựng1bodyrồialiaschỉsausoátPNGsource+SVGthật.CácnhãnBtrongsau_pa_Bnếucókhôngcótrongnative,khôngthêmBvàoSVG."
+  },
+  {
+    "i": 258,
+    "hash": "2c3441e6409c7bf00eb9fd90f982ee4bbe41f4824d2d725f52676b74b7fd1b60",
+    "fileNguon": "anh/2c3441e6409c7bf00eb9fd90f982ee4bbe41f4824d2d725f52676b74b7fd1b60.png",
+    "canvas": [
+      737,
+      87
+    ],
+    "daMoNativeRieng": true,
+    "questions": [
+      {
+        "qid": "12-C1-B1-D3-I-39",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "12-C1-B1-D3-I-39.hinh.1.du_lieu",
+            "viTri": "sau_pa_B"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestLucDoc": false,
+    "kind": "fatty-acid-skeletal",
+    "carbonCount": 20,
+    "doubleBondsFromCOOH": [
+      5,
+      8,
+      11,
+      14,
+      17
+    ],
+    "stereo": "5Z;mọiC=Cngangởdưới,2nhánhkềhướnglêncùngphía",
+    "smiles": "CC/C=C\\C/C=C\\C/C=C\\C/C=C\\C/C=C\\CCCC(=O)O",
+    "geometry": "TừmethyltráiđếmpolylineC1end→C2đỉnhcao→C3thấp=C4thấp→C5cao→C6thấp=C7thấp→C8cao→C9thấp=C10thấp→C11cao→C12thấp=C13thấp→C14cao→C15thấp=C16thấp→C17cao→C18thấp→C19cao→C20trongCOOHphải. 5doubleđượcbổsungđườngngắnTHỨ2ởTRÊNnétđôithấp. C3=C4,C6=C7,C9=C10,C12=C13,C15=C16tínhmethylkhôngphảicarboxyl.",
+    "caption": [],
+    "explicitH": "ChỉHtrongCOOHtext,glycounitskhôngHexplicit.",
+    "charges": [],
+    "notes": "ĐâylàC20/5ZkhôngC22DHA6Z,khôngbỏ1double. 4nguồncùngnộidungđãmởRIÊNG,dựng1bodyrồialiaschỉsausoátPNGsource+SVGthật.CácnhãnBtrongsau_pa_Bnếucókhôngcótrongnative,khôngthêmBvàoSVG."
+  },
+  {
+    "i": 745,
+    "hash": "8b4d8d870cbca38bb5d892b64a4382b2af3225a36104373b43254b820510f029",
+    "fileNguon": "anh/8b4d8d870cbca38bb5d892b64a4382b2af3225a36104373b43254b820510f029.png",
+    "canvas": [
+      734,
+      87
+    ],
+    "daMoNativeRieng": true,
+    "questions": [
+      {
+        "qid": "12-KT-C1-D2-I-14",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "12-KT-C1-D2-I-14.hinh.1.du_lieu",
+            "viTri": "sau_pa_B"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestLucDoc": false,
+    "kind": "fatty-acid-skeletal",
+    "carbonCount": 20,
+    "doubleBondsFromCOOH": [
+      5,
+      8,
+      11,
+      14,
+      17
+    ],
+    "stereo": "5Z;mọiC=Cngangởdưới,2nhánhkềhướnglêncùngphía",
+    "smiles": "CC/C=C\\C/C=C\\C/C=C\\C/C=C\\C/C=C\\CCCC(=O)O",
+    "geometry": "TừmethyltráiđếmpolylineC1end→C2đỉnhcao→C3thấp=C4thấp→C5cao→C6thấp=C7thấp→C8cao→C9thấp=C10thấp→C11cao→C12thấp=C13thấp→C14cao→C15thấp=C16thấp→C17cao→C18thấp→C19cao→C20trongCOOHphải. 5doubleđượcbổsungđườngngắnTHỨ2ởTRÊNnétđôithấp. C3=C4,C6=C7,C9=C10,C12=C13,C15=C16tínhmethylkhôngphảicarboxyl.",
+    "caption": [],
+    "explicitH": "ChỉHtrongCOOHtext,glycounitskhôngHexplicit.",
+    "charges": [],
+    "notes": "ĐâylàC20/5ZkhôngC22DHA6Z,khôngbỏ1double. 4nguồncùngnộidungđãmởRIÊNG,dựng1bodyrồialiaschỉsausoátPNGsource+SVGthật.CácnhãnBtrongsau_pa_Bnếucókhôngcótrongnative,khôngthêmBvàoSVG."
+  },
+  {
+    "i": 496,
+    "hash": "5baeca22373d8b271be462e09e72631f474e4096c9fff0fa3dffe0618e6cbed0",
+    "fileNguon": "anh/5baeca22373d8b271be462e09e72631f474e4096c9fff0fa3dffe0618e6cbed0.png",
+    "canvas": [
+      359,
+      37
+    ],
+    "daMoNativeRieng": true,
+    "questions": [
+      {
+        "qid": "DH-12-C1-B1-P2-I-30",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P2-I-30.hinh.1.du_lieu",
+            "viTri": "sau_pa_B"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B3-D1-I-3",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B3-D1-I-3.hinh.1.du_lieu",
+            "viTri": "sau_pa_B"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestLucDoc": false,
+    "kind": "fatty-acid-skeletal",
+    "carbonCount": 20,
+    "doubleBondsFromCOOH": [
+      5,
+      8,
+      11,
+      14,
+      17
+    ],
+    "stereo": "5Z;mọiC=Cngangởdưới,2nhánhkềhướnglêncùngphía",
+    "smiles": "CC/C=C\\C/C=C\\C/C=C\\C/C=C\\C/C=C\\CCCC(=O)O",
+    "geometry": "TừmethyltráiđếmpolylineC1end→C2đỉnhcao→C3thấp=C4thấp→C5cao→C6thấp=C7thấp→C8cao→C9thấp=C10thấp→C11cao→C12thấp=C13thấp→C14cao→C15thấp=C16thấp→C17cao→C18thấp→C19cao→C20trongCOOHphải. 5doubleđượcbổsungđườngngắnTHỨ2ởTRÊNnétđôithấp. C3=C4,C6=C7,C9=C10,C12=C13,C15=C16tínhmethylkhôngphảicarboxyl.",
+    "caption": [],
+    "explicitH": "ChỉHtrongCOOHtext,glycounitskhôngHexplicit.",
+    "charges": [],
+    "notes": "ĐâylàC20/5ZkhôngC22DHA6Z,khôngbỏ1double. 4nguồncùngnộidungđãmởRIÊNG,dựng1bodyrồialiaschỉsausoátPNGsource+SVGthật.CácnhãnBtrongsau_pa_Bnếucókhôngcótrongnative,khôngthêmBvàoSVG."
+  },
+  {
+    "i": 1139,
+    "hash": "cd54123aebde9f0022a264120472b90fdd2cde34da18025c20fd944241bb07f6",
+    "fileNguon": "anh/cd54123aebde9f0022a264120472b90fdd2cde34da18025c20fd944241bb07f6.png",
+    "canvas": [
+      629,
+      92
+    ],
+    "daMoNativeRieng": true,
+    "questions": [
+      {
+        "qid": "12-C1-B3-D1-I-2",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "12-C1-B3-D1-I-2.hinh.2.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      },
+      {
+        "qid": "12-C1-B1-D3-I-39",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "12-C1-B1-D3-I-39.hinh.2.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestLucDoc": false,
+    "kind": "fatty-acid-skeletal",
+    "carbonCount": 18,
+    "doubleBondsFromCOOH": [
+      9,
+      12
+    ],
+    "stereo": "2Z;doubleởcao,2nhánhkềxuống",
+    "smiles": "CCCCC/C=C\\C/C=C\\CCCCCCCC(=O)O",
+    "geometry": "Từmethyltrái17skeletalCngoàitext+carbonylC18trongCOOH. Methyl-sideC6=C7vàC9=C10ngangtrên;1CH₂ngăndouble. KếtthúcC17thấpnốilênCOOHtextphải.",
+    "baseCandidate": {
+      "i": 660,
+      "hash": "7a7982aa8e05dc2bd46c690dfe637315f28742ecb78bae194ebabceee39fcd0d",
+      "tepSVG": "acid-beo-ddh-0f00c2995bfb636cb1b7307eef593becdea0105070a504a412e31ce35f976cc7.svg",
+      "hashSvg": "0f00c2995bfb636cb1b7307eef593becdea0105070a504a412e31ce35f976cc7"
+    },
+    "caption": [],
+    "explicitH": "COOHtextgiữHacid",
+    "charges": [],
+    "notes": "CùngC18Δ9Z12Zvới660đãđạt,nhưngđâychỉứngviêndùnglại,CHƯAchứngnhậnhashSVGrender.NguyênvịOH/COOHtext/chaincountkhớpPNGnativeđãmở."
+  },
+  {
+    "i": 656,
+    "hash": "7a1d88af5e69fbea1a1c0f7bde36423a134a43922616134b75bb7559edf68706",
+    "fileNguon": "anh/7a1d88af5e69fbea1a1c0f7bde36423a134a43922616134b75bb7559edf68706.png",
+    "canvas": [
+      628,
+      93
+    ],
+    "daMoNativeRieng": true,
+    "questions": [
+      {
+        "qid": "12-KT-C1-D2-I-14",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "12-KT-C1-D2-I-14.hinh.2.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestLucDoc": false,
+    "kind": "fatty-acid-skeletal",
+    "carbonCount": 18,
+    "doubleBondsFromCOOH": [
+      9,
+      12
+    ],
+    "stereo": "2Z;doubleởcao,2nhánhkềxuống",
+    "smiles": "CCCCC/C=C\\C/C=C\\CCCCCCCC(=O)O",
+    "geometry": "Từmethyltrái17skeletalCngoàitext+carbonylC18trongCOOH. Methyl-sideC6=C7vàC9=C10ngangtrên;1CH₂ngăndouble. KếtthúcC17thấpnốilênCOOHtextphải.",
+    "baseCandidate": {
+      "i": 660,
+      "hash": "7a7982aa8e05dc2bd46c690dfe637315f28742ecb78bae194ebabceee39fcd0d",
+      "tepSVG": "acid-beo-ddh-0f00c2995bfb636cb1b7307eef593becdea0105070a504a412e31ce35f976cc7.svg",
+      "hashSvg": "0f00c2995bfb636cb1b7307eef593becdea0105070a504a412e31ce35f976cc7"
+    },
+    "caption": [],
+    "explicitH": "COOHtextgiữHacid",
+    "charges": [],
+    "notes": "CùngC18Δ9Z12Zvới660đãđạt,nhưngđâychỉứngviêndùnglại,CHƯAchứngnhậnhashSVGrender.NguyênvịOH/COOHtext/chaincountkhớpPNGnativeđãmở."
+  },
+  {
+    "i": 932,
+    "hash": "a878ebcf688d883d69a1793af495b147707f77664f9c88249e2a0e51608b52c3",
+    "fileNguon": "anh/a878ebcf688d883d69a1793af495b147707f77664f9c88249e2a0e51608b52c3.png",
+    "canvas": [
+      765,
+      113
+    ],
+    "daMoNativeRieng": true,
+    "questions": [
+      {
+        "qid": "12-C1-B3-D1-I-2",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "12-C1-B3-D1-I-2.hinh.3.du_lieu",
+            "viTri": "sau_pa_D"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestLucDoc": false,
+    "kind": "fatty-acid-skeletal",
+    "carbonCount": 22,
+    "doubleBondsFromCOOH": [
+      10,
+      13,
+      16
+    ],
+    "stereo": "3Z;doubleởcao,2nhánhkềxuống",
+    "smiles": "CCCCC/C=C\\C/C=C\\C/C=C\\CCCCCCCCC(=O)O",
+    "geometry": "Từmethyltrái21skeletalCngoàitext+carbonylC22trongCOOH. Methyl-sideC6=C7,C9=C10,C12=C13ngangtrên,1CH₂ngănmỗicặpdouble. SauC13cònC14..C21zigzagvàC22COOH. KHÔNGtựbiến18CALAtheotêncâuhỏi.",
+    "baseCandidate": {
+      "i": 52,
+      "hash": "0ace5ac23faae6a3368caefca50597e6e7876896c2b674a761e6f39e82821183",
+      "tepSVG": "acid-beo-ddh-f5cf49a86d186c3088495da1b96992a25283fa6ac481393e6cde50877232b869.svg",
+      "hashSvg": "f5cf49a86d186c3088495da1b96992a25283fa6ac481393e6cde50877232b869"
+    },
+    "caption": [],
+    "explicitH": "COOHtextgiữHacid",
+    "charges": [],
+    "notes": "3nguồn932/26/580đãmởRIÊNGđếmdouble/chains.Cùngbody52đãđạt,CHƯAchứngnhậnhashSVGrender."
+  },
+  {
+    "i": 26,
+    "hash": "052140e94ce182f80fbbcf491f5e4bd72d75b3ddef440d2a967cec9f54b5a128",
+    "fileNguon": "anh/052140e94ce182f80fbbcf491f5e4bd72d75b3ddef440d2a967cec9f54b5a128.png",
+    "canvas": [
+      765,
+      112
+    ],
+    "daMoNativeRieng": true,
+    "questions": [
+      {
+        "qid": "12-C1-B1-D3-I-39",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "12-C1-B1-D3-I-39.hinh.3.du_lieu",
+            "viTri": "sau_pa_D"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestLucDoc": false,
+    "kind": "fatty-acid-skeletal",
+    "carbonCount": 22,
+    "doubleBondsFromCOOH": [
+      10,
+      13,
+      16
+    ],
+    "stereo": "3Z;doubleởcao,2nhánhkềxuống",
+    "smiles": "CCCCC/C=C\\C/C=C\\C/C=C\\CCCCCCCCC(=O)O",
+    "geometry": "Từmethyltrái21skeletalCngoàitext+carbonylC22trongCOOH. Methyl-sideC6=C7,C9=C10,C12=C13ngangtrên,1CH₂ngănmỗicặpdouble. SauC13cònC14..C21zigzagvàC22COOH. KHÔNGtựbiến18CALAtheotêncâuhỏi.",
+    "baseCandidate": {
+      "i": 52,
+      "hash": "0ace5ac23faae6a3368caefca50597e6e7876896c2b674a761e6f39e82821183",
+      "tepSVG": "acid-beo-ddh-f5cf49a86d186c3088495da1b96992a25283fa6ac481393e6cde50877232b869.svg",
+      "hashSvg": "f5cf49a86d186c3088495da1b96992a25283fa6ac481393e6cde50877232b869"
+    },
+    "caption": [],
+    "explicitH": "COOHtextgiữHacid",
+    "charges": [],
+    "notes": "3nguồn932/26/580đãmởRIÊNGđếmdouble/chains.Cùngbody52đãđạt,CHƯAchứngnhậnhashSVGrender."
+  },
+  {
+    "i": 580,
+    "hash": "6c447bac2a6e13885dc1bacaf78688aa713475b2f817f7e799081e86bb9e76ed",
+    "fileNguon": "anh/6c447bac2a6e13885dc1bacaf78688aa713475b2f817f7e799081e86bb9e76ed.png",
+    "canvas": [
+      765,
+      112
+    ],
+    "daMoNativeRieng": true,
+    "questions": [
+      {
+        "qid": "12-KT-C1-D2-I-14",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "12-KT-C1-D2-I-14.hinh.3.du_lieu",
+            "viTri": "sau_pa_D"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestLucDoc": false,
+    "kind": "fatty-acid-skeletal",
+    "carbonCount": 22,
+    "doubleBondsFromCOOH": [
+      10,
+      13,
+      16
+    ],
+    "stereo": "3Z;doubleởcao,2nhánhkềxuống",
+    "smiles": "CCCCC/C=C\\C/C=C\\C/C=C\\CCCCCCCCC(=O)O",
+    "geometry": "Từmethyltrái21skeletalCngoàitext+carbonylC22trongCOOH. Methyl-sideC6=C7,C9=C10,C12=C13ngangtrên,1CH₂ngănmỗicặpdouble. SauC13cònC14..C21zigzagvàC22COOH. KHÔNGtựbiến18CALAtheotêncâuhỏi.",
+    "baseCandidate": {
+      "i": 52,
+      "hash": "0ace5ac23faae6a3368caefca50597e6e7876896c2b674a761e6f39e82821183",
+      "tepSVG": "acid-beo-ddh-f5cf49a86d186c3088495da1b96992a25283fa6ac481393e6cde50877232b869.svg",
+      "hashSvg": "f5cf49a86d186c3088495da1b96992a25283fa6ac481393e6cde50877232b869"
+    },
+    "caption": [],
+    "explicitH": "COOHtextgiữHacid",
+    "charges": [],
+    "notes": "3nguồn932/26/580đãmởRIÊNGđếmdouble/chains.Cùngbody52đãđạt,CHƯAchứngnhậnhashSVGrender."
+  },
+  {
+    "i": 1198,
+    "hash": "d8c61f86f9e6495b88f11b33d3434678b97f3e0e4f9d093439b0d9c91fbcbb24",
+    "fileNguon": "anh/d8c61f86f9e6495b88f11b33d3434678b97f3e0e4f9d093439b0d9c91fbcbb24.png",
+    "canvas": [
+      373,
+      312
+    ],
+    "daMoNativeRieng": true,
+    "questions": [
+      {
+        "qid": "DH-12-C1-B1-P1-III-10",
+        "de": "Geranyl acetate là ester có mùi hoa hồng, có công thức cấu tạo như hình dưới đây: Tổng số nguyên tử có trong phân tử geranyl acetate là bao nhiêu?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P1-III-10.hinh.1.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestLucDoc": false,
+    "kind": "keep-raster-photo",
+    "notes": "ẢnhTHẬTbônghoahồngđỏ/láxanh,nophotooverlaytext. Giữnguyênrasterimmutable,cacheoffline,nocreatedSVG. Source1198hinh.1vàgeranylacetate155hinh.0đãđạt;khôngthayrose bằngillustrationvectorvìnằmngoạiphạmvihìnhvẽ.",
+    "requiresNewDrawing": false
+  }
+]

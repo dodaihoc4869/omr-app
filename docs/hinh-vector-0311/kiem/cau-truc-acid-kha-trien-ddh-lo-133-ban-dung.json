@@ -1,0 +1,397 @@
+[
+  {
+    "i": 837,
+    "hash": "9a91cc32733459e8d3007d0bbfd96eba2ac126a9149f63c108fac86dc02fc36c",
+    "fileNguon": "anh/9a91cc32733459e8d3007d0bbfd96eba2ac126a9149f63c108fac86dc02fc36c.png",
+    "canvas": [
+      521,
+      73
+    ],
+    "daMoNative": true,
+    "kind": "fatty-acid-skeletal",
+    "smiles": "CC/C=C\\C/C=C\\C/C=C\\C/C=C\\C/C=C\\C/C=C\\CCC(=O)O",
+    "carbonCount": 22,
+    "doubleBondsFromCOOH": [
+      4,
+      7,
+      10,
+      13,
+      16,
+      19
+    ],
+    "stereo": "6Z nhìntrên6doubleđềuupperhorizontal/nhánhkềxuống",
+    "notes": "COOHKHA TRIỂNởTRÁI:HO–C(=Oxuống)–mạch;khôngCOOHtextphải.Mạch22C,6C=Cngănnhau1CH₂,đếmđúng6doublekhông5. Methylendpointphải. Khôngcaption/charges/HexplicitngoàiHacidtrongHO.",
+    "questions": [
+      {
+        "qid": "DH-12-C1-B1-P2-II-11",
+        "de": "Trong nhiều năm, một số nghiên cứu đã phát hiện ra rằng việc tiêu thụ acid béo Omega-3 như docosahexaenoic acid (DHA) giúp giảm tử vong cho nhiều người mắc bệnh tim mạch.\nCông thức cấu tạo của DHA như sau:",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P2-II-11.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B3-D2-III-1",
+        "de": "Trong nhiều năm, một số nghiên cứu đã phát hiện ra rằng việc tiêu thụ acid béo Omega-3 như docosahexanoic acid (DHA) giúp giảm tử vong cho nhiều người mắc bệnh tim mạch.\nCông thức cấu tạo của DHA như sau: Tổng số nguyên tử carbon có trong một phân tử DHA là bao nhiêu?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B3-D2-III-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "svg": "acid-kha-trien-ddh-22ea6be6aa780fa020f6d6479e868177f7d744a2dd89a3b78c406435a0c6b83e.svg",
+    "hashSvg": "22ea6be6aa780fa020f6d6479e868177f7d744a2dd89a3b78c406435a0c6b83e",
+    "byteSvg": 4920,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "diemCarbon": [
+      [
+        60,
+        120
+      ],
+      [
+        84,
+        80
+      ],
+      [
+        108,
+        120
+      ],
+      [
+        132,
+        80
+      ],
+      [
+        180,
+        80
+      ],
+      [
+        204,
+        120
+      ],
+      [
+        228,
+        80
+      ],
+      [
+        276,
+        80
+      ],
+      [
+        300,
+        120
+      ],
+      [
+        324,
+        80
+      ],
+      [
+        372,
+        80
+      ],
+      [
+        396,
+        120
+      ],
+      [
+        420,
+        80
+      ],
+      [
+        468,
+        80
+      ],
+      [
+        492,
+        120
+      ],
+      [
+        516,
+        80
+      ],
+      [
+        564,
+        80
+      ],
+      [
+        588,
+        120
+      ],
+      [
+        612,
+        80
+      ],
+      [
+        660,
+        80
+      ],
+      [
+        684,
+        120
+      ],
+      [
+        708,
+        80
+      ]
+    ],
+    "bondDoiTuCOOH": [
+      4,
+      7,
+      10,
+      13,
+      16,
+      19
+    ],
+    "ghiChuDung": "HOexplicittrái;837C=Oxuống22C6Z;378/700C=Olên18C3Z;khônggộpCOOH/tựthêmcaption/charge.",
+    "hashSvgDaSoat": "22ea6be6aa780fa020f6d6479e868177f7d744a2dd89a3b78c406435a0c6b83e",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 378,
+    "hash": "42f68ae59e054187bf03e901335ed33c2f18a0c7ca5e5c0e9bc8ddc254912c56",
+    "fileNguon": "anh/42f68ae59e054187bf03e901335ed33c2f18a0c7ca5e5c0e9bc8ddc254912c56.png",
+    "canvas": [
+      487,
+      79
+    ],
+    "daMoNative": true,
+    "kind": "fatty-acid-skeletal",
+    "smiles": "CC/C=C\\C/C=C\\C/C=C\\CCCCCCCC(=O)O",
+    "carbonCount": 18,
+    "doubleBondsFromCOOH": [
+      9,
+      12,
+      15
+    ],
+    "stereo": "Z,Z,Z;3doublehorizupper,nhánhkềxuống",
+    "notes": "COOHKHA TRIỂNTRÁI:HO–C(=Olên)–mạch. Mạch18C,3doubleởgiữaphải,ngăn1CH₂,methylendpointphải. ĐãmởRIÊNG378và700cùngnộidung/shape,khácpixel. Khôngcaption/charges,acidHOHexplicitgiữ.",
+    "questions": [
+      {
+        "qid": "DH-12-C1-B1-P2-I-50",
+        "de": "α-linolenic acid (ALA) là một loại acid béo quan trọng đối với cơ thể, được cung cấp chủ yếu từ thức ăn có nguồn gốc thực vật như dầu đậu nành, dầu hạt cải, cải bó xôi,... Cấu trúc mạch carbon của α-linolenic acid như sau:\nCho các phát biểu sau:\n(1) ALA là acid béo thuộc loại Omega-3.\n(2) Trong ALA, nhóm nguyên tử ở carbon nối đôi ở vị trí cis với nhau.\n(3) Muối sodium của ALA có tác dụng giặt rửa.\n(4) Phân tử ALA có chứa 18 nguyên tử carbon.\nSố phát biểu đúng là",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P2-I-50.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "svg": "acid-kha-trien-ddh-d22c44bf39dfbd76b103566b36d7ab0c5e640ae46d7cf7685934a16f77652d91.svg",
+    "hashSvg": "d22c44bf39dfbd76b103566b36d7ab0c5e640ae46d7cf7685934a16f77652d91",
+    "byteSvg": 4092,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "diemCarbon": [
+      [
+        60,
+        80
+      ],
+      [
+        84,
+        120
+      ],
+      [
+        108,
+        80
+      ],
+      [
+        132,
+        120
+      ],
+      [
+        156,
+        80
+      ],
+      [
+        180,
+        120
+      ],
+      [
+        204,
+        80
+      ],
+      [
+        228,
+        120
+      ],
+      [
+        252,
+        80
+      ],
+      [
+        300,
+        80
+      ],
+      [
+        324,
+        120
+      ],
+      [
+        348,
+        80
+      ],
+      [
+        396,
+        80
+      ],
+      [
+        420,
+        120
+      ],
+      [
+        444,
+        80
+      ],
+      [
+        492,
+        80
+      ],
+      [
+        516,
+        120
+      ],
+      [
+        540,
+        80
+      ]
+    ],
+    "bondDoiTuCOOH": [
+      9,
+      12,
+      15
+    ],
+    "ghiChuDung": "HOexplicittrái;837C=Oxuống22C6Z;378/700C=Olên18C3Z;khônggộpCOOH/tựthêmcaption/charge.",
+    "hashSvgDaSoat": "d22c44bf39dfbd76b103566b36d7ab0c5e640ae46d7cf7685934a16f77652d91",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 700,
+    "hash": "82803bb213af2292e5ba3ee0baeec6552c248af292c485caa121f2cb63f039f2",
+    "fileNguon": "anh/82803bb213af2292e5ba3ee0baeec6552c248af292c485caa121f2cb63f039f2.png",
+    "canvas": [
+      487,
+      79
+    ],
+    "daMoNative": true,
+    "kind": "fatty-acid-skeletal",
+    "smiles": "CC/C=C\\C/C=C\\C/C=C\\CCCCCCCC(=O)O",
+    "carbonCount": 18,
+    "doubleBondsFromCOOH": [
+      9,
+      12,
+      15
+    ],
+    "stereo": "Z,Z,Z;3doublehorizupper,nhánhkềxuống",
+    "notes": "COOHKHA TRIỂNTRÁI:HO–C(=Olên)–mạch. Mạch18C,3doubleởgiữaphải,ngăn1CH₂,methylendpointphải. ĐãmởRIÊNG378và700cùngnộidung/shape,khácpixel. Khôngcaption/charges,acidHOHexplicitgiữ.",
+    "questions": [
+      {
+        "qid": "VIP27-CDK-ESTER-TN-II-16",
+        "de": "Dầu hạt lanh là một nguồn dưỡng chất thực vật quý giá, đặc biệt giàu các acid béo không bão hòa đa, có lợi cho hệ tim mạch và giảm cholesterol xấu. Thành phần chính tạo nên giá trị của loại dầu này là hai loại acid béo thiết yếu: α-linolenic acid (ALA) và linoleic acid (LA). Cơ thể người không thể tự tổng hợp được hai acid này mà bắt buộc phải hấp thu từ chế độ ăn uống. Mỗi viên nang mềm \"Dầu hạt lanh hữu cơ\" có khối lượng 500 mg dầu nền, trong đó chứa 55% ALA và 15% LA về khối lượng. ALA và LA có công thức cấu tạo phân tử mạch hở như hình (hình trên: ALA; hình dưới: LA).",
+        "refs": [
+          {
+            "where": "VIP27-CDK-ESTER-TN-II-16.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daTrongManifestSauKhiGuiDotDau": false,
+    "svg": "acid-kha-trien-ddh-d22c44bf39dfbd76b103566b36d7ab0c5e640ae46d7cf7685934a16f77652d91.svg",
+    "hashSvg": "d22c44bf39dfbd76b103566b36d7ab0c5e640ae46d7cf7685934a16f77652d91",
+    "byteSvg": 4092,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "diemCarbon": [
+      [
+        60,
+        80
+      ],
+      [
+        84,
+        120
+      ],
+      [
+        108,
+        80
+      ],
+      [
+        132,
+        120
+      ],
+      [
+        156,
+        80
+      ],
+      [
+        180,
+        120
+      ],
+      [
+        204,
+        80
+      ],
+      [
+        228,
+        120
+      ],
+      [
+        252,
+        80
+      ],
+      [
+        300,
+        80
+      ],
+      [
+        324,
+        120
+      ],
+      [
+        348,
+        80
+      ],
+      [
+        396,
+        80
+      ],
+      [
+        420,
+        120
+      ],
+      [
+        444,
+        80
+      ],
+      [
+        492,
+        80
+      ],
+      [
+        516,
+        120
+      ],
+      [
+        540,
+        80
+      ]
+    ],
+    "bondDoiTuCOOH": [
+      9,
+      12,
+      15
+    ],
+    "ghiChuDung": "HOexplicittrái;837C=Oxuống22C6Z;378/700C=Olên18C3Z;khônggộpCOOH/tựthêmcaption/charge.",
+    "hashSvgDaSoat": "d22c44bf39dfbd76b103566b36d7ab0c5e640ae46d7cf7685934a16f77652d91",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
