@@ -22,56 +22,77 @@ import { damBaoKtCn } from '../server/src/kiem-tra-ca-nhan-schema'
 import { metaKt } from '../server/src/kiem-tra-ca-nhan'
 import type { Env } from '../server/src/kieu'
 
+let vetCrypto: ((event: string) => void) | null = null
 const NOW = Date.parse('2026-10-12T13:30:00Z') // 20:30 giờ VN — giờ cao điểm
-beforeEach(() => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(NOW) })
-afterEach(() => { vi.useRealTimers(); xoaDemPhamVi(); xoaDemChienDich(); xoaDemCaBaoVe(); xoaDemChanKhoi(); xoaDemMetaCau() })
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(NOW)
+  if (process.env.TRACE_D1_VECTOR) {
+    const goc = crypto.subtle.sign.bind(crypto.subtle)
+    vi.spyOn(crypto.subtle, 'sign').mockImplementation(async (...args) => {
+      vetCrypto?.('crypto.sign.begin')
+      try { return await goc(...args) } finally { vetCrypto?.('crypto.sign.done') }
+    })
+  }
+})
+afterEach(() => { vi.restoreAllMocks(); vi.useRealTimers(); xoaDemPhamVi(); xoaDemChienDich(); xoaDemCaBaoVe(); xoaDemChanKhoi(); xoaDemMetaCau() })
 
 type Lenh = { first?: unknown; all?: unknown; run?: unknown; bind?: unknown }
 /** Bọc D1 đếm đợt: mỗi lần chạy (first/all/run/batch) xếp hàng; `chay` trả cả hàng khi mã đã rảnh (một đợt). */
 function boDemDot(goc: Env['DB']) {
   const hang: (() => void)[] = []
   const that = new WeakMap<object, unknown>()
-  let lan = 0
-  const cho = <T,>(f: () => Promise<T>) => new Promise<T>((ok, loi) => { lan++; hang.push(() => { f().then(ok, loi) }) })
-  const boc = (st: Lenh & object): unknown => {
+  const cauSql = new WeakMap<object, string>()
+  let lan = 0, thuTuDo = 0
+  let dauVet: Record<string, unknown>[] | null = null
+  const vet = (event: string, info: Record<string, unknown> = {}) => { dauVet?.push({ event, ...info }) }
+  const cho = <T,>(f: () => Promise<T>, sql: string) => new Promise<T>((ok, loi) => {
+    const id = ++lan; vet('enqueue', { id, sql: sql.slice(0, 1000), ...(dauVet ? { stack: new Error().stack?.split('\n').filter(x => x.includes('/server/')).slice(0, 5) } : {}) })
+    hang.push(() => { vet('start', { id }); f().then((x) => { vet('done', { id }); ok(x) }, (e) => { vet('error', { id }); loi(e) }) })
+  })
+  const boc = (st: Lenh & object, sql: string): unknown => {
     const b = {
-      bind: (...a: unknown[]) => boc((st.bind as (...x: unknown[]) => Lenh & object)(...a)),
-      first: (...a: unknown[]) => cho(() => (st.first as (...x: unknown[]) => Promise<unknown>)(...a)),
-      all: () => cho(() => (st.all as () => Promise<unknown>)()),
-      run: () => cho(() => (st.run as () => Promise<unknown>)()),
-      raw: (...a: unknown[]) => cho(() => ((st as { raw: (...x: unknown[]) => Promise<unknown> }).raw)(...a)),
+      bind: (...a: unknown[]) => boc((st.bind as (...x: unknown[]) => Lenh & object)(...a), sql),
+      first: (...a: unknown[]) => cho(() => (st.first as (...x: unknown[]) => Promise<unknown>)(...a), sql),
+      all: () => cho(() => (st.all as () => Promise<unknown>)(), sql),
+      run: () => cho(() => (st.run as () => Promise<unknown>)(), sql),
+      raw: (...a: unknown[]) => cho(() => ((st as { raw: (...x: unknown[]) => Promise<unknown> }).raw)(...a), sql),
     }
-    that.set(b, st)
+    that.set(b, st); cauSql.set(b, sql)
     return b
   }
   const g = goc as unknown as { prepare(q: string): Lenh & object; batch(ds: unknown[]): Promise<unknown> }
   const db: Record<string, unknown> = {
-    prepare: (q: string) => boc(g.prepare(q)),
-    batch: (ds: object[]) => cho(() => g.batch(ds.map((x) => that.get(x) ?? x))),
+    prepare: (q: string) => boc(g.prepare(q), q),
+    batch: (ds: object[]) => cho(() => g.batch(ds.map((x) => that.get(x) ?? x)), 'batch: ' + ds.map(x => cauSql.get(x) ?? '?').join(' | ')),
   }
   db.withSession = () => db
   const raNgoai = () => new Promise<void>((r) => setImmediate(r))
   /** Chạy `viec` tới khi có phản hồi; trả số đợt chờ D1 nối tiếp và tổng số lệnh D1 trên đường trả lời. Sau đó xả hết việc phụ (không tính). */
   async function chay<T>(viec: (chotDo: () => void) => Promise<T>, viecPhu: Promise<unknown>[]): Promise<{ kq: T; dot: number; lenh: number }> {
     let xong = false, dot = 0
+    const soDo = ++thuTuDo
+    dauVet = process.env.TRACE_D1_VECTOR ? [] : null
+    vet('begin', { soDo }); vetCrypto = (e) => vet(e)
     const lan0 = lan
     let daChot = false, dotChot = 0, lenhChot = 0
     // Chốt ngay ở biên nhận phản hồi, trước khi phía đọc tiếp luồng nhường lượt cho D1 nền.
     const chotDo = () => {
       if (daChot) return
-      daChot = true; dotChot = dot; lenhChot = lan - lan0 - hang.length
+      daChot = true; dotChot = dot; lenhChot = lan - lan0 - hang.length; vet('snapshot', { dot: dotChot, lenh: lenhChot, queued: hang.length })
     }
     const p = viec(chotDo).finally(() => { chotDo(); xong = true })
     p.catch(() => {})
     for (;;) {
       await raNgoai()
       if (xong) break
-      if (hang.length) { if (!daChot) dot++; for (const f of hang.splice(0)) f() }
+      if (hang.length) { if (!daChot) dot++; vet('flush', { dot, count: hang.length }); for (const f of hang.splice(0)) f() }
     }
     let phuXong = false
     const phu = Promise.allSettled(viecPhu).finally(() => { phuXong = true })
     for (let i = 0; i < 10_000 && !(phuXong && !hang.length); i++) { await raNgoai(); for (const f of hang.splice(0)) f() }
     await phu
+    if (process.env.TRACE_D1_VECTOR) fs.appendFileSync(process.env.TRACE_D1_VECTOR, JSON.stringify({ soDo, dot: dotChot, lenh: lenhChot, events: dauVet }) + '\n')
+    dauVet = null; vetCrypto = null
     return { kq: await p, dot: dotChot, lenh: lenhChot }
   }
   return { db: db as unknown as Env['DB'], chay }

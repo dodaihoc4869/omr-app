@@ -1,0 +1,134 @@
+{
+  "author": "cau_truc_6",
+  "scope": "Trace plan only; no repo/app/budget edits",
+  "evidence": [
+    {
+      "kind": "observed logs",
+      "detail": "lô164 lần1 nop-cau-luong-truot4đợt/7lệnh;mốc1/3; lần2ke-hoach-ngay-lai3đợt/mốc2; isolatedvector/mainPASS;fullfinalPASSkhôngxóalịchsửđỏ."
+    },
+    {
+      "kind": "code confirmed",
+      "detail": "Harnesssnapshotnewline1đãsửa;JSONkehoachvẫnsnapshotfinally. D1counterdùngsetImmediateđểflushqueue;DatefakechỉDatekhôngfakeeventloop."
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "claim": "D1nềnchạysaufirstwrite/trướcfirstreadcóthểlẫnmetricstream;khôngcòncửa sổsauparse/chotdo nhưngtrướcđóvẫncó.",
+      "proofNeeded": "D1enqueue/flush/settle nằmtrước/sauwriterfirstwrite vàreaderfirstread/chotDo theoeventseq."
+    },
+    {
+      "id": "H2",
+      "claim": "Dynamicimport/crypto/microtask làm những lượt đọc muốnparallel rơi vào2flushthay1khi4fileparallel.",
+      "proofNeeded": "SQLfingerprintcùngnhómenqueueởkhácturn dùkhôngcóD1dependencygiữa;stackcallerschỉawaitimport/signature."
+    },
+    {
+      "id": "H3",
+      "claim": "Kếhoạchthậtcóqueryphụthuộc đọc/ghi phát sinh do cache20s/60shay trạngtháisổđổi.",
+      "proofNeeded": "Trace2và3đợtcóchínhSQLkhác,dependencybatchhoặccachepathkhác;khôngđượcquyflakychoeventloopkhiquerychỉxuấthiệnbảnđỏ."
+    }
+  ],
+  "testOnlyInstrumentation": {
+    "runIdentity": [
+      "runId",
+      "gitHEAD/dirtyDiffSha",
+      "cwd",
+      "nodeVersion",
+      "vitestWorkers/pool/fileParallelism",
+      "testFile/testName",
+      "requestMetricName",
+      "fakeDateNow",
+      "performanceNow(monotonic,khôngDatefake)",
+      "sequencecounter"
+    ],
+    "d1Wrapper": {
+      "where": "tests/toc-do-may-chu-nop-2710.test.ts boDemDot prepare/bind/cho/flush(chay)",
+      "events": [
+        "sql.prepare",
+        "sql.enqueue(first/all/run/raw/batch)",
+        "pump.begin(setImmediateTurn)",
+        "sql.dispatch(groupid)",
+        "sql.resolve/reject",
+        "pump.end",
+        "metric.freeze",
+        "drain.begin/end"
+      ],
+      "payload": [
+        "requestId/sqlId,parentBatchId,batchchildfingerprints",
+        "normalizedSQLfull(orSQLhash+separatetableSQL),method",
+        "paramsTYPE/COUNTonly;neverpassword/token/answer/solution",
+        "enqueueSeq/turn,dispatchSeq/turn,resolveSeq/turn,pumpGroup",
+        "phase measuring/frozen/draining,lan/hang.length/dot snapshot",
+        "stackatprepare orenqueuetoidentifyserverfile/line"
+      ],
+      "counterRule": "Đừng thêmawait/yield vàowrapper;ghiJSONvàomemoryarray,ghiNDJSONfilesau-test;giữoriginalpromisereturn,gắnobservationalthenkhôngthaypromise. Recordbatchas1commandnhưngliệt kêchildren đểđọcthựcchất. KhôngrenameSQL/bỏquerykhỏimetric."
+    },
+    "stream": {
+      "consumerWhere": "goiLuong ngay trướcworker.fetch;fetchsettle;trước/sau reader.read;newlinefound;parse/chotDo;tailread/done",
+      "producerOption": "Trongtestinstrumentprototype writer.write/reader.read bằngtransparent spy,saveoriginalvàrestoreafterEach;lọcstreamtrênNDJSONtam. Logwrite.call/resolve/reject,chunksize/linecount/TAMflagONLYkhôngbody. CóthểspyphatTamSomexportnhưnginternalESMbindingcóthểkhôngbịintercept,khôngcoikhôngloglàkhôngphát. Khôngsửaapp.",
+      "timingCaution": "Spy thêmthen/microtasks cóthểđổiinterleaving;chạytraceon/offkhôngcấutrúcappchanged. KhôngwrapbằngTransformStreammới vìthêmbackpressurelàmđổiphépđo.",
+      "criticalEvents": [
+        "fetch.call",
+        "phatTamSom.call nếuinterceptđượcthật",
+        "writer.first.call",
+        "writer.first.resolve",
+        "reader.first.call",
+        "reader.first.resolve/newline",
+        "metric.freeze",
+        "reader.tail.call/resolve",
+        "writer.second.call/resolve",
+        "waitUntilregistered/settled"
+      ]
+    },
+    "json": {
+      "where": "keHoachhelperworker.fetch+res.json+chayfinally",
+      "events": [
+        "json.fetch.call/resolve",
+        "json.parse.call/resolve/reject",
+        "metric.freeze",
+        "waitUntil.register/settle",
+        "cache-dependentSQLfingerprints"
+      ],
+      "rule": "JSONphảigiữmetricđếnres.jsonhoàntất;khôngchốtởheadersđểlàmxanh."
+    }
+  },
+  "callgraphTargets": [
+    {
+      "file": "server/src/index.ts",
+      "range": "3823..3854",
+      "detail": "/hs/ke-hoach-ngay:ktModdynamicimport;gameIdentity callbackkhidaKy→ktSom.docKtCn+batDauKh→keHoachCoDem→dungKeHoachEm;awaitkt/gatingcong;awaitkh;cachehitcódocThanThuđọctươi."
+    },
+    {
+      "file": "server/src/ke-hoach-ngay-d1.ts",
+      "range": "892..914;260;654..670",
+      "detail": "hsKeHoachNgay:thanThuSom/laHocSinhThat/lapVaLuuKeHoachsong song;cong chặn ghi. TraceSQLsổ/ke_hoach_ngay/học_sinh/thầnthú/tổnghợpthôngquafingerprintvàstack,khôngsuychỉtừtênmetric."
+    },
+    {
+      "file": "server/src/game-v2-auth.ts",
+      "range": "41..62",
+      "detail": "signaturecryptoasync,khiđệm60strượtthìpasswordSELECTmat_khauFROMhoc_sinh,sauawaitnull cho batching. FakeDate làmTTLreproducible,cryptoschedulingvẫnreal."
+    },
+    {
+      "file": "server/src/game-v2.ts",
+      "range": "360;656..662;736",
+      "detail": "gameIdentity callback→batDauDocSom+docKtCn;chấm→phatTamSomtrướcomni/write;phầnprofile/expvàlôghiđuôi;SQLtracechỉra3queryđầu vsphụ."
+    },
+    {
+      "file": "server/src/nop-luong.ts",
+      "range": "36..46;88..96",
+      "detail": "Promise.racetam/du,rồiTransformStreamwrite1awaitduwrite2close;producerduđãchạysongsong,khônggánmọiD1sauwrite1làcritical."
+    }
+  ],
+  "executionMatrix": [
+    "Giữ1fixture/requestsequence/fakeDate nhưtestgốc;cấptracechỉ2metric nop-cau-luong-truot vàke-hoach-ngay-lai,cũngtraceamCo/requesttrướckèmIDđểpháthiệnnềnsót.",
+    "Run isolated cùngtest;full4fileparallel;worker/poolmặcđịnhvàcontrolledsingleworker đểphânbiệttải. Lặpbounded3–5lầnmỗichếđộ,khôngrerununtilgreen.",
+    "Cùnginstrumentdiffchạytạivectorvàmainclean,giữcùngdependency/Node/fixture;mốc1/3và2khôngđổi.",
+    "Lưutraceon/offsummary vàmọiđỏ/xanh,failassertgiữnguyên. Nếutracegâyđổikếtquả,chưacoitraceonlàchứngminhđãfix."
+  ],
+  "decisionRules": [
+    "SQLđợt3JSONawaitSQLđợt2thậtcầnkếtquả⇒appdependency/batchingissue;cầnfixappnghiệpvụhợp lệ,khôngđổi mốc.",
+    "CùngSQLlệnhđọcđộclậpbịđộngimport/cryptochiaflush⇒harnessdotapproximatesrealreadwaves cóschedulingvariance;cầnđịnhnghĩadependencywaves/controlledscheduler,bảo negativecontrols chứkhônggộpbừa2đợt.",
+    "Stream4/7vượtchủ yếuSQLđuôisaufirstwrite/màfirstlineđãqueued⇒phânbiệttransportdeliveryboundaryvscausalboundary;khôngtrừbằngSQLheuristic,hãygiữ2metricriêngnếucần.",
+    "NếukhôngtáihiệnđỏhoặctracekhôngphânbiệtđượcthìghiChưaxácminh,khôngclaimfixmọiflaky."
+  ]
+}

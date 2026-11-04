@@ -1,0 +1,1825 @@
+{
+  "ghiChu": "Chỉ fixture test SQLplaceholder, không token/giátrịbind/đápán. Cùng26D1:greenbatch159enqueueTRƯỚCflush2/query154..158chưastart;redbatch159enqueueSAUdone5queryấy. Greenchứngminhbatchkhôngphụthuộc5queryđó,redchưaxácminhawaitnonD1gâytrễ. Crypto3redsign.doneTRƯỚCflush1 nênkhôngquynguyêndosign. Khôngđổi mốc/khôngclaimfixxong.",
+  "cacVet": {
+    "vector-d1-trace166.jsonl": {
+      "soDo": 21,
+      "dot": 2,
+      "lenh": 26,
+      "events": [
+        {
+          "event": "begin",
+          "soDo": 21
+        },
+        {
+          "event": "enqueue",
+          "id": 134,
+          "sql": "SELECT mat_khau FROM hoc_sinh WHERE sbd=?"
+        },
+        {
+          "event": "enqueue",
+          "id": 135,
+          "sql": "SELECT c.id, c.ma_btvn, c.ten_btvn, c.gui_luc, c.han_nop, c.loi_em, c.loi_ph, c.em_xem_luc, c.ph_xem_luc, c.moc, b.han_nop AS han_hien_tai,\n              e.dap_an_json, e.xong_vong1_luc, e.lo_da_xong, e.so_chang, e.chot_luc\n         FROM ca"
+        },
+        {
+          "event": "enqueue",
+          "id": 136,
+          "sql": "SELECT gia_tri FROM cau_hinh WHERE khoa = 'exp_moi'"
+        },
+        {
+          "event": "enqueue",
+          "id": 137,
+          "sql": "SELECT json_extract(json, '$.pet') AS pet, json_type(json, '$.pet') AS pet_kieu, json_extract(json, '$.cap') AS cap,\n              json_extract(json, '$.nickname') AS nickname, json_type(json, '$.nickname') AS nickname_kieu, json_extract(js"
+        },
+        {
+          "event": "enqueue",
+          "id": 138,
+          "sql": "SELECT CASE WHEN EXISTS (SELECT 1 FROM hoc_sinh WHERE sbd = ?) OR EXISTS (SELECT 1 FROM danh_sach WHERE sbd = ?)\n                   OR EXISTS (SELECT 1 FROM luot WHERE sbd = ?) THEN 1 ELSE 0 END AS co"
+        },
+        {
+          "event": "enqueue",
+          "id": 139,
+          "sql": "SELECT e.sbd,\n       COUNT(*) AS so_su_kien,\n       COUNT(DISTINCT CASE WHEN e.ngay_vn = ? THEN e.qid END) AS da_lam,\n       COUNT(DISTINCT CASE WHEN e.ngay_vn = ? AND e.ket_qua = 1 THEN e.qid END) AS dung,\n       COUNT(DISTINCT CASE WHEN e"
+        },
+        {
+          "event": "enqueue",
+          "id": 140,
+          "sql": "SELECT khoa, gia_tri FROM cau_hinh WHERE khoa IN (?, ?, ?)"
+        },
+        {
+          "event": "enqueue",
+          "id": 141,
+          "sql": "SELECT k.sbd, k.ngay, k.so_su_kien, k.phien_ban, k.muc_tieu_json, k.deferred_count, k.over_budget_seconds FROM ke_hoach_ngay k\n        WHERE k.sbd IN (SELECT value FROM json_each(?)) AND k.ngay = (SELECT MAX(z.ngay) FROM ke_hoach_ngay z WHE"
+        },
+        {
+          "event": "enqueue",
+          "id": 142,
+          "sql": "SELECT khoa, gia_tri FROM cau_hinh WHERE khoa IN ('ngay_nghi', 'ngan_sach_luot')"
+        },
+        {
+          "event": "enqueue",
+          "id": 143,
+          "sql": "SELECT gia_tri FROM cau_hinh WHERE khoa = ?"
+        },
+        {
+          "event": "enqueue",
+          "id": 144,
+          "sql": "SELECT sbd,lop,ten_lop FROM hoc_sinh WHERE sbd IN (SELECT value FROM json_each(?))"
+        },
+        {
+          "event": "enqueue",
+          "id": 145,
+          "sql": "SELECT 'c' AS k, sbd, qid AS c1, ma_dang AS c2, moc_on_ke AS c3, lan_sai AS c4, luc_cuoi AS c5, NULL AS c6, NULL AS c7, NULL AS c8, NULL AS c9 FROM nam_kt_cau\n        WHERE sbd IN (SELECT value FROM json_each(?)) AND trang_thai IN ('moi_sai"
+        },
+        {
+          "event": "enqueue",
+          "id": 146,
+          "sql": "SELECT ca.ma_ca,ca.bank_r2,ca.cap_nhat_luc,ca.trang_thai,ca.cong_bo,ca.het_han_vao,ca.thoi_gian_phut,ca.loai,ca.han_nop,ca.bat_dau,\n    (SELECT COUNT(*) FROM luot l WHERE l.ma_ca=ca.ma_ca) entered,\n    (SELECT COUNT(*) FROM luot l WHERE l.m"
+        },
+        {
+          "event": "enqueue",
+          "id": 147,
+          "sql": "SELECT sbd, ngay, ket_qua FROM ke_hoach_ngay WHERE sbd IN (SELECT value FROM json_each(?)) AND ngay < ? AND ngay >= ? ORDER BY ngay DESC"
+        },
+        {
+          "event": "enqueue",
+          "id": 148,
+          "sql": "SELECT sbd, minutes FROM study_preferences WHERE sbd IN (SELECT value FROM json_each(?))"
+        },
+        {
+          "event": "enqueue",
+          "id": 149,
+          "sql": "SELECT sbd, id, dang FROM game_v2_task WHERE sbd IN (SELECT value FROM json_each(?)) AND completed_at IS NULL"
+        },
+        {
+          "event": "enqueue",
+          "id": 150,
+          "sql": "SELECT ma_ca, ten_ca, bat_dau, lop FROM ca WHERE trang_thai = 'mo' AND COALESCE(loai, 'thi') = 'thi' AND bat_dau > ? AND bat_dau <= ?"
+        },
+        {
+          "event": "enqueue",
+          "id": 151,
+          "sql": "SELECT be.sbd, be.ma_btvn, COALESCE(be.lo_da_xong, 0) AS lo, b.so_cau, b.giao_luc, b.han_nop, b.ca_nhan, be.so_cau_em, be.chot_luc, be.chang_mo_json\n         FROM btvn_em be JOIN btvn b ON b.ma_btvn = be.ma_btvn\n        WHERE be.sbd IN (SEL"
+        },
+        {
+          "event": "enqueue",
+          "id": 152,
+          "sql": "SELECT sbd, id, question_count, created_at, started_at, qid_json AS qid_json FROM mom_bai\n        WHERE sbd IN (SELECT value FROM json_each(?)) AND submitted_at IS NULL AND ((started_at IS NOT NULL AND started_at > ?) OR (started_at IS NULL"
+        },
+        {
+          "event": "enqueue",
+          "id": 153,
+          "sql": "SELECT k.id,k.sbd,k.lop,k.ngay,k.mo_luc,k.han_luc,k.trang_thai,k.nop_luc,k.diem,k.da_ghi,k.cap_nhat_luc,\n COALESCE((SELECT json_remove(json_set(km.meta_json,'$.daTra',(SELECT COUNT(*) FROM json_each(km.meta_json,'$.phan') p JOIN json_each(k"
+        },
+        {
+          "event": "flush",
+          "dot": 1,
+          "count": 20
+        },
+        {
+          "event": "start",
+          "id": 134
+        },
+        {
+          "event": "start",
+          "id": 135
+        },
+        {
+          "event": "start",
+          "id": 136
+        },
+        {
+          "event": "start",
+          "id": 137
+        },
+        {
+          "event": "start",
+          "id": 138
+        },
+        {
+          "event": "start",
+          "id": 139
+        },
+        {
+          "event": "start",
+          "id": 140
+        },
+        {
+          "event": "start",
+          "id": 141
+        },
+        {
+          "event": "start",
+          "id": 142
+        },
+        {
+          "event": "start",
+          "id": 143
+        },
+        {
+          "event": "start",
+          "id": 144
+        },
+        {
+          "event": "start",
+          "id": 145
+        },
+        {
+          "event": "start",
+          "id": 146
+        },
+        {
+          "event": "start",
+          "id": 147
+        },
+        {
+          "event": "start",
+          "id": 148
+        },
+        {
+          "event": "start",
+          "id": 149
+        },
+        {
+          "event": "start",
+          "id": 150
+        },
+        {
+          "event": "start",
+          "id": 151
+        },
+        {
+          "event": "start",
+          "id": 152
+        },
+        {
+          "event": "start",
+          "id": 153
+        },
+        {
+          "event": "done",
+          "id": 134
+        },
+        {
+          "event": "done",
+          "id": 135
+        },
+        {
+          "event": "done",
+          "id": 136
+        },
+        {
+          "event": "done",
+          "id": 137
+        },
+        {
+          "event": "done",
+          "id": 138
+        },
+        {
+          "event": "done",
+          "id": 139
+        },
+        {
+          "event": "done",
+          "id": 140
+        },
+        {
+          "event": "done",
+          "id": 141
+        },
+        {
+          "event": "done",
+          "id": 142
+        },
+        {
+          "event": "done",
+          "id": 143
+        },
+        {
+          "event": "done",
+          "id": 144
+        },
+        {
+          "event": "done",
+          "id": 145
+        },
+        {
+          "event": "done",
+          "id": 146
+        },
+        {
+          "event": "done",
+          "id": 147
+        },
+        {
+          "event": "done",
+          "id": 148
+        },
+        {
+          "event": "done",
+          "id": 149
+        },
+        {
+          "event": "done",
+          "id": 150
+        },
+        {
+          "event": "done",
+          "id": 151
+        },
+        {
+          "event": "done",
+          "id": 152
+        },
+        {
+          "event": "done",
+          "id": 153
+        },
+        {
+          "event": "enqueue",
+          "id": 154,
+          "sql": "WITH dang AS (SELECT be.ma_btvn AS ma, COALESCE(NULLIF(TRIM(c.ten_ca), ''), NULLIF(TRIM(d.ten_de), ''), '') AS ten, b.han_nop, b.giao_luc, b.so_cau AS so_cau_bai, COALESCE(be.lo_da_xong, 0) AS lo_da_xong, COALESCE(b.ca_nhan, 0) AS ca_nhan, "
+        },
+        {
+          "event": "enqueue",
+          "id": 155,
+          "sql": "SELECT 'em' AS k, lop AS a, nam_sinh AS b, NULL AS c, NULL AS d, NULL AS e, NULL AS f FROM hoc_sinh WHERE sbd = ?\n     UNION ALL SELECT 'ds', lop, nam_sinh, NULL, NULL, NULL, NULL FROM danh_sach WHERE sbd = ?\n     UNION ALL SELECT 'ca', ma_"
+        },
+        {
+          "event": "enqueue",
+          "id": 156,
+          "sql": "SELECT moc_on_ke AS ngay, COUNT(*) AS n FROM nam_kt_cau\n      WHERE sbd = ? AND trang_thai IN ('moi_sai', 'dang_on', 'da_khac_phuc') AND can_day_lai = 0 AND moc_on_ke IS NOT NULL AND moc_on_ke < ?\n      GROUP BY moc_on_ke"
+        },
+        {
+          "event": "enqueue",
+          "id": 157,
+          "sql": "SELECT id, title, question_count, created_at FROM mom_bai\n      WHERE sbd = ? AND COALESCE(submitted_at, '') = '' AND substr(id, 1, 6) <> 'daily_' AND created_at >= ? ORDER BY created_at, id LIMIT 60"
+        },
+        {
+          "event": "enqueue",
+          "id": 158,
+          "sql": "SELECT 'g' AS k, giay AS a, NULL AS b FROM (SELECT giay FROM su_kien_hoc WHERE sbd = ? AND giay IS NOT NULL AND ngay_vn >= ? ORDER BY luc DESC LIMIT 400)\n     UNION ALL SELECT 'h', CAST(strftime('%H', luc, '+7 hours') AS INTEGER), COUNT(*) "
+        },
+        {
+          "event": "enqueue",
+          "id": 159,
+          "sql": "batch"
+        },
+        {
+          "event": "flush",
+          "dot": 2,
+          "count": 6
+        },
+        {
+          "event": "start",
+          "id": 154
+        },
+        {
+          "event": "start",
+          "id": 155
+        },
+        {
+          "event": "start",
+          "id": 156
+        },
+        {
+          "event": "start",
+          "id": 157
+        },
+        {
+          "event": "start",
+          "id": 158
+        },
+        {
+          "event": "start",
+          "id": 159
+        },
+        {
+          "event": "done",
+          "id": 154
+        },
+        {
+          "event": "done",
+          "id": 155
+        },
+        {
+          "event": "done",
+          "id": 156
+        },
+        {
+          "event": "done",
+          "id": 157
+        },
+        {
+          "event": "done",
+          "id": 158
+        },
+        {
+          "event": "done",
+          "id": 159
+        },
+        {
+          "event": "snapshot",
+          "dot": 2,
+          "lenh": 26,
+          "queued": 0
+        }
+      ]
+    },
+    "vector-d1-trace166-2.jsonl": {
+      "soDo": 21,
+      "dot": 3,
+      "lenh": 26,
+      "events": [
+        {
+          "event": "begin",
+          "soDo": 21
+        },
+        {
+          "event": "enqueue",
+          "id": 134,
+          "sql": "SELECT mat_khau FROM hoc_sinh WHERE sbd=?"
+        },
+        {
+          "event": "enqueue",
+          "id": 135,
+          "sql": "SELECT c.id, c.ma_btvn, c.ten_btvn, c.gui_luc, c.han_nop, c.loi_em, c.loi_ph, c.em_xem_luc, c.ph_xem_luc, c.moc, b.han_nop AS han_hien_tai,\n              e.dap_an_json, e.xong_vong1_luc, e.lo_da_xong, e.so_chang, e.chot_luc\n         FROM ca"
+        },
+        {
+          "event": "enqueue",
+          "id": 136,
+          "sql": "SELECT gia_tri FROM cau_hinh WHERE khoa = 'exp_moi'"
+        },
+        {
+          "event": "enqueue",
+          "id": 137,
+          "sql": "SELECT json_extract(json, '$.pet') AS pet, json_type(json, '$.pet') AS pet_kieu, json_extract(json, '$.cap') AS cap,\n              json_extract(json, '$.nickname') AS nickname, json_type(json, '$.nickname') AS nickname_kieu, json_extract(js"
+        },
+        {
+          "event": "enqueue",
+          "id": 138,
+          "sql": "SELECT CASE WHEN EXISTS (SELECT 1 FROM hoc_sinh WHERE sbd = ?) OR EXISTS (SELECT 1 FROM danh_sach WHERE sbd = ?)\n                   OR EXISTS (SELECT 1 FROM luot WHERE sbd = ?) THEN 1 ELSE 0 END AS co"
+        },
+        {
+          "event": "enqueue",
+          "id": 139,
+          "sql": "SELECT e.sbd,\n       COUNT(*) AS so_su_kien,\n       COUNT(DISTINCT CASE WHEN e.ngay_vn = ? THEN e.qid END) AS da_lam,\n       COUNT(DISTINCT CASE WHEN e.ngay_vn = ? AND e.ket_qua = 1 THEN e.qid END) AS dung,\n       COUNT(DISTINCT CASE WHEN e"
+        },
+        {
+          "event": "enqueue",
+          "id": 140,
+          "sql": "SELECT khoa, gia_tri FROM cau_hinh WHERE khoa IN (?, ?, ?)"
+        },
+        {
+          "event": "enqueue",
+          "id": 141,
+          "sql": "SELECT k.sbd, k.ngay, k.so_su_kien, k.phien_ban, k.muc_tieu_json, k.deferred_count, k.over_budget_seconds FROM ke_hoach_ngay k\n        WHERE k.sbd IN (SELECT value FROM json_each(?)) AND k.ngay = (SELECT MAX(z.ngay) FROM ke_hoach_ngay z WHE"
+        },
+        {
+          "event": "enqueue",
+          "id": 142,
+          "sql": "SELECT khoa, gia_tri FROM cau_hinh WHERE khoa IN ('ngay_nghi', 'ngan_sach_luot')"
+        },
+        {
+          "event": "enqueue",
+          "id": 143,
+          "sql": "SELECT gia_tri FROM cau_hinh WHERE khoa = ?"
+        },
+        {
+          "event": "enqueue",
+          "id": 144,
+          "sql": "SELECT sbd,lop,ten_lop FROM hoc_sinh WHERE sbd IN (SELECT value FROM json_each(?))"
+        },
+        {
+          "event": "enqueue",
+          "id": 145,
+          "sql": "SELECT 'c' AS k, sbd, qid AS c1, ma_dang AS c2, moc_on_ke AS c3, lan_sai AS c4, luc_cuoi AS c5, NULL AS c6, NULL AS c7, NULL AS c8, NULL AS c9 FROM nam_kt_cau\n        WHERE sbd IN (SELECT value FROM json_each(?)) AND trang_thai IN ('moi_sai"
+        },
+        {
+          "event": "enqueue",
+          "id": 146,
+          "sql": "SELECT ca.ma_ca,ca.bank_r2,ca.cap_nhat_luc,ca.trang_thai,ca.cong_bo,ca.het_han_vao,ca.thoi_gian_phut,ca.loai,ca.han_nop,ca.bat_dau,\n    (SELECT COUNT(*) FROM luot l WHERE l.ma_ca=ca.ma_ca) entered,\n    (SELECT COUNT(*) FROM luot l WHERE l.m"
+        },
+        {
+          "event": "enqueue",
+          "id": 147,
+          "sql": "SELECT sbd, ngay, ket_qua FROM ke_hoach_ngay WHERE sbd IN (SELECT value FROM json_each(?)) AND ngay < ? AND ngay >= ? ORDER BY ngay DESC"
+        },
+        {
+          "event": "enqueue",
+          "id": 148,
+          "sql": "SELECT sbd, minutes FROM study_preferences WHERE sbd IN (SELECT value FROM json_each(?))"
+        },
+        {
+          "event": "enqueue",
+          "id": 149,
+          "sql": "SELECT sbd, id, dang FROM game_v2_task WHERE sbd IN (SELECT value FROM json_each(?)) AND completed_at IS NULL"
+        },
+        {
+          "event": "enqueue",
+          "id": 150,
+          "sql": "SELECT ma_ca, ten_ca, bat_dau, lop FROM ca WHERE trang_thai = 'mo' AND COALESCE(loai, 'thi') = 'thi' AND bat_dau > ? AND bat_dau <= ?"
+        },
+        {
+          "event": "enqueue",
+          "id": 151,
+          "sql": "SELECT be.sbd, be.ma_btvn, COALESCE(be.lo_da_xong, 0) AS lo, b.so_cau, b.giao_luc, b.han_nop, b.ca_nhan, be.so_cau_em, be.chot_luc, be.chang_mo_json\n         FROM btvn_em be JOIN btvn b ON b.ma_btvn = be.ma_btvn\n        WHERE be.sbd IN (SEL"
+        },
+        {
+          "event": "enqueue",
+          "id": 152,
+          "sql": "SELECT sbd, id, question_count, created_at, started_at, qid_json AS qid_json FROM mom_bai\n        WHERE sbd IN (SELECT value FROM json_each(?)) AND submitted_at IS NULL AND ((started_at IS NOT NULL AND started_at > ?) OR (started_at IS NULL"
+        },
+        {
+          "event": "enqueue",
+          "id": 153,
+          "sql": "SELECT k.id,k.sbd,k.lop,k.ngay,k.mo_luc,k.han_luc,k.trang_thai,k.nop_luc,k.diem,k.da_ghi,k.cap_nhat_luc,\n COALESCE((SELECT json_remove(json_set(km.meta_json,'$.daTra',(SELECT COUNT(*) FROM json_each(km.meta_json,'$.phan') p JOIN json_each(k"
+        },
+        {
+          "event": "flush",
+          "dot": 1,
+          "count": 20
+        },
+        {
+          "event": "start",
+          "id": 134
+        },
+        {
+          "event": "start",
+          "id": 135
+        },
+        {
+          "event": "start",
+          "id": 136
+        },
+        {
+          "event": "start",
+          "id": 137
+        },
+        {
+          "event": "start",
+          "id": 138
+        },
+        {
+          "event": "start",
+          "id": 139
+        },
+        {
+          "event": "start",
+          "id": 140
+        },
+        {
+          "event": "start",
+          "id": 141
+        },
+        {
+          "event": "start",
+          "id": 142
+        },
+        {
+          "event": "start",
+          "id": 143
+        },
+        {
+          "event": "start",
+          "id": 144
+        },
+        {
+          "event": "start",
+          "id": 145
+        },
+        {
+          "event": "start",
+          "id": 146
+        },
+        {
+          "event": "start",
+          "id": 147
+        },
+        {
+          "event": "start",
+          "id": 148
+        },
+        {
+          "event": "start",
+          "id": 149
+        },
+        {
+          "event": "start",
+          "id": 150
+        },
+        {
+          "event": "start",
+          "id": 151
+        },
+        {
+          "event": "start",
+          "id": 152
+        },
+        {
+          "event": "start",
+          "id": 153
+        },
+        {
+          "event": "done",
+          "id": 134
+        },
+        {
+          "event": "done",
+          "id": 135
+        },
+        {
+          "event": "done",
+          "id": 136
+        },
+        {
+          "event": "done",
+          "id": 137
+        },
+        {
+          "event": "done",
+          "id": 138
+        },
+        {
+          "event": "done",
+          "id": 139
+        },
+        {
+          "event": "done",
+          "id": 140
+        },
+        {
+          "event": "done",
+          "id": 141
+        },
+        {
+          "event": "done",
+          "id": 142
+        },
+        {
+          "event": "done",
+          "id": 143
+        },
+        {
+          "event": "done",
+          "id": 144
+        },
+        {
+          "event": "done",
+          "id": 145
+        },
+        {
+          "event": "done",
+          "id": 146
+        },
+        {
+          "event": "done",
+          "id": 147
+        },
+        {
+          "event": "done",
+          "id": 148
+        },
+        {
+          "event": "done",
+          "id": 149
+        },
+        {
+          "event": "done",
+          "id": 150
+        },
+        {
+          "event": "done",
+          "id": 151
+        },
+        {
+          "event": "done",
+          "id": 152
+        },
+        {
+          "event": "done",
+          "id": 153
+        },
+        {
+          "event": "enqueue",
+          "id": 154,
+          "sql": "WITH dang AS (SELECT be.ma_btvn AS ma, COALESCE(NULLIF(TRIM(c.ten_ca), ''), NULLIF(TRIM(d.ten_de), ''), '') AS ten, b.han_nop, b.giao_luc, b.so_cau AS so_cau_bai, COALESCE(be.lo_da_xong, 0) AS lo_da_xong, COALESCE(b.ca_nhan, 0) AS ca_nhan, "
+        },
+        {
+          "event": "enqueue",
+          "id": 155,
+          "sql": "SELECT 'em' AS k, lop AS a, nam_sinh AS b, NULL AS c, NULL AS d, NULL AS e, NULL AS f FROM hoc_sinh WHERE sbd = ?\n     UNION ALL SELECT 'ds', lop, nam_sinh, NULL, NULL, NULL, NULL FROM danh_sach WHERE sbd = ?\n     UNION ALL SELECT 'ca', ma_"
+        },
+        {
+          "event": "enqueue",
+          "id": 156,
+          "sql": "SELECT moc_on_ke AS ngay, COUNT(*) AS n FROM nam_kt_cau\n      WHERE sbd = ? AND trang_thai IN ('moi_sai', 'dang_on', 'da_khac_phuc') AND can_day_lai = 0 AND moc_on_ke IS NOT NULL AND moc_on_ke < ?\n      GROUP BY moc_on_ke"
+        },
+        {
+          "event": "enqueue",
+          "id": 157,
+          "sql": "SELECT id, title, question_count, created_at FROM mom_bai\n      WHERE sbd = ? AND COALESCE(submitted_at, '') = '' AND substr(id, 1, 6) <> 'daily_' AND created_at >= ? ORDER BY created_at, id LIMIT 60"
+        },
+        {
+          "event": "enqueue",
+          "id": 158,
+          "sql": "SELECT 'g' AS k, giay AS a, NULL AS b FROM (SELECT giay FROM su_kien_hoc WHERE sbd = ? AND giay IS NOT NULL AND ngay_vn >= ? ORDER BY luc DESC LIMIT 400)\n     UNION ALL SELECT 'h', CAST(strftime('%H', luc, '+7 hours') AS INTEGER), COUNT(*) "
+        },
+        {
+          "event": "flush",
+          "dot": 2,
+          "count": 5
+        },
+        {
+          "event": "start",
+          "id": 154
+        },
+        {
+          "event": "start",
+          "id": 155
+        },
+        {
+          "event": "start",
+          "id": 156
+        },
+        {
+          "event": "start",
+          "id": 157
+        },
+        {
+          "event": "start",
+          "id": 158
+        },
+        {
+          "event": "done",
+          "id": 154
+        },
+        {
+          "event": "done",
+          "id": 155
+        },
+        {
+          "event": "done",
+          "id": 156
+        },
+        {
+          "event": "done",
+          "id": 157
+        },
+        {
+          "event": "done",
+          "id": 158
+        },
+        {
+          "event": "enqueue",
+          "id": 159,
+          "sql": "batch"
+        },
+        {
+          "event": "flush",
+          "dot": 3,
+          "count": 1
+        },
+        {
+          "event": "start",
+          "id": 159
+        },
+        {
+          "event": "done",
+          "id": 159
+        },
+        {
+          "event": "snapshot",
+          "dot": 3,
+          "lenh": 26,
+          "queued": 0
+        }
+      ]
+    },
+    "vector-d1-trace166-stack.jsonl": {
+      "soDo": 21,
+      "dot": 2,
+      "lenh": 26,
+      "events": [
+        {
+          "event": "begin",
+          "soDo": 21
+        },
+        {
+          "event": "enqueue",
+          "id": 134,
+          "sql": "SELECT mat_khau FROM hoc_sinh WHERE sbd=?",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/game-v2-auth.ts:60:93"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 135,
+          "sql": "SELECT c.id, c.ma_btvn, c.ten_btvn, c.gui_luc, c.han_nop, c.loi_em, c.loi_ph, c.em_xem_luc, c.ph_xem_luc, c.moc, b.han_nop AS han_hien_tai,\n              e.dap_an_json, e.xong_vong1_luc, e.lo_da_xong, e.so_chang, e.chot_luc\n         FROM canh_bao_thay c\n         JOIN btvn_em e ON e.ma_btvn = c.ma_btvn AND e.sbd = c.sbd\n         JOIN btvn b ON b.ma_btvn = c.ma_btvn\n        WHERE c.sbd = ? AND c.gui_luc >= ? AND e.nop_luc IS NULL AND e.thu_hoi = 0 AND b.da_xoa = 0 AND (? = 'em' OR (c.gui_ph = 1 AND c.loi_ph <> ''))\n        ORDER BY c.gui_luc DESC LIMIT 3",
+          "stack": [
+            "    at docCanhBaoCuaEm (/workspace/omr-vector/server/src/canh-bao-thay.ts:192:72)",
+            "    at canhBaoChoEm (/workspace/omr-vector/server/src/canh-bao-thay.ts:201:20)",
+            "    at dungKeHoachEm (/workspace/omr-vector/server/src/index.ts:154:36)",
+            "    at /workspace/omr-vector/server/src/index.ts:3834:188",
+            "    at keHoachCoDem (/workspace/omr-vector/server/src/dem-ke-hoach.ts:33:31)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 136,
+          "sql": "SELECT gia_tri FROM cau_hinh WHERE khoa = 'exp_moi'",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/exp-d1.ts:69:144",
+            "    at nhoTheoLuot (/workspace/omr-vector/server/src/doc-d1-theo-luot.ts:55:18)",
+            "    at /workspace/omr-vector/server/src/exp-d1.ts:69:28",
+            "    at an (/workspace/omr-vector/server/src/exp-d1.ts:48:18)",
+            "    at docCauHinhExp (/workspace/omr-vector/server/src/exp-d1.ts:69:19)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 137,
+          "sql": "SELECT json_extract(json, '$.pet') AS pet, json_type(json, '$.pet') AS pet_kieu, json_extract(json, '$.cap') AS cap,\n              json_extract(json, '$.nickname') AS nickname, json_type(json, '$.nickname') AS nickname_kieu, json_extract(json, '$.choice') AS choice\n         FROM game_v2_profile WHERE sbd = ?",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:882:17",
+            "    at tat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:45:18)",
+            "    at docThanThu (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:877:19)",
+            "    at hsKeHoachNgay (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:905:22)",
+            "    at hsKeHoachNgayCoExp (/workspace/omr-vector/server/src/exp-d1.ts:1131:19)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 138,
+          "sql": "SELECT CASE WHEN EXISTS (SELECT 1 FROM hoc_sinh WHERE sbd = ?) OR EXISTS (SELECT 1 FROM danh_sach WHERE sbd = ?)\n                   OR EXISTS (SELECT 1 FROM luot WHERE sbd = ?) THEN 1 ELSE 0 END AS co",
+          "stack": [
+            "    at laHocSinhThat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:859:25)",
+            "    at hsKeHoachNgay (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:906:17)",
+            "    at hsKeHoachNgayCoExp (/workspace/omr-vector/server/src/exp-d1.ts:1131:19)",
+            "    at dungKeHoachEm (/workspace/omr-vector/server/src/index.ts:159:20)",
+            "    at /workspace/omr-vector/server/src/index.ts:3834:188"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 139,
+          "sql": "SELECT e.sbd,\n       COUNT(*) AS so_su_kien,\n       COUNT(DISTINCT CASE WHEN e.ngay_vn = ? THEN e.qid END) AS da_lam,\n       COUNT(DISTINCT CASE WHEN e.ngay_vn = ? AND e.ket_qua = 1 THEN e.qid END) AS dung,\n       COUNT(DISTINCT CASE WHEN e.ngay_vn = ? AND e.ket_qua = 1 AND EXISTS (SELECT 1 FROM su_kien_hoc p WHERE p.sbd = e.sbd AND p.qid = e.qid AND p.ngay_vn < e.ngay_vn AND (p.ket_qua = 0 OR p.ket_qua IS NULL)) THEN e.qid END) AS len_bac,\n       COUNT(DISTINCT CASE WHEN e.ngay_vn = ? AND e.ket_qua = 0 AND EXISTS (SELECT 1 FROM su_kien_hoc p WHERE p.sbd = e.sbd AND p.qid = e.qid AND p.ngay_vn < e.ngay_vn AND p.ket_qua = 1) THEN e.qid END) AS tut_bac,\n       COUNT(DISTINCT CASE WHEN e.ngay_vn = ? AND e.luc >= ? AND e.ket_qua IS NOT NULL THEN e.qid END) AS hien_thi_so_cau,\n       COUNT(DISTINCT CASE WHEN e.ngay_vn = ? AND e.luc >= ? AND e.ket_qua = 1 THEN e.qid END) AS hien_thi_so_dung,\n       GROUP_CONCAT(CASE WHEN e.giay IS NOT NULL AND e.ngay_vn >= ? THEN e.giay END) AS giay_list\n  F",
+          "stack": [
+            "    at docTongHop (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:220:55)",
+            "    at docTongHopHomNay (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:235:16)",
+            "    at batDauDocKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:639:14)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:656:25)",
+            "    at hsKeHoachNgay (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:908:15)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 140,
+          "sql": "SELECT khoa, gia_tri FROM cau_hinh WHERE khoa IN (?, ?, ?)",
+          "stack": [
+            "    at docMocHienThi (/workspace/omr-vector/server/src/moc-no.ts:81:160)",
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:238:39",
+            "    at docTongHopHomNay (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:241:4)",
+            "    at batDauDocKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:639:14)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:656:25)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 141,
+          "sql": "SELECT k.sbd, k.ngay, k.so_su_kien, k.phien_ban, k.muc_tieu_json, k.deferred_count, k.over_budget_seconds FROM ke_hoach_ngay k\n        WHERE k.sbd IN (SELECT value FROM json_each(?)) AND k.ngay = (SELECT MAX(z.ngay) FROM ke_hoach_ngay z WHERE z.sbd = k.sbd)",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:643:17",
+            "    at tat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:45:18)",
+            "    at batDauDocKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:640:9)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:656:25)",
+            "    at hsKeHoachNgay (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:908:15)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 142,
+          "sql": "SELECT khoa, gia_tri FROM cau_hinh WHERE khoa IN ('ngay_nghi', 'ngan_sach_luot')",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:79:5",
+            "    at tat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:45:18)",
+            "    at docCauHinhKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:77:19)",
+            "    at docDauVao (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:274:25)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:661:19)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 143,
+          "sql": "SELECT gia_tri FROM cau_hinh WHERE khoa = ?",
+          "stack": [
+            "    at phamViBat (/workspace/omr-vector/server/src/pham-vi-hoc.ts:144:106)",
+            "    at docDauVao (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:276:27)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:661:19)",
+            "    at hsKeHoachNgay (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:908:15)",
+            "    at hsKeHoachNgayCoExp (/workspace/omr-vector/server/src/exp-d1.ts:1131:19)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 144,
+          "sql": "SELECT sbd,lop,ten_lop FROM hoc_sinh WHERE sbd IN (SELECT value FROM json_each(?))",
+          "stack": [
+            "    at doc (/workspace/omr-vector/server/src/game-v2-bank.ts:388:160)",
+            "    at docKhoiVaLopCacEm (/workspace/omr-vector/server/src/game-v2-bank.ts:390:18)",
+            "    at docDauVao (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:277:25)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:661:19)",
+            "    at hsKeHoachNgay (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:908:15)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 145,
+          "sql": "SELECT 'c' AS k, sbd, qid AS c1, ma_dang AS c2, moc_on_ke AS c3, lan_sai AS c4, luc_cuoi AS c5, NULL AS c6, NULL AS c7, NULL AS c8, NULL AS c9 FROM nam_kt_cau\n        WHERE sbd IN (SELECT value FROM json_each(?)) AND trang_thai IN ('moi_sai','dang_on','da_khac_phuc','chua_thay_sai') AND can_day_lai = 0 AND moc_on_ke IS NOT NULL AND moc_on_ke <= ?\n       UNION ALL SELECT 'n', sbd, COUNT(*), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL FROM nam_kt_cau WHERE sbd IN (SELECT value FROM json_each(?)) AND trang_thai IN ('moi_sai','dang_on') GROUP BY sbd\n       UNION ALL SELECT 'd', sbd, ma_dang, so_gap, so_sai, so_da_khac_phuc, so_moi_sai, so_chua_thay_sai, bac, moc_on_ke, moc_moi_sai FROM nam_kt_dang WHERE sbd IN (SELECT value FROM json_each(?))\n       UNION ALL SELECT 'x', NULL, (SELECT 1 FROM game_v2_index LIMIT 1), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:288:29",
+            "    at tat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:45:18)",
+            "    at hoi (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:282:35)",
+            "    at docHoSoD1 (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:290:23)",
+            "    at docDauVao (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:301:18)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 146,
+          "sql": "SELECT ca.ma_ca,ca.bank_r2,ca.cap_nhat_luc,ca.trang_thai,ca.cong_bo,ca.het_han_vao,ca.thoi_gian_phut,ca.loai,ca.han_nop,ca.bat_dau,\n    (SELECT COUNT(*) FROM luot l WHERE l.ma_ca=ca.ma_ca) entered,\n    (SELECT COUNT(*) FROM luot l WHERE l.ma_ca=ca.ma_ca AND l.trang_thai='da_nop') submitted,\n    (SELECT COUNT(*) FROM luot l WHERE l.ma_ca=ca.ma_ca AND l.trang_thai='dang_lam' AND (l.het_gio_luc IS NULL OR l.het_gio_luc>?)) active\n    FROM ca WHERE ca.trang_thai<>'da_xoa' AND (ca.trang_thai='mo' OR COALESCE(NULLIF(ca.bat_dau,''),ca.cap_nhat_luc)>=?) ORDER BY ca.ma_ca",
+          "stack": [
+            "    at caDangBaoVe (/workspace/omr-vector/server/src/game-v2-bank.ts:259:188)",
+            "    at protectedQuestions (/workspace/omr-vector/server/src/game-v2-bank.ts:271:26)",
+            "    at baoVeMotLuot (/workspace/omr-vector/server/src/cau-theo-qid.ts:127:27)",
+            "    at docDauVao (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:305:23)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:661:19)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 147,
+          "sql": "SELECT sbd, ngay, ket_qua FROM ke_hoach_ngay WHERE sbd IN (SELECT value FROM json_each(?)) AND ngay < ? AND ngay >= ? ORDER BY ngay DESC",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:308:180",
+            "    at tat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:45:18)",
+            "    at docDauVao (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:308:20)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:661:19)",
+            "    at hsKeHoachNgay (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:908:15)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 148,
+          "sql": "SELECT sbd, minutes FROM study_preferences WHERE sbd IN (SELECT value FROM json_each(?))",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:309:116",
+            "    at tat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:45:18)",
+            "    at docDauVao (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:309:20)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:661:19)",
+            "    at hsKeHoachNgay (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:908:15)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 149,
+          "sql": "SELECT sbd, id, dang FROM game_v2_task WHERE sbd IN (SELECT value FROM json_each(?)) AND completed_at IS NULL",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:310:137",
+            "    at tat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:45:18)",
+            "    at docDauVao (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:310:20)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:661:19)",
+            "    at hsKeHoachNgay (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:908:15)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 150,
+          "sql": "SELECT ma_ca, ten_ca, bat_dau, lop FROM ca WHERE trang_thai = 'mo' AND COALESCE(loai, 'thi') = 'thi' AND bat_dau > ? AND bat_dau <= ?",
+          "stack": [
+            "    at docCaSapMo (/workspace/omr-vector/server/src/game-v2-bank.ts:221:191)",
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:313:31",
+            "    at tat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:45:18)",
+            "    at docDauVao (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:313:21)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:661:19)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 151,
+          "sql": "SELECT be.sbd, be.ma_btvn, COALESCE(be.lo_da_xong, 0) AS lo, b.so_cau, b.giao_luc, b.han_nop, b.ca_nhan, be.so_cau_em, be.chot_luc, be.chang_mo_json\n         FROM btvn_em be JOIN btvn b ON b.ma_btvn = be.ma_btvn\n        WHERE be.sbd IN (SELECT value FROM json_each(?)) AND be.thu_hoi = 0 AND b.da_xoa = 0 AND be.nop_luc IS NULL AND b.han_nop > ?",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:320:155",
+            "    at tat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:45:18)",
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:320:20",
+            "    at docDauVao (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:324:4)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:661:19)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 152,
+          "sql": "SELECT sbd, id, question_count, created_at, started_at, qid_json AS qid_json FROM mom_bai\n        WHERE sbd IN (SELECT value FROM json_each(?)) AND submitted_at IS NULL AND ((started_at IS NOT NULL AND started_at > ?) OR (started_at IS NULL AND (id NOT LIKE 'daily_%' OR id = ?)))",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:332:77",
+            "    at tat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:45:18)",
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:332:20",
+            "    at docDauVao (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:335:4)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:661:19)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 153,
+          "sql": "SELECT k.id,k.sbd,k.lop,k.ngay,k.mo_luc,k.han_luc,k.trang_thai,k.nop_luc,k.diem,k.da_ghi,k.cap_nhat_luc,\n COALESCE((SELECT json_remove(json_set(km.meta_json,'$.daTra',(SELECT COUNT(*) FROM json_each(km.meta_json,'$.phan') p JOIN json_each(k.tra_json) a ON a.key=p.key WHERE a.type='text' AND CASE p.value WHEN 'I' THEN a.value IN('A','B','C','D') WHEN 'II' THEN length(a.value)=4 AND replace(replace(a.value,'D',''),'S','')='' ELSE length(trim(a.value,char(9,10,11,12,13,32,160,5760,8192,8193,8194,8195,8196,8197,8198,8199,8200,8201,8202,8232,8233,8239,8287,12288,65279)))>0 AND length(a.value)<=100 END)),'$.phan') FROM kiem_tra_ca_nhan_meta km WHERE km.id=k.id),\n json_object('tong',json_array_length(k.json,'$.cau'),'phienBan',json_extract(k.json,'$.phienBan'),'baiNgayToiThieu',COALESCE(json_extract(k.json,'$.baiNgayToiThieu'),0),'soChang',json_array_length(k.json,'$.chang'),'phut',json_extract(k.json,'$.phut'),'soBai',json_array_length(k.json,'$.bai'),'tongKienThuc',(SELECT COUNT(*) FROM jso",
+          "stack": [
+            "    at Module.docKtCn (/workspace/omr-vector/server/src/kiem-tra-ca-nhan.ts:75:369)"
+          ]
+        },
+        {
+          "event": "flush",
+          "dot": 1,
+          "count": 20
+        },
+        {
+          "event": "start",
+          "id": 134
+        },
+        {
+          "event": "start",
+          "id": 135
+        },
+        {
+          "event": "start",
+          "id": 136
+        },
+        {
+          "event": "start",
+          "id": 137
+        },
+        {
+          "event": "start",
+          "id": 138
+        },
+        {
+          "event": "start",
+          "id": 139
+        },
+        {
+          "event": "start",
+          "id": 140
+        },
+        {
+          "event": "start",
+          "id": 141
+        },
+        {
+          "event": "start",
+          "id": 142
+        },
+        {
+          "event": "start",
+          "id": 143
+        },
+        {
+          "event": "start",
+          "id": 144
+        },
+        {
+          "event": "start",
+          "id": 145
+        },
+        {
+          "event": "start",
+          "id": 146
+        },
+        {
+          "event": "start",
+          "id": 147
+        },
+        {
+          "event": "start",
+          "id": 148
+        },
+        {
+          "event": "start",
+          "id": 149
+        },
+        {
+          "event": "start",
+          "id": 150
+        },
+        {
+          "event": "start",
+          "id": 151
+        },
+        {
+          "event": "start",
+          "id": 152
+        },
+        {
+          "event": "start",
+          "id": 153
+        },
+        {
+          "event": "done",
+          "id": 134
+        },
+        {
+          "event": "done",
+          "id": 135
+        },
+        {
+          "event": "done",
+          "id": 136
+        },
+        {
+          "event": "done",
+          "id": 137
+        },
+        {
+          "event": "done",
+          "id": 138
+        },
+        {
+          "event": "done",
+          "id": 139
+        },
+        {
+          "event": "done",
+          "id": 140
+        },
+        {
+          "event": "done",
+          "id": 141
+        },
+        {
+          "event": "done",
+          "id": 142
+        },
+        {
+          "event": "done",
+          "id": 143
+        },
+        {
+          "event": "done",
+          "id": 144
+        },
+        {
+          "event": "done",
+          "id": 145
+        },
+        {
+          "event": "done",
+          "id": 146
+        },
+        {
+          "event": "done",
+          "id": 147
+        },
+        {
+          "event": "done",
+          "id": 148
+        },
+        {
+          "event": "done",
+          "id": 149
+        },
+        {
+          "event": "done",
+          "id": 150
+        },
+        {
+          "event": "done",
+          "id": 151
+        },
+        {
+          "event": "done",
+          "id": 152
+        },
+        {
+          "event": "done",
+          "id": 153
+        },
+        {
+          "event": "enqueue",
+          "id": 154,
+          "sql": "WITH dang AS (SELECT be.ma_btvn AS ma, COALESCE(NULLIF(TRIM(c.ten_ca), ''), NULLIF(TRIM(d.ten_de), ''), '') AS ten, b.han_nop, b.giao_luc, b.so_cau AS so_cau_bai, COALESCE(be.lo_da_xong, 0) AS lo_da_xong, COALESCE(b.ca_nhan, 0) AS ca_nhan, be.so_cau_em, be.chot_luc, be.chang_mo_json, be.so_chang\n      FROM btvn_em be JOIN btvn b ON b.ma_btvn = be.ma_btvn LEFT JOIN ca c ON c.ma_ca = b.ma_ca LEFT JOIN de_kho d ON d.ma_de = b.ma_de\n     WHERE be.sbd = ? AND COALESCE(be.nop_luc, '') = '' AND be.thu_hoi = 0 AND b.da_xoa = 0 AND b.han_nop > ?\n     ORDER BY b.han_nop, b.ma_btvn LIMIT 20) SELECT 'bt' AS k, ma AS c1, ten AS c2, han_nop AS c3, giao_luc AS c4, so_cau_bai AS c5, lo_da_xong AS c6, ca_nhan AS c7, so_cau_em AS c8, chot_luc AS c9, chang_mo_json AS c10, so_chang AS c11 FROM dang UNION ALL SELECT 'cg', m.ma_btvn, m.chang, COUNT(*), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL FROM btvn_em_cau m WHERE m.sbd = ? AND m.chang >= 0 AND m.ma_btvn IN (SELECT ma FROM dang) GROUP BY m.ma_btvn,",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ve-dich-d1.ts:178:53",
+            "    at docBai (/workspace/omr-vector/server/src/ve-dich-d1.ts:216:17)",
+            "    at docVeDichCuaEm (/workspace/omr-vector/server/src/ve-dich-d1.ts:365:5)",
+            "    at docVeDich (/workspace/omr-vector/server/src/index.ts:157:38)",
+            "    at /workspace/omr-vector/server/src/index.ts:159:80"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 155,
+          "sql": "SELECT 'em' AS k, lop AS a, nam_sinh AS b, NULL AS c, NULL AS d, NULL AS e, NULL AS f FROM hoc_sinh WHERE sbd = ?\n     UNION ALL SELECT 'ds', lop, nam_sinh, NULL, NULL, NULL, NULL FROM danh_sach WHERE sbd = ?\n     UNION ALL SELECT 'ca', ma_ca, bat_dau, thoi_gian_phut, lop, pham_vi, danh_sach_chon_json FROM ca\n      WHERE trang_thai = 'mo' AND COALESCE(loai, 'thi') = 'thi' AND bat_dau >= ? AND bat_dau <= ?",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ve-dich-d1.ts:178:53",
+            "    at docEmVaCa (/workspace/omr-vector/server/src/ve-dich-d1.ts:247:19)",
+            "    at docVeDichCuaEm (/workspace/omr-vector/server/src/ve-dich-d1.ts:365:29)",
+            "    at docVeDich (/workspace/omr-vector/server/src/index.ts:157:38)",
+            "    at /workspace/omr-vector/server/src/index.ts:159:80"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 156,
+          "sql": "SELECT moc_on_ke AS ngay, COUNT(*) AS n FROM nam_kt_cau\n      WHERE sbd = ? AND trang_thai IN ('moi_sai', 'dang_on', 'da_khac_phuc') AND can_day_lai = 0 AND moc_on_ke IS NOT NULL AND moc_on_ke < ?\n      GROUP BY moc_on_ke",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ve-dich-d1.ts:178:53",
+            "    at docOn (/workspace/omr-vector/server/src/ve-dich-d1.ts:279:19)",
+            "    at docVeDichCuaEm (/workspace/omr-vector/server/src/ve-dich-d1.ts:365:56)",
+            "    at docVeDich (/workspace/omr-vector/server/src/index.ts:157:38)",
+            "    at /workspace/omr-vector/server/src/index.ts:159:80"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 157,
+          "sql": "SELECT id, title, question_count, created_at FROM mom_bai\n      WHERE sbd = ? AND COALESCE(submitted_at, '') = '' AND substr(id, 1, 6) <> 'daily_' AND created_at >= ? ORDER BY created_at, id LIMIT 60",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ve-dich-d1.ts:178:53",
+            "    at docGoi (/workspace/omr-vector/server/src/ve-dich-d1.ts:292:19)",
+            "    at docVeDichCuaEm (/workspace/omr-vector/server/src/ve-dich-d1.ts:365:80)",
+            "    at docVeDich (/workspace/omr-vector/server/src/index.ts:157:38)",
+            "    at /workspace/omr-vector/server/src/index.ts:159:80"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 158,
+          "sql": "SELECT 'g' AS k, giay AS a, NULL AS b FROM (SELECT giay FROM su_kien_hoc WHERE sbd = ? AND giay IS NOT NULL AND ngay_vn >= ? ORDER BY luc DESC LIMIT 400)\n     UNION ALL SELECT 'h', CAST(strftime('%H', luc, '+7 hours') AS INTEGER), COUNT(*) FROM su_kien_hoc WHERE sbd = ? AND ngay_vn >= ? GROUP BY strftime('%H', luc, '+7 hours')",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ve-dich-d1.ts:178:53",
+            "    at docSoHoc (/workspace/omr-vector/server/src/ve-dich-d1.ts:308:19)",
+            "    at docVeDichCuaEm (/workspace/omr-vector/server/src/ve-dich-d1.ts:365:104)",
+            "    at docVeDich (/workspace/omr-vector/server/src/index.ts:157:38)",
+            "    at /workspace/omr-vector/server/src/index.ts:159:80"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 159,
+          "sql": "batch: INSERT INTO ke_hoach_ngay (khoa, sbd, ngay, phien_ban, seed, ngan_sach_json, viec_json, canh_bao_json, ket_qua, so_cau_da_lam,\n    so_cau_len_bac, so_cau_tut_bac, la_ngay_nghi, so_su_kien, cap_nhat_luc, muc_tieu_json, deferred_count, over_budget_seconds)\n  SELECT json_extract(j.value,'$.k'), json_extract(j.value,'$.s'), json_extract(j.value,'$.n'), json_extract(j.value,'$.p'), json_extract(j.value,'$.d'),\n         json_extract(j.value,'$.a'), json_extract(j.value,'$.v'), json_extract(j.value,'$.c'), NULL, json_extract(j.value,'$.l'),\n         json_extract(j.value,'$.u'), json_extract(j.value,'$.t'), json_extract(j.value,'$.z'), json_extract(j.value,'$.e'), ?,\n         json_extract(j.value,'$.m'), json_extract(j.value,'$.h1'), json_extract(j.value,'$.h2')\n    FROM json_each(?) j WHERE 1\n  ON CONFLICT(khoa) DO UPDATE SET phien_ban = excluded.phien_ban, seed = excluded.seed, ngan_sach_json = excluded.ngan_sach_json,\n    viec_json = excluded.viec_json, canh_bao_json = excluded.canh_",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:694:75",
+            "    at tat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:45:18)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:694:11)"
+          ]
+        },
+        {
+          "event": "flush",
+          "dot": 2,
+          "count": 6
+        },
+        {
+          "event": "start",
+          "id": 154
+        },
+        {
+          "event": "start",
+          "id": 155
+        },
+        {
+          "event": "start",
+          "id": 156
+        },
+        {
+          "event": "start",
+          "id": 157
+        },
+        {
+          "event": "start",
+          "id": 158
+        },
+        {
+          "event": "start",
+          "id": 159
+        },
+        {
+          "event": "done",
+          "id": 154
+        },
+        {
+          "event": "done",
+          "id": 155
+        },
+        {
+          "event": "done",
+          "id": 156
+        },
+        {
+          "event": "done",
+          "id": 157
+        },
+        {
+          "event": "done",
+          "id": 158
+        },
+        {
+          "event": "done",
+          "id": 159
+        },
+        {
+          "event": "snapshot",
+          "dot": 2,
+          "lenh": 26,
+          "queued": 0
+        }
+      ]
+    },
+    "vector-d1-trace166-crypto3.jsonl": {
+      "soDo": 21,
+      "dot": 3,
+      "lenh": 26,
+      "events": [
+        {
+          "event": "begin",
+          "soDo": 21
+        },
+        {
+          "event": "crypto.sign.begin"
+        },
+        {
+          "event": "crypto.sign.done"
+        },
+        {
+          "event": "enqueue",
+          "id": 134,
+          "sql": "SELECT mat_khau FROM hoc_sinh WHERE sbd=?",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/game-v2-auth.ts:60:93"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 135,
+          "sql": "SELECT c.id, c.ma_btvn, c.ten_btvn, c.gui_luc, c.han_nop, c.loi_em, c.loi_ph, c.em_xem_luc, c.ph_xem_luc, c.moc, b.han_nop AS han_hien_tai,\n              e.dap_an_json, e.xong_vong1_luc, e.lo_da_xong, e.so_chang, e.chot_luc\n         FROM canh_bao_thay c\n         JOIN btvn_em e ON e.ma_btvn = c.ma_btvn AND e.sbd = c.sbd\n         JOIN btvn b ON b.ma_btvn = c.ma_btvn\n        WHERE c.sbd = ? AND c.gui_luc >= ? AND e.nop_luc IS NULL AND e.thu_hoi = 0 AND b.da_xoa = 0 AND (? = 'em' OR (c.gui_ph = 1 AND c.loi_ph <> ''))\n        ORDER BY c.gui_luc DESC LIMIT 3",
+          "stack": [
+            "    at docCanhBaoCuaEm (/workspace/omr-vector/server/src/canh-bao-thay.ts:192:72)",
+            "    at canhBaoChoEm (/workspace/omr-vector/server/src/canh-bao-thay.ts:201:20)",
+            "    at dungKeHoachEm (/workspace/omr-vector/server/src/index.ts:154:36)",
+            "    at /workspace/omr-vector/server/src/index.ts:3834:188",
+            "    at keHoachCoDem (/workspace/omr-vector/server/src/dem-ke-hoach.ts:33:31)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 136,
+          "sql": "SELECT gia_tri FROM cau_hinh WHERE khoa = 'exp_moi'",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/exp-d1.ts:69:144",
+            "    at nhoTheoLuot (/workspace/omr-vector/server/src/doc-d1-theo-luot.ts:55:18)",
+            "    at /workspace/omr-vector/server/src/exp-d1.ts:69:28",
+            "    at an (/workspace/omr-vector/server/src/exp-d1.ts:48:18)",
+            "    at docCauHinhExp (/workspace/omr-vector/server/src/exp-d1.ts:69:19)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 137,
+          "sql": "SELECT json_extract(json, '$.pet') AS pet, json_type(json, '$.pet') AS pet_kieu, json_extract(json, '$.cap') AS cap,\n              json_extract(json, '$.nickname') AS nickname, json_type(json, '$.nickname') AS nickname_kieu, json_extract(json, '$.choice') AS choice\n         FROM game_v2_profile WHERE sbd = ?",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:882:17",
+            "    at tat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:45:18)",
+            "    at docThanThu (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:877:19)",
+            "    at hsKeHoachNgay (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:905:22)",
+            "    at hsKeHoachNgayCoExp (/workspace/omr-vector/server/src/exp-d1.ts:1131:19)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 138,
+          "sql": "SELECT CASE WHEN EXISTS (SELECT 1 FROM hoc_sinh WHERE sbd = ?) OR EXISTS (SELECT 1 FROM danh_sach WHERE sbd = ?)\n                   OR EXISTS (SELECT 1 FROM luot WHERE sbd = ?) THEN 1 ELSE 0 END AS co",
+          "stack": [
+            "    at laHocSinhThat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:859:25)",
+            "    at hsKeHoachNgay (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:906:17)",
+            "    at hsKeHoachNgayCoExp (/workspace/omr-vector/server/src/exp-d1.ts:1131:19)",
+            "    at dungKeHoachEm (/workspace/omr-vector/server/src/index.ts:159:20)",
+            "    at /workspace/omr-vector/server/src/index.ts:3834:188"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 139,
+          "sql": "SELECT e.sbd,\n       COUNT(*) AS so_su_kien,\n       COUNT(DISTINCT CASE WHEN e.ngay_vn = ? THEN e.qid END) AS da_lam,\n       COUNT(DISTINCT CASE WHEN e.ngay_vn = ? AND e.ket_qua = 1 THEN e.qid END) AS dung,\n       COUNT(DISTINCT CASE WHEN e.ngay_vn = ? AND e.ket_qua = 1 AND EXISTS (SELECT 1 FROM su_kien_hoc p WHERE p.sbd = e.sbd AND p.qid = e.qid AND p.ngay_vn < e.ngay_vn AND (p.ket_qua = 0 OR p.ket_qua IS NULL)) THEN e.qid END) AS len_bac,\n       COUNT(DISTINCT CASE WHEN e.ngay_vn = ? AND e.ket_qua = 0 AND EXISTS (SELECT 1 FROM su_kien_hoc p WHERE p.sbd = e.sbd AND p.qid = e.qid AND p.ngay_vn < e.ngay_vn AND p.ket_qua = 1) THEN e.qid END) AS tut_bac,\n       COUNT(DISTINCT CASE WHEN e.ngay_vn = ? AND e.luc >= ? AND e.ket_qua IS NOT NULL THEN e.qid END) AS hien_thi_so_cau,\n       COUNT(DISTINCT CASE WHEN e.ngay_vn = ? AND e.luc >= ? AND e.ket_qua = 1 THEN e.qid END) AS hien_thi_so_dung,\n       GROUP_CONCAT(CASE WHEN e.giay IS NOT NULL AND e.ngay_vn >= ? THEN e.giay END) AS giay_list\n  F",
+          "stack": [
+            "    at docTongHop (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:220:55)",
+            "    at docTongHopHomNay (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:235:16)",
+            "    at batDauDocKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:639:14)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:656:25)",
+            "    at hsKeHoachNgay (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:908:15)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 140,
+          "sql": "SELECT khoa, gia_tri FROM cau_hinh WHERE khoa IN (?, ?, ?)",
+          "stack": [
+            "    at docMocHienThi (/workspace/omr-vector/server/src/moc-no.ts:81:160)",
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:238:39",
+            "    at docTongHopHomNay (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:241:4)",
+            "    at batDauDocKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:639:14)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:656:25)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 141,
+          "sql": "SELECT k.sbd, k.ngay, k.so_su_kien, k.phien_ban, k.muc_tieu_json, k.deferred_count, k.over_budget_seconds FROM ke_hoach_ngay k\n        WHERE k.sbd IN (SELECT value FROM json_each(?)) AND k.ngay = (SELECT MAX(z.ngay) FROM ke_hoach_ngay z WHERE z.sbd = k.sbd)",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:643:17",
+            "    at tat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:45:18)",
+            "    at batDauDocKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:640:9)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:656:25)",
+            "    at hsKeHoachNgay (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:908:15)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 142,
+          "sql": "SELECT khoa, gia_tri FROM cau_hinh WHERE khoa IN ('ngay_nghi', 'ngan_sach_luot')",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:79:5",
+            "    at tat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:45:18)",
+            "    at docCauHinhKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:77:19)",
+            "    at docDauVao (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:274:25)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:661:19)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 143,
+          "sql": "SELECT gia_tri FROM cau_hinh WHERE khoa = ?",
+          "stack": [
+            "    at phamViBat (/workspace/omr-vector/server/src/pham-vi-hoc.ts:144:106)",
+            "    at docDauVao (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:276:27)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:661:19)",
+            "    at hsKeHoachNgay (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:908:15)",
+            "    at hsKeHoachNgayCoExp (/workspace/omr-vector/server/src/exp-d1.ts:1131:19)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 144,
+          "sql": "SELECT sbd,lop,ten_lop FROM hoc_sinh WHERE sbd IN (SELECT value FROM json_each(?))",
+          "stack": [
+            "    at doc (/workspace/omr-vector/server/src/game-v2-bank.ts:388:160)",
+            "    at docKhoiVaLopCacEm (/workspace/omr-vector/server/src/game-v2-bank.ts:390:18)",
+            "    at docDauVao (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:277:25)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:661:19)",
+            "    at hsKeHoachNgay (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:908:15)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 145,
+          "sql": "SELECT 'c' AS k, sbd, qid AS c1, ma_dang AS c2, moc_on_ke AS c3, lan_sai AS c4, luc_cuoi AS c5, NULL AS c6, NULL AS c7, NULL AS c8, NULL AS c9 FROM nam_kt_cau\n        WHERE sbd IN (SELECT value FROM json_each(?)) AND trang_thai IN ('moi_sai','dang_on','da_khac_phuc','chua_thay_sai') AND can_day_lai = 0 AND moc_on_ke IS NOT NULL AND moc_on_ke <= ?\n       UNION ALL SELECT 'n', sbd, COUNT(*), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL FROM nam_kt_cau WHERE sbd IN (SELECT value FROM json_each(?)) AND trang_thai IN ('moi_sai','dang_on') GROUP BY sbd\n       UNION ALL SELECT 'd', sbd, ma_dang, so_gap, so_sai, so_da_khac_phuc, so_moi_sai, so_chua_thay_sai, bac, moc_on_ke, moc_moi_sai FROM nam_kt_dang WHERE sbd IN (SELECT value FROM json_each(?))\n       UNION ALL SELECT 'x', NULL, (SELECT 1 FROM game_v2_index LIMIT 1), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:288:29",
+            "    at tat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:45:18)",
+            "    at hoi (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:282:35)",
+            "    at docHoSoD1 (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:290:23)",
+            "    at docDauVao (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:301:18)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 146,
+          "sql": "SELECT ca.ma_ca,ca.bank_r2,ca.cap_nhat_luc,ca.trang_thai,ca.cong_bo,ca.het_han_vao,ca.thoi_gian_phut,ca.loai,ca.han_nop,ca.bat_dau,\n    (SELECT COUNT(*) FROM luot l WHERE l.ma_ca=ca.ma_ca) entered,\n    (SELECT COUNT(*) FROM luot l WHERE l.ma_ca=ca.ma_ca AND l.trang_thai='da_nop') submitted,\n    (SELECT COUNT(*) FROM luot l WHERE l.ma_ca=ca.ma_ca AND l.trang_thai='dang_lam' AND (l.het_gio_luc IS NULL OR l.het_gio_luc>?)) active\n    FROM ca WHERE ca.trang_thai<>'da_xoa' AND (ca.trang_thai='mo' OR COALESCE(NULLIF(ca.bat_dau,''),ca.cap_nhat_luc)>=?) ORDER BY ca.ma_ca",
+          "stack": [
+            "    at caDangBaoVe (/workspace/omr-vector/server/src/game-v2-bank.ts:259:188)",
+            "    at protectedQuestions (/workspace/omr-vector/server/src/game-v2-bank.ts:271:26)",
+            "    at baoVeMotLuot (/workspace/omr-vector/server/src/cau-theo-qid.ts:127:27)",
+            "    at docDauVao (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:305:23)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:661:19)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 147,
+          "sql": "SELECT sbd, ngay, ket_qua FROM ke_hoach_ngay WHERE sbd IN (SELECT value FROM json_each(?)) AND ngay < ? AND ngay >= ? ORDER BY ngay DESC",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:308:180",
+            "    at tat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:45:18)",
+            "    at docDauVao (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:308:20)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:661:19)",
+            "    at hsKeHoachNgay (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:908:15)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 148,
+          "sql": "SELECT sbd, minutes FROM study_preferences WHERE sbd IN (SELECT value FROM json_each(?))",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:309:116",
+            "    at tat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:45:18)",
+            "    at docDauVao (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:309:20)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:661:19)",
+            "    at hsKeHoachNgay (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:908:15)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 149,
+          "sql": "SELECT sbd, id, dang FROM game_v2_task WHERE sbd IN (SELECT value FROM json_each(?)) AND completed_at IS NULL",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:310:137",
+            "    at tat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:45:18)",
+            "    at docDauVao (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:310:20)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:661:19)",
+            "    at hsKeHoachNgay (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:908:15)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 150,
+          "sql": "SELECT ma_ca, ten_ca, bat_dau, lop FROM ca WHERE trang_thai = 'mo' AND COALESCE(loai, 'thi') = 'thi' AND bat_dau > ? AND bat_dau <= ?",
+          "stack": [
+            "    at docCaSapMo (/workspace/omr-vector/server/src/game-v2-bank.ts:221:191)",
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:313:31",
+            "    at tat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:45:18)",
+            "    at docDauVao (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:313:21)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:661:19)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 151,
+          "sql": "SELECT be.sbd, be.ma_btvn, COALESCE(be.lo_da_xong, 0) AS lo, b.so_cau, b.giao_luc, b.han_nop, b.ca_nhan, be.so_cau_em, be.chot_luc, be.chang_mo_json\n         FROM btvn_em be JOIN btvn b ON b.ma_btvn = be.ma_btvn\n        WHERE be.sbd IN (SELECT value FROM json_each(?)) AND be.thu_hoi = 0 AND b.da_xoa = 0 AND be.nop_luc IS NULL AND b.han_nop > ?",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:320:155",
+            "    at tat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:45:18)",
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:320:20",
+            "    at docDauVao (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:324:4)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:661:19)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 152,
+          "sql": "SELECT sbd, id, question_count, created_at, started_at, qid_json AS qid_json FROM mom_bai\n        WHERE sbd IN (SELECT value FROM json_each(?)) AND submitted_at IS NULL AND ((started_at IS NOT NULL AND started_at > ?) OR (started_at IS NULL AND (id NOT LIKE 'daily_%' OR id = ?)))",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:332:77",
+            "    at tat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:45:18)",
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:332:20",
+            "    at docDauVao (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:335:4)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:661:19)"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 153,
+          "sql": "SELECT k.id,k.sbd,k.lop,k.ngay,k.mo_luc,k.han_luc,k.trang_thai,k.nop_luc,k.diem,k.da_ghi,k.cap_nhat_luc,\n COALESCE((SELECT json_remove(json_set(km.meta_json,'$.daTra',(SELECT COUNT(*) FROM json_each(km.meta_json,'$.phan') p JOIN json_each(k.tra_json) a ON a.key=p.key WHERE a.type='text' AND CASE p.value WHEN 'I' THEN a.value IN('A','B','C','D') WHEN 'II' THEN length(a.value)=4 AND replace(replace(a.value,'D',''),'S','')='' ELSE length(trim(a.value,char(9,10,11,12,13,32,160,5760,8192,8193,8194,8195,8196,8197,8198,8199,8200,8201,8202,8232,8233,8239,8287,12288,65279)))>0 AND length(a.value)<=100 END)),'$.phan') FROM kiem_tra_ca_nhan_meta km WHERE km.id=k.id),\n json_object('tong',json_array_length(k.json,'$.cau'),'phienBan',json_extract(k.json,'$.phienBan'),'baiNgayToiThieu',COALESCE(json_extract(k.json,'$.baiNgayToiThieu'),0),'soChang',json_array_length(k.json,'$.chang'),'phut',json_extract(k.json,'$.phut'),'soBai',json_array_length(k.json,'$.bai'),'tongKienThuc',(SELECT COUNT(*) FROM jso",
+          "stack": [
+            "    at Module.docKtCn (/workspace/omr-vector/server/src/kiem-tra-ca-nhan.ts:75:369)"
+          ]
+        },
+        {
+          "event": "flush",
+          "dot": 1,
+          "count": 20
+        },
+        {
+          "event": "start",
+          "id": 134
+        },
+        {
+          "event": "start",
+          "id": 135
+        },
+        {
+          "event": "start",
+          "id": 136
+        },
+        {
+          "event": "start",
+          "id": 137
+        },
+        {
+          "event": "start",
+          "id": 138
+        },
+        {
+          "event": "start",
+          "id": 139
+        },
+        {
+          "event": "start",
+          "id": 140
+        },
+        {
+          "event": "start",
+          "id": 141
+        },
+        {
+          "event": "start",
+          "id": 142
+        },
+        {
+          "event": "start",
+          "id": 143
+        },
+        {
+          "event": "start",
+          "id": 144
+        },
+        {
+          "event": "start",
+          "id": 145
+        },
+        {
+          "event": "start",
+          "id": 146
+        },
+        {
+          "event": "start",
+          "id": 147
+        },
+        {
+          "event": "start",
+          "id": 148
+        },
+        {
+          "event": "start",
+          "id": 149
+        },
+        {
+          "event": "start",
+          "id": 150
+        },
+        {
+          "event": "start",
+          "id": 151
+        },
+        {
+          "event": "start",
+          "id": 152
+        },
+        {
+          "event": "start",
+          "id": 153
+        },
+        {
+          "event": "done",
+          "id": 134
+        },
+        {
+          "event": "done",
+          "id": 135
+        },
+        {
+          "event": "done",
+          "id": 136
+        },
+        {
+          "event": "done",
+          "id": 137
+        },
+        {
+          "event": "done",
+          "id": 138
+        },
+        {
+          "event": "done",
+          "id": 139
+        },
+        {
+          "event": "done",
+          "id": 140
+        },
+        {
+          "event": "done",
+          "id": 141
+        },
+        {
+          "event": "done",
+          "id": 142
+        },
+        {
+          "event": "done",
+          "id": 143
+        },
+        {
+          "event": "done",
+          "id": 144
+        },
+        {
+          "event": "done",
+          "id": 145
+        },
+        {
+          "event": "done",
+          "id": 146
+        },
+        {
+          "event": "done",
+          "id": 147
+        },
+        {
+          "event": "done",
+          "id": 148
+        },
+        {
+          "event": "done",
+          "id": 149
+        },
+        {
+          "event": "done",
+          "id": 150
+        },
+        {
+          "event": "done",
+          "id": 151
+        },
+        {
+          "event": "done",
+          "id": 152
+        },
+        {
+          "event": "done",
+          "id": 153
+        },
+        {
+          "event": "enqueue",
+          "id": 154,
+          "sql": "WITH dang AS (SELECT be.ma_btvn AS ma, COALESCE(NULLIF(TRIM(c.ten_ca), ''), NULLIF(TRIM(d.ten_de), ''), '') AS ten, b.han_nop, b.giao_luc, b.so_cau AS so_cau_bai, COALESCE(be.lo_da_xong, 0) AS lo_da_xong, COALESCE(b.ca_nhan, 0) AS ca_nhan, be.so_cau_em, be.chot_luc, be.chang_mo_json, be.so_chang\n      FROM btvn_em be JOIN btvn b ON b.ma_btvn = be.ma_btvn LEFT JOIN ca c ON c.ma_ca = b.ma_ca LEFT JOIN de_kho d ON d.ma_de = b.ma_de\n     WHERE be.sbd = ? AND COALESCE(be.nop_luc, '') = '' AND be.thu_hoi = 0 AND b.da_xoa = 0 AND b.han_nop > ?\n     ORDER BY b.han_nop, b.ma_btvn LIMIT 20) SELECT 'bt' AS k, ma AS c1, ten AS c2, han_nop AS c3, giao_luc AS c4, so_cau_bai AS c5, lo_da_xong AS c6, ca_nhan AS c7, so_cau_em AS c8, chot_luc AS c9, chang_mo_json AS c10, so_chang AS c11 FROM dang UNION ALL SELECT 'cg', m.ma_btvn, m.chang, COUNT(*), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL FROM btvn_em_cau m WHERE m.sbd = ? AND m.chang >= 0 AND m.ma_btvn IN (SELECT ma FROM dang) GROUP BY m.ma_btvn,",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ve-dich-d1.ts:178:53",
+            "    at docBai (/workspace/omr-vector/server/src/ve-dich-d1.ts:216:17)",
+            "    at docVeDichCuaEm (/workspace/omr-vector/server/src/ve-dich-d1.ts:365:5)",
+            "    at docVeDich (/workspace/omr-vector/server/src/index.ts:157:38)",
+            "    at /workspace/omr-vector/server/src/index.ts:159:80"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 155,
+          "sql": "SELECT 'em' AS k, lop AS a, nam_sinh AS b, NULL AS c, NULL AS d, NULL AS e, NULL AS f FROM hoc_sinh WHERE sbd = ?\n     UNION ALL SELECT 'ds', lop, nam_sinh, NULL, NULL, NULL, NULL FROM danh_sach WHERE sbd = ?\n     UNION ALL SELECT 'ca', ma_ca, bat_dau, thoi_gian_phut, lop, pham_vi, danh_sach_chon_json FROM ca\n      WHERE trang_thai = 'mo' AND COALESCE(loai, 'thi') = 'thi' AND bat_dau >= ? AND bat_dau <= ?",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ve-dich-d1.ts:178:53",
+            "    at docEmVaCa (/workspace/omr-vector/server/src/ve-dich-d1.ts:247:19)",
+            "    at docVeDichCuaEm (/workspace/omr-vector/server/src/ve-dich-d1.ts:365:29)",
+            "    at docVeDich (/workspace/omr-vector/server/src/index.ts:157:38)",
+            "    at /workspace/omr-vector/server/src/index.ts:159:80"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 156,
+          "sql": "SELECT moc_on_ke AS ngay, COUNT(*) AS n FROM nam_kt_cau\n      WHERE sbd = ? AND trang_thai IN ('moi_sai', 'dang_on', 'da_khac_phuc') AND can_day_lai = 0 AND moc_on_ke IS NOT NULL AND moc_on_ke < ?\n      GROUP BY moc_on_ke",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ve-dich-d1.ts:178:53",
+            "    at docOn (/workspace/omr-vector/server/src/ve-dich-d1.ts:279:19)",
+            "    at docVeDichCuaEm (/workspace/omr-vector/server/src/ve-dich-d1.ts:365:56)",
+            "    at docVeDich (/workspace/omr-vector/server/src/index.ts:157:38)",
+            "    at /workspace/omr-vector/server/src/index.ts:159:80"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 157,
+          "sql": "SELECT id, title, question_count, created_at FROM mom_bai\n      WHERE sbd = ? AND COALESCE(submitted_at, '') = '' AND substr(id, 1, 6) <> 'daily_' AND created_at >= ? ORDER BY created_at, id LIMIT 60",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ve-dich-d1.ts:178:53",
+            "    at docGoi (/workspace/omr-vector/server/src/ve-dich-d1.ts:292:19)",
+            "    at docVeDichCuaEm (/workspace/omr-vector/server/src/ve-dich-d1.ts:365:80)",
+            "    at docVeDich (/workspace/omr-vector/server/src/index.ts:157:38)",
+            "    at /workspace/omr-vector/server/src/index.ts:159:80"
+          ]
+        },
+        {
+          "event": "enqueue",
+          "id": 158,
+          "sql": "SELECT 'g' AS k, giay AS a, NULL AS b FROM (SELECT giay FROM su_kien_hoc WHERE sbd = ? AND giay IS NOT NULL AND ngay_vn >= ? ORDER BY luc DESC LIMIT 400)\n     UNION ALL SELECT 'h', CAST(strftime('%H', luc, '+7 hours') AS INTEGER), COUNT(*) FROM su_kien_hoc WHERE sbd = ? AND ngay_vn >= ? GROUP BY strftime('%H', luc, '+7 hours')",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ve-dich-d1.ts:178:53",
+            "    at docSoHoc (/workspace/omr-vector/server/src/ve-dich-d1.ts:308:19)",
+            "    at docVeDichCuaEm (/workspace/omr-vector/server/src/ve-dich-d1.ts:365:104)",
+            "    at docVeDich (/workspace/omr-vector/server/src/index.ts:157:38)",
+            "    at /workspace/omr-vector/server/src/index.ts:159:80"
+          ]
+        },
+        {
+          "event": "flush",
+          "dot": 2,
+          "count": 5
+        },
+        {
+          "event": "start",
+          "id": 154
+        },
+        {
+          "event": "start",
+          "id": 155
+        },
+        {
+          "event": "start",
+          "id": 156
+        },
+        {
+          "event": "start",
+          "id": 157
+        },
+        {
+          "event": "start",
+          "id": 158
+        },
+        {
+          "event": "done",
+          "id": 154
+        },
+        {
+          "event": "done",
+          "id": 155
+        },
+        {
+          "event": "done",
+          "id": 156
+        },
+        {
+          "event": "done",
+          "id": 157
+        },
+        {
+          "event": "done",
+          "id": 158
+        },
+        {
+          "event": "enqueue",
+          "id": 159,
+          "sql": "batch: INSERT INTO ke_hoach_ngay (khoa, sbd, ngay, phien_ban, seed, ngan_sach_json, viec_json, canh_bao_json, ket_qua, so_cau_da_lam,\n    so_cau_len_bac, so_cau_tut_bac, la_ngay_nghi, so_su_kien, cap_nhat_luc, muc_tieu_json, deferred_count, over_budget_seconds)\n  SELECT json_extract(j.value,'$.k'), json_extract(j.value,'$.s'), json_extract(j.value,'$.n'), json_extract(j.value,'$.p'), json_extract(j.value,'$.d'),\n         json_extract(j.value,'$.a'), json_extract(j.value,'$.v'), json_extract(j.value,'$.c'), NULL, json_extract(j.value,'$.l'),\n         json_extract(j.value,'$.u'), json_extract(j.value,'$.t'), json_extract(j.value,'$.z'), json_extract(j.value,'$.e'), ?,\n         json_extract(j.value,'$.m'), json_extract(j.value,'$.h1'), json_extract(j.value,'$.h2')\n    FROM json_each(?) j WHERE 1\n  ON CONFLICT(khoa) DO UPDATE SET phien_ban = excluded.phien_ban, seed = excluded.seed, ngan_sach_json = excluded.ngan_sach_json,\n    viec_json = excluded.viec_json, canh_bao_json = excluded.canh_",
+          "stack": [
+            "    at /workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:694:75",
+            "    at tat (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:45:18)",
+            "    at lapVaLuuKeHoach (/workspace/omr-vector/server/src/ke-hoach-ngay-d1.ts:694:11)"
+          ]
+        },
+        {
+          "event": "flush",
+          "dot": 3,
+          "count": 1
+        },
+        {
+          "event": "start",
+          "id": 159
+        },
+        {
+          "event": "done",
+          "id": 159
+        },
+        {
+          "event": "snapshot",
+          "dot": 3,
+          "lenh": 26,
+          "queued": 0
+        }
+      ]
+    }
+  }
+}

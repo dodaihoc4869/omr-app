@@ -1,0 +1,59 @@
+[
+  {
+    "i": 695,
+    "hash": "80c220e4c7731b776725529504ad05e07e9e7f2ccd41864b6c222982e326f84c",
+    "fileNguon": "anh/80c220e4c7731b776725529504ad05e07e9e7f2ccd41864b6c222982e326f84c.png",
+    "questions": [
+      {
+        "qid": "12-C2-B6-D1-I-112",
+        "de": "Quan sát cấu trúc phân tử carbohydrate X được cho dưới đây:\nPhát biểu nào sau đây là đúng về carbohydrate X?",
+        "refs": [
+          {
+            "where": "12-C2-B6-D1-I-112.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "12-C2-B7-D1-I-16",
+        "de": "Quan sát cấu trúc phân tử carbohydrate X được cho dưới đây:\nPhát biểu nào sau đây là đúng về carbohydrate X?",
+        "refs": [
+          {
+            "where": "12-C2-B7-D1-I-16.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-I-99",
+        "de": "Quan sát cấu trúc phân tử carbohydrate X được cho dưới đây:\nPhát biểu nào sau đây là đúng về carbohydrate X?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-99.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-I-125",
+        "de": "Quan sát cấu trúc phân tử carbohydrate X được cho dưới đây:\nPhát biểu nào sau đây là đúng về carbohydrate X?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-125.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daMoNative": true,
+    "svg": "polyglucose-ddh-6a55b15c8b0413a40d90a616ce42acd89cd4468309254833cde762b1111b4af9.svg",
+    "hashSvg": "6a55b15c8b0413a40d90a616ce42acd89cd4468309254833cde762b1111b4af9",
+    "byteSvg": 29421,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "3rings/3CH2OH/allH-OHexplicit/2bridgeO/ngoặcgiữagiữaunit2vàbridge/7 000literal/frontboldC3–C2ngang+2nêmfrontchéodàyvề2đỉnhdưới;khôngthêmn/sốC/ellipsis.",
+    "hashSvgDaSoat": "6a55b15c8b0413a40d90a616ce42acd89cd4468309254833cde762b1111b4af9",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

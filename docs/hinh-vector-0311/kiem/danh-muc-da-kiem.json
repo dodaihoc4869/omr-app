@@ -2107,6 +2107,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "80c220e4c7731b776725529504ad05e07e9e7f2ccd41864b6c222982e326f84c": {
+      "tep": "polyglucose-ddh-6a55b15c8b0413a40d90a616ce42acd89cd4468309254833cde762b1111b4af9.svg",
+      "hashSvg": "6a55b15c8b0413a40d90a616ce42acd89cd4468309254833cde762b1111b4af9",
+      "byteSvg": 29421,
+      "byteGzip": 2058,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "0cfd73b72f0975f9c99da573505c4c75dc0c64479e80b2e34e6c198e94bf2963": {
       "tep": "do-thi-ddh-651fa08a6013179859407b22035afd377be0cf0dbf4d5a05d11e2b9be432643b.svg",
       "hashSvg": "651fa08a6013179859407b22035afd377be0cf0dbf4d5a05d11e2b9be432643b",
@@ -8885,6 +8894,20 @@
       ]
     },
     {
+      "qid": "12-C2-B6-D1-I-112",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "80c220e4c7731b776725529504ad05e07e9e7f2ccd41864b6c222982e326f84c",
+          "where": "12-C2-B6-D1-I-112.hinh.0.du_lieu",
+          "hashDataUrl": "5ebad796ef084cc604b44212b8127eea479eca064b3e3fa647eafcbeaa453655",
+          "vector": "polyglucose-ddh-6a55b15c8b0413a40d90a616ce42acd89cd4468309254833cde762b1111b4af9.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-C2-B6-D2-I-5",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -8923,6 +8946,20 @@
           "where": "12-C2-B7-D1-I-5.hinh.0.du_lieu",
           "hashDataUrl": "071394efe0e0ac9c6f242592edc8827bd6fb41ed73b6b41ff69ad8885a5c95b1",
           "vector": "fructofuranose-ddh-93fefa471605af279dbb701e10d65f422b0e7b5982ceed03829bba2997f66776.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-C2-B7-D1-I-16",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "80c220e4c7731b776725529504ad05e07e9e7f2ccd41864b6c222982e326f84c",
+          "where": "12-C2-B7-D1-I-16.hinh.0.du_lieu",
+          "hashDataUrl": "5ebad796ef084cc604b44212b8127eea479eca064b3e3fa647eafcbeaa453655",
+          "vector": "polyglucose-ddh-6a55b15c8b0413a40d90a616ce42acd89cd4468309254833cde762b1111b4af9.svg"
         }
       ]
     },
@@ -14595,6 +14632,20 @@
       ]
     },
     {
+      "qid": "DB-12-B4-D3-I-99",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "80c220e4c7731b776725529504ad05e07e9e7f2ccd41864b6c222982e326f84c",
+          "where": "DB-12-B4-D3-I-99.hinh.0.du_lieu",
+          "hashDataUrl": "5ebad796ef084cc604b44212b8127eea479eca064b3e3fa647eafcbeaa453655",
+          "vector": "polyglucose-ddh-6a55b15c8b0413a40d90a616ce42acd89cd4468309254833cde762b1111b4af9.svg"
+        }
+      ]
+    },
+    {
       "qid": "DB-12-B4-D3-I-122",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -14605,6 +14656,20 @@
           "where": "DB-12-B4-D3-I-122.hinh.0.du_lieu",
           "hashDataUrl": "071394efe0e0ac9c6f242592edc8827bd6fb41ed73b6b41ff69ad8885a5c95b1",
           "vector": "fructofuranose-ddh-93fefa471605af279dbb701e10d65f422b0e7b5982ceed03829bba2997f66776.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D3-I-125",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "80c220e4c7731b776725529504ad05e07e9e7f2ccd41864b6c222982e326f84c",
+          "where": "DB-12-B4-D3-I-125.hinh.0.du_lieu",
+          "hashDataUrl": "5ebad796ef084cc604b44212b8127eea479eca064b3e3fa647eafcbeaa453655",
+          "vector": "polyglucose-ddh-6a55b15c8b0413a40d90a616ce42acd89cd4468309254833cde762b1111b4af9.svg"
         }
       ]
     },
@@ -22804,9 +22869,11 @@
     "12-C2-B4-D2-I-5",
     "12-C2-B4-D2-I-7",
     "12-C2-B6-D1-II-3",
+    "12-C2-B6-D1-I-112",
     "12-C2-B6-D2-I-5",
     "12-C2-B6-D2-II-27",
     "12-C2-B7-D1-I-5",
+    "12-C2-B7-D1-I-16",
     "12-C3-B10-D2-II-11",
     "12-C3-B10-D2-II-12",
     "12-C3-B10-D2-II-15",
@@ -23152,7 +23219,9 @@
     "DB-12-B4-D3-I-24",
     "DB-12-B4-D3-I-39",
     "DB-12-B4-D3-I-69",
+    "DB-12-B4-D3-I-99",
     "DB-12-B4-D3-I-122",
+    "DB-12-B4-D3-I-125",
     "DB-12-B4-D3-I-138",
     "DB-12-B4-D3-I-140",
     "DB-12-B4-D3-I-146",

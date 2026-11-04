@@ -1,0 +1,65 @@
+{
+  "ghiChu": "Chạy matrixcốđịnh,giữmọiđỏ/xanh;khôngđổi mốc. Gatekhôngtrace1lượt17/17xanhkhôngxóatracematrixtái hiệnđỏ3flush cùng26D1. Chưađủkếtluậnfixcổng,khôngPUSH.",
+  "cacLan": [
+    {
+      "file": "vector-trace166-stack.log",
+      "hash": "4d5d12b5755a8fe44e0a9b45b0aae307316ddb5dbd792722f00104d45bc80fdd",
+      "ketQua": "Đạt",
+      "cuoiLog": "  sanh-lan-sau: 1 đợt / 2 lệnh (mốc 1 / 3)\n\n·\n\n Test Files  4 passed (4)\n      Tests  17 passed (17)\n   Start at  17:47:15\n   Duration  6.55s (transform 10.96s, setup 661ms, import 13.60s, tests 2.97s, environment 0ms)\n"
+    },
+    {
+      "file": "vector-trace166-crypto.log",
+      "hash": "0587b8ac41f0d9e0ba21cd27a527a06ee6324f1e7d05563960e0b3af4b99218a",
+      "ketQua": "Đạt",
+      "cuoiLog": "  sanh-lan-sau: 1 đợt / 2 lệnh (mốc 1 / 3)\n\n·\n\n Test Files  4 passed (4)\n      Tests  17 passed (17)\n   Start at  17:49:16\n   Duration  6.55s (transform 11.41s, setup 588ms, import 14.10s, tests 2.78s, environment 0ms)\n"
+    },
+    {
+      "file": "vector-trace166-crypto2.log",
+      "hash": "efe4db398ca2f6e24a02623ae53b6777eafdead081d2a9bdc7750ee4fbce079b",
+      "ketQua": "Đạt",
+      "cuoiLog": "  sanh-lan-sau: 1 đợt / 2 lệnh (mốc 1 / 3)\n\n·\n\n Test Files  4 passed (4)\n      Tests  17 passed (17)\n   Start at  17:49:50\n   Duration  8.98s (transform 16.06s, setup 681ms, import 19.75s, tests 3.91s, environment 0ms)\n"
+    },
+    {
+      "file": "vector-trace166-3.log",
+      "hash": "f17081ae4d73b9ff1c51089c455e9f03661d268efc5ff173d833619611c8b266",
+      "ketQua": "Đạt",
+      "cuoiLog": "  sanh-lan-sau: 1 đợt / 2 lệnh (mốc 1 / 3)\n\n·\n\n Test Files  4 passed (4)\n      Tests  17 passed (17)\n   Start at  17:46:26\n   Duration  6.25s (transform 10.94s, setup 681ms, import 13.60s, tests 2.77s, environment 0ms)\n"
+    },
+    {
+      "file": "vector-trace166-crypto3.log",
+      "hash": "ef7b47c2cade778eea67c07b1a61482124c63bf9c194d46b7165dde7a8d4ce06",
+      "ketQua": "Chưa đạt",
+      "cuoiLog": "\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯\n\n\n Test Files  1 failed | 3 passed (4)\n      Tests  1 failed | 16 passed (17)\n   Start at  17:49:59\n   Duration  7.07s (transform 12.16s, setup 754ms, import 15.15s, tests 2.97s, environment 1ms)\n"
+    },
+    {
+      "file": "vector-trace166-4.log",
+      "hash": "e19fef1d040fa25187cd7c875025452d8bb17a966a06a9b63c84232940fe1b3b",
+      "ketQua": "Đạt",
+      "cuoiLog": "  sanh-lan-sau: 1 đợt / 2 lệnh (mốc 1 / 3)\n\n·\n\n Test Files  4 passed (4)\n      Tests  17 passed (17)\n   Start at  17:46:33\n   Duration  6.31s (transform 11.05s, setup 578ms, import 13.78s, tests 2.59s, environment 0ms)\n"
+    },
+    {
+      "file": "vector-trace166-crypto4.log",
+      "hash": "9eda63fbe2b571ab4d0fbe549bcddd3f6f00086790053bbe5357aa5d30e2dae9",
+      "ketQua": "Đạt",
+      "cuoiLog": "  sanh-lan-sau: 1 đợt / 2 lệnh (mốc 1 / 3)\n\n·\n\n Test Files  4 passed (4)\n      Tests  17 passed (17)\n   Start at  17:50:07\n   Duration  7.20s (transform 12.82s, setup 664ms, import 15.50s, tests 3.13s, environment 0ms)\n"
+    },
+    {
+      "file": "vector-trace166.log",
+      "hash": "b8fcc6ea48ed86d27b57ac75f3671a2596321215a999c1598f6db4235e5d16a0",
+      "ketQua": "Đạt",
+      "cuoiLog": "  sanh-lan-sau: 1 đợt / 2 lệnh (mốc 1 / 3)\n\n·\n\n Test Files  4 passed (4)\n      Tests  17 passed (17)\n   Start at  17:45:55\n   Duration  6.63s (transform 11.69s, setup 649ms, import 14.59s, tests 2.84s, environment 0ms)\n"
+    },
+    {
+      "file": "vector-trace166-2.log",
+      "hash": "a739c8bd3ab77bf850b806dfc418c7e9e349b3108539901a5eb36c2c65cea810",
+      "ketQua": "Chưa đạt",
+      "cuoiLog": "\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯\n\n\n Test Files  1 failed | 3 passed (4)\n      Tests  1 failed | 16 passed (17)\n   Start at  17:46:19\n   Duration  6.58s (transform 11.92s, setup 641ms, import 14.70s, tests 2.83s, environment 0ms)\n"
+    },
+    {
+      "file": "vector-speed-lo166.log",
+      "hash": "a405570e21fde80682ace17264003c136385299210beeb5eb5870a09e62d9fd7",
+      "ketQua": "Đạt",
+      "cuoiLog": "  sanh-lan-sau: 1 đợt / 2 lệnh (mốc 1 / 3)\n\n·\n\n Test Files  4 passed (4)\n      Tests  17 passed (17)\n   Start at  17:50:38\n   Duration  5.79s (transform 9.93s, setup 568ms, import 12.48s, tests 2.60s, environment 0ms)\n"
+    }
+  ]
+}
