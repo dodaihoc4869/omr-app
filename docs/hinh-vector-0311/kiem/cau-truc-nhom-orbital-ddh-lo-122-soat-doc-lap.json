@@ -1,0 +1,42 @@
+[
+  {
+    "i": 627,
+    "hashSvg": "dfe1abe384f1a0a88591b373aac2c28cbabbb8e3fb9a3130c891ed2b172c8af2",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG native và SVG render thật của nguồn này, đọc geometry độc lập scratch/doc-ao-geometry-lo-122.json. Hai thùy xám SW/NE có shading, caption AO p nguyên văn; ba arrow xSW/yphải/zlên đúng. Trục nằm sau body, không đường xuyên thùy, không thêm phase/tên khác. DDH path tự chứa không text/image/fallback; gaps/label rõ, không cắt/chạm/tràn. Hash byte thực khớp metadata.",
+    "hash": "742f0681bfcbeffd66bca16a6a424a73b00548e25489fdd69606606471d97882",
+    "hashSvgDaSoat": "dfe1abe384f1a0a88591b373aac2c28cbabbb8e3fb9a3130c891ed2b172c8af2"
+  },
+  {
+    "i": 737,
+    "hashSvg": "2cc9c6c88f9e6d237dfbd12a2c3777ba36c5033cc8acfd4ee19e9e07c814a957",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG native và SVG render thật của nguồn này, đọc geometry độc lập scratch/doc-ao-geometry-lo-122.json. Bốn panel giữ thứ tự sphere/xchéo/yngang/zđứng, sphere1body và mỗi p đúng2thùy xám. Mỗi panel đủ xSW/yphải/ztrên, headx và headz đủ; panel2..4 có headyphải, panel1 giữ cap không tự thêm mũi nhọn khi nguồn không rõ. Body che axes đúng, không thêm s/px/py/pz/caption/phase. DDH path tự chứa không text/image/fallback; gaps/label rõ, không cắt/chạm/tràn. Hash byte thực khớp metadata.",
+    "hash": "898e524a08bdb99c74b295dad627ef887f915bdbc0c646ccb44ed9b1a8b5c432",
+    "hashSvgDaSoat": "2cc9c6c88f9e6d237dfbd12a2c3777ba36c5033cc8acfd4ee19e9e07c814a957"
+  },
+  {
+    "i": 981,
+    "hashSvg": "2cc9c6c88f9e6d237dfbd12a2c3777ba36c5033cc8acfd4ee19e9e07c814a957",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG native và SVG render thật của nguồn này, đọc geometry độc lập scratch/doc-ao-geometry-lo-122.json. Bốn panel giữ thứ tự sphere/xchéo/yngang/zđứng, sphere1body và mỗi p đúng2thùy xám. Mỗi panel đủ xSW/yphải/ztrên, headx và headz đủ; panel2..4 có headyphải, panel1 giữ cap không tự thêm mũi nhọn khi nguồn không rõ. Body che axes đúng, không thêm s/px/py/pz/caption/phase. DDH path tự chứa không text/image/fallback; gaps/label rõ, không cắt/chạm/tràn. Hash byte thực khớp metadata.",
+    "hash": "af672a3e128c141f6f1aa4f14ad3c9c1ed79733f8e76309c0f613c784cb374d3",
+    "hashSvgDaSoat": "2cc9c6c88f9e6d237dfbd12a2c3777ba36c5033cc8acfd4ee19e9e07c814a957"
+  },
+  {
+    "i": 1175,
+    "hashSvg": "183561c54722d5e1bce7d8826df486f77bd41d92cbf5426dc73e98249edd6c49",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: mởPNGnative+SVG renderthật;4graylobes/2nodes/innerlensoverlapdark đúngnguồn,trụcngangFRONTkhôngarrow/text;geometry/gapskhôngcắt/chạm/tràn,path-only/SHA256khớp.",
+    "hash": "d43c75e215cac79028a9da0748791c2992b6e5a753da5290b05e02d81a70e5d6",
+    "hashSvgDaSoat": "183561c54722d5e1bce7d8826df486f77bd41d92cbf5426dc73e98249edd6c49"
+  },
+  {
+    "i": 1337,
+    "hashSvg": "0aa72a6a53acb71502d9f7c12a02c1982490b77e5bb3de26a1a98bd462df608d",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: đãfreshmởPNGnative+renderSVGbảnsửa;panel(c)axisarrowrangòailobephải/gapvớidđủ. Đủ4panel(a)ss2sphereoverlap/noaxis,(b)sp1sphere+2plobesoverlap/axisarrow,(c)pp4lobes/innerlensoverlapdark/axisarrow,(d)2verticalp4lobes/2overlaps/2verticalaxis+1horizontalFRONT/noarrow. Đủ4captionexact(a) Xen phủ trục s-s;(b) Xen phủ trục s-p;(c) Xen phủ trục p-p;(d) Xen phủ bên p-p;khôngσπthêm. DDHpath-only/count/frontback/geometry/gapskhôngcắtchạmtràn,SHA256khớp.",
+    "hash": "f24234795a592eb9c137cb3050b00c47a823ac6eea0ab5058712f2b7caf2e40f",
+    "hashSvgDaSoat": "0aa72a6a53acb71502d9f7c12a02c1982490b77e5bb3de26a1a98bd462df608d"
+  }
+]

@@ -1,5 +1,5 @@
 {
-  "ngay": "2026-11-03",
+  "ngay": "2026-11-04",
   "nguon": {
     "soDe": 321,
     "soCau": 17042,
@@ -60,8 +60,8 @@
       "Toàn kho còn chưa hoàn tất, app chưa thay hình; không báo đã xong hoặc đã triển khai."
     ],
     "danhMucDaKiem": "docs/hinh-vector-0311/kiem/danh-muc-da-kiem.json",
-    "loVuaXong": "833câu đủ mọi hình+DDH/2mộtphần;651nguồn→437SVG;6.353.453byte/gzip1.293.249;777nguồn còn lại.9nguồnmớiđãmởRIÊNGtừngPNG+SVG renderthật/soátđộclậpexacthash.",
-    "viecNenLamTiep": "Nhóm117còn6CHƯADỰNG627/737/981/1175/1337/1254,đọc dữliệukiem/doc-molecule-lo-117.json.627AO pcaption,737/9814shapeaxes,1175ppsigma4lobe/overlap,1337đủ4captionxenphủ;1254PHẢIgiữcảS-lactic2D+ballstick3C3O6H,soat_nguon_2đangbổsung scratch/doc-lactic-model-1254.json.14/20records117đãmanifest(5cũ+9mớilô119–121),khôngdựngtrùng.2partialchỉảnhhoa1403/1198thậtgiữnguyênkhôngcộngsốvẽ.",
+    "loVuaXong": "844câu đủ mọi hình+DDH/2mộtphần;657nguồn→442SVG;6.409.307byte/gzip1.302.229;771nguồn còn lại.6nguồnmớiđãmởRIÊNGtừngPNG+SVG renderthật/soátđộclậpexacthash;nhóm117đủ20/20recordsđãmanifest.",
+    "viecNenLamTiep": "Nhóm124đangđọcbởi cau_truc_5,scratch/doc-molecule-lo-124.json;copybảnmớivềkiemkhiđủdữliệu,đốimanifesttrướcdựng. Nhóm11720/20đãxongkhônglàmtrùng;2partialchỉảnhhoa1403/1198thậtgiữnguyênkhôngcộngsốvẽ.",
     "canhBaoCheckpoint": "Checkpointmớiđượcghi/sẽpushsaukiểm;ưu tiêncommit/worktree localmớinhất. Khôngcheckoutremote cũ đè. Khônghạgate,khôngbáotíchhợp/pháthànhkhibộchưađủ. Mainorigin7dff17afchưagộp."
   },
   "tuDongTiepTuc": {
@@ -79,14 +79,14 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 651,
-    "soSvgRieng": 437,
-    "soCauDungHinh": 835,
-    "soCauDuMoiHinh": 833,
+    "soAnhNguon": 657,
+    "soSvgRieng": 442,
+    "soCauDungHinh": 846,
+    "soCauDuMoiHinh": 844,
     "soCauMoiXongMotPhan": 2,
-    "byteSvg": 6353453,
-    "byteGzip": 1293249,
-    "soAnhNguonConLai": 777,
+    "byteSvg": 6409307,
+    "byteGzip": 1302229,
+    "soAnhNguonConLai": 771,
     "daTichHop": false
   },
   "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.",
@@ -106,15 +106,15 @@
     "daChuyenHetBoDaVe": true
   },
   "daDatPhongApp": {
-    "soNguon": 651,
-    "soCauDuHinhVaPhong": 833,
+    "soNguon": 657,
+    "soCauDuHinhVaPhong": 844,
     "ghiChu": "Các số tổngDaDoiChieu vẫn mô tả nội dung đã kiểm; bản cũ chưa đổi phông không được coi đạt yêu cầu phông mới."
   },
   "loMoiNhat": {
-    "lo": "119–121",
-    "ketQua": "833câu đủ mọi hình+DDH/2mộtphần;651nguồn→437SVG;6.353.453byte/gzip1.293.249;777nguồn còn lại.9nguồnmớiđãmởRIÊNGtừngPNG+SVG renderthật/soátđộclậpexacthash.",
-    "suaLoi": "935/113vòng5đủ6sốC/2Cngoạivòngimplicitkha triển;7992CH2OHtext/no số.578giữ19/38/17;125giữOOCCH3khôngOCOCH3/ngoặc/n/stub;1155giữRnode/noCHalpha.880/838sửaHup/HOupkhỏitopring,freshreviewhashmới;arrow2giữtargetBOND O-ring–C2,1/4ĐẢONHAUđúngsource.9524BONDlabels/nocarbonnumber.",
-    "tiepTheo": "Nhóm117còn6CHƯADỰNG627/737/981/1175/1337/1254,đọc dữliệukiem/doc-molecule-lo-117.json.627AO pcaption,737/9814shapeaxes,1175ppsigma4lobe/overlap,1337đủ4captionxenphủ;1254PHẢIgiữcảS-lactic2D+ballstick3C3O6H,soat_nguon_2đangbổsung scratch/doc-lactic-model-1254.json.14/20records117đãmanifest(5cũ+9mớilô119–121),khôngdựngtrùng.2partialchỉảnhhoa1403/1198thậtgiữnguyênkhôngcộngsốvẽ.",
-    "gioiHan": "Chưa tíchhợp hình/chưa reloadofflineapp/chưa phát hành. Build/tốcđộlô120đạt/precache170/2613KB,sauđóchỉassets/scripts. Origin/main7dff17afchưagộp;phảicậpnhậtmainmớinhất/sotesttheotên/kiểm cathi trước triểnkhai."
+    "lo": "122–123",
+    "ketQua": "844câu đủ mọi hình+DDH/2mộtphần;657nguồn→442SVG;6.409.307byte/gzip1.302.229;771nguồn còn lại.6nguồnmớiđãmởRIÊNGtừngPNG+SVG renderthật/soátđộclậpexacthash;nhóm117đủ20/20recordsđãmanifest.",
+    "suaLoi": "627giữAO pcaption/3arrow/2graylobes;737/9814panels/bodycheaxes,yheadpanel1yếu/capkhôngthêmmũinhọnđoán.11754lobes/lensoverlap/axisfront/noarrow;1337đủ4panelcaption/overlap/frontaxes,đãsửaarrow(c)ranngoàilobe(+50px)/freshreviewhashmới.1254giữcả2DSnêmOHvà3D12sphere3C3O6H/11connections12rods/C=O2rods/Halphaẩn1phần/graycolor/occlusion,noextras.",
+    "tiepTheo": "Nhóm124đangđọcbởi cau_truc_5,scratch/doc-molecule-lo-124.json;copybảnmớivềkiemkhiđủdữliệu,đốimanifesttrướcdựng. Nhóm11720/20đãxongkhônglàmtrùng;2partialchỉảnhhoa1403/1198thậtgiữnguyênkhôngcộngsốvẽ.",
+    "gioiHan": "Chưa tíchhợp hình/chưa reloadofflineapp/chưa phát hành. Build/tốcđộlô123đạt/precache170/2613KB. Origin/main7dff17afchưagộp;phảicậpnhậtmainmớinhất/sotesttheotên/kiểm cathi trước triểnkhai."
   }
 }

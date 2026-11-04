@@ -1,0 +1,763 @@
+[
+  {
+    "i": 737,
+    "hash": "898e524a08bdb99c74b295dad627ef887f915bdbc0c646ccb44ed9b1a8b5c432",
+    "fileNguon": "anh/898e524a08bdb99c74b295dad627ef887f915bdbc0c646ccb44ed9b1a8b5c432.png",
+    "canvas": [
+      1190,
+      315
+    ],
+    "daMoNative": true,
+    "kind": "orbital-grid-4",
+    "panels": [
+      "sphere_s",
+      "p_diagonal_x",
+      "p_horizontal_y",
+      "p_vertical_z"
+    ],
+    "notes": "4panelngangcùng3trục:xchéoSW↔NElabelxởSW,ynganglabelyphải,zđứnglabelztrên. Từngpanel:1quảcầuxámgradientởgốc;2hai lobeSW/NEdọcx;3hai lobetrái/phảidọcy;4hai lobetrên/dướidọcz. Chỉx/y/zlabels,KHÔNGthêm s/pₓ/pᵧ/p_z/(a)..(d) vìnguồnkhôngcó. Giữthứtựsphere,px,py,pz,tonexám+highlights. 2nguồnđãmởriêngcùngnộidungkhácscale.",
+    "questions": [
+      {
+        "qid": "10-C1-B3-D2-II-5",
+        "de": "Orbital nguyên tử có một số hình dạng khác nhau. Hình ảnh dưới đây mô tả hình dạng của một số AO thường gặp.",
+        "refs": [
+          {
+            "where": "10-C1-B3-D2-II-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-10-B3-D1-II-96",
+        "de": "Orbital nguyên tử có một số hình dạng khác nhau. Hình ảnh dưới đây mô tả hình dạng của một số AO thường gặp.",
+        "refs": [
+          {
+            "where": "DB-10-B3-D1-II-96.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "arrowInvestigation": {
+      "method": "Mởnative/full vàzoomnearest7x từngendpointz+/y+/xSW,artifactendpointskèmtheo. KhôngsuytừtênAO.",
+      "artifact": "/workspace/scratch/ao737-endpoints.png",
+      "xSW": "Có dấuheadhướngSWthấyđượctrên4panel,nhỏ;nằmtrướclabelx.",
+      "zUp": "Có mũiheadtrênđầu trụcz,737rõ3x/7x;981rấtítpixelnhưngvẫnphìnhhai bênđầunhọnvàlabelzkhácbiệt.",
+      "yRight": "737panel2/3/4cóheadnhọnphảirõ. Panel1headrấtngắn/capgầnvuông,khôngđủrõđểkhẳngđịnhriêngheadnhọn;cầnnêugiớihạn.981panel2/3/4headnhỏvàgiảmđộphân giải,cóphình/thutạiđầu;panel1gầnnétcapvuôngkhôngđủrõ. Khôngđượccoitấtcảchỉnétvàbỏheadsđãthấyrõ."
+    },
+    "axisEndsApprox": [
+      [
+        [
+          124,
+          48
+        ],
+        [
+          247,
+          159
+        ],
+        [
+          48,
+          236
+        ]
+      ],
+      [
+        [
+          445,
+          49
+        ],
+        [
+          568,
+          158
+        ],
+        [
+          368,
+          237
+        ]
+      ],
+      [
+        [
+          757,
+          49
+        ],
+        [
+          882,
+          158
+        ],
+        [
+          679,
+          237
+        ]
+      ],
+      [
+        [
+          1032,
+          49
+        ],
+        [
+          1155,
+          158
+        ],
+        [
+          952,
+          237
+        ]
+      ]
+    ],
+    "occlusion": "TrụcởSAUlobe/sphere:panel1spherechephầngiữa3axes;pxcheđườngxtrong2lobe,pycheđườngytrong2lobe,pzcheđườngztrong2lobe;cácaxeskhácđiquanodetrungtâmnhưngkhôngxuyênsurfacephầnbềrộnglobe.",
+    "labels": "MỗipanelchỉxởSW/yphải/ztrên,không(a)..(d)haytêns/px/py/pz."
+  },
+  {
+    "i": 981,
+    "hash": "af672a3e128c141f6f1aa4f14ad3c9c1ed79733f8e76309c0f613c784cb374d3",
+    "fileNguon": "anh/af672a3e128c141f6f1aa4f14ad3c9c1ed79733f8e76309c0f613c784cb374d3.png",
+    "canvas": [
+      633,
+      144
+    ],
+    "daMoNative": true,
+    "kind": "orbital-grid-4",
+    "panels": [
+      "sphere_s",
+      "p_diagonal_x",
+      "p_horizontal_y",
+      "p_vertical_z"
+    ],
+    "notes": "4panelngangcùng3trục:xchéoSW↔NElabelxởSW,ynganglabelyphải,zđứnglabelztrên. Từngpanel:1quảcầuxámgradientởgốc;2hai lobeSW/NEdọcx;3hai lobetrái/phảidọcy;4hai lobetrên/dướidọcz. Chỉx/y/zlabels,KHÔNGthêm s/pₓ/pᵧ/p_z/(a)..(d) vìnguồnkhôngcó. Giữthứtựsphere,px,py,pz,tonexám+highlights. 2nguồnđãmởriêngcùngnộidungkhácscale.",
+    "questions": [
+      {
+        "qid": "DB-10-B3-D1-II-234",
+        "de": "Orbital nguyên tử có một số hình dạng khác nhau. Hình ảnh dưới đây mô tả hình dạng của một số AO thường gặp.",
+        "refs": [
+          {
+            "where": "DB-10-B3-D1-II-234.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B3-II-6",
+        "de": "Orbital nguyên tử có một số hình dạng khác nhau. Hình ảnh dưới đây mô tả hình dạng của một số AO thường gặp.",
+        "refs": [
+          {
+            "where": "DH-10-C1-B3-II-6.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "arrowInvestigation": {
+      "method": "Mởnative/full vàzoomnearest7x từngendpointz+/y+/xSW,artifactendpointskèmtheo. KhôngsuytừtênAO.",
+      "artifact": "/workspace/scratch/ao981-endpoints.png",
+      "xSW": "Có dấuheadhướngSWthấyđượctrên4panel,nhỏ;nằmtrướclabelx.",
+      "zUp": "Có mũiheadtrênđầu trụcz,737rõ3x/7x;981rấtítpixelnhưngvẫnphìnhhai bênđầunhọnvàlabelzkhácbiệt.",
+      "yRight": "737panel2/3/4cóheadnhọnphảirõ. Panel1headrấtngắn/capgầnvuông,khôngđủrõđểkhẳngđịnhriêngheadnhọn;cầnnêugiớihạn.981panel2/3/4headnhỏvàgiảmđộphân giải,cóphình/thutạiđầu;panel1gầnnétcapvuôngkhôngđủrõ. Khôngđượccoitấtcảchỉnétvàbỏheadsđãthấyrõ."
+    },
+    "axisEndsApprox": [
+      [
+        [
+          54,
+          9
+        ],
+        [
+          123,
+          73
+        ],
+        [
+          12,
+          117
+        ]
+      ],
+      [
+        [
+          232,
+          9
+        ],
+        [
+          301,
+          72
+        ],
+        [
+          190,
+          117
+        ]
+      ],
+      [
+        [
+          407,
+          9
+        ],
+        [
+          475,
+          72
+        ],
+        [
+          365,
+          117
+        ]
+      ],
+      [
+        [
+          559,
+          9
+        ],
+        [
+          628,
+          72
+        ],
+        [
+          517,
+          117
+        ]
+      ]
+    ],
+    "occlusion": "TrụcởSAUlobe/sphere:panel1spherechephầngiữa3axes;pxcheđườngxtrong2lobe,pycheđườngytrong2lobe,pzcheđườngztrong2lobe;cácaxeskhácđiquanodetrungtâmnhưngkhôngxuyênsurfacephầnbềrộnglobe.",
+    "labels": "MỗipanelchỉxởSW/yphải/ztrên,không(a)..(d)haytêns/px/py/pz."
+  },
+  {
+    "i": 627,
+    "hash": "742f0681bfcbeffd66bca16a6a424a73b00548e25489fdd69606606471d97882",
+    "fileNguon": "anh/742f0681bfcbeffd66bca16a6a424a73b00548e25489fdd69606606471d97882.png",
+    "canvas": [
+      267,
+      250
+    ],
+    "daMoNative": true,
+    "kind": "orbital-p",
+    "orientation": "diagonal-caption",
+    "notes": "Hai lobepchéoSW↔NEđềutôxámvớiđiểmsángdọcgiữa. zarrowlênlabelz,Yarrowphảilabely,xarrowSWvàlabelxSW. Captiondướinguyênvăn AO p. Giữcaption/cáchđặtxkhác593.",
+    "questions": [
+      {
+        "qid": "DB-10-B3-D1-III-251",
+        "de": "Hình ảnh bên mô tả AO px với hai thùy.\nXác suất tìm thấy electron ở mỗi thùy là khoảng bao nhiêu phần trăm?",
+        "refs": [
+          {
+            "where": "DB-10-B3-D1-III-251.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B3-III-1",
+        "de": "Hình ảnh bên mô tả AO px với hai thùy.\nXác suất tìm thấy electron ở mỗi thùy là khoảng bao nhiêu phần trăm?",
+        "refs": [
+          {
+            "where": "DH-10-C1-B3-III-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "nativeCanvas": [
+      267,
+      250
+    ],
+    "axes": {
+      "origin": [
+        113,
+        107
+      ],
+      "z": {
+        "start": [
+          113,
+          195
+        ],
+        "end": [
+          113,
+          21
+        ],
+        "arrow": true,
+        "label": [
+          125,
+          25
+        ]
+      },
+      "y": {
+        "start": [
+          35,
+          107
+        ],
+        "end": [
+          207,
+          107
+        ],
+        "arrow": true,
+        "label": [
+          203,
+          94
+        ]
+      },
+      "x": {
+        "start": [
+          175,
+          46
+        ],
+        "end": [
+          52,
+          168
+        ],
+        "arrow": true,
+        "label": [
+          59,
+          177
+        ]
+      }
+    },
+    "lobes": [
+      {
+        "node": [
+          113,
+          107
+        ],
+        "tip": [
+          154,
+          57
+        ],
+        "outlineApprox": [
+          [
+            113,
+            107
+          ],
+          [
+            121,
+            71
+          ],
+          [
+            140,
+            52
+          ],
+          [
+            158,
+            57
+          ],
+          [
+            166,
+            72
+          ],
+          [
+            152,
+            93
+          ],
+          [
+            113,
+            107
+          ]
+        ]
+      },
+      {
+        "node": [
+          113,
+          107
+        ],
+        "tip": [
+          69,
+          155
+        ],
+        "outlineApprox": [
+          [
+            113,
+            107
+          ],
+          [
+            98,
+            116
+          ],
+          [
+            70,
+            131
+          ],
+          [
+            60,
+            149
+          ],
+          [
+            69,
+            160
+          ],
+          [
+            88,
+            152
+          ],
+          [
+            109,
+            121
+          ],
+          [
+            113,
+            107
+          ]
+        ]
+      }
+    ],
+    "lobeCount": 2,
+    "layering": "TrụcchéoxởSAUlobe:chỉthấysegmentngoàibodyởNEvàSW.Trụcngang/đứngđiquanode,vùnglobecheđoạnnàonằmtrongbody;khôngđầumũitênngoạitrừ3đầuxSW/yright/zup.",
+    "caption": {
+      "text": "AO p",
+      "anchor": [
+        121,
+        218
+      ]
+    },
+    "artifacts": [
+      "/workspace/scratch/ao627-3x.png"
+    ],
+    "extraMarks": "Nativecó2vếtnétvụnởméptráidướikhoảng(23,154)/(21,171),khôngthànhglyph/caption;khôngbịasốkýhiệuchúng."
+  },
+  {
+    "i": 1175,
+    "hash": "d43c75e215cac79028a9da0748791c2992b6e5a753da5290b05e02d81a70e5d6",
+    "fileNguon": "anh/d43c75e215cac79028a9da0748791c2992b6e5a753da5290b05e02d81a70e5d6.png",
+    "canvas": [
+      806,
+      257
+    ],
+    "daMoNative": true,
+    "kind": "orbital-overlap-p-p-sigma",
+    "notes": "Mộtfigurekhôngtext:2AO_pnằmngang,trụcliênkếtngangđenmảnhtừtráisangphải.Khóihình4lobetổng,tạogiao2nútởx~273và~531trêncanvas806x257:lobengoàitráix116..273;AOtráiinnerlobex273..~440;AOphảiinnerlobex~359..531;ngoàiphảix531..685. Haiinnerlobechồngnhauvùnggiữa~359..440đậmxámhìnhovalđứng. Khôngmũitêntrục,khôngσ/textp/điệntích/nucleusdotthêm. Môphỏngvectoropacityđểgiữvùngoverlapđậm.",
+    "questions": [
+      {
+        "qid": "10-C3-B12-I-2",
+        "de": "Khi hai orbital p xen phủ với nhau dọc theo trục liên kết thì tạo thành liên kết σ như hình dưới.\nPhân tử nào sau đây có liên kết tạo thành do sự xen phủ trục của các orbital p với p?",
+        "refs": [
+          {
+            "where": "10-C3-B12-I-2.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "nativeCanvas": [
+      806,
+      257
+    ],
+    "axis": {
+      "from": [
+        76,
+        126
+      ],
+      "to": [
+        725,
+        126
+      ],
+      "arrow": false,
+      "layer": "FRONT: đườngngangxámnhìnthấyliêntụctrênmọilobe/vùngoverlap"
+    },
+    "orbitalNodes": [
+      [
+        273,
+        126
+      ],
+      [
+        532,
+        126
+      ]
+    ],
+    "lobeCount": 4,
+    "lobes": [
+      {
+        "orbital": 1,
+        "side": "outer-left",
+        "node": [
+          273,
+          126
+        ],
+        "boundsApprox": [
+          117,
+          61,
+          273,
+          190
+        ]
+      },
+      {
+        "orbital": 1,
+        "side": "inner-right",
+        "node": [
+          273,
+          126
+        ],
+        "boundsApprox": [
+          273,
+          61,
+          443,
+          191
+        ]
+      },
+      {
+        "orbital": 2,
+        "side": "inner-left",
+        "node": [
+          532,
+          126
+        ],
+        "boundsApprox": [
+          359,
+          61,
+          532,
+          191
+        ]
+      },
+      {
+        "orbital": 2,
+        "side": "outer-right",
+        "node": [
+          532,
+          126
+        ],
+        "boundsApprox": [
+          532,
+          61,
+          685,
+          190
+        ]
+      }
+    ],
+    "overlap": {
+      "pair": "2 inner lobes",
+      "boundsApprox": [
+        359,
+        62,
+        443,
+        190
+      ],
+      "shape": "lenticular oval đứng ởgiữa,tôđậmhơn2lobeđơndoopacitychồng"
+    },
+    "labels": [],
+    "notesGeometry": "Cácbounds/contoursước lượngpixelđểgiữtopology4lobe/2node/centraloverlap;khôngbổsung2nucleusdotnếunguồnkhôngcó. Khôngσ/π/x/y/z/arrowthêm.",
+    "artifacts": [
+      "/workspace/scratch/ao1175-3x.png"
+    ]
+  },
+  {
+    "i": 1337,
+    "hash": "f24234795a592eb9c137cb3050b00c47a823ac6eea0ab5058712f2b7caf2e40f",
+    "fileNguon": "anh/f24234795a592eb9c137cb3050b00c47a823ac6eea0ab5058712f2b7caf2e40f.png",
+    "canvas": [
+      1391,
+      300
+    ],
+    "daMoNative": true,
+    "kind": "orbital-overlap-grid-4",
+    "captions": [
+      "(a) Xen phủ trục s-s",
+      "(b) Xen phủ trục s-p",
+      "(c) Xen phủ trục p-p",
+      "(d) Xen phủ bên p-p"
+    ],
+    "notes": "4panelngang: a2quảcầuxámchồngrìa,khôngtrục;bspherechồng1lobecủaAO_pngangvớiđầutrụcngangmũitênphải;c2AO_pnganginnerlobeschồnggiữa,trụcngangmũitênphải;d2AO_pĐỨNGsongsongeach2lobes,total4lobes,trụcđứngmỗiorbitalvà1đườngngangqua2node;overlaplobeTRÊN-TRÊNvàDƯỚI-DƯỚI. Giữ4captionđầutheonguồn,kHÔNGtựthêmσ/π.",
+    "questions": [
+      {
+        "qid": "DH-10-C3-B14-D1-I-11",
+        "de": "Cho các hình biểu diễn sự xen phủ orbital nguyên tử để tạo liên kết hóa học như hình: (a) xen phủ trục s-s; (b) xen phủ trục s-p; (c) xen phủ trục p-p; (d) xen phủ bên p-p.\nBiết số hiệu các nguyên tử của H, F và S lần lượt là 1, 9 và 16. Sự tạo liên kết trong các phân tử $\\ce{H2S}$ và $\\ce{F2}$ theo kiểu xen phủ tương ứng là",
+        "refs": [
+          {
+            "where": "DH-10-C3-B14-D1-I-11.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "nativeCanvas": [
+      1391,
+      300
+    ],
+    "panelsDetailed": [
+      {
+        "caption": "(a) Xen phủ trục s-s",
+        "captionAnchor": [
+          146,
+          279
+        ],
+        "spheres": [
+          [
+            136,
+            161,
+            36
+          ],
+          [
+            187,
+            161,
+            37
+          ]
+        ],
+        "overlap": "lensdọcgiữa2sphere",
+        "axes": []
+      },
+      {
+        "caption": "(b) Xen phủ trục s-p",
+        "captionAnchor": [
+          506,
+          279
+        ],
+        "sphere": [
+          365,
+          161,
+          35
+        ],
+        "pNode": [
+          477,
+          163
+        ],
+        "lobes": "2lobes:inner-lefttừ477vềmặttrái~348rộnggầnx394;outer-right477..578. SpherechồnglobeTRÁIởx~348..402.",
+        "axis": {
+          "from": [
+            318,
+            163
+          ],
+          "to": [
+            608,
+            163
+          ],
+          "arrow": true,
+          "layer": "frontvisiblethroughgrey"
+        }
+      },
+      {
+        "caption": "(c) Xen phủ trục p-p",
+        "captionAnchor": [
+          851,
+          279
+        ],
+        "nodes": [
+          [
+            744,
+            156
+          ],
+          [
+            899,
+            156
+          ]
+        ],
+        "lobes": "4lobes:ngoàitrái~645..744;inner-right744..~858;inner-left~797..899;ngoàiphải899..1007.",
+        "overlap": "2innerlobeschồngđậmvùnggiữa~797..858",
+        "axis": {
+          "from": [
+            628,
+            156
+          ],
+          "to": [
+            1043,
+            156
+          ],
+          "arrow": true,
+          "layer": "frontvisiblethroughgrey"
+        }
+      },
+      {
+        "caption": "(d) Xen phủ bên p-p",
+        "captionAnchor": [
+          1229,
+          279
+        ],
+        "nodes": [
+          [
+            1187,
+            128
+          ],
+          [
+            1231,
+            128
+          ]
+        ],
+        "lobeCount": 4,
+        "lobes": [
+          {
+            "centerNode": [
+              1187,
+              128
+            ],
+            "side": "top",
+            "boundsApprox": [
+              1159,
+              27,
+              1211,
+              128
+            ]
+          },
+          {
+            "centerNode": [
+              1231,
+              128
+            ],
+            "side": "top",
+            "boundsApprox": [
+              1203,
+              27,
+              1259,
+              128
+            ]
+          },
+          {
+            "centerNode": [
+              1187,
+              128
+            ],
+            "side": "bottom",
+            "boundsApprox": [
+              1160,
+              128,
+              1211,
+              232
+            ]
+          },
+          {
+            "centerNode": [
+              1231,
+              128
+            ],
+            "side": "bottom",
+            "boundsApprox": [
+              1203,
+              128,
+              1258,
+              232
+            ]
+          }
+        ],
+        "overlaps": [
+          "top-left+top-right ởdảigiữax1203..1211,trênnode",
+          "bottom-left+bottom-right ởdảigiữax1203..1211,dướinode"
+        ],
+        "axes": [
+          {
+            "from": [
+              1187,
+              12
+            ],
+            "to": [
+              1187,
+              248
+            ],
+            "arrow": false
+          },
+          {
+            "from": [
+              1231,
+              12
+            ],
+            "to": [
+              1231,
+              248
+            ],
+            "arrow": false
+          },
+          {
+            "from": [
+              1153,
+              128
+            ],
+            "to": [
+              1264,
+              128
+            ],
+            "arrow": false
+          }
+        ],
+        "layer": "Cả2trụcđứngvà1trụcngangFRONT nhìnthấyđenliêntụctrênlobes. Khôngarrowởd,nocrosslobetopbottomkhôngbịgộpthành2lobelớn."
+      }
+    ],
+    "extraLabels": "Khôngthêmσ/π/tênAO/dấu+−/nucleusdot. Caption(a)..(d)nguyênvănđủ4.",
+    "artifacts": [
+      "/workspace/scratch/ao1337-paneld-3x.png"
+    ],
+    "evidence": "Mởnative1337fullvàcroppaneld3xriêng,nhìnthấy4lobes/2nodes/2vùngoverlapsongson/trụcđứng-front."
+  }
+]

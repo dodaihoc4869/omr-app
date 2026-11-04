@@ -1,0 +1,216 @@
+[
+  {
+    "i": 627,
+    "hash": "742f0681bfcbeffd66bca16a6a424a73b00548e25489fdd69606606471d97882",
+    "fileNguon": "anh/742f0681bfcbeffd66bca16a6a424a73b00548e25489fdd69606606471d97882.png",
+    "canvas": [
+      267,
+      250
+    ],
+    "daMoNative": true,
+    "kind": "orbital-p",
+    "orientation": "diagonal-caption",
+    "notes": "Hai lobepchéoSW↔NEđềutôxámvớiđiểmsángdọcgiữa. zarrowlênlabelz,Yarrowphảilabely,xarrowSWvàlabelxSW. Captiondướinguyênvăn AO p. Giữcaption/cáchđặtxkhác593.",
+    "questions": [
+      {
+        "qid": "DB-10-B3-D1-III-251",
+        "de": "Hình ảnh bên mô tả AO px với hai thùy.\nXác suất tìm thấy electron ở mỗi thùy là khoảng bao nhiêu phần trăm?",
+        "refs": [
+          {
+            "where": "DB-10-B3-D1-III-251.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B3-III-1",
+        "de": "Hình ảnh bên mô tả AO px với hai thùy.\nXác suất tìm thấy electron ở mỗi thùy là khoảng bao nhiêu phần trăm?",
+        "refs": [
+          {
+            "where": "DH-10-C1-B3-III-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "nhom-orbital-ddh-dfe1abe384f1a0a88591b373aac2c28cbabbb8e3fb9a3130c891ed2b172c8af2.svg",
+    "hashSvg": "dfe1abe384f1a0a88591b373aac2c28cbabbb8e3fb9a3130c891ed2b172c8af2",
+    "byteSvg": 4240,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Giữthứtự/caption/4lobesvàoverlap.737/981panel1yheadrấtyếu/capvuôngnênkhôngthêmmũinhọnrõ;panel2..4giữheadx/y/z.627captionAO p,khôngalias593phaWHITE.",
+    "hashSvgDaSoat": "dfe1abe384f1a0a88591b373aac2c28cbabbb8e3fb9a3130c891ed2b172c8af2",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 737,
+    "hash": "898e524a08bdb99c74b295dad627ef887f915bdbc0c646ccb44ed9b1a8b5c432",
+    "fileNguon": "anh/898e524a08bdb99c74b295dad627ef887f915bdbc0c646ccb44ed9b1a8b5c432.png",
+    "canvas": [
+      1190,
+      315
+    ],
+    "daMoNative": true,
+    "kind": "orbital-grid-4",
+    "panels": [
+      "sphere_s",
+      "p_diagonal_x",
+      "p_horizontal_y",
+      "p_vertical_z"
+    ],
+    "notes": "4panelngangcùng3trục:xchéoSW↔NElabelxởSW,ynganglabelyphải,zđứnglabelztrên. Từngpanel:1quảcầuxámgradientởgốc;2hai lobeSW/NEdọcx;3hai lobetrái/phảidọcy;4hai lobetrên/dướidọcz. Chỉx/y/zlabels,KHÔNGthêm s/pₓ/pᵧ/p_z/(a)..(d) vìnguồnkhôngcó. Giữthứtựsphere,px,py,pz,tonexám+highlights. 2nguồnđãmởriêngcùngnộidungkhácscale.",
+    "questions": [
+      {
+        "qid": "10-C1-B3-D2-II-5",
+        "de": "Orbital nguyên tử có một số hình dạng khác nhau. Hình ảnh dưới đây mô tả hình dạng của một số AO thường gặp.",
+        "refs": [
+          {
+            "where": "10-C1-B3-D2-II-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-10-B3-D1-II-96",
+        "de": "Orbital nguyên tử có một số hình dạng khác nhau. Hình ảnh dưới đây mô tả hình dạng của một số AO thường gặp.",
+        "refs": [
+          {
+            "where": "DB-10-B3-D1-II-96.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "nhom-orbital-ddh-2cc9c6c88f9e6d237dfbd12a2c3777ba36c5033cc8acfd4ee19e9e07c814a957.svg",
+    "hashSvg": "2cc9c6c88f9e6d237dfbd12a2c3777ba36c5033cc8acfd4ee19e9e07c814a957",
+    "byteSvg": 9429,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Giữthứtự/caption/4lobesvàoverlap.737/981panel1yheadrấtyếu/capvuôngnênkhôngthêmmũinhọnrõ;panel2..4giữheadx/y/z.627captionAO p,khôngalias593phaWHITE.",
+    "hashSvgDaSoat": "2cc9c6c88f9e6d237dfbd12a2c3777ba36c5033cc8acfd4ee19e9e07c814a957",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 981,
+    "hash": "af672a3e128c141f6f1aa4f14ad3c9c1ed79733f8e76309c0f613c784cb374d3",
+    "fileNguon": "anh/af672a3e128c141f6f1aa4f14ad3c9c1ed79733f8e76309c0f613c784cb374d3.png",
+    "canvas": [
+      633,
+      144
+    ],
+    "daMoNative": true,
+    "kind": "orbital-grid-4",
+    "panels": [
+      "sphere_s",
+      "p_diagonal_x",
+      "p_horizontal_y",
+      "p_vertical_z"
+    ],
+    "notes": "4panelngangcùng3trục:xchéoSW↔NElabelxởSW,ynganglabelyphải,zđứnglabelztrên. Từngpanel:1quảcầuxámgradientởgốc;2hai lobeSW/NEdọcx;3hai lobetrái/phảidọcy;4hai lobetrên/dướidọcz. Chỉx/y/zlabels,KHÔNGthêm s/pₓ/pᵧ/p_z/(a)..(d) vìnguồnkhôngcó. Giữthứtựsphere,px,py,pz,tonexám+highlights. 2nguồnđãmởriêngcùngnộidungkhácscale.",
+    "questions": [
+      {
+        "qid": "DB-10-B3-D1-II-234",
+        "de": "Orbital nguyên tử có một số hình dạng khác nhau. Hình ảnh dưới đây mô tả hình dạng của một số AO thường gặp.",
+        "refs": [
+          {
+            "where": "DB-10-B3-D1-II-234.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B3-II-6",
+        "de": "Orbital nguyên tử có một số hình dạng khác nhau. Hình ảnh dưới đây mô tả hình dạng của một số AO thường gặp.",
+        "refs": [
+          {
+            "where": "DH-10-C1-B3-II-6.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "nhom-orbital-ddh-2cc9c6c88f9e6d237dfbd12a2c3777ba36c5033cc8acfd4ee19e9e07c814a957.svg",
+    "hashSvg": "2cc9c6c88f9e6d237dfbd12a2c3777ba36c5033cc8acfd4ee19e9e07c814a957",
+    "byteSvg": 9429,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Giữthứtự/caption/4lobesvàoverlap.737/981panel1yheadrấtyếu/capvuôngnênkhôngthêmmũinhọnrõ;panel2..4giữheadx/y/z.627captionAO p,khôngalias593phaWHITE.",
+    "hashSvgDaSoat": "2cc9c6c88f9e6d237dfbd12a2c3777ba36c5033cc8acfd4ee19e9e07c814a957",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 1175,
+    "hash": "d43c75e215cac79028a9da0748791c2992b6e5a753da5290b05e02d81a70e5d6",
+    "fileNguon": "anh/d43c75e215cac79028a9da0748791c2992b6e5a753da5290b05e02d81a70e5d6.png",
+    "canvas": [
+      806,
+      257
+    ],
+    "daMoNative": true,
+    "kind": "orbital-overlap-p-p-sigma",
+    "notes": "Mộtfigurekhôngtext:2AO_pnằmngang,trụcliênkếtngangđenmảnhtừtráisangphải.Khóihình4lobetổng,tạogiao2nútởx~273và~531trêncanvas806x257:lobengoàitráix116..273;AOtráiinnerlobex273..~440;AOphảiinnerlobex~359..531;ngoàiphảix531..685. Haiinnerlobechồngnhauvùnggiữa~359..440đậmxámhìnhovalđứng. Khôngmũitêntrục,khôngσ/textp/điệntích/nucleusdotthêm. Môphỏngvectoropacityđểgiữvùngoverlapđậm.",
+    "questions": [
+      {
+        "qid": "10-C3-B12-I-2",
+        "de": "Khi hai orbital p xen phủ với nhau dọc theo trục liên kết thì tạo thành liên kết σ như hình dưới.\nPhân tử nào sau đây có liên kết tạo thành do sự xen phủ trục của các orbital p với p?",
+        "refs": [
+          {
+            "where": "10-C3-B12-I-2.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "nhom-orbital-ddh-183561c54722d5e1bce7d8826df486f77bd41d92cbf5426dc73e98249edd6c49.svg",
+    "hashSvg": "183561c54722d5e1bce7d8826df486f77bd41d92cbf5426dc73e98249edd6c49",
+    "byteSvg": 1347,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Giữthứtự/caption/4lobesvàoverlap.737/981panel1yheadrấtyếu/capvuôngnênkhôngthêmmũinhọnrõ;panel2..4giữheadx/y/z.627captionAO p,khôngalias593phaWHITE.",
+    "hashSvgDaSoat": "183561c54722d5e1bce7d8826df486f77bd41d92cbf5426dc73e98249edd6c49",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 1337,
+    "hash": "f24234795a592eb9c137cb3050b00c47a823ac6eea0ab5058712f2b7caf2e40f",
+    "fileNguon": "anh/f24234795a592eb9c137cb3050b00c47a823ac6eea0ab5058712f2b7caf2e40f.png",
+    "canvas": [
+      1391,
+      300
+    ],
+    "daMoNative": true,
+    "kind": "orbital-overlap-grid-4",
+    "captions": [
+      "(a) Xen phủ trục s-s",
+      "(b) Xen phủ trục s-p",
+      "(c) Xen phủ trục p-p",
+      "(d) Xen phủ bên p-p"
+    ],
+    "notes": "4panelngang: a2quảcầuxámchồngrìa,khôngtrục;bspherechồng1lobecủaAO_pngangvớiđầutrụcngangmũitênphải;c2AO_pnganginnerlobeschồnggiữa,trụcngangmũitênphải;d2AO_pĐỨNGsongsongeach2lobes,total4lobes,trụcđứngmỗiorbitalvà1đườngngangqua2node;overlaplobeTRÊN-TRÊNvàDƯỚI-DƯỚI. Giữ4captionđầutheonguồn,kHÔNGtựthêmσ/π.",
+    "questions": [
+      {
+        "qid": "DH-10-C3-B14-D1-I-11",
+        "de": "Cho các hình biểu diễn sự xen phủ orbital nguyên tử để tạo liên kết hóa học như hình: (a) xen phủ trục s-s; (b) xen phủ trục s-p; (c) xen phủ trục p-p; (d) xen phủ bên p-p.\nBiết số hiệu các nguyên tử của H, F và S lần lượt là 1, 9 và 16. Sự tạo liên kết trong các phân tử $\\ce{H2S}$ và $\\ce{F2}$ theo kiểu xen phủ tương ứng là",
+        "refs": [
+          {
+            "where": "DH-10-C3-B14-D1-I-11.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "nhom-orbital-ddh-0aa72a6a53acb71502d9f7c12a02c1982490b77e5bb3de26a1a98bd462df608d.svg",
+    "hashSvg": "0aa72a6a53acb71502d9f7c12a02c1982490b77e5bb3de26a1a98bd462df608d",
+    "byteSvg": 33708,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Giữthứtự/caption/4lobesvàoverlap.737/981panel1yheadrấtyếu/capvuôngnênkhôngthêmmũinhọnrõ;panel2..4giữheadx/y/z.627captionAO p,khôngalias593phaWHITE.",
+    "hashSvgDaSoat": "0aa72a6a53acb71502d9f7c12a02c1982490b77e5bb3de26a1a98bd462df608d",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

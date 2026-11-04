@@ -1,0 +1,154 @@
+[
+  {
+    "i": 67,
+    "hash": "0ccb5d5b1660ba243671e13736c278fc42f7428680c445b029594bc55570d0c7",
+    "fileNguon": "anh/0ccb5d5b1660ba243671e13736c278fc42f7428680c445b029594bc55570d0c7.png",
+    "canvas": [
+      217,
+      221
+    ],
+    "daMoNative": true,
+    "kind": "recycle",
+    "text": [
+      "5",
+      "PP"
+    ],
+    "notes": "3mũitênđenquaykimđồnghồtạotamgiácbo,đầumũitênđáychỉtrái.5giữa,PPdướiinSANSđậm,không05. Cùngnộidung1140/1228đãđạtnhưngphảisoátrenderthựcnếualias.",
+    "questions": [
+      {
+        "qid": "12-C4-B12-II-4",
+        "de": "Polymer X có thể chịu được nhiệt độ lên tới 160°C nên được dùng làm ống dẫn nước nóng, hộp đựng thực phẩm có thể sử dụng trong lò vi sóng,... Các vật dụng làm từ X thường được in kí hiệu như hình bên.",
+        "refs": [
+          {
+            "where": "12-C4-B12-II-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 810,
+    "hash": "9636380b824717a97e8cb5a91e5204b6a2da365cad436fb020394eeb6c319e71",
+    "fileNguon": "anh/9636380b824717a97e8cb5a91e5204b6a2da365cad436fb020394eeb6c319e71.png",
+    "canvas": [
+      234,
+      262
+    ],
+    "daMoNative": true,
+    "kind": "recycle",
+    "text": [
+      "5",
+      "PP"
+    ],
+    "notes": "3mũitênđenquaykimđồnghồtamgiácbo,5giữa,PPdướiSERIFđậmkhác67. Giữ5không05;vềstylefontDDHđượcđồngbộtheomẫu,nộidungkhôngkhác. Khôngtựthêmtext.",
+    "questions": [
+      {
+        "qid": "12-KT-C4-D1-II-2",
+        "de": "Polymer X có thể chịu được nhiệt độ lên tới 160 °C nên được dùng làm ống dẫn nước nóng, hộp đựng thực phẩm có thể sử dụng trong lò vi sóng. Các vật dụng làm từ X thường được in kí hiệu như hình dưới đây.",
+        "refs": [
+          {
+            "where": "12-KT-C4-D1-II-2.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 399,
+    "hash": "46677a532fbee3cac3095f3676709da492552a0bd4bcf11c29be629325367d56",
+    "fileNguon": "anh/46677a532fbee3cac3095f3676709da492552a0bd4bcf11c29be629325367d56.png",
+    "canvas": [
+      376,
+      169
+    ],
+    "daMoNative": true,
+    "kind": "recycle-pair",
+    "panels": [
+      {
+        "number": "2",
+        "caption": "HDPE"
+      },
+      {
+        "number": "3",
+        "caption": "PVC"
+      }
+    ],
+    "notes": "2logongang,trái2HDPE,phải3PVC;MỖIlogo3mũitênkimđồnghồđầumũitênđáychỉtrái. MộtđườngkẻĐỨNGđenngăn2panelởgiữa,giữdòngnày. Khôngđổi3thành03.",
+    "questions": [
+      {
+        "qid": "VIP27-C4-B14-D2-II-4",
+        "de": "Nhựa là một loại vật liệu có nhiều ứng dụng trong đời sống. Dưới đáy chai hoặc các vật dụng bằng nhựa thường có kí hiệu các con số (như hình bên). Số 2 là kí hiệu của nhựa làm từ polymer X, loại này mềm, nóng chảy trên 110°C, có tính khá trơ với môi trường acid, kiềm, dầu mỡ, được dùng phổ biến làm màng mỏng, bình chứa. Số 3 là kí hiệu của nhựa làm từ polymer Y, loại nhựa này được sử dụng để sản xuất đồ nhựa như ống dẫn nước, vải che mưa. Ở nhiệt độ cao, nhựa làm từ polymer Y bị phân hủy, có mùi hôi và gây ngộ độc.",
+        "refs": [
+          {
+            "where": "VIP27-C4-B14-D2-II-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 933,
+    "hash": "a8c82fee05086272d56d16bed54361decfdb80a1eff163de86e8f5765c269ba7",
+    "fileNguon": "anh/a8c82fee05086272d56d16bed54361decfdb80a1eff163de86e8f5765c269ba7.png",
+    "canvas": [
+      248,
+      257
+    ],
+    "daMoNative": true,
+    "kind": "recycle",
+    "text": [
+      "03",
+      "PVC"
+    ],
+    "notes": "1logo3mũitênđenquaykimđồnghồtamgiácbo. BẮTBUỘCgiữ03cósố0trước3;PVCdưới. Khôngcùngtextvớilogo3PVCkhông0.",
+    "questions": [
+      {
+        "qid": "12-KT-C4-D3-II-1",
+        "de": "Polymer X là chất dẻo có tính cách điện tốt, bền với acid, dùng phổ biến để sản xuất vật liệu cách điện, ống dẫn nước, áo mưa. Các vật dụng làm từ X thường được in kí hiệu như hình dưới đây.",
+        "refs": [
+          {
+            "where": "12-KT-C4-D3-II-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 755,
+    "hash": "8c9f331305502b341848064f45d00c659c60393deb65d298911d655eb6931453",
+    "fileNguon": "anh/8c9f331305502b341848064f45d00c659c60393deb65d298911d655eb6931453.png",
+    "canvas": [
+      371,
+      221
+    ],
+    "daMoNative": true,
+    "kind": "recycle-pair",
+    "panels": [
+      {
+        "number": "2",
+        "caption": "HDPE"
+      },
+      {
+        "number": "4",
+        "caption": "LDPE"
+      }
+    ],
+    "notes": "2logomàuxámđậmngang:trái2HDPE,phải4LDPE;MỖIlogo3mũitênkimđồnghồđáychỉtrái. KHÔNGđườngngănđứnggiữa (khác399cóline). Không02/04.",
+    "questions": [
+      {
+        "qid": "12-C4-B13-II-7",
+        "de": "PE (Polyethylene) có hai dạng chính là LDPE (Low-Density Polyethylene) và HDPE (High-Density Polyethylene). HDPE có cấu trúc phân tử không phân nhánh, xếp chồng lên nhau, tạo ra một cấu trúc dày đặc hơn, mang lại tính bền vững và cứng hơn cho vật liệu.\nHDPE mang kí hiệu số 2, dễ dàng tái chế, thường dùng để sản xuất chai nhựa, thùng chứa và ống dẫn nước. LDPE có cấu trúc phân tử nhiều nhánh, dây phân tử ngắn, tạo ra một mạng lưới liên kết lỏng lẻo, giúp vật liệu có độ dẻo và linh hoạt.\nLDPE được kí hiệu số 4 trong hệ thống phân loại nhựa, có thể tái chế, thường dùng để sản xuất túi nylon, màng bọc thực phẩm.",
+        "refs": [
+          {
+            "where": "12-C4-B13-II-7.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  }
+]
