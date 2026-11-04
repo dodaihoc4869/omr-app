@@ -1,7 +1,7 @@
 // @vitest-environment node
 // KẾT THÚC CA (thầy 04/11: «Khi bấm kết thúc ca thì nhiều hs ko chấm chuẩn bị mất câu phải bấm nhận chấm lại»).
 // Gốc lỗi: `khoaCa` đổi mọi lượt `dang_lam` ⇒ `da_nop` bằng bản lưu tạm NGAY khi thầy bấm. Máy em biết ca đóng rồi nộp — tới sau vài giây ⇒ `/nop` thấy lượt đã
-// đóng ⇒ cất «bài bổ sung chờ duyệt» (thầy phải bấm Nhận + chấm lại). Nay lượt do thầy kết thúc ca đóng hộ mang dấu, bài tới trong 3 phút được NHẬN THẲNG + chấm lại.
+// đóng ⇒ cất «bài bổ sung chờ duyệt» (thầy phải bấm Nhận + chấm lại). Nay lượt do thầy kết thúc ca đóng hộ mang dấu, bài tới trong 90 giây được NHẬN THẲNG + chấm lại.
 // Chạy trên SQLite THẬT (`_d1-that.ts`): `/nop`, `khoaCa`, cron chấm bù thật.
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import worker from '../server/src/index'
@@ -43,7 +43,7 @@ const nop = (d: D1That, sbd: string, dapAn: unknown = TREN_MAY) => goiWorker(wor
 beforeEach(() => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(NOW); xoaHenChamBu() })
 afterEach(() => vi.useRealTimers())
 
-it('thầy kết thúc ca rồi máy em nộp trong 3 phút ⇒ nhận thẳng (gộp với bản lưu tạm), không thành bài bổ sung, cron chấm bù chấm đủ câu', async () => {
+it('thầy kết thúc ca rồi máy em nộp trong 90 giây ⇒ nhận thẳng (gộp với bản lưu tạm), không thành bài bổ sung, cron chấm bù chấm đủ câu', async () => {
   const d = dung(); themLuot(d, 'E1')
   expect(await khoaCa(d.env, { maCa: MA })).toMatchObject({ ok: true, soEmBiNop: 1 })
   expect(JSON.parse(luot(d, 'E1').integrity_json!)).toMatchObject({ dongBoi: 'khoa' })
@@ -54,9 +54,23 @@ it('thầy kết thúc ca rồi máy em nộp trong 3 phút ⇒ nhận thẳng (
   expect(JSON.parse(l.dap_an_json)).toEqual(TREN_MAY)
   expect(JSON.parse(l.integrity_json!)).toMatchObject({ nopSauKhoa: true, leaveCount: 1 })
   expect(JSON.parse(l.integrity_json!).dongBoi).toBeUndefined() // nhận một lần: dấu đã xoá
-  const r = await cronChamBu(d.env, NOW + (PHUT_CHO_CHAM_BU + 1) * 60_000, ghiQuaWorker)
+  const r = await cronChamBu(d.env, NOW + (PHUT_CHO_CHAM_BU + 3) * 60_000, ghiQuaWorker)
   expect(r.soGhi).toBeGreaterThan(0)
   expect(luot(d, 'E1').tong).toBe(10)
+})
+
+it('RACE: màn Theo dõi ghi điểm theo bản lưu tạm TỚI SAU lượt nhận bài muộn ⇒ giờ nộp đã đổi (màn chấm lại theo bài gộp); sổ lưu giờ khoá', async () => {
+  const d = dung(); themLuot(d, 'E6')
+  await khoaCa(d.env, { maCa: MA })
+  const khoaLuc = (d.sql.prepare('SELECT nop_luc FROM luot WHERE khoa=?').get(`${MA}|E6|1`) as { nop_luc: string }).nop_luc
+  vi.setSystemTime(NOW + 5_000)
+  await nop(d, 'E6')
+  // lượt ghi điểm của màn thầy (chấm theo bản lưu tạm nó đọc lúc vừa bấm Kết thúc) tới máy chủ SAU
+  await goiWorker(worker, d.env, '/cham-diem', { maCa: MA, bai: [{ sbd: 'E6', lanThu: 1, diem: { I: 2.5, II: 0, III: 0, tong: 2.5 }, cau: [] }] }, true)
+  const sau = d.sql.prepare('SELECT nop_luc,integrity_json,dap_an_json FROM luot WHERE khoa=?').get(`${MA}|E6|1`) as { nop_luc: string; integrity_json: string; dap_an_json: string }
+  expect(sau.nop_luc).not.toBe(khoaLuc) // màn Theo dõi nhận diện lượt theo (sbd, lần, nop_luc) ⇒ thấy lượt mới ⇒ chấm lại bài gộp
+  expect(JSON.parse(sau.integrity_json)).toMatchObject({ nopSauKhoa: true, khoaLuc })
+  expect(JSON.parse(sau.dap_an_json)).toEqual(TREN_MAY)
 })
 
 it('đã chấm theo bản lưu tạm rồi bài máy em mới tới (trong cửa) ⇒ xoá điểm cũ, chấm lại đủ câu', async () => {
@@ -74,7 +88,7 @@ it('đã chấm theo bản lưu tạm rồi bài máy em mới tới (trong cử
   expect(luot(d, 'E2').tong).toBe(10)
 })
 
-it('quá 3 phút sau khi kết thúc ca ⇒ như cũ: bài bổ sung chờ thầy duyệt, bài đã chốt không đổi', async () => {
+it('quá 90 giây sau khi kết thúc ca ⇒ như cũ: bài bổ sung chờ thầy duyệt, bài đã chốt không đổi', async () => {
   const d = dung(); themLuot(d, 'E3')
   await khoaCa(d.env, { maCa: MA })
   vi.setSystemTime(NOW + (GIAY_NHAN_SAU_KHOA + 5) * 1000)

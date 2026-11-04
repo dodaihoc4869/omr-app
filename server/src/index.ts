@@ -675,7 +675,7 @@ async function nop(env: Env, b: Record<string, unknown>): Promise<Response> {
     // chuyện thường, báo đỏ ở đây là em tưởng mất bài và nộp lại lần nữa.
     const da = sau
     if (da && (da.trang_thai === 'da_nop' || da.trang_thai === 'khoa')) {
-      // Lượt đã đóng: thầy vừa kết thúc ca (≤ 3 phút) ⇒ nhận thẳng + chấm lại; không ⇒ bài bổ sung chờ duyệt (bai-bo-sung.ts, 01/10 ca 313224).
+      // Lượt đã đóng: thầy vừa kết thúc ca (≤ 90 giây) ⇒ nhận thẳng + chấm lại; không ⇒ bài bổ sung chờ duyệt (bai-bo-sung.ts, 01/10 ca 313224).
       const { boSung } = await nhanSauKhoaHoacBoSung(env, da as never, b)
       return raCoKeyBank({ ok: true, daNhan: true, nopLuc: da.nop_luc, ...(boSung > 0 ? { boSung } : {}) }, await congBo())
     }

@@ -1337,7 +1337,7 @@ export async function khoaCa(env: Env, b: Record<string, unknown>): Promise<Reco
   if (!maCa) return { ok: false, error: 'Thiếu mã ca' }
   const nay = NAY()
   const r = await env.DB.batch([
-    // Dấu «thầy kết thúc ca đóng hộ» (bai-bo-sung.ts SQL_DAU_KHOA): bài máy em gửi tới trong 3 phút sau được nhận thẳng + chấm lại, không thành bài bổ sung chờ duyệt.
+    // Dấu «thầy kết thúc ca đóng hộ» (bai-bo-sung.ts SQL_DAU_KHOA): bài máy em gửi tới trong 90 giây sau được nhận thẳng + chấm lại, không thành bài bổ sung chờ duyệt.
     env.DB.prepare(`UPDATE luot SET trang_thai = 'da_nop', ${SQL_DAU_KHOA}, nop_luc = COALESCE(NULLIF(nop_luc,''), ?), cap_nhat_luc = ? WHERE ma_ca = ? AND trang_thai = 'dang_lam'`).bind(nay, nay, maCa),
     env.DB.prepare("UPDATE ca SET trang_thai = 'dong', cap_nhat_luc = ? WHERE ma_ca = ?").bind(nay, maCa),
   ])

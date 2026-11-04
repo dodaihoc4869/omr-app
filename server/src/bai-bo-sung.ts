@@ -67,8 +67,9 @@ export function gopBai(cuV: unknown, moiV: unknown): BaiLam {
 /** DẤU «THẦY KẾT THÚC CA ĐÓNG HỘ» (thầy 04/11: «Khi bấm kết thúc ca thì nhiều hs ko chấm chuẩn bị mất câu phải bấm nhận chấm lại»): lượt `dang_lam` bị
  *  đóng bởi nút Kết thúc ca (goi-cu.ts `khoaCa`, index.ts sửa ca `khoaLuot`) mang `integrity_json.dongBoi = 'khoa'` — em CHƯA tự nộp. */
 export const SQL_DAU_KHOA = `integrity_json = json_set(COALESCE(NULLIF(integrity_json, ''), '{}'), '$.dongBoi', 'khoa')`
-/** Cửa nhận bài máy em gửi tới SAU khi thầy kết thúc ca (giây): máy em biết ca đóng qua nhịp hỏi trạng thái rồi nộp ngay — mạng chậm vài chục giây. */
-export const GIAY_NHAN_SAU_KHOA = 180
+/** Cửa nhận bài máy em gửi tới SAU khi thầy kết thúc ca (giây): máy em tự nộp khi hết giờ / lưu tạm 20 giây một nhịp — bài tới trong vài giây, mạng chậm vài
+ *  chục giây. Giữ HẸP (90 giây): bài tới muộn hơn có thể có câu làm sau giờ ⇒ vẫn là bài bổ sung chờ thầy duyệt (em không lợi dụng sửa bài sau giờ được). */
+export const GIAY_NHAN_SAU_KHOA = 90
 
 /**
  * `/nop` tới khi lượt ĐÃ đóng. Lượt do thầy KẾT THÚC CA đóng hộ (dấu `SQL_DAU_KHOA`) và bài tới trong `GIAY_NHAN_SAU_KHOA` giây ⇒ NHẬN THẲNG vào bài
@@ -89,12 +90,14 @@ export async function nhanSauKhoaHoacBoSung(
   if (d.trang_thai === 'da_nop' && dau === 'khoa' && b.dapAn && typeof b.dapAn === 'object' && tre >= 0 && tre <= GIAY_NHAN_SAU_KHOA * 1000) {
     const it = (b.integrity && typeof b.integrity === 'object' ? b.integrity : {}) as { leaveCount?: unknown; totalHiddenMs?: unknown }
     const r = await env.DB.prepare(
+      // `nop_luc` = lúc nhận: màn Theo dõi của thầy nhận diện lượt đã ghi điểm theo (sbd, lần, nop_luc) ⇒ thấy lượt «mới» và CHẤM LẠI theo bài đã gộp — kể cả khi
+      // lượt ghi điểm theo bản lưu tạm của chính màn ấy (vừa bấm Kết thúc) tới máy chủ SAU lượt nhận này. Màn đã đóng ⇒ `tong` NULL ⇒ cron chấm bù chấm.
       `UPDATE luot SET dap_an_json = ?, giay_cau_json = COALESCE(?, giay_cau_json), integrity_json = ?, so_lan_roi_man = ?, tong_giay_roi_man = ?,
-         da_day_sheet = 0, tong = NULL, diem_i = NULL, diem_ii = NULL, diem_iii = NULL, cap_nhat_luc = ?
+         nop_luc = ?, da_day_sheet = 0, tong = NULL, diem_i = NULL, diem_ii = NULL, diem_iii = NULL, cap_nhat_luc = ?
        WHERE khoa = ? AND trang_thai = 'da_nop' AND json_extract(integrity_json, '$.dongBoi') = 'khoa'`,
     ).bind(
-      JSON.stringify(gopBai(d.dap_an_json, b.dapAn)), b.giayCau ? JSON.stringify(b.giayCau) : null, JSON.stringify({ ...it, nopSauKhoa: true }),
-      Number(it.leaveCount ?? 0) || 0, Math.round(Number(it.totalHiddenMs ?? 0) / 1000) || 0, new Date(nowMs).toISOString(), d.khoa,
+      JSON.stringify(gopBai(d.dap_an_json, b.dapAn)), b.giayCau ? JSON.stringify(b.giayCau) : null, JSON.stringify({ ...it, nopSauKhoa: true, khoaLuc: d.nop_luc }),
+      Number(it.leaveCount ?? 0) || 0, Math.round(Number(it.totalHiddenMs ?? 0) / 1000) || 0, new Date(nowMs).toISOString(), new Date(nowMs).toISOString(), d.khoa,
     ).run().catch(() => null)
     if (r && Number(r.meta?.changes ?? 0) > 0) return { nhan: true, boSung: 0 }
   }
