@@ -1,0 +1,84 @@
+[
+  {
+    "i": 1248,
+    "hash": "e28c736f07f1c1fef519b548a13962324963ffec0dffe820c494d9dfb5dcc2e3",
+    "fileNguon": "anh/e28c736f07f1c1fef519b548a13962324963ffec0dffe820c494d9dfb5dcc2e3.png",
+    "canvas": [
+      1024,
+      832
+    ],
+    "daMoNative": true,
+    "kind": "fertilizer-flow-7box",
+    "nodes": [
+      "SO₂(g) + O₂(g)",
+      "A(g)",
+      "Hợp chất (Q)",
+      "Hợp chất (X)",
+      "N₂(g) + H₂(g)",
+      "Hợp chất (Y)",
+      "Phân bón (Z)"
+    ],
+    "edges": [
+      {
+        "from": 0,
+        "to": 1,
+        "text": "t°, V₂O₅(s)"
+      },
+      {
+        "from": 1,
+        "to": 2,
+        "text": "+ H₂SO₄(l)"
+      },
+      {
+        "from": 2,
+        "to": 3,
+        "text": "+ H₂O(l)"
+      },
+      {
+        "from": 4,
+        "to": 5,
+        "text": ""
+      },
+      {
+        "from": [
+          3,
+          5
+        ],
+        "to": 6,
+        "text": ""
+      }
+    ],
+    "notes": "7boxviềnđen/nềntrắng;nhánhtrái4boxdọc,nhánhphải2boxdọcnganghàng3/4nhánhtrái;2boxcuốinốidâygấpphíadướivào1nútgiữa,mũitênxuốngPhânbón(Z). KHÔNGđiềukiệntrênN₂+H₂→YtrongsourceđừngthêmFe/t/p.KHÔNGtựgiảiA/Q/X/Y/Zsốchất. Giữngoặcvòngở(Q)/(X)/(Y)/(Z),statetagsg/s/l.",
+    "questions": [
+      {
+        "qid": "DB-11-B8-D5-II-9",
+        "de": "Sơ đồ quy trình dưới đây mô tả các bước trong quá trình sản xuất phân bón (Z):",
+        "refs": [
+          {
+            "where": "DB-11-B8-D5-II-9.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B8-II-18",
+        "de": "Sơ đồ quy trình dưới đây mô tả các bước trong quá trình sản xuất phân bón (Z):",
+        "refs": [
+          {
+            "where": "DH-11-C2-B8-II-18.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "phan-bon-flow-ddh-175f8bc9006db645a405bcc72dcaa5b29fa9235f85b125be4ade00b6ed146365.svg",
+    "hashSvg": "175f8bc9006db645a405bcc72dcaa5b29fa9235f85b125be4ade00b6ed146365",
+    "byteSvg": 44080,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "7hộp/5arrow/nhánhhợpvuônggóc;biếnA/Q/X/Y/Z,tagg/s/l,3điềukiệnnhánhtrái;N2H2→YKHÔNGcond;khônggiảichất/charges.",
+    "hashSvgDaSoat": "175f8bc9006db645a405bcc72dcaa5b29fa9235f85b125be4ade00b6ed146365",
+    "nguoiSoat": "cau_truc_6"
+  }
+]

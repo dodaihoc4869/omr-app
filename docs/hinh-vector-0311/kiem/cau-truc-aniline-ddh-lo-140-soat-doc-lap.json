@@ -1,0 +1,18 @@
+[
+  {
+    "i": 984,
+    "hashSvg": "2fbb6fb3f4c5fc94b30159189b66e5dffbc6e65bc58183cd01d76b138526eb70",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG native/full và actual SVG render. 4 vòng mỗi vòng3double; NO2/NH3Cl/NH2 cạnh phải trên. NH3Cl literal không thêm charge. Arrow1 trống; arrow2 Zn+HCl(aq); arrow3 NaOH(aq). Đủ từng chỉ số/group/bond, không sửa theory/thêm điều kiện/hệ số/caption/charge. DDH path tự chứa không text/image/fallback; gaps rõ không cắt/chạm/tràn. Hash byte thực khớp metadata.",
+    "hash": "b03f83efa970cd709a3b8e93576bcf818d7c0b6fa1b96c6e3da971f9b314572c",
+    "hashSvgDaSoat": "2fbb6fb3f4c5fc94b30159189b66e5dffbc6e65bc58183cd01d76b138526eb70"
+  },
+  {
+    "i": 1292,
+    "hashSvg": "4182abbda4d476fab18dcd019087db284d7957f7596e99befe424b7b4dfdcc88",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG PNG native/full và actual SVG render. 3 vòng CIRCLE; NO2/NH2 trên đỉnh. Arrow1 +HNO3 đặc trên, xt,t0 dưới với0 superscript; arrow2 +Fe/HCl trên. Đủ từng chỉ số/group/bond, không sửa theory/thêm điều kiện/hệ số/caption/charge. DDH path tự chứa không text/image/fallback; gaps rõ không cắt/chạm/tràn. Hash byte thực khớp metadata.",
+    "hash": "eaad5541aeb2e82801ffd094fc88ef313586974e86928fb37b4e8329a9143790",
+    "hashSvgDaSoat": "4182abbda4d476fab18dcd019087db284d7957f7596e99befe424b7b4dfdcc88"
+  }
+]

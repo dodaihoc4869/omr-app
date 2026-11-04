@@ -928,6 +928,33 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "6fe87a48dea9b81beed8296afb2362d6256aa5cae001820eb3fcd0d6dfa00ab4": {
+      "tep": "paracetamol-ddh-cc3596e0076afb260d805c6ad031fa8ec7d0f93652bac1ed1dfa5b7b2f78f543.svg",
+      "hashSvg": "cc3596e0076afb260d805c6ad031fa8ec7d0f93652bac1ed1dfa5b7b2f78f543",
+      "byteSvg": 27303,
+      "byteGzip": 4357,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
+    "a7e924244d8b691025f3714a449465ac5e2ac51358ba1d208699260d433c025b": {
+      "tep": "paracetamol-ddh-cc3596e0076afb260d805c6ad031fa8ec7d0f93652bac1ed1dfa5b7b2f78f543.svg",
+      "hashSvg": "cc3596e0076afb260d805c6ad031fa8ec7d0f93652bac1ed1dfa5b7b2f78f543",
+      "byteSvg": 27303,
+      "byteGzip": 4357,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
+    "6fc5508d7e56add3d3ce587282325b34387e72c0c6edf8b202c4862967649c0d": {
+      "tep": "paracetamol-ddh-cc3596e0076afb260d805c6ad031fa8ec7d0f93652bac1ed1dfa5b7b2f78f543.svg",
+      "hashSvg": "cc3596e0076afb260d805c6ad031fa8ec7d0f93652bac1ed1dfa5b7b2f78f543",
+      "byteSvg": 27303,
+      "byteGzip": 4357,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "fd9dc4ef16a9abd4bb2a16d9f10a9a8650446ba720443d35ed5f2d27a29ae739": {
       "tep": "hoa-ddh-d10f6e532938a44e8fde49e362275075ef26e2e2c851016063c6a5662c49dabb.svg",
       "hashSvg": "d10f6e532938a44e8fde49e362275075ef26e2e2c851016063c6a5662c49dabb",
@@ -1540,6 +1567,24 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "b03f83efa970cd709a3b8e93576bcf818d7c0b6fa1b96c6e3da971f9b314572c": {
+      "tep": "aniline-ddh-2fbb6fb3f4c5fc94b30159189b66e5dffbc6e65bc58183cd01d76b138526eb70.svg",
+      "hashSvg": "2fbb6fb3f4c5fc94b30159189b66e5dffbc6e65bc58183cd01d76b138526eb70",
+      "byteSvg": 15042,
+      "byteGzip": 3060,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
+    "eaad5541aeb2e82801ffd094fc88ef313586974e86928fb37b4e8329a9143790": {
+      "tep": "aniline-ddh-4182abbda4d476fab18dcd019087db284d7957f7596e99befe424b7b4dfdcc88.svg",
+      "hashSvg": "4182abbda4d476fab18dcd019087db284d7957f7596e99befe424b7b4dfdcc88",
+      "byteSvg": 13803,
+      "byteGzip": 3821,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "a3da0a5c4aad5ffeb7f5717528cc57cf206f43ca427bbe801a322486a484e856": {
       "tep": "cau-truc-ddh-e6a786dfec8777156b08c3f1679bf81b9fef730de8e74a7fb8d8c62353d8e9c1.svg",
       "hashSvg": "e6a786dfec8777156b08c3f1679bf81b9fef730de8e74a7fb8d8c62353d8e9c1",
@@ -1671,6 +1716,60 @@
       "hashSvg": "717546d3117cf9228c06eea17571dc386b5a809649ae713d38f1967bef902f94",
       "byteSvg": 922,
       "byteGzip": 312,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
+    "881eabf1171f2c86c696828c17a1bb0d7d4d7c44167ca97868c002ffee9c2e83": {
+      "tep": "aspirin-ddh-c4bd0bb5e6eadf49601ef8758d2e35101b98457aea5a309c5214025c06f85506.svg",
+      "hashSvg": "c4bd0bb5e6eadf49601ef8758d2e35101b98457aea5a309c5214025c06f85506",
+      "byteSvg": 23086,
+      "byteGzip": 4016,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
+    "ef539229317d33ae386b1c98aa6249c155255e9da231e9c963157be9d4460ebe": {
+      "tep": "aspirin-ddh-738e9e3a6e53cfff5ecdd4e398a8edfef2d300cfcf47cb388c2654b488643871.svg",
+      "hashSvg": "738e9e3a6e53cfff5ecdd4e398a8edfef2d300cfcf47cb388c2654b488643871",
+      "byteSvg": 24038,
+      "byteGzip": 4349,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
+    "e901f90224119c78a1d4d1538962b6a6533a4c9e466f4f2a24a8de23ad8f22ae": {
+      "tep": "aspirin-ddh-7990e7bb805cd86bd4e1bd85d0ccfc13d5be3a554c64bd936b0444cf0e7fa259.svg",
+      "hashSvg": "7990e7bb805cd86bd4e1bd85d0ccfc13d5be3a554c64bd936b0444cf0e7fa259",
+      "byteSvg": 25214,
+      "byteGzip": 4720,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
+    "2244842bb9174b43a2ff8dc140b04a2c7338208fbf94475f0ae57b681cec5097": {
+      "tep": "aspirin-ddh-ee5b8a564b385dd78cd90b72ccdefc2869436b0bf42675fe9122b278fd290b16.svg",
+      "hashSvg": "ee5b8a564b385dd78cd90b72ccdefc2869436b0bf42675fe9122b278fd290b16",
+      "byteSvg": 15221,
+      "byteGzip": 1994,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
+    "23764464098ba10c9a74b47d5ba441adc22d1d676f47bddeedc73db1ba8ce2af": {
+      "tep": "aspirin-ddh-ee5b8a564b385dd78cd90b72ccdefc2869436b0bf42675fe9122b278fd290b16.svg",
+      "hashSvg": "ee5b8a564b385dd78cd90b72ccdefc2869436b0bf42675fe9122b278fd290b16",
+      "byteSvg": 15221,
+      "byteGzip": 1994,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
+    "d32c59e7f0828cd37e16bde375f06ce3bf4c3f88fd27d2327284bcdcc79f7ce5": {
+      "tep": "aspirin-ddh-b827acb74982154c03e7b9a20b9c7a65976f0d0e5ac9c4e522c27550727a2cab.svg",
+      "hashSvg": "b827acb74982154c03e7b9a20b9c7a65976f0d0e5ac9c4e522c27550727a2cab",
+      "byteSvg": 24109,
+      "byteGzip": 4231,
       "trangThai": "cau-truc-da-soat-doc-lap",
       "canNenSang": true,
       "font": "DDH Rounded"
@@ -2166,6 +2265,15 @@
       "hashSvg": "58b0055e0eda80727ed8f170a44fa7bb5d8dfdd552cc60319cc72c4f5ac3f34a",
       "byteSvg": 4974,
       "byteGzip": 1002,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
+    "e28c736f07f1c1fef519b548a13962324963ffec0dffe820c494d9dfb5dcc2e3": {
+      "tep": "phan-bon-flow-ddh-175f8bc9006db645a405bcc72dcaa5b29fa9235f85b125be4ade00b6ed146365.svg",
+      "hashSvg": "175f8bc9006db645a405bcc72dcaa5b29fa9235f85b125be4ade00b6ed146365",
+      "byteSvg": 44080,
+      "byteGzip": 7098,
       "trangThai": "cau-truc-da-soat-doc-lap",
       "canNenSang": true,
       "font": "DDH Rounded"
@@ -6283,6 +6391,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "f623d1ca4cdc50f02668a602dfaf136bf2b0f5ffcdb1f8a086a211102cc1c131": {
+      "tep": "do-thi-aspirin-ddh-cea584f57e1a2ceabaa0931910cbd9d0e3abf154b0baa727ecd7c6e425b2c700.svg",
+      "hashSvg": "cea584f57e1a2ceabaa0931910cbd9d0e3abf154b0baa727ecd7c6e425b2c700",
+      "byteSvg": 70199,
+      "byteGzip": 9947,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "9acf8a0a8dd4ddd57055a105d22a5c375e8066934964242434cee1258247a0b2": {
       "tep": "hinh-ddh-41b9629a93af5ba52440304ec69e5cc4f15f01830d17da1c30b1a3313871267b.svg",
       "hashSvg": "41b9629a93af5ba52440304ec69e5cc4f15f01830d17da1c30b1a3313871267b",
@@ -7452,6 +7569,20 @@
       ]
     },
     {
+      "qid": "12-C1-B1-D1-II-20",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "e901f90224119c78a1d4d1538962b6a6533a4c9e466f4f2a24a8de23ad8f22ae",
+          "where": "12-C1-B1-D1-II-20.hinh.0.du_lieu",
+          "hashDataUrl": "e72fe73d71c7f35262966e6753fff12582be12573cf8a5588aa1d590f65809f2",
+          "vector": "aspirin-ddh-7990e7bb805cd86bd4e1bd85d0ccfc13d5be3a554c64bd936b0444cf0e7fa259.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-BD7-20-II-2",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -8058,6 +8189,20 @@
           "where": "12-C1-B2-III-27.hinh.0.du_lieu",
           "hashDataUrl": "fb221be9787f0386993602babff1cb0e1c0e985f032458076a0249d62f1d98f9",
           "vector": "cau-truc-ddh-daf5b3b6e29f063a571e22abddbaa09f2e6154c96c19666f9c78714eaf074bc8.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-C1-B1-D2-II-7",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "23764464098ba10c9a74b47d5ba441adc22d1d676f47bddeedc73db1ba8ce2af",
+          "where": "12-C1-B1-D2-II-7.hinh.0.du_lieu",
+          "hashDataUrl": "08b9d63360a633a337dfd4838a6fb9c5d68da615aca553f848a025eadb4dcd86",
+          "vector": "aspirin-ddh-ee5b8a564b385dd78cd90b72ccdefc2869436b0bf42675fe9122b278fd290b16.svg"
         }
       ]
     },
@@ -8782,6 +8927,20 @@
       ]
     },
     {
+      "qid": "12-C3-B8-D2-III-29",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "6fe87a48dea9b81beed8296afb2362d6256aa5cae001820eb3fcd0d6dfa00ab4",
+          "where": "12-C3-B8-D2-III-29.hinh.0.du_lieu",
+          "hashDataUrl": "610e104305c94a546d4cca68e047fe63874f316b4f4abfbad87e056f4618a1b0",
+          "vector": "paracetamol-ddh-cc3596e0076afb260d805c6ad031fa8ec7d0f93652bac1ed1dfa5b7b2f78f543.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-C3-B8-D2-I-16",
       "duMoiHinh": true,
       "soHinhNguon": 4,
@@ -8942,6 +9101,20 @@
           "where": "12-C3-B8-D2-III-40.hinh.0.du_lieu",
           "hashDataUrl": "bee076d06afb62d58b69bf12518f45866b34c42f64882c748b8c490bb549f768",
           "vector": "cau-truc-ddh-b6d00eded3632c0c2763521ac656c9027ab39e09da9a7e608a7a4a8f46b91624.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-C3-B8-D2-III-45",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "6fc5508d7e56add3d3ce587282325b34387e72c0c6edf8b202c4862967649c0d",
+          "where": "12-C3-B8-D2-III-45.hinh.0.du_lieu",
+          "hashDataUrl": "63d0ee17ac14dea0a81f70e18a314751ba74f2bb99f90edf104d69bb5932b5c2",
+          "vector": "paracetamol-ddh-cc3596e0076afb260d805c6ad031fa8ec7d0f93652bac1ed1dfa5b7b2f78f543.svg"
         }
       ]
     },
@@ -9986,6 +10159,20 @@
       ]
     },
     {
+      "qid": "12-KT-C1-D4-II-2",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "ef539229317d33ae386b1c98aa6249c155255e9da231e9c963157be9d4460ebe",
+          "where": "12-KT-C1-D4-II-2.hinh.0.du_lieu",
+          "hashDataUrl": "f16759c33a87a801912ae6827f85261e713392911db3403894d3b1e58b85c5a5",
+          "vector": "aspirin-ddh-738e9e3a6e53cfff5ecdd4e398a8edfef2d300cfcf47cb388c2654b488643871.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-KT-C1-D4-III-5",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -10484,6 +10671,20 @@
       ]
     },
     {
+      "qid": "12-KT-C3-D3-III-6",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "a7e924244d8b691025f3714a449465ac5e2ac51358ba1d208699260d433c025b",
+          "where": "12-KT-C3-D3-III-6.hinh.0.du_lieu",
+          "hashDataUrl": "a09cc2cab0827bd2f5bac898e622e5cc3960f8674d6b8ac9fdd6887e9210b859",
+          "vector": "paracetamol-ddh-cc3596e0076afb260d805c6ad031fa8ec7d0f93652bac1ed1dfa5b7b2f78f543.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-KT-C3-D4-I-5",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -10858,6 +11059,20 @@
           "where": "12-KT-C3-D5-II-4.hinh.0.du_lieu",
           "hashDataUrl": "bb9df59e5bf303d9afb4be7edaaac91dac124dcf57e999194ddfc9622cf54259",
           "vector": "hinh-ddh-44050f3813654f131fba282f1bb8544588ae61db58ef340af3c5f33e1394dd99.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-KT-C3-D5-III-5",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "eaad5541aeb2e82801ffd094fc88ef313586974e86928fb37b4e8329a9143790",
+          "where": "12-KT-C3-D5-III-5.hinh.0.du_lieu",
+          "hashDataUrl": "a0860d175c9dadcd4f724ff6011d0f2bdd0144610a582d63c1bfd96d3f4650c6",
+          "vector": "aniline-ddh-4182abbda4d476fab18dcd019087db284d7957f7596e99befe424b7b4dfdcc88.svg"
         }
       ]
     },
@@ -12388,6 +12603,20 @@
       ]
     },
     {
+      "qid": "DB-11-B8-D5-II-9",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "e28c736f07f1c1fef519b548a13962324963ffec0dffe820c494d9dfb5dcc2e3",
+          "where": "DB-11-B8-D5-II-9.hinh.0.du_lieu",
+          "hashDataUrl": "4cea179ad36530892092ff999ca5247af7c855486e91f515b8a5957500c94dca",
+          "vector": "phan-bon-flow-ddh-175f8bc9006db645a405bcc72dcaa5b29fa9235f85b125be4ade00b6ed146365.svg"
+        }
+      ]
+    },
+    {
       "qid": "DB-12-B1-P1-D2-I-12",
       "duMoiHinh": true,
       "soHinhNguon": 4,
@@ -12676,6 +12905,34 @@
       ]
     },
     {
+      "qid": "DB-12-B1-P1-D1-II-31",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "e901f90224119c78a1d4d1538962b6a6533a4c9e466f4f2a24a8de23ad8f22ae",
+          "where": "DB-12-B1-P1-D1-II-31.hinh.0.du_lieu",
+          "hashDataUrl": "e72fe73d71c7f35262966e6753fff12582be12573cf8a5588aa1d590f65809f2",
+          "vector": "aspirin-ddh-7990e7bb805cd86bd4e1bd85d0ccfc13d5be3a554c64bd936b0444cf0e7fa259.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B1-P1-D1-II-40",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "23764464098ba10c9a74b47d5ba441adc22d1d676f47bddeedc73db1ba8ce2af",
+          "where": "DB-12-B1-P1-D1-II-40.hinh.0.du_lieu",
+          "hashDataUrl": "08b9d63360a633a337dfd4838a6fb9c5d68da615aca553f848a025eadb4dcd86",
+          "vector": "aspirin-ddh-ee5b8a564b385dd78cd90b72ccdefc2869436b0bf42675fe9122b278fd290b16.svg"
+        }
+      ]
+    },
+    {
       "qid": "DB-12-B1-P1-D1-III-45",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -12714,6 +12971,20 @@
           "where": "DB-12-B1-P1-D1-III-106.hinh.0.du_lieu",
           "hashDataUrl": "333f3c49b776988b4b5c50655f7e8302db4be4bc38bc77dd916f7f24b9fd1d11",
           "vector": "cau-truc-ddh-6c8ad21724f663036932aef18275a57b56aa9d4d0b0a6f9c9c358353f4f9304b.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B1-P1-D1-II-108",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "ef539229317d33ae386b1c98aa6249c155255e9da231e9c963157be9d4460ebe",
+          "where": "DB-12-B1-P1-D1-II-108.hinh.0.du_lieu",
+          "hashDataUrl": "f16759c33a87a801912ae6827f85261e713392911db3403894d3b1e58b85c5a5",
+          "vector": "aspirin-ddh-738e9e3a6e53cfff5ecdd4e398a8edfef2d300cfcf47cb388c2654b488643871.svg"
         }
       ]
     },
@@ -12860,6 +13131,34 @@
           "where": "DB-12-B1-P1-D1-I-145.hinh.4.du_lieu",
           "hashDataUrl": "dccf06f52dd9ae2be0cd6f97f4abbdd1e3852dfc6cebb768355a24486c953c0f",
           "vector": "cau-truc-ddh-a7e68273fb10afbce4e2a6046b4cf343d2532060aed55d588cbb91ce05023bde.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B1-P1-D1-II-153",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "2244842bb9174b43a2ff8dc140b04a2c7338208fbf94475f0ae57b681cec5097",
+          "where": "DB-12-B1-P1-D1-II-153.hinh.0.du_lieu",
+          "hashDataUrl": "e0f9f69aff24b75999e35d066412c71e19ab786f0ca4121754a6fb5efbcee0ed",
+          "vector": "aspirin-ddh-ee5b8a564b385dd78cd90b72ccdefc2869436b0bf42675fe9122b278fd290b16.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B1-P1-D1-II-158",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "881eabf1171f2c86c696828c17a1bb0d7d4d7c44167ca97868c002ffee9c2e83",
+          "where": "DB-12-B1-P1-D1-II-158.hinh.0.du_lieu",
+          "hashDataUrl": "bc347c6e64be1873a07d61cde0608c21190c6c868e8a03748c2611241e08884a",
+          "vector": "aspirin-ddh-c4bd0bb5e6eadf49601ef8758d2e35101b98457aea5a309c5214025c06f85506.svg"
         }
       ]
     },
@@ -14482,6 +14781,20 @@
       ]
     },
     {
+      "qid": "DB-12-B8-D1-III-148",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "6fe87a48dea9b81beed8296afb2362d6256aa5cae001820eb3fcd0d6dfa00ab4",
+          "where": "DB-12-B8-D1-III-148.hinh.0.du_lieu",
+          "hashDataUrl": "610e104305c94a546d4cca68e047fe63874f316b4f4abfbad87e056f4618a1b0",
+          "vector": "paracetamol-ddh-cc3596e0076afb260d805c6ad031fa8ec7d0f93652bac1ed1dfa5b7b2f78f543.svg"
+        }
+      ]
+    },
+    {
       "qid": "DB-12-B8-D1-I-158",
       "duMoiHinh": true,
       "soHinhNguon": 4,
@@ -14612,6 +14925,20 @@
       ]
     },
     {
+      "qid": "DB-12-B8-D1-III-194",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "6fc5508d7e56add3d3ce587282325b34387e72c0c6edf8b202c4862967649c0d",
+          "where": "DB-12-B8-D1-III-194.hinh.0.du_lieu",
+          "hashDataUrl": "63d0ee17ac14dea0a81f70e18a314751ba74f2bb99f90edf104d69bb5932b5c2",
+          "vector": "paracetamol-ddh-cc3596e0076afb260d805c6ad031fa8ec7d0f93652bac1ed1dfa5b7b2f78f543.svg"
+        }
+      ]
+    },
+    {
       "qid": "DB-12-B8-D1-I-197",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -14692,6 +15019,20 @@
           "where": "DB-12-B8-D1-I-257.hinh.0.du_lieu",
           "hashDataUrl": "62dd76394b17942a960ecd1ecf614b6ef55ec80b9b13f68b637bd6f826a4e954",
           "vector": "cau-truc-ddh-7bbf1928d957c2c553c35b6110cc124d29df3c3bdbc902233dc1553fc43dab6d.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B8-D1-III-272",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "a7e924244d8b691025f3714a449465ac5e2ac51358ba1d208699260d433c025b",
+          "where": "DB-12-B8-D1-III-272.hinh.0.du_lieu",
+          "hashDataUrl": "a09cc2cab0827bd2f5bac898e622e5cc3960f8674d6b8ac9fdd6887e9210b859",
+          "vector": "paracetamol-ddh-cc3596e0076afb260d805c6ad031fa8ec7d0f93652bac1ed1dfa5b7b2f78f543.svg"
         }
       ]
     },
@@ -15022,6 +15363,20 @@
       ]
     },
     {
+      "qid": "DB-12-B8-D1-III-432",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "b03f83efa970cd709a3b8e93576bcf818d7c0b6fa1b96c6e3da971f9b314572c",
+          "where": "DB-12-B8-D1-III-432.hinh.0.du_lieu",
+          "hashDataUrl": "e438294b1fb02f7a2b0cafb63ebbb661ece404db16b95b1d2cdec31b31ccab9b",
+          "vector": "aniline-ddh-2fbb6fb3f4c5fc94b30159189b66e5dffbc6e65bc58183cd01d76b138526eb70.svg"
+        }
+      ]
+    },
+    {
       "qid": "DB-12-B8-D1-II-439",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -15032,6 +15387,20 @@
           "where": "DB-12-B8-D1-II-439.hinh.0.du_lieu",
           "hashDataUrl": "8eeb17bc7b353b1dbe885924cb10786ab585ad80ad6891cc2375e2914f7a1bc0",
           "vector": "cau-truc-ddh-15c8526137fa3527253dfa7957a74ee50da53ac680228b972167bdae891038b8.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B8-D3-III-6",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "eaad5541aeb2e82801ffd094fc88ef313586974e86928fb37b4e8329a9143790",
+          "where": "DB-12-B8-D3-III-6.hinh.0.du_lieu",
+          "hashDataUrl": "a0860d175c9dadcd4f724ff6011d0f2bdd0144610a582d63c1bfd96d3f4650c6",
+          "vector": "aniline-ddh-4182abbda4d476fab18dcd019087db284d7957f7596e99befe424b7b4dfdcc88.svg"
         }
       ]
     },
@@ -17420,6 +17789,20 @@
       ]
     },
     {
+      "qid": "DH-11-C2-B8-II-18",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "e28c736f07f1c1fef519b548a13962324963ffec0dffe820c494d9dfb5dcc2e3",
+          "where": "DH-11-C2-B8-II-18.hinh.0.du_lieu",
+          "hashDataUrl": "4cea179ad36530892092ff999ca5247af7c855486e91f515b8a5957500c94dca",
+          "vector": "phan-bon-flow-ddh-175f8bc9006db645a405bcc72dcaa5b29fa9235f85b125be4ade00b6ed146365.svg"
+        }
+      ]
+    },
+    {
       "qid": "DH-11-C3-B12-III-2",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -17644,6 +18027,34 @@
       ]
     },
     {
+      "qid": "DH-12-C1-B1-P1-II-20",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "2244842bb9174b43a2ff8dc140b04a2c7338208fbf94475f0ae57b681cec5097",
+          "where": "DH-12-C1-B1-P1-II-20.hinh.0.du_lieu",
+          "hashDataUrl": "e0f9f69aff24b75999e35d066412c71e19ab786f0ca4121754a6fb5efbcee0ed",
+          "vector": "aspirin-ddh-ee5b8a564b385dd78cd90b72ccdefc2869436b0bf42675fe9122b278fd290b16.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C1-B1-P1-II-31",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "881eabf1171f2c86c696828c17a1bb0d7d4d7c44167ca97868c002ffee9c2e83",
+          "where": "DH-12-C1-B1-P1-II-31.hinh.0.du_lieu",
+          "hashDataUrl": "bc347c6e64be1873a07d61cde0608c21190c6c868e8a03748c2611241e08884a",
+          "vector": "aspirin-ddh-c4bd0bb5e6eadf49601ef8758d2e35101b98457aea5a309c5214025c06f85506.svg"
+        }
+      ]
+    },
+    {
       "qid": "DH-12-C1-B1-P1-III-10",
       "duMoiHinh": false,
       "soHinhNguon": 2,
@@ -17738,6 +18149,20 @@
           "where": "DH-11-C3-B14-D2-III-2.hinh.0.du_lieu",
           "hashDataUrl": "ece4b37876610b1e9e64f7fb39ab1dc997620a80233bf82d5845ed6faf07e560",
           "vector": "cau-truc-ddh-c9ffcf29a159ab661108c26f7c38dd4d92f791a7785d2ffcf8ffe4bb0d0ae63e.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C1-B1-P1-VD-II-3",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "881eabf1171f2c86c696828c17a1bb0d7d4d7c44167ca97868c002ffee9c2e83",
+          "where": "DH-12-C1-B1-P1-VD-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "bc347c6e64be1873a07d61cde0608c21190c6c868e8a03748c2611241e08884a",
+          "vector": "aspirin-ddh-c4bd0bb5e6eadf49601ef8758d2e35101b98457aea5a309c5214025c06f85506.svg"
         }
       ]
     },
@@ -18722,6 +19147,20 @@
       ]
     },
     {
+      "qid": "DH-12-C3-B8-DT-III-5",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "b03f83efa970cd709a3b8e93576bcf818d7c0b6fa1b96c6e3da971f9b314572c",
+          "where": "DH-12-C3-B8-DT-III-5.hinh.0.du_lieu",
+          "hashDataUrl": "e438294b1fb02f7a2b0cafb63ebbb661ece404db16b95b1d2cdec31b31ccab9b",
+          "vector": "aniline-ddh-2fbb6fb3f4c5fc94b30159189b66e5dffbc6e65bc58183cd01d76b138526eb70.svg"
+        }
+      ]
+    },
+    {
       "qid": "DH-12-C3-B8-VD-II-1",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -19142,6 +19581,20 @@
           "where": "DH-12-C3-B8-III-28.hinh.0.du_lieu",
           "hashDataUrl": "78550d628b42103d46edbcc3c837a6684c6729c59fe7ee7d273aaf42e295eb46",
           "vector": "phan-ung-chu-ddh-94bdbe3d94684bdbcd66a3420a427ea1fad87d7ff5cccacd134a139e66b229ef.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C3-B8-III-38",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "b03f83efa970cd709a3b8e93576bcf818d7c0b6fa1b96c6e3da971f9b314572c",
+          "where": "DH-12-C3-B8-III-38.hinh.0.du_lieu",
+          "hashDataUrl": "e438294b1fb02f7a2b0cafb63ebbb661ece404db16b95b1d2cdec31b31ccab9b",
+          "vector": "aniline-ddh-2fbb6fb3f4c5fc94b30159189b66e5dffbc6e65bc58183cd01d76b138526eb70.svg"
         }
       ]
     },
@@ -20360,6 +20813,26 @@
       ]
     },
     {
+      "qid": "VIP27-C1-B3-D2-II-4",
+      "duMoiHinh": true,
+      "soHinhNguon": 2,
+      "soHinhDaKiem": 2,
+      "hinh": [
+        {
+          "hash": "f623d1ca4cdc50f02668a602dfaf136bf2b0f5ffcdb1f8a086a211102cc1c131",
+          "where": "VIP27-C1-B3-D2-II-4.hinh.0.du_lieu",
+          "hashDataUrl": "a89215e159d064d80722801ae807bb53749b90cf145abd9c2336628b2a22570b",
+          "vector": "do-thi-aspirin-ddh-cea584f57e1a2ceabaa0931910cbd9d0e3abf154b0baa727ecd7c6e425b2c700.svg"
+        },
+        {
+          "hash": "d32c59e7f0828cd37e16bde375f06ce3bf4c3f88fd27d2327284bcdcc79f7ce5",
+          "where": "VIP27-C1-B3-D2-II-4.hinh.1.du_lieu",
+          "hashDataUrl": "3a8f0f3fb150992a6415927716889f134460296a5e66ce38feaed19571fa0523",
+          "vector": "aspirin-ddh-b827acb74982154c03e7b9a20b9c7a65976f0d0e5ac9c4e522c27550727a2cab.svg"
+        }
+      ]
+    },
+    {
       "qid": "VIP27-C1-B2-I-15",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -21056,6 +21529,7 @@
     "12-C1-B1-D1-I-103",
     "12-C1-B1-D1-II-17",
     "12-C1-B1-D1-II-19",
+    "12-C1-B1-D1-II-20",
     "12-BD7-20-II-2",
     "12-BD7-20-III-3",
     "12-BD7-19-I-17",
@@ -21091,6 +21565,7 @@
     "12-C1-B2-III-10",
     "12-C1-B2-III-13",
     "12-C1-B2-III-27",
+    "12-C1-B1-D2-II-7",
     "12-C1-B1-D2-III-11",
     "12-C1-B1-D2-III-19",
     "12-C1-B3-D2-II-3",
@@ -21136,6 +21611,7 @@
     "12-C3-B8-D2-II-17",
     "12-C3-B8-D2-II-19",
     "12-C3-B8-D2-III-8",
+    "12-C3-B8-D2-III-29",
     "12-C3-B8-D2-I-16",
     "12-C3-B8-D2-I-18",
     "12-C3-B8-D2-I-20",
@@ -21146,6 +21622,7 @@
     "12-C3-B8-D2-III-36",
     "12-C3-B8-D2-III-37",
     "12-C3-B8-D2-III-40",
+    "12-C3-B8-D2-III-45",
     "12-C3-B11-D1-I-3",
     "12-C3-B11-D1-II-2",
     "12-C3-B11-D1-II-4",
@@ -21213,6 +21690,7 @@
     "12-KT-C1-D4-I-16",
     "12-KT-C1-D4-I-17",
     "12-KT-C1-D4-II-1",
+    "12-KT-C1-D4-II-2",
     "12-KT-C1-D4-III-5",
     "12-KT-C1-D5-I-9",
     "12-KT-C1-D5-I-14",
@@ -21240,6 +21718,7 @@
     "12-KT-C3-D1-I-8",
     "12-KT-C3-D3-I-4",
     "12-KT-C3-D3-II-2",
+    "12-KT-C3-D3-III-6",
     "12-KT-C3-D4-I-5",
     "12-KT-C3-D4-I-11",
     "12-KT-C3-D4-I-15",
@@ -21264,6 +21743,7 @@
     "12-KT-C3-D5-I-2",
     "12-KT-C3-D5-I-8",
     "12-KT-C3-D5-II-4",
+    "12-KT-C3-D5-III-5",
     "12-KT-C4-D2-I-14",
     "12-KT-C4-D3-II-1",
     "12-KT-C4-D5-I-1",
@@ -21358,6 +21838,7 @@
     "DB-11-B6-D2-III-88",
     "DB-11-B6-D2-I-95",
     "DB-11-B8-D1-I-26",
+    "DB-11-B8-D5-II-9",
     "DB-12-B1-P1-D2-I-12",
     "DB-12-B1-P1-D2-II-21",
     "DB-12-B1-P1-D2-III-34",
@@ -21371,13 +21852,18 @@
     "DB-12-B1-P1-D2-II-93",
     "DB-12-B1-P1-D2-III-106",
     "DB-12-B1-P1-D1-I-25",
+    "DB-12-B1-P1-D1-II-31",
+    "DB-12-B1-P1-D1-II-40",
     "DB-12-B1-P1-D1-III-45",
     "DB-12-B1-P1-D1-III-75",
     "DB-12-B1-P1-D1-III-106",
+    "DB-12-B1-P1-D1-II-108",
     "DB-12-B1-P1-D1-I-110",
     "DB-12-B1-P1-D1-I-111",
     "DB-12-B1-P1-D1-I-123",
     "DB-12-B1-P1-D1-I-145",
+    "DB-12-B1-P1-D1-II-153",
+    "DB-12-B1-P1-D1-II-158",
     "DB-12-B1-P1-D1-III-161",
     "DB-12-B1-P1-D1-I-183",
     "DB-12-B2-D1-I-13",
@@ -21473,6 +21959,7 @@
     "DB-12-B8-D1-I-88",
     "DB-12-B8-D1-II-122",
     "DB-12-B8-D1-III-133",
+    "DB-12-B8-D1-III-148",
     "DB-12-B8-D1-I-158",
     "DB-12-B8-D1-I-160",
     "DB-12-B8-D1-I-162",
@@ -21481,12 +21968,14 @@
     "DB-12-B8-D1-III-186",
     "DB-12-B8-D1-III-187",
     "DB-12-B8-D1-III-190",
+    "DB-12-B8-D1-III-194",
     "DB-12-B8-D1-I-197",
     "DB-12-B8-D1-I-223",
     "DB-12-B8-D1-I-240",
     "DB-12-B8-D1-I-246",
     "DB-12-B8-D1-I-247",
     "DB-12-B8-D1-I-257",
+    "DB-12-B8-D1-III-272",
     "DB-12-B8-D1-I-275",
     "DB-12-B8-D1-II-276",
     "DB-12-B8-D1-I-278",
@@ -21509,7 +21998,9 @@
     "DB-12-B8-D1-III-412",
     "DB-12-B8-D1-III-414",
     "DB-12-B8-D1-III-415",
+    "DB-12-B8-D1-III-432",
     "DB-12-B8-D1-II-439",
+    "DB-12-B8-D3-III-6",
     "DB-12-B8-D3-III-7",
     "DB-12-B8-D3-II-9",
     "DB-12-B8-D3-III-10",
@@ -21661,6 +22152,7 @@
     "DH-11-C2-B6-III-33",
     "DH-11-C2-B6-VD-III-3",
     "DH-11-C2-B8-I-2",
+    "DH-11-C2-B8-II-18",
     "DH-11-C3-B12-III-2",
     "DH-11-C2-B9-D1-I-11",
     "DH-11-C2-B9-D1-II-1",
@@ -21673,11 +22165,14 @@
     "DH-12-C1-B1-P1-I-85",
     "DH-12-C1-B1-P1-II-10",
     "DH-12-C1-B1-P1-II-12",
+    "DH-12-C1-B1-P1-II-20",
+    "DH-12-C1-B1-P1-II-31",
     "DH-12-C1-B1-P1-III-12",
     "DH-12-C1-B1-P1-III-20",
     "DH-11-C3-B14-D1-I-11",
     "DH-11-C3-B14-D1-III-2",
     "DH-11-C3-B14-D2-III-2",
+    "DH-12-C1-B1-P1-VD-II-3",
     "DH-12-C1-B1-P2-I-30",
     "DH-12-C1-B1-P2-I-50",
     "DH-12-C1-B1-P2-I-55",
@@ -21732,6 +22227,7 @@
     "DH-12-C3-B11-D1-II-4",
     "DH-12-C2-B7-D2-I-16",
     "DH-12-C3-B8-DT-II-1",
+    "DH-12-C3-B8-DT-III-5",
     "DH-12-C3-B8-VD-II-1",
     "DH-12-C3-B11-D2-I-7",
     "DH-12-C3-B11-D2-II-1",
@@ -21761,6 +22257,7 @@
     "DH-12-C3-B8-III-11",
     "DH-12-C3-B8-III-12",
     "DH-12-C3-B8-III-28",
+    "DH-12-C3-B8-III-38",
     "DH-12-C3-B9-P2-I-4",
     "DH-12-C3-B9-P2-I-17",
     "DH-12-C3-B9-P2-I-18",
@@ -21836,6 +22333,7 @@
     "VIP27-C1-B1-ESTER-III-3",
     "VIP27-C1-B3-D1-II-3",
     "VIP27-C1-B3-D2-I-6",
+    "VIP27-C1-B3-D2-II-4",
     "VIP27-C1-B2-I-15",
     "VIP27-C1-HC11-D1-I-17",
     "VIP27-C1-HC11-D1-II-4",

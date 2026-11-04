@@ -1,0 +1,161 @@
+[
+  {
+    "i": 604,
+    "hash": "6fe87a48dea9b81beed8296afb2362d6256aa5cae001820eb3fcd0d6dfa00ab4",
+    "fileNguon": "anh/6fe87a48dea9b81beed8296afb2362d6256aa5cae001820eb3fcd0d6dfa00ab4.png",
+    "canvas": [
+      1218,
+      307
+    ],
+    "daMoNative": true,
+    "kind": "paracetamol-synthesis-3",
+    "smilesNodes": [
+      "O=[N+]([O-])c1ccc(O)cc1",
+      "Nc1ccc(O)cc1",
+      "CC(=O)Nc1ccc(O)cc1"
+    ],
+    "captions": [
+      "p-nitrophenol",
+      "p-aminophenol",
+      "Paracetamol"
+    ],
+    "notes": "3vòng3đôiKHÔNGcircle,phenolOHởdướitrái,vịtríđốidiệnparaNO₂/NH₂/NHCOCH₃ởtrênphải. HaiarrowphảiKHÔNGđiềukiện/khôngbyproduct. SourceNO₂textkhôngformalchargehiểnthị,nitrocanonicalSMILESphảioverrideNO₂literalđừngthêm[N+][O−]textvàoảnh.ProductNHamideHhiệnrờidướiN,C=Oxuống,CH₃phảitrên. Captionp-nitrophenol/p-aminophenolnghiêngvàp-plaintextphảigiữ,ParacetamolPcapital.Nocharge/stereonêm. 604/927/603nativeđãmởriêngsamecontentkhácscale.",
+    "questions": [
+      {
+        "qid": "12-C3-B8-D2-III-29",
+        "de": "Thuốc Paracetamol là một loại thuốc được sử dụng rất nhiều trong y học. Thuốc có tác dụng giảm đau, hạ sốt, tuy nhiên ít có tác dụng kháng viêm. Thuốc Paracetamol được tổng hợp từ p-nitrophenol theo sơ đồ: p-nitrophenol (HO-C₆H₄-NO₂) → p-aminophenol (HO-C₆H₄-NH₂) → Paracetamol (HO-C₆H₄-NH-CO-CH₃) (biết hiệu suất của quá trình phản ứng đạt 80%).\nĐể sản xuất 1,5 triệu viên thuốc paracetamol thì cần dùng bao nhiêu kg p-nitrophenol biết rằng mỗi viên thuốc chứa 500 mg Paracetamol (Lấy kết quả làm tròn đến số nguyên)",
+        "refs": [
+          {
+            "where": "12-C3-B8-D2-III-29.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B8-D1-III-148",
+        "de": "Thuốc Paracetamol là một loại thuốc được sử dụng rất nhiều trong y học. Thuốc có tác dụng giảm đau, hạ sốt, tuy nhiên ít có tác dụng kháng viêm. Thuốc Paracetamol được tổng hợp từ p-nitrophenol theo sơ đồ: p-nitrophenol (HO-C₆H₄-NO₂) → p-aminophenol (HO-C₆H₄-NH₂) → Paracetamol (HO-C₆H₄-NH-CO-CH₃) (biết hiệu suất của quá trình phản ứng đạt 80%).\nĐể sản xuất 1,5 triệu viên thuốc paracetamol thì cần dùng bao nhiêu kg p-nitrophenol biết rằng mỗi viên thuốc chứa 500 mg Paracetamol (Lấy kết quả làm tròn đến số nguyên)",
+        "refs": [
+          {
+            "where": "DB-12-B8-D1-III-148.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "paracetamol-ddh-cc3596e0076afb260d805c6ad031fa8ec7d0f93652bac1ed1dfa5b7b2f78f543.svg",
+    "hashSvg": "cc3596e0076afb260d805c6ad031fa8ec7d0f93652bac1ed1dfa5b7b2f78f543",
+    "byteSvg": 27303,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "3vòng3double/HOdướitrái/NO2NH2NHCOCH3para;2arrowKHÔNGcond/byproduct/charge;NHamideHhiệnxếpdướiNtheosource/C=Oxuống/CH3text;đủ3caption,p-prefix/ParacetamolPcapital.",
+    "hashSvgDaSoat": "cc3596e0076afb260d805c6ad031fa8ec7d0f93652bac1ed1dfa5b7b2f78f543",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 927,
+    "hash": "a7e924244d8b691025f3714a449465ac5e2ac51358ba1d208699260d433c025b",
+    "fileNguon": "anh/a7e924244d8b691025f3714a449465ac5e2ac51358ba1d208699260d433c025b.png",
+    "canvas": [
+      1095,
+      282
+    ],
+    "daMoNative": true,
+    "kind": "paracetamol-synthesis-3",
+    "smilesNodes": [
+      "O=[N+]([O-])c1ccc(O)cc1",
+      "Nc1ccc(O)cc1",
+      "CC(=O)Nc1ccc(O)cc1"
+    ],
+    "captions": [
+      "p-nitrophenol",
+      "p-aminophenol",
+      "Paracetamol"
+    ],
+    "notes": "3vòng3đôiKHÔNGcircle,phenolOHởdướitrái,vịtríđốidiệnparaNO₂/NH₂/NHCOCH₃ởtrênphải. HaiarrowphảiKHÔNGđiềukiện/khôngbyproduct. SourceNO₂textkhôngformalchargehiểnthị,nitrocanonicalSMILESphảioverrideNO₂literalđừngthêm[N+][O−]textvàoảnh.ProductNHamideHhiệnrờidướiN,C=Oxuống,CH₃phảitrên. Captionp-nitrophenol/p-aminophenolnghiêngvàp-plaintextphảigiữ,ParacetamolPcapital.Nocharge/stereonêm. 604/927/603nativeđãmởriêngsamecontentkhácscale.",
+    "questions": [
+      {
+        "qid": "12-KT-C3-D3-III-6",
+        "de": "Thuốc Paracetamol là một loại thuốc được sử dụng rất nhiều trong y học. Thuốc có tác dụng giảm đau, hạ sốt tuy nhiên ít có tác dụng kháng viêm. Thuốc Paracetamol được tổng hợp từ p-nitrophenol theo sơ đồ trong hình dưới đây (biết hiệu suất của cả quá trình phản ứng đạt 90%).\nĐể sản xuất 30,2 triệu viên thuốc Paracetamol thì khối lượng (tấn) p-nitrophenol cần dùng gần nhất với giá trị nào?\nBiết rằng mỗi viên thuốc chứa 500 mg Paracetamol. (Kết quả làm tròn đến phần mười.)",
+        "refs": [
+          {
+            "where": "12-KT-C3-D3-III-6.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B8-D1-III-272",
+        "de": "Thuốc Paracetamol là một loại thuốc được sử dụng rất nhiều trong y học. Thuốc có tác dụng giảm đau, hạ sốt tuy nhiên ít có tác dụng kháng viêm. Thuốc Paracetamol được tổng hợp từ p-nitrophenol theo sơ đồ trong hình dưới đây (biết hiệu suất của cả quá trình phản ứng đạt 90%).\nĐể sản xuất 30,2 triệu viên thuốc Paracetamol thì khối lượng (tấn) p-nitrophenol cần dùng gần nhất với giá trị nào?\nBiết rằng mỗi viên thuốc chứa 500 mg Paracetamol. (Kết quả làm tròn đến phần mười.)",
+        "refs": [
+          {
+            "where": "DB-12-B8-D1-III-272.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "paracetamol-ddh-cc3596e0076afb260d805c6ad031fa8ec7d0f93652bac1ed1dfa5b7b2f78f543.svg",
+    "hashSvg": "cc3596e0076afb260d805c6ad031fa8ec7d0f93652bac1ed1dfa5b7b2f78f543",
+    "byteSvg": 27303,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "3vòng3double/HOdướitrái/NO2NH2NHCOCH3para;2arrowKHÔNGcond/byproduct/charge;NHamideHhiệnxếpdướiNtheosource/C=Oxuống/CH3text;đủ3caption,p-prefix/ParacetamolPcapital.",
+    "hashSvgDaSoat": "cc3596e0076afb260d805c6ad031fa8ec7d0f93652bac1ed1dfa5b7b2f78f543",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 603,
+    "hash": "6fc5508d7e56add3d3ce587282325b34387e72c0c6edf8b202c4862967649c0d",
+    "fileNguon": "anh/6fc5508d7e56add3d3ce587282325b34387e72c0c6edf8b202c4862967649c0d.png",
+    "canvas": [
+      1254,
+      323
+    ],
+    "daMoNative": true,
+    "kind": "paracetamol-synthesis-3",
+    "smilesNodes": [
+      "O=[N+]([O-])c1ccc(O)cc1",
+      "Nc1ccc(O)cc1",
+      "CC(=O)Nc1ccc(O)cc1"
+    ],
+    "captions": [
+      "p-nitrophenol",
+      "p-aminophenol",
+      "Paracetamol"
+    ],
+    "notes": "3vòng3đôiKHÔNGcircle,phenolOHởdướitrái,vịtríđốidiệnparaNO₂/NH₂/NHCOCH₃ởtrênphải. HaiarrowphảiKHÔNGđiềukiện/khôngbyproduct. SourceNO₂textkhôngformalchargehiểnthị,nitrocanonicalSMILESphảioverrideNO₂literalđừngthêm[N+][O−]textvàoảnh.ProductNHamideHhiệnrờidướiN,C=Oxuống,CH₃phảitrên. Captionp-nitrophenol/p-aminophenolnghiêngvàp-plaintextphảigiữ,ParacetamolPcapital.Nocharge/stereonêm. 604/927/603nativeđãmởriêngsamecontentkhácscale.",
+    "questions": [
+      {
+        "qid": "12-C3-B8-D2-III-45",
+        "de": "Thuốc Paracetamol là một loại thuốc được sử dụng rất nhiều trong y học. Thuốc có tác dụng giảm đau, hạ sốt, tuy nhiên ít có tác dụng kháng viêm.\nThuốc Paracetamol được tổng hợp từ p-nitrophenol theo phương trình hóa học sau (biết hiệu suất của quá trình phản ứng đạt 80%): Để sản xuất 30,2 triệu viên thuốc paracetamol thì cần dùng bao nhiêu tấn p-nitrophenol biết rằng mỗi viên thuốc chứa 500 mg Paracetamol (Lấy kết quả làm tròn đến số nguyên)",
+        "refs": [
+          {
+            "where": "12-C3-B8-D2-III-45.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B8-D1-III-194",
+        "de": "Thuốc Paracetamol là một loại thuốc được sử dụng rất nhiều trong y học. Thuốc có tác dụng giảm đau, hạ sốt, tuy nhiên ít có tác dụng kháng viêm.\nThuốc Paracetamol được tổng hợp từ p-nitrophenol theo phương trình hóa học sau (biết hiệu suất của quá trình phản ứng đạt 80%): Để sản xuất 30,2 triệu viên thuốc paracetamol thì cần dùng bao nhiêu tấn p-nitrophenol biết rằng mỗi viên thuốc chứa 500 mg Paracetamol (Lấy kết quả làm tròn đến số nguyên)",
+        "refs": [
+          {
+            "where": "DB-12-B8-D1-III-194.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "paracetamol-ddh-cc3596e0076afb260d805c6ad031fa8ec7d0f93652bac1ed1dfa5b7b2f78f543.svg",
+    "hashSvg": "cc3596e0076afb260d805c6ad031fa8ec7d0f93652bac1ed1dfa5b7b2f78f543",
+    "byteSvg": 27303,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "3vòng3double/HOdướitrái/NO2NH2NHCOCH3para;2arrowKHÔNGcond/byproduct/charge;NHamideHhiệnxếpdướiNtheosource/C=Oxuống/CH3text;đủ3caption,p-prefix/ParacetamolPcapital.",
+    "hashSvgDaSoat": "cc3596e0076afb260d805c6ad031fa8ec7d0f93652bac1ed1dfa5b7b2f78f543",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

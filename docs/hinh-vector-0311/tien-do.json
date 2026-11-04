@@ -60,8 +60,8 @@
       "Toàn kho còn chưa hoàn tất, app chưa thay hình; không báo đã xong hoặc đã triển khai."
     ],
     "danhMucDaKiem": "docs/hinh-vector-0311/kiem/danh-muc-da-kiem.json",
-    "loVuaXong": "888 câu đủ mọi hình+DDH/7 một phần;704 nguồn→470 SVG;6.738.968 byte/gzip1.367.664;724 nguồn còn lại. Lô135–138 thêm7nguồn đãsoátđộclập từngPNG/render/hash,khépnhóm13020/20.",
-    "viecNenLamTiep": "Nhóm130ĐỦ20/20đãmanifestđừngdựngtrùng. Nhóm139ĐÃĐỌCĐỦ20records/lưukiem/doc-molecule-lo-139.json,tấtcảCHƯAdựng.5đầurõ1248flow7boxbiếnA/Q/X/Y/Z/condt°,V2O5(s),+H2SO4(l),+H2O(l);984aniline4vòng3đôi/NH3Clliteralkhôngcharge;1292aniline3vòngCIRCLE/điềukiệnriêng;727aspirinhydrolysis2captionKHÔNGcond;1323cùngnhưngGIỮ(1)cuốiphải. Nhóm12459/1391ROI bịloại phongcáchchưađạt/khôngđoánshortticks/hạt.7partialchỉ6câuảnhthật(4photo581+hoa1198/1403)giữrastervà1câu4icons thiếu59/1391. Còn15nguồn139:1284/202/211/1168aspirinGIỮOOCCH3literal/condvàcaptionriêng;1361graph10opencircles/ticks/grid/pixelanchorskhôngbịatimes;604/927/603paracetamol3caption/2arrowKHÔNGcond;1210glucoseC1OHdown/6sốC;1266fructosearrowmappingriêng;678/1356icebath/tube(a)/(b)/K;1197gasXYZT;926reflux5label/hướngarrow1-2;1309cellulosechairnitrate3OH→3ONO2/cond/stubdash.",
+    "loVuaXong": "913 câu đủ mọi hình+DDH/7 một phần;717 nguồn→480 SVG;7.021.063 byte/gzip1.415.257;711 nguồn còn lại. Lô139–143 thêm13nguồn đãsoátđộclập từngPNG/render/exacthash,khép25câu.",
+    "viecNenLamTiep": "Nhóm139đãxong13/20qua139–143;CÒN7CHƯADỰNG1210/1266/678/1356/1197/926/1309. Fullsource/de/refskiem/doc-molecule-lo-139.json;Geometry5đầuđãlưu kiem/doc-chi-tiet-con-lai-lo-144.json,926/1309đangbổsung; bảnmớiscratch/doc-chi-tiet-con-lai-lo-144.jsonưu tiên/copyvềkiemtrướccheckpoint.1210glucoseC1OHdown/6sốC/CH2OHkhatriển;1266fructosearrowmappingriêng1OH/4CH2OH;6781356tube(a)nhạticebath/(b)đậmngoài/K;1197gasXYZTđủhướng;926reflux5labels/arrow1-2giữhướngsource;1309cellulosechairnitrate3OH→3ONO2/cond/stubdashKHÔNGfiniteSMILES.1361graphĐÃđạt143/90x378/10opencircles,đừngdựngtrùng. Nhóm12459/1391ROI bịloại phongcáchchưađạt/khôngđoánshortticks/hạt.7partialchỉ6câuảnhthật(4photo581+hoa1198/1403)giữrastervà1câu4icons thiếu59/1391.",
     "canhBaoCheckpoint": "Giữworktree/commitmớihơn. Origin/main0200b893chưagộp;khôngpháthànhkhichưatoànphạmvi."
   },
   "tuDongTiepTuc": {
@@ -70,7 +70,7 @@
     "lich": "moi-gio",
     "mucTieu": "Tự vẽ, soát, sửa, tích hợp và kiểm bản sống đến khi đạt; tự tắt khi hoàn tất",
     "thongBao": "Chỉ khi hoàn tất, có lỗi chặn thực sự hoặc cần hành động của thầy",
-    "lyDo": "Tiếptục từcheckpoint888câu/470SVG,mỗi lượt hoànthiệnlôthật,chỉtắtkhitoànphạmviđãvàoappvàkiểmbảnsống."
+    "lyDo": "Tiếptục từcheckpoint913câu/480SVG,mỗi lượt hoànthiệnlôthật,chỉtắtkhitoànphạmviđãvàoappvàkiểmbảnsống."
   },
   "loOrbitalDaSoat": {
     "soAnhNguon": 23,
@@ -79,14 +79,14 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 704,
-    "soSvgRieng": 470,
-    "soCauDungHinh": 895,
-    "soCauDuMoiHinh": 888,
+    "soAnhNguon": 717,
+    "soSvgRieng": 480,
+    "soCauDungHinh": 920,
+    "soCauDuMoiHinh": 913,
     "soCauMoiXongMotPhan": 7,
-    "byteSvg": 6738968,
-    "byteGzip": 1367664,
-    "soAnhNguonConLai": 724,
+    "byteSvg": 7021063,
+    "byteGzip": 1415257,
+    "soAnhNguonConLai": 711,
     "daTichHop": false
   },
   "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.",
@@ -101,20 +101,20 @@
     "batBuocMoiHinh": true,
     "daHoanTatToanBo": false,
     "ghiChu": "Bộ đangchọn đãđạtfontDDH/pathtựchứa vàsoátđộclập;toànkhochưahoàntất,khôngpháthànhbộchưađủ.",
-    "loMoi": "Lô135–138 đã dựngpathDDH vàsoáttừngsource/render/hash,primebằngglyphapostropheappnhỏ,vớibằngchứngfont-prime-vector-investigation.json.",
+    "loMoi": "Lô139–143 đã dựngpathDDH vàsoáttừngsource/render/hash. Superscript0đượcdựngbằngglyph0DDHnhỏnângbaseline,khôngfallback.",
     "congCu": "scripts/phong-vector-0311.py",
     "daChuyenHetBoDaVe": true
   },
   "daDatPhongApp": {
-    "soNguon": 704,
-    "soCauDuHinhVaPhong": 888,
+    "soNguon": 717,
+    "soCauDuHinhVaPhong": 913,
     "ghiChu": "Các số tổngDaDoiChieu vẫn mô tả nội dung đã kiểm; bản cũ chưa đổi phông không được coi đạt yêu cầu phông mới."
   },
   "loMoiNhat": {
-    "lo": "135–138",
-    "ketQua": "888 câu đủ mọi hình+DDH/7 một phần;704 nguồn→470 SVG;6.738.968 byte/gzip1.367.664;724 nguồn còn lại. Lô135–138 thêm7nguồn đãsoátđộclập từngPNG/render/hash,khépnhóm13020/20.",
-    "suaLoi": "135giữNHphảigộp/Rprime/Rplainvs1100H3rời/R1R2/leaderKHÔNGhead/mappingkhác;136grid5/6/5/7C/triple3nét;1373highlightAyellow/Bdotted/Cdashed+cắtmépnguồn;138sửaviềngreendướibluebodydùngchungouterclipđáy,freshhashreviewđạt/chỉ78%21%. Primefontthiếu ghépR+glyphapostropheDDHnhỏbaseline/pathkhôngfallback.",
-    "tiepTheo": "Nhóm130ĐỦ20/20đãmanifestđừngdựngtrùng. Nhóm139ĐÃĐỌCĐỦ20records/lưukiem/doc-molecule-lo-139.json,tấtcảCHƯAdựng.5đầurõ1248flow7boxbiếnA/Q/X/Y/Z/condt°,V2O5(s),+H2SO4(l),+H2O(l);984aniline4vòng3đôi/NH3Clliteralkhôngcharge;1292aniline3vòngCIRCLE/điềukiệnriêng;727aspirinhydrolysis2captionKHÔNGcond;1323cùngnhưngGIỮ(1)cuốiphải. Nhóm12459/1391ROI bịloại phongcáchchưađạt/khôngđoánshortticks/hạt.7partialchỉ6câuảnhthật(4photo581+hoa1198/1403)giữrastervà1câu4icons thiếu59/1391. Còn15nguồn139:1284/202/211/1168aspirinGIỮOOCCH3literal/condvàcaptionriêng;1361graph10opencircles/ticks/grid/pixelanchorskhôngbịatimes;604/927/603paracetamol3caption/2arrowKHÔNGcond;1210glucoseC1OHdown/6sốC;1266fructosearrowmappingriêng;678/1356icebath/tube(a)/(b)/K;1197gasXYZT;926reflux5label/hướngarrow1-2;1309cellulosechairnitrate3OH→3ONO2/cond/stubdash.",
-    "gioiHan": "Chưa tíchhợp/chưa reload offline app/chưa phát hành. Build/tốcđộlô138đạt/precache170/2613KB,sauđóchỉsửaSVG/scriptpie. Main0200b893chưagộp;phảicậpnhậtmainmớinhất/sotesttheotên/kiểmcathi trướctriểnkhai."
+    "lo": "139–143",
+    "ketQua": "913 câu đủ mọi hình+DDH/7 một phần;717 nguồn→480 SVG;7.021.063 byte/gzip1.415.257;711 nguồn còn lại. Lô139–143 thêm13nguồn đãsoátđộclập từngPNG/render/exacthash,khép25câu.",
+    "suaLoi": "6aspirinkhácOCO/OOCCH3/kiểuvòng/cond/caption/(1)giữtừngsource;9844vòngZnHCl/NH3Clliteralkhôngchargevs12923circle/HNO3đặc/xtt0/FeHCl;12487box5arrowbiếnKHÔNGgiảichất;3paracetamolNHamideHexplicit/HOpara/2arrowbare/3caption;136110opencircles/grid/ticks/titleunits/90x378khôngtự350/khônggánsamplesbịatimes.",
+    "tiepTheo": "Nhóm139đãxong13/20qua139–143;CÒN7CHƯADỰNG1210/1266/678/1356/1197/926/1309. Fullsource/de/refskiem/doc-molecule-lo-139.json;Geometry5đầuđãlưu kiem/doc-chi-tiet-con-lai-lo-144.json,926/1309đangbổsung; bảnmớiscratch/doc-chi-tiet-con-lai-lo-144.jsonưu tiên/copyvềkiemtrướccheckpoint.1210glucoseC1OHdown/6sốC/CH2OHkhatriển;1266fructosearrowmappingriêng1OH/4CH2OH;6781356tube(a)nhạticebath/(b)đậmngoài/K;1197gasXYZTđủhướng;926reflux5labels/arrow1-2giữhướngsource;1309cellulosechairnitrate3OH→3ONO2/cond/stubdashKHÔNGfiniteSMILES.1361graphĐÃđạt143/90x378/10opencircles,đừngdựngtrùng. Nhóm12459/1391ROI bịloại phongcáchchưađạt/khôngđoánshortticks/hạt.7partialchỉ6câuảnhthật(4photo581+hoa1198/1403)giữrastervà1câu4icons thiếu59/1391.",
+    "gioiHan": "Chưa tíchhợp/chưa reload offline app/chưa phát hành. Build/tốcđộlô141đạt/precache170/2613KB,sauđóchỉassets/scripts142–143. Main0200b893chưagộp;phảicậpnhậtmainmớinhất/sotesttheotên/kiểmcathi trướctriểnkhai."
   }
 }

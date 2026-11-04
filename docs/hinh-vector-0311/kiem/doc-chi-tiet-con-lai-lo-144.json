@@ -1,0 +1,1398 @@
+[
+  {
+    "i": 1210,
+    "hash": "db3df2a7a2209f940e1f28d19e617e21b76a012af20dc82293b7911a3aea9900",
+    "fileNguon": "anh/db3df2a7a2209f940e1f28d19e617e21b76a012af20dc82293b7911a3aea9900.png",
+    "canvas": [
+      362,
+      259
+    ],
+    "daMoNative": true,
+    "kind": "haworth-glucose-numbered",
+    "substituents": {
+      "C1": {
+        "down": "OH"
+      },
+      "C2": {
+        "down": "OH"
+      },
+      "C3": {
+        "up": "OH"
+      },
+      "C4": {
+        "down": "OH"
+      },
+      "C5": {
+        "up": "CH₂–OH expanded, carbon6"
+      }
+    },
+    "notes": "6ringOtopright,frontC4–C3–C2–C1đậm. NoHexplicit.MởrộngCH₂OHC5lênCH₂rồichéolênphảiOH. Sốcarbon1..6đủ:1bênphảiC1,2tráidướiC2,3dướiC3,4tráiC4,5tráiC5,6tráitrênbranch. KhônggộpbranchthànhCH₂OHtextnếumấtsố6/khácnguồn. Khác1243C1OHup,C1đâydown.",
+    "questions": [
+      {
+        "qid": "12-KT-C2-D4-I-3",
+        "de": "Cho công thức cấu tạo dạng mạch vòng α-glucose như sau: Nhóm OH hemiacetal trong α-glucose liên kết với nguyên tử carbon số mấy?",
+        "refs": [
+          {
+            "where": "12-KT-C2-D4-I-3.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B5-D2-I-217",
+        "de": "Cho công thức cấu tạo dạng mạch vòng α-glucose như sau: Nhóm OH hemiacetal trong α-glucose liên kết với nguyên tử carbon số mấy?",
+        "refs": [
+          {
+            "where": "DB-12-B5-D2-I-217.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry": {
+      "ringVertices": {
+        "C1": [
+          297,
+          136
+        ],
+        "C2": [
+          229,
+          167
+        ],
+        "C3": [
+          131,
+          167
+        ],
+        "C4": [
+          69,
+          136
+        ],
+        "C5": [
+          132,
+          104
+        ],
+        "ringO": [
+          230,
+          104
+        ]
+      },
+      "ringOrder": [
+        "C5",
+        "ringO",
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "C5"
+      ],
+      "boldBonds": [
+        [
+          "C4",
+          "C3"
+        ],
+        [
+          "C3",
+          "C2"
+        ],
+        [
+          "C2",
+          "C1"
+        ]
+      ],
+      "substituentBonds": {
+        "C1_OH": [
+          [
+            297,
+            136
+          ],
+          [
+            297,
+            164
+          ]
+        ],
+        "C2_OH": [
+          [
+            229,
+            167
+          ],
+          [
+            229,
+            195
+          ]
+        ],
+        "C3_OH": [
+          [
+            131,
+            167
+          ],
+          [
+            131,
+            143
+          ]
+        ],
+        "C4_OH": [
+          [
+            69,
+            136
+          ],
+          [
+            69,
+            160
+          ]
+        ],
+        "C5_C6": [
+          [
+            132,
+            104
+          ],
+          [
+            132,
+            77
+          ]
+        ],
+        "C6_OH": [
+          [
+            132,
+            77
+          ],
+          [
+            160,
+            63
+          ]
+        ]
+      },
+      "textAnchors": {
+        "ringO": [
+          230,
+          104
+        ],
+        "OH_C1": [
+          298,
+          180
+        ],
+        "OH_C2": [
+          236,
+          207
+        ],
+        "OH_C3": [
+          147,
+          137
+        ],
+        "OH_C4": [
+          82,
+          174
+        ],
+        "OH_C6": [
+          183,
+          59
+        ]
+      },
+      "carbonNumbers": {
+        "1": [
+          303,
+          128
+        ],
+        "2": [
+          213,
+          187
+        ],
+        "3": [
+          133,
+          187
+        ],
+        "4": [
+          55,
+          134
+        ],
+        "5": [
+          115,
+          100
+        ],
+        "6": [
+          120,
+          75
+        ]
+      }
+    },
+    "explicitH": "KhôngcóbấtkỳHtrêncarbonhiểnthị,CH₂carbon6kha triểnđứng/chéotớitextOH,cáccarbonkhôngviếtC/CH₂.Giữsố6kềbranchngayvịtrí.CH₂OHkhônggộptextvìmấtsố6geometry.",
+    "pixelNote": "Anchorsnativeapproxtextcenter,rootphảigiữCOHorientationvàcarbonnumbersnhưnativekhôngsuybeta/alpha."
+  },
+  {
+    "i": 1266,
+    "hash": "e5a6ab2cc58f236eeb16e783a265b05e1d63572691b3d44eaf647a17df1da18d",
+    "fileNguon": "anh/e5a6ab2cc58f236eeb16e783a265b05e1d63572691b3d44eaf647a17df1da18d.png",
+    "canvas": [
+      412,
+      248
+    ],
+    "daMoNative": true,
+    "kind": "fructose-arrow-labels",
+    "substituents": {
+      "C2": {
+        "up": "CH₂OH",
+        "down": "OH"
+      },
+      "C3": {
+        "up": "HO",
+        "down": "H"
+      },
+      "C4": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C5": {
+        "up": "CH₂OH",
+        "down": "H"
+      }
+    },
+    "arrowLabels": {
+      "1": "OHởC2dướiphải",
+      "2": "bondO_vòng–C2ởtrênphải",
+      "3": "OHởC4dướitrái",
+      "4": "CH₂OHởC2trênphải"
+    },
+    "notes": "Cùngbody+mapping880đãđọc:5ringOtop,C2right,C3lowerright,C4lowerleft,C5left,3cạnhtrướcđậm. Giữ3Hexplicitvà2CH₂OHtext. Label2arrowtipthậtnativeởBONDchéoO–C2khôngtựdờisangHOcủaC3. Source1266đãmởriêngmọiarrow/labelsđủ. Khôngcarbonnumbers.",
+    "questions": [
+      {
+        "qid": "12-KT-C2-D1-I-9",
+        "de": "Trong công thức của fructose ở hình dưới đây, nhóm OH hemiketal là nhóm OH được đánh số",
+        "refs": [
+          {
+            "where": "12-KT-C2-D1-I-9.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-I-146",
+        "de": "Trong công thức của fructose ở hình dưới đây, nhóm OH hemiketal là nhóm OH được đánh số",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-146.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry": {
+      "ringVertices": {
+        "C5": [
+          88,
+          114
+        ],
+        "ringO": [
+          187,
+          85
+        ],
+        "C2": [
+          280,
+          116
+        ],
+        "C3": [
+          242,
+          166
+        ],
+        "C4": [
+          123,
+          166
+        ]
+      },
+      "ringOrder": [
+        "C5",
+        "ringO",
+        "C2",
+        "C3",
+        "C4",
+        "C5"
+      ],
+      "boldBonds": [
+        [
+          "C5",
+          "C4"
+        ],
+        [
+          "C4",
+          "C3"
+        ],
+        [
+          "C3",
+          "C2"
+        ]
+      ],
+      "substituents": {
+        "C5_CH2OH": {
+          "bond": [
+            [
+              88,
+              114
+            ],
+            [
+              88,
+              94
+            ]
+          ],
+          "text": [
+            126,
+            76
+          ]
+        },
+        "C5_H": {
+          "bond": [
+            [
+              88,
+              114
+            ],
+            [
+              88,
+              134
+            ]
+          ],
+          "text": [
+            88,
+            147
+          ]
+        },
+        "C4_H": {
+          "bond": [
+            [
+              123,
+              166
+            ],
+            [
+              123,
+              146
+            ]
+          ],
+          "text": [
+            123,
+            137
+          ]
+        },
+        "C4_OH": {
+          "bond": [
+            [
+              123,
+              166
+            ],
+            [
+              123,
+              186
+            ]
+          ],
+          "text": [
+            137,
+            199
+          ]
+        },
+        "C3_HO": {
+          "bond": [
+            [
+              242,
+              166
+            ],
+            [
+              242,
+              146
+            ]
+          ],
+          "text": [
+            230,
+            132
+          ]
+        },
+        "C3_H": {
+          "bond": [
+            [
+              242,
+              166
+            ],
+            [
+              242,
+              186
+            ]
+          ],
+          "text": [
+            242,
+            199
+          ]
+        },
+        "C2_CH2OH": {
+          "bond": [
+            [
+              280,
+              116
+            ],
+            [
+              280,
+              95
+            ]
+          ],
+          "text": [
+            318,
+            76
+          ]
+        },
+        "C2_OH": {
+          "bond": [
+            [
+              280,
+              116
+            ],
+            [
+              280,
+              137
+            ]
+          ],
+          "text": [
+            294,
+            152
+          ]
+        }
+      },
+      "arrows": [
+        {
+          "label": "1",
+          "labelAt": [
+            339,
+            193
+          ],
+          "tail": [
+            321,
+            184
+          ],
+          "tip": [
+            289,
+            164
+          ],
+          "target": "OH_C2"
+        },
+        {
+          "label": "2",
+          "labelAt": [
+            246,
+            48
+          ],
+          "tail": [
+            246,
+            61
+          ],
+          "tip": [
+            246,
+            108
+          ],
+          "target": "BOND ringO–C2,giữarrow2đèđúngbondnativeKHÔNGdờisangHO_C3"
+        },
+        {
+          "label": "3",
+          "labelAt": [
+            46,
+            173
+          ],
+          "tail": [
+            61,
+            178
+          ],
+          "tip": [
+            109,
+            190
+          ],
+          "target": "OH_C4"
+        },
+        {
+          "label": "4",
+          "labelAt": [
+            365,
+            154
+          ],
+          "tail": [
+            358,
+            143
+          ],
+          "tip": [
+            345,
+            96
+          ],
+          "target": "CH₂OH_C2"
+        }
+      ]
+    },
+    "explicitH": "3HtrênC5xuống/C4lên/C3xuốngtườngminh;C2khôngH,2CH₂OHtext. Khôngprime/numberscarbon.4numberlàARROWlabels."
+  },
+  {
+    "i": 678,
+    "hash": "7cee507b549b6654e46c85a37661b230e109254b630fb59190d82776aada6d62",
+    "fileNguon": "anh/7cee507b549b6654e46c85a37661b230e109254b630fb59190d82776aada6d62.png",
+    "canvas": [
+      321,
+      220
+    ],
+    "daMoNative": true,
+    "kind": "NO2-equilibrium-two-tubes",
+    "labels": [
+      "(a)",
+      "(b)",
+      "K",
+      "Nước đá"
+    ],
+    "notes": "2ốngnghiệmđáytrònĐỨNGcónútđenmiệng;ốngtrái(a)màuvàngnâuNHẠT,nằmtrongbeakerNƯỚCĐÁviềnxanh(icechunksrõ);ốngphải(b)màunâuđỏĐẬMởngoàikhôngbeaker. 2nhánhngangngắngiữaốngcùngcaogắnkhóaKthânxanhdương/handleđenđứng. LabelKtrênvan,(a)tráitrêntubetrái,(b)phảitrêntubephải;Nướcđácóleaderchéotrỏicebath.KhôngtựghiNO₂/N₂O₄/t⁰/arrowvìnguồnkhôngcó. 678/1356cùngnộidungmởriêng;sourcecolorskháclýthuyếtcầngiữquan hệđậmtươngứng.",
+    "questions": [
+      {
+        "qid": "DB-11-B1-D1-I-215",
+        "de": "Lắp bộ dụng cụ gồm 2 ống nghiệm có nhánh (a) và (b), được nối với nhau bằng một ống nhựa mềm, có khóa K. Cho cân bằng sau trong bình kín:\n2NO₂(g) (màu nâu đỏ) ⇌ N₂O₄(g) (không màu).\nBiết khi ngâm ống nghiệm (a) vào cốc nước đá thì màu của ống nghiệm (a) nhạt dần. Phản ứng thuận có",
+        "refs": [
+          {
+            "where": "DB-11-B1-D1-I-215.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C1-B3-D1-I-10",
+        "de": "Lắp bộ dụng cụ gồm 2 ống nghiệm có nhánh (a) và (b), được nối với nhau bằng một ống nhựa mềm, có khóa K. Cho cân bằng sau trong bình kín:\n2NO₂(g) (màu nâu đỏ) ⇌ N₂O₄(g) (không màu).\nBiết khi ngâm ống nghiệm (a) vào cốc nước đá thì màu của ống nghiệm (a) nhạt dần. Phản ứng thuận có",
+        "refs": [
+          {
+            "where": "DH-11-C1-B3-D1-I-10.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry": {
+      "tubeLeft": {
+        "walls": [
+          [
+            125,
+            31
+          ],
+          [
+            125,
+            193
+          ],
+          [
+            127,
+            207
+          ],
+          [
+            139,
+            214
+          ],
+          [
+            151,
+            213
+          ],
+          [
+            162,
+            204
+          ],
+          [
+            163,
+            31
+          ]
+        ],
+        "fill": "ochre/mustardlight"
+      },
+      "tubeRight": {
+        "walls": [
+          [
+            256,
+            31
+          ],
+          [
+            256,
+            194
+          ],
+          [
+            260,
+            207
+          ],
+          [
+            274,
+            214
+          ],
+          [
+            289,
+            208
+          ],
+          [
+            294,
+            194
+          ],
+          [
+            294,
+            31
+          ]
+        ],
+        "fill": "brownorange-dark"
+      },
+      "caps": [
+        [
+          121,
+          10,
+          167,
+          34
+        ],
+        [
+          252,
+          10,
+          298,
+          34
+        ]
+      ],
+      "connectorY": [
+        62,
+        73
+      ],
+      "valveBlueBox": [
+        188,
+        60,
+        233,
+        75
+      ],
+      "valveHandle": [
+        [
+          209,
+          53
+        ],
+        [
+          209,
+          82
+        ]
+      ],
+      "valveTopBar": [
+        [
+          202,
+          53
+        ],
+        [
+          216,
+          53
+        ]
+      ],
+      "iceBeaker": {
+        "leftTop": [
+          66,
+          107
+        ],
+        "rightTop": [
+          216,
+          107
+        ],
+        "bottomApprox": [
+          [
+            66,
+            201
+          ],
+          [
+            69,
+            211
+          ],
+          [
+            78,
+            216
+          ],
+          [
+            206,
+            216
+          ],
+          [
+            216,
+            205
+          ]
+        ],
+        "waterIceTopY": 129
+      },
+      "labels": {
+        "(a)": [
+          111,
+          69
+        ],
+        "(b)": [
+          310,
+          69
+        ],
+        "K": [
+          210,
+          40
+        ],
+        "Nước đá": [
+          32,
+          140
+        ]
+      },
+      "iceLeader": [
+        [
+          43,
+          151
+        ],
+        [
+          91,
+          174
+        ]
+      ]
+    },
+    "tubeFluidNote": "Màuvàngnâu/xámđậmtrongốnglàkhímàuminhhọađầybody,KHÔNGvẽmặtchấtlỏngđúngống.Khốitrongbeakertráilànhữngmảnhnướcđákhôngđềuxanhtrắng,cóđườngmứcnước/đámđátrên,chỉống(a)ngâm.Kcount1van,khôngmũitên/khíformula/nhiệtđộtrênsource.",
+    "duplication": "678/1356cùngnộidungnhưngscale/fonts/bềrộngbốtríkhác;giữtọađộrelativebody/labels,nocroppedpartiallabels."
+  },
+  {
+    "i": 1356,
+    "hash": "f5aaeff9d163e12a895e3c80a64fe0bcb0da9ac2436319faa7c38b83b1c0b1d9",
+    "fileNguon": "anh/f5aaeff9d163e12a895e3c80a64fe0bcb0da9ac2436319faa7c38b83b1c0b1d9.png",
+    "canvas": [
+      478,
+      344
+    ],
+    "daMoNative": true,
+    "kind": "NO2-equilibrium-two-tubes",
+    "labels": [
+      "(a)",
+      "(b)",
+      "K",
+      "Nước đá"
+    ],
+    "notes": "2ốngnghiệmđáytrònĐỨNGcónútđenmiệng;ốngtrái(a)màuvàngnâuNHẠT,nằmtrongbeakerNƯỚCĐÁviềnxanh(icechunksrõ);ốngphải(b)màunâuđỏĐẬMởngoàikhôngbeaker. 2nhánhngangngắngiữaốngcùngcaogắnkhóaKthânxanhdương/handleđenđứng. LabelKtrênvan,(a)tráitrêntubetrái,(b)phảitrêntubephải;Nướcđácóleaderchéotrỏicebath.KhôngtựghiNO₂/N₂O₄/t⁰/arrowvìnguồnkhôngcó. 678/1356cùngnộidungmởriêng;sourcecolorskháclýthuyếtcầngiữquan hệđậmtươngứng.",
+    "questions": [
+      {
+        "qid": "11-C1-B1-I-52",
+        "de": "Lắp bộ dụng cụ gồm 2 ống nghiệm có nhánh (a) và (b), được nối với nhau bằng một ống nhựa mềm, có khoá K như hình. Cho cân bằng sau trong bình kín:\n2NO₂(g) (màu nâu đỏ) ⇌ N₂O₄(g) (không màu).\nBiết khi ngâm ống nghiệm (a) vào cốc nước đá thì màu của ống nghiệm (a) nhạt dần. Phản ứng thuận có",
+        "refs": [
+          {
+            "where": "11-C1-B1-I-52.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-11-B1-D1-I-50",
+        "de": "Lắp bộ dụng cụ gồm 2 ống nghiệm có nhánh (a) và (b), được nối với nhau bằng một ống nhựa mềm, có khoá K như hình. Cho cân bằng sau trong bình kín:\n2NO₂(g) (màu nâu đỏ) ⇌ N₂O₄(g) (không màu).\nBiết khi ngâm ống nghiệm (a) vào cốc nước đá thì màu của ống nghiệm (a) nhạt dần. Phản ứng thuận có",
+        "refs": [
+          {
+            "where": "DB-11-B1-D1-I-50.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry": {
+      "tubeLeft": {
+        "walls": [
+          [
+            190,
+            72
+          ],
+          [
+            190,
+            282
+          ],
+          [
+            194,
+            298
+          ],
+          [
+            205,
+            306
+          ],
+          [
+            224,
+            306
+          ],
+          [
+            240,
+            295
+          ],
+          [
+            242,
+            72
+          ]
+        ],
+        "fill": "ochre/mustardlight"
+      },
+      "tubeRight": {
+        "walls": [
+          [
+            365,
+            72
+          ],
+          [
+            365,
+            282
+          ],
+          [
+            369,
+            298
+          ],
+          [
+            382,
+            307
+          ],
+          [
+            402,
+            306
+          ],
+          [
+            415,
+            293
+          ],
+          [
+            416,
+            72
+          ]
+        ],
+        "fill": "brownorange-dark"
+      },
+      "caps": [
+        [
+          187,
+          41,
+          244,
+          74
+        ],
+        [
+          362,
+          41,
+          419,
+          74
+        ]
+      ],
+      "connectorY": [
+        109,
+        124
+      ],
+      "valveBlueBox": [
+        274,
+        105,
+        334,
+        126
+      ],
+      "valveHandle": [
+        [
+          304,
+          97
+        ],
+        [
+          304,
+          134
+        ]
+      ],
+      "valveTopBar": [
+        [
+          294,
+          97
+        ],
+        [
+          313,
+          97
+        ]
+      ],
+      "iceBeaker": {
+        "leftTop": [
+          114,
+          167
+        ],
+        "rightTop": [
+          313,
+          167
+        ],
+        "bottomApprox": [
+          [
+            114,
+            291
+          ],
+          [
+            118,
+            305
+          ],
+          [
+            133,
+            310
+          ],
+          [
+            297,
+            310
+          ],
+          [
+            313,
+            296
+          ]
+        ],
+        "waterIceTopY": 197
+      },
+      "labels": {
+        "(a)": [
+          172,
+          118
+        ],
+        "(b)": [
+          436,
+          118
+        ],
+        "K": [
+          304,
+          81
+        ],
+        "Nước đá": [
+          69,
+          212
+        ]
+      },
+      "iceLeader": [
+        [
+          79,
+          228
+        ],
+        [
+          157,
+          266
+        ]
+      ]
+    },
+    "tubeFluidNote": "Màuvàngnâu/xámđậmtrongốnglàkhímàuminhhọađầybody,KHÔNGvẽmặtchấtlỏngđúngống.Khốitrongbeakertráilànhữngmảnhnướcđákhôngđềuxanhtrắng,cóđườngmứcnước/đámđátrên,chỉống(a)ngâm.Kcount1van,khôngmũitên/khíformula/nhiệtđộtrênsource.",
+    "duplication": "678/1356cùngnộidungnhưngscale/fonts/bềrộngbốtríkhác;giữtọađộrelativebody/labels,nocroppedpartiallabels."
+  },
+  {
+    "i": 1197,
+    "hash": "d8b95f0d03c89489fddd25896a1866c3b88ab6aac8f94f39e851a77a080093af",
+    "fileNguon": "anh/d8b95f0d03c89489fddd25896a1866c3b88ab6aac8f94f39e851a77a080093af.png",
+    "canvas": [
+      857,
+      216
+    ],
+    "daMoNative": true,
+    "kind": "gas-collection-grid-4",
+    "labels": [
+      "X",
+      "Y",
+      "Z",
+      "T"
+    ],
+    "notes": "4panelngang.X:bìnhtamgiácĐỨNGnút2lỗ?nativecổlàplugkẹpống,ốngdẫnngắnđixuốngtrongbình,vàcổngtrênbẻngangphải mởmiệngphải,mũitênTRÁIởmiệngchỉkhívàobình;labelXtrên.Y:bìnhtamgiácÚPngược,cổngnhỏdưới,ốngbẻLđivàotừtráiphíadưới,mũitênPHẢI,labelYtráidưới.Z:bìnhĐỨNG,ốngbẻLtrênmiệngcổtừTRÁI,mũitênPHẢIởđầuvàokhí,labelZtrên;ốngbêndướitrongbìnhKHÔNGkéodàiđếnđáy.T:bểchữnhậtchứanước(đườnggạchngangmức),bìnhnónÚPtrongbể,miệngdướinước;ốngdẫntừtrêntráichéoxuốngbểrồiuốnUđilênvàobình,bọtkhítròntrongbình;mũitênchéoxuốngphảiởcổngtrêntrái,labelT.Khônggántênchấtkhí/giảiđápán. GiữhướngmũitênphânbiệtX/Y/Z/T.",
+    "questions": [
+      {
+        "qid": "DB-11-B5-D2-I-55",
+        "de": "Các chất khí được thu vào bình theo đúng nguyên tắc bằng cách đẩy không khí (X, Y, Z) và đẩy nước (T) như sau: Nhận xét nào sau đây không đúng?",
+        "refs": [
+          {
+            "where": "DB-11-B5-D2-I-55.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B5-I-67",
+        "de": "Các chất khí được thu vào bình theo đúng nguyên tắc bằng cách đẩy không khí (X, Y, Z) và đẩy nước (T) như sau: Nhận xét nào sau đây không đúng?",
+        "refs": [
+          {
+            "where": "DH-11-C2-B5-I-67.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry": {
+      "panelX": {
+        "flaskApprox": [
+          [
+            47,
+            200
+          ],
+          [
+            82,
+            77
+          ],
+          [
+            82,
+            62
+          ],
+          [
+            105,
+            62
+          ],
+          [
+            105,
+            77
+          ],
+          [
+            139,
+            200
+          ]
+        ],
+        "label": [
+          "X",
+          [
+            119,
+            17
+          ]
+        ],
+        "gasTubeDoublePath": [
+          [
+            [
+              90,
+              138
+            ],
+            [
+              90,
+              44
+            ],
+            [
+              94,
+              36
+            ],
+            [
+              151,
+              36
+            ]
+          ],
+          [
+            [
+              97,
+              138
+            ],
+            [
+              97,
+              45
+            ],
+            [
+              100,
+              42
+            ],
+            [
+              151,
+              42
+            ]
+          ]
+        ],
+        "flowArrow": {
+          "tail": [
+            193,
+            38
+          ],
+          "head": [
+            160,
+            38
+          ]
+        },
+        "note": "Đứng,cổngngoàitừPHẢIvào,mũitênTRÁI,ốngtrongngắny138khôngđếnđáy."
+      },
+      "panelY": {
+        "invertedFlaskApprox": [
+          [
+            261,
+            37
+          ],
+          [
+            352,
+            37
+          ],
+          [
+            316,
+            176
+          ],
+          [
+            299,
+            176
+          ],
+          [
+            261,
+            37
+          ]
+        ],
+        "label": [
+          "Y",
+          [
+            261,
+            180
+          ]
+        ],
+        "gasTubeDoublePath": [
+          [
+            [
+              249,
+              198
+            ],
+            [
+              298,
+              198
+            ],
+            [
+              303,
+              194
+            ],
+            [
+              303,
+              99
+            ]
+          ],
+          [
+            [
+              249,
+              204
+            ],
+            [
+              302,
+              204
+            ],
+            [
+              309,
+              198
+            ],
+            [
+              309,
+              99
+            ]
+          ]
+        ],
+        "flowArrow": {
+          "tail": [
+            207,
+            199
+          ],
+          "head": [
+            240,
+            199
+          ]
+        },
+        "note": "Úpngược,mởcổdưới,ốngsupplytừTRÁIdướirồibẻLđilên,mũitênPHẢI."
+      },
+      "panelZ": {
+        "flaskApprox": [
+          [
+            453,
+            205
+          ],
+          [
+            489,
+            83
+          ],
+          [
+            489,
+            66
+          ],
+          [
+            513,
+            66
+          ],
+          [
+            513,
+            83
+          ],
+          [
+            546,
+            205
+          ]
+        ],
+        "label": [
+          "Z",
+          [
+            469,
+            20
+          ]
+        ],
+        "gasTubeDoublePath": [
+          [
+            [
+              443,
+              40
+            ],
+            [
+              495,
+              40
+            ],
+            [
+              503,
+              45
+            ],
+            [
+              503,
+              154
+            ]
+          ],
+          [
+            [
+              443,
+              47
+            ],
+            [
+              493,
+              47
+            ],
+            [
+              497,
+              51
+            ],
+            [
+              497,
+              154
+            ]
+          ]
+        ],
+        "flowArrow": {
+          "tail": [
+            402,
+            42
+          ],
+          "head": [
+            435,
+            42
+          ]
+        },
+        "note": "Đứng,cổngngoàitừTRÁIvào,mũitênPHẢI,ốngtrongngắny154khôngđếnđáy."
+      },
+      "panelT": {
+        "label": [
+          "T",
+          [
+            669,
+            82
+          ]
+        ],
+        "bathApprox": [
+          [
+            642,
+            119
+          ],
+          [
+            642,
+            192
+          ],
+          [
+            645,
+            202
+          ],
+          [
+            656,
+            206
+          ],
+          [
+            817,
+            206
+          ],
+          [
+            832,
+            199
+          ],
+          [
+            834,
+            119
+          ]
+        ],
+        "bathWaterSurface": [
+          [
+            642,
+            128
+          ],
+          [
+            834,
+            128
+          ]
+        ],
+        "invertedFlaskApprox": [
+          [
+            700,
+            36
+          ],
+          [
+            791,
+            36
+          ],
+          [
+            755,
+            145
+          ],
+          [
+            755,
+            175
+          ],
+          [
+            735,
+            175
+          ],
+          [
+            735,
+            145
+          ],
+          [
+            700,
+            36
+          ]
+        ],
+        "internalLiquidTopY": 91,
+        "gasTubeDoublePath": [
+          [
+            [
+              648,
+              88
+            ],
+            [
+              717,
+              186
+            ],
+            [
+              731,
+              190
+            ],
+            [
+              739,
+              187
+            ],
+            [
+              740,
+              129
+            ]
+          ],
+          [
+            [
+              655,
+              84
+            ],
+            [
+              725,
+              178
+            ],
+            [
+              733,
+              184
+            ],
+            [
+              745,
+              180
+            ],
+            [
+              747,
+              129
+            ]
+          ]
+        ],
+        "flowArrow": {
+          "tail": [
+            625,
+            61
+          ],
+          "head": [
+            643,
+            81
+          ]
+        },
+        "bubbleCirclesApprox": [
+          [
+            745,
+            114,
+            4
+          ],
+          [
+            739,
+            123,
+            4
+          ],
+          [
+            750,
+            122,
+            4
+          ]
+        ],
+        "bubbleCountCertain": 3,
+        "waterPattern": "Short horizontaldashesinsidetankbelow128ANDinsidereceiveraboveexternal128uptointernal91,giữ2mứcsourcekhácnhau."
+      }
+    },
+    "diagnostic": "/workspace/scratch/gas1197-T-4x.png",
+    "notesGeometry": "Nativefull857x216vàTcrop4xđãmở.3bubblestrònrõ,nodeTflowarrowchéoxuốngphải,khôngcopyngượcarrowX. Mộtfig4panelkhônglabel(a)..(d),chỉX/Y/Z/T."
+  }
+]

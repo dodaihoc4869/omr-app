@@ -1,0 +1,345 @@
+[
+  {
+    "i": 727,
+    "hash": "881eabf1171f2c86c696828c17a1bb0d7d4d7c44167ca97868c002ffee9c2e83",
+    "fileNguon": "anh/881eabf1171f2c86c696828c17a1bb0d7d4d7c44167ca97868c002ffee9c2e83.png",
+    "canvas": [
+      899,
+      211
+    ],
+    "daMoNative": true,
+    "kind": "aspirin-hydrolysis",
+    "literalReactantBranch": "OCOCH₃",
+    "phenylSubstituents": "COOHtop,OCOCH₃top-right,ortho",
+    "reactants": [
+      "aspirin",
+      "H₂O"
+    ],
+    "products": [
+      "salicylic acid",
+      "CH₃COOH"
+    ],
+    "arrow": "⇌",
+    "captions": [
+      "Aspirin",
+      "Salicylic acid"
+    ],
+    "notes": "Vòng3đôiKHÔNGcircle,COOHtexttop/pháiOCOCH₃trênphải(phảigiữthứtựOCO)ortho. ProductOHtoprightorthoCOOHtop. KHÔNGH⁺/t⁰trênarrownguồn,kHÔNGnhãn(1)cuốirxn.Khôngtựthêmđiềukiện/tênCH₃COOH/H₂Ongoàicapđãcó.",
+    "questions": [
+      {
+        "qid": "DB-12-B1-P1-D1-II-158",
+        "de": "Aspirin là một hợp chất được sử dụng làm giảm đau, hạ sốt. Sau khi uống, aspirin bị thủy phân trong cơ thể sẽ tạo thành salicylic acid theo phương trình hoá học sau:",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D1-II-158.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B1-P1-II-31",
+        "de": "Aspirin là một hợp chất được sử dụng làm giảm đau, hạ sốt. Sau khi uống, aspirin bị thủy phân trong cơ thể sẽ tạo thành salicylic acid theo phương trình hoá học sau:",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P1-II-31.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B1-P1-VD-II-3",
+        "de": "Aspirin là một hợp chất được sử dụng làm giảm đau, hạ sốt. Sau khi uống, aspirin bị thủy phân trong cơ thể sẽ tạo thành salicylic acid theo phương trình hoá học sau:",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P1-VD-II-3.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "aspirin-ddh-c4bd0bb5e6eadf49601ef8758d2e35101b98457aea5a309c5214025c06f85506.svg",
+    "hashSvg": "c4bd0bb5e6eadf49601ef8758d2e35101b98457aea5a309c5214025c06f85506",
+    "byteSvg": 23086,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "727/1323COOHtop/OCOCH3side,3doubleđúngpatternsource/nocond/2caption/1323GIỮ(1);1284OOCCH3top/CIRCLE/H+,t°/2caption;2022111168OOCCH3top/3double/H+KHÔNGt°/chỉ1168CÓcaption. Khôngsửaliteraltheohóahọc.",
+    "hashSvgDaSoat": "c4bd0bb5e6eadf49601ef8758d2e35101b98457aea5a309c5214025c06f85506",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 1323,
+    "hash": "ef539229317d33ae386b1c98aa6249c155255e9da231e9c963157be9d4460ebe",
+    "fileNguon": "anh/ef539229317d33ae386b1c98aa6249c155255e9da231e9c963157be9d4460ebe.png",
+    "canvas": [
+      926,
+      229
+    ],
+    "daMoNative": true,
+    "kind": "aspirin-hydrolysis-numbered",
+    "literalReactantBranch": "OCOCH₃",
+    "phenylSubstituents": "COOHtop,OCOCH₃top-right,ortho",
+    "reactants": [
+      "aspirin",
+      "H₂O"
+    ],
+    "products": [
+      "salicylic acid",
+      "CH₃COOH"
+    ],
+    "arrow": "⇌",
+    "captions": [
+      "Aspirin",
+      "Salicylic acid"
+    ],
+    "reactionLabel": "(1)",
+    "notes": "Cùngcấutrúcvòng3đôi/2capnhư727NHƯNGGIỮ(1)ởbênphảicuốiphươngtrình. KhôngH⁺/t⁰trênarrow. Native1323đãmởriêng,khôngalias727làmrụng(1).",
+    "questions": [
+      {
+        "qid": "12-KT-C1-D4-II-2",
+        "de": "Aspirin là một hợp chất được sử dụng làm giảm đau, hạ sốt. Sau khi uống, aspirin bị thủy phân một phần trong cơ thể sẽ tạo thành salicylic acid theo phương trình hoá học sau:",
+        "refs": [
+          {
+            "where": "12-KT-C1-D4-II-2.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D1-II-108",
+        "de": "Aspirin là một hợp chất được sử dụng làm giảm đau, hạ sốt. Sau khi uống, aspirin bị thủy phân một phần trong cơ thể sẽ tạo thành salicylic acid theo phương trình hoá học sau:",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D1-II-108.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "aspirin-ddh-738e9e3a6e53cfff5ecdd4e398a8edfef2d300cfcf47cb388c2654b488643871.svg",
+    "hashSvg": "738e9e3a6e53cfff5ecdd4e398a8edfef2d300cfcf47cb388c2654b488643871",
+    "byteSvg": 24038,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "727/1323COOHtop/OCOCH3side,3doubleđúngpatternsource/nocond/2caption/1323GIỮ(1);1284OOCCH3top/CIRCLE/H+,t°/2caption;2022111168OOCCH3top/3double/H+KHÔNGt°/chỉ1168CÓcaption. Khôngsửaliteraltheohóahọc.",
+    "hashSvgDaSoat": "738e9e3a6e53cfff5ecdd4e398a8edfef2d300cfcf47cb388c2654b488643871",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 1284,
+    "hash": "e901f90224119c78a1d4d1538962b6a6533a4c9e466f4f2a24a8de23ad8f22ae",
+    "fileNguon": "anh/e901f90224119c78a1d4d1538962b6a6533a4c9e466f4f2a24a8de23ad8f22ae.png",
+    "canvas": [
+      1077,
+      278
+    ],
+    "daMoNative": true,
+    "kind": "aspirin-hydrolysis-circle",
+    "literalReactantBranch": "OOCCH₃",
+    "reactants": [
+      "aspirin",
+      "H₂O"
+    ],
+    "products": [
+      "salicylic acid",
+      "CH₃COOH"
+    ],
+    "arrow": "⇌",
+    "overArrow": "H⁺, t°",
+    "captions": [
+      "Aspirin",
+      "Salicylic acid"
+    ],
+    "notes": "NguồnreactanttextOOCCH₃đúngthứtựnhưảnh,KHÔNGtựđổithànhOCOCH₃theotênaspirin. OOCCH₃ởtopvòng,COOHtoprightortho. ProductOHtop/COOHtoprightortho. 2vòngCIRCLEkhông3đôi. GiữcondH⁺,t°trênarrowvà2cap,nolabel(1).",
+    "questions": [
+      {
+        "qid": "12-C1-B1-D1-II-20",
+        "de": "Aspirin là một hợp chất được sử dụng làm giảm đau, hạ sốt. Sau khi uống, aspirin bị thủy phân trong cơ thể sẽ tạo thành salicylic acid. Salicylic acid ức chế quá trình sinh tổng hợp prostaglandin (chất gây đau, sốt và viêm khi nồng độ trong máu cao hơn mức bình thường).",
+        "refs": [
+          {
+            "where": "12-C1-B1-D1-II-20.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D1-II-31",
+        "de": "Aspirin là một hợp chất được sử dụng làm giảm đau, hạ sốt. Sau khi uống, aspirin bị thủy phân trong cơ thể sẽ tạo thành salicylic acid. Salicylic acid ức chế quá trình sinh tổng hợp prostaglandin (chất gây đau, sốt và viêm khi nồng độ trong máu cao hơn mức bình thường).",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D1-II-31.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "aspirin-ddh-7990e7bb805cd86bd4e1bd85d0ccfc13d5be3a554c64bd936b0444cf0e7fa259.svg",
+    "hashSvg": "7990e7bb805cd86bd4e1bd85d0ccfc13d5be3a554c64bd936b0444cf0e7fa259",
+    "byteSvg": 25214,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "727/1323COOHtop/OCOCH3side,3doubleđúngpatternsource/nocond/2caption/1323GIỮ(1);1284OOCCH3top/CIRCLE/H+,t°/2caption;2022111168OOCCH3top/3double/H+KHÔNGt°/chỉ1168CÓcaption. Khôngsửaliteraltheohóahọc.",
+    "hashSvgDaSoat": "7990e7bb805cd86bd4e1bd85d0ccfc13d5be3a554c64bd936b0444cf0e7fa259",
+    "nguoiSoat": "cau_truc_6"
+  },
+  {
+    "i": 202,
+    "hash": "2244842bb9174b43a2ff8dc140b04a2c7338208fbf94475f0ae57b681cec5097",
+    "fileNguon": "anh/2244842bb9174b43a2ff8dc140b04a2c7338208fbf94475f0ae57b681cec5097.png",
+    "canvas": [
+      468,
+      94
+    ],
+    "daMoNative": true,
+    "kind": "aspirin-hydrolysis-doublebond-literal",
+    "literalReactantBranch": "OOCCH₃",
+    "reactants": [
+      "aspirin",
+      "H₂O"
+    ],
+    "products": [
+      "salicylic acid",
+      "CH₃COOH"
+    ],
+    "arrow": "⇌",
+    "overArrow": "H⁺",
+    "captions": [],
+    "notes": "2vòng3đôiKHÔNGcircle. ReactantOOCCH₃TOP/COOHtoprightortho;productOHtop/COOHtoprightortho. OOCCH₃sourcegiữliteralKHÔNGtựOCOCH₃;H⁺trênarrowKHÔNGt°.1168CÓ2capAspirin/Salicylicacid,còn202/211KHÔNGcaption;đãmởRIÊNG3nguồnkhôngaliaslàmrụng/thêmcaption.",
+    "questions": [
+      {
+        "qid": "DB-12-B1-P1-D1-II-153",
+        "de": "Aspirin được sử dụng làm thuốc giảm đau, hạ sốt. Sau khi uống, aspirin bị thuỷ phân trong cơ thể tạo thành salicylic acid, chất này làm ức chế quá trình tạo ra chất gây đau, sốt.\nTrong phòng thí nghiệm, một nhóm học sinh tiến hành nghiên cứu quá trình thuỷ phân aspirin theo phản ứng: aspirin salicylic acid Kết quả xác định nồng độ aspirin theo thời gian được thể hiện ở bảng dưới đây:",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D1-II-153.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B1-P1-II-20",
+        "de": "Aspirin được sử dụng làm thuốc giảm đau, hạ sốt. Sau khi uống, aspirin bị thuỷ phân trong cơ thể tạo thành salicylic acid, chất này làm ức chế quá trình tạo ra chất gây đau, sốt.\nTrong phòng thí nghiệm, một nhóm học sinh tiến hành nghiên cứu quá trình thuỷ phân aspirin theo phản ứng: aspirin salicylic acid Kết quả xác định nồng độ aspirin theo thời gian được thể hiện ở bảng dưới đây:",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P1-II-20.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "aspirin-ddh-ee5b8a564b385dd78cd90b72ccdefc2869436b0bf42675fe9122b278fd290b16.svg",
+    "hashSvg": "ee5b8a564b385dd78cd90b72ccdefc2869436b0bf42675fe9122b278fd290b16",
+    "byteSvg": 15221,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "727/1323COOHtop/OCOCH3side,3doubleđúngpatternsource/nocond/2caption/1323GIỮ(1);1284OOCCH3top/CIRCLE/H+,t°/2caption;2022111168OOCCH3top/3double/H+KHÔNGt°/chỉ1168CÓcaption. Khôngsửaliteraltheohóahọc.",
+    "hashSvgDaSoat": "ee5b8a564b385dd78cd90b72ccdefc2869436b0bf42675fe9122b278fd290b16",
+    "nguoiSoat": "cau_truc_6"
+  },
+  {
+    "i": 211,
+    "hash": "23764464098ba10c9a74b47d5ba441adc22d1d676f47bddeedc73db1ba8ce2af",
+    "fileNguon": "anh/23764464098ba10c9a74b47d5ba441adc22d1d676f47bddeedc73db1ba8ce2af.png",
+    "canvas": [
+      1031,
+      252
+    ],
+    "daMoNative": true,
+    "kind": "aspirin-hydrolysis-doublebond-literal",
+    "literalReactantBranch": "OOCCH₃",
+    "reactants": [
+      "aspirin",
+      "H₂O"
+    ],
+    "products": [
+      "salicylic acid",
+      "CH₃COOH"
+    ],
+    "arrow": "⇌",
+    "overArrow": "H⁺",
+    "captions": [],
+    "notes": "2vòng3đôiKHÔNGcircle. ReactantOOCCH₃TOP/COOHtoprightortho;productOHtop/COOHtoprightortho. OOCCH₃sourcegiữliteralKHÔNGtựOCOCH₃;H⁺trênarrowKHÔNGt°.1168CÓ2capAspirin/Salicylicacid,còn202/211KHÔNGcaption;đãmởRIÊNG3nguồnkhôngaliaslàmrụng/thêmcaption.",
+    "questions": [
+      {
+        "qid": "12-C1-B1-D2-II-7",
+        "de": "Aspirin được sử dụng làm thuốc giảm đau, hạ sốt. Sau khi uống, aspirin bị thuỷ phân trong cơ thể tạo thành salicylic acid, chất này làm ức chế quá trình tạo ra chất gây đau, sốt.\nTrong phòng thí nghiệm, một nhóm học sinh tiến hành nghiên cứu quá trình thuỷ phân aspirin theo phản ứng aspirin → salicylic acid. Kết quả xác định nồng độ aspirin theo thời gian được thể hiện ở bảng dưới đây:",
+        "refs": [
+          {
+            "where": "12-C1-B1-D2-II-7.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D1-II-40",
+        "de": "Aspirin được sử dụng làm thuốc giảm đau, hạ sốt. Sau khi uống, aspirin bị thuỷ phân trong cơ thể tạo thành salicylic acid, chất này làm ức chế quá trình tạo ra chất gây đau, sốt.\nTrong phòng thí nghiệm, một nhóm học sinh tiến hành nghiên cứu quá trình thuỷ phân aspirin theo phản ứng aspirin → salicylic acid. Kết quả xác định nồng độ aspirin theo thời gian được thể hiện ở bảng dưới đây:",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D1-II-40.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "aspirin-ddh-ee5b8a564b385dd78cd90b72ccdefc2869436b0bf42675fe9122b278fd290b16.svg",
+    "hashSvg": "ee5b8a564b385dd78cd90b72ccdefc2869436b0bf42675fe9122b278fd290b16",
+    "byteSvg": 15221,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "727/1323COOHtop/OCOCH3side,3doubleđúngpatternsource/nocond/2caption/1323GIỮ(1);1284OOCCH3top/CIRCLE/H+,t°/2caption;2022111168OOCCH3top/3double/H+KHÔNGt°/chỉ1168CÓcaption. Khôngsửaliteraltheohóahọc.",
+    "hashSvgDaSoat": "ee5b8a564b385dd78cd90b72ccdefc2869436b0bf42675fe9122b278fd290b16",
+    "nguoiSoat": "cau_truc_6"
+  },
+  {
+    "i": 1168,
+    "hash": "d32c59e7f0828cd37e16bde375f06ce3bf4c3f88fd27d2327284bcdcc79f7ce5",
+    "fileNguon": "anh/d32c59e7f0828cd37e16bde375f06ce3bf4c3f88fd27d2327284bcdcc79f7ce5.png",
+    "canvas": [
+      828,
+      191
+    ],
+    "daMoNative": true,
+    "kind": "aspirin-hydrolysis-doublebond-literal",
+    "literalReactantBranch": "OOCCH₃",
+    "reactants": [
+      "aspirin",
+      "H₂O"
+    ],
+    "products": [
+      "salicylic acid",
+      "CH₃COOH"
+    ],
+    "arrow": "⇌",
+    "overArrow": "H⁺",
+    "captions": [
+      "Aspirin",
+      "Salicylic acid"
+    ],
+    "notes": "2vòng3đôiKHÔNGcircle. ReactantOOCCH₃TOP/COOHtoprightortho;productOHtop/COOHtoprightortho. OOCCH₃sourcegiữliteralKHÔNGtựOCOCH₃;H⁺trênarrowKHÔNGt°.1168CÓ2capAspirin/Salicylicacid,còn202/211KHÔNGcaption;đãmởRIÊNG3nguồnkhôngaliaslàmrụng/thêmcaption.",
+    "questions": [
+      {
+        "qid": "VIP27-C1-B3-D2-II-4",
+        "de": "Aspirin được sử dụng làm thuốc giảm đau, hạ sốt. Sau khi uống, aspirin bị thuỷ phân trong cơ thể tạo thành salicylic acid, chất này có tác dụng ức chế quá trình sinh tổng hợp các chất gây viêm, đau, sốt. Trong phòng thí nghiệm, một nhóm học sinh tiến hành nghiên cứu quá trình thuỷ phân aspirin trong môi trường acid và thu được kết quả như đồ thị; sơ đồ quá trình thủy phân aspirin như hình.",
+        "refs": [
+          {
+            "where": "VIP27-C1-B3-D2-II-4.hinh.1.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "aspirin-ddh-b827acb74982154c03e7b9a20b9c7a65976f0d0e5ac9c4e522c27550727a2cab.svg",
+    "hashSvg": "b827acb74982154c03e7b9a20b9c7a65976f0d0e5ac9c4e522c27550727a2cab",
+    "byteSvg": 24109,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "727/1323COOHtop/OCOCH3side,3doubleđúngpatternsource/nocond/2caption/1323GIỮ(1);1284OOCCH3top/CIRCLE/H+,t°/2caption;2022111168OOCCH3top/3double/H+KHÔNGt°/chỉ1168CÓcaption. Khôngsửaliteraltheohóahọc.",
+    "hashSvgDaSoat": "b827acb74982154c03e7b9a20b9c7a65976f0d0e5ac9c4e522c27550727a2cab",
+    "nguoiSoat": "cau_truc_6"
+  }
+]

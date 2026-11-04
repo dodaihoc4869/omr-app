@@ -1,0 +1,366 @@
+[
+  {
+    "i": 1361,
+    "hash": "f623d1ca4cdc50f02668a602dfaf136bf2b0f5ffcdb1f8a086a211102cc1c131",
+    "fileNguon": "anh/f623d1ca4cdc50f02668a602dfaf136bf2b0f5ffcdb1f8a086a211102cc1c131.png",
+    "canvas": [
+      638,
+      416
+    ],
+    "daMoNative": true,
+    "kind": "graph-drawing-not-photo",
+    "title": [
+      "Đồ thị sự biến đổi nồng độ Aspirin theo",
+      "thời gian trong phản ứng thủy phân"
+    ],
+    "xLabel": "Thời gian (phút)",
+    "yLabel": "Nồng độ aspirin (M)",
+    "yTicks": [
+      "0,0",
+      "0,02",
+      "0,04",
+      "0,06",
+      "0,08",
+      "0,10"
+    ],
+    "xTicks": [
+      "0",
+      "30",
+      "60",
+      "90",
+      "120",
+      "150",
+      "180"
+    ],
+    "axesPixel": {
+      "box": [
+        116,
+        106,
+        610,
+        343
+      ],
+      "yTickPixel": [
+        343,
+        297,
+        249,
+        202,
+        155,
+        106
+      ],
+      "xLabelCentersApprox": [
+        116,
+        194,
+        272,
+        378,
+        455,
+        533,
+        611
+      ]
+    },
+    "openCirclePixel": [
+      [
+        116,
+        106
+      ],
+      [
+        168,
+        145
+      ],
+      [
+        219,
+        177
+      ],
+      [
+        272,
+        203
+      ],
+      [
+        323,
+        224
+      ],
+      [
+        378,
+        240
+      ],
+      [
+        431,
+        254
+      ],
+      [
+        482,
+        264
+      ],
+      [
+        533,
+        267
+      ],
+      [
+        610,
+        267
+      ]
+    ],
+    "notes": "NguồncònthiếulàĐỒTHỊvẽ,khôngảnhthật.10markers/1curve/box4cạnh/title/ticks/labelsphảigiữ. Partner1168đãđạt,khôngdựnglạipartner. KhôngdiễnGiảiđápán.",
+    "questions": [
+      {
+        "qid": "VIP27-C1-B3-D2-II-4",
+        "de": "Aspirin được sử dụng làm thuốc giảm đau, hạ sốt. Sau khi uống, aspirin bị thuỷ phân trong cơ thể tạo thành salicylic acid, chất này có tác dụng ức chế quá trình sinh tổng hợp các chất gây viêm, đau, sốt. Trong phòng thí nghiệm, một nhóm học sinh tiến hành nghiên cứu quá trình thuỷ phân aspirin trong môi trường acid và thu được kết quả như đồ thị; sơ đồ quá trình thủy phân aspirin như hình.",
+        "refs": [
+          {
+            "where": "VIP27-C1-B3-D2-II-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "qid": "VIP27-C1-B3-D2-II-4",
+    "de": "Aspirin được sử dụng làm thuốc giảm đau, hạ sốt. Sau khi uống, aspirin bị thuỷ phân trong cơ thể tạo thành salicylic acid, chất này có tác dụng ức chế quá trình sinh tổng hợp các chất gây viêm, đau, sốt. Trong phòng thí nghiệm, một nhóm học sinh tiến hành nghiên cứu quá trình thuỷ phân aspirin trong môi trường acid và thu được kết quả như đồ thị; sơ đồ quá trình thủy phân aspirin như hình.",
+    "where": "VIP27-C1-B3-D2-II-4.hinh.0.du_lieu",
+    "viTri": "sau_de",
+    "sourceCounterpart": {
+      "i": 1168,
+      "hash": "d32c59e7f0828cd37e16bde375f06ce3bf4c3f88fd27d2327284bcdcc79f7ce5",
+      "alreadyVerified": true
+    },
+    "daMoNativeLan143": true,
+    "diagnosticZoom": "/workspace/scratch/aspirin1361-axis-2x.png",
+    "geometry": {
+      "canvas": [
+        638,
+        416
+      ],
+      "plotBox": [
+        116,
+        106,
+        611,
+        343
+      ],
+      "xTicks": [
+        {
+          "text": "0",
+          "x": 116
+        },
+        {
+          "text": "30",
+          "x": 194
+        },
+        {
+          "text": "60",
+          "x": 272
+        },
+        {
+          "text": "90",
+          "x": 378
+        },
+        {
+          "text": "120",
+          "x": 455
+        },
+        {
+          "text": "150",
+          "x": 533
+        },
+        {
+          "text": "180",
+          "x": 611
+        }
+      ],
+      "yTicks": [
+        {
+          "text": "0,0",
+          "y": 343
+        },
+        {
+          "text": "0,02",
+          "y": 297
+        },
+        {
+          "text": "0,04",
+          "y": 249
+        },
+        {
+          "text": "0,06",
+          "y": 202
+        },
+        {
+          "text": "0,08",
+          "y": 155
+        },
+        {
+          "text": "0,10",
+          "y": 106
+        }
+      ],
+      "minorGridXApprox": [
+        142,
+        168,
+        219,
+        245,
+        297,
+        323,
+        349,
+        403,
+        429,
+        481,
+        507,
+        559,
+        585
+      ],
+      "minorGridYApprox": [
+        131,
+        178,
+        225,
+        273,
+        320
+      ],
+      "curveSamples": [
+        [
+          116,
+          106
+        ],
+        [
+          142,
+          127
+        ],
+        [
+          168,
+          145
+        ],
+        [
+          194,
+          161
+        ],
+        [
+          219,
+          177
+        ],
+        [
+          245,
+          191
+        ],
+        [
+          272,
+          203
+        ],
+        [
+          297,
+          214
+        ],
+        [
+          323,
+          224
+        ],
+        [
+          349,
+          232
+        ],
+        [
+          378,
+          240
+        ],
+        [
+          403,
+          247
+        ],
+        [
+          431,
+          254
+        ],
+        [
+          455,
+          260
+        ],
+        [
+          482,
+          264
+        ],
+        [
+          507,
+          266
+        ],
+        [
+          533,
+          267
+        ],
+        [
+          559,
+          267
+        ],
+        [
+          585,
+          267
+        ],
+        [
+          611,
+          267
+        ]
+      ],
+      "openCircles": [
+        [
+          116,
+          106
+        ],
+        [
+          168,
+          145
+        ],
+        [
+          219,
+          177
+        ],
+        [
+          272,
+          203
+        ],
+        [
+          323,
+          224
+        ],
+        [
+          378,
+          240
+        ],
+        [
+          431,
+          254
+        ],
+        [
+          482,
+          264
+        ],
+        [
+          533,
+          267
+        ],
+        [
+          611,
+          267
+        ]
+      ],
+      "openCircleRadiusApprox": 5,
+      "curveStyle": "one solid black smooth descending curve,10opencircle markers",
+      "grid": "dashedgreymajorsstronger/minorslighter",
+      "axisArrowHeads": false,
+      "titleLines": [
+        "Đồ thị sự biến đổi nồng độ Aspirin theo",
+        "thời gian trong phản ứng thủy phân"
+      ],
+      "titleTopLeft": [
+        116,
+        28
+      ],
+      "xLabel": "Thời gian (phút)",
+      "yLabel": "Nồng độ aspirin (M)"
+    },
+    "sourceTickCaution": "NativeTHẬT đặt90tạix378,khôngx350(trongkhi0/30/60ở116/194/272). Đãzoom2xđọcriêngticktext/vạch. Khôngtựgánthờigian0/20/40...chocáccirclehoặcsửaphânphối90tickởlượtđọcnày.Giữanchor/texttheoảnh,cầnrootsoátkhiquyếtđịnhchuẩnhóa. Đâytiếtlộhìnhhọcnguồnkhôngphảikếtluậnhóahọc/đápán.",
+    "canDraw": true,
+    "svg": "do-thi-aspirin-ddh-cea584f57e1a2ceabaa0931910cbd9d0e3abf154b0baa727ecd7c6e425b2c700.svg",
+    "hashSvg": "cea584f57e1a2ceabaa0931910cbd9d0e3abf154b0baa727ecd7c6e425b2c700",
+    "byteSvg": 70199,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "10opencircles/1curvePCHIPqua20pixelanchors/major-minorgrid/box4cạnh/noarrow. GIỮ90tạix378không350/khônggánthờigiangiảchosamples/title2dòng/axisM-phút/Y0,0..0,10.",
+    "hashSvgDaSoat": "cea584f57e1a2ceabaa0931910cbd9d0e3abf154b0baa727ecd7c6e425b2c700",
+    "nguoiSoat": "cau_truc_6"
+  }
+]
