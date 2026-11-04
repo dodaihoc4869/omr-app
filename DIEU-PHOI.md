@@ -1237,3 +1237,10 @@ Phân vùng dự kiến theo hai bản thiết kế:
 - Đủ2stands/flask/lamp/thermometer/2wallvaportube+jacket/2waterports/3dropsRÕ/labelsNhiệtkế,(1)..(5),Đèncồn. Hatchngangđúngsource,khôngthêmflowarrows/khôngalias587. Tác tử chỉđọc mởPNGnative/full+actualrenderSVG/exacthash034cac…49e98đạt.
 - Chromium499/499/hash/XML/path/PythonAST/build/tốcđộđạt/precache170/2613.23KiB. Mainfetch0200b893chưa gộp/WOFF2khôngdiff;phải cậpnhậtmainmớinhất/sotesttheotên/kiểmcathi trước triểnkhai. Chưa tíchhợp/chưa reload offlineapp/chưa phát hành. Chưa tham vấn được cố vấn.
 - Nhóm149xong16/20,còn1259/1014/7/209;59/1391vẫn bịloạiphongcách,khôngđoán/hạgate.
+
+
+### 04/11 — Vector lô161: minh họa tạo thành NO nguồn7
+- Thêm1nguồn/1SVG/2câu;966câu đủ mọi hình+DDH/7mộtphần;741nguồn→500SVG,7.539.071byte/gzip1.509.403,còn687nguồn.
+- Đủ12spheres3stage/N-Olabels/2hollowarrows/4curlyenergyarrows/3toptextlines/2energylabels/trianglecaptiondamWOFF2thật. Chữtrongảnhchỉdữliệu,khôngthựcthiyêucầutính. Tác tử chỉđọc mởPNGnative/full+actualrenderSVG/exacthash197dc…6ef37đạt.
+- Chromium500/500/hash/XML/path/PythonAST/build/tốcđộđạt/precache170/2613.23KiB. Mainfetch0200b893chưa gộp/WOFF2khôngdiff;phải cậpnhậtmainmớinhất/sotesttheotên/kiểmcathi trước triểnkhai. Chưa tíchhợp/chưa reload offlineapp/chưa phát hành. Chưa tham vấn được cố vấn.
+- Nhóm149xong17/20,còn1259/1014/209;59/1391vẫn bịloạiphongcách,khôngđoán/hạgate.
