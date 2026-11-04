@@ -247,5 +247,818 @@
         ]
       }
     ]
+  },
+  {
+    "i": 483,
+    "hash": "58f484540c027a1f096add48fcc2455e8da64ba62ba1faf2b8467a8b28b68d74",
+    "fileNguon": "anh/58f484540c027a1f096add48fcc2455e8da64ba62ba1faf2b8467a8b28b68d74.png",
+    "canvas": [
+      645,
+      429
+    ],
+    "daMoNative": true,
+    "kind": "galvanic-Zn-Cu-NH4Cl",
+    "labels": [
+      "Zn",
+      "Cu",
+      "ZnSO₄(aq)",
+      "CuSO₄(aq)",
+      "Cầu muối",
+      "NH₄Cl",
+      "Cl⁻",
+      "NH₄⁺",
+      "e",
+      "e"
+    ],
+    "notes": "2cốcngang,tráiZn/solutionZnSO₄(aq),phảiCu/CuSO₄(aq). CầuNH₄ClốngUconglộnngượcnhúng2đầuvàodungdịch. MạchngoàidâyhìnhΠnối2thanh,1vòngtròncókýnétzigzagtrêngiữa. 2mũitêneTRÊNdâyđềuchỉPHẢI.NhãneKHÔNGcódấu−trongsourceđừngtựe−. Trêncầu2arrowhorizHƯỚNGVÀOGIỮA:tráiarrow→,phảiarrow←;labelCầumuối/NH₄Clởgiữatrênvớileader↓. TrongđầucầutráighiCl⁻,phảighiNH₄⁺vàmũitên↓từđầucầuvàodungdịch. Giữwrong-lookingtopcầuarrowhướngvàogiữatheosource,khôngtựsửagiảđịnhionmigration. Nềnrasterhạttrongsolutioncóthểvectorfillmịnchứkhôngdữliệuhạtđếm. 483/1216đãmởriêngsamecontentkhácscale.",
+    "questions": [
+      {
+        "qid": "12-KT-C56-D2-I-16",
+        "de": "Sử dụng thông tin về cấu tạo của pin Galvani Zn-Cu ở hình dưới.\nCho các nhận định sau:\n(1) Phản ứng xảy ra trong pin là Zn(s) + Cu²⁺(aq) → Zn²⁺(aq) + Cu(s).\n(2) Thanh Zn là cực âm, tức anode, và thanh Cu là cực dương, tức cathode.\n(3) Khi Zn(s) hoặc Cu²⁺(aq) hết thì phản ứng trong pin sẽ ngừng lại.\n(4) Sức điện động của pin không thay đổi trong quá trình pin hoạt động.\nSố nhận định đúng là",
+        "refs": [
+          {
+            "where": "12-KT-C56-D2-I-16.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "12-KT-C56-D2-I-17",
+        "de": "Với pin Galvani Zn-Cu ở hình dưới, nếu thể tích các dung dịch đều là 0,50 L, nồng độ của các muối ban đầu đều là 1,0 M và khối lượng các điện cực Zn hoặc Cu đều bằng 100 gam, pin hoạt động tạo ra dòng điện có cường độ ổn định là 0,10 A. Thời gian mà pin hoạt động là",
+        "refs": [
+          {
+            "where": "12-KT-C56-D2-I-17.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "12-KT-C56-D2-I-18",
+        "de": "Với pin Galvani Zn-Cu ở hình dưới, trong quá trình pin hoạt động, cho các nhận định sau:\n(1) Nồng độ ion Zn²⁺ ở dung dịch bên trái tăng dần.\n(2) Nồng độ ion Cu²⁺ ở dung dịch bên phải giảm dần.\n(3) Nồng độ các anion trong hai dung dịch không thay đổi.\n(4) Khối lượng các điện cực và các dung dịch không thay đổi.\nSố nhận định đúng là",
+        "refs": [
+          {
+            "where": "12-KT-C56-D2-I-18.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1216,
+    "hash": "dc67821262ad7ab691290a4f1ec181c0f69df2e3c20dcd44e661214aac477af7",
+    "fileNguon": "anh/dc67821262ad7ab691290a4f1ec181c0f69df2e3c20dcd44e661214aac477af7.png",
+    "canvas": [
+      687,
+      459
+    ],
+    "daMoNative": true,
+    "kind": "galvanic-Zn-Cu-NH4Cl",
+    "labels": [
+      "Zn",
+      "Cu",
+      "ZnSO₄(aq)",
+      "CuSO₄(aq)",
+      "Cầu muối",
+      "NH₄Cl",
+      "Cl⁻",
+      "NH₄⁺",
+      "e",
+      "e"
+    ],
+    "notes": "2cốcngang,tráiZn/solutionZnSO₄(aq),phảiCu/CuSO₄(aq). CầuNH₄ClốngUconglộnngượcnhúng2đầuvàodungdịch. MạchngoàidâyhìnhΠnối2thanh,1vòngtròncókýnétzigzagtrêngiữa. 2mũitêneTRÊNdâyđềuchỉPHẢI.NhãneKHÔNGcódấu−trongsourceđừngtựe−. Trêncầu2arrowhorizHƯỚNGVÀOGIỮA:tráiarrow→,phảiarrow←;labelCầumuối/NH₄Clởgiữatrênvớileader↓. TrongđầucầutráighiCl⁻,phảighiNH₄⁺vàmũitên↓từđầucầuvàodungdịch. Giữwrong-lookingtopcầuarrowhướngvàogiữatheosource,khôngtựsửagiảđịnhionmigration. Nềnrasterhạttrongsolutioncóthểvectorfillmịnchứkhôngdữliệuhạtđếm. 483/1216đãmởriêngsamecontentkhácscale.",
+    "questions": [
+      {
+        "qid": "12-KT-C5-D3-II-1",
+        "de": "Cho cấu tạo của pin Galvani Zn-Cu như hình dưới:",
+        "refs": [
+          {
+            "where": "12-KT-C5-D3-II-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 575,
+    "hash": "6b57afe5a9415b5639b5e284a4842bb350f4d2014a4e3e9c1008da90f6368dc7",
+    "fileNguon": "anh/6b57afe5a9415b5639b5e284a4842bb350f4d2014a4e3e9c1008da90f6368dc7.png",
+    "canvas": [
+      601,
+      249
+    ],
+    "daMoNative": true,
+    "kind": "NH3-fountain-lab",
+    "labels": [
+      "Khí NH₃",
+      "Nước có hòa tan vài giọt phenolphthalein"
+    ],
+    "notes": "Bìnhchữnhậtbo2góctrênÚPngược,nútcaosuđenởcổdưới.Cóốngthủy tinhnhỏđứngđitừbeakernướcbênDƯỚIquanútvàlêntrongbình,kếtthúcnhọnởgiữabình. Beakernướcdưới hìnhchữnhậtviềnmảnh/nhiềugạchngangnhỏdướimứcwaterline. Giáđỡtrụđứngtrái,thanhkẹpngangđếncổbình,nềnchânđếxám. LabelKhíNH₃leaderchỉvùngtrongbình,Nướccóhòatan...2dòngleaderchỉnướctrongbeaker. KHÔNGtựvẽmàuhồng/nướcdâng/fountainjetvìsourcechưacótrạngtháithínghiệmnày.",
+    "questions": [
+      {
+        "qid": "DB-11-B5-D2-I-33",
+        "de": "Cho thí nghiệm như hình vẽ, bên trong bình có chứa khí ammonia, trong chậu thủy tinh chứa nước có nhỏ vài giọt phenolphthalein.\nHiện tượng xảy ra trong thí nghiệm là",
+        "refs": [
+          {
+            "where": "DB-11-B5-D2-I-33.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-11-B5-D2-I-94",
+        "de": "Cho thí nghiệm như hình dưới, bên trong bình có chứa khí ammonia, trong chậu thủy tinh chứa nước có nhỏ vài giọt phenolphthalein.\nHiện tượng xảy ra trong thí nghiệm là",
+        "refs": [
+          {
+            "where": "DB-11-B5-D2-I-94.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B5-I-32",
+        "de": "Cho thí nghiệm như hình vẽ, bên trong bình có chứa khí ammonia, trong chậu thủy tinh chứa nước có nhỏ vài giọt phenolphthalein.\nHiện tượng xảy ra trong thí nghiệm là",
+        "refs": [
+          {
+            "where": "DH-11-C2-B5-I-32.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B9-D1-I-4",
+        "de": "Cho thí nghiệm như hình dưới, bên trong bình có chứa khí ammonia, trong chậu thủy tinh chứa nước có nhỏ vài giọt phenolphthalein.\nHiện tượng xảy ra trong thí nghiệm là",
+        "refs": [
+          {
+            "where": "DH-11-C2-B9-D1-I-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 82,
+    "hash": "10da97400c3268d7fe33736059052f7b4c76a1c3464449e1076b93a01236e073",
+    "fileNguon": "anh/10da97400c3268d7fe33736059052f7b4c76a1c3464449e1076b93a01236e073.png",
+    "canvas": [
+      368,
+      414
+    ],
+    "daMoNative": true,
+    "kind": "saponification-lab-stir",
+    "text": [
+      "Liên tục khuấy",
+      "bằng đũa thủy tinh",
+      "2 mL dầu ăn",
+      "5 mL dung dịch",
+      "NaOH 40%"
+    ],
+    "notes": "Bátsứchịunhiệtbođáycótayđũathủytinhchéolêntừtrongliquidyellow,sốlabelvănđỏởtrêntrái;curvedstirarrowquanhđầuđũaphíatrênphải(nhìnsourcegiữhướnghead). Bátđặttrênlướivuôngôcrosshatch,trên3chângiáxanhlam,códèncồnnhỏdướigiữavàngọnlửađỏdướibát. Nướcdầumàuvàngtrongbát,KHÔNGmôphỏngảnhphoto;đâylàillustration. Giữ5dòngtext/2mL/5mL/40%,khôngđổi5mLNaOH40%thànhnồngđộkhác.",
+    "questions": [
+      {
+        "qid": "12-BD7-18-II-1",
+        "de": "Tiến hành thí nghiệm xà phòng hoá chất béo được minh hoạ như hình bên:\nBước 1: Cho vào bát sứ nhỏ khoảng 2 mL dầu ăn và 5 mL dung dịch NaOH 40%.\nBước 2: Đun sôi nhẹ hỗn hợp, liên tục khuấy đều bằng đũa thuỷ tinh khoảng 20 phút và thỉnh thoảng thêm nước cất để giữ cho thể tích hỗn hợp không đổi rồi để nguội hỗn hợp.\nBước 3: Rót thêm vào hỗn hợp 15-20 mL dung dịch NaCl bão hoà, khuấy nhẹ rồi để yên hỗn hợp.",
+        "refs": [
+          {
+            "where": "12-BD7-18-II-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "12-C1-B1-D1-II-7",
+        "de": "Tiến hành thí nghiệm xà phòng hoá chất béo được minh hoạ như hình bên:\nBước 1: Cho vào bát sứ nhỏ khoảng 2 mL dầu ăn và 5 mL dung dịch NaOH 40%.\nBước 2: Đun sôi nhẹ hỗn hợp, liên tục khuấy đều bằng đũa thuỷ tinh khoảng 20 phút và thỉnh thoảng thêm nước cất để giữ cho thể tích hỗn hợp không đổi rồi để nguội hỗn hợp.\nBước 3: Rót thêm vào hỗn hợp 15-20 mL dung dịch NaCl bão hoà, khuấy nhẹ rồi để yên hỗn hợp.",
+        "refs": [
+          {
+            "where": "12-C1-B1-D1-II-7.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P2-D1-II-4",
+        "de": "Tiến hành thí nghiệm xà phòng hoá chất béo được minh hoạ như hình bên:\nBước 1: Cho vào bát sứ nhỏ khoảng 2 mL dầu ăn và 5 mL dung dịch NaOH 40%.\nBước 2: Đun sôi nhẹ hỗn hợp, liên tục khuấy đều bằng đũa thuỷ tinh khoảng 20 phút và thỉnh thoảng thêm nước cất để giữ cho thể tích hỗn hợp không đổi rồi để nguội hỗn hợp.\nBước 3: Rót thêm vào hỗn hợp 15-20 mL dung dịch NaCl bão hoà, khuấy nhẹ rồi để yên hỗn hợp.",
+        "refs": [
+          {
+            "where": "DB-12-B1-P2-D1-II-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P2-D1-II-55",
+        "de": "Tiến hành thí nghiệm xà phòng hoá chất béo được minh hoạ như hình bên:\nBước 1: Cho vào bát sứ nhỏ khoảng 2 mL dầu ăn và 5 mL dung dịch NaOH 40%.\nBước 2: Đun sôi nhẹ hỗn hợp, liên tục khuấy đều bằng đũa thuỷ tinh khoảng 20 phút và thỉnh thoảng thêm nước cất để giữ cho thể tích hỗn hợp không đổi rồi để nguội hỗn hợp.\nBước 3: Rót thêm vào hỗn hợp 15-20 mL dung dịch NaCl bão hoà, khuấy nhẹ rồi để yên hỗn hợp.",
+        "refs": [
+          {
+            "where": "DB-12-B1-P2-D1-II-55.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 587,
+    "hash": "6d7ce74590055d3d9750cd959ffd019b5e3fdd4e128de0aac0065a81a6d91125",
+    "fileNguon": "anh/6d7ce74590055d3d9750cd959ffd019b5e3fdd4e128de0aac0065a81a6d91125.png",
+    "canvas": [
+      464,
+      290
+    ],
+    "daMoNative": true,
+    "kind": "distillation-lab-labelled",
+    "labels": [
+      "Nước ra",
+      "Sinh hàn",
+      "Nước vào",
+      "Bình cầu",
+      "Lưới amiăng",
+      "Bình hứng"
+    ],
+    "notes": "2giáđỡtrụđứng/chânđếtrái/phải. Roundflasktráiđứngtrênlướinằmngangkẹpgiá,dướicódèncồnmàutrongmờcóngọnlửa,flaskchứaliquidxámthấpmức,nocầnthermometertrongsource. Ốnghơitừcổflaskđứnglênrồibẻgócphảixuống,điquasinhhànTHẲNGinclineddownright,kếtthúcuốngcongđivàobìnhtamgiáchứngtrênkhốigỗvânởphảidưới. NhãnNướcratrênbêntráisinhhàn,sourceportđầucao;Nướcvàodướigầnđầuphải/thấp;Sinhhànleadergiữathân.Bìnhcầu/Lướiamiăng/Bìnhhứngleaderchỉđúng3parts. Khôngsố1..5/khôngthêmNhiệtkếnếunguồnkhôngcó.",
+    "questions": [
+      {
+        "qid": "DB-12-B1-P1-D2-II-99",
+        "de": "Tiến hành thí nghiệm điều chế isoamyl acetate (có mùi chuối chín) theo thứ tự các bước sau:\nBước 1. Cho 3 mL isoamyl alcohol, 4 mL acetic acid và 5 mL H₂SO₄ đặc vào bình cầu, lắc đều và đun nhẹ trong khoảng 7 – 8 phút.\nBước 2. Để nguội chất lỏng ở bình hứng, thêm 10 mL dung dịch NaCl bão hoà và cho sang phễu chiết để tách sản phẩm.\nMỗi phát biểu sau đây là đúng hay sai?",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D2-II-99.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D2-II-100",
+        "de": "Tiến hành thí nghiệm điều chế isoamyl acetate (có mùi chuối chín) theo thứ tự các bước sau đây:\nBước 1. Cho 3 mL isoamyl alcohol, 4 mL acetic acid và 5 mL H₂SO₄ đặc vào bình cầu, lắc đều và đun nhẹ trong khoảng 7−8 phút.\nBước 2. Để nguội chất lỏng ở bình hứng, thêm 10 mL dung dịch NaCl bão hoà và cho sang phễu chiết để tách sản phẩm thu được.\nMỗi phát biểu sau đây là đúng hay sai?",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D2-II-100.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B1-P1-II-28",
+        "de": "Tiến hành thí nghiệm điều chế isoamyl acetate (có mùi chuối chín) theo thứ tự các bước sau:\nBước 1. Cho 3 mL isoamyl alcohol, 4 mL acetic acid và 5 mL H₂SO₄ đặc vào bình cầu, lắc đều và đun nhẹ trong khoảng 7 – 8 phút.\nBước 2. Để nguội chất lỏng ở bình hứng, thêm 10 mL dung dịch NaCl bão hoà và cho sang phễu chiết để tách sản phẩm.\nMỗi phát biểu sau đây là đúng hay sai?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P1-II-28.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B1-P1-II-33",
+        "de": "Tiến hành thí nghiệm điều chế isoamyl acetate (có mùi chuối chín) theo thứ tự các bước sau đây:\nBước 1. Cho 3 mL isoamyl alcohol, 4 mL acetic acid và 5 mL H₂SO₄ đặc vào bình cầu, lắc đều và đun nhẹ trong khoảng 7−8 phút.\nBước 2. Để nguội chất lỏng ở bình hứng, thêm 10 mL dung dịch NaCl bão hoà và cho sang phễu chiết để tách sản phẩm thu được.\nMỗi phát biểu sau đây là đúng hay sai?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P1-II-33.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B1-P1-VD-II-5",
+        "de": "Tiến hành thí nghiệm điều chế isoamyl acetate (có mùi chuối chín) theo thứ tự các bước sau đây:\nBước 1. Cho 3 mL isoamyl alcohol, 4 mL acetic acid và 5mLH₂SO₄ đặc vào bình cầu, lắc đều và đun nhẹ trong khoảng 7−8 phút.\nBước 2. Để nguội chất lỏng ở bình hứng, thêm 10 mL dung dịch NaCl bão hoà và cho sang phễu chiết để tách sản phẩm thu được.",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P1-VD-II-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1024,
+    "hash": "b7ea7934af2b39b7b32ac961724ff6b366f8c67a13650d1f76379ae065510c49",
+    "fileNguon": "anh/b7ea7934af2b39b7b32ac961724ff6b366f8c67a13650d1f76379ae065510c49.png",
+    "canvas": [
+      739,
+      567
+    ],
+    "daMoNative": true,
+    "kind": "distillation-lab-numbered",
+    "labels": [
+      "Nhiệt kế",
+      "Đèn cồn",
+      "(1)",
+      "(2)",
+      "(3)",
+      "(4)",
+      "(5)"
+    ],
+    "notes": "2giáđỡkẹpflasktráivàsinhhàninclineddownright,2chânđế.CổflaskcónhiệtkếđứngLÊNqua nútđen,cácvạchnhỏtrênthermometerKHÔNGcósố. Nhánhhơibênphảinốisinhhàn2lớpvàraốngcongđếnErlenhứng,giữ3giọtrơitrongreceiver vàmứcchấtlỏng.Sinhhànjacketcóvânnétchéo bêntrong.Parentlabels(1)portwaterđầuthấpphảidướisinhhàn,(2)portđầucaotráitrên,(3)leadertrongjacket,(4)roundflask,(5)receivingErlen. Khôngmũitênflowởportschỉleadernhãn,đừngthêmcoldwaterflow. LabelĐèncồnleadertrỏdènflametrái;Nhiệtkếleadertrỏthermometer. Giữmesh/labstandnhưsourcekhôngvẽốnghơitrởlạiflas.",
+    "questions": [
+      {
+        "qid": "100-II-2",
+        "de": "Trong phòng thí nghiệm, ethyl acetate được điều chế từ acetic acid và ethanol, xúc tác H₂SO₄ đặc, theo mô hình thí nghiệm như hình. Biết nhiệt độ trong bình cầu (4) giữ ở mức 65–70°C, nhiệt độ trong ống sinh hàn (3) duy trì ở 25°C. Sau thí nghiệm, tiến hành phân tách sản phẩm. Ghi phổ hồng ngoại của acetic acid, ethanol và ethyl acetate.\nCho biết số sóng hấp thụ đặc trưng của một số liên kết trên phổ hồng ngoại như bảng dưới.",
+        "refs": [
+          {
+            "where": "100-II-2.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "12-C1-B1-D1-II-1",
+        "de": "Trong phòng thí nghiệm, ethyl acetate được điều chế từ acetic acid và ethanol, xúc tác H₂SO₄ đặc, theo mô hình thí nghiệm như hình. Biết nhiệt độ trong bình cầu (4) giữ ở mức 65–70°C, nhiệt độ trong ống sinh hàn (3) duy trì ở 25°C. Sau thí nghiệm, tiến hành phân tách sản phẩm. Ghi phổ hồng ngoại của acetic acid, ethanol và ethyl acetate.\nCho biết số sóng hấp thụ đặc trưng của một số liên kết trên phổ hồng ngoại như bảng dưới.",
+        "refs": [
+          {
+            "where": "12-C1-B1-D1-II-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D2-II-14",
+        "de": "Trong phòng thí nghiệm, ethyl acetate được điều chế từ acetic acid và ethanol, xúc tác H₂SO₄ đặc, theo mô hình thí nghiệm như hình. Biết nhiệt độ trong bình cầu (4) giữ ở mức 65–70°C, nhiệt độ trong ống sinh hàn (3) duy trì ở 25°C. Sau thí nghiệm, tiến hành phân tách sản phẩm. Ghi phổ hồng ngoại của acetic acid, ethanol và ethyl acetate.\nCho biết số sóng hấp thụ đặc trưng của một số liên kết trên phổ hồng ngoại như bảng dưới.",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D2-II-14.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D2-II-55",
+        "de": "Trong phòng thí nghiệm, ethyl acetate được điều chế từ acetic acid và ethanol, xúc tác H₂SO₄ đặc, theo mô hình thí nghiệm như hình. Biết nhiệt độ trong bình cầu (4) giữ ở mức 65–70°C, nhiệt độ trong ống sinh hàn (3) duy trì ở 25°C. Sau thí nghiệm, tiến hành phân tách sản phẩm. Ghi phổ hồng ngoại của acetic acid, ethanol và ethyl acetate.\nCho biết số sóng hấp thụ đặc trưng của một số liên kết trên phổ hồng ngoại như bảng dưới.",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D2-II-55.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1259,
+    "hash": "e4bb3007b9f23540990cf8b900e34248990c371e790ed671f9f07ba9f93e0aee",
+    "fileNguon": "anh/e4bb3007b9f23540990cf8b900e34248990c371e790ed671f9f07ba9f93e0aee.png",
+    "canvas": [
+      978,
+      427
+    ],
+    "daMoNative": true,
+    "kind": "pH-products-illustration",
+    "pHMap": [
+      {
+        "pH": 0,
+        "label": "Pin",
+        "icon": "battery"
+      },
+      {
+        "pH": 1,
+        "label": "Acid dạ dày",
+        "icon": "stomach"
+      },
+      {
+        "pH": 2,
+        "label": "Chanh",
+        "icon": "lemon"
+      },
+      {
+        "pH": 3,
+        "label": "Giấm",
+        "icon": "bottle"
+      },
+      {
+        "pH": 4,
+        "label": "Cà chua",
+        "icon": "tomato"
+      },
+      {
+        "pH": 5,
+        "label": "Coffee",
+        "icon": "coffee cup"
+      },
+      {
+        "pH": 6,
+        "label": "Sữa",
+        "icon": "milk bottle"
+      },
+      {
+        "pH": 7,
+        "label": "Nước",
+        "icon": "water splash"
+      },
+      {
+        "pH": 8,
+        "label": "Máu",
+        "icon": "blood tube"
+      },
+      {
+        "pH": 9,
+        "label": "Baking Soda",
+        "icon": "white tub"
+      },
+      {
+        "pH": 10,
+        "label": "Viên thuốc dạ dày",
+        "icon": "stomach tablets"
+      },
+      {
+        "pH": 11,
+        "label": "Dung dịch Ammonia",
+        "icon": "conical flask"
+      },
+      {
+        "pH": 12,
+        "label": "Xà phòng",
+        "icon": "soap"
+      },
+      {
+        "pH": 13,
+        "label": "Chất tẩy",
+        "icon": "detergent bottle"
+      },
+      {
+        "pH": 14,
+        "label": "Chất thông cống",
+        "icon": "drain"
+      }
+    ],
+    "notes": "15ôpH0..14liềntừđỏ→cam→vàng→xanhlá→xanhdương→tím,mỗisốtrắng. 15iconvòngtrònminhhọatươngứng,đượcnốibằngthanhdọcvềôpH;iconsxếpxen kẽpHchẵnhàngDƯỚI/pHlẻhàngTRÊN. GiữtextCoffee/BakingSoda/AmmoniaEnglishđúngcapitalizationkhôngdịch. Đâyillustrationicon,nophoto. CácgiátrịpHminhhọakhôngsửatheokiếnthứcphổbiến.",
+    "questions": [
+      {
+        "qid": "11-C1-B2-D2-II-1",
+        "de": "Hình vẽ sau đây giới thiệu các giá trị pH của một số sản phẩm hàng ngày:",
+        "refs": [
+          {
+            "where": "11-C1-B2-D2-II-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-11-B2-D3-II-58",
+        "de": "Hình vẽ sau đây giới thiệu các giá trị pH của một số sản phẩm hàng ngày:",
+        "refs": [
+          {
+            "where": "DB-11-B2-D3-II-58.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1014,
+    "hash": "b6035201b1962339b3a63bc7393f1f3acb73b2ebcbc69b7d7444bd9a6352479e",
+    "fileNguon": "anh/b6035201b1962339b3a63bc7393f1f3acb73b2ebcbc69b7d7444bd9a6352479e.png",
+    "canvas": [
+      386,
+      388
+    ],
+    "daMoNative": true,
+    "kind": "keep-raster-experiment-composite",
+    "notes": "Source2testtubethểtíchglassgrayscalemàunướcthấp,độphảnxạ/hạtrastermịnkhóphântáchảnhchụp/render3D;ưu tiênGIỮRASTERgốcimmutable(chưavẽvector2ốnggiả). CótextNướcchlorinenghiêngtrêntrái+arrow↓vàoốngtrái,arrowlớn→giữa2ống,textDungdịchpotassiumiodidenghiêngdướitoànhình. Nếucầnvectorphầntext/arrow,táchkhỏi2ảnhốngthậtvàbảotoànhashnguồn,khôngtựđổidòngchữ/hiệntượngmàu.",
+    "questions": [
+      {
+        "qid": "DB-10-B8-D1-III-64",
+        "de": "So sánh tính phi kim của chlorine và iodine. Chuẩn bị: Hình ảnh hoặc video phản ứng của nước chlorine với dung dịch potassium iodide. Tiến hành: Quan sát hình ảnh hoặc xem video phản ứng của nước chlorine với dung dịch potassium iodide. Câu hỏi: So sánh tính phi kim của chlorine và iodine.",
+        "refs": [
+          {
+            "where": "DB-10-B8-D1-III-64.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C2-B6-III-20",
+        "de": "So sánh tính phi kim của chlorine và iodine. Chuẩn bị: Hình ảnh hoặc video phản ứng của nước chlorine với dung dịch potassium iodide. Tiến hành: Quan sát hình ảnh hoặc xem video phản ứng của nước chlorine với dung dịch potassium iodide. Câu hỏi: So sánh tính phi kim của chlorine và iodine.",
+        "refs": [
+          {
+            "where": "DH-10-C2-B6-III-20.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C2-B6-VD-III-2",
+        "de": "So sánh tính phi kim của chlorine và iodine. Chuẩn bị: Hình ảnh hoặc video phản ứng của nước chlorine với dung dịch potassium iodide. Tiến hành: Quan sát hình ảnh hoặc xem video phản ứng của nước chlorine với dung dịch potassium iodide. Câu hỏi: So sánh tính phi kim của chlorine và iodine.",
+        "refs": [
+          {
+            "where": "DH-10-C2-B6-VD-III-2.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1278,
+    "hash": "e85f764d0daf928cb8e863606ffa1e0f4d2f4c3b2cf09acda6e3c7678de1ebef",
+    "fileNguon": "anh/e85f764d0daf928cb8e863606ffa1e0f4d2f4c3b2cf09acda6e3c7678de1ebef.png",
+    "canvas": [
+      302,
+      299
+    ],
+    "daMoNative": true,
+    "kind": "enzyme-P-time-labelled",
+    "xLabel": "Thời gian",
+    "yLabel": "[P]",
+    "caption": [
+      "A."
+    ],
+    "shape": "straight-steep",
+    "notes": "1curveđenfromorigin,[P]Y/ThờigianX,2trụcARROW,khôngtick/số/guide. Bộcùng2qidcó4ảnhA./B./C./D.;glyphnhãnởméptráidướibịcắtTHÂNTRÁI nhưngAchéo/B2lobe/Ccungmở/Dcungđóng+dotcònnhìnthấyvàcontextbộ4xácnhận,GIỮcaptionkhôiphụckhôngbỏvìrefsau_de. Ađườngthẳngdốclớn~45°,Bthẳngdốcnhỏ,Ctăngbãohòaplateau,Dlõmlêntăngnhanh;KHÔNGđổiCbằngDtheokiếnthứcenzyme. Riêng978cófooterPDFmépdướiphảibịcắt(chỉvụn50/...),khôngbịanộidungfooter.",
+    "questions": [
+      {
+        "qid": "12-C2-B4-D1-I-61",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian (cơ chất được bổ sung liên tục nên luôn dư)?",
+        "refs": [
+          {
+            "where": "12-C2-B4-D1-I-61.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D2-I-8",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian (cơ chất được bổ sung liên tục nên luôn dư)?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-I-8.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 978,
+    "hash": "aee404211db20283ab5bc521111ff0d7335d8059428110d92b21d87b2b520402",
+    "fileNguon": "anh/aee404211db20283ab5bc521111ff0d7335d8059428110d92b21d87b2b520402.png",
+    "canvas": [
+      295,
+      291
+    ],
+    "daMoNative": true,
+    "kind": "enzyme-P-time-labelled",
+    "xLabel": "Thời gian",
+    "yLabel": "[P]",
+    "caption": [
+      "B."
+    ],
+    "shape": "straight-shallow",
+    "notes": "1curveđenfromorigin,[P]Y/ThờigianX,2trụcARROW,khôngtick/số/guide. Bộcùng2qidcó4ảnhA./B./C./D.;glyphnhãnởméptráidướibịcắtTHÂNTRÁI nhưngAchéo/B2lobe/Ccungmở/Dcungđóng+dotcònnhìnthấyvàcontextbộ4xácnhận,GIỮcaptionkhôiphụckhôngbỏvìrefsau_de. Ađườngthẳngdốclớn~45°,Bthẳngdốcnhỏ,Ctăngbãohòaplateau,Dlõmlêntăngnhanh;KHÔNGđổiCbằngDtheokiếnthứcenzyme. Riêng978cófooterPDFmépdướiphảibịcắt(chỉvụn50/...),khôngbịanộidungfooter.",
+    "questions": [
+      {
+        "qid": "12-C2-B4-D1-I-61",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian (cơ chất được bổ sung liên tục nên luôn dư)?",
+        "refs": [
+          {
+            "where": "12-C2-B4-D1-I-61.hinh.1.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D2-I-8",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian (cơ chất được bổ sung liên tục nên luôn dư)?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-I-8.hinh.1.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 271,
+    "hash": "2e382dbc573b912922c54539ebf209a8b7d1fe869bea3a21e19b0e27971e2865",
+    "fileNguon": "anh/2e382dbc573b912922c54539ebf209a8b7d1fe869bea3a21e19b0e27971e2865.png",
+    "canvas": [
+      290,
+      291
+    ],
+    "daMoNative": true,
+    "kind": "enzyme-P-time-labelled",
+    "xLabel": "Thời gian",
+    "yLabel": "[P]",
+    "caption": [
+      "C."
+    ],
+    "shape": "concave-down-plateau",
+    "notes": "1curveđenfromorigin,[P]Y/ThờigianX,2trụcARROW,khôngtick/số/guide. Bộcùng2qidcó4ảnhA./B./C./D.;glyphnhãnởméptráidướibịcắtTHÂNTRÁI nhưngAchéo/B2lobe/Ccungmở/Dcungđóng+dotcònnhìnthấyvàcontextbộ4xácnhận,GIỮcaptionkhôiphụckhôngbỏvìrefsau_de. Ađườngthẳngdốclớn~45°,Bthẳngdốcnhỏ,Ctăngbãohòaplateau,Dlõmlêntăngnhanh;KHÔNGđổiCbằngDtheokiếnthứcenzyme. Riêng978cófooterPDFmépdướiphảibịcắt(chỉvụn50/...),khôngbịanộidungfooter.",
+    "questions": [
+      {
+        "qid": "12-C2-B4-D1-I-61",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian (cơ chất được bổ sung liên tục nên luôn dư)?",
+        "refs": [
+          {
+            "where": "12-C2-B4-D1-I-61.hinh.2.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D2-I-8",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian (cơ chất được bổ sung liên tục nên luôn dư)?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-I-8.hinh.2.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 574,
+    "hash": "6b2de25299a5c9569b6504331c034def65fc368add97d030d7b52db066443313",
+    "fileNguon": "anh/6b2de25299a5c9569b6504331c034def65fc368add97d030d7b52db066443313.png",
+    "canvas": [
+      295,
+      296
+    ],
+    "daMoNative": true,
+    "kind": "enzyme-P-time-labelled",
+    "xLabel": "Thời gian",
+    "yLabel": "[P]",
+    "caption": [
+      "D."
+    ],
+    "shape": "concave-up",
+    "notes": "1curveđenfromorigin,[P]Y/ThờigianX,2trụcARROW,khôngtick/số/guide. Bộcùng2qidcó4ảnhA./B./C./D.;glyphnhãnởméptráidướibịcắtTHÂNTRÁI nhưngAchéo/B2lobe/Ccungmở/Dcungđóng+dotcònnhìnthấyvàcontextbộ4xácnhận,GIỮcaptionkhôiphụckhôngbỏvìrefsau_de. Ađườngthẳngdốclớn~45°,Bthẳngdốcnhỏ,Ctăngbãohòaplateau,Dlõmlêntăngnhanh;KHÔNGđổiCbằngDtheokiếnthứcenzyme. Riêng978cófooterPDFmépdướiphảibịcắt(chỉvụn50/...),khôngbịanộidungfooter.",
+    "questions": [
+      {
+        "qid": "12-C2-B4-D1-I-61",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian (cơ chất được bổ sung liên tục nên luôn dư)?",
+        "refs": [
+          {
+            "where": "12-C2-B4-D1-I-61.hinh.3.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D2-I-8",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian (cơ chất được bổ sung liên tục nên luôn dư)?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-I-8.hinh.3.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1379,
+    "hash": "f8fb0793580a20e441af19c3251aa8acd1b82aed91d89de8c1d8f9da27ca168b",
+    "fileNguon": "anh/f8fb0793580a20e441af19c3251aa8acd1b82aed91d89de8c1d8f9da27ca168b.png",
+    "canvas": [
+      1123,
+      306
+    ],
+    "daMoNative": true,
+    "kind": "four-amino-acid-reactions-literal",
+    "rows": [
+      {
+        "label": "a)",
+        "left": "H₂NCH₂COOH + CH₃CH₂OH",
+        "overArrow": "H₂SO₄, t⁰",
+        "right": "H₂NCH₂CH₂COOCH₃ + H₂O"
+      },
+      {
+        "label": "b)",
+        "left": "HCl + H₂NCH(CH₃)COOH",
+        "overArrow": "",
+        "right": "ClH₃NCH(CH₃)COOH"
+      },
+      {
+        "label": "c)",
+        "left": "H₂NCH(CH₃)COOH + NaOH",
+        "overArrow": "",
+        "right": "H₂NCH(CH₃)COONa + H₂O"
+      },
+      {
+        "label": "d)",
+        "left": "nH₂N[CH₂]₅COOH",
+        "overArrow": "xt, t⁰, p",
+        "right": "(–HN–[CH₂]₅–CO–)ₙ + nH₂O"
+      }
+    ],
+    "notes": "4rowđềumộtarrowphải,khôngequilibrium. Sourcea)productthậtH₂NCH₂CH₂COOCH₃khácethylglycinatechuẩn,PHẢIGIỮ2CH₂phíaN/methylester,đừngsửagiảđịnhđềsai. Sourceb)đãZOOM3xđọcrõClH₃N(...),C+l+H3,khôngCH3N vàkhôngionchargeđượcthêm. d)polymerroundparentheses+repeatnngoàithấpphải,giữ5vàstubhaiđầu,kHÔNGfiniteSMILES. Khôngtínhđápánamphoteric.",
+    "questions": [
+      {
+        "qid": "12-KT-C3-D2-I-13",
+        "de": "Cho các phản ứng của các amino acid trong hình dưới đây.\nTrong các phản ứng trên, phản ứng nào chứng minh tính chất lưỡng tính của amino acid?",
+        "refs": [
+          {
+            "where": "12-KT-C3-D2-I-13.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P1-D2-I-68",
+        "de": "Cho các phản ứng của các amino acid trong hình dưới đây.\nTrong các phản ứng trên, phản ứng nào chứng minh tính chất lưỡng tính của amino acid?",
+        "refs": [
+          {
+            "where": "DB-12-B9-P1-D2-I-68.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 7,
+    "hash": "0131ad8f6e282f78e81e50f7c9886ed2dc6a1fa734b7d941d1f945ae07eebbf7",
+    "fileNguon": "anh/0131ad8f6e282f78e81e50f7c9886ed2dc6a1fa734b7d941d1f945ae07eebbf7.png",
+    "canvas": [
+      960,
+      380
+    ],
+    "daMoNative": true,
+    "kind": "NO-bond-energy-diagram-with-source-text",
+    "sourceText": "14.5. Tính nhiệt tạo thành chuẩn của HF và NO dựa vào năng lượng liên kết (Bảng 14.1 SGK), của F₂, H₂, HF, N₂, O₂, NO. Giải thích sự khác nhau về nhiệt tạo thành của HF và NO.",
+    "labels": [
+      "Năng lượng để bẻ gãy liên kết",
+      "Năng lượng giải phóng khi liên kết hình thành",
+      "▲ Sự tạo thành NO từ N₂ và O₂"
+    ],
+    "notes": "PhầntexttrênLÀNỘIDUNGẢNH,khôngthực thiyêucầutính/giảithích. Diagram3giaiđoạnngang:tráiN₂(pair2Nspheres)ởtrên+O₂(pair2Ospheres)dưới;middle4spheresrờiN/N/O/O;phải2pairN–O,mộtrêntráimộtdướiphải. Haihollowblockarrows→đenviềntrắnggiữa3giaiđoạn. Có2curlyenergyarrowsởtráihướngvàocặpN₂/O₂,2curlyenergyarrowsrờitừpairNOphảiđira,labelgiảiphóngliênkếttrênphải,labelbẻgãytráidưới. GiữatomlettersN/Otrênmọisphere,khôngtựbondorders/ΔHnumbers/answer. Captiontriangle▲giữ.",
+    "questions": [
+      {
+        "qid": "DB-11-B6-D3-III-4",
+        "de": "Tính nhiệt tạo thành chuẩn của NO theo năng lượng liên kết.\nBiết năng lượng liên kết được cho ở bảng dưới.\nGiá trị nhiệt tạo thành chuẩn của NO(g) theo năng lượng liên kết là bao nhiêu kJ/mol?",
+        "refs": [
+          {
+            "where": "DB-11-B6-D3-III-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B4-III-15",
+        "de": "Tính nhiệt tạo thành chuẩn của NO theo năng lượng liên kết.\nBiết năng lượng liên kết được cho ở bảng dưới.\nGiá trị nhiệt tạo thành chuẩn của NO(g) theo năng lượng liên kết là bao nhiêu kJ/mol?",
+        "refs": [
+          {
+            "where": "DH-11-C2-B4-III-15.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 209,
+    "hash": "2355c03a95e76f8ef52accefc3999b9befc7abf29244b64c6afcf6887bcbd876",
+    "fileNguon": "anh/2355c03a95e76f8ef52accefc3999b9befc7abf29244b64c6afcf6887bcbd876.png",
+    "canvas": [
+      706,
+      161
+    ],
+    "daMoNative": true,
+    "kind": "gas-collection-three-methods",
+    "captions": [
+      "Cách 1",
+      "Cách 2",
+      "Cách 3"
+    ],
+    "labels": [
+      "nước"
+    ],
+    "notes": "3panelngang.Cách1testtubeÚPđóngđầutrên,cổngdưới,ốnggasdoublelineLđitừtráidướisaugấpuplêntớigầnđầutrêntrongtube;outsidearrow→từtráivàongangống.Cách2testtubeĐỨNGđóngđáy,miệngtrên,ốnggasdoublelinebẻ90°từtráitrênđixuốnggầnđáy,arrow→ởcổng.Cách3testtubeÚPngâmtrongbểwater,hướnggasốngchéotừtráitrênxuốngbểrồiUđilêntrongreceiver,bọttròntrongtube,labelnướcleaderchỉliquidbathphải;arrowchéoxuốngphảivàotube. KhônggánX/Y/Z/Thoặctênkhí/answers. GiữCách1/2/3đầudướimỗipanel/nướcchỉbểpanel3.",
+    "questions": [
+      {
+        "qid": "DB-11-B5-D1-I-18",
+        "de": "Các chất khí điều chế trong phòng thí nghiệm thường được thu theo phương pháp đẩy không khí (cách 1, cách 2) hoặc đẩy nước (cách 3) như các hình vẽ dưới đây: Có thể dùng cách nào trong 3 cách trên để thu khí ammonia?",
+        "refs": [
+          {
+            "where": "DB-11-B5-D1-I-18.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B5-VD-I-2",
+        "de": "Các chất khí điều chế trong phòng thí nghiệm thường được thu theo phương pháp đẩy không khí (cách 1, cách 2) hoặc đẩy nước (cách 3) như các hình vẽ dưới đây: Có thể dùng cách nào trong 3 cách trên để thu khí ammonia?",
+        "refs": [
+          {
+            "where": "DH-11-C2-B5-VD-I-2.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B5-I-73",
+        "de": "Các chất khí điều chế trong phòng thí nghiệm thường được thu theo phương pháp đẩy không khí (cách 1, cách 2) hoặc đẩy nước (cách 3) như các hình vẽ dưới đây: Có thể dùng cách nào trong 3 cách trên để thu khí ammonia?",
+        "refs": [
+          {
+            "where": "DH-11-C2-B5-I-73.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
   }
 ]
