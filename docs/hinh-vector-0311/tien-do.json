@@ -60,9 +60,9 @@
       "Toàn kho còn chưa hoàn tất, app chưa thay hình; không báo đã xong hoặc đã triển khai."
     ],
     "danhMucDaKiem": "docs/hinh-vector-0311/kiem/danh-muc-da-kiem.json",
-    "loVuaXong": "863 câu đủ mọi hình+DDH/3 một phần;674 nguồn→456 SVG;6.608.684 byte/gzip1.339.910;754 nguồn còn lại. Lô127–128 thêm5nguồn được soát độc lập từng PNG/render/exacthash.",
-    "viecNenLamTiep": "Nhóm124 còn59/1391/831 chưa đạt.59/1391 RGB-ROI thất bại phong cách (mép/vạch nối và nét không đồng nhất), KHÔNG được chọn; phải sửa thật, không tự đoán sốvạch/hạt.831 chưa dựng: doc-dien-hoa-lo-127.json,2beakers/Ubridge/0.57/2dây/genericlabels;crossingjack mờ không suy theory.3partial gồm1câu4dụngcụ thiếu59/1391 và2ảnhhoa1198/1403 thật giữnguyên.",
-    "canhBaoCheckpoint": "Checkpointmớiđượcghi/sẽpushsaukiểm;ưu tiêncommit/worktree localmớinhất. Khôngcheckoutremote cũ đè. Khônghạgate,khôngbáotíchhợp/pháthànhkhibộchưađủ. Mainorigin7dff17afchưagộp."
+    "loVuaXong": "869 câu đủ mọi hình+DDH/7 một phần;678 nguồn→459SVG;6.668.553 byte/gzip1.350.931;750 nguồn còn lại. Lô129–131 thêm4nguồn soát độc lập từngPNG/render/exacthash.",
+    "viecNenLamTiep": "Nhóm124 chỉcòn59/1391CHƯAĐẠT:ROI bịloại phongcách, phải sửa thật/không đoánshortticks/hạt.831đãđạt129. Nhóm130 đangđọc scratch/doc-molecule-lo-130.json:1393/264/567đãdựng/soát xong,KHÔNGtrùng.568butanone3highlightvà1032pie78%/21%chưadựng.4partialmớicùngphoto581hộp/tuýpMethocylat,giữảnhthật/khôngcộngsốvẽ;2hoa1198/1403thậtgiữ,1câu4icons thiếu59/1391.",
+    "canhBaoCheckpoint": "Giữworktree/commitmớihơn. Origin/main0200b893chưagộp;khôngpháthànhkhichưatoànphạmvi."
   },
   "tuDongTiepTuc": {
     "id": "6ae96c39083081918a50bc48bc6c8d3e",
@@ -79,14 +79,14 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 674,
-    "soSvgRieng": 456,
-    "soCauDungHinh": 866,
-    "soCauDuMoiHinh": 863,
-    "soCauMoiXongMotPhan": 3,
-    "byteSvg": 6608684,
-    "byteGzip": 1339910,
-    "soAnhNguonConLai": 754,
+    "soAnhNguon": 678,
+    "soSvgRieng": 459,
+    "soCauDungHinh": 876,
+    "soCauDuMoiHinh": 869,
+    "soCauMoiXongMotPhan": 7,
+    "byteSvg": 6668553,
+    "byteGzip": 1350931,
+    "soAnhNguonConLai": 750,
     "daTichHop": false
   },
   "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.",
@@ -106,15 +106,15 @@
     "daChuyenHetBoDaVe": true
   },
   "daDatPhongApp": {
-    "soNguon": 674,
-    "soCauDuHinhVaPhong": 863,
+    "soNguon": 678,
+    "soCauDuHinhVaPhong": 869,
     "ghiChu": "Các số tổngDaDoiChieu vẫn mô tả nội dung đã kiểm; bản cũ chưa đổi phông không được coi đạt yêu cầu phông mới."
   },
   "loMoiNhat": {
-    "lo": "127–128",
-    "ketQua": "863 câu đủ mọi hình+DDH/3 một phần;674 nguồn→456 SVG;6.608.684 byte/gzip1.339.910;754 nguồn còn lại. Lô127–128 thêm5nguồn được soát độc lập từng PNG/render/exacthash.",
-    "suaLoi": "1166stopcockphải/plugtrái;752đúng3vạch;266+trái−phải;1090Zn/Cu/lamp/2dâyKHÔNGsaltbridge;1399đúng3rayphải/sourceđỏ/nhãn/leader.59/1391ứngviênROI bịloại vìphongcách,khôngtínhđạt.",
-    "tiepTheo": "Nhóm124 còn59/1391/831 chưa đạt.59/1391 RGB-ROI thất bại phong cách (mép/vạch nối và nét không đồng nhất), KHÔNG được chọn; phải sửa thật, không tự đoán sốvạch/hạt.831 chưa dựng: doc-dien-hoa-lo-127.json,2beakers/Ubridge/0.57/2dây/genericlabels;crossingjack mờ không suy theory.3partial gồm1câu4dụngcụ thiếu59/1391 và2ảnhhoa1198/1403 thật giữnguyên.",
-    "gioiHan": "Chưa tíchhợp/chưa reload offline app/chưa phát hành. Phải cập nhậtmainmới/sotesttheotên/kiểmcathi trước triểnkhai."
+    "lo": "129–131",
+    "ketQua": "869 câu đủ mọi hình+DDH/7 một phần;678 nguồn→459SVG;6.668.553 byte/gzip1.350.931;750 nguồn còn lại. Lô129–131 thêm4nguồn soát độc lập từngPNG/render/exacthash.",
+    "suaLoi": "831giữđoạndâylộ/cheU+cốc/khôngsuyjackmapping/khôngjunction/0.57dot;1393/264ortho3đôi/H+/2arrow;567sửaanchorstartngănclip/chạm,sauđãrender+freshreviewhashmới.",
+    "tiepTheo": "Nhóm124 chỉcòn59/1391CHƯAĐẠT:ROI bịloại phongcách, phải sửa thật/không đoánshortticks/hạt.831đãđạt129. Nhóm130 đangđọc scratch/doc-molecule-lo-130.json:1393/264/567đãdựng/soát xong,KHÔNGtrùng.568butanone3highlightvà1032pie78%/21%chưadựng.4partialmớicùngphoto581hộp/tuýpMethocylat,giữảnhthật/khôngcộngsốvẽ;2hoa1198/1403thậtgiữ,1câu4icons thiếu59/1391.",
+    "gioiHan": "Appchưatíchhợp/chưareloadoffline/chưapháthành. Build/tốcđộlô129đạt/precache170/2613KB,sauđóchỉassets/scripts. Mainvừafetch0200b893CHƯAgộp;WOFF2khôngdiff. Phảisotesttheotên/kiểmcathi/mainmớinhấttrướctriểnkhai."
   }
 }

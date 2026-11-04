@@ -1,0 +1,214 @@
+{
+  "i": 831,
+  "hashNguon": "99b912de8d32f2f4669eae8d6ff0e0ca019b29da6d83d45aa95776f50c04423f",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/99b912de8d32f2f4669eae8d6ff0e0ca019b29da6d83d45aa95776f50c04423f.png",
+  "nativeCanvas": [
+    305,
+    179
+  ],
+  "inspected": [
+    "native full",
+    "4x full",
+    "8x nearest crop x110..264/y10..148"
+  ],
+  "coordinates": "Approx native pixels; polylines describe exposed geometry only. Smooth curves, not corners.",
+  "segments": [
+    {
+      "id": "left-electrode-upper",
+      "points": [
+        [
+          117,
+          24
+        ],
+        [
+          120,
+          20
+        ],
+        [
+          124,
+          19
+        ],
+        [
+          128,
+          21
+        ],
+        [
+          135,
+          29
+        ],
+        [
+          145,
+          44
+        ],
+        [
+          160,
+          64
+        ]
+      ],
+      "occlusion": "Disappears behind LEFT U leg at outer boundary near160,64; not a connection to salt bridge."
+    },
+    {
+      "id": "left-top-continuation-inner-gap",
+      "points": [
+        [
+          167,
+          73
+        ],
+        [
+          175,
+          83
+        ],
+        [
+          183,
+          94
+        ],
+        [
+          188,
+          104
+        ],
+        [
+          192,
+          115
+        ],
+        [
+          194,
+          123
+        ],
+        [
+          193,
+          129
+        ],
+        [
+          188,
+          134
+        ],
+        [
+          180,
+          138
+        ],
+        [
+          173,
+          140
+        ]
+      ],
+      "occlusion": "Emerges at inner edge of LEFT U leg near167,73. Runs in white central gap; crosses other thin wire near188,104. Both continuous, no junction dot."
+    },
+    {
+      "id": "right-electrode-upper",
+      "points": [
+        [
+          257,
+          24
+        ],
+        [
+          256,
+          19
+        ],
+        [
+          254,
+          18
+        ],
+        [
+          251,
+          20
+        ],
+        [
+          241,
+          34
+        ],
+        [
+          226,
+          55
+        ],
+        [
+          213,
+          73
+        ]
+      ],
+      "occlusion": "Disappears behind RIGHT U leg around213,73; no electrical junction to U."
+    },
+    {
+      "id": "right-top-continuation-inner-gap",
+      "points": [
+        [
+          205,
+          84
+        ],
+        [
+          199,
+          93
+        ],
+        [
+          192,
+          101
+        ],
+        [
+          185,
+          106
+        ],
+        [
+          182,
+          110
+        ],
+        [
+          181,
+          115
+        ],
+        [
+          182,
+          123
+        ],
+        [
+          184,
+          130
+        ],
+        [
+          184,
+          133
+        ],
+        [
+          181,
+          137
+        ],
+        [
+          173,
+          140
+        ]
+      ],
+      "occlusion": "Emerges at inner edge RIGHT U leg near205,84. Lower curve stays to LEFT of other curve, rejoins projected overlap near left beaker outer right wall173,140. No node."
+    },
+    {
+      "id": "meter-lower-leads",
+      "points": [
+        [
+          51,
+          139
+        ],
+        [
+          63,
+          143
+        ],
+        [
+          85,
+          142
+        ],
+        [
+          116,
+          142
+        ]
+      ],
+      "note": "Two near-parallel paths, other jack around61,138; they merge visually at native resolution along y141..144. Left beaker body covers continuation between x116 and173. Do not connect the two leads electrically or assert jack mapping."
+    }
+  ],
+  "depthOrder": [
+    "Upper leads behind broad U legs: render wires first, bridge opaque on top, preserving hidden crossings.",
+    "Inner-gap thin-wire segments visible between inner edges of U. No wire line over tube fill at x159..167 /205..213.",
+    "Lower thin curves disappear at right side of left beaker near173,140; horizontal meter runs disappear at left side near116,142. Beaker/liquid artwork occludes intervening routes, rather than drawing cables across its front.",
+    "At thin-wire crossing approx188,104 no dot, connector or explicit front/back bridge; preserve simple X crossing without imposed electrical junction."
+  ],
+  "uncertain": [
+    "Exact continuation under beaker and which meter jack reaches which electrode is not visible; no assertion.",
+    "Native1px strokes plus antialias mean coordinates +/-2px; renderer may reflow while preserving exposed routing and occlusion."
+  ],
+  "repoModified": false
+}

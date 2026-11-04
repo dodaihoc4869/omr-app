@@ -1,0 +1,93 @@
+{
+  "i": 581,
+  "hashNguon": "6c478010fdebd004d5254bb39b705b4e5f36c3ee49543509cae134372076c3f8",
+  "fileNguon": "anh/6c478010fdebd004d5254bb39b705b4e5f36c3ee49543509cae134372076c3f8.png",
+  "actualByteHash": "6c478010fdebd004d5254bb39b705b4e5f36c3ee49543509cae134372076c3f8",
+  "canvas": [
+    459,
+    256
+  ],
+  "nguoiSoat": "soat_nguon_3",
+  "nativeOpened": true,
+  "ketQua": "Xác nhận độc lập: ảnh chụp sản phẩm thật, giữ raster nguyên gốc; không vector hóa và không đổi chữ trên bao bì sang DDH.",
+  "bangChungThiGiac": [
+    "Hộp thuốc xanh chụp phối cảnh phía trên và tuýp thuốc xanh với nắp trắng phía dưới; có đổ bóng, texture in bao bì và chuyển sắc ánh sáng.",
+    "Chữ sản phẩm trên hộp/tuýp là Methocylat, bên dưới Methyl Salicylat; không phải sơ đồ, công thức cấu tạo hay hình vector học thuật.",
+    "Không tái dựng logo, nhãn nhỏ hoặc chữ mờ; giữ toàn bộ pixels và crop ảnh gốc."
+  ],
+  "questions": [
+    {
+      "qid": "DB-12-B1-P1-D2-III-114",
+      "maDe": "DB-12-B1-P1-D2",
+      "de": "Methyl salicylate dùng làm thuốc xoa bóp giảm đau, được điều chế bằng phản ứng ester hoá giữa salicylic acid và methanol. Để sản xuất 1,9 triệu tuýp thuốc xoa bóp giảm đau cần tối thiểu m tấn salicylic acid.\nBiết mỗi tuýp thuốc chứa 2,7 gam methyl salicylate và hiệu suất phản ứng tính theo salicylic acid là 75%.\nGiá trị của m là bao nhiêu? (Kết quả làm tròn đến hàng phần mười.)",
+      "hinh": [
+        {
+          "hash": "6c478010fdebd004d5254bb39b705b4e5f36c3ee49543509cae134372076c3f8",
+          "where": "DB-12-B1-P1-D2-III-114.hinh.0.du_lieu",
+          "hashDataUrl": "a6d821eff89c953c8b9ade95de0d218d4dc7bbf85cdbb31bdf808b264b35a3e4"
+        },
+        {
+          "hash": "2cf8cb275e27b3028c72d0cb5e8af36b1f7ff6a85a9149feebcdc4aab310eb13",
+          "where": "DB-12-B1-P1-D2-III-114.hinh.1.du_lieu",
+          "hashDataUrl": "536718a87f9c7285e6bcdfd98b1ba6a216d06e608ee39e9513f52e0b8723ddee"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B1-P1-D2-III-118",
+      "maDe": "DB-12-B1-P1-D2",
+      "de": "Methyl salicylate dùng làm thuốc xoa bóp giảm đau, được điều chế từ salicylic acid và methanol. Để sản xuất 1,9 triệu tuýp thuốc xoa bóp giảm đau cần tối thiểu m tấn salicylic acid.\nBiết mỗi tuýp thuốc chứa 2,7 gam methyl salicylate và hiệu suất phản ứng tính theo salicylic acid là 75%.\nGiá trị của m là bao nhiêu? (Làm tròn đến hàng phần trăm)",
+      "hinh": [
+        {
+          "hash": "6c478010fdebd004d5254bb39b705b4e5f36c3ee49543509cae134372076c3f8",
+          "where": "DB-12-B1-P1-D2-III-118.hinh.0.du_lieu",
+          "hashDataUrl": "a6d821eff89c953c8b9ade95de0d218d4dc7bbf85cdbb31bdf808b264b35a3e4"
+        },
+        {
+          "hash": "2cf8cb275e27b3028c72d0cb5e8af36b1f7ff6a85a9149feebcdc4aab310eb13",
+          "where": "DB-12-B1-P1-D2-III-118.hinh.1.du_lieu",
+          "hashDataUrl": "536718a87f9c7285e6bcdfd98b1ba6a216d06e608ee39e9513f52e0b8723ddee"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C1-B1-P1-III-42",
+      "maDe": "DH-12-C1-B1-P1",
+      "de": "Methyl salicylate dùng làm thuốc xoa bóp giảm đau, được điều chế bằng phản ứng ester hoá giữa salicylic acid và methanol. Để sản xuất 1,9 triệu tuýp thuốc xoa bóp giảm đau cần tối thiểu m tấn salicylic acid.\nBiết mỗi tuýp thuốc chứa 2,7 gam methyl salicylate và hiệu suất phản ứng tính theo salicylic acid là 75%.\nGiá trị của m là bao nhiêu? (Kết quả làm tròn đến hàng phần mười.)",
+      "hinh": [
+        {
+          "hash": "6c478010fdebd004d5254bb39b705b4e5f36c3ee49543509cae134372076c3f8",
+          "where": "DH-12-C1-B1-P1-III-42.hinh.0.du_lieu",
+          "hashDataUrl": "a6d821eff89c953c8b9ade95de0d218d4dc7bbf85cdbb31bdf808b264b35a3e4"
+        },
+        {
+          "hash": "2cf8cb275e27b3028c72d0cb5e8af36b1f7ff6a85a9149feebcdc4aab310eb13",
+          "where": "DH-12-C1-B1-P1-III-42.hinh.1.du_lieu",
+          "hashDataUrl": "536718a87f9c7285e6bcdfd98b1ba6a216d06e608ee39e9513f52e0b8723ddee"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C1-B3-D1-III-5",
+      "maDe": "DH-12-C1-B3-D1",
+      "de": "Methyl salicylate dùng làm thuốc xoa bóp giảm đau, được điều chế từ salicylic acid và methanol. Để sản xuất 1,9 triệu tuýp thuốc xoa bóp giảm đau cần tối thiểu m tấn salicylic acid.\nBiết mỗi tuýp thuốc chứa 2,7 gam methyl salicylate và hiệu suất phản ứng tính theo salicylic acid là 75%.\nGiá trị của m là bao nhiêu? (Làm tròn đến hàng phần trăm)",
+      "hinh": [
+        {
+          "hash": "6c478010fdebd004d5254bb39b705b4e5f36c3ee49543509cae134372076c3f8",
+          "where": "DH-12-C1-B3-D1-III-5.hinh.0.du_lieu",
+          "hashDataUrl": "a6d821eff89c953c8b9ade95de0d218d4dc7bbf85cdbb31bdf808b264b35a3e4"
+        },
+        {
+          "hash": "2cf8cb275e27b3028c72d0cb5e8af36b1f7ff6a85a9149feebcdc4aab310eb13",
+          "where": "DH-12-C1-B3-D1-III-5.hinh.1.du_lieu",
+          "hashDataUrl": "536718a87f9c7285e6bcdfd98b1ba6a216d06e608ee39e9513f52e0b8723ddee"
+        }
+      ]
+    }
+  ],
+  "sourceScope": "Chỉ xem ảnh native và public stem/refs từ kiem-ke.json; không đọc đáp án/lời giải.",
+  "otherImageInSameQuestions": "Cả4câu còn có hinh.1 hash2cf8cb275e27b3028c72d0cb5e8af36b1f7ff6a85a9149feebcdc4aab310eb13; đánh giá này chỉ áp dụng hinh.0/photo581, không suy trạng thái ảnh thứ2.",
+  "repoModified": false,
+  "vectorApproved": false,
+  "disposition": "giu_anh_that"
+}

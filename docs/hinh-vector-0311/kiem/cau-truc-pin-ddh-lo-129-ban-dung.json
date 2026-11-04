@@ -1,0 +1,294 @@
+[
+  {
+    "i": 831,
+    "hash": "99b912de8d32f2f4669eae8d6ff0e0ca019b29da6d83d45aa95776f50c04423f",
+    "fileNguon": "anh/99b912de8d32f2f4669eae8d6ff0e0ca019b29da6d83d45aa95776f50c04423f.png",
+    "canvas": [
+      305,
+      179
+    ],
+    "nativeOpened": true,
+    "zoomOpened": "/workspace/scratch/dien-831-zoom.png",
+    "status": "Source reading only; SVG not reviewed/approved",
+    "coordinateSystem": "Approximate native pixels, origin top-left; preserve topology and label ownership, not pixel-perfect claim",
+    "questions": [
+      {
+        "qid": "VIP27-C5-B15-I-17",
+        "de": "Một học sinh tiến hành thí nghiệm pin điện hóa, tra cứu điện thế khử chuẩn của 4 cặp oxi hóa - khử như bảng dưới và chuẩn bị nước cất, cầu muối, cốc có mỏ, các loại muối và điện cực tương ứng. Học sinh lấy ra hai cặp oxi hóa - khử, và dùng cầu muối kết nối chúng để tạo thành pin điện hóa, như hình sau.\nCho các phát biểu sau:\n(a) Trong pin đo được suất điện động 0,57 V (ảnh trên) thì cực dương (cathode) là lá đồng (Cu).\n(b) Trong pin Nickel-Zinc, lá nickel (Ni) là cực âm (anode).\n(c) Suất điện động đo được của pin Ni-Pb sẽ lớn hơn 0,36 V.\n(d) Nếu tháo cầu muối và thay bằng dây đồng, vẫn có thể tạo thành pin.\n(e) Nếu thay kim loại của bán pin bằng than chì (graphite), vẫn có thể tạo thành pin.\nSố phát biểu đúng là",
+        "refs": [
+          {
+            "where": "VIP27-C5-B15-I-17.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "labels": [
+      {
+        "text": "−",
+        "at": [
+          119,
+          7
+        ]
+      },
+      {
+        "text": "+",
+        "at": [
+          252,
+          5
+        ]
+      },
+      {
+        "text": "Thanh kim loại",
+        "at": [
+          73,
+          167
+        ],
+        "leader": [
+          [
+            91,
+            156
+          ],
+          [
+            134,
+            122
+          ]
+        ]
+      },
+      {
+        "text": "Dung dịch",
+        "at": [
+          137,
+          168
+        ],
+        "leader": [
+          [
+            140,
+            158
+          ],
+          [
+            161,
+            143
+          ]
+        ]
+      },
+      {
+        "text": "Thanh\nkim loại",
+        "at": [
+          284,
+          129
+        ],
+        "leader": [
+          [
+            266,
+            128
+          ],
+          [
+            238,
+            126
+          ]
+        ]
+      },
+      {
+        "text": "Dung dịch",
+        "at": [
+          258,
+          168
+        ],
+        "leader": [
+          [
+            252,
+            158
+          ],
+          [
+            242,
+            141
+          ]
+        ]
+      }
+    ],
+    "beakers": [
+      {
+        "mouth": [
+          116,
+          94,
+          57,
+          6
+        ],
+        "bottom": [
+          145,
+          151
+        ],
+        "liquidY": 114
+      },
+      {
+        "mouth": [
+          201,
+          94,
+          56,
+          6
+        ],
+        "bottom": [
+          230,
+          151
+        ],
+        "liquidY": 114
+      }
+    ],
+    "bars": [
+      {
+        "axis": [
+          [
+            116,
+            24
+          ],
+          [
+            139,
+            148
+          ]
+        ],
+        "polarity": "−",
+        "note": "dark tilted bar; top connector/crocodile-like sleeve"
+      },
+      {
+        "axis": [
+          [
+            257,
+            24
+          ],
+          [
+            232,
+            148
+          ]
+        ],
+        "polarity": "+",
+        "note": "light tilted bar; top connector/sleeve"
+      }
+    ],
+    "saltBridge": {
+      "count": 1,
+      "kind": "inverted U broad tube, 2 parallel outlines, rounded top",
+      "outerApprox": [
+        [
+          159,
+          132
+        ],
+        [
+          159,
+          72
+        ],
+        [
+          164,
+          51
+        ],
+        [
+          185,
+          44
+        ],
+        [
+          205,
+          51
+        ],
+        [
+          212,
+          72
+        ],
+        [
+          212,
+          132
+        ]
+      ],
+      "innerLegEnds": [
+        [
+          162,
+          135
+        ],
+        [
+          210,
+          135
+        ]
+      ],
+      "note": "Both lower tube ends submerged; small darker end plugs/caps. U top above mouths, not a flat wire."
+    },
+    "meter": {
+      "bounds": [
+        24,
+        78,
+        51,
+        66
+      ],
+      "display": "0.57",
+      "displayBounds": [
+        33,
+        84,
+        37,
+        16
+      ],
+      "knob": {
+        "center": [
+          51,
+          119
+        ],
+        "radius": 16,
+        "diagonal": "upper-left to lower-right"
+      },
+      "smallButtons": [
+        [
+          36,
+          104
+        ],
+        [
+          66,
+          104
+        ],
+        [
+          36,
+          133
+        ],
+        [
+          66,
+          133
+        ]
+      ],
+      "leadJacks": [
+        [
+          51,
+          139
+        ],
+        [
+          61,
+          138
+        ]
+      ],
+      "note": "Literal decimal POINT, not comma. No V text visible on meter."
+    },
+    "wires": [
+      {
+        "from": "left meter jack around(51,139)",
+        "to": "one electrode top terminal",
+        "routing": "runs right near y142 then loops up through central gap; source crossing has no junction dot"
+      },
+      {
+        "from": "right meter jack around(61,138)",
+        "to": "other electrode top terminal",
+        "routing": "runs right near y142 then loops up through central gap; two fine curves cross; no joined electrical node"
+      }
+    ],
+    "wireEndpointCertainty": "Each electrode top has one independent lead and meter has two independent jacks. At native raster crossing/overlap with tube makes exact jack-to-left/right mapping not safe to assert; do not invent junction or electron direction. Preserve traced visual curves.",
+    "arrows": [],
+    "sourceVoltage": null,
+    "notes": [
+      "2 generic beakers,2 electrodes,1 inverted-U bridge,1 digital meter.",
+      "Both beakers have own Thanh kim loại and Dung dịch labels. Do not add Zn/Cu or named salt."
+    ],
+    "svg": "pin-generic-ddh-d760aba9bfea66ba89ac58336f2930ec186db74d6c76f0bc458d867832e02f7f.svg",
+    "hashSvg": "d760aba9bfea66ba89ac58336f2930ec186db74d6c76f0bc458d867832e02f7f",
+    "byteSvg": 26481,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Giữ 0.57/chấm;2thanh/2cốc/2chânU nhúng/4nút/2jack/2dây khôngjunction. Mappingjack tại crossing raster không khẳng định. KhôngZnCu/tênmuối/V hayarrow thêm.",
+    "hashSvgDaSoat": "d760aba9bfea66ba89ac58336f2930ec186db74d6c76f0bc458d867832e02f7f",
+    "nguoiSoat": "cau_truc_6"
+  }
+]

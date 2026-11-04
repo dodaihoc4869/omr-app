@@ -1,0 +1,788 @@
+[
+  {
+    "i": 568,
+    "hash": "69d6cb92f6ab726134c690944054219e9419cf39574216b3aac87ff7edbdea36",
+    "fileNguon": "anh/69d6cb92f6ab726134c690944054219e9419cf39574216b3aac87ff7edbdea36.png",
+    "canvas": [
+      300,
+      175
+    ],
+    "daMoNative": true,
+    "kind": "butanone-highlight",
+    "smiles": "CCC(=O)C",
+    "notes": "LiteralC₂H₅–C(=O xuống)–CH₃ngang. Highlight(A)làkhungnềnVÀNGbochữnhậtbaoC₂H₅–C=O,khôngCH₃;(A)ởdướitráitrongnềnvàng. (B)làovalCHẤMđỏđứngbaoC₂H₅,(B)ởtrêntrongoval. (C)làovalNÉTĐỨTđỏlớnbaoC(=O)–CH₃,(C)dướiphảitrongoval. Giữ3highlightkhácnhau/3label,mộtSMILESđơnlẻkhôngđủ. Khôngcharge/stereo.",
+    "questions": [
+      {
+        "qid": "VIP27-BDT-L2-0201-I-11",
+        "de": "Đặc điểm cấu tạo nào trong phân tử butanone (được kí hiệu như hình bên) quyết định khả năng tham gia phản ứng iodoform?",
+        "refs": [
+          {
+            "where": "VIP27-BDT-L2-0201-I-11.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1393,
+    "hash": "fafdb07fbf91274ebbb869f641a4d482a7608e673794feaa77f5bfbbb10c23cc",
+    "fileNguon": "anh/fafdb07fbf91274ebbb869f641a4d482a7608e673794feaa77f5bfbbb10c23cc.png",
+    "canvas": [
+      1030,
+      250
+    ],
+    "daMoNative": true,
+    "kind": "esterification-salicylic",
+    "reactants": [
+      {
+        "smiles": "O=C(O)c1ccccc1O"
+      },
+      "CH₃OH"
+    ],
+    "products": [
+      {
+        "smiles": "COC(=O)c1ccccc1O"
+      },
+      "H₂O"
+    ],
+    "arrow": "⇌",
+    "overArrow": "H⁺",
+    "notes": "2vòngbenzene3đôiKHÔNGcircle. PhenolOHORTHO vớiCOOH/COOCH₃. ReactantphenolOHởbêndướiphải,COOHtrênphải;productphenolOHdướiphải,COO–CH₃trênphải. C=Ođềulên;CH₃ởesterOphảitrên. HaiarrowngượchướngvàH⁺ởtrên. Khôngđổithànhpara/meta/hệsố/labeltên.",
+    "questions": [
+      {
+        "qid": "12-C1-B3-D1-III-5",
+        "de": "Methyl salicylate dùng làm thuốc xoa bóp giảm đau, được điều chế theo phản ứng sau. Để sản xuất 1,9 triệu tuýp thuốc xoa bóp giảm đau cần tối thiểu m tấn salicylic acid.\nBiết mỗi tuýp thuốc chứa 2,7 gam methyl salicylate và hiệu suất phản ứng tính theo salicylic acid là 75%.\nGiá trị của m là bao nhiêu? (Kết quả làm tròn đến hàng phần mười.)",
+        "refs": [
+          {
+            "where": "12-C1-B3-D1-III-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "12-C1-B1-D3-III-5",
+        "de": "Methyl salicylate dùng làm thuốc xoa bóp giảm đau, được điều chế theo phản ứng sau. Để sản xuất 1,9 triệu tuýp thuốc xoa bóp giảm đau cần tối thiểu m tấn salicylic acid.\nBiết mỗi tuýp thuốc chứa 2,7 gam methyl salicylate và hiệu suất phản ứng tính theo salicylic acid là 75%.\nGiá trị của m là bao nhiêu? (Kết quả làm tròn đến hàng phần mười.)",
+        "refs": [
+          {
+            "where": "12-C1-B1-D3-III-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D2-III-54",
+        "de": "Methyl salicylate dùng làm thuốc xoa bóp giảm đau, được điều chế theo phản ứng sau. Để sản xuất 1,9 triệu tuýp thuốc xoa bóp giảm đau cần tối thiểu m tấn salicylic acid.\nBiết mỗi tuýp thuốc chứa 2,7 gam methyl salicylate và hiệu suất phản ứng tính theo salicylic acid là 75%.\nGiá trị của m là bao nhiêu? (Kết quả làm tròn đến hàng phần mười.)",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D2-III-54.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D2-III-62",
+        "de": "Methyl salicylate dùng làm thuốc xoa bóp giảm đau, được điều chế theo phản ứng sau. Để sản xuất 1,9 triệu tuýp thuốc xoa bóp giảm đau cần tối thiểu m tấn salicylic acid.\nBiết mỗi tuýp thuốc chứa 2,7 gam methyl salicylate và hiệu suất phản ứng tính theo salicylic acid là 75%.\nGiá trị của m là bao nhiêu? (Kết quả làm tròn đến hàng phần mười.)",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D2-III-62.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 264,
+    "hash": "2cf8cb275e27b3028c72d0cb5e8af36b1f7ff6a85a9149feebcdc4aab310eb13",
+    "fileNguon": "anh/2cf8cb275e27b3028c72d0cb5e8af36b1f7ff6a85a9149feebcdc4aab310eb13.png",
+    "canvas": [
+      833,
+      165
+    ],
+    "daMoNative": true,
+    "kind": "esterification-salicylic",
+    "reactants": [
+      {
+        "smiles": "O=C(O)c1ccccc1O"
+      },
+      "CH₃OH"
+    ],
+    "products": [
+      {
+        "smiles": "COC(=O)c1ccccc1O"
+      },
+      "H₂O"
+    ],
+    "arrow": "⇌",
+    "overArrow": "H⁺",
+    "notes": "ĐãmởRIÊNGnative264:nộidungcùng1393đủsalicylicacidortho+CH₃OH⇌methylsalicylateortho+H₂O,H⁺trênarrow. Vòng3đôikhôngcircle,C=Otrên/OHphenoldướiphải. Scale/bốtríkhácnhưngcóthểsharetemplateSAUSOÁT.",
+    "questions": [
+      {
+        "qid": "DB-12-B1-P1-D2-III-114",
+        "de": "Methyl salicylate dùng làm thuốc xoa bóp giảm đau, được điều chế bằng phản ứng ester hoá giữa salicylic acid và methanol. Để sản xuất 1,9 triệu tuýp thuốc xoa bóp giảm đau cần tối thiểu m tấn salicylic acid.\nBiết mỗi tuýp thuốc chứa 2,7 gam methyl salicylate và hiệu suất phản ứng tính theo salicylic acid là 75%.\nGiá trị của m là bao nhiêu? (Kết quả làm tròn đến hàng phần mười.)",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D2-III-114.hinh.1.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D2-III-118",
+        "de": "Methyl salicylate dùng làm thuốc xoa bóp giảm đau, được điều chế từ salicylic acid và methanol. Để sản xuất 1,9 triệu tuýp thuốc xoa bóp giảm đau cần tối thiểu m tấn salicylic acid.\nBiết mỗi tuýp thuốc chứa 2,7 gam methyl salicylate và hiệu suất phản ứng tính theo salicylic acid là 75%.\nGiá trị của m là bao nhiêu? (Làm tròn đến hàng phần trăm)",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D2-III-118.hinh.1.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B1-P1-III-42",
+        "de": "Methyl salicylate dùng làm thuốc xoa bóp giảm đau, được điều chế bằng phản ứng ester hoá giữa salicylic acid và methanol. Để sản xuất 1,9 triệu tuýp thuốc xoa bóp giảm đau cần tối thiểu m tấn salicylic acid.\nBiết mỗi tuýp thuốc chứa 2,7 gam methyl salicylate và hiệu suất phản ứng tính theo salicylic acid là 75%.\nGiá trị của m là bao nhiêu? (Kết quả làm tròn đến hàng phần mười.)",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P1-III-42.hinh.1.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B3-D1-III-5",
+        "de": "Methyl salicylate dùng làm thuốc xoa bóp giảm đau, được điều chế từ salicylic acid và methanol. Để sản xuất 1,9 triệu tuýp thuốc xoa bóp giảm đau cần tối thiểu m tấn salicylic acid.\nBiết mỗi tuýp thuốc chứa 2,7 gam methyl salicylate và hiệu suất phản ứng tính theo salicylic acid là 75%.\nGiá trị của m là bao nhiêu? (Làm tròn đến hàng phần trăm)",
+        "refs": [
+          {
+            "where": "DH-12-C1-B3-D1-III-5.hinh.1.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 567,
+    "hash": "697e0da613c2635ab41b3b413094fc2ab99e5012ed5edb86c1f229ddc34667d1",
+    "fileNguon": "anh/697e0da613c2635ab41b3b413094fc2ab99e5012ed5edb86c1f229ddc34667d1.png",
+    "canvas": [
+      670,
+      47
+    ],
+    "daMoNative": true,
+    "kind": "reaction-literal",
+    "reactants": "C₆H₁₂O₆",
+    "products": "HOOC–CH(NH₂)–CH₂–CH₂–COOH + sản phẩm phụ",
+    "arrow": "→",
+    "notes": "Mộtarrowphải,kHÔNGđiềukiệntrên/dưới. GiữtextcôngthứcglutamicacidcóNH₂ngoặcvòngởCH,2CH₂và2COOH. KhôngthêmhệsốO₂/NH₃/enzyme/Na⁺,khôngtínhtổngsảnphẩmphụvìnguồnchỉtext.",
+    "questions": [
+      {
+        "qid": "DH-12-C3-B9-P1-III-35",
+        "de": "Bột ngọt (monosodium glutamate – MSG) là một loại gia vị, thường được sử dụng trong chế biến món ăn để tăng hương vị cho thức ăn. Bột ngọt hiện nay được sản xuất chủ yếu bằng phương pháp lên men vi sinh từ nguyên liệu là các hợp chất chứa tinh bột. Tiến hành theo các bước sau:\nBước 1: Cho m tấn nguyên liệu (chứa 90% tinh bột, còn lại là chất trơ) thủy phân bằng các enzyme để chuyển hóa thành glucose.\nBước 2: Lên men glucose thành glutamic acid dưới tác dụng của vi khuẩn được kiểm soát chặt chẽ (nhiệt độ, độ pH và các yếu tố khác) để đảm bảo quá trình lên men diễn ra ổn định và hiệu quả. Phương trình theo tỉ lệ:\nBước 3: Cho glutamic acid tác dụng với dung dịch NaOH, sau đó lọc bỏ tạp chất thu được dung dịch MSG bão hòa ở 60 °C (gọi là dung dịch X), làm nguội dung dịch X về 25 °C thì khối lượng MSG kết tinh là 1,5 tấn. Biết hiệu suất cả quá trình sản xuất từ nguyên liệu đến khi thu được dung dịch X là 85%, độ tan của MSG ở 60 °C là 112gam/100 gam nước, ở 25 °C là 74 gam/100 gam nước.\nGiá trị của m là bao nhiêu? (Chỉ làm tròn ở phép tính cuối cùng, kết quả làm tròn đến hàng phần trăm)",
+        "refs": [
+          {
+            "where": "DH-12-C3-B9-P1-III-35.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1032,
+    "hash": "b90f29e283875fec0b797036b9658e406a9e95c78cca602647f715d75508ae77",
+    "fileNguon": "anh/b90f29e283875fec0b797036b9658e406a9e95c78cca602647f715d75508ae77.png",
+    "canvas": [
+      189,
+      105
+    ],
+    "daMoNative": true,
+    "kind": "pie-3d",
+    "labels": [
+      {
+        "text": "78%",
+        "color": "green-dark",
+        "sector": "green-large"
+      },
+      {
+        "text": "21%",
+        "color": "white",
+        "sector": "blue-medium"
+      }
+    ],
+    "notes": "3sectormàu3Dellipsepie:tophugexanhlá78%,topxanhdươngphảiphíatrước21%,mộtnêmĐỎrấtmảnhgiữa2mảngởtráiphíatrước.KHÔNGnhãn1%trênsectormỏng,trongsourcekhôngcó1%haylegend.Nềntrắng,thân3Dthấycáccạnhdọcsâuxuống,cùngsector3Dcolors;giữ2label78/21khôngtựthêmN₂/O₂/khíkhác. Đãzoom5xxácnhậnkhông1%.",
+    "questions": [
+      {
+        "qid": "DH-11-C2-B4-III-1",
+        "de": "Ở dạng đơn chất, nitrogen chiếm khoảng bao nhiêu phần trăm thể tích của không khí?",
+        "refs": [
+          {
+            "where": "DH-11-C2-B4-III-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 785,
+    "hash": "92b8d83f947812ee95d51236134a2f528e01990d5e68aa5580755979ee125958",
+    "fileNguon": "anh/92b8d83f947812ee95d51236134a2f528e01990d5e68aa5580755979ee125958.png",
+    "canvas": [
+      228,
+      36
+    ],
+    "daMoNative": true,
+    "kind": "fatty-acid-skeletal",
+    "smiles": "CCCCC/C=C\\CCCCCCC(=O)O",
+    "carbonCount": 14,
+    "doubleBondsFromCOOH": [
+      8
+    ],
+    "stereo": "Z ởC8=C9 từcarboxyl,2nhánhcarboncùngphíadướiC=Cngangtrên",
+    "notes": "Nguồnmạch14C gồmCOOH,KHÔNGtựthànholeicC18. Từmethyltrái:5CđơntrướcC6=C7ngangtrên,saudoubleđến7Ctínhcarboxylởphải. COOHgiữtextgộp,noH/charge/caption.899/1038/941bodycùngnhaukhácscale,785nhỏhơncùng14C/1Z. NativeđãmởRIÊNGtừngnguồn.",
+    "questions": [
+      {
+        "qid": "DH-12-C1-B1-P2-I-30",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P2-I-30.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B3-D1-I-3",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B3-D1-I-3.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 899,
+    "hash": "a50a2a52398f76714ece7c42807d53ed0badd85ed77224ce064360f1fa969591",
+    "fileNguon": "anh/a50a2a52398f76714ece7c42807d53ed0badd85ed77224ce064360f1fa969591.png",
+    "canvas": [
+      481,
+      104
+    ],
+    "daMoNative": true,
+    "kind": "fatty-acid-skeletal",
+    "smiles": "CCCCC/C=C\\CCCCCCC(=O)O",
+    "carbonCount": 14,
+    "doubleBondsFromCOOH": [
+      8
+    ],
+    "stereo": "Z ởC8=C9 từcarboxyl,2nhánhcarboncùngphíadướiC=Cngangtrên",
+    "notes": "Nguồnmạch14C gồmCOOH,KHÔNGtựthànholeicC18. Từmethyltrái:5CđơntrướcC6=C7ngangtrên,saudoubleđến7Ctínhcarboxylởphải. COOHgiữtextgộp,noH/charge/caption.899/1038/941bodycùngnhaukhácscale,785nhỏhơncùng14C/1Z. NativeđãmởRIÊNGtừngnguồn.",
+    "questions": [
+      {
+        "qid": "12-C1-B3-D1-I-2",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "12-C1-B3-D1-I-2.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1038,
+    "hash": "bb39cba6cb479897d6fb0d6b6a3b0069d791f87e6e27ec20af8fecf03a23f98f",
+    "fileNguon": "anh/bb39cba6cb479897d6fb0d6b6a3b0069d791f87e6e27ec20af8fecf03a23f98f.png",
+    "canvas": [
+      481,
+      104
+    ],
+    "daMoNative": true,
+    "kind": "fatty-acid-skeletal",
+    "smiles": "CCCCC/C=C\\CCCCCCC(=O)O",
+    "carbonCount": 14,
+    "doubleBondsFromCOOH": [
+      8
+    ],
+    "stereo": "Z ởC8=C9 từcarboxyl,2nhánhcarboncùngphíadướiC=Cngangtrên",
+    "notes": "Nguồnmạch14C gồmCOOH,KHÔNGtựthànholeicC18. Từmethyltrái:5CđơntrướcC6=C7ngangtrên,saudoubleđến7Ctínhcarboxylởphải. COOHgiữtextgộp,noH/charge/caption.899/1038/941bodycùngnhaukhácscale,785nhỏhơncùng14C/1Z. NativeđãmởRIÊNGtừngnguồn.",
+    "questions": [
+      {
+        "qid": "12-KT-C1-D2-I-14",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "12-KT-C1-D2-I-14.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 941,
+    "hash": "aa146568fcf3cf338b63eb86d670e566a03b846be55b621bc49d50b34ad5dcf5",
+    "fileNguon": "anh/aa146568fcf3cf338b63eb86d670e566a03b846be55b621bc49d50b34ad5dcf5.png",
+    "canvas": [
+      482,
+      104
+    ],
+    "daMoNative": true,
+    "kind": "fatty-acid-skeletal",
+    "smiles": "CCCCC/C=C\\CCCCCCC(=O)O",
+    "carbonCount": 14,
+    "doubleBondsFromCOOH": [
+      8
+    ],
+    "stereo": "Z ởC8=C9 từcarboxyl,2nhánhcarboncùngphíadướiC=Cngangtrên",
+    "notes": "Nguồnmạch14C gồmCOOH,KHÔNGtựthànholeicC18. Từmethyltrái:5CđơntrướcC6=C7ngangtrên,saudoubleđến7Ctínhcarboxylởphải. COOHgiữtextgộp,noH/charge/caption.899/1038/941bodycùngnhaukhácscale,785nhỏhơncùng14C/1Z. NativeđãmởRIÊNGtừngnguồn.",
+    "questions": [
+      {
+        "qid": "12-C1-B1-D3-I-39",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "12-C1-B1-D3-I-39.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 660,
+    "hash": "7a7982aa8e05dc2bd46c690dfe637315f28742ecb78bae194ebabceee39fcd0d",
+    "fileNguon": "anh/7a7982aa8e05dc2bd46c690dfe637315f28742ecb78bae194ebabceee39fcd0d.png",
+    "canvas": [
+      293,
+      38
+    ],
+    "daMoNative": true,
+    "kind": "fatty-acid-skeletal",
+    "smiles": "CCCCC/C=C\\C/C=C\\CCCCCCCC(=O)O",
+    "carbonCount": 18,
+    "doubleBondsFromCOOH": [
+      9,
+      12
+    ],
+    "stereo": "Z,Z;C=Cđềungangởcao,2nhánhkếhaiđầuxuốngcùngphía",
+    "notes": "Đếmmạch18CbaoCOOH,textCOOHphải. TừmethyltráicácdoubleởC6=C7 vàC9=C10,ngăn1CH₂.Sốđôi2,chứkhông3.NoH/charge/caption. KhôngdùngtênlinoleicthaybằngchứngđếmC.",
+    "questions": [
+      {
+        "qid": "DH-12-C1-B1-P2-I-30",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P2-I-30.hinh.2.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B3-D1-I-3",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B3-D1-I-3.hinh.2.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1182,
+    "hash": "d669a6a8f8cd13ad455a2e2a49f472d2d4111853366a7a5f32b0c3ed86f9cb81",
+    "fileNguon": "anh/d669a6a8f8cd13ad455a2e2a49f472d2d4111853366a7a5f32b0c3ed86f9cb81.png",
+    "canvas": [
+      377,
+      62
+    ],
+    "daMoNative": true,
+    "kind": "fatty-acid-skeletal",
+    "smiles": "CCCCC/C=C\\C/C=C\\CCCCCCCC(=O)O",
+    "carbonCount": 18,
+    "doubleBondsFromCOOH": [
+      9,
+      12
+    ],
+    "stereo": "Z,Z;C=Cđềungangởcao,2nhánhkếhaiđầuxuốngcùngphía",
+    "notes": "Đếmmạch18CbaoCOOH,textCOOHphải. TừmethyltráicácdoubleởC6=C7 vàC9=C10,ngăn1CH₂.Sốđôi2,chứkhông3.NoH/charge/caption. KhôngdùngtênlinoleicthaybằngchứngđếmC.",
+    "questions": [
+      {
+        "qid": "VIP27-CDK-ESTER-TN-II-16",
+        "de": "Dầu hạt lanh là một nguồn dưỡng chất thực vật quý giá, đặc biệt giàu các acid béo không bão hòa đa, có lợi cho hệ tim mạch và giảm cholesterol xấu. Thành phần chính tạo nên giá trị của loại dầu này là hai loại acid béo thiết yếu: α-linolenic acid (ALA) và linoleic acid (LA). Cơ thể người không thể tự tổng hợp được hai acid này mà bắt buộc phải hấp thu từ chế độ ăn uống. Mỗi viên nang mềm \"Dầu hạt lanh hữu cơ\" có khối lượng 500 mg dầu nền, trong đó chứa 55% ALA và 15% LA về khối lượng. ALA và LA có công thức cấu tạo phân tử mạch hở như hình (hình trên: ALA; hình dưới: LA).",
+        "refs": [
+          {
+            "where": "VIP27-CDK-ESTER-TN-II-16.hinh.1.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 52,
+    "hash": "0ace5ac23faae6a3368caefca50597e6e7876896c2b674a761e6f39e82821183",
+    "fileNguon": "anh/0ace5ac23faae6a3368caefca50597e6e7876896c2b674a761e6f39e82821183.png",
+    "canvas": [
+      357,
+      38
+    ],
+    "daMoNative": true,
+    "kind": "fatty-acid-skeletal",
+    "smiles": "CCCCC/C=C\\C/C=C\\C/C=C\\CCCCCCCCC(=O)O",
+    "carbonCount": 22,
+    "doubleBondsFromCOOH": [
+      10,
+      13,
+      16
+    ],
+    "stereo": "Z,Z,Z từ2nhánhkềC=Cđềuxuốngcùngphía",
+    "notes": "Đếmmạchsource22CbaoCOOH,KHÔNGtựthànhALA18C. Từmethyltrái3doubleởC6=C7,C9=C10,C12=C13;khúcđơnsaudouble3đếnCOOHcòn9Ctínhcarboxyl. COOHtextphải,khôngcaption/Hexplicit/charges. Khirootsoátphảiđếm21skeletalCngoàitext+1COOH,làmriêngkhôngaliaslinolenic.",
+    "questions": [
+      {
+        "qid": "DH-12-C1-B1-P2-I-30",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P2-I-30.hinh.3.du_lieu",
+            "viTri": "sau_pa_D"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B3-D1-I-3",
+        "de": "Chất nào sau đây thuộc loại acid béo omega-3?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B3-D1-I-3.hinh.3.du_lieu",
+            "viTri": "sau_pa_D"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 837,
+    "hash": "9a91cc32733459e8d3007d0bbfd96eba2ac126a9149f63c108fac86dc02fc36c",
+    "fileNguon": "anh/9a91cc32733459e8d3007d0bbfd96eba2ac126a9149f63c108fac86dc02fc36c.png",
+    "canvas": [
+      521,
+      73
+    ],
+    "daMoNative": true,
+    "kind": "fatty-acid-skeletal",
+    "smiles": "CC/C=C\\C/C=C\\C/C=C\\C/C=C\\C/C=C\\C/C=C\\CCC(=O)O",
+    "carbonCount": 22,
+    "doubleBondsFromCOOH": [
+      4,
+      7,
+      10,
+      13,
+      16,
+      19
+    ],
+    "stereo": "6Z nhìntrên6doubleđềuupperhorizontal/nhánhkềxuống",
+    "notes": "COOHKHA TRIỂNởTRÁI:HO–C(=Oxuống)–mạch;khôngCOOHtextphải.Mạch22C,6C=Cngănnhau1CH₂,đếmđúng6doublekhông5. Methylendpointphải. Khôngcaption/charges/HexplicitngoàiHacidtrongHO.",
+    "questions": [
+      {
+        "qid": "DH-12-C1-B1-P2-II-11",
+        "de": "Trong nhiều năm, một số nghiên cứu đã phát hiện ra rằng việc tiêu thụ acid béo Omega-3 như docosahexaenoic acid (DHA) giúp giảm tử vong cho nhiều người mắc bệnh tim mạch.\nCông thức cấu tạo của DHA như sau:",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P2-II-11.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B3-D2-III-1",
+        "de": "Trong nhiều năm, một số nghiên cứu đã phát hiện ra rằng việc tiêu thụ acid béo Omega-3 như docosahexanoic acid (DHA) giúp giảm tử vong cho nhiều người mắc bệnh tim mạch.\nCông thức cấu tạo của DHA như sau: Tổng số nguyên tử carbon có trong một phân tử DHA là bao nhiêu?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B3-D2-III-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 378,
+    "hash": "42f68ae59e054187bf03e901335ed33c2f18a0c7ca5e5c0e9bc8ddc254912c56",
+    "fileNguon": "anh/42f68ae59e054187bf03e901335ed33c2f18a0c7ca5e5c0e9bc8ddc254912c56.png",
+    "canvas": [
+      487,
+      79
+    ],
+    "daMoNative": true,
+    "kind": "fatty-acid-skeletal",
+    "smiles": "CC/C=C\\C/C=C\\C/C=C\\CCCCCCCC(=O)O",
+    "carbonCount": 18,
+    "doubleBondsFromCOOH": [
+      9,
+      12,
+      15
+    ],
+    "stereo": "Z,Z,Z;3doublehorizupper,nhánhkềxuống",
+    "notes": "COOHKHA TRIỂNTRÁI:HO–C(=Olên)–mạch. Mạch18C,3doubleởgiữaphải,ngăn1CH₂,methylendpointphải. ĐãmởRIÊNG378và700cùngnộidung/shape,khácpixel. Khôngcaption/charges,acidHOHexplicitgiữ.",
+    "questions": [
+      {
+        "qid": "DH-12-C1-B1-P2-I-50",
+        "de": "α-linolenic acid (ALA) là một loại acid béo quan trọng đối với cơ thể, được cung cấp chủ yếu từ thức ăn có nguồn gốc thực vật như dầu đậu nành, dầu hạt cải, cải bó xôi,... Cấu trúc mạch carbon của α-linolenic acid như sau:\nCho các phát biểu sau:\n(1) ALA là acid béo thuộc loại Omega-3.\n(2) Trong ALA, nhóm nguyên tử ở carbon nối đôi ở vị trí cis với nhau.\n(3) Muối sodium của ALA có tác dụng giặt rửa.\n(4) Phân tử ALA có chứa 18 nguyên tử carbon.\nSố phát biểu đúng là",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P2-I-50.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 700,
+    "hash": "82803bb213af2292e5ba3ee0baeec6552c248af292c485caa121f2cb63f039f2",
+    "fileNguon": "anh/82803bb213af2292e5ba3ee0baeec6552c248af292c485caa121f2cb63f039f2.png",
+    "canvas": [
+      487,
+      79
+    ],
+    "daMoNative": true,
+    "kind": "fatty-acid-skeletal",
+    "smiles": "CC/C=C\\C/C=C\\C/C=C\\CCCCCCCC(=O)O",
+    "carbonCount": 18,
+    "doubleBondsFromCOOH": [
+      9,
+      12,
+      15
+    ],
+    "stereo": "Z,Z,Z;3doublehorizupper,nhánhkềxuống",
+    "notes": "COOHKHA TRIỂNTRÁI:HO–C(=Olên)–mạch. Mạch18C,3doubleởgiữaphải,ngăn1CH₂,methylendpointphải. ĐãmởRIÊNG378và700cùngnộidung/shape,khácpixel. Khôngcaption/charges,acidHOHexplicitgiữ.",
+    "questions": [
+      {
+        "qid": "VIP27-CDK-ESTER-TN-II-16",
+        "de": "Dầu hạt lanh là một nguồn dưỡng chất thực vật quý giá, đặc biệt giàu các acid béo không bão hòa đa, có lợi cho hệ tim mạch và giảm cholesterol xấu. Thành phần chính tạo nên giá trị của loại dầu này là hai loại acid béo thiết yếu: α-linolenic acid (ALA) và linoleic acid (LA). Cơ thể người không thể tự tổng hợp được hai acid này mà bắt buộc phải hấp thu từ chế độ ăn uống. Mỗi viên nang mềm \"Dầu hạt lanh hữu cơ\" có khối lượng 500 mg dầu nền, trong đó chứa 55% ALA và 15% LA về khối lượng. ALA và LA có công thức cấu tạo phân tử mạch hở như hình (hình trên: ALA; hình dưới: LA).",
+        "refs": [
+          {
+            "where": "VIP27-CDK-ESTER-TN-II-16.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 200,
+    "hash": "222dc75add8005c94fd4e8910c4b9e739d8c0de91d1e514ac568e50051daee4e",
+    "fileNguon": "anh/222dc75add8005c94fd4e8910c4b9e739d8c0de91d1e514ac568e50051daee4e.png",
+    "canvas": [
+      261,
+      207
+    ],
+    "daMoNative": true,
+    "kind": "generic-peptide-bond-arrows",
+    "literal": "CH₃–NH–CH(R′)–C(=O)–NH–CH(R)–C(=O)–NH–CH₃",
+    "labels": {
+      "(1)": "first C=O bond, Oup",
+      "(2)": "first carbonylC–middleNH bond",
+      "(3)": "left CH(R′)–first carbonylC bond",
+      "(4)": "middleNH–right CH(R) bond"
+    },
+    "notes": "3NđềuNH(3H trênN),2C=O(đầulên/cuốixuống),2CHalphaHẩn,R′dướitrái,Rtrênphải. GiữCH₃endpointtrái/phảiẩntrongline.Số(1)..(4)làarrowlabelsđềucóHEADchỉtớibond,khônggắntrênatomkhác. KhôngtựthêmfreeNH₂/COOH/charge/stereo. Source200/330/1178cùngliteral/labelmappingđãmởriêng.",
+    "questions": [
+      {
+        "qid": "DB-12-B9-P2-D1-I-151",
+        "de": "Trong cấu trúc phân tử của chất cho ở hình bên, liên kết peptide là",
+        "refs": [
+          {
+            "where": "DB-12-B9-P2-D1-I-151.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B9-P2-I-4",
+        "de": "Trong cấu trúc phân tử của chất cho ở hình bên, liên kết peptide là",
+        "refs": [
+          {
+            "where": "DH-12-C3-B9-P2-I-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 330,
+    "hash": "398d9ba47e4adbca478595a6c6586a61736347e1c3f35d78e450bde05818e1ae",
+    "fileNguon": "anh/398d9ba47e4adbca478595a6c6586a61736347e1c3f35d78e450bde05818e1ae.png",
+    "canvas": [
+      495,
+      385
+    ],
+    "daMoNative": true,
+    "kind": "generic-peptide-bond-arrows",
+    "literal": "CH₃–NH–CH(R′)–C(=O)–NH–CH(R)–C(=O)–NH–CH₃",
+    "labels": {
+      "(1)": "first C=O bond, Oup",
+      "(2)": "first carbonylC–middleNH bond",
+      "(3)": "left CH(R′)–first carbonylC bond",
+      "(4)": "middleNH–right CH(R) bond"
+    },
+    "notes": "3NđềuNH(3H trênN),2C=O(đầulên/cuốixuống),2CHalphaHẩn,R′dướitrái,Rtrênphải. GiữCH₃endpointtrái/phảiẩntrongline.Số(1)..(4)làarrowlabelsđềucóHEADchỉtớibond,khônggắntrênatomkhác. KhôngtựthêmfreeNH₂/COOH/charge/stereo. Source200/330/1178cùngliteral/labelmappingđãmởriêng.",
+    "questions": [
+      {
+        "qid": "12-KT-C3-D5-I-8",
+        "de": "Trong cấu trúc phân tử của chất cho ở hình dưới đây, liên kết peptide là",
+        "refs": [
+          {
+            "where": "12-KT-C3-D5-I-8.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P2-D1-I-129",
+        "de": "Trong cấu trúc phân tử của chất cho ở hình dưới đây, liên kết peptide là",
+        "refs": [
+          {
+            "where": "DB-12-B9-P2-D1-I-129.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1178,
+    "hash": "d4d87ec0a2b8498b1d9b306b51c46036eadb97450b6316d99ba9939e44ff07e8",
+    "fileNguon": "anh/d4d87ec0a2b8498b1d9b306b51c46036eadb97450b6316d99ba9939e44ff07e8.png",
+    "canvas": [
+      458,
+      368
+    ],
+    "daMoNative": true,
+    "kind": "generic-peptide-bond-arrows",
+    "literal": "CH₃–NH–CH(R′)–C(=O)–NH–CH(R)–C(=O)–NH–CH₃",
+    "labels": {
+      "(1)": "first C=O bond, Oup",
+      "(2)": "first carbonylC–middleNH bond",
+      "(3)": "left CH(R′)–first carbonylC bond",
+      "(4)": "middleNH–right CH(R) bond"
+    },
+    "notes": "3NđềuNH(3H trênN),2C=O(đầulên/cuốixuống),2CHalphaHẩn,R′dướitrái,Rtrênphải. GiữCH₃endpointtrái/phảiẩntrongline.Số(1)..(4)làarrowlabelsđềucóHEADchỉtớibond,khônggắntrênatomkhác. KhôngtựthêmfreeNH₂/COOH/charge/stereo. Source200/330/1178cùngliteral/labelmappingđãmởriêng.",
+    "questions": [
+      {
+        "qid": "12-C3-B9-D2-I-4",
+        "de": "Trong cấu trúc phân tử của chất cho ở hình bên (CH₃-NH-CH(R')-C(=O)-NH-CH(R)-C(=O)-NH-CH₃; mũi tên (1) chỉ liên kết C=O, (2) chỉ liên kết C(=O)-N, (3) chỉ liên kết CH(R')-C(=O), (4) chỉ liên kết N-CH(R)), liên kết peptide là",
+        "refs": [
+          {
+            "where": "12-C3-B9-D2-I-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P2-D1-I-25",
+        "de": "Trong cấu trúc phân tử của chất cho ở hình bên (CH₃-NH-CH(R')-C(=O)-NH-CH(R)-C(=O)-NH-CH₃; mũi tên (1) chỉ liên kết C=O, (2) chỉ liên kết C(=O)-N, (3) chỉ liên kết CH(R')-C(=O), (4) chỉ liên kết N-CH(R)), liên kết peptide là",
+        "refs": [
+          {
+            "where": "DB-12-B9-P2-D1-I-25.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1100,
+    "hash": "c66a57952918d2dca9114ee94513af864eebc79f72b720177b8737483d618276",
+    "fileNguon": "anh/c66a57952918d2dca9114ee94513af864eebc79f72b720177b8737483d618276.png",
+    "canvas": [
+      391,
+      170
+    ],
+    "daMoNative": true,
+    "kind": "generic-peptide-bond-leaders",
+    "literal": "CH₃–NH–CH(R₁)–C(=O)–NH–CH(R₂)–C(=O)–NH–CH₃",
+    "labels": {
+      "(1)": "left NH–CH(R₁) bond",
+      "(2)": "first C=O bond",
+      "(3)": "first carbonylC–middleNH bond",
+      "(4)": "middleNH–CH(R₂) bond"
+    },
+    "notes": "Khôngđượcalias200:nguồn1100dùngR₁/R₂thayR′/Rvàlabels1/2/3mappingKHÁC. Cácleaderlinesmảnhgầnnhãnvànativekhôngheadarrowrõ,giữleaderkhôngthêmheadto.R₁dướiCHtrái,R₂trênCHphải.3NHexplicitH;2C=Ođầulên/cuốixuống,endpointsmethylẩn. Nocharge/stereo.",
+    "questions": [
+      {
+        "qid": "VIP27-C3-B11-D2-I-11",
+        "de": "Trong cấu trúc phân tử của chất cho ở hình bên, liên kết peptide là",
+        "refs": [
+          {
+            "where": "VIP27-C3-B11-D2-I-11.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1063,
+    "hash": "bff4825eb8c5e79260af176a9308496c4904f63f45ab0afba0f386b31763cab7",
+    "fileNguon": "anh/bff4825eb8c5e79260af176a9308496c4904f63f45ab0afba0f386b31763cab7.png",
+    "canvas": [
+      567,
+      80
+    ],
+    "daMoNative": true,
+    "kind": "hydrocarbon-grid-4",
+    "columns": 2,
+    "panels": [
+      {
+        "smiles": "C=C(C)CC",
+        "caption": [
+          "(a)"
+        ],
+        "notes": "CH₂=C(CH₃)CH₂CH₃:5C,terminalalkene,khôngE/Z."
+      },
+      {
+        "smiles": "CC(C)C#CC",
+        "caption": [
+          "(b)"
+        ],
+        "notes": "Branchedalkyne6C:CH(CH₃)₂–C≡C–CH₃;khôngbỏmethylnhánh."
+      },
+      {
+        "smiles": "CC#CCC",
+        "caption": [
+          "(c)"
+        ],
+        "notes": "Pentyne5C:CH₃–C≡C–CH₂–CH₃."
+      },
+      {
+        "smiles": "C=CCC(C)(C)C",
+        "caption": [
+          "(d)"
+        ],
+        "notes": "7C:CH₂=CH–CH₂–C(CH₃)₃;centralquaternaryC3methylvà1CH₂,khônghydrogen.C=ClàterminalkhôngE/Z."
+      }
+    ],
+    "notes": "4panelnguồnmộthàng,nhãn(a)..(d)dướitừngchất. Cóthểreflow2cộtkhôngmấtlabels. NoHexplicit/charges/stereo/circle.",
+    "questions": [
+      {
+        "qid": "VIP27-C1-HC11-D1-I-17",
+        "de": "Cho công thức cấu tạo của một số hydrocarbon sau đây (hình (a), (b), (c), (d)).\nPhát biểu nào sau đây là đúng?",
+        "refs": [
+          {
+            "where": "VIP27-C1-HC11-D1-I-17.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "i": 567,
+    "hash": "697e0da613c2635ab41b3b413094fc2ab99e5012ed5edb86c1f229ddc34667d1",
+    "fileNguon": "anh/697e0da613c2635ab41b3b413094fc2ab99e5012ed5edb86c1f229ddc34667d1.png",
+    "canvas": [
+      670,
+      47
+    ],
+    "daMoNative": true,
+    "kind": "reaction-literal",
+    "reactants": "C₆H₁₂O₆",
+    "products": "HOOC–CH(NH₂)–CH₂–CH₂–COOH + sản phẩm phụ",
+    "arrow": "→",
+    "notes": "Mộtarrowphải,kHÔNGđiềukiệntrên/dưới. GiữtextcôngthứcglutamicacidcóNH₂ngoặcvòngởCH,2CH₂và2COOH. KhôngthêmhệsốO₂/NH₃/enzyme/Na⁺,khôngtínhtổngsảnphẩmphụvìnguồnchỉtext.",
+    "questions": [
+      {
+        "qid": "DH-12-C3-B9-P1-III-35",
+        "de": "Bột ngọt (monosodium glutamate – MSG) là một loại gia vị, thường được sử dụng trong chế biến món ăn để tăng hương vị cho thức ăn. Bột ngọt hiện nay được sản xuất chủ yếu bằng phương pháp lên men vi sinh từ nguyên liệu là các hợp chất chứa tinh bột. Tiến hành theo các bước sau:\nBước 1: Cho m tấn nguyên liệu (chứa 90% tinh bột, còn lại là chất trơ) thủy phân bằng các enzyme để chuyển hóa thành glucose.\nBước 2: Lên men glucose thành glutamic acid dưới tác dụng của vi khuẩn được kiểm soát chặt chẽ (nhiệt độ, độ pH và các yếu tố khác) để đảm bảo quá trình lên men diễn ra ổn định và hiệu quả. Phương trình theo tỉ lệ:\nBước 3: Cho glutamic acid tác dụng với dung dịch NaOH, sau đó lọc bỏ tạp chất thu được dung dịch MSG bão hòa ở 60 °C (gọi là dung dịch X), làm nguội dung dịch X về 25 °C thì khối lượng MSG kết tinh là 1,5 tấn. Biết hiệu suất cả quá trình sản xuất từ nguyên liệu đến khi thu được dung dịch X là 85%, độ tan của MSG ở 60 °C là 112gam/100 gam nước, ở 25 °C là 74 gam/100 gam nước.\nGiá trị của m là bao nhiêu? (Chỉ làm tròn ở phép tính cuối cùng, kết quả làm tròn đến hàng phần trăm)",
+        "refs": [
+          {
+            "where": "DH-12-C3-B9-P1-III-35.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "glutamic-literal-ddh-26110333726dfd8d7ec4ace71c37be86189769250ae68bcf8e30ffcc7f9ad1e2.svg",
+    "hashSvg": "26110333726dfd8d7ec4ace71c37be86189769250ae68bcf8e30ffcc7f9ad1e2",
+    "byteSvg": 20341,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Giữ C6H12O6→HOOC–CH(NH2)–CH2–CH2–COOH+sảnphẩmphụ, khôngthêm điềukiện/hệsố haychất khác.",
+    "hashSvgDaSoat": "26110333726dfd8d7ec4ace71c37be86189769250ae68bcf8e30ffcc7f9ad1e2",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
