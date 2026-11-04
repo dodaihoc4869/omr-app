@@ -289,5 +289,757 @@
         ]
       }
     ]
+  },
+  {
+    "i": 1284,
+    "hash": "e901f90224119c78a1d4d1538962b6a6533a4c9e466f4f2a24a8de23ad8f22ae",
+    "fileNguon": "anh/e901f90224119c78a1d4d1538962b6a6533a4c9e466f4f2a24a8de23ad8f22ae.png",
+    "canvas": [
+      1077,
+      278
+    ],
+    "daMoNative": true,
+    "kind": "aspirin-hydrolysis-circle",
+    "literalReactantBranch": "OOCCH₃",
+    "reactants": [
+      "aspirin",
+      "H₂O"
+    ],
+    "products": [
+      "salicylic acid",
+      "CH₃COOH"
+    ],
+    "arrow": "⇌",
+    "overArrow": "H⁺, t°",
+    "captions": [
+      "Aspirin",
+      "Salicylic acid"
+    ],
+    "notes": "NguồnreactanttextOOCCH₃đúngthứtựnhưảnh,KHÔNGtựđổithànhOCOCH₃theotênaspirin. OOCCH₃ởtopvòng,COOHtoprightortho. ProductOHtop/COOHtoprightortho. 2vòngCIRCLEkhông3đôi. GiữcondH⁺,t°trênarrowvà2cap,nolabel(1).",
+    "questions": [
+      {
+        "qid": "12-C1-B1-D1-II-20",
+        "de": "Aspirin là một hợp chất được sử dụng làm giảm đau, hạ sốt. Sau khi uống, aspirin bị thủy phân trong cơ thể sẽ tạo thành salicylic acid. Salicylic acid ức chế quá trình sinh tổng hợp prostaglandin (chất gây đau, sốt và viêm khi nồng độ trong máu cao hơn mức bình thường).",
+        "refs": [
+          {
+            "where": "12-C1-B1-D1-II-20.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D1-II-31",
+        "de": "Aspirin là một hợp chất được sử dụng làm giảm đau, hạ sốt. Sau khi uống, aspirin bị thủy phân trong cơ thể sẽ tạo thành salicylic acid. Salicylic acid ức chế quá trình sinh tổng hợp prostaglandin (chất gây đau, sốt và viêm khi nồng độ trong máu cao hơn mức bình thường).",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D1-II-31.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 202,
+    "hash": "2244842bb9174b43a2ff8dc140b04a2c7338208fbf94475f0ae57b681cec5097",
+    "fileNguon": "anh/2244842bb9174b43a2ff8dc140b04a2c7338208fbf94475f0ae57b681cec5097.png",
+    "canvas": [
+      468,
+      94
+    ],
+    "daMoNative": true,
+    "kind": "aspirin-hydrolysis-doublebond-literal",
+    "literalReactantBranch": "OOCCH₃",
+    "reactants": [
+      "aspirin",
+      "H₂O"
+    ],
+    "products": [
+      "salicylic acid",
+      "CH₃COOH"
+    ],
+    "arrow": "⇌",
+    "overArrow": "H⁺",
+    "captions": [],
+    "notes": "2vòng3đôiKHÔNGcircle. ReactantOOCCH₃TOP/COOHtoprightortho;productOHtop/COOHtoprightortho. OOCCH₃sourcegiữliteralKHÔNGtựOCOCH₃;H⁺trênarrowKHÔNGt°.1168CÓ2capAspirin/Salicylicacid,còn202/211KHÔNGcaption;đãmởRIÊNG3nguồnkhôngaliaslàmrụng/thêmcaption.",
+    "questions": [
+      {
+        "qid": "DB-12-B1-P1-D1-II-153",
+        "de": "Aspirin được sử dụng làm thuốc giảm đau, hạ sốt. Sau khi uống, aspirin bị thuỷ phân trong cơ thể tạo thành salicylic acid, chất này làm ức chế quá trình tạo ra chất gây đau, sốt.\nTrong phòng thí nghiệm, một nhóm học sinh tiến hành nghiên cứu quá trình thuỷ phân aspirin theo phản ứng: aspirin salicylic acid Kết quả xác định nồng độ aspirin theo thời gian được thể hiện ở bảng dưới đây:",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D1-II-153.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B1-P1-II-20",
+        "de": "Aspirin được sử dụng làm thuốc giảm đau, hạ sốt. Sau khi uống, aspirin bị thuỷ phân trong cơ thể tạo thành salicylic acid, chất này làm ức chế quá trình tạo ra chất gây đau, sốt.\nTrong phòng thí nghiệm, một nhóm học sinh tiến hành nghiên cứu quá trình thuỷ phân aspirin theo phản ứng: aspirin salicylic acid Kết quả xác định nồng độ aspirin theo thời gian được thể hiện ở bảng dưới đây:",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P1-II-20.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 211,
+    "hash": "23764464098ba10c9a74b47d5ba441adc22d1d676f47bddeedc73db1ba8ce2af",
+    "fileNguon": "anh/23764464098ba10c9a74b47d5ba441adc22d1d676f47bddeedc73db1ba8ce2af.png",
+    "canvas": [
+      1031,
+      252
+    ],
+    "daMoNative": true,
+    "kind": "aspirin-hydrolysis-doublebond-literal",
+    "literalReactantBranch": "OOCCH₃",
+    "reactants": [
+      "aspirin",
+      "H₂O"
+    ],
+    "products": [
+      "salicylic acid",
+      "CH₃COOH"
+    ],
+    "arrow": "⇌",
+    "overArrow": "H⁺",
+    "captions": [],
+    "notes": "2vòng3đôiKHÔNGcircle. ReactantOOCCH₃TOP/COOHtoprightortho;productOHtop/COOHtoprightortho. OOCCH₃sourcegiữliteralKHÔNGtựOCOCH₃;H⁺trênarrowKHÔNGt°.1168CÓ2capAspirin/Salicylicacid,còn202/211KHÔNGcaption;đãmởRIÊNG3nguồnkhôngaliaslàmrụng/thêmcaption.",
+    "questions": [
+      {
+        "qid": "12-C1-B1-D2-II-7",
+        "de": "Aspirin được sử dụng làm thuốc giảm đau, hạ sốt. Sau khi uống, aspirin bị thuỷ phân trong cơ thể tạo thành salicylic acid, chất này làm ức chế quá trình tạo ra chất gây đau, sốt.\nTrong phòng thí nghiệm, một nhóm học sinh tiến hành nghiên cứu quá trình thuỷ phân aspirin theo phản ứng aspirin → salicylic acid. Kết quả xác định nồng độ aspirin theo thời gian được thể hiện ở bảng dưới đây:",
+        "refs": [
+          {
+            "where": "12-C1-B1-D2-II-7.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D1-II-40",
+        "de": "Aspirin được sử dụng làm thuốc giảm đau, hạ sốt. Sau khi uống, aspirin bị thuỷ phân trong cơ thể tạo thành salicylic acid, chất này làm ức chế quá trình tạo ra chất gây đau, sốt.\nTrong phòng thí nghiệm, một nhóm học sinh tiến hành nghiên cứu quá trình thuỷ phân aspirin theo phản ứng aspirin → salicylic acid. Kết quả xác định nồng độ aspirin theo thời gian được thể hiện ở bảng dưới đây:",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D1-II-40.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1168,
+    "hash": "d32c59e7f0828cd37e16bde375f06ce3bf4c3f88fd27d2327284bcdcc79f7ce5",
+    "fileNguon": "anh/d32c59e7f0828cd37e16bde375f06ce3bf4c3f88fd27d2327284bcdcc79f7ce5.png",
+    "canvas": [
+      828,
+      191
+    ],
+    "daMoNative": true,
+    "kind": "aspirin-hydrolysis-doublebond-literal",
+    "literalReactantBranch": "OOCCH₃",
+    "reactants": [
+      "aspirin",
+      "H₂O"
+    ],
+    "products": [
+      "salicylic acid",
+      "CH₃COOH"
+    ],
+    "arrow": "⇌",
+    "overArrow": "H⁺",
+    "captions": [
+      "Aspirin",
+      "Salicylic acid"
+    ],
+    "notes": "2vòng3đôiKHÔNGcircle. ReactantOOCCH₃TOP/COOHtoprightortho;productOHtop/COOHtoprightortho. OOCCH₃sourcegiữliteralKHÔNGtựOCOCH₃;H⁺trênarrowKHÔNGt°.1168CÓ2capAspirin/Salicylicacid,còn202/211KHÔNGcaption;đãmởRIÊNG3nguồnkhôngaliaslàmrụng/thêmcaption.",
+    "questions": [
+      {
+        "qid": "VIP27-C1-B3-D2-II-4",
+        "de": "Aspirin được sử dụng làm thuốc giảm đau, hạ sốt. Sau khi uống, aspirin bị thuỷ phân trong cơ thể tạo thành salicylic acid, chất này có tác dụng ức chế quá trình sinh tổng hợp các chất gây viêm, đau, sốt. Trong phòng thí nghiệm, một nhóm học sinh tiến hành nghiên cứu quá trình thuỷ phân aspirin trong môi trường acid và thu được kết quả như đồ thị; sơ đồ quá trình thủy phân aspirin như hình.",
+        "refs": [
+          {
+            "where": "VIP27-C1-B3-D2-II-4.hinh.1.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1361,
+    "hash": "f623d1ca4cdc50f02668a602dfaf136bf2b0f5ffcdb1f8a086a211102cc1c131",
+    "fileNguon": "anh/f623d1ca4cdc50f02668a602dfaf136bf2b0f5ffcdb1f8a086a211102cc1c131.png",
+    "canvas": [
+      638,
+      416
+    ],
+    "daMoNative": true,
+    "kind": "aspirin-time-graph",
+    "title": [
+      "Đồ thị sự biến đổi nồng độ Aspirin theo",
+      "thời gian trong phản ứng thủy phân"
+    ],
+    "xLabel": "Thời gian (phút)",
+    "yLabel": "Nồng độ aspirin (M)",
+    "yTicks": [
+      "0,0",
+      "0,02",
+      "0,04",
+      "0,06",
+      "0,08",
+      "0,10"
+    ],
+    "xTicks": [
+      "0",
+      "30",
+      "60",
+      "90",
+      "120",
+      "150",
+      "180"
+    ],
+    "axesPixel": {
+      "box": [
+        116,
+        106,
+        610,
+        343
+      ],
+      "yTickPixel": [
+        343,
+        297,
+        249,
+        202,
+        155,
+        106
+      ],
+      "xLabelCentersApprox": [
+        116,
+        194,
+        272,
+        378,
+        455,
+        533,
+        611
+      ]
+    },
+    "openCirclePixel": [
+      [
+        116,
+        106
+      ],
+      [
+        168,
+        145
+      ],
+      [
+        219,
+        177
+      ],
+      [
+        272,
+        203
+      ],
+      [
+        323,
+        224
+      ],
+      [
+        378,
+        240
+      ],
+      [
+        431,
+        254
+      ],
+      [
+        482,
+        264
+      ],
+      [
+        533,
+        267
+      ],
+      [
+        610,
+        267
+      ]
+    ],
+    "notes": "1curveđenGIẢMtiệmcậnplateau~0,032M,với10OPENcirclestrêncurve,khôngchấmđặc. Gridđứtmajor/minor2chiều,khung4cạnhKHÔNGarrowaxes. Giữtitletừngchữ/số/ticksnguyênnguồn,kHÔNGtựgánthờigiankhoảngpointsnếuaxisnguồnkhôngđềuphânphối. Point/tickpositionslàpixelnativekhôngtựthêmnhãndata. Khóa0,0gốc/0,10topvàlowercaseaspirinởYkhácAspirintrongtitle.",
+    "questions": [
+      {
+        "qid": "VIP27-C1-B3-D2-II-4",
+        "de": "Aspirin được sử dụng làm thuốc giảm đau, hạ sốt. Sau khi uống, aspirin bị thuỷ phân trong cơ thể tạo thành salicylic acid, chất này có tác dụng ức chế quá trình sinh tổng hợp các chất gây viêm, đau, sốt. Trong phòng thí nghiệm, một nhóm học sinh tiến hành nghiên cứu quá trình thuỷ phân aspirin trong môi trường acid và thu được kết quả như đồ thị; sơ đồ quá trình thủy phân aspirin như hình.",
+        "refs": [
+          {
+            "where": "VIP27-C1-B3-D2-II-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 604,
+    "hash": "6fe87a48dea9b81beed8296afb2362d6256aa5cae001820eb3fcd0d6dfa00ab4",
+    "fileNguon": "anh/6fe87a48dea9b81beed8296afb2362d6256aa5cae001820eb3fcd0d6dfa00ab4.png",
+    "canvas": [
+      1218,
+      307
+    ],
+    "daMoNative": true,
+    "kind": "paracetamol-synthesis-3",
+    "smilesNodes": [
+      "O=[N+]([O-])c1ccc(O)cc1",
+      "Nc1ccc(O)cc1",
+      "CC(=O)Nc1ccc(O)cc1"
+    ],
+    "captions": [
+      "p-nitrophenol",
+      "p-aminophenol",
+      "Paracetamol"
+    ],
+    "notes": "3vòng3đôiKHÔNGcircle,phenolOHởdướitrái,vịtríđốidiệnparaNO₂/NH₂/NHCOCH₃ởtrênphải. HaiarrowphảiKHÔNGđiềukiện/khôngbyproduct. SourceNO₂textkhôngformalchargehiểnthị,nitrocanonicalSMILESphảioverrideNO₂literalđừngthêm[N+][O−]textvàoảnh.ProductNHamideHhiệnrờidướiN,C=Oxuống,CH₃phảitrên. Captionp-nitrophenol/p-aminophenolnghiêngvàp-plaintextphảigiữ,ParacetamolPcapital.Nocharge/stereonêm. 604/927/603nativeđãmởriêngsamecontentkhácscale.",
+    "questions": [
+      {
+        "qid": "12-C3-B8-D2-III-29",
+        "de": "Thuốc Paracetamol là một loại thuốc được sử dụng rất nhiều trong y học. Thuốc có tác dụng giảm đau, hạ sốt, tuy nhiên ít có tác dụng kháng viêm. Thuốc Paracetamol được tổng hợp từ p-nitrophenol theo sơ đồ: p-nitrophenol (HO-C₆H₄-NO₂) → p-aminophenol (HO-C₆H₄-NH₂) → Paracetamol (HO-C₆H₄-NH-CO-CH₃) (biết hiệu suất của quá trình phản ứng đạt 80%).\nĐể sản xuất 1,5 triệu viên thuốc paracetamol thì cần dùng bao nhiêu kg p-nitrophenol biết rằng mỗi viên thuốc chứa 500 mg Paracetamol (Lấy kết quả làm tròn đến số nguyên)",
+        "refs": [
+          {
+            "where": "12-C3-B8-D2-III-29.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B8-D1-III-148",
+        "de": "Thuốc Paracetamol là một loại thuốc được sử dụng rất nhiều trong y học. Thuốc có tác dụng giảm đau, hạ sốt, tuy nhiên ít có tác dụng kháng viêm. Thuốc Paracetamol được tổng hợp từ p-nitrophenol theo sơ đồ: p-nitrophenol (HO-C₆H₄-NO₂) → p-aminophenol (HO-C₆H₄-NH₂) → Paracetamol (HO-C₆H₄-NH-CO-CH₃) (biết hiệu suất của quá trình phản ứng đạt 80%).\nĐể sản xuất 1,5 triệu viên thuốc paracetamol thì cần dùng bao nhiêu kg p-nitrophenol biết rằng mỗi viên thuốc chứa 500 mg Paracetamol (Lấy kết quả làm tròn đến số nguyên)",
+        "refs": [
+          {
+            "where": "DB-12-B8-D1-III-148.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 927,
+    "hash": "a7e924244d8b691025f3714a449465ac5e2ac51358ba1d208699260d433c025b",
+    "fileNguon": "anh/a7e924244d8b691025f3714a449465ac5e2ac51358ba1d208699260d433c025b.png",
+    "canvas": [
+      1095,
+      282
+    ],
+    "daMoNative": true,
+    "kind": "paracetamol-synthesis-3",
+    "smilesNodes": [
+      "O=[N+]([O-])c1ccc(O)cc1",
+      "Nc1ccc(O)cc1",
+      "CC(=O)Nc1ccc(O)cc1"
+    ],
+    "captions": [
+      "p-nitrophenol",
+      "p-aminophenol",
+      "Paracetamol"
+    ],
+    "notes": "3vòng3đôiKHÔNGcircle,phenolOHởdướitrái,vịtríđốidiệnparaNO₂/NH₂/NHCOCH₃ởtrênphải. HaiarrowphảiKHÔNGđiềukiện/khôngbyproduct. SourceNO₂textkhôngformalchargehiểnthị,nitrocanonicalSMILESphảioverrideNO₂literalđừngthêm[N+][O−]textvàoảnh.ProductNHamideHhiệnrờidướiN,C=Oxuống,CH₃phảitrên. Captionp-nitrophenol/p-aminophenolnghiêngvàp-plaintextphảigiữ,ParacetamolPcapital.Nocharge/stereonêm. 604/927/603nativeđãmởriêngsamecontentkhácscale.",
+    "questions": [
+      {
+        "qid": "12-KT-C3-D3-III-6",
+        "de": "Thuốc Paracetamol là một loại thuốc được sử dụng rất nhiều trong y học. Thuốc có tác dụng giảm đau, hạ sốt tuy nhiên ít có tác dụng kháng viêm. Thuốc Paracetamol được tổng hợp từ p-nitrophenol theo sơ đồ trong hình dưới đây (biết hiệu suất của cả quá trình phản ứng đạt 90%).\nĐể sản xuất 30,2 triệu viên thuốc Paracetamol thì khối lượng (tấn) p-nitrophenol cần dùng gần nhất với giá trị nào?\nBiết rằng mỗi viên thuốc chứa 500 mg Paracetamol. (Kết quả làm tròn đến phần mười.)",
+        "refs": [
+          {
+            "where": "12-KT-C3-D3-III-6.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B8-D1-III-272",
+        "de": "Thuốc Paracetamol là một loại thuốc được sử dụng rất nhiều trong y học. Thuốc có tác dụng giảm đau, hạ sốt tuy nhiên ít có tác dụng kháng viêm. Thuốc Paracetamol được tổng hợp từ p-nitrophenol theo sơ đồ trong hình dưới đây (biết hiệu suất của cả quá trình phản ứng đạt 90%).\nĐể sản xuất 30,2 triệu viên thuốc Paracetamol thì khối lượng (tấn) p-nitrophenol cần dùng gần nhất với giá trị nào?\nBiết rằng mỗi viên thuốc chứa 500 mg Paracetamol. (Kết quả làm tròn đến phần mười.)",
+        "refs": [
+          {
+            "where": "DB-12-B8-D1-III-272.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 603,
+    "hash": "6fc5508d7e56add3d3ce587282325b34387e72c0c6edf8b202c4862967649c0d",
+    "fileNguon": "anh/6fc5508d7e56add3d3ce587282325b34387e72c0c6edf8b202c4862967649c0d.png",
+    "canvas": [
+      1254,
+      323
+    ],
+    "daMoNative": true,
+    "kind": "paracetamol-synthesis-3",
+    "smilesNodes": [
+      "O=[N+]([O-])c1ccc(O)cc1",
+      "Nc1ccc(O)cc1",
+      "CC(=O)Nc1ccc(O)cc1"
+    ],
+    "captions": [
+      "p-nitrophenol",
+      "p-aminophenol",
+      "Paracetamol"
+    ],
+    "notes": "3vòng3đôiKHÔNGcircle,phenolOHởdướitrái,vịtríđốidiệnparaNO₂/NH₂/NHCOCH₃ởtrênphải. HaiarrowphảiKHÔNGđiềukiện/khôngbyproduct. SourceNO₂textkhôngformalchargehiểnthị,nitrocanonicalSMILESphảioverrideNO₂literalđừngthêm[N+][O−]textvàoảnh.ProductNHamideHhiệnrờidướiN,C=Oxuống,CH₃phảitrên. Captionp-nitrophenol/p-aminophenolnghiêngvàp-plaintextphảigiữ,ParacetamolPcapital.Nocharge/stereonêm. 604/927/603nativeđãmởriêngsamecontentkhácscale.",
+    "questions": [
+      {
+        "qid": "12-C3-B8-D2-III-45",
+        "de": "Thuốc Paracetamol là một loại thuốc được sử dụng rất nhiều trong y học. Thuốc có tác dụng giảm đau, hạ sốt, tuy nhiên ít có tác dụng kháng viêm.\nThuốc Paracetamol được tổng hợp từ p-nitrophenol theo phương trình hóa học sau (biết hiệu suất của quá trình phản ứng đạt 80%): Để sản xuất 30,2 triệu viên thuốc paracetamol thì cần dùng bao nhiêu tấn p-nitrophenol biết rằng mỗi viên thuốc chứa 500 mg Paracetamol (Lấy kết quả làm tròn đến số nguyên)",
+        "refs": [
+          {
+            "where": "12-C3-B8-D2-III-45.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B8-D1-III-194",
+        "de": "Thuốc Paracetamol là một loại thuốc được sử dụng rất nhiều trong y học. Thuốc có tác dụng giảm đau, hạ sốt, tuy nhiên ít có tác dụng kháng viêm.\nThuốc Paracetamol được tổng hợp từ p-nitrophenol theo phương trình hóa học sau (biết hiệu suất của quá trình phản ứng đạt 80%): Để sản xuất 30,2 triệu viên thuốc paracetamol thì cần dùng bao nhiêu tấn p-nitrophenol biết rằng mỗi viên thuốc chứa 500 mg Paracetamol (Lấy kết quả làm tròn đến số nguyên)",
+        "refs": [
+          {
+            "where": "DB-12-B8-D1-III-194.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1210,
+    "hash": "db3df2a7a2209f940e1f28d19e617e21b76a012af20dc82293b7911a3aea9900",
+    "fileNguon": "anh/db3df2a7a2209f940e1f28d19e617e21b76a012af20dc82293b7911a3aea9900.png",
+    "canvas": [
+      362,
+      259
+    ],
+    "daMoNative": true,
+    "kind": "haworth-glucose-numbered",
+    "substituents": {
+      "C1": {
+        "down": "OH"
+      },
+      "C2": {
+        "down": "OH"
+      },
+      "C3": {
+        "up": "OH"
+      },
+      "C4": {
+        "down": "OH"
+      },
+      "C5": {
+        "up": "CH₂–OH expanded, carbon6"
+      }
+    },
+    "notes": "6ringOtopright,frontC4–C3–C2–C1đậm. NoHexplicit.MởrộngCH₂OHC5lênCH₂rồichéolênphảiOH. Sốcarbon1..6đủ:1bênphảiC1,2tráidướiC2,3dướiC3,4tráiC4,5tráiC5,6tráitrênbranch. KhônggộpbranchthànhCH₂OHtextnếumấtsố6/khácnguồn. Khác1243C1OHup,C1đâydown.",
+    "questions": [
+      {
+        "qid": "12-KT-C2-D4-I-3",
+        "de": "Cho công thức cấu tạo dạng mạch vòng α-glucose như sau: Nhóm OH hemiacetal trong α-glucose liên kết với nguyên tử carbon số mấy?",
+        "refs": [
+          {
+            "where": "12-KT-C2-D4-I-3.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B5-D2-I-217",
+        "de": "Cho công thức cấu tạo dạng mạch vòng α-glucose như sau: Nhóm OH hemiacetal trong α-glucose liên kết với nguyên tử carbon số mấy?",
+        "refs": [
+          {
+            "where": "DB-12-B5-D2-I-217.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1266,
+    "hash": "e5a6ab2cc58f236eeb16e783a265b05e1d63572691b3d44eaf647a17df1da18d",
+    "fileNguon": "anh/e5a6ab2cc58f236eeb16e783a265b05e1d63572691b3d44eaf647a17df1da18d.png",
+    "canvas": [
+      412,
+      248
+    ],
+    "daMoNative": true,
+    "kind": "fructose-arrow-labels",
+    "substituents": {
+      "C2": {
+        "up": "CH₂OH",
+        "down": "OH"
+      },
+      "C3": {
+        "up": "HO",
+        "down": "H"
+      },
+      "C4": {
+        "up": "H",
+        "down": "OH"
+      },
+      "C5": {
+        "up": "CH₂OH",
+        "down": "H"
+      }
+    },
+    "arrowLabels": {
+      "1": "OHởC2dướiphải",
+      "2": "bondO_vòng–C2ởtrênphải",
+      "3": "OHởC4dướitrái",
+      "4": "CH₂OHởC2trênphải"
+    },
+    "notes": "Cùngbody+mapping880đãđọc:5ringOtop,C2right,C3lowerright,C4lowerleft,C5left,3cạnhtrướcđậm. Giữ3Hexplicitvà2CH₂OHtext. Label2arrowtipthậtnativeởBONDchéoO–C2khôngtựdờisangHOcủaC3. Source1266đãmởriêngmọiarrow/labelsđủ. Khôngcarbonnumbers.",
+    "questions": [
+      {
+        "qid": "12-KT-C2-D1-I-9",
+        "de": "Trong công thức của fructose ở hình dưới đây, nhóm OH hemiketal là nhóm OH được đánh số",
+        "refs": [
+          {
+            "where": "12-KT-C2-D1-I-9.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-I-146",
+        "de": "Trong công thức của fructose ở hình dưới đây, nhóm OH hemiketal là nhóm OH được đánh số",
+        "refs": [
+          {
+            "where": "DB-12-B4-D3-I-146.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 678,
+    "hash": "7cee507b549b6654e46c85a37661b230e109254b630fb59190d82776aada6d62",
+    "fileNguon": "anh/7cee507b549b6654e46c85a37661b230e109254b630fb59190d82776aada6d62.png",
+    "canvas": [
+      321,
+      220
+    ],
+    "daMoNative": true,
+    "kind": "NO2-equilibrium-two-tubes",
+    "labels": [
+      "(a)",
+      "(b)",
+      "K",
+      "Nước đá"
+    ],
+    "notes": "2ốngnghiệmđáytrònĐỨNGcónútđenmiệng;ốngtrái(a)màuvàngnâuNHẠT,nằmtrongbeakerNƯỚCĐÁviềnxanh(icechunksrõ);ốngphải(b)màunâuđỏĐẬMởngoàikhôngbeaker. 2nhánhngangngắngiữaốngcùngcaogắnkhóaKthânxanhdương/handleđenđứng. LabelKtrênvan,(a)tráitrêntubetrái,(b)phảitrêntubephải;Nướcđácóleaderchéotrỏicebath.KhôngtựghiNO₂/N₂O₄/t⁰/arrowvìnguồnkhôngcó. 678/1356cùngnộidungmởriêng;sourcecolorskháclýthuyếtcầngiữquan hệđậmtươngứng.",
+    "questions": [
+      {
+        "qid": "DB-11-B1-D1-I-215",
+        "de": "Lắp bộ dụng cụ gồm 2 ống nghiệm có nhánh (a) và (b), được nối với nhau bằng một ống nhựa mềm, có khóa K. Cho cân bằng sau trong bình kín:\n2NO₂(g) (màu nâu đỏ) ⇌ N₂O₄(g) (không màu).\nBiết khi ngâm ống nghiệm (a) vào cốc nước đá thì màu của ống nghiệm (a) nhạt dần. Phản ứng thuận có",
+        "refs": [
+          {
+            "where": "DB-11-B1-D1-I-215.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C1-B3-D1-I-10",
+        "de": "Lắp bộ dụng cụ gồm 2 ống nghiệm có nhánh (a) và (b), được nối với nhau bằng một ống nhựa mềm, có khóa K. Cho cân bằng sau trong bình kín:\n2NO₂(g) (màu nâu đỏ) ⇌ N₂O₄(g) (không màu).\nBiết khi ngâm ống nghiệm (a) vào cốc nước đá thì màu của ống nghiệm (a) nhạt dần. Phản ứng thuận có",
+        "refs": [
+          {
+            "where": "DH-11-C1-B3-D1-I-10.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1356,
+    "hash": "f5aaeff9d163e12a895e3c80a64fe0bcb0da9ac2436319faa7c38b83b1c0b1d9",
+    "fileNguon": "anh/f5aaeff9d163e12a895e3c80a64fe0bcb0da9ac2436319faa7c38b83b1c0b1d9.png",
+    "canvas": [
+      478,
+      344
+    ],
+    "daMoNative": true,
+    "kind": "NO2-equilibrium-two-tubes",
+    "labels": [
+      "(a)",
+      "(b)",
+      "K",
+      "Nước đá"
+    ],
+    "notes": "2ốngnghiệmđáytrònĐỨNGcónútđenmiệng;ốngtrái(a)màuvàngnâuNHẠT,nằmtrongbeakerNƯỚCĐÁviềnxanh(icechunksrõ);ốngphải(b)màunâuđỏĐẬMởngoàikhôngbeaker. 2nhánhngangngắngiữaốngcùngcaogắnkhóaKthânxanhdương/handleđenđứng. LabelKtrênvan,(a)tráitrêntubetrái,(b)phảitrêntubephải;Nướcđácóleaderchéotrỏicebath.KhôngtựghiNO₂/N₂O₄/t⁰/arrowvìnguồnkhôngcó. 678/1356cùngnộidungmởriêng;sourcecolorskháclýthuyếtcầngiữquan hệđậmtươngứng.",
+    "questions": [
+      {
+        "qid": "11-C1-B1-I-52",
+        "de": "Lắp bộ dụng cụ gồm 2 ống nghiệm có nhánh (a) và (b), được nối với nhau bằng một ống nhựa mềm, có khoá K như hình. Cho cân bằng sau trong bình kín:\n2NO₂(g) (màu nâu đỏ) ⇌ N₂O₄(g) (không màu).\nBiết khi ngâm ống nghiệm (a) vào cốc nước đá thì màu của ống nghiệm (a) nhạt dần. Phản ứng thuận có",
+        "refs": [
+          {
+            "where": "11-C1-B1-I-52.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-11-B1-D1-I-50",
+        "de": "Lắp bộ dụng cụ gồm 2 ống nghiệm có nhánh (a) và (b), được nối với nhau bằng một ống nhựa mềm, có khoá K như hình. Cho cân bằng sau trong bình kín:\n2NO₂(g) (màu nâu đỏ) ⇌ N₂O₄(g) (không màu).\nBiết khi ngâm ống nghiệm (a) vào cốc nước đá thì màu của ống nghiệm (a) nhạt dần. Phản ứng thuận có",
+        "refs": [
+          {
+            "where": "DB-11-B1-D1-I-50.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1197,
+    "hash": "d8b95f0d03c89489fddd25896a1866c3b88ab6aac8f94f39e851a77a080093af",
+    "fileNguon": "anh/d8b95f0d03c89489fddd25896a1866c3b88ab6aac8f94f39e851a77a080093af.png",
+    "canvas": [
+      857,
+      216
+    ],
+    "daMoNative": true,
+    "kind": "gas-collection-grid-4",
+    "labels": [
+      "X",
+      "Y",
+      "Z",
+      "T"
+    ],
+    "notes": "4panelngang.X:bìnhtamgiácĐỨNGnút2lỗ?nativecổlàplugkẹpống,ốngdẫnngắnđixuốngtrongbình,vàcổngtrênbẻngangphải mởmiệngphải,mũitênTRÁIởmiệngchỉkhívàobình;labelXtrên.Y:bìnhtamgiácÚPngược,cổngnhỏdưới,ốngbẻLđivàotừtráiphíadưới,mũitênPHẢI,labelYtráidưới.Z:bìnhĐỨNG,ốngbẻLtrênmiệngcổtừTRÁI,mũitênPHẢIởđầuvàokhí,labelZtrên;ốngbêndướitrongbìnhKHÔNGkéodàiđếnđáy.T:bểchữnhậtchứanước(đườnggạchngangmức),bìnhnónÚPtrongbể,miệngdướinước;ốngdẫntừtrêntráichéoxuốngbểrồiuốnUđilênvàobình,bọtkhítròntrongbình;mũitênchéoxuốngphảiởcổngtrêntrái,labelT.Khônggántênchấtkhí/giảiđápán. GiữhướngmũitênphânbiệtX/Y/Z/T.",
+    "questions": [
+      {
+        "qid": "DB-11-B5-D2-I-55",
+        "de": "Các chất khí được thu vào bình theo đúng nguyên tắc bằng cách đẩy không khí (X, Y, Z) và đẩy nước (T) như sau: Nhận xét nào sau đây không đúng?",
+        "refs": [
+          {
+            "where": "DB-11-B5-D2-I-55.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B5-I-67",
+        "de": "Các chất khí được thu vào bình theo đúng nguyên tắc bằng cách đẩy không khí (X, Y, Z) và đẩy nước (T) như sau: Nhận xét nào sau đây không đúng?",
+        "refs": [
+          {
+            "where": "DH-11-C2-B5-I-67.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 926,
+    "hash": "a7d554899fc246f3df01f53c36716d273fa9f48e59d75c7946e3a51ae5295283",
+    "fileNguon": "anh/a7d554899fc246f3df01f53c36716d273fa9f48e59d75c7946e3a51ae5295283.png",
+    "canvas": [
+      440,
+      445
+    ],
+    "daMoNative": true,
+    "kind": "reflux-lab-5labels",
+    "labels": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5"
+    ],
+    "notes": "BìnhcầucổgiữagắnsinhhànTHẲNGđứngjacket2lớp,bêntráicó2portngang:portTRÊNlabel1arrowPHẢIđivàoport;portDƯỚIlabel2arrowTRÁIđirangoài(giữnguồnkhôngsửawaterflowtheolýthuyết). Trênsinhhàncómộtnắpvùngnhỏ.3leaderchỉvàoRODchéotừtrêntráixuyênquaadaptervàcổtráiflas xuốngtrongliquid;khôngscale/tênthermometerthêm.4leadergấpvuôngmũinhọnTRÁIchỉcổnhánhphảicầubịtadapter/stopper.5leaderngangmũinhọnTRÁIchỉvùngbểgia_nhiệtchữnhậtdướiflas. Trongflas mặtliquidgợnsóng,1stirbarhìnhchữnhậtnhỏởđáy;khôngngọnlửa/cầuchưngcấtngangphátminhthêm.",
+    "questions": [
+      {
+        "qid": "12-C1-B1-D3-I-58",
+        "de": "Phản ứng ester hoá được coi là một trong những phản ứng hoá học quan trọng trong công nghiệp. Các ester của acrylic acid có nhiều ứng dụng trong công nghiệp như để sản xuất lớp phủ và mực, chất kết dính, dệt may, nhựa và chất đàn hồi.\nTrong một phương pháp tổng hợp methyl acrylate, người ta đun hồi lưu acid và alcohol tương ứng với xúc tác là H₂SO₄. Trong một thí nghiệm điều chế ester này, người ta lắp đặt dụng cụ như ở hình 1. Các chất phản ứng được cho vào bình cầu 3 cổ (đặt trên máy khuấy từ - vị trí 5).\nCác vị trí còn lại (đánh số 1, 2, 3, 4) đang thiếu thông tin.\nTrong hình vẽ về thí nghiệm nói trên, chất phản ứng được đưa vào ở vị trí nào?",
+        "refs": [
+          {
+            "where": "12-C1-B1-D3-I-58.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "12-C1-B1-D3-I-59",
+        "de": "Phản ứng ester hoá được coi là một trong những phản ứng hoá học quan trọng trong công nghiệp. Các ester của acrylic acid có nhiều ứng dụng trong công nghiệp như để sản xuất lớp phủ và mực, chất kết dính, dệt may, nhựa và chất đàn hồi.\nTrong một phương pháp tổng hợp ethyl acrylate, người ta đun hồi lưu acid và alcohol tương ứng với xúc tác là H₂SO₄. Trong một thí nghiệm điều chế ester này, người ta lắp đặt dụng cụ như ở hình 1. Các chất phản ứng được cho vào bình cầu 3 cổ (đặt trên máy khuấy từ - vị trí 5).\nCác vị trí còn lại (đánh số 1, 2, 3, 4) đang thiếu thông tin.\nPhát biểu nào dưới đây là đúng khi nhận xét về đặc điểm của phản ứng giữa acrylic acid và ethyl alcohol?",
+        "refs": [
+          {
+            "where": "12-C1-B1-D3-I-59.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D2-I-44",
+        "de": "Phản ứng ester hoá được coi là một trong những phản ứng hoá học quan trọng trong công nghiệp. Các ester của acrylic acid có nhiều ứng dụng trong công nghiệp như để sản xuất lớp phủ và mực, chất kết dính, dệt may, nhựa và chất đàn hồi.\nTrong một phương pháp tổng hợp methyl acrylate, người ta đun hồi lưu acid và alcohol tương ứng với xúc tác là H₂SO₄. Trong một thí nghiệm điều chế ester này, người ta lắp đặt dụng cụ như ở hình 1. Các chất phản ứng được cho vào bình cầu 3 cổ (đặt trên máy khuấy từ - vị trí 5).\nCác vị trí còn lại (đánh số 1, 2, 3, 4) đang thiếu thông tin.\nTrong hình vẽ về thí nghiệm nói trên, chất phản ứng được đưa vào ở vị trí nào?",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D2-I-44.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D2-I-45",
+        "de": "Phản ứng ester hoá được coi là một trong những phản ứng hoá học quan trọng trong công nghiệp. Các ester của acrylic acid có nhiều ứng dụng trong công nghiệp như để sản xuất lớp phủ và mực, chất kết dính, dệt may, nhựa và chất đàn hồi.\nTrong một phương pháp tổng hợp ethyl acrylate, người ta đun hồi lưu acid và alcohol tương ứng với xúc tác là H₂SO₄. Trong một thí nghiệm điều chế ester này, người ta lắp đặt dụng cụ như ở hình 1. Các chất phản ứng được cho vào bình cầu 3 cổ (đặt trên máy khuấy từ - vị trí 5).\nCác vị trí còn lại (đánh số 1, 2, 3, 4) đang thiếu thông tin.\nPhát biểu nào dưới đây là đúng khi nhận xét về đặc điểm của phản ứng giữa acrylic acid và ethyl alcohol?",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D2-I-45.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "i": 1309,
+    "hash": "eccf27dc2a580c69eb29157c0c839617cdc3884a3fb103fd36b959f587810e54",
+    "fileNguon": "anh/eccf27dc2a580c69eb29157c0c839617cdc3884a3fb103fd36b959f587810e54.png",
+    "canvas": [
+      1216,
+      182
+    ],
+    "daMoNative": true,
+    "kind": "cellulose-nitration-chair-repeat",
+    "overArrow": "+ HNO₃ (đặc)/xt H₂SO₄ đặc, t°",
+    "underArrow": "− H₂O",
+    "notes": "2đơnvịchairglucopyranosepolymer,trái3OHtựdo(phảivẽđúngnốiCH₂OHtop-left/OHleft/OHlower-right),phảicùngchairthay3OHbằng3nitrateester:branchCH₂–ONO₂top-left,branchleftlabelO₂NO(terminalOởphảinốicarbon),branchlower-rightlabelONO₂. RingOphảivàglycosidicOngoàianomericCgiữNGUYÊNkhôngnitrate. LinkbêntráitừC4làdashedstubchainvàbênphảiquaOngoàivòngrồidashedstubchain;khôngfiniteSMILES/khôngtựđặtnngoặc. Native3OHchuyển3ONO₂nhưngarrowtextKHÔNGhệsố3HNO₃/3H₂Ogiữnhưsource,khôngtựcânbằng. NoHexplittrêncarbon,KHÔNGthêmH/sốC/labels.",
+    "questions": [
+      {
+        "qid": "DB-12-B6-D2-II-41",
+        "de": "Cellulose trinitrate là một hóa chất được sử dụng nhiều trong công nghiệp quốc phòng với mục đích chính là làm thuốc nổ. Phản ứng điều chế cellulose trinitrate từ cellulose và nitric acid (xúc tác H₂SO₄ đặc) như sau: Khi đốt cháy cellulose trinitrate bằng oxygen thu được sản phẩm cháy gồm CO₂, N₂ và H₂O.",
+        "refs": [
+          {
+            "where": "DB-12-B6-D2-II-41.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B7-D2-II-4",
+        "de": "Cellulose trinitrate là một hóa chất được sử dụng nhiều trong công nghiệp quốc phòng với mục đích chính là làm thuốc nổ. Phản ứng điều chế cellulose trinitrate từ cellulose và nitric acid (xúc tác H₂SO₄ đặc) như sau: Khi đốt cháy cellulose trinitrate bằng oxygen thu được sản phẩm cháy gồm CO₂, N₂ và H₂O.",
+        "refs": [
+          {
+            "where": "DH-12-C2-B7-D2-II-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ]
   }
 ]
