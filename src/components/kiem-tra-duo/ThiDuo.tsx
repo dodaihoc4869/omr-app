@@ -33,6 +33,9 @@ export interface ThiDuoProps {
   luu: { nhan: string; tt: 'da' | 'dang' | 'loi' | 'mang' }
   /** Câu đang xem, 1..tong. */
   cauHien: number
+  /** Đề (phần I, II, III theo thứ tự câu) + mã ca — ghép ra qid câu đang xem cho nhãn «đã làm đúng/sai» (03/11). Bài tập về nhà (không có `gio`) ⇒ không nhãn. */
+  bai?: { phanI: { qid: string }[]; phanII: { qid: string }[]; phanIII: { qid: string }[] } | null
+  maCa?: string
   onDenCau: (so: number) => void
   /** Phần của từng câu (1..tong). */
   phan: PhanThi[]
@@ -204,7 +207,7 @@ export default function ThiDuo(p: ThiDuoProps) {
       {p.gio && p.luot && <BaoGio gio={p.gio} luot={p.luot} />}
       {p.tren}
       <main className="duo-kt-than thi-noi-dung">
-        <NhanCauKt so={p.cauHien} tong={p.tong} phu={tenNhom(p.phan[p.cauHien - 1] ?? 'I')} />
+        <NhanCauKt so={p.cauHien} tong={p.tong} phu={tenNhom(p.phan[p.cauHien - 1] ?? 'I')} qid={p.gio && p.maCa && p.bai ? [...p.bai.phanI, ...p.bai.phanII, ...p.bai.phanIII][p.cauHien - 1]?.qid : undefined} tru={`thi|${p.maCa}`} />
         <GiamThiThi phan={p.phan[p.cauHien - 1] ?? 'I'} cauHien={p.cauHien} roi={p.roi} goc={goc} />
         {p.children}
       </main>

@@ -18,7 +18,7 @@ describe('hệ số cỡ chữ', () => {
 
 /** jsdom không dàn trang ⇒ giả bề rộng: mỗi ô rộng `o` px ở 2 cột, `2o` ở 1 cột; chữ cần `can` px × (cỡ / 19). */
 function dung(can: number[], o: number) {
-  document.body.innerHTML = `<div class="duo-tra" data-luoi><div class="ht2-lam-tn">${can.map(() => '<button class="ht2-lam-pa"><span class="ht2-lam-pa-chu">x</span></button>').join('')}</div></div>`
+  document.body.innerHTML = `<div class="duo-tra" data-luoi><div class="ht2-lam-tn">${can.map(() => '<button class="ht2-lam-pa"><span class="ht2-lam-pa-chu">CH3CH2CH(NH2)COOH.</span></button>').join('')}</div></div>`
   const khung = document.querySelector<HTMLElement>('.ht2-lam-tn')!
   const goc = window.getComputedStyle.bind(window)
   vi.spyOn(window, 'getComputedStyle').mockImplementation((e: Element) => {
@@ -33,6 +33,18 @@ function dung(can: number[], o: number) {
   })
   return { khung, chu }
 }
+
+describe('bỏ qua nhóm đáp án ngắn (không đo bố cục)', () => {
+  it('mọi đáp án < 7 ký tự liền / có dấu cách ⇒ không ghi kiểu nào, không đọc scrollWidth', () => {
+    document.body.innerHTML = '<div class="ht2-lam-tn"><span class="ht2-lam-pa-chu">6,8 gam.</span><span class="ht2-lam-pa-chu">12</span></div>'
+    const khung = document.querySelector<HTMLElement>('.ht2-lam-tn')!
+    const doc = vi.spyOn(HTMLElement.prototype, 'scrollWidth', 'get')
+    vuaPhuongAn(khung)
+    expect(doc).not.toHaveBeenCalled()
+    expect(khung.style.gridTemplateColumns).toBe('')
+    expect(khung.querySelector<HTMLElement>('.ht2-lam-pa-chu')!.style.overflowWrap).toBe('')
+  })
+})
 
 describe('vuaPhuongAn', () => {
   it('công thức vừa ô ⇒ không đổi gì', () => {

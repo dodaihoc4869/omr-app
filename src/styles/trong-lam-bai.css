@@ -1219,3 +1219,6 @@ html[data-trong='hs'] .duo-tren > .duo-thanh:not(:has(> .duo-doan)) > i { height
   html[data-trong='hs'] .duo-tren > .duo-thanh { max-width: 560px; }
   html[data-trong='hs'] .duo-day:not(.duo-ket) > .duo-giua > .duo-nut { width: min(100%, 340px); margin-inline: auto; }
 }
+
+/* Thẻ «Chọn cách làm» (TheChonCach.tsx, thầy 03/11): điện thoại dọc ẩn — giữ dải hai nút đáy (thầy 27/10); khổ rộng hiện ở styles/trong-chang-ngang.css (luật nặng hơn). */
+:root[data-trong] .duo-chon { display: none; }

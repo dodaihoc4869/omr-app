@@ -9,6 +9,7 @@
 // mặc định, lọc ra được. Cờ tắt ⇒ màn y như cũ.
 import ChuTheLoc, { tenTheLoc } from '../components/ChuTheLoc'
 import { useEffect, useMemo, useState } from 'react'
+import { napTruocCaThay, napTruocMotCa } from '../lib/nap-truoc-ca-thay'
 import { CheckSquare, RefreshCw, RotateCcw, Search, Square, Trash2, ChevronDown, ChevronRight, ClipboardList } from 'lucide-react'
 import { Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { THU_MUC_KHAC, gomCaTheoNamSinh } from '../lib/nam-sinh-ca'
@@ -57,6 +58,16 @@ function gioNgayHoa2(iso: string): string {
   return `${gioPhutVN(iso)} · ${n.slice(8, 10)}/${n.slice(5, 7)}`
 }
 
+/** Nạp sẵn mảnh màn theo dõi ca (ExamMonitorScreen + mảnh con) lúc rảnh — bấm ca là vẽ ngay, không chờ tải mảnh. */
+let daWarm = false
+function warmManTheoDoi(): void {
+  if (daWarm) return
+  daWarm = true
+  const ric = (window as Window & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }).requestIdleCallback
+  const lam = () => { void import('./ExamMonitorScreen').catch(() => { daWarm = false }) }
+  if (ric) ric(lam, { timeout: 3000 }); else setTimeout(lam, 1500)
+}
+
 export default function LichSuCaScreen() {
   const setScreen = useAppStore((s) => s.setScreen)
   const moChiTietCa = useAppStore((s) => s.moChiTietCa)
@@ -96,6 +107,7 @@ export default function LichSuCaScreen() {
       if (!mat.trim()) throw new Error('Chưa nhập mã bí mật — vào Cài đặt → Kết nối máy chủ')
       const ds = await danhSachCa(url.trim(), mat.trim(), xemDaXoa)
       setDsCa(ds)
+      if (!xemDaXoa) { napTruocCaThay(ds); warmManTheoDoi() } // TẢI SẴN ca gần đây + mảnh màn theo dõi (thầy 03/11 «bấm vào từng ca mãi mới vào được»)
       if (!xemDaXoa) datSo({ caMo: ds.filter((c) => c.loai !== 'baitap' && caConEmDangLam(c, gioMayChu())).length })
     } catch (e) {
       setLoi(e instanceof Error ? e.message : 'Lỗi không rõ')
@@ -553,7 +565,7 @@ export default function LichSuCaScreen() {
                   const moi = emTheoLop.get(c.lop.trim()) ?? 0
                   const bam = chonMode ? () => bat(c.maCa) : !xemDaXoa ? () => moChiTietCa(c.maCa) : undefined
                   return (
-                    <tr key={c.maCa} data-trang-thai={tt.ten} className={chonMode && tich ? 'gv2-dong-chon' : undefined}>
+                    <tr key={c.maCa} data-trang-thai={tt.ten} className={chonMode && tich ? 'gv2-dong-chon' : undefined} onPointerEnter={() => napTruocMotCa(c.maCa)} onTouchStart={() => napTruocMotCa(c.maCa)}>
                       {chonMode && (
                         <td>
                           {/* Trung tu 09/10: ô tích nằm trong nhãn 44×44 — chạm trúng dễ (B3) */}
@@ -643,6 +655,8 @@ export default function LichSuCaScreen() {
               return (
                 <div
                   key={c.maCa}
+                  onPointerEnter={() => napTruocMotCa(c.maCa)}
+                  onTouchStart={() => napTruocMotCa(c.maCa)}
                   onClick={chonMode ? () => bat(c.maCa) : (!xemDaXoa ? () => moChiTietCa(c.maCa) : undefined)}
                   // Hàng ca bấm được (chọn / mở chi tiết) ⇒ vai nút + bàn phím; ca đã xoá (chỉ xem) không bấm.
                   role={chonMode || !xemDaXoa ? 'button' : undefined}

@@ -119,11 +119,12 @@ function ChipChon({ chon, onClick, children }: { chon: boolean; onClick: () => v
 
 type BoRut = { ids: Set<string>; soCau: SoCauPhan; lenBang: boolean; idsChua?: Set<string>; deRieng?: boolean; phamViHoiLai?: 'gan_nhat' | 'ba_ca' | 'khong' | 'da_dung' }
 
-/** BỐN THẺ CÁCH RA ĐỀ (thầy chốt 21/10) — chọn theo MỤC ĐÍCH, một tầng. Tên giữ đúng tên thầy đã quen. */
+/** THẺ CÁCH RA ĐỀ (thầy chốt 21/10) — chọn theo MỤC ĐÍCH, một tầng. Tên giữ đúng tên thầy đã quen.
+ *  04/11 thầy «Bỏ phần ca thi kiểm tra điểm yếu»: BỎ thẻ «Kiểm tra điểm yếu» khỏi màn Mở ca. Ca cũ đã mở ở chế độ ấy vẫn chạy / xem / chấm nguyên
+ *  (`diem_yeu` còn trong KhoiRutDe, rut-de-v2, màn Theo dõi, Gọi lên bảng — chỉ không mở MỚI được). */
 const THE_CACH_RA_DE: { id: CheDoCa; ten: string; mota: string }[] = [
   { id: 'ca_lop', ten: 'Cả lớp cùng một đề', mota: 'Cùng bộ câu, điểm so được với nhau — lấy điểm, xếp hạng, báo phụ huynh.' },
   { id: 'rieng', ten: 'Đề riêng từng em', mota: 'Mỗi em một bộ câu, chống chép bài; có thể kèm câu chữa lỗi của chính em.' },
-  { id: 'diem_yeu', ten: 'Kiểm tra điểm yếu', mota: '15 phút đầu buổi chữa: câu em đã sai đến hạn, câu song sinh.' },
   { id: 'da_dung', ten: 'Kiểm chứng câu đã đúng', mota: 'Câu em đã tự làm đúng, đổi số — xem em có nắm thật không.' },
 ]
 

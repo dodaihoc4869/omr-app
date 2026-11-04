@@ -1,0 +1,38 @@
+# ĐẾM EM BỊ KẸT Ở KIỂM TRA ÔN TẬP VÌ CÂU TẠM GIỮ (CHỈ ĐỌC) — thầy 03/11: «Kiểm tra kĩ xem hôm qua bao nhiêu học sinh bị kẹt câu, ko nhất thiết phải ở chặng 5».
+# Trước #822, một câu của chặng đang giữ cho ca thi chưa công bố / đổi nguồn ⇒ lệnh mở chặng ném lỗi TRƯỚC khi ghi dòng chặng ⇒ chặng ấy KHÔNG có dòng
+# kiem_tra_ca_nhan_chang. Dấu hiệu nghi kẹt: em ĐÃ mở ≥ 1 chặng (có làm bài) nhưng bài vẫn còn chặng chưa mở. CHỈ in số đếm gộp — không mã em, tên em, mã câu (repo công khai).
+name: Đếm em kẹt câu tạm giữ ở Kiểm tra ôn tập (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/focused-ramanujan-fq23pk]
+    paths: ['.github/workflows/do-ktcn-cau-giu-0311.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-ktcn-cau-giu-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm (chỉ SELECT gộp)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c '.[0].results'; }
+          q "ca thi đang mở" "SELECT COUNT(*) n FROM ca WHERE trang_thai='mo'"
+          q "ca chưa công bố gần đây (giữ câu)" "SELECT COUNT(*) n FROM ca WHERE trang_thai<>'da_xoa' AND COALESCE(cong_bo,'')<>'ngay' AND COALESCE(NULLIF(bat_dau,''),cap_nhat_luc)>='2026-10-27'"
+          q "theo ngày từ 27/10: bài · số em · đã nộp · hết hạn · còn chặng chưa mở · NGHI KẸT (đã mở ≥1 chặng mà còn chặng chưa mở) · nghi kẹt hết hạn · số chặng chưa mở của em nghi kẹt" "WITH k AS (SELECT id,sbd,ngay,trang_thai,json_array_length(json,'\$.chang') so_chang,(SELECT COUNT(*) FROM kiem_tra_ca_nhan_chang c WHERE c.bai_id=kiem_tra_ca_nhan.id) da_mo FROM kiem_tra_ca_nhan WHERE ngay>='2026-10-27' AND trang_thai<>'cho_nguon') SELECT ngay,COUNT(*) bai,COUNT(DISTINCT sbd) em,SUM(trang_thai='da_nop') da_nop,SUM(trang_thai='het_han') het_han,SUM(da_mo<so_chang) con_chang_chua_mo,SUM(da_mo>=1 AND da_mo<so_chang) nghi_ket,SUM(da_mo>=1 AND da_mo<so_chang AND trang_thai='het_han') nghi_ket_het_han,SUM(CASE WHEN da_mo>=1 AND da_mo<so_chang THEN so_chang-da_mo ELSE 0 END) chang_chua_mo FROM k GROUP BY ngay ORDER BY ngay"
+          q "phân bố chặng chưa mở (02/11–03/11) theo số thứ tự chặng, chỉ em đã mở ≥1 chặng" "WITH k AS (SELECT id,json FROM kiem_tra_ca_nhan WHERE ngay IN('2026-11-02','2026-11-03') AND trang_thai<>'cho_nguon' AND (SELECT COUNT(*) FROM kiem_tra_ca_nhan_chang c WHERE c.bai_id=kiem_tra_ca_nhan.id)>=1) SELECT CAST(j.key AS INTEGER)+1 chang,COUNT(*) n FROM k,json_each(k.json,'\$.chang') j WHERE NOT EXISTS(SELECT 1 FROM kiem_tra_ca_nhan_chang c WHERE c.bai_id=k.id AND c.stt=CAST(j.key AS INTEGER)) GROUP BY chang ORDER BY chang"
+          q "chấm lại câu giữ (04/11): cờ đã chạy (số bài xét / số bài nâng điểm)" "SELECT gia_tri,cap_nhat_luc FROM cau_hinh WHERE khoa='ktcn_cham_lai_cau_giu_0411'"
+          q "chấm lại câu giữ: theo ngày · số bài · điểm cũ TB · điểm mới TB" "SELECT ngay,COUNT(*) n,ROUND(AVG(diem_cu),2) cu_tb,ROUND(AVG(diem_moi),2) moi_tb FROM ktcn_cham_lai GROUP BY ngay ORDER BY ngay"

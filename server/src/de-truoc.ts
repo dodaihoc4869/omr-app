@@ -56,11 +56,15 @@ export async function deTruoc(env: Env, b: Record<string, unknown>): Promise<Rec
   const maCa = String(b.maCa ?? '').trim(), sbd = String(b.sbd ?? '').trim()
   if (!maCa || !sbd || maCa.length > 64 || sbd.length > 40 || !env.DE || !env.MA_BI_MAT) return { ok: false, lyDo: 'thieu' }
   const ca = await env.DB.prepare(
-    `SELECT bank_r2, cap_nhat_luc FROM ca WHERE ma_ca = ?1 AND trang_thai = 'mo'
+    `SELECT bank_r2, cap_nhat_luc, bat_dau_thi_luc FROM ca WHERE ma_ca = ?1 AND trang_thai = 'mo'
        AND (EXISTS (SELECT 1 FROM phong_cho WHERE khoa = ?2) OR EXISTS (SELECT 1 FROM luot WHERE ma_ca = ?1 AND sbd = ?3))`,
-  ).bind(maCa, `${maCa}|${sbd}`, sbd).first<{ bank_r2: string | null; cap_nhat_luc: string | null }>()
+  ).bind(maCa, `${maCa}|${sbd}`, sbd).first<{ bank_r2: string | null; cap_nhat_luc: string | null; bat_dau_thi_luc?: string | null }>()
   if (!ca?.bank_r2) return { ok: false, lyDo: 'khong_tim_thay' }
+  // Lượt HỎI LẠI (có `phien`) sau giờ bắt đầu ⇒ báo máy em thôi hỏi (vào thi đã có `/de?phien=` lo phần còn lại).
+  if (typeof b.phien === 'string' && String(ca.bat_dau_thi_luc ?? '')) return { ok: false, lyDo: 'da_bat_dau' }
   const g = await goiDeCuaCa(env, maCa, ca.bank_r2, String(ca.cap_nhat_luc ?? ''))
+  // HỎI LẠI Ở PHÒNG CHỜ (04/11, src/lib/khoa-de-thi.ts `lamMoiSanPhongCho`): máy em gửi phiên bản gói đang giữ — không đổi ⇒ chỉ đáp `khongDoi` (không gửi lại gói).
+  if (g && typeof b.phien === 'string' && b.phien === g.phien) return { ok: true, khongDoi: true, phien: g.phien }
   return g ? { ok: true, ...g } : { ok: false, lyDo: 'chua_co_de' }
 }
 

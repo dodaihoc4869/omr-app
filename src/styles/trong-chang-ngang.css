@@ -15,7 +15,6 @@
  *   (đề, phương án thu lên trên dải — không bị dải phủ như trước).
  * Hàng lưới: 1 thanh trên · 2 viên chuỗi đúng (thưởng) · 3 cột phải = min(nội dung, chỗ còn lại) · 4 «Kiểm tra» / thẻ kết quả · 5 phần trống. ── */
 :root[data-trong] .duo-cuon { display: none; }
-:root[data-trong] .duo-chon { display: none; } /* điện thoại dọc: thẻ «Chọn cách làm» ẩn, giữ dải hai nút (thầy 27/10) — khổ rộng hiện ở dưới */
 
 @media (orientation: landscape) and (min-width: 640px), (min-width: 700px) and (min-aspect-ratio: 10/13) {
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) {
@@ -66,9 +65,9 @@
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong])[data-chon-cach] > .duo-day:not(.duo-ket) { display: none; }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong])[data-chon-cach] .duo-cot-tra { grid-row: 3 / -1; padding-top: 4px; }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon {
-    display: flex; flex-direction: column; gap: 12px; padding: 22px 20px 20px; border-radius: 28px; background: var(--kinh-ve, var(--tr-mat));
-    -webkit-backdrop-filter: var(--kinh-mo-ve); backdrop-filter: var(--kinh-mo-ve);
-    box-shadow: inset 0 1px 0 var(--kinh-vien, transparent), inset 0 0 0 1px var(--kinh-vien-2, var(--tr-vien)), var(--kinh-bong, none);
+    display: flex; flex-direction: column; gap: 12px; padding: 22px 20px 20px; border-radius: 28px; background: color-mix(in oklab, var(--tr-mat) 62%, transparent);
+    -webkit-backdrop-filter: blur(26px) saturate(170%); backdrop-filter: blur(26px) saturate(170%);
+    box-shadow: inset 0 1px 0 color-mix(in oklab, var(--tr-mat) 85%, transparent), inset 0 0 0 1px var(--tr-vien), 0 18px 40px -24px var(--tr-phu);
   }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-nhan { margin: 0; font-size: 12.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--tr-hs-chu); }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-tieu { margin: -4px 0 4px; font-size: 22px; font-weight: 800; line-height: 1.25; color: var(--tr-chu); }

@@ -151,7 +151,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:
   });day.current=p
   return p
  }
- const mo=async(i:number)=>{const lan=lanPhien.current;huyHenThuLai();setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-start',token,{id,chang:i});if(!conPhien(lan))return;const t=nhan(r);if(r.daChot){xoaKtcnDangLam(sbd);setCs([]);setStt(null);await guiNhapTre(i,Number(r.hanChang),t.serverNow);await tai();return}const questions=r.questions as Question[];setCs(questions);setStt(i);setTimeout(taiGoi,CHO_GOI_MS);setViTri(0);setHan(Number(r.hanChang));ghiKtcnDangLam(sbd,id,i,Number(r.hanChang));const a=r.tra as Record<string,string>;traRef.current=a;setTra(a);setLuu('Đã tải câu trả lời đã lưu');tuNop.current=false;lanThuLai.current=0
+ const mo=async(i:number)=>{const lan=lanPhien.current;huyHenThuLai();setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-start',token,{id,chang:i});if(!conPhien(lan))return;const t=nhan(r);if(r.daChot){xoaKtcnDangLam(sbd);setCs([]);setStt(null);await guiNhapTre(i,Number(r.hanChang),t.serverNow);await tai();return}const questions=r.questions as Question[];setCs(questions);setStt(i);setTimeout(taiGoi,CHO_GOI_MS);setViTri(0);setHan(Number(r.hanChang));ghiKtcnDangLam(sbd,id,i,Number(r.hanChang));const a=r.tra as Record<string,string>;traRef.current=a;setTra(a);setLuu(Number(r.soGiu)>0?`Đã tải câu trả lời đã lưu · ${Number(r.soGiu)} câu đang được giữ cho ca kiểm tra, không tính điểm`:'Đã tải câu trả lời đã lưu');tuNop.current=false;lanThuLai.current=0
   // Mở lại chặng (kể cả sau khi tắt app): TỰ nạp bản nháp trên máy vào đúng câu em đang làm rồi tự gửi — không còn nút «Khôi phục» (thầy 28/10).
   try{
    const vtLuu=Number(localStorage.getItem(`ktcn:vt:${sbd}:${id}:${i}`))
@@ -264,7 +264,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:
     {baoLoi}
     {mayBan&&!loi&&<p className="ktcn-ban" role="status">{CHU_MAY_CHU_BAN_EM}</p>}
     <div key={`d${q.qid}`} className="duo-cot-de">
-     <NhanCauKt so={viTri+1} tong={cs.length} phu={`Chặng ${stt+1}/${chang.length||stt+1}`}/>
+     <NhanCauKt so={viTri+1} tong={cs.length} phu={`Chặng ${stt+1}/${chang.length||stt+1}`} qid={q.qid} tru={`game|${id}`}/>
      <DeCau q={q} stt={viTri+1}/>
     </div>
     <ThanhCuon key={`cd${q.qid}`} cot="de"/>
@@ -378,7 +378,8 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:
     <div className="ktcn-loc" role="group" aria-label="Lọc câu">
      {([['tat-ca',`Tất cả · ${ket.cau.length}`],['on',`Cần ôn lại · ${kq.on}`],['trong',`Chưa trả lời · ${kq.trong}`],['dung',`Đúng · ${kq.dung}`]] as [Loc,string][]).filter(([k])=>k==='tat-ca'||(k==='on'?kq.on:k==='trong'?kq.trong:kq.dung)>0).map(([k,chu])=><button type="button" key={k} aria-pressed={loc===k} onClick={()=>setLoc(k)}>{chu}</button>)}
     </div>
-    <div className="ktcn-ds-cau">{cauLoc.map(({c,i})=><details className="ktcn-cau-kq" key={c.de.qid}><summary><span className="ktcn-chip" data-sac={c.dung?'xanh':c.tra?'vang':'xam'}>Câu {i+1}</span><span>{c.tra?c.dung?'Đúng':'Cần ôn lại':'Chưa trả lời'}</span></summary><TheCau {...propsCauHoc(c.de,i+1,c.tra,()=>{},{correct:c.dung,answer:c.dapAn,solution:c.loiGiai},true)} hoiThay={{qid:c.de.qid,nguon:'kiem_tra_ca_nhan'}}/></details>)}</div>
+    <section className="duo-kt-t4" data-tru={`game|${id}`} data-ds={ket.cau.filter(c=>c.tra).map(c=>`${c.de.qid}:${c.dung?1:0}`).join(',')} hidden/>
+    <div className="ktcn-ds-cau">{cauLoc.map(({c,i})=><details className="ktcn-cau-kq" key={c.de.qid}><summary><span className="ktcn-chip" data-sac={c.dung?'xanh':c.tra?'vang':'xam'}>Câu {i+1}</span><span>{c.tra?c.dung?'Đúng':'Cần ôn lại':'Chưa trả lời'}</span>{c.tra&&<span className="duo-kt-ls" data-qid={c.de.qid} data-tru={`game|${id}`} data-dung={c.dung?'1':'0'} hidden/>}</summary><TheCau {...propsCauHoc(c.de,i+1,c.tra,()=>{},{correct:c.dung,answer:c.dapAn,solution:c.loiGiai},true)} hoiThay={{qid:c.de.qid,nguon:'kiem_tra_ca_nhan'}}/></details>)}</div>
     <p className="ktcn-ch-ghi">Bấm từng câu để xem đáp án và lời giải.</p>
     <button type="button" className="ktcn-nut-chinh" onClick={()=>void ve()}>Về {tenTrangChinh()}</button>
    </div>

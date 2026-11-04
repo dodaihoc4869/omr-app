@@ -19,6 +19,7 @@ import { emLechDiem, loiBaoLechDiem } from '../lib/lech-diem'
 import { dongSoCauHoiLai } from '../lib/dem-cau-hoi-lai'
 import { maCaLay, vaBienBanCu } from '../lib/va-bien-ban-cu'
 import { khoChiVuaMotBo, sinhBoTheoEm, TEN_MUC_PHAN_TANG } from '../lib/de-rieng-blueprint'
+import { layCaNapTruoc } from '../lib/nap-truoc-ca-thay'
 import { docCheDoDeRieng, docDeRiengCa, docSoCauCa, loadScriptUrl, loadSessionTeacherBank, luuDeRiengCa, luuSoCauCa, saveSessionTeacherBank, loadTeacherSecret, type BienBanDeRieng, type DeRiengCaLuu } from '../lib/exam-db'
 import { loiKhongTimThayCa } from '../lib/cau-chu-ca'
 import { CHU_LY_DO_THIEU } from '../lib/de-rieng'
@@ -47,6 +48,7 @@ import ThanhTabCa, { type MucTabCa } from '../components/ThanhTabCa'
 import { demCauDaLam, tongSoCauCa } from '../lib/con-lai-ca'
 import './ca-thi-m3.css'
 // CA THI 28/09 (docs/ban-ve-ca-thi-2809): đầu màn Theo dõi, màn Kết thúc ca, Báo cáo chi tiết — THAY khối gập BaoCaoCaLop + trang BaoCaoMotEm cũ.
+import { layLichSuCaEm } from '../lib/ho-so-em-thay'
 import TheoDoiCa, { type EmTheoDoi } from '../components/ca-thi/TheoDoiCa'
 import { demConTrongGio, xepCauChuaCa } from '../lib/chieu-chua-ca'
 import { dungToChuaCa } from '../components/ca-thi/dung-to-chua-ca'
@@ -424,7 +426,9 @@ export default function ExamMonitorScreen() {
   }, [])
 
   useEffect(() => {
-    if (!chiTiet) {
+    // Danh sách «gợi ý ca» chỉ cần khi KHÔNG đang mở một ca cụ thể (ô nhập mã) hoặc ca vừa báo không tìm thấy — trước đây MỌI lần bấm vào ca đều gọi thêm `danhSachCa`
+    // song song với `chiTietCa` (một lệnh nặng chen vào đúng lúc thầy đang chờ).
+    if (!chiTiet && (!maCaTheoDoi || loi)) {
       Promise.all([loadScriptUrl(), loadTeacherSecret()])
         .then(([u, m]) => {
           if (u.trim() && m.trim()) {
@@ -439,7 +443,7 @@ export default function ExamMonitorScreen() {
         })
         .catch(() => {})
     }
-  }, [chiTiet, scriptUrl, secret])
+  }, [chiTiet, scriptUrl, secret, loi]) // eslint-disable-line react-hooks/exhaustive-deps -- maCaTheoDoi chỉ đọc lúc chạy
 
   /** Đang có một lượt tải chạy (tay hoặc nền): lượt NỀN không chồng lên (kế hoạch giờ cao điểm 21/09 — không gọi chồng). */
   const dangTaiRef = useRef(false)
@@ -463,7 +467,12 @@ export default function ExamMonitorScreen() {
       // không chấm lại, không xuất bảng điểm, không tải phiếu được. Lệnh đã đòi
       // mã bí mật nên không mở rộng quyền cho ai.
       const banksCu = await loadSessionTeacherBank(ma.trim())
-      const ct = await chiTietCa(url, mat, ma.trim(), !banksCu)
+      // TẢI SẴN (src/lib/nap-truoc-ca-thay.ts, thầy 03/11): màn «Ca kiểm tra» đã xin sẵn chi tiết + ngân hàng có đáp án lúc rảnh ⇒ vẽ NGAY bản ấy (≤ 90 s), rồi làm mới
+      // ngầm; dùng được khi máy đã có ngân hàng (cũ hoặc vừa cất) hoặc bản tải sẵn mang `keyBank`.
+      const sanCo = !imLang ? layCaNapTruoc(ma.trim()) : null
+      const dungSan = !!sanCo && (!!banksCu || !!sanCo.ct.keyBank)
+      const ct = dungSan ? sanCo!.ct : await chiTietCa(url, mat, ma.trim(), !banksCu)
+      if (dungSan && sanCo!.tuoiMs > 5_000) setTimeout(() => { void tai(ma, true) }, 0)
       setChiTiet(ct)
       let bank = banksCu
       if (!bank && ct.keyBank && (ct.keyBank.phanI.length || ct.keyBank.phanII.length || ct.keyBank.phanIII.length)) {
@@ -1210,6 +1219,7 @@ export default function ExamMonitorScreen() {
       let daLamLaiTheoEm: Record<string, Record<string, string>> | undefined
       let bacTheoEm: Record<string, Record<string, string>> | undefined
       let banDoDaDung: { daDung: Record<string, Record<string, string>>; demDaDung: Record<string, Record<string, [number, number]>> } | undefined
+      let loiV2 = ''
       if (caCanDeRieng) {
         // ĐÚNG NHỮNG EM TRONG PHÒNG CHỜ — không ∪ cả lớp đăng ký (vá 19/09). Bản 17/09
         // gộp thêm mọi em cùng lớp: em vắng cũng chiếm một suất chia vòng tròn, nên
@@ -1241,7 +1251,7 @@ export default function ExamMonitorScreen() {
             demSai = {}
             banDoDaDung = dd.banDoDaDung
             bienBan = dd.bienBan as unknown as BienBanDeRieng
-            await luuDeRiengCa(chiTiet.ca.maCa, dd.boTheoEm, {}, {}, bienBan)
+            void luuDeRiengCa(chiTiet.ca.maCa, dd.boTheoEm, {}, {}, bienBan).catch(() => showToast('Chưa lưu được bản sao đề riêng trên máy này.', 'warn'))
             setRutThuDaDung(docRutThuDaDung(chiTiet.ca.maCa) ?? null)
             if (dd.soEmRutThem > 0) showToast(`Đã rút thêm bộ câu cho ${dd.soEmRutThem} em vào phòng sau lượt chạy thử.`, 'success')
             if (dd.soCauNoiThem > 0) showToast(`Đã nối ${dd.soCauNoiThem} câu (câu thay và câu em đã làm đúng nằm ngoài kho ca) vào đề ca này.`, 'success')
@@ -1261,14 +1271,15 @@ export default function ExamMonitorScreen() {
             bacTheoEm = v2.bacTheoEm
             bienBan = v2.bienBan as unknown as BienBanDeRieng
             demSai = {}
-            await luuDeRiengCa(chiTiet.ca.maCa, v2.boTheoEm, {}, v2.lapTheoEm, bienBan)
+            void luuDeRiengCa(chiTiet.ca.maCa, v2.boTheoEm, {}, v2.lapTheoEm, bienBan).catch(() => showToast('Chưa lưu được bản sao đề riêng trên máy này.', 'warn'))
             setRutThu(docRutThu(chiTiet.ca.maCa) ?? null)
             if (v2.soEmCapNhat > 0) showToast(`Đã cập nhật đề của ${v2.soEmCapNhat} em theo bài các em vừa làm.`, 'success')
             if (v2.soEmRutThem > 0) showToast(`Đã rút thêm bộ câu cho ${v2.soEmRutThem} em vào phòng sau lượt chạy thử.`, 'success')
             if (v2.soCauNoiThem > 0) showToast(`Đã nối ${v2.soCauNoiThem} câu ngoài kho (câu sai cũ, câu song sinh) vào đề ca này.`, 'success')
             for (const c of v2.canhBao) showToast(c, 'warn')
           } catch (e) {
-            showToast(`Chưa rút được theo cách mới (${e instanceof Error ? e.message : 'lỗi không rõ'}) — app rút theo cách cũ.`, 'warn')
+            loiV2 = (e instanceof Error ? e.message : 'lỗi không rõ').slice(0, 200)
+            showToast(`Chưa rút được theo cách mới (${loiV2}) — app rút theo cách cũ.`, 'warn')
           }
         }
         if (!boTheoEm) {
@@ -1294,11 +1305,13 @@ export default function ExamMonitorScreen() {
             songSinhTheoEm: ra.songSinhTheoEm,
             ghiChu: ra.ghiChu,
             ...(Object.keys(ra.daLamLaiTheoEm).length > 0 ? { daLamLaiTheoEm: ra.daLamLaiTheoEm } : {}),
+            // 04/11: đi đường cũ vì cách mới LỖI ⇒ ghi lý do lên biên bản (máy chủ giữ) — đo chỉ đọc biết ngay vì sao (.github/workflows/do-rut-de-0411.yml).
+            ...(loiV2 ? ({ loiV2 } as Record<string, string>) : {}),
             lucRut: new Date().toISOString(),
           }
           daLamLaiTheoEm = ra.daLamLaiTheoEm
           demSai = ra.lapCua
-          await luuDeRiengCa(chiTiet.ca.maCa, ra.boTheoEm, ra.lapCua, ra.lapTheoEm, bienBan)
+          void luuDeRiengCa(chiTiet.ca.maCa, ra.boTheoEm, ra.lapCua, ra.lapTheoEm, bienBan).catch(() => showToast('Chưa lưu được bản sao đề riêng trên máy này.', 'warn'))
           const tongSongSinh = Object.values(ra.songSinhTheoEm ?? {}).reduce((s, a) => s + (a?.length ?? 0), 0)
           if (tongSongSinh > 0) showToast(`Đã sinh ${tongSongSinh} câu song sinh cùng dạng đổi số chống học vẹt.`, 'success')
           if (ra.cauNoiThem.soCau > 0) showToast(`Đã kéo ${ra.cauNoiThem.soCau} câu em từng sai từ kho vào đề ca này.`, 'success')
@@ -1986,6 +1999,7 @@ export default function ExamMonitorScreen() {
             <TheoDoiCa
               tenCa={tenHienCua(chiTiet.ca.tenCa, chiTiet.ca.maCa)}
               maCa={chiTiet.ca.maCa}
+              layLichSu={layLichSuCaEm}
               link={`${location.origin}${import.meta.env.BASE_URL}t/${chiTiet.ca.maCa}`}
               daChepLink={daCopy}
               onChepLink={copyLink}
@@ -2336,13 +2350,13 @@ export default function ExamMonitorScreen() {
                         )}
                       </span>
                       <span className="ca-o ca-o-gian">
-                          {daNop && l.soLanRoiMan > 0 && <Nhan tone="cam">rời màn {l.soLanRoiMan} lần / {l.tongGiayRoiMan}s</Nhan>}
+                          {daNop && l.soLanRoiMan > 0 && <Nhan tone="cam" wrap>rời màn {l.soLanRoiMan} lần / {l.tongGiayRoiMan}s</Nhan>}
                           {!daNop && l.soLanRoiMan > 0 && <span className="ca-gian-so">{l.tongGiayRoiMan}s ngoài màn</span>}
                           {/* GIỮ ĐỂ ĐỌC (GIUDEDOC mục 4F): hai con số, KHÔNG tô
                               đỏ, KHÔNG gọi là vi phạm. Nhả tay là chuyện bình
                               thường; nhưng đề tắt 20 phút trong ca 50 phút là
                               điều thầy nên nhìn. */}
-                          {chuTatDe(l.integrity) && <Nhan tone="xam">{chuTatDe(l.integrity)}</Nhan>}
+                          {chuTatDe(l.integrity) && <Nhan tone="xam" wrap>{chuTatDe(l.integrity)}</Nhan>}
                           {l.soLanRoiMan === 0 && !chuTatDe(l.integrity) && <span className="ca-khong" aria-label="Không có cảnh báo">—</span>}
                       </span>
                       <span className="ca-hd">

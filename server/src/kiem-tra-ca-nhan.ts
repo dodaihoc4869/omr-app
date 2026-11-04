@@ -57,6 +57,8 @@ export async function coKtCn(env: Env): Promise<boolean> {
 }
 export const duTraKt = (phan: string, a: string) => phan === 'I' ? /^[ABCD]$/.test(a) : phan === 'II' ? /^[DS]{4}$/.test(a) : a.trim().length > 0 && a.length <= 100
 const dungKt = (q: PrivateQuestion, a: string) => q.phan === 'III' ? khopPhanIII(a, q.correct) : grade(q, a)
+/** Điểm bài trên đúng tập câu `cau` (tử + mẫu cùng tập) — một công thức cho chốt bài và chấm lại. */
+const diemBaiKt = (cau: readonly CauDe[], t: Record<string, string>) => diemTo7(cau.reduce((n,c)=>n+diemGoi7(c.q.phan,t[c.q.qid]??'',c.q.correct,dungKt(c.q,t[c.q.qid]??'')),0),cau.reduce((n,c)=>n+(c.q.phan==='II'?1:0.25),0))
 // Lịch/báo cáo chỉ lấy số ở D1, không tải hàng trăm bản đề riêng chứa nội dung/đáp án lên Worker.
 // Lịch/báo cáo chỉ lấy SỐ, không tải đề riêng chứa nội dung/đáp án lên Worker. KHẨN 13/10 (D1 quá tải, mã 7429): bản cũ bóc JSON đề
 // lớn ngay trong SQL (json_each lồng nhau + NOT IN tương quan) ≈ 0,9 s MỖI dòng ⇒ mỗi lần em mở app, phụ huynh xem, thầy mở bảng là D1 xếp hàng.
@@ -213,13 +215,19 @@ async function docBai(env: Env, sbd: string, id: string) {
   if (!r) throw new Error('Bài kiểm tra này không thuộc lớp hiện tại của em.')
   return r
 }
-async function kiemNguon(env: Env, sbd: string, cs: readonly CauDe[]) {
+/** CÂU TẠM GIỮ của bài (03/11 — em kẹt «Một câu của bài đang đổi nguồn hoặc được giữ cho ca kiểm tra» lúc còn 2 giờ 47 tới hạn 24:00, chặng 5 không mở được):
+ *  trước đây MỘT câu không còn mở được (đang giữ cho ca thi chưa công bố, đổi phiên bản / bỏ khỏi kho, nằm trong BTVN chưa nộp, bị chặn) là KHOÁ CẢ CHẶNG + khoá
+ *  cả phần xem kết quả. Nay trả TẬP câu tạm giữ: câu ấy không gửi xuống máy (không lộ đề / đáp án câu đang bảo vệ), các câu còn lại em làm bình thường; lúc chốt,
+ *  câu tạm giữ mà em CHƯA trả lời không tính vào điểm (cả tử lẫn mẫu). Chỉ «việc học đang tạm dừng» vẫn chặn. */
+async function kiemNguon(env: Env, sbd: string, cs: readonly CauDe[]): Promise<Set<string>> {
   const [baoVe, scope, btvn, khoi] = await Promise.all([protectedQuestions(env),readGameScope(env,sbd),docCauBtvnChuaNop(env,sbd),docKhoiEm(env,sbd)])
   if (!scope.enabled) throw new Error('Việc học đang tạm dừng.')
   // Đề đã lập: câu bị nghi đáp án SAU lúc lập vẫn giữ (`ktcn_cu`), không thì cả chặng chứa câu không mở được (lỗi em báo 19/10 "ko làm đc chặng 4").
   const qua = new Set((await chanKhacKhoiEm(env,'ktcn_cu',{sbd,khoiEm:khoi},cs.map(c=>c.q))).map(q=>q.qid))
   const refs = await Promise.all(cs.map(c=>docCauTheoRef(env,c.q)))
-  for (let i=0;i<cs.length;i++) { const q=cs[i]!.q, current=refs[i]; if (!current?.reviewed || current.version!==q.version || !qua.has(q.qid) || baoVe.has(q.qid) || baoVe.has(q.group) || btvn.has(q.qid) || scope.blocked.includes(q.qid) || scope.types.length && (!q.dang || !scope.types.includes(q.dang))) throw new Error('Một câu của bài đang đổi nguồn hoặc được giữ cho ca kiểm tra. Thầy sẽ xử lý; kết quả đã lưu của em được giữ.') }
+  const giu = new Set<string>()
+  for (let i=0;i<cs.length;i++) { const q=cs[i]!.q, current=refs[i]; if (!current?.reviewed || current.version!==q.version || !qua.has(q.qid) || baoVe.has(q.qid) || baoVe.has(q.group) || btvn.has(q.qid) || scope.blocked.includes(q.qid) || scope.types.length && (!q.dang || !scope.types.includes(q.dang))) giu.add(q.qid) }
+  return giu
 }
 
 const XEM_CHUA_MS = 12 * 3_600_000
@@ -245,8 +253,12 @@ async function trongXemChua12h(env: Env, r: Row, d: ReturnType<typeof de>): Prom
 
 /** Chốt một lần, ghi sổ có receipt ổn định; retry/cron có thể hồi phục sau khi ghi sổ lỗi. */
 export async function chotKtCn(env: Env, r: Row, now: number, hetHan = false) {
+  // câu tạm giữ (kiemNguon) mà em CHƯA trả lời ⇒ không tính điểm (em không được nhận câu ấy). Lỗi đọc ⇒ tính như cũ.
+  // Chỉ soi câu CHƯA trả lời (câu đã trả lời luôn tính) ⇒ nộp đủ câu (thường gặp) không thêm lượt đọc nào.
+  const chuaTra=r.nop_luc?[]:de(r).cau.filter(c=>!duTraKt(c.q.phan,tra(r)[c.q.qid]??''))
+  const giuChot=chuaTra.length?await kiemNguon(env,s(r.sbd),chuaTra).catch(()=>new Set<string>()):new Set<string>()
   for(let lan=0;!r.nop_luc&&lan<4;lan++) {
-    const d=de(r), t=tra(r), diem=diemTo7(d.cau.reduce((n,c)=>n+diemGoi7(c.q.phan,t[c.q.qid]??'',c.q.correct,dungKt(c.q,t[c.q.qid]??'')),0),d.cau.reduce((n,c)=>n+(c.q.phan==='II'?1:0.25),0))
+    const d0=de(r), t=tra(r), d={...d0,cau:d0.cau.filter(c=>!giuChot.has(c.q.qid)||duTraKt(c.q.phan,t[c.q.qid]??''))}, diem=diemBaiKt(d.cau,t)
     // Chốt đúng phiên bản nháp đã chấm; một lượt lưu chen vào phải khiến chấm lại, không lệch điểm với sổ.
     await env.DB.prepare(`UPDATE kiem_tra_ca_nhan SET nop_luc=?,diem=?,trang_thai=?,cap_nhat_luc=? WHERE id=? AND nop_luc IS NULL AND revision=?`).bind(Math.min(now,Number(r.han_luc)),diem,hetHan?'het_han':'da_nop',now,r.id,r.revision).run()
     r=(await env.DB.prepare('SELECT * FROM kiem_tra_ca_nhan WHERE id=?').bind(r.id).first<Row>())!
@@ -306,7 +318,7 @@ export async function ktCnAction(env: Env, sbd: string, action: string, b: Row, 
   const ch=d.chang[stt]!, cs=d.cau.filter(c=>ch.qids.includes(c.q.qid))
   let row=await env.DB.prepare('SELECT * FROM kiem_tra_ca_nhan_chang WHERE bai_id=? AND stt=?').bind(r.id,stt).first<Row>()
   if (action==='hoc-tap-ktcn-start') {
-    await kiemNguon(env,sbd,cs)
+    const giu=await kiemNguon(env,sbd,cs), csMo=cs.filter(c=>!giu.has(c.q.qid))
     // KHÔNG KHOÁ CHẶNG VÌ "VỪA XEM PHẦN CHỮA" (lỗi 17–18/10 — thầy 19/10 gửi ảnh "Em vừa xem phần chữa… quay lại sau ít nhất 12 giờ" lúc còn 1 giờ 37 phút tới hạn
     // 24:00, và "Không cho làm chặng 3"): từ 16/10 mỗi câu nộp ở bài thường cũng ghi `loi_giai_hoi` (nguồn 'goi7:sau_nop' — game-v2.ts) ⇒ đề kiểm tra có câu em
     // vừa làm trong 12 giờ là chặng bị khoá, kể cả chặng ĐÃ MỞ, tới hạn thì chốt 0 câu. Nay em luôn mở/làm tiếp được; câu em xem phần chữa trong 12 giờ trước
@@ -315,7 +327,9 @@ export async function ktCnAction(env: Env, sbd: string, action: string, b: Row, 
     row=await env.DB.prepare('SELECT * FROM kiem_tra_ca_nhan_chang WHERE bai_id=? AND stt=?').bind(r.id,stt).first<Row>()
     if (!row) throw new Error('Em hoàn thành chặng đang mở trước nhé.')
     if (now>=Number(row.han)&&!row.chot_luc) { await env.DB.prepare('UPDATE kiem_tra_ca_nhan_chang SET chot_luc=han WHERE bai_id=? AND stt=? AND chot_luc IS NULL').bind(r.id,stt).run(); row.chot_luc=row.han }
-    return {ok:true,kiemTra:tomTatKt(r,now),revision:Number(r.revision),chang:stt,hanChang:Number(row.han),daChot:!!row.chot_luc,questions:cs.map(c=>publicQuestion(c.q)),tra:Object.fromEntries(ch.qids.map(id=>[id,tra(r)[id]??'']))}
+    // CẢ chặng đều là câu tạm giữ ⇒ KHÔNG báo lỗi (thầy 03/11 «bỏ hẳn lỗi kiểu này»): chặng tự chốt rỗng, em đi tiếp; câu giữ chưa trả lời không tính điểm (chotKtCn).
+    if (!csMo.length&&!row.chot_luc) { const c=Math.min(now,Number(row.han)); await env.DB.prepare('UPDATE kiem_tra_ca_nhan_chang SET chot_luc=? WHERE bai_id=? AND stt=? AND chot_luc IS NULL').bind(c,r.id,stt).run(); row.chot_luc=c }
+    return {ok:true,kiemTra:tomTatKt(r,now),revision:Number(r.revision),chang:stt,hanChang:Number(row.han),daChot:!!row.chot_luc,questions:csMo.map(c=>publicQuestion(c.q)),tra:Object.fromEntries(csMo.map(c=>[c.q.qid,tra(r)[c.q.qid]??''])),...(giu.size?{soGiu:giu.size}:{})}
   }
   if (!row) throw new Error('Em mở chặng trước khi lưu bài.')
   if (action!=='hoc-tap-ktcn-luu'&&action!=='hoc-tap-ktcn-chot-chang') throw new Error('Lệnh kiểm tra chưa có.')
@@ -349,8 +363,10 @@ export async function ktCnAction(env: Env, sbd: string, action: string, b: Row, 
 }
 
 async function ketQuaKt(env: Env, r: Row, now: number) {
-  const d=de(r), t=tra(r)
-  await kiemNguon(env,s(r.sbd),d.cau)
+  const d0=de(r), t=tra(r)
+  // câu TẠM GIỮ (đang bảo vệ cho ca thi chưa công bố, đổi nguồn…): KHÔNG hiện đề / đáp án / lời giải trong phần chữa — lộ đáp án câu đang bảo vệ là cấm (03/11)
+  const giu=await kiemNguon(env,s(r.sbd),d0.cau)
+  const d={...d0,cau:d0.cau.filter(c=>!giu.has(c.q.qid))}
   // Phần chữa tới SAU receipt nộp: không để hai dấu giờ cùng mili giây phủ nhận lượt tự làm vừa chốt.
   const xemLuc=Math.max(now,Number(r.nop_luc)+1)
   await env.DB.prepare('INSERT OR IGNORE INTO loi_giai_hoi(sbd,qid,luc) SELECT ?,value,? FROM json_each(?)').bind(r.sbd,new Date(xemLuc).toISOString(),JSON.stringify(d.cau.map(c=>c.q.qid))).run()
@@ -368,11 +384,52 @@ async function ketQuaKt(env: Env, r: Row, now: number) {
   return {bai,daGhiSo:Number(r.da_ghi)===1,cau:d.cau.map(c=>({de:publicQuestion(c.q),tra:t[c.q.qid]??'',dung:dungKt(c.q,t[c.q.qid]??''),dapAn:c.q.correct,loiGiai:c.q.solution})),chu:'Kết quả lần này; khả năng nhớ lâu được kiểm chứng tiếp trong lịch học.'}
 }
 
+let daChamLai0411=false
+const KHOA_CHAM_LAI_0411='ktcn_cham_lai_cau_giu_0411'
+/** CHẤM LẠI BÀI BỊ KẸT CÂU TẠM GIỮ (thầy 04/11 «Cho phép đẩy luôn ko hỏi lại»). Trước #822, chặng chứa một câu đang giữ cho ca thi / đổi nguồn KHÔNG MỞ
+ *  ĐƯỢC (lệnh mở ném lỗi trước khi ghi dòng chặng) ⇒ cả chặng tính 0 câu. Chỉ chấm lại bài 28/10–03/11 đã chốt mà: em đã mở ≥ 1 chặng VÀ có chặng chưa từng
+ *  mở chứa câu HIỆN VẪN đang giữ (kiemNguon) — khẳng định được là kẹt; câu chưa trả lời của chặng ấy bỏ khỏi cả tử lẫn mẫu (như chốt bài mới). Chỉ NÂNG
+ *  điểm, không bao giờ hạ. Điểm cũ ghi bảng `ktcn_cham_lai` (lùi: đặt lại diem = diem_cu theo bảng này); sổ học không đổi. Xong ghi cờ cau_hinh. */
+export async function chamLaiCauGiu0411(env: Env, now: number) {
+  if (await env.DB.prepare('SELECT 1 FROM cau_hinh WHERE khoa=?').bind(KHOA_CHAM_LAI_0411).first()) { daChamLai0411=true; return null }
+  await env.DB.prepare('CREATE TABLE IF NOT EXISTS ktcn_cham_lai (id TEXT PRIMARY KEY, sbd TEXT NOT NULL, ngay TEXT NOT NULL, diem_cu REAL, diem_moi REAL NOT NULL, chang_bo TEXT NOT NULL, ly_do TEXT NOT NULL, luc TEXT NOT NULL)').run()
+  const [bai,chang]=await Promise.all([
+    env.DB.prepare(`SELECT k.* FROM kiem_tra_ca_nhan k WHERE k.ngay BETWEEN '2026-10-28' AND '2026-11-03' AND k.nop_luc IS NOT NULL AND k.trang_thai<>'cho_nguon' AND (SELECT COUNT(*) FROM kiem_tra_ca_nhan_chang c WHERE c.bai_id=k.id) BETWEEN 1 AND json_array_length(k.json,'$.chang')-1`).all<Row>(),
+    env.DB.prepare(`SELECT c.bai_id,c.stt FROM kiem_tra_ca_nhan_chang c JOIN kiem_tra_ca_nhan k ON k.id=c.bai_id WHERE k.ngay BETWEEN '2026-10-28' AND '2026-11-03' AND k.nop_luc IS NOT NULL`).all<Row>(),
+  ])
+  const daMo=new Map<string,Set<number>>()
+  for(const c of chang.results)(daMo.get(s(c.bai_id))??daMo.set(s(c.bai_id),new Set()).get(s(c.bai_id))!).add(Number(c.stt))
+  let soBai=0
+  for(const r of bai.results){
+    const d=de(r), t=tra(r), mo=daMo.get(s(r.id))??new Set<number>(), bo=new Set<string>(), changBo:number[]=[]
+    for(let i=0;i<d.chang.length;i++){
+      if(mo.has(i))continue
+      const cs=d.cau.filter(c=>d.chang[i]!.qids.includes(c.q.qid))
+      if(!(await kiemNguon(env,s(r.sbd),cs)).size)continue
+      changBo.push(i+1); for(const c of cs)if(!duTraKt(c.q.phan,t[c.q.qid]??''))bo.add(c.q.qid)
+    }
+    if(!bo.size)continue
+    const con=d.cau.filter(c=>!bo.has(c.q.qid)), moi=con.length?diemBaiKt(con,t):null, cu=r.diem==null?null:Number(r.diem)
+    if(moi==null||cu!=null&&moi<=cu)continue
+    await env.DB.batch([
+      env.DB.prepare('INSERT OR IGNORE INTO ktcn_cham_lai(id,sbd,ngay,diem_cu,diem_moi,chang_bo,ly_do,luc) VALUES(?,?,?,?,?,?,?,?)').bind(r.id,r.sbd,r.ngay,cu,moi,JSON.stringify(changBo),'chặng có câu tạm giữ cho ca thi không mở được (lỗi trước #822)',new Date(now).toISOString()),
+      env.DB.prepare('UPDATE kiem_tra_ca_nhan SET diem=?,cap_nhat_luc=? WHERE id=? AND nop_luc IS NOT NULL AND diem IS ?').bind(moi,now,r.id,cu),
+    ])
+    soBai++
+  }
+  await env.DB.prepare('INSERT OR IGNORE INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES(?,?,?)').bind(KHOA_CHAM_LAI_0411,JSON.stringify({xong:true,xet:bai.results.length,soBai}),new Date(now).toISOString()).run()
+  daChamLai0411=true
+  console.log('[ktcn] chấm lại câu giữ',JSON.stringify({xet:bai.results.length,soBai}))
+  return {xet:bai.results.length,soBai}
+}
+
 export async function dongBoKtCn(env: Env, now: number, tran=2,dungKhung2026=true,chuanBiKhiTat=false) {
   const bat=await coKtCn(env)
   if (!bat&&!chuanBiKhiTat) return {soEm:0,soMoi:0}
   await damBaoKtCn(env)
   if (await env.DB.prepare("SELECT 1 FROM ca WHERE trang_thai='mo' LIMIT 1").first()) return {soEm:0,soMoi:0,hoan:true}
+  // Chấm lại MỘT LẦN các bài em bị kẹt câu tạm giữ (thầy cho phép 04/11) — chỉ trong Worker (có kho R2 để biết câu đang giữ), ngoài giờ học tối. Lỗi ⇒ thử lại phút sau.
+  if ((env as {DE?:unknown}).DE && !daChamLai0411 && new Date(now+7*3600000).getUTCHours()<18) await chamLaiCauGiu0411(env,now).catch(e=>console.error('[ktcn] chấm lại câu giữ',e))
   await buMetaKt(env,10)
   const cfg=JSON.parse((await docCauHinhDem(env,'kiem_tra_ca_nhan_v1'))??'{}'),batLuc=Date.parse(s(cfg.batLuc))||0
   const het=bat?await env.DB.prepare(`SELECT * FROM kiem_tra_ca_nhan WHERE trang_thai<>'cho_nguon' AND ((nop_luc IS NULL AND han_luc<=? AND han_luc>? AND ngay NOT IN(${SQL_DS_BAO_TRI})) OR (nop_luc IS NOT NULL AND da_ghi=0)) ORDER BY han_luc LIMIT ?`).bind(now,batLuc,tran).all<Row>():{results:[] as Row[]}

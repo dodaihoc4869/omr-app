@@ -90,6 +90,27 @@ describe('đề + đáp án tải sẵn ở phòng chờ, chìa trao lúc vào t
     expect(k2.phanI.map((c: Any) => c.id)).toEqual(['q1', 'q2', 'q9'])
   })
 
+  it('04/11 HỎI LẠI Ở PHÒNG CHỜ: gửi phiên bản đang giữ ⇒ không đổi chỉ một dòng; thầy nối câu ⇒ gói mới (vẫn mã hoá); đã bắt đầu ⇒ «da_bat_dau» (thôi hỏi)', async () => {
+    const { d, env, r2 } = await dung()
+    await goi(env, '/vao-thi', { maCa: 'C1', sbd: '10001', idThietBi: 'm1' })
+    const g = (await goi(env, '/de-truoc', { maCa: 'C1', sbd: '10001' })).j
+    const lai = await goi(env, '/de-truoc', { maCa: 'C1', sbd: '10001', phien: g.phien })
+    expect(lai.j).toMatchObject({ ok: true, khongDoi: true, phien: g.phien })
+    expect(lai.txt.length).toBeLessThan(120)
+    const MOI = { ...BANK, phanI: [...BANK.phanI, { id: 'q9', text: 'Câu nối thêm', choices: ['a', 'b', 'c', 'd'] }] }
+    await r2.put('de/C1.json', JSON.stringify(MOI))
+    d.sql.prepare("UPDATE ca SET cap_nhat_luc = ? WHERE ma_ca = 'C1'").run(new Date(Date.now() + 1000).toISOString())
+    const moi = await goi(env, '/de-truoc', { maCa: 'C1', sbd: '10001', phien: g.phien })
+    expect(moi.j.ok).toBe(true)
+    expect(moi.j.khongDoi).toBeUndefined()
+    expect(moi.j.phien).not.toBe(g.phien)
+    expect(moi.txt).not.toMatch(/Câu nối thêm|choices/) // gói mới vẫn chỉ là chuỗi mã hoá
+    d.sql.prepare("UPDATE ca SET bat_dau_thi_luc = ? WHERE ma_ca = 'C1'").run(new Date().toISOString())
+    expect((await goi(env, '/de-truoc', { maCa: 'C1', sbd: '10001', phien: moi.j.phien })).j).toMatchObject({ ok: false, lyDo: 'da_bat_dau' })
+    // lần tải ĐẦU (không phiên bản) sau giờ bắt đầu vẫn nhận gói như cũ (em vào muộn)
+    expect((await goi(env, '/de-truoc', { maCa: 'C1', sbd: '10001' })).j.ok).toBe(true)
+  })
+
   it('gói tờ đáp án đã khoá tải được ngay từ phòng chờ (chưa có lượt); em ngoài phòng ⇒ không', async () => {
     const { env } = await dung()
     expect((await goi(env, '/khoa-de', { maCa: 'C1', sbd: '10001' })).j.ok).toBe(false)

@@ -33,6 +33,7 @@ import { docDsQid, docNamKtChoLop, type NamKtCauMayChu } from './ho-so-len-bang'
 import { tenLopCuaEm } from './ten-lop'
 import { docTrangThaiCongBo, dongChuaCongBo, laSanSangCongBo } from './cong-bo-diem'
 import { chamLuotTuNganHang } from './cham-lai-ca'
+import { SQL_DAU_KHOA } from './bai-bo-sung'
 import { docKeyBankDem, ghiKeyBank } from './dem-ca-thi'
 import { chiaGoiDe, dungGoiDe } from './khoa-de-thi'
 import { buSoCauChoKeyBank, hopNhatKeyBank } from './key-bank-hop-nhat'
@@ -1336,7 +1337,8 @@ export async function khoaCa(env: Env, b: Record<string, unknown>): Promise<Reco
   if (!maCa) return { ok: false, error: 'Thiếu mã ca' }
   const nay = NAY()
   const r = await env.DB.batch([
-    env.DB.prepare("UPDATE luot SET trang_thai = 'da_nop', nop_luc = COALESCE(NULLIF(nop_luc,''), ?), cap_nhat_luc = ? WHERE ma_ca = ? AND trang_thai = 'dang_lam'").bind(nay, nay, maCa),
+    // Dấu «thầy kết thúc ca đóng hộ» (bai-bo-sung.ts SQL_DAU_KHOA): bài máy em gửi tới trong 90 giây sau được nhận thẳng + chấm lại, không thành bài bổ sung chờ duyệt.
+    env.DB.prepare(`UPDATE luot SET trang_thai = 'da_nop', ${SQL_DAU_KHOA}, nop_luc = COALESCE(NULLIF(nop_luc,''), ?), cap_nhat_luc = ? WHERE ma_ca = ? AND trang_thai = 'dang_lam'`).bind(nay, nay, maCa),
     env.DB.prepare("UPDATE ca SET trang_thai = 'dong', cap_nhat_luc = ? WHERE ma_ca = ?").bind(nay, maCa),
   ])
   xoaDemCaBaoVe(); xoaDemPhongCho(env) // HẠ TẢI D1 (Boss 22/09): khoá ca ⇒ bỏ đệm `protectedQuestions` ngay

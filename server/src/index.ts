@@ -2,6 +2,7 @@ import { docPhongChoDongThoi, xoaDemPhongCho } from './phong-cho-dong-thoi'
 import { lamSachThanLoi, loiBanTheoDuong, thanTuLoiNem } from './loi-may-chu'
 import { khoiPhucChienDich0810 } from './khoi-phuc-chien-dich-0810'
 import { nhipCa } from './nhip-ca'
+import { hsLichSuQid, gvLichSuCaEm } from './lich-su-qid'
 import { anhCo, anhDay, layAnh } from './kho-anh'
 import { ghiDoLenh, heSoGoiNen, nhipDeNghi, sucKhoeMay, tenLenh } from './suc-khoe-may'
 import { emCoGhi, keHoachCoDem } from './dem-ke-hoach'
@@ -63,7 +64,7 @@ import {chamBuCa, cronChamBu} from './cham-bu'
 import {kiemChamCa} from './kiem-cham'
 import {phucHoiKeyCa} from './key-bank-bo-sung'
 import {buSoCauChoKeyBank, hopNhatKeyBank} from './key-bank-hop-nhat'
-import { catBaiBoSung, dsBaiBoSung, xuLyBaiBoSung } from './bai-bo-sung'
+import { nhanSauKhoaHoacBoSung, SQL_DAU_KHOA, dsBaiBoSung, xuLyBaiBoSung } from './bai-bo-sung'
 import { mom, LoiChamMom } from './mom'
 import { luyenDe } from './luyen-de'
 import {adminGame} from './game-v2-reports'
@@ -75,15 +76,7 @@ import { napPhienNhanh } from './cham-nhanh'
 import { dongBoCacTo, xoaDemCaBaoVe, xoaDemSync } from './game-v2-bank'
 import { gameToken, gameIdentity, gameSbdDaKy } from './game-v2-auth'
 import { phanTichGianLanBtvn, type ThiThatBaseline, type ThongTinHocSinhBtvn } from './gian-lan-btvn'
-// MÁY CHỦ MỚI — bốn lệnh nóng lúc thi (MAY-CHU-MOI.md).
-//
-// BA LUẬT KHÔNG ĐƯỢC PHÁ:
-//   1. Mỗi endpoint dùng 1–3 câu truy vấn. Trần D1 miễn phí là 50 câu một lượt
-//      gọi Worker, và vòng lặp truy vấn theo số em là đường chắc chắn chạm trần.
-//   2. Gói đề KHÔNG nằm trong D1 (trần 2 MB một dòng, kho thầy đã 2,1 MB) —
-//      nằm ở R2, D1 chỉ giữ khoá đối tượng.
-//   3. Lệnh của HỌC SINH không đòi mã bí mật (giống Apps Script hiện nay);
-//      lệnh của THẦY thì đòi. Không nới luật này ở bất kỳ đâu.
+// docs/luat-lenh-nong.md
 import { CA_DO_TAI, TRANG_DO_TAI } from './do-tai'
 import { chotBatDau, lapBoChoEmVaoMuon, loiDenHan } from './rut-de-v2'
 import { cauDaDung, lapBoDaDungChoEmVaoMuon } from './cau-da-dung'
@@ -646,7 +639,7 @@ async function nop(env: Env, b: Record<string, unknown>): Promise<Response> {
       ...dk.tham,
       ...(chan ? [maCa] : []),
     )
-  const docLuot = () => env.DB.prepare(`SELECT het_gio_luc, trang_thai, nop_luc, khoa, ma_ca, sbd, lan_thu, dap_an_json FROM luot WHERE ${dk.sql}`).bind(...dk.tham)
+  const docLuot = () => env.DB.prepare(`SELECT het_gio_luc, trang_thai, nop_luc, khoa, ma_ca, sbd, lan_thu, dap_an_json, integrity_json FROM luot WHERE ${dk.sql}`).bind(...dk.tham)
   // Tờ đáp án (ca công bố ngay) tải SONG SONG với vòng D1 khi isolate đã biết ca này công bố ngay; quyết định trả hay không vẫn theo
   // `cong_bo` đọc trong chính batch dưới đây.
   const keySom = maCa && env.DE && doanCongBoNgay(maCa) ? docKeyBankDem(env, maCa).catch(() => null) : null
@@ -682,10 +675,8 @@ async function nop(env: Env, b: Record<string, unknown>): Promise<Response> {
     // chuyện thường, báo đỏ ở đây là em tưởng mất bài và nộp lại lần nữa.
     const da = sau
     if (da && (da.trang_thai === 'da_nop' || da.trang_thai === 'khoa')) {
-      // 01/10: lượt đã đóng (máy chủ chốt hộ / thầy khoá) mà máy em gửi tới bài KHÁC ⇒ cất làm BÀI BỔ SUNG chờ thầy duyệt,
-      // không vứt đi như trước (ca 313224: ba em mất mọi câu làm sau khi máy ngừng liên lạc).
-      const d = da as DongLuot & { khoa?: string; ma_ca?: string; sbd?: string; lan_thu?: number; dap_an_json?: unknown }
-      const boSung = d.khoa ? await catBaiBoSung(env, { khoa: d.khoa, ma_ca: String(d.ma_ca ?? ''), sbd: String(d.sbd ?? ''), lan_thu: Number(d.lan_thu) || 1, dap_an_json: d.dap_an_json }, b.dapAn, b.giayCau) : 0
+      // Lượt đã đóng: thầy vừa kết thúc ca (≤ 90 giây) ⇒ nhận thẳng + chấm lại; không ⇒ bài bổ sung chờ duyệt (bai-bo-sung.ts, 01/10 ca 313224).
+      const { boSung } = await nhanSauKhoaHoacBoSung(env, da as never, b)
       return raCoKeyBank({ ok: true, daNhan: true, nopLuc: da.nop_luc, ...(boSung > 0 ? { boSung } : {}) }, await congBo())
     }
     return ra({ ok: false, lyDo: 'khong_tim_thay' })
@@ -1423,7 +1414,7 @@ async function suaCa(env: Env, b: Record<string, unknown>): Promise<Response> {
     const ghi = String(b.ghiChu ?? '') || `thầy khoá ca ${nay.slice(11, 16)}Z, nộp phần đã làm`
     const r = await env.DB.prepare(
       `UPDATE luot
-          SET trang_thai = 'da_nop',
+          SET trang_thai = 'da_nop', ${SQL_DAU_KHOA},
               nop_luc = ?,
               ghi_chu = CASE WHEN ghi_chu IS NULL OR ghi_chu = '' THEN ? ELSE ghi_chu || ' · ' || ? END,
               cap_nhat_luc = ?
@@ -3772,6 +3763,7 @@ const boXuLy = {
       if (p === '/hs/lich-su') return ra(await G.hsLichSuCa(env, b))
       if (p === '/hs/cau-sai') return ra(await G.hsCauSai(env, b))
       if (p === '/hs/cau-da-thi') return ra(await G.hsCauDaThi(env, b))
+      if (p === '/hs/lich-su-qid') return ra(await hsLichSuQid(env, b))
       if (p === '/hs/than-thu') return ra(await G.thanThuDoc(env, b))
       if (p === '/hs/than-thu-ghi') return ra(await G.thanThuGhi(env, b))
       if (p === '/hs/btvn') return ra(await G.hsBtvn(env, b))
@@ -4002,6 +3994,7 @@ const boXuLy = {
       if (p === '/ke-hoach/hom-nay-thay') return ra(await homNayThay(env, b))
       // Kế hoạch hôm nay của MỘT em cho màn Học sinh của thầy: CHỈ ĐỌC (không lập kế hoạch, không capNhatExp) để không nuốt `expNhan` của em.
       if (p === '/gv/ke-hoach-em') return ra(await gvKeHoachEm(envDoc, b))
+      if (p === '/gv/lich-su-ca-em') return ra(await gvLichSuCaEm(envDoc, b))
       // HÔM NAY v2 (docs/hop-dong-hom-nay-v2-2109.md): MỘT lệnh GHI (cảnh báo em chưa nộp — chỉ thầy bấm mới gửi).
       if (p === '/gv/canh-bao-nop-bai') return ra(await guiCanhBao(env, b))
       if (p === '/gv/nhac-tu-dong') return ra(await gvNhacTuDong(env, b))

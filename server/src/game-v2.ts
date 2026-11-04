@@ -532,7 +532,8 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     const tuLuan=await qidTuLuanTrongLuot(env,session.questions,await docKhoiEm(env,sbd))
     for(const q of await qidThuHoiTrongLuot(env,sbd,session))tuLuan.add(q) // THU HỒI KHI HUỶ (06/10): câu của chiến dịch đã huỷ không trả lại cho em làm nốt (lượt không cờ ⇒ rỗng, không truy vấn)
     // 29/09: câu THẬT SỰ đổi đề/đáp án (hoặc bị rút) giữa lượt ⇒ BỎ câu ấy khỏi lượt trả về như câu tự luận (em làm nốt các câu còn lại, `complete` cũng không đòi) — em không kẹt.
-    for(const ref of session.questions){if(tuLuan.has(ref.qid))continue;const q=await docCauTheoRef(env,ref);if(!q||laCauTuLuan(q))continue;if(blocked.has(q.qid)||blocked.has(q.group))throw new Error('Lượt cũ có câu đang bảo vệ. Em mở lượt mới.');const qx=apXaoTheoRef(q,ref);riengQ.push(qx);qs.push(publicQuestion(qx))} // 05/10: bản xáo phát lại y hệt lúc phát
+    // 03/11 (thầy «bỏ hẳn lỗi kiểu này»): câu vừa bị GIỮ CHO CA THI giữa lượt cũng BỎ như vậy (không xuống máy) — trước: ném «Lượt cũ có câu đang bảo vệ. Em mở lượt mới.»
+    for(const ref of session.questions){if(tuLuan.has(ref.qid))continue;const q=await docCauTheoRef(env,ref);if(!q||laCauTuLuan(q))continue;if(blocked.has(q.qid)||blocked.has(q.group))continue;const qx=apXaoTheoRef(q,ref);riengQ.push(qx);qs.push(publicQuestion(qx))} // 05/10: bản xáo phát lại y hệt lúc phát
     if(!qs.length)return {ok:true,questions:[]}
     if((session as {hocTap?:number}).hocTap===1)await ganNiemChoCau(env,sbd,qs as unknown as Record<string,unknown>[],riengQ,(session as {hoa2?:number}).hoa2===1) // TEM NIÊM PHONG (niem-cau.ts): phiên học tập mở lại vẫn có dòng 1 tức thì
     const rows=await env.DB.prepare('SELECT json FROM game_v2_attempt WHERE session=? AND sbd=? ORDER BY created_at').bind(row.id,sbd).all<{json:string}>()
@@ -572,7 +573,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     // 06/10: câu CHẨN ĐOÁN bước sai (chan-doan-buoc-sai.ts) đứng thay chỗ một câu lỗi ĐÃ qua phạm vi lúc phát — không xét lại dạng (câu nền không mang dạng của kho).
     const laCD=laQidChanDoan(qid)
     if(control.types.length&&!laCD&&(!q.dang||!control.types.includes(q.dang)))throw new Error('Thầy vừa đổi phạm vi luyện. Em mở lượt mới.')
-    if(blocked.has(q.qid)||blocked.has(q.group))throw new Error('Câu đang được dùng cho ca thi. Em mở lượt học khác; câu này không bị tính sai.')
+    if(blocked.has(q.qid)||blocked.has(q.group))throw new Error('Câu này vừa được giữ cho ca kiểm tra. Em bấm Tải lại để làm tiếp các câu còn lại; câu này không bị tính sai.')
     // Hậu xử lý có thể chạy lại từ receipt nếu lần nộp trước dừng giữa chừng.
     // Gói R 15/10: sổ học là VIỆC PHỤ sau phản hồi (`ctx.waitUntil`) ⇒ ghi THẲNG D1 gốc (vẫn qua rào cổng đóng băng `RAO_GHI` như mọi lệnh ghi của lượt), không
     // xếp hàng chung với đường trả lời — trước: lệnh ghi sổ vào hàng ghi của bản gộp đọc ⇒ lượt đọc EXP còn lại của phản hồi phải chờ nó (một đợt D1). Phần còn lại
@@ -749,6 +750,8 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     // 29/09: câu chưa làm mà nay đã đổi đề/đáp án hoặc bị rút (máy em đã tự bỏ qua) cũng không bị đòi — chỉ tra khi còn thiếu, nên lượt đủ câu không tốn thêm truy vấn.
     const daLam=new Set(done.map(x=>x.attempt.qid))
     for(const ref of session.questions)if(!tuLuan.has(ref.qid)&&!daLam.has(ref.qid)&&!await docCauTheoRef(env,ref))tuLuan.add(ref.qid)
+    // 03/11 (thầy «bỏ hẳn lỗi kiểu này»): câu chưa làm mà nay đang giữ cho ca thi / bị chặn (resume đã bỏ, answer từ chối) cũng không bị đòi — chỉ tra khi còn thiếu.
+    if(session.questions.some(x=>!tuLuan.has(x.qid)&&!daLam.has(x.qid))){const bv=await protectedQuestions(env),ct=await readGameScope(env,sbd);for(const ref of session.questions){if(tuLuan.has(ref.qid)||daLam.has(ref.qid))continue;const q=await docCauTheoRef(env,ref);if(q&&(bv.has(q.qid)||bv.has(q.group)||ct.blocked.includes(q.qid)))tuLuan.add(ref.qid)}}
     if(done.filter(x=>!tuLuan.has(x.attempt.qid)).length!==session.questions.filter(x=>!tuLuan.has(x.qid)).length)throw new Error('Em cần hoàn thành các câu trong lượt.')
     // Tối ưu 05/10: mọi lệnh đánh dấu nhiệm vụ xong (trước: mỗi dạng một đợt nối tiếp) + đọc lại hồ sơ (trước: đợt riêng ở cuối) trong MỘT lô —
     // D1 chạy lô tuần tự trong một giao dịch ⇒ hồ sơ đọc được SAU các lệnh ghi, như cũ. Nhả chỗ (bảng `giu_cho`, không đụng hồ sơ) vẫn chạy sau, như cũ.
