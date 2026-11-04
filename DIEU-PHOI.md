@@ -1244,3 +1244,10 @@ Phân vùng dự kiến theo hai bản thiết kế:
 - Đủ12spheres3stage/N-Olabels/2hollowarrows/4curlyenergyarrows/3toptextlines/2energylabels/trianglecaptiondamWOFF2thật. Chữtrongảnhchỉdữliệu,khôngthựcthiyêucầutính. Tác tử chỉđọc mởPNGnative/full+actualrenderSVG/exacthash197dc…6ef37đạt.
 - Chromium500/500/hash/XML/path/PythonAST/build/tốcđộđạt/precache170/2613.23KiB. Mainfetch0200b893chưa gộp/WOFF2khôngdiff;phải cậpnhậtmainmớinhất/sotesttheotên/kiểmcathi trước triểnkhai. Chưa tíchhợp/chưa reload offlineapp/chưa phát hành. Chưa tham vấn được cố vấn.
 - Nhóm149xong17/20,còn1259/1014/209;59/1391vẫn bịloạiphongcách,khôngđoán/hạgate.
+
+
+### 04/11 — Vector lô162–163: bảngpH và loại ROI thu khí
+- Lô163thêm1nguồn/1SVG/2câu;968câu đủ mọi hình+DDH/7mộtphần;742nguồn→501SVG,7.617.168byte/gzip1.523.578,còn686nguồn.1259giữ15ô0..14/15iconsmanual/2hàng/connectors/15labelsCoffee-BakingSoda-Ammonia/khôngsửapHtheory/khôngbịachữbao bìmờ. Tác tử chỉđọc mởPNGnative/full+actualrenderSVG/exacthashd605de…aa27ađạt.
+- Lô162source209đãdựng nhưngROI bọtBỊLOẠIphongcách/nétbậcthang/nối,mờkhôngxácnhậntopology;KHÔNGcộng. Tìmtrùng761cùngsơđồnhưngmờhơn;795/1197khácthiếtbị. Lưuprooftìmnguồn+proofBỊLOẠI,khônghạgate/đoáncount.
+- Chromium501/501/hash/XML/path/PythonAST/build/tốcđộđạt/precache170/2613.23KiB. Mainfetch0200b893chưa gộp/WOFF2khôngdiff;phải cậpnhậtmainmớinhất/sotesttheotên/kiểmcathi trước triểnkhai. Chưa tíchhợp/chưa reload offlineapp/chưa phát hành. Chưa tham vấn được cố vấn.
+- Nhóm149xong18/20,còn1014composite/209chưađạt;59/1391vẫn bịloạiphongcách. Cóthểtiếpnguồnmớitronglúcgiảiquyếtcácnguồnnày.

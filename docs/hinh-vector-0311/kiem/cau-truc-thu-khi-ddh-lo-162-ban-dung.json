@@ -1,0 +1,403 @@
+[
+  {
+    "i": 209,
+    "hash": "2355c03a95e76f8ef52accefc3999b9befc7abf29244b64c6afcf6887bcbd876",
+    "fileNguon": "anh/2355c03a95e76f8ef52accefc3999b9befc7abf29244b64c6afcf6887bcbd876.png",
+    "canvas": [
+      706,
+      161
+    ],
+    "daMoNative": true,
+    "kind": "gas-collection-three-methods",
+    "captions": [
+      "Cách 1",
+      "Cách 2",
+      "Cách 3"
+    ],
+    "labels": [
+      "nước"
+    ],
+    "notes": "3panelngang.Cách1testtubeÚPđóngđầutrên,cổngdưới,ốnggasdoublelineLđitừtráidướisaugấpuplêntớigầnđầutrêntrongtube;outsidearrow→từtráivàongangống.Cách2testtubeĐỨNGđóngđáy,miệngtrên,ốnggasdoublelinebẻ90°từtráitrênđixuốnggầnđáy,arrow→ởcổng.Cách3testtubeÚPngâmtrongbểwater,hướnggasốngchéotừtráitrênxuốngbểrồiUđilêntrongreceiver,bọttròntrongtube,labelnướcleaderchỉliquidbathphải;arrowchéoxuốngphảivàotube. KhônggánX/Y/Z/Thoặctênkhí/answers. GiữCách1/2/3đầudướimỗipanel/nướcchỉbểpanel3.",
+    "questions": [
+      {
+        "qid": "DB-11-B5-D1-I-18",
+        "de": "Các chất khí điều chế trong phòng thí nghiệm thường được thu theo phương pháp đẩy không khí (cách 1, cách 2) hoặc đẩy nước (cách 3) như các hình vẽ dưới đây: Có thể dùng cách nào trong 3 cách trên để thu khí ammonia?",
+        "refs": [
+          {
+            "where": "DB-11-B5-D1-I-18.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B5-VD-I-2",
+        "de": "Các chất khí điều chế trong phòng thí nghiệm thường được thu theo phương pháp đẩy không khí (cách 1, cách 2) hoặc đẩy nước (cách 3) như các hình vẽ dưới đây: Có thể dùng cách nào trong 3 cách trên để thu khí ammonia?",
+        "refs": [
+          {
+            "where": "DH-11-C2-B5-VD-I-2.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B5-I-73",
+        "de": "Các chất khí điều chế trong phòng thí nghiệm thường được thu theo phương pháp đẩy không khí (cách 1, cách 2) hoặc đẩy nước (cách 3) như các hình vẽ dưới đây: Có thể dùng cách nào trong 3 cách trên để thu khí ammonia?",
+        "refs": [
+          {
+            "where": "DH-11-C2-B5-I-73.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry155": {
+      "canvas": [
+        706,
+        161
+      ],
+      "method1": {
+        "tubeOuterApprox": [
+          [
+            76,
+            98
+          ],
+          [
+            76,
+            17
+          ],
+          [
+            79,
+            9
+          ],
+          [
+            84,
+            7
+          ],
+          [
+            90,
+            10
+          ],
+          [
+            92,
+            17
+          ],
+          [
+            92,
+            98
+          ]
+        ],
+        "gasDoublePath": [
+          [
+            [
+              33,
+              104
+            ],
+            [
+              73,
+              104
+            ],
+            [
+              80,
+              99
+            ],
+            [
+              81,
+              15
+            ]
+          ],
+          [
+            [
+              33,
+              108
+            ],
+            [
+              76,
+              108
+            ],
+            [
+              86,
+              101
+            ],
+            [
+              86,
+              15
+            ]
+          ]
+        ],
+        "gasArrow": {
+          "tail": [
+            0,
+            105
+          ],
+          "head": [
+            27,
+            105
+          ]
+        },
+        "caption": [
+          "Cách 1",
+          [
+            61,
+            149
+          ]
+        ]
+      },
+      "method2": {
+        "tubeOuterApprox": [
+          [
+            349,
+            20
+          ],
+          [
+            349,
+            103
+          ],
+          [
+            351,
+            111
+          ],
+          [
+            356,
+            114
+          ],
+          [
+            362,
+            111
+          ],
+          [
+            364,
+            103
+          ],
+          [
+            364,
+            20
+          ]
+        ],
+        "gasDoublePath": [
+          [
+            [
+              313,
+              9
+            ],
+            [
+              344,
+              9
+            ],
+            [
+              352,
+              14
+            ],
+            [
+              354,
+              23
+            ],
+            [
+              354,
+              106
+            ]
+          ],
+          [
+            [
+              313,
+              13
+            ],
+            [
+              341,
+              13
+            ],
+            [
+              348,
+              18
+            ],
+            [
+              350,
+              23
+            ],
+            [
+              350,
+              106
+            ]
+          ]
+        ],
+        "gasArrow": {
+          "tail": [
+            276,
+            11
+          ],
+          "head": [
+            306,
+            11
+          ]
+        },
+        "caption": [
+          "Cách 2",
+          [
+            338,
+            149
+          ]
+        ]
+      },
+      "method3": {
+        "tubeOuterApprox": [
+          [
+            587,
+            112
+          ],
+          [
+            587,
+            45
+          ],
+          [
+            590,
+            39
+          ],
+          [
+            594,
+            38
+          ],
+          [
+            599,
+            43
+          ],
+          [
+            600,
+            112
+          ]
+        ],
+        "internalWaterY": 67,
+        "bathOutline": [
+          [
+            532,
+            74
+          ],
+          [
+            632,
+            74
+          ],
+          [
+            632,
+            115
+          ],
+          [
+            629,
+            123
+          ],
+          [
+            536,
+            123
+          ],
+          [
+            532,
+            118
+          ],
+          [
+            532,
+            74
+          ]
+        ],
+        "bathWaterY": 99,
+        "gasDoublePath": [
+          [
+            [
+              539,
+              32
+            ],
+            [
+              564,
+              43
+            ],
+            [
+              571,
+              64
+            ],
+            [
+              585,
+              115
+            ],
+            [
+              591,
+              118
+            ]
+          ],
+          [
+            [
+              539,
+              36
+            ],
+            [
+              561,
+              46
+            ],
+            [
+              567,
+              65
+            ],
+            [
+              581,
+              116
+            ],
+            [
+              586,
+              120
+            ],
+            [
+              594,
+              119
+            ]
+          ]
+        ],
+        "gasArrow": {
+          "tail": [
+            507,
+            23
+          ],
+          "head": [
+            532,
+            33
+          ]
+        },
+        "caption": [
+          "Cách 3",
+          [
+            587,
+            149
+          ]
+        ],
+        "waterLabel": {
+          "text": "nước",
+          "at": [
+            684,
+            120
+          ],
+          "leader": [
+            [
+              664,
+              118
+            ],
+            [
+              618,
+              107
+            ]
+          ]
+        },
+        "bubbles": "nhiềuvòngnhỏmờtrongtube3chồngwaterdash;khôngchốtsốbubblesvìcópixelnhập"
+      },
+      "allText": [
+        "Cách 1",
+        "Cách 2",
+        "Cách 3",
+        "nước"
+      ]
+    },
+    "criticalGeometry": "1tubeÚP/2tubeĐỨNG/3tubeÚPwater;2ống1/2supplypipeđigầnđầuđóngtrongreceiverkhácnhau,mọiheadarrowngoàigascổnggiữnguồn. Khônglấypanel1197Tđổingượccaptionqua3methodnay.",
+    "diagnosticMethod3": "/workspace/scratch/gas209-3-bubbles6x.png",
+    "svg": "thu-khi-ddh-412dfbc21867d93b9ab2b298c374172e9e8f0056ccc514344e39e4f967331849.svg",
+    "hashSvg": "412dfbc21867d93b9ab2b298c374172e9e8f0056ccc514344e39e4f967331849",
+    "byteSvg": 18373,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "bi-loai-phong-cach",
+    "ghiChuDung": "3method/doublewalltubes/3inputarrows/3captions/nước+leader;ROI588..599,72..112giữbiênmựcnguồnngưỡngcốđịnh128/làmtròngóc khôngđoánsốbubble,CHƯAđượcxemđạtphongcáchtrướcsoátđộclập.",
+    "lyDoBiLoai": "ROI bọt dạng ôvuông/bậcthang khôngđạtphongcách,khôngthểxácnhậntopologytừnguồnmờ;proofthu-khi-lo-162-bi-loai.json.761cùngthiếtbịmờhơn,khôngđượcbịacount."
+  }
+]

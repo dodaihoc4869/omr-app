@@ -1,0 +1,88 @@
+{
+  "i": 209,
+  "hash": "2355c03a95e76f8ef52accefc3999b9befc7abf29244b64c6afcf6887bcbd876",
+  "nguoiDoc": "cau_truc_4",
+  "ketQua": "Chưa tìm thấy nguồn cùng sơ đồ rõ hơn đủ chứng cứ để chốt count/contour bubble. Không đoán.",
+  "sameSourceRefs": [
+    {
+      "qid": "DB-11-B5-D1-I-18",
+      "maDe": "DB-11-B5-D1",
+      "de": "Các chất khí điều chế trong phòng thí nghiệm thường được thu theo phương pháp đẩy không khí (cách 1, cách 2) hoặc đẩy nước (cách 3) như các hình vẽ dưới đây: Có thể dùng cách nào trong 3 cách trên để thu khí ammonia?",
+      "hinh": [
+        {
+          "hash": "2355c03a95e76f8ef52accefc3999b9befc7abf29244b64c6afcf6887bcbd876",
+          "where": "DB-11-B5-D1-I-18.hinh.0.du_lieu",
+          "hashDataUrl": "870f7effb763f87307dd24c80884ef1c3e3b2e687f0f1fc3464b2d4d882d304a"
+        }
+      ]
+    },
+    {
+      "qid": "DH-11-C2-B5-VD-I-2",
+      "maDe": "DH-11-C2-B5-VD",
+      "de": "Các chất khí điều chế trong phòng thí nghiệm thường được thu theo phương pháp đẩy không khí (cách 1, cách 2) hoặc đẩy nước (cách 3) như các hình vẽ dưới đây: Có thể dùng cách nào trong 3 cách trên để thu khí ammonia?",
+      "hinh": [
+        {
+          "hash": "2355c03a95e76f8ef52accefc3999b9befc7abf29244b64c6afcf6887bcbd876",
+          "where": "DH-11-C2-B5-VD-I-2.hinh.0.du_lieu",
+          "hashDataUrl": "870f7effb763f87307dd24c80884ef1c3e3b2e687f0f1fc3464b2d4d882d304a"
+        }
+      ]
+    },
+    {
+      "qid": "DH-11-C2-B5-I-73",
+      "maDe": "DH-11-C2-B5",
+      "de": "Các chất khí điều chế trong phòng thí nghiệm thường được thu theo phương pháp đẩy không khí (cách 1, cách 2) hoặc đẩy nước (cách 3) như các hình vẽ dưới đây: Có thể dùng cách nào trong 3 cách trên để thu khí ammonia?",
+      "hinh": [
+        {
+          "hash": "2355c03a95e76f8ef52accefc3999b9befc7abf29244b64c6afcf6887bcbd876",
+          "where": "DH-11-C2-B5-I-73.hinh.0.du_lieu",
+          "hashDataUrl": "870f7effb763f87307dd24c80884ef1c3e3b2e687f0f1fc3464b2d4d882d304a"
+        }
+      ]
+    }
+  ],
+  "candidateSameDiagram": {
+    "i": 761,
+    "hash": "8d82b16b4831f6785a8308e7e4edbe344ff3b5e4d2ac75bbd0a2f65cc0cd756c",
+    "file": "anh/8d82b16b4831f6785a8308e7e4edbe344ff3b5e4d2ac75bbd0a2f65cc0cd756c.png",
+    "mime": "image/png",
+    "bytes": 23506,
+    "daMoNative": true,
+    "ketQua": "Cùng bố trí3cách/cùngtubes;scanDÀYvàMỜHƠN209,bubblecụmvệtđậmkhônggiúpchốtcount/contour.",
+    "refs": [
+      {
+        "qid": "DH-11-C2-B4-I-43",
+        "maDe": "DH-11-C2-B4",
+        "de": "Các chất khí điều chế trong phòng thí nghiệm thường theo phương pháp đẩy không khí (cách 1, cách 2) hoặc đẩy nước (cách 3) như hình dưới.\nCó thể dùng cách nào trong ba cách trên để thu khí N₂?",
+        "hinh": [
+          {
+            "hash": "8d82b16b4831f6785a8308e7e4edbe344ff3b5e4d2ac75bbd0a2f65cc0cd756c",
+            "where": "DH-11-C2-B4-I-43.hinh.0.du_lieu",
+            "hashDataUrl": "d6f2b32ad430c9d66991573dbef5e12c0ca2b67865ffd932738dfdedd53af1dd"
+          }
+        ]
+      }
+    ]
+  },
+  "otherReadSources": [
+    {
+      "i": 795,
+      "hash": "945e63eebef1b189c90a146ca822f9b4bb6a8393ad26ed8d23a035aec925bf9a",
+      "file": "anh/945e63eebef1b189c90a146ca822f9b4bb6a8393ad26ed8d23a035aec925bf9a.png",
+      "mime": "image/png",
+      "bytes": 16206,
+      "daMoNative": true,
+      "ketQua": "Khác thiết bị và bố trí,không dùng bubblecount/geometry để sửa209."
+    },
+    {
+      "i": 1197,
+      "hash": "d8b95f0d03c89489fddd25896a1866c3b88ab6aac8f94f39e851a77a080093af",
+      "file": "anh/d8b95f0d03c89489fddd25896a1866c3b88ab6aac8f94f39e851a77a080093af.png",
+      "mime": "image/png",
+      "bytes": 9136,
+      "daMoNative": true,
+      "ketQua": "Khác thiết bị và bố trí,không dùng bubblecount/geometry để sửa209."
+    }
+  ],
+  "search": "Đã tìm toàn bộpublicstems chứa đẩy nước/đẩy không khí/phương pháp thu khí/cách thu khí;3refs209cùnghash,1cùngsơđồ761. So sánh ảnh aspect2.5..7 toàn1428asset bằngpixels80x32chỉlàtriage,khôngphát hiện near-duplicate rõ hơn;khôngdùng thuậttoán để chứngnhận nội dung."
+}
