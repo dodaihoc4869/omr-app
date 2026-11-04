@@ -1,0 +1,620 @@
+[
+  {
+    "i": 266,
+    "hash": "2d2551ae312eea69476e3ceca4adfeaa1026c86b3c37922987db8e7144fa0b1f",
+    "fileNguon": "anh/2d2551ae312eea69476e3ceca4adfeaa1026c86b3c37922987db8e7144fa0b1f.png",
+    "canvas": [
+      367,
+      190
+    ],
+    "nativeOpened": true,
+    "zoomOpened": "/workspace/scratch/dien-266-zoom.png",
+    "status": "Source reading only; SVG not reviewed/approved",
+    "coordinateSystem": "Approximate native pixels, origin top-left; preserve topology and label ownership, not pixel-perfect claim",
+    "questions": [
+      {
+        "qid": "VIP27-C3-B11-D2-II-3",
+        "de": "Thuỷ phân hoàn toàn tripeptide E chứa các gốc amino acid của glycine (Gly), glutamic acid (Glu) và lysine (Lys) trong dung dịch NaOH thu được dung dịch X. Nhúng hai điện cực của dòng điện một chiều có hiệu điện thế thấp vào dung dịch X (hình vẽ), sau đó thêm từ từ dung dịch HCl vào X đến khi dung dịch thu được có pH = 1,0 (dung dịch Y).",
+        "refs": [
+          {
+            "where": "VIP27-C3-B11-D2-II-3.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "labels": [
+      {
+        "text": "(+)",
+        "at": [
+          67,
+          29
+        ]
+      },
+      {
+        "text": "(−)",
+        "at": [
+          276,
+          29
+        ]
+      },
+      {
+        "text": "dung dịch X",
+        "at": [
+          170,
+          149
+        ]
+      }
+    ],
+    "container": {
+      "kind": "open-top rectangular U outline, NOT salt bridge",
+      "path": [
+        [
+          45,
+          69
+        ],
+        [
+          45,
+          185
+        ],
+        [
+          305,
+          185
+        ],
+        [
+          305,
+          69
+        ]
+      ],
+      "liquidRect": [
+        46,
+        98,
+        258,
+        86
+      ]
+    },
+    "bars": [
+      {
+        "bounds": [
+          63,
+          44,
+          11,
+          130
+        ],
+        "polarity": "+"
+      },
+      {
+        "bounds": [
+          272,
+          45,
+          11,
+          130
+        ],
+        "polarity": "−"
+      }
+    ],
+    "wires": [
+      {
+        "from": [
+          67,
+          52
+        ],
+        "via": [
+          [
+            39,
+            43
+          ],
+          [
+            25,
+            32
+          ]
+        ],
+        "to": [
+          8,
+          11
+        ],
+        "note": "curved thin free lead to upper-left, no source box"
+      },
+      {
+        "from": [
+          278,
+          50
+        ],
+        "via": [
+          [
+            313,
+            44
+          ],
+          [
+            335,
+            30
+          ]
+        ],
+        "to": [
+          359,
+          6
+        ],
+        "note": "curved free lead to upper-right"
+      }
+    ],
+    "saltBridge": false,
+    "arrows": [],
+    "sourceVoltage": null,
+    "notes": [
+      "2 outlined rectangular electrode bars; white interior.",
+      "No bubbles, ion/electron arrows, electrode names or V box."
+    ],
+    "svg": "dien-hoa-ddh-b5eeeb04b7e6cc80d59b28642a498e4c827e1fb58791651464f0ab478ce98643.svg",
+    "hashSvg": "b5eeeb04b7e6cc80d59b28642a498e4c827e1fb58791651464f0ab478ce98643",
+    "byteSvg": 7266,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "266+left−right/nosourcebox;1090ZnleftCuright/1,0M/LAMPCIRCLEX/KHÔNGsaltbridgegốc;1399−left+right/3raysright/sourcehighVkhôngsố;khôngtựsửađiệnhóanguồn.",
+    "hashSvgDaSoat": "b5eeeb04b7e6cc80d59b28642a498e4c827e1fb58791651464f0ab478ce98643",
+    "nguoiSoat": "cau_truc_6"
+  },
+  {
+    "i": 1090,
+    "hash": "c3e93280205f90d144dea03f56c58dd506e47401172e179b1bf36df376188460",
+    "fileNguon": "anh/c3e93280205f90d144dea03f56c58dd506e47401172e179b1bf36df376188460.png",
+    "canvas": [
+      249,
+      255
+    ],
+    "nativeOpened": true,
+    "zoomOpened": "/workspace/scratch/dien-1090-zoom.png",
+    "status": "Source reading only; SVG not reviewed/approved",
+    "coordinateSystem": "Approximate native pixels, origin top-left; preserve topology and label ownership, not pixel-perfect claim",
+    "questions": [
+      {
+        "qid": "VIP27-C5-B17-D1-I-9",
+        "de": "Dụng cụ nào cần bổ sung vào hệ được mô tả như sơ đồ ở hình bên để tạo thành pin Galvani hoạt động?",
+        "refs": [
+          {
+            "where": "VIP27-C5-B17-D1-I-9.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "labels": [
+      {
+        "text": "Bóng đèn",
+        "at": [
+          120,
+          10
+        ]
+      },
+      {
+        "text": "Dây\ndẫn điện",
+        "at": [
+          121,
+          65
+        ]
+      },
+      {
+        "text": "Thanh Zn",
+        "at": [
+          31,
+          56
+        ]
+      },
+      {
+        "text": "Thanh Cu",
+        "at": [
+          215,
+          56
+        ]
+      },
+      {
+        "text": "Dung dịch\nZnSO₄ 1,0 M",
+        "at": [
+          70,
+          235
+        ]
+      },
+      {
+        "text": "Dung dịch\nCuSO₄ 1,0 M",
+        "at": [
+          182,
+          235
+        ]
+      }
+    ],
+    "beakers": [
+      {
+        "mouthApprox": [
+          21,
+          91,
+          91,
+          18
+        ],
+        "bottomY": 214,
+        "liquidEllipse": [
+          30,
+          128,
+          79,
+          16
+        ]
+      },
+      {
+        "mouthApprox": [
+          135,
+          91,
+          88,
+          18
+        ],
+        "bottomY": 214,
+        "liquidEllipse": [
+          143,
+          128,
+          76,
+          16
+        ]
+      }
+    ],
+    "bars": [
+      {
+        "bounds": [
+          60,
+          65,
+          19,
+          122
+        ],
+        "label": "Zn"
+      },
+      {
+        "bounds": [
+          169,
+          65,
+          20,
+          122
+        ],
+        "label": "Cu"
+      }
+    ],
+    "lamp": {
+      "circle": [
+        121,
+        33,
+        12
+      ],
+      "inside": "X, two diagonal lines"
+    },
+    "wires": [
+      {
+        "from": [
+          69,
+          65
+        ],
+        "via": [
+          [
+            69,
+            33
+          ]
+        ],
+        "to": [
+          109,
+          33
+        ]
+      },
+      {
+        "from": [
+          133,
+          33
+        ],
+        "via": [
+          [
+            179,
+            33
+          ]
+        ],
+        "to": [
+          179,
+          65
+        ]
+      }
+    ],
+    "saltBridge": false,
+    "arrows": [],
+    "sourceVoltage": null,
+    "notes": [
+      "NO connecting tube/bridge between solutions in native source. The missing device is part of public question; never add it.",
+      "No +/−, no e arrows. Two beakers with spouts at upper-left, each one rectangular electrode. Concentrations use comma 1,0 M."
+    ],
+    "svg": "dien-hoa-ddh-9737a78f5293ee640b81f8a93785944761c4544a689454100ca39c06190afba1.svg",
+    "hashSvg": "9737a78f5293ee640b81f8a93785944761c4544a689454100ca39c06190afba1",
+    "byteSvg": 33765,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "266+left−right/nosourcebox;1090ZnleftCuright/1,0M/LAMPCIRCLEX/KHÔNGsaltbridgegốc;1399−left+right/3raysright/sourcehighVkhôngsố;khôngtựsửađiệnhóanguồn.",
+    "hashSvgDaSoat": "9737a78f5293ee640b81f8a93785944761c4544a689454100ca39c06190afba1",
+    "nguoiSoat": "cau_truc_6"
+  },
+  {
+    "i": 1399,
+    "hash": "fc0e80ce07efe61d7fd3637d5b7d6a187bbcb9700a20ad51a9fc87c866a8a6ca",
+    "fileNguon": "anh/fc0e80ce07efe61d7fd3637d5b7d6a187bbcb9700a20ad51a9fc87c866a8a6ca.png",
+    "canvas": [
+      354,
+      207
+    ],
+    "nativeOpened": true,
+    "zoomOpened": "/workspace/scratch/dien-1399-zoom.png",
+    "status": "Source reading only; SVG not reviewed/approved",
+    "coordinateSystem": "Approximate native pixels, origin top-left; preserve topology and label ownership, not pixel-perfect claim",
+    "questions": [
+      {
+        "qid": "DB-10-B1-D1-II-142",
+        "de": "J. J. Thomson, nhà vật lí người Anh, được trao Giải thưởng Nobel Vật lí vào năm 1906 vì phát hiện ra một loại hạt cơ bản tạo nên nguyên tử.\nThomson đã chế tạo ống tia âm cực gồm một ống thuỷ tinh được hút phần lớn không khí ra khỏi ống, một hiệu điện thế cao được đặt vào hai điện cực gắn ở hai đầu ống. Năm 1897, ông phát hiện ra một dòng hạt đi ra từ điện cực tích điện âm sang điện cực tích điện dương. Ống tia âm cực",
+        "refs": [
+          {
+            "where": "DB-10-B1-D1-II-142.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C1-B1-II-3",
+        "de": "J. J. Thomson, nhà vật lí người Anh, được trao Giải thưởng Nobel Vật lí vào năm 1906 vì phát hiện ra một loại hạt cơ bản tạo nên nguyên tử.\nThomson đã chế tạo ống tia âm cực gồm một ống thuỷ tinh được hút phần lớn không khí ra khỏi ống, một hiệu điện thế cao được đặt vào hai điện cực gắn ở hai đầu ống. Năm 1897, ông phát hiện ra một dòng hạt đi ra từ điện cực tích điện âm sang điện cực tích điện dương. Ống tia âm cực",
+        "refs": [
+          {
+            "where": "DH-10-C1-B1-II-3.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "labels": [
+      {
+        "text": "Ống phóng điện",
+        "at": [
+          78,
+          19
+        ],
+        "leader": [
+          [
+            85,
+            36
+          ],
+          [
+            101,
+            43
+          ]
+        ]
+      },
+      {
+        "text": "Cực âm",
+        "at": [
+          95,
+          125
+        ],
+        "leader": [
+          [
+            83,
+            107
+          ],
+          [
+            118,
+            78
+          ]
+        ]
+      },
+      {
+        "text": "Cực dương",
+        "at": [
+          290,
+          120
+        ],
+        "leader": [
+          [
+            291,
+            104
+          ],
+          [
+            272,
+            79
+          ]
+        ]
+      },
+      {
+        "text": "Hiệu điện thế cao",
+        "at": [
+          93,
+          185
+        ],
+        "leader": [
+          [
+            157,
+            183
+          ],
+          [
+            171,
+            180
+          ]
+        ]
+      },
+      {
+        "text": "−",
+        "at": [
+          68,
+          65
+        ]
+      },
+      {
+        "text": "+",
+        "at": [
+          320,
+          60
+        ]
+      }
+    ],
+    "tube": {
+      "bounds": [
+        76,
+        42,
+        236,
+        60
+      ],
+      "shape": "horizontal capsule, pale yellow interior",
+      "bars": [
+        {
+          "axis": [
+            [
+              118,
+              52
+            ],
+            [
+              118,
+              92
+            ]
+          ],
+          "polarity": "−"
+        },
+        {
+          "axis": [
+            [
+              272,
+              52
+            ],
+            [
+              272,
+              92
+            ]
+          ],
+          "polarity": "+"
+        }
+      ]
+    },
+    "rays": [
+      {
+        "from": [
+          122,
+          65
+        ],
+        "to": [
+          267,
+          65
+        ],
+        "arrow": "right"
+      },
+      {
+        "from": [
+          122,
+          71
+        ],
+        "to": [
+          267,
+          71
+        ],
+        "arrow": "right"
+      },
+      {
+        "from": [
+          122,
+          78
+        ],
+        "to": [
+          267,
+          78
+        ],
+        "arrow": "right"
+      }
+    ],
+    "wires": [
+      {
+        "from": [
+          118,
+          71
+        ],
+        "via": [
+          [
+            54,
+            71
+          ],
+          [
+            54,
+            156
+          ],
+          [
+            183,
+            156
+          ]
+        ],
+        "to": [
+          183,
+          168
+        ]
+      },
+      {
+        "from": [
+          272,
+          71
+        ],
+        "via": [
+          [
+            336,
+            71
+          ],
+          [
+            336,
+            156
+          ],
+          [
+            207,
+            156
+          ]
+        ],
+        "to": [
+          207,
+          168
+        ]
+      }
+    ],
+    "source": {
+      "bounds": [
+        171,
+        168,
+        45,
+        24
+      ],
+      "color": "dark red",
+      "terminals": [
+        {
+          "text": "−",
+          "at": [
+            184,
+            180
+          ],
+          "wire": "left"
+        },
+        {
+          "text": "+",
+          "at": [
+            203,
+            180
+          ],
+          "wire": "right"
+        }
+      ],
+      "voltageText": "Hiệu điện thế cao",
+      "numericVoltage": null
+    },
+    "saltBridge": false,
+    "notes": [
+      "3 horizontal ray lines with tiny arrowheads near right electrode; all point right. Do not substitute electron dots or add gas/pressure/V values.",
+      "Exterior wire horizontal through tube endpoints to each electrode; label leader lines are separate, not extra wires."
+    ],
+    "svg": "dien-hoa-ddh-8e0df6edade7e7a4aa9b5c23bf3e80309a57e2c063f8ab5d590e2d5c4ecd1605.svg",
+    "hashSvg": "8e0df6edade7e7a4aa9b5c23bf3e80309a57e2c063f8ab5d590e2d5c4ecd1605",
+    "byteSvg": 25799,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "266+left−right/nosourcebox;1090ZnleftCuright/1,0M/LAMPCIRCLEX/KHÔNGsaltbridgegốc;1399−left+right/3raysright/sourcehighVkhôngsố;khôngtựsửađiệnhóanguồn.",
+    "hashSvgDaSoat": "8e0df6edade7e7a4aa9b5c23bf3e80309a57e2c063f8ab5d590e2d5c4ecd1605",
+    "nguoiSoat": "cau_truc_6"
+  }
+]

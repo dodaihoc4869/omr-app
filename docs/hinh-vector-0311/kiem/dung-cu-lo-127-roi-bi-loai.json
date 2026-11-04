@@ -1,0 +1,14 @@
+[
+  {
+    "i": 59,
+    "hashSvg": "c8e0c9266df8995372f775e2e262892206704f41808b595cd2e9f01976789b17",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Cần sửa: Đã mở RIÊNG PNG native+SVG render full và zoom. ROI giữ từng RGB đúng nguồn, đã tái đọc toàn bộ run path và so từng pixel/crop hash, không threshold/quantize/blur. Tuy vậy style chưa đạt: vạch trong ROI pixel mờ/đen khác nét manual xanh sắc, mép phải ROI đen dày chồng đường thành manual, seam đầu/cuối dải dễ thấy. Giữ được9longticks và contours còn lại nhưng không xác nhận số shorttick mờ/không gán47. Cần xử lý seam/style bằng nguồn hoặc bằng chứng rõ hơn; không ép Đạt do hashROI. Không image/font/bitmap nhúng; không cắt canvas."
+  },
+  {
+    "i": 1391,
+    "hashSvg": "8a33deeae188ff9e2d79a011d6a8cb771e9dc22b700f637a3dabfaf304161496",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Cần sửa: Đã mở RIÊNG PNG native+SVG render full và zoom. ROI giữ từng RGB đúng nguồn, đã tái đọc toàn bộ run path và so từng pixel/crop hash, không threshold/quantize/blur. Tuy vậy style chưa đạt: patch hạt chữ nhật mờ rõ, vạch cong thứ4 chuyển đột ngột manual sắc→ROI mờ/đen; hai mảng viền đáy đen ở mép ROI nối sai độ cong/màu với manual. Spout/bốn vạch cong/hạt giữ nguồn nhưng không xác nhận số hạt hay suy chất lỏng. Cần xử lý seam/style bằng nguồn hoặc bằng chứng rõ hơn; không ép Đạt do hashROI. Không image/font/bitmap nhúng; không cắt canvas."
+  }
+]

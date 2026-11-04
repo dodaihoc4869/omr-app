@@ -1,0 +1,30 @@
+[
+  {
+    "i": 59,
+    "box": [
+      41,
+      37,
+      67,
+      161
+    ],
+    "sourceHash": "0bbe101793287d27bd0b5b390c30f8a47d938232a77ff74658b46a53631a2184",
+    "hashRgbRoi": "30aaf4e485d13dcc542bf3f05855aa714c723c573bbc9f3d498f8c83f455b9bc",
+    "palette": 250,
+    "runCount": 2517,
+    "method": "RLEtừngpixelRGBthật bằngrect-path,khôngthreshold/quantize/blur/đoáncount;khôngimage/bitmapnhúng;phảisoátđộclập."
+  },
+  {
+    "i": 1391,
+    "box": [
+      32,
+      151,
+      149,
+      175
+    ],
+    "sourceHash": "facc4804d6a988274d7b9f4575aaa8405d3153b3cdf67054c5e931645cfcb271",
+    "hashRgbRoi": "2eb1e58d96f27615a6c17c49c66ef42d93c1a84bcab6391e362852898880bd48",
+    "palette": 207,
+    "runCount": 2507,
+    "method": "RLEtừngpixelRGBthật bằngrect-path,khôngthreshold/quantize/blur/đoáncount;khôngimage/bitmapnhúng;phảisoátđộclập."
+  }
+]

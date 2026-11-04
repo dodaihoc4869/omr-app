@@ -1,0 +1,969 @@
+[
+  {
+    "i": 1166,
+    "hash": "d319f77425ea93334ab02573d1f06dcc62971599d34eb6aafb8aa61a35ec1966",
+    "fileNguon": "anh/d319f77425ea93334ab02573d1f06dcc62971599d34eb6aafb8aa61a35ec1966.png",
+    "canvas": [
+      74,
+      179
+    ],
+    "daMoNative": true,
+    "kind": "separatory-funnel-icon",
+    "notes": "Phễuchiếtđứng,mặttrênnắphìnhtrụnhỏ,thânhìnhquảlêthonxuống,vanngangởgầndưới,từvanđiốngthẳnghẹpxuốngvàmiệngcắtchéo. Hìnhđenxámlineartkhôngchứa chấtlỏng/nhãn/vạchchia/giáđỡ. Giữcóvan,chớvẽthànhphễulọcthường.",
+    "questions": [
+      {
+        "qid": "VIP27-BDT-KTTX-601-I-2",
+        "de": "Trong thí nghiệm điều chế ethyl acetate, bạn học sinh cần đong 24 mL cồn 96°. Dụng cụ nào sau đây phù hợp nhất cho thao tác trên?",
+        "refs": [
+          {
+            "where": "VIP27-BDT-KTTX-601-I-2.hinh.0.du_lieu",
+            "viTri": "sau_pa_A"
+          }
+        ]
+      }
+    ],
+    "nativeZoom": "/workspace/scratch/lab1166-5x.png",
+    "outline": {
+      "mouthOuterEllipseApprox": [
+        38,
+        10,
+        13,
+        4
+      ],
+      "mouthInnerBackArcApprox": [
+        [
+          26,
+          10
+        ],
+        [
+          38,
+          8
+        ],
+        [
+          49,
+          10
+        ]
+      ],
+      "collarWalls": [
+        [
+          [
+            26,
+            12
+          ],
+          [
+            26,
+            23
+          ]
+        ],
+        [
+          [
+            51,
+            12
+          ],
+          [
+            51,
+            23
+          ]
+        ]
+      ],
+      "collarBottomEllipseApprox": [
+        38,
+        23,
+        12,
+        3
+      ],
+      "bodyLeftApprox": [
+        [
+          26,
+          23
+        ],
+        [
+          15,
+          29
+        ],
+        [
+          8,
+          37
+        ],
+        [
+          7,
+          45
+        ],
+        [
+          11,
+          64
+        ],
+        [
+          34,
+          134
+        ]
+      ],
+      "bodyRightApprox": [
+        [
+          51,
+          23
+        ],
+        [
+          63,
+          32
+        ],
+        [
+          70,
+          43
+        ],
+        [
+          68,
+          51
+        ],
+        [
+          44,
+          134
+        ]
+      ],
+      "bodyBottomJoin": [
+        [
+          34,
+          134
+        ],
+        [
+          38,
+          136
+        ],
+        [
+          44,
+          134
+        ]
+      ],
+      "outletTube": {
+        "left": [
+          [
+            35,
+            145
+          ],
+          [
+            35,
+            175
+          ]
+        ],
+        "right": [
+          [
+            42,
+            145
+          ],
+          [
+            42,
+            172
+          ]
+        ],
+        "cutTip": [
+          [
+            35,
+            175
+          ],
+          [
+            42,
+            172
+          ]
+        ]
+      }
+    },
+    "stopcock": {
+      "present": true,
+      "orientation": "horizontal",
+      "centerApprox": [
+        38,
+        139
+      ],
+      "leftPlugApprox": [
+        [
+          34,
+          135
+        ],
+        [
+          27,
+          137
+        ],
+        [
+          25,
+          140
+        ],
+        [
+          31,
+          143
+        ],
+        [
+          36,
+          144
+        ]
+      ],
+      "rightArmApprox": [
+        [
+          43,
+          135
+        ],
+        [
+          49,
+          135
+        ],
+        [
+          52,
+          130
+        ]
+      ],
+      "rightKnobApprox": [
+        [
+          53,
+          130
+        ],
+        [
+          58,
+          132
+        ],
+        [
+          60,
+          139
+        ],
+        [
+          58,
+          148
+        ],
+        [
+          54,
+          149
+        ],
+        [
+          50,
+          142
+        ]
+      ],
+      "bodyBelowApprox": [
+        [
+          34,
+          144
+        ],
+        [
+          36,
+          147
+        ],
+        [
+          42,
+          146
+        ],
+        [
+          45,
+          143
+        ]
+      ],
+      "notes": "TayvannúmđứngởbênPHẢI,plugnhôtrái,trongvanđườngthânốngdọcnốixuốngtip. Khôngxoayvanthànhnằmđứnghaybỏplugphải."
+    },
+    "graduations": [],
+    "numericLabels": [],
+    "liquid": false,
+    "evidence": "Native+5x;đâyphễuchiếtcócổ/van/outlettubecắtchéo,khôngdụngcụcóthangchiahaymiệngspoutrót.",
+    "svg": "dung-cu-ddh-108918a99199c5494f0822d2d1bb2756ff156ecfe59a7feba38d69887a563261.svg",
+    "hashSvg": "108918a99199c5494f0822d2d1bb2756ff156ecfe59a7feba38d69887a563261",
+    "byteSvg": 863,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Khôngchữsố/đơnvịchấtlỏngthêm.1166đủvan;752đúng3vạch.59graduationROI/1391grainROIgiữtoànbộpixelRGBbằngpath,KHÔNGsuyshorttick/particlecount,khôngthreshold/blur/quantize. BảnứngviênchỉĐạtsausaotừngsource/render/ROI.",
+    "hashSvgDaSoat": "108918a99199c5494f0822d2d1bb2756ff156ecfe59a7feba38d69887a563261",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 59,
+    "hash": "0bbe101793287d27bd0b5b390c30f8a47d938232a77ff74658b46a53631a2184",
+    "fileNguon": "anh/0bbe101793287d27bd0b5b390c30f8a47d938232a77ff74658b46a53631a2184.png",
+    "canvas": [
+      91,
+      182
+    ],
+    "daMoNative": true,
+    "kind": "graduated-cylinder-icon",
+    "notes": "Ốngđongđứng:miệngovalhở/trêncólip,thânhìnhtrụthon,nềntrắng,đếovalxòerộng. Nhiềuvạchchiangắn/dàibênphảiTRONGthânvùngy~39..160,tuyệtnhiênKHÔNGcósố/đơnvị.Bềrộngvạchlớn/nhỏđúngnhìnnguồn,khônggánmLhaythangdungtích.Khôngchấtlỏng.",
+    "questions": [
+      {
+        "qid": "VIP27-BDT-KTTX-601-I-2",
+        "de": "Trong thí nghiệm điều chế ethyl acetate, bạn học sinh cần đong 24 mL cồn 96°. Dụng cụ nào sau đây phù hợp nhất cho thao tác trên?",
+        "refs": [
+          {
+            "where": "VIP27-BDT-KTTX-601-I-2.hinh.1.du_lieu",
+            "viTri": "sau_pa_B"
+          }
+        ]
+      }
+    ],
+    "nativeZoom": "/workspace/scratch/lab59-5x.png",
+    "outline": {
+      "mouthOuterEllipseApprox": [
+        49,
+        17,
+        26,
+        6
+      ],
+      "mouthInnerBackArcApprox": [
+        [
+          31,
+          16
+        ],
+        [
+          49,
+          15
+        ],
+        [
+          66,
+          17
+        ]
+      ],
+      "mouthFrontArcApprox": [
+        [
+          25,
+          20
+        ],
+        [
+          48,
+          23
+        ],
+        [
+          74,
+          20
+        ]
+      ],
+      "rightLipTipApprox": [
+        74,
+        20
+      ],
+      "leftWall": [
+        [
+          25,
+          22
+        ],
+        [
+          25,
+          166
+        ]
+      ],
+      "rightWall": [
+        [
+          66,
+          23
+        ],
+        [
+          66,
+          166
+        ]
+      ],
+      "footOuterApprox": [
+        [
+          25,
+          166
+        ],
+        [
+          7,
+          173
+        ],
+        [
+          8,
+          177
+        ],
+        [
+          28,
+          181
+        ],
+        [
+          67,
+          181
+        ],
+        [
+          89,
+          175
+        ],
+        [
+          87,
+          171
+        ],
+        [
+          67,
+          166
+        ]
+      ],
+      "footInnerStubs": [
+        [
+          [
+            25,
+            165
+          ],
+          [
+            20,
+            170
+          ]
+        ],
+        [
+          [
+            66,
+            166
+          ],
+          [
+            71,
+            171
+          ]
+        ]
+      ]
+    },
+    "graduations": {
+      "longCountCertain": 9,
+      "longY": [
+        39,
+        53,
+        67,
+        81,
+        94,
+        109,
+        123,
+        136,
+        151
+      ],
+      "longFromX": 42,
+      "rightEndX": 66,
+      "shortLeftApproxX": 51,
+      "shortYDetectedCandidates": [
+        39,
+        42,
+        46,
+        49,
+        51,
+        53,
+        55,
+        57,
+        60,
+        64,
+        67,
+        69,
+        72,
+        74,
+        76,
+        79,
+        81,
+        83,
+        85,
+        88,
+        91,
+        94,
+        97,
+        100,
+        102,
+        104,
+        106,
+        109,
+        111,
+        115,
+        118,
+        120,
+        123,
+        125,
+        127,
+        130,
+        133,
+        136,
+        139,
+        141,
+        144,
+        146,
+        148,
+        151,
+        153,
+        155,
+        158
+      ],
+      "totalCountCertain": null,
+      "whyNotCertain": "Native91x182,cácshortstrokebịantialias/nhiễuvàcóđộdàykhôngđều. 47localmaxcủaprofilex51..63ởngưỡngprominence12làCANDIDATES,KHÔNGphảikhẳngđịnh47vạch. Mộtvạchdàytách2peak/2vạchnhòenhậpđược. Khôngđượcđếmsuy5hay10vạchmỗikhoảng.",
+      "renderSuggestion": "Giữ9longticksđọcrõ;đểgiữmọishortstrokechínhxác,cầnoutline-traceROIgraduationtheopixelnguồnvàsoátảnhlạitrựcquan,khôngtựtạoraNtickđều. Đâychỉdữliệunghiêncứu,chưabảnđạt.",
+      "numericLabels": []
+    },
+    "sourceDuplicateSearch": "pHash+dct cropmaskso59vớitoàn1428assets;gợiýgầnnhấtngoài59là1331score26.52/57328.25/116629.01/34529.09. Đãmởnative1331/573/345:khôngphảibảnCÙNGcylindergraduations59,khôngkhôiphụcđượcvạchrõhơn.Phạmvilàscreeninghash+visualtopcandidates,khôngcoihashlàbằngchứng.",
+    "svg": "dung-cu-ddh-c8e0c9266df8995372f775e2e262892206704f41808b595cd2e9f01976789b17.svg",
+    "hashSvg": "c8e0c9266df8995372f775e2e262892206704f41808b595cd2e9f01976789b17",
+    "byteSvg": 45704,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "cho-soat-doc-lap",
+    "ghiChuDung": "Khôngchữsố/đơnvịchấtlỏngthêm.1166đủvan;752đúng3vạch.59graduationROI/1391grainROIgiữtoànbộpixelRGBbằngpath,KHÔNGsuyshorttick/particlecount,khôngthreshold/blur/quantize. BảnứngviênchỉĐạtsausaotừngsource/render/ROI."
+  },
+  {
+    "i": 752,
+    "hash": "8bcfb4705d31c35efb9a158babde3b7af2b3fbdb8f78111fc6d347668b32d33a",
+    "fileNguon": "anh/8bcfb4705d31c35efb9a158babde3b7af2b3fbdb8f78111fc6d347668b32d33a.png",
+    "canvas": [
+      136,
+      177
+    ],
+    "daMoNative": true,
+    "kind": "erlenmeyer-icon",
+    "notes": "BìnhtamgiácErlenmeyer:miệngovalnhỏ,cổhẹp,thâncônrộngxuống,đáyovalrộng. Có3vạchchiaNGANGbênphảithânởkhoảngy92/125/156native,khôngcósố/đơnvị/chấtlỏng. Khôngnút/van/phễu.",
+    "questions": [
+      {
+        "qid": "VIP27-BDT-KTTX-601-I-2",
+        "de": "Trong thí nghiệm điều chế ethyl acetate, bạn học sinh cần đong 24 mL cồn 96°. Dụng cụ nào sau đây phù hợp nhất cho thao tác trên?",
+        "refs": [
+          {
+            "where": "VIP27-BDT-KTTX-601-I-2.hinh.3.du_lieu",
+            "viTri": "sau_pa_D"
+          }
+        ]
+      }
+    ],
+    "nativeZoom": "/workspace/scratch/lab752-5x.png",
+    "outline": {
+      "topOuterEllipseApprox": [
+        68,
+        11,
+        18,
+        5
+      ],
+      "topInnerEllipseApprox": [
+        68,
+        10,
+        14,
+        2
+      ],
+      "neckWalls": [
+        [
+          [
+            53,
+            15
+          ],
+          [
+            54,
+            39
+          ]
+        ],
+        [
+          [
+            83,
+            15
+          ],
+          [
+            81,
+            39
+          ]
+        ]
+      ],
+      "neckBottomEllipseApprox": [
+        68,
+        39,
+        14,
+        3
+      ],
+      "conicalWalls": [
+        [
+          [
+            54,
+            40
+          ],
+          [
+            8,
+            160
+          ]
+        ],
+        [
+          [
+            81,
+            40
+          ],
+          [
+            128,
+            160
+          ]
+        ]
+      ],
+      "baseFrontArcApprox": [
+        [
+          8,
+          160
+        ],
+        [
+          10,
+          169
+        ],
+        [
+          32,
+          175
+        ],
+        [
+          69,
+          177
+        ],
+        [
+          110,
+          174
+        ],
+        [
+          129,
+          167
+        ],
+        [
+          128,
+          160
+        ]
+      ],
+      "baseInnerBackArcApprox": [
+        [
+          29,
+          167
+        ],
+        [
+          68,
+          164
+        ],
+        [
+          107,
+          167
+        ]
+      ]
+    },
+    "graduations": {
+      "certainCount": 3,
+      "marksApprox": [
+        [
+          [
+            77,
+            92
+          ],
+          [
+            101,
+            92
+          ]
+        ],
+        [
+          [
+            77,
+            125
+          ],
+          [
+            113,
+            125
+          ]
+        ],
+        [
+          [
+            77,
+            150
+          ],
+          [
+            123,
+            150
+          ]
+        ]
+      ],
+      "connectToRightWall": true,
+      "numericLabels": []
+    },
+    "stopcock": false,
+    "liquid": false,
+    "caption": [],
+    "evidence": "3vạchthấyriêngrẽrõ,tráihorizontalngangphảiđếnthànhcôn. Đãmởnative/5x,ellipsevòngcổởy39làoutlineneckKHÔNGvạchthứ4.",
+    "svg": "dung-cu-ddh-f0879020ae64f2c0ef77568fc6a7344810ff91cab2b0a4cc7ec33a455cfc6d73.svg",
+    "hashSvg": "f0879020ae64f2c0ef77568fc6a7344810ff91cab2b0a4cc7ec33a455cfc6d73",
+    "byteSvg": 946,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Khôngchữsố/đơnvịchấtlỏngthêm.1166đủvan;752đúng3vạch.59graduationROI/1391grainROIgiữtoànbộpixelRGBbằngpath,KHÔNGsuyshorttick/particlecount,khôngthreshold/blur/quantize. BảnứngviênchỉĐạtsausaotừngsource/render/ROI.",
+    "hashSvgDaSoat": "f0879020ae64f2c0ef77568fc6a7344810ff91cab2b0a4cc7ec33a455cfc6d73",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 1391,
+    "hash": "facc4804d6a988274d7b9f4575aaa8405d3153b3cdf67054c5e931645cfcb271",
+    "fileNguon": "anh/facc4804d6a988274d7b9f4575aaa8405d3153b3cdf67054c5e931645cfcb271.png",
+    "canvas": [
+      169,
+      182
+    ],
+    "daMoNative": true,
+    "kind": "beaker-solid-icon",
+    "notes": "Cốccótia/rótspouttrêntrái,miệngoval/2đườnglip,thânhìnhtrụđáycong. 4vạchchiangắncongbênphảithân,khôngsố/đơnvị. ĐáytrongcốccónhiềuhạtchấtRẮNnhỏđenrờihạt,khôngmặtnướcnằmngang. Khôngđổiđáyhạtthànhdungdịch/chấtrắnkhốiđặc.",
+    "questions": [
+      {
+        "qid": "VIP27-BDT-KTTX-601-I-2",
+        "de": "Trong thí nghiệm điều chế ethyl acetate, bạn học sinh cần đong 24 mL cồn 96°. Dụng cụ nào sau đây phù hợp nhất cho thao tác trên?",
+        "refs": [
+          {
+            "where": "VIP27-BDT-KTTX-601-I-2.hinh.2.du_lieu",
+            "viTri": "sau_pa_C"
+          }
+        ]
+      }
+    ],
+    "nativeZoom": "/workspace/scratch/lab1391-5x.png",
+    "particlesZoom": "/workspace/scratch/lab1391-particles8x.png",
+    "outline": {
+      "spoutApprox": [
+        [
+          12,
+          22
+        ],
+        [
+          8,
+          26
+        ],
+        [
+          11,
+          30
+        ],
+        [
+          18,
+          28
+        ],
+        [
+          25,
+          29
+        ]
+      ],
+      "outerRimApprox": [
+        [
+          12,
+          22
+        ],
+        [
+          31,
+          10
+        ],
+        [
+          72,
+          3
+        ],
+        [
+          112,
+          5
+        ],
+        [
+          149,
+          12
+        ],
+        [
+          162,
+          22
+        ],
+        [
+          158,
+          30
+        ],
+        [
+          141,
+          36
+        ],
+        [
+          92,
+          39
+        ],
+        [
+          43,
+          36
+        ],
+        [
+          18,
+          28
+        ]
+      ],
+      "innerRimApprox": [
+        [
+          18,
+          22
+        ],
+        [
+          41,
+          13
+        ],
+        [
+          78,
+          6
+        ],
+        [
+          114,
+          8
+        ],
+        [
+          145,
+          15
+        ],
+        [
+          151,
+          23
+        ],
+        [
+          139,
+          29
+        ],
+        [
+          95,
+          33
+        ],
+        [
+          53,
+          31
+        ],
+        [
+          30,
+          24
+        ],
+        [
+          18,
+          22
+        ]
+      ],
+      "leftWall": [
+        [
+          18,
+          29
+        ],
+        [
+          26,
+          43
+        ],
+        [
+          25,
+          164
+        ]
+      ],
+      "rightWall": [
+        [
+          155,
+          33
+        ],
+        [
+          155,
+          164
+        ]
+      ],
+      "baseFrontArc": [
+        [
+          25,
+          164
+        ],
+        [
+          41,
+          173
+        ],
+        [
+          76,
+          179
+        ],
+        [
+          113,
+          177
+        ],
+        [
+          141,
+          170
+        ],
+        [
+          155,
+          164
+        ]
+      ],
+      "innerLipBelowRim": [
+        [
+          34,
+          39
+        ],
+        [
+          63,
+          45
+        ],
+        [
+          101,
+          47
+        ],
+        [
+          145,
+          40
+        ]
+      ]
+    },
+    "graduations": {
+      "certainCount": 4,
+      "curvedMarksApprox": [
+        [
+          [
+            82,
+            88
+          ],
+          [
+            111,
+            86
+          ],
+          [
+            150,
+            79
+          ]
+        ],
+        [
+          [
+            82,
+            110
+          ],
+          [
+            114,
+            108
+          ],
+          [
+            151,
+            101
+          ]
+        ],
+        [
+          [
+            84,
+            134
+          ],
+          [
+            116,
+            131
+          ],
+          [
+            151,
+            124
+          ]
+        ],
+        [
+          [
+            85,
+            154
+          ],
+          [
+            117,
+            151
+          ],
+          [
+            151,
+            145
+          ]
+        ]
+      ],
+      "numericLabels": [],
+      "notes": "Vạchphải4,đềucónhẹconglênphải. Vòngdướilip~y40..47KHÔNGvạchthứ5."
+    },
+    "particles": {
+      "isGranularSolid": true,
+      "countCertain": null,
+      "whyNotCountCertain": "Cácđốmđen/xámnhòe,nhậpvàocurvetick/bottomoutline.Ngưỡng100/120/140/160/180trả14/19/28/41/46connectedcomponentsởROIchọn,khôngổnđịnhvàcócomponent65pixelchínhlàtick;KHÔNGđượcđồngnhấtcomponentcountvớisốhạt.",
+      "regionApprox": [
+        32,
+        151,
+        149,
+        175
+      ],
+      "shape": "Đốmkhôngđều,khôngphảinguyêntửcầutrònđếmđược,màutốinhạtkhácloại,phânbốtrongvùngđáycong. Khôngtựsuy sốhạt haybiếnhạtrờithànhkhốifill/liquidlevel.",
+      "diagnosticOnlyFile": "/workspace/scratch/lab1391-dark-components.json",
+      "renderSuggestion": "Đểgiữnguyênvânnguồn,cóthểtraceseparatemaskparticlesđađộxámtrongROI,khôngđặtsốđốmđềutưởngtượng;chỉchứngnhậnsaumởrenderfullsoát."
+    },
+    "svg": "dung-cu-ddh-8a33deeae188ff9e2d79a011d6a8cb771e9dc22b700f637a3dabfaf304161496.svg",
+    "hashSvg": "8a33deeae188ff9e2d79a011d6a8cb771e9dc22b700f637a3dabfaf304161496",
+    "byteSvg": 47191,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "cho-soat-doc-lap",
+    "ghiChuDung": "Khôngchữsố/đơnvịchấtlỏngthêm.1166đủvan;752đúng3vạch.59graduationROI/1391grainROIgiữtoànbộpixelRGBbằngpath,KHÔNGsuyshorttick/particlecount,khôngthreshold/blur/quantize. BảnứngviênchỉĐạtsausaotừngsource/render/ROI."
+  }
+]
