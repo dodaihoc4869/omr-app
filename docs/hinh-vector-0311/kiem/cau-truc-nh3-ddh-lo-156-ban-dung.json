@@ -1,0 +1,243 @@
+[
+  {
+    "i": 575,
+    "hash": "6b57afe5a9415b5639b5e284a4842bb350f4d2014a4e3e9c1008da90f6368dc7",
+    "fileNguon": "anh/6b57afe5a9415b5639b5e284a4842bb350f4d2014a4e3e9c1008da90f6368dc7.png",
+    "canvas": [
+      601,
+      249
+    ],
+    "daMoNative": true,
+    "kind": "NH3-fountain-lab",
+    "labels": [
+      "Khí NH₃",
+      "Nước có hòa tan vài giọt phenolphthalein"
+    ],
+    "notes": "Bìnhchữnhậtbo2góctrênÚPngược,nútcaosuđenởcổdưới.Cóốngthủy tinhnhỏđứngđitừbeakernướcbênDƯỚIquanútvàlêntrongbình,kếtthúcnhọnởgiữabình. Beakernướcdưới hìnhchữnhậtviềnmảnh/nhiềugạchngangnhỏdướimứcwaterline. Giáđỡtrụđứngtrái,thanhkẹpngangđếncổbình,nềnchânđếxám. LabelKhíNH₃leaderchỉvùngtrongbình,Nướccóhòatan...2dòngleaderchỉnướctrongbeaker. KHÔNGtựvẽmàuhồng/nướcdâng/fountainjetvìsourcechưacótrạngtháithínghiệmnày.",
+    "questions": [
+      {
+        "qid": "DB-11-B5-D2-I-33",
+        "de": "Cho thí nghiệm như hình vẽ, bên trong bình có chứa khí ammonia, trong chậu thủy tinh chứa nước có nhỏ vài giọt phenolphthalein.\nHiện tượng xảy ra trong thí nghiệm là",
+        "refs": [
+          {
+            "where": "DB-11-B5-D2-I-33.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-11-B5-D2-I-94",
+        "de": "Cho thí nghiệm như hình dưới, bên trong bình có chứa khí ammonia, trong chậu thủy tinh chứa nước có nhỏ vài giọt phenolphthalein.\nHiện tượng xảy ra trong thí nghiệm là",
+        "refs": [
+          {
+            "where": "DB-11-B5-D2-I-94.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B5-I-32",
+        "de": "Cho thí nghiệm như hình vẽ, bên trong bình có chứa khí ammonia, trong chậu thủy tinh chứa nước có nhỏ vài giọt phenolphthalein.\nHiện tượng xảy ra trong thí nghiệm là",
+        "refs": [
+          {
+            "where": "DH-11-C2-B5-I-32.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B9-D1-I-4",
+        "de": "Cho thí nghiệm như hình dưới, bên trong bình có chứa khí ammonia, trong chậu thủy tinh chứa nước có nhỏ vài giọt phenolphthalein.\nHiện tượng xảy ra trong thí nghiệm là",
+        "refs": [
+          {
+            "where": "DH-11-C2-B9-D1-I-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry155": {
+      "canvas": [
+        601,
+        249
+      ],
+      "stand": {
+        "pole": [
+          69,
+          39,
+          78,
+          213
+        ],
+        "foot": [
+          44,
+          217,
+          282,
+          231
+        ],
+        "feet": [
+          [
+            54,
+            230,
+            67,
+            236
+          ],
+          [
+            258,
+            230,
+            270,
+            236
+          ]
+        ],
+        "horizontalRod": [
+          [
+            9,
+            143
+          ],
+          [
+            184,
+            143
+          ]
+        ],
+        "clampsApprox": [
+          [
+            61,
+            135,
+            96,
+            150
+          ],
+          [
+            169,
+            138,
+            187,
+            146
+          ]
+        ]
+      },
+      "invertedGasFlask": {
+        "bodyRoundedRect": [
+          164,
+          35,
+          251,
+          140
+        ],
+        "neck": [
+          184,
+          139,
+          230,
+          146
+        ],
+        "rubberPlug": [
+          188,
+          145,
+          230,
+          164
+        ]
+      },
+      "gasTube": {
+        "leftWall": [
+          [
+            205,
+            211
+          ],
+          [
+            205,
+            107
+          ],
+          [
+            207,
+            99
+          ]
+        ],
+        "rightWall": [
+          [
+            210,
+            211
+          ],
+          [
+            210,
+            107
+          ],
+          [
+            207,
+            99
+          ]
+        ],
+        "note": "Thựcống2vách,nocurvedfountainjet. Đầutrênnhọncógặptrongbình,đầudướinhúngnước."
+      },
+      "beaker": {
+        "rect": [
+          149,
+          177,
+          267,
+          216
+        ],
+        "waterSurface": [
+          [
+            149,
+            185
+          ],
+          [
+            267,
+            185
+          ]
+        ],
+        "fill": "short horizontal blackdashwaterpatternbelow185"
+      },
+      "labels": [
+        {
+          "text": "Khí NH₃",
+          "at": [
+            353,
+            45
+          ],
+          "leader": [
+            [
+              306,
+              56
+            ],
+            [
+              226,
+              72
+            ]
+          ],
+          "arrowHead": false
+        },
+        {
+          "text": "Nước có hòa tan vài giọt",
+          "at": [
+            491,
+            159
+          ]
+        },
+        {
+          "text": "phenolphthalein",
+          "at": [
+            465,
+            181
+          ],
+          "leader": [
+            [
+              370,
+              181
+            ],
+            [
+              246,
+              197
+            ]
+          ],
+          "arrowHead": false
+        }
+      ]
+    },
+    "criticalState": "CHƯAfountainjet/khônghồng/khôngtiaxịt,nướcchỉtrongbeakerdưới,bìnhtrênchỉkhíNH₃. Giữnguồntrạngtháibanđầukhôngminhhọađápánhiệntượng.",
+    "svg": "nh3-setup-ddh-5f152bd8defeada3d3a72f55cb5809a02b45ff274c63e46db4264b9c1d9d39f3.svg",
+    "hashSvg": "5f152bd8defeada3d3a72f55cb5809a02b45ff274c63e46db4264b9c1d9d39f3",
+    "byteSvg": 24294,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Bìnhúp/chỉkhí/plugđen/ống2váchđầunhọn/beakernướcdưới/standclamps/2labelgroups2leadersNOhead;CHƯAjet-hồng/nướcdâng/bubbles/thêmphenomenon. Waterhatchkýhiệukhôngsốhạt.",
+    "hashSvgDaSoat": "5f152bd8defeada3d3a72f55cb5809a02b45ff274c63e46db4264b9c1d9d39f3",
+    "nguoiSoat": "cau_truc_6"
+  }
+]

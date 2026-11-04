@@ -1,0 +1,892 @@
+[
+  {
+    "i": 483,
+    "hash": "58f484540c027a1f096add48fcc2455e8da64ba62ba1faf2b8467a8b28b68d74",
+    "fileNguon": "anh/58f484540c027a1f096add48fcc2455e8da64ba62ba1faf2b8467a8b28b68d74.png",
+    "canvas": [
+      645,
+      429
+    ],
+    "daMoNative": true,
+    "kind": "galvanic-Zn-Cu-NH4Cl",
+    "labels": [
+      "Zn",
+      "Cu",
+      "ZnSO₄(aq)",
+      "CuSO₄(aq)",
+      "Cầu muối",
+      "NH₄Cl",
+      "Cl⁻",
+      "NH₄⁺",
+      "e",
+      "e"
+    ],
+    "notes": "2cốcngang,tráiZn/solutionZnSO₄(aq),phảiCu/CuSO₄(aq). CầuNH₄ClốngUconglộnngượcnhúng2đầuvàodungdịch. MạchngoàidâyhìnhΠnối2thanh,1vòngtròncókýnétzigzagtrêngiữa. 2mũitêneTRÊNdâyđềuchỉPHẢI.NhãneKHÔNGcódấu−trongsourceđừngtựe−. Trêncầu2arrowhorizHƯỚNGVÀOGIỮA:tráiarrow→,phảiarrow←;labelCầumuối/NH₄Clởgiữatrênvớileader↓. TrongđầucầutráighiCl⁻,phảighiNH₄⁺vàmũitên↓từđầucầuvàodungdịch. Giữwrong-lookingtopcầuarrowhướngvàogiữatheosource,khôngtựsửagiảđịnhionmigration. Nềnrasterhạttrongsolutioncóthểvectorfillmịnchứkhôngdữliệuhạtđếm. 483/1216đãmởriêngsamecontentkhácscale.",
+    "questions": [
+      {
+        "qid": "12-KT-C56-D2-I-16",
+        "de": "Sử dụng thông tin về cấu tạo của pin Galvani Zn-Cu ở hình dưới.\nCho các nhận định sau:\n(1) Phản ứng xảy ra trong pin là Zn(s) + Cu²⁺(aq) → Zn²⁺(aq) + Cu(s).\n(2) Thanh Zn là cực âm, tức anode, và thanh Cu là cực dương, tức cathode.\n(3) Khi Zn(s) hoặc Cu²⁺(aq) hết thì phản ứng trong pin sẽ ngừng lại.\n(4) Sức điện động của pin không thay đổi trong quá trình pin hoạt động.\nSố nhận định đúng là",
+        "refs": [
+          {
+            "where": "12-KT-C56-D2-I-16.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "12-KT-C56-D2-I-17",
+        "de": "Với pin Galvani Zn-Cu ở hình dưới, nếu thể tích các dung dịch đều là 0,50 L, nồng độ của các muối ban đầu đều là 1,0 M và khối lượng các điện cực Zn hoặc Cu đều bằng 100 gam, pin hoạt động tạo ra dòng điện có cường độ ổn định là 0,10 A. Thời gian mà pin hoạt động là",
+        "refs": [
+          {
+            "where": "12-KT-C56-D2-I-17.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "12-KT-C56-D2-I-18",
+        "de": "Với pin Galvani Zn-Cu ở hình dưới, trong quá trình pin hoạt động, cho các nhận định sau:\n(1) Nồng độ ion Zn²⁺ ở dung dịch bên trái tăng dần.\n(2) Nồng độ ion Cu²⁺ ở dung dịch bên phải giảm dần.\n(3) Nồng độ các anion trong hai dung dịch không thay đổi.\n(4) Khối lượng các điện cực và các dung dịch không thay đổi.\nSố nhận định đúng là",
+        "refs": [
+          {
+            "where": "12-KT-C56-D2-I-18.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry155": {
+      "canvas": [
+        645,
+        429
+      ],
+      "leftBeaker": {
+        "rim": [
+          225,
+          186,
+          70,
+          11
+        ],
+        "liquid": [
+          225,
+          201,
+          69,
+          11
+        ],
+        "bottom": [
+          225,
+          359,
+          70,
+          12
+        ],
+        "walls": [
+          [
+            [
+              155,
+              186
+            ],
+            [
+              155,
+              359
+            ]
+          ],
+          [
+            [
+              295,
+              186
+            ],
+            [
+              295,
+              359
+            ]
+          ]
+        ]
+      },
+      "rightBeaker": {
+        "rim": [
+          430,
+          186,
+          70,
+          11
+        ],
+        "liquid": [
+          430,
+          201,
+          69,
+          11
+        ],
+        "bottom": [
+          430,
+          359,
+          70,
+          12
+        ],
+        "walls": [
+          [
+            [
+              360,
+              186
+            ],
+            [
+              360,
+              359
+            ]
+          ],
+          [
+            [
+              500,
+              186
+            ],
+            [
+              500,
+              359
+            ]
+          ]
+        ]
+      },
+      "electrodes": {
+        "Zn": [
+          174,
+          217,
+          195,
+          349
+        ],
+        "Cu": [
+          468,
+          217,
+          489,
+          349
+        ]
+      },
+      "outerWire": [
+        [
+          183,
+          217
+        ],
+        [
+          183,
+          75
+        ],
+        [
+          306,
+          75
+        ]
+      ],
+      "outerWireRight": [
+        [
+          344,
+          75
+        ],
+        [
+          469,
+          75
+        ],
+        [
+          469,
+          217
+        ]
+      ],
+      "centralSymbol": {
+        "circle": [
+          325,
+          75,
+          19
+        ],
+        "insideZigzag": [
+          [
+            308,
+            76
+          ],
+          [
+            317,
+            69
+          ],
+          [
+            329,
+            81
+          ],
+          [
+            339,
+            73
+          ]
+        ]
+      },
+      "eArrows": [
+        {
+          "text": "e",
+          "textAt": [
+            246,
+            61
+          ],
+          "tail": [
+            223,
+            51
+          ],
+          "head": [
+            276,
+            51
+          ]
+        },
+        {
+          "text": "e",
+          "textAt": [
+            400,
+            61
+          ],
+          "tail": [
+            376,
+            50
+          ],
+          "head": [
+            430,
+            50
+          ]
+        }
+      ],
+      "bridge": {
+        "outerTopApprox": [
+          [
+            216,
+            171
+          ],
+          [
+            219,
+            159
+          ],
+          [
+            230,
+            154
+          ],
+          [
+            421,
+            154
+          ],
+          [
+            435,
+            160
+          ],
+          [
+            438,
+            171
+          ]
+        ],
+        "topArrows": [
+          {
+            "tail": [
+              228,
+              154
+            ],
+            "head": [
+              283,
+              154
+            ]
+          },
+          {
+            "tail": [
+              421,
+              154
+            ],
+            "head": [
+              370,
+              154
+            ]
+          }
+        ],
+        "leftEndApprox": [
+          225,
+          181,
+          257,
+          250
+        ],
+        "rightEndApprox": [
+          398,
+          181,
+          429,
+          250
+        ],
+        "leftIonText": {
+          "text": "Cl⁻",
+          "at": [
+            241,
+            201
+          ]
+        },
+        "rightIonText": {
+          "text": "NH₄⁺",
+          "at": [
+            413,
+            201
+          ]
+        },
+        "ionArrows": [
+          {
+            "tail": [
+              241,
+              211
+            ],
+            "head": [
+              241,
+              267
+            ]
+          },
+          {
+            "tail": [
+              413,
+              211
+            ],
+            "head": [
+              413,
+              270
+            ]
+          }
+        ]
+      },
+      "labelsAndLeaders": [
+        {
+          "text": "Cầu muối",
+          "at": [
+            326,
+            98
+          ]
+        },
+        {
+          "text": "NH₄Cl",
+          "at": [
+            325,
+            120
+          ],
+          "leader": [
+            [
+              325,
+              135
+            ],
+            [
+              325,
+              157
+            ]
+          ],
+          "head": true
+        },
+        {
+          "text": "Zn",
+          "at": [
+            108,
+            217
+          ],
+          "leader": [
+            [
+              122,
+              224
+            ],
+            [
+              177,
+              263
+            ]
+          ],
+          "head": true
+        },
+        {
+          "text": "Cu",
+          "at": [
+            543,
+            217
+          ],
+          "leader": [
+            [
+              530,
+              224
+            ],
+            [
+              480,
+              263
+            ]
+          ],
+          "head": true
+        },
+        {
+          "text": "ZnSO₄(aq)",
+          "at": [
+            104,
+            373
+          ],
+          "leader": [
+            [
+              145,
+              371
+            ],
+            [
+              224,
+              340
+            ]
+          ],
+          "head": true
+        },
+        {
+          "text": "CuSO₄(aq)",
+          "at": [
+            565,
+            373
+          ],
+          "leader": [
+            [
+              516,
+              371
+            ],
+            [
+              425,
+              341
+            ]
+          ],
+          "head": true
+        }
+      ]
+    },
+    "criticalArrowDirections": "2eArrows→→trêndây;2arrowsTRÊNcầumuối→←hướngVÀOGIỮAgiữnguồn;2arrowsbênTRONGđầucầubêntráiCl⁻vàphảiNH₄⁺đềuchỉXUỐNG. Khôngđầumũitênởvịtríkháctựsuyphysics.",
+    "ionArrowEvidence": "Đãcrop/zoom4xRIÊNGhaiđầucầu,Cl⁻arrowxuốngRÕdùchìmtronggrain;NH₄⁺arrowxuốngRÕ. Khôngdùngnhiễuscannhưdữliệuhạtcầnđếm.",
+    "artifact": "/workspace/scratch/pin483-bridge4x.png",
+    "drawTreatment": "Ảnhlineartgốc,môphỏngvector2solutionfillxámmịnđểđọcrõlabels/tubes;giữốngUcó2vách/nhúng2đầu,khôngmấttubetrongnềnsolution.",
+    "svg": "pin-zn-cu-ddh-7466c3f98254818dea2c3d1684cfd79af437350d52bd1505004268f535486245.svg",
+    "hashSvg": "7466c3f98254818dea2c3d1684cfd79af437350d52bd1505004268f535486245",
+    "byteSvg": 24399,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "2cups/ZnCu/ZnSO4CuSO4(aq)/2e→KHÔNGminus/2bridgearcs→←VÀOGIỮA/Cl−↓NH4+↓/NH4Cl/Cầumuối/2wallU2endsnhúng/solutiongraykhôngsốhạt. LabelreflowtheoDDHđểkhôngđụngleader;khôngpolarityhayionmớithêm.",
+    "hashSvgDaSoat": "7466c3f98254818dea2c3d1684cfd79af437350d52bd1505004268f535486245",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 1216,
+    "hash": "dc67821262ad7ab691290a4f1ec181c0f69df2e3c20dcd44e661214aac477af7",
+    "fileNguon": "anh/dc67821262ad7ab691290a4f1ec181c0f69df2e3c20dcd44e661214aac477af7.png",
+    "canvas": [
+      687,
+      459
+    ],
+    "daMoNative": true,
+    "kind": "galvanic-Zn-Cu-NH4Cl",
+    "labels": [
+      "Zn",
+      "Cu",
+      "ZnSO₄(aq)",
+      "CuSO₄(aq)",
+      "Cầu muối",
+      "NH₄Cl",
+      "Cl⁻",
+      "NH₄⁺",
+      "e",
+      "e"
+    ],
+    "notes": "2cốcngang,tráiZn/solutionZnSO₄(aq),phảiCu/CuSO₄(aq). CầuNH₄ClốngUconglộnngượcnhúng2đầuvàodungdịch. MạchngoàidâyhìnhΠnối2thanh,1vòngtròncókýnétzigzagtrêngiữa. 2mũitêneTRÊNdâyđềuchỉPHẢI.NhãneKHÔNGcódấu−trongsourceđừngtựe−. Trêncầu2arrowhorizHƯỚNGVÀOGIỮA:tráiarrow→,phảiarrow←;labelCầumuối/NH₄Clởgiữatrênvớileader↓. TrongđầucầutráighiCl⁻,phảighiNH₄⁺vàmũitên↓từđầucầuvàodungdịch. Giữwrong-lookingtopcầuarrowhướngvàogiữatheosource,khôngtựsửagiảđịnhionmigration. Nềnrasterhạttrongsolutioncóthểvectorfillmịnchứkhôngdữliệuhạtđếm. 483/1216đãmởriêngsamecontentkhácscale.",
+    "questions": [
+      {
+        "qid": "12-KT-C5-D3-II-1",
+        "de": "Cho cấu tạo của pin Galvani Zn-Cu như hình dưới:",
+        "refs": [
+          {
+            "where": "12-KT-C5-D3-II-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry155": {
+      "canvas": [
+        687,
+        459
+      ],
+      "leftBeaker": {
+        "rim": [
+          237,
+          195,
+          75,
+          12
+        ],
+        "liquid": [
+          237,
+          212,
+          75,
+          12
+        ],
+        "bottom": [
+          237,
+          381,
+          75,
+          13
+        ],
+        "walls": [
+          [
+            [
+              162,
+              195
+            ],
+            [
+              162,
+              381
+            ]
+          ],
+          [
+            [
+              312,
+              195
+            ],
+            [
+              312,
+              381
+            ]
+          ]
+        ]
+      },
+      "rightBeaker": {
+        "rim": [
+          457,
+          195,
+          75,
+          12
+        ],
+        "liquid": [
+          457,
+          212,
+          75,
+          12
+        ],
+        "bottom": [
+          457,
+          381,
+          75,
+          13
+        ],
+        "walls": [
+          [
+            [
+              382,
+              195
+            ],
+            [
+              382,
+              381
+            ]
+          ],
+          [
+            [
+              532,
+              195
+            ],
+            [
+              532,
+              381
+            ]
+          ]
+        ]
+      },
+      "electrodes": {
+        "Zn": [
+          183,
+          229,
+          204,
+          373
+        ],
+        "Cu": [
+          490,
+          229,
+          512,
+          373
+        ]
+      },
+      "outerWire": [
+        [
+          192,
+          229
+        ],
+        [
+          192,
+          76
+        ],
+        [
+          326,
+          76
+        ]
+      ],
+      "outerWireRight": [
+        [
+          364,
+          76
+        ],
+        [
+          499,
+          76
+        ],
+        [
+          499,
+          229
+        ]
+      ],
+      "centralSymbol": {
+        "circle": [
+          345,
+          76,
+          19
+        ],
+        "insideZigzag": [
+          [
+            328,
+            77
+          ],
+          [
+            337,
+            70
+          ],
+          [
+            350,
+            82
+          ],
+          [
+            360,
+            74
+          ]
+        ]
+      },
+      "eArrows": [
+        {
+          "text": "e",
+          "textAt": [
+            260,
+            61
+          ],
+          "tail": [
+            235,
+            50
+          ],
+          "head": [
+            292,
+            50
+          ]
+        },
+        {
+          "text": "e",
+          "textAt": [
+            426,
+            61
+          ],
+          "tail": [
+            399,
+            50
+          ],
+          "head": [
+            456,
+            50
+          ]
+        }
+      ],
+      "bridge": {
+        "outerTopApprox": [
+          [
+            227,
+            178
+          ],
+          [
+            230,
+            168
+          ],
+          [
+            240,
+            162
+          ],
+          [
+            451,
+            162
+          ],
+          [
+            463,
+            169
+          ],
+          [
+            466,
+            178
+          ]
+        ],
+        "topArrows": [
+          {
+            "tail": [
+              241,
+              162
+            ],
+            "head": [
+              300,
+              162
+            ]
+          },
+          {
+            "tail": [
+              450,
+              162
+            ],
+            "head": [
+              393,
+              162
+            ]
+          }
+        ],
+        "leftEndApprox": [
+          237,
+          191,
+          270,
+          267
+        ],
+        "rightEndApprox": [
+          423,
+          191,
+          456,
+          267
+        ],
+        "leftIonText": {
+          "text": "Cl⁻",
+          "at": [
+            254,
+            214
+          ]
+        },
+        "rightIonText": {
+          "text": "NH₄⁺",
+          "at": [
+            439,
+            214
+          ]
+        },
+        "ionArrows": [
+          {
+            "tail": [
+              254,
+              228
+            ],
+            "head": [
+              254,
+              282
+            ]
+          },
+          {
+            "tail": [
+              439,
+              228
+            ],
+            "head": [
+              439,
+              286
+            ]
+          }
+        ]
+      },
+      "labelsAndLeaders": [
+        {
+          "text": "Cầu muối",
+          "at": [
+            345,
+            102
+          ]
+        },
+        {
+          "text": "NH₄Cl",
+          "at": [
+            345,
+            124
+          ],
+          "leader": [
+            [
+              345,
+              142
+            ],
+            [
+              345,
+              165
+            ]
+          ],
+          "head": true
+        },
+        {
+          "text": "Zn",
+          "at": [
+            111,
+            230
+          ],
+          "leader": [
+            [
+              125,
+              237
+            ],
+            [
+              187,
+              281
+            ]
+          ],
+          "head": true
+        },
+        {
+          "text": "Cu",
+          "at": [
+            579,
+            229
+          ],
+          "leader": [
+            [
+              566,
+              237
+            ],
+            [
+              505,
+              281
+            ]
+          ],
+          "head": true
+        },
+        {
+          "text": "ZnSO₄(aq)",
+          "at": [
+            108,
+            399
+          ],
+          "leader": [
+            [
+              151,
+              396
+            ],
+            [
+              238,
+              364
+            ]
+          ],
+          "head": true
+        },
+        {
+          "text": "CuSO₄(aq)",
+          "at": [
+            592,
+            399
+          ],
+          "leader": [
+            [
+              550,
+              396
+            ],
+            [
+              455,
+              364
+            ]
+          ],
+          "head": true
+        }
+      ]
+    },
+    "criticalArrowDirections": "2eArrows→→trêndây;2arrowsTRÊNcầumuối→←hướngVÀOGIỮAgiữnguồn;2arrowsbênTRONGđầucầubêntráiCl⁻vàphảiNH₄⁺đềuchỉXUỐNG. Khôngđầumũitênởvịtríkháctựsuyphysics.",
+    "ionArrowEvidence": "Đãcrop/zoom4xRIÊNGhaiđầucầu,Cl⁻arrowxuốngRÕdùchìmtronggrain;NH₄⁺arrowxuốngRÕ. Khôngdùngnhiễuscannhưdữliệuhạtcầnđếm.",
+    "artifact": "/workspace/scratch/pin1216-bridge4x.png",
+    "drawTreatment": "Ảnhlineartgốc,môphỏngvector2solutionfillxámmịnđểđọcrõlabels/tubes;giữốngUcó2vách/nhúng2đầu,khôngmấttubetrongnềnsolution.",
+    "svg": "pin-zn-cu-ddh-7466c3f98254818dea2c3d1684cfd79af437350d52bd1505004268f535486245.svg",
+    "hashSvg": "7466c3f98254818dea2c3d1684cfd79af437350d52bd1505004268f535486245",
+    "byteSvg": 24399,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "2cups/ZnCu/ZnSO4CuSO4(aq)/2e→KHÔNGminus/2bridgearcs→←VÀOGIỮA/Cl−↓NH4+↓/NH4Cl/Cầumuối/2wallU2endsnhúng/solutiongraykhôngsốhạt. LabelreflowtheoDDHđểkhôngđụngleader;khôngpolarityhayionmớithêm.",
+    "hashSvgDaSoat": "7466c3f98254818dea2c3d1684cfd79af437350d52bd1505004268f535486245",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

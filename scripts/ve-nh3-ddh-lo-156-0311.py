@@ -1,0 +1,14 @@
+"""Thiết bị NH3 ở trạng thái nguồn: chưa có tia nước hoặc màu hồng."""
+from pathlib import Path
+import importlib.util,json,hashlib
+G=Path(__file__).resolve().parents[1];M=G/'docs/hinh-vector-0311/kiem';s=importlib.util.spec_from_file_location('phong',G/'scripts/phong-vector-0311.py');F=importlib.util.module_from_spec(s);s.loader.exec_module(F)
+r=next(r for r in json.loads((M/'doc-chi-tiet-con-lai-lo-155.json').read_text())if r['i']==575)
+b='<defs><linearGradient id="steel"><stop stop-color="#666"/><stop offset=".35" stop-color="#eee"/><stop offset="1" stop-color="#888"/></linearGradient><clipPath id="water"><rect x="150" y="186" width="116" height="29" rx="3"/></clipPath></defs><g transform="translate(25 20) scale(2)"><rect x="69" y="39" width="9" height="174" fill="url(#steel)" stroke="#252440" stroke-width=".8"/><rect x="64" y="212" width="19" height="5" fill="#aaa" stroke="#252440" stroke-width=".8"/><rect x="44" y="217" width="238" height="14" fill="#999" stroke="#252440" stroke-width=".9"/>'
+for x,y,w,h in[(54,230,13,6),(258,230,12,6)]:b+=f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="#999" stroke="#252440" stroke-width=".7"/>'
+b+='<path d="M180 35H235Q251 35 251 51V121Q251 136 230 139V145H184V139Q164 136 164 121V51Q164 35 180 35Z" fill="#fff" stroke="#252440" stroke-width="1.1"/><rect x="9" y="142" width="175" height="3" fill="#ddd" stroke="#252440" stroke-width=".7"/><ellipse cx="78" cy="143" rx="19" ry="7" fill="#161614"/><rect x="65" y="134" width="13" height="17" fill="#161614"/><ellipse cx="178" cy="142" rx="9" ry="4" fill="#161614"/><rect x="149" y="177" width="118" height="39" rx="3" fill="#fff" stroke="#252440" stroke-width=".9"/><path d="M149 185H267" stroke="#252440" stroke-width=".7"/><g clip-path="url(#water)">'
+for row,y in enumerate(range(189,216,5)):
+ for x in range(153+(row%2)*5,267,13):b+=f'<path d="M{x} {y}h4" stroke="#252440" stroke-width=".65"/>'
+b+='</g><path d="M205 211V107L207 99L210 107V211" fill="none" stroke="#252440" stroke-width=".9"/><rect x="188" y="145" width="42" height="19" fill="#141413"/>'
+b+=F.label(353,51,'Khí NH₃',18)+F.label(390,165,'Nước có hòa tan vài giọt',18,'start')+F.label(390,187,'phenolphthalein',18,'start')+'<path d="M306 56L226 72M370 181L246 197" stroke="#252440" stroke-width=".8" fill="none"/></g>'
+raw=('<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="550" viewBox="0 0 1400 550"><title>Bộ thiết bị khí NH3 theo trạng thái nguồn</title>'+b+'</svg>').encode();hh=hashlib.sha256(raw).hexdigest();fn='nh3-setup-ddh-'+hh+'.svg';(M/fn).write_bytes(raw);r.update(svg=fn,hashSvg=hh,byteSvg=len(raw),font='DDH Rounded',hashPhong=F.HASH,trangThai='cho-soat-doc-lap',ghiChuDung='Bìnhúp/chỉkhí/plugđen/ống2váchđầunhọn/beakernướcdưới/standclamps/2labelgroups2leadersNOhead;CHƯAjet-hồng/nướcdâng/bubbles/thêmphenomenon. Waterhatchkýhiệukhôngsốhạt.')
+(M/'cau-truc-nh3-ddh-lo-156-ban-dung.json').write_text(json.dumps([r],ensure_ascii=False,indent=2))

@@ -1209,3 +1209,10 @@ Phân vùng dự kiến theo hai bản thiết kế:
 - 04/11 UTC · Codex(vector kho) · ĐãlưuĐỦ20nguồn149native/full+publicde/refs/geometry;CHƯAđượctínhđạt/chưadựng.1014photo-compositecầnsoátgiữrasterkhôngvẽgiả;4graphgiữA-Dtheoglyph/fullset/stem,1379giữproductnguyênvănkhôngtựsửahóahọc.
 
 - 04/11 UTC · Codex(vector kho) · Lô149–154 hoànthiện9nguồn/8SVG,khép12câu;soátđộclậpRIÊNGPNG/base/render/hash:1291dóng295/đỉnh308;1207MSbarpixelgiữheight;1339đúng14màuRGBmedian/CHỈ3concentration;1304alias346;1406CHỈhorizontalC3–C2đậm;4graphGIỮA.B.C.D.theoglyph/fullset/stem,footer978unknownngoàifigurekhôngbịa/khôngbỏB-Xlabel. Tổng941câuđủmọihình+DDH/7mộtphần;733nguồn→493SVG;7.218.032byte/gzip1.458.678;còn695nguồn. Chromium493/493/hash/XML/path/Python/build/tốcđộđạt/precache170/2613KB. Nhóm149còn11đãđọcgeometry155đủ/lưu;1014compositeraster+labelvectorchỉsoátnguồnCHƯAasset/khôngtínhđạt. Main0200b893chưagộp/WOFF2khôngdiff;chưatíchhợp/chưareloadofflineapp/chưapháthành. Chưa tham vấn được cố vấn.
+
+
+### 04/11 — Vector lô155–156: pin ZnCu và setup NH3
+- Hoàn thiện thêm3nguồn/2SVG, khép8câu;949câu đủ mọi hình+DDH/7mộtphần,736nguồn→495SVG,7.266.725byte/gzip1.468.516,còn692nguồn.
+- 483/1216giữ2electronarrow→,2bridgearrow→←vào giữa và ionCl−/NH4+;đãthu NH4+size12 để không chạm vách.575giữsetup ban đầu,khôngjet/pink/nước dâng;2captionline/2leader. Tác tử chỉ đọc mở riêng từngPNGnative vàSVG render,proofexacthash155/156 đã nhập helper.
+- Chromium495/495/hash/XML/path/PythonAST/build/tốcđộđạt;precache170/2613.23KiB. Mainfetch0200b893chưa gộp,WOFF2khôngdiff;testfulltheotên/mainmới+ca thi còn phải chạy trước triểnkhai. Chưa tích hợp/chưa reload offline app/chưa phát hành. Chưa tham vấn được cố vấn.
+- Tiếp82/587/1024/1259/1014/1379/7/209 từgeometry155;1014composite phải táchDDHlabel/arrow,giữpixel2ống.59/1391vẫn bịloạiphongcách,khôngđoánvạch/hạt/hạgate.
