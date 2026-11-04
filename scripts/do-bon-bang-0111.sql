@@ -1,11 +1,11 @@
--- HÔM NAY · 4 BẢNG — SOÁT TRÊN DỮ LIỆU THẬT (CHỈ ĐỌC, 01/11 · đếm lại 02/11 sau tính BAN_BON 4 = v3 ca thi + lên bảng, v3b hai trục bỏ «Đang theo dõi», PR #741). · đếm 03/11 sáng
+-- HÔM NAY · 4 BẢNG — SOÁT TRÊN DỮ LIỆU THẬT (CHỈ ĐỌC, 01/11 · đếm lại 02/11 sau tính BAN_BON 4 = v3 ca thi + lên bảng, v3b hai trục bỏ «Đang theo dõi», PR #741). · đếm 04/11 sáng (ban 5)
 -- Một câu SELECT, chỉ SỐ ĐẾM GỘP: không SBD, không tên (repo công khai). Cột v3 chỉ tính trên dòng đã tính lại `ban = 4`.
 -- PHẢI = 0: chua_xep_bang_nao, sai_truc_cong_suc, chong_ht_dp, dang_theo_doi_ban4. chua_co_ban_tinh = em đang học chưa có dòng (cron chưa tới lượt).
 SELECT
   COUNT(*) AS so_em,
   (SELECT COUNT(*) FROM hoc_sinh h WHERE COALESCE(h.trang_thai, '') NOT IN ('khoa', 'da_nghi')) AS hoc_sinh_dang_hoc,
   (SELECT COUNT(*) FROM hoc_sinh h WHERE COALESCE(h.trang_thai, '') NOT IN ('khoa', 'da_nghi') AND NOT EXISTS (SELECT 1 FROM bon_chi_so_em b WHERE b.sbd = h.sbd)) AS chua_co_ban_tinh,
-  SUM(json_extract(so_lieu_json, '$.ban') = 4) AS da_tinh_ban4,
+  SUM(json_extract(so_lieu_json, '$.ban') = 5) AS da_tinh_ban5,
   SUM(COALESCE(json_extract(so_lieu_json, '$.ban'), 0) < 4) AS con_ban_cu,
   SUM(json_extract(so_lieu_json, '$.vao.ht') = 1) AS bang_hoc_that,
   SUM(json_extract(so_lieu_json, '$.vao.dp') = 1) AS bang_doi_pho,
