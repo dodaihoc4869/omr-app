@@ -1,0 +1,316 @@
+[
+  {
+    "i": 82,
+    "hash": "10da97400c3268d7fe33736059052f7b4c76a1c3464449e1076b93a01236e073",
+    "fileNguon": "anh/10da97400c3268d7fe33736059052f7b4c76a1c3464449e1076b93a01236e073.png",
+    "canvas": [
+      368,
+      414
+    ],
+    "daMoNative": true,
+    "kind": "saponification-lab-stir",
+    "text": [
+      "Liên tục khuấy",
+      "bằng đũa thủy tinh",
+      "2 mL dầu ăn",
+      "5 mL dung dịch",
+      "NaOH 40%"
+    ],
+    "notes": "Bátsứchịunhiệtbođáycótayđũathủytinhchéolêntừtrongliquidyellow,sốlabelvănđỏởtrêntrái;curvedstirarrowquanhđầuđũaphíatrênphải(nhìnsourcegiữhướnghead). Bátđặttrênlướivuôngôcrosshatch,trên3chângiáxanhlam,códèncồnnhỏdướigiữavàngọnlửađỏdướibát. Nướcdầumàuvàngtrongbát,KHÔNGmôphỏngảnhphoto;đâylàillustration. Giữ5dòngtext/2mL/5mL/40%,khôngđổi5mLNaOH40%thànhnồngđộkhác.",
+    "questions": [
+      {
+        "qid": "12-BD7-18-II-1",
+        "de": "Tiến hành thí nghiệm xà phòng hoá chất béo được minh hoạ như hình bên:\nBước 1: Cho vào bát sứ nhỏ khoảng 2 mL dầu ăn và 5 mL dung dịch NaOH 40%.\nBước 2: Đun sôi nhẹ hỗn hợp, liên tục khuấy đều bằng đũa thuỷ tinh khoảng 20 phút và thỉnh thoảng thêm nước cất để giữ cho thể tích hỗn hợp không đổi rồi để nguội hỗn hợp.\nBước 3: Rót thêm vào hỗn hợp 15-20 mL dung dịch NaCl bão hoà, khuấy nhẹ rồi để yên hỗn hợp.",
+        "refs": [
+          {
+            "where": "12-BD7-18-II-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "12-C1-B1-D1-II-7",
+        "de": "Tiến hành thí nghiệm xà phòng hoá chất béo được minh hoạ như hình bên:\nBước 1: Cho vào bát sứ nhỏ khoảng 2 mL dầu ăn và 5 mL dung dịch NaOH 40%.\nBước 2: Đun sôi nhẹ hỗn hợp, liên tục khuấy đều bằng đũa thuỷ tinh khoảng 20 phút và thỉnh thoảng thêm nước cất để giữ cho thể tích hỗn hợp không đổi rồi để nguội hỗn hợp.\nBước 3: Rót thêm vào hỗn hợp 15-20 mL dung dịch NaCl bão hoà, khuấy nhẹ rồi để yên hỗn hợp.",
+        "refs": [
+          {
+            "where": "12-C1-B1-D1-II-7.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P2-D1-II-4",
+        "de": "Tiến hành thí nghiệm xà phòng hoá chất béo được minh hoạ như hình bên:\nBước 1: Cho vào bát sứ nhỏ khoảng 2 mL dầu ăn và 5 mL dung dịch NaOH 40%.\nBước 2: Đun sôi nhẹ hỗn hợp, liên tục khuấy đều bằng đũa thuỷ tinh khoảng 20 phút và thỉnh thoảng thêm nước cất để giữ cho thể tích hỗn hợp không đổi rồi để nguội hỗn hợp.\nBước 3: Rót thêm vào hỗn hợp 15-20 mL dung dịch NaCl bão hoà, khuấy nhẹ rồi để yên hỗn hợp.",
+        "refs": [
+          {
+            "where": "DB-12-B1-P2-D1-II-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P2-D1-II-55",
+        "de": "Tiến hành thí nghiệm xà phòng hoá chất béo được minh hoạ như hình bên:\nBước 1: Cho vào bát sứ nhỏ khoảng 2 mL dầu ăn và 5 mL dung dịch NaOH 40%.\nBước 2: Đun sôi nhẹ hỗn hợp, liên tục khuấy đều bằng đũa thuỷ tinh khoảng 20 phút và thỉnh thoảng thêm nước cất để giữ cho thể tích hỗn hợp không đổi rồi để nguội hỗn hợp.\nBước 3: Rót thêm vào hỗn hợp 15-20 mL dung dịch NaCl bão hoà, khuấy nhẹ rồi để yên hỗn hợp.",
+        "refs": [
+          {
+            "where": "DB-12-B1-P2-D1-II-55.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry155": {
+      "canvas": [
+        368,
+        414
+      ],
+      "redLabels": [
+        {
+          "text": "Liên tục khuấy",
+          "at": [
+            127,
+            55
+          ]
+        },
+        {
+          "text": "bằng đũa thủy tinh",
+          "at": [
+            148,
+            86
+          ]
+        },
+        {
+          "text": "2 mL dầu ăn",
+          "at": [
+            90,
+            138
+          ]
+        },
+        {
+          "text": "5 mL dung dịch",
+          "at": [
+            104,
+            171
+          ]
+        },
+        {
+          "text": "NaOH 40%",
+          "at": [
+            83,
+            204
+          ]
+        }
+      ],
+      "bowl": {
+        "rimEllipse": [
+          210,
+          192,
+          62,
+          25
+        ],
+        "bodyApprox": [
+          [
+            148,
+            189
+          ],
+          [
+            150,
+            241
+          ],
+          [
+            164,
+            281
+          ],
+          [
+            191,
+            300
+          ],
+          [
+            217,
+            301
+          ],
+          [
+            247,
+            281
+          ],
+          [
+            266,
+            241
+          ],
+          [
+            272,
+            196
+          ]
+        ],
+        "yellowLiquidEllipse": [
+          209,
+          266,
+          48,
+          28
+        ]
+      },
+      "glassRod": {
+        "from": [
+          256,
+          61
+        ],
+        "to": [
+          208,
+          270
+        ],
+        "color": "lightblue"
+      },
+      "stirArrow": {
+        "curvedPathApprox": [
+          [
+            263,
+            85
+          ],
+          [
+            240,
+            80
+          ],
+          [
+            220,
+            91
+          ],
+          [
+            222,
+            105
+          ],
+          [
+            240,
+            116
+          ],
+          [
+            261,
+            114
+          ],
+          [
+            278,
+            104
+          ]
+        ],
+        "head": [
+          278,
+          104
+        ],
+        "noextraLabel": true
+      },
+      "meshQuadrilateral": [
+        [
+          147,
+          212
+        ],
+        [
+          333,
+          212
+        ],
+        [
+          289,
+          303
+        ],
+        [
+          94,
+          303
+        ]
+      ],
+      "tripodLegs": [
+        [
+          [
+            125,
+            303
+          ],
+          [
+            116,
+            376
+          ]
+        ],
+        [
+          [
+            281,
+            303
+          ],
+          [
+            294,
+            374
+          ]
+        ],
+        [
+          [
+            321,
+            240
+          ],
+          [
+            328,
+            292
+          ]
+        ]
+      ],
+      "alcoholLamp": {
+        "bowlEllipse": [
+          205,
+          347,
+          44,
+          26
+        ],
+        "baseApprox": [
+          177,
+          370,
+          232,
+          380
+        ],
+        "wickPath": [
+          [
+            204,
+            310
+          ],
+          [
+            199,
+            326
+          ],
+          [
+            197,
+            334
+          ],
+          [
+            215,
+            345
+          ],
+          [
+            217,
+            358
+          ],
+          [
+            195,
+            369
+          ]
+        ],
+        "smallFlameRedAt": [
+          204,
+          305
+        ]
+      },
+      "reagentLeader": [
+        [
+          128,
+          185
+        ],
+        [
+          185,
+          268
+        ]
+      ]
+    },
+    "criticalTextAndShape": "BÁTSỨbođáykhôngbeakercóngangthành/spout. Giữ2mL/5mL/NaOH40%vàtextstir. Rodyellowliquid+curvedarrowdothuyếtminhkhôngshowprecipitate/soapflake.",
+    "svg": "bat-su-ddh-4684b69c9d6ebec4490fa29c88bcec1c8ebe98105a91c76d296e5ff0ae64b12b.svg",
+    "hashSvg": "4684b69c9d6ebec4490fa29c88bcec1c8ebe98105a91c76d296e5ff0ae64b12b",
+    "byteSvg": 32189,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Bát sứ/liquid vàng/đũa/arrow khuấy/mesh3chân/lamp;đủ5dòngđỏ2mL5mL40%,khôngthêm sản phẩm/hạt.",
+    "hashSvgDaSoat": "4684b69c9d6ebec4490fa29c88bcec1c8ebe98105a91c76d296e5ff0ae64b12b",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

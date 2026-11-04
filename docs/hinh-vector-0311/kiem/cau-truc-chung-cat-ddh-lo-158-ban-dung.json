@@ -1,0 +1,476 @@
+[
+  {
+    "i": 587,
+    "hash": "6d7ce74590055d3d9750cd959ffd019b5e3fdd4e128de0aac0065a81a6d91125",
+    "fileNguon": "anh/6d7ce74590055d3d9750cd959ffd019b5e3fdd4e128de0aac0065a81a6d91125.png",
+    "canvas": [
+      464,
+      290
+    ],
+    "daMoNative": true,
+    "kind": "distillation-lab-labelled",
+    "labels": [
+      "Nước ra",
+      "Sinh hàn",
+      "Nước vào",
+      "Bình cầu",
+      "Lưới amiăng",
+      "Bình hứng"
+    ],
+    "notes": "2giáđỡtrụđứng/chânđếtrái/phải. Roundflasktráiđứngtrênlướinằmngangkẹpgiá,dướicódèncồnmàutrongmờcóngọnlửa,flaskchứaliquidxámthấpmức,nocầnthermometertrongsource. Ốnghơitừcổflaskđứnglênrồibẻgócphảixuống,điquasinhhànTHẲNGinclineddownright,kếtthúcuốngcongđivàobìnhtamgiáchứngtrênkhốigỗvânởphảidưới. NhãnNướcratrênbêntráisinhhàn,sourceportđầucao;Nướcvàodướigầnđầuphải/thấp;Sinhhànleadergiữathân.Bìnhcầu/Lướiamiăng/Bìnhhứngleaderchỉđúng3parts. Khôngsố1..5/khôngthêmNhiệtkếnếunguồnkhôngcó.",
+    "questions": [
+      {
+        "qid": "DB-12-B1-P1-D2-II-99",
+        "de": "Tiến hành thí nghiệm điều chế isoamyl acetate (có mùi chuối chín) theo thứ tự các bước sau:\nBước 1. Cho 3 mL isoamyl alcohol, 4 mL acetic acid và 5 mL H₂SO₄ đặc vào bình cầu, lắc đều và đun nhẹ trong khoảng 7 – 8 phút.\nBước 2. Để nguội chất lỏng ở bình hứng, thêm 10 mL dung dịch NaCl bão hoà và cho sang phễu chiết để tách sản phẩm.\nMỗi phát biểu sau đây là đúng hay sai?",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D2-II-99.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D2-II-100",
+        "de": "Tiến hành thí nghiệm điều chế isoamyl acetate (có mùi chuối chín) theo thứ tự các bước sau đây:\nBước 1. Cho 3 mL isoamyl alcohol, 4 mL acetic acid và 5 mL H₂SO₄ đặc vào bình cầu, lắc đều và đun nhẹ trong khoảng 7−8 phút.\nBước 2. Để nguội chất lỏng ở bình hứng, thêm 10 mL dung dịch NaCl bão hoà và cho sang phễu chiết để tách sản phẩm thu được.\nMỗi phát biểu sau đây là đúng hay sai?",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D2-II-100.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B1-P1-II-28",
+        "de": "Tiến hành thí nghiệm điều chế isoamyl acetate (có mùi chuối chín) theo thứ tự các bước sau:\nBước 1. Cho 3 mL isoamyl alcohol, 4 mL acetic acid và 5 mL H₂SO₄ đặc vào bình cầu, lắc đều và đun nhẹ trong khoảng 7 – 8 phút.\nBước 2. Để nguội chất lỏng ở bình hứng, thêm 10 mL dung dịch NaCl bão hoà và cho sang phễu chiết để tách sản phẩm.\nMỗi phát biểu sau đây là đúng hay sai?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P1-II-28.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B1-P1-II-33",
+        "de": "Tiến hành thí nghiệm điều chế isoamyl acetate (có mùi chuối chín) theo thứ tự các bước sau đây:\nBước 1. Cho 3 mL isoamyl alcohol, 4 mL acetic acid và 5 mL H₂SO₄ đặc vào bình cầu, lắc đều và đun nhẹ trong khoảng 7−8 phút.\nBước 2. Để nguội chất lỏng ở bình hứng, thêm 10 mL dung dịch NaCl bão hoà và cho sang phễu chiết để tách sản phẩm thu được.\nMỗi phát biểu sau đây là đúng hay sai?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P1-II-33.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B1-P1-VD-II-5",
+        "de": "Tiến hành thí nghiệm điều chế isoamyl acetate (có mùi chuối chín) theo thứ tự các bước sau đây:\nBước 1. Cho 3 mL isoamyl alcohol, 4 mL acetic acid và 5mLH₂SO₄ đặc vào bình cầu, lắc đều và đun nhẹ trong khoảng 7−8 phút.\nBước 2. Để nguội chất lỏng ở bình hứng, thêm 10 mL dung dịch NaCl bão hoà và cho sang phễu chiết để tách sản phẩm thu được.",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P1-VD-II-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry155": {
+      "canvas": [
+        464,
+        290
+      ],
+      "stands": [
+        {
+          "pole": [
+            [
+              45,
+              5
+            ],
+            [
+              45,
+              273
+            ]
+          ],
+          "footPolygon": [
+            [
+              26,
+              272
+            ],
+            [
+              183,
+              272
+            ],
+            [
+              194,
+              285
+            ],
+            [
+              18,
+              285
+            ]
+          ]
+        },
+        {
+          "pole": [
+            [
+              283,
+              5
+            ],
+            [
+              283,
+              273
+            ]
+          ],
+          "footPolygon": [
+            [
+              220,
+              273
+            ],
+            [
+              345,
+              273
+            ],
+            [
+              355,
+              284
+            ],
+            [
+              212,
+              284
+            ]
+          ]
+        }
+      ],
+      "roundFlask": {
+        "center": [
+          111,
+          166
+        ],
+        "radius": 26,
+        "neckRect": [
+          103,
+          104,
+          119,
+          143
+        ],
+        "liquidTopY": 174
+      },
+      "vapourTubeApprox": [
+        [
+          111,
+          104
+        ],
+        [
+          111,
+          61
+        ],
+        [
+          115,
+          54
+        ],
+        [
+          122,
+          55
+        ],
+        [
+          179,
+          76
+        ]
+      ],
+      "condenser": {
+        "axisFrom": [
+          180,
+          77
+        ],
+        "axisTo": [
+          367,
+          141
+        ],
+        "outerJacketApprox": [
+          [
+            208,
+            75
+          ],
+          [
+            358,
+            125
+          ],
+          [
+            365,
+            137
+          ],
+          [
+            356,
+            144
+          ],
+          [
+            200,
+            90
+          ],
+          [
+            195,
+            82
+          ]
+        ],
+        "innerDoubleLines": [
+          [
+            [
+              181,
+              76
+            ],
+            [
+              366,
+              138
+            ]
+          ],
+          [
+            [
+              179,
+              81
+            ],
+            [
+              364,
+              144
+            ]
+          ]
+        ],
+        "upperWaterPortApprox": [
+          [
+            219,
+            78
+          ],
+          [
+            220,
+            74
+          ],
+          [
+            229,
+            77
+          ]
+        ],
+        "lowerWaterPortApprox": [
+          [
+            334,
+            140
+          ],
+          [
+            332,
+            146
+          ],
+          [
+            341,
+            148
+          ]
+        ]
+      },
+      "receivingTube": [
+        [
+          367,
+          141
+        ],
+        [
+          415,
+          160
+        ],
+        [
+          424,
+          168
+        ],
+        [
+          425,
+          181
+        ]
+      ],
+      "receiverErlen": {
+        "mouth": [
+          424,
+          180,
+          7,
+          3
+        ],
+        "bodyApprox": [
+          [
+            419,
+            184
+          ],
+          [
+            397,
+            243
+          ],
+          [
+            403,
+            247
+          ],
+          [
+            441,
+            247
+          ],
+          [
+            449,
+            243
+          ],
+          [
+            430,
+            184
+          ]
+        ]
+      },
+      "woodBlock": [
+        398,
+        249,
+        449,
+        285
+      ],
+      "wireGauze": [
+        [
+          82,
+          196
+        ],
+        [
+          151,
+          196
+        ]
+      ],
+      "alcoholLamp": {
+        "bodyEllipse": [
+          111,
+          249,
+          28,
+          18
+        ],
+        "neck": [
+          105,
+          220,
+          117,
+          230
+        ],
+        "flameAt": [
+          112,
+          210
+        ]
+      },
+      "labels": [
+        {
+          "text": "Nước ra",
+          "at": [
+            211,
+            54
+          ],
+          "leader": [
+            [
+              226,
+              64
+            ],
+            [
+              254,
+              72
+            ]
+          ],
+          "flowArrowHead": [
+            254,
+            72
+          ]
+        },
+        {
+          "text": "Sinh hàn",
+          "at": [
+            382,
+            115
+          ],
+          "leader": [
+            [
+              347,
+              115
+            ],
+            [
+              304,
+              115
+            ]
+          ],
+          "arrowHead": false
+        },
+        {
+          "text": "Nước vào",
+          "at": [
+            352,
+            165
+          ],
+          "leader": [
+            [
+              315,
+              150
+            ],
+            [
+              338,
+              157
+            ]
+          ],
+          "flowArrowHead": [
+            315,
+            150
+          ]
+        },
+        {
+          "text": "Bình cầu",
+          "at": [
+            194,
+            163
+          ],
+          "leader": [
+            [
+              162,
+              164
+            ],
+            [
+              137,
+              164
+            ]
+          ],
+          "arrowHead": false
+        },
+        {
+          "text": "Lưới amiăng",
+          "at": [
+            218,
+            191
+          ],
+          "leader": [
+            [
+              169,
+              190
+            ],
+            [
+              143,
+              193
+            ]
+          ],
+          "arrowHead": false
+        },
+        {
+          "text": "Bình hứng",
+          "at": [
+            338,
+            231
+          ],
+          "leader": [
+            [
+              379,
+              230
+            ],
+            [
+              407,
+              236
+            ]
+          ],
+          "arrowHead": false
+        }
+      ]
+    },
+    "sourceCaution": "Nướcralabel/flowarrowởđầucaotráisinhhàn,Nướcvàoởđầuthấpphải;khôngđảohaiport/label. Khôngthermometer/số(1)..(5)trongsource587,đừngcopy1024thêm. Condensatedropnhỏtrongreceivernhòeđừngtựchốtcount,giữgeometrysourcekhiroottrace.",
+    "svg": "chung-cat-ddh-30359c04ecb88b090a7ea0e45a0095a3053226cbd243529114b814e62ee0d53b.svg",
+    "hashSvg": "30359c04ecb88b090a7ea0e45a0095a3053226cbd243529114b814e62ee0d53b",
+    "byteSvg": 28775,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "2stands/flaskmeshspiritlamp/2wall inclinedcondenser/portsupperOUTlowerIN/receiverwoodblock/6labels;khôngthermometer/numbers/khôngđoáncount giọt mờ.",
+    "hashSvgDaSoat": "30359c04ecb88b090a7ea0e45a0095a3053226cbd243529114b814e62ee0d53b",
+    "nguoiSoat": "cau_truc_6"
+  }
+]

@@ -1216,3 +1216,10 @@ Phân vùng dự kiến theo hai bản thiết kế:
 - 483/1216giữ2electronarrow→,2bridgearrow→←vào giữa và ionCl−/NH4+;đãthu NH4+size12 để không chạm vách.575giữsetup ban đầu,khôngjet/pink/nước dâng;2captionline/2leader. Tác tử chỉ đọc mở riêng từngPNGnative vàSVG render,proofexacthash155/156 đã nhập helper.
 - Chromium495/495/hash/XML/path/PythonAST/build/tốcđộđạt;precache170/2613.23KiB. Mainfetch0200b893chưa gộp,WOFF2khôngdiff;testfulltheotên/mainmới+ca thi còn phải chạy trước triểnkhai. Chưa tích hợp/chưa reload offline app/chưa phát hành. Chưa tham vấn được cố vấn.
 - Tiếp82/587/1024/1259/1014/1379/7/209 từgeometry155;1014composite phải táchDDHlabel/arrow,giữpixel2ống.59/1391vẫn bịloạiphongcách,khôngđoánvạch/hạt/hạgate.
+
+
+### 04/11 — Vector lô157–158: bát sứ và chưng cất
+- Thêm2nguồn/2SVG/9câu;958câu đủ mọi hình+DDH/7mộtphần;738nguồn→497SVG,7.327.689byte/gzip1.480.806,còn690nguồn.
+-82giữ5dòngđỏ/2mL5mL40%/rod-stirarrow/mesh3chân/lamp;đãsửagapchữtinh–arrow bằngsize16hai dòngtrên.587giữ6labels/2stands/flaskmeshspiritlamp/condenser/OUTupperINlower/receiverwoodblock;đãbổsungkẹpstandphải trướcống,khôngthêmthermometer/numbers/countgiọtmờ. Tác tử chỉđọc soát RIÊNGPNGnative/renderfresh/exacthashđạt;2bảncũCầnsửa lưu riêngBỊLOẠI,khôngchọn.
+- Chromium497/497/hash/XML/path/PythonAST/build/tốcđộđạt;precache170/2613.23KiB. Mainfetch0200b893chưagộp,WOFF2khôngdiff;phải sofulltesttheotên/mainmới+ca thi trước triểnkhai. Chưa tích hợp/chưa reloadofflineapp/chưa phát hành. Chưa tham vấn được cố vấn.
+-Nhóm149xong14/20,còn1024/1259/1014/1379/7/209 từgeometry155;1014composite cầnraster+DDHannotations,chưađạt.59/1391vẫnbịloạiphongcách,khôngđoán/hạgate.
