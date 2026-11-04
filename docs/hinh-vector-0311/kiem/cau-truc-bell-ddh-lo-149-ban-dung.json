@@ -1,0 +1,113 @@
+[
+  {
+    "i": 1291,
+    "hash": "eaac9a38986a1cd27a039ffce453de540a9f14e1f1948ee2cb8facb26b96074c",
+    "fileNguon": "anh/eaac9a38986a1cd27a039ffce453de540a9f14e1f1948ee2cb8facb26b96074c.png",
+    "canvas": [
+      587,
+      428
+    ],
+    "daMoNative": true,
+    "kind": "enzyme-temperature-bell",
+    "xLabel": "T(°C)",
+    "yLabel": "r",
+    "xTicks": [
+      10,
+      20,
+      30,
+      40,
+      50,
+      60
+    ],
+    "notes": "1curveđenbắtđầu~(71,317),tăngđếnđỉnh(308,73),rồigiảmđến(479,345). Origin(40,355),Yarrow(40,54),Xarrow(529,355). DóngDỌCĐỨTtừ(295,355)lên(295,74)ởgiữa30/40(gần38°C),KHÔNGđiđúngtick40;đỉnhcurve(30873)lệchphảidóng~13px. Sourcegiữdóng38-ishkhôngtựdờisangđỉnh.Ticksnative10x68/20x150/30x230/40x311/50x392/60x474. KHÔNGYticks/0/labelamylase.",
+    "questions": [
+      {
+        "qid": "12-KT-C2-D4-II-4",
+        "de": "Sự phụ thuộc của tốc độ thuỷ phân tinh bột (r) vào nhiệt độ (T) của phản ứng được xúc tác bởi một loại enzyme amylase (có cấu tạo từ protein) được mô tả như hình dưới đây.",
+        "refs": [
+          {
+            "where": "12-KT-C2-D4-II-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B6-D1-II-51",
+        "de": "Sự phụ thuộc của tốc độ thuỷ phân tinh bột (r) vào nhiệt độ (T) của phản ứng được xúc tác bởi một loại enzyme amylase (có cấu tạo từ protein) được mô tả như hình dưới đây.",
+        "refs": [
+          {
+            "where": "DB-12-B6-D1-II-51.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "bell-r-ddh-280fde9d8b6608891bb1e27d2fafcb03cb179cc2871ac761ae5cfee177e4f39c.svg",
+    "hashSvg": "280fde9d8b6608891bb1e27d2fafcb03cb179cc2871ac761ae5cfee177e4f39c",
+    "byteSvg": 9535,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "curvePixelAnchors": [
+      [
+        71,
+        317
+      ],
+      [
+        115,
+        274
+      ],
+      [
+        154,
+        228
+      ],
+      [
+        197,
+        172
+      ],
+      [
+        235,
+        121
+      ],
+      [
+        270,
+        87
+      ],
+      [
+        295,
+        75
+      ],
+      [
+        308,
+        73
+      ],
+      [
+        350,
+        82
+      ],
+      [
+        389,
+        109
+      ],
+      [
+        422,
+        155
+      ],
+      [
+        445,
+        208
+      ],
+      [
+        465,
+        278
+      ],
+      [
+        479,
+        345
+      ]
+    ],
+    "ghiChuDung": "Dóngnative295lên74/đỉnh30873KHÔNGtrùng;6Xticks/no0-Yticks-caption/curvebắtđầu71317kết479345/2axisarrows. Khôngsửadóngtheotick40/khôngtựgánamylase.",
+    "hashSvgDaSoat": "280fde9d8b6608891bb1e27d2fafcb03cb179cc2871ac761ae5cfee177e4f39c",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

@@ -1,0 +1,64 @@
+[
+  {
+    "i": 1304,
+    "hash": "ebdaab182a48b7ffd7453938ee65a70b77f1769baa9d87824e425aaf5cf92198",
+    "fileNguon": "anh/ebdaab182a48b7ffd7453938ee65a70b77f1769baa9d87824e425aaf5cf92198.png",
+    "canvas": [
+      1193,
+      254
+    ],
+    "daMoNative": true,
+    "kind": "triglyceride-saponification-literal",
+    "leftRows": [
+      "C₁₅H₃₁COOCH₂",
+      "C₁₅H₃₁COOCH",
+      "C₁₅H₃₁COOCH₂"
+    ],
+    "reactantAdditional": "3NaOH",
+    "overArrow": "t°",
+    "products": [
+      "3C₁₅H₃₁COONa",
+      {
+        "rows": [
+          "CH₂OH",
+          "CHOH",
+          "CH₂OH"
+        ],
+        "verticalBonds": true
+      }
+    ],
+    "notes": "Cùngliteral346đãđạt:3rowleftglycerolCH₂–CH–CH₂nốidọc,1arrowphảit°;2sign+giữaester/3NaOHvàsalt/glycerol. Source1304rasterriêngđãmở,khôngtựthêmcaption/charges/finitefattyacidlength;candidatealias346chỉsausoátSVGthật.",
+    "questions": [
+      {
+        "qid": "12-C1-B1-D2-I-49",
+        "de": "Cho phản ứng được biểu diễn thông qua phương trình hoá học sau:\nPhản ứng trên thuộc loại phản ứng nào sau đây?",
+        "refs": [
+          {
+            "where": "12-C1-B1-D2-I-49.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D1-I-38",
+        "de": "Cho phản ứng được biểu diễn thông qua phương trình hoá học sau:\nPhản ứng trên thuộc loại phản ứng nào sau đây?",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D1-I-38.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "polymer-xa-phong-ddh-a5f677f01625c969c2441e21fb22f34372489b5b39d53a5d5fbdc825883e2237.svg",
+    "hashSvg": "a5f677f01625c969c2441e21fb22f34372489b5b39d53a5d5fbdc825883e2237",
+    "byteSvg": 31987,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "baseNguon": 346,
+    "ghiChuDung": "Nguồn1304đãmởriêng/candidate346:3row15-31COOCH2/CH/CH2nốidọc,+3NaOH,t0,3salt+glycerol3rowOH/2plussign;phảimởsource/base/renderđộc lậpexacthash,khôngduyệtfingerprint.",
+    "hashSvgDaSoat": "a5f677f01625c969c2441e21fb22f34372489b5b39d53a5d5fbdc825883e2237",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

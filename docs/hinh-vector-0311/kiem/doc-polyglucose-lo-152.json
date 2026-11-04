@@ -1,0 +1,850 @@
+[
+  {
+    "i": 1406,
+    "hash": "fcca2f3cd109a98de6620b44ca19a1cfbfa1be7abe9d20710c8f0a2b82182285",
+    "fileNguon": "anh/fcca2f3cd109a98de6620b44ca19a1cfbfa1be7abe9d20710c8f0a2b82182285.png",
+    "canvas": [
+      506,
+      166
+    ],
+    "daMoNative": true,
+    "kind": "polysaccharide-three-unit-labelled-link",
+    "notes": "3glucopyranose6ringOtoprightliêntụcliênkếtglycosidicOởdướigiữa2unit.MỖIunitCH₂OHlênC5,OHlênC3,OHxuốngC2;C4bêntráivàC1bênphảilàđiểmnốimạch,KHÔNGOHtựdothêm. KHÔNGHexplit,cácCH₂OH/OHtextphảigiữ.Tấtcảunitcùngorientation,frontC4–C3–C2đậm. Giữaunit1và2:labelcarbon1ởC1unit1,4ởC4unit2;khôngarrowchỉsố1/4.KHÔNGcarbonnumberskhác.Tráivàphảicóellipsis... nốiraC4unit1vàOngoàiC1unit3;giữcả2stub/ellipsis,khôngfinite trisaccharide/nohydrogenendcap.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D2-II-138",
+        "de": "Tại một nhà máy sản xuất rượu, cứ 10 tấn tinh bột (chứa 6,85% tạp chất trơ) sẽ sản xuất được 7,21 m³ dung dịch ethanol 40° (cho khối lượng riêng của ethanol nguyên chất là 0,789 g/cm³). Tinh bột là một polysaccharide gồm nhiều gốc α-glucose liên kết với nhau tạo ra hai dạng mạch amylose và amylopectin. Dưới đây là một đoạn cấu tạo của tinh bột:",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-II-138.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B6-II-28",
+        "de": "Tại một nhà máy sản xuất rượu, cứ 10 tấn tinh bột (chứa 6,85% tạp chất trơ) sẽ sản xuất được 7,21 m³ dung dịch ethanol 40° (cho khối lượng riêng của ethanol nguyên chất là 0,789 g/cm³). Tinh bột là một polysaccharide gồm nhiều gốc α-glucose liên kết với nhau tạo ra hai dạng mạch amylose và amylopectin. Dưới đây là một đoạn cấu tạo của tinh bột:",
+        "refs": [
+          {
+            "where": "DH-12-C2-B6-II-28.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry": {
+      "nativeCanvas": [
+        506,
+        166
+      ],
+      "units": [
+        {
+          "vertices": {
+            "C4": [
+              48,
+              81
+            ],
+            "C3": [
+              72,
+              112
+            ],
+            "C2": [
+              116,
+              112
+            ],
+            "C1": [
+              137,
+              81
+            ],
+            "ringO": [
+              113,
+              47
+            ],
+            "C5": [
+              70,
+              47
+            ]
+          },
+          "CH2OH": {
+            "bond": [
+              [
+                70,
+                47
+              ],
+              [
+                70,
+                28
+              ]
+            ],
+            "text": [
+              90,
+              20
+            ]
+          },
+          "OH_C3": {
+            "bond": [
+              [
+                72,
+                112
+              ],
+              [
+                73,
+                99
+              ]
+            ],
+            "text": [
+              78,
+              89
+            ]
+          },
+          "OH_C2": {
+            "bond": [
+              [
+                116,
+                112
+              ],
+              [
+                117,
+                134
+              ]
+            ],
+            "text": [
+              124,
+              147
+            ]
+          },
+          "ringOrder": [
+            "C4",
+            "C3",
+            "C2",
+            "C1",
+            "ringO",
+            "C5",
+            "C4"
+          ],
+          "boldBonds": [
+            [
+              "C3",
+              "C2"
+            ]
+          ],
+          "otherBondStyle": "5cạnhvòngcònlạithinregularALLsingle,khôngwedge/stereoextra"
+        },
+        {
+          "vertices": {
+            "C4": [
+              205,
+              84
+            ],
+            "C3": [
+              229,
+              115
+            ],
+            "C2": [
+              274,
+              115
+            ],
+            "C1": [
+              293,
+              84
+            ],
+            "ringO": [
+              272,
+              50
+            ],
+            "C5": [
+              227,
+              50
+            ]
+          },
+          "CH2OH": {
+            "bond": [
+              [
+                227,
+                50
+              ],
+              [
+                227,
+                31
+              ]
+            ],
+            "text": [
+              247,
+              23
+            ]
+          },
+          "OH_C3": {
+            "bond": [
+              [
+                229,
+                115
+              ],
+              [
+                230,
+                101
+              ]
+            ],
+            "text": [
+              236,
+              92
+            ]
+          },
+          "OH_C2": {
+            "bond": [
+              [
+                274,
+                115
+              ],
+              [
+                275,
+                137
+              ]
+            ],
+            "text": [
+              281,
+              150
+            ]
+          },
+          "ringOrder": [
+            "C4",
+            "C3",
+            "C2",
+            "C1",
+            "ringO",
+            "C5",
+            "C4"
+          ],
+          "boldBonds": [
+            [
+              "C3",
+              "C2"
+            ]
+          ],
+          "otherBondStyle": "5cạnhvòngcònlạithinregularALLsingle,khôngwedge/stereoextra"
+        },
+        {
+          "vertices": {
+            "C4": [
+              344,
+              82
+            ],
+            "C3": [
+              368,
+              113
+            ],
+            "C2": [
+              412,
+              113
+            ],
+            "C1": [
+              432,
+              82
+            ],
+            "ringO": [
+              410,
+              48
+            ],
+            "C5": [
+              366,
+              48
+            ]
+          },
+          "CH2OH": {
+            "bond": [
+              [
+                366,
+                48
+              ],
+              [
+                366,
+                29
+              ]
+            ],
+            "text": [
+              386,
+              21
+            ]
+          },
+          "OH_C3": {
+            "bond": [
+              [
+                368,
+                113
+              ],
+              [
+                369,
+                99
+              ]
+            ],
+            "text": [
+              375,
+              90
+            ]
+          },
+          "OH_C2": {
+            "bond": [
+              [
+                412,
+                113
+              ],
+              [
+                413,
+                135
+              ]
+            ],
+            "text": [
+              419,
+              148
+            ]
+          },
+          "ringOrder": [
+            "C4",
+            "C3",
+            "C2",
+            "C1",
+            "ringO",
+            "C5",
+            "C4"
+          ],
+          "boldBonds": [
+            [
+              "C3",
+              "C2"
+            ]
+          ],
+          "otherBondStyle": "5cạnhvòngcònlạithinregularALLsingle,khôngwedge/stereoextra"
+        }
+      ],
+      "bridges": [
+        {
+          "fromUnit": 1,
+          "from": "C1",
+          "toUnit": 2,
+          "to": "C4",
+          "oxygen": {
+            "text": "O",
+            "anchor": [
+              173,
+              110
+            ]
+          },
+          "bonds": [
+            [
+              [
+                137,
+                81
+              ],
+              [
+                164,
+                103
+              ]
+            ],
+            [
+              [
+                182,
+                103
+              ],
+              [
+                204,
+                84
+              ]
+            ]
+          ]
+        },
+        {
+          "fromUnit": 2,
+          "from": "C1",
+          "toUnit": 3,
+          "to": "C4",
+          "oxygen": {
+            "text": "O",
+            "anchor": [
+              322,
+              111
+            ]
+          },
+          "bonds": [
+            [
+              [
+                293,
+                84
+              ],
+              [
+                313,
+                103
+              ]
+            ],
+            [
+              [
+                330,
+                103
+              ],
+              [
+                344,
+                82
+              ]
+            ]
+          ]
+        }
+      ],
+      "leftContinuation": {
+        "bond": [
+          [
+            48,
+            81
+          ],
+          [
+            34,
+            99
+          ]
+        ],
+        "ellipsisCenters": [
+          [
+            12,
+            100
+          ],
+          [
+            20,
+            100
+          ],
+          [
+            27,
+            100
+          ]
+        ]
+      },
+      "rightContinuation": {
+        "bond": [
+          [
+            432,
+            82
+          ],
+          [
+            461,
+            104
+          ]
+        ],
+        "oxygen": {
+          "text": "O",
+          "anchor": [
+            469,
+            112
+          ]
+        },
+        "ellipsisCenters": [
+          [
+            483,
+            112
+          ],
+          [
+            490,
+            112
+          ],
+          [
+            497,
+            112
+          ]
+        ]
+      },
+      "carbonNumbers": [
+        {
+          "text": "1",
+          "anchor": [
+            126,
+            83
+          ],
+          "target": "unit1C1"
+        },
+        {
+          "text": "4",
+          "anchor": [
+            195,
+            82
+          ],
+          "target": "unit2C4"
+        }
+      ]
+    },
+    "explicitH": "ZEROHtrêncarbonhiểnthị. Giữ3CH₂OHtext/6OHtext/3ringO/2bridgeO/1externalrightO. CarbonC4ởtráivàC1ởphảigiữaunitkhôngOHtựdo.GiữOH_C3lên/OH_C2xuốngcả3unit. KhôngthêmH/Cnumberskhác.",
+    "correctionAfterZoom": "Quantrọng:ở1406sourceCHỈC3–C2horizontalfrontlàđậmtrênMỖIunit. C4–C3/C2–C1ĐỀUnétthường,đãzoom3xđọcrõ.Khôngáp3boldfrontbondsnhưcácHaworthkhác.",
+    "scope": "ĐoạnPOLYMER3unitvớiellipsis2đầu,kHÔNGfiniteoligosaccharide/capOH/H.Nguồnkhôngrepeatn/brackets,tênamylose/cellulosekhôngthêm.",
+    "diagnostic": "/workspace/scratch/poly1406-3x.png"
+  },
+  {
+    "i": 1207,
+    "hash": "dae44689d492fe14f28614e3ff5450635e5541f06bd3a86fcf7a2c2b79f82b1f",
+    "fileNguon": "anh/dae44689d492fe14f28614e3ff5450635e5541f06bd3a86fcf7a2c2b79f82b1f.png",
+    "canvas": [
+      795,
+      654
+    ],
+    "daMoNative": true,
+    "kind": "isotope-MS-magnesium",
+    "xLabel": "m/z",
+    "yLabel": "Phần trăm số nguyên tử, %",
+    "peaks": [
+      {
+        "mz": 24,
+        "percent": "80%"
+      },
+      {
+        "mz": 25,
+        "percent": "10%"
+      },
+      {
+        "mz": 26,
+        "percent": "10%"
+      }
+    ],
+    "notes": "3đỉnhbarđen/xámhẹp,24cao80%,25và26cao10%bằngnhau;label80%/10%/10%trênđỉnh. Yticks0/20/40/60/80/100;khung4cạnh,khôngmũitên/grid. Xcó3tickCÓSỐ24/25/26và3tickkhôngsốởphầntrái/phảiquanhphổ,đừngtựghi22/23/27.Vịtrínativeplotbox172,70..717,555;peaks404,168..555/482,503..555/558,503..555. Khôngthêm²⁴Mgtextnếunguồnkhôngcó.",
+    "questions": [
+      {
+        "qid": "10-C1-B2-II-19",
+        "de": "Nguyên tố magnesium (₁₂Mg) là nguyên tố phổ biến thứ tám trên vỏ Trái Đất, có trong thành phần đá xà vân, quặng dolomite, carnallite... Phổ khối lượng của nguyên tố magnesium được cho ở hình dưới. Cho 1 amu = 1,66 × 10⁻²⁴ gam.",
+        "refs": [
+          {
+            "where": "10-C1-B2-II-19.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-10-B2-D2-II-42",
+        "de": "Nguyên tố magnesium (₁₂Mg) là nguyên tố phổ biến thứ tám trên vỏ Trái Đất, có trong thành phần đá xà vân, quặng dolomite, carnallite... Phổ khối lượng của nguyên tố magnesium được cho ở hình dưới. Cho 1 amu = 1,66 × 10⁻²⁴ gam.",
+        "refs": [
+          {
+            "where": "DB-10-B2-D2-II-42.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry": {
+      "nativeCanvas": [
+        795,
+        654
+      ],
+      "plotBox": [
+        172,
+        70,
+        717,
+        555
+      ],
+      "axisArrows": false,
+      "xTicks": [
+        {
+          "x": 249,
+          "text": null
+        },
+        {
+          "x": 327,
+          "text": null
+        },
+        {
+          "x": 404,
+          "text": "24"
+        },
+        {
+          "x": 482,
+          "text": "25"
+        },
+        {
+          "x": 558,
+          "text": "26"
+        },
+        {
+          "x": 634,
+          "text": null
+        }
+      ],
+      "yTicks": [
+        {
+          "y": 555,
+          "text": "0"
+        },
+        {
+          "y": 460,
+          "text": "20"
+        },
+        {
+          "y": 362,
+          "text": "40"
+        },
+        {
+          "y": 265,
+          "text": "60"
+        },
+        {
+          "y": 167,
+          "text": "80"
+        },
+        {
+          "y": 70,
+          "text": "100"
+        }
+      ],
+      "bars": [
+        {
+          "mz": 24,
+          "rect": [
+            400,
+            168,
+            407,
+            555
+          ],
+          "label": "80%",
+          "labelAnchor": [
+            420,
+            148
+          ]
+        },
+        {
+          "mz": 25,
+          "rect": [
+            478,
+            503,
+            485,
+            555
+          ],
+          "label": "10%",
+          "labelAnchor": [
+            486,
+            481
+          ]
+        },
+        {
+          "mz": 26,
+          "rect": [
+            554,
+            503,
+            561,
+            555
+          ],
+          "label": "10%",
+          "labelAnchor": [
+            567,
+            481
+          ]
+        }
+      ],
+      "xLabel": {
+        "text": "m/z",
+        "anchor": [
+          689,
+          591
+        ]
+      },
+      "yLabel": {
+        "text": "Phần trăm số nguyên tử, %",
+        "anchor": [
+          85,
+          302
+        ],
+        "orientation": "vertical"
+      }
+    },
+    "notesExact": "6Xtickcóthật,3trống249/327/634KHÔNGtựđiền22/23/27.Khung4cạnh,khônggrid/arrow/isotopeatomicletters.Barsheightnative~387pxvà52pxchưahoàntoàntỷlệ8:1vìsource,giữlabel80/10/10vàgeometrytheoảnhkhôngthêmdữliệuphụ."
+  },
+  {
+    "i": 1291,
+    "hash": "eaac9a38986a1cd27a039ffce453de540a9f14e1f1948ee2cb8facb26b96074c",
+    "fileNguon": "anh/eaac9a38986a1cd27a039ffce453de540a9f14e1f1948ee2cb8facb26b96074c.png",
+    "canvas": [
+      587,
+      428
+    ],
+    "daMoNative": true,
+    "kind": "enzyme-temperature-bell",
+    "xLabel": "T(°C)",
+    "yLabel": "r",
+    "xTicks": [
+      10,
+      20,
+      30,
+      40,
+      50,
+      60
+    ],
+    "notes": "1curveđenbắtđầu~(71,317),tăngđếnđỉnh(308,73),rồigiảmđến(479,345). Origin(40,355),Yarrow(40,54),Xarrow(529,355). DóngDỌCĐỨTtừ(295,355)lên(295,74)ởgiữa30/40(gần38°C),KHÔNGđiđúngtick40;đỉnhcurve(30873)lệchphảidóng~13px. Sourcegiữdóng38-ishkhôngtựdờisangđỉnh.Ticksnative10x68/20x150/30x230/40x311/50x392/60x474. KHÔNGYticks/0/labelamylase.",
+    "questions": [
+      {
+        "qid": "12-KT-C2-D4-II-4",
+        "de": "Sự phụ thuộc của tốc độ thuỷ phân tinh bột (r) vào nhiệt độ (T) của phản ứng được xúc tác bởi một loại enzyme amylase (có cấu tạo từ protein) được mô tả như hình dưới đây.",
+        "refs": [
+          {
+            "where": "12-KT-C2-D4-II-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B6-D1-II-51",
+        "de": "Sự phụ thuộc của tốc độ thuỷ phân tinh bột (r) vào nhiệt độ (T) của phản ứng được xúc tác bởi một loại enzyme amylase (có cấu tạo từ protein) được mô tả như hình dưới đây.",
+        "refs": [
+          {
+            "where": "DB-12-B6-D1-II-51.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry": {
+      "nativeCanvas": [
+        587,
+        428
+      ],
+      "axes": {
+        "origin": [
+          40,
+          355
+        ],
+        "xArrowHead": [
+          529,
+          355
+        ],
+        "yArrowHead": [
+          40,
+          54
+        ],
+        "xTicks": [
+          {
+            "text": "10",
+            "x": 68
+          },
+          {
+            "text": "20",
+            "x": 149
+          },
+          {
+            "text": "30",
+            "x": 230
+          },
+          {
+            "text": "40",
+            "x": 311
+          },
+          {
+            "text": "50",
+            "x": 392
+          },
+          {
+            "text": "60",
+            "x": 473
+          }
+        ],
+        "yTicks": [],
+        "xLabel": {
+          "text": "T(°C)",
+          "anchor": [
+            528,
+            377
+          ]
+        },
+        "yLabel": {
+          "text": "r",
+          "anchor": [
+            49,
+            48
+          ]
+        }
+      },
+      "curve": {
+        "style": "solidblack",
+        "samples": [
+          [
+            71,
+            316
+          ],
+          [
+            100,
+            289
+          ],
+          [
+            130,
+            256
+          ],
+          [
+            160,
+            219
+          ],
+          [
+            190,
+            177
+          ],
+          [
+            220,
+            134
+          ],
+          [
+            250,
+            98
+          ],
+          [
+            280,
+            78
+          ],
+          [
+            295,
+            74
+          ],
+          [
+            308,
+            73
+          ],
+          [
+            335,
+            77
+          ],
+          [
+            360,
+            89
+          ],
+          [
+            390,
+            115
+          ],
+          [
+            420,
+            163
+          ],
+          [
+            440,
+            209
+          ],
+          [
+            460,
+            270
+          ],
+          [
+            479,
+            344
+          ]
+        ],
+        "peakApprox": [
+          308,
+          73
+        ],
+        "start": [
+          71,
+          316
+        ],
+        "end": [
+          479,
+          344
+        ]
+      },
+      "guide": {
+        "from": [
+          295,
+          355
+        ],
+        "to": [
+          295,
+          74
+        ],
+        "style": "dashedblack"
+      }
+    },
+    "notesExact": "CurveONElõmlênrồilõmxuốngđỉnhvàgiảmnhanhphải,nocaption/data/0labels. GuideX295nằmtráiđỉnhX308(khoảng13px),khôngtựkéođỉnhvàguidevề40°C.XtickT60ở473,endcurve479gầnnóc.Khôngthêm38/37label. Đọcngưỡngpixelđen17cột đểxácnhậnsamples."
+  }
+]

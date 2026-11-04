@@ -1,0 +1,96 @@
+[
+  {
+    "i": 1339,
+    "hash": "f28dee75abab70b43232fbfd29122e279ec25fde4d81c1ab00c628cb0bc391d4",
+    "fileNguon": "anh/f28dee75abab70b43232fbfd29122e279ec25fde4d81c1ab00c628cb0bc391d4.png",
+    "canvas": [
+      1128,
+      225
+    ],
+    "daMoNative": true,
+    "kind": "pH-color-scale-14",
+    "topLeft": [
+      "[H⁺]",
+      "(mol/L)"
+    ],
+    "bottomLeft": "pH",
+    "pHNumbers": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "concentrationLabels": [
+      {
+        "atPH": 1,
+        "text": "10⁻¹"
+      },
+      {
+        "atPH": 7,
+        "text": "10⁻⁷"
+      },
+      {
+        "atPH": 14,
+        "text": "10⁻¹⁴"
+      }
+    ],
+    "notes": "14ôchữnhậtmàutừtráiphảipH1..14;từđỏtím→đỏhồng→cam→vàngcam→vàng→vàngtươi→vàngolive→xanhláxám→xanhláđậm→xanhlụcxám→xanhxám→xanhdươngxám→xanhchàm→tím. Mỗiôcó1tickngắntrênvà1tickdưới,sốpHởdưới. CHỈ3concentrationlabel10^-1/-7/-14bêntrên1/7/14,khôngthêm12nhãnkhác. KhôngpH0/15 haytênacid/base;giữdấungoặc[H⁺].",
+    "questions": [
+      {
+        "qid": "11-C1-B2-D2-II-8",
+        "de": "Thang màu pH và nồng độ mol của ion H⁺ trong dung dịch được mô tả ở hình dưới đây:",
+        "refs": [
+          {
+            "where": "11-C1-B2-D2-II-8.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-11-B2-D3-II-62",
+        "de": "Thang màu pH và nồng độ mol của ion H⁺ trong dung dịch được mô tả ở hình dưới đây:",
+        "refs": [
+          {
+            "where": "DB-11-B2-D3-II-62.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "ph-14-ddh-fec484a5cfb90b358780fd09995ba1ec1b9dc9d945be831ca6f0a098a7dbdb36.svg",
+    "hashSvg": "fec484a5cfb90b358780fd09995ba1ec1b9dc9d945be831ca6f0a098a7dbdb36",
+    "byteSvg": 21752,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "mauDoTuNguon": [
+      "#ba4e74",
+      "#fd5f78",
+      "#ff9b69",
+      "#ffc766",
+      "#fcdc66",
+      "#fef867",
+      "#d9ce73",
+      "#a6b38b",
+      "#819977",
+      "#6d8c7e",
+      "#7d8b8d",
+      "#53829f",
+      "#524f99",
+      "#584c95"
+    ],
+    "ghiChuDung": "14ô1..14/28tickmarks/CHỈ3[H+]nồngđộ10^-1,-7,-14tại1/7/14;không0/15/acid-basecaption. ExponentdùngglyphDDHminus-Latindigitnhỏnângbaseline,pathkhôngfallback.",
+    "hashSvgDaSoat": "fec484a5cfb90b358780fd09995ba1ec1b9dc9d945be831ca6f0a098a7dbdb36",
+    "nguoiSoat": "cau_truc_6"
+  }
+]

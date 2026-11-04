@@ -1,0 +1,710 @@
+[
+  {
+    "i": 1278,
+    "hash": "e85f764d0daf928cb8e863606ffa1e0f4d2f4c3b2cf09acda6e3c7678de1ebef",
+    "fileNguon": "anh/e85f764d0daf928cb8e863606ffa1e0f4d2f4c3b2cf09acda6e3c7678de1ebef.png",
+    "canvas": [
+      302,
+      299
+    ],
+    "daMoNative": true,
+    "kind": "enzyme-P-time-labelled",
+    "xLabel": "Thời gian",
+    "yLabel": "[P]",
+    "caption": [
+      "A."
+    ],
+    "shape": "straight-steep",
+    "notes": "1curveđenfromorigin,[P]Y/ThờigianX,2trụcARROW,khôngtick/số/guide. Bộcùng2qidcó4ảnhA./B./C./D.;glyphnhãnởméptráidướibịcắtTHÂNTRÁI nhưngAchéo/B2lobe/Ccungmở/Dcungđóng+dotcònnhìnthấyvàcontextbộ4xácnhận,GIỮcaptionkhôiphụckhôngbỏvìrefsau_de. Ađườngthẳngdốclớn~45°,Bthẳngdốcnhỏ,Ctăngbãohòaplateau,Dlõmlêntăngnhanh;KHÔNGđổiCbằngDtheokiếnthứcenzyme. Riêng978cófooterPDFmépdướiphảibịcắt(ký tựbịcắtKHÔNGđọcrõ),khôngbịanộidungfooter.",
+    "questions": [
+      {
+        "qid": "12-C2-B4-D1-I-61",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian (cơ chất được bổ sung liên tục nên luôn dư)?",
+        "refs": [
+          {
+            "where": "12-C2-B4-D1-I-61.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D2-I-8",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian (cơ chất được bổ sung liên tục nên luôn dư)?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-I-8.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry154": {
+      "canvas": [
+        302,
+        299
+      ],
+      "axes": {
+        "origin": [
+          68,
+          230
+        ],
+        "xArrowHead": [
+          254,
+          230
+        ],
+        "yArrowHead": [
+          68,
+          37
+        ],
+        "xTickPositions": [],
+        "yTickPositions": [],
+        "xLabel": {
+          "text": "Thời gian",
+          "anchor": [
+            160,
+            253
+          ]
+        },
+        "yLabel": {
+          "text": "[P]",
+          "anchor": [
+            42,
+            132
+          ]
+        }
+      },
+      "curve": {
+        "count": 1,
+        "style": "solidblack,nohead,nodots",
+        "samplesPixel": [
+          [
+            68,
+            230
+          ],
+          [
+            90,
+            207
+          ],
+          [
+            120,
+            178
+          ],
+          [
+            150,
+            149
+          ],
+          [
+            180,
+            119
+          ],
+          [
+            210,
+            90
+          ],
+          [
+            250,
+            52
+          ]
+        ],
+        "kind": "straight-steep"
+      },
+      "guides": [],
+      "caption": {
+        "text": "A.",
+        "visibleNativeBox": [
+          0,
+          249,
+          19,
+          272
+        ],
+        "reconstructionSuggestion": "GiữcaptionA./B./C./D.Đểhiệnđủthântráibịcắt,nênthêm~15pxpaddingtrái,đặtcaptionsắpcùngbaselinegốcởbêntráidướiplot. AnchorleftvisiblecropKHÔNGnghĩađượcphépvẽcaptionbịcắtlại."
+      }
+    },
+    "captionEvidence": {
+      "glyphSeen": "A.cònnhánhxiênphải đi xuốngphảivàchânserif+chấm,khôngvòngcung. Điểmchấm~(15,267). BộcùngfontA/B/C/DđọcđủhỗtrợA,khôngchỉindex0.",
+      "artifact": "/workspace/scratch/graph1278-glyph6x.png",
+      "fullSet": [
+        {
+          "i": 1278,
+          "hash": "e85f764d0daf928cb8e863606ffa1e0f4d2f4c3b2cf09acda6e3c7678de1ebef",
+          "caption": [
+            "A."
+          ]
+        },
+        {
+          "i": 978,
+          "hash": "aee404211db20283ab5bc521111ff0d7335d8059428110d92b21d87b2b520402",
+          "caption": [
+            "B."
+          ]
+        },
+        {
+          "i": 271,
+          "hash": "2e382dbc573b912922c54539ebf209a8b7d1fe869bea3a21e19b0e27971e2865",
+          "caption": [
+            "C."
+          ]
+        },
+        {
+          "i": 574,
+          "hash": "6b2de25299a5c9569b6504331c034def65fc368add97d030d7b52db066443313",
+          "caption": [
+            "D."
+          ]
+        }
+      ],
+      "publicContext": "Cả2qid12-C2-B4-D1-I-61 vàDB-12-B4-D2-I-8cóchínhbộ4nàysau_de,hinh0..3. Stemchỉhỏigraphenzymeeffect,nocaptionA-Dtrongstem. Khôngdựađápánđểgáncaption,đọcglyphcònthấyvàfullsetcùngkiểu."
+    },
+    "dataNotToAdd": "Không0origin/xticks/yticks/guide/caption(A)thayA./tênenzyme/đườngnétđứt;giữ[ ]của[P]. Nhữngđốmnhỏscanvụnrờirạckhôngphảidatapoints.",
+    "svg": "bo-graph-ddh-c4aed409de6ab783db8bc27bc723ef1a2465c2ecb39fcdca9a68265455214373.svg",
+    "hashSvg": "c4aed409de6ab783db8bc27bc723ef1a2465c2ecb39fcdca9a68265455214373",
+    "byteSvg": 6639,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "GIỮA./B./C./D.damthật/2axesarrow/[P]/Thờigian/1solidcurve/nodots-ticks-0-guide. Asteep/Bshallow/Cplateau/Dconcaveup;KHÔNGđổitheođápán. Chỉtáchlềinunknown978ROI252,278..295,291ngoàifigure,khôngđọcbịafooter/khôngbỏBhoặcXlabel.",
+    "hashSvgDaSoat": "c4aed409de6ab783db8bc27bc723ef1a2465c2ecb39fcdca9a68265455214373",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 978,
+    "hash": "aee404211db20283ab5bc521111ff0d7335d8059428110d92b21d87b2b520402",
+    "fileNguon": "anh/aee404211db20283ab5bc521111ff0d7335d8059428110d92b21d87b2b520402.png",
+    "canvas": [
+      295,
+      291
+    ],
+    "daMoNative": true,
+    "kind": "enzyme-P-time-labelled",
+    "xLabel": "Thời gian",
+    "yLabel": "[P]",
+    "caption": [
+      "B."
+    ],
+    "shape": "straight-shallow",
+    "notes": "1curveđenfromorigin,[P]Y/ThờigianX,2trụcARROW,khôngtick/số/guide. Bộcùng2qidcó4ảnhA./B./C./D.;glyphnhãnởméptráidướibịcắtTHÂNTRÁI nhưngAchéo/B2lobe/Ccungmở/Dcungđóng+dotcònnhìnthấyvàcontextbộ4xácnhận,GIỮcaptionkhôiphụckhôngbỏvìrefsau_de. Ađườngthẳngdốclớn~45°,Bthẳngdốcnhỏ,Ctăngbãohòaplateau,Dlõmlêntăngnhanh;KHÔNGđổiCbằngDtheokiếnthứcenzyme. Riêng978cófooterPDFmépdướiphảibịcắt(ký tựkhôngđọcrõ,khôngchốtE04/504/50/...),khôngbịanộidungfooter.",
+    "questions": [
+      {
+        "qid": "12-C2-B4-D1-I-61",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian (cơ chất được bổ sung liên tục nên luôn dư)?",
+        "refs": [
+          {
+            "where": "12-C2-B4-D1-I-61.hinh.1.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D2-I-8",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian (cơ chất được bổ sung liên tục nên luôn dư)?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-I-8.hinh.1.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry154": {
+      "canvas": [
+        295,
+        291
+      ],
+      "axes": {
+        "origin": [
+          74,
+          223
+        ],
+        "xArrowHead": [
+          253,
+          223
+        ],
+        "yArrowHead": [
+          74,
+          37
+        ],
+        "xTickPositions": [],
+        "yTickPositions": [],
+        "xLabel": {
+          "text": "Thời gian",
+          "anchor": [
+            171,
+            249
+          ]
+        },
+        "yLabel": {
+          "text": "[P]",
+          "anchor": [
+            46,
+            130
+          ]
+        }
+      },
+      "curve": {
+        "count": 1,
+        "style": "solidblack,nohead,nodots",
+        "samplesPixel": [
+          [
+            74,
+            223
+          ],
+          [
+            100,
+            218
+          ],
+          [
+            130,
+            213
+          ],
+          [
+            160,
+            209
+          ],
+          [
+            190,
+            204
+          ],
+          [
+            220,
+            199
+          ],
+          [
+            241,
+            195
+          ]
+        ],
+        "kind": "straight-shallow"
+      },
+      "guides": [],
+      "caption": {
+        "text": "B.",
+        "visibleNativeBox": [
+          0,
+          241,
+          20,
+          264
+        ],
+        "reconstructionSuggestion": "GiữcaptionA./B./C./D.Đểhiệnđủthântráibịcắt,nênthêm~15pxpaddingtrái,đặtcaptionsắpcùngbaselinegốcởbêntráidướiplot. AnchorleftvisiblecropKHÔNGnghĩađượcphépvẽcaptionbịcắtlại."
+      }
+    },
+    "captionEvidence": {
+      "glyphSeen": "B.còn2lobe/bầuphảitrên-dướirõvớieogiữa+chấmở~(16,258),khácD1cungvàCkhehở. Khôngchỉindex1.",
+      "artifact": "/workspace/scratch/graph978-glyph6x.png",
+      "fullSet": [
+        {
+          "i": 1278,
+          "hash": "e85f764d0daf928cb8e863606ffa1e0f4d2f4c3b2cf09acda6e3c7678de1ebef",
+          "caption": [
+            "A."
+          ]
+        },
+        {
+          "i": 978,
+          "hash": "aee404211db20283ab5bc521111ff0d7335d8059428110d92b21d87b2b520402",
+          "caption": [
+            "B."
+          ]
+        },
+        {
+          "i": 271,
+          "hash": "2e382dbc573b912922c54539ebf209a8b7d1fe869bea3a21e19b0e27971e2865",
+          "caption": [
+            "C."
+          ]
+        },
+        {
+          "i": 574,
+          "hash": "6b2de25299a5c9569b6504331c034def65fc368add97d030d7b52db066443313",
+          "caption": [
+            "D."
+          ]
+        }
+      ],
+      "publicContext": "Cả2qid12-C2-B4-D1-I-61 vàDB-12-B4-D2-I-8cóchínhbộ4nàysau_de,hinh0..3. Stemchỉhỏigraphenzymeeffect,nocaptionA-Dtrongstem. Khôngdựađápánđểgáncaption,đọcglyphcònthấyvàfullsetcùngkiểu."
+    },
+    "dataNotToAdd": "Không0origin/xticks/yticks/guide/caption(A)thayA./tênenzyme/đườngnétđứt;giữ[ ]của[P]. Nhữngđốmnhỏscanvụnrờirạckhôngphảidatapoints.",
+    "unknownFooter": {
+      "nativeROI": [
+        252,
+        278,
+        295,
+        291
+      ],
+      "artifact": "/workspace/scratch/graph978-footer-10x.png",
+      "status": "Textbịcắtnửadướiởmépdướiphải,KHÔNGđọcrõ;khôngchốt50/.../E04/504hayfullstringbấtkỳ.",
+      "relationToFigure": "Ngoàiplot(hộpdiagramtớiY223),ngoàiXlabelkếtthúckhoảngY260,ởlềinmépY283..291;khôngđượclẫnfooterunknownvớicaptionB.ởtráidưới.",
+      "handling": "Cóthểtách/cắtPHẦNLỀINnàychoassetfiguretheochuẩnhóarepo,nhưngphảigiữB.vàThờigianvàmọioutline/curves;khôngtựphụchồi/tạochữfooter. Chưađềnghịxóabấtkỳchữcaptionfigure."
+    },
+    "svg": "bo-graph-ddh-f13bf68e5fea3b72ae7342ccb5df18720ad0d1e4274379cd46a0dc88378293e0.svg",
+    "hashSvg": "f13bf68e5fea3b72ae7342ccb5df18720ad0d1e4274379cd46a0dc88378293e0",
+    "byteSvg": 6765,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "GIỮA./B./C./D.damthật/2axesarrow/[P]/Thờigian/1solidcurve/nodots-ticks-0-guide. Asteep/Bshallow/Cplateau/Dconcaveup;KHÔNGđổitheođápán. Chỉtáchlềinunknown978ROI252,278..295,291ngoàifigure,khôngđọcbịafooter/khôngbỏBhoặcXlabel.",
+    "hashSvgDaSoat": "f13bf68e5fea3b72ae7342ccb5df18720ad0d1e4274379cd46a0dc88378293e0",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 271,
+    "hash": "2e382dbc573b912922c54539ebf209a8b7d1fe869bea3a21e19b0e27971e2865",
+    "fileNguon": "anh/2e382dbc573b912922c54539ebf209a8b7d1fe869bea3a21e19b0e27971e2865.png",
+    "canvas": [
+      290,
+      291
+    ],
+    "daMoNative": true,
+    "kind": "enzyme-P-time-labelled",
+    "xLabel": "Thời gian",
+    "yLabel": "[P]",
+    "caption": [
+      "C."
+    ],
+    "shape": "concave-down-plateau",
+    "notes": "1curveđenfromorigin,[P]Y/ThờigianX,2trụcARROW,khôngtick/số/guide. Bộcùng2qidcó4ảnhA./B./C./D.;glyphnhãnởméptráidướibịcắtTHÂNTRÁI nhưngAchéo/B2lobe/Ccungmở/Dcungđóng+dotcònnhìnthấyvàcontextbộ4xácnhận,GIỮcaptionkhôiphụckhôngbỏvìrefsau_de. Ađườngthẳngdốclớn~45°,Bthẳngdốcnhỏ,Ctăngbãohòaplateau,Dlõmlêntăngnhanh;KHÔNGđổiCbằngDtheokiếnthứcenzyme. Riêng978cófooterPDFmépdướiphảibịcắt(ký tựbịcắtKHÔNGđọcrõ),khôngbịanộidungfooter.",
+    "questions": [
+      {
+        "qid": "12-C2-B4-D1-I-61",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian (cơ chất được bổ sung liên tục nên luôn dư)?",
+        "refs": [
+          {
+            "where": "12-C2-B4-D1-I-61.hinh.2.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D2-I-8",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian (cơ chất được bổ sung liên tục nên luôn dư)?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-I-8.hinh.2.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry154": {
+      "canvas": [
+        290,
+        291
+      ],
+      "axes": {
+        "origin": [
+          72,
+          222
+        ],
+        "xArrowHead": [
+          253,
+          222
+        ],
+        "yArrowHead": [
+          72,
+          34
+        ],
+        "xTickPositions": [],
+        "yTickPositions": [],
+        "xLabel": {
+          "text": "Thời gian",
+          "anchor": [
+            161,
+            251
+          ]
+        },
+        "yLabel": {
+          "text": "[P]",
+          "anchor": [
+            46,
+            129
+          ]
+        }
+      },
+      "curve": {
+        "count": 1,
+        "style": "solidblack,nohead,nodots",
+        "samplesPixel": [
+          [
+            72,
+            222
+          ],
+          [
+            92,
+            205
+          ],
+          [
+            112,
+            188
+          ],
+          [
+            132,
+            173
+          ],
+          [
+            152,
+            162
+          ],
+          [
+            172,
+            154
+          ],
+          [
+            192,
+            150
+          ],
+          [
+            212,
+            148
+          ],
+          [
+            232,
+            147
+          ],
+          [
+            252,
+            148
+          ]
+        ],
+        "kind": "concave-down-plateau"
+      },
+      "guides": [],
+      "caption": {
+        "text": "C.",
+        "visibleNativeBox": [
+          0,
+          240,
+          19,
+          265
+        ],
+        "reconstructionSuggestion": "GiữcaptionA./B./C./D.Đểhiệnđủthântráibịcắt,nênthêm~15pxpaddingtrái,đặtcaptionsắpcùngbaselinegốcởbêntráidướiplot. AnchorleftvisiblecropKHÔNGnghĩađượcphépvẽcaptionbịcắtlại."
+      }
+    },
+    "captionEvidence": {
+      "glyphSeen": "C.cònhaiđầucungtrên/dướivớikheHỞPHẢI+serif,không1cungđóngD;chấm~(15,259). Khôngchỉindex2.",
+      "artifact": "/workspace/scratch/graph271-glyph6x.png",
+      "fullSet": [
+        {
+          "i": 1278,
+          "hash": "e85f764d0daf928cb8e863606ffa1e0f4d2f4c3b2cf09acda6e3c7678de1ebef",
+          "caption": [
+            "A."
+          ]
+        },
+        {
+          "i": 978,
+          "hash": "aee404211db20283ab5bc521111ff0d7335d8059428110d92b21d87b2b520402",
+          "caption": [
+            "B."
+          ]
+        },
+        {
+          "i": 271,
+          "hash": "2e382dbc573b912922c54539ebf209a8b7d1fe869bea3a21e19b0e27971e2865",
+          "caption": [
+            "C."
+          ]
+        },
+        {
+          "i": 574,
+          "hash": "6b2de25299a5c9569b6504331c034def65fc368add97d030d7b52db066443313",
+          "caption": [
+            "D."
+          ]
+        }
+      ],
+      "publicContext": "Cả2qid12-C2-B4-D1-I-61 vàDB-12-B4-D2-I-8cóchínhbộ4nàysau_de,hinh0..3. Stemchỉhỏigraphenzymeeffect,nocaptionA-Dtrongstem. Khôngdựađápánđểgáncaption,đọcglyphcònthấyvàfullsetcùngkiểu."
+    },
+    "dataNotToAdd": "Không0origin/xticks/yticks/guide/caption(A)thayA./tênenzyme/đườngnétđứt;giữ[ ]của[P]. Nhữngđốmnhỏscanvụnrờirạckhôngphảidatapoints.",
+    "svg": "bo-graph-ddh-dceff72f756a2618b9cfdb2f410f663de571fc91e5cf03553c576742db13bba6.svg",
+    "hashSvg": "dceff72f756a2618b9cfdb2f410f663de571fc91e5cf03553c576742db13bba6",
+    "byteSvg": 6972,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "GIỮA./B./C./D.damthật/2axesarrow/[P]/Thờigian/1solidcurve/nodots-ticks-0-guide. Asteep/Bshallow/Cplateau/Dconcaveup;KHÔNGđổitheođápán. Chỉtáchlềinunknown978ROI252,278..295,291ngoàifigure,khôngđọcbịafooter/khôngbỏBhoặcXlabel.",
+    "hashSvgDaSoat": "dceff72f756a2618b9cfdb2f410f663de571fc91e5cf03553c576742db13bba6",
+    "nguoiSoat": "cau_truc_6"
+  },
+  {
+    "i": 574,
+    "hash": "6b2de25299a5c9569b6504331c034def65fc368add97d030d7b52db066443313",
+    "fileNguon": "anh/6b2de25299a5c9569b6504331c034def65fc368add97d030d7b52db066443313.png",
+    "canvas": [
+      295,
+      296
+    ],
+    "daMoNative": true,
+    "kind": "enzyme-P-time-labelled",
+    "xLabel": "Thời gian",
+    "yLabel": "[P]",
+    "caption": [
+      "D."
+    ],
+    "shape": "concave-up",
+    "notes": "1curveđenfromorigin,[P]Y/ThờigianX,2trụcARROW,khôngtick/số/guide. Bộcùng2qidcó4ảnhA./B./C./D.;glyphnhãnởméptráidướibịcắtTHÂNTRÁI nhưngAchéo/B2lobe/Ccungmở/Dcungđóng+dotcònnhìnthấyvàcontextbộ4xácnhận,GIỮcaptionkhôiphụckhôngbỏvìrefsau_de. Ađườngthẳngdốclớn~45°,Bthẳngdốcnhỏ,Ctăngbãohòaplateau,Dlõmlêntăngnhanh;KHÔNGđổiCbằngDtheokiếnthứcenzyme. Riêng978cófooterPDFmépdướiphảibịcắt(ký tựbịcắtKHÔNGđọcrõ),khôngbịanộidungfooter.",
+    "questions": [
+      {
+        "qid": "12-C2-B4-D1-I-61",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian (cơ chất được bổ sung liên tục nên luôn dư)?",
+        "refs": [
+          {
+            "where": "12-C2-B4-D1-I-61.hinh.3.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D2-I-8",
+        "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian (cơ chất được bổ sung liên tục nên luôn dư)?",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-I-8.hinh.3.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry154": {
+      "canvas": [
+        295,
+        296
+      ],
+      "axes": {
+        "origin": [
+          68,
+          231
+        ],
+        "xArrowHead": [
+          257,
+          231
+        ],
+        "yArrowHead": [
+          68,
+          30
+        ],
+        "xTickPositions": [],
+        "yTickPositions": [],
+        "xLabel": {
+          "text": "Thời gian",
+          "anchor": [
+            160,
+            253
+          ]
+        },
+        "yLabel": {
+          "text": "[P]",
+          "anchor": [
+            42,
+            133
+          ]
+        }
+      },
+      "curve": {
+        "count": 1,
+        "style": "solidblack,nohead,nodots",
+        "samplesPixel": [
+          [
+            68,
+            231
+          ],
+          [
+            100,
+            231
+          ],
+          [
+            120,
+            231
+          ],
+          [
+            140,
+            227
+          ],
+          [
+            160,
+            221
+          ],
+          [
+            180,
+            213
+          ],
+          [
+            200,
+            201
+          ],
+          [
+            220,
+            186
+          ],
+          [
+            240,
+            168
+          ],
+          [
+            258,
+            152
+          ]
+        ],
+        "kind": "concave-up"
+      },
+      "guides": [],
+      "caption": {
+        "text": "D.",
+        "visibleNativeBox": [
+          0,
+          246,
+          20,
+          270
+        ],
+        "reconstructionSuggestion": "GiữcaptionA./B./C./D.Đểhiệnđủthântráibịcắt,nênthêm~15pxpaddingtrái,đặtcaptionsắpcùngbaselinegốcởbêntráidướiplot. AnchorleftvisiblecropKHÔNGnghĩađượcphépvẽcaptionbịcắtlại."
+      }
+    },
+    "captionEvidence": {
+      "glyphSeen": "D.còn1cungphảiLIÊNTỤCđóngtừtrênxuốngdưới+dot~(16,265),không2lobeB/khôngkhephảiC. KếthợpbộA/B/C/DcùngfontvịtríxácnhậnD,khôngchỉindex3.",
+      "artifact": "/workspace/scratch/graph574-glyph6x.png",
+      "fullSet": [
+        {
+          "i": 1278,
+          "hash": "e85f764d0daf928cb8e863606ffa1e0f4d2f4c3b2cf09acda6e3c7678de1ebef",
+          "caption": [
+            "A."
+          ]
+        },
+        {
+          "i": 978,
+          "hash": "aee404211db20283ab5bc521111ff0d7335d8059428110d92b21d87b2b520402",
+          "caption": [
+            "B."
+          ]
+        },
+        {
+          "i": 271,
+          "hash": "2e382dbc573b912922c54539ebf209a8b7d1fe869bea3a21e19b0e27971e2865",
+          "caption": [
+            "C."
+          ]
+        },
+        {
+          "i": 574,
+          "hash": "6b2de25299a5c9569b6504331c034def65fc368add97d030d7b52db066443313",
+          "caption": [
+            "D."
+          ]
+        }
+      ],
+      "publicContext": "Cả2qid12-C2-B4-D1-I-61 vàDB-12-B4-D2-I-8cóchínhbộ4nàysau_de,hinh0..3. Stemchỉhỏigraphenzymeeffect,nocaptionA-Dtrongstem. Khôngdựađápánđểgáncaption,đọcglyphcònthấyvàfullsetcùngkiểu."
+    },
+    "dataNotToAdd": "Không0origin/xticks/yticks/guide/caption(A)thayA./tênenzyme/đườngnétđứt;giữ[ ]của[P]. Nhữngđốmnhỏscanvụnrờirạckhôngphảidatapoints.",
+    "svg": "bo-graph-ddh-6c75a4175e523735cfa4bb1517171d0cc10299d0fb7b1655bde3151c4d19c7c6.svg",
+    "hashSvg": "6c75a4175e523735cfa4bb1517171d0cc10299d0fb7b1655bde3151c4d19c7c6",
+    "byteSvg": 6943,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "GIỮA./B./C./D.damthật/2axesarrow/[P]/Thờigian/1solidcurve/nodots-ticks-0-guide. Asteep/Bshallow/Cplateau/Dconcaveup;KHÔNGđổitheođápán. Chỉtáchlềinunknown978ROI252,278..295,291ngoàifigure,khôngđọcbịafooter/khôngbỏBhoặcXlabel.",
+    "hashSvgDaSoat": "6c75a4175e523735cfa4bb1517171d0cc10299d0fb7b1655bde3151c4d19c7c6",
+    "nguoiSoat": "cau_truc_6"
+  }
+]

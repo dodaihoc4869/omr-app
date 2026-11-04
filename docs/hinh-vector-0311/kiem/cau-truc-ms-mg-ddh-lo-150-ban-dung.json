@@ -1,0 +1,61 @@
+[
+  {
+    "i": 1207,
+    "hash": "dae44689d492fe14f28614e3ff5450635e5541f06bd3a86fcf7a2c2b79f82b1f",
+    "fileNguon": "anh/dae44689d492fe14f28614e3ff5450635e5541f06bd3a86fcf7a2c2b79f82b1f.png",
+    "canvas": [
+      795,
+      654
+    ],
+    "daMoNative": true,
+    "kind": "isotope-MS-magnesium",
+    "xLabel": "m/z",
+    "yLabel": "Phần trăm số nguyên tử, %",
+    "peaks": [
+      {
+        "mz": 24,
+        "percent": "80%"
+      },
+      {
+        "mz": 25,
+        "percent": "10%"
+      },
+      {
+        "mz": 26,
+        "percent": "10%"
+      }
+    ],
+    "notes": "3đỉnhbarđen/xámhẹp,24cao80%,25và26cao10%bằngnhau;label80%/10%/10%trênđỉnh. Yticks0/20/40/60/80/100;khung4cạnh,khôngmũitên/grid. Xcó3tickCÓSỐ24/25/26và3tickkhôngsốởphầntrái/phảiquanhphổ,đừngtựghi22/23/27.Vịtrínativeplotbox172,70..717,555;peaks404,168..555/482,503..555/558,503..555. Khôngthêm²⁴Mgtextnếunguồnkhôngcó.",
+    "questions": [
+      {
+        "qid": "10-C1-B2-II-19",
+        "de": "Nguyên tố magnesium (₁₂Mg) là nguyên tố phổ biến thứ tám trên vỏ Trái Đất, có trong thành phần đá xà vân, quặng dolomite, carnallite... Phổ khối lượng của nguyên tố magnesium được cho ở hình dưới. Cho 1 amu = 1,66 × 10⁻²⁴ gam.",
+        "refs": [
+          {
+            "where": "10-C1-B2-II-19.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-10-B2-D2-II-42",
+        "de": "Nguyên tố magnesium (₁₂Mg) là nguyên tố phổ biến thứ tám trên vỏ Trái Đất, có trong thành phần đá xà vân, quặng dolomite, carnallite... Phổ khối lượng của nguyên tố magnesium được cho ở hình dưới. Cho 1 amu = 1,66 × 10⁻²⁴ gam.",
+        "refs": [
+          {
+            "where": "DB-10-B2-D2-II-42.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "svg": "ms-mg-ddh-72dd48920940237f31f0ee693317c97f6fa18cb4ce3c82692ab9ecec9c169d56.svg",
+    "hashSvg": "72dd48920940237f31f0ee693317c97f6fa18cb4ce3c82692ab9ecec9c169d56",
+    "byteSvg": 28130,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "3bar24/25/26ở404/482/558,top168/503/503bottom555;80%/10%/10%nguyênvăn,KHÔNGchuẩnhoáy10%.6XticksCHỈ3số/6Ylabels/4Ytickmarks/box4cạnh/noarrow-grid/isotopetextthêm.",
+    "hashSvgDaSoat": "72dd48920940237f31f0ee693317c97f6fa18cb4ce3c82692ab9ecec9c169d56",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

@@ -1,0 +1,4440 @@
+[
+  {
+    "i": 483,
+    "hash": "58f484540c027a1f096add48fcc2455e8da64ba62ba1faf2b8467a8b28b68d74",
+    "fileNguon": "anh/58f484540c027a1f096add48fcc2455e8da64ba62ba1faf2b8467a8b28b68d74.png",
+    "canvas": [
+      645,
+      429
+    ],
+    "daMoNative": true,
+    "kind": "galvanic-Zn-Cu-NH4Cl",
+    "labels": [
+      "Zn",
+      "Cu",
+      "ZnSO₄(aq)",
+      "CuSO₄(aq)",
+      "Cầu muối",
+      "NH₄Cl",
+      "Cl⁻",
+      "NH₄⁺",
+      "e",
+      "e"
+    ],
+    "notes": "2cốcngang,tráiZn/solutionZnSO₄(aq),phảiCu/CuSO₄(aq). CầuNH₄ClốngUconglộnngượcnhúng2đầuvàodungdịch. MạchngoàidâyhìnhΠnối2thanh,1vòngtròncókýnétzigzagtrêngiữa. 2mũitêneTRÊNdâyđềuchỉPHẢI.NhãneKHÔNGcódấu−trongsourceđừngtựe−. Trêncầu2arrowhorizHƯỚNGVÀOGIỮA:tráiarrow→,phảiarrow←;labelCầumuối/NH₄Clởgiữatrênvớileader↓. TrongđầucầutráighiCl⁻,phảighiNH₄⁺vàmũitên↓từđầucầuvàodungdịch. Giữwrong-lookingtopcầuarrowhướngvàogiữatheosource,khôngtựsửagiảđịnhionmigration. Nềnrasterhạttrongsolutioncóthểvectorfillmịnchứkhôngdữliệuhạtđếm. 483/1216đãmởriêngsamecontentkhácscale.",
+    "questions": [
+      {
+        "qid": "12-KT-C56-D2-I-16",
+        "de": "Sử dụng thông tin về cấu tạo của pin Galvani Zn-Cu ở hình dưới.\nCho các nhận định sau:\n(1) Phản ứng xảy ra trong pin là Zn(s) + Cu²⁺(aq) → Zn²⁺(aq) + Cu(s).\n(2) Thanh Zn là cực âm, tức anode, và thanh Cu là cực dương, tức cathode.\n(3) Khi Zn(s) hoặc Cu²⁺(aq) hết thì phản ứng trong pin sẽ ngừng lại.\n(4) Sức điện động của pin không thay đổi trong quá trình pin hoạt động.\nSố nhận định đúng là",
+        "refs": [
+          {
+            "where": "12-KT-C56-D2-I-16.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "12-KT-C56-D2-I-17",
+        "de": "Với pin Galvani Zn-Cu ở hình dưới, nếu thể tích các dung dịch đều là 0,50 L, nồng độ của các muối ban đầu đều là 1,0 M và khối lượng các điện cực Zn hoặc Cu đều bằng 100 gam, pin hoạt động tạo ra dòng điện có cường độ ổn định là 0,10 A. Thời gian mà pin hoạt động là",
+        "refs": [
+          {
+            "where": "12-KT-C56-D2-I-17.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "12-KT-C56-D2-I-18",
+        "de": "Với pin Galvani Zn-Cu ở hình dưới, trong quá trình pin hoạt động, cho các nhận định sau:\n(1) Nồng độ ion Zn²⁺ ở dung dịch bên trái tăng dần.\n(2) Nồng độ ion Cu²⁺ ở dung dịch bên phải giảm dần.\n(3) Nồng độ các anion trong hai dung dịch không thay đổi.\n(4) Khối lượng các điện cực và các dung dịch không thay đổi.\nSố nhận định đúng là",
+        "refs": [
+          {
+            "where": "12-KT-C56-D2-I-18.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry155": {
+      "canvas": [
+        645,
+        429
+      ],
+      "leftBeaker": {
+        "rim": [
+          225,
+          186,
+          70,
+          11
+        ],
+        "liquid": [
+          225,
+          201,
+          69,
+          11
+        ],
+        "bottom": [
+          225,
+          359,
+          70,
+          12
+        ],
+        "walls": [
+          [
+            [
+              155,
+              186
+            ],
+            [
+              155,
+              359
+            ]
+          ],
+          [
+            [
+              295,
+              186
+            ],
+            [
+              295,
+              359
+            ]
+          ]
+        ]
+      },
+      "rightBeaker": {
+        "rim": [
+          430,
+          186,
+          70,
+          11
+        ],
+        "liquid": [
+          430,
+          201,
+          69,
+          11
+        ],
+        "bottom": [
+          430,
+          359,
+          70,
+          12
+        ],
+        "walls": [
+          [
+            [
+              360,
+              186
+            ],
+            [
+              360,
+              359
+            ]
+          ],
+          [
+            [
+              500,
+              186
+            ],
+            [
+              500,
+              359
+            ]
+          ]
+        ]
+      },
+      "electrodes": {
+        "Zn": [
+          174,
+          217,
+          195,
+          349
+        ],
+        "Cu": [
+          468,
+          217,
+          489,
+          349
+        ]
+      },
+      "outerWire": [
+        [
+          183,
+          217
+        ],
+        [
+          183,
+          75
+        ],
+        [
+          306,
+          75
+        ]
+      ],
+      "outerWireRight": [
+        [
+          344,
+          75
+        ],
+        [
+          469,
+          75
+        ],
+        [
+          469,
+          217
+        ]
+      ],
+      "centralSymbol": {
+        "circle": [
+          325,
+          75,
+          19
+        ],
+        "insideZigzag": [
+          [
+            308,
+            76
+          ],
+          [
+            317,
+            69
+          ],
+          [
+            329,
+            81
+          ],
+          [
+            339,
+            73
+          ]
+        ]
+      },
+      "eArrows": [
+        {
+          "text": "e",
+          "textAt": [
+            246,
+            61
+          ],
+          "tail": [
+            223,
+            51
+          ],
+          "head": [
+            276,
+            51
+          ]
+        },
+        {
+          "text": "e",
+          "textAt": [
+            400,
+            61
+          ],
+          "tail": [
+            376,
+            50
+          ],
+          "head": [
+            430,
+            50
+          ]
+        }
+      ],
+      "bridge": {
+        "outerTopApprox": [
+          [
+            216,
+            171
+          ],
+          [
+            219,
+            159
+          ],
+          [
+            230,
+            154
+          ],
+          [
+            421,
+            154
+          ],
+          [
+            435,
+            160
+          ],
+          [
+            438,
+            171
+          ]
+        ],
+        "topArrows": [
+          {
+            "tail": [
+              228,
+              154
+            ],
+            "head": [
+              283,
+              154
+            ]
+          },
+          {
+            "tail": [
+              421,
+              154
+            ],
+            "head": [
+              370,
+              154
+            ]
+          }
+        ],
+        "leftEndApprox": [
+          225,
+          181,
+          257,
+          250
+        ],
+        "rightEndApprox": [
+          398,
+          181,
+          429,
+          250
+        ],
+        "leftIonText": {
+          "text": "Cl⁻",
+          "at": [
+            241,
+            201
+          ]
+        },
+        "rightIonText": {
+          "text": "NH₄⁺",
+          "at": [
+            413,
+            201
+          ]
+        },
+        "ionArrows": [
+          {
+            "tail": [
+              241,
+              211
+            ],
+            "head": [
+              241,
+              267
+            ]
+          },
+          {
+            "tail": [
+              413,
+              211
+            ],
+            "head": [
+              413,
+              270
+            ]
+          }
+        ]
+      },
+      "labelsAndLeaders": [
+        {
+          "text": "Cầu muối",
+          "at": [
+            326,
+            98
+          ]
+        },
+        {
+          "text": "NH₄Cl",
+          "at": [
+            325,
+            120
+          ],
+          "leader": [
+            [
+              325,
+              135
+            ],
+            [
+              325,
+              157
+            ]
+          ],
+          "head": true
+        },
+        {
+          "text": "Zn",
+          "at": [
+            108,
+            217
+          ],
+          "leader": [
+            [
+              122,
+              224
+            ],
+            [
+              177,
+              263
+            ]
+          ],
+          "head": true
+        },
+        {
+          "text": "Cu",
+          "at": [
+            543,
+            217
+          ],
+          "leader": [
+            [
+              530,
+              224
+            ],
+            [
+              480,
+              263
+            ]
+          ],
+          "head": true
+        },
+        {
+          "text": "ZnSO₄(aq)",
+          "at": [
+            104,
+            373
+          ],
+          "leader": [
+            [
+              145,
+              371
+            ],
+            [
+              224,
+              340
+            ]
+          ],
+          "head": true
+        },
+        {
+          "text": "CuSO₄(aq)",
+          "at": [
+            565,
+            373
+          ],
+          "leader": [
+            [
+              516,
+              371
+            ],
+            [
+              425,
+              341
+            ]
+          ],
+          "head": true
+        }
+      ]
+    },
+    "criticalArrowDirections": "2eArrows→→trêndây;2arrowsTRÊNcầumuối→←hướngVÀOGIỮAgiữnguồn;2arrowsbênTRONGđầucầubêntráiCl⁻vàphảiNH₄⁺đềuchỉXUỐNG. Khôngđầumũitênởvịtríkháctựsuyphysics.",
+    "ionArrowEvidence": "Đãcrop/zoom4xRIÊNGhaiđầucầu,Cl⁻arrowxuốngRÕdùchìmtronggrain;NH₄⁺arrowxuốngRÕ. Khôngdùngnhiễuscannhưdữliệuhạtcầnđếm.",
+    "artifact": "/workspace/scratch/pin483-bridge4x.png",
+    "drawTreatment": "Ảnhlineartgốc,môphỏngvector2solutionfillxámmịnđểđọcrõlabels/tubes;giữốngUcó2vách/nhúng2đầu,khôngmấttubetrongnềnsolution."
+  },
+  {
+    "i": 1216,
+    "hash": "dc67821262ad7ab691290a4f1ec181c0f69df2e3c20dcd44e661214aac477af7",
+    "fileNguon": "anh/dc67821262ad7ab691290a4f1ec181c0f69df2e3c20dcd44e661214aac477af7.png",
+    "canvas": [
+      687,
+      459
+    ],
+    "daMoNative": true,
+    "kind": "galvanic-Zn-Cu-NH4Cl",
+    "labels": [
+      "Zn",
+      "Cu",
+      "ZnSO₄(aq)",
+      "CuSO₄(aq)",
+      "Cầu muối",
+      "NH₄Cl",
+      "Cl⁻",
+      "NH₄⁺",
+      "e",
+      "e"
+    ],
+    "notes": "2cốcngang,tráiZn/solutionZnSO₄(aq),phảiCu/CuSO₄(aq). CầuNH₄ClốngUconglộnngượcnhúng2đầuvàodungdịch. MạchngoàidâyhìnhΠnối2thanh,1vòngtròncókýnétzigzagtrêngiữa. 2mũitêneTRÊNdâyđềuchỉPHẢI.NhãneKHÔNGcódấu−trongsourceđừngtựe−. Trêncầu2arrowhorizHƯỚNGVÀOGIỮA:tráiarrow→,phảiarrow←;labelCầumuối/NH₄Clởgiữatrênvớileader↓. TrongđầucầutráighiCl⁻,phảighiNH₄⁺vàmũitên↓từđầucầuvàodungdịch. Giữwrong-lookingtopcầuarrowhướngvàogiữatheosource,khôngtựsửagiảđịnhionmigration. Nềnrasterhạttrongsolutioncóthểvectorfillmịnchứkhôngdữliệuhạtđếm. 483/1216đãmởriêngsamecontentkhácscale.",
+    "questions": [
+      {
+        "qid": "12-KT-C5-D3-II-1",
+        "de": "Cho cấu tạo của pin Galvani Zn-Cu như hình dưới:",
+        "refs": [
+          {
+            "where": "12-KT-C5-D3-II-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry155": {
+      "canvas": [
+        687,
+        459
+      ],
+      "leftBeaker": {
+        "rim": [
+          237,
+          195,
+          75,
+          12
+        ],
+        "liquid": [
+          237,
+          212,
+          75,
+          12
+        ],
+        "bottom": [
+          237,
+          381,
+          75,
+          13
+        ],
+        "walls": [
+          [
+            [
+              162,
+              195
+            ],
+            [
+              162,
+              381
+            ]
+          ],
+          [
+            [
+              312,
+              195
+            ],
+            [
+              312,
+              381
+            ]
+          ]
+        ]
+      },
+      "rightBeaker": {
+        "rim": [
+          457,
+          195,
+          75,
+          12
+        ],
+        "liquid": [
+          457,
+          212,
+          75,
+          12
+        ],
+        "bottom": [
+          457,
+          381,
+          75,
+          13
+        ],
+        "walls": [
+          [
+            [
+              382,
+              195
+            ],
+            [
+              382,
+              381
+            ]
+          ],
+          [
+            [
+              532,
+              195
+            ],
+            [
+              532,
+              381
+            ]
+          ]
+        ]
+      },
+      "electrodes": {
+        "Zn": [
+          183,
+          229,
+          204,
+          373
+        ],
+        "Cu": [
+          490,
+          229,
+          512,
+          373
+        ]
+      },
+      "outerWire": [
+        [
+          192,
+          229
+        ],
+        [
+          192,
+          76
+        ],
+        [
+          326,
+          76
+        ]
+      ],
+      "outerWireRight": [
+        [
+          364,
+          76
+        ],
+        [
+          499,
+          76
+        ],
+        [
+          499,
+          229
+        ]
+      ],
+      "centralSymbol": {
+        "circle": [
+          345,
+          76,
+          19
+        ],
+        "insideZigzag": [
+          [
+            328,
+            77
+          ],
+          [
+            337,
+            70
+          ],
+          [
+            350,
+            82
+          ],
+          [
+            360,
+            74
+          ]
+        ]
+      },
+      "eArrows": [
+        {
+          "text": "e",
+          "textAt": [
+            260,
+            61
+          ],
+          "tail": [
+            235,
+            50
+          ],
+          "head": [
+            292,
+            50
+          ]
+        },
+        {
+          "text": "e",
+          "textAt": [
+            426,
+            61
+          ],
+          "tail": [
+            399,
+            50
+          ],
+          "head": [
+            456,
+            50
+          ]
+        }
+      ],
+      "bridge": {
+        "outerTopApprox": [
+          [
+            227,
+            178
+          ],
+          [
+            230,
+            168
+          ],
+          [
+            240,
+            162
+          ],
+          [
+            451,
+            162
+          ],
+          [
+            463,
+            169
+          ],
+          [
+            466,
+            178
+          ]
+        ],
+        "topArrows": [
+          {
+            "tail": [
+              241,
+              162
+            ],
+            "head": [
+              300,
+              162
+            ]
+          },
+          {
+            "tail": [
+              450,
+              162
+            ],
+            "head": [
+              393,
+              162
+            ]
+          }
+        ],
+        "leftEndApprox": [
+          237,
+          191,
+          270,
+          267
+        ],
+        "rightEndApprox": [
+          423,
+          191,
+          456,
+          267
+        ],
+        "leftIonText": {
+          "text": "Cl⁻",
+          "at": [
+            254,
+            214
+          ]
+        },
+        "rightIonText": {
+          "text": "NH₄⁺",
+          "at": [
+            439,
+            214
+          ]
+        },
+        "ionArrows": [
+          {
+            "tail": [
+              254,
+              228
+            ],
+            "head": [
+              254,
+              282
+            ]
+          },
+          {
+            "tail": [
+              439,
+              228
+            ],
+            "head": [
+              439,
+              286
+            ]
+          }
+        ]
+      },
+      "labelsAndLeaders": [
+        {
+          "text": "Cầu muối",
+          "at": [
+            345,
+            102
+          ]
+        },
+        {
+          "text": "NH₄Cl",
+          "at": [
+            345,
+            124
+          ],
+          "leader": [
+            [
+              345,
+              142
+            ],
+            [
+              345,
+              165
+            ]
+          ],
+          "head": true
+        },
+        {
+          "text": "Zn",
+          "at": [
+            111,
+            230
+          ],
+          "leader": [
+            [
+              125,
+              237
+            ],
+            [
+              187,
+              281
+            ]
+          ],
+          "head": true
+        },
+        {
+          "text": "Cu",
+          "at": [
+            579,
+            229
+          ],
+          "leader": [
+            [
+              566,
+              237
+            ],
+            [
+              505,
+              281
+            ]
+          ],
+          "head": true
+        },
+        {
+          "text": "ZnSO₄(aq)",
+          "at": [
+            108,
+            399
+          ],
+          "leader": [
+            [
+              151,
+              396
+            ],
+            [
+              238,
+              364
+            ]
+          ],
+          "head": true
+        },
+        {
+          "text": "CuSO₄(aq)",
+          "at": [
+            592,
+            399
+          ],
+          "leader": [
+            [
+              550,
+              396
+            ],
+            [
+              455,
+              364
+            ]
+          ],
+          "head": true
+        }
+      ]
+    },
+    "criticalArrowDirections": "2eArrows→→trêndây;2arrowsTRÊNcầumuối→←hướngVÀOGIỮAgiữnguồn;2arrowsbênTRONGđầucầubêntráiCl⁻vàphảiNH₄⁺đềuchỉXUỐNG. Khôngđầumũitênởvịtríkháctựsuyphysics.",
+    "ionArrowEvidence": "Đãcrop/zoom4xRIÊNGhaiđầucầu,Cl⁻arrowxuốngRÕdùchìmtronggrain;NH₄⁺arrowxuốngRÕ. Khôngdùngnhiễuscannhưdữliệuhạtcầnđếm.",
+    "artifact": "/workspace/scratch/pin1216-bridge4x.png",
+    "drawTreatment": "Ảnhlineartgốc,môphỏngvector2solutionfillxámmịnđểđọcrõlabels/tubes;giữốngUcó2vách/nhúng2đầu,khôngmấttubetrongnềnsolution."
+  },
+  {
+    "i": 575,
+    "hash": "6b57afe5a9415b5639b5e284a4842bb350f4d2014a4e3e9c1008da90f6368dc7",
+    "fileNguon": "anh/6b57afe5a9415b5639b5e284a4842bb350f4d2014a4e3e9c1008da90f6368dc7.png",
+    "canvas": [
+      601,
+      249
+    ],
+    "daMoNative": true,
+    "kind": "NH3-fountain-lab",
+    "labels": [
+      "Khí NH₃",
+      "Nước có hòa tan vài giọt phenolphthalein"
+    ],
+    "notes": "Bìnhchữnhậtbo2góctrênÚPngược,nútcaosuđenởcổdưới.Cóốngthủy tinhnhỏđứngđitừbeakernướcbênDƯỚIquanútvàlêntrongbình,kếtthúcnhọnởgiữabình. Beakernướcdưới hìnhchữnhậtviềnmảnh/nhiềugạchngangnhỏdướimứcwaterline. Giáđỡtrụđứngtrái,thanhkẹpngangđếncổbình,nềnchânđếxám. LabelKhíNH₃leaderchỉvùngtrongbình,Nướccóhòatan...2dòngleaderchỉnướctrongbeaker. KHÔNGtựvẽmàuhồng/nướcdâng/fountainjetvìsourcechưacótrạngtháithínghiệmnày.",
+    "questions": [
+      {
+        "qid": "DB-11-B5-D2-I-33",
+        "de": "Cho thí nghiệm như hình vẽ, bên trong bình có chứa khí ammonia, trong chậu thủy tinh chứa nước có nhỏ vài giọt phenolphthalein.\nHiện tượng xảy ra trong thí nghiệm là",
+        "refs": [
+          {
+            "where": "DB-11-B5-D2-I-33.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-11-B5-D2-I-94",
+        "de": "Cho thí nghiệm như hình dưới, bên trong bình có chứa khí ammonia, trong chậu thủy tinh chứa nước có nhỏ vài giọt phenolphthalein.\nHiện tượng xảy ra trong thí nghiệm là",
+        "refs": [
+          {
+            "where": "DB-11-B5-D2-I-94.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B5-I-32",
+        "de": "Cho thí nghiệm như hình vẽ, bên trong bình có chứa khí ammonia, trong chậu thủy tinh chứa nước có nhỏ vài giọt phenolphthalein.\nHiện tượng xảy ra trong thí nghiệm là",
+        "refs": [
+          {
+            "where": "DH-11-C2-B5-I-32.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B9-D1-I-4",
+        "de": "Cho thí nghiệm như hình dưới, bên trong bình có chứa khí ammonia, trong chậu thủy tinh chứa nước có nhỏ vài giọt phenolphthalein.\nHiện tượng xảy ra trong thí nghiệm là",
+        "refs": [
+          {
+            "where": "DH-11-C2-B9-D1-I-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry155": {
+      "canvas": [
+        601,
+        249
+      ],
+      "stand": {
+        "pole": [
+          69,
+          39,
+          78,
+          213
+        ],
+        "foot": [
+          44,
+          217,
+          282,
+          231
+        ],
+        "feet": [
+          [
+            54,
+            230,
+            67,
+            236
+          ],
+          [
+            258,
+            230,
+            270,
+            236
+          ]
+        ],
+        "horizontalRod": [
+          [
+            9,
+            143
+          ],
+          [
+            184,
+            143
+          ]
+        ],
+        "clampsApprox": [
+          [
+            61,
+            135,
+            96,
+            150
+          ],
+          [
+            169,
+            138,
+            187,
+            146
+          ]
+        ]
+      },
+      "invertedGasFlask": {
+        "bodyRoundedRect": [
+          164,
+          35,
+          251,
+          140
+        ],
+        "neck": [
+          184,
+          139,
+          230,
+          146
+        ],
+        "rubberPlug": [
+          188,
+          145,
+          230,
+          164
+        ]
+      },
+      "gasTube": {
+        "leftWall": [
+          [
+            205,
+            211
+          ],
+          [
+            205,
+            107
+          ],
+          [
+            207,
+            99
+          ]
+        ],
+        "rightWall": [
+          [
+            210,
+            211
+          ],
+          [
+            210,
+            107
+          ],
+          [
+            207,
+            99
+          ]
+        ],
+        "note": "Thựcống2vách,nocurvedfountainjet. Đầutrênnhọncógặptrongbình,đầudướinhúngnước."
+      },
+      "beaker": {
+        "rect": [
+          149,
+          177,
+          267,
+          216
+        ],
+        "waterSurface": [
+          [
+            149,
+            185
+          ],
+          [
+            267,
+            185
+          ]
+        ],
+        "fill": "short horizontal blackdashwaterpatternbelow185"
+      },
+      "labels": [
+        {
+          "text": "Khí NH₃",
+          "at": [
+            353,
+            45
+          ],
+          "leader": [
+            [
+              306,
+              56
+            ],
+            [
+              226,
+              72
+            ]
+          ],
+          "arrowHead": false
+        },
+        {
+          "text": "Nước có hòa tan vài giọt",
+          "at": [
+            491,
+            159
+          ]
+        },
+        {
+          "text": "phenolphthalein",
+          "at": [
+            465,
+            181
+          ],
+          "leader": [
+            [
+              370,
+              181
+            ],
+            [
+              246,
+              197
+            ]
+          ],
+          "arrowHead": false
+        }
+      ]
+    },
+    "criticalState": "CHƯAfountainjet/khônghồng/khôngtiaxịt,nướcchỉtrongbeakerdưới,bìnhtrênchỉkhíNH₃. Giữnguồntrạngtháibanđầukhôngminhhọađápánhiệntượng."
+  },
+  {
+    "i": 82,
+    "hash": "10da97400c3268d7fe33736059052f7b4c76a1c3464449e1076b93a01236e073",
+    "fileNguon": "anh/10da97400c3268d7fe33736059052f7b4c76a1c3464449e1076b93a01236e073.png",
+    "canvas": [
+      368,
+      414
+    ],
+    "daMoNative": true,
+    "kind": "saponification-lab-stir",
+    "text": [
+      "Liên tục khuấy",
+      "bằng đũa thủy tinh",
+      "2 mL dầu ăn",
+      "5 mL dung dịch",
+      "NaOH 40%"
+    ],
+    "notes": "Bátsứchịunhiệtbođáycótayđũathủytinhchéolêntừtrongliquidyellow,sốlabelvănđỏởtrêntrái;curvedstirarrowquanhđầuđũaphíatrênphải(nhìnsourcegiữhướnghead). Bátđặttrênlướivuôngôcrosshatch,trên3chângiáxanhlam,códèncồnnhỏdướigiữavàngọnlửađỏdướibát. Nướcdầumàuvàngtrongbát,KHÔNGmôphỏngảnhphoto;đâylàillustration. Giữ5dòngtext/2mL/5mL/40%,khôngđổi5mLNaOH40%thànhnồngđộkhác.",
+    "questions": [
+      {
+        "qid": "12-BD7-18-II-1",
+        "de": "Tiến hành thí nghiệm xà phòng hoá chất béo được minh hoạ như hình bên:\nBước 1: Cho vào bát sứ nhỏ khoảng 2 mL dầu ăn và 5 mL dung dịch NaOH 40%.\nBước 2: Đun sôi nhẹ hỗn hợp, liên tục khuấy đều bằng đũa thuỷ tinh khoảng 20 phút và thỉnh thoảng thêm nước cất để giữ cho thể tích hỗn hợp không đổi rồi để nguội hỗn hợp.\nBước 3: Rót thêm vào hỗn hợp 15-20 mL dung dịch NaCl bão hoà, khuấy nhẹ rồi để yên hỗn hợp.",
+        "refs": [
+          {
+            "where": "12-BD7-18-II-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "12-C1-B1-D1-II-7",
+        "de": "Tiến hành thí nghiệm xà phòng hoá chất béo được minh hoạ như hình bên:\nBước 1: Cho vào bát sứ nhỏ khoảng 2 mL dầu ăn và 5 mL dung dịch NaOH 40%.\nBước 2: Đun sôi nhẹ hỗn hợp, liên tục khuấy đều bằng đũa thuỷ tinh khoảng 20 phút và thỉnh thoảng thêm nước cất để giữ cho thể tích hỗn hợp không đổi rồi để nguội hỗn hợp.\nBước 3: Rót thêm vào hỗn hợp 15-20 mL dung dịch NaCl bão hoà, khuấy nhẹ rồi để yên hỗn hợp.",
+        "refs": [
+          {
+            "where": "12-C1-B1-D1-II-7.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P2-D1-II-4",
+        "de": "Tiến hành thí nghiệm xà phòng hoá chất béo được minh hoạ như hình bên:\nBước 1: Cho vào bát sứ nhỏ khoảng 2 mL dầu ăn và 5 mL dung dịch NaOH 40%.\nBước 2: Đun sôi nhẹ hỗn hợp, liên tục khuấy đều bằng đũa thuỷ tinh khoảng 20 phút và thỉnh thoảng thêm nước cất để giữ cho thể tích hỗn hợp không đổi rồi để nguội hỗn hợp.\nBước 3: Rót thêm vào hỗn hợp 15-20 mL dung dịch NaCl bão hoà, khuấy nhẹ rồi để yên hỗn hợp.",
+        "refs": [
+          {
+            "where": "DB-12-B1-P2-D1-II-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P2-D1-II-55",
+        "de": "Tiến hành thí nghiệm xà phòng hoá chất béo được minh hoạ như hình bên:\nBước 1: Cho vào bát sứ nhỏ khoảng 2 mL dầu ăn và 5 mL dung dịch NaOH 40%.\nBước 2: Đun sôi nhẹ hỗn hợp, liên tục khuấy đều bằng đũa thuỷ tinh khoảng 20 phút và thỉnh thoảng thêm nước cất để giữ cho thể tích hỗn hợp không đổi rồi để nguội hỗn hợp.\nBước 3: Rót thêm vào hỗn hợp 15-20 mL dung dịch NaCl bão hoà, khuấy nhẹ rồi để yên hỗn hợp.",
+        "refs": [
+          {
+            "where": "DB-12-B1-P2-D1-II-55.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry155": {
+      "canvas": [
+        368,
+        414
+      ],
+      "redLabels": [
+        {
+          "text": "Liên tục khuấy",
+          "at": [
+            127,
+            55
+          ]
+        },
+        {
+          "text": "bằng đũa thủy tinh",
+          "at": [
+            148,
+            86
+          ]
+        },
+        {
+          "text": "2 mL dầu ăn",
+          "at": [
+            90,
+            138
+          ]
+        },
+        {
+          "text": "5 mL dung dịch",
+          "at": [
+            104,
+            171
+          ]
+        },
+        {
+          "text": "NaOH 40%",
+          "at": [
+            83,
+            204
+          ]
+        }
+      ],
+      "bowl": {
+        "rimEllipse": [
+          210,
+          192,
+          62,
+          25
+        ],
+        "bodyApprox": [
+          [
+            148,
+            189
+          ],
+          [
+            150,
+            241
+          ],
+          [
+            164,
+            281
+          ],
+          [
+            191,
+            300
+          ],
+          [
+            217,
+            301
+          ],
+          [
+            247,
+            281
+          ],
+          [
+            266,
+            241
+          ],
+          [
+            272,
+            196
+          ]
+        ],
+        "yellowLiquidEllipse": [
+          209,
+          266,
+          48,
+          28
+        ]
+      },
+      "glassRod": {
+        "from": [
+          256,
+          61
+        ],
+        "to": [
+          208,
+          270
+        ],
+        "color": "lightblue"
+      },
+      "stirArrow": {
+        "curvedPathApprox": [
+          [
+            263,
+            85
+          ],
+          [
+            240,
+            80
+          ],
+          [
+            220,
+            91
+          ],
+          [
+            222,
+            105
+          ],
+          [
+            240,
+            116
+          ],
+          [
+            261,
+            114
+          ],
+          [
+            278,
+            104
+          ]
+        ],
+        "head": [
+          278,
+          104
+        ],
+        "noextraLabel": true
+      },
+      "meshQuadrilateral": [
+        [
+          147,
+          212
+        ],
+        [
+          333,
+          212
+        ],
+        [
+          289,
+          303
+        ],
+        [
+          94,
+          303
+        ]
+      ],
+      "tripodLegs": [
+        [
+          [
+            125,
+            303
+          ],
+          [
+            116,
+            376
+          ]
+        ],
+        [
+          [
+            281,
+            303
+          ],
+          [
+            294,
+            374
+          ]
+        ],
+        [
+          [
+            321,
+            240
+          ],
+          [
+            328,
+            292
+          ]
+        ]
+      ],
+      "alcoholLamp": {
+        "bowlEllipse": [
+          205,
+          347,
+          44,
+          26
+        ],
+        "baseApprox": [
+          177,
+          370,
+          232,
+          380
+        ],
+        "wickPath": [
+          [
+            204,
+            310
+          ],
+          [
+            199,
+            326
+          ],
+          [
+            197,
+            334
+          ],
+          [
+            215,
+            345
+          ],
+          [
+            217,
+            358
+          ],
+          [
+            195,
+            369
+          ]
+        ],
+        "smallFlameRedAt": [
+          204,
+          305
+        ]
+      },
+      "reagentLeader": [
+        [
+          128,
+          185
+        ],
+        [
+          185,
+          268
+        ]
+      ]
+    },
+    "criticalTextAndShape": "BÁTSỨbođáykhôngbeakercóngangthành/spout. Giữ2mL/5mL/NaOH40%vàtextstir. Rodyellowliquid+curvedarrowdothuyếtminhkhôngshowprecipitate/soapflake."
+  },
+  {
+    "i": 587,
+    "hash": "6d7ce74590055d3d9750cd959ffd019b5e3fdd4e128de0aac0065a81a6d91125",
+    "fileNguon": "anh/6d7ce74590055d3d9750cd959ffd019b5e3fdd4e128de0aac0065a81a6d91125.png",
+    "canvas": [
+      464,
+      290
+    ],
+    "daMoNative": true,
+    "kind": "distillation-lab-labelled",
+    "labels": [
+      "Nước ra",
+      "Sinh hàn",
+      "Nước vào",
+      "Bình cầu",
+      "Lưới amiăng",
+      "Bình hứng"
+    ],
+    "notes": "2giáđỡtrụđứng/chânđếtrái/phải. Roundflasktráiđứngtrênlướinằmngangkẹpgiá,dướicódèncồnmàutrongmờcóngọnlửa,flaskchứaliquidxámthấpmức,nocầnthermometertrongsource. Ốnghơitừcổflaskđứnglênrồibẻgócphảixuống,điquasinhhànTHẲNGinclineddownright,kếtthúcuốngcongđivàobìnhtamgiáchứngtrênkhốigỗvânởphảidưới. NhãnNướcratrênbêntráisinhhàn,sourceportđầucao;Nướcvàodướigầnđầuphải/thấp;Sinhhànleadergiữathân.Bìnhcầu/Lướiamiăng/Bìnhhứngleaderchỉđúng3parts. Khôngsố1..5/khôngthêmNhiệtkếnếunguồnkhôngcó.",
+    "questions": [
+      {
+        "qid": "DB-12-B1-P1-D2-II-99",
+        "de": "Tiến hành thí nghiệm điều chế isoamyl acetate (có mùi chuối chín) theo thứ tự các bước sau:\nBước 1. Cho 3 mL isoamyl alcohol, 4 mL acetic acid và 5 mL H₂SO₄ đặc vào bình cầu, lắc đều và đun nhẹ trong khoảng 7 – 8 phút.\nBước 2. Để nguội chất lỏng ở bình hứng, thêm 10 mL dung dịch NaCl bão hoà và cho sang phễu chiết để tách sản phẩm.\nMỗi phát biểu sau đây là đúng hay sai?",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D2-II-99.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D2-II-100",
+        "de": "Tiến hành thí nghiệm điều chế isoamyl acetate (có mùi chuối chín) theo thứ tự các bước sau đây:\nBước 1. Cho 3 mL isoamyl alcohol, 4 mL acetic acid và 5 mL H₂SO₄ đặc vào bình cầu, lắc đều và đun nhẹ trong khoảng 7−8 phút.\nBước 2. Để nguội chất lỏng ở bình hứng, thêm 10 mL dung dịch NaCl bão hoà và cho sang phễu chiết để tách sản phẩm thu được.\nMỗi phát biểu sau đây là đúng hay sai?",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D2-II-100.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B1-P1-II-28",
+        "de": "Tiến hành thí nghiệm điều chế isoamyl acetate (có mùi chuối chín) theo thứ tự các bước sau:\nBước 1. Cho 3 mL isoamyl alcohol, 4 mL acetic acid và 5 mL H₂SO₄ đặc vào bình cầu, lắc đều và đun nhẹ trong khoảng 7 – 8 phút.\nBước 2. Để nguội chất lỏng ở bình hứng, thêm 10 mL dung dịch NaCl bão hoà và cho sang phễu chiết để tách sản phẩm.\nMỗi phát biểu sau đây là đúng hay sai?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P1-II-28.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B1-P1-II-33",
+        "de": "Tiến hành thí nghiệm điều chế isoamyl acetate (có mùi chuối chín) theo thứ tự các bước sau đây:\nBước 1. Cho 3 mL isoamyl alcohol, 4 mL acetic acid và 5 mL H₂SO₄ đặc vào bình cầu, lắc đều và đun nhẹ trong khoảng 7−8 phút.\nBước 2. Để nguội chất lỏng ở bình hứng, thêm 10 mL dung dịch NaCl bão hoà và cho sang phễu chiết để tách sản phẩm thu được.\nMỗi phát biểu sau đây là đúng hay sai?",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P1-II-33.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B1-P1-VD-II-5",
+        "de": "Tiến hành thí nghiệm điều chế isoamyl acetate (có mùi chuối chín) theo thứ tự các bước sau đây:\nBước 1. Cho 3 mL isoamyl alcohol, 4 mL acetic acid và 5mLH₂SO₄ đặc vào bình cầu, lắc đều và đun nhẹ trong khoảng 7−8 phút.\nBước 2. Để nguội chất lỏng ở bình hứng, thêm 10 mL dung dịch NaCl bão hoà và cho sang phễu chiết để tách sản phẩm thu được.",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P1-VD-II-5.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry155": {
+      "canvas": [
+        464,
+        290
+      ],
+      "stands": [
+        {
+          "pole": [
+            [
+              45,
+              5
+            ],
+            [
+              45,
+              273
+            ]
+          ],
+          "footPolygon": [
+            [
+              26,
+              272
+            ],
+            [
+              183,
+              272
+            ],
+            [
+              194,
+              285
+            ],
+            [
+              18,
+              285
+            ]
+          ]
+        },
+        {
+          "pole": [
+            [
+              283,
+              5
+            ],
+            [
+              283,
+              273
+            ]
+          ],
+          "footPolygon": [
+            [
+              220,
+              273
+            ],
+            [
+              345,
+              273
+            ],
+            [
+              355,
+              284
+            ],
+            [
+              212,
+              284
+            ]
+          ]
+        }
+      ],
+      "roundFlask": {
+        "center": [
+          111,
+          166
+        ],
+        "radius": 26,
+        "neckRect": [
+          103,
+          104,
+          119,
+          143
+        ],
+        "liquidTopY": 174
+      },
+      "vapourTubeApprox": [
+        [
+          111,
+          104
+        ],
+        [
+          111,
+          61
+        ],
+        [
+          115,
+          54
+        ],
+        [
+          122,
+          55
+        ],
+        [
+          179,
+          76
+        ]
+      ],
+      "condenser": {
+        "axisFrom": [
+          180,
+          77
+        ],
+        "axisTo": [
+          367,
+          141
+        ],
+        "outerJacketApprox": [
+          [
+            208,
+            75
+          ],
+          [
+            358,
+            125
+          ],
+          [
+            365,
+            137
+          ],
+          [
+            356,
+            144
+          ],
+          [
+            200,
+            90
+          ],
+          [
+            195,
+            82
+          ]
+        ],
+        "innerDoubleLines": [
+          [
+            [
+              181,
+              76
+            ],
+            [
+              366,
+              138
+            ]
+          ],
+          [
+            [
+              179,
+              81
+            ],
+            [
+              364,
+              144
+            ]
+          ]
+        ],
+        "upperWaterPortApprox": [
+          [
+            219,
+            78
+          ],
+          [
+            220,
+            74
+          ],
+          [
+            229,
+            77
+          ]
+        ],
+        "lowerWaterPortApprox": [
+          [
+            334,
+            140
+          ],
+          [
+            332,
+            146
+          ],
+          [
+            341,
+            148
+          ]
+        ]
+      },
+      "receivingTube": [
+        [
+          367,
+          141
+        ],
+        [
+          415,
+          160
+        ],
+        [
+          424,
+          168
+        ],
+        [
+          425,
+          181
+        ]
+      ],
+      "receiverErlen": {
+        "mouth": [
+          424,
+          180,
+          7,
+          3
+        ],
+        "bodyApprox": [
+          [
+            419,
+            184
+          ],
+          [
+            397,
+            243
+          ],
+          [
+            403,
+            247
+          ],
+          [
+            441,
+            247
+          ],
+          [
+            449,
+            243
+          ],
+          [
+            430,
+            184
+          ]
+        ]
+      },
+      "woodBlock": [
+        398,
+        249,
+        449,
+        285
+      ],
+      "wireGauze": [
+        [
+          82,
+          196
+        ],
+        [
+          151,
+          196
+        ]
+      ],
+      "alcoholLamp": {
+        "bodyEllipse": [
+          111,
+          249,
+          28,
+          18
+        ],
+        "neck": [
+          105,
+          220,
+          117,
+          230
+        ],
+        "flameAt": [
+          112,
+          210
+        ]
+      },
+      "labels": [
+        {
+          "text": "Nước ra",
+          "at": [
+            211,
+            54
+          ],
+          "leader": [
+            [
+              226,
+              64
+            ],
+            [
+              254,
+              72
+            ]
+          ],
+          "flowArrowHead": [
+            254,
+            72
+          ]
+        },
+        {
+          "text": "Sinh hàn",
+          "at": [
+            382,
+            115
+          ],
+          "leader": [
+            [
+              347,
+              115
+            ],
+            [
+              304,
+              115
+            ]
+          ],
+          "arrowHead": false
+        },
+        {
+          "text": "Nước vào",
+          "at": [
+            352,
+            165
+          ],
+          "leader": [
+            [
+              315,
+              150
+            ],
+            [
+              338,
+              157
+            ]
+          ],
+          "flowArrowHead": [
+            315,
+            150
+          ]
+        },
+        {
+          "text": "Bình cầu",
+          "at": [
+            194,
+            163
+          ],
+          "leader": [
+            [
+              162,
+              164
+            ],
+            [
+              137,
+              164
+            ]
+          ],
+          "arrowHead": false
+        },
+        {
+          "text": "Lưới amiăng",
+          "at": [
+            218,
+            191
+          ],
+          "leader": [
+            [
+              169,
+              190
+            ],
+            [
+              143,
+              193
+            ]
+          ],
+          "arrowHead": false
+        },
+        {
+          "text": "Bình hứng",
+          "at": [
+            338,
+            231
+          ],
+          "leader": [
+            [
+              379,
+              230
+            ],
+            [
+              407,
+              236
+            ]
+          ],
+          "arrowHead": false
+        }
+      ]
+    },
+    "sourceCaution": "Nướcralabel/flowarrowởđầucaotráisinhhàn,Nướcvàoởđầuthấpphải;khôngđảohaiport/label. Khôngthermometer/số(1)..(5)trongsource587,đừngcopy1024thêm. Condensatedropnhỏtrongreceivernhòeđừngtựchốtcount,giữgeometrysourcekhiroottrace."
+  },
+  {
+    "i": 1024,
+    "hash": "b7ea7934af2b39b7b32ac961724ff6b366f8c67a13650d1f76379ae065510c49",
+    "fileNguon": "anh/b7ea7934af2b39b7b32ac961724ff6b366f8c67a13650d1f76379ae065510c49.png",
+    "canvas": [
+      739,
+      567
+    ],
+    "daMoNative": true,
+    "kind": "distillation-lab-numbered",
+    "labels": [
+      "Nhiệt kế",
+      "Đèn cồn",
+      "(1)",
+      "(2)",
+      "(3)",
+      "(4)",
+      "(5)"
+    ],
+    "notes": "2giáđỡkẹpflasktráivàsinhhàninclineddownright,2chânđế.CổflaskcónhiệtkếđứngLÊNqua nútđen,cácvạchnhỏtrênthermometerKHÔNGcósố. Nhánhhơibênphảinốisinhhàn2lớpvàraốngcongđếnErlenhứng,giữ3giọtrơitrongreceiver vàmứcchấtlỏng.Sinhhànjacketcóvânnétchéo bêntrong.Parentlabels(1)portwaterđầuthấpphảidướisinhhàn,(2)portđầucaotráitrên,(3)leadertrongjacket,(4)roundflask,(5)receivingErlen. Khôngmũitênflowởportschỉleadernhãn,đừngthêmcoldwaterflow. LabelĐèncồnleadertrỏdènflametrái;Nhiệtkếleadertrỏthermometer. Giữmesh/labstandnhưsourcekhôngvẽốnghơitrởlạiflas.",
+    "questions": [
+      {
+        "qid": "100-II-2",
+        "de": "Trong phòng thí nghiệm, ethyl acetate được điều chế từ acetic acid và ethanol, xúc tác H₂SO₄ đặc, theo mô hình thí nghiệm như hình. Biết nhiệt độ trong bình cầu (4) giữ ở mức 65–70°C, nhiệt độ trong ống sinh hàn (3) duy trì ở 25°C. Sau thí nghiệm, tiến hành phân tách sản phẩm. Ghi phổ hồng ngoại của acetic acid, ethanol và ethyl acetate.\nCho biết số sóng hấp thụ đặc trưng của một số liên kết trên phổ hồng ngoại như bảng dưới.",
+        "refs": [
+          {
+            "where": "100-II-2.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "12-C1-B1-D1-II-1",
+        "de": "Trong phòng thí nghiệm, ethyl acetate được điều chế từ acetic acid và ethanol, xúc tác H₂SO₄ đặc, theo mô hình thí nghiệm như hình. Biết nhiệt độ trong bình cầu (4) giữ ở mức 65–70°C, nhiệt độ trong ống sinh hàn (3) duy trì ở 25°C. Sau thí nghiệm, tiến hành phân tách sản phẩm. Ghi phổ hồng ngoại của acetic acid, ethanol và ethyl acetate.\nCho biết số sóng hấp thụ đặc trưng của một số liên kết trên phổ hồng ngoại như bảng dưới.",
+        "refs": [
+          {
+            "where": "12-C1-B1-D1-II-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D2-II-14",
+        "de": "Trong phòng thí nghiệm, ethyl acetate được điều chế từ acetic acid và ethanol, xúc tác H₂SO₄ đặc, theo mô hình thí nghiệm như hình. Biết nhiệt độ trong bình cầu (4) giữ ở mức 65–70°C, nhiệt độ trong ống sinh hàn (3) duy trì ở 25°C. Sau thí nghiệm, tiến hành phân tách sản phẩm. Ghi phổ hồng ngoại của acetic acid, ethanol và ethyl acetate.\nCho biết số sóng hấp thụ đặc trưng của một số liên kết trên phổ hồng ngoại như bảng dưới.",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D2-II-14.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D2-II-55",
+        "de": "Trong phòng thí nghiệm, ethyl acetate được điều chế từ acetic acid và ethanol, xúc tác H₂SO₄ đặc, theo mô hình thí nghiệm như hình. Biết nhiệt độ trong bình cầu (4) giữ ở mức 65–70°C, nhiệt độ trong ống sinh hàn (3) duy trì ở 25°C. Sau thí nghiệm, tiến hành phân tách sản phẩm. Ghi phổ hồng ngoại của acetic acid, ethanol và ethyl acetate.\nCho biết số sóng hấp thụ đặc trưng của một số liên kết trên phổ hồng ngoại như bảng dưới.",
+        "refs": [
+          {
+            "where": "DB-12-B1-P1-D2-II-55.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry155": {
+      "canvas": [
+        739,
+        567
+      ],
+      "leftStand": {
+        "pole": [
+          [
+            84,
+            87
+          ],
+          [
+            84,
+            529
+          ]
+        ],
+        "footPolygon": [
+          [
+            11,
+            528
+          ],
+          [
+            316,
+            528
+          ],
+          [
+            329,
+            540
+          ],
+          [
+            315,
+            549
+          ],
+          [
+            11,
+            549
+          ]
+        ],
+        "clamps": [
+          [
+            42,
+            201,
+            189,
+            216
+          ],
+          [
+            40,
+            378,
+            151,
+            393
+          ]
+        ]
+      },
+      "rightStand": {
+        "pole": [
+          [
+            442,
+            84
+          ],
+          [
+            442,
+            530
+          ]
+        ],
+        "footPolygon": [
+          [
+            379,
+            530
+          ],
+          [
+            519,
+            530
+          ],
+          [
+            525,
+            543
+          ],
+          [
+            368,
+            543
+          ]
+        ],
+        "jacketClampsApprox": [
+          [
+            423,
+            222,
+            456,
+            241
+          ],
+          [
+            429,
+            272,
+            460,
+            296
+          ]
+        ]
+      },
+      "flask": {
+        "neckWalls": [
+          [
+            [
+              187,
+              126
+            ],
+            [
+              187,
+              250
+            ]
+          ],
+          [
+            [
+              220,
+              126
+            ],
+            [
+              220,
+              250
+            ]
+          ]
+        ],
+        "blackStopper": [
+          185,
+          115,
+          222,
+          130
+        ],
+        "bulbOutlineApprox": [
+          [
+            187,
+            250
+          ],
+          [
+            164,
+            267
+          ],
+          [
+            151,
+            292
+          ],
+          [
+            151,
+            326
+          ],
+          [
+            165,
+            353
+          ],
+          [
+            187,
+            373
+          ],
+          [
+            218,
+            374
+          ],
+          [
+            244,
+            351
+          ],
+          [
+            259,
+            326
+          ],
+          [
+            259,
+            292
+          ],
+          [
+            244,
+            269
+          ],
+          [
+            220,
+            250
+          ]
+        ],
+        "liquidTopY": 330
+      },
+      "thermometer": {
+        "tubeApprox": [
+          [
+            199,
+            12
+          ],
+          [
+            205,
+            12
+          ],
+          [
+            206,
+            207
+          ],
+          [
+            202,
+            212
+          ],
+          [
+            199,
+            207
+          ],
+          [
+            199,
+            12
+          ]
+        ],
+        "graduations": "tinyblackticksinside,notnumeric",
+        "label": [
+          "Nhiệt kế",
+          [
+            279,
+            29
+          ]
+        ],
+        "leader": [
+          [
+            241,
+            44
+          ],
+          [
+            203,
+            56
+          ]
+        ]
+      },
+      "condenser": {
+        "vapourAxis": [
+          [
+            220,
+            172
+          ],
+          [
+            615,
+            321
+          ]
+        ],
+        "jointAdapterApprox": [
+          [
+            250,
+            170
+          ],
+          [
+            276,
+            179
+          ],
+          [
+            289,
+            192
+          ],
+          [
+            279,
+            205
+          ],
+          [
+            245,
+            192
+          ]
+        ],
+        "jacketOutlineApprox": [
+          [
+            319,
+            197
+          ],
+          [
+            343,
+            195
+          ],
+          [
+            564,
+            281
+          ],
+          [
+            578,
+            295
+          ],
+          [
+            576,
+            307
+          ],
+          [
+            564,
+            315
+          ],
+          [
+            319,
+            230
+          ],
+          [
+            310,
+            217
+          ],
+          [
+            312,
+            205
+          ]
+        ],
+        "waterPortHigh2": [
+          [
+            354,
+            206
+          ],
+          [
+            359,
+            191
+          ],
+          [
+            366,
+            194
+          ],
+          [
+            361,
+            209
+          ]
+        ],
+        "waterPortLow1": [
+          [
+            529,
+            307
+          ],
+          [
+            523,
+            327
+          ],
+          [
+            531,
+            330
+          ],
+          [
+            538,
+            311
+          ]
+        ],
+        "hachure": "diagonalparallelwaterjacketmarksinside,scannednativesomefaint;notnumericcountdata"
+      },
+      "outletDoubleTube": [
+        [
+          [
+            614,
+            320
+          ],
+          [
+            637,
+            334
+          ],
+          [
+            644,
+            349
+          ],
+          [
+            645,
+            409
+          ]
+        ],
+        [
+          [
+            610,
+            328
+          ],
+          [
+            625,
+            339
+          ],
+          [
+            630,
+            351
+          ],
+          [
+            630,
+            414
+          ]
+        ]
+      ],
+      "receiver": {
+        "mouthX": [
+          614,
+          654
+        ],
+        "neckY": [
+          394,
+          414
+        ],
+        "bodyApprox": [
+          [
+            614,
+            414
+          ],
+          [
+            569,
+            540
+          ],
+          [
+            574,
+            555
+          ],
+          [
+            682,
+            555
+          ],
+          [
+            699,
+            540
+          ],
+          [
+            654,
+            414
+          ]
+        ],
+        "liquidSurfaceY": 520,
+        "drops": [
+          {
+            "center": [
+              632,
+              449
+            ],
+            "teardropTip": [
+              630,
+              439
+            ]
+          },
+          {
+            "center": [
+              639,
+              482
+            ],
+            "teardropTip": [
+              637,
+              470
+            ]
+          },
+          {
+            "center": [
+              630,
+              509
+            ],
+            "teardropTip": [
+              628,
+              499
+            ]
+          }
+        ],
+        "dropCountCertain": 3
+      },
+      "alcoholLamp": {
+        "bodyEllipse": [
+          210,
+          484,
+          47,
+          39
+        ],
+        "wickApprox": [
+          [
+            209,
+            451
+          ],
+          [
+            201,
+            484
+          ],
+          [
+            196,
+            521
+          ]
+        ],
+        "flameApprox": [
+          [
+            196,
+            419
+          ],
+          [
+            198,
+            405
+          ],
+          [
+            203,
+            415
+          ],
+          [
+            210,
+            403
+          ],
+          [
+            218,
+            413
+          ],
+          [
+            222,
+            421
+          ]
+        ],
+        "blackBurner": [
+          197,
+          421,
+          220,
+          451
+        ]
+      },
+      "labels": [
+        {
+          "text": "(1)",
+          "at": [
+            515,
+            352
+          ],
+          "target": "lower-rightwaterport"
+        },
+        {
+          "text": "(2)",
+          "at": [
+            370,
+            163
+          ],
+          "target": "upper-leftwaterport"
+        },
+        {
+          "text": "(3)",
+          "at": [
+            521,
+            203
+          ],
+          "leader": [
+            [
+              522,
+              223
+            ],
+            [
+              491,
+              265
+            ]
+          ],
+          "arrowHead": false
+        },
+        {
+          "text": "(4)",
+          "at": [
+            314,
+            305
+          ],
+          "leader": [
+            [
+              283,
+              302
+            ],
+            [
+              258,
+              314
+            ]
+          ],
+          "arrowHead": false
+        },
+        {
+          "text": "(5)",
+          "at": [
+            717,
+            451
+          ],
+          "leader": [
+            [
+              699,
+              474
+            ],
+            [
+              662,
+              493
+            ]
+          ],
+          "arrowHead": false
+        },
+        {
+          "text": "Đèn cồn",
+          "at": [
+            320,
+            462
+          ],
+          "leader": [
+            [
+              290,
+              474
+            ],
+            [
+              232,
+              495
+            ]
+          ],
+          "arrowHead": false
+        }
+      ]
+    },
+    "sourceCaution": "(1)/(2)KHÔNGflowarrows,khôngtựđặtmũitênnhư926hoặc587.Label3chỉjacket,4flask,5receiver.Vạchthermometernhỏkhôngsố;3dropsrõ,khôngbỏgiọtnướctạođápán."
+  },
+  {
+    "i": 1379,
+    "hash": "f8fb0793580a20e441af19c3251aa8acd1b82aed91d89de8c1d8f9da27ca168b",
+    "fileNguon": "anh/f8fb0793580a20e441af19c3251aa8acd1b82aed91d89de8c1d8f9da27ca168b.png",
+    "canvas": [
+      1123,
+      306
+    ],
+    "daMoNative": true,
+    "kind": "four-amino-acid-reactions-literal",
+    "rows": [
+      {
+        "label": "a)",
+        "left": "H₂NCH₂COOH + CH₃CH₂OH",
+        "overArrow": "H₂SO₄, t⁰",
+        "right": "H₂NCH₂CH₂COOCH₃ + H₂O"
+      },
+      {
+        "label": "b)",
+        "left": "HCl + H₂NCH(CH₃)COOH",
+        "overArrow": "",
+        "right": "ClH₃NCH(CH₃)COOH"
+      },
+      {
+        "label": "c)",
+        "left": "H₂NCH(CH₃)COOH + NaOH",
+        "overArrow": "",
+        "right": "H₂NCH(CH₃)COONa + H₂O"
+      },
+      {
+        "label": "d)",
+        "left": "nH₂N[CH₂]₅COOH",
+        "overArrow": "xt, t⁰, p",
+        "right": "(–HN–[CH₂]₅–CO–)ₙ + nH₂O"
+      }
+    ],
+    "notes": "4rowđềumộtarrowphải,khôngequilibrium. Sourcea)productthậtH₂NCH₂CH₂COOCH₃khácethylglycinatechuẩn,PHẢIGIỮ2CH₂phíaN/methylester,đừngsửagiảđịnhđềsai. Sourceb)đãZOOM3xđọcrõClH₃N(...),C+l+H3,khôngCH3N vàkhôngionchargeđượcthêm. d)polymerroundparentheses+repeatnngoàithấpphải,giữ5vàstubhaiđầu,kHÔNGfiniteSMILES. Khôngtínhđápánamphoteric.",
+    "questions": [
+      {
+        "qid": "12-KT-C3-D2-I-13",
+        "de": "Cho các phản ứng của các amino acid trong hình dưới đây.\nTrong các phản ứng trên, phản ứng nào chứng minh tính chất lưỡng tính của amino acid?",
+        "refs": [
+          {
+            "where": "12-KT-C3-D2-I-13.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P1-D2-I-68",
+        "de": "Cho các phản ứng của các amino acid trong hình dưới đây.\nTrong các phản ứng trên, phản ứng nào chứng minh tính chất lưỡng tính của amino acid?",
+        "refs": [
+          {
+            "where": "DB-12-B9-P1-D2-I-68.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry155": {
+      "canvas": [
+        1123,
+        306
+      ],
+      "rows": [
+        {
+          "label": "a)",
+          "labelAnchor": [
+            66,
+            50
+          ],
+          "leftTextAnchor": [
+            91,
+            50
+          ],
+          "arrow": {
+            "tail": [
+              501,
+              52
+            ],
+            "head": [
+              673,
+              52
+            ]
+          },
+          "conditionAnchor": [
+            588,
+            35
+          ],
+          "rightTextAnchor": [
+            685,
+            50
+          ]
+        },
+        {
+          "label": "b)",
+          "labelAnchor": [
+            65,
+            110
+          ],
+          "leftTextAnchor": [
+            91,
+            110
+          ],
+          "arrow": {
+            "tail": [
+              481,
+              111
+            ],
+            "head": [
+              559,
+              111
+            ]
+          },
+          "rightTextAnchor": [
+            573,
+            110
+          ]
+        },
+        {
+          "label": "c)",
+          "labelAnchor": [
+            65,
+            170
+          ],
+          "leftTextAnchor": [
+            91,
+            170
+          ],
+          "arrow": {
+            "tail": [
+              512,
+              171
+            ],
+            "head": [
+              591,
+              171
+            ]
+          },
+          "rightTextAnchor": [
+            603,
+            170
+          ]
+        },
+        {
+          "label": "d)",
+          "labelAnchor": [
+            65,
+            229
+          ],
+          "leftTextAnchor": [
+            91,
+            229
+          ],
+          "arrow": {
+            "tail": [
+              373,
+              233
+            ],
+            "head": [
+              505,
+              233
+            ]
+          },
+          "conditionAnchor": [
+            441,
+            215
+          ],
+          "polymer": {
+            "leftParenthesisCenter": [
+              535,
+              232
+            ],
+            "rightParenthesisCenter": [
+              800,
+              232
+            ],
+            "repeatnAnchor": [
+              815,
+              247
+            ],
+            "backboneText": "HN–[CH₂]₅–CO",
+            "horizontalStubs": "leftcrossingparenandrightcrossingparen"
+          },
+          "byproductTextAnchor": [
+            860,
+            229
+          ]
+        }
+      ]
+    },
+    "criticalLiteral": "a)tráiH₂NCH₂COOH+CH₃CH₂OHnhưngPHẢIgiữproductH₂NCH₂CH₂COOCH₃+H₂Otheonative,đừngsửaethylester.b)productClH₃NCH(CH₃)COOHđãzoom3xđọcrõCl,gộpformulaNATIVEkhôngthêm+−.c)NaOH/saltNa/hệsốkhôngthêm.d)polymern[CH₂]₅,repeatnngoàiroundbrackets,khôngfiniteSMILES.Nocânbằnghaygiảiđápán.",
+    "diagnosticProductB": "/workspace/scratch/1379-productb-3x.png"
+  },
+  {
+    "i": 7,
+    "hash": "0131ad8f6e282f78e81e50f7c9886ed2dc6a1fa734b7d941d1f945ae07eebbf7",
+    "fileNguon": "anh/0131ad8f6e282f78e81e50f7c9886ed2dc6a1fa734b7d941d1f945ae07eebbf7.png",
+    "canvas": [
+      960,
+      380
+    ],
+    "daMoNative": true,
+    "kind": "NO-bond-energy-diagram-with-source-text",
+    "sourceText": "14.5. Tính nhiệt tạo thành chuẩn của HF và NO dựa vào năng lượng liên kết (Bảng 14.1 SGK), của F₂, H₂, HF, N₂, O₂, NO. Giải thích sự khác nhau về nhiệt tạo thành của HF và NO.",
+    "labels": [
+      "Năng lượng để bẻ gãy liên kết",
+      "Năng lượng giải phóng khi liên kết hình thành",
+      "▲ Sự tạo thành NO từ N₂ và O₂"
+    ],
+    "notes": "PhầntexttrênLÀNỘIDUNGẢNH,khôngthực thiyêucầutính/giảithích. Diagram3giaiđoạnngang:tráiN₂(pair2Nspheres)ởtrên+O₂(pair2Ospheres)dưới;middle4spheresrờiN/N/O/O;phải2pairN–O,mộtrêntráimộtdướiphải. Haihollowblockarrows→đenviềntrắnggiữa3giaiđoạn. Có2curlyenergyarrowsởtráihướngvàocặpN₂/O₂,2curlyenergyarrowsrờitừpairNOphảiđira,labelgiảiphóngliênkếttrênphải,labelbẻgãytráidưới. GiữatomlettersN/Otrênmọisphere,khôngtựbondorders/ΔHnumbers/answer. Captiontriangle▲giữ.",
+    "questions": [
+      {
+        "qid": "DB-11-B6-D3-III-4",
+        "de": "Tính nhiệt tạo thành chuẩn của NO theo năng lượng liên kết.\nBiết năng lượng liên kết được cho ở bảng dưới.\nGiá trị nhiệt tạo thành chuẩn của NO(g) theo năng lượng liên kết là bao nhiêu kJ/mol?",
+        "refs": [
+          {
+            "where": "DB-11-B6-D3-III-4.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B4-III-15",
+        "de": "Tính nhiệt tạo thành chuẩn của NO theo năng lượng liên kết.\nBiết năng lượng liên kết được cho ở bảng dưới.\nGiá trị nhiệt tạo thành chuẩn của NO(g) theo năng lượng liên kết là bao nhiêu kJ/mol?",
+        "refs": [
+          {
+            "where": "DH-11-C2-B4-III-15.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry155": {
+      "canvas": [
+        960,
+        380
+      ],
+      "topTextLines": [
+        {
+          "at": [
+            40,
+            34
+          ],
+          "text": "14.5. Tính nhiệt tạo thành chuẩn của HF và NO dựa vào năng lượng liên kết (Bảng"
+        },
+        {
+          "at": [
+            84,
+            64
+          ],
+          "text": "14.1 SGK), của F₂, H₂, HF, N₂, O₂, NO. Giải thích sự khác nhau về nhiệt tạo thành"
+        },
+        {
+          "at": [
+            84,
+            93
+          ],
+          "text": "của HF và NO."
+        }
+      ],
+      "atoms": [
+        {
+          "label": "N",
+          "center": [
+            212,
+            192
+          ],
+          "radius": 17
+        },
+        {
+          "label": "N",
+          "center": [
+            242,
+            192
+          ],
+          "radius": 17
+        },
+        {
+          "label": "O",
+          "center": [
+            276,
+            270
+          ],
+          "radius": 17
+        },
+        {
+          "label": "O",
+          "center": [
+            304,
+            270
+          ],
+          "radius": 17
+        },
+        {
+          "label": "N",
+          "center": [
+            415,
+            217
+          ],
+          "radius": 17
+        },
+        {
+          "label": "N",
+          "center": [
+            464,
+            199
+          ],
+          "radius": 17
+        },
+        {
+          "label": "O",
+          "center": [
+            415,
+            280
+          ],
+          "radius": 17
+        },
+        {
+          "label": "O",
+          "center": [
+            465,
+            263
+          ],
+          "radius": 17
+        },
+        {
+          "label": "N",
+          "center": [
+            576,
+            210
+          ],
+          "radius": 17
+        },
+        {
+          "label": "O",
+          "center": [
+            608,
+            207
+          ],
+          "radius": 17
+        },
+        {
+          "label": "N",
+          "center": [
+            630,
+            291
+          ],
+          "radius": 17
+        },
+        {
+          "label": "O",
+          "center": [
+            660,
+            286
+          ],
+          "radius": 17
+        }
+      ],
+      "blockArrows": [
+        {
+          "outline": [
+            [
+              332,
+              230
+            ],
+            [
+              359,
+              230
+            ],
+            [
+              359,
+              220
+            ],
+            [
+              376,
+              239
+            ],
+            [
+              359,
+              257
+            ],
+            [
+              359,
+              247
+            ],
+            [
+              332,
+              247
+            ],
+            [
+              332,
+              230
+            ]
+          ]
+        },
+        {
+          "outline": [
+            [
+              509,
+              230
+            ],
+            [
+              534,
+              230
+            ],
+            [
+              534,
+              219
+            ],
+            [
+              552,
+              238
+            ],
+            [
+              534,
+              256
+            ],
+            [
+              534,
+              246
+            ],
+            [
+              509,
+              246
+            ],
+            [
+              509,
+              230
+            ]
+          ]
+        }
+      ],
+      "energyCurlyArrows": [
+        {
+          "curveApprox": [
+            [
+              232,
+              249
+            ],
+            [
+              220,
+              244
+            ],
+            [
+              229,
+              237
+            ],
+            [
+              222,
+              230
+            ],
+            [
+              227,
+              220
+            ],
+            [
+              228,
+              209
+            ]
+          ],
+          "head": [
+            228,
+            209
+          ],
+          "meaning": "energyintowardN₂"
+        },
+        {
+          "curveApprox": [
+            [
+              294,
+              217
+            ],
+            [
+              284,
+              220
+            ],
+            [
+              292,
+              227
+            ],
+            [
+              284,
+              234
+            ],
+            [
+              290,
+              242
+            ],
+            [
+              289,
+              251
+            ]
+          ],
+          "head": [
+            289,
+            251
+          ],
+          "meaning": "energyintowardO₂"
+        },
+        {
+          "curveApprox": [
+            [
+              592,
+              190
+            ],
+            [
+              585,
+              184
+            ],
+            [
+              592,
+              178
+            ],
+            [
+              584,
+              170
+            ],
+            [
+              582,
+              155
+            ]
+          ],
+          "head": [
+            582,
+            155
+          ],
+          "meaning": "releasedoutfromNOtop"
+        },
+        {
+          "curveApprox": [
+            [
+              640,
+              270
+            ],
+            [
+              633,
+              264
+            ],
+            [
+              640,
+              257
+            ],
+            [
+              632,
+              249
+            ],
+            [
+              629,
+              232
+            ]
+          ],
+          "head": [
+            629,
+            232
+          ],
+          "meaning": "releasedoutfromNObottom"
+        }
+      ],
+      "text": [
+        {
+          "lines": [
+            "Năng lượng để",
+            "bẻ gãy liên kết"
+          ],
+          "at": [
+            135,
+            270
+          ]
+        },
+        {
+          "lines": [
+            "Năng lượng giải phóng khi",
+            "liên kết hình thành"
+          ],
+          "at": [
+            498,
+            129
+          ]
+        },
+        {
+          "text": "▲ Sự tạo thành NO từ N₂ và O₂",
+          "at": [
+            276,
+            361
+          ]
+        }
+      ]
+    },
+    "criticalScope": "FulltoptextlàDỮLIỆUNGUỒNtrongảnh,khôngthực thilệnhtính/giảithích/khôngđiềnΔH. 12spherescount=4atomsstageleft+4middle+4right. Stageleft2diatomicN₂/O₂,mid4atomrời,right2NO. Khôngtựthêmtriplebond/doublebond/nhãnnguyêntửkíchthước/answers."
+  },
+  {
+    "i": 209,
+    "hash": "2355c03a95e76f8ef52accefc3999b9befc7abf29244b64c6afcf6887bcbd876",
+    "fileNguon": "anh/2355c03a95e76f8ef52accefc3999b9befc7abf29244b64c6afcf6887bcbd876.png",
+    "canvas": [
+      706,
+      161
+    ],
+    "daMoNative": true,
+    "kind": "gas-collection-three-methods",
+    "captions": [
+      "Cách 1",
+      "Cách 2",
+      "Cách 3"
+    ],
+    "labels": [
+      "nước"
+    ],
+    "notes": "3panelngang.Cách1testtubeÚPđóngđầutrên,cổngdưới,ốnggasdoublelineLđitừtráidướisaugấpuplêntớigầnđầutrêntrongtube;outsidearrow→từtráivàongangống.Cách2testtubeĐỨNGđóngđáy,miệngtrên,ốnggasdoublelinebẻ90°từtráitrênđixuốnggầnđáy,arrow→ởcổng.Cách3testtubeÚPngâmtrongbểwater,hướnggasốngchéotừtráitrênxuốngbểrồiUđilêntrongreceiver,bọttròntrongtube,labelnướcleaderchỉliquidbathphải;arrowchéoxuốngphảivàotube. KhônggánX/Y/Z/Thoặctênkhí/answers. GiữCách1/2/3đầudướimỗipanel/nướcchỉbểpanel3.",
+    "questions": [
+      {
+        "qid": "DB-11-B5-D1-I-18",
+        "de": "Các chất khí điều chế trong phòng thí nghiệm thường được thu theo phương pháp đẩy không khí (cách 1, cách 2) hoặc đẩy nước (cách 3) như các hình vẽ dưới đây: Có thể dùng cách nào trong 3 cách trên để thu khí ammonia?",
+        "refs": [
+          {
+            "where": "DB-11-B5-D1-I-18.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B5-VD-I-2",
+        "de": "Các chất khí điều chế trong phòng thí nghiệm thường được thu theo phương pháp đẩy không khí (cách 1, cách 2) hoặc đẩy nước (cách 3) như các hình vẽ dưới đây: Có thể dùng cách nào trong 3 cách trên để thu khí ammonia?",
+        "refs": [
+          {
+            "where": "DH-11-C2-B5-VD-I-2.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B5-I-73",
+        "de": "Các chất khí điều chế trong phòng thí nghiệm thường được thu theo phương pháp đẩy không khí (cách 1, cách 2) hoặc đẩy nước (cách 3) như các hình vẽ dưới đây: Có thể dùng cách nào trong 3 cách trên để thu khí ammonia?",
+        "refs": [
+          {
+            "where": "DH-11-C2-B5-I-73.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry155": {
+      "canvas": [
+        706,
+        161
+      ],
+      "method1": {
+        "tubeOuterApprox": [
+          [
+            76,
+            98
+          ],
+          [
+            76,
+            17
+          ],
+          [
+            79,
+            9
+          ],
+          [
+            84,
+            7
+          ],
+          [
+            90,
+            10
+          ],
+          [
+            92,
+            17
+          ],
+          [
+            92,
+            98
+          ]
+        ],
+        "gasDoublePath": [
+          [
+            [
+              33,
+              104
+            ],
+            [
+              73,
+              104
+            ],
+            [
+              80,
+              99
+            ],
+            [
+              81,
+              15
+            ]
+          ],
+          [
+            [
+              33,
+              108
+            ],
+            [
+              76,
+              108
+            ],
+            [
+              86,
+              101
+            ],
+            [
+              86,
+              15
+            ]
+          ]
+        ],
+        "gasArrow": {
+          "tail": [
+            0,
+            105
+          ],
+          "head": [
+            27,
+            105
+          ]
+        },
+        "caption": [
+          "Cách 1",
+          [
+            61,
+            149
+          ]
+        ]
+      },
+      "method2": {
+        "tubeOuterApprox": [
+          [
+            349,
+            20
+          ],
+          [
+            349,
+            103
+          ],
+          [
+            351,
+            111
+          ],
+          [
+            356,
+            114
+          ],
+          [
+            362,
+            111
+          ],
+          [
+            364,
+            103
+          ],
+          [
+            364,
+            20
+          ]
+        ],
+        "gasDoublePath": [
+          [
+            [
+              313,
+              9
+            ],
+            [
+              344,
+              9
+            ],
+            [
+              352,
+              14
+            ],
+            [
+              354,
+              23
+            ],
+            [
+              354,
+              106
+            ]
+          ],
+          [
+            [
+              313,
+              13
+            ],
+            [
+              341,
+              13
+            ],
+            [
+              348,
+              18
+            ],
+            [
+              350,
+              23
+            ],
+            [
+              350,
+              106
+            ]
+          ]
+        ],
+        "gasArrow": {
+          "tail": [
+            276,
+            11
+          ],
+          "head": [
+            306,
+            11
+          ]
+        },
+        "caption": [
+          "Cách 2",
+          [
+            338,
+            149
+          ]
+        ]
+      },
+      "method3": {
+        "tubeOuterApprox": [
+          [
+            587,
+            112
+          ],
+          [
+            587,
+            45
+          ],
+          [
+            590,
+            39
+          ],
+          [
+            594,
+            38
+          ],
+          [
+            599,
+            43
+          ],
+          [
+            600,
+            112
+          ]
+        ],
+        "internalWaterY": 67,
+        "bathOutline": [
+          [
+            532,
+            74
+          ],
+          [
+            632,
+            74
+          ],
+          [
+            632,
+            115
+          ],
+          [
+            629,
+            123
+          ],
+          [
+            536,
+            123
+          ],
+          [
+            532,
+            118
+          ],
+          [
+            532,
+            74
+          ]
+        ],
+        "bathWaterY": 99,
+        "gasDoublePath": [
+          [
+            [
+              539,
+              32
+            ],
+            [
+              564,
+              43
+            ],
+            [
+              571,
+              64
+            ],
+            [
+              585,
+              115
+            ],
+            [
+              591,
+              118
+            ]
+          ],
+          [
+            [
+              539,
+              36
+            ],
+            [
+              561,
+              46
+            ],
+            [
+              567,
+              65
+            ],
+            [
+              581,
+              116
+            ],
+            [
+              586,
+              120
+            ],
+            [
+              594,
+              119
+            ]
+          ]
+        ],
+        "gasArrow": {
+          "tail": [
+            507,
+            23
+          ],
+          "head": [
+            532,
+            33
+          ]
+        },
+        "caption": [
+          "Cách 3",
+          [
+            587,
+            149
+          ]
+        ],
+        "waterLabel": {
+          "text": "nước",
+          "at": [
+            684,
+            120
+          ],
+          "leader": [
+            [
+              664,
+              118
+            ],
+            [
+              618,
+              107
+            ]
+          ]
+        },
+        "bubbles": "nhiềuvòngnhỏmờtrongtube3chồngwaterdash;khôngchốtsốbubblesvìcópixelnhập"
+      },
+      "allText": [
+        "Cách 1",
+        "Cách 2",
+        "Cách 3",
+        "nước"
+      ]
+    },
+    "criticalGeometry": "1tubeÚP/2tubeĐỨNG/3tubeÚPwater;2ống1/2supplypipeđigầnđầuđóngtrongreceiverkhácnhau,mọiheadarrowngoàigascổnggiữnguồn. Khônglấypanel1197Tđổingượccaptionqua3methodnay.",
+    "diagnosticMethod3": "/workspace/scratch/gas209-3-bubbles6x.png"
+  },
+  {
+    "i": 1259,
+    "hash": "e4bb3007b9f23540990cf8b900e34248990c371e790ed671f9f07ba9f93e0aee",
+    "fileNguon": "anh/e4bb3007b9f23540990cf8b900e34248990c371e790ed671f9f07ba9f93e0aee.png",
+    "canvas": [
+      978,
+      427
+    ],
+    "daMoNative": true,
+    "kind": "pH-products-illustration",
+    "pHMap": [
+      {
+        "pH": 0,
+        "label": "Pin",
+        "icon": "battery"
+      },
+      {
+        "pH": 1,
+        "label": "Acid dạ dày",
+        "icon": "stomach"
+      },
+      {
+        "pH": 2,
+        "label": "Chanh",
+        "icon": "lemon"
+      },
+      {
+        "pH": 3,
+        "label": "Giấm",
+        "icon": "bottle"
+      },
+      {
+        "pH": 4,
+        "label": "Cà chua",
+        "icon": "tomato"
+      },
+      {
+        "pH": 5,
+        "label": "Coffee",
+        "icon": "coffee cup"
+      },
+      {
+        "pH": 6,
+        "label": "Sữa",
+        "icon": "milk bottle"
+      },
+      {
+        "pH": 7,
+        "label": "Nước",
+        "icon": "water splash"
+      },
+      {
+        "pH": 8,
+        "label": "Máu",
+        "icon": "blood tube"
+      },
+      {
+        "pH": 9,
+        "label": "Baking Soda",
+        "icon": "white tub"
+      },
+      {
+        "pH": 10,
+        "label": "Viên thuốc dạ dày",
+        "icon": "stomach tablets"
+      },
+      {
+        "pH": 11,
+        "label": "Dung dịch Ammonia",
+        "icon": "conical flask"
+      },
+      {
+        "pH": 12,
+        "label": "Xà phòng",
+        "icon": "soap"
+      },
+      {
+        "pH": 13,
+        "label": "Chất tẩy",
+        "icon": "detergent bottle"
+      },
+      {
+        "pH": 14,
+        "label": "Chất thông cống",
+        "icon": "drain"
+      }
+    ],
+    "notes": "15ôpH0..14liềntừđỏ→cam→vàng→xanhlá→xanhdương→tím,mỗisốtrắng. 15iconvòngtrònminhhọatươngứng,đượcnốibằngthanhdọcvềôpH;iconsxếpxen kẽpHchẵnhàngDƯỚI/pHlẻhàngTRÊN. GiữtextCoffee/BakingSoda/AmmoniaEnglishđúngcapitalizationkhôngdịch. Đâyillustrationicon,nophoto. CácgiátrịpHminhhọakhôngsửatheokiếnthứcphổbiến.",
+    "questions": [
+      {
+        "qid": "11-C1-B2-D2-II-1",
+        "de": "Hình vẽ sau đây giới thiệu các giá trị pH của một số sản phẩm hàng ngày:",
+        "refs": [
+          {
+            "where": "11-C1-B2-D2-II-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-11-B2-D3-II-58",
+        "de": "Hình vẽ sau đây giới thiệu các giá trị pH của một số sản phẩm hàng ngày:",
+        "refs": [
+          {
+            "where": "DB-11-B2-D3-II-58.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry155": {
+      "canvas": [
+        978,
+        427
+      ],
+      "barTop": 315,
+      "barBottom": 391,
+      "items": [
+        {
+          "pH": 0,
+          "label": "Pin",
+          "icon": "battery",
+          "barCellApprox": [
+            55,
+            315,
+            111,
+            391
+          ],
+          "numberAnchor": [
+            83,
+            360
+          ],
+          "iconCircle": [
+            83,
+            244,
+            47
+          ],
+          "connector": [
+            [
+              83,
+              291
+            ],
+            [
+              83,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            83,
+            186
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 1,
+          "label": "Acid dạ dày",
+          "icon": "stomach",
+          "barCellApprox": [
+            111,
+            315,
+            167,
+            391
+          ],
+          "numberAnchor": [
+            139,
+            360
+          ],
+          "iconCircle": [
+            139,
+            109,
+            47
+          ],
+          "connector": [
+            [
+              139,
+              156
+            ],
+            [
+              139,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            139,
+            52
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 2,
+          "label": "Chanh",
+          "icon": "lemon",
+          "barCellApprox": [
+            170,
+            315,
+            226,
+            391
+          ],
+          "numberAnchor": [
+            198,
+            360
+          ],
+          "iconCircle": [
+            198,
+            244,
+            47
+          ],
+          "connector": [
+            [
+              198,
+              291
+            ],
+            [
+              198,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            198,
+            186
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 3,
+          "label": "Giấm",
+          "icon": "bottle",
+          "barCellApprox": [
+            227,
+            315,
+            283,
+            391
+          ],
+          "numberAnchor": [
+            255,
+            360
+          ],
+          "iconCircle": [
+            255,
+            109,
+            47
+          ],
+          "connector": [
+            [
+              255,
+              156
+            ],
+            [
+              255,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            255,
+            52
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 4,
+          "label": "Cà chua",
+          "icon": "tomato",
+          "barCellApprox": [
+            286,
+            315,
+            342,
+            391
+          ],
+          "numberAnchor": [
+            314,
+            360
+          ],
+          "iconCircle": [
+            314,
+            244,
+            47
+          ],
+          "connector": [
+            [
+              314,
+              291
+            ],
+            [
+              314,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            314,
+            186
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 5,
+          "label": "Coffee",
+          "icon": "coffee cup",
+          "barCellApprox": [
+            345,
+            315,
+            401,
+            391
+          ],
+          "numberAnchor": [
+            373,
+            360
+          ],
+          "iconCircle": [
+            373,
+            109,
+            47
+          ],
+          "connector": [
+            [
+              373,
+              156
+            ],
+            [
+              373,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            373,
+            52
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 6,
+          "label": "Sữa",
+          "icon": "milk bottle",
+          "barCellApprox": [
+            403,
+            315,
+            459,
+            391
+          ],
+          "numberAnchor": [
+            431,
+            360
+          ],
+          "iconCircle": [
+            431,
+            244,
+            47
+          ],
+          "connector": [
+            [
+              431,
+              291
+            ],
+            [
+              431,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            431,
+            186
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 7,
+          "label": "Nước",
+          "icon": "water splash",
+          "barCellApprox": [
+            460,
+            315,
+            516,
+            391
+          ],
+          "numberAnchor": [
+            488,
+            360
+          ],
+          "iconCircle": [
+            488,
+            109,
+            47
+          ],
+          "connector": [
+            [
+              488,
+              156
+            ],
+            [
+              488,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            488,
+            52
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 8,
+          "label": "Máu",
+          "icon": "blood tube",
+          "barCellApprox": [
+            519,
+            315,
+            575,
+            391
+          ],
+          "numberAnchor": [
+            547,
+            360
+          ],
+          "iconCircle": [
+            547,
+            244,
+            47
+          ],
+          "connector": [
+            [
+              547,
+              291
+            ],
+            [
+              547,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            547,
+            186
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 9,
+          "label": "Baking Soda",
+          "icon": "white tub",
+          "barCellApprox": [
+            575,
+            315,
+            631,
+            391
+          ],
+          "numberAnchor": [
+            603,
+            360
+          ],
+          "iconCircle": [
+            603,
+            109,
+            47
+          ],
+          "connector": [
+            [
+              603,
+              156
+            ],
+            [
+              603,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            603,
+            52
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 10,
+          "label": "Viên thuốc dạ dày",
+          "icon": "stomach tablets",
+          "barCellApprox": [
+            634,
+            315,
+            690,
+            391
+          ],
+          "numberAnchor": [
+            662,
+            360
+          ],
+          "iconCircle": [
+            662,
+            244,
+            47
+          ],
+          "connector": [
+            [
+              662,
+              291
+            ],
+            [
+              662,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            662,
+            186
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 11,
+          "label": "Dung dịch Ammonia",
+          "icon": "conical flask",
+          "barCellApprox": [
+            693,
+            315,
+            749,
+            391
+          ],
+          "numberAnchor": [
+            721,
+            360
+          ],
+          "iconCircle": [
+            721,
+            109,
+            47
+          ],
+          "connector": [
+            [
+              721,
+              156
+            ],
+            [
+              721,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            721,
+            52
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 12,
+          "label": "Xà phòng",
+          "icon": "soap",
+          "barCellApprox": [
+            751,
+            315,
+            807,
+            391
+          ],
+          "numberAnchor": [
+            779,
+            360
+          ],
+          "iconCircle": [
+            779,
+            244,
+            47
+          ],
+          "connector": [
+            [
+              779,
+              291
+            ],
+            [
+              779,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            779,
+            186
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 13,
+          "label": "Chất tẩy",
+          "icon": "detergent bottle",
+          "barCellApprox": [
+            808,
+            315,
+            864,
+            391
+          ],
+          "numberAnchor": [
+            836,
+            360
+          ],
+          "iconCircle": [
+            836,
+            109,
+            47
+          ],
+          "connector": [
+            [
+              836,
+              156
+            ],
+            [
+              836,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            836,
+            52
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 14,
+          "label": "Chất thông cống",
+          "icon": "drain",
+          "barCellApprox": [
+            867,
+            315,
+            923,
+            391
+          ],
+          "numberAnchor": [
+            895,
+            360
+          ],
+          "iconCircle": [
+            895,
+            244,
+            47
+          ],
+          "connector": [
+            [
+              895,
+              291
+            ],
+            [
+              895,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            895,
+            186
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        }
+      ],
+      "labelLineOverrides": {
+        "11": [
+          [
+            "Dung dịch",
+            [
+              721,
+              35
+            ]
+          ],
+          [
+            "Ammonia",
+            [
+              721,
+              55
+            ]
+          ]
+        ],
+        "10": [
+          [
+            "Viên thuốc",
+            [
+              662,
+              165
+            ]
+          ],
+          [
+            "dạ dày",
+            [
+              662,
+              186
+            ]
+          ]
+        ],
+        "14": [
+          [
+            "Chất",
+            [
+              895,
+              165
+            ]
+          ],
+          [
+            "thông cống",
+            [
+              895,
+              186
+            ]
+          ]
+        ]
+      }
+    },
+    "requiredIcons": "0whitebatteryminusleft/plusright;1orangeanatomicalstomach;2lemonslice;3glassvinegarbottle;4redtomatogreencalyx;5browncoffee-takeawaycupgraylid;6whitemilkbottle;7watersplash;8redbloodtesttubewithcap;9whitebakingsodatub;10stomach+whitetablets;11Erlenammonialiquid;12soapbar+bubbles;13whitecleaningjughandle;14graydraintray. VectorstylecóthểđồngbộmẫunhưngKHÔNGbỏicon/đổinhãnđểnhanh.",
+    "literalEnglish": "Coffee,Baking Soda,Dung dịch Ammonia giữnguyênkhôngdịch/thaybrand.Khôngtựthêmacid/base/neutralregionsnếunguồnkhôngcó."
+  },
+  {
+    "i": 1014,
+    "hash": "b6035201b1962339b3a63bc7393f1f3acb73b2ebcbc69b7d7444bd9a6352479e",
+    "fileNguon": "anh/b6035201b1962339b3a63bc7393f1f3acb73b2ebcbc69b7d7444bd9a6352479e.png",
+    "canvas": [
+      386,
+      388
+    ],
+    "daMoNative": true,
+    "kind": "mixed-raster-source-only-not-asset",
+    "notes": "Source2testtubethểtíchglassgrayscalemàunướcthấp,độphảnxạ/hạtrastermịnkhóphântáchảnhchụp/render3D;ưu tiênGIỮRASTERgốcimmutable(chưavẽvector2ốnggiả). CótextNướcchlorinenghiêngtrêntrái+arrow↓vàoốngtrái,arrowlớn→giữa2ống,textDungdịchpotassiumiodidenghiêngdướitoànhình. Nếucầnvectorphầntext/arrow,táchkhỏi2ảnhốngthậtvàbảotoànhashnguồn,khôngtựđổidòngchữ/hiệntượngmàu.",
+    "questions": [
+      {
+        "qid": "DB-10-B8-D1-III-64",
+        "de": "So sánh tính phi kim của chlorine và iodine. Chuẩn bị: Hình ảnh hoặc video phản ứng của nước chlorine với dung dịch potassium iodide. Tiến hành: Quan sát hình ảnh hoặc xem video phản ứng của nước chlorine với dung dịch potassium iodide. Câu hỏi: So sánh tính phi kim của chlorine và iodine.",
+        "refs": [
+          {
+            "where": "DB-10-B8-D1-III-64.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C2-B6-III-20",
+        "de": "So sánh tính phi kim của chlorine và iodine. Chuẩn bị: Hình ảnh hoặc video phản ứng của nước chlorine với dung dịch potassium iodide. Tiến hành: Quan sát hình ảnh hoặc xem video phản ứng của nước chlorine với dung dịch potassium iodide. Câu hỏi: So sánh tính phi kim của chlorine và iodine.",
+        "refs": [
+          {
+            "where": "DH-10-C2-B6-III-20.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-10-C2-B6-VD-III-2",
+        "de": "So sánh tính phi kim của chlorine và iodine. Chuẩn bị: Hình ảnh hoặc video phản ứng của nước chlorine với dung dịch potassium iodide. Tiến hành: Quan sát hình ảnh hoặc xem video phản ứng của nước chlorine với dung dịch potassium iodide. Câu hỏi: So sánh tính phi kim của chlorine và iodine.",
+        "refs": [
+          {
+            "where": "DH-10-C2-B6-VD-III-2.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "sourceOnlyClassification": "/workspace/omr-vector/docs/hinh-vector-0311/kiem/phan-loai-raster-1014.json",
+    "classificationRead": {
+      "i": 1014,
+      "hash": "b6035201b1962339b3a63bc7393f1f3acb73b2ebcbc69b7d7444bd9a6352479e",
+      "fileNguon": "anh/b6035201b1962339b3a63bc7393f1f3acb73b2ebcbc69b7d7444bd9a6352479e.png",
+      "nguoiSoat": "soat_hinh_vector",
+      "loai": "Hình ghép raster: hai ảnh ống thủy tinh có shading/reflection + chữ và hai mũi tên đồ họa",
+      "daMoNativeFull": true,
+      "ketQua": "Giữ raster gốc của hai ống và hiện tượng nhìn thấy; không vẽ giả. Có thể nhận rõ glass/reflection/grain nhưng chỉ từ raster không phân biệt chắc ảnh chụp máy thật hay render3D, không khẳng định xuất xứ nhiếp ảnh.",
+      "phanGiuRaster": [
+        "Ống trái và toàn bộ vùng chất trong ống/ánh phản xạ",
+        "Ống phải và toàn bộ vùng chất trong ống/ánh phản xạ"
+      ],
+      "phanDoHoaCoTheTach": [
+        {
+          "text": "Nước chlorine",
+          "viTri": "trên trái, chữ nghiêng",
+          "canTachDDH": true
+        },
+        {
+          "text": "Dung dịch potassium iodide",
+          "viTri": "dưới cả hai ống, chữ nghiêng",
+          "canTachDDH": true
+        },
+        {
+          "shape": "mũi tên xám xuống",
+          "viTri": "dưới Nước chlorine, hướng vào miệng ống trái"
+        },
+        {
+          "shape": "mũi tên xám lớn sang phải",
+          "viTri": "giữa hai ống"
+        }
+      ],
+      "huongXuLy": "Nếu cần đồng bộ DDH, chỉ tách chữ/mũi tên đồ họa ra lớp vector và giữ nguyên hai vùng raster/source immutable; cần soát riêng bản dựng, chưa duyệt bất kỳ SVG mới.",
+      "questions": [
+        {
+          "qid": "DB-10-B8-D1-III-64",
+          "de": "So sánh tính phi kim của chlorine và iodine. Chuẩn bị: Hình ảnh hoặc video phản ứng của nước chlorine với dung dịch potassium iodide. Tiến hành: Quan sát hình ảnh hoặc xem video phản ứng của nước chlorine với dung dịch potassium iodide. Câu hỏi: So sánh tính phi kim của chlorine và iodine.",
+          "where": "DB-10-B8-D1-III-64.hinh.0.du_lieu",
+          "viTri": "sau_de",
+          "congKhaiTruocNop": true,
+          "hashDataUrl": "536717e56aa81eca1d058db8b62e87e297067a829bcbfaa4e3315017ebc24dc8"
+        },
+        {
+          "qid": "DH-10-C2-B6-III-20",
+          "de": "So sánh tính phi kim của chlorine và iodine. Chuẩn bị: Hình ảnh hoặc video phản ứng của nước chlorine với dung dịch potassium iodide. Tiến hành: Quan sát hình ảnh hoặc xem video phản ứng của nước chlorine với dung dịch potassium iodide. Câu hỏi: So sánh tính phi kim của chlorine và iodine.",
+          "where": "DH-10-C2-B6-III-20.hinh.0.du_lieu",
+          "viTri": "sau_de",
+          "congKhaiTruocNop": true,
+          "hashDataUrl": "536717e56aa81eca1d058db8b62e87e297067a829bcbfaa4e3315017ebc24dc8"
+        },
+        {
+          "qid": "DH-10-C2-B6-VD-III-2",
+          "de": "So sánh tính phi kim của chlorine và iodine. Chuẩn bị: Hình ảnh hoặc video phản ứng của nước chlorine với dung dịch potassium iodide. Tiến hành: Quan sát hình ảnh hoặc xem video phản ứng của nước chlorine với dung dịch potassium iodide. Câu hỏi: So sánh tính phi kim của chlorine và iodine.",
+          "where": "DH-10-C2-B6-VD-III-2.hinh.0.du_lieu",
+          "viTri": "sau_de",
+          "congKhaiTruocNop": true,
+          "hashDataUrl": "536717e56aa81eca1d058db8b62e87e297067a829bcbfaa4e3315017ebc24dc8"
+        }
+      ],
+      "proofNguonOnly": true,
+      "daDuyetSVG": false,
+      "veLaiHaiOng": false,
+      "congSoVe": false
+    },
+    "geometry155": {
+      "canvas": [
+        386,
+        388
+      ],
+      "rasterROIsSuggestedWithWhitePadding": [
+        {
+          "part": "lefttesttube+allcontents/reflection",
+          "rect": [
+            40,
+            75,
+            106,
+            342
+          ]
+        },
+        {
+          "part": "righttesttube+allcontents/reflection",
+          "rect": [
+            274,
+            75,
+            339,
+            338
+          ]
+        }
+      ],
+      "vectorableParts": [
+        {
+          "text": "Nước chlorine",
+          "fontStyle": "italic",
+          "bboxApprox": [
+            16,
+            7,
+            183,
+            31
+          ]
+        },
+        {
+          "shape": "grayarrowdown",
+          "outlineApprox": [
+            [
+              54,
+              40
+            ],
+            [
+              66,
+              40
+            ],
+            [
+              66,
+              51
+            ],
+            [
+              73,
+              51
+            ],
+            [
+              61,
+              64
+            ],
+            [
+              49,
+              51
+            ],
+            [
+              54,
+              51
+            ],
+            [
+              54,
+              40
+            ]
+          ]
+        },
+        {
+          "shape": "grayarrowright",
+          "outlineApprox": [
+            [
+              158,
+              204
+            ],
+            [
+              191,
+              204
+            ],
+            [
+              191,
+              189
+            ],
+            [
+              220,
+              219
+            ],
+            [
+              191,
+              245
+            ],
+            [
+              191,
+              232
+            ],
+            [
+              158,
+              232
+            ],
+            [
+              158,
+              204
+            ]
+          ]
+        },
+        {
+          "text": "Dung dịch potassium iodide",
+          "fontStyle": "italic",
+          "bboxApprox": [
+            32,
+            355,
+            366,
+            381
+          ]
+        }
+      ]
+    },
+    "criticalScope": "Phânloạinguồn-onlyđãsoátKHÔNGđồngnghĩaSVGassetđãđạt. Haiốngrasterphảigiữnguyênsourcepixels/hiệntượngđậmnhạt,khôngvẽgiả/cắtđốmbọtkhí.CóthểlớpDDHvectorchữ/arrowskèm2croprasterimmutabletrongassetmớiCHỈSAUSOÁTsource/render.SVGmớiđặtnewhashkhôngghiđèhashnguồn. Khôngđặtxuấtxứchắcảnhchụpvsrender3D."
+  }
+]

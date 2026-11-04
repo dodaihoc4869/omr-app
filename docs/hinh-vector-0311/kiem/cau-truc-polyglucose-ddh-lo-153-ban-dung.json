@@ -1,0 +1,482 @@
+[
+  {
+    "i": 1406,
+    "hash": "fcca2f3cd109a98de6620b44ca19a1cfbfa1be7abe9d20710c8f0a2b82182285",
+    "fileNguon": "anh/fcca2f3cd109a98de6620b44ca19a1cfbfa1be7abe9d20710c8f0a2b82182285.png",
+    "canvas": [
+      506,
+      166
+    ],
+    "daMoNative": true,
+    "kind": "polysaccharide-three-unit-labelled-link",
+    "notes": "3glucopyranose6ringOtoprightliêntụcliênkếtglycosidicOởdướigiữa2unit.MỖIunitCH₂OHlênC5,OHlênC3,OHxuốngC2;C4bêntráivàC1bênphảilàđiểmnốimạch,KHÔNGOHtựdothêm. KHÔNGHexplit,cácCH₂OH/OHtextphảigiữ.Tấtcảunitcùngorientation,frontC4–C3–C2đậm. Giữaunit1và2:labelcarbon1ởC1unit1,4ởC4unit2;khôngarrowchỉsố1/4.KHÔNGcarbonnumberskhác.Tráivàphảicóellipsis... nốiraC4unit1vàOngoàiC1unit3;giữcả2stub/ellipsis,khôngfinite trisaccharide/nohydrogenendcap.",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D2-II-138",
+        "de": "Tại một nhà máy sản xuất rượu, cứ 10 tấn tinh bột (chứa 6,85% tạp chất trơ) sẽ sản xuất được 7,21 m³ dung dịch ethanol 40° (cho khối lượng riêng của ethanol nguyên chất là 0,789 g/cm³). Tinh bột là một polysaccharide gồm nhiều gốc α-glucose liên kết với nhau tạo ra hai dạng mạch amylose và amylopectin. Dưới đây là một đoạn cấu tạo của tinh bột:",
+        "refs": [
+          {
+            "where": "DB-12-B4-D2-II-138.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B6-II-28",
+        "de": "Tại một nhà máy sản xuất rượu, cứ 10 tấn tinh bột (chứa 6,85% tạp chất trơ) sẽ sản xuất được 7,21 m³ dung dịch ethanol 40° (cho khối lượng riêng của ethanol nguyên chất là 0,789 g/cm³). Tinh bột là một polysaccharide gồm nhiều gốc α-glucose liên kết với nhau tạo ra hai dạng mạch amylose và amylopectin. Dưới đây là một đoạn cấu tạo của tinh bột:",
+        "refs": [
+          {
+            "where": "DH-12-C2-B6-II-28.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "geometry": {
+      "nativeCanvas": [
+        506,
+        166
+      ],
+      "units": [
+        {
+          "vertices": {
+            "C4": [
+              48,
+              81
+            ],
+            "C3": [
+              72,
+              112
+            ],
+            "C2": [
+              116,
+              112
+            ],
+            "C1": [
+              137,
+              81
+            ],
+            "ringO": [
+              113,
+              47
+            ],
+            "C5": [
+              70,
+              47
+            ]
+          },
+          "CH2OH": {
+            "bond": [
+              [
+                70,
+                47
+              ],
+              [
+                70,
+                28
+              ]
+            ],
+            "text": [
+              90,
+              20
+            ]
+          },
+          "OH_C3": {
+            "bond": [
+              [
+                72,
+                112
+              ],
+              [
+                73,
+                99
+              ]
+            ],
+            "text": [
+              78,
+              89
+            ]
+          },
+          "OH_C2": {
+            "bond": [
+              [
+                116,
+                112
+              ],
+              [
+                117,
+                134
+              ]
+            ],
+            "text": [
+              124,
+              147
+            ]
+          },
+          "ringOrder": [
+            "C4",
+            "C3",
+            "C2",
+            "C1",
+            "ringO",
+            "C5",
+            "C4"
+          ],
+          "boldBonds": [
+            [
+              "C3",
+              "C2"
+            ]
+          ],
+          "otherBondStyle": "5cạnhvòngcònlạithinregularALLsingle,khôngwedge/stereoextra"
+        },
+        {
+          "vertices": {
+            "C4": [
+              205,
+              84
+            ],
+            "C3": [
+              229,
+              115
+            ],
+            "C2": [
+              274,
+              115
+            ],
+            "C1": [
+              293,
+              84
+            ],
+            "ringO": [
+              272,
+              50
+            ],
+            "C5": [
+              227,
+              50
+            ]
+          },
+          "CH2OH": {
+            "bond": [
+              [
+                227,
+                50
+              ],
+              [
+                227,
+                31
+              ]
+            ],
+            "text": [
+              247,
+              23
+            ]
+          },
+          "OH_C3": {
+            "bond": [
+              [
+                229,
+                115
+              ],
+              [
+                230,
+                101
+              ]
+            ],
+            "text": [
+              236,
+              92
+            ]
+          },
+          "OH_C2": {
+            "bond": [
+              [
+                274,
+                115
+              ],
+              [
+                275,
+                137
+              ]
+            ],
+            "text": [
+              281,
+              150
+            ]
+          },
+          "ringOrder": [
+            "C4",
+            "C3",
+            "C2",
+            "C1",
+            "ringO",
+            "C5",
+            "C4"
+          ],
+          "boldBonds": [
+            [
+              "C3",
+              "C2"
+            ]
+          ],
+          "otherBondStyle": "5cạnhvòngcònlạithinregularALLsingle,khôngwedge/stereoextra"
+        },
+        {
+          "vertices": {
+            "C4": [
+              344,
+              82
+            ],
+            "C3": [
+              368,
+              113
+            ],
+            "C2": [
+              412,
+              113
+            ],
+            "C1": [
+              432,
+              82
+            ],
+            "ringO": [
+              410,
+              48
+            ],
+            "C5": [
+              366,
+              48
+            ]
+          },
+          "CH2OH": {
+            "bond": [
+              [
+                366,
+                48
+              ],
+              [
+                366,
+                29
+              ]
+            ],
+            "text": [
+              386,
+              21
+            ]
+          },
+          "OH_C3": {
+            "bond": [
+              [
+                368,
+                113
+              ],
+              [
+                369,
+                99
+              ]
+            ],
+            "text": [
+              375,
+              90
+            ]
+          },
+          "OH_C2": {
+            "bond": [
+              [
+                412,
+                113
+              ],
+              [
+                413,
+                135
+              ]
+            ],
+            "text": [
+              419,
+              148
+            ]
+          },
+          "ringOrder": [
+            "C4",
+            "C3",
+            "C2",
+            "C1",
+            "ringO",
+            "C5",
+            "C4"
+          ],
+          "boldBonds": [
+            [
+              "C3",
+              "C2"
+            ]
+          ],
+          "otherBondStyle": "5cạnhvòngcònlạithinregularALLsingle,khôngwedge/stereoextra"
+        }
+      ],
+      "bridges": [
+        {
+          "fromUnit": 1,
+          "from": "C1",
+          "toUnit": 2,
+          "to": "C4",
+          "oxygen": {
+            "text": "O",
+            "anchor": [
+              173,
+              110
+            ]
+          },
+          "bonds": [
+            [
+              [
+                137,
+                81
+              ],
+              [
+                164,
+                103
+              ]
+            ],
+            [
+              [
+                182,
+                103
+              ],
+              [
+                204,
+                84
+              ]
+            ]
+          ]
+        },
+        {
+          "fromUnit": 2,
+          "from": "C1",
+          "toUnit": 3,
+          "to": "C4",
+          "oxygen": {
+            "text": "O",
+            "anchor": [
+              322,
+              111
+            ]
+          },
+          "bonds": [
+            [
+              [
+                293,
+                84
+              ],
+              [
+                313,
+                103
+              ]
+            ],
+            [
+              [
+                330,
+                103
+              ],
+              [
+                344,
+                82
+              ]
+            ]
+          ]
+        }
+      ],
+      "leftContinuation": {
+        "bond": [
+          [
+            48,
+            81
+          ],
+          [
+            34,
+            99
+          ]
+        ],
+        "ellipsisCenters": [
+          [
+            12,
+            100
+          ],
+          [
+            20,
+            100
+          ],
+          [
+            27,
+            100
+          ]
+        ]
+      },
+      "rightContinuation": {
+        "bond": [
+          [
+            432,
+            82
+          ],
+          [
+            461,
+            104
+          ]
+        ],
+        "oxygen": {
+          "text": "O",
+          "anchor": [
+            469,
+            112
+          ]
+        },
+        "ellipsisCenters": [
+          [
+            483,
+            112
+          ],
+          [
+            490,
+            112
+          ],
+          [
+            497,
+            112
+          ]
+        ]
+      },
+      "carbonNumbers": [
+        {
+          "text": "1",
+          "anchor": [
+            126,
+            83
+          ],
+          "target": "unit1C1"
+        },
+        {
+          "text": "4",
+          "anchor": [
+            195,
+            82
+          ],
+          "target": "unit2C4"
+        }
+      ]
+    },
+    "explicitH": "ZEROHtrêncarbonhiểnthị. Giữ3CH₂OHtext/6OHtext/3ringO/2bridgeO/1externalrightO. CarbonC4ởtráivàC1ởphảigiữaunitkhôngOHtựdo.GiữOH_C3lên/OH_C2xuốngcả3unit. KhôngthêmH/Cnumberskhác.",
+    "correctionAfterZoom": "Quantrọng:ở1406sourceCHỈC3–C2horizontalfrontlàđậmtrênMỖIunit. C4–C3/C2–C1ĐỀUnétthường,đãzoom3xđọcrõ.Khôngáp3boldfrontbondsnhưcácHaworthkhác.",
+    "scope": "ĐoạnPOLYMER3unitvớiellipsis2đầu,kHÔNGfiniteoligosaccharide/capOH/H.Nguồnkhôngrepeatn/brackets,tênamylose/cellulosekhôngthêm.",
+    "diagnostic": "/workspace/scratch/poly1406-3x.png",
+    "svg": "polyglucose-ddh-d84ef4e03a3f6070bbce393940dffb1a26bd01587edaa7673f1680f83232e672.svg",
+    "hashSvg": "d84ef4e03a3f6070bbce393940dffb1a26bd01587edaa7673f1680f83232e672",
+    "byteSvg": 20205,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "3unit6ring/3CH2OH/6OH/3ringO/2bridgeO/1externalrightO/num1unit1C1và4unit2C4/2stub+ellipsis. CHỈC3–C2horizontalfrontđậm(mỗivòng),cạnhkhácthườngALLsingle/noCIP-extraH/nrepeat-brackets-caption/finiteoligosaccharide.",
+    "hashSvgDaSoat": "d84ef4e03a3f6070bbce393940dffb1a26bd01587edaa7673f1680f83232e672",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

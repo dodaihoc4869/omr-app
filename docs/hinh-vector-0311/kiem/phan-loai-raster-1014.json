@@ -1,0 +1,64 @@
+{
+  "i": 1014,
+  "hash": "b6035201b1962339b3a63bc7393f1f3acb73b2ebcbc69b7d7444bd9a6352479e",
+  "fileNguon": "anh/b6035201b1962339b3a63bc7393f1f3acb73b2ebcbc69b7d7444bd9a6352479e.png",
+  "nguoiSoat": "soat_hinh_vector",
+  "loai": "Hình ghép raster: hai ảnh ống thủy tinh có shading/reflection + chữ và hai mũi tên đồ họa",
+  "daMoNativeFull": true,
+  "ketQua": "Giữ raster gốc của hai ống và hiện tượng nhìn thấy; không vẽ giả. Có thể nhận rõ glass/reflection/grain nhưng chỉ từ raster không phân biệt chắc ảnh chụp máy thật hay render3D, không khẳng định xuất xứ nhiếp ảnh.",
+  "phanGiuRaster": [
+    "Ống trái và toàn bộ vùng chất trong ống/ánh phản xạ",
+    "Ống phải và toàn bộ vùng chất trong ống/ánh phản xạ"
+  ],
+  "phanDoHoaCoTheTach": [
+    {
+      "text": "Nước chlorine",
+      "viTri": "trên trái, chữ nghiêng",
+      "canTachDDH": true
+    },
+    {
+      "text": "Dung dịch potassium iodide",
+      "viTri": "dưới cả hai ống, chữ nghiêng",
+      "canTachDDH": true
+    },
+    {
+      "shape": "mũi tên xám xuống",
+      "viTri": "dưới Nước chlorine, hướng vào miệng ống trái"
+    },
+    {
+      "shape": "mũi tên xám lớn sang phải",
+      "viTri": "giữa hai ống"
+    }
+  ],
+  "huongXuLy": "Nếu cần đồng bộ DDH, chỉ tách chữ/mũi tên đồ họa ra lớp vector và giữ nguyên hai vùng raster/source immutable; cần soát riêng bản dựng, chưa duyệt bất kỳ SVG mới.",
+  "questions": [
+    {
+      "qid": "DB-10-B8-D1-III-64",
+      "de": "So sánh tính phi kim của chlorine và iodine. Chuẩn bị: Hình ảnh hoặc video phản ứng của nước chlorine với dung dịch potassium iodide. Tiến hành: Quan sát hình ảnh hoặc xem video phản ứng của nước chlorine với dung dịch potassium iodide. Câu hỏi: So sánh tính phi kim của chlorine và iodine.",
+      "where": "DB-10-B8-D1-III-64.hinh.0.du_lieu",
+      "viTri": "sau_de",
+      "congKhaiTruocNop": true,
+      "hashDataUrl": "536717e56aa81eca1d058db8b62e87e297067a829bcbfaa4e3315017ebc24dc8"
+    },
+    {
+      "qid": "DH-10-C2-B6-III-20",
+      "de": "So sánh tính phi kim của chlorine và iodine. Chuẩn bị: Hình ảnh hoặc video phản ứng của nước chlorine với dung dịch potassium iodide. Tiến hành: Quan sát hình ảnh hoặc xem video phản ứng của nước chlorine với dung dịch potassium iodide. Câu hỏi: So sánh tính phi kim của chlorine và iodine.",
+      "where": "DH-10-C2-B6-III-20.hinh.0.du_lieu",
+      "viTri": "sau_de",
+      "congKhaiTruocNop": true,
+      "hashDataUrl": "536717e56aa81eca1d058db8b62e87e297067a829bcbfaa4e3315017ebc24dc8"
+    },
+    {
+      "qid": "DH-10-C2-B6-VD-III-2",
+      "de": "So sánh tính phi kim của chlorine và iodine. Chuẩn bị: Hình ảnh hoặc video phản ứng của nước chlorine với dung dịch potassium iodide. Tiến hành: Quan sát hình ảnh hoặc xem video phản ứng của nước chlorine với dung dịch potassium iodide. Câu hỏi: So sánh tính phi kim của chlorine và iodine.",
+      "where": "DH-10-C2-B6-VD-III-2.hinh.0.du_lieu",
+      "viTri": "sau_de",
+      "congKhaiTruocNop": true,
+      "hashDataUrl": "536717e56aa81eca1d058db8b62e87e297067a829bcbfaa4e3315017ebc24dc8"
+    }
+  ],
+  "proofNguonOnly": true,
+  "daDuyetSVG": false,
+  "veLaiHaiOng": false,
+  "congSoVe": false
+}

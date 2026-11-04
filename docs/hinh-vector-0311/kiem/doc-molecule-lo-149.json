@@ -224,7 +224,7 @@
     ],
     "daMoNative": true,
     "kind": "polysaccharide-three-unit-labelled-link",
-    "notes": "3glucopyranose6ringOtoprightliêntụcliênkếtglycosidicOởdướigiữa2unit.MỖIunitCH₂OHlênC5,OHlênC3,OHxuốngC2;C4bêntráivàC1bênphảilàđiểmnốimạch,KHÔNGOHtựdothêm. KHÔNGHexplit,cácCH₂OH/OHtextphảigiữ.Tấtcảunitcùngorientation,frontC4–C3–C2đậm. Giữaunit1và2:labelcarbon1ởC1unit1,4ởC4unit2;khôngarrowchỉsố1/4.KHÔNGcarbonnumberskhác.Tráivàphảicóellipsis... nốiraC4unit1vàOngoàiC1unit3;giữcả2stub/ellipsis,khôngfinite trisaccharide/nohydrogenendcap.",
+    "notes": "3glucopyranose6ringOtoprightliêntụcliênkếtglycosidicOởdướigiữa2unit.MỖIunitCH₂OHlênC5,OHlênC3,OHxuốngC2;C4bêntráivàC1bênphảilàđiểmnốimạch,KHÔNGOHtựdothêm. KHÔNGHexplit,cácCH₂OH/OHtextphảigiữ.Tấtcảunitcùngorientation,SAUZOOMCHỈC3–C2horizontalđậm,C4–C3/C2–C1nétthường. Giữaunit1và2:labelcarbon1ởC1unit1,4ởC4unit2;khôngarrowchỉsố1/4.KHÔNGcarbonnumberskhác.Tráivàphảicóellipsis... nốiraC4unit1vàOngoàiC1unit3;giữcả2stub/ellipsis,khôngfinite trisaccharide/nohydrogenendcap.",
     "questions": [
       {
         "qid": "DB-12-B4-D2-II-138",
@@ -246,7 +246,8 @@
           }
         ]
       }
-    ]
+    ],
+    "correctionAfterZoom": "Quantrọng:ở1406sourceCHỈC3–C2horizontalfrontlàđậmtrênMỖIunit. C4–C3/C2–C1ĐỀUnétthường,đãzoom3xđọcrõ.Khôngáp3boldfrontbondsnhưcácHaworthkhác."
   },
   {
     "i": 483,
@@ -714,7 +715,7 @@
       388
     ],
     "daMoNative": true,
-    "kind": "keep-raster-experiment-composite",
+    "kind": "composite-raster-plus-vector-labels",
     "notes": "Source2testtubethểtíchglassgrayscalemàunướcthấp,độphảnxạ/hạtrastermịnkhóphântáchảnhchụp/render3D;ưu tiênGIỮRASTERgốcimmutable(chưavẽvector2ốnggiả). CótextNướcchlorinenghiêngtrêntrái+arrow↓vàoốngtrái,arrowlớn→giữa2ống,textDungdịchpotassiumiodidenghiêngdướitoànhình. Nếucầnvectorphầntext/arrow,táchkhỏi2ảnhốngthậtvàbảotoànhashnguồn,khôngtựđổidòngchữ/hiệntượngmàu.",
     "questions": [
       {
@@ -747,7 +748,9 @@
           }
         ]
       }
-    ]
+    ],
+    "trangThaiNguon": "Đã soát nguồn, CHƯA dựng/soát asset ghép",
+    "ghiChuSoatNguon": "Giữ2vùngốngraster/minhhọa,khôngkhẳngđịnhảnhchụphayrender3D;2labelNướcchlorine/Dungdịchpotassiumiodidevà2arrowrõphảitáchDDH/vector.KHÔNGtínhSVGđạt/khôngvẽgiảống."
   },
   {
     "i": 1278,
@@ -765,7 +768,7 @@
       "A."
     ],
     "shape": "straight-steep",
-    "notes": "1curveđenfromorigin,[P]Y/ThờigianX,2trụcARROW,khôngtick/số/guide. Bộcùng2qidcó4ảnhA./B./C./D.;glyphnhãnởméptráidướibịcắtTHÂNTRÁI nhưngAchéo/B2lobe/Ccungmở/Dcungđóng+dotcònnhìnthấyvàcontextbộ4xácnhận,GIỮcaptionkhôiphụckhôngbỏvìrefsau_de. Ađườngthẳngdốclớn~45°,Bthẳngdốcnhỏ,Ctăngbãohòaplateau,Dlõmlêntăngnhanh;KHÔNGđổiCbằngDtheokiếnthứcenzyme. Riêng978cófooterPDFmépdướiphảibịcắt(chỉvụn50/...),khôngbịanộidungfooter.",
+    "notes": "1curveđenfromorigin,[P]Y/ThờigianX,2trụcARROW,khôngtick/số/guide. Bộcùng2qidcó4ảnhA./B./C./D.;glyphnhãnởméptráidướibịcắtTHÂNTRÁI nhưngAchéo/B2lobe/Ccungmở/Dcungđóng+dotcònnhìnthấyvàcontextbộ4xácnhận,GIỮcaptionkhôiphụckhôngbỏvìrefsau_de. Ađườngthẳngdốclớn~45°,Bthẳngdốcnhỏ,Ctăngbãohòaplateau,Dlõmlêntăngnhanh;KHÔNGđổiCbằngDtheokiếnthứcenzyme. Riêng978cófooterPDFmépdướiphảibịcắt(ký tựbịcắtKHÔNGđọcrõ),khôngbịanộidungfooter.",
     "questions": [
       {
         "qid": "12-C2-B4-D1-I-61",
@@ -805,7 +808,7 @@
       "B."
     ],
     "shape": "straight-shallow",
-    "notes": "1curveđenfromorigin,[P]Y/ThờigianX,2trụcARROW,khôngtick/số/guide. Bộcùng2qidcó4ảnhA./B./C./D.;glyphnhãnởméptráidướibịcắtTHÂNTRÁI nhưngAchéo/B2lobe/Ccungmở/Dcungđóng+dotcònnhìnthấyvàcontextbộ4xácnhận,GIỮcaptionkhôiphụckhôngbỏvìrefsau_de. Ađườngthẳngdốclớn~45°,Bthẳngdốcnhỏ,Ctăngbãohòaplateau,Dlõmlêntăngnhanh;KHÔNGđổiCbằngDtheokiếnthứcenzyme. Riêng978cófooterPDFmépdướiphảibịcắt(chỉvụn50/...),khôngbịanộidungfooter.",
+    "notes": "1curveđenfromorigin,[P]Y/ThờigianX,2trụcARROW,khôngtick/số/guide. Bộcùng2qidcó4ảnhA./B./C./D.;glyphnhãnởméptráidướibịcắtTHÂNTRÁI nhưngAchéo/B2lobe/Ccungmở/Dcungđóng+dotcònnhìnthấyvàcontextbộ4xácnhận,GIỮcaptionkhôiphụckhôngbỏvìrefsau_de. Ađườngthẳngdốclớn~45°,Bthẳngdốcnhỏ,Ctăngbãohòaplateau,Dlõmlêntăngnhanh;KHÔNGđổiCbằngDtheokiếnthứcenzyme. Riêng978cófooterPDFmépdướiphảibịcắt(ký tựbịcắtKHÔNGđọcrõ),khôngbịanộidungfooter.",
     "questions": [
       {
         "qid": "12-C2-B4-D1-I-61",
@@ -845,7 +848,7 @@
       "C."
     ],
     "shape": "concave-down-plateau",
-    "notes": "1curveđenfromorigin,[P]Y/ThờigianX,2trụcARROW,khôngtick/số/guide. Bộcùng2qidcó4ảnhA./B./C./D.;glyphnhãnởméptráidướibịcắtTHÂNTRÁI nhưngAchéo/B2lobe/Ccungmở/Dcungđóng+dotcònnhìnthấyvàcontextbộ4xácnhận,GIỮcaptionkhôiphụckhôngbỏvìrefsau_de. Ađườngthẳngdốclớn~45°,Bthẳngdốcnhỏ,Ctăngbãohòaplateau,Dlõmlêntăngnhanh;KHÔNGđổiCbằngDtheokiếnthứcenzyme. Riêng978cófooterPDFmépdướiphảibịcắt(chỉvụn50/...),khôngbịanộidungfooter.",
+    "notes": "1curveđenfromorigin,[P]Y/ThờigianX,2trụcARROW,khôngtick/số/guide. Bộcùng2qidcó4ảnhA./B./C./D.;glyphnhãnởméptráidướibịcắtTHÂNTRÁI nhưngAchéo/B2lobe/Ccungmở/Dcungđóng+dotcònnhìnthấyvàcontextbộ4xácnhận,GIỮcaptionkhôiphụckhôngbỏvìrefsau_de. Ađườngthẳngdốclớn~45°,Bthẳngdốcnhỏ,Ctăngbãohòaplateau,Dlõmlêntăngnhanh;KHÔNGđổiCbằngDtheokiếnthứcenzyme. Riêng978cófooterPDFmépdướiphảibịcắt(ký tựbịcắtKHÔNGđọcrõ),khôngbịanộidungfooter.",
     "questions": [
       {
         "qid": "12-C2-B4-D1-I-61",
@@ -885,7 +888,7 @@
       "D."
     ],
     "shape": "concave-up",
-    "notes": "1curveđenfromorigin,[P]Y/ThờigianX,2trụcARROW,khôngtick/số/guide. Bộcùng2qidcó4ảnhA./B./C./D.;glyphnhãnởméptráidướibịcắtTHÂNTRÁI nhưngAchéo/B2lobe/Ccungmở/Dcungđóng+dotcònnhìnthấyvàcontextbộ4xácnhận,GIỮcaptionkhôiphụckhôngbỏvìrefsau_de. Ađườngthẳngdốclớn~45°,Bthẳngdốcnhỏ,Ctăngbãohòaplateau,Dlõmlêntăngnhanh;KHÔNGđổiCbằngDtheokiếnthứcenzyme. Riêng978cófooterPDFmépdướiphảibịcắt(chỉvụn50/...),khôngbịanộidungfooter.",
+    "notes": "1curveđenfromorigin,[P]Y/ThờigianX,2trụcARROW,khôngtick/số/guide. Bộcùng2qidcó4ảnhA./B./C./D.;glyphnhãnởméptráidướibịcắtTHÂNTRÁI nhưngAchéo/B2lobe/Ccungmở/Dcungđóng+dotcònnhìnthấyvàcontextbộ4xácnhận,GIỮcaptionkhôiphụckhôngbỏvìrefsau_de. Ađườngthẳngdốclớn~45°,Bthẳngdốcnhỏ,Ctăngbãohòaplateau,Dlõmlêntăngnhanh;KHÔNGđổiCbằngDtheokiếnthứcenzyme. Riêng978cófooterPDFmépdướiphảibịcắt(ký tựbịcắtKHÔNGđọcrõ),khôngbịanộidungfooter.",
     "questions": [
       {
         "qid": "12-C2-B4-D1-I-61",
