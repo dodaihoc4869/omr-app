@@ -1,0 +1,71 @@
+{
+  "task": "Điều tra cổng tốc độ lô164",
+  "nguoiDoc": "cau_truc_6",
+  "repoModified": false,
+  "observations": [
+    {
+      "log": "/workspace/scratch/vector-speed-lo164.log",
+      "failure": "nop-cau-luong-truot:4 đợt/7 lệnh, mốc1/3"
+    },
+    {
+      "log": "/workspace/scratch/vector-speed-lo164-rerun.log",
+      "failure": "ke-hoach-ngay-lai:3 đợt,mốc2; không cùng điểm đỏ lần1"
+    },
+    {
+      "evidenceFromRoot": "Isolated vector và mainclean8513361b cùng PASS; fullgate chạy4file song song có2lầnfail; fullfinal11/11xanh. Giữ cả2logđỏ,không xem lần xanh xóa lỗi cũ."
+    }
+  ],
+  "conclusion": "Có cửa sổ đo không được đóng nguyên tử tại lúc nhận dòng1; có khả năng lẫn D1 nền vào metric. Chưa có trace xác lập nguyên nhân đủ cho từng lần đỏ; chưa có bằng chứng regression app/vector. Không nâng mốc/không sửa app hoặc bỏ test để được xanh.",
+  "locations": [
+    {
+      "file": "tests/toc-do-may-chu-nop-2710.test.ts",
+      "lines": [
+        55,
+        58,
+        61,
+        63,
+        65,
+        67,
+        68
+      ],
+      "finding": "boDemDot.chay đo bằng state xong từ Promise.finally, kiểm theo setImmediate rồi flush toàn queue D1; snapshot lenh ở65 là bộ đếm global trừ queue còn treo,không phân biệt request critical path/background."
+    },
+    {
+      "file": "tests/toc-do-may-chu-nop-2710.test.ts",
+      "lines": [
+        119,
+        121,
+        122,
+        123,
+        124
+      ],
+      "finding": "Sau khi có newline đầu,122 khởi động conLai và doc.read dòng2 ngay trong phần còn tính đo,trước viec.finally và snapshot65. Việc đọc nền có thể tiến triển trước khi metric đóng; việc tính dot/lenh phụ thuộc thứ tự eventloop/microtask."
+    },
+    {
+      "file": "server/src/nop-luong.ts",
+      "lines": [
+        36,
+        41,
+        42,
+        44
+      ],
+      "finding": "TransformStream:write dòng1 rồi awaitdu/write dòng2. du đã khởi động song song trước khi phatLuong; không được khẳng định riêng việc đọc dòng2 là thứ khởi động D1 nền. D1 nền có thể bắt đầu ngay cả khi tail chưa đọc. Đây giới hạn của kết luận đọc mã."
+    }
+  ],
+  "proposedFix": {
+    "scope": "Fix harness measurement boundary, giữ nguyên docs/moc-toc-do.json và mọi mức budget. Không đổi production semantics để phục vụ test.",
+    "design": [
+      "Cho boDemDot có explicit finish/snapshot đồng bộ gọi NGAY trong continuation đọc được newline đầu (sau parse/sanity dòng1,trước khởi động tail reader). Snapshot dot và lenh không đổi sau finish.",
+      "Tách chay thành pha đo và pha drain. Sau finish mới khởi động tail reader, rồi pump tất cả D1/await waitUntil và kiểm dòng2 đầy đủ như hiện tại. Không chỉ dời conLai xuống sau chay vì chay đang đợi waitUntil; có thể deadlock TransformStream second write.",
+      "Vẫn có D1 background đã chạy TRƯỚC client nhận dòng1; cần thêm trace/tag request critical-path và background hoặc snapshot ở explicit firstline delivery boundary để biết chúng có bị tính nhầm. Không trừ mọi D1 nền bằng heuristic SQL text; tránh bỏ truy vấn thật cần cho dòng1.",
+      "Với ke-hoach-ngay-lai là JSON thường, lỗi không được giải thích chỉ bằng streamtail122. Instrument enqueue/flush/settle cùngSQL id và async phase để xác minh setImmediate grouping; nếu critical dependency thật thành3đợt thì sửa query batching app,không sửa budget."
+    ]
+  },
+  "meaningfulValidation": [
+    "Harness regression synthetic NDJSON:firstline sau1queuedD1;tail cốý cần3đợtD1+nhiềulệnh. Metric bắtbuộc1vàkhôngtăngkhi tail/background bịdelay hoặc bắt đầu ngay; vẫn drain xong và kiểm dòng2 đúng.",
+    "Negative control:firstline cốý phụ thuộc2đợtD1phảiđỏvớimốc1; khôngđược xanhnhờchốt snapshot quá sớm. Thêm nonstream JSON2đợt/parallel reads cùngđợt để giữýnghĩa metric.",
+    "Force ordering variations bằng deferred promises cho read firstline/tail/writer/D1; tái hiện cả background enqueue trước và sau firstline. Test deadlock/cancel/error không làm promise waitUntil bị bỏ.",
+    "Chạy cùng instrumentation trên vector và mainclean,isolated lẫn full4file parallel, nhiều lần có kiểm soát tải. Lưu mọi đỏ/xanh và trace; không rerun-until-green làm bằng chứng duy nhất.",
+    "Giữ kiểm đầy đủ line1 tam/correct và line2 ok/correct/non-tam;budget không đổi. Nếu vẫn sai,phân loại harness vs actual serial dependency bằng trace rồi sửa đúng lớp."
+  ]
+}
