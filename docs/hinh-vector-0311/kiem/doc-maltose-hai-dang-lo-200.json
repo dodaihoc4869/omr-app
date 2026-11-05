@@ -1,0 +1,507 @@
+{
+  "i": 64,
+  "hash": "0c76fb96a3ea6ed26b904baa727b6a9780ce40554edee5c88dc43f4f05dc37db",
+  "fileNguon": "anh/0c76fb96a3ea6ed26b904baa727b6a9780ce40554edee5c88dc43f4f05dc37db.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "zooms": [
+    "/workspace/scratch/cau4-maltose200-I-zoom.png",
+    "/workspace/scratch/cau4-maltose200-II-zoom.png"
+  ],
+  "questions": [
+    {
+      "qid": "12-KT-C2-D4-II-1",
+      "de": "Đường mạch nha là nguyên liệu quan trọng trong công nghiệp chế biến bánh, kẹo và được sản xuất bằng phương pháp lên men tinh bột, mầm ngũ cốc. Thành phần chính của đường mạch nha là maltose. Maltose được cấu tạo từ hai đơn vị glucose và tồn tại ở hai dạng cấu tạo (I) và (II) trong hình dưới đây. Hai dạng (I) và (II) có thể chuyển hoá qua nhau trong dung dịch nước.",
+      "refs": [
+        {
+          "hash": "0c76fb96a3ea6ed26b904baa727b6a9780ce40554edee5c88dc43f4f05dc37db",
+          "where": "12-KT-C2-D4-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "7de3876d25cbc1459f37ef73f1da81b7e1757a72027e5f7962ad419aac9bb260"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D2-II-93",
+      "de": "Đường mạch nha là nguyên liệu quan trọng trong công nghiệp chế biến bánh, kẹo và được sản xuất bằng phương pháp lên men tinh bột, mầm ngũ cốc. Thành phần chính của đường mạch nha là maltose. Maltose được cấu tạo từ hai đơn vị glucose và tồn tại ở hai dạng cấu tạo (I) và (II) trong hình dưới đây. Hai dạng (I) và (II) có thể chuyển hoá qua nhau trong dung dịch nước.",
+      "refs": [
+        {
+          "hash": "0c76fb96a3ea6ed26b904baa727b6a9780ce40554edee5c88dc43f4f05dc37db",
+          "where": "DB-12-B4-D2-II-93.hinh.0.du_lieu",
+          "hashDataUrl": "7de3876d25cbc1459f37ef73f1da81b7e1757a72027e5f7962ad419aac9bb260"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–2pxapprox;4drawingunitsallfrontstyle2taper+horizontalbold inclopenunit,bondsnotinventedCIP.",
+    "I": {
+      "rings": [
+        {
+          "nodes": {
+            "C4": [
+              77,
+              152
+            ],
+            "C5": [
+              124,
+              119
+            ],
+            "O": [
+              204,
+              119
+            ],
+            "C1": [
+              243,
+              158
+            ],
+            "C2": [
+              197,
+              176
+            ],
+            "C3": [
+              119,
+              176
+            ]
+          },
+          "C6": [
+            124,
+            85
+          ],
+          "terminalOH": [
+            171,
+            63
+          ],
+          "terminalBond": [
+            [
+              124,
+              85
+            ],
+            [
+              147,
+              72
+            ]
+          ],
+          "OH": [
+            {
+              "at": [
+                86,
+                194
+              ],
+              "bond": [
+                [
+                  77,
+                  152
+                ],
+                [
+                  77,
+                  180
+                ]
+              ]
+            },
+            {
+              "at": [
+                130,
+                135
+              ],
+              "bond": [
+                [
+                  119,
+                  176
+                ],
+                [
+                  119,
+                  148
+                ]
+              ]
+            },
+            {
+              "at": [
+                207,
+                219
+              ],
+              "bond": [
+                [
+                  197,
+                  176
+                ],
+                [
+                  197,
+                  205
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "nodes": {
+            "C4": [
+              305,
+              158
+            ],
+            "C5": [
+              340,
+              121
+            ],
+            "O": [
+              426,
+              121
+            ],
+            "C1": [
+              469,
+              165
+            ],
+            "C2": [
+              423,
+              184
+            ],
+            "C3": [
+              346,
+              184
+            ]
+          },
+          "C6": [
+            340,
+            91
+          ],
+          "terminalOH": [
+            390,
+            65
+          ],
+          "terminalBond": [
+            [
+              340,
+              91
+            ],
+            [
+              367,
+              75
+            ]
+          ],
+          "OH": [
+            {
+              "at": [
+                357,
+                140
+              ],
+              "bond": [
+                [
+                  346,
+                  184
+                ],
+                [
+                  346,
+                  155
+                ]
+              ]
+            },
+            {
+              "at": [
+                433,
+                226
+              ],
+              "bond": [
+                [
+                  423,
+                  184
+                ],
+                [
+                  423,
+                  213
+                ]
+              ]
+            },
+            {
+              "at": [
+                479,
+                206
+              ],
+              "bond": [
+                [
+                  469,
+                  165
+                ],
+                [
+                  469,
+                  194
+                ]
+              ]
+            }
+          ]
+        }
+      ],
+      "bridgeO": [
+        273,
+        187
+      ],
+      "bridgeBonds": [
+        [
+          243,
+          158,
+          262,
+          177
+        ],
+        [
+          284,
+          177,
+          305,
+          158
+        ]
+      ],
+      "caption": "(I)",
+      "captionAt": [
+        289,
+        267
+      ],
+      "captionWeight": "bold"
+    },
+    "II": {
+      "ring": {
+        "nodes": {
+          "C4": [
+            617,
+            166
+          ],
+          "C5": [
+            663,
+            134
+          ],
+          "O": [
+            744,
+            134
+          ],
+          "C1": [
+            783,
+            173
+          ],
+          "C2": [
+            736,
+            191
+          ],
+          "C3": [
+            660,
+            191
+          ]
+        },
+        "C6": [
+          663,
+          100
+        ],
+        "terminalOH": [
+          710,
+          77
+        ],
+        "terminalBond": [
+          [
+            663,
+            100
+          ],
+          [
+            687,
+            86
+          ]
+        ],
+        "OH": [
+          {
+            "at": [
+              626,
+              208
+            ],
+            "bond": [
+              [
+                617,
+                166
+              ],
+              [
+                617,
+                194
+              ]
+            ]
+          },
+          {
+            "at": [
+              671,
+              147
+            ],
+            "bond": [
+              [
+                660,
+                191
+              ],
+              [
+                660,
+                161
+              ]
+            ]
+          },
+          {
+            "at": [
+              747,
+              234
+            ],
+            "bond": [
+              [
+                736,
+                191
+              ],
+              [
+                736,
+                219
+              ]
+            ]
+          }
+        ]
+      },
+      "open": {
+        "C4": [
+          844,
+          173
+        ],
+        "C5": [
+          881,
+          135
+        ],
+        "C6": [
+          881,
+          105
+        ],
+        "C3": [
+          886,
+          197
+        ],
+        "C2": [
+          964,
+          197
+        ],
+        "C1carbonyl": [
+          1010,
+          179
+        ],
+        "terminalOH": [
+          931,
+          78
+        ],
+        "terminalBond": [
+          [
+            881,
+            105
+          ],
+          [
+            907,
+            89
+          ]
+        ],
+        "OH": [
+          {
+            "at": [
+              933,
+              135
+            ],
+            "bond": [
+              [
+                881,
+                135
+              ],
+              [
+                909,
+                135
+              ]
+            ]
+          },
+          {
+            "at": [
+              897,
+              155
+            ],
+            "bond": [
+              [
+                886,
+                197
+              ],
+              [
+                886,
+                168
+              ]
+            ]
+          },
+          {
+            "at": [
+              975,
+              239
+            ],
+            "bond": [
+              [
+                964,
+                197
+              ],
+              [
+                964,
+                226
+              ]
+            ]
+          }
+        ],
+        "aldehydeO": [
+          1021,
+          137
+        ],
+        "doubleSegments": [
+          [
+            1006,
+            179,
+            1013,
+            151
+          ],
+          [
+            1013,
+            179,
+            1020,
+            153
+          ]
+        ],
+        "explicitH": [
+          1047,
+          200
+        ],
+        "Hbond": [
+          [
+            1010,
+            179
+          ],
+          [
+            1034,
+            191
+          ]
+        ],
+        "frontBonds": "C4→C3taperthinC4wideC3,C3–C2boldhorizontal,C2→C1carbonyl taperwideC2thinC1;DONOTremoveopenunitboldstyle."
+      },
+      "bridgeO": [
+        814,
+        202
+      ],
+      "bridgeBonds": [
+        [
+          783,
+          173,
+          802,
+          190
+        ],
+        [
+          825,
+          191,
+          844,
+          173
+        ]
+      ],
+      "caption": "(II)",
+      "captionAt": [
+        858,
+        261
+      ],
+      "captionWeight": "bold"
+    },
+    "counts": "Eachpanel12C11O/2terminalimplicitC–OH/6standaloneOHlabels;panelI2ringO+1bridgeO,II1ringO+1bridgeO+1carbonylO. 1HexplicitONLYaldehydeII;noHelse/noCH2OHtext/noCnums/noequilibriumarrowprinted. Eachof4units2taper+1horizontalbold=8taper4boldtotal.",
+    "captionPolicy": "BothpublicstemEXPLICITcall(I)/(II),keepboldcaptions,noextraalpha/beta/names.",
+    "critical": "SourceOHinsideleftunitplacednearrearC5butonlysinglebondfromC3;noC5downstub/Hadded. TerminalCH2OHpresentedasimplicitbranchC+OH,nottextCH2OH."
+  },
+  "verdict": "Đọcsource,chưaactualSVGreview."
+}
