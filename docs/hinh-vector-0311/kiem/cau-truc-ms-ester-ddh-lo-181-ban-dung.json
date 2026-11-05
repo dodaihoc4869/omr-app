@@ -1,0 +1,178 @@
+[
+  {
+    "i": 765,
+    "hash": "8ec3f9d772b36a656b81c9367127d6930dcdc2c2c25d3b8df8caea633753badb",
+    "fileNguon": "anh/8ec3f9d772b36a656b81c9367127d6930dcdc2c2c25d3b8df8caea633753badb.png",
+    "canvas": [
+      579,
+      294
+    ],
+    "daMoNative": true,
+    "kind": "MS-ester-single-plot",
+    "xLabel": "m/z",
+    "yLabel": "Cường độ tương đối (%)",
+    "xTickLabels": [
+      10,
+      20,
+      30,
+      40,
+      50,
+      60,
+      70
+    ],
+    "yTickLabels": [
+      0,
+      20,
+      40,
+      60,
+      80,
+      100
+    ],
+    "geometry": {
+      "plotBox": [
+        81,
+        7,
+        543,
+        248
+      ],
+      "prominentBarPixels": [
+        [
+          120,
+          203,
+          248
+        ],
+        [
+          219,
+          236,
+          248
+        ],
+        [
+          227,
+          139,
+          248
+        ],
+        [
+          235,
+          233,
+          248
+        ],
+        [
+          243,
+          8,
+          248
+        ],
+        [
+          251,
+          139,
+          248
+        ],
+        [
+          466,
+          157,
+          248
+        ]
+      ]
+    },
+    "notes": "CácbarKHÔNGlabelsriêngvàKHÔNG[M]marker. Đừngtựghi15/27/28/29/30/31/60trênbarvìnativechỉaxislabels. Parentplotgiữ4frame/minorticks.HairlinestinybaselinecòncầnsoátzoomtracemaskCHƯAchốttotalpeakcount,vìcóđốmscan/axisminor.Nhóm3qidnguồn765đọcđủfullđểđềxuấtdựng,cácyheightpixelkhôngphảiinferredchemanswer.",
+    "questions": [
+      {
+        "qid": "DH-12-C1-B1-P1-II-14",
+        "de": "Phổ khối lượng của ester E được cho ở hình dưới đây:",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P1-II-14.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B1-P1-II-29",
+        "de": "Phổ khối lượng của ester mạch hở E được cho ở hình dưới đây:",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P1-II-29.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B1-P1-VD-II-1",
+        "de": "Phổ khối lượng của ester mạch hở E được cho ở hình dưới đây:",
+        "refs": [
+          {
+            "where": "DH-12-C1-B1-P1-VD-II-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daCoManifestTaiCheckpoint": false,
+    "svg": "ms-ester-ddh-61378d7386ee75017819191651fccdcecd38710bd77f5cade7fb0dcd9fde7d1c.svg",
+    "hashSvg": "61378d7386ee75017819191651fccdcecd38710bd77f5cade7fb0dcd9fde7d1c",
+    "byteSvg": 30694,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "peaksPixel": [
+      [
+        104,
+        245
+      ],
+      [
+        112,
+        242
+      ],
+      [
+        120,
+        203
+      ],
+      [
+        143,
+        245
+      ],
+      [
+        219.5,
+        235
+      ],
+      [
+        227,
+        139
+      ],
+      [
+        234.5,
+        233
+      ],
+      [
+        243,
+        8
+      ],
+      [
+        251,
+        139
+      ],
+      [
+        257.5,
+        245
+      ],
+      [
+        342.5,
+        244
+      ],
+      [
+        350,
+        246
+      ],
+      [
+        466,
+        157
+      ],
+      [
+        472.5,
+        246
+      ]
+    ],
+    "ghiChuDung": "4frame/minorX1major10/Yminor5major20/pixelheight/noextraMzpeaklabels/noM/DDHpath. Tinybarschốtđọcsourcezoomkhôngsuytheory.",
+    "hashSvgDaSoat": "61378d7386ee75017819191651fccdcecd38710bd77f5cade7fb0dcd9fde7d1c",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

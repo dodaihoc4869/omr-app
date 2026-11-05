@@ -1335,3 +1335,10 @@ Nhóm169đãxong15/20;1120/1030/1046ĐÃĐẠTđừngtrùng. CÒN765/1195/806/10
 -806MSanilinegiữmọibarlabelledvàunlabelled/11labels/2blueaxes/X20-40-60-80/Y50-100/captiontriangle/noM/no0/DDHpath. Tinybaselinevạchgiữpixelkhônggánmz. PNGnative/full+freshactualSVG/exacthashsoátđộclập.
 -Chromium521/521/hash/XML/path/selfcontained/AST/build180/precache170/2613.23KiB/speed21/21đạt. SizegateđỏNỀNindex.tsnguyênbytekhôngnângmốc;phảixửlýtrướcgộp/deploy.Mainab81c625chưagộp/WOFF2khôngdiff. Chưa tích hợp/chưa reload offline app/chưa phát hành. Chưa tham vấn được cố vấn.
 -Nhóm169đãđạt19/20;CHỈcòn765CHƯAdựng.806ĐÃĐẠTđừngtrùng.765MSweakbaselinehairlines/frame4cạnh/minorticks/cầnnativezoomtừngvạchkhôngđoánpeakcount. Fullsource/publicde/refs/geometrykiem/doc-molecule-lo-169.json. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.
+
+
+### 05/11 — Lô181: phổ ester khép nhóm169
+-1025 câu đủ mọi hình+DDH/7 một phần;769 nguồn→522 SVG;8330289byte/gzip1648736;659 nguồn còn lại.
+-765MSester4frame/minorX1major10/Yminor5major20/tinybaselinevạchgiữsource/heightpixel/khôngnhãnmzpeak/khôngM/DDHpath. PNGnative/full+zoombaseline+freshactualSVG/exacthashsoátđộclập.
+-Chromium522/522/hash/XML/path/selfcontained/AST/build181/precache170/2613.23KiB/speed21/21đạt. SizegateđỏNỀNindex.tsnguyênbytekhôngnângmốc;phảixửlýtrướcgộp/deploy.Mainab81c625chưagộp/WOFF2khôngdiff. Chưa tích hợp/chưa reload offline app/chưa phát hành. Chưa tham vấn được cố vấn.
+-Nhóm169ĐỦ20/20đãđạt,khôngdựngtrùng. Tiếpưu tiênnguồndùngnhiềucâu1213stereochemicaldisaccharide/1214triesterhydrolysis(rootđãmởnativechưađủgeometry),1033IR2panelE/F/736surfactant4panelchưađọchết. Đốimanifest/hashtrướcdựng,rankingchỉgợiý. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.

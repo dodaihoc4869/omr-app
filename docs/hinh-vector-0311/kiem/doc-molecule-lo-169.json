@@ -629,7 +629,9 @@
       }
     ],
     "chiLaDuLieuDungChuaSoatRender": true,
-    "daCoManifestTaiCheckpoint": false
+    "daCoManifestTaiCheckpoint": true,
+    "svgDaChon": "ms-ester-ddh-61378d7386ee75017819191651fccdcecd38710bd77f5cade7fb0dcd9fde7d1c.svg",
+    "hashSvgDaChon": "61378d7386ee75017819191651fccdcecd38710bd77f5cade7fb0dcd9fde7d1c"
   },
   {
     "i": 1195,

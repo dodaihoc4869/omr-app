@@ -1,0 +1,10 @@
+[
+  {
+    "i": 765,
+    "hashSvg": "61378d7386ee75017819191651fccdcecd38710bd77f5cade7fb0dcd9fde7d1c",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: Đã mở riêng PNG native/full và 4 crop baseline nearest; tự render actual SVG hiện tại bằng Chromium (/workspace/scratch/cau4-181-fresh.png). Đủ 14 nét phổ xác nhận (7 prominent, 7 tiny); không biến 6 fringe baseline/tick thành peak. Vị trí/độ cao giữ pixel nguồn, 4 cạnh frame, X10–70 major10/minor1, Y0–100 major20/minor5; 2 tên trục nguyên văn Cường độ tương đối (%) và m/z. Không thêm nhãn m/z từng peak, M+, %, caption hay normalize theo lý thuyết. DDH path tự chứa, không text/tspan/image/fallback; nhãn không chạm/cắt/tràn. Exact SHA256 thực khớp metadata.",
+    "hash": "8ec3f9d772b36a656b81c9367127d6930dcdc2c2c25d3b8df8caea633753badb",
+    "hashSvgDaSoat": "61378d7386ee75017819191651fccdcecd38710bd77f5cade7fb0dcd9fde7d1c"
+  }
+]
