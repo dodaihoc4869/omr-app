@@ -1,0 +1,431 @@
+{
+  "i": 93,
+  "hash": "1241eaf0cb21af2b27c69d8ebc9cf9ea5458200de1d2fac6a5f42a214c136cc1",
+  "fileNguon": "anh/1241eaf0cb21af2b27c69d8ebc9cf9ea5458200de1d2fac6a5f42a214c136cc1.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "zoom": "/workspace/scratch/cau4-extraction203-middlezoom.png",
+  "questions": [
+    {
+      "qid": "12-C1-B1-D2-II-6",
+      "de": "Một nhóm học sinh đã thực hiện phản ứng điều chế ethyl acetate từ nguyên liệu ban đầu là acetic acid và ethanol trong phòng thí nghiệm. Khi phản ứng kết thúc, nhóm đã thu được hỗn hợp sản phẩm gồm ethyl acetate và acetic acid, ethanol còn dư theo phương trình hoá học:\nCH₃COOH + C₂H₅OH ⇌(H₂SO₄ đặc, t°) CH₃COOC₂H₅ + H₂O\nVì ethyl acetate không phân cực, còn acetic acid và ethanol đều phân cực nên nhóm đã dùng dung môi hữu cơ không phân cực diethyl ether (C₂H₅OC₂H₅) để chiết ethyl acetate ra khỏi hỗn hợp sau phản ứng theo sơ đồ sau:\nCho các phát biểu sau về thí nghiệm của nhóm:",
+      "refs": [
+        {
+          "hash": "1241eaf0cb21af2b27c69d8ebc9cf9ea5458200de1d2fac6a5f42a214c136cc1",
+          "where": "12-C1-B1-D2-II-6.hinh.0.du_lieu",
+          "hashDataUrl": "a3e0e130fda5d206aa7ac636b6394847ff1a58306094f4ae8e791b165abf580b"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B1-P1-D2-II-26",
+      "de": "Một nhóm học sinh đã thực hiện phản ứng điều chế ethyl acetate từ nguyên liệu ban đầu là acetic acid và ethanol trong phòng thí nghiệm. Khi phản ứng kết thúc, nhóm đã thu được hỗn hợp sản phẩm gồm ethyl acetate và acetic acid, ethanol còn dư theo phương trình hoá học:\nCH₃COOH + C₂H₅OH ⇌(H₂SO₄ đặc, t°) CH₃COOC₂H₅ + H₂O\nVì ethyl acetate không phân cực, còn acetic acid và ethanol đều phân cực nên nhóm đã dùng dung môi hữu cơ không phân cực diethyl ether (C₂H₅OC₂H₅) để chiết ethyl acetate ra khỏi hỗn hợp sau phản ứng theo sơ đồ sau:\nCho các phát biểu sau về thí nghiệm của nhóm:",
+      "refs": [
+        {
+          "hash": "1241eaf0cb21af2b27c69d8ebc9cf9ea5458200de1d2fac6a5f42a214c136cc1",
+          "where": "DB-12-B1-P1-D2-II-26.hinh.0.du_lieu",
+          "hashDataUrl": "a3e0e130fda5d206aa7ac636b6394847ff1a58306094f4ae8e791b165abf580b"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–2pxapprox. ĐwithcrossbarKHÔNGD/Ðguess. Noequationaddedfromstem.",
+    "beakers": [
+      {
+        "wall": [
+          [
+            75,
+            42
+          ],
+          [
+            81,
+            48
+          ],
+          [
+            81,
+            240
+          ],
+          [
+            220,
+            240
+          ],
+          [
+            220,
+            48
+          ],
+          [
+            226,
+            43
+          ]
+        ],
+        "levels": [
+          155
+        ],
+        "labels": [
+          {
+            "text": "S",
+            "at": [
+              110,
+              188
+            ]
+          },
+          {
+            "text": "Đ",
+            "at": [
+              178,
+              188
+            ]
+          },
+          {
+            "text": "(nước)",
+            "at": [
+              143,
+              213
+            ]
+          }
+        ]
+      },
+      {
+        "wall": [
+          [
+            318,
+            42
+          ],
+          [
+            325,
+            48
+          ],
+          [
+            325,
+            240
+          ],
+          [
+            464,
+            240
+          ],
+          [
+            464,
+            48
+          ],
+          [
+            471,
+            43
+          ]
+        ],
+        "levels": [
+          77,
+          155
+        ],
+        "labels": [
+          {
+            "text": "(diethyl ether)",
+            "at": [
+              395,
+              116
+            ]
+          },
+          {
+            "text": "S",
+            "at": [
+              357,
+              188
+            ]
+          },
+          {
+            "text": "Đ",
+            "at": [
+              426,
+              188
+            ]
+          },
+          {
+            "text": "(nước)",
+            "at": [
+              394,
+              213
+            ]
+          }
+        ]
+      },
+      {
+        "wall": [
+          [
+            498,
+            42
+          ],
+          [
+            504,
+            48
+          ],
+          [
+            504,
+            240
+          ],
+          [
+            645,
+            240
+          ],
+          [
+            645,
+            48
+          ],
+          [
+            651,
+            43
+          ]
+        ],
+        "levels": [
+          77,
+          155
+        ],
+        "labels": [
+          {
+            "text": "(diethyl ether)",
+            "at": [
+              575,
+              104
+            ]
+          },
+          {
+            "text": "S",
+            "at": [
+              574,
+              132
+            ]
+          },
+          {
+            "text": "Đ",
+            "at": [
+              575,
+              188
+            ]
+          },
+          {
+            "text": "(nước)",
+            "at": [
+              575,
+              213
+            ]
+          }
+        ]
+      },
+      {
+        "wall": [
+          [
+            737,
+            43
+          ],
+          [
+            743,
+            49
+          ],
+          [
+            743,
+            241
+          ],
+          [
+            883,
+            241
+          ],
+          [
+            883,
+            48
+          ],
+          [
+            889,
+            43
+          ]
+        ],
+        "levels": [
+          156
+        ],
+        "labels": [
+          {
+            "text": "S",
+            "at": [
+              812,
+              187
+            ]
+          },
+          {
+            "text": "(diethyl ether)",
+            "at": [
+              814,
+              213
+            ]
+          }
+        ]
+      },
+      {
+        "wall": [
+          [
+            913,
+            43
+          ],
+          [
+            919,
+            49
+          ],
+          [
+            919,
+            241
+          ],
+          [
+            1060,
+            241
+          ],
+          [
+            1060,
+            48
+          ],
+          [
+            1066,
+            43
+          ]
+        ],
+        "levels": [
+          156
+        ],
+        "labels": [
+          {
+            "text": "Đ",
+            "at": [
+              984,
+              185
+            ]
+          },
+          {
+            "text": "(nước)",
+            "at": [
+              988,
+              211
+            ]
+          }
+        ]
+      }
+    ],
+    "fill": "Allliquid/layersuniformpalegrayinsource,notdifferentcolorimplyingconcentration;upper2layersb2/b3separatedbyhorizontal155.",
+    "phaseUpArrow": {
+      "shaft": [
+        [
+          372,
+          179
+        ],
+        [
+          372,
+          132
+        ]
+      ],
+      "filledTriangle": [
+        [
+          366,
+          143
+        ],
+        [
+          372,
+          132
+        ],
+        [
+          378,
+          143
+        ]
+      ],
+      "direction": "UPfromSbottomtowarddiethylethertopbeaker2"
+    },
+    "hollowRightArrows": [
+      {
+        "polygon": [
+          [
+            245,
+            136
+          ],
+          [
+            286,
+            136
+          ],
+          [
+            286,
+            124
+          ],
+          [
+            307,
+            143
+          ],
+          [
+            286,
+            162
+          ],
+          [
+            286,
+            150
+          ],
+          [
+            245,
+            150
+          ]
+        ],
+        "direction": "RIGHT"
+      },
+      {
+        "polygon": [
+          [
+            667,
+            138
+          ],
+          [
+            708,
+            138
+          ],
+          [
+            708,
+            126
+          ],
+          [
+            729,
+            144
+          ],
+          [
+            708,
+            163
+          ],
+          [
+            708,
+            151
+          ],
+          [
+            667,
+            151
+          ]
+        ],
+        "direction": "RIGHT"
+      }
+    ],
+    "captions": [
+      {
+        "text": "Hỗn hợp sau phản\nứng gồm sản phẩm\n(S) và các chất ban\nđầu (Đ) còn dư",
+        "anchor": [
+          153,
+          290
+        ]
+      },
+      {
+        "text": "Dung môi diethyl ether được\nthêm vào để chiết sản phẩm\nhữu cơ ra khỏi hỗn hợp",
+        "anchor": [
+          484,
+          290
+        ]
+      },
+      {
+        "text": "Sản phẩm là ethyl acetate đã\nđược tách ra khỏi hỗn hợp",
+        "anchor": [
+          905,
+          290
+        ]
+      }
+    ],
+    "counts": "5beakers/2hollowRIGHTarrows/1filledUPphasearrow/4Slabels/4Đlabels?sourceSpositionsB1B2B3B4=4,ĐpositionsB1B2B3B5=4;3captionblocks;2layersB2+B3,1layerothers.",
+    "critical": "Captions(S)/(Đ)parentheses,mustpreserveĐnotD;parenthesized(diethylether)/(nước)alllabels;ethylacetateNOTisoamylname;nofunnel/extraarrow/equation/theory."
+  },
+  "verdict": "Đọcsource,chưaactualSVGreview."
+}

@@ -5266,6 +5266,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "1241eaf0cb21af2b27c69d8ebc9cf9ea5458200de1d2fac6a5f42a214c136cc1": {
+      "tep": "chiet-diethyl-ether-ddh-70f4a364b9816581aefac28bd4d606c4cf1cc84d5c7b0c0f5577a6b0362e376c.svg",
+      "hashSvg": "70f4a364b9816581aefac28bd4d606c4cf1cc84d5c7b0c0f5577a6b0362e376c",
+      "byteSvg": 124665,
+      "byteGzip": 12633,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "9a7db2630e9d23f7ce9d40311c4923a7cbb68ef4dac758baa6acef3bcf2a28e2": {
       "tep": "khep-be-mat-ddh-bdccfd4f711578d8c48571c3491eeccaf8cd7971e00ef25890f066b27f1cc6df.svg",
       "hashSvg": "bdccfd4f711578d8c48571c3491eeccaf8cd7971e00ef25890f066b27f1cc6df",
@@ -9181,6 +9190,20 @@
           "where": "12-C1-B1-D2-I-49.hinh.0.du_lieu",
           "hashDataUrl": "4428792b4771a03149438c857b60ed8a88795d237f3daffa6f3b5689ca1828a2",
           "vector": "polymer-xa-phong-ddh-a5f677f01625c969c2441e21fb22f34372489b5b39d53a5d5fbdc825883e2237.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-C1-B1-D2-II-6",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "1241eaf0cb21af2b27c69d8ebc9cf9ea5458200de1d2fac6a5f42a214c136cc1",
+          "where": "12-C1-B1-D2-II-6.hinh.0.du_lieu",
+          "hashDataUrl": "a3e0e130fda5d206aa7ac636b6394847ff1a58306094f4ae8e791b165abf580b",
+          "vector": "chiet-diethyl-ether-ddh-70f4a364b9816581aefac28bd4d606c4cf1cc84d5c7b0c0f5577a6b0362e376c.svg"
         }
       ]
     },
@@ -14449,6 +14472,20 @@
           "where": "DB-12-B1-P1-D2-II-21.hinh.0.du_lieu",
           "hashDataUrl": "544d4a269034e297185b99dc72731f6c7bde093241f4a232fcc62ce40a442dbc",
           "vector": "ion-ester-glycerol-ddh-678f070da26bcdc14a922e69073d3275d008bbc8fbcae871b6d15e4e757e6424.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B1-P1-D2-II-26",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "1241eaf0cb21af2b27c69d8ebc9cf9ea5458200de1d2fac6a5f42a214c136cc1",
+          "where": "DB-12-B1-P1-D2-II-26.hinh.0.du_lieu",
+          "hashDataUrl": "a3e0e130fda5d206aa7ac636b6394847ff1a58306094f4ae8e791b165abf580b",
+          "vector": "chiet-diethyl-ether-ddh-70f4a364b9816581aefac28bd4d606c4cf1cc84d5c7b0c0f5577a6b0362e376c.svg"
         }
       ]
     },
@@ -24705,6 +24742,7 @@
     "12-C1-B2-III-13",
     "12-C1-B2-III-27",
     "12-C1-B1-D2-I-49",
+    "12-C1-B1-D2-II-6",
     "12-C1-B1-D2-II-7",
     "12-C1-B1-D2-III-11",
     "12-C1-B1-D2-III-19",
@@ -25035,6 +25073,7 @@
     "DB-12-B1-P1-D2-I-12",
     "DB-12-B1-P1-D2-II-14",
     "DB-12-B1-P1-D2-II-21",
+    "DB-12-B1-P1-D2-II-26",
     "DB-12-B1-P1-D2-III-34",
     "DB-12-B1-P1-D2-I-42",
     "DB-12-B1-P1-D2-I-44",

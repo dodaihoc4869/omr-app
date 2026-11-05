@@ -1,0 +1,40 @@
+[
+  {
+    "i": 93,
+    "hash": "1241eaf0cb21af2b27c69d8ebc9cf9ea5458200de1d2fac6a5f42a214c136cc1",
+    "fileNguon": "anh/1241eaf0cb21af2b27c69d8ebc9cf9ea5458200de1d2fac6a5f42a214c136cc1.png",
+    "svg": "chiet-diethyl-ether-ddh-70f4a364b9816581aefac28bd4d606c4cf1cc84d5c7b0c0f5577a6b0362e376c.svg",
+    "hashSvg": "70f4a364b9816581aefac28bd4d606c4cf1cc84d5c7b0c0f5577a6b0362e376c",
+    "byteSvg": 124665,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C1-B1-D2-II-6",
+        "de": "Một nhóm học sinh đã thực hiện phản ứng điều chế ethyl acetate từ nguyên liệu ban đầu là acetic acid và ethanol trong phòng thí nghiệm. Khi phản ứng kết thúc, nhóm đã thu được hỗn hợp sản phẩm gồm ethyl acetate và acetic acid, ethanol còn dư theo phương trình hoá học:\nCH₃COOH + C₂H₅OH ⇌(H₂SO₄ đặc, t°) CH₃COOC₂H₅ + H₂O\nVì ethyl acetate không phân cực, còn acetic acid và ethanol đều phân cực nên nhóm đã dùng dung môi hữu cơ không phân cực diethyl ether (C₂H₅OC₂H₅) để chiết ethyl acetate ra khỏi hỗn hợp sau phản ứng theo sơ đồ sau:\nCho các phát biểu sau về thí nghiệm của nhóm:",
+        "refs": [
+          {
+            "hash": "1241eaf0cb21af2b27c69d8ebc9cf9ea5458200de1d2fac6a5f42a214c136cc1",
+            "where": "12-C1-B1-D2-II-6.hinh.0.du_lieu",
+            "hashDataUrl": "a3e0e130fda5d206aa7ac636b6394847ff1a58306094f4ae8e791b165abf580b"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D2-II-26",
+        "de": "Một nhóm học sinh đã thực hiện phản ứng điều chế ethyl acetate từ nguyên liệu ban đầu là acetic acid và ethanol trong phòng thí nghiệm. Khi phản ứng kết thúc, nhóm đã thu được hỗn hợp sản phẩm gồm ethyl acetate và acetic acid, ethanol còn dư theo phương trình hoá học:\nCH₃COOH + C₂H₅OH ⇌(H₂SO₄ đặc, t°) CH₃COOC₂H₅ + H₂O\nVì ethyl acetate không phân cực, còn acetic acid và ethanol đều phân cực nên nhóm đã dùng dung môi hữu cơ không phân cực diethyl ether (C₂H₅OC₂H₅) để chiết ethyl acetate ra khỏi hỗn hợp sau phản ứng theo sơ đồ sau:\nCho các phát biểu sau về thí nghiệm của nhóm:",
+        "refs": [
+          {
+            "hash": "1241eaf0cb21af2b27c69d8ebc9cf9ea5458200de1d2fac6a5f42a214c136cc1",
+            "where": "DB-12-B1-P1-D2-II-26.hinh.0.du_lieu",
+            "hashDataUrl": "a3e0e130fda5d206aa7ac636b6394847ff1a58306094f4ae8e791b165abf580b"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "5openbeakers/2hollowRIGHTarrows/1phaseUParrow/S-Đlabels/diethylether-nước/3captionblocks/literaldata/DDHpath.",
+    "hashSvgDaSoat": "70f4a364b9816581aefac28bd4d606c4cf1cc84d5c7b0c0f5577a6b0362e376c",
+    "nguoiSoat": "cau_truc_4"
+  }
+]
