@@ -1419,3 +1419,10 @@ Nhóm169đãxong15/20;1120/1030/1046ĐÃĐẠTđừngtrùng. CÒN765/1195/806/10
 -13fructose5ring/6C6O/3Hexplicit/2CH2OH-Cfirst/OH-HO/sourceC2OHdownCH2OHup/2taper+horizontalbold/4arrowlabelsdam1..4NOTCnumbers/arrow2tip8pxdướibondsourceliteral/noCaption/DDHpath. Nativefull/zoom/freshactualSVG/hashsoátđộclập.
 -Chromium533/533/hash/XML/path/selfcontained/AST/build192/precache170/2613.23KiB/speed21/21đạt. SizegateđỏNỀNindex.tsnguyênbytekhôngnângmốc;phảixửlýtrướcgộp/deploy.Mainab81c625chưagộp/WOFF2khôngdiff. Chưa tích hợp/chưa reload offline app/chưa phát hành. Chưa tham vấn được cố vấn.
 -Nguồn13/10/2đãđạtđừngtrùng. Tiếpnguồndùng2câuchưađạt4/24/36/37/40/43/47/48/49/58/64/65...socảhashmanifest,đọcnativefull/stemrefs/rankingchỉgợiýkhôngduyệtalias.4bộrửakhíSO2-chấtTrootđãmởnativeCHƯAdựng,hạtpatternmờkhônggáncount.138/753/1305ảnhthậtcầnsoátphânloạiđộclậpGIỮrasterkhôngvẽgiả. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.
+
+
+### 05/11 — Lô193: thí nghiệm Rutherford
+-1062 câu đủ mọi hình+DDH/7 một phần;781 nguồn→534 SVG;8761479byte/gzip1718426;647 nguồn còn lại.
+-24Rutherford5rayarrowheads+1roundendpoint/beam2finebounds/goldfoil/Pbsourceblock/openingdetectorscreen-frontocclusion/all8labels+captionliteral/DDHpath. Nativefull/zoom/freshactualSVG/hashsoátđộclập;khôngthêmangles/numbers/heads.
+-Chromium534/534/hash/XML/path/selfcontained/AST/build193/precache170/2613.23KiB/speed21/21đạt. SizegateđỏNỀNindex.tsnguyênbytekhôngnângmốc;phảixửlýtrướcgộp/deploy.Mainab81c625chưagộp/WOFF2khôngdiff. Chưa tích hợp/chưa reload offline app/chưa phát hành. Chưa tham vấn được cố vấn.
+-Nguồn24/13/10/2đãđạtđừngtrùng. Tiếpnguồndùng2câuchưađạt4/36/37/40/43/47/48/49/58/64/65...socảhashmanifest,đọcnativefull/stemrefs/rankingchỉgợiýkhôngduyệtalias.4bộrửakhíSO2-chấtTrootđãmởnativeCHƯAdựng,hạtpatternmờkhônggáncount.138/753/1305ảnhthậtcầnsoátphânloạiđộclậpGIỮrasterkhôngvẽgiả. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.

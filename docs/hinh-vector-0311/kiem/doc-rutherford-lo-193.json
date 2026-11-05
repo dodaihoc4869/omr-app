@@ -1,0 +1,477 @@
+{
+  "i": 24,
+  "hash": "0419ff0d08adcbebffdaa037e6cb21d692b40d49a5897a2b237beb2ea7fb2bcb",
+  "fileNguon": "anh/0419ff0d08adcbebffdaa037e6cb21d692b40d49a5897a2b237beb2ea7fb2bcb.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNative": true,
+  "zoom": "/workspace/scratch/cau4-rutherford193-rays-zoom.png",
+  "questions": [
+    {
+      "qid": "10-C1-B1-II-5",
+      "maDe": "10-C1-B1",
+      "de": "Năm 1911, E. Rutherford (Rơ-đơ-pho, người New Zealand) và các cộng sự đã dùng các hạt α bắn phá lá vàng mỏng và dùng màn huỳnh quang đặt sau lá vàng để theo dõi đường đi của các hạt α (hình vẽ). Kết quả thí nghiệm đã rút ra các kết luận về nguyên tử như sau:",
+      "hinh": [
+        {
+          "hash": "0419ff0d08adcbebffdaa037e6cb21d692b40d49a5897a2b237beb2ea7fb2bcb",
+          "where": "10-C1-B1-II-5.hinh.0.du_lieu",
+          "hashDataUrl": "cc03a6ba44240d42f2087d06fd83f3c5ac9188b289a2c32aeb23567aaa902dce"
+        }
+      ]
+    },
+    {
+      "qid": "DB-10-B1-D1-II-58",
+      "maDe": "DB-10-B1-D1",
+      "de": "Năm 1911, E. Rutherford (Rơ-đơ-pho, người New Zealand) và các cộng sự đã dùng các hạt α bắn phá lá vàng mỏng và dùng màn huỳnh quang đặt sau lá vàng để theo dõi đường đi của các hạt α (hình vẽ). Kết quả thí nghiệm đã rút ra các kết luận về nguyên tử như sau:",
+      "hinh": [
+        {
+          "hash": "0419ff0d08adcbebffdaa037e6cb21d692b40d49a5897a2b237beb2ea7fb2bcb",
+          "where": "DB-10-B1-D1-II-58.hinh.0.du_lieu",
+          "hashDataUrl": "cc03a6ba44240d42f2087d06fd83f3c5ac9188b289a2c32aeb23567aaa902dce"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–3pxapprox;5rayarrowheads+1roundendpoint,khôngtựthêmarrowheadởround.",
+    "labels": [
+      {
+        "text": "Hạt alpha bị bật ngược",
+        "at": [
+          159,
+          83
+        ]
+      },
+      {
+        "text": "trở lại",
+        "at": [
+          69,
+          114
+        ]
+      },
+      {
+        "text": "Chùm hạt alpha",
+        "at": [
+          187,
+          198
+        ]
+      },
+      {
+        "text": "Nguồn hạt alpha",
+        "at": [
+          113,
+          301
+        ]
+      },
+      {
+        "text": "Chì",
+        "at": [
+          382,
+          332
+        ]
+      },
+      {
+        "text": "Màn chắn",
+        "at": [
+          574,
+          332
+        ]
+      },
+      {
+        "text": "Lá vàng",
+        "at": [
+          571,
+          178
+        ]
+      },
+      {
+        "text": "Hạt alpha xuyên thẳng",
+        "at": [
+          733,
+          50
+        ]
+      },
+      {
+        "text": "Hạt alpha bị lệch",
+        "at": [
+          777,
+          195
+        ]
+      }
+    ],
+    "caption": "Thí nghiệm bắn phá lá vàng bằng các hạt alpha của Rutherford",
+    "captionAnchor": [
+      435,
+      378
+    ],
+    "leaders": [
+      {
+        "label": "backscatter",
+        "from": [
+          279,
+          89
+        ],
+        "to": [
+          347,
+          149
+        ]
+      },
+      {
+        "label": "beam",
+        "from": [
+          274,
+          197
+        ],
+        "to": [
+          316,
+          261
+        ]
+      },
+      {
+        "label": "source",
+        "from": [
+          207,
+          293
+        ],
+        "to": [
+          273,
+          293
+        ]
+      },
+      {
+        "label": "lead",
+        "from": [
+          357,
+          324
+        ],
+        "to": [
+          300,
+          300
+        ]
+      },
+      {
+        "label": "screen",
+        "from": [
+          519,
+          321
+        ],
+        "to": [
+          465,
+          286
+        ]
+      },
+      {
+        "label": "gold",
+        "from": [
+          525,
+          172
+        ],
+        "to": [
+          488,
+          159
+        ]
+      },
+      {
+        "label": "straight",
+        "from": [
+          604,
+          43
+        ],
+        "to": [
+          555,
+          111
+        ]
+      },
+      {
+        "label": "deflect",
+        "from": [
+          679,
+          185
+        ],
+        "to": [
+          625,
+          146
+        ]
+      }
+    ],
+    "foil": {
+      "polygon": [
+        [
+          434,
+          94
+        ],
+        [
+          509,
+          142
+        ],
+        [
+          509,
+          233
+        ],
+        [
+          434,
+          185
+        ]
+      ],
+      "color": "gold/yellow",
+      "rayOcclusion": "Raysthinvisibleacrossfoil/foilcolors,withedgesstillvisible;noholeadded."
+    },
+    "rayArrowEndpoints": [
+      [
+        306,
+        141
+      ],
+      [
+        596,
+        85
+      ],
+      [
+        606,
+        95
+      ],
+      [
+        637,
+        132
+      ],
+      [
+        553,
+        230
+      ]
+    ],
+    "rayStartsApprox": [
+      [
+        472,
+        165
+      ],
+      [
+        476,
+        165
+      ],
+      [
+        478,
+        164
+      ],
+      [
+        480,
+        164
+      ],
+      [
+        474,
+        168
+      ]
+    ],
+    "roundRay": {
+      "from": [
+        472,
+        165
+      ],
+      "to": [
+        505,
+        48
+      ],
+      "endpoint": "solidgraycircle radius3,noarrowhead"
+    },
+    "incomingBeam": {
+      "from": [
+        273,
+        293
+      ],
+      "to": [
+        473,
+        165
+      ],
+      "type": "twofineparallelboundaries,gray/goldbetween",
+      "noArrowAdded": true
+    },
+    "leadBlock": {
+      "vertices": [
+        [
+          235,
+          271
+        ],
+        [
+          272,
+          246
+        ],
+        [
+          309,
+          271
+        ],
+        [
+          309,
+          318
+        ],
+        [
+          272,
+          341
+        ],
+        [
+          235,
+          317
+        ]
+      ],
+      "faces": "3grayfaces/shaded",
+      "holeDiamond": [
+        [
+          261,
+          290
+        ],
+        [
+          272,
+          280
+        ],
+        [
+          284,
+          291
+        ],
+        [
+          272,
+          303
+        ]
+      ],
+      "sourceDot": [
+        273,
+        293
+      ],
+      "dotColor": "gold"
+    },
+    "screen": {
+      "outerTopEllipseBbox": [
+        297,
+        20,
+        647,
+        250
+      ],
+      "innerBackArcAnchors": [
+        [
+          306,
+          146
+        ],
+        [
+          327,
+          112
+        ],
+        [
+          378,
+          88
+        ],
+        [
+          443,
+          77
+        ],
+        [
+          503,
+          78
+        ],
+        [
+          565,
+          96
+        ],
+        [
+          617,
+          123
+        ],
+        [
+          641,
+          152
+        ]
+      ],
+      "frontVisibleWallAnchors": [
+        [
+          364,
+          222
+        ],
+        [
+          405,
+          239
+        ],
+        [
+          470,
+          249
+        ],
+        [
+          535,
+          242
+        ],
+        [
+          594,
+          223
+        ],
+        [
+          630,
+          195
+        ],
+        [
+          646,
+          154
+        ],
+        [
+          646,
+          211
+        ],
+        [
+          626,
+          250
+        ],
+        [
+          577,
+          277
+        ],
+        [
+          513,
+          296
+        ],
+        [
+          450,
+          300
+        ],
+        [
+          401,
+          291
+        ],
+        [
+          364,
+          276
+        ]
+      ],
+      "openingEdges": [
+        [
+          336,
+          203,
+          336,
+          251
+        ],
+        [
+          364,
+          222,
+          364,
+          276
+        ]
+      ],
+      "leftBackWall": [
+        [
+          297,
+          147
+        ],
+        [
+          299,
+          197
+        ],
+        [
+          308,
+          222
+        ],
+        [
+          336,
+          251
+        ],
+        [
+          336,
+          203
+        ]
+      ],
+      "occlusion": "Frontwallscreenshouldoccludelowerbackscene;beamvisiblethroughgapleftfrontbetween336and364,notcutstraightthroughgraywall."
+    },
+    "counts": "5scatterarrows(1back/2upper/1right/1lower)+1solidroundendray;noalpha-numbercounts/charges,alllabelsVietnameseasliteralalpha(notαsubstitution)."
+  },
+  "verdict": "Đọc source;chưaactualSVGreview."
+}
