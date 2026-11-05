@@ -1398,3 +1398,10 @@ Nhóm169đãxong15/20;1120/1030/1046ĐÃĐẠTđừngtrùng. CÒN765/1195/806/10
 -386ACIDRAINgiữmọiEnglishlabels/formulassubscript/4clouds1sun/4wavyUP2DOWN2runoffarrows/2+3factorychimneys/trees/lake/DDHpath. Smoke-rain-waterwaves-foliagepatternkhônggáncount. Đãsửa3facadecreamfactoryphải+chimneybehindwall,saufreshreview;4161cũCầnsửalưuriêng. Nativefull/zoom/freshactualSVG/hashsoátđộclập.
 -Chromium530/530/hash/XML/path/selfcontained/AST/build189/precache170/2613.23KiB/speed21/21đạt. SizegateđỏNỀNindex.tsnguyênbytekhôngnângmốc;phảixửlýtrướcgộp/deploy.Mainab81c625chưagộp/WOFF2khôngdiff. Chưa tích hợp/chưa reload offline app/chưa phát hành. Chưa tham vấn được cố vấn.
 -386/25/1402/251đãđạtđừngtrùng. Tiếpxếphạngnguồncònlaịtheosốrefsđểchọnnhómmới;138Glucose5%,753Sorbitolbaobì,1305LifebuoyTHẬTCHƯAsoátphânloạiđộclậpGIỮrasterkhôngvẽgiả/khôngcộngsốvẽ. Đọcnative/full/stem/refssocảhashmanifesttrướcdựng,rankingchỉgợiýkhôngduyệtalias. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.
+
+
+### 05/11 — Lô190: fructose ba nhãn số
+-1056 câu đủ mọi hình+DDH/7 một phần;778 nguồn→531 SVG;8646747byte/gzip1701894;650 nguồn còn lại.
+-2fructose3forms/18nums/allringHexplicit/CH2OHleftC6CfirstkhôngHOCH2/αC2CH2OHupOHdownvsβOHupCH2OHdown/HOupC3HupC4/4taper2horizontalbold/2⇌/(1)(2)(3)trueboldDDHpath. Nativefull/zoom/freshactualSVG/hashsoátđộclập;khôngalias1046.
+-Chromium531/531/hash/XML/path/selfcontained/AST/build190/precache170/2613.23KiB/speed21/21đạt. SizegateđỏNỀNindex.tsnguyênbytekhôngnângmốc;phảixửlýtrướcgộp/deploy.Mainab81c625chưagộp/WOFF2khôngdiff. Chưa tích hợp/chưa reload offline app/chưa phát hành. Chưa tham vấn được cố vấn.
+-Nguồn2đãđạtđừngtrùng. Tiếpnguồndùng2câucònmanifestchưađạt4/10/13/24/36/37/40/43/47/48/49/58/64/65...socảhashmanifest,đọcnativefull/stemrefschọnnhómmới.138/753/1305ảnhthậtcầnsoátphânloạiđộclậpGIỮrasterkhôngvẽgiả. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.

@@ -6886,6 +6886,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "0069e29920cf864e2d9ee63e924d3e01231d347e00c847bb41dc6a352e961629": {
+      "tep": "fructose-nhan-so-ddh-49e58d9c5d4ed86c0f73ac5a2d6541086d73b3d80c2de487fdc461ed163a2654.svg",
+      "hashSvg": "49e58d9c5d4ed86c0f73ac5a2d6541086d73b3d80c2de487fdc461ed163a2654",
+      "byteSvg": 43782,
+      "byteGzip": 4024,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "769181e586141340c81d5d1290ec5ffdd97b81579b743fd3aca476f5397a7f4f": {
       "tep": "nong-do-ddh-fdffcef0f9cdaecd89c1d7229733690ada26275558fddf0c695902b411b68bcb.svg",
       "hashSvg": "fdffcef0f9cdaecd89c1d7229733690ada26275558fddf0c695902b411b68bcb",
@@ -11719,6 +11728,20 @@
       ]
     },
     {
+      "qid": "12-KT-C2-D5-II-1",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "0069e29920cf864e2d9ee63e924d3e01231d347e00c847bb41dc6a352e961629",
+          "where": "12-KT-C2-D5-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "1112864d9f466d87785a26b9cc0ad1651a41759b3c51f74e84e2cc8c8e39e410",
+          "vector": "fructose-nhan-so-ddh-49e58d9c5d4ed86c0f73ac5a2d6541086d73b3d80c2de487fdc461ed163a2654.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-KT-C2-D5-II-4",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -15665,6 +15688,20 @@
           "where": "DB-12-B4-D3-I-155.hinh.3.du_lieu",
           "hashDataUrl": "794dc1929ef689869ec558e0ab016fcad39c5ed63170c26d74b39163892e0c9d",
           "vector": "haworth-ddh-f2a9d043d530350580e4759aec2a4a0a7db3f1f537323389fd2a146a8a276c5d.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D3-II-166",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "0069e29920cf864e2d9ee63e924d3e01231d347e00c847bb41dc6a352e961629",
+          "where": "DB-12-B4-D3-II-166.hinh.0.du_lieu",
+          "hashDataUrl": "1112864d9f466d87785a26b9cc0ad1651a41759b3c51f74e84e2cc8c8e39e410",
+          "vector": "fructose-nhan-so-ddh-49e58d9c5d4ed86c0f73ac5a2d6541086d73b3d80c2de487fdc461ed163a2654.svg"
         }
       ]
     },
@@ -24369,6 +24406,7 @@
     "12-KT-C2-D3-I-9",
     "12-KT-C2-D2-I-8",
     "12-KT-C2-D5-I-1",
+    "12-KT-C2-D5-II-1",
     "12-KT-C2-D5-II-4",
     "12-KT-C3-D1-I-8",
     "12-KT-C3-D3-I-4",
@@ -24605,6 +24643,7 @@
     "DB-12-B4-D3-III-150",
     "DB-12-B4-D3-I-152",
     "DB-12-B4-D3-I-155",
+    "DB-12-B4-D3-II-166",
     "DB-12-B4-D3-I-176",
     "DB-12-B4-D3-I-187",
     "DB-12-B4-D3-I-188",

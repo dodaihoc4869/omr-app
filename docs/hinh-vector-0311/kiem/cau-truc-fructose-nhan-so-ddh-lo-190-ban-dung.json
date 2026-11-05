@@ -1,0 +1,40 @@
+[
+  {
+    "i": 2,
+    "hash": "0069e29920cf864e2d9ee63e924d3e01231d347e00c847bb41dc6a352e961629",
+    "fileNguon": "anh/0069e29920cf864e2d9ee63e924d3e01231d347e00c847bb41dc6a352e961629.png",
+    "svg": "fructose-nhan-so-ddh-49e58d9c5d4ed86c0f73ac5a2d6541086d73b3d80c2de487fdc461ed163a2654.svg",
+    "hashSvg": "49e58d9c5d4ed86c0f73ac5a2d6541086d73b3d80c2de487fdc461ed163a2654",
+    "byteSvg": 43782,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C2-D5-II-1",
+        "de": "Fructose là một trong hai dạng monosaccharide phổ biến trong đời sống. Fructose tồn tại ở dạng mạch hở và chủ yếu tồn tại ở dạng mạch vòng như hình dưới đây, gồm ba công thức cấu tạo (1), (2) và (3).",
+        "refs": [
+          {
+            "hash": "0069e29920cf864e2d9ee63e924d3e01231d347e00c847bb41dc6a352e961629",
+            "where": "12-KT-C2-D5-II-1.hinh.0.du_lieu",
+            "hashDataUrl": "1112864d9f466d87785a26b9cc0ad1651a41759b3c51f74e84e2cc8c8e39e410"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-II-166",
+        "de": "Fructose là một trong hai dạng monosaccharide phổ biến trong đời sống. Fructose tồn tại ở dạng mạch hở và chủ yếu tồn tại ở dạng mạch vòng như hình dưới đây, gồm ba công thức cấu tạo (1), (2) và (3).",
+        "refs": [
+          {
+            "hash": "0069e29920cf864e2d9ee63e924d3e01231d347e00c847bb41dc6a352e961629",
+            "where": "DB-12-B4-D3-II-166.hinh.0.du_lieu",
+            "hashDataUrl": "1112864d9f466d87785a26b9cc0ad1651a41759b3c51f74e84e2cc8c8e39e410"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3forms/18nums/allringHexplicit/CH2OHleftC6textCfirstNOTHOCH2/αC2CH2OHupOHdown/βOHupCH2OHdown/HOupC3/HupC4/4taper2bold/2⇌/captions(1)(2)(3)truebold/noalias1046.",
+    "hashSvgDaSoat": "49e58d9c5d4ed86c0f73ac5a2d6541086d73b3d80c2de487fdc461ed163a2654",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

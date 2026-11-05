@@ -1,0 +1,753 @@
+{
+  "i": 2,
+  "hash": "0069e29920cf864e2d9ee63e924d3e01231d347e00c847bb41dc6a352e961629",
+  "fileNguon": "anh/0069e29920cf864e2d9ee63e924d3e01231d347e00c847bb41dc6a352e961629.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNative": true,
+  "zooms": [
+    "/workspace/scratch/cau4-fructose190-left-zoom.png",
+    "/workspace/scratch/cau4-fructose190-open-right-zoom.png"
+  ],
+  "questions": [
+    {
+      "qid": "12-KT-C2-D5-II-1",
+      "maDe": "12-KT-C2-D5",
+      "de": "Fructose là một trong hai dạng monosaccharide phổ biến trong đời sống. Fructose tồn tại ở dạng mạch hở và chủ yếu tồn tại ở dạng mạch vòng như hình dưới đây, gồm ba công thức cấu tạo (1), (2) và (3).",
+      "hinh": [
+        {
+          "hash": "0069e29920cf864e2d9ee63e924d3e01231d347e00c847bb41dc6a352e961629",
+          "where": "12-KT-C2-D5-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "1112864d9f466d87785a26b9cc0ad1651a41759b3c51f74e84e2cc8c8e39e410"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D3-II-166",
+      "maDe": "DB-12-B4-D3",
+      "de": "Fructose là một trong hai dạng monosaccharide phổ biến trong đời sống. Fructose tồn tại ở dạng mạch hở và chủ yếu tồn tại ở dạng mạch vòng như hình dưới đây, gồm ba công thức cấu tạo (1), (2) và (3).",
+      "hinh": [
+        {
+          "hash": "0069e29920cf864e2d9ee63e924d3e01231d347e00c847bb41dc6a352e961629",
+          "where": "DB-12-B4-D3-II-166.hinh.0.du_lieu",
+          "hashDataUrl": "1112864d9f466d87785a26b9cc0ad1651a41759b3c51f74e84e2cc8c8e39e410"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchorsapprox1–2px;sourceallCH2OH dùng Cfirst KHÔNG HOCH2.",
+    "left": {
+      "ring": {
+        "C5": [
+          206,
+          154
+        ],
+        "O": [
+          303,
+          126
+        ],
+        "C2": [
+          395,
+          154
+        ],
+        "C3": [
+          351,
+          216
+        ],
+        "C4": [
+          248,
+          216
+        ]
+      },
+      "groups": [
+        {
+          "text": "CH₂OH",
+          "at": [
+            240,
+            108
+          ],
+          "bond": [
+            [
+              206,
+              154
+            ],
+            [
+              206,
+              124
+            ]
+          ],
+          "bondTarget": "Cfirst",
+          "carbonNum": 6
+        },
+        {
+          "text": "CH₂OH",
+          "at": [
+            429,
+            118
+          ],
+          "bond": [
+            [
+              395,
+              154
+            ],
+            [
+              395,
+              134
+            ]
+          ],
+          "bondTarget": "Cfirst",
+          "carbonNum": 1
+        },
+        {
+          "text": "OH",
+          "at": [
+            403,
+            204
+          ],
+          "bond": [
+            [
+              395,
+              154
+            ],
+            [
+              395,
+              189
+            ]
+          ]
+        },
+        {
+          "text": "HO",
+          "at": [
+            340,
+            163
+          ],
+          "bond": [
+            [
+              351,
+              216
+            ],
+            [
+              351,
+              179
+            ]
+          ],
+          "bondTarget": "Oright"
+        },
+        {
+          "text": "H",
+          "at": [
+            351,
+            261
+          ],
+          "bond": [
+            [
+              351,
+              216
+            ],
+            [
+              351,
+              247
+            ]
+          ]
+        },
+        {
+          "text": "H",
+          "at": [
+            248,
+            163
+          ],
+          "bond": [
+            [
+              248,
+              216
+            ],
+            [
+              248,
+              178
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            257,
+            267
+          ],
+          "bond": [
+            [
+              248,
+              216
+            ],
+            [
+              248,
+              252
+            ]
+          ]
+        },
+        {
+          "text": "H",
+          "at": [
+            205,
+            227
+          ],
+          "bond": [
+            [
+              206,
+              154
+            ],
+            [
+              206,
+              213
+            ]
+          ]
+        }
+      ],
+      "numbers": {
+        "1": [
+          393,
+          94
+        ],
+        "2": [
+          405,
+          158
+        ],
+        "3": [
+          366,
+          232
+        ],
+        "4": [
+          237,
+          235
+        ],
+        "5": [
+          192,
+          157
+        ],
+        "6": [
+          206,
+          84
+        ]
+      },
+      "caption": "(1)",
+      "captionAnchor": [
+        255,
+        328
+      ],
+      "captionWeight": "bold",
+      "frontBonds": [
+        {
+          "from": [
+            206,
+            154
+          ],
+          "to": [
+            248,
+            216
+          ],
+          "style": "taper narrowatC5wideatC4"
+        },
+        {
+          "from": [
+            248,
+            216
+          ],
+          "to": [
+            351,
+            216
+          ],
+          "style": "boldhorizontal"
+        },
+        {
+          "from": [
+            351,
+            216
+          ],
+          "to": [
+            395,
+            154
+          ],
+          "style": "taper wideatC3narrowatC2"
+        }
+      ]
+    },
+    "open": {
+      "chain": [
+        [
+          677,
+          94
+        ],
+        [
+          677,
+          116
+        ],
+        [
+          677,
+          157
+        ],
+        [
+          677,
+          198
+        ],
+        [
+          677,
+          239
+        ],
+        [
+          677,
+          267
+        ]
+      ],
+      "top": {
+        "text": "CH₂OH",
+        "at": [
+          711,
+          78
+        ],
+        "carbonNum": 1,
+        "bondTarget": "Cfirst"
+      },
+      "bottom": {
+        "text": "CH₂OH",
+        "at": [
+          711,
+          282
+        ],
+        "carbonNum": 6,
+        "bondTarget": "Cfirst"
+      },
+      "carbonyl": {
+        "O": [
+          717,
+          118
+        ],
+        "segments": [
+          [
+            677,
+            113,
+            706,
+            113
+          ],
+          [
+            677,
+            120,
+            706,
+            120
+          ]
+        ]
+      },
+      "crossRows": [
+        {
+          "center": [
+            677,
+            157
+          ],
+          "leftText": "HO",
+          "leftLabelAt": [
+            626,
+            157
+          ],
+          "leftBond": [
+            [
+              677,
+              157
+            ],
+            [
+              648,
+              157
+            ]
+          ],
+          "rightText": "H",
+          "rightLabelAt": [
+            716,
+            158
+          ],
+          "rightBond": [
+            [
+              677,
+              157
+            ],
+            [
+              706,
+              157
+            ]
+          ]
+        },
+        {
+          "center": [
+            677,
+            198
+          ],
+          "leftText": "H",
+          "leftLabelAt": [
+            637,
+            198
+          ],
+          "leftBond": [
+            [
+              677,
+              198
+            ],
+            [
+              648,
+              198
+            ]
+          ],
+          "rightText": "OH",
+          "rightLabelAt": [
+            726,
+            198
+          ],
+          "rightBond": [
+            [
+              677,
+              198
+            ],
+            [
+              706,
+              198
+            ]
+          ]
+        },
+        {
+          "center": [
+            677,
+            239
+          ],
+          "leftText": "H",
+          "leftLabelAt": [
+            637,
+            239
+          ],
+          "leftBond": [
+            [
+              677,
+              239
+            ],
+            [
+              648,
+              239
+            ]
+          ],
+          "rightText": "OH",
+          "rightLabelAt": [
+            726,
+            239
+          ],
+          "rightBond": [
+            [
+              677,
+              239
+            ],
+            [
+              706,
+              239
+            ]
+          ]
+        }
+      ],
+      "numbers": {
+        "1": [
+          676,
+          54
+        ],
+        "2": [
+          669,
+          115
+        ],
+        "3": [
+          669,
+          143
+        ],
+        "4": [
+          669,
+          184
+        ],
+        "5": [
+          669,
+          225
+        ],
+        "6": [
+          667,
+          260
+        ]
+      },
+      "caption": "(2)",
+      "captionAnchor": [
+        653,
+        328
+      ],
+      "captionWeight": "bold"
+    },
+    "right": {
+      "ring": {
+        "C5": [
+          925,
+          156
+        ],
+        "O": [
+          1021,
+          128
+        ],
+        "C2": [
+          1113,
+          156
+        ],
+        "C3": [
+          1070,
+          218
+        ],
+        "C4": [
+          967,
+          218
+        ]
+      },
+      "groups": [
+        {
+          "text": "CH₂OH",
+          "at": [
+            957,
+            110
+          ],
+          "bond": [
+            [
+              925,
+              156
+            ],
+            [
+              925,
+              126
+            ]
+          ],
+          "bondTarget": "Cfirst",
+          "carbonNum": 6
+        },
+        {
+          "text": "OH",
+          "at": [
+            1122,
+            121
+          ],
+          "bond": [
+            [
+              1113,
+              156
+            ],
+            [
+              1113,
+              135
+            ]
+          ]
+        },
+        {
+          "text": "CH₂OH",
+          "at": [
+            1146,
+            207
+          ],
+          "bond": [
+            [
+              1113,
+              156
+            ],
+            [
+              1113,
+              191
+            ]
+          ],
+          "bondTarget": "Cfirst",
+          "carbonNum": 1
+        },
+        {
+          "text": "HO",
+          "at": [
+            1059,
+            165
+          ],
+          "bond": [
+            [
+              1070,
+              218
+            ],
+            [
+              1070,
+              180
+            ]
+          ],
+          "bondTarget": "Oright"
+        },
+        {
+          "text": "H",
+          "at": [
+            1070,
+            263
+          ],
+          "bond": [
+            [
+              1070,
+              218
+            ],
+            [
+              1070,
+              249
+            ]
+          ]
+        },
+        {
+          "text": "H",
+          "at": [
+            967,
+            165
+          ],
+          "bond": [
+            [
+              967,
+              218
+            ],
+            [
+              967,
+              179
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            976,
+            269
+          ],
+          "bond": [
+            [
+              967,
+              218
+            ],
+            [
+              967,
+              253
+            ]
+          ]
+        },
+        {
+          "text": "H",
+          "at": [
+            925,
+            229
+          ],
+          "bond": [
+            [
+              925,
+              156
+            ],
+            [
+              925,
+              214
+            ]
+          ]
+        }
+      ],
+      "numbers": {
+        "1": [
+          1115,
+          232
+        ],
+        "2": [
+          1124,
+          160
+        ],
+        "3": [
+          1084,
+          234
+        ],
+        "4": [
+          957,
+          237
+        ],
+        "5": [
+          911,
+          159
+        ],
+        "6": [
+          924,
+          86
+        ]
+      },
+      "caption": "(3)",
+      "captionAnchor": [
+        966,
+        328
+      ],
+      "captionWeight": "bold",
+      "frontBonds": [
+        {
+          "from": [
+            925,
+            156
+          ],
+          "to": [
+            967,
+            218
+          ],
+          "style": "taper narrowatC5wideatC4"
+        },
+        {
+          "from": [
+            967,
+            218
+          ],
+          "to": [
+            1070,
+            218
+          ],
+          "style": "boldhorizontal"
+        },
+        {
+          "from": [
+            1070,
+            218
+          ],
+          "to": [
+            1113,
+            156
+          ],
+          "style": "taper wideatC3narrowatC2"
+        }
+      ]
+    },
+    "equilibria": [
+      {
+        "upper": [
+          479,
+          178,
+          572,
+          178
+        ],
+        "direction": "right",
+        "lower": [
+          572,
+          185,
+          479,
+          185
+        ],
+        "lowerDirection": "left"
+      },
+      {
+        "upper": [
+          786,
+          174,
+          879,
+          174
+        ],
+        "direction": "right",
+        "lower": [
+          879,
+          181,
+          786,
+          181
+        ],
+        "lowerDirection": "left"
+      }
+    ],
+    "counts": "18carbonnumbers;2ringseach4implicitC+2CH2OHtext;open4implicitC+2CH2OHtext;each6C6O;3explicitHring1+3ring3+3open=9Hlabels. RingHO atC3up usesOrightnotH,CH2OH mustbondCfirst;noHOCH2aliases.",
+    "preserveCaptions": "PublicstemEXPLICITcalls(1),(2),(3):bắtbuộcgiữboldcaption,khôngcleanup."
+  },
+  "verdict": "Đọc source, chưa actualSVGreview."
+}
