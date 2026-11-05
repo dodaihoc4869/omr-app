@@ -1,0 +1,10 @@
+[
+  {
+    "i": 736,
+    "hashSvg": "d232d0c7a9a0de70ff96056ca29e2f60ee6c500c8246cfd51fac929bc1eef09b",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: Đã mở lại PNG native/full, đối chiếu AB/CD zoom nguồn; tự render actual SVG hiện tại bằng Chromium (/workspace/scratch/cau4-184-fresh.png), mở thêm crop BCD2x. Đủ A9/B17(14surface+3free)/C14(13surface+1free)/D12 và inset1 riêng; head filledcyan/tails hướng và chỗ kết thúc theo nguồn, không nối phântử hay tạojunction giữa12tail D. Đúng dirt nổi dần4panel, layernước/vậtliệu và biênsóng,occlusiontailtrêndirt,3arrow,4nhãn+leaders,insetcircle,captions(a)..(d). Không thêmcharge/data haytínhđápán; watermarkmờ vàmảngprintcắtngoàifigure khôngđượcbiếnthànhnộidung. DDH path tựchứa,mọi nhãn khôngchạm/cắt/tràn,exactSHA256 thực khớp metadata.",
+    "hash": "896d86f2ece3f5f1f916370fe2cb67a08f1b9acd56bc66f7e19e4f9881a9bdb3",
+    "hashSvgDaSoat": "d232d0c7a9a0de70ff96056ca29e2f60ee6c500c8246cfd51fac929bc1eef09b"
+  }
+]

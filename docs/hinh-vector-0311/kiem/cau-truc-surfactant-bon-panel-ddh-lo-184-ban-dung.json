@@ -1,0 +1,395 @@
+[
+  {
+    "i": 736,
+    "hash": "896d86f2ece3f5f1f916370fe2cb67a08f1b9acd56bc66f7e19e4f9881a9bdb3",
+    "fileNguon": "anh/896d86f2ece3f5f1f916370fe2cb67a08f1b9acd56bc66f7e19e4f9881a9bdb3.png",
+    "svg": "surfactant-bon-panel-ddh-d232d0c7a9a0de70ff96056ca29e2f60ee6c500c8246cfd51fac929bc1eef09b.svg",
+    "hashSvg": "d232d0c7a9a0de70ff96056ca29e2f60ee6c500c8246cfd51fac929bc1eef09b",
+    "byteSvg": 37985,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-12-B2-D1-II-198",
+        "de": "Tác dụng tẩy rửa của xà phòng và chất giặt rửa tổng hợp được mô tả ở hình dưới đây.\nMỗi phát biểu sau đây là đúng hay sai?",
+        "refs": [
+          {
+            "hash": "896d86f2ece3f5f1f916370fe2cb67a08f1b9acd56bc66f7e19e4f9881a9bdb3",
+            "where": "DB-12-B2-D1-II-198.hinh.0.du_lieu",
+            "hashDataUrl": "2bf7c17e279c598bb601ddb10f10a716b82f52b62a918871858ea3add6ec1ec8"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B2-D1-II-200",
+        "de": "Tác dụng tẩy rửa của xà phòng và chất giặt rửa tổng hợp được mô tả ở hình dưới đây: Mỗi phát biểu sau đây là đúng hay sai?",
+        "refs": [
+          {
+            "hash": "896d86f2ece3f5f1f916370fe2cb67a08f1b9acd56bc66f7e19e4f9881a9bdb3",
+            "where": "DB-12-B2-D1-II-200.hinh.0.du_lieu",
+            "hashDataUrl": "2bf7c17e279c598bb601ddb10f10a716b82f52b62a918871858ea3add6ec1ec8"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B2-VD-II-3",
+        "de": "Tác dụng tẩy rửa của xà phòng và chất giặt rửa tổng hợp được mô ta quả hình dưới đây: Mỗi phát biểu sau đây là đúng hay sai?",
+        "refs": [
+          {
+            "hash": "896d86f2ece3f5f1f916370fe2cb67a08f1b9acd56bc66f7e19e4f9881a9bdb3",
+            "where": "DH-12-C1-B2-VD-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "2bf7c17e279c598bb601ddb10f10a716b82f52b62a918871858ea3add6ec1ec8"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B2-II-20",
+        "de": "Tác dụng tẩy rửa của xà phòng và chất giặt rửa tổng hợp được mô tả ở hình dưới đây.\nMỗi phát biểu sau đây là đúng hay sai?",
+        "refs": [
+          {
+            "hash": "896d86f2ece3f5f1f916370fe2cb67a08f1b9acd56bc66f7e19e4f9881a9bdb3",
+            "where": "DH-12-C1-B2-II-20.hinh.0.du_lieu",
+            "hashDataUrl": "2bf7c17e279c598bb601ddb10f10a716b82f52b62a918871858ea3add6ec1ec8"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B2-II-23",
+        "de": "Tác dụng tẩy rửa của xà phòng và chất giặt rửa tổng hợp được mô tả ở hình dưới đây: Mỗi phát biểu sau đây là đúng hay sai?",
+        "refs": [
+          {
+            "hash": "896d86f2ece3f5f1f916370fe2cb67a08f1b9acd56bc66f7e19e4f9881a9bdb3",
+            "where": "DH-12-C1-B2-II-23.hinh.0.du_lieu",
+            "hashDataUrl": "2bf7c17e279c598bb601ddb10f10a716b82f52b62a918871858ea3add6ec1ec8"
+          }
+        ]
+      }
+    ],
+    "molecules": {
+      "A": [
+        [
+          272,
+          109,
+          279,
+          132
+        ],
+        [
+          310,
+          91,
+          311,
+          115
+        ],
+        [
+          338,
+          102,
+          326,
+          124
+        ],
+        [
+          361,
+          119,
+          369,
+          143
+        ],
+        [
+          235,
+          130,
+          239,
+          153
+        ],
+        [
+          221,
+          145,
+          233,
+          166
+        ],
+        [
+          265,
+          145,
+          255,
+          167
+        ],
+        [
+          306,
+          158,
+          315,
+          182
+        ],
+        [
+          342,
+          150,
+          329,
+          173
+        ]
+      ],
+      "B": [
+        [
+          425,
+          127,
+          429,
+          151
+        ],
+        [
+          448,
+          100,
+          456,
+          123
+        ],
+        [
+          563,
+          143,
+          550,
+          163
+        ],
+        [
+          411,
+          189,
+          412,
+          211
+        ],
+        [
+          423,
+          188,
+          436,
+          203
+        ],
+        [
+          435,
+          180,
+          447,
+          195
+        ],
+        [
+          447,
+          173,
+          457,
+          191
+        ],
+        [
+          461,
+          165,
+          467,
+          188
+        ],
+        [
+          479,
+          161,
+          479,
+          184
+        ],
+        [
+          494,
+          164,
+          489,
+          187
+        ],
+        [
+          507,
+          169,
+          500,
+          192
+        ],
+        [
+          519,
+          174,
+          511,
+          197
+        ],
+        [
+          531,
+          179,
+          524,
+          202
+        ],
+        [
+          543,
+          183,
+          538,
+          204
+        ],
+        [
+          555,
+          182,
+          553,
+          204
+        ],
+        [
+          570,
+          189,
+          570,
+          211
+        ],
+        [
+          582,
+          189,
+          582,
+          211
+        ]
+      ],
+      "C": [
+        [
+          749,
+          99,
+          736,
+          121
+        ],
+        [
+          649,
+          138,
+          668,
+          149
+        ],
+        [
+          661,
+          124,
+          673,
+          145
+        ],
+        [
+          677,
+          120,
+          677,
+          145
+        ],
+        [
+          693,
+          123,
+          683,
+          145
+        ],
+        [
+          707,
+          136,
+          688,
+          148
+        ],
+        [
+          712,
+          155,
+          690,
+          155
+        ],
+        [
+          705,
+          170,
+          695,
+          192
+        ],
+        [
+          718,
+          176,
+          710,
+          199
+        ],
+        [
+          730,
+          180,
+          724,
+          201
+        ],
+        [
+          743,
+          183,
+          737,
+          203
+        ],
+        [
+          646,
+          158,
+          668,
+          158
+        ],
+        [
+          659,
+          174,
+          673,
+          193
+        ],
+        [
+          649,
+          184,
+          661,
+          202
+        ]
+      ],
+      "D": [
+        [
+          868,
+          85,
+          869,
+          110
+        ],
+        [
+          886,
+          88,
+          876,
+          111
+        ],
+        [
+          852,
+          90,
+          863,
+          111
+        ],
+        [
+          899,
+          101,
+          878,
+          114
+        ],
+        [
+          840,
+          103,
+          861,
+          115
+        ],
+        [
+          904,
+          118,
+          880,
+          119
+        ],
+        [
+          836,
+          120,
+          860,
+          120
+        ],
+        [
+          900,
+          136,
+          878,
+          125
+        ],
+        [
+          841,
+          137,
+          862,
+          125
+        ],
+        [
+          854,
+          149,
+          864,
+          128
+        ],
+        [
+          888,
+          149,
+          876,
+          128
+        ],
+        [
+          870,
+          154,
+          870,
+          130
+        ]
+      ]
+    },
+    "ghiChuDung": "4panel9/17/14/12heads+insethead/3arrows/4labelsleaders/captions(a)..(d)/water-materiallayers/dirt. Watermarkpublisherbackgroundnotcontent,ngoàifiguretopfringeexcluded.",
+    "hashSvgDaSoat": "d232d0c7a9a0de70ff96056ca29e2f60ee6c500c8246cfd51fac929bc1eef09b",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

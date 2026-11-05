@@ -1,0 +1,737 @@
+{
+  "i": 736,
+  "hash": "896d86f2ece3f5f1f916370fe2cb67a08f1b9acd56bc66f7e19e4f9881a9bdb3",
+  "fileNguon": "anh/896d86f2ece3f5f1f916370fe2cb67a08f1b9acd56bc66f7e19e4f9881a9bdb3.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNative": true,
+  "zoomFiles": [
+    "/workspace/scratch/cau4-184-ab.png",
+    "/workspace/scratch/cau4-184-cd.png"
+  ],
+  "questions": [
+    {
+      "qid": "DB-12-B2-D1-II-198",
+      "maDe": "DB-12-B2-D1",
+      "de": "Tác dụng tẩy rửa của xà phòng và chất giặt rửa tổng hợp được mô tả ở hình dưới đây.\nMỗi phát biểu sau đây là đúng hay sai?",
+      "hinh": [
+        {
+          "hash": "896d86f2ece3f5f1f916370fe2cb67a08f1b9acd56bc66f7e19e4f9881a9bdb3",
+          "where": "DB-12-B2-D1-II-198.hinh.0.du_lieu",
+          "hashDataUrl": "2bf7c17e279c598bb601ddb10f10a716b82f52b62a918871858ea3add6ec1ec8"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B2-D1-II-200",
+      "maDe": "DB-12-B2-D1",
+      "de": "Tác dụng tẩy rửa của xà phòng và chất giặt rửa tổng hợp được mô tả ở hình dưới đây: Mỗi phát biểu sau đây là đúng hay sai?",
+      "hinh": [
+        {
+          "hash": "896d86f2ece3f5f1f916370fe2cb67a08f1b9acd56bc66f7e19e4f9881a9bdb3",
+          "where": "DB-12-B2-D1-II-200.hinh.0.du_lieu",
+          "hashDataUrl": "2bf7c17e279c598bb601ddb10f10a716b82f52b62a918871858ea3add6ec1ec8"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C1-B2-VD-II-3",
+      "maDe": "DH-12-C1-B2-VD",
+      "de": "Tác dụng tẩy rửa của xà phòng và chất giặt rửa tổng hợp được mô ta quả hình dưới đây: Mỗi phát biểu sau đây là đúng hay sai?",
+      "hinh": [
+        {
+          "hash": "896d86f2ece3f5f1f916370fe2cb67a08f1b9acd56bc66f7e19e4f9881a9bdb3",
+          "where": "DH-12-C1-B2-VD-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "2bf7c17e279c598bb601ddb10f10a716b82f52b62a918871858ea3add6ec1ec8"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C1-B2-II-20",
+      "maDe": "DH-12-C1-B2",
+      "de": "Tác dụng tẩy rửa của xà phòng và chất giặt rửa tổng hợp được mô tả ở hình dưới đây.\nMỗi phát biểu sau đây là đúng hay sai?",
+      "hinh": [
+        {
+          "hash": "896d86f2ece3f5f1f916370fe2cb67a08f1b9acd56bc66f7e19e4f9881a9bdb3",
+          "where": "DH-12-C1-B2-II-20.hinh.0.du_lieu",
+          "hashDataUrl": "2bf7c17e279c598bb601ddb10f10a716b82f52b62a918871858ea3add6ec1ec8"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C1-B2-II-23",
+      "maDe": "DH-12-C1-B2",
+      "de": "Tác dụng tẩy rửa của xà phòng và chất giặt rửa tổng hợp được mô tả ở hình dưới đây: Mỗi phát biểu sau đây là đúng hay sai?",
+      "hinh": [
+        {
+          "hash": "896d86f2ece3f5f1f916370fe2cb67a08f1b9acd56bc66f7e19e4f9881a9bdb3",
+          "where": "DH-12-C1-B2-II-23.hinh.0.du_lieu",
+          "hashDataUrl": "2bf7c17e279c598bb601ddb10f10a716b82f52b62a918871858ea3add6ec1ec8"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Native anchors approximate1–3px due scan; arrays [headX,headY,tailEndX,tailEndY]. Tail ends visible gray strokes, không nối chung tâm, không suy count từ lý thuyết.",
+    "frames": [
+      [
+        190,
+        61,
+        386,
+        260
+      ],
+      [
+        398,
+        61,
+        592,
+        260
+      ],
+      [
+        605,
+        61,
+        798,
+        260
+      ],
+      [
+        811,
+        61,
+        1008,
+        260
+      ]
+    ],
+    "panelA": {
+      "molecules": [
+        [
+          221,
+          145,
+          232,
+          166
+        ],
+        [
+          235,
+          130,
+          241,
+          152
+        ],
+        [
+          265,
+          145,
+          255,
+          168
+        ],
+        [
+          272,
+          109,
+          279,
+          133
+        ],
+        [
+          306,
+          158,
+          314,
+          182
+        ],
+        [
+          310,
+          91,
+          310,
+          116
+        ],
+        [
+          338,
+          103,
+          327,
+          123
+        ],
+        [
+          342,
+          151,
+          332,
+          172
+        ],
+        [
+          361,
+          119,
+          370,
+          142
+        ]
+      ],
+      "count": 9,
+      "dirtOutlineApprox": [
+        [
+          219,
+          201
+        ],
+        [
+          247,
+          181
+        ],
+        [
+          268,
+          177
+        ],
+        [
+          286,
+          179
+        ],
+        [
+          313,
+          193
+        ],
+        [
+          356,
+          200
+        ],
+        [
+          356,
+          205
+        ],
+        [
+          219,
+          205
+        ]
+      ]
+    },
+    "panelB": {
+      "freeMolecules": [
+        [
+          425,
+          127,
+          430,
+          151
+        ],
+        [
+          448,
+          100,
+          456,
+          123
+        ],
+        [
+          563,
+          143,
+          550,
+          164
+        ]
+      ],
+      "surfaceMolecules": [
+        [
+          411,
+          189,
+          411,
+          206
+        ],
+        [
+          423,
+          188,
+          435,
+          204
+        ],
+        [
+          435,
+          180,
+          446,
+          198
+        ],
+        [
+          447,
+          173,
+          458,
+          194
+        ],
+        [
+          461,
+          165,
+          471,
+          188
+        ],
+        [
+          479,
+          161,
+          478,
+          188
+        ],
+        [
+          494,
+          164,
+          488,
+          188
+        ],
+        [
+          507,
+          169,
+          500,
+          194
+        ],
+        [
+          519,
+          174,
+          511,
+          200
+        ],
+        [
+          531,
+          179,
+          524,
+          204
+        ],
+        [
+          543,
+          183,
+          537,
+          204
+        ],
+        [
+          555,
+          182,
+          550,
+          205
+        ],
+        [
+          570,
+          189,
+          570,
+          207
+        ],
+        [
+          582,
+          189,
+          583,
+          207
+        ]
+      ],
+      "total": 17,
+      "dirtOutlineApprox": [
+        [
+          426,
+          202
+        ],
+        [
+          451,
+          185
+        ],
+        [
+          479,
+          176
+        ],
+        [
+          499,
+          178
+        ],
+        [
+          528,
+          193
+        ],
+        [
+          563,
+          199
+        ],
+        [
+          563,
+          205
+        ],
+        [
+          426,
+          205
+        ]
+      ]
+    },
+    "panelC": {
+      "freeMolecules": [
+        [
+          749,
+          99,
+          737,
+          122
+        ]
+      ],
+      "surfaceMolecules": [
+        [
+          649,
+          138,
+          664,
+          148
+        ],
+        [
+          661,
+          124,
+          668,
+          142
+        ],
+        [
+          677,
+          120,
+          677,
+          145
+        ],
+        [
+          693,
+          123,
+          685,
+          143
+        ],
+        [
+          707,
+          136,
+          688,
+          148
+        ],
+        [
+          712,
+          155,
+          695,
+          158
+        ],
+        [
+          705,
+          170,
+          691,
+          192
+        ],
+        [
+          718,
+          176,
+          710,
+          201
+        ],
+        [
+          730,
+          180,
+          722,
+          201
+        ],
+        [
+          743,
+          183,
+          736,
+          201
+        ],
+        [
+          646,
+          158,
+          668,
+          157
+        ],
+        [
+          659,
+          174,
+          673,
+          190
+        ],
+        [
+          649,
+          184,
+          662,
+          202
+        ]
+      ],
+      "total": 14,
+      "dirtOutlineApprox": [
+        [
+          649,
+          203
+        ],
+        [
+          665,
+          188
+        ],
+        [
+          670,
+          173
+        ],
+        [
+          660,
+          165
+        ],
+        [
+          654,
+          154
+        ],
+        [
+          658,
+          144
+        ],
+        [
+          672,
+          139
+        ],
+        [
+          687,
+          141
+        ],
+        [
+          700,
+          151
+        ],
+        [
+          699,
+          161
+        ],
+        [
+          688,
+          174
+        ],
+        [
+          695,
+          186
+        ],
+        [
+          716,
+          196
+        ],
+        [
+          743,
+          201
+        ],
+        [
+          743,
+          205
+        ],
+        [
+          649,
+          205
+        ]
+      ]
+    },
+    "panelD": {
+      "molecules": [
+        [
+          868,
+          85,
+          868,
+          111
+        ],
+        [
+          886,
+          88,
+          877,
+          111
+        ],
+        [
+          852,
+          90,
+          860,
+          111
+        ],
+        [
+          899,
+          101,
+          882,
+          115
+        ],
+        [
+          840,
+          103,
+          853,
+          112
+        ],
+        [
+          904,
+          118,
+          885,
+          119
+        ],
+        [
+          836,
+          120,
+          855,
+          120
+        ],
+        [
+          900,
+          136,
+          884,
+          128
+        ],
+        [
+          841,
+          137,
+          857,
+          128
+        ],
+        [
+          854,
+          149,
+          862,
+          134
+        ],
+        [
+          888,
+          149,
+          879,
+          133
+        ],
+        [
+          870,
+          154,
+          870,
+          135
+        ]
+      ],
+      "count": 12,
+      "dirtCircle": [
+        870,
+        119,
+        25
+      ],
+      "allHeadsOutside": true,
+      "tailInnerGap": "Tails chìm vào vùng nâu nhưng vẫn đểkhoảngtrống center, không nối nhau."
+    },
+    "inset": {
+      "circle": [
+        210,
+        85,
+        36
+      ],
+      "head": [
+        217,
+        72,
+        10
+      ],
+      "tailEnd": [
+        195,
+        111
+      ],
+      "notCountedInPanelA9": true,
+      "fill": "headcyan/tailcyan; nềntrắng, circleoutlinebrownblack chepanelborder"
+    },
+    "labels": [
+      {
+        "text": "Đầu ưa nước",
+        "anchor": [
+          210,
+          27
+        ],
+        "leader": [
+          [
+            229,
+            31
+          ],
+          [
+            219,
+            64
+          ]
+        ]
+      },
+      {
+        "text": "Đuôi kị nước",
+        "anchor": [
+          15,
+          94
+        ],
+        "leader": [
+          [
+            157,
+            91
+          ],
+          [
+            207,
+            91
+          ]
+        ]
+      },
+      {
+        "text": "Vết bẩn dầu mỡ",
+        "anchor": [
+          5,
+          195
+        ],
+        "leader": [
+          [
+            181,
+            191
+          ],
+          [
+            264,
+            191
+          ]
+        ]
+      },
+      {
+        "text": "Vật liệu",
+        "anchor": [
+          91,
+          251
+        ],
+        "leader": [
+          [
+            180,
+            243
+          ],
+          [
+            264,
+            243
+          ]
+        ]
+      }
+    ],
+    "captions": [
+      {
+        "text": "(a)",
+        "at": [
+          288,
+          289
+        ]
+      },
+      {
+        "text": "(b)",
+        "at": [
+          496,
+          289
+        ]
+      },
+      {
+        "text": "(c)",
+        "at": [
+          701,
+          289
+        ]
+      },
+      {
+        "text": "(d)",
+        "at": [
+          909,
+          289
+        ]
+      }
+    ],
+    "arrows": [
+      {
+        "from": [
+          376,
+          160
+        ],
+        "to": [
+          405,
+          160
+        ]
+      },
+      {
+        "from": [
+          584,
+          160
+        ],
+        "to": [
+          614,
+          160
+        ]
+      },
+      {
+        "from": [
+          789,
+          160
+        ],
+        "to": [
+          820,
+          160
+        ]
+      }
+    ],
+    "layers": {
+      "water": "palecyan y65..205",
+      "whitePinkBand": "y205..213 nearwhite then pale pink y213..238",
+      "material": "pale pink darker lower with wavy top around y229..239,bottom257"
+    },
+    "colors": "Heads filledcyan/darkeroutline; tailsgray-blue; dirtbrown; arrowblue; framescyan; nocharges/numbersadditional.",
+    "excludedNonFigure": "Watermark mờ KẾT NỐI TRI THỨC VỚI CUỘC SỐNG trải 4panel không mangdata; mảng in cắt sát mép trên y0..7 ngoàifigure khôngphảiđường/nội dungcầnkhôiphục."
+  },
+  "verdict": "Đọc nguồn; chưa duyệt SVG. Không tựtính sốphântử/chemanswer,không đếm inset vào9."
+}
