@@ -737,7 +737,9 @@
       }
     ],
     "chiLaDuLieuDungChuaSoatRender": true,
-    "daCoManifestTaiCheckpoint": false
+    "daCoManifestTaiCheckpoint": true,
+    "svgDaChon": "ms-sulfur-ddh-c60b4416d3658ecbdda44d9ce92f96f9ad1f8ab3e4a9a7b73d51e6c24c0a37e6.svg",
+    "hashSvgDaChon": "c60b4416d3658ecbdda44d9ce92f96f9ad1f8ab3e4a9a7b73d51e6c24c0a37e6"
   },
   {
     "i": 806,

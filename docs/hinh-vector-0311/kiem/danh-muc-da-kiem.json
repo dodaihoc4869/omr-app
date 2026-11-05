@@ -1594,6 +1594,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "d870a8f44437563c0509c17e0b33d23fb0e4b5d422193822aa75b441e685b955": {
+      "tep": "ms-sulfur-ddh-c60b4416d3658ecbdda44d9ce92f96f9ad1f8ab3e4a9a7b73d51e6c24c0a37e6.svg",
+      "hashSvg": "c60b4416d3658ecbdda44d9ce92f96f9ad1f8ab3e4a9a7b73d51e6c24c0a37e6",
+      "byteSvg": 35128,
+      "byteGzip": 7450,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "f4f7b22b19489642ca15e4d982f03ac203813886d36b5df70bbfe3bcc9027565": {
       "tep": "nhan-orbital-config-ddh-1f5d2faaff9a85c9c0911c71f62892c42d65b9801c1851b1f850c090ab93b409.svg",
       "hashSvg": "1f5d2faaff9a85c9c0911c71f62892c42d65b9801c1851b1f850c090ab93b409",
@@ -13771,6 +13780,20 @@
       ]
     },
     {
+      "qid": "DB-11-B7-D2-III-65",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "d870a8f44437563c0509c17e0b33d23fb0e4b5d422193822aa75b441e685b955",
+          "where": "DB-11-B7-D2-III-65.hinh.0.du_lieu",
+          "hashDataUrl": "ee2656284e46dab9c7052446ce0b99e3a810843c7ae72fc4a5fc8aae05bc0628",
+          "vector": "ms-sulfur-ddh-c60b4416d3658ecbdda44d9ce92f96f9ad1f8ab3e4a9a7b73d51e6c24c0a37e6.svg"
+        }
+      ]
+    },
+    {
       "qid": "DB-11-B8-D1-I-26",
       "duMoiHinh": true,
       "soHinhNguon": 4,
@@ -19547,6 +19570,20 @@
       ]
     },
     {
+      "qid": "DH-11-C2-B7-III-8",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "d870a8f44437563c0509c17e0b33d23fb0e4b5d422193822aa75b441e685b955",
+          "where": "DH-11-C2-B7-III-8.hinh.0.du_lieu",
+          "hashDataUrl": "ee2656284e46dab9c7052446ce0b99e3a810843c7ae72fc4a5fc8aae05bc0628",
+          "vector": "ms-sulfur-ddh-c60b4416d3658ecbdda44d9ce92f96f9ad1f8ab3e4a9a7b73d51e6c24c0a37e6.svg"
+        }
+      ]
+    },
+    {
       "qid": "DH-11-C2-B6-VD-III-3",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -23878,6 +23915,7 @@
     "DB-11-B5-D2-I-55",
     "DB-11-B5-D2-I-94",
     "DB-11-B6-D3-III-4",
+    "DB-11-B7-D2-III-65",
     "DB-11-B8-D1-I-26",
     "DB-11-B8-D5-II-9",
     "DB-12-B1-P1-D2-I-12",
@@ -24232,6 +24270,7 @@
     "DH-11-C2-B6-II-5",
     "DH-11-C2-B6-III-28",
     "DH-11-C2-B6-III-33",
+    "DH-11-C2-B7-III-8",
     "DH-11-C2-B6-VD-III-3",
     "DH-11-C2-B8-I-2",
     "DH-11-C2-B8-II-18",

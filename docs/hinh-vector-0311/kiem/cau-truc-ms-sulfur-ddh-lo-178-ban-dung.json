@@ -1,0 +1,118 @@
+[
+  {
+    "i": 1195,
+    "hash": "d870a8f44437563c0509c17e0b33d23fb0e4b5d422193822aa75b441e685b955",
+    "fileNguon": "anh/d870a8f44437563c0509c17e0b33d23fb0e4b5d422193822aa75b441e685b955.png",
+    "canvas": [
+      514,
+      361
+    ],
+    "daMoNative": true,
+    "kind": "MS-sulfur",
+    "xLabel": "m/z",
+    "yLabel": "Cường độ tương đối (%)",
+    "xTickLabels": [
+      30,
+      60,
+      90,
+      120,
+      150,
+      180,
+      210,
+      240,
+      270
+    ],
+    "yTickLabels": [
+      0,
+      20,
+      40,
+      60,
+      80,
+      100,
+      120
+    ],
+    "geometry": {
+      "origin": [
+        65,
+        305
+      ],
+      "topY": 10,
+      "prominentBarsPixels": [
+        [
+          160,
+          92,
+          305
+        ],
+        [
+          204,
+          253,
+          305
+        ],
+        [
+          249,
+          204,
+          305
+        ],
+        [
+          295,
+          163,
+          305
+        ],
+        [
+          345,
+          254,
+          305
+        ],
+        [
+          392,
+          295,
+          305
+        ],
+        [
+          434,
+          129,
+          305
+        ],
+        [
+          442,
+          248,
+          305
+        ]
+      ]
+    },
+    "molecularLabel": "[M⁺] = 256",
+    "notes": "Nguồn[M⁺]=256labeltrênbarphảiRÕ,khôngsuySatommultiple/câutrảlời.Largestsignaltráiy100nearx160,molecularbar256height~80.CácbarKHÔNGmzlabelsriêng,khôngtựgắn64/96/128/160/192/224/258.Vạchdọcđenmépphải~504làFRAMEkhôngpeak. 8prominentbarsvisible,cáckýhiệuscanspeckkhôngdatapoints,allminipeakchưatựchứngnhận.",
+    "questions": [
+      {
+        "qid": "DB-11-B7-D2-III-65",
+        "de": "Phổ MS của đơn chất sulfur (Sₙ) được cho ở hình dưới đây: Dựa vào phổ MS hãy xác định giá trị của n trong đơn chất sulfur?",
+        "refs": [
+          {
+            "where": "DB-11-B7-D2-III-65.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B7-III-8",
+        "de": "Phổ MS của đơn chất sulfur (Sₙ) được cho ở hình dưới đây: Dựa vào phổ MS hãy xác định giá trị của n trong đơn chất sulfur?",
+        "refs": [
+          {
+            "where": "DH-11-C2-B7-III-8.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daCoManifestTaiCheckpoint": false,
+    "svg": "ms-sulfur-ddh-c60b4416d3658ecbdda44d9ce92f96f9ad1f8ab3e4a9a7b73d51e6c24c0a37e6.svg",
+    "hashSvg": "c60b4416d3658ecbdda44d9ce92f96f9ad1f8ab3e4a9a7b73d51e6c24c0a37e6",
+    "byteSvg": 35128,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "8peaksnativeheight/frame3sides/noextraMzpeaklabels/noheightnormalization/Y0..120/X30..270/Msup+256/DDHpath.",
+    "hashSvgDaSoat": "c60b4416d3658ecbdda44d9ce92f96f9ad1f8ab3e4a9a7b73d51e6c24c0a37e6",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

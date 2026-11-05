@@ -1314,3 +1314,10 @@ Nhóm169đãxong15/20;1120/1030/1046ĐÃĐẠTđừngtrùng. CÒN765/1195/806/10
 -1416ba dạngα-glucose/mạchhở/β-glucose,18sốC/allH-OH/2cặp⇌/2OHboxdashed/2curvedleader+OHhemiacetal/3caption. GiữalphaC4HOdown,betaC4OHdown theo glyph nguồn. TừngPNGnative/full+actualSVG/exacthashsoátđộclập.
 -Chromium518/518/hash/XML/path/selfcontained/AST/build177/precache170/2613.23KiB/speed21/21đạt. SizegateđỏNỀNindex.tsnguyênbytekhôngnângmốc;phảixửlýtrướcgộp/deploy.Mainab81c625chưagộp/WOFF2khôngdiff. Chưa tích hợp/chưa reload offline app/chưa phát hành. Chưa tham vấn được cố vấn.
 -Nhóm169đãđạt16/20;còn765/1195/806/1028chưadựng. 1416/1046/1120/1030đãđạtđừngtrùng.765MSweakbaselinehairlines/1195sulfur/806aniline/1028curvesgiữtick/label/pixelkhôngsuytheory. Fullsource/publicde/refs/geometrykiem/doc-molecule-lo-169.json. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.
+
+
+### 05/11 — Lô178: phổ MS sulfur
+-1019 câu đủ mọi hình+DDH/7 một phần;766 nguồn→519 SVG;8203769byte/gzip1620060;662 nguồn còn lại.
+-1195MSsulfur8đỉnhgiữpixelheight/vịtrí/frame3cạnh/X30..270/Y0..120/[Msup+]=256/chữDDHpath. Khôngnormalizeheight/khôngthêmnhãnmzpeak. PNGnative/full+actualSVG/hashsoátđộclập.
+-Chromium519/519/hash/XML/path/selfcontained/AST/build178/precache170/2613.23KiB/speed21/21đạt. SizegateđỏNỀNindex.tsnguyênbytekhôngnângmốc;phảixửlýtrướcgộp/deploy.Mainab81c625chưagộp/WOFF2khôngdiff. Chưa tích hợp/chưa reload offline app/chưa phát hành. Chưa tham vấn được cố vấn.
+-Nhóm169đãđạt17/20;còn765/806/1028chưadựng.1195ĐÃĐẠTđừngtrùng.765MSweakbaselinehairlines/806aniline/1028curvesgiữtick/label/pixelkhôngsuytheory. Fullsource/publicde/refs/geometrykiem/doc-molecule-lo-169.json. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.
