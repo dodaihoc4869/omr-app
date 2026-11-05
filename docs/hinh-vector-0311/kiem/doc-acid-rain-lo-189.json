@@ -1,0 +1,485 @@
+{
+  "i": 386,
+  "hash": "45002f0511a3f63ddde829cf1f5281e0e84339978834992e3b938349fc1e37f9",
+  "fileNguon": "anh/45002f0511a3f63ddde829cf1f5281e0e84339978834992e3b938349fc1e37f9.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNative": true,
+  "zoom": "/workspace/scratch/cau4-acid189-zoom.png",
+  "questions": [
+    {
+      "qid": "DB-11-B6-D2-II-60",
+      "maDe": "DB-11-B6-D2",
+      "de": "Hình ảnh dưới đây mô tả quá trình hình thành mưa acid: Mỗi phát biểu sau đây là đúng hay sai?",
+      "hinh": [
+        {
+          "hash": "45002f0511a3f63ddde829cf1f5281e0e84339978834992e3b938349fc1e37f9",
+          "where": "DB-11-B6-D2-II-60.hinh.0.du_lieu",
+          "hashDataUrl": "4f3ec2da9d4f114f1fc6a7977114e2f4b8b61130a92093fc95a243772f5d8966"
+        }
+      ]
+    },
+    {
+      "qid": "DH-11-C2-B6-II-19",
+      "maDe": "DH-11-C2-B6",
+      "de": "Hình ảnh dưới đây mô tả quá trình hình thành mưa acid: Mỗi phát biểu sau đây là đúng hay sai?",
+      "hinh": [
+        {
+          "hash": "45002f0511a3f63ddde829cf1f5281e0e84339978834992e3b938349fc1e37f9",
+          "where": "DH-11-C2-B6-II-19.hinh.0.du_lieu",
+          "hashDataUrl": "4f3ec2da9d4f114f1fc6a7977114e2f4b8b61130a92093fc95a243772f5d8966"
+        }
+      ]
+    },
+    {
+      "qid": "DH-11-C2-B6-VD-II-1",
+      "maDe": "DH-11-C2-B6-VD",
+      "de": "Hình ảnh dưới đây mô tả quá trình hình thành mưa acid: Mỗi phát biểu sau đây là đúng hay sai?",
+      "hinh": [
+        {
+          "hash": "45002f0511a3f63ddde829cf1f5281e0e84339978834992e3b938349fc1e37f9",
+          "where": "DH-11-C2-B6-VD-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "4f3ec2da9d4f114f1fc6a7977114e2f4b8b61130a92093fc95a243772f5d8966"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–3pxapprox,scenegeometrysemantic; khôngđịnhlượngrain/foliage/smokeparticles.",
+    "labels": [
+      {
+        "text": "ACID RAIN",
+        "at": [
+          232,
+          24
+        ]
+      },
+      {
+        "text": "H₂SO₄",
+        "at": [
+          46,
+          129
+        ]
+      },
+      {
+        "text": "HNO₃",
+        "at": [
+          140,
+          129
+        ]
+      },
+      {
+        "text": "H₂O",
+        "at": [
+          305,
+          82
+        ]
+      },
+      {
+        "text": "NO₂",
+        "at": [
+          238,
+          170
+        ]
+      },
+      {
+        "text": "SO₂",
+        "at": [
+          342,
+          171
+        ]
+      },
+      {
+        "text": "Trees killed",
+        "at": [
+          70,
+          196
+        ],
+        "color": "red-orange"
+      },
+      {
+        "text": "by acid rain",
+        "at": [
+          71,
+          210
+        ],
+        "color": "red-orange"
+      }
+    ],
+    "clouds": [
+      {
+        "bbox": [
+          18,
+          53,
+          159,
+          112
+        ],
+        "kind": "largeraincloudleft"
+      },
+      {
+        "bbox": [
+          240,
+          49,
+          364,
+          101
+        ],
+        "kind": "largewatercloudright"
+      },
+      {
+        "bbox": [
+          180,
+          46,
+          226,
+          67
+        ],
+        "kind": "smalltopcloud"
+      },
+      {
+        "bbox": [
+          396,
+          101,
+          442,
+          120
+        ],
+        "kind": "smallrightcloud"
+      }
+    ],
+    "sun": {
+      "center": [
+        193,
+        92
+      ],
+      "radius": 17,
+      "rays": "yellowgold,sunbehindemptyspacebetweenlargeclouds"
+    },
+    "wavyUpArrows": [
+      {
+        "anchors": [
+          [
+            223,
+            153
+          ],
+          [
+            226,
+            145
+          ],
+          [
+            221,
+            133
+          ],
+          [
+            223,
+            121
+          ],
+          [
+            222,
+            111
+          ],
+          [
+            223,
+            103
+          ]
+        ],
+        "head": [
+          223,
+          103
+        ]
+      },
+      {
+        "anchors": [
+          [
+            248,
+            153
+          ],
+          [
+            251,
+            145
+          ],
+          [
+            246,
+            133
+          ],
+          [
+            249,
+            121
+          ],
+          [
+            247,
+            111
+          ],
+          [
+            248,
+            103
+          ]
+        ],
+        "head": [
+          248,
+          103
+        ]
+      },
+      {
+        "anchors": [
+          [
+            328,
+            153
+          ],
+          [
+            331,
+            145
+          ],
+          [
+            326,
+            133
+          ],
+          [
+            328,
+            121
+          ],
+          [
+            326,
+            111
+          ],
+          [
+            326,
+            103
+          ]
+        ],
+        "head": [
+          326,
+          103
+        ]
+      },
+      {
+        "anchors": [
+          [
+            353,
+            153
+          ],
+          [
+            355,
+            145
+          ],
+          [
+            350,
+            133
+          ],
+          [
+            353,
+            121
+          ],
+          [
+            351,
+            111
+          ],
+          [
+            351,
+            103
+          ]
+        ],
+        "head": [
+          351,
+          103
+        ]
+      }
+    ],
+    "downArrows": [
+      {
+        "type": "broadredfilled",
+        "polygonApprox": [
+          [
+            82,
+            111
+          ],
+          [
+            97,
+            106
+          ],
+          [
+            97,
+            132
+          ],
+          [
+            106,
+            132
+          ],
+          [
+            88,
+            158
+          ],
+          [
+            74,
+            133
+          ],
+          [
+            81,
+            133
+          ]
+        ],
+        "tip": [
+          88,
+          158
+        ]
+      },
+      {
+        "type": "straightredthinfilled",
+        "from": [
+          112,
+          161
+        ],
+        "to": [
+          112,
+          214
+        ],
+        "tip": [
+          112,
+          214
+        ]
+      }
+    ],
+    "runoffArrows": [
+      {
+        "from": [
+          210,
+          252
+        ],
+        "to": [
+          190,
+          266
+        ],
+        "head": [
+          190,
+          266
+        ]
+      },
+      {
+        "from": [
+          179,
+          279
+        ],
+        "to": [
+          202,
+          289
+        ],
+        "head": [
+          202,
+          289
+        ]
+      }
+    ],
+    "factories": {
+      "left": {
+        "bbox": [
+          215,
+          185,
+          282,
+          247
+        ],
+        "chimneys": [
+          [
+            224,
+            187,
+            232,
+            222
+          ],
+          [
+            244,
+            185,
+            252,
+            222
+          ]
+        ],
+        "mainbuilding": [
+          216,
+          220,
+          259,
+          246
+        ],
+        "windows": "3visiblefrontwindows,notnewnumbers"
+      },
+      "right": {
+        "bbox": [
+          294,
+          189,
+          386,
+          252
+        ],
+        "sawtoothSections": 3,
+        "chimneysBlue": [
+          [
+            315,
+            189,
+            326,
+            220
+          ],
+          [
+            351,
+            207,
+            360,
+            232
+          ],
+          [
+            379,
+            215,
+            386,
+            244
+          ]
+        ],
+        "smoke": "palewhitesmokeupbehindredarrows/labels,notparticlecount"
+      }
+    },
+    "deadTrees": {
+      "bbox": [
+        69,
+        211,
+        141,
+        277
+      ],
+      "visibleMajorTrunkGroupsApproxX": [
+        79,
+        103,
+        129
+      ],
+      "caution": "Nhiềunhánhkhô,khônggánđịnhlượngbranch/foliage/tuổicây;giữtreegroupsởbờtráibêntextcallout."
+    },
+    "landwater": {
+      "landBbox": [
+        19,
+        177,
+        449,
+        279
+      ],
+      "waterBbox": [
+        4,
+        267,
+        463,
+        347
+      ],
+      "streamPathApprox": [
+        [
+          231,
+          244
+        ],
+        [
+          212,
+          251
+        ],
+        [
+          199,
+          262
+        ],
+        [
+          177,
+          273
+        ],
+        [
+          187,
+          284
+        ]
+      ],
+      "mountains": "darkgreensback;lefttreelandgreen/rightfactorylandgreen;runoffra2arrowspreserve",
+      "waterColors": "cyanbluewaterwithdecorativeripples;khôngđếmwave/rain"
+    },
+    "excludedNonData": "Faintstockwatermarks/spirals/diagonalstocktext ởsky-water khôngphảichất/phươngtrình/nhãn;khôngphụcdựng.",
+    "noAdded": "Khôngthêmtênkhí/chất/chỉsố/polarity/equation/raincounts."
+  },
+  "verdict": "Đọc source;chưaactualSVGreview."
+}

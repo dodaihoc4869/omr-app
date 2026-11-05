@@ -1,0 +1,51 @@
+[
+  {
+    "i": 386,
+    "hash": "45002f0511a3f63ddde829cf1f5281e0e84339978834992e3b938349fc1e37f9",
+    "fileNguon": "anh/45002f0511a3f63ddde829cf1f5281e0e84339978834992e3b938349fc1e37f9.png",
+    "svg": "acid-rain-ddh-b523410e349ca5d73f2e0f74902e8c0e415fc944f3fb8604ade1d05583a9bdda.svg",
+    "hashSvg": "b523410e349ca5d73f2e0f74902e8c0e415fc944f3fb8604ade1d05583a9bdda",
+    "byteSvg": 37783,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-11-B6-D2-II-60",
+        "de": "Hình ảnh dưới đây mô tả quá trình hình thành mưa acid: Mỗi phát biểu sau đây là đúng hay sai?",
+        "refs": [
+          {
+            "hash": "45002f0511a3f63ddde829cf1f5281e0e84339978834992e3b938349fc1e37f9",
+            "where": "DB-11-B6-D2-II-60.hinh.0.du_lieu",
+            "hashDataUrl": "4f3ec2da9d4f114f1fc6a7977114e2f4b8b61130a92093fc95a243772f5d8966"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B6-II-19",
+        "de": "Hình ảnh dưới đây mô tả quá trình hình thành mưa acid: Mỗi phát biểu sau đây là đúng hay sai?",
+        "refs": [
+          {
+            "hash": "45002f0511a3f63ddde829cf1f5281e0e84339978834992e3b938349fc1e37f9",
+            "where": "DH-11-C2-B6-II-19.hinh.0.du_lieu",
+            "hashDataUrl": "4f3ec2da9d4f114f1fc6a7977114e2f4b8b61130a92093fc95a243772f5d8966"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B6-VD-II-1",
+        "de": "Hình ảnh dưới đây mô tả quá trình hình thành mưa acid: Mỗi phát biểu sau đây là đúng hay sai?",
+        "refs": [
+          {
+            "hash": "45002f0511a3f63ddde829cf1f5281e0e84339978834992e3b938349fc1e37f9",
+            "where": "DH-11-C2-B6-VD-II-1.hinh.0.du_lieu",
+            "hashDataUrl": "4f3ec2da9d4f114f1fc6a7977114e2f4b8b61130a92093fc95a243772f5d8966"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "ACIDRAIN/allEnglishlabels-formulas/4clouds/sun/4wavyuparrows/2downarrows/redrunoffarrows/trees/factories/lake/sourceillustrationnotquantitativevegetation.",
+    "hashSvgDaSoat": "b523410e349ca5d73f2e0f74902e8c0e415fc944f3fb8604ade1d05583a9bdda",
+    "nguoiSoat": "cau_truc_4"
+  }
+]
