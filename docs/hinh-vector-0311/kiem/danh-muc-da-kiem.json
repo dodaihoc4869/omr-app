@@ -2836,6 +2836,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "01818a91aa8ba7178a6488db185db06c17fbeb82c1fe479a05a58e1583d31947": {
+      "tep": "hai-surfactant-ddh-7ece4c47e4c5ed8dd493d3a830b218c3a418cf7401c69beac56d1481545ed534.svg",
+      "hashSvg": "7ece4c47e4c5ed8dd493d3a830b218c3a418cf7401c69beac56d1481545ed534",
+      "byteSvg": 15841,
+      "byteGzip": 3796,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "28f8060920085eef8be12307f2edd37c6a11445fd1cf41d0295722ca73b7dfa3": {
       "tep": "ms-ddh-fdfc619e1fa023fc60aed9551b1d9669caaffb2ac06b12e7cf9a8639bfa4f19e.svg",
       "hashSvg": "fdfc619e1fa023fc60aed9551b1d9669caaffb2ac06b12e7cf9a8639bfa4f19e",
@@ -11332,6 +11341,20 @@
       ]
     },
     {
+      "qid": "12-KT-C1-D5-II-1",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "01818a91aa8ba7178a6488db185db06c17fbeb82c1fe479a05a58e1583d31947",
+          "where": "12-KT-C1-D5-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "9ca27f197175d96fad853645f0a3f65d076bfa43ab4b93337f84bafd255ed999",
+          "vector": "hai-surfactant-ddh-7ece4c47e4c5ed8dd493d3a830b218c3a418cf7401c69beac56d1481545ed534.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-KT-C1-D5-III-2",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -15100,6 +15123,20 @@
           "where": "DB-12-B2-D1-II-125.hinh.0.du_lieu",
           "hashDataUrl": "66d1033e25a7b06c7eefaa74bd652fe0a6eaac41fa944f59b02539ebda6159de",
           "vector": "cau-truc-ddh-342a7e28e565e7c65e335d616264667be1e03267b41ea5b2105f9dc2be1a0865.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B2-D1-II-128",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "01818a91aa8ba7178a6488db185db06c17fbeb82c1fe479a05a58e1583d31947",
+          "where": "DB-12-B2-D1-II-128.hinh.0.du_lieu",
+          "hashDataUrl": "9ca27f197175d96fad853645f0a3f65d076bfa43ab4b93337f84bafd255ed999",
+          "vector": "hai-surfactant-ddh-7ece4c47e4c5ed8dd493d3a830b218c3a418cf7401c69beac56d1481545ed534.svg"
         }
       ]
     },
@@ -24382,6 +24419,7 @@
     "12-KT-C1-D5-I-9",
     "12-KT-C1-D5-I-14",
     "12-KT-C1-D5-I-17",
+    "12-KT-C1-D5-II-1",
     "12-KT-C1-D5-III-2",
     "12-KT-C12-D2-I-2",
     "12-KT-C12-D2-I-11",
@@ -24610,6 +24648,7 @@
     "DB-12-B2-D1-I-112",
     "DB-12-B2-D1-III-118",
     "DB-12-B2-D1-II-125",
+    "DB-12-B2-D1-II-128",
     "DB-12-B2-D1-III-129",
     "DB-12-B2-D1-III-134",
     "DB-12-B2-D1-I-151",

@@ -1,0 +1,356 @@
+{
+  "i": 10,
+  "hash": "01818a91aa8ba7178a6488db185db06c17fbeb82c1fe479a05a58e1583d31947",
+  "fileNguon": "anh/01818a91aa8ba7178a6488db185db06c17fbeb82c1fe479a05a58e1583d31947.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNative": true,
+  "zoom": "/workspace/scratch/cau4-surfchem191-zoom.png",
+  "questions": [
+    {
+      "qid": "12-KT-C1-D5-II-1",
+      "maDe": "12-KT-C1-D5",
+      "de": "Cho các chất sau: Sodium stearate (X) Sodium dodecylbenzenesulfonate (Y)",
+      "hinh": [
+        {
+          "hash": "01818a91aa8ba7178a6488db185db06c17fbeb82c1fe479a05a58e1583d31947",
+          "where": "12-KT-C1-D5-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "9ca27f197175d96fad853645f0a3f65d076bfa43ab4b93337f84bafd255ed999"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B2-D1-II-128",
+      "maDe": "DB-12-B2-D1",
+      "de": "Cho các chất sau: Sodium stearate (X) Sodium dodecylbenzenesulfonate (Y)",
+      "hinh": [
+        {
+          "hash": "01818a91aa8ba7178a6488db185db06c17fbeb82c1fe479a05a58e1583d31947",
+          "where": "DB-12-B2-D1-II-128.hinh.0.du_lieu",
+          "hashDataUrl": "9ca27f197175d96fad853645f0a3f65d076bfa43ab4b93337f84bafd255ed999"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "top": {
+      "chainVertices": [
+        [
+          35,
+          120
+        ],
+        [
+          79,
+          94
+        ],
+        [
+          122,
+          120
+        ],
+        [
+          166,
+          94
+        ],
+        [
+          210,
+          120
+        ],
+        [
+          254,
+          94
+        ],
+        [
+          298,
+          120
+        ],
+        [
+          342,
+          94
+        ],
+        [
+          385,
+          120
+        ],
+        [
+          429,
+          94
+        ],
+        [
+          473,
+          120
+        ],
+        [
+          517,
+          94
+        ],
+        [
+          560,
+          120
+        ],
+        [
+          604,
+          94
+        ],
+        [
+          648,
+          120
+        ],
+        [
+          692,
+          94
+        ],
+        [
+          735,
+          120
+        ],
+        [
+          779,
+          94
+        ]
+      ],
+      "totalC": 18,
+      "carbonylO": [
+        779,
+        45
+      ],
+      "doubleSegments": [
+        [
+          775,
+          63,
+          775,
+          94
+        ],
+        [
+          783,
+          63,
+          783,
+          94
+        ]
+      ],
+      "carboxylateBond": [
+        [
+          779,
+          94
+        ],
+        [
+          807,
+          110
+        ]
+      ],
+      "OminusLabel": [
+        823,
+        121
+      ],
+      "minusSup": [
+        841,
+        108
+      ],
+      "NaPlusLabel": [
+        881,
+        121
+      ],
+      "plusSup": [
+        905,
+        108
+      ],
+      "caption": "Sodium stearate (X)",
+      "captionAnchor": [
+        473,
+        158
+      ],
+      "sourceCaptionStyle": "italic serif;rebuildappDDHkhôngfallback",
+      "noOtherCaption": true
+    },
+    "bottom": {
+      "alkylVertices": [
+        [
+          76,
+          228
+        ],
+        [
+          109,
+          208
+        ],
+        [
+          156,
+          236
+        ],
+        [
+          204,
+          208
+        ],
+        [
+          251,
+          236
+        ],
+        [
+          299,
+          208
+        ],
+        [
+          346,
+          236
+        ],
+        [
+          393,
+          208
+        ],
+        [
+          440,
+          236
+        ],
+        [
+          488,
+          208
+        ],
+        [
+          535,
+          236
+        ],
+        [
+          583,
+          208
+        ]
+      ],
+      "alkylC": 12,
+      "bondToRing": [
+        [
+          583,
+          208
+        ],
+        [
+          630,
+          236
+        ]
+      ],
+      "ringVertices": [
+        [
+          630,
+          236
+        ],
+        [
+          677,
+          208
+        ],
+        [
+          725,
+          236
+        ],
+        [
+          725,
+          291
+        ],
+        [
+          677,
+          318
+        ],
+        [
+          630,
+          291
+        ]
+      ],
+      "ringC": 6,
+      "doubleSegments": [
+        [
+          638,
+          240,
+          677,
+          217
+        ],
+        [
+          718,
+          242,
+          718,
+          286
+        ],
+        [
+          638,
+          287,
+          677,
+          309
+        ]
+      ],
+      "literalRingSBond": [
+        [
+          703,
+          265
+        ],
+        [
+          740,
+          265
+        ]
+      ],
+      "warning": "BondstartsINSIDEringat703265,crossesrightverticaldoubleandedge,khôngtựgắn lạivàovertex/parabondtheory.",
+      "Slabel": [
+        759,
+        265
+      ],
+      "Oup": [
+        757,
+        211
+      ],
+      "Odown": [
+        757,
+        321
+      ],
+      "SODoubleUp": [
+        [
+          754,
+          228,
+          754,
+          248
+        ],
+        [
+          760,
+          228,
+          760,
+          248
+        ]
+      ],
+      "SODoubleDown": [
+        [
+          754,
+          282,
+          754,
+          303
+        ],
+        [
+          760,
+          282,
+          760,
+          303
+        ]
+      ],
+      "S_OminusBond": [
+        [
+          776,
+          265
+        ],
+        [
+          795,
+          265
+        ]
+      ],
+      "OminusLabel": [
+        811,
+        265
+      ],
+      "minusSup": [
+        826,
+        255
+      ],
+      "NaPlusLabel": [
+        838,
+        307
+      ],
+      "plusSup": [
+        859,
+        296
+      ],
+      "Ocount": 3,
+      "caption": null
+    },
+    "captionPolicy": "NguồnbảnthânCHỈcaptiontopSodiumstearate(X). Stem2qid cócảtênYnhưngkhôngtựthêmcaptionbottomvàoSVG.",
+    "noAdded": "NoH/Ctext/CIP/circle/extraO/counterionbond;giữchargesO−/Na+ởcả2molecules."
+  },
+  "verdict": "Đọc source,chưaSVGreview."
+}

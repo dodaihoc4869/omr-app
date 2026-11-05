@@ -1,0 +1,168 @@
+[
+  {
+    "i": 10,
+    "hash": "01818a91aa8ba7178a6488db185db06c17fbeb82c1fe479a05a58e1583d31947",
+    "fileNguon": "anh/01818a91aa8ba7178a6488db185db06c17fbeb82c1fe479a05a58e1583d31947.png",
+    "svg": "hai-surfactant-ddh-7ece4c47e4c5ed8dd493d3a830b218c3a418cf7401c69beac56d1481545ed534.svg",
+    "hashSvg": "7ece4c47e4c5ed8dd493d3a830b218c3a418cf7401c69beac56d1481545ed534",
+    "byteSvg": 15841,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C1-D5-II-1",
+        "de": "Cho các chất sau: Sodium stearate (X) Sodium dodecylbenzenesulfonate (Y)",
+        "refs": [
+          {
+            "hash": "01818a91aa8ba7178a6488db185db06c17fbeb82c1fe479a05a58e1583d31947",
+            "where": "12-KT-C1-D5-II-1.hinh.0.du_lieu",
+            "hashDataUrl": "9ca27f197175d96fad853645f0a3f65d076bfa43ab4b93337f84bafd255ed999"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B2-D1-II-128",
+        "de": "Cho các chất sau: Sodium stearate (X) Sodium dodecylbenzenesulfonate (Y)",
+        "refs": [
+          {
+            "hash": "01818a91aa8ba7178a6488db185db06c17fbeb82c1fe479a05a58e1583d31947",
+            "where": "DB-12-B2-D1-II-128.hinh.0.du_lieu",
+            "hashDataUrl": "9ca27f197175d96fad853645f0a3f65d076bfa43ab4b93337f84bafd255ed999"
+          }
+        ]
+      }
+    ],
+    "topPoints": [
+      [
+        35,
+        119
+      ],
+      [
+        79,
+        94
+      ],
+      [
+        122,
+        119
+      ],
+      [
+        166,
+        94
+      ],
+      [
+        210,
+        119
+      ],
+      [
+        254,
+        94
+      ],
+      [
+        297,
+        119
+      ],
+      [
+        341,
+        94
+      ],
+      [
+        385,
+        119
+      ],
+      [
+        429,
+        94
+      ],
+      [
+        472,
+        119
+      ],
+      [
+        516,
+        94
+      ],
+      [
+        560,
+        119
+      ],
+      [
+        604,
+        94
+      ],
+      [
+        647,
+        119
+      ],
+      [
+        691,
+        94
+      ],
+      [
+        735,
+        119
+      ],
+      [
+        778,
+        94
+      ]
+    ],
+    "bottomPoints": [
+      [
+        75,
+        228
+      ],
+      [
+        109,
+        209
+      ],
+      [
+        156,
+        236
+      ],
+      [
+        203,
+        209
+      ],
+      [
+        250,
+        236
+      ],
+      [
+        298,
+        209
+      ],
+      [
+        345,
+        236
+      ],
+      [
+        393,
+        209
+      ],
+      [
+        440,
+        236
+      ],
+      [
+        488,
+        209
+      ],
+      [
+        535,
+        236
+      ],
+      [
+        582,
+        209
+      ],
+      [
+        630,
+        236
+      ]
+    ],
+    "ghiChuDung": "Top18CcarboxylateO−Na+/Sodiumstearate(X);bottom12alkylC+benzene6C/3double/expandedS(=O)2O−Na+free/literalbondstart703264inring/NObottomcaption/noHadded/DDHpath.",
+    "hashSvgDaSoat": "7ece4c47e4c5ed8dd493d3a830b218c3a418cf7401c69beac56d1481545ed534",
+    "nguoiSoat": "cau_truc_4"
+  }
+]
