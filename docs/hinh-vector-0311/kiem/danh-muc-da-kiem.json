@@ -2566,6 +2566,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "09bee4ba201084345a24020edca93309b20d32786e653def6f162e4341eb3d23": {
+      "tep": "doi-chieu-polysaccharide-ddh-f2d9502085121f1835e1640427fa75b77a2813cbf9000fc6d46951bb6dceca99.svg",
+      "hashSvg": "f2d9502085121f1835e1640427fa75b77a2813cbf9000fc6d46951bb6dceca99",
+      "byteSvg": 68963,
+      "byteGzip": 6971,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "9bb7aa06b64ca2d835e85ce63916337dfab7c55fc56377de55a99fb584e1c084": {
       "tep": "hinh-ddh-bab55db64e1c8b3c334036ff8136905253c3c16be0c0940a4bfa48d3609f8c2d.svg",
       "hashSvg": "bab55db64e1c8b3c334036ff8136905253c3c16be0c0940a4bfa48d3609f8c2d",
@@ -9534,6 +9543,20 @@
       ]
     },
     {
+      "qid": "12-C2-B6-D2-II-14",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "09bee4ba201084345a24020edca93309b20d32786e653def6f162e4341eb3d23",
+          "where": "12-C2-B6-D2-II-14.hinh.0.du_lieu",
+          "hashDataUrl": "5285158c3c8a9d67ccee891f173de3d2f8c2ba3390b57abe1ac9199ed471a946",
+          "vector": "doi-chieu-polysaccharide-ddh-f2d9502085121f1835e1640427fa75b77a2813cbf9000fc6d46951bb6dceca99.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-C2-B6-D2-II-27",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -15698,6 +15721,20 @@
           "where": "DB-12-B4-D3-I-100.hinh.0.du_lieu",
           "hashDataUrl": "24056de5178095918cb5028eb43b6fce646b01282a79e9fa3fffe0366f7155cb",
           "vector": "polysaccharide-ddh-92a01509d1f03b2081374f10d68f4bef415f78e68158d0162b5aad6f90a12cbf.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D3-II-106",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "09bee4ba201084345a24020edca93309b20d32786e653def6f162e4341eb3d23",
+          "where": "DB-12-B4-D3-II-106.hinh.0.du_lieu",
+          "hashDataUrl": "5285158c3c8a9d67ccee891f173de3d2f8c2ba3390b57abe1ac9199ed471a946",
+          "vector": "doi-chieu-polysaccharide-ddh-f2d9502085121f1835e1640427fa75b77a2813cbf9000fc6d46951bb6dceca99.svg"
         }
       ]
     },
@@ -24469,6 +24506,7 @@
     "12-C2-B6-D1-I-112",
     "12-C2-B6-D2-I-2",
     "12-C2-B6-D2-I-5",
+    "12-C2-B6-D2-II-14",
     "12-C2-B6-D2-II-27",
     "12-C2-B6-D2-II-39",
     "12-C2-B7-D1-I-5",
@@ -24848,6 +24886,7 @@
     "DB-12-B4-D3-I-69",
     "DB-12-B4-D3-I-99",
     "DB-12-B4-D3-I-100",
+    "DB-12-B4-D3-II-106",
     "DB-12-B4-D3-II-114",
     "DB-12-B4-D3-I-122",
     "DB-12-B4-D3-I-125",

@@ -1,0 +1,1158 @@
+{
+  "i": 47,
+  "hash": "09bee4ba201084345a24020edca93309b20d32786e653def6f162e4341eb3d23",
+  "fileNguon": "anh/09bee4ba201084345a24020edca93309b20d32786e653def6f162e4341eb3d23.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNative": true,
+  "zooms": [
+    "/workspace/scratch/cau4-polymer197-amy-zoom.png",
+    "/workspace/scratch/cau4-polymer197-cell-zoom.png",
+    "/workspace/scratch/cau4-polymer197-amy23.png",
+    "/workspace/scratch/cau4-polymer197-cell23.png"
+  ],
+  "questions": [
+    {
+      "qid": "12-C2-B6-D2-II-14",
+      "maDe": "12-C2-B6-D2",
+      "de": "Quan sát cấu trúc phân tử amylose và phân tử cellulose dưới đây:",
+      "hinh": [
+        {
+          "hash": "09bee4ba201084345a24020edca93309b20d32786e653def6f162e4341eb3d23",
+          "where": "12-C2-B6-D2-II-14.hinh.0.du_lieu",
+          "hashDataUrl": "5285158c3c8a9d67ccee891f173de3d2f8c2ba3390b57abe1ac9199ed471a946"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D3-II-106",
+      "maDe": "DB-12-B4-D3",
+      "de": "Quan sát cấu trúc phân tử amylose và phân tử cellulose dưới đây:",
+      "hinh": [
+        {
+          "hash": "09bee4ba201084345a24020edca93309b20d32786e653def6f162e4341eb3d23",
+          "where": "DB-12-B4-D3-II-106.hinh.0.du_lieu",
+          "hashDataUrl": "5285158c3c8a9d67ccee891f173de3d2f8c2ba3390b57abe1ac9199ed471a946"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–2pxapprox;C1Hupamy/downcell. Numbersnone,NOTchair,NOTalias43C5stub.",
+    "amylose": {
+      "units": [
+        {
+          "nodes": {
+            "C4": [
+              110,
+              112
+            ],
+            "C5": [
+              146,
+              75
+            ],
+            "O": [
+              197,
+              76
+            ],
+            "C1": [
+              235,
+              112
+            ],
+            "C2": [
+              198,
+              148
+            ],
+            "C3": [
+              146,
+              148
+            ]
+          },
+          "CH2OH": {
+            "anchor": [
+              174,
+              44
+            ],
+            "bond": [
+              [
+                146,
+                75
+              ],
+              [
+                146,
+                55
+              ]
+            ],
+            "target": "Cfirst"
+          },
+          "Hlabels": [
+            {
+              "on": "C4",
+              "at": [
+                110,
+                77
+              ],
+              "bond": [
+                [
+                  110,
+                  112
+                ],
+                [
+                  110,
+                  86
+                ]
+              ]
+            },
+            {
+              "on": "C5",
+              "at": [
+                146,
+                101
+              ],
+              "bond": [
+                [
+                  146,
+                  75
+                ],
+                [
+                  146,
+                  91
+                ]
+              ]
+            },
+            {
+              "on": "C3",
+              "at": [
+                146,
+                180
+              ],
+              "bond": [
+                [
+                  146,
+                  148
+                ],
+                [
+                  146,
+                  171
+                ]
+              ]
+            },
+            {
+              "on": "C2",
+              "at": [
+                198,
+                121
+              ],
+              "bond": [
+                [
+                  198,
+                  148
+                ],
+                [
+                  198,
+                  130
+                ]
+              ]
+            },
+            {
+              "on": "C1up",
+              "at": [
+                235,
+                74
+              ]
+            }
+          ],
+          "OHlabels": [
+            {
+              "on": "C3up",
+              "at": [
+                158,
+                121
+              ],
+              "bond": [
+                [
+                  146,
+                  148
+                ],
+                [
+                  146,
+                  130
+                ]
+              ]
+            },
+            {
+              "on": "C2down",
+              "at": [
+                208,
+                180
+              ],
+              "bond": [
+                [
+                  198,
+                  148
+                ],
+                [
+                  198,
+                  171
+                ]
+              ]
+            }
+          ],
+          "front": "2diagonaluniform~2px NOtaper;horizontalamy3..4px/cell2..3px"
+        },
+        {
+          "nodes": {
+            "C4": [
+              319,
+              110
+            ],
+            "C5": [
+              354,
+              75
+            ],
+            "O": [
+              407,
+              75
+            ],
+            "C1": [
+              443,
+              110
+            ],
+            "C2": [
+              407,
+              146
+            ],
+            "C3": [
+              354,
+              146
+            ]
+          },
+          "CH2OH": {
+            "anchor": [
+              382,
+              43
+            ],
+            "bond": [
+              [
+                354,
+                75
+              ],
+              [
+                354,
+                54
+              ]
+            ],
+            "target": "Cfirst"
+          },
+          "Hlabels": [
+            {
+              "on": "C4",
+              "at": [
+                319,
+                75
+              ],
+              "bond": [
+                [
+                  319,
+                  110
+                ],
+                [
+                  319,
+                  84
+                ]
+              ]
+            },
+            {
+              "on": "C5",
+              "at": [
+                354,
+                101
+              ],
+              "bond": [
+                [
+                  354,
+                  75
+                ],
+                [
+                  354,
+                  91
+                ]
+              ]
+            },
+            {
+              "on": "C3",
+              "at": [
+                354,
+                178
+              ],
+              "bond": [
+                [
+                  354,
+                  146
+                ],
+                [
+                  354,
+                  169
+                ]
+              ]
+            },
+            {
+              "on": "C2",
+              "at": [
+                407,
+                119
+              ],
+              "bond": [
+                [
+                  407,
+                  146
+                ],
+                [
+                  407,
+                  128
+                ]
+              ]
+            },
+            {
+              "on": "C1up",
+              "at": [
+                443,
+                72
+              ]
+            }
+          ],
+          "OHlabels": [
+            {
+              "on": "C3up",
+              "at": [
+                366,
+                119
+              ],
+              "bond": [
+                [
+                  354,
+                  146
+                ],
+                [
+                  354,
+                  128
+                ]
+              ]
+            },
+            {
+              "on": "C2down",
+              "at": [
+                417,
+                178
+              ],
+              "bond": [
+                [
+                  407,
+                  146
+                ],
+                [
+                  407,
+                  169
+                ]
+              ]
+            }
+          ],
+          "front": "2diagonaluniform~2px NOtaper;horizontalamy3..4px/cell2..3px"
+        },
+        {
+          "nodes": {
+            "C4": [
+              530,
+              112
+            ],
+            "C5": [
+              567,
+              75
+            ],
+            "O": [
+              619,
+              76
+            ],
+            "C1": [
+              655,
+              112
+            ],
+            "C2": [
+              619,
+              147
+            ],
+            "C3": [
+              567,
+              147
+            ]
+          },
+          "CH2OH": {
+            "anchor": [
+              595,
+              44
+            ],
+            "bond": [
+              [
+                567,
+                75
+              ],
+              [
+                567,
+                55
+              ]
+            ],
+            "target": "Cfirst"
+          },
+          "Hlabels": [
+            {
+              "on": "C4",
+              "at": [
+                530,
+                77
+              ],
+              "bond": [
+                [
+                  530,
+                  112
+                ],
+                [
+                  530,
+                  86
+                ]
+              ]
+            },
+            {
+              "on": "C5",
+              "at": [
+                567,
+                101
+              ],
+              "bond": [
+                [
+                  567,
+                  75
+                ],
+                [
+                  567,
+                  91
+                ]
+              ]
+            },
+            {
+              "on": "C3",
+              "at": [
+                567,
+                179
+              ],
+              "bond": [
+                [
+                  567,
+                  147
+                ],
+                [
+                  567,
+                  170
+                ]
+              ]
+            },
+            {
+              "on": "C2",
+              "at": [
+                619,
+                120
+              ],
+              "bond": [
+                [
+                  619,
+                  147
+                ],
+                [
+                  619,
+                  129
+                ]
+              ]
+            },
+            {
+              "on": "C1up",
+              "at": [
+                655,
+                74
+              ]
+            }
+          ],
+          "OHlabels": [
+            {
+              "on": "C3up",
+              "at": [
+                579,
+                120
+              ],
+              "bond": [
+                [
+                  567,
+                  147
+                ],
+                [
+                  567,
+                  129
+                ]
+              ]
+            },
+            {
+              "on": "C2down",
+              "at": [
+                629,
+                179
+              ],
+              "bond": [
+                [
+                  619,
+                  147
+                ],
+                [
+                  619,
+                  170
+                ]
+              ]
+            }
+          ],
+          "front": "2diagonaluniform~2px NOtaper;horizontalamy3..4px/cell2..3px"
+        }
+      ],
+      "externalO": [
+        [
+          64,
+          139
+        ],
+        [
+          275,
+          139
+        ],
+        [
+          485,
+          139
+        ],
+        [
+          696,
+          139
+        ]
+      ],
+      "externalBonds": [
+        [
+          76,
+          137,
+          110,
+          112
+        ],
+        [
+          235,
+          112,
+          263,
+          136
+        ],
+        [
+          286,
+          136,
+          319,
+          110
+        ],
+        [
+          443,
+          110,
+          474,
+          135
+        ],
+        [
+          496,
+          135,
+          530,
+          112
+        ],
+        [
+          655,
+          112,
+          684,
+          134
+        ]
+      ],
+      "ellipsis": [
+        [
+          27,
+          145,
+          51,
+          145
+        ],
+        [
+          709,
+          145,
+          739,
+          145
+        ]
+      ],
+      "caption": "Phân tử amylose",
+      "captionAnchor": [
+        382,
+        231
+      ]
+    },
+    "cellulose": {
+      "units": [
+        {
+          "nodes": {
+            "C4": [
+              851,
+              212
+            ],
+            "C5": [
+              885,
+              178
+            ],
+            "O": [
+              933,
+              180
+            ],
+            "C1": [
+              968,
+              212
+            ],
+            "C2": [
+              934,
+              245
+            ],
+            "C3": [
+              885,
+              245
+            ]
+          },
+          "CH2OH": {
+            "anchor": [
+              913,
+              149
+            ],
+            "bond": [
+              [
+                885,
+                178
+              ],
+              [
+                885,
+                160
+              ]
+            ],
+            "target": "Cfirst"
+          },
+          "Hlabels": [
+            {
+              "on": "C4",
+              "at": [
+                851,
+                177
+              ],
+              "bond": [
+                [
+                  851,
+                  212
+                ],
+                [
+                  851,
+                  186
+                ]
+              ]
+            },
+            {
+              "on": "C5",
+              "at": [
+                885,
+                204
+              ],
+              "bond": [
+                [
+                  885,
+                  178
+                ],
+                [
+                  885,
+                  194
+                ]
+              ]
+            },
+            {
+              "on": "C3",
+              "at": [
+                885,
+                277
+              ],
+              "bond": [
+                [
+                  885,
+                  245
+                ],
+                [
+                  885,
+                  268
+                ]
+              ]
+            },
+            {
+              "on": "C2",
+              "at": [
+                934,
+                218
+              ],
+              "bond": [
+                [
+                  934,
+                  245
+                ],
+                [
+                  934,
+                  227
+                ]
+              ]
+            },
+            {
+              "on": "C1down",
+              "at": [
+                968,
+                250
+              ]
+            }
+          ],
+          "OHlabels": [
+            {
+              "on": "C3up",
+              "at": [
+                897,
+                218
+              ],
+              "bond": [
+                [
+                  885,
+                  245
+                ],
+                [
+                  885,
+                  227
+                ]
+              ]
+            },
+            {
+              "on": "C2down",
+              "at": [
+                944,
+                277
+              ],
+              "bond": [
+                [
+                  934,
+                  245
+                ],
+                [
+                  934,
+                  268
+                ]
+              ]
+            }
+          ],
+          "front": "2diagonaluniform~2px NOtaper;horizontalamy3..4px/cell2..3px"
+        },
+        {
+          "nodes": {
+            "C4": [
+              1052,
+              157
+            ],
+            "C5": [
+              1086,
+              123
+            ],
+            "O": [
+              1134,
+              125
+            ],
+            "C1": [
+              1169,
+              157
+            ],
+            "C2": [
+              1134,
+              190
+            ],
+            "C3": [
+              1086,
+              190
+            ]
+          },
+          "CH2OH": {
+            "anchor": [
+              1114,
+              94
+            ],
+            "bond": [
+              [
+                1086,
+                123
+              ],
+              [
+                1086,
+                105
+              ]
+            ],
+            "target": "Cfirst"
+          },
+          "Hlabels": [
+            {
+              "on": "C4",
+              "at": [
+                1052,
+                122
+              ],
+              "bond": [
+                [
+                  1052,
+                  157
+                ],
+                [
+                  1052,
+                  131
+                ]
+              ]
+            },
+            {
+              "on": "C5",
+              "at": [
+                1086,
+                149
+              ],
+              "bond": [
+                [
+                  1086,
+                  123
+                ],
+                [
+                  1086,
+                  139
+                ]
+              ]
+            },
+            {
+              "on": "C3",
+              "at": [
+                1086,
+                222
+              ],
+              "bond": [
+                [
+                  1086,
+                  190
+                ],
+                [
+                  1086,
+                  213
+                ]
+              ]
+            },
+            {
+              "on": "C2",
+              "at": [
+                1134,
+                163
+              ],
+              "bond": [
+                [
+                  1134,
+                  190
+                ],
+                [
+                  1134,
+                  172
+                ]
+              ]
+            },
+            {
+              "on": "C1down",
+              "at": [
+                1169,
+                195
+              ]
+            }
+          ],
+          "OHlabels": [
+            {
+              "on": "C3up",
+              "at": [
+                1098,
+                163
+              ],
+              "bond": [
+                [
+                  1086,
+                  190
+                ],
+                [
+                  1086,
+                  172
+                ]
+              ]
+            },
+            {
+              "on": "C2down",
+              "at": [
+                1144,
+                222
+              ],
+              "bond": [
+                [
+                  1134,
+                  190
+                ],
+                [
+                  1134,
+                  213
+                ]
+              ]
+            }
+          ],
+          "front": "2diagonaluniform~2px NOtaper;horizontalamy3..4px/cell2..3px"
+        },
+        {
+          "nodes": {
+            "C4": [
+              1251,
+              100
+            ],
+            "C5": [
+              1285,
+              66
+            ],
+            "O": [
+              1333,
+              66
+            ],
+            "C1": [
+              1368,
+              100
+            ],
+            "C2": [
+              1333,
+              133
+            ],
+            "C3": [
+              1285,
+              133
+            ]
+          },
+          "CH2OH": {
+            "anchor": [
+              1313,
+              37
+            ],
+            "bond": [
+              [
+                1285,
+                66
+              ],
+              [
+                1285,
+                48
+              ]
+            ],
+            "target": "Cfirst"
+          },
+          "Hlabels": [
+            {
+              "on": "C4",
+              "at": [
+                1251,
+                65
+              ],
+              "bond": [
+                [
+                  1251,
+                  100
+                ],
+                [
+                  1251,
+                  74
+                ]
+              ]
+            },
+            {
+              "on": "C5",
+              "at": [
+                1285,
+                92
+              ],
+              "bond": [
+                [
+                  1285,
+                  66
+                ],
+                [
+                  1285,
+                  82
+                ]
+              ]
+            },
+            {
+              "on": "C3",
+              "at": [
+                1285,
+                165
+              ],
+              "bond": [
+                [
+                  1285,
+                  133
+                ],
+                [
+                  1285,
+                  156
+                ]
+              ]
+            },
+            {
+              "on": "C2",
+              "at": [
+                1333,
+                106
+              ],
+              "bond": [
+                [
+                  1333,
+                  133
+                ],
+                [
+                  1333,
+                  115
+                ]
+              ]
+            },
+            {
+              "on": "C1down",
+              "at": [
+                1368,
+                138
+              ]
+            }
+          ],
+          "OHlabels": [
+            {
+              "on": "C3up",
+              "at": [
+                1297,
+                106
+              ],
+              "bond": [
+                [
+                  1285,
+                  133
+                ],
+                [
+                  1285,
+                  115
+                ]
+              ]
+            },
+            {
+              "on": "C2down",
+              "at": [
+                1343,
+                165
+              ],
+              "bond": [
+                [
+                  1333,
+                  133
+                ],
+                [
+                  1333,
+                  156
+                ]
+              ]
+            }
+          ],
+          "front": "2diagonaluniform~2px NOtaper;horizontalamy3..4px/cell2..3px"
+        }
+      ],
+      "externalO": [
+        [
+          807,
+          235
+        ],
+        [
+          1009,
+          184
+        ],
+        [
+          1207,
+          127
+        ],
+        [
+          1408,
+          73
+        ]
+      ],
+      "externalBonds": [
+        [
+          819,
+          232,
+          851,
+          212
+        ],
+        [
+          968,
+          212,
+          998,
+          189
+        ],
+        [
+          1020,
+          180,
+          1052,
+          157
+        ],
+        [
+          1169,
+          157,
+          1197,
+          133
+        ],
+        [
+          1219,
+          119,
+          1251,
+          100
+        ],
+        [
+          1368,
+          100,
+          1396,
+          76
+        ]
+      ],
+      "ellipsis": [
+        [
+          782,
+          241,
+          798,
+          241
+        ],
+        [
+          1422,
+          74,
+          1446,
+          74
+        ]
+      ],
+      "caption": "Phân tử cellulose",
+      "captionAnchor": [
+        1117,
+        318
+      ]
+    },
+    "counts": "6rings/6CH₂OH-Cfirst/12OH/30Hlabels(5eachincludingC5downEXPLICIT)/6ringO+8externalO(4eachpanel),4ellipses,2captions,nocarbonnumbers/brackets.",
+    "boldCritical": "Source NOtaperwedges. Frontdiagonaluniform~2px,lowerhorizontalthicker~3–4pxamy/~2–3pxcell. Sourceallringssame,donotadd4taperlike186/187.",
+    "printArtifacts": "Detachedverticalprintline748253..338betweenpanels/isolatedinknear871302and1438117andbackgroundscannoiseoutsidebonds,notlabels/leaders;full2refscontainonlypolymerscomparison/nofigureframeinstruction. Excludenonfigureink."
+  },
+  "verdict": "Đọcsource,chưaactualSVGreview."
+}
