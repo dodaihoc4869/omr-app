@@ -60,8 +60,8 @@
       "Toàn kho còn chưa hoàn tất, app chưa thay hình; không báo đã xong hoặc đã triển khai."
     ],
     "danhMucDaKiem": "docs/hinh-vector-0311/kiem/danh-muc-da-kiem.json",
-    "loVuaXong": "1038 câu đủ mọi hình+DDH/7 một phần;772 nguồn→525 SVG;8404441byte/gzip1661733;656 nguồn còn lại.",
-    "viecNenLamTiep": "Tiếpưu tiên1033IR2panelE/FCHƯAđọchết/CHƯAdựng.736/1213/1214ĐÃĐẠTđừngtrùng. Nhóm169ĐỦ20/20. Tìmbộnguồndùngnhiềucâu/partial,đọcnative/full/stem/refssocảhashmanifesttrướcdựng. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.",
+    "loVuaXong": "1042 câu đủ mọi hình+DDH/7 một phần;773 nguồn→526 SVG;8484135byte/gzip1679494;655 nguồn còn lại.",
+    "viecNenLamTiep": "1033/736/1213/1214ĐÃĐẠTđừngtrùng. Tìmbộnguồndùngnhiềucâu/partialchưađạt,đọcnative/full/stem/refssocảhashmanifesttrướcdựng,rankingchỉgợiýkhôngduyệtalias. Nhóm169ĐỦ20/20. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.",
     "canhBaoCheckpoint": "Giữworktree/commitmớihơn. Origin/mainab81c625chưagộp;khôngpháthànhkhichưatoànphạmvi/cổng/offlineappđạt."
   },
   "tuDongTiepTuc": {
@@ -70,7 +70,7 @@
     "lich": "moi-gio",
     "mucTieu": "Tự vẽ, soát, sửa, tích hợp và kiểm bản sống đến khi đạt; tự tắt khi hoàn tất",
     "thongBao": "Chỉ khi hoàn tất, có lỗi chặn thực sự hoặc cần hành động của thầy",
-    "lyDo": "Tiếp từ1038câu/525SVG;chỉtắt khi toànphạmviđạt/vàoapp/kiểmbảnsống."
+    "lyDo": "Tiếp từ1042câu/526SVG;chỉtắt khi toànphạmviđạt/vàoapp/kiểmbảnsống."
   },
   "loOrbitalDaSoat": {
     "soAnhNguon": 23,
@@ -79,14 +79,14 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 772,
-    "soSvgRieng": 525,
-    "soCauDungHinh": 1045,
-    "soCauDuMoiHinh": 1038,
+    "soAnhNguon": 773,
+    "soSvgRieng": 526,
+    "soCauDungHinh": 1049,
+    "soCauDuMoiHinh": 1042,
     "soCauMoiXongMotPhan": 7,
-    "byteSvg": 8404441,
-    "byteGzip": 1661733,
-    "soAnhNguonConLai": 656,
+    "byteSvg": 8484135,
+    "byteGzip": 1679494,
+    "soAnhNguonConLai": 655,
     "daTichHop": false
   },
   "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.",
@@ -101,20 +101,20 @@
     "batBuocMoiHinh": true,
     "daHoanTatToanBo": false,
     "ghiChu": "Bộ đangchọn đãđạtfontDDH/pathtựchứa vàsoátđộclập;toànkhochưahoàntất,khôngpháthànhbộchưađủ.",
-    "loMoi": "184mọichữ/DDH Rounded path tự chứa/khôngfallback.",
+    "loMoi": "185mọichữ/DDH Rounded path tự chứa/khôngfallback.",
     "congCu": "scripts/phong-vector-0311.py",
     "daChuyenHetBoDaVe": true
   },
   "daDatPhongApp": {
-    "soNguon": 772,
-    "soCauDuHinhVaPhong": 1038,
+    "soNguon": 773,
+    "soCauDuHinhVaPhong": 1042,
     "ghiChu": "Các số tổngDaDoiChieu vẫn mô tả nội dung đã kiểm; bản cũ chưa đổi phông không được coi đạt yêu cầu phông mới."
   },
   "loMoiNhat": {
-    "lo": "184",
-    "ketQua": "1038 câu đủ mọi hình+DDH/7 một phần;772 nguồn→525 SVG;8404441byte/gzip1661733;656 nguồn còn lại.",
-    "suaLoi": "736surfactant4panels9/17/14/12heads+inset1/từnghead-tail/sourcecolor/layers/dirt/3arrows/4labelsleaders/(a)..(d)/DDHpath. Watermarknhàxuấtbản+mảngincắtngoàifigurekhôngphảidata. Nativefull/zoom/freshactualSVG/hashsoátđộclập.",
-    "tiepTheo": "Tiếpưu tiên1033IR2panelE/FCHƯAđọchết/CHƯAdựng.736/1213/1214ĐÃĐẠTđừngtrùng. Nhóm169ĐỦ20/20. Tìmbộnguồndùngnhiềucâu/partial,đọcnative/full/stem/refssocảhashmanifesttrướcdựng. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.",
-    "gioiHan": "Chưa tích hợp/chưa reload offline app/chưa phát hành. Build184/speed21/21/Chromium525/525/hashXML/path/ASTđạt;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy."
+    "lo": "185",
+    "ketQua": "1042 câu đủ mọi hình+DDH/7 một phần;773 nguồn→526 SVG;8484135byte/gzip1679494;655 nguồn còn lại.",
+    "suaLoi": "1033IR2panelsE/F/4frames/ticks/Y0..100/2titlesmỗipanel/Xspacingliteralphi tuyến tínhtoànmiền/đườngphổsourcecenterline+sửamanualtipsnarrowtheonativezoom/khôngsuytênchất/DDHpath. FreshactualSVG/hashsoátđộclập;candidate6d55medianlàmnôngtipskhôngchọn.",
+    "tiepTheo": "1033/736/1213/1214ĐÃĐẠTđừngtrùng. Tìmbộnguồndùngnhiềucâu/partialchưađạt,đọcnative/full/stem/refssocảhashmanifesttrướcdựng,rankingchỉgợiýkhôngduyệtalias. Nhóm169ĐỦ20/20. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.",
+    "gioiHan": "Chưa tích hợp/chưa reload offline app/chưa phát hành. Build185/speed21/21/Chromium526/526/hashXML/path/ASTđạt;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy."
   }
 }

@@ -1363,3 +1363,10 @@ Nhóm169đãxong15/20;1120/1030/1046ĐÃĐẠTđừngtrùng. CÒN765/1195/806/10
 -736surfactant4panels9/17/14/12heads+inset1/từnghead-tail/sourcecolor/layers/dirt/3arrows/4labelsleaders/(a)..(d)/DDHpath. Watermarknhàxuấtbản+mảngincắtngoàifigurekhôngphảidata. Nativefull/zoom/freshactualSVG/hashsoátđộclập.
 -Chromium525/525/hash/XML/path/selfcontained/AST/build184/precache170/2613.23KiB/speed21/21đạt. SizegateđỏNỀNindex.tsnguyênbytekhôngnângmốc;phảixửlýtrướcgộp/deploy.Mainab81c625chưagộp/WOFF2khôngdiff. Chưa tích hợp/chưa reload offline app/chưa phát hành. Chưa tham vấn được cố vấn.
 -Tiếpưu tiên1033IR2panelE/FCHƯAđọchết/CHƯAdựng.736/1213/1214ĐÃĐẠTđừngtrùng. Nhóm169ĐỦ20/20. Tìmbộnguồndùngnhiềucâu/partial,đọcnative/full/stem/refssocảhashmanifesttrướcdựng. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.
+
+
+### 05/11 — Lô185: hai phổ IR
+-1042 câu đủ mọi hình+DDH/7 một phần;773 nguồn→526 SVG;8484135byte/gzip1679494;655 nguồn còn lại.
+-1033IR2panelsE/F/4frames/ticks/Y0..100/2titlesmỗipanel/Xspacingliteralphi tuyến tínhtoànmiền/đườngphổsourcecenterline+sửamanualtipsnarrowtheonativezoom/khôngsuytênchất/DDHpath. FreshactualSVG/hashsoátđộclập;candidate6d55medianlàmnôngtipskhôngchọn.
+-Chromium526/526/hash/XML/path/selfcontained/AST/build185/precache170/2613.23KiB/speed21/21đạt. SizegateđỏNỀNindex.tsnguyênbytekhôngnângmốc;phảixửlýtrướcgộp/deploy.Mainab81c625chưagộp/WOFF2khôngdiff. Chưa tích hợp/chưa reload offline app/chưa phát hành. Chưa tham vấn được cố vấn.
+-1033/736/1213/1214ĐÃĐẠTđừngtrùng. Tìmbộnguồndùngnhiềucâu/partialchưađạt,đọcnative/full/stem/refssocảhashmanifesttrướcdựng,rankingchỉgợiýkhôngduyệtalias. Nhóm169ĐỦ20/20. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.
