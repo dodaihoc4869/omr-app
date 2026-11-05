@@ -1,0 +1,40 @@
+[
+  {
+    "i": 99,
+    "hash": "13ab7877243941189907b506084a1ba97e56c54e5c9c61f82dac86ce1791dc25",
+    "fileNguon": "anh/13ab7877243941189907b506084a1ba97e56c54e5c9c61f82dac86ce1791dc25.png",
+    "svg": "tinh-che-dong-ddh-e57ddb8edaef9caab6d75a985fff1dac557343d36aa8e89a9624094a3d3d4f3b.svg",
+    "hashSvg": "e57ddb8edaef9caab6d75a985fff1dac557343d36aa8e89a9624094a3d3d4f3b",
+    "byteSvg": 13108,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C5-B17-D2-I-17",
+        "de": "Kim loại đồng sau quá trình tách từ quặng thường lẫn các tạp chất là Ag, Ni, Fe. Để tinh chế đồng kim loại người ta tiến hành điện phân dung dịch chứa muối copper(II) sulfate, trong đó một điện cực là các lá đồng tinh khiết và điện cực còn lại là các khối đồng kim loại có lẫn tạp chất (hình).\nKhối đồng kim loại lẫn tạp chất được gắn với điện cực nào của dòng điện một chiều? và quá trình xảy ra tại điện cực đó?",
+        "refs": [
+          {
+            "hash": "13ab7877243941189907b506084a1ba97e56c54e5c9c61f82dac86ce1791dc25",
+            "where": "VIP27-C5-B17-D2-I-17.hinh.0.du_lieu",
+            "hashDataUrl": "93cf69155d89a55180e4867498b079cb8310c03bdb7c677c093d0dd59067c8f5"
+          }
+        ]
+      },
+      {
+        "qid": "VIP27-C5-B17-D2-I-18",
+        "de": "Kim loại đồng sau quá trình tách từ quặng thường lẫn các tạp chất là Ag, Ni, Fe. Để tinh chế đồng kim loại người ta tiến hành điện phân dung dịch chứa muối copper(II) sulfate, trong đó một điện cực là các lá đồng tinh khiết và điện cực còn lại là các khối đồng kim loại có lẫn tạp chất (hình).\nCho các phát biểu sau:\n(a) Nồng độ ion $\\ce{Cu^2+}$ không thay đổi trong quá trình điện phân.\n(b) Khối lượng lá đồng tăng bằng khối lượng khối đồng giảm.\n(c) Phần chất rắn trong \"bùn anode\" chủ yếu là các kim loại Ni, Fe.\n(d) Số mol electron trao đổi ở hai điện cực bằng nhau.\nSố phát biểu đúng là",
+        "refs": [
+          {
+            "hash": "13ab7877243941189907b506084a1ba97e56c54e5c9c61f82dac86ce1791dc25",
+            "where": "VIP27-C5-B17-D2-I-18.hinh.0.du_lieu",
+            "hashDataUrl": "93cf69155d89a55180e4867498b079cb8310c03bdb7c677c093d0dd59067c8f5"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "Láđồng/khốiđồng/bùnanode/3leaders/2batteryplatesRIGHTlong/wires/purpleliquid/blackbeaker/sourcecolors/nochargeletters/noparticlecount/DDHpath.",
+    "hashSvgDaSoat": "e57ddb8edaef9caab6d75a985fff1dac557343d36aa8e89a9624094a3d3d4f3b",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

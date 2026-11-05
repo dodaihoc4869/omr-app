@@ -7039,6 +7039,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "13ab7877243941189907b506084a1ba97e56c54e5c9c61f82dac86ce1791dc25": {
+      "tep": "tinh-che-dong-ddh-e57ddb8edaef9caab6d75a985fff1dac557343d36aa8e89a9624094a3d3d4f3b.svg",
+      "hashSvg": "e57ddb8edaef9caab6d75a985fff1dac557343d36aa8e89a9624094a3d3d4f3b",
+      "byteSvg": 13108,
+      "byteGzip": 3263,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "10da97400c3268d7fe33736059052f7b4c76a1c3464449e1076b93a01236e073": {
       "tep": "bat-su-ddh-4684b69c9d6ebec4490fa29c88bcec1c8ebe98105a91c76d296e5ff0ae64b12b.svg",
       "hashSvg": "4684b69c9d6ebec4490fa29c88bcec1c8ebe98105a91c76d296e5ff0ae64b12b",
@@ -24478,6 +24487,34 @@
       ]
     },
     {
+      "qid": "VIP27-C5-B17-D2-I-17",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "13ab7877243941189907b506084a1ba97e56c54e5c9c61f82dac86ce1791dc25",
+          "where": "VIP27-C5-B17-D2-I-17.hinh.0.du_lieu",
+          "hashDataUrl": "93cf69155d89a55180e4867498b079cb8310c03bdb7c677c093d0dd59067c8f5",
+          "vector": "tinh-che-dong-ddh-e57ddb8edaef9caab6d75a985fff1dac557343d36aa8e89a9624094a3d3d4f3b.svg"
+        }
+      ]
+    },
+    {
+      "qid": "VIP27-C5-B17-D2-I-18",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "13ab7877243941189907b506084a1ba97e56c54e5c9c61f82dac86ce1791dc25",
+          "where": "VIP27-C5-B17-D2-I-18.hinh.0.du_lieu",
+          "hashDataUrl": "93cf69155d89a55180e4867498b079cb8310c03bdb7c677c093d0dd59067c8f5",
+          "vector": "tinh-che-dong-ddh-e57ddb8edaef9caab6d75a985fff1dac557343d36aa8e89a9624094a3d3d4f3b.svg"
+        }
+      ]
+    },
+    {
       "qid": "VIP27-CDK-ESTER-TN-II-11",
       "duMoiHinh": true,
       "soHinhNguon": 2,
@@ -25690,6 +25727,8 @@
     "VIP27-C5-B17-D1-I-9",
     "VIP27-C5-B15-I-17",
     "VIP27-C4-B14-D2-II-4",
+    "VIP27-C5-B17-D2-I-17",
+    "VIP27-C5-B17-D2-I-18",
     "VIP27-CDK-ESTER-TN-II-11",
     "VIP27-CDK-ESTER-TN-II-16",
     "VIP27-CDK-ESTER-TN-II-28",

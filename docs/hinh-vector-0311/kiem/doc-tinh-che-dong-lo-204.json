@@ -1,0 +1,271 @@
+{
+  "i": 99,
+  "hash": "13ab7877243941189907b506084a1ba97e56c54e5c9c61f82dac86ce1791dc25",
+  "fileNguon": "anh/13ab7877243941189907b506084a1ba97e56c54e5c9c61f82dac86ce1791dc25.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "zoom": "/workspace/scratch/cau4-copper204-zoom.png",
+  "questions": [
+    {
+      "qid": "VIP27-C5-B17-D2-I-17",
+      "de": "Kim loại đồng sau quá trình tách từ quặng thường lẫn các tạp chất là Ag, Ni, Fe. Để tinh chế đồng kim loại người ta tiến hành điện phân dung dịch chứa muối copper(II) sulfate, trong đó một điện cực là các lá đồng tinh khiết và điện cực còn lại là các khối đồng kim loại có lẫn tạp chất (hình).\nKhối đồng kim loại lẫn tạp chất được gắn với điện cực nào của dòng điện một chiều? và quá trình xảy ra tại điện cực đó?",
+      "refs": [
+        {
+          "hash": "13ab7877243941189907b506084a1ba97e56c54e5c9c61f82dac86ce1791dc25",
+          "where": "VIP27-C5-B17-D2-I-17.hinh.0.du_lieu",
+          "hashDataUrl": "93cf69155d89a55180e4867498b079cb8310c03bdb7c677c093d0dd59067c8f5"
+        }
+      ]
+    },
+    {
+      "qid": "VIP27-C5-B17-D2-I-18",
+      "de": "Kim loại đồng sau quá trình tách từ quặng thường lẫn các tạp chất là Ag, Ni, Fe. Để tinh chế đồng kim loại người ta tiến hành điện phân dung dịch chứa muối copper(II) sulfate, trong đó một điện cực là các lá đồng tinh khiết và điện cực còn lại là các khối đồng kim loại có lẫn tạp chất (hình).\nCho các phát biểu sau:\n(a) Nồng độ ion $\\ce{Cu^2+}$ không thay đổi trong quá trình điện phân.\n(b) Khối lượng lá đồng tăng bằng khối lượng khối đồng giảm.\n(c) Phần chất rắn trong \"bùn anode\" chủ yếu là các kim loại Ni, Fe.\n(d) Số mol electron trao đổi ở hai điện cực bằng nhau.\nSố phát biểu đúng là",
+      "refs": [
+        {
+          "hash": "13ab7877243941189907b506084a1ba97e56c54e5c9c61f82dac86ce1791dc25",
+          "where": "VIP27-C5-B17-D2-I-18.hinh.0.du_lieu",
+          "hashDataUrl": "93cf69155d89a55180e4867498b079cb8310c03bdb7c677c093d0dd59067c8f5"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–2pxapprox,nopolaritysymbolsprinted.",
+    "battery": {
+      "shortLeftPlate": [
+        [
+          257,
+          9
+        ],
+        [
+          257,
+          30
+        ]
+      ],
+      "longRightPlate": [
+        [
+          265,
+          4
+        ],
+        [
+          265,
+          38
+        ]
+      ],
+      "color": "orange",
+      "rightPlateLonger": true,
+      "labels": []
+    },
+    "wires": {
+      "left": [
+        [
+          257,
+          20
+        ],
+        [
+          147,
+          20
+        ],
+        [
+          147,
+          78
+        ]
+      ],
+      "right": [
+        [
+          265,
+          20
+        ],
+        [
+          426,
+          20
+        ],
+        [
+          426,
+          76
+        ]
+      ],
+      "noConnectionBetweenPlates": true,
+      "color": "orange"
+    },
+    "copperFoilLeft": {
+      "rect": [
+        138,
+        78,
+        155,
+        249
+      ],
+      "color": "orange",
+      "wireEndpoint": [
+        147,
+        78
+      ]
+    },
+    "copperBlockRight": {
+      "polygon": [
+        [
+          391,
+          88
+        ],
+        [
+          398,
+          84
+        ],
+        [
+          407,
+          76
+        ],
+        [
+          463,
+          76
+        ],
+        [
+          463,
+          244
+        ],
+        [
+          448,
+          255
+        ],
+        [
+          391,
+          255
+        ]
+      ],
+      "color": "orange",
+      "wireEndpoint": [
+        426,
+        76
+      ],
+      "note": "TopLeftnotch/bevel+bottomrightbevel,NOTplainrect/nonewfacescolor."
+    },
+    "beaker": {
+      "wall": [
+        [
+          105,
+          102
+        ],
+        [
+          105,
+          270
+        ],
+        [
+          491,
+          270
+        ],
+        [
+          491,
+          102
+        ]
+      ],
+      "stroke": "black~3px",
+      "openTop": true,
+      "noRimEllipse": true
+    },
+    "liquid": {
+      "rect": [
+        107,
+        142,
+        490,
+        268
+      ],
+      "fill": "uniformlavenderpurple",
+      "surfaceY": 142,
+      "note": "Faintsurfacelevelstrokecontinuesacrossorangeelectrodesinsource;electrodesremainopaqueorange,notpurplemasked."
+    },
+    "sludge": {
+      "outlineApprox": [
+        [
+          382,
+          268
+        ],
+        [
+          395,
+          265
+        ],
+        [
+          409,
+          263
+        ],
+        [
+          424,
+          261
+        ],
+        [
+          436,
+          263
+        ],
+        [
+          450,
+          267
+        ],
+        [
+          456,
+          268
+        ]
+      ],
+      "color": "black",
+      "location": "onbottomunder-rightblock,neverfloating",
+      "notParticleCount": true
+    },
+    "labels": [
+      {
+        "text": "lá đồng",
+        "anchor": [
+          47,
+          48
+        ],
+        "leader": [
+          [
+            80,
+            64
+          ],
+          [
+            138,
+            98
+          ]
+        ],
+        "leaderColor": "palelavender"
+      },
+      {
+        "text": "khối đồng",
+        "anchor": [
+          576,
+          53
+        ],
+        "leader": [
+          [
+            519,
+            60
+          ],
+          [
+            448,
+            106
+          ]
+        ],
+        "leaderColor": "palelavender"
+      },
+      {
+        "text": "bùn anode",
+        "anchor": [
+          597,
+          211
+        ],
+        "leader": [
+          [
+            541,
+            218
+          ],
+          [
+            448,
+            264
+          ]
+        ],
+        "leaderColor": "gray"
+      }
+    ],
+    "counts": "2electrodes/2batteryplates/2wires/3labels+3leaders/1sludgemound/1liquidbeaker. No+/−lettersCuions/electronarrows/currentdirectioncaptionadded.",
+    "publicStemData": "Refsaskpolarity/statementtruth;doNOTsolveoraddpolarity/chemicalformulasfromstem."
+  },
+  "verdict": "Đọcsource,chưaactualSVGreview."
+}
