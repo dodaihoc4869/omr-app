@@ -1,0 +1,40 @@
+[
+  {
+    "i": 73,
+    "hash": "0ea2d853eeaf3d420361bc7e85bc98572359ad43a93a9b52f874fd9c4c7ce1df",
+    "fileNguon": "anh/0ea2d853eeaf3d420361bc7e85bc98572359ad43a93a9b52f874fd9c4c7ce1df.png",
+    "svg": "disaccharide-doi-chieu-ddh-1a4396c12613b9d44c9661c45f36c8defa52dd10808e0515ae2182d46d1ec86e.svg",
+    "hashSvg": "1a4396c12613b9d44c9661c45f36c8defa52dd10808e0515ae2182d46d1ec86e",
+    "byteSvg": 85390,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-12-B5-D2-II-293",
+        "de": "Cấu trúc phân tử saccharose và maltose được cho trong hình dưới đây:",
+        "refs": [
+          {
+            "hash": "0ea2d853eeaf3d420361bc7e85bc98572359ad43a93a9b52f874fd9c4c7ce1df",
+            "where": "DB-12-B5-D2-II-293.hinh.0.du_lieu",
+            "hashDataUrl": "cd853a14b7da291406429e88e2cf9d71e674d93d750126789dbbfc44cb4500fd"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B5-II-10",
+        "de": "Cấu trúc phân tử saccharose và maltose được cho trong hình dưới đây:",
+        "refs": [
+          {
+            "hash": "0ea2d853eeaf3d420361bc7e85bc98572359ad43a93a9b52f874fd9c4c7ce1df",
+            "where": "DH-12-C2-B5-II-10.hinh.0.du_lieu",
+            "hashDataUrl": "cd853a14b7da291406429e88e2cf9d71e674d93d750126789dbbfc44cb4500fd"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2panels/3sixrings1five/24Cnumbers/allH-OH-CH2OH-HOCH2/2bridgeO/2leaderarrows/2glycosidecaptions/2bottomcaptions/4lowerhorizontalbold/uniformdiagonals/DDHpath.",
+    "hashSvgDaSoat": "1a4396c12613b9d44c9661c45f36c8defa52dd10808e0515ae2182d46d1ec86e",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

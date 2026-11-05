@@ -1,0 +1,678 @@
+{
+  "i": 73,
+  "hash": "0ea2d853eeaf3d420361bc7e85bc98572359ad43a93a9b52f874fd9c4c7ce1df",
+  "fileNguon": "anh/0ea2d853eeaf3d420361bc7e85bc98572359ad43a93a9b52f874fd9c4c7ce1df.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "zooms": [
+    "/workspace/scratch/cau4-202-saccharose-zoom.png",
+    "/workspace/scratch/cau4-202-maltose-zoom.png"
+  ],
+  "questions": [
+    {
+      "qid": "DB-12-B5-D2-II-293",
+      "de": "Cấu trúc phân tử saccharose và maltose được cho trong hình dưới đây:",
+      "refs": [
+        {
+          "hash": "0ea2d853eeaf3d420361bc7e85bc98572359ad43a93a9b52f874fd9c4c7ce1df",
+          "where": "DB-12-B5-D2-II-293.hinh.0.du_lieu",
+          "hashDataUrl": "cd853a14b7da291406429e88e2cf9d71e674d93d750126789dbbfc44cb4500fd"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C2-B5-II-10",
+      "de": "Cấu trúc phân tử saccharose và maltose được cho trong hình dưới đây:",
+      "refs": [
+        {
+          "hash": "0ea2d853eeaf3d420361bc7e85bc98572359ad43a93a9b52f874fd9c4c7ce1df",
+          "where": "DH-12-C2-B5-II-10.hinh.0.du_lieu",
+          "hashDataUrl": "cd853a14b7da291406429e88e2cf9d71e674d93d750126789dbbfc44cb4500fd"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–2pxapprox;24Cnumberslabelsnotarrows. Noalias787/1325assumed.",
+    "saccharose": {
+      "glucose": {
+        "ring": {
+          "C4": [
+            24,
+            139
+          ],
+          "C5": [
+            54,
+            106
+          ],
+          "O": [
+            97,
+            108
+          ],
+          "C1": [
+            127,
+            139
+          ],
+          "C2": [
+            96,
+            171
+          ],
+          "C3": [
+            54,
+            171
+          ]
+        },
+        "CH2OH": {
+          "anchor": [
+            78,
+            78
+          ],
+          "bond": [
+            [
+              54,
+              106
+            ],
+            [
+              54,
+              89
+            ]
+          ],
+          "target": "Cfirst"
+        },
+        "OH": [
+          {
+            "on": "C4down",
+            "anchor": [
+              30,
+              169
+            ]
+          },
+          {
+            "on": "C3up",
+            "anchor": [
+              63,
+              147
+            ]
+          },
+          {
+            "on": "C2down",
+            "anchor": [
+              105,
+              201
+            ]
+          }
+        ],
+        "H": [
+          {
+            "on": "C4up",
+            "at": [
+              24,
+              109
+            ]
+          },
+          {
+            "on": "C5down",
+            "at": [
+              54,
+              127
+            ]
+          },
+          {
+            "on": "C3down",
+            "at": [
+              54,
+              201
+            ]
+          },
+          {
+            "on": "C2up",
+            "at": [
+              96,
+              143
+            ]
+          },
+          {
+            "on": "C1up",
+            "at": [
+              127,
+              109
+            ]
+          }
+        ],
+        "frontstyle": "diagonalsuniformNOTtaper;horizontalbold",
+        "numbers": {
+          "1": [
+            133,
+            134
+          ],
+          "2": [
+            93,
+            181
+          ],
+          "3": [
+            59,
+            181
+          ],
+          "4": [
+            17,
+            140
+          ],
+          "5": [
+            49,
+            103
+          ],
+          "6": [
+            55,
+            66
+          ]
+        }
+      },
+      "fructose": {
+        "ring": {
+          "C2": [
+            211,
+            135
+          ],
+          "C3": [
+            236,
+            184
+          ],
+          "C4": [
+            293,
+            184
+          ],
+          "C5": [
+            312,
+            135
+          ],
+          "O": [
+            262,
+            108
+          ]
+        },
+        "terminalGroups": [
+          {
+            "text": "HOCH₂",
+            "anchor": [
+              208,
+              100
+            ],
+            "bond": [
+              [
+                211,
+                135
+              ],
+              [
+                211,
+                111
+              ]
+            ],
+            "target": "CafterHO",
+            "Cnumber": 1
+          },
+          {
+            "text": "CH₂OH",
+            "anchor": [
+              334,
+              169
+            ],
+            "bond": [
+              [
+                312,
+                135
+              ],
+              [
+                312,
+                156
+              ]
+            ],
+            "target": "Cfirst",
+            "Cnumber": 6
+          }
+        ],
+        "OH": [
+          {
+            "text": "OH",
+            "on": "C3down",
+            "at": [
+              243,
+              214
+            ],
+            "bond": [
+              [
+                236,
+                184
+              ],
+              [
+                236,
+                204
+              ]
+            ]
+          },
+          {
+            "text": "HO",
+            "on": "C4up",
+            "at": [
+              284,
+              155
+            ],
+            "bond": [
+              [
+                293,
+                184
+              ],
+              [
+                293,
+                165
+              ]
+            ],
+            "target": "Oright"
+          }
+        ],
+        "H": [
+          {
+            "on": "C3up",
+            "at": [
+              237,
+              153
+            ]
+          },
+          {
+            "on": "C4down",
+            "at": [
+              293,
+              214
+            ]
+          },
+          {
+            "on": "C5up",
+            "at": [
+              311,
+              103
+            ]
+          }
+        ],
+        "numbers": {
+          "1": [
+            210,
+            86
+          ],
+          "2": [
+            206,
+            130
+          ],
+          "3": [
+            242,
+            194
+          ],
+          "4": [
+            286,
+            194
+          ],
+          "5": [
+            318,
+            131
+          ],
+          "6": [
+            317,
+            156
+          ]
+        },
+        "frontstyle": "uniformdiagonalsNOTtriangularwedge,horizontalbold"
+      },
+      "bridgeO": [
+        163,
+        164
+      ],
+      "bridgeBonds": [
+        [
+          127,
+          139,
+          153,
+          160
+        ],
+        [
+          173,
+          159,
+          211,
+          135
+        ]
+      ],
+      "leader": {
+        "label": "liên kết α-1,2-glycoside",
+        "anchor": [
+          164,
+          23
+        ],
+        "shaft": [
+          [
+            149,
+            38
+          ],
+          [
+            149,
+            156
+          ]
+        ],
+        "target": "externalGlucoseC1–Olinknear150157bond,notOatom/reducingOH"
+      },
+      "caption": "Phân tử saccharose",
+      "captionAnchor": [
+        174,
+        239
+      ]
+    },
+    "maltose": {
+      "left": {
+        "ring": {
+          "C4": [
+            421,
+            138
+          ],
+          "C5": [
+            453,
+            107
+          ],
+          "O": [
+            494,
+            108
+          ],
+          "C1": [
+            526,
+            138
+          ],
+          "C2": [
+            495,
+            171
+          ],
+          "C3": [
+            453,
+            171
+          ]
+        },
+        "CH2OH": {
+          "anchor": [
+            477,
+            79
+          ],
+          "bond": [
+            [
+              453,
+              107
+            ],
+            [
+              453,
+              90
+            ]
+          ],
+          "target": "Cfirst"
+        },
+        "OH": [
+          {
+            "on": "C4down",
+            "anchor": [
+              427,
+              168
+            ]
+          },
+          {
+            "on": "C3up",
+            "anchor": [
+              462,
+              147
+            ]
+          },
+          {
+            "on": "C2down",
+            "anchor": [
+              504,
+              201
+            ]
+          }
+        ],
+        "H": [
+          {
+            "on": "C4up",
+            "at": [
+              421,
+              108
+            ]
+          },
+          {
+            "on": "C5down",
+            "at": [
+              453,
+              128
+            ]
+          },
+          {
+            "on": "C3down",
+            "at": [
+              453,
+              201
+            ]
+          },
+          {
+            "on": "C2up",
+            "at": [
+              495,
+              143
+            ]
+          },
+          {
+            "on": "C1up",
+            "at": [
+              526,
+              108
+            ]
+          }
+        ],
+        "frontstyle": "diagonalsuniformNOTtaper;horizontalbold",
+        "numbers": {
+          "1": [
+            531,
+            134
+          ],
+          "2": [
+            491,
+            181
+          ],
+          "3": [
+            459,
+            181
+          ],
+          "4": [
+            414,
+            138
+          ],
+          "5": [
+            449,
+            103
+          ],
+          "6": [
+            452,
+            65
+          ]
+        }
+      },
+      "right": {
+        "ring": {
+          "C4": [
+            597,
+            136
+          ],
+          "C5": [
+            626,
+            102
+          ],
+          "O": [
+            672,
+            104
+          ],
+          "C1": [
+            705,
+            136
+          ],
+          "C2": [
+            671,
+            169
+          ],
+          "C3": [
+            628,
+            169
+          ]
+        },
+        "CH2OH": {
+          "anchor": [
+            650,
+            74
+          ],
+          "bond": [
+            [
+              626,
+              102
+            ],
+            [
+              626,
+              85
+            ]
+          ],
+          "target": "Cfirst"
+        },
+        "OH": [
+          {
+            "on": "C3up",
+            "anchor": [
+              637,
+              145
+            ]
+          },
+          {
+            "on": "C2down",
+            "anchor": [
+              680,
+              199
+            ]
+          },
+          {
+            "on": "C1down",
+            "anchor": [
+              714,
+              169
+            ]
+          }
+        ],
+        "H": [
+          {
+            "on": "C4up",
+            "at": [
+              597,
+              106
+            ]
+          },
+          {
+            "on": "C5down",
+            "at": [
+              626,
+              123
+            ]
+          },
+          {
+            "on": "C3down",
+            "at": [
+              628,
+              199
+            ]
+          },
+          {
+            "on": "C2up",
+            "at": [
+              671,
+              141
+            ]
+          },
+          {
+            "on": "C1up",
+            "at": [
+              705,
+              103
+            ]
+          }
+        ],
+        "frontstyle": "diagonalsuniformNOTtaper;horizontalbold",
+        "numbers": {
+          "1": [
+            712,
+            132
+          ],
+          "2": [
+            667,
+            179
+          ],
+          "3": [
+            634,
+            179
+          ],
+          "4": [
+            591,
+            134
+          ],
+          "5": [
+            622,
+            99
+          ],
+          "6": [
+            627,
+            62
+          ]
+        },
+        "note": "C4 nối glycosidicO,KHÔNG cóOHdownmới."
+      },
+      "bridgeO": [
+        562,
+        162
+      ],
+      "bridgeBonds": [
+        [
+          526,
+          138,
+          551,
+          157
+        ],
+        [
+          574,
+          156,
+          597,
+          136
+        ]
+      ],
+      "leader": {
+        "label": "liên kết α-1,4-glycoside",
+        "anchor": [
+          560,
+          20
+        ],
+        "shaft": [
+          [
+            545,
+            35
+          ],
+          [
+            546,
+            150
+          ]
+        ],
+        "target": "externalC1–Obondnear546154,gap~4pxsource;notOatom"
+      },
+      "caption": "Phân tử maltose",
+      "captionAnchor": [
+        558,
+        237
+      ]
+    },
+    "counts": "4rings(3six1five)/24Cnumbers/18Hexplicit(5eachglucose+3fructose)/5terminalOHgroups(4CH2OH-Cfirst+1HOCH2-CafterHO),11standaloneOH/HOlabels=16alcoholgroupsbothpanels/4ringO+2bridgeO=22Ototal;2glycosideleaders/2captions.",
+    "style": "Native3sixringsfrontdiagonalsuniform~1.5..2px/horizontal~2..3px;fivefrontdiagonaluniform~2pxnotclearwedges,noaddtaper. Captionsandlinklabelsapparentlybold;rebuildDDHdamtrulyifweightchosen.",
+    "noAdded": "Noalpha-betaextra/catalysts/equilibriumarrows/CIP/atomHchanges/aliaswithoutnativecomparison."
+  },
+  "verdict": "Đọcsource,chưaactualSVGreview."
+}
