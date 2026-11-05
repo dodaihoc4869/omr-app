@@ -1,0 +1,620 @@
+{
+  "i": 1402,
+  "hash": "fc5001e1b004158336c360edfbc6b82319d4ab9b1df302469a0ada0e26e5df98",
+  "fileNguon": "anh/fc5001e1b004158336c360edfbc6b82319d4ab9b1df302469a0ada0e26e5df98.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNative": true,
+  "zoom": "/workspace/scratch/cau4-glucose187-zoom.png",
+  "questions": [
+    {
+      "qid": "DB-12-B5-D2-II-253",
+      "maDe": "DB-12-B5-D2",
+      "de": "Cho sơ đồ cấu tạo dạng mạch hở và mạch vòng của glucose được mô tả ở hình dưới đây:",
+      "hinh": [
+        {
+          "hash": "fc5001e1b004158336c360edfbc6b82319d4ab9b1df302469a0ada0e26e5df98",
+          "where": "DB-12-B5-D2-II-253.hinh.0.du_lieu",
+          "hashDataUrl": "b4a68144da522383b4e72faf3c1976eaaf5e5059b21c4e5f3b3f80b8e641ef56"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C2-B4-II-26",
+      "maDe": "DH-12-C2-B4",
+      "de": "Cho sơ đồ cấu tạo dạng mạch hở và mạch vòng của glucose được mô tả ở hình dưới đây:",
+      "hinh": [
+        {
+          "hash": "fc5001e1b004158336c360edfbc6b82319d4ab9b1df302469a0ada0e26e5df98",
+          "where": "DH-12-C2-B4-II-26.hinh.0.du_lieu",
+          "hashDataUrl": "b4a68144da522383b4e72faf3c1976eaaf5e5059b21c4e5f3b3f80b8e641ef56"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C2-B4-VD-II-2",
+      "maDe": "DH-12-C2-B4-VD",
+      "de": "Cho sơ đồ cấu tạo dạng mạch hở và mạch vòng của glucose được mô tả ở hình dưới đây:",
+      "hinh": [
+        {
+          "hash": "fc5001e1b004158336c360edfbc6b82319d4ab9b1df302469a0ada0e26e5df98",
+          "where": "DH-12-C2-B4-VD-II-2.hinh.0.du_lieu",
+          "hashDataUrl": "b4a68144da522383b4e72faf3c1976eaaf5e5059b21c4e5f3b3f80b8e641ef56"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchor1–2pxscantolerance; khôngthêmHtheotên.",
+    "alpha": {
+      "nodes": {
+        "C4": [
+          26,
+          91
+        ],
+        "C3": [
+          64,
+          120
+        ],
+        "C2": [
+          123,
+          120
+        ],
+        "C1": [
+          162,
+          91
+        ],
+        "O": [
+          123,
+          61
+        ],
+        "C5": [
+          64,
+          62
+        ]
+      },
+      "branchC6": [
+        64,
+        37
+      ],
+      "OH": [
+        {
+          "text": "OH",
+          "at": [
+            93,
+            22
+          ],
+          "bond": [
+            [
+              64,
+              37
+            ],
+            [
+              79,
+              27
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            168,
+            119
+          ],
+          "bond": [
+            [
+              162,
+              91
+            ],
+            [
+              162,
+              113
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            129,
+            147
+          ],
+          "bond": [
+            [
+              123,
+              120
+            ],
+            [
+              123,
+              141
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            70,
+            84
+          ],
+          "bond": [
+            [
+              64,
+              120
+            ],
+            [
+              64,
+              93
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            32,
+            120
+          ],
+          "bond": [
+            [
+              26,
+              91
+            ],
+            [
+              26,
+              114
+            ]
+          ]
+        }
+      ],
+      "numbers": {
+        "1": [
+          162,
+          81
+        ],
+        "2": [
+          113,
+          130
+        ],
+        "3": [
+          64,
+          130
+        ],
+        "4": [
+          20,
+          87
+        ],
+        "5": [
+          55,
+          57
+        ],
+        "6": [
+          59,
+          32
+        ]
+      },
+      "caption": "α-glucose",
+      "captionAt": [
+        91,
+        168
+      ],
+      "frontBonds": [
+        {
+          "from": [
+            26,
+            91
+          ],
+          "to": [
+            64,
+            120
+          ],
+          "style": "taper narrowatC4wideatC3"
+        },
+        {
+          "from": [
+            64,
+            120
+          ],
+          "to": [
+            123,
+            120
+          ],
+          "style": "boldhorizontal"
+        },
+        {
+          "from": [
+            123,
+            120
+          ],
+          "to": [
+            162,
+            91
+          ],
+          "style": "taper wideatC2narrowatC1"
+        }
+      ]
+    },
+    "open": {
+      "chain": [
+        [
+          275,
+          25
+        ],
+        [
+          275,
+          51
+        ],
+        [
+          275,
+          77
+        ],
+        [
+          275,
+          103
+        ],
+        [
+          275,
+          130
+        ],
+        [
+          275,
+          157
+        ]
+      ],
+      "topAldehyde": {
+        "carbonylBonds": [
+          [
+            275,
+            24,
+            291,
+            14
+          ],
+          [
+            278,
+            27,
+            293,
+            17
+          ]
+        ],
+        "O": [
+          299,
+          10
+        ],
+        "Hexplicit": false,
+        "Cexplicit": false
+      },
+      "groups": [
+        {
+          "text": "OH",
+          "at": [
+            307,
+            49
+          ],
+          "bond": [
+            [
+              275,
+              51
+            ],
+            [
+              294,
+              51
+            ]
+          ]
+        },
+        {
+          "text": "HO",
+          "at": [
+            243,
+            76
+          ],
+          "bond": [
+            [
+              275,
+              77
+            ],
+            [
+              254,
+              77
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            307,
+            102
+          ],
+          "bond": [
+            [
+              275,
+              103
+            ],
+            [
+              294,
+              103
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            307,
+            129
+          ],
+          "bond": [
+            [
+              275,
+              130
+            ],
+            [
+              294,
+              130
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            303,
+            169
+          ],
+          "bond": [
+            [
+              275,
+              157
+            ],
+            [
+              291,
+              167
+            ]
+          ]
+        }
+      ],
+      "numbers": {
+        "1": [
+          268,
+          27
+        ],
+        "2": [
+          268,
+          52
+        ],
+        "3": [
+          268,
+          85
+        ],
+        "4": [
+          268,
+          107
+        ],
+        "5": [
+          268,
+          132
+        ],
+        "6": [
+          268,
+          158
+        ]
+      },
+      "caption": null
+    },
+    "beta": {
+      "nodes": {
+        "C4": [
+          388,
+          91
+        ],
+        "C3": [
+          426,
+          120
+        ],
+        "C2": [
+          485,
+          120
+        ],
+        "C1": [
+          524,
+          91
+        ],
+        "O": [
+          485,
+          61
+        ],
+        "C5": [
+          426,
+          62
+        ]
+      },
+      "branchC6": [
+        426,
+        37
+      ],
+      "OH": [
+        {
+          "text": "OH",
+          "at": [
+            455,
+            22
+          ],
+          "bond": [
+            [
+              426,
+              37
+            ],
+            [
+              441,
+              27
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            530,
+            57
+          ],
+          "bond": [
+            [
+              524,
+              91
+            ],
+            [
+              524,
+              67
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            491,
+            147
+          ],
+          "bond": [
+            [
+              485,
+              120
+            ],
+            [
+              485,
+              141
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            432,
+            84
+          ],
+          "bond": [
+            [
+              426,
+              120
+            ],
+            [
+              426,
+              93
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            394,
+            120
+          ],
+          "bond": [
+            [
+              388,
+              91
+            ],
+            [
+              388,
+              114
+            ]
+          ]
+        }
+      ],
+      "numbers": {
+        "1": [
+          530,
+          101
+        ],
+        "2": [
+          475,
+          130
+        ],
+        "3": [
+          429,
+          130
+        ],
+        "4": [
+          385,
+          87
+        ],
+        "5": [
+          420,
+          57
+        ],
+        "6": [
+          421,
+          32
+        ]
+      },
+      "caption": "β-glucose",
+      "captionAt": [
+        453,
+        168
+      ],
+      "frontBonds": [
+        {
+          "from": [
+            388,
+            91
+          ],
+          "to": [
+            426,
+            120
+          ],
+          "style": "taper narrowatC4wideatC3"
+        },
+        {
+          "from": [
+            426,
+            120
+          ],
+          "to": [
+            485,
+            120
+          ],
+          "style": "boldhorizontal"
+        },
+        {
+          "from": [
+            485,
+            120
+          ],
+          "to": [
+            524,
+            91
+          ],
+          "style": "taper wideatC2narrowatC1"
+        }
+      ]
+    },
+    "equilibria": [
+      {
+        "upper": [
+          190,
+          90,
+          219,
+          90
+        ],
+        "upperDirection": "right",
+        "lower": [
+          219,
+          94,
+          190,
+          94
+        ],
+        "lowerDirection": "left"
+      },
+      {
+        "upper": [
+          333,
+          90,
+          363,
+          90
+        ],
+        "upperDirection": "right",
+        "lower": [
+          363,
+          94,
+          333,
+          94
+        ],
+        "lowerDirection": "left"
+      }
+    ],
+    "counts": "3forms/18Cnumbers;each6implicitC+6O;ring5OH+1etherO,open5OH+1carbonylO;0Hexplit/0Cexplicit/0CH2OHtext/2captionsonly.",
+    "critical": "alphaC1OHdown,betaC1OHup;C2OHdown/C3OHup/C4OHdown/C6branchupboth. Front2taper+horizontalboldMỖIring khôngbỏ4taper. OpenaldehydeHẩn,khôngthêmH–Ctext."
+  },
+  "verdict": "Đọc nguồn; chưa soSVG."
+}

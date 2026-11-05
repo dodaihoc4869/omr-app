@@ -1,0 +1,51 @@
+[
+  {
+    "i": 1402,
+    "hash": "fc5001e1b004158336c360edfbc6b82319d4ab9b1df302469a0ada0e26e5df98",
+    "fileNguon": "anh/fc5001e1b004158336c360edfbc6b82319d4ab9b1df302469a0ada0e26e5df98.png",
+    "svg": "glucose-ba-dang-1402-ddh-ad0d2fa10f3128484f33cef01221ad2bb0977225bba0373198558cfcc56af13d.svg",
+    "hashSvg": "ad0d2fa10f3128484f33cef01221ad2bb0977225bba0373198558cfcc56af13d",
+    "byteSvg": 35507,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-12-B5-D2-II-253",
+        "de": "Cho sơ đồ cấu tạo dạng mạch hở và mạch vòng của glucose được mô tả ở hình dưới đây:",
+        "refs": [
+          {
+            "hash": "fc5001e1b004158336c360edfbc6b82319d4ab9b1df302469a0ada0e26e5df98",
+            "where": "DB-12-B5-D2-II-253.hinh.0.du_lieu",
+            "hashDataUrl": "b4a68144da522383b4e72faf3c1976eaaf5e5059b21c4e5f3b3f80b8e641ef56"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-II-26",
+        "de": "Cho sơ đồ cấu tạo dạng mạch hở và mạch vòng của glucose được mô tả ở hình dưới đây:",
+        "refs": [
+          {
+            "hash": "fc5001e1b004158336c360edfbc6b82319d4ab9b1df302469a0ada0e26e5df98",
+            "where": "DH-12-C2-B4-II-26.hinh.0.du_lieu",
+            "hashDataUrl": "b4a68144da522383b4e72faf3c1976eaaf5e5059b21c4e5f3b3f80b8e641ef56"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-VD-II-2",
+        "de": "Cho sơ đồ cấu tạo dạng mạch hở và mạch vòng của glucose được mô tả ở hình dưới đây:",
+        "refs": [
+          {
+            "hash": "fc5001e1b004158336c360edfbc6b82319d4ab9b1df302469a0ada0e26e5df98",
+            "where": "DH-12-C2-B4-VD-II-2.hinh.0.du_lieu",
+            "hashDataUrl": "b4a68144da522383b4e72faf3c1976eaaf5e5059b21c4e5f3b3f80b8e641ef56"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3formsα/open/β/18numbers/allOH-HO/terminalimplicitC/0Hexplicit/0CH2OH-CHOtext/4taperfront+2horizontalbold/2⇌/2captions/DDHpath.",
+    "hashSvgDaSoat": "ad0d2fa10f3128484f33cef01221ad2bb0977225bba0373198558cfcc56af13d",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

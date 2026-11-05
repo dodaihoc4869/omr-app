@@ -1377,3 +1377,10 @@ Nhóm169đãxong15/20;1120/1030/1046ĐÃĐẠTđừngtrùng. CÒN765/1195/806/10
 -251fructose3formsα/open/β/18nums/từngOH-HO/implicitCterminalbranches/0Hexplicit/0CH2OHtext/2taperfront+horizontalboldmỗivòng/2⇌/2captions/DDHpath. Nativefull/zoom/freshactualSVG/hashsoátđộclập;khôngalias1046. Đãsửabroadwidth4taperfrontsaufreshreview,candidate97f71bịloạilưuriêng.
 -Chromium527/527/hash/XML/path/selfcontained/AST/build186/precache170/2613.23KiB/speed21/21đạt. SizegateđỏNỀNindex.tsnguyênbytekhôngnângmốc;phảixửlýtrướcgộp/deploy.Mainab81c625chưagộp/WOFF2khôngdiff. Chưa tích hợp/chưa reload offline app/chưa phát hành. Chưa tham vấn được cố vấn.
 -Tiếpnhómnguồndùng3câu25/386/753/1305/1402chưamanifest,đọcnative/full/stem/refssocảhashtrướcdựng.251đãđạtđừngtrùng;138làảnhchaiGlucose5%rootđãmởnativeCHƯAsoátphânloạiđộclập/khôngvẽgiảphoto.25làbátsứ-khuấy-lưới3chânđèncồn0text,rootđãmởnativeCHƯAdựng. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.
+
+
+### 05/11 — Lô187: ba dạng glucose nguồn1402
+-1048 câu đủ mọi hình+DDH/7 một phần;775 nguồn→528 SVG;8556502byte/gzip1688584;653 nguồn còn lại.
+-1402glucose3formsα/open/β/18nums/allOH-HO/terminalimplicitC/0Hexplicit/0CH2OH-CHOtext/openaldehydeC=Ochéophải/4taperfront+2horizontalbold/2⇌/2captions/DDHpath. Nativefull/zoom/freshactualSVG/hashsoátđộclập.
+-Chromium528/528/hash/XML/path/selfcontained/AST/build187/precache170/2613.23KiB/speed21/21đạt. SizegateđỏNỀNindex.tsnguyênbytekhôngnângmốc;phảixửlýtrướcgộp/deploy.Mainab81c625chưagộp/WOFF2khôngdiff. Chưa tích hợp/chưa reload offline app/chưa phát hành. Chưa tham vấn được cố vấn.
+-Tiếpnhómnguồndùng3câu25/386/753/1305chưamanifest,đọcnative/full/stem/refssocảhashtrướcdựng.1402/251đãđạtđừngtrùng;138ảnhchaiGlucose5%CHƯAsoátphânloạiđộclập/khôngvẽgiảphoto.25bátsứ-khuấy-lưới3chânđèncồn0textrootđãmởnativeCHƯAdựng. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.
