@@ -136,6 +136,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "0730f7837bde8a5f413205fe4ca422ad495c4bc8a2da8a01b9aca5ef493427f7": {
+      "tep": "ong-phong-dien-ddh-f68611fd65544bd538148883e5f3ac0657fca1ee7a25c8f8a2899610fa687555.svg",
+      "hashSvg": "f68611fd65544bd538148883e5f3ac0657fca1ee7a25c8f8a2899610fa687555",
+      "byteSvg": 26303,
+      "byteGzip": 5321,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "9e853dc325dddbe7c58462e4e89158a25484fe337451e0773c3c52d5818e5375": {
       "tep": "ms-cu-ddh-edadd0c0f2254abdda86d1f564ec2861326528380646c0e088f2fed374b88c4e.svg",
       "hashSvg": "edadd0c0f2254abdda86d1f564ec2861326528380646c0e088f2fed374b88c4e",
@@ -7061,6 +7070,20 @@
       ]
     },
     {
+      "qid": "10-C1-B1-II-3",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "0730f7837bde8a5f413205fe4ca422ad495c4bc8a2da8a01b9aca5ef493427f7",
+          "where": "10-C1-B1-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "3658dc1c2ad98bb0ab480e3dcabb58c633be8ed4e6dc6a873c44a16a9d8b7b86",
+          "vector": "ong-phong-dien-ddh-f68611fd65544bd538148883e5f3ac0657fca1ee7a25c8f8a2899610fa687555.svg"
+        }
+      ]
+    },
+    {
       "qid": "10-C1-B1-II-5",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -12859,6 +12882,20 @@
           "where": "DB-10-B1-D1-I-43.hinh.0.du_lieu",
           "hashDataUrl": "7556dd2fa14066ef67768c50e05f5f6d027c5c4ae17b059de5d8ac0a2b2abb1d",
           "vector": "nguyen-tu-ddh-66e18baf05c3cd4658c1c4ffe8c885284702b98d6fbd3e876293684540e7c21c.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-10-B1-D1-II-56",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "0730f7837bde8a5f413205fe4ca422ad495c4bc8a2da8a01b9aca5ef493427f7",
+          "where": "DB-10-B1-D1-II-56.hinh.0.du_lieu",
+          "hashDataUrl": "3658dc1c2ad98bb0ab480e3dcabb58c633be8ed4e6dc6a873c44a16a9d8b7b86",
+          "vector": "ong-phong-dien-ddh-f68611fd65544bd538148883e5f3ac0657fca1ee7a25c8f8a2899610fa687555.svg"
         }
       ]
     },
@@ -24228,6 +24265,7 @@
   "cauDuMoiHinh": [
     "10-C1-B1-I-48",
     "10-C1-B1-I-50",
+    "10-C1-B1-II-3",
     "10-C1-B1-II-5",
     "10-C1-B1-III-18",
     "10-C1-B2-I-27",
@@ -24588,6 +24626,7 @@
     "DB-10-B2-D2-III-131",
     "DB-10-B1-D1-I-41",
     "DB-10-B1-D1-I-43",
+    "DB-10-B1-D1-II-56",
     "DB-10-B1-D1-II-58",
     "DB-10-B1-D1-III-77",
     "DB-10-B1-D1-I-80",

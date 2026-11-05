@@ -1,0 +1,298 @@
+{
+  "i": 36,
+  "hash": "0730f7837bde8a5f413205fe4ca422ad495c4bc8a2da8a01b9aca5ef493427f7",
+  "fileNguon": "anh/0730f7837bde8a5f413205fe4ca422ad495c4bc8a2da8a01b9aca5ef493427f7.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNative": true,
+  "zoom": "/workspace/scratch/cau4-discharge194-zoom.png",
+  "questions": [
+    {
+      "qid": "10-C1-B1-II-3",
+      "maDe": "10-C1-B1",
+      "de": "J. J. Thomson, nhà vật lí người Anh, được trao Giải thưởng Nobel Vật lí vào năm 1906 vì phát hiện ra một loại hạt cơ bản tạo nên nguyên tử.\nThomson đã chế tạo ống tia âm cực gồm một ống thuỷ tinh được hút phần lớn không khí ra khỏi ống, một hiệu điện thế cao được đặt vào hai điện cực gắn ở hai đầu ống. Năm 1897, ông phát hiện ra một dòng hạt đi ra từ điện cực tích điện âm sang điện cực tích điện dương.\nỐng tia âm cực",
+      "hinh": [
+        {
+          "hash": "0730f7837bde8a5f413205fe4ca422ad495c4bc8a2da8a01b9aca5ef493427f7",
+          "where": "10-C1-B1-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "3658dc1c2ad98bb0ab480e3dcabb58c633be8ed4e6dc6a873c44a16a9d8b7b86"
+        }
+      ]
+    },
+    {
+      "qid": "DB-10-B1-D1-II-56",
+      "maDe": "DB-10-B1-D1",
+      "de": "J. J. Thomson, nhà vật lí người Anh, được trao Giải thưởng Nobel Vật lí vào năm 1906 vì phát hiện ra một loại hạt cơ bản tạo nên nguyên tử.\nThomson đã chế tạo ống tia âm cực gồm một ống thuỷ tinh được hút phần lớn không khí ra khỏi ống, một hiệu điện thế cao được đặt vào hai điện cực gắn ở hai đầu ống. Năm 1897, ông phát hiện ra một dòng hạt đi ra từ điện cực tích điện âm sang điện cực tích điện dương.\nỐng tia âm cực",
+      "hinh": [
+        {
+          "hash": "0730f7837bde8a5f413205fe4ca422ad495c4bc8a2da8a01b9aca5ef493427f7",
+          "where": "DB-10-B1-D1-II-56.hinh.0.du_lieu",
+          "hashDataUrl": "3658dc1c2ad98bb0ab480e3dcabb58c633be8ed4e6dc6a873c44a16a9d8b7b86"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–2pxapprox,3headsRIGHTđọczoomkhôngsuytheory.",
+    "capsule": {
+      "bbox": [
+        139,
+        90,
+        487,
+        179
+      ],
+      "radiusApprox": 44,
+      "fill": "pale yellow",
+      "border": "darkgray/slighthighlight,double-ishscanedgekhôngthêmwallmới"
+    },
+    "electrodes": [
+      {
+        "from": [
+          203,
+          104
+        ],
+        "to": [
+          203,
+          165
+        ],
+        "polarity": "−",
+        "polarityAnchor": [
+          128,
+          124
+        ],
+        "color": "gray"
+      },
+      {
+        "from": [
+          428,
+          104
+        ],
+        "to": [
+          428,
+          165
+        ],
+        "polarity": "+",
+        "polarityAnchor": [
+          501,
+          118
+        ],
+        "color": "gray"
+      }
+    ],
+    "rays": [
+      {
+        "from": [
+          209,
+          124
+        ],
+        "to": [
+          422,
+          124
+        ],
+        "direction": "RIGHT",
+        "arrowHeadApprox": [
+          [
+            412,
+            121
+          ],
+          [
+            422,
+            124
+          ],
+          [
+            412,
+            127
+          ]
+        ]
+      },
+      {
+        "from": [
+          209,
+          134
+        ],
+        "to": [
+          422,
+          134
+        ],
+        "direction": "RIGHT",
+        "arrowHeadApprox": [
+          [
+            412,
+            131
+          ],
+          [
+            422,
+            134
+          ],
+          [
+            412,
+            137
+          ]
+        ]
+      },
+      {
+        "from": [
+          209,
+          143
+        ],
+        "to": [
+          422,
+          143
+        ],
+        "direction": "RIGHT",
+        "arrowHeadApprox": [
+          [
+            412,
+            140
+          ],
+          [
+            422,
+            143
+          ],
+          [
+            412,
+            146
+          ]
+        ]
+      }
+    ],
+    "rayCount": 3,
+    "wireLeft": [
+      [
+        203,
+        132
+      ],
+      [
+        106,
+        132
+      ],
+      [
+        106,
+        259
+      ],
+      [
+        297,
+        259
+      ],
+      [
+        297,
+        277
+      ]
+    ],
+    "wireRight": [
+      [
+        428,
+        132
+      ],
+      [
+        525,
+        132
+      ],
+      [
+        525,
+        259
+      ],
+      [
+        333,
+        259
+      ],
+      [
+        333,
+        277
+      ]
+    ],
+    "voltageSource": {
+      "rect": [
+        280,
+        277,
+        345,
+        311
+      ],
+      "fill": "redmaroon",
+      "border": "darkgray",
+      "minus": [
+        299,
+        294
+      ],
+      "plus": [
+        326,
+        294
+      ],
+      "symbolsColor": "palegray/offwhite",
+      "noOtherSwitch": true
+    },
+    "labels": [
+      {
+        "text": "Ống phóng điện",
+        "anchor": [
+          143,
+          57
+        ],
+        "leader": [
+          [
+            151,
+            79
+          ],
+          [
+            175,
+            90
+          ]
+        ]
+      },
+      {
+        "text": "Cực âm",
+        "anchor": [
+          167,
+          213
+        ],
+        "leader": [
+          [
+            148,
+            186
+          ],
+          [
+            201,
+            139
+          ]
+        ]
+      },
+      {
+        "text": "Cực dương",
+        "anchor": [
+          456,
+          206
+        ],
+        "leader": [
+          [
+            465,
+            184
+          ],
+          [
+            429,
+            147
+          ]
+        ]
+      },
+      {
+        "text": "Hiệu điện thế cao",
+        "anchor": [
+          166,
+          301
+        ],
+        "leader": [
+          [
+            266,
+            302
+          ],
+          [
+            279,
+            298
+          ]
+        ]
+      }
+    ],
+    "caption": null,
+    "occlusion": "Raysinsidetube only209..422dontcrossverticalelectrodes;wirehorizontalmeetseach electrode;yellowfillbehindwires/electrodes/rays,leadersfront;sourcewireterminatesontopredrectnotthroughsourcebody.",
+    "noAdded": "Khôngchargeelectron/hạtdots/photon/arrowhướngngược/sốvolt/theory/caption."
+  },
+  "verdict": "Đọc source,chưaactualSVGreview."
+}
