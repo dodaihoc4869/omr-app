@@ -1091,7 +1091,9 @@
       }
     ],
     "chiLaDuLieuDungChuaSoatRender": true,
-    "daCoManifestTaiCheckpoint": false
+    "daCoManifestTaiCheckpoint": true,
+    "svgDaChon": "nong-do-hno3-ddh-c0749d57dfdbf69f3e47d72c5084350c6b8c124b4900221fc8ec450331e1fe77.svg",
+    "hashSvgDaChon": "c0749d57dfdbf69f3e47d72c5084350c6b8c124b4900221fc8ec450331e1fe77"
   },
   {
     "i": 1012,
