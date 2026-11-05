@@ -1,0 +1,393 @@
+{
+  "i": 1213,
+  "hash": "dc2bd40b294b55feffd71e7fe84b43722490ce97bc2610310388b15eb75f2830",
+  "fileNguon": "anh/dc2bd40b294b55feffd71e7fe84b43722490ce97bc2610310388b15eb75f2830.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNative": true,
+  "daMoZoom": "Toàn ảnh3x nearest; crops[70,100,155,108]6x,[200,83,100,80]8x; pixelrows187..204 hỗ trợ đếm vạch dưới.",
+  "questions": [
+    {
+      "qid": "12-BD7-19-III-5",
+      "maDe": "12-BD7-19",
+      "de": "Saccharose là một loại đường phổ biến, sản xuất chủ yếu từ cây mía.\nSaccharose có cấu trúc phân tử như hình.\nSố nhóm chức alcohol trong phân tử saccharose là bao nhiêu?",
+      "hinh": [
+        {
+          "hash": "dc2bd40b294b55feffd71e7fe84b43722490ce97bc2610310388b15eb75f2830",
+          "where": "12-BD7-19-III-5.hinh.0.du_lieu",
+          "hashDataUrl": "24ae4c7e35fe7582a04dbc83a044aa31990eea59216322d3c69c2a1e111f1b1c"
+        }
+      ]
+    },
+    {
+      "qid": "12-C2-B5-III-4",
+      "maDe": "12-C2-B5",
+      "de": "Saccharose là một loại đường phổ biến, sản xuất chủ yếu từ cây mía.\nSaccharose có cấu trúc phân tử như hình.\nSố nhóm chức alcohol trong phân tử saccharose là bao nhiêu?",
+      "hinh": [
+        {
+          "hash": "dc2bd40b294b55feffd71e7fe84b43722490ce97bc2610310388b15eb75f2830",
+          "where": "12-C2-B5-III-4.hinh.0.du_lieu",
+          "hashDataUrl": "24ae4c7e35fe7582a04dbc83a044aa31990eea59216322d3c69c2a1e111f1b1c"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B5-D2-III-55",
+      "maDe": "DB-12-B5-D2",
+      "de": "Saccharose là một loại đường phổ biến, sản xuất chủ yếu từ cây mía.\nSaccharose có cấu trúc phân tử như hình.\nSố nhóm chức alcohol trong phân tử saccharose là bao nhiêu?",
+      "hinh": [
+        {
+          "hash": "dc2bd40b294b55feffd71e7fe84b43722490ce97bc2610310388b15eb75f2830",
+          "where": "DB-12-B5-D2-III-55.hinh.0.du_lieu",
+          "hashDataUrl": "24ae4c7e35fe7582a04dbc83a044aa31990eea59216322d3c69c2a1e111f1b1c"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B5-D2-III-165",
+      "maDe": "DB-12-B5-D2",
+      "de": "Saccharose là một loại đường phổ biến, sản xuất chủ yếu từ cây mía.\nSaccharose có cấu trúc phân tử như hình.\nSố nhóm chức alcohol trong phân tử saccharose là bao nhiêu?",
+      "hinh": [
+        {
+          "hash": "dc2bd40b294b55feffd71e7fe84b43722490ce97bc2610310388b15eb75f2830",
+          "where": "DB-12-B5-D2-III-165.hinh.0.du_lieu",
+          "hashDataUrl": "24ae4c7e35fe7582a04dbc83a044aa31990eea59216322d3c69c2a1e111f1b1c"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Anchors native x/y, sai số nét scan1–2px. Không suy từ tên molecule.",
+    "leftRing": {
+      "nodes": [
+        [
+          103,
+          121
+        ],
+        [
+          136,
+          102
+        ],
+        {
+          "O": [
+            170,
+            121
+          ]
+        },
+        [
+          170,
+          161
+        ],
+        [
+          136,
+          180
+        ],
+        [
+          103,
+          161
+        ]
+      ],
+      "edges": "6 cạnh đều đơn, chừa gap quanh O ring"
+    },
+    "rightRing": {
+      "nodes": [
+        [
+          240,
+          122
+        ],
+        [
+          280,
+          113
+        ],
+        [
+          300,
+          148
+        ],
+        {
+          "O": [
+            273,
+            175
+          ]
+        },
+        [
+          236,
+          160
+        ]
+      ],
+      "edges": "5 cạnh đơn chừa gap quanh O ring"
+    },
+    "glycosidicO": [
+      203,
+      179
+    ],
+    "glycosidicBonds": [
+      {
+        "from": [
+          170,
+          161
+        ],
+        "to": [
+          190,
+          172
+        ],
+        "type": "hashed wedge",
+        "narrowAt": [
+          170,
+          161
+        ],
+        "wideAt": [
+          190,
+          172
+        ],
+        "hatchCount": 5
+      },
+      {
+        "from": [
+          219,
+          170
+        ],
+        "to": [
+          236,
+          160
+        ],
+        "type": "single"
+      }
+    ],
+    "solidWedges": [
+      {
+        "from": [
+          136,
+          102
+        ],
+        "to": [
+          136,
+          63
+        ],
+        "narrowAt": [
+          136,
+          102
+        ],
+        "wideAt": [
+          136,
+          63
+        ],
+        "attached": "implicit CH2 then HO at89,51 via bond11156→13663"
+      },
+      {
+        "from": [
+          103,
+          161
+        ],
+        "to": [
+          78,
+          170
+        ],
+        "narrowAt": [
+          103,
+          161
+        ],
+        "wideAt": [
+          78,
+          170
+        ],
+        "attached": "HO at54,170"
+      },
+      {
+        "from": [
+          240,
+          122
+        ],
+        "to": [
+          241,
+          95
+        ],
+        "narrowAt": [
+          240,
+          122
+        ],
+        "wideAt": [
+          241,
+          95
+        ],
+        "attached": "OH at250,80"
+      },
+      {
+        "from": [
+          300,
+          148
+        ],
+        "to": [
+          336,
+          151
+        ],
+        "narrowAt": [
+          300,
+          148
+        ],
+        "wideAt": [
+          336,
+          151
+        ],
+        "attached": "implicit CH2 then OH at366,117 via bond336151→351130"
+      }
+    ],
+    "otherHashedWedges": [
+      {
+        "from": [
+          103,
+          121
+        ],
+        "to": [
+          78,
+          107
+        ],
+        "narrowAt": [
+          103,
+          121
+        ],
+        "wideAt": [
+          78,
+          107
+        ],
+        "hatchCount": 5,
+        "attached": "HO at58,101"
+      },
+      {
+        "from": [
+          136,
+          180
+        ],
+        "to": [
+          136,
+          205
+        ],
+        "narrowAt": [
+          136,
+          180
+        ],
+        "wideAt": [
+          136,
+          205
+        ],
+        "hatchCount": 5,
+        "nativeHatchCentersY": [
+          187.5,
+          191.5,
+          195.5,
+          199.5,
+          203.5
+        ],
+        "attached": "OH at145,218"
+      },
+      {
+        "from": [
+          280,
+          113
+        ],
+        "to": [
+          291,
+          88
+        ],
+        "narrowAt": [
+          280,
+          113
+        ],
+        "wideAt": [
+          291,
+          88
+        ],
+        "hatchCount": 5,
+        "attached": "OH at305,76"
+      },
+      {
+        "from": [
+          236,
+          160
+        ],
+        "to": [
+          207,
+          142
+        ],
+        "narrowAt": [
+          236,
+          160
+        ],
+        "wideAt": [
+          207,
+          142
+        ],
+        "hatchCount": 5,
+        "attached": "implicit CH2 at206141 then single up206112 to OH at21499"
+      }
+    ],
+    "atomCounts": {
+      "implicitCarbons": 12,
+      "leftRingC": 5,
+      "rightRingC": 4,
+      "branchC": 3,
+      "Ototal": 11,
+      "OH_HOgroups": 8,
+      "etherO": 3,
+      "explicitHydrogenSeparate": 0
+    },
+    "literalLabels": [
+      {
+        "text": "HO",
+        "at": [
+          89,
+          51
+        ]
+      },
+      {
+        "text": "HO",
+        "at": [
+          58,
+          101
+        ]
+      },
+      {
+        "text": "HO",
+        "at": [
+          54,
+          170
+        ]
+      },
+      {
+        "text": "OH",
+        "at": [
+          145,
+          218
+        ]
+      },
+      {
+        "text": "OH",
+        "at": [
+          214,
+          99
+        ]
+      },
+      {
+        "text": "OH",
+        "at": [
+          250,
+          80
+        ]
+      },
+      {
+        "text": "OH",
+        "at": [
+          305,
+          76
+        ]
+      },
+      {
+        "text": "OH",
+        "at": [
+          366,
+          117
+        ]
+      }
+    ],
+    "captions": []
+  },
+  "verdict": "Đọc nguồn chỉ, chưa so bản SVG. Không thêm H riêng/CIP/tên/caption/numbers/đổi orientation."
+}

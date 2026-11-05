@@ -1,0 +1,10 @@
+[
+  {
+    "i": 1213,
+    "hashSvg": "fbe6f74d069444f3c3591eb5c1d606118eaee8ad58589d6f5f403af0bc41767c",
+    "nguoiSoat": "cau_truc_4",
+    "ketQua": "Đạt: Mở lại PNG native/full và nguồn zoom; tự render actual SVG hiện tại bằng Chromium (/workspace/scratch/cau4-183-fresh.png) rồi mở bản phóng3x để đếm từng nhóm. Giữ ring6 gồm5C+O và ring5 gồm4C+O,3branchC implicit; tổng12C/11O,8nhóm OH-HO và3etherO. Đúng hướng/chỗ nối mọi OH-HO,4nêm đặc và5nhóm nêm đứt,mỗi nhóm5vạch; đầu hẹp ở ringatom,đầu rộng về substituent,đặc biệt glycosidicO và nhánh CH2OH bên trái ring5. Từng liên kết glycosidicO đúng atom,không thêm H riêng/CIP/sốC/caption. DDH path tự chứa,không fallback/text/image; nhãn/nét không chạm,cắt,tràn. Exact SHA256 hiện tại khớp metadata; không dùng hash0c33 cũ.",
+    "hash": "dc2bd40b294b55feffd71e7fe84b43722490ce97bc2610310388b15eb75f2830",
+    "hashSvgDaSoat": "fbe6f74d069444f3c3591eb5c1d606118eaee8ad58589d6f5f403af0bc41767c"
+  }
+]

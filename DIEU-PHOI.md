@@ -1349,3 +1349,10 @@ Nhóm169đãxong15/20;1120/1030/1046ĐÃĐẠTđừngtrùng. CÒN765/1195/806/10
 -1214triesterliteral:ester3chains14/13/15C,Z14C/T15CbaoCOONaC,Tkinktrướcdoublecóthật. Giữ6esterO/3Cdọc/+3NaOH/t°/Y3OH/2Z+T/(X)(Y)(Z)(T)/khôngsửatheory. Nativefull/zoom/freshactualSVG/hashsoátđộclập.
 -Chromium523/523/hash/XML/path/selfcontained/AST/build182/precache170/2613.23KiB/speed21/21đạt. SizegateđỏNỀNindex.tsnguyênbytekhôngnângmốc;phảixửlýtrướcgộp/deploy.Mainab81c625chưagộp/WOFF2khôngdiff. Chưa tích hợp/chưa reload offline app/chưa phát hành. Chưa tham vấn được cố vấn.
 -Tiếpưu tiên1213stereochemicaldisaccharide(rootđãmởnativechưađủgeometry),1033IR2panelE/F/736surfactant4panelchưađọchết.1214ĐÃĐẠTđừngtrùng,giữsốCkhácnhauđúngsourcekhôngcânbằng2Z. Nhóm169ĐỦ20/20đãđạt. Đốimanifest/hashtrướcdựng. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.
+
+
+### 05/11 — Lô183: disaccharide stereo
+-1033 câu đủ mọi hình+DDH/7 một phần;771 nguồn→524 SVG;8366456byte/gzip1654939;657 nguồn còn lại.
+-1213disaccharide6ring+5ring/12C11O/8HO-OH/3etherO/4solidwedge+5hashedgroupsMỖI5vạch/3implicitCbranches/noH-CIP-captionsadded/DDHpath. Đãsửađúng5vạchmỗinhómsauđọcnativezoom,freshactualSVG/hashsoátđộclập.
+-Chromium524/524/hash/XML/path/selfcontained/AST/build183/precache170/2613.23KiB/speed21/21đạt. SizegateđỏNỀNindex.tsnguyênbytekhôngnângmốc;phảixửlýtrướcgộp/deploy.Mainab81c625chưagộp/WOFF2khôngdiff. Chưa tích hợp/chưa reload offline app/chưa phát hành. Chưa tham vấn được cố vấn.
+-Tiếpưu tiên1033IR2panelE/F/736surfactant4panelchưađọchết;đọcnative/full/stem/refssocảhashmanifesttrướcdựng.1213/1214ĐÃĐẠTđừngtrùng;1214giữ14/13/15esterC,Z14/T15+Tkinkkhôngcânbằngtheory. Nhóm169ĐỦ20/20đãđạt. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.
