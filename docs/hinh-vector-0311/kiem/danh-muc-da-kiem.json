@@ -1063,6 +1063,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "0a0d6fd649673af842fbff8328fceae1a8447858a2a03e08f845356037c3b443": {
+      "tep": "disaccharide-cheo-ddh-3447d0e44a9d02c1da2ba293aed2745926f26da18ffb9340f19d668f648f4d16.svg",
+      "hashSvg": "3447d0e44a9d02c1da2ba293aed2745926f26da18ffb9340f19d668f648f4d16",
+      "byteSvg": 12863,
+      "byteGzip": 1520,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "6fe87a48dea9b81beed8296afb2362d6256aa5cae001820eb3fcd0d6dfa00ab4": {
       "tep": "paracetamol-ddh-cc3596e0076afb260d805c6ad031fa8ec7d0f93652bac1ed1dfa5b7b2f78f543.svg",
       "hashSvg": "cc3596e0076afb260d805c6ad031fa8ec7d0f93652bac1ed1dfa5b7b2f78f543",
@@ -9399,6 +9408,20 @@
       ]
     },
     {
+      "qid": "12-C2-B4-D2-II-10",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "0a0d6fd649673af842fbff8328fceae1a8447858a2a03e08f845356037c3b443",
+          "where": "12-C2-B4-D2-II-10.hinh.0.du_lieu",
+          "hashDataUrl": "24cb10acc93eb96384490d2925388ab1faac6258d251cbd4f1b62d01a01865f0",
+          "vector": "disaccharide-cheo-ddh-3447d0e44a9d02c1da2ba293aed2745926f26da18ffb9340f19d668f648f4d16.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-C2-B4-D2-I-2",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -16245,6 +16268,20 @@
           "where": "DB-12-B4-D2-II-10.hinh.0.du_lieu",
           "hashDataUrl": "f2a1067a6952674d8220bf71c9725da90061972d2e46b2917db4c2d5cad55285",
           "vector": "do-thi-ddh-15363921e30bb0d5a74bb68562578cbbb40862e449e84e7c8058184134323d82.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D2-II-11",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "0a0d6fd649673af842fbff8328fceae1a8447858a2a03e08f845356037c3b443",
+          "where": "DB-12-B4-D2-II-11.hinh.0.du_lieu",
+          "hashDataUrl": "24cb10acc93eb96384490d2925388ab1faac6258d251cbd4f1b62d01a01865f0",
+          "vector": "disaccharide-cheo-ddh-3447d0e44a9d02c1da2ba293aed2745926f26da18ffb9340f19d668f648f4d16.svg"
         }
       ]
     },
@@ -24497,6 +24534,7 @@
     "12-C2-B4-D1-I-63",
     "12-C2-B4-D1-II-6",
     "12-C2-B4-D2-II-9",
+    "12-C2-B4-D2-II-10",
     "12-C2-B4-D2-I-2",
     "12-C2-B4-D2-I-5",
     "12-C2-B4-D2-I-7",
@@ -24914,6 +24952,7 @@
     "DB-12-B4-D2-I-4",
     "DB-12-B4-D2-I-8",
     "DB-12-B4-D2-II-10",
+    "DB-12-B4-D2-II-11",
     "DB-12-B4-D2-I-23",
     "DB-12-B4-D2-III-28",
     "DB-12-B4-D2-II-38",

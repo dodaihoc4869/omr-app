@@ -1,0 +1,350 @@
+{
+  "i": 48,
+  "hash": "0a0d6fd649673af842fbff8328fceae1a8447858a2a03e08f845356037c3b443",
+  "fileNguon": "anh/0a0d6fd649673af842fbff8328fceae1a8447858a2a03e08f845356037c3b443.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNative": true,
+  "zoom": "/workspace/scratch/cau4-disaccharide198-zoom.png",
+  "questions": [
+    {
+      "qid": "12-C2-B4-D2-II-10",
+      "maDe": "12-C2-B4-D2",
+      "de": "Lactose, còn gọi là đường sữa, là một loại đường disaccharide được tạo thành từ một phân tử glucose và một phân tử galactose liên kết với nhau. Lactose chủ yếu được tìm thấy trong sữa và các sản phẩm từ sữa, như phô mai và sữa chua.\nĐây là nguồn cung cấp năng lượng quan trọng, đặc biệt là cho trẻ sơ sinh và trẻ nhỏ.\nTuy nhiên, một số người gặp khó khăn trong việc tiêu hóa lactose do thiếu enzyme lactase, dẫn đến tình trạng không dung nạp lactose, gây ra các triệu chứng như đầy bụng và tiêu chảy khi tiêu thụ các sản phẩm chứa lactose.\nTrong công nghiệp thực phẩm, lactose được sử dụng như một chất làm ngọt nhẹ và cũng đóng vai trò quan trọng trong việc lên men các sản phẩm từ sữa. Cho công thức cấu tạo của lactose như bên.",
+      "hinh": [
+        {
+          "hash": "0a0d6fd649673af842fbff8328fceae1a8447858a2a03e08f845356037c3b443",
+          "where": "12-C2-B4-D2-II-10.hinh.0.du_lieu",
+          "hashDataUrl": "24cb10acc93eb96384490d2925388ab1faac6258d251cbd4f1b62d01a01865f0"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D2-II-11",
+      "maDe": "DB-12-B4-D2",
+      "de": "Lactose, còn gọi là đường sữa, là một loại đường disaccharide được tạo thành từ một phân tử glucose và một phân tử galactose liên kết với nhau. Lactose chủ yếu được tìm thấy trong sữa và các sản phẩm từ sữa, như phô mai và sữa chua.\nĐây là nguồn cung cấp năng lượng quan trọng, đặc biệt là cho trẻ sơ sinh và trẻ nhỏ.\nTuy nhiên, một số người gặp khó khăn trong việc tiêu hóa lactose do thiếu enzyme lactase, dẫn đến tình trạng không dung nạp lactose, gây ra các triệu chứng như đầy bụng và tiêu chảy khi tiêu thụ các sản phẩm chứa lactose.\nTrong công nghiệp thực phẩm, lactose được sử dụng như một chất làm ngọt nhẹ và cũng đóng vai trò quan trọng trong việc lên men các sản phẩm từ sữa. Cho công thức cấu tạo của lactose như bên.",
+      "hinh": [
+        {
+          "hash": "0a0d6fd649673af842fbff8328fceae1a8447858a2a03e08f845356037c3b443",
+          "where": "DB-12-B4-D2-II-11.hinh.0.du_lieu",
+          "hashDataUrl": "24cb10acc93eb96384490d2925388ab1faac6258d251cbd4f1b62d01a01865f0"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–2pxapprox;2Haworthdiagonal,both6member;0Hexplicit/0numbers/0caption.",
+    "lowerLeft": {
+      "nodes": {
+        "C4": [
+          47,
+          202
+        ],
+        "C5": [
+          82,
+          167
+        ],
+        "O": [
+          132,
+          167
+        ],
+        "C1": [
+          168,
+          202
+        ],
+        "C2": [
+          132,
+          238
+        ],
+        "C3": [
+          82,
+          238
+        ]
+      },
+      "frontBonds": [
+        {
+          "from": [
+            47,
+            202
+          ],
+          "to": [
+            82,
+            238
+          ],
+          "style": "taperthinC4wideC3"
+        },
+        {
+          "from": [
+            82,
+            238
+          ],
+          "to": [
+            132,
+            238
+          ],
+          "style": "boldhorizontal"
+        },
+        {
+          "from": [
+            132,
+            238
+          ],
+          "to": [
+            168,
+            202
+          ],
+          "style": "taperwideC2thinC1"
+        }
+      ],
+      "groups": [
+        {
+          "text": "CH₂OH",
+          "at": [
+            111,
+            129
+          ],
+          "bond": [
+            [
+              82,
+              167
+            ],
+            [
+              82,
+              141
+            ]
+          ],
+          "target": "Cfirst"
+        },
+        {
+          "text": "OH",
+          "at": [
+            55,
+            164
+          ],
+          "bond": [
+            [
+              47,
+              202
+            ],
+            [
+              47,
+              176
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            91,
+            201
+          ],
+          "bond": [
+            [
+              82,
+              238
+            ],
+            [
+              82,
+              212
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            141,
+            278
+          ],
+          "bond": [
+            [
+              132,
+              238
+            ],
+            [
+              132,
+              267
+            ]
+          ]
+        }
+      ]
+    },
+    "upperRight": {
+      "nodes": {
+        "C4": [
+          168,
+          125
+        ],
+        "C5": [
+          203,
+          89
+        ],
+        "O": [
+          253,
+          89
+        ],
+        "C1": [
+          288,
+          125
+        ],
+        "C2": [
+          253,
+          160
+        ],
+        "C3": [
+          203,
+          160
+        ]
+      },
+      "frontBonds": [
+        {
+          "from": [
+            168,
+            125
+          ],
+          "to": [
+            203,
+            160
+          ],
+          "style": "taperthinC4wideC3"
+        },
+        {
+          "from": [
+            203,
+            160
+          ],
+          "to": [
+            253,
+            160
+          ],
+          "style": "boldhorizontal"
+        },
+        {
+          "from": [
+            253,
+            160
+          ],
+          "to": [
+            288,
+            125
+          ],
+          "style": "taperwideC2thinC1"
+        }
+      ],
+      "groups": [
+        {
+          "text": "CH₂OH",
+          "at": [
+            231,
+            51
+          ],
+          "bond": [
+            [
+              203,
+              89
+            ],
+            [
+              203,
+              64
+            ]
+          ],
+          "target": "Cfirst"
+        },
+        {
+          "text": "OH",
+          "at": [
+            297,
+            86
+          ],
+          "bond": [
+            [
+              288,
+              125
+            ],
+            [
+              288,
+              99
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            212,
+            123
+          ],
+          "bond": [
+            [
+              203,
+              160
+            ],
+            [
+              203,
+              134
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            262,
+            201
+          ],
+          "bond": [
+            [
+              253,
+              160
+            ],
+            [
+              253,
+              188
+            ]
+          ]
+        }
+      ]
+    },
+    "bridge": {
+      "O": [
+        168,
+        165
+      ],
+      "bonds": [
+        [
+          168,
+          202
+        ],
+        [
+          168,
+          177
+        ],
+        [
+          168,
+          152
+        ],
+        [
+          168,
+          125
+        ]
+      ],
+      "description": "VerticalLowerC1UP–O–DOWNfromupperC4,notdiagonal/C-Omisattach;2separatesinglelineswithgapOlabel."
+    },
+    "atomCounts": {
+      "C": 12,
+      "O": 11,
+      "ringO": 2,
+      "bridgeO": 1,
+      "CH2OHtext": 2,
+      "standaloneOH": 6,
+      "explicitH": 0
+    },
+    "stereo": "lowerC4OHUP(lowerleftnonaliasglucose),lowerC3OHUP/lowerC2OHDOWN/CH2OHUP;upperC1OHUP/C3OHUP/C2OHDOWN/CH2OHUP. 4taperfront+2horizontalbold.",
+    "printArtifact": {
+      "line": [
+        325,
+        28,
+        325,
+        297
+      ],
+      "classification": "Detachedpalerightpagelineoutsideallmolecule/labelwithnoglyph/leaderconnection. Readbothfullpublicstemsdescribeformulaasbeside,noaxis/frame/table;excludeprintlineonly."
+    }
+  },
+  "verdict": "Đọcsource,chưaactualSVGreview."
+}
