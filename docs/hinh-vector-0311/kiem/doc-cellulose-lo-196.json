@@ -1,0 +1,540 @@
+{
+  "i": 590,
+  "hash": "6e0ca319b0c0ee2547a3924a380ebc68c7c43a5ea478434000bc37fd9353f252",
+  "fileNguon": "anh/6e0ca319b0c0ee2547a3924a380ebc68c7c43a5ea478434000bc37fd9353f252.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNative": true,
+  "zooms": [
+    "/workspace/scratch/cau4-cellulose196-first-zoom.png",
+    "/workspace/scratch/cau4-cellulose196-second-third-zoom.png"
+  ],
+  "questions": [
+    {
+      "qid": "12-C2-B6-D2-II-39",
+      "maDe": "12-C2-B6-D2",
+      "de": "Quan sát cấu trúc phân tử amylose và phân tử cellulose dưới đây:",
+      "hinh": [
+        {
+          "hash": "0922fb276b31d180cdfd51c1e4fd4b3922deeb98fbcf351003369052c308d510",
+          "where": "12-C2-B6-D2-II-39.hinh.0.du_lieu",
+          "hashDataUrl": "07514632414b613914cff7571bea57a3874bbf413f78e7a1335bb7dd79782138"
+        },
+        {
+          "hash": "6e0ca319b0c0ee2547a3924a380ebc68c7c43a5ea478434000bc37fd9353f252",
+          "where": "12-C2-B6-D2-II-39.hinh.1.du_lieu",
+          "hashDataUrl": "032bbf95bee205accae24e26dcff683be5c5797ef7bb4b3600754a63a7937efa"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D3-II-114",
+      "maDe": "DB-12-B4-D3",
+      "de": "Quan sát cấu trúc phân tử amylose và phân tử cellulose dưới đây:",
+      "hinh": [
+        {
+          "hash": "0922fb276b31d180cdfd51c1e4fd4b3922deeb98fbcf351003369052c308d510",
+          "where": "DB-12-B4-D3-II-114.hinh.0.du_lieu",
+          "hashDataUrl": "07514632414b613914cff7571bea57a3874bbf413f78e7a1335bb7dd79782138"
+        },
+        {
+          "hash": "6e0ca319b0c0ee2547a3924a380ebc68c7c43a5ea478434000bc37fd9353f252",
+          "where": "DB-12-B4-D3-II-114.hinh.1.du_lieu",
+          "hashDataUrl": "032bbf95bee205accae24e26dcff683be5c5797ef7bb4b3600754a63a7937efa"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–2pxapprox;3chairsnotamylosealias.",
+    "units": [
+      {
+        "ring": {
+          "C4": [
+            73,
+            69
+          ],
+          "C5": [
+            141,
+            86
+          ],
+          "O": [
+            204,
+            72
+          ],
+          "C1": [
+            186,
+            122
+          ],
+          "C2": [
+            147,
+            108
+          ],
+          "C3": [
+            99,
+            122
+          ]
+        },
+        "CH2OH": {
+          "text": "CH₂OH",
+          "anchor": [
+            141,
+            49
+          ],
+          "bentBond": [
+            [
+              141,
+              86
+            ],
+            [
+              106,
+              67
+            ],
+            [
+              106,
+              62
+            ]
+          ],
+          "target": "Cfirst",
+          "note": "Sourcebentstroke/shortupcap,noaddedimplicitvertex/H/OHtheory."
+        },
+        "HOleft": {
+          "text": "HO",
+          "anchor": [
+            66,
+            119
+          ],
+          "bond": [
+            [
+              99,
+              122
+            ],
+            [
+              86,
+              120
+            ]
+          ],
+          "target": "Oright"
+        },
+        "OHdown": {
+          "text": "OH",
+          "anchor": [
+            197,
+            157
+          ],
+          "bond": [
+            [
+              186,
+              122
+            ],
+            [
+              186,
+              142
+            ]
+          ],
+          "target": "Oleft"
+        },
+        "frontBonds": [
+          {
+            "from": [
+              73,
+              69
+            ],
+            "to": [
+              99,
+              122
+            ],
+            "style": "taperthinC4wideC3"
+          },
+          {
+            "from": [
+              99,
+              122
+            ],
+            "to": [
+              147,
+              108
+            ],
+            "style": "bold"
+          },
+          {
+            "from": [
+              147,
+              108
+            ],
+            "to": [
+              186,
+              122
+            ],
+            "style": "bold"
+          },
+          {
+            "from": [
+              186,
+              122
+            ],
+            "to": [
+              204,
+              87
+            ],
+            "style": "taperwideC1thinRingO"
+          }
+        ]
+      },
+      {
+        "ring": {
+          "C4": [
+            308,
+            69
+          ],
+          "C5": [
+            376,
+            86
+          ],
+          "O": [
+            439,
+            72
+          ],
+          "C1": [
+            421,
+            122
+          ],
+          "C2": [
+            382,
+            108
+          ],
+          "C3": [
+            334,
+            122
+          ]
+        },
+        "CH2OH": {
+          "text": "CH₂OH",
+          "anchor": [
+            376,
+            49
+          ],
+          "bentBond": [
+            [
+              376,
+              86
+            ],
+            [
+              341,
+              67
+            ],
+            [
+              341,
+              62
+            ]
+          ],
+          "target": "Cfirst",
+          "note": "Sourcebentstroke/shortupcap,noaddedimplicitvertex/H/OHtheory."
+        },
+        "HOleft": {
+          "text": "HO",
+          "anchor": [
+            301,
+            119
+          ],
+          "bond": [
+            [
+              334,
+              122
+            ],
+            [
+              321,
+              120
+            ]
+          ],
+          "target": "Oright"
+        },
+        "OHdown": {
+          "text": "OH",
+          "anchor": [
+            432,
+            157
+          ],
+          "bond": [
+            [
+              421,
+              122
+            ],
+            [
+              421,
+              142
+            ]
+          ],
+          "target": "Oleft"
+        },
+        "frontBonds": [
+          {
+            "from": [
+              308,
+              69
+            ],
+            "to": [
+              334,
+              122
+            ],
+            "style": "taperthinC4wideC3"
+          },
+          {
+            "from": [
+              334,
+              122
+            ],
+            "to": [
+              382,
+              108
+            ],
+            "style": "bold"
+          },
+          {
+            "from": [
+              382,
+              108
+            ],
+            "to": [
+              421,
+              122
+            ],
+            "style": "bold"
+          },
+          {
+            "from": [
+              421,
+              122
+            ],
+            "to": [
+              439,
+              87
+            ],
+            "style": "taperwideC1thinRingO"
+          }
+        ]
+      },
+      {
+        "ring": {
+          "C4": [
+            543,
+            69
+          ],
+          "C5": [
+            611,
+            86
+          ],
+          "O": [
+            674,
+            72
+          ],
+          "C1": [
+            656,
+            122
+          ],
+          "C2": [
+            617,
+            108
+          ],
+          "C3": [
+            569,
+            122
+          ]
+        },
+        "CH2OH": {
+          "text": "CH₂OH",
+          "anchor": [
+            611,
+            49
+          ],
+          "bentBond": [
+            [
+              611,
+              86
+            ],
+            [
+              576,
+              67
+            ],
+            [
+              576,
+              62
+            ]
+          ],
+          "target": "Cfirst",
+          "note": "Sourcebentstroke/shortupcap,noaddedimplicitvertex/H/OHtheory."
+        },
+        "HOleft": {
+          "text": "HO",
+          "anchor": [
+            536,
+            119
+          ],
+          "bond": [
+            [
+              569,
+              122
+            ],
+            [
+              556,
+              120
+            ]
+          ],
+          "target": "Oright"
+        },
+        "OHdown": {
+          "text": "OH",
+          "anchor": [
+            667,
+            157
+          ],
+          "bond": [
+            [
+              656,
+              122
+            ],
+            [
+              656,
+              142
+            ]
+          ],
+          "target": "Oleft"
+        },
+        "frontBonds": [
+          {
+            "from": [
+              543,
+              69
+            ],
+            "to": [
+              569,
+              122
+            ],
+            "style": "taperthinC4wideC3"
+          },
+          {
+            "from": [
+              569,
+              122
+            ],
+            "to": [
+              617,
+              108
+            ],
+            "style": "bold"
+          },
+          {
+            "from": [
+              617,
+              108
+            ],
+            "to": [
+              656,
+              122
+            ],
+            "style": "bold"
+          },
+          {
+            "from": [
+              656,
+              122
+            ],
+            "to": [
+              674,
+              87
+            ],
+            "style": "taperwideC1thinRingO"
+          }
+        ]
+      }
+    ],
+    "bridges": [
+      {
+        "O": [
+          262,
+          102
+        ],
+        "bonds": [
+          [
+            220,
+            81,
+            249,
+            95
+          ],
+          [
+            276,
+            93,
+            308,
+            69
+          ]
+        ]
+      },
+      {
+        "O": [
+          497,
+          102
+        ],
+        "bonds": [
+          [
+            455,
+            81,
+            484,
+            95
+          ],
+          [
+            511,
+            93,
+            543,
+            69
+          ]
+        ]
+      }
+    ],
+    "leftEnd": {
+      "stub": [
+        [
+          73,
+          69
+        ],
+        [
+          43,
+          99
+        ]
+      ],
+      "ellipsis": [
+        16,
+        110,
+        38,
+        110
+      ],
+      "noLeftEndO": true
+    },
+    "rightEnd": {
+      "stub": [
+        [
+          690,
+          82
+        ],
+        [
+          714,
+          96
+        ]
+      ],
+      "ellipsis": [
+        719,
+        110,
+        740,
+        110
+      ],
+      "noRightEndO": true
+    },
+    "caption": "Phân tử cellulose",
+    "captionAnchor": [
+      385,
+      198
+    ],
+    "counts": "3chairrings/3ringO/2bridgeO/3CH₂OHtext/6standaloneHO-OH,0Hexplicit/0Cnums/0brackets/2ellipsis;each4frontbonds(2taper+2bold).",
+    "sourceStubs": "NoOH/HonlowercentralC2ofeachchair;keepimplicitblank. CH2OHbentattachmentnotstraightalias.",
+    "printArtifact": "Detachedtinylower-rightblackcorner~733208outsidecaption/molecule,sourcepairedamylose43alsohasoutsidecropmarks;notchemicalbond/label,noinventnewdata."
+  },
+  "verdict": "Đọcsource,chưaactualSVGreview."
+}

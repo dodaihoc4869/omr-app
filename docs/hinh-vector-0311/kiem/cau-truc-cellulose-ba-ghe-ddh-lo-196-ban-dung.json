@@ -1,0 +1,40 @@
+[
+  {
+    "i": 590,
+    "hash": "6e0ca319b0c0ee2547a3924a380ebc68c7c43a5ea478434000bc37fd9353f252",
+    "fileNguon": "anh/6e0ca319b0c0ee2547a3924a380ebc68c7c43a5ea478434000bc37fd9353f252.png",
+    "svg": "cellulose-ba-ghe-ddh-8860d10f38dbd2a0c805b45228a84bdd2139bdcfbd6823918d3e7a8a857a5d64.svg",
+    "hashSvg": "8860d10f38dbd2a0c805b45228a84bdd2139bdcfbd6823918d3e7a8a857a5d64",
+    "byteSvg": 25452,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C2-B6-D2-II-39",
+        "de": "Quan sát cấu trúc phân tử amylose và phân tử cellulose dưới đây:",
+        "refs": [
+          {
+            "hash": "6e0ca319b0c0ee2547a3924a380ebc68c7c43a5ea478434000bc37fd9353f252",
+            "where": "12-C2-B6-D2-II-39.hinh.1.du_lieu",
+            "hashDataUrl": "032bbf95bee205accae24e26dcff683be5c5797ef7bb4b3600754a63a7937efa"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-II-114",
+        "de": "Quan sát cấu trúc phân tử amylose và phân tử cellulose dưới đây:",
+        "refs": [
+          {
+            "hash": "6e0ca319b0c0ee2547a3924a380ebc68c7c43a5ea478434000bc37fd9353f252",
+            "where": "DB-12-B4-D3-II-114.hinh.1.du_lieu",
+            "hashDataUrl": "032bbf95bee205accae24e26dcff683be5c5797ef7bb4b3600754a63a7937efa"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3chairrings/3CH2OHbentCfirst/3HO+3OH/3ringO+2bridgeO/6taper+6lowerbold/ellipsis2ends/caption/noHnumbersadded/sourceupperO-stubconnectivityliteral/notfiniteSMILES/printcornerexcluded.",
+    "hashSvgDaSoat": "8860d10f38dbd2a0c805b45228a84bdd2139bdcfbd6823918d3e7a8a857a5d64",
+    "nguoiSoat": "cau_truc_4"
+  }
+]
