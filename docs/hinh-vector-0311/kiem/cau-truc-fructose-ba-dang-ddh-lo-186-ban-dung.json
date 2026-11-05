@@ -1,0 +1,51 @@
+[
+  {
+    "i": 251,
+    "hash": "2b076b46a2a1a894b0d272bf060cb90a2c0f71a77947113916c0e7259a78f74a",
+    "fileNguon": "anh/2b076b46a2a1a894b0d272bf060cb90a2c0f71a77947113916c0e7259a78f74a.png",
+    "svg": "fructose-ba-dang-ddh-cef0873483b79c97aaaecf2799f8ad7838e7575ed4775ea034781acfdcba4a38.svg",
+    "hashSvg": "cef0873483b79c97aaaecf2799f8ad7838e7575ed4775ea034781acfdcba4a38",
+    "byteSvg": 36860,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D3-II-223",
+        "de": "Cho sơ đồ cấu tạo dạng mạch hở và mạch vòng của fructose được mô tả ở hình dưới đây:",
+        "refs": [
+          {
+            "hash": "2b076b46a2a1a894b0d272bf060cb90a2c0f71a77947113916c0e7259a78f74a",
+            "where": "DB-12-B4-D3-II-223.hinh.0.du_lieu",
+            "hashDataUrl": "e5291b602b92fa3ce0f5d7abbd490a1f2b6665da4a05390c6e174ea18f1023dd"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-II-27",
+        "de": "Cho sơ đồ cấu tạo dạng mạch hở và mạch vòng của fructose được mô tả ở hình dưới đây:",
+        "refs": [
+          {
+            "hash": "2b076b46a2a1a894b0d272bf060cb90a2c0f71a77947113916c0e7259a78f74a",
+            "where": "DH-12-C2-B4-II-27.hinh.0.du_lieu",
+            "hashDataUrl": "e5291b602b92fa3ce0f5d7abbd490a1f2b6665da4a05390c6e174ea18f1023dd"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-VD-II-3",
+        "de": "Cho sơ đồ cấu tạo dạng mạch hở và mạch vòng của fructose được mô tả ở hình dưới đây:",
+        "refs": [
+          {
+            "hash": "2b076b46a2a1a894b0d272bf060cb90a2c0f71a77947113916c0e7259a78f74a",
+            "where": "DH-12-C2-B4-VD-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "e5291b602b92fa3ce0f5d7abbd490a1f2b6665da4a05390c6e174ea18f1023dd"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3formsα/open/β/18numbers/8OH+2ringO/implicitCbranches/noexplicitH/3frontboldmỗivòng/2equilibriumpairs/2captionssource. Khôngalias1046.",
+    "hashSvgDaSoat": "cef0873483b79c97aaaecf2799f8ad7838e7575ed4775ea034781acfdcba4a38",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

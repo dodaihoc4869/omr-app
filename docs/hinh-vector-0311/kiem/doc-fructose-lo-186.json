@@ -1,0 +1,628 @@
+{
+  "i": 251,
+  "hash": "2b076b46a2a1a894b0d272bf060cb90a2c0f71a77947113916c0e7259a78f74a",
+  "fileNguon": "anh/2b076b46a2a1a894b0d272bf060cb90a2c0f71a77947113916c0e7259a78f74a.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNative": true,
+  "zoom": "/workspace/scratch/cau4-fructose186-zoom.png",
+  "questions": [
+    {
+      "qid": "DB-12-B4-D3-II-223",
+      "maDe": "DB-12-B4-D3",
+      "de": "Cho sơ đồ cấu tạo dạng mạch hở và mạch vòng của fructose được mô tả ở hình dưới đây:",
+      "hinh": [
+        {
+          "hash": "2b076b46a2a1a894b0d272bf060cb90a2c0f71a77947113916c0e7259a78f74a",
+          "where": "DB-12-B4-D3-II-223.hinh.0.du_lieu",
+          "hashDataUrl": "e5291b602b92fa3ce0f5d7abbd490a1f2b6665da4a05390c6e174ea18f1023dd"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C2-B4-II-27",
+      "maDe": "DH-12-C2-B4",
+      "de": "Cho sơ đồ cấu tạo dạng mạch hở và mạch vòng của fructose được mô tả ở hình dưới đây:",
+      "hinh": [
+        {
+          "hash": "2b076b46a2a1a894b0d272bf060cb90a2c0f71a77947113916c0e7259a78f74a",
+          "where": "DH-12-C2-B4-II-27.hinh.0.du_lieu",
+          "hashDataUrl": "e5291b602b92fa3ce0f5d7abbd490a1f2b6665da4a05390c6e174ea18f1023dd"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C2-B4-VD-II-3",
+      "maDe": "DH-12-C2-B4-VD",
+      "de": "Cho sơ đồ cấu tạo dạng mạch hở và mạch vòng của fructose được mô tả ở hình dưới đây:",
+      "hinh": [
+        {
+          "hash": "2b076b46a2a1a894b0d272bf060cb90a2c0f71a77947113916c0e7259a78f74a",
+          "where": "DH-12-C2-B4-VD-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "e5291b602b92fa3ce0f5d7abbd490a1f2b6665da4a05390c6e174ea18f1023dd"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "coordinateNote": "Native anchors1–2px scan tolerance; khôngsuyH/CIP từtên.",
+    "alpha": {
+      "ringNodes": {
+        "C5": [
+          23,
+          99
+        ],
+        "O": [
+          85,
+          80
+        ],
+        "C2": [
+          146,
+          99
+        ],
+        "C3": [
+          123,
+          123
+        ],
+        "C4": [
+          47,
+          123
+        ]
+      },
+      "branchC6": [
+        23,
+        71
+      ],
+      "branchC1": [
+        146,
+        71
+      ],
+      "OHlabels": [
+        {
+          "text": "OH",
+          "at": [
+            52,
+            56
+          ],
+          "bond": [
+            [
+              23,
+              71
+            ],
+            [
+              39,
+              60
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            176,
+            56
+          ],
+          "bond": [
+            [
+              146,
+              71
+            ],
+            [
+              162,
+              60
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            152,
+            130
+          ],
+          "bond": [
+            [
+              146,
+              99
+            ],
+            [
+              146,
+              122
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            129,
+            77
+          ],
+          "bond": [
+            [
+              123,
+              123
+            ],
+            [
+              123,
+              86
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            53,
+            150
+          ],
+          "bond": [
+            [
+              47,
+              123
+            ],
+            [
+              47,
+              143
+            ]
+          ]
+        }
+      ],
+      "carbonNumberPositions": {
+        "1": [
+          149,
+          62
+        ],
+        "2": [
+          153,
+          99
+        ],
+        "3": [
+          121,
+          132
+        ],
+        "4": [
+          37,
+          132
+        ],
+        "5": [
+          16,
+          96
+        ],
+        "6": [
+          19,
+          65
+        ]
+      },
+      "frontBonds": [
+        {
+          "from": [
+            23,
+            99
+          ],
+          "to": [
+            47,
+            123
+          ],
+          "type": "taper narrowatC5wideatC4"
+        },
+        {
+          "from": [
+            47,
+            123
+          ],
+          "to": [
+            123,
+            123
+          ],
+          "type": "boldhorizontal"
+        },
+        {
+          "from": [
+            123,
+            123
+          ],
+          "to": [
+            146,
+            99
+          ],
+          "type": "taper wideatC3narrowatC2"
+        }
+      ],
+      "caption": "α-fructose",
+      "captionAt": [
+        82,
+        175
+      ]
+    },
+    "open": {
+      "carbonChain": [
+        [
+          259,
+          28
+        ],
+        [
+          259,
+          55
+        ],
+        [
+          259,
+          83
+        ],
+        [
+          259,
+          111
+        ],
+        [
+          259,
+          138
+        ],
+        [
+          259,
+          166
+        ]
+      ],
+      "carbonyl": {
+        "atC": 2,
+        "O": [
+          286,
+          55
+        ],
+        "doubleSegments": [
+          [
+            259,
+            53,
+            279,
+            53
+          ],
+          [
+            259,
+            58,
+            279,
+            58
+          ]
+        ]
+      },
+      "groups": [
+        {
+          "text": "OH",
+          "at": [
+            288,
+            13
+          ],
+          "bond": [
+            [
+              259,
+              28
+            ],
+            [
+              275,
+              19
+            ]
+          ]
+        },
+        {
+          "text": "HO",
+          "at": [
+            225,
+            82
+          ],
+          "bond": [
+            [
+              259,
+              83
+            ],
+            [
+              239,
+              83
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            291,
+            111
+          ],
+          "bond": [
+            [
+              259,
+              111
+            ],
+            [
+              279,
+              111
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            291,
+            138
+          ],
+          "bond": [
+            [
+              259,
+              138
+            ],
+            [
+              279,
+              138
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            288,
+            179
+          ],
+          "bond": [
+            [
+              259,
+              166
+            ],
+            [
+              275,
+              175
+            ]
+          ]
+        }
+      ],
+      "carbonNumberPositions": {
+        "1": [
+          253,
+          24
+        ],
+        "2": [
+          253,
+          56
+        ],
+        "3": [
+          253,
+          81
+        ],
+        "4": [
+          253,
+          111
+        ],
+        "5": [
+          253,
+          138
+        ],
+        "6": [
+          253,
+          165
+        ]
+      },
+      "caption": null,
+      "centersHaveCText": false
+    },
+    "beta": {
+      "ringNodes": {
+        "C5": [
+          369,
+          99
+        ],
+        "O": [
+          432,
+          80
+        ],
+        "C2": [
+          493,
+          99
+        ],
+        "C3": [
+          470,
+          123
+        ],
+        "C4": [
+          394,
+          123
+        ]
+      },
+      "branchC6": [
+        369,
+        71
+      ],
+      "branchC1": [
+        493,
+        130
+      ],
+      "OHlabels": [
+        {
+          "text": "OH",
+          "at": [
+            399,
+            56
+          ],
+          "bond": [
+            [
+              369,
+              71
+            ],
+            [
+              385,
+              60
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            499,
+            65
+          ],
+          "bond": [
+            [
+              493,
+              99
+            ],
+            [
+              493,
+              74
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            521,
+            143
+          ],
+          "bond": [
+            [
+              493,
+              130
+            ],
+            [
+              509,
+              139
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            476,
+            77
+          ],
+          "bond": [
+            [
+              470,
+              123
+            ],
+            [
+              470,
+              86
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "at": [
+            400,
+            150
+          ],
+          "bond": [
+            [
+              394,
+              123
+            ],
+            [
+              394,
+              143
+            ]
+          ]
+        }
+      ],
+      "carbonNumberPositions": {
+        "1": [
+          493,
+          138
+        ],
+        "2": [
+          502,
+          96
+        ],
+        "3": [
+          469,
+          132
+        ],
+        "4": [
+          383,
+          132
+        ],
+        "5": [
+          363,
+          96
+        ],
+        "6": [
+          363,
+          65
+        ]
+      },
+      "frontBonds": [
+        {
+          "from": [
+            369,
+            99
+          ],
+          "to": [
+            394,
+            123
+          ],
+          "type": "taper narrowatC5wideatC4"
+        },
+        {
+          "from": [
+            394,
+            123
+          ],
+          "to": [
+            470,
+            123
+          ],
+          "type": "boldhorizontal"
+        },
+        {
+          "from": [
+            470,
+            123
+          ],
+          "to": [
+            493,
+            99
+          ],
+          "type": "taper wideatC3narrowatC2"
+        }
+      ],
+      "caption": "β-fructose",
+      "captionAt": [
+        428,
+        175
+      ]
+    },
+    "equilibriumPairs": [
+      {
+        "upperFrom": [
+          167,
+          99
+        ],
+        "upperTo": [
+          205,
+          99
+        ],
+        "direction": "right",
+        "lowerFrom": [
+          205,
+          102
+        ],
+        "lowerTo": [
+          167,
+          102
+        ],
+        "lowerDirection": "left"
+      },
+      {
+        "upperFrom": [
+          313,
+          99
+        ],
+        "upperTo": [
+          351,
+          99
+        ],
+        "direction": "right",
+        "lowerFrom": [
+          351,
+          102
+        ],
+        "lowerTo": [
+          313,
+          102
+        ],
+        "lowerDirection": "left"
+      }
+    ],
+    "counts": "Mỗi panel6C/6O (ring5OH+1etherO;open5OH+1carbonylO). Tổng18carbonnumbers,0Hexplicit,0Cexplicittext;2captionsonly;2equilibriumpairs.",
+    "sourceDifference1046": "Khôngalias: khôngHexplicit,nhánhterminal làimplicitC+OH,KHÔNGCH2OHtext."
+  },
+  "verdict": "Đọc nguồn, chưa soSVG. KhôngthêmH/CH2OHtext/CIP/tênởopen."
+}
