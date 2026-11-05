@@ -1,0 +1,629 @@
+{
+  "i": 43,
+  "hash": "0922fb276b31d180cdfd51c1e4fd4b3922deeb98fbcf351003369052c308d510",
+  "fileNguon": "anh/0922fb276b31d180cdfd51c1e4fd4b3922deeb98fbcf351003369052c308d510.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNative": true,
+  "zooms": [
+    "/workspace/scratch/cau4-amylose195-first-zoom.png",
+    "/workspace/scratch/cau4-amylose195-second-third-zoom.png"
+  ],
+  "questions": [
+    {
+      "qid": "12-C2-B6-D2-II-39",
+      "maDe": "12-C2-B6-D2",
+      "de": "Quan sát cấu trúc phân tử amylose và phân tử cellulose dưới đây:",
+      "hinh": [
+        {
+          "hash": "0922fb276b31d180cdfd51c1e4fd4b3922deeb98fbcf351003369052c308d510",
+          "where": "12-C2-B6-D2-II-39.hinh.0.du_lieu",
+          "hashDataUrl": "07514632414b613914cff7571bea57a3874bbf413f78e7a1335bb7dd79782138"
+        },
+        {
+          "hash": "6e0ca319b0c0ee2547a3924a380ebc68c7c43a5ea478434000bc37fd9353f252",
+          "where": "12-C2-B6-D2-II-39.hinh.1.du_lieu",
+          "hashDataUrl": "032bbf95bee205accae24e26dcff683be5c5797ef7bb4b3600754a63a7937efa"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D3-II-114",
+      "maDe": "DB-12-B4-D3",
+      "de": "Quan sát cấu trúc phân tử amylose và phân tử cellulose dưới đây:",
+      "hinh": [
+        {
+          "hash": "0922fb276b31d180cdfd51c1e4fd4b3922deeb98fbcf351003369052c308d510",
+          "where": "DB-12-B4-D3-II-114.hinh.0.du_lieu",
+          "hashDataUrl": "07514632414b613914cff7571bea57a3874bbf413f78e7a1335bb7dd79782138"
+        },
+        {
+          "hash": "6e0ca319b0c0ee2547a3924a380ebc68c7c43a5ea478434000bc37fd9353f252",
+          "where": "DB-12-B4-D3-II-114.hinh.1.du_lieu",
+          "hashDataUrl": "032bbf95bee205accae24e26dcff683be5c5797ef7bb4b3600754a63a7937efa"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchorsapprox1–2px;sourcehasC5downstubnearinsideOH,donotrepairtheory.",
+    "units": [
+      {
+        "ring": {
+          "C4": [
+            69,
+            122
+          ],
+          "C3": [
+            111,
+            156
+          ],
+          "C2": [
+            183,
+            156
+          ],
+          "C1": [
+            225,
+            122
+          ],
+          "O": [
+            182,
+            86
+          ],
+          "C5": [
+            111,
+            85
+          ]
+        },
+        "CH2OH": {
+          "text": "CH₂OH",
+          "at": [
+            146,
+            51
+          ],
+          "bond": [
+            [
+              111,
+              85
+            ],
+            [
+              111,
+              67
+            ]
+          ],
+          "target": "Cfirst"
+        },
+        "C5downStub": [
+          [
+            111,
+            85
+          ],
+          [
+            111,
+            107
+          ]
+        ],
+        "NO_H_C5down": true,
+        "innerOH": {
+          "text": "OH",
+          "at": [
+            121,
+            122
+          ],
+          "bondFromC3": [
+            [
+              111,
+              156
+            ],
+            [
+              111,
+              138
+            ]
+          ],
+          "critical": "C5stubends107,OringinsideOHtop~113gap~5px,keepbothstubsandSINGLEOHlabelwithoutH/newOH/mergefix."
+        },
+        "C3Hdown": {
+          "H": [
+            111,
+            192
+          ],
+          "bond": [
+            [
+              111,
+              156
+            ],
+            [
+              111,
+              178
+            ]
+          ]
+        },
+        "C2Hup": {
+          "H": [
+            182,
+            123
+          ],
+          "bond": [
+            [
+              183,
+              156
+            ],
+            [
+              183,
+              138
+            ]
+          ]
+        },
+        "C2OHdown": {
+          "OH": [
+            192,
+            192
+          ],
+          "bond": [
+            [
+              183,
+              156
+            ],
+            [
+              183,
+              178
+            ]
+          ]
+        },
+        "C4Hup": {
+          "H": [
+            69,
+            85
+          ],
+          "bond": [
+            [
+              69,
+              122
+            ],
+            [
+              69,
+              101
+            ]
+          ]
+        },
+        "C1Hup": {
+          "H": [
+            225,
+            85
+          ],
+          "bond": [
+            [
+              225,
+              122
+            ],
+            [
+              225,
+              101
+            ]
+          ]
+        },
+        "front": "C4→C3taperthinC4wideC3,C3–C2horizontalbold,C2→C1taperwideC2thinC1"
+      },
+      {
+        "ring": {
+          "C4": [
+            296,
+            122
+          ],
+          "C3": [
+            338,
+            156
+          ],
+          "C2": [
+            410,
+            156
+          ],
+          "C1": [
+            452,
+            122
+          ],
+          "O": [
+            409,
+            86
+          ],
+          "C5": [
+            338,
+            85
+          ]
+        },
+        "CH2OH": {
+          "text": "CH₂OH",
+          "at": [
+            373,
+            51
+          ],
+          "bond": [
+            [
+              338,
+              85
+            ],
+            [
+              338,
+              67
+            ]
+          ],
+          "target": "Cfirst"
+        },
+        "C5downStub": [
+          [
+            338,
+            85
+          ],
+          [
+            338,
+            107
+          ]
+        ],
+        "NO_H_C5down": true,
+        "innerOH": {
+          "text": "OH",
+          "at": [
+            348,
+            122
+          ],
+          "bondFromC3": [
+            [
+              338,
+              156
+            ],
+            [
+              338,
+              138
+            ]
+          ],
+          "critical": "C5stubends107,OringinsideOHtop~113gap~5px,keepbothstubsandSINGLEOHlabelwithoutH/newOH/mergefix."
+        },
+        "C3Hdown": {
+          "H": [
+            338,
+            192
+          ],
+          "bond": [
+            [
+              338,
+              156
+            ],
+            [
+              338,
+              178
+            ]
+          ]
+        },
+        "C2Hup": {
+          "H": [
+            409,
+            123
+          ],
+          "bond": [
+            [
+              410,
+              156
+            ],
+            [
+              410,
+              138
+            ]
+          ]
+        },
+        "C2OHdown": {
+          "OH": [
+            419,
+            192
+          ],
+          "bond": [
+            [
+              410,
+              156
+            ],
+            [
+              410,
+              178
+            ]
+          ]
+        },
+        "C4Hup": {
+          "H": [
+            296,
+            85
+          ],
+          "bond": [
+            [
+              296,
+              122
+            ],
+            [
+              296,
+              101
+            ]
+          ]
+        },
+        "C1Hup": {
+          "H": [
+            452,
+            85
+          ],
+          "bond": [
+            [
+              452,
+              122
+            ],
+            [
+              452,
+              101
+            ]
+          ]
+        },
+        "front": "C4→C3taperthinC4wideC3,C3–C2horizontalbold,C2→C1taperwideC2thinC1"
+      },
+      {
+        "ring": {
+          "C4": [
+            523,
+            122
+          ],
+          "C3": [
+            565,
+            156
+          ],
+          "C2": [
+            637,
+            156
+          ],
+          "C1": [
+            679,
+            122
+          ],
+          "O": [
+            636,
+            86
+          ],
+          "C5": [
+            565,
+            85
+          ]
+        },
+        "CH2OH": {
+          "text": "CH₂OH",
+          "at": [
+            600,
+            51
+          ],
+          "bond": [
+            [
+              565,
+              85
+            ],
+            [
+              565,
+              67
+            ]
+          ],
+          "target": "Cfirst"
+        },
+        "C5downStub": [
+          [
+            565,
+            85
+          ],
+          [
+            565,
+            107
+          ]
+        ],
+        "NO_H_C5down": true,
+        "innerOH": {
+          "text": "OH",
+          "at": [
+            575,
+            122
+          ],
+          "bondFromC3": [
+            [
+              565,
+              156
+            ],
+            [
+              565,
+              138
+            ]
+          ],
+          "critical": "C5stubends107,OringinsideOHtop~113gap~5px,keepbothstubsandSINGLEOHlabelwithoutH/newOH/mergefix."
+        },
+        "C3Hdown": {
+          "H": [
+            565,
+            192
+          ],
+          "bond": [
+            [
+              565,
+              156
+            ],
+            [
+              565,
+              178
+            ]
+          ]
+        },
+        "C2Hup": {
+          "H": [
+            636,
+            123
+          ],
+          "bond": [
+            [
+              637,
+              156
+            ],
+            [
+              637,
+              138
+            ]
+          ]
+        },
+        "C2OHdown": {
+          "OH": [
+            646,
+            192
+          ],
+          "bond": [
+            [
+              637,
+              156
+            ],
+            [
+              637,
+              178
+            ]
+          ]
+        },
+        "C4Hup": {
+          "H": [
+            523,
+            85
+          ],
+          "bond": [
+            [
+              523,
+              122
+            ],
+            [
+              523,
+              101
+            ]
+          ]
+        },
+        "C1Hup": {
+          "H": [
+            679,
+            85
+          ],
+          "bond": [
+            [
+              679,
+              122
+            ],
+            [
+              679,
+              101
+            ]
+          ]
+        },
+        "front": "C4→C3taperthinC4wideC3,C3–C2horizontalbold,C2→C1taperwideC2thinC1"
+      }
+    ],
+    "leftEnd": {
+      "ellipsis": [
+        29,
+        165,
+        53,
+        165
+      ],
+      "OH": [
+        77,
+        157
+      ],
+      "bond": [
+        [
+          69,
+          122
+        ],
+        [
+          69,
+          143
+        ]
+      ],
+      "notBridgeO": true
+    },
+    "bridges": [
+      {
+        "O": [
+          260,
+          157
+        ],
+        "bonds": [
+          [
+            225,
+            122,
+            249,
+            146
+          ],
+          [
+            272,
+            146,
+            296,
+            122
+          ]
+        ]
+      },
+      {
+        "O": [
+          487,
+          157
+        ],
+        "bonds": [
+          [
+            452,
+            122,
+            476,
+            146
+          ],
+          [
+            499,
+            146,
+            523,
+            122
+          ]
+        ]
+      }
+    ],
+    "rightEnd": {
+      "O": [
+        679,
+        157
+      ],
+      "bond": [
+        [
+          679,
+          122
+        ],
+        [
+          679,
+          143
+        ]
+      ],
+      "ellipsis": [
+        693,
+        165,
+        717,
+        165
+      ]
+    },
+    "caption": "Phân tử amylose",
+    "captionAt": [
+      380,
+      231
+    ],
+    "counts": "3ringO/2bridgeO/1rightendO/3CH₂OHtext/7OHlabelsstandaloneinclleftterminal/12Hlabels(4perring),NOHtextatC5down;6taperfront+3horizontalbold;2ellipsis.",
+    "printArtifacts": {
+      "rightLine": [
+        723,
+        27,
+        723,
+        250
+      ],
+      "leftCorner": [
+        26,
+        231,
+        48,
+        247
+      ],
+      "classification": "Disconnectedouterpage/figurecropmarks,noleader/bond;full2publicrefsfigure0amyloseandfigure1celluloseonly,bothstemscontrastpolysaccharides. Openedpairedcellulosenativehash6e0ca319...f252,alsohasdetachedlowercornerartifact. Excludenonfiguremarkswithoutchangingchemcaption."
+    }
+  },
+  "verdict": "Đọcsource;chưaactualSVGreview."
+}

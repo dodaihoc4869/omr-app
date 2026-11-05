@@ -6940,6 +6940,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "0922fb276b31d180cdfd51c1e4fd4b3922deeb98fbcf351003369052c308d510": {
+      "tep": "amylose-ba-vong-ddh-48d1a6aacc93953861567850a2993c4b4d6c9560501c753c274f93aa539a4c9a.svg",
+      "hashSvg": "48d1a6aacc93953861567850a2993c4b4d6c9560501c753c274f93aa539a4c9a",
+      "byteSvg": 33599,
+      "byteGzip": 4327,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "f623d1ca4cdc50f02668a602dfaf136bf2b0f5ffcdb1f8a086a211102cc1c131": {
       "tep": "do-thi-aspirin-ddh-cea584f57e1a2ceabaa0931910cbd9d0e3abf154b0baa727ecd7c6e425b2c700.svg",
       "hashSvg": "cea584f57e1a2ceabaa0931910cbd9d0e3abf154b0baa727ecd7c6e425b2c700",
@@ -9526,6 +9535,20 @@
           "where": "12-C2-B6-D2-II-27.hinh.0.du_lieu",
           "hashDataUrl": "ffdfa11a712937fa58c30c30a68670ef391e1ea8bdf8c576a7892bb0c7583763",
           "vector": "lewis-nitric-ddh-43541ed9e7b5bdf9fc9f85f049b8732f5eb15319ace8c9fa0976c305125dae97.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-C2-B6-D2-II-39",
+      "duMoiHinh": false,
+      "soHinhNguon": 2,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "0922fb276b31d180cdfd51c1e4fd4b3922deeb98fbcf351003369052c308d510",
+          "where": "12-C2-B6-D2-II-39.hinh.0.du_lieu",
+          "hashDataUrl": "07514632414b613914cff7571bea57a3874bbf413f78e7a1335bb7dd79782138",
+          "vector": "amylose-ba-vong-ddh-48d1a6aacc93953861567850a2993c4b4d6c9560501c753c274f93aa539a4c9a.svg"
         }
       ]
     },
@@ -15660,6 +15683,20 @@
           "where": "DB-12-B4-D3-I-100.hinh.0.du_lieu",
           "hashDataUrl": "24056de5178095918cb5028eb43b6fce646b01282a79e9fa3fffe0366f7155cb",
           "vector": "polysaccharide-ddh-92a01509d1f03b2081374f10d68f4bef415f78e68158d0162b5aad6f90a12cbf.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D3-II-114",
+      "duMoiHinh": false,
+      "soHinhNguon": 2,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "0922fb276b31d180cdfd51c1e4fd4b3922deeb98fbcf351003369052c308d510",
+          "where": "DB-12-B4-D3-II-114.hinh.0.du_lieu",
+          "hashDataUrl": "07514632414b613914cff7571bea57a3874bbf413f78e7a1335bb7dd79782138",
+          "vector": "amylose-ba-vong-ddh-48d1a6aacc93953861567850a2993c4b4d6c9560501c753c274f93aa539a4c9a.svg"
         }
       ]
     },
@@ -25329,8 +25366,10 @@
     "VIP27-CDK-ACIDBASE-III-13"
   ],
   "cauMoiXongMotPhan": [
+    "12-C2-B6-D2-II-39",
     "DB-12-B1-P1-D2-III-114",
     "DB-12-B1-P1-D2-III-118",
+    "DB-12-B4-D3-II-114",
     "DH-12-C1-B1-P1-II-5",
     "DH-12-C1-B1-P1-III-10",
     "DH-12-C1-B1-P1-III-42",
