@@ -1328,3 +1328,10 @@ Nhóm169đãxong15/20;1120/1030/1046ĐÃĐẠTđừngtrùng. CÒN765/1195/806/10
 -1028nămPCHIPcurvegiữpixelanchors/crossings/extrema/endpoints/10dashedguides+Yticks/4Xticks/3Ylabels/5curve labels/NH4sup+/CsubHNO3/molLsup-1/2axisarrows/DDHpath. PNGnative/full+actualSVG/exacthashsoátđộclập;khôngsuyđápán.
 -Chromium520/520/hash/XML/path/selfcontained/AST/build179/precache170/2613.23KiB/speed21/21đạt. SizegateđỏNỀNindex.tsnguyênbytekhôngnângmốc;phảixửlýtrướcgộp/deploy.Mainab81c625chưagộp/WOFF2khôngdiff. Chưa tích hợp/chưa reload offline app/chưa phát hành. Chưa tham vấn được cố vấn.
 -Nhóm169đãđạt18/20;còn765/806chưadựng.1028/1195ĐÃĐẠTđừngtrùng.765MSweakbaselinehairlines/806anilinegiữmọibarlabelledvàunlabelled/tick/label/pixelkhôngsuytheory. Fullsource/publicde/refs/geometrykiem/doc-molecule-lo-169.json. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.
+
+
+### 05/11 — Lô180: phổ aniline
+-1022 câu đủ mọi hình+DDH/7 một phần;768 nguồn→521 SVG;8299595byte/gzip1642613;660 nguồn còn lại.
+-806MSanilinegiữmọibarlabelledvàunlabelled/11labels/2blueaxes/X20-40-60-80/Y50-100/captiontriangle/noM/no0/DDHpath. Tinybaselinevạchgiữpixelkhônggánmz. PNGnative/full+freshactualSVG/exacthashsoátđộclập.
+-Chromium521/521/hash/XML/path/selfcontained/AST/build180/precache170/2613.23KiB/speed21/21đạt. SizegateđỏNỀNindex.tsnguyênbytekhôngnângmốc;phảixửlýtrướcgộp/deploy.Mainab81c625chưagộp/WOFF2khôngdiff. Chưa tích hợp/chưa reload offline app/chưa phát hành. Chưa tham vấn được cố vấn.
+-Nhóm169đãđạt19/20;CHỈcòn765CHƯAdựng.806ĐÃĐẠTđừngtrùng.765MSweakbaselinehairlines/frame4cạnh/minorticks/cầnnativezoomtừngvạchkhôngđoánpeakcount. Fullsource/publicde/refs/geometrykiem/doc-molecule-lo-169.json. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.

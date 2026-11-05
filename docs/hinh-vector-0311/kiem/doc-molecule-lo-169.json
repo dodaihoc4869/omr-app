@@ -791,7 +791,9 @@
       }
     ],
     "chiLaDuLieuDungChuaSoatRender": true,
-    "daCoManifestTaiCheckpoint": false
+    "daCoManifestTaiCheckpoint": true,
+    "svgDaChon": "ms-aniline-ddh-5c4e4a3a0afae4f30f8c028da7b2b35742d9e22548abff646c8fe2479d8800a4.svg",
+    "hashSvgDaChon": "5c4e4a3a0afae4f30f8c028da7b2b35742d9e22548abff646c8fe2479d8800a4"
   },
   {
     "i": 1028,

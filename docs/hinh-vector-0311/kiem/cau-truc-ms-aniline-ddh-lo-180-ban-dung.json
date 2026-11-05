@@ -1,0 +1,228 @@
+[
+  {
+    "i": 806,
+    "hash": "95b813c93b53365f6fc1b24723ad9f8a0a6333264d36686517b51c0c8c749917",
+    "fileNguon": "anh/95b813c93b53365f6fc1b24723ad9f8a0a6333264d36686517b51c0c8c749917.png",
+    "canvas": [
+      716,
+      644
+    ],
+    "daMoNative": true,
+    "kind": "MS-aniline-coloured",
+    "xLabel": "m/z",
+    "yLabel": "Cường độ tương đối (%)",
+    "xTickLabels": [
+      20,
+      40,
+      60,
+      80
+    ],
+    "yTickLabels": [
+      50,
+      100
+    ],
+    "labelledMz": [
+      28,
+      30,
+      39,
+      41,
+      46,
+      52,
+      63,
+      66,
+      74,
+      78,
+      93
+    ],
+    "caption": "▲ Phổ khối lượng của aniline",
+    "notes": "1plot2trụcxanhlamnhạt,barspink/magenta.CóNHIỀUbarKHÔNGlabelngoài11labelđãliệtkê,bắtbuộcgiữkhirootdựng,KHÔNGvẽchỉ11labelledpeaks. Peak93tớigần100,peak66height~70,39~20;unlabelledbar92rấtcaogần50. Không[M]⁺marker/khungtrênphải/grid.Cầntracemaskmàumagentapolylines/đọcfulltrướcduyệtallbar,vịtríminibarKHÔNGđượcđoántừanilinefragmentation.Captionsource▲đenhồngmarkerphảigiữ.",
+    "questions": [
+      {
+        "qid": "DH-11-C3-B12-III-21",
+        "de": "Aniline là hợp chất quan trọng trong công nghiệp phẩm nhuộm sản xuất polymer. Kết quả phân tích nguyên tố aniline như sau 77,42% C, 7,53% H về khối lượng còn lại là nitrogen. Phân tử khối của aniline được xác định trên phổ khối lượng nguyên tử tương ứng với peak có cường độ tương đối mạnh nhất.\nCó bao nhiêu nguyên tử carbon trong phân tử aniline?",
+        "refs": [
+          {
+            "where": "DH-11-C3-B12-III-21.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "daCoManifestTaiCheckpoint": false,
+    "svg": "ms-aniline-ddh-5c4e4a3a0afae4f30f8c028da7b2b35742d9e22548abff646c8fe2479d8800a4.svg",
+    "hashSvg": "5c4e4a3a0afae4f30f8c028da7b2b35742d9e22548abff646c8fe2479d8800a4",
+    "byteSvg": 45734,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "peaksPixel": [
+      [
+        164,
+        544
+      ],
+      [
+        171,
+        543
+      ],
+      [
+        182,
+        526
+      ],
+      [
+        200,
+        545
+      ],
+      [
+        215,
+        543
+      ],
+      [
+        244.5,
+        531
+      ],
+      [
+        254.5,
+        505
+      ],
+      [
+        264,
+        432
+      ],
+      [
+        269.5,
+        512
+      ],
+      [
+        276.5,
+        507
+      ],
+      [
+        286.5,
+        540
+      ],
+      [
+        295.5,
+        544
+      ],
+      [
+        307,
+        547
+      ],
+      [
+        318.5,
+        515
+      ],
+      [
+        335,
+        543
+      ],
+      [
+        343.5,
+        514
+      ],
+      [
+        353,
+        508
+      ],
+      [
+        357,
+        500
+      ],
+      [
+        364,
+        532
+      ],
+      [
+        372.5,
+        510
+      ],
+      [
+        381,
+        543
+      ],
+      [
+        394.5,
+        542
+      ],
+      [
+        417.5,
+        545
+      ],
+      [
+        425.5,
+        532
+      ],
+      [
+        433,
+        522
+      ],
+      [
+        438.5,
+        499
+      ],
+      [
+        450.5,
+        512
+      ],
+      [
+        458,
+        323
+      ],
+      [
+        464.5,
+        195
+      ],
+      [
+        472.5,
+        503
+      ],
+      [
+        486,
+        547
+      ],
+      [
+        505,
+        544
+      ],
+      [
+        522,
+        536
+      ],
+      [
+        530.5,
+        543
+      ],
+      [
+        540,
+        532
+      ],
+      [
+        553,
+        522
+      ],
+      [
+        575,
+        545
+      ],
+      [
+        608,
+        547
+      ],
+      [
+        648.5,
+        522
+      ],
+      [
+        656,
+        298
+      ],
+      [
+        666,
+        35
+      ]
+    ],
+    "ghiChuDung": "11labelledpeaks+unlabelledvạchgiữpixel/2blueaxes/X20-40-60-80/Y50-100/no0/noM/captiontriangle/DDHpath. Tinybaselinegraystrokeskeptat307486505575608,khônggánmz/khôngsuytheory.",
+    "hashSvgDaSoat": "5c4e4a3a0afae4f30f8c028da7b2b35742d9e22548abff646c8fe2479d8800a4",
+    "nguoiSoat": "cau_truc_4"
+  }
+]
