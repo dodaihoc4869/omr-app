@@ -1,0 +1,45 @@
+{
+  "i": 49,
+  "hashNguon": "0a19be47e8519a4f8dc682a3758dc82283bf5234053ba5e48f570233e85e72be",
+  "nguonDoiChieu": {
+    "i": 1028,
+    "hash": "b870c7568e7c64e8245dc20b5720734c2c328cc9d3d27e83ff38312d3b3cfdb2"
+  },
+  "hashSvg": "c0749d57dfdbf69f3e47d72c5084350c6b8c124b4900221fc8ec450331e1fe77",
+  "nguoiSoat": "cau_truc_4",
+  "daMoRieng2PNGNativeFull": true,
+  "zooms": [
+    "/workspace/scratch/cau4-199-source49-crossings.png",
+    "/workspace/scratch/cau4-199-source1028-crossings.png"
+  ],
+  "actualChromium": "/workspace/scratch/cau4-199-alias179-fresh.png",
+  "questions": [
+    {
+      "qid": "DB-11-B6-D2-II-59",
+      "maDe": "DB-11-B6-D2",
+      "de": "Khi Fe phản ứng với HNO₃ với nồng độ khác nhau, hàm lượng sản phẩm khử với nồng độ nitric acid được thể hiện trong Hình 2.2. Hình 2.2. Hàm lượng sản phẩm khử với nồng độ HNO₃",
+      "hinh": [
+        {
+          "hash": "0a19be47e8519a4f8dc682a3758dc82283bf5234053ba5e48f570233e85e72be",
+          "where": "DB-11-B6-D2-II-59.hinh.0.du_lieu",
+          "hashDataUrl": "5184a140f1fe051e59787bdc941bd2419b92e6fca24d5e4154199193625c66ec"
+        }
+      ]
+    },
+    {
+      "qid": "DH-11-C2-B6-II-16",
+      "maDe": "DH-11-C2-B6",
+      "de": "Khi Fe phản ứng với HNO₃ với nồng độ khác nhau, hàm lượng sản phẩm khử với nồng độ nitric acid được thể hiện trong Hình 2.2. Hình 2.2. Hàm lượng sản phẩm khử với nồng độ HNO₃",
+      "hinh": [
+        {
+          "hash": "0a19be47e8519a4f8dc682a3758dc82283bf5234053ba5e48f570233e85e72be",
+          "where": "DH-11-C2-B6-II-16.hinh.0.du_lieu",
+          "hashDataUrl": "5184a140f1fe051e59787bdc941bd2419b92e6fca24d5e4154199193625c66ec"
+        }
+      ]
+    }
+  ],
+  "doiChieu": "Cùng đồ thị5curve/5labels/ticks/10guides vàmọicrossing/extrema/endpoints. Nativepixelskhôngbytegiống:49gốcx146/y424,1028x166/y453;Y10ở65vs93;49plotrộnghơn~5%,dịchY~−29. X49≈146+1.05*(X1028−166),Y49≈Y1028−29. Đâyđổiscale/layoutscan,khôngđổidữliệu. TựmởbothcrossingzoomthấycùngthứtựNH4+/N2/N2O/NO2vàplateau/vùngcutoff. KhôngpHashduyệt.",
+  "batDong": "Khôngpháthiệnbấtđồngngữnghĩa/nhãn/data/stereograph;chỉscanresize/offset/fontnative.",
+  "ketQua": "Đạt dùng chung SVG179 sau đối chiếu riêng nguồn49 + nguồn1028 + actualrender. Khôngtuyênbố2PNGpixelidentical."
+}

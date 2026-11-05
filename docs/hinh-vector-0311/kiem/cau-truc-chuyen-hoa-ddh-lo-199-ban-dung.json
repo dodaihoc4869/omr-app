@@ -1,0 +1,40 @@
+[
+  {
+    "i": 58,
+    "hash": "0b7e56b1275a64889d7aa748bea128079bd3fbc584df4ca3518161fb05f4a92f",
+    "fileNguon": "anh/0b7e56b1275a64889d7aa748bea128079bd3fbc584df4ca3518161fb05f4a92f.png",
+    "svg": "chuyen-hoa-ddh-e52c1a679dd803da708e3d231eee5b1503dc57a16a14ba96d8b8cf945b382cbb.svg",
+    "hashSvg": "e52c1a679dd803da708e3d231eee5b1503dc57a16a14ba96d8b8cf945b382cbb",
+    "byteSvg": 21717,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C2-ON-I-7",
+        "de": "Cho dãy phản ứng hoá học sau: Các giai đoạn có thể thực hiện nhờ xúc tác acid là",
+        "refs": [
+          {
+            "hash": "0b7e56b1275a64889d7aa748bea128079bd3fbc584df4ca3518161fb05f4a92f",
+            "where": "12-C2-ON-I-7.hinh.0.du_lieu",
+            "hashDataUrl": "916766c8f71d837091651e709400f51c42a95d73aa95044a447c162205e1e2ad"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D2-I-61",
+        "de": "Cho dãy phản ứng hoá học sau: Các giai đoạn có thể thực hiện nhờ xúc tác acid là",
+        "refs": [
+          {
+            "hash": "0b7e56b1275a64889d7aa748bea128079bd3fbc584df4ca3518161fb05f4a92f",
+            "where": "DB-12-B4-D2-I-61.hinh.0.du_lieu",
+            "hashDataUrl": "916766c8f71d837091651e709400f51c42a95d73aa95044a447c162205e1e2ad"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "CO2→(C6H10O5)n→C12H22O11→C6H12O6→C2H5OH/4arrows/labels(1)..(4)/DDHpath.",
+    "hashSvgDaSoat": "e52c1a679dd803da708e3d231eee5b1503dc57a16a14ba96d8b8cf945b382cbb",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

@@ -1,0 +1,141 @@
+{
+  "i": 58,
+  "hash": "0b7e56b1275a64889d7aa748bea128079bd3fbc584df4ca3518161fb05f4a92f",
+  "fileNguon": "anh/0b7e56b1275a64889d7aa748bea128079bd3fbc584df4ca3518161fb05f4a92f.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "questions": [
+    {
+      "qid": "12-C2-ON-I-7",
+      "de": "Cho dãy phản ứng hoá học sau: Các giai đoạn có thể thực hiện nhờ xúc tác acid là",
+      "refs": [
+        {
+          "hash": "0b7e56b1275a64889d7aa748bea128079bd3fbc584df4ca3518161fb05f4a92f",
+          "where": "12-C2-ON-I-7.hinh.0.du_lieu",
+          "hashDataUrl": "916766c8f71d837091651e709400f51c42a95d73aa95044a447c162205e1e2ad"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D2-I-61",
+      "de": "Cho dãy phản ứng hoá học sau: Các giai đoạn có thể thực hiện nhờ xúc tác acid là",
+      "refs": [
+        {
+          "hash": "0b7e56b1275a64889d7aa748bea128079bd3fbc584df4ca3518161fb05f4a92f",
+          "where": "DB-12-B4-D2-I-61.hinh.0.du_lieu",
+          "hashDataUrl": "916766c8f71d837091651e709400f51c42a95d73aa95044a447c162205e1e2ad"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "formulas": [
+      {
+        "text": "CO₂",
+        "anchor": [
+          68,
+          49
+        ]
+      },
+      {
+        "text": "(C₆H₁₀O₅)ₙ",
+        "anchor": [
+          266,
+          49
+        ],
+        "note": "roundparentheses,nsubscriptoutsideclosing,notnnormalbaseline"
+      },
+      {
+        "text": "C₁₂H₂₂O₁₁",
+        "anchor": [
+          502,
+          51
+        ]
+      },
+      {
+        "text": "C₆H₁₂O₆",
+        "anchor": [
+          716,
+          51
+        ]
+      },
+      {
+        "text": "C₂H₅OH",
+        "anchor": [
+          921,
+          52
+        ]
+      }
+    ],
+    "arrows": [
+      {
+        "from": [
+          113,
+          51
+        ],
+        "to": [
+          176,
+          51
+        ],
+        "direction": "RIGHT",
+        "label": "(1)",
+        "labelAnchor": [
+          145,
+          38
+        ]
+      },
+      {
+        "from": [
+          360,
+          51
+        ],
+        "to": [
+          426,
+          51
+        ],
+        "direction": "RIGHT",
+        "label": "(2)",
+        "labelAnchor": [
+          393,
+          40
+        ]
+      },
+      {
+        "from": [
+          583,
+          54
+        ],
+        "to": [
+          648,
+          54
+        ],
+        "direction": "RIGHT",
+        "label": "(3)",
+        "labelAnchor": [
+          616,
+          41
+        ]
+      },
+      {
+        "from": [
+          787,
+          55
+        ],
+        "to": [
+          853,
+          55
+        ],
+        "direction": "RIGHT",
+        "label": "(4)",
+        "labelAnchor": [
+          820,
+          42
+        ]
+      }
+    ],
+    "counts": "5formulas/4rightarrows/4parenthesizedstagelabels(1)..(4). Nootherconditions/catalysts/coefficients/captions.",
+    "sourceInstructionData": "Publicstemaskstageacidcatalyst;doNOTsolve/addacidconditions.",
+    "glyphs": "Allnumbersinchemicalformulassubscriptincl10/12/22/11;terminalOHnormalbaseline,nrepeatlowercaseoutsideparenthesis."
+  },
+  "verdict": "Đọcsource,chưaactualSVGreview."
+}
