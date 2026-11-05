@@ -1,0 +1,357 @@
+[
+  {
+    "i": 1214,
+    "hash": "dc5ab4189af556323a11c8fea6473de14ec8d272e7eb1c8d16b4370da436b61d",
+    "fileNguon": "anh/dc5ab4189af556323a11c8fea6473de14ec8d272e7eb1c8d16b4370da436b61d.png",
+    "svg": "triester-ddh-bc05605a8f4e13c14122ea06b5cf3aadd023f6cca328407a0f9b85c7dcb8d467.svg",
+    "hashSvg": "bc05605a8f4e13c14122ea06b5cf3aadd023f6cca328407a0f9b85c7dcb8d467",
+    "byteSvg": 22039,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C1-B2-II-25",
+        "de": "Chất béo X có trong thành phần dầu cá. Thuỷ phân X bằng dung dịch NaOH đun nóng, thu được các sản phẩm hữu cơ Y, Z, T theo phương trình hoá học sau. Trong đó Y là glycerol, Z và T là các muối sodium của acid béo.\nCho biết chất Z và chất T đều có tính chất giặt rửa.",
+        "refs": [
+          {
+            "hash": "dc5ab4189af556323a11c8fea6473de14ec8d272e7eb1c8d16b4370da436b61d",
+            "where": "12-C1-B2-II-25.hinh.0.du_lieu",
+            "hashDataUrl": "a017294e95da3526e57c2b1a9d97108a5adfd87928d19db5319aeb6951e7820c"
+          }
+        ]
+      },
+      {
+        "qid": "12-C1-B3-D2-II-2",
+        "de": "Chất béo X có trong thành phần dầu cá. Thuỷ phân X bằng dung dịch NaOH đun nóng, thu được các sản phẩm hữu cơ Y, Z, T theo phương trình hoá học sau. Trong đó Y là glycerol, Z và T là các muối sodium của acid béo.\nCho biết chất Z và chất T đều có tính chất giặt rửa.",
+        "refs": [
+          {
+            "hash": "dc5ab4189af556323a11c8fea6473de14ec8d272e7eb1c8d16b4370da436b61d",
+            "where": "12-C1-B3-D2-II-2.hinh.0.du_lieu",
+            "hashDataUrl": "a017294e95da3526e57c2b1a9d97108a5adfd87928d19db5319aeb6951e7820c"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P2-D1-II-45",
+        "de": "Chất béo X có trong thành phần dầu cá. Thuỷ phân X bằng dung dịch NaOH đun nóng, thu được các sản phẩm hữu cơ Y, Z, T theo phương trình hoá học sau. Trong đó Y là glycerol, Z và T là các muối sodium của acid béo.\nCho biết chất Z và chất T đều có tính chất giặt rửa.",
+        "refs": [
+          {
+            "hash": "dc5ab4189af556323a11c8fea6473de14ec8d272e7eb1c8d16b4370da436b61d",
+            "where": "DB-12-B1-P2-D1-II-45.hinh.0.du_lieu",
+            "hashDataUrl": "a017294e95da3526e57c2b1a9d97108a5adfd87928d19db5319aeb6951e7820c"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P2-D1-II-60",
+        "de": "Chất béo X có trong thành phần dầu cá. Thuỷ phân X bằng dung dịch NaOH đun nóng, thu được các sản phẩm hữu cơ Y, Z, T theo phương trình hoá học sau. Trong đó Y là glycerol, Z và T là các muối sodium của acid béo.\nCho biết chất Z và chất T đều có tính chất giặt rửa.",
+        "refs": [
+          {
+            "hash": "dc5ab4189af556323a11c8fea6473de14ec8d272e7eb1c8d16b4370da436b61d",
+            "where": "DB-12-B1-P2-D1-II-60.hinh.0.du_lieu",
+            "hashDataUrl": "a017294e95da3526e57c2b1a9d97108a5adfd87928d19db5319aeb6951e7820c"
+          }
+        ]
+      }
+    ],
+    "polylines": {
+      "top": [
+        [
+          107,
+          86
+        ],
+        [
+          141,
+          105
+        ],
+        [
+          173,
+          86
+        ],
+        [
+          203,
+          105
+        ],
+        [
+          233,
+          86
+        ],
+        [
+          264,
+          105
+        ],
+        [
+          292,
+          86
+        ],
+        [
+          323,
+          105
+        ],
+        [
+          350,
+          86
+        ],
+        [
+          380,
+          105
+        ],
+        [
+          409,
+          86
+        ],
+        [
+          438,
+          105
+        ],
+        [
+          466,
+          86
+        ],
+        [
+          495,
+          105
+        ]
+      ],
+      "mid": [
+        [
+          135,
+          171
+        ],
+        [
+          165,
+          187
+        ],
+        [
+          194,
+          169
+        ],
+        [
+          222,
+          187
+        ],
+        [
+          249,
+          169
+        ],
+        [
+          277,
+          187
+        ],
+        [
+          303,
+          171
+        ],
+        [
+          329,
+          171
+        ],
+        [
+          353,
+          187
+        ],
+        [
+          381,
+          169
+        ],
+        [
+          409,
+          187
+        ],
+        [
+          437,
+          169
+        ],
+        [
+          465,
+          187
+        ]
+      ],
+      "bottom": [
+        [
+          85,
+          249
+        ],
+        [
+          110,
+          239
+        ],
+        [
+          140,
+          258
+        ],
+        [
+          170,
+          239
+        ],
+        [
+          199,
+          258
+        ],
+        [
+          229,
+          239
+        ],
+        [
+          258,
+          258
+        ],
+        [
+          287,
+          239
+        ],
+        [
+          317,
+          258
+        ],
+        [
+          345,
+          239
+        ],
+        [
+          375,
+          258
+        ],
+        [
+          404,
+          239
+        ],
+        [
+          434,
+          258
+        ],
+        [
+          464,
+          239
+        ],
+        [
+          493,
+          258
+        ]
+      ],
+      "Z": [
+        [
+          844,
+          117
+        ],
+        [
+          864,
+          101
+        ],
+        [
+          884,
+          117
+        ],
+        [
+          905,
+          101
+        ],
+        [
+          925,
+          117
+        ],
+        [
+          946,
+          101
+        ],
+        [
+          967,
+          117
+        ],
+        [
+          988,
+          101
+        ],
+        [
+          1009,
+          117
+        ],
+        [
+          1030,
+          101
+        ],
+        [
+          1050,
+          117
+        ],
+        [
+          1071,
+          101
+        ],
+        [
+          1092,
+          117
+        ],
+        [
+          1108,
+          109
+        ]
+      ],
+      "T": [
+        [
+          838,
+          235
+        ],
+        [
+          859,
+          218
+        ],
+        [
+          881,
+          235
+        ],
+        [
+          904,
+          218
+        ],
+        [
+          926,
+          235
+        ],
+        [
+          948,
+          218
+        ],
+        [
+          970,
+          231
+        ],
+        [
+          974,
+          220
+        ],
+        [
+          996,
+          220
+        ],
+        [
+          1017,
+          235
+        ],
+        [
+          1039,
+          218
+        ],
+        [
+          1061,
+          235
+        ],
+        [
+          1082,
+          218
+        ],
+        [
+          1103,
+          235
+        ],
+        [
+          1115,
+          227
+        ]
+      ]
+    },
+    "hashSvgDaSoat": "bc05605a8f4e13c14122ea06b5cf3aadd023f6cca328407a0f9b85c7dcb8d467",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

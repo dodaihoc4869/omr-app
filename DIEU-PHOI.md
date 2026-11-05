@@ -1342,3 +1342,10 @@ Nhóm169đãxong15/20;1120/1030/1046ĐÃĐẠTđừngtrùng. CÒN765/1195/806/10
 -765MSester4frame/minorX1major10/Yminor5major20/tinybaselinevạchgiữsource/heightpixel/khôngnhãnmzpeak/khôngM/DDHpath. PNGnative/full+zoombaseline+freshactualSVG/exacthashsoátđộclập.
 -Chromium522/522/hash/XML/path/selfcontained/AST/build181/precache170/2613.23KiB/speed21/21đạt. SizegateđỏNỀNindex.tsnguyênbytekhôngnângmốc;phảixửlýtrướcgộp/deploy.Mainab81c625chưagộp/WOFF2khôngdiff. Chưa tích hợp/chưa reload offline app/chưa phát hành. Chưa tham vấn được cố vấn.
 -Nhóm169ĐỦ20/20đãđạt,khôngdựngtrùng. Tiếpưu tiênnguồndùngnhiềucâu1213stereochemicaldisaccharide/1214triesterhydrolysis(rootđãmởnativechưađủgeometry),1033IR2panelE/F/736surfactant4panelchưađọchết. Đốimanifest/hashtrướcdựng,rankingchỉgợiý. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.
+
+
+### 05/11 — Lô182: triester literal
+-1029 câu đủ mọi hình+DDH/7 một phần;770 nguồn→523 SVG;8352328byte/gzip1652693;658 nguồn còn lại.
+-1214triesterliteral:ester3chains14/13/15C,Z14C/T15CbaoCOONaC,Tkinktrướcdoublecóthật. Giữ6esterO/3Cdọc/+3NaOH/t°/Y3OH/2Z+T/(X)(Y)(Z)(T)/khôngsửatheory. Nativefull/zoom/freshactualSVG/hashsoátđộclập.
+-Chromium523/523/hash/XML/path/selfcontained/AST/build182/precache170/2613.23KiB/speed21/21đạt. SizegateđỏNỀNindex.tsnguyênbytekhôngnângmốc;phảixửlýtrướcgộp/deploy.Mainab81c625chưagộp/WOFF2khôngdiff. Chưa tích hợp/chưa reload offline app/chưa phát hành. Chưa tham vấn được cố vấn.
+-Tiếpưu tiên1213stereochemicaldisaccharide(rootđãmởnativechưađủgeometry),1033IR2panelE/F/736surfactant4panelchưađọchết.1214ĐÃĐẠTđừngtrùng,giữsốCkhácnhauđúngsourcekhôngcânbằng2Z. Nhóm169ĐỦ20/20đãđạt. Đốimanifest/hashtrướcdựng. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.

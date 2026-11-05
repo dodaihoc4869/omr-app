@@ -1,0 +1,548 @@
+{
+  "i": 1214,
+  "hash": "dc5ab4189af556323a11c8fea6473de14ec8d272e7eb1c8d16b4370da436b61d",
+  "fileNguon": "anh/dc5ab4189af556323a11c8fea6473de14ec8d272e7eb1c8d16b4370da436b61d.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNative": true,
+  "daMoZoom": [
+    [
+      25,
+      40,
+      480,
+      270
+    ],
+    [
+      810,
+      75,
+      397,
+      185
+    ],
+    [
+      830,
+      205,
+      300,
+      45
+    ]
+  ],
+  "questions": [
+    {
+      "qid": "12-C1-B2-II-25",
+      "maDe": "12-C1-B2",
+      "de": "Chất béo X có trong thành phần dầu cá. Thuỷ phân X bằng dung dịch NaOH đun nóng, thu được các sản phẩm hữu cơ Y, Z, T theo phương trình hoá học sau. Trong đó Y là glycerol, Z và T là các muối sodium của acid béo.\nCho biết chất Z và chất T đều có tính chất giặt rửa.",
+      "hinh": [
+        {
+          "hash": "dc5ab4189af556323a11c8fea6473de14ec8d272e7eb1c8d16b4370da436b61d",
+          "where": "12-C1-B2-II-25.hinh.0.du_lieu",
+          "hashDataUrl": "a017294e95da3526e57c2b1a9d97108a5adfd87928d19db5319aeb6951e7820c"
+        }
+      ]
+    },
+    {
+      "qid": "12-C1-B3-D2-II-2",
+      "maDe": "12-C1-B3-D2",
+      "de": "Chất béo X có trong thành phần dầu cá. Thuỷ phân X bằng dung dịch NaOH đun nóng, thu được các sản phẩm hữu cơ Y, Z, T theo phương trình hoá học sau. Trong đó Y là glycerol, Z và T là các muối sodium của acid béo.\nCho biết chất Z và chất T đều có tính chất giặt rửa.",
+      "hinh": [
+        {
+          "hash": "dc5ab4189af556323a11c8fea6473de14ec8d272e7eb1c8d16b4370da436b61d",
+          "where": "12-C1-B3-D2-II-2.hinh.0.du_lieu",
+          "hashDataUrl": "a017294e95da3526e57c2b1a9d97108a5adfd87928d19db5319aeb6951e7820c"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B1-P2-D1-II-45",
+      "maDe": "DB-12-B1-P2-D1",
+      "de": "Chất béo X có trong thành phần dầu cá. Thuỷ phân X bằng dung dịch NaOH đun nóng, thu được các sản phẩm hữu cơ Y, Z, T theo phương trình hoá học sau. Trong đó Y là glycerol, Z và T là các muối sodium của acid béo.\nCho biết chất Z và chất T đều có tính chất giặt rửa.",
+      "hinh": [
+        {
+          "hash": "dc5ab4189af556323a11c8fea6473de14ec8d272e7eb1c8d16b4370da436b61d",
+          "where": "DB-12-B1-P2-D1-II-45.hinh.0.du_lieu",
+          "hashDataUrl": "a017294e95da3526e57c2b1a9d97108a5adfd87928d19db5319aeb6951e7820c"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B1-P2-D1-II-60",
+      "maDe": "DB-12-B1-P2-D1",
+      "de": "Chất béo X có trong thành phần dầu cá. Thuỷ phân X bằng dung dịch NaOH đun nóng, thu được các sản phẩm hữu cơ Y, Z, T theo phương trình hoá học sau. Trong đó Y là glycerol, Z và T là các muối sodium của acid béo.\nCho biết chất Z và chất T đều có tính chất giặt rửa.",
+      "hinh": [
+        {
+          "hash": "dc5ab4189af556323a11c8fea6473de14ec8d272e7eb1c8d16b4370da436b61d",
+          "where": "DB-12-B1-P2-D1-II-60.hinh.0.du_lieu",
+          "hashDataUrl": "a017294e95da3526e57c2b1a9d97108a5adfd87928d19db5319aeb6951e7820c"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "coordinateNote": "Native pixel anchors đọc trực tiếp; độ rộng antialias khoảng1–2px. Carbonyl vertex được tính C đầu mỗichain. Không suy từ tên fatty acid.",
+    "glycerolBackboneX": [
+      [
+        38,
+        132
+      ],
+      [
+        38,
+        180
+      ],
+      [
+        38,
+        229
+      ]
+    ],
+    "esterO": [
+      [
+        67,
+        103
+      ],
+      [
+        89,
+        179
+      ],
+      [
+        65,
+        257
+      ]
+    ],
+    "topChain": {
+      "vertices": [
+        [
+          107,
+          87
+        ],
+        [
+          141,
+          105
+        ],
+        [
+          174,
+          86
+        ],
+        [
+          203,
+          105
+        ],
+        [
+          233,
+          86
+        ],
+        [
+          263,
+          105
+        ],
+        [
+          293,
+          86
+        ],
+        [
+          322,
+          105
+        ],
+        [
+          351,
+          86
+        ],
+        [
+          380,
+          105
+        ],
+        [
+          409,
+          86
+        ],
+        [
+          438,
+          105
+        ],
+        [
+          467,
+          86
+        ],
+        [
+          496,
+          105
+        ]
+      ],
+      "totalC": 14,
+      "carbonylO": [
+        107,
+        50
+      ],
+      "doubleBondOsegments": [
+        [
+          104,
+          64,
+          104,
+          87
+        ],
+        [
+          110,
+          64,
+          110,
+          86
+        ]
+      ]
+    },
+    "middleChain": {
+      "vertices": [
+        [
+          135,
+          170
+        ],
+        [
+          166,
+          187
+        ],
+        [
+          194,
+          170
+        ],
+        [
+          222,
+          188
+        ],
+        [
+          250,
+          170
+        ],
+        [
+          277,
+          187
+        ],
+        [
+          304,
+          171
+        ],
+        [
+          329,
+          171
+        ],
+        [
+          352,
+          187
+        ],
+        [
+          381,
+          170
+        ],
+        [
+          410,
+          188
+        ],
+        [
+          438,
+          170
+        ],
+        [
+          465,
+          187
+        ]
+      ],
+      "totalC": 13,
+      "carbonylO": [
+        135,
+        135
+      ],
+      "alkeneVertexIndices1Based": [
+        7,
+        8
+      ],
+      "alkeneDoubleSegments": [
+        [
+          304,
+          171,
+          329,
+          171
+        ],
+        [
+          304,
+          178,
+          328,
+          178
+        ]
+      ],
+      "stereo": "Hai nhánh kề C7=C8 cùng down; không thêm E/Z text hoặc H."
+    },
+    "bottomChain": {
+      "vertices": [
+        [
+          85,
+          256
+        ],
+        [
+          110,
+          239
+        ],
+        [
+          139,
+          257
+        ],
+        [
+          168,
+          239
+        ],
+        [
+          198,
+          257
+        ],
+        [
+          227,
+          239
+        ],
+        [
+          257,
+          257
+        ],
+        [
+          286,
+          239
+        ],
+        [
+          315,
+          257
+        ],
+        [
+          345,
+          239
+        ],
+        [
+          375,
+          257
+        ],
+        [
+          405,
+          239
+        ],
+        [
+          434,
+          257
+        ],
+        [
+          464,
+          239
+        ],
+        [
+          493,
+          257
+        ]
+      ],
+      "totalC": 15,
+      "carbonylO": [
+        85,
+        296
+      ],
+      "carbonylDirection": "down"
+    },
+    "productY": {
+      "vertices": [
+        [
+          703,
+          138
+        ],
+        [
+          716,
+          170
+        ],
+        [
+          704,
+          207
+        ]
+      ],
+      "OHexact": [
+        [
+          721,
+          96
+        ],
+        [
+          767,
+          170
+        ],
+        [
+          722,
+          247
+        ]
+      ],
+      "caption": "(Y)"
+    },
+    "productZ": {
+      "coefficient": "2",
+      "verticesApprox": [
+        [
+          844,
+          117
+        ],
+        [
+          865,
+          101
+        ],
+        [
+          885,
+          117
+        ],
+        [
+          905,
+          101
+        ],
+        [
+          926,
+          117
+        ],
+        [
+          946,
+          101
+        ],
+        [
+          967,
+          117
+        ],
+        [
+          988,
+          101
+        ],
+        [
+          1009,
+          117
+        ],
+        [
+          1030,
+          101
+        ],
+        [
+          1051,
+          117
+        ],
+        [
+          1072,
+          101
+        ],
+        [
+          1093,
+          117
+        ]
+      ],
+      "terminalText": "COONa",
+      "terminalBond": [
+        1093,
+        117,
+        1108,
+        109
+      ],
+      "totalC": 14,
+      "note": "13 C implicit + C đầu COONa; endpoint bond tới chữ C không tính thêm vertex."
+    },
+    "productT": {
+      "terminalText": "COONa",
+      "note": "Đã mở thêm crop native [830,205,300,45] phóng4x. C7 tại968233 là kink THẬT, không bỏ. Double đầu C8~976219 tới C9~998219; nhánh kề cùng DOWN. 14 C implicit + 1C chữ COONa =15C. Đầu nét đôi source hơi xô/có khe do scan, KHÔNG thêm C ở2nétđôi.",
+      "vertices": [
+        [
+          837,
+          234
+        ],
+        [
+          858,
+          218
+        ],
+        [
+          881,
+          234
+        ],
+        [
+          903,
+          218
+        ],
+        [
+          925,
+          234
+        ],
+        [
+          948,
+          218
+        ],
+        [
+          968,
+          233
+        ],
+        [
+          976,
+          219
+        ],
+        [
+          998,
+          219
+        ],
+        [
+          1016,
+          234
+        ],
+        [
+          1037,
+          218
+        ],
+        [
+          1059,
+          234
+        ],
+        [
+          1080,
+          218
+        ],
+        [
+          1102,
+          234
+        ]
+      ],
+      "totalC": 15,
+      "alkeneVertexIndices1BasedFromMethyl": [
+        8,
+        9
+      ],
+      "doubleSegments": [
+        [
+          975,
+          218,
+          998,
+          218
+        ],
+        [
+          976,
+          225,
+          995,
+          225
+        ]
+      ],
+      "terminalBond": [
+        1102,
+        234,
+        1114,
+        226
+      ]
+    },
+    "reactionText": [
+      "+",
+      "3NaOH",
+      "t°",
+      "+",
+      "2",
+      "+"
+    ],
+    "captions": [
+      "(X)",
+      "(Y)",
+      "(Z)",
+      "(T)"
+    ],
+    "arrow": {
+      "from": [
+        617,
+        176
+      ],
+      "to": [
+        686,
+        176
+      ],
+      "type": "one right arrow",
+      "condition": "t°"
+    }
+  },
+  "canhBao": "Nguồn tự bất nhất carboncount: top14C/bottom15C/middle13C; productsZ14C/T15C. Giữ literal không sửa theo 2Z hoặc câu dẫn. T có kink thêm trước double phải giữ; không ép từ tên acid/tính cân bằng. Chưa chứng nhận actual SVG."
+}
