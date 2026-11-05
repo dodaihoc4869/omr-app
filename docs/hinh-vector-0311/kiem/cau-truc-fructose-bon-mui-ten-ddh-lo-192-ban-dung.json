@@ -1,0 +1,40 @@
+[
+  {
+    "i": 13,
+    "hash": "01ece4fc016efadb4afb6af1d3160e9c21da3102418c9b65ae813f01480e20ed",
+    "fileNguon": "anh/01ece4fc016efadb4afb6af1d3160e9c21da3102418c9b65ae813f01480e20ed.png",
+    "svg": "fructose-bon-mui-ten-ddh-7befec1b81a0c94db385015fc88d1d99650fbf27f5a315df9a58ca0f483dc241.svg",
+    "hashSvg": "7befec1b81a0c94db385015fc88d1d99650fbf27f5a315df9a58ca0f483dc241",
+    "byteSvg": 13279,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C2-B4-D2-I-2",
+        "de": "Trong công thức của fructose ở hình dưới đây: Nhóm-OH hemiketal là nhóm -OH được đánh số",
+        "refs": [
+          {
+            "hash": "01ece4fc016efadb4afb6af1d3160e9c21da3102418c9b65ae813f01480e20ed",
+            "where": "12-C2-B4-D2-I-2.hinh.0.du_lieu",
+            "hashDataUrl": "bc00335cf17dfd367af8e64d798ecc001474471a1ce948dea99dcbc075204f8c"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-I-66",
+        "de": "Trong công thức của fructose ở hình dưới đây: Nhóm-OH hemiketal là nhóm -OH được đánh số",
+        "refs": [
+          {
+            "hash": "01ece4fc016efadb4afb6af1d3160e9c21da3102418c9b65ae813f01480e20ed",
+            "where": "DB-12-B4-D3-I-66.hinh.0.du_lieu",
+            "hashDataUrl": "bc00335cf17dfd367af8e64d798ecc001474471a1ce948dea99dcbc075204f8c"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "5ring/Otop/2CH2OH/all3H/HO-C3up-OH-C4down/C2OHdownCH2OHup/2taper+horizontalbold/4arrowslabelsdam1..4NOTCnumbers/arrow2bondO-C2literal/noCaption/DDHpath.",
+    "hashSvgDaSoat": "7befec1b81a0c94db385015fc88d1d99650fbf27f5a315df9a58ca0f483dc241",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

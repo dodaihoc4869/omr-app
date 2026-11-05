@@ -199,6 +199,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "01ece4fc016efadb4afb6af1d3160e9c21da3102418c9b65ae813f01480e20ed": {
+      "tep": "fructose-bon-mui-ten-ddh-7befec1b81a0c94db385015fc88d1d99650fbf27f5a315df9a58ca0f483dc241.svg",
+      "hashSvg": "7befec1b81a0c94db385015fc88d1d99650fbf27f5a315df9a58ca0f483dc241",
+      "byteSvg": 13279,
+      "byteGzip": 2419,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "ce1617fd5c91c001258a7067b314decf60d58f469affc264da9c58c0f034a9b7": {
       "tep": "hinh-ddh-4d6fd077d37b3f28fd5beecca049ca13e1429f81e3739eb6c626a481cc6bd914.svg",
       "hashSvg": "4d6fd077d37b3f28fd5beecca049ca13e1429f81e3739eb6c626a481cc6bd914",
@@ -9317,6 +9326,20 @@
       ]
     },
     {
+      "qid": "12-C2-B4-D2-I-2",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "01ece4fc016efadb4afb6af1d3160e9c21da3102418c9b65ae813f01480e20ed",
+          "where": "12-C2-B4-D2-I-2.hinh.0.du_lieu",
+          "hashDataUrl": "bc00335cf17dfd367af8e64d798ecc001474471a1ce948dea99dcbc075204f8c",
+          "vector": "fructose-bon-mui-ten-ddh-7befec1b81a0c94db385015fc88d1d99650fbf27f5a315df9a58ca0f483dc241.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-C2-B4-D2-I-5",
       "duMoiHinh": true,
       "soHinhNguon": 4,
@@ -15489,6 +15512,20 @@
           "where": "DB-12-B4-D3-II-44.hinh.0.du_lieu",
           "hashDataUrl": "bd685472ad794145e0a0a044d00f4a91fd4268190a9fff038f7f33880adb9987",
           "vector": "fructose-can-bang-ddh-dac322d24db2d603a0cce7da2e2ccc24cfb0baaaad1913c3448fa46af151070e.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D3-I-66",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "01ece4fc016efadb4afb6af1d3160e9c21da3102418c9b65ae813f01480e20ed",
+          "where": "DB-12-B4-D3-I-66.hinh.0.du_lieu",
+          "hashDataUrl": "bc00335cf17dfd367af8e64d798ecc001474471a1ce948dea99dcbc075204f8c",
+          "vector": "fructose-bon-mui-ten-ddh-7befec1b81a0c94db385015fc88d1d99650fbf27f5a315df9a58ca0f483dc241.svg"
         }
       ]
     },
@@ -24289,6 +24326,7 @@
     "12-C2-B4-D1-I-63",
     "12-C2-B4-D1-II-6",
     "12-C2-B4-D2-II-9",
+    "12-C2-B4-D2-I-2",
     "12-C2-B4-D2-I-5",
     "12-C2-B4-D2-I-7",
     "12-C2-B4-D2-III-38",
@@ -24669,6 +24707,7 @@
     "DB-12-B4-D3-I-25",
     "DB-12-B4-D3-I-39",
     "DB-12-B4-D3-II-44",
+    "DB-12-B4-D3-I-66",
     "DB-12-B4-D3-I-69",
     "DB-12-B4-D3-I-99",
     "DB-12-B4-D3-I-100",

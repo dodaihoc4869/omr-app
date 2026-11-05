@@ -1,0 +1,308 @@
+{
+  "i": 13,
+  "hash": "01ece4fc016efadb4afb6af1d3160e9c21da3102418c9b65ae813f01480e20ed",
+  "fileNguon": "anh/01ece4fc016efadb4afb6af1d3160e9c21da3102418c9b65ae813f01480e20ed.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNative": true,
+  "zoom": "/workspace/scratch/cau4-fructose192-zoom.png",
+  "questions": [
+    {
+      "qid": "12-C2-B4-D2-I-2",
+      "maDe": "12-C2-B4-D2",
+      "de": "Trong công thức của fructose ở hình dưới đây: Nhóm-OH hemiketal là nhóm -OH được đánh số",
+      "hinh": [
+        {
+          "hash": "01ece4fc016efadb4afb6af1d3160e9c21da3102418c9b65ae813f01480e20ed",
+          "where": "12-C2-B4-D2-I-2.hinh.0.du_lieu",
+          "hashDataUrl": "bc00335cf17dfd367af8e64d798ecc001474471a1ce948dea99dcbc075204f8c"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D3-I-66",
+      "maDe": "DB-12-B4-D3",
+      "de": "Trong công thức của fructose ở hình dưới đây: Nhóm-OH hemiketal là nhóm -OH được đánh số",
+      "hinh": [
+        {
+          "hash": "01ece4fc016efadb4afb6af1d3160e9c21da3102418c9b65ae813f01480e20ed",
+          "where": "DB-12-B4-D3-I-66.hinh.0.du_lieu",
+          "hashDataUrl": "bc00335cf17dfd367af8e64d798ecc001474471a1ce948dea99dcbc075204f8c"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–2pxscantolerance. Nums1..4làARROWlabels,KHÔNGCnumbers.",
+    "ring": {
+      "C5": [
+        92,
+        125
+      ],
+      "O": [
+        204,
+        89
+      ],
+      "C2": [
+        314,
+        127
+      ],
+      "C3": [
+        271,
+        181
+      ],
+      "C4": [
+        134,
+        181
+      ]
+    },
+    "groups": [
+      {
+        "text": "CH₂OH",
+        "anchor": [
+          128,
+          80
+        ],
+        "bond": [
+          [
+            92,
+            125
+          ],
+          [
+            92,
+            98
+          ]
+        ],
+        "target": "Cfirst"
+      },
+      {
+        "text": "CH₂OH",
+        "anchor": [
+          358,
+          80
+        ],
+        "bond": [
+          [
+            314,
+            127
+          ],
+          [
+            314,
+            103
+          ]
+        ],
+        "target": "Cfirst"
+      },
+      {
+        "text": "H",
+        "anchor": [
+          91,
+          160
+        ],
+        "bond": [
+          [
+            92,
+            125
+          ],
+          [
+            92,
+            147
+          ]
+        ]
+      },
+      {
+        "text": "H",
+        "anchor": [
+          134,
+          142
+        ],
+        "bond": [
+          [
+            134,
+            181
+          ],
+          [
+            134,
+            157
+          ]
+        ]
+      },
+      {
+        "text": "OH",
+        "anchor": [
+          146,
+          220
+        ],
+        "bond": [
+          [
+            134,
+            181
+          ],
+          [
+            134,
+            208
+          ]
+        ]
+      },
+      {
+        "text": "HO",
+        "anchor": [
+          259,
+          143
+        ],
+        "bond": [
+          [
+            271,
+            181
+          ],
+          [
+            271,
+            157
+          ]
+        ],
+        "target": "Oright"
+      },
+      {
+        "text": "H",
+        "anchor": [
+          271,
+          218
+        ],
+        "bond": [
+          [
+            271,
+            181
+          ],
+          [
+            271,
+            207
+          ]
+        ]
+      },
+      {
+        "text": "OH",
+        "anchor": [
+          328,
+          168
+        ],
+        "bond": [
+          [
+            314,
+            127
+          ],
+          [
+            314,
+            151
+          ]
+        ]
+      }
+    ],
+    "frontBonds": [
+      {
+        "from": [
+          92,
+          125
+        ],
+        "to": [
+          134,
+          181
+        ],
+        "style": "taperthinC5wideC4"
+      },
+      {
+        "from": [
+          134,
+          181
+        ],
+        "to": [
+          271,
+          181
+        ],
+        "style": "boldhorizontal"
+      },
+      {
+        "from": [
+          271,
+          181
+        ],
+        "to": [
+          314,
+          127
+        ],
+        "style": "taperwideC3thinC2"
+      }
+    ],
+    "arrows": [
+      {
+        "label": "1",
+        "labelAnchor": [
+          385,
+          213
+        ],
+        "start": [
+          374,
+          212
+        ],
+        "tip": [
+          322,
+          181
+        ],
+        "target": "OHanomericC2down",
+        "weight": "bold"
+      },
+      {
+        "label": "2",
+        "labelAnchor": [
+          275,
+          46
+        ],
+        "start": [
+          275,
+          62
+        ],
+        "tip": [
+          276,
+          122
+        ],
+        "target": "literalringO–C2BOND(arrowcrossesbondnear276114,tipbelow~122),KHÔNGdờivàoHOtext",
+        "weight": "bold"
+      },
+      {
+        "label": "3",
+        "labelAnchor": [
+          43,
+          190
+        ],
+        "start": [
+          54,
+          193
+        ],
+        "tip": [
+          115,
+          210
+        ],
+        "target": "OHlowerleftC4group",
+        "weight": "bold"
+      },
+      {
+        "label": "4",
+        "labelAnchor": [
+          409,
+          171
+        ],
+        "start": [
+          404,
+          160
+        ],
+        "tip": [
+          390,
+          103
+        ],
+        "target": "CH2OHup-rightgroup(notHOupinside)",
+        "weight": "bold"
+      }
+    ],
+    "counts": "6C6O/2CH₂OHtext/3Hexplicit/5OHgroupsincl2terminal;4arrowlabelsONLY,noCnumbers,nocaption.",
+    "critical": "C3HOupbondtoOright,C4Hup/OHdown,C5CH2OHup/Hdown,C2CH2OHup/OHdown. Preserveall4arrowtips/shafts/sourceorientation;khôngtínhđápán/khôngsửaPAarrow2 dùstemhỏioh."
+  },
+  "verdict": "Đọc source,chưaactualSVGreview."
+}

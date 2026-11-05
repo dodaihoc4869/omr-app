@@ -1412,3 +1412,10 @@ Nhóm169đãxong15/20;1120/1030/1046ĐÃĐẠTđừngtrùng. CÒN765/1195/806/10
 -10haisurfactantTop18C/O−Na+/Sodiumstearate(X);bottom12alkylC+6benzene/3double/expandedS(=O)2O−Na+free/literalbondstartinsideRing703264/khôngbottomcaption/DDHpath. Nativefull/zoom/freshactualSVG/hashsoátđộclập;khôngsửatheory.
 -Chromium532/532/hash/XML/path/selfcontained/AST/build191/precache170/2613.23KiB/speed21/21đạt. SizegateđỏNỀNindex.tsnguyênbytekhôngnângmốc;phảixửlýtrướcgộp/deploy.Mainab81c625chưagộp/WOFF2khôngdiff. Chưa tích hợp/chưa reload offline app/chưa phát hành. Chưa tham vấn được cố vấn.
 -Nguồn10/2đãđạtđừngtrùng. Tiếpnguồndùng2câuchưađạt4/13/24/36/37/40/43/47/48/49/58/64/65...socảhashmanifest,đọcnativefull/stemrefs/rankingchỉgợiýkhôngduyệtalias.4bộrửakhíSO2-chấtTrootđãmởnativeCHƯAdựng,hạtpatternmờkhônggáncount.138/753/1305ảnhthậtcầnsoátphânloạiđộclậpGIỮrasterkhôngvẽgiả. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.
+
+
+### 05/11 — Lô192: fructose bốn mũi tên
+-1060 câu đủ mọi hình+DDH/7 một phần;780 nguồn→533 SVG;8675867byte/gzip1708109;648 nguồn còn lại.
+-13fructose5ring/6C6O/3Hexplicit/2CH2OH-Cfirst/OH-HO/sourceC2OHdownCH2OHup/2taper+horizontalbold/4arrowlabelsdam1..4NOTCnumbers/arrow2tip8pxdướibondsourceliteral/noCaption/DDHpath. Nativefull/zoom/freshactualSVG/hashsoátđộclập.
+-Chromium533/533/hash/XML/path/selfcontained/AST/build192/precache170/2613.23KiB/speed21/21đạt. SizegateđỏNỀNindex.tsnguyênbytekhôngnângmốc;phảixửlýtrướcgộp/deploy.Mainab81c625chưagộp/WOFF2khôngdiff. Chưa tích hợp/chưa reload offline app/chưa phát hành. Chưa tham vấn được cố vấn.
+-Nguồn13/10/2đãđạtđừngtrùng. Tiếpnguồndùng2câuchưađạt4/24/36/37/40/43/47/48/49/58/64/65...socảhashmanifest,đọcnativefull/stemrefs/rankingchỉgợiýkhôngduyệtalias.4bộrửakhíSO2-chấtTrootđãmởnativeCHƯAdựng,hạtpatternmờkhônggáncount.138/753/1305ảnhthậtcầnsoátphânloạiđộclậpGIỮrasterkhôngvẽgiả. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.
