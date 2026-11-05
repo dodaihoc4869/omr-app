@@ -6652,6 +6652,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "0c9ac40930023c578717a5301c9151b16ee54b44ac31b1cb2cad629e5c659c9b": {
+      "tep": "thuy-phan-cellulose-ddh-f2cce413b6df7bb6d9b5e794dc991cba6281b9a1ecdee9fb0d91ff523e51d00d.svg",
+      "hashSvg": "f2cce413b6df7bb6d9b5e794dc991cba6281b9a1ecdee9fb0d91ff523e51d00d",
+      "byteSvg": 104386,
+      "byteGzip": 12635,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "5d1aa299d418373acd97b0a88c8f3efe77bb890a89410e6b00e439b46b1a8056": {
       "tep": "leucine-nem-ddh-6ef94c4a27f24f8be44f7d4782de4785646f4127179f9aff57677b8d260a48f4.svg",
       "hashSvg": "6ef94c4a27f24f8be44f7d4782de4785646f4127179f9aff57677b8d260a48f4",
@@ -11945,6 +11954,20 @@
       ]
     },
     {
+      "qid": "12-KT-C2-D2-II-3",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "0c9ac40930023c578717a5301c9151b16ee54b44ac31b1cb2cad629e5c659c9b",
+          "where": "12-KT-C2-D2-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "df246153454600191543331a6ec3b3de65c4027bf81fcbb885233194fc09e33f",
+          "vector": "thuy-phan-cellulose-ddh-f2cce413b6df7bb6d9b5e794dc991cba6281b9a1ecdee9fb0d91ff523e51d00d.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-KT-C2-D5-I-1",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -16579,6 +16602,20 @@
           "where": "DB-12-B6-D1-I-41.hinh.0.du_lieu",
           "hashDataUrl": "2c169791956c8c711243f119d1b9e563c22b7b4045d5f72b3eda1721a5493bb9",
           "vector": "tinh-bot-ddh-08e0ab7ab3b24b474c502f4b10845bd9e099ca36821ac087381b15709b0e7d4a.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B6-D1-II-47",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "0c9ac40930023c578717a5301c9151b16ee54b44ac31b1cb2cad629e5c659c9b",
+          "where": "DB-12-B6-D1-II-47.hinh.0.du_lieu",
+          "hashDataUrl": "df246153454600191543331a6ec3b3de65c4027bf81fcbb885233194fc09e33f",
+          "vector": "thuy-phan-cellulose-ddh-f2cce413b6df7bb6d9b5e794dc991cba6281b9a1ecdee9fb0d91ff523e51d00d.svg"
         }
       ]
     },
@@ -24805,6 +24842,7 @@
     "12-KT-C2-D4-II-4",
     "12-KT-C2-D3-I-9",
     "12-KT-C2-D2-I-8",
+    "12-KT-C2-D2-II-3",
     "12-KT-C2-D5-I-1",
     "12-KT-C2-D5-II-1",
     "12-KT-C2-D5-II-4",
@@ -25082,6 +25120,7 @@
     "DB-12-B4-D2-II-138",
     "DB-12-B6-D1-I-26",
     "DB-12-B6-D1-I-41",
+    "DB-12-B6-D1-II-47",
     "DB-12-B6-D1-II-51",
     "DB-12-B6-D1-I-84",
     "DB-12-B6-D2-II-41",

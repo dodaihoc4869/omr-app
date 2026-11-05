@@ -1,0 +1,400 @@
+{
+  "i": 65,
+  "hash": "0c9ac40930023c578717a5301c9151b16ee54b44ac31b1cb2cad629e5c659c9b",
+  "fileNguon": "anh/0c9ac40930023c578717a5301c9151b16ee54b44ac31b1cb2cad629e5c659c9b.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "zoom": "/workspace/scratch/cau4-hydrolysis201-firstzoom.png",
+  "questions": [
+    {
+      "qid": "12-KT-C2-D2-II-3",
+      "de": "Tiến hành thí nghiệm thuỷ phân cellulose (bông) bằng dung dịch acid H₂SO₄ 70% như hình mô tả sau đây. Dung dịch Y có chứa hỗn hợp các monosaccharide, disaccharide, trisaccharide,… do phản ứng thuỷ phân xảy ra chưa hoàn toàn.",
+      "refs": [
+        {
+          "hash": "0c9ac40930023c578717a5301c9151b16ee54b44ac31b1cb2cad629e5c659c9b",
+          "where": "12-KT-C2-D2-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "df246153454600191543331a6ec3b3de65c4027bf81fcbb885233194fc09e33f"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B6-D1-II-47",
+      "de": "Tiến hành thí nghiệm thuỷ phân cellulose (bông) bằng dung dịch acid H₂SO₄ 70% như hình mô tả sau đây. Dung dịch Y có chứa hỗn hợp các monosaccharide, disaccharide, trisaccharide,… do phản ứng thuỷ phân xảy ra chưa hoàn toàn.",
+      "refs": [
+        {
+          "hash": "0c9ac40930023c578717a5301c9151b16ee54b44ac31b1cb2cad629e5c659c9b",
+          "where": "DB-12-B6-D1-II-47.hinh.0.du_lieu",
+          "hashDataUrl": "df246153454600191543331a6ec3b3de65c4027bf81fcbb885233194fc09e33f"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–2pxapprox,textsourceallliteral;liquiddashpatternnotparticles/counts.",
+    "beakers": [
+      {
+        "wallPath": [
+          [
+            218,
+            172
+          ],
+          [
+            218,
+            282
+          ],
+          [
+            220,
+            290
+          ],
+          [
+            227,
+            294
+          ],
+          [
+            314,
+            294
+          ],
+          [
+            321,
+            289
+          ],
+          [
+            323,
+            282
+          ],
+          [
+            323,
+            180
+          ],
+          [
+            330,
+            172
+          ]
+        ],
+        "liquidY": 227,
+        "bottomY": 294
+      },
+      {
+        "wallPath": [
+          [
+            509,
+            172
+          ],
+          [
+            509,
+            283
+          ],
+          [
+            512,
+            292
+          ],
+          [
+            520,
+            295
+          ],
+          [
+            605,
+            295
+          ],
+          [
+            612,
+            290
+          ],
+          [
+            614,
+            282
+          ],
+          [
+            614,
+            180
+          ],
+          [
+            621,
+            172
+          ]
+        ],
+        "liquidY": 227,
+        "bottomY": 295
+      },
+      {
+        "wallPath": [
+          [
+            889,
+            171
+          ],
+          [
+            889,
+            282
+          ],
+          [
+            892,
+            291
+          ],
+          [
+            900,
+            294
+          ],
+          [
+            984,
+            294
+          ],
+          [
+            991,
+            289
+          ],
+          [
+            993,
+            281
+          ],
+          [
+            993,
+            180
+          ],
+          [
+            1000,
+            171
+          ]
+        ],
+        "liquidY": 226,
+        "bottomY": 294
+      }
+    ],
+    "liquidTexture": "Grayfillwithmanyshorthorizontaldarkgraydashesarrangedirregularrows,clippedinsidewalls;sametypeall3,nobubbles/particlescounts,newreactiondata.",
+    "rod": {
+      "left": [
+        267,
+        36,
+        267,
+        260
+      ],
+      "right": [
+        273,
+        36,
+        273,
+        261
+      ],
+      "topRound": [
+        270,
+        33,
+        3
+      ],
+      "bottomRound": [
+        270,
+        262,
+        3
+      ],
+      "fill": "gray",
+      "occlusion": "Rodvisiblethroughwhitecottoninternallytill~263,notextendbelowcotton/bottombeaker."
+    },
+    "cotton": {
+      "whiteLobedOutlineApprox": [
+        [
+          245,
+          259
+        ],
+        [
+          250,
+          251
+        ],
+        [
+          263,
+          248
+        ],
+        [
+          273,
+          253
+        ],
+        [
+          284,
+          249
+        ],
+        [
+          295,
+          256
+        ],
+        [
+          301,
+          265
+        ],
+        [
+          298,
+          271
+        ],
+        [
+          287,
+          275
+        ],
+        [
+          277,
+          273
+        ],
+        [
+          265,
+          275
+        ],
+        [
+          253,
+          274
+        ],
+        [
+          247,
+          270
+        ]
+      ],
+      "insideMarks": "Fewcurvedfinecreases,donotassignfiber/particlecounts.",
+      "center": [
+        273,
+        262
+      ]
+    },
+    "stirEllipse": {
+      "center": [
+        270,
+        145
+      ],
+      "radii": [
+        30,
+        16
+      ],
+      "headCount": 2,
+      "headTipsApprox": [
+        [
+          245,
+          133
+        ],
+        [
+          291,
+          156
+        ]
+      ],
+      "direction": "alongellipseclockwise,upperlefttipup-right,lowerrighttipdown-left",
+      "notOneArrow": true
+    },
+    "labels": [
+      {
+        "text": "khuấy nhẹ",
+        "at": [
+          341,
+          99
+        ],
+        "leader": null
+      },
+      {
+        "text": "bông",
+        "at": [
+          135,
+          222
+        ],
+        "leader": [
+          [
+            165,
+            230
+          ],
+          [
+            248,
+            257
+          ]
+        ]
+      },
+      {
+        "text": "dung dịch",
+        "at": [
+          98,
+          269
+        ]
+      },
+      {
+        "text": "H₂SO₄ 70%",
+        "at": [
+          98,
+          297
+        ],
+        "leader": [
+          [
+            160,
+            281
+          ],
+          [
+            234,
+            286
+          ]
+        ]
+      },
+      {
+        "text": "dung dịch",
+        "at": [
+          726,
+          210
+        ]
+      },
+      {
+        "text": "đồng nhất",
+        "at": [
+          728,
+          236
+        ]
+      },
+      {
+        "text": "(dung dịch X)",
+        "at": [
+          727,
+          261
+        ],
+        "leader": [
+          [
+            663,
+            238
+          ],
+          [
+            573,
+            265
+          ]
+        ],
+        "sourceXWeight": "bold"
+      },
+      {
+        "text": "dung dịch Y",
+        "at": [
+          1070,
+          218
+        ],
+        "leader": [
+          [
+            1042,
+            238
+          ],
+          [
+            952,
+            264
+          ]
+        ],
+        "sourceYWeight": "bold"
+      }
+    ],
+    "captions": [
+      {
+        "text": "(a) Sơ đồ tiến hành\nthí nghiệm",
+        "at": [
+          270,
+          343
+        ]
+      },
+      {
+        "text": "(b) Dung dịch thu được\nsau khi thủy phân",
+        "at": [
+          563,
+          345
+        ]
+      },
+      {
+        "text": "(c) Trung hòa acid trong dung dịch\nsau khi thủy phân bằng NaHCO₃.",
+        "at": [
+          952,
+          343
+        ]
+      }
+    ],
+    "noAdded": "Noequation/heater/thermometer/numbers/bubbles/amountsincaptions;chemformulaH2SO4andNaHCO3subscriptsONLYasprinted."
+  },
+  "verdict": "Đọcsource,chưaactualSVGreview."
+}
