@@ -1,0 +1,450 @@
+{
+  "i": 25,
+  "hash": "04376952a642db61207a91a7316e26f6903bba0264c19b02da696e7a74c8a486",
+  "fileNguon": "anh/04376952a642db61207a91a7316e26f6903bba0264c19b02da696e7a74c8a486.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNative": true,
+  "zoom": [
+    "/workspace/scratch/cau4-188-zoom.png",
+    "/workspace/scratch/cau4-188-bowlmarks.png"
+  ],
+  "questions": [
+    {
+      "qid": "DB-12-B1-P1-D1-II-185",
+      "maDe": "DB-12-B1-P1-D1",
+      "de": "Tiến hành thí nghiệm xà phòng hóa theo các bước sau:\nBước 1: Cho vào cốc thủy tinh chịu nhiệt khoảng 2 gam mỡ lợn và 4 mL dung dịch NaOH 40%.\nBước 2: Đun sôi nhẹ hỗn hợp, liên tục khuấy đều bằng đũa thủy tinh khoảng 10 phút và thỉnh thoảng thêm nước cất để giữ cho thể tích hỗn hợp không đổi.\nBước 3: Rót thêm vào hỗn hợp 30 mL dung dịch NaCl bão hòa nóng, khuấy nhẹ.\nĐể nguội hỗn hợp.\nMỗi phát biểu sau đây là đúng hay sai?",
+      "hinh": [
+        {
+          "hash": "04376952a642db61207a91a7316e26f6903bba0264c19b02da696e7a74c8a486",
+          "where": "DB-12-B1-P1-D1-II-185.hinh.0.du_lieu",
+          "hashDataUrl": "5f3667821c19079cdf403283af585a5c0a4739c8e9d3d116d5780705b24bf9ed"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C1-B2-VD-II-1",
+      "maDe": "DH-12-C1-B2-VD",
+      "de": "Tiến hành thí nghiệm xà phòng hóa theo các bước sau:\nBước 1: Cho vào cốc thủy tinh chịu nhiệt khoảng 2 gam mỡ lợn và 4 mL dung dịch NaOH 40%.\nBước 2: Đun sôi nhẹ hỗn hợp, liên tục khuấy đều bằng đũa thủy tinh khoảng 10 phút và thỉnh thoảng thêm nước cất để giữ cho thể tích hỗn hợp không đổi.\nBước 3: Rót thêm vào hỗn hợp 30 mL dung dịch NaCl bão hòa nóng, khuấy nhẹ.\nĐể nguội hỗn hợp.\nMỗi phát biểu sau đây là đúng hay sai?",
+      "hinh": [
+        {
+          "hash": "04376952a642db61207a91a7316e26f6903bba0264c19b02da696e7a74c8a486",
+          "where": "DH-12-C1-B2-VD-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "5f3667821c19079cdf403283af585a5c0a4739c8e9d3d116d5780705b24bf9ed"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C1-B2-II-21",
+      "maDe": "DH-12-C1-B2",
+      "de": "Tiến hành thí nghiệm xà phòng hóa theo các bước sau:\nBước 1: Cho vào cốc thủy tinh chịu nhiệt khoảng 2 gam mỡ lợn và 4 mL dung dịch NaOH 40%.\nBước 2: Đun sôi nhẹ hỗn hợp, liên tục khuấy đều bằng đũa thủy tinh khoảng 10 phút và thỉnh thoảng thêm nước cất để giữ cho thể tích hỗn hợp không đổi.\nBước 3: Rót thêm vào hỗn hợp 30 mL dung dịch NaCl bão hòa nóng, khuấy nhẹ.\nĐể nguội hỗn hợp.\nMỗi phát biểu sau đây là đúng hay sai?",
+      "hinh": [
+        {
+          "hash": "04376952a642db61207a91a7316e26f6903bba0264c19b02da696e7a74c8a486",
+          "where": "DH-12-C1-B2-II-21.hinh.0.du_lieu",
+          "hashDataUrl": "5f3667821c19079cdf403283af585a5c0a4739c8e9d3d116d5780705b24bf9ed"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchorsapprox1–2px. No labels/numbers.",
+    "rod": {
+      "from": [
+        179,
+        6
+      ],
+      "to": [
+        123,
+        188
+      ],
+      "width": 5,
+      "color": "gray",
+      "frontOcclusion": "Rod devant backrim y133 andfrontrim~182,tipoverliquid~189."
+    },
+    "stirArrow": {
+      "curveAnchors": [
+        [
+          183,
+          51
+        ],
+        [
+          158,
+          52
+        ],
+        [
+          136,
+          58
+        ],
+        [
+          131,
+          64
+        ],
+        [
+          136,
+          70
+        ],
+        [
+          151,
+          74
+        ],
+        [
+          169,
+          77
+        ]
+      ],
+      "hollowTriangle": [
+        [
+          169,
+          74
+        ],
+        [
+          183,
+          78
+        ],
+        [
+          168,
+          80
+        ]
+      ],
+      "direction": "ellipse-ish curve ending RIGHT near16977;arrowheadhollow",
+      "tinyStroke": [
+        135,
+        54,
+        139,
+        57
+      ]
+    },
+    "bowl": {
+      "rimEllipse": [
+        129,
+        157,
+        69,
+        25
+      ],
+      "outerBowlCurve": [
+        [
+          60,
+          157
+        ],
+        [
+          71,
+          184
+        ],
+        [
+          98,
+          204
+        ],
+        [
+          128,
+          208
+        ],
+        [
+          161,
+          201
+        ],
+        [
+          185,
+          182
+        ],
+        [
+          198,
+          157
+        ]
+      ],
+      "liquidEllipse": [
+        129,
+        196,
+        37,
+        11
+      ],
+      "liquidMarksApprox": [
+        [
+          111,
+          190,
+          133,
+          191
+        ],
+        [
+          111,
+          194,
+          124,
+          194
+        ],
+        [
+          130,
+          195,
+          139,
+          195
+        ],
+        [
+          115,
+          198,
+          126,
+          198
+        ],
+        [
+          123,
+          200,
+          133,
+          200
+        ],
+        [
+          129,
+          202,
+          141,
+          202
+        ],
+        [
+          115,
+          203,
+          127,
+          203
+        ]
+      ],
+      "marksCaution": "Nhiềuvệtngangchồngrod;anchorsđểmẫuvisual khônggánhạt/sốlượngđịnhlượng. Bowlwhite masksmeshbehind."
+    },
+    "mesh": {
+      "polygon": [
+        [
+          17,
+          238
+        ],
+        [
+          55,
+          164
+        ],
+        [
+          238,
+          164
+        ],
+        [
+          203,
+          238
+        ]
+      ],
+      "verticalXApprox": [
+        27,
+        35,
+        43,
+        51,
+        59,
+        67,
+        75,
+        83,
+        91,
+        99,
+        107,
+        115,
+        123,
+        131,
+        139,
+        147,
+        155,
+        163,
+        171,
+        179,
+        187,
+        195,
+        203,
+        211,
+        219,
+        227,
+        235
+      ],
+      "verticalCountIncludingClipped": 27,
+      "horizontalYApprox": [
+        164,
+        172,
+        180,
+        188,
+        196,
+        204,
+        212,
+        220,
+        228,
+        236
+      ],
+      "horizontalCountIncludingTopBottom": 10,
+      "orientation": "screenvertical/horizontal,clippedtrongparallelogramvàbowlwhite;khôngđườngchéonộibộ",
+      "occlusion": "Meshbehindbowl,beforelegs+lampcap;trênbowlkhônghiệngrid."
+    },
+    "tripodLegs": [
+      [
+        [
+          52,
+          239
+        ],
+        [
+          42,
+          283
+        ]
+      ],
+      [
+        [
+          104,
+          240
+        ],
+        [
+          88,
+          328
+        ]
+      ],
+      [
+        [
+          204,
+          238
+        ],
+        [
+          214,
+          284
+        ]
+      ]
+    ],
+    "lamp": {
+      "bodyOutline": [
+        [
+          92,
+          243
+        ],
+        [
+          70,
+          257
+        ],
+        [
+          55,
+          278
+        ],
+        [
+          57,
+          294
+        ],
+        [
+          76,
+          312
+        ],
+        [
+          104,
+          324
+        ],
+        [
+          135,
+          327
+        ],
+        [
+          165,
+          319
+        ],
+        [
+          189,
+          303
+        ],
+        [
+          201,
+          287
+        ],
+        [
+          198,
+          272
+        ],
+        [
+          182,
+          255
+        ],
+        [
+          165,
+          244
+        ]
+      ],
+      "capArcApprox": [
+        [
+          93,
+          239
+        ],
+        [
+          96,
+          246
+        ],
+        [
+          115,
+          251
+        ],
+        [
+          140,
+          251
+        ],
+        [
+          160,
+          246
+        ],
+        [
+          165,
+          239
+        ]
+      ],
+      "capDoubleContours": true,
+      "liquidEllipse": [
+        129,
+        292,
+        72,
+        26
+      ],
+      "liquidPattern": "Wavyzigzaghorizontallinesclippedellipsoidlowerbody,notparticles;donotassigncounts.",
+      "wickBlackPathApprox": [
+        [
+          130,
+          251
+        ],
+        [
+          130,
+          272
+        ],
+        [
+          126,
+          284
+        ],
+        [
+          115,
+          291
+        ],
+        [
+          107,
+          301
+        ],
+        [
+          109,
+          307
+        ],
+        [
+          123,
+          309
+        ],
+        [
+          140,
+          309
+        ],
+        [
+          150,
+          304
+        ],
+        [
+          143,
+          298
+        ],
+        [
+          130,
+          297
+        ],
+        [
+          119,
+          298
+        ]
+      ],
+      "wickWidthApprox": 6,
+      "flame": "KHÔNG thấy ngọnlửa riêng ngoài wick;khôngthêmflame vàng/cam hoặcsvgflamemới.",
+      "occlusion": "Frontleg104240→88328drawnfrontoflamp,blackwickinsidelamp;meshokcovercapmiddle."
+    },
+    "caption": null,
+    "labels": []
+  },
+  "verdict": "Đọc source;chưa soactualSVG,khôngthêmtext/đoánhạt/flame."
+}

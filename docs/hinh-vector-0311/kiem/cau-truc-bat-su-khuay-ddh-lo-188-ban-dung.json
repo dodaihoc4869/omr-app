@@ -1,0 +1,52 @@
+[
+  {
+    "i": 25,
+    "hash": "04376952a642db61207a91a7316e26f6903bba0264c19b02da696e7a74c8a486",
+    "fileNguon": "anh/04376952a642db61207a91a7316e26f6903bba0264c19b02da696e7a74c8a486.png",
+    "svg": "bat-su-khuay-ddh-5294f205a967384672a97523f6c3c3b12457ba99293602de88da7b3a6810d9aa.svg",
+    "hashSvg": "5294f205a967384672a97523f6c3c3b12457ba99293602de88da7b3a6810d9aa",
+    "byteSvg": 8680,
+    "font": "DDH Rounded",
+    "khongCoChu": true,
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-12-B1-P1-D1-II-185",
+        "de": "Tiến hành thí nghiệm xà phòng hóa theo các bước sau:\nBước 1: Cho vào cốc thủy tinh chịu nhiệt khoảng 2 gam mỡ lợn và 4 mL dung dịch NaOH 40%.\nBước 2: Đun sôi nhẹ hỗn hợp, liên tục khuấy đều bằng đũa thủy tinh khoảng 10 phút và thỉnh thoảng thêm nước cất để giữ cho thể tích hỗn hợp không đổi.\nBước 3: Rót thêm vào hỗn hợp 30 mL dung dịch NaCl bão hòa nóng, khuấy nhẹ.\nĐể nguội hỗn hợp.\nMỗi phát biểu sau đây là đúng hay sai?",
+        "refs": [
+          {
+            "hash": "04376952a642db61207a91a7316e26f6903bba0264c19b02da696e7a74c8a486",
+            "where": "DB-12-B1-P1-D1-II-185.hinh.0.du_lieu",
+            "hashDataUrl": "5f3667821c19079cdf403283af585a5c0a4739c8e9d3d116d5780705b24bf9ed"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B2-VD-II-1",
+        "de": "Tiến hành thí nghiệm xà phòng hóa theo các bước sau:\nBước 1: Cho vào cốc thủy tinh chịu nhiệt khoảng 2 gam mỡ lợn và 4 mL dung dịch NaOH 40%.\nBước 2: Đun sôi nhẹ hỗn hợp, liên tục khuấy đều bằng đũa thủy tinh khoảng 10 phút và thỉnh thoảng thêm nước cất để giữ cho thể tích hỗn hợp không đổi.\nBước 3: Rót thêm vào hỗn hợp 30 mL dung dịch NaCl bão hòa nóng, khuấy nhẹ.\nĐể nguội hỗn hợp.\nMỗi phát biểu sau đây là đúng hay sai?",
+        "refs": [
+          {
+            "hash": "04376952a642db61207a91a7316e26f6903bba0264c19b02da696e7a74c8a486",
+            "where": "DH-12-C1-B2-VD-II-1.hinh.0.du_lieu",
+            "hashDataUrl": "5f3667821c19079cdf403283af585a5c0a4739c8e9d3d116d5780705b24bf9ed"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B2-II-21",
+        "de": "Tiến hành thí nghiệm xà phòng hóa theo các bước sau:\nBước 1: Cho vào cốc thủy tinh chịu nhiệt khoảng 2 gam mỡ lợn và 4 mL dung dịch NaOH 40%.\nBước 2: Đun sôi nhẹ hỗn hợp, liên tục khuấy đều bằng đũa thủy tinh khoảng 10 phút và thỉnh thoảng thêm nước cất để giữ cho thể tích hỗn hợp không đổi.\nBước 3: Rót thêm vào hỗn hợp 30 mL dung dịch NaCl bão hòa nóng, khuấy nhẹ.\nĐể nguội hỗn hợp.\nMỗi phát biểu sau đây là đúng hay sai?",
+        "refs": [
+          {
+            "hash": "04376952a642db61207a91a7316e26f6903bba0264c19b02da696e7a74c8a486",
+            "where": "DH-12-C1-B2-II-21.hinh.0.du_lieu",
+            "hashDataUrl": "5f3667821c19079cdf403283af585a5c0a4739c8e9d3d116d5780705b24bf9ed"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "Bowl2ellipses/rodgray/stircurvearrow/meshclip/3legs/spiritlampwick-liquidpattern/0text/khôngthêmflame/labels/particlescount.",
+    "hashSvgDaSoat": "5294f205a967384672a97523f6c3c3b12457ba99293602de88da7b3a6810d9aa",
+    "nguoiSoat": "cau_truc_4"
+  }
+]
