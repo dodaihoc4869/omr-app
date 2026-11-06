@@ -1,0 +1,657 @@
+{
+  "i": 318,
+  "hash": "37166ff253ceab6d688bc041c00ecc8090a3fe02990e26a03c0af6ab09f9af13",
+  "fileNguon": "anh/37166ff253ceab6d688bc041c00ecc8090a3fe02990e26a03c0af6ab09f9af13.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "questions": [
+    {
+      "qid": "DB-11-B2-D2-II-144",
+      "de": "Chuẩn bị ba cốc: cốc (1) đựng dung dịch HCl 0,1M, cốc (2) đựng dung dịch CH₃COOH 0,1M, cốc (3) đựng nước nguyên chất và lắp bộ dụng cụ như hình dưới đây. Nối các đầu dây dẫn điện với cùng một nguồn điện.",
+      "refs": [
+        {
+          "hash": "37166ff253ceab6d688bc041c00ecc8090a3fe02990e26a03c0af6ab09f9af13",
+          "where": "DB-11-B2-D2-II-144.hinh.0.du_lieu",
+          "hashDataUrl": "1b4dbb6c8980edd5785d95bcf78ae2d37050b93b9ef6c97739bcbebcce9eecca"
+        }
+      ]
+    },
+    {
+      "qid": "DH-11-C1-B2-II-4",
+      "de": "Chuẩn bị ba cốc: cốc (1) đựng dung dịch HCl 0,1M, cốc (2) đựng dung dịch CH₃COOH 0,1M, cốc (3) đựng nước nguyên chất và lắp bộ dụng cụ như hình dưới đây. Nối các đầu dây dẫn điện với cùng một nguồn điện.",
+      "refs": [
+        {
+          "hash": "37166ff253ceab6d688bc041c00ecc8090a3fe02990e26a03c0af6ab09f9af13",
+          "where": "DH-11-C1-B2-II-4.hinh.0.du_lieu",
+          "hashDataUrl": "1b4dbb6c8980edd5785d95bcf78ae2d37050b93b9ef6c97739bcbebcce9eecca"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–2pxapprox/source-onlyNOTreviewedSVG.",
+    "classification": {
+      "type": "pureillustrationgray",
+      "evidence": "Regularcylindricalellipsewalls/lineartleadcurves/3cartoonbulbidenticaloutline/flatgraypowerboxfaces,noopticalphototexture. RastercontainerPNGbutcontentdrawnillustration,notrealphoto."
+    },
+    "sourceBox": {
+      "front": [
+        [
+          208,
+          47
+        ],
+        [
+          337,
+          54
+        ],
+        [
+          337,
+          104
+        ],
+        [
+          208,
+          87
+        ]
+      ],
+      "top": [
+        [
+          208,
+          47
+        ],
+        [
+          249,
+          41
+        ],
+        [
+          369,
+          50
+        ],
+        [
+          337,
+          54
+        ]
+      ],
+      "right": [
+        [
+          337,
+          54
+        ],
+        [
+          369,
+          50
+        ],
+        [
+          369,
+          93
+        ],
+        [
+          337,
+          104
+        ]
+      ],
+      "terminalPairs": [
+        [
+          [
+            217,
+            70
+          ],
+          [
+            229,
+            71
+          ]
+        ],
+        [
+          [
+            265,
+            74
+          ],
+          [
+            278,
+            75
+          ]
+        ],
+        [
+          [
+            315,
+            79
+          ],
+          [
+            327,
+            80
+          ]
+        ]
+      ],
+      "label": {
+        "text": "Nguồn điện",
+        "at": [
+          362,
+          20
+        ],
+        "leader": [
+          [
+            334,
+            40
+          ],
+          [
+            301,
+            50
+          ]
+        ]
+      }
+    },
+    "externalSixWiresApprox": [
+      {
+        "terminal": [
+          217,
+          70
+        ],
+        "path": [
+          [
+            208,
+            88
+          ],
+          [
+            166,
+            112
+          ],
+          [
+            128,
+            123
+          ],
+          [
+            78,
+            128
+          ]
+        ],
+        "endpoint": "bulb1outerupperright~78128literal"
+      },
+      {
+        "terminal": [
+          229,
+          71
+        ],
+        "path": [
+          [
+            220,
+            91
+          ],
+          [
+            211,
+            108
+          ],
+          [
+            181,
+            135
+          ],
+          [
+            150,
+            153
+          ],
+          [
+            127,
+            151
+          ],
+          [
+            117,
+            151
+          ],
+          [
+            113,
+            156
+          ]
+        ],
+        "endpoint": "cup1rightbindingpost"
+      },
+      {
+        "terminal": [
+          265,
+          74
+        ],
+        "path": [
+          [
+            265,
+            102
+          ],
+          [
+            272,
+            118
+          ],
+          [
+            268,
+            128
+          ],
+          [
+            254,
+            139
+          ],
+          [
+            235,
+            145
+          ]
+        ],
+        "endpoint": "bulb2lowerouterright~235145"
+      },
+      {
+        "terminal": [
+          278,
+          75
+        ],
+        "path": [
+          [
+            273,
+            99
+          ],
+          [
+            278,
+            112
+          ],
+          [
+            288,
+            125
+          ],
+          [
+            289,
+            137
+          ],
+          [
+            280,
+            143
+          ],
+          [
+            267,
+            143
+          ],
+          [
+            266,
+            155
+          ]
+        ],
+        "endpoint": "cup2rightbindingpost"
+      },
+      {
+        "terminal": [
+          315,
+          79
+        ],
+        "path": [
+          [
+            316,
+            111
+          ],
+          [
+            316,
+            133
+          ],
+          [
+            326,
+            143
+          ],
+          [
+            344,
+            148
+          ],
+          [
+            355,
+            148
+          ],
+          [
+            358,
+            159
+          ]
+        ],
+        "endpoint": "bulb3baseterminalside~358159"
+      },
+      {
+        "terminal": [
+          327,
+          80
+        ],
+        "path": [
+          [
+            330,
+            107
+          ],
+          [
+            335,
+            123
+          ],
+          [
+            346,
+            131
+          ],
+          [
+            356,
+            134
+          ]
+        ],
+        "endpoint": "bulb3outerleft~356134(near-glasslineendgapliteral)"
+      }
+    ],
+    "cups": [
+      {
+        "panel": 1,
+        "topLidEllipses": {
+          "outer": [
+            85,
+            171,
+            44,
+            14
+          ],
+          "inner": [
+            85,
+            169,
+            38,
+            10
+          ]
+        },
+        "bodyWallBbox": [
+          45,
+          180,
+          125,
+          274
+        ],
+        "liquidSurfaceEllipse": [
+          85,
+          203,
+          40,
+          13
+        ],
+        "bottomFrontArcApprox": [
+          [
+            45,
+            260
+          ],
+          [
+            50,
+            269
+          ],
+          [
+            85,
+            274
+          ],
+          [
+            120,
+            269
+          ],
+          [
+            125,
+            260
+          ]
+        ],
+        "bottomBackArc": "DASHED~y254..263behindbody/electrodes",
+        "electrodeRects": [
+          [
+            92,
+            189,
+            101,
+            259
+          ],
+          [
+            109,
+            180,
+            117,
+            259
+          ]
+        ],
+        "bindingPostRects": [
+          [
+            92,
+            156,
+            101,
+            171
+          ],
+          [
+            109,
+            154,
+            117,
+            171
+          ]
+        ],
+        "bulbCenter": [
+          65,
+          139
+        ],
+        "bulbBbox": [
+          52,
+          119,
+          78,
+          161
+        ],
+        "bulbBaseEllipse": [
+          66,
+          166,
+          17,
+          8
+        ],
+        "localSeriesWire": "Curvedshortwirefrombulbbase/sideupandaroundtorightwardLEFTbindingpost;preservesnativepostconnectionsnotconnectelectrodesdirectly.",
+        "numberCaption": "(1)",
+        "numberAt": [
+          85,
+          300
+        ]
+      },
+      {
+        "panel": 2,
+        "topLidEllipses": {
+          "outer": [
+            238,
+            171,
+            44,
+            14
+          ],
+          "inner": [
+            238,
+            169,
+            38,
+            10
+          ]
+        },
+        "bodyWallBbox": [
+          198,
+          180,
+          278,
+          274
+        ],
+        "liquidSurfaceEllipse": [
+          238,
+          203,
+          40,
+          13
+        ],
+        "bottomFrontArcApprox": [
+          [
+            198,
+            260
+          ],
+          [
+            203,
+            269
+          ],
+          [
+            238,
+            274
+          ],
+          [
+            273,
+            269
+          ],
+          [
+            278,
+            260
+          ]
+        ],
+        "bottomBackArc": "DASHED~y254..263behindbody/electrodes",
+        "electrodeRects": [
+          [
+            245,
+            189,
+            254,
+            259
+          ],
+          [
+            262,
+            180,
+            270,
+            259
+          ]
+        ],
+        "bindingPostRects": [
+          [
+            245,
+            156,
+            254,
+            171
+          ],
+          [
+            262,
+            154,
+            270,
+            171
+          ]
+        ],
+        "bulbCenter": [
+          218,
+          139
+        ],
+        "bulbBbox": [
+          205,
+          119,
+          231,
+          161
+        ],
+        "bulbBaseEllipse": [
+          219,
+          166,
+          17,
+          8
+        ],
+        "localSeriesWire": "Curvedshortwirefrombulbbase/sideupandaroundtorightwardLEFTbindingpost;preservesnativepostconnectionsnotconnectelectrodesdirectly.",
+        "numberCaption": "(2)",
+        "numberAt": [
+          238,
+          300
+        ]
+      },
+      {
+        "panel": 3,
+        "topLidEllipses": {
+          "outer": [
+            390,
+            171,
+            44,
+            14
+          ],
+          "inner": [
+            390,
+            169,
+            38,
+            10
+          ]
+        },
+        "bodyWallBbox": [
+          350,
+          180,
+          430,
+          274
+        ],
+        "liquidSurfaceEllipse": [
+          390,
+          203,
+          40,
+          13
+        ],
+        "bottomFrontArcApprox": [
+          [
+            350,
+            260
+          ],
+          [
+            355,
+            269
+          ],
+          [
+            390,
+            274
+          ],
+          [
+            425,
+            269
+          ],
+          [
+            430,
+            260
+          ]
+        ],
+        "bottomBackArc": "DASHED~y254..263behindbody/electrodes",
+        "electrodeRects": [
+          [
+            397,
+            189,
+            406,
+            259
+          ],
+          [
+            414,
+            180,
+            422,
+            259
+          ]
+        ],
+        "bindingPostRects": [
+          [
+            397,
+            156,
+            406,
+            171
+          ],
+          [
+            414,
+            154,
+            422,
+            171
+          ]
+        ],
+        "bulbCenter": [
+          370,
+          139
+        ],
+        "bulbBbox": [
+          357,
+          119,
+          383,
+          161
+        ],
+        "bulbBaseEllipse": [
+          371,
+          166,
+          17,
+          8
+        ],
+        "localSeriesWire": "Curvedshortwirefrombulbbase/sideupandaroundtorightwardLEFTbindingpost;preservesnativepostconnectionsnotconnectelectrodesdirectly.",
+        "numberCaption": "(3)",
+        "numberAt": [
+          390,
+          300
+        ]
+      }
+    ],
+    "bulbBrightnessEvidence": {
+      "zoomFiles": [
+        "/workspace/scratch/cau4-conduct318-bulb1.png",
+        "/workspace/scratch/cau4-conduct318-bulb2.png",
+        "/workspace/scratch/cau4-conduct318-bulb3.png"
+      ],
+      "allFilaments": "Darkgraystem/ribbonwithtwolegs,NOyellowglow/NOemissionraysineach.",
+      "visibleDifference": "Bulb1haspalegrayINNERcrescentupperaroundstem,bulb2noinnercrescentvisible/whitefill,bulb3verylightgrayinteriorfield. KeepnativevisualdifferenceONLY.",
+      "uncertainMeaning": "Cannotassertbright/dim/offfromgrayarcdifferencealone. DO NOTinferHClstrong/CH3COOHweak/waterofforaddrays/color. Sourceuncertaintyblocksanyclaimedbrightnesssemantics."
+    },
+    "allZoom": "/workspace/scratch/cau4-conduct318-allzoom.png",
+    "counts": "3lamps/6externalwires/6supplyterminals/6electrodes/3cups/3numbercaptions/1sourcecaption,NOelectronarrows/polarities/ions/chemicalnamesprintedinfigure.",
+    "noAdded": "NoHCl/CH3COOHlabelsfromstem/numbersvoltage/flowarrows/specificparticles/photoreplacement."
+  },
+  "verdict": "Đạt bản sửa rod phải y180, trái y189 sau mở native full và fresh actual Chromium; chỉ chứng nhận nội dung visual, không suy ý nghĩa độ sáng.",
+  "loMoi": 225,
+  "daMoLaiNativeFullVa3Bulb10x": true,
+  "docLapFreshSVG": "0607bf831551b9b8f16774932cc7d69fcf8803f5828424ab4b7a0e2468e27230",
+  "suaGeometry": "Rod phải x109..117 bắt đầu y180 (native ngay dưới nắp); rod trái x92..101 từy189 vì nắp che. Áp dụng shift +153/+305. SVG hiện tại cả2rod từ189 là sai phần lộ trên rod phải."
+}

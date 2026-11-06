@@ -1,0 +1,653 @@
+{
+  "hash": "3cf43c1fcf1288ca1441eb285f0293df19520bde0d4a2ae1684b50096bf712a4",
+  "file": "anh/3cf43c1fcf1288ca1441eb285f0293df19520bde0d4a2ae1684b50096bf712a4.png",
+  "mime": "image/png",
+  "bytes": 19694,
+  "i": 343,
+  "questions": [
+    {
+      "qid": "12-C2-B6-D2-II-28",
+      "de": "Tại một nhà máy sản xuất rượu, cứ 10 tấn tinh bột (chứa 6,85% tạp chất trơ) sẽ sản xuất được 7,21 m³ dung dịch ethanol 40° (cho khối lượng riêng của ethanol nguyên chất là 0,789 g/cm³). Tinh bột là một polysaccharide gồm nhiều gốc α-glucose liên kết với nhau tạo ra hai dạng mạch amylose và amylopectin. Dưới đây là một đoạn cấu tạo của tinh bột:",
+      "refs": [
+        {
+          "hash": "3cf43c1fcf1288ca1441eb285f0293df19520bde0d4a2ae1684b50096bf712a4",
+          "where": "12-C2-B6-D2-II-28.hinh.0.du_lieu",
+          "hashDataUrl": "36869afb1a922f082cb5778caa9ea144ad7db396a2866929c3bc27626eaae417",
+          "publicPosition": {
+            "where": "12-C2-B6-D2-II-28.hinh.0.du_lieu",
+            "hashDataUrl": "36869afb1a922f082cb5778caa9ea144ad7db396a2866929c3bc27626eaae417",
+            "viTri": "sau_de",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D2-II-44",
+      "de": "Tại một nhà máy sản xuất rượu, cứ 10 tấn tinh bột (chứa 6,85% tạp chất trơ) sẽ sản xuất được 7,21 m³ dung dịch ethanol 40° (cho khối lượng riêng của ethanol nguyên chất là 0,789 g/cm³). Tinh bột là một polysaccharide gồm nhiều gốc α-glucose liên kết với nhau tạo ra hai dạng mạch amylose và amylopectin. Dưới đây là một đoạn cấu tạo của tinh bột:",
+      "refs": [
+        {
+          "hash": "3cf43c1fcf1288ca1441eb285f0293df19520bde0d4a2ae1684b50096bf712a4",
+          "where": "DB-12-B4-D2-II-44.hinh.0.du_lieu",
+          "hashDataUrl": "36869afb1a922f082cb5778caa9ea144ad7db396a2866929c3bc27626eaae417",
+          "publicPosition": {
+            "where": "DB-12-B4-D2-II-44.hinh.0.du_lieu",
+            "hashDataUrl": "36869afb1a922f082cb5778caa9ea144ad7db396a2866929c3bc27626eaae417",
+            "viTri": "sau_de",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        }
+      ]
+    }
+  ],
+  "fileNguon": "anh/3cf43c1fcf1288ca1441eb285f0293df19520bde0d4a2ae1684b50096bf712a4.png",
+  "nativeSize": [
+    810,
+    305
+  ],
+  "daMoNativeFullVaZoom3x": true,
+  "ringFrontZooms": [
+    "/workspace/scratch/chair225-ring1.png",
+    "/workspace/scratch/chair225-ring2.png",
+    "/workspace/scratch/chair225-ring3.png"
+  ],
+  "gapZooms": [
+    "/workspace/scratch/chair225-middleC4.png",
+    "/workspace/scratch/chair225-middleC1.png"
+  ],
+  "numberZoom": "/workspace/scratch/chair225-labels.png",
+  "units": [
+    {
+      "unit": 1,
+      "nodesApprox": {
+        "C4": [
+          100,
+          149
+        ],
+        "C5": [
+          132,
+          100
+        ],
+        "ringO": [
+          197,
+          102
+        ],
+        "C1": [
+          232,
+          150
+        ],
+        "C2": [
+          201,
+          197
+        ],
+        "C3": [
+          137,
+          197
+        ]
+      },
+      "CH2OH": {
+        "on": "C5",
+        "direction": "UP",
+        "bondTo": "CđầuCH2OH",
+        "C5HnotPrinted": true
+      },
+      "OH": [
+        {
+          "on": "C3",
+          "direction": "UP",
+          "literal": "OH"
+        },
+        {
+          "on": "C2",
+          "direction": "DOWN",
+          "literal": "OH"
+        }
+      ],
+      "front": {
+        "leftDiagonal": "TAPERhẹpC4/rộngC3",
+        "horizontal": "C3–C2đậmrộngđều~10pxnative",
+        "rightDiagonal": "MẢNHUNIFORM,C2→C1,khoảng3pxnative,KHÔNGtaper"
+      },
+      "Hstandalone": 0
+    },
+    {
+      "unit": 2,
+      "nodesApprox": {
+        "C4": [
+          335,
+          154
+        ],
+        "C5": [
+          367,
+          104
+        ],
+        "ringO": [
+          431,
+          106
+        ],
+        "C1": [
+          464,
+          154
+        ],
+        "C2": [
+          434,
+          202
+        ],
+        "C3": [
+          370,
+          202
+        ]
+      },
+      "CH2OH": {
+        "on": "C5",
+        "direction": "UP",
+        "bondTo": "CđầuCH2OH",
+        "C5HnotPrinted": true
+      },
+      "OH": [
+        {
+          "on": "C3",
+          "direction": "UP",
+          "literal": "OH"
+        },
+        {
+          "on": "C2",
+          "direction": "DOWN",
+          "literal": "OH"
+        }
+      ],
+      "front": {
+        "leftDiagonal": "TAPERhẹpC4/rộngC3",
+        "horizontal": "C3–C2đậmrộngđều~10pxnative",
+        "rightDiagonal": "MẢNHUNIFORM,C2→C1,khoảng3pxnative,KHÔNGtaper"
+      },
+      "Hstandalone": 0
+    },
+    {
+      "unit": 3,
+      "nodesApprox": {
+        "C4": [
+          539,
+          152
+        ],
+        "C5": [
+          573,
+          102
+        ],
+        "ringO": [
+          638,
+          104
+        ],
+        "C1": [
+          673,
+          152
+        ],
+        "C2": [
+          642,
+          200
+        ],
+        "C3": [
+          578,
+          200
+        ]
+      },
+      "CH2OH": {
+        "on": "C5",
+        "direction": "UP",
+        "bondTo": "CđầuCH2OH",
+        "C5HnotPrinted": true
+      },
+      "OH": [
+        {
+          "on": "C3",
+          "direction": "UP",
+          "literal": "OH"
+        },
+        {
+          "on": "C2",
+          "direction": "DOWN",
+          "literal": "OH"
+        }
+      ],
+      "front": {
+        "leftDiagonal": "TAPERhẹpC4/rộngC3",
+        "horizontal": "C3–C2đậmrộngđều~10pxnative",
+        "rightDiagonal": "MẢNHUNIFORM,C2→C1,khoảng3pxnative,KHÔNGtaper"
+      },
+      "Hstandalone": 0
+    }
+  ],
+  "carbonNumberLabels": [
+    {
+      "literal": "1",
+      "on": "C1ringLEFT",
+      "centerApprox": [
+        218,
+        150
+      ]
+    },
+    {
+      "literal": "4",
+      "on": "C4ringMIDDLE",
+      "centerApprox": [
+        319,
+        150
+      ]
+    }
+  ],
+  "numberLabelsNotPresent": [
+    "2",
+    "3",
+    "C5/C6numbers",
+    "n",
+    "m"
+  ],
+  "externalO": [
+    {
+      "kind": "bridge1",
+      "centerApprox": [
+        286,
+        193
+      ],
+      "leftBondApprox": [
+        [
+          232,
+          150
+        ],
+        [
+          274,
+          182
+        ]
+      ],
+      "rightBondApprox": [
+        [
+          299,
+          181
+        ],
+        [
+          332,
+          155
+        ]
+      ]
+    },
+    {
+      "kind": "bridge2",
+      "centerApprox": [
+        508,
+        188
+      ],
+      "leftBondApprox": [
+        [
+          466,
+          154
+        ],
+        [
+          496,
+          176
+        ]
+      ],
+      "rightBondApprox": [
+        [
+          520,
+          175
+        ],
+        [
+          539,
+          152
+        ]
+      ]
+    },
+    {
+      "kind": "RIGHTterminal",
+      "centerApprox": [
+        727,
+        194
+      ],
+      "bondApprox": [
+        [
+          673,
+          152
+        ],
+        [
+          714,
+          183
+        ]
+      ]
+    }
+  ],
+  "continuation": {
+    "left": {
+      "dotCentersApprox": [
+        [
+          45,
+          177
+        ],
+        [
+          55,
+          177
+        ],
+        [
+          66,
+          177
+        ]
+      ],
+      "segmentApprox": [
+        [
+          80,
+          172
+        ],
+        [
+          100,
+          149
+        ]
+      ],
+      "NOO": true
+    },
+    "right": {
+      "terminalO": true,
+      "dotCentersApprox": [
+        [
+          748,
+          197
+        ],
+        [
+          759,
+          197
+        ],
+        [
+          770,
+          197
+        ]
+      ]
+    },
+    "groups": 2
+  },
+  "literalGaps": {
+    "middleC4": {
+      "nominalNodeApprox": [
+        335,
+        154
+      ],
+      "inkEndpointsNearGapThreshold200": [
+        [
+          335,
+          149
+        ],
+        [
+          333,
+          155
+        ],
+        [
+          337,
+          158
+        ]
+      ],
+      "description": "C5→C4dừngtại335149;bridgeO→C4dừng333155;C4→C3bắtđầu337158. Cówhitegapgiữa3nét,khôngkéođếncùng1node."
+    },
+    "middleC1": {
+      "nominalNodeApprox": [
+        464,
+        154
+      ],
+      "inkEndpointsNearGapThreshold200": [
+        [
+          462,
+          150
+        ],
+        [
+          466,
+          155
+        ],
+        [
+          462,
+          158
+        ]
+      ],
+      "description": "O-ring→C1dừnggần462150;C1→bridgeObắtđầugần466155;C2→C1dừnggần462158. Cũngcówhitegap3nét,khôngnốitheotheory."
+    },
+    "pixelMeasurement": {
+      "middleC4": {
+        "128": [
+          {
+            "bounds": [
+              335,
+              136,
+              345,
+              148
+            ],
+            "pixels": 46,
+            "nearestInkToGapCenter": [
+              335,
+              148
+            ]
+          },
+          {
+            "bounds": [
+              315,
+              142,
+              322,
+              153
+            ],
+            "pixels": 39,
+            "nearestInkToGapCenter": [
+              322,
+              153
+            ]
+          },
+          {
+            "bounds": [
+              313,
+              153,
+              332,
+              171
+            ],
+            "pixels": 78,
+            "nearestInkToGapCenter": [
+              332,
+              155
+            ]
+          },
+          {
+            "bounds": [
+              337,
+              159,
+              354,
+              180
+            ],
+            "pixels": 79,
+            "nearestInkToGapCenter": [
+              337,
+              159
+            ]
+          }
+        ],
+        "200": [
+          {
+            "bounds": [
+              335,
+              136,
+              346,
+              149
+            ],
+            "pixels": 66,
+            "nearestInkToGapCenter": [
+              335,
+              149
+            ]
+          },
+          {
+            "bounds": [
+              314,
+              142,
+              323,
+              154
+            ],
+            "pixels": 76,
+            "nearestInkToGapCenter": [
+              323,
+              152
+            ]
+          },
+          {
+            "bounds": [
+              313,
+              152,
+              333,
+              171
+            ],
+            "pixels": 113,
+            "nearestInkToGapCenter": [
+              333,
+              155
+            ]
+          },
+          {
+            "bounds": [
+              336,
+              158,
+              354,
+              180
+            ],
+            "pixels": 113,
+            "nearestInkToGapCenter": [
+              337,
+              158
+            ]
+          }
+        ]
+      },
+      "middleC1": {
+        "128": [
+          {
+            "bounds": [
+              454,
+              138,
+              463,
+              149
+            ],
+            "pixels": 41,
+            "nearestInkToGapCenter": [
+              462,
+              149
+            ]
+          },
+          {
+            "bounds": [
+              466,
+              154,
+              485,
+              169
+            ],
+            "pixels": 71,
+            "nearestInkToGapCenter": [
+              466,
+              154
+            ]
+          },
+          {
+            "bounds": [
+              448,
+              159,
+              462,
+              177
+            ],
+            "pixels": 69,
+            "nearestInkToGapCenter": [
+              462,
+              159
+            ]
+          }
+        ],
+        "200": [
+          {
+            "bounds": [
+              454,
+              138,
+              464,
+              150
+            ],
+            "pixels": 60,
+            "nearestInkToGapCenter": [
+              462,
+              150
+            ]
+          },
+          {
+            "bounds": [
+              466,
+              153,
+              485,
+              170
+            ],
+            "pixels": 103,
+            "nearestInkToGapCenter": [
+              466,
+              155
+            ]
+          },
+          {
+            "bounds": [
+              447,
+              158,
+              462,
+              177
+            ],
+            "pixels": 95,
+            "nearestInkToGapCenter": [
+              462,
+              158
+            ]
+          }
+        ]
+      }
+    },
+    "note": "BboxpixeltrongROI,từnativeL<128/200,có4cụmC4vìglyph4riêngkhôngphảibond. Tọađộanchorapproxkhôngđồngnghĩadữliệuthínghiệm."
+  },
+  "counts": {
+    "rings": 3,
+    "CH2OH": 3,
+    "OH": 6,
+    "standaloneH": 0,
+    "ringO": 3,
+    "bridgeO": 2,
+    "terminalO": 1,
+    "leftO": 0,
+    "frontLeftTaper": 3,
+    "frontRightUniformThin": 3,
+    "frontHorizontalBold": 3,
+    "ellipsisGroups": 2,
+    "dotsPerGroup": [
+      3,
+      3
+    ],
+    "carbonNumberGlyphs": [
+      "1",
+      "4"
+    ],
+    "caption": 0
+  },
+  "notPresent": [
+    "HOlabel",
+    "standaloneHởcarbonđường",
+    "leftterminalO",
+    "endOH",
+    "n/mbrackets",
+    "arrow",
+    "charge",
+    "caption",
+    "bổsungcôngthứctinhbột"
+  ],
+  "critical": "Vẽliteral3rings/3leftTAPER+3rightTHINUNIFORM+3boldhorizontal,khôngcopy590/265mỗiring2taperhoặc47uniformcả2. GiữmiddleC4+C1gaps,cácsốchỉ1và4,khônggánnốt2/3theostereochemistry. LeftellipsisNOO,rightO+ellipsis.",
+  "nguoiDocNguon": "soat_nguon_2",
+  "trangThai": "Đọcnguồn,chưađạtSVG",
+  "actualSvgReview": {
+    "svg": "chair-polymer-ddh-5b577f3a707f87472a80475442b23621ab7b3e88634e25eed97b696b5b2605b8.svg",
+    "hashSvg": "5b577f3a707f87472a80475442b23621ab7b3e88634e25eed97b696b5b2605b8",
+    "byteSvg": 19630,
+    "freshChromiumActual": "/workspace/scratch/chair225-5b577f3a-chromium.png",
+    "actual1x": "/workspace/scratch/chair225-5b577f3a-1x.png",
+    "verdict": "Đạt:đủ3leftTAPER/3boldhoriz/3rightTHINUNIFORM,literalgapsmiddleC4+C1,onlycarbon1+4,dots3+3/allatoms/gaps. Khôngnốicácnétgaptheotheory."
+  }
+}
