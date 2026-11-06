@@ -9,13 +9,15 @@
 //   node scripts/do-app-hs.mjs --kham=1   (in mọi lượt gọi máy chủ + chụp màn — dò đường khi viết kịch bản)
 //   node scripts/do-app-hs.mjs --dist=<dist> --kich=anh --anh=<thư mục> [--omni=1] [--gio=ISO] [--cpu=1]
 //        (ẢNH GIAO DIỆN màn học tập hiện tại, trạng thái tất định — so điểm ảnh hai bản: node scripts/do-app-hs/so-anh.mjs <trước> <sau>)
+//        Thiếu ảnh / bước hỏng / lỗi trang ⇒ mã thoát 1.
+//   Cờ chung: --toi=1 (giao diện tối) · --khong-yeu=1 (tắt chế độ máy yếu để chụp đúng kính mờ)
 //
 // Chromium: PW_CHROMIUM hoặc /opt/pw-browsers/chromium-*/chrome-linux/chrome (KHÔNG `playwright install`).
 // Kết quả + cách đọc: docs/do-toi-uu-app-hs-3009.md.
 import { execSync } from 'node:child_process'
 import { createSecureServer } from 'node:http2'
 import { tmpdir } from 'node:os'
-import { existsSync, readFileSync, readdirSync, statSync, writeFileSync, mkdirSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync, statSync, writeFileSync, mkdirSync, rmSync } from 'node:fs'
 import { extname, join, resolve } from 'node:path'
 import { gzipSync, brotliCompressSync, constants as zc } from 'node:zlib'
 import { chromium } from 'playwright'
@@ -33,6 +35,10 @@ const OMNI_GIA = arg('omni', '') === '1'
 const GIO = arg('gio', '2026-09-30T03:00:00Z')
 const LAN = Number(arg('lan', '1'))
 const PHUT_HEAP = Number(arg('phut-heap', '5'))
+// --toi=1: giả máy đặt giao diện tối (prefers-color-scheme: dark). --khong-yeu=1: localStorage ddh.mayYeu='0' ⇒ app KHÔNG bật chế độ máy yếu
+// (Chromium headless + RAM giả 2 GB bị nhận là máy yếu ⇒ tắt kính mờ, ảnh không giống máy thật tốt).
+const TOI = arg('toi', '') === '1'
+const KHONG_YEU = arg('khong-yeu', '') === '1'
 const muon = (ten) => !KICH || KICH.split(',').includes(ten)
 const MAN = KHUNG === 'ngang' ? { width: 740, height: 360 } : { width: 360, height: 740 }
 
@@ -241,13 +247,15 @@ async function mayChuGia(ctx, goc) {
 }
 
 async function moMay(trinh, goc, { sw = false, mang = true } = {}) {
-  const ctx = await trinh.newContext({ viewport: MAN, screen: MAN, deviceScaleFactor: 2, isMobile: true, hasTouch: true, serviceWorkers: sw ? 'allow' : 'block', ignoreHTTPSErrors: true, locale: 'vi-VN', timezoneId: 'Asia/Ho_Chi_Minh', userAgent: 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36' })
+  const ctx = await trinh.newContext({ colorScheme: TOI ? 'dark' : 'light', viewport: MAN, screen: MAN, deviceScaleFactor: 2, isMobile: true, hasTouch: true, serviceWorkers: sw ? 'allow' : 'block', ignoreHTTPSErrors: true, locale: 'vi-VN', timezoneId: 'Asia/Ho_Chi_Minh', userAgent: 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36' })
   await ctx.addInitScript(DO_TRONG_TRANG)
   // Máy Android yếu thật: RAM 2 GB, 4 luồng ⇒ app tự bật chế độ `may-yeu` như trên máy em.
   await ctx.addInitScript(() => {
     Object.defineProperty(Navigator.prototype, 'deviceMemory', { get: () => 2, configurable: true })
     Object.defineProperty(Navigator.prototype, 'hardwareConcurrency', { get: () => 4, configurable: true })
   })
+  // '0' = không bao giờ bật máy yếu (src/lib/may-yeu.ts, do-nhip-khung.ts cũng tôn trọng). try: trang about:blank không có localStorage.
+  if (KHONG_YEU) await ctx.addInitScript(() => { try { localStorage.setItem('ddh.mayYeu', '0') } catch {} })
   await mayChuGia(ctx, goc)
   const p = await ctx.newPage()
   const loi = []
@@ -267,8 +275,26 @@ async function dangNhap(p) {
 }
 
 // ── thao tác + đo trong trang ──────────────────────────────────────────────────────────────────────
-// Giữ tên mốc SANH trong JSON để công cụ so sánh số đo cũ đọc được; màn thật nay là Học tập.
-const SANH = '.ht-app .ht2-hn[aria-busy="false"]'
+// Giữ tên mốc SANH trong JSON để công cụ so sánh số đo cũ đọc được; màn thật nay là Hôm nay (hệ kính 02/11).
+// 06/11: `.ht2-hn` không còn ⇒ chờ SỐ trên thẻ «Tổng câu hôm nay» (`.kb-hero`, TrongHs.tsx) — số chỉ hiện khi Sảnh đã về (aria-busy chỉ "true" lúc đang
+// tải, trước lúc bắt đầu tải là "false" mà thẻ còn rỗng ⇒ không chờ riêng aria-busy). Vế sau giữ cho bản cũ trước 02/11 (mốc «app cũ» 26/10) đo được.
+const SANH = '.kb-hero:not([aria-busy="true"]) .kb-so, .ht-app .ht2-hn[aria-busy="false"]'
+// Thanh nổi (hệ kính): Hôm nay · Kiểm tra · Thành tích · Thêm. Luyện tập (Tự sửa lỗi, Câu đã làm, Tu luyện…) nằm trong tấm «Thêm».
+const NUT_THEM = '.kb-thanh .tr-menu-cham'
+const TAM_THEM_MO = '#tr-menu[data-mo]'
+const MUC_LUYEN_TAP = '#tr-menu[data-mo] .tr-menu-muc[data-hien]'
+const VE_HOM_NAY = '[aria-label="Về Hôm nay"], [aria-label="Về Lộ trình"]'
+/** Nút chính trên Hôm nay (nhãn đổi theo việc: Bắt đầu / Học tiếp / Làm tiếp…) và phương án ở màn làm câu. */
+const NUT_BAT_DAU = '.kb-cta'
+const MAN_LAM_CAU = '.ht2-lam-pa'
+const LUU_VE_HOM_NAY = '[aria-label="Lưu và về Hôm nay"]'
+/** Màn làm câu đang phủ lên Hôm nay? (Hôm nay vẫn gắn bên dưới ⇒ SANH vẫn khớp; mở lại /hs thì app KHÔI PHỤC màn làm câu dở.) */
+const dangLamCau = (p) => p.evaluate(({ chon, TIM_CHU }) => !!new Function('return ' + TIM_CHU)()(chon), { chon: MAN_LAM_CAU, TIM_CHU })
+/** Rời màn làm câu bằng «Lưu và về Hôm nay», chờ phương án biến mất. */
+async function roiLamCau(p) {
+  await cham(p, LUU_VE_HOM_NAY)
+  await p.waitForFunction(({ chon, TIM_CHU }) => !new Function('return ' + TIM_CHU)()(chon), { chon: MAN_LAM_CAU, TIM_CHU }, { polling: 100, timeout: 30000 })
+}
 /** Tìm phần tử trong trang: `text=…` (nút/nhãn chứa chữ, ưu tiên khớp đúng) hoặc bộ chọn CSS. Chạy TRONG trang (rẻ, không dò cây trợ năng). */
 const TIM = (chon) => {
   const hien = (e) => !!e && (e.offsetWidth || e.offsetHeight || e.getClientRects().length) && getComputedStyle(e).visibility !== 'hidden'
@@ -407,10 +433,27 @@ async function inVet(cdp, ten) {
   console.error(`VẾT ${ten} — theo loại việc (ms, có lồng):\n${inBang(theoTen, 22)}\nTHEO TỆP:\n${inBang(theoTep, 30)}\nHÀM TỐN NHẤT (tự thân):\n${inBang(tu, 30)}`)
 }
 
+/** Hôm nay → Thêm → Luyện tập (chờ tấm Thêm mở hẳn: `cham` đo toạ độ một lần, CPU ×6 tấm còn đang trượt thì chạm trượt). */
+async function vaoLuyenTap(p) {
+  await cham(p, NUT_THEM)
+  await choThay(p, TAM_THEM_MO, 20000)
+  await p.waitForTimeout(500)
+  await cham(p, MUC_LUYEN_TAP)
+  await choThay(p, 'text=Câu đã làm', 20000)
+}
+
+/** Nút «Về Hôm nay» của Câu đã làm / Tu luyện nay quay về mục vừa mở (Luyện tập) ⇒ bấm tiếp «Hôm nay» trên thanh nổi. */
+async function veHomNayTuLuyenTap(p) {
+  if (await p.evaluate(({ chon, TIM_CHU }) => !!new Function('return ' + TIM_CHU)()(chon), { chon: SANH, TIM_CHU })) return
+  await cham(p, NUT_THANH('Hôm nay'))
+  await choThay(p, SANH, 20000)
+}
+
 async function veSanh(p) {
   await p.goto(goc + '/hs', { waitUntil: 'commit' })
   await choThay(p, SANH)
   await p.waitForTimeout(3000)
+  if (await dangLamCau(p)) (await roiLamCau(p), await p.waitForTimeout(1500))
 }
 
 // ── kịch bản ────────────────────────────────────────────────────────────────────────────────────────
@@ -489,18 +532,25 @@ async function cacMan() {
       const b = (ten, ...a) => vet(ten, () => buocAn(p, ...a))
       await veSanh(p)
       m.sanhYen = await k('sanhYen', 5000)
-      // Câu đã làm: mở (tải chi tiết + công thức), lọc, cuộn.
+      // Câu đã làm (Thêm → Luyện tập → Câu đã làm): mở (tải chi tiết + công thức), lọc, cuộn.
       await veSanh(p)
+      await vaoLuyenTap(p)
       m.vaoCauDaLam = await b('vaoCauDaLam', 'text=Câu đã làm', '.h2-cdl-loc', 4000)
       m.cdlLoc = await b('cdlLoc', 'text=Sai lần gần nhất', null, 2000)
       m.cdlLocTatCa = await b('cdlLocTatCa', 'text=Tất cả', null, 2000)
       m.cdlCuon = await kc('cdlCuon', 4000)
-      m.veSanhTuCdl = await b('veSanhTuCdl', '[aria-label="Về Hôm nay"], [aria-label="Về Lộ trình"]', SANH, 1500)
-      // Tu luyện: mở, từng thẻ chế độ, thẻ Tổng hợp.
-      await cham(p, 'text=Ôn & sửa')
+      // (khoá cũ giữ tên cho so-sanh.mjs) nay đo «Về» → Luyện tập hiện lại; rồi thanh nổi → Hôm nay.
+      m.veSanhTuCdl = await b('veSanhTuCdl', VE_HOM_NAY, '.da-o', 1500)
+      await veHomNayTuLuyenTap(p)
+      // Tu luyện (Thêm → Luyện tập → Tu luyện): mở, từng thẻ chế độ, thẻ Tổng hợp.
+      await vaoLuyenTap(p)
       m.vaoTuLuyen = await b('vaoTuLuyen', 'text=Tu luyện', 'text=Sửa câu sai', 2500)
       for (const [k, t] of [['tlSuaCauSai', 'Sửa câu sai'], ['tlDangCauSai', 'Dạng câu sai'], ['tlDangBai', 'Dạng bài'], ['tlTuDo', 'Tự do'], ['tlTongHop', 'Tổng hợp'], ['tlLuyenDe', 'Luyện đề cấu trúc'], ['tlLuyen', 'Luyện']]) m[k] = await b(k, 'text=' + t, null, 1500)
-      m.veSanhTuTl = await b('veSanhTuTl', '[aria-label="Về Hôm nay"], [aria-label="Về Lộ trình"]', SANH, 1500)
+      m.veSanhTuTl = await b('veSanhTuTl', VE_HOM_NAY, '.da-o', 1500)
+      // Màn làm câu: nút chính Hôm nay («Bắt đầu» / «Học tiếp»…) → phương án hiện.
+      await veSanh(p)
+      m.vaoLamCau = await b('vaoLamCau', NUT_BAT_DAU, MAN_LAM_CAU, 2500)
+      await roiLamCau(p).catch(() => {})
       kq.lan.push(m)
     }
     kq.heapMB = await heapMb(cdp)
@@ -531,7 +581,7 @@ async function nhanh(ghiDo) {
     GIA.datLai()
     await veSanh(p)
     await lam('sanhYen', () => khung(p, 5000))
-    await lam('vaoCauDaLam', () => buoc(p, 'text=Câu đã làm', '.h2-cdl-loc', 4000))
+    await lam('vaoCauDaLam', async () => (await vaoLuyenTap(p), buoc(p, 'text=Câu đã làm', '.h2-cdl-loc', 4000)))
     await lam('cdlCuon', () => khungCuon(p, 4000, cdp))
     await lam('cdlLocTatCa', () => buoc(p, 'text=Tất cả', null, 2500))
     kq.heapMB = await heapMb(cdp)
@@ -558,16 +608,17 @@ async function heapDai(phut) {
     let vong = 0
     const ghi = async () => kq.mau.push({ vong, giay: Math.round((Date.now() - dau) / 1000), heapMB: await heapMb(cdp), ...(await domCounters(cdp)) })
     const ve = async () => {
-      await cham(p, '[aria-label="Về Hôm nay"], [aria-label="Về Lộ trình"]')
-      await choThay(p, SANH)
+      await cham(p, VE_HOM_NAY)
+      await choThay(p, '.da-o', 20000)
+      await veHomNayTuLuyenTap(p)
     }
     await ghi()
     while (Date.now() - dau < phut * 60000) {
       vong++
       GIA.datLai()
-      await cham(p, 'text=Câu đã làm'); await choThay(p, '.h2-cdl-loc', 20000).catch(() => {}); await p.waitForTimeout(2500)
+      await vaoLuyenTap(p); await cham(p, 'text=Câu đã làm'); await choThay(p, '.h2-cdl-loc', 20000).catch(() => {}); await p.waitForTimeout(2500)
       await ve(); await choThay(p, SANH, 20000).catch(() => {}); await p.waitForTimeout(800)
-      await cham(p, 'text=Ôn & sửa'); await cham(p, 'text=Tu luyện'); await choThay(p, 'text=Sửa câu sai', 20000).catch(() => {}); await p.waitForTimeout(1500)
+      await vaoLuyenTap(p); await cham(p, 'text=Tu luyện'); await choThay(p, 'text=Sửa câu sai', 20000).catch(() => {}); await p.waitForTimeout(1500)
       await ve(); await choThay(p, SANH, 20000).catch(() => {}); await p.waitForTimeout(800)
       if (vong % 2 === 0) await ghi()
     }
@@ -583,15 +634,19 @@ async function heapDai(phut) {
 // ── ẢNH GIAO DIỆN để SO ĐIỂM ẢNH (thầy 05/10: "app của học sinh giữ nguyên mọi thứ giao diện, hình nền màu nhé") ──────────────────────
 /** Một bước kịch bản: `chờ:<bộ chọn>` · `ngu:<ms>` · `kb:<json>` (đổi kịch bản máy chủ giả) · `css:<bộ chọn>` (bấm) · `cuon:<bộ chọn>` (cuộn tới)
  *  · `anh:<tên>` (chụp vào --anh, tắt hoạt ảnh/chuyển cảnh CHỈ lúc chụp) · `js:<biểu thức>` (in kết quả — dò lỗi) · còn lại = bấm theo chữ. */
+/** Bước hỏng (không thấy / không bấm / không cuộn được) — gom lại để `--kich=anh` / `--kham` thoát mã 1 thay vì «chạy xong» mà thiếu ảnh. */
+const BUOC_HONG = []
+const hong = (loai, b) => () => (console.log(loai, b), BUOC_HONG.push(`${loai}: ${b}`))
 async function chayBuoc(p, b) {
-  if (b.startsWith('chờ:')) await p.waitForSelector(b.slice(4), { timeout: 30000 }).catch(() => console.log('KHÔNG THẤY', b))
+  // Chỉ phần tử ĐANG HIỆN: màn Hôm nay vẫn gắn trong DOM dưới các màn khác, cột bên (`.dm-ben`) có «Câu đã làm» ẩn trên điện thoại.
+  if (b.startsWith('chờ:')) await p.waitForSelector(b.slice(4), { timeout: 30000 }).catch(hong('KHÔNG THẤY', b))
   else if (b.startsWith('ngu:')) await p.waitForTimeout(Number(b.slice(4)))
   else if (b.startsWith('kb:')) Object.assign(GIA.kichBan, JSON.parse(b.slice(3)))
-  else if (b.startsWith('css:')) await p.locator(b.slice(4)).first().click({ timeout: 15000 }).catch(() => console.log('KHÔNG BẤM ĐƯỢC', b))
-  else if (b.startsWith('cuon:')) await p.locator(b.slice(5)).first().scrollIntoViewIfNeeded({ timeout: 15000 }).catch(() => console.log('KHÔNG CUỘN ĐƯỢC', b))
+  else if (b.startsWith('css:')) await p.locator(b.slice(4)).filter({ visible: true }).first().click({ timeout: 15000 }).catch(hong('KHÔNG BẤM ĐƯỢC', b))
+  else if (b.startsWith('cuon:')) await p.locator(b.slice(5)).filter({ visible: true }).first().scrollIntoViewIfNeeded({ timeout: 15000 }).catch(hong('KHÔNG CUỘN ĐƯỢC', b))
   else if (b.startsWith('anh:')) await chupMan(p, b.slice(4))
   else if (b.startsWith('js:')) console.log('JS:', JSON.stringify(await p.evaluate(b.slice(3)).catch((e) => String(e.message).slice(0, 120))))
-  else await p.getByText(b, { exact: false }).first().click({ timeout: 15000 }).catch(() => console.log('KHÔNG BẤM ĐƯỢC', b))
+  else await p.getByText(b, { exact: false }).filter({ visible: true }).first().click({ timeout: 15000 }).catch(hong('KHÔNG BẤM ĐƯỢC', b))
 }
 /** Chờ mọi vùng cuộn (trang + phần tử cuộn được) ĐỨNG YÊN 3 lần đo liền (app tự cuộn mượt tới nút chốt… ⇒ chụp giữa chừng là lệch dọc). */
 async function choCuonDung(p) {
@@ -611,16 +666,27 @@ async function chupMan(p, ten) {
 }
 /** màn học tập hiện tại ở trạng thái TẤT ĐỊNH: giờ đóng băng (`--gio`, page.clock.setFixedTime), không giả mạng, mỗi kịch bản một phiên mới
  *  (đăng nhập lại). `--omni=1`: máy chủ giả trả thêm `omni` cho Sảnh như khi lớp bật OMNI. */
+// 06/11: theo thanh nổi hệ kính (Hôm nay · Kiểm tra · Thành tích · Thêm); Luyện tập → Câu đã làm / Tu luyện đi qua tấm «Thêm»; thêm màn làm câu.
+const NUT_THANH = (ten) => `.kb-thanh .kb-thanh-muc[aria-label="${ten}"]`
+const O_TO = (ten) => `.da-o:has-text("${ten}")` // ô to của mục Luyện tập / Thành tích (TrongHs.tsx OTo)
+const VAO_LUYEN_TAP = ['css:' + NUT_THEM, 'chờ:' + TAM_THEM_MO, 'ngu:800', 'css:' + MUC_LUYEN_TAP, `chờ:${O_TO('Câu đã làm')}:visible`, 'ngu:1500']
 const KICH_ANH = [
-  ['Học tập', true, ['ngu:2000', 'anh:1-hoc-tap']],
-  ['Câu đã làm', false, ['ngu:1500', 'Câu đã làm', 'chờ:.h2-cdl-loc', 'ngu:3000', 'anh:6-cau-da-lam']],
-  ['Tu luyện', false, ['ngu:1500', 'Ôn & sửa', 'Tu luyện', 'chờ:text=Sửa câu sai', 'ngu:2500', 'anh:8-tu-luyen']],
+  ['Hôm nay', true, ['ngu:2000', 'anh:1-hom-nay']],
+  ['Kiểm tra', false, ['ngu:1000', 'css:' + NUT_THANH('Kiểm tra'), 'chờ:button:has-text("Vào ca kiểm tra"):visible', 'ngu:1500', 'anh:2-kiem-tra']],
+  ['Thành tích', false, ['ngu:1000', 'css:' + NUT_THANH('Thành tích'), `chờ:${O_TO('Huy hiệu')}:visible`, 'ngu:2000', 'anh:3-thanh-tich']],
+  ['Thêm → Luyện tập → Câu đã làm', false, ['ngu:1000', 'css:' + NUT_THEM, 'chờ:' + TAM_THEM_MO, 'ngu:800', 'anh:4-them', 'css:' + MUC_LUYEN_TAP, `chờ:${O_TO('Câu đã làm')}:visible`, 'ngu:1500', 'anh:5-luyen-tap',
+    'css:' + O_TO('Câu đã làm'), 'chờ:.h2-cdl-loc', 'ngu:3000', 'anh:6-cau-da-lam']],
+  ['Tu luyện', false, ['ngu:1000', ...VAO_LUYEN_TAP, 'css:' + O_TO('Tu luyện'), 'chờ:button:has-text("Sửa câu sai"):visible', 'ngu:2500', 'anh:7-tu-luyen']],
+  ['Làm câu', false, ['ngu:1500', 'css:' + NUT_BAT_DAU, `chờ:${MAN_LAM_CAU}:visible`, 'ngu:2000', 'anh:8-lam-cau']],
 ]
 async function chupAnhGiaoDien() {
   mkdirSync(THU_MUC_ANH, { recursive: true })
+  const canCo = ['0-dang-nhap', ...KICH_ANH.flatMap(([, , b]) => b.filter((x) => x.startsWith('anh:')).map((x) => x.slice(4)))]
+  for (const t of canCo) rmSync(join(THU_MUC_ANH, `${t}.png`), { force: true }) // ảnh cũ cùng tên không được tính là «đủ ảnh»
   TRE_API = false
   const ket = []
   for (const [ten, anhDangNhap, buoc] of KICH_ANH) {
+    const hongTruoc = BUOC_HONG.length
     GIA.datLai()
     GIA.kichBan.omni = OMNI_GIA
     GIA.kichBan.gio = Date.parse(GIO) // dữ liệu mẫu cùng giờ đóng băng với trang
@@ -639,12 +705,20 @@ async function chupAnhGiaoDien() {
         await chayBuoc(p, b)
         await p.waitForTimeout(300)
       }
-      ket.push({ kich: ten, loi: loi.slice(0, 3) })
+      ket.push({ kich: ten, loi: loi.slice(0, 3), hong: BUOC_HONG.slice(hongTruoc) })
+    } catch (e) {
+      ket.push({ kich: ten, loi: [...loi.slice(0, 3), String(e.message).slice(0, 160)], hong: BUOC_HONG.slice(hongTruoc) })
     } finally {
       await ctx.close()
     }
   }
-  return ket
+  // Nghiệm thu: đủ ảnh + không bước hỏng + không lỗi trang ⇒ mã thoát 0.
+  const thieu = canCo.filter((t) => !existsSync(join(THU_MUC_ANH, `${t}.png`)))
+  if (thieu.length || ket.some((k) => k.loi.length || k.hong.length)) {
+    process.exitCode = 1
+    console.error(`ẢNH CHƯA ĐẠT — thiếu: ${thieu.join(', ') || 'không'} · kịch bản lỗi: ${ket.filter((k) => k.loi.length || k.hong.length).map((k) => k.kich).join(', ') || 'không'}`)
+  }
+  return { anh: canCo.length - thieu.length, thieu, kich: ket }
 }
 
 // ── chạy ─────────────────────────────────────────────────────────────────────────────────────────
@@ -676,6 +750,7 @@ try {
     console.log('LỚP GỐC:', await p.evaluate(() => [...document.querySelectorAll('body > div > div > *, [class*="dao"], [class*="dh-"], [class*="tl-"], [class*="cdl"]')].slice(0, 12).map((e) => e.tagName + '.' + String(e.className).split(' ').slice(0, 3).join('.')).join(' ')))
     console.log('GỌI:', NHAT_KY.map((x) => x[1]).join(' '))
     console.log('LỖI:', loi.join(' | '))
+    if (BUOC_HONG.length) (process.exitCode = 1), console.log('BƯỚC HỎNG:', BUOC_HONG.join(' | '))
     // Hoạt ảnh đang chạy: tên + thuộc tính bị đổi + phần tử; và ai đang gọi requestAnimationFrame liên tục.
     console.log('HOẠT ẢNH:', JSON.stringify(await p.evaluate(() => {
       const m = new Map()
