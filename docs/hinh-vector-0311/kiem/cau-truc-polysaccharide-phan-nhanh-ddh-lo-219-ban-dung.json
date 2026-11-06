@@ -1,0 +1,40 @@
+[
+  {
+    "i": 225,
+    "hash": "26aeade244c7dd9029e4b3d97d4365c9295cb7e312556ccfedd88edaa4cee2e4",
+    "fileNguon": "anh/26aeade244c7dd9029e4b3d97d4365c9295cb7e312556ccfedd88edaa4cee2e4.png",
+    "svg": "polysaccharide-phan-nhanh-ddh-e6bb7b685fd35ee774ed627cb5663a3b2cdf27b9a7d02efb41817d27a0cd924b.svg",
+    "hashSvg": "e6bb7b685fd35ee774ed627cb5663a3b2cdf27b9a7d02efb41817d27a0cd924b",
+    "byteSvg": 53455,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C2-D3-I-17",
+        "de": "Quan sát hình sau đây:\nCho các phát biểu sau:\n(a) X có nhiều trong trái cây chín.\n(b) X có cấu trúc mạch phân nhánh.\n(c) X có vị ngọt hơn glucose.\n(d) X chiếm tỉ lệ lớn trong thành phần gạo nếp.\nSố phát biểu đúng là",
+        "refs": [
+          {
+            "hash": "26aeade244c7dd9029e4b3d97d4365c9295cb7e312556ccfedd88edaa4cee2e4",
+            "where": "12-KT-C2-D3-I-17.hinh.0.du_lieu",
+            "hashDataUrl": "534e65612746271d72a1fc0d59b7a6464174763348d667a0b2820c14be629e84"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-I-156",
+        "de": "Quan sát hình sau đây:\nCho các phát biểu sau:\n(a) X có nhiều trong trái cây chín.\n(b) X có cấu trúc mạch phân nhánh.\n(c) X có vị ngọt hơn glucose.\n(d) X chiếm tỉ lệ lớn trong thành phần gạo nếp.\nSố phát biểu đúng là",
+        "refs": [
+          {
+            "hash": "26aeade244c7dd9029e4b3d97d4365c9295cb7e312556ccfedd88edaa4cee2e4",
+            "where": "DB-12-B4-D3-I-156.hinh.0.du_lieu",
+            "hashDataUrl": "534e65612746271d72a1fc0d59b7a6464174763348d667a0b2820c14be629e84"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "6rings/30H/15OH/5CH2OH+1CH2branch/5externalO/6horizontalbold/frontdiagsuniform-notwedges/2bracketpairs-m-n/noaddedX-caption/DDHpath.",
+    "hashSvgDaSoat": "e6bb7b685fd35ee774ed627cb5663a3b2cdf27b9a7d02efb41817d27a0cd924b",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

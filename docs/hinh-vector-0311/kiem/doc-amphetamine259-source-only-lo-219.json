@@ -1,0 +1,221 @@
+{
+  "i": 259,
+  "hashNguon": "2ca5723dcc6a244b502fc4d34a8aab0e98c8ef8f0765a6ed0e55be6511eb7770",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "canvas": [
+    364,
+    101
+  ],
+  "sourceQuestions": [
+    {
+      "qid": "12-C3-B8-D2-I-5",
+      "maDe": "12-C3-B8-D2",
+      "de": "Amphetamine (còn được gọi là hồng phiến) là một dạng chất ma tuý có tác dụng gây kích thích thần kinh, tăng cường sức chịu đựng, tăng cảm giác hưng phấn, nếu sử dụng quá liều sẽ gây nghiện, dẫn đến lạm dụng; ảnh hưởng xấu đến hệ thần kinh; gây rối loạn nhịp tim, tăng hoặc giảm huyết áp; gây rối loạn nhịp thở, co giật; suy nhược cơ thể. Amphetamine có cấu tạo như sau:\nCho các phát biểu sau đây:\n(a) 1 mol amphetamine tác dụng tối đa với 1 mol HCl.\n(b) Amphetamine là amine bậc 2.\n(c) Đốt cháy hoàn toàn 0,1 mol amphetamine thu được 0,1 mol N₂.\n(d) Công thức phân tử của amphetamine C₉H₁₂N.\n(e) Ở điều kiện thích hợp, amphetamine có thể tham gia phản ứng cộng H₂ theo tỷ lệ mol 1 : 3.\nSố phát biểu đúng là",
+      "hinh": [
+        {
+          "hash": "2ca5723dcc6a244b502fc4d34a8aab0e98c8ef8f0765a6ed0e55be6511eb7770",
+          "where": "12-C3-B8-D2-I-5.hinh.0.du_lieu",
+          "hashDataUrl": "19f949494961d030d5e23f843cefe2d8265268d76efe313f2953835a6436e682"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B8-D1-I-103",
+      "maDe": "DB-12-B8-D1",
+      "de": "Amphetamine (còn được gọi là hồng phiến) là một dạng chất ma tuý có tác dụng gây kích thích thần kinh, tăng cường sức chịu đựng, tăng cảm giác hưng phấn, nếu sử dụng quá liều sẽ gây nghiện, dẫn đến lạm dụng; ảnh hưởng xấu đến hệ thần kinh; gây rối loạn nhịp tim, tăng hoặc giảm huyết áp; gây rối loạn nhịp thở, co giật; suy nhược cơ thể. Amphetamine có cấu tạo như sau:\nCho các phát biểu sau đây:\n(a) 1 mol amphetamine tác dụng tối đa với 1 mol HCl.\n(b) Amphetamine là amine bậc 2.\n(c) Đốt cháy hoàn toàn 0,1 mol amphetamine thu được 0,1 mol N₂.\n(d) Công thức phân tử của amphetamine C₉H₁₂N.\n(e) Ở điều kiện thích hợp, amphetamine có thể tham gia phản ứng cộng H₂ theo tỷ lệ mol 1 : 3.\nSố phát biểu đúng là",
+      "hinh": [
+        {
+          "hash": "2ca5723dcc6a244b502fc4d34a8aab0e98c8ef8f0765a6ed0e55be6511eb7770",
+          "where": "DB-12-B8-D1-I-103.hinh.0.du_lieu",
+          "hashDataUrl": "19f949494961d030d5e23f843cefe2d8265268d76efe313f2953835a6436e682"
+        }
+      ]
+    }
+  ],
+  "searchMethod": "Read-onlypublicinventorydecontainsamphetamine/amfet,allresultshashesopenednativeindividually;noanswer/solutiondownload,nopHashapproval.",
+  "cropProblem": "Source259cutbottomat101:phenylbottomandNH2labelmissing,alphaCverticalbondcontinuesbelowcrop. Cannotrebuildfromname/stemalone.",
+  "candidateSources": [
+    {
+      "hash": "f3f6a910d977b78470e1d028bae650c6ef285ae3c54d3d8d1a03bb8112008a46",
+      "i": 1347,
+      "file": "anh/f3f6a910d977b78470e1d028bae650c6ef285ae3c54d3d8d1a03bb8112008a46.png",
+      "canvas": [
+        174,
+        79
+      ],
+      "daMoNativeFull": true,
+      "questions": [
+        {
+          "qid": "DB-12-B8-D1-I-369",
+          "maDe": "DB-12-B8-D1",
+          "de": "Amphetamine (còn được gọi là hồng phiến) là một dạng chất ma tuý có tác dụng gây kích thích thần kinh, tăng cường sức chịu đựng, tăng cảm giác hưng phấn, nếu sử dụng quá liều sẽ gây nghiện, dẫn đến lạm dụng; ảnh hưởng xấu đến hệ thần kinh; gây rối loạn nhịp tim, tăng hoặc giảm huyết áp; gây rối loạn nhịp thở, co giật; suy nhược cơ thể. Amphetamine có cấu tạo như sau:\nCho các phát biểu sau đây:\n(a) 1 mol amphetamine tác dụng tối đa với 1 mol HCl.\n(b) Amphetamine là amine bậc 2.\n(c) Đốt cháy hoàn toàn 0,1 mol amphetamine thu được 0,1 mol N₂.\n(d) Công thức phân tử của amphetamine C₉H₁₂N.\n(e) Ở điều kiện thích hợp, amphetamine có thể tham gia phản ứng cộng H₂ theo tỷ lệ mol 1: 3.\nSố phát biểu đúng là",
+          "hinh": [
+            {
+              "hash": "f3f6a910d977b78470e1d028bae650c6ef285ae3c54d3d8d1a03bb8112008a46",
+              "where": "DB-12-B8-D1-I-369.hinh.0.du_lieu",
+              "hashDataUrl": "44d7e8612270e32852149ad4322cbc8f3b29dcd647a0cc1d1ec0f8369b35b604"
+            }
+          ]
+        },
+        {
+          "qid": "DH-12-C3-B8-I-83",
+          "maDe": "DH-12-C3-B8",
+          "de": "Amphetamine (còn được gọi là hồng phiến) là một dạng chất ma tuý có tác dụng gây kích thích thần kinh, tăng cường sức chịu đựng, tăng cảm giác hưng phấn, nếu sử dụng quá liều sẽ gây nghiện, dẫn đến lạm dụng; ảnh hưởng xấu đến hệ thần kinh; gây rối loạn nhịp tim, tăng hoặc giảm huyết áp; gây rối loạn nhịp thở, co giật; suy nhược cơ thể. Amphetamine có cấu tạo như sau:\nCho các phát biểu sau đây:\n(a) 1 mol amphetamine tác dụng tối đa với 1 mol HCl.\n(b) Amphetamine là amine bậc 2.\n(c) Đốt cháy hoàn toàn 0,1 mol amphetamine thu được 0,1 mol N₂.\n(d) Công thức phân tử của amphetamine C₉H₁₂N.\n(e) Ở điều kiện thích hợp, amphetamine có thể tham gia phản ứng cộng H₂ theo tỷ lệ mol 1: 3.\nSố phát biểu đúng là",
+          "hinh": [
+            {
+              "hash": "f3f6a910d977b78470e1d028bae650c6ef285ae3c54d3d8d1a03bb8112008a46",
+              "where": "DH-12-C3-B8-I-83.hinh.0.du_lieu",
+              "hashDataUrl": "44d7e8612270e32852149ad4322cbc8f3b29dcd647a0cc1d1ec0f8369b35b604"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "hash": "df82e6b53009b2b5da1b793ead27e78bb9ab504bc5da9f3bd9efd479204a3642",
+      "i": 1233,
+      "file": "anh/df82e6b53009b2b5da1b793ead27e78bb9ab504bc5da9f3bd9efd479204a3642.png",
+      "canvas": [
+        390,
+        207
+      ],
+      "daMoNativeFull": true,
+      "questions": [
+        {
+          "qid": "12-C3-B8-D2-I-21",
+          "maDe": "12-C3-B8-D2",
+          "de": "Amphetamine là chất kích thích (mạnh hơn caffeine) làm tăng sự tỉnh táo và giảm cảm giác thèm ăn.\nNó được sử dụng rộng rãi trong thế chiến thứ hai để ngăn chặn sự mệt mỏi khi chiến đấu.\nAmphetamine có công thức cấu tạo như hình dưới đây: Công thức phân tử của amphetamine là",
+          "hinh": [
+            {
+              "hash": "df82e6b53009b2b5da1b793ead27e78bb9ab504bc5da9f3bd9efd479204a3642",
+              "where": "12-C3-B8-D2-I-21.hinh.0.du_lieu",
+              "hashDataUrl": "0dd65a4a361c7c0dced99f9100f6ec4a4e3445def100f90675777d9201a80643"
+            }
+          ]
+        },
+        {
+          "qid": "DB-12-B8-D1-I-163",
+          "maDe": "DB-12-B8-D1",
+          "de": "Amphetamine là chất kích thích (mạnh hơn caffeine) làm tăng sự tỉnh táo và giảm cảm giác thèm ăn.\nNó được sử dụng rộng rãi trong thế chiến thứ hai để ngăn chặn sự mệt mỏi khi chiến đấu.\nAmphetamine có công thức cấu tạo như hình dưới đây: Công thức phân tử của amphetamine là",
+          "hinh": [
+            {
+              "hash": "df82e6b53009b2b5da1b793ead27e78bb9ab504bc5da9f3bd9efd479204a3642",
+              "where": "DB-12-B8-D1-I-163.hinh.0.du_lieu",
+              "hashDataUrl": "0dd65a4a361c7c0dced99f9100f6ec4a4e3445def100f90675777d9201a80643"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "hash": "1abc15472e085941b56a965267dba71ed3975cdd12f7688c66906bc137e5ee2c",
+      "i": 154,
+      "file": "anh/1abc15472e085941b56a965267dba71ed3975cdd12f7688c66906bc137e5ee2c.png",
+      "canvas": [
+        970,
+        315
+      ],
+      "daMoNativeFull": true,
+      "questions": [
+        {
+          "qid": "12-C3-B8-D2-III-40",
+          "maDe": "12-C3-B8-D2",
+          "de": "Amphetamine và methamphetamine đều là những loại ma túy, lần lượt có tên gọi là hồng phiến và ma túy đá.\nAmphetamine có x nguyên tử hydrogen, methamphetamine có y nguyên tử hydrogen.\nGiá trị xy là bao nhiêu?",
+          "hinh": [
+            {
+              "hash": "1abc15472e085941b56a965267dba71ed3975cdd12f7688c66906bc137e5ee2c",
+              "where": "12-C3-B8-D2-III-40.hinh.0.du_lieu",
+              "hashDataUrl": "bee076d06afb62d58b69bf12518f45866b34c42f64882c748b8c490bb549f768"
+            }
+          ]
+        },
+        {
+          "qid": "DB-12-B8-D1-III-190",
+          "maDe": "DB-12-B8-D1",
+          "de": "Amphetamine và methamphetamine đều là những loại ma túy, lần lượt có tên gọi là hồng phiến và ma túy đá.\nAmphetamine có x nguyên tử hydrogen, methamphetamine có y nguyên tử hydrogen.\nGiá trị xy là bao nhiêu?",
+          "hinh": [
+            {
+              "hash": "1abc15472e085941b56a965267dba71ed3975cdd12f7688c66906bc137e5ee2c",
+              "where": "DB-12-B8-D1-III-190.hinh.0.du_lieu",
+              "hashDataUrl": "bee076d06afb62d58b69bf12518f45866b34c42f64882c748b8c490bb549f768"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "bestDuplicate": {
+    "hash": "f3f6a910d977b78470e1d028bae650c6ef285ae3c54d3d8d1a03bb8112008a46",
+    "i": 1347,
+    "support": "Samepublicquestionstatement5assertions/integerconditions/name,theonlystemvariationformatratio1:3v1 : 3. FullcandidatehassamevisiblelayoutPhupperhalf/centralCH2up/alphaCdown/rightupCH3label,NH2verticaldownfull.",
+    "visibleCoordinatesSource259": {
+      "PhLeft": [
+        28,
+        69
+      ],
+      "PhTop": [
+        85,
+        36
+      ],
+      "PhRight": [
+        143,
+        69
+      ],
+      "chainCH2": [
+        199,
+        36
+      ],
+      "alphaC": [
+        256,
+        69
+      ],
+      "CH3bondEnd": [
+        303,
+        43
+      ]
+    },
+    "visibleCoordinatesFullCandidate": {
+      "PhLeft": [
+        5,
+        24
+      ],
+      "PhTop": [
+        35,
+        6
+      ],
+      "PhRight": [
+        65,
+        24
+      ],
+      "chainCH2": [
+        94,
+        6
+      ],
+      "alphaC": [
+        124,
+        23
+      ],
+      "CH3bondEnd": [
+        147,
+        11
+      ]
+    },
+    "approxTransform": "x259≈1.92*(xFull−5)+28;y259≈1.89*(yFull−6)+36,scantolerance1–3px. FontCH3/glyphsubscriptandinnerdoublelocationssameorientation;nativebytes/pixelsnotidentical.",
+    "missingPartNowDirectlyVisible": "FullcandidatePhlower3edges+doublebottomright/bottomNH2(labelNfirstwithsub2),bondalphaC12423→12451,neutralNOcharges/NOstereowedges. Source259missingNH2notguessedchemistry.",
+    "caption": "none",
+    "safeNextStep": "Rootmaycreatecandidateusingfullsourcehashproofandkeepmappingoriginal259+fullduplicate,separatelyfreshSVGnative2sourcecheckbeforeadmission."
+  },
+  "nonExactCandidates": [
+    {
+      "hash": "df82e6b53009b2b5da1b793ead27e78bb9ab504bc5da9f3bd9efd479204a3642",
+      "reason": "SamecompoundnamebutNH2upright/implicitmethylDOWN,original259CH3explicitupright/NH2down;openednativeNOTsamegraphic."
+    },
+    {
+      "hash": "1abc15472e085941b56a965267dba71ed3975cdd12f7688c66906bc137e5ee2c",
+      "reason": "Gridamphetamine+methamphetamine,amphetamineNH2UP/Phleftlowerlink/labels;notoriginalgraphic,onlycorroborativecompoundcontextNOTrecoverybase."
+    }
+  ],
+  "ketQua": "CHƯA ĐẠT SVG/CHƯA manifest: source-onlyevidencefoundfullsamepublicquestionduplicate,notadmittedfromname/pHash/theory. MissingglyphreconstructionneedsrootnewSVGandindependentvisualreview.",
+  "rootKiemManifest1347": "Fullsource1347đãcómanifest:SVGcau-truc-ddh-115f6f94de935c73a8c31c65f207c80d889c1008b96dfd7bd292c38f34061a29.svg/5797B;KHÔNGdựngtrùng1347. CầnmởfreshactualSVGvàsoátRIÊNG259+1347trướcduyệtdùngchung."
+}

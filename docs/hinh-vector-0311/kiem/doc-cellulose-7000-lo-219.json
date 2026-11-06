@@ -1,0 +1,358 @@
+{
+  "hash": "2d018b8b2f83477d81f66ca0aa16fa33d4fc5edea603868e445b7f538065467b",
+  "file": "anh/2d018b8b2f83477d81f66ca0aa16fa33d4fc5edea603868e445b7f538065467b.png",
+  "mime": "image/png",
+  "bytes": 15778,
+  "i": 265,
+  "questions": [
+    {
+      "qid": "12-C2-B6-D1-I-100",
+      "de": "Quan sát cấu trúc phân tử carbohydrate X được cho dưới đây:\nCho các phát biểu về carbohydrate X:\n(a) Phân tử khối của X là 1 134 000.\n(b) X chỉ có cấu trúc mạch không phân nhánh.\n(c) X có vị ngọt hơn glucose.\n(d) X là thành phần chính của các loại hạt như ngô, gạo, đậu, ...\nSố phát biểu đúng là",
+      "refs": [
+        {
+          "hash": "2d018b8b2f83477d81f66ca0aa16fa33d4fc5edea603868e445b7f538065467b",
+          "where": "12-C2-B6-D1-I-100.hinh.0.du_lieu",
+          "hashDataUrl": "c27a3e53e12601e10059e7411f96374641640a15d3464480684f14473a297a4d",
+          "publicPosition": {
+            "where": "12-C2-B6-D1-I-100.hinh.0.du_lieu",
+            "hashDataUrl": "c27a3e53e12601e10059e7411f96374641640a15d3464480684f14473a297a4d",
+            "viTri": "sau_de",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D3-I-96",
+      "de": "Quan sát cấu trúc phân tử carbohydrate X được cho dưới đây:\nCho các phát biểu về carbohydrate X:\n(a) Phân tử khối của X là 1 134 000.\n(b) X chỉ có cấu trúc mạch không phân nhánh.\n(c) X có vị ngọt hơn glucose.\n(d) X là thành phần chính của các loại hạt như ngô, gạo, đậu, ...\nSố phát biểu đúng là",
+      "refs": [
+        {
+          "hash": "2d018b8b2f83477d81f66ca0aa16fa33d4fc5edea603868e445b7f538065467b",
+          "where": "DB-12-B4-D3-I-96.hinh.0.du_lieu",
+          "hashDataUrl": "c27a3e53e12601e10059e7411f96374641640a15d3464480684f14473a297a4d",
+          "publicPosition": {
+            "where": "DB-12-B4-D3-I-96.hinh.0.du_lieu",
+            "hashDataUrl": "c27a3e53e12601e10059e7411f96374641640a15d3464480684f14473a297a4d",
+            "viTri": "sau_de",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        }
+      ]
+    }
+  ],
+  "fileNguon": "anh/2d018b8b2f83477d81f66ca0aa16fa33d4fc5edea603868e445b7f538065467b.png",
+  "nativeSize": [
+    749,
+    348
+  ],
+  "daMoNativeFull": true,
+  "ringFrontZooms": [
+    "/workspace/scratch/cellulose219-ring1-4x.png",
+    "/workspace/scratch/cellulose219-ring2-4x.png",
+    "/workspace/scratch/cellulose219-ring3-4x.png"
+  ],
+  "bracketZoom": "/workspace/scratch/cellulose219-bracket-3x.png",
+  "units": [
+    {
+      "unit": 1,
+      "nodesApprox": {
+        "C4": [
+          87,
+          236
+        ],
+        "C5": [
+          125,
+          198
+        ],
+        "O": [
+          178,
+          198
+        ],
+        "C1": [
+          216,
+          236
+        ],
+        "C2": [
+          178,
+          274
+        ],
+        "C3": [
+          125,
+          274
+        ]
+      },
+      "CH2OH": "C5up,gắnCđầuCH2OH;C5HdownEXPLICIT",
+      "otherSubstituents": {
+        "C4": "Hup;OHdown đầu mạch",
+        "C3": "OHup,Hdown",
+        "C2": "Hup,OHdown",
+        "C1": "bridgeOup-right,Hdown"
+      },
+      "front": {
+        "leftDiagonal": "TAPER:đầuhẹpC4,đầurộngC3",
+        "rightDiagonal": "TAPER:đầuhẹpC1,đầurộngC2",
+        "horizontal": "C3–C2đậmrộngđều~5pxnative"
+      },
+      "explicitStandaloneH": 5
+    },
+    {
+      "unit": 2,
+      "nodesApprox": {
+        "C4": [
+          310,
+          175
+        ],
+        "C5": [
+          348,
+          138
+        ],
+        "O": [
+          401,
+          138
+        ],
+        "C1": [
+          439,
+          175
+        ],
+        "C2": [
+          402,
+          213
+        ],
+        "C3": [
+          348,
+          213
+        ]
+      },
+      "CH2OH": "C5up,gắnCđầuCH2OH;C5HdownEXPLICIT",
+      "otherSubstituents": {
+        "C4": "Hup;bridgeOdown-left",
+        "C3": "OHup,Hdown",
+        "C2": "Hup,OHdown",
+        "C1": "bridgeOup-right,Hdown"
+      },
+      "front": {
+        "leftDiagonal": "TAPER:đầuhẹpC4,đầurộngC3",
+        "rightDiagonal": "TAPER:đầuhẹpC1,đầurộngC2",
+        "horizontal": "C3–C2đậmrộngđều~5pxnative"
+      },
+      "explicitStandaloneH": 5
+    },
+    {
+      "unit": 3,
+      "nodesApprox": {
+        "C4": [
+          531,
+          113
+        ],
+        "C5": [
+          569,
+          76
+        ],
+        "O": [
+          622,
+          76
+        ],
+        "C1": [
+          660,
+          113
+        ],
+        "C2": [
+          623,
+          151
+        ],
+        "C3": [
+          569,
+          151
+        ]
+      },
+      "CH2OH": "C5up,gắnCđầuCH2OH;C5HdownEXPLICIT",
+      "otherSubstituents": {
+        "C4": "Hup;bridgeOdown-left",
+        "C3": "OHup,Hdown",
+        "C2": "Hup,OHdown",
+        "C1": "OHup,Hdown đầu mạch"
+      },
+      "front": {
+        "leftDiagonal": "TAPER:đầuhẹpC4,đầurộngC3",
+        "rightDiagonal": "TAPER:đầuhẹpC1,đầurộngC2",
+        "horizontal": "C3–C2đậmrộngđều~5pxnative"
+      },
+      "explicitStandaloneH": 5
+    }
+  ],
+  "counts": {
+    "rings": 3,
+    "standaloneH": 15,
+    "OH": 8,
+    "CH2OH": 3,
+    "ringO": 3,
+    "bridgeO": 2,
+    "frontTaper": 6,
+    "frontBoldHorizontal": 3,
+    "ellipsis": 0
+  },
+  "bridges": [
+    {
+      "OcenterApprox": [
+        261.5,
+        204
+      ],
+      "bondsApprox": [
+        [
+          [
+            216,
+            236
+          ],
+          [
+            252,
+            210
+          ]
+        ],
+        [
+          [
+            272,
+            198
+          ],
+          [
+            310,
+            175
+          ]
+        ]
+      ]
+    },
+    {
+      "OcenterApprox": [
+        483.5,
+        144.5
+      ],
+      "bondsApprox": [
+        [
+          [
+            439,
+            175
+          ],
+          [
+            474,
+            151
+          ]
+        ],
+        [
+          [
+            494,
+            138
+          ],
+          [
+            531,
+            113
+          ]
+        ]
+      ]
+    }
+  ],
+  "endOH": {
+    "left": {
+      "on": "firstRingC4",
+      "direction": "DOWN",
+      "bondApprox": [
+        [
+          87,
+          236
+        ],
+        [
+          87,
+          265
+        ]
+      ],
+      "labelApprox": [
+        95,
+        278
+      ]
+    },
+    "right": {
+      "on": "thirdRingC1",
+      "direction": "UP",
+      "bondApprox": [
+        [
+          660,
+          113
+        ],
+        [
+          660,
+          87
+        ]
+      ],
+      "labelApprox": [
+        668,
+        77
+      ]
+    }
+  },
+  "brackets": {
+    "left": {
+      "pathApprox": [
+        [
+          297,
+          88
+        ],
+        [
+          287,
+          88
+        ],
+        [
+          287,
+          260
+        ],
+        [
+          297,
+          260
+        ]
+      ]
+    },
+    "right": {
+      "pathApprox": [
+        [
+          502,
+          88
+        ],
+        [
+          512,
+          88
+        ],
+        [
+          512,
+          260
+        ],
+        [
+          502,
+          260
+        ]
+      ]
+    },
+    "index": {
+      "literal": "7 000",
+      "positionApprox": [
+        519,
+        261
+      ],
+      "at": "outsidebracketbottomright",
+      "not": "khôngn/không7,000/khônglũythừa"
+    },
+    "scope": "Mộtmiddlering+nốiOphải;leftbracketcrossincomingbond(272,198)→(310,175),rightbracketcrossoutgoingbond(494,138)→(531,113). Giữcrossingsliteral,khoảngtrốngnàykhôngphảidấuchấmtiếpdiễn."
+  },
+  "caption": [],
+  "notPresent": [
+    "carbonnumbers",
+    "CIPletters",
+    "nrepeat",
+    "ellipsis",
+    "chữcellulosecaption",
+    "arrowheads",
+    "charge",
+    "lờigiải"
+  ],
+  "critical": "Ba ring cùnghướngchéolênphải;6frontdiagonals TAPER đọcđượcrõởnative4x,khôngdùnguniform47. Giữ15H+8OH+3CH2OH cảendOH vàC5Hdown;khôngalias47/160/590.",
+  "nguoiDocNguon": "soat_nguon_2",
+  "trangThai": "Đọcnguồn,chưađạtSVG"
+}

@@ -1,0 +1,40 @@
+[
+  {
+    "i": 265,
+    "hash": "2d018b8b2f83477d81f66ca0aa16fa33d4fc5edea603868e445b7f538065467b",
+    "fileNguon": "anh/2d018b8b2f83477d81f66ca0aa16fa33d4fc5edea603868e445b7f538065467b.png",
+    "svg": "cellulose-7000-ddh-7f72b35df5b19b9e1d6adbf28826a0490cc8603288159f21617ca2fbc01bdc77.svg",
+    "hashSvg": "7f72b35df5b19b9e1d6adbf28826a0490cc8603288159f21617ca2fbc01bdc77",
+    "byteSvg": 28754,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C2-B6-D1-I-100",
+        "de": "Quan sát cấu trúc phân tử carbohydrate X được cho dưới đây:\nCho các phát biểu về carbohydrate X:\n(a) Phân tử khối của X là 1 134 000.\n(b) X chỉ có cấu trúc mạch không phân nhánh.\n(c) X có vị ngọt hơn glucose.\n(d) X là thành phần chính của các loại hạt như ngô, gạo, đậu, ...\nSố phát biểu đúng là",
+        "refs": [
+          {
+            "hash": "2d018b8b2f83477d81f66ca0aa16fa33d4fc5edea603868e445b7f538065467b",
+            "where": "12-C2-B6-D1-I-100.hinh.0.du_lieu",
+            "hashDataUrl": "c27a3e53e12601e10059e7411f96374641640a15d3464480684f14473a297a4d"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-I-96",
+        "de": "Quan sát cấu trúc phân tử carbohydrate X được cho dưới đây:\nCho các phát biểu về carbohydrate X:\n(a) Phân tử khối của X là 1 134 000.\n(b) X chỉ có cấu trúc mạch không phân nhánh.\n(c) X có vị ngọt hơn glucose.\n(d) X là thành phần chính của các loại hạt như ngô, gạo, đậu, ...\nSố phát biểu đúng là",
+        "refs": [
+          {
+            "hash": "2d018b8b2f83477d81f66ca0aa16fa33d4fc5edea603868e445b7f538065467b",
+            "where": "DB-12-B4-D3-I-96.hinh.0.du_lieu",
+            "hashDataUrl": "c27a3e53e12601e10059e7411f96374641640a15d3464480684f14473a297a4d"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3Haworthchéo/15H/8OH/3CH2OH/2bridgeO/6TAPER3horizontalbold/leftOHdown-rightOHup/brackets7 000literal/noaddedcaption-carbonnums/DDHpath.",
+    "hashSvgDaSoat": "7f72b35df5b19b9e1d6adbf28826a0490cc8603288159f21617ca2fbc01bdc77",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

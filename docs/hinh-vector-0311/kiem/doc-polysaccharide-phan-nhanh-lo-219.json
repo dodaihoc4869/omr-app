@@ -1,0 +1,491 @@
+{
+  "i": 225,
+  "hash": "26aeade244c7dd9029e4b3d97d4365c9295cb7e312556ccfedd88edaa4cee2e4",
+  "fileNguon": "anh/26aeade244c7dd9029e4b3d97d4365c9295cb7e312556ccfedd88edaa4cee2e4.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "zooms": [
+    "/workspace/scratch/cau4-branch219-ring1.png",
+    "/workspace/scratch/cau4-branch219-top23.png",
+    "/workspace/scratch/cau4-branch219-lower3.png",
+    "/workspace/scratch/cau4-branch219-toprepeat.png",
+    "/workspace/scratch/cau4-branch219-bottomrepeat.png"
+  ],
+  "questions": [
+    {
+      "qid": "12-KT-C2-D3-I-17",
+      "maDe": "12-KT-C2-D3",
+      "de": "Quan sát hình sau đây:\nCho các phát biểu sau:\n(a) X có nhiều trong trái cây chín.\n(b) X có cấu trúc mạch phân nhánh.\n(c) X có vị ngọt hơn glucose.\n(d) X chiếm tỉ lệ lớn trong thành phần gạo nếp.\nSố phát biểu đúng là",
+      "hinh": [
+        {
+          "hash": "26aeade244c7dd9029e4b3d97d4365c9295cb7e312556ccfedd88edaa4cee2e4",
+          "where": "12-KT-C2-D3-I-17.hinh.0.du_lieu",
+          "hashDataUrl": "534e65612746271d72a1fc0d59b7a6464174763348d667a0b2820c14be629e84"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D3-I-156",
+      "maDe": "DB-12-B4-D3",
+      "de": "Quan sát hình sau đây:\nCho các phát biểu sau:\n(a) X có nhiều trong trái cây chín.\n(b) X có cấu trúc mạch phân nhánh.\n(c) X có vị ngọt hơn glucose.\n(d) X chiếm tỉ lệ lớn trong thành phần gạo nếp.\nSố phát biểu đúng là",
+      "hinh": [
+        {
+          "hash": "26aeade244c7dd9029e4b3d97d4365c9295cb7e312556ccfedd88edaa4cee2e4",
+          "where": "DB-12-B4-D3-I-156.hinh.0.du_lieu",
+          "hashDataUrl": "534e65612746271d72a1fc0d59b7a6464174763348d667a0b2820c14be629e84"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–2pxapprox;TOPm/BOTTOMnconfirmedSEPARATE20xglyphnative.",
+    "rings": [
+      {
+        "ring": {
+          "C4": [
+            62,
+            141
+          ],
+          "C5": [
+            108,
+            92
+          ],
+          "O": [
+            173,
+            94
+          ],
+          "C1": [
+            218,
+            141
+          ],
+          "C2": [
+            172,
+            187
+          ],
+          "C3": [
+            107,
+            187
+          ]
+        },
+        "C6text": "CH₂OH",
+        "C6anchor": [
+          138,
+          51
+        ],
+        "C6target": "Cfirst",
+        "Hlabels": "C4UP/C5DOWN/C3DOWN/C2UP/C1UP=5",
+        "OHlabels": "C3UP/C2DOWN/C4DOWN",
+        "front": "2diagonalUNIFORMnoTAPER+horizontalbold"
+      },
+      {
+        "ring": {
+          "C4": [
+            323,
+            139
+          ],
+          "C5": [
+            371,
+            92
+          ],
+          "O": [
+            436,
+            92
+          ],
+          "C1": [
+            481,
+            139
+          ],
+          "C2": [
+            435,
+            186
+          ],
+          "C3": [
+            371,
+            186
+          ]
+        },
+        "C6text": "CH₂OH",
+        "C6anchor": [
+          401,
+          51
+        ],
+        "C6target": "Cfirst",
+        "Hlabels": "C4UP/C5DOWN/C3DOWN/C2UP/C1UP=5",
+        "OHlabels": "C3UP/C2DOWN",
+        "front": "2diagonalUNIFORMnoTAPER+horizontalbold"
+      },
+      {
+        "ring": {
+          "C4": [
+            591,
+            139
+          ],
+          "C5": [
+            636,
+            92
+          ],
+          "O": [
+            701,
+            94
+          ],
+          "C1": [
+            746,
+            139
+          ],
+          "C2": [
+            701,
+            187
+          ],
+          "C3": [
+            636,
+            187
+          ]
+        },
+        "C6text": "CH₂OH",
+        "C6anchor": [
+          666,
+          51
+        ],
+        "C6target": "Cfirst",
+        "Hlabels": "C4UP/C5DOWN/C3DOWN/C2UP/C1UP=5",
+        "OHlabels": "C3UP/C2DOWN",
+        "front": "2diagonalUNIFORMnoTAPER+horizontalbold"
+      },
+      {
+        "ring": {
+          "C4": [
+            487,
+            389
+          ],
+          "C5": [
+            533,
+            342
+          ],
+          "O": [
+            598,
+            343
+          ],
+          "C1": [
+            643,
+            389
+          ],
+          "C2": [
+            597,
+            437
+          ],
+          "C3": [
+            533,
+            437
+          ]
+        },
+        "C6text": "CH₂OH",
+        "C6anchor": [
+          563,
+          301
+        ],
+        "C6target": "Cfirst",
+        "Hlabels": "C4UP/C5DOWN/C3DOWN/C2UP/C1UP=5",
+        "OHlabels": "C3UP/C2DOWN/C4DOWN",
+        "front": "2diagonalUNIFORMnoTAPER+horizontalbold"
+      },
+      {
+        "ring": {
+          "C4": [
+            748,
+            387
+          ],
+          "C5": [
+            794,
+            339
+          ],
+          "O": [
+            858,
+            340
+          ],
+          "C1": [
+            904,
+            387
+          ],
+          "C2": [
+            858,
+            434
+          ],
+          "C3": [
+            794,
+            434
+          ]
+        },
+        "C6text": "CH₂",
+        "C6anchor": [
+          808,
+          298
+        ],
+        "C6target": "Cfirst",
+        "Hlabels": "C4UP/C5DOWN/C3DOWN/C2UP/C1UP=5",
+        "OHlabels": "C3UP/C2DOWN",
+        "front": "2diagonalUNIFORMnoTAPER+horizontalbold"
+      },
+      {
+        "ring": {
+          "C4": [
+            1012,
+            388
+          ],
+          "C5": [
+            1062,
+            340
+          ],
+          "O": [
+            1127,
+            342
+          ],
+          "C1": [
+            1172,
+            388
+          ],
+          "C2": [
+            1126,
+            435
+          ],
+          "C3": [
+            1062,
+            435
+          ]
+        },
+        "C6text": "CH₂OH",
+        "C6anchor": [
+          1092,
+          299
+        ],
+        "C6target": "Cfirst",
+        "Hlabels": "C4UP/C5DOWN/C3DOWN/C2UP/C1UP=5",
+        "OHlabels": "C3UP/C2DOWN/C1DOWN",
+        "front": "2diagonalUNIFORMnoTAPER+horizontalbold"
+      }
+    ],
+    "externalO": [
+      {
+        "O": [
+          271,
+          177
+        ],
+        "bonds": [
+          [
+            218,
+            141,
+            258,
+            170
+          ],
+          [
+            282,
+            171,
+            323,
+            139
+          ]
+        ]
+      },
+      {
+        "O": [
+          534,
+          176
+        ],
+        "bonds": [
+          [
+            481,
+            139,
+            522,
+            169
+          ],
+          [
+            547,
+            170,
+            591,
+            139
+          ]
+        ]
+      },
+      {
+        "O": [
+          798,
+          176
+        ],
+        "bonds": [
+          [
+            746,
+            139,
+            786,
+            169
+          ],
+          [
+            798,
+            190,
+            798,
+            282
+          ]
+        ],
+        "branch": "verticalO–C6CH₂ofLOWERMIDDLEring,notC5direct/CH2OHadded"
+      },
+      {
+        "O": [
+          694,
+          426
+        ],
+        "bonds": [
+          [
+            643,
+            389,
+            681,
+            419
+          ],
+          [
+            706,
+            419,
+            748,
+            387
+          ]
+        ]
+      },
+      {
+        "O": [
+          958,
+          425
+        ],
+        "bonds": [
+          [
+            904,
+            387,
+            945,
+            418
+          ],
+          [
+            971,
+            418,
+            1012,
+            388
+          ]
+        ]
+      }
+    ],
+    "branchC6": {
+      "literal": "CH₂",
+      "anchor": [
+        808,
+        298
+      ],
+      "topBond": [
+        [
+          798,
+          190
+        ],
+        [
+          798,
+          282
+        ]
+      ],
+      "bottomBond": [
+        [
+          794,
+          314
+        ],
+        [
+          794,
+          339
+        ]
+      ],
+      "target": "Cfirst~794298",
+      "noOHatC6": true
+    },
+    "squareRepeatBrackets": [
+      {
+        "left": [
+          [
+            310,
+            35
+          ],
+          [
+            300,
+            35
+          ],
+          [
+            300,
+            244
+          ],
+          [
+            310,
+            244
+          ]
+        ],
+        "right": [
+          [
+            553,
+            38
+          ],
+          [
+            562,
+            38
+          ],
+          [
+            562,
+            247
+          ],
+          [
+            552,
+            247
+          ]
+        ],
+        "subscript": "m",
+        "subscriptAt": [
+          575,
+          251
+        ]
+      },
+      {
+        "left": [
+          [
+            734,
+            282
+          ],
+          [
+            723,
+            282
+          ],
+          [
+            723,
+            492
+          ],
+          [
+            734,
+            492
+          ]
+        ],
+        "right": [
+          [
+            977,
+            286
+          ],
+          [
+            986,
+            286
+          ],
+          [
+            986,
+            495
+          ],
+          [
+            976,
+            495
+          ]
+        ],
+        "subscript": "n",
+        "subscriptAt": [
+          995,
+          500
+        ]
+      }
+    ],
+    "counts": "6rings/30Hlabels/15OHstandalone/5CH₂OH+1CH₂/6ringO+5externalO/6boldhorizontal+12uniformdiags/2squarebracketpairs(mTOP,nBOTTOM)/NOcaption/NOellipsis/carbonnums.",
+    "terminalGroups": "TopfirstC4OHdown/lowerfirstC4OHdown/lowerrightC1OHdown;nootherendOHadded.",
+    "noAdded": "NoCIP/triangularwedges/nrepeatforcedsame/polymernameX/answer/sourceOHcounttheoryfix."
+  },
+  "verdict": "Đọcsource,chưaactualSVGreview."
+}
