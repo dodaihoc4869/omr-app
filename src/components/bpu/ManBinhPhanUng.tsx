@@ -7,10 +7,8 @@ import { createPortal } from 'react-dom'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { DOI_BPU, KJ, kyHieu, type ViewEm } from '../../lib/bpu/phong'
 import type { Question } from '../../game/than-thu-v2/core'
-import { ChonDungSai, ChonTracNghiem, DeCau, OTraLoiNgan } from '../hoc-tap/LamCau'
-import '../bang-nhiem-vu/m3-theme.css'
-import '../m3/m3.css'
-import '../hoc-tap/hoc-tap.css'
+// Phần hiện câu của chặng nạp ĐỘNG qua mảnh chặng (đã tải sẵn ở Lộ trình) — nhập tĩnh làm bộ đóng gói chia lại mảnh dùng chung (precache + byte mở tăng).
+type MangChang = typeof import('../hoc-tap/ManLamBaiTap')['PHAN_CAU_CHANG']
 import './bpu-hs.css'
 
 const GOC_MAC_DINH = 'https://omr.ttadodaihoc.workers.dev'
@@ -53,6 +51,8 @@ export default function ManBinhPhanUng({ token, buoiId, onDong }: { token: strin
   const luotChon = useRef(0)
   const chuaMo = useRef(false)
   const soLuot = v?.luot?.so ?? 0
+  const [LC, setLC] = useState<MangChang | null>(null)
+  useEffect(() => { let huy = false; void import('../hoc-tap/ManLamBaiTap').then((m) => { if (!huy) setLC(m.PHAN_CAU_CHANG) }).catch(() => {}); return () => { huy = true } }, [])
 
   const gui = useCallback((t: Tin) => {
     const w = ws.current
@@ -189,7 +189,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong }: { token: strin
             <button type="button" aria-pressed={g.emDoan === 0} disabled={g.emDoan !== null} onClick={() => gui({ t: 'doan', v: 0 })}>Chưa đúng</button>
           </div>
           <p className="nho">Đoán đúng +{KJ.doanDung} kJ cho em. Mỗi lần chạm nút dưới, một tia lửa bay lên bảng tới bạn ấy.</p>
-          {q ? <div className="bpu-de-xem"><span className="m3-chip">Đề trên bảng · chỉ xem</span><DeCau q={q} stt={l.so} /></div> : null}
+          {q ? <div className="bpu-de-xem"><span className="m3-chip">Đề trên bảng · chỉ xem</span>{LC ? <LC.DeCau q={q} stt={l.so} /> : <p className="bpu-de-tho">{q.text}</p>}</div> : null}
         </>
       )
       day = <button type="button" className="bpu-nut tiep" style={{ ['--doi' as string]: `var(${DOI_BPU[g.doi]?.mau})` }} disabled={g.emTiep >= 10} onClick={() => gui({ t: 'tiep' })}>{cung ? `Tiếp sức ${DOI_BPU[g.doi]?.ten}` : 'Cổ vũ bạn ấy'} · {g.emTiep}/10</button>
@@ -201,11 +201,11 @@ export default function ManBinhPhanUng({ token, buoiId, onDong }: { token: strin
     than = (
       <>
         <span className="m3-chip bpu-chip">{l.tuLuan ? 'Tự luận · làm ra giấy' : l.phan === 'I' ? 'Trắc nghiệm' : l.phan === 'II' ? 'Đúng–sai' : 'Trả lời ngắn'}</span>
-        <DeCau q={q} stt={l.so} />
+        {LC ? <LC.DeCau q={q} stt={l.so} /> : <p className="bpu-de-tho">{q.text}</p>}
         {l.tuLuan ? <div className="bpu-the">Câu này thầy chữa trên bảng, máy không chấm. Em làm ra giấy, xong thì bấm nút bên dưới.</div>
-          : l.phan === 'I' ? <ChonTracNghiem q={q} value={chonHien} onChon={(x) => setChon(x)} khoa={daGui || daMo} />
-          : l.phan === 'II' ? <ChonDungSai q={q} value={chonHien.padEnd(4, ' ')} onChon={(i, x) => setChon((c) => { const a = c.padEnd(4, ' ').split(''); a[i] = x; return a.join('') })} khoa={daGui || daMo} />
-          : <div className="bpu-tln"><OTraLoiNgan value={chonHien} soO={q.soO} />{!daGui && !daMo ? <div className="bpu-phim">{PHIM_SO.map((p) => <button type="button" key={p} onClick={() => phimSo(p)} aria-label={p === '−' ? 'Đổi dấu' : p}>{p}</button>)}<button type="button" className="xoa" onClick={() => setChon((c) => c.slice(0, -1))}>Xoá</button></div> : null}</div>}
+          : !LC ? <p className="nho">Đang tải phương án…</p> : l.phan === 'I' ? <LC.ChonTracNghiem q={q} value={chonHien} onChon={(x) => setChon(x)} khoa={daGui || daMo} />
+          : l.phan === 'II' ? <LC.ChonDungSai q={q} value={chonHien.padEnd(4, ' ')} onChon={(i, x) => setChon((c) => { const a = c.padEnd(4, ' ').split(''); a[i] = x; return a.join('') })} khoa={daGui || daMo} />
+          : <div className="bpu-tln"><LC.OTraLoiNgan value={chonHien} soO={q.soO} />{!daGui && !daMo ? <div className="bpu-phim">{PHIM_SO.map((p) => <button type="button" key={p} onClick={() => phimSo(p)} aria-label={p === '−' ? 'Đổi dấu' : p}>{p}</button>)}<button type="button" className="xoa" onClick={() => setChon((c) => c.slice(0, -1))}>Xoá</button></div> : null}</div>}
         {baoTra ? <div className="bpu-bao" role="status">{baoTra}</div> : null}
         {tt === 'mat-mang' ? <div className="bpu-bao" role="status">Mất kết nối, đang nối lại… Đáp án em chọn vẫn giữ trên máy, nối lại là gửi.</div> : null}
       </>

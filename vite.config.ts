@@ -368,6 +368,13 @@ export default defineConfig({
         // vẫn tải được, tải một lần rồi cất ở kho chạy-lúc (`omr-manh-chay-lan`, xem src/sw.ts). `scripts/kiem-sw.mjs` chặn precache phình to lại.
         globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm,data,woff2}'],
         globIgnores: [
+          // Bình Phản Ứng (06/11): bảng chiếu + bộ nghe phím P chỉ máy thầy dùng ⇒ kho chạy-lúc (precache giữ trần 170 tệp). Màn máy em vẫn precache bình thường.
+          '**/BangBinhPhanUng-*.{js,css}',
+          '**/gan-gv-*.{js,css}',
+          '**/gan-hs-*.{js,css}',
+          // Màn máy em cũng ra kho chạy-lúc: chỉ mở khi lớp đang chơi (cần mạng sẵn) ⇒ không làm phình lượt cài.
+          '**/ManBinhPhanUng-*.{js,css}',
+          '**/phong-*.js',
           // Lời giải Kính (thầy chốt 02/11): khung + bộ tải sẵn chỉ app học sinh dùng ⇒ kho chạy-lúc + kho tải ngầm học sinh (KHO_HS_GOC), precache giữ 170.
           '**/LoiGiaiKinhHs-*.{js,css}',
           '**/tai-san-*.js',

@@ -30,6 +30,8 @@ import '../../styles/trong-gv-diem-danh.css' // «Trong» 26/10 — chỉ áp kh
 
 const HoSoLamCauEm = lazy(() => import('../chien-dich/HoSoLamCauEm'))
 const BanChieuDiemDanh = lazy(() => import('./BanChieuDiemDanh'))
+// Thầy 06/11 «bỏ kiểu điểm danh hiện tại, thiết kế lại cho phù hợp game lên bảng»: bản chiếu điểm danh = MỞ MÀN Bình Phản Ứng. Máy chủ tắt (`TAT_BPU`) ⇒ lùi về bản chiếu cũ.
+const BangBinhPhanUng = lazy(() => import('../bpu/BangBinhPhanUng'))
 
 /** Số dòng "Vừa điểm danh" hiện sẵn (bản vẽ: 6); còn lại mở bằng "Xem cả N em có mặt". */
 export const SO_VUA_DIEM_DANH = 6
@@ -282,6 +284,7 @@ export default function Buoc1DiemDanh({
   const bang = useMemo(() => nhipTheoSbd(nhip.kq), [nhip.kq])
   const tk = useMemo(() => thongKeBuoi(tt, bang), [tt, bang])
   const [banChieu, setBanChieu] = useState<CheDoChieu | null>(null)
+  const [bpuTat, setBpuTat] = useState(false)
   const [hoSo, setHoSo] = useState<EmHoSo | null>(null)
   const [moVua, setMoVua] = useState(false)
   const [moVang, setMoVang] = useState(false)
@@ -699,7 +702,11 @@ export default function Buoc1DiemDanh({
         )}
       </section>
 
-      {banChieu && tt && (
+      {banChieu === 'diem-danh' && tt && !bpuTat && !!tt.buoi.id ? (
+        <Suspense fallback={null}>
+          <BangBinhPhanUng buoiId={tt.buoi.id} ma={tt.ma} linkQr={tt.ma ? linkDiemDanh(goc, tt.ma) : null} onDong={dongChieu} onTat={() => setBpuTat(true)} />
+        </Suspense>
+      ) : banChieu && tt && (
         <Suspense fallback={null}>
           <BanChieuDiemDanh
             cheDo={banChieu}

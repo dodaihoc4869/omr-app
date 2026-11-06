@@ -61,7 +61,7 @@ export function moKenhDay(token: string): () => void {
         daMo = true
       }
       // BÌNH PHẢN ỨNG (06/11): tin `bpu` = thầy vừa chiếu câu cho cả lớp ⇒ CHỈ mở màn Bình Phản Ứng (không đọc lại Lộ trình: 40 máy đọc cùng lúc là nghẽn).
-      w.onmessage = (e) => { if (typeof e.data !== 'string' || !e.data.includes('"doi"')) return; if (e.data.includes('"bpu"')) { window.dispatchEvent(new CustomEvent('ddh:bpu')); return } if (e.data.includes('"goi"')) napGoi(true); bao() }
+      w.onmessage = (e) => { if (typeof e.data !== 'string' || !e.data.includes('"doi"')) return; if (e.data.includes('"bpu"')) { void import('../components/bpu/gan-hs').then((m) => m.moBpuHs(token, null)).catch(() => {}); return } if (e.data.includes('"goi"')) napGoi(true); bao() }
       w.onclose = () => { if (ws !== w) return; ws = null; tatPing(); henLai() }
       w.onerror = () => { try { w.close() } catch { /* đã đóng */ } }
     } catch {

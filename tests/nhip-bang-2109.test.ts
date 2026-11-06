@@ -20,6 +20,8 @@ const KHONG_GOI_MAY_CHU: Record<string, number> = {
   'src/components/NutNopBtvn.tsx': 1,
   'src/components/PhongChoGame.tsx': 0, // 01/10: Chuyến bay dùng RAF, bỏ đồng hồ cao độ 100 ms
   'src/components/bang-nhiem-vu/LamCauOn.tsx': 1, // 20/10 đo giây (thầy: mọi câu đều đo được): 1 s cộng giây câu em đang làm, CHỈ cục bộ (không gọi máy chủ); dừng khi tab ẩn / 180 giây không chạm
+  'src/components/bpu/BangBinhPhanUng.tsx': 2, // 06/11 Bình Phản Ứng (bảng chiếu máy thầy): 0,5 s vẽ đồng hồ êm + 45 s ping WebSocket (phòng tự trả pong, không đánh thức, không D1)
+  'src/components/bpu/ManBinhPhanUng.tsx': 2, // 06/11 Bình Phản Ứng (máy em): 0,5 s vẽ đồng hồ êm + 45 s ping WebSocket (phòng tự trả pong, không đánh thức, không D1)
   'src/components/hoc-tap/ManLamBaiTap.tsx': 1, // 20/10 đo giây: 1 s cộng giây câu đang hiện, CHỈ cục bộ (không gọi máy chủ); dừng khi tab ẩn / 180 giây không chạm
   'src/components/bang-tin-san/hooks.ts': 1, // 1 s đồng hồ câu Bi-a (chấm qua `answer` một lần khi em chốt, không có vòng hỏi)
   'src/components/giam-thi/giam-thi-ve.ts': 1, // 27/10 giám thị theo mức câu: 34 ms gõ dần chữ bong bóng càu nhàu (≤ 42 kí tự rồi tự dừng); chỉ cục bộ, không gọi máy chủ

@@ -1067,6 +1067,14 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
   document.addEventListener('mc-vao-dot', dongSai); // tờ vừa nối app (cầu nối): hiện nút chỉ dùng được khi có app
   document.addEventListener('mc-thay-chua', function () { veThanh(); baoNhanh('Đã ghi: Thầy chữa — không gọi em'); });
   function thayChuaDot() { var d = dot(); return !!(d && d.hasAttribute && d.hasAttribute('data-thay-chua')); }
+  // BÌNH PHẢN ỨNG (06/11): phím P «Cả lớp làm» ⇒ báo app (cửa sổ cha / cửa sổ đã mở tờ) câu đang chiếu; app mở bảng + gửi câu xuống máy cả lớp.
+  function caLopLam() {
+    var d = dot(), q = d && d.getAttribute && d.getAttribute('data-qid');
+    if (!q) { baoNhanh('Câu này chưa gửi xuống máy em được'); return; }
+    var dich = window.parent && window.parent !== window ? window.parent : window.opener;
+    if (!dich) { baoNhanh('Mở tờ chiếu từ app thầy để dùng Cả lớp làm'); return; }
+    try { dich.postMessage({ nguon: 'to-chieu', loai: 'bpu', qid: q }, '*'); baoNhanh('Đang gửi câu xuống máy cả lớp…'); } catch (e) { baoNhanh('Chưa gửi được, thầy thử lại'); }
+  }
   function lenh(k) {
     if ((k === 'L' || k === 'D' || k === 'K' || k === 'C') && thayChuaDot()) { baoNhanh('Câu này thầy chữa — không gọi em'); return; }
     switch (k) {
@@ -1078,6 +1086,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
       case 'K': cham(false); break;
       case 'T': batTk(); break;
       case 'B': batBut(); break;
+      case 'P': caLopLam(); break;
       case 'Tab': if (luoi.classList.contains('mc-mo')) luoi.classList.remove('mc-mo'); else moLuoi(); break;
       case '?': if (phim.classList.contains('mc-mo')) phim.classList.remove('mc-mo'); else moPhim(); break;
       case '→': toiDot(chiSo() + 1); break;
@@ -1112,7 +1121,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
     if (/^[0-9]$/.test(k)) { S.soGo = (S.soGo + k).slice(-3); baoNhanh('Tới đợt: ' + S.soGo + '  ↵ Enter', 0); return; }
     if (k === 'Backspace' && S.soGo) { S.soGo = S.soGo.slice(0, -1); baoNhanh(S.soGo ? 'Tới đợt: ' + S.soGo + '  ↵ Enter' : '', 0); return; }
     if (k === 'Enter' && S.soGo) { var n = +S.soGo; S.soGo = ''; luoi.classList.remove('mc-mo'); e.preventDefault(); toiDot(n - 1); return; }
-    var MAP = { l: 'L', g: 'G', d: 'D', k: 'K', c: 'C', x: 'X', t: 'T', b: 'B', Tab: 'Tab', '?': '?', ArrowRight: '→', ArrowLeft: '←', ' ': 'SP', ArrowDown: '↓', PageDown: '↓', ArrowUp: '↑', PageUp: '↑', Home: 'H', End: 'E' };
+    var MAP = { p: 'P', l: 'L', g: 'G', d: 'D', k: 'K', c: 'C', x: 'X', t: 'T', b: 'B', Tab: 'Tab', '?': '?', ArrowRight: '→', ArrowLeft: '←', ' ': 'SP', ArrowDown: '↓', PageDown: '↓', ArrowUp: '↑', PageUp: '↑', Home: 'H', End: 'E' };
     var m = MAP[k] || MAP[k.toLowerCase ? k.toLowerCase() : k];
     if (!m) return;
     e.preventDefault();

@@ -18,6 +18,7 @@ import {experimentHtml,experimentOriginal} from './experiments/render'
 // Chữ và công thức đi qua đúng `chuHtml` của phiếu, nên mhchem, chỉ số dưới và
 // ký tự hoá học hiện y như mọi tờ khác. Lời giải dùng lại `oGiaiHtml` — cùng
 // một khuôn với báo cáo và phiếu, không dựng khuôn thứ hai.
+import { ngheBpuToChieu } from './bpu/nghe-to-chieu'
 import { chuPhuongAn } from './anh-phuong-an'
 import type { CauLuyen } from './bai-tap-pdf'
 import { CSS_PHIEU, anhHtml, bangHtml, chuHtml, dapAnChu, hinhTaiViTri, oGiaiHtml, thoat } from './html-phieu'
@@ -363,7 +364,8 @@ function dotMotEmHtml(o: OBang, soDot: number, tuyChon: TuyChonMayChieu): string
   const secondsAttr = tuyChon.dayHoc ? `data-seconds="${thoiGianDayHoc(o)}"` : ''
   const ma = `giai-${soDot}-don`
   const gio = gioCuaO(o, Boolean(tuyChon.dayHoc))
-  return `<div class="mc-dot mc-dot-don" data-dot="${soDot}" ${secondsAttr}>
+  const qidDot = String(o.qid || o.cau.id || '').replace(/[^A-Za-z0-9_~|:.#-]/g, '')
+  return `<div class="mc-dot mc-dot-don" data-dot="${soDot}" ${secondsAttr}${qidDot ? ` data-qid="${qidDot}"` : ''}>
   <section class="mc-nua mc-don"${tuyChon.dayHoc ? ` data-giay="${thoiGianDayHoc(o)}"` : ''} data-lam="${gio.lam}" data-chua="${gio.chua}" data-lam0="${gio.lam0}" data-chua0="${gio.chua0}">
     ${o.chuaCuoi ? '' : `<button type="button" class="mc-nut-hien-em mc-nut-giai" aria-expanded="false" aria-controls="em-${ma}">Hiện học sinh và thần thú →</button>${headerEmHtml(o, ma)}`}
     <div class="mc-vung-de">${thongKeHtml(o.thongKe)}${dauDeHtml(o)}<div class="mc-than">${o.chuaCuoi ? `<p class="mc-de">${chuDeChieu(o.chuaCuoi)}</p>` : ''}${thanCauHtml(o.cau,Boolean(o.chuaCuoi))}</div>
@@ -1107,6 +1109,7 @@ const JS_MAY_CHIEU = `
  * Dựng tờ máy chiếu từ danh sách ô bảng, MỘT ô một đợt (bản vẽ 28/09: bỏ đợt đôi ½ bảng).
  */
 export function taoHtmlMayChieu(dsO: OBang[], tuyChonGoc: TuyChonMayChieu = {}): string {
+  ngheBpuToChieu() // Bình Phản Ứng: phím P «Cả lớp làm» của tờ này mở bảng + gửi câu xuống máy cả lớp
   // Chuẩn hoá mã phiên MỘT lần rồi mọi chỗ cùng đọc: mã rỗng/toàn ký tự lạ = KHÔNG có cầu nối (không nút, không mã).
   const maPhien = chuanMaPhien(tuyChonGoc.cauNoi?.maPhien)
   const tuyChon: TuyChonMayChieu = { ...tuyChonGoc, cauNoi: maPhien ? { maPhien } : undefined }
@@ -1143,6 +1146,7 @@ ${coAiSai ? '    <button type="button" class="mc-nut-phim" data-k="X" hidden><kb
 ${tuyChon.chuaBai ? `    ${NUT_GOI}\n` : ''}    <button type="button" class="mc-nut-phim" data-k="G"><kbd>G</kbd><span class="mc-nut-chu">Giải</span></button>
     <button type="button" class="mc-nut-phim" data-k="T"><kbd>T</kbd><span class="mc-nut-chu">Thống kê</span></button>
 ${tuyChon.chuaBai ? `    ${NUT_THU_GON}\n` : ''}    <button type="button" class="mc-nut-phim" data-k="B"><kbd>B</kbd><span class="mc-nut-chu">Bút</span></button>
+    <button type="button" class="mc-nut-phim" data-k="P" title="Bình Phản Ứng: câu đang chiếu hiện trên máy cả lớp"><kbd>P</kbd><span class="mc-nut-chu">Cả lớp làm</span></button>
     <button type="button" class="mc-nut-phim" data-k="Tab"><kbd>Tab</kbd><span class="mc-nut-chu">Tổng quan</span></button>
     <button type="button" class="mc-nut-phim" data-k="?"><kbd>?</kbd><span class="mc-nut-chu">Phím</span></button>
   </div>

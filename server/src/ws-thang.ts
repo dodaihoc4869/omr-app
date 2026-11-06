@@ -1,0 +1,42 @@
+// CỬA ĐI THẲNG + LỆNH BÌNH PHẢN ỨNG (tách khỏi index.ts 07/11 để tệp chính không phình — cổng kiem-co-tep).
+// WebSocket phải đi THẲNG, trước mọi lớp bọc của index.ts (lớp bọc dựng lại Response ⇒ mất kết nối 101). Nội dung các nhánh giữ nguyên như trước khi tách.
+import type { Env, ExecutionContext } from './kieu'
+import { vaoPhongDau } from './dau-ion-ve'
+import { DAU_TRONG_NGAN, vaoKenh } from './ngan-hoc-sinh'
+import { DUONG_KENH } from './kenh-day'
+import { hsDiemDanh } from './buoi-hoc'
+import { gameIdentity } from './game-v2-auth'
+import { DUONG_PHONG_BPU, baoPhongVaoLop, gvBpuLuot, gvBpuMo, hsBpuCuaEm, hsBpuVe, vaoPhongBpu } from './phong-binh-phan-ung'
+
+type Row = Record<string, unknown>
+
+export function wsThang(req: Request, env: Env, ctx?: ExecutionContext): Promise<Response> | null {
+  if (req.method !== 'GET') return null
+  const u = req.url
+  // ĐẤU ION (30/10): nâng cấp WebSocket vào phòng đấu của ca.
+  if (u.includes('/dau-ion/') && new URL(u).pathname.startsWith('/dau-ion/')) return vaoPhongDau(req, env)
+  // BÌNH PHẢN ỨNG (06/11): nâng cấp WebSocket vào phòng của buổi; vé kiểm ở phong-binh-phan-ung.ts.
+  if (u.includes(DUONG_PHONG_BPU) && new URL(u).pathname === DUONG_PHONG_BPU) return vaoPhongBpu(req, env)
+  // KÊNH ĐẨY HAI THIẾT BỊ (31/10, kenh-day.ts): nâng cấp WebSocket vào ngăn của em.
+  if (u.includes(DUONG_KENH) && new URL(u).pathname === DUONG_KENH && !req.headers.has(DAU_TRONG_NGAN)) return vaoKenh(req, env, ctx)
+  return null
+}
+
+/** `/hs/diem-danh` + báo phòng Bình Phản Ứng của buổi (nếu đang mở) để bảng hiện em vào lớp NGAY; lỗi báo phòng không ảnh hưởng điểm danh. */
+export async function hsDiemDanhBao(env: Env, b: Row): Promise<Row> {
+  const r = await hsDiemDanh(env, b)
+  if (r.ok && r.buoi) await gameIdentity(env, b).then((sbd) => baoPhongVaoLop(env, (r.buoi as { id?: unknown }).id, sbd)).catch(() => undefined)
+  return r
+}
+/** `/hs/bpu/*` (token em). */
+export async function bpuHs(env: Env, p: string, b: Row): Promise<Row> {
+  if (p === '/hs/bpu/ve') return hsBpuVe(env, b)
+  if (p === '/hs/bpu/cua-em') return hsBpuCuaEm(env, b)
+  return { ok: false, error: 'Không có lệnh này.' }
+}
+/** `/gv/bpu/*` (sau chốt mã bí mật của thầy). */
+export async function bpuGv(env: Env, p: string, b: Row): Promise<Row> {
+  if (p === '/gv/bpu/mo') return gvBpuMo(env, b)
+  if (p === '/gv/bpu/luot') return gvBpuLuot(env, b)
+  return { ok: false, error: 'Không có lệnh này.' }
+}

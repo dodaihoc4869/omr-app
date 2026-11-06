@@ -1,0 +1,80 @@
+// Bình Phản Ứng — giao diện máy em + bảng chiếu với phòng giả (WebSocket giả, dữ liệu từ luật phòng thật): đi đủ các màn, không vỡ, chữ đúng chuẩn.
+import { act, render, screen, waitFor } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { goiLenBang, lamBang, moDapAn, moLuot, nhanTra, taoPhong, viewBang, viewEm, ketThuc } from '../src/lib/bpu/phong'
+
+vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu' }))
+vi.mock('../src/lib/goi-lenh-thay', () => ({ goiLenh: async () => ({ ok: true, du: { ok: true, ve: 've-thay' } }) }))
+vi.mock('../src/lib/ung-vien-chieu', () => ({ layEmChieu: async () => new Map() }))
+
+class WsGia { static ds: WsGia[] = []; readyState = 1; gui: string[] = []; onopen?: () => void; onmessage?: (e: { data: string }) => void; onclose?: () => void; onerror?: () => void
+  constructor(public url: string) { WsGia.ds.push(this); setTimeout(() => this.onopen?.(), 0) }
+  send(d: string) { this.gui.push(d) } close() {} nhan(v: unknown) { act(() => { this.onmessage?.({ data: JSON.stringify(v) }) }) } }
+
+const T0 = Date.now()
+const chamSo = (a: string, b: string) => a === b
+const phong = () => taoPhong({ buoiId: 'b1', lop: '12A1', nay: T0, ds: [{ sbd: 'S1', ten: 'Nguyễn Minh Anh', coMat: true, luc: T0 }, { sbd: 'S2', ten: 'Trần Gia Bảo', coMat: true, luc: T0 }] })
+const cau = { qid: 'q1', phan: 'I' as const, tuLuan: false, cau: { qid: 'q1', maDe: 'm', phan: 'I', text: 'Chất nào là amine bậc hai?', choices: ['CH3NH2', 'CH3NHCH3', '(CH3)3N', 'C6H5NH2'], ideas: [], hinhAnh: [], kienThuc: [] }, dung: 'B', hanGiay: 60 }
+
+beforeEach(() => { WsGia.ds = []; vi.stubGlobal('WebSocket', WsGia); vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ ok: true, ve: 've-em', buoiId: 'b1' })))) })
+afterEach(() => { vi.unstubAllGlobals() })
+
+describe('máy em', () => {
+  it('chờ → câu → đã gửi → đoán bạn lên bảng → kết quả → kết thúc', async () => {
+    const { default: Man } = await import('../src/components/bpu/ManBinhPhanUng')
+    render(<Man token="tok" buoiId="b1" onDong={() => {}} />)
+    await waitFor(() => expect(WsGia.ds.length).toBe(1))
+    const ws = WsGia.ds[0]!
+    expect(ws.url).toBe('wss://may-chu/bpu/phong?ve=ve-em')
+    const st = phong()
+    ws.nhan(viewEm(st, 'S1'))
+    expect(await screen.findByText(/Em đã vào lớp lúc/)).toBeTruthy()
+    moLuot(st, cau, T0); ws.nhan(viewEm(st, 'S1'))
+    expect(await screen.findByRole('button', { name: 'Gửi đáp án' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: /Thoát|Đóng/ })).toBeNull()
+    nhanTra(st, 'S1', 'B', T0 + 3000); ws.nhan(viewEm(st, 'S1'))
+    expect(await screen.findByText(/Đã gửi sau 3 giây/)).toBeTruthy()
+    goiLenBang(st, 'S2', ['Lý do một', 'Lý do hai'], T0); ws.nhan(viewEm(st, 'S1'))
+    expect(await screen.findByText('Em đoán bạn ấy làm đúng không?')).toBeTruthy()
+    expect(screen.getByRole('button', { name: /Cổ vũ bạn ấy|Tiếp sức/ })).toBeTruthy()
+    lamBang(st, T0); moDapAn(st, T0 + 5000, chamSo); ws.nhan(viewEm(st, 'S1'))
+    expect(await screen.findByText('Chính xác!')).toBeTruthy()
+    ketThuc(st, T0); ws.nhan(viewEm(st, 'S1'))
+    expect(await screen.findByRole('button', { name: 'Về chặng đang làm' })).toBeTruthy()
+    expect(document.body.textContent).not.toMatch(/tinh thể|mẻ/i)
+  })
+  it('em được gọi lên bảng thấy lý do', async () => {
+    const { default: Man } = await import('../src/components/bpu/ManBinhPhanUng')
+    render(<Man token="tok" buoiId="b1" onDong={() => {}} />)
+    await waitFor(() => expect(WsGia.ds.length).toBe(1))
+    const st = phong(); moLuot(st, cau, T0); goiLenBang(st, 'S1', ['Em đã tự làm đúng câu này trên app: lên giảng lại cho cả lớp.'], T0)
+    WsGia.ds[0]!.nhan(viewEm(st, 'S1'))
+    expect(await screen.findByText('Em được mời lên bảng!')).toBeTruthy()
+    expect(screen.getByText(/lên giảng lại cho cả lớp/)).toBeTruthy()
+  })
+})
+
+describe('bảng chiếu', () => {
+  it('điểm danh → lượt → gọi lên bảng → mở đáp án → vinh danh', async () => {
+    const { default: Bang } = await import('../src/components/bpu/BangBinhPhanUng')
+    render(<Bang buoiId="b1" ma="482715" linkQr="https://app/hs?diem-danh=482715" onDong={() => {}} />)
+    await waitFor(() => expect(WsGia.ds.length).toBe(1))
+    const ws = WsGia.ds[0]!
+    const st = phong()
+    ws.nhan(viewBang(st))
+    expect(await screen.findByText('Vào lớp: mở app, nhập mã')).toBeTruthy()
+    expect(screen.getByRole('img', { name: 'Mã QR điểm danh' })).toBeTruthy()
+    moLuot(st, cau, T0); nhanTra(st, 'S1', 'B', T0 + 1000); ws.nhan(viewBang(st))
+    expect(await screen.findByText(/em đã gửi/)).toBeTruthy()
+    goiLenBang(st, 'S2', ['Lý do A', 'Lý do B', 'Lý do C'], T0); ws.nhan(viewBang(st))
+    expect(await screen.findByText('Mời em lên bảng')).toBeTruthy()
+    expect(screen.getByText('Lý do B')).toBeTruthy()
+    lamBang(st, T0); ws.nhan(viewBang(st))
+    expect(await screen.findByText('Đang làm trên bảng')).toBeTruthy()
+    moDapAn(st, T0 + 3000, chamSo); ws.nhan(viewBang(st))
+    expect(await screen.findByText('Đáp án')).toBeTruthy()
+    act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'v' })) })
+    expect(await screen.findByText('Vô địch buổi hôm nay')).toBeTruthy()
+    expect(document.body.textContent).not.toMatch(/tinh thể|Cần kèm/)
+  })
+})
