@@ -13,6 +13,8 @@ import type { EmNhipHoc } from '../server/src/nhip-hoc-kieu'
 const { goi } = vi.hoisted(() => ({ goi: vi.fn() }))
 vi.mock('../src/lib/goi-lenh-thay', () => ({ goiLenh: (duong: string, body: Record<string, unknown>) => goi(duong, body) }))
 vi.mock('../src/components/hop-thoai', () => ({ hoiXacNhan: async () => true }))
+// 06/11: bản chiếu điểm danh mặc định là bảng Bình Phản Ứng; tệp này khoá bản chiếu CŨ A/B (đường lùi khi máy chủ tắt `TAT_BPU`) ⇒ giả lập máy chủ tắt.
+vi.mock('../src/components/bpu/BangBinhPhanUng', async () => { const { useEffect } = await import('react'); return { default: function BangGiaTat({ onTat }: { onTat?: () => void }) { useEffect(() => { onTat?.() }, [onTat]); return null } } })
 vi.mock('../src/components/chien-dich/HoSoLamCauEm', () => ({
   default: (p: { em: { sbd: string; ten: string; lop?: string; khoi: string | null }; onDong: () => void }) => (
     <div role="dialog" aria-label="Hồ sơ làm bài">
