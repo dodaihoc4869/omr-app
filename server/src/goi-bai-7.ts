@@ -639,7 +639,9 @@ async function lapGoi7Tho(env: Env, sbd: string, now: number, gsSom?: Promise<{ 
   const coThe = soDaLam + plan.viec.length
   // (30/10, em báo «có 3 câu»: ca kiểm tra 269333 mở 18:20 khoá TẠM câu bài ⇒ kế hoạch rỗng ⇒ mức bị hạ VĨNH VIỄN xuống số câu đã làm) — thiếu câu vì đang có ca
   // kiểm tra (`khoaCaThi`) KHÔNG phải kho thiếu: giữ nguyên mức, câu mở lại khi ca đóng (Lộ trình nói rõ «Đang có ca kiểm tra»).
-  if (coThe < toiThieu && vaoPlan.onSom && !vuaLam.size && soDaLam > 0 && hs.cau.length >= soDaLam && muc7.daChot && khoaCaThi === 0) {
+  // (06/11) Trước đòi «đã làm > 0» ⇒ kho thiếu ngay LẦN MỞ ĐẦU NGÀY (em lên tầng 2, mức 30, bài chỉ còn 27 câu xếp được) thì vòng tròn «còn 30» mà thể lực 27.
+  // Nay hạ cả lúc chưa làm câu nào; chỉ chặn hạ về 0 (`coThe > 0`: hồ sơ / kho đọc rỗng thì không đoán).
+  if (coThe < toiThieu && coThe > 0 && vaoPlan.onSom && !vuaLam.size && hs.cau.length >= soDaLam && muc7.daChot && khoaCaThi === 0) {
     toiThieu = coThe
     som(envGhiRieng(env).DB.prepare('UPDATE goi_bai_7_muc_ngay SET muc=? WHERE sbd=? AND ngay=? AND muc>?').bind(coThe, sbd, ngay, coThe).run())
       .catch((e: unknown) => console.error('[goi7] chưa hạ được mức hôm nay khi hết câu:', e instanceof Error ? e.message : e))

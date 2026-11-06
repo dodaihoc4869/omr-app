@@ -157,13 +157,13 @@ describe('Ca 3 · Gói 7, lịch câu mới 32 > mức tầng 24 (ảnh thầy 1
 
 describe('Ca 2 · Gói 7, lịch câu mới 3 < mức tầng', () => {
   /** Hôm qua (11/10, 20:00) em mở bài và gặp 22/40 câu ⇒ hôm nay còn 18 câu chưa gặp / 6 ngày ⇒ lịch 3 câu mới; 22 câu đã gặp thành câu ôn / sửa. */
-  async function homQua22() {
+  async function homQua22(dung: (i: number) => boolean = (i) => i % 4 !== 1) {
     const k = await khoGoi7(40)
     const HQ = Date.parse('2026-10-11T13:00:00Z')
     const s = await sanh(k.env, k.token, HQ)
     expect(s.goi7.toiThieu).toBe(24)
     const viec = (await lapGoi7(k.env, 'S1', HQ + PHUT))!.plan.viec
-    for (const [i, v] of viec.slice(0, 22).entries()) await lam(k.env, 'S1', qidGoc(v.qid), HQ + (2 + i) * PHUT, i % 4 !== 1, { cauVersion: 'v1' })
+    for (const [i, v] of viec.slice(0, 22).entries()) await lam(k.env, 'S1', qidGoc(v.qid), HQ + (2 + i) * PHUT, dung(i), { cauVersion: 'v1' })
     return k
   }
   it('M = mức tầng (lịch 3 nhỏ hơn); kế hoạch = M − đã làm câu, 3 câu mới theo lịch đứng đầu; mọi phía cùng số — hôm nay và hôm qua (22/24 thiếu 2)', async () => {
@@ -189,6 +189,42 @@ describe('Ca 2 · Gói 7, lịch câu mới 3 < mức tầng', () => {
     // hôm qua: dòng chốt 24 (lịch 6 < 24), làm 22 ⇒ thiếu 2 ở mọi bảng thầy
     const hq = (await ngayBaiCuaMotEm(k.env, 'S1', '2026-10-11', '2026-10-11', HOM_NAY))![0]!
     expect([hq.mucToiThieu, hq.daLam, hq.thieu, hq.datMuc, hq.nguonMuc]).toEqual([24, 22, 2, false, 'da-chot'])
+  })
+
+  // KHO THIẾU NGAY LẦN MỞ ĐẦU NGÀY (lỗi 06/11): hôm qua em đúng cả 22 câu ⇒ hôm nay lên tầng 2, mức tầng 30, mà bài 40 câu chỉ còn xếp được 27 câu.
+  // Trước đây đường hạ mức đòi «đã làm > 0» ⇒ lúc em chưa làm câu nào: vòng tròn «còn 30» nhưng thể lực 27. Luật thầy 23/10: mức hạ đúng bằng số câu
+  // em làm được để ngày ấy tính đủ mức — mọi phía (vòng tròn, «còn x câu», thể lực, tiêu đề, bảng thầy, Nhịp học, phụ huynh) cùng MỘT số.
+  it('kho thiếu ngay lần mở đầu ngày (tầng 2, mức 30 > số câu còn xếp được) ⇒ mức hạ bằng số câu làm được; mọi phía cùng một số tới lúc đủ mức', async () => {
+    const k = await homQua22(() => true)
+    const s0 = await sanh(k.env, k.token, NOW)
+    // Điều kiện đầu của ca (dữ liệu kho đổi mà ca không còn thiếu câu ⇒ đỏ ngay, không xanh ngầm): tầng 2, mức tầng 30, kho xếp được ít hơn 30.
+    expect(mucChot(k)).toMatchObject({ tang: 2, toi_thieu_tang: CAU_TOI_THIEU[2], quota: 3 })
+    const M = s0.theLuc.con
+    expect(M).toBeGreaterThan(0)
+    expect(M).toBeLessThan(CAU_TOI_THIEU[2])
+    expect(phiaEm(s0)).toEqual({ muc: M, daLam: 0, con: M, du: false })
+    expect(tongTieuDe(s0)).toBe(M)
+    expect((mucChot(k) as { muc: number }).muc).toBe(M) // dòng chốt đã hạ ⇒ thầy / phụ huynh đọc cùng số
+    cungMotSo(await phiaKhac(k.env, 'S1', k.token, NOW), phiaEm(s0))
+
+    const lap = await lapGoi7(k.env, 'S1', NOW + PHUT)
+    expect(lap!.toiThieu).toBe(M)
+    expect(lap!.plan.viec).toHaveLength(M)
+    for (const [i, v] of lap!.plan.viec.slice(0, 7).entries()) await lam(k.env, 'S1', qidGoc(v.qid), NOW + (2 + i) * PHUT, true, { cauVersion: 'v1' })
+    const s1 = await sanh(k.env, k.token, NOW + 10 * PHUT)
+    expect(phiaEm(s1)).toEqual({ muc: M, daLam: 7, con: M - 7, du: false })
+    expect(s1.theLuc.con).toBe(M - 7)
+    expect(tongTieuDe(s1)).toBe(M - 7)
+    cungMotSo(await phiaKhac(k.env, 'S1', k.token, NOW + 10 * PHUT), phiaEm(s1))
+
+    // Làm hết phần còn lại ⇒ đủ mức ở MỌI phía (ngày ấy tính đủ — em không mất chuỗi vì kho thiếu).
+    const conLai = (await lapGoi7(k.env, 'S1', NOW + 40 * PHUT))!.plan.viec
+    expect(conLai).toHaveLength(M - 7)
+    for (const [i, v] of conLai.entries()) await lam(k.env, 'S1', qidGoc(v.qid), NOW + (41 + i) * PHUT, true, { cauVersion: 'v1' })
+    const s2 = await sanh(k.env, k.token, NOW + 90 * PHUT)
+    expect(phiaEm(s2)).toEqual({ muc: M, daLam: M, con: 0, du: true })
+    expect(s2.theLuc.con).toBe(0)
+    cungMotSo(await phiaKhac(k.env, 'S1', k.token, NOW + 90 * PHUT), phiaEm(s2))
   })
 
   it('mức đã chốt KHÔNG nhảy trong ngày (lịch gói đổi giữa ngày vẫn đọc lại số chốt); ngày mới chốt lại', async () => {

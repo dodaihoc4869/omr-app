@@ -35,8 +35,9 @@ describe('lapGoi7 — nối ôn sớm và hạ mức khi hết câu (khoá ngu�
     expect(ma).toMatch(/vaoPlan\.onSom = hs\.cau\.filter/)
     expect(ma).toMatch(/!deKt\.has\(c\.qid\)/)
   })
-  it('hạ mức chỉ khi còn thiếu, không có câu "vừa làm", đã làm > 0 và mức đã chốt; câu ghi chỉ hạ (muc>?)', () => {
-    expect(ma).toMatch(/coThe < toiThieu && vaoPlan\.onSom && !vuaLam\.size && soDaLam > 0 && hs\.cau\.length >= soDaLam && muc7\.daChot/)
+  it('hạ mức chỉ khi còn thiếu, không hạ về 0, không có câu "vừa làm", mức đã chốt, không ca kiểm tra (kể cả lúc chưa làm câu nào — 06/11); câu ghi chỉ hạ (muc>?)', () => {
+    expect(ma).toMatch(/coThe < toiThieu && coThe > 0 && vaoPlan\.onSom && !vuaLam\.size && hs\.cau\.length >= soDaLam && muc7\.daChot && khoaCaThi === 0/)
+    expect(ma).not.toMatch(/soDaLam > 0 && hs\.cau\.length/)
     expect(ma).toMatch(/UPDATE goi_bai_7_muc_ngay SET muc=\? WHERE sbd=\? AND ngay=\? AND muc>\?/)
   })
 })
