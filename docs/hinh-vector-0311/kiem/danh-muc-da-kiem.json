@@ -4843,6 +4843,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "13bf4d0cad1e75ab4ef58f8ca6f78ee8b6aa4404c5b637ca658d21cd0115c4fe": {
+      "tep": "sulfon-hoa-ddh-d617d8ae9ba403084aa4e5fa45e9d467708afc9de9c3a517f23bb3762593a5e6.svg",
+      "hashSvg": "d617d8ae9ba403084aa4e5fa45e9d467708afc9de9c3a517f23bb3762593a5e6",
+      "byteSvg": 13772,
+      "byteGzip": 3692,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "909083af717d21138719c2c4997d2122058612492f534cd2dd3fdbd34b660ccd": {
       "tep": "ms-ddh-c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2.svg",
       "hashSvg": "c3c2d57b17682e4dcadd59666416f2bc294b588ec29ccafbd555a5e52d295ec2",
@@ -11739,6 +11748,20 @@
       ]
     },
     {
+      "qid": "12-KT-C123-D2-I-10",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "13bf4d0cad1e75ab4ef58f8ca6f78ee8b6aa4404c5b637ca658d21cd0115c4fe",
+          "where": "12-KT-C123-D2-I-10.hinh.0.du_lieu",
+          "hashDataUrl": "d690de236f02b62ce5af1c182b349a3ce757abd60bcc2277f1b6cbad1fe391ac",
+          "vector": "sulfon-hoa-ddh-d617d8ae9ba403084aa4e5fa45e9d467708afc9de9c3a517f23bb3762593a5e6.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-KT-C1234-D1-I-3",
       "duMoiHinh": true,
       "soHinhNguon": 5,
@@ -15493,6 +15516,20 @@
           "where": "DB-12-B2-D1-III-134.hinh.0.du_lieu",
           "hashDataUrl": "8501df8b951b3c4529016dc345967a7762ee4c0bc52c01fb6c82bda6050b7b14",
           "vector": "hinh-ddh-a16ff5ba57e72aa796bb153bca0319088fbfbce43428511681d8e40c80d80a4b.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B2-D1-I-138",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "13bf4d0cad1e75ab4ef58f8ca6f78ee8b6aa4404c5b637ca658d21cd0115c4fe",
+          "where": "DB-12-B2-D1-I-138.hinh.0.du_lieu",
+          "hashDataUrl": "d690de236f02b62ce5af1c182b349a3ce757abd60bcc2277f1b6cbad1fe391ac",
+          "vector": "sulfon-hoa-ddh-d617d8ae9ba403084aa4e5fa45e9d467708afc9de9c3a517f23bb3762593a5e6.svg"
         }
       ]
     },
@@ -24940,6 +24977,7 @@
     "12-KT-C123-D1-II-3",
     "12-KT-C123-D2-I-2",
     "12-KT-C123-D2-I-8",
+    "12-KT-C123-D2-I-10",
     "12-KT-C1234-D1-I-3",
     "12-KT-C1234-D1-I-10",
     "12-KT-C1234-D1-I-15",
@@ -25167,6 +25205,7 @@
     "DB-12-B2-D1-II-128",
     "DB-12-B2-D1-III-129",
     "DB-12-B2-D1-III-134",
+    "DB-12-B2-D1-I-138",
     "DB-12-B2-D1-I-151",
     "DB-12-B2-D1-I-154",
     "DB-12-B2-D1-I-173",

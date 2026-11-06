@@ -1,0 +1,252 @@
+{
+  "i": 101,
+  "hash": "13bf4d0cad1e75ab4ef58f8ca6f78ee8b6aa4404c5b637ca658d21cd0115c4fe",
+  "fileNguon": "anh/13bf4d0cad1e75ab4ef58f8ca6f78ee8b6aa4404c5b637ca658d21cd0115c4fe.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "zoom": "/workspace/scratch/cau4-sulfonate205-labelszoom.png",
+  "questions": [
+    {
+      "qid": "12-KT-C123-D2-I-10",
+      "de": "Xác định chất X trong sơ đồ điều chế chất giặt rửa tổng hợp alkylbenzene sulfonate ở hình dưới.",
+      "refs": [
+        {
+          "hash": "13bf4d0cad1e75ab4ef58f8ca6f78ee8b6aa4404c5b637ca658d21cd0115c4fe",
+          "where": "12-KT-C123-D2-I-10.hinh.0.du_lieu",
+          "hashDataUrl": "d690de236f02b62ce5af1c182b349a3ce757abd60bcc2277f1b6cbad1fe391ac"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B2-D1-I-138",
+      "de": "Xác định chất X trong sơ đồ điều chế chất giặt rửa tổng hợp alkylbenzene sulfonate ở hình dưới.",
+      "refs": [
+        {
+          "hash": "13bf4d0cad1e75ab4ef58f8ca6f78ee8b6aa4404c5b637ca658d21cd0115c4fe",
+          "where": "DB-12-B2-D1-I-138.hinh.0.du_lieu",
+          "hashDataUrl": "d690de236f02b62ce5af1c182b349a3ce757abd60bcc2277f1b6cbad1fe391ac"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–3pxapprox,3AROMATICCIRCLESnotKekule3doubles.",
+    "rings": [
+      {
+        "vertices": [
+          [
+            136,
+            125
+          ],
+          [
+            170,
+            65
+          ],
+          [
+            237,
+            67
+          ],
+          [
+            267,
+            127
+          ],
+          [
+            233,
+            188
+          ],
+          [
+            167,
+            187
+          ]
+        ],
+        "circle": [
+          201,
+          127,
+          46
+        ],
+        "Rlabel": [
+          70,
+          128
+        ],
+        "Rbond": [
+          [
+            87,
+            126
+          ],
+          [
+            136,
+            125
+          ]
+        ]
+      },
+      {
+        "vertices": [
+          [
+            528,
+            129
+          ],
+          [
+            563,
+            69
+          ],
+          [
+            628,
+            71
+          ],
+          [
+            659,
+            133
+          ],
+          [
+            625,
+            191
+          ],
+          [
+            559,
+            189
+          ]
+        ],
+        "circle": [
+          594,
+          131,
+          45
+        ],
+        "Rlabel": [
+          454,
+          131
+        ],
+        "Rbond": [
+          [
+            472,
+            129
+          ],
+          [
+            528,
+            129
+          ]
+        ],
+        "rightText": "SO₃H",
+        "rightTextAnchor": [
+          752,
+          129
+        ],
+        "rightBond": [
+          [
+            659,
+            133
+          ],
+          [
+            716,
+            133
+          ]
+        ],
+        "rightBondTarget": "Sfirst"
+      },
+      {
+        "vertices": [
+          [
+            985,
+            134
+          ],
+          [
+            1018,
+            74
+          ],
+          [
+            1086,
+            76
+          ],
+          [
+            1118,
+            139
+          ],
+          [
+            1085,
+            196
+          ],
+          [
+            1015,
+            193
+          ]
+        ],
+        "circle": [
+          1052,
+          134,
+          46
+        ],
+        "Rlabel": [
+          919,
+          132
+        ],
+        "Rbond": [
+          [
+            933,
+            132
+          ],
+          [
+            985,
+            134
+          ]
+        ],
+        "rightText": "SO₃Na",
+        "rightTextAnchor": [
+          1211,
+          130
+        ],
+        "rightBond": [
+          [
+            1118,
+            139
+          ],
+          [
+            1162,
+            139
+          ]
+        ],
+        "rightBondTarget": "Sfirst"
+      }
+    ],
+    "arrows": [
+      {
+        "from": [
+          283,
+          126
+        ],
+        "to": [
+          425,
+          126
+        ],
+        "direction": "RIGHT",
+        "topText": "H₂SO₄ đặc",
+        "topAnchor": [
+          348,
+          103
+        ],
+        "bottomText": "t°",
+        "bottomAnchor": [
+          350,
+          148
+        ]
+      },
+      {
+        "from": [
+          804,
+          132
+        ],
+        "to": [
+          896,
+          132
+        ],
+        "direction": "RIGHT",
+        "topText": "X",
+        "topAnchor": [
+          840,
+          104
+        ]
+      }
+    ],
+    "counts": "3hexagons+3insidecircles/3R/2rightarrows/SO3Hmiddle/SO3Naright,0charges/0caption/0extrabyproducts.",
+    "critical": "RingrightbondfromrightVERTEX(1118139)notINSIDEunlike191. PreserveSO₃NaCONDENSEDwithoutadding−/+orOexpanded. NoanswerX/catalystguess;sourceXremainliteral. NoextraRalkylvertices."
+  },
+  "verdict": "Đọcsource,chưaactualSVGreview."
+}
