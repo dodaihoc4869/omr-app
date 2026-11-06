@@ -38,9 +38,10 @@ for (const k of ['moLai', 'moLai2']) {
 }
 const lan = (i) => (NHANH ? 'man.nhanh.man' : `man.cacMan.lan.${i}`)
 const TEN = {
-  sanhYen: 'Học tập đứng yên 5 s',
-  vaoCauDaLam: 'Học tập → Câu đã làm', cdlLoc: 'Câu đã làm: lọc "Sai lần gần nhất"', cdlLocTatCa: 'Câu đã làm: lọc "Tất cả"', cdlCuon: 'Câu đã làm: vuốt cuộn 4 s', veSanhTuCdl: 'Câu đã làm → Học tập',
-  vaoTuLuyen: 'Học tập → Tu luyện', tlSuaCauSai: 'Tu luyện: thẻ Sửa câu sai', tlDangCauSai: 'Tu luyện: thẻ Dạng câu sai', tlDangBai: 'Tu luyện: thẻ Dạng bài', tlTuDo: 'Tu luyện: thẻ Tự do', tlTongHop: 'Tu luyện: Tổng hợp', tlLuyenDe: 'Tu luyện: Luyện đề cấu trúc', tlLuyen: 'Tu luyện: Luyện', veSanhTuTl: 'Tu luyện → Học tập',
+  sanhYen: 'Hôm nay đứng yên 5 s',
+  vaoCauDaLam: 'Hôm nay → Thêm → Luyện tập → Câu đã làm', cdlLoc: 'Câu đã làm: lọc "Sai lần gần nhất"', cdlLocTatCa: 'Câu đã làm: lọc "Tất cả"', cdlCuon: 'Câu đã làm: vuốt cuộn 4 s', veSanhTuCdl: 'Câu đã làm → Về (Luyện tập)',
+  vaoTuLuyen: 'Hôm nay → Thêm → Luyện tập → Tu luyện', tlSuaCauSai: 'Tu luyện: thẻ Sửa câu sai', tlDangCauSai: 'Tu luyện: thẻ Dạng câu sai', tlDangBai: 'Tu luyện: thẻ Dạng bài', tlTuDo: 'Tu luyện: thẻ Tự do', tlTongHop: 'Tu luyện: Tổng hợp', tlLuyenDe: 'Tu luyện: Luyện đề cấu trúc', tlLuyen: 'Tu luyện: Luyện', veSanhTuTl: 'Tu luyện → Về (Luyện tập)',
+  vaoLamCau: 'Hôm nay → nút chính (Bắt đầu) → màn làm câu',
 }
 for (const i of NHANH ? [0] : [0, 1]) {
   console.log(NHANH ? '\n**Từng màn (kịch bản ngắn, lần đầu mở màn)**\n' : `\n**Từng màn — lượt ${i + 1} (${i ? 'mở lại màn, mảnh đã có' : 'lần đầu mở màn, mảnh lười tải qua Slow 4G'})**\n`)

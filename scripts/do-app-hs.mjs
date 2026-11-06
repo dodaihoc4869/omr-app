@@ -293,7 +293,7 @@ const dangLamCau = (p) => p.evaluate(({ chon, TIM_CHU }) => !!new Function('retu
 /** Rời màn làm câu bằng «Lưu và về Hôm nay», chờ phương án biến mất. */
 async function roiLamCau(p) {
   await cham(p, LUU_VE_HOM_NAY)
-  await p.waitForFunction(({ chon, TIM_CHU }) => !new Function('return ' + TIM_CHU)()(chon), { chon: MAN_LAM_CAU, TIM_CHU }, { polling: 100, timeout: 30000 })
+  await choMat(p, MAN_LAM_CAU, 30000)
 }
 /** Tìm phần tử trong trang: `text=…` (nút/nhãn chứa chữ, ưu tiên khớp đúng) hoặc bộ chọn CSS. Chạy TRONG trang (rẻ, không dò cây trợ năng). */
 const TIM = (chon) => {
@@ -334,6 +334,11 @@ async function choThay(p, chon, han = 90000) {
   const h = await p.waitForFunction(({ chon, TIM_CHU }) => (new Function('return ' + TIM_CHU)()(chon) ? performance.now() : 0), { chon, TIM_CHU }, { polling: 50, timeout: han })
   return h.jsonValue()
 }
+/** Chờ phần tử BIẾN MẤT (màn phủ đóng lại — màn dưới vẫn gắn trong DOM nên không chờ «màn dưới hiện» được); trả mốc performance.now() của trang. */
+async function choMat(p, chon, han = 90000) {
+  const h = await p.waitForFunction(({ chon, TIM_CHU }) => (new Function('return ' + TIM_CHU)()(chon) ? 0 : performance.now()), { chon, TIM_CHU }, { polling: 50, timeout: han })
+  return h.jsonValue()
+}
 const bayGio = (p) => p.evaluate(() => performance.now())
 const batDo = (p) => p.evaluate(() => ((window.__do.dai = []), (window.__do.sk = []), window.__batDem()))
 const layDo = (p) => p.evaluate(() => ({ dai: window.__do.dai, sk: window.__do.sk, commit: window.__do.commit, veLai: window.__do.veLai, fcp: window.__do.fcp, lcp: window.__do.lcp }))
@@ -343,12 +348,12 @@ const inpTu = (sk, tu) => {
   for (const [, t, d, id] of sk) if (t >= tu - 5) m.set(id, Math.max(m.get(id) || 0, d))
   return Math.max(0, ...m.values())
 }
-/** Một bước: chạm `chon` → chờ `cho` hiện → nghỉ `nghi` ms. Trả thời gian chuyển màn, tác vụ dài, INP, số commit/component vẽ lại. */
+/** Một bước: chạm `chon` → chờ `cho` hiện (`!<bộ chọn>` = chờ biến mất) → nghỉ `nghi` ms. Trả thời gian chuyển màn, tác vụ dài, INP, số commit/component vẽ lại. */
 async function buoc(p, chon, cho, nghi = 1500) {
   await batDo(p)
   const t0 = await bayGio(p)
   await cham(p, chon)
-  const t1 = cho ? await choThay(p, cho) : t0
+  const t1 = !cho ? t0 : cho.startsWith('!') ? await choMat(p, cho.slice(1)) : await choThay(p, cho)
   await p.waitForTimeout(nghi)
   const d = await layDo(p)
   return { chuyenMs: cho ? Math.round(t1 - t0) : null, taskMax: daiNhat(d.dai, t0), tbt: tbt(d.dai, t0), inp: inpTu(d.sk, t0), commit: d.commit, veLai: d.veLai }
@@ -539,14 +544,14 @@ async function cacMan() {
       m.cdlLoc = await b('cdlLoc', 'text=Sai lần gần nhất', null, 2000)
       m.cdlLocTatCa = await b('cdlLocTatCa', 'text=Tất cả', null, 2000)
       m.cdlCuon = await kc('cdlCuon', 4000)
-      // (khoá cũ giữ tên cho so-sanh.mjs) nay đo «Về» → Luyện tập hiện lại; rồi thanh nổi → Hôm nay.
-      m.veSanhTuCdl = await b('veSanhTuCdl', VE_HOM_NAY, '.da-o', 1500)
+      // (khoá cũ giữ tên cho so-sanh.mjs) nay đo «Về» → Câu đã làm đóng hẳn (về Luyện tập); rồi thanh nổi → Hôm nay.
+      m.veSanhTuCdl = await b('veSanhTuCdl', VE_HOM_NAY, '!.h2-cdl-loc', 1500)
       await veHomNayTuLuyenTap(p)
       // Tu luyện (Thêm → Luyện tập → Tu luyện): mở, từng thẻ chế độ, thẻ Tổng hợp.
       await vaoLuyenTap(p)
       m.vaoTuLuyen = await b('vaoTuLuyen', 'text=Tu luyện', 'text=Sửa câu sai', 2500)
       for (const [k, t] of [['tlSuaCauSai', 'Sửa câu sai'], ['tlDangCauSai', 'Dạng câu sai'], ['tlDangBai', 'Dạng bài'], ['tlTuDo', 'Tự do'], ['tlTongHop', 'Tổng hợp'], ['tlLuyenDe', 'Luyện đề cấu trúc'], ['tlLuyen', 'Luyện']]) m[k] = await b(k, 'text=' + t, null, 1500)
-      m.veSanhTuTl = await b('veSanhTuTl', VE_HOM_NAY, '.da-o', 1500)
+      m.veSanhTuTl = await b('veSanhTuTl', VE_HOM_NAY, '!text=Sửa câu sai', 1500)
       // Màn làm câu: nút chính Hôm nay («Bắt đầu» / «Học tiếp»…) → phương án hiện.
       await veSanh(p)
       m.vaoLamCau = await b('vaoLamCau', NUT_BAT_DAU, MAN_LAM_CAU, 2500)
@@ -607,9 +612,9 @@ async function heapDai(phut) {
     const dau = Date.now()
     let vong = 0
     const ghi = async () => kq.mau.push({ vong, giay: Math.round((Date.now() - dau) / 1000), heapMB: await heapMb(cdp), ...(await domCounters(cdp)) })
-    const ve = async () => {
+    const ve = async (dau) => {
       await cham(p, VE_HOM_NAY)
-      await choThay(p, '.da-o', 20000)
+      await choMat(p, dau, 20000)
       await veHomNayTuLuyenTap(p)
     }
     await ghi()
@@ -617,9 +622,9 @@ async function heapDai(phut) {
       vong++
       GIA.datLai()
       await vaoLuyenTap(p); await cham(p, 'text=Câu đã làm'); await choThay(p, '.h2-cdl-loc', 20000).catch(() => {}); await p.waitForTimeout(2500)
-      await ve(); await choThay(p, SANH, 20000).catch(() => {}); await p.waitForTimeout(800)
+      await ve('.h2-cdl-loc'); await p.waitForTimeout(800)
       await vaoLuyenTap(p); await cham(p, 'text=Tu luyện'); await choThay(p, 'text=Sửa câu sai', 20000).catch(() => {}); await p.waitForTimeout(1500)
-      await ve(); await choThay(p, SANH, 20000).catch(() => {}); await p.waitForTimeout(800)
+      await ve('text=Sửa câu sai'); await p.waitForTimeout(800)
       if (vong % 2 === 0) await ghi()
     }
     await ghi()
