@@ -48,7 +48,7 @@ function trinhBayCongThuc(v: string, truoc = '', sau = ''): string | (string | J
   return ra
 }
 
-const RE_KHONG = /(?<![\p{L}\p{M}\p{N}])kh(?:ô|o\u0302)ng(?![\p{L}\p{M}\p{N}])/giu
+const RE_KHONG = /(^|[^\p{L}\p{M}\p{N}])(kh(?:ô|o\u0302)ng)(?![\p{L}\p{M}\p{N}])/giu // nhóm bắt ký tự đứng trước thay cho nhìn-lùi (iPhone iOS < 16.4 không chạy)
 const RE_KHONG_NHANH = /kh(?:ô|o\u0302)ng/i
 const TU_GHEP = /^\s+(khí|màu|mùi|vị|gian|đổi|no|phân cực|bão hòa|bão hoà|đáng kể)(?![\p{L}\p{M}\p{N}])/u
 const HAY_HOAC = /(?:^|[^\p{L}\p{M}])(?:hay|hoặc)\s+$/iu
@@ -73,11 +73,11 @@ export function trinhBayChu(v: string, truoc = '', sau = ''): string | (string |
     ra.push(typeof k === 'string' ? k : <Fragment key={`p${tu}`}>{k}</Fragment>)
   }
   for (const m of v.matchAll(RE_KHONG)) {
-    const i = m.index ?? 0
-    if (!laKhongNhan(v, i, m[0].length)) continue
+    const i = (m.index ?? 0) + m[1].length, chu = m[2]
+    if (!laKhongNhan(v, i, chu.length)) continue
     day(i)
-    ra.push(<span key={`k${i}`} className="ct-khong">{m[0]}</span>)
-    tu = i + m[0].length
+    ra.push(<span key={`k${i}`} className="ct-khong">{chu}</span>)
+    tu = i + chu.length
   }
   if (!ra.length) return trinhBayCongThuc(v, truoc, sau)
   day(v.length)

@@ -18,7 +18,7 @@
   --tr-tin: #00bed8; --tr-tin-nhat: #dbf5fa; --tr-tin-chu: #007889; --tr-tin-day: #009eb5;
   --tr-sao: #ffbf35; --tr-sao-nhat: #fff5d4; --tr-sao-chu: #956400; --tr-sao-day: #e3a605;
   --tr-tim: #fc67d3; --tr-tim-day: #c851a8; --tr-tim-chu: #b33d95;
-  --tr-hs: #8792ff; --tr-hs-nut: #767eff; --tr-hs-day: #5a5ae9; --tr-hs-nhat: #eeeeff; --tr-hs-chu: #565bbd; --tr-hs-tren: #ffffff;
+  --tr-hs: #8f9bff; --tr-hs-nut: #767eff; --tr-hs-day: #5a5ae9; --tr-hs-nhat: #eeeeff; --tr-hs-chu: #565bbd; --tr-hs-tren: #ffffff;
   --tr-nguyen-tu: #00bed8; --tr-nguyen-tu-so: #009eb5;
   --tr-phu: rgba(75, 75, 75, 0.5);
   --tr-bong-1: 0 2px 0 #e2e2f0; --tr-bong-2: 0 4px 0 #e2e2f0; --tr-bong-3: 0 8px 0 rgba(0, 0, 0, 0.1);
@@ -109,7 +109,7 @@ html[data-trong='hs'] div.fixed.inset-0.overflow-y-auto:not([class*='bg-']) { ba
 :root[data-trong='hs'] { --tr-chinh-nut: var(--tr-hs-day); }
 
 /* ═══ SÁNG + SẮC NÉT (thầy 06/11: «màu app hs sáng hẳn như doligo, vẽ lại vector cho sắc nét, kính long lanh chuẩn apple»).
-   Màu: nền gần trắng, chàm đậm / hồng / đỏ tươi hơn (cùng sắc bộ B, độ tươi tới mép gam sRGB); kính trắng trong hơn + bão hoà cao + viền sáng mép trên
+   Màu: nền gần trắng, chàm đậm (nút chính) / hồng / đỏ tươi hơn (cùng sắc bộ B, độ tươi tới mép gam sRGB); kính trắng trong hơn + bão hoà cao + viền sáng mép trên
    + ánh trong mép trên + bóng nhuốm chàm (đều nằm trong token --kinh-*, không thêm lớp vẽ). BIỂU TƯỢNG lucide nét mặc định 2 ⇒ 2,5 (dày, tròn như
    Duolingo); biểu tượng hình kín (lửa, cúp, huy hiệu, bình…) tô lót 20% cùng màu nét ⇒ khối đặc, sắc. Chỉ đụng nét mặc định / fill="none":
    biểu tượng đã tự đặt nét hay tô đặc giữ nguyên. */
