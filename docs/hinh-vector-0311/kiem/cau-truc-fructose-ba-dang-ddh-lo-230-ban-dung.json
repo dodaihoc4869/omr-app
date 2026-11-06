@@ -1,0 +1,40 @@
+[
+  {
+    "i": 385,
+    "hash": "44cf15f355c45359262f7c1322b572524c9660b5fa8bef7a2c599304b26752f2",
+    "fileNguon": "anh/44cf15f355c45359262f7c1322b572524c9660b5fa8bef7a2c599304b26752f2.png",
+    "svg": "fructose-ba-dang-ddh-e62f88ed5965fa9bcb581fddc48300cbf5cbeb9822fe1d4934f06620e4539a61.svg",
+    "hashSvg": "e62f88ed5965fa9bcb581fddc48300cbf5cbeb9822fe1d4934f06620e4539a61",
+    "byteSvg": 62105,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D3-II-213",
+        "de": "Cho cấu tạo của fructose ở hình bên:",
+        "refs": [
+          {
+            "hash": "44cf15f355c45359262f7c1322b572524c9660b5fa8bef7a2c599304b26752f2",
+            "where": "DB-12-B4-D3-II-213.hinh.0.du_lieu",
+            "hashDataUrl": "2240206f774d3a024968520153c9438358dafb1dabfd85a70593b7ee67c2f887"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B4-II-8",
+        "de": "Cho cấu tạo của fructose ở hình bên:",
+        "refs": [
+          {
+            "hash": "44cf15f355c45359262f7c1322b572524c9660b5fa8bef7a2c599304b26752f2",
+            "where": "DH-12-C2-B4-II-8.hinh.0.du_lieu",
+            "hashDataUrl": "2240206f774d3a024968520153c9438358dafb1dabfd85a70593b7ee67c2f887"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "alpha-open-beta/18Cnums9standaloneH/6terminalCH2OHgroupsinclHOCH2/18O/4TAPER2bold/2equilibriumpairs/3captionsGreek-DDHpath/noaddedH-carbonyl-answer.",
+    "hashSvgDaSoat": "e62f88ed5965fa9bcb581fddc48300cbf5cbeb9822fe1d4934f06620e4539a61",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

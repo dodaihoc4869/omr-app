@@ -1,0 +1,218 @@
+{
+  "i": 385,
+  "hash": "44cf15f355c45359262f7c1322b572524c9660b5fa8bef7a2c599304b26752f2",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/44cf15f355c45359262f7c1322b572524c9660b5fa8bef7a2c599304b26752f2.png",
+  "nativeSize": [
+    1024,
+    422
+  ],
+  "reviewed": [
+    "native full",
+    "left3x",
+    "middle3x",
+    "right3x"
+  ],
+  "questions": [
+    {
+      "qid": "DB-12-B4-D3-II-213",
+      "maDe": "DB-12-B4-D3",
+      "de": "Cho cấu tạo của fructose ở hình bên:",
+      "hinh": [
+        {
+          "hash": "44cf15f355c45359262f7c1322b572524c9660b5fa8bef7a2c599304b26752f2",
+          "where": "DB-12-B4-D3-II-213.hinh.0.du_lieu",
+          "hashDataUrl": "2240206f774d3a024968520153c9438358dafb1dabfd85a70593b7ee67c2f887"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C2-B4-II-8",
+      "maDe": "DH-12-C2-B4",
+      "de": "Cho cấu tạo của fructose ở hình bên:",
+      "hinh": [
+        {
+          "hash": "44cf15f355c45359262f7c1322b572524c9660b5fa8bef7a2c599304b26752f2",
+          "where": "DH-12-C2-B4-II-8.hinh.0.du_lieu",
+          "hashDataUrl": "2240206f774d3a024968520153c9438358dafb1dabfd85a70593b7ee67c2f887"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "left": {
+      "type": "five-member Haworth",
+      "C5": [
+        64,
+        208
+      ],
+      "C4": [
+        103,
+        282
+      ],
+      "C3": [
+        190,
+        282
+      ],
+      "C2": [
+        220,
+        208
+      ],
+      "ringO": [
+        144,
+        171
+      ],
+      "branches": {
+        "C5up": "HOCH₂ with carbon6 above C of label",
+        "C5down": "H",
+        "C4up": "H",
+        "C4down": "OH",
+        "C3up": "HO (O nearest bond)",
+        "C3down": "H",
+        "C2up": "CH₂OH with carbon1 above C of label",
+        "C2down": "OH"
+      },
+      "numbers": {
+        "1": "above CH2OH at x217,y141",
+        "2": "right of C2 at x232,y203",
+        "3": "left/below C3 at x178,y300",
+        "4": "right/below C4 at x115,y299",
+        "5": "left of C5 at x53,y207",
+        "6": "above HOCH2 C at x68,y139"
+      },
+      "caption": "dạng α-fructose",
+      "captionNear": [
+        133,
+        372
+      ]
+    },
+    "middle": {
+      "type": "Fischer",
+      "axisX": 509,
+      "top": "CH₂OH with number1 above C atx509,y15",
+      "carbonyl": {
+        "center": [
+          509,
+          105
+        ],
+        "side": "right",
+        "doubleBond": "two horizontal thin lines y101 and109 to565; O near577,105",
+        "number2": "left at496,105"
+      },
+      "rows": [
+        {
+          "y": 169,
+          "left": "HO",
+          "right": "H",
+          "number": "3 upper-left of junction"
+        },
+        {
+          "y": 236,
+          "left": "H",
+          "right": "OH",
+          "number": "4 upper-left"
+        },
+        {
+          "y": 303,
+          "left": "H",
+          "right": "OH",
+          "number": "5 upper-left"
+        }
+      ],
+      "bottom": "CH₂OH with carbon6 to left of C, not subscript6; vertical ends at356 above CH2OH",
+      "caption": "fructose, mạch hở",
+      "captionNear": [
+        523,
+        408
+      ]
+    },
+    "right": {
+      "type": "five-member Haworth",
+      "C5": [
+        788,
+        207
+      ],
+      "C4": [
+        826,
+        280
+      ],
+      "C3": [
+        913,
+        280
+      ],
+      "C2": [
+        943,
+        207
+      ],
+      "ringO": [
+        867,
+        170
+      ],
+      "branches": {
+        "C5up": "HOCH₂ with carbon6 above C of label",
+        "C5down": "H",
+        "C4up": "H",
+        "C4down": "OH",
+        "C3up": "HO (O nearest bond)",
+        "C3down": "H",
+        "C2up": "OH",
+        "C2down": "CH₂OH with carbon1 below C of label"
+      },
+      "numbers": "all1..6 once,1belowC2CH2OH;2right,3left/below,4right/below,5left,6aboveHOCH2",
+      "caption": "dạng β-fructose",
+      "captionNear": [
+        875,
+        367
+      ]
+    },
+    "frontBondStyles": "4 tapered front diagonals total: C5->C4 widens toward C4 and C2->C3 widens toward C3 in BOTH rings;2bold front horizontals C4-C3; rear uniform thin",
+    "equilibriumArrows": [
+      {
+        "xStart": 298,
+        "xEnd": 383,
+        "upperY": 209,
+        "lowerY": 216,
+        "upperHead": "RIGHT half head angled up-left",
+        "lowerHead": "LEFT half head angled down-right"
+      },
+      {
+        "xStart": 637,
+        "xEnd": 722,
+        "upperY": 209,
+        "lowerY": 216,
+        "upperHead": "RIGHT half head angled up-left",
+        "lowerHead": "LEFT half head angled down-right"
+      }
+    ],
+    "totals": {
+      "carbonNumbers": 18,
+      "standaloneH": 9,
+      "ringO": 2,
+      "carbonylO": 1,
+      "HOCH2Text": 2,
+      "CH2OHText": 4,
+      "OHorHOseparate": 9,
+      "taper": 4,
+      "boldHorizontal": 2,
+      "halfArrowHeads": 4
+    },
+    "noExtra": [
+      "No carbon center C labels",
+      "No answers/intermediates/conditions added",
+      "No CHO or carbonyl explicitH",
+      "No clipped external print"
+    ]
+  },
+  "status": "Đạt exact hash mới sau sửa spacing 6; negative63cd9 giữ riêng",
+  "actualReview": {
+    "i": 385,
+    "hashSvg": "e62f88ed5965fa9bcb581fddc48300cbf5cbeb9822fe1d4934f06620e4539a61",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã tự fresh Chromium exact hash mới và mở actualfull/crop6fixed, đối chiếu nativefull/ba panel3x cùng hai public refs. Hai số6 trên HOCH2 đã nâng tạo gap trắng rõ, đúng C anchor. Đủ18 sốC/9H/2HOCH2+4CH2OH/9OH-HO riêng/2ringO+1carbonylO; đúng mọi hướng nhánh α/open/β,4taper2bold,2 cặp equilibrium halfheads, captions dạng α-fructose / fructose, mạch hở / dạng β-fructose bằng DDHpaths. Không chạm/cắt/tràn, không thêm đáp án.",
+    "actualSvgReviewed": true,
+    "byteSvg": 62105,
+    "render": "/workspace/scratch/fructose385-230-e62f88ed-chromium.png",
+    "detail": "/workspace/scratch/fructose385-6fixed.png",
+    "sourceHash": "44cf15f355c45359262f7c1322b572524c9660b5fa8bef7a2c599304b26752f2",
+    "oldNegativeProof": "/workspace/scratch/fructose385-230-bi-loai.json"
+  }
+}
