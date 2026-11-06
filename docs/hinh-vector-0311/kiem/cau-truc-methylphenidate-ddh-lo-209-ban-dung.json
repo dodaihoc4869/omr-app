@@ -1,0 +1,40 @@
+[
+  {
+    "i": 118,
+    "hash": "1680cc35f202211731150fcc74201d8e974daa186a2b7e7b393b4bcb893b20bb",
+    "fileNguon": "anh/1680cc35f202211731150fcc74201d8e974daa186a2b7e7b393b4bcb893b20bb.png",
+    "svg": "methylphenidate-ddh-d5180b7089e2ad7ab1f57dc3ea623b919b98c9ac89ac58b41a2eb73c52f70e68.svg",
+    "hashSvg": "d5180b7089e2ad7ab1f57dc3ea623b919b98c9ac89ac58b41a2eb73c52f70e68",
+    "byteSvg": 18275,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C3-B8-D2-III-42",
+        "de": "Thuốc Ritalin là chất kích thích hệ thần kinh trung ương được sử dụng phổ biến nhất trong điều trị rối loạn tăng động giảm chú ý và chứng ngủ rũ. Mỗi viên thuốc ritalin chứa 10 mg muối methylphenidate hydrochloride (có cấu tạo như hình bên).\nĐể sản xuất 1000 hộp thuốc loại 30 viên/hộp thì cần dùng tối thiểu bao nhiêu gam methylphenidate hydrochloride? (Làm tròn kết quả đến hàng đơn vị)",
+        "refs": [
+          {
+            "hash": "1680cc35f202211731150fcc74201d8e974daa186a2b7e7b393b4bcb893b20bb",
+            "where": "12-C3-B8-D2-III-42.hinh.0.du_lieu",
+            "hashDataUrl": "3a2faa716bcb18502e58b7e78b91d1019f5459b150cb63b3bace6625257691b2"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B8-D1-III-192",
+        "de": "Thuốc Ritalin là chất kích thích hệ thần kinh trung ương được sử dụng phổ biến nhất trong điều trị rối loạn tăng động giảm chú ý và chứng ngủ rũ. Mỗi viên thuốc ritalin chứa 10 mg muối methylphenidate hydrochloride (có cấu tạo như hình bên).\nĐể sản xuất 1000 hộp thuốc loại 30 viên/hộp thì cần dùng tối thiểu bao nhiêu gam methylphenidate hydrochloride? (Làm tròn kết quả đến hàng đơn vị)",
+        "refs": [
+          {
+            "hash": "1680cc35f202211731150fcc74201d8e974daa186a2b7e7b393b4bcb893b20bb",
+            "where": "DB-12-B8-D1-III-192.hinh.0.du_lieu",
+            "hashDataUrl": "3a2faa716bcb18502e58b7e78b91d1019f5459b150cb63b3bace6625257691b2"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "Benzene3double/Nsixring/COOCH3/ClH2Nliteral/nocharges-stereo/branches/captionEnglishdamWOFF2/DDHpath.",
+    "hashSvgDaSoat": "d5180b7089e2ad7ab1f57dc3ea623b919b98c9ac89ac58b41a2eb73c52f70e68",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

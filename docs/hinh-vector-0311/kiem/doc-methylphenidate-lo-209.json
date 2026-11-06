@@ -1,0 +1,194 @@
+{
+  "i": 118,
+  "hash": "1680cc35f202211731150fcc74201d8e974daa186a2b7e7b393b4bcb893b20bb",
+  "fileNguon": "anh/1680cc35f202211731150fcc74201d8e974daa186a2b7e7b393b4bcb893b20bb.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "zoom": "/workspace/scratch/cau4-methyl209-zoom.png",
+  "questions": [
+    {
+      "qid": "12-C3-B8-D2-III-42",
+      "de": "Thuốc Ritalin là chất kích thích hệ thần kinh trung ương được sử dụng phổ biến nhất trong điều trị rối loạn tăng động giảm chú ý và chứng ngủ rũ. Mỗi viên thuốc ritalin chứa 10 mg muối methylphenidate hydrochloride (có cấu tạo như hình bên).\nĐể sản xuất 1000 hộp thuốc loại 30 viên/hộp thì cần dùng tối thiểu bao nhiêu gam methylphenidate hydrochloride? (Làm tròn kết quả đến hàng đơn vị)",
+      "refs": [
+        {
+          "hash": "1680cc35f202211731150fcc74201d8e974daa186a2b7e7b393b4bcb893b20bb",
+          "where": "12-C3-B8-D2-III-42.hinh.0.du_lieu",
+          "hashDataUrl": "3a2faa716bcb18502e58b7e78b91d1019f5459b150cb63b3bace6625257691b2"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B8-D1-III-192",
+      "de": "Thuốc Ritalin là chất kích thích hệ thần kinh trung ương được sử dụng phổ biến nhất trong điều trị rối loạn tăng động giảm chú ý và chứng ngủ rũ. Mỗi viên thuốc ritalin chứa 10 mg muối methylphenidate hydrochloride (có cấu tạo như hình bên).\nĐể sản xuất 1000 hộp thuốc loại 30 viên/hộp thì cần dùng tối thiểu bao nhiêu gam methylphenidate hydrochloride? (Làm tròn kết quả đến hàng đơn vị)",
+      "refs": [
+        {
+          "hash": "1680cc35f202211731150fcc74201d8e974daa186a2b7e7b393b4bcb893b20bb",
+          "where": "DB-12-B8-D1-III-192.hinh.0.du_lieu",
+          "hashDataUrl": "3a2faa716bcb18502e58b7e78b91d1019f5459b150cb63b3bace6625257691b2"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–2pxapprox;allbondsuniformNOwedges/stereotext. LiteralClH2Nwithoutcharges,notC1H2N.",
+    "benzene": {
+      "vertices": [
+        [
+          126,
+          137
+        ],
+        [
+          168,
+          113
+        ],
+        [
+          209,
+          137
+        ],
+        [
+          209,
+          184
+        ],
+        [
+          168,
+          209
+        ],
+        [
+          126,
+          184
+        ]
+      ],
+      "doubleSegments": [
+        [
+          136,
+          142,
+          168,
+          124
+        ],
+        [
+          201,
+          143,
+          201,
+          179
+        ],
+        [
+          136,
+          179,
+          168,
+          198
+        ]
+      ],
+      "circle": false
+    },
+    "centralC": [
+      247,
+      112
+    ],
+    "bondPhCentral": [
+      [
+        209,
+        137
+      ],
+      [
+        247,
+        112
+      ]
+    ],
+    "ester": {
+      "text": "COOCH₃",
+      "anchor": [
+        294,
+        50
+      ],
+      "bond": [
+        [
+          247,
+          112
+        ],
+        [
+          247,
+          72
+        ]
+      ],
+      "target": "Cfirst~24750",
+      "noExpandedO": true
+    },
+    "nitrogenRing": {
+      "nodes": {
+        "C1": [
+          287,
+          137
+        ],
+        "C2": [
+          331,
+          112
+        ],
+        "C3": [
+          374,
+          137
+        ],
+        "C4": [
+          374,
+          184
+        ],
+        "C5": [
+          331,
+          209
+        ],
+        "N": [
+          287,
+          189
+        ]
+      },
+      "centralBond": [
+        [
+          247,
+          112
+        ],
+        [
+          287,
+          137
+        ]
+      ],
+      "topNstub": [
+        [
+          287,
+          137
+        ],
+        [
+          287,
+          160
+        ]
+      ],
+      "bottomNBond": [
+        [
+          304,
+          194
+        ],
+        [
+          331,
+          209
+        ]
+      ],
+      "literalLabel": "ClH₂N",
+      "labelAnchor": [
+        259,
+        189
+      ],
+      "Ntarget": "Nright~287189",
+      "Clglyph": "Cuppercase+lLOWERCASE,crossnotdigit1,NOminus/plus/HClreorder",
+      "noCharges": true
+    },
+    "caption": {
+      "text": "Methylphenidate hydrochloride",
+      "anchor": [
+        244,
+        245
+      ],
+      "sourceStyle": "bolditalicserif,rebuildDDHdamtruefontwithouthostfallback"
+    },
+    "atomCounts": "14C(6Ph+1central+5Nring+2COOCH3)/1N/2O/1Cl;explicitHliteral2N+CH3groups,NOotherHadded.",
+    "critical": "KeepClH₂NliteralnotCl−H₂N+/ClH₃N/NH/HClseparate;COOCH3graftcentralC,notC=Odrawnextra;Nring6membersnotpyrrolidine. NoCIP/namesextra/noanswer."
+  },
+  "verdict": "Đọcsource,chưaactualSVGreview."
+}
