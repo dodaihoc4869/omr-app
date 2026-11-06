@@ -406,7 +406,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
       if(action==='hoc-tap-lam-lai')return import('./goi-bai-7-lam-lai').then(m=>m.lamLaiCuoiChang7(env,sbd,b,Date.now()))
       // GÓI BÀI CẢ NGÀY TRÊN MÁY EM (thầy 29/10 22:05 «cách khác hoàn toàn để app hs load tức thì ở mọi thời điểm», goi-ngay.ts): lập gói NỀN (không ai chờ) · mở phiên từ
       // một chặng của gói (máy em đã hiện câu; một đợt đọc + một lệnh ghi, không lập kế hoạch). Công tắc tắt / không phải em thử ⇒ `tat` / `GOI_TAT` (máy em đi đường cũ).
-      if(action==='hoc-tap-goi-ngay')return import('./goi-ngay').then(m=>m.goiNgay7(env,sbd,Date.now()))
+      if(action==='hoc-tap-goi-ngay')return import('./goi-ngay').then(m=>m.goiNgay7(env,sbd,Date.now(),true))
       if(action==='hoc-tap-mo-goi')return import('./goi-ngay').then(m=>m.moGoi7(env,sbd,b,Date.now()))
       // SẴN SÀNG (27/10): bản sẵn khớp dấu, cùng ngày ⇒ chặng đã lập sẵn thành phiên ngay (MỘT lô ghi) — không lập kế hoạch trên đường chờ. Không được ⇒ đường cũ.
       if(action==='hoc-tap-start'){const ss=hocTapSom?await hocTapSom.sanSang.catch(()=>null):null,nowSs=Date.now();if(ss&&dungDuoc(ss[1],ss[0],ngayVn7(nowSs))&&ss[1].chang){const rs=await moChangSanSang(env,sbd,nowSs,ss[1]).catch(()=>null);if(rs)return rs}

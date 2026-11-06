@@ -3459,8 +3459,8 @@ const boXuLy = {
       // KHUNG HỌC 18:00–23:59 VN (thầy 27/10 «tức thì mọi khung giờ»; đo Analytics 19–23h: D1 bận 20 % thời gian, lệnh em chờ ~1,3 s/đợt): việc LẤP DẦN này
       // không ai chờ ⇒ nghỉ cả khung, chạy bù ngoài giờ (120 câu/phút).
       if(!laKhungHocVn(Date.now()))await import('./cau-doc-giay').then(m=>m.dongBoCauDocGiay(env,120)).catch(e=>console.error('[cau-doc-giay] đồng bộ',e))
-      const ht=await import('./hanh-trinh-hop-nhat').then(m => m.dongBoBaHanhTrinh(env, Date.now()))
-        .catch(async e => { console.error('[hanh-trinh] đồng bộ lỗi:',e); await ghiLoiMay(env,'hanh_trinh_dong_bo'); return null })
+      const ht=(!laGioCaoDiemVn(Date.now())||new Date().getUTCMinutes()%10===0)?await import('./hanh-trinh-hop-nhat').then(m => m.dongBoBaHanhTrinh(env, Date.now()))
+        .catch(async e => { console.error('[hanh-trinh] đồng bộ lỗi:',e); await ghiLoiMay(env,'hanh_trinh_dong_bo'); return null }):null
       if(ht?.trangThai==='vua_hop_nhat')console.log('[hanh-trinh] đã gộp',ht.soChienDich)
       // BẢNG TRA THÀNH VIÊN CHIẾN DỊCH (31/10, chien-dich-tv.ts): lập chỉ mục cho chiến dịch thiếu dấu (vừa gộp / thêm / đổi danh sách em). Thường ngày một câu đọc nhẹ.
       await import('./chien-dich-tv').then(m=>m.lapChiMucTv(env,Date.now())).then(r=>{if(r.lap||r.loi)console.log('[chien-dich-tv] lập',JSON.stringify(r))}).catch(e=>console.error('[chien-dich-tv] cron lỗi:',e))
@@ -3856,8 +3856,8 @@ const boXuLy = {
       // Một đợt D1; việc ghi «có trợ giúp» vào lượt game chạy sau phản hồi.
       if (p === '/hs/goi-y-so-do') return ra(await import('./loi-giai-so-do').then((m) => m.hsGoiYSoDo(env, b, { sau: ctx ? (viec) => ctx.waitUntil(viec) : undefined })))
       // LỜI GIẢI KÍNH (thầy chốt 02/11): tải sẵn bản Kính mã hoá cho câu em đang có (loi-giai-kinh.ts — cùng luật phạm vi với gói đáp án dm).
-      if (p === '/hs/loi-giai-kinh') return ra(await import('./loi-giai-kinh').then((m) => m.hsGoiKinh(env, b)))
-      if (p === '/hs/hinh-ve') return ra(await import('./hinh-ve').then((m) => m.hsHinhVe(env, b)))
+      if (p === '/hs/loi-giai-kinh') return ra(await import('./loi-giai-kinh').then((m) => m.hsGoiKinh(envDoc, b)))
+      if (p === '/hs/hinh-ve') return ra(await import('./hinh-ve').then((m) => m.hsHinhVe(envDoc, b)))
       if (p === '/hs/hoi-thay') {
         // HỎI THÊM THẦY (13/10, hoi-tro-ly.ts): phản hồi mở được lời giải ⇒ kèm `hoiThem` = máy em hiện ô nhắn hỏi Thầy (AI) dưới lời giải.
         // Tốc độ (thầy 13/10): cờ đọc SONG SONG với các lượt kiểm của hsHoiThay; việc ghi sổ chạy sau phản hồi (ctx.waitUntil).

@@ -66,6 +66,16 @@ describe('kho gói cả ngày', () => {
     await expect(napGoiNgay('tk', vi.fn(async () => { throw new Error('mất mạng') }))).resolves.toBeUndefined()
     expect(layChangGoi('s1')).toBeNull()
   })
+  it('gói cả ngày mang theo `kinh` ⇒ lưu sẵn vào ddh.kinh.v1, coGoiKinh và taiSanKinh không cần gọi /hs/loi-giai-kinh nữa (06/11)', async () => {
+    const goi = vi.fn(async () => ({ ...goiMau(), kinh: { tn1: 'iv1.ct1', tn2: '' } }))
+    await napGoiNgay('tk', goi)
+    const { coGoiKinh } = await import('../src/lib/loi-giai-kinh/tai-san')
+    expect(coGoiKinh('tn1')).toBe(true)
+    expect(coGoiKinh('tn2')).toBe(false)
+    const raw = JSON.parse(localStorage.getItem('ddh.kinh.v1') || '{}') as Record<string, { dm: string }>
+    expect(raw.tn1?.dm).toBe('iv1.ct1')
+    expect(raw.tn2?.dm).toBe('')
+  })
 })
 
 describe('màn làm bài mở chặng từ gói', () => {

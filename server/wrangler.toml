@@ -107,3 +107,8 @@ enabled = true
 # Bảng tin phụ huynh: 00:01 giờ Việt Nam hằng ngày.
 [triggers]
 crons = ["1 17 * * *", "* * * * *"]
+
+# Bật đọc qua bản sao D1 kèm dấu trang nhân quả trong NganHocSinh (server/src/ngan-hoc-sinh.ts, 06/11):
+# mọi lệnh đọc của em đi qua read replica gần nhất (hạn mức riêng), lệnh ghi tự về primary và giữ bookmark.
+[vars]
+BAT_BAN_SAO_NGAN = "1"

@@ -168,7 +168,7 @@ export function napGoiNgay(token: string, goi: typeof goiHoa2 = goiHoa2, now: nu
   if (napDang) return napDang
   const tat = Number(docJson(KHOA_TAT)) || 0
   if (now < tat) return Promise.resolve()
-  if (!luon && napCuoi.token === token && now - napCuoi.luc < TUOI_GOI_MS) return Promise.resolve()
+  if (!luon && (coChangGoiCua(token, now) || (napCuoi.token === token && now - napCuoi.luc < TUOI_GOI_MS))) return Promise.resolve()
   napCuoi = { token, luc: now }
   napDang = Promise.resolve().then(() => goi('hoc-tap-goi-ngay', token, {}, 60)).then((r) => {
     if (r.ok !== true || typeof r.sbd !== 'string' || !r.sbd) return
@@ -179,9 +179,24 @@ export function napGoiNgay(token: string, goi: typeof goiHoa2 = goiHoa2, now: nu
     nhoGoi.set(r.sbd.trim(), g)
     ghiJson(khoaGoi(r.sbd), g)
     ghiJson(KHOA_CUA, { sbd: r.sbd, t: duoiToken(token) })
-    napAnhSan(chang.flatMap((c) => c.questions).slice(0, CAU_MOI_CHANG_GOI))
+    if (r.kinh && typeof r.kinh === 'object') luuKinhTuGoi(r.kinh as Record<string, unknown>, r.ngay, now)
+    napAnhSan(chang.flatMap((c) => c.questions).slice(0, CAU_MOI_CHANG_GOI * 2))
   }).catch(() => {}).finally(() => { napDang = null })
   return napDang
+}
+
+function luuKinhTuGoi(kinh: Record<string, unknown>, ngay: string, luc: number): void {
+  try {
+    const cu = (docJson('ddh.kinh.v1') ?? {}) as Record<string, { dm?: string; ngay?: string; luc?: number }>
+    const moi: Record<string, { dm: string; ngay: string; luc?: number }> = {}
+    for (const [k, v] of Object.entries(cu)) if (v && v.ngay === ngay && typeof v.dm === 'string') moi[k] = { dm: v.dm, ngay, ...(v.luc ? { luc: v.luc } : {}) }
+    for (const [q, dm] of Object.entries(kinh)) {
+      if (typeof dm === 'string' && dm.includes('.')) moi[q] = { dm, ngay }
+      else if (dm === '' && !moi[q]?.dm) moi[q] = { dm: '', ngay, luc }
+    }
+    const ds = Object.entries(moi)
+    ghiJson('ddh.kinh.v1', ds.length > 600 ? Object.fromEntries(ds.slice(-600)) : moi)
+  } catch { /* bỏ */ }
 }
 
 /** Nạp sẵn ẢNH ĐỀ của chặng kế (hình đề, thân câu, hình phương án / ý — không hình lời giải) lúc máy rảnh: mở chặng là hình có ngay, mạng yếu không chờ tải. */

@@ -6,14 +6,22 @@ import { docTokenHs, goiHs } from '../loi-giai-api'
 import { giaiChuoi } from '../dap-an-may'
 
 const KHOA_LUU = 'ddh.kinh.v1'
-const TRAN = 400
-type Luu = Record<string, { dm: string; ngay: string }>
+const TRAN = 600
+// Câu đã xin mà máy chủ chưa có bản (máy soạn chưa tới / ca còn bảo vệ): giữ dấu trong localStorage 30 phút để đổi màn / tải lại trang không gọi lại D1.
+const XIN_LAI_MS = 30 * 60_000
+type Luu = Record<string, { dm: string; ngay: string; luc?: number }>
 const ngayVn = (ms = Date.now()) => new Date(ms + 7 * 3_600_000).toISOString().slice(0, 10)
 
 let nho: Luu | null = null
+let rawCuoi: string | null = null
 function kho(): Luu {
-  if (nho) return nho
-  try { const v = JSON.parse(localStorage.getItem(KHOA_LUU) || '{}'); nho = v && typeof v === 'object' ? (v as Luu) : {} } catch { nho = {} }
+  let raw: string | null = null
+  try { raw = localStorage.getItem(KHOA_LUU) } catch { /* bỏ */ }
+  if (nho && raw === rawCuoi) return nho
+  rawCuoi = raw
+  let trenDia: Luu = {}
+  try { const v = JSON.parse(raw || '{}'); if (v && typeof v === 'object') trenDia = v as Luu } catch { /* bỏ */ }
+  nho = nho ? { ...trenDia, ...nho } : trenDia
   const hom = ngayVn()
   for (const [k, v] of Object.entries(nho)) if (!v || v.ngay !== hom) delete nho[k]
   return nho
@@ -22,8 +30,15 @@ function luu(): void {
   try {
     const ds = Object.entries(kho())
     if (ds.length > TRAN) nho = Object.fromEntries(ds.slice(-TRAN))
-    localStorage.setItem(KHOA_LUU, JSON.stringify(nho))
+    const s = JSON.stringify(nho)
+    rawCuoi = s
+    localStorage.setItem(KHOA_LUU, s)
   } catch { /* hết chỗ / chặn lưu: vẫn còn trong bộ nhớ */ }
+}
+function daCoHoacVuaXin(v: { dm: string; ngay: string; luc?: number } | undefined, nay = Date.now()): boolean {
+  if (!v) return false
+  if (v.dm && v.dm.includes('.')) return true
+  return v.dm === '' && nay - (v.luc ?? 0) <= XIN_LAI_MS
 }
 
 const dangTai = new Map<string, Promise<void>>()
@@ -31,14 +46,20 @@ const dangTai = new Map<string, Promise<void>>()
 export function taiSanKinh(token: string, qids: readonly string[]): Promise<void> {
   if (!token) return Promise.resolve()
   const k = kho()
-  const tat = [...new Set(qids.filter((q) => q && !k[q] && !dangTai.has(q)))]
+  const nay = Date.now()
+  const tat = [...new Set(qids.filter((q) => q && !daCoHoacVuaXin(k[q], nay) && !dangTai.has(q)))]
   if (tat.length > 80) return Promise.all(Array.from({ length: Math.ceil(tat.length / 80) }, (_, i) => taiSanKinh(token, tat.slice(i * 80, i * 80 + 80)))).then(() => undefined)
   const can = tat
   if (!can.length) return Promise.all(qids.map((q) => dangTai.get(q)).filter(Boolean)).then(() => undefined)
   const p = goiHs('/hs/loi-giai-kinh', { token, qids: can }).then((r) => {
-    const ban = r && r.ok === true && r.ban && typeof r.ban === 'object' ? (r.ban as Record<string, unknown>) : {}
-    const hom = ngayVn()
-    for (const [q, dm] of Object.entries(ban)) if (typeof dm === 'string' && dm.includes('.')) kho()[q] = { dm, ngay: hom }
+    const ban = r && r.ok === true && r.ban && typeof r.ban === 'object' ? (r.ban as Record<string, unknown>) : null
+    if (!ban) return
+    const hom = ngayVn(), luc = Date.now(), dong = r?.dong === true
+    for (const q of can) {
+      const dm = ban[q]
+      if (typeof dm === 'string' && dm.includes('.')) kho()[q] = { dm, ngay: hom }
+      else if (!dong && !kho()[q]?.dm) kho()[q] = { dm: '', ngay: hom, luc }
+    }
     luu()
   }).catch(() => undefined).finally(() => { for (const q of can) dangTai.delete(q) })
   for (const q of can) dangTai.set(q, p)
@@ -46,7 +67,7 @@ export function taiSanKinh(token: string, qids: readonly string[]): Promise<void
 }
 
 /** Có gói Kính của câu trên máy chưa (không mở gói). */
-export const coGoiKinh = (qid: string): boolean => !!kho()[qid]
+export const coGoiKinh = (qid: string): boolean => Boolean(kho()[qid]?.dm)
 
 // Màn nào cần bản mà máy chưa có (Câu đã làm, Chữa câu sai…): gom mọi câu xin trong cùng ~40 ms thành MỘT lệnh, token lấy từ phiên học sinh đã lưu.
 let hangCho: Set<string> | null = null
@@ -64,19 +85,19 @@ function xinGom(qid: string): Promise<void> {
   hangCho.add(qid)
   return henGom!
 }
-// Câu đã xin mà máy chủ chưa có bản (máy soạn chưa tới / ca còn bảo vệ): xin lại sau 10 phút, không xin dồn mỗi lần mở.
-const XIN_LAI_MS = 10 * 60_000
 const daXin = new Map<string, number>()
 
 /** Mở gói Kính của câu (bản THÔ còn `_goc` — nơi vẽ sắp theo câu đã phát bằng `xepTheoCauPhat`). Chưa có ⇒ xin máy chủ một lần (gom). Không có / hỏng ⇒ null. */
 export async function banKinhCua(qid: string): Promise<unknown | null> {
-  const g = kho()[qid]
-  if (!g) {
+  let g = kho()[qid]
+  if (!g?.dm) {
     await dangTai.get(qid)
-    if (!kho()[qid] && Date.now() - (daXin.get(qid) ?? 0) > XIN_LAI_MS) { daXin.set(qid, Date.now()); await xinGom(qid) }
-    if (!kho()[qid]) return null
+    g = kho()[qid]
+    const nay = Date.now()
+    if (!daCoHoacVuaXin(g, nay) && nay - (daXin.get(qid) ?? 0) > XIN_LAI_MS) { daXin.set(qid, nay); await xinGom(qid); g = kho()[qid] }
+    if (!g?.dm) return null
   }
-  const dm = kho()[qid]!.dm
+  const dm = g.dm
   const i = dm.indexOf('.')
   const chu = i > 0 ? await giaiChuoi(dm.slice(0, i), `kinh|${qid}`, dm.slice(i + 1)) : null
   if (!chu) return null

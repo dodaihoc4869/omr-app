@@ -131,9 +131,18 @@ export default function HocTapHomNay(p: Props) {
   // ngay (mo-chang-truoc.ts — kết quả y hệt gọi lúc bấm; mỗi token tối đa một lượt mỗi 10 phút). Nạp ĐỘNG mảnh màn làm bài (cùng mảnh nút Học tiếp mở): không
   // thêm tệp vào lượt mở app / precache, và màn làm bài được nạp sẵn luôn.
   const coTheHoc = !!sanh && !ngayKiem && !khoaHoc && !!con && con > 0 && !p.coCa
-  // Gói cả ngày (mo-chang-truoc.ts, thầy 29/10): máy em đã có chặng trong gói ⇒ `moChangTruoc` không gọi máy chủ (câu hiện từ gói). Gói chỉ lập lại sau mỗi chặng (màn làm bài)
-  // — mở app KHÔNG thêm lệnh nặng nào giờ cao điểm.
-  useEffect(() => { if (coTheHoc && p.token) { const token = p.token; void import('./ManLamBaiTap').then((m) => m.moChangTruoc(token)).catch(() => {}) } }, [coTheHoc, p.token])
+  // Gói cả ngày (mo-chang-truoc.ts, thầy 29/10 & 06/11): máy em đã có chặng trong gói ⇒ `moChangTruoc` không gọi máy chủ; chưa có gói cả ngày ⇒ sau 1,2 s tải sẵn trọn
+  // các chặng + đáp án mã hoá `dm` + lời giải Kính mã hoá `kinh` xuống máy để mọi chặng trong ngày mở và chấm 0 ms tại máy, không gọi lại D1.
+  useEffect(() => {
+    if (!coTheHoc || !p.token) return
+    const token = p.token
+    let h = 0
+    void import('./ManLamBaiTap').then((m) => {
+      m.moChangTruoc(token)
+      h = window.setTimeout(() => { void m.napGoiNgay(token) }, 1200)
+    }).catch(() => {})
+    return () => { if (h) window.clearTimeout(h) }
+  }, [coTheHoc, p.token])
 
   // Tấm "Của em": Esc đóng, focus vào tấm khi mở và trả về ảnh đại diện khi đóng.
   useEffect(() => {

@@ -30,6 +30,9 @@ export const CAU_MOI_CHANG = 6
  *  dư hai nhịp ⇒ mạng yếu / giờ cao điểm lượt lập lại về chậm hay hỏng một lần vẫn có chặng sẵn. Không lập cả ngày: mỗi lượt lập đọc + niêm phong đúng số câu này. */
 export const SO_CHANG_GOI = 3
 export const SO_CAU_GOI_NGAY = SO_CHANG_GOI * CAU_MOI_CHANG
+/** Gói cả ngày thật cho máy em (06/11): tối đa 8 chặng (48 câu = trọn ngày học) + bản Kính mã hoá đi kèm trong một lệnh duy nhất. */
+export const SO_CHANG_CA_NGAY = 8
+export const SO_CAU_CA_NGAY = SO_CHANG_CA_NGAY * CAU_MOI_CHANG
 export const goiNgayBat = (sbd: string): boolean => cheDo === 'bat' || (cheDo === 'thu' && SBD_THU.has(sbd))
 // `v2` (01/11, luật tự luận siết): gói cả ngày niêm trước đó có thể mang câu tự luận ⇒ mở không được (GOI_CU) ⇒ máy em bỏ gói cũ, tải gói mới.
 const aadVe = (sbd: string, ngay: string) => `goi-ngay|v2|${sbd}|${ngay}`
@@ -45,26 +48,37 @@ async function phienBanHienTai(env: Env, refs: readonly Ref[]): Promise<Map<stri
 }
 interface NoiDungVe { v: number; e: number; r: Ref[]; g: string[] }
 
-/** Lập gói cả ngày cho em. Không có kế hoạch / thầy tạm dừng ⇒ gói rỗng. */
-export async function goiNgay7(env: Env, sbd: string, now: number): Promise<Record<string, unknown>> {
+async function dinhKinh(env: Env, sbd: string, chang: readonly { questions: unknown[] }[], now: number): Promise<Record<string, string>> {
+  const qids = chang.flatMap((c) => c.questions).map((q) => (q && typeof q === 'object' ? String((q as { qid?: unknown }).qid ?? '') : '')).filter(Boolean)
+  if (!qids.length) return {}
+  return import('./loi-giai-kinh').then((m) => m.kinhChoGoiNgay(env, sbd, qids, now)).catch(() => ({}))
+}
+
+/** Lập gói cả ngày cho em. Không có kế hoạch / thầy tạm dừng ⇒ gói rỗng. `caNgay`: lập trọn ngày (tối đa 8 chặng = 48 câu + Kính). */
+export async function goiNgay7(env: Env, sbd: string, now: number, caNgay = false): Promise<Record<string, unknown>> {
   if (!goiNgayBat(sbd)) return { ok: true, tat: true, sbd }
   // BẢN SẴN (san-sang.ts — cron lập sẵn cho mọi em; dấu khớp, cùng ngày, chưa có đợt mới hơn): chặng kế đã lập ⇒ gói từ bản ấy, KHÔNG lập kế hoạch (một lệnh D1).
-  // Gói một chặng; hết chặng máy em lập lại gói (đường đủ dưới).
+  // Khi máy em xin trọn ngày (`caNgay`), chỉ dừng ở bản sẵn 1 chặng nếu phần còn lại hôm nay của em gói gọn trong đúng chặng ấy; còn nhiều chặng hơn ⇒ lập đủ cả ngày.
   const ss = await import('./san-sang')
   const [dauSs, ban] = await ss.docDauVaBan(env, sbd, now)
   const c = ban?.chang as { refs?: unknown; questions?: unknown; goi7?: unknown; goiIds?: unknown; phienCu?: unknown } | null | undefined
+  const conSanh = Number((ban?.sanh as { theLuc?: { con?: unknown } } | null)?.theLuc?.con)
   if (ss.dungDuoc(ban, dauSs, ngayVn7(now)) && ban.phienMoi < ban.luc && c && !c.phienCu && Array.isArray(c.refs) && c.refs.length > 0 && Array.isArray(c.questions)
-    && c.questions.length === c.refs.length && Array.isArray(c.goiIds)) {
+    && c.questions.length === c.refs.length && Array.isArray(c.goiIds) && (!caNgay || (Number.isFinite(conSanh) && conSanh <= c.questions.length))) {
     const ve = await niemMa(env, aadVe(sbd, ban.ngay), { r: c.refs, g: c.goiIds }, now, HAN_NIEM_CHUAN_BI_MS)
-    if (ve) return { ok: true, sbd, ngay: ban.ngay, luc: now, chang: [{ ve, questions: c.questions }], goi7: c.goi7, tuBanSan: true }
+    if (ve) {
+      const chang = [{ ve, questions: c.questions as Record<string, unknown>[] }]
+      return { ok: true, sbd, ngay: ban.ngay, luc: now, chang, goi7: c.goi7, tuBanSan: true, kinh: await dinhKinh(env, sbd, chang, now) }
+    }
   }
+  const soChang = caNgay ? SO_CHANG_CA_NGAY : SO_CHANG_GOI
   const g7 = await import('./goi-bai-7')
-  const x = await g7.xayGoiNgay7(env, sbd, now, SO_CAU_GOI_NGAY)
+  const x = await g7.xayGoiNgay7(env, sbd, now, soChang * CAU_MOI_CHANG)
   if (!x) return { ok: true, sbd, ngay: ngayVn7(now), luc: now, chang: [] }
   const daLam = Number((x.goi7 as { daLamHomNay?: unknown } | null)?.daLamHomNay) || 0
   const dau = CAU_MOI_CHANG - (daLam % CAU_MOI_CHANG) // chặng đầu bù cho khớp ranh chặng của Lộ trình (⌊đã làm / 6⌋)
   const chang: { ve: string; questions: Record<string, unknown>[] }[] = []
-  for (let i = 0; i < x.refs.length && chang.length < SO_CHANG_GOI;) {
+  for (let i = 0; i < x.refs.length && chang.length < soChang;) {
     const n = chang.length === 0 ? dau : CAU_MOI_CHANG
     const refs = x.refs.slice(i, i + n), questions = x.questions.slice(i, i + n)
     i += n
@@ -72,7 +86,7 @@ export async function goiNgay7(env: Env, sbd: string, now: number): Promise<Reco
     if (!ve) return { ok: false, error: 'Chưa lập được gói bài hôm nay.' }
     chang.push({ ve, questions })
   }
-  return { ok: true, sbd, ngay: x.ngay, luc: now, chang, goi7: x.goi7 }
+  return { ok: true, sbd, ngay: x.ngay, luc: now, chang, goi7: x.goi7, kinh: await dinhKinh(env, sbd, chang, now) }
 }
 
 /** Mở phiên từ gói. `b.ves` (hoặc `b.ve` của máy em cũ) = các bộ ref niêm phong (≤ 4 chặng của gói — máy em ghép câu còn lại cho đủ một chặng); `b.qids` (tuỳ chọn) =

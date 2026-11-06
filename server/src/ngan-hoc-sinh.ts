@@ -136,6 +136,7 @@ async function docTram(): Promise<string> {
  */
 export const HAN_DEM_PHAN_HOI: Readonly<Record<string, number>> = {
   '/hs/ca-dang-mo': 10_000, '/hs/buoi-hoc': 20_000, '/mom/list': 20_000, '/notifications/list': 20_000, '/hs/thuong': 15_000, '/hs/chua-cau-sai/co': 20_000,
+  '/game-v2/hoc-tap-dem': 15_000, '/game-v2/hoc-tap-sanh': 15_000, '/hs/ke-hoach-ngay': 15_000, '/hs/nhip-hoc': 20_000,
 }
 type DemPh = { luc: number; han: number; headers: [string, string][]; than: string }
 

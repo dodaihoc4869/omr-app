@@ -116,6 +116,11 @@ it('em có bản sẵn (cron) còn dùng được ⇒ gói lấy đúng chặng 
   expect(mo.ok).toBe(true)
   expect(mo.qids).toEqual(qBan)
   expect(Object.keys(mo.sk).length).toBe(qBan.length)
+  // `caNgay = true` (hoc-tap-goi-ngay): em còn nhiều hơn 1 chặng hôm nay ⇒ vượt qua bản sẵn 1 chặng để lập trọn các chặng trong ngày + đính kèm `kinh`.
+  const goiCaNgay = await goiNgay7(k.env, 'S1', NOW, true) as unknown as Goi & { tuBanSan?: boolean; kinh?: Record<string, string> }
+  expect(goiCaNgay.tuBanSan).toBeUndefined()
+  expect(goiCaNgay.chang.length).toBeGreaterThan(1)
+  expect(typeof goiCaNgay.kinh).toBe('object')
 })
 
 it('máy em ghép câu của hai chặng trong gói (`ves` + `qids`) ⇒ phiên đúng các câu ấy, tối đa 6; một `ve` hỏng ⇒ GOI_CU', async () => {

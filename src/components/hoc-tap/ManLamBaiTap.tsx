@@ -786,7 +786,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     onCapNhat()
     henNapLai(() => capNhatRef.current())
     boChangMoTruoc()
-    void napGoiNgay(token, goiHoa2, Date.now(), true)
+    if (!layChangGoi(sbd, Date.now(), CAU_MOI_CHANG_GOI * 2)) void napGoiNgay(token, goiHoa2, Date.now(), true)
     moChangTruoc(token)
   }
   // A3 — câu cũ trượt trái mờ dần (bản sao, không trễ bước sang câu mới; chỉ màn Duo).
