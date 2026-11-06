@@ -1,0 +1,145 @@
+{
+  "i": 110,
+  "hash": "14b953017b488e11acd383be65e26411b465e148de197f3c6b71256715c621e4",
+  "fileNguon": "anh/14b953017b488e11acd383be65e26411b465e148de197f3c6b71256715c621e4.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "zoom": "/workspace/scratch/cau4-isotope207-glyphzoom.png",
+  "questions": [
+    {
+      "qid": "10-C1-B2-II-7",
+      "de": "Mô hình dưới đây mô tả cấu tạo nguyên tử các đồng vị của nguyên tố hydrogen:",
+      "refs": [
+        {
+          "hash": "14b953017b488e11acd383be65e26411b465e148de197f3c6b71256715c621e4",
+          "where": "10-C1-B2-II-7.hinh.0.du_lieu",
+          "hashDataUrl": "18bcb0b611bde0931bed1888f16fe55f80e6e770a49d293e63b08dae24c5c19a"
+        }
+      ]
+    },
+    {
+      "qid": "DB-10-B2-D2-II-34",
+      "de": "Mô hình dưới đây mô tả cấu tạo nguyên tử các đồng vị của nguyên tố hydrogen:",
+      "refs": [
+        {
+          "hash": "14b953017b488e11acd383be65e26411b465e148de197f3c6b71256715c621e4",
+          "where": "DB-10-B2-D2-II-34.hinh.0.du_lieu",
+          "hashDataUrl": "18bcb0b611bde0931bed1888f16fe55f80e6e770a49d293e63b08dae24c5c19a"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–2pxapprox,countactualnotchemtheory.",
+    "panels": [
+      {
+        "caption": "Protium",
+        "captionAnchor": [
+          113,
+          283
+        ],
+        "cloud": [
+          121,
+          123,
+          109
+        ],
+        "electron": [
+          137,
+          22,
+          18
+        ],
+        "protons": [
+          [
+            121,
+            123,
+            24
+          ]
+        ],
+        "neutrons": []
+      },
+      {
+        "caption": "Deuterium",
+        "captionAnchor": [
+          372,
+          285
+        ],
+        "cloud": [
+          373,
+          123,
+          109
+        ],
+        "electron": [
+          420,
+          30,
+          18
+        ],
+        "protons": [
+          [
+            347,
+            123,
+            24
+          ]
+        ],
+        "neutrons": [
+          [
+            395,
+            123,
+            24
+          ]
+        ]
+      },
+      {
+        "caption": "Tritium",
+        "captionAnchor": [
+          624,
+          286
+        ],
+        "cloud": [
+          626,
+          123,
+          109
+        ],
+        "electron": [
+          684,
+          30,
+          18
+        ],
+        "protons": [
+          [
+            595,
+            123,
+            24
+          ]
+        ],
+        "neutrons": [
+          [
+            639,
+            100,
+            24
+          ],
+          [
+            635,
+            147,
+            24
+          ]
+        ]
+      }
+    ],
+    "glyphs": {
+      "electron": "e−BASELINEminus(midlineofe),NOTsuperscript",
+      "proton": "p⁺PLUSsuperscriptupperrightsmaller,pbodyfullsize",
+      "neutron": "nnocharge/no0",
+      "captions": "EnglishexactProtium/Deuterium/Tritium,blackBOLDtruefont"
+    },
+    "colors": {
+      "cloud": "circularradialgradientcenterpalewhiteyellow→brightyellowedge/goldthinoutline",
+      "electron": "limegreenfill/greenoutline",
+      "proton": "bluecyanradialgradient/darkerblueoutline",
+      "neutron": "pinkmagenta radialgradient/darkerpinkoutline"
+    },
+    "counts": "3e−(1each)/3p+(1each)/3n(0/1/2panels),3cloudcirclesNOorbitalpaths/countercharges/nums/atomicmasslabels.",
+    "occlusion": "Electronscovercloudboundary;protonsandneutronsforegroundincloud;Tritium2nverticallynear/touchp+left,lowernfrontupper/sideboundaryslighttouchsource. DoNOTmerge2nintooneblob.",
+    "noAdded": "Noorbitalrings/arrows/numberisotopes/A-Zlabels/chargetheory/captiontranslations."
+  },
+  "verdict": "Đọcsource,chưaactualSVGreview."
+}

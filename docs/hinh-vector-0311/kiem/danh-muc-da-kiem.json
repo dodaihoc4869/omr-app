@@ -379,6 +379,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "14b953017b488e11acd383be65e26411b465e148de197f3c6b71256715c621e4": {
+      "tep": "dong-vi-hydrogen-ddh-4731a272320c2dee490ab7c87adbca81de391a9ac0972783f894b3d18ff05723.svg",
+      "hashSvg": "4731a272320c2dee490ab7c87adbca81de391a9ac0972783f894b3d18ff05723",
+      "byteSvg": 20894,
+      "byteGzip": 3593,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "140f0df917df37e648f76dfe43ec9993f5f3d8465ed89bba639fdf14432dac5e": {
       "tep": "glucose-ba-dang-ddh-5a734981aff43d1f61aa65e1479d55e8d303485a310de25a47fcc9f0dc9c1021.svg",
       "hashSvg": "5a734981aff43d1f61aa65e1479d55e8d303485a310de25a47fcc9f0dc9c1021",
@@ -7331,6 +7340,20 @@
       ]
     },
     {
+      "qid": "10-C1-B2-II-7",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "14b953017b488e11acd383be65e26411b465e148de197f3c6b71256715c621e4",
+          "where": "10-C1-B2-II-7.hinh.0.du_lieu",
+          "hashDataUrl": "18bcb0b611bde0931bed1888f16fe55f80e6e770a49d293e63b08dae24c5c19a",
+          "vector": "dong-vi-hydrogen-ddh-4731a272320c2dee490ab7c87adbca81de391a9ac0972783f894b3d18ff05723.svg"
+        }
+      ]
+    },
+    {
       "qid": "10-C1-B2-II-17",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -12791,6 +12814,20 @@
           "where": "DB-10-B2-D2-I-29.hinh.3.du_lieu",
           "hashDataUrl": "a895ea0fe8f3c26886bd7c87233e66cb7a277c0bb0df119053270d83237ac1ca",
           "vector": "ms-pa-d-ddh-257b3faf028de13bda6a377b66987c5e348a35a1af3dd18d874f80722f931a92.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-10-B2-D2-II-34",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "14b953017b488e11acd383be65e26411b465e148de197f3c6b71256715c621e4",
+          "where": "DB-10-B2-D2-II-34.hinh.0.du_lieu",
+          "hashDataUrl": "18bcb0b611bde0931bed1888f16fe55f80e6e770a49d293e63b08dae24c5c19a",
+          "vector": "dong-vi-hydrogen-ddh-4731a272320c2dee490ab7c87adbca81de391a9ac0972783f894b3d18ff05723.svg"
         }
       ]
     },
@@ -24739,6 +24776,7 @@
     "10-C1-B2-I-44",
     "10-C1-B2-I-45",
     "10-C1-B2-I-58",
+    "10-C1-B2-II-7",
     "10-C1-B2-II-17",
     "10-C1-B2-II-18",
     "10-C1-B2-II-19",
@@ -25077,6 +25115,7 @@
     "DB-10-B2-D2-I-18",
     "DB-10-B2-D2-I-19",
     "DB-10-B2-D2-I-29",
+    "DB-10-B2-D2-II-34",
     "DB-10-B2-D2-II-40",
     "DB-10-B2-D2-II-41",
     "DB-10-B2-D2-II-42",

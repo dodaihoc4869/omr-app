@@ -1,0 +1,40 @@
+[
+  {
+    "i": 110,
+    "hash": "14b953017b488e11acd383be65e26411b465e148de197f3c6b71256715c621e4",
+    "fileNguon": "anh/14b953017b488e11acd383be65e26411b465e148de197f3c6b71256715c621e4.png",
+    "svg": "dong-vi-hydrogen-ddh-4731a272320c2dee490ab7c87adbca81de391a9ac0972783f894b3d18ff05723.svg",
+    "hashSvg": "4731a272320c2dee490ab7c87adbca81de391a9ac0972783f894b3d18ff05723",
+    "byteSvg": 20894,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "10-C1-B2-II-7",
+        "de": "Mô hình dưới đây mô tả cấu tạo nguyên tử các đồng vị của nguyên tố hydrogen:",
+        "refs": [
+          {
+            "hash": "14b953017b488e11acd383be65e26411b465e148de197f3c6b71256715c621e4",
+            "where": "10-C1-B2-II-7.hinh.0.du_lieu",
+            "hashDataUrl": "18bcb0b611bde0931bed1888f16fe55f80e6e770a49d293e63b08dae24c5c19a"
+          }
+        ]
+      },
+      {
+        "qid": "DB-10-B2-D2-II-34",
+        "de": "Mô hình dưới đây mô tả cấu tạo nguyên tử các đồng vị của nguyên tố hydrogen:",
+        "refs": [
+          {
+            "hash": "14b953017b488e11acd383be65e26411b465e148de197f3c6b71256715c621e4",
+            "where": "DB-10-B2-D2-II-34.hinh.0.du_lieu",
+            "hashDataUrl": "18bcb0b611bde0931bed1888f16fe55f80e6e770a49d293e63b08dae24c5c19a"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3yellowclouds/3electrons-e−/3protons-p+/neutrons0-1-2/3Englishcaptionsdam/sourcecolors/internalgradients/DDHpath.",
+    "hashSvgDaSoat": "4731a272320c2dee490ab7c87adbca81de391a9ac0972783f894b3d18ff05723",
+    "nguoiSoat": "cau_truc_4"
+  }
+]
