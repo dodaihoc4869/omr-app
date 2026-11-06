@@ -112,6 +112,10 @@ export interface Env {
   PHONG_DAU_ION?: DurableObjectNamespace
   /** Công tắc tắt Đấu Nguyên Tử trên mạng: có giá trị ⇒ không phát vé, cửa trả 410, phòng đang mở bị đóng (máy em còn Tập với A.I cục bộ). */
   TAT_DAU_ION?: string
+  /** Bình Phản Ứng (06/11, server/src/phong-binh-phan-ung.ts): một Durable Object mỗi buổi học — cả lớp cùng làm câu thầy chiếu. Vắng ⇒ tắt. */
+  PHONG_BPU?: DurableObjectNamespace
+  /** Công tắc tắt Bình Phản Ứng: có giá trị ⇒ không mở phòng, không phát vé, cửa trả 410 (điểm danh chiếu lại màn cũ). */
+  TAT_BPU?: string
   /** Chỉ có khi lệnh chạy TRONG ngăn của em (ngan-hoc-sinh.ts): kho riêng của đúng em đó. */
   KHO_EM?: KhoEm
   /** Mã bí mật của thầy — đặt bằng `wrangler secret put MA_BI_MAT`, KHÔNG vào git. */

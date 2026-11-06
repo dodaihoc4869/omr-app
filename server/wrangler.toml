@@ -72,6 +72,12 @@ class_name = "PhongDauIon"
 name = "GOM_D1"
 class_name = "NganGomD1"
 
+# Bình Phản Ứng (06/11, server/src/phong-binh-phan-ung.ts): cả lớp cùng làm câu thầy chiếu — MỘT Durable Object mỗi buổi học (idFromName `bpu:<buổi>`),
+# WebSocket Hibernation, lớp SQLite, trạng thái trong storage. Tắt nhanh: biến/secret `TAT_BPU`.
+[[durable_objects.bindings]]
+name = "PHONG_BPU"
+class_name = "PhongBinhPhanUng"
+
 [[migrations]]
 tag = "bia-v1"
 new_sqlite_classes = ["BanBiA"]
@@ -91,6 +97,10 @@ new_sqlite_classes = ["PhongDauIon"]
 [[migrations]]
 tag = "gom-d1-v1"
 new_sqlite_classes = ["NganGomD1"]
+
+[[migrations]]
+tag = "bpu-v1"
+new_sqlite_classes = ["PhongBinhPhanUng"]
 
 [[r2_buckets]]
 binding = "DE"

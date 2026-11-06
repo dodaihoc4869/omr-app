@@ -74,6 +74,8 @@ const ManLamBaiTap = veNgayKhiCo(lazy(napManLamBaiTap), napManLamBaiTap)
 const TAB_LAM_BAI: ReadonlySet<string> = new Set(['hoctap', 'kiemtra', 'vaothi', 'tuluyen', 'btvn', 'mom', 'cauon', 'khacphuc'])
 // Thẻ điểm danh nổi của giao diện CŨ (không «Trong») — nạp lười (30/10): «Trong» dùng khối điểm danh trong menu (TrongHs, diem-danh-hs.ts).
 const TheDiemDanhHs = lazy(() => import('../components/diem-danh/TheDiemDanhHs'))
+// BÌNH PHẢN ỨNG (thầy 06/11): cả lớp cùng làm câu thầy chiếu — mảnh nạp lười, chỉ mở khi em vừa điểm danh hoặc kênh đẩy báo `bpu`.
+const ManBinhPhanUng = lazy(() => import('../components/bpu/ManBinhPhanUng'))
 /** MÁY YẾU 30/10 (hồ sơ CPU ×6): Lộ trình nằm ẩn (`inert`) dưới màn làm chặng / màn khác mà vẫn vẽ lại CẢ cây (~665 nút) mỗi lần cổng đổi trạng thái — ngay
  *  trong cú chạm «Bắt đầu» và sau mỗi câu (số tiến độ). Đang ẩn ⇒ giữ nguyên cây (không vẽ lại); hiện lại ⇒ vẽ một lượt với số mới nhất. */
 const DungKhiAn = memo(function DungKhiAn({ children }: { an: boolean; children: ReactNode }) { return <>{children}</> }, (_truoc, sau) => sau.an)
@@ -486,6 +488,19 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
     void import('../lib/kenh-day').then((m) => { if (!huy) dong = m.moKenhDay(token) }).catch(() => {})
     return () => { huy = true; dong?.() }
   }, [auth?.sbd, auth?.token])
+  // BÌNH PHẢN ỨNG: tin `ddh:bpu` (điểm danh xong — kèm buổi; hoặc kênh đẩy — thầy vừa chiếu câu) ⇒ mở màn đầy màn hình. Đang thi / phòng chờ / kiểm tra ⇒ KHÔNG cướp màn.
+  const [bpu, setBpu] = useState<{ buoiId: string | null } | null>(null)
+  const chanBpu = useRef(false)
+  chanBpu.current = !!manThi || !!boVaoThi || tab === 'kiemtra' || tab === 'vaothi'
+  useEffect(() => {
+    const nghe = (e: Event) => {
+      if (chanBpu.current) return
+      const id = (e as CustomEvent<{ buoiId?: string } | undefined>).detail?.buoiId
+      setBpu((cu) => (cu ? (id && !cu.buoiId ? { buoiId: id } : cu) : { buoiId: id ?? null }))
+    }
+    window.addEventListener('ddh:bpu', nghe)
+    return () => window.removeEventListener('ddh:bpu', nghe)
+  }, [])
   useEffect(() => {
     if (!auth?.sbd || !auth.token) return
     const sbd = auth.sbd, token = auth.token
@@ -1014,6 +1029,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
       {hop}
       {/* ĐIỂM DANH BUỔI HỌC (bảng Dạy học của thầy, 28/09): thẻ nổi khi lớp em có buổi đang mở; quét QR ⇒ tự điểm danh. Không hiện khi đang thi. */}
       {/* + bong bóng A.I Đỗ Đại Học (24/10): chỉ ở Hôm nay, không khi đang thi / mở hồ sơ. */}
+      {auth.token && bpu && !manThi && <Suspense fallback={null}><ManBinhPhanUng token={auth.token} buoiId={bpu.buoiId} onDong={() => setBpu(null)} /></Suspense>}
       {auth.token && !manThi && tab === null && <>{!trongHs && <Suspense fallback={null}><TheDiemDanhHs token={auth.token} /></Suspense>}{!moHoSoEm && <Suspense fallback={null}><BongBongAiDdh auth={auth} anBong={trongHs} /></Suspense>}</>}
       {auth.token && !manThi && (
         <div inert={tab !== null} aria-hidden={tab !== null || undefined}><DungKhiAn an={tab !== null}><HocTapHomNay nguon={duLieuBang.nguon} dangLamMoi={keHoachNgay.dangLamMoi} thongBao={<ThongBaoHocSinh token={auth.token} onOpen={(t) => { setTab(t); if (t === 'mom') void napDsMom(); if (t === 'btvn') void napLaiBtvn() }} />}

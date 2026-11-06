@@ -29,3 +29,5 @@ Quyết định chưa chọn ⇒ theo đề xuất ở GHI-CHU §8: không cộn
 6. **Phát hành:** gộp vào main ⇒ deploy.yml (cổng giờ học 18:00–23:30; ca mở chặn). Ghi Nhật ký.
 
 ## Tiến độ (ghi thêm khi xong từng phần)
+
+- a09a34a+ · máy chủ (phong-binh-phan-ung.ts, src/lib/bpu/phong.ts + test 11/11), màn máy em (ManBinhPhanUng + bpu-hs.css), gắn StudentPortal/kenh-day/diem-danh-hs. Phím tờ chiếu sẽ là P (L đã là Lên bảng). Điểm = kJ (tinh thể đã là phần thưởng có sẵn).
