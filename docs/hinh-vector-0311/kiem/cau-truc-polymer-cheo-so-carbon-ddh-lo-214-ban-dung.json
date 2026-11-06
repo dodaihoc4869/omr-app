@@ -1,0 +1,40 @@
+[
+  {
+    "i": 160,
+    "hash": "1b842e1ee8d68bf8b6db65b3778f23f06a269e5aafd0fdd9d782e2d0c29060a4",
+    "fileNguon": "anh/1b842e1ee8d68bf8b6db65b3778f23f06a269e5aafd0fdd9d782e2d0c29060a4.png",
+    "svg": "polymer-cheo-so-carbon-ddh-4cee967767e0cbf43a7cf3363ae20f909e1f7b04fd433032712ec76c3f52179a.svg",
+    "hashSvg": "4cee967767e0cbf43a7cf3363ae20f909e1f7b04fd433032712ec76c3f52179a",
+    "byteSvg": 37353,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D3-II-257",
+        "de": "Hình ảnh dưới đây mô tả cấu tạo phân tử cellulose:",
+        "refs": [
+          {
+            "hash": "1b842e1ee8d68bf8b6db65b3778f23f06a269e5aafd0fdd9d782e2d0c29060a4",
+            "where": "DB-12-B4-D3-II-257.hinh.0.du_lieu",
+            "hashDataUrl": "f48f749f13f4057712a462d03285549d2a77c5a13a8f3d29e93307ffb0b38320"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B6-II-13",
+        "de": "Hình ảnh dưới đây mô tả cấu tạo phân tử cellulose:",
+        "refs": [
+          {
+            "hash": "1b842e1ee8d68bf8b6db65b3778f23f06a269e5aafd0fdd9d782e2d0c29060a4",
+            "where": "DH-12-C2-B6-II-13.hinh.0.du_lieu",
+            "hashDataUrl": "f48f749f13f4057712a462d03285549d2a77c5a13a8f3d29e93307ffb0b38320"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3diagonalHaworth/18Cnums/15H/allOH-CH2OH/3ringO2bridge2terminalO/2ellipsis/normalfrontdiagonals3horizontalbold/noCaption/DDHpath.",
+    "hashSvgDaSoat": "4cee967767e0cbf43a7cf3363ae20f909e1f7b04fd433032712ec76c3f52179a",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

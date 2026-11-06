@@ -1,0 +1,555 @@
+{
+  "i": 160,
+  "hash": "1b842e1ee8d68bf8b6db65b3778f23f06a269e5aafd0fdd9d782e2d0c29060a4",
+  "fileNguon": "anh/1b842e1ee8d68bf8b6db65b3778f23f06a269e5aafd0fdd9d782e2d0c29060a4.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "zoom": "/workspace/scratch/cau4-polymer214-zoom.png",
+  "questions": [
+    {
+      "qid": "DB-12-B4-D3-II-257",
+      "de": "Hình ảnh dưới đây mô tả cấu tạo phân tử cellulose:",
+      "refs": [
+        {
+          "hash": "1b842e1ee8d68bf8b6db65b3778f23f06a269e5aafd0fdd9d782e2d0c29060a4",
+          "where": "DB-12-B4-D3-II-257.hinh.0.du_lieu",
+          "hashDataUrl": "f48f749f13f4057712a462d03285549d2a77c5a13a8f3d29e93307ffb0b38320"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C2-B6-II-13",
+      "de": "Hình ảnh dưới đây mô tả cấu tạo phân tử cellulose:",
+      "refs": [
+        {
+          "hash": "1b842e1ee8d68bf8b6db65b3778f23f06a269e5aafd0fdd9d782e2d0c29060a4",
+          "where": "DH-12-C2-B6-II-13.hinh.0.du_lieu",
+          "hashDataUrl": "f48f749f13f4057712a462d03285549d2a77c5a13a8f3d29e93307ffb0b38320"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–2pxapprox;NOTalias197becausenumbers18/onepanel/sourcewording.",
+    "units": [
+      {
+        "nodes": {
+          "C4": [
+            151,
+            316
+          ],
+          "C5": [
+            205,
+            262
+          ],
+          "O": [
+            279,
+            264
+          ],
+          "C1": [
+            336,
+            316
+          ],
+          "C2": [
+            282,
+            369
+          ],
+          "C3": [
+            205,
+            369
+          ]
+        },
+        "CH2OH": {
+          "text": "CH₂OH",
+          "anchor": [
+            243,
+            217
+          ],
+          "bond": [
+            [
+              205,
+              262
+            ],
+            [
+              205,
+              232
+            ]
+          ],
+          "target": "Cfirst"
+        },
+        "OH": [
+          {
+            "text": "OH",
+            "on": "C3up",
+            "at": [
+              217,
+              329
+            ],
+            "bond": [
+              [
+                205,
+                369
+              ],
+              [
+                205,
+                342
+              ]
+            ]
+          },
+          {
+            "text": "OH",
+            "on": "C2down",
+            "at": [
+              294,
+              417
+            ],
+            "bond": [
+              [
+                282,
+                369
+              ],
+              [
+                282,
+                401
+              ]
+            ]
+          }
+        ],
+        "H": [
+          {
+            "on": "C4up",
+            "at": [
+              151,
+              272
+            ]
+          },
+          {
+            "on": "C5down",
+            "at": [
+              205,
+              299
+            ]
+          },
+          {
+            "on": "C3down",
+            "at": [
+              205,
+              417
+            ]
+          },
+          {
+            "on": "C2up",
+            "at": [
+              282,
+              328
+            ]
+          },
+          {
+            "on": "C1down",
+            "at": [
+              336,
+              369
+            ]
+          }
+        ],
+        "numbers": {
+          "1": [
+            335,
+            294
+          ],
+          "2": [
+            298,
+            383
+          ],
+          "3": [
+            193,
+            385
+          ],
+          "4": [
+            140,
+            306
+          ],
+          "5": [
+            192,
+            253
+          ],
+          "6": [
+            205,
+            195
+          ]
+        },
+        "frontStyle": "2diagonalsUNIFORM~2pxNOtaper;horizontalbold~4px"
+      },
+      {
+        "nodes": {
+          "C4": [
+            468,
+            228
+          ],
+          "C5": [
+            522,
+            174
+          ],
+          "O": [
+            597,
+            175
+          ],
+          "C1": [
+            653,
+            228
+          ],
+          "C2": [
+            598,
+            281
+          ],
+          "C3": [
+            522,
+            281
+          ]
+        },
+        "CH2OH": {
+          "text": "CH₂OH",
+          "anchor": [
+            560,
+            129
+          ],
+          "bond": [
+            [
+              522,
+              174
+            ],
+            [
+              522,
+              144
+            ]
+          ],
+          "target": "Cfirst"
+        },
+        "OH": [
+          {
+            "text": "OH",
+            "on": "C3up",
+            "at": [
+              534,
+              241
+            ],
+            "bond": [
+              [
+                522,
+                281
+              ],
+              [
+                522,
+                254
+              ]
+            ]
+          },
+          {
+            "text": "OH",
+            "on": "C2down",
+            "at": [
+              610,
+              329
+            ],
+            "bond": [
+              [
+                598,
+                281
+              ],
+              [
+                598,
+                313
+              ]
+            ]
+          }
+        ],
+        "H": [
+          {
+            "on": "C4up",
+            "at": [
+              468,
+              184
+            ]
+          },
+          {
+            "on": "C5down",
+            "at": [
+              522,
+              211
+            ]
+          },
+          {
+            "on": "C3down",
+            "at": [
+              522,
+              329
+            ]
+          },
+          {
+            "on": "C2up",
+            "at": [
+              598,
+              240
+            ]
+          },
+          {
+            "on": "C1down",
+            "at": [
+              653,
+              281
+            ]
+          }
+        ],
+        "numbers": {
+          "1": [
+            653,
+            207
+          ],
+          "2": [
+            613,
+            294
+          ],
+          "3": [
+            510,
+            296
+          ],
+          "4": [
+            456,
+            218
+          ],
+          "5": [
+            509,
+            164
+          ],
+          "6": [
+            522,
+            107
+          ]
+        },
+        "frontStyle": "2diagonalsUNIFORM~2pxNOtaper;horizontalbold~4px"
+      },
+      {
+        "nodes": {
+          "C4": [
+            784,
+            136
+          ],
+          "C5": [
+            838,
+            82
+          ],
+          "O": [
+            912,
+            83
+          ],
+          "C1": [
+            968,
+            136
+          ],
+          "C2": [
+            914,
+            189
+          ],
+          "C3": [
+            838,
+            189
+          ]
+        },
+        "CH2OH": {
+          "text": "CH₂OH",
+          "anchor": [
+            876,
+            37
+          ],
+          "bond": [
+            [
+              838,
+              82
+            ],
+            [
+              838,
+              52
+            ]
+          ],
+          "target": "Cfirst"
+        },
+        "OH": [
+          {
+            "text": "OH",
+            "on": "C3up",
+            "at": [
+              850,
+              149
+            ],
+            "bond": [
+              [
+                838,
+                189
+              ],
+              [
+                838,
+                162
+              ]
+            ]
+          },
+          {
+            "text": "OH",
+            "on": "C2down",
+            "at": [
+              926,
+              237
+            ],
+            "bond": [
+              [
+                914,
+                189
+              ],
+              [
+                914,
+                221
+              ]
+            ]
+          }
+        ],
+        "H": [
+          {
+            "on": "C4up",
+            "at": [
+              784,
+              92
+            ]
+          },
+          {
+            "on": "C5down",
+            "at": [
+              838,
+              119
+            ]
+          },
+          {
+            "on": "C3down",
+            "at": [
+              838,
+              237
+            ]
+          },
+          {
+            "on": "C2up",
+            "at": [
+              914,
+              148
+            ]
+          },
+          {
+            "on": "C1down",
+            "at": [
+              968,
+              189
+            ]
+          }
+        ],
+        "numbers": {
+          "1": [
+            968,
+            115
+          ],
+          "2": [
+            929,
+            202
+          ],
+          "3": [
+            825,
+            203
+          ],
+          "4": [
+            772,
+            126
+          ],
+          "5": [
+            825,
+            72
+          ],
+          "6": [
+            838,
+            15
+          ]
+        },
+        "frontStyle": "2diagonalsUNIFORM~2pxNOtaper;horizontalbold~4px"
+      }
+    ],
+    "externalO": [
+      [
+        82,
+        363
+      ],
+      [
+        400,
+        272
+      ],
+      [
+        714,
+        180
+      ],
+      [
+        1031,
+        93
+      ]
+    ],
+    "bonds": [
+      [
+        99,
+        359,
+        151,
+        316
+      ],
+      [
+        336,
+        316,
+        382,
+        279
+      ],
+      [
+        415,
+        263,
+        468,
+        228
+      ],
+      [
+        653,
+        228,
+        698,
+        191
+      ],
+      [
+        732,
+        173,
+        784,
+        136
+      ],
+      [
+        968,
+        136,
+        1014,
+        99
+      ]
+    ],
+    "ellipsis": [
+      [
+        44,
+        365,
+        63,
+        365
+      ],
+      [
+        1048,
+        93,
+        1071,
+        93
+      ]
+    ],
+    "counts": "3sixmemberrings/18Cnumbers/15H(5each)/3CH₂OH-Cfirst/6OHstandalone/3ringO+2bridgeO+2terminalO/2ellipsis/NOcaption.",
+    "frontCritical": "NoTAPER:frontdiagonalwidthuniformsimilarrear,lowerhorizontalbold. PreserveC1Hdown/bridgeUP/C2Hup-OHdown/C3OHup-Hdown/C4Hup/C5CH₂OHup-Hdown.",
+    "noAdded": "NoCIP/wedges/nrepeatbrackets/newcaption/cellulosewordingfromstem/extraH/O."
+  },
+  "verdict": "Đọcsource,chưaactualSVGreview."
+}
