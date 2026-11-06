@@ -1,0 +1,40 @@
+[
+  {
+    "i": 440,
+    "hash": "4f91263c51177ac0240802a4b6c533d5e563694ebaa9450696c072b546c353be",
+    "fileNguon": "anh/4f91263c51177ac0240802a4b6c533d5e563694ebaa9450696c072b546c353be.png",
+    "svg": "dien-di-hai-panel-ddh-c04f42e0dd8eecb7b1a6655229155837bcf9b9fddab866486023068a4f52cd84.svg",
+    "hashSvg": "c04f42e0dd8eecb7b1a6655229155837bcf9b9fddab866486023068a4f52cd84",
+    "byteSvg": 55096,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C3-B9-D1-I-83",
+        "de": "Một thí nghiệm điện di được mô tả như hình: ban đầu vệt chứa hỗn hợp Ala, Lys, Glu đặt giữa bản, môi trường pH = 6, cathode (−) ở bên trái, anode (+) ở bên phải; kết thúc thu được ba vệt (1), (2), (3) lần lượt từ trái sang phải.\nThứ tự các amino acid ứng các vệt được đánh dấu (1), (2), (3) là",
+        "refs": [
+          {
+            "hash": "4f91263c51177ac0240802a4b6c533d5e563694ebaa9450696c072b546c353be",
+            "where": "12-C3-B9-D1-I-83.hinh.0.du_lieu",
+            "hashDataUrl": "1f2d969df9a0a067cd520ec859bdb97094531ba2934c8042a4b2b729ac892814"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P1-D2-I-19",
+        "de": "Một thí nghiệm điện di được mô tả như hình: ban đầu vệt chứa hỗn hợp Ala, Lys, Glu đặt giữa bản, môi trường pH = 6, cathode (−) ở bên trái, anode (+) ở bên phải; kết thúc thu được ba vệt (1), (2), (3) lần lượt từ trái sang phải.\nThứ tự các amino acid ứng các vệt được đánh dấu (1), (2), (3) là",
+        "refs": [
+          {
+            "hash": "4f91263c51177ac0240802a4b6c533d5e563694ebaa9450696c072b546c353be",
+            "where": "DB-12-B9-P1-D2-I-19.hinh.0.du_lieu",
+            "hashDataUrl": "1f2d969df9a0a067cd520ec859bdb97094531ba2934c8042a4b2b729ac892814"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2panels/1+3flatgraybands/2sourceboxesminusLEFTplusRIGHT/4terminals/4electrodes/4leaders/cathode-anode/8chargeglyphs/pH6/allliteralcaptionsNOchất-period/retainminutemark/noaddedanswer/DDHpath.",
+    "hashSvgDaSoat": "c04f42e0dd8eecb7b1a6655229155837bcf9b9fddab866486023068a4f52cd84",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

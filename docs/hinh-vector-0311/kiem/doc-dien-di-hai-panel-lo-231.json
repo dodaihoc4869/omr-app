@@ -1,0 +1,306 @@
+{
+  "i": 440,
+  "hash": "4f91263c51177ac0240802a4b6c533d5e563694ebaa9450696c072b546c353be",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/4f91263c51177ac0240802a4b6c533d5e563694ebaa9450696c072b546c353be.png",
+  "nativeSize": [
+    1439,
+    350
+  ],
+  "classification": "Grayscale printed schematic illustration, not photograph; gray flat vertical sample bands with raster print texture, not metallic objects or particle counts.",
+  "reviewed": [
+    "nativefull",
+    "left2x",
+    "right2x",
+    "tiny mark12x",
+    "separate source177 and453 full for context only; NOT alias"
+  ],
+  "questions": [
+    {
+      "qid": "12-C3-B9-D1-I-83",
+      "maDe": "12-C3-B9-D1",
+      "de": "Một thí nghiệm điện di được mô tả như hình: ban đầu vệt chứa hỗn hợp Ala, Lys, Glu đặt giữa bản, môi trường pH = 6, cathode (−) ở bên trái, anode (+) ở bên phải; kết thúc thu được ba vệt (1), (2), (3) lần lượt từ trái sang phải.\nThứ tự các amino acid ứng các vệt được đánh dấu (1), (2), (3) là",
+      "hinh": [
+        {
+          "hash": "4f91263c51177ac0240802a4b6c533d5e563694ebaa9450696c072b546c353be",
+          "where": "12-C3-B9-D1-I-83.hinh.0.du_lieu",
+          "hashDataUrl": "1f2d969df9a0a067cd520ec859bdb97094531ba2934c8042a4b2b729ac892814"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B9-P1-D2-I-19",
+      "maDe": "DB-12-B9-P1-D2",
+      "de": "Một thí nghiệm điện di được mô tả như hình: ban đầu vệt chứa hỗn hợp Ala, Lys, Glu đặt giữa bản, môi trường pH = 6, cathode (−) ở bên trái, anode (+) ở bên phải; kết thúc thu được ba vệt (1), (2), (3) lần lượt từ trái sang phải.\nThứ tự các amino acid ứng các vệt được đánh dấu (1), (2), (3) là",
+      "hinh": [
+        {
+          "hash": "4f91263c51177ac0240802a4b6c533d5e563694ebaa9450696c072b546c353be",
+          "where": "DB-12-B9-P1-D2-I-19.hinh.0.du_lieu",
+          "hashDataUrl": "1f2d969df9a0a067cd520ec859bdb97094531ba2934c8042a4b2b729ac892814"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "left": {
+      "panelLabel": "Ban đầu",
+      "labelNear": [
+        63,
+        136
+      ],
+      "sourceBox": [
+        317,
+        36,
+        458,
+        107
+      ],
+      "sourceText": "Nguồn điện",
+      "sourcePolarity": "− left near306,52; +right near467,49",
+      "sourceTerminals": [
+        [
+          308,
+          71
+        ],
+        [
+          467,
+          71
+        ]
+      ],
+      "wire": "Left from308,71 across172,71 round left113,136 to171,202 then242,202; right467,71 across595,71 round663,136 back603,202 to534,202. No arrows.",
+      "plateBox": [
+        214,
+        124,
+        562,
+        281
+      ],
+      "cathode": {
+        "text": "cathode",
+        "near": [
+          258,
+          141
+        ],
+        "sign": "−",
+        "signNear": [
+          228,
+          165
+        ],
+        "electrode": [
+          242,
+          154,
+          242,
+          251
+        ]
+      },
+      "anode": {
+        "text": "anode",
+        "near": [
+          531,
+          141
+        ],
+        "sign": "+",
+        "signNear": [
+          547,
+          164
+        ],
+        "electrode": [
+          534,
+          154,
+          534,
+          251
+        ]
+      },
+      "bands": [
+        [
+          382,
+          154,
+          398,
+          248
+        ]
+      ],
+      "mediumLabel": "Môi trường có pH = 6",
+      "mediumNear": [
+        394,
+        265
+      ],
+      "leader": [
+        [
+          400,
+          217
+        ],
+        [
+          630,
+          292
+        ]
+      ],
+      "caption": "Vệt có chứa Ala, Lys, Glu",
+      "captionNear": [
+        633,
+        310
+      ],
+      "captionNoExtra": "No word chất, no trailing period"
+    },
+    "right": {
+      "panelLabel": "Kết thúc",
+      "labelNear": [
+        798,
+        126
+      ],
+      "sourceBox": [
+        1053,
+        30,
+        1200,
+        96
+      ],
+      "sourceText": "Nguồn điện",
+      "sourcePolarity": "− left near1043,45; +right near1210,42",
+      "sourceTerminals": [
+        [
+          1045,
+          63
+        ],
+        [
+          1208,
+          63
+        ]
+      ],
+      "wire": "Left from1045,64 across904,64 round846,126 back902,188 to977,188; right1208,64 across1347,64 round1409,126 back1351,188 to1278,188. No arrows.",
+      "plateBox": [
+        948,
+        114,
+        1307,
+        262
+      ],
+      "cathode": {
+        "text": "cathode",
+        "near": [
+          995,
+          129
+        ],
+        "sign": "−",
+        "signNear": [
+          963,
+          152
+        ],
+        "electrode": [
+          977,
+          142,
+          977,
+          235
+        ]
+      },
+      "anode": {
+        "text": "anode",
+        "near": [
+          1272,
+          129
+        ],
+        "sign": "+",
+        "signNear": [
+          1291,
+          151
+        ],
+        "electrode": [
+          1278,
+          141,
+          1278,
+          235
+        ]
+      },
+      "bands": [
+        [
+          1046,
+          142,
+          1062,
+          231
+        ],
+        [
+          1122,
+          142,
+          1137,
+          231
+        ],
+        [
+          1195,
+          142,
+          1211,
+          231
+        ]
+      ],
+      "leaders": [
+        {
+          "start": [
+            1039,
+            235
+          ],
+          "end": [
+            978,
+            296
+          ],
+          "caption": "(1)",
+          "captionNear": [
+            967,
+            310
+          ]
+        },
+        {
+          "start": [
+            1127,
+            237
+          ],
+          "end": [
+            1127,
+            297
+          ],
+          "caption": "(2)",
+          "captionNear": [
+            1127,
+            310
+          ]
+        },
+        {
+          "start": [
+            1212,
+            237
+          ],
+          "end": [
+            1277,
+            297
+          ],
+          "caption": "(3)",
+          "captionNear": [
+            1278,
+            310
+          ]
+        }
+      ],
+      "mediumLabel": null
+    },
+    "tinyMark": {
+      "bboxApprox": [
+        143,
+        41,
+        147,
+        45
+      ],
+      "appearance": "isolated 4px-wide black bump/triangle, no readable glyph, no connecting line",
+      "comparison": "same isolated mark appears source453 above left wire atapprox108,6; source177 is right panel and has no corresponding mark",
+      "publicEvidence": "Both public stems describe initial mixed band/pH6/cathode left/anode right/three final bands; no reference to isolated upper-left mark. This alone does not prove mark can be dropped.",
+      "decision": "Preserve small mark if no cleaner original proves nondata; do not silently omit while uncertain."
+    }
+  },
+  "noInference": [
+    "Do not assign amino acids to bands (1)/(2)/(3).",
+    "No extra arrows/labels/material textures; keep one initial and three final bands.",
+    "Not alias177/453: composite layout and text positions differ."
+  ],
+  "status": "Đạt exact SVG sau actual review; tiny mark preserved",
+  "actualReview": {
+    "i": 440,
+    "hashSvg": "c04f42e0dd8eecb7b1a6655229155837bcf9b9fddab866486023068a4f52cd84",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Tự fresh Chromium exact SVG, mở full và từng panel actual2x; đối chiếu nativefull/2panelzooms/mark12x và hai public refs. Đúng hai panel Ban đầu/Kết thúc,2 nguồn điện −trái/+phải,4 electrode cathode−/anode+,wires/endpoints,1+3 flat gray bands và leader endpoints/nhãn(1)(2)(3). Giữ Môi trường có pH = 6 và caption literal Vệt có chứa Ala, Lys, Glu không thêm chữ chất/chấm. Tiny mark trên trái được bảo toàn đúng vị trí; không đoán ý nghĩa. Không metallic/photo/particle count, không thêm đáp án AA. Không chữ/nét chạm/cắt/tràn.",
+    "actualSvgReviewed": true,
+    "byteSvg": 55096,
+    "render": "/workspace/scratch/dien-di440-231-c04f42e0-chromium.png",
+    "sourceHash": "4f91263c51177ac0240802a4b6c533d5e563694ebaa9450696c072b546c353be"
+  }
+}

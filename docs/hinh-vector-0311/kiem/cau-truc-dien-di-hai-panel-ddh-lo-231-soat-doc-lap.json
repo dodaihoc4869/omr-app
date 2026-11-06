@@ -1,0 +1,14 @@
+[
+  {
+    "i": 440,
+    "hashSvg": "c04f42e0dd8eecb7b1a6655229155837bcf9b9fddab866486023068a4f52cd84",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Tự fresh Chromium exact SVG, mở full và từng panel actual2x; đối chiếu nativefull/2panelzooms/mark12x và hai public refs. Đúng hai panel Ban đầu/Kết thúc,2 nguồn điện −trái/+phải,4 electrode cathode−/anode+,wires/endpoints,1+3 flat gray bands và leader endpoints/nhãn(1)(2)(3). Giữ Môi trường có pH = 6 và caption literal Vệt có chứa Ala, Lys, Glu không thêm chữ chất/chấm. Tiny mark trên trái được bảo toàn đúng vị trí; không đoán ý nghĩa. Không metallic/photo/particle count, không thêm đáp án AA. Không chữ/nét chạm/cắt/tràn.",
+    "actualSvgReviewed": true,
+    "byteSvg": 55096,
+    "render": "/workspace/scratch/dien-di440-231-c04f42e0-chromium.png",
+    "sourceHash": "4f91263c51177ac0240802a4b6c533d5e563694ebaa9450696c072b546c353be",
+    "hash": "4f91263c51177ac0240802a4b6c533d5e563694ebaa9450696c072b546c353be",
+    "hashSvgDaSoat": "c04f42e0dd8eecb7b1a6655229155837bcf9b9fddab866486023068a4f52cd84"
+  }
+]
