@@ -1,8 +1,11 @@
 // Gói bài 7 ngày: phủ câu gốc, tự làm và hiểu kiến thức là ba bằng chứng khác nhau.
+import { bamMt, demTheoO, oMaTran, xepTheoMaTran } from './ma-tran-rut-moi'
 export type VaiGoi7 = 'moi' | 'sua' | 'on' | 'tiep_can' | 'chua'
 export interface CauGoi7 {
   qid: string; maDe: string; maTo?: string; soCau?:number; version: string; group: string; phan: 'I' | 'II' | 'III'
   hopLe?: boolean; kho: boolean; tinhToan: boolean; kyNang: string[]
+  /** Mức độ (NB/TH/VD/VDC hoặc biet/hieu/van_dung) — ô ma trận khi rút câu mới (`ma-tran-rut-moi.ts`). Vắng ⇒ Hiểu. */
+  mucDo?: string | null
 }
 export interface ViecGoi7 { qid: string; vai: VaiGoi7; huongDan: boolean }
 export const ngayVn7 = (ms: number): string => new Date(ms + 7 * 3600000).toISOString().slice(0, 10)
@@ -35,16 +38,30 @@ export function chonGoi7(a: {
   /** ÔN SỚM (thầy 23/10, em báo «3 câu chờ thầy bổ sung» ở 27/30): câu em ĐÃ làm, chưa tới lịch ôn — tầng CUỐI, chỉ lấp phần mức còn thiếu khi
    *  câu mới / chữa / sửa / ôn đến lịch đã hết. Vai 'on' (phát như câu ôn). Vắng ⇒ hành vi cũ. */
   onSom?: readonly string[]
+  /** Ngày lập (YYYY-MM-DD): hoà trong một ô ma trận xoay theo ngày. Vắng ⇒ theo mã câu. */
+  ngay?: string
+  /** Câu em GẶP LẦN ĐẦU HÔM NAY (nằm trong `daGap`): vẫn đứng trong dãy ma trận của ngày rồi mới bỏ ra ⇒ lập lại giữa ngày không đổi phần câu mới còn lại,
+   *  em làm câu nào trước cũng vậy. Vắng ⇒ mọi câu `daGap` tính là đã rút trước hôm nay. */
+  gapHomNay?: ReadonlySet<string>
 }): { viec: ViecGoi7[]; thieuPhu: number; tuLam: number; tiepCan: number } {
   const viec: ViecGoi7[] = [], used = new Set<string>()
   const muc = Math.max(0, a.mucTieuNgay ?? 24)
-  const moi = a.cau.filter(q => !a.daGap.has(q.qid) && !a.chan.has(q.qid) && !a.chan.has(q.group))
-    .sort((x, y) => Number(!a.sanSang.has(x.qid))-Number(!a.sanSang.has(y.qid)) ||
-      (a.trongSo?.[y.qid]??0)-(a.trongSo?.[x.qid]??0) || Number(x.kho) - Number(y.kho) || Number(x.tinhToan) - Number(y.tinhToan) || x.qid.localeCompare(y.qid))
+  // CÂU MỚI THEO MA TRẬN ĐỀ 2026 (thầy 06/11, bỏ «dễ trước khó sau»): trong một ô (phần × mức) — sẵn sàng trước, trọng số OMNI, hoà xoay theo ngày;
+  // giữa các ô — `xepTheoMaTran`, đếm cả câu mới đã rút những ngày trước của CÙNG nhóm ⇒ ô ít câu không dồn về cuối. Số câu mới mỗi ngày giữ nguyên.
+  const hoa = (q: CauGoi7) => a.ngay ? bamMt(`${a.ngay}|${q.qid}`) : 0
+  const hang = (x: CauGoi7, y: CauGoi7) => Number(!a.sanSang.has(x.qid))-Number(!a.sanSang.has(y.qid)) ||
+    (a.trongSo?.[y.qid]??0)-(a.trongSo?.[x.qid]??0) || hoa(x) - hoa(y) || x.qid.localeCompare(y.qid)
+  const oCua = (q: CauGoi7) => oMaTran(q.phan, q.mucDo)
+  const truocNay = (id: string) => a.daGap.has(id) && !a.gapHomNay?.has(id)
+  const xepMoi = (ds: readonly CauGoi7[]): CauGoi7[] => xepTheoMaTran(
+    ds.filter(q => !truocNay(q.qid) && !a.chan.has(q.qid) && !a.chan.has(q.group)).sort(hang), oCua, demTheoO(ds.filter(q => truocNay(q.qid)), oCua),
+  ).filter(q => !a.daGap.has(q.qid))
+  const moi = xepMoi(a.cau)
   const phu:CauGoi7[]=[],daChon=new Set<string>()
   let thieuPhu=0
   if(a.nhomPhu?.length){
-    for(const g of a.nhomPhu){const ids=new Set(g.qids),con=Math.max(0,g.quota-[...daChon].filter(id=>ids.has(id)).length),chon=moi.filter(q=>ids.has(q.qid)&&!daChon.has(q.qid)).slice(0,con);for(const q of chon){phu.push(q);daChon.add(q.qid)}thieuPhu+=Math.max(0,con-chon.length)}
+    const theoQid=new Map(a.cau.map(q=>[q.qid,q] as const))
+    for(const g of a.nhomPhu){const ids=new Set(g.qids),con=Math.max(0,g.quota-[...daChon].filter(id=>ids.has(id)).length),chon=xepMoi([...ids].flatMap(id=>theoQid.get(id)??[])).filter(q=>!daChon.has(q.qid)).slice(0,con);for(const q of chon){phu.push(q);daChon.add(q.qid)}thieuPhu+=Math.max(0,con-chon.length)}
   }else {phu.push(...moi.slice(0,a.quotaCon));thieuPhu=Math.max(0,a.quotaCon-moi.length)}
   for (const q of a.chiTrongMuc ? phu.slice(0, muc) : phu) {
     const huongDan = !a.sanSang.has(q.qid)

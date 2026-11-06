@@ -1,5 +1,6 @@
 // OMNI 3 · làn A2 — luật thuần mới của `lapKeHoachNgay` (đặc tả docs/dac-ta-cu/DAC-TA-BUILD-OMNI-3-0510.md mục 1 bước 3 + 11, mục 4.9; prompt tick bài mục B, C, D, G):
 // nhiều bài song song (EDF, quota riêng, Huyết Chiến), trọng số câu, dạng đã vững, ôn bài cũ, chế độ chờ. Mọi trường TUỲ CHỌN.
+import { oMaTran } from '../server/src/ma-tran-rut-moi'
 import { describe, expect, it } from 'vitest'
 import { congNgay, lapKeHoachNgay, phatLaiCau, quotaCauMoi, type CauSrs, type LanLam, type TrangThaiCau, type TuyChonKeHoach } from '../server/src/srs2-loi'
 import { theLucCho } from '../server/src/omni-ke-hoach'
@@ -68,7 +69,8 @@ describe('trongSoCau — đổi THỨ TỰ câu mới trong quota, KHÔNG đổi
   }
   it('cùng số câu mới; chọn đúng các câu trọng số cao nhất (hoà theo băm ngày)', () => {
     const b = dung()
-    const tc: TuyChonKeHoach = { homNay: HOM_NAY, hanNop: han(8), tranNgay: 40, raiDeu: true }
+    // 06/11: bản TẮT ma trận (`giuThuTuMoiCu`) — trọng số quyết định toàn bộ; bản ma trận (mặc định máy chủ) so ngay dưới.
+    const tc: TuyChonKeHoach = { homNay: HOM_NAY, hanNop: han(8), tranNgay: 40, raiDeu: true, giuThuTuMoiCu: true }
     const goc = lapKeHoachNgay(b.cau, b.tt, tc)
     // trọng số: câu m40..m59 cao nhất (giảm dần theo chỉ số), còn lại 0
     const trongSoCau = Object.fromEntries(b.cau.filter((c) => c.qid.startsWith('m')).map((c) => [c.qid, Number(c.qid.slice(1)) >= 40 ? Number(c.qid.slice(1)) : 0]))
@@ -80,6 +82,17 @@ describe('trongSoCau — đổi THỨ TỰ câu mới trong quota, KHÔNG đổi
     expect(chon).toEqual(Array.from({ length: 12 }, (_, i) => 59 - i))
     expect(tatCa(ts).filter((q) => q.startsWith('m')).sort()).not.toEqual(tatCa(goc).filter((q) => q.startsWith('m')).sort())
     expect(dem(tatCa(ts), 'n')).toBe(dem(tatCa(goc), 'n'))
+    // MA TRẬN (mặc định): cùng số câu mới; số câu theo ô do ma trận chia, TRONG mỗi ô vẫn lấy đúng các câu trọng số cao nhất của ô ấy.
+    const { giuThuTuMoiCu: _bo, ...tcMt } = tc
+    const mt = lapKeHoachNgay(b.cau, b.tt, { ...tcMt, trongSoCau })
+    expect(soMoi(mt)).toBe(soMoi(ts))
+    const oCua = new Map(b.cau.map((c) => [c.qid, oMaTran(c.phan, c.mucDo)]))
+    const chonMt = tatCa(mt).filter((q) => q.startsWith('m'))
+    for (const o of new Set(chonMt.map((q) => oCua.get(q)))) {
+      const trongO = chonMt.filter((q) => oCua.get(q) === o)
+      const caO = b.cau.filter((c) => c.qid.startsWith('m') && oCua.get(c.qid) === o).map((c) => trongSoCau[c.qid] ?? 0).sort((x, y) => y - x)
+      expect(trongO.map((q) => trongSoCau[q] ?? 0).sort((x, y) => y - x)).toEqual(caO.slice(0, trongO.length))
+    }
   })
   it('thay cả bốc cá nhân (hạng theo dạng): số câu mới vẫn theo quota', () => {
     const b = dung()
