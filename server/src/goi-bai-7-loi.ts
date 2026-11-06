@@ -48,13 +48,18 @@ export function chonGoi7(a: {
   const muc = Math.max(0, a.mucTieuNgay ?? 24)
   // CÂU MỚI THEO MA TRẬN ĐỀ 2026 (thầy 06/11, bỏ «dễ trước khó sau»): trong một ô (phần × mức) — sẵn sàng trước, trọng số OMNI, hoà xoay theo ngày;
   // giữa các ô — `xepTheoMaTran`, đếm cả câu mới đã rút những ngày trước của CÙNG nhóm ⇒ ô ít câu không dồn về cuối. Số câu mới mỗi ngày giữ nguyên.
-  const hoa = (q: CauGoi7) => a.ngay ? bamMt(`${a.ngay}|${q.qid}`) : 0
+  // Tốc độ máy chủ: băm xoay + so chuỗi chỉ tính MỘT lần trên cả kho; mỗi nhóm phụ chỉ lọc rồi xếp theo hạng số nguyên đã có (cùng thứ tự với xếp lại từ đầu).
+  const hoaDem = new Map<string, number>()
+  const hoa = (q: CauGoi7) => { if (!a.ngay) return 0; let h = hoaDem.get(q.qid); if (h === undefined) { h = bamMt(`${a.ngay}|${q.qid}`); hoaDem.set(q.qid, h) } return h }
   const hang = (x: CauGoi7, y: CauGoi7) => Number(!a.sanSang.has(x.qid))-Number(!a.sanSang.has(y.qid)) ||
     (a.trongSo?.[y.qid]??0)-(a.trongSo?.[x.qid]??0) || hoa(x) - hoa(y) || x.qid.localeCompare(y.qid)
+  const hangSo = new Map<CauGoi7, number>()
+  a.cau.slice().sort(hang).forEach((q, i) => hangSo.set(q, i))
+  const theoHang = (x: CauGoi7, y: CauGoi7) => hangSo.get(x)! - hangSo.get(y)!
   const oCua = (q: CauGoi7) => oMaTran(q.phan, q.mucDo)
   const truocNay = (id: string) => a.daGap.has(id) && !a.gapHomNay?.has(id)
   const xepMoi = (ds: readonly CauGoi7[]): CauGoi7[] => xepTheoMaTran(
-    ds.filter(q => !truocNay(q.qid) && !a.chan.has(q.qid) && !a.chan.has(q.group)).sort(hang), oCua, demTheoO(ds.filter(q => truocNay(q.qid)), oCua),
+    ds.filter(q => !truocNay(q.qid) && !a.chan.has(q.qid) && !a.chan.has(q.group)).sort(theoHang), oCua, demTheoO(ds.filter(q => truocNay(q.qid)), oCua),
   ).filter(q => !a.daGap.has(q.qid))
   const moi = xepMoi(a.cau)
   const phu:CauGoi7[]=[],daChon=new Set<string>()

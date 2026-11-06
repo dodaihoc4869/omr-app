@@ -35,10 +35,17 @@ const MUC_CHUAN: Record<string, MucMt> = {
  */
 export function oMaTran(phan: string | null | undefined, mucDo: string | null | undefined): string {
   const p: PhanMt = phan === 'II' || phan === 'III' ? phan : 'I'
+  // Đệm theo (phần, mức thô): kho vài trăm câu chỉ có vài tổ hợp ⇒ không tách/nối chuỗi lại mỗi câu.
+  const k = mucDo == null ? p : p + '\u0001' + mucDo
+  const c = DEM_O.get(k)
+  if (c) return c
   let m: MucMt = (mucDo != null && MUC_CHUAN[mucDo.trim()]) || 'hieu'
   if (MA_TRAN_RUT_MOI[p][m] <= 0) m = 'hieu'
-  return `${p}|${m}`
+  const o = `${p}|${m}`
+  if (DEM_O.size < 256) DEM_O.set(k, o)
+  return o
 }
+const DEM_O = new Map<string, string>()
 
 const THU_TU_O = (Object.keys(MA_TRAN_RUT_MOI) as PhanMt[]).flatMap((p) => (Object.keys(MA_TRAN_RUT_MOI[p]) as MucMt[]).map((m) => `${p}|${m}`))
 const trongSoO = (o: string): number => { const [p, m] = o.split('|') as [PhanMt, MucMt]; return MA_TRAN_RUT_MOI[p]?.[m] ?? 0 }
@@ -59,24 +66,27 @@ export function xepTheoMaTran<T>(ds: readonly T[], o: (x: T) => string, daRut?: 
   const hang = new Map<string, T[]>()
   for (const x of ds) { const k = o(x); const h = hang.get(k); if (h) h.push(x); else hang.set(k, [x]) }
   // Khoá lạ (nơi gọi không dùng `oMaTran`) ⇒ trọng số 0, đứng sau mọi ô thật — không bao giờ mất câu, không lặp vô hạn.
+  // Tốc độ máy chủ: mọi thứ theo ô tính MỘT lần vào mảng song song; vòng chính chỉ duyệt ≤ 8 ô bằng chỉ số, không cấp phát, không tách chuỗi.
   const cacO = [...THU_TU_O.filter((k) => hang.has(k)), ...[...hang.keys()].filter((k) => !THU_TU_O.includes(k))]
-  const viTri = new Map(cacO.map((k) => [k, 0]))
-  const da = new Map(cacO.map((k) => [k, Math.max(0, Math.floor(Number(daRut?.get(k)) || 0))]))
+  const m = cacO.length
+  const ds2 = cacO.map((k) => hang.get(k)!)
+  const wO = cacO.map(trongSoO)
+  const vt = new Array<number>(m).fill(0)
+  const da = cacO.map((k) => Math.max(0, Math.floor(Number(daRut?.get(k)) || 0)))
   const ra: T[] = []
-  while (ra.length < ds.length) {
-    const con = cacO.filter((k) => viTri.get(k)! < hang.get(k)!.length)
-    const W = con.reduce((s, k) => s + trongSoO(k), 0)
-    const T = con.reduce((s, k) => s + da.get(k)!, 0) + 1
-    let tot = con[0]!, diemTot = -Infinity
-    if (W > 0) for (const k of con) {
-      if (trongSoO(k) <= 0) continue
-      const d = (trongSoO(k) / W) * T - da.get(k)!
-      if (d > diemTot + 1e-9 || (Math.abs(d - diemTot) <= 1e-9 && trongSoO(k) > trongSoO(tot))) { tot = k; diemTot = d }
+  const tong = ds.length
+  while (ra.length < tong) {
+    let W = 0, Tn = 1, tot = -1
+    for (let j = 0; j < m; j++) if (vt[j]! < ds2[j]!.length) { if (tot < 0) tot = j; W += wO[j]!; Tn += da[j]! }
+    let diemTot = -Infinity
+    if (W > 0) for (let j = 0; j < m; j++) {
+      if (vt[j]! >= ds2[j]!.length || wO[j]! <= 0) continue
+      const d = (wO[j]! / W) * Tn - da[j]!
+      if (d > diemTot + 1e-9 || (Math.abs(d - diemTot) <= 1e-9 && wO[j]! > wO[tot]!)) { tot = j; diemTot = d }
     }
-    const i = viTri.get(tot)!
-    ra.push(hang.get(tot)![i]!)
-    viTri.set(tot, i + 1)
-    da.set(tot, da.get(tot)! + 1)
+    ra.push(ds2[tot]![vt[tot]!]!)
+    vt[tot] = vt[tot]! + 1
+    da[tot] = da[tot]! + 1
   }
   return ra
 }
