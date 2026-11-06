@@ -1,0 +1,40 @@
+[
+  {
+    "i": 213,
+    "hash": "23b5701061e2a0da406fb65129240b2fa36ddadada39471f5c4efb2392310c45",
+    "fileNguon": "anh/23b5701061e2a0da406fb65129240b2fa36ddadada39471f5c4efb2392310c45.png",
+    "svg": "quinine-ddh-e2c218bc7b3052b3b3e119236365cb358ecd4a8f2790aee4436c2c936e3f1cd6.svg",
+    "hashSvg": "e2c218bc7b3052b3b3e119236365cb358ecd4a8f2790aee4436c2c936e3f1cd6",
+    "byteSvg": 4055,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C3-B8-D1-I-84",
+        "de": "Quinine là hợp chất có tác dụng chữa bệnh sốt rét.\nCông thức của quinine như hình bên dưới.\nCác nhóm chức amine trong phân tử quinine có bậc mấy?",
+        "refs": [
+          {
+            "hash": "23b5701061e2a0da406fb65129240b2fa36ddadada39471f5c4efb2392310c45",
+            "where": "12-C3-B8-D1-I-84.hinh.0.du_lieu",
+            "hashDataUrl": "e3372062f5ade5cbada485c0b7a6b91b7530e357c7b0e8aaebd913a62fe41621"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B8-D1-I-83",
+        "de": "Quinine là hợp chất có tác dụng chữa bệnh sốt rét.\nCông thức của quinine như hình bên dưới.\nCác nhóm chức amine trong phân tử quinine có bậc mấy?",
+        "refs": [
+          {
+            "hash": "23b5701061e2a0da406fb65129240b2fa36ddadada39471f5c4efb2392310c45",
+            "where": "DB-12-B8-D1-I-83.hinh.0.du_lieu",
+            "hashDataUrl": "e3372062f5ade5cbada485c0b7a6b91b7530e357c7b0e8aaebd913a62fe41621"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "OMe/2N/OH/quinoline5double+vinyl1double/3hashedbarsOH/cagecrossinggap/noHchargescaptionadded/DDHpath.",
+    "hashSvgDaSoat": "e2c218bc7b3052b3b3e119236365cb358ecd4a8f2790aee4436c2c936e3f1cd6",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

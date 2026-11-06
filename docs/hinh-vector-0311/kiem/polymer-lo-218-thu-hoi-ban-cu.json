@@ -1,0 +1,53 @@
+{
+  "ketQua": "Cần sửa: soát218 xác nhận nguồn47 và247 chỉ2chấm ởđầu trái cellulose; SVG197thừa1chấm. Thu hồi verdict cũ cho hashf2d950, lưu lịch sử và kiểm lại hash mới, không đổi các nhóm khác.",
+  "banDungCu": [
+    {
+      "i": 47,
+      "hash": "09bee4ba201084345a24020edca93309b20d32786e653def6f162e4341eb3d23",
+      "fileNguon": "anh/09bee4ba201084345a24020edca93309b20d32786e653def6f162e4341eb3d23.png",
+      "svg": "doi-chieu-polysaccharide-ddh-f2d9502085121f1835e1640427fa75b77a2813cbf9000fc6d46951bb6dceca99.svg",
+      "hashSvg": "f2d9502085121f1835e1640427fa75b77a2813cbf9000fc6d46951bb6dceca99",
+      "byteSvg": 68963,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "trangThai": "da-soat-doc-lap",
+      "questions": [
+        {
+          "qid": "12-C2-B6-D2-II-14",
+          "de": "Quan sát cấu trúc phân tử amylose và phân tử cellulose dưới đây:",
+          "refs": [
+            {
+              "hash": "09bee4ba201084345a24020edca93309b20d32786e653def6f162e4341eb3d23",
+              "where": "12-C2-B6-D2-II-14.hinh.0.du_lieu",
+              "hashDataUrl": "5285158c3c8a9d67ccee891f173de3d2f8c2ba3390b57abe1ac9199ed471a946"
+            }
+          ]
+        },
+        {
+          "qid": "DB-12-B4-D3-II-106",
+          "de": "Quan sát cấu trúc phân tử amylose và phân tử cellulose dưới đây:",
+          "refs": [
+            {
+              "hash": "09bee4ba201084345a24020edca93309b20d32786e653def6f162e4341eb3d23",
+              "where": "DB-12-B4-D3-II-106.hinh.0.du_lieu",
+              "hashDataUrl": "5285158c3c8a9d67ccee891f173de3d2f8c2ba3390b57abe1ac9199ed471a946"
+            }
+          ]
+        }
+      ],
+      "ghiChuDung": "2panels3Haworthngangamylose/3Haworthchéocellulose/6CH2OH/allH-OH-C5Hexpl/diagonalsUNIFORM-notwedges/bridgesO+2terminalOmỗipanel/4ellipsis/2captions/noHnumbersadded/noalias43-590/printlinesexcluded/DDHpath.",
+      "hashSvgDaSoat": "f2d9502085121f1835e1640427fa75b77a2813cbf9000fc6d46951bb6dceca99",
+      "nguoiSoat": "cau_truc_4"
+    }
+  ],
+  "proofCuDaThuHoi": [
+    {
+      "i": 47,
+      "hashSvg": "f2d9502085121f1835e1640427fa75b77a2813cbf9000fc6d46951bb6dceca99",
+      "nguoiSoat": "cau_truc_4",
+      "ketQua": "Đạt: Mở native/full và4crop nguồnđủ6rings,đọc2publicrefs/fullstems;tựfreshChromiumactualSVG (/workspace/scratch/cau4-197-fresh.png). Đúngamylose3Haworthngang/cellulose3Haworthchéolên,KHÔNGchair/alias43-590. Mỗi5HexplicitinclC5down,2OHstandalone+CH₂OH-Cfirst;6ringO+8externalO(2bridge+2endOmỗipanel),4ellipsis/2captionsđủ. AmyC1Hup/bridgeOdown,cellC1Hdown/bridgeOup,allotherH-OHsourceorientationgiữ. FrontdiagonalsUNIFORMkhôngtaper,lowerhorizontalđậmhơn đúngnative;khôngthêmwedges/Hextra/Cnumbers/brackets. Onlydetachedprintline/scaninkoutsidefigureexcluded,nochemicalbondremoved. DDHpath tựchứa khôngfallback/text/image,glyphgapskhôngchạm/cắt/tràn;exactSHA256hiệntạikhớpmetadata,khôngdùngf5ffcandidatecũ.",
+      "hash": "09bee4ba201084345a24020edca93309b20d32786e653def6f162e4341eb3d23",
+      "hashSvgDaSoat": "f2d9502085121f1835e1640427fa75b77a2813cbf9000fc6d46951bb6dceca99"
+    }
+  ]
+}

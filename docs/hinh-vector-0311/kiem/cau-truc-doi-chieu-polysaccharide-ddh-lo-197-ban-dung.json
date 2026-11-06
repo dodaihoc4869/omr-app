@@ -3,9 +3,9 @@
     "i": 47,
     "hash": "09bee4ba201084345a24020edca93309b20d32786e653def6f162e4341eb3d23",
     "fileNguon": "anh/09bee4ba201084345a24020edca93309b20d32786e653def6f162e4341eb3d23.png",
-    "svg": "doi-chieu-polysaccharide-ddh-f2d9502085121f1835e1640427fa75b77a2813cbf9000fc6d46951bb6dceca99.svg",
-    "hashSvg": "f2d9502085121f1835e1640427fa75b77a2813cbf9000fc6d46951bb6dceca99",
-    "byteSvg": 68963,
+    "svg": "doi-chieu-polysaccharide-ddh-f0649dedf5ba32c541b8a068278a8df4c50e8a0a825dda82f3a41dd18e0aee7e.svg",
+    "hashSvg": "f0649dedf5ba32c541b8a068278a8df4c50e8a0a825dda82f3a41dd18e0aee7e",
+    "byteSvg": 68913,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "trangThai": "da-soat-doc-lap",
@@ -33,8 +33,8 @@
         ]
       }
     ],
-    "ghiChuDung": "2panels3Haworthngangamylose/3Haworthchéocellulose/6CH2OH/allH-OH-C5Hexpl/diagonalsUNIFORM-notwedges/bridgesO+2terminalOmỗipanel/4ellipsis/2captions/noHnumbersadded/noalias43-590/printlinesexcluded/DDHpath.",
-    "hashSvgDaSoat": "f2d9502085121f1835e1640427fa75b77a2813cbf9000fc6d46951bb6dceca99",
-    "nguoiSoat": "cau_truc_4"
+    "ghiChuDung": "2panels3Haworthngangamylose/3Haworthchéocellulose/6CH2OH/allH-OH-C5Hexpl/diagonalsUNIFORM-notwedges/bridgesO+2terminalOmỗipanel/3nhóm3dots+1nhóm2dotsTRÁIcellulose/2captions/noHnumbersadded/noalias43-590/printlinesexcluded/DDHpath.",
+    "hashSvgDaSoat": "f0649dedf5ba32c541b8a068278a8df4c50e8a0a825dda82f3a41dd18e0aee7e",
+    "nguoiSoat": "soat_nguon_2"
   }
 ]

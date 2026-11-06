@@ -1,0 +1,42 @@
+[
+  {
+    "i": 247,
+    "hash": "2a6dd33363b6da7ccf40ce8cd767568a80e6667cf08a227ea8e65c045dd14393",
+    "fileNguon": "anh/2a6dd33363b6da7ccf40ce8cd767568a80e6667cf08a227ea8e65c045dd14393.png",
+    "svg": "doi-chieu-polysaccharide-ddh-f0649dedf5ba32c541b8a068278a8df4c50e8a0a825dda82f3a41dd18e0aee7e.svg",
+    "hashSvg": "f0649dedf5ba32c541b8a068278a8df4c50e8a0a825dda82f3a41dd18e0aee7e",
+    "byteSvg": 68913,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C2-D1-II-4",
+        "de": "Quan sát cấu trúc phân tử amylose và phân tử cellulose dưới đây:",
+        "refs": [
+          {
+            "hash": "2a6dd33363b6da7ccf40ce8cd767568a80e6667cf08a227ea8e65c045dd14393",
+            "where": "12-KT-C2-D1-II-4.hinh.0.du_lieu",
+            "hashDataUrl": "4f4c0fcce341c9d7f118b14ae867af37d5a87a27aac478db4aa519181e2813e7"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-II-149",
+        "de": "Quan sát cấu trúc phân tử amylose và phân tử cellulose dưới đây:",
+        "refs": [
+          {
+            "hash": "2a6dd33363b6da7ccf40ce8cd767568a80e6667cf08a227ea8e65c045dd14393",
+            "where": "DB-12-B4-D3-II-149.hinh.0.du_lieu",
+            "hashDataUrl": "4f4c0fcce341c9d7f118b14ae867af37d5a87a27aac478db4aa519181e2813e7"
+          }
+        ]
+      }
+    ],
+    "geometryBaseSource": 47,
+    "canvasNguon": "Hai bản scan có tỷ lệ khác nhau, không pixel identical; kiểm riêng toàn nội dung trước dùng chung.",
+    "ghiChuDung": "2panels/6Haworth/30H/6CH2OH/allOH/3nhóm3dots+1nhóm2dotsTRÁIcellulose/2captions/frontdiagonalsUNIFORM/horizontalbold/DDHpath;khôngpHashapprove.",
+    "hashSvgDaSoat": "f0649dedf5ba32c541b8a068278a8df4c50e8a0a825dda82f3a41dd18e0aee7e",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

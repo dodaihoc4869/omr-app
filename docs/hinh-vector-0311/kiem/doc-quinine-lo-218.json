@@ -1,0 +1,305 @@
+{
+  "i": 213,
+  "hash": "23b5701061e2a0da406fb65129240b2fa36ddadada39471f5c4efb2392310c45",
+  "fileNguon": "anh/23b5701061e2a0da406fb65129240b2fa36ddadada39471f5c4efb2392310c45.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "zooms": [
+    "/workspace/scratch/cau4-quinine218-zoom.png",
+    "/workspace/scratch/cau4-quinine218-hashmacro.png",
+    "/workspace/scratch/cau4-quinine218-cagemacro.png"
+  ],
+  "questions": [
+    {
+      "qid": "12-C3-B8-D1-I-84",
+      "maDe": "12-C3-B8-D1",
+      "de": "Quinine là hợp chất có tác dụng chữa bệnh sốt rét.\nCông thức của quinine như hình bên dưới.\nCác nhóm chức amine trong phân tử quinine có bậc mấy?",
+      "hinh": [
+        {
+          "hash": "23b5701061e2a0da406fb65129240b2fa36ddadada39471f5c4efb2392310c45",
+          "where": "12-C3-B8-D1-I-84.hinh.0.du_lieu",
+          "hashDataUrl": "e3372062f5ade5cbada485c0b7a6b91b7530e357c7b0e8aaebd913a62fe41621"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B8-D1-I-83",
+      "maDe": "DB-12-B8-D1",
+      "de": "Quinine là hợp chất có tác dụng chữa bệnh sốt rét.\nCông thức của quinine như hình bên dưới.\nCác nhóm chức amine trong phân tử quinine có bậc mấy?",
+      "hinh": [
+        {
+          "hash": "23b5701061e2a0da406fb65129240b2fa36ddadada39471f5c4efb2392310c45",
+          "where": "DB-12-B8-D1-I-83.hinh.0.du_lieu",
+          "hashDataUrl": "e3372062f5ade5cbada485c0b7a6b91b7530e357c7b0e8aaebd913a62fe41621"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1pxapprox;allsourcecagecrossingliteralnotCIPguess.",
+    "quinoline": {
+      "vertices": {
+        "A": [
+          46,
+          137
+        ],
+        "B": [
+          82,
+          115
+        ],
+        "C": [
+          118,
+          136
+        ],
+        "D": [
+          118,
+          177
+        ],
+        "E": [
+          82,
+          199
+        ],
+        "F": [
+          46,
+          177
+        ],
+        "G": [
+          152,
+          199
+        ],
+        "H": [
+          152,
+          240
+        ],
+        "I": [
+          117,
+          261
+        ],
+        "N": [
+          81,
+          242
+        ]
+      },
+      "outerRingEdges": "A-B-C-D-E-F-A andE-D-G-H-I-N-E",
+      "doubleInnerSegments": [
+        [
+          53,
+          144,
+          53,
+          171
+        ],
+        [
+          85,
+          124,
+          109,
+          138
+        ],
+        [
+          90,
+          199,
+          115,
+          184
+        ],
+        [
+          145,
+          207,
+          145,
+          232
+        ],
+        [
+          99,
+          242,
+          120,
+          254
+        ]
+      ],
+      "NbottomDouble": "N–Iedgehasinnerparallel99,242→120,254;notlonepair/ncharge",
+      "OMe": {
+        "text": "OMe",
+        "anchor": [
+          102,
+          76
+        ],
+        "bond": [
+          [
+            82,
+            115
+          ],
+          [
+            82,
+            89
+          ]
+        ],
+        "target": "Ofirst"
+      }
+    },
+    "centralOH": {
+      "C": [
+        188,
+        177
+      ],
+      "toQuinoline": [
+        [
+          152,
+          199
+        ],
+        [
+          188,
+          177
+        ]
+      ],
+      "toCage": [
+        [
+          188,
+          177
+        ],
+        [
+          188,
+          137
+        ]
+      ],
+      "hashedCount": 3,
+      "hashedBarsApprox": [
+        [
+          195,
+          181,
+          194,
+          184
+        ],
+        [
+          203,
+          185,
+          200,
+          190
+        ],
+        [
+          212,
+          190,
+          207,
+          197
+        ]
+      ],
+      "wideToward": "OH",
+      "OHlabel": [
+        235,
+        199
+      ],
+      "target": "Oleft"
+    },
+    "cage": {
+      "N": [
+        229,
+        127
+      ],
+      "Cnodes": {
+        "A": [
+          188,
+          137
+        ],
+        "B": [
+          209,
+          101
+        ],
+        "C": [
+          249,
+          90
+        ],
+        "D": [
+          290,
+          100
+        ],
+        "E": [
+          269,
+          137
+        ],
+        "F": [
+          229,
+          83
+        ],
+        "G": [
+          249,
+          48
+        ]
+      },
+      "edges": [
+        "N–A",
+        "A–B",
+        "B–C",
+        "C–D",
+        "D–E",
+        "E–N",
+        "N–F",
+        "F–G",
+        "G–C"
+      ],
+      "NleftBond": [
+        [
+          188,
+          137
+        ],
+        [
+          215,
+          129
+        ]
+      ],
+      "NrightBond": [
+        [
+          244,
+          130
+        ],
+        [
+          269,
+          137
+        ]
+      ],
+      "NtopBond": [
+        [
+          229,
+          83
+        ],
+        [
+          229,
+          111
+        ]
+      ],
+      "crossing": "B–Cbackbondgapnearx229,y96toavoidconnectingN–Ffrontvertical. VisibleB209101→22096 then23793→24990;gap221..236,NOTvertexintersection."
+    },
+    "vinyl": {
+      "singleFromCage": [
+        [
+          249,
+          48
+        ],
+        [
+          212,
+          38
+        ]
+      ],
+      "doubleMain": [
+        [
+          212,
+          38
+        ],
+        [
+          183,
+          67
+        ]
+      ],
+      "doubleInner": [
+        [
+          212,
+          47
+        ],
+        [
+          190,
+          74
+        ]
+      ],
+      "doubleCount": 1,
+      "note": "OneC=CtwoPARALLELLINES,not2differentdoublebonds."
+    },
+    "counts": "20CinclMe/2N/2O,quinoline5double+vinyl1double=6,total3hashedOHbars/NOcharges/noexplicitHnew/noOMeexpansion/caption.",
+    "critical": "BothNneutralnoHtext,allcagebridgesnotshorten/delete/addC,crossinggapkeep;OH3hashnot5/solidwedge,noextraCIP/names/answer."
+  },
+  "verdict": "Đọcsource,chưaactualSVGreview."
+}
