@@ -162,7 +162,8 @@ describe('Học sinh 2.0 (bản vẽ GV-HocSinh)', () => {
     expect(nut.getAttribute('aria-haspopup')).toBe('menu')
     fireEvent.click(nut)
     const td = screen.getByRole('menu', { name: 'Thao tác cho em Nguyễn Văn Em 0' })
-    expect(within(td).getAllByRole('menuitem').map((x) => x.textContent?.replace(/ · .*/, ''))).toEqual(['Mở hồ sơ', 'Báo cáo ca gần nhất', 'Lịch sử ca (2)', 'Học phí', 'Đặt lại mật khẩu'])
+    expect(within(td).getAllByRole('menuitem').map((x) => x.textContent?.replace(/ · .*/, ''))).toEqual(['Mở hồ sơ', 'Báo cáo ca gần nhất', 'Lịch sử ca (2)', 'Học phí', 'Đặt lại mật khẩu', 'Đánh dấu nghỉ học'])
+    // ↑ 9c105da (thầy 06/11 «nút tick khôi phục HS đã nghỉ», công tắc nghỉ học 04/11): thực đơn thêm mục nghỉ học / khôi phục ở cuối — đổi có chủ ý.
     fireEvent.click(within(td).getByRole('menuitem', { name: 'Mở hồ sơ' }))
     expect(m.moHoSoEm).toHaveBeenCalledWith('1200')
     expect(screen.queryByRole('menu')).toBeNull()
