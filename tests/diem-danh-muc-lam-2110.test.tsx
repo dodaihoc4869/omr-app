@@ -11,7 +11,7 @@ vi.mock('../src/lib/goi-lenh-thay', () => ({ goiLenh: (duong: string, body: Reco
 vi.mock('../src/components/hop-thoai', () => ({ hoiXacNhan: async () => true }))
 vi.mock('../src/components/chien-dich/HoSoLamCauEm', () => ({ default: () => <div role="dialog" aria-label="Hồ sơ làm bài" /> }))
 // 06/11: bản chiếu điểm danh mặc định là bảng Bình Phản Ứng; test này khoá bản chiếu CŨ (đường lùi khi máy chủ tắt `TAT_BPU`) ⇒ giả lập máy chủ tắt.
-vi.mock('../src/components/bpu/BangBinhPhanUng', async () => { const { useEffect } = await import('react'); return { default: ({ onTat }: { onTat?: () => void }) => { useEffect(() => { onTat?.() }, [onTat]); return null } } })
+vi.mock('../src/components/bpu/BangBinhPhanUng', async () => { const { useEffect } = await import('react'); return { default: function BangGiaTat({ onTat }: { onTat?: () => void }) { useEffect(() => { onTat?.() }, [onTat]); return null } } })
 
 import { BuocDiemDanh, useDiemDanhBuoi } from '../src/components/day-hoc/DiemDanhBuoi'
 import { CHO_HOI_MUC_LAM_MS } from '../src/components/day-hoc/Buoc1DiemDanh'
