@@ -1,0 +1,314 @@
+{
+  "i": 189,
+  "hash": "2035e2ffe087401d81a15a1038398541e2a798a1133e8129c686088dbf9e00e0",
+  "fileNguon": "anh/2035e2ffe087401d81a15a1038398541e2a798a1133e8129c686088dbf9e00e0.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "questions": [
+    {
+      "qid": "12-BD7-18-I-5",
+      "de": "Cho cấu tạo của một đoạn mạch trong phân tử polymer X như hình. Tên gọi của polymer X là",
+      "refs": [
+        {
+          "hash": "2035e2ffe087401d81a15a1038398541e2a798a1133e8129c686088dbf9e00e0",
+          "where": "12-BD7-18-I-5.hinh.0.du_lieu",
+          "hashDataUrl": "94ffec332580c9b47b165291cc459a474daa00fca9ef8556cf35c891d07dda8e"
+        }
+      ]
+    },
+    {
+      "qid": "12-C4-B12-I-10",
+      "de": "Cho cấu tạo của một đoạn mạch trong phân tử polymer X như hình. Tên gọi của polymer X là",
+      "refs": [
+        {
+          "hash": "2035e2ffe087401d81a15a1038398541e2a798a1133e8129c686088dbf9e00e0",
+          "where": "12-C4-B12-I-10.hinh.0.du_lieu",
+          "hashDataUrl": "94ffec332580c9b47b165291cc459a474daa00fca9ef8556cf35c891d07dda8e"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–2pxapprox,6backboneEXPLICITCnotimplicitvertices.",
+    "backboneC": [
+      [
+        141,
+        115
+      ],
+      [
+        231,
+        115
+      ],
+      [
+        322,
+        115
+      ],
+      [
+        412,
+        115
+      ],
+      [
+        503,
+        115
+      ],
+      [
+        593,
+        115
+      ]
+    ],
+    "backboneBonds": [
+      [
+        156,
+        115,
+        214,
+        115
+      ],
+      [
+        246,
+        115,
+        305,
+        115
+      ],
+      [
+        337,
+        115,
+        395,
+        115
+      ],
+      [
+        427,
+        115,
+        485,
+        115
+      ],
+      [
+        518,
+        115,
+        575,
+        115
+      ]
+    ],
+    "continuationStubs": [
+      [
+        50,
+        115,
+        123,
+        115
+      ],
+      [
+        609,
+        115,
+        683,
+        115
+      ]
+    ],
+    "topGroups": [
+      {
+        "text": "H",
+        "anchor": [
+          141,
+          47
+        ],
+        "bond": [
+          [
+            141,
+            99
+          ],
+          [
+            141,
+            63
+          ]
+        ]
+      },
+      {
+        "text": "CH₃",
+        "anchor": [
+          254,
+          47
+        ],
+        "bond": [
+          [
+            231,
+            99
+          ],
+          [
+            231,
+            63
+          ]
+        ],
+        "target": "Cfirst"
+      },
+      {
+        "text": "H",
+        "anchor": [
+          322,
+          47
+        ],
+        "bond": [
+          [
+            322,
+            99
+          ],
+          [
+            322,
+            63
+          ]
+        ]
+      },
+      {
+        "text": "CH₃",
+        "anchor": [
+          435,
+          47
+        ],
+        "bond": [
+          [
+            412,
+            99
+          ],
+          [
+            412,
+            63
+          ]
+        ],
+        "target": "Cfirst"
+      },
+      {
+        "text": "H",
+        "anchor": [
+          503,
+          47
+        ],
+        "bond": [
+          [
+            503,
+            99
+          ],
+          [
+            503,
+            63
+          ]
+        ]
+      },
+      {
+        "text": "CH₃",
+        "anchor": [
+          616,
+          47
+        ],
+        "bond": [
+          [
+            593,
+            99
+          ],
+          [
+            593,
+            63
+          ]
+        ],
+        "target": "Cfirst"
+      }
+    ],
+    "bottomH": [
+      {
+        "anchor": [
+          141,
+          181
+        ],
+        "bond": [
+          [
+            141,
+            130
+          ],
+          [
+            141,
+            165
+          ]
+        ]
+      },
+      {
+        "anchor": [
+          231,
+          181
+        ],
+        "bond": [
+          [
+            231,
+            130
+          ],
+          [
+            231,
+            165
+          ]
+        ]
+      },
+      {
+        "anchor": [
+          322,
+          181
+        ],
+        "bond": [
+          [
+            322,
+            130
+          ],
+          [
+            322,
+            165
+          ]
+        ]
+      },
+      {
+        "anchor": [
+          412,
+          181
+        ],
+        "bond": [
+          [
+            412,
+            130
+          ],
+          [
+            412,
+            165
+          ]
+        ]
+      },
+      {
+        "anchor": [
+          503,
+          181
+        ],
+        "bond": [
+          [
+            503,
+            130
+          ],
+          [
+            503,
+            165
+          ]
+        ]
+      },
+      {
+        "anchor": [
+          593,
+          181
+        ],
+        "bond": [
+          [
+            593,
+            130
+          ],
+          [
+            593,
+            165
+          ]
+        ]
+      }
+    ],
+    "counts": "6Cexplicitbackbone/3CH3textbranchespositions2-4-6up/9Hexplicitlabels(top1-3-5+bottomall6)/5internalCC+2continuationstubs/12verticalbonds,allSINGLEuniform/noCIP/wedges.",
+    "noAdded": "Nobrackets/nrepeat/caption/polymername/doublebonds/Hextra/endgroups. Source6Catomsportionnotwholefinitealkane,stubsstayopen."
+  },
+  "verdict": "Đọcsource,chưaactualSVGreview."
+}

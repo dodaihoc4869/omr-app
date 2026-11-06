@@ -1,0 +1,171 @@
+{
+  "hash": "217e990bbf1a2d2aaf4e51e61b533c23a213317b15db20293a124de516fc7e70",
+  "file": "anh/217e990bbf1a2d2aaf4e51e61b533c23a213317b15db20293a124de516fc7e70.png",
+  "mime": "image/png",
+  "bytes": 3322,
+  "i": 198,
+  "questions": [
+    {
+      "qid": "12-C2-B5-II-15",
+      "de": "Cho sơ đồ phản ứng (X, Y, Z, T là các chất hữu cơ khác nhau):",
+      "refs": [
+        {
+          "hash": "217e990bbf1a2d2aaf4e51e61b533c23a213317b15db20293a124de516fc7e70",
+          "where": "12-C2-B5-II-15.hinh.0.du_lieu",
+          "hashDataUrl": "80989d4fb12bba6a177fd8fc214ecdac090a3235f5c515f7598eaf9d16e106d4"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D1-II-51",
+      "de": "Cho sơ đồ phản ứng (X, Y, Z, T là các chất hữu cơ khác nhau):",
+      "refs": [
+        {
+          "hash": "217e990bbf1a2d2aaf4e51e61b533c23a213317b15db20293a124de516fc7e70",
+          "where": "DB-12-B4-D1-II-51.hinh.0.du_lieu",
+          "hashDataUrl": "80989d4fb12bba6a177fd8fc214ecdac090a3235f5c515f7598eaf9d16e106d4"
+        }
+      ]
+    }
+  ],
+  "nativeSize": [
+    773,
+    295
+  ],
+  "daMoNativeVaZoom4x": true,
+  "labels": {
+    "left": "Saccharose",
+    "upperUnknown": "X",
+    "lowerUnknown": "Y",
+    "upperProduct": "T",
+    "lowerProduct": "Z"
+  },
+  "conditions": {
+    "hydrolysis": {
+      "above": "+ H₂O, H⁺, t⁰",
+      "below": null,
+      "literal": "t có số0 superscript, không phải thêm chữC/đổiđiềukiện."
+    },
+    "upper": {
+      "above": "+ AgNO₃/NH₃",
+      "below": null
+    },
+    "lower": {
+      "above": "+ Br₂ + H₂O",
+      "below": null
+    }
+  },
+  "geometryPixel": {
+    "stem": [
+      [
+        188,
+        159
+      ],
+      [
+        389,
+        159
+      ]
+    ],
+    "branchVertical": [
+      [
+        389,
+        86
+      ],
+      [
+        389,
+        239
+      ]
+    ],
+    "branchUpper": [
+      [
+        389,
+        86
+      ],
+      [
+        439,
+        86
+      ]
+    ],
+    "branchLower": [
+      [
+        389,
+        239
+      ],
+      [
+        441,
+        239
+      ]
+    ],
+    "upperReaction": [
+      [
+        480,
+        86
+      ],
+      [
+        701,
+        86
+      ]
+    ],
+    "lowerReaction": [
+      [
+        482,
+        241
+      ],
+      [
+        703,
+        241
+      ]
+    ],
+    "arrowheads": [
+      {
+        "tip": [
+          439,
+          86
+        ],
+        "direction": "right"
+      },
+      {
+        "tip": [
+          441,
+          239
+        ],
+        "direction": "right"
+      },
+      {
+        "tip": [
+          701,
+          86
+        ],
+        "direction": "right"
+      },
+      {
+        "tip": [
+          703,
+          241
+        ],
+        "direction": "right"
+      }
+    ]
+  },
+  "literalRules": [
+    "StemSaccharoseđếntrụcdọcKHÔNGcóarrowhead. Chỉ4arrowhead:sangX,sangY,X→T,Y→Z.",
+    "X/Y/T/Zlàunknown,khôngthaybằngchấtđoántừhóahọc.",
+    "KhôngthêmcôngthứcSaccharose,hệsố,nướcsảnphẩm,nhiệtđộcho2nhánhphải.",
+    "Khôngthêmarrowreversible,mũitêntừXxuốngYhaytrụcđứt.",
+    "Giữdấucộngđầutrướccả3conditionblock: +H2O; +AgNO3/NH3; +Br2+H2O.",
+    "KhôngcaptionkhácngoàiSaccharosevà4chữunknown."
+  ],
+  "nguoiDocNguon": "soat_nguon_2",
+  "trangThai": "Đãđọcnguồn,chưađạtSVG",
+  "svgGapFix": {
+    "oldStemStart": [
+      188,
+      159
+    ],
+    "newStemStart": [
+      194,
+      159
+    ],
+    "reason": "GlyphDDHendsx187.721;newgap6.279px tránhchữe chạmstem. Chỉ sửa khoảnghởtrongSVG,khôngđổi dữliệunguồn."
+  }
+}

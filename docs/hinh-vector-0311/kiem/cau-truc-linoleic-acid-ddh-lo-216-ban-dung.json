@@ -1,0 +1,40 @@
+[
+  {
+    "i": 180,
+    "hash": "1f3d2ced408fd27b2226c07a3d612f18bd099af3b46b303179a5a7ff3aea6686",
+    "fileNguon": "anh/1f3d2ced408fd27b2226c07a3d612f18bd099af3b46b303179a5a7ff3aea6686.png",
+    "svg": "linoleic-acid-ddh-fe7b985fa8f8024f47f0c63c8a192e70cdf9960e02a7d643a57e96f61222fdd5.svg",
+    "hashSvg": "fe7b985fa8f8024f47f0c63c8a192e70cdf9960e02a7d643a57e96f61222fdd5",
+    "byteSvg": 2237,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C1-D4-I-18",
+        "de": "Linoleic acid (có cấu tạo như hình dưới) là một trong những acid béo có lợi cho sức khỏe tim mạch, ngăn ngừa các bệnh về tim, động mạch vành.\nCho các nhận định sau:\n(a) Trilinolein có công thức phân tử là C₅₇H₉₈O₆.\n(b) Linoleic acid thuộc loại acid béo omega-6.\n(c) Hydrogen hoá hoàn toàn 1 mol trilinolein cần 6 mol H₂.\n(d) Trong phân tử linoleic acid có 2 liên kết π.\nSố nhận định đúng là",
+        "refs": [
+          {
+            "hash": "1f3d2ced408fd27b2226c07a3d612f18bd099af3b46b303179a5a7ff3aea6686",
+            "where": "12-KT-C1-D4-I-18.hinh.0.du_lieu",
+            "hashDataUrl": "6ec0f7e88001f2ff5278a94358ec4d9a08ea0303f6603f01dafff80e561f5819"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P2-D3-I-16",
+        "de": "Linoleic acid (có cấu tạo như hình dưới) là một trong những acid béo có lợi cho sức khỏe tim mạch, ngăn ngừa các bệnh về tim, động mạch vành.\nCho các nhận định sau:\n(a) Trilinolein có công thức phân tử là C₅₇H₉₈O₆.\n(b) Linoleic acid thuộc loại acid béo omega-6.\n(c) Hydrogen hoá hoàn toàn 1 mol trilinolein cần 6 mol H₂.\n(d) Trong phân tử linoleic acid có 2 liên kết π.\nSố nhận định đúng là",
+        "refs": [
+          {
+            "hash": "1f3d2ced408fd27b2226c07a3d612f18bd099af3b46b303179a5a7ff3aea6686",
+            "where": "DB-12-B1-P2-D3-I-16.hinh.0.du_lieu",
+            "hashDataUrl": "6ec0f7e88001f2ff5278a94358ec4d9a08ea0303f6603f01dafff80e561f5819"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "17Cimplicit+COOH/2horizontalC=C/zigzagliteral/noadditionalH-labels-caption/DDHpath.",
+    "hashSvgDaSoat": "fe7b985fa8f8024f47f0c63c8a192e70cdf9960e02a7d643a57e96f61222fdd5",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

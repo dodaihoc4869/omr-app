@@ -1,0 +1,170 @@
+{
+  "i": 180,
+  "hash": "1f3d2ced408fd27b2226c07a3d612f18bd099af3b46b303179a5a7ff3aea6686",
+  "fileNguon": "anh/1f3d2ced408fd27b2226c07a3d612f18bd099af3b46b303179a5a7ff3aea6686.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "zoom": "/workspace/scratch/cau4-linoleic216-zoom.png",
+  "questions": [
+    {
+      "qid": "12-KT-C1-D4-I-18",
+      "de": "Linoleic acid (có cấu tạo như hình dưới) là một trong những acid béo có lợi cho sức khỏe tim mạch, ngăn ngừa các bệnh về tim, động mạch vành.\nCho các nhận định sau:\n(a) Trilinolein có công thức phân tử là C₅₇H₉₈O₆.\n(b) Linoleic acid thuộc loại acid béo omega-6.\n(c) Hydrogen hoá hoàn toàn 1 mol trilinolein cần 6 mol H₂.\n(d) Trong phân tử linoleic acid có 2 liên kết π.\nSố nhận định đúng là",
+      "refs": [
+        {
+          "hash": "1f3d2ced408fd27b2226c07a3d612f18bd099af3b46b303179a5a7ff3aea6686",
+          "where": "12-KT-C1-D4-I-18.hinh.0.du_lieu",
+          "hashDataUrl": "6ec0f7e88001f2ff5278a94358ec4d9a08ea0303f6603f01dafff80e561f5819"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B1-P2-D3-I-16",
+      "de": "Linoleic acid (có cấu tạo như hình dưới) là một trong những acid béo có lợi cho sức khỏe tim mạch, ngăn ngừa các bệnh về tim, động mạch vành.\nCho các nhận định sau:\n(a) Trilinolein có công thức phân tử là C₅₇H₉₈O₆.\n(b) Linoleic acid thuộc loại acid béo omega-6.\n(c) Hydrogen hoá hoàn toàn 1 mol trilinolein cần 6 mol H₂.\n(d) Trong phân tử linoleic acid có 2 liên kết π.\nSố nhận định đúng là",
+      "refs": [
+        {
+          "hash": "1f3d2ced408fd27b2226c07a3d612f18bd099af3b46b303179a5a7ff3aea6686",
+          "where": "DB-12-B1-P2-D3-I-16.hinh.0.du_lieu",
+          "hashDataUrl": "6ec0f7e88001f2ff5278a94358ec4d9a08ea0303f6603f01dafff80e561f5819"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–2pxapprox,countliteralfrommethylendpointnotname/theory.",
+    "implicitCvertices": [
+      [
+        47,
+        93
+      ],
+      [
+        92,
+        47
+      ],
+      [
+        138,
+        93
+      ],
+      [
+        183,
+        47
+      ],
+      [
+        230,
+        93
+      ],
+      [
+        276,
+        47
+      ],
+      [
+        340,
+        47
+      ],
+      [
+        386,
+        93
+      ],
+      [
+        432,
+        47
+      ],
+      [
+        497,
+        47
+      ],
+      [
+        543,
+        93
+      ],
+      [
+        589,
+        47
+      ],
+      [
+        635,
+        93
+      ],
+      [
+        680,
+        47
+      ],
+      [
+        727,
+        93
+      ],
+      [
+        772,
+        47
+      ],
+      [
+        819,
+        93
+      ]
+    ],
+    "implicitCcount": 17,
+    "carboxyl": {
+      "text": "COOH",
+      "anchor": [
+        881,
+        55
+      ],
+      "bondFromLastC": [
+        [
+          819,
+          93
+        ],
+        [
+          847,
+          65
+        ]
+      ],
+      "target": "Cfirst~85655",
+      "COOHcarbonCount": 1,
+      "noExtraImplicitCAtBondEnd": true
+    },
+    "doubleBonds": {
+      "vertexIndicesFromMethyl1Based": [
+        [
+          6,
+          7
+        ],
+        [
+          9,
+          10
+        ]
+      ],
+      "upperSegments": [
+        [
+          276,
+          47,
+          340,
+          47
+        ],
+        [
+          432,
+          47,
+          497,
+          47
+        ]
+      ],
+      "innerSegments": [
+        [
+          280,
+          57,
+          335,
+          57
+        ],
+        [
+          437,
+          57,
+          491,
+          57
+        ]
+      ],
+      "orientation": "BothdoublehorizontalTOP,bothadjacentbranchesDOWN/sourceZgeometry,noEZtextadded"
+    },
+    "counts": "18Ctotal=17implicit+1COOH-C,17backboneconnections=2double+15single;COOHcondensednotexpanded,0Hexplicit/charges/caption/nums/CIP.",
+    "noAdded": "No18Cnormalizationfromname/missingvertexrepair/stereoH/nem/omega labels/answers."
+  },
+  "verdict": "Đọcsource,chưaactualSVGreview."
+}

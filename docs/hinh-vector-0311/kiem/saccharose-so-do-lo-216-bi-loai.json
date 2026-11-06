@@ -1,0 +1,10 @@
+[
+  {
+    "i": 198,
+    "hashSvg": "fe643f68b4a0239ee377de3dcf9d8918ddb784bc889412b24167810ed4aac7de",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Cần sửa: Đã mở nativefull/zoom4x và freshactualChromium exactSVG19723B. Nội dung Saccharose,+H₂O,H⁺,t⁰,+AgNO₃/NH₃,+Br₂+H₂O,X/Y/T/Z,nhánh4arrowheads đúng; không cắt/tràn. Tuy nhiên glyph Saccharose kết thúcx187.721 trong nativeSVG trongkhi stemM188159 bắtđầux188, gapchỉ0.279px; actualrender nhìn chữe chạmstem. Cần dờistemstartx≥192,trước khi duyệt.",
+    "actualRender": "/workspace/scratch/saccharose216-playwright.png",
+    "renderMethod": "FreshChromiumPlaywright setContent exactSVGbytes→locatorSVGscreenshot deviceScaleFactor2; hashverified fe643f.../19723B."
+  }
+]
