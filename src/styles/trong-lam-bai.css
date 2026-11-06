@@ -407,6 +407,9 @@ html:root[data-trong='hs'] .ht2-lam-de-chu .ct-khong { font-weight: 900; }
 /* 06/11: màn học tập cổng học sinh ra khỏi luật «chữ mảnh toàn app» (trong.css mục 10) — riêng NỘI DUNG ĐỀ THI mở trong cổng (ExamTakeScreen) và
    Kiểm tra ôn tập (ThiDuo) giữ y nguyên mảnh 500 như trước: không đụng chữ đề thi. */
 html:root[data-ht2] .thi-noi-dung *:not(.gyc-cham, .gyc-cham *) { font-weight: 500 !important; }
+/* 07/11 (thầy: «in đậm chữ không trong đề thi nữa»): «không» phủ định trong THÂN ĐỀ thi (TheCau `div.cau-de` — màn thi /t, thi trong cổng, Kiểm tra ôn tập)
+   đậm 900; thắng luật chữ mảnh !important (trong.css mục 10 + dòng trên). Phương án / đáp án hiện sau nộp (span.cau-de) giữ mảnh. */
+html:root[data-trong='hs'] div.cau-de .ct-khong { font-weight: 900 !important; }
 /* phương án: ô lớn, viền dày có gờ đáy */
 [data-trong] .duo .ht2-lam-tn { display: grid; gap: 12px; }
 [data-trong] .duo .duo-tra[data-luoi] .ht2-lam-tn { grid-template-columns: repeat(2, minmax(0, 1fr)); }

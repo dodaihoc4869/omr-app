@@ -3,7 +3,9 @@
 import { describe, expect, it } from 'vitest'
 import { render } from '@testing-library/react'
 import { ChemText } from '../src/lib/chem-format'
-import { laKhongNhan } from '../src/lib/chem-trinh-bay' // nạp ⇒ tự cắm vào ChemText như màn làm bài HS
+import { laKhongNhan, trinhBayChu } from '../src/lib/chem-trinh-bay'
+import { datTrinhBayChu } from '../src/lib/chem-format'
+datTrinhBayChu(trinhBayChu) // 07/11: mảnh chỉ tự cắm khi <html data-trong='hs'> ⇒ test cắm tay như màn làm bài HS
 
 const nhan = (de: string) => {
   const { container } = render(<p><ChemText text={de} /></p>)

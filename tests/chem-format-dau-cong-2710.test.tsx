@@ -6,7 +6,9 @@ import katex from 'katex'
 import 'katex/contrib/mhchem'
 import { ChemText, parseChemText, type ChemPart } from '../src/lib/chem-format'
 import { tachToanTuCongCe } from '../src/lib/chem-latex'
-import { trinhBayChu } from '../src/lib/chem-trinh-bay' // nạp ⇒ tự cắm vào ChemText như màn làm bài HS
+import { trinhBayChu } from '../src/lib/chem-trinh-bay'
+import { datTrinhBayChu } from '../src/lib/chem-format'
+datTrinhBayChu(trinhBayChu) // 07/11: mảnh chỉ tự cắm khi <html data-trong='hs'> ⇒ test cắm tay như màn làm bài HS
 
 /** Dạng đọc được: `_{…}` chỉ số dưới, `^{…}` số mũ. */
 const doc = (s: string) => parseChemText(s).map((p: ChemPart) => (p.t === 'sub' ? `_{${p.v}}` : p.t === 'sup' ? `^{${p.v}}` : p.t === 'text' ? p.v : `[${p.mui}]`)).join('')

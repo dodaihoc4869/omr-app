@@ -84,4 +84,13 @@ export function trinhBayChu(v: string, truoc = '', sau = ''): string | (string |
   return ra
 }
 
-datTrinhBayChu(trinhBayChu)
+// 07/11 (thầy: «in đậm chữ không trong đề thi nữa»): mảnh này nay nạp CÙNG gói KaTeX (katex-goi.ts, không còn import ở ManLamBaiTap) ⇒ màn thi /t,
+// thi trong cổng, Kiểm tra ôn tập, mọi màn làm câu đều có (cắm TRƯỚC khi KaTeX báo về ⇒ mọi ChemText vẽ lại có đánh dấu). CHỈ cắm khi
+// <html data-trong='hs'>: app thầy ('gv'), phiếu, test (không có data-trong — tests/_nap-katex.ts nạp KaTeX cho mọi tệp) giữ DOM y nguyên;
+// test cần trình bày này gọi `datTrinhBayChu(trinhBayChu)`.
+export function camNeuHs(): boolean {
+  const co = typeof document !== 'undefined' && document.documentElement.dataset.trong === 'hs'
+  if (co) datTrinhBayChu(trinhBayChu)
+  return co
+}
+camNeuHs()
