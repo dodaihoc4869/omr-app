@@ -1,0 +1,286 @@
+{
+  "hash": "46baafa20f0b39e1d27f51e90547a33c835ea038991faa819b300348e2c928b5",
+  "file": "anh/46baafa20f0b39e1d27f51e90547a33c835ea038991faa819b300348e2c928b5.png",
+  "mime": "image/png",
+  "bytes": 6660,
+  "i": 401,
+  "questions": [
+    {
+      "qid": "DB-12-B8-D1-I-351",
+      "de": "Ghép công thức cấu tạo của amine ở cột A với tên và bậc amine của chúng ở cột B sao cho phù hợp.",
+      "refs": [
+        {
+          "hash": "46baafa20f0b39e1d27f51e90547a33c835ea038991faa819b300348e2c928b5",
+          "where": "DB-12-B8-D1-I-351.hinh.0.du_lieu",
+          "hashDataUrl": "579071298f3ac05a89c2d8a0bf641f250228e59d4a2cd010239b977d2a69cf16",
+          "publicPosition": {
+            "where": "DB-12-B8-D1-I-351.hinh.0.du_lieu",
+            "hashDataUrl": "579071298f3ac05a89c2d8a0bf641f250228e59d4a2cd010239b977d2a69cf16",
+            "viTri": "sau_de",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C3-B8-I-57",
+      "de": "Ghép công thức cấu tạo của amine ở cột A với tên và bậc amine của chúng ở cột B sao cho phù hợp.",
+      "refs": [
+        {
+          "hash": "46baafa20f0b39e1d27f51e90547a33c835ea038991faa819b300348e2c928b5",
+          "where": "DH-12-C3-B8-I-57.hinh.0.du_lieu",
+          "hashDataUrl": "579071298f3ac05a89c2d8a0bf641f250228e59d4a2cd010239b977d2a69cf16",
+          "publicPosition": {
+            "where": "DH-12-C3-B8-I-57.hinh.0.du_lieu",
+            "hashDataUrl": "579071298f3ac05a89c2d8a0bf641f250228e59d4a2cd010239b977d2a69cf16",
+            "viTri": "sau_de",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        }
+      ]
+    }
+  ],
+  "nativeSize": [
+    568,
+    204
+  ],
+  "fileNguon": "anh/46baafa20f0b39e1d27f51e90547a33c835ea038991faa819b300348e2c928b5.png",
+  "daMoNativeFullVaZoom3x": true,
+  "zoom": "/workspace/scratch/amine401-227-3x.png",
+  "headers": [
+    {
+      "literal": "Cột (A)",
+      "centerApprox": [
+        118,
+        20
+      ],
+      "nativeBold": true
+    },
+    {
+      "literal": "Cột (B)",
+      "centerApprox": [
+        398,
+        20
+      ],
+      "nativeBold": true
+    }
+  ],
+  "rowTexts": [
+    {
+      "literal": "a) N-methylbutan-2-amine; amine bậc hai",
+      "startApprox": [
+        242,
+        63
+      ]
+    },
+    {
+      "literal": "b) butan-1-amine; amine bậc một",
+      "startApprox": [
+        242,
+        120
+      ]
+    },
+    {
+      "literal": "c) benzenamine; amine bậc một",
+      "startApprox": [
+        242,
+        173
+      ]
+    }
+  ],
+  "structures": [
+    {
+      "number": "(1)",
+      "numberApprox": [
+        18,
+        62
+      ],
+      "labels": [
+        "H₂N"
+      ],
+      "connectivity": "H2N–phenyl,khôngcirclearomatic",
+      "smiles": "Nc1ccccc1",
+      "ringNodesApprox": [
+        [
+          130,
+          58
+        ],
+        [
+          141,
+          38
+        ],
+        [
+          162,
+          38
+        ],
+        [
+          174,
+          58
+        ],
+        [
+          162,
+          78
+        ],
+        [
+          141,
+          78
+        ]
+      ],
+      "phDoublePositions": "left-upper,right-upper,bottomhorizontal,mỗivịtrí2nétKekulé",
+      "NtoRingBondApprox": [
+        [
+          111,
+          58
+        ],
+        [
+          130,
+          58
+        ]
+      ],
+      "H2NLabelApprox": [
+        94,
+        58
+      ]
+    },
+    {
+      "number": "(2)",
+      "numberApprox": [
+        18,
+        118
+      ],
+      "labels": [
+        "H₂N"
+      ],
+      "connectivity": "H2N–CH2–CH2–CH2–CH3,mạch4C",
+      "smiles": "CCCCN",
+      "carbonAnchorsApprox": [
+        [
+          114,
+          99
+        ],
+        [
+          134,
+          110
+        ],
+        [
+          154,
+          99
+        ],
+        [
+          173,
+          110
+        ]
+      ],
+      "NEndBondApprox": [
+        [
+          103,
+          106
+        ],
+        [
+          114,
+          99
+        ]
+      ],
+      "orientation": "H2Ntrái,mạchzigzagchéolên/đivềphảinhưngkhôngđảođầu"
+    },
+    {
+      "number": "(3)",
+      "numberApprox": [
+        18,
+        171
+      ],
+      "labels": [
+        "N",
+        "H"
+      ],
+      "connectivity": "CH3–NH–CH(CH3)–CH2–CH3,5C,NHsecondarykhôngstereo",
+      "smiles": "CCC(C)NC",
+      "NcenterApprox": [
+        100,
+        161
+      ],
+      "NtoHApprox": [
+        [
+          100,
+          172
+        ],
+        [
+          100,
+          181
+        ]
+      ],
+      "HcenterApprox": [
+        100,
+        189
+      ],
+      "NleftMethylBondApprox": [
+        [
+          91,
+          156
+        ],
+        [
+          75,
+          147
+        ]
+      ],
+      "NtoSecCHApprox": [
+        [
+          109,
+          156
+        ],
+        [
+          126,
+          147
+        ]
+      ],
+      "secCHupperMethylApprox": [
+        [
+          126,
+          147
+        ],
+        [
+          126,
+          126
+        ]
+      ],
+      "secCHEthylApprox": [
+        [
+          126,
+          147
+        ],
+        [
+          146,
+          158
+        ],
+        [
+          167,
+          147
+        ]
+      ],
+      "note": "HữuhiệnởdướiN,bondN–Hphảigiữ;khôngCH3labelsởcácđầumạch."
+    }
+  ],
+  "layout": {
+    "grid": false,
+    "borders": false,
+    "columns": 2,
+    "rows": 3,
+    "noMatchingArrows": true,
+    "caption": null
+  },
+  "critical": "KHÔNGalias267. Giữtexta)bậchai(dù267khác),giữ3Phdouble/địnhhướngcả3molecule/explicitN–Hrow3;khôngtựghépđápán1-2-3vớia-b-c/khôngthêmgrid.",
+  "nguoiDocNguon": "soat_nguon_2",
+  "trangThai": "Đọcnguồn,chưađạtSVG",
+  "soatActualSVG": {
+    "i": 401,
+    "hashSvg": "83770f56f5a840dd3f412c3863fd5a64735c7d54293845ab97fc1613f3998013",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã mở riêng PNG native/3x và render Chromium mới từ exact SVG; kiểm thêm crop vòng phenyl. Đủ ba cấu trúc đúng số C/nhánh và hướng nguồn, ba liên kết đôi phenyl, hai H2N và N–H tường minh hàng (3); hai tiêu đề đậm, nhãn (1)–(3), đủ ba dòng a/b/c giữ nguyên dấu nối/chấm phẩy và bậc hai/một/một. Không khung bảng, không đáp án thêm, chữ/nét không chạm/cắt/tràn. Đối chiếu đủ hai public stems/refs.",
+    "byteSvg": 57428,
+    "actualSvgReviewed": true,
+    "render": "/workspace/scratch/amine401-227-83770f56-chromium.png",
+    "sourceHash": "46baafa20f0b39e1d27f51e90547a33c835ea038991faa819b300348e2c928b5"
+  }
+}

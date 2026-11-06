@@ -1,0 +1,14 @@
+[
+  {
+    "i": 401,
+    "hashSvg": "83770f56f5a840dd3f412c3863fd5a64735c7d54293845ab97fc1613f3998013",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã mở riêng PNG native/3x và render Chromium mới từ exact SVG; kiểm thêm crop vòng phenyl. Đủ ba cấu trúc đúng số C/nhánh và hướng nguồn, ba liên kết đôi phenyl, hai H2N và N–H tường minh hàng (3); hai tiêu đề đậm, nhãn (1)–(3), đủ ba dòng a/b/c giữ nguyên dấu nối/chấm phẩy và bậc hai/một/một. Không khung bảng, không đáp án thêm, chữ/nét không chạm/cắt/tràn. Đối chiếu đủ hai public stems/refs.",
+    "byteSvg": 57428,
+    "actualSvgReviewed": true,
+    "render": "/workspace/scratch/amine401-227-83770f56-chromium.png",
+    "sourceHash": "46baafa20f0b39e1d27f51e90547a33c835ea038991faa819b300348e2c928b5",
+    "hash": "46baafa20f0b39e1d27f51e90547a33c835ea038991faa819b300348e2c928b5",
+    "hashSvgDaSoat": "83770f56f5a840dd3f412c3863fd5a64735c7d54293845ab97fc1613f3998013"
+  }
+]
