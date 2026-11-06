@@ -1,0 +1,40 @@
+[
+  {
+    "i": 197,
+    "hash": "215ff8d1773c9fa7dfb4e3694af4cae56acc9582d7b99ca3be07ad76aac66efc",
+    "fileNguon": "anh/215ff8d1773c9fa7dfb4e3694af4cae56acc9582d7b99ca3be07ad76aac66efc.png",
+    "svg": "lewis-bon-cong-thuc-ddh-c7716bd3e1da8dfee7c4340f7c08fb51107f0084156df61ee7c16a25185d1e9b.svg",
+    "hashSvg": "c7716bd3e1da8dfee7c4340f7c08fb51107f0084156df61ee7c16a25185d1e9b",
+    "byteSvg": 13819,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-11-B6-D2-III-66",
+        "de": "Trong các công thức dưới đây: Có bao nhiêu công thức không thỏa mãn quy tắc octet?",
+        "refs": [
+          {
+            "hash": "215ff8d1773c9fa7dfb4e3694af4cae56acc9582d7b99ca3be07ad76aac66efc",
+            "where": "DB-11-B6-D2-III-66.hinh.0.du_lieu",
+            "hashDataUrl": "e0a11c46f2e6e030dea50c787a0c0077ec43f1cb2c5af226a19ff3b2bf61558f"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B6-III-6",
+        "de": "Trong các công thức dưới đây: Có bao nhiêu công thức không thỏa mãn quy tắc octet?",
+        "refs": [
+          {
+            "hash": "215ff8d1773c9fa7dfb4e3694af4cae56acc9582d7b99ca3be07ad76aac66efc",
+            "where": "DH-11-C2-B6-III-6.hinh.0.du_lieu",
+            "hashDataUrl": "e0a11c46f2e6e030dea50c787a0c0077ec43f1cb2c5af226a19ff3b2bf61558f"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "4formulas/31electrondots/4numberlabelsdamthật/allatoms-bondsliteral/nochargesadded/noanswer/DDHpath.",
+    "hashSvgDaSoat": "c7716bd3e1da8dfee7c4340f7c08fb51107f0084156df61ee7c16a25185d1e9b",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

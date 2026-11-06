@@ -1,0 +1,439 @@
+{
+  "hash": "25b4bf0cdf73e8d22fb8d532fc3296f61acaf77ddc397c0d36748e1030e18ee5",
+  "file": "anh/25b4bf0cdf73e8d22fb8d532fc3296f61acaf77ddc397c0d36748e1030e18ee5.png",
+  "mime": "image/png",
+  "bytes": 18881,
+  "i": 217,
+  "questions": [
+    {
+      "qid": "12-BD7-14-II-3",
+      "de": "Trong công nghiệp, nhôm được điều chế bằng cách điện phân nóng chảy hỗn hợp alumina (Al₂O₃) và cryolite (Na₃AlF₆) còn gọi là quy trình Hall-Héroult: 2Al₂O₃(l) tạo 4Al(l) + 3O₂(g) như hình dưới đây.\nNhiệt độ nóng chảy của hỗn hợp alumina và cryolite khoảng 950 độ C, thấp hơn nhiều so với nhiệt độ nóng chảy của alumina (trên 2000 độ C); ngoài ra, cryolite còn làm tăng độ dẫn điện của hỗn hợp nóng chảy.\nTrong quá trình điện phân, cực dương làm bằng graphite bị ăn mòn và liên tục bị nhúng xuống bể điện phân. Sau một thời gian, các thanh graphite này sẽ được thay mới.",
+      "refs": [
+        {
+          "hash": "25b4bf0cdf73e8d22fb8d532fc3296f61acaf77ddc397c0d36748e1030e18ee5",
+          "where": "12-BD7-14-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "4d621c04e22ce433fea1b6794730ac88095045c753c4e8326e33a7c78bd994c1",
+          "position": {
+            "where": "12-BD7-14-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "4d621c04e22ce433fea1b6794730ac88095045c753c4e8326e33a7c78bd994c1",
+            "viTri": "sau_de",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        }
+      ]
+    },
+    {
+      "qid": "12-C5-B16-II-6",
+      "de": "Trong công nghiệp, nhôm được điều chế bằng cách điện phân nóng chảy hỗn hợp alumina (Al₂O₃) và cryolite (Na₃AlF₆) còn gọi là quy trình Hall-Héroult: 2Al₂O₃(l) tạo 4Al(l) + 3O₂(g) như hình dưới đây.\nNhiệt độ nóng chảy của hỗn hợp alumina và cryolite khoảng 950 độ C, thấp hơn nhiều so với nhiệt độ nóng chảy của alumina (trên 2000 độ C); ngoài ra, cryolite còn làm tăng độ dẫn điện của hỗn hợp nóng chảy.\nTrong quá trình điện phân, cực dương làm bằng graphite bị ăn mòn và liên tục bị nhúng xuống bể điện phân. Sau một thời gian, các thanh graphite này sẽ được thay mới.",
+      "refs": [
+        {
+          "hash": "25b4bf0cdf73e8d22fb8d532fc3296f61acaf77ddc397c0d36748e1030e18ee5",
+          "where": "12-C5-B16-II-6.hinh.0.du_lieu",
+          "hashDataUrl": "4d621c04e22ce433fea1b6794730ac88095045c753c4e8326e33a7c78bd994c1",
+          "position": {
+            "where": "12-C5-B16-II-6.hinh.0.du_lieu",
+            "hashDataUrl": "4d621c04e22ce433fea1b6794730ac88095045c753c4e8326e33a7c78bd994c1",
+            "viTri": "sau_de",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        }
+      ]
+    }
+  ],
+  "nativeSize": [
+    679,
+    252
+  ],
+  "daMoNativeFullVaZoom3x": true,
+  "classification": "Sơ đồ cắt ngang bể Hall–Héroult; sơ đồ thiết bị điện phân, không phải công thức/phân bố hạt.",
+  "labels": [
+    {
+      "text": "Graphite",
+      "position": "trên busbar/anode thứ nhất",
+      "approx": [
+        265,
+        10
+      ]
+    },
+    {
+      "text": "Graphite",
+      "position": "bên trái,leader vào lớp lótđen",
+      "approx": [
+        158,
+        111
+      ]
+    },
+    {
+      "text": "Alumina +",
+      "position": "phải dòng1",
+      "approx": [
+        502,
+        95
+      ]
+    },
+    {
+      "text": "criolite nóng chảy",
+      "position": "phải dòng2",
+      "approx": [
+        502,
+        117
+      ]
+    },
+    {
+      "text": "Nhôm nóng chảy",
+      "position": "phải lớp trắng dưới",
+      "approx": [
+        502,
+        145
+      ]
+    },
+    {
+      "text": "Bể điện phân bằng thép",
+      "position": "trái dưới,leader vào vỏ ngoài",
+      "approx": [
+        49,
+        174
+      ]
+    }
+  ],
+  "caption": {
+    "text": "Hình 15.1. Mô hình quy trình Hall – Héroult",
+    "positionApprox": [
+      173,
+      207
+    ],
+    "boldNativePrefix": "Hình 15.1.",
+    "literal": "Giữcriolitetronglabel nhưnative,khôngtựsửacryoliteđểkhớpstem. Giữé trongHéroult vàgạchnganggiữaHall/Héroult."
+  },
+  "polarity": {
+    "plus": {
+      "center": [
+        210,
+        9
+      ],
+      "circleRadiusApprox": 8,
+      "wire": [
+        [
+          210,
+          17
+        ],
+        [
+          210,
+          40
+        ],
+        [
+          233,
+          40
+        ]
+      ],
+      "connects": "busbar treo4anode"
+    },
+    "minus": {
+      "center": [
+        460,
+        13
+      ],
+      "circleRadiusApprox": 8,
+      "wire": [
+        [
+          461,
+          21
+        ],
+        [
+          461,
+          77
+        ]
+      ],
+      "connects": "mép phải lớp lót graphite đen tại thành bể;khôngnốibathgray"
+    }
+  },
+  "geometryPixel": {
+    "busbar": {
+      "thickStrokeApprox": 8,
+      "path": [
+        [
+          233,
+          40
+        ],
+        [
+          413,
+          43
+        ],
+        [
+          413,
+          72
+        ]
+      ],
+      "branchStems": [
+        [
+          [
+            297,
+            41
+          ],
+          [
+            297,
+            70
+          ]
+        ],
+        [
+          [
+            335,
+            41
+          ],
+          [
+            335,
+            70
+          ]
+        ],
+        [
+          [
+            374,
+            42
+          ],
+          [
+            374,
+            71
+          ]
+        ]
+      ],
+      "lastStemIsBusbarDownTurn": true
+    },
+    "anodes": {
+      "count": 4,
+      "rectsApprox": [
+        [
+          283,
+          70,
+          309,
+          113
+        ],
+        [
+          322,
+          70,
+          348,
+          113
+        ],
+        [
+          361,
+          71,
+          387,
+          115
+        ],
+        [
+          400,
+          72,
+          427,
+          116
+        ]
+      ],
+      "fill": "darkgrayblack;all4hangfromsamepositivebusbar"
+    },
+    "outerSteelShell": {
+      "boundsApprox": [
+        232,
+        71,
+        477,
+        190
+      ],
+      "texture": "grayprint/grain,khôngparticle",
+      "profile": "thànhtrái/thànhphải/đáydạngchữU,đáyhơi nghiêngxuốngphải"
+    },
+    "graphiteLiner": {
+      "fill": "đen",
+      "profileAnchorsApprox": [
+        [
+          240,
+          73
+        ],
+        [
+          256,
+          73
+        ],
+        [
+          267,
+          151
+        ],
+        [
+          441,
+          155
+        ],
+        [
+          454,
+          77
+        ],
+        [
+          470,
+          78
+        ],
+        [
+          470,
+          182
+        ],
+        [
+          241,
+          178
+        ]
+      ],
+      "shape": "lótUđenởtrongvỏthép,trái/phải/đáyliên tục"
+    },
+    "electrolyte": {
+      "fill": "grayprint/halftone",
+      "upperBoundaryApprox": [
+        [
+          263,
+          80
+        ],
+        [
+          448,
+          85
+        ]
+      ],
+      "lowerBoundaryApprox": [
+        [
+          270,
+          136
+        ],
+        [
+          444,
+          142
+        ]
+      ],
+      "occlusion": "4anodechèovàolớpgray,phảivẽanodeởtrước;2bênbịthànhgraphiteche"
+    },
+    "aluminium": {
+      "fill": "trắng",
+      "upperBoundaryApprox": [
+        [
+          267,
+          136
+        ],
+        [
+          444,
+          142
+        ]
+      ],
+      "lowerBoundaryApprox": [
+        [
+          267,
+          151
+        ],
+        [
+          441,
+          155
+        ]
+      ],
+      "thicknessApprox": 15,
+      "occlusion": "nằmgiữaelectrolytegrayvàđáylótgraphiteđen,khôngtôđồngmàubathgray"
+    },
+    "pipe": {
+      "count": 1,
+      "kind": "mộtốngrỗng2viền,horizontaltráilàmiệng,đổihướngxuốngchéophải",
+      "upperOutlineApprox": [
+        [
+          226,
+          61
+        ],
+        [
+          261,
+          61
+        ],
+        [
+          277,
+          138
+        ]
+      ],
+      "lowerOutlineApprox": [
+        [
+          226,
+          66
+        ],
+        [
+          257,
+          66
+        ],
+        [
+          272,
+          137
+        ]
+      ],
+      "fill": "trắng",
+      "outletApprox": [
+        276,
+        138
+      ],
+      "occlusion": "ốngnằmtrướclớpgraykhipassvàobể,đầudướigầnlớpnhômtrắng;khôngarrow,khôngtựgánchấtdòngchảy."
+    },
+    "leadersApprox": {
+      "graphiteTop": [
+        [
+          296,
+          25
+        ],
+        [
+          296,
+          69
+        ]
+      ],
+      "graphiteLeft": [
+        [
+          214,
+          120
+        ],
+        [
+          241,
+          120
+        ]
+      ],
+      "electrolyteRight": [
+        [
+          434,
+          100
+        ],
+        [
+          499,
+          103
+        ]
+      ],
+      "aluminiumRight": [
+        [
+          425,
+          146
+        ],
+        [
+          499,
+          149
+        ]
+      ],
+      "steelLeft": [
+        [
+          215,
+          183
+        ],
+        [
+          239,
+          183
+        ]
+      ]
+    }
+  },
+  "counts": {
+    "anodes": 4,
+    "bentHollowPipes": 1,
+    "polaritySymbols": 2,
+    "grayTextureParticleCount": null
+  },
+  "notPresent": [
+    "arrowheads/dòngchảy",
+    "electron/hạt/ionđếmđược",
+    "Al2O3/Na3AlF6formulaởhình",
+    "nhiệtđộ950°Cởhình",
+    "tênanode/cathodechữtronghình",
+    "bubblecircles"
+  ],
+  "uncertainty": "Tọađộđọcmanualtừnative/zoom,saisố1–2px;grayprinttexturekhôngphảidữliệuhạt,khôngđếmhaychuẩnhoáthànhion/bubbles.",
+  "nguoiDocNguon": "soat_nguon_2",
+  "trangThai": "Đãđọcnguồn,chưađạtSVG",
+  "svgSpacingFix": "Bản dựng hiện tại đã dời đầu hai leader trái để có khoảng hở với glyphDDH; không thay đối tượng được chỉ. Nguồn geometry bên trên giữ literalpixel gốc."
+}

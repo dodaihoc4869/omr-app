@@ -1,0 +1,40 @@
+[
+  {
+    "i": 217,
+    "hash": "25b4bf0cdf73e8d22fb8d532fc3296f61acaf77ddc397c0d36748e1030e18ee5",
+    "fileNguon": "anh/25b4bf0cdf73e8d22fb8d532fc3296f61acaf77ddc397c0d36748e1030e18ee5.png",
+    "svg": "hall-heroult-ddh-5f9dc9422699ed4fb8e53479b3616049d427346997e71e57674fca5f4f74f888.svg",
+    "hashSvg": "5f9dc9422699ed4fb8e53479b3616049d427346997e71e57674fca5f4f74f888",
+    "byteSvg": 54451,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-BD7-14-II-3",
+        "de": "Trong công nghiệp, nhôm được điều chế bằng cách điện phân nóng chảy hỗn hợp alumina (Al₂O₃) và cryolite (Na₃AlF₆) còn gọi là quy trình Hall-Héroult: 2Al₂O₃(l) tạo 4Al(l) + 3O₂(g) như hình dưới đây.\nNhiệt độ nóng chảy của hỗn hợp alumina và cryolite khoảng 950 độ C, thấp hơn nhiều so với nhiệt độ nóng chảy của alumina (trên 2000 độ C); ngoài ra, cryolite còn làm tăng độ dẫn điện của hỗn hợp nóng chảy.\nTrong quá trình điện phân, cực dương làm bằng graphite bị ăn mòn và liên tục bị nhúng xuống bể điện phân. Sau một thời gian, các thanh graphite này sẽ được thay mới.",
+        "refs": [
+          {
+            "hash": "25b4bf0cdf73e8d22fb8d532fc3296f61acaf77ddc397c0d36748e1030e18ee5",
+            "where": "12-BD7-14-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "4d621c04e22ce433fea1b6794730ac88095045c753c4e8326e33a7c78bd994c1"
+          }
+        ]
+      },
+      {
+        "qid": "12-C5-B16-II-6",
+        "de": "Trong công nghiệp, nhôm được điều chế bằng cách điện phân nóng chảy hỗn hợp alumina (Al₂O₃) và cryolite (Na₃AlF₆) còn gọi là quy trình Hall-Héroult: 2Al₂O₃(l) tạo 4Al(l) + 3O₂(g) như hình dưới đây.\nNhiệt độ nóng chảy của hỗn hợp alumina và cryolite khoảng 950 độ C, thấp hơn nhiều so với nhiệt độ nóng chảy của alumina (trên 2000 độ C); ngoài ra, cryolite còn làm tăng độ dẫn điện của hỗn hợp nóng chảy.\nTrong quá trình điện phân, cực dương làm bằng graphite bị ăn mòn và liên tục bị nhúng xuống bể điện phân. Sau một thời gian, các thanh graphite này sẽ được thay mới.",
+        "refs": [
+          {
+            "hash": "25b4bf0cdf73e8d22fb8d532fc3296f61acaf77ddc397c0d36748e1030e18ee5",
+            "where": "12-C5-B16-II-6.hinh.0.du_lieu",
+            "hashDataUrl": "4d621c04e22ce433fea1b6794730ac88095045c753c4e8326e33a7c78bd994c1"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "4anodes/plusleft-minusright/steelshell-graphitelining-graymelt-whitelowerlayer/2wallpipe/alllabels-criolite-captionliteral/DDHpath;grayprinttexturekhôngparticlecount.",
+    "hashSvgDaSoat": "5f9dc9422699ed4fb8e53479b3616049d427346997e71e57674fca5f4f74f888",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]
