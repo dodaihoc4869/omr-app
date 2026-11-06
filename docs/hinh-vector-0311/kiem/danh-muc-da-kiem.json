@@ -6076,6 +6076,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "588ebd641abba8772dcc2dade968bb242325e070d2caec0dd33bac6cdfe02ca6": {
+      "tep": "butyl-polymer-ddh-68cfee04e782f0d2918875a5e705563b20bb822d98814d218111e930d731ed52.svg",
+      "hashSvg": "68cfee04e782f0d2918875a5e705563b20bb822d98814d218111e930d731ed52",
+      "byteSvg": 23326,
+      "byteGzip": 2328,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "b93c0cabc6f6f1a6010f25ce35464cc4f11faa7a2015a8b8b107b1c1487ef0f1": {
       "tep": "ir-hai-panel-ddh-cfc62b796bcd8fe340465ca2c55e803a6eadc268a73dc66358f814146d050615.svg",
       "hashSvg": "cfc62b796bcd8fe340465ca2c55e803a6eadc268a73dc66358f814146d050615",
@@ -8635,6 +8644,20 @@
           "where": "11-C6-B23-II-2.hinh.0.du_lieu",
           "hashDataUrl": "47d7f6c702e02e5e03eb1e93bc900e50227bd164a3c3e941e6f7478a7e0b2c37",
           "vector": "hoa-ddh-6f845005c6af4551ca2efd837ff060557a784c229d1e333c7b933da3e235c40a.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-BD7-10-I-7",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "588ebd641abba8772dcc2dade968bb242325e070d2caec0dd33bac6cdfe02ca6",
+          "where": "12-BD7-10-I-7.hinh.0.du_lieu",
+          "hashDataUrl": "991ec25a032fc425c8fb25aa62d83589f6f6156f7622d103a23f7b0420d38b71",
+          "vector": "butyl-polymer-ddh-68cfee04e782f0d2918875a5e705563b20bb822d98814d218111e930d731ed52.svg"
         }
       ]
     },
@@ -11885,6 +11908,20 @@
           "where": "12-C5-B16-I-24.hinh.0.du_lieu",
           "hashDataUrl": "bbb6d92640b3a466fbc01c107fdd21fe9e5ab2baa6584e7c7835f0b2f122fe39",
           "vector": "hoa-ddh-d10f6e532938a44e8fde49e362275075ef26e2e2c851016063c6a5662c49dabb.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-C4-B13-I-5",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "588ebd641abba8772dcc2dade968bb242325e070d2caec0dd33bac6cdfe02ca6",
+          "where": "12-C4-B13-I-5.hinh.0.du_lieu",
+          "hashDataUrl": "991ec25a032fc425c8fb25aa62d83589f6f6156f7622d103a23f7b0420d38b71",
+          "vector": "butyl-polymer-ddh-68cfee04e782f0d2918875a5e705563b20bb822d98814d218111e930d731ed52.svg"
         }
       ]
     },
@@ -26320,6 +26357,7 @@
     "11-C5-ON-I-2",
     "11-C6-B23-I-9",
     "11-C6-B23-II-2",
+    "12-BD7-10-I-7",
     "12-BD7-07-I-6",
     "12-BD7-07-I-7",
     "12-BD7-14-II-3",
@@ -26529,6 +26567,7 @@
     "12-C4-B12-II-4",
     "12-C5-B16-II-6",
     "12-C5-B16-I-24",
+    "12-C4-B13-I-5",
     "12-C4-B13-I-15",
     "12-C4-B13-I-68",
     "12-C4-B13-I-74",

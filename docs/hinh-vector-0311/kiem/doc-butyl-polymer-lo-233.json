@@ -1,0 +1,204 @@
+{
+  "i": 481,
+  "hash": "588ebd641abba8772dcc2dade968bb242325e070d2caec0dd33bac6cdfe02ca6",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/588ebd641abba8772dcc2dade968bb242325e070d2caec0dd33bac6cdfe02ca6.png",
+  "nativeSize": [
+    1073,
+    241
+  ],
+  "reviewed": [
+    "nativefull",
+    "full2x",
+    "two waveROIs5x",
+    "repeatROI5x"
+  ],
+  "questions": [
+    {
+      "qid": "12-BD7-10-I-7",
+      "maDe": "12-BD7-10",
+      "de": "Cao su butyl có khả năng chống thấm tốt, chống chịu hoá chất nên được sử dụng làm lớp lót trong săm lốp, găng tay cao su.\nCao su butyl thường được sản xuất bằng cách trùng hợp 98% monomer X với 2% monomer Y. Dưới đây là một đoạn mạch của cao su butyl.\nX và Y lần lượt là các chất nào sau đây?",
+      "hinh": [
+        {
+          "hash": "588ebd641abba8772dcc2dade968bb242325e070d2caec0dd33bac6cdfe02ca6",
+          "where": "12-BD7-10-I-7.hinh.0.du_lieu",
+          "hashDataUrl": "991ec25a032fc425c8fb25aa62d83589f6f6156f7622d103a23f7b0420d38b71"
+        }
+      ]
+    },
+    {
+      "qid": "12-C4-B13-I-5",
+      "maDe": "12-C4-B13",
+      "de": "Cao su butyl có khả năng chống thấm tốt, chống chịu hoá chất nên được sử dụng làm lớp lót trong săm lốp, găng tay cao su.\nCao su butyl thường được sản xuất bằng cách trùng hợp 98% monomer X với 2% monomer Y. Dưới đây là một đoạn mạch của cao su butyl.\nX và Y lần lượt là các chất nào sau đây?",
+      "hinh": [
+        {
+          "hash": "588ebd641abba8772dcc2dade968bb242325e070d2caec0dd33bac6cdfe02ca6",
+          "where": "12-C4-B13-I-5.hinh.0.du_lieu",
+          "hashDataUrl": "991ec25a032fc425c8fb25aa62d83589f6f6156f7622d103a23f7b0420d38b71"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "backboneLabelsLeftToRight": [
+      {
+        "text": "CH₂",
+        "Canchor": [
+          145,
+          123
+        ]
+      },
+      {
+        "text": "C",
+        "Canchor": [
+          232,
+          123
+        ],
+        "top": "CH₃",
+        "bottom": "CH₃"
+      },
+      {
+        "text": "CH₂",
+        "Canchor": [
+          318,
+          123
+        ]
+      },
+      {
+        "text": "C",
+        "Canchor": [
+          431,
+          123
+        ],
+        "top": "CH₃",
+        "bottom": "CH₃"
+      },
+      {
+        "text": "CH₂",
+        "Canchor": [
+          541,
+          123
+        ]
+      },
+      {
+        "text": "C",
+        "Canchor": [
+          631,
+          123
+        ],
+        "bottom": "CH₃"
+      },
+      {
+        "text": "CH",
+        "Canchor": [
+          688,
+          123
+        ]
+      },
+      {
+        "text": "CH₂",
+        "Canchor": [
+          759,
+          123
+        ]
+      },
+      {
+        "text": "CH₂",
+        "Canchor": [
+          843,
+          123
+        ]
+      },
+      {
+        "text": "C",
+        "Canchor": [
+          927,
+          123
+        ],
+        "top": "CH₃",
+        "bottom": "CH₃"
+      }
+    ],
+    "links": "Single horizontal bonds y123 between neighboring labels except double between C631 and CH688. No extra single backboneH labels.",
+    "doubleBond": {
+      "fromX": 648,
+      "toX": 673,
+      "yLines": [
+        119,
+        127
+      ],
+      "between": "C(CH3) and CH"
+    },
+    "branches": {
+      "C232": "up bond y106→70 to CH3 around[248,53],down y139→166 toCH3[248,185]",
+      "C431": "up y106→70 toCH3[447,53],down y140→166 toCH3[447,185]",
+      "C631": "down y139→165 toCH3[648,185]",
+      "C927": "up y106→73 toCH3[944,57],down y140→167 toCH3[944,185]"
+    },
+    "parentheses": {
+      "left": "( nearx273,y64..185 crosses outgoing bond C232-CH2318 atx273,y123",
+      "right": ") nearx501,y65..186 crosses bond C431-CH2541 atx501,y123",
+      "inside": "ONLY CH₂–C(CH₃)₂ repeat; do not enclose C232 or CH2541",
+      "subscript": "n nearx503,y177 outside lower-right"
+    },
+    "waves": {
+      "left": {
+        "approxStart": [
+          35,
+          124
+        ],
+        "approxEnd": [
+          128,
+          123
+        ],
+        "crests": 4,
+        "troughs": 4,
+        "trend": "start midpoint descending to trough then rising; fourth crest descends back to near midpoint at end",
+        "connectivity": "free outer left end; right end stops with gap before first CH2 label"
+      },
+      "right": {
+        "approxStart": [
+          944,
+          125
+        ],
+        "approxEnd": [
+          1036,
+          125
+        ],
+        "crests": 4,
+        "troughs": 4,
+        "trend": "start midpoint descending to trough then rising; fourth crest descends toward midpoint at end",
+        "connectivity": "start with small gap after terminal C927 glyph; outer right end free"
+      },
+      "topology": "single continuous wave per end, no closed loops/no arrowheads"
+    },
+    "counts": {
+      "CH2labels": 5,
+      "CHlabels": 1,
+      "Clabels": 4,
+      "CH3labels": 7,
+      "printedCarbonTokens": 17,
+      "CCdouble": 1,
+      "parenthesesPair": 1,
+      "n": 1,
+      "waveLines": 2,
+      "captions": 0
+    },
+    "sourceLiteral": "Only skeletal condensed chain labels/subscripts/parentheses/n/waves, no caption or formula name."
+  },
+  "cautions": [
+    "Repeat written literally even if theory would suggest alternate parenthesis position.",
+    "Do not infer monomers X/Y or add percent labels from stem.",
+    "No explicit standaloneH beyond condensed CH/CH2/CH3."
+  ],
+  "status": "Đạt exact SVG sau actual review",
+  "actualReview": {
+    "i": 481,
+    "hashSvg": "68cfee04e782f0d2918875a5e705563b20bb822d98814d218111e930d731ed52",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Tự fresh Chromium exact SVG2x, mở actualfull và đối chiếu nativefull/2x/wave5x/repeat5x cùng hai public refs. Đủ17Ctokens=5CH2+1CH+4C+7CH3, đúng mộtC=C/vị trí nhánh/condensedHsubs. Ngoặc chỉ bao CH2–C(CH3)2, n dưới phải, không sửa repeat theo lý thuyết. Hai wave mỗi đầu4crests4troughs/startdown/endmid, không kín/khônghead. DDHpaths rõ, gaps không chạm/cắt/tràn, không thêm caption/giảiXY.",
+    "actualSvgReviewed": true,
+    "byteSvg": 23326,
+    "render": "/workspace/scratch/butyl481-233-68cfee04-chromium.png",
+    "sourceHash": "588ebd641abba8772dcc2dade968bb242325e070d2caec0dd33bac6cdfe02ca6"
+  }
+}

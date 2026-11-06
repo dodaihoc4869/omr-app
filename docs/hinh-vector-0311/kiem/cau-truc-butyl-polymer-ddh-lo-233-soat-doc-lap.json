@@ -1,0 +1,14 @@
+[
+  {
+    "i": 481,
+    "hashSvg": "68cfee04e782f0d2918875a5e705563b20bb822d98814d218111e930d731ed52",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Tự fresh Chromium exact SVG2x, mở actualfull và đối chiếu nativefull/2x/wave5x/repeat5x cùng hai public refs. Đủ17Ctokens=5CH2+1CH+4C+7CH3, đúng mộtC=C/vị trí nhánh/condensedHsubs. Ngoặc chỉ bao CH2–C(CH3)2, n dưới phải, không sửa repeat theo lý thuyết. Hai wave mỗi đầu4crests4troughs/startdown/endmid, không kín/khônghead. DDHpaths rõ, gaps không chạm/cắt/tràn, không thêm caption/giảiXY.",
+    "actualSvgReviewed": true,
+    "byteSvg": 23326,
+    "render": "/workspace/scratch/butyl481-233-68cfee04-chromium.png",
+    "sourceHash": "588ebd641abba8772dcc2dade968bb242325e070d2caec0dd33bac6cdfe02ca6",
+    "hash": "588ebd641abba8772dcc2dade968bb242325e070d2caec0dd33bac6cdfe02ca6",
+    "hashSvgDaSoat": "68cfee04e782f0d2918875a5e705563b20bb822d98814d218111e930d731ed52"
+  }
+]
