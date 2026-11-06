@@ -103,7 +103,8 @@ function dungKichBan(kb: KichBan): { cau: CauSrs[]; tt: Map<string, TrangThaiCau
   for (let i = 0; i < (kb.catTia ?? 0); i++) them('x', i, r() < 0.5 ? 'cd' : 'no_cu', (q) => [0, 1, 2, 3].map((k) => lan(q, cong(HOM_NAY, -6 + k), false)), han)
   // Trộn thứ tự đầu vào (tất định) — kế hoạch không được phụ thuộc thứ tự cau ngoài luật băm.
   for (let i = cau.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [cau[i], cau[j]] = [cau[j]!, cau[i]!] }
-  const tc: TuyChonKeHoach = { homNay: HOM_NAY, hanNop: han }
+  // 06/11: lõi rút câu mới theo ma trận đề 2026 — bảng chốt này giữ hành vi CŨ qua cờ tắt ma trận; bản ma trận so riêng ở cuối tệp (cùng số câu, chỉ đổi câu mới nào).
+  const tc: TuyChonKeHoach = { homNay: HOM_NAY, hanNop: han, giuThuTuMoiCu: true }
   if (kb.tranNgay != null) tc.tranNgay = kb.tranNgay
   if (kb.tranHuyet != null) tc.tranHuyetChien = kb.tranHuyet
   if (kb.raiDeu != null) tc.raiDeu = kb.raiDeu
@@ -231,6 +232,22 @@ describe('OMNI 3 · trường mới mang giá trị TRUNG TÍNH ⇒ kế hoạch
       expect(onBaiCu).toEqual([])
       expect(JSON.stringify(conLai)).toBe(KY_VONG[kb.ten])
       if (tc.hanNop && tc.hanNop >= '2026-10-05') expect(JSON.stringify(lapKeHoachNgay(cau, tt, { ...tc, cheDoCho: { theLuc: 24 } }, daLam))).toBe(KY_VONG[kb.ten])
+    })
+  }
+})
+
+describe('06/11 · rút câu mới theo MA TRẬN đề 2026 (mặc định máy chủ) — cùng 30 kịch bản: SỐ không đổi, chỉ đổi câu mới nào', () => {
+  for (const kb of KICH_BAN) {
+    it(kb.ten, () => {
+      const { cau, tt, tc, daLam } = dungKichBan(kb)
+      const cu = lapKeHoachNgay(cau, tt, tc, daLam)
+      const { giuThuTuMoiCu: _bo, ...tcMoi } = tc
+      const moi = lapKeHoachNgay(cau, tt, tcMoi, daLam)
+      const laMoi = (id: string) => tt.get(id)?.laMoi === true && (cau.find((c) => c.qid === id)?.nguon ?? 'chien_dich') === 'chien_dich'
+      // Mọi trường số / cờ y hệt; câu ôn / nợ / Đoàn y hệt (tập); câu mới: cùng số câu, đều là câu mới chiến dịch.
+      expect({ ...moi, dao: moi.dao.length, doan: moi.doan }).toEqual({ ...cu, dao: cu.dao.length, doan: cu.doan })
+      expect(new Set(moi.dao.filter((id) => !laMoi(id)))).toEqual(new Set(cu.dao.filter((id) => !laMoi(id))))
+      expect(moi.dao.filter(laMoi).length).toBe(cu.dao.filter(laMoi).length)
     })
   }
 })
