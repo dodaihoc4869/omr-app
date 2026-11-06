@@ -492,7 +492,7 @@ function TheEm({ e, vua, noi, mucLam, onMoEm }: { e: EmBuoi; vua: boolean; noi: 
         <span className="ddv-the-bac">{k === 'moi' ? 'Mới vào lớp' : TEN_NHOM[k]}</span>
         {e.nhip && (
           <span className="ddv-the-nhip" aria-hidden="true">
-            <DaiNgay e={e} />
+            <DaiNgay e={e} n={14} />
             <span className="ddv-the-so-lieu">
               {s && k !== 'moi' && (
                 <span>
@@ -658,8 +658,8 @@ function NhipChuaCo({ nhip, onThuLai }: { nhip: TrangThaiNhip; onThuLai?: () => 
 }
 
 // ------------------------------------------------------------------ B · NHỊP HỌC CỦA LỚP (nền sáng + Cách làm bài + cột Treo máy)
-function DaiNgay({ e }: { e: EmBuoi }) {
-  const o = (e.nhip?.o ?? []).filter((x) => !x.homNay)
+function DaiNgay({ e, n }: { e: EmBuoi; n?: number }) {
+  const o = (e.nhip?.o ?? []).filter((x) => !x.homNay).slice(n ? -n : 0)
   return (
     <span className="ddv-ngay" aria-hidden="true">
       {o.map((x) => (

@@ -42,6 +42,21 @@ export const tenNgan = (hoTen: string, sbd: string) => {
   return t.length ? (t.length >= 3 ? t.slice(-2).join(' ') : t.join(' ')) : `SBD ${sbd}`
 }
 const TOI_DA_HIEN = 150
+/** Buổi thầy đang xem gần nhất — chỉ dùng trong cùng ngày (giờ VN). */
+const KHOA_BUOI_NHO = 'ddh.gv.buoi-xem'
+const ngayVn = () => new Date(Date.now() + 7 * 3_600_000).toISOString().slice(0, 10)
+const laTest = typeof process !== 'undefined' && !!process.env?.VITEST
+function docBuoiNho(): string {
+  if (laTest) return ''
+  try {
+    const v = JSON.parse(localStorage.getItem(KHOA_BUOI_NHO) || 'null') as { id?: unknown; n?: unknown } | null
+    return v && v.n === ngayVn() && typeof v.id === 'string' ? v.id : ''
+  } catch { return '' }
+}
+function ghiBuoiNho(id: string): void {
+  if (laTest) return
+  try { localStorage.setItem(KHOA_BUOI_NHO, JSON.stringify({ id, n: ngayVn() })) } catch { /* máy chặn lưu */ }
+}
 
 export interface TuyChonDiemDanhBuoi {
   /** Chọn sẵn lớp khi màn này phục vụ một luồng đã biết lớp (vd buổi chữa chiến dịch). */
@@ -81,18 +96,20 @@ export function useDiemDanhBuoi(tuyChon: TuyChonDiemDanhBuoi = {}) {
     setLopChon(lopMacDinh)
     void layLopThay().then((r) => con && r.ok && setDsLop(r.du.lop))
     void (async () => {
-      const r = await buoiDangMo()
+      // THOÁT RA VÀO LẠI (thầy 06/11 «Thoát ra ko lưu điểm danh»):
+      // Ưu tiên buổi đang mở trên máy chủ; nếu không có buổi đang mở thì khôi phục lại buổi đã xem hôm nay (kể cả vừa kết thúc).
+      let r = await buoiDangMo()
+      if (!r.ok && r.loai !== 'chua_co_lenh') r = await buoiDangMo()
       if (!con) return
-      if (!r.ok) {
-        setLoiBuoi(r.loai === 'chua_co_lenh' ? r.chu : '')
-        setDangTaiBuoi(false)
-        return
-      }
-      setBuoiMoMayChu(chiNoiBuoiCungLop ? r.du.filter((x) => x.lop === lopMacDinh) : r.du)
-      const b = chiNoiBuoiCungLop ? r.du.find((x) => x.lop === lopMacDinh) : r.du[0]
-      if (b) {
-        const x = await xemBuoiHoc(b.id, true)
-        if (con && x.ok) setTt(x.du)
+      if (r.ok) setBuoiMoMayChu(chiNoiBuoiCungLop ? r.du.filter((x) => x.lop === lopMacDinh) : r.du)
+      else setLoiBuoi(r.loai === 'chua_co_lenh' ? r.chu : '')
+      const ds = r.ok ? r.du : []
+      const bMo = chiNoiBuoiCungLop ? ds.find((x) => x.lop === lopMacDinh) : ds[0]
+      const nho = docBuoiNho()
+      const idXem = bMo?.id || nho
+      if (idXem) {
+        const x = await xemBuoiHoc(idXem, true)
+        if (con && x.ok && (!chiNoiBuoiCungLop || x.du.buoi.lop === lopMacDinh)) setTt(x.du)
       }
       if (con) setDangTaiBuoi(false)
     })()
@@ -100,6 +117,10 @@ export function useDiemDanhBuoi(tuyChon: TuyChonDiemDanhBuoi = {}) {
       con = false
     }
   }, [chiNoiBuoiCungLop, lopMacDinh])
+  // Nhớ buổi đang xem (theo ngày) ⇒ thoát ra / tải lại vẫn về đúng danh sách điểm danh này.
+  useEffect(() => {
+    if (idBuoi) ghiBuoiNho(idBuoi)
+  }, [idBuoi])
 
   const capNhat = useCallback(
     (x: TrangThaiBuoi) =>

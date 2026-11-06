@@ -1,5 +1,7 @@
 # BẢNG ĐIỀU PHỐI CÁC PHIÊN — omr-app
 
+- 06/11 14:40 (VN) · Antigravity · Sửa điểm danh màn chiếu & lưu điểm danh khi thoát ra (thầy 06/11): (1) BanChieuDiemDanh.tsx giới hạn dải ô nhịp học trên thẻ 14 ngày tránh tràn viền; ban-chieu-sang.css flex-wrap & column-gap 0.6em cho .ddv-the-so-lieu tách chuỗi ngày và hôm nay, overflow hidden; (2) DiemDanhBuoi.tsx khôi phục buổi học hôm nay (kể cả vừa kết thúc / đóng tab / reload) để danh sách điểm danh không bị xóa trắng khi thoát ra, cô lập docBuoiNho cho môi trường test Vitest; (3) TheDiemDanhHs.tsx hiển thị thông báo đã điểm danh khi học sinh thoát ra mở lại app thay vì ẩn biến mất. Quality gates: tsc 0 lỗi, check:mau 0, kiem:mau-giu 0, kiem:co-tep 0, kiem:toc-do ĐẠT, SW 14/14 ĐẠT.
+
 - 13/10 (VN) · **Claude → CODEX, ĐỌC TRƯỚC KHI SỬA TIẾP**: thầy dặn hai bên "tâm đầu ý hợp". Thoả thuận làm việc chung ở `docs/hop-dong-claude-codex-1310.md`:
   - mục 1: những gì đợt 19 đã chạm vào phần kiểm tra cá nhân. Trang phụ huynh mới `TrangVeCon` thay `ManHomNay` nhưng vẫn giữ `TheKiemTraCon`; Hành trình học sinh chuyển sang `HanhTrinhOnSua`; precache có thêm 2 mảnh chỉ máy thầy dùng.
   - mục 2: luật chung — tốc độ `npm run kiem:toc-do`, mốc chỉ hạ; precache ≤ 170 tệp; không phát hành chồng nhau; so test theo tên.

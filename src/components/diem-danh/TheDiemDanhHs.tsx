@@ -11,7 +11,25 @@ export { ngayGon, useDiemDanhHs, type TrangThaiDiemDanh } from './diem-danh-hs'
 export default function TheDiemDanhHs({ token }: { token: string }) {
   const { tt, setTt, mo, setMo, ma, setMa, loi, setLoi, dangGui, gui, oNhap } = useDiemDanhHs(token)
 
-  if (tt.loai === 'an') return null
+  if (tt.loai === 'an') {
+    if (tt.daXong) {
+      return (
+        <div className="dd-hs dd-hs--xong" role="status" data-khoi="diem-danh-hs">
+          <span className="dd-hs-dau" aria-hidden="true">
+            ✓
+          </span>
+          <span className="dd-hs-chu">
+            <b>Em đã điểm danh</b>
+            <span>{tt.daXong.ten}</span>
+          </span>
+          <button type="button" className="dd-hs-an" onClick={() => setTt({ loai: 'an' })} aria-label="Ẩn thông báo điểm danh">
+            Ẩn
+          </button>
+        </div>
+      )
+    }
+    return null
+  }
 
   if (tt.loai === 'xong')
     return (
