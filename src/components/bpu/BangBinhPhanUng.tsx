@@ -66,7 +66,9 @@ export interface PropsBang {
 }
 
 export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, onDong, onTat }: PropsBang) {
-  const [v, setV] = useState<ViewBang | null>(null)
+  // Điểm danh (không có câu): mã + QR hiện NGAY từ props, không chờ phòng; phòng lỗi ⇒ lùi bản chiếu cũ (onTat).
+  const [v, setV] = useState<ViewBang | null>(() => (qid ? null : { t: 'bang', buoiId, lop: '', soLuot: 0, ketThuc: false, doiThuong: [0, 0, 0, 0], doiDu: null, vuaVao: [], lichSu: [], ds: [], luot: null }))
+  const laDiemDanh = useRef(!qid)
   const [loi, setLoi] = useState<{ chu: string; chan?: boolean } | null>(null)
   const [manPhu, setManPhu] = useState<'dua' | 'vinh-danh' | null>(null)
   const [an, setAn] = useState(false)
@@ -89,10 +91,12 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, onD
 
   // Mở phòng (vé thầy) + nối WebSocket; rớt ⇒ nối lại.
   useEffect(() => {
-    let dung = false, hen: ReturnType<typeof setTimeout> | undefined, ping: ReturnType<typeof setInterval> | undefined, lan = 0
+    let dung = false, hen: ReturnType<typeof setTimeout> | undefined, ping: ReturnType<typeof setInterval> | undefined, lan = 0, daCoTin = false
     async function noi() {
       const r = await goiLenh('/gv/bpu/mo', { buoiId }, 'Máy chủ chưa có Bình Phản Ứng.')
       if (dung) return
+      // Mở từ bước Điểm danh mà phòng không mở được (mất mạng, lớp có ca mở, máy chủ tắt) ⇒ LÙI bản chiếu điểm danh cũ: mã điểm danh luôn chiếu được.
+      if ((!r.ok || r.du.ok === false) && laDiemDanh.current) { onTat?.(); return }
       if (!r.ok) { setLoi({ chu: r.chu }); hen = setTimeout(() => void noi(), 8000); return }
       if (r.du.ok === false) { if (r.du.lyDo === 'tat') { onTat?.(); return } setLoi({ chu: String(r.du.error ?? 'Chưa mở được Bình Phản Ứng.'), chan: r.du.lyDo === 'ca-mo' }); return }
       setLoi(null)
@@ -100,8 +104,8 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, onD
       const w = new WebSocket(`${goc0.replace(/^http/, 'ws')}/bpu/phong?ve=${encodeURIComponent(String(r.du.ve))}`)
       ws.current = w
       w.onopen = () => { lan = 0; w.send('{"t":"chao"}'); clearInterval(ping); ping = setInterval(() => { try { w.send('{"t":"ping"}') } catch { /* rớt */ } }, 45_000) }
-      w.onmessage = (e) => { if (typeof e.data !== 'string') return; try { const m = JSON.parse(e.data) as { t?: string }; if (m.t === 'bang') setV(m as unknown as ViewBang) } catch { /* bỏ qua */ } }
-      w.onclose = () => { if (ws.current !== w) return; ws.current = null; clearInterval(ping); if (!dung) hen = setTimeout(() => void noi(), [1500, 3000, 6000, 12000][Math.min(lan++, 3)]) }
+      w.onmessage = (e) => { if (typeof e.data !== 'string') return; try { const m = JSON.parse(e.data) as { t?: string }; if (m.t === 'bang') { daCoTin = true; setV(m as unknown as ViewBang) } } catch { /* bỏ qua */ } }
+      w.onclose = () => { if (ws.current !== w) return; ws.current = null; clearInterval(ping); if (dung) return; if (laDiemDanh.current && !daCoTin && lan >= 2) { onTat?.(); return } hen = setTimeout(() => void noi(), [1500, 3000, 6000, 12000][Math.min(lan++, 3)]) }
       w.onerror = () => { try { w.close() } catch { /* đã đóng */ } }
     }
     void noi()
@@ -233,6 +237,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, onD
       if (kk === 'm' && (man === 'tra-loi' || man === 'goi' || man === 'lam-bang')) { gui({ t: 'mo' }); return }
       if ((kk === 'k' || e.key === 'ArrowRight') && man === 'mo') { setManPhu('dua'); return }
       if (kk === 'v') { setManPhu((c) => (c === 'vinh-danh' ? null : 'vinh-danh')); return }
+      if (kk === 'x') { gui({ t: 'ket-thuc' }); setManPhu('vinh-danh'); return }
       if (kk === 'h') setAn((a) => !a)
     }
     window.addEventListener('keydown', phim, true)
@@ -284,7 +289,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, onD
         {DOI_BPU.map((d, i) => { const so = ds.filter((e) => e.doi === i && e.vao).length, tong = ds.filter((e) => e.doi === i).length; return <div key={d.ten} className={`bb-dd-doi${so === tong && tong ? ' du' : ''}`} style={{ left: X_LUA_DD[i], ['--doi' as string]: mauDoi(i) }}><b>{d.ten.replace('Đội ', '')}</b><span>{so}/{tong}</span><small>{v.doiThuong[i]} kJ</small></div> })}
         <div className="bb-dd-dem"><b>{coMat.length}</b>/{ds.length} em có mặt</div>
         <div className="bb-bth" style={{ gridTemplateColumns: `repeat(${cot}, minmax(0, 1fr))` }}>{o}</div>
-        {phim([['P', 'trên tờ chiếu: cả lớp làm câu đang chiếu', true], ['V', 'Vinh danh'], ['H', 'Ẩn tên'], ['Esc', 'Đóng bảng']])}
+        {phim([['P', 'trên tờ chiếu: cả lớp làm câu đang chiếu', true], ['V', 'Vinh danh'], ['X', 'Kết thúc buổi chơi'], ['H', 'Ẩn tên'], ['Esc', 'Đóng bảng']])}
       </>
     )
   } else if (man === 'dua') {
@@ -296,7 +301,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, onD
         {DOI_BPU.map((d, i) => <div key={d.ten} className="bb-dua-nhan" style={{ left: X_LUA_DUA[i], ['--doi' as string]: mauDoi(i) }}><b>{d.ten}</b><span>{diemDoi(v, i)} kJ</span><small>hạng {thu.findIndex((x) => x.d === i) + 1}</small></div>)}
         <div className="bb-top"><h3>Nhiều kJ nhất</h3>{xep.slice(0, 6).map((e, i) => <div key={e.sbd} className="bb-top-hang" style={{ ['--doi' as string]: mauDoi(e.doi) }}><span className="h">{i + 1}</span><span className="t">{ten(e)}</span><span className="d">{e.kj}</span></div>)}</div>
         <div className="bb-bth" style={{ gridTemplateColumns: `repeat(${cot}, minmax(0, 1fr))` }}>{o}</div>
-        {phim([['P', 'trên tờ chiếu: lượt tiếp', true], ['V', 'Vinh danh'], ['H', 'Ẩn tên'], ['Esc', 'Về tờ chiếu']])}
+        {phim([['P', 'trên tờ chiếu: lượt tiếp', true], ['V', 'Vinh danh'], ['X', 'Kết thúc buổi chơi'], ['H', 'Ẩn tên'], ['Esc', 'Về tờ chiếu']])}
       </>
     )
   } else if (man === 'vinh-danh') {
@@ -313,7 +318,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, onD
           <div className="bb-vd-buc">{top.map((e, i) => e ? <div key={e.sbd} className="bb-vd-cot" style={{ ['--m' as string]: ['var(--tr-tin)', 'var(--tr-sao)', 'var(--tr-chu-y)'][i] }}><div className="ngoc" style={{ width: [150, 196, 128][i] }}><Ngoc mau="var(--m)" /><Sao x={8} y={18} d={i * 0.4} /><Sao x={80} y={6} d={0.7 + i * 0.4} /><Sao x={92} y={62} d={1.3 + i * 0.4} /></div><div className="ten">{ten(e)}</div><div className="phu">{e.kj} kJ · đúng {e.dungSo}/{v.lichSu.filter((x) => !x.tuLuan).length} lượt</div><div className="bac" style={{ height: [190, 250, 140][i] }}><span>{[2, 1, 3][i]}</span></div></div> : <div key={i} className="bb-vd-cot" />)}</div>
           <div className="bb-vd-ben phai"><h3>Cả lớp hôm nay</h3><div className="bb-vd-so"><b>{tyLe}%</b><span>câu trả lời đúng</span></div>{kho ? <div className="bb-vd-so"><b>Lượt {kho.so}</b><span>khó nhất · {kho.soDung}/{kho.soGui} em đúng</span></div> : null}<div className="bb-vd-so"><b>{v.soLuot}</b><span>lượt đã chơi</span></div></div>
         </div>
-        {phim([['V', 'Đóng vinh danh', true], ['Esc', 'Về tờ chiếu']])}
+        {phim([['V', 'Đóng vinh danh', true], ['X', 'Kết thúc buổi chơi'], ['Esc', 'Về tờ chiếu']])}
       </>
     )
   } else if (l && q) {
@@ -359,7 +364,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, onD
         ) : null}
         {toast ? <div className="bb-toast" role="status">{toast}</div> : null}
         {loi && v ? <div className="bb-toast loi" role="alert">{loi.chu}</div> : null}
-        {phim(man === 'mo' ? [['K', 'Đua ngọn lửa', true], ['P', 'trên tờ chiếu: lượt tiếp'], ['V', 'Vinh danh'], ['H', 'Ẩn tên'], ['Esc', 'Về tờ chiếu']]
+        {phim(man === 'mo' ? [['K', 'Đua ngọn lửa', true], ['P', 'trên tờ chiếu: lượt tiếp'], ['V', 'Vinh danh'], ['X', 'Kết thúc buổi chơi'], ['Esc', 'Về tờ chiếu']]
           : man === 'goi' ? [['Enter', 'Chiếu đề cho em làm', true], ['N', 'Chọn em khác'], ['Space', 'Mở đáp án'], ['Esc', 'Về tờ chiếu']]
           : man === 'lam-bang' ? [['D', `Đạt · đội +${KJ.lenBangDat}`, true], ['F', 'Chưa đạt'], ['N', 'Chọn em khác'], ['Space', 'Mở đáp án'], ['Esc', 'Về tờ chiếu']]
           : [['Space', 'Gọi lên bảng', true], ['M', l.tuLuan ? 'Hiện lời giải' : 'Mở đáp án ngay'], ['H', 'Ẩn tên'], ['Esc', 'Về tờ chiếu']])}

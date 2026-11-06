@@ -4,7 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { goiLenBang, lamBang, moDapAn, moLuot, nhanTra, taoPhong, viewBang, viewEm, ketThuc } from '../src/lib/bpu/phong'
 
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu' }))
-vi.mock('../src/lib/goi-lenh-thay', () => ({ goiLenh: async () => ({ ok: true, du: { ok: true, ve: 've-thay' } }) }))
+const traMo = vi.hoisted(() => ({ v: { ok: true, du: { ok: true, ve: 've-thay' } } as Record<string, unknown> }))
+vi.mock('../src/lib/goi-lenh-thay', () => ({ goiLenh: async () => traMo.v }))
 vi.mock('../src/lib/ung-vien-chieu', () => ({ layEmChieu: async () => new Map() }))
 
 class WsGia { static ds: WsGia[] = []; readyState = 1; gui: string[] = []; onopen?: () => void; onmessage?: (e: { data: string }) => void; onclose?: () => void; onerror?: () => void
@@ -29,6 +30,8 @@ describe('máy em', () => {
     const st = phong()
     ws.nhan(viewEm(st, 'S1'))
     expect(await screen.findByText(/Em đã vào lớp lúc/)).toBeTruthy()
+    // Lúc chờ (chưa có lượt) em rời được — không bị kẹt khi thầy quên kết thúc / có ca kiểm tra.
+    expect(screen.getByRole('button', { name: 'Rời Bình Phản Ứng' })).toBeTruthy()
     moLuot(st, cau, T0); ws.nhan(viewEm(st, 'S1'))
     expect(await screen.findByRole('button', { name: 'Gửi đáp án' })).toBeTruthy()
     expect(screen.queryByRole('button', { name: /Thoát|Đóng/ })).toBeNull()
@@ -73,8 +76,18 @@ describe('bảng chiếu', () => {
     expect(await screen.findByText('Đang làm trên bảng')).toBeTruthy()
     moDapAn(st, T0 + 3000, chamSo); ws.nhan(viewBang(st))
     expect(await screen.findByText('Đáp án')).toBeTruthy()
-    act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'v' })) })
+    act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'x' })) })
+    expect(ws.gui.some((t) => t.includes('ket-thuc'))).toBe(true)
     expect(await screen.findByText('Vô địch buổi hôm nay')).toBeTruthy()
     expect(document.body.textContent).not.toMatch(/tinh thể|Cần kèm/)
+  })
+  it('bước điểm danh: mã + QR hiện ngay; phòng không mở được (lớp có ca mở) ⇒ lùi bản chiếu cũ', async () => {
+    const { default: Bang } = await import('../src/components/bpu/BangBinhPhanUng')
+    traMo.v = { ok: true, du: { ok: false, lyDo: 'ca-mo', error: 'Lớp đang có ca kiểm tra mở.' } }
+    const onTat = vi.fn()
+    render(<Bang buoiId="b1" ma="482715" linkQr="https://app/hs?diem-danh=482715" onDong={() => {}} onTat={onTat} />)
+    expect(screen.getByText('Vào lớp: mở app, nhập mã')).toBeTruthy()
+    await waitFor(() => expect(onTat).toHaveBeenCalled())
+    traMo.v = { ok: true, du: { ok: true, ve: 've-thay' } }
   })
 })

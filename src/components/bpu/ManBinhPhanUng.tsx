@@ -110,8 +110,11 @@ export default function ManBinhPhanUng({ token, buoiId, onDong }: { token: strin
   const coHan = !!v?.luot?.han && v.luot.pha === 'tra-loi'
   useEffect(() => { if (!coHan) return; const h = setInterval(() => setNay(Date.now()), 500); return () => clearInterval(h) }, [coHan])
 
-  // RỜI MÀN: ẩn app ≥ 2 giây ⇒ báo phòng một lần; quay lại ⇒ màn cảnh báo. Không có nút thoát; nút Back của trình duyệt bị giữ lại trong buổi.
+  // RỜI MÀN: CHỈ khi đang có lượt chưa mở đáp án (đang làm / bạn lên bảng). Ẩn app ≥ 2 giây ⇒ báo phòng một lần; quay lại ⇒ màn cảnh báo; nút Back bị giữ.
+  // Lúc chờ giữa các lượt em rời được (nút «Rời Bình Phản Ứng», không phạt) ⇒ thầy quên kết thúc hay mở ca kiểm tra thì em không bị kẹt.
+  const dangChoi = !!v?.luot && v.luot.pha !== 'mo' && !v.ketThuc
   useEffect(() => {
+    if (!dangChoi) return
     let hen: ReturnType<typeof setTimeout> | undefined
     const doi = () => {
       if (document.hidden) { hen = setTimeout(() => { gui({ t: 'roi' }); setVuaRoi(true) }, ROI_MAN_MS) }
@@ -121,10 +124,10 @@ export default function ManBinhPhanUng({ token, buoiId, onDong }: { token: strin
     document.addEventListener('visibilitychange', doi)
     window.addEventListener('pagehide', anTrang)
     try { window.history.pushState({ bpu: 1 }, '') } catch { /* trình duyệt cũ */ }
-    const giuLai = () => { if (!v?.ketThuc) { try { window.history.pushState({ bpu: 1 }, '') } catch { /* bỏ qua */ } } }
+    const giuLai = () => { try { window.history.pushState({ bpu: 1 }, '') } catch { /* bỏ qua */ } }
     window.addEventListener('popstate', giuLai)
     return () => { clearTimeout(hen); document.removeEventListener('visibilitychange', doi); window.removeEventListener('pagehide', anTrang); window.removeEventListener('popstate', giuLai) }
-  }, [gui, v?.ketThuc])
+  }, [gui, dangChoi])
 
   // Toàn màn hình ở lần chạm đầu (trình duyệt chỉ cho khi có thao tác của em; không hỗ trợ ⇒ bỏ qua).
   const xinToanMan = () => { try { const d = document.documentElement as HTMLElement & { requestFullscreen?: () => Promise<void> }; if (!document.fullscreenElement && d.requestFullscreen) void d.requestFullscreen().catch(() => {}) } catch { /* bỏ qua */ } }
@@ -169,8 +172,9 @@ export default function ManBinhPhanUng({ token, buoiId, onDong }: { token: strin
     than = (
       <div className="bpu-hs-giua"><NguyenTu ky={kyHieu(e.ten)} doi={doi} to /><h3>{e.luc ? `Em đã vào lớp lúc ${gioPhut(e.luc)}` : 'Em đã vào lớp'}</h3>
         <div className="bpu-doi-the" style={{ ['--doi' as string]: `var(${DOI_BPU[doi]?.mau})` }}><b>{tenDoi} · {v.doi.so}/{v.doi.tong} bạn đã vào</b><div className="vach"><i style={{ width: `${(v.doi.so / Math.max(1, v.doi.tong)) * 100}%` }} /></div><span>Đội đang có {v.doi.kj} kJ.</span></div>
-        <p>Thầy chiếu câu nào, câu đó tự hiện ở đây. Em giữ màn này; rời màn là thầy thấy trên bảng.</p></div>
+        <p>Thầy chiếu câu nào, câu đó tự hiện ở đây. Đang làm câu mà rời màn là thầy thấy trên bảng.</p></div>
     )
+    day = <button type="button" className="bpu-nut phu" onClick={onDong}>Rời Bình Phản Ứng</button>
   } else if ((l.pha === 'goi' || l.pha === 'lam-bang') && l.goi) {
     const g = l.goi, cung = g.doi === doi
     if (g.sbd === e.sbd) {
@@ -211,11 +215,12 @@ export default function ManBinhPhanUng({ token, buoiId, onDong }: { token: strin
       </>
     )
     if (daMo) {
+      const roiNho = <button type="button" className="bpu-roi-nho" onClick={onDong}>Rời Bình Phản Ứng</button>
       const k = l.ketQua
       const chuDung = l.tuLuan ? '' : l.phan === 'II' ? (l.dung ?? '').split('').map((x, i) => `${'abcd'[i]}) ${x === 'D' ? 'Đúng' : 'Sai'}`).join(' · ') : String(l.dung ?? '')
-      if (l.tuLuan) day = <div className="bpu-ket"><h4>Thầy đang chữa trên bảng</h4><p>Em nhìn lên bảng và đối chiếu bài làm của mình.</p></div>
-      else if (k?.dung) day = <div className="bpu-ket dung" role="status"><h4>{l.phan === 'II' ? 'Đúng cả 4 ý!' : 'Chính xác!'}</h4><p>+{k.kj} kJ{k.nhanh ? ` · nhanh thứ ${k.nhanh} cả lớp` : ''} · hạng {e.hang}/{e.soEm}</p></div>
-      else day = <div className="bpu-ket sai" role="status"><h4>{l.emTra ? 'Chưa đúng' : 'Em chưa gửi kịp'}</h4><p>{l.phan === 'II' && k ? `Em đúng ${k.soY ?? 0}/4 ý · +${k.kj} kJ. ` : ''}Đáp án đúng: {chuDung}</p></div>
+      if (l.tuLuan) day = <div className="bpu-ket"><h4>Thầy đang chữa trên bảng</h4><p>Em nhìn lên bảng và đối chiếu bài làm của mình.</p>{roiNho}</div>
+      else if (k?.dung) day = <div className="bpu-ket dung" role="status"><h4>{l.phan === 'II' ? 'Đúng cả 4 ý!' : 'Chính xác!'}</h4><p>+{k.kj} kJ{k.nhanh ? ` · nhanh thứ ${k.nhanh} cả lớp` : ''} · hạng {e.hang}/{e.soEm}</p>{roiNho}</div>
+      else day = <div className="bpu-ket sai" role="status"><h4>{l.emTra ? 'Chưa đúng' : 'Em chưa gửi kịp'}</h4><p>{l.phan === 'II' && k ? `Em đúng ${k.soY ?? 0}/4 ý · +${k.kj} kJ. ` : ''}Đáp án đúng: {chuDung}</p>{roiNho}</div>
     } else if (daGui) {
       day = <div className="bpu-gui"><NguyenTu ky={kyHieu(e.ten)} doi={doi} /><b>{l.tuLuan ? 'Đã báo thầy em làm xong' : `Đã gửi sau ${Math.round(l.emTra!.t / 1000)} giây`}</b><span>Nhìn lên bảng nhé · {l.daGui}/{l.coMat} bạn đã {l.tuLuan ? 'xong' : 'gửi'}</span></div>
     } else {

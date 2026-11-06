@@ -12,11 +12,12 @@ beforeAll(() => {
 })
 
 function taoPhong() {
-  const kho = new Map<string, unknown>(), dsWs: WsGia[] = []
+  const kho = new Map<string, unknown>(), dsWs: WsGia[] = [], hen: number[] = []
   const ctx = {
-    storage: { get: async (k: string) => kho.get(k), put: async (k: string, v: unknown) => { kho.set(k, JSON.parse(JSON.stringify(v))) }, delete: async (k: string) => kho.delete(k), setAlarm: async () => {}, getAlarm: async () => null, deleteAlarm: async () => {} },
+    storage: { get: async (k: string) => kho.get(k), put: async (k: string, v: unknown) => { kho.set(k, JSON.parse(JSON.stringify(v))) }, delete: async (k: string) => kho.delete(k), setAlarm: async (t: number) => { hen.push(t) }, getAlarm: async () => null, deleteAlarm: async () => {} },
     acceptWebSocket: (ws: WsGia, tags?: string[]) => { ws.tag = tags?.[0] ?? ''; dsWs.push(ws) },
     getWebSockets: (tag?: string) => dsWs.filter((w) => !tag || w.tag === tag),
+    waitUntil: () => {},
   }
   const p = new PhongBinhPhanUng(ctx as never, { MA_BI_MAT: 'x' } as never)
   const noi = async (vai: 'gv' | 'hs', sbd = '') => {
@@ -26,7 +27,7 @@ function taoPhong() {
     return dsWs[truoc]!
   }
   const post = (duong: string, b: unknown) => p.fetch(new Request(`https://bpu${duong}`, { method: 'POST', body: JSON.stringify(b) })).then((r) => r.json() as Promise<Record<string, unknown>>)
-  return { p, noi, post }
+  return { p, noi, post, hen, kho }
 }
 
 describe('phòng Bình Phản Ứng (Durable Object)', () => {
@@ -71,5 +72,17 @@ describe('phòng Bình Phản Ứng (Durable Object)', () => {
     expect(await kiemVeBpu('bi-mat', `${sua}.${ky}`)).toBeNull()
     expect(than).toBeTruthy()
     expect(await kiemVeBpu('bi-mat', await kyVeBpu('bi-mat', { b: 'b1', s: 'S1', v: 'hs', h: Date.now() - 1 }))).toBeNull()
+  })
+  it('việc của em không kéo dài phòng; thầy kết thúc buổi ⇒ phòng kết thúc, máy em nhận «kết thúc»', async () => {
+    const { p, noi, post, hen } = taoPhong()
+    await post('/khoi', { buoiId: 'b3', lop: 'L', ds: [{ sbd: 'S1', ten: 'A B', coMat: true, luc: 1 }] })
+    const em = await noi('hs', 'S1')
+    await post('/luot', { qid: 'q', phan: 'I', tuLuan: false, cau: {}, dung: 'A', hanGiay: 0 })
+    const truoc = hen.length
+    await p.webSocketMessage(em as never, JSON.stringify({ t: 'tra', chon: 'A' }))
+    await p.webSocketMessage(em as never, JSON.stringify({ t: 'roi' }))
+    expect(hen.length).toBe(truoc)
+    await post('/dong', {})
+    expect(JSON.parse(em.tin.at(-1)!).ketThuc).toBe(true)
   })
 })

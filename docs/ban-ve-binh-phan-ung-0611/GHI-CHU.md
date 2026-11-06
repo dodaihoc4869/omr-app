@@ -317,3 +317,14 @@ Cả năm nơi chiếu đề dựng tờ chiếu bằng `taoHtmlMayChieu` (`src/
   - `server/src/index.ts`, `wrangler.toml`, `vite.config.ts`;
   - `kiem-tra-ca-nhan.ts` (tách hàm kiểm câu, làn Codex).
 - **Làn Codex:** `/gv/ung-vien-chieu` (thêm trường) và `kiem-tra-ca-nhan.ts`. Codex soát PR.
+
+## 10. KHI BUILD (07/11) — chỗ khác bản vẽ / đặc tả ở trên (ghi thật, mục trên giữ nguyên làm lịch sử)
+- **Phím P «Cả lớp làm»** (không phải L — L trên tờ chiếu đã là «Lên bảng»).
+- **Điểm là kJ (năng lượng)**, không phải «tinh thể» — «tinh thể» đã là phần thưởng tích luỹ sẵn có của app học sinh.
+- **Màu đội** dùng biến CỐ ĐỊNH sẵn có ở tokens.css (không thêm byte vào tờ màu lúc mở app): Natri vàng cam `--p-cam` · Kali tím `--p-tim-2` · Đồng xanh lục `--p-xanh` · Canxi đỏ `--p-do` (bản vẽ: vàng / hồng / xanh lam / cam).
+- **Bảng chiếu hiện đề dạng chữ + chỉ số dưới** (C6H5NH2 ⇒ C₆H₅NH₂) và ảnh thân câu; không nhập bộ hiện câu của chặng (nhập từ máy thầy làm app học sinh nặng thêm). Máy em dùng đúng bộ hiện câu của chặng (nạp động).
+- **Lý do lên bảng** chỉ từ dữ liệu thật của `/gv/ung-vien-chieu`: đã đúng / đã sai câu này / vừa sức theo lịch sử / mới với em · số ngày chưa lên bảng. Chưa có dòng «đã làm N câu dạng này, đúng M» (cần thêm trường ở lệnh làn Codex).
+- **Chưa làm ở đợt này:** lời giải trên máy em sau khi mở đáp án; nút Bình Phản Ứng trên điện thoại điều khiển máy chiếu; kết quả đưa vào hồ sơ / lịch ôn lại (đã ghi bảng `bpu_luot`, chưa nối hồ sơ).
+- **Đội** chia đều SỐ bạn (cố định theo tháng, theo băm sbd), chưa cân theo sức học; xếp hạng theo TỔNG kJ (con số hiện trên bảng).
+- **Bản chiếu điểm danh**: mặc định là bảng Bình Phản Ứng; phòng không mở được (mất mạng / lớp có ca mở / `TAT_BPU`) ⇒ tự lùi bản chiếu cũ. Đường «→ Nhịp học / Gọi lên bảng đầu giờ» của bản chiếu cũ chỉ còn ở đường lùi.
+- **An toàn em:** lúc chờ giữa các lượt em rời được («Rời Bình Phản Ứng», không phạt); rời màn chỉ tính khi đang có lượt; thầy bấm X kết thúc buổi chơi; kết thúc buổi học ⇒ phòng kết thúc; phòng tự kết thúc sau 45 phút thầy không thao tác.

@@ -145,8 +145,13 @@ export async function hsBpuCuaEm(env: Env, b: Row, nay = Date.now()): Promise<Ro
 export async function baoPhongVaoLop(env: Env, buoiId: unknown, sbd: string): Promise<void> {
   const id = buoiHop(buoiId)
   if (!bpuBat(env) || !id || !sbd) return
-  const r = await goiPhong(env, id, '/vao', { sbd }).catch(() => null)
-  if (r?.ok) await baoMayCacEm(env, [sbd], 'bpu').catch(() => 0)
+  await goiPhong(env, id, '/vao', { sbd }).catch(() => null)
+}
+/** Kết thúc phòng của buổi (thầy kết thúc buổi học). Phòng chưa từng mở ⇒ không làm gì. */
+export async function dongPhongBpu(env: Env, buoiId: unknown): Promise<void> {
+  const id = buoiHop(buoiId)
+  if (!env.PHONG_BPU || !id) return
+  await goiPhong(env, id, '/dong', {}).catch(() => null)
 }
 
 /** `GET /bpu/phong?ve=…` (nâng cấp WebSocket): kiểm vé ở Worker rồi chuyển vào phòng với vai đã kiểm. */
@@ -176,10 +181,12 @@ export class PhongBinhPhanUng {
     if (this.st === undefined) this.st = (await this.ctx.storage.get<L.TrangThaiPhong>('st')) ?? null
     return this.st
   }
-  private async luu(): Promise<void> {
+  /** Lưu trạng thái; `henNghi` = việc của THẦY (mở phòng, mở lượt, lệnh bảng) ⇒ hẹn lại mốc tự kết thúc 45 phút. Việc của em (gửi, rời màn, tiếp sức) KHÔNG
+   *  kéo dài phòng — thầy quên đóng thì phòng vẫn tự kết thúc, máy em không bị giữ. */
+  private async luu(henNghi = true): Promise<void> {
     if (!this.st) return
     await this.ctx.storage.put('st', this.st)
-    if (!this.st.ketThuc) await this.ctx.storage.setAlarm(Date.now() + NGHI_MS)
+    if (henNghi && !this.st.ketThuc) await this.ctx.storage.setAlarm(Date.now() + NGHI_MS)
   }
   private gui(ws: WsMayChu, d: string): void { try { ws.send(d) } catch { /* kết nối vừa đóng */ } }
   private phat(): void {
@@ -255,7 +262,12 @@ export class PhongBinhPhanUng {
     }
     const st = await this.doc()
     if (!st || st.ketThuc) return json({ ok: false, lyDo: 'chua-mo', error: 'Phòng chưa mở. Thầy bấm mở Bình Phản Ứng trước.' })
-    if (u.pathname === '/vao') { const co = L.vaoLop(st, str(b.sbd), nay); if (co) { await this.luu(); this.phat() } return json({ ok: co }) }
+    if (u.pathname === '/vao') {
+      const co = L.vaoLop(st, str(b.sbd), nay)
+      // Em vừa điểm danh ⇒ kênh đẩy mở màn chờ trên máy em (phòng gửi — không phải ngăn của em gọi lại chính nó).
+      if (co) { await this.luu(false); this.phat(); this.ctx.waitUntil(baoMayCacEm(this.env, [str(b.sbd)], 'bpu').catch(() => 0)) }
+      return json({ ok: co })
+    }
     if (u.pathname === '/luot') {
       const l = L.moLuot(st, { qid: str(b.qid), phan: (b.phan === 'II' || b.phan === 'III' ? b.phan : 'I'), tuLuan: b.tuLuan === true, cau: (b.cau ?? {}) as Row, dung: str(b.dung), hanGiay: Number(b.hanGiay) || null }, nay)
       await this.luu(); this.phat()
@@ -294,7 +306,7 @@ export class PhongBinhPhanUng {
       else if (j.t === 'ket-thuc') { await this.ketThucBuoi(); return }
     }
     if (!doi) return
-    await this.luu()
+    await this.luu(a.v === 'gv')
     if (gom) this.phatSau(); else this.phat()
   }
 

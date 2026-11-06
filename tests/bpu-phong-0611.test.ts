@@ -100,6 +100,13 @@ describe('gọi lên bảng, đoán, tiếp sức, rời màn', () => {
     expect(st.ds.find((e) => e.sbd === 'S1')!.kj).toBe(KJ.doanDung)
     expect(st.ds.find((e) => e.sbd === 'S2')!.kj).toBe(0)
   })
+  it('rời màn KHÔNG tính khi chưa có lượt hoặc lượt đã mở đáp án (lúc chờ em được rời)', () => {
+    const st = phong()
+    expect(roiMan(st, 'S1', T0)).toBe(false)
+    moLuot(st, cauTN, T0); moDapAn(st, T0 + 1000, chamSo)
+    expect(roiMan(st, 'S1', T0)).toBe(false)
+    expect(st.ds[0]!.roi).toBe(0)
+  })
   it('rời màn −20 cho đội, đếm lần, ghi vào lượt', () => {
     const st = phong(); moLuot(st, cauTN, T0)
     const d = st.ds[0]!.doi, truoc = st.doiThuong[d]!

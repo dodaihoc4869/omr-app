@@ -173,10 +173,11 @@ export function nhanTra(st: TrangThaiPhong, sbd: string, chon: string, nay: numb
   return { ok: true }
 }
 
-/** Em rời màn (ẩn app ≥ 2 s — máy em tự đo): −20 kJ cho đội, đếm lần. */
+/** Em rời màn (ẩn app ≥ 2 s — máy em tự đo): −20 kJ cho đội, đếm lần. CHỈ tính khi đang có lượt chưa mở đáp án (đang trả lời / lên bảng);
+ *  lúc chờ giữa các lượt em được rời (không phạt, không báo). */
 export function roiMan(st: TrangThaiPhong, sbd: string, nay: number): boolean {
   const e = em(st, sbd)
-  if (!e || st.ketThuc) return false
+  if (!e || st.ketThuc || !st.luot || st.luot.pha === 'mo') return false
   e.roi += 1
   st.doiThuong[e.doi] = (st.doiThuong[e.doi] ?? 0) + KJ.roiMan
   if (st.luot && !st.luot.roiMe.includes(sbd)) st.luot.roiMe.push(sbd)

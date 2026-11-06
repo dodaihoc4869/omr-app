@@ -4,9 +4,9 @@ import type { Env, ExecutionContext } from './kieu'
 import { vaoPhongDau } from './dau-ion-ve'
 import { DAU_TRONG_NGAN, vaoKenh } from './ngan-hoc-sinh'
 import { DUONG_KENH } from './kenh-day'
-import { hsDiemDanh } from './buoi-hoc'
+import { gvBuoiHoc, hsDiemDanh } from './buoi-hoc'
 import { gameIdentity } from './game-v2-auth'
-import { DUONG_PHONG_BPU, baoPhongVaoLop, gvBpuLuot, gvBpuMo, hsBpuCuaEm, hsBpuVe, vaoPhongBpu } from './phong-binh-phan-ung'
+import { DUONG_PHONG_BPU, baoPhongVaoLop, dongPhongBpu, gvBpuLuot, gvBpuMo, hsBpuCuaEm, hsBpuVe, vaoPhongBpu } from './phong-binh-phan-ung'
 
 type Row = Record<string, unknown>
 
@@ -22,10 +22,20 @@ export function wsThang(req: Request, env: Env, ctx?: ExecutionContext): Promise
   return null
 }
 
-/** `/hs/diem-danh` + báo phòng Bình Phản Ứng của buổi (nếu đang mở) để bảng hiện em vào lớp NGAY; lỗi báo phòng không ảnh hưởng điểm danh. */
-export async function hsDiemDanhBao(env: Env, b: Row): Promise<Row> {
+/** `/hs/diem-danh` + báo phòng Bình Phản Ứng của buổi (nếu đang mở) để bảng hiện em vào lớp NGAY. Việc báo phòng chạy NỀN (`waitUntil`):
+ *  câu trả lời điểm danh KHÔNG BAO GIỜ chờ phòng; lỗi báo phòng không ảnh hưởng điểm danh. */
+export async function hsDiemDanhBao(env: Env, b: Row, ctx?: ExecutionContext): Promise<Row> {
   const r = await hsDiemDanh(env, b)
-  if (r.ok && r.buoi) await gameIdentity(env, b).then((sbd) => baoPhongVaoLop(env, (r.buoi as { id?: unknown }).id, sbd)).catch(() => undefined)
+  if (r.ok && r.buoi) {
+    const viec = gameIdentity(env, b).then((sbd) => baoPhongVaoLop(env, (r.buoi as { id?: unknown }).id, sbd)).catch(() => undefined)
+    if (ctx) ctx.waitUntil(viec); else void viec
+  }
+  return r
+}
+/** `/gv/buoi-hoc`: thầy KẾT THÚC buổi ⇒ phòng Bình Phản Ứng của buổi cũng kết thúc (máy em về chỗ cũ, ghi kết quả). */
+export async function gvBuoiHocBpu(env: Env, b: Row): Promise<Row> {
+  const r = await gvBuoiHoc(env, b)
+  if (String(b.action ?? '') === 'dong' && r.ok !== false) await dongPhongBpu(env, b.id).catch(() => undefined)
   return r
 }
 /** `/hs/bpu/*` (token em). */

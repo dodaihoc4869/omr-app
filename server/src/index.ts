@@ -98,7 +98,7 @@ import type { D1PreparedStatement, D1Result, DongCa, DongLuot, Env, ExecutionCon
 import { gvChienDich } from './srs2-gv'
 import { gvHoSoLenBang } from './ho-so-em-chieu'
 import { gvLichSuLamCau } from './lich-su-lam-cau'
-import { gvBuoiHoc, gvSucHocBuoi, hsBuoiHocDangMo } from './buoi-hoc'
+import { gvSucHocBuoi, hsBuoiHocDangMo } from './buoi-hoc'
 import { gvDauGio } from './dau-gio'
 import { thayChuaCau } from './thay-chua-cau'
 import { aiSaiCau } from './ai-sai-cau'
@@ -121,7 +121,7 @@ import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
 import { docGoiDeDem, docKeyBankDem, ghiKeyBank, doanCongBoNgay, layDemHetGioLuot, nhoCongBo, nhoHetGioLuot } from './dem-ca-thi'
 import { chiaGoiDe, dongGoiDe, dungGoiDe } from './khoa-de-thi'
 import { dongPhongDau, veDauChoEm } from './dau-ion-ve'
-import { bpuGv, bpuHs, hsDiemDanhBao, wsThang } from './ws-thang'
+import { bpuGv, bpuHs, gvBuoiHocBpu, hsDiemDanhBao, wsThang } from './ws-thang'
 import { chiaDeTruoc, deTruoc, goiDapAnEm, goiDeCuaCa, maAnCa } from './de-truoc'
 
 // CORS — app chạy ở `dodaihoc4869.github.io`, Worker ở `workers.dev`, nên MỌI
@@ -3954,7 +3954,7 @@ const boXuLy = {
 
       // ĐIỂM DANH BUỔI HỌC (bảng DẠY HỌC của mục Lên bảng, 28/09 — server/src/buoi-hoc.ts): em chỉ điểm danh CHO MÌNH (SBD từ token), mã đổi mỗi 60 giây.
       if (p === '/hs/buoi-hoc') return ra(await hsBuoiHocDangMo(env, b))
-      if (p === '/hs/diem-danh') return ra(await hsDiemDanhBao(env, b))
+      if (p === '/hs/diem-danh') return ra(await hsDiemDanhBao(env, b, ctx))
       if (p.startsWith('/hs/bpu/')) return ra(await bpuHs(env, p, b))
       // Vé kênh đẩy hai thiết bị (kenh-day.ts): kiểm chữ ký token, 0 lệnh D1.
       if (p === DUONG_VE_KENH) return ra(await kenhVe(env, b))
@@ -4098,7 +4098,7 @@ const boXuLy = {
       // mức/đã làm từng ngày từ 01/10 (cùng phép tính Bài hằng ngày), cờ đối phó tính theo lô. MỘT lần gọi cho cả màn.
       if (p === '/gv/nhip-hoc') return ra(await import('./nhip-hoc').then((m) => m.gvNhipHocCoDem(envDoc, b)))
       // BUỔI HỌC — bảng DẠY HỌC của Lên bảng (buoi-hoc.ts): mở/xem/thêm-bớt em/kết thúc điểm danh (GHI, bảng chỉ-thêm) + sức học em có mặt (ĐỌC-CHỈ).
-      if (p === '/gv/buoi-hoc') return ra(await gvBuoiHoc(env, b))
+      if (p === '/gv/buoi-hoc') return ra(await gvBuoiHocBpu(env, b))
       // KIỂM TRA ĐẦU GIỜ (thẻ thứ ba của Lên bảng, 29/09 — dau-gio.ts): ứng viên / chốt lượt / chấm Đạt–Chưa đạt (sổ nguon='dau_gio') / Thầy đã chữa / kết thúc. Có ghi ⇒ `env`.
       if (p === '/gv/dau-gio') return ra(await gvDauGio(env, b))
       // THẦY CHỮA một câu từ tờ chiếu (thầy 05/10, server/src/thay-chua-cau.ts): Gọi lên bảng / Dạy học — nhãn "Thầy đã chữa" + mốc dạy lại.
